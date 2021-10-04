@@ -37,17 +37,18 @@ C
       ELSE
       IDATE=IDATA(3)
       ENDIF
+      !open checkpoint files for i/o
       WRITE(CHARY,'(I4)')IDATE
       OUTX='P'//DATA(1)(1:2)//CHARY(1:4)
       OUTC='C'//DATA(1)(1:2)//CHARY(1:4)
       OUTM='M'//DATA(1)(1:2)//CHARY(1:4)
       OUTR='R'//DATA(1)(1:2)//CHARY(1:4)
       OUTQ='Q'//DATA(1)(1:2)//CHARY(1:4)
-      OPEN(26,FILE=OUTX,STATUS='UNKNOWN')
-      OPEN(27,FILE=OUTC,STATUS='UNKNOWN')
-      OPEN(28,FILE=OUTM,STATUS='UNKNOWN')
-      OPEN(29,FILE=OUTR,STATUS='UNKNOWN')
-      OPEN(30,FILE=OUTQ,STATUS='UNKNOWN')
+      OPEN(26,FILE=trim(outdir)//OUTX,STATUS='UNKNOWN')
+      OPEN(27,FILE=trim(outdir)//OUTC,STATUS='UNKNOWN')
+      OPEN(28,FILE=trim(outdir)//OUTM,STATUS='UNKNOWN')
+      OPEN(29,FILE=trim(outdir)//OUTR,STATUS='UNKNOWN')
+      OPEN(30,FILE=trim(outdir)//OUTQ,STATUS='UNKNOWN')
       ENDIF
 C
 C     READ PLANT MANAGEMENT FILE NAMES FOR EACH GRID CELL

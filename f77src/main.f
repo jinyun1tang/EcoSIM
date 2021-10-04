@@ -14,29 +14,46 @@ C
       CHARACTER*3 CHOICE(102,20)
       CHARACTER*8 CDATE
       CHARACTER*80 BUF,PREFIX
+
+      character*36 case_name
+      logical is_dos
+
+      is_dos=.false.
+C     obtain working directory  
       CALL GETCWD(BUF)
+      print*,trim(buf)
 C
 C     IDENTIFY OPERATING SYSTEM: DOS OR UNIX
 C
       IF((.NOT.(BUF(1:1).EQ.'/'.OR.BUF(1:1).EQ.'~'))
      2.AND.BUF(2:2).EQ.':')THEN
+      print*,'dos system'
+      is_dos=.true.
       CALL GETARG(1,BUF)
       OPEN(5,FILE=BUF,STATUS='OLD')
       CALL GETARG(2,BUF)
       CALL CHDIR(BUF)
-      PREFIX='.\\'
+      PREFIX='.\\'  ! location where input files are put
 C     make output directory
-      outdir=trim(buf)//'\\outputs\\'
       ELSE
-      PREFIX='./'
+      print*,'unix system'        
+      PREFIX='./'   ! location where input files are put
 C     make output directory
-      outdir=trim(buf)//'/outputs/'
       ENDIF
-      call system('mkdir -p '//trim(outdir))
 C
 C     READ INPUT FILES
 C
 10    FORMAT(A16)
+      read(5,*)case_name
+      print*,'case name:',trim(case_name)
+      if(is_dos)then
+      outdir=trim(buf)//'\\'//trim(case_name)//'_outputs\\'
+      else
+      outdir=trim(buf)//'/'//trim(case_name)//'_outputs/'
+      endif        
+      call system('mkdir -p '//trim(outdir))
+      read(5,'(A)')prefix
+      print*,'input files at:',trim(prefix)
       IGO=0
 C
 C     NUMBER OF COLUMNS AND ROWS
