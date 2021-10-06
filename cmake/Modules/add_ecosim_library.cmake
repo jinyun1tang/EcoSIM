@@ -1,7 +1,7 @@
-function(add_betr_library lib)
+function(add_ecosim_library lib)
   add_library(${lib} ${ARGN})
   if (BUILD_SHARED_LIBS)
-    target_link_libraries(${lib} ${BETR_LIBRARIES})
+	  target_link_libraries(${lib} ${ECOSIM_LIBRARIES})
   endif()
-endfunction(add_betr_library)
+endfunction(add_ecosim_library)
 

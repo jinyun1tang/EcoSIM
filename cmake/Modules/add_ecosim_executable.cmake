@@ -1,5 +1,5 @@
-function(add_betr_executable exe)
+function(add_ecosim_executable exe)
   add_executable(${exe} ${ARGN})
-  target_link_libraries(${exe} ${BETR_LIBRARIES})
-endfunction(add_betr_executable)
+  target_link_libraries(${exe} ${ECOSIM_LIBRARIES})
+endfunction(add_ecosim_executable)
 

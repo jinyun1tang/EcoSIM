@@ -1,5 +1,5 @@
-# This function adds a pfunit test executable for BeTR.
-function(add_betr_pfunit_test exe)
+# This function adds a pfunit test executable for EcoSIM.
+function(add_ecosim_pfunit_test exe)
 
   # separate the input args into test sources and include dirs
   foreach (arg ${ARGN})
@@ -26,7 +26,7 @@ function(add_betr_pfunit_test exe)
 
   # create the executable
   add_executable(${exe} ${sources} driver.F90)
-  target_link_libraries(${exe} pfunit;${BETR_LIBRARIES})
+  target_link_libraries(${exe} pfunit;${ECOSIM_LIBRARIES})
   set_target_properties(${exe} PROPERTIES LINKER_LANGUAGE Fortran)
   set_target_properties(${exe} PROPERTIES COMPILE_FLAGS "-DCMAKE_CURRENT_SOURCE_DIR=\\\"${CMAKE_CURRENT_SOURCE_DIR}\\\"")
 
