@@ -51,7 +51,7 @@ configure_file(blkc.h    blkc.h COPYONLY)
 configure_file(blktest.h  blktest.h COPYONLY)
 configure_file(filec.h  filec.h COPYONLY)
 configure_file(files.h  files.h COPYONLY)
-
+configure_file(parameters.h parameters.h COPYONLY)
 set(ECOSYS_SOURCES 
 	BLOCKDATA001.f
 	day.f
