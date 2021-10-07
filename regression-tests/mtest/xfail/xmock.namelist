@@ -1,0 +1,6 @@
+&regression_test
+  write_regression_output = .true.
+  cells = 5
+/
+
+xx

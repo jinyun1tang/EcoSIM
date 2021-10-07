@@ -1,0 +1,9 @@
+[run]
+branch = True
+
+[report]
+skip_covered = True
+
+[html]
+directory = coverage-html
+title = 'EcoSIM regression test driver "meta tests" coverage report.'
