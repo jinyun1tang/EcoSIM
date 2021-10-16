@@ -1,0 +1,9 @@
+&regression_test
+ cells   =           3
+ write_regression_output = .false.
+/
+
+&ecosys
+case_name='sample_run'
+prefix='../../sample_run/'
+/

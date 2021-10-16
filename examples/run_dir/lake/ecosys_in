@@ -1,0 +1,10 @@
+&regression_test
+ cells   =           0
+ write_regression_output = .false.
+/
+
+&ecosys
+case_name='lake'
+prefix='../../lake/'
+
+/

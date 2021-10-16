@@ -1,0 +1,8 @@
+&regression_test
+
+/
+
+&ecosys
+case_name='dryland_maize'
+prefix='../../dryland_maize/'
+/

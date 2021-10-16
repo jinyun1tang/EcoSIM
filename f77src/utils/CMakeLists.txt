@@ -1,0 +1,17 @@
+set(ECOSYS_UTIL_SOURCES
+	endrun.f
+	TestMod.F90
+)
+
+
+include(add_ecosim_library)
+add_ecosim_library(ecosys_util ${ECOSYS_UTIL_SOURCES})
+
+
+set(ECOSIM_LIBRARIES ecosys_util;${ECOSIM_LIBRARIES} PARENT_SCOPE)
+
+if (NOT CMAKE_INSTALL_PREFIX STREQUAL "INSTALL_DISABLED")
+  install(TARGETS ecosys_util DESTINATION lib)
+  file(GLOB HEADERS *.h)
+  install(FILES ${HEADERS} DESTINATION include/ecosys/util)
+endif()

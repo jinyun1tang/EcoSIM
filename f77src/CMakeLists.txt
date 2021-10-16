@@ -1,2 +1,4 @@
+add_subdirectory(utils)
+add_subdirectory(ioutils)
 add_subdirectory(ecosys_src)
 add_subdirectory(driver)

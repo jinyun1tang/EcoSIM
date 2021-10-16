@@ -4,7 +4,10 @@ main.f
 )
 
 include_directories(${ECOSYS_INCLUDE_DIRS})
+include_directories(${CMAKE_BINARY_DIR}/f77src/utils/)
+include_directories(${CMAKE_BINARY_DIR}/f77src/ioutils/)
 include_directories(${CMAKE_BINARY_DIR}/f77src/ecosys_src/)
+
 include(add_ecosim_library)
 add_ecosim_library(ecosys_driver ${ECOSYS_DRIVER_SOURCES})
 

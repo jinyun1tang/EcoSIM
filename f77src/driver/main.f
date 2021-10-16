@@ -3,10 +3,13 @@ C     THIS SUBROUTINE READS THE RUNSCRIPT AND ENTERS FILENAMES INTO DATA ARRAYS
 C     FOR USE IN 'READS' AND 'READQ'. WHEN FINISHED THIS SUBROUTINE CALLS
 C     'SOIL' WHICH IS THE MAIN SUBROUTINE FROM WHICH ALL OTHERS ARE CALLED
 C
+      use TestMod, only : regression
+
       include "parameters.h"
       include "filec.h"
       include "files.h"
       include "blkc.h"
+
       DIMENSION NA(250),ND(250)
       CHARACTER*16 DATA(30),DATAC(30,250,250),DATAP(JP,JY,JX)
      2,DATAM(JP,JY,JX),DATAX(JP),DATAY(JP),DATAZ(JP,JY,JX)
@@ -16,6 +19,7 @@ C
       CHARACTER*80 BUF,PREFIX
 
       character*36 case_name
+      character*36 nmlfile
       logical is_dos
 
       is_dos=.false.
@@ -44,7 +48,7 @@ C
 C     READ INPUT FILES
 C
 10    FORMAT(A16)
-      read(5,*)case_name
+      call regression%Init(case_name,prefix) 
       print*,'case name:',trim(case_name)
       if(is_dos)then
       outdir=trim(buf)//'\\'//trim(case_name)//'_outputs\\'
@@ -52,9 +56,9 @@ C
       outdir=trim(buf)//'/'//trim(case_name)//'_outputs/'
       endif        
       call system('mkdir -p '//trim(outdir))
-      read(5,'(A)')prefix
       print*,'input files at:',trim(prefix)
       IGO=0
+
 C
 C     NUMBER OF COLUMNS AND ROWS
 C
