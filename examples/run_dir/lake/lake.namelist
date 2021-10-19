@@ -5,6 +5,6 @@
 
 &ecosys
 case_name='lake'
-prefix='../../lake/'
-
+prefix='../../inputs/lake/'
+runfile='./runfile.lake'
 /

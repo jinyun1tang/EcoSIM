@@ -4,6 +4,7 @@
 /
 
 &ecosys
-case_name='sample_run'
-prefix='../../sample_run/'
+case_name='sample'
+prefix='../../inputs/sample/'
+runfile='./runfile.sample'
 /

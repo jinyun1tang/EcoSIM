@@ -17,7 +17,7 @@ C
       CHARACTER*3 CHOICE(102,20)
       CHARACTER*8 CDATE
       CHARACTER*80 BUF,PREFIX
-
+      character*80 runfile
       character*36 case_name
       character*36 nmlfile
       logical is_dos
@@ -25,31 +25,32 @@ C
       is_dos=.false.
 C     obtain working directory  
       CALL GETCWD(BUF)
-      print*,trim(buf)
 C
 C     IDENTIFY OPERATING SYSTEM: DOS OR UNIX
 C
+      CALL GETARG(1,nmlfile)
+      call readnml(trim(nmlfile),runfile, case_name, prefix)
+
+      OPEN(5,FILE=runfile,STATUS='OLD')
       IF((.NOT.(BUF(1:1).EQ.'/'.OR.BUF(1:1).EQ.'~'))
      2.AND.BUF(2:2).EQ.':')THEN
       print*,'dos system'
       is_dos=.true.
-      CALL GETARG(1,BUF)
-      OPEN(5,FILE=BUF,STATUS='OLD')
+C      CALL GETARG(1,BUF)
+C      OPEN(5,FILE=BUF,STATUS='OLD')
       CALL GETARG(2,BUF)
       CALL CHDIR(BUF)
       PREFIX='.\\'  ! location where input files are put
 C     make output directory
       ELSE
       print*,'unix system'        
-      PREFIX='./'   ! location where input files are put
 C     make output directory
       ENDIF
 C
 C     READ INPUT FILES
 C
 10    FORMAT(A16)
-      call regression%Init(case_name,prefix) 
-      print*,'case name:',trim(case_name)
+      call regression%Init(trim(nmlfile),case_name) 
       if(is_dos)then
       outdir=trim(buf)//'\\'//trim(case_name)//'_outputs\\'
       else
@@ -127,5 +128,6 @@ C
 C     SCRIPT COMPLETED, START NEXT SCRIPT
 C
       GO TO 100
+      close(5)
 1000  STOP
       END

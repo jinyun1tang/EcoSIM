@@ -53,19 +53,18 @@ implicit none
   public :: create_error_status_type
 contains
 
-    subroutine Init(this, case_name, prefix)
+    subroutine Init(this, namelist_file, case_name)
 
     implicit none
 
     class(ecosys_regression_type)              , intent(inout) :: this
-    character(len=36)    , intent(out)  :: case_name
-    character(len=80)    , intent(out) :: prefix
-    character(len=ecosys_filename_length)     :: namelist_file
+    character(len=*), intent(in)     :: namelist_file
+    character(len=*), intent(in)     :: case_name
 
+    !local variables
     type(error_status_type) :: err_status
     this%output = 16
-    namelist_file='ecosys_in'
-    call this%ReadNamelist(namelist_file, case_name, prefix,err_status)
+    call this%ReadNamelist(trim(namelist_file),err_status)
     if(err_status%check_status())then
       call endrun('stopped in '//mod_filename, __LINE__)      
     endif
@@ -75,13 +74,11 @@ contains
 
 
 
-  subroutine ReadNamelist(this, namelist_file, case_name, prefix, err_status)
+  subroutine ReadNamelist(this, namelist_file, err_status)
     implicit none
 
     class(ecosys_regression_type), intent(inout) :: this
-    character(len=ecosys_filename_length), intent(in) :: namelist_file
-    character(len=36)    , intent(out)  :: case_name
-    character(len=80)    , intent(out) :: prefix
+    character(len=*), intent(in) :: namelist_file
     class(error_status_type)        , intent(out)   :: err_status
 
     character(len=*), parameter :: subname = 'ecosys_regression:ReadNamelist'
@@ -90,15 +87,14 @@ contains
     integer :: cells
     character(len=ecosim_string_length_long) :: ioerror_msg
     logical :: write_regression_output
-    !-----------------------------------------------------------------------
+
     integer :: fu, rc
     namelist / regression_test / cells, write_regression_output
-    namelist / ecosys/case_name, prefix
+
+
     call err_status%reset()
     cells = 0
     write_regression_output = .false.
-    case_name='example'
-    prefix='./'
     ! ----------------------------------------------------------------------
     ! Read namelist from standard input.
     ! ----------------------------------------------------------------------
@@ -108,7 +104,7 @@ contains
        call endrun('stopped in '//mod_filename, __LINE__)
      end if
 
-     open (action='read', file=namelist_file, iostat=rc, newunit=fu)
+     open (action='read', file=trim(namelist_file), iostat=rc, newunit=fu)
      if (rc /= 0) then
         write (*, '(3a)') 'Error openning input file "', trim(namelist_file)
         call endrun('stopped in '//mod_filename, __LINE__)
@@ -117,11 +113,6 @@ contains
     if ( rc==0 )then
        ioerror_msg=''
        read(unit=fu, nml=regression_test, iostat=nml_error, iomsg=ioerror_msg)
-       if (nml_error /= 0) then
-         call err_status%set_msg(msg="ERROR reading ecosys_regression_test namelist "//errmsg(mod_filename, __LINE__),err=-1)
-         call endrun('stopped in '//mod_filename, __LINE__)
-       end if
-       read(unit=fu, nml=ecosys, iostat=nml_error, iomsg=ioerror_msg)
        if (nml_error /= 0) then
          call err_status%set_msg(msg="ERROR reading ecosys_regression_test namelist "//errmsg(mod_filename, __LINE__),err=-1)
          call endrun('stopped in '//mod_filename, __LINE__)
@@ -138,9 +129,6 @@ contains
        write(stdout, *) ' regression_test namelist settings :'
        write(stdout, *)
        write(stdout, regression_test)
-       write(stdout, *)
-       write(stdout, *) '--------------------'
-       write(stdout,ecosys)
        write(stdout, *)
        write(stdout, *) '--------------------'
     endif

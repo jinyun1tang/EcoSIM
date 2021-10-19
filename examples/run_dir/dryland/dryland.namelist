@@ -1,0 +1,10 @@
+&regression_test
+ cells   =           0
+ write_regression_output = .false.
+/
+
+&ecosys
+case_name='dryland_maize'
+prefix='../../inputs/dryland_maize/'
+runfile='runfile.dryland'
+/
