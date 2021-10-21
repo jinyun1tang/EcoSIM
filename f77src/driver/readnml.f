@@ -1,4 +1,5 @@
-      subroutine readnml(nmlfile,runfile, case_name, prefix,do_rgres)
+      subroutine readnml(nmlfile,runfile, case_name,
+     2prefix,do_rgres,LYRG)
 
       !Description
       !read control namelist
@@ -9,16 +10,20 @@
       character(len=36)    , intent(out)  :: case_name
       character(len=80)    , intent(out) :: prefix
       logical              , intent(out) :: do_rgres
+      integer              , intent(out) :: LYRG
       integer, parameter :: stdout = 6
 
       logical :: do_regression_test
-      namelist / ecosys/case_name, prefix, runfile, do_regression_test
+      integer :: num_of_simdays
+      namelist / ecosys/case_name, prefix, runfile, do_regression_test,
+     2num_of_simdays
 
       !local variables
       character(len=256) :: ioerror_msg
       integer :: rc, fu
       integer :: nml_error
 
+      num_of_simdays=-1
       do_regression_test=.false.
       inquire (file=nmlfile, iostat=rc)
       if (rc /= 0) then
@@ -49,4 +54,5 @@
        write(stdout, *) '--------------------'
       endif     
       do_rgres=do_regression_test 
+      LYRG=num_of_simdays
       end subroutine readnml 

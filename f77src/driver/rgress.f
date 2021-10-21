@@ -1,18 +1,36 @@
-      subroutine rgress(nmfile,case_name)
+      subroutine rgress(nmfile,case_name, NX, NY)
 
       use TestMod, only : regression              
       include "parameters.h"
       include "filec.h"
       include "files.h"
       include "blkc.h"
+      include "blk1cp.h"
+      include "blk1cr.h"
+      include "blk1g.h"
+      include "blk1n.h"
+      include "blk1p.h"
       include "blk3.h"
+      include "blk8a.h"
+      include "blk8b.h"
+      include "blk9a.h"
+      include "blk9b.h"
+      include "blk9c.h"
+      include "blk11a.h"
+      include "blk12a.h"
+      include "blk12b.h"
+      include "blk13b.h"
+      include "blk14.h"
 
-      character(len=*) :: nmfile
-      character(len=*) :: case_name
-
+      character(len=*), intent(in) :: nmfile
+      character(len=*), intent(in) :: case_name
+      integer, intent(in) :: NX
+      integer, intent(in) :: NY
       !local variables
       character(len=128) :: category
       character(len=128) :: name
+      integer :: nz, ll
+      dimension datv(12)
 
       call regression%Init(trim(nmfile),case_name)
 
@@ -20,22 +38,35 @@
         write(*,*)'write regression file'
         call regression%OpenOutput()
 
-
+        do NZ=1,NP(NY,NX)
+        IF(IFLGC(NZ,NY,NX).EQ.1)THEN
+                
         category = 'Flux (g m^-3 h^-1)'
         name = 'NH4_UPTK'
-        call regression%writedata(category,name,(/1.,1.,1.,1./))
+        do ll=1,12
+        datv(ll)=(RUPNH4(1,ll,NZ,NY,NX)+RUPNH4(2,ll,NZ,NY,NX)
+     2+RUPNHB(1,ll,NZ,NY,NX)+RUPNHB(2,ll,NZ,NY,NX))/AREA(3,ll,NY,NX)
+        enddo
+        call regression%writedata(category,name, datv)
+        exit
+        endif
+
+        enddo
 
         category = 'concentration (g m^3)'
         name = 'O2'
-        call regression%writedata(category,name,(/1.,1.,1.,1./))
+        datv=COXYS(1:12,NY,NX)
+        call regression%writedata(category,name,datv)
 
         category = 'Soil water (m^3 m^-3)'
         name = 'THETWZ'
-        call regression%writedata(category,name,(/1.,1.,1.,1./))
+        datv=THETWZ(1:12,NY,NX)
+        call regression%writedata(category,name,datv)
 
         category = 'Soil Temperature (oC)'
-        name = 'THETWZ'
-        call regression%writedata(category,name,(/1.,1.,1.,1./))        
+        name = 'TCS'
+        datv=TCS(1:12,NY,NX)
+        call regression%writedata(category,name,datv)        
 
         call regression%CloseOutput()
       endif        

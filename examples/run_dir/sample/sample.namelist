@@ -1,10 +1,10 @@
 &regression_test
  cells   =           3
- write_regression_output = .false.
 /
 
 &ecosys
 case_name='sample'
 prefix='../../inputs/sample/'
 runfile='./runfile.sample'
+do_regression_test=.false.
 /

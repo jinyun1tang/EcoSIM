@@ -12,6 +12,8 @@ C
      3,OUTS(10),OUTP(10),OUTFILS(10,JY,JX),OUTFILP(10,JP,JY,JX)
       CHARACTER*3 CHOICE(102,20)
       CHARACTER*8 CDATE
+      integer LYRG
+      logical do_rgres
       SAVE NF,NX,NTZ,NTZX
       DATA NF,NX,NTZ,NTZX/0,0,0,0/
 C
@@ -93,6 +95,7 @@ C
       IYRR=IYRR+1
       ENDIF
       ENDIF
+      IF(do_rgres .and. I.eq.LYRG)RETURN
       IF(I.GT.IFIN)GO TO 9999
 C     WRITE(*,333)'FINISH'
 C
