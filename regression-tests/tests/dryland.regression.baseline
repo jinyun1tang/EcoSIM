@@ -1,5 +1,5 @@
-[NH4_UPTK]
-category = Flux (g m^-3 h^-1)
+[NH4_UPTK (g m^-3 h^-1)]
+category = flux
 min =   0.0000000000000E+00
 max =   0.9844809398426E-06
 mean =   0.9010745320852E-07
@@ -7,8 +7,8 @@ cell    1 =   0.9844809398426E-06
 cell    5 =   0.0000000000000E+00
 cell    9 =   0.0000000000000E+00
 
-[O2]
-category = concentration (g m^3)
+[aqueous soil O2 (g m^3)]
+category = state
 min =   0.6195948579164E+00
 max =   0.8041363995904E+01
 mean =   0.5778167792864E+01
@@ -16,8 +16,8 @@ cell    1 =   0.8041363995904E+01
 cell    5 =   0.4708833376017E+01
 cell    9 =   0.7204927252019E+01
 
-[THETWZ]
-category = Soil water (m^3 m^-3)
+[liquid soil water (m^3 m^-3)]
+category = state
 min =   0.1066214112103E+00
 max =   0.4105552875715E+00
 mean =   0.3547457602568E+00
@@ -25,8 +25,8 @@ cell    1 =   0.1066214112103E+00
 cell    5 =   0.3847275633984E+00
 cell    9 =   0.3839346901698E+00
 
-[TCS]
-category = Soil Temperature (oC)
+[soil temperature (oC)]
+category = state
 min =   0.1955198512940E+02
 max =   0.3614625824084E+02
 mean =   0.2971210779527E+02

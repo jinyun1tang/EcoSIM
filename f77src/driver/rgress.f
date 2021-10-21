@@ -41,8 +41,8 @@
         do NZ=1,NP(NY,NX)
         IF(IFLGC(NZ,NY,NX).EQ.1)THEN
                 
-        category = 'Flux (g m^-3 h^-1)'
-        name = 'NH4_UPTK'
+        category = 'flux'
+        name = 'NH4_UPTK (g m^-3 h^-1)'
         do ll=1,12
         datv(ll)=(RUPNH4(1,ll,NZ,NY,NX)+RUPNH4(2,ll,NZ,NY,NX)
      2+RUPNHB(1,ll,NZ,NY,NX)+RUPNHB(2,ll,NZ,NY,NX))/AREA(3,ll,NY,NX)
@@ -53,18 +53,18 @@
 
         enddo
 
-        category = 'concentration (g m^3)'
-        name = 'O2'
+        category = 'state'
+        name = 'aqueous soil O2 (g m^3)'
         datv=COXYS(1:12,NY,NX)
         call regression%writedata(category,name,datv)
 
-        category = 'Soil water (m^3 m^-3)'
-        name = 'THETWZ'
+        category = 'state'
+        name = 'liquid soil water (m^3 m^-3)'
         datv=THETWZ(1:12,NY,NX)
         call regression%writedata(category,name,datv)
 
-        category = 'Soil Temperature (oC)'
-        name = 'TCS'
+        category = 'state'
+        name = 'soil temperature (oC)'
         datv=TCS(1:12,NY,NX)
         call regression%writedata(category,name,datv)        
 

@@ -4,7 +4,7 @@
 /
 
 &ecosys
-case_name='dryland_maize'
+case_name='dryland'
 prefix='../../examples/inputs/dryland_maize/'
 runfile='runfile.dryland'
 do_regression_test=.true.
