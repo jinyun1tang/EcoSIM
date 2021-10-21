@@ -1,4 +1,4 @@
-      subroutine readnml(nmlfile,runfile, case_name, prefix)
+      subroutine readnml(nmlfile,runfile, case_name, prefix,do_rgres)
 
       !Description
       !read control namelist
@@ -8,14 +8,18 @@
       character(len=80), intent(out) :: runfile
       character(len=36)    , intent(out)  :: case_name
       character(len=80)    , intent(out) :: prefix
+      logical              , intent(out) :: do_rgres
       integer, parameter :: stdout = 6
-      namelist / ecosys/case_name, prefix, runfile
+
+      logical :: do_regression_test
+      namelist / ecosys/case_name, prefix, runfile, do_regression_test
 
       !local variables
       character(len=256) :: ioerror_msg
       integer :: rc, fu
       integer :: nml_error
 
+      do_regression_test=.false.
       inquire (file=nmlfile, iostat=rc)
       if (rc /= 0) then
         write (stdout, '(3a)') 'Error: input file ', trim(nmlfile), 
@@ -43,5 +47,6 @@
        write(stdout,ecosys)
        write(stdout, *)
        write(stdout, *) '--------------------'
-      endif      
+      endif     
+      do_rgres=do_regression_test 
       end subroutine readnml 

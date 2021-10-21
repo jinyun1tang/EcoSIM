@@ -1,6 +1,7 @@
 set(ECOSYS_DRIVER_SOURCES
 	readnml.f
 	soil.f
+	rgress.f
 	main.f
 )
 
@@ -16,6 +17,6 @@ set(ECOSIM_LIBRARIES ecosys_driver;${ECOSIM_LIBRARIES} PARENT_SCOPE)
 
 link_libraries(${ECOSIM_LIBRARIES};${ECOSIM_TPLS})
 include(add_ecosim_executable)
-add_ecosim_executable(ecosys.x main.f readnml.f soil.f)
+add_ecosim_executable(ecosys.x main.f readnml.f rgress.f soil.f)
 
 install(TARGETS ecosys.x DESTINATION bin)

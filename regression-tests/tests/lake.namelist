@@ -1,0 +1,10 @@
+&regression_test
+ cells   =           3
+ write_regression_output = .true.
+/
+
+&ecosys
+case_name='lake'
+prefix='../../examples/inputs/lake/'
+runfile='./runfile.lake'
+/
