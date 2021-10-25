@@ -44,13 +44,13 @@ ifeq ($(mpi), 1)
   CONFIG_FLAGS += -DHAVE_MPI=1
 else
   ifeq ($(CC), not-set)
-    CC  = cc
+    CC  = $(ENVCC)
   endif
   ifeq ($(CXX), not-set)
-    CXX = c++
+    CXX = $(ENVCXX)
   endif
   ifeq ($(FC), not-set)
-    FC = gfortran
+    FC = $(ENVFC)
   endif
   CONFIG_FLAGS += -DHAVE_MPI=0
 endif
@@ -163,6 +163,7 @@ clean:
 
 config: distclean
 	$(run-config)
+	@export ENVCC=$(CC); export ENVCXX=$(CXX); export ENVFC=$(FC)
 
 distclean:
 	@rm -rf $(BUILDDIR)
