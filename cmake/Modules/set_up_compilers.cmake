@@ -3,6 +3,7 @@ macro(set_up_compilers)
   #
   # General C compiler flags.
   #
+  message("HOSTNAME ${HOSTNAME}")
   message("CMAKE_C_COMPILER_ID ${CMAKE_C_COMPILER_ID}")
   if (CMAKE_C_COMPILER_ID STREQUAL "GNU")
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c99 -Wall -pedantic-errors -Wextra")
@@ -33,7 +34,11 @@ macro(set_up_compilers)
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-unused-function")
 
   elseif (CMAKE_C_COMPILER_ID STREQUAL "Intel")
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c99 -Wall")
+    if (CMAKE_BUILD_TYPEi MATCHES "Debug")
+      set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c99 -Wall -g")
+    else()
+      set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c99 -Wall")
+    endif()
   endif()
 
   set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${SYS_FLAGS}")
@@ -51,8 +56,17 @@ macro(set_up_compilers)
 
   elseif (CMAKE_Fortran_COMPILER_ID STREQUAL "Intel")
     set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -DCPRINTEL")
+    
     if (HOSTNAME MATCHES "cori")
-      set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -mkl -O2 -mp1 -r8 -i4 -align dcommons -auto-scalar -fimf-arch-consistency=true")
+      message("Using set up for cori")
+      set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -O2 -mp1 -r8 -i4 -align dcommons -auto-scalar -fimf-arch-consistency=true")
+    elseif (HOSTNAME MATCHES "[scs]")
+      message("Using set up for lawrencium")
+      if (CMAKE_BUILD_TYPEi MATCHES "Debug") 
+        set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -g -debug -r8 -i4 -align dcommons -auto-scalar -fimf-arch-consistency=true")
+      else()
+      set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -O2 -mp1 -r8 -i4 -align dcommons -auto-scalar -fimf-arch-consistency=true")
+      endif()
     endif()
   endif()
 

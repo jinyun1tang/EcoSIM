@@ -11,6 +11,8 @@ COVERAGE_RUN_FLAGS = $(COVERAGERC) -m unittest discover
 
 test : mtest rtest
 
+update : FORCE
+	$(RTEST) $(RTEST_ARGS) --update-baseline
 rtest : FORCE
 	$(RTEST) $(RTEST_ARGS)
 

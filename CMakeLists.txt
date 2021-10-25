@@ -101,8 +101,8 @@ else()
   set (ECOSIM_BGC 0)
 endif()
 
-if (SECOSIM)
-  set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -DSECOSIM")
+if (ECOSIM)
+  set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -DECOSIM")
 endif()
 # Figure out the system type.
 set(ECOSIM_HAVE_BOOL 1) # All reasonable C99 compilers have this now.

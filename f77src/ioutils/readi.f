@@ -25,6 +25,8 @@ C
       CHARACTER*4 CHARY
       CHARACTER*1 TTYPE,CTYPE,IVAR(20),VAR(50),TYP(50)
       CHARACTER*80 PREFIX
+      logical :: lverb
+      integer :: ll
       DIMENSION IDAT(20),DAT(50),DATK(50)
       PARAMETER (TWILGT=0.06976)
 C
@@ -69,6 +71,54 @@ C
       READ(1,*)(DHI(NX),NX=1,NHE)
       READ(1,*)(DVI(NY),NY=1,NVS)
       CLOSE(1)
+
+      if(lverb)then
+      write(*,*)'read site data file: ',DATA(1)
+      write(*,'(40A)')('-',ll=1,40)
+      write(*,*)'Latitude (o): ALATG',ALATG
+      write(*,*)'Altitude (m): ALTIG',ALTIG
+      write(*,*)'Mean annual temperaure (oC): ATCAG',ATCAG
+      write(*,*)'water table flag, 0=none, 1=natural stationary, '//
+     2'2=natural mobile, 3=artificial stationary, 4=artificial mobile',
+     3IDTBLG
+      write(*,'(40A)')('-',ll=1,40)
+      write(*,*)'atmospheric O2 (ppm): OXYEG',OXYEG
+      write(*,*)'atmospheric N2 (ppm): Z2GEG',Z2GEG
+      write(*,*)'atmospheric CO2 (ppm): CO2EIG',CO2EIG
+      write(*,*)'atmospheric CH4 (ppm): CH4EG',CH4EG
+      write(*,*)'atmospheric N2O (ppm): Z2OEG',Z2OEG
+      write(*,*)'atmospheric NH3 (ppm): ZNH3EG',ZNH3EG
+      write(*,'(40A)')('-',ll=1,40)
+      write(*,*)'Koppen climate zone: IETYPG',IETYPG
+      write(*,*)'flag for salt model: ISALTG',ISALTG
+      write(*,*)'flag for erosion model: IERSNG',IERSNG
+      write(*,*)'flag for lateral connections between grid cells (1),'//
+     2' no connections (3): NCNG',NCNG
+      write(*,*)'depth of natural water table: DTBLIG',DTBLIG
+      write(*,*)'depth of artificial water table: DTBLDIG',DTBLDIG
+      write(*,*)'slope of natural water table relative to landscape '//
+     2'surface: DTBLGG',DTBLGG
+      write(*,*)'boundary condns for N surface runoff: RCHQNG',RCHQNG
+      write(*,*)'boundary condns for E surface runoff: RCHQEG',RCHQEG
+      write(*,*)'boundary condns for S surface runoff: RCHQSG',RCHQSG
+      write(*,*)'boundary condns for W surface runoff: RCHQWG',RCHQWG
+      write(*,*)'bound condns for N subsurf flow: RCHGNUG',RCHGNUG
+      write(*,*)'bound condns for E subsurf flow: RCHGEUG',RCHGEUG
+      write(*,*)'bound condns for S subsurf flow: RCHGSUG',RCHGSUG
+      write(*,*)'bound condns for W subsurf flow: RCHGWUG',RCHGWUG
+      write(*,*)'N distance to water table (m): RCHGNTG',RCHGNTG
+      write(*,*)'E distance to water table (m): RCHGETG',RCHGETG
+      write(*,*)'S distance to water table (m): RCHGSTG',RCHGSTG
+      write(*,*)'W distance to water table (m): RCHGWTG',RCHGWTG
+      write(*,*)'lower boundary conditions for water flow:RCHGDG',
+     2RCHGDG 
+      write(*,'(40A)')('-',ll=1,40)
+      write(*,*)'width of each W-E landscape column: DHI'
+      write(*,*)(DHI(NX),NX=1,NHE)
+      write(*,*)'width of each N-S landscape row: DVI'
+      write(*,*)(DVI(NY),NY=1,NVS)
+      write(*,'(100A)')('=',ll=1,100)
+      endif
       DO 9895 NX=NHW,NHE
       DO 9890 NY=NVN,NVS
       ALAT(NY,NX)=ALATG
@@ -141,6 +191,18 @@ C
 C
 C     OPEN AND READ SOIL FILE
 C
+      if(lverb)then
+      write(*,*)'Read Topographic characterization file: ',DATA(2)
+      write(*,'(40A)')('-',ll=1,40)
+      write(*,*)'for NX in NH1 and NH2',NH1,NH2
+      write(*,*)'NY in NV1 and NV2',NV1,NV2
+      write(*,*)'Aspect (o): ASPX',ASPX
+      write(*,*)'EW slope (o): SL1',SL1
+      write(*,*)'NS slope (o): SL2',SL2
+      write(*,*)'Initial snowpack depth: DPTHSX',DPTHSX
+      write(*,'(100A)')('=',ll=1,100)
+      write(*,*)'read soil file ',DATA(7)
+      endif
       OPEN(9,FILE=TRIM(PREFIX)//DATA(7),STATUS='OLD')
       DO 9995 NX=NH1,NH2
       DO 9990 NY=NV1,NV2
@@ -178,6 +240,34 @@ C
       NM(NY,NX)=NJ(NY,NX)+NL1
       NLI(NY,NX)=NM(NY,NX)+NL2 
       NL(NY,NX)=NLI(NY,NX)
+      if(lverb)then
+      write(*,*)'Water potential at field capacity (MPa)',PSIFC(NY,NX)
+      write(*,*)'Water potential at wilting point (MPa)',PSIWP(NY,NX)
+      write(*,*)'Wet soil albedo',ALBS(NY,NX)
+      write(*,*)'Litter pH',PH(0,NY,NX)
+      write(*,*)'C in surface fine litter (g m-2)',RSC(1,0,NY,NX)
+      write(*,*)'N in surface fine litter (g m-2)',RSN(1,0,NY,NX)
+      write(*,*)'P in surface fine litter (g m-2)',RSP(1,0,NY,NX)
+      write(*,*)'C in surface woody litter (g m-2)',RSC(0,0,NY,NX)
+      write(*,*)'N in surface woody litter (g m-2)',RSN(0,0,NY,NX)
+      write(*,*)'P in surface woody litter (g m-2)',RSP(0,0,NY,NX)
+      write(*,*)'C in surface manure litter (g m-2)',RSC(2,0,NY,NX)
+      write(*,*)'N in surface manure litter (g m-2)',RSN(2,0,NY,NX)
+      write(*,*)'P in surface manure litter (g m-2)',RSP(2,0,NY,NX)
+      write(*,*)'surface litter type:1=plant,2=manure',
+     2IXTYP(1,NY,NX),IXTYP(2,NY,NX)
+      write(*,*)'number of soil surface layer NUI',NUI(NY,NX)
+      write(*,*)'number of maximum rooting layer NJ',NJ(NY,NX)
+      write(*,*)'number of additional layers below NJ with data in file'
+     2,NL1
+      write(*,*)'number of additional layers below NJ without data '//
+     2'in file',NL2
+      write(*,*)'Flag for natural(0),reconstructed(1) soil profile',
+     2ISOILR(NY,NX)
+      write(*,*)
+      write(*,'(A,I2,A,I2)')'read data for layers from layer ',
+     2NU(NY,NX),' to layer ',NM(NY,NX)
+      endif
 C
 C     PHYSICAL PROPERTIES
 C
@@ -186,6 +276,12 @@ C     BKDSI=initial bulk density (Mg m-3,0=water)
 C
       READ(9,*)(CDPTH(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
       READ(9,*)(BKDSI(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
+      if(lverb)then
+      write(*,*)'Depth to bottom of soil layer (m): CDPTH'
+      write(*,*)(CDPTH(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
+      write(*,*)'Initial bulk density (Mg m-3, 0=water): BKDSI'
+      write(*,*)(BKDSI(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
+      endif      
 C
 C     HYDROLOGIC PROPERTIES
 C
@@ -196,6 +292,16 @@ C
       READ(9,*)(WP(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
       READ(9,*)(SCNV(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
       READ(9,*)(SCNH(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
+      if(lverb)then
+      write(*,*)'Field capacity (m3 m-3): FC'
+      write(*,*)(FC(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
+      write(*,*)'Wilting point (m3 m-3): WP'
+      write(*,*)(WP(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
+      write(*,*)'Vertical Ksat (mm h-1): SCNV'
+      write(*,*)(SCNV(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
+      write(*,*)'Lateral Ksat (mm h-1): SCNH'
+      write(*,*)(SCNH(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
+      endif
 C
 C     PHYSICAL PROPERTIES
 C
@@ -206,6 +312,16 @@ C
       READ(9,*)(CSILT(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
       READ(9,*)(FHOL(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
       READ(9,*)(ROCK(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
+      if(lverb)then
+      write(*,*)'Sand (kg Mg-1): CSAND'
+      write(*,*)(CSAND(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
+      write(*,*)'Silt (kg Mg-1): CSILT'
+      write(*,*)(CSILT(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
+      write(*,*)'Macropore fraction (0-1): FOHL'
+      write(*,*)(FHOL(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
+      write(*,*)'Rock fraction (0-1): ROCK'
+      write(*,*)(ROCK(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
+      endif
 C
 C     CHEMICAL PROPERTIES
 C
@@ -215,6 +331,14 @@ C
       READ(9,*)(PH(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
       READ(9,*)(CEC(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
       READ(9,*)(AEC(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
+      if(lverb)then
+      write(*,*)'pH'
+      write(*,*)(PH(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
+      write(*,*)'Cation exchange capacity (cmol Kg-1): CEC'
+      write(*,*)(CEC(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
+      write(*,*)'Anion exchange capacity (cmol Kg-1): AEC'
+      write(*,*)(AEC(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
+      endif
 C
 C     ORGANIC C, N AND P CONCENTRATIONS
 C
@@ -225,6 +349,16 @@ C
       READ(9,*)(CORGR(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
       READ(9,*)(CORGN(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
       READ(9,*)(CORGP(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
+      if(lverb)then
+      write(*,*)'Total SOC (kg C/Mg soil): CORGC'
+      write(*,*)(CORGC(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
+      write(*,*)'POC (part of SOC) (kg C/Mg soil): CORGR '
+      write(*,*)(CORGR(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
+      write(*,*)'Total SON (g N/Mg soil): CORGN '
+      write(*,*)(CORGN(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
+      write(*,*)'Total SOP (g P/Mg soil): CORGP'
+      write(*,*)(CORGP(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
+      endif
 C
 C     INORGANIC N AND P CONCENTRATIONS
 C
@@ -233,6 +367,14 @@ C
       READ(9,*)(CNH4(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
       READ(9,*)(CNO3(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
       READ(9,*)(CPO4(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
+      if(lverb)then
+      write(*,*)'Total soil NH4 concentration (gN Mg-1): CNH4 '
+      write(*,*)(CNH4(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
+      write(*,*)'Total soil NO3 concentration (gN Mg-1): CNO3'
+      write(*,*)(CNO3(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
+      write(*,*)'Total soil H2PO4 concentration (gP Mg-1): CPO4 '
+      write(*,*)(CPO4(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
+      endif
 C
 C     CATION AND ANION CONCENTRATIONS
 C
@@ -247,6 +389,22 @@ C
       READ(9,*)(CKA(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
       READ(9,*)(CSO4(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
       READ(9,*)(CCL(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
+      if(lverb)then
+      write(*,*)'Soluble soil Al content (g Mg-1): CAL'
+      write(*,*)(CAL(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
+      write(*,*)'Soluble soil Fe content (g Mg-1): CFE'
+      write(*,*)(CFE(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
+      write(*,*)'Soluble soil Ca content (g Mg-1): CCA'
+      write(*,*)(CCA(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
+      write(*,*)'Soluble soil Na content (g Mg-1): CNA'
+      write(*,*)(CNA(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
+      write(*,*)'Soluble soil K content (g Mg-1): CKA'
+      write(*,*)(CKA(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
+      write(*,*)'Soluble soil SO4 content (gS Mg-1): CSO4'
+      write(*,*)(CSO4(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
+      write(*,*)'Soluble soil Cl content (g Mg-1): CCL'
+      write(*,*)(CCL(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
+      endif
 C
 C     PRECIPITATED MINERAL CONCENTRATIONS
 C
@@ -261,6 +419,24 @@ C
       READ(9,*)(CFEOH(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
       READ(9,*)(CCACO(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
       READ(9,*)(CCASO(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
+      if(lverb)then
+      write(*,*)'Soil AlPO4 content (g Mg-1): CALPO'
+      write(*,*)(CALPO(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
+      write(*,*)'Soil FePO4 content (g Mg-1): CFEPO'
+      write(*,*)(CFEPO(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
+      write(*,*)'Soil CaHPO4 content (g Mg-1): CCAPD'
+      write(*,*)(CCAPD(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
+      write(*,*)'Soil apatite content (g Mg-1): CCAPH '
+      write(*,*)(CCAPH(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
+      write(*,*)'Soil Al(OH)3 content (g Mg-1): CALOH '
+      write(*,*)(CALOH(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
+      write(*,*)'Soil Fe(OH)3 content (g Mg-1): CFEOH '
+      write(*,*)(CFEOH(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
+      write(*,*)'Soil CaCO3 content (g Mg-1): CCACO'
+      write(*,*)(CCACO(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
+      write(*,*)'Soil CaSO4 content (g Mg-1): CCASO'
+      write(*,*)(CCASO(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
+      endif
 C
 C     GAPON SELECTIVITY CO-EFFICIENTS
 C
@@ -273,11 +449,31 @@ C
       READ(9,*)(GKCM(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
       READ(9,*)(GKCN(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
       READ(9,*)(GKCK(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
+      if(lverb)then
+      write(*,*)'Ca-NH4 Gapon selectivity coefficient: GKC4'
+      write(*,*)(GKC4(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
+      write(*,*)'Ca-H Gapon selectivity coefficient: GKCH'
+      write(*,*)(GKCH(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
+      write(*,*)'Ca-Al Gapon selectivity coefficient: GKCA'
+      write(*,*)(GKCA(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
+      write(*,*)'Ca-Mg Gapon selectivity coefficient: GKCM'
+      write(*,*)(GKCM(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
+      write(*,*)'Ca-Na Gapon selectivity coefficient: GKCN'
+      write(*,*)(GKCN(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
+      write(*,*)'Ca-K Gapon selectivity coefficient: GKCK'
+      write(*,*)(GKCK(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
+      endif
 C
 C     INITIAL WATER, ICE CONTENTS
 C
       READ(9,*)(THW(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
       READ(9,*)(THI(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
+      if(lverb)then
+      write(*,*)'Initial soil water content (m3/m3): THW'
+      write(*,*)(THW(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
+      write(*,*)'Initial soil ice content (m3/m3): THI'
+      write(*,*)(THI(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
+      endif
 C
 C     THW,THI=initial water,ice:>1=satd,1=FC,0=WP,<0=0,0-1=m3 m-3
 C
@@ -295,6 +491,27 @@ C
       READ(9,*)(RSN(2,L,NY,NX),L=NU(NY,NX),NM(NY,NX))
       READ(9,*)(RSP(2,L,NY,NX),L=NU(NY,NX),NM(NY,NX))
       REWIND(9)
+      if(lverb)then
+      write(*,*)'Initial fine litter C (gC m-2): RSC(1)'
+      write(*,*)(RSC(1,L,NY,NX),L=NU(NY,NX),NM(NY,NX))
+      write(*,*)'Initial fine litter N (gN m-2): RSN(1)'
+      write(*,*)(RSN(1,L,NY,NX),L=NU(NY,NX),NM(NY,NX))
+      write(*,*)'Initial fine litter P (gP m-2): RSP(1)'
+      write(*,*)(RSP(1,L,NY,NX),L=NU(NY,NX),NM(NY,NX))
+      write(*,*)'Initial woody liter C (gC m-2): RSC(0)'
+      write(*,*)(RSC(0,L,NY,NX),L=NU(NY,NX),NM(NY,NX))
+      write(*,*)'Initial woody litter N (gN m-2): RSN(0)'
+      write(*,*)(RSN(0,L,NY,NX),L=NU(NY,NX),NM(NY,NX))
+      write(*,*)'Initial woody litter P (gP m-2): RSP(0)'
+      write(*,*)(RSP(0,L,NY,NX),L=NU(NY,NX),NM(NY,NX))
+      write(*,*)'Initial manure liter C (gC m-2): RSC(2)'
+      write(*,*)(RSC(2,L,NY,NX),L=NU(NY,NX),NM(NY,NX))
+      write(*,*)'Initial manure litter N (gN m-2): RSN(2)'
+      write(*,*)(RSN(2,L,NY,NX),L=NU(NY,NX),NM(NY,NX))
+      write(*,*)'Initial manure litter P (gP m-2): RSP(2)'
+      write(*,*)(RSP(2,L,NY,NX),L=NU(NY,NX),NM(NY,NX))
+      write(*,'(100A)')('=',ll=1,100)
+      endif
       RSC(1,0,NY,NX)=AMAX1(1.0E-06,RSC(1,0,NY,NX))
       RSN(1,0,NY,NX)=AMAX1(0.04E-06,RSN(1,0,NY,NX))
       RSP(1,0,NY,NX)=AMAX1(0.004E-06,RSP(1,0,NY,NX))

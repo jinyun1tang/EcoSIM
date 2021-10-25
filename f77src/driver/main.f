@@ -23,16 +23,20 @@ C
       logical is_dos
       logical do_rgres
       integer LYRG    ! # of simulation days, used for regression test
+      logical lverb
+
       is_dos=.false.
-C     obtain working directory  
+
+C      print*,'obtain working directory'
       CALL GETCWD(BUF)
 C
 C     IDENTIFY OPERATING SYSTEM: DOS OR UNIX
 C
       CALL GETARG(1,nmlfile)
+C      print*,'read namelist'
       call readnml(trim(nmlfile),runfile, case_name, prefix, 
-     2do_rgres,LYRG)
-
+     2do_rgres,LYRG,lverb)
+      print*,'read runfile'
       OPEN(5,FILE=runfile,STATUS='OLD')
       IF((.NOT.(BUF(1:1).EQ.'/'.OR.BUF(1:1).EQ.'~'))
      2.AND.BUF(2:2).EQ.':')THEN
