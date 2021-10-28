@@ -83,10 +83,38 @@ C
       READ(4,'(A3)')DATA(18)
       READ(4,'(A3)')DATA(19)
       READ(4,'(A3)')DATA(20)
+      if(lverb)then
+      write(*,'(100A)')('-',ll=1,100)
+      write(*,*)'read option file ',DATAC(4,NE,NEX)
+      write(*,*)'start date of scenario DDMMYYYY: IDATA(1:3) '
+     2,IDATA(1),IDATA(2),IDATA(3)
+      write(*,*)'end date of scenario DDMMYYYY: IDATA(4:6) '
+     2,IDATA(4),IDATA(5),IDATA(6)
+      write(*,*)'start date of run DDMMYYYY: IDATA(7:9) '
+     2,IDATA(7),IDATA(8),IDATA(9)
+      write(*,*)'ouput hourly visualization in visual.f?: '//
+     2'DATA(18) ',DATA(18)
+      write(*,*)'write checkpoint file?: DATA(19) ',DATA(19)
+      write(*,*)'read chkpt file?: DATA(20) ',DATA(20)
+      endif
       DO 25 N=1,4
       READ(4,*)DRAD(N),DTMPX(N),DTMPN(N),DHUM(N),DPREC(N)
      2,DIRRI(N),DWIND(N),DCO2E(N),DCN4R(N),DCNOR(N)
 25    CONTINUE
+      if(lverb)then
+      write(*,*)'annual changes in radiation: DRAD(1:4)',DRAD(1:4)
+      write(*,*)'annual changes in max temperature: DTMPX(1:4)'
+     2,DTMPX(1:4)
+      write(*,*)'annual changes in min temperature: DTMPN(1:4)'
+     2,DTMPN(1:4)
+      write(*,*)'annual changes in humidity: DHUM(1:4)',DHUM(1:4)
+      write(*,*)'annual changes in precip: DPREC(1:4)',DPREC(1:4)
+      write(*,*)'annual changes in irrigation: DIRRI(1:4)',DIRRI(1:4)
+      write(*,*)'annual changes in wind speed: DWIND(1:4)',DWIND(1:4)
+      write(*,*)'annual changes in atm CO2 conc: DCO2E(1:4)',DCO2E(1:4)
+      write(*,*)'annual changes in atm NH4 conc: DCN4R(1:4)',DCN4R(1:4)
+      write(*,*)'annual changes in atm NO3 conc: DCNOR(1:4)',DCNOR(1:4) 
+      endif
       DO 26 N=5,12
       DRAD(N)=DRAD(N-1)
       DTMPX(N)=DTMPX(N-1)
@@ -100,6 +128,18 @@ C
       DCNOR(N)=DCNOR(N-1)
 26    CONTINUE
       READ(4,*)NPX,NPY,JOUT,IOUT,KOUT,ICLM
+      if(lverb)then
+      write(*,*)'number of cycles per hour for water,heat,'//
+     2'solute flux calcns: NPX ',NPX
+      write(*,*)'number of cycles per NPX for gas flux calcns',
+     2': NPY',NPY
+      write(*,*)'output frequency for hourly data: JOUT ',JOUT
+      write(*,*)'output frequency for daily data: IOUT ',IOUT
+      write(*,*)'output frequency for checkpoint data: '//
+     2'KOUT ',KOUT
+      write(*,*)'changes to weather data (0=none,1=step,2=transient)'
+     2': ICLM ',ICLM
+      endif
 C
 C     INCREMENTS IN START AND END DATES FOR SUCCESSIVE SCENARIOS
 C     FROM LOOPS FOR SCENES, SCENARIOS IN RUNSCRIPT SET IN MAIN.F
@@ -223,6 +263,33 @@ C
       READ(3,*)Z0G,IFLGW,ZNOONG
       READ(3,*)PHRG,CN4RIG,CNORIG,CPORG,CALRG,CFERG,CCARG,CMGRG,CNARG
      2,CKARG,CSORG,CCLRG
+      if(lverb)then
+      write(*,'(40A)')('-',ll=1,40)
+      write(*,*)'read weather file head from ',DATAC(3,NE,NEX)
+      write(*,*)'time step format: TTYPE ',TTYPE
+      write(*,*)'calendar format: CTYPE ',CTYPE
+      write(*,*)'number of time variables: NI ',NI
+      write(*,*)'time var type: IVAR ',(IVAR(K),K=1,NI)
+      write(*,*)'number of weather data variables: NN ',NN
+      write(*,*)'weather var type: VAR ',(VAR(K),K=1,NN)
+      write(*,*)'weather var units: TYP ',(TYP(K),K=1,NN)
+      write(*,*)'windspeed measurement height: Z0G',Z0G
+      write(*,*)'flag for raising Z0G with vegn: IFLGW ',IFLGW
+      write(*,*)'time of solar noon: ZNOONG ',ZNOONG
+      write(*,*)'pH in precipitation: PHRG ',PHRG
+      write(*,*)'NH4 conc in precip: CN4RIG ',CN4RIG
+      write(*,*)'NO3 conc in precip: CNORIG ',CNORIG
+      write(*,*)'H2PO4 conc in precip: CPORG ',CPORG
+      write(*,*)'Al conc in precip: CALRG ',CALRG
+      write(*,*)'Fe conc in precip: CFERG ',CFERG
+      write(*,*)'Ca conc in precip: CCARG ',CCARG
+      write(*,*)'Mg conc in precip: CMGRG ',CMGRG
+      write(*,*)'Na conc in precip: CNARG ',CNARG
+      write(*,*)'K conc in precip: CKARG ',CKARG
+      write(*,*)'SO4 conc in precip: CSORG ',CSORG
+      write(*,*)'Cl conc in precip: CCLRG ',CCLRG
+      write(*,*)'weather data are in the format time,weather variable'
+      endif
       DO 55 K=1,NN
       DATK(K)=0.0
 55    CONTINUE

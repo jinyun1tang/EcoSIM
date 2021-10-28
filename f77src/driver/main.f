@@ -27,13 +27,13 @@ C
 
       is_dos=.false.
 
-C      print*,'obtain working directory'
+      print*,'obtain working directory'
       CALL GETCWD(BUF)
 C
 C     IDENTIFY OPERATING SYSTEM: DOS OR UNIX
 C
       CALL GETARG(1,nmlfile)
-C      print*,'read namelist'
+      print*,'read namelist'
       call readnml(trim(nmlfile),runfile, case_name, prefix, 
      2do_rgres,LYRG,lverb)
       print*,'read runfile'

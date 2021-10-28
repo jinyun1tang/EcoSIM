@@ -44,13 +44,13 @@ ifeq ($(mpi), 1)
   CONFIG_FLAGS += -DHAVE_MPI=1
 else
   ifeq ($(CC), not-set)
-    CC  = $(ENVCC)
+    CC  = icc
   endif
   ifeq ($(CXX), not-set)
-    CXX = $(ENVCXX)
+    CXX = icpc
   endif
   ifeq ($(FC), not-set)
-    FC = $(ENVFC)
+    FC = ifort
   endif
   CONFIG_FLAGS += -DHAVE_MPI=0
 endif
