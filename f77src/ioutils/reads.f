@@ -29,6 +29,7 @@ C
       PARAMETER (TWILGT=0.06976)
       DATA IFLGY,IYRX,IYRD/0,0,0/
       SAVE N1,N2,N1X,N2X,IFLGY,IYRX,IYRD
+      LOGICAL :: GO110,GO60
 C
 C     OPEN WEATHER(3, OPTIONS(4, AND LAND MANAGEMENT(9, FILES FROM
 C     FILE NAMES IN DATA ARRAYS LOADED IN MAIN.F
@@ -45,8 +46,8 @@ C     ARTIFICIAL SOIL WARMING
 C
 C     soiltemp=file with hourly soil temperatures from baseline run
 C     OUT=hourly soil temperatures from baseline run (oC)
-C     TKSZ=temperature used to calculate additional heat flux 
-C     for warming in watsub.f 
+C     TKSZ=temperature used to calculate additional heat flux
+C     for warming in watsub.f
 C
 C     OPEN(6,FILE='soiltemp',STATUS='OLD')
 C23   READ(6,'(F8.3,4X,A8,I8,50E16.7E3)',END=27)DOY,CDATE,J
@@ -68,7 +69,7 @@ C     IDATA(1),IDATA(2),IDATA(3)=start date of scenario DDMMYYYY
 C     IDATA(4),IDATA(5),IDATA(6)=end date of scenario DDMMYYYY
 C     IDATA(7),IDATA(8),IDATA(9)=start date of run DDMMYYYY
 C     DATA(18),DATA(19),DATA(20)=options for visualization in visual.f
-C     generating checkpoint files,resuming from earlier checkpt files 
+C     generating checkpoint files,resuming from earlier checkpt files
 C     DRAD,DTMPX,DTMPN,DHUM,DPREC,DIRRI,DWIND,DCO2E,DCNR4,DCNOR
 C     =annual changes in radiation,max+min temperature,humidity,
 C     precip,irrign,windspeed,atm CO2 concn,NH4,NO3 concn in precip
@@ -113,7 +114,7 @@ C
       write(*,*)'annual changes in wind speed: DWIND(1:4)',DWIND(1:4)
       write(*,*)'annual changes in atm CO2 conc: DCO2E(1:4)',DCO2E(1:4)
       write(*,*)'annual changes in atm NH4 conc: DCN4R(1:4)',DCN4R(1:4)
-      write(*,*)'annual changes in atm NO3 conc: DCNOR(1:4)',DCNOR(1:4) 
+      write(*,*)'annual changes in atm NO3 conc: DCNOR(1:4)',DCNOR(1:4)
       endif
       DO 26 N=5,12
       DRAD(N)=DRAD(N-1)
@@ -182,7 +183,7 @@ C
       ENDIF
       ENDIF
       ENDIF
-C     WRITE(*,7766)'IDATA3',IGO,IDATA(3),IDATA(6),IYRR,IYRC 
+C     WRITE(*,7766)'IDATA3',IGO,IDATA(3),IDATA(6),IYRR,IYRC
 C    2,NE,NT,NEX,NF,NTX,NFX,NTZ,NTZX,N1,N2,N1X,N2X
 C    3,NA(NEX),ND(NEX),NAX
 7766  FORMAT(A8,30I8)
@@ -250,8 +251,8 @@ C     IVAR,VAR=time,weather variable type
 C     TYP=weather variable units
 C     Z0G,IFLGW=windspeed meast height,flag for raising Z0G with vegn
 C     ZNOONG=time of solar noon
-C     PHRG,CN4RIG,CNORIG,CPORG,CALRG,CFERG,CCARG,CMGRG,CNARG,CKARG, 
-C     CSORG,CCLRG=pH,NH4,NO3,H2PO4,Al,Fe,Ca,Mg,Na,K,SO4,Cl 
+C     PHRG,CN4RIG,CNORIG,CPORG,CALRG,CFERG,CCARG,CMGRG,CNARG,CKARG,
+C     CSORG,CCLRG=pH,NH4,NO3,H2PO4,Al,Fe,Ca,Mg,Na,K,SO4,Cl
 C     concentration in precipitation
 C     IDAT,DAT=time,weather variable
 C
@@ -301,386 +302,24 @@ C
 C     READ DAILY WEATHER DATA AND CONVERT TO MODEL UNITS
 C
       IF(TTYPE.EQ.'D')THEN
-C
-C     DERIVE DAY I FROM TIME VARIABLES IVAR
-C
-C     IWTHR=weather data type:1=daily,2=hourly for first(L=1) or second(L=2) scene
-C
-      IWTHR(L)=1
-      DO 160 K=1,NI
-      IF(IVAR(K).EQ.'M')THEN
-      M=IDAT(K)
-      ELSEIF(IVAR(K).EQ.'D')THEN
-      N=IDAT(K)
-      ENDIF
-      IF(IVAR(K).EQ.'Y')THEN
-      IFLGY=1
-      IYRX=IDAT(K)+(NTX-1)*NFX
-      IF(MOD(IDAT(K),4))170,175,170
-175   IYRD=366
-170   IYRD=365
-      ENDIF
-160   CONTINUE
-      IF(IFLGY.EQ.1.AND.IYRX.LT.IYRC)GO TO 60
-      IF(CTYPE.EQ.'J')THEN
-      I=N
-      ELSE
-      LPY=0
-      IF(MOD(IDATA(3),4))70,75,70
-75    IF(M.GT.2)LPY=1
-70    IF(M.EQ.1)THEN
-      I=N
-      ELSE
-      I=30*(M-1)+ICOR(M-1)+N+LPY
-      ENDIF
-      ENDIF
-C
-C     DERIVE START DATE FROM TIME VARIABLES
-C
-      IF(IFLG3.EQ.0)THEN
-      IBEGIN=I
-      ISTART=MAX(ISTART,IBEGIN)
-      IFLG3=1
-      ENDIF
-      IF(L.NE.1)THEN
-      IF(I.LE.ILAST)GO TO 60
-      ENDIF
-C
-C     CONVERT DAILY WEATHER VARIABLES TO MODEL UNITS 
-C     AND ENTER INTO MODEL ARRAYS
-C
-C     TMPX,TMPN=maximum,minimum temperature (OC) 
-C     SRAD=solar radiation (MJ m-2 d-1)
-C     WIND=windspeed (m h-1)
-C     DWPT=vapor pressure (kPa)
-C     RAIN=precipitation (mm d-1)
-C
-      DO 65 K=1,NN
-C
-C     MAX,MIN REMPERATURE
-C
-      IF(VAR(K).EQ.'M')THEN
-      IF(TYP(K).EQ.'F')THEN
-      TMPX(I)=(DAT(K)-32.0)*0.556
-      ELSEIF(TYP(K).EQ.'K')THEN
-      TMPX(I)=DAT(K)-273.16
-      ELSE
-      TMPX(I)=DAT(K)
-      ENDIF
-      ELSEIF(VAR(K).EQ.'N')THEN
-      IF(TYP(K).EQ.'F')THEN
-      TMPN(I)=(DAT(K)-32.0)*0.556
-      ELSEIF(TYP(K).EQ.'K')THEN
-      TMPN(I)=DAT(K)-273.16
-      ELSE
-      TMPN(I)=DAT(K)
-      ENDIF
-C
-C     SOLAR RADIATION
-C
-      ELSEIF(VAR(K).EQ.'R')THEN
-      IF(TYP(K).EQ.'L')THEN
-      SRAD(I)=AMAX1(0.0,DAT(K)/23.87)
-      ELSEIF(TYP(K).EQ.'J')THEN
-      SRAD(I)=AMAX1(0.0,DAT(K)*0.01)
-      ELSE
-      SRAD(I)=AMAX1(0.0,DAT(K))
-      ENDIF
-C
-C     WIND SPEED
-C
-      ELSEIF(VAR(K).EQ.'W')THEN
-      IF(TYP(K).EQ.'S')THEN
-      WIND(I)=ABS(DAT(K))*3600.0
-      ELSEIF(TYP(K).EQ.'H')THEN
-      WIND(I)=ABS(DAT(K))*1000.0
-      ELSEIF(TYP(K).EQ.'D')THEN
-      WIND(I)=ABS(DAT(K))*1000.0/24.0
-      ELSEIF(TYP(K).EQ.'M')THEN
-      WIND(I)=ABS(DAT(K))*1600.0
-      ELSE
-      WIND(I)=ABS(DAT(K))
-      ENDIF
-C
-C     VAPOR PRESSURE
-C
-      ELSEIF(VAR(K).EQ.'H')THEN
-      IF(TYP(K).EQ.'D')THEN
-      DWPT(1,I)=0.61*EXP(5360.0*(3.661E-03-1.0
-     2/(273.15+DAT(K))))
-      DWPT(2,I)=0.61*EXP(5360.0*(3.661E-03-1.0
-     2/(273.15+DAT(K))))
-      ELSEIF(TYP(K).EQ.'F')THEN
-      DAT(K)=(DAT(K)-32.0)*0.556
-      DWPT(1,I)=0.61*EXP(5360.0*(3.661E-03-1.0
-     2/(273.15+DAT(K))))
-      DWPT(2,I)=0.61*EXP(5360.0*(3.661E-03-1.0
-     2/(273.15+DAT(K))))
-      ELSEIF(TYP(K).EQ.'H')THEN
-      DAT(K)=AMAX1(0.0,AMIN1(1.0,DAT(K)))
-      DWPT(1,I)=0.61*EXP(5360.0*(3.661E-03-1.0
-     2/(273.15+(TMPN(I)+TMPX(I))/2)))*DAT(K)
-      DWPT(2,I)=0.61*EXP(5360.0*(3.661E-03-1.0
-     2/(273.15+TMPN(I))))
-      ELSEIF(TYP(K).EQ.'R')THEN
-      DAT(K)=AMAX1(0.0,AMIN1(100.0,DAT(K)))
-      DWPT(1,I)=0.61*EXP(5360.0*(3.661E-03-1.0
-     2/(273.15+(TMPN(I)+TMPX(I))/2)))*DAT(K)*0.01
-      DWPT(2,I)=0.61*EXP(5360.0*(3.661E-03-1.0
-     2/(273.15+TMPN(I))))
-      ELSEIF(TYP(K).EQ.'S')THEN
-      DWPT(1,I)=AMAX1(0.0,DAT(K))*0.0289/18.0*101.325
-     2*EXP(-ALTIG/7272.0)*288.15/(273.15+(TMPN(I)+TMPX(I))/2)
-      DWPT(2,I)=AMAX1(0.0,DAT(K))*0.0289/18.0*101.325
-     2*EXP(-ALTIG/7272.0)*288.15/(273.15+TMPN(I))
-      ELSEIF(TYP(K).EQ.'G')THEN
-      DWPT(1,I)=AMAX1(0.0,DAT(K))*28.9/18.0*101.325
-     2*EXP(-ALTIG/7272.0)*288.15/(273.15+(TMPN(I)+TMPX(I))/2)
-      DWPT(2,I)=AMAX1(0.0,DAT(K))*28.9/18.0*101.325
-     2*EXP(-ALTIG/7272.0)*288.15/(273.15+TMPN(I))
-      ELSEIF(TYP(K).EQ.'M')THEN
-      DWPT(1,I)=AMAX1(0.0,DAT(K)*0.1)
-      DWPT(2,I)=AMAX1(0.0,DAT(K)*0.1)
-      ELSE
-      DWPT(1,I)=AMAX1(0.0,DAT(K))
-      DWPT(2,I)=AMAX1(0.0,DAT(K))
-      ENDIF
-C
-C     PRECIPITATION
-C
-      ELSEIF(VAR(K).EQ.'P')THEN
-      IF(TYP(K).EQ.'M')THEN
-      RAIN(I)=AMAX1(0.0,DAT(K))/1.0E+03
-      ELSEIF(TYP(K).EQ.'C')THEN
-      RAIN(I)=AMAX1(0.0,DAT(K))/1.0E+02
-      ELSEIF(TYP(K).EQ.'I')THEN
-      RAIN(I)=AMAX1(0.0,DAT(K))*0.0254
-      ELSE
-      RAIN(I)=AMAX1(0.0,DAT(K))
-      ENDIF
-      ENDIF
-65    CONTINUE
-      IX=I
-      IF(IFLGY.EQ.1.AND.I.EQ.IYRD)THEN
-      GO TO 110
-      ENDIF
-      GO TO 60
+
+      call rdweth(GO110,GO60)
+      IF(GO60)GO TO 60
+      IF(GO110)GO TO 110
 C
 C     READ HOURLY WEATHER DATA AND CONVERT TO MODEL UNITS
 C
       ELSE
-C
-C     DERIVE DAY I AND HOUR J FROM TIME VARIABLES IVAR
-C
-      IWTHR(L)=2
-      DO 190 K=1,NI
-      IF(IVAR(K).EQ.'M')THEN
-      M=IDAT(K)
-      ELSEIF(IVAR(K).EQ.'D')THEN
-      N=IDAT(K)
-      ELSEIF(IVAR(K).EQ.'H')THEN
-      J=IDAT(K)
-      ENDIF
-      IF(IVAR(K).EQ.'Y')THEN
-      IFLGY=1
-      ENDIF
-190   CONTINUE
-      IF(IFLGY.EQ.1.AND.IYRX.LT.IYRC)GO TO 60
-      IF(CTYPE.EQ.'J')THEN
-      I=N
-      ELSE
-      LPY=0
-      IF(MOD(IDATA(3),4))100,115,100
-115   IF(M.GT.2)LPY=1
-100   IF(M.EQ.1)THEN
-      I=N
-      ELSE
-      I=30*(M-1)+ICOR(M-1)+N+LPY
-      ENDIF
-      ENDIF
-      IF(J.GT.24.AND.(J/100)*100.NE.J)THEN
-      DO 80 K=1,NN
-      DATK(K)=DATK(K)+DAT(K)
-80    CONTINUE
-      IH=IH+1
-      GO TO 60
-      ENDIF
-      IF(J.GT.24)J=INT(J/100)
-      IF(J.EQ.0)THEN
-      J=24
-      I=I-1
-      IF(I.LT.1)GO TO 60
-      ENDIF
-C
-C     DERIVE START DATE FROM TIME VARIABLES
-C
-      IF(IFLG3.EQ.0)THEN
-      IBEGIN=N
-      ISTART=MAX(ISTART,IBEGIN)
-      IFLG3=1
-      ENDIF
-      IF(L.NE.1)THEN
-      IF(I.LE.ILAST)GO TO 60
-      ENDIF
-      XRADH(J,I)=0.0
-C
-C     CONVERT HOURLY WEATHER VARIABLES TO MODEL UNITS 
-C     AND ENTER INTO MODEL ARRAYS
-C
-C     TMPH=temperature (oC)
-C     SRADH=solar radiation (MJ m-2 h-1)
-C     WINDH=windspeed (m h-1)
-C     DWPTH=vapor pressure (kPa)
-C     RAINH=precipitation (mm h-1)
-C     XRADH=longwave radiation (MJ m-2 h-1)
-C
-      DO 95 K=1,NN
-C
-C     TEMPERATURE
-C
-      IF(VAR(K).EQ.'T')THEN
-      IF(TYP(K).EQ.'F')THEN
-      TMPH(J,I)=((DAT(K)+DATK(K))/IH-32.0)*0.556
-      ELSEIF(TYP(K).EQ.'K')THEN
-      TMPH(J,I)=(DAT(K)+DATK(K))/IH-273.16
-      ELSE
-      TMPH(J,I)=(DAT(K)+DATK(K))/IH
-      ENDIF
-C
-C     SOLAR RADIATION
-C
-      ELSEIF(VAR(K).EQ.'R')THEN
-      IF(TYP(K).EQ.'W')THEN
-      SRADH(J,I)=AMAX1(0.0,(DAT(K)+DATK(K))/IH*0.0036)
-      ELSEIF(TYP(K).EQ.'J')THEN
-      SRADH(J,I)=AMAX1(0.0,(DAT(K)+DATK(K))/IH*0.01)
-      ELSEIF(TYP(K).EQ.'K')THEN
-      SRADH(J,I)=AMAX1(0.0,(DAT(K)+DATK(K))/IH*0.001)
-      ELSEIF(TYP(K).EQ.'P')THEN
-      SRADH(J,I)=AMAX1(0.0,(DAT(K)+DATK(K))/IH*0.0036*0.457)
-C     ELSEIF(TYP(K).EQ.'M')THEN
-C     SRADH(J,I)=AMAX1(0.0,(DAT(K)+DATK(K))/IH*3.6*0.457)
-      ELSE
-      SRADH(J,I)=AMAX1(0.0,(DAT(K)+DATK(K))/IH)
-      ENDIF
-C
-C     WIND SPEED
-C
-      ELSEIF(VAR(K).EQ.'W')THEN
-      IF(TYP(K).EQ.'S')THEN
-      WINDH(J,I)=(DAT(K)+DATK(K))/IH*3600.0
-      ELSEIF(TYP(K).EQ.'H')THEN
-      WINDH(J,I)=(DAT(K)+DATK(K))/IH*1000.0
-      ELSEIF(TYP(K).EQ.'M')THEN
-      WINDH(J,I)=(DAT(K)+DATK(K))/IH*1600.0
-      ELSE
-      WINDH(J,I)=(DAT(K)+DATK(K))/IH
-      ENDIF
-      ELSEIF(VAR(K).EQ.'H')THEN
-C
-C     VAPOR PRESSURE
-C
-      IF(TYP(K).EQ.'D')THEN
-      DWPTH(J,I)=0.61*EXP(5360.0*(3.661E-03-1.0/(273.15
-     2+(DAT(K)+DATK(K))/IH)))
-      ELSEIF(TYP(K).EQ.'F')THEN
-      DAT(K)=(DAT(K)-32.0)*0.556
-      DWPTH(J,I)=0.61*EXP(5360.0*(3.661E-03-1.0/(273.15
-     2+(DAT(K)+DATK(K))/IH)))
-      ELSEIF(TYP(K).EQ.'H')THEN
-      DWPTH(J,I)=0.61*EXP(5360.0*(3.661E-03-1.0/(273.15+TMPH(J,I))))
-     2*AMAX1(0.0,AMIN1(1.0,(DAT(K)+DATK(K))/IH))
-      ELSEIF(TYP(K).EQ.'R')THEN
-      DWPTH(J,I)=0.61*EXP(5360.0*(3.661E-03-1.0/(273.15+TMPH(J,I))))
-     2*AMAX1(0.0,AMIN1(100.0,(DAT(K)+DATK(K))/IH))*0.01
-      ELSEIF(TYP(K).EQ.'S')THEN
-      DWPTH(J,I)=AMAX1(0.0,(DAT(K)+DATK(K))/IH)*0.0289/18.0*101.325
-     2*EXP(-ALTIG/7272.0)*288.15/(273.15+TMPH(J,I))
-      ELSEIF(TYP(K).EQ.'G')THEN
-      DWPTH(J,I)=AMAX1(0.0,(DAT(K)+DATK(K))/IH)*28.9/18.0*101.325
-     2*EXP(-ALTIG/7272.0)*288.15/(273.15+TMPH(J,I))
-      ELSEIF(TYP(K).EQ.'M')THEN
-      DWPTH(J,I)=AMAX1(0.0,(DAT(K)+DATK(K))/IH*0.1)
-      ELSE
-      DWPTH(J,I)=AMAX1(0.0,(DAT(K)+DATK(K))/IH)
-      ENDIF
-C
-C     PRECIPITATION
-C
-      ELSEIF(VAR(K).EQ.'P')THEN
-      IF(TYP(K).EQ.'M')THEN
-      RAINH(J,I)=AMAX1(0.0,DAT(K)+DATK(K))/1.0E+03
-      ELSEIF(TYP(K).EQ.'C')THEN
-      RAINH(J,I)=AMAX1(0.0,DAT(K)+DATK(K))/1.0E+02
-      ELSEIF(TYP(K).EQ.'I')THEN
-      RAINH(J,I)=AMAX1(0.0,DAT(K)+DATK(K))*0.0254
-      ELSEIF(TYP(K).EQ.'S')THEN
-      IF(TTYPE.EQ.'H')THEN
-      RAINH(J,I)=AMAX1(0.0,DAT(K)+DATK(K))*3.6
-      ELSE
-      RAINH(J,I)=AMAX1(0.0,DAT(K)+DATK(K))*1.8
-      ENDIF
-      ELSE
-      RAINH(J,I)=AMAX1(0.0,DAT(K)+DATK(K))
-      ENDIF
-C
-C     LONGWAVE RADIATION (OPTIONAL)
-C
-      ELSEIF(VAR(K).EQ.'L')THEN
-      IF(TYP(K).EQ.'W')THEN
-      XRADH(J,I)=AMAX1(0.0,(DAT(K)+DATK(K))/IH*0.0036)
-      ELSEIF(TYP(K).EQ.'J')THEN
-      XRADH(J,I)=AMAX1(0.0,(DAT(K)+DATK(K))/IH*0.01)
-      ELSEIF(TYP(K).EQ.'K')THEN
-      XRADH(J,I)=AMAX1(0.0,(DAT(K)+DATK(K))/IH*0.001)
-      ELSE
-      XRADH(J,I)=AMAX1(0.0,(DAT(K)+DATK(K))/IH)
-      ENDIF
-      ENDIF
-      DATK(K)=0.0
-95    CONTINUE
+      call rhweth(go60)
+      IF(GO60)GO TO 60
+
       IH=1
       IX=I
       IF(TTYPE.EQ.'3')THEN
-      JJ=J-3
-      II=I
-      IF(JJ.EQ.0)THEN
-      JJ=24
-      II=I-1
+C     weather data is every 3 hrs, do interpolation
+      call infl3h
       ENDIF
-C
-C     INFILL 3-HOURLY WEATHER DATA
-C
-      IF(II.LT.1)THEN
-      TMPH(J-2,I)=TMPH(J,I)
-      TMPH(J-1,I)=TMPH(J,I)
-      SRADH(J-2,I)=SRADH(J,I)
-      SRADH(J-1,I)=SRADH(J,I)
-      WINDH(J-2,I)=WINDH(J,I)
-      WINDH(J-1,I)=WINDH(J,I)
-      DWPTH(J-2,I)=DWPTH(J,I)
-      DWPTH(J-1,I)=DWPTH(J,I)
-      RAINH(J,I)=RAINH(J,I)/3.0
-      RAINH(J-2,I)=RAINH(J,I)
-      RAINH(J-1,I)=RAINH(J,I)
-      XRADH(J-2,I)=XRADH(J,I)
-      XRADH(J-1,I)=XRADH(J,I)
-      ELSE
-      TMPH(J-2,I)=0.667*TMPH(JJ,II)+0.333*TMPH(J,I)
-      TMPH(J-1,I)=0.333*TMPH(JJ,II)+0.667*TMPH(J,I)
-      SRADH(J-2,I)=0.667*SRADH(JJ,II)+0.333*SRADH(J,I)
-      SRADH(J-1,I)=0.333*SRADH(JJ,II)+0.667*SRADH(J,I)
-      WINDH(J-2,I)=0.667*WINDH(JJ,II)+0.333*WINDH(J,I)
-      WINDH(J-1,I)=0.333*WINDH(JJ,II)+0.667*WINDH(J,I)
-      DWPTH(J-2,I)=0.667*DWPTH(JJ,II)+0.333*DWPTH(J,I)
-      DWPTH(J-1,I)=0.333*DWPTH(JJ,II)+0.667*DWPTH(J,I)
-      RAINH(J,I)=RAINH(J,I)/3.0
-      RAINH(J-2,I)=RAINH(J,I)
-      RAINH(J-1,I)=RAINH(J,I)
-      XRADH(J-2,I)=0.667*XRADH(JJ,II)+0.333*XRADH(J,I)
-      XRADH(J-1,I)=0.333*XRADH(JJ,II)+0.667*XRADH(J,I)
-      ENDIF
-      ENDIF
+
       IF(IFLGY.EQ.1.AND.I.EQ.IYRD.AND.J.EQ.24)THEN
       GO TO 110
       ENDIF
@@ -857,7 +496,7 @@ C
 C     DY=date DDMMYYYY
 C     IPLOW,DPLOW=intensity,depth of disturbance
 C     ITILL=soil disturbance type 1-20:tillage,21=litter removal,22=fire,23-24=drainage
-C     DCORP=intensity (fire) or depth (tillage,drainage) of disturbance 
+C     DCORP=intensity (fire) or depth (tillage,drainage) of disturbance
 C
 295   CONTINUE
       READ(10,*,END=305)DY,IPLOW,DPLOW
@@ -979,20 +618,21 @@ C
 C     AUTOMATED IRRIGATION
 C
 C     DST,DEN=start,end dates,hours DDMMHHHH
-C     IFLGVX=flag for irrigation criterion,0=SWC,1=canopy water potl 
-C     FIRRX=depletion of SWC from CIRRX to WP(IFLGV=0),or minimum canopy 
+C     IFLGVX=flag for irrigation criterion,0=SWC,1=canopy water potl
+C     FIRRX=depletion of SWC from CIRRX to WP(IFLGV=0),or minimum canopy
 C     water potential(IFLGV=1), to trigger irrigation
 C     CIRRX= fraction of FC to which irrigation will raise SWC
 C     DIRRX= depth to which water depletion and rewatering is calculated
-C     WDPTHI=depth at which irrigation is applied 
-C     PHQX,CN4QX,CNOQX,CPOQX,CALQX,CFEQX,CCAQX,CMGQX,CNAQX,CKAQX, 
-C     CSOQX,CCLQX=pH,NH4,NO3,H2PO4,Al,Fe,Ca,Mg,Na,K,SO4,Cl 
+C     WDPTHI=depth at which irrigation is applied
+C     PHQX,CN4QX,CNOQX,CPOQX,CALQX,CFEQX,CCAQX,CMGQX,CNAQX,CKAQX,
+C     CSOQX,CCLQX=pH,NH4,NO3,H2PO4,Al,Fe,Ca,Mg,Na,K,SO4,Cl
 C     concentration in irrigation water
 C
       READ(2,*,END=105)DST,DEN,IFLGVX,FIRRX,CIRRX,DIRRX,WDPTHI
      2,PHQX,CN4QX,CNOQX,CPOQX,CALQX,CFEQX,CCAQX,CMGQX,CNAQX,CKAQX
      3,CSOQX,CCLQX
       LPY=0
+C     idy1: day, idy2:mon, idy3:hour 
       IDY1=INT(DST/1.0E+06)
       IDY2=INT(DST/1.0E+04-IDY1*1.0E+02)
       IDY3=INT(DST-(IDY1*1.0E+06+IDY2*1.0E+04))
@@ -1017,7 +657,7 @@ C
 5530  CONTINUE
       IHRE=IDY3
 C
-C     TRANSFER INPUTS TO MODEL ARRAYS 
+C     TRANSFER INPUTS TO MODEL ARRAYS
 C
       DO 7965 NX=NH1,NH2
       DO 7960 NY=NV1,NV2
@@ -1053,8 +693,8 @@ C
 2500  CONTINUE
 C
 C     DY,RR,JST,JEN=date DDMMYYYY,amount (mm),start and end hours
-C     PHQX,CN4QX,CNOQX,CPOQX,CALQX,CFEQX,CCAQX,CMGQX,CNAQX,CKAQX, 
-C     CSOQX,CCLQX=pH,NH4,NO3,H2PO4,Al,Fe,Ca,Mg,Na,K,SO4,Cl 
+C     PHQX,CN4QX,CNOQX,CPOQX,CALQX,CFEQX,CCAQX,CMGQX,CNAQX,CKAQX,
+C     CSOQX,CCLQX=pH,NH4,NO3,H2PO4,Al,Fe,Ca,Mg,Na,K,SO4,Cl
 C     concentration in irrigation water
 C
       READ(2,*,END=105)DY,RR,JST,JEN,WDPTHI,PHQX,CN4QX,CNOQX,CPOQX
@@ -1077,7 +717,7 @@ C
       IF(J.GE.JST.AND.J.LE.JEN)RRIG(J,IDY,NY,NX)=RRH/1000.0
 2535  CONTINUE
 C
-C     TRANSFER INPUTS TO MODEL ARRAYS 
+C     TRANSFER INPUTS TO MODEL ARRAYS
 C
       PHQ(IDY,NY,NX)=PHQX
       CN4Q(IDY,NY,NX)=CN4QX/14.0
@@ -1105,6 +745,414 @@ C
       ENDIF
       IMNG=1
       RETURN
-      END
+      contains
 
+      subroutine rdweth(go110,go60)
+C     read daily weather data
+C
+C     DERIVE DAY I FROM TIME VARIABLES IVAR
+C
+C     IWTHR=weather data type:1=daily,2=hourly for first(L=1) or second(L=2) scene
+C
+      logical :: go110, go60
+      go110=.false.
+      go60=.false.
+      IWTHR(L)=1
+      DO 160 K=1,NI
+      IF(IVAR(K).EQ.'M')THEN
+      M=IDAT(K)
+      ELSEIF(IVAR(K).EQ.'D')THEN
+      N=IDAT(K)
+      ENDIF
+      IF(IVAR(K).EQ.'Y')THEN
+      IFLGY=1
+      IYRX=IDAT(K)+(NTX-1)*NFX
+      IF(MOD(IDAT(K),4))170,175,170
+175   IYRD=366
+170   IYRD=365
+      ENDIF
+160   CONTINUE
+      IF(IFLGY.EQ.1.AND.IYRX.LT.IYRC)THEN
+        GO60=.TRUE.
+        RETURN
+      ENDIF
+C     CTYPE for calendar format
+      IF(CTYPE.EQ.'J')THEN
+      I=N
+      ELSE
+      LPY=0
+      IF(MOD(IDATA(3),4))70,75,70
+75    IF(M.GT.2)LPY=1
+70    IF(M.EQ.1)THEN
+      I=N
+      ELSE
+      I=30*(M-1)+ICOR(M-1)+N+LPY
+      ENDIF
+      ENDIF
+C
+C     DERIVE START DATE FROM TIME VARIABLES
+C
+      IF(IFLG3.EQ.0)THEN
+      IBEGIN=I
+      ISTART=MAX(ISTART,IBEGIN)
+      IFLG3=1
+      ENDIF
+      IF(L.NE.1)THEN
+      IF(I.LE.ILAST)THEN
+        GO60=.TRUE.
+      ENDIF
+      ENDIF
+C
+C     CONVERT DAILY WEATHER VARIABLES TO MODEL UNITS
+C     AND ENTER INTO MODEL ARRAYS
+C
+C     TMPX,TMPN=maximum,minimum temperature (OC)
+C     SRAD=solar radiation (MJ m-2 d-1)
+C     WIND=windspeed (m h-1)
+C     DWPT=vapor pressure (kPa)
+C     RAIN=precipitation (mm d-1)
+C
+      DO 65 K=1,NN
+C
+C     MAX,MIN REMPERATURE
+C
+      IF(VAR(K).EQ.'M')THEN
+      IF(TYP(K).EQ.'F')THEN
+      TMPX(I)=(DAT(K)-32.0)*0.556
+      ELSEIF(TYP(K).EQ.'K')THEN
+      TMPX(I)=DAT(K)-273.16
+      ELSE
+      TMPX(I)=DAT(K)
+      ENDIF
+      ELSEIF(VAR(K).EQ.'N')THEN
+      IF(TYP(K).EQ.'F')THEN
+      TMPN(I)=(DAT(K)-32.0)*0.556
+      ELSEIF(TYP(K).EQ.'K')THEN
+      TMPN(I)=DAT(K)-273.16
+      ELSE
+      TMPN(I)=DAT(K)
+      ENDIF
+C
+C     SOLAR RADIATION
+C
+      ELSEIF(VAR(K).EQ.'R')THEN
+      IF(TYP(K).EQ.'L')THEN
+      SRAD(I)=AMAX1(0.0,DAT(K)/23.87)
+      ELSEIF(TYP(K).EQ.'J')THEN
+      SRAD(I)=AMAX1(0.0,DAT(K)*0.01)
+      ELSE
+      SRAD(I)=AMAX1(0.0,DAT(K))
+      ENDIF
+C
+C     WIND SPEED
+C
+      ELSEIF(VAR(K).EQ.'W')THEN
+      IF(TYP(K).EQ.'S')THEN
+      WIND(I)=ABS(DAT(K))*3600.0
+      ELSEIF(TYP(K).EQ.'H')THEN
+      WIND(I)=ABS(DAT(K))*1000.0
+      ELSEIF(TYP(K).EQ.'D')THEN
+      WIND(I)=ABS(DAT(K))*1000.0/24.0
+      ELSEIF(TYP(K).EQ.'M')THEN
+      WIND(I)=ABS(DAT(K))*1600.0
+      ELSE
+      WIND(I)=ABS(DAT(K))
+      ENDIF
+C
+C     VAPOR PRESSURE
+C
+      ELSEIF(VAR(K).EQ.'H')THEN
+      IF(TYP(K).EQ.'D')THEN
+      DWPT(1,I)=0.61*EXP(5360.0*(3.661E-03-1.0
+     2/(273.15+DAT(K))))
+      DWPT(2,I)=0.61*EXP(5360.0*(3.661E-03-1.0
+     2/(273.15+DAT(K))))
+      ELSEIF(TYP(K).EQ.'F')THEN
+      DAT(K)=(DAT(K)-32.0)*0.556
+      DWPT(1,I)=0.61*EXP(5360.0*(3.661E-03-1.0
+     2/(273.15+DAT(K))))
+      DWPT(2,I)=0.61*EXP(5360.0*(3.661E-03-1.0
+     2/(273.15+DAT(K))))
+      ELSEIF(TYP(K).EQ.'H')THEN
+      DAT(K)=AMAX1(0.0,AMIN1(1.0,DAT(K)))
+      DWPT(1,I)=0.61*EXP(5360.0*(3.661E-03-1.0
+     2/(273.15+(TMPN(I)+TMPX(I))/2)))*DAT(K)
+      DWPT(2,I)=0.61*EXP(5360.0*(3.661E-03-1.0
+     2/(273.15+TMPN(I))))
+      ELSEIF(TYP(K).EQ.'R')THEN
+      DAT(K)=AMAX1(0.0,AMIN1(100.0,DAT(K)))
+      DWPT(1,I)=0.61*EXP(5360.0*(3.661E-03-1.0
+     2/(273.15+(TMPN(I)+TMPX(I))/2)))*DAT(K)*0.01
+      DWPT(2,I)=0.61*EXP(5360.0*(3.661E-03-1.0
+     2/(273.15+TMPN(I))))
+      ELSEIF(TYP(K).EQ.'S')THEN
+      DWPT(1,I)=AMAX1(0.0,DAT(K))*0.0289/18.0*101.325
+     2*EXP(-ALTIG/7272.0)*288.15/(273.15+(TMPN(I)+TMPX(I))/2)
+      DWPT(2,I)=AMAX1(0.0,DAT(K))*0.0289/18.0*101.325
+     2*EXP(-ALTIG/7272.0)*288.15/(273.15+TMPN(I))
+      ELSEIF(TYP(K).EQ.'G')THEN
+      DWPT(1,I)=AMAX1(0.0,DAT(K))*28.9/18.0*101.325
+     2*EXP(-ALTIG/7272.0)*288.15/(273.15+(TMPN(I)+TMPX(I))/2)
+      DWPT(2,I)=AMAX1(0.0,DAT(K))*28.9/18.0*101.325
+     2*EXP(-ALTIG/7272.0)*288.15/(273.15+TMPN(I))
+      ELSEIF(TYP(K).EQ.'M')THEN
+      DWPT(1,I)=AMAX1(0.0,DAT(K)*0.1)
+      DWPT(2,I)=AMAX1(0.0,DAT(K)*0.1)
+      ELSE
+      DWPT(1,I)=AMAX1(0.0,DAT(K))
+      DWPT(2,I)=AMAX1(0.0,DAT(K))
+      ENDIF
+C
+C     PRECIPITATION
+C
+      ELSEIF(VAR(K).EQ.'P')THEN
+      IF(TYP(K).EQ.'M')THEN
+      RAIN(I)=AMAX1(0.0,DAT(K))/1.0E+03
+      ELSEIF(TYP(K).EQ.'C')THEN
+      RAIN(I)=AMAX1(0.0,DAT(K))/1.0E+02
+      ELSEIF(TYP(K).EQ.'I')THEN
+      RAIN(I)=AMAX1(0.0,DAT(K))*0.0254
+      ELSE
+      RAIN(I)=AMAX1(0.0,DAT(K))
+      ENDIF
+      ENDIF
+65    CONTINUE
+      IX=I
+      IF(IFLGY.EQ.1.AND.I.EQ.IYRD)THEN
+      GO110=.true.
+      return
+      ENDIF
+      GO60=.TRUE.
+      end subroutine rdweth
 
+      subroutine rhweth(go60)
+C     read hourly weather data
+C
+C     DERIVE DAY I AND HOUR J FROM TIME VARIABLES IVAR
+C
+      logical :: go60
+      go60=.false.
+
+      IWTHR(L)=2
+      DO 190 K=1,NI
+      IF(IVAR(K).EQ.'M')THEN
+      M=IDAT(K)
+      ELSEIF(IVAR(K).EQ.'D')THEN
+      N=IDAT(K)
+      ELSEIF(IVAR(K).EQ.'H')THEN
+      J=IDAT(K)
+      ENDIF
+      IF(IVAR(K).EQ.'Y')THEN
+      IFLGY=1
+      ENDIF
+190   CONTINUE
+
+      IF(IFLGY.EQ.1.AND.IYRX.LT.IYRC)then
+      GO60=.true.
+      return
+      endif
+      IF(CTYPE.EQ.'J')THEN
+      I=N
+      ELSE
+      LPY=0
+      IF(MOD(IDATA(3),4))100,115,100
+115   IF(M.GT.2)LPY=1
+100   IF(M.EQ.1)THEN
+      I=N
+      ELSE
+      I=30*(M-1)+ICOR(M-1)+N+LPY
+      ENDIF
+      ENDIF
+
+      IF(J.GT.24.AND.(J/100)*100.NE.J)THEN
+      DO 80 K=1,NN
+      DATK(K)=DATK(K)+DAT(K)
+80    CONTINUE
+      IH=IH+1
+      go60=.true.
+      return
+      ENDIF
+
+      IF(J.GT.24)J=INT(J/100)
+      IF(J.EQ.0)THEN
+      J=24
+      I=I-1
+      IF(I.LT.1)then
+      GO60=.true.
+      return
+      endif
+      ENDIF
+C
+C     DERIVE START DATE FROM TIME VARIABLES
+C
+      IF(IFLG3.EQ.0)THEN
+      IBEGIN=N
+      ISTART=MAX(ISTART,IBEGIN)
+      IFLG3=1
+      ENDIF
+      IF(L.NE.1)THEN
+      IF(I.LE.ILAST)then
+      GO60=.true.
+      return
+      endif
+      ENDIF
+      XRADH(J,I)=0.0
+C
+C     CONVERT HOURLY WEATHER VARIABLES TO MODEL UNITS
+C     AND ENTER INTO MODEL ARRAYS
+C
+C     TMPH=temperature (oC)
+C     SRADH=solar radiation (MJ m-2 h-1)
+C     WINDH=windspeed (m h-1)
+C     DWPTH=vapor pressure (kPa)
+C     RAINH=precipitation (mm h-1)
+C     XRADH=longwave radiation (MJ m-2 h-1)
+C
+      DO 95 K=1,NN
+C
+C     TEMPERATURE
+C
+      IF(VAR(K).EQ.'T')THEN
+      IF(TYP(K).EQ.'F')THEN
+      TMPH(J,I)=((DAT(K)+DATK(K))/IH-32.0)*0.556
+      ELSEIF(TYP(K).EQ.'K')THEN
+      TMPH(J,I)=(DAT(K)+DATK(K))/IH-273.16
+      ELSE
+      TMPH(J,I)=(DAT(K)+DATK(K))/IH
+      ENDIF
+C
+C     SOLAR RADIATION
+C
+      ELSEIF(VAR(K).EQ.'R')THEN
+      IF(TYP(K).EQ.'W')THEN
+      SRADH(J,I)=AMAX1(0.0,(DAT(K)+DATK(K))/IH*0.0036)
+      ELSEIF(TYP(K).EQ.'J')THEN
+      SRADH(J,I)=AMAX1(0.0,(DAT(K)+DATK(K))/IH*0.01)
+      ELSEIF(TYP(K).EQ.'K')THEN
+      SRADH(J,I)=AMAX1(0.0,(DAT(K)+DATK(K))/IH*0.001)
+      ELSEIF(TYP(K).EQ.'P')THEN
+      SRADH(J,I)=AMAX1(0.0,(DAT(K)+DATK(K))/IH*0.0036*0.457)
+C     ELSEIF(TYP(K).EQ.'M')THEN
+C     SRADH(J,I)=AMAX1(0.0,(DAT(K)+DATK(K))/IH*3.6*0.457)
+      ELSE
+      SRADH(J,I)=AMAX1(0.0,(DAT(K)+DATK(K))/IH)
+      ENDIF
+C
+C     WIND SPEED
+C
+      ELSEIF(VAR(K).EQ.'W')THEN
+      IF(TYP(K).EQ.'S')THEN
+      WINDH(J,I)=(DAT(K)+DATK(K))/IH*3600.0
+      ELSEIF(TYP(K).EQ.'H')THEN
+      WINDH(J,I)=(DAT(K)+DATK(K))/IH*1000.0
+      ELSEIF(TYP(K).EQ.'M')THEN
+      WINDH(J,I)=(DAT(K)+DATK(K))/IH*1600.0
+      ELSE
+      WINDH(J,I)=(DAT(K)+DATK(K))/IH
+      ENDIF
+      ELSEIF(VAR(K).EQ.'H')THEN
+C
+C     VAPOR PRESSURE
+C
+      IF(TYP(K).EQ.'D')THEN
+      DWPTH(J,I)=0.61*EXP(5360.0*(3.661E-03-1.0/(273.15
+     2+(DAT(K)+DATK(K))/IH)))
+      ELSEIF(TYP(K).EQ.'F')THEN
+      DAT(K)=(DAT(K)-32.0)*0.556
+      DWPTH(J,I)=0.61*EXP(5360.0*(3.661E-03-1.0/(273.15
+     2+(DAT(K)+DATK(K))/IH)))
+      ELSEIF(TYP(K).EQ.'H')THEN
+      DWPTH(J,I)=0.61*EXP(5360.0*(3.661E-03-1.0/(273.15+TMPH(J,I))))
+     2*AMAX1(0.0,AMIN1(1.0,(DAT(K)+DATK(K))/IH))
+      ELSEIF(TYP(K).EQ.'R')THEN
+      DWPTH(J,I)=0.61*EXP(5360.0*(3.661E-03-1.0/(273.15+TMPH(J,I))))
+     2*AMAX1(0.0,AMIN1(100.0,(DAT(K)+DATK(K))/IH))*0.01
+      ELSEIF(TYP(K).EQ.'S')THEN
+      DWPTH(J,I)=AMAX1(0.0,(DAT(K)+DATK(K))/IH)*0.0289/18.0*101.325
+     2*EXP(-ALTIG/7272.0)*288.15/(273.15+TMPH(J,I))
+      ELSEIF(TYP(K).EQ.'G')THEN
+      DWPTH(J,I)=AMAX1(0.0,(DAT(K)+DATK(K))/IH)*28.9/18.0*101.325
+     2*EXP(-ALTIG/7272.0)*288.15/(273.15+TMPH(J,I))
+      ELSEIF(TYP(K).EQ.'M')THEN
+      DWPTH(J,I)=AMAX1(0.0,(DAT(K)+DATK(K))/IH*0.1)
+      ELSE
+      DWPTH(J,I)=AMAX1(0.0,(DAT(K)+DATK(K))/IH)
+      ENDIF
+C
+C     PRECIPITATION
+C
+      ELSEIF(VAR(K).EQ.'P')THEN
+      IF(TYP(K).EQ.'M')THEN
+      RAINH(J,I)=AMAX1(0.0,DAT(K)+DATK(K))/1.0E+03
+      ELSEIF(TYP(K).EQ.'C')THEN
+      RAINH(J,I)=AMAX1(0.0,DAT(K)+DATK(K))/1.0E+02
+      ELSEIF(TYP(K).EQ.'I')THEN
+      RAINH(J,I)=AMAX1(0.0,DAT(K)+DATK(K))*0.0254
+      ELSEIF(TYP(K).EQ.'S')THEN
+      IF(TTYPE.EQ.'H')THEN
+      RAINH(J,I)=AMAX1(0.0,DAT(K)+DATK(K))*3.6
+      ELSE
+      RAINH(J,I)=AMAX1(0.0,DAT(K)+DATK(K))*1.8
+      ENDIF
+      ELSE
+      RAINH(J,I)=AMAX1(0.0,DAT(K)+DATK(K))
+      ENDIF
+C
+C     LONGWAVE RADIATION (OPTIONAL)
+C
+      ELSEIF(VAR(K).EQ.'L')THEN
+      IF(TYP(K).EQ.'W')THEN
+      XRADH(J,I)=AMAX1(0.0,(DAT(K)+DATK(K))/IH*0.0036)
+      ELSEIF(TYP(K).EQ.'J')THEN
+      XRADH(J,I)=AMAX1(0.0,(DAT(K)+DATK(K))/IH*0.01)
+      ELSEIF(TYP(K).EQ.'K')THEN
+      XRADH(J,I)=AMAX1(0.0,(DAT(K)+DATK(K))/IH*0.001)
+      ELSE
+      XRADH(J,I)=AMAX1(0.0,(DAT(K)+DATK(K))/IH)
+      ENDIF
+      ENDIF
+      DATK(K)=0.0
+95    CONTINUE
+      end subroutine rhweth
+
+      subroutine infl3h
+      JJ=J-3
+      II=I
+      IF(JJ.EQ.0)THEN
+      JJ=24
+      II=I-1
+      ENDIF
+C
+C     INFILL 3-HOURLY WEATHER DATA
+C
+      IF(II.LT.1)THEN
+      TMPH(J-2,I)=TMPH(J,I)
+      TMPH(J-1,I)=TMPH(J,I)
+      SRADH(J-2,I)=SRADH(J,I)
+      SRADH(J-1,I)=SRADH(J,I)
+      WINDH(J-2,I)=WINDH(J,I)
+      WINDH(J-1,I)=WINDH(J,I)
+      DWPTH(J-2,I)=DWPTH(J,I)
+      DWPTH(J-1,I)=DWPTH(J,I)
+      RAINH(J,I)=RAINH(J,I)/3.0
+      RAINH(J-2,I)=RAINH(J,I)
+      RAINH(J-1,I)=RAINH(J,I)
+      XRADH(J-2,I)=XRADH(J,I)
+      XRADH(J-1,I)=XRADH(J,I)
+      ELSE
+      TMPH(J-2,I)=0.667*TMPH(JJ,II)+0.333*TMPH(J,I)
+      TMPH(J-1,I)=0.333*TMPH(JJ,II)+0.667*TMPH(J,I)
+      SRADH(J-2,I)=0.667*SRADH(JJ,II)+0.333*SRADH(J,I)
+      SRADH(J-1,I)=0.333*SRADH(JJ,II)+0.667*SRADH(J,I)
+      WINDH(J-2,I)=0.667*WINDH(JJ,II)+0.333*WINDH(J,I)
+      WINDH(J-1,I)=0.333*WINDH(JJ,II)+0.667*WINDH(J,I)
+      DWPTH(J-2,I)=0.667*DWPTH(JJ,II)+0.333*DWPTH(J,I)
+      DWPTH(J-1,I)=0.333*DWPTH(JJ,II)+0.667*DWPTH(J,I)
+      RAINH(J,I)=RAINH(J,I)/3.0
+      RAINH(J-2,I)=RAINH(J,I)
+      RAINH(J-1,I)=RAINH(J,I)
+      XRADH(J-2,I)=0.667*XRADH(JJ,II)+0.333*XRADH(J,I)
+      XRADH(J-1,I)=0.333*XRADH(JJ,II)+0.667*XRADH(J,I)
+      ENDIF
+      end subroutine infl3h
+      END subroutine reads
