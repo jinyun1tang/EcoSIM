@@ -1,4 +1,4 @@
-      subroutine readnml(nmlfile,runfile, case_name,
+      subroutine readnamelist(nmlfile,runfile, case_name,
      2prefix,do_rgres,LYRG,lverb)
 
       !Description
@@ -58,4 +58,4 @@
       do_rgres=do_regression_test 
       LYRG=num_of_simdays
       lverb=lverbose
-      end subroutine readnml 
+      end subroutine readnamelist 

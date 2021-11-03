@@ -34,7 +34,7 @@ C     IDENTIFY OPERATING SYSTEM: DOS OR UNIX
 C
       CALL GETARG(1,nmlfile)
       print*,'read namelist'
-      call readnml(trim(nmlfile),runfile, case_name, prefix, 
+      call readnamelist(trim(nmlfile),runfile, case_name, prefix, 
      2do_rgres,LYRG,lverb)
       print*,'read runfile'
       OPEN(5,FILE=runfile,STATUS='OLD')
@@ -135,6 +135,8 @@ C     SCRIPT COMPLETED, START NEXT SCRIPT
 C
       GO TO 100
       close(5)
-1000  if(do_rgres)call rgress(trim(nmlfile),trim(case_name),NHW,NVN)
+1000  if(do_rgres)then
+        call regressiontest(trim(nmlfile),trim(case_name),NHW,NVN)
+      endif
       STOP
       END

@@ -1,4 +1,4 @@
-      subroutine rgress(nmfile,case_name, NX, NY)
+      subroutine regressiontest(nmfile,case_name, NX, NY)
 
       use TestMod, only : regression              
       include "parameters.h"
@@ -70,4 +70,4 @@
 
         call regression%CloseOutput()
       endif        
-      end subroutine rgress    
+      end subroutine regressiontest    
