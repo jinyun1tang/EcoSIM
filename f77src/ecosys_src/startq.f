@@ -30,9 +30,9 @@ C
       include "blk16.h"
       include "blk18a.h"
       include "blk18b.h"
-      CHARACTER*16 DATA(30),DATAP(JP,JY,JX)
-      CHARACTER*3 CHOICE(102,20)
-      CHARACTER*8 CDATE
+C      CHARACTER*16 DATA(30),DATAP(JP,JY,JX)
+C      CHARACTER*3 CHOICE(102,20)
+C      CHARACTER*8 CDATE
       DIMENSION CNOPC(4),CPOPC(4)
 C
 C     INITIALIZE SHOOT GROWTH VARIABLES
@@ -49,7 +49,7 @@ C     O2I=intercellular O2 concentration in C3,C4 PFT (umol mol-1)
 C
       DO 9995 NX=NHWQ,NHEQ
       DO 9990 NY=NVNQ,NVSQ
-      NZ2X=MIN(NZ2Q,NP(NY,NX)) 
+      NZ2X=MIN(NZ2Q,NP(NY,NX))
       DO 9985 NZ=NZ1Q,NZ2X
       IF(IFLGC(NZ,NY,NX).EQ.0)THEN
       IYR0(NZ,NY,NX)=IYRX(NZ,NY,NX)
@@ -60,8 +60,8 @@ C
       PPX(NZ,NY,NX)=PPI(NZ,NY,NX)
       CF(NZ,NY,NX)=CFI(NZ,NY,NX)
 C     WRITE(*,3232)'STARTQ',IYRC,NX,NY,NZ
-C    2,IDAY0(NZ,NY,NX),IYR0(NZ,NY,NX) 
-C    3,IDAYH(NZ,NY,NX),IYRH(NZ,NY,NX) 
+C    2,IDAY0(NZ,NY,NX),IYR0(NZ,NY,NX)
+C    3,IDAYH(NZ,NY,NX),IYRH(NZ,NY,NX)
 C    4,IYRC,IDAYX(NZ,NY,NX),IDAYY(NZ,NY,NX)
 C    5,IYRX(NZ,NY,NX),IYRY(NZ,NY,NX),IFLGC(NZ,NY,NX)
 C    5,PPI(NZ,NY,NX),PPX(NZ,NY,NX),CFI(NZ,NY,NX),CF(NZ,NY,NX)
@@ -313,9 +313,9 @@ C     NG,NIX,NINR=seeding,upper,lower rooting layer
 C     CNRTS,CPRTS=N,P root growth yield
 C     RRAD1M,RRAD2M=maximum primary,secondary mycorrhizal radius (m)
 C     PORT=mycorrhizal porosity
-C     UPMXZH,UPKMZH,UPMNZH=NH4 max uptake(g m-2 h-1),Km(uM),min concn (uM)      
-C     UPMXZO,UPKMZO,UPMNZO=NO3 max uptake(g m-2 h-1),Km(uM), min concn (uM)      
-C     UPMXPO,UPKMPO,UPMNPO=H2PO4 max uptake(g m-2 h-1),Km(uM),min concn (uM)      
+C     UPMXZH,UPKMZH,UPMNZH=NH4 max uptake(g m-2 h-1),Km(uM),min concn (uM)
+C     UPMXZO,UPKMZO,UPMNZO=NO3 max uptake(g m-2 h-1),Km(uM), min concn (uM)
+C     UPMXPO,UPKMPO,UPMNPO=H2PO4 max uptake(g m-2 h-1),Km(uM),min concn (uM)
 C     RSRR,RSRA=radial,axial root resistivity (m2 MPa-1 h-1)
 C
       SDPTH(NZ,NY,NX)=SDPTHI(NZ,NY,NX)
@@ -580,8 +580,8 @@ C
       RNH3C(NZ,NY,NX)=0.0
       TNH3C(NZ,NY,NX)=0.0
       VCO2F(NZ,NY,NX)=0.0
-      VCH4F(NZ,NY,NX)=0.0 
-      VOXYF(NZ,NY,NX)=0.0 
+      VCH4F(NZ,NY,NX)=0.0
+      VOXYF(NZ,NY,NX)=0.0
       VNH3F(NZ,NY,NX)=0.0
       VN2OF(NZ,NY,NX)=0.0
       VPO4F(NZ,NY,NX)=0.0
@@ -605,8 +605,8 @@ C
      2*CFOPN(5,M,NZ,NY,NX)
       WTSTDP(M,NZ,NY,NX)=WTSTDX*CPSTK(NZ,NY,NX)
      2*CFOPP(5,M,NZ,NY,NX)
-      WTSTG(NZ,NY,NX)=WTSTG(NZ,NY,NX)+WTSTDG(M,NZ,NY,NX) 
-      WTSTGN(NZ,NY,NX)=WTSTGN(NZ,NY,NX)+WTSTDN(M,NZ,NY,NX) 
+      WTSTG(NZ,NY,NX)=WTSTG(NZ,NY,NX)+WTSTDG(M,NZ,NY,NX)
+      WTSTGN(NZ,NY,NX)=WTSTGN(NZ,NY,NX)+WTSTDN(M,NZ,NY,NX)
       WTSTGP(NZ,NY,NX)=WTSTGP(NZ,NY,NX)+WTSTDP(M,NZ,NY,NX)
 155   CONTINUE
       ENDIF
@@ -814,5 +814,3 @@ C
 9995  CONTINUE
       RETURN
       END
-
-

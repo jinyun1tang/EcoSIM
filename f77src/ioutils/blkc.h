@@ -13,3 +13,4 @@
      3,ISOIL(4,JZ,JY,JX),LYRX,LYRC,LSG(JZ,JY,JX),NP(JY,JX),do_rgres
      4,NP0(JY,JX),IFLGI(JP,JY,JX),IFLGC(JP,JY,JX),IETYP(JY,JX),LYRG
 
+      logical :: lverb

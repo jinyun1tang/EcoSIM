@@ -16,15 +16,16 @@ C
       include "blk17.h"
       include "blktest.h"
       DIMENSION NA(10),ND(10)
-      CHARACTER*16 DATA(30),DATAC(30,250,250),DATAP(JP,JY,JX)
-     2,DATAM(JP,JY,JX),DATAX(JP),DATAY(JP),DATAZ(JP,JY,JX)
-     3,OUTS(10),OUTP(10),OUTFILS(10,JY,JX),OUTFILP(10,JP,JY,JX)
-      CHARACTER*3 CHOICE(102,20)
-      CHARACTER*8 CDATE
+C      CHARACTER*16 DATA(30),DATAC(30,250,250),DATAP(JP,JY,JX)
+C     2,DATAM(JP,JY,JX),DATAX(JP),DATAY(JP),DATAZ(JP,JY,JX)
+C     3,OUTS(10),OUTP(10),OUTFILS(10,JY,JX),OUTFILP(10,JP,JY,JX)
+C      CHARACTER*3 CHOICE(102,20)
+C      CHARACTER*8 CDATE
+C      CHARACTER*80 PREFIX
+
       CHARACTER*16 OUTW,OUTI,OUTT,OUTN,OUTF
       CHARACTER*4 CHARY
       CHARACTER*1 TTYPE,CTYPE,IVAR(20),VAR(50),TYP(50)
-      CHARACTER*80 PREFIX
       DIMENSION IDAT(20),DAT(50),DATK(50),OUT(50)
       PARAMETER (TWILGT=0.06976)
       DATA IFLGY,IYRX,IYRD/0,0,0/
@@ -138,8 +139,8 @@ C
       write(*,*)'output frequency for daily data: IOUT ',IOUT
       write(*,*)'output frequency for checkpoint data: '//
      2'KOUT ',KOUT
-      write(*,*)'changes to weather data (0=none,1=step,2=transient)'
-     2': ICLM ',ICLM
+      write(*,*)'changes to weather data (0=none,1=step,'//
+     2'2=transient): ICLM ',ICLM
       endif
 C
 C     INCREMENTS IN START AND END DATES FOR SUCCESSIVE SCENARIOS
@@ -632,7 +633,7 @@ C
      2,PHQX,CN4QX,CNOQX,CPOQX,CALQX,CFEQX,CCAQX,CMGQX,CNAQX,CKAQX
      3,CSOQX,CCLQX
       LPY=0
-C     idy1: day, idy2:mon, idy3:hour 
+C     idy1: day, idy2:mon, idy3:hour
       IDY1=INT(DST/1.0E+06)
       IDY2=INT(DST/1.0E+04-IDY1*1.0E+02)
       IDY3=INT(DST-(IDY1*1.0E+06+IDY2*1.0E+04))

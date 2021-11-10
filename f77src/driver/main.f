@@ -11,19 +11,19 @@ C
       include "blkc.h"
 
       DIMENSION NA(250),ND(250)
-      CHARACTER*16 DATA(30),DATAC(30,250,250),DATAP(JP,JY,JX)
-     2,DATAM(JP,JY,JX),DATAX(JP),DATAY(JP),DATAZ(JP,JY,JX)
-     3,OUTS(10),OUTP(10),OUTFILS(10,JY,JX),OUTFILP(10,JP,JY,JX)
-      CHARACTER*3 CHOICE(102,20)
-      CHARACTER*8 CDATE
-      CHARACTER*80 BUF,PREFIX
+C      CHARACTER*16 DATA(30),DATAC(30,250,250),DATAP(JP,JY,JX)
+C     2,DATAM(JP,JY,JX),DATAX(JP),DATAY(JP),DATAZ(JP,JY,JX)
+C     3,OUTS(10),OUTP(10),OUTFILS(10,JY,JX),OUTFILP(10,JP,JY,JX)
+C      CHARACTER*3 CHOICE(102,20)
+C      CHARACTER*8 CDATE
+C      CHARACTER*80 PREFIX
+      CHARACTER*80 BUF
       character*80 runfile
       character*36 case_name
       character*36 nmlfile
       logical is_dos
       logical do_rgres
       integer LYRG    ! # of simulation days, used for regression test
-      logical lverb
 
       is_dos=.false.
 
@@ -34,7 +34,7 @@ C     IDENTIFY OPERATING SYSTEM: DOS OR UNIX
 C
       CALL GETARG(1,nmlfile)
       print*,'read namelist'
-      call readnamelist(trim(nmlfile),runfile, case_name, prefix, 
+      call readnamelist(trim(nmlfile),runfile, case_name, prefix,
      2do_rgres,LYRG,lverb)
       print*,'read runfile'
       OPEN(5,FILE=runfile,STATUS='OLD')
@@ -49,7 +49,7 @@ C      OPEN(5,FILE=BUF,STATUS='OLD')
       PREFIX='.\\'  ! location where input files are put
 C     make output directory
       ELSE
-      print*,'unix system'        
+      print*,'unix system'
 C     make output directory
       ENDIF
 C
@@ -61,7 +61,7 @@ C
       outdir=trim(buf)//'\\'//trim(case_name)//'_outputs\\'
       else
       outdir=trim(buf)//'/'//trim(case_name)//'_outputs/'
-      endif        
+      endif
       call system('mkdir -p '//trim(outdir))
       print*,'input files at:',trim(prefix)
       IGO=0

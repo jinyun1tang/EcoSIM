@@ -1,8 +1,8 @@
       subroutine regressiontest(nmfile,case_name, NX, NY)
 
-      use TestMod, only : regression              
+      use TestMod, only : regression
       include "parameters.h"
-      include "filec.h"
+C      include "filec.h"
       include "files.h"
       include "blkc.h"
       include "blk1cp.h"
@@ -40,7 +40,7 @@
 
         do NZ=1,NP(NY,NX)
         IF(IFLGC(NZ,NY,NX).EQ.1)THEN
-                
+
         category = 'flux'
         name = 'NH4_UPTK (g m^-3 h^-1)'
         do ll=1,12
@@ -66,8 +66,8 @@
         category = 'state'
         name = 'soil temperature (oC)'
         datv=TCS(1:12,NY,NX)
-        call regression%writedata(category,name,datv)        
+        call regression%writedata(category,name,datv)
 
         call regression%CloseOutput()
-      endif        
-      end subroutine regressiontest    
+      endif
+      end subroutine regressiontest

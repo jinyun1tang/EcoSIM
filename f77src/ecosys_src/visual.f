@@ -31,13 +31,13 @@
       include "blk16.h"
       include "blk18a.h"
       include "blk18b.h"
-      CHARACTER*16 DATA(30),DATAC(30,250,250),DATAP(JP,JY,JX)
-     2,DATAM(JP,JY,JX),DATAX(JP),DATAY(JP),DATAZ(JP,JY,JX)
-     3,OUTS(10),OUTP(10),OUTFILS(10,JY,JX),OUTFILP(10,JP,JY,JX)
+C      CHARACTER*16 DATA(30),DATAC(30,250,250),DATAP(JP,JY,JX)
+C     2,DATAM(JP,JY,JX),DATAX(JP),DATAY(JP),DATAZ(JP,JY,JX)
+C     3,OUTS(10),OUTP(10),OUTFILS(10,JY,JX),OUTFILP(10,JP,JY,JX)
+C      CHARACTER*3 CHOICE(102,20)
+C      CHARACTER*8 CDATE
+C      CHARACTER*80 PREFIX
       DIMENSION OUT(100),SWC(JY,JX)
-      CHARACTER*3 CHOICE(102,20)
-      CHARACTER*8 CDATE
-      CHARACTER*80 PREFIX
       PARAMETER (DEFAULT=-9999)
       DATA ICHECK/0/
       SAVE IYR1,IYR2,ICHECK
@@ -92,7 +92,7 @@ C    8,'Root Shrub     ','Root Moss      ','SOC 0          '
 C    9,'SOC 1          ','SOC 2          ','SOC 3          '
 C    9,'SOC 4          ','SOC 5          ','SOC 6          '
 C    9,'SOC 7          ','SOC 8          ','SOC 9          '
-C    9,'SOC 10         ' 
+C    9,'SOC 10         '
 
 C     WRITE(20,95)'-              ','-              '
 C    2,'               ','mm             ','mm             '
@@ -177,7 +177,7 @@ C     ENDIF
 C
 C     DAILY AND SEASONAL OUTPUT
 C
-C     IF(J.EQ.24)THEN 
+C     IF(J.EQ.24)THEN
 C     IYRZ=IYRC
 C     XI=REAL(I)
 C     XP=REAL(IDAY0(NZ,NY,NX))
@@ -196,7 +196,7 @@ C     TCSNY=TCSN0(NZ,NY,NX)
 C     IF(I.EQ.IDAY0(NZ,NY,NX).OR.I.EQ.IDAYH(NZ,NY,NX))THEN
 C     ICHKA=0
 C     ICHKM=0
-C     TCSNX=0.0 
+C     TCSNX=0.0
 C     ENDIF
       OUT(1)=0.001*CARBN(1,NY,NX)/(AREA(3,NU(NY,NX),NY,NX)*3600)
       OUT(2)=0.001*CARBN(3,NY,NX)/(AREA(3,NU(NY,NX),NY,NX)*3600)
@@ -254,7 +254,7 @@ C     WRITE OUTPUT
 C
 C     WRITE(19,91)'ECOSYS_HUMMOCK',IYRC,I,J,(OUT(N),N=1,38)
 C     IF(J.EQ.24)THEN
-C     WRITE(20,96)'ECOSYS_HUMMOCK',IYRC,I,(OUT(N),N=39,68) 
+C     WRITE(20,96)'ECOSYS_HUMMOCK',IYRC,I,(OUT(N),N=39,68)
 C     ENDIF
 C     ENDIF
 90    FORMAT(50A16)
@@ -276,7 +276,7 @@ C
 2025  FORMAT(A16,3I6,100E12.4)
       IF(J.EQ.24)THEN
       WRITE(20,2026)'SWC',IYRC,I,J,((DPTHS(NY,NX)
-     2,NX=NHW,NHE),NY=NVN,NVS),DEFAULT 
+     2,NX=NHW,NHE),NY=NVN,NVS),DEFAULT
      3,((SWC(NY,NX),NX=NHW,NHE),NY=NVN,NVS),DEFAULT
      3,((-(DPTHA(NY,NX)-CDPTH(NU(NY,NX)-1,NY,NX))
      4,NX=NHW,NHE),NY=NVN,NVS)

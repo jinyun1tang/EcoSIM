@@ -16,16 +16,15 @@ C
       include "blk17.h"
       include "blk11a.h"
       DIMENSION NA(10),ND(10),NM(JY,JX),DHI(JX),DVI(JY)
-      CHARACTER*16 DATA(30),DATAC(30,250,250),DATAP(JP,JY,JX)
-     2,DATAM(JP,JY,JX),DATAX(JP),DATAY(JP),DATAZ(JP,JY,JX)
-     3,OUTS(10),OUTP(10),OUTFILS(10,JY,JX),OUTFILP(10,JP,JY,JX)
-      CHARACTER*3 CHOICE(102,20)
-      CHARACTER*8 CDATE
+C      CHARACTER*16 DATA(30),DATAC(30,250,250),DATAP(JP,JY,JX)
+C     2,DATAM(JP,JY,JX),DATAX(JP),DATAY(JP),DATAZ(JP,JY,JX)
+C     3,OUTS(10),OUTP(10),OUTFILS(10,JY,JX),OUTFILP(10,JP,JY,JX)
+C      CHARACTER*3 CHOICE(102,20)
+C      CHARACTER*8 CDATE
       CHARACTER*16 OUTW,OUTI,OUTT,OUTN,OUTF
       CHARACTER*4 CHARY
       CHARACTER*1 TTYPE,CTYPE,IVAR(20),VAR(50),TYP(50)
-      CHARACTER*80 PREFIX
-      logical :: lverb
+C      CHARACTER*80 PREFIX
       integer :: ll
       DIMENSION IDAT(20),DAT(50),DATK(50)
       PARAMETER (TWILGT=0.06976)
@@ -61,12 +60,12 @@ C     RCHGNUG,RCHGEUG,RCHGSUG,RCHGWUG=bound condns for N,E,S,W subsurf flow
 C     RCHGNTG,RCHGETG,RCHGSTG,RCHGWTG=N,E,S,W distance to water table (m)
 C     RCHGDG=lower boundary conditions for water flow
 C     DHI=width of each W-E landscape column
-C     DVI=width of each N-S landscape row  
+C     DVI=width of each N-S landscape row
 C
       READ(1,*)ALATG,ALTIG,ATCAG,IDTBLG
       READ(1,*)OXYEG,Z2GEG,CO2EIG,CH4EG,Z2OEG,ZNH3EG
       READ(1,*)IETYPG,ISALTG,IERSNG,NCNG,DTBLIG,DTBLDIG,DTBLGG
-      READ(1,*)RCHQNG,RCHQEG,RCHQSG,RCHQWG,RCHGNUG,RCHGEUG,RCHGSUG 
+      READ(1,*)RCHQNG,RCHQEG,RCHQSG,RCHQWG,RCHGNUG,RCHGEUG,RCHGSUG
      2,RCHGWUG,RCHGNTG,RCHGETG,RCHGSTG,RCHGWTG,RCHGDG
       READ(1,*)(DHI(NX),NX=1,NHE)
       READ(1,*)(DVI(NY),NY=1,NVS)
@@ -111,7 +110,7 @@ C
       write(*,*)'S distance to water table (m): RCHGSTG',RCHGSTG
       write(*,*)'W distance to water table (m): RCHGWTG',RCHGWTG
       write(*,*)'lower boundary conditions for water flow:RCHGDG',
-     2RCHGDG 
+     2RCHGDG
       write(*,'(40A)')('-',ll=1,40)
       write(*,*)'width of each W-E landscape column: DHI'
       write(*,*)(DHI(NX),NX=1,NHE)
@@ -180,7 +179,7 @@ C
 C     READ TOPOGRAPHY DATA AND SOIL FILE NAME FOR EACH GRID CELL
 C
 C     for each unit within the landscape:
-C     NH1,NV1,NH2,NV2=NW,SE column,row 
+C     NH1,NV1,NH2,NV2=NW,SE column,row
 C     ASPX=N,E,S,W aspect (o)
 C     SL1,SL2=EW,NS slope (o)
 C     DPTHSX=initial snowpack depth
@@ -218,16 +217,16 @@ C
       ASP(NY,NX)=450.0-ASP(NY,NX)
       IF(ASP(NY,NX).GE.360.0)ASP(NY,NX)=ASP(NY,NX)-360.0
 C
-C     SURFACE PROPERTIES 
+C     SURFACE PROPERTIES
 C
 C     PSIFC,PSIWP=water potentials at field capacity,wilting point (MPa)
 C     ALBS=wet soil albedo
 C     PH=litter pH
 C     RSC,RSC,RSP=C,N,P in fine(1,0),woody(0,0),manure(2,0) surface litter (g m-2)
-C     IXTYP=surface litter type:1=plant,2=manure 
+C     IXTYP=surface litter type:1=plant,2=manure
 C     NUI,NJ=number of soil surface layer,maximum rooting layer
 C     NL1,NL2=number of additional layers below NJ with,without data in file
-C     ISOILR=natural(0),reconstructed(1) soil profile 
+C     ISOILR=natural(0),reconstructed(1) soil profile
 C
       READ(9,*)PSIFC(NY,NX),PSIWP(NY,NX),ALBS(NY,NX),PH(0,NY,NX)
      2,RSC(1,0,NY,NX),RSN(1,0,NY,NX),RSP(1,0,NY,NX)
@@ -238,7 +237,7 @@ C
       NU(NY,NX)=NUI(NY,NX)
       NK(NY,NX)=NJ(NY,NX)+1
       NM(NY,NX)=NJ(NY,NX)+NL1
-      NLI(NY,NX)=NM(NY,NX)+NL2 
+      NLI(NY,NX)=NM(NY,NX)+NL2
       NL(NY,NX)=NLI(NY,NX)
       if(lverb)then
       write(*,*)'Water potential at field capacity (MPa)',PSIFC(NY,NX)
@@ -281,7 +280,7 @@ C
       write(*,*)(CDPTH(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
       write(*,*)'Initial bulk density (Mg m-3, 0=water): BKDSI'
       write(*,*)(BKDSI(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
-      endif      
+      endif
 C
 C     HYDROLOGIC PROPERTIES
 C
@@ -697,7 +696,7 @@ C     CEC,AEC=cation,anion exchange capacity converted to mol Mg-1
 C     CNH4...=solute concentrations converted to mol Mg-1
 C
       DO 28 L=1,NL(NY,NX)
-C     BKDSI(L,NY,NX)=BKDSI(L,NY,NX)/(1.0-FHOL(L,NY,NX)) 
+C     BKDSI(L,NY,NX)=BKDSI(L,NY,NX)/(1.0-FHOL(L,NY,NX))
       BKDS(L,NY,NX)=BKDSI(L,NY,NX)
       IF(BKDS(L,NY,NX).EQ.0.0)FHOL(L,NY,NX)=0.0
       FMPR(L,NY,NX)=(1.0-ROCK(L,NY,NX))*(1.0-FHOL(L,NY,NX))
@@ -779,6 +778,3 @@ C     WRITE(*,2223)'NVS',NY,NVN,NVS,NHE,NL(NY,NHE)
       IOLD=0
       RETURN
       END
-
-
-
