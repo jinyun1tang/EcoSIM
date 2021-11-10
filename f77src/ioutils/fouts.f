@@ -3,6 +3,7 @@
 C
 C     THIS SUBROUTINE OPENS AND LABELS OUTPUT FILES FOR SOIL DATA
 C
+      use data_kind_mod, only : r8 => SHR_KIND_R8
       include "parameters.h"
       include "filec.h"
       include "files.h"

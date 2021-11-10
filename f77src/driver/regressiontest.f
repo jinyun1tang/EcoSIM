@@ -3,7 +3,6 @@
       use data_kind_mod, only : r8 => SHR_KIND_R8
       use TestMod, only : regression
       include "parameters.h"
-C      include "filec.h"
       include "files.h"
       include "blkc.h"
       include "blk1cp.h"

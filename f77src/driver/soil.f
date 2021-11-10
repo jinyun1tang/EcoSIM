@@ -3,6 +3,7 @@
 C
 C     THIS IS THE MAIN SUBROUTINE FROM WHICH ALL OTHERS ARE CALLED
 C
+      use data_kind_mod, only : r8 => SHR_KIND_R8
       include "parameters.h"
       include "filec.h"
       include "files.h"
@@ -13,8 +14,6 @@ C     3,OUTS(10),OUTP(10),OUTFILS(10,JY,JX),OUTFILP(10,JP,JY,JX)
 C      CHARACTER*3 CHOICE(102,20)
 C      CHARACTER*8 CDATE
 
-      integer LYRG
-      logical do_rgres
       SAVE NF,NX,NTZ,NTZX
       DATA NF,NX,NTZ,NTZX/0,0,0,0/
 C

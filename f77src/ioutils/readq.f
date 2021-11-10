@@ -5,6 +5,8 @@ C
 C     THIS SUBROUTINE READS INPUT DATA FROM PLANT SPECIES
 C     AND MANAGEMENT FILES IDENTIFIED IN 'ROUTQ'
 C
+      use data_kind_mod, only : r8 => SHR_KIND_R8
+
       include "parameters.h"
       include "filec.h"
       include "files.h"

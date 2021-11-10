@@ -1,1 +1,3 @@
-      COMMON/BLK17/ICOR(12)
+      integer :: ICOR(12)
+
+      COMMON/BLK17/ICOR

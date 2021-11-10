@@ -3,6 +3,7 @@ C     THIS SUBROUTINE READS THE RUNSCRIPT AND ENTERS FILENAMES INTO DATA ARRAYS
 C     FOR USE IN 'READS' AND 'READQ'. WHEN FINISHED THIS SUBROUTINE CALLS
 C     'SOIL' WHICH IS THE MAIN SUBROUTINE FROM WHICH ALL OTHERS ARE CALLED
 C
+      use data_kind_mod, only : r8 => SHR_KIND_R8
       use TestMod, only : regression
 
       include "parameters.h"
@@ -17,13 +18,11 @@ C     3,OUTS(10),OUTP(10),OUTFILS(10,JY,JX),OUTFILP(10,JP,JY,JX)
 C      CHARACTER*3 CHOICE(102,20)
 C      CHARACTER*8 CDATE
 C      CHARACTER*80 PREFIX
-      CHARACTER*80 BUF
-      character*80 runfile
-      character*36 case_name
-      character*36 nmlfile
-      logical is_dos
-      logical do_rgres
-      integer LYRG    ! # of simulation days, used for regression test
+      CHARACTER(len=80):: BUF
+      character(len=80):: runfile
+      character(len=36):: case_name
+      character(len=36):: nmlfile
+      logical :: is_dos
 
       is_dos=.false.
 

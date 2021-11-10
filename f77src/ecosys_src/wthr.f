@@ -3,6 +3,8 @@ C
 C     THIS SUBROUTINE REINITIALIZES WEATHER VARIABLES USED IN OTHER
 C     SUBROUTINES
 C
+      use data_kind_mod, only : r8 => SHR_KIND_R8
+
       include "parameters.h"
       include "blkc.h"
       include "blk1g.h"
@@ -44,7 +46,7 @@ C
      2,RADN(JY,JX),VPS(JY,JX)
 C
 C     CDIR,CDIF=fraction of solar SW,sky diffuse radiation in visible
-C     PDIR,PDIF=PAR:SW ratio (umol s-1/(MJ h-1)) 
+C     PDIR,PDIF=PAR:SW ratio (umol s-1/(MJ h-1))
 C     TSNOW=temperature below which precipitation is snow (oC)
 C
       PARAMETER (CDIR=0.42,CDIF=0.58,PDIR=1269.4,PDIF=1269.4)
@@ -54,7 +56,7 @@ C
 C
 C     SWITCH OUT ECOSYS WEATHER HERE IF CESM WEATHER IS READ IN
 C
-C     IF …
+C     IF ï¿½
 C
 C     IWTHR=weather data type in first(1) or second(2) scene
 C     ITYPE=weather data type:1=daily,2=hourly
@@ -73,7 +75,7 @@ C
       DO 9910 NY=NVN,NVS
 C
 C     IETYP=Koppen climate zone:-2=phytotron
-C     RADN=hourky SW radiation 
+C     RADN=hourky SW radiation
 C     RMAX=maximum hourly radiation
 C     ZNOON=time of solar noon
 C     DYLN=daylength
@@ -202,7 +204,7 @@ C
 C     DIRECT VS DIFFUSE RADIATION IN SOLAR OR SKY BEAMS
 C
 C     RADZ=diffuse radiation at horizontal surface
-C     RADS,RADY,RAPS,RAPY=direct,diffuse SW,PAR in solar beam 
+C     RADS,RADY,RAPS,RAPY=direct,diffuse SW,PAR in solar beam
 C
       RADZ=AMIN1(RADN(NY,NX),0.5*(RADX-RADN(NY,NX)))
       RADS(NY,NX)=(RADN(NY,NX)-RADZ)/SSIN(NY,NX)
@@ -215,7 +217,7 @@ C     ATMOSPHERIC RADIATIVE PROPERTIES AFM 139:171
 C
 C     CLD=cloudiness factor for EMM
 C     EMM=sky emissivity
-C     VPK,TKA=vapor pressure,temperature     
+C     VPK,TKA=vapor pressure,temperature
 C
       IF(RADX.GT.ZERO)THEN
       CLD=AMIN1(1.0,AMAX1(0.2,2.33-3.33*RADN(NY,NX)/RADX))
@@ -223,7 +225,7 @@ C
       CLD=0.2
       ENDIF
       EMM=0.625*AMAX1(1.0,(1.0E+03*VPK(NY,NX)/TKA(NY,NX))**0.131)
-      EMM=EMM*(1.0+0.242*CLD**0.583) 
+      EMM=EMM*(1.0+0.242*CLD**0.583)
 C
 C     IF PHYTOTRON
 C
@@ -242,7 +244,7 @@ C     LONGWAVE RADIATION
 C
 C     XRADH=longwave radiation
 C     THSX=longwave radiation from weather file or calculated from
-C     atmospheric properties  
+C     atmospheric properties
 C
       IF(XRADH(J,I).GT.0.0)THEN
 C     THSX(NY,NX)=EMM*(2.04E-10*TKA(NY,NX)**4)
@@ -259,7 +261,7 @@ C     RADS=DIRECT SW RADIATION (MJ M-2 H-1)
 C     RADY=INDIRECT SW RADIATION (MJ M-2 H-1)
 C     RAPS=DIRECT PAR (UMOL M-2 S-1)
 C     RAPY=INDIRECT PAR (UMOL M-2 S-1)
-C     THSX=LW RADIATION (MJ M-2 H-1)      
+C     THSX=LW RADIATION (MJ M-2 H-1)
 C     TCA=AIR TEMPERATURE (C)
 C     TKA=AIR TEMPERATURE (K)
 C     VPK=VAPOR PRESSURE (KPA)
@@ -341,7 +343,7 @@ C     TEMPERATURE CHANGE
 C
 C     TDTPX,TDTPN=change in max,min temperature
 C     DTA,AMP,DHR=change in daily average,amplitude of air temperature
-C     DHR=diurnal effect on AMP         
+C     DHR=diurnal effect on AMP
 C
       IF(TDTPX(NY,NX,N).NE.0.0.OR.TDTPN(NY,NX,N).NE.0.0)THEN
       DTA=0.5*(TDTPX(NY,NX,N)+TDTPN(NY,NX,N))
@@ -354,11 +356,11 @@ C     ACCLIMATION TO GRADUAL CLIMATE CHANGE
 C
 C     DTS=change in daily average soil temperature
 C     ATCA,ATCS=mean annual air,soil temperature
-C     OFFSET=shift in Arrhenius curve for MFT activity in nitro.f 
+C     OFFSET=shift in Arrhenius curve for MFT activity in nitro.f
 C     OFFST=shift in Arrhenius curve for PFT activity in uptake.f
 C     ZTYP=PFT thermal adaptation zone
 C     HTC=high temperature threshold for grain number loss (oC)
-C     GROUPI,XTLI=node number at floral initiation,planting (maturity group) 
+C     GROUPI,XTLI=node number at floral initiation,planting (maturity group)
 C
       IF(ICLM.EQ.2.AND.J.EQ.1)THEN
       DTS=0.5*DTA
@@ -383,7 +385,7 @@ C     TCX(NZ,NY,NX)=AMIN1(15.0,TCZ(NZ,NY,NX)+TCXD)
 C     IF(I.EQ.180)THEN
 C     WRITE(*,1111)'OFFSET',IYRC,I,J,NZ,N,OFFSET(NY,NX),OFFST(NZ,NY,NX)
 C    2,DTA,DTS,ATCA(NY,NX),ATCS(NY,NX),ZTYP(NZ,NY,NX)
-C    3,GROUPI(NZ,NY,NX),TDTPX(NY,NX,N),TDTPN(NY,NX,N) 
+C    3,GROUPI(NZ,NY,NX),TDTPX(NY,NX,N),TDTPN(NY,NX,N)
 1111  FORMAT(A8,5I4,12E12.4)
 C     ENDIF
 9900  CONTINUE

@@ -7,6 +7,8 @@ C     EACH SCENE OF THE MODEL RUN INTO INDIVIDUAL FILES FOR EACH
 C     GRID CELL AT THE END OF THE SCENE WITH FILE NAME PREFIXES
 C     INDICATING ITS COLUMN AND ROW POSITION.
 C
+      use data_kind_mod, only : r8 => SHR_KIND_R8
+
       include "parameters.h"
       include "filec.h"
       include "files.h"

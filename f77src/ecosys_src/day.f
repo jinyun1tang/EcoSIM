@@ -3,6 +3,8 @@ C
 C     THIS SUBROUTINE REINITIALIZES DAILY VARIABLES USED IN OTHER
 C     SUBROUTINES E.G. LAND MANAGEMENT
 C
+      use data_kind_mod, only : r8 => SHR_KIND_R8
+
       include "parameters.h"
       include "filec.h"
       include "files.h"

@@ -4,6 +4,8 @@ C     THIS SUBROUTINE TAKES MASS BALANCE VARIABLES CALCULATED
 C     IN 'REDIST' AND PERFORMS MASS BALANCE CHECKS AT THE END
 C     OF EACH DAY OF THE MODEL RUN, AND ERRORS OF > 1UG ARE FLAGGED.
 C
+      use data_kind_mod, only : r8 => SHR_KIND_R8
+
       include "parameters.h"
       include "blkc.h"
       include "blk2a.h"

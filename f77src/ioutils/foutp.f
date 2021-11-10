@@ -4,6 +4,7 @@ C
 C     THIS SUBROUTINE OPENS AND LABELS OUTPUT FILES
 C     FOR PLANT DATA
 C
+      use data_kind_mod, only : r8 => SHR_KIND_R8
       include "parameters.h"
       include "filec.h"
       include "files.h"
@@ -17,11 +18,11 @@ C     3,OUTS(10),OUTP(10),OUTFILS(10,JY,JX),OUTFILP(10,JP,JY,JX)
 C      CHARACTER*3 CHOICE(102,20)
 C      CHARACTER*8 CDATE
 C      CHARACTER*80 PREFIX
-      CHARACTER*8 CDOY,DATE,HOUR
-      CHARACTER*1 CHARM,CHARN,CHARZ,CHARO
-      CHARACTER*2 CHARX,CHARY
-      CHARACTER*4 CHARR
-      CHARACTER*16 HEAD(50)
+      CHARACTER(len=8):: CDOY,DATE,HOUR
+      CHARACTER(len=1):: CHARM,CHARN,CHARZ,CHARO
+      CHARACTER(len=2):: CHARX,CHARY
+      CHARACTER(len=4):: CHARR
+      CHARACTER(len=16):: HEAD(50)
       CDOY='DOY     '
       DATE='DATE    '
       HOUR='HOUR    '

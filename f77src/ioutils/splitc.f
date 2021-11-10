@@ -1,5 +1,7 @@
 
       SUBROUTINE splitc(NT,NE,NAX,NDX,NTX,NEX,NHW,NHE,NVN,NVS)
+      use data_kind_mod, only : r8 => SHR_KIND_R8
+
       include "parameters.h"
       include "filec.h"
       include "files.h"

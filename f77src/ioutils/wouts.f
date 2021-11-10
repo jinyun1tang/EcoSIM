@@ -5,6 +5,8 @@ C     CHECKPOINT FILES AT THE FREQUENCY GIVEN IN THE OPTIONS
 C     FILE SO THAT OUTPUTS FROM EARLIER MODEL RUNS CAN BE USED
 C     TO INITIALIZE LATER MODEL RUNS
 C
+      use data_kind_mod, only : r8 => SHR_KIND_R8
+
       include "parameters.h"
       include "filec.h"
       include "files.h"

@@ -3,6 +3,8 @@ C
 C     THIS SUBROUTINE READS SOIL CHECKPOINT FILES TO
 C     RE-INITILIAZE THE MODEL FROM A SELECTED DATE IN AN EARLIER RUN
 C
+      use data_kind_mod, only : r8 => SHR_KIND_R8
+
       include "parameters.h"
       include "filec.h"
       include "files.h"

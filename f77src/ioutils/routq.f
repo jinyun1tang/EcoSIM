@@ -4,6 +4,8 @@ C
 C     THIS SUBROUTINE OPENS CHECKPOINT FILES AND READS
 C     FILE NAMES FOR PLANT SPECIES AND MANAGEMENT
 C
+      use data_kind_mod, only : r8 => SHR_KIND_R8
+
       include "parameters.h"
       include "filec.h"
       include "files.h"
