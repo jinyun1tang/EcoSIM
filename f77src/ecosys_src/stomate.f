@@ -4,6 +4,8 @@ C
 C     THIS SUBROUTINE CALCULATES CANOPY STOMATAL RESISTANCE AT MAXIMUM
 C     CANOPY TURGOR FOR USE IN ENERGY BALANCE EQUATIONS IN 'UPTAKE'
 C
+      use data_kind_mod, only : r8 => SHR_KIND_R8
+
       include "parameters.h"
       include "blkc.h"
       include "blk1cp.h"
@@ -31,7 +33,7 @@ C     ATRPZ=hours to full dehardening of conifers in spring (h)
 C     COMP4=C4 CO2 compensation point (uM)
 C     FDML=leaf water content (g H2O g-1 C)
 C     FBS,FMP=leaf water content in bundle sheath, mesophyll in C4 CO2 fixn
-C     C4KI=nonstructural C inhibition constant on PEP carboxylase (uM) 
+C     C4KI=nonstructural C inhibition constant on PEP carboxylase (uM)
 C     FLG4Y=number of hours with no grain fill to terminate annuals
 C
       PARAMETER (QNTM=0.45,CURV=0.70,CURV2=2.0*CURV,CURV4=4.0*CURV
@@ -46,10 +48,10 @@ C     CANOPY TEMPERATURE + OFFSET FOR THERMAL ADAPTATION FROM 'READQ'
 C
 C     CANOPY BOUNDARY LAYER RESISTANCE
 C
-C     RI=Richardson’s number
-C     RIB=canopy isothermal Richardson’s number
+C     RI=Richardsonï¿½s number
+C     RIB=canopy isothermal Richardsonï¿½s number
 C     TKA,TKCZ=air,canopy temperature
-C     RAZ=canopy isothermal boundary later resistance 
+C     RAZ=canopy isothermal boundary later resistance
 C     RAC=canopy boundary layer resistance to CO2
 C     FMOL=number of moles of air per m3
 C
@@ -70,7 +72,7 @@ C
 C     MESOPHYLL CO2 CONCENTRATION FROM CI:CA RATIO ENTERED IN 'READQ'
 C
 C     CO2I=intercellular CO2 concentration
-C     FCO2=intercellular:atmospheric CO2 concn ratio from PFT file 
+C     FCO2=intercellular:atmospheric CO2 concn ratio from PFT file
 C     SSIN=sine of solar angle
 C     ARLFP=PFT leaf area
 C
@@ -101,7 +103,7 @@ C     oxygenation,e- transport (25 oC =1)
 C     8.313,710.0=gas constant,enthalpy
 C     197500,222500=energy of high,low temp inactivn(KJ mol-1)
 C     65000,60000,43000=activation energy for carboxylation,
-C     oxygenation,e- transport 
+C     oxygenation,e- transport
 C
       CH2O=0.0
       TKCO=TKCZ(NZ,NY,NX)+OFFST(NZ,NY,NX)
@@ -117,8 +119,8 @@ C
 C     XKCO2L,XKCO2O=Km for rubisco carboxylation without,with O2
 C     XKO2L=Km for rubisco oxygenation
 C
-      XKCO2L(NZ,NY,NX)=XKCO2(NZ,NY,NX)*EXP(16.136-40000/RTK) 
-      XKO2L=XKO2(NZ,NY,NX)*EXP(8.067-20000/RTK) 
+      XKCO2L(NZ,NY,NX)=XKCO2(NZ,NY,NX)*EXP(16.136-40000/RTK)
+      XKO2L=XKO2(NZ,NY,NX)*EXP(8.067-20000/RTK)
       XKCO2O(NZ,NY,NX)=XKCO2L(NZ,NY,NX)*(1.0+O2L(NZ,NY,NX)/XKO2L)
 C
 C     FOR EACH BRANCH
@@ -128,8 +130,8 @@ C
 C     FEEDBACK ON CO2 FIXATION
 C
 C     IWTYP=phenology type from PFT file
-C     VRNS,VRNL=leafout hours,hours required for leafout 
-C     VRNF,VRNX=leafoff hours,hours required for leafoff 
+C     VRNS,VRNL=leafout hours,hours required for leafout
+C     VRNF,VRNX=leafoff hours,hours required for leafoff
 C
       IF(IWTYP(NZ,NY,NX).EQ.0
      2.OR.VRNS(NB,NZ,NY,NX).GE.VRNL(NB,NZ,NY,NX)
@@ -139,7 +141,7 @@ C     FEEDBACK ON C3 CARBOXYLATION FROM NON-STRUCTURAL C:N:P
 C
 C     CCPOLB,CZPOLB,CPPOLB=nonstructural C,N,P concn in branch
 C     FDBK=N,P feedback inhibition on C3 CO2 fixation
-C     CNKI,CPKI=nonstructural N,P inhibition constant on rubisco 
+C     CNKI,CPKI=nonstructural N,P inhibition constant on rubisco
 C
       IF(CCPOLB(NB,NZ,NY,NX).GT.ZERO)THEN
       FDBK(NB,NZ,NY,NX)=AMIN1(CZPOLB(NB,NZ,NY,NX)
@@ -150,7 +152,7 @@ C
       FDBK(NB,NZ,NY,NX)=1.0
       ENDIF
 C
-C     CHILLING 
+C     CHILLING
 C
 C     CHILL=accumulated chilling hours used to limit CO2 fixn
 C
@@ -159,14 +161,14 @@ C
 C     DEHARDENING OF EVERGREENS IN SPRING
 C
 C     ATRP=hours above threshold temperature for dehardening since leafout
-C     ATRPZ=hours to full dehardening of conifers in spring 
+C     ATRPZ=hours to full dehardening of conifers in spring
 C
       IF(IWTYP(NZ,NY,NX).NE.0.AND.IBTYP(NZ,NY,NX).GE.2)THEN
       FDBK(NB,NZ,NY,NX)=FDBK(NB,NZ,NY,NX)*AMAX1(0.0,AMIN1(1.0
      2,ATRP(NB,NZ,NY,NX)/(0.9*ATRPZ)))
       ENDIF
 C
-C     TERMINATION OF ANNUALS 
+C     TERMINATION OF ANNUALS
 C
 C     ISTYP=growth habit:0=annual,1=perennial from PFT file
 C     FLG4=number of hours with no grain fill after start of grain fill
@@ -221,7 +223,7 @@ C     CC4M,CCBS=C4 nonstruct C concn in mesophyll,bundle sheath (uM)
 C     CPOOL4,CO2B=C4 nonstructural C mass in mesophyll,bundle sheath
 C     WGLF=leaf C mass
 C     FBS,FMP=leaf water content in bundle sheath, mesophyll
-C     FDBK4=N,P feedback inhibition on C4 CO2 fixation 
+C     FDBK4=N,P feedback inhibition on C4 CO2 fixation
 C
       CC4M=AMAX1(0.0,0.021E+09*CPOOL4(K,NB,NZ,NY,NX)
      2/(WGLF(K,NB,NZ,NY,NX)*FMP))
@@ -259,7 +261,7 @@ C     C4 ELECTRON TRANSFER RATES
 C
 C     ETGR4=light saturated e- transport rate
 C     ETMX=specific chlorophyll activity from PFT file
-C     TFNE=temperature function for e- transport 
+C     TFNE=temperature function for e- transport
 C     ETDN4=surficial density of chlorophyll in mesophyll
 C     CBXN4=PEP caboxylation efficiency
 C     CO2L=intercellular CO2 concentrations (uM)
@@ -290,7 +292,7 @@ C
 C
 C     LIGHT-LIMITED CARBOXYLATION RATES
 C
-C     QNTM=quantum efficiency 
+C     QNTM=quantum efficiency
 C     PAR=direct PAR flux
 C     ETGR4=light saturated e- transport rate
 C     ETLF4=light-limited e- transport rate
@@ -308,7 +310,7 @@ C     VL=PEP carboxylation rate limited by light,CO2,N,P
 C     VGRO4=PEP carboxylation rate limited by CO2
 C     EGRO4=light-limited PEP carboxylation rate
 C     FDBK4=N,P feedback inhibition on C4 CO2 fixation
-C     CH2O=total PEP carboxylation rate  
+C     CH2O=total PEP carboxylation rate
 C     SURFX=unself-shaded leaf surface area
 C     TAUS=fraction of direct radiation transmitted from layer above
 C
@@ -350,8 +352,8 @@ C
 C     VL=PEP carboxylation rate limited by light,CO2,N,P
 C     VGRO4=PEP carboxylation rate limited by CO2
 C     EGRO4=light-limited PEP carboxylation rate
-C     CH2O=total PEP carboxylation rate  
-C     FDBK4=N,P feedback inhibition on C4 CO2 fixation 
+C     CH2O=total PEP carboxylation rate
+C     FDBK4=N,P feedback inhibition on C4 CO2 fixation
 C     SURFX=unself-shaded leaf surface area
 C     TAU0=fraction of diffuse radiation transmitted from layer above
 C
@@ -407,7 +409,7 @@ C     C3 ELECTRON TRANSFER RATES
 C
 C     ETGRO=light-limited rubisco carboxylation rate
 C     ETMX=specific chlorophyll activity from PFT file
-C     TFNE=temperature function for e- transport 
+C     TFNE=temperature function for e- transport
 C     ETDN=surficial density of chlorophyll in bundle sheath
 C     CBXN=rubisco caboxylation efficiency
 C     CO2L=intercellular CO2 concentrations (uM)
@@ -459,7 +461,7 @@ C     C3 ELECTRON TRANSFER RATES
 C
 C     ETGRO=light-limited rubisco carboxylation rate
 C     ETMX=specific chlorophyll activity from PFT file
-C     TFNE=temperature function for e- transport 
+C     TFNE=temperature function for e- transport
 C     ETDN=surficial density of chlorophyll in mesophyll
 C     CBXN=rubisco caboxylation efficiency
 C     CO2L=intercellular CO2 concentrations (uM)
@@ -491,7 +493,7 @@ C
 C
 C     LIGHT-LIMITED CARBOXYLATION RATES
 C
-C     QNTM=quantum efficiency 
+C     QNTM=quantum efficiency
 C     PAR=direct PAR flux
 C     ETGRO=light saturated e- transport rate
 C     ETLF=light-limited e- transport rate
@@ -509,7 +511,7 @@ C     VL=rubisco carboxylation rate limited by light,CO2,N,P
 C     VGRO=rubisco carboxylation rate limited by CO2
 C     EGRO=light-limited rubisco carboxylation rate
 C     FDBK=N,P feedback inhibition on C3 CO2 fixation
-C     CH2O=total rubisco carboxylation rate  
+C     CH2O=total rubisco carboxylation rate
 C     SURFX=unself-shaded leaf surface area
 C     TAUS=fraction of direct radiation transmitted from layer above
 C
@@ -549,8 +551,8 @@ C
 C     VL=rubisco carboxylation rate limited by light,CO2,N,P
 C     VGRO=rubisco carboxylation rate limited by CO2
 C     EGRO=light-limited rubisco carboxylation rate
-C     CH2O=total rubisco carboxylation rate  
-C     FDBK=N,P feedback inhibition on C3 CO2 fixation 
+C     CH2O=total rubisco carboxylation rate
+C     FDBK=N,P feedback inhibition on C3 CO2 fixation
 C     SURFX=unself-shaded leaf surface area
 C     TAU0=fraction of diffuse radiation transmitted from layer above
 C
@@ -583,10 +585,10 @@ C     MINIMUM CANOPY STOMATAL RESISTANCE FROM CO2 CONCENTRATION
 C     DIFFERENCE DIVIDED BY TOTAL CO2 FIXATION
 C
 C     RSX,RSMN=minimum canopy stomatal resistance to CO2,H2O (h m-1)
-C     CH2O=total PEP(C4) or rubisco(C3) carboxylation rate  
+C     CH2O=total PEP(C4) or rubisco(C3) carboxylation rate
 C     FRADP=fraction of radiation received by each PFT canopy
 C     DCO2=difference between atmosph and intercellular CO2 concn (umol m-3)
-C     AREA=area of grid cell 
+C     AREA=area of grid cell
 C     RSMY=minimum stomatal resistance for CO2 uptake (h m-1)
 C
       IF(CH2O.GT.ZEROP(NZ,NY,NX))THEN
@@ -607,4 +609,3 @@ C     ENDIF
 3010  FORMAT(A8,2I4,1E12.4)
       RETURN
       END
-

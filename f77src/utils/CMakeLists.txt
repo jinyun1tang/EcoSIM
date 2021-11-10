@@ -1,4 +1,5 @@
 set(ECOSYS_UTIL_SOURCES
+  data_kind_mod.F90
 	endrun.f
 	TestMod.F90
 )

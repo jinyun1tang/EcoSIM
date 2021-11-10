@@ -1,5 +1,5 @@
 module TestMod
-
+  use data_kind_mod, only : r8 => SHR_KIND_R8
 implicit none
 
   private
@@ -66,7 +66,7 @@ contains
     this%output = 16
     call this%ReadNamelist(trim(namelist_file),err_status)
     if(err_status%check_status())then
-      call endrun('stopped in '//mod_filename, __LINE__)      
+      call endrun('stopped in '//mod_filename, __LINE__)
     endif
     call this%CheckInput(err_status)
     this%filename = trim(case_name) // '.regression'
@@ -208,10 +208,10 @@ contains
     class(ecosys_regression_type)         , intent(inout) :: this
     character(len=ecosim_string_length)   , intent(in)    :: category
     character(len=ecosim_var_name_length) , intent(in)    :: name
-    real*8                            , intent(in)    :: data(:)
+    real(r8)                            , intent(in)    :: data(:)
 
     integer :: cell_increment, num_cells, cell
-    real*8 :: val, local_val
+    real(r8) :: val, local_val
 
     ! FIXME(bja, 201603) cfg/ini format limits the characters that can
     ! be use in section names. We need to sanitize the names!
@@ -278,7 +278,7 @@ contains
   character(len=*), intent(in) :: msg
   integer, intent(in) :: err
   integer, optional, intent(in) :: c
-  
+
   if(present(c))then
     write(this%msg,'(A,A,I6.6)')trim(msg),' col=',c
   else
@@ -313,7 +313,7 @@ contains
   integer :: print_err
 
   print_err = this%error
-  end function print_err  
+  end function print_err
 
 
 

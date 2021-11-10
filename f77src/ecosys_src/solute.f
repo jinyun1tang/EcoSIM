@@ -3,6 +3,8 @@ C
 C     THIS SUBROUTINE CALCULATES ALL SOLUTE TRANSFORMATIONS
 C     FROM THERMODYNAMIC EQUILIBRIA
 C
+      use data_kind_mod, only : r8 => SHR_KIND_R8
+
       include "parameters.h"
       include "blkc.h"
       include "blk2a.h"
@@ -967,10 +969,10 @@ C------------------------------------------------------------------------
 
       subroutine urea_hydrolysis(RSNUA, RSNUB)
 
-      real*8, intent(out) :: RSNUA
-      real*8, intent(out) :: RSNUB
-      real*8 :: CNHUA, COMA, DUKD
-      real*8 :: DFNSA
+      real(r8), intent(out) :: RSNUA
+      real(r8), intent(out) :: RSNUB
+      real(r8) :: CNHUA, COMA, DUKD
+      real(r8) :: DFNSA
 C
 C     UREA HYDROLYSIS IN BAND AND NON-BAND SOIL ZONES
 C
@@ -1057,14 +1059,14 @@ C------------------------------------------------------------------------
       subroutine update_soil_fertlizer(CN41, CN31, CN3B,
      2CN4B, XN4B, XN41)
 
-      real*8, intent(out) :: CN41, CN31
-      real*8, intent(out) :: CN3B
-      real*8, intent(out) :: CN4B
-      real*8, intent(out) :: XN4B, XN41
-      real*8 :: RN4X,RN3X
-      real*8 :: VOLWNX
-      real*8 :: RNBX
-      real*8 :: R3BX
+      real(r8), intent(out) :: CN41, CN31
+      real(r8), intent(out) :: CN3B
+      real(r8), intent(out) :: CN4B
+      real(r8), intent(out) :: XN4B, XN41
+      real(r8) :: RN4X,RN3X
+      real(r8) :: VOLWNX
+      real(r8) :: RNBX
+      real(r8) :: R3BX
 
       call urea_hydrolysis(RSNUA, RSNUB)
 

@@ -6,6 +6,8 @@ C     C, N, P, WATER AND HEAT TO OUTPUT FILES DEPENDING
 C     ON SELECTIONS MADE IN OUTPUT CONTROL FILES IN
 C     THE RUN SCRIPT
 C
+      use data_kind_mod, only : r8 => SHR_KIND_R8
+
       include "parameters.h"
       include "filec.h"
       include "files.h"

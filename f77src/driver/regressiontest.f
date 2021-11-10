@@ -1,5 +1,6 @@
       subroutine regressiontest(nmfile,case_name, NX, NY)
 
+      use data_kind_mod, only : r8 => SHR_KIND_R8
       use TestMod, only : regression
       include "parameters.h"
 C      include "filec.h"

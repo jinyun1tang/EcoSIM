@@ -3,6 +3,8 @@ C
 C     THIS SUBROUTINE REINITIALIZES HOURLY VARIABLES USED IN OTHER
 C     SUBROUTINES
 C
+      use data_kind_mod, only : r8 => SHR_KIND_R8
+
       include "parameters.h"
       include "files.h"
       include "filec.h"

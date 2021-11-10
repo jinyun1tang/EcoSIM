@@ -4,6 +4,8 @@ C
 C     THIS SUBROUTINE CALCULATES EXCHANGES OF ENERGY, C, N AND P
 C     BETWEEN THE CANOPY AND THE ATMOSPHERE AND BETWEEN ROOTS AND THE SOIL
 C
+      use data_kind_mod, only : r8 => SHR_KIND_R8
+
       include "parameters.h"
       include "blkc.h"
       include "blk1cp.h"
@@ -271,7 +273,7 @@ C     RESET TOTAL UPTAKE ARRAYS
 C
 C     ARLFP,ARSTP=leaf,stalk areas
 C
-      real*8 :: ARLSC
+      real(r8) :: ARLSC
 
       ARLSC=0.0
       DO 9984 NZ=1,NP0(NY,NX)
@@ -351,7 +353,7 @@ C     ENDIF
 C------------------------------------------------------------------------
       subroutine calc_canopy_vars
 
-      real*8 :: TFRADP, ALFZ
+      real(r8) :: TFRADP, ALFZ
 C
 C     APPLY CLUMPING FACTOR TO LEAF SURFACE AREA DEFINED BY
 C     INCLINATION N, LAYER L, NODE K, BRANCH NB, SPECIES NZ,
@@ -517,12 +519,12 @@ C------------------------------------------------------------------------
 
       subroutine handling_divergence(DIFF,NN, FDMP)
 
-      real*8, intent(in) :: DIFF
+      real(r8), intent(in) :: DIFF
       integer, intent(in) :: NN
-      real*8, intent(out) :: FDMP
+      real(r8), intent(out) :: FDMP
 C     local variables
-      real*8 :: FTHRM, APSILT, CCPOLT, OSWT, APSIRT
-      real*8 :: FDMR
+      real(r8) :: FTHRM, APSILT, CCPOLT, OSWT, APSIRT
+      real(r8) :: FDMR
 
       IF(NN.GE.MXN)THEN
       WRITE(*,9999)IYRC,I,J,NX,NY,NZ
@@ -573,21 +575,21 @@ C     local variables
 C------------------------------------------------------------------------------
       function test_convergence(TKCX, VHCPX, WVPLT, HFLWC1, PSILH,
      2FPC, MXN, DIFF, UPRT, VFLXC) result(NN)
-      real*8 , intent(in) :: TKCX
-      real*8 , intent(in) :: VHCPX
-      real*8 , intent(in) :: HFLWC1
-      real*8 , intent(in) :: PSILH
+      real(r8) , intent(in) :: TKCX
+      real(r8) , intent(in) :: VHCPX
+      real(r8) , intent(in) :: HFLWC1
+      real(r8) , intent(in) :: PSILH
       integer, intent(in) :: MXN
-      real*8, intent(out) :: DIFF
-      real*8, intent(out) :: UPRT
-      real*8, intent(out) :: VFLXC
+      real(r8), intent(out) :: DIFF
+      real(r8), intent(out) :: UPRT
+      real(r8), intent(out) :: VFLXC
 C     return variables
       integer :: NN
 C     local variables
       integer :: ICHK, IC
-      real*8 :: PSIL2, EPX, UPRTX, VOLWPX, XC
-      real*8 :: RA1, PAREX, PARHX
-      real*8 :: OSWT, CCPOLT, FTHRM, FDTHS
+      real(r8) :: PSIL2, EPX, UPRTX, VOLWPX, XC
+      real(r8) :: RA1, PAREX, PARHX
+      real(r8) :: OSWT, CCPOLT, FTHRM, FDTHS
 
       CCPOLT=CCPOLP(NZ,NY,NX)+CZPOLP(NZ,NY,NX)+CPPOLP(NZ,NY,NX)
       OSWT=36.0+840.0*AMAX1(0.0,CCPOLT)
@@ -880,8 +882,8 @@ C
 C------------------------------------------------------------------------
       subroutine calc_resistance(CNDT, PSILH)
 
-      real*8, intent(out) :: CNDT, PSILH
-      real*8 :: FRADW
+      real(r8), intent(out) :: CNDT, PSILH
+      real(r8) :: FRADW
 C     GRAVIMETRIC WATER POTENTIAL FROM CANOPY HEIGHT
 C
 C     HTSTZ=canopy height for water uptake
@@ -1001,10 +1003,10 @@ C------------------------------------------------------------------------
 
       subroutine set_bare_soil(FDMP)
 
-      real*8, intent(out) :: FDMP
-      real*8 :: FDMR
-      real*8 :: FTHRM, APSILT, CCPOLT
-      real*8 :: OSWT, APSIRT
+      real(r8), intent(out) :: FDMP
+      real(r8) :: FDMR
+      real(r8) :: FTHRM, APSILT, CCPOLT
+      real(r8) :: OSWT, APSIRT
 
       RAD1(NZ,NY,NX)=0.0
       EFLXC(NZ,NY,NX)=0.0
@@ -1054,13 +1056,13 @@ C------------------------------------------------------------------------
       subroutine update_canopy_water(TKCX, VHCPX, UPRT, HFLWC1,
      2VFLXC)
 
-      real*8, intent(in) :: VHCPX
-      real*8, intent(in) :: TKCX
-      real*8, intent(in) :: UPRT
-      real*8, intent(in) :: HFLWC1
-      real*8, intent(in) :: VFLXC
-      real*8 :: FDMR, APSIRT
-      real*8 :: CCPOLT
+      real(r8), intent(in) :: VHCPX
+      real(r8), intent(in) :: TKCX
+      real(r8), intent(in) :: UPRT
+      real(r8), intent(in) :: HFLWC1
+      real(r8), intent(in) :: VFLXC
+      real(r8) :: FDMR, APSIRT
+      real(r8) :: CCPOLT
 C
 C     CANOPY SURFACE WATER STORAGE, SENSIBLE AND STORAGE HEAT FLUXES
 C     (NOT EXPLICITLY CALCULATED IN CONVERGENCE SOLUTION)
@@ -1128,8 +1130,8 @@ C------------------------------------------------------------------------
 
       subroutine set_canopy_growth_fT
 
-      real*8 :: TKGO
-      real*8 :: RTK, STK, ACTV
+      real(r8) :: TKGO
+      real(r8) :: RTK, STK, ACTV
 C
 C     SET CANOPY GROWTH TEMPERATURE FROM SOIL SURFACE
 C     OR CANOPY TEMPERATURE DEPENDING ON GROWTH STAGE
@@ -1184,8 +1186,8 @@ C------------------------------------------------------------------------
 
       subroutine canopy_nh3_flux(FDMP)
 
-      real*8, intent(in) :: FDMP
-      real*8 :: CNH3P, ZPOOLB, FNH3P
+      real(r8), intent(in) :: FDMP
+      real(r8) :: CNH3P, ZPOOLB, FNH3P
 C
 C     NH3 EXCHANGE BETWEEN CANOPY AND ATMOSPHERE FROM NH3
 C     CONCENTRATION DIFFERENCES 'CNH3E' (ATMOSPHERE FROM 'READS') AND
@@ -1327,15 +1329,15 @@ C------------------------------------------------------------------------
       subroutine uptake_HPO4(FCUP, FPUP, UPWTRP, DIFFL, FWSRT,
      2FP14X, FP1BX)
 
-      real*8, intent(in) :: FCUP
-      real*8, intent(in) :: FPUP
-      real*8, intent(in) :: UPWTRP
-      real*8, intent(in) :: DIFFL
-      real*8, intent(in) :: FWSRT
-      real*8, intent(in) :: FP14X, FP1BX
-      real*8 :: RMFH1P, DIFH1P
-      REAL*8 :: X, Y, B, C, CP, BP
-      real*8 :: RTKH1P, H1POM, H1POX
+      real(r8), intent(in) :: FCUP
+      real(r8), intent(in) :: FPUP
+      real(r8), intent(in) :: UPWTRP
+      real(r8), intent(in) :: DIFFL
+      real(r8), intent(in) :: FWSRT
+      real(r8), intent(in) :: FP14X, FP1BX
+      real(r8) :: RMFH1P, DIFH1P
+      real(r8) :: X, Y, B, C, CP, BP
+      real(r8) :: RTKH1P, H1POM, H1POX
 C
 C     HPO4 UPTAKE IN NON-BAND SOIL ZONE
 C
@@ -1482,12 +1484,12 @@ C------------------------------------------------------------------------
       subroutine uptake_H2PO4(FCUP, FPUP, UPWTRP, DIFFL,
      2FWSRT, FPO4X, FPOBX)
 
-      real*8, intent(in) :: FCUP
-      real*8, intent(in) :: FPUP
-      real*8, intent(in) :: UPWTRP
-      real*8, intent(in) :: DIFFL
-      real*8, intent(in) :: FWSRT
-      real*8, intent(in) :: FPO4X, FPOBX
+      real(r8), intent(in) :: FCUP
+      real(r8), intent(in) :: FPUP
+      real(r8), intent(in) :: UPWTRP
+      real(r8), intent(in) :: DIFFL
+      real(r8), intent(in) :: FWSRT
+      real(r8), intent(in) :: FPO4X, FPOBX
 
 C
 C     H2PO4 UPTAKE IN NON-BAND SOIL ZONE
@@ -1636,17 +1638,17 @@ C------------------------------------------------------------------------
       subroutine uptake_minP(FCUP, FPUP, UPWTRP, FWSRT,
      2TFPO4X,TFP14X,TFPOBX,TFP1BX)
 
-      real*8, intent(in) :: FCUP
-      real*8, intent(in) :: FPUP
-      real*8, intent(in) :: FWSRT
-      real*8, intent(in) :: UPWTRP
-      real*8, intent(inout) :: TFPO4X,TFP14X,TFPOBX,TFP1BX
-      real*8 :: POSGX
-      real*8 :: PATHL
-      real*8  :: DIFFL
+      real(r8), intent(in) :: FCUP
+      real(r8), intent(in) :: FPUP
+      real(r8), intent(in) :: FWSRT
+      real(r8), intent(in) :: UPWTRP
+      real(r8), intent(inout) :: TFPO4X,TFP14X,TFPOBX,TFP1BX
+      real(r8) :: POSGX
+      real(r8) :: PATHL
+      real(r8)  :: DIFFL
 
-      real*8 :: FP14X, FP1BX
-      real*8 :: FPO4X, FPOBX
+      real(r8) :: FP14X, FP1BX
+      real(r8) :: FPO4X, FPOBX
 
 
       IF(RPO4Y(L,NY,NX).GT.ZEROS(NY,NX))THEN
@@ -1721,14 +1723,14 @@ C------------------------------------------------------------------------
       subroutine uptake_NO3(FCUP, FZUP, UPWTRP, FWSRT,
      2FNO3X, FNOBX)
 
-      real*8, intent(in) :: FCUP
-      real*8, intent(in) :: FZUP
-      real*8, intent(in) :: UPWTRP
-      real*8, intent(in) :: FWSRT
-      real*8, intent(in) :: FNO3X, FNOBX
-      real*8 :: ZOSGX
-      real*8 :: PATHL
-      real*8 :: DIFFL
+      real(r8), intent(in) :: FCUP
+      real(r8), intent(in) :: FZUP
+      real(r8), intent(in) :: UPWTRP
+      real(r8), intent(in) :: FWSRT
+      real(r8), intent(in) :: FNO3X, FNOBX
+      real(r8) :: ZOSGX
+      real(r8) :: PATHL
+      real(r8) :: DIFFL
 C
 C     PARAMETERS FOR RADIAL MASS FLOW AND DIFFUSION OF NO3
 C     FROM SOIL TO ROOT
@@ -1892,14 +1894,14 @@ C------------------------------------------------------------------------
 
       subroutine uptake_NH4(FCUP, FZUP, UPWTRP, FWSRT, FNH4X, FNHBX)
 
-      real*8, intent(in) :: FCUP
-      real*8, intent(in) :: FZUP
-      real*8, intent(in) :: UPWTRP
-      real*8, intent(in) :: FWSRT
-      real*8, intent(in) :: FNH4X, FNHBX
-      real*8 :: ZNSGX
-      real*8 :: PATHL
-      real*8 :: DIFFL
+      real(r8), intent(in) :: FCUP
+      real(r8), intent(in) :: FZUP
+      real(r8), intent(in) :: UPWTRP
+      real(r8), intent(in) :: FWSRT
+      real(r8), intent(in) :: FNH4X, FNHBX
+      real(r8) :: ZNSGX
+      real(r8) :: PATHL
+      real(r8) :: DIFFL
 C     ZNSGL=NH4 diffusivity
 C     TORT=soil tortuosity
 C     PATH=path length of water and nutrient uptake
@@ -2061,9 +2063,9 @@ C------------------------------------------------------------------------
       subroutine uptake_minN(FCUP, FZUP, UPWTRP, FWSRT,
      2TFNH4X, TFNO3X, TFNHBX, TFNOBX)
 
-      real*8, intent(inout) :: TFNH4X, TFNO3X, TFNHBX, TFNOBX
-      real*8 :: FNO3X, FNOBX
-      real*8 :: FNH4X, FNHBX
+      real(r8), intent(inout) :: TFNH4X, TFNO3X, TFNHBX, TFNOBX
+      real(r8) :: FNO3X, FNOBX
+      real(r8) :: FNH4X, FNHBX
       IF(RNH4Y(L,NY,NX).GT.ZEROS(NY,NX))THEN
       FNH4X=AMAX1(FPP(N,L,NZ),RUNNHP(N,L,NZ,NY,NX)/RNH4Y(L,NY,NX))
       ELSE
@@ -2236,7 +2238,7 @@ C------------------------------------------------------------------------
       subroutine get_uptake_capcity(FWSRT, FCUP, FZUP, FPUP,
      2UPWTRP, UPWTRH, FOXYX)
 
-      real*8, intent(out) ::FWSRT, FCUP, FZUP, FPUP,
+      real(r8), intent(out) ::FWSRT, FCUP, FZUP, FPUP,
      2UPWTRP, UPWTRH, FOXYX
 C
 C     UPTAKE CAPACITY 'FWSRT' DEPENDS ON ROOT,MYCORRHIZAL
@@ -2338,8 +2340,8 @@ C------------------------------------------------------------------------
 
       subroutine root_soil_gas_exchange(FOXYX, RUPOXT)
 
-      real*8, intent(in) :: FOXYX
-      real*8, intent(out):: RUPOXT
+      real(r8), intent(in) :: FOXYX
+      real(r8), intent(out):: RUPOXT
       IF(RCO2M(N,L,NZ,NY,NX).GT.ZEROP(NZ,NY,NX)
      2.AND.RTVLW(N,L,NZ,NY,NX).GT.ZEROP(NZ,NY,NX)
      2.AND.FOXYX.GT.ZEROQ(NZ,NY,NX))THEN

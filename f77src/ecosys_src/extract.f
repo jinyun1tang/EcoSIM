@@ -3,6 +3,8 @@ C
 C     THIS SUBROUTINE AGGREGATES ALL SOIL-PLANT C,N,P EXCHANGES
 C     FROM 'UPTAKE' AMD 'GROSUB' AND SENDS RESULTS TO 'REDIST'
 C
+      use data_kind_mod, only : r8 => SHR_KIND_R8
+
       include "parameters.h"
       include "blkc.h"
       include "blk1cp.h"
@@ -34,8 +36,8 @@ C
 C
 C     TOTAL LITTERFALL OF ALL PLANT SPECIES
 C
-C     ZCSNC,ZZSNC,ZPSNC=total C,N,P litterfall 
-C     HCSNC,HZSNC,HPSNC=hourly PFT C,N,P litterfall from grosub.f 
+C     ZCSNC,ZZSNC,ZPSNC=total C,N,P litterfall
+C     HCSNC,HZSNC,HPSNC=hourly PFT C,N,P litterfall from grosub.f
 C     WTSTGT=total standing dead C,N,P mass
 C     WTSTG=PFT standing dead C,N,P mass
 C     CSNC,ZSNC,PSNC=cumulative PFT C,N,P litterfall from grosub.f
@@ -84,7 +86,7 @@ C
 C
 C     TOTAL ROOT DENSITY
 C
-C     RTDNT=total root length density 
+C     RTDNT=total root length density
 C     RTDNP=PFT root length density per plant
 C     UPWTR=total water uptake
 C     UPWTR=PFT root water uptake
@@ -154,13 +156,13 @@ C
      2+H2GA(N,L,NZ,NY,NX)
 C     IF(NX.EQ.1.AND.NY.EQ.1)THEN
 C     WRITE(*,5566)'TLOXYP',I,J,NX,NY,NZ,L,N
-C    2,TLOXYP(L,NY,NX),OXYP(N,L,NZ,NY,NX),OXYA(N,L,NZ,NY,NX) 
+C    2,TLOXYP(L,NY,NX),OXYP(N,L,NZ,NY,NX),OXYA(N,L,NZ,NY,NX)
 C    3,ROXDFA(N,L,NZ,NY,NX),RUPOXP(N,L,NZ,NY,NX),ROXFLA(N,L,NZ,NY,NX)
 C    4,TLCO2P(L,NY,NX),CO2P(N,L,NZ,NY,NX),CO2A(N,L,NZ,NY,NX)
 C    5,RCODFA(N,L,NZ,NY,NX),RCO2P(N,L,NZ,NY,NX)
 C    6,RCO2S(N,L,NZ,NY,NX)
 C    4,TLCH4P(L,NY,NX),CH4P(N,L,NZ,NY,NX),CH4A(N,L,NZ,NY,NX)
-C    5,RCHDFA(N,L,NZ,NY,NX),RUPCHS(N,L,NZ,NY,NX),RCHFLA(N,L,NZ,NY,NX) 
+C    5,RCHDFA(N,L,NZ,NY,NX),RUPCHS(N,L,NZ,NY,NX),RCHFLA(N,L,NZ,NY,NX)
 5566  FORMAT(A8,7I4,20E12.4)
 C     ENDIF
 C
@@ -206,14 +208,14 @@ C    2,RUPOXS(N,L,NZ,NY,NX),TUPOXP(L,NY,NX),RUPOXP(N,L,NZ,NY,NX)
 C     WRITE(*,4141)'TCHFLA',I,J,NX,NY,L,NZ,N,TCHFLA(L,NY,NX)
 C    2,RCHFLA(N,L,NZ,NY,NX),RUPCHS(N,L,NZ,NY,NX)
 C     WRITE(*,4141)'TUPN2S',I,J,NX,NY,L,NZ,N,TUPN2S(L,NY,NX)
-C    2,RUPN2S(N,L,NZ,NY,NX) 
+C    2,RUPN2S(N,L,NZ,NY,NX)
 4141  FORMAT(A8,7I4,12E12.4)
 C     ENDIF
 C
 C     TOTAL ROOT C,N,P EXUDATION
 C
 C     TDFOMC,TDFOMN,TDFOMP=total nonstructl C,N,P exchange
-C     RDFOMC,RDFOMN,RDFOMP=PFT nonstructl C,N,P exchange 
+C     RDFOMC,RDFOMN,RDFOMP=PFT nonstructl C,N,P exchange
 C
       DO 195 K=0,4
       TDFOMC(K,L,NY,NX)=TDFOMC(K,L,NY,NX)-RDFOMC(N,K,L,NZ,NY,NX)
@@ -225,7 +227,7 @@ C     TOTAL ROOT O2, NH4, NO3, PO4 UPTAKE CONTRIBUTES TO
 C     TOTAL ROOT + MICROBIAL UPTAKE USED TO CALCULATE
 C     COMPETITION CONSTRAINTS
 C
-C     ROXYX=O2 demand by all microbial,root,myco populations 
+C     ROXYX=O2 demand by all microbial,root,myco populations
 C     RNH4X=NH4 demand in non-band by all microbial,root,myco populations
 C     RNO3X=NO3 demand in non-band by all microbial,root,myco populations
 C     RPO4X=H2PO4 demand in non-band by all microbial,root,myco populations
@@ -283,14 +285,14 @@ C     TCCAN=total net CO2 fixation
 C     CNET=PFT net CO2 fixation
 C     TVOLWP,TVOLWC=total water volume in canopy,on canopy surfaces
 C     VOLWP,VOLWC=PFT water volume in canopy,on canopy surfaces
-C     TEVAPP,TEVAPC=total water flux to,from canopy,canopy surfaces 
+C     TEVAPP,TEVAPC=total water flux to,from canopy,canopy surfaces
 C     EVAPC,EP=water flux to,from canopy surfaces, inside canopy
 C     TENGYC=total canopy water heat content
 C     ENGYC=PFT canopy water heat content
 C     ARLFC,ARSTC=total leaf,stalk area
 C     ARLFP,ARSTP=PFT leaf,stalk area
-C     ZCSNC,ZZSNC,ZPSNC=total net root-soil C,N,P exchange 
-C     HCUPTK,HZUPTK,HPUPTK=PFT net root-soil C,N,P exchange 
+C     ZCSNC,ZZSNC,ZPSNC=total net root-soil C,N,P exchange
+C     HCUPTK,HZUPTK,HPUPTK=PFT net root-soil C,N,P exchange
 C     TBALC,TBALN,TBALP=total C,N,P balance
 C     BALC,BALN,BALP=PFT C,N,P balance
 C     TCO2Z,TOXYZ,TCH4Z,TN2OZ,TNH3Z,TH2GZ=total loss of root CO2, O2, CH4, N2O, NH3, H2
