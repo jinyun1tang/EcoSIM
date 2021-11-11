@@ -6,8 +6,9 @@ C     THIS SUBROUTINE READS INPUT DATA FROM PLANT SPECIES
 C     AND MANAGEMENT FILES IDENTIFIED IN 'ROUTQ'
 C
       use data_kind_mod, only : r8 => SHR_KIND_R8
-      integer, intent(in) :: NA(:),ND(:)
-      integer, intent(in) :: NT,NE,NAX,NDX,NTX,NEX,NF,NFX,NTZ
+      integer, intent(in) :: NEX
+      integer, intent(in) :: NA(1:NEX),ND(1:NEX)
+      integer, intent(in) :: NT,NE,NAX,NDX,NTX,NF,NFX,NTZ
      2,NTZX,NHW,NHE,NVN,NVS
 
       include "parameters.h"

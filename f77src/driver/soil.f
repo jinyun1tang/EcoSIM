@@ -4,7 +4,7 @@ C
 C     THIS IS THE MAIN SUBROUTINE FROM WHICH ALL OTHERS ARE CALLED
 C
       use data_kind_mod, only : r8 => SHR_KIND_R8
-      integer, intent(in) :: NA(:),ND(:)
+      integer, intent(in) :: NA(1:NEX),ND(1:NEX)
       integer, intent(in) :: NT,NE,NAX,NDX,NTX,NEX
      2,NHW,NHE,NVN,NVS
 
@@ -24,7 +24,8 @@ C     WRITE(*,333)'READI'
       CALL READI(NA,ND,NT,NE,NAX,NDX,NTX,NEX,NF,NFX,NTZ
      2,NTZX,NHW,NHE,NVN,NVS)
       ENDIF
-C     WRITE(*,333)'READS'
+      WRITE(*,333)'READS'
+      print*,'na',size(na)
       CALL READS(NA,ND,NT,NE,NAX,NDX,NTX,NEX,NF,NFX,NTZ
      2,NTZX,NHW,NHE,NVN,NVS)
 C     WRITE(*,333)'FOUTS'

@@ -9,7 +9,7 @@ C
       integer, intent(in) :: NT,NE,NAX,NDX,NTX,NEX
      2,NTZX,NHW,NHE,NVN,NVS
       integer, intent(out) :: NF, NFX, NTZ
-      integer, intent(in) :: NA(:),ND(:)
+      integer, intent(in) :: NA(1:NEX),ND(1:NEX)
       include "parameters.h"
       include "filec.h"
       include "files.h"

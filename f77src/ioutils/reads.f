@@ -5,9 +5,9 @@ C
 C     THIS SUBROUTINE READS ALL SOIL AND PLANT MANAGEMENT INPUT FILES
 C
       use data_kind_mod, only : r8 => SHR_KIND_R8
-      integer, intent(in) :: NA(:),ND(:)
-      integer, intent(in) :: NT,NE,NAX,NDX,NTX,NEX
-     2,NHW,NHE,NVN,NVS
+      integer, intent(in) :: NEX
+      integer, intent(in) :: NA(1:NEX),ND(1:NEX)
+      integer, intent(in) :: NT,NE,NAX,NDX,NTX,NHW,NHE,NVN,NVS
       integer, intent(inout) :: NF, NFX, NTZ
       integer, intent(out) :: NTZX
       include "parameters.h"
