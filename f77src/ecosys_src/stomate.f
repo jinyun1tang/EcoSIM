@@ -5,6 +5,8 @@ C     THIS SUBROUTINE CALCULATES CANOPY STOMATAL RESISTANCE AT MAXIMUM
 C     CANOPY TURGOR FOR USE IN ENERGY BALANCE EQUATIONS IN 'UPTAKE'
 C
       use data_kind_mod, only : r8 => SHR_KIND_R8
+      integer, intent(in) :: I, J
+      integer, intent(in) :: NZ,NY,NX
 
       include "parameters.h"
       include "blkc.h"
@@ -21,7 +23,7 @@ C
       include "blk9b.h"
       include "blk9c.h"
       include "blk1u.h"
-      DIMENSION FLG4Y(0:5)
+      real(r8) :: FLG4Y(0:5)
 C
 C     QNTM=quantum efficiency (umol e- umol-1 PAR)
 C     CURV=shape parameter for e- transport response to PAR
@@ -36,12 +38,12 @@ C     FBS,FMP=leaf water content in bundle sheath, mesophyll in C4 CO2 fixn
 C     C4KI=nonstructural C inhibition constant on PEP carboxylase (uM)
 C     FLG4Y=number of hours with no grain fill to terminate annuals
 C
-      PARAMETER (QNTM=0.45,CURV=0.70,CURV2=2.0*CURV,CURV4=4.0*CURV
-     2,ELEC3=4.5,ELEC4=3.0)
-      PARAMETER (CNKI=1.0E+02,CPKI=1.0E+03)
-      PARAMETER (RSMY=2.78E-03,ATRPZ=276.9)
-      PARAMETER (COMP4=0.5,FDML=6.0,FBS=0.2*FDML,FMP=0.8*FDML
-     2,C4KI=5.0E+06)
+      real(r8), PARAMETER :: QNTM=0.45,CURV=0.70,CURV2=2.0*CURV
+     2,CURV4=4.0*CURV,ELEC3=4.5,ELEC4=3.0
+      real(r8), PARAMETER :: CNKI=1.0E+02,CPKI=1.0E+03
+      real(r8), PARAMETER :: RSMY=2.78E-03,ATRPZ=276.9
+      real(r8), PARAMETER :: COMP4=0.5,FDML=6.0,FBS=0.2*FDML
+     2,FMP=0.8*FDML,C4KI=5.0E+06
       DATA FLG4Y/336.0,672.0,672.0,672.0,672.0,672.0/
 C
 C     CANOPY TEMPERATURE + OFFSET FOR THERMAL ADAPTATION FROM 'READQ'

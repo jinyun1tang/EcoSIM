@@ -5,6 +5,8 @@ C     AND SOIL SURFACES, FREEZING, THAWING, AND HEAT AND WATER
 C     TRANSFER THROUGH SOIL PROFILES
 C
       use data_kind_mod, only : r8 => SHR_KIND_R8
+      integer, intent(in) :: I, J
+      integer, intent(in) :: NHW,NHE,NVN,NVS
 
       include "parameters.h"
       include "blkc.h"
@@ -26,7 +28,8 @@ C
       include "blk22b.h"
       include "blk22c.h"
       include "blktest.h"
-      DIMENSION VOLWX1(JZ,JY,JX),VPQ(JY,JX),TKQ(JY,JX)
+
+      real(r8) :: VOLWX1(JZ,JY,JX),VPQ(JY,JX),TKQ(JY,JX)
      2,XVOLT(JY,JX),XVOLW(JY,JX),XVOLI(JY,JX),FMAC(JZ,JY,JX)
      3,FGRD(JZ,JY,JX),VOLW1(0:JZ,JY,JX),VOLI1(0:JZ,JY,JX)
      4,VHCP1(0:JZ,JY,JX),VHCP1A(JZ,JY,JX),VHCP1B(JZ,JY,JX)
@@ -45,7 +48,7 @@ C
      6,TQR1(JY,JX),THQR1(JY,JX),EVAPG(JY,JX),TTFLXL(JZ,JY,JX)
      7,EVAPW(JY,JX),EVAPS(JY,JX),EVAPR(JY,JX),FLWRL(JY,JX)
      8,HFLWRL(JY,JX),FINHL(JZ,JY,JX),FLWL(3,JD,JV,JH)
-      DIMENSION FLWHL(3,JD,JV,JH),HFLWL(3,JD,JV,JH)
+      real(r8) :: FLWHL(3,JD,JV,JH),HFLWL(3,JD,JV,JH)
      2,TFLWL(JZ,JY,JX),TFLWHL(JZ,JY,JX),THFLWL(JZ,JY,JX)
      3,WFLXL(JZ,JY,JX),TFLXL(JZ,JY,JX),AVCNHL(3,JD,JV,JH)
      5,THRYW(JY,JX),THRMW(JY,JX),THRMS(JY,JX),THRMR(JY,JX)
@@ -59,7 +62,7 @@ C
      5,VOLIH1(JZ,JY,JX),THETPY(0:JZ,JY,JX),FLWNX(JY,JX)
      6,FLWXNX(JY,JX),FLWHNX(JY,JX),HFLWNX(JY,JX),N6X(JY,JX)
      7,PSISA1(JZ,JY,JX)
-      DIMENSION TQS1(JY,JX),TQW1(JY,JX),TQI1(JY,JX),THQS1(JY,JX)
+      real(r8) :: TQS1(JY,JX),TQW1(JY,JX),TQI1(JY,JX),THQS1(JY,JX)
      2,TFLWS(JS,JY,JX),TFLWW(JS,JY,JX),TFLWI(JS,JY,JX)
      3,THFLWW(JS,JY,JX),TFLX0(JS,JY,JX),WFLXS(JS,JY,JX)
      4,WFLXI(JS,JY,JX),FLW0W(JS,JY,JX),FLW0S(JS,JY,JX)
@@ -75,32 +78,35 @@ C     DPTHSX=minimum snowpack depth for full cover (m)
 C     Z1S,Z2SW,Z2SD,Z3SX=parameters for air-water gas transfers in soil
 C     Z1R,Z2RW,Z2RD,Z3RX=parameters for air-water gas transfers in litter
 C
-      PARAMETER (EMMS=0.97,EMMW=0.97,EMMR=0.97
-     2,RACX=0.0139,RARX=0.0139,RZ=0.0139,RAM=1.39-03,DPTHSX=0.075)
-      PARAMETER (Z1S=0.010,Z2SW=12.0,Z2SD=12.0,Z3SX=0.50
-     2,Z1R=0.01,Z2RW=12.0,Z2RD=12.0,Z3R=0.50)
+      real(r8), PARAMETER :: EMMS=0.97,EMMW=0.97,EMMR=0.97
+     2,RACX=0.0139,RARX=0.0139,RZ=0.0139,RAM=1.39-03,DPTHSX=0.075
+      real(r8), PARAMETER :: Z1S=0.010,Z2SW=12.0,Z2SD=12.0,Z3SX=0.50
+     2,Z1R=0.01,Z2RW=12.0,Z2RD=12.0,Z3R=0.50
 C
 C     Parameters for calculating convective effects on heat transfer
 C     in porous media (air and water)
 C     VISCW,VISCA=water,air viscosity (Mg m-1 s)
 C
-      PARAMETER (VISCW=1.0E-06,VISCA=2.0E-08,DIFFW=1.45E-07
-     2,DIFFA=2.01E-05,EXPNW=2.07E-04,EXPNA=3.66E-03,GRAV=9.8
-     3,RYLXW=GRAV*EXPNW/(VISCW*DIFFW),RYLXA=GRAV*EXPNA/(VISCA*DIFFA)
-     4,PRNTW=VISCW/DIFFW,PRNTA=VISCA/DIFFA
-     5,DNUSW=(1.0+(0.492/PRNTW)**0.5625)**0.4444
-     6,DNUSA=(1.0+(0.492/PRNTA)**0.5625)**0.4444
-     7,TRBW=0.375,TRBA=0.000)
+      real(r8), PARAMETER :: VISCW=1.0E-06,VISCA=2.0E-08
+     2,DIFFW=1.45E-07,DIFFA=2.01E-05,EXPNW=2.07E-04,EXPNA=3.66E-03
+     3,GRAV=9.8,RYLXW=GRAV*EXPNW/(VISCW*DIFFW)
+     4,RYLXA=GRAV*EXPNA/(VISCA*DIFFA)
+     5,PRNTW=VISCW/DIFFW,PRNTA=VISCA/DIFFA
+     6,DNUSW=(1.0+(0.492/PRNTW)**0.5625)**0.4444
+     7,DNUSA=(1.0+(0.492/PRNTA)**0.5625)**0.4444
+     8,TRBW=0.375,TRBA=0.000
 C
 C     FVOLAH=parameter for clay effect on macropore volume
 C     DTHETW=difference between saturation and effective saturation
 C     HCNDRR=saturated hydraulic conductivity of surface litter
 C     FENGYP=rate constant for restoring surface Ksat
 C
-      PARAMETER (FVOLAH=0.0,DTHETW=1.0E-06,HCNDRR=25.0
-     2,FENGYP=1.0E-03)
+      real(r8), PARAMETER :: FVOLAH=0.0,DTHETW=1.0E-06,HCNDRR=25.0
+     2,FENGYP=1.0E-03
+
       REAL*4 RI,THETWR,THETW1,THETA1,THETAL,THETWL
      2,TKR1,TKS1,TKY,TKW1,TK11,TK12,TK0X,TKXR,TK1X,TKX1,TFND1
+
       DO 9995 NX=NHW,NHE
       DO 9990 NY=NVN,NVS
       NUM(NY,NX)=NU(NY,NX)

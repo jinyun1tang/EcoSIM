@@ -4,6 +4,8 @@ C
 C     THIS SUBROUTINE CALCULATES PLANT PHENOLOGY
 C
       use data_kind_mod, only : r8 => SHR_KIND_R8
+      integer, intent(in) :: I, J
+      integer, intent(in) :: NHW,NHE,NVN,NVS
 
       include "parameters.h"
       include "filec.h"
@@ -30,12 +32,8 @@ C
       include "blk16.h"
       include "blk18a.h"
       include "blk18b.h"
-      DIMENSION NBX(0:3),PSILY(0:3)
-C      CHARACTER*16 DATA(30),DATAC(30,250,250),DATAP(JP,JY,JX)
-C     2,DATAM(JP,JY,JX),DATAX(JP),DATAY(JP),DATAZ(JP,JY,JX)
-C     3,OUTS(10),OUTP(10),OUTFILS(10,JY,JX),OUTFILP(10,JP,JY,JX)
-C      CHARACTER*3 CHOICE(102,20)
-C      CHARACTER*8 CDATE
+      real(r8) :: PSILY(0:3)
+      integer :: NBX(0:3)
 C
 C     PSILM=minimum canopy turgor potential for leaf expansion (MPa)
 C     PSILX=minimum canopy water potential for leafout of drought-deciduous PFT (MPa)
@@ -44,10 +42,11 @@ C     GSTGG,GSTGR=normalized growth stage durations for vegetative,reproductive 
 C     NBX=maximum branch number for PFT defined by IBTYP in PFT file
 C     VRNE=maximum hours for leafout,leafoff
 C
-      PARAMETER (PSILM=0.1,PSILX=-0.2)
-      PARAMETER(GSTGG=2.00,GSTGR=0.667,VRNE=3600.0)
+      real(r8), PARAMETER :: PSILM=0.1,PSILX=-0.2
+      real(r8) ,PARAMETER :: GSTGG=2.00,GSTGR=0.667,VRNE=3600.0
       DATA PSILY/-200.0,-2.0,-2.0,-2.0/
       DATA NBX /5,1,1,1/
+
       DO 9995 NX=NHW,NHE
       DO 9990 NY=NVN,NVS
       DO 9985 NZ=1,NP(NY,NX)

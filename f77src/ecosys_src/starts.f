@@ -3,6 +3,7 @@ C
 C     THIS SUBROUTINE INITIALIZES ALL SOIL VARIABLES
 C
       use data_kind_mod, only : r8 => SHR_KIND_R8
+      integer, intent(in) :: NHW,NHE,NVN,NVS
 
       include "parameters.h"
       include "blkc.h"
@@ -20,7 +21,7 @@ C
       include "blk16.h"
       include "blk18a.h"
       include "blk18b.h"
-      DIMENSION YSIN(4),YCOS(4),YAZI(4),ZAZI(4),OSCI(0:4),OSNI(0:4)
+      real(r8) :: YSIN(4),YCOS(4),YAZI(4),ZAZI(4),OSCI(0:4),OSNI(0:4)
      2,ORCI(2,0:4),OSPI(0:4),OSCM(0:4),CORGCX(0:4)
      3,CORGNX(0:4),CORGPX(0:4),CNOSCT(0:4),CPOSCT(0:4)
      4,GSINA(JY,JX),GCOSA(JY,JX),ALTX(JV,JH),CDPTHSI(JS)
@@ -40,7 +41,9 @@ C     FCI,WPI=FC,WP for water retention by ice (MPa)
 C     CDPTHSI=depth to bottom of snowpack layers
 C     POROQ=Penman Water Linear Reduction tortuosity used in gas flux calculations
 C
-      PARAMETER (DCKR=0.25,DCKM=2.5E+04,PSIPS=-0.5E-03,RDN=57.29577951)
+      real(r8), PARAMETER :: DCKR=0.25,DCKM=2.5E+04,PSIPS=-0.5E-03
+     2,RDN=57.29577951
+
       DATA OMCI/0.010,0.050,0.005,0.050,0.050,0.005,0.050,0.050,0.005
      2,0.010,0.050,0.005,0.010,0.050,0.005/
       DATA ORCI/0.01,0.05,0.01,0.05,0.01,0.05

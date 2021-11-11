@@ -5,7 +5,11 @@ C
 C     THIS SUBROUTINE READS ALL SOIL AND PLANT MANAGEMENT INPUT FILES
 C
       use data_kind_mod, only : r8 => SHR_KIND_R8
-
+      integer, intent(in) :: NA(:),ND(:)
+      integer, intent(in) :: NT,NE,NAX,NDX,NTX,NEX
+     2,NHW,NHE,NVN,NVS
+      integer, intent(inout) :: NF, NFX, NTZ
+      integer, intent(out) :: NTZX
       include "parameters.h"
       include "filec.h"
       include "files.h"
@@ -17,21 +21,17 @@ C
       include "blk8b.h"
       include "blk17.h"
       include "blktest.h"
-      DIMENSION NA(10),ND(10)
-C      CHARACTER*16 DATA(30),DATAC(30,250,250),DATAP(JP,JY,JX)
-C     2,DATAM(JP,JY,JX),DATAX(JP),DATAY(JP),DATAZ(JP,JY,JX)
-C     3,OUTS(10),OUTP(10),OUTFILS(10,JY,JX),OUTFILP(10,JP,JY,JX)
-C      CHARACTER*3 CHOICE(102,20)
-C      CHARACTER*8 CDATE
-C      CHARACTER*80 PREFIX
 
-      CHARACTER*16 OUTW,OUTI,OUTT,OUTN,OUTF
-      CHARACTER*4 CHARY
-      CHARACTER*1 TTYPE,CTYPE,IVAR(20),VAR(50),TYP(50)
-      DIMENSION IDAT(20),DAT(50),DATK(50),OUT(50)
-      PARAMETER (TWILGT=0.06976)
+
+      CHARACTER(len=16) :: OUTW,OUTI,OUTT,OUTN,OUTF
+      CHARACTER(len=4) :: CHARY
+      CHARACTER(len=1) :: TTYPE,CTYPE,IVAR(20),VAR(50),TYP(50)
+      integer :: IDAT(20)
+      real(r8) :: DAT(50),DATK(50),OUT(50)
+      real(r8), PARAMETER :: TWILGT=0.06976
       DATA IFLGY,IYRX,IYRD/0,0,0/
-      SAVE N1,N2,N1X,N2X,IFLGY,IYRX,IYRD
+
+      integer, SAVE :: N1,N2,N1X,N2X,IFLGY,IYRX,IYRD
       LOGICAL :: GO110,GO60
 C
 C     OPEN WEATHER(3, OPTIONS(4, AND LAND MANAGEMENT(9, FILES FROM

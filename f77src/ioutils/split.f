@@ -8,21 +8,18 @@ C     GRID CELL AT THE END OF THE SCENE WITH FILE NAME PREFIXES
 C     INDICATING ITS COLUMN AND ROW POSITION.
 C
       use data_kind_mod, only : r8 => SHR_KIND_R8
+      integer, intent(in) :: NT,NE,NAX,NDX,NTX,NEX,NHW,NHE,NVN,NVS
 
       include "parameters.h"
       include "filec.h"
       include "files.h"
       include "blkc.h"
-C      CHARACTER*16 DATA(30),DATAC(30,250,250),DATAP(JP,JY,JX)
-C     2,DATAM(JP,JY,JX),DATAX(JP),DATAY(JP),DATAZ(JP,JY,JX)
-C     3,OUTS(10),OUTP(10),OUTFILS(10,JY,JX),OUTFILP(10,JP,JY,JX)
-C      CHARACTER*3 CHOICE(102,20)
-C      CHARACTER*8 CDATE
-      CHARACTER*8 CDOY,DATE,HOUR
-      CHARACTER*16 CHEAD
-      CHARACTER*16 OUTFILE
-      CHARACTER*16 HEAD(50)
-      DIMENSION HEAX(50)
+
+      CHARACTER(len=8) :: CDOY,DATE,HOUR
+      CHARACTER(len=16):: CHEAD
+      CHARACTER(len=16):: OUTFILE
+      CHARACTER(len=16):: HEAD(50)
+      real(r8) :: HEAX(50)
 
       DO 9995 NX=NHW,NHE
       DO 9990 NY=NVN,NVS

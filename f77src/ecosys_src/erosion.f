@@ -6,6 +6,9 @@ C     FROM RUNOFF IN 'WATSUB'
 C
       use data_kind_mod, only : r8 => SHR_KIND_R8
 
+      integer, intent(in) :: I, J
+      integer, intent(in) :: NHW,NHE,NVN,NVS
+
       include "parameters.h"
       include "blkc.h"
       include "blk2a.h"
@@ -21,7 +24,8 @@ C
       include "blk19b.h"
       include "blk19c.h"
       include "blk20f.h"
-      PARAMETER(FSINK=0.01)
+
+      real(r8), PARAMETER :: FSINK=0.01
       DIMENSION RERSED(2,2,JV,JH),TERSED(JY,JX),RDTSED(JY,JX)
      2,FVOLIM(JY,JX),FVOLWM(JY,JX),FERSNM(JY,JX),RERSED0(JY,JX)
 C

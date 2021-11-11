@@ -6,6 +6,10 @@ C     THIS SUBROUTINE READS ALL SOIL AND TOPOGRAPHIC INPUT FILES
 C
       use data_kind_mod, only : r8 => SHR_KIND_R8
 
+      integer, intent(in) :: NT,NE,NAX,NDX,NTX,NEX
+     2,NTZX,NHW,NHE,NVN,NVS
+      integer, intent(out) :: NF, NFX, NTZ
+      integer, intent(in) :: NA(:),ND(:)
       include "parameters.h"
       include "filec.h"
       include "files.h"
@@ -17,19 +21,17 @@ C
       include "blk8b.h"
       include "blk17.h"
       include "blk11a.h"
-      DIMENSION NA(10),ND(10),NM(JY,JX),DHI(JX),DVI(JY)
-C      CHARACTER*16 DATA(30),DATAC(30,250,250),DATAP(JP,JY,JX)
-C     2,DATAM(JP,JY,JX),DATAX(JP),DATAY(JP),DATAZ(JP,JY,JX)
-C     3,OUTS(10),OUTP(10),OUTFILS(10,JY,JX),OUTFILP(10,JP,JY,JX)
-C      CHARACTER*3 CHOICE(102,20)
-C      CHARACTER*8 CDATE
-      CHARACTER*16 OUTW,OUTI,OUTT,OUTN,OUTF
-      CHARACTER*4 CHARY
-      CHARACTER*1 TTYPE,CTYPE,IVAR(20),VAR(50),TYP(50)
-C      CHARACTER*80 PREFIX
+
+      integer :: NM(JY,JX)
+      real(r8) :: DHI(JX),DVI(JY)
+
+      CHARACTER(len=16) :: OUTW,OUTI,OUTT,OUTN,OUTF
+      CHARACTER(len=4) :: CHARY
+      CHARACTER(len=1) :: TTYPE,CTYPE,IVAR(20),VAR(50),TYP(50)
+
       integer :: ll
-      DIMENSION IDAT(20),DAT(50),DATK(50)
-      PARAMETER (TWILGT=0.06976)
+      real(r8) :: DAT(50),DATK(50)
+      real(r8), PARAMETER :: TWILGT=0.06976
 C
 C     OPEN OUTPUT LOGFILES,AND SITE,TOPOGRAPHY FILES FROM
 C     FILE NAMES IN DATA ARRAYS LOADED IN 'MAIN'

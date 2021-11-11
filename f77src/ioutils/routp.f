@@ -5,6 +5,7 @@ C     THIS SUBROUTINE READS PLANT CHECKPOINT FILES TO
 C     RE-INITIALIZE THE MODEL FROM A SELECTED DATE IN AN EARLIER RUN
 C
       use data_kind_mod, only : r8 => SHR_KIND_R8
+      integer, intent(in) :: NHW,NHE,NVN,NVS
 
       include "parameters.h"
       include "files.h"
@@ -27,8 +28,10 @@ C
       include "blk14.h"
       include "blk18a.h"
       include "blk18b.h"
-      DIMENSION NPP(JY,JX),IYR02(JP,JY,JX),IDAY02(JP,JY,JX)
+
+      integer :: NPP(JY,JX),IYR02(JP,JY,JX),IDAY02(JP,JY,JX)
      2,IYRH2(JP,JY,JX),IDAYH2(JP,JY,JX)
+
       REWIND(26)
       REWIND(27)
       REWIND(28)

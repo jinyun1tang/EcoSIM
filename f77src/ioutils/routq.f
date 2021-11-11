@@ -6,23 +6,19 @@ C     FILE NAMES FOR PLANT SPECIES AND MANAGEMENT
 C
       use data_kind_mod, only : r8 => SHR_KIND_R8
 
+      integer, intent(in) :: NT,NE,NAX,NDX,NTX,NEX,NHW,NHE,NVN,NVS
       include "parameters.h"
       include "filec.h"
       include "files.h"
       include "blkc.h"
       include "blk9c.h"
-      DIMENSION NPP(JY,JX)
-C      CHARACTER*16 DATA(30),DATAC(30,250,250),DATAP(JP,JY,JX)
-C     2,DATAM(JP,JY,JX),DATAX(JP),DATAY(JP),DATAZ(JP,JY,JX)
-C     3,OUTS(10),OUTP(10),OUTFILS(10,JY,JX),OUTFILP(10,JP,JY,JX)
-C      CHARACTER*3 CHOICE(102,20)
-C      CHARACTER*8 CDATE
-C      CHARACTER*80 PREFIX
 
-      CHARACTER*16 DATAA(JP,JY,JX),DATAB(JP,JY,JX)
-      CHARACTER*16 OUTX,OUTC,OUTM,OUTR,OUTQ
-      CHARACTER*4 CHARY
-      CHARACTER*2 CLIMATE
+      integer :: NPP(JY,JX)
+
+      CHARACTER(len=16) :: DATAA(JP,JY,JX),DATAB(JP,JY,JX)
+      CHARACTER(len=16) :: OUTX,OUTC,OUTM,OUTR,OUTQ
+      CHARACTER(len=4) :: CHARY
+      CHARACTER(len=2) :: CLIMATE
 C
 C     OPEN CHECKPOINT FILES FOR PLANT VARIABLES
 C

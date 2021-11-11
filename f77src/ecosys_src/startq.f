@@ -3,6 +3,7 @@ C
 C     THIS SUBROUTINE INITIALIZES ALL PLANT VARIABLES
 C
       use data_kind_mod, only : r8 => SHR_KIND_R8
+      integer, intent(in) :: NHWQ,NHEQ,NVNQ,NVSQ,NZ1Q,NZ2Q
 
       include "parameters.h"
       include "filec.h"
@@ -32,10 +33,8 @@ C
       include "blk16.h"
       include "blk18a.h"
       include "blk18b.h"
-C      CHARACTER*16 DATA(30),DATAP(JP,JY,JX)
-C      CHARACTER*3 CHOICE(102,20)
-C      CHARACTER*8 CDATE
-      DIMENSION CNOPC(4),CPOPC(4)
+
+      real(r8) :: CNOPC(4),CPOPC(4)
 C
 C     INITIALIZE SHOOT GROWTH VARIABLES
 C

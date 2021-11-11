@@ -4,6 +4,7 @@ C     THIS SUBROUTINE READS SOIL CHECKPOINT FILES TO
 C     RE-INITILIAZE THE MODEL FROM A SELECTED DATE IN AN EARLIER RUN
 C
       use data_kind_mod, only : r8 => SHR_KIND_R8
+      integer, intent(in) :: NHW,NHE,NVN,NVS
 
       include "parameters.h"
       include "filec.h"
@@ -27,11 +28,6 @@ C
       include "blk19b.h"
       include "blk19c.h"
       include "blk19d.h"
-C      CHARACTER*16 DATA(30),DATAC(30,250,250),DATAP(JP,JY,JX)
-C     2,DATAM(JP,JY,JX),DATAX(JP),DATAY(JP),DATAZ(JP,JY,JX)
-C     3,OUTS(10),OUTP(10),OUTFILS(10,JY,JX),OUTFILP(10,JP,JY,JX)
-C      CHARACTER*3 CHOICE(102,20)
-C      CHARACTER*8 CDATE
 
       REWIND(21)
       REWIND(22)

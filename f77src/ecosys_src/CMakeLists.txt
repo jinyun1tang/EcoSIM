@@ -1,4 +1,5 @@
-set(ECOSYS_SOURCES 
+configure_file(solutepar.h  solutepar.h COPYONLY)
+set(ECOSYS_SOURCES
 	day.f
 	erosion.f
 	exec.f

@@ -4,6 +4,8 @@ C
 C     THIS SUBROUTINE CALCULATES ALL PLANT BIOLOGICAL TRANSFORMATIONS
 C
       use data_kind_mod, only : r8 => SHR_KIND_R8
+      integer, intent(in) :: I, J
+      integer, intent(in) :: NHW,NHE,NVN,NVS
 
       include "parameters.h"
       include "files.h"
@@ -35,19 +37,23 @@ C
       include "blk16.h"
       include "blk18a.h"
       include "blk18b.h"
-      DIMENSION PART(7),TFN6(JZ),ARSTKB(10),NRX(2,JZ),ICHK1(2,JZ)
+
+      real(r8) :: PART(7),TFN6(JZ),ARSTKB(10),NRX(2,JZ),ICHK1(2,JZ)
      2,NBZ(10),FXFB(0:3),FXFR(0:3),FXRT(0:1),FXSH(0:1),FXRN(6)
      3,WTLSBZ(10),CPOOLZ(10),ZPOOLZ(10),PPOOLZ(10)
      4,ZCX(JP,JY,JX),UPNFC(JP,JY,JX),FRSV(0:3),FXFY(0:1),FXFZ(0:1)
-      DIMENSION RTNT(2),RLNT(2,JZ),RTSK1(2,JZ,10),RTSK2(2,JZ,10)
+
+      real(r8) :: RTNT(2),RLNT(2,JZ),RTSK1(2,JZ,10),RTSK2(2,JZ,10)
      2,RTDPL(10,JZ),FWTR(JZ),FWTB(JP),FRTDP(0:3),RCCX(0:3),RCCQ(0:3)
      3,RCCZ(0:3),RCCY(0:3),EFIRE(2,5:5),WGLFBL(JZ,10,JP,JY,JX)
      4,WTSHTA(JZ,JY,JX),FLG4Y(0:3),ATRPX(0:1),GVMX(0:1),RTSK(0:3)
-      DIMENSION CH2O3(25),CH2O4(25),CPOOLK(10,JP,JY,JX),FHVSTK(0:25)
+
+      real(r8) :: CH2O3(25),CH2O4(25),CPOOLK(10,JP,JY,JX),FHVSTK(0:25)
      2,FHVSHK(0:25),WFNGR(2,JZ),PSILY(0:3),FVRN(0:5)
-      DIMENSION FWOOD(0:1),FWOODN(0:1),FWOODP(0:1)
+      real(r8) :: FWOOD(0:1),FWOODN(0:1),FWOODP(0:1)
      2,FWODB(0:1),FWODLN(0:1),FWODLP(0:1),FWODSN(0:1),FWODSP(0:1)
      3,FWODR(0:1),FWODRN(0:1),FWODRP(0:1)
+
 C     DIMENSION VCO2(400,366,05)
 C
 C     PART1X,PART2X=modifiers to organ partitioning coefficients
@@ -62,10 +68,11 @@ C     FSNK=min ratio of branch or mycorrhizae to root for calculating C transfer
 C     FXFS=rate constant for remobilization of stalk C,N,P (h-1)
 C     FMYC=rate constant for root-mycorrhizal C,N,P exchange (h-1)
 C
-      PARAMETER(PART1X=0.05,PART2X=0.02
+      real(r8), PARAMETER :: PART1X=0.05,PART2X=0.02
      2,VMXC=0.015,FSNR=2.884E-03,FLG4X=168.0
-     3,FLGZX=240.0,XFRX=2.5E-02,XFRY=2.5E-03,IFLGQX=960
-     4,FSNK=0.05,FXFS=1.0,FMYC=0.1)
+     3,FLGZX=240.0,XFRX=2.5E-02,XFRY=2.5E-03
+     4,FSNK=0.05,FXFS=1.0,FMYC=0.1
+      integer, parameter :: IFLGQX=960
 C
 C     CNKI,CPKI=nonstructural N,P inhibition constant on growth (g N,P g-1 C)
 C     RMPLT=specific maintenance respiration rate (g C g-1 N h-1)
@@ -167,7 +174,7 @@ C
       DATA FVRN/0.75,0.5,0.5,0.5,0.5,0.5/
 C     DATA TC4,TLK/0.0,0.0/
       REAL*4 TFN5,WFNG,WFNC,WFNS,WFNSG,WFN4,WFNB
-     2,WFNR,WFNRG,WFNGR,FSNC2
+     2,WFNR,WFNRG,FSNC2
 C
 C     TOTAL AGB FOR GRAZING IN LANDSCAPE SECTION
 C

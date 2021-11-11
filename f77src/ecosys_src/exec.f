@@ -6,6 +6,8 @@ C     OF EACH DAY OF THE MODEL RUN, AND ERRORS OF > 1UG ARE FLAGGED.
 C
       use data_kind_mod, only : r8 => SHR_KIND_R8
 
+      integer, intent(in) :: I
+
       include "parameters.h"
       include "blkc.h"
       include "blk2a.h"

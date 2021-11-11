@@ -11,13 +11,8 @@ C
       include "files.h"
       include "blkc.h"
 
-      DIMENSION NA(250),ND(250)
-C      CHARACTER*16 DATA(30),DATAC(30,250,250),DATAP(JP,JY,JX)
-C     2,DATAM(JP,JY,JX),DATAX(JP),DATAY(JP),DATAZ(JP,JY,JX)
-C     3,OUTS(10),OUTP(10),OUTFILS(10,JY,JX),OUTFILP(10,JP,JY,JX)
-C      CHARACTER*3 CHOICE(102,20)
-C      CHARACTER*8 CDATE
-C      CHARACTER*80 PREFIX
+      integer :: NA(250),ND(250)
+
       CHARACTER(len=80):: BUF
       character(len=80):: runfile
       character(len=36):: case_name

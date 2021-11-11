@@ -5,6 +5,9 @@ C     FROM 'UPTAKE' AMD 'GROSUB' AND SENDS RESULTS TO 'REDIST'
 C
       use data_kind_mod, only : r8 => SHR_KIND_R8
 
+      integer, intent(in) :: I, J
+      integer, intent(in) :: NHW,NHE,NVN,NVS
+
       include "parameters.h"
       include "blkc.h"
       include "blk1cp.h"
@@ -30,6 +33,7 @@ C
       include "blk16.h"
       include "blk18a.h"
       include "blk18b.h"
+
       DO 9995 NX=NHW,NHE
       DO 9990 NY=NVN,NVS
       DO 9985 NZ=1,NP0(NY,NX)

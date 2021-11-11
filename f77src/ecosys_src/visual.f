@@ -1,6 +1,8 @@
       SUBROUTINE visual(I,J,NHW,NHE,NVN,NVS)
 
       use data_kind_mod, only : r8 => SHR_KIND_R8
+      integer, intent(in) :: I, J
+      integer, intent(in) :: NHW,NHE,NVN,NVS
 
       include "parameters.h"
       include "filec.h"
@@ -34,15 +36,12 @@
       include "blk16.h"
       include "blk18a.h"
       include "blk18b.h"
-C      CHARACTER*16 DATA(30),DATAC(30,250,250),DATAP(JP,JY,JX)
-C     2,DATAM(JP,JY,JX),DATAX(JP),DATAY(JP),DATAZ(JP,JY,JX)
-C     3,OUTS(10),OUTP(10),OUTFILS(10,JY,JX),OUTFILP(10,JP,JY,JX)
-C      CHARACTER*3 CHOICE(102,20)
-C      CHARACTER*8 CDATE
-C      CHARACTER*80 PREFIX
-      DIMENSION OUT(100),SWC(JY,JX)
-      PARAMETER (DEFAULT=-9999)
+
+      real(r8) :: OUT(100),SWC(JY,JX)
+      real(r8), PARAMETER :: DEFAULT=-9999
+
       DATA ICHECK/0/
+
       SAVE IYR1,IYR2,ICHECK
       IF(ICHECK.EQ.0)THEN
       OPEN(16,FILE=trim(prefix)//'years',STATUS='OLD')

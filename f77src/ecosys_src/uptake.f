@@ -1,10 +1,14 @@
 
       SUBROUTINE uptake(I,J,NHW,NHE,NVN,NVS)
+
 C
 C     THIS SUBROUTINE CALCULATES EXCHANGES OF ENERGY, C, N AND P
 C     BETWEEN THE CANOPY AND THE ATMOSPHERE AND BETWEEN ROOTS AND THE SOIL
 C
       use data_kind_mod, only : r8 => SHR_KIND_R8
+
+      integer, intent(in) :: I, J
+      integer, intent(in) :: NHW,NHE,NVN,NVS
 
       include "parameters.h"
       include "blkc.h"
@@ -37,11 +41,13 @@ C
       include "blk18a.h"
       include "blk18b.h"
       include "blk1u.h"
-      DIMENSION PSIST1(JZ),PATH(2,JZ),RRADL(2,JZ)
-     2,RSRT(2,JZ),ILYR(2,JZ),RSRG(2,JZ),RSR1(2,JZ),RSR2(2,JZ)
+
+      real(r8) :: PSIST1(JZ),PATH(2,JZ),RRADL(2,JZ)
+     2,RSRT(2,JZ),RSRG(2,JZ),RSR1(2,JZ),RSR2(2,JZ)
      3,RSSX(2,JZ),RSRS(2,JZ),WTRTG(JZ),FPQ(2,JZ,05),FPP(2,JZ,05)
      4,RACZ(JP,JY,JX),FRTDPX(JZ,05),RTARR(2,JZ)
      5,VOLPU(JZ),VOLWU(JZ)
+      integer :: ILYR(2,JZ)
 C
 C     MXN=max number of cycles in convergence soln for water uptake
 C     DIFFX,DIFFY=acceptance criteria in convergence soln
@@ -55,13 +61,14 @@ C     EMMC=canopy emissivity
 C     ZCKI,PCKI,ZPKI,PZKI=N,P inhibition on root,myco N,P uptake(g g-1)
 C     FEXUC,FEXUN,FEXUP=rate constant for root C,N,P exudation (h-1)
 C
-      PARAMETER(MXN=200,DIFFX=1.0E-09,DIFFY=0.5E-02)
-      PARAMETER (FMN=1.0E-06,RACM=0.00139,RACX=0.0278,RZ=0.0139)
-      PARAMETER(DSTK=0.225,VSTK=1.0E-06/DSTK)
-      PARAMETER(SNH3X=2.852E+02,EMMC=0.97,EMODW=50.0)
-      PARAMETER(ZCKI=0.5E-01,PCKI=0.5E-02,ZPKI=ZCKI/PCKI
-     2,PZKI=PCKI/ZCKI)
-      PARAMETER(FEXUC=0.5E-03,FEXUN=1.0E-02,FEXUP=1.0E-02)
+      integer, PARAMETER :: MXN=200
+      real(r8),PARAMETER :: DIFFX=1.0E-09,DIFFY=0.5E-02
+      real(r8),PARAMETER :: FMN=1.0E-06,RACM=0.00139,RACX=0.0278,RZ=0.0139
+      real(r8),PARAMETER :: DSTK=0.225,VSTK=1.0E-06/DSTK
+      real(r8),PARAMETER :: SNH3X=2.852E+02,EMMC=0.97,EMODW=50.0
+      real(r8),PARAMETER :: ZCKI=0.5E-01,PCKI=0.5E-02,ZPKI=ZCKI/PCKI
+     2,PZKI=PCKI/ZCKI
+      real(r8),PARAMETER :: FEXUC=0.5E-03,FEXUN=1.0E-02,FEXUP=1.0E-02
       REAL*4 RI,TKGO,TKSO
 C     REAL*16 B,C
 

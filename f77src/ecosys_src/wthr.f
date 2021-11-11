@@ -4,6 +4,8 @@ C     THIS SUBROUTINE REINITIALIZES WEATHER VARIABLES USED IN OTHER
 C     SUBROUTINES
 C
       use data_kind_mod, only : r8 => SHR_KIND_R8
+      integer, intent(in) :: I, J
+      integer, intent(in) :: NHW,NHE,NVN,NVS
 
       include "parameters.h"
       include "blkc.h"
@@ -42,15 +44,17 @@ C
       include "blk20f.h"
       include "blk21a.h"
       include "blk21b.h"
-      DIMENSION PRECRI(JY,JX),PRECWI(JY,JX),PRECII(JY,JX),PRECUI(JY,JX)
-     2,RADN(JY,JX),VPS(JY,JX)
+
+      real(r8) :: PRECRI(JY,JX),PRECWI(JY,JX),PRECII(JY,JX)
+     2,PRECUI(JY,JX),RADN(JY,JX),VPS(JY,JX)
 C
 C     CDIR,CDIF=fraction of solar SW,sky diffuse radiation in visible
 C     PDIR,PDIF=PAR:SW ratio (umol s-1/(MJ h-1))
 C     TSNOW=temperature below which precipitation is snow (oC)
 C
-      PARAMETER (CDIR=0.42,CDIF=0.58,PDIR=1269.4,PDIF=1269.4)
-      PARAMETER (TSNOW=-0.25,TWILGT=0.06976)
+      real(r8), PARAMETER :: CDIR=0.42,CDIF=0.58,PDIR=1269.4,PDIF=1269.4
+      real(r8), PARAMETER :: TSNOW=-0.25,TWILGT=0.06976
+
       XJ=J
       DOY=I-1+XJ/24
 C

@@ -6,6 +6,8 @@ C     ON SELECTIONS MADE IN OUTPUT CONTROL FILES IN
 C     THE RUN SCRIPT
 C
       use data_kind_mod, only : r8 => SHR_KIND_R8
+      integer, intent(in) :: I,NT,NE,NAX,NDX
+      integer, intent(in) :: NTX,NEX,NHW,NHE,NVN,NVS
 
       include "parameters.h"
       include "filec.h"
@@ -25,13 +27,9 @@ C
       include "blk12a.h"
       include "blk12b.h"
       include "blk14.h"
-C      CHARACTER*16 DATA(30),DATAC(30,250,250),DATAP(JP,JY,JX)
-C     2,DATAM(JP,JY,JX),DATAX(JP),DATAY(JP),DATAZ(JP,JY,JX)
-C     3,OUTS(10),OUTP(10),OUTFILS(10,JY,JX),OUTFILP(10,JP,JY,JX)
-C      CHARACTER*3 CHOICE(102,20)
-C      CHARACTER*8 CDATE
-      CHARACTER*16 CHEAD
-      DIMENSION HEAD(50)
+
+      CHARACTER(len=16) :: CHEAD
+      real(r8) :: HEAD(50)
 
       DO 1040 N=26,30
       IF(DATAC(N,NE,NEX).NE.'NO')THEN
