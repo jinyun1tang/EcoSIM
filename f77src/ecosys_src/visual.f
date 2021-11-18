@@ -42,7 +42,10 @@
 
       DATA ICHECK/0/
 
-      SAVE IYR1,IYR2,ICHECK
+      integer, SAVE :: IYR1,IYR2,ICHECK
+
+C     execution begins here
+
       IF(ICHECK.EQ.0)THEN
       OPEN(16,FILE=trim(prefix)//'years',STATUS='OLD')
       READ(16,*)IYR1,IYR2

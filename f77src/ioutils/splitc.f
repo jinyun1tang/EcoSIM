@@ -13,6 +13,8 @@
       integer :: failure
       character(len=*), parameter :: modfile='splitc'
 
+C     execution begins here
+
       nz=1
       do nx=nhw,nhe
          do ny=nvn,nvs

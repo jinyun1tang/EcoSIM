@@ -31,7 +31,9 @@ C
       include "solutepar.h"
 C
       DATA RNHUI/10.0E-02,1.0E-02,0.5E-02/
-
+      real(r8) :: RSNUA, RSNUB
+      real(r8) :: CN41, CN31, CN3B, CN4B, XN4B, XN41
+C     execution begins here
       NPI=INT(NPH/2)
       DO 9995 NX=NHW,NHE
       DO 9990 NY=NVN,NVS

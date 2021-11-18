@@ -14,7 +14,10 @@ C
       include "blk2b.h"
       include "blk2c.h"
       include "blk16.h"
-      SAVE TLW,TLH,TLO,TLC,TLN,TLP,TLI
+
+      real(r8), SAVE :: TLW,TLH,TLO,TLC,TLN,TLP,TLI
+
+C     execution begins here
 C
 C     CALCULATE MASS BALANCES FOR WATER, HEAT, O2, C, N, P AND SOLUTES
 C

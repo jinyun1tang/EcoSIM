@@ -14,6 +14,8 @@ C
       include "files.h"
       include "blkc.h"
 
+C     execution begins here
+
       DO 9995 NX=NHW,NHE
       DO 9990 NY=NVN,NVS
       WRITE(30,90)I,IDATA(3),NP(NY,NX)

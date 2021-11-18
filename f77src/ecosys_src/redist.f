@@ -194,6 +194,9 @@ C
       DATA TDORGC,TDYLXC/0.0,0.0/
       DATA TDVOLI,TDLYXF/0.0,0.0/
       DATA THETCX/8.0E-06,8.0E-06/
+
+C     execution begins here
+
       VOLISO=0.0
       UDVOLI=0.0
       UDLYXF=0.0

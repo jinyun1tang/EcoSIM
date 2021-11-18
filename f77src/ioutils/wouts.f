@@ -31,6 +31,8 @@ C
       include "blk19c.h"
       include "blk19d.h"
 
+C     execution begins here
+
       WRITE(21,90)I,IDATA(3),CRAIN,TSEDOU
      2,HEATIN,OXYGIN,TORGF,TORGN,TORGP,CO2GIN,ZN2GIN,VOLWOU,CEVAP
      3,CRUN,HEATOU,OXYGOU,TCOU,TZOU,TPOU,TZIN,TPIN,XCSN,XZSN,XPSN

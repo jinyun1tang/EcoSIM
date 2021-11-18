@@ -73,6 +73,9 @@ C
       real(r8), PARAMETER :: TPD=2.5E-02,TAD=5.0E-02,TSL=0.5,A0=1.0
      2,COOH=2.5E-02,CALMX=10.0,CFEMX=10.0,CCAMX=10.0
       integer, parameter :: MRXN=1000
+
+C     execution begins here
+
 C
 C     INITIALIZE CATION AND ANION CONCENTRATIONS
 C     IN PRECIPITATION (K=1), IRRIGATION (K=2) AND SOIL (K=3)

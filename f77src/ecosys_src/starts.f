@@ -61,6 +61,8 @@ C
       DATA PSIHY,FCI,WPI/-2500.0,0.05,0.025/
       DATA CDPTHSI/0.05,0.15,0.30,0.60,1.00/
       DATA POROQ/0.66/
+
+C     execution begins here
 C
 C     NPH=no. of cycles h-1 for water, heat and solute flux calculns
 C     NPT=number of cycles NPH-1 for gas flux calculations

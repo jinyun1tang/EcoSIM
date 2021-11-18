@@ -31,6 +31,8 @@ C
 
       real(r8) :: HEAD(50)
 
+C     execution begins here
+
       DO 1040 N=21,25
       IF(DATAC(N,NE,NEX).NE.'NO')THEN
       DO 1010 M=1,50

@@ -19,6 +19,8 @@ C
       CHARACTER(len=4) :: CHARR
       CHARACTER(len=16):: HEAD(50)
 
+C     execution begins here
+
       CDOY='DOY     '
       DATE='DATE    '
       HOUR='HOUR    '

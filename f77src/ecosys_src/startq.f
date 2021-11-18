@@ -35,6 +35,8 @@ C
       include "blk18b.h"
 
       real(r8) :: CNOPC(4),CPOPC(4)
+
+C     execution begins here
 C
 C     INITIALIZE SHOOT GROWTH VARIABLES
 C
@@ -48,6 +50,7 @@ C     CNWS,CPWS=protein:N,protein:P ratios
 C     CWSRT=maximum root protein concentration (g g-1)
 C     O2I=intercellular O2 concentration in C3,C4 PFT (umol mol-1)
 C
+
       DO 9995 NX=NHWQ,NHEQ
       DO 9990 NY=NVNQ,NVSQ
       NZ2X=MIN(NZ2Q,NP(NY,NX))

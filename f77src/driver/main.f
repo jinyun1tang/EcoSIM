@@ -19,6 +19,8 @@ C
       character(len=36):: nmlfile
       logical :: is_dos
 
+C     execution begins here
+
       is_dos=.false.
 
       print*,'obtain working directory'

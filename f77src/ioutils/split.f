@@ -21,6 +21,8 @@ C
       CHARACTER(len=16):: HEAD(50)
       real(r8) :: HEAX(50)
 
+C     execution begins here
+
       DO 9995 NX=NHW,NHE
       DO 9990 NY=NVN,NVS
       DO 1010 N=21,25

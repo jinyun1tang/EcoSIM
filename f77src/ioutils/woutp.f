@@ -31,6 +31,8 @@ C
       include "blk18a.h"
       include "blk18b.h"
 
+C     execution begins here
+
       DO 9990 NX=NHW,NHE
       DO 9985 NY=NVN,NVS
       WRITE(26,90)I,IDATA(3),NP(NY,NX),IFLGT(NY,NX)

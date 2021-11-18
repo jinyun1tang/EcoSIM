@@ -17,7 +17,7 @@ implicit none
   integer, parameter :: ecosim_string_length_long = 256
   integer, parameter :: ecosim_namelist_buffer_size = 4096
   integer, parameter :: ecosim_namelist_buffer_size_ext = 12288
-
+  real(r8), parameter :: tiny_val=1.e-50_r8
   type, public :: error_status_type
     integer :: error
     character(len=error_errmsg_len) :: msg
@@ -220,15 +220,15 @@ contains
     write(this%output, '("category = ",a)') trim(category)
 
     val = minval(data(:))
-    if(abs(val)<1.e-50)val=0.
+    if(abs(val)<tiny_val)val=0.
     write(this%output, '("min = ",e21.13)') val
 
     val = maxval(data(:))
-    if(abs(val)<1.e-50)val=0.
+    if(abs(val)<tiny_val)val=0.
     write(this%output, '("max = ",e21.13)') val
 
     val = sum(data(:)) / size(data)
-    if(abs(val)<1.e-50)val=0.
+    if(abs(val)<tiny_val)val=0.
     write(this%output, '("mean = ",e21.13)') val
 
     if (this%num_cells > 0) then
@@ -242,7 +242,7 @@ contains
 
        do cell = 1, size(data), cell_increment
           local_val = data(cell)
-          if(abs(local_val)<1.e-50)local_val=0.
+          if(abs(local_val)<tiny_val)local_val=0.
           write(this%output, '("cell ", i4, " = ", e21.13)') cell, local_val
        end do
     write(this%output, '(a)')

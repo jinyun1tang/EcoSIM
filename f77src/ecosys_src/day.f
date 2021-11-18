@@ -37,6 +37,7 @@ C
       CHARACTER(len=3) :: CHARN1,CHARN2
       CHARACTER(len=4) :: CHARN3
       real(r8), PARAMETER :: TWILGT=0.06976
+C     execution begins here
 C
 C     WRITE DATE
 C

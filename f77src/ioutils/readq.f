@@ -22,6 +22,8 @@ C
 
       real(r8), PARAMETER :: TWILGT=0.06976
 
+C     execution begins here
+
       DO 9995 NX=NHW,NHE
       DO 9990 NY=NVN,NVS
       DO 9985 NZ=1,NP(NY,NX)

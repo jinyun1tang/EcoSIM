@@ -32,6 +32,7 @@ C
       include "blk16.h"
       include "blk18a.h"
       include "blk18b.h"
+
       real(r8) :: PSILY(0:3)
       integer :: NBX(0:3)
 C
@@ -47,6 +48,7 @@ C
       DATA PSILY/-200.0,-2.0,-2.0,-2.0/
       DATA NBX /5,1,1,1/
 
+C     execution begins here
       DO 9995 NX=NHW,NHE
       DO 9990 NY=NVN,NVS
       DO 9985 NZ=1,NP(NY,NX)

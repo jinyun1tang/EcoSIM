@@ -82,9 +82,9 @@ C     RTDPX=distance behind growing point for secondary roots (m)
 C     RTLGAX=minimum average secondary root length (m)
 C     EMODR=root modulus of elasticity (MPa)
 C
-      PARAMETER(CNKI=1.0E-01,CPKI=1.0E-02)
-      PARAMETER(RMPLT=0.010,PSILM=0.1,RCMN=1.560E+01,RTDPX=0.00
-     2,RTLGAX=1.0E-03,EMODR=5.0)
+      real(r8), PARAMETER :: CNKI=1.0E-01,CPKI=1.0E-02
+      real(r8), PARAMETER :: RMPLT=0.010,PSILM=0.1,RCMN=1.560E+01
+     2,RTDPX=0.00,RTLGAX=1.0E-03,EMODR=5.0
 C
 C     QNTM=quantum efficiency (umol e- umol-1 PAR)
 C     CURV=shape parameter for e- transport response to PAR
@@ -96,9 +96,11 @@ C     COMP4=C4 CO2 compensation point (uM)
 C     FDML=leaf water content (g H2O g-1 C)
 C     FBS,FMP=leaf water content in bundle sheath, mesophyll in C4 CO2 fixn
 C
-      PARAMETER(QNTM=0.45,CURV=0.70,CURV2=2.0*CURV,CURV4=4.0*CURV
-     2,ELEC3=4.5,ELEC4=3.0,CO2KI=1.0E+03,FCO2B=0.02,FHCOB=1.0-FCO2B)
-      PARAMETER(COMP4=0.5,FDML=6.0,FBS=0.2*FDML,FMP=0.8*FDML)
+      real(r8), PARAMETER :: QNTM=0.45,CURV=0.70,CURV2=2.0*CURV
+     2,CURV4=4.0*CURV,ELEC3=4.5,ELEC4=3.0,CO2KI=1.0E+03,FCO2B=0.02
+     3,FHCOB=1.0-FCO2B
+      real(r8), PARAMETER :: COMP4=0.5,FDML=6.0,FBS=0.2*FDML
+     2,FMP=0.8*FDML
 C
 C     ZPLFM=min N:C,P:C in leaves relative to max values from PFT file
 C     ZPGRM=min N:C,P:C in grain relative to max values from PFT file
@@ -107,19 +109,19 @@ C     FSTK=fraction of stalk area contributing to water,heat flow
 C     DSTK,VSTK=stalk density (Mg m-3),specific volume (m3 g-1)
 C     FRTX=fraction used to calculate woody faction of stalk,root
 C
-      PARAMETER(ZPLFM=0.33,ZPLFD=1.0-ZPLFM,ZPGRM=0.75
-     2,ZPGRD=1.0-ZPGRM,GY=1.0,GZ=1.0-GY)
-      PARAMETER(FSTK=0.05,ZSTX=1.0E-03,DSTK=0.225,VSTK=1.0E-06/DSTK
-     2,FRTX=1.0/(1.0-(1.0-FSTK)**2))
+      real(r8),PARAMETER :: ZPLFM=0.33,ZPLFD=1.0-ZPLFM,ZPGRM=0.75
+     2,ZPGRD=1.0-ZPGRM,GY=1.0,GZ=1.0-GY
+      real(r8), PARAMETER :: FSTK=0.05,ZSTX=1.0E-03,DSTK=0.225
+     2,VSTK=1.0E-06/DSTK,FRTX=1.0/(1.0-(1.0-FSTK)**2)
 C
 C     SETC,SETN,SETP=Km for nonstructural C,N,P concn on seed set (g g-1)
 C     SLA2,SSL2,SNL2=parameter for calculating leaf area expansion, petiole
 C     and internode extension vs leaf, petiole, internode growth
 C     CNMX,CPMX,CNMN,CPMN=max,min N:C,P:C for nonstructural C,N,P transfers
 C
-      PARAMETER(SETC=1.0E-02,SETN=1.0E-03,SETP=1.0E-04)
-      PARAMETER(SLA2=-0.33,SSL2=-0.50,SNL2=-0.67)
-      PARAMETER(CNMX=0.20,CPMX=0.020,CNMN=0.050,CPMN=0.005)
+      real(r8), PARAMETER :: SETC=1.0E-02,SETN=1.0E-03,SETP=1.0E-04
+      real(r8), PARAMETER :: SLA2=-0.33,SSL2=-0.50,SNL2=-0.67
+      real(r8), PARAMETER :: CNMX=0.20,CPMX=0.020,CNMN=0.050,CPMN=0.005
 C
 C     EN2F=N fixation yield from C oxidation (g N g-1 C)
 C     VMXO=specific respiration rate by bacterial N2 fixers (g g-1 h-1)
@@ -134,11 +136,11 @@ C     RCCXN,RCCQN=max fractions for bacteria N,P recycling
 C     RCCZ,RCCY=min,max fractions for shoot,bacteria C recycling
 C     RCCX,RCCQ=max fractions for shoot,bacteria N,P recycling
 C
-      PARAMETER(EN2F=0.20,VMXO=0.125,SPNDLK=0.01
+      real(r8), PARAMETER :: EN2F=0.20,VMXO=0.125,SPNDLK=0.01
      2,SPNDL=5.0E-04,CCNGR=2.5E-01,CCNGB=6.0E-04
      2,WTNDI=1.0E-03,CZKM=2.5E-03,CPKM=2.5E-04
      3,RCCZR=0.056,RCCYR=0.167,RCCXR=0.833,RCCQR=0.833
-     3,RCCZN=0.167,RCCYN=0.833,RCCXN=0.833,RCCQN=0.833)
+     3,RCCZN=0.167,RCCYN=0.833,RCCXN=0.833,RCCQN=0.833
       DATA RCCZ/0.167,0.167,0.167,0.056/
       DATA RCCY/0.333,0.333,0.167,0.333/
       DATA RCCX/0.417,0.833,0.833,0.833/
@@ -173,8 +175,11 @@ C
       DATA ATRPX/68.96,276.9/,GVMX/0.010,0.0025/
       DATA FVRN/0.75,0.5,0.5,0.5,0.5,0.5/
 C     DATA TC4,TLK/0.0,0.0/
-      REAL*4 TFN5,WFNG,WFNC,WFNS,WFNSG,WFN4,WFNB
+      REAL(r8) :: TFN5,WFNG,WFNC,WFNS,WFNSG,WFN4,WFNB
      2,WFNR,WFNRG,FSNC2
+
+C     execution begins here
+
 C
 C     TOTAL AGB FOR GRAZING IN LANDSCAPE SECTION
 C

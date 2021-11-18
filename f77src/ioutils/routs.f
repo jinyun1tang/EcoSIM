@@ -29,6 +29,8 @@ C
       include "blk19c.h"
       include "blk19d.h"
 
+C     execution begins here
+
       REWIND(21)
       REWIND(22)
       REWIND(23)

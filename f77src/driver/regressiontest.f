@@ -30,7 +30,7 @@
       character(len=128) :: category
       character(len=128) :: name
       integer :: nz, ll
-      dimension datv(12)
+      real(r8) :: datv(12)
 
       call regression%Init(trim(nmfile),case_name)
 

@@ -69,9 +69,13 @@ C
       real(r8),PARAMETER :: ZCKI=0.5E-01,PCKI=0.5E-02,ZPKI=ZCKI/PCKI
      2,PZKI=PCKI/ZCKI
       real(r8),PARAMETER :: FEXUC=0.5E-03,FEXUN=1.0E-02,FEXUP=1.0E-02
-      REAL*4 RI,TKGO,TKSO
-C     REAL*16 B,C
-
+      REAL(r8) :: RI,TKGO,TKSO
+      real(r8) :: CNDT,TKCX,VHCPX,HFLWC1,PSILH,DIFF
+      real(r8) :: UPRT,VFLXC,FCUP,FZUP,FPUP,FDMP,FWSRT
+      real(r8) :: UPWTRP,UPWTRH,FOXYX,RUPOXT
+      real(r8) :: TFNH4X,TFNO3X,TFNHBX,TFNOBX,TFPO4X,TFP14X
+      real(r8) :: TFPOBX,TFP1BX
+C     execution begins here
 
       DO 9995 NX=NHW,NHE
       DO 9990 NY=NVN,NVS
@@ -2070,9 +2074,12 @@ C------------------------------------------------------------------------
       subroutine uptake_minN(FCUP, FZUP, UPWTRP, FWSRT,
      2TFNH4X, TFNO3X, TFNHBX, TFNOBX)
 
+      real(r8), intent(inout) :: FCUP, FZUP, UPWTRP, FWSRT
       real(r8), intent(inout) :: TFNH4X, TFNO3X, TFNHBX, TFNOBX
+
       real(r8) :: FNO3X, FNOBX
       real(r8) :: FNH4X, FNHBX
+
       IF(RNH4Y(L,NY,NX).GT.ZEROS(NY,NX))THEN
       FNH4X=AMAX1(FPP(N,L,NZ),RUNNHP(N,L,NZ,NY,NX)/RNH4Y(L,NY,NX))
       ELSE

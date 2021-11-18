@@ -32,6 +32,8 @@ C
       integer :: NPP(JY,JX),IYR02(JP,JY,JX),IDAY02(JP,JY,JX)
      2,IYRH2(JP,JY,JX),IDAYH2(JP,JY,JX)
 
+C     execution begins here
+
       REWIND(26)
       REWIND(27)
       REWIND(28)

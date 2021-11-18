@@ -113,7 +113,10 @@ C
       DATA XVOLWC/5.0E-04,2.5E-04,2.5E-04,2.5E-04/
       DATA THETRX/4.0E-06,8.0E-06,8.0E-06/
 
-      REAL*4 TFACL,TFACG,TFACW,TFACR,TFACA
+      REAL(r8) :: TFACL,TFACG,TFACW,TFACR,TFACA
+
+C     execution begins here
+
       XJ=J
       DOY=I-1+XJ/24
 C

@@ -55,6 +55,8 @@ C
       real(r8), PARAMETER :: CDIR=0.42,CDIF=0.58,PDIR=1269.4,PDIF=1269.4
       real(r8), PARAMETER :: TSNOW=-0.25,TWILGT=0.06976
 
+C     execution begins here
+
       XJ=J
       DOY=I-1+XJ/24
 C

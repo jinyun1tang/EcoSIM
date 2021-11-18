@@ -327,6 +327,9 @@ C
       real(r8) :: THETW1(JZ,JY,JX),FLWU(JZ,JY,JX)
      2,POSGL2(JZ,JY,JX)
       real(r8), PARAMETER :: VFLWX=0.5,XFRS=0.05
+
+C     execution begins here
+
 C
 C     TIME STEPS FOR SOLUTE FLUX CALCULATIONS
 C

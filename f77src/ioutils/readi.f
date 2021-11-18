@@ -32,6 +32,9 @@ C
       integer :: ll
       real(r8) :: DAT(50),DATK(50)
       real(r8), PARAMETER :: TWILGT=0.06976
+
+C     execution begins here
+
 C
 C     OPEN OUTPUT LOGFILES,AND SITE,TOPOGRAPHY FILES FROM
 C     FILE NAMES IN DATA ARRAYS LOADED IN 'MAIN'

@@ -19,6 +19,9 @@ C
       CHARACTER(len=16) :: OUTX,OUTC,OUTM,OUTR,OUTQ
       CHARACTER(len=4) :: CHARY
       CHARACTER(len=2) :: CLIMATE
+
+C     execution begins here
+
 C
 C     OPEN CHECKPOINT FILES FOR PLANT VARIABLES
 C
