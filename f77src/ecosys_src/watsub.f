@@ -60,7 +60,7 @@ C
      2,THETWX(0:JZ,JY,JX),THETIX(0:JZ,JY,JX),THETPX(0:JZ,JY,JX)
      4,VOLAH1(JZ,JY,JX),VOLWH1(JZ,JY,JX),VOLPH1(JZ,JY,JX)
      5,VOLIH1(JZ,JY,JX),THETPY(0:JZ,JY,JX),FLWNX(JY,JX)
-     6,FLWXNX(JY,JX),FLWHNX(JY,JX),HFLWNX(JY,JX),N6X(JY,JX)
+     6,FLWXNX(JY,JX),FLWHNX(JY,JX),HFLWNX(JY,JX)
      7,PSISA1(JZ,JY,JX)
       real(r8) :: TQS1(JY,JX),TQW1(JY,JX),TQI1(JY,JX),THQS1(JY,JX)
      2,TFLWS(JS,JY,JX),TFLWW(JS,JY,JX),TFLWI(JS,JY,JX)
@@ -69,6 +69,7 @@ C
      5,FLW0I(JS,JY,JX),HFLW0W(JS,JY,JX)
      6,VOLS0M(JS,JY,JX),VOLW0M(JS,JY,JX)
      7,VOLI0M(JS,JY,JX),VHCPWMM(JS,JY,JX),TK0M(JS,JY,JX)
+      integer :: N6X(JY,JX)
 C
 C     EMMS,EMMW,EMMR=emissivities of surface soil, snow and litter
 C     RACX,RARX=minimum boundary layer resistances of canopy,litter (h m-1)

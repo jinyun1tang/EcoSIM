@@ -38,8 +38,9 @@ C
       include "blk18a.h"
       include "blk18b.h"
 
-      real(r8) :: PART(7),TFN6(JZ),ARSTKB(10),NRX(2,JZ),ICHK1(2,JZ)
-     2,NBZ(10),FXFB(0:3),FXFR(0:3),FXRT(0:1),FXSH(0:1),FXRN(6)
+      integer :: ICHK1(2,JZ),NRX(2,JZ),NBZ(10)
+      real(r8) :: PART(7),TFN6(JZ),ARSTKB(10)
+     2,FXFB(0:3),FXFR(0:3),FXRT(0:1),FXSH(0:1),FXRN(6)
      3,WTLSBZ(10),CPOOLZ(10),ZPOOLZ(10),PPOOLZ(10)
      4,ZCX(JP,JY,JX),UPNFC(JP,JY,JX),FRSV(0:3),FXFY(0:1),FXFZ(0:1)
 
