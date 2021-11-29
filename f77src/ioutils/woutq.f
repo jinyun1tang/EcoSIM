@@ -7,13 +7,14 @@ C     FILE SO THAT OUTPUTS FROM EARLIER MODEL RUNS CAN BE USED
 C     TO INITIALIZE LATER MODEL RUNS
 C
       use data_kind_mod, only : r8 => SHR_KIND_R8
+      implicit none
       integer, intent(in) :: I,NHW,NHE,NVN,NVS
 
       include "parameters.h"
       include "filec.h"
       include "files.h"
       include "blkc.h"
-
+      integer :: NX,NY,NZ
 C     execution begins here
 
       DO 9995 NX=NHW,NHE

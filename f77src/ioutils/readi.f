@@ -5,7 +5,7 @@ C
 C     THIS SUBROUTINE READS ALL SOIL AND TOPOGRAPHIC INPUT FILES
 C
       use data_kind_mod, only : r8 => SHR_KIND_R8
-
+      implicit none
       integer, intent(in) :: NT,NE,NAX,NDX,NTX,NEX
      2,NTZX,NHW,NHE,NVN,NVS
       integer, intent(out) :: NF, NFX, NTZ
@@ -32,6 +32,14 @@ C
       integer :: ll
       real(r8) :: DAT(50),DATK(50)
       real(r8), PARAMETER :: TWILGT=0.06976
+      real(r8) :: ALATG,ATCAG,AZI,ASPX,CO2EIG,CH4EG,DTBLIG,DTBLDIG
+      real(r8) :: DTBLGG,DECDAY,DECLIN,DEC,DPTHSX,OXYEG,RCHQNG,RCHQEG
+      real(r8) :: RCHQSG,RCHQWG,RCHGNUG,RCHGEUG,RCHGSUG,RCHGWUG
+      real(r8) :: RCHGNTG,RCHGETG,RCHGSTG,RCHGWTG,RCHGDG
+      real(r8) :: SL0,XI,Z2GEG,Z2OEG,ZNH3EG,SLX,SL1,SL2
+
+      integer :: IDTBLG,IETYPG,L,NX,NY,NCNG,NH1,NH2,NV1,NV2,NL1
+      integer :: NL2
 
 C     execution begins here
 

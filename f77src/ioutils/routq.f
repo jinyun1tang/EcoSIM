@@ -5,7 +5,7 @@ C     THIS SUBROUTINE OPENS CHECKPOINT FILES AND READS
 C     FILE NAMES FOR PLANT SPECIES AND MANAGEMENT
 C
       use data_kind_mod, only : r8 => SHR_KIND_R8
-
+      implicit none
       integer, intent(in) :: NT,NE,NAX,NDX,NTX,NEX,NHW,NHE,NVN,NVS
       include "parameters.h"
       include "filec.h"
@@ -19,6 +19,7 @@ C
       CHARACTER(len=16) :: OUTX,OUTC,OUTM,OUTR,OUTQ
       CHARACTER(len=4) :: CHARY
       CHARACTER(len=2) :: CLIMATE
+      integer :: IDATE,IYR,NX,NY,NZ,NN,NH1,NH2,NV1,NV2,NS
 
 C     execution begins here
 
@@ -39,7 +40,7 @@ C
       ELSE
       IDATE=IDATA(3)
       ENDIF
-      !open checkpoint files for i/o
+C     open checkpoint files for i/o
       WRITE(CHARY,'(I4)')IDATE
       OUTX='P'//DATA(1)(1:2)//CHARY(1:4)
       OUTC='C'//DATA(1)(1:2)//CHARY(1:4)

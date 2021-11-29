@@ -6,6 +6,7 @@ C     ON SELECTIONS MADE IN OUTPUT CONTROL FILES IN
 C     THE RUN SCRIPT
 C
       use data_kind_mod, only : r8 => SHR_KIND_R8
+      implicit none
       integer, intent(in) :: I,NT,NE,NAX,NDX
       integer, intent(in) :: NTX,NEX,NHW,NHE,NVN,NVS
 
@@ -30,6 +31,7 @@ C
 
       CHARACTER(len=16) :: CHEAD
       real(r8) :: HEAD(50)
+      integer :: IHEAD,K,KN,LUN,M,N,NX,NY,NZ
 
 C     execution begins here
 

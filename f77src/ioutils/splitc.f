@@ -1,7 +1,7 @@
 
       SUBROUTINE splitc(NT,NE,NAX,NDX,NTX,NEX,NHW,NHE,NVN,NVS)
       use data_kind_mod, only : r8 => SHR_KIND_R8
-
+      implicit none
       integer, intent(in) :: NT,NE,NAX,NDX,NTX,NEX,NHW,NHE,NVN,NVS
       include "parameters.h"
       include "filec.h"
