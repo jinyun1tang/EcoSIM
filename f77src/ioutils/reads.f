@@ -5,6 +5,7 @@ C
 C     THIS SUBROUTINE READS ALL SOIL AND PLANT MANAGEMENT INPUT FILES
 C
       use data_kind_mod, only : r8 => SHR_KIND_R8
+      implicit none
       integer, intent(in) :: NEX
       integer, intent(in) :: NA(1:NEX),ND(1:NEX)
       integer, intent(in) :: NT,NE,NAX,NDX,NTX,NHW,NHE,NVN,NVS
@@ -33,6 +34,17 @@ C
 
       integer, SAVE :: N1,N2,N1X,N2X,IFLGY,IYRX,IYRD
       LOGICAL :: GO110,GO60
+      integer :: IDATE,IDY,IFLG3,IH,IX,I,ICHECK,IDY1,IDY2,IDY3,IPLOW
+      integer :: IR0,IR1,IR2,IDYS,IHRS,IDYE,IHRE,IFLGVX,II,J,JEN
+      integer :: JST,JJ,K,LPY,L,M,N,NN,NX,NY,NH1,NH2,NV1,NV2,NI,LL
+      real(r8) :: CN4RIG,CNORIG,CN4RG,CNORG,CPORG,CALRG
+      real(r8) :: CFERG,CCARG,CMGRG,CNARG,CKARG,CSORG,CCLRG,CAC
+      real(r8) :: CAS,CIRRX,CN4QX,CNOQX,CPOQX,CALQX,CFEQX,CCAQX
+      real(r8) :: CMGQX,CNAQX,CKAQX,CSOQX,CCLQX,DY,DPLOW,DST,DEN
+      real(r8) :: DIRRX,FDPTHI,FIRRX
+      real(r8) :: PHRG,PMA,PMB,PHA,PHQX,RSC1,RSN1,RSP1
+      real(r8) :: RSC2,RSN2,RSP2,ROWX,RRH,RR,WDPTHI,Z0G,ZNOONG,Z4A
+      real(r8) :: Z3A,ZUA,ZOA,Z4B,Z3B,ZUB,ZOB
 
 C     execution begins here
 

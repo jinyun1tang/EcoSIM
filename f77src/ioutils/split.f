@@ -8,6 +8,7 @@ C     GRID CELL AT THE END OF THE SCENE WITH FILE NAME PREFIXES
 C     INDICATING ITS COLUMN AND ROW POSITION.
 C
       use data_kind_mod, only : r8 => SHR_KIND_R8
+      implicit none
       integer, intent(in) :: NT,NE,NAX,NDX,NTX,NEX,NHW,NHE,NVN,NVS
 
       include "parameters.h"
@@ -20,6 +21,8 @@ C
       CHARACTER(len=16):: OUTFILE
       CHARACTER(len=16):: HEAD(50)
       real(r8) :: HEAX(50)
+      integer :: LUN,LUX,NX,NY,N,NZ,K,J,IHEAD
+
 
 C     execution begins here
 

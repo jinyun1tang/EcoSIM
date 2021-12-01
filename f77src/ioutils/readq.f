@@ -6,6 +6,7 @@ C     THIS SUBROUTINE READS INPUT DATA FROM PLANT SPECIES
 C     AND MANAGEMENT FILES IDENTIFIED IN 'ROUTQ'
 C
       use data_kind_mod, only : r8 => SHR_KIND_R8
+      implicit none
       integer, intent(in) :: NEX
       integer, intent(in) :: NA(1:NEX),ND(1:NEX)
       integer, intent(in) :: NT,NE,NAX,NDX,NTX,NF,NFX,NTZ
@@ -21,6 +22,11 @@ C
       include "blk17.h"
 
       real(r8), PARAMETER :: TWILGT=0.06976
+      integer :: IDX,IMO,IYR,IDY,ICUT,IDYE,IDYG,IDYS,JCUT,LPY,M
+      integer :: NX,NY,NZ,NB,N,NN
+      real(r8) :: DY,ECUT11,ECUT12,ECUT13,ECUT14,ECUT21,ECUT22,ECUT23
+      real(r8) :: ECUT24,HCUT,PCUT,VRNLI
+      real(r8) :: VRNXI
 
 C     execution begins here
 

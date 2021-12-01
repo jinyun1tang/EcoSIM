@@ -6,6 +6,7 @@ C     ON SELECTIONS MADE IN OUTPUT CONTROL FILES IN
 C     THE RUN SCRIPT
 C
       use data_kind_mod, only : r8 => SHR_KIND_R8
+      implicit none
       integer, intent(in) :: I,NT,NE,NAX,NDX,NTX,NEX,NHW,NHE,NVN,NVS
 
       include "parameters.h"
@@ -29,6 +30,7 @@ C
       include "blk19b.h"
 
       real(r8) :: HEAD(50)
+      integer :: K,LUN,M,N,NX,NY
 
 C     execution begins here
 

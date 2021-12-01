@@ -5,6 +5,7 @@ C     THIS SUBROUTINE OPENS AND LABELS OUTPUT FILES
 C     FOR PLANT DATA
 C
       use data_kind_mod, only : r8 => SHR_KIND_R8
+      implicit none
       integer, intent(in) :: NT,NE,NAX,NDX,NTX,NEX
       integer, intent(in) :: NF,NFX,NHW,NHE,NVN,NVS
 
@@ -21,6 +22,8 @@ C
       CHARACTER(len=2):: CHARX,CHARY
       CHARACTER(len=4):: CHARR
       CHARACTER(len=16):: HEAD(50)
+
+      integer :: L,M,NX,NY,NZ,N,K
 
 C     execution begins here
 
