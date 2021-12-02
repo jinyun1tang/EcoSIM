@@ -5,6 +5,11 @@ C     FROM 'UPTAKE' AMD 'GROSUB' AND SENDS RESULTS TO 'REDIST'
 C
       use data_kind_mod, only : r8 => SHR_KIND_R8
 
+      implicit none
+
+      real(r8) :: ENGYC
+
+      integer :: K,L,M,NX,NY,NZ,N,NB
       integer, intent(in) :: I, J
       integer, intent(in) :: NHW,NHE,NVN,NVS
 

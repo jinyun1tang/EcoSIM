@@ -4,6 +4,12 @@ C
 C     THIS SUBROUTINE CALCULATES PLANT PHENOLOGY
 C
       use data_kind_mod, only : r8 => SHR_KIND_R8
+      implicit none
+
+      real(r8) :: ARLSP,ACTV,OFNG,PPD,RTK,RNI,RLA,STK,TKCO,TFNP
+      real(r8) :: WFNG
+
+      integer :: KVSTGX,L,NX,NY,NZ,NB,NBTX,N
       integer, intent(in) :: I, J
       integer, intent(in) :: NHW,NHE,NVN,NVS
 

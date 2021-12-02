@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 
       SUBROUTINE grosub(I,J,NHW,NHE,NVN,NVS)
 C

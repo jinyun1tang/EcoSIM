@@ -6,6 +6,7 @@ C     TRANSFER THROUGH SOIL PROFILES
 C
       use data_kind_mod, only : r8 => SHR_KIND_R8
       implicit none
+
       integer, intent(in) :: I, J
       integer, intent(in) :: NHW,NHE,NVN,NVS
 

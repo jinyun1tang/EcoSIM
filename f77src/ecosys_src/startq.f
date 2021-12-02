@@ -5,6 +5,12 @@ C
       use data_kind_mod, only : r8 => SHR_KIND_R8
       integer, intent(in) :: NHWQ,NHEQ,NVNQ,NVSQ,NZ1Q,NZ2Q
 
+      implicit none
+
+      real(r8) :: CNOPCT,CPOPCT,CCO2A,CCO2P,COXYA,COXYP,FDM,WTSTDX
+
+      integer :: K,L,M,NX,NY,NZ2X,NZ,N,NR,NB
+      
       include "parameters.h"
       include "filec.h"
       include "files.h"

@@ -5,6 +5,13 @@ C     THIS SUBROUTINE CALCULATES CANOPY STOMATAL RESISTANCE AT MAXIMUM
 C     CANOPY TURGOR FOR USE IN ENERGY BALANCE EQUATIONS IN 'UPTAKE'
 C
       use data_kind_mod, only : r8 => SHR_KIND_R8
+      implicit none
+      
+      real(r8) :: ACTV,CH2O,CC4M,CCBS,ETDN4,ETLF4,EGRO4,ETDN,ETLF
+      real(r8) :: EGRO,PARX,PARJ,RI,RAC,RTK,RSX,STK,TCCZ,TKCO,TFN1
+      real(r8) :: TFN2,TFNE,VCDN4,VL,VCDN,VOGRO,WSDN,XKO2L
+
+      integer :: K,L,M,NB,N
       integer, intent(in) :: I, J
       integer, intent(in) :: NZ,NY,NX
 
