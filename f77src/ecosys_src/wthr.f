@@ -4,6 +4,10 @@ C     THIS SUBROUTINE REINITIALIZES WEATHER VARIABLES USED IN OTHER
 C     SUBROUTINES
 C
       use data_kind_mod, only : r8 => SHR_KIND_R8
+      implicit none
+      real(r8) :: AMP,CLD,DTA,DHR,DTS,EMM,RADX,RADZ,VPX,WDPTHD,XJ
+
+      integer :: ITYPE,NX,NY,N,NZ
       integer, intent(in) :: I, J
       integer, intent(in) :: NHW,NHE,NVN,NVS
 

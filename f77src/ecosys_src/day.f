@@ -5,9 +5,15 @@ C     SUBROUTINES E.G. LAND MANAGEMENT
 C
       use data_kind_mod, only : r8 => SHR_KIND_R8
 
+      implicit none
+
+      real(r8) :: CORP,DECDAY,DECLIN,DIRRA1,DIRRA2,FW,FZ,520,510,520
+      real(r8) :: RR,TFZ,TWP,TVW,XI
+      
       integer, intent(in) :: I
       integer, intent(in) :: NHW,NHE,NVN,NVS
-
+      integer :: ITYPE,I2,I3,J,L,M,N,NN,N1,N2,N3,NX,NY,NZ
+      
       include "parameters.h"
       include "filec.h"
       include "files.h"

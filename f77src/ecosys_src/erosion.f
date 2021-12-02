@@ -6,6 +6,12 @@ C     FROM RUNOFF IN 'WATSUB'
 C
       use data_kind_mod, only : r8 => SHR_KIND_R8
 
+      implicit none
+      real(r8) :: CSEDD,CSEDX,CSEDE,DETW,DETR,DEPI,DETI,FERM,FSEDER
+      real(r8) :: RCHQF,SEDX,STPR,XN
+
+      integer :: K,M,M1,M2,M4,M5,NX,NY,N1,N2,N,NN,N4,N5,N4B,N5B
+      integer :: NO
       integer, intent(in) :: I, J
       integer, intent(in) :: NHW,NHE,NVN,NVS
 
