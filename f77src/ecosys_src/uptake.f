@@ -37,7 +37,8 @@ C
       real(r8) :: RDXCHS,RUPCSX,RDFN2S,RDXN2S,RUPZSX,RDFN3S,RDXNHS
       real(r8) :: RUPNSX,RDFN3B,RDXNHB,RUPNBX,RDFHGS,RDXHGS,RUPHGX
       real(r8) :: RCODFQ,RUPOST,RNBDFQ,RUPNTX,RCODF1,RCOFL1,ROXFL1
-      real(r8) :: RCHFL1,RN2FL1,RNHFL1,RHGFL1,STK,SNH3P,TEST_CONVERGENCE(:,:,:,:,:,:,:,:,:,:)
+      real(r8) :: RCHFL1,RN2FL1,RNHFL1,RHGFL1,STK,SNH3P
+C      real(r8) :: TEST_CONVERGENCE(:,:,:,:,:,:,:,:,:,:)
       real(r8) :: TFOXYX,TFRADP,TKC1,TKCY,THETW1,THETM,UPRTX,UPMXP
       real(r8) :: UPMX,VOLWPX,VPC,VOLWPZ,VOLWK,VOLWT,VOLWCA,VOLWOA
       real(r8) :: VOLWC4,VOLWZA,VOLWNA,VOLWH2,VOLWMO,VOLWMM,VOLPMM
@@ -48,8 +49,8 @@ C
       real(r8) :: ZNHBX,ZPOOLX,Z2OA1,Z2OP1,Z2OS1,ZH3A1,ZH3P1,ZH3S1
       real(r8) :: ZH3B1,Z2SGL1,ZHSGL1,ZVSGL1,ZNSGL1,Z2OG1,ZH3G1
       real(r8) :: ZH3PA,ZH3PB,ZH3GA,ZH3GB,Z2OPX,ZH3PX
-
-      integer :: IC,ICHK,K,L,M,MX,NX,NY,NZ,NN,N,NB,NZZ,NR
+      
+      integer :: IC,ICHK,K,L,M,MX,NN,N,NB,NZZ,NR,NX,NY,NZ
       integer, intent(in) :: I, J
       integer, intent(in) :: NHW,NHE,NVN,NVS
 
@@ -89,7 +90,8 @@ C
      2,RSRT(2,JZ),RSRG(2,JZ),RSR1(2,JZ),RSR2(2,JZ)
      3,RSSX(2,JZ),RSRS(2,JZ),WTRTG(JZ),FPQ(2,JZ,05),FPP(2,JZ,05)
      4,RACZ(JP,JY,JX),FRTDPX(JZ,05),RTARR(2,JZ)
-     5,VOLPU(JZ),VOLWU(JZ)
+     5     ,VOLPU(JZ),VOLWU(JZ)
+C     (AG) ,NB1(NZ,NY,NX)
       integer :: ILYR(2,JZ)
 C
 C     MXN=max number of cycles in convergence soln for water uptake
@@ -152,6 +154,7 @@ C    3,FRADP(NZ,NY,NX),RTDP1(1,1,NZ,NY,NX),RADC(NZ,NY,NX)
 C    4,RADP(NZ,NY,NX),FRTDPX(L,NZ),RTDPX,RAZ(NZ,NY,NX)
 2123  FORMAT(A8,6I4,20E12.4)
 C     ENDIF
+C     (AG: - originally this line had a N0B1 here )
       IF((IDAY(1,NB1(NZ,NY,NX),NZ,NY,NX).NE.0)
      3.AND.(ARLFS(NZ,NY,NX).GT.ZEROL(NZ,NY,NX)
      4.AND.FRADP(NZ,NY,NX).GT.0.0)
@@ -198,6 +201,7 @@ C
 C
 C     CONVERGENCE SOLUTION
 C
+
       NN=test_convergence(TKCX, VHCPX, WVPLT, HFLWC1, PSILH, FPC,
      2MXN,DIFF,UPRT,VFLXC)
 C
@@ -633,6 +637,8 @@ C------------------------------------------------------------------------------
       real(r8) , intent(in) :: VHCPX
       real(r8) , intent(in) :: HFLWC1
       real(r8) , intent(in) :: PSILH
+      real(r8) , intent(in) :: FPC
+      real(r8) , intent(in) :: WVPLT
       integer, intent(in) :: MXN
       real(r8), intent(out) :: DIFF
       real(r8), intent(out) :: UPRT

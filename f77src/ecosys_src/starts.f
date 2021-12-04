@@ -3,8 +3,9 @@ C
 C     THIS SUBROUTINE INITIALIZES ALL SOIL VARIABLES
 C
       use data_kind_mod, only : r8 => SHR_KIND_R8
-      integer, intent(in) :: NHW,NHE,NVN,NVS
       implicit none
+      integer, intent(in) :: NHW,NHE,NVN,NVS
+
 
       real(r8) :: ALTY,ALTZG,CDPTHG,CORGL,CORGCZ,CORGRZ,CORGNZ,CORGPZ
       real(r8) :: CORGCM,DAZI,DGAZI,DLYRSI,FCY,FC0,FCO,FCX,FC1,FRNT
