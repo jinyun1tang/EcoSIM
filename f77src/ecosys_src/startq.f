@@ -3,9 +3,9 @@ C
 C     THIS SUBROUTINE INITIALIZES ALL PLANT VARIABLES
 C
       use data_kind_mod, only : r8 => SHR_KIND_R8
-      integer, intent(in) :: NHWQ,NHEQ,NVNQ,NVSQ,NZ1Q,NZ2Q
-
       implicit none
+      
+      integer, intent(in) :: NHWQ,NHEQ,NVNQ,NVSQ,NZ1Q,NZ2Q
 
       real(r8) :: CNOPCT,CPOPCT,CCO2A,CCO2P,COXYA,COXYP,FDM,WTSTDX
 
