@@ -4,6 +4,8 @@ C
 C     THIS IS THE MAIN SUBROUTINE FROM WHICH ALL OTHERS ARE CALLED
 C
       use data_kind_mod, only : r8 => SHR_KIND_R8
+      implicit none
+
       integer, intent(in) :: NA(1:NEX),ND(1:NEX)
       integer, intent(in) :: NT,NE,NAX,NDX,NTX,NEX
      2,NHW,NHE,NVN,NVS
@@ -13,7 +15,8 @@ C
       include "files.h"
       include "blkc.h"
 
-      integer, SAVE :: NF,NX,NTZ,NTZX
+      integer :: I,J
+      integer, SAVE :: NF,NX,NTZ,NTZX, NFX
       DATA NF,NX,NTZ,NTZX/0,0,0,0/
 C     execution begins here
 
