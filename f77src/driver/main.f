@@ -6,13 +6,17 @@ C
       use data_kind_mod, only : r8 => SHR_KIND_R8
       use TestMod, only : regression
 
+      implicit none
+      
       include "parameters.h"
       include "filec.h"
       include "files.h"
       include "blkc.h"
 
       integer :: NA(250),ND(250)
-
+      integer :: NAX,NDX,NEX,NAY,NDY,NE,N,NTX,NT
+      integer :: NHW,NVN,NHE,NVS
+      
       CHARACTER(len=80):: BUF
       character(len=80):: runfile
       character(len=36):: case_name
