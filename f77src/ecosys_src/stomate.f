@@ -1,10 +1,12 @@
 
-      SUBROUTINE stomate(I,J,NZ,NY,NX)
+      Subroutine stomate(I,J,NZ,NY,NX)
 C
 C     THIS SUBROUTINE CALCULATES CANOPY STOMATAL RESISTANCE AT MAXIMUM
 C     CANOPY TURGOR FOR USE IN ENERGY BALANCE EQUATIONS IN 'UPTAKE'
 C
       use data_kind_mod, only : r8 => SHR_KIND_R8
+      implicit none
+      
       integer, intent(in) :: I, J
       integer, intent(in) :: NZ,NY,NX
 
@@ -23,6 +25,13 @@ C
       include "blk9b.h"
       include "blk9c.h"
       include "blk1u.h"
+      
+      real(r8) :: ACTV,CH2O,CC4M,CCBS,ETDN4,ETLF4,EGRO4,ETDN,ETLF
+      real(r8) :: EGRO,PARX,PARJ,RI,RAC,RTK,RSX,STK,TCCZ,TKCO,TFN1
+      real(r8) :: TFN2,TFNE,VCDN4,VL,VCDN,VOGRO,WSDN,XKO2L
+
+      integer :: K,L,M,NB,N
+      
       real(r8) :: FLG4Y(0:5)
 C
 C     QNTM=quantum efficiency (umol e- umol-1 PAR)

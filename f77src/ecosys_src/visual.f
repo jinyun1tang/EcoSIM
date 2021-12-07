@@ -1,6 +1,8 @@
       SUBROUTINE visual(I,J,NHW,NHE,NVN,NVS)
 
       use data_kind_mod, only : r8 => SHR_KIND_R8
+      implicit none
+
       integer, intent(in) :: I, J
       integer, intent(in) :: NHW,NHE,NVN,NVS
 
@@ -37,6 +39,10 @@
       include "blk18a.h"
       include "blk18b.h"
 
+      real(r8) :: TCSNX,TTRN,TTLE,TTSH,TTGH,TTCO,TTCH
+
+      integer :: L,NX,NY,N
+      
       real(r8) :: OUT(100),SWC(JY,JX)
       real(r8), PARAMETER :: DEFAULT=-9999
 

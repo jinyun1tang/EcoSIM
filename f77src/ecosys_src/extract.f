@@ -4,6 +4,7 @@ C     THIS SUBROUTINE AGGREGATES ALL SOIL-PLANT C,N,P EXCHANGES
 C     FROM 'UPTAKE' AMD 'GROSUB' AND SENDS RESULTS TO 'REDIST'
 C
       use data_kind_mod, only : r8 => SHR_KIND_R8
+      implicit none
 
       integer, intent(in) :: I, J
       integer, intent(in) :: NHW,NHE,NVN,NVS
@@ -34,6 +35,10 @@ C
       include "blk18a.h"
       include "blk18b.h"
 
+      real(r8) :: ENGYC
+
+      integer :: K,L,M,NX,NY,NZ,N,NB
+      
 C     execution begins here
 
       DO 9995 NX=NHW,NHE

@@ -3,6 +3,7 @@ C
 C     THIS SUBROUTINE INITIALIZES ALL SOIL VARIABLES
 C
       use data_kind_mod, only : r8 => SHR_KIND_R8
+      implicit none
       integer, intent(in) :: NHW,NHE,NVN,NVS
 
       include "parameters.h"
@@ -21,6 +22,16 @@ C
       include "blk16.h"
       include "blk18a.h"
       include "blk18b.h"
+
+      real(r8) :: ALTY,ALTZG,CDPTHG,CORGL,CORGCZ,CORGRZ,CORGNZ,CORGPZ
+      real(r8) :: CORGCM,DAZI,DGAZI,DLYRSI,FCY,FC0,FCO,FCX,FC1,FRNT
+      real(r8) :: FRPT,FOSCI,FOSNI,FOSPI,HCX,OMEGY,OMEGZ,OMC1,OMN1
+      real(r8) :: OMP1,OC,ON,OP,PTDS,RNT,RPT,RC,TORGC,TORGM,TOSCI
+      real(r8) :: TOSNI,TOSPI,TOMC,VOLSWI,VORGC,VMINL,VSAND,X,YAGL
+      real(r8) :: ZAGL
+
+      integer :: K,KK,L,M,N,NX,NY,N1,N2,N3,N4,N5,N6,NN
+      
       real(r8) :: YSIN(4),YCOS(4),YAZI(4),ZAZI(4),OSCI(0:4),OSNI(0:4)
      2,ORCI(2,0:4),OSPI(0:4),OSCM(0:4),CORGCX(0:4)
      3,CORGNX(0:4),CORGPX(0:4),CNOSCT(0:4),CPOSCT(0:4)

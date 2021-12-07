@@ -4,6 +4,8 @@ C
 C     THIS SUBROUTINE CALCULATES PLANT PHENOLOGY
 C
       use data_kind_mod, only : r8 => SHR_KIND_R8
+      implicit none
+
       integer, intent(in) :: I, J
       integer, intent(in) :: NHW,NHE,NVN,NVS
 
@@ -34,6 +36,9 @@ C
       include "blk18b.h"
 
       real(r8) :: PSILY(0:3)
+      real(r8) :: ARLSP,ACTV,OFNG,PPD,RTK,RNI,RLA,STK,TKCO,TFNP
+      real(r8) :: WFNG
+      integer :: KVSTGX,L,NX,NY,NZ,NB,NBTX,N
       integer :: NBX(0:3)
 C
 C     PSILM=minimum canopy turgor potential for leaf expansion (MPa)

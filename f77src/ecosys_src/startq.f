@@ -3,6 +3,8 @@ C
 C     THIS SUBROUTINE INITIALIZES ALL PLANT VARIABLES
 C
       use data_kind_mod, only : r8 => SHR_KIND_R8
+      implicit none
+      
       integer, intent(in) :: NHWQ,NHEQ,NVNQ,NVSQ,NZ1Q,NZ2Q
 
       include "parameters.h"
@@ -35,7 +37,10 @@ C
       include "blk18b.h"
 
       real(r8) :: CNOPC(4),CPOPC(4)
+      real(r8) :: CNOPCT,CPOPCT,CCO2A,CCO2P,COXYA,COXYP,FDM,WTSTDX
 
+      integer :: K,L,M,NX,NY,NZ2X,NZ,N,NR,NB
+      
 C     execution begins here
 C
 C     INITIALIZE SHOOT GROWTH VARIABLES
