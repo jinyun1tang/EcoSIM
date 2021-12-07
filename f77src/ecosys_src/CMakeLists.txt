@@ -1,15 +1,11 @@
-configure_file(solutepar.h  solutepar.h COPYONLY)
 set(ECOSYS_SOURCES
 	day.f
 	erosion.f
 	exec.f
 	extract.f
-	grosub.f
 	hfunc.f
 	hour1.f
-	nitro.f
 	redist.f
-	solute.f
 	starte.f
 	startq.f
 	starts.f

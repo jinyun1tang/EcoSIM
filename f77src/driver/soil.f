@@ -4,6 +4,9 @@ C
 C     THIS IS THE MAIN SUBROUTINE FROM WHICH ALL OTHERS ARE CALLED
 C
       use data_kind_mod, only : r8 => SHR_KIND_R8
+	  use grosubMod    , only : grosub
+	  use nitroMod     , only : nitro
+	  use soluteMod    , only : solute
       implicit none
 
       integer, intent(in) :: NA(1:NEX),ND(1:NEX)
