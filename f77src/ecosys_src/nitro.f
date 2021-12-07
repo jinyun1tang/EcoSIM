@@ -5,6 +5,32 @@ C
       use data_kind_mod, only : r8 => SHR_KIND_R8
       implicit none
 
+      integer, intent(in) :: I, J
+      integer, intent(in) :: NHW,NHE,NVN,NVS
+
+      include "parameters.h"
+      include "blkc.h"
+      include "blk2a.h"
+      include "blk2b.h"
+      include "blk2c.h"
+      include "blk8a.h"
+      include "blk8b.h"
+      include "blk10.h"
+      include "blk11a.h"
+      include "blk11b.h"
+      include "blk13a.h"
+      include "blk13b.h"
+      include "blk13c.h"
+      include "blk13d.h"
+      include "blk15a.h"
+      include "blk15b.h"
+      include "blk16.h"
+      include "blk18a.h"
+      include "blk18b.h"
+      include "blk19a.h"
+      include "blk19b.h"
+      include "blk21b.h"
+
       real(r8) :: ACTV,ACTVM,AECX,B,CHY1,CHNO2,CHNOB,COMC,CH4G1
       real(r8) :: CH4S1,CCH4S1,COXYS1,C,CNH4X,CNH4Y,CNO3X,CNO3Y
       real(r8) :: CH2PX,CH2PY,CH1PX,CH1PY,CGOMX,CGOMD,CGOXC,CCC
@@ -50,32 +76,7 @@ C
       real(r8) :: ZNO3BX,ZNO2SX,ZNO2BX,Z2OSX,ZNH4M,ZNHBM,ZNO3M,ZNOBM
       
       integer :: IFLGJ,KL,K,KK,L,LL,LN,M,MM,MX,NX,NY,N,NLL
-      integer, intent(in) :: I, J
-      integer, intent(in) :: NHW,NHE,NVN,NVS
-
-      include "parameters.h"
-      include "blkc.h"
-      include "blk2a.h"
-      include "blk2b.h"
-      include "blk2c.h"
-      include "blk8a.h"
-      include "blk8b.h"
-      include "blk10.h"
-      include "blk11a.h"
-      include "blk11b.h"
-      include "blk13a.h"
-      include "blk13b.h"
-      include "blk13c.h"
-      include "blk13d.h"
-      include "blk15a.h"
-      include "blk15b.h"
-      include "blk16.h"
-      include "blk18a.h"
-      include "blk18b.h"
-      include "blk19a.h"
-      include "blk19b.h"
-      include "blk21b.h"
-
+      
       real(r8) :: CNOMA(7,0:5),CPOMA(7,0:5),OMA(7,0:5),FOMA(7,0:5)
      2,FOMN(7,0:5),RDOSC(4,0:4),RDOSN(4,0:4),RDOSP(4,0:4),RHOSC(4,0:4)
      3,RHOSN(4,0:4),RHOSP(4,0:4),RCOSC(4,0:4),RCOSN(4,0:4),RCOSP(4,0:4)

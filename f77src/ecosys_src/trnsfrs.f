@@ -6,6 +6,39 @@ C
       use data_kind_mod, only : r8 => SHR_KIND_R8
       implicit none
 
+      integer, intent(in) :: I, J
+      integer, intent(in) :: NHW,NHE,NVN,NVS
+
+      include "parameters.h"
+      include "blkc.h"
+      include "blk2a.h"
+      include "blk2b.h"
+      include "blk2c.h"
+      include "blk8a.h"
+      include "blk8b.h"
+      include "blk10.h"
+      include "blk11a.h"
+      include "blk11b.h"
+      include "blk13c.h"
+      include "blk15a.h"
+      include "blk15b.h"
+      include "blk18a.h"
+      include "blk18b.h"
+      include "blk19a.h"
+      include "blk19b.h"
+      include "blk19c.h"
+      include "blk19d.h"
+      include "blk20a.h"
+      include "blk20b.h"
+      include "blk20c.h"
+      include "blk20d.h"
+      include "blk20e.h"
+      include "blk21a.h"
+      include "blk21b.h"
+      include "blk22a.h"
+      include "blk22b.h"
+      include "blk22c.h"
+
       real(r8) :: CAL1,CFE1,CHY1,CCA1,CMG1,CNA1,CKA1,COH1,CSO41
       real(r8) :: CCL1,CCO31,CHCO31,CAL11,CAL21,CAL31,CAL41,CALS1
       real(r8) :: CFE11,CFE21,CFE31,CFE41,CFES1,CCAO1,CCAC1,CCAH1
@@ -70,39 +103,7 @@ C
 
       integer :: ICHKL,IFLGB,L,L2,LL,LS,LS2,M,M1,M2,M3,M4,M5,M6
       integer :: NX,NY,N1,N2,N,NN,N4,N5,N4B,N5B,N3,N6
-      integer, intent(in) :: I, J
-      integer, intent(in) :: NHW,NHE,NVN,NVS
-
-      include "parameters.h"
-      include "blkc.h"
-      include "blk2a.h"
-      include "blk2b.h"
-      include "blk2c.h"
-      include "blk8a.h"
-      include "blk8b.h"
-      include "blk10.h"
-      include "blk11a.h"
-      include "blk11b.h"
-      include "blk13c.h"
-      include "blk15a.h"
-      include "blk15b.h"
-      include "blk18a.h"
-      include "blk18b.h"
-      include "blk19a.h"
-      include "blk19b.h"
-      include "blk19c.h"
-      include "blk19d.h"
-      include "blk20a.h"
-      include "blk20b.h"
-      include "blk20c.h"
-      include "blk20d.h"
-      include "blk20e.h"
-      include "blk21a.h"
-      include "blk21b.h"
-      include "blk22a.h"
-      include "blk22b.h"
-      include "blk22c.h"
-
+      
       real(r8) :: ZAL2(0:JZ,JY,JX),ZFE2(0:JZ,JY,JX),ZHY2(0:JZ,JY,JX)
      2,ZCA2(0:JZ,JY,JX),ZMG2(0:JZ,JY,JX),ZNA2(0:JZ,JY,JX)
      3,ZKA2(0:JZ,JY,JX),ZOH2(0:JZ,JY,JX),ZSO42(0:JZ,JY,JX)

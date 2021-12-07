@@ -9,6 +9,31 @@ C
       integer, intent(in) :: I, J
       integer, intent(in) :: NHW, NHE, NVN, NVS
 
+      include "parameters.h"
+      include "blkc.h"
+      include "blk2a.h"
+      include "blk2b.h"
+      include "blk2c.h"
+      include "blk8a.h"
+      include "blk8b.h"
+      include "blk10.h"
+      include "blk11a.h"
+      include "blk11b.h"
+      include "blk13a.h"
+      include "blk13b.h"
+      include "blk13c.h"
+      include "blk15a.h"
+      include "blk15b.h"
+      include "blk18a.h"
+      include "blk18b.h"
+      include "blk19a.h"
+      include "blk19b.h"
+      include "blk19c.h"
+      include "blk19d.h"
+      include "blk21a.h"
+      include "blk21b.h"
+      include "solutepar.h"
+C
       real(r8) :: A1,A2,A3,AHY1,AOH1,AAL1,AALO1,AALO2,AALO3,AALO4
       real(r8) :: AFE1,AFEO1,AFEO2,AFEO3,AFEO4,ACA1,ACO31,AHCO31
       real(r8) :: ACO21,ASO41,AH0P1,AH1P1,AH2P1,AH3P1,AF1P1,AF2P1
@@ -68,32 +93,7 @@ C
       real(r8) :: XCA1,XMG1,XNA1,XKA1,XHC1,XALO21,XFEO21,XCOOH,XCOO
 
       integer :: L,M,NPI,NX,NY,NR1,NP2,NP3
-      
-      include "parameters.h"
-      include "blkc.h"
-      include "blk2a.h"
-      include "blk2b.h"
-      include "blk2c.h"
-      include "blk8a.h"
-      include "blk8b.h"
-      include "blk10.h"
-      include "blk11a.h"
-      include "blk11b.h"
-      include "blk13a.h"
-      include "blk13b.h"
-      include "blk13c.h"
-      include "blk15a.h"
-      include "blk15b.h"
-      include "blk18a.h"
-      include "blk18b.h"
-      include "blk19a.h"
-      include "blk19b.h"
-      include "blk19c.h"
-      include "blk19d.h"
-      include "blk21a.h"
-      include "blk21b.h"
-      include "solutepar.h"
-C
+C      
       DATA RNHUI/10.0E-02,1.0E-02,0.5E-02/
       real(r8) :: RSNUA, RSNUB
       real(r8) :: CN41, CN31, CN3B, CN4B, XN4B, XN41

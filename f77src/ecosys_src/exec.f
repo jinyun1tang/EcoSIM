@@ -5,10 +5,7 @@ C     IN 'REDIST' AND PERFORMS MASS BALANCE CHECKS AT THE END
 C     OF EACH DAY OF THE MODEL RUN, AND ERRORS OF > 1UG ARE FLAGGED.
 C
       use data_kind_mod, only : r8 => SHR_KIND_R8
-
       implicit none
-
-      real(r8) :: DIFFQ,DIFFH,DIFFO,DIFFC,DIFFN,DIFFP,DIFFI
       
       integer, intent(in) :: I
 
@@ -20,7 +17,7 @@ C
       include "blk16.h"
 
       real(r8), SAVE :: TLW,TLH,TLO,TLC,TLN,TLP,TLI
-
+      real(r8) :: DIFFQ,DIFFH,DIFFO,DIFFC,DIFFN,DIFFP,DIFFI
 C     execution begins here
 C
 C     CALCULATE MASS BALANCES FOR WATER, HEAT, O2, C, N, P AND SOLUTES

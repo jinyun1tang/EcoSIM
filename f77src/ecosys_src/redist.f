@@ -7,6 +7,51 @@ C
       use data_kind_mod, only : r8 => SHR_KIND_R8
       implicit none
 
+      integer, intent(in) :: I, J
+      integer, intent(in) :: NHW,NHE,NVN,NVS
+
+      include "parameters.h"
+      include "blkc.h"
+      include "blk1n.h"
+      include "blk1p.h"
+      include "blk1cr.h"
+      include "blk2a.h"
+      include "blk2b.h"
+      include "blk2c.h"
+      include "blk3.h"
+      include "blk5.h"
+      include "blk8a.h"
+      include "blk8b.h"
+      include "blk9b.h"
+      include "blk11a.h"
+      include "blk11b.h"
+      include "blk12a.h"
+      include "blk12b.h"
+      include "blk13a.h"
+      include "blk13b.h"
+      include "blk13c.h"
+      include "blk15a.h"
+      include "blk15b.h"
+      include "blk16.h"
+      include "blk18a.h"
+      include "blk18b.h"
+      include "blk19a.h"
+      include "blk19b.h"
+      include "blk19c.h"
+      include "blk19d.h"
+      include "blk20a.h"
+      include "blk20b.h"
+      include "blk20c.h"
+      include "blk20d.h"
+      include "blk20e.h"
+      include "blk20f.h"
+      include "blk21a.h"
+      include "blk21b.h"
+      include "blk22a.h"
+      include "blk22b.h"
+      include "blk22c.h"
+      include "blktest.h"
+
       real(r8) :: CXR,COR,CXE,COE,COD,CXD,CXS,CVISC,CI,CH,CO,CX
       real(r8) :: CS,CIB,CHB,COB,CORP,CORP0,DCORPW,DENSX,DENSF,DDENS1
       real(r8) :: DDENS2,DORGP,DC,DN,DP,DDLYXS,DDLYXX,DDLYRS,DDLYXP
@@ -105,51 +150,7 @@ C
       integer :: IFLGLS,ICHKLX,ICHKL,K,L,LL,LG,LX,LS,LS2,L1,L0,LY
       integer :: M,NX,NY,N,N1,N2,NN,N4,N5,N6,NO,N3,N4B,N5B,NUX,NZ
       integer :: NR
-      integer, intent(in) :: I, J
-      integer, intent(in) :: NHW,NHE,NVN,NVS
-
-      include "parameters.h"
-      include "blkc.h"
-      include "blk1n.h"
-      include "blk1p.h"
-      include "blk1cr.h"
-      include "blk2a.h"
-      include "blk2b.h"
-      include "blk2c.h"
-      include "blk3.h"
-      include "blk5.h"
-      include "blk8a.h"
-      include "blk8b.h"
-      include "blk9b.h"
-      include "blk11a.h"
-      include "blk11b.h"
-      include "blk12a.h"
-      include "blk12b.h"
-      include "blk13a.h"
-      include "blk13b.h"
-      include "blk13c.h"
-      include "blk15a.h"
-      include "blk15b.h"
-      include "blk16.h"
-      include "blk18a.h"
-      include "blk18b.h"
-      include "blk19a.h"
-      include "blk19b.h"
-      include "blk19c.h"
-      include "blk19d.h"
-      include "blk20a.h"
-      include "blk20b.h"
-      include "blk20c.h"
-      include "blk20d.h"
-      include "blk20e.h"
-      include "blk20f.h"
-      include "blk21a.h"
-      include "blk21b.h"
-      include "blk22a.h"
-      include "blk22b.h"
-      include "blk22c.h"
-      include "blktest.h"
-
+      
       real(r8) :: TFLW(JZ,JY,JX),TFLWX(JZ,JY,JX),THFLW(JZ,JY,JX)
      1,TFLWH(JZ,JY,JX),TOCFLS(0:4,JZ,JY,JX),TONFLS(0:4,JZ,JY,JX)
      2,TOPFLS(0:4,JZ,JY,JX),TOAFLS(0:4,JZ,JY,JX),TCOFLS(JZ,JY,JX)

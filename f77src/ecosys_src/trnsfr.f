@@ -6,6 +6,35 @@ C
       use data_kind_mod, only : r8 => SHR_KIND_R8
       implicit none
 
+      integer, intent(in) :: I, J
+      integer, intent(in) :: NHW,NHE,NVN,NVS
+
+      include "parameters.h"
+      include "blkc.h"
+      include "blk2a.h"
+      include "blk2b.h"
+      include "blk2c.h"
+      include "blk8a.h"
+      include "blk8b.h"
+      include "blk10.h"
+      include "blk11a.h"
+      include "blk11b.h"
+      include "blk13a.h"
+      include "blk13b.h"
+      include "blk13c.h"
+      include "blk15a.h"
+      include "blk15b.h"
+      include "blk18a.h"
+      include "blk18b.h"
+      include "blk19d.h"
+      include "blk20d.h"
+      include "blk20e.h"
+      include "blk21a.h"
+      include "blk21b.h"
+      include "blk22a.h"
+      include "blk22b.h"
+      include "blk22c.h"
+
       real(r8) :: CCO2S1,CCH4S1,COXYS1,CZ2GS1,CZ2OS1,CH2GS1,CNH4S1
       real(r8) :: CNH3S1,CNO3S1,CNO2S1,CP14S1,CPO4S1,CCO2GQ,CCH4GQ
       real(r8) :: COXYGQ,CZ2GGQ,CZ2OGQ,CZN3GQ,CH2GGQ,CCO2S2,CCH4S2
@@ -62,35 +91,7 @@ C
 
       integer :: ICHKL,IFLGB,K,L,L2,LL,LS,LS2,MX,MM,M,M1,M2,M3,M4
       integer :: M5,M6,NX,NY,N1,N2,N,NN,N4,N5,N4B,N5B,N3,N6
-      integer, intent(in) :: I, J
-      integer, intent(in) :: NHW,NHE,NVN,NVS
-
-      include "parameters.h"
-      include "blkc.h"
-      include "blk2a.h"
-      include "blk2b.h"
-      include "blk2c.h"
-      include "blk8a.h"
-      include "blk8b.h"
-      include "blk10.h"
-      include "blk11a.h"
-      include "blk11b.h"
-      include "blk13a.h"
-      include "blk13b.h"
-      include "blk13c.h"
-      include "blk15a.h"
-      include "blk15b.h"
-      include "blk18a.h"
-      include "blk18b.h"
-      include "blk19d.h"
-      include "blk20d.h"
-      include "blk20e.h"
-      include "blk21a.h"
-      include "blk21b.h"
-      include "blk22a.h"
-      include "blk22b.h"
-      include "blk22c.h"
-
+      
       real(r8) :: CO2G2(JZ,JY,JX),CO2S2(0:JZ,JY,JX)
      2,CH4G2(JZ,JY,JX),CH4S2(0:JZ,JY,JX),OXYG2(JZ,JY,JX)
      3,OXYS2(0:JZ,JY,JX),Z2GG2(JZ,JY,JX),Z2GS2(0:JZ,JY,JX)
