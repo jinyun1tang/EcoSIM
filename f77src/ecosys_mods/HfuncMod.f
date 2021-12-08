@@ -160,7 +160,6 @@ C
 9990  CONTINUE
 9995  CONTINUE
       RETURN
-      contains
       END subroutine hfunc
       
       subroutine set_flags
