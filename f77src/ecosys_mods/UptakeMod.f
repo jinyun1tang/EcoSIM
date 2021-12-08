@@ -327,6 +327,8 @@ C
 9995  CONTINUE
       RETURN
       contains
+
+      END subroutine uptake
 C------------------------------------------------------------------------
 
       subroutine stage_for_uptake
@@ -3103,3 +3105,6 @@ C     ENDIF
       ENDIF
       end subroutine root_soil_gas_exchange
       END
+
+      end module UptakeMod
+      

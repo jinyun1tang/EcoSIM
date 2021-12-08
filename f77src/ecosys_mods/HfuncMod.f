@@ -929,3 +929,6 @@ C
       end subroutine living_branch_phenology
 
       END
+
+      END subroutine hfunc
+      end module HfuncMod
