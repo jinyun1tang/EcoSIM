@@ -3670,7 +3670,6 @@ C
 8995  CONTINUE
 8990  CONTINUE
       RETURN
-      END
 
       END subroutine hour1
       end module Hour1Mod

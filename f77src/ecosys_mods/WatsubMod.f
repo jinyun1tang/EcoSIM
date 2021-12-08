@@ -5089,7 +5089,6 @@ C    4,VHCPNX(NY,NX),VHCP1(0,NY,NX)
       ENDIF
 3320  CONTINUE
       RETURN
-      END
 
       END subroutine watsub
       end module WatsubMod

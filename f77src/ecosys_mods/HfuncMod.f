@@ -161,7 +161,8 @@ C
 9995  CONTINUE
       RETURN
       contains
-
+      END subroutine hfunc
+      
       subroutine set_flags
       IF(J.EQ.1)THEN
       IF(IDAY0(NZ,NY,NX).LE.IDAYH(NZ,NY,NX)
@@ -928,7 +929,4 @@ C
       ENDIF
       end subroutine living_branch_phenology
 
-      END
-
-      END subroutine hfunc
       end module HfuncMod
