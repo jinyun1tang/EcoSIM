@@ -28,7 +28,7 @@
       integer :: K,M,M1,M2,M4,M5,NX,NY,N1,N2,N,NN,N4,N5,N4B,N5B
       integer :: NO
 
-      public :: solute
+      public :: erosion
       contains
       
       SUBROUTINE erosion(I,J,NHW,NHE,NVN,NVS)

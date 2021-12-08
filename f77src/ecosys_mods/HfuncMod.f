@@ -47,7 +47,7 @@ C
       DATA PSILY/-200.0,-2.0,-2.0,-2.0/
       DATA NBX /5,1,1,1/
 
-      public :: solute
+      public :: hfunc
       contains
       
       SUBROUTINE hfunc(I,J,NHW,NHE,NVN,NVS)
