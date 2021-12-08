@@ -2149,3 +2149,6 @@ C
 9995  CONTINUE
       RETURN
       END
+
+      END subroutine starte
+      end module StarteMod

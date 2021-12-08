@@ -372,3 +372,6 @@ C    3,(RRIG(J,I,NY,NX),J=1,24)
 9995  CONTINUE
       RETURN
       END
+
+      END subroutine day
+      END module DayMod
