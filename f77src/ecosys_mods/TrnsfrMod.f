@@ -6409,7 +6409,5 @@ C     ENDIF
       MX=M
 30    CONTINUE
       RETURN
-      END
-
       END subroutine trnsfr
       end module TrnsfrMod

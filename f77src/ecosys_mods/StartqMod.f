@@ -827,7 +827,5 @@ C
 9990  CONTINUE
 9995  CONTINUE
       RETURN
-      END
-
       END subroutine startq
       end module StartqMod

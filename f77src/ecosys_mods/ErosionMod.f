@@ -1062,7 +1062,6 @@ C     ENDIF
 8990  CONTINUE
 8995  CONTINUE
       RETURN
-      END
 
       END subroutine erosion
       end module ErosionMod

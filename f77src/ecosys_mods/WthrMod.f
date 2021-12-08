@@ -477,7 +477,6 @@ C
 9940  CONTINUE
 9945  CONTINUE
       RETURN
-      END
 
       END subroutine wthr
       end module WthrMod

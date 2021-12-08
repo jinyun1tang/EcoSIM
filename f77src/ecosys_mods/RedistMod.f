@@ -9479,7 +9479,6 @@ C     ENDIF
 9990  CONTINUE
 9995  CONTINUE
       RETURN
-      END
 
       END subroutine redist
       end module RedistMod

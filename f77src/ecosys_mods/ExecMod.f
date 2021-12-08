@@ -104,7 +104,6 @@ C
       IMNG=0
       NYR=0
       RETURN
-      END
 
       END subroutine exec
       end module ExecMod

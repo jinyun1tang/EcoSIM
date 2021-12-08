@@ -3104,7 +3104,6 @@ C     ENDIF
       ENDIF
       ENDIF
       end subroutine root_soil_gas_exchange
-      END
 
       end module UptakeMod
       
