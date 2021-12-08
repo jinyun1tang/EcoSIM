@@ -5095,4 +5095,10 @@ C    4,VHCPNX(NY,NX),VHCP1(0,NY,NX)
       end module WatsubMod
 =======
       END
+<<<<<<< HEAD
 >>>>>>> 3750af0 (added inital Module files initialized with the basic module structure)
+=======
+
+      END subroutine watsub
+      end module WatsubMod
+>>>>>>> 3c60b11 (added end of subroutines)
