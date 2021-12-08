@@ -5090,6 +5090,7 @@ C    4,VHCPNX(NY,NX),VHCP1(0,NY,NX)
 3320  CONTINUE
       RETURN
 <<<<<<< HEAD
+<<<<<<< HEAD
 
       END subroutine watsub
       end module WatsubMod
@@ -5098,6 +5099,8 @@ C    4,VHCPNX(NY,NX),VHCP1(0,NY,NX)
 <<<<<<< HEAD
 >>>>>>> 3750af0 (added inital Module files initialized with the basic module structure)
 =======
+=======
+>>>>>>> 8c95303 (fixed the end statments on the Mods and moved the end main subroutine to the correct place for modules that currently have multiple subroutines)
 
       END subroutine watsub
       end module WatsubMod
