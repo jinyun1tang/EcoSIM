@@ -1,7 +1,24 @@
 set(ECOSYSMOD_SOURCES
+	DayMod.f
+	ErosionMod.f
+	ExecMod.f
+	ExtractMod.f
 	GrosubMod.f
+	HfuncMod.f
+	Hour1Mod.f
 	NitroMod.f
+	RedistMod.f
 	SoluteMod.f
+	StarteMod.f
+	StartqMod.f
+	StartsMod.f
+	StomateMod.f
+	TrnsfrMod.f
+	TrnsfrsMod.f
+	UptakeMod.f
+	VisualMod.f
+	WatsubMod.f
+	WthrMod.f
 )
 include_directories(${CMAKE_BINARY_DIR}/f77src/ecosim_datatype/)
 include_directories(${CMAKE_BINARY_DIR}/f77src/utils/)

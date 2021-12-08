@@ -1,21 +1,4 @@
 set(ECOSYS_SOURCES
-	day.f
-	erosion.f
-	exec.f
-	extract.f
-	hfunc.f
-	hour1.f
-	redist.f
-	starte.f
-	startq.f
-	starts.f
-	stomate.f
-	trnsfr.f
-	trnsfrs.f
-	uptake.f
-	visual.f
-	watsub.f
-	wthr.f
 	)
 include_directories(${CMAKE_BINARY_DIR}/f77src/ecosim_datatype/)
 include_directories(${CMAKE_BINARY_DIR}/f77src/utils/)
