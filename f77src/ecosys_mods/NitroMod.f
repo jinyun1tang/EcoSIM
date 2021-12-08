@@ -1,10 +1,10 @@
       module nitroMod
-C DESCRIPTION
-C codes to do soil biological transformations
+C     DESCRIPTION
+C     codes to do soil biological transformations
       use data_kind_mod, only : r8 => SHR_KIND_R8
       implicit none
 	  
-	  private
+      private
       include "parameters.h"
       include "blkc.h"
       include "blk2a.h"
@@ -237,7 +237,7 @@ C
       REAL(r8) :: WFNG,TFNX,TFNY,CNSHZ,CPSHZ,FRM
 		  		  
 	
-	  public :: nitro			  
+      public :: nitro			  
       contains		  		  
       SUBROUTINE nitro(I,J,NHW,NHE,NVN,NVS)
 C

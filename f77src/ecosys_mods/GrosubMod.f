@@ -4,7 +4,8 @@ C module for plant biological transformations
 		  		  		         
       use data_kind_mod, only : r8 => SHR_KIND_R8
       implicit none
-			  
+
+      private
       include "parameters.h"
       include "files.h"
       include "blkc.h"
@@ -253,10 +254,9 @@ C
       DATA ATRPX/68.96,276.9/,GVMX/0.010,0.0025/
       DATA FVRN/0.75,0.5,0.5,0.5,0.5,0.5/
 
-	  public :: grosub 
+      public :: grosub 
       contains
-	  
-	  
+      
       SUBROUTINE grosub(I,J,NHW,NHE,NVN,NVS)
 C
 C     THIS SUBROUTINE CALCULATES ALL PLANT BIOLOGICAL TRANSFORMATIONS
