@@ -85,7 +85,7 @@
 
       integer :: ICHKL,IFLGB,K,L,L2,LL,LS,LS2,MX,MM,M,M1,M2,M3,M4
       integer :: M5,M6,NX,NY,N1,N2,N,NN,N4,N5,N4B,N5B,N3,N6
-      
+
       real(r8) :: CO2G2(JZ,JY,JX),CO2S2(0:JZ,JY,JX)
      2,CH4G2(JZ,JY,JX),CH4S2(0:JZ,JY,JX),OXYG2(JZ,JY,JX)
      3,OXYS2(0:JZ,JY,JX),Z2GG2(JZ,JY,JX),Z2GS2(0:JZ,JY,JX)
@@ -265,7 +265,7 @@
 
       public :: trnsfr
       contains
-      
+
       SUBROUTINE trnsfr(I,J,NHW,NHE,NVN,NVS)
 C
 C     THIS SUBROUTINE CALCULATES 3-DIMENSIONAL FLUXES OF ALL SOIL

@@ -49,13 +49,13 @@ C
       implicit none
 
       integer, intent(in) :: I
-      integer, intent(in) :: NHW,NHE,NVN,NVS    
+      integer, intent(in) :: NHW,NHE,NVN,NVS
 C     execution begins here
 C
 C     WRITE DATE
 C
 C     CDATE=DDMMYYYY
-C      
+C
       N=0
       NN=0
       DO 500 M=1,12

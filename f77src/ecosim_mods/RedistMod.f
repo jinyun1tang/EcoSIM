@@ -143,7 +143,7 @@
       integer :: IFLGLS,ICHKLX,ICHKL,K,L,LL,LG,LX,LS,LS2,L1,L0,LY
       integer :: M,NX,NY,N,N1,N2,NN,N4,N5,N6,NO,N3,N4B,N5B,NUX,NZ
       integer :: NR
-      
+
       real(r8) :: TFLW(JZ,JY,JX),TFLWX(JZ,JY,JX),THFLW(JZ,JY,JX)
      1,TFLWH(JZ,JY,JX),TOCFLS(0:4,JZ,JY,JX),TONFLS(0:4,JZ,JY,JX)
      2,TOPFLS(0:4,JZ,JY,JX),TOAFLS(0:4,JZ,JY,JX),TCOFLS(JZ,JY,JX)
@@ -292,7 +292,7 @@
 
       public :: redist
       contains
-      
+
       SUBROUTINE redist(I,J,NHW,NHE,NVN,NVS)
 C
 C     THIS SUBROUTINE UPDATES SOIL STATE VARIABLES WITH WATER, HEAT,
@@ -302,7 +302,7 @@ C
 
       integer, intent(in) :: I, J
       integer, intent(in) :: NHW,NHE,NVN,NVS
-      
+
 C     execution begins here
 
       VOLISO=0.0

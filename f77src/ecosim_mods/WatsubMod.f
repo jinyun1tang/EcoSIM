@@ -5089,6 +5089,10 @@ C    4,VHCPNX(NY,NX),VHCP1(0,NY,NX)
       ENDIF
 3320  CONTINUE
       RETURN
+<<<<<<< HEAD
 
       END subroutine watsub
       end module WatsubMod
+=======
+      END
+>>>>>>> 3750af0 (added inital Module files initialized with the basic module structure)

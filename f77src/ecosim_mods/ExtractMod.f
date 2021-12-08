@@ -5,7 +5,7 @@ C
       module ExtractMod
       use data_kind_mod, only : r8 => SHR_KIND_R8
       implicit none
-      
+
       private
       include "parameters.h"
       include "blkc.h"
@@ -43,10 +43,10 @@ C
       SUBROUTINE extract(I,J,NHW,NHE,NVN,NVS)
 C     execution begins here
       implicit none
-      
+
       integer, intent(in) :: I, J
       integer, intent(in) :: NHW,NHE,NVN,NVS
-      
+
       DO 9995 NX=NHW,NHE
       DO 9990 NY=NVN,NVS
       DO 9985 NZ=1,NP0(NY,NX)

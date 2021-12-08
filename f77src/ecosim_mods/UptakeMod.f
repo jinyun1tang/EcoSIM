@@ -75,16 +75,15 @@
       real(r8) :: ZNHBX,ZPOOLX,Z2OA1,Z2OP1,Z2OS1,ZH3A1,ZH3P1,ZH3S1
       real(r8) :: ZH3B1,Z2SGL1,ZHSGL1,ZVSGL1,ZNSGL1,Z2OG1,ZH3G1
       real(r8) :: ZH3PA,ZH3PB,ZH3GA,ZH3GB,Z2OPX,ZH3PX
-      
-      integer :: IC,ICHK,K,L,M,MX,NN,N,NB,NZZ,NR,NX,NY,NZ      
-      integer :: I,J
-      
+
+      integer :: IC,ICHK,K,L,M,MX,NN,N,NB,NZZ,NR,NX,NY,NZ
+
       real(r8) :: PSIST1(JZ),PATH(2,JZ),RRADL(2,JZ)
      2,RSRT(2,JZ),RSRG(2,JZ),RSR1(2,JZ),RSR2(2,JZ)
      3,RSSX(2,JZ),RSRS(2,JZ),WTRTG(JZ),FPQ(2,JZ,05),FPP(2,JZ,05)
      4,RACZ(JP,JY,JX),FRTDPX(JZ,05),RTARR(2,JZ)
      5     ,VOLPU(JZ),VOLWU(JZ)
-      
+
       integer :: ILYR(2,JZ)
 C
 C     MXN=max number of cycles in convergence soln for water uptake
@@ -116,7 +115,7 @@ C
 
       public :: uptake
       contains
-      
+
       SUBROUTINE uptake(I,J,NHW,NHE,NVN,NVS)
 C
 C     THIS SUBROUTINE CALCULATES EXCHANGES OF ENERGY, C, N AND P
@@ -3106,4 +3105,3 @@ C     ENDIF
       end subroutine root_soil_gas_exchange
 
       end module UptakeMod
-      

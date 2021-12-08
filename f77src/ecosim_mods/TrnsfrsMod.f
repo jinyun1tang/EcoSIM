@@ -97,7 +97,7 @@
 
       integer :: ICHKL,IFLGB,L,L2,LL,LS,LS2,M,M1,M2,M3,M4,M5,M6
       integer :: NX,NY,N1,N2,N,NN,N4,N5,N4B,N5B,N3,N6
-      
+
       real(r8) :: ZAL2(0:JZ,JY,JX),ZFE2(0:JZ,JY,JX),ZHY2(0:JZ,JY,JX)
      2,ZCA2(0:JZ,JY,JX),ZMG2(0:JZ,JY,JX),ZNA2(0:JZ,JY,JX)
      3,ZKA2(0:JZ,JY,JX),ZOH2(0:JZ,JY,JX),ZSO42(0:JZ,JY,JX)
@@ -391,7 +391,7 @@
 
       public :: trnsfrs
       contains
-      
+
       SUBROUTINE trnsfrs(I,J,NHW,NHE,NVN,NVS)
 C
 C     THIS SUBROUTINE CALCULATES 3-DIMENSIONAL FLUXES OF ALL SOIL

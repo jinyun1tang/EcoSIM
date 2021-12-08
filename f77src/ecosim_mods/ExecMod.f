@@ -1,7 +1,7 @@
       module ExecMod
       use data_kind_mod, only : r8 => SHR_KIND_R8
       implicit none
-      
+
       private
       include "parameters.h"
       include "blkc.h"
@@ -15,7 +15,7 @@
 
       public :: exec
       contains
-      
+
       SUBROUTINE exec(I)
 C
 C     THIS SUBROUTINE TAKES MASS BALANCE VARIABLES CALCULATED
@@ -23,12 +23,12 @@ C     IN 'REDIST' AND PERFORMS MASS BALANCE CHECKS AT THE END
 C     OF EACH DAY OF THE MODEL RUN, AND ERRORS OF > 1UG ARE FLAGGED.
 C
       implicit none
-      
+
       integer, intent(in) :: I
 C     execution begins here
 C
 C     CALCULATE MASS BALANCES FOR WATER, HEAT, O2, C, N, P AND SOLUTES
-C      
+C
       IF(I.EQ.IBEGIN.OR.I.EQ.ISTART.OR.I.EQ.ILAST+1)THEN
       TLW=VOLWSO-CRAIN+CRUN+CEVAP+VOLWOU
       TLH=HEATSO-HEATIN+HEATOU

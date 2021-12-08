@@ -30,22 +30,22 @@
 
       public :: erosion
       contains
-      
+
       SUBROUTINE erosion(I,J,NHW,NHE,NVN,NVS)
 C
 C     THIS SUBROUTINE CALCULATES DETACHMENT AND OVERLAND TRANSPORT
 C     OF SURFACE SEDIMENT FROM PRECIPITATION IN WEATHER FILE AND
 C     FROM RUNOFF IN 'WATSUB'
       implicit none
-      
+
       integer, intent(in) :: I, J
-      integer, intent(in) :: NHW,NHE,NVN,NVS 
+      integer, intent(in) :: NHW,NHE,NVN,NVS
 C     execution begins here
 C
 C     INTERNAL TIME STEP AT WHICH SEDIMENT DETACHMENT AND TRANSPORT
 C     IS CALCULATED. DETACHMENT IS THE SUM OF THAT BY RAINFALL AND
 C     OVERLAND FLOW
-C          
+C
       DO 30 M=1,NPH
       DO 9895 NX=NHW,NHE
       DO 9890 NY=NVN,NVS

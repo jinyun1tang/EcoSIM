@@ -40,11 +40,11 @@
       include "blk20f.h"
       include "blk21a.h"
       include "blk21b.h"
-      
+
       real(r8) :: AMP,CLD,DTA,DHR,DTS,EMM,RADX,RADZ,VPX,XJ
 
       integer :: ITYPE,NX,NY,N,NZ
-      
+
       real(r8) :: PRECRI(JY,JX),PRECWI(JY,JX),PRECII(JY,JX)
      2,PRECUI(JY,JX),RADN(JY,JX),VPS(JY,JX)
 C
@@ -57,7 +57,7 @@ C
 
       public :: wthr
       contains
-      
+
       SUBROUTINE wthr(I,J,NHW,NHE,NVN,NVS)
 C
 C     THIS SUBROUTINE REINITIALIZES WEATHER VARIABLES USED IN OTHER
@@ -65,7 +65,7 @@ C     SUBROUTINES
 C
       implicit none
       integer, intent(in) :: I, J
-      integer, intent(in) :: NHW,NHE,NVN,NVS      
+      integer, intent(in) :: NHW,NHE,NVN,NVS
 C     execution begins here
 
       XJ=J

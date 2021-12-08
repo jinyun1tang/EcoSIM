@@ -1,7 +1,7 @@
       module StarteMod
       use data_kind_mod, only : r8 => SHR_KIND_R8
       implicit none
-      
+
       private
       include "parameters.h"
       include "filec.h"
@@ -116,7 +116,7 @@
 
       public :: starte
       contains
-      
+
       SUBROUTINE starte(NHW,NHE,NVN,NVS)
 C
 C     THIS SUBROUTINE INITIALIZES ALL SOIL CHEMISTRY VARIABLES

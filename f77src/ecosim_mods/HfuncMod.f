@@ -36,7 +36,7 @@
       integer :: KVSTGX,L,NX,NY,NZ,NB,NBTX,N
       integer :: NBX(0:3)
       integer :: I,J
-C     
+C
 C     PSILM=minimum canopy turgor potential for leaf expansion (MPa)
 C     PSILX=minimum canopy water potential for leafout of drought-deciduous PFT (MPa)
 C     PSILY=minimum canopy water potential for leafoff of drought-deciduous PFT (MPa
@@ -51,16 +51,16 @@ C
 
       public :: hfunc
       contains
-      
+
       SUBROUTINE hfunc(I,J,NHW,NHE,NVN,NVS)
 C
 C     THIS SUBROUTINE CALCULATES PLANT PHENOLOGY
-C      
+C
       implicit none
-      
+
       integer, intent(in) :: I, J
       integer, intent(in) :: NHW,NHE,NVN,NVS
-      
+
 C     execution begins here
       DO 9995 NX=NHW,NHE
       DO 9990 NY=NVN,NVS
@@ -163,7 +163,7 @@ C
 9995  CONTINUE
       RETURN
       END subroutine hfunc
-      
+
       subroutine set_flags
       IF(J.EQ.1)THEN
       IF(IDAY0(NZ,NY,NX).LE.IDAYH(NZ,NY,NX)
