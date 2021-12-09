@@ -4,7 +4,8 @@ C module for plant biological transformations
 		  		  		         
       use data_kind_mod, only : r8 => SHR_KIND_R8
       implicit none
-			  
+
+C     include_section			  
       include "parameters.h"
       include "files.h"
       include "blkc.h"
@@ -35,6 +36,7 @@ C module for plant biological transformations
       include "blk16.h"
       include "blk18a.h"
       include "blk18b.h"
+C     end_include_section
 
 C     DIMENSION VCO2(400,366,05)
 C
@@ -253,7 +255,7 @@ C
       DATA ATRPX/68.96,276.9/,GVMX/0.010,0.0025/
       DATA FVRN/0.75,0.5,0.5,0.5,0.5,0.5/
 
-	  public :: grosub 
+      public :: grosub 
       contains
 	  
 	  
@@ -265,7 +267,7 @@ C
       integer, intent(in) :: I, J
       integer, intent(in) :: NHW,NHE,NVN,NVS
 
-C     execution begins here
+C     begin_execution
 	  
 C     TOTAL AGB FOR GRAZING IN LANDSCAPE SECTION
 C
@@ -10318,6 +10320,5 @@ C     ENDIF
 9995  CONTINUE
       RETURN
       END subroutine grosub
-	  
+
       end module grosubMod
-	  

@@ -1,8 +1,9 @@
       module SoluteMod
       use data_kind_mod, only : r8 => SHR_KIND_R8
       implicit none
-
+      
       private
+C     include_section
       include "parameters.h"
       include "blkc.h"
       include "blk2a.h"
@@ -27,7 +28,8 @@
       include "blk21a.h"
       include "blk21b.h"
       include "solutepar.h"
-C
+C     end_include_section
+      
       real(r8) :: A1,A2,A3,AHY1,AOH1,AAL1,AALO1,AALO2,AALO3,AALO4
       real(r8) :: AFE1,AFEO1,AFEO2,AFEO3,AFEO4,ACA1,ACO31,AHCO31
       real(r8) :: ACO21,ASO41,AH0P1,AH1P1,AH2P1,AH3P1,AF1P1,AF2P1
@@ -85,27 +87,28 @@ C
       real(r8) :: XOH01,XOH11,XOH21,XH1P1,XH2P1,XH01B,XH11B,XH21B
       real(r8) :: X1P1B,X2P1B,XNBQ,XMGQ,XNAQ,XKAQ,XHY1,XAL1,XFE1
       real(r8) :: XCA1,XMG1,XNA1,XKA1,XHC1,XALO21,XFEO21,XCOOH,XCOO
-
+      
       integer :: L,M,NPI,NX,NY,NR1,NP2,NP3
-C      
+C
       DATA RNHUI/10.0E-02,1.0E-02,0.5E-02/
       real(r8) :: RSNUA, RSNUB
       real(r8) :: CN41, CN31, CN3B, CN4B, XN4B, XN41
-
+      
       public :: solute
       contains
-
+      
       SUBROUTINE solute(I,J,NHW,NHE,NVN,NVS)
 C
 C     THIS SUBROUTINE CALCULATES ALL SOLUTE TRANSFORMATIONS
 C     FROM THERMODYNAMIC EQUILIBRIA
 C
       implicit none
-
+      
       integer, intent(in) :: I, J
       integer, intent(in) :: NHW, NHE, NVN, NVS
-
-C     execution begins here
+C     local variable declaration
+      
+C     begin_execution
       NPI=INT(NPH/2)
       DO 9995 NX=NHW,NHE
       DO 9990 NY=NVN,NVS
@@ -144,10 +147,9 @@ C
       BKVLPO=VOLWPO
       BKVLPB=VOLWPB
       ENDIF
-
-      call update_soil_fertlizer(CN41, CN31, CN3B,
-     2CN4B, XN4B, XN41)
-
+      
+      call update_soil_fertlizer
+      
 C
 C     IF SALT OPTION SELECTED IN SITE FILE
 C     THEN SOLVE FULL SET OF EQUILIBRIA REACTIONS
@@ -155,10 +157,10 @@ C
 C     ISALTG=salt flag from site file
 C
       IF(ISALTG.NE.0)THEN
-
+      
       call salt_chem_equilibria
-
-
+      
+      
 C     IF NO SALTS IS SELECTED IN SITE FILE THEN A SUBSET
 C     OF THE EQUILIBRIA REACTIONS ARE SOLVED: MOSTLY THOSE
 C     FOR PHOSPHORUS AND CO-REACTANTS
@@ -969,14 +971,16 @@ C    3,SPNH4,ZNH4FA(0,NY,NX),THETWR
       RETURN
       end subroutine solute
 C------------------------------------------------------------------------
-
-      subroutine urea_hydrolysis(RSNUA, RSNUB)
-
-	  implicit none
-      real(r8), intent(out) :: RSNUA
-      real(r8), intent(out) :: RSNUB
-      real(r8) :: CNHUA, COMA, DUKD
-      real(r8) :: DFNSA
+      
+      subroutine urea_hydrolysis
+      
+      implicit none
+C      real(r8), intent(out) :: RSNUA
+C      real(r8), intent(out) :: RSNUB
+C      real(r8) :: CNHUA, COMA, DUKD
+C      real(r8) :: DFNSA
+      
+C     begin_execution
 C
 C     UREA HYDROLYSIS IN BAND AND NON-BAND SOIL ZONES
 C
@@ -1059,22 +1063,22 @@ C    5,THETW(L,NY,NX)
 C     ENDIF
       end subroutine urea_hydrolysis
 C------------------------------------------------------------------------
-
-      subroutine update_soil_fertlizer(CN41, CN31, CN3B,
-     2CN4B, XN4B, XN41)
-
-  	  implicit none
-      real(r8), intent(out) :: CN41, CN31
-      real(r8), intent(out) :: CN3B
-      real(r8), intent(out) :: CN4B
-      real(r8), intent(out) :: XN4B, XN41
-      real(r8) :: RN4X,RN3X
-      real(r8) :: VOLWNX
-      real(r8) :: RNBX
-      real(r8) :: R3BX
-
-      call urea_hydrolysis(RSNUA, RSNUB)
-
+      
+      subroutine update_soil_fertlizer
+      
+      implicit none
+C      real(r8), intent(out) :: CN41, CN31
+C      real(r8), intent(out) :: CN3B
+C      real(r8), intent(out) :: CN4B
+C      real(r8), intent(out) :: XN4B, XN41
+C      real(r8) :: RN4X,RN3X
+C      real(r8) :: VOLWNX
+C      real(r8) :: RNBX
+C      real(r8) :: R3BX
+      
+C     begin_execution
+      call urea_hydrolysis
+      
 C
 C     NH4, NH3, UREA, NO3 DISSOLUTION IN BAND AND NON-BAND
 C     SOIL ZONES FROM FIRST-ORDER FUNCTIONS OF REMAINING
@@ -1254,11 +1258,13 @@ C    2,VOLWPX,RH2PX,XH2PS(L,NY,NX),TUPH2P(L,NY,NX)
       PCAPHB=0.0
       ENDIF
       end subroutine update_soil_fertlizer
-
+      
 C------------------------------------------------------------------
       subroutine nosalt_chem_equilibria
+      
+      implicit none
 
-	  implicit none
+C     begin_execution
 C
 C     PRECIPITATION-DISSOLUTION CALCULATED FROM ACTIVITIES
 C     OF REACTANTS AND PRODUCTS THROUGH SOLUTIONS
@@ -1272,6 +1278,7 @@ C     DP*=dissociation constant from PARAMETER above
 C     SP*=solubility product from PARAMETER above
 C     C*<0.0=solve for C* from equilibrium with other solutes
 C
+
       IF(BKVLX.GT.ZEROS(NY,NX))THEN
       CCEC=AMAX1(ZERO,XCEC(L,NY,NX)/BKVLX)
       ELSE
@@ -1741,27 +1748,12 @@ C    3,TRX2P(L,NY,NX)
 24    FORMAT(A8,3I4,60E12.4)
 C     ENDIF
       end subroutine nosalt_chem_equilibria
-
+      
 C------------------------------------------------------------------------
+      subroutine stage_ion_concs
+      implicit none
 
-      subroutine salt_chem_equilibria
-
-	  implicit none	  
-C
-C     salt code: *HY*=H+,*OH*=OH-,*AL*=Al3+,*FE*=Fe3+,*CA*=Ca2+,*MG*=Mg2+
-C          :*NA*=Na+,*KA*=K+,*SO4*=SO42-,*CL*=Cl-,*CO3*=CO32-,*HCO3*=HCO3-
-C          :*CO2*=CO2,*ALO1*=AlOH2-,*ALOH2=AlOH2-,*ALOH3*=AlOH3
-C          :*ALOH4*=AlOH4+,*ALS*=AlSO4+,*FEO1*=FeOH2-,*FEOH2=F3OH2-
-C          :*FEOH3*=FeOH3,*FEOH4*=FeOH4+,*FES*=FeSO4+,*CAO*=CaOH
-C          :*CAC*=CaCO3,*CAH*=CaHCO3-,*CAS*=CaSO4,*MGO*=MgOH,*MGC*=MgCO3
-C          :*MHG*=MgHCO3-,*MGS*=MgSO4,*NAC*=NaCO3-,*NAS*=NaSO4-,*KAS*=KSO4-
-C     phosphorus code: *H0P*=PO43-,*H3P*=H3PO4,*F1P*=FeHPO42-,*F2P*=F1H2PO4-
-C          :*C0P*=CaPO4-,*C1P*=CaHPO4,*C2P*=CaH2PO4+,*M1P*=MgHPO4,*COO*=COOH-
-C          :*1=non-band,*B=band
-C     C*,X*,Z*=soluble,exchangeable concentration, mass
-C
-C      call stage_ion_concs
-C      subroutine stage_ion_concs(CNO1, CNOB)
+C     begin_execution
 C     SOLUBLE NO3 CONCENTRATIONS
 C     IN NON-BAND AND BAND SOIL ZONES
 C
@@ -1774,7 +1766,7 @@ C
       ELSE
       CNO1=0.0
       ENDIF
-
+      
       IF(VOLWNZ.GT.ZEROS2(NY,NX))THEN
       CNOB=AMAX1(0.0,ZNO3B(L,NY,NX)/(14.0*VOLWNZ))
       ELSE
@@ -1951,14 +1943,14 @@ C
       PCACO1=0.0
       PCASO1=0.0
       ENDIF
-C      end subroutine stage_ion_concs
+      end subroutine stage_ion_concs
+      
+C--------------------------------------------------------------------------
+      subroutine solve_chem_equilibria
+      
+      implicit none
 
-C
-C     CONVERGENCE TOWARDS SOLUTE EQILIBRIA
-C
-C      call solve_chem_equilibria
-C
-C      subroutine solve_chem_equilibria
+C     begin_execution
 
       DO 1000 M=1,MRXN
 C
@@ -3441,7 +3433,7 @@ C
       RC2B=0.0
       RM1B=0.0
       ENDIF
-
+      
 C
 C     TOTAL ION FLUXES FOR CURRENT ITERATION
 C     FROM ALL REACTIONS ABOVE
@@ -3861,11 +3853,45 @@ C    3,(CCA1*A2)**0.5*XNA1/(CNA1*A1*XCA1*2)
 C    5,(CCA1*A2)**0.5*XKA1/(CKA1*A1*XCA1*2)
 C    6,CHY1*A1*XCOO/XHC1,CALO2*A1*XCOO/XALO21
 C     ENDIF
-C      end subroutine solve_chem_equilibria
+      end subroutine solve_chem_equilibria
+      
+C--------------------------------------------------------------------------
+      subroutine salt_chem_equilibria
+      
+      implicit none
+      
+C     begin_execution
+C
+C     salt code: *HY*=H+,*OH*=OH-,*AL*=Al3+,*FE*=Fe3+,*CA*=Ca2+,*MG*=Mg2+
+C          :*NA*=Na+,*KA*=K+,*SO4*=SO42-,*CL*=Cl-,*CO3*=CO32-,*HCO3*=HCO3-
+C          :*CO2*=CO2,*ALO1*=AlOH2-,*ALOH2=AlOH2-,*ALOH3*=AlOH3
+C          :*ALOH4*=AlOH4+,*ALS*=AlSO4+,*FEO1*=FeOH2-,*FEOH2=F3OH2-
+C          :*FEOH3*=FeOH3,*FEOH4*=FeOH4+,*FES*=FeSO4+,*CAO*=CaOH
+C          :*CAC*=CaCO3,*CAH*=CaHCO3-,*CAS*=CaSO4,*MGO*=MgOH,*MGC*=MgCO3
+C          :*MHG*=MgHCO3-,*MGS*=MgSO4,*NAC*=NaCO3-,*NAS*=NaSO4-,*KAS*=KSO4-
+C     phosphorus code: *H0P*=PO43-,*H3P*=H3PO4,*F1P*=FeHPO42-,*F2P*=F1H2PO4-
+C          :*C0P*=CaPO4-,*C1P*=CaHPO4,*C2P*=CaH2PO4+,*M1P*=MgHPO4,*COO*=COOH-
+C          :*1=non-band,*B=band
+C     C*,X*,Z*=soluble,exchangeable concentration, mass
+C
+      call stage_ion_concs
+      
+C
+C     CONVERGENCE TOWARDS SOLUTE EQILIBRIA
+C
+      call solve_chem_equilibria
+C
+      
+      call summarize_ion_flxes
+      
+      
+      end subroutine salt_chem_equilibria
+C----------------------------------------------------------------------------
+      subroutine summarize_ion_flxes
 
-C      call summarize_ion_flxes
+      implicit none
 
-C      subroutine summarize_ion_flxes
+C     begin_execution
 C     CONVERT TOTAL ION FLUXES FROM CHANGES IN CONCENTRATION
 C     TO CHANGES IN MASS PER UNIT AREA FOR USE IN 'REDIST'
 C
@@ -4000,7 +4026,6 @@ C    2,TRMGH(L,NY,NX),TRCACO(L,NY,NX),VOLWM(NPH,L,NY,NX),RCO2
 C    3,RHCO,RHCACH,RCO2Q,RCAH,RMGH,RHCO3,AHY1,AHCO31,ACO21,DPCO2
 C     WRITE(*,1111)'TBION',I,J,L,M,TBION(L,NY,NX)
 C     ENDIF
-C      end subroutine summarize_ion_flxes
+      end subroutine summarize_ion_flxes
 
-      end subroutine salt_chem_equilibria
       END module SoluteMod
