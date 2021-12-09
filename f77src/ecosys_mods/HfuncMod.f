@@ -1,5 +1,6 @@
       module HfuncMod
       use data_kind_mod, only : r8 => SHR_KIND_R8
+      use StartqMod    , only : startq
       implicit none
 
       private
@@ -34,7 +35,8 @@
       real(r8) :: WFNG
       integer :: KVSTGX,L,NX,NY,NZ,NB,NBTX,N
       integer :: NBX(0:3)
-C
+      integer :: I,J
+C     
 C     PSILM=minimum canopy turgor potential for leaf expansion (MPa)
 C     PSILX=minimum canopy water potential for leafout of drought-deciduous PFT (MPa)
 C     PSILY=minimum canopy water potential for leafoff of drought-deciduous PFT (MPa

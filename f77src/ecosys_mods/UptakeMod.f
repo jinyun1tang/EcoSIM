@@ -1,5 +1,6 @@
       module UptakeMod
       use data_kind_mod, only : r8 => SHR_KIND_R8
+      use StomateMod   , only : stomate
       implicit none
 
       private
@@ -76,6 +77,7 @@
       real(r8) :: ZH3PA,ZH3PB,ZH3GA,ZH3GB,Z2OPX,ZH3PX
       
       integer :: IC,ICHK,K,L,M,MX,NN,N,NB,NZZ,NR,NX,NY,NZ      
+      integer :: I,J
       
       real(r8) :: PSIST1(JZ),PATH(2,JZ),RRADL(2,JZ)
      2,RSRT(2,JZ),RSRG(2,JZ),RSR1(2,JZ),RSR2(2,JZ)

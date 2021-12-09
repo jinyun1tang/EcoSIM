@@ -5,6 +5,7 @@ C     THIS SUBROUTINE READS PLANT CHECKPOINT FILES TO
 C     RE-INITIALIZE THE MODEL FROM A SELECTED DATE IN AN EARLIER RUN
 C
       use data_kind_mod, only : r8 => SHR_KIND_R8
+      use StartqMod    , only : startq
       implicit none
       integer, intent(in) :: NHW,NHE,NVN,NVS
 
