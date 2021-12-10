@@ -6,6 +6,7 @@ set(ECOSYS_DRIVER_SOURCES
 )
 
 include_directories(${ECOSYS_INCLUDE_DIRS})
+include_directories(${CMAKE_BINARY_DIR}/f77src/ecosim_datatype/)
 include_directories(${CMAKE_BINARY_DIR}/f77src/utils/)
 include_directories(${CMAKE_BINARY_DIR}/f77src/ioutils/)
 include_directories(${CMAKE_BINARY_DIR}/f77src/ecosys_mods/)
