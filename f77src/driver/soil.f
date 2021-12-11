@@ -4,6 +4,27 @@ C
 C     THIS IS THE MAIN SUBROUTINE FROM WHICH ALL OTHERS ARE CALLED
 C
       use data_kind_mod, only : r8 => SHR_KIND_R8
+      use DayMod       , only : day
+      use ErosionMod   , only : erosion
+      use ExecMod      , only : exec
+      use ExtractMod   , only : extract
+      use grosubMod    , only : grosub
+      use HfuncMod     , only : hfunc
+      use Hour1Mod     , only : hour1
+      use nitroMod     , only : nitro
+      use RedistMod    , only : redist
+      use soluteMod    , only : solute
+      use StarteMod    , only : starte
+      use StartqMod    , only : startq
+      use StartsMod    , only : starts
+      use StomateMod   , only : stomate
+      use TrnsfrMod    , only : trnsfr
+      use TrnsfrsMod   , only : trnsfrs
+      use UptakeMod    , only : uptake
+      use VisualMod    , only : visual
+      use WatsubMod    , only : watsub
+      use WthrMod      , only : wthr
+          
       implicit none
 
       integer, intent(in) :: NA(1:NEX),ND(1:NEX)
