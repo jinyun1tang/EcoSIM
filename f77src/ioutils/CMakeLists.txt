@@ -22,8 +22,7 @@ set(IOUTILS_SOURCES
 	)
 include_directories(${CMAKE_BINARY_DIR}/f77src/ecosim_datatype/)
 include_directories(${CMAKE_BINARY_DIR}/f77src/utils/)
-include_directories(${CMAKE_BINARY_DIR}/f77src/ioutils/ecosim_init/)
-include_directories(${CMAKE_BINARY_DIR}/f77src/ecosim_init/)
+include_directories(${CMAKE_BINARY_DIR}/f77src/ecosys_mods/)
 include(add_ecosim_library)
 add_ecosim_library(ioutils ${IOUTILS_SOURCES})
 
