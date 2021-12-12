@@ -1,4 +1,4 @@
-set(ECOSYSMOD_SOURCES
+set(ECOSIM_MOD_SOURCES
 	DayMod.f
 	ErosionMod.f
 	ExecMod.f
@@ -24,12 +24,12 @@ include_directories(${CMAKE_BINARY_DIR}/f77src/ecosim_datatype/)
 include_directories(${CMAKE_BINARY_DIR}/f77src/utils/)
 include_directories(${CMAKE_BINARY_DIR}/f77src/ioutils/)
 include(add_ecosim_library)
-add_ecosim_library(ecosys_mods ${ECOSYSMOD_SOURCES})
+add_ecosim_library(ecosim_mods ${ECOSIM_MOD_SOURCES})
 
-set(ECOSIM_LIBRARIES ecosys_mods;${ECOSIM_LIBRARIES} PARENT_SCOPE)
+set(ECOSIM_LIBRARIES ecosim_mods;${ECOSIM_LIBRARIES} PARENT_SCOPE)
 
 if (NOT CMAKE_INSTALL_PREFIX STREQUAL "INSTALL_DISABLED")
-  install(TARGETS ecosys_mods DESTINATION lib)
+  install(TARGETS ecosim_mods DESTINATION lib)
   file(GLOB HEADERS *.h)
-  install(FILES ${HEADERS} DESTINATION include/ecosys/mods)
+  install(FILES ${HEADERS} DESTINATION include/ecosim/mods)
 endif()

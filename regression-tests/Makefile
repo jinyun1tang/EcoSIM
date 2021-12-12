@@ -1,6 +1,6 @@
 # FIXME(bja, 201604) need to stop using a hard coded path. Maybe
 # switch to some sort of cmake-ified out of source tests.
-ECOSYS = ../local/bin/ecosys.x
+ECOSYS = ../local/bin/ecosim.x
 
 RTEST = ./rtest_ecosim.py
 RTEST_ARGS = --backtrace
@@ -41,7 +41,7 @@ test-coverage : FORCE
 # NOTE(bja, 201605) this creates the python virtual environment and
 # install the code coverage tool. Requires virtualenv be
 # installed at the system level.
-env : 
+env :
 	virtualenv env
 	. env/bin/activate; pip install coverage
 
@@ -59,4 +59,4 @@ clobber : clean
 	-find . -name '*.regression' -print0 | xargs -0 rm
 
 
-FORCE : 
+FORCE :

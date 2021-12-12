@@ -1,4 +1,4 @@
-set(ECOSYS_UTIL_SOURCES
+set(ECOSIM_UTIL_SOURCES
   data_kind_mod.F90
 	endrun.f
 	TestMod.F90
@@ -6,13 +6,13 @@ set(ECOSYS_UTIL_SOURCES
 
 
 include(add_ecosim_library)
-add_ecosim_library(ecosys_util ${ECOSYS_UTIL_SOURCES})
+add_ecosim_library(ecosim_util ${ECOSIM_UTIL_SOURCES})
 
 
-set(ECOSIM_LIBRARIES ecosys_util;${ECOSIM_LIBRARIES} PARENT_SCOPE)
+set(ECOSIM_LIBRARIES ecosim_util;${ECOSIM_LIBRARIES} PARENT_SCOPE)
 
 if (NOT CMAKE_INSTALL_PREFIX STREQUAL "INSTALL_DISABLED")
-  install(TARGETS ecosys_util DESTINATION lib)
+  install(TARGETS ecosim_util DESTINATION lib)
   file(GLOB HEADERS *.h)
-  install(FILES ${HEADERS} DESTINATION include/ecosys/util)
+  install(FILES ${HEADERS} DESTINATION include/ecosim/util)
 endif()

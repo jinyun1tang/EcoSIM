@@ -3,6 +3,7 @@
 |Directory        | Description                                  |
 |-----------------|----------------------------------------------|
 |driver/          | major driver files                           |
-|ecosys_src_/     | Essential code for ecosim derived from ecosys|
+|ecosim_datatype  | Files define ecosim data types               |
+|ecosim_mods/     | Essential code for ecosim derived from ecosys|
 |ioutils/         | subroutines for input and output             |
 |utils/           | Code for model enhancement                   |

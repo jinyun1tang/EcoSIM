@@ -1,4 +1,4 @@
-set(IOUTILS_SOURCES 
+set(IOUTILS_SOURCES
 	BLOCKDATA001.f
 	foutp.f
 	fouts.f
@@ -22,7 +22,7 @@ set(IOUTILS_SOURCES
 	)
 include_directories(${CMAKE_BINARY_DIR}/f77src/ecosim_datatype/)
 include_directories(${CMAKE_BINARY_DIR}/f77src/utils/)
-include_directories(${CMAKE_BINARY_DIR}/f77src/ecosys_mods/)
+include_directories(${CMAKE_BINARY_DIR}/f77src/ecosim_mods/)
 include(add_ecosim_library)
 add_ecosim_library(ioutils ${IOUTILS_SOURCES})
 
@@ -31,5 +31,5 @@ set(ECOSIM_LIBRARIES ioutils;${ECOSIM_LIBRARIES} PARENT_SCOPE)
 if (NOT CMAKE_INSTALL_PREFIX STREQUAL "INSTALL_DISABLED")
   install(TARGETS ioutils DESTINATION lib)
   file(GLOB HEADERS *.h)
-  install(FILES ${HEADERS} DESTINATION include/ecosys/ioutils)
+  install(FILES ${HEADERS} DESTINATION include/ecosim/ioutils)
 endif()
