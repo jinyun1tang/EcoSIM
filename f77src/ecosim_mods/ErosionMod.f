@@ -42,6 +42,7 @@ C     FROM RUNOFF IN 'WATSUB'
       integer, intent(in) :: NHW,NHE,NVN,NVS
 C     execution begins here
 C
+
       DO 30 M=1,NPH
 
       call SedimentDetachment(NHW,NHE,NVN,NVS)
@@ -70,10 +71,11 @@ C     IS CALCULATED. DETACHMENT IS THE SUM OF THAT BY RAINFALL AND
 C     OVERLAND FLOW
 C
 
+
       implicit none
 
       integer, intent(in) :: NHW,NHE,NVN,NVS
-      
+
       DO 9895 NX=NHW,NHE
       DO 9890 NY=NVN,NVS
       IF(IERSNG.EQ.1.OR.IERSNG.EQ.3)THEN
@@ -249,6 +251,7 @@ C     ENDIF
       ENDIF
 9890  CONTINUE
 9895  CONTINUE
+
       end subroutine SedimentDetachment
       
       subroutine SedimentTransport(NHW,NHE,NVN,NVS)
@@ -401,6 +404,7 @@ C    2,TERSED(NY,NX),RDTSED(NY,NX)
       ENDIF
 9690  CONTINUE
 9695  CONTINUE
+
       end subroutine SedimentTransport
       
       subroutine InternalSedimentFluxes(NHW, NHE,NVN,NVS)
@@ -844,6 +848,7 @@ C
       ENDIF
 9490  CONTINUE
 9495  CONTINUE
+
       end subroutine InternalSedimentFluxes
 
 C----------------------------------------------------------------------------------------------
@@ -1108,6 +1113,6 @@ C     ENDIF
       ENDIF
 8990  CONTINUE
 8995  CONTINUE
-      end subroutine ExternalSedimentFluxes      
 
+      end subroutine ExternalSedimentFluxes      
       end module ErosionMod
