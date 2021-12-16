@@ -47,7 +47,11 @@ macro(set_up_compilers)
   # Fortran compiler flags.
   #
   if (CMAKE_Fortran_COMPILER_ID STREQUAL "GNU")
-    set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -W -Wall -std=gnu -pedantic -finit-local-zero -Wall -cpp -O2")
+    if (CMAKE_BUILD_TYPEi MATCHES "Debug")
+     set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -W -Wall -std=gnu -pedantic -finit-local-zero -Wall -cpp -g")
+    else()
+     set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -W -Wall -std=gnu -pedantic -finit-local-zero -Wall -cpp -O2")
+    endif()
     set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -DCPRGNU -fdefault-real-8")
     set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -Wno-unused-variable -ffpe-trap=invalid")
     set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -Wno-unused-parameter -Wno-unused-function")
