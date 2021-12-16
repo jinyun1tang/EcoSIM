@@ -1,5 +1,6 @@
       module RedistMod
       use data_kind_mod, only : r8 => SHR_KIND_R8
+      use abortutils, only : padr, print_info
       implicit none
 
       private
@@ -3332,6 +3333,11 @@ C
      2+XWFLXI(L,NY,NX)
       VOLISL(L,NY,NX)=VOLISL(L,NY,NX)+TFLWI(L,NY,NX)
      2-XWFLXI(L,NY,NX)/DENSI
+      if(VOLISL(L,NY,NX)/=VOLISL(L,NY,NX))then
+      call print_info('VOLISL(L,NY,NX)=VOLISL(L,NY,NX)',
+     2(/padr('TFLWI',10),padr('XWFLXI',10)/),(/TFLWI(L,NY,NX)
+     3,XWFLXI(L,NY,NX)/))
+      endif
 C
 C     ACCUMULATE SNOW MASS FOR CALCULATING COMPRESSION
 C
@@ -4248,6 +4254,12 @@ C     CUMULATIVE SUMS OF ALL ADDITIONS AND REMOVALS
 C
       DO 9785 L=1,JS
       WS=VOLSSL(L,NY,NX)+VOLWSL(L,NY,NX)+VOLISL(L,NY,NX)*DENSI
+      if(ws/=ws)then
+      print*,'L=',L
+      call print_info('ws/=ws',(/padr('VOLSSL',10),
+     2padr('VOLWSL',10),padr('VOLISL',10),padr('DENSI',10)/),
+     3(/VOLSSL(L,NY,NX),VOLWSL(L,NY,NX),VOLISL(L,NY,NX),DENSI/))
+      endif
       VOLWSO=VOLWSO+WS
       UVOLW(NY,NX)=UVOLW(NY,NX)+WS
       ENGYW=VHCPW(L,NY,NX)*TKW(L,NY,NX)

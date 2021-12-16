@@ -29,7 +29,7 @@ C
       CHARACTER(len=16) :: OUTW,OUTI,OUTT,OUTN,OUTF
       CHARACTER(len=4) :: CHARY
       CHARACTER(len=1) :: TTYPE,CTYPE,IVAR(20),VAR(50),TYP(50)
-
+      character(len=*), parameter :: subname='readi.f'
       integer :: ll
       real(r8) :: DAT(50),DATK(50)
       real(r8), PARAMETER :: TWILGT=0.06976
@@ -83,7 +83,7 @@ C      READ(1,*)ALATG,ALTIG,ATCAG,IDTBLG
  	  ALATG=datav(1)
  	  ALTIG=datav(2)
  	  ATCAG=datav(3)
- 	  IDTBLG=int(datav(4))	  
+ 	  IDTBLG=int(datav(4))
       READ(1,*)OXYEG,Z2GEG,CO2EIG,CH4EG,Z2OEG,ZNH3EG
       READ(1,*)IETYPG,ISALTG,IERSNG,NCNG,DTBLIG,DTBLDIG,DTBLGG
       READ(1,*)RCHQNG,RCHQEG,RCHQSG,RCHQWG,RCHGNUG,RCHGEUG,RCHGSUG
@@ -93,6 +93,7 @@ C      READ(1,*)ALATG,ALTIG,ATCAG,IDTBLG
       CLOSE(1)
 
       if(lverb)then
+      write(*,*)'read data in '//trim(subname)
       write(*,*)'read site data file: ',DATA(1)
       write(*,'(40A)')('-',ll=1,40)
       write(*,*)'Latitude (o): ALATG',ALATG
@@ -275,7 +276,7 @@ C     6,NUI(NY,NX),NJ(NY,NX),NL1,NL2,ISOILR(NY,NX)
 	  NJ(NY,NX)  =int(datav(17))
 	  NL1=int(datav(18))
 	  NL2=int(datav(19))
-	  ISOILR(NY,NX)=int(datav(20))	 
+	  ISOILR(NY,NX)=int(datav(20))
       NU(NY,NX)=NUI(NY,NX)
       NK(NY,NX)=NJ(NY,NX)+1
       NM(NY,NX)=NJ(NY,NX)+NL1

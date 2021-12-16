@@ -1,6 +1,6 @@
 set(ECOSIM_UTIL_SOURCES
   data_kind_mod.F90
-	endrun.f
+  abortutils.F90
 	TestMod.F90
 )
 

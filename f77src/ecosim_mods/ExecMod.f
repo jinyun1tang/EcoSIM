@@ -1,5 +1,6 @@
       module ExecMod
       use data_kind_mod, only : r8 => SHR_KIND_R8
+      use abortutils, only : endrun, padr, print_info
       implicit none
 
       private
@@ -10,6 +11,7 @@
       include "blk2c.h"
       include "blk16.h"
 
+      character(len=*), parameter :: subname='ExecMod'
       real(r8), SAVE :: TLW,TLH,TLO,TLC,TLN,TLP,TLI
       real(r8) :: DIFFQ,DIFFH,DIFFO,DIFFC,DIFFN,DIFFP,DIFFI
 
@@ -31,6 +33,11 @@ C     CALCULATE MASS BALANCES FOR WATER, HEAT, O2, C, N, P AND SOLUTES
 C
       IF(I.EQ.IBEGIN.OR.I.EQ.ISTART.OR.I.EQ.ILAST+1)THEN
       TLW=VOLWSO-CRAIN+CRUN+CEVAP+VOLWOU
+      if(tlw/=tlw)then
+      call print_info('tlw/=tlw',(/padr('VOLWSO',10),padr('CRAIN',10),
+     2padr('CRUN',10),padr('CEVAP',10),padr('VOLWOU',10)/),
+     3(/VOLWSO,CRAIN,CRUN,CEVAP,VOLWOU/))
+      endif
       TLH=HEATSO-HEATIN+HEATOU
       TLO=OXYGSO-OXYGIN+OXYGOU
       TLC=TLRSDC+TLORGC+TLCO2G-CO2GIN+TCOU-TORGF-XCSN
@@ -53,6 +60,17 @@ C
       WRITE(*,212)I,IYRC
       WRITE(18,213)I,IYRC,DIFFQ,DIFFH,DIFFO,DIFFC,DIFFN
      2,DIFFP,DIFFI
+      if(diffq/=diffq)then
+      write(*,*)'DIFFQ=',DIFFQ
+      write(*,*)'VOLWSO=',VOLWSO
+      write(*,*)'CRAIN=',CRAIN
+      write(*,*)'CRUN=',CRUN
+      write(*,*)'CEVAP=',CEVAP
+      write(*,*)'VOLWOU=',VOLWOU
+      write(*,*)'TLW=',TLW
+      write(*,*)'TAREA=',TAREA
+      call endrun(msg='NaN encounterd in '//trim(subname))
+      endif
 212   FORMAT('NOW EXECUTING DAY',I6,'   OF YEAR',I6)
 213   FORMAT(2I6,10F16.6)
 C

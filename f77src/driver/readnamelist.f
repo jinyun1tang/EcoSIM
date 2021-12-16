@@ -3,6 +3,7 @@
 
       !Description
       !read control namelist
+      use abortutils, only : endrun
       implicit none
       character(len=*), intent(in) :: nmlfile
       character(len=80), intent(out) :: runfile
@@ -29,7 +30,7 @@
       lverbose=.false.
       inquire (file=nmlfile, iostat=rc)
       if (rc /= 0) then
-        write (stdout, '(3a)') 'Error: input file ', trim(nmlfile), 
+        write (stdout, '(3a)') 'Error: input file ', trim(nmlfile),
      &' does not exist.'
         call endrun('stopped in readnml', 25)
       end if
@@ -54,8 +55,8 @@
        write(stdout,ecosys)
        write(stdout, *)
        write(stdout, *) '--------------------'
-      endif     
-      do_rgres=do_regression_test 
+      endif
+      do_rgres=do_regression_test
       LYRG=num_of_simdays
       lverb=lverbose
-      end subroutine readnamelist 
+      end subroutine readnamelist
