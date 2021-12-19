@@ -29,7 +29,7 @@ C
       CHARACTER(len=16) :: OUTW,OUTI,OUTT,OUTN,OUTF
       CHARACTER(len=4) :: CHARY
       CHARACTER(len=1) :: TTYPE,CTYPE,IVAR(20),VAR(50),TYP(50)
-
+      character(len=*), parameter :: subname='readi.f'
       integer :: ll
       real(r8) :: DAT(50),DATK(50)
       real(r8), PARAMETER :: TWILGT=0.06976
@@ -80,10 +80,10 @@ C     DVI=width of each N-S landscape row
 C
 C      READ(1,*)ALATG,ALTIG,ATCAG,IDTBLG
       READ(1,*)(datav(jj),jj=1,4)
- 	  ALATG=datav(1)
- 	  ALTIG=datav(2)
- 	  ATCAG=datav(3)
- 	  IDTBLG=int(datav(4))	  
+ 	ALATG=datav(1)
+ 	ALTIG=datav(2)
+ 	ATCAG=datav(3)
+ 	IDTBLG=int(datav(4))
       READ(1,*)OXYEG,Z2GEG,CO2EIG,CH4EG,Z2OEG,ZNH3EG
       READ(1,*)IETYPG,ISALTG,IERSNG,NCNG,DTBLIG,DTBLDIG,DTBLGG
       READ(1,*)RCHQNG,RCHQEG,RCHQSG,RCHQWG,RCHGNUG,RCHGEUG,RCHGSUG
@@ -93,6 +93,7 @@ C      READ(1,*)ALATG,ALTIG,ATCAG,IDTBLG
       CLOSE(1)
 
       if(lverb)then
+      write(*,*)'read data in '//trim(subname)
       write(*,*)'read site data file: ',DATA(1)
       write(*,'(40A)')('-',ll=1,40)
       write(*,*)'Latitude (o): ALATG',ALATG
@@ -257,31 +258,33 @@ C     5,IXTYP(1,NY,NX),IXTYP(2,NY,NX)
 C     6,NUI(NY,NX),NJ(NY,NX),NL1,NL2,ISOILR(NY,NX)
       READ(9,*)(datav(jj),jj=1,20)
       PSIFC(NY,NX)=datav(1)
-	  PSIWP(NY,NX)=datav(2)
-	  ALBS(NY,NX) =datav(3)
-	  PH(0,NY,NX) =datav(4)
+      PSIWP(NY,NX)=datav(2)
+      ALBS(NY,NX) =datav(3)
+      PH(0,NY,NX) =datav(4)
       RSC(1,0,NY,NX) =datav(5)
-	  RSN(1,0,NY,NX) =datav(6)
-	  RSP(1,0,NY,NX) =datav(7)
+      RSN(1,0,NY,NX) =datav(6)
+      RSP(1,0,NY,NX) =datav(7)
       RSC(0,0,NY,NX) =datav(8)
-	  RSN(0,0,NY,NX) =datav(9)
-	  RSP(0,0,NY,NX) =datav(10)
+      RSN(0,0,NY,NX) =datav(9)
+      RSP(0,0,NY,NX) =datav(10)
       RSC(2,0,NY,NX) =datav(11)
-	  RSN(2,0,NY,NX) =datav(12)
-	  RSP(2,0,NY,NX) =datav(13)
+      RSN(2,0,NY,NX) =datav(12)
+      RSP(2,0,NY,NX) =datav(13)
       IXTYP(1,NY,NX) =int(datav(14))
-	  IXTYP(2,NY,NX) =int(datav(15))
+      IXTYP(2,NY,NX) =int(datav(15))
       NUI(NY,NX) = int(datav(16))
-	  NJ(NY,NX)  =int(datav(17))
-	  NL1=int(datav(18))
-	  NL2=int(datav(19))
-	  ISOILR(NY,NX)=int(datav(20))	 
+      NJ(NY,NX)  =int(datav(17))
+      NL1=int(datav(18))
+      NL2=int(datav(19))
+      ISOILR(NY,NX)=int(datav(20))
       NU(NY,NX)=NUI(NY,NX)
       NK(NY,NX)=NJ(NY,NX)+1
       NM(NY,NX)=NJ(NY,NX)+NL1
       NLI(NY,NX)=NM(NY,NX)+NL2
       NL(NY,NX)=NLI(NY,NX)
       if(lverb)then
+      write(*,*)''
+      write(*,*)'NY,NX=',NY,NX
       write(*,*)'Water potential at field capacity (MPa)',PSIFC(NY,NX)
       write(*,*)'Water potential at wilting point (MPa)',PSIWP(NY,NX)
       write(*,*)'Wet soil albedo',ALBS(NY,NX)
@@ -334,6 +337,8 @@ C
       READ(9,*)(SCNV(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
       READ(9,*)(SCNH(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
       if(lverb)then
+      write(*,*)''
+      write(*,*)'NY,NX=',NY,NX
       write(*,*)'Field capacity (m3 m-3): FC'
       write(*,*)(FC(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
       write(*,*)'Wilting point (m3 m-3): WP'
@@ -354,6 +359,8 @@ C
       READ(9,*)(FHOL(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
       READ(9,*)(ROCK(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
       if(lverb)then
+      write(*,*)''
+      write(*,*)'NY,NX=',NY,NX
       write(*,*)'Sand (kg Mg-1): CSAND'
       write(*,*)(CSAND(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
       write(*,*)'Silt (kg Mg-1): CSILT'
@@ -373,6 +380,8 @@ C
       READ(9,*)(CEC(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
       READ(9,*)(AEC(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
       if(lverb)then
+      write(*,*)''
+      write(*,*)'NY,NX=',NY,NX
       write(*,*)'pH'
       write(*,*)(PH(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
       write(*,*)'Cation exchange capacity (cmol Kg-1): CEC'
@@ -391,6 +400,8 @@ C
       READ(9,*)(CORGN(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
       READ(9,*)(CORGP(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
       if(lverb)then
+      write(*,*)''
+      write(*,*)'NY,NX=',NY,NX
       write(*,*)'Total SOC (kg C/Mg soil): CORGC'
       write(*,*)(CORGC(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
       write(*,*)'POC (part of SOC) (kg C/Mg soil): CORGR '
@@ -409,6 +420,8 @@ C
       READ(9,*)(CNO3(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
       READ(9,*)(CPO4(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
       if(lverb)then
+      write(*,*)''
+      write(*,*)'NY,NX=',NY,NX
       write(*,*)'Total soil NH4 concentration (gN Mg-1): CNH4 '
       write(*,*)(CNH4(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
       write(*,*)'Total soil NO3 concentration (gN Mg-1): CNO3'
@@ -431,6 +444,8 @@ C
       READ(9,*)(CSO4(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
       READ(9,*)(CCL(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
       if(lverb)then
+      write(*,*)''
+      write(*,*)'NY,NX=',NY,NX
       write(*,*)'Soluble soil Al content (g Mg-1): CAL'
       write(*,*)(CAL(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
       write(*,*)'Soluble soil Fe content (g Mg-1): CFE'
@@ -461,6 +476,8 @@ C
       READ(9,*)(CCACO(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
       READ(9,*)(CCASO(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
       if(lverb)then
+      write(*,*)''
+      write(*,*)'NY,NX=',NY,NX
       write(*,*)'Soil AlPO4 content (g Mg-1): CALPO'
       write(*,*)(CALPO(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
       write(*,*)'Soil FePO4 content (g Mg-1): CFEPO'
@@ -491,6 +508,8 @@ C
       READ(9,*)(GKCN(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
       READ(9,*)(GKCK(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
       if(lverb)then
+      write(*,*)''
+      write(*,*)'NY,NX=',NY,NX
       write(*,*)'Ca-NH4 Gapon selectivity coefficient: GKC4'
       write(*,*)(GKC4(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
       write(*,*)'Ca-H Gapon selectivity coefficient: GKCH'
@@ -533,6 +552,8 @@ C
       READ(9,*)(RSP(2,L,NY,NX),L=NU(NY,NX),NM(NY,NX))
       REWIND(9)
       if(lverb)then
+      write(*,*)''
+      write(*,*)'NY,NX=',NY,NX
       write(*,*)'Initial fine litter C (gC m-2): RSC(1)'
       write(*,*)(RSC(1,L,NY,NX),L=NU(NY,NX),NM(NY,NX))
       write(*,*)'Initial fine litter N (gN m-2): RSN(1)'

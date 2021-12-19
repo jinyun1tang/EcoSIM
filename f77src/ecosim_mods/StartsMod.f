@@ -1,7 +1,8 @@
       module StartsMod
       use data_kind_mod, only : r8 => SHR_KIND_R8
+      use abortutils, only : padr, print_info
       implicit none
-      
+
       private
       include "parameters.h"
       include "blkc.h"
@@ -28,7 +29,7 @@
       real(r8) :: ZAGL
 
       integer :: K,KK,L,M,N,NX,NY,N1,N2,N3,N4,N5,N6,NN
-      
+
       real(r8) :: YSIN(4),YCOS(4),YAZI(4),ZAZI(4),OSCI(0:4),OSNI(0:4)
      2,ORCI(2,0:4),OSPI(0:4),OSCM(0:4),CORGCX(0:4)
      3,CORGNX(0:4),CORGPX(0:4),CNOSCT(0:4),CPOSCT(0:4)
@@ -72,7 +73,7 @@ C
 
       public :: starts
       contains
-      
+
       SUBROUTINE starts(NHW,NHE,NVN,NVS)
 C
 C     THIS SUBROUTINE INITIALIZES ALL SOIL VARIABLES
@@ -80,278 +81,20 @@ C
       implicit none
       integer, intent(in) :: NHW,NHE,NVN,NVS
 C     execution begins here
-C
-C     NPH=no. of cycles h-1 for water, heat and solute flux calculns
-C     NPT=number of cycles NPH-1 for gas flux calculations
-C     NPG=number of cycles h-1 for gas flux calculations
-C     NPR,NPS=number of cycles NPH-1 for litter,snowpack flux calculns
-C     THETX=minimum air-filled porosity for gas flux calculations
-C     THETPI,DENSI=ice porosity,density
-C
-      NPH=NPX
-      NPT=NPY
-      NPG=NPH*NPT
-      NPR=30
-      NPS=10
-      XNPH=1.0/NPH
-      XNPT=1.0/NPT
-      XNPG=1.0/NPG
-      XNPR=1.0/NPR
-      XNPS=1.0/NPS
-      XNPY=XNPH*XNPS
-      XNPZ=XNPH*XNPR
-      XNPQ=XNPZ*XNPS
-      XNPV=XNPR*XNPS
-      XNPD=600.0*XNPG
-      XNPX=AMIN1(1.0,20.0*XNPH)
-      XNPA=XNPX*XNPS
-      XNPB=XNPX*XNPR
-      XNPC=XNPX*XNPV
-C     NDIM=1
-C     IF(NHE.GT.NHW)NDIM=NDIM+1
-C     IF(NVS.GT.NVN)NDIM=NDIM+1
-C     XDIM=1.0/NDIM
-      ZERO=1.0E-15
-      ZERO2=1.0E-08
-      TAREA=0.0
-      THETX=1.0E-03
-      THETPI=0.00
-      DENSI=0.92-THETPI
-      DENSJ=1.0-DENSI
-C
-C     INITIALIZE MASS BALANCE CHECKS
-C
-      CRAIN=0.0
-      HEATIN=0.0
-      CO2GIN=0.0
-      OXYGIN=0.0
-      H2GIN=0.0
-      TZIN=0.0
-      ZN2GIN=0.0
-      TPIN=0.0
-      TORGF=0.0
-      TORGN=0.0
-      TORGP=0.0
-      VOLWOU=0.0
-      CEVAP=0.0
-      CRUN=0.0
-      HEATOU=0.0
-      OXYGOU=0.0
-      H2GOU=0.0
-      TSEDOU=0.0
-      TCOU=0.0
-      TZOU=0.0
-      TPOU=0.0
-      XCSN=0.0
-      XZSN=0.0
-      XPSN=0.0
-      TIONIN=0.0
-      TIONOU=0.0
-      VAP=2465.0
-      VAPS=2834.0
-      OXKM=0.080
-      TYSIN=0.0
+
+C     Initialize controling parameters
+      call init_control_paras
 C
 C     IRRADIANCE INTERCEPTION GEOMETRY
-C
-C     ZSIN,ZCOS=sine,cosine of leaf inclination class
-C     ZAZI=leaf azimuth class
-C     YAZI,YSIN,YCOS=sky azimuth,sine,cosine of sky azimuth
-C     OMEGA,OMEGX=incident angle of diffuse radn at leaf,horizontal surface
-C     IALBY:1=backscattering,2=forward scattering of sky radiation
-C
-      ZSIN(1)=0.195
-      ZSIN(2)=0.556
-      ZSIN(3)=0.831
-      ZSIN(4)=0.981
-      ZCOS(1)=0.981
-      ZCOS(2)=0.831
-      ZCOS(3)=0.556
-      ZCOS(4)=0.195
-      DO 205 L=1,4
-      ZAZI(L)=(L-0.5)*3.1416/4.0
-205   CONTINUE
-      DO 230 N=1,4
-      YAZI(N)=3.1416*(2*N-1)/4.0
-      YAGL=3.1416/4.0
-      YSIN(N)=SIN(YAGL)
-      YCOS(N)=COS(YAGL)
-      TYSIN=TYSIN+YSIN(N)
-      DO 225 L=1,4
-      DAZI=COS(ZAZI(L)-YAZI(N))
-      DO 225 M=1,4
-      OMEGY=ZCOS(M)*YSIN(N)+ZSIN(M)*YCOS(N)*DAZI
-      OMEGA(N,M,L)=ABS(OMEGY)
-      OMEGX(N,M,L)=OMEGA(N,M,L)/YSIN(N)
-      IF(ZCOS(M).GT.YSIN(N))THEN
-      OMEGZ=ACOS(OMEGY)
-      ELSE
-      OMEGZ=-ACOS(OMEGY)
-      ENDIF
-      IF(OMEGZ.GT.-1.5708)THEN
-      ZAGL=YAGL+2.0*OMEGZ
-      ELSE
-      ZAGL=YAGL-2.0*(3.1416+OMEGZ)
-      ENDIF
-      IF(ZAGL.GT.0.0.AND.ZAGL.LT.3.1416)THEN
-      IALBY(N,M,L)=1
-      ELSE
-      IALBY(N,M,L)=2
-      ENDIF
-225   CONTINUE
-230   CONTINUE
+      call init_irrad_geometry
 C
 C     INITIALIZE C-N AND C-P RATIOS OF RESIDUE AND SOIL
 C
-C     CNOFC,CPOFC=fractions to allocate N,P to kinetic components
-C     CNOMC,CPOMC=maximum N:C and P:C ratios in microbial biomass
-C
-      CNOFC(1,0)=0.005
-      CNOFC(2,0)=0.005
-      CNOFC(3,0)=0.005
-      CNOFC(4,0)=0.020
-      CPOFC(1,0)=0.0005
-      CPOFC(2,0)=0.0005
-      CPOFC(3,0)=0.0005
-      CPOFC(4,0)=0.0020
-      CNOFC(1,1)=0.020
-      CNOFC(2,1)=0.020
-      CNOFC(3,1)=0.020
-      CNOFC(4,1)=0.020
-      CPOFC(1,1)=0.0020
-      CPOFC(2,1)=0.0020
-      CPOFC(3,1)=0.0020
-      CPOFC(4,1)=0.0020
-      CNOFC(1,2)=0.020
-      CNOFC(2,2)=0.020
-      CNOFC(3,2)=0.020
-      CNOFC(4,2)=0.020
-      CPOFC(1,2)=0.0020
-      CPOFC(2,2)=0.0020
-      CPOFC(3,2)=0.0020
-      CPOFC(4,2)=0.0020
-      FL(1)=0.55
-      FL(2)=0.45
-      DO 95 K=0,5
-      DO 95 N=1,7
-      IF(K.LE.4.AND.N.EQ.3)THEN
-      CNOMC(1,N,K)=0.15
-      CNOMC(2,N,K)=0.09
-      CPOMC(1,N,K)=0.015
-      CPOMC(2,N,K)=0.009
-      ELSE
-      CNOMC(1,N,K)=0.225
-      CNOMC(2,N,K)=0.135
-      CPOMC(1,N,K)=0.0225
-      CPOMC(2,N,K)=0.0135
-      ENDIF
-      CNOMC(3,N,K)=FL(1)*CNOMC(1,N,K)+FL(2)*CNOMC(2,N,K)
-      CPOMC(3,N,K)=FL(1)*CPOMC(1,N,K)+FL(2)*CPOMC(2,N,K)
-95    CONTINUE
+      call init_CNP_ratios
 C
 C     CALCULATE ELEVATION OF EACH GRID CELL
 C
-C     GAZI=ground surface azimuth
-C     GSIN,GCOS=sine,cosine of ground surface
-C     OMEGAG=incident sky angle at ground surface
-C     SLOPE=sine of ground surface slope in (0)aspect, (1)EW,(2)NS directions
-C     ALT=ground surface elevation
-C     ALTY=maximum surface elevation in landscape
-C     IRCHG=runoff boundary flags:0=not possible,1=possible
-C
-      ALTY=0.0
-      DO 9985 NX=NHW,NHE
-      DO 9980 NY=NVN,NVS
-      ZEROS(NY,NX)=ZERO*DH(NY,NX)*DV(NY,NX)
-      ZEROS2(NY,NX)=ZERO2*DH(NY,NX)*DV(NY,NX)
-      GAZI(NY,NX)=ASP(NY,NX)/RDN
-      GSINA(NY,NX)=ABS(SIN(GAZI(NY,NX)))
-      GCOSA(NY,NX)=ABS(COS(GAZI(NY,NX)))
-      SLOPE(0,NY,NX)=AMAX1(1.745E-04,SIN(SL(NY,NX)/RDN))
-      IF(ASP(NY,NX).GE.0.0.AND.ASP(NY,NX).LT.90.0)THEN
-      SLOPE(1,NY,NX)=-SLOPE(0,NY,NX)*COS(ASP(NY,NX)/RDN)
-      SLOPE(2,NY,NX)=SLOPE(0,NY,NX)*SIN(ASP(NY,NX)/RDN)
-      IRCHG(1,1,NY,NX)=1
-      IRCHG(2,1,NY,NX)=0
-      IRCHG(1,2,NY,NX)=0
-      IRCHG(2,2,NY,NX)=1
-      ELSEIF(ASP(NY,NX).GE.90.0.AND.ASP(NY,NX).LT.180.0)THEN
-      SLOPE(1,NY,NX)=SLOPE(0,NY,NX)*SIN((ASP(NY,NX)-90.0)/RDN)
-      SLOPE(2,NY,NX)=SLOPE(0,NY,NX)*COS((ASP(NY,NX)-90.0)/RDN)
-      IRCHG(1,1,NY,NX)=0
-      IRCHG(2,1,NY,NX)=1
-      IRCHG(1,2,NY,NX)=0
-      IRCHG(2,2,NY,NX)=1
-      ELSEIF(ASP(NY,NX).GE.180.0.AND.ASP(NY,NX).LT.270.0)THEN
-      SLOPE(1,NY,NX)=SLOPE(0,NY,NX)*COS((ASP(NY,NX)-180.0)/RDN)
-      SLOPE(2,NY,NX)=-SLOPE(0,NY,NX)*SIN((ASP(NY,NX)-180.0)/RDN)
-      IRCHG(1,1,NY,NX)=0
-      IRCHG(2,1,NY,NX)=1
-      IRCHG(1,2,NY,NX)=1
-      IRCHG(2,2,NY,NX)=0
-      ELSEIF(ASP(NY,NX).GE.270.0.AND.ASP(NY,NX).LE.360.0)THEN
-      SLOPE(1,NY,NX)=-SLOPE(0,NY,NX)*SIN((ASP(NY,NX)-270.0)/RDN)
-      SLOPE(2,NY,NX)=-SLOPE(0,NY,NX)*COS((ASP(NY,NX)-270.0)/RDN)
-      IRCHG(1,1,NY,NX)=1
-      IRCHG(2,1,NY,NX)=0
-      IRCHG(1,2,NY,NX)=1
-      IRCHG(2,2,NY,NX)=0
-      ENDIF
-      SLOPE(3,NY,NX)=-1.0
-      IF(SLOPE(1,NY,NX).NE.0.0.OR.SLOPE(2,NY,NX).NE.0.0)THEN
-      FSLOPE(1,NY,NX)=ABS(SLOPE(1,NY,NX))
-     2/(ABS(SLOPE(1,NY,NX))+ABS(SLOPE(2,NY,NX)))
-      FSLOPE(2,NY,NX)=ABS(SLOPE(2,NY,NX))
-     2/(ABS(SLOPE(1,NY,NX))+ABS(SLOPE(2,NY,NX)))
-      ELSE
-      FSLOPE(1,NY,NX)=0.5
-      FSLOPE(2,NY,NX)=0.5
-      ENDIF
-      GSIN(NY,NX)=SLOPE(0,NY,NX)
-      GCOS(NY,NX)=SQRT(1.0-GSIN(NY,NX)**2)
-      DO 240 N=1,4
-      DGAZI=COS(GAZI(NY,NX)-YAZI(N))
-      OMEGAG(N,NY,NX)=AMAX1(0.0,AMIN1(1.0,GCOS(NY,NX)*YSIN(N)
-     2+GSIN(NY,NX)*YCOS(N)*DGAZI))
-240   CONTINUE
-      IF(NX.EQ.NHW)THEN
-      IF(NY.EQ.NVN)THEN
-      ALT(NY,NX)=0.5*DH(NY,NX)*SLOPE(1,NY,NX)
-     2+0.5*DV(NY,NX)*SLOPE(2,NY,NX)
-      ELSE
-      ALT(NY,NX)=ALT(NY-1,NX)
-     2+1.0*DH(NY,NX)*SLOPE(1,NY,NX)
-     4+0.5*DV(NY-1,NX)*(SLOPE(2,NY-1,NX))
-     5+0.5*DV(NY,NX)*SLOPE(2,NY,NX)
-      ENDIF
-      ELSE
-      IF(NY.EQ.NVN)THEN
-      ALT(NY,NX)=ALT(NY,NX-1)
-     2+0.5*DH(NY,NX-1)*SLOPE(1,NY,NX-1)
-     3+0.5*DH(NY,NX)*SLOPE(1,NY,NX)
-     2+0.5*DV(NY,NX-1)*SLOPE(2,NY,NX-1)
-     3+0.5*DV(NY,NX)*SLOPE(2,NY,NX)
-      ELSE
-      ALT(NY,NX)=(ALT(NY,NX-1)
-     2+0.5*DH(NY,NX-1)*SLOPE(1,NY,NX-1)
-     3+0.5*DH(NY,NX)*SLOPE(1,NY,NX)
-     4+ALT(NY-1,NX)
-     4+0.5*DV(NY-1,NX)*SLOPE(2,NY-1,NX)
-     5+0.5*DV(NY,N)*SLOPE(2,NY,NX))/2.0
-      ENDIF
-      ENDIF
-      IF(NX.EQ.NHW.AND.NY.EQ.NVN)THEN
-      ALTY=ALT(NY,NX)
-      ELSE
-      ALTY=MAX(ALTY,ALT(NY,NX))
-      ENDIF
-      WRITE(*,1111)'ALT',NX,NY,((IRCHG(NN,N,NY,NX),NN=1,2),N=1,2)
-     2,ALT(NY,NX),DH(NY,NX),DV(NY,NX),ASP(NY,NX),SL(NY,NX)
-     3,SLOPE(0,NY,NX),SLOPE(1,NY,NX),SLOPE(2,NY,NX)
-     4,GSIN(NY,NX),GCOSA(NY,NX),GSINA(NY,NX)
-1111  FORMAT(A8,6I4,20E12.4)
-9980  CONTINUE
-9985  CONTINUE
+      call init_grid_elevation(NHW,NHE,NVN,NVS)
 C
 C     INITIALIZE ACCUMULATORS AND MASS BALANCE CHECKS
 C     OF EACH GRID CELL
@@ -360,96 +103,8 @@ C
       CDPTHG=0.0
       DO 9995 NX=NHW,NHE
       DO 9990 NY=NVN,NVS
-      DO 600 N=1,12
-      TDTPX(NY,NX,N)=0.0
-      TDTPN(NY,NX,N)=0.0
-      TDRAD(NY,NX,N)=1.0
-      TDWND(NY,NX,N)=1.0
-      TDHUM(NY,NX,N)=1.0
-      TDPRC(NY,NX,N)=1.0
-      TDIRI(NY,NX,N)=1.0
-      TDCO2(NY,NX,N)=1.0
-      TDCN4(NY,NX,N)=1.0
-      TDCNO(NY,NX,N)=1.0
-600   CONTINUE
-      IUTYP(NY,NX)=0
-      IFNHB(NY,NX)=0
-      IFNOB(NY,NX)=0
-      IFPOB(NY,NX)=0
-      IFLGS(NY,NX)=1
-      IFLGT(NY,NX)=0
-      ATCA(NY,NX)=ATCAI(NY,NX)
-      ATCS(NY,NX)=ATCAI(NY,NX)
-      ATKA(NY,NX)=ATCA(NY,NX)+273.15
-      ATKS(NY,NX)=ATCS(NY,NX)+273.15
-      URAIN(NY,NX)=0.0
-      UCO2G(NY,NX)=0.0
-      UCH4G(NY,NX)=0.0
-      UOXYG(NY,NX)=0.0
-      UN2GG(NY,NX)=0.0
-      UN2OG(NY,NX)=0.0
-      UNH3G(NY,NX)=0.0
-      UN2GS(NY,NX)=0.0
-      UCO2F(NY,NX)=0.0
-      UCH4F(NY,NX)=0.0
-      UOXYF(NY,NX)=0.0
-      UN2OF(NY,NX)=0.0
-      UNH3F(NY,NX)=0.0
-      UPO4F(NY,NX)=0.0
-      UORGF(NY,NX)=0.0
-      UFERTN(NY,NX)=0.0
-      UFERTP(NY,NX)=0.0
-      UVOLO(NY,NX)=0.0
-      UEVAP(NY,NX)=0.0
-      URUN(NY,NX)=0.0
-      USEDOU(NY,NX)=0.0
-      UCOP(NY,NX)=0.0
-      UDOCQ(NY,NX)=0.0
-      UDOCD(NY,NX)=0.0
-      UDONQ(NY,NX)=0.0
-      UDOND(NY,NX)=0.0
-      UDOPQ(NY,NX)=0.0
-      UDOPD(NY,NX)=0.0
-      UDICQ(NY,NX)=0.0
-      UDICD(NY,NX)=0.0
-      UDINQ(NY,NX)=0.0
-      UDIND(NY,NX)=0.0
-      UDIPQ(NY,NX)=0.0
-      UDIPD(NY,NX)=0.0
-      UIONOU(NY,NX)=0.0
-      UXCSN(NY,NX)=0.0
-      UXZSN(NY,NX)=0.0
-      UXPSN(NY,NX)=0.0
-      UDRAIN(NY,NX)=0.0
-      ZDRAIN(NY,NX)=0.0
-      PDRAIN(NY,NX)=0.0
-      DPNH4(NY,NX)=0.0
-      DPNO3(NY,NX)=0.0
-      DPPO4(NY,NX)=0.0
-      OXYS(0,NY,NX)=0.0
-      FRADG(NY,NX)=1.0
-      THRMG(NY,NX)=0.0
-      THRMC(NY,NX)=0.0
-      TRN(NY,NX)=0.0
-      TLE(NY,NX)=0.0
-      TSH(NY,NX)=0.0
-      TGH(NY,NX)=0.0
-      TLEC(NY,NX)=0.0
-      TSHC(NY,NX)=0.0
-      TLEX(NY,NX)=0.0
-      TSHX(NY,NX)=0.0
-      TCNET(NY,NX)=0.0
-      TVOLWC(NY,NX)=0.0
-      ARLFC(NY,NX)=0.0
-      ARSTC(NY,NX)=0.0
-      TFLWC(NY,NX)=0.0
-      PPT(NY,NX)=0.0
-      DYLN(NY,NX)=12.0
-      ALBX(NY,NX)=ALBS(NY,NX)
-      XHVSTC(NY,NX)=0.0
-      XHVSTN(NY,NX)=0.0
-      XHVSTP(NY,NX)=0.0
-      ENGYP(NY,NX)=0.0
+
+      call init_accumulators(NY,NX)
 C
 C     MINIMUM SURFACE ELEVATION IN LANDSCAPE
 C
@@ -504,111 +159,10 @@ C
 C     DISTRIBUTION OF OM AMONG FRACTIONS OF DIFFERING
 C     BIOLOGICAL ACTIVITY
 C
-      DO 1195 L=0,NL(NY,NX)
-C
-C     LAYER DEPTHS AND THEIR PHYSICAL PROPERTIES
-C
-C     surface litter:L=0,soil layer:L>0
-C     DLYR,AREA=layer thickness,x-sectional area:1=EW,2=NS,3=vertical
-C     ORGC=organic C content
-C     VOLT,VOLX=volume including,excluding macropores+rock
-C     BKVL=mass
-C     CDPTH,DPTH=depth to bottom,midpoint
-C
-      DLYRI(1,L,NY,NX)=DH(NY,NX)
-      DLYRI(2,L,NY,NX)=DV(NY,NX)
-      DLYR(1,L,NY,NX)=DLYRI(1,L,NY,NX)
-      DLYR(2,L,NY,NX)=DLYRI(2,L,NY,NX)
-      AREA(3,L,NY,NX)=DLYR(1,L,NY,NX)*DLYR(2,L,NY,NX)
-      IF(L.EQ.0)THEN
-      TAREA=TAREA+AREA(3,L,NY,NX)
-      CDPTHZ(L,NY,NX)=0.0
-      ORGC(L,NY,NX)=(RSC(0,L,NY,NX)+RSC(1,L,NY,NX)+RSC(2,L,NY,NX))
-     2*AREA(3,L,NY,NX)
-      ORGCX(L,NY,NX)=ORGC(L,NY,NX)
-      VOLR(NY,NX)=(RSC(0,L,NY,NX)*1.0E-06/BKRS(0)
-     2+RSC(1,L,NY,NX)*1.0E-06/BKRS(1)+RSC(2,L,NY,NX)*1.0E-06/BKRS(2))
-     2*AREA(3,L,NY,NX)
-      VOLT(L,NY,NX)=VOLR(NY,NX)
-      VOLX(L,NY,NX)=VOLT(L,NY,NX)
-      VOLY(L,NY,NX)=VOLX(L,NY,NX)
-      VOLTI(L,NY,NX)=VOLT(L,NY,NX)
-      BKVL(L,NY,NX)=1.82E-06*ORGC(L,NY,NX)
-      DLYRI(3,L,NY,NX)=VOLX(L,NY,NX)/AREA(3,L,NY,NX)
-      DLYR(3,L,NY,NX)=DLYRI(3,L,NY,NX)
-      ELSE
-      IF(BKDSI(L,NY,NX).LE.ZERO)FHOL(L,NY,NX)=0.0
-      DLYRI(3,L,NY,NX)=(CDPTH(L,NY,NX)-CDPTH(L-1,NY,NX))
-      DLYR(3,L,NY,NX)=DLYRI(3,L,NY,NX)
-      DPTH(L,NY,NX)=0.5*(CDPTH(L,NY,NX)+CDPTH(L-1,NY,NX))
-      CDPTHZ(L,NY,NX)=CDPTH(L,NY,NX)-CDPTH(NU(NY,NX),NY,NX)
-     2+DLYR(3,NU(NY,NX),NY,NX)
-      DPTHZ(L,NY,NX)=0.5*(CDPTHZ(L,NY,NX)+CDPTHZ(L-1,NY,NX))
-      VOLT(L,NY,NX)=AREA(3,L,NY,NX)*DLYR(3,L,NY,NX)
-      VOLX(L,NY,NX)=VOLT(L,NY,NX)*FMPR(L,NY,NX)
-      VOLY(L,NY,NX)=VOLX(L,NY,NX)
-      VOLTI(L,NY,NX)=VOLT(L,NY,NX)
-      BKVL(L,NY,NX)=BKDS(L,NY,NX)*VOLX(L,NY,NX)
-      RTDNT(L,NY,NX)=0.0
-      ENDIF
-      AREA(1,L,NY,NX)=DLYR(3,L,NY,NX)*DLYR(2,L,NY,NX)
-      AREA(2,L,NY,NX)=DLYR(3,L,NY,NX)*DLYR(1,L,NY,NX)
-1195  CONTINUE
-      CDPTH(0,NY,NX)=CDPTH(NU(NY,NX),NY,NX)-DLYR(3,NU(NY,NX),NY,NX)
-      CDPTHI(NY,NX)=CDPTH(0,NY,NX)
+      call init_layer_depths(NY,NX)
 C
 C     INITIALIZE SNOWPACK LAYERS
-C
-C     CDPTHS=depth to bottom
-C     DENS0=snow density (Mg m-3)
-C     VOLSS,VOLWS,VOLIS,VOLS=snow,water,ice,total snowpack volume(m3)
-C     DPTHA=active layer depth (m)
-C     CDPTHSI=depth to bottom of snowpack layers
-C     DLYRS=snowpack layer thickness (m)
-C     VOLSSL,VOLWSL,VOLISL,VOLSL=snow,water,ice,total layer volume(m3)
-C     DENSS=layer density (Mg m-3)
-C     TKW,TCW=later temperature K,oC
-C     VHCPW=layer volumetric heat capacity (MJ m-3 K-1)
-C
-      CDPTHS(0,NY,NX)=0.0
-      DENS0(NY,NX)=0.10
-      VOLSS(NY,NX)=DPTHS(NY,NX)*DENS0(NY,NX)*DH(NY,NX)*DV(NY,NX)
-      VOLWS(NY,NX)=0.0
-      VOLIS(NY,NX)=0.0
-      VOLS(NY,NX)=VOLSS(NY,NX)/DENS0(NY,NX)+VOLWS(NY,NX)+VOLIS(NY,NX)
-      DPTHA(NY,NX)=9999.0
-      VOLSWI=0.0
-      DO 9580 L=1,JS
-      IF(L.EQ.1)THEN
-      DLYRSI=CDPTHSI(L)
-      DLYRS(L,NY,NX)=AMIN1(DLYRSI,DPTHS(NY,NX))
-      ELSE
-      DLYRSI=CDPTHSI(L)-CDPTHSI(L-1)
-      DLYRS(L,NY,NX)=AMIN1(DLYRSI,AMAX1(0.0
-     2,DPTHS(NY,NX)-CDPTHSI(L-1)))
-      ENDIF
-      VOLSSL(L,NY,NX)=DLYRS(L,NY,NX)*DENS0(NY,NX)
-     2*DH(NY,NX)*DV(NY,NX)
-      VOLWSL(L,NY,NX)=0.0
-      VOLISL(L,NY,NX)=0.0
-      IF(L.EQ.1)THEN
-      VOLSWI=VOLSWI+0.5*(VOLSSL(L,NY,NX)+VOLWSL(L,NY,NX)
-     2+VOLISL(L,NY,NX)*DENSI)
-      ELSE
-      VOLSWI=VOLSWI+0.5*(VOLSSL(L-1,NY,NX)+VOLWSL(L-1,NY,NX)
-     2+VOLISL(L-1,NY,NX)*DENSI+VOLSSL(L,NY,NX)+VOLWSL(L,NY,NX)
-     2+VOLISL(L,NY,NX)*DENSI)
-      ENDIF
-      DENSS(L,NY,NX)=DENS0(NY,NX)
-      VOLSL(L,NY,NX)=VOLSSL(L,NY,NX)/DENSS(L,NY,NX)
-     2+VOLWSL(L,NY,NX)+VOLISL(L,NY,NX)
-      VOLSI(L,NY,NX)=DLYRSI*DH(NY,NX)*DV(NY,NX)
-      CDPTHS(L,NY,NX)=CDPTHS(L-1,NY,NX)+DLYRS(L,NY,NX)
-      TKW(L,NY,NX)=AMIN1(273.15,ATKA(NY,NX))
-      TCW(L,NY,NX)=AMIN1(0.0,ATCA(NY,NX))
-      VHCPW(L,NY,NX)=2.095*VOLSSL(L,NY,NX)+4.19*VOLWSL(L,NY,NX)
-     2+1.9274*VOLISL(L,NY,NX)
-9580  CONTINUE
+      call init_snow_layers
 C
 C     SURFACE WATER STORAGE AND LOWER HEAT SINK
 C
@@ -646,20 +200,31 @@ C
       ENDIF
 9990  CONTINUE
 9995  CONTINUE
+
 C
 C     INITIALIZE GRID CELL DIMENSIONS
 C
+      call init_soil_vars(NHW,NHE,NVN,NVS)
+
+      RETURN
+      END subroutine starts
+C------------------------------------------------------------------------------------------
+      subroutine init_soil_vars(NHW,NHE,NVN,NVS)
 C     N3,N2,N1=L,NY,NX of source grid cell
 C     N6,N5,N4=L,NY,NX of destination grid cell
 C     ALTZG=minimum surface elevation in landscape
 C     DTBLI,DTBLDI=depth of natural,artificial water table
 C     DTBLG=slope of natural water table relative to landscape surface
+C     in geography, slope =rise/run
 C     DTBLZ,DTBLD=depth of natural,artificial water table adjusted for elevn
 C     DPTHT=depth to internal water table
 C     DIST=distance between adjacent layers:1=EW,2=NS,3=vertical(m)
 C     XDPTH=x-section area/distance in solute flux calculations (m2/m)
 C     DISP=dispersivity parameter in solute flux calculations (m2 h-1)
 C
+      implicit none
+      integer, intent(in) :: NHW,NHE,NVN,NVS
+
       DO 9895 NX=NHW,NHE
       DO 9890 NY=NVN,NVS
       ALTZ(NY,NX)=ALTZG
@@ -753,6 +318,74 @@ C
 C
 C     ALLOCATE LITTER,SOC TO WOODY,NON-WOODY,MANURE,POC AND HUMUS
 C
+      call init_litter_prof(NY,NX)
+C
+C     SURFACE LITTER HEAT CAPACITY
+C
+      BKVLNM(NY,NX)=AMAX1(0.0,SAND(NU(NY,NX),NY,NX)
+     2+SILT(NU(NY,NX),NY,NX)+CLAY(NU(NY,NX),NY,NX))
+      VHCP(0,NY,NX)=2.496E-06*ORGC(0,NY,NX)+4.19*VOLW(0,NY,NX)
+     2+1.9274*VOLI(0,NY,NX)
+      VHCM(0,NY,NX)=0.0
+      VOLAI(0,NY,NX)=0.0
+9890  CONTINUE
+9895  CONTINUE
+      end subroutine init_soil_vars
+C------------------------------------------------------------------------------------------
+      subroutine init_irrad_geometry
+
+      implicit none
+C     ZSIN,ZCOS=sine,cosine of leaf inclination class
+C     ZAZI=leaf azimuth class
+C     YAZI,YSIN,YCOS=sky azimuth,sine,cosine of sky azimuth
+C     OMEGA,OMEGX=incident angle of diffuse radn at leaf,horizontal surface
+C     IALBY:1=backscattering,2=forward scattering of sky radiation
+C
+      ZSIN(1)=0.195
+      ZSIN(2)=0.556
+      ZSIN(3)=0.831
+      ZSIN(4)=0.981
+      ZCOS(1)=0.981
+      ZCOS(2)=0.831
+      ZCOS(3)=0.556
+      ZCOS(4)=0.195
+      DO 205 L=1,4
+      ZAZI(L)=(L-0.5)*3.1416/4.0
+205   CONTINUE
+      DO 230 N=1,4
+      YAZI(N)=3.1416*(2*N-1)/4.0
+      YAGL=3.1416/4.0
+      YSIN(N)=SIN(YAGL)
+      YCOS(N)=COS(YAGL)
+      TYSIN=TYSIN+YSIN(N)
+      DO 225 L=1,4
+      DAZI=COS(ZAZI(L)-YAZI(N))
+      DO 225 M=1,4
+      OMEGY=ZCOS(M)*YSIN(N)+ZSIN(M)*YCOS(N)*DAZI
+      OMEGA(N,M,L)=ABS(OMEGY)
+      OMEGX(N,M,L)=OMEGA(N,M,L)/YSIN(N)
+      IF(ZCOS(M).GT.YSIN(N))THEN
+      OMEGZ=ACOS(OMEGY)
+      ELSE
+      OMEGZ=-ACOS(OMEGY)
+      ENDIF
+      IF(OMEGZ.GT.-1.5708)THEN
+      ZAGL=YAGL+2.0*OMEGZ
+      ELSE
+      ZAGL=YAGL-2.0*(3.1416+OMEGZ)
+      ENDIF
+      IF(ZAGL.GT.0.0.AND.ZAGL.LT.3.1416)THEN
+      IALBY(N,M,L)=1
+      ELSE
+      IALBY(N,M,L)=2
+      ENDIF
+225   CONTINUE
+230   CONTINUE
+      end subroutine init_irrad_geometry
+C------------------------------------------------------------------------------------------
+      subroutine init_litter_prof(NY,NX)
+      implicit none
+      integer, intent(in) :: NY,NX
 C     CORGCX,CORGNX,CORGPX=C,N,P concentations from woody(0),
 C     non-woody(1), manure(2), litter, POC(3) and humus(4) (g Mg-1)
 C     RSC,RSC,RSP=C,N,P in fine(1),woody(0),manure(2) litter (g m-2)
@@ -771,6 +404,10 @@ C
       CORGPX(1)=RSP(1,L,NY,NX)*AREA(3,L,NY,NX)/BKVL(L,NY,NX)
       CORGPX(2)=RSP(2,L,NY,NX)*AREA(3,L,NY,NX)/BKVL(L,NY,NX)
       ELSE
+      if(abs(VOLT(L,NY,NX))<1.e-10_r8)then
+      print*,'L,NY,NX=',L,NY,NX
+      print*,'VOLT(L,NY,NX)=',VOLT(L,NY,NX)
+      endif
       CORGCX(0)=RSC(0,L,NY,NX)*AREA(3,L,NY,NX)/VOLT(L,NY,NX)
       CORGCX(1)=RSC(1,L,NY,NX)*AREA(3,L,NY,NX)/VOLT(L,NY,NX)
       CORGCX(2)=RSC(2,L,NY,NX)*AREA(3,L,NY,NX)/VOLT(L,NY,NX)
@@ -814,243 +451,16 @@ C
       ENDIF
 C
 C     SURFACE RESIDUE KINETIC COMPONENTS
-C
-      IF(L.EQ.0)THEN
-C
-C     CFOSC=fraction of litter in protein(1),nonstructural(2)
-C     cellulose(3) and lignin(4)
-C
-C     PREVIOUS COARSE WOODY RESIDUE
-C
-      CFOSC(1,0,L,NY,NX)=0.000
-      CFOSC(2,0,L,NY,NX)=0.045
-      CFOSC(3,0,L,NY,NX)=0.660
-      CFOSC(4,0,L,NY,NX)=0.295
-C
-C     MAIZE
-C
-      IF(IXTYP(1,NY,NX).EQ.1)THEN
-      CFOSC(1,1,L,NY,NX)=0.080
-      CFOSC(2,1,L,NY,NX)=0.245
-      CFOSC(3,1,L,NY,NX)=0.613
-      CFOSC(4,1,L,NY,NX)=0.062
-C
-C     WHEAT
-C
-      ELSEIF(IXTYP(1,NY,NX).EQ.2)THEN
-      CFOSC(1,1,L,NY,NX)=0.125
-      CFOSC(2,1,L,NY,NX)=0.171
-      CFOSC(3,1,L,NY,NX)=0.560
-      CFOSC(4,1,L,NY,NX)=0.144
-C
-C     SOYBEAN
-C
-      ELSEIF(IXTYP(1,NY,NX).EQ.3)THEN
-      CFOSC(1,1,L,NY,NX)=0.138
-      CFOSC(2,1,L,NY,NX)=0.426
-      CFOSC(3,1,L,NY,NX)=0.316
-      CFOSC(4,1,L,NY,NX)=0.120
-C
-C     NEW STRAW
-C
-      ELSEIF(IXTYP(1,NY,NX).EQ.4)THEN
-      CFOSC(1,1,L,NY,NX)=0.036
-      CFOSC(2,1,L,NY,NX)=0.044
-      CFOSC(3,1,L,NY,NX)=0.767
-      CFOSC(4,1,L,NY,NX)=0.153
-C
-C     OLD STRAW
-C
-      ELSEIF(IXTYP(1,NY,NX).EQ.5)THEN
-      CFOSC(1,1,L,NY,NX)=0.075
-      CFOSC(2,1,L,NY,NX)=0.125
-      CFOSC(3,1,L,NY,NX)=0.550
-      CFOSC(4,1,L,NY,NX)=0.250
-C
-C     COMPOST
-C
-      ELSEIF(IXTYP(1,NY,NX).EQ.6)THEN
-      CFOSC(1,1,L,NY,NX)=0.143
-      CFOSC(2,1,L,NY,NX)=0.015
-      CFOSC(3,1,L,NY,NX)=0.640
-      CFOSC(4,1,L,NY,NX)=0.202
-C
-C     GREEN MANURE
-C
-      ELSEIF(IXTYP(1,NY,NX).EQ.7)THEN
-      CFOSC(1,1,L,NY,NX)=0.202
-      CFOSC(2,1,L,NY,NX)=0.013
-      CFOSC(3,1,L,NY,NX)=0.560
-      CFOSC(4,1,L,NY,NX)=0.225
-C
-C     NEW DECIDUOUS FOREST
-C
-      ELSEIF(IXTYP(1,NY,NX).EQ.8)THEN
-      CFOSC(1,1,L,NY,NX)=0.07
-      CFOSC(2,1,L,NY,NX)=0.41
-      CFOSC(3,1,L,NY,NX)=0.36
-      CFOSC(4,1,L,NY,NX)=0.16
-C
-C     NEW CONIFEROUS FOREST
-C
-      ELSEIF(IXTYP(1,NY,NX).EQ.9)THEN
-      CFOSC(1,1,L,NY,NX)=0.07
-      CFOSC(2,1,L,NY,NX)=0.25
-      CFOSC(3,1,L,NY,NX)=0.38
-      CFOSC(4,1,L,NY,NX)=0.30
-C
-C     OLD DECIDUOUS FOREST
-C
-      ELSEIF(IXTYP(1,NY,NX).EQ.10)THEN
-      CFOSC(1,1,L,NY,NX)=0.02
-      CFOSC(2,1,L,NY,NX)=0.06
-      CFOSC(3,1,L,NY,NX)=0.34
-      CFOSC(4,1,L,NY,NX)=0.58
-C
-C     OLD CONIFEROUS FOREST
-C
-      ELSEIF(IXTYP(1,NY,NX).EQ.11)THEN
-      CFOSC(1,1,L,NY,NX)=0.02
-      CFOSC(2,1,L,NY,NX)=0.06
-      CFOSC(3,1,L,NY,NX)=0.34
-      CFOSC(4,1,L,NY,NX)=0.58
-C
-C     DEFAULT
-C
-      ELSE
-      CFOSC(1,1,L,NY,NX)=0.075
-      CFOSC(2,1,L,NY,NX)=0.125
-      CFOSC(3,1,L,NY,NX)=0.550
-      CFOSC(4,1,L,NY,NX)=0.250
-      ENDIF
-C
-C     PREVIOUS COARSE (K=0) AND FINE (K=1) ROOTS
-C
-      ELSE
-      CFOSC(1,0,L,NY,NX)=0.00
-      CFOSC(2,0,L,NY,NX)=0.00
-      CFOSC(3,0,L,NY,NX)=0.20
-      CFOSC(4,0,L,NY,NX)=0.80
-      CFOSC(1,1,L,NY,NX)=0.02
-      CFOSC(2,1,L,NY,NX)=0.06
-      CFOSC(3,1,L,NY,NX)=0.34
-      CFOSC(4,1,L,NY,NX)=0.58
-      ENDIF
+      call init_surfr_kincomp(L,NY,NX)
+
 C
 C     ANIMAL MANURE
-C
-C     RUMINANT
-C
-      IF(IXTYP(2,NY,NX).EQ.1)THEN
-      CFOSC(1,2,L,NY,NX)=0.036
-      CFOSC(2,2,L,NY,NX)=0.044
-      CFOSC(3,2,L,NY,NX)=0.630
-      CFOSC(4,2,L,NY,NX)=0.290
-C
-C     NON-RUMINANT
-C
-      ELSEIF(IXTYP(2,NY,NX).EQ.2)THEN
-      CFOSC(1,2,L,NY,NX)=0.138
-      CFOSC(2,2,L,NY,NX)=0.401
-      CFOSC(3,2,L,NY,NX)=0.316
-      CFOSC(4,2,L,NY,NX)=0.145
-C
-C     OTHER
-C
-      ELSE
-      CFOSC(1,2,L,NY,NX)=0.138
-      CFOSC(2,2,L,NY,NX)=0.401
-      CFOSC(3,2,L,NY,NX)=0.316
-      CFOSC(4,2,L,NY,NX)=0.145
-      ENDIF
+      call init_manure_kincomp(L,NY,NX)
+
 C
 C     POM
-C
-C     CFOSC=single kinetic fraction in POM
-C
-      IF(L.NE.0)THEN
-      CFOSC(1,3,L,NY,NX)=1.00
-      CFOSC(2,3,L,NY,NX)=0.00
-      CFOSC(3,3,L,NY,NX)=0.00
-      CFOSC(4,3,L,NY,NX)=0.00
-C
-C     HUMUS PARTITIONED TO DIFFERENT FRACTIONS
-C     BASED ON SOC ACCUMULATION ABOVE EACH LAYER
-C
-C     NATURAL SOILS
-C
-      IF(ISOILR(NY,NX).EQ.0)THEN
-C
-C     DRYLAND SOIL
-C
-C     CORGC,FORGC=SOC,minimum SOC for organic soil(g Mg-1)
-C     DPTH,DTBLZ=depth to layer midpoint,external water table(m)
-C     FC0=partitioning to less resistant component at DPTH=0
-C     FCX=reduction in FC0 at DPTH
-C     CORGCX,CORGNX,CORGPX=C,N,P concentations in humus
-C
-      IF(CORGC(L,NY,NX).LE.FORGC.OR
-     2.DPTH(L,NY,NX).LE.DTBLZ(NY,NX)
-     2+CDPTH(NU(NY,NX),NY,NX)-CDPTHG)THEN
-      FCY=0.60
-      IF(CORGCX(4).GT.1.0E-32)THEN
-      FC0=FCY*EXP(-5.0*(AMIN1(CORGNX(4),10.0*CORGPX(4))
-     2/CORGCX(4)))
-      ELSE
-      FCO=FCY
-      ENDIF
-      FCX=EXP(HCX*TORGL(L))
-C
-C     WETLAND
-C
-      ELSE
-      FCY=0.60
-      IF(CORGCX(4).GT.1.0E-32)THEN
-      FC0=FCY*EXP(-5.0*(AMIN1(CORGNX(4),10.0*CORGPX(4))
-     2/CORGCX(4)))
-      ELSE
-      FCO=FCY
-      ENDIF
-C     FCX=(EXP(HCX*TORGL(L)))**0.5
-      FCX=EXP(HCX*TORGL(L))
-      ENDIF
-C
-C     RECONSTRUCTED SOILS
-C
-      ELSE
-      FCY=0.30
-      IF(CORGCX(4).GT.1.0E-32)THEN
-      FC0=FCY*EXP(-5.0*(AMIN1(CORGNX(4),10.0*CORGPX(4))
-     2/CORGCX(4)))
-      ELSE
-      FCO=FCY
-      ENDIF
-      FCX=1.0
-      ENDIF
-C
-C     PARTITION HUMUS
-C
-C     CFOSC=fraction of humus in less(1),more(2) resistant component
-C
-      FC1=FC0*FCX
-      CFOSC(1,4,L,NY,NX)=FC1
-      CFOSC(2,4,L,NY,NX)=1.0-FC1
-      CFOSC(3,4,L,NY,NX)=0.00
-      CFOSC(4,4,L,NY,NX)=0.00
-C
-C     MICROBIAL DETRITUS ALLOCATED TO HUMUS MAINTAINS
-C     HUMUS PARTITIONING TO COMPONENTS
-C
-C     CFOMC=fraction of microbial litter allocated to humus components
-C
-      CFOMC(1,L,NY,NX)=3.0*FC1/(2.0*FC1+1.0)
-      CFOMC(2,L,NY,NX)=1.0-CFOMC(1,L,NY,NX)
-C     WRITE(*,5432)'PART',L,FC0,FC1,FCX,HCX,TORGM,TORGL(L)
-C    2,CORGCX(4),CORGNX(4),CORGPX(4),DPTH(L,NY,NX),DTBLZ(NY,NX)
-C    3,CDPTH(NU(NY,NX),NY,NX),CDPTHG,CORGC(L,NY,NX),FORGC
-C    4,EXP(HCX*TORGL(L))
-5432  FORMAT(A8,I4,20E12.4)
-      ENDIF
+      call init_pom_kincomp(L,NY,NX)
+
 C
 C     LAYER WATER, ICE, AIR CONTENTS
 C
@@ -1527,17 +937,703 @@ C
       ZNFNI(L,NY,NX)=0.0
       ZNFN0(L,NY,NX)=0.0
 1200  CONTINUE
+      end subroutine init_litter_prof
+C------------------------------------------------------------------------------------------
+      subroutine init_surfr_kincomp(L,NY,NX)
+      implicit none
+      integer, intent(in) :: L, NY,NX
+      IF(L.EQ.0)THEN
 C
-C     SURFACE LITTER HEAT CAPACITY
+C     CFOSC=fraction of litter in protein(1),nonstructural(2)
+C     cellulose(3) and lignin(4)
 C
-      BKVLNM(NY,NX)=AMAX1(0.0,SAND(NU(NY,NX),NY,NX)
-     2+SILT(NU(NY,NX),NY,NX)+CLAY(NU(NY,NX),NY,NX))
-      VHCP(0,NY,NX)=2.496E-06*ORGC(0,NY,NX)+4.19*VOLW(0,NY,NX)
-     2+1.9274*VOLI(0,NY,NX)
-      VHCM(0,NY,NX)=0.0
-      VOLAI(0,NY,NX)=0.0
-9890  CONTINUE
-9895  CONTINUE
-      RETURN
-      END subroutine starts
+C     PREVIOUS COARSE WOODY RESIDUE
+C
+      CFOSC(1,0,L,NY,NX)=0.000
+      CFOSC(2,0,L,NY,NX)=0.045
+      CFOSC(3,0,L,NY,NX)=0.660
+      CFOSC(4,0,L,NY,NX)=0.295
+C
+C     MAIZE
+C
+      IF(IXTYP(1,NY,NX).EQ.1)THEN
+      CFOSC(1,1,L,NY,NX)=0.080
+      CFOSC(2,1,L,NY,NX)=0.245
+      CFOSC(3,1,L,NY,NX)=0.613
+      CFOSC(4,1,L,NY,NX)=0.062
+C
+C     WHEAT
+C
+      ELSEIF(IXTYP(1,NY,NX).EQ.2)THEN
+      CFOSC(1,1,L,NY,NX)=0.125
+      CFOSC(2,1,L,NY,NX)=0.171
+      CFOSC(3,1,L,NY,NX)=0.560
+      CFOSC(4,1,L,NY,NX)=0.144
+C
+C     SOYBEAN
+C
+      ELSEIF(IXTYP(1,NY,NX).EQ.3)THEN
+      CFOSC(1,1,L,NY,NX)=0.138
+      CFOSC(2,1,L,NY,NX)=0.426
+      CFOSC(3,1,L,NY,NX)=0.316
+      CFOSC(4,1,L,NY,NX)=0.120
+C
+C     NEW STRAW
+C
+      ELSEIF(IXTYP(1,NY,NX).EQ.4)THEN
+      CFOSC(1,1,L,NY,NX)=0.036
+      CFOSC(2,1,L,NY,NX)=0.044
+      CFOSC(3,1,L,NY,NX)=0.767
+      CFOSC(4,1,L,NY,NX)=0.153
+C
+C     OLD STRAW
+C
+      ELSEIF(IXTYP(1,NY,NX).EQ.5)THEN
+      CFOSC(1,1,L,NY,NX)=0.075
+      CFOSC(2,1,L,NY,NX)=0.125
+      CFOSC(3,1,L,NY,NX)=0.550
+      CFOSC(4,1,L,NY,NX)=0.250
+C
+C     COMPOST
+C
+      ELSEIF(IXTYP(1,NY,NX).EQ.6)THEN
+      CFOSC(1,1,L,NY,NX)=0.143
+      CFOSC(2,1,L,NY,NX)=0.015
+      CFOSC(3,1,L,NY,NX)=0.640
+      CFOSC(4,1,L,NY,NX)=0.202
+C
+C     GREEN MANURE
+C
+      ELSEIF(IXTYP(1,NY,NX).EQ.7)THEN
+      CFOSC(1,1,L,NY,NX)=0.202
+      CFOSC(2,1,L,NY,NX)=0.013
+      CFOSC(3,1,L,NY,NX)=0.560
+      CFOSC(4,1,L,NY,NX)=0.225
+C
+C     NEW DECIDUOUS FOREST
+C
+      ELSEIF(IXTYP(1,NY,NX).EQ.8)THEN
+      CFOSC(1,1,L,NY,NX)=0.07
+      CFOSC(2,1,L,NY,NX)=0.41
+      CFOSC(3,1,L,NY,NX)=0.36
+      CFOSC(4,1,L,NY,NX)=0.16
+C
+C     NEW CONIFEROUS FOREST
+C
+      ELSEIF(IXTYP(1,NY,NX).EQ.9)THEN
+      CFOSC(1,1,L,NY,NX)=0.07
+      CFOSC(2,1,L,NY,NX)=0.25
+      CFOSC(3,1,L,NY,NX)=0.38
+      CFOSC(4,1,L,NY,NX)=0.30
+C
+C     OLD DECIDUOUS FOREST
+C
+      ELSEIF(IXTYP(1,NY,NX).EQ.10)THEN
+      CFOSC(1,1,L,NY,NX)=0.02
+      CFOSC(2,1,L,NY,NX)=0.06
+      CFOSC(3,1,L,NY,NX)=0.34
+      CFOSC(4,1,L,NY,NX)=0.58
+C
+C     OLD CONIFEROUS FOREST
+C
+      ELSEIF(IXTYP(1,NY,NX).EQ.11)THEN
+      CFOSC(1,1,L,NY,NX)=0.02
+      CFOSC(2,1,L,NY,NX)=0.06
+      CFOSC(3,1,L,NY,NX)=0.34
+      CFOSC(4,1,L,NY,NX)=0.58
+C
+C     DEFAULT
+C
+      ELSE
+      CFOSC(1,1,L,NY,NX)=0.075
+      CFOSC(2,1,L,NY,NX)=0.125
+      CFOSC(3,1,L,NY,NX)=0.550
+      CFOSC(4,1,L,NY,NX)=0.250
+      ENDIF
+C
+C     PREVIOUS COARSE (K=0) AND FINE (K=1) ROOTS
+C
+      ELSE
+      CFOSC(1,0,L,NY,NX)=0.00
+      CFOSC(2,0,L,NY,NX)=0.00
+      CFOSC(3,0,L,NY,NX)=0.20
+      CFOSC(4,0,L,NY,NX)=0.80
+      CFOSC(1,1,L,NY,NX)=0.02
+      CFOSC(2,1,L,NY,NX)=0.06
+      CFOSC(3,1,L,NY,NX)=0.34
+      CFOSC(4,1,L,NY,NX)=0.58
+      ENDIF
+      end subroutine init_surfr_kincomp
+C------------------------------------------------------------------------------------------
+      subroutine init_manure_kincomp(L,NY,NX)
+
+      implicit none
+      integer, intent(in) :: L, NY, NX
+C
+C     RUMINANT
+C
+      IF(IXTYP(2,NY,NX).EQ.1)THEN
+      CFOSC(1,2,L,NY,NX)=0.036
+      CFOSC(2,2,L,NY,NX)=0.044
+      CFOSC(3,2,L,NY,NX)=0.630
+      CFOSC(4,2,L,NY,NX)=0.290
+C
+C     NON-RUMINANT
+C
+      ELSEIF(IXTYP(2,NY,NX).EQ.2)THEN
+      CFOSC(1,2,L,NY,NX)=0.138
+      CFOSC(2,2,L,NY,NX)=0.401
+      CFOSC(3,2,L,NY,NX)=0.316
+      CFOSC(4,2,L,NY,NX)=0.145
+C
+C     OTHER
+C
+      ELSE
+      CFOSC(1,2,L,NY,NX)=0.138
+      CFOSC(2,2,L,NY,NX)=0.401
+      CFOSC(3,2,L,NY,NX)=0.316
+      CFOSC(4,2,L,NY,NX)=0.145
+      ENDIF
+      end subroutine init_manure_kincomp
+C------------------------------------------------------------------------------------------
+      subroutine init_pom_kincomp(L,NY,NX)
+      implicit none
+      integer, intent(in) :: L, NY, NX
+C
+C     CFOSC=single kinetic fraction in POM
+C
+      IF(L.NE.0)THEN
+      CFOSC(1,3,L,NY,NX)=1.00
+      CFOSC(2,3,L,NY,NX)=0.00
+      CFOSC(3,3,L,NY,NX)=0.00
+      CFOSC(4,3,L,NY,NX)=0.00
+C
+C     HUMUS PARTITIONED TO DIFFERENT FRACTIONS
+C     BASED ON SOC ACCUMULATION ABOVE EACH LAYER
+C
+C     NATURAL SOILS
+C
+      IF(ISOILR(NY,NX).EQ.0)THEN
+C
+C     DRYLAND SOIL
+C
+C     CORGC,FORGC=SOC,minimum SOC for organic soil(g Mg-1)
+C     DPTH,DTBLZ=depth to layer midpoint,external water table(m)
+C     FC0=partitioning to less resistant component at DPTH=0
+C     FCX=reduction in FC0 at DPTH
+C     CORGCX,CORGNX,CORGPX=C,N,P concentations in humus
+C
+      IF(CORGC(L,NY,NX).LE.FORGC.OR
+     2.DPTH(L,NY,NX).LE.DTBLZ(NY,NX)
+     2+CDPTH(NU(NY,NX),NY,NX)-CDPTHG)THEN
+      FCY=0.60
+      IF(CORGCX(4).GT.1.0E-32)THEN
+      FC0=FCY*EXP(-5.0*(AMIN1(CORGNX(4),10.0*CORGPX(4))
+     2/CORGCX(4)))
+      ELSE
+      FCO=FCY
+      ENDIF
+      FCX=EXP(HCX*TORGL(L))
+C
+C     WETLAND
+C
+      ELSE
+      FCY=0.60
+      IF(CORGCX(4).GT.1.0E-32)THEN
+      FC0=FCY*EXP(-5.0*(AMIN1(CORGNX(4),10.0*CORGPX(4))
+     2/CORGCX(4)))
+      ELSE
+      FCO=FCY
+      ENDIF
+C     FCX=(EXP(HCX*TORGL(L)))**0.5
+      FCX=EXP(HCX*TORGL(L))
+      ENDIF
+C
+C     RECONSTRUCTED SOILS
+C
+      ELSE
+      FCY=0.30
+      IF(CORGCX(4).GT.1.0E-32)THEN
+      FC0=FCY*EXP(-5.0*(AMIN1(CORGNX(4),10.0*CORGPX(4))
+     2/CORGCX(4)))
+      ELSE
+      FCO=FCY
+      ENDIF
+      FCX=1.0
+      ENDIF
+C
+C     PARTITION HUMUS
+C
+C     CFOSC=fraction of humus in less(1),more(2) resistant component
+C
+      FC1=FC0*FCX
+      CFOSC(1,4,L,NY,NX)=FC1
+      CFOSC(2,4,L,NY,NX)=1.0-FC1
+      CFOSC(3,4,L,NY,NX)=0.00
+      CFOSC(4,4,L,NY,NX)=0.00
+C
+C     MICROBIAL DETRITUS ALLOCATED TO HUMUS MAINTAINS
+C     HUMUS PARTITIONING TO COMPONENTS
+C
+C     CFOMC=fraction of microbial litter allocated to humus components
+C
+      CFOMC(1,L,NY,NX)=3.0*FC1/(2.0*FC1+1.0)
+      CFOMC(2,L,NY,NX)=1.0-CFOMC(1,L,NY,NX)
+C     WRITE(*,5432)'PART',L,FC0,FC1,FCX,HCX,TORGM,TORGL(L)
+C    2,CORGCX(4),CORGNX(4),CORGPX(4),DPTH(L,NY,NX),DTBLZ(NY,NX)
+C    3,CDPTH(NU(NY,NX),NY,NX),CDPTHG,CORGC(L,NY,NX),FORGC
+C    4,EXP(HCX*TORGL(L))
+5432  FORMAT(A8,I4,20E12.4)
+      ENDIF
+      end subroutine init_pom_kincomp
+C------------------------------------------------------------------------------------------
+      subroutine init_snow_layers
+C
+C     CDPTHS=depth to bottom
+C     DENS0=snow density (Mg m-3)
+C     VOLSS,VOLWS,VOLIS,VOLS=snow,water,ice,total snowpack volume(m3)
+C     DPTHA=active layer depth (m)
+C     CDPTHSI=depth to bottom of snowpack layers
+C     DLYRS=snowpack layer thickness (m)
+C     VOLSSL,VOLWSL,VOLISL,VOLSL=snow,water,ice,total layer volume(m3)
+C     DENSS=layer density (Mg m-3)
+C     TKW,TCW=later temperature K,oC
+C     VHCPW=layer volumetric heat capacity (MJ m-3 K-1)
+C
+      CDPTHS(0,NY,NX)=0.0
+      DENS0(NY,NX)=0.10
+      VOLSS(NY,NX)=DPTHS(NY,NX)*DENS0(NY,NX)*DH(NY,NX)*DV(NY,NX)
+      VOLWS(NY,NX)=0.0
+      VOLIS(NY,NX)=0.0
+      VOLS(NY,NX)=VOLSS(NY,NX)/DENS0(NY,NX)+VOLWS(NY,NX)+VOLIS(NY,NX)
+      DPTHA(NY,NX)=9999.0
+      VOLSWI=0.0
+      DO 9580 L=1,JS
+      IF(L.EQ.1)THEN
+      DLYRSI=CDPTHSI(L)
+      DLYRS(L,NY,NX)=AMIN1(DLYRSI,DPTHS(NY,NX))
+      ELSE
+      DLYRSI=CDPTHSI(L)-CDPTHSI(L-1)
+      DLYRS(L,NY,NX)=AMIN1(DLYRSI,AMAX1(0.0
+     2,DPTHS(NY,NX)-CDPTHSI(L-1)))
+      ENDIF
+      VOLSSL(L,NY,NX)=DLYRS(L,NY,NX)*DENS0(NY,NX)
+     2*DH(NY,NX)*DV(NY,NX)
+      VOLWSL(L,NY,NX)=0.0
+      VOLISL(L,NY,NX)=0.0
+      IF(L.EQ.1)THEN
+      VOLSWI=VOLSWI+0.5*(VOLSSL(L,NY,NX)+VOLWSL(L,NY,NX)
+     2+VOLISL(L,NY,NX)*DENSI)
+      ELSE
+      VOLSWI=VOLSWI+0.5*(VOLSSL(L-1,NY,NX)+VOLWSL(L-1,NY,NX)
+     2+VOLISL(L-1,NY,NX)*DENSI+VOLSSL(L,NY,NX)+VOLWSL(L,NY,NX)
+     2+VOLISL(L,NY,NX)*DENSI)
+      ENDIF
+      DENSS(L,NY,NX)=DENS0(NY,NX)
+      VOLSL(L,NY,NX)=VOLSSL(L,NY,NX)/DENSS(L,NY,NX)
+     2+VOLWSL(L,NY,NX)+VOLISL(L,NY,NX)
+      VOLSI(L,NY,NX)=DLYRSI*DH(NY,NX)*DV(NY,NX)
+      CDPTHS(L,NY,NX)=CDPTHS(L-1,NY,NX)+DLYRS(L,NY,NX)
+      TKW(L,NY,NX)=AMIN1(273.15,ATKA(NY,NX))
+      TCW(L,NY,NX)=AMIN1(0.0,ATCA(NY,NX))
+      VHCPW(L,NY,NX)=2.095*VOLSSL(L,NY,NX)+4.19*VOLWSL(L,NY,NX)
+     2+1.9274*VOLISL(L,NY,NX)
+9580  CONTINUE
+      end subroutine init_snow_layers
+C------------------------------------------------------------------------------------------
+      subroutine init_CNP_ratios
+C     CNOFC,CPOFC=fractions to allocate N,P to kinetic components
+C     CNOMC,CPOMC=maximum N:C and P:C ratios in microbial biomass
+C
+      CNOFC(1,0)=0.005
+      CNOFC(2,0)=0.005
+      CNOFC(3,0)=0.005
+      CNOFC(4,0)=0.020
+      CPOFC(1,0)=0.0005
+      CPOFC(2,0)=0.0005
+      CPOFC(3,0)=0.0005
+      CPOFC(4,0)=0.0020
+      CNOFC(1,1)=0.020
+      CNOFC(2,1)=0.020
+      CNOFC(3,1)=0.020
+      CNOFC(4,1)=0.020
+      CPOFC(1,1)=0.0020
+      CPOFC(2,1)=0.0020
+      CPOFC(3,1)=0.0020
+      CPOFC(4,1)=0.0020
+      CNOFC(1,2)=0.020
+      CNOFC(2,2)=0.020
+      CNOFC(3,2)=0.020
+      CNOFC(4,2)=0.020
+      CPOFC(1,2)=0.0020
+      CPOFC(2,2)=0.0020
+      CPOFC(3,2)=0.0020
+      CPOFC(4,2)=0.0020
+      FL(1)=0.55
+      FL(2)=0.45
+      DO 95 K=0,5
+      DO 95 N=1,7
+      IF(K.LE.4.AND.N.EQ.3)THEN
+      CNOMC(1,N,K)=0.15
+      CNOMC(2,N,K)=0.09
+      CPOMC(1,N,K)=0.015
+      CPOMC(2,N,K)=0.009
+      ELSE
+      CNOMC(1,N,K)=0.225
+      CNOMC(2,N,K)=0.135
+      CPOMC(1,N,K)=0.0225
+      CPOMC(2,N,K)=0.0135
+      ENDIF
+      CNOMC(3,N,K)=FL(1)*CNOMC(1,N,K)+FL(2)*CNOMC(2,N,K)
+      CPOMC(3,N,K)=FL(1)*CPOMC(1,N,K)+FL(2)*CPOMC(2,N,K)
+95    CONTINUE
+      end subroutine init_CNP_ratios
+C------------------------------------------------------------------------------------------
+      subroutine init_grid_elevation(NHW,NHE,NVN,NVS)
+      implicit none
+      integer, intent(in) :: NHW,NHE,NVN,NVS
+C     GAZI=ground surface azimuth
+C     GSIN,GCOS=sine,cosine of ground surface
+C     OMEGAG=incident sky angle at ground surface
+C     SLOPE=sine of ground surface slope in (0)aspect, (1)EW,(2)NS directions
+C     ALT=ground surface elevation
+C     ALTY=maximum surface elevation in landscape
+C     IRCHG=runoff boundary flags:0=not possible,1=possible
+C
+      ALTY=0.0
+      DO 9985 NX=NHW,NHE
+      DO 9980 NY=NVN,NVS
+      ZEROS(NY,NX)=ZERO*DH(NY,NX)*DV(NY,NX)
+      ZEROS2(NY,NX)=ZERO2*DH(NY,NX)*DV(NY,NX)
+      GAZI(NY,NX)=ASP(NY,NX)/RDN
+      GSINA(NY,NX)=ABS(SIN(GAZI(NY,NX)))
+      GCOSA(NY,NX)=ABS(COS(GAZI(NY,NX)))
+      SLOPE(0,NY,NX)=AMAX1(1.745E-04,SIN(SL(NY,NX)/RDN))
+      IF(ASP(NY,NX).GE.0.0.AND.ASP(NY,NX).LT.90.0)THEN
+      SLOPE(1,NY,NX)=-SLOPE(0,NY,NX)*COS(ASP(NY,NX)/RDN)
+      SLOPE(2,NY,NX)=SLOPE(0,NY,NX)*SIN(ASP(NY,NX)/RDN)
+      IRCHG(1,1,NY,NX)=1
+      IRCHG(2,1,NY,NX)=0
+      IRCHG(1,2,NY,NX)=0
+      IRCHG(2,2,NY,NX)=1
+      ELSEIF(ASP(NY,NX).GE.90.0.AND.ASP(NY,NX).LT.180.0)THEN
+      SLOPE(1,NY,NX)=SLOPE(0,NY,NX)*SIN((ASP(NY,NX)-90.0)/RDN)
+      SLOPE(2,NY,NX)=SLOPE(0,NY,NX)*COS((ASP(NY,NX)-90.0)/RDN)
+      IRCHG(1,1,NY,NX)=0
+      IRCHG(2,1,NY,NX)=1
+      IRCHG(1,2,NY,NX)=0
+      IRCHG(2,2,NY,NX)=1
+      ELSEIF(ASP(NY,NX).GE.180.0.AND.ASP(NY,NX).LT.270.0)THEN
+      SLOPE(1,NY,NX)=SLOPE(0,NY,NX)*COS((ASP(NY,NX)-180.0)/RDN)
+      SLOPE(2,NY,NX)=-SLOPE(0,NY,NX)*SIN((ASP(NY,NX)-180.0)/RDN)
+      IRCHG(1,1,NY,NX)=0
+      IRCHG(2,1,NY,NX)=1
+      IRCHG(1,2,NY,NX)=1
+      IRCHG(2,2,NY,NX)=0
+      ELSEIF(ASP(NY,NX).GE.270.0.AND.ASP(NY,NX).LE.360.0)THEN
+      SLOPE(1,NY,NX)=-SLOPE(0,NY,NX)*SIN((ASP(NY,NX)-270.0)/RDN)
+      SLOPE(2,NY,NX)=-SLOPE(0,NY,NX)*COS((ASP(NY,NX)-270.0)/RDN)
+      IRCHG(1,1,NY,NX)=1
+      IRCHG(2,1,NY,NX)=0
+      IRCHG(1,2,NY,NX)=1
+      IRCHG(2,2,NY,NX)=0
+      ENDIF
+      SLOPE(3,NY,NX)=-1.0
+      IF(SLOPE(1,NY,NX).NE.0.0.OR.SLOPE(2,NY,NX).NE.0.0)THEN
+      FSLOPE(1,NY,NX)=ABS(SLOPE(1,NY,NX))
+     2/(ABS(SLOPE(1,NY,NX))+ABS(SLOPE(2,NY,NX)))
+      FSLOPE(2,NY,NX)=ABS(SLOPE(2,NY,NX))
+     2/(ABS(SLOPE(1,NY,NX))+ABS(SLOPE(2,NY,NX)))
+      ELSE
+      FSLOPE(1,NY,NX)=0.5
+      FSLOPE(2,NY,NX)=0.5
+      ENDIF
+      GSIN(NY,NX)=SLOPE(0,NY,NX)
+      GCOS(NY,NX)=SQRT(1.0-GSIN(NY,NX)**2)
+      DO 240 N=1,4
+      DGAZI=COS(GAZI(NY,NX)-YAZI(N))
+      OMEGAG(N,NY,NX)=AMAX1(0.0,AMIN1(1.0,GCOS(NY,NX)*YSIN(N)
+     2+GSIN(NY,NX)*YCOS(N)*DGAZI))
+240   CONTINUE
+      IF(NX.EQ.NHW)THEN
+      IF(NY.EQ.NVN)THEN
+      ALT(NY,NX)=0.5*DH(NY,NX)*SLOPE(1,NY,NX)
+     2+0.5*DV(NY,NX)*SLOPE(2,NY,NX)
+      ELSE
+      ALT(NY,NX)=ALT(NY-1,NX)
+     2+1.0*DH(NY,NX)*SLOPE(1,NY,NX)
+     4+0.5*DV(NY-1,NX)*(SLOPE(2,NY-1,NX))
+     5+0.5*DV(NY,NX)*SLOPE(2,NY,NX)
+      ENDIF
+      ELSE
+      IF(NY.EQ.NVN)THEN
+      ALT(NY,NX)=ALT(NY,NX-1)
+     2+0.5*DH(NY,NX-1)*SLOPE(1,NY,NX-1)
+     3+0.5*DH(NY,NX)*SLOPE(1,NY,NX)
+     2+0.5*DV(NY,NX-1)*SLOPE(2,NY,NX-1)
+     3+0.5*DV(NY,NX)*SLOPE(2,NY,NX)
+      ELSE
+      ALT(NY,NX)=(ALT(NY,NX-1)
+     2+0.5*DH(NY,NX-1)*SLOPE(1,NY,NX-1)
+     3+0.5*DH(NY,NX)*SLOPE(1,NY,NX)
+     4+ALT(NY-1,NX)
+     4+0.5*DV(NY-1,NX)*SLOPE(2,NY-1,NX)
+     5+0.5*DV(NY,N)*SLOPE(2,NY,NX))/2.0
+      ENDIF
+      ENDIF
+      IF(NX.EQ.NHW.AND.NY.EQ.NVN)THEN
+      ALTY=ALT(NY,NX)
+      ELSE
+      ALTY=MAX(ALTY,ALT(NY,NX))
+      ENDIF
+      WRITE(*,1111)'ALT',NX,NY,((IRCHG(NN,N,NY,NX),NN=1,2),N=1,2)
+     2,ALT(NY,NX),DH(NY,NX),DV(NY,NX),ASP(NY,NX),SL(NY,NX)
+     3,SLOPE(0,NY,NX),SLOPE(1,NY,NX),SLOPE(2,NY,NX)
+     4,GSIN(NY,NX),GCOSA(NY,NX),GSINA(NY,NX)
+1111  FORMAT(A8,6I4,20E12.4)
+9980  CONTINUE
+9985  CONTINUE
+      end subroutine init_grid_elevation
+C------------------------------------------------------------------------------------------
+      subroutine init_control_paras
+C
+C     NPH=no. of cycles h-1 for water, heat and solute flux calculns
+C     NPT=number of cycles NPH-1 for gas flux calculations
+C     NPG=number of cycles h-1 for gas flux calculations
+C     NPR,NPS=number of cycles NPH-1 for litter,snowpack flux calculns
+C     THETX=minimum air-filled porosity for gas flux calculations
+C     THETPI,DENSI=ice porosity,density
+C
+      NPH=NPX
+      NPT=NPY
+      NPG=NPH*NPT
+      NPR=30
+      NPS=10
+      XNPH=1.0/NPH
+      XNPT=1.0/NPT
+      XNPG=1.0/NPG
+      XNPR=1.0/NPR
+      XNPS=1.0/NPS
+      XNPY=XNPH*XNPS
+      XNPZ=XNPH*XNPR
+      XNPQ=XNPZ*XNPS
+      XNPV=XNPR*XNPS
+      XNPD=600.0*XNPG
+      XNPX=AMIN1(1.0,20.0*XNPH)
+      XNPA=XNPX*XNPS
+      XNPB=XNPX*XNPR
+      XNPC=XNPX*XNPV
+C     NDIM=1
+C     IF(NHE.GT.NHW)NDIM=NDIM+1
+C     IF(NVS.GT.NVN)NDIM=NDIM+1
+C     XDIM=1.0/NDIM
+      ZERO=1.0E-15
+      ZERO2=1.0E-08
+      TAREA=0.0
+      THETX=1.0E-03
+      THETPI=0.00
+      DENSI=0.92-THETPI
+      DENSJ=1.0-DENSI
+C
+C     INITIALIZE MASS BALANCE CHECKS
+C
+      CRAIN=0.0
+      HEATIN=0.0
+      CO2GIN=0.0
+      OXYGIN=0.0
+      H2GIN=0.0
+      TZIN=0.0
+      ZN2GIN=0.0
+      TPIN=0.0
+      TORGF=0.0
+      TORGN=0.0
+      TORGP=0.0
+      VOLWOU=0.0
+      CEVAP=0.0
+      CRUN=0.0
+      HEATOU=0.0
+      OXYGOU=0.0
+      H2GOU=0.0
+      TSEDOU=0.0
+      TCOU=0.0
+      TZOU=0.0
+      TPOU=0.0
+      XCSN=0.0
+      XZSN=0.0
+      XPSN=0.0
+      TIONIN=0.0
+      TIONOU=0.0
+      VAP=2465.0
+      VAPS=2834.0
+      OXKM=0.080
+      TYSIN=0.0
+      end subroutine init_control_paras
+C------------------------------------------------------------------------------------------
+      subroutine init_accumulators(NY,NX)
+      implicit none
+      integer, intent(in) :: NY, NX
+
+      DO 600 N=1,12
+      TDTPX(NY,NX,N)=0.0
+      TDTPN(NY,NX,N)=0.0
+      TDRAD(NY,NX,N)=1.0
+      TDWND(NY,NX,N)=1.0
+      TDHUM(NY,NX,N)=1.0
+      TDPRC(NY,NX,N)=1.0
+      TDIRI(NY,NX,N)=1.0
+      TDCO2(NY,NX,N)=1.0
+      TDCN4(NY,NX,N)=1.0
+      TDCNO(NY,NX,N)=1.0
+600   CONTINUE
+      IUTYP(NY,NX)=0
+      IFNHB(NY,NX)=0
+      IFNOB(NY,NX)=0
+      IFPOB(NY,NX)=0
+      IFLGS(NY,NX)=1
+      IFLGT(NY,NX)=0
+      ATCA(NY,NX)=ATCAI(NY,NX)
+      ATCS(NY,NX)=ATCAI(NY,NX)
+      ATKA(NY,NX)=ATCA(NY,NX)+273.15
+      ATKS(NY,NX)=ATCS(NY,NX)+273.15
+      URAIN(NY,NX)=0.0
+      UCO2G(NY,NX)=0.0
+      UCH4G(NY,NX)=0.0
+      UOXYG(NY,NX)=0.0
+      UN2GG(NY,NX)=0.0
+      UN2OG(NY,NX)=0.0
+      UNH3G(NY,NX)=0.0
+      UN2GS(NY,NX)=0.0
+      UCO2F(NY,NX)=0.0
+      UCH4F(NY,NX)=0.0
+      UOXYF(NY,NX)=0.0
+      UN2OF(NY,NX)=0.0
+      UNH3F(NY,NX)=0.0
+      UPO4F(NY,NX)=0.0
+      UORGF(NY,NX)=0.0
+      UFERTN(NY,NX)=0.0
+      UFERTP(NY,NX)=0.0
+      UVOLO(NY,NX)=0.0
+      UEVAP(NY,NX)=0.0
+      URUN(NY,NX)=0.0
+      USEDOU(NY,NX)=0.0
+      UCOP(NY,NX)=0.0
+      UDOCQ(NY,NX)=0.0
+      UDOCD(NY,NX)=0.0
+      UDONQ(NY,NX)=0.0
+      UDOND(NY,NX)=0.0
+      UDOPQ(NY,NX)=0.0
+      UDOPD(NY,NX)=0.0
+      UDICQ(NY,NX)=0.0
+      UDICD(NY,NX)=0.0
+      UDINQ(NY,NX)=0.0
+      UDIND(NY,NX)=0.0
+      UDIPQ(NY,NX)=0.0
+      UDIPD(NY,NX)=0.0
+      UIONOU(NY,NX)=0.0
+      UXCSN(NY,NX)=0.0
+      UXZSN(NY,NX)=0.0
+      UXPSN(NY,NX)=0.0
+      UDRAIN(NY,NX)=0.0
+      ZDRAIN(NY,NX)=0.0
+      PDRAIN(NY,NX)=0.0
+      DPNH4(NY,NX)=0.0
+      DPNO3(NY,NX)=0.0
+      DPPO4(NY,NX)=0.0
+      OXYS(0,NY,NX)=0.0
+      FRADG(NY,NX)=1.0
+      THRMG(NY,NX)=0.0
+      THRMC(NY,NX)=0.0
+      TRN(NY,NX)=0.0
+      TLE(NY,NX)=0.0
+      TSH(NY,NX)=0.0
+      TGH(NY,NX)=0.0
+      TLEC(NY,NX)=0.0
+      TSHC(NY,NX)=0.0
+      TLEX(NY,NX)=0.0
+      TSHX(NY,NX)=0.0
+      TCNET(NY,NX)=0.0
+      TVOLWC(NY,NX)=0.0
+      ARLFC(NY,NX)=0.0
+      ARSTC(NY,NX)=0.0
+      TFLWC(NY,NX)=0.0
+      PPT(NY,NX)=0.0
+      DYLN(NY,NX)=12.0
+      ALBX(NY,NX)=ALBS(NY,NX)
+      XHVSTC(NY,NX)=0.0
+      XHVSTN(NY,NX)=0.0
+      XHVSTP(NY,NX)=0.0
+      ENGYP(NY,NX)=0.0
+      end subroutine init_accumulators
+C------------------------------------------------------------------------------------------
+      subroutine init_layer_depths(NY,NX)
+
+      implicit none
+      integer, intent(in) :: NY, NX
+
+      DO 1195 L=0,NL(NY,NX)
+C
+C     LAYER DEPTHS AND THEIR PHYSICAL PROPERTIES
+C
+C     surface litter:L=0,soil layer:L>0
+C     DLYR,AREA=layer thickness,x-sectional area:1=EW,2=NS,3=vertical
+C     ORGC=organic C content
+C     VOLT,VOLX=volume including,excluding macropores+rock
+C     BKVL=mass
+C     CDPTH,DPTH=depth to bottom,midpoint
+C
+      DLYRI(1,L,NY,NX)=DH(NY,NX)
+      DLYRI(2,L,NY,NX)=DV(NY,NX)
+      DLYR(1,L,NY,NX)=DLYRI(1,L,NY,NX)
+      DLYR(2,L,NY,NX)=DLYRI(2,L,NY,NX)
+      AREA(3,L,NY,NX)=DLYR(1,L,NY,NX)*DLYR(2,L,NY,NX)
+      IF(L.EQ.0)THEN
+      TAREA=TAREA+AREA(3,L,NY,NX)
+      CDPTHZ(L,NY,NX)=0.0
+      ORGC(L,NY,NX)=(RSC(0,L,NY,NX)+RSC(1,L,NY,NX)+RSC(2,L,NY,NX))
+     2*AREA(3,L,NY,NX)
+      ORGCX(L,NY,NX)=ORGC(L,NY,NX)
+      VOLR(NY,NX)=(RSC(0,L,NY,NX)*1.0E-06/BKRS(0)
+     2+RSC(1,L,NY,NX)*1.0E-06/BKRS(1)+RSC(2,L,NY,NX)*1.0E-06/BKRS(2))
+     2*AREA(3,L,NY,NX)
+      VOLT(L,NY,NX)=VOLR(NY,NX)
+      VOLX(L,NY,NX)=VOLT(L,NY,NX)
+      VOLY(L,NY,NX)=VOLX(L,NY,NX)
+      VOLTI(L,NY,NX)=VOLT(L,NY,NX)
+      BKVL(L,NY,NX)=1.82E-06*ORGC(L,NY,NX)
+      DLYRI(3,L,NY,NX)=VOLX(L,NY,NX)/AREA(3,L,NY,NX)
+      DLYR(3,L,NY,NX)=DLYRI(3,L,NY,NX)
+      ELSE
+      IF(BKDSI(L,NY,NX).LE.ZERO)FHOL(L,NY,NX)=0.0
+      DLYRI(3,L,NY,NX)=(CDPTH(L,NY,NX)-CDPTH(L-1,NY,NX))
+C      if(abs(DLYRI(3,L,NY,NX))<1.e-10_r8)then
+C      print*,'L,NX,NY=',L,NX,NY
+C      print*,'DLYRI(3,L,NY,NX)=',DLYRI(3,L,NY,NX)
+C      call print_info('CDPTH(L,NY,NX)',(/padr('CDPTH(L)',12),
+C      2padr('CDPTH(L-1)',12)/),
+C      3(/CDPTH(L,NY,NX),CDPTH(L-1,NY,NX)/))
+C      endif
+      DLYR(3,L,NY,NX)=DLYRI(3,L,NY,NX)
+      DPTH(L,NY,NX)=0.5*(CDPTH(L,NY,NX)+CDPTH(L-1,NY,NX))
+      CDPTHZ(L,NY,NX)=CDPTH(L,NY,NX)-CDPTH(NU(NY,NX),NY,NX)
+     2+DLYR(3,NU(NY,NX),NY,NX)
+      DPTHZ(L,NY,NX)=0.5*(CDPTHZ(L,NY,NX)+CDPTHZ(L-1,NY,NX))
+      VOLT(L,NY,NX)=amax1(AREA(3,L,NY,NX)*DLYR(3,L,NY,NX),1.e-8_r8)
+C      if(abs(DLYR(3,L,NY,NX))<1.e-10_r8)then
+C      print*,'L,NX,NY=',L,NX,NY
+C      print*,'VOLT(L,NY,NX)=',VOLT(L,NY,NX)
+C      call print_info('DLYR(3,L,NY,NX)==0.',(/padr('DLYR(3)',10)/),
+C     2(/DLYR(3,L,NY,NX)/))
+C      endif
+      VOLX(L,NY,NX)=VOLT(L,NY,NX)*FMPR(L,NY,NX)
+      VOLY(L,NY,NX)=VOLX(L,NY,NX)
+      VOLTI(L,NY,NX)=VOLT(L,NY,NX)
+      BKVL(L,NY,NX)=BKDS(L,NY,NX)*VOLX(L,NY,NX)
+      RTDNT(L,NY,NX)=0.0
+      ENDIF
+      AREA(1,L,NY,NX)=DLYR(3,L,NY,NX)*DLYR(2,L,NY,NX)
+      AREA(2,L,NY,NX)=DLYR(3,L,NY,NX)*DLYR(1,L,NY,NX)
+1195  CONTINUE
+      CDPTH(0,NY,NX)=CDPTH(NU(NY,NX),NY,NX)-DLYR(3,NU(NY,NX),NY,NX)
+      CDPTHI(NY,NX)=CDPTH(0,NY,NX)
+      end subroutine init_layer_depths
       end module StartsMod

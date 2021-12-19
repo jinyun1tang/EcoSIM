@@ -39,7 +39,7 @@
       real(r8) :: TCSNX,TTRN,TTLE,TTSH,TTGH,TTCO,TTCH
 
       integer :: L,NX,NY,N
-      
+
       real(r8) :: OUT(100),SWC(JY,JX)
       real(r8), PARAMETER :: DEFAULT=-9999
 
@@ -49,7 +49,7 @@
 
       public :: visual
       contains
-      
+
       SUBROUTINE visual(I,J,NHW,NHE,NVN,NVS)
 
       implicit none

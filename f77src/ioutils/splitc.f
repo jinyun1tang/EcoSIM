@@ -1,6 +1,7 @@
 
       SUBROUTINE splitc(NT,NE,NAX,NDX,NTX,NEX,NHW,NHE,NVN,NVS)
       use data_kind_mod, only : r8 => SHR_KIND_R8
+      use abortutils, only : endrun
       implicit none
       integer, intent(in) :: NT,NE,NAX,NDX,NTX,NEX,NHW,NHE,NVN,NVS
       include "parameters.h"
@@ -28,13 +29,13 @@ C     execution begins here
 C          call splits(NHW,NHE,NVN,NVS,OUTS(N))
           call splits(NHW,NHE,NVN,NVS,outdir,OUTS(N), failure)
           if(failure==1)call endrun('Fail to process file '//
-     2trim(outdir)//trim(OUTS(N))//' in '//trim(modfile),29)
+     2trim(outdir)//trim(OUTS(N))//' in '//trim(modfile))
           str='rm -f ' // OUTS(N)
           call system (str)
 C          call splitp(NHW,NHE,NVN,NVS,nz,OUTP(N))
           call splitp(NHW,NHE,NVN,NVS,nz,outdir, OUTP(N), failure)
           if(failure==1)call endrun('Fail to process file '//
-     2trim(outdir)//trim(OUTP(N))//' in '//trim(modfile),35)
+     2trim(outdir)//trim(OUTP(N))//' in '//trim(modfile))
           str = 'rm -f ' // OUTP(N)
           call system (str)
         endif

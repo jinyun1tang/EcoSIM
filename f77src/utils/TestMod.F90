@@ -1,5 +1,6 @@
 module TestMod
   use data_kind_mod, only : r8 => SHR_KIND_R8
+  use abortutils, only : endrun  
 implicit none
 
   private

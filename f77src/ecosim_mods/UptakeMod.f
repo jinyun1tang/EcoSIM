@@ -75,16 +75,15 @@
       real(r8) :: ZNHBX,ZPOOLX,Z2OA1,Z2OP1,Z2OS1,ZH3A1,ZH3P1,ZH3S1
       real(r8) :: ZH3B1,Z2SGL1,ZHSGL1,ZVSGL1,ZNSGL1,Z2OG1,ZH3G1
       real(r8) :: ZH3PA,ZH3PB,ZH3GA,ZH3GB,Z2OPX,ZH3PX
-      
-      integer :: IC,ICHK,K,L,M,MX,NN,N,NB,NZZ,NR,NX,NY,NZ      
-      integer :: I,J
-      
+
+      integer :: IC,ICHK,MX,NB,NZZ,NR
+
       real(r8) :: PSIST1(JZ),PATH(2,JZ),RRADL(2,JZ)
      2,RSRT(2,JZ),RSRG(2,JZ),RSR1(2,JZ),RSR2(2,JZ)
      3,RSSX(2,JZ),RSRS(2,JZ),WTRTG(JZ),FPQ(2,JZ,05),FPP(2,JZ,05)
      4,RACZ(JP,JY,JX),FRTDPX(JZ,05),RTARR(2,JZ)
      5     ,VOLPU(JZ),VOLWU(JZ)
-      
+
       integer :: ILYR(2,JZ)
 C
 C     MXN=max number of cycles in convergence soln for water uptake
@@ -116,7 +115,7 @@ C
 
       public :: uptake
       contains
-      
+
       SUBROUTINE uptake(I,J,NHW,NHE,NVN,NVS)
 C
 C     THIS SUBROUTINE CALCULATES EXCHANGES OF ENERGY, C, N AND P
@@ -126,12 +125,14 @@ C
       integer, intent(in) :: I, J
       integer, intent(in) :: NHW,NHE,NVN,NVS
 
+      integer :: NN,N,NX,NY,NZ,K,L
+
 C     execution begins here
 
       DO 9995 NX=NHW,NHE
       DO 9990 NY=NVN,NVS
 
-      call stage_for_uptake
+      call stage_for_uptake(NY,NX)
 
 C
 C     IF PLANT SPECIES EXISTS
@@ -141,13 +142,13 @@ C
       OSTRD=0.0
       IF(IFLGC(NZ,NY,NX).EQ.1.AND.PP(NZ,NY,NX).GT.0.0)THEN
 
-      call calc_canopy_vars
+      call calc_canopy_vars(NZ,NY,NX)
 
 C     STOMATE=solve for minimum canopy stomatal resistance
       CALL STOMATE(I,J,NZ,NY,NX)
 C
 C     CALCULATE VARIABLES USED IN ROOT UPTAKE OF WATER AND NUTRIENTS
-      call calc_root_vars
+      call calc_root_vars(NZ,NY,NX)
 
 C
 C     CALCULATE CANOPY WATER STATUS FROM CONVERGENCE SOLUTION FOR
@@ -167,7 +168,7 @@ C     (AG: - originally this line had a N0B1 here )
      5.AND.(RTDP1(1,1,NZ,NY,NX).GT.SDPTH(NZ,NY,NX)+CDPTHZ(0,NY,NX)))THEN
 C
 
-      call calc_resistance(CNDT, PSILH)
+      call calc_resistance(NZ,NY,NX)
 
 C
 C     INITIALIZE CANOPY WATER POTENTIAL, OTHER VARIABLES USED IN ENERGY
@@ -208,8 +209,7 @@ C
 C     CONVERGENCE SOLUTION
 C
 
-      NN=test_convergence(TKCX, VHCPX, WVPLT, HFLWC1, PSILH, FPC,
-     2MXN,DIFF,UPRT,VFLXC)
+      NN=test_convergence(I,J,NZ,NY,NX)
 C
 C     FINAL CANOPY TEMPERATURE, DIFFERENCE WITH AIR TEMPERATURE
 C
@@ -224,21 +224,20 @@ C
 C     IF CONVERGENCE NOT ACHIEVED (RARE), SET DEFAULT
 C     TEMPERATURES, ENERGY FLUXES, WATER POTENTIALS, RESISTANCES
 C
-      call handling_divergence(DIFF,NN, FDMP)
+      call handling_divergence(I,J,NN,NZ,NY,NX)
 
-      call update_canopy_water(TKCX, VHCPX, UPRT,
-     2HFLWC1, VFLXC)
+      call update_canopy_water(NZ,NY,NX)
 
 C
 C     DEFAULT VALUES IF PLANT SPECIES DOES NOT EXIST
 C
       ELSE
-      call set_bare_soil(FDMP)
+      call set_bare_soil(NZ,NY,NX)
       ENDIF
 
-      call set_canopy_growth_fT
+      call set_canopy_growth_fT(NZ,NY,NX)
 
-      call canopy_nh3_flux(FDMP)
+      call canopy_nh3_flux(NZ,NY,NX)
 
 C
 C     ROOT(N=1) AD MYCORRHIZAL(N=2) O2 AND NUTRIENT UPTAKE
@@ -259,8 +258,7 @@ C
       TFP14X=0.0
       TFP1BX=0.0
 
-      call get_uptake_capcity(FWSRT, FCUP, FZUP, FPUP,
-     2UPWTRP, UPWTRH, FOXYX)
+      call get_uptake_capcity(N,L,NZ,NY,NX)
 
       TFOXYX=TFOXYX+FOXYX
 C
@@ -273,12 +271,12 @@ C     FOXYX=fraction of total O2 demand from previous hour
 C
       ROXYP(N,L,NZ,NY,NX)=2.667*RCO2M(N,L,NZ,NY,NX)
 
-      call root_soil_gas_exchange(FOXYX, RUPOXT)
+      call root_soil_gas_exchange(N,L,NZ,NY,NX)
 
       OSTRD=OSTRD+ROXYP(N,L,NZ,NY,NX)
       OSTRN=OSTRN+RUPOXT
 
-      call root_exudates
+      call root_exudates(N,L,NZ,NY,NX)
 
 C
 C     NUTRIENT UPTAKE
@@ -294,25 +292,23 @@ C
 C
 C     FZUP=limitn to active uptake respiration from CZPOLR
 C
-      call uptake_minN(FCUP, FZUP, UPWTRP, FWSRT,
-     2TFNH4X, TFNO3X, TFNHBX, TFNOBX)
+      call uptake_minN(N,L,NZ,NY,NX)
 
 C
 C     FPUP=limitn to active uptake respiration from CPPOLR
 C
-      call uptake_minP(FCUP, FPUP, UPWTRP, FWSRT,
-     2TFPO4X,TFP14X,TFPOBX,TFP1BX)
+      call uptake_minP(N,L,NZ,NY,NX)
 
       ELSE
-      call noactive_uptake(N,L)
+      call noactive_uptake(N,L,NZ,NY,NX)
 
       ENDIF
       ELSE
-      call zero_uptake(N,L)
+      call zero_uptake(N,L,NZ,NY,NX)
 
       ENDIF
 
-      call sumup_nutrient_uptk(N,L)
+      call sumup_nutrient_uptk(N,L,NZ,NY,NX)
 
 950   CONTINUE
 955   CONTINUE
@@ -331,13 +327,15 @@ C
       END subroutine uptake
 C------------------------------------------------------------------------
 
-      subroutine stage_for_uptake
+      subroutine stage_for_uptake(NY,NX)
+      implicit none
+      integer, intent(in) :: NY, NX
+      integer :: NZ, L, N
 C
 C     RESET TOTAL UPTAKE ARRAYS
 C
 C     ARLFP,ARSTP=leaf,stalk areas
 C
-      real(r8) :: ARLSC
 
       ARLSC=0.0
       DO 9984 NZ=1,NP0(NY,NX)
@@ -415,9 +413,12 @@ C     ENDIF
 9000  CONTINUE
       end subroutine stage_for_uptake
 C------------------------------------------------------------------------
-      subroutine calc_canopy_vars
+      subroutine calc_canopy_vars(NZ,NY,NX)
 
-      real(r8) :: TFRADP, ALFZ
+      implicit none
+      integer, intent(in) :: NZ,NY,NX
+
+      integer :: NB,K,L,N
 C
 C     APPLY CLUMPING FACTOR TO LEAF SURFACE AREA DEFINED BY
 C     INCLINATION N, LAYER L, NODE K, BRANCH NB, SPECIES NZ,
@@ -503,7 +504,13 @@ C
       TKCZ(NZ,NY,NX)=TKA(NY,NX)+DTKC(NZ,NY,NX)
       end subroutine calc_canopy_vars
 C------------------------------------------------------------------------
-      subroutine calc_root_vars
+      subroutine calc_root_vars(NZ,NY,NX)
+
+      implicit none
+      integer, intent(in) :: NZ,NY,NX
+
+      integer :: N,L
+
 C     RTDPZ,RTDP1=primary root depth
 C     FRTDPX=fraction of each soil layer with primary root
 C     DLYR=layer thickness
@@ -581,14 +588,13 @@ C     ENDIF
       end subroutine calc_root_vars
 C------------------------------------------------------------------------
 
-      subroutine handling_divergence(DIFF,NN, FDMP)
+      subroutine handling_divergence(I,J,NN,NZ,NY,NX)
 
-      real(r8), intent(in) :: DIFF
-      integer, intent(in) :: NN
-      real(r8), intent(out) :: FDMP
-C     local variables
-      real(r8) :: FTHRM, APSILT, CCPOLT, OSWT, APSIRT
-      real(r8) :: FDMR
+      implicit none
+      integer, intent(in) :: NN, I, J
+      integer, intent(in) :: NZ,NY,NX
+
+      integer :: N,L
 
       IF(NN.GE.MXN)THEN
       WRITE(*,9999)IYRC,I,J,NX,NY,NZ
@@ -637,25 +643,14 @@ C     local variables
       end subroutine handling_divergence
 
 C------------------------------------------------------------------------------
-      function test_convergence(TKCX, VHCPX, WVPLT, HFLWC1, PSILH,
-     2FPC, MXN, DIFF, UPRT, VFLXC) result(NN)
-      real(r8) , intent(in) :: TKCX
-      real(r8) , intent(in) :: VHCPX
-      real(r8) , intent(in) :: HFLWC1
-      real(r8) , intent(in) :: PSILH
-      real(r8) , intent(in) :: FPC
-      real(r8) , intent(in) :: WVPLT
-      integer, intent(in) :: MXN
-      real(r8), intent(out) :: DIFF
-      real(r8), intent(out) :: UPRT
-      real(r8), intent(out) :: VFLXC
+      function test_convergence(I,J,NZ,NY,NX) result(NN)
+      implicit none
+      integer, intent(in) :: I, J
+      integer, intent(in) :: NZ,NY,NX
 C     return variables
       integer :: NN
 C     local variables
-      integer :: ICHK, IC
-      real(r8) :: PSIL2, EPX, UPRTX, VOLWPX, XC
-      real(r8) :: RA1, PAREX, PARHX
-      real(r8) :: OSWT, CCPOLT, FTHRM, FDTHS
+      integer :: N,L
 
       CCPOLT=CCPOLP(NZ,NY,NX)+CZPOLP(NZ,NY,NX)+CPPOLP(NZ,NY,NX)
       OSWT=36.0+840.0*AMAX1(0.0,CCPOLT)
@@ -946,10 +941,12 @@ C
       return
       end function test_convergence
 C------------------------------------------------------------------------
-      subroutine calc_resistance(CNDT, PSILH)
+      subroutine calc_resistance(NZ,NY,NX)
 
-      real(r8), intent(out) :: CNDT, PSILH
-      real(r8) :: FRADW
+      implicit none
+      integer, intent(in) :: NZ, NY, NX
+
+      integer :: N, L
 C     GRAVIMETRIC WATER POTENTIAL FROM CANOPY HEIGHT
 C
 C     HTSTZ=canopy height for water uptake
@@ -1067,12 +1064,11 @@ C     ENDIF
       end subroutine calc_resistance
 C------------------------------------------------------------------------
 
-      subroutine set_bare_soil(FDMP)
+      subroutine set_bare_soil(NZ,NY,NX)
 
-      real(r8), intent(out) :: FDMP
-      real(r8) :: FDMR
-      real(r8) :: FTHRM, APSILT, CCPOLT
-      real(r8) :: OSWT, APSIRT
+      implicit none
+      integer, intent(in) :: NZ,NY,NX
+      integer :: N,L
 
       RAD1(NZ,NY,NX)=0.0
       EFLXC(NZ,NY,NX)=0.0
@@ -1119,16 +1115,12 @@ C------------------------------------------------------------------------
       end subroutine set_bare_soil
 C------------------------------------------------------------------------
 
-      subroutine update_canopy_water(TKCX, VHCPX, UPRT, HFLWC1,
-     2VFLXC)
+      subroutine update_canopy_water(NZ,NY,NX)
 
-      real(r8), intent(in) :: VHCPX
-      real(r8), intent(in) :: TKCX
-      real(r8), intent(in) :: UPRT
-      real(r8), intent(in) :: HFLWC1
-      real(r8), intent(in) :: VFLXC
-      real(r8) :: FDMR, APSIRT
-      real(r8) :: CCPOLT
+      implicit none
+      integer, intent(in) :: NZ,NY,NX
+
+      integer :: N,L
 C
 C     CANOPY SURFACE WATER STORAGE, SENSIBLE AND STORAGE HEAT FLUXES
 C     (NOT EXPLICITLY CALCULATED IN CONVERGENCE SOLUTION)
@@ -1194,10 +1186,12 @@ C     ENDIF
 
 C------------------------------------------------------------------------
 
-      subroutine set_canopy_growth_fT
+      subroutine set_canopy_growth_fT(NZ,NY,NX)
 
-      real(r8) :: TKGO
-      real(r8) :: RTK, STK, ACTV
+      implicit none
+      integer, intent(in) :: NZ,NY,NX
+
+      integer :: L
 C
 C     SET CANOPY GROWTH TEMPERATURE FROM SOIL SURFACE
 C     OR CANOPY TEMPERATURE DEPENDING ON GROWTH STAGE
@@ -1250,10 +1244,12 @@ C
       end subroutine set_canopy_growth_fT
 C------------------------------------------------------------------------
 
-      subroutine canopy_nh3_flux(FDMP)
+      subroutine canopy_nh3_flux(NZ,NY,NX)
 
-      real(r8), intent(in) :: FDMP
-      real(r8) :: CNH3P, ZPOOLB, FNH3P
+      implicit none
+      integer, intent(in) :: NZ,NY,NX
+
+      integer :: NB
 C
 C     NH3 EXCHANGE BETWEEN CANOPY AND ATMOSPHERE FROM NH3
 C     CONCENTRATION DIFFERENCES 'CNH3E' (ATMOSPHERE FROM 'READS') AND
@@ -1294,9 +1290,13 @@ C    4,ZPOOL(NB,NZ,NY,NX),WTLSB(NB,NZ,NY,NX),FRADP(NZ,NY,NX)
 
 C------------------------------------------------------------------------
 
-      subroutine zero_uptake(N,L)
+      subroutine zero_uptake(N,L,NZ,NY,NX)
 
+      implicit none
       integer, intent(in) :: N, L
+      integer, intent(in) :: NZ,NY,NX
+
+      integer :: K
       RCOFLA(N,L,NZ,NY,NX)=0.0
       ROXFLA(N,L,NZ,NY,NX)=0.0
       RCHFLA(N,L,NZ,NY,NX)=0.0
@@ -1355,9 +1355,12 @@ C------------------------------------------------------------------------
       IF(N.EQ.1)RUPNF(L,NZ,NY,NX)=0.0
       end subroutine zero_uptake
 C------------------------------------------------------------------------
-      subroutine noactive_uptake(N,L)
+      subroutine noactive_uptake(N,L,NZ,NY,NX)
 
+      implicit none
       integer, intent(in) :: N, L
+      integer, intent(in) :: NZ,NY,NX
+
       RUNNHP(N,L,NZ,NY,NX)=0.0
       RUPNH4(N,L,NZ,NY,NX)=0.0
       RUONH4(N,L,NZ,NY,NX)=0.0
@@ -1392,18 +1395,11 @@ C------------------------------------------------------------------------
       RUCH1B(N,L,NZ,NY,NX)=0.0
       end subroutine noactive_uptake
 C------------------------------------------------------------------------
-      subroutine uptake_HPO4(FCUP, FPUP, UPWTRP, DIFFL, FWSRT,
-     2FP14X, FP1BX)
+      subroutine uptake_HPO4(N,L,NZ,NY,NX)
 
-      real(r8), intent(in) :: FCUP
-      real(r8), intent(in) :: FPUP
-      real(r8), intent(in) :: UPWTRP
-      real(r8), intent(in) :: DIFFL
-      real(r8), intent(in) :: FWSRT
-      real(r8), intent(in) :: FP14X, FP1BX
-      real(r8) :: RMFH1P, DIFH1P
-      real(r8) :: X, Y, B, C, CP, BP
-      real(r8) :: RTKH1P, H1POM, H1POX
+      implicit none
+      integer, intent(in) :: N,L
+      integer, intent(in) :: NZ,NY,NX
 C
 C     HPO4 UPTAKE IN NON-BAND SOIL ZONE
 C
@@ -1547,15 +1543,11 @@ C
       end subroutine uptake_HPO4
 C------------------------------------------------------------------------
 
-      subroutine uptake_H2PO4(FCUP, FPUP, UPWTRP, DIFFL,
-     2FWSRT, FPO4X, FPOBX)
+      subroutine uptake_H2PO4(N,L,NZ,NY,NX)
 
-      real(r8), intent(in) :: FCUP
-      real(r8), intent(in) :: FPUP
-      real(r8), intent(in) :: UPWTRP
-      real(r8), intent(in) :: DIFFL
-      real(r8), intent(in) :: FWSRT
-      real(r8), intent(in) :: FPO4X, FPOBX
+      implicit none
+      integer, intent(in) :: N,L
+      integer, intent(in) :: NZ,NY,NX
 
 C
 C     H2PO4 UPTAKE IN NON-BAND SOIL ZONE
@@ -1701,21 +1693,11 @@ C
       end subroutine uptake_H2PO4
 C------------------------------------------------------------------------
 
-      subroutine uptake_minP(FCUP, FPUP, UPWTRP, FWSRT,
-     2TFPO4X,TFP14X,TFPOBX,TFP1BX)
+      subroutine uptake_minP(N,L,NZ,NY,NX)
 
-      real(r8), intent(in) :: FCUP
-      real(r8), intent(in) :: FPUP
-      real(r8), intent(in) :: FWSRT
-      real(r8), intent(in) :: UPWTRP
-      real(r8), intent(inout) :: TFPO4X,TFP14X,TFPOBX,TFP1BX
-      real(r8) :: POSGX
-      real(r8) :: PATHL
-      real(r8)  :: DIFFL
-
-      real(r8) :: FP14X, FP1BX
-      real(r8) :: FPO4X, FPOBX
-
+      implicit none
+      integer, intent(in) :: N,L
+      integer, intent(in) :: NZ,NY,NX
 
       IF(RPO4Y(L,NY,NX).GT.ZEROS(NY,NX))THEN
       FPO4X=AMAX1(FPP(N,L,NZ),RUPP2P(N,L,NZ,NY,NX)/RPO4Y(L,NY,NX))
@@ -1759,11 +1741,9 @@ C
       PATHL=AMIN1(PATH(N,L),RRADL(N,L)+SQRT(2.0*POSGX))
       DIFFL=POSGX*RTARR(N,L)/LOG(PATHL/RRADL(N,L))
 
-      call uptake_H2PO4(FCUP, FPUP, UPWTRP, DIFFL, FWSRT,
-     2FPO4X, FPOBX)
+      call uptake_H2PO4(N,L,NZ,NY,NX)
 
-      call uptake_HPO4(FCUP, FPUP, UPWTRP, DIFFL, FWSRT,
-     2FP14X, FP1BX)
+      call uptake_HPO4(N,L,NZ,NY,NX)
 
       ELSE
       RUPP2P(N,L,NZ,NY,NX)=0.0
@@ -1786,17 +1766,11 @@ C
       end subroutine uptake_minP
 C------------------------------------------------------------------------
 
-      subroutine uptake_NO3(FCUP, FZUP, UPWTRP, FWSRT,
-     2FNO3X, FNOBX)
+      subroutine uptake_NO3(N,L,NZ,NY,NX)
 
-      real(r8), intent(in) :: FCUP
-      real(r8), intent(in) :: FZUP
-      real(r8), intent(in) :: UPWTRP
-      real(r8), intent(in) :: FWSRT
-      real(r8), intent(in) :: FNO3X, FNOBX
-      real(r8) :: ZOSGX
-      real(r8) :: PATHL
-      real(r8) :: DIFFL
+      implicit none
+      integer, intent(in) :: N,L
+      integer, intent(in) :: NZ,NY,NX
 C
 C     PARAMETERS FOR RADIAL MASS FLOW AND DIFFUSION OF NO3
 C     FROM SOIL TO ROOT
@@ -1958,16 +1932,12 @@ C
 
 C------------------------------------------------------------------------
 
-      subroutine uptake_NH4(FCUP, FZUP, UPWTRP, FWSRT, FNH4X, FNHBX)
+      subroutine uptake_NH4(N,L,NZ,NY,NX)
 
-      real(r8), intent(in) :: FCUP
-      real(r8), intent(in) :: FZUP
-      real(r8), intent(in) :: UPWTRP
-      real(r8), intent(in) :: FWSRT
-      real(r8), intent(in) :: FNH4X, FNHBX
-      real(r8) :: ZNSGX
-      real(r8) :: PATHL
-      real(r8) :: DIFFL
+      implicit none
+      integer, intent(in) :: N,L
+      integer, intent(in) :: NZ,NY,NX
+
 C     ZNSGL=NH4 diffusivity
 C     TORT=soil tortuosity
 C     PATH=path length of water and nutrient uptake
@@ -2126,14 +2096,11 @@ C
       end subroutine uptake_NH4
 C------------------------------------------------------------------------
 
-      subroutine uptake_minN(FCUP, FZUP, UPWTRP, FWSRT,
-     2TFNH4X, TFNO3X, TFNHBX, TFNOBX)
+      subroutine uptake_minN(N,L,NZ,NY,NX)
 
-      real(r8), intent(inout) :: FCUP, FZUP, UPWTRP, FWSRT
-      real(r8), intent(inout) :: TFNH4X, TFNO3X, TFNHBX, TFNOBX
-
-      real(r8) :: FNO3X, FNOBX
-      real(r8) :: FNH4X, FNHBX
+      implicit none
+      integer, intent(in) :: N,L
+      integer, intent(in) :: NZ,NY,NX
 
       IF(RNH4Y(L,NY,NX).GT.ZEROS(NY,NX))THEN
       FNH4X=AMAX1(FPP(N,L,NZ),RUNNHP(N,L,NZ,NY,NX)/RNH4Y(L,NY,NX))
@@ -2167,10 +2134,10 @@ C
 C     PARAMETERS FOR RADIAL MASS FLOW AND DIFFUSION OF NH4,NO3
 C     FROM SOIL TO ROOT
 C
-      call uptake_NH4(FCUP, FZUP, UPWTRP, FWSRT, FNH4X, FNHBX)
+      call uptake_NH4(N,L,NZ,NY,NX)
 
 
-      call uptake_NO3(FCUP, FZUP, UPWTRP, FWSRT, FNO3X, FNOBX)
+      call uptake_NO3(N,L,NZ,NY,NX)
 
 
       ELSE
@@ -2194,7 +2161,13 @@ C
       end subroutine uptake_minN
 C------------------------------------------------------------------------
 
-      subroutine root_exudates
+      subroutine root_exudates(N,L,NZ,NY,NX)
+
+      implicit none
+      integer, intent(in) :: N,L
+      integer, intent(in) :: NZ,NY,NX
+
+      integer :: K
 C
 C     ROOT EXUDATION OF C, N AND P DEPENDS ON CONCN DIFFERENCES
 C     BETWEEN ROOT NON-STRUCTURAL POOLS AND SOIL DISSOLVED POOLS
@@ -2264,9 +2237,13 @@ C     ENDIF
 
 C------------------------------------------------------------------------
 
-      subroutine sumup_nutrient_uptk(N,L)
+      subroutine sumup_nutrient_uptk(N,L,NZ,NY,NX)
 
+      implicit none
       integer, intent(in) :: N, L
+      integer, intent(in) :: NZ,NY,NX
+
+      integer :: K
 C
 C     TOTAL C,N,P EXCHANGE BETWEEN ROOTS AND SOIL
 C
@@ -2304,11 +2281,11 @@ C     ENDIF
       end subroutine sumup_nutrient_uptk
 C------------------------------------------------------------------------
 
-      subroutine get_uptake_capcity(FWSRT, FCUP, FZUP, FPUP,
-     2UPWTRP, UPWTRH, FOXYX)
+      subroutine get_uptake_capcity(N,L,NZ,NY,NX)
 
-      real(r8), intent(out) ::FWSRT, FCUP, FZUP, FPUP,
-     2UPWTRP, UPWTRH, FOXYX
+      implicit none
+      integer, intent(in) :: N,L
+      integer, intent(in) :: NZ,NY,NX
 C
 C     UPTAKE CAPACITY 'FWSRT' DEPENDS ON ROOT,MYCORRHIZAL
 C     PROTEIN CONTENT RELATIVE TO 5% FOR WHICH ACTIVE UPTAKE
@@ -2407,10 +2384,13 @@ C
       end subroutine get_uptake_capcity
 C------------------------------------------------------------------------
 
-      subroutine root_soil_gas_exchange(FOXYX, RUPOXT)
+      subroutine root_soil_gas_exchange(N,L,NZ,NY,NX)
 
-      real(r8), intent(in) :: FOXYX
-      real(r8), intent(out):: RUPOXT
+      implicit none
+      integer, intent(in) :: N,L,NZ,NY,NX
+
+      integer :: M
+
       IF(RCO2M(N,L,NZ,NY,NX).GT.ZEROP(NZ,NY,NX)
      2.AND.RTVLW(N,L,NZ,NY,NX).GT.ZEROP(NZ,NY,NX)
      2.AND.FOXYX.GT.ZEROQ(NZ,NY,NX))THEN
@@ -3106,4 +3086,3 @@ C     ENDIF
       end subroutine root_soil_gas_exchange
 
       end module UptakeMod
-      

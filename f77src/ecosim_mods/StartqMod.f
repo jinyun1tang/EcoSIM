@@ -39,13 +39,13 @@
 
       public :: startq
       contains
-      
+
       SUBROUTINE startq(NHWQ,NHEQ,NVNQ,NVSQ,NZ1Q,NZ2Q)
 C
 C     THIS SUBROUTINE INITIALIZES ALL PLANT VARIABLES
 C
       implicit none
-      integer, intent(in) :: NHWQ,NHEQ,NVNQ,NVSQ,NZ1Q,NZ2Q      
+      integer, intent(in) :: NHWQ,NHEQ,NVNQ,NVSQ,NZ1Q,NZ2Q
 C     execution begins here
 C
 C     INITIALIZE SHOOT GROWTH VARIABLES
