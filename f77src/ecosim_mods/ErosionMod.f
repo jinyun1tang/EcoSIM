@@ -58,6 +58,7 @@ C
 C
 C     EXTERNAL BOUNDARY SEDIMENT FLUXES
 C
+
       call ExternalSedimentFluxes(NHW,NHE,NVN,NVS)
       RETURN
 
@@ -70,7 +71,6 @@ C     INTERNAL TIME STEP AT WHICH SEDIMENT DETACHMENT AND TRANSPORT
 C     IS CALCULATED. DETACHMENT IS THE SUM OF THAT BY RAINFALL AND
 C     OVERLAND FLOW
 C
-
 
       implicit none
 
@@ -408,7 +408,6 @@ C    2,TERSED(NY,NX),RDTSED(NY,NX)
       end subroutine SedimentTransport
       
       subroutine InternalSedimentFluxes(NHW, NHE,NVN,NVS)
-
       implicit none
       integer, intent(in) :: NHW,NHE,NVN,NVS
 
