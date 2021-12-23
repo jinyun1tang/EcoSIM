@@ -315,7 +315,6 @@ C
 
       END subroutine write_daily_accumulators
 
-
 C-----------------------------------------------------------------------------------------
       subroutine tillage_and_irrigation_events(I, NHW, NHE, NVN, NVS)
       implicit none
