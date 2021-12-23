@@ -403,7 +403,6 @@ C    2,TERSED(NY,NX),RDTSED(NY,NX)
       ENDIF
 9690  CONTINUE
 9695  CONTINUE
-
       end subroutine SedimentTransport
 
       subroutine InternalSedimentFluxes(NHW, NHE,NVN,NVS)
@@ -846,6 +845,7 @@ C
       ENDIF
 9490  CONTINUE
 9495  CONTINUE
+
       end subroutine InternalSedimentFluxes
 
 C----------------------------------------------------------------------------------------------
