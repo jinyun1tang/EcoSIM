@@ -42,10 +42,32 @@ C     FROM RUNOFF IN 'WATSUB'
       integer, intent(in) :: NHW,NHE,NVN,NVS
 C     execution begins here
 C
+      call sediment_detachment_and_transport(NHW,NHE,NVN,NVS)
+
+C
+C     INTERNAL SEDIMENT FLUXES
+C
+      call internal_sediment_fluxes(NHW, NHE,NVN,NVS)
+
+C
+C     EXTERNAL BOUNDARY SEDIMENT FLUXES
+C
+      call external_boundary_sediment_fluxes(NHW,NHE,NVN,NVS)
+      RETURN
+
+      END subroutine erosion
+
+C---------------------------------------------------------------------------------------------------
+      
+      subroutine sediment_detachment_and_transport(NHW,NHE,NVN,NVS)
 C     INTERNAL TIME STEP AT WHICH SEDIMENT DETACHMENT AND TRANSPORT
 C     IS CALCULATED. DETACHMENT IS THE SUM OF THAT BY RAINFALL AND
 C     OVERLAND FLOW
 C
+      implicit none
+
+      integer, intent(in) :: NHW,NHE,NVN,NVS
+      
       DO 30 M=1,NPH
       DO 9895 NX=NHW,NHE
       DO 9890 NY=NVN,NVS
@@ -364,9 +386,13 @@ C    2,TERSED(NY,NX),RDTSED(NY,NX)
 9690  CONTINUE
 9695  CONTINUE
 30    CONTINUE
-C
-C     INTERNAL SEDIMENT FLUXES
-C
+      end sediment_detachment_and_transport
+      
+      subroutine internal_sediment_fluxes(NHW, NHE,NVN,NVS)
+
+      implicit none
+      integer, intent(in) :: NHW,NHE,NVN,NVS
+
       DO 9495 NX=NHW,NHE
       DO 9490 NY=NVN,NVS
       IF(IERSNG.EQ.1.OR.IERSNG.EQ.3)THEN
@@ -803,9 +829,15 @@ C
       ENDIF
 9490  CONTINUE
 9495  CONTINUE
-C
-C     EXTERNAL BOUNDARY SEDIMENT FLUXES
-C
+      end  internal_sediment_fluxes
+
+C----------------------------------------------------------------------------------------------
+      
+      subroutine external_boundary_sediment_fluxes(NHW,NHE,NVN,NVS)
+      implicit none
+
+      integer, intent(in) :: NHW,NHE,NVN,NVS
+     
       DO 8995 NX=NHW,NHE
       DO 8990 NY=NVN,NVS
       IF((IERSNG.EQ.1.OR.IERSNG.EQ.3)
@@ -1061,7 +1093,6 @@ C     ENDIF
       ENDIF
 8990  CONTINUE
 8995  CONTINUE
-      RETURN
+      end external_boundary_sediment_fluxes      
 
-      END subroutine erosion
       end module ErosionMod
