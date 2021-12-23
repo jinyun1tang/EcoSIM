@@ -386,7 +386,7 @@ C    2,TERSED(NY,NX),RDTSED(NY,NX)
 9690  CONTINUE
 9695  CONTINUE
 30    CONTINUE
-      end sediment_detachment_and_transport
+      end subroutine sediment_detachment_and_transport
       
       subroutine internal_sediment_fluxes(NHW, NHE,NVN,NVS)
 
@@ -829,7 +829,7 @@ C
       ENDIF
 9490  CONTINUE
 9495  CONTINUE
-      end  internal_sediment_fluxes
+      end subroutine internal_sediment_fluxes
 
 C----------------------------------------------------------------------------------------------
       
@@ -1093,6 +1093,6 @@ C     ENDIF
       ENDIF
 8990  CONTINUE
 8995  CONTINUE
-      end external_boundary_sediment_fluxes      
+      end subroutine external_boundary_sediment_fluxes      
 
       end module ErosionMod
