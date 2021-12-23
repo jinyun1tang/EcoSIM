@@ -43,6 +43,7 @@ C     FROM RUNOFF IN 'WATSUB'
 C     execution begins here
 C
 
+
       DO 30 M=1,NPH
 
       call sediment_detachment(NHW,NHE,NVN,NVS)
@@ -65,6 +66,7 @@ C
 
 C---------------------------------------------------------------------------------------------------
       
+
       subroutine sediment_detachment(NHW,NHE,NVN,NVS)
 C     INTERNAL TIME STEP AT WHICH SEDIMENT DETACHMENT AND TRANSPORT
 C     IS CALCULATED. DETACHMENT IS THE SUM OF THAT BY RAINFALL AND
@@ -1112,6 +1114,6 @@ C     ENDIF
       ENDIF
 8990  CONTINUE
 8995  CONTINUE
-
       end subroutine external_boundary_sediment_fluxes      
+
       end module ErosionMod
