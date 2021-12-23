@@ -318,7 +318,6 @@ C
 
 C-----------------------------------------------------------------------------------------
       
-
       subroutine TillageandIrrigationEvents(I, NHW, NHE, NVN, NVS)
       implicit none
 
