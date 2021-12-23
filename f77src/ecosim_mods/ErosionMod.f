@@ -42,7 +42,6 @@ C     FROM RUNOFF IN 'WATSUB'
       integer, intent(in) :: NHW,NHE,NVN,NVS
 C     execution begins here
 C
-
       DO 30 M=1,NPH
 
       call SedimentDetachment(NHW,NHE,NVN,NVS)
@@ -54,29 +53,26 @@ C
 C     INTERNAL SEDIMENT FLUXES
 C
       call InternalSedimentFluxes(NHW, NHE,NVN,NVS)
-
 C
 C     EXTERNAL BOUNDARY SEDIMENT FLUXES
 C
-
       call ExternalSedimentFluxes(NHW,NHE,NVN,NVS)
       RETURN
 
       END subroutine erosion
 
 C---------------------------------------------------------------------------------------------------
-      
+
       subroutine SedimentDetachment(NHW,NHE,NVN,NVS)
 
 C     INTERNAL TIME STEP AT WHICH SEDIMENT DETACHMENT AND TRANSPORT
 C     IS CALCULATED. DETACHMENT IS THE SUM OF THAT BY RAINFALL AND
 C     OVERLAND FLOW
 C
-
-
       implicit none
 
       integer, intent(in) :: NHW,NHE,NVN,NVS
+
       DO 9895 NX=NHW,NHE
       DO 9890 NY=NVN,NVS
       IF(IERSNG.EQ.1.OR.IERSNG.EQ.3)THEN
@@ -850,7 +846,6 @@ C
       ENDIF
 9490  CONTINUE
 9495  CONTINUE
-
       end subroutine InternalSedimentFluxes
 
 C----------------------------------------------------------------------------------------------
