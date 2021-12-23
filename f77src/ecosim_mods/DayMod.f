@@ -71,6 +71,7 @@ C
       WRITE(CHARN3,'(I4)')N3
       WRITE(CDATE,'(2A2,A4)')CHARN1(2:3),CHARN2(2:3),CHARN3(1:4)
 C     GO TO 501
+
       call WriteDailyAccumulators(I, NHW, NHE, NVN, NVS)
 
       ENDIF
@@ -84,6 +85,7 @@ C     501
       END subroutine day
 
 C-----------------------------------------------------------------------------------------
+
 
       subroutine WriteDailyAccumulators(I, NHW, NHE, NVN, NVS)
 C     WRITE DAILY MAX MIN ACCUMULATORS FOR WEATHER VARIABLES
@@ -394,6 +396,7 @@ C    3,(RRIG(J,I,NY,NX),J=1,24)
       ENDIF
 9990  CONTINUE
 9995  CONTINUE
+
       end subroutine TillageandIrrigationEvents
       
       END module DayMod
