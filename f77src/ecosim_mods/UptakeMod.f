@@ -142,13 +142,13 @@ C
       OSTRD=0.0
       IF(IFLGC(NZ,NY,NX).EQ.1.AND.PP(NZ,NY,NX).GT.0.0)THEN
 
-      call calc_canopy_vars(NZ,NY,NX)
+      call update_canopy_char(NZ,NY,NX)
 
 C     STOMATE=solve for minimum canopy stomatal resistance
       CALL STOMATE(I,J,NZ,NY,NX)
 C
 C     CALCULATE VARIABLES USED IN ROOT UPTAKE OF WATER AND NUTRIENTS
-      call calc_root_vars(NZ,NY,NX)
+      call update_root_char(NZ,NY,NX)
 
 C
 C     CALCULATE CANOPY WATER STATUS FROM CONVERGENCE SOLUTION FOR
@@ -209,7 +209,7 @@ C
 C     CONVERGENCE SOLUTION
 C
 
-      NN=test_convergence(I,J,NZ,NY,NX)
+      NN=canopy_energywater_iteration(I,J,NZ,NY,NX)
 C
 C     FINAL CANOPY TEMPERATURE, DIFFERENCE WITH AIR TEMPERATURE
 C
@@ -242,76 +242,7 @@ C
 C
 C     ROOT(N=1) AD MYCORRHIZAL(N=2) O2 AND NUTRIENT UPTAKE
 C
-      DO 955 N=1,MY(NZ,NY,NX)
-      DO 950 L=NU(NY,NX),NI(NZ,NY,NX)
-      IF(VOLX(L,NY,NX).GT.ZEROS2(NY,NX)
-     2.AND.RTDNP(N,L,NZ,NY,NX).GT.ZERO
-     3.AND.RTVLW(N,L,NZ,NY,NX).GT.ZEROP(NZ,NY,NX)
-     4.AND.THETW(L,NY,NX).GT.ZERO)THEN
-      TFOXYX=0.0
-      TFNH4X=0.0
-      TFNHBX=0.0
-      TFNO3X=0.0
-      TFNOBX=0.0
-      TFPO4X=0.0
-      TFPOBX=0.0
-      TFP14X=0.0
-      TFP1BX=0.0
-
-      call get_uptake_capcity(N,L,NZ,NY,NX)
-
-      TFOXYX=TFOXYX+FOXYX
-C
-C     ROOT O2 DEMAND CALCULATED FROM O2 NON-LIMITED RESPIRATION RATE
-C
-C     ROXYP=O2 demand
-C     RCO2M=respiration unlimited by O2
-C     RTVLW=root or myco aqueous volume
-C     FOXYX=fraction of total O2 demand from previous hour
-C
-      ROXYP(N,L,NZ,NY,NX)=2.667*RCO2M(N,L,NZ,NY,NX)
-
-      call root_soil_gas_exchange(N,L,NZ,NY,NX)
-
-      OSTRD=OSTRD+ROXYP(N,L,NZ,NY,NX)
-      OSTRN=OSTRN+RUPOXT
-
-      call root_exudates(N,L,NZ,NY,NX)
-
-C
-C     NUTRIENT UPTAKE
-C
-C     WFR=constraint by O2 consumption on all biological processes
-C     FCUP=limitation to active uptake respiration from CPOOLR
-C     FWSRT=protein concentration relative to 5%
-C     RTLGP=root,myco length per plant
-C
-      IF(WFR(N,L,NZ,NY,NX).GT.ZERO
-     2.AND.FCUP.GT.ZERO.AND.FWSRT.GT.ZERO
-     3.AND.RTLGP(N,L,NZ,NY,NX).GT.ZEROP(NZ,NY,NX))THEN
-C
-C     FZUP=limitn to active uptake respiration from CZPOLR
-C
-      call uptake_minN(N,L,NZ,NY,NX)
-
-C
-C     FPUP=limitn to active uptake respiration from CPPOLR
-C
-      call uptake_minP(N,L,NZ,NY,NX)
-
-      ELSE
-      call noactive_uptake(N,L,NZ,NY,NX)
-
-      ENDIF
-      ELSE
-      call zero_uptake(N,L,NZ,NY,NX)
-
-      ENDIF
-
-      call sumup_nutrient_uptk(N,L,NZ,NY,NX)
-
-950   CONTINUE
-955   CONTINUE
+      call root_myco_o2_nutrient_uptake(NZ,NY,NX)
       TLEC(NY,NX)=TLEC(NY,NX)+EFLXC(NZ,NY,NX)*RA(NZ,NY,NX)
       TSHC(NY,NX)=TSHC(NY,NX)+SFLXC(NZ,NY,NX)*RA(NZ,NY,NX)
       IF(OSTRD.GT.ZEROP(NZ,NY,NX))THEN
@@ -328,6 +259,8 @@ C
 C------------------------------------------------------------------------
 
       subroutine stage_for_uptake(NY,NX)
+C
+C     prepare for uptake calculation
       implicit none
       integer, intent(in) :: NY, NX
       integer :: NZ, L, N
@@ -413,8 +346,9 @@ C     ENDIF
 9000  CONTINUE
       end subroutine stage_for_uptake
 C------------------------------------------------------------------------
-      subroutine calc_canopy_vars(NZ,NY,NX)
-
+      subroutine update_canopy_char(NZ,NY,NX)
+C
+C     update canopy characterization
       implicit none
       integer, intent(in) :: NZ,NY,NX
 
@@ -502,9 +436,11 @@ C     TKA=current air temperature
 C     DTKC=TKC-TKA from previous hour
 C
       TKCZ(NZ,NY,NX)=TKA(NY,NX)+DTKC(NZ,NY,NX)
-      end subroutine calc_canopy_vars
+      end subroutine update_canopy_char
 C------------------------------------------------------------------------
-      subroutine calc_root_vars(NZ,NY,NX)
+      subroutine update_root_char(NZ,NY,NX)
+C
+C     update root characterization
 
       implicit none
       integer, intent(in) :: NZ,NY,NX
@@ -585,7 +521,7 @@ C    2,PORT(N,NZ,NY,NX),PP(NZ,NY,NX),RTLGP(N,L,NZ,NY,NX)
 4413  FORMAT(A8,7I4,30E12.4)
 C     ENDIF
 2000  CONTINUE
-      end subroutine calc_root_vars
+      end subroutine update_root_char
 C------------------------------------------------------------------------
 
       subroutine handling_divergence(I,J,NN,NZ,NY,NX)
@@ -643,14 +579,17 @@ C------------------------------------------------------------------------
       end subroutine handling_divergence
 
 C------------------------------------------------------------------------------
-      function test_convergence(I,J,NZ,NY,NX) result(NN)
+      function canopy_energywater_iteration(I,J,NZ,NY,NX) result(NN)
       implicit none
       integer, intent(in) :: I, J
       integer, intent(in) :: NZ,NY,NX
 C     return variables
       integer :: NN
+
 C     local variables
       integer :: N,L
+
+C     execution begins here
 
       CCPOLT=CCPOLP(NZ,NY,NX)+CZPOLP(NZ,NY,NX)+CPPOLP(NZ,NY,NX)
       OSWT=36.0+840.0*AMAX1(0.0,CCPOLT)
@@ -855,7 +794,7 @@ C     DIFF=normalized difference between DIFFZ and DIFFU
 C     5.0E-03=acceptance criterion for DIFF
 C     RSSZ=change in canopy water potl vs change in canopy water cnt
 C     RSSU=change in canopy water potl vs change in transpiration
-C
+
       VOLWPZ=1.0E-06*WVPLT/FDMP
       DIFFZ=VOLWPZ-VOLWP(NZ,NY,NX)
       DIFFU=EP(NZ,NY,NX)-UPRT
@@ -939,7 +878,7 @@ C
 4000  CONTINUE
 4500  CONTINUE
       return
-      end function test_convergence
+      end function canopy_energywater_iteration
 C------------------------------------------------------------------------
       subroutine calc_resistance(NZ,NY,NX)
 
@@ -1355,7 +1294,7 @@ C------------------------------------------------------------------------
       IF(N.EQ.1)RUPNF(L,NZ,NY,NX)=0.0
       end subroutine zero_uptake
 C------------------------------------------------------------------------
-      subroutine noactive_uptake(N,L,NZ,NY,NX)
+      subroutine noactive_nutrient_uptake(N,L,NZ,NY,NX)
 
       implicit none
       integer, intent(in) :: N, L
@@ -1393,7 +1332,7 @@ C------------------------------------------------------------------------
       RUPH1B(N,L,NZ,NY,NX)=0.0
       RUOH1B(N,L,NZ,NY,NX)=0.0
       RUCH1B(N,L,NZ,NY,NX)=0.0
-      end subroutine noactive_uptake
+      end subroutine noactive_nutrient_uptake
 C------------------------------------------------------------------------
       subroutine uptake_HPO4(N,L,NZ,NY,NX)
 
@@ -1693,7 +1632,7 @@ C
       end subroutine uptake_H2PO4
 C------------------------------------------------------------------------
 
-      subroutine uptake_minP(N,L,NZ,NY,NX)
+      subroutine uptake_mineral_phosporhus(N,L,NZ,NY,NX)
 
       implicit none
       integer, intent(in) :: N,L
@@ -1763,7 +1702,7 @@ C
       RUOH1B(N,L,NZ,NY,NX)=0.0
       RUCH1B(N,L,NZ,NY,NX)=0.0
       ENDIF
-      end subroutine uptake_minP
+      end subroutine uptake_mineral_phosporhus
 C------------------------------------------------------------------------
 
       subroutine uptake_NO3(N,L,NZ,NY,NX)
@@ -2096,7 +2035,7 @@ C
       end subroutine uptake_NH4
 C------------------------------------------------------------------------
 
-      subroutine uptake_minN(N,L,NZ,NY,NX)
+      subroutine uptake_mineral_Nitrogen(N,L,NZ,NY,NX)
 
       implicit none
       integer, intent(in) :: N,L
@@ -2158,7 +2097,7 @@ C
       RUONOB(N,L,NZ,NY,NX)=0.0
       RUCNOB(N,L,NZ,NY,NX)=0.0
       ENDIF
-      end subroutine uptake_minN
+      end subroutine uptake_mineral_Nitrogen
 C------------------------------------------------------------------------
 
       subroutine root_exudates(N,L,NZ,NY,NX)
@@ -2237,7 +2176,7 @@ C     ENDIF
 
 C------------------------------------------------------------------------
 
-      subroutine sumup_nutrient_uptk(N,L,NZ,NY,NX)
+      subroutine sumup_nutrient_uptake(N,L,NZ,NY,NX)
 
       implicit none
       integer, intent(in) :: N, L
@@ -2278,7 +2217,7 @@ C     WRITE(*,8765)'PLANT',I,J,NX,NY,L,NZ,N,TFOXYX,TFNH4X
 C    2,TFNO3X,TFPO4X,TFNHBX,TFNOBX,TFPOBX
 8765  FORMAT(A8,7I4,7F15.6)
 C     ENDIF
-      end subroutine sumup_nutrient_uptk
+      end subroutine sumup_nutrient_uptake
 C------------------------------------------------------------------------
 
       subroutine get_uptake_capcity(N,L,NZ,NY,NX)
@@ -3084,5 +3023,87 @@ C     ENDIF
       ENDIF
       ENDIF
       end subroutine root_soil_gas_exchange
+
+C------------------------------------------------------------------------------------------
+
+      subroutine root_myco_o2_nutrient_uptake(NZ,NY,NX)
+
+      implicit none
+      integer, intent(in) :: NZ,NY,NX
+
+      integer :: N,L
+C     execution begins here
+
+      DO 955 N=1,MY(NZ,NY,NX)
+      DO 950 L=NU(NY,NX),NI(NZ,NY,NX)
+      IF(VOLX(L,NY,NX).GT.ZEROS2(NY,NX)
+     2.AND.RTDNP(N,L,NZ,NY,NX).GT.ZERO
+     3.AND.RTVLW(N,L,NZ,NY,NX).GT.ZEROP(NZ,NY,NX)
+     4.AND.THETW(L,NY,NX).GT.ZERO)THEN
+      TFOXYX=0.0
+      TFNH4X=0.0
+      TFNHBX=0.0
+      TFNO3X=0.0
+      TFNOBX=0.0
+      TFPO4X=0.0
+      TFPOBX=0.0
+      TFP14X=0.0
+      TFP1BX=0.0
+
+      call get_uptake_capcity(N,L,NZ,NY,NX)
+
+      TFOXYX=TFOXYX+FOXYX
+C
+C     ROOT O2 DEMAND CALCULATED FROM O2 NON-LIMITED RESPIRATION RATE
+C
+C     ROXYP=O2 demand
+C     RCO2M=respiration unlimited by O2
+C     RTVLW=root or myco aqueous volume
+C     FOXYX=fraction of total O2 demand from previous hour
+C
+      ROXYP(N,L,NZ,NY,NX)=2.667*RCO2M(N,L,NZ,NY,NX)
+
+      call root_soil_gas_exchange(N,L,NZ,NY,NX)
+
+      OSTRD=OSTRD+ROXYP(N,L,NZ,NY,NX)
+      OSTRN=OSTRN+RUPOXT
+
+      call root_exudates(N,L,NZ,NY,NX)
+
+C
+C     NUTRIENT UPTAKE
+C
+C     WFR=constraint by O2 consumption on all biological processes
+C     FCUP=limitation to active uptake respiration from CPOOLR
+C     FWSRT=protein concentration relative to 5%
+C     RTLGP=root,myco length per plant
+C
+      IF(WFR(N,L,NZ,NY,NX).GT.ZERO
+     2.AND.FCUP.GT.ZERO.AND.FWSRT.GT.ZERO
+     3.AND.RTLGP(N,L,NZ,NY,NX).GT.ZEROP(NZ,NY,NX))THEN
+C
+C     FZUP=limitn to active uptake respiration from CZPOLR
+C
+      call uptake_mineral_Nitrogen(N,L,NZ,NY,NX)
+
+C
+C     FPUP=limitn to active uptake respiration from CPPOLR
+C
+      call uptake_mineral_phosporhus(N,L,NZ,NY,NX)
+
+      ELSE
+      call noactive_nutrient_uptake(N,L,NZ,NY,NX)
+
+      ENDIF
+      ELSE
+      call zero_uptake(N,L,NZ,NY,NX)
+
+      ENDIF
+
+      call sumup_nutrient_uptake(N,L,NZ,NY,NX)
+
+950   CONTINUE
+955   CONTINUE
+      end subroutine root_myco_o2_nutrient_uptake
 
       end module UptakeMod

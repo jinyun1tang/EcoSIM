@@ -1,7 +1,7 @@
       module SoluteMod
       use data_kind_mod, only : r8 => SHR_KIND_R8
       implicit none
-      
+
       private
 C     include_section
       include "parameters.h"
@@ -29,7 +29,7 @@ C     include_section
       include "blk21b.h"
       include "solutepar.h"
 C     end_include_section
-      
+
       real(r8) :: A1,A2,A3,AHY1,AOH1,AAL1,AALO1,AALO2,AALO3,AALO4
       real(r8) :: AFE1,AFEO1,AFEO2,AFEO3,AFEO4,ACA1,ACO31,AHCO31
       real(r8) :: ACO21,ASO41,AH0P1,AH1P1,AH2P1,AH3P1,AF1P1,AF2P1
@@ -87,28 +87,29 @@ C     end_include_section
       real(r8) :: XOH01,XOH11,XOH21,XH1P1,XH2P1,XH01B,XH11B,XH21B
       real(r8) :: X1P1B,X2P1B,XNBQ,XMGQ,XNAQ,XKAQ,XHY1,XAL1,XFE1
       real(r8) :: XCA1,XMG1,XNA1,XKA1,XHC1,XALO21,XFEO21,XCOOH,XCOO
-      
-      integer :: L,M,NPI,NX,NY,NR1,NP2,NP3
+
+      integer :: NR1,NP2,NP3
 C
       DATA RNHUI/10.0E-02,1.0E-02,0.5E-02/
       real(r8) :: RSNUA, RSNUB
       real(r8) :: CN41, CN31, CN3B, CN4B, XN4B, XN41
-      
+
       public :: solute
       contains
-      
+
       SUBROUTINE solute(I,J,NHW,NHE,NVN,NVS)
 C
 C     THIS SUBROUTINE CALCULATES ALL SOLUTE TRANSFORMATIONS
 C     FROM THERMODYNAMIC EQUILIBRIA
 C
       implicit none
-      
+
       integer, intent(in) :: I, J
       integer, intent(in) :: NHW, NHE, NVN, NVS
 C     local variable declaration
-      
-C     begin_execution
+      integer :: L,NY,NX,NPI
+
+C     execution begins here
       NPI=INT(NPH/2)
       DO 9995 NX=NHW,NHE
       DO 9990 NY=NVN,NVS
@@ -147,9 +148,9 @@ C
       BKVLPO=VOLWPO
       BKVLPB=VOLWPB
       ENDIF
-      
-      call update_soil_fertlizer
-      
+
+      call update_soil_fertlizer(L,NY,NX)
+
 C
 C     IF SALT OPTION SELECTED IN SITE FILE
 C     THEN SOLVE FULL SET OF EQUILIBRIA REACTIONS
@@ -157,16 +158,15 @@ C
 C     ISALTG=salt flag from site file
 C
       IF(ISALTG.NE.0)THEN
-      
-      call salt_chem_equilibria
-      
-      
+
+      call salt_chem_equilibria(L,NY,NX)
+
 C     IF NO SALTS IS SELECTED IN SITE FILE THEN A SUBSET
 C     OF THE EQUILIBRIA REACTIONS ARE SOLVED: MOSTLY THOSE
 C     FOR PHOSPHORUS AND CO-REACTANTS
 C
       ELSE
-        call nosalt_chem_equilibria
+        call nosalt_chem_equilibria(L,NY,NX)
       ENDIF
 C
 C     CHANGE IN WIDTHS AND DEPTHS OF FERTILIZER BANDS FROM
@@ -181,379 +181,15 @@ C     IF(ROWI(I,NY,NX).GT.0.0)THEN
 C
 C     NH4 FERTILIZER BAND
 C
-C     IFNHB=banded NH4 fertilizer flag
-C     ROWN=NH4 fertilizer band row width
-C     DPNH4=NH4 fertilizer band depth
-C
-      IF(IFNHB(NY,NX).EQ.1.AND.ROWN(NY,NX).GT.0.0)THEN
-      IF(L.EQ.NU(NY,NX).OR.CDPTH(L-1,NY,NX).LT.DPNH4(NY,NX))THEN
-C
-C     NH4 BAND WIDTH
-C
-C     DWNH4=change in NH4 fertilizer band width
-C     WDNHB=layer NH4 fertilizer band width
-C     ZNSGL=NH4 diffusivity
-C     TORT=tortuosity
-C
-      DWNH4=0.5*SQRT(ZNSGL(L,NY,NX))*TORT(NPH,L,NY,NX)
-      WDNHB(L,NY,NX)=AMIN1(ROWN(NY,NX)
-     2,AMAX1(0.025,WDNHB(L,NY,NX))+DWNH4)
-C
-C     NH4 BAND DEPTH
-C
-C     DPFLW=change in NH4 fertilizer band depth
-C     DPNH4,DPNHB=total,layer NH4 fertilizer band depth
-C
-      IF(CDPTH(L,NY,NX).GE.DPNH4(NY,NX))THEN
-      DPFLW=FLWD+DWNH4
-      DPNH4(NY,NX)=DPNH4(NY,NX)+DPFLW
-      DPNHB(L,NY,NX)=DPNHB(L,NY,NX)+DPFLW
-      IF(DPNHB(L,NY,NX).GT.DLYR(3,L,NY,NX))THEN
-      DPNHB(L+1,NY,NX)=DPNHB(L+1,NY,NX)+(DPNHB(L,NY,NX)-DLYR(3,L,NY,NX))
-      WDNHB(L+1,NY,NX)=WDNHB(L,NY,NX)
-      DPNHB(L,NY,NX)=DLYR(3,L,NY,NX)
-      ELSEIF(DPNHB(L,NY,NX).LT.0.0)THEN
-      DPNHB(L-1,NY,NX)=DPNHB(L-1,NY,NX)+DPNHB(L,NY,NX)
-      DPNHB(L,NY,NX)=0.0
-      WDNHB(L,NY,NX)=0.0
-      ENDIF
-      ENDIF
-C
-C     FRACTION OF SOIL LAYER OCCUPIED BY NH4 BAND
-C     FROM BAND WIDTH X DEPTH
-C
-C     VLNH4,VLNHB=fraction of soil volume in NH4 non-band,band
-C     DLYR=soil layer thickness
-C     FVLNH4=relative change in VLNH4
-C
-      XVLNH4=VLNH4(L,NY,NX)
-      IF(DLYR(3,L,NY,NX).GT.ZERO)THEN
-      VLNHB(L,NY,NX)=AMAX1(0.0,AMIN1(0.999,WDNHB(L,NY,NX)
-     2/ROWN(NY,NX)*DPNHB(L,NY,NX)/DLYR(3,L,NY,NX)))
-      ELSE
-      VLNHB(L,NY,NX)=0.0
-      ENDIF
-      VLNH4(L,NY,NX)=1.0-VLNHB(L,NY,NX)
-      FVLNH4=AMIN1(0.0,(VLNH4(L,NY,NX)-XVLNH4)/XVLNH4)
-C
-C     TRANSFER NH4, NH3 FROM NON-BAND TO BAND
-C     DURING BAND GROWTH
-C
-C     DNH4S,DNH3S,DXNH4=transfer of NH4,NH3,exchangeable NH4
-C
-      DNH4S=FVLNH4*ZNH4S(L,NY,NX)/14.0
-      DNH3S=FVLNH4*ZNH3S(L,NY,NX)/14.0
-      DXNH4=FVLNH4*XN4(L,NY,NX)
-      TRN4S(L,NY,NX)=TRN4S(L,NY,NX)+DNH4S
-      TRN4B(L,NY,NX)=TRN4B(L,NY,NX)-DNH4S
-      TRN3S(L,NY,NX)=TRN3S(L,NY,NX)+DNH3S
-      TRN3B(L,NY,NX)=TRN3B(L,NY,NX)-DNH3S
-      TRXN4(L,NY,NX)=TRXN4(L,NY,NX)+DXNH4
-      TRXNB(L,NY,NX)=TRXNB(L,NY,NX)-DXNH4
-      ELSE
-C
-C     AMALGAMATE NH4 BAND WITH NON-BAND IF BAND NO LONGER EXISTS
-C
-      DPNHB(L,NY,NX)=0.0
-      WDNHB(L,NY,NX)=0.0
-      VLNH4(L,NY,NX)=1.0
-      VLNHB(L,NY,NX)=0.0
-      ZNH4S(L,NY,NX)=ZNH4S(L,NY,NX)+ZNH4B(L,NY,NX)
-      ZNH3S(L,NY,NX)=ZNH3S(L,NY,NX)+ZNH3B(L,NY,NX)
-      ZNH4B(L,NY,NX)=0.0
-      ZNH3B(L,NY,NX)=0.0
-      XN4(L,NY,NX)=XN4(L,NY,NX)+XNB(L,NY,NX)
-      XNB(L,NY,NX)=0.0
-      ENDIF
-      ENDIF
+      call update_NH3_fert_bandinfo(L,NY,NX)
 C
 C     NO3 FERTILIZER BAND
 C
-C     IFNOB=banded NO3 fertilizer flag
-C     ROWO=NO3 fertilizer band row width
-C     DPNO3=NO3 fertilizer band depth
-C
-      IF(IFNOB(NY,NX).EQ.1.AND.ROWO(NY,NX).GT.0.0)THEN
-      IF(L.EQ.NU(NY,NX).OR.CDPTH(L-1,NY,NX).LT.DPNO3(NY,NX))THEN
-C
-C     NO3 BAND WIDTH
-C
-C     DWNO3=change in NO3 fertilizer band width
-C     WDNOB=layer NO3 fertilizer band width
-C     ZOSGL=NO3 diffusivity
-C     TORT=tortuosity
-C
-      DWNO3=0.5*SQRT(ZOSGL(L,NY,NX))*TORT(NPH,L,NY,NX)
-      WDNOB(L,NY,NX)=AMIN1(ROWO(NY,NX),WDNOB(L,NY,NX)+DWNO3)
-C
-C     NO3 BAND DEPTH
-C
-C     DPFLW=change in NO3 fertilizer band depth
-C     DPNO3,DPNOB=total,layer NO3 fertilizer band depth
-C
-      IF(CDPTH(L,NY,NX).GE.DPNO3(NY,NX))THEN
-      DPFLW=FLWD+DWNO3
-      DPNO3(NY,NX)=DPNO3(NY,NX)+DPFLW
-      DPNOB(L,NY,NX)=DPNOB(L,NY,NX)+DPFLW
-      IF(DPNOB(L,NY,NX).GT.DLYR(3,L,NY,NX))THEN
-      DPNOB(L+1,NY,NX)=DPNOB(L+1,NY,NX)+(DPNOB(L,NY,NX)-DLYR(3,L,NY,NX))
-      WDNOB(L+1,NY,NX)=WDNOB(L,NY,NX)
-      DPNOB(L,NY,NX)=DLYR(3,L,NY,NX)
-      ELSE IF(DPNOB(L,NY,NX).LT.0.0)THEN
-      DPNOB(L-1,NY,NX)=DPNOB(L-1,NY,NX)+DPNOB(L,NY,NX)
-      DPNOB(L,NY,NX)=0.0
-      WDNOB(L,NY,NX)=0.0
-      ENDIF
-      ENDIF
-C
-C     FRACTION OF SOIL LAYER OCCUPIED BY NO3 BAND
-C     FROM BAND WIDTH X DEPTH
-C
-C     VLNO3,VLNOB=fraction of soil volume in NO3 non-band,band
-C     DLYR=soil layer thickness
-C     FVLNO3=relative change in VLNO3
-C
-      XVLNO3=VLNO3(L,NY,NX)
-      IF(DLYR(3,L,NY,NX).GT.ZERO)THEN
-      VLNOB(L,NY,NX)=AMAX1(0.0,AMIN1(0.999,WDNOB(L,NY,NX)
-     2/ROWO(NY,NX)*DPNOB(L,NY,NX)/DLYR(3,L,NY,NX)))
-      ELSE
-      VLNOB(L,NY,NX)=0.0
-      ENDIF
-      VLNO3(L,NY,NX)=1.0-VLNOB(L,NY,NX)
-      FVLNO3=AMIN1(0.0,(VLNO3(L,NY,NX)-XVLNO3)/XVLNO3)
-C
-C     TRANSFER NO3 FROM NON-BAND TO BAND
-C     DURING BAND GROWTH
-C
-C     DNO3S,DNO2S=transfer of NO3,NO2
-C
-      DNO3S=FVLNO3*ZNO3S(L,NY,NX)/14.0
-      DNO2S=FVLNO3*ZNO2S(L,NY,NX)/14.0
-      TRNO3(L,NY,NX)=TRNO3(L,NY,NX)+DNO3S
-      TRNO2(L,NY,NX)=TRNO2(L,NY,NX)+DNO2S
-      TRNOB(L,NY,NX)=TRNOB(L,NY,NX)-DNO3S
-      TRN2B(L,NY,NX)=TRN2B(L,NY,NX)-DNO2S
-      ELSE
-C
-C     AMALGAMATE NO3 BAND WITH NON-BAND IF BAND NO LONGER EXISTS
-C
-      DPNOB(L,NY,NX)=0.0
-      WDNOB(L,NY,NX)=0.0
-      VLNO3(L,NY,NX)=1.0
-      VLNOB(L,NY,NX)=0.0
-      ZNO3S(L,NY,NX)=ZNO3S(L,NY,NX)+ZNO3B(L,NY,NX)
-      ZNO2S(L,NY,NX)=ZNO2S(L,NY,NX)+ZNO2B(L,NY,NX)
-      ZNO3B(L,NY,NX)=0.0
-      ZNO2B(L,NY,NX)=0.0
-      ENDIF
-      ENDIF
+      call update_no3_fert_bandinfo(L,NY,NX)
 C
 C     PO4 FERTILIZER BAND
 C
-C     IFPOB=banded H2PO4 fertilizer flag
-C     ROWP=H2PO4 fertilizer band row width
-C     DPPO4=H2PO4 fertilizer band depth
-C
-      IF(IFPOB(NY,NX).EQ.1.AND.ROWP(NY,NX).GT.0.0)THEN
-      IF(L.EQ.NU(NY,NX).OR.CDPTH(L-1,NY,NX).LT.DPPO4(NY,NX))THEN
-C
-C     PO4 BAND WIDTH
-C
-C     DWPO4=change in H2PO4 fertilizer band width
-C     WDPO4=layer H2PO4 fertilizer band width
-C     POSGL=H2PO4 diffusivity
-C     TORT=tortuosity
-C
-      DWPO4=0.5*SQRT(POSGL(L,NY,NX))*TORT(NPH,L,NY,NX)
-      WDPOB(L,NY,NX)=AMIN1(ROWP(NY,NX),WDPOB(L,NY,NX)+DWPO4)
-C
-C     PO4 BAND DEPTH
-C
-C     DPFLW=change in H2PO4 fertilizer band depth
-C     DPPO4,DPPOB=total,layer H2PO4 fertilizer band depth
-C
-      IF(CDPTH(L,NY,NX).GE.DPPO4(NY,NX))THEN
-      DPFLW=FLWD+DWPO4
-      DPPO4(NY,NX)=DPPO4(NY,NX)+DPFLW
-      DPPOB(L,NY,NX)=DPPOB(L,NY,NX)+DPFLW
-      IF(DPPOB(L,NY,NX).GT.DLYR(3,L,NY,NX))THEN
-      DPPOB(L+1,NY,NX)=DPPOB(L+1,NY,NX)+(DPPOB(L,NY,NX)-DLYR(3,L,NY,NX))
-      WDPOB(L+1,NY,NX)=WDPOB(L,NY,NX)
-      DPPOB(L,NY,NX)=DLYR(3,L,NY,NX)
-      ELSEIF(DPPOB(L,NY,NX).LT.0.0)THEN
-      DPPOB(L-1,NY,NX)=DPPOB(L-1,NY,NX)+DPPOB(L,NY,NX)
-      DPPOB(L,NY,NX)=0.0
-      WDPOB(L,NY,NX)=0.0
-      ENDIF
-      ENDIF
-C
-C     FRACTION OF SOIL LAYER OCCUPIED BY PO4 BAND
-C     FROM BAND WIDTH X DEPTH
-C
-C     VLPO43,VLPOB=fraction of soil volume in H2PO4 non-band,band
-C     DLYR=soil layer thickness
-C     FVLPO4=relative change in VLPO4
-C
-      XVLPO4=VLPO4(L,NY,NX)
-      IF(DLYR(3,L,NY,NX).GT.ZERO)THEN
-      VLPOB(L,NY,NX)=AMAX1(0.0,AMIN1(0.999,WDPOB(L,NY,NX)
-     2/ROWP(NY,NX)*DPPOB(L,NY,NX)/DLYR(3,L,NY,NX)))
-      ELSE
-      VLPOB(L,NY,NX)=0.0
-      ENDIF
-      VLPO4(L,NY,NX)=1.0-VLPOB(L,NY,NX)
-      FVLPO4=AMIN1(0.0,(VLPO4(L,NY,NX)-XVLPO4)/XVLPO4)
-C
-C     TRANSFER HPO4,H2PO4 FROM NON-BAND TO BAND
-C     DURING BAND GROWTH DEPENDING ON SALT
-C     VS. NON-SALT OPTION
-C
-C     DZ*,DX*,DP*=transfer of solute,adsorbed,precipitated HPO4,H2PO4
-C
-      IF(ISALTG.NE.0)THEN
-      DZH0P=FVLPO4*H0PO4(L,NY,NX)
-      DZH1P=FVLPO4*H1PO4(L,NY,NX)/31.0
-      DZH2P=FVLPO4*H2PO4(L,NY,NX)/31.0
-      DZH3P=FVLPO4*H3PO4(L,NY,NX)
-      DZF1P=FVLPO4*ZFE1P(L,NY,NX)
-      DZF2P=FVLPO4*ZFE2P(L,NY,NX)
-      DZC0P=FVLPO4*ZCA0P(L,NY,NX)
-      DZC1P=FVLPO4*ZCA1P(L,NY,NX)
-      DZC2P=FVLPO4*ZCA2P(L,NY,NX)
-      DZM1P=FVLPO4*ZMG1P(L,NY,NX)
-      DXOH0=FVLPO4*XOH0(L,NY,NX)
-      DXOH1=FVLPO4*XOH1(L,NY,NX)
-      DXOH2=FVLPO4*XOH2(L,NY,NX)
-      DXH1P=FVLPO4*XH1P(L,NY,NX)
-      DXH2P=FVLPO4*XH2P(L,NY,NX)
-      DPALP=FVLPO4*PALPO(L,NY,NX)
-      DPFEP=FVLPO4*PFEPO(L,NY,NX)
-      DPCDP=FVLPO4*PCAPD(L,NY,NX)
-      DPCHP=FVLPO4*PCAPH(L,NY,NX)
-      DPCMP=FVLPO4*PCAPM(L,NY,NX)
-      TRH0P(L,NY,NX)=TRH0P(L,NY,NX)+DZH0P
-      TRH1P(L,NY,NX)=TRH1P(L,NY,NX)+DZH1P
-      TRH2P(L,NY,NX)=TRH2P(L,NY,NX)+DZH2P
-      TRH3P(L,NY,NX)=TRH3P(L,NY,NX)+DZH3P
-      TRF1P(L,NY,NX)=TRF1P(L,NY,NX)+DZF1P
-      TRF2P(L,NY,NX)=TRF2P(L,NY,NX)+DZF2P
-      TRC0P(L,NY,NX)=TRC0P(L,NY,NX)+DZC0P
-      TRC1P(L,NY,NX)=TRC1P(L,NY,NX)+DZC1P
-      TRC2P(L,NY,NX)=TRC2P(L,NY,NX)+DZC2P
-      TRM1P(L,NY,NX)=TRM1P(L,NY,NX)+DZM1P
-      TRH0B(L,NY,NX)=TRH0B(L,NY,NX)-DZH0P
-      TRH1B(L,NY,NX)=TRH1B(L,NY,NX)-DZH1P
-      TRH2B(L,NY,NX)=TRH2B(L,NY,NX)-DZH2P
-      TRH3B(L,NY,NX)=TRH3B(L,NY,NX)-DZH3P
-      TRF1B(L,NY,NX)=TRF1B(L,NY,NX)-DZF1P
-      TRF2B(L,NY,NX)=TRF2B(L,NY,NX)-DZF2P
-      TRC0B(L,NY,NX)=TRC0B(L,NY,NX)-DZC0P
-      TRC1B(L,NY,NX)=TRC1B(L,NY,NX)-DZC1P
-      TRC2B(L,NY,NX)=TRC2B(L,NY,NX)-DZC2P
-      TRM1B(L,NY,NX)=TRM1B(L,NY,NX)-DZM1P
-      TRXH0(L,NY,NX)=TRXH0(L,NY,NX)+DXOH0
-      TRXH1(L,NY,NX)=TRXH1(L,NY,NX)+DXOH1
-      TRXH2(L,NY,NX)=TRXH2(L,NY,NX)+DXOH2
-      TRX1P(L,NY,NX)=TRX1P(L,NY,NX)+DXH1P
-      TRX2P(L,NY,NX)=TRX2P(L,NY,NX)+DXH2P
-      TRBH0(L,NY,NX)=TRBH0(L,NY,NX)-DXOH0
-      TRBH1(L,NY,NX)=TRBH1(L,NY,NX)-DXOH1
-      TRBH2(L,NY,NX)=TRBH2(L,NY,NX)-DXOH2
-      TRB1P(L,NY,NX)=TRB1P(L,NY,NX)-DXH1P
-      TRB2P(L,NY,NX)=TRB2P(L,NY,NX)-DXH2P
-      TRALPO(L,NY,NX)=TRALPO(L,NY,NX)+DPALP
-      TRFEPO(L,NY,NX)=TRFEPO(L,NY,NX)+DPFEP
-      TRCAPD(L,NY,NX)=TRCAPD(L,NY,NX)+DPCDP
-      TRCAPH(L,NY,NX)=TRCAPH(L,NY,NX)+DPCHP
-      TRCAPM(L,NY,NX)=TRCAPM(L,NY,NX)+DPCMP
-      TRALPB(L,NY,NX)=TRALPB(L,NY,NX)-DPALP
-      TRFEPB(L,NY,NX)=TRFEPB(L,NY,NX)-DPFEP
-      TRCPDB(L,NY,NX)=TRCPDB(L,NY,NX)-DPCDP
-      TRCPHB(L,NY,NX)=TRCPHB(L,NY,NX)-DPCHP
-      TRCPMB(L,NY,NX)=TRCPMB(L,NY,NX)-DPCMP
-      ELSE
-      DZH1P=FVLPO4*H1PO4(L,NY,NX)/31.0
-      DZH2P=FVLPO4*H2PO4(L,NY,NX)/31.0
-      DXOH1=FVLPO4*XOH1(L,NY,NX)
-      DXOH2=FVLPO4*XOH2(L,NY,NX)
-      DXH2P=FVLPO4*XH2P(L,NY,NX)
-      DPALP=FVLPO4*PALPO(L,NY,NX)
-      DPFEP=FVLPO4*PFEPO(L,NY,NX)
-      DPCDP=FVLPO4*PCAPD(L,NY,NX)
-      DPCHP=FVLPO4*PCAPH(L,NY,NX)
-      DPCMP=FVLPO4*PCAPM(L,NY,NX)
-      TRH1P(L,NY,NX)=TRH1P(L,NY,NX)+DZH1P
-      TRH2P(L,NY,NX)=TRH2P(L,NY,NX)+DZH2P
-      TRXH1(L,NY,NX)=TRXH1(L,NY,NX)+DXOH1
-      TRXH2(L,NY,NX)=TRXH2(L,NY,NX)+DXOH2
-      TRX2P(L,NY,NX)=TRX2P(L,NY,NX)+DXH2P
-      TRH1B(L,NY,NX)=TRH1B(L,NY,NX)-DZH1P
-      TRH2B(L,NY,NX)=TRH2B(L,NY,NX)-DZH2P
-      TRBH1(L,NY,NX)=TRBH1(L,NY,NX)-DXOH1
-      TRBH2(L,NY,NX)=TRBH2(L,NY,NX)-DXOH2
-      TRB2P(L,NY,NX)=TRB2P(L,NY,NX)-DXH2P
-      TRALPO(L,NY,NX)=TRALPO(L,NY,NX)+DPALP
-      TRFEPO(L,NY,NX)=TRFEPO(L,NY,NX)+DPFEP
-      TRCAPD(L,NY,NX)=TRCAPD(L,NY,NX)+DPCDP
-      TRCAPH(L,NY,NX)=TRCAPH(L,NY,NX)+DPCHP
-      TRCAPM(L,NY,NX)=TRCAPM(L,NY,NX)+DPCMP
-      TRALPB(L,NY,NX)=TRALPB(L,NY,NX)-DPALP
-      TRFEPB(L,NY,NX)=TRFEPB(L,NY,NX)-DPFEP
-      TRCPDB(L,NY,NX)=TRCPDB(L,NY,NX)-DPCDP
-      TRCPHB(L,NY,NX)=TRCPHB(L,NY,NX)-DPCHP
-      TRCPMB(L,NY,NX)=TRCPMB(L,NY,NX)-DPCMP
-      ENDIF
-      ELSE
-C
-C     AMALGAMATE PO4 BAND WITH NON-BAND IF BAND NO LONGER EXISTS
-C
-      DPPOB(L,NY,NX)=0.0
-      WDPOB(L,NY,NX)=0.0
-      VLPOB(L,NY,NX)=0.0
-      VLPO4(L,NY,NX)=1.0
-      H0PO4(L,NY,NX)=H0PO4(L,NY,NX)+H0POB(L,NY,NX)
-      H1PO4(L,NY,NX)=H1PO4(L,NY,NX)+H1POB(L,NY,NX)
-      H2PO4(L,NY,NX)=H2PO4(L,NY,NX)+H2POB(L,NY,NX)
-      H3PO4(L,NY,NX)=H3PO4(L,NY,NX)+H3POB(L,NY,NX)
-      ZFE1P(L,NY,NX)=ZFE1P(L,NY,NX)+ZFE1PB(L,NY,NX)
-      ZFE2P(L,NY,NX)=ZFE2P(L,NY,NX)+ZFE2PB(L,NY,NX)
-      ZCA0P(L,NY,NX)=ZCA0P(L,NY,NX)+ZCA0PB(L,NY,NX)
-      ZCA1P(L,NY,NX)=ZCA1P(L,NY,NX)+ZCA1PB(L,NY,NX)
-      ZCA2P(L,NY,NX)=ZCA2P(L,NY,NX)+ZCA2PB(L,NY,NX)
-      ZMG1P(L,NY,NX)=ZMG1P(L,NY,NX)+ZMG1PB(L,NY,NX)
-      H0POB(L,NY,NX)=0.0
-      H1POB(L,NY,NX)=0.0
-      H2POB(L,NY,NX)=0.0
-      H3POB(L,NY,NX)=0.0
-      ZFE1PB(L,NY,NX)=0.0
-      ZFE2PB(L,NY,NX)=0.0
-      ZCA0PB(L,NY,NX)=0.0
-      ZCA1PB(L,NY,NX)=0.0
-      ZCA2PB(L,NY,NX)=0.0
-      ZMG1PB(L,NY,NX)=0.0
-      XOH0(L,NY,NX)=XOH0(L,NY,NX)+XOH0B(L,NY,NX)
-      XOH1(L,NY,NX)=XOH1(L,NY,NX)+XOH1B(L,NY,NX)
-      XOH2(L,NY,NX)=XOH2(L,NY,NX)+XOH2B(L,NY,NX)
-      XH1P(L,NY,NX)=XH1P(L,NY,NX)+XH1PB(L,NY,NX)
-      XH2P(L,NY,NX)=XH2P(L,NY,NX)+XH2PB(L,NY,NX)
-      XOH0B(L,NY,NX)=0.0
-      XOH1B(L,NY,NX)=0.0
-      XOH2B(L,NY,NX)=0.0
-      XH1PB(L,NY,NX)=0.0
-      XH2PB(L,NY,NX)=0.0
-      PALPO(L,NY,NX)=PALPO(L,NY,NX)+PALPB(L,NY,NX)
-      PFEPO(L,NY,NX)=PFEPO(L,NY,NX)+PFEPB(L,NY,NX)
-      PCAPD(L,NY,NX)=PCAPD(L,NY,NX)+PCPDB(L,NY,NX)
-      PCAPH(L,NY,NX)=PCAPH(L,NY,NX)+PCPHB(L,NY,NX)
-      PCAPM(L,NY,NX)=PCAPM(L,NY,NX)+PCPMB(L,NY,NX)
-      PALPB(L,NY,NX)=0.0
-      PFEPB(L,NY,NX)=0.0
-      PCPDB(L,NY,NX)=0.0
-      PCPHB(L,NY,NX)=0.0
-      PCPMB(L,NY,NX)=0.0
-      ENDIF
-      ENDIF
+      call update_PO4_fert_bandinfo(L,NY,NX)
 C     ENDIF
 C
 C     SUBTRACT FERTILIZER DISSOLUTION FROM FERTILIZER POOLS
@@ -615,309 +251,7 @@ C     ENDIF
 C
 C     SURFACE RESIDUE
 C
-C     BKVL=litter mass
-C
-      IF(VOLWM(NPH,0,NY,NX).GT.ZEROS2(NY,NX))THEN
-      BKVLX=BKVL(0,NY,NX)
-C
-C     UREA HYDROLYSIS IN SURFACE RESIDUE
-C
-C     VOLQ=biologically active litter water volume from nitro.f
-C     COMA=concentration of active biomass
-C     TOQCK=total microbial activity from nitro.f
-C     DUKD=Km for urea hydrolysis
-C
-      IF(VOLQ(0,NY,NX).GT.ZEROS2(NY,NX))THEN
-      COMA=AMIN1(0.1E+06,TOQCK(0,NY,NX)/VOLQ(0,NY,NX))
-      ELSE
-      COMA=0.1E+06
-      ENDIF
-      DUKD=DUKM*(1.0+COMA/DUKI)
-C
-C     UREA HYDROLYSIS INHIBITION
-C
-C     ZNHU0,ZNHUI=initial,current inhibition activity
-C     RNHUI=rate constant for decline in urea hydrolysis inhibition
-C
-      IF(ZNHU0(0,NY,NX).GT.ZEROS(NY,NX)
-     2.AND.ZNHUI(0,NY,NX).GT.ZEROS(NY,NX))THEN
-      ZNHUI(0,NY,NX)=ZNHUI(0,NY,NX)-TFNQ(0,NY,NX)**0.25
-     2*RNHUI(IUTYP(NY,NX))*ZNHUI(0,NY,NX)
-     3*AMAX1(RNHUI(IUTYP(NY,NX)),1.0-ZNHUI(0,NY,NX)/ZNHU0(0,NY,NX))
-      ELSE
-      ZNHUI(0,NY,NX)=0.0
-      ENDIF
-C
-C     UREA CONCENTRATION AND HYDROLYSIS IN SURFACE RESIDUE
-C
-C     ZNHUFA=urea fertilizer
-C     CNHUA=concentration of urea fertilizer
-C     DFNSA=effect of microbial concentration on urea hydrolysis
-C     RSNUA=rate of urea hydrolysis
-C     SPNHU=specific rate constant for urea hydrolysis
-C     TFNQ=temperature effect on microbial activity from nitro.f
-C
-      IF(ZNHUFA(0,NY,NX).GT.ZEROS(NY,NX)
-     2.AND.BKVL(0,NY,NX).GT.ZEROS(NY,NX))THEN
-      CNHUA=ZNHUFA(0,NY,NX)/BKVL(0,NY,NX)
-      DFNSA=CNHUA/(CNHUA+DUKD)
-      RSNUA=AMIN1(ZNHUFA(0,NY,NX)
-     2,SPNHU*TOQCK(0,NY,NX)*DFNSA*TFNQ(0,NY,NX))*(1.0-ZNHUI(0,NY,NX))
-      ELSE
-      RSNUA=0.0
-      ENDIF
-C     IF(ZNHUFA(0,NY,NX).GT.ZEROS(NY,NX))THEN
-C     WRITE(*,8778)'UREA0',I,J,IUTYP(NY,NX)
-C    2,ZNHUFA(0,NY,NX),RSNUA
-C    2,DFNSA,TFNQ(0,NY,NX),CNHUA,DUKD,DUKM,DUKI,TOQCK(0,NY,NX)
-C    3,BKVL(0,NY,NX),TFNQ(0,NY,NX),SPNHU,ZNHU0(0,NY,NX),ZNHUI(0,NY,NX)
-C    4,RNHUI(IUTYP(NY,NX))
-8778  FORMAT(A8,3I4,40E12.4)
-C     ENDIF
-C
-C     NH4, NH3, UREA, NO3 DISSOLUTION IN SURFACE RESIDUE
-C     FROM FIRST-ORDER FUNCTIONS OF REMAINING
-C     FERTILIZER (NOTE: SUPERPHOSPHATE AND ROCK PHOSPHATE
-C     ARE REPRESENTED AS MONOCALCIUM PHOSPHATE AND HYDROXYAPATITE
-C     MODELLED IN PHOSPHORUS REACTIONS BELOW)
-C
-C     RSN4AA=rate of broadcast NH4 fertilizer dissoln
-C     RSN3AA=rate of broadcast NH3 fertilizer dissoln
-C     RSNUAA=rate of broadcast urea fertr dissoln
-C     RSNOAA=rate of broadcast NO3 fertilizer dissoln
-C
-      IF(VOLWRX(NY,NX).GT.ZEROS(NY,NX))THEN
-      THETWR=AMIN1(1.0,VOLW(0,NY,NX)/VOLWRX(NY,NX))
-      ELSE
-      THETWR=1.0
-      ENDIF
-      RSN4AA=SPNH4*ZNH4FA(0,NY,NX)*THETWR
-      RSN3AA=SPNH3*ZNH3FA(0,NY,NX)
-      RSNUAA=RSNUA*THETWR
-      RSNOAA=SPNO3*ZNO3FA(0,NY,NX)*THETWR
-C
-C     SOLUBLE AND EXCHANGEABLE NH4 CONCENTRATIONS
-C
-C     VOLWNH=water volume
-C     RN4X,RN3X=NH4,NH3 input from uptake, mineraln, dissoln
-C     XNH4S=net change in NH4 from nitro.f
-C     CN41,CN31=total NH4,NH3 concentration
-C     XN41=adsorbed NH4 concentration
-C
-      IF(VOLWM(NPH,0,NY,NX).GT.ZEROS2(NY,NX))THEN
-      VOLWMX=14.0*VOLWM(NPH,0,NY,NX)
-      RN4X=(XNH4S(0,NY,NX)+14.0*RSN4AA)/VOLWMX
-      RN3X=14.0*RSNUAA/VOLWMX
-      CN41=AMAX1(ZERO,ZNH4S(0,NY,NX)/VOLWMX+RN4X)
-      CN31=AMAX1(ZERO,ZNH3S(0,NY,NX)/VOLWMX+RN3X)
-      IF(BKVLX.GT.ZEROS(NY,NX))THEN
-      XN41=AMAX1(ZERO,XN4(0,NY,NX)/BKVLX)
-      ELSE
-      XN41=0.0
-      ENDIF
-C
-C     SOLUBLE, EXCHANGEABLE AND PRECIPITATED PO4 CONCENTRATIONS
-C
-C     VOLWMP=water volume
-C     RH1PX,RH2PX=HPO4,H2PO4 inputs from mineraln, uptake
-C     XH1PS=net change in HPO4 from nitro.f
-C     CH1P1,CH2P1=HPO4,H2PO4 concentrations
-C
-      VOLWMP=31.0*VOLWM(NPH,0,NY,NX)
-      RH1PX=XH1PS(0,NY,NX)/VOLWMP
-      RH2PX=XH2PS(0,NY,NX)/VOLWMP
-      CH1P1=AMAX1(0.0,H1PO4(0,NY,NX)/VOLWMP+RH1PX)
-      CH2P1=AMAX1(0.0,H2PO4(0,NY,NX)/VOLWMP+RH2PX)
-      ELSE
-      RN4X=0.0
-      RN3X=0.0
-      CN41=0.0
-      CN31=0.0
-      XN41=0.0
-      RH1PX=0.0
-      RH2PX=0.0
-      CH1P1=0.0
-      CH2P1=0.0
-      ENDIF
-C
-C     PHOSPHORUS TRANSFORMATIONS IN SURFACE RESIDUE
-C
-C     PALPO1,PFEPO1=concn of precip AlPO4,FEPO4
-C     PCAPM1,PCAPD1,PCAPH1=concn of precip CaH2PO4,CaHPO4,apatite
-C
-      IF(BKVLX.GT.ZEROS(NY,NX))THEN
-      PALPO1=AMAX1(0.0,PALPO(0,NY,NX)/BKVLX)
-      PFEPO1=AMAX1(0.0,PFEPO(0,NY,NX)/BKVLX)
-      PCAPM1=AMAX1(0.0,PCAPM(0,NY,NX)/BKVLX)
-      PCAPD1=AMAX1(0.0,PCAPD(0,NY,NX)/BKVLX)
-      PCAPH1=AMAX1(0.0,PCAPH(0,NY,NX)/BKVLX)
-      ELSE
-      PALPO1=0.0
-      PFEPO1=0.0
-      PCAPM1=0.0
-      PCAPD1=0.0
-      PCAPH1=0.0
-      ENDIF
-C
-C     CALCULATE H2PO4 COPRECIPITATES FRPM LITTER PH
-C
-      CHY1=AMAX1(ZERO,10.0**(-(PH(0,NY,NX)-3.0)))
-      COH1=AMAX1(ZERO,DPH2O/CHY1)
-      CAL1=AMAX1(ZERO,SPALO/COH1**3)
-      CFE1=AMAX1(ZERO,SPFEO/COH1**3)
-      CCO20=AMAX1(ZERO,CCO2S(0,NY,NX)/12.0)
-      CCO31=AMAX1(ZERO,CCO20*DPCO3/CHY1**2)
-      CCA1=AMAX1(ZERO,AMIN1(CCAMX,SPCAC/CCO31))
-C
-C     ALUMINUM PHOSPHATE (VARISCITE)
-C
-C     CH2PA,CH2P1=equilibrium,current H2PO4 concentration in litter
-C     SYA0P2=solubility product derived from SPALO
-C     RPALPX=H2PO4 dissolution from AlPO4 in litter
-C
-      CH2PA=SYA0P2/(CAL1*COH1**2)
-      RPALPX=AMIN1(AMAX1(0.0,4.0E-08*ORGC(0,NY,NX)-PALPO1)
-     2,AMAX1(-PALPO1,TPD*(CH2P1-CH2PA)))
-C
-C     IRON PHOSPHATE (STRENGITE)
-C
-C     CH2PF,CH2P1=equilibrium,current H2PO4 concentration in litter
-C     SYF0P2=solubility product derived from SPALO
-C     RPFEPX=H2PO4 dissolution from FePO4 in litter
-C
-      CH2PF=SYF0P2/(CFE1*COH1**2)
-      RPFEPX=AMIN1(AMAX1(0.0,2.0E-06*ORGC(0,NY,NX)-PFEPO1)
-     2,AMAX1(-PFEPO1,TPD*(CH2P1-CH2PF)))
-C
-C     DICALCIUM PHOSPHATE
-C
-C     CH2PD,CH2P1=equilibrium,current H2PO4 concentration in litter
-C     SYCAD2=solubility product derived from SPALO
-C     RPCADX=H2PO4 dissolution from CaHPO4 in litter
-C
-      CH2PD=SYCAD2/(CCA1*COH1)
-      RPCADX=AMIN1(AMAX1(0-.0,5.0E-05*ORGC(0,NY,NX)-PCAPD1)
-     2,AMAX1(-PCAPD1,TPD*(CH2P1-CH2PD)))
-C
-C     HYDROXYAPATITE
-C
-C     CH2PH,CH2P1=equilibrium,current H2PO4 concentration in litter
-C     SYCAH2=solubility product derived from SPALO
-C     RPCAHX=H2PO4 dissolution from apatite in litter
-C
-      CH2PH=(SYCAH2/(CCA1**5*COH1**7))**0.333
-      RPCAHX=AMIN1(AMAX1(0.0,5.0E-05*ORGC(0,NY,NX)-PCAPH1)
-     2,AMAX1(-PCAPH1,TPD*(CH2P1-CH2PH)))
-C
-C     MONOCALCIUM PHOSPHATE
-C
-C     CH2PM,CH2P1=equilibrium,current H2PO4 concentration in litter
-C     SPCAM=solubility product for Ca(H2PO4)2
-C     RPCAMX=H2PO4 dissolution from Ca(H2PO4)2 in litter
-C
-      CH2PM=SQRT(SPCAM/CCA1)
-      RPCAMX=AMIN1(AMAX1(0.0,5.0E-05*ORGC(0,NY,NX)-PCAPM1)
-     2,AMAX1(-PCAPM1*SPPO4,TPD*(CH2P1-CH2PM)))
-C     IF(I.GT.315)THEN
-C     WRITE(*,2227)'RPPO4',I,J,L,RPCAHX,CH2P1,CH2PA,CH2PH
-C    2,SYA0P2,CAL1,COH1,SYCAH2,CCA1,CCO21,CCO31,PCAPH1
-C    3,VOLWM(NPH,0,NY,NX),SPCAC/CCO31,H2PO4(0,NY,NX)
-C    4,CCO20,DPCO3,CHY1,CCO2S(0,NY,NX)
-2227  FORMAT(A8,3I4,20E12.4)
-C     ENDIF
-C
-C     PHOSPHORUS ANION EXCHANGE IN SURFACE REDISUE
-C     CALCULATED FROM EXCHANGE EQUILIBRIA AMONG H2PO4-,
-C     HPO4--, H+, OH- AND PROTONATED AND NON-PROTONATED -OH
-C     EXCHANGE SITES (NOT CALCULATED)
-C
-C     H2PO4-H+HPO4
-C
-C     DPH2P=dissociation constant
-C     S1=equilibrium concentration in litter
-C     RH2P=H2PO4-H+HPO4 dissociation in litter
-C
-      DP=DPH2P
-      S0=CH1P1+CHY1+DP
-      S1=AMAX1(0.0,S0**2-4.0*(CH1P1*CHY1-DP*CH2P1))
-      RH2P=TSL*(S0-SQRT(S1))
-C
-C     EQUILIBRIUM X-CA CONCENTRATION FROM CEC, GAPON COEFFICIENTS
-C     AND CATION CONCENTRATIONS
-C
-C     CCEC,XCEC=cation exchange concentration,capacity
-C     XCAX=equilibrium R-Ca concentration
-C     GKC4,GKCH,GKCA,GKCM,GKCN,GKCK=Gapon selectivity coefficients for
-C     CA-NH4,CA-H,CA-AL,CA-MG,CA-NA,CA-K
-C     X*Q=equilibrium exchangeable concentrations
-C     XTLQ=total equilibrium exchangeable concentration
-C
-      IF(BKVLX.GT.ZEROS(NY,NX))THEN
-      CCEC0=AMAX1(ZERO,COOH*ORGC(0,NY,NX)/BKVLX)
-      ELSE
-      CCEC0=ZERO
-      ENDIF
-      CALX=AMAX1(ZERO,CAL1)**0.333
-      CFEX=AMAX1(ZERO,CFE1)**0.333
-      CCAX=AMAX1(ZERO,CCA1)**0.500
-C
-C     EQUILIBRIUM X-CA CONCENTRATION FROM CEC AND CATION
-C     CONCENTRATIONS
-C
-      XCAX=CCEC0/(1.0+GKC4(NU(NY,NX),NY,NX)*CN41/CCAX
-     2+GKCH(NU(NY,NX),NY,NX)*CHY1/CCAX
-     3+GKCA(NU(NY,NX),NY,NX)*CALX/CCAX
-     3+GKCA(NU(NY,NX),NY,NX)*CFEX/CCAX)
-      XN4Q=XCAX*CN41*GKC4(NU(NY,NX),NY,NX)
-      XHYQ=XCAX*CHY1*GKCH(NU(NY,NX),NY,NX)
-      XALQ=XCAX*CALX*GKCA(NU(NY,NX),NY,NX)
-      XFEQ=XCAX*CFEX*GKCA(NU(NY,NX),NY,NX)
-      XCAQ=XCAX*CCAX
-      XTLQ=XN4Q+XHYQ+XALQ+XFEQ+XCAQ
-      IF(XTLQ.GT.ZERO)THEN
-      FX=CCEC0/XTLQ
-      ELSE
-      FX=0.0
-      ENDIF
-      XN4Q=FX*XN4Q
-C
-C     NH4 AND NH3 EXCHANGE IN SURFACE RESIDUE
-C
-C     RXN4=NH4 adsorption in litter
-C     TADC0=adsorption rate constant
-C     RNH4=NH4-NH3+H dissociation in litter
-C     DPN4=NH4 dissociation constant
-C
-      RXN4=TADC0*(XN4Q-XN41)
-      RNH4=(CHY1*CN31-DPN4*CN41)/(DPN4+CHY1)
-C     IF(J.EQ.12)THEN
-C     WRITE(*,2223)'RXN4',I,J,RXN4,CN41,XN41,TADC0,XN4Q
-C    2,CCAX,CCA1,CCO20,CCO31
-C    2,XCAQ,CCEC0,FN4X,FCAQ,GKC4(NU(NY,NX),NY,NX)
-C    3,PH(0,NY,NX),CHY1,RNH4
-C    3,CN31,DPN4,ZNH4S(0,NY,NX),XN4(0,NY,NX),14.0*RSN4AA,RN4X,BKVLX
-C    4,BKVL(0,NY,NX),VOLWM(NPH,0,NY,NX)
-2223  FORMAT(A8,2I4,30E12.4)
-C     ENDIF
-      ELSE
-      RSN4AA=0.0
-      RSN3AA=0.0
-      RSNUAA=0.0
-      RSNOAA=0.0
-      RPALPX=0.0
-      RPFEPX=0.0
-      RPCADX=0.0
-      RPCAHX=0.0
-      RPCAMX=0.0
-      RXN4=0.0
-      RNH4=0.0
-      RH2P=0.0
-      RPALPX=0.0
-      RPFEPX=0.0
-      RPCADX=0.0
-      RPCAMX=0.0
-      RPCAHX=0.0
-      ENDIF
+      call update_surf_residue_solute(NX,NY)
 C
 C     TOTAL ION FLUXES FOR ALL REACTIONS ABOVE
 C
@@ -971,16 +305,17 @@ C    3,SPNH4,ZNH4FA(0,NY,NX),THETWR
       RETURN
       end subroutine solute
 C------------------------------------------------------------------------
-      
-      subroutine urea_hydrolysis
-      
+
+      subroutine urea_hydrolysis(L,NY,NX)
+
       implicit none
+      integer, intent(in) :: L,NY,NX
 C      real(r8), intent(out) :: RSNUA
 C      real(r8), intent(out) :: RSNUB
 C      real(r8) :: CNHUA, COMA, DUKD
 C      real(r8) :: DFNSA
-      
-C     begin_execution
+
+C     execution begins here
 C
 C     UREA HYDROLYSIS IN BAND AND NON-BAND SOIL ZONES
 C
@@ -1063,10 +398,11 @@ C    5,THETW(L,NY,NX)
 C     ENDIF
       end subroutine urea_hydrolysis
 C------------------------------------------------------------------------
-      
-      subroutine update_soil_fertlizer
-      
+
+      subroutine update_soil_fertlizer(L,NY,NX)
+
       implicit none
+      integer, intent(in) :: L,NY,NX
 C      real(r8), intent(out) :: CN41, CN31
 C      real(r8), intent(out) :: CN3B
 C      real(r8), intent(out) :: CN4B
@@ -1075,10 +411,11 @@ C      real(r8) :: RN4X,RN3X
 C      real(r8) :: VOLWNX
 C      real(r8) :: RNBX
 C      real(r8) :: R3BX
-      
-C     begin_execution
-      call urea_hydrolysis
-      
+
+C     execution begins here
+
+      call urea_hydrolysis(L,NY,NX)
+
 C
 C     NH4, NH3, UREA, NO3 DISSOLUTION IN BAND AND NON-BAND
 C     SOIL ZONES FROM FIRST-ORDER FUNCTIONS OF REMAINING
@@ -1258,13 +595,14 @@ C    2,VOLWPX,RH2PX,XH2PS(L,NY,NX),TUPH2P(L,NY,NX)
       PCAPHB=0.0
       ENDIF
       end subroutine update_soil_fertlizer
-      
-C------------------------------------------------------------------
-      subroutine nosalt_chem_equilibria
-      
-      implicit none
 
-C     begin_execution
+C------------------------------------------------------------------
+      subroutine nosalt_chem_equilibria(L,NY,NX)
+
+      implicit none
+      integer, intent(in) :: L,NY,NX
+
+C     execution begins here
 C
 C     PRECIPITATION-DISSOLUTION CALCULATED FROM ACTIVITIES
 C     OF REACTANTS AND PRODUCTS THROUGH SOLUTIONS
@@ -1748,12 +1086,14 @@ C    3,TRX2P(L,NY,NX)
 24    FORMAT(A8,3I4,60E12.4)
 C     ENDIF
       end subroutine nosalt_chem_equilibria
-      
-C------------------------------------------------------------------------
-      subroutine stage_ion_concs
-      implicit none
 
-C     begin_execution
+C------------------------------------------------------------------------
+      subroutine stage_ion_concs(L,NY,NX)
+      implicit none
+      integer, intent(in) :: L,NY,NX
+
+C     execution begins here
+
 C     SOLUBLE NO3 CONCENTRATIONS
 C     IN NON-BAND AND BAND SOIL ZONES
 C
@@ -1766,7 +1106,7 @@ C
       ELSE
       CNO1=0.0
       ENDIF
-      
+
       IF(VOLWNZ.GT.ZEROS2(NY,NX))THEN
       CNOB=AMAX1(0.0,ZNO3B(L,NY,NX)/(14.0*VOLWNZ))
       ELSE
@@ -1944,175 +1284,24 @@ C
       PCASO1=0.0
       ENDIF
       end subroutine stage_ion_concs
-      
-C--------------------------------------------------------------------------
-      subroutine solve_chem_equilibria
-      
-      implicit none
 
-C     begin_execution
+C--------------------------------------------------------------------------
+      subroutine solve_chem_equilibria(L,NY,NX)
+
+      implicit none
+      integer, intent(in) :: L,NY,NX
+
+      integer :: M
+C     execution begins here
 
       DO 1000 M=1,MRXN
 C
 C     SOLUTE CONCENTRATIONS
 C
-      CN41=AMAX1(ZERO,CN41)
-      CN4B=AMAX1(ZERO,CN4B)
-      CN31=AMAX1(ZERO,CN31)
-      CN3B=AMAX1(ZERO,CN3B)
-      CHY1=AMAX1(ZERO,10.0**(-(PH(L,NY,NX)-3.0)))
-      COH1=AMAX1(ZERO,DPH2O/CHY1)
-      CCO31=AMAX1(ZERO,CCO31)
-      CAL1=AMAX1(ZERO,CAL1)
-      CFE1=AMAX1(ZERO,CFE1)
-      CCA1=AMAX1(ZERO,AMIN1(CCAMX,CCA1))
-      CMG1=AMAX1(ZERO,CMG1)
-      CNA1=AMAX1(ZERO,CNA1)
-      CKA1=AMAX1(ZERO,CKA1)
-      CSO41=AMAX1(ZERO,CSO41)
-      CHCO31=AMAX1(ZERO,CHCO31)
-      CCO21=AMAX1(ZERO,CCO21)
-      CALO1=AMAX1(ZERO,CALO1)
-      CALO2=AMAX1(ZERO,CALO2)
-      CALO3=AMAX1(ZERO,CALO3)
-      CALO4=AMAX1(ZERO,CALO4)
-      CALS1=AMAX1(ZERO,CALS1)
-      CFEO1=AMAX1(ZERO,CFEO1)
-      CFEO2=AMAX1(ZERO,CFEO2)
-      CFEO3=AMAX1(ZERO,CFEO3)
-      CFEO4=AMAX1(ZERO,CFEO4)
-      CFES1=AMAX1(ZERO,CFES1)
-      CCAO1=AMAX1(ZERO,CCAO1)
-      CCAC1=AMAX1(ZERO,CCAC1)
-      CCAH1=AMAX1(ZERO,CCAH1)
-      CCAS1=AMAX1(ZERO,CCAS1)
-      CMGO1=AMAX1(ZERO,CMGO1)
-      CMGC1=AMAX1(ZERO,CMGC1)
-      CMGH1=AMAX1(ZERO,CMGH1)
-      CMGS1=AMAX1(ZERO,CMGS1)
-      CNAC1=AMAX1(ZERO,CNAC1)
-      CNAS1=AMAX1(ZERO,CNAS1)
-      CKAS1=AMAX1(ZERO,CKAS1)
-      CH0P1=AMAX1(ZERO,CH0P1)
-      CH1P1=AMAX1(ZERO,CH1P1)
-      CH2P1=AMAX1(ZERO,CH2P1)
-      CH3P1=AMAX1(ZERO,CH3P1)
-      CF1P1=AMAX1(ZERO,CF1P1)
-      CF2P1=AMAX1(ZERO,CF2P1)
-      CC0P1=AMAX1(ZERO,CC0P1)
-      CC1P1=AMAX1(ZERO,CC1P1)
-      CC2P1=AMAX1(ZERO,CC2P1)
-      CM1P1=AMAX1(ZERO,CM1P1)
-      CH0PB=AMAX1(ZERO,CH0PB)
-      CH1PB=AMAX1(ZERO,CH1PB)
-      CH2PB=AMAX1(ZERO,CH2PB)
-      CH3PB=AMAX1(ZERO,CH3PB)
-      CF1PB=AMAX1(ZERO,CF1PB)
-      CF2PB=AMAX1(ZERO,CF2PB)
-      CC0PB=AMAX1(ZERO,CC0PB)
-      CC1PB=AMAX1(ZERO,CC1PB)
-      CC2PB=AMAX1(ZERO,CC2PB)
-      CM1PB=AMAX1(ZERO,CM1PB)
-      XCOO=AMAX1(0.0,XCOOH-XHC1-XALO21-XFEO21)
+      call get_solute_concs(L,NY,NX)
+
 C
-C     IONIC STRENGTH FROM SUMS OF ION CONCENTRATIONS
-C
-C     CC3,CA3,CC2,CA2,CC1,CA1=total tri-,di-,univalent cations C,anions A
-C     CSTR1=ion strength
-C
-      CC3=CAL1+CFE1
-      CA3=CH0P1*VLPO4(L,NY,NX)+CH0PB*VLPOB(L,NY,NX)
-      CC2=CCA1+CMG1+CALO1+CFEO1+CF2P1*VLPO4(L,NY,NX)
-     2+CF2PB*VLPOB(L,NY,NX)
-      CA2=CSO41+CCO31+CH1P1*VLPO4(L,NY,NX)+CH1PB*VLPOB(L,NY,NX)
-      CC1=CN41*VLNH4(L,NY,NX)+CN4B*VLNHB(L,NY,NX)+CHY1+CNA1+CKA1
-     2+CALO2+CFEO2+CALS1+CFES1+CCAO1+CCAH1+CMGO1+CMGH1
-     3+(CF1P1+CC2P1)*VLPO4(L,NY,NX)+(CF1PB+CC2PB)*VLPOB(L,NY,NX)
-      CA1=CNO1*VLNO3(L,NY,NX)+CNOB*VLNOB(L,NY,NX)+COH1+CHCO31+CCL1
-     2+CALO4+CFEO4+CNAC1+CNAS1+CKAS1+(CH2P1+CC0P1)*VLPO4(L,NY,NX)
-     3+(CH2PB+CC0PB)*VLPOB(L,NY,NX)
-      CSTR1=AMAX1(0.0,0.5E-03*(9.0*(CC3+CA3)+4.0*(CC2+CA2)
-     2+CC1+CA1))
-      CSTR2=SQRT(CSTR1)
-      FSTR2=CSTR2/(1.0+CSTR2)
-C
-C     ACTIVITY COEFFICIENTS CALCULATED FROM ION STRENGTH
-C
-      A1=AMIN1(1.0,10.0**(-0.509*1.0*FSTR2+0.20*CSTR2))
-      A2=AMIN1(1.0,10.0**(-0.509*4.0*FSTR2+0.20*CSTR2))
-      A3=AMIN1(1.0,10.0**(-0.509*9.0*FSTR2+0.20*CSTR2))
-C
-C     PRECIPITATION-DISSOLUTION REACTIONS IN NON-BAND, BAND
-C     CALCULATED FROM ACTIVITIES OF REACTANTS AND PRODUCTS THROUGH
-C     CONVERGENCE SOLUTIONS FOR THEIR EQUILIBRIUM CONCENTRATIONS USING
-C     SOLUTE FORMS CURRENTLY AT HIGHEST CONCENTRATIONS
-C
-C     for all reactions:
-C     A*=ion activity
-C     PX,PY=solute forms with greatest activity
-C     R*,P*=reactant,product
-C     NR*,NP*=reactant,product stoichiometry
-C     SP=solubility product of PX from parameters above
-C     SPX=equilibrium product concentration
-C     R*X=precipitation-dissolution rate
-C
-      AHY1=CHY1*A1
-      AOH1=COH1*A1
-      AAL1=CAL1*A3
-      AALO1=CALO1*A2
-      AALO2=CALO2*A1
-      AALO3=CALO3
-      AALO4=CALO4*A1
-      AFE1=CFE1*A3
-      AFEO1=CFEO1*A2
-      AFEO2=CFEO2*A1
-      AFEO3=CFEO3
-      AFEO4=CFEO4*A1
-      ACA1=CCA1*A2
-      ACO31=CCO31*A2
-      AHCO31=CHCO31*A1
-      ACO21=CCO21*A0
-      ASO41=CSO41*A2
-      AH0P1=CH0P1*A3
-      AH1P1=CH1P1*A2
-      AH2P1=CH2P1*A1
-      AH3P1=CH3P1*A0
-      AF1P1=CF1P1*A2
-      AF2P1=CF2P1*A1
-      AC0P1=CC0P1*A1
-      AC1P1=CC1P1*A0
-      AC2P1=CC2P1*A1
-      AM1P1=CM1P1*A0
-      AH0PB=CH0PB*A3
-      AH1PB=CH1PB*A2
-      AH2PB=CH2PB*A1
-      AH3PB=CH3PB*A0
-      AF1PB=CF1PB*A2
-      AF2PB=CF2PB*A1
-      AC0PB=CC0PB*A1
-      AC1PB=CC1PB*A0
-      AC2PB=CC2PB*A1
-      AM1PB=CM1PB*A0
-      AN41=CN41*A1
-      AN4B=CN4B*A1
-      AN31=CN31*A0
-      AN3B=CN3B*A0
-      AMG1=CMG1*A2
-      ANA1=CNA1*A1
-      AKA1=CKA1*A1
-      AALS1=CALS1*A1
-      AFES1=CFES1*A1
-      ACAO1=CCAO1*A1
-      ACAC1=CCAC1*A0
-      ACAS1=CCAS1*A0
-      ACAH1=CCAH1*A1
-      AMGO1=CMGO1*A1
-      AMGC1=CMGC1*A0
-      AMGH1=CMGH1*A1
-      AMGS1=CMGS1*A0
-      ANAC1=CNAC1*A1
-      ANAS1=CNAS1*A1
-      AKAS1=CKAS1*A1
+      call ion_strength_activity(L,NY,NX)
 C
 C     ALUMINUM HYDROXIDE (GIBBSITE)
 C
@@ -2300,6 +1489,417 @@ C     ENDIF
 C
 C     PHOSPHORUS PRECIPITATION-DISSOLUTION IN NON-BAND SOIL ZONE
 C
+      call phosp_precip_dissol_nonband(NY,NX)
+C
+C     PHOSPHORUS PRECIPITATION-DISSOLUTION IN BAND SOIL ZONE
+C
+      call phosp_precip_dissol_band(NY,NX)
+C
+      call phosp_anion_exch_noband(L,NY,NX)
+C
+      call phosp_anion_exch_band(L,NY,NX)
+C
+C     CATION EXCHANGE FROM GAPON SELECTIVITY COEFFICIENTS
+C     FOR CA-NH4, CA-H, CA-AL, CA-MG, CA-NA, CA-K
+C
+      call cation_exchange(L,NY,NX)
+C
+C     SOLUTE DISSOCIATION REACTIONS
+C
+      call solute_dissociation(L,NY,NX)
+C
+C     TOTAL ION FLUXES FOR CURRENT ITERATION
+C     FROM ALL REACTIONS ABOVE
+C
+      call update_ion_flux_cur_iter(L,NY,NX)
+
+      call update_ion_conc_cur_iter(L,NY,NX)
+C
+      call accumulate_ion_flux(L,NY,NX)
+C
+C     GO TO NEXT ITERATION
+C
+1000  CONTINUE
+C     CONVERGENCE ITERATIONS COMPLETED
+C
+C     IF(J.EQ.24)THEN
+C     WRITE(*,1119)'GAPON',I,J,L,M,CH0P1,CAL1,CFE1,CH0P1*A3*CAL1*A3
+C    2,SPALP,CH0P1*A3*CFE1*A3,SPFEP
+C    6,SPOH2,XOH11*CHY1*A1/XOH21,SPOH1,XOH01*CHY1*A1/XOH11
+C    7,SPH2P,XOH21*CH2P1*A1/XH2P1,SXH2P,XOH11*CH2P1/(XH2P1*COH1)
+C    8,SPH1P,XOH11*CH1P1*A2/(XH1P1*COH1*A1)
+C    9,COH1*A1,CHY1*A1
+1119  FORMAT(A8,4I4,24E11.3)
+C     WRITE(*,1119)'CATION',I,J,L,M,CCEC,XN41+XHY1+3*XAL1+2*(XCA1+XMG1)
+C    2+XNA1+XKA1,XN41,XHY1,XAL1,XCA1,XMG1,XNA1,XKA1,CN41,CHY1,CAL1,CCA1
+C    2,CMG1,CNA1,CKA1,(CCA1*A2)**0.5*XN41/(CN41*A1*XCA1*2)
+C    3,(CCA1*A2)**0.5*XHY1/(CHY1*A1*XCA1*2)
+C    2,(CCA1*A2)**0.5*XAL1*3/((CAL1*A3)**0.333*XCA1*2)
+C    3,(CCA1*A2)**0.5*XMG1*2/((CMG1*A2)**0.5*XCA1*2)
+C    3,(CCA1*A2)**0.5*XNA1/(CNA1*A1*XCA1*2)
+C    5,(CCA1*A2)**0.5*XKA1/(CKA1*A1*XCA1*2)
+C    6,CHY1*A1*XCOO/XHC1,CALO2*A1*XCOO/XALO21
+C     ENDIF
+      end subroutine solve_chem_equilibria
+
+C--------------------------------------------------------------------------
+      subroutine salt_chem_equilibria(L,NY,NX)
+
+      implicit none
+      integer, intent(in) :: L,NY,NX
+
+C     execution begins here
+C
+C     salt code: *HY*=H+,*OH*=OH-,*AL*=Al3+,*FE*=Fe3+,*CA*=Ca2+,*MG*=Mg2+
+C          :*NA*=Na+,*KA*=K+,*SO4*=SO42-,*CL*=Cl-,*CO3*=CO32-,*HCO3*=HCO3-
+C          :*CO2*=CO2,*ALO1*=AlOH2-,*ALOH2=AlOH2-,*ALOH3*=AlOH3
+C          :*ALOH4*=AlOH4+,*ALS*=AlSO4+,*FEO1*=FeOH2-,*FEOH2=F3OH2-
+C          :*FEOH3*=FeOH3,*FEOH4*=FeOH4+,*FES*=FeSO4+,*CAO*=CaOH
+C          :*CAC*=CaCO3,*CAH*=CaHCO3-,*CAS*=CaSO4,*MGO*=MgOH,*MGC*=MgCO3
+C          :*MHG*=MgHCO3-,*MGS*=MgSO4,*NAC*=NaCO3-,*NAS*=NaSO4-,*KAS*=KSO4-
+C     phosphorus code: *H0P*=PO43-,*H3P*=H3PO4,*F1P*=FeHPO42-,*F2P*=F1H2PO4-
+C          :*C0P*=CaPO4-,*C1P*=CaHPO4,*C2P*=CaH2PO4+,*M1P*=MgHPO4,*COO*=COOH-
+C          :*1=non-band,*B=band
+C     C*,X*,Z*=soluble,exchangeable concentration, mass
+C
+      call stage_ion_concs(L,NY,NX)
+
+C
+C     CONVERGENCE TOWARDS SOLUTE EQILIBRIA
+C
+      call solve_chem_equilibria(L,NY,NX)
+C
+
+      call summarize_ion_flxes(L,NY,NX)
+
+
+      end subroutine salt_chem_equilibria
+C----------------------------------------------------------------------------
+      subroutine summarize_ion_flxes(L,NY,NX)
+
+      implicit none
+      integer, intent(in) :: L,NY,NX
+
+C     execution begins here
+C     CONVERT TOTAL ION FLUXES FROM CHANGES IN CONCENTRATION
+C     TO CHANGES IN MASS PER UNIT AREA FOR USE IN 'REDIST'
+C
+      TRN4S(L,NY,NX)=TRN4S(L,NY,NX)*VOLWNH
+      TRN4B(L,NY,NX)=TRN4B(L,NY,NX)*VOLWNB
+      TRN3S(L,NY,NX)=TRN3S(L,NY,NX)*VOLWNH
+      TRN3B(L,NY,NX)=TRN3B(L,NY,NX)*VOLWNB
+      TRAL(L,NY,NX)=TRAL(L,NY,NX)*VOLWM(NPH,L,NY,NX)
+      TRFE(L,NY,NX)=TRFE(L,NY,NX)*VOLWM(NPH,L,NY,NX)
+      TRHY(L,NY,NX)=TRHY(L,NY,NX)*VOLWM(NPH,L,NY,NX)
+      TRCA(L,NY,NX)=TRCA(L,NY,NX)*VOLWM(NPH,L,NY,NX)
+      TRMG(L,NY,NX)=TRMG(L,NY,NX)*VOLWM(NPH,L,NY,NX)
+      TRNA(L,NY,NX)=TRNA(L,NY,NX)*VOLWM(NPH,L,NY,NX)
+      TRKA(L,NY,NX)=TRKA(L,NY,NX)*VOLWM(NPH,L,NY,NX)
+      TROH(L,NY,NX)=TROH(L,NY,NX)*VOLWM(NPH,L,NY,NX)
+      TRSO4(L,NY,NX)=TRSO4(L,NY,NX)*VOLWM(NPH,L,NY,NX)
+      TRCO3(L,NY,NX)=TRCO3(L,NY,NX)*VOLWM(NPH,L,NY,NX)
+      TRHCO(L,NY,NX)=TRHCO(L,NY,NX)*VOLWM(NPH,L,NY,NX)
+      TRCO2(L,NY,NX)=TRCO2(L,NY,NX)*VOLWM(NPH,L,NY,NX)
+      TRAL1(L,NY,NX)=TRAL1(L,NY,NX)*VOLWM(NPH,L,NY,NX)
+      TRAL2(L,NY,NX)=TRAL2(L,NY,NX)*VOLWM(NPH,L,NY,NX)
+      TRAL3(L,NY,NX)=TRAL3(L,NY,NX)*VOLWM(NPH,L,NY,NX)
+      TRAL4(L,NY,NX)=TRAL4(L,NY,NX)*VOLWM(NPH,L,NY,NX)
+      TRALS(L,NY,NX)=TRALS(L,NY,NX)*VOLWM(NPH,L,NY,NX)
+      TRFE1(L,NY,NX)=TRFE1(L,NY,NX)*VOLWM(NPH,L,NY,NX)
+      TRFE2(L,NY,NX)=TRFE2(L,NY,NX)*VOLWM(NPH,L,NY,NX)
+      TRFE3(L,NY,NX)=TRFE3(L,NY,NX)*VOLWM(NPH,L,NY,NX)
+      TRFE4(L,NY,NX)=TRFE4(L,NY,NX)*VOLWM(NPH,L,NY,NX)
+      TRFES(L,NY,NX)=TRFES(L,NY,NX)*VOLWM(NPH,L,NY,NX)
+      TRCAO(L,NY,NX)=TRCAO(L,NY,NX)*VOLWM(NPH,L,NY,NX)
+      TRCAC(L,NY,NX)=TRCAC(L,NY,NX)*VOLWM(NPH,L,NY,NX)
+      TRCAH(L,NY,NX)=TRCAH(L,NY,NX)*VOLWM(NPH,L,NY,NX)
+      TRCAS(L,NY,NX)=TRCAS(L,NY,NX)*VOLWM(NPH,L,NY,NX)
+      TRMGO(L,NY,NX)=TRMGO(L,NY,NX)*VOLWM(NPH,L,NY,NX)
+      TRMGC(L,NY,NX)=TRMGC(L,NY,NX)*VOLWM(NPH,L,NY,NX)
+      TRMGH(L,NY,NX)=TRMGH(L,NY,NX)*VOLWM(NPH,L,NY,NX)
+      TRMGS(L,NY,NX)=TRMGS(L,NY,NX)*VOLWM(NPH,L,NY,NX)
+      TRNAC(L,NY,NX)=TRNAC(L,NY,NX)*VOLWM(NPH,L,NY,NX)
+      TRNAS(L,NY,NX)=TRNAS(L,NY,NX)*VOLWM(NPH,L,NY,NX)
+      TRKAS(L,NY,NX)=TRKAS(L,NY,NX)*VOLWM(NPH,L,NY,NX)
+      TRH0P(L,NY,NX)=TRH0P(L,NY,NX)*VOLWPO
+      TRH1P(L,NY,NX)=TRH1P(L,NY,NX)*VOLWPO
+      TRH2P(L,NY,NX)=TRH2P(L,NY,NX)*VOLWPO
+      TRH3P(L,NY,NX)=TRH3P(L,NY,NX)*VOLWPO
+      TRF1P(L,NY,NX)=TRF1P(L,NY,NX)*VOLWPO
+      TRF2P(L,NY,NX)=TRF2P(L,NY,NX)*VOLWPO
+      TRC0P(L,NY,NX)=TRC0P(L,NY,NX)*VOLWPO
+      TRC1P(L,NY,NX)=TRC1P(L,NY,NX)*VOLWPO
+      TRC2P(L,NY,NX)=TRC2P(L,NY,NX)*VOLWPO
+      TRM1P(L,NY,NX)=TRM1P(L,NY,NX)*VOLWPO
+      TRH0B(L,NY,NX)=TRH0B(L,NY,NX)*VOLWPB
+      TRH1B(L,NY,NX)=TRH1B(L,NY,NX)*VOLWPB
+      TRH2B(L,NY,NX)=TRH2B(L,NY,NX)*VOLWPB
+      TRH3B(L,NY,NX)=TRH3B(L,NY,NX)*VOLWPB
+      TRF1B(L,NY,NX)=TRF1B(L,NY,NX)*VOLWPB
+      TRF2B(L,NY,NX)=TRF2B(L,NY,NX)*VOLWPB
+      TRC0B(L,NY,NX)=TRC0B(L,NY,NX)*VOLWPB
+      TRC1B(L,NY,NX)=TRC1B(L,NY,NX)*VOLWPB
+      TRC2B(L,NY,NX)=TRC2B(L,NY,NX)*VOLWPB
+      TRM1B(L,NY,NX)=TRM1B(L,NY,NX)*VOLWPB
+      TRXN4(L,NY,NX)=TRXN4(L,NY,NX)*VOLWNH
+      TRXNB(L,NY,NX)=TRXNB(L,NY,NX)*VOLWNB
+      TRXHY(L,NY,NX)=TRXHY(L,NY,NX)*VOLWM(NPH,L,NY,NX)
+      TRXAL(L,NY,NX)=TRXAL(L,NY,NX)*VOLWM(NPH,L,NY,NX)
+      TRXFE(L,NY,NX)=TRXFE(L,NY,NX)*VOLWM(NPH,L,NY,NX)
+      TRXCA(L,NY,NX)=TRXCA(L,NY,NX)*VOLWM(NPH,L,NY,NX)
+      TRXMG(L,NY,NX)=TRXMG(L,NY,NX)*VOLWM(NPH,L,NY,NX)
+      TRXNA(L,NY,NX)=TRXNA(L,NY,NX)*VOLWM(NPH,L,NY,NX)
+      TRXKA(L,NY,NX)=TRXKA(L,NY,NX)*VOLWM(NPH,L,NY,NX)
+      TRXHC(L,NY,NX)=TRXHC(L,NY,NX)*VOLWM(NPH,L,NY,NX)
+      TRXAL2(L,NY,NX)=TRXAL2(L,NY,NX)*VOLWM(NPH,L,NY,NX)
+      TRXFE2(L,NY,NX)=TRXFE2(L,NY,NX)*VOLWM(NPH,L,NY,NX)
+      TRXH0(L,NY,NX)=TRXH0(L,NY,NX)*VOLWPO
+      TRXH1(L,NY,NX)=TRXH1(L,NY,NX)*VOLWPO
+      TRXH2(L,NY,NX)=TRXH2(L,NY,NX)*VOLWPO
+      TRX1P(L,NY,NX)=TRX1P(L,NY,NX)*VOLWPO
+      TRX2P(L,NY,NX)=TRX2P(L,NY,NX)*VOLWPO
+      TRBH0(L,NY,NX)=TRBH0(L,NY,NX)*VOLWPB
+      TRBH1(L,NY,NX)=TRBH1(L,NY,NX)*VOLWPB
+      TRBH2(L,NY,NX)=TRBH2(L,NY,NX)*VOLWPB
+      TRB1P(L,NY,NX)=TRB1P(L,NY,NX)*VOLWPB
+      TRB2P(L,NY,NX)=TRB2P(L,NY,NX)*VOLWPB
+      TRALOH(L,NY,NX)=TRALOH(L,NY,NX)*VOLWM(NPH,L,NY,NX)
+      TRFEOH(L,NY,NX)=TRFEOH(L,NY,NX)*VOLWM(NPH,L,NY,NX)
+      TRCACO(L,NY,NX)=TRCACO(L,NY,NX)*VOLWM(NPH,L,NY,NX)
+      TRCASO(L,NY,NX)=TRCASO(L,NY,NX)*VOLWM(NPH,L,NY,NX)
+      TRALPO(L,NY,NX)=TRALPO(L,NY,NX)*VOLWPO
+      TRFEPO(L,NY,NX)=TRFEPO(L,NY,NX)*VOLWPO
+      TRCAPD(L,NY,NX)=TRCAPD(L,NY,NX)*VOLWPO
+      TRCAPH(L,NY,NX)=TRCAPH(L,NY,NX)*VOLWPO
+      TRCAPM(L,NY,NX)=TRCAPM(L,NY,NX)*VOLWPO
+      TRALPB(L,NY,NX)=TRALPB(L,NY,NX)*VOLWPB
+      TRFEPB(L,NY,NX)=TRFEPB(L,NY,NX)*VOLWPB
+      TRCPDB(L,NY,NX)=TRCPDB(L,NY,NX)*VOLWPB
+      TRCPHB(L,NY,NX)=TRCPHB(L,NY,NX)*VOLWPB
+      TRCPMB(L,NY,NX)=TRCPMB(L,NY,NX)*VOLWPB
+C
+C     BOUNDARY SALT FLUXES FOR C, H, OH, P, AL+FE, CA, OH
+C     USED TO CHECK MATERIAL BALANCES IN REDIST.F
+C
+C     TBCO2=CO2 net change from all solute equilibria
+C     TRH2O=H2O net change from all solute equilibria
+C     TBION=total solute net change from all solute equilibria
+C
+      TBCO2(L,NY,NX)=TRCO3(L,NY,NX)
+     2+TRCAC(L,NY,NX)+TRMGC(L,NY,NX)+TRNAC(L,NY,NX)+TRCACO(L,NY,NX)
+     3+2.0*(TRHCO(L,NY,NX)+TRCAH(L,NY,NX)+TRMGH(L,NY,NX))
+      TRH2O(L,NY,NX)=TRHY(L,NY,NX)+TROH(L,NY,NX)+TRXHY(L,NY,NX)
+     2+TRXHC(L,NY,NX)
+      TBION(L,NY,NX)=4.0*(TRH3P(L,NY,NX)+TRH3B(L,NY,NX))
+     2+3.0*(TRF2P(L,NY,NX)+TRC2P(L,NY,NX)
+     2+TRF2B(L,NY,NX)+TRC2B(L,NY,NX))
+     3+2.0*(TRF1P(L,NY,NX)+TRC1P(L,NY,NX)+TRM1P(L,NY,NX)
+     4+TRF1B(L,NY,NX)+TRC1B(L,NY,NX)+TRM1B(L,NY,NX))
+     5+TRH0P(L,NY,NX)+TRC0P(L,NY,NX)+TRH0B(L,NY,NX)+TRC0B(L,NY,NX)
+     6-(TRALPO(L,NY,NX)+TRFEPO(L,NY,NX)
+     6+TRALPB(L,NY,NX)+TRFEPB(L,NY,NX))
+     7-(TRCAPD(L,NY,NX)+TRCAPM(L,NY,NX)
+     6+TRCPDB(L,NY,NX)+TRCPMB(L,NY,NX)
+     8+5.0*(TRCAPH(L,NY,NX)+TRCPHB(L,NY,NX)))
+     9+TRAL1(L,NY,NX)+TRFE1(L,NY,NX)
+     1+2.0*(TRAL2(L,NY,NX)+TRFE2(L,NY,NX))
+     1+3.0*(TRAL3(L,NY,NX)+TRFE3(L,NY,NX))
+     2+4.0*(TRAL4(L,NY,NX)+TRFE4(L,NY,NX))
+     3+TRCAO(L,NY,NX)+TRMGO(L,NY,NX)
+     4+3.0*(TRALOH(L,NY,NX)+TRFEOH(L,NY,NX))
+C     IF(L.EQ.11)THEN
+C     WRITE(*,1111)'TRCO2',I,J,L,M,TRCO2(L,NY,NX),TRCO3(L,NY,NX)
+C    2,TRHCO(L,NY,NX),TRCAC(L,NY,NX),TRMGC(L,NY,NX)
+C    2,TRNAC(L,NY,NX),TRCAH(L,NY,NX)
+C    2,TRMGH(L,NY,NX),TRCACO(L,NY,NX),VOLWM(NPH,L,NY,NX),RCO2
+C    3,RHCO,RHCACH,RCO2Q,RCAH,RMGH,RHCO3,AHY1,AHCO31,ACO21,DPCO2
+C     WRITE(*,1111)'TBION',I,J,L,M,TBION(L,NY,NX)
+C     ENDIF
+      end subroutine summarize_ion_flxes
+
+C------------------------------------------------------------------------------------------
+
+      subroutine get_solute_concs(L,NY,NX)
+      implicit none
+      integer, intent(in) :: L,NY,NX
+
+C     execution begins here
+
+      CN41=AMAX1(ZERO,CN41)
+      CN4B=AMAX1(ZERO,CN4B)
+      CN31=AMAX1(ZERO,CN31)
+      CN3B=AMAX1(ZERO,CN3B)
+      CHY1=AMAX1(ZERO,10.0**(-(PH(L,NY,NX)-3.0)))
+      COH1=AMAX1(ZERO,DPH2O/CHY1)
+      CCO31=AMAX1(ZERO,CCO31)
+      CAL1=AMAX1(ZERO,CAL1)
+      CFE1=AMAX1(ZERO,CFE1)
+      CCA1=AMAX1(ZERO,AMIN1(CCAMX,CCA1))
+      CMG1=AMAX1(ZERO,CMG1)
+      CNA1=AMAX1(ZERO,CNA1)
+      CKA1=AMAX1(ZERO,CKA1)
+      CSO41=AMAX1(ZERO,CSO41)
+      CHCO31=AMAX1(ZERO,CHCO31)
+      CCO21=AMAX1(ZERO,CCO21)
+      CALO1=AMAX1(ZERO,CALO1)
+      CALO2=AMAX1(ZERO,CALO2)
+      CALO3=AMAX1(ZERO,CALO3)
+      CALO4=AMAX1(ZERO,CALO4)
+      CALS1=AMAX1(ZERO,CALS1)
+      CFEO1=AMAX1(ZERO,CFEO1)
+      CFEO2=AMAX1(ZERO,CFEO2)
+      CFEO3=AMAX1(ZERO,CFEO3)
+      CFEO4=AMAX1(ZERO,CFEO4)
+      CFES1=AMAX1(ZERO,CFES1)
+      CCAO1=AMAX1(ZERO,CCAO1)
+      CCAC1=AMAX1(ZERO,CCAC1)
+      CCAH1=AMAX1(ZERO,CCAH1)
+      CCAS1=AMAX1(ZERO,CCAS1)
+      CMGO1=AMAX1(ZERO,CMGO1)
+      CMGC1=AMAX1(ZERO,CMGC1)
+      CMGH1=AMAX1(ZERO,CMGH1)
+      CMGS1=AMAX1(ZERO,CMGS1)
+      CNAC1=AMAX1(ZERO,CNAC1)
+      CNAS1=AMAX1(ZERO,CNAS1)
+      CKAS1=AMAX1(ZERO,CKAS1)
+      CH0P1=AMAX1(ZERO,CH0P1)
+      CH1P1=AMAX1(ZERO,CH1P1)
+      CH2P1=AMAX1(ZERO,CH2P1)
+      CH3P1=AMAX1(ZERO,CH3P1)
+      CF1P1=AMAX1(ZERO,CF1P1)
+      CF2P1=AMAX1(ZERO,CF2P1)
+      CC0P1=AMAX1(ZERO,CC0P1)
+      CC1P1=AMAX1(ZERO,CC1P1)
+      CC2P1=AMAX1(ZERO,CC2P1)
+      CM1P1=AMAX1(ZERO,CM1P1)
+      CH0PB=AMAX1(ZERO,CH0PB)
+      CH1PB=AMAX1(ZERO,CH1PB)
+      CH2PB=AMAX1(ZERO,CH2PB)
+      CH3PB=AMAX1(ZERO,CH3PB)
+      CF1PB=AMAX1(ZERO,CF1PB)
+      CF2PB=AMAX1(ZERO,CF2PB)
+      CC0PB=AMAX1(ZERO,CC0PB)
+      CC1PB=AMAX1(ZERO,CC1PB)
+      CC2PB=AMAX1(ZERO,CC2PB)
+      CM1PB=AMAX1(ZERO,CM1PB)
+      XCOO=AMAX1(0.0,XCOOH-XHC1-XALO21-XFEO21)
+      end subroutine get_solute_concs
+
+C------------------------------------------------------------------------------------------
+
+      subroutine ion_strength_activity(L,NY,NX)
+      implicit none
+      integer, intent(in) :: L,NY,NX
+
+C     execution begins here
+
+C     IONIC STRENGTH FROM SUMS OF ION CONCENTRATIONS
+C
+C     CC3,CA3,CC2,CA2,CC1,CA1=total tri-,di-,univalent cations C,anions A
+C     CSTR1=ion strength
+C
+      CC3=CAL1+CFE1
+      CA3=CH0P1*VLPO4(L,NY,NX)+CH0PB*VLPOB(L,NY,NX)
+      CC2=CCA1+CMG1+CALO1+CFEO1+CF2P1*VLPO4(L,NY,NX)
+     2+CF2PB*VLPOB(L,NY,NX)
+      CA2=CSO41+CCO31+CH1P1*VLPO4(L,NY,NX)+CH1PB*VLPOB(L,NY,NX)
+      CC1=CN41*VLNH4(L,NY,NX)+CN4B*VLNHB(L,NY,NX)+CHY1+CNA1+CKA1
+     2+CALO2+CFEO2+CALS1+CFES1+CCAO1+CCAH1+CMGO1+CMGH1
+     3+(CF1P1+CC2P1)*VLPO4(L,NY,NX)+(CF1PB+CC2PB)*VLPOB(L,NY,NX)
+      CA1=CNO1*VLNO3(L,NY,NX)+CNOB*VLNOB(L,NY,NX)+COH1+CHCO31+CCL1
+     2+CALO4+CFEO4+CNAC1+CNAS1+CKAS1+(CH2P1+CC0P1)*VLPO4(L,NY,NX)
+     3+(CH2PB+CC0PB)*VLPOB(L,NY,NX)
+      CSTR1=AMAX1(0.0,0.5E-03*(9.0*(CC3+CA3)+4.0*(CC2+CA2)
+     2+CC1+CA1))
+      CSTR2=SQRT(CSTR1)
+      FSTR2=CSTR2/(1.0+CSTR2)
+C
+C     ACTIVITY COEFFICIENTS CALCULATED FROM ION STRENGTH
+C
+      A1=AMIN1(1.0,10.0**(-0.509*1.0*FSTR2+0.20*CSTR2))
+      A2=AMIN1(1.0,10.0**(-0.509*4.0*FSTR2+0.20*CSTR2))
+      A3=AMIN1(1.0,10.0**(-0.509*9.0*FSTR2+0.20*CSTR2))
+C
+C     PRECIPITATION-DISSOLUTION REACTIONS IN NON-BAND, BAND
+C     CALCULATED FROM ACTIVITIES OF REACTANTS AND PRODUCTS THROUGH
+C     CONVERGENCE SOLUTIONS FOR THEIR EQUILIBRIUM CONCENTRATIONS USING
+C     SOLUTE FORMS CURRENTLY AT HIGHEST CONCENTRATIONS
+C
+C     for all reactions:
+C     A*=ion activity
+C     PX,PY=solute forms with greatest activity
+C     R*,P*=reactant,product
+C     NR*,NP*=reactant,product stoichiometry
+C     SP=solubility product of PX from parameters above
+C     SPX=equilibrium product concentration
+C     R*X=precipitation-dissolution rate
+C
+      AHY1=CHY1*A1
+      AOH1=COH1*A1
+      AAL1=CAL1*A3
+      AALO1=CALO1*A2
+      AALO2=CALO2*A1
+      AALO3=CALO3
+      AALO4=CALO4*A1
+      AFE1=CFE1*A3
+      AFEO1=CFEO1*A2
+      AFEO2=CFEO2*A1
+      AFEO3=CFEO3
+      AFEO4=CFEO4*A1
+      ACA1=CCA1*A2
+      ACO31=CCO31*A2
+      AHCO31=CHCO31*A1
+      ACO21=CCO21*A0
+      ASO41=CSO41*A2
+      AH0P1=CH0P1*A3
+      AH1P1=CH1P1*A2
+      AH2P1=CH2P1*A1
+      AH3P1=CH3P1*A0
+      AF1P1=CF1P1*A2
+      AF2P1=CF2P1*A1
+      AC0P1=CC0P1*A1
+      AC1P1=CC1P1*A0
+      AC2P1=CC2P1*A1
+      AM1P1=CM1P1*A0
+      AH0PB=CH0PB*A3
+      AH1PB=CH1PB*A2
+      AH2PB=CH2PB*A1
+      AH3PB=CH3PB*A0
+      AF1PB=CF1PB*A2
+      AF2PB=CF2PB*A1
+      AC0PB=CC0PB*A1
+      AC1PB=CC1PB*A0
+      AC2PB=CC2PB*A1
+      AM1PB=CM1PB*A0
+      AN41=CN41*A1
+      AN4B=CN4B*A1
+      AN31=CN31*A0
+      AN3B=CN3B*A0
+      AMG1=CMG1*A2
+      ANA1=CNA1*A1
+      AKA1=CKA1*A1
+      AALS1=CALS1*A1
+      AFES1=CFES1*A1
+      ACAO1=CCAO1*A1
+      ACAC1=CCAC1*A0
+      ACAS1=CCAS1*A0
+      ACAH1=CCAH1*A1
+      AMGO1=CMGO1*A1
+      AMGC1=CMGC1*A0
+      AMGH1=CMGH1*A1
+      AMGS1=CMGS1*A0
+      ANAC1=CNAC1*A1
+      ANAS1=CNAS1*A1
+      AKAS1=CKAS1*A1
+      end subroutine ion_strength_activity
+
+C------------------------------------------------------------------------------------------
+
+      subroutine phosp_precip_dissol_nonband(NY,NX)
+
+      implicit none
+      integer, intent(in) :: NY,NX
+
       IF(VOLWPO.GT.ZEROS2(NY,NX))THEN
 C
 C     ALUMINUM PHOSPHATE (VARISCITE)
@@ -2648,9 +2248,17 @@ C
       RHCAH2=0.0
       RPCAMX=0.0
       ENDIF
-C
-C     PHOSPHORUS PRECIPITATION-DISSOLUTION IN BAND SOIL ZONE
-C
+      end subroutine phosp_precip_dissol_nonband
+
+C------------------------------------------------------------------------------------------
+
+      subroutine phosp_precip_dissol_band(NY,NX)
+
+      implicit none
+      integer, intent(in) :: NY,NX
+
+C     execution begins here
+
       IF(VOLWPB.GT.ZEROS2(NY,NX))THEN
 C
 C     ALUMINUM PHOSPHATE (VARISCITE)
@@ -2964,7 +2572,70 @@ C
       RHCHB1=0.0
       RHCHB2=0.0
       ENDIF
+      end subroutine phosp_precip_dissol_band
+
+C------------------------------------------------------------------------------------------
+
+      subroutine phosp_anion_exch_band(L,NY,NX)
+      implicit none
+      integer, intent(in) :: L,NY,NX
+
+C     execution begins here
+
+C     PHOSPHORUS ANION EXCHANGE IN BAND SOIL ZONE
+C     CALCULATED FROM EXCHANGE EQUILIBRIA AMONG H2PO4-,
+C     HPO4--, H+, OH- AND PROTONATED AND NON-PROTONATED -OH
+C     EXCHANGE SITES
 C
+      IF(VOLWPB.GT.ZEROS2(NY,NX)
+     2.AND.XAEC(L,NY,NX).GT.ZEROS(NY,NX))THEN
+C
+C     RXO2B,RXO1B=OH2,OH exchange with R-OH2,R-OH in band
+C     SXOH2,SXOH1=equilibrium constant for OH2,OH exchange with R-OH2,R-OH
+C
+      RXO2B=TADAX*(XH11B*AHY1-SXOH2*XH21B)/(XH11B+SXOH2)*VOLWBK
+      RXO1B=TADAX*(XH01B*AHY1-SXOH1*XH11B)/(XH01B+SXOH1)*VOLWBK
+C
+C     H2PO4 EXCHANGE IN BAND SOIL ZONE FROM CONVERGENCE
+C     SOLUTION FOR EQUILIBRIUM AMONG H2PO4-, H+, OH-, X-OH
+C     AND X-H2PO4
+C
+C     SPH2P,SXH2P=equilibrium constant for H2PO4 exchange with R-OH2,R-OH
+C     RXH2B,RYH2B=H2PO4 exchange with R-OH2,R-OH in band
+C
+      SPH2P=SXH2P*DPH2O
+      RXH2B=TADAX*(XH21B*AH2PB-SPH2P*X2P1B)/(XH21B+SPH2P)*VOLWBK
+      RYH2B=TADAX*(XH11B*AH2PB-SXH2P*X2P1B*AOH1)/(XH11B+SXH2P)*VOLWBK
+C
+C     HPO4 EXCHANGE IN BAND SOIL ZONE FROM CONVERGENCE
+C     SOLUTION FOR EQUILIBRIUM AMONG HPO4--, H+, OH-, X-OH
+C     AND X-HPO4
+C
+C     SPH1P=equilibrium constant for HPO4 exchange with R-OH
+C     RXH1B=HPO4 exchange with R-OH in band
+C
+      SPH1P=SXH1P*DPH2O/DPH2P
+      RXH1B=TADAX*(XH11B*AH1PB-SPH1P*X1P1B)/(XH11B+SPH1P)*VOLWBK
+C     WRITE(*,2226)'RXH1B',I,J,L,M,RXH1B,XH11B,XH21B,CH1PB
+C    2,SPH1P,X1P1B,RYH2B,CH2PB,SXH2P,X2P1B,COH1,CHY1,ROH
+2226  FORMAT(A8,4I4,20E12.4)
+      ELSE
+      RXO2B=0.0
+      RXO1B=0.0
+      RXH2B=0.0
+      RYH2B=0.0
+      RXH1B=0.0
+      ENDIF
+      end subroutine phosp_anion_exch_band
+
+C------------------------------------------------------------------------------------------
+
+      subroutine phosp_anion_exch_noband(L,NY,NX)
+      implicit none
+      integer, intent(in) :: L,NY,NX
+
+C     execution begins here
+
 C     PHOSPHORUS ANION EXCHANGE IN NON-BAND SOIL ZONE
 C     CALCULATED FROM EXCHANGE EQUILIBRIA AMONG H2PO4-,
 C     HPO4--, H+, OH- AND PROTONATED AND NON-PROTONATED -OH
@@ -3015,55 +2686,15 @@ C
       RYH2P=0.0
       RXH1P=0.0
       ENDIF
-C
-C     PHOSPHORUS ANION EXCHANGE IN BAND SOIL ZONE
-C     CALCULATED FROM EXCHANGE EQUILIBRIA AMONG H2PO4-,
-C     HPO4--, H+, OH- AND PROTONATED AND NON-PROTONATED -OH
-C     EXCHANGE SITES
-C
-      IF(VOLWPB.GT.ZEROS2(NY,NX)
-     2.AND.XAEC(L,NY,NX).GT.ZEROS(NY,NX))THEN
-C
-C     RXO2B,RXO1B=OH2,OH exchange with R-OH2,R-OH in band
-C     SXOH2,SXOH1=equilibrium constant for OH2,OH exchange with R-OH2,R-OH
-C
-      RXO2B=TADAX*(XH11B*AHY1-SXOH2*XH21B)/(XH11B+SXOH2)*VOLWBK
-      RXO1B=TADAX*(XH01B*AHY1-SXOH1*XH11B)/(XH01B+SXOH1)*VOLWBK
-C
-C     H2PO4 EXCHANGE IN BAND SOIL ZONE FROM CONVERGENCE
-C     SOLUTION FOR EQUILIBRIUM AMONG H2PO4-, H+, OH-, X-OH
-C     AND X-H2PO4
-C
-C     SPH2P,SXH2P=equilibrium constant for H2PO4 exchange with R-OH2,R-OH
-C     RXH2B,RYH2B=H2PO4 exchange with R-OH2,R-OH in band
-C
-      SPH2P=SXH2P*DPH2O
-      RXH2B=TADAX*(XH21B*AH2PB-SPH2P*X2P1B)/(XH21B+SPH2P)*VOLWBK
-      RYH2B=TADAX*(XH11B*AH2PB-SXH2P*X2P1B*AOH1)/(XH11B+SXH2P)*VOLWBK
-C
-C     HPO4 EXCHANGE IN BAND SOIL ZONE FROM CONVERGENCE
-C     SOLUTION FOR EQUILIBRIUM AMONG HPO4--, H+, OH-, X-OH
-C     AND X-HPO4
-C
-C     SPH1P=equilibrium constant for HPO4 exchange with R-OH
-C     RXH1B=HPO4 exchange with R-OH in band
-C
-      SPH1P=SXH1P*DPH2O/DPH2P
-      RXH1B=TADAX*(XH11B*AH1PB-SPH1P*X1P1B)/(XH11B+SPH1P)*VOLWBK
-C     WRITE(*,2226)'RXH1B',I,J,L,M,RXH1B,XH11B,XH21B,CH1PB
-C    2,SPH1P,X1P1B,RYH2B,CH2PB,SXH2P,X2P1B,COH1,CHY1,ROH
-2226  FORMAT(A8,4I4,20E12.4)
-      ELSE
-      RXO2B=0.0
-      RXO1B=0.0
-      RXH2B=0.0
-      RYH2B=0.0
-      RXH1B=0.0
-      ENDIF
-C
-C     CATION EXCHANGE FROM GAPON SELECTIVITY COEFFICIENTS
-C     FOR CA-NH4, CA-H, CA-AL, CA-MG, CA-NA, CA-K
-C
+      end subroutine phosp_anion_exch_noband
+
+C------------------------------------------------------------------------------------------
+
+      subroutine cation_exchange(L,NY,NX)
+      implicit none
+      integer, intent(in) :: L,NY,NX
+C     execution begins here
+
       IF(XCEC(L,NY,NX).GT.ZEROS(NY,NX))THEN
 C
 C     CATION CONCENTRATIONS
@@ -3147,9 +2778,16 @@ C     ENDIF
       RXNA=0.0
       RXKA=0.0
       ENDIF
-C
-C     SOLUTE DISSOCIATION REACTIONS
-C
+      end subroutine cation_exchange
+
+C------------------------------------------------------------------------------------------
+
+      subroutine solute_dissociation(L,NY,NX)
+      implicit none
+      integer, intent(in) :: L,NY,NX
+
+C     execution begins here
+
 C     for all reactions:
 C     S0,S1=equilibrium constant,equilibrium solute concentration**2
 C     TSLX=dissociation rate constant
@@ -3433,11 +3071,15 @@ C
       RC2B=0.0
       RM1B=0.0
       ENDIF
-      
-C
-C     TOTAL ION FLUXES FOR CURRENT ITERATION
-C     FROM ALL REACTIONS ABOVE
-C
+      end subroutine solute_dissociation
+
+C------------------------------------------------------------------------------------------
+
+      subroutine update_ion_flux_cur_iter(L,NY,NX)
+      implicit none
+      integer, intent(in) :: L,NY,NX
+C     execution begins here
+
 C     RN4S,RN4B=net NH4 flux in non-band,band
 C     RN3S,RN3B=net NH3 flux in non-band,band
 C     RAL,RFE,RHY,RCA,RMG,RNA,RKA,ROH=net Al,Fe,H,Ca,Mg,Na,K,OH flux
@@ -3555,6 +3197,14 @@ C    4,RHCAH2,RPCAMX,RXH2P,RYH2P,RH2P,RH3P,RF2P,RC2P
 23    FORMAT(A8,6I4,60E12.4)
 C     ENDIF
 C
+      end subroutine update_ion_flux_cur_iter
+
+C------------------------------------------------------------------------------------------
+
+      subroutine update_ion_conc_cur_iter(L,NY,NX)
+      implicit none
+      integer, intent(in) :: L,NY,NX
+C     execution begins here
 C     UPDATE ION CONCENTRATIONS FOR CURRENT ITERATION
 C     FROM TOTAL ION FLUXES
 C
@@ -3705,7 +3355,14 @@ C
       PCAPDB=PCAPDB+RPCDBX
       PCAPHB=PCAPHB+RPCHBX
       PCAPMB=PCAPMB+RPCMBX
-C
+      end subroutine update_ion_conc_cur_iter
+
+C------------------------------------------------------------------------------------------
+
+      subroutine accumulate_ion_flux(L,NY,NX)
+      implicit none
+      integer, intent(in) :: L,NY,NX
+C     execution begins here
 C     ACCUMULATE TOTAL ION FLUXES FOR ALL ITERATIONS
 C
 C     TRN4S,TRN4B=total NH4 flux in non-band,band
@@ -3829,203 +3486,714 @@ C
       TRCPDB(L,NY,NX)=TRCPDB(L,NY,NX)+RPCDBX
       TRCPHB(L,NY,NX)=TRCPHB(L,NY,NX)+RPCHBX
       TRCPMB(L,NY,NX)=TRCPMB(L,NY,NX)+RPCMBX
-C
-C     GO TO NEXT ITERATION
-C
-1000  CONTINUE
-C     CONVERGENCE ITERATIONS COMPLETED
-C
-C     IF(J.EQ.24)THEN
-C     WRITE(*,1119)'GAPON',I,J,L,M,CH0P1,CAL1,CFE1,CH0P1*A3*CAL1*A3
-C    2,SPALP,CH0P1*A3*CFE1*A3,SPFEP
-C    6,SPOH2,XOH11*CHY1*A1/XOH21,SPOH1,XOH01*CHY1*A1/XOH11
-C    7,SPH2P,XOH21*CH2P1*A1/XH2P1,SXH2P,XOH11*CH2P1/(XH2P1*COH1)
-C    8,SPH1P,XOH11*CH1P1*A2/(XH1P1*COH1*A1)
-C    9,COH1*A1,CHY1*A1
-1119  FORMAT(A8,4I4,24E11.3)
-C     WRITE(*,1119)'CATION',I,J,L,M,CCEC,XN41+XHY1+3*XAL1+2*(XCA1+XMG1)
-C    2+XNA1+XKA1,XN41,XHY1,XAL1,XCA1,XMG1,XNA1,XKA1,CN41,CHY1,CAL1,CCA1
-C    2,CMG1,CNA1,CKA1,(CCA1*A2)**0.5*XN41/(CN41*A1*XCA1*2)
-C    3,(CCA1*A2)**0.5*XHY1/(CHY1*A1*XCA1*2)
-C    2,(CCA1*A2)**0.5*XAL1*3/((CAL1*A3)**0.333*XCA1*2)
-C    3,(CCA1*A2)**0.5*XMG1*2/((CMG1*A2)**0.5*XCA1*2)
-C    3,(CCA1*A2)**0.5*XNA1/(CNA1*A1*XCA1*2)
-C    5,(CCA1*A2)**0.5*XKA1/(CKA1*A1*XCA1*2)
-C    6,CHY1*A1*XCOO/XHC1,CALO2*A1*XCOO/XALO21
-C     ENDIF
-      end subroutine solve_chem_equilibria
-      
-C--------------------------------------------------------------------------
-      subroutine salt_chem_equilibria
-      
-      implicit none
-      
-C     begin_execution
-C
-C     salt code: *HY*=H+,*OH*=OH-,*AL*=Al3+,*FE*=Fe3+,*CA*=Ca2+,*MG*=Mg2+
-C          :*NA*=Na+,*KA*=K+,*SO4*=SO42-,*CL*=Cl-,*CO3*=CO32-,*HCO3*=HCO3-
-C          :*CO2*=CO2,*ALO1*=AlOH2-,*ALOH2=AlOH2-,*ALOH3*=AlOH3
-C          :*ALOH4*=AlOH4+,*ALS*=AlSO4+,*FEO1*=FeOH2-,*FEOH2=F3OH2-
-C          :*FEOH3*=FeOH3,*FEOH4*=FeOH4+,*FES*=FeSO4+,*CAO*=CaOH
-C          :*CAC*=CaCO3,*CAH*=CaHCO3-,*CAS*=CaSO4,*MGO*=MgOH,*MGC*=MgCO3
-C          :*MHG*=MgHCO3-,*MGS*=MgSO4,*NAC*=NaCO3-,*NAS*=NaSO4-,*KAS*=KSO4-
-C     phosphorus code: *H0P*=PO43-,*H3P*=H3PO4,*F1P*=FeHPO42-,*F2P*=F1H2PO4-
-C          :*C0P*=CaPO4-,*C1P*=CaHPO4,*C2P*=CaH2PO4+,*M1P*=MgHPO4,*COO*=COOH-
-C          :*1=non-band,*B=band
-C     C*,X*,Z*=soluble,exchangeable concentration, mass
-C
-      call stage_ion_concs
-      
-C
-C     CONVERGENCE TOWARDS SOLUTE EQILIBRIA
-C
-      call solve_chem_equilibria
-C
-      
-      call summarize_ion_flxes
-      
-      
-      end subroutine salt_chem_equilibria
-C----------------------------------------------------------------------------
-      subroutine summarize_ion_flxes
+      end subroutine accumulate_ion_flux
 
-      implicit none
+C------------------------------------------------------------------------------------------
 
-C     begin_execution
-C     CONVERT TOTAL ION FLUXES FROM CHANGES IN CONCENTRATION
-C     TO CHANGES IN MASS PER UNIT AREA FOR USE IN 'REDIST'
+      subroutine update_NH3_fert_bandinfo(L,NY,NX)
+      implicit none
+      integer, intent(in) :: L,NY,NX
+C     execution begins here
+
+C     IFNHB=banded NH4 fertilizer flag
+C     ROWN=NH4 fertilizer band row width
+C     DPNH4=NH4 fertilizer band depth
 C
-      TRN4S(L,NY,NX)=TRN4S(L,NY,NX)*VOLWNH
-      TRN4B(L,NY,NX)=TRN4B(L,NY,NX)*VOLWNB
-      TRN3S(L,NY,NX)=TRN3S(L,NY,NX)*VOLWNH
-      TRN3B(L,NY,NX)=TRN3B(L,NY,NX)*VOLWNB
-      TRAL(L,NY,NX)=TRAL(L,NY,NX)*VOLWM(NPH,L,NY,NX)
-      TRFE(L,NY,NX)=TRFE(L,NY,NX)*VOLWM(NPH,L,NY,NX)
-      TRHY(L,NY,NX)=TRHY(L,NY,NX)*VOLWM(NPH,L,NY,NX)
-      TRCA(L,NY,NX)=TRCA(L,NY,NX)*VOLWM(NPH,L,NY,NX)
-      TRMG(L,NY,NX)=TRMG(L,NY,NX)*VOLWM(NPH,L,NY,NX)
-      TRNA(L,NY,NX)=TRNA(L,NY,NX)*VOLWM(NPH,L,NY,NX)
-      TRKA(L,NY,NX)=TRKA(L,NY,NX)*VOLWM(NPH,L,NY,NX)
-      TROH(L,NY,NX)=TROH(L,NY,NX)*VOLWM(NPH,L,NY,NX)
-      TRSO4(L,NY,NX)=TRSO4(L,NY,NX)*VOLWM(NPH,L,NY,NX)
-      TRCO3(L,NY,NX)=TRCO3(L,NY,NX)*VOLWM(NPH,L,NY,NX)
-      TRHCO(L,NY,NX)=TRHCO(L,NY,NX)*VOLWM(NPH,L,NY,NX)
-      TRCO2(L,NY,NX)=TRCO2(L,NY,NX)*VOLWM(NPH,L,NY,NX)
-      TRAL1(L,NY,NX)=TRAL1(L,NY,NX)*VOLWM(NPH,L,NY,NX)
-      TRAL2(L,NY,NX)=TRAL2(L,NY,NX)*VOLWM(NPH,L,NY,NX)
-      TRAL3(L,NY,NX)=TRAL3(L,NY,NX)*VOLWM(NPH,L,NY,NX)
-      TRAL4(L,NY,NX)=TRAL4(L,NY,NX)*VOLWM(NPH,L,NY,NX)
-      TRALS(L,NY,NX)=TRALS(L,NY,NX)*VOLWM(NPH,L,NY,NX)
-      TRFE1(L,NY,NX)=TRFE1(L,NY,NX)*VOLWM(NPH,L,NY,NX)
-      TRFE2(L,NY,NX)=TRFE2(L,NY,NX)*VOLWM(NPH,L,NY,NX)
-      TRFE3(L,NY,NX)=TRFE3(L,NY,NX)*VOLWM(NPH,L,NY,NX)
-      TRFE4(L,NY,NX)=TRFE4(L,NY,NX)*VOLWM(NPH,L,NY,NX)
-      TRFES(L,NY,NX)=TRFES(L,NY,NX)*VOLWM(NPH,L,NY,NX)
-      TRCAO(L,NY,NX)=TRCAO(L,NY,NX)*VOLWM(NPH,L,NY,NX)
-      TRCAC(L,NY,NX)=TRCAC(L,NY,NX)*VOLWM(NPH,L,NY,NX)
-      TRCAH(L,NY,NX)=TRCAH(L,NY,NX)*VOLWM(NPH,L,NY,NX)
-      TRCAS(L,NY,NX)=TRCAS(L,NY,NX)*VOLWM(NPH,L,NY,NX)
-      TRMGO(L,NY,NX)=TRMGO(L,NY,NX)*VOLWM(NPH,L,NY,NX)
-      TRMGC(L,NY,NX)=TRMGC(L,NY,NX)*VOLWM(NPH,L,NY,NX)
-      TRMGH(L,NY,NX)=TRMGH(L,NY,NX)*VOLWM(NPH,L,NY,NX)
-      TRMGS(L,NY,NX)=TRMGS(L,NY,NX)*VOLWM(NPH,L,NY,NX)
-      TRNAC(L,NY,NX)=TRNAC(L,NY,NX)*VOLWM(NPH,L,NY,NX)
-      TRNAS(L,NY,NX)=TRNAS(L,NY,NX)*VOLWM(NPH,L,NY,NX)
-      TRKAS(L,NY,NX)=TRKAS(L,NY,NX)*VOLWM(NPH,L,NY,NX)
-      TRH0P(L,NY,NX)=TRH0P(L,NY,NX)*VOLWPO
-      TRH1P(L,NY,NX)=TRH1P(L,NY,NX)*VOLWPO
-      TRH2P(L,NY,NX)=TRH2P(L,NY,NX)*VOLWPO
-      TRH3P(L,NY,NX)=TRH3P(L,NY,NX)*VOLWPO
-      TRF1P(L,NY,NX)=TRF1P(L,NY,NX)*VOLWPO
-      TRF2P(L,NY,NX)=TRF2P(L,NY,NX)*VOLWPO
-      TRC0P(L,NY,NX)=TRC0P(L,NY,NX)*VOLWPO
-      TRC1P(L,NY,NX)=TRC1P(L,NY,NX)*VOLWPO
-      TRC2P(L,NY,NX)=TRC2P(L,NY,NX)*VOLWPO
-      TRM1P(L,NY,NX)=TRM1P(L,NY,NX)*VOLWPO
-      TRH0B(L,NY,NX)=TRH0B(L,NY,NX)*VOLWPB
-      TRH1B(L,NY,NX)=TRH1B(L,NY,NX)*VOLWPB
-      TRH2B(L,NY,NX)=TRH2B(L,NY,NX)*VOLWPB
-      TRH3B(L,NY,NX)=TRH3B(L,NY,NX)*VOLWPB
-      TRF1B(L,NY,NX)=TRF1B(L,NY,NX)*VOLWPB
-      TRF2B(L,NY,NX)=TRF2B(L,NY,NX)*VOLWPB
-      TRC0B(L,NY,NX)=TRC0B(L,NY,NX)*VOLWPB
-      TRC1B(L,NY,NX)=TRC1B(L,NY,NX)*VOLWPB
-      TRC2B(L,NY,NX)=TRC2B(L,NY,NX)*VOLWPB
-      TRM1B(L,NY,NX)=TRM1B(L,NY,NX)*VOLWPB
-      TRXN4(L,NY,NX)=TRXN4(L,NY,NX)*VOLWNH
-      TRXNB(L,NY,NX)=TRXNB(L,NY,NX)*VOLWNB
-      TRXHY(L,NY,NX)=TRXHY(L,NY,NX)*VOLWM(NPH,L,NY,NX)
-      TRXAL(L,NY,NX)=TRXAL(L,NY,NX)*VOLWM(NPH,L,NY,NX)
-      TRXFE(L,NY,NX)=TRXFE(L,NY,NX)*VOLWM(NPH,L,NY,NX)
-      TRXCA(L,NY,NX)=TRXCA(L,NY,NX)*VOLWM(NPH,L,NY,NX)
-      TRXMG(L,NY,NX)=TRXMG(L,NY,NX)*VOLWM(NPH,L,NY,NX)
-      TRXNA(L,NY,NX)=TRXNA(L,NY,NX)*VOLWM(NPH,L,NY,NX)
-      TRXKA(L,NY,NX)=TRXKA(L,NY,NX)*VOLWM(NPH,L,NY,NX)
-      TRXHC(L,NY,NX)=TRXHC(L,NY,NX)*VOLWM(NPH,L,NY,NX)
-      TRXAL2(L,NY,NX)=TRXAL2(L,NY,NX)*VOLWM(NPH,L,NY,NX)
-      TRXFE2(L,NY,NX)=TRXFE2(L,NY,NX)*VOLWM(NPH,L,NY,NX)
-      TRXH0(L,NY,NX)=TRXH0(L,NY,NX)*VOLWPO
-      TRXH1(L,NY,NX)=TRXH1(L,NY,NX)*VOLWPO
-      TRXH2(L,NY,NX)=TRXH2(L,NY,NX)*VOLWPO
-      TRX1P(L,NY,NX)=TRX1P(L,NY,NX)*VOLWPO
-      TRX2P(L,NY,NX)=TRX2P(L,NY,NX)*VOLWPO
-      TRBH0(L,NY,NX)=TRBH0(L,NY,NX)*VOLWPB
-      TRBH1(L,NY,NX)=TRBH1(L,NY,NX)*VOLWPB
-      TRBH2(L,NY,NX)=TRBH2(L,NY,NX)*VOLWPB
-      TRB1P(L,NY,NX)=TRB1P(L,NY,NX)*VOLWPB
-      TRB2P(L,NY,NX)=TRB2P(L,NY,NX)*VOLWPB
-      TRALOH(L,NY,NX)=TRALOH(L,NY,NX)*VOLWM(NPH,L,NY,NX)
-      TRFEOH(L,NY,NX)=TRFEOH(L,NY,NX)*VOLWM(NPH,L,NY,NX)
-      TRCACO(L,NY,NX)=TRCACO(L,NY,NX)*VOLWM(NPH,L,NY,NX)
-      TRCASO(L,NY,NX)=TRCASO(L,NY,NX)*VOLWM(NPH,L,NY,NX)
-      TRALPO(L,NY,NX)=TRALPO(L,NY,NX)*VOLWPO
-      TRFEPO(L,NY,NX)=TRFEPO(L,NY,NX)*VOLWPO
-      TRCAPD(L,NY,NX)=TRCAPD(L,NY,NX)*VOLWPO
-      TRCAPH(L,NY,NX)=TRCAPH(L,NY,NX)*VOLWPO
-      TRCAPM(L,NY,NX)=TRCAPM(L,NY,NX)*VOLWPO
-      TRALPB(L,NY,NX)=TRALPB(L,NY,NX)*VOLWPB
-      TRFEPB(L,NY,NX)=TRFEPB(L,NY,NX)*VOLWPB
-      TRCPDB(L,NY,NX)=TRCPDB(L,NY,NX)*VOLWPB
-      TRCPHB(L,NY,NX)=TRCPHB(L,NY,NX)*VOLWPB
-      TRCPMB(L,NY,NX)=TRCPMB(L,NY,NX)*VOLWPB
+      IF(IFNHB(NY,NX).EQ.1.AND.ROWN(NY,NX).GT.0.0)THEN
+      IF(L.EQ.NU(NY,NX).OR.CDPTH(L-1,NY,NX).LT.DPNH4(NY,NX))THEN
 C
-C     BOUNDARY SALT FLUXES FOR C, H, OH, P, AL+FE, CA, OH
-C     USED TO CHECK MATERIAL BALANCES IN REDIST.F
+C     NH4 BAND WIDTH
 C
-C     TBCO2=CO2 net change from all solute equilibria
-C     TRH2O=H2O net change from all solute equilibria
-C     TBION=total solute net change from all solute equilibria
+C     DWNH4=change in NH4 fertilizer band width
+C     WDNHB=layer NH4 fertilizer band width
+C     ZNSGL=NH4 diffusivity
+C     TORT=tortuosity
 C
-      TBCO2(L,NY,NX)=TRCO3(L,NY,NX)
-     2+TRCAC(L,NY,NX)+TRMGC(L,NY,NX)+TRNAC(L,NY,NX)+TRCACO(L,NY,NX)
-     3+2.0*(TRHCO(L,NY,NX)+TRCAH(L,NY,NX)+TRMGH(L,NY,NX))
-      TRH2O(L,NY,NX)=TRHY(L,NY,NX)+TROH(L,NY,NX)+TRXHY(L,NY,NX)
-     2+TRXHC(L,NY,NX)
-      TBION(L,NY,NX)=4.0*(TRH3P(L,NY,NX)+TRH3B(L,NY,NX))
-     2+3.0*(TRF2P(L,NY,NX)+TRC2P(L,NY,NX)
-     2+TRF2B(L,NY,NX)+TRC2B(L,NY,NX))
-     3+2.0*(TRF1P(L,NY,NX)+TRC1P(L,NY,NX)+TRM1P(L,NY,NX)
-     4+TRF1B(L,NY,NX)+TRC1B(L,NY,NX)+TRM1B(L,NY,NX))
-     5+TRH0P(L,NY,NX)+TRC0P(L,NY,NX)+TRH0B(L,NY,NX)+TRC0B(L,NY,NX)
-     6-(TRALPO(L,NY,NX)+TRFEPO(L,NY,NX)
-     6+TRALPB(L,NY,NX)+TRFEPB(L,NY,NX))
-     7-(TRCAPD(L,NY,NX)+TRCAPM(L,NY,NX)
-     6+TRCPDB(L,NY,NX)+TRCPMB(L,NY,NX)
-     8+5.0*(TRCAPH(L,NY,NX)+TRCPHB(L,NY,NX)))
-     9+TRAL1(L,NY,NX)+TRFE1(L,NY,NX)
-     1+2.0*(TRAL2(L,NY,NX)+TRFE2(L,NY,NX))
-     1+3.0*(TRAL3(L,NY,NX)+TRFE3(L,NY,NX))
-     2+4.0*(TRAL4(L,NY,NX)+TRFE4(L,NY,NX))
-     3+TRCAO(L,NY,NX)+TRMGO(L,NY,NX)
-     4+3.0*(TRALOH(L,NY,NX)+TRFEOH(L,NY,NX))
-C     IF(L.EQ.11)THEN
-C     WRITE(*,1111)'TRCO2',I,J,L,M,TRCO2(L,NY,NX),TRCO3(L,NY,NX)
-C    2,TRHCO(L,NY,NX),TRCAC(L,NY,NX),TRMGC(L,NY,NX)
-C    2,TRNAC(L,NY,NX),TRCAH(L,NY,NX)
-C    2,TRMGH(L,NY,NX),TRCACO(L,NY,NX),VOLWM(NPH,L,NY,NX),RCO2
-C    3,RHCO,RHCACH,RCO2Q,RCAH,RMGH,RHCO3,AHY1,AHCO31,ACO21,DPCO2
-C     WRITE(*,1111)'TBION',I,J,L,M,TBION(L,NY,NX)
+      DWNH4=0.5*SQRT(ZNSGL(L,NY,NX))*TORT(NPH,L,NY,NX)
+      WDNHB(L,NY,NX)=AMIN1(ROWN(NY,NX)
+     2,AMAX1(0.025,WDNHB(L,NY,NX))+DWNH4)
+C
+C     NH4 BAND DEPTH
+C
+C     DPFLW=change in NH4 fertilizer band depth
+C     DPNH4,DPNHB=total,layer NH4 fertilizer band depth
+C
+      IF(CDPTH(L,NY,NX).GE.DPNH4(NY,NX))THEN
+      DPFLW=FLWD+DWNH4
+      DPNH4(NY,NX)=DPNH4(NY,NX)+DPFLW
+      DPNHB(L,NY,NX)=DPNHB(L,NY,NX)+DPFLW
+      IF(DPNHB(L,NY,NX).GT.DLYR(3,L,NY,NX))THEN
+      DPNHB(L+1,NY,NX)=DPNHB(L+1,NY,NX)+(DPNHB(L,NY,NX)-DLYR(3,L,NY,NX))
+      WDNHB(L+1,NY,NX)=WDNHB(L,NY,NX)
+      DPNHB(L,NY,NX)=DLYR(3,L,NY,NX)
+      ELSEIF(DPNHB(L,NY,NX).LT.0.0)THEN
+      DPNHB(L-1,NY,NX)=DPNHB(L-1,NY,NX)+DPNHB(L,NY,NX)
+      DPNHB(L,NY,NX)=0.0
+      WDNHB(L,NY,NX)=0.0
+      ENDIF
+      ENDIF
+C
+C     FRACTION OF SOIL LAYER OCCUPIED BY NH4 BAND
+C     FROM BAND WIDTH X DEPTH
+C
+C     VLNH4,VLNHB=fraction of soil volume in NH4 non-band,band
+C     DLYR=soil layer thickness
+C     FVLNH4=relative change in VLNH4
+C
+      XVLNH4=VLNH4(L,NY,NX)
+      IF(DLYR(3,L,NY,NX).GT.ZERO)THEN
+      VLNHB(L,NY,NX)=AMAX1(0.0,AMIN1(0.999,WDNHB(L,NY,NX)
+     2/ROWN(NY,NX)*DPNHB(L,NY,NX)/DLYR(3,L,NY,NX)))
+      ELSE
+      VLNHB(L,NY,NX)=0.0
+      ENDIF
+      VLNH4(L,NY,NX)=1.0-VLNHB(L,NY,NX)
+      FVLNH4=AMIN1(0.0,(VLNH4(L,NY,NX)-XVLNH4)/XVLNH4)
+C
+C     TRANSFER NH4, NH3 FROM NON-BAND TO BAND
+C     DURING BAND GROWTH
+C
+C     DNH4S,DNH3S,DXNH4=transfer of NH4,NH3,exchangeable NH4
+C
+      DNH4S=FVLNH4*ZNH4S(L,NY,NX)/14.0
+      DNH3S=FVLNH4*ZNH3S(L,NY,NX)/14.0
+      DXNH4=FVLNH4*XN4(L,NY,NX)
+      TRN4S(L,NY,NX)=TRN4S(L,NY,NX)+DNH4S
+      TRN4B(L,NY,NX)=TRN4B(L,NY,NX)-DNH4S
+      TRN3S(L,NY,NX)=TRN3S(L,NY,NX)+DNH3S
+      TRN3B(L,NY,NX)=TRN3B(L,NY,NX)-DNH3S
+      TRXN4(L,NY,NX)=TRXN4(L,NY,NX)+DXNH4
+      TRXNB(L,NY,NX)=TRXNB(L,NY,NX)-DXNH4
+      ELSE
+C
+C     AMALGAMATE NH4 BAND WITH NON-BAND IF BAND NO LONGER EXISTS
+C
+      DPNHB(L,NY,NX)=0.0
+      WDNHB(L,NY,NX)=0.0
+      VLNH4(L,NY,NX)=1.0
+      VLNHB(L,NY,NX)=0.0
+      ZNH4S(L,NY,NX)=ZNH4S(L,NY,NX)+ZNH4B(L,NY,NX)
+      ZNH3S(L,NY,NX)=ZNH3S(L,NY,NX)+ZNH3B(L,NY,NX)
+      ZNH4B(L,NY,NX)=0.0
+      ZNH3B(L,NY,NX)=0.0
+      XN4(L,NY,NX)=XN4(L,NY,NX)+XNB(L,NY,NX)
+      XNB(L,NY,NX)=0.0
+      ENDIF
+      ENDIF
+      end subroutine update_NH3_fert_bandinfo
+
+C------------------------------------------------------------------------------------------
+
+      subroutine update_PO4_fert_bandinfo(L,NY,NX)
+      implicit none
+      integer, intent(in) :: L,NY,NX
+C     execution begins here
+
+C     IFPOB=banded H2PO4 fertilizer flag
+C     ROWP=H2PO4 fertilizer band row width
+C     DPPO4=H2PO4 fertilizer band depth
+C
+      IF(IFPOB(NY,NX).EQ.1.AND.ROWP(NY,NX).GT.0.0)THEN
+      IF(L.EQ.NU(NY,NX).OR.CDPTH(L-1,NY,NX).LT.DPPO4(NY,NX))THEN
+C
+C     PO4 BAND WIDTH
+
+C     DWPO4=change in H2PO4 fertilizer band width
+C     WDPO4=layer H2PO4 fertilizer band width
+C     POSGL=H2PO4 diffusivity
+C     TORT=tortuosity
+C
+      DWPO4=0.5*SQRT(POSGL(L,NY,NX))*TORT(NPH,L,NY,NX)
+      WDPOB(L,NY,NX)=AMIN1(ROWP(NY,NX),WDPOB(L,NY,NX)+DWPO4)
+C
+C     PO4 BAND DEPTH
+C
+C     DPFLW=change in H2PO4 fertilizer band depth
+C     DPPO4,DPPOB=total,layer H2PO4 fertilizer band depth
+C
+      IF(CDPTH(L,NY,NX).GE.DPPO4(NY,NX))THEN
+      DPFLW=FLWD+DWPO4
+      DPPO4(NY,NX)=DPPO4(NY,NX)+DPFLW
+      DPPOB(L,NY,NX)=DPPOB(L,NY,NX)+DPFLW
+      IF(DPPOB(L,NY,NX).GT.DLYR(3,L,NY,NX))THEN
+      DPPOB(L+1,NY,NX)=DPPOB(L+1,NY,NX)+(DPPOB(L,NY,NX)-DLYR(3,L,NY,NX))
+      WDPOB(L+1,NY,NX)=WDPOB(L,NY,NX)
+      DPPOB(L,NY,NX)=DLYR(3,L,NY,NX)
+      ELSEIF(DPPOB(L,NY,NX).LT.0.0)THEN
+      DPPOB(L-1,NY,NX)=DPPOB(L-1,NY,NX)+DPPOB(L,NY,NX)
+      DPPOB(L,NY,NX)=0.0
+      WDPOB(L,NY,NX)=0.0
+      ENDIF
+      ENDIF
+C
+C     FRACTION OF SOIL LAYER OCCUPIED BY PO4 BAND
+C     FROM BAND WIDTH X DEPTH
+C
+C     VLPO43,VLPOB=fraction of soil volume in H2PO4 non-band,band
+C     DLYR=soil layer thickness
+C     FVLPO4=relative change in VLPO4
+C
+      XVLPO4=VLPO4(L,NY,NX)
+      IF(DLYR(3,L,NY,NX).GT.ZERO)THEN
+      VLPOB(L,NY,NX)=AMAX1(0.0,AMIN1(0.999,WDPOB(L,NY,NX)
+     2/ROWP(NY,NX)*DPPOB(L,NY,NX)/DLYR(3,L,NY,NX)))
+      ELSE
+      VLPOB(L,NY,NX)=0.0
+      ENDIF
+      VLPO4(L,NY,NX)=1.0-VLPOB(L,NY,NX)
+      FVLPO4=AMIN1(0.0,(VLPO4(L,NY,NX)-XVLPO4)/XVLPO4)
+C
+C     TRANSFER HPO4,H2PO4 FROM NON-BAND TO BAND
+C     DURING BAND GROWTH DEPENDING ON SALT
+C     VS. NON-SALT OPTION
+C
+C     DZ*,DX*,DP*=transfer of solute,adsorbed,precipitated HPO4,H2PO4
+C
+      IF(ISALTG.NE.0)THEN
+      DZH0P=FVLPO4*H0PO4(L,NY,NX)
+      DZH1P=FVLPO4*H1PO4(L,NY,NX)/31.0
+      DZH2P=FVLPO4*H2PO4(L,NY,NX)/31.0
+      DZH3P=FVLPO4*H3PO4(L,NY,NX)
+      DZF1P=FVLPO4*ZFE1P(L,NY,NX)
+      DZF2P=FVLPO4*ZFE2P(L,NY,NX)
+      DZC0P=FVLPO4*ZCA0P(L,NY,NX)
+      DZC1P=FVLPO4*ZCA1P(L,NY,NX)
+      DZC2P=FVLPO4*ZCA2P(L,NY,NX)
+      DZM1P=FVLPO4*ZMG1P(L,NY,NX)
+      DXOH0=FVLPO4*XOH0(L,NY,NX)
+      DXOH1=FVLPO4*XOH1(L,NY,NX)
+      DXOH2=FVLPO4*XOH2(L,NY,NX)
+      DXH1P=FVLPO4*XH1P(L,NY,NX)
+      DXH2P=FVLPO4*XH2P(L,NY,NX)
+      DPALP=FVLPO4*PALPO(L,NY,NX)
+      DPFEP=FVLPO4*PFEPO(L,NY,NX)
+      DPCDP=FVLPO4*PCAPD(L,NY,NX)
+      DPCHP=FVLPO4*PCAPH(L,NY,NX)
+      DPCMP=FVLPO4*PCAPM(L,NY,NX)
+      TRH0P(L,NY,NX)=TRH0P(L,NY,NX)+DZH0P
+      TRH1P(L,NY,NX)=TRH1P(L,NY,NX)+DZH1P
+      TRH2P(L,NY,NX)=TRH2P(L,NY,NX)+DZH2P
+      TRH3P(L,NY,NX)=TRH3P(L,NY,NX)+DZH3P
+      TRF1P(L,NY,NX)=TRF1P(L,NY,NX)+DZF1P
+      TRF2P(L,NY,NX)=TRF2P(L,NY,NX)+DZF2P
+      TRC0P(L,NY,NX)=TRC0P(L,NY,NX)+DZC0P
+      TRC1P(L,NY,NX)=TRC1P(L,NY,NX)+DZC1P
+      TRC2P(L,NY,NX)=TRC2P(L,NY,NX)+DZC2P
+      TRM1P(L,NY,NX)=TRM1P(L,NY,NX)+DZM1P
+      TRH0B(L,NY,NX)=TRH0B(L,NY,NX)-DZH0P
+      TRH1B(L,NY,NX)=TRH1B(L,NY,NX)-DZH1P
+      TRH2B(L,NY,NX)=TRH2B(L,NY,NX)-DZH2P
+      TRH3B(L,NY,NX)=TRH3B(L,NY,NX)-DZH3P
+      TRF1B(L,NY,NX)=TRF1B(L,NY,NX)-DZF1P
+      TRF2B(L,NY,NX)=TRF2B(L,NY,NX)-DZF2P
+      TRC0B(L,NY,NX)=TRC0B(L,NY,NX)-DZC0P
+      TRC1B(L,NY,NX)=TRC1B(L,NY,NX)-DZC1P
+      TRC2B(L,NY,NX)=TRC2B(L,NY,NX)-DZC2P
+      TRM1B(L,NY,NX)=TRM1B(L,NY,NX)-DZM1P
+      TRXH0(L,NY,NX)=TRXH0(L,NY,NX)+DXOH0
+      TRXH1(L,NY,NX)=TRXH1(L,NY,NX)+DXOH1
+      TRXH2(L,NY,NX)=TRXH2(L,NY,NX)+DXOH2
+      TRX1P(L,NY,NX)=TRX1P(L,NY,NX)+DXH1P
+      TRX2P(L,NY,NX)=TRX2P(L,NY,NX)+DXH2P
+      TRBH0(L,NY,NX)=TRBH0(L,NY,NX)-DXOH0
+      TRBH1(L,NY,NX)=TRBH1(L,NY,NX)-DXOH1
+      TRBH2(L,NY,NX)=TRBH2(L,NY,NX)-DXOH2
+      TRB1P(L,NY,NX)=TRB1P(L,NY,NX)-DXH1P
+      TRB2P(L,NY,NX)=TRB2P(L,NY,NX)-DXH2P
+      TRALPO(L,NY,NX)=TRALPO(L,NY,NX)+DPALP
+      TRFEPO(L,NY,NX)=TRFEPO(L,NY,NX)+DPFEP
+      TRCAPD(L,NY,NX)=TRCAPD(L,NY,NX)+DPCDP
+      TRCAPH(L,NY,NX)=TRCAPH(L,NY,NX)+DPCHP
+      TRCAPM(L,NY,NX)=TRCAPM(L,NY,NX)+DPCMP
+      TRALPB(L,NY,NX)=TRALPB(L,NY,NX)-DPALP
+      TRFEPB(L,NY,NX)=TRFEPB(L,NY,NX)-DPFEP
+      TRCPDB(L,NY,NX)=TRCPDB(L,NY,NX)-DPCDP
+      TRCPHB(L,NY,NX)=TRCPHB(L,NY,NX)-DPCHP
+      TRCPMB(L,NY,NX)=TRCPMB(L,NY,NX)-DPCMP
+      ELSE
+      DZH1P=FVLPO4*H1PO4(L,NY,NX)/31.0
+      DZH2P=FVLPO4*H2PO4(L,NY,NX)/31.0
+      DXOH1=FVLPO4*XOH1(L,NY,NX)
+      DXOH2=FVLPO4*XOH2(L,NY,NX)
+      DXH2P=FVLPO4*XH2P(L,NY,NX)
+      DPALP=FVLPO4*PALPO(L,NY,NX)
+      DPFEP=FVLPO4*PFEPO(L,NY,NX)
+      DPCDP=FVLPO4*PCAPD(L,NY,NX)
+      DPCHP=FVLPO4*PCAPH(L,NY,NX)
+      DPCMP=FVLPO4*PCAPM(L,NY,NX)
+      TRH1P(L,NY,NX)=TRH1P(L,NY,NX)+DZH1P
+      TRH2P(L,NY,NX)=TRH2P(L,NY,NX)+DZH2P
+      TRXH1(L,NY,NX)=TRXH1(L,NY,NX)+DXOH1
+      TRXH2(L,NY,NX)=TRXH2(L,NY,NX)+DXOH2
+      TRX2P(L,NY,NX)=TRX2P(L,NY,NX)+DXH2P
+      TRH1B(L,NY,NX)=TRH1B(L,NY,NX)-DZH1P
+      TRH2B(L,NY,NX)=TRH2B(L,NY,NX)-DZH2P
+      TRBH1(L,NY,NX)=TRBH1(L,NY,NX)-DXOH1
+      TRBH2(L,NY,NX)=TRBH2(L,NY,NX)-DXOH2
+      TRB2P(L,NY,NX)=TRB2P(L,NY,NX)-DXH2P
+      TRALPO(L,NY,NX)=TRALPO(L,NY,NX)+DPALP
+      TRFEPO(L,NY,NX)=TRFEPO(L,NY,NX)+DPFEP
+      TRCAPD(L,NY,NX)=TRCAPD(L,NY,NX)+DPCDP
+      TRCAPH(L,NY,NX)=TRCAPH(L,NY,NX)+DPCHP
+      TRCAPM(L,NY,NX)=TRCAPM(L,NY,NX)+DPCMP
+      TRALPB(L,NY,NX)=TRALPB(L,NY,NX)-DPALP
+      TRFEPB(L,NY,NX)=TRFEPB(L,NY,NX)-DPFEP
+      TRCPDB(L,NY,NX)=TRCPDB(L,NY,NX)-DPCDP
+      TRCPHB(L,NY,NX)=TRCPHB(L,NY,NX)-DPCHP
+      TRCPMB(L,NY,NX)=TRCPMB(L,NY,NX)-DPCMP
+      ENDIF
+      ELSE
+C
+C     AMALGAMATE PO4 BAND WITH NON-BAND IF BAND NO LONGER EXISTS
+C
+      DPPOB(L,NY,NX)=0.0
+      WDPOB(L,NY,NX)=0.0
+      VLPOB(L,NY,NX)=0.0
+      VLPO4(L,NY,NX)=1.0
+      H0PO4(L,NY,NX)=H0PO4(L,NY,NX)+H0POB(L,NY,NX)
+      H1PO4(L,NY,NX)=H1PO4(L,NY,NX)+H1POB(L,NY,NX)
+      H2PO4(L,NY,NX)=H2PO4(L,NY,NX)+H2POB(L,NY,NX)
+      H3PO4(L,NY,NX)=H3PO4(L,NY,NX)+H3POB(L,NY,NX)
+      ZFE1P(L,NY,NX)=ZFE1P(L,NY,NX)+ZFE1PB(L,NY,NX)
+      ZFE2P(L,NY,NX)=ZFE2P(L,NY,NX)+ZFE2PB(L,NY,NX)
+      ZCA0P(L,NY,NX)=ZCA0P(L,NY,NX)+ZCA0PB(L,NY,NX)
+      ZCA1P(L,NY,NX)=ZCA1P(L,NY,NX)+ZCA1PB(L,NY,NX)
+      ZCA2P(L,NY,NX)=ZCA2P(L,NY,NX)+ZCA2PB(L,NY,NX)
+      ZMG1P(L,NY,NX)=ZMG1P(L,NY,NX)+ZMG1PB(L,NY,NX)
+      H0POB(L,NY,NX)=0.0
+      H1POB(L,NY,NX)=0.0
+      H2POB(L,NY,NX)=0.0
+      H3POB(L,NY,NX)=0.0
+      ZFE1PB(L,NY,NX)=0.0
+      ZFE2PB(L,NY,NX)=0.0
+      ZCA0PB(L,NY,NX)=0.0
+      ZCA1PB(L,NY,NX)=0.0
+      ZCA2PB(L,NY,NX)=0.0
+      ZMG1PB(L,NY,NX)=0.0
+      XOH0(L,NY,NX)=XOH0(L,NY,NX)+XOH0B(L,NY,NX)
+      XOH1(L,NY,NX)=XOH1(L,NY,NX)+XOH1B(L,NY,NX)
+      XOH2(L,NY,NX)=XOH2(L,NY,NX)+XOH2B(L,NY,NX)
+      XH1P(L,NY,NX)=XH1P(L,NY,NX)+XH1PB(L,NY,NX)
+      XH2P(L,NY,NX)=XH2P(L,NY,NX)+XH2PB(L,NY,NX)
+      XOH0B(L,NY,NX)=0.0
+      XOH1B(L,NY,NX)=0.0
+      XOH2B(L,NY,NX)=0.0
+      XH1PB(L,NY,NX)=0.0
+      XH2PB(L,NY,NX)=0.0
+      PALPO(L,NY,NX)=PALPO(L,NY,NX)+PALPB(L,NY,NX)
+      PFEPO(L,NY,NX)=PFEPO(L,NY,NX)+PFEPB(L,NY,NX)
+      PCAPD(L,NY,NX)=PCAPD(L,NY,NX)+PCPDB(L,NY,NX)
+      PCAPH(L,NY,NX)=PCAPH(L,NY,NX)+PCPHB(L,NY,NX)
+      PCAPM(L,NY,NX)=PCAPM(L,NY,NX)+PCPMB(L,NY,NX)
+      PALPB(L,NY,NX)=0.0
+      PFEPB(L,NY,NX)=0.0
+      PCPDB(L,NY,NX)=0.0
+      PCPHB(L,NY,NX)=0.0
+      PCPMB(L,NY,NX)=0.0
+      ENDIF
+      ENDIF
+      end subroutine update_PO4_fert_bandinfo
+
+C------------------------------------------------------------------------------------------
+
+      subroutine update_no3_fert_bandinfo(L,NY,NX)
+      implicit none
+      integer, intent(in) :: L,NY,NX
+C     execution begins here
+
+C     IFNOB=banded NO3 fertilizer flag
+C     ROWO=NO3 fertilizer band row width
+C     DPNO3=NO3 fertilizer band depth
+C
+      IF(IFNOB(NY,NX).EQ.1.AND.ROWO(NY,NX).GT.0.0)THEN
+
+      IF(L.EQ.NU(NY,NX).OR.CDPTH(L-1,NY,NX).LT.DPNO3(NY,NX))THEN
+C
+C     NO3 BAND WIDTH
+C
+C     DWNO3=change in NO3 fertilizer band width
+C     WDNOB=layer NO3 fertilizer band width
+C     ZOSGL=NO3 diffusivity
+C     TORT=tortuosity
+C
+      DWNO3=0.5*SQRT(ZOSGL(L,NY,NX))*TORT(NPH,L,NY,NX)
+      WDNOB(L,NY,NX)=AMIN1(ROWO(NY,NX),WDNOB(L,NY,NX)+DWNO3)
+C
+C     NO3 BAND DEPTH
+C
+C     DPFLW=change in NO3 fertilizer band depth
+C     DPNO3,DPNOB=total,layer NO3 fertilizer band depth
+C
+      IF(CDPTH(L,NY,NX).GE.DPNO3(NY,NX))THEN
+      DPFLW=FLWD+DWNO3
+      DPNO3(NY,NX)=DPNO3(NY,NX)+DPFLW
+      DPNOB(L,NY,NX)=DPNOB(L,NY,NX)+DPFLW
+      IF(DPNOB(L,NY,NX).GT.DLYR(3,L,NY,NX))THEN
+      DPNOB(L+1,NY,NX)=DPNOB(L+1,NY,NX)+(DPNOB(L,NY,NX)-DLYR(3,L,NY,NX))
+      WDNOB(L+1,NY,NX)=WDNOB(L,NY,NX)
+      DPNOB(L,NY,NX)=DLYR(3,L,NY,NX)
+      ELSEIF(DPNOB(L,NY,NX).LT.0.0)THEN
+      DPNOB(L-1,NY,NX)=DPNOB(L-1,NY,NX)+DPNOB(L,NY,NX)
+      DPNOB(L,NY,NX)=0.0
+      WDNOB(L,NY,NX)=0.0
+      ENDIF
+      ENDIF
+C
+C     FRACTION OF SOIL LAYER OCCUPIED BY NO3 BAND
+C     FROM BAND WIDTH X DEPTH
+C
+C     VLNO3,VLNOB=fraction of soil volume in NO3 non-band,band
+C     DLYR=soil layer thickness
+C     FVLNO3=relative change in VLNO3
+C
+      XVLNO3=VLNO3(L,NY,NX)
+      IF(DLYR(3,L,NY,NX).GT.ZERO)THEN
+      VLNOB(L,NY,NX)=AMAX1(0.0,AMIN1(0.999,WDNOB(L,NY,NX)
+     2/ROWO(NY,NX)*DPNOB(L,NY,NX)/DLYR(3,L,NY,NX)))
+      ELSE
+      VLNOB(L,NY,NX)=0.0
+      ENDIF
+      VLNO3(L,NY,NX)=1.0-VLNOB(L,NY,NX)
+      FVLNO3=AMIN1(0.0,(VLNO3(L,NY,NX)-XVLNO3)/XVLNO3)
+C
+C     TRANSFER NO3 FROM NON-BAND TO BAND
+C     DURING BAND GROWTH
+C
+C     DNO3S,DNO2S=transfer of NO3,NO2
+C
+      DNO3S=FVLNO3*ZNO3S(L,NY,NX)/14.0
+      DNO2S=FVLNO3*ZNO2S(L,NY,NX)/14.0
+      TRNO3(L,NY,NX)=TRNO3(L,NY,NX)+DNO3S
+      TRNO2(L,NY,NX)=TRNO2(L,NY,NX)+DNO2S
+      TRNOB(L,NY,NX)=TRNOB(L,NY,NX)-DNO3S
+      TRN2B(L,NY,NX)=TRN2B(L,NY,NX)-DNO2S
+      ELSE
+C
+C     AMALGAMATE NO3 BAND WITH NON-BAND IF BAND NO LONGER EXISTS
+C
+      DPNOB(L,NY,NX)=0.0
+      WDNOB(L,NY,NX)=0.0
+      VLNO3(L,NY,NX)=1.0
+      VLNOB(L,NY,NX)=0.0
+      ZNO3S(L,NY,NX)=ZNO3S(L,NY,NX)+ZNO3B(L,NY,NX)
+      ZNO2S(L,NY,NX)=ZNO2S(L,NY,NX)+ZNO2B(L,NY,NX)
+      ZNO3B(L,NY,NX)=0.0
+      ZNO2B(L,NY,NX)=0.0
+      ENDIF
+      ENDIF
+      end subroutine update_no3_fert_bandinfo
+
+C------------------------------------------------------------------------------------------
+
+      subroutine update_surf_residue_solute(NX,NY)
+      implicit none
+      integer, intent(in) :: NY,NX
+
+C     execution begins here
+
+C     BKVL=litter mass
+C
+      IF(VOLWM(NPH,0,NY,NX).GT.ZEROS2(NY,NX))THEN
+      BKVLX=BKVL(0,NY,NX)
+C
+C     UREA HYDROLYSIS IN SURFACE RESIDUE
+C
+C     VOLQ=biologically active litter water volume from nitro.f
+C     COMA=concentration of active biomass
+C     TOQCK=total microbial activity from nitro.f
+C     DUKD=Km for urea hydrolysis
+C
+      IF(VOLQ(0,NY,NX).GT.ZEROS2(NY,NX))THEN
+      COMA=AMIN1(0.1E+06,TOQCK(0,NY,NX)/VOLQ(0,NY,NX))
+      ELSE
+      COMA=0.1E+06
+      ENDIF
+      DUKD=DUKM*(1.0+COMA/DUKI)
+C
+C     UREA HYDROLYSIS INHIBITION
+C
+C     ZNHU0,ZNHUI=initial,current inhibition activity
+C     RNHUI=rate constant for decline in urea hydrolysis inhibition
+C
+      IF(ZNHU0(0,NY,NX).GT.ZEROS(NY,NX)
+     2.AND.ZNHUI(0,NY,NX).GT.ZEROS(NY,NX))THEN
+      ZNHUI(0,NY,NX)=ZNHUI(0,NY,NX)-TFNQ(0,NY,NX)**0.25
+     2*RNHUI(IUTYP(NY,NX))*ZNHUI(0,NY,NX)
+     3*AMAX1(RNHUI(IUTYP(NY,NX)),1.0-ZNHUI(0,NY,NX)/ZNHU0(0,NY,NX))
+      ELSE
+      ZNHUI(0,NY,NX)=0.0
+      ENDIF
+C
+C     UREA CONCENTRATION AND HYDROLYSIS IN SURFACE RESIDUE
+C
+C     ZNHUFA=urea fertilizer
+C     CNHUA=concentration of urea fertilizer
+C     DFNSA=effect of microbial concentration on urea hydrolysis
+C     RSNUA=rate of urea hydrolysis
+C     SPNHU=specific rate constant for urea hydrolysis
+C     TFNQ=temperature effect on microbial activity from nitro.f
+C
+      IF(ZNHUFA(0,NY,NX).GT.ZEROS(NY,NX)
+     2.AND.BKVL(0,NY,NX).GT.ZEROS(NY,NX))THEN
+      CNHUA=ZNHUFA(0,NY,NX)/BKVL(0,NY,NX)
+      DFNSA=CNHUA/(CNHUA+DUKD)
+      RSNUA=AMIN1(ZNHUFA(0,NY,NX)
+     2,SPNHU*TOQCK(0,NY,NX)*DFNSA*TFNQ(0,NY,NX))*(1.0-ZNHUI(0,NY,NX))
+      ELSE
+      RSNUA=0.0
+      ENDIF
+C     IF(ZNHUFA(0,NY,NX).GT.ZEROS(NY,NX))THEN
+C     WRITE(*,8778)'UREA0',I,J,IUTYP(NY,NX)
+C    2,ZNHUFA(0,NY,NX),RSNUA
+C    2,DFNSA,TFNQ(0,NY,NX),CNHUA,DUKD,DUKM,DUKI,TOQCK(0,NY,NX)
+C    3,BKVL(0,NY,NX),TFNQ(0,NY,NX),SPNHU,ZNHU0(0,NY,NX),ZNHUI(0,NY,NX)
+C    4,RNHUI(IUTYP(NY,NX))
+8778  FORMAT(A8,3I4,40E12.4)
 C     ENDIF
-      end subroutine summarize_ion_flxes
+C
+C     NH4, NH3, UREA, NO3 DISSOLUTION IN SURFACE RESIDUE
+C     FROM FIRST-ORDER FUNCTIONS OF REMAINING
+C     FERTILIZER (NOTE: SUPERPHOSPHATE AND ROCK PHOSPHATE
+C     ARE REPRESENTED AS MONOCALCIUM PHOSPHATE AND HYDROXYAPATITE
+C     MODELLED IN PHOSPHORUS REACTIONS BELOW)
+C
+C     RSN4AA=rate of broadcast NH4 fertilizer dissoln
+C     RSN3AA=rate of broadcast NH3 fertilizer dissoln
+C     RSNUAA=rate of broadcast urea fertr dissoln
+C     RSNOAA=rate of broadcast NO3 fertilizer dissoln
+C
+      IF(VOLWRX(NY,NX).GT.ZEROS(NY,NX))THEN
+      THETWR=AMIN1(1.0,VOLW(0,NY,NX)/VOLWRX(NY,NX))
+      ELSE
+      THETWR=1.0
+      ENDIF
+      RSN4AA=SPNH4*ZNH4FA(0,NY,NX)*THETWR
+      RSN3AA=SPNH3*ZNH3FA(0,NY,NX)
+      RSNUAA=RSNUA*THETWR
+      RSNOAA=SPNO3*ZNO3FA(0,NY,NX)*THETWR
+C
+C     SOLUBLE AND EXCHANGEABLE NH4 CONCENTRATIONS
+C
+C     VOLWNH=water volume
+C     RN4X,RN3X=NH4,NH3 input from uptake, mineraln, dissoln
+C     XNH4S=net change in NH4 from nitro.f
+C     CN41,CN31=total NH4,NH3 concentration
+C     XN41=adsorbed NH4 concentration
+C
+      IF(VOLWM(NPH,0,NY,NX).GT.ZEROS2(NY,NX))THEN
+      VOLWMX=14.0*VOLWM(NPH,0,NY,NX)
+      RN4X=(XNH4S(0,NY,NX)+14.0*RSN4AA)/VOLWMX
+      RN3X=14.0*RSNUAA/VOLWMX
+      CN41=AMAX1(ZERO,ZNH4S(0,NY,NX)/VOLWMX+RN4X)
+      CN31=AMAX1(ZERO,ZNH3S(0,NY,NX)/VOLWMX+RN3X)
+      IF(BKVLX.GT.ZEROS(NY,NX))THEN
+      XN41=AMAX1(ZERO,XN4(0,NY,NX)/BKVLX)
+      ELSE
+      XN41=0.0
+      ENDIF
+C
+C     SOLUBLE, EXCHANGEABLE AND PRECIPITATED PO4 CONCENTRATIONS
+C
+C     VOLWMP=water volume
+C     RH1PX,RH2PX=HPO4,H2PO4 inputs from mineraln, uptake
+C     XH1PS=net change in HPO4 from nitro.f
+C     CH1P1,CH2P1=HPO4,H2PO4 concentrations
+C
+      VOLWMP=31.0*VOLWM(NPH,0,NY,NX)
+      RH1PX=XH1PS(0,NY,NX)/VOLWMP
+      RH2PX=XH2PS(0,NY,NX)/VOLWMP
+      CH1P1=AMAX1(0.0,H1PO4(0,NY,NX)/VOLWMP+RH1PX)
+      CH2P1=AMAX1(0.0,H2PO4(0,NY,NX)/VOLWMP+RH2PX)
+      ELSE
+      RN4X=0.0
+      RN3X=0.0
+      CN41=0.0
+      CN31=0.0
+      XN41=0.0
+      RH1PX=0.0
+      RH2PX=0.0
+      CH1P1=0.0
+      CH2P1=0.0
+      ENDIF
+C
+C     PHOSPHORUS TRANSFORMATIONS IN SURFACE RESIDUE
+C
+C     PALPO1,PFEPO1=concn of precip AlPO4,FEPO4
+C     PCAPM1,PCAPD1,PCAPH1=concn of precip CaH2PO4,CaHPO4,apatite
+C
+      IF(BKVLX.GT.ZEROS(NY,NX))THEN
+      PALPO1=AMAX1(0.0,PALPO(0,NY,NX)/BKVLX)
+      PFEPO1=AMAX1(0.0,PFEPO(0,NY,NX)/BKVLX)
+      PCAPM1=AMAX1(0.0,PCAPM(0,NY,NX)/BKVLX)
+      PCAPD1=AMAX1(0.0,PCAPD(0,NY,NX)/BKVLX)
+      PCAPH1=AMAX1(0.0,PCAPH(0,NY,NX)/BKVLX)
+      ELSE
+      PALPO1=0.0
+      PFEPO1=0.0
+      PCAPM1=0.0
+      PCAPD1=0.0
+      PCAPH1=0.0
+      ENDIF
+C
+C     CALCULATE H2PO4 COPRECIPITATES FRPM LITTER PH
+C
+      CHY1=AMAX1(ZERO,10.0**(-(PH(0,NY,NX)-3.0)))
+      COH1=AMAX1(ZERO,DPH2O/CHY1)
+      CAL1=AMAX1(ZERO,SPALO/COH1**3)
+      CFE1=AMAX1(ZERO,SPFEO/COH1**3)
+      CCO20=AMAX1(ZERO,CCO2S(0,NY,NX)/12.0)
+      CCO31=AMAX1(ZERO,CCO20*DPCO3/CHY1**2)
+      CCA1=AMAX1(ZERO,AMIN1(CCAMX,SPCAC/CCO31))
+C
+C     ALUMINUM PHOSPHATE (VARISCITE)
+C
+C     CH2PA,CH2P1=equilibrium,current H2PO4 concentration in litter
+C     SYA0P2=solubility product derived from SPALO
+C     RPALPX=H2PO4 dissolution from AlPO4 in litter
+C
+      CH2PA=SYA0P2/(CAL1*COH1**2)
+      RPALPX=AMIN1(AMAX1(0.0,4.0E-08*ORGC(0,NY,NX)-PALPO1)
+     2,AMAX1(-PALPO1,TPD*(CH2P1-CH2PA)))
+C
+C     IRON PHOSPHATE (STRENGITE)
+C
+C     CH2PF,CH2P1=equilibrium,current H2PO4 concentration in litter
+C     SYF0P2=solubility product derived from SPALO
+C     RPFEPX=H2PO4 dissolution from FePO4 in litter
+C
+      CH2PF=SYF0P2/(CFE1*COH1**2)
+      RPFEPX=AMIN1(AMAX1(0.0,2.0E-06*ORGC(0,NY,NX)-PFEPO1)
+     2,AMAX1(-PFEPO1,TPD*(CH2P1-CH2PF)))
+C
+C     DICALCIUM PHOSPHATE
+C
+C     CH2PD,CH2P1=equilibrium,current H2PO4 concentration in litter
+C     SYCAD2=solubility product derived from SPALO
+C     RPCADX=H2PO4 dissolution from CaHPO4 in litter
+C
+      CH2PD=SYCAD2/(CCA1*COH1)
+      RPCADX=AMIN1(AMAX1(0-.0,5.0E-05*ORGC(0,NY,NX)-PCAPD1)
+     2,AMAX1(-PCAPD1,TPD*(CH2P1-CH2PD)))
+C
+C     HYDROXYAPATITE
+C
+C     CH2PH,CH2P1=equilibrium,current H2PO4 concentration in litter
+C     SYCAH2=solubility product derived from SPALO
+C     RPCAHX=H2PO4 dissolution from apatite in litter
+C
+      CH2PH=(SYCAH2/(CCA1**5*COH1**7))**0.333
+      RPCAHX=AMIN1(AMAX1(0.0,5.0E-05*ORGC(0,NY,NX)-PCAPH1)
+     2,AMAX1(-PCAPH1,TPD*(CH2P1-CH2PH)))
+C
+C     MONOCALCIUM PHOSPHATE
+C
+C     CH2PM,CH2P1=equilibrium,current H2PO4 concentration in litter
+C     SPCAM=solubility product for Ca(H2PO4)2
+C     RPCAMX=H2PO4 dissolution from Ca(H2PO4)2 in litter
+C
+      CH2PM=SQRT(SPCAM/CCA1)
+      RPCAMX=AMIN1(AMAX1(0.0,5.0E-05*ORGC(0,NY,NX)-PCAPM1)
+     2,AMAX1(-PCAPM1*SPPO4,TPD*(CH2P1-CH2PM)))
+C     IF(I.GT.315)THEN
+C     WRITE(*,2227)'RPPO4',I,J,L,RPCAHX,CH2P1,CH2PA,CH2PH
+C    2,SYA0P2,CAL1,COH1,SYCAH2,CCA1,CCO21,CCO31,PCAPH1
+C    3,VOLWM(NPH,0,NY,NX),SPCAC/CCO31,H2PO4(0,NY,NX)
+C    4,CCO20,DPCO3,CHY1,CCO2S(0,NY,NX)
+2227  FORMAT(A8,3I4,20E12.4)
+C     ENDIF
+C
+C     PHOSPHORUS ANION EXCHANGE IN SURFACE REDISUE
+C     CALCULATED FROM EXCHANGE EQUILIBRIA AMONG H2PO4-,
+C     HPO4--, H+, OH- AND PROTONATED AND NON-PROTONATED -OH
+C     EXCHANGE SITES (NOT CALCULATED)
+C
+C     H2PO4-H+HPO4
+C
+C     DPH2P=dissociation constant
+C     S1=equilibrium concentration in litter
+C     RH2P=H2PO4-H+HPO4 dissociation in litter
+C
+      DP=DPH2P
+      S0=CH1P1+CHY1+DP
+      S1=AMAX1(0.0,S0**2-4.0*(CH1P1*CHY1-DP*CH2P1))
+      RH2P=TSL*(S0-SQRT(S1))
+C
+C     EQUILIBRIUM X-CA CONCENTRATION FROM CEC, GAPON COEFFICIENTS
+C     AND CATION CONCENTRATIONS
+C
+C     CCEC,XCEC=cation exchange concentration,capacity
+C     XCAX=equilibrium R-Ca concentration
+C     GKC4,GKCH,GKCA,GKCM,GKCN,GKCK=Gapon selectivity coefficients for
+C     CA-NH4,CA-H,CA-AL,CA-MG,CA-NA,CA-K
+C     X*Q=equilibrium exchangeable concentrations
+C     XTLQ=total equilibrium exchangeable concentration
+C
+      IF(BKVLX.GT.ZEROS(NY,NX))THEN
+      CCEC0=AMAX1(ZERO,COOH*ORGC(0,NY,NX)/BKVLX)
+      ELSE
+      CCEC0=ZERO
+      ENDIF
+      CALX=AMAX1(ZERO,CAL1)**0.333
+      CFEX=AMAX1(ZERO,CFE1)**0.333
+      CCAX=AMAX1(ZERO,CCA1)**0.500
+C
+C     EQUILIBRIUM X-CA CONCENTRATION FROM CEC AND CATION
+C     CONCENTRATIONS
+C
+      XCAX=CCEC0/(1.0+GKC4(NU(NY,NX),NY,NX)*CN41/CCAX
+     2+GKCH(NU(NY,NX),NY,NX)*CHY1/CCAX
+     3+GKCA(NU(NY,NX),NY,NX)*CALX/CCAX
+     3+GKCA(NU(NY,NX),NY,NX)*CFEX/CCAX)
+      XN4Q=XCAX*CN41*GKC4(NU(NY,NX),NY,NX)
+      XHYQ=XCAX*CHY1*GKCH(NU(NY,NX),NY,NX)
+      XALQ=XCAX*CALX*GKCA(NU(NY,NX),NY,NX)
+      XFEQ=XCAX*CFEX*GKCA(NU(NY,NX),NY,NX)
+      XCAQ=XCAX*CCAX
+      XTLQ=XN4Q+XHYQ+XALQ+XFEQ+XCAQ
+      IF(XTLQ.GT.ZERO)THEN
+      FX=CCEC0/XTLQ
+      ELSE
+      FX=0.0
+      ENDIF
+      XN4Q=FX*XN4Q
+C
+C     NH4 AND NH3 EXCHANGE IN SURFACE RESIDUE
+C
+C     RXN4=NH4 adsorption in litter
+C     TADC0=adsorption rate constant
+C     RNH4=NH4-NH3+H dissociation in litter
+C     DPN4=NH4 dissociation constant
+C
+      RXN4=TADC0*(XN4Q-XN41)
+      RNH4=(CHY1*CN31-DPN4*CN41)/(DPN4+CHY1)
+C     IF(J.EQ.12)THEN
+C     WRITE(*,2223)'RXN4',I,J,RXN4,CN41,XN41,TADC0,XN4Q
+C    2,CCAX,CCA1,CCO20,CCO31
+C    2,XCAQ,CCEC0,FN4X,FCAQ,GKC4(NU(NY,NX),NY,NX)
+C    3,PH(0,NY,NX),CHY1,RNH4
+C    3,CN31,DPN4,ZNH4S(0,NY,NX),XN4(0,NY,NX),14.0*RSN4AA,RN4X,BKVLX
+C    4,BKVL(0,NY,NX),VOLWM(NPH,0,NY,NX)
+2223  FORMAT(A8,2I4,30E12.4)
+C     ENDIF
+      ELSE
+      RSN4AA=0.0
+      RSN3AA=0.0
+      RSNUAA=0.0
+      RSNOAA=0.0
+      RPALPX=0.0
+      RPFEPX=0.0
+      RPCADX=0.0
+      RPCAHX=0.0
+      RPCAMX=0.0
+      RXN4=0.0
+      RNH4=0.0
+      RH2P=0.0
+      RPALPX=0.0
+      RPFEPX=0.0
+      RPCADX=0.0
+      RPCAMX=0.0
+      RPCAHX=0.0
+      ENDIF
+      end subroutine update_surf_residue_solute
 
       END module SoluteMod
