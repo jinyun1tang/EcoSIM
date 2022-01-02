@@ -127,12 +127,12 @@ C
 
       integer :: NN,N,NX,NY,NZ,K,L
 
-C     execution begins here
+C     begin_execution
 
       DO 9995 NX=NHW,NHE
       DO 9990 NY=NVN,NVS
 
-      call stage_for_uptake(NY,NX)
+      call PrepUptake(NY,NX)
 
 C
 C     IF PLANT SPECIES EXISTS
@@ -142,13 +142,13 @@ C
       OSTRD=0.0
       IF(IFLGC(NZ,NY,NX).EQ.1.AND.PP(NZ,NY,NX).GT.0.0)THEN
 
-      call update_canopy_char(NZ,NY,NX)
+      call UpdateCanopyProperty(NZ,NY,NX)
 
 C     STOMATE=solve for minimum canopy stomatal resistance
       CALL STOMATE(I,J,NZ,NY,NX)
 C
 C     CALCULATE VARIABLES USED IN ROOT UPTAKE OF WATER AND NUTRIENTS
-      call update_root_char(NZ,NY,NX)
+      call UpdateRootProperty(NZ,NY,NX)
 
 C
 C     CALCULATE CANOPY WATER STATUS FROM CONVERGENCE SOLUTION FOR
@@ -168,7 +168,7 @@ C     (AG: - originally this line had a N0B1 here )
      5.AND.(RTDP1(1,1,NZ,NY,NX).GT.SDPTH(NZ,NY,NX)+CDPTHZ(0,NY,NX)))THEN
 C
 
-      call calc_resistance(NZ,NY,NX)
+      call CalcResistance(NZ,NY,NX)
 
 C
 C     INITIALIZE CANOPY WATER POTENTIAL, OTHER VARIABLES USED IN ENERGY
@@ -209,7 +209,7 @@ C
 C     CONVERGENCE SOLUTION
 C
 
-      NN=canopy_energywater_iteration(I,J,NZ,NY,NX)
+      NN=CanopyEnergyH2OIteration(I,J,NZ,NY,NX)
 C
 C     FINAL CANOPY TEMPERATURE, DIFFERENCE WITH AIR TEMPERATURE
 C
@@ -224,25 +224,25 @@ C
 C     IF CONVERGENCE NOT ACHIEVED (RARE), SET DEFAULT
 C     TEMPERATURES, ENERGY FLUXES, WATER POTENTIALS, RESISTANCES
 C
-      call handling_divergence(I,J,NN,NZ,NY,NX)
+      call HandlingDivergence(I,J,NN,NZ,NY,NX)
 
-      call update_canopy_water(NZ,NY,NX)
+      call UpdateCanopyWater(NZ,NY,NX)
 
 C
 C     DEFAULT VALUES IF PLANT SPECIES DOES NOT EXIST
 C
       ELSE
-      call set_bare_soil(NZ,NY,NX)
+      call HandleBareSoil(NZ,NY,NX)
       ENDIF
 
-      call set_canopy_growth_fT(NZ,NY,NX)
+      call SetCanopyGrowthFuncs(NZ,NY,NX)
 
-      call canopy_nh3_flux(NZ,NY,NX)
+      call CanopyNH3Flux(NZ,NY,NX)
 
 C
 C     ROOT(N=1) AD MYCORRHIZAL(N=2) O2 AND NUTRIENT UPTAKE
 C
-      call root_myco_o2_nutrient_uptake(NZ,NY,NX)
+      call RootMycoO2NutrientUptake(NZ,NY,NX)
       TLEC(NY,NX)=TLEC(NY,NX)+EFLXC(NZ,NY,NX)*RA(NZ,NY,NX)
       TSHC(NY,NX)=TSHC(NY,NX)+SFLXC(NZ,NY,NX)*RA(NZ,NY,NX)
       IF(OSTRD.GT.ZEROP(NZ,NY,NX))THEN
@@ -258,7 +258,7 @@ C
       END subroutine uptake
 C------------------------------------------------------------------------
 
-      subroutine stage_for_uptake(NY,NX)
+      subroutine PrepUptake(NY,NX)
 C
 C     prepare for uptake calculation
       implicit none
@@ -344,9 +344,9 @@ C     IF(IFLGC(NZ,NY,NX).EQ.1.AND.PP(NZ,NY,NX).GT.0.0)THEN
 C     ENDIF
 9005  CONTINUE
 9000  CONTINUE
-      end subroutine stage_for_uptake
+      end subroutine PrepUptake
 C------------------------------------------------------------------------
-      subroutine update_canopy_char(NZ,NY,NX)
+      subroutine UpdateCanopyProperty(NZ,NY,NX)
 C
 C     update canopy characterization
       implicit none
@@ -436,9 +436,9 @@ C     TKA=current air temperature
 C     DTKC=TKC-TKA from previous hour
 C
       TKCZ(NZ,NY,NX)=TKA(NY,NX)+DTKC(NZ,NY,NX)
-      end subroutine update_canopy_char
+      end subroutine UpdateCanopyProperty
 C------------------------------------------------------------------------
-      subroutine update_root_char(NZ,NY,NX)
+      subroutine UpdateRootProperty(NZ,NY,NX)
 C
 C     update root characterization
 
@@ -521,10 +521,10 @@ C    2,PORT(N,NZ,NY,NX),PP(NZ,NY,NX),RTLGP(N,L,NZ,NY,NX)
 4413  FORMAT(A8,7I4,30E12.4)
 C     ENDIF
 2000  CONTINUE
-      end subroutine update_root_char
+      end subroutine UpdateRootProperty
 C------------------------------------------------------------------------
 
-      subroutine handling_divergence(I,J,NN,NZ,NY,NX)
+      subroutine HandlingDivergence(I,J,NN,NZ,NY,NX)
 
       implicit none
       integer, intent(in) :: NN, I, J
@@ -576,10 +576,10 @@ C------------------------------------------------------------------------
 4290  CONTINUE
       ENDIF
       ENDIF
-      end subroutine handling_divergence
+      end subroutine HandlingDivergence
 
 C------------------------------------------------------------------------------
-      function canopy_energywater_iteration(I,J,NZ,NY,NX) result(NN)
+      function CanopyEnergyH2OIteration(I,J,NZ,NY,NX) result(NN)
       implicit none
       integer, intent(in) :: I, J
       integer, intent(in) :: NZ,NY,NX
@@ -589,7 +589,7 @@ C     return variables
 C     local variables
       integer :: N,L
 
-C     execution begins here
+C     begin_execution
 
       CCPOLT=CCPOLP(NZ,NY,NX)+CZPOLP(NZ,NY,NX)+CPPOLP(NZ,NY,NX)
       OSWT=36.0+840.0*AMAX1(0.0,CCPOLT)
@@ -878,9 +878,9 @@ C
 4000  CONTINUE
 4500  CONTINUE
       return
-      end function canopy_energywater_iteration
+      end function CanopyEnergyH2OIteration
 C------------------------------------------------------------------------
-      subroutine calc_resistance(NZ,NY,NX)
+      subroutine CalcResistance(NZ,NY,NX)
 
       implicit none
       integer, intent(in) :: NZ, NY, NX
@@ -1000,10 +1000,10 @@ C    8,RTN1(1,L,NZ,NY,NX),FRADW,RTNL(N,L,NZ,NY,NX),CNDT
 C     ENDIF
       ENDIF
 3890  CONTINUE
-      end subroutine calc_resistance
+      end subroutine CalcResistance
 C------------------------------------------------------------------------
 
-      subroutine set_bare_soil(NZ,NY,NX)
+      subroutine HandleBareSoil(NZ,NY,NX)
 
       implicit none
       integer, intent(in) :: NZ,NY,NX
@@ -1051,10 +1051,10 @@ C------------------------------------------------------------------------
      2-PSIRO(N,L,NZ,NY,NX))
       UPWTR(N,L,NZ,NY,NX)=0.0
 4300  CONTINUE
-      end subroutine set_bare_soil
+      end subroutine HandleBareSoil
 C------------------------------------------------------------------------
 
-      subroutine update_canopy_water(NZ,NY,NX)
+      subroutine UpdateCanopyWater(NZ,NY,NX)
 
       implicit none
       integer, intent(in) :: NZ,NY,NX
@@ -1121,11 +1121,11 @@ C    3,RSRG(N,L),RSR1(N,L),RSR2(N,L),RTAR2,VOLWM(NPH,L,NY,NX)
 C     ENDIF
 4510  CONTINUE
 4505  CONTINUE
-      end subroutine update_canopy_water
+      end subroutine UpdateCanopyWater
 
 C------------------------------------------------------------------------
 
-      subroutine set_canopy_growth_fT(NZ,NY,NX)
+      subroutine SetCanopyGrowthFuncs(NZ,NY,NX)
 
       implicit none
       integer, intent(in) :: NZ,NY,NX
@@ -1180,10 +1180,10 @@ C
       ELSE
       CHILL(NZ,NY,NX)=AMAX1(0.0,CHILL(NZ,NY,NX)-1.0)
       ENDIF
-      end subroutine set_canopy_growth_fT
+      end subroutine SetCanopyGrowthFuncs
 C------------------------------------------------------------------------
 
-      subroutine canopy_nh3_flux(NZ,NY,NX)
+      subroutine CanopyNH3Flux(NZ,NY,NX)
 
       implicit none
       integer, intent(in) :: NZ,NY,NX
@@ -1225,17 +1225,20 @@ C    2,ARLFB(NB,NZ,NY,NX),ARLFP(NZ,NY,NX),SNH3P
 C    4,ZPOOL(NB,NZ,NY,NX),WTLSB(NB,NZ,NY,NX),FRADP(NZ,NY,NX)
 7777  FORMAT(A8,4I4,40E24.16)
 105   CONTINUE
-      end subroutine canopy_nh3_flux
+      end subroutine CanopyNH3Flux
 
 C------------------------------------------------------------------------
 
-      subroutine zero_uptake(N,L,NZ,NY,NX)
+      subroutine ZeroUptake(N,L,NZ,NY,NX)
 
       implicit none
       integer, intent(in) :: N, L
       integer, intent(in) :: NZ,NY,NX
 
       integer :: K
+
+C     begin_execution
+
       RCOFLA(N,L,NZ,NY,NX)=0.0
       ROXFLA(N,L,NZ,NY,NX)=0.0
       RCHFLA(N,L,NZ,NY,NX)=0.0
@@ -1292,13 +1295,15 @@ C------------------------------------------------------------------------
       RUOH1B(N,L,NZ,NY,NX)=0.0
       RUCH1B(N,L,NZ,NY,NX)=0.0
       IF(N.EQ.1)RUPNF(L,NZ,NY,NX)=0.0
-      end subroutine zero_uptake
+      end subroutine ZeroUptake
 C------------------------------------------------------------------------
-      subroutine noactive_nutrient_uptake(N,L,NZ,NY,NX)
+      subroutine NoActiveNutrientUptake(N,L,NZ,NY,NX)
 
       implicit none
       integer, intent(in) :: N, L
       integer, intent(in) :: NZ,NY,NX
+
+C     begin_execution
 
       RUNNHP(N,L,NZ,NY,NX)=0.0
       RUPNH4(N,L,NZ,NY,NX)=0.0
@@ -1332,13 +1337,15 @@ C------------------------------------------------------------------------
       RUPH1B(N,L,NZ,NY,NX)=0.0
       RUOH1B(N,L,NZ,NY,NX)=0.0
       RUCH1B(N,L,NZ,NY,NX)=0.0
-      end subroutine noactive_nutrient_uptake
+      end subroutine NoActiveNutrientUptake
 C------------------------------------------------------------------------
-      subroutine uptake_HPO4(N,L,NZ,NY,NX)
+      subroutine UptakeHPO4(N,L,NZ,NY,NX)
 
       implicit none
       integer, intent(in) :: N,L
       integer, intent(in) :: NZ,NY,NX
+
+C     begin_execution
 C
 C     HPO4 UPTAKE IN NON-BAND SOIL ZONE
 C
@@ -1479,10 +1486,10 @@ C
       RUOH1B(N,L,NZ,NY,NX)=0.0
       RUCH1B(N,L,NZ,NY,NX)=0.0
       ENDIF
-      end subroutine uptake_HPO4
+      end subroutine UptakeHPO4
 C------------------------------------------------------------------------
 
-      subroutine uptake_H2PO4(N,L,NZ,NY,NX)
+      subroutine UptakeH2PO4(N,L,NZ,NY,NX)
 
       implicit none
       integer, intent(in) :: N,L
@@ -1629,15 +1636,16 @@ C
       RUOH2B(N,L,NZ,NY,NX)=0.0
       RUCH2B(N,L,NZ,NY,NX)=0.0
       ENDIF
-      end subroutine uptake_H2PO4
+      end subroutine UptakeH2PO4
 C------------------------------------------------------------------------
 
-      subroutine uptake_mineral_phosporhus(N,L,NZ,NY,NX)
+      subroutine UptakeMineralPhosporhus(N,L,NZ,NY,NX)
 
       implicit none
       integer, intent(in) :: N,L
       integer, intent(in) :: NZ,NY,NX
 
+C     begin_execution
       IF(RPO4Y(L,NY,NX).GT.ZEROS(NY,NX))THEN
       FPO4X=AMAX1(FPP(N,L,NZ),RUPP2P(N,L,NZ,NY,NX)/RPO4Y(L,NY,NX))
       ELSE
@@ -1680,9 +1688,9 @@ C
       PATHL=AMIN1(PATH(N,L),RRADL(N,L)+SQRT(2.0*POSGX))
       DIFFL=POSGX*RTARR(N,L)/LOG(PATHL/RRADL(N,L))
 
-      call uptake_H2PO4(N,L,NZ,NY,NX)
+      call UptakeH2PO4(N,L,NZ,NY,NX)
 
-      call uptake_HPO4(N,L,NZ,NY,NX)
+      call UptakeHPO4(N,L,NZ,NY,NX)
 
       ELSE
       RUPP2P(N,L,NZ,NY,NX)=0.0
@@ -1702,10 +1710,10 @@ C
       RUOH1B(N,L,NZ,NY,NX)=0.0
       RUCH1B(N,L,NZ,NY,NX)=0.0
       ENDIF
-      end subroutine uptake_mineral_phosporhus
+      end subroutine UptakeMineralPhosporhus
 C------------------------------------------------------------------------
 
-      subroutine uptake_NO3(N,L,NZ,NY,NX)
+      subroutine UptakeNO3(N,L,NZ,NY,NX)
 
       implicit none
       integer, intent(in) :: N,L
@@ -1867,16 +1875,17 @@ C
       RUONOB(N,L,NZ,NY,NX)=0.0
       RUCNOB(N,L,NZ,NY,NX)=0.0
       ENDIF
-      end subroutine uptake_NO3
+      end subroutine UptakeNO3
 
 C------------------------------------------------------------------------
 
-      subroutine uptake_NH4(N,L,NZ,NY,NX)
+      subroutine UptakeNH4(N,L,NZ,NY,NX)
 
       implicit none
       integer, intent(in) :: N,L
       integer, intent(in) :: NZ,NY,NX
 
+C     begin_execution
 C     ZNSGL=NH4 diffusivity
 C     TORT=soil tortuosity
 C     PATH=path length of water and nutrient uptake
@@ -2032,14 +2041,16 @@ C
       RUONHB(N,L,NZ,NY,NX)=0.0
       RUCNHB(N,L,NZ,NY,NX)=0.0
       ENDIF
-      end subroutine uptake_NH4
+      end subroutine UptakeNH4
 C------------------------------------------------------------------------
 
-      subroutine uptake_mineral_Nitrogen(N,L,NZ,NY,NX)
+      subroutine UptakeMineralNitrogen(N,L,NZ,NY,NX)
 
       implicit none
       integer, intent(in) :: N,L
       integer, intent(in) :: NZ,NY,NX
+
+C     begin_execution
 
       IF(RNH4Y(L,NY,NX).GT.ZEROS(NY,NX))THEN
       FNH4X=AMAX1(FPP(N,L,NZ),RUNNHP(N,L,NZ,NY,NX)/RNH4Y(L,NY,NX))
@@ -2073,10 +2084,10 @@ C
 C     PARAMETERS FOR RADIAL MASS FLOW AND DIFFUSION OF NH4,NO3
 C     FROM SOIL TO ROOT
 C
-      call uptake_NH4(N,L,NZ,NY,NX)
+      call UptakeNH4(N,L,NZ,NY,NX)
 
 
-      call uptake_NO3(N,L,NZ,NY,NX)
+      call UptakeNO3(N,L,NZ,NY,NX)
 
 
       ELSE
@@ -2097,16 +2108,18 @@ C
       RUONOB(N,L,NZ,NY,NX)=0.0
       RUCNOB(N,L,NZ,NY,NX)=0.0
       ENDIF
-      end subroutine uptake_mineral_Nitrogen
+      end subroutine UptakeMineralNitrogen
 C------------------------------------------------------------------------
 
-      subroutine root_exudates(N,L,NZ,NY,NX)
+      subroutine RootExudates(N,L,NZ,NY,NX)
 
       implicit none
       integer, intent(in) :: N,L
       integer, intent(in) :: NZ,NY,NX
 
       integer :: K
+
+C     begin_execution
 C
 C     ROOT EXUDATION OF C, N AND P DEPENDS ON CONCN DIFFERENCES
 C     BETWEEN ROOT NON-STRUCTURAL POOLS AND SOIL DISSOLVED POOLS
@@ -2172,17 +2185,19 @@ C    6,PPOOLX/CPOOLR(N,L,NZ,NY,NX)
 2224  FORMAT(A8,8I4,30E12.4)
 C     ENDIF
 195   CONTINUE
-      end subroutine root_exudates
+      end subroutine RootExudates
 
 C------------------------------------------------------------------------
 
-      subroutine sumup_nutrient_uptake(N,L,NZ,NY,NX)
+      subroutine SumupNutrientUptake(N,L,NZ,NY,NX)
 
       implicit none
       integer, intent(in) :: N, L
       integer, intent(in) :: NZ,NY,NX
 
       integer :: K
+
+C     begin_execution
 C
 C     TOTAL C,N,P EXCHANGE BETWEEN ROOTS AND SOIL
 C
@@ -2217,10 +2232,10 @@ C     WRITE(*,8765)'PLANT',I,J,NX,NY,L,NZ,N,TFOXYX,TFNH4X
 C    2,TFNO3X,TFPO4X,TFNHBX,TFNOBX,TFPOBX
 8765  FORMAT(A8,7I4,7F15.6)
 C     ENDIF
-      end subroutine sumup_nutrient_uptake
+      end subroutine SumupNutrientUptake
 C------------------------------------------------------------------------
 
-      subroutine get_uptake_capcity(N,L,NZ,NY,NX)
+      subroutine GetUptakeCapcity(N,L,NZ,NY,NX)
 
       implicit none
       integer, intent(in) :: N,L
@@ -2320,15 +2335,17 @@ C
       ELSE
       FOXYX=FPQ(N,L,NZ)
       ENDIF
-      end subroutine get_uptake_capcity
+      end subroutine GetUptakeCapcity
 C------------------------------------------------------------------------
 
-      subroutine root_soil_gas_exchange(N,L,NZ,NY,NX)
+      subroutine RootSoilGasExchange(N,L,NZ,NY,NX)
 
       implicit none
       integer, intent(in) :: N,L,NZ,NY,NX
 
       integer :: M
+
+C     begin_execution
 
       IF(RCO2M(N,L,NZ,NY,NX).GT.ZEROP(NZ,NY,NX)
      2.AND.RTVLW(N,L,NZ,NY,NX).GT.ZEROP(NZ,NY,NX)
@@ -3022,17 +3039,18 @@ C     ENDIF
       WFR(N,L,NZ,NY,NX)=1.0
       ENDIF
       ENDIF
-      end subroutine root_soil_gas_exchange
+      end subroutine RootSoilGasExchange
 
 C------------------------------------------------------------------------------------------
 
-      subroutine root_myco_o2_nutrient_uptake(NZ,NY,NX)
+      subroutine RootMycoO2NutrientUptake(NZ,NY,NX)
 
       implicit none
       integer, intent(in) :: NZ,NY,NX
 
       integer :: N,L
-C     execution begins here
+
+C     begin_execution
 
       DO 955 N=1,MY(NZ,NY,NX)
       DO 950 L=NU(NY,NX),NI(NZ,NY,NX)
@@ -3050,7 +3068,7 @@ C     execution begins here
       TFP14X=0.0
       TFP1BX=0.0
 
-      call get_uptake_capcity(N,L,NZ,NY,NX)
+      call GetUptakeCapcity(N,L,NZ,NY,NX)
 
       TFOXYX=TFOXYX+FOXYX
 C
@@ -3063,12 +3081,12 @@ C     FOXYX=fraction of total O2 demand from previous hour
 C
       ROXYP(N,L,NZ,NY,NX)=2.667*RCO2M(N,L,NZ,NY,NX)
 
-      call root_soil_gas_exchange(N,L,NZ,NY,NX)
+      call RootSoilGasExchange(N,L,NZ,NY,NX)
 
       OSTRD=OSTRD+ROXYP(N,L,NZ,NY,NX)
       OSTRN=OSTRN+RUPOXT
 
-      call root_exudates(N,L,NZ,NY,NX)
+      call RootExudates(N,L,NZ,NY,NX)
 
 C
 C     NUTRIENT UPTAKE
@@ -3084,26 +3102,26 @@ C
 C
 C     FZUP=limitn to active uptake respiration from CZPOLR
 C
-      call uptake_mineral_Nitrogen(N,L,NZ,NY,NX)
+      call UptakeMineralNitrogen(N,L,NZ,NY,NX)
 
 C
 C     FPUP=limitn to active uptake respiration from CPPOLR
 C
-      call uptake_mineral_phosporhus(N,L,NZ,NY,NX)
+      call UptakeMineralPhosporhus(N,L,NZ,NY,NX)
 
       ELSE
-      call noactive_nutrient_uptake(N,L,NZ,NY,NX)
+      call NoActiveNutrientUptake(N,L,NZ,NY,NX)
 
       ENDIF
       ELSE
-      call zero_uptake(N,L,NZ,NY,NX)
+      call ZeroUptake(N,L,NZ,NY,NX)
 
       ENDIF
 
-      call sumup_nutrient_uptake(N,L,NZ,NY,NX)
+      call SumupNutrientUptake(N,L,NZ,NY,NX)
 
 950   CONTINUE
 955   CONTINUE
-      end subroutine root_myco_o2_nutrient_uptake
+      end subroutine RootMycoO2NutrientUptake
 
       end module UptakeMod

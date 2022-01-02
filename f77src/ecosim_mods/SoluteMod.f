@@ -109,7 +109,7 @@ C
 C     local variable declaration
       integer :: L,NY,NX,NPI
 
-C     execution begins here
+C     begin_execution
       NPI=INT(NPH/2)
       DO 9995 NX=NHW,NHE
       DO 9990 NY=NVN,NVS
@@ -149,7 +149,7 @@ C
       BKVLPB=VOLWPB
       ENDIF
 
-      call update_soil_fertlizer(L,NY,NX)
+      call UpdateSoilFertlizer(L,NY,NX)
 
 C
 C     IF SALT OPTION SELECTED IN SITE FILE
@@ -159,14 +159,14 @@ C     ISALTG=salt flag from site file
 C
       IF(ISALTG.NE.0)THEN
 
-      call salt_chem_equilibria(L,NY,NX)
+      call DoSaltChemEquilibria(L,NY,NX)
 
 C     IF NO SALTS IS SELECTED IN SITE FILE THEN A SUBSET
 C     OF THE EQUILIBRIA REACTIONS ARE SOLVED: MOSTLY THOSE
 C     FOR PHOSPHORUS AND CO-REACTANTS
 C
       ELSE
-        call nosalt_chem_equilibria(L,NY,NX)
+        call DoNoSaltChemEquilibria(L,NY,NX)
       ENDIF
 C
 C     CHANGE IN WIDTHS AND DEPTHS OF FERTILIZER BANDS FROM
@@ -181,15 +181,15 @@ C     IF(ROWI(I,NY,NX).GT.0.0)THEN
 C
 C     NH4 FERTILIZER BAND
 C
-      call update_NH3_fert_bandinfo(L,NY,NX)
+      call UpdateNH3FertilizerBandinfo(L,NY,NX)
 C
 C     NO3 FERTILIZER BAND
 C
-      call update_no3_fert_bandinfo(L,NY,NX)
+      call UpdateNO3FertilizerBandinfo(L,NY,NX)
 C
 C     PO4 FERTILIZER BAND
 C
-      call update_PO4_fert_bandinfo(L,NY,NX)
+      call UpdatePO4FertilizerBandinfo(L,NY,NX)
 C     ENDIF
 C
 C     SUBTRACT FERTILIZER DISSOLUTION FROM FERTILIZER POOLS
@@ -251,7 +251,7 @@ C     ENDIF
 C
 C     SURFACE RESIDUE
 C
-      call update_surf_residue_solute(NX,NY)
+      call UpdateSoluteInSurfaceResidue(NX,NY)
 C
 C     TOTAL ION FLUXES FOR ALL REACTIONS ABOVE
 C
@@ -306,7 +306,7 @@ C    3,SPNH4,ZNH4FA(0,NY,NX),THETWR
       end subroutine solute
 C------------------------------------------------------------------------
 
-      subroutine urea_hydrolysis(L,NY,NX)
+      subroutine UreaHydrolysis(L,NY,NX)
 
       implicit none
       integer, intent(in) :: L,NY,NX
@@ -315,7 +315,7 @@ C      real(r8), intent(out) :: RSNUB
 C      real(r8) :: CNHUA, COMA, DUKD
 C      real(r8) :: DFNSA
 
-C     execution begins here
+C     begin_execution
 C
 C     UREA HYDROLYSIS IN BAND AND NON-BAND SOIL ZONES
 C
@@ -396,10 +396,10 @@ C    4,RNHUI(IUTYP(NY,NX)),VLNH4(L,NY,NX),VLNHB(L,NY,NX)
 C    5,THETW(L,NY,NX)
 8888  FORMAT(A8,4I4,40E12.4)
 C     ENDIF
-      end subroutine urea_hydrolysis
+      end subroutine UreaHydrolysis
 C------------------------------------------------------------------------
 
-      subroutine update_soil_fertlizer(L,NY,NX)
+      subroutine UpdateSoilFertlizer(L,NY,NX)
 
       implicit none
       integer, intent(in) :: L,NY,NX
@@ -412,9 +412,9 @@ C      real(r8) :: VOLWNX
 C      real(r8) :: RNBX
 C      real(r8) :: R3BX
 
-C     execution begins here
+C     begin_execution
 
-      call urea_hydrolysis(L,NY,NX)
+      call UreaHydrolysis(L,NY,NX)
 
 C
 C     NH4, NH3, UREA, NO3 DISSOLUTION IN BAND AND NON-BAND
@@ -594,15 +594,15 @@ C    2,VOLWPX,RH2PX,XH2PS(L,NY,NX),TUPH2P(L,NY,NX)
       PCAPDB=0.0
       PCAPHB=0.0
       ENDIF
-      end subroutine update_soil_fertlizer
+      end subroutine UpdateSoilFertlizer
 
 C------------------------------------------------------------------
-      subroutine nosalt_chem_equilibria(L,NY,NX)
+      subroutine DoNoSaltChemEquilibria(L,NY,NX)
 
       implicit none
       integer, intent(in) :: L,NY,NX
 
-C     execution begins here
+C     begin_execution
 C
 C     PRECIPITATION-DISSOLUTION CALCULATED FROM ACTIVITIES
 C     OF REACTANTS AND PRODUCTS THROUGH SOLUTIONS
@@ -1085,14 +1085,14 @@ C    2,RPALPX,RPFEPX,RPCADX,2.0*RPCAMX,3.0*RPCAHX
 C    3,TRX2P(L,NY,NX)
 24    FORMAT(A8,3I4,60E12.4)
 C     ENDIF
-      end subroutine nosalt_chem_equilibria
+      end subroutine DoNoSaltChemEquilibria
 
 C------------------------------------------------------------------------
-      subroutine stage_ion_concs(L,NY,NX)
+      subroutine PrepIonConcentrations(L,NY,NX)
       implicit none
       integer, intent(in) :: L,NY,NX
 
-C     execution begins here
+C     begin_execution
 
 C     SOLUBLE NO3 CONCENTRATIONS
 C     IN NON-BAND AND BAND SOIL ZONES
@@ -1283,25 +1283,26 @@ C
       PCACO1=0.0
       PCASO1=0.0
       ENDIF
-      end subroutine stage_ion_concs
+      end subroutine PrepIonConcentrations
 
 C--------------------------------------------------------------------------
-      subroutine solve_chem_equilibria(L,NY,NX)
+      subroutine SolveChemEquilibria(L,NY,NX)
 
       implicit none
       integer, intent(in) :: L,NY,NX
 
       integer :: M
-C     execution begins here
+
+C     begin_execution
 
       DO 1000 M=1,MRXN
 C
 C     SOLUTE CONCENTRATIONS
 C
-      call get_solute_concs(L,NY,NX)
+      call GetSoluteConcentrations(L,NY,NX)
 
 C
-      call ion_strength_activity(L,NY,NX)
+      call IonStrengthActivity(L,NY,NX)
 C
 C     ALUMINUM HYDROXIDE (GIBBSITE)
 C
@@ -1489,33 +1490,33 @@ C     ENDIF
 C
 C     PHOSPHORUS PRECIPITATION-DISSOLUTION IN NON-BAND SOIL ZONE
 C
-      call phosp_precip_dissol_nonband(NY,NX)
+      call PhospPrecipDissolNonBand(NY,NX)
 C
 C     PHOSPHORUS PRECIPITATION-DISSOLUTION IN BAND SOIL ZONE
 C
-      call phosp_precip_dissol_band(NY,NX)
+      call PhospPrecipDissolBand(NY,NX)
 C
-      call phosp_anion_exch_noband(L,NY,NX)
+      call PhospAnionExchNoBand(L,NY,NX)
 C
-      call phosp_anion_exch_band(L,NY,NX)
+      call PhospAnionExchBand(L,NY,NX)
 C
 C     CATION EXCHANGE FROM GAPON SELECTIVITY COEFFICIENTS
 C     FOR CA-NH4, CA-H, CA-AL, CA-MG, CA-NA, CA-K
 C
-      call cation_exchange(L,NY,NX)
+      call CationExchange(L,NY,NX)
 C
 C     SOLUTE DISSOCIATION REACTIONS
 C
-      call solute_dissociation(L,NY,NX)
+      call SoluteDissociation(L,NY,NX)
 C
 C     TOTAL ION FLUXES FOR CURRENT ITERATION
 C     FROM ALL REACTIONS ABOVE
 C
-      call update_ion_flux_cur_iter(L,NY,NX)
+      call UpdateIonFluxCurentIter(L,NY,NX)
 
-      call update_ion_conc_cur_iter(L,NY,NX)
+      call UpdateIonConcCurrentIter(L,NY,NX)
 C
-      call accumulate_ion_flux(L,NY,NX)
+      call AccumulateIonFlux(L,NY,NX)
 C
 C     GO TO NEXT ITERATION
 C
@@ -1540,15 +1541,15 @@ C    3,(CCA1*A2)**0.5*XNA1/(CNA1*A1*XCA1*2)
 C    5,(CCA1*A2)**0.5*XKA1/(CKA1*A1*XCA1*2)
 C    6,CHY1*A1*XCOO/XHC1,CALO2*A1*XCOO/XALO21
 C     ENDIF
-      end subroutine solve_chem_equilibria
+      end subroutine SolveChemEquilibria
 
 C--------------------------------------------------------------------------
-      subroutine salt_chem_equilibria(L,NY,NX)
+      subroutine DoSaltChemEquilibria(L,NY,NX)
 
       implicit none
       integer, intent(in) :: L,NY,NX
 
-C     execution begins here
+C     begin_execution
 C
 C     salt code: *HY*=H+,*OH*=OH-,*AL*=Al3+,*FE*=Fe3+,*CA*=Ca2+,*MG*=Mg2+
 C          :*NA*=Na+,*KA*=K+,*SO4*=SO42-,*CL*=Cl-,*CO3*=CO32-,*HCO3*=HCO3-
@@ -1562,25 +1563,25 @@ C          :*C0P*=CaPO4-,*C1P*=CaHPO4,*C2P*=CaH2PO4+,*M1P*=MgHPO4,*COO*=COOH-
 C          :*1=non-band,*B=band
 C     C*,X*,Z*=soluble,exchangeable concentration, mass
 C
-      call stage_ion_concs(L,NY,NX)
+      call PrepIonConcentrations(L,NY,NX)
 
 C
 C     CONVERGENCE TOWARDS SOLUTE EQILIBRIA
 C
-      call solve_chem_equilibria(L,NY,NX)
+      call SolveChemEquilibria(L,NY,NX)
 C
 
-      call summarize_ion_flxes(L,NY,NX)
+      call SummarizeIonFluxes(L,NY,NX)
 
 
-      end subroutine salt_chem_equilibria
+      end subroutine DoSaltChemEquilibria
 C----------------------------------------------------------------------------
-      subroutine summarize_ion_flxes(L,NY,NX)
+      subroutine SummarizeIonFluxes(L,NY,NX)
 
       implicit none
       integer, intent(in) :: L,NY,NX
 
-C     execution begins here
+C     begin_execution
 C     CONVERT TOTAL ION FLUXES FROM CHANGES IN CONCENTRATION
 C     TO CHANGES IN MASS PER UNIT AREA FOR USE IN 'REDIST'
 C
@@ -1715,15 +1716,15 @@ C    2,TRMGH(L,NY,NX),TRCACO(L,NY,NX),VOLWM(NPH,L,NY,NX),RCO2
 C    3,RHCO,RHCACH,RCO2Q,RCAH,RMGH,RHCO3,AHY1,AHCO31,ACO21,DPCO2
 C     WRITE(*,1111)'TBION',I,J,L,M,TBION(L,NY,NX)
 C     ENDIF
-      end subroutine summarize_ion_flxes
+      end subroutine SummarizeIonFluxes
 
 C------------------------------------------------------------------------------------------
 
-      subroutine get_solute_concs(L,NY,NX)
+      subroutine GetSoluteConcentrations(L,NY,NX)
       implicit none
       integer, intent(in) :: L,NY,NX
 
-C     execution begins here
+C     begin_execution
 
       CN41=AMAX1(ZERO,CN41)
       CN4B=AMAX1(ZERO,CN4B)
@@ -1783,15 +1784,15 @@ C     execution begins here
       CC2PB=AMAX1(ZERO,CC2PB)
       CM1PB=AMAX1(ZERO,CM1PB)
       XCOO=AMAX1(0.0,XCOOH-XHC1-XALO21-XFEO21)
-      end subroutine get_solute_concs
+      end subroutine GetSoluteConcentrations
 
 C------------------------------------------------------------------------------------------
 
-      subroutine ion_strength_activity(L,NY,NX)
+      subroutine IonStrengthActivity(L,NY,NX)
       implicit none
       integer, intent(in) :: L,NY,NX
 
-C     execution begins here
+C     begin_execution
 
 C     IONIC STRENGTH FROM SUMS OF ION CONCENTRATIONS
 C
@@ -1891,11 +1892,11 @@ C
       ANAC1=CNAC1*A1
       ANAS1=CNAS1*A1
       AKAS1=CKAS1*A1
-      end subroutine ion_strength_activity
+      end subroutine IonStrengthActivity
 
 C------------------------------------------------------------------------------------------
 
-      subroutine phosp_precip_dissol_nonband(NY,NX)
+      subroutine PhospPrecipDissolNonBand(NY,NX)
 
       implicit none
       integer, intent(in) :: NY,NX
@@ -2248,16 +2249,16 @@ C
       RHCAH2=0.0
       RPCAMX=0.0
       ENDIF
-      end subroutine phosp_precip_dissol_nonband
+      end subroutine PhospPrecipDissolNonBand
 
 C------------------------------------------------------------------------------------------
 
-      subroutine phosp_precip_dissol_band(NY,NX)
+      subroutine PhospPrecipDissolBand(NY,NX)
 
       implicit none
       integer, intent(in) :: NY,NX
 
-C     execution begins here
+C     begin_execution
 
       IF(VOLWPB.GT.ZEROS2(NY,NX))THEN
 C
@@ -2572,15 +2573,15 @@ C
       RHCHB1=0.0
       RHCHB2=0.0
       ENDIF
-      end subroutine phosp_precip_dissol_band
+      end subroutine PhospPrecipDissolBand
 
 C------------------------------------------------------------------------------------------
 
-      subroutine phosp_anion_exch_band(L,NY,NX)
+      subroutine PhospAnionExchBand(L,NY,NX)
       implicit none
       integer, intent(in) :: L,NY,NX
 
-C     execution begins here
+C     begin_execution
 
 C     PHOSPHORUS ANION EXCHANGE IN BAND SOIL ZONE
 C     CALCULATED FROM EXCHANGE EQUILIBRIA AMONG H2PO4-,
@@ -2626,15 +2627,15 @@ C    2,SPH1P,X1P1B,RYH2B,CH2PB,SXH2P,X2P1B,COH1,CHY1,ROH
       RYH2B=0.0
       RXH1B=0.0
       ENDIF
-      end subroutine phosp_anion_exch_band
+      end subroutine PhospAnionExchBand
 
 C------------------------------------------------------------------------------------------
 
-      subroutine phosp_anion_exch_noband(L,NY,NX)
+      subroutine PhospAnionExchNoBand(L,NY,NX)
       implicit none
       integer, intent(in) :: L,NY,NX
 
-C     execution begins here
+C     begin_execution
 
 C     PHOSPHORUS ANION EXCHANGE IN NON-BAND SOIL ZONE
 C     CALCULATED FROM EXCHANGE EQUILIBRIA AMONG H2PO4-,
@@ -2686,14 +2687,15 @@ C
       RYH2P=0.0
       RXH1P=0.0
       ENDIF
-      end subroutine phosp_anion_exch_noband
+      end subroutine PhospAnionExchNoBand
 
 C------------------------------------------------------------------------------------------
 
-      subroutine cation_exchange(L,NY,NX)
+      subroutine CationExchange(L,NY,NX)
       implicit none
       integer, intent(in) :: L,NY,NX
-C     execution begins here
+
+C     begin_execution
 
       IF(XCEC(L,NY,NX).GT.ZEROS(NY,NX))THEN
 C
@@ -2778,15 +2780,15 @@ C     ENDIF
       RXNA=0.0
       RXKA=0.0
       ENDIF
-      end subroutine cation_exchange
+      end subroutine CationExchange
 
 C------------------------------------------------------------------------------------------
 
-      subroutine solute_dissociation(L,NY,NX)
+      subroutine SoluteDissociation(L,NY,NX)
       implicit none
       integer, intent(in) :: L,NY,NX
 
-C     execution begins here
+C     begin_execution
 
 C     for all reactions:
 C     S0,S1=equilibrium constant,equilibrium solute concentration**2
@@ -3071,14 +3073,15 @@ C
       RC2B=0.0
       RM1B=0.0
       ENDIF
-      end subroutine solute_dissociation
+      end subroutine SoluteDissociation
 
 C------------------------------------------------------------------------------------------
 
-      subroutine update_ion_flux_cur_iter(L,NY,NX)
+      subroutine UpdateIonFluxCurentIter(L,NY,NX)
       implicit none
       integer, intent(in) :: L,NY,NX
-C     execution begins here
+
+C     begin_execution
 
 C     RN4S,RN4B=net NH4 flux in non-band,band
 C     RN3S,RN3B=net NH3 flux in non-band,band
@@ -3197,14 +3200,15 @@ C    4,RHCAH2,RPCAMX,RXH2P,RYH2P,RH2P,RH3P,RF2P,RC2P
 23    FORMAT(A8,6I4,60E12.4)
 C     ENDIF
 C
-      end subroutine update_ion_flux_cur_iter
+      end subroutine UpdateIonFluxCurentIter
 
 C------------------------------------------------------------------------------------------
 
-      subroutine update_ion_conc_cur_iter(L,NY,NX)
+      subroutine UpdateIonConcCurrentIter(L,NY,NX)
       implicit none
       integer, intent(in) :: L,NY,NX
-C     execution begins here
+
+C     begin_execution
 C     UPDATE ION CONCENTRATIONS FOR CURRENT ITERATION
 C     FROM TOTAL ION FLUXES
 C
@@ -3355,14 +3359,15 @@ C
       PCAPDB=PCAPDB+RPCDBX
       PCAPHB=PCAPHB+RPCHBX
       PCAPMB=PCAPMB+RPCMBX
-      end subroutine update_ion_conc_cur_iter
+      end subroutine UpdateIonConcCurrentIter
 
 C------------------------------------------------------------------------------------------
 
-      subroutine accumulate_ion_flux(L,NY,NX)
+      subroutine AccumulateIonFlux(L,NY,NX)
       implicit none
       integer, intent(in) :: L,NY,NX
-C     execution begins here
+
+C     begin_execution
 C     ACCUMULATE TOTAL ION FLUXES FOR ALL ITERATIONS
 C
 C     TRN4S,TRN4B=total NH4 flux in non-band,band
@@ -3486,14 +3491,15 @@ C
       TRCPDB(L,NY,NX)=TRCPDB(L,NY,NX)+RPCDBX
       TRCPHB(L,NY,NX)=TRCPHB(L,NY,NX)+RPCHBX
       TRCPMB(L,NY,NX)=TRCPMB(L,NY,NX)+RPCMBX
-      end subroutine accumulate_ion_flux
+      end subroutine AccumulateIonFlux
 
 C------------------------------------------------------------------------------------------
 
-      subroutine update_NH3_fert_bandinfo(L,NY,NX)
+      subroutine UpdateNH3FertilizerBandinfo(L,NY,NX)
       implicit none
       integer, intent(in) :: L,NY,NX
-C     execution begins here
+
+C     begin_execution
 
 C     IFNHB=banded NH4 fertilizer flag
 C     ROWN=NH4 fertilizer band row width
@@ -3580,14 +3586,15 @@ C
       XNB(L,NY,NX)=0.0
       ENDIF
       ENDIF
-      end subroutine update_NH3_fert_bandinfo
+      end subroutine UpdateNH3FertilizerBandinfo
 
 C------------------------------------------------------------------------------------------
 
-      subroutine update_PO4_fert_bandinfo(L,NY,NX)
+      subroutine UpdatePO4FertilizerBandinfo(L,NY,NX)
       implicit none
       integer, intent(in) :: L,NY,NX
-C     execution begins here
+
+C     begin_execution
 
 C     IFPOB=banded H2PO4 fertilizer flag
 C     ROWP=H2PO4 fertilizer band row width
@@ -3792,14 +3799,15 @@ C
       PCPMB(L,NY,NX)=0.0
       ENDIF
       ENDIF
-      end subroutine update_PO4_fert_bandinfo
+      end subroutine UpdatePO4FertilizerBandinfo
 
 C------------------------------------------------------------------------------------------
 
-      subroutine update_no3_fert_bandinfo(L,NY,NX)
+      subroutine UpdateNO3FertilizerBandinfo(L,NY,NX)
       implicit none
       integer, intent(in) :: L,NY,NX
-C     execution begins here
+
+C     begin_execution
 
 C     IFNOB=banded NO3 fertilizer flag
 C     ROWO=NO3 fertilizer band row width
@@ -3881,15 +3889,15 @@ C
       ZNO2B(L,NY,NX)=0.0
       ENDIF
       ENDIF
-      end subroutine update_no3_fert_bandinfo
+      end subroutine UpdateNO3FertilizerBandinfo
 
 C------------------------------------------------------------------------------------------
 
-      subroutine update_surf_residue_solute(NX,NY)
+      subroutine UpdateSoluteInSurfaceResidue(NX,NY)
       implicit none
       integer, intent(in) :: NY,NX
 
-C     execution begins here
+C     begin_execution
 
 C     BKVL=litter mass
 C
@@ -4194,6 +4202,6 @@ C     ENDIF
       RPCAMX=0.0
       RPCAHX=0.0
       ENDIF
-      end subroutine update_surf_residue_solute
+      end subroutine UpdateSoluteInSurfaceResidue
 
       END module SoluteMod

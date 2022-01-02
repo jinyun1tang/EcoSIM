@@ -250,7 +250,7 @@ C
 
       integer :: L,NX,NY
 
-C     execution begins here
+C     begin_execution
 
       DO 9995 NX=NHW,NHE
       DO 9990 NY=NVN,NVS
@@ -265,28 +265,28 @@ C     concentrations that drive microbial density effects on
 C     decomposition
 C
       DO 998 L=0,NL(NY,NX)
-      call soil_bgc_1layer(I,J,L,NY,NX)
+      call SoilBGCOneLayer(I,J,L,NY,NX)
 998   CONTINUE
 C     WRITE(20,3434)'RN2O',IYRC,I,J,(RN2O(L,NY,NX),L=0,NL(NY,NX))
 3434  FORMAT(A8,3I4,20E12.4)
 C
 C     SOC LOSS IF FIRE OR REMOVAL EVENT IS ENTERED IN DISTURBANCE FILE
 C
-      call SOM_disturb_removal(I,J,NY,NX)
+      call SOMRemovalByDisturbance(I,J,NY,NX)
 9990  CONTINUE
 9995  CONTINUE
       RETURN
       END subroutine nitro
 C------------------------------------------------------------------------------------------
 
-      subroutine soil_bgc_1layer(I,J,L,NY,NX)
+      subroutine SoilBGCOneLayer(I,J,L,NY,NX)
       implicit none
       integer, intent(in) :: I,J,L,NY,NX
 
       integer :: LL,K,KL
       integer :: M,N
 
-C     execution begins here
+C     begin_execution
 
       IF(VOLX(L,NY,NX).GT.ZEROS2(NY,NX))THEN
       IF(L.EQ.0.OR.L.GE.NU(NY,NX))THEN
@@ -326,7 +326,7 @@ C     TEMPERATURE FUNCTIONS FOR GROWTH AND MAINTENANCE
 C     WITH OFFSET FOR THERMAL ADAPTATION
 C
 
-      call stage_bgc_env_condition(KL,L,NY,NX)
+      call StageBGCEnvironCondition(KL,L,NY,NX)
 C
 C     RESPIRATION BY MICROBIAL POPULATIONS
 C
@@ -353,10 +353,10 @@ C
       LL=NU(NY,NX)
       ENDIF
 
-      call microbial_catabolism(L,LL,NY,NX)
+      call MicrobialCatabolism(L,LL,NY,NX)
 C
-C     CHEMODENITRIFICATION
-      call chemodenitrification(L,NY,NX)
+C     ChemoDenitrification
+      call ChemoDenitrification(L,NY,NX)
 C
 C     DECOMPOSITION
 C
@@ -386,7 +386,7 @@ C     ENDIF
 1870  CONTINUE
 C
 C     PRIMING of DOC,DON,DOP BETWEEN LITTER AND NON-LITTER C
-      call priming_OM_transfer(KL,L,NY,NX)
+      call OMTransferForPriming(KL,L,NY,NX)
 C
 C     TRANSFER ALL PRIMING AMONG ALL K
 C
@@ -407,11 +407,11 @@ C     ENDIF
 C
 C     DECOMPOSITION OF ORGANIC SUBSTRATES
 C
-      call solid_OM_decomp(K,L,NY,NX)
+      call SolidOMDecomposition(K,L,NY,NX)
 C
 C     DOC ADSORPTION - DESORPTION
 C
-      call DOC_sorption(K,L,NY,NX)
+      call DOMSorption(K,L,NY,NX)
 C     IF(I.EQ.116)THEN
 C     WRITE(*,591)'CSORP',I,J,NX,NY,L,K,CSORP(K),CSORPA(K)
 C    1,OQC(K,L,NY,NX),OHC(K,L,NY,NX),OQA(K,L,NY,NX),OHA(K,L,NY,NX)
@@ -424,19 +424,19 @@ C    5,FOSRH(K,L,NY,NX),TCGOQC(K),OQCX
 C     ENDIF
 1790  CONTINUE
 
-      call redist_decomp_product(KL,L,NY,NX)
+      call RedistDecompositionProduct(KL,L,NY,NX)
 C
 C     MICROBIAL GROWTH FROM RESPIRATION, MINERALIZATION
 
-      call microbial_anabolism_update(L,NY,NX)
+      call MicrobialAnabolicUpdate(L,NY,NX)
 C
 C     MICROBIAL COLONIZATION OF NEW LITTER
 C
-      call microbial_litter_colonization(KL,L,NY,NX)
+      call MicrobialLitterColonization(KL,L,NY,NX)
 C
 C     AGGREGATE ALL TRANSFORMATIONS CALCULATED ABOVE FOR EACH N,K
 C
-      call agg_alloc_transformation(L,NY,NX)
+      call AggregateTransformations(L,NY,NX)
 C     IF(ISALTG.NE.0)THEN
 C     XZHYS(L,NY,NX)=XZHYS(L,NY,NX)+0.1429*(RVOXA(1)+RVOXB(1)
 C    2-TRDN3-TRDNB)-0.0714*(TRDN2+TRD2B+TRDNO)
@@ -475,7 +475,7 @@ C     WRITE(*,2324)'XOQCS',I,J,NX,NY,L,(XOQCS(K,L,NY,NX),K=0,4)
 C
 C     MIX LITTER C BETWEEN ADJACENT SOIL LAYERS L AND LL
 C
-      call litter_vertmix_L_LL(I,J,L,NY,NX)
+      call VerticalLitterMixLvsLL(I,J,L,NY,NX)
       ELSE
       RCO2O(L,NY,NX)=0.0
       RCH4O(L,NY,NX)=0.0
@@ -495,17 +495,17 @@ C
       XH1BS(L,NY,NX)=0.0
       XN2GS(L,NY,NX)=0.0
       ENDIF
-      end subroutine soil_bgc_1layer
+      end subroutine SoilBGCOneLayer
 
 C------------------------------------------------------------------------------------------
 
-      subroutine SOM_disturb_removal(I,J,NY,NX)
+      subroutine SOMRemovalByDisturbance(I,J,NY,NX)
 
       implicit none
       integer, intent(in) :: I,J,NY,NX
 
       integer :: L,K,M,N
-C     execution begins here
+C     begin_execution
 
       IF(J.EQ.INT(ZNOON(NY,NX)).AND.(ITILL(I,NY,NX).EQ.21
      2.OR.ITILL(I,NY,NX).EQ.22))THEN
@@ -792,17 +792,17 @@ C     ENDIF
       ENDIF
 2950  CONTINUE
       ENDIF
-      end subroutine SOM_disturb_removal
+      end subroutine SOMRemovalByDisturbance
 
 C------------------------------------------------------------------------------------------
 
-      subroutine litter_vertmix_L_LL(I,J,L,NY,NX)
+      subroutine VerticalLitterMixLvsLL(I,J,L,NY,NX)
 
       implicit none
       integer, intent(in) :: I,J,L,NY,NX
 
       integer :: LL
-C     execution begins here
+C     begin_execution
 
       IF(FOSCZ0.GT.ZERO)THEN
 C     ORGR=total litter C
@@ -863,7 +863,7 @@ C    3,TKS(L,NY,NX)
 1115  FORMAT(A8,6I4,30E12.4)
 C     ENDIF
 C     apply mixing
-      call apply_vertmix(FOSCXS,L,LL,NY,NX)
+      call ApplyVerticalMix(FOSCXS,L,LL,NY,NX)
       ENDIF
 C     IF((I/1)*1.EQ.I.AND.J.EQ.19.AND.L.LE.5)THEN
 C     WRITE(*,2123)'TOTALL',I,J,NX,NY,L,TFOXYX,TFNH4X
@@ -872,18 +872,18 @@ C    3,TFOQC,TFOQA
 2123  FORMAT(A8,5I4,12E15.4)
 C     ENDIF
       ENDIF
-      end subroutine litter_vertmix_L_LL
+      end subroutine VerticalLitterMixLvsLL
 
 C------------------------------------------------------------------------------------------
 
-      subroutine apply_vertmix(FOSCXS,L,LL,NY,NX)
+      subroutine ApplyVerticalMix(FOSCXS,L,LL,NY,NX)
 
       implicit none
       real(r8), intent(in) :: FOSCXS
       integer, intent(in) :: L,LL,NY,NX
 
       integer :: K,M,N
-C     execution begins here
+C     begin_execution
       IF(FOSCXS.GT.ZERO)THEN
       DO 7971 K=1,2
       DO 7961 N=1,7
@@ -1010,17 +1010,17 @@ C     ENDIF
 7931  CONTINUE
 7901  CONTINUE
       ENDIF
-      end subroutine apply_vertmix
+      end subroutine ApplyVerticalMix
 
 C------------------------------------------------------------------------------------------
 
-      subroutine stage_bgc_env_condition(KL,L,NY,NX)
+      subroutine StageBGCEnvironCondition(KL,L,NY,NX)
       implicit none
       integer, intent(in) :: KL,L,NY,NX
 
       integer :: K
       integer :: M,N
-C     execution begins here
+C     begin_execution
 
 C     TKS=soil temperature
 C     OFFSET=adjustment for acclimation based on MAT in starts.f
@@ -1268,17 +1268,17 @@ C
       CHNOB=CNO2B(L,NY,NX)*CHY1/0.5
       GH2X=8.3143E-03*TKS(L,NY,NX)
      2*LOG((AMAX1(1.0E-03,CH2GS(L,NY,NX))/H2KI)**4)
-      end subroutine stage_bgc_env_condition
+      end subroutine StageBGCEnvironCondition
 
 C------------------------------------------------------------------------------------------
 
-      subroutine microbial_catabolism(L,LL,NY,NX)
+      subroutine MicrobialCatabolism(L,LL,NY,NX)
 
       implicit none
       integer, intent(in) :: L,LL,NY,NX
 
       integer :: K,M,N
-C     execution begins here
+C     begin_execution
 
       DO 760 K=0,5
       IF(L.NE.0.OR.(K.NE.3.AND.K.NE.4))THEN
@@ -1350,7 +1350,7 @@ C
 C     FACTORS CONSTRAINING DOC, ACETATE, O2, NH4, NO3, PO4 UPTAKE
 C     AMONG COMPETING MICROBIAL AND ROOT POPULATIONS IN SOIL LAYERS
 C
-      call substrate_competition_factors(N,K,L,NY,NX)
+      call SubstrateCompetitionFactors(N,K,L,NY,NX)
 C
 C     HETEROTROPHIC BIOMASS RESPIRATION
 C
@@ -1361,7 +1361,7 @@ C     N=(1)OBLIGATE AEROBES,(2)FACULTATIVE ANAEROBES,(3)FUNGI
 C    (6)N2 FIXERS
 C
       IF(N.LE.3.OR.N.EQ.6)THEN
-      call aeroheterotroph_catabolism(N,K,L,NY,NX)
+      call AerobicHeterotrophCatabolism(N,K,L,NY,NX)
 C     RESPIRATION BY HETEROTROPHIC ANAEROBES:
 C     N=(4)ACETOGENIC FERMENTERS (7) ACETOGENIC N2 FIXERS
 C
@@ -1374,14 +1374,14 @@ C     GOAX=acetate effect on energy yield of fermentation
 C     ECHZ=growth respiration efficiency of fermentation
 C
       ELSEIF(N.EQ.4.OR.N.EQ.7)THEN
-      call anaerob_catabolism(N,K,L,NY,NX)
+      call AnaerobCatabolism(N,K,L,NY,NX)
 C     ENERGY YIELD FROM ACETOTROPHIC METHANOGENESIS
 C
 C     GOMX=acetate effect on energy yield
 C     ECHZ=growth respiration efficiency of aceto. methanogenesis
 C
       ELSEIF(N.EQ.5)THEN
-      call acetomethanogen_catabolism(N,K,L,NY,NX)
+      call AcetoMethanogenCatabolism(N,K,L,NY,NX)
       ENDIF
 C
 C     RESPIRATION RATES BY AUTOTROPHS 'RGOMP' FROM SPECIFIC
@@ -1396,22 +1396,22 @@ C
 C     NH3 OXIDIZERS
 C
       IF(N.EQ.1)THEN
-      call nh3_oxidizer_catabolism(N,K,L,NY,NX)
+      call NH3OxidizerCatabolism(N,K,L,NY,NX)
 
 C     NO2 OXIDIZERS
 C
       ELSEIF(N.EQ.2)THEN
 C
-      call no2_oxidizer_catabolism(N,K,L,NY,NX)
+      call NO2OxidizerCatabolism(N,K,L,NY,NX)
 C     H2TROPHIC METHANOGENS
 C
       ELSEIF(N.EQ.5)THEN
 
-      call h2_methanogens_catabolism(N,K,L,NY,NX)
+      call H2MethanogensCatabolism(N,K,L,NY,NX)
 C     METHANOTROPHS
 C
       ELSEIF(N.EQ.3)THEN
-      call methanotroph_catabolism(N,K,L,NY,NX)
+      call MethanotrophCatabolism(N,K,L,NY,NX)
       ELSE
       RGOMP=0.0
       ROXYM(N,K)=0.0
@@ -1441,7 +1441,7 @@ C
       IF(N.LE.3.OR.N.EQ.6)THEN
 C     N=(1)OBLIGATE AEROBES,(2)FACULTATIVE ANAEROBES,(3)FUNGI
 C    (6)N2 FIXERS
-      call aerob_O2_uptake(N,K,L,NY,NX)
+      call AerobsO2Uptake(N,K,L,NY,NX)
       ELSEIF(N.EQ.4.OR.N.EQ.7)THEN
       RGOMO(N,K)=RGOMP
       RCO2X(N,K)=0.333*RGOMO(N,K)
@@ -1475,13 +1475,13 @@ C     HETEROTROPHIC DENITRIFICATION
 C
       IF(K.LE.4.AND.N.EQ.2.AND.ROXYM(N,K).GT.0.0
      2.AND.(L.NE.0.OR.VOLX(L,NY,NX).GT.ZEROS(NY,NX)))THEN
-      call hetero_denit_catabolism(N,K,L,NY,NX)
+      call HeteroDenitrificCatabolism(N,K,L,NY,NX)
 C     AUTOTROPHIC DENITRIFICATION
 C
       ELSEIF(K.EQ.5.AND.N.EQ.1.AND.ROXYM(N,K).GT.0.0
      2.AND.(L.NE.0.OR.VOLX(L,NY,NX).GT.ZEROS(NY,NX)))THEN
 
-      call autotroph_denit_catabolism(N,K,L,NY,NX)
+      call AutotrophDenitrificCatabolism(N,K,L,NY,NX)
       ELSE
       RDNO3(N,K)=0.0
       RDNOB(N,K)=0.0
@@ -1494,28 +1494,28 @@ C
 C
 C     BIOMASS DECOMPOSITION AND MINERALIZATION
 C
-      call biomass_mineralization(N,K,L,NY,NX)
+      call BiomassMineralization(N,K,L,NY,NX)
 C
-      call gather_microbial_respiration(N,K,L,NY,NX)
+      call GatherMicrobialRespiration(N,K,L,NY,NX)
 C
-      call microbial_anabolism_flux(N,K,L,NY,NX)
+      call GetMicrobialAnabolismFlux(N,K,L,NY,NX)
 
       ELSE
-      call zero_active_microbes(N,K,L)
+      call DealNoActiveMicrobes(N,K,L)
       ENDIF
       ENDIF
 750   CONTINUE
       ENDIF
 760   CONTINUE
-      end subroutine microbial_catabolism
+      end subroutine MicrobialCatabolism
 
 C------------------------------------------------------------------------------------------
 
-      subroutine chemodenitrification(L,NY,NX)
+      subroutine ChemoDenitrification(L,NY,NX)
       implicit none
       integer, intent(in) :: L,NY,NX
 
-C     execution begins here
+C     begin_execution
 C
 C     FNO2,FNB2=fraction of total NO2 demand in non-band,band
 C     VMXC4S,VMXC4B=substrate-unlimited NO2 reduction in non-band,band
@@ -1559,17 +1559,17 @@ C    3,VMXC4S,VMXC4B,RVMXC(L,NY,NX),RNO2Y(L,NY,NX),RCN2O,RCN2B
 C    4,RCNO3,RCNOB,RCOQN,VLNO3(L,NY,NX),VLNOB(L,NY,NX)
 7779  FORMAT(A8,3I4,30E12.4)
 C     ENDIF
-      end subroutine chemodenitrification
+      end subroutine ChemoDenitrification
 
 C------------------------------------------------------------------------------------------
 
-      subroutine priming_OM_transfer(KL,L,NY,NX)
+      subroutine OMTransferForPriming(KL,L,NY,NX)
 
       implicit none
       integer, intent(in) :: KL,L,NY,NX
 
       integer :: K,M,N,KK
-C     execution begins here
+C     begin_execution
 
 C
 C     OSRH=total SOC in each K
@@ -1727,16 +1727,16 @@ C    3,XOMCZ(M,N,K),XOMNZ(M,N,K),XOMPZ(M,N,K)
 C     ENDIF
 840   CONTINUE
 
-      end subroutine priming_OM_transfer
+      end subroutine OMTransferForPriming
 
 C------------------------------------------------------------------------------------------
 
-      subroutine DOC_sorption(K,L,NY,NX)
+      subroutine DOMSorption(K,L,NY,NX)
       implicit none
       integer, intent(in) :: K,L,NY,NX
 
 
-C     execution begins here
+C     begin_execution
 C     VOLWM=soil water content, FOSRH=fraction of total SOC
 C     AEC,AECX=anion exchange capacity
 C     OQC,OQN,OQP,OQA=DOC,DON,DOP,acetate in micropores
@@ -1785,17 +1785,17 @@ C
       ZSORP(K)=0.0
       PSORP(K)=0.0
       ENDIF
-      end subroutine DOC_sorption
+      end subroutine DOMSorption
 
 C------------------------------------------------------------------------------------------
 
-      subroutine solid_OM_decomp(K,L,NY,NX)
+      subroutine SolidOMDecomposition(K,L,NY,NX)
 
       implicit none
       integer, intent(in) :: K,L,NY,NX
 
       integer :: M
-C     execution begins here
+C     begin_execution
 
 C     FCPK=N,P limitation to microbial activity in each K
 C     CNOMX,CPOMX=N:C,P:C ratios relative to set maximum values
@@ -2032,17 +2032,17 @@ C    3*AMIN1(FCNK(K),FCPK(K))
       RDOHP(K)=0.0
       RDOHA(K)=0.0
       ENDIF
-      end subroutine solid_OM_decomp
+      end subroutine SolidOMDecomposition
 
 C------------------------------------------------------------------------------------------
 
-      subroutine redist_decomp_product(KL,L,NY,NX)
+      subroutine RedistDecompositionProduct(KL,L,NY,NX)
 
       implicit none
       integer, intent(in) :: KL,L,NY,NX
 
       integer :: K,M,N
-C     execution begins here
+C     begin_execution
 
 C
 C     REDISTRIBUTE AUTOTROPHIC DECOMPOSITION PRODUCTS AMONG
@@ -2203,16 +2203,16 @@ C    2,RCOQN*FORC(K),(CGOMN(N,K),N=1,7),ZSORP(K),OHN(K,L,NY,NX)
 592   FORMAT(A8,6I4,80E12.4)
 C     ENDIF
 590   CONTINUE
-      end subroutine redist_decomp_product
+      end subroutine RedistDecompositionProduct
 
 C------------------------------------------------------------------------------------------
 
-      subroutine microbial_anabolism_update(L,NY,NX)
+      subroutine MicrobialAnabolicUpdate(L,NY,NX)
       implicit none
       integer, intent(in) :: L,NY,NX
 
       integer :: K,M,N
-C     execution begins here
+C     begin_execution
 
 C
 C     OMC,OMN,OMP=microbial C,N,P
@@ -2351,16 +2351,16 @@ C     ENDIF
 545   CONTINUE
       ENDIF
 550   CONTINUE
-      end subroutine microbial_anabolism_update
+      end subroutine MicrobialAnabolicUpdate
 
 C------------------------------------------------------------------------------------------
 
-      subroutine microbial_litter_colonization(KL,L,NY,NX)
+      subroutine MicrobialLitterColonization(KL,L,NY,NX)
       implicit none
       integer, intent(in) :: KL,L,NY,NX
 
       integer :: K,M
-C     execution begins here
+C     begin_execution
 
 C     OSCT,OSAT,OSCX=total,colonized,uncolonized SOC
 C     OSA,OSC=colonized,total litter
@@ -2399,16 +2399,16 @@ C    4,(OSC(M,K,L,NY,NX),M=1,4)
 8823  FORMAT(A8,4I4,100E12.4)
 C     ENDIF
 480   CONTINUE
-      end subroutine microbial_litter_colonization
+      end subroutine MicrobialLitterColonization
 
 C------------------------------------------------------------------------------------------
 
-      subroutine agg_alloc_transformation(L,NY,NX)
+      subroutine AggregateTransformations(L,NY,NX)
       implicit none
       integer, intent(in) :: L,NY,NX
 
       integer :: K,M,N
-C     execution begins here
+C     begin_execution
 
       TRINH=0.0
       TRINO=0.0
@@ -2588,15 +2588,15 @@ C
       XN2GS(L,NY,NX)=TRN2F
       TFNQ(L,NY,NX)=TFNX
       VOLQ(L,NY,NX)=VOLWZ
-      end subroutine agg_alloc_transformation
+      end subroutine AggregateTransformations
 
 C------------------------------------------------------------------------------------------
 
-      subroutine substrate_competition_factors(N,K,L,NY,NX)
+      subroutine SubstrateCompetitionFactors(N,K,L,NY,NX)
       implicit none
       integer, intent(in) :: N,K,L,NY,NX
 
-C     execution begins here
+C     begin_execution
 C     F*=fraction of substrate uptake relative to total uptake from
 C     previous hour. OXYX=O2, NH4X=NH4 non-band, NB4X=NH4 band
 C     NO3X=NO3 non-band, NB3X=NO3 band, PO4X=H2PO4 non-band
@@ -2710,15 +2710,15 @@ C
       TFPO4X=TFPO4X+FPO4XR(N,K)
       TFP14X=TFP14X+FP14XR(N,K)
       ENDIF
-      end subroutine substrate_competition_factors
+      end subroutine SubstrateCompetitionFactors
 
 C------------------------------------------------------------------------------------------
 
-      subroutine nh3_oxidizer_catabolism(N,K,L,NY,NX)
+      subroutine NH3OxidizerCatabolism(N,K,L,NY,NX)
       implicit none
       integer, intent(in) :: N,K,L,NY,NX
 
-C     execution begins here
+C     begin_execution
 C
 C     FACTOR TO REGULATE COMPETITION FOR NH4 AMONG DIFFERENT
 C     MICROBIAL AND ROOT POPULATIONS FNH4
@@ -2817,15 +2817,15 @@ C    6,FNH4,FNB4,ZNFN4S,ZNFN4B,ZNFNI(L,NY,NX),ZNFN0(L,NY,NX)
 6666  FORMAT(A8,5I4,40E12.4)
 C     ENDIF
 C
-      end subroutine nh3_oxidizer_catabolism
+      end subroutine NH3OxidizerCatabolism
 
 C------------------------------------------------------------------------------------------
 
-      subroutine no2_oxidizer_catabolism(N,K,L,NY,NX)
+      subroutine NO2OxidizerCatabolism(N,K,L,NY,NX)
       implicit none
       integer, intent(in) :: N,K,L,NY,NX
 
-C     execution begins here
+C     begin_execution
 C     FACTOR TO REGULATE COMPETITION FOR NO2 AMONG DIFFERENT
 C     MICROBIAL POPULATIONS
 C
@@ -2900,14 +2900,14 @@ C    7,SPOMK(1),RMOMK(1)
 6667  FORMAT(A8,5I4,50E12.4)
 C     ENDIF
 C
-      end subroutine no2_oxidizer_catabolism
+      end subroutine NO2OxidizerCatabolism
 
 C------------------------------------------------------------------------------------------
 
-      subroutine h2_methanogens_catabolism(N,K,L,NY,NX)
+      subroutine H2MethanogensCatabolism(N,K,L,NY,NX)
       implicit none
       integer, intent(in) :: N,K,L,NY,NX
-C     execution begins here
+C     begin_execution
 C
 C     CO2 REDUCTION FROM SPECIFIC REDUCTION RATE, ENERGY YIELD,
 C     ACTIVE OXIDIZER BIOMASS, TEMPERATURE, AQUEOUS CO2 AND H2
@@ -2938,16 +2938,16 @@ C    4,SPOMK(1),RMOMK(1)
 5553  FORMAT(A8,7I4,20E12.4)
 C     ENDIF
 C
-      end subroutine h2_methanogens_catabolism
+      end subroutine H2MethanogensCatabolism
 
 C------------------------------------------------------------------------------------------
 
-      subroutine methanotroph_catabolism(N,K,L,NY,NX)
+      subroutine MethanotrophCatabolism(N,K,L,NY,NX)
       implicit none
       integer, intent(in) :: N,K,L,NY,NX
 
       integer :: M
-C     execution begins here
+C     begin_execution
 C
 C     CH4 OXIDATION FROM SPECIFIC OXIDATION RATE, ENERGY YIELD,
 C     ACTIVE OXIDIZER BIOMASS, TEMPERATURE, AQUEOUS CO2 AND
@@ -3036,15 +3036,15 @@ C
       ROXYM(N,K)=2.667*RGOMP
       ROXYP(N,K)=ROXYM(N,K)+4.00*RVOXP
       ROXYS(N,K,L,NY,NX)=ROXYP(N,K)
-      end subroutine methanotroph_catabolism
+      end subroutine MethanotrophCatabolism
 
 C------------------------------------------------------------------------------------------
 
-      subroutine acetomethanogen_catabolism(N,K,L,NY,NX)
+      subroutine AcetoMethanogenCatabolism(N,K,L,NY,NX)
       implicit none
       integer, intent(in) :: N,K,L,NY,NX
 
-C     execution begins here
+C     begin_execution
       GOMX=8.3143E-03*TKS(L,NY,NX)
      2*LOG((AMAX1(ZERO,COQA(K,L,NY,NX))/OAKI))
       GOMM=GOMX/24.0
@@ -3093,15 +3093,15 @@ C    5,VOLWM(NPH,L,NY,NX),PSISM(L,NY,NX),WFNG,COXYS(L,NY,NX)
 C    6,OHA(K,L,NY,NX),FSBST,SPOMK(1),RMOMK(1)
 5552  FORMAT(A8,7I4,40E12.4)
 C     ENDIF
-      end subroutine acetomethanogen_catabolism
+      end subroutine AcetoMethanogenCatabolism
 
 C------------------------------------------------------------------------------------------
 
-      subroutine aeroheterotroph_catabolism(N,K,L,NY,NX)
+      subroutine AerobicHeterotrophCatabolism(N,K,L,NY,NX)
       implicit none
       integer, intent(in) :: N,K,L,NY,NX
 
-C     execution begins here
+C     begin_execution
 
 C     ENERGY YIELDS OF O2 REDOX REACTIONS
 C     E* = growth respiration efficiency calculated in PARAMETERS
@@ -3178,15 +3178,15 @@ C    7,TFNX,WFNG,PSISM(L,NY,NX),TKS(L,NY,NX),TKSO
 5555  FORMAT(A8,7I4,60E12.4)
 C     ENDIF
 C
-      end subroutine aeroheterotroph_catabolism
+      end subroutine AerobicHeterotrophCatabolism
 
 C------------------------------------------------------------------------------------------
 
-      subroutine anaerob_catabolism(N,K,L,NY,NX)
+      subroutine AnaerobCatabolism(N,K,L,NY,NX)
       implicit none
       integer, intent(in) :: N,K,L,NY,NX
 
-C     execution begins here
+C     begin_execution
       GH2F=GH2X/72.0
       GOAX=8.3143E-03*TKS(L,NY,NX)
      2*LOG((AMAX1(ZERO,COQA(K,L,NY,NX))/OAKI)**2)
@@ -3239,15 +3239,15 @@ C    6,FSBST,FOSRH(K,L,NY,NX),SPOMK(1),RMOMK(1),ROQCD(N,K)
 5554  FORMAT(A8,7I4,60E12.4)
 C     ENDIF
 C
-      end subroutine anaerob_catabolism
+      end subroutine AnaerobCatabolism
 
 C------------------------------------------------------------------------------------------
 
-      subroutine hetero_denit_catabolism(N,K,L,NY,NX)
+      subroutine HeteroDenitrificCatabolism(N,K,L,NY,NX)
       implicit none
       integer, intent(in) :: N,K,L,NY,NX
 
-C     execution begins here
+C     begin_execution
 C
 C     FACTOR TO CONSTRAIN NO3 UPAKE AMONG COMPETING MICROBIAL
 C     AND ROOT POPULATIONS
@@ -3466,15 +3466,15 @@ C    2,(1.0+(CZ2OS(L,NY,NX)*Z2KM)/(CNO2S(L,NY,NX)*Z1KM))
 2222  FORMAT(A8,5I4,70E12.4)
 C     ENDIF
 C
-      end subroutine hetero_denit_catabolism
+      end subroutine HeteroDenitrificCatabolism
 
 C------------------------------------------------------------------------------------------
 
-      subroutine autotroph_denit_catabolism(N,K,L,NY,NX)
+      subroutine AutotrophDenitrificCatabolism(N,K,L,NY,NX)
 
       implicit none
       integer, intent(in) :: N,K,L,NY,NX
-C     execution begins here
+C     begin_execution
 C
 C     FACTOR TO CONSTRAIN NO2 UPAKE AMONG COMPETING MICROBIAL
 C     POPULATIONS
@@ -3553,16 +3553,16 @@ C    4,ROXYD,VMXD4,VMXDXS,VMXDXB,VMXD4S,VMXD4B,FNO2S,FNO2B
 C    5,ZNFN4S,ZNFN4B
 7777  FORMAT(A8,5I4,50E12.4)
 C     ENDIF
-      end subroutine autotroph_denit_catabolism
+      end subroutine AutotrophDenitrificCatabolism
 
 C------------------------------------------------------------------------------------------
 
-      subroutine aerob_O2_uptake(N,K,L,NY,NX)
+      subroutine AerobsO2Uptake(N,K,L,NY,NX)
       implicit none
       integer, intent(in) :: N,K,L,NY,NX
 
       integer :: M
-C     execution begins here
+C     begin_execution
       IF(ROXYP(N,K).GT.ZEROS(NY,NX).AND.FOXYX.GT.ZERO)THEN
       IF(L.NE.0.OR.VOLX(L,NY,NX).GT.ZEROS(NY,NX))THEN
 C
@@ -3700,15 +3700,15 @@ C
       RVOXA(N)=RVOXPA*WFN(N,K)
       RVOXB(N)=RVOXPB*WFN(N,K)
       ENDIF
-      end subroutine aerob_O2_uptake
+      end subroutine AerobsO2Uptake
 
 C------------------------------------------------------------------------------------------
 
-      subroutine biomass_mineralization(N,K,L,NY,NX)
+      subroutine BiomassMineralization(N,K,L,NY,NX)
       implicit none
       integer, intent(in) :: N,K,L,NY,NX
 
-C     execution begins here
+C     begin_execution
 C     MINERALIZATION-IMMOBILIZATION OF NH4 IN SOIL FROM MICROBIAL
 C     C:N AND NH4 CONCENTRATION IN BAND AND NON-BAND SOIL ZONES
 C
@@ -4058,15 +4058,15 @@ C
 C     WRITE(*,7778)'RIP14R',I,J,NX,NY,L,K,N,RIP14R(N,K),FP14XR(N,K)
 C    2,H1P4T(NU(NY,NX)),RIPO1R(N,K,NY,NX),RIP1PR
       ENDIF
-      end subroutine biomass_mineralization
+      end subroutine BiomassMineralization
 
 C------------------------------------------------------------------------------------------
 
-      subroutine gather_microbial_respiration(N,K,L,NY,NX)
+      subroutine GatherMicrobialRespiration(N,K,L,NY,NX)
       implicit none
       integer, intent(in) :: N,K,L,NY,NX
 
-C     execution begins here
+C     begin_execution
 C     pH EFFECT ON MAINTENANCE RESPIRATION
 C
 C     FPH=pH effect on maintenance respiration
@@ -4128,16 +4128,16 @@ C     ENDIF
       RN2FX(N,K)=0.0
       RGN2F(N,K)=0.0
       ENDIF
-      end subroutine gather_microbial_respiration
+      end subroutine GatherMicrobialRespiration
 
 C------------------------------------------------------------------------------------------
 
-      subroutine microbial_anabolism_flux(N,K,L,NY,NX)
+      subroutine GetMicrobialAnabolismFlux(N,K,L,NY,NX)
       implicit none
       integer, intent(in) :: N,K,L,NY,NX
 
       integer :: M
-C     execution begins here
+C     begin_execution
 
 C     DOC, DON, DOP AND ACETATE UPTAKE DRIVEN BY GROWTH RESPIRATION
 C     FROM O2, NOX AND C REDUCTION
@@ -4377,18 +4377,18 @@ C     ENDIF
 720   CONTINUE
       ENDIF
 
-      end subroutine microbial_anabolism_flux
+      end subroutine GetMicrobialAnabolismFlux
 
 C------------------------------------------------------------------------------------------
 
-      subroutine zero_active_microbes(N,K,L)
+      subroutine DealNoActiveMicrobes(N,K,L)
 C
 C     zero out within modulue flux arrays
       implicit none
       integer, intent(in) :: N,K,L
 
       integer :: M
-C     execution begins here
+C     begin_execution
 
       RUPOX(N,K)=0.0
       RGOMO(N,K)=0.0
@@ -4470,6 +4470,6 @@ C     execution begins here
       RH2GZ=0.0
       ENDIF
       ENDIF
-      end subroutine zero_active_microbes
+      end subroutine DealNoActiveMicrobes
 
       end module NitroMod
