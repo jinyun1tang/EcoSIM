@@ -42,8 +42,13 @@ C     FROM RUNOFF IN 'WATSUB'
       integer, intent(in) :: NHW,NHE,NVN,NVS
 C     execution begins here
 C
-      call sediment_detachment_and_transport(NHW,NHE,NVN,NVS)
+      DO 30 M=1,NPH
 
+      call sediment_detachment(NHW,NHE,NVN,NVS)
+      call sediment_transport(NHW,NHE,NVN,NVS)   
+
+ 30   CONTINUE
+      
 C
 C     INTERNAL SEDIMENT FLUXES
 C
@@ -59,7 +64,7 @@ C
 
 C---------------------------------------------------------------------------------------------------
       
-      subroutine sediment_detachment_and_transport(NHW,NHE,NVN,NVS)
+      subroutine sediment_detachment(NHW,NHE,NVN,NVS)
 C     INTERNAL TIME STEP AT WHICH SEDIMENT DETACHMENT AND TRANSPORT
 C     IS CALCULATED. DETACHMENT IS THE SUM OF THAT BY RAINFALL AND
 C     OVERLAND FLOW
@@ -68,7 +73,6 @@ C
 
       integer, intent(in) :: NHW,NHE,NVN,NVS
       
-      DO 30 M=1,NPH
       DO 9895 NX=NHW,NHE
       DO 9890 NY=NVN,NVS
       IF(IERSNG.EQ.1.OR.IERSNG.EQ.3)THEN
@@ -244,6 +248,17 @@ C     ENDIF
       ENDIF
 9890  CONTINUE
 9895  CONTINUE
+      end subroutine sediment_detachment
+      
+      subroutine sediment_transport(NHW,NHE,NVN,NVS)
+C     INTERNAL TIME STEP AT WHICH SEDIMENT DETACHMENT AND TRANSPORT
+C     IS CALCULATED. DETACHMENT IS THE SUM OF THAT BY RAINFALL AND
+C     OVERLAND FLOW
+C
+      implicit none
+
+      integer, intent(in) :: NHW,NHE,NVN,NVS
+
 C
 C     BOUNDARY SEDIMENT FLUXES
 C
@@ -385,8 +400,7 @@ C    2,TERSED(NY,NX),RDTSED(NY,NX)
       ENDIF
 9690  CONTINUE
 9695  CONTINUE
-30    CONTINUE
-      end subroutine sediment_detachment_and_transport
+      end subroutine sediment_transport
       
       subroutine internal_sediment_fluxes(NHW, NHE,NVN,NVS)
 
