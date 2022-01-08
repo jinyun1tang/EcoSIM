@@ -49,6 +49,33 @@ C     execution begins here
 
       DO 9995 NX=NHW,NHE
       DO 9990 NY=NVN,NVS
+      
+      call TotalLitterfall()
+         
+      DO 9975 NZ=1,NP(NY,NX)   
+      IF(IFLGC(NZ,NY,NX).EQ.1)THEN
+
+      call TotalLitterfall()
+         
+      call TotalGasandSoluteUptake()
+         
+C     IF(ISALTG.NE.0)THEN
+C     XZHYS(L,NY,NX)=XZHYS(L,NY,NX)
+C    2+0.0714*(TUPNH4(L,NY,NX)+TUPNHB(L,NY,NX))
+C    3-0.0714*(TUPNO3(L,NY,NX)+TUPNOB(L,NY,NX))
+C     ENDIF
+      call CanopyFluxesandFixation()
+      
+      ENDIF
+9975  CONTINUE
+9990  CONTINUE
+9995  CONTINUE
+      RETURN
+      END subroutine extract
+
+      subroutine TotalLitterfall()
+      implicit none
+      
       DO 9985 NZ=1,NP0(NY,NX)
 C
 C     TOTAL LITTERFALL OF ALL PLANT SPECIES
@@ -80,8 +107,9 @@ C
       WGLFT(L,NY,NX)=0.0
       ARSTT(L,NY,NX)=0.0
 915   CONTINUE
-      DO 9975 NZ=1,NP(NY,NX)
-      IF(IFLGC(NZ,NY,NX).EQ.1)THEN
+      end subroutine TotalLitterfall
+
+      subroutine TotalLeafArea()
 C
 C     TOTAL LEAF AREA OF ALL PLANT SPECIES
 C
@@ -90,14 +118,21 @@ C     ARLFV,ARSTV=PFT leaf,stalk area in canopy layer
 C     WGLFT=total leaf C of combined canopy layer
 C     WGLFV=PFT leaf C in canopy layer
 C
+      implicit none
+      
       DO 910 L=1,JC
       ARLFT(L,NY,NX)=ARLFT(L,NY,NX)+ARLFV(L,NZ,NY,NX)
       WGLFT(L,NY,NX)=WGLFT(L,NY,NX)+WGLFV(L,NZ,NY,NX)
       ARSTT(L,NY,NX)=ARSTT(L,NY,NX)+ARSTV(L,NZ,NY,NX)
 910   CONTINUE
+      end subroutine TotalLeafArea
+
+      subroutine TotalGasandSoluteUptake()
 C
 C     TOTAL GAS AND SOLUTE UPTAKE BY ALL PLANT SPECIES
 C
+      implicit none
+      
       DO 100 N=1,MY(NZ,NY,NX)
       DO 100 L=NU(NY,NX),NI(NZ,NY,NX)
 C
@@ -273,17 +308,16 @@ C
       RPOBX(L,NY,NX)=RPOBX(L,NY,NX)+RUPP2B(N,L,NZ,NY,NX)
       RP1BX(L,NY,NX)=RP1BX(L,NY,NX)+RUPP1B(N,L,NZ,NY,NX)
 100   CONTINUE
-C     IF(ISALTG.NE.0)THEN
-C     XZHYS(L,NY,NX)=XZHYS(L,NY,NX)
-C    2+0.0714*(TUPNH4(L,NY,NX)+TUPNHB(L,NY,NX))
-C    3-0.0714*(TUPNO3(L,NY,NX)+TUPNOB(L,NY,NX))
-C     ENDIF
+      end subroutine TotalGasandSoluteUptake
+
+      subroutine CanopyFluxesandFixation()
 C
 C     TOTAL ROOT N2 FIXATION BY ALL PLANT SPECIES
 C
 C     TUPNF=total root N2 fixation
 C     RUPNF=PFT root N2 fixation
 C
+      implicit none
       DO 85 L=NU(NY,NX),NI(NZ,NY,NX)
       TUPNF(L,NY,NX)=TUPNF(L,NY,NX)+RUPNF(L,NZ,NY,NX)
 85    CONTINUE
@@ -357,10 +391,6 @@ C
       RNH3C(NZ,NY,NX)=RNH3C(NZ,NY,NX)+RNH3B(NB,NZ,NY,NX)
       TNH3C(NZ,NY,NX)=TNH3C(NZ,NY,NX)+RNH3B(NB,NZ,NY,NX)
 80    CONTINUE
-      ENDIF
-9975  CONTINUE
-9990  CONTINUE
-9995  CONTINUE
-      RETURN
-      END subroutine extract
+      end subroutine CanopyFluxesandFixation
+      
       end module ExtractMod
