@@ -68,6 +68,7 @@ C
       DO 9985 NZ=NZ1Q,NZ2X
       IF(IFLGC(NZ,NY,NX).EQ.0)THEN
 
+
       call InitShootGrowth(NZ,NY,NX)
 
       call PlantLitterFractions(NZ,NY,NX)      
@@ -85,7 +86,6 @@ C
       call InitRootMychorMorphoBio(NZ,NY,NX)
 
       call InitSeedMorphoBio(NZ,NY,NX)
-      
 C     ENDIF
       ENDIF
       ZEROP(NZ,NY,NX)=ZERO*PP(NZ,NY,NX)
@@ -156,7 +156,6 @@ C     IF(DATAP(NZ,NY,NX).NE.'NO')THEN
 
       implicit none
       integer, intent(in) :: NZ,NY,NX
-
 C     
 C     FRACTIONS OF PLANT LITTER ALLOCATED TO KINETIC COMPONENTS
 C     PROTEIN(*,1),CH2O(*,2),CELLULOSE(*,3),LIGNIN(*,4) IN SOIL LITTER
@@ -464,7 +463,6 @@ C    2*SQRT(0.25*(1.0-PORT(N,NZ,NY,NX)))
 
       implicit none
       integer, intent(in) :: NZ, NY, NX
-      
 C     
 C     INITIALIZE PLANT PHENOLOGY
 C
@@ -718,6 +716,7 @@ C
 155   CONTINUE
       ENDIF
       end subroutine InitMassBalance
+
 
       subroutine InitPlantHeatandWater(NZ,NY,NX)
 
