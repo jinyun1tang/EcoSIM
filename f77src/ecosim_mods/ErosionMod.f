@@ -44,7 +44,6 @@ C     execution begins here
 C
       DO 30 M=1,NPH
 
-
       call SedimentDetachment(NHW,NHE,NVN,NVS)
       call SedimentTransport(NHW,NHE,NVN,NVS)   
 
@@ -840,7 +839,6 @@ C
       ENDIF
 9490  CONTINUE
 9495  CONTINUE
-
       end subroutine InternalSedimentFluxes
 
 C----------------------------------------------------------------------------------------------

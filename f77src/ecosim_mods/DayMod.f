@@ -79,7 +79,6 @@ C     GO TO 501
 C     501
 
       call TillageandIrrigationEvents(I, NHW, NHE, NVN, NVS)
-
       RETURN
 
       END subroutine day
