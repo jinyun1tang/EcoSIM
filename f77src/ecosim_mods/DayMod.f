@@ -71,21 +71,21 @@ C
       WRITE(CHARN3,'(I4)')N3
       WRITE(CDATE,'(2A2,A4)')CHARN1(2:3),CHARN2(2:3),CHARN3(1:4)
 C     GO TO 501
-      call write_daily_accumulators(I, NHW, NHE, NVN, NVS)
+      call WriteDailyAccumulators(I, NHW, NHE, NVN, NVS)
 
       ENDIF
       NN=N
 500   CONTINUE
 C     501
 
-      call tillage_and_irrigation_events(I, NHW, NHE, NVN, NVS)
+      call TillageandIrrigationEvents(I, NHW, NHE, NVN, NVS)
       RETURN
 
       END subroutine day
 
 C-----------------------------------------------------------------------------------------
 
-      subroutine write_daily_accumulators(I, NHW, NHE, NVN, NVS)
+      subroutine WriteDailyAccumulators(I, NHW, NHE, NVN, NVS)
 C     WRITE DAILY MAX MIN ACCUMULATORS FOR WEATHER VARIABLES
       
       implicit none
@@ -313,10 +313,11 @@ C
 950   CONTINUE
 955   CONTINUE
 
-      END subroutine write_daily_accumulators
+      END subroutine WriteDailyAccumulators
 
 C-----------------------------------------------------------------------------------------
-      subroutine tillage_and_irrigation_events(I, NHW, NHE, NVN, NVS)
+      
+      subroutine TillageandIrrigationEvents(I, NHW, NHE, NVN, NVS)
       implicit none
 
       integer, intent(in) :: I, NHW, NHE, NVN, NVS
@@ -393,6 +394,6 @@ C    3,(RRIG(J,I,NY,NX),J=1,24)
       ENDIF
 9990  CONTINUE
 9995  CONTINUE
-      end subroutine tillage_and_irrigation_events
+      end subroutine TillageandIrrigationEvents
       
       END module DayMod
