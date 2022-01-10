@@ -44,27 +44,27 @@ C     execution begins here
 C
       DO 30 M=1,NPH
 
-      call sediment_detachment(NHW,NHE,NVN,NVS)
-      call sediment_transport(NHW,NHE,NVN,NVS)   
+      call SedimentDetachment(NHW,NHE,NVN,NVS)
+      call SedimentTransport(NHW,NHE,NVN,NVS)   
 
  30   CONTINUE
       
 C
 C     INTERNAL SEDIMENT FLUXES
 C
-      call internal_sediment_fluxes(NHW, NHE,NVN,NVS)
+      call InternalSedimentFluxes(NHW, NHE,NVN,NVS)
 
 C
 C     EXTERNAL BOUNDARY SEDIMENT FLUXES
 C
-      call external_boundary_sediment_fluxes(NHW,NHE,NVN,NVS)
+      call ExternalSedimentFluxes(NHW,NHE,NVN,NVS)
       RETURN
 
       END subroutine erosion
 
 C---------------------------------------------------------------------------------------------------
       
-      subroutine sediment_detachment(NHW,NHE,NVN,NVS)
+      subroutine SedimentDetachment(NHW,NHE,NVN,NVS)
 C     INTERNAL TIME STEP AT WHICH SEDIMENT DETACHMENT AND TRANSPORT
 C     IS CALCULATED. DETACHMENT IS THE SUM OF THAT BY RAINFALL AND
 C     OVERLAND FLOW
@@ -249,9 +249,9 @@ C     ENDIF
       ENDIF
 9890  CONTINUE
 9895  CONTINUE
-      end subroutine sediment_detachment
+      end subroutine SedimentDetachment
       
-      subroutine sediment_transport(NHW,NHE,NVN,NVS)
+      subroutine SedimentTransport(NHW,NHE,NVN,NVS)
 C     INTERNAL TIME STEP AT WHICH SEDIMENT DETACHMENT AND TRANSPORT
 C     IS CALCULATED. DETACHMENT IS THE SUM OF THAT BY RAINFALL AND
 C     OVERLAND FLOW
@@ -401,9 +401,9 @@ C    2,TERSED(NY,NX),RDTSED(NY,NX)
       ENDIF
 9690  CONTINUE
 9695  CONTINUE
-      end subroutine sediment_transport
+      end subroutine SedimentTransport
       
-      subroutine internal_sediment_fluxes(NHW, NHE,NVN,NVS)
+      subroutine InternalSedimentFluxes(NHW, NHE,NVN,NVS)
 
       implicit none
       integer, intent(in) :: NHW,NHE,NVN,NVS
@@ -844,12 +844,11 @@ C
       ENDIF
 9490  CONTINUE
 9495  CONTINUE
-
-      end subroutine internal_sediment_fluxes
+      end subroutine InternalSedimentFluxes
 
 C----------------------------------------------------------------------------------------------
       
-      subroutine external_boundary_sediment_fluxes(NHW,NHE,NVN,NVS)
+      subroutine ExternalSedimentFluxes(NHW,NHE,NVN,NVS)
       implicit none
 
       integer, intent(in) :: NHW,NHE,NVN,NVS
@@ -1109,6 +1108,6 @@ C     ENDIF
       ENDIF
 8990  CONTINUE
 8995  CONTINUE
-      end subroutine external_boundary_sediment_fluxes      
+      end subroutine ExternalSedimentFluxes      
 
       end module ErosionMod
