@@ -55,7 +55,6 @@ C     execution begins here
       DO 9975 NZ=1,NP(NY,NX)   
       IF(IFLGC(NZ,NY,NX).EQ.1)THEN
 
-
       call TotalLeafArea(NZ,NY,NX)
          
       call TotalGasandSoluteUptake(NZ,NY,NX)
@@ -323,6 +322,7 @@ C
 C     TUPNF=total root N2 fixation
 C     RUPNF=PFT root N2 fixation
 C
+      
       implicit none
       integer, intent(in) :: NZ, NY, NX
       
