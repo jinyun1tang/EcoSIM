@@ -55,7 +55,7 @@ C     execution begins here
       DO 9975 NZ=1,NP(NY,NX)   
       IF(IFLGC(NZ,NY,NX).EQ.1)THEN
 
-      call TotalLitterfall(NZ,NY,NX)
+      call TotalLeafArea(NZ,NY,NX)
          
       call TotalGasandSoluteUptake(NZ,NY,NX)
          
@@ -111,7 +111,7 @@ C
 915   CONTINUE
       end subroutine TotalLitterfall
 
-      subroutine TotalLeafArea()
+      subroutine TotalLeafArea(NZ,NY,NX)
 C
 C     TOTAL LEAF AREA OF ALL PLANT SPECIES
 C
@@ -121,6 +121,7 @@ C     WGLFT=total leaf C of combined canopy layer
 C     WGLFV=PFT leaf C in canopy layer
 C
       implicit none
+      integer, intent(in) :: NZ,NY,NX
       
       DO 910 L=1,JC
       ARLFT(L,NY,NX)=ARLFT(L,NY,NX)+ARLFV(L,NZ,NY,NX)
