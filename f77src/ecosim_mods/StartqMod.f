@@ -68,7 +68,6 @@ C
       DO 9985 NZ=NZ1Q,NZ2X
       IF(IFLGC(NZ,NY,NX).EQ.0)THEN
 
-
       call InitShootGrowth(NZ,NY,NX)
 
       call PlantLitterFractions(NZ,NY,NX)      
@@ -463,6 +462,7 @@ C    2*SQRT(0.25*(1.0-PORT(N,NZ,NY,NX)))
 
       implicit none
       integer, intent(in) :: NZ, NY, NX
+
 C     
 C     INITIALIZE PLANT PHENOLOGY
 C
@@ -716,7 +716,6 @@ C
 155   CONTINUE
       ENDIF
       end subroutine InitMassBalance
-
 
       subroutine InitPlantHeatandWater(NZ,NY,NX)
 
