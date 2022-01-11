@@ -50,21 +50,21 @@ C     execution begins here
       DO 9995 NX=NHW,NHE
       DO 9990 NY=NVN,NVS
       
-      call TotalLitterfall()
+      call TotalLitterfall(NY,NX)
          
       DO 9975 NZ=1,NP(NY,NX)   
       IF(IFLGC(NZ,NY,NX).EQ.1)THEN
 
-      call TotalLitterfall()
+      call TotalLitterfall(NZ,NY,NX)
          
-      call TotalGasandSoluteUptake()
+      call TotalGasandSoluteUptake(NZ,NY,NX)
          
 C     IF(ISALTG.NE.0)THEN
 C     XZHYS(L,NY,NX)=XZHYS(L,NY,NX)
 C    2+0.0714*(TUPNH4(L,NY,NX)+TUPNHB(L,NY,NX))
 C    3-0.0714*(TUPNO3(L,NY,NX)+TUPNOB(L,NY,NX))
 C     ENDIF
-      call CanopyFluxesandFixation()
+      call CanopyFluxesandFixation(NZ,NY,NX)
       
       ENDIF
 9975  CONTINUE
@@ -73,8 +73,10 @@ C     ENDIF
       RETURN
       END subroutine extract
 
-      subroutine TotalLitterfall()
+      subroutine TotalLitterfall(NY,NX)
+
       implicit none
+      integer, intent(in) :: NY,NX
       
       DO 9985 NZ=1,NP0(NY,NX)
 C
@@ -127,11 +129,13 @@ C
 910   CONTINUE
       end subroutine TotalLeafArea
 
-      subroutine TotalGasandSoluteUptake()
+      subroutine TotalGasandSoluteUptake(NZ,NY,NX)
 C
 C     TOTAL GAS AND SOLUTE UPTAKE BY ALL PLANT SPECIES
 C
+      
       implicit none
+      integer, intent(in) :: NZ, NY, NX
       
       DO 100 N=1,MY(NZ,NY,NX)
       DO 100 L=NU(NY,NX),NI(NZ,NY,NX)
@@ -310,14 +314,17 @@ C
 100   CONTINUE
       end subroutine TotalGasandSoluteUptake
 
-      subroutine CanopyFluxesandFixation()
+      subroutine CanopyFluxesandFixation(NZ,NY,NX)
 C
 C     TOTAL ROOT N2 FIXATION BY ALL PLANT SPECIES
 C
 C     TUPNF=total root N2 fixation
 C     RUPNF=PFT root N2 fixation
 C
+      
       implicit none
+      integer, intent(in) :: NZ, NY, NX
+      
       DO 85 L=NU(NY,NX),NI(NZ,NY,NX)
       TUPNF(L,NY,NX)=TUPNF(L,NY,NX)+RUPNF(L,NZ,NY,NX)
 85    CONTINUE
