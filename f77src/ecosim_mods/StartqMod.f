@@ -747,8 +747,9 @@ C
       FRADP(NZ,NY,NX)=0.0
       end subroutine InitPlantHeatandWater
 
-      subroutine InitRootMychorMorphoBio()
+      subroutine InitRootMychorMorphoBio(NZ,NY,NX)
       implicit none
+      integer, intent(in) :: NZ, NY, NX
 C     
 C     INITIALIZE ROOT(N=1),MYCORRHIZAL(N=2) MORPHOLOGY AND BIOMASS
 C
