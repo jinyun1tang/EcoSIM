@@ -68,23 +68,23 @@ C
       DO 9985 NZ=NZ1Q,NZ2X
       IF(IFLGC(NZ,NY,NX).EQ.0)THEN
 
-      call InitShootGrowth()
+      call InitShootGrowth(NZ,NY,NX)
 
-      call PlantLitterFractions()      
+      call PlantLitterFractions(NZ,NY,NX)      
       
-      call PFTThermalAcclimation()
+      call PFTThermalAcclimation(NZ,NY,NX)
 
-      call InitDimensionsandUptake()
+      call InitDimensionsandUptake(NZ,NY,NX)
 
-      call InitPlantPhenoMorphoBio()
+      call InitPlantPhenoMorphoBio(NZ,NY,NX)
 
-      call InitMassBalance()
+      call InitMassBalance(NZ,NY,NX)
 
-      call InitPlantHeatandWater()
+      call InitPlantHeatandWater(NZ,NY,NX)
 
-      call InitRootMychorMorphoBio()
+      call InitRootMychorMorphoBio(NZ,NY,NX)
 
-      call InitSeedMorphoBio()
+      call InitSeedMorphoBio(NZ,NY,NX)
       
 C     ENDIF
       ENDIF
@@ -119,8 +119,10 @@ C
       RETURN
       END subroutine startq
 
-      subroutine InitShootGrowth()
+      subroutine InitShootGrowth(NZ,NY,NX)
+
       implicit none
+      integer, intent(in) :: NZ, NY, NX
       
       IYR0(NZ,NY,NX)=IYRX(NZ,NY,NX)
       IDAY0(NZ,NY,NX)=IDAYX(NZ,NY,NX)
@@ -150,8 +152,11 @@ C     IF(DATAP(NZ,NY,NX).NE.'NO')THEN
       ENDIF
       end subroutine InitShootGrowth
 
-      subroutine PlantLitterFractions()
+      subroutine PlantLitterFractions(NZ,NY,NX)
+
       implicit none
+      integer, intent(in) :: NZ,NY,NX
+
 C     
 C     FRACTIONS OF PLANT LITTER ALLOCATED TO KINETIC COMPONENTS
 C     PROTEIN(*,1),CH2O(*,2),CELLULOSE(*,3),LIGNIN(*,4) IN SOIL LITTER
@@ -344,9 +349,12 @@ C
       ENDIF
       end subroutine PlantLitterFractions
 
-      subroutine PFTThermalAcclimation()
+      subroutine PFTThermalAcclimation(NZ,NY,NX)
+
       implicit none
-C      
+      integer, intent(in) :: NZ, NY, NX
+
+C     
 C     PFT THERMAL ACCLIMATION
 C
 C     ZTYP,ZTYPI=dynamic,initial thermal adaptation zone from PFT file
@@ -375,8 +383,11 @@ C
       ENDIF
       end subroutine PFTThermalAcclimation
 
-      subroutine InitDimensionsandUptake()
+      subroutine InitDimensionsandUptake(NZ,NY,NX)
+
       implicit none
+      integer, intent(in) :: NZ, NY, NX
+      
 C     
 C     SEED CHARACTERISTICS
 C
@@ -449,8 +460,11 @@ C    2*SQRT(0.25*(1.0-PORT(N,NZ,NY,NX)))
 500   CONTINUE
       end subroutine InitDimensionsandUptake
 
-      subroutine InitPlantPhenoMorphoBio()
+      subroutine InitPlantPhenoMorphoBio(NZ,NY,NX)
+
       implicit none
+      integer, intent(in) :: NZ, NY, NX
+      
 C     
 C     INITIALIZE PLANT PHENOLOGY
 C
@@ -648,8 +662,11 @@ C
       ARSTP(NZ,NY,NX)=0.0
       end subroutine InitPlantPhenoMorphoBio
 
-      subroutine InitMassBalance()
+      subroutine InitMassBalance(NZ,NY,NX)
+
       implicit none
+      integer, intent(in) :: NZ, NY, NX
+      
 C     
 C     INITIALIZE MASS BALANCE CHECKS
 C
@@ -702,8 +719,11 @@ C
       ENDIF
       end subroutine InitMassBalance
 
-      subroutine InitPlantHeatandWater()
+      subroutine InitPlantHeatandWater(NZ,NY,NX)
+
       implicit none
+      integer, intent(in) :: NZ, NY, NX
+      
 C     
 C     INITIALIZE PLANT HEAT AND WATER STATUS
 C
@@ -841,8 +861,11 @@ C
 40    CONTINUE
       end subroutine InitRootMychorMorphoBio
 
-      subroutine InitSeedMorphoBio()
+      subroutine InitSeedMorphoBio(NZ,NY,NX)
+      
       implicit none
+      integer, intent(in) :: NZ, NY, NX
+      
 C     
 C     INITIALIZE SEED MORPHOLOGY AND BIOMASS
 C
