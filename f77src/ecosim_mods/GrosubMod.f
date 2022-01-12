@@ -3525,7 +3525,7 @@ C     HTSTZ=canopy height for water uptake
 C     RTSK=relative primary root sink strength
 C     RTSK1=primary root sink strength
 C     XRTN1=number of primary root axes
-C     RRAD1,RRAD2=primary,secondary root radius
+C     RRAD1,RRAD2=primary, secondary root radius
 C     RTNT,RLNT=total root sink strength
 C
       IF(N.EQ.1)THEN
@@ -3762,7 +3762,7 @@ C     RCO2GM,RCO2G=growth respiration limited by N,P unltd,ltd by O2
 C     DMRTD=root C respiration vs nonstructural C consumption
 C     GRTWGM,GRTWTG=root C growth unltd,ltd by O2
 C     DMRT=root growth yield
-C     ZADD2M,ZADD2,PADD2=nonstructural N,P unltd,ltd by O2 used in growth
+C     ZADD2M,ZADD2,PADD2=nonstructural N,P unlimited,limited by O2 used in growth
 C     CNRDM,CNRDA=respiration for N assimilation unltd,ltd by O2
 C
       CGRORM=RCO2GM/DMRTD
