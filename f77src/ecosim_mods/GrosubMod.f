@@ -9201,6 +9201,7 @@ C-------------------------------------------------------------------------------
 
       subroutine StagePlantForGrowth(I,J,NZ,NY,NX)
       integer, intent(in) :: I,J,NZ,NY,NX
+
 C     begin_execution
 
 C     IF(I.EQ.1.AND.J.EQ.1)THEN
