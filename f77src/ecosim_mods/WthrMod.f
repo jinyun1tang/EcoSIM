@@ -1,4 +1,7 @@
       module WthrMod
+C
+C     Description:
+C
       use data_kind_mod, only : r8 => SHR_KIND_R8
       implicit none
 
@@ -43,7 +46,7 @@
 
       real(r8) :: AMP,CLD,DTA,DHR,DTS,EMM,RADX,RADZ,VPX,XJ
 
-      integer :: ITYPE,NX,NY,N,NZ
+
 
       real(r8) :: PRECRI(JY,JX),PRECWI(JY,JX),PRECII(JY,JX)
      2,PRECUI(JY,JX),RADN(JY,JX),VPS(JY,JX)
@@ -60,12 +63,15 @@ C
 
       SUBROUTINE wthr(I,J,NHW,NHE,NVN,NVS)
 C
-C     THIS SUBROUTINE REINITIALIZES WEATHER VARIABLES USED IN OTHER
+C     Description:
+C
+C     REINITIALIZES WEATHER VARIABLES USED IN OTHER
 C     SUBROUTINES
 C
       implicit none
       integer, intent(in) :: I, J
       integer, intent(in) :: NHW,NHE,NVN,NVS
+      integer :: ITYPE,NX,NY,N,NZ
 C     execution begins here
 
       XJ=J
@@ -73,7 +79,7 @@ C     execution begins here
 C
 C     SWITCH OUT ECOSYS WEATHER HERE IF CESM WEATHER IS READ IN
 C
-C     IF �
+C     IF
 C
 C     IWTHR=weather data type in first(1) or second(2) scene
 C     ITYPE=weather data type:1=daily,2=hourly
@@ -88,6 +94,39 @@ C     CALCULATE HOURLY TEMPERATURE, RADIATION, WINDSPEED, VAPOR PRESSURE
 C     AND PRECIPITATION FROM DAILY WEATHER ARRAYS LOADED IN 'READS'
 C
       IF(ITYPE.EQ.1)THEN
+C
+      call DailyWeather(I,J,NHW,NHE,NVN,NVS)
+C     CALCULATE HOURLY TEMPERATURE, RADIATION, WINDSPEED, VAPOR PRESSURE
+C     AND PRECIPITATION FROM HOURLY WEATHER ARRAYS LOADED IN 'READS'
+C
+      ELSE
+      call HourlyWeather(I,J,NHW,NHE,NVN,NVS)
+      ENDIF
+C
+      call CalcRadiation(I,J,NHW,NHE,NVN,NVS)
+C
+
+      IF(ICLM.EQ.1.OR.ICLM.EQ.2)THEN
+      call ApplyClimateCorrection(I,J,NHW,NHE,NVN,NVS)
+      ENDIF
+C
+
+      call SummaryForOutput(NHW,NHE,NVN,NVS)
+      RETURN
+
+      END subroutine wthr
+C------------------------------------------------------------------------------------------
+
+      subroutine DailyWeather(I,J,NHW,NHE,NVN,NVS)
+C
+C     Description:
+C
+      implicit none
+      integer,  intent(in) :: I,J,NHW,NHE,NVN,NVS
+
+      integer :: NY,NX
+C     begin_execution
+
       DO 9915 NX=NHW,NHE
       DO 9910 NY=NVN,NVS
 C
@@ -164,10 +203,19 @@ C     IF(PRECWI(NY,NX).LT.0.25E-03)PRECWI(NY,NX)=0.0
 9910  CONTINUE
 9915  CONTINUE
 C
-C     CALCULATE HOURLY TEMPERATURE, RADIATION, WINDSPEED, VAPOR PRESSURE
-C     AND PRECIPITATION FROM HOURLY WEATHER ARRAYS LOADED IN 'READS'
+      end subroutine DailyWeather
+
+C------------------------------------------------------------------------------------------
+
+      subroutine HourlyWeather(I,J,NHW,NHE,NVN,NVS)
 C
-      ELSE
+C     Description:
+C
+      integer, intent(in) :: I,J,NHW,NHE,NVN,NVS
+      integer :: NY,NX
+
+C     begin_execution
+
       DO 9935 NX=NHW,NHE
       DO 9930 NY=NVN,NVS
 C
@@ -194,8 +242,22 @@ C
       ENDIF
 9930  CONTINUE
 9935  CONTINUE
-      ENDIF
+      end subroutine HourlyWeather
+
+C------------------------------------------------------------------------------------------
+
+      subroutine CalcRadiation(I,J,NHW,NHE,NVN,NVS)
 C
+C     Description:
+C
+      implicit none
+      integer, intent(in) :: I,J,NHW,NHE,NVN,NVS
+
+      integer :: NY,NX
+
+C     begin_execution
+
+
 C     CALCULATE DIRECT, DIFFUSE AND LONGWAVE RADIATION FROM
 C     INCOMING RADIATION READ IN 'READS', SOLAR ANGLE, HUMIDITY,
 C     TEMPERATURE AND CLOUDINESS
@@ -304,15 +366,26 @@ C     PRECUI(NY,NX)=RRIG(J,I,NY,NX)
 C     ENDIF
 9960  CONTINUE
 9965  CONTINUE
+      end subroutine CalcRadiation
+
+C------------------------------------------------------------------------------------------
+
+      subroutine ApplyClimateCorrection(I,J,NHW,NHE,NVN,NVS)
 C
+C     DESCRIPTION:
 C     IMPLEMENT CLIMATE CHANGES READ IN 'READS' TO HOURLY TEMPERATURE,
 C     RADIATION, WINDSPEED,VAPOR PRESSURE, PRECIPITATION, IRRIGATION
 C     AND CO2
+      implicit none
+      integer, intent(in) :: I,J,NHW,NHE,NVN,NVS
+
+      integer :: NY,NX,NZ,N
+C     begin_execution
+
 C
 C     ICLM=changes to weather data (0=none,1=step,2=transient)
 C     N=season or month
 C
-      IF(ICLM.EQ.1.OR.ICLM.EQ.2)THEN
 C
 C     SEASONAL CHANGES
 C
@@ -440,11 +513,22 @@ C
       CNOR(NY,NX)=CNORI(NY,NX)*TDCNO(NY,NX,N)
 9920  CONTINUE
 9925  CONTINUE
-      ENDIF
+      end subroutine ApplyClimateCorrection
+
+C------------------------------------------------------------------------------------------
+
+      subroutine SummaryForOutput(NHW,NHE,NVN,NVS)
 C
+C     DESCRIPTION:
 C     DAILY WEATHER TOTALS, MAXIMA AND MINIMA FOR DAILY OUTPUT
 C     CHECK AGAINST INPUTS FROM WEATHER FILE
+      implicit none
+      integer, intent(in) :: NHW,NHE,NVN,NVS
+
+      integer :: NY,NX
 C
+C     begin_execution
+
       DO 9945 NX=NHW,NHE
       DO 9940 NY=NVN,NVS
       IF(SSIN(NY,NX).GT.0.0)TRAD(NY,NX)=TRAD(NY,NX)+RADS(NY,NX)
@@ -476,7 +560,6 @@ C
       THS(NY,NX)=THSX(NY,NX)*AREA(3,NU(NY,NX),NY,NX)
 9940  CONTINUE
 9945  CONTINUE
-      RETURN
+      end subroutine SummaryForOutput
 
-      END subroutine wthr
       end module WthrMod
