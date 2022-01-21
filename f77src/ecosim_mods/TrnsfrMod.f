@@ -434,7 +434,7 @@ C-------------------------------------------------------------------------------
       DO 9890 NY=NVN,NVS
 
       call ResetandInitFluxAccumulators(M,NY,NX)
-  
+
       IF(M.NE.MX)THEN
 C     This IF statement is the next ~1700 lines so I'm leaving it in here
 C
@@ -463,7 +463,6 @@ C
 C     DIFFUSIVE FLUXES BETWEEN CURRENT AND ADJACENT GRID CELL
 C     MICROPORES
 C
-C      call DiffusiveFluxAdjacentCell(NY,NX)
 C
 C     TOTAL MICROPORE AND MACROPORE SOLUTE TRANSPORT FLUXES BETWEEN
 C     ADJACENT GRID CELLS = CONVECTIVE + DIFFUSIVE FLUXES
@@ -498,7 +497,6 @@ C
 C
 C     SOIL SURFACE WATER-AIR GAS EXCHANGE
 C
-C      call SurfaceWaterAirGasExchange(M,NY,NX)
 C
 C     SOLUTE FLUXES BETWEEN ADJACENT GRID CELLS
 C
@@ -636,7 +634,6 @@ C
 C
 C     SOLUTE LOSS WITH SUBSURFACE MICROPORE WATER LOSS
 C
-C      call WaterExchangeFromPores(N,NN,M,N1,N2,M1,M2,M3,M4,M5,M6)
       ENDIF
 9575  CONTINUE
 C
@@ -663,6 +660,7 @@ C
       IF(NCN(N2,N1).NE.3.OR.N.EQ.3)THEN
 
       call NetFluxMicroandMacropores(N,M,N1,N2,N3,N4,N5)
+
       ENDIF
 9580  CONTINUE
 9585  CONTINUE
@@ -673,6 +671,7 @@ C
 C------------------------------------------------------------------------------------------
 
       subroutine UpdateStateVar(MM,NPG,NHW,NHE,NVN,NVS)
+
       implicit none
       
       integer, intent(in) :: MM, NPG, NHW, NHE, NVN, NVS
@@ -1063,6 +1062,7 @@ C-------------------------------------------------------------------------------
 C------------------------------------------------------------------------------------------
       
       subroutine StateVarforGasandSolute(NY,NX)
+
       implicit none
       
       integer, intent(in) :: NY, NX
@@ -1094,6 +1094,7 @@ C-------------------------------------------------------------------------------
       implicit none
       
       integer, intent(in) :: NY, NX
+
       DO 8855 K=0,4
       IF(K.LE.2)THEN
       XOCFLS(K,3,0,NY,NX)=0.0
@@ -1114,12 +1115,13 @@ C-------------------------------------------------------------------------------
 
 C------------------------------------------------------------------------------------------      
       
+
       subroutine HourlySoluteFluxes(I,NY,NX)
       implicit none
 
       integer, intent(in) :: I
       integer, intent(in) :: NY,NX
-      
+
       IF(PRECW(NY,NX).GT.0.0.OR.(PRECR(NY,NX).GT.0.0
      2.AND.VHCPWM(1,1,NY,NX).GT.VHCPWX(NY,NX)))THEN
       XCOBLS(1,NY,NX)=FLQGQ(NY,NX)*CCOR(NY,NX)
@@ -1440,7 +1442,7 @@ C
       end subroutine SubHourlyFluxesFromSiteFile
 
 C------------------------------------------------------------------------------------------      
-      
+
       subroutine ImportFluxFromOutsideModules(I,NY,NX)
       implicit none
 
@@ -1852,7 +1854,6 @@ C     ENDIF
 C------------------------------------------------------------------------------------------
       
       subroutine SoluteFluxSnowpack(M,NY,NX)
-
       implicit none
 
       integer, intent(in) :: M, NY, NX      
@@ -2554,15 +2555,7 @@ C
       DIFNG=DIFNG0*DIFNG1/(DIFNG0+DIFNG1)*AREA(3,NU(NY,NX),NY,NX)
       DIFN2=DIFN20*DIFN21/(DIFN20+DIFN21)*AREA(3,NU(NY,NX),NY,NX)
       DIFHG=DIFHG0*DIFHG1/(DIFHG0+DIFHG1)*AREA(3,NU(NY,NX),NY,NX)
-C      end subroutine DiffusiveFluxAtSoilSurface
-C      
-C------------------------------------------------------------------------------------------      
-C      
-C      subroutine DiffusiveFluxAdjacentCell(NY,NX)
-C      implicit none
-C
-C      integer, intent(in) :: NY, NX
-C     
+
 C     DFV*S,DFV*B=diffusive solute flux between litter and soil surface in non-band,band
 C     DIF*=aqueous diffusivity-dispersivity between litter and soil surface
 C     solute code:CO=CO2,CH=CH4,OX=O2,NG=N2,N2=N2O,HG=H2
@@ -2624,7 +2617,6 @@ C
       DFVPOB=0.0
       ENDIF
       end subroutine DiffusiveFluxAtSoilSurface
-C      end subroutine DiffusiveFluxAdjacentCell
 
 C------------------------------------------------------------------------------------------      
       
@@ -2632,6 +2624,7 @@ C-------------------------------------------------------------------------------
       implicit none
 
       integer, intent(in) :: NY, NX
+
 C     R*FLS=convective + diffusive solute flux between litter, soil surface
 C     R*FLW,R*FLB=convective + diffusive solute flux into soil in non-band,band
 C     solute code:CO=CO2,CH=CH4,OX=O2,NG=N2,N2=N2O,HG=H2
@@ -3795,15 +3788,6 @@ C    3,VFLW,DZ2GG(3,NU(NY,NX),NY,NX),PARGNG(NY,NX)
 C    4,THETPM(M,NU(NY,NX),NY,NX),VOLPM(M,NU(NY,NX),NY,NX)
 3131  FORMAT(A8,6I4,30E12.4)
 C     ENDIF
-C      end subroutine GasDiffusionConvection
-
-C------------------------------------------------------------------------------------------      
-      
-C     subroutine SurfaceWaterAirGasExchange(M,NY,NX)
-C      implicit none
-C
-C      integer, intent(in) :: M, NY, NX
-C     
 C     VOLWM=micropore water-filled porosity from watsub.f
 C     VOLW*=equivalent aqueous volume for gas
 C     gas code:*CO2*=CO2,*OXY*=O2,*CH4*=CH4,*Z2G*=N2,*Z2O*=N2O
@@ -3975,7 +3959,6 @@ C    4,OXYS2(NU(NY,NX),NY,NX)),VOLPM(M,NU(NY,NX),NY,NX)
       RNBDFG(NU(NY,NX),NY,NX)=0.0
       RHGDFG(NU(NY,NX),NY,NX)=0.0
       ENDIF
-C      end subroutine SurfaceWaterAirGasExchange
       end subroutine GasDiffusionConvection
       
 C------------------------------------------------------------------------------------------     
@@ -5977,15 +5960,6 @@ C
       RQSH2P(N,M5,M4)=0.0
       ENDIF
       ENDIF
-C      end subroutine BoundaryRunoffandSnow
-C
-C------------------------------------------------------------------------------------------      
-C      
-C      subroutine WaterExchangeFromPores(N,NN,M,N1,N2,M1,M2,M3,M4,M5,M6)
-C      implicit none
-C
-C      integer, intent(in) :: N, NN, M, N1, N2, M1, M2, M3, M4, M5, M6
-C     
 C     FLWM=water flux through soil micropore from watsub.f
 C     VOLWM=micropore water-filled porosity from watsub.f
 C     R*FLS=convective solute flux through micropores
@@ -6317,7 +6291,6 @@ C     ENDIF
       RN3FLG(N,M6,M5,M4)=0.0
       RHGFLG(N,M6,M5,M4)=0.0
       ENDIF
-C      end subroutine WaterExchangeFromPores
       end subroutine BoundaryRunoffandSnow      
 C
 C------------------------------------------------------------------------------------------      
