@@ -282,7 +282,7 @@ C
       DO 9995 NX=NHW,NHE
       DO 9990 NY=NVN,NVS
 
-      call InitFluxandStateVariables(NY,NX)
+      call InitFluxandStateVariables(I,NY,NX)
 
 9990  CONTINUE
 9995  CONTINUE
@@ -293,11 +293,11 @@ C
       DO 30 MM=1,NPG
       M=MIN(NPH,INT((MM-1)*XNPT)+1)
 
-      call ModelSoluteHydroFlux
+      call ModelSoluteHydroFlux(M, NHW, NHE, NVN, NVS)
 C
 C     BOUNDARY SOLUTE AND GAS FLUXES
 C
-      call BoundaryFlux()
+      call BoundaryFlux(NHW,NHE,NVN,NVS)
 C
 C     UPDATE STATE VARIABLES FROM TOTAL FLUXES CALCULATED ABOVE
 C
@@ -306,9 +306,13 @@ C
 30    CONTINUE
       RETURN
       END subroutine trnsfr
+
 C------------------------------------------------------------------------------------------
 
-     subroutine InitFluxandStateVariables(NY,NX)
+      subroutine InitFluxandStateVariables(I,NY,NX)
+      implicit none
+      
+      integer, intent(in) :: I, NY, NX
 C
 C     GAS AND SOLUTE SINKS AND SOURCES IN SURFACE RESIDUE FROM MICROBIAL
 C     TRANSFORMATIONS IN 'NITRO' + ROOT EXCHANGE IN 'EXTRACT'
@@ -374,8 +378,7 @@ C     FLQGQ,FLQGI=water flux to snowpack from rain,irrigation
 C     C*R,C*Q=precipitation,irrigation solute concentrations
 C     gas code: *CO*=CO2,*OX*=O2,*CH*=CH4,*NG*=N2,*N2*=N2O,*NH*=NH3,*H2*=H2
 C
-      call HourlySoluteFluxes(NY,NX)
-C
+      call HourlySoluteFluxes(I,NY,NX)
 C     GAS AND SOLUTE FLUXES AT SUB-HOURLY FLUX TIME STEP
 C     ENTERED IN SITE FILE
 C
@@ -418,16 +421,20 @@ C     TUPNO3,TUPNOB=root NO3 uptake in non-band,band from extract.f
 C     TUPH2P,TUPH2B=root H2PO4 uptake in non-band,band from extract.f
 C     TUPH1P,TUPH1B=root HPO4 uptake in non-band,band from extract.f
 C
-      call ImportFluxFromOutsideModules(NY,NX)
+      call ImportFluxFromOutsideModules(I,NY,NX)
       end subroutine InitFluxandStateVariables
 
 C------------------------------------------------------------------------------------------
 
-      subroutine ModelSoluteHydroFlux
+      subroutine ModelSoluteHydroFlux(M, NHW, NHE, NVN, NVS)
+      implicit none
+
+      integer, intent(in) :: M, NHW, NHE, NVN, NVS
       DO 9895 NX=NHW,NHE
       DO 9890 NY=NVN,NVS
 
       call ResetandInitFluxAccumulators(M,NY,NX)
+  
       IF(M.NE.MX)THEN
 C     This IF statement is the next ~1700 lines so I'm leaving it in here
 C
@@ -456,7 +463,7 @@ C
 C     DIFFUSIVE FLUXES BETWEEN CURRENT AND ADJACENT GRID CELL
 C     MICROPORES
 C
-      call DiffusiveFluxAdjacentCell(NY,NX)
+C      call DiffusiveFluxAdjacentCell(NY,NX)
 C
 C     TOTAL MICROPORE AND MACROPORE SOLUTE TRANSPORT FLUXES BETWEEN
 C     ADJACENT GRID CELLS = CONVECTIVE + DIFFUSIVE FLUXES
@@ -473,8 +480,7 @@ C     SOLUTE TRANSPORT FROM WATER OVERLAND FLOW
 C     IN 'WATSUB' AND FROM SOLUTE CONCENTRATIONS
 C     IN SOIL SURFACE LAYER
 C
-      call OverlandFlowSnowdriftTransport(M,NY,NX)
-      call SnowdriftTransport(M)
+      call OverlandFlowSnowdriftTransport(M,NY,NX,NHE,NHW,NVS,NVN)
       ENDIF
 C
 C     VOLATILIZATION-DISSOLUTION OF GASES IN RESIDUE AND SOIL SURFACE
@@ -492,11 +498,11 @@ C
 C
 C     SOIL SURFACE WATER-AIR GAS EXCHANGE
 C
-      call SurfaceWaterAirGasExchange(M,NY,NX)
+C      call SurfaceWaterAirGasExchange(M,NY,NX)
 C
 C     SOLUTE FLUXES BETWEEN ADJACENT GRID CELLS
 C
-      call SoluteFluxAdjacentCells(NY,NX)
+      call SoluteFluxAdjacentCells(NY,NX,NHE,NVS)
 
 9890  CONTINUE
 9895  CONTINUE
@@ -504,7 +510,10 @@ C
 
 C------------------------------------------------------------------------------------------
 
-      subroutine BoundaryFlux()
+      subroutine BoundaryFlux(NHW,NHE,NVN,NVS)
+      implicit none
+
+      integer, intent(in) :: NHW, NHE, NVN, NVS
 C     N3,N2,N1=L,NY,NX of source grid cell
 C     M6,M5,M4=L,NY,NX of destination grid cell
 C
@@ -627,22 +636,15 @@ C
 C
 C     SOLUTE LOSS WITH SUBSURFACE MICROPORE WATER LOSS
 C
-      call WaterExchangeFromPores(N,NN,M,N1,N2,M1,M2,M3,M4,M5,M6)
+C      call WaterExchangeFromPores(N,NN,M,N1,N2,M1,M2,M3,M4,M5,M6)
       ENDIF
 9575  CONTINUE
 C
 C     NET GAS AND SOLUTE FLUXES IN EACH GRID CELL
-C
-      IF(M.NE.MX)THEN
-      IF(L.EQ.NUM(N2,N1))THEN
-      IF(N.NE.3)THEN
-C
+CC
 C     NET OVERLAND SOLUTE FLUX IN WATER
 C
       call NetOverlandFlux(N,M,N1,N2)
-      ENDIF
-      ENDIF
-      ENDIF
 C
 C     TOTAL SOLUTE FLUX IN MICROPORES AND MACROPORES
 C
@@ -660,7 +662,7 @@ C             :N4B=NH4,N3B=NH3,NOB=NO3,N2B=NO2,P1B=HPO4,POB=H2PO4 in band
 C
       IF(NCN(N2,N1).NE.3.OR.N.EQ.3)THEN
 
-      call NetFluxMicroandMacropores(N,M,N1,N2,N3,N4,N5,N6)
+      call NetFluxMicroandMacropores(N,M,N1,N2,N3,N4,N5)
       ENDIF
 9580  CONTINUE
 9585  CONTINUE
@@ -671,6 +673,10 @@ C
 C------------------------------------------------------------------------------------------
 
       subroutine UpdateStateVar(MM,NPG,NHW,NHE,NVN,NVS)
+      implicit none
+      
+      integer, intent(in) :: MM, NPG, NHW, NHE, NVN, NVS
+    
       IF(MM.NE.NPG)THEN
       DO 9695 NX=NHW,NHE
       DO 9690 NY=NVN,NVS
@@ -1057,6 +1063,10 @@ C-------------------------------------------------------------------------------
 C------------------------------------------------------------------------------------------
       
       subroutine StateVarforGasandSolute(NY,NX)
+      implicit none
+      
+      integer, intent(in) :: NY, NX
+      
       CO2S2(0,NY,NX)=CO2S(0,NY,NX)
       CH4S2(0,NY,NX)=CH4S(0,NY,NX)
       OXYS2(0,NY,NX)=OXYS(0,NY,NX)
@@ -1081,6 +1091,9 @@ C-------------------------------------------------------------------------------
 C------------------------------------------------------------------------------------------      
       
       subroutine SurfaceSolutefromAtmo(NY,NX)
+      implicit none
+      
+      integer, intent(in) :: NY, NX
       DO 8855 K=0,4
       IF(K.LE.2)THEN
       XOCFLS(K,3,0,NY,NX)=0.0
@@ -1101,7 +1114,12 @@ C-------------------------------------------------------------------------------
 
 C------------------------------------------------------------------------------------------      
       
-      subroutine HourlySoluteFluxes(NY,NX)
+      subroutine HourlySoluteFluxes(I,NY,NX)
+      implicit none
+
+      integer, intent(in) :: I
+      integer, intent(in) :: NY,NX
+      
       IF(PRECW(NY,NX).GT.0.0.OR.(PRECR(NY,NX).GT.0.0
      2.AND.VHCPWM(1,1,NY,NX).GT.VHCPWX(NY,NX)))THEN
       XCOBLS(1,NY,NX)=FLQGQ(NY,NX)*CCOR(NY,NX)
@@ -1316,6 +1334,10 @@ C
 C------------------------------------------------------------------------------------------      
       
       subroutine SubHourlyFluxesFromSiteFile(NY,NX)
+      implicit none
+
+      integer, intent(in) :: NY, NX
+      
       DO 9845 K=0,2
       ROCFL0(K,NY,NX)=XOCFLS(K,3,0,NY,NX)*XNPH
       RONFL0(K,NY,NX)=XONFLS(K,3,0,NY,NX)*XNPH
@@ -1419,7 +1441,11 @@ C
 
 C------------------------------------------------------------------------------------------      
       
-      subroutine ImportFluxFromOutsideModules(NY,NX)
+      subroutine ImportFluxFromOutsideModules(I,NY,NX)
+      implicit none
+
+      integer, intent(in) ::  I,NY, NX
+      
       DO 10 L=NU(NY,NX),NL(NY,NX)
       CHY0(L,NY,NX)=10.0**(-(PH(L,NY,NX)-3.0))
       FLWU(L,NY,NX)=TUPWTR(L,NY,NX)*XNPH
@@ -1625,6 +1651,10 @@ C     ENDIF
 C------------------------------------------------------------------------------------------      
       
       subroutine ResetandInitFluxAccumulators(M,NY,NX)
+      implicit none
+
+      integer, intent(in) :: M, NY, NX
+      
       IF(M.NE.MX)THEN
 C
 C     GASEOUS BOUNDARY LAYER CONDUCTANCES
@@ -1822,6 +1852,10 @@ C     ENDIF
 C------------------------------------------------------------------------------------------
       
       subroutine SoluteFluxSnowpack(M,NY,NX)
+
+      implicit none
+
+      integer, intent(in) :: M, NY, NX      
 C
 C     VHCPWM,VHCPWX=current,minimum volumetric heat capacity of snowpack
 C     VOLWSL=snowpack water content
@@ -1961,6 +1995,10 @@ C
 C------------------------------------------------------------------------------------------      
       
       subroutine SoluteFluxSurface(NY,NX)
+      implicit none
+
+      integer, intent(in) :: NY, NX
+      
 C     VOLWM,VOLWHM,VOLPM,FLPM=micropore,macropore water volume, air volume and change in air volume
 C     FLWM,FLWHM=water flux into soil micropore,macropore from watsub.f
 C     VLNH4,VLNO3,VLPO4=non-band NH4,NO3,PO4 volume fraction
@@ -2340,6 +2378,10 @@ C     ENDIF
 C------------------------------------------------------------------------------------------      
       
       subroutine ConvectiveSurfaceSoluteFlux(M,NY,NX)
+      implicit none
+
+      integer, intent(in) :: M, NY, NX
+      
       FLWRM1=FLWRM(M,NY,NX)
 C
 C     FLWRM=litter-soil water flux from watsub.f
@@ -2441,7 +2483,10 @@ C
 C------------------------------------------------------------------------------------------      
       
       subroutine DiffusiveFluxAtSoilSurface(M,NY,NX)
-C
+      implicit none
+
+      integer, intent(in) :: M, NY, NX
+C     
 C     VOLT,DLYR,AREA=soil surface volume, thickness, area
 C     VOLWM=micropore water-filled porosity from watsub.f
 C
@@ -2509,12 +2554,15 @@ C
       DIFNG=DIFNG0*DIFNG1/(DIFNG0+DIFNG1)*AREA(3,NU(NY,NX),NY,NX)
       DIFN2=DIFN20*DIFN21/(DIFN20+DIFN21)*AREA(3,NU(NY,NX),NY,NX)
       DIFHG=DIFHG0*DIFHG1/(DIFHG0+DIFHG1)*AREA(3,NU(NY,NX),NY,NX)
-      end subroutine DiffusiveFluxAtSoilSurface
-
+C      end subroutine DiffusiveFluxAtSoilSurface
+C      
 C------------------------------------------------------------------------------------------      
-      
-      subroutine DiffusiveFluxAdjacentCell(NY,NX)
+C      
+C      subroutine DiffusiveFluxAdjacentCell(NY,NX)
+C      implicit none
 C
+C      integer, intent(in) :: NY, NX
+C     
 C     DFV*S,DFV*B=diffusive solute flux between litter and soil surface in non-band,band
 C     DIF*=aqueous diffusivity-dispersivity between litter and soil surface
 C     solute code:CO=CO2,CH=CH4,OX=O2,NG=N2,N2=N2O,HG=H2
@@ -2575,11 +2623,15 @@ C
       DFVP1B=0.0
       DFVPOB=0.0
       ENDIF
-      end subroutine DiffusiveFluxAdjacentCell
+      end subroutine DiffusiveFluxAtSoilSurface
+C      end subroutine DiffusiveFluxAdjacentCell
 
 C------------------------------------------------------------------------------------------      
       
       subroutine TotalPoreFluxAdjacentCell(NY,NX)
+      implicit none
+
+      integer, intent(in) :: NY, NX
 C     R*FLS=convective + diffusive solute flux between litter, soil surface
 C     R*FLW,R*FLB=convective + diffusive solute flux into soil in non-band,band
 C     solute code:CO=CO2,CH=CH4,OX=O2,NG=N2,N2=N2O,HG=H2
@@ -2725,7 +2777,10 @@ C
 C------------------------------------------------------------------------------------------      
       
       subroutine MacroMicroTransfer(M,NY,NX)
-C
+      implicit none
+
+      integer, intent(in) :: M, NY, NX
+C     
 C     FINHM=macro-micropore water transfer from watsub.f
 C     VOLWM,VOLWHM=micropore,macropore water volume
 C     RFL*=convective macropore-micropore solute transfer
@@ -3085,7 +3140,10 @@ C
 
 C------------------------------------------------------------------------------------------      
       
-      subroutine OverlandFlowSnowdriftTransport(M,NY,NX)
+      subroutine OverlandFlowSnowdriftTransport(M,NY,NX,NHE,NHW,NVS,NVN)
+      implicit none
+
+      integer, intent(in) :: M, NY, NX, NHE, NHW, NVS, NVN
 C     QRM=runoff from watsub.f
 C     RQR*=solute in runoff
 C     solute code:CO=CO2,CH=CH4,OX=O2,NG=N2,N2=N2O,HG=H2
@@ -3448,7 +3506,10 @@ C     ENDIF
 C------------------------------------------------------------------------------------------
       
       subroutine SurfaceGasVolatilDissol(NY,NX)
-C
+      implicit none
+
+      integer, intent(in) :: NY, NX
+C     
 C     VOLT=litter volume from hour1.f
 C     VOLWM,VOLPM=micropore water volume, air volume from watsub.f
 C     VOLW*=equivalent aqueous volume for gas
@@ -3561,7 +3622,10 @@ C
 C------------------------------------------------------------------------------------------      
       
       subroutine GasDiffusionConvection(M,NY,NX)
-C
+      implicit none
+
+      integer, intent(in) :: M, NY, NX
+C     
 C     THETPM=air-filled porosity from watsub.f
 C     BKDS=bulk density
 C
@@ -3731,12 +3795,15 @@ C    3,VFLW,DZ2GG(3,NU(NY,NX),NY,NX),PARGNG(NY,NX)
 C    4,THETPM(M,NU(NY,NX),NY,NX),VOLPM(M,NU(NY,NX),NY,NX)
 3131  FORMAT(A8,6I4,30E12.4)
 C     ENDIF
-      end subroutine GasDiffusionConvection
+C      end subroutine GasDiffusionConvection
 
 C------------------------------------------------------------------------------------------      
       
-      subroutine SurfaceWaterAirGasExchange(M,NY,NX)
+C     subroutine SurfaceWaterAirGasExchange(M,NY,NX)
+C      implicit none
 C
+C      integer, intent(in) :: M, NY, NX
+C     
 C     VOLWM=micropore water-filled porosity from watsub.f
 C     VOLW*=equivalent aqueous volume for gas
 C     gas code:*CO2*=CO2,*OXY*=O2,*CH4*=CH4,*Z2G*=N2,*Z2O*=N2O
@@ -3908,11 +3975,15 @@ C    4,OXYS2(NU(NY,NX),NY,NX)),VOLPM(M,NU(NY,NX),NY,NX)
       RNBDFG(NU(NY,NX),NY,NX)=0.0
       RHGDFG(NU(NY,NX),NY,NX)=0.0
       ENDIF
-      end subroutine SurfaceWaterAirGasExchange
-
+C      end subroutine SurfaceWaterAirGasExchange
+      end subroutine GasDiffusionConvection
+      
 C------------------------------------------------------------------------------------------     
       
-      subroutine SoluteFluxAdjacentCells(NY,NX)
+      subroutine SoluteFluxAdjacentCells(NY,NX,NHE,NVS)
+      implicit none
+
+      integer, intent(in) :: NY, NX, NHE, NVS
 C     N3,N2,N1=L,NY,NX of source grid cell
 C     N6,N5,N4=L,NY,NX of destination grid cell
 C
@@ -5752,7 +5823,10 @@ C     ENDIF
 C------------------------------------------------------------------------------------------      
       
       subroutine BoundaryRunoffandSnow(N,NN,M,N1,N2,M1,M2,M4,M5)
-C
+      implicit none
+
+      integer, intent(in) :: N, NN, M, N1, N2, M1, M2, M4, M5
+C     
 C     QRM =runoff from watsub.f
 C     RQR*=solute in runoff
 C     solute code:CO=CO2,CH=CH4,OX=O2,NG=N2,N2=N2O,HG=H2
@@ -5760,6 +5834,7 @@ C             :OC=DOC,ON=DON,OP=DOP,OA=acetate
 C             :NH4=NH4,NH3=NH3,NO3=NO3,NO2=NO2,P14=HPO4,PO4=H2PO4 in non-band
 C             :N4B=NH4,N3B=NH3,NOB=NO3,N2B=NO2,P1B=HPO4,POB=H2PO4 in band
 c
+      IF(M.NE.MX)THEN
       IF(L.EQ.NUM(M2,M1).AND.N.NE.3)THEN
       IF(IRCHG(NN,N,N2,N1).EQ.0.OR.RCHQF.EQ.0.0
      2.OR.QRM(M,N2,N1).LE.ZEROS(N2,N1))THEN
@@ -5902,12 +5977,15 @@ C
       RQSH2P(N,M5,M4)=0.0
       ENDIF
       ENDIF
-      end subroutine BoundaryRunoffandSnow
-
-C------------------------------------------------------------------------------------------      
-      
-      subroutine WaterExchangeFromPores(N,NN,M,N1,N2,M1,M2,M3,M4,M5,M6)
+C      end subroutine BoundaryRunoffandSnow
 C
+C------------------------------------------------------------------------------------------      
+C      
+C      subroutine WaterExchangeFromPores(N,NN,M,N1,N2,M1,M2,M3,M4,M5,M6)
+C      implicit none
+C
+C      integer, intent(in) :: N, NN, M, N1, N2, M1, M2, M3, M4, M5, M6
+C     
 C     FLWM=water flux through soil micropore from watsub.f
 C     VOLWM=micropore water-filled porosity from watsub.f
 C     R*FLS=convective solute flux through micropores
@@ -6238,11 +6316,16 @@ C     ENDIF
       RN2FLG(N,M6,M5,M4)=0.0
       RN3FLG(N,M6,M5,M4)=0.0
       RHGFLG(N,M6,M5,M4)=0.0
-      end subroutine WaterExchangeFromPores
-
+      ENDIF
+C      end subroutine WaterExchangeFromPores
+      end subroutine BoundaryRunoffandSnow      
+C
 C------------------------------------------------------------------------------------------      
-      
+C      
       subroutine NetOverlandFlux(N,M,N1,N2)
+      implicit none
+
+      integer, intent(in) :: N, M, N1, N2      
 C
 C     TQR*=net overland solute flux
 C     RQR*=overland solute flux
@@ -6251,6 +6334,10 @@ C             :OC=DOC,ON=DON,OP=DOP,OA=acetate
 C             :NH4=NH4,NH3=NH3,NO3=NO3,NO2=NO2,P14=HPO4,PO4=H2PO4 in non-band
 C             :N4B=NH4,N3B=NH3,NOB=NO3,N2B=NO2,P1B=HPO4,POB=H2PO4 in band
 C
+      IF(M.NE.MX)THEN
+      IF(L.EQ.NUM(N2,N1))THEN
+      IF(N.NE.3)THEN
+
       DO 1202 NN=1,2
       DO 9550 K=0,4
       TQROC(K,N2,N1)=TQROC(K,N2,N1)+RQROC(K,N,NN,N2,N1)
@@ -6404,12 +6491,18 @@ C    3-RH2PHS(3,NUM(N2,N1),N2,N1)-RH2BHB(3,NUM(N2,N1),N2,N1)
       ENDIF
       ENDIF
 1205  CONTINUE
+      ENDIF
+      ENDIF
+      ENDIF
       end subroutine NetOverlandFlux
 
 C------------------------------------------------------------------------------------------
       
-      subroutine NetFluxMicroandMacropores(N,M,N1,N2,N3,N4,N5,N6)
+      subroutine NetFluxMicroandMacropores(N,M,N1,N2,N3,N4,N5)
+      implicit none
 
+      integer, intent(in) :: N, M, N1, N2, N3, N4, N5
+      
       DO 1200 LL=N6,NL(NY,NX)
       IF(VOLX(LL,N2,N1).GT.ZEROS2(N2,N1))THEN
       N6=LL
