@@ -671,7 +671,6 @@ C
 C------------------------------------------------------------------------------------------
 
       subroutine UpdateStateVar(MM,NPG,NHW,NHE,NVN,NVS)
-
       implicit none
       
       integer, intent(in) :: MM, NPG, NHW, NHE, NVN, NVS
@@ -1062,7 +1061,6 @@ C-------------------------------------------------------------------------------
 C------------------------------------------------------------------------------------------
       
       subroutine StateVarforGasandSolute(NY,NX)
-
       implicit none
       
       integer, intent(in) :: NY, NX
@@ -1115,7 +1113,6 @@ C-------------------------------------------------------------------------------
 
 C------------------------------------------------------------------------------------------      
       
-
       subroutine HourlySoluteFluxes(I,NY,NX)
       implicit none
 
@@ -2555,7 +2552,6 @@ C
       DIFNG=DIFNG0*DIFNG1/(DIFNG0+DIFNG1)*AREA(3,NU(NY,NX),NY,NX)
       DIFN2=DIFN20*DIFN21/(DIFN20+DIFN21)*AREA(3,NU(NY,NX),NY,NX)
       DIFHG=DIFHG0*DIFHG1/(DIFHG0+DIFHG1)*AREA(3,NU(NY,NX),NY,NX)
-
 C     DFV*S,DFV*B=diffusive solute flux between litter and soil surface in non-band,band
 C     DIF*=aqueous diffusivity-dispersivity between litter and soil surface
 C     solute code:CO=CO2,CH=CH4,OX=O2,NG=N2,N2=N2O,HG=H2
