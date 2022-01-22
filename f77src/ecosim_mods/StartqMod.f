@@ -46,7 +46,8 @@ C     THIS SUBROUTINE INITIALIZES ALL PLANT VARIABLES
 C
       implicit none
       integer, intent(in) :: NHWQ,NHEQ,NVNQ,NVSQ,NZ1Q,NZ2Q
-C     execution begins here
+
+C     begin_execution
 C
 C     INITIALIZE SHOOT GROWTH VARIABLES
 C

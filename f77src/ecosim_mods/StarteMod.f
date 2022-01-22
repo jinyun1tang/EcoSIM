@@ -123,7 +123,7 @@ C     THIS SUBROUTINE INITIALIZES ALL SOIL CHEMISTRY VARIABLES
 C
       implicit none
       integer, intent(in) :: NHW,NHE,NVN,NVS
-C     execution begins here
+C     begin_execution
 
 C
 C     INITIALIZE CATION AND ANION CONCENTRATIONS

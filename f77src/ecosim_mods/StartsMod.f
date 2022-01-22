@@ -28,8 +28,6 @@
       real(r8) :: TOSNI,TOSPI,TOMC,VOLSWI,VORGC,VMINL,VSAND,X,YAGL
       real(r8) :: ZAGL
 
-      integer :: K,KK,L,M,N,NX,NY,N1,N2,N3,N4,N5,N6,NN
-
       real(r8) :: YSIN(4),YCOS(4),YAZI(4),ZAZI(4),OSCI(0:4),OSNI(0:4)
      2,ORCI(2,0:4),OSPI(0:4),OSCM(0:4),CORGCX(0:4)
      3,CORGNX(0:4),CORGPX(0:4),CNOSCT(0:4),CPOSCT(0:4)
@@ -38,7 +36,7 @@
      6,OHCK(0:4),TOSCK(0:4),TOSNK(0:4),TOSPK(0:4),TORGL(JZ)
 C
 C     DCKR,DCKM=parameters to initialize microbial biomass from SOC
-C     OMCI,ORCI=allocation of biomass,residue to kinetic components
+C     OMCI(3,0:4),ORCI(2,0:4)=allocation of biomass,residue to kinetic components
 C     OMCK,ORCK,OQCK,OHCK=fractions of SOC in biomass,litter,DOC,adsorbed C
 C     OMCF,OMCA=hetero,autotrophic microbial biomass composition in SOC
 C     CNRH,CPRH=default N:C,P:C ratios in SOC complexes
@@ -80,21 +78,24 @@ C     THIS SUBROUTINE INITIALIZES ALL SOIL VARIABLES
 C
       implicit none
       integer, intent(in) :: NHW,NHE,NVN,NVS
-C     execution begins here
+
+      integer :: NY,NX,L
+
+C     begin_execution
 
 C     Initialize controling parameters
-      call init_control_paras
+      call InitControlParameters
 C
 C     IRRADIANCE INTERCEPTION GEOMETRY
-      call init_irrad_geometry
+      call InitIrradianceGeometry
 C
 C     INITIALIZE C-N AND C-P RATIOS OF RESIDUE AND SOIL
 C
-      call init_CNP_ratios
+      call InitCNPRatios
 C
 C     CALCULATE ELEVATION OF EACH GRID CELL
 C
-      call init_grid_elevation(NHW,NHE,NVN,NVS)
+      call InitGridElevation(NHW,NHE,NVN,NVS)
 C
 C     INITIALIZE ACCUMULATORS AND MASS BALANCE CHECKS
 C     OF EACH GRID CELL
@@ -104,7 +105,7 @@ C
       DO 9995 NX=NHW,NHE
       DO 9990 NY=NVN,NVS
 
-      call init_accumulators(NY,NX)
+      call InitAccumulators(NY,NX)
 C
 C     MINIMUM SURFACE ELEVATION IN LANDSCAPE
 C
@@ -159,10 +160,10 @@ C
 C     DISTRIBUTION OF OM AMONG FRACTIONS OF DIFFERING
 C     BIOLOGICAL ACTIVITY
 C
-      call init_layer_depths(NY,NX)
+      call InitLayerDepths(NY,NX)
 C
 C     INITIALIZE SNOWPACK LAYERS
-      call init_snow_layers
+      call InitSnowLayers(NY,NX)
 C
 C     SURFACE WATER STORAGE AND LOWER HEAT SINK
 C
@@ -204,12 +205,12 @@ C
 C
 C     INITIALIZE GRID CELL DIMENSIONS
 C
-      call init_soil_vars(NHW,NHE,NVN,NVS)
+      call InitSoilVars(NHW,NHE,NVN,NVS)
 
       RETURN
       END subroutine starts
 C------------------------------------------------------------------------------------------
-      subroutine init_soil_vars(NHW,NHE,NVN,NVS)
+      subroutine InitSoilVars(NHW,NHE,NVN,NVS)
 C     N3,N2,N1=L,NY,NX of source grid cell
 C     N6,N5,N4=L,NY,NX of destination grid cell
 C     ALTZG=minimum surface elevation in landscape
@@ -225,6 +226,10 @@ C
       implicit none
       integer, intent(in) :: NHW,NHE,NVN,NVS
 
+      integer :: NY,NX,L,N
+      integer :: N1,N2,N3,N4,N5,N6
+
+C     begin_execution
       DO 9895 NX=NHW,NHE
       DO 9890 NY=NVN,NVS
       ALTZ(NY,NX)=ALTZG
@@ -318,7 +323,7 @@ C
 C
 C     ALLOCATE LITTER,SOC TO WOODY,NON-WOODY,MANURE,POC AND HUMUS
 C
-      call init_litter_prof(NY,NX)
+      call InitLitterProfile(NY,NX)
 C
 C     SURFACE LITTER HEAT CAPACITY
 C
@@ -330,17 +335,21 @@ C
       VOLAI(0,NY,NX)=0.0
 9890  CONTINUE
 9895  CONTINUE
-      end subroutine init_soil_vars
+      end subroutine InitSoilVars
 C------------------------------------------------------------------------------------------
-      subroutine init_irrad_geometry
+      subroutine InitIrradianceGeometry
 
       implicit none
+      integer :: L,M,N
+
+C     begin_execution
 C     ZSIN,ZCOS=sine,cosine of leaf inclination class
 C     ZAZI=leaf azimuth class
 C     YAZI,YSIN,YCOS=sky azimuth,sine,cosine of sky azimuth
 C     OMEGA,OMEGX=incident angle of diffuse radn at leaf,horizontal surface
 C     IALBY:1=backscattering,2=forward scattering of sky radiation
 C
+
       ZSIN(1)=0.195
       ZSIN(2)=0.556
       ZSIN(3)=0.831
@@ -381,11 +390,15 @@ C
       ENDIF
 225   CONTINUE
 230   CONTINUE
-      end subroutine init_irrad_geometry
+      end subroutine InitIrradianceGeometry
 C------------------------------------------------------------------------------------------
-      subroutine init_litter_prof(NY,NX)
+      subroutine InitLitterProfile(NY,NX)
       implicit none
       integer, intent(in) :: NY,NX
+
+      integer :: L,M,K,N,KK,NN
+
+C     begin_execution
 C     CORGCX,CORGNX,CORGPX=C,N,P concentations from woody(0),
 C     non-woody(1), manure(2), litter, POC(3) and humus(4) (g Mg-1)
 C     RSC,RSC,RSP=C,N,P in fine(1),woody(0),manure(2) litter (g m-2)
@@ -451,15 +464,15 @@ C
       ENDIF
 C
 C     SURFACE RESIDUE KINETIC COMPONENTS
-      call init_surfr_kincomp(L,NY,NX)
+      call InitSurfResiduKinetiComponent(L,NY,NX)
 
 C
 C     ANIMAL MANURE
-      call init_manure_kincomp(L,NY,NX)
+      call InitManureKinetiComponent(L,NY,NX)
 
 C
 C     POM
-      call init_pom_kincomp(L,NY,NX)
+      call InitPOMKinetiComponent(L,NY,NX)
 
 C
 C     LAYER WATER, ICE, AIR CONTENTS
@@ -937,11 +950,13 @@ C
       ZNFNI(L,NY,NX)=0.0
       ZNFN0(L,NY,NX)=0.0
 1200  CONTINUE
-      end subroutine init_litter_prof
+      end subroutine InitLitterProfile
 C------------------------------------------------------------------------------------------
-      subroutine init_surfr_kincomp(L,NY,NX)
+      subroutine InitSurfResiduKinetiComponent(L,NY,NX)
       implicit none
       integer, intent(in) :: L, NY,NX
+
+C     begin_execution
       IF(L.EQ.0)THEN
 C
 C     CFOSC=fraction of litter in protein(1),nonstructural(2)
@@ -1063,12 +1078,13 @@ C
       CFOSC(3,1,L,NY,NX)=0.34
       CFOSC(4,1,L,NY,NX)=0.58
       ENDIF
-      end subroutine init_surfr_kincomp
+      end subroutine InitSurfResiduKinetiComponent
 C------------------------------------------------------------------------------------------
-      subroutine init_manure_kincomp(L,NY,NX)
+      subroutine InitManureKinetiComponent(L,NY,NX)
 
       implicit none
       integer, intent(in) :: L, NY, NX
+C     begin_execution
 C
 C     RUMINANT
 C
@@ -1094,11 +1110,13 @@ C
       CFOSC(3,2,L,NY,NX)=0.316
       CFOSC(4,2,L,NY,NX)=0.145
       ENDIF
-      end subroutine init_manure_kincomp
+      end subroutine InitManureKinetiComponent
 C------------------------------------------------------------------------------------------
-      subroutine init_pom_kincomp(L,NY,NX)
+      subroutine InitPOMKinetiComponent(L,NY,NX)
       implicit none
       integer, intent(in) :: L, NY, NX
+
+C     begin_execution
 C
 C     CFOSC=single kinetic fraction in POM
 C
@@ -1185,9 +1203,15 @@ C    3,CDPTH(NU(NY,NX),NY,NX),CDPTHG,CORGC(L,NY,NX),FORGC
 C    4,EXP(HCX*TORGL(L))
 5432  FORMAT(A8,I4,20E12.4)
       ENDIF
-      end subroutine init_pom_kincomp
+      end subroutine InitPOMKinetiComponent
 C------------------------------------------------------------------------------------------
-      subroutine init_snow_layers
+      subroutine InitSnowLayers(NY,NX)
+
+      implicit none
+      integer, intent(in) :: NY,NX
+      integer :: L
+
+C     begin_execution
 C
 C     CDPTHS=depth to bottom
 C     DENS0=snow density (Mg m-3)
@@ -1239,9 +1263,13 @@ C
       VHCPW(L,NY,NX)=2.095*VOLSSL(L,NY,NX)+4.19*VOLWSL(L,NY,NX)
      2+1.9274*VOLISL(L,NY,NX)
 9580  CONTINUE
-      end subroutine init_snow_layers
+      end subroutine InitSnowLayers
 C------------------------------------------------------------------------------------------
-      subroutine init_CNP_ratios
+      subroutine InitCNPRatios
+
+      integer :: K,N
+
+C     begin_execution
 C     CNOFC,CPOFC=fractions to allocate N,P to kinetic components
 C     CNOMC,CPOMC=maximum N:C and P:C ratios in microbial biomass
 C
@@ -1287,11 +1315,15 @@ C
       CNOMC(3,N,K)=FL(1)*CNOMC(1,N,K)+FL(2)*CNOMC(2,N,K)
       CPOMC(3,N,K)=FL(1)*CPOMC(1,N,K)+FL(2)*CPOMC(2,N,K)
 95    CONTINUE
-      end subroutine init_CNP_ratios
+      end subroutine InitCNPRatios
 C------------------------------------------------------------------------------------------
-      subroutine init_grid_elevation(NHW,NHE,NVN,NVS)
+      subroutine InitGridElevation(NHW,NHE,NVN,NVS)
       implicit none
       integer, intent(in) :: NHW,NHE,NVN,NVS
+
+      integer :: NY,NX,N,NN
+
+C     begin_execution
 C     GAZI=ground surface azimuth
 C     GSIN,GCOS=sine,cosine of ground surface
 C     OMEGAG=incident sky angle at ground surface
@@ -1393,9 +1425,11 @@ C
 1111  FORMAT(A8,6I4,20E12.4)
 9980  CONTINUE
 9985  CONTINUE
-      end subroutine init_grid_elevation
+      end subroutine InitGridElevation
 C------------------------------------------------------------------------------------------
-      subroutine init_control_paras
+      subroutine InitControlParameters
+
+C     begin_execution
 C
 C     NPH=no. of cycles h-1 for water, heat and solute flux calculns
 C     NPT=number of cycles NPH-1 for gas flux calculations
@@ -1467,12 +1501,14 @@ C
       VAPS=2834.0
       OXKM=0.080
       TYSIN=0.0
-      end subroutine init_control_paras
+      end subroutine InitControlParameters
 C------------------------------------------------------------------------------------------
-      subroutine init_accumulators(NY,NX)
+      subroutine InitAccumulators(NY,NX)
       implicit none
       integer, intent(in) :: NY, NX
+      integer :: N
 
+C     begin_execution
       DO 600 N=1,12
       TDTPX(NY,NX,N)=0.0
       TDTPN(NY,NX,N)=0.0
@@ -1563,13 +1599,15 @@ C-------------------------------------------------------------------------------
       XHVSTN(NY,NX)=0.0
       XHVSTP(NY,NX)=0.0
       ENGYP(NY,NX)=0.0
-      end subroutine init_accumulators
+      end subroutine InitAccumulators
 C------------------------------------------------------------------------------------------
-      subroutine init_layer_depths(NY,NX)
+      subroutine InitLayerDepths(NY,NX)
 
       implicit none
       integer, intent(in) :: NY, NX
+      integer :: L
 
+C     begin_execution
       DO 1195 L=0,NL(NY,NX)
 C
 C     LAYER DEPTHS AND THEIR PHYSICAL PROPERTIES
@@ -1635,5 +1673,5 @@ C      endif
 1195  CONTINUE
       CDPTH(0,NY,NX)=CDPTH(NU(NY,NX),NY,NX)-DLYR(3,NU(NY,NX),NY,NX)
       CDPTHI(NY,NX)=CDPTH(0,NY,NX)
-      end subroutine init_layer_depths
+      end subroutine InitLayerDepths
       end module StartsMod

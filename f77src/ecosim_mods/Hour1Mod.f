@@ -134,8 +134,7 @@ C
 C     adding reals missed by the analyzer by hand
       real(r8) :: STOPS, STOPX, STOPY, STOPZ, STOPSZ, STOPYZ
 
-      integer :: IFLGL,IFLGY,ICHKA,K,L,LL,LFDPTH,M,NX
-      integer :: NY,N,NN,NO,NZ,NB,NR
+      integer :: IFLGL,IFLGY,ICHKA,LFDPTH
 
       public :: hour1
       contains
@@ -149,7 +148,9 @@ C
 
       integer, intent(in) :: I, J
       integer, intent(in) :: NHW,NHE,NVN,NVS
+      integer :: L,NX,NY
 
+      integer :: NZ,NR
 C     execution begins here
 
       XJ=J
@@ -177,6 +178,211 @@ C
       TBALC=0.0
       TBALN=0.0
       TBALP=0.0
+      call SetAtmosTracerConcentration(I,NHW,NHE,NVN,NVS)
+C
+C     RESET FLUX ARRAYS USED IN OTHER SUBROUTINES
+C
+      call ResetFluxArrays(I,NHW,NHE,NVN,NVS)
+C
+C     IF SALT FLAG SET
+C
+      call ResetSaltModelArrays(NHW,NHE,NVN,NVS)
+C
+C     RESET SOIL PROPERTIES AND PEDOTRANSFER FUNCTIONS
+C     FOLLOWING ANY SOIL DISTURBANCE
+C
+      DO 9995 NX=NHW,NHE
+      DO 9990 NY=NVN,NVS
+      IF(J.EQ.1)THEN
+      IFLGT(NY,NX)=0
+      DO 9905 NZ=1,NP(NY,NX)
+      PSILZ(NZ,NY,NX)=0.0
+9905  CONTINUE
+      ENDIF
+C
+C     HYDROLOGICAL PRPOERTIES OR SURFACE LITTER
+C
+C     VOLWRX=liter water holding capacity
+C     VOLR=dry litter volume
+C     POROS0,FC,WP=litter porosity,field capacity,wilting point
+C
+      VOLWRX(NY,NX)=AMAX1(0.0,THETRX(0)*RC0(0,NY,NX)
+     2+THETRX(1)*RC0(1,NY,NX)+THETRX(2)*RC0(2,NY,NX))
+      VOLR(NY,NX)=AMAX1(0.0,RC0(0,NY,NX)*1.0E-06/BKRS(0)
+     2+RC0(1,NY,NX)*1.0E-06/BKRS(1)+RC0(2,NY,NX)*1.0E-06/BKRS(2))
+      IF(VOLR(NY,NX).GT.ZEROS(NY,NX))THEN
+      FVOLR=VOLWRX(NY,NX)/VOLR(NY,NX)
+      ELSE
+      FVOLR=THETRX(1)/BKRS(1)
+      ENDIF
+      POROS0(NY,NX)=FVOLR
+      FC(0,NY,NX)=0.500*FVOLR
+      WP(0,NY,NX)=0.125*FVOLR
+      PSL(0,NY,NX)=LOG(POROS0(NY,NX))
+      FCL(0,NY,NX)=LOG(FC(0,NY,NX))
+      WPL(0,NY,NX)=LOG(WP(0,NY,NX))
+      PSD(0,NY,NX)=PSL(0,NY,NX)-FCL(0,NY,NX)
+      FCD(0,NY,NX)=FCL(0,NY,NX)-WPL(0,NY,NX)
+      SRP(0,NY,NX)=1.00
+C
+C     RESET SURFACE LITTER PHYSICAL PROPERTIES (DENSITY, TEXTURE)
+C     AFTER DISTURBANCES (E.G. TILLAGE, EROSION)
+C
+      call SetLiterSoilPropAftDisturbance(I,J,NY,NX)
+C
+C     END OF RESET AFTER DISTURBANCE
+C
+C     PARAMETERS FOR COHESION, EROSIVITY, AND ROUGHNESS OF SURFACE SOIL USED
+C     FOR SURFACE WATER AND SEDIMENT TRANSPORT IN 'EROSION'
+
+      call SetSurfaceProperty4SedErosion(NY,NX)
+C
+C     RESET HOURLY ACCUMULATORS
+      call SetHourlyAccumulators(NY,NX)
+C
+C     RESET ARRAYS TO TRANSFER MATERIALS WITHIN SOILS
+C     AND BETWEEN SOILS AND PLANTS
+C
+      DO 9875 L=0,NL(NY,NX)
+
+      call SetArrays4PlantSoilTransfer(L,NY,NX)
+C
+C     IF SOC FLAG IS SET
+C
+      IF(IERSNG.EQ.2.OR.IERSNG.EQ.3)THEN
+      call UpdateTotalSOC(L,NY,NX)
+      ENDIF
+
+9875  CONTINUE
+      IFLGL=0
+      IFLGY=0
+      ICHKA=0
+      DO 9985 L=NUI(NY,NX),NLI(NY,NX)
+
+      call ZeroHourlyArrays(L,NY,NX)
+C
+      call GetChemicalConcsInSoil(L,NY,NX)
+
+C     WRITE(*,1113)'CORGC',I,J,NX,NY,L,CORGC(L,NY,NX)
+C    2,ORGC(L,NY,NX),BKVL(L,NY,NX),BKDS(L,NY,NX),VOLX(L,NY,NX)
+C
+      call GetSoluteConcentrations(L,NY,NX)
+
+      call PrepVars4PlantMicrobeUptake(L,NY,NX)
+C
+      call GetSoilHydraulicVars(L,NY,NX)
+
+C
+C     CALCULATE ACTIVE LAYER DEPTH
+
+      call DiagActiveLayerDepth(L,NY,NX)
+C
+C     OUTPUT FOR WATER TABLE DEPTH
+C
+      call GetOutput4WaterTableDepth(L,NY,NX)
+9985  CONTINUE
+C
+
+      call GetSurfResidualProperties(NY,NX)
+
+      call SetTracerPropertyInLiterAir(NY,NX)
+C
+      call MultiLayerSurfaceRadiation(I,J,NY,NX)
+
+C     IF(NX.EQ.4.AND.NY.EQ.5)THEN
+C     DO 140 NZ=1,NP(NY,NX)
+C     WRITE(*,1926)'CANOPY',IYRC,I,J,NX,NY,NZ,FRADP(NZ,NY,NX)
+C    2,RADP(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX),RAP(NY,NX)
+C    2,FRADG(NY,NX),ARLFS(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+C    3,ARLFP(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+C    4,ARSTP(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+C    4,ARLSS(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+C    5,SSIN(NY,NX),DPTHS(NY,NX),FRADPT
+1926  FORMAT(A10,6I6,30E12.4)
+140   CONTINUE
+C     ENDIF
+
+      call DivideCanopyLayerByLAI(NY,NX)
+
+      call CalcBoundaryLayerProperties(NY,NX)
+C
+C     RESET HOURLY INDICATORS
+C
+      THRMCX(NY,NX)=THRMC(NY,NX)
+      THRMGX(NY,NX)=THRMG(NY,NX)
+      CNETX(NY,NX)=TCNET(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+      THRMC(NY,NX)=0.0
+      THRMG(NY,NX)=0.0
+      TLEX(NY,NX)=TLEC(NY,NX)
+      TSHX(NY,NX)=TSHC(NY,NX)
+      TLEC(NY,NX)=0.0
+      TSHC(NY,NX)=0.0
+      TRN(NY,NX)=0.0
+      TLE(NY,NX)=0.0
+      TSH(NY,NX)=0.0
+      TGH(NY,NX)=0.0
+      TCCAN(NY,NX)=0.0
+      TCNET(NY,NX)=0.0
+      RECO(NY,NX)=0.0
+C
+C     CANOPY RETENTION OF PRECIPITATION
+C
+C     XVOLWC=foliar surface water retention capacity
+C     ARLFP,ARSTP=leaf,stalk area of PFT
+C     FLWC,TFLWC=water retention of PFT,combined canopy
+C     PRECA=precipitation+irrigation
+C     FRADP=fraction of radiation received by each PFT canopy
+C     VOLWC=canopy surface water retention
+C
+      DO 1930 NZ=1,NP(NY,NX)
+      VOLWCX=XVOLWC(IGTYP(NZ,NY,NX))
+     2*(ARLFP(NZ,NY,NX)+ARSTP(NZ,NY,NX))
+      FLWC(NZ,NY,NX)=AMAX1(0.0,AMIN1(PRECA(NY,NX)*FRADP(NZ,NY,NX)
+     2,VOLWCX-VOLWC(NZ,NY,NX)))
+      TFLWCI(NY,NX)=TFLWCI(NY,NX)+PRECA(NY,NX)*FRADP(NZ,NY,NX)
+      TFLWC(NY,NX)=TFLWC(NY,NX)+FLWC(NZ,NY,NX)
+C
+C     NUMBERS OF TOP AND BOTTOM ROOTED SOIL LAYERS
+C
+C     NG=number of uppermost rooted layer
+C     NINR=number of lowest rooted layer
+C
+      NG(NZ,NY,NX)=MAX(NG(NZ,NY,NX),NU(NY,NX))
+      NIX(NZ,NY,NX)=MAX(NIX(NZ,NY,NX),NU(NY,NX))
+      DO 9790 NR=1,10
+      NINR(NR,NZ,NY,NX)=MAX(NINR(NR,NZ,NY,NX),NU(NY,NX))
+9790  CONTINUE
+1930  CONTINUE
+C
+C     WRITE SW AND PAR ALBEDO
+C
+C     IF(ABS(J-ZNOON(NY,NX)).LT.1)THEN
+C     IF(RAD(NY,NX).GT.0.0.AND.RAP(NY,NX).GT.0.0)THEN
+C     WRITE(19,1927)'ALBEDO',IYRC,I,J,NX,NY
+C    2,RAD(NY,NX),RAP(NY,NX),TRADC(NY,NX),TRAPC(NY,NX)
+C    3,TRADG(NY,NX),TRAPG(NY,NX)
+C    4,(RAD(NY,NX)-TRADC(NY,NX)-TRADG(NY,NX))/RAD(NY,NX)
+C    5,(RAP(NY,NX)-TRAPC(NY,NX)-TRAPG(NY,NX))/RAP(NY,NX)
+1927  FORMAT(A10,5I6,30E12.4)
+C     ENDIF
+C     ENDIF
+9990  CONTINUE
+9995  CONTINUE
+C
+C     FERTILIZER APPLICATIONS OCCUR AT SOLAR NOON
+      call ApplyFertilizerAtNoon(I,J,NHW,NHE,NVN,NVS)
+      RETURN
+
+      END subroutine hour1
+C------------------------------------------------------------------------------------------
+
+      subroutine SetAtmosTracerConcentration(I,NHW,NHE,NVN,NVS)
+      implicit none
+      integer, intent(in) :: I,NHW,NHE,NVN,NVS
+
+      integer :: NX, NY
+
+C     begin_execution
 C
 C     CONCENTRATIONS OF CO2, CH4, O2, N2, N2O, NH3, H2 IN ATMOSPHERE,
 C     PRECIPITATION AND IRRIGATION FROM MIXING RATIOS READ IN 'READS'
@@ -216,9 +422,17 @@ C
      2*EXP(0.897-0.0299*TCA(NY,NX))
 9140  CONTINUE
 9145  CONTINUE
-C
-C     RESET FLUX ARRAYS USED IN OTHER SUBROUTINES
-C
+      end subroutine SetAtmosTracerConcentration
+
+C------------------------------------------------------------------------------------------
+
+      subroutine ResetFluxArrays(I,NHW,NHE,NVN,NVS)
+      implicit none
+      integer, intent(in) :: I,NHW,NHE,NVN,NVS
+
+      integer :: L,N,NX,NY,K,NN,NO,M
+
+C     begin_execution
       DO 9895 NX=NHW,NHE+1
       DO 9890 NY=NVN,NVS+1
       DO 9885 L=0,NL(NY,NX)+1
@@ -416,9 +630,18 @@ C
 9885  CONTINUE
 9890  CONTINUE
 9895  CONTINUE
-C
-C     IF SALT FLAG SET
-C
+      end subroutine ResetFluxArrays
+
+C------------------------------------------------------------------------------------------
+
+      subroutine ResetSaltModelArrays(NHW,NHE,NVN,NVS)
+      implicit none
+      integer, intent(in) :: NHW,NHE,NVN,NVS
+
+      integer :: N,NX,NY,L,NN
+
+C     begin_execution
+
       DO 8895 NX=NHW,NHE+1
       DO 8890 NY=NVN,NVS+1
       IF(ISALTG.NE.0)THEN
@@ -614,101 +837,17 @@ C
       ENDIF
 8890  CONTINUE
 8895  CONTINUE
-C
-C     RESET SOIL PROPERTIES AND PEDOTRANSFER FUNCTIONS
-C     FOLLOWING ANY SOIL DISTURBANCE
-C
-      DO 9995 NX=NHW,NHE
-      DO 9990 NY=NVN,NVS
-      IF(J.EQ.1)THEN
-      IFLGT(NY,NX)=0
-      DO 9905 NZ=1,NP(NY,NX)
-      PSILZ(NZ,NY,NX)=0.0
-9905  CONTINUE
-      ENDIF
-C
-C     HYDROLOGICAL PRPOERTIES OR SURFACE LITTER
-C
-C     VOLWRX=liter water holding capacity
-C     VOLR=dry litter volume
-C     POROS0,FC,WP=litter porosity,field capacity,wilting point
-C
-      VOLWRX(NY,NX)=AMAX1(0.0,THETRX(0)*RC0(0,NY,NX)
-     2+THETRX(1)*RC0(1,NY,NX)+THETRX(2)*RC0(2,NY,NX))
-      VOLR(NY,NX)=AMAX1(0.0,RC0(0,NY,NX)*1.0E-06/BKRS(0)
-     2+RC0(1,NY,NX)*1.0E-06/BKRS(1)+RC0(2,NY,NX)*1.0E-06/BKRS(2))
-      IF(VOLR(NY,NX).GT.ZEROS(NY,NX))THEN
-      FVOLR=VOLWRX(NY,NX)/VOLR(NY,NX)
-      ELSE
-      FVOLR=THETRX(1)/BKRS(1)
-      ENDIF
-      POROS0(NY,NX)=FVOLR
-      FC(0,NY,NX)=0.500*FVOLR
-      WP(0,NY,NX)=0.125*FVOLR
-      PSL(0,NY,NX)=LOG(POROS0(NY,NX))
-      FCL(0,NY,NX)=LOG(FC(0,NY,NX))
-      WPL(0,NY,NX)=LOG(WP(0,NY,NX))
-      PSD(0,NY,NX)=PSL(0,NY,NX)-FCL(0,NY,NX)
-      FCD(0,NY,NX)=FCL(0,NY,NX)-WPL(0,NY,NX)
-      SRP(0,NY,NX)=1.00
-C
-C     RESET SURFACE LITTER PHYSICAL PROPERTIES (DENSITY, TEXTURE)
-C     AFTER DISTURBANCES (E.G. TILLAGE, EROSION)
-C
-C     IFLGS=disturbance flag
-C     BKDS,BKDSI=current,initial bulk density
-C
-C     WRITE(*,1116)'IFLGS',IYRC,I,J,IFLGS(NY,NX)
-1116  FORMAT(A8,4I6)
-      IF(IFLGS(NY,NX).NE.0)THEN
-      IF(VOLT(0,NY,NX).GT.ZEROS2(NY,NX))THEN
-      BKDS(0,NY,NX)=BKVL(0,NY,NX)/VOLT(0,NY,NX)
-      ELSE
-      BKDS(0,NY,NX)=BKRS(1)
-      ENDIF
-      THETY(0,NY,NX)=EXP((PSIMX(NY,NX)-LOG(-PSIHY))
-     2*FCD(0,NY,NX)/PSIMD(NY,NX)+FCL(0,NY,NX))
-      SUM2=0.0
-      DO 1220 K=1,100
-      XK=K-1
-      THETK(K)=POROS0(NY,NX)-(XK/100.0*POROS0(NY,NX))
-      IF(THETK(K).LT.FC(0,NY,NX))THEN
-      PSISK(K)=AMAX1(PSIHY,-EXP(PSIMX(NY,NX)
-     2+((FCL(0,NY,NX)-LOG(THETK(K)))
-     3/FCD(0,NY,NX)*PSIMD(NY,NX))))
-      ELSEIF(THETK(K).LT.POROS0(NY,NX))THEN
-      PSISK(K)=-EXP(PSIMS(NY,NX)
-     2+(((PSL(0,NY,NX)-LOG(THETK(K)))
-     3/PSD(0,NY,NX))**SRP(0,NY,NX)*PSISD(NY,NX)))
-      ELSE
-      PSISK(K)=PSISE(0,NY,NX)
-      ENDIF
-      SUM2=SUM2+(2*K-1)/(PSISK(K)**2)
-1220  CONTINUE
-      DO 1235 K=1,100
-      SUM1=0.0
-      XK=K-1
-      YK=((100.0-XK)/100.0)**1.33
-      DO 1230 M=K,100
-      SUM1=SUM1+(2*M+1-2*K)/(PSISK(M)**2)
-1230  CONTINUE
-      HCND(3,K,0,NY,NX)=SCNV(0,NY,NX)*YK*SUM1/SUM2
-      HCND(1,K,0,NY,NX)=0.0
-      HCND(2,K,0,NY,NX)=0.0
-      IF(K.GT.1.AND.PSISK(K).LT.PSISA(0,NY,NX)
-     2.AND.PSISK(K-1).GE.PSISA(0,NY,NX))THEN
-      THETS(0,NY,NX)=THETK(K)
-      ENDIF
-C     WRITE(*,3534)'PSI0',K,THETK(K),PSISK(K),HCND(3,K,0,NY,NX)
-C    2,PSL(0,NY,NX),LOG(THETK(K)),POROS0(NY,NX),FC(0,NY,NX),WP(0,NY,NX)
-C    3,SRP(0,NY,NX),VOLWRX(NY,NX),VOLR(NY,NX),THETS(0,NY,NX)
-C    4,PSISA(0,NY,NX)
-3534  FORMAT(A8,1I4,20E12.4)
-1235  CONTINUE
-C
-C     RESET SOIL PHYSICAL PROPERTIES (DENSITY, TEXTURE)
-C     AFTER DISTURBANCES (E.G. TILLAGE, EROSION)
-C
+      end subroutine ResetSaltModelArrays
+
+C------------------------------------------------------------------------------------------
+
+      subroutine SetSoilPropertyAftDisturbance(I,J,NY,NX)
+      implicit none
+      integer, intent(in) :: I,J,NY,NX
+
+      integer :: L,K,N,M
+
+C     begin_execution
       DO 9975 L=NUI(NY,NX),NLI(NY,NX)
 C
 C     AREA,DLYR=lateral(1,2), vertical(3) area,thickness of soil layer
@@ -1029,8 +1168,15 @@ C
       DTC(L,NY,NX)=0.0
       ENDIF
 9975  CONTINUE
-C
-C     SURFACE RESIDUE PROPERTIES
+      end subroutine SetSoilPropertyAftDisturbance
+
+C------------------------------------------------------------------------------------------
+
+      subroutine ResetSurfResidualProperty(NY,NX)
+      implicit none
+      integer, intent(in) :: NY,NX
+
+C     begin_execution
 C
 C     FCR=litter water content at -0.01 MPa
 C     THETY=litter hygroscopic water content
@@ -1095,76 +1241,92 @@ C    3,AREA(3,NU(NY,NX),NY,NX),VOLWD(NY,NX),ZS(NY,NX),SLOPE(0,NY,NX)
       EHUM(0,NY,NX)=0.200+0.333*AMIN1(0.5,CCLAY(NU(NY,NX),NY,NX))
 C    2+0.167E-06*CORGC(NU(NY,NX),NY,NX)
       EPOC(0,NY,NX)=0.150
+      end subroutine ResetSurfResidualProperty
+
+C------------------------------------------------------------------------------------------
+
+      subroutine SetLiterSoilPropAftDisturbance(I,J,NY,NX)
+      implicit none
+      integer, intent(in) :: I,J,NY,NX
+
+      integer :: K,M
+
+C     begin_execution
+
+C     IFLGS=disturbance flag
+C     BKDS,BKDSI=current,initial bulk density
+C
+C     WRITE(*,1116)'IFLGS',IYRC,I,J,IFLGS(NY,NX)
+1116  FORMAT(A8,4I6)
+      IF(IFLGS(NY,NX).NE.0)THEN
+      IF(VOLT(0,NY,NX).GT.ZEROS2(NY,NX))THEN
+      BKDS(0,NY,NX)=BKVL(0,NY,NX)/VOLT(0,NY,NX)
+      ELSE
+      BKDS(0,NY,NX)=BKRS(1)
+      ENDIF
+      THETY(0,NY,NX)=EXP((PSIMX(NY,NX)-LOG(-PSIHY))
+     2*FCD(0,NY,NX)/PSIMD(NY,NX)+FCL(0,NY,NX))
+      SUM2=0.0
+      DO 1220 K=1,100
+      XK=K-1
+      THETK(K)=POROS0(NY,NX)-(XK/100.0*POROS0(NY,NX))
+      IF(THETK(K).LT.FC(0,NY,NX))THEN
+      PSISK(K)=AMAX1(PSIHY,-EXP(PSIMX(NY,NX)
+     2+((FCL(0,NY,NX)-LOG(THETK(K)))
+     3/FCD(0,NY,NX)*PSIMD(NY,NX))))
+      ELSEIF(THETK(K).LT.POROS0(NY,NX))THEN
+      PSISK(K)=-EXP(PSIMS(NY,NX)
+     2+(((PSL(0,NY,NX)-LOG(THETK(K)))
+     3/PSD(0,NY,NX))**SRP(0,NY,NX)*PSISD(NY,NX)))
+      ELSE
+      PSISK(K)=PSISE(0,NY,NX)
+      ENDIF
+      SUM2=SUM2+(2*K-1)/(PSISK(K)**2)
+1220  CONTINUE
+      DO 1235 K=1,100
+      SUM1=0.0
+      XK=K-1
+      YK=((100.0-XK)/100.0)**1.33
+      DO 1230 M=K,100
+      SUM1=SUM1+(2*M+1-2*K)/(PSISK(M)**2)
+1230  CONTINUE
+      HCND(3,K,0,NY,NX)=SCNV(0,NY,NX)*YK*SUM1/SUM2
+      HCND(1,K,0,NY,NX)=0.0
+      HCND(2,K,0,NY,NX)=0.0
+      IF(K.GT.1.AND.PSISK(K).LT.PSISA(0,NY,NX)
+     2.AND.PSISK(K-1).GE.PSISA(0,NY,NX))THEN
+      THETS(0,NY,NX)=THETK(K)
+      ENDIF
+C     WRITE(*,3534)'PSI0',K,THETK(K),PSISK(K),HCND(3,K,0,NY,NX)
+C    2,PSL(0,NY,NX),LOG(THETK(K)),POROS0(NY,NX),FC(0,NY,NX),WP(0,NY,NX)
+C    3,SRP(0,NY,NX),VOLWRX(NY,NX),VOLR(NY,NX),THETS(0,NY,NX)
+C    4,PSISA(0,NY,NX)
+3534  FORMAT(A8,1I4,20E12.4)
+1235  CONTINUE
+C
+C     RESET SOIL PHYSICAL PROPERTIES (DENSITY, TEXTURE)
+C     AFTER DISTURBANCES (E.G. TILLAGE, EROSION)
+C
+      call SetSoilPropertyAftDisturbance(I,J,NY,NX)
+C
+C     SURFACE RESIDUE PROPERTIES
+      call ResetSurfResidualProperty(NY,NX)
 C
 C     IFLGS=reset disturbance flag
 C
       IFLGS(NY,NX)=0
       ENDIF
-C
-C     END OF RESET AFTER DISTURBANCE
-C
-C     PARAMETERS FOR COHESION, EROSIVITY, AND ROUGHNESS OF SURFACE SOIL USED
-C     FOR SURFACE WATER AND SEDIMENT TRANSPORT IN 'EROSION'
-C
-C     DETS=soil detachability from rainfall impact
-C     D50=average particle size
-C     CER,XER=parameters for runoff transport capacity
-C     ZD50=particle size effect on surface roughness
-C     VLS=hourly sinking rate
-C     COHS=soil cohesion
-C     DETE=soil detachability
-C     ZM=surface roughness used in runoff velocity calculation in watsub.f
-C
-      BKVLNU(NY,NX)=AMAX1(0.0,BKVLNM(NY,NX)
-     3+1.82E-06*ORGC(NU(NY,NX),NY,NX))
-C     WRITE(*,2423)'BKVLH',I,J,NX,NY,BKVL(NU(N2,N1),N2,N1)
-C    2,BKVLNM(N2,N1),BKVLNU(N2,N1),ORGR(NU(N2,N1),N2,N1)
-C    3,ORGC(NU(N2,N1),N2,N1),SAND(NU(N2,N1),N2,N1)
-C    3,SILT(NU(N2,N1),N2,N1),CLAY(NU(N2,N1),N2,N1)
-2423  FORMAT(A8,4I4,20E12.4)
-      BKVLNX=SAND(NU(NY,NX),NY,NX)+SILT(NU(NY,NX),NY,NX)
-     2+CLAY(NU(NY,NX),NY,NX)+1.82E-06*ORGC(NU(NY,NX),NY,NX)
-      IF(BKVLNX.GT.ZEROS(NY,NX))THEN
-      CORGM=1.82E-06*ORGC(NU(NY,NX),NY,NX)/BKVLNX
-      CORGC(NU(NY,NX),NY,NX)=0.55E+06*CORGM
-      CSAND(NU(NY,NX),NY,NX)=SAND(NU(NY,NX),NY,NX)/BKVLNX
-      CSILT(NU(NY,NX),NY,NX)=SILT(NU(NY,NX),NY,NX)/BKVLNX
-      CCLAY(NU(NY,NX),NY,NX)=CLAY(NU(NY,NX),NY,NX)/BKVLNX
-      ELSE
-      CORGM=0.0
-      CORGC(NU(NY,NX),NY,NX)=0.0
-      CSAND(NU(NY,NX),NY,NX)=0.0
-      CSILT(NU(NY,NX),NY,NX)=1.0
-      CCLAY(NU(NY,NX),NY,NX)=0.0
-      ENDIF
-      IF(IERSNG.EQ.2.OR.IERSNG.EQ.3)THEN
-      D50=1.0*CCLAY(NU(NY,NX),NY,NX)+10.0*CSILT(NU(NY,NX),NY,NX)
-     2+100.0*CSAND(NU(NY,NX),NY,NX)+100.0*CORGM
-      ZD50=0.041*(1.0E-06*D50)**0.167
-      ZM(NY,NX)=ZS(NY,NX)+ZD50+1.0*VOLR(NY,NX)/AREA(3,0,NY,NX)
-      CER(NY,NX)=((D50+5.0)/0.32)**(-0.6)
-      XER(NY,NX)=((D50+5.0)/300.0)**0.25
-      DETS(NY,NX)=1.0E-06*(1.0+2.0*(1.0-CSILT(NU(NY,NX),NY,NX)-CORGM))
-      COHS=2.0+10.0*(CCLAY(NU(NY,NX),NY,NX)+CORGM)
-     2+5.0*(1.0-EXP(-2.0E-06*RTDNT(NU(NY,NX),NY,NX)))
-      DETE(NY,NX)=0.79*EXP(-0.85*AMAX1(1.0,COHS))
-      PTDSNU(NY,NX)=1.30*CORGM+2.66*(1.0-CORGM)
-      VISCWL=VISCW*EXP(0.533-0.0267*TCS(0,NY,NX))
-      VLS(NY,NX)=3.6E+03*9.8*(PTDSNU(NY,NX)-1.0)
-     2*(1.0E-06*D50)**2/(18.0*VISCWL)
-C     WRITE(*,1118)'COHS',I,J,NX,NY,NU(NY,NX),COHS,DETE(NY,NX)
-C    2,ZM(NY,NX),VLS(NY,NX),D50,ZD50,PTDSNU(NY,NX)
-C    3,RTDNT(NU(NY,NX),NY,NX),VOLR(NY,NX)/AREA(3,0,NY,NX)
-C    3,ORGC(0,NY,NX)
-C    3,CCLAY(NU(NY,NX),NY,NX),CSILT(NU(NY,NX),NY,NX)
-C    4,CSAND(NU(NY,NX),NY,NX),CORGM,CORGC(NU(NY,NX),NY,NX)
-C    5,BKVL(NU(NY,NX),NY,NX),BKVLNX
-C    3,VISCWL,TCS(0,NY,NX)
-1118  FORMAT(A8,5I4,20E12.4)
-      ENDIF
-C
-C     RESET HOURLY ACCUMULATORS
-C
+      end subroutine SetLiterSoilPropAftDisturbance
+
+C------------------------------------------------------------------------------------------
+
+      subroutine SetHourlyAccumulators(NY,NX)
+C     implicit none
+      integer, intent(in) :: NX,NY
+
+      integer :: L
+C     begin_execution
+
       UCO2S(NY,NX)=0.0
       TOMT(NY,NX)=0.0
       TONT(NY,NX)=0.0
@@ -1299,11 +1461,17 @@ C
       XM1PBS(L,NY,NX)=0.0
       ENDIF
 9865  CONTINUE
-C
-C     RESET ARRAYS TO TRANSFER MATERIALS WITHIN SOILS
-C     AND BETWEEN SOILS AND PLANTS
-C
-      DO 9875 L=0,NL(NY,NX)
+      end subroutine SetHourlyAccumulators
+
+C------------------------------------------------------------------------------------------
+
+      subroutine SetArrays4PlantSoilTransfer(L,NY,NX)
+      implicit none
+      integer, intent(in) :: L,NY,NX
+
+      integer :: K,M
+C     begin_execution
+
       DO 9950 K=0,1
       DO 9950 M=1,4
       CSNT(M,K,L,NY,NX)=0.0
@@ -1355,10 +1523,154 @@ C
       DO 9795 M=1,NPH
       ROXSK(M,L,NY,NX)=0.0
 9795  CONTINUE
+      end subroutine SetArrays4PlantSoilTransfer
+
+C------------------------------------------------------------------------------------------
+
+      subroutine GetOutput4WaterTableDepth(L,NY,NX)
+      implicit none
+      integer, intent(in) :: L,NY,NX
+
+      integer :: LL
+C     begin_execution
+
+C     IDTBL=water table flag from site file
+C     THETPZ,THETPW=current,minimum air-filled, porosity for water table
+C     DPTH,DTBLX=depth of soil layer midpoint, water table
+C     PSIS1=water potential in hydraulic equilibrium with layer below
+C     THETW1,THETWP=water content at PSIS1,minimum SWC for water table
+C     DPTHT=water table depth
 C
-C     IF SOC FLAG IS SET
+      IF(IDTBL(NY,NX).NE.0)THEN
+      IF(IFLGY.EQ.0)THEN
+      IF(THETPZ(L,NY,NX).LT.THETPW.OR.L.EQ.NL(NY,NX))THEN
+      IFLGY=1
+      IF(DPTH(L,NY,NX).LT.DTBLX(NY,NX))THEN
+      DO 5705 LL=MIN(L+1,NL(NY,NX)),NL(NY,NX)
+      IF(THETPZ(LL,NY,NX).GE.THETPW.AND.LL.NE.NL(NY,NX))THEN
+      IFLGY=0
+      GO TO 5706
+      ELSEIF(DPTH(LL,NY,NX).GE.DTBLX(NY,NX))THEN
+      GO TO 5706
+      ENDIF
+5705  CONTINUE
+      ENDIF
+5706  CONTINUE
+      IF(IFLGY.EQ.1)THEN
+      IF(THETPZ(L,NY,NX).GE.THETPW.AND.L.NE.NL(NY,NX))THEN
+      PSIS1=PSISM(L+1,NY,NX)-0.0098*(DPTH(L+1,NY,NX)-DPTH(L,NY,NX))
+      THETWM=THETWP*POROS(L,NY,NX)
+      THETW1=AMIN1(THETWM,EXP((PSIMS(NY,NX)-LOG(-PSIS1))
+     2*PSD(L,NY,NX)/PSISD(NY,NX)+PSL(L,NY,NX)))
+      IF(THETWM.GT.THETW1)THEN
+      THETPX=AMIN1(1.0,AMAX1(0.0,(THETWM-THETW(L,NY,NX))
+     2/(THETWM-THETW1)))
+      DPTHT(NY,NX)=CDPTH(L,NY,NX)-DLYR(3,L,NY,NX)*(1.0-THETPX)
+      ELSE
+      DPTHT(NY,NX)=CDPTH(L,NY,NX)-DLYR(3,L,NY,NX)
+      ENDIF
+      ELSEIF(L.GT.NU(NY,NX))THEN
+      PSIS1=PSISM(L,NY,NX)-0.0098*(DPTH(L,NY,NX)-DPTH(L-1,NY,NX))
+      THETWM=THETWP*POROS(L-1,NY,NX)
+      THETW1=AMIN1(THETWM,EXP((PSIMS(NY,NX)-LOG(-PSIS1))
+     2*PSD(L-1,NY,NX)/PSISD(NY,NX)+PSL(L-1,NY,NX)))
+      IF(THETWM.GT.THETW1)THEN
+      THETPX=AMIN1(1.0,AMAX1(0.0,(THETWM-THETW(L-1,NY,NX))
+     2/(THETWM-THETW1)))
+      DPTHT(NY,NX)=CDPTH(L-1,NY,NX)-DLYR(3,L-1,NY,NX)*(1.0-THETPX)
+      ELSE
+      DPTHT(NY,NX)=CDPTH(L-1,NY,NX)-DLYR(3,L-1,NY,NX)
+      ENDIF
+      ELSE
+      DPTHT(NY,NX)=CDPTH(L,NY,NX)-DLYR(3,L,NY,NX)
+      ENDIF
+      ENDIF
+      ENDIF
+      ENDIF
+C     IF(NX.EQ.3.AND.NY.EQ.3)THEN
+C     WRITE(*,5353)'DPTHT',I,J,NX,NY,L,LL,IFLGY,DPTHT(NY,NX)
+C    2,CDPTH(L,NY,NX),DLYR(3,L,NY,NX),DPTH(L,NY,NX),DPTH(L-1,NY,NX)
+C    3,PSIS1,PSISM(L,NY,NX),THETWM,THETW1,THETW(L-1,NY,NX)
+C    4,THETPZ(L,NY,NX),THETPW
+5353  FORMAT(A8,7I4,30E12.4)
+C     ENDIF
+      ENDIF
+      end subroutine GetOutput4WaterTableDepth
+
+C------------------------------------------------------------------------------------------
+
+      subroutine SetSurfaceProperty4SedErosion(NY,NX)
+      implicit none
+      integer, intent(in) :: NY,NX
+
+C     begin_execution
 C
+C     DETS=soil detachability from rainfall impact
+C     D50=average particle size
+C     CER,XER=parameters for runoff transport capacity
+C     ZD50=particle size effect on surface roughness
+C     VLS=hourly sinking rate
+C     COHS=soil cohesion
+C     DETE=soil detachability
+C     ZM=surface roughness used in runoff velocity calculation in watsub.f
+C
+      BKVLNU(NY,NX)=AMAX1(0.0,BKVLNM(NY,NX)
+     3+1.82E-06*ORGC(NU(NY,NX),NY,NX))
+C     WRITE(*,2423)'BKVLH',I,J,NX,NY,BKVL(NU(N2,N1),N2,N1)
+C    2,BKVLNM(N2,N1),BKVLNU(N2,N1),ORGR(NU(N2,N1),N2,N1)
+C    3,ORGC(NU(N2,N1),N2,N1),SAND(NU(N2,N1),N2,N1)
+C    3,SILT(NU(N2,N1),N2,N1),CLAY(NU(N2,N1),N2,N1)
+2423  FORMAT(A8,4I4,20E12.4)
+      BKVLNX=SAND(NU(NY,NX),NY,NX)+SILT(NU(NY,NX),NY,NX)
+     2+CLAY(NU(NY,NX),NY,NX)+1.82E-06*ORGC(NU(NY,NX),NY,NX)
+      IF(BKVLNX.GT.ZEROS(NY,NX))THEN
+      CORGM=1.82E-06*ORGC(NU(NY,NX),NY,NX)/BKVLNX
+      CORGC(NU(NY,NX),NY,NX)=0.55E+06*CORGM
+      CSAND(NU(NY,NX),NY,NX)=SAND(NU(NY,NX),NY,NX)/BKVLNX
+      CSILT(NU(NY,NX),NY,NX)=SILT(NU(NY,NX),NY,NX)/BKVLNX
+      CCLAY(NU(NY,NX),NY,NX)=CLAY(NU(NY,NX),NY,NX)/BKVLNX
+      ELSE
+      CORGM=0.0
+      CORGC(NU(NY,NX),NY,NX)=0.0
+      CSAND(NU(NY,NX),NY,NX)=0.0
+      CSILT(NU(NY,NX),NY,NX)=1.0
+      CCLAY(NU(NY,NX),NY,NX)=0.0
+      ENDIF
       IF(IERSNG.EQ.2.OR.IERSNG.EQ.3)THEN
+      D50=1.0*CCLAY(NU(NY,NX),NY,NX)+10.0*CSILT(NU(NY,NX),NY,NX)
+     2+100.0*CSAND(NU(NY,NX),NY,NX)+100.0*CORGM
+      ZD50=0.041*(1.0E-06*D50)**0.167
+      ZM(NY,NX)=ZS(NY,NX)+ZD50+1.0*VOLR(NY,NX)/AREA(3,0,NY,NX)
+      CER(NY,NX)=((D50+5.0)/0.32)**(-0.6)
+      XER(NY,NX)=((D50+5.0)/300.0)**0.25
+      DETS(NY,NX)=1.0E-06*(1.0+2.0*(1.0-CSILT(NU(NY,NX),NY,NX)-CORGM))
+      COHS=2.0+10.0*(CCLAY(NU(NY,NX),NY,NX)+CORGM)
+     2+5.0*(1.0-EXP(-2.0E-06*RTDNT(NU(NY,NX),NY,NX)))
+      DETE(NY,NX)=0.79*EXP(-0.85*AMAX1(1.0,COHS))
+      PTDSNU(NY,NX)=1.30*CORGM+2.66*(1.0-CORGM)
+      VISCWL=VISCW*EXP(0.533-0.0267*TCS(0,NY,NX))
+      VLS(NY,NX)=3.6E+03*9.8*(PTDSNU(NY,NX)-1.0)
+     2*(1.0E-06*D50)**2/(18.0*VISCWL)
+C     WRITE(*,1118)'COHS',I,J,NX,NY,NU(NY,NX),COHS,DETE(NY,NX)
+C    2,ZM(NY,NX),VLS(NY,NX),D50,ZD50,PTDSNU(NY,NX)
+C    3,RTDNT(NU(NY,NX),NY,NX),VOLR(NY,NX)/AREA(3,0,NY,NX)
+C    3,ORGC(0,NY,NX)
+C    3,CCLAY(NU(NY,NX),NY,NX),CSILT(NU(NY,NX),NY,NX)
+C    4,CSAND(NU(NY,NX),NY,NX),CORGM,CORGC(NU(NY,NX),NY,NX)
+C    5,BKVL(NU(NY,NX),NY,NX),BKVLNX
+C    3,VISCWL,TCS(0,NY,NX)
+1118  FORMAT(A8,5I4,20E12.4)
+      ENDIF
+      end subroutine SetSurfaceProperty4SedErosion
+
+C------------------------------------------------------------------------------------------
+
+      subroutine UpdateTotalSOC(L,NY,NX)
+      implicit none
+      integer, intent(in) :: L,NY,NX
+
+      integer :: K,M,N
+C     begin_execution
 C
 C     TOTAL SOC FOR CALCULATING CHANGES IN SOC CALCULATED IN NITRO.F
 C
@@ -1388,290 +1700,272 @@ C
 7910  CONTINUE
 7900  CONTINUE
       ORGCX(L,NY,NX)=OC
-      ENDIF
-9875  CONTINUE
-      IFLGL=0
-      IFLGY=0
-      ICHKA=0
-      DO 9985 L=NUI(NY,NX),NLI(NY,NX)
-      FINH(L,NY,NX)=0.0
-      TCO2S(L,NY,NX)=0.0
-      TCO2P(L,NY,NX)=0.0
-      TCOFLA(L,NY,NX)=0.0
-      TCHFLA(L,NY,NX)=0.0
-      TLCO2P(L,NY,NX)=0.0
-      TUPOXP(L,NY,NX)=0.0
-      TUPOXS(L,NY,NX)=0.0
-      TUPCHS(L,NY,NX)=0.0
-      TUPN2S(L,NY,NX)=0.0
-      TUPN3S(L,NY,NX)=0.0
-      TUPN3B(L,NY,NX)=0.0
-      TUPHGS(L,NY,NX)=0.0
-      TOXFLA(L,NY,NX)=0.0
-      TCHFLA(L,NY,NX)=0.0
-      TN2FLA(L,NY,NX)=0.0
-      TNHFLA(L,NY,NX)=0.0
-      THGFLA(L,NY,NX)=0.0
-      TLOXYP(L,NY,NX)=0.0
-      TLCH4P(L,NY,NX)=0.0
-      TLN2OP(L,NY,NX)=0.0
-      TLNH3P(L,NY,NX)=0.0
-      TLH2GP(L,NY,NX)=0.0
-      TUPNH4(L,NY,NX)=0.0
-      TUPNO3(L,NY,NX)=0.0
-      TUPH2P(L,NY,NX)=0.0
-      TUPH1P(L,NY,NX)=0.0
-      TUPNHB(L,NY,NX)=0.0
-      TUPNOB(L,NY,NX)=0.0
-      TUPH2B(L,NY,NX)=0.0
-      TUPH1B(L,NY,NX)=0.0
-      TUPNF(L,NY,NX)=0.0
-      TRN4B(L,NY,NX)=0.0
-      TRN3B(L,NY,NX)=0.0
-      TRNOB(L,NY,NX)=0.0
-      TRN2B(L,NY,NX)=0.0
-      TRH1B(L,NY,NX)=0.0
-      TRH2B(L,NY,NX)=0.0
-      TRAL(L,NY,NX)=0.0
-      TRFE(L,NY,NX)=0.0
-      TRHY(L,NY,NX)=0.0
-      TRCA(L,NY,NX)=0.0
-      TRMG(L,NY,NX)=0.0
-      TRNA(L,NY,NX)=0.0
-      TRKA(L,NY,NX)=0.0
-      TROH(L,NY,NX)=0.0
-      TRSO4(L,NY,NX)=0.0
-      TRCO3(L,NY,NX)=0.0
-      TRHCO(L,NY,NX)=0.0
-      TRCO2(L,NY,NX)=0.0
-      TBCO2(L,NY,NX)=0.0
-      TRAL1(L,NY,NX)=0.0
-      TRAL2(L,NY,NX)=0.0
-      TRAL3(L,NY,NX)=0.0
-      TRAL4(L,NY,NX)=0.0
-      TRALS(L,NY,NX)=0.0
-      TRFE1(L,NY,NX)=0.0
-      TRFE2(L,NY,NX)=0.0
-      TRFE3(L,NY,NX)=0.0
-      TRFE4(L,NY,NX)=0.0
-      TRFES(L,NY,NX)=0.0
-      TRCAO(L,NY,NX)=0.0
-      TRCAC(L,NY,NX)=0.0
-      TRCAH(L,NY,NX)=0.0
-      TRCAS(L,NY,NX)=0.0
-      TRMGO(L,NY,NX)=0.0
-      TRMGC(L,NY,NX)=0.0
-      TRMGH(L,NY,NX)=0.0
-      TRMGS(L,NY,NX)=0.0
-      TRNAC(L,NY,NX)=0.0
-      TRNAS(L,NY,NX)=0.0
-      TRKAS(L,NY,NX)=0.0
-      TRH0P(L,NY,NX)=0.0
-      TRH3P(L,NY,NX)=0.0
-      TRC0P(L,NY,NX)=0.0
-      TRF1P(L,NY,NX)=0.0
-      TRF2P(L,NY,NX)=0.0
-      TRC1P(L,NY,NX)=0.0
-      TRC2P(L,NY,NX)=0.0
-      TRM1P(L,NY,NX)=0.0
-      TRH0B(L,NY,NX)=0.0
-      TRH3B(L,NY,NX)=0.0
-      TRF1B(L,NY,NX)=0.0
-      TRF2B(L,NY,NX)=0.0
-      TRC0B(L,NY,NX)=0.0
-      TRC1B(L,NY,NX)=0.0
-      TRC2B(L,NY,NX)=0.0
-      TRM1B(L,NY,NX)=0.0
-      TRXNB(L,NY,NX)=0.0
-      TRXHY(L,NY,NX)=0.0
-      TRXAL(L,NY,NX)=0.0
-      TRXFE(L,NY,NX)=0.0
-      TRXCA(L,NY,NX)=0.0
-      TRXMG(L,NY,NX)=0.0
-      TRXNA(L,NY,NX)=0.0
-      TRXKA(L,NY,NX)=0.0
-      TRXHC(L,NY,NX)=0.0
-      TRXAL2(L,NY,NX)=0.0
-      TRXFE2(L,NY,NX)=0.0
-      TRBH0(L,NY,NX)=0.0
-      TRBH1(L,NY,NX)=0.0
-      TRBH2(L,NY,NX)=0.0
-      TRB1P(L,NY,NX)=0.0
-      TRB2P(L,NY,NX)=0.0
-      TRALOH(L,NY,NX)=0.0
-      TRFEOH(L,NY,NX)=0.0
-      TRCACO(L,NY,NX)=0.0
-      TRCASO(L,NY,NX)=0.0
-      TRALPB(L,NY,NX)=0.0
-      TRFEPB(L,NY,NX)=0.0
-      TRCPDB(L,NY,NX)=0.0
-      TRCPHB(L,NY,NX)=0.0
-      TRCPMB(L,NY,NX)=0.0
-      XCOFXS(L,NY,NX)=0.0
-      XCHFXS(L,NY,NX)=0.0
-      XOXFXS(L,NY,NX)=0.0
-      XNGFXS(L,NY,NX)=0.0
-      XN2FXS(L,NY,NX)=0.0
-      XHGFXS(L,NY,NX)=0.0
-      XN4FXW(L,NY,NX)=0.0
-      XN3FXW(L,NY,NX)=0.0
-      XNOFXW(L,NY,NX)=0.0
-      XNXFXS(L,NY,NX)=0.0
-      XH1PXS(L,NY,NX)=0.0
-      XH2PXS(L,NY,NX)=0.0
-      XN4FXB(L,NY,NX)=0.0
-      XN3FXB(L,NY,NX)=0.0
-      XNOFXB(L,NY,NX)=0.0
-      XNXFXB(L,NY,NX)=0.0
-      XH1BXB(L,NY,NX)=0.0
-      XH2BXB(L,NY,NX)=0.0
-      XALFXS(L,NY,NX)=0.0
-      XFEFXS(L,NY,NX)=0.0
-      XHYFXS(L,NY,NX)=0.0
-      XCAFXS(L,NY,NX)=0.0
-      XMGFXS(L,NY,NX)=0.0
-      XNAFXS(L,NY,NX)=0.0
-      XKAFXS(L,NY,NX)=0.0
-      XOHFXS(L,NY,NX)=0.0
-      XSOFXS(L,NY,NX)=0.0
-      XCLFXS(L,NY,NX)=0.0
-      XC3FXS(L,NY,NX)=0.0
-      XHCFXS(L,NY,NX)=0.0
-      XAL1XS(L,NY,NX)=0.0
-      XAL2XS(L,NY,NX)=0.0
-      XAL3XS(L,NY,NX)=0.0
-      XAL4XS(L,NY,NX)=0.0
-      XALSXS(L,NY,NX)=0.0
-      XFE1XS(L,NY,NX)=0.0
-      XFE2XS(L,NY,NX)=0.0
-      XFE3XS(L,NY,NX)=0.0
-      XFE4XS(L,NY,NX)=0.0
-      XFESXS(L,NY,NX)=0.0
-      XCAOXS(L,NY,NX)=0.0
-      XCACXS(L,NY,NX)=0.0
-      XCAHXS(L,NY,NX)=0.0
-      XCASXS(L,NY,NX)=0.0
-      XMGOXS(L,NY,NX)=0.0
-      XMGCXS(L,NY,NX)=0.0
-      XMGHXS(L,NY,NX)=0.0
-      XMGSXS(L,NY,NX)=0.0
-      XNACXS(L,NY,NX)=0.0
-      XNASXS(L,NY,NX)=0.0
-      XKASXS(L,NY,NX)=0.0
-      XH0PXS(L,NY,NX)=0.0
-      XH3PXS(L,NY,NX)=0.0
-      XF1PXS(L,NY,NX)=0.0
-      XF2PXS(L,NY,NX)=0.0
-      XC0PXS(L,NY,NX)=0.0
-      XC1PXS(L,NY,NX)=0.0
-      XC2PXS(L,NY,NX)=0.0
-      XM1PXS(L,NY,NX)=0.0
-      XH0BXB(L,NY,NX)=0.0
-      XH3BXB(L,NY,NX)=0.0
-      XF1BXB(L,NY,NX)=0.0
-      XF2BXB(L,NY,NX)=0.0
-      XC0BXB(L,NY,NX)=0.0
-      XC1BXB(L,NY,NX)=0.0
-      XC2BXB(L,NY,NX)=0.0
-      XM1BXB(L,NY,NX)=0.0
-      DO 9955 K=0,4
-      XOCFXS(K,L,NY,NX)=0.0
-      XONFXS(K,L,NY,NX)=0.0
-      XOPFXS(K,L,NY,NX)=0.0
-      XOAFXS(K,L,NY,NX)=0.0
-9955  CONTINUE
-      THAW(L,NY,NX)=0.0
-      THAWH(L,NY,NX)=0.0
-      HTHAW(L,NY,NX)=0.0
-      XCOBBL(L,NY,NX)=0.0
-      XCHBBL(L,NY,NX)=0.0
-      XOXBBL(L,NY,NX)=0.0
-      XNGBBL(L,NY,NX)=0.0
-      XN2BBL(L,NY,NX)=0.0
-      XN3BBL(L,NY,NX)=0.0
-      XNBBBL(L,NY,NX)=0.0
-      XHGBBL(L,NY,NX)=0.0
-      RTDNT(L,NY,NX)=0.0
+      end subroutine UpdateTotalSOC
+
+C------------------------------------------------------------------------------------------
+
+      subroutine GetSoilHydraulicVars(L,NY,NX)
+      implicit none
+      integer, intent(in) :: L,NY,NX
+
+      integer :: K
+C     begin_execution
+
+C     WATER POTENTIALS
 C
-C     CALCULATE SOIL CONCENTRATIONS OF SOLUTES, GASES
+C     FC,WP=water contents at field capacity,wilting point,saturation
+C     PSISM,PSISE=matric,saturation water potential
+C     SRP=parameter for deviation from linear log-log water retention
+C     FC,WP=water contents at field capacity,wilting point from soil file
+C     FCL,WPL=log FC,WP
+C     FCD,PSD=FCL-WPL,log(POROS)-FCL
+C     FCI,WPI=FC,WP of ice
+C     THETIX=ice concentration
 C
-C     THETW,THETI,THETP=soil micropore water,ice,air concentration
-C     THETPZ=soil micropore+macropore air concn for output
-C
-      IF(VOLX(L,NY,NX).LE.ZEROS(NY,NX))THEN
-      THETW(L,NY,NX)=POROS(L,NY,NX)
-      THETI(L,NY,NX)=0.0
-      THETP(L,NY,NX)=0.0
-      ELSE
-      THETW(L,NY,NX)=AMAX1(0.0,AMIN1(POROS(L,NY,NX)
+      IF(BKVL(L,NY,NX).GT.ZEROS(NY,NX)
+     2.AND.VOLX(L,NY,NX).GT.ZEROS(NY,NX))THEN
+      THETW1=AMAX1(0.0,AMIN1(POROS(L,NY,NX)
      2,VOLW(L,NY,NX)/VOLY(L,NY,NX)))
-      THETI(L,NY,NX)=AMAX1(0.0,AMIN1(POROS(L,NY,NX)
-     2,VOLI(L,NY,NX)/VOLY(L,NY,NX)))
-      THETP(L,NY,NX)=AMAX1(0.0,VOLP(L,NY,NX)/VOLY(L,NY,NX))
+      IF(THETW1.LT.FC(L,NY,NX))THEN
+      PSISM(L,NY,NX)=AMAX1(PSIHY,-EXP(PSIMX(NY,NX)
+     2+((FCL(L,NY,NX)-LOG(THETW1))
+     3/FCD(L,NY,NX)*PSIMD(NY,NX))))
+      ELSEIF(THETW1.LT.POROS(L,NY,NX)-DTHETW)THEN
+      PSISM(L,NY,NX)=-EXP(PSIMS(NY,NX)
+     2+(((PSL(L,NY,NX)-LOG(THETW1))
+     3/PSD(L,NY,NX))**SRP(L,NY,NX)*PSISD(NY,NX)))
+      ELSE
+      PSISM(L,NY,NX)=PSISE(L,NY,NX)
       ENDIF
-      THETPZ(L,NY,NX)=AMAX1(0.0,POROS(L,NY,NX)-THETW(L,NY,NX)
-     2-THETI(L,NY,NX))
-C     IF(L.EQ.7)THEN
-C     WRITE(*,1117)'BKDS',I,J,L
-C    3,BKDS(L,NY,NX),BKDSI(L,NY,NX),BKVL(L,NY,NX)
-C    4,DLYR(3,L,NY,NX),DLYRI(3,L,NY,NX)
-C    2,CORGC(L,NY,NX),ORGC(L,NY,NX)
-C    6,VOLT(L,NY,NX),VOLX(L,NY,NX),VOLA(L,NY,NX)
-C    7,VOLY(L,NY,NX),VOLW(L,NY,NX),VOLI(L,NY,NX)
-C    7,VOLWH(L,NY,NX),VOLIH(L,NY,NX)
-C    8,THETWZ(L,NY,NX),THETIZ(L,NY,NX)
-C    9,THETWZ(L,NY,NX)+THETIZ(L,NY,NX)
-1117  FORMAT(A8,3I4,30E14.6)
+      ELSEIF(VOLX(L,NY,NX).GT.ZEROS2(NY,NX))THEN
+      FCX=FCI*THETI(L,NY,NX)
+      WPX=WPI*THETI(L,NY,NX)
+      FCLX=LOG(FCX)
+      WPLX=LOG(WPX)
+      PSDX=PSL(L,NY,NX)-FCLX
+      FCDX=FCLX-WPLX
+      IF(THETW(L,NY,NX).LT.FCX)THEN
+      PSISM(L,NY,NX)=AMAX1(PSIHY,-EXP(PSIMX(NY,NX)
+     2+((FCLX-LOG(THETW(L,NY,NX)))
+     3/FCDX*PSIMD(NY,NX))))
+      ELSEIF(THETW(L,NY,NX).LT.POROS(L,NY,NX)-DTHETW)THEN
+      PSISM(L,NY,NX)=-EXP(PSIMS(NY,NX)
+     2+(((PSL(L,NY,NX)-LOG(THETW(L,NY,NX)))
+     3/PSDX)*PSISD(NY,NX)))
+      ELSE
+      PSISM(L,NY,NX)=PSISE(L,NY,NX)
+      ENDIF
+      ELSE
+      PSISM(L,NY,NX)=PSISE(L,NY,NX)
+      ENDIF
+C     WRITE(*,443)'PSISM',I,J,NX,NY,L,PSISM(L,NY,NX)
+C    2,THETW(L,NY,NX),THETI(L,NY,NX),FCX,WPX,POROS(L,NY,NX)
+C
+C     SOIL OSMOTIC, GRAVIMETRIC AND MATRIC WATER POTENTIALS
+C
+C     PSISM,PSISO,PSISH,PSIST=matric,osmotic,gravimetric,total water potential
+C
+      PSISO(L,NY,NX)=-8.3143E-06*TKS(L,NY,NX)*CION(L,NY,NX)
+      PSISH(L,NY,NX)=0.0098*(ALT(NY,NX)-DPTH(L,NY,NX))
+      PSIST(L,NY,NX)=AMIN1(0.0,PSISM(L,NY,NX)+PSISO(L,NY,NX)
+     2+PSISH(L,NY,NX))
+C     IF((I/30)*30.EQ.I.AND.J.EQ.15)THEN
+C     WRITE(*,1113)'PSISM1',I,J,NX,NY,L,PSISM(L,NY,NX)
+C    2,THETW(L,NY,NX),THETW1,VOLX(L,NY,NX)
+C    2,FC(L,NY,NX),WP(L,NY,NX),POROS(L,NY,NX),VOLP(L,NY,NX)
+C    3,VOLW(L,NY,NX),VOLI(L,NY,NX),VOLA(L,NY,NX),VOLT(L,NY,NX)
+C    4,CDPTH(L,NY,NX),DPTH(L,NY,NX),CDPTHZ(L,NY,NX),DPTHZ(L,NY,NX)
+C    5,DLYR(3,L,NY,NX),PSIST(L,NY,NX),PSISO(L,NY,NX)
+C    2,PSISH(L,NY,NX),TKS(L,NY,NX),CION(L,NY,NX)
+1113  FORMAT(A8,5I4,50E12.4)
 C     ENDIF
 C
-C     GAS CONCENTRATIONS
+C     SOIL RESISTANCE TO ROOT PENETRATION
+C
+C     RSCS=soil resistance to root penetration (MPa)
+C
+C     IF(BKDS(L,NY,NX).GT.ZERO)THEN
+C     CCLAYT=CCLAY(L,NY,NX)*1.0E+02
+C     CORGCT=CORGC(L,NY,NX)*1.0E-04
+C     CC=EXP(-3.6733-0.1447*CCLAYT+0.7653*CORGCT)
+C     DD=-0.4805-0.1239*CCLAYT+0.2080*CORGCT
+C     EE=3.8521+0.0963*CCLAYT
+C     RSCS(L,NY,NX)=CC*THETW(L,NY,NX)**DD*BKDS(L,NY,NX)**EE
+C     ELSE
+      RSCS(L,NY,NX)=0.0
+C     ENDIF
+C     WRITE(*,2442)'RSCS',I,J,NX,NY,L,RSCS(L,NY,NX),THETW(L,NY,NX)
+C    2,BKDS(L,NY,NX),CCLAY(L,NY,NX),CORGC(L,NY,NX)
+2442  FORMAT(A8,5I4,12E12.4)
+C
+C     SOIL HYDRAULIC CONDUCTIVITIES FROM AMBIENT SOIL WATER CONTENTS
+C
+C     CNDU=soil hydraulic conductivity for root uptake
+C
+      K=MAX(1,MIN(100,INT(100.0*(POROS(L,NY,NX)-THETW(L,NY,NX))
+     2/POROS(L,NY,NX))+1))
+      CNDU(L,NY,NX)=0.5*(HCND(1,K,L,NY,NX)+HCND(3,K,L,NY,NX))
+      end subroutine GetSoilHydraulicVars
+
+C------------------------------------------------------------------------------------------
+
+      subroutine DiagActiveLayerDepth(L,NY,NX)
+
+      implicit none
+      integer, intent(in) :: L,NY,NX
+
+      integer :: LL
+
+C     begin_execution
+C
+C     VOLI,VOLIH=ice volume in micropores,macropores
+C     VOLW,VOLWH=water volume in micropores,macropores
+C     VOLA,VOLAH=total volume in micropores,macropores
+C     DPTHA=active layer depth
+C     CDPTH,DLYR=depth to bottom,thickness of soil layer
+C
+      IF(ICHKA.EQ.0)THEN
+      VOLIT=VOLI(L,NY,NX)+VOLIH(L,NY,NX)
+      VOLAT=VOLA(L,NY,NX)+VOLAH(L,NY,NX)
+      IF(VOLAT.GT.ZEROS2(NY,NX).AND.VOLIT.GT.0.01*VOLAT)THEN
+      DO 5700 LL=MIN(L+1,NL(NY,NX)),NL(NY,NX)
+      VOLITL=VOLI(LL,NY,NX)+VOLIH(LL,NY,NX)
+      VOLWTL=VOLW(LL,NY,NX)+VOLWH(LL,NY,NX)
+      VOLATL=VOLA(LL,NY,NX)+VOLAH(LL,NY,NX)
+      IF(VOLATL.GT.ZEROS2(NY,NX).AND.VOLITL.LT.0.01*VOLATL)THEN
+      GO TO 5701
+      ENDIF
+5700  CONTINUE
+      IF(VOLAT.GT.ZEROS2(NY,NX))THEN
+      DPTHA(NY,NX)=CDPTH(L,NY,NX)-DLYR(3,L,NY,NX)
+     2*AMIN1(1.0,VOLIT/VOLAT)
+      ELSE
+      DPTHA(NY,NX)=CDPTH(L,NY,NX)-DLYR(3,L,NY,NX)
+      ENDIF
+      ICHKA=1
+      GO TO 5702
+5701  DPTHA(NY,NX)=9999.0
+5702  CONTINUE
+      ENDIF
+      ENDIF
+      end subroutine DiagActiveLayerDepth
+
+C------------------------------------------------------------------------------------------
+
+      subroutine SetTracerPropertyInLiterAir(NY,NX)
+      implicit none
+      integer, intent(in) :: NY,NX
+
+      integer :: K,L
+C     begin_execution
+
+C
+C     LITTER GAS CONCENTRATIOS
 C
 C     C*G=soil gas gaseous concentration
+C     *E=atmospheric concentration
+C     TKS,TCS=litter temperature (K,C)
+C     S*L=gas solubility
 C     C*S=soil gas aqueous concentration
 C
-      IF(THETP(L,NY,NX).GT.THETX)THEN
-      CCO2G(L,NY,NX)=AMAX1(0.0,CO2G(L,NY,NX)/VOLP(L,NY,NX))
-      CCH4G(L,NY,NX)=AMAX1(0.0,CH4G(L,NY,NX)/VOLP(L,NY,NX))
-      COXYG(L,NY,NX)=AMAX1(0.0,OXYG(L,NY,NX)/VOLP(L,NY,NX))
-      CZ2GG(L,NY,NX)=AMAX1(0.0,Z2GG(L,NY,NX)/VOLP(L,NY,NX))
-      CZ2OG(L,NY,NX)=AMAX1(0.0,Z2OG(L,NY,NX)/VOLP(L,NY,NX))
-      CNH3G(L,NY,NX)=AMAX1(0.0,ZNH3G(L,NY,NX)/VOLP(L,NY,NX))
-      CH2GG(L,NY,NX)=AMAX1(0.0,H2GG(L,NY,NX)/VOLP(L,NY,NX))
+      CCO2G(0,NY,NX)=CO2E(NY,NX)*5.36E-04*273.15/TKS(0,NY,NX)
+      CCH4G(0,NY,NX)=CH4E(NY,NX)*5.36E-04*273.15/TKS(0,NY,NX)
+      COXYG(0,NY,NX)=OXYE(NY,NX)*1.43E-03*273.15/TKS(0,NY,NX)
+      CZ2GG(0,NY,NX)=Z2GE(NY,NX)*1.25E-03*273.15/TKS(0,NY,NX)
+      CZ2OG(0,NY,NX)=Z2OE(NY,NX)*1.25E-03*273.15/TKS(0,NY,NX)
+      CNH3G(0,NY,NX)=ZNH3E(NY,NX)*6.25E-04*273.15/TKS(0,NY,NX)
+      CH2GG(0,NY,NX)=H2GE(NY,NX)*8.92E-05*273.15/TKS(0,NY,NX)
+      CNH4B(0,NY,NX)=0.0
+      CNH3B(0,NY,NX)=0.0
+      CNO3B(0,NY,NX)=0.0
+      CNO2B(0,NY,NX)=0.0
+      CH2P4B(0,NY,NX)=0.0
+      SCO2L(0,NY,NX)=SCO2X*EXP(0.843-0.0281*TCS(0,NY,NX))
+      SCH4L(0,NY,NX)=SCH4X*EXP(0.597-0.0199*TCS(0,NY,NX))
+      SOXYL(0,NY,NX)=SOXYX*EXP(0.516-0.0172*TCS(0,NY,NX))
+      SN2GL(0,NY,NX)=SN2GX*EXP(0.456-0.0152*TCS(0,NY,NX))
+      SN2OL(0,NY,NX)=SN2OX*EXP(0.897-0.0299*TCS(0,NY,NX))
+      SNH3L(0,NY,NX)=SNH3X*EXP(0.513-0.0171*TCS(0,NY,NX))
+      SH2GL(0,NY,NX)=SH2GX*EXP(0.597-0.0199*TCS(0,NY,NX))
+      IF(VOLW(0,NY,NX).GT.ZEROS2(NY,NX))THEN
+      CCO2S(0,NY,NX)=AMAX1(0.0,CO2S(0,NY,NX)/VOLW(0,NY,NX))
+      CCH4S(0,NY,NX)=AMAX1(0.0,CH4S(0,NY,NX)/VOLW(0,NY,NX))
+      COXYS(0,NY,NX)=AMAX1(0.0,OXYS(0,NY,NX)/VOLW(0,NY,NX))
+      CZ2GS(0,NY,NX)=AMAX1(0.0,Z2GS(0,NY,NX)/VOLW(0,NY,NX))
+      CZ2OS(0,NY,NX)=AMAX1(0.0,Z2OS(0,NY,NX)/VOLW(0,NY,NX))
+      CH2GS(0,NY,NX)=AMAX1(0.0,H2GS(0,NY,NX)/VOLW(0,NY,NX))
       ELSE
-      CCO2G(L,NY,NX)=0.0
-      CCH4G(L,NY,NX)=0.0
-      COXYG(L,NY,NX)=0.0
-      CZ2GG(L,NY,NX)=0.0
-      CZ2OG(L,NY,NX)=0.0
-      CNH3G(L,NY,NX)=0.0
-      CH2GG(L,NY,NX)=0.0
-      ENDIF
-      IF(VOLW(L,NY,NX).GT.ZEROS2(NY,NX))THEN
-      CCO2S(L,NY,NX)=AMAX1(0.0,CO2S(L,NY,NX)/VOLW(L,NY,NX))
-      CCH4S(L,NY,NX)=AMAX1(0.0,CH4S(L,NY,NX)/VOLW(L,NY,NX))
-      COXYS(L,NY,NX)=AMAX1(0.0,OXYS(L,NY,NX)/VOLW(L,NY,NX))
-      CZ2GS(L,NY,NX)=AMAX1(0.0,Z2GS(L,NY,NX)/VOLW(L,NY,NX))
-      CZ2OS(L,NY,NX)=AMAX1(0.0,Z2OS(L,NY,NX)/VOLW(L,NY,NX))
-      CH2GS(L,NY,NX)=AMAX1(0.0,H2GS(L,NY,NX)/VOLW(L,NY,NX))
-      ELSE
-      CCO2S(L,NY,NX)=0.0
-      CCH4S(L,NY,NX)=0.0
-      COXYS(L,NY,NX)=0.0
-      CZ2GS(L,NY,NX)=0.0
-      CZ2OS(L,NY,NX)=0.0
-      CH2GS(L,NY,NX)=0.0
+      CCO2S(0,NY,NX)=0.0
+      CCH4S(0,NY,NX)=0.0
+      COXYS(0,NY,NX)=0.0
+      CZ2GS(0,NY,NX)=0.0
+      CZ2OS(0,NY,NX)=0.0
+      CH2GS(0,NY,NX)=0.0
       ENDIF
 C
-C     CORGC=SOC concentration
+C     TFACL=temperature effect on diffusivity
+C     *SGL= gaseous,aqueous diffusivity for gases,solutes listed in
+C     *SG PARAMETER statement above
 C
-      IF(BKVL(L,NY,NX).GT.ZEROS(NY,NX))THEN
-      CORGC(L,NY,NX)=AMIN1(0.55E+06,ORGC(L,NY,NX)/BKVL(L,NY,NX))
-      ELSE
-      CORGC(L,NY,NX)=0.0
-      ENDIF
-C     WRITE(*,1113)'CORGC',I,J,NX,NY,L,CORGC(L,NY,NX)
-C    2,ORGC(L,NY,NX),BKVL(L,NY,NX),BKDS(L,NY,NX),VOLX(L,NY,NX)
+      TFACL=(TKS(0,NY,NX)/298.15)**6
+      TFND(0,NY,NX)=TFACL
+      CQSGL(0,NY,NX)=CQSG*TFACL
+      OLSGL(0,NY,NX)=OLSG*TFACL
+      ZLSGL(0,NY,NX)=ZLSG*TFACL
+      ZNSGL(0,NY,NX)=ZNSG*TFACL
+      HLSGL(0,NY,NX)=HLSG*TFACL
+      ZVSGL(0,NY,NX)=ZVSG*TFACL
+      ZOSGL(0,NY,NX)=ZOSG*TFACL
+      POSGL(0,NY,NX)=POSG*TFACL
+      OCSGL(0,NY,NX)=OCSG*TFACL
+      ONSGL(0,NY,NX)=ONSG*TFACL
+      OPSGL(0,NY,NX)=OPSG*TFACL
+      OASGL(0,NY,NX)=OASG*TFACL
 C
+C     R*Y,R*X=total substrate uptake from previous,current hour
+C     used in nitro.f, uptake.f
+C
+      ROXYY(0,NY,NX)=ROXYX(0,NY,NX)
+      RNH4Y(0,NY,NX)=RNH4X(0,NY,NX)
+      RNO3Y(0,NY,NX)=RNO3X(0,NY,NX)
+      RNO2Y(0,NY,NX)=RNO2X(0,NY,NX)
+      RN2OY(0,NY,NX)=RN2OX(0,NY,NX)
+      RP14Y(0,NY,NX)=RP14X(0,NY,NX)
+      RPO4Y(0,NY,NX)=RPO4X(0,NY,NX)
+      ROXYX(0,NY,NX)=0.0
+      RNH4X(0,NY,NX)=0.0
+      RNO3X(0,NY,NX)=0.0
+      RNO2X(0,NY,NX)=0.0
+      RN2OX(0,NY,NX)=0.0
+      RP14X(0,NY,NX)=0.0
+      RPO4X(0,NY,NX)=0.0
+      DO 5055 K=0,4
+      ROQCY(K,0,NY,NX)=ROQCX(K,0,NY,NX)
+      ROQAY(K,0,NY,NX)=ROQAX(K,0,NY,NX)
+      ROQCX(K,0,NY,NX)=0.0
+      ROQAX(K,0,NY,NX)=0.0
+5055  CONTINUE
+C
+C     WGSGA,WGSGR,WGSGW=vapor diffusivity in air,litter,snowpack
+C
+      TFACA=(TKA(NY,NX)/298.15)**1.75
+      WGSGA(NY,NX)=WGSG*TFACA
+      TFACR=(TKS(0,NY,NX)/298.15)**1.75
+      WGSGR(NY,NX)=WGSG*TFACR
+      DO 5060 L=1,JS
+      TFACW=(TKW(L,NY,NX)/298.15)**1.75
+      WGSGW(L,NY,NX)=WGSG*TFACW
+5060  CONTINUE
+      end subroutine SetTracerPropertyInLiterAir
+
+C------------------------------------------------------------------------------------------
+
+      subroutine GetSoluteConcentrations(L,NY,NX)
+      implicit none
+      integer, intent(in) :: L,NY,NX
+
+C     begin_execution
+
 C     CALCULATE SOIL CONCENTRATIONS OF NH4, NH3, NO3, PO4
 C     IN BAND AND NON-BAND ZONES
 C
@@ -1767,6 +2061,16 @@ C
       CH2P4B(L,NY,NX)=0.0
       CPO4B(L,NY,NX)=0.0
       ENDIF
+      end subroutine GetSoluteConcentrations
+
+C------------------------------------------------------------------------------------------
+
+      subroutine PrepVars4PlantMicrobeUptake(L,NY,NX)
+      implicit none
+      integer, intent(in) :: L,NY,NX
+
+      integer :: K
+C     begin_execution
 C
 C     PREPARE ARRAYS FOR TOTAL O2 UPTAKE AND NH4,NO3.NO2,N2O,HPO4,H2PO4
 C     UPTAKE IN NON-BAND,BAND AND DOC,DON,DOP,ACETATE UPTAKE
@@ -1916,200 +2220,17 @@ C
      2*EXP(0.513-0.0171*TCS(L,NY,NX))*FH2O
       SH2GL(L,NY,NX)=SH2GX/(EXP(AH2GX*CSTR(L,NY,NX)))
      2*EXP(0.597-0.0199*TCS(L,NY,NX))*FH2O
-C
-C     WATER POTENTIALS
-C
-C     FC,WP=water contents at field capacity,wilting point,saturation
-C     PSISM,PSISE=matric,saturation water potential
-C     SRP=parameter for deviation from linear log-log water retention
-C     FC,WP=water contents at field capacity,wilting point from soil file
-C     FCL,WPL=log FC,WP
-C     FCD,PSD=FCL-WPL,log(POROS)-FCL
-C     FCI,WPI=FC,WP of ice
-C     THETIX=ice concentration
-C
-      IF(BKVL(L,NY,NX).GT.ZEROS(NY,NX)
-     2.AND.VOLX(L,NY,NX).GT.ZEROS(NY,NX))THEN
-      THETW1=AMAX1(0.0,AMIN1(POROS(L,NY,NX)
-     2,VOLW(L,NY,NX)/VOLY(L,NY,NX)))
-      IF(THETW1.LT.FC(L,NY,NX))THEN
-      PSISM(L,NY,NX)=AMAX1(PSIHY,-EXP(PSIMX(NY,NX)
-     2+((FCL(L,NY,NX)-LOG(THETW1))
-     3/FCD(L,NY,NX)*PSIMD(NY,NX))))
-      ELSEIF(THETW1.LT.POROS(L,NY,NX)-DTHETW)THEN
-      PSISM(L,NY,NX)=-EXP(PSIMS(NY,NX)
-     2+(((PSL(L,NY,NX)-LOG(THETW1))
-     3/PSD(L,NY,NX))**SRP(L,NY,NX)*PSISD(NY,NX)))
-      ELSE
-      PSISM(L,NY,NX)=PSISE(L,NY,NX)
-      ENDIF
-      ELSEIF(VOLX(L,NY,NX).GT.ZEROS2(NY,NX))THEN
-      FCX=FCI*THETI(L,NY,NX)
-      WPX=WPI*THETI(L,NY,NX)
-      FCLX=LOG(FCX)
-      WPLX=LOG(WPX)
-      PSDX=PSL(L,NY,NX)-FCLX
-      FCDX=FCLX-WPLX
-      IF(THETW(L,NY,NX).LT.FCX)THEN
-      PSISM(L,NY,NX)=AMAX1(PSIHY,-EXP(PSIMX(NY,NX)
-     2+((FCLX-LOG(THETW(L,NY,NX)))
-     3/FCDX*PSIMD(NY,NX))))
-      ELSEIF(THETW(L,NY,NX).LT.POROS(L,NY,NX)-DTHETW)THEN
-      PSISM(L,NY,NX)=-EXP(PSIMS(NY,NX)
-     2+(((PSL(L,NY,NX)-LOG(THETW(L,NY,NX)))
-     3/PSDX)*PSISD(NY,NX)))
-      ELSE
-      PSISM(L,NY,NX)=PSISE(L,NY,NX)
-      ENDIF
-      ELSE
-      PSISM(L,NY,NX)=PSISE(L,NY,NX)
-      ENDIF
-C     WRITE(*,443)'PSISM',I,J,NX,NY,L,PSISM(L,NY,NX)
-C    2,THETW(L,NY,NX),THETI(L,NY,NX),FCX,WPX,POROS(L,NY,NX)
-C
-C     SOIL OSMOTIC, GRAVIMETRIC AND MATRIC WATER POTENTIALS
-C
-C     PSISM,PSISO,PSISH,PSIST=matric,osmotic,gravimetric,total water potential
-C
-      PSISO(L,NY,NX)=-8.3143E-06*TKS(L,NY,NX)*CION(L,NY,NX)
-      PSISH(L,NY,NX)=0.0098*(ALT(NY,NX)-DPTH(L,NY,NX))
-      PSIST(L,NY,NX)=AMIN1(0.0,PSISM(L,NY,NX)+PSISO(L,NY,NX)
-     2+PSISH(L,NY,NX))
-C     IF((I/30)*30.EQ.I.AND.J.EQ.15)THEN
-C     WRITE(*,1113)'PSISM1',I,J,NX,NY,L,PSISM(L,NY,NX)
-C    2,THETW(L,NY,NX),THETW1,VOLX(L,NY,NX)
-C    2,FC(L,NY,NX),WP(L,NY,NX),POROS(L,NY,NX),VOLP(L,NY,NX)
-C    3,VOLW(L,NY,NX),VOLI(L,NY,NX),VOLA(L,NY,NX),VOLT(L,NY,NX)
-C    4,CDPTH(L,NY,NX),DPTH(L,NY,NX),CDPTHZ(L,NY,NX),DPTHZ(L,NY,NX)
-C    5,DLYR(3,L,NY,NX),PSIST(L,NY,NX),PSISO(L,NY,NX)
-C    2,PSISH(L,NY,NX),TKS(L,NY,NX),CION(L,NY,NX)
-1113  FORMAT(A8,5I4,50E12.4)
-C     ENDIF
-C
-C     SOIL RESISTANCE TO ROOT PENETRATION
-C
-C     RSCS=soil resistance to root penetration (MPa)
-C
-C     IF(BKDS(L,NY,NX).GT.ZERO)THEN
-C     CCLAYT=CCLAY(L,NY,NX)*1.0E+02
-C     CORGCT=CORGC(L,NY,NX)*1.0E-04
-C     CC=EXP(-3.6733-0.1447*CCLAYT+0.7653*CORGCT)
-C     DD=-0.4805-0.1239*CCLAYT+0.2080*CORGCT
-C     EE=3.8521+0.0963*CCLAYT
-C     RSCS(L,NY,NX)=CC*THETW(L,NY,NX)**DD*BKDS(L,NY,NX)**EE
-C     ELSE
-      RSCS(L,NY,NX)=0.0
-C     ENDIF
-C     WRITE(*,2442)'RSCS',I,J,NX,NY,L,RSCS(L,NY,NX),THETW(L,NY,NX)
-C    2,BKDS(L,NY,NX),CCLAY(L,NY,NX),CORGC(L,NY,NX)
-2442  FORMAT(A8,5I4,12E12.4)
-C
-C     SOIL HYDRAULIC CONDUCTIVITIES FROM AMBIENT SOIL WATER CONTENTS
-C
-C     CNDU=soil hydraulic conductivity for root uptake
-C
-      K=MAX(1,MIN(100,INT(100.0*(POROS(L,NY,NX)-THETW(L,NY,NX))
-     2/POROS(L,NY,NX))+1))
-      CNDU(L,NY,NX)=0.5*(HCND(1,K,L,NY,NX)+HCND(3,K,L,NY,NX))
-C
-C     CALCULATE ACTIVE LAYER DEPTH
-C
-C     VOLI,VOLIH=ice volume in micropores,macropores
-C     VOLW,VOLWH=water volume in micropores,macropores
-C     VOLA,VOLAH=total volume in micropores,macropores
-C     DPTHA=active layer depth
-C     CDPTH,DLYR=depth to bottom,thickness of soil layer
-C
-      IF(ICHKA.EQ.0)THEN
-      VOLIT=VOLI(L,NY,NX)+VOLIH(L,NY,NX)
-      VOLAT=VOLA(L,NY,NX)+VOLAH(L,NY,NX)
-      IF(VOLAT.GT.ZEROS2(NY,NX).AND.VOLIT.GT.0.01*VOLAT)THEN
-      DO 5700 LL=MIN(L+1,NL(NY,NX)),NL(NY,NX)
-      VOLITL=VOLI(LL,NY,NX)+VOLIH(LL,NY,NX)
-      VOLWTL=VOLW(LL,NY,NX)+VOLWH(LL,NY,NX)
-      VOLATL=VOLA(LL,NY,NX)+VOLAH(LL,NY,NX)
-      IF(VOLATL.GT.ZEROS2(NY,NX).AND.VOLITL.LT.0.01*VOLATL)THEN
-      GO TO 5701
-      ENDIF
-5700  CONTINUE
-      IF(VOLAT.GT.ZEROS2(NY,NX))THEN
-      DPTHA(NY,NX)=CDPTH(L,NY,NX)-DLYR(3,L,NY,NX)
-     2*AMIN1(1.0,VOLIT/VOLAT)
-      ELSE
-      DPTHA(NY,NX)=CDPTH(L,NY,NX)-DLYR(3,L,NY,NX)
-      ENDIF
-      ICHKA=1
-      GO TO 5702
-5701  DPTHA(NY,NX)=9999.0
-5702  CONTINUE
-      ENDIF
-      ENDIF
-C
-C     OUTPUT FOR WATER TABLE DEPTH
-C
-C     IDTBL=water table flag from site file
-C     THETPZ,THETPW=current,minimum air-filled, porosity for water table
-C     DPTH,DTBLX=depth of soil layer midpoint, water table
-C     PSIS1=water potential in hydraulic equilibrium with layer below
-C     THETW1,THETWP=water content at PSIS1,minimum SWC for water table
-C     DPTHT=water table depth
-C
-      IF(IDTBL(NY,NX).NE.0)THEN
-      IF(IFLGY.EQ.0)THEN
-      IF(THETPZ(L,NY,NX).LT.THETPW.OR.L.EQ.NL(NY,NX))THEN
-      IFLGY=1
-      IF(DPTH(L,NY,NX).LT.DTBLX(NY,NX))THEN
-      DO 5705 LL=MIN(L+1,NL(NY,NX)),NL(NY,NX)
-      IF(THETPZ(LL,NY,NX).GE.THETPW.AND.LL.NE.NL(NY,NX))THEN
-      IFLGY=0
-      GO TO 5706
-      ELSEIF(DPTH(LL,NY,NX).GE.DTBLX(NY,NX))THEN
-      GO TO 5706
-      ENDIF
-5705  CONTINUE
-      ENDIF
-5706  CONTINUE
-      IF(IFLGY.EQ.1)THEN
-      IF(THETPZ(L,NY,NX).GE.THETPW.AND.L.NE.NL(NY,NX))THEN
-      PSIS1=PSISM(L+1,NY,NX)-0.0098*(DPTH(L+1,NY,NX)-DPTH(L,NY,NX))
-      THETWM=THETWP*POROS(L,NY,NX)
-      THETW1=AMIN1(THETWM,EXP((PSIMS(NY,NX)-LOG(-PSIS1))
-     2*PSD(L,NY,NX)/PSISD(NY,NX)+PSL(L,NY,NX)))
-      IF(THETWM.GT.THETW1)THEN
-      THETPX=AMIN1(1.0,AMAX1(0.0,(THETWM-THETW(L,NY,NX))
-     2/(THETWM-THETW1)))
-      DPTHT(NY,NX)=CDPTH(L,NY,NX)-DLYR(3,L,NY,NX)*(1.0-THETPX)
-      ELSE
-      DPTHT(NY,NX)=CDPTH(L,NY,NX)-DLYR(3,L,NY,NX)
-      ENDIF
-      ELSEIF(L.GT.NU(NY,NX))THEN
-      PSIS1=PSISM(L,NY,NX)-0.0098*(DPTH(L,NY,NX)-DPTH(L-1,NY,NX))
-      THETWM=THETWP*POROS(L-1,NY,NX)
-      THETW1=AMIN1(THETWM,EXP((PSIMS(NY,NX)-LOG(-PSIS1))
-     2*PSD(L-1,NY,NX)/PSISD(NY,NX)+PSL(L-1,NY,NX)))
-      IF(THETWM.GT.THETW1)THEN
-      THETPX=AMIN1(1.0,AMAX1(0.0,(THETWM-THETW(L-1,NY,NX))
-     2/(THETWM-THETW1)))
-      DPTHT(NY,NX)=CDPTH(L-1,NY,NX)-DLYR(3,L-1,NY,NX)*(1.0-THETPX)
-      ELSE
-      DPTHT(NY,NX)=CDPTH(L-1,NY,NX)-DLYR(3,L-1,NY,NX)
-      ENDIF
-      ELSE
-      DPTHT(NY,NX)=CDPTH(L,NY,NX)-DLYR(3,L,NY,NX)
-      ENDIF
-      ENDIF
-      ENDIF
-      ENDIF
-C     IF(NX.EQ.3.AND.NY.EQ.3)THEN
-C     WRITE(*,5353)'DPTHT',I,J,NX,NY,L,LL,IFLGY,DPTHT(NY,NX)
-C    2,CDPTH(L,NY,NX),DLYR(3,L,NY,NX),DPTH(L,NY,NX),DPTH(L-1,NY,NX)
-C    3,PSIS1,PSISM(L,NY,NX),THETWM,THETW1,THETW(L-1,NY,NX)
-C    4,THETPZ(L,NY,NX),THETPW
-5353  FORMAT(A8,7I4,30E12.4)
-C     ENDIF
-      ENDIF
-9985  CONTINUE
-C
+      end subroutine PrepVars4PlantMicrobeUptake
+
+C------------------------------------------------------------------------------------------
+
+      subroutine GetSurfResidualProperties(NY,NX)
+
+      implicit none
+      integer, intent(in) :: NY,NX
+
+C     begin_execution
+
 C     PHYSICAL PROPERTIES, AND WATER, GAS, AND MINERAL CONTENTS
 C     OF SURFACE RESIDUE
 C
@@ -2225,104 +2346,17 @@ C
       CZ2OS(0,NY,NX)=0.0
       CH2GS(0,NY,NX)=0.0
       ENDIF
-C
-C     LITTER GAS CONCENTRATIOS
-C
-C     C*G=soil gas gaseous concentration
-C     *E=atmospheric concentration
-C     TKS,TCS=litter temperature (K,C)
-C     S*L=gas solubility
-C     C*S=soil gas aqueous concentration
-C
-      CCO2G(0,NY,NX)=CO2E(NY,NX)*5.36E-04*273.15/TKS(0,NY,NX)
-      CCH4G(0,NY,NX)=CH4E(NY,NX)*5.36E-04*273.15/TKS(0,NY,NX)
-      COXYG(0,NY,NX)=OXYE(NY,NX)*1.43E-03*273.15/TKS(0,NY,NX)
-      CZ2GG(0,NY,NX)=Z2GE(NY,NX)*1.25E-03*273.15/TKS(0,NY,NX)
-      CZ2OG(0,NY,NX)=Z2OE(NY,NX)*1.25E-03*273.15/TKS(0,NY,NX)
-      CNH3G(0,NY,NX)=ZNH3E(NY,NX)*6.25E-04*273.15/TKS(0,NY,NX)
-      CH2GG(0,NY,NX)=H2GE(NY,NX)*8.92E-05*273.15/TKS(0,NY,NX)
-      CNH4B(0,NY,NX)=0.0
-      CNH3B(0,NY,NX)=0.0
-      CNO3B(0,NY,NX)=0.0
-      CNO2B(0,NY,NX)=0.0
-      CH2P4B(0,NY,NX)=0.0
-      SCO2L(0,NY,NX)=SCO2X*EXP(0.843-0.0281*TCS(0,NY,NX))
-      SCH4L(0,NY,NX)=SCH4X*EXP(0.597-0.0199*TCS(0,NY,NX))
-      SOXYL(0,NY,NX)=SOXYX*EXP(0.516-0.0172*TCS(0,NY,NX))
-      SN2GL(0,NY,NX)=SN2GX*EXP(0.456-0.0152*TCS(0,NY,NX))
-      SN2OL(0,NY,NX)=SN2OX*EXP(0.897-0.0299*TCS(0,NY,NX))
-      SNH3L(0,NY,NX)=SNH3X*EXP(0.513-0.0171*TCS(0,NY,NX))
-      SH2GL(0,NY,NX)=SH2GX*EXP(0.597-0.0199*TCS(0,NY,NX))
-      IF(VOLW(0,NY,NX).GT.ZEROS2(NY,NX))THEN
-      CCO2S(0,NY,NX)=AMAX1(0.0,CO2S(0,NY,NX)/VOLW(0,NY,NX))
-      CCH4S(0,NY,NX)=AMAX1(0.0,CH4S(0,NY,NX)/VOLW(0,NY,NX))
-      COXYS(0,NY,NX)=AMAX1(0.0,OXYS(0,NY,NX)/VOLW(0,NY,NX))
-      CZ2GS(0,NY,NX)=AMAX1(0.0,Z2GS(0,NY,NX)/VOLW(0,NY,NX))
-      CZ2OS(0,NY,NX)=AMAX1(0.0,Z2OS(0,NY,NX)/VOLW(0,NY,NX))
-      CH2GS(0,NY,NX)=AMAX1(0.0,H2GS(0,NY,NX)/VOLW(0,NY,NX))
-      ELSE
-      CCO2S(0,NY,NX)=0.0
-      CCH4S(0,NY,NX)=0.0
-      COXYS(0,NY,NX)=0.0
-      CZ2GS(0,NY,NX)=0.0
-      CZ2OS(0,NY,NX)=0.0
-      CH2GS(0,NY,NX)=0.0
-      ENDIF
-C
-C     TFACL=temperature effect on diffusivity
-C     *SGL= gaseous,aqueous diffusivity for gases,solutes listed in
-C     *SG PARAMETER statement above
-C
-      TFACL=(TKS(0,NY,NX)/298.15)**6
-      TFND(0,NY,NX)=TFACL
-      CQSGL(0,NY,NX)=CQSG*TFACL
-      OLSGL(0,NY,NX)=OLSG*TFACL
-      ZLSGL(0,NY,NX)=ZLSG*TFACL
-      ZNSGL(0,NY,NX)=ZNSG*TFACL
-      HLSGL(0,NY,NX)=HLSG*TFACL
-      ZVSGL(0,NY,NX)=ZVSG*TFACL
-      ZOSGL(0,NY,NX)=ZOSG*TFACL
-      POSGL(0,NY,NX)=POSG*TFACL
-      OCSGL(0,NY,NX)=OCSG*TFACL
-      ONSGL(0,NY,NX)=ONSG*TFACL
-      OPSGL(0,NY,NX)=OPSG*TFACL
-      OASGL(0,NY,NX)=OASG*TFACL
-C
-C     R*Y,R*X=total substrate uptake from previous,current hour
-C     used in nitro.f, uptake.f
-C
-      ROXYY(0,NY,NX)=ROXYX(0,NY,NX)
-      RNH4Y(0,NY,NX)=RNH4X(0,NY,NX)
-      RNO3Y(0,NY,NX)=RNO3X(0,NY,NX)
-      RNO2Y(0,NY,NX)=RNO2X(0,NY,NX)
-      RN2OY(0,NY,NX)=RN2OX(0,NY,NX)
-      RP14Y(0,NY,NX)=RP14X(0,NY,NX)
-      RPO4Y(0,NY,NX)=RPO4X(0,NY,NX)
-      ROXYX(0,NY,NX)=0.0
-      RNH4X(0,NY,NX)=0.0
-      RNO3X(0,NY,NX)=0.0
-      RNO2X(0,NY,NX)=0.0
-      RN2OX(0,NY,NX)=0.0
-      RP14X(0,NY,NX)=0.0
-      RPO4X(0,NY,NX)=0.0
-      DO 5055 K=0,4
-      ROQCY(K,0,NY,NX)=ROQCX(K,0,NY,NX)
-      ROQAY(K,0,NY,NX)=ROQAX(K,0,NY,NX)
-      ROQCX(K,0,NY,NX)=0.0
-      ROQAX(K,0,NY,NX)=0.0
-5055  CONTINUE
-C
-C     WGSGA,WGSGR,WGSGW=vapor diffusivity in air,litter,snowpack
-C
-      TFACA=(TKA(NY,NX)/298.15)**1.75
-      WGSGA(NY,NX)=WGSG*TFACA
-      TFACR=(TKS(0,NY,NX)/298.15)**1.75
-      WGSGR(NY,NX)=WGSG*TFACR
-      DO 5060 L=1,JS
-      TFACW=(TKW(L,NY,NX)/298.15)**1.75
-      WGSGW(L,NY,NX)=WGSG*TFACW
-5060  CONTINUE
-C
+      end subroutine GetSurfResidualProperties
+
+C------------------------------------------------------------------------------------------
+
+      subroutine MultiLayerSurfaceRadiation(I,J,NY,NX)
+      implicit none
+      integer, intent(in) :: I,J,NY,NX
+
+      integer :: NB,NZ,L,K,M,N,NN
+C     begin_execution
+
 C     MULTILAYER CANOPY INTERECEPTION OF DIRECT AND DIFFUSE RADIATION
 C     IN SW AND VISIBLE BANDS BY INCLINATION N, AZIMUTH M, LAYER L,
 C     NODE K, BRANCH NB, PFT NZ
@@ -2893,18 +2927,17 @@ C
       FRADP(NZ,NY,NX)=0.0
 146   CONTINUE
       ENDIF
-C     IF(NX.EQ.4.AND.NY.EQ.5)THEN
-C     DO 140 NZ=1,NP(NY,NX)
-C     WRITE(*,1926)'CANOPY',IYRC,I,J,NX,NY,NZ,FRADP(NZ,NY,NX)
-C    2,RADP(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX),RAP(NY,NX)
-C    2,FRADG(NY,NX),ARLFS(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-C    3,ARLFP(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-C    4,ARSTP(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-C    4,ARLSS(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-C    5,SSIN(NY,NX),DPTHS(NY,NX),FRADPT
-1926  FORMAT(A10,6I6,30E12.4)
-140   CONTINUE
-C     ENDIF
+      end subroutine MultiLayerSurfaceRadiation
+
+C------------------------------------------------------------------------------------------
+
+      subroutine DivideCanopyLayerByLAI(NY,NX)
+      implicit none
+      integer, intent(in) :: NY,NX
+
+      integer :: NZ,L
+C     begin_execution
+
 C
 C     DIVISION OF CANOPY INTO LAYERS WITH EQUAL LAI
 C
@@ -2951,7 +2984,15 @@ C     ZL(L-1,NY,NX)=AMAX1(0.0,AMIN1(ZL(L,NY,NX)-1.0E-06
 C    2,ZL(L-1,NY,NX)))
 2770  CONTINUE
       ENDIF
-C
+      end subroutine DivideCanopyLayerByLAI
+
+C------------------------------------------------------------------------------------------
+
+      subroutine CalcBoundaryLayerProperties(NY,NX)
+      implicit none
+      integer, intent(in) :: NY,NX
+
+C     begin_execution
 C     CANOPY ZERO PLANE AND ROUGHNESS HEIGHTS
 C
 C     ARLFC,ARSTC=leaf,stalk area of combined canopy
@@ -2997,75 +3038,360 @@ C
       RAB(NY,NX)=RAM
       RIB(NY,NX)=0.0
       ENDIF
+      end subroutine CalcBoundaryLayerProperties
+
+C------------------------------------------------------------------------------------------
+
+      subroutine ApplyFertilizerAtNoon(I,J,NHW,NHE,NVN,NVS)
 C
-C     RESET HOURLY INDICATORS
-C
-      THRMCX(NY,NX)=THRMC(NY,NX)
-      THRMGX(NY,NX)=THRMG(NY,NX)
-      CNETX(NY,NX)=TCNET(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-      THRMC(NY,NX)=0.0
-      THRMG(NY,NX)=0.0
-      TLEX(NY,NX)=TLEC(NY,NX)
-      TSHX(NY,NX)=TSHC(NY,NX)
-      TLEC(NY,NX)=0.0
-      TSHC(NY,NX)=0.0
-      TRN(NY,NX)=0.0
-      TLE(NY,NX)=0.0
-      TSH(NY,NX)=0.0
-      TGH(NY,NX)=0.0
-      TCCAN(NY,NX)=0.0
-      TCNET(NY,NX)=0.0
-      RECO(NY,NX)=0.0
-C
-C     CANOPY RETENTION OF PRECIPITATION
-C
-C     XVOLWC=foliar surface water retention capacity
-C     ARLFP,ARSTP=leaf,stalk area of PFT
-C     FLWC,TFLWC=water retention of PFT,combined canopy
-C     PRECA=precipitation+irrigation
-C     FRADP=fraction of radiation received by each PFT canopy
-C     VOLWC=canopy surface water retention
-C
-      DO 1930 NZ=1,NP(NY,NX)
-      VOLWCX=XVOLWC(IGTYP(NZ,NY,NX))
-     2*(ARLFP(NZ,NY,NX)+ARSTP(NZ,NY,NX))
-      FLWC(NZ,NY,NX)=AMAX1(0.0,AMIN1(PRECA(NY,NX)*FRADP(NZ,NY,NX)
-     2,VOLWCX-VOLWC(NZ,NY,NX)))
-      TFLWCI(NY,NX)=TFLWCI(NY,NX)+PRECA(NY,NX)*FRADP(NZ,NY,NX)
-      TFLWC(NY,NX)=TFLWC(NY,NX)+FLWC(NZ,NY,NX)
-C
-C     NUMBERS OF TOP AND BOTTOM ROOTED SOIL LAYERS
-C
-C     NG=number of uppermost rooted layer
-C     NINR=number of lowest rooted layer
-C
-      NG(NZ,NY,NX)=MAX(NG(NZ,NY,NX),NU(NY,NX))
-      NIX(NZ,NY,NX)=MAX(NIX(NZ,NY,NX),NU(NY,NX))
-      DO 9790 NR=1,10
-      NINR(NR,NZ,NY,NX)=MAX(NINR(NR,NZ,NY,NX),NU(NY,NX))
-9790  CONTINUE
-1930  CONTINUE
-C
-C     WRITE SW AND PAR ALBEDO
-C
-C     IF(ABS(J-ZNOON(NY,NX)).LT.1)THEN
-C     IF(RAD(NY,NX).GT.0.0.AND.RAP(NY,NX).GT.0.0)THEN
-C     WRITE(19,1927)'ALBEDO',IYRC,I,J,NX,NY
-C    2,RAD(NY,NX),RAP(NY,NX),TRADC(NY,NX),TRAPC(NY,NX)
-C    3,TRADG(NY,NX),TRAPG(NY,NX)
-C    4,(RAD(NY,NX)-TRADC(NY,NX)-TRADG(NY,NX))/RAD(NY,NX)
-C    5,(RAP(NY,NX)-TRAPC(NY,NX)-TRAPG(NY,NX))/RAP(NY,NX)
-1927  FORMAT(A10,5I6,30E12.4)
-C     ENDIF
-C     ENDIF
-9990  CONTINUE
-9995  CONTINUE
-C
-C     FERTILIZER APPLICATIONS OCCUR AT SOLAR NOON
-C
+      implicit none
+      integer, intent(in) :: I,J,NHW,NHE,NVN,NVS
+
+      integer :: NX,NY
+C     begin_execution
+
       DO 8990 NX=NHW,NHE
       DO 8995 NY=NVN,NVS
       IF(J.EQ.INT(ZNOON(NY,NX)))THEN
+
+      call ApplyMineralFertilizer(I,J,NY,NX)
+C
+C     SOIL LAYER NUMBER IN WHICH PLANT OR ANIMAL RESIDUES ARE APPLIED
+C
+      call ApplyPlantAnimalResidue(I,J,NY,NX)
+C
+C     FERTILIZER UREA, NITRIFICATION INHIBITORS
+      call ApplyUreaNitrifierInhibitor(I,J,NY,NX)
+
+      ENDIF
+8995  CONTINUE
+8990  CONTINUE
+      end subroutine ApplyFertilizerAtNoon
+
+C------------------------------------------------------------------------------------------
+
+      subroutine ApplyUreaNitrifierInhibitor(I,J,NY,NX)
+
+      implicit none
+      integer, intent(in) :: I,J,NY,NX
+
+      integer :: L
+C     begin_execution
+
+C
+C     IYTYP=fertilizer release type from fertilizer input file
+C     FERT=fertilizer type from fertilizer input file
+C     IUTYP=urea hydrolysis inhibitor type (1=no,2=yes)
+C     ZNHU0,ZNHUI=initial,current urea hydrolysis inhibition activity
+C     ZNFN0,ZNFNI=initial,current nitrification inhibition activity
+C
+      IF(FERT(3,I,NY,NX).GT.0.0.OR.FERT(7,I,NY,NX).GT.0.0)THEN
+      IF(IYTYP(0,I,NY,NX).EQ.0)THEN
+      IUTYP(NY,NX)=0
+      ELSEIF(IYTYP(0,I,NY,NX).EQ.1.OR.IYTYP(0,I,NY,NX).EQ.3)THEN
+      IUTYP(NY,NX)=1
+      ELSE
+      IUTYP(NY,NX)=2
+      ENDIF
+      DO 9964 L=0,NL(NY,NX)
+      IF(L.EQ.LFDPTH)THEN
+      ZNHU0(L,NY,NX)=1.0
+      ZNHUI(L,NY,NX)=1.0
+      ELSE
+      ZNHU0(L,NY,NX)=0.0
+      ZNHUI(L,NY,NX)=0.0
+      ENDIF
+9964  CONTINUE
+      ENDIF
+      IF(IYTYP(0,I,NY,NX).EQ.3.OR.IYTYP(0,I,NY,NX).EQ.4)THEN
+      DO 9965 L=0,NL(NY,NX)
+      IF(L.EQ.LFDPTH)THEN
+      ZNFN0(L,NY,NX)=1.0
+      ZNFNI(L,NY,NX)=1.0
+      ELSE
+      ZNFN0(L,NY,NX)=0.0
+      ZNFNI(L,NY,NX)=0.0
+      ENDIF
+9965  CONTINUE
+      ENDIF
+      end subroutine ApplyUreaNitrifierInhibitor
+
+C------------------------------------------------------------------------------------------
+
+      subroutine ApplyPlantAnimalResidue(I,J,NY,NX)
+      implicit none
+      integer, intent(in) :: I,J,NY,NX
+
+      integer :: L,K,M,N,NN
+
+C     begin_execution
+C     LFDPTH=layer number
+C
+      IF(OFC(1)+OFC(2).GT.0.0)THEN
+      DO 2985 L=0,JZ
+      FDPTHM=FDPTH(I,NY,NX)+CDPTH(NU(NY,NX)-1,NY,NX)
+      IF(FDPTHM.LE.0.0)THEN
+      LFDPTH=0
+      GO TO 2980
+      ELSEIF(CDPTH(L,NY,NX).GE.FDPTHM)THEN
+      LFDPTH=L
+      GO TO 2980
+      ENDIF
+2985  CONTINUE
+2980  CONTINUE
+C
+C     ALLOCATION OF PLANT RESIDUE APPLICATION TO
+C     RESIDUE PROTEIN, CH2O, CELLULOSE, LIGNIN
+C
+C     CFOSC=fraction of litter allocated to protein(1)
+C     soluble CH2O(2), cellulose(3) and lignin(4)
+C     ITYPE=litter type entered in fertilizer input file
+C
+C     MAIZE
+C
+      IF(IYTYP(1,I,NY,NX).EQ.1)THEN
+      CFOSC(1,1,LFDPTH,NY,NX)=0.080
+      CFOSC(2,1,LFDPTH,NY,NX)=0.245
+      CFOSC(3,1,LFDPTH,NY,NX)=0.613
+      CFOSC(4,1,LFDPTH,NY,NX)=0.062
+C
+C     WHEAT
+C
+      ELSEIF(IYTYP(1,I,NY,NX).EQ.2)THEN
+      CFOSC(1,1,LFDPTH,NY,NX)=0.125
+      CFOSC(2,1,LFDPTH,NY,NX)=0.171
+      CFOSC(3,1,LFDPTH,NY,NX)=0.560
+      CFOSC(4,1,LFDPTH,NY,NX)=0.144
+C
+C     SOYBEAN
+C
+      ELSEIF(IYTYP(1,I,NY,NX).EQ.3)THEN
+      CFOSC(1,1,LFDPTH,NY,NX)=0.138
+      CFOSC(2,1,LFDPTH,NY,NX)=0.426
+      CFOSC(3,1,LFDPTH,NY,NX)=0.316
+      CFOSC(4,1,LFDPTH,NY,NX)=0.120
+C
+C     OLD STRAW
+C
+      ELSEIF(IYTYP(1,I,NY,NX).EQ.4)THEN
+      CFOSC(1,1,LFDPTH,NY,NX)=0.075
+      CFOSC(2,1,LFDPTH,NY,NX)=0.125
+      CFOSC(3,1,LFDPTH,NY,NX)=0.550
+      CFOSC(4,1,LFDPTH,NY,NX)=0.250
+C
+C     STRAW
+C
+      ELSEIF(IYTYP(1,I,NY,NX).EQ.5)THEN
+      CFOSC(1,1,LFDPTH,NY,NX)=0.036
+      CFOSC(2,1,LFDPTH,NY,NX)=0.044
+      CFOSC(3,1,LFDPTH,NY,NX)=0.767
+      CFOSC(4,1,LFDPTH,NY,NX)=0.153
+C
+C     COMPOST
+C
+      ELSEIF(IYTYP(1,I,NY,NX).EQ.6)THEN
+      CFOSC(1,1,LFDPTH,NY,NX)=0.143
+      CFOSC(2,1,LFDPTH,NY,NX)=0.015
+      CFOSC(3,1,LFDPTH,NY,NX)=0.640
+      CFOSC(4,1,LFDPTH,NY,NX)=0.202
+C
+C     GREEN MANURE
+C
+      ELSEIF(IYTYP(1,I,NY,NX).EQ.7)THEN
+      CFOSC(1,1,LFDPTH,NY,NX)=0.202
+      CFOSC(2,1,LFDPTH,NY,NX)=0.013
+      CFOSC(3,1,LFDPTH,NY,NX)=0.560
+      CFOSC(4,1,LFDPTH,NY,NX)=0.225
+C
+C     SIMPLE SUBSTRATE
+C
+      ELSEIF(IYTYP(1,I,NY,NX).EQ.10)THEN
+      CFOSC(1,1,LFDPTH,NY,NX)=0.000
+      CFOSC(2,1,LFDPTH,NY,NX)=1.000
+      CFOSC(3,1,LFDPTH,NY,NX)=0.000
+      CFOSC(4,1,LFDPTH,NY,NX)=0.000
+      ELSE
+      CFOSC(1,1,LFDPTH,NY,NX)=0.075
+      CFOSC(2,1,LFDPTH,NY,NX)=0.125
+      CFOSC(3,1,LFDPTH,NY,NX)=0.550
+      CFOSC(4,1,LFDPTH,NY,NX)=0.250
+      ENDIF
+C
+C     ALLOCATION OF ANIMAL MANURE APPLICATION TO
+C     RESIDUE PROTEIN, CH2O, CELLULOSE, LIGNIN
+C
+C     RUMINANT
+C
+      IF(IYTYP(2,I,NY,NX).EQ.1)THEN
+      CFOSC(1,2,LFDPTH,NY,NX)=0.036
+      CFOSC(2,2,LFDPTH,NY,NX)=0.044
+      CFOSC(3,2,LFDPTH,NY,NX)=0.630
+      CFOSC(4,2,LFDPTH,NY,NX)=0.290
+C
+C     NON-RUMINANT
+C
+      ELSEIF(IYTYP(2,I,NY,NX).EQ.2)THEN
+      CFOSC(1,2,LFDPTH,NY,NX)=0.138
+      CFOSC(2,2,LFDPTH,NY,NX)=0.401
+      CFOSC(3,2,LFDPTH,NY,NX)=0.316
+      CFOSC(4,2,LFDPTH,NY,NX)=0.145
+C
+C     GRAZING
+C
+      ELSEIF(IYTYP(2,I,NY,NX).EQ.3)THEN
+      CFOSC(1,2,LFDPTH,NY,NX)=0.036
+      CFOSC(2,2,LFDPTH,NY,NX)=0.044
+      CFOSC(3,2,LFDPTH,NY,NX)=0.630
+      CFOSC(4,2,LFDPTH,NY,NX)=0.290
+C
+C     OTHER
+C
+      ELSE
+      CFOSC(1,2,LFDPTH,NY,NX)=0.138
+      CFOSC(2,2,LFDPTH,NY,NX)=0.401
+      CFOSC(3,2,LFDPTH,NY,NX)=0.316
+      CFOSC(4,2,LFDPTH,NY,NX)=0.145
+      ENDIF
+C
+C     DISTRIBUTE RESIDUE APPLICATION AMONG COMPONENTS OF RESIDUE COMPLEX
+C
+C     OFC,OFN,OFP=litter C,N,P application from fertilizer file
+C
+      DO 2965 K=1,2
+      OSCI=OFC(K)*AREA(3,LFDPTH,NY,NX)
+      OSNI=OFN(K)*AREA(3,LFDPTH,NY,NX)
+      OSPI=OFP(K)*AREA(3,LFDPTH,NY,NX)
+      IF(BKVL(LFDPTH,NY,NX).GT.ZEROS(NY,NX))THEN
+      CORGCX=OSCI/BKVL(LFDPTH,NY,NX)
+      ELSE
+      CORGCX=0.55E+06
+      ENDIF
+      OSCX=0.0
+      OSNX=0.0
+      OSPX=0.0
+C
+C     BIOMASSES OF MICROBIAL POPULATIONS IN RESIDUE
+C
+C     OMC,OMN,OMP=microbial biomass in litter application
+C     OMCI=microbial biomass content in litter
+C     OMCF,OMCA=hetero,autotrophic biomass composition in litter
+C
+      DO 2960 N=1,7
+      DO 2961 M=1,3
+      OMC1=AMAX1(0.0,AMIN1(OSCI*OMCI(M,K)*OMCF(N),OSCI-OSCX))
+      OMN1=AMAX1(0.0,AMIN1(OMC1*CNOMC(M,N,K),OSNI-OSNX))
+      OMP1=AMAX1(0.0,AMIN1(OMC1*CPOMC(M,N,K),OSPI-OSPX))
+      OMC(M,N,K,LFDPTH,NY,NX)=OMC(M,N,K,LFDPTH,NY,NX)+OMC1
+      OMN(M,N,K,LFDPTH,NY,NX)=OMN(M,N,K,LFDPTH,NY,NX)+OMN1
+      OMP(M,N,K,LFDPTH,NY,NX)=OMP(M,N,K,LFDPTH,NY,NX)+OMP1
+C     WRITE(*,2345)'OMCI',I,J,LFDPTH,K,N,M
+C    2,OMC1,OMN1,OMP1,OSCI,OMCI(M,K)
+C    2,OMCF(N),OSCX,CNOMC(M,N,K),CPOMC(M,N,K),OSNI,OSPI
+C    2,OMC(M,N,K,LFDPTH,NY,NX),OMN(M,N,K,LFDPTH,NY,NX)
+2345  FORMAT(A8,6I4,20E12.4)
+      OSCX=OSCX+OMC1
+      OSNX=OSNX+OMN1
+      OSPX=OSPX+OMP1
+      DO 2962 NN=1,7
+      OMC(M,NN,5,LFDPTH,NY,NX)=OMC(M,NN,5,LFDPTH,NY,NX)+OMC1*OMCA(NN)
+      OMN(M,NN,5,LFDPTH,NY,NX)=OMN(M,NN,5,LFDPTH,NY,NX)+OMN1*OMCA(NN)
+      OMP(M,NN,5,LFDPTH,NY,NX)=OMP(M,NN,5,LFDPTH,NY,NX)+OMP1*OMCA(NN)
+C     WRITE(*,2346)'OMCA',I,J,LFDPTH,K,N,NN,M
+C    2,OMC1,OMCA(NN),OMC(M,NN,5,LFDPTH,NY,NX)
+2346  FORMAT(A8,7I4,20E12.4)
+      OSCX=OSCX+OMC1*OMCA(NN)
+      OSNX=OSNX+OMN1*OMCA(NN)
+      OSPX=OSPX+OMP1*OMCA(NN)
+2962  CONTINUE
+2961  CONTINUE
+2960  CONTINUE
+C
+C     DOC, DON AND DOP IN RESIDUE
+C
+C     OQC,OQN,OQP=DOC,DON,DOP in litter
+C
+      OQC1=AMIN1(0.1*OSCX,OSCI-OSCX)
+      OQN1=AMIN1(0.1*OSNX,OSNI-OSNX)
+      OQP1=AMIN1(0.1*OSPX,OSPI-OSPX)
+      OQC(K,LFDPTH,NY,NX)=OQC(K,LFDPTH,NY,NX)+OQC1
+      OQN(K,LFDPTH,NY,NX)=OQN(K,LFDPTH,NY,NX)+OQN1
+      OQP(K,LFDPTH,NY,NX)=OQP(K,LFDPTH,NY,NX)+OQP1
+C
+C     REMAINDER DISTRIBUTED TO RESIDUE FRACTIONS
+C
+C     OSC,OSN,OSP,OSA=SOC,SON,SOP,colonized SOC in litter
+C     VOLT=litter volume
+C     UORGF,UFERTN,UFERTP=accumulated litter C,N,P application
+C     TNBP=accumulated net biome productivity
+C
+      OSCX=OSCX+OQC1
+      OSNX=OSNX+OQN1
+      OSPX=OSPX+OQP1
+      CNOFT=0.0
+      CPOFT=0.0
+      IF(OSCI-OSCX.GT.ZEROS(NY,NX))THEN
+      RNT=0.0
+      RPT=0.0
+      DO 965 M=1,4
+      RNT=RNT+(OSCI-OSCX)*CFOSC(M,K,LFDPTH,NY,NX)*CNOFC(M,K)
+      RPT=RPT+(OSCI-OSCX)*CFOSC(M,K,LFDPTH,NY,NX)*CPOFC(M,K)
+965   CONTINUE
+      FRNT=(OSNI-OSNX)/RNT
+      FRPT=(OSPI-OSPX)/RPT
+      DO 970 M=1,4
+      CNOF(M)=CNOFC(M,K)*FRNT
+      CPOF(M)=CPOFC(M,K)*FRPT
+      CNOFT=CNOFT+CFOSC(M,K,LFDPTH,NY,NX)*CNOF(M)
+      CPOFT=CPOFT+CFOSC(M,K,LFDPTH,NY,NX)*CPOF(M)
+970   CONTINUE
+      ELSE
+      DO 975 M=1,4
+      CNOF(M)=0.0
+      CPOF(M)=0.0
+975   CONTINUE
+      ENDIF
+      DO 2970 M=1,4
+      OSC1=CFOSC(M,K,LFDPTH,NY,NX)*(OSCI-OSCX)
+      IF(CNOFT.GT.ZERO)THEN
+      OSN1=CFOSC(M,K,LFDPTH,NY,NX)*CNOF(M)/CNOFT*(OSNI-OSNX)
+      ELSE
+      OSN1=0.0
+      ENDIF
+      IF(CPOFT.GT.ZERO)THEN
+      OSP1=CFOSC(M,K,LFDPTH,NY,NX)*CPOF(M)/CPOFT*(OSPI-OSPX)
+      ELSE
+      OSP1=0.0
+      ENDIF
+      OSC(M,K,LFDPTH,NY,NX)=OSC(M,K,LFDPTH,NY,NX)+OSC1
+      OSA(M,K,LFDPTH,NY,NX)=OSA(M,K,LFDPTH,NY,NX)+OSC1*OMCI(1,K)
+      OSN(M,K,LFDPTH,NY,NX)=OSN(M,K,LFDPTH,NY,NX)+OSN1
+      OSP(M,K,LFDPTH,NY,NX)=OSP(M,K,LFDPTH,NY,NX)+OSP1
+      IF(LFDPTH.EQ.0)THEN
+      VOLT(LFDPTH,NY,NX)=VOLT(LFDPTH,NY,NX)+OSC1*1.0E-06/BKRS(1)
+      ENDIF
+2970  CONTINUE
+      TORGF=TORGF+OSCI
+      TORGN=TORGN+OSNI
+      TORGP=TORGP+OSPI
+      UORGF(NY,NX)=UORGF(NY,NX)+OSCI
+      UFERTN(NY,NX)=UFERTN(NY,NX)+OSNI
+      UFERTP(NY,NX)=UFERTP(NY,NX)+OSPI
+      IF(IYTYP(2,I,NY,NX).LT.3)THEN
+      TNBP(NY,NX)=TNBP(NY,NX)+OSCI
+      ENDIF
+2965  CONTINUE
+      ENDIF
+      end subroutine ApplyPlantAnimalResidue
+
+C------------------------------------------------------------------------------------------
+
+      subroutine ApplyMineralFertilizer(I,J,NY,NX)
+      implicit none
+      integer, intent(in) :: I,J,NY,NX
+
+      integer :: L
+C     begin_execution
+
 C
 C     NH4,NH3,UREA,NO3 FERTILIZER APPLICATION
 C
@@ -3104,7 +3430,7 @@ C
       OFC(2)=FERT(17,I,NY,NX)
       OFN(2)=FERT(18,I,NY,NX)
       OFP(2)=FERT(19,I,NY,NX)
-C�
+C
 C     SOIL LAYER NUMBER AT DEPTH OF FERTILIZER APPLICATION
 C
 C     LFDPTH=layer number
@@ -3369,307 +3695,300 @@ C
      2+ZUAX+ZUBX+ZOAX+ZOBX)
       UFERTP(NY,NX)=UFERTP(NY,NX)+62.0*(PMAX+PMBX)+93.0*PHAX
       ENDIF
-C
-C     SOIL LAYER NUMBER IN WHICH PLANT OR ANIMAL RESIDUES ARE APPLIED
-C
-C     LFDPTH=layer number
-C
-      IF(OFC(1)+OFC(2).GT.0.0)THEN
-      DO 2985 L=0,JZ
-      FDPTHM=FDPTH(I,NY,NX)+CDPTH(NU(NY,NX)-1,NY,NX)
-      IF(FDPTHM.LE.0.0)THEN
-      LFDPTH=0
-      GO TO 2980
-      ELSEIF(CDPTH(L,NY,NX).GE.FDPTHM)THEN
-      LFDPTH=L
-      GO TO 2980
-      ENDIF
-2985  CONTINUE
-2980  CONTINUE
-C
-C     ALLOCATION OF PLANT RESIDUE APPLICATION TO
-C     RESIDUE PROTEIN, CH2O, CELLULOSE, LIGNIN
-C
-C     CFOSC=fraction of litter allocated to protein(1)
-C     soluble CH2O(2), cellulose(3) and lignin(4)
-C     ITYPE=litter type entered in fertilizer input file
-C
-C     MAIZE
-C
-      IF(IYTYP(1,I,NY,NX).EQ.1)THEN
-      CFOSC(1,1,LFDPTH,NY,NX)=0.080
-      CFOSC(2,1,LFDPTH,NY,NX)=0.245
-      CFOSC(3,1,LFDPTH,NY,NX)=0.613
-      CFOSC(4,1,LFDPTH,NY,NX)=0.062
-C
-C     WHEAT
-C
-      ELSEIF(IYTYP(1,I,NY,NX).EQ.2)THEN
-      CFOSC(1,1,LFDPTH,NY,NX)=0.125
-      CFOSC(2,1,LFDPTH,NY,NX)=0.171
-      CFOSC(3,1,LFDPTH,NY,NX)=0.560
-      CFOSC(4,1,LFDPTH,NY,NX)=0.144
-C
-C     SOYBEAN
-C
-      ELSEIF(IYTYP(1,I,NY,NX).EQ.3)THEN
-      CFOSC(1,1,LFDPTH,NY,NX)=0.138
-      CFOSC(2,1,LFDPTH,NY,NX)=0.426
-      CFOSC(3,1,LFDPTH,NY,NX)=0.316
-      CFOSC(4,1,LFDPTH,NY,NX)=0.120
-C
-C     OLD STRAW
-C
-      ELSEIF(IYTYP(1,I,NY,NX).EQ.4)THEN
-      CFOSC(1,1,LFDPTH,NY,NX)=0.075
-      CFOSC(2,1,LFDPTH,NY,NX)=0.125
-      CFOSC(3,1,LFDPTH,NY,NX)=0.550
-      CFOSC(4,1,LFDPTH,NY,NX)=0.250
-C
-C     STRAW
-C
-      ELSEIF(IYTYP(1,I,NY,NX).EQ.5)THEN
-      CFOSC(1,1,LFDPTH,NY,NX)=0.036
-      CFOSC(2,1,LFDPTH,NY,NX)=0.044
-      CFOSC(3,1,LFDPTH,NY,NX)=0.767
-      CFOSC(4,1,LFDPTH,NY,NX)=0.153
-C
-C     COMPOST
-C
-      ELSEIF(IYTYP(1,I,NY,NX).EQ.6)THEN
-      CFOSC(1,1,LFDPTH,NY,NX)=0.143
-      CFOSC(2,1,LFDPTH,NY,NX)=0.015
-      CFOSC(3,1,LFDPTH,NY,NX)=0.640
-      CFOSC(4,1,LFDPTH,NY,NX)=0.202
-C
-C     GREEN MANURE
-C
-      ELSEIF(IYTYP(1,I,NY,NX).EQ.7)THEN
-      CFOSC(1,1,LFDPTH,NY,NX)=0.202
-      CFOSC(2,1,LFDPTH,NY,NX)=0.013
-      CFOSC(3,1,LFDPTH,NY,NX)=0.560
-      CFOSC(4,1,LFDPTH,NY,NX)=0.225
-C
-C     SIMPLE SUBSTRATE
-C
-      ELSEIF(IYTYP(1,I,NY,NX).EQ.10)THEN
-      CFOSC(1,1,LFDPTH,NY,NX)=0.000
-      CFOSC(2,1,LFDPTH,NY,NX)=1.000
-      CFOSC(3,1,LFDPTH,NY,NX)=0.000
-      CFOSC(4,1,LFDPTH,NY,NX)=0.000
-      ELSE
-      CFOSC(1,1,LFDPTH,NY,NX)=0.075
-      CFOSC(2,1,LFDPTH,NY,NX)=0.125
-      CFOSC(3,1,LFDPTH,NY,NX)=0.550
-      CFOSC(4,1,LFDPTH,NY,NX)=0.250
-      ENDIF
-C
-C     ALLOCATION OF ANIMAL MANURE APPLICATION TO
-C     RESIDUE PROTEIN, CH2O, CELLULOSE, LIGNIN
-C
-C     RUMINANT
-C
-      IF(IYTYP(2,I,NY,NX).EQ.1)THEN
-      CFOSC(1,2,LFDPTH,NY,NX)=0.036
-      CFOSC(2,2,LFDPTH,NY,NX)=0.044
-      CFOSC(3,2,LFDPTH,NY,NX)=0.630
-      CFOSC(4,2,LFDPTH,NY,NX)=0.290
-C
-C     NON-RUMINANT
-C
-      ELSEIF(IYTYP(2,I,NY,NX).EQ.2)THEN
-      CFOSC(1,2,LFDPTH,NY,NX)=0.138
-      CFOSC(2,2,LFDPTH,NY,NX)=0.401
-      CFOSC(3,2,LFDPTH,NY,NX)=0.316
-      CFOSC(4,2,LFDPTH,NY,NX)=0.145
-C
-C     GRAZING
-C
-      ELSEIF(IYTYP(2,I,NY,NX).EQ.3)THEN
-      CFOSC(1,2,LFDPTH,NY,NX)=0.036
-      CFOSC(2,2,LFDPTH,NY,NX)=0.044
-      CFOSC(3,2,LFDPTH,NY,NX)=0.630
-      CFOSC(4,2,LFDPTH,NY,NX)=0.290
-C
-C     OTHER
-C
-      ELSE
-      CFOSC(1,2,LFDPTH,NY,NX)=0.138
-      CFOSC(2,2,LFDPTH,NY,NX)=0.401
-      CFOSC(3,2,LFDPTH,NY,NX)=0.316
-      CFOSC(4,2,LFDPTH,NY,NX)=0.145
-      ENDIF
-C
-C     DISTRIBUTE RESIDUE APPLICATION AMONG COMPONENTS OF RESIDUE COMPLEX
-C
-C     OFC,OFN,OFP=litter C,N,P application from fertilizer file
-C
-      DO 2965 K=1,2
-      OSCI=OFC(K)*AREA(3,LFDPTH,NY,NX)
-      OSNI=OFN(K)*AREA(3,LFDPTH,NY,NX)
-      OSPI=OFP(K)*AREA(3,LFDPTH,NY,NX)
-      IF(BKVL(LFDPTH,NY,NX).GT.ZEROS(NY,NX))THEN
-      CORGCX=OSCI/BKVL(LFDPTH,NY,NX)
-      ELSE
-      CORGCX=0.55E+06
-      ENDIF
-      OSCX=0.0
-      OSNX=0.0
-      OSPX=0.0
-C
-C     BIOMASSES OF MICROBIAL POPULATIONS IN RESIDUE
-C
-C     OMC,OMN,OMP=microbial biomass in litter application
-C     OMCI=microbial biomass content in litter
-C     OMCF,OMCA=hetero,autotrophic biomass composition in litter
-C
-      DO 2960 N=1,7
-      DO 2961 M=1,3
-      OMC1=AMAX1(0.0,AMIN1(OSCI*OMCI(M,K)*OMCF(N),OSCI-OSCX))
-      OMN1=AMAX1(0.0,AMIN1(OMC1*CNOMC(M,N,K),OSNI-OSNX))
-      OMP1=AMAX1(0.0,AMIN1(OMC1*CPOMC(M,N,K),OSPI-OSPX))
-      OMC(M,N,K,LFDPTH,NY,NX)=OMC(M,N,K,LFDPTH,NY,NX)+OMC1
-      OMN(M,N,K,LFDPTH,NY,NX)=OMN(M,N,K,LFDPTH,NY,NX)+OMN1
-      OMP(M,N,K,LFDPTH,NY,NX)=OMP(M,N,K,LFDPTH,NY,NX)+OMP1
-C     WRITE(*,2345)'OMCI',I,J,LFDPTH,K,N,M
-C    2,OMC1,OMN1,OMP1,OSCI,OMCI(M,K)
-C    2,OMCF(N),OSCX,CNOMC(M,N,K),CPOMC(M,N,K),OSNI,OSPI
-C    2,OMC(M,N,K,LFDPTH,NY,NX),OMN(M,N,K,LFDPTH,NY,NX)
-2345  FORMAT(A8,6I4,20E12.4)
-      OSCX=OSCX+OMC1
-      OSNX=OSNX+OMN1
-      OSPX=OSPX+OMP1
-      DO 2962 NN=1,7
-      OMC(M,NN,5,LFDPTH,NY,NX)=OMC(M,NN,5,LFDPTH,NY,NX)+OMC1*OMCA(NN)
-      OMN(M,NN,5,LFDPTH,NY,NX)=OMN(M,NN,5,LFDPTH,NY,NX)+OMN1*OMCA(NN)
-      OMP(M,NN,5,LFDPTH,NY,NX)=OMP(M,NN,5,LFDPTH,NY,NX)+OMP1*OMCA(NN)
-C     WRITE(*,2346)'OMCA',I,J,LFDPTH,K,N,NN,M
-C    2,OMC1,OMCA(NN),OMC(M,NN,5,LFDPTH,NY,NX)
-2346  FORMAT(A8,7I4,20E12.4)
-      OSCX=OSCX+OMC1*OMCA(NN)
-      OSNX=OSNX+OMN1*OMCA(NN)
-      OSPX=OSPX+OMP1*OMCA(NN)
-2962  CONTINUE
-2961  CONTINUE
-2960  CONTINUE
-C
-C     DOC, DON AND DOP IN RESIDUE
-C
-C     OQC,OQN,OQP=DOC,DON,DOP in litter
-C
-      OQC1=AMIN1(0.1*OSCX,OSCI-OSCX)
-      OQN1=AMIN1(0.1*OSNX,OSNI-OSNX)
-      OQP1=AMIN1(0.1*OSPX,OSPI-OSPX)
-      OQC(K,LFDPTH,NY,NX)=OQC(K,LFDPTH,NY,NX)+OQC1
-      OQN(K,LFDPTH,NY,NX)=OQN(K,LFDPTH,NY,NX)+OQN1
-      OQP(K,LFDPTH,NY,NX)=OQP(K,LFDPTH,NY,NX)+OQP1
-C
-C     REMAINDER DISTRIBUTED TO RESIDUE FRACTIONS
-C
-C     OSC,OSN,OSP,OSA=SOC,SON,SOP,colonized SOC in litter
-C     VOLT=litter volume
-C     UORGF,UFERTN,UFERTP=accumulated litter C,N,P application
-C     TNBP=accumulated net biome productivity
-C
-      OSCX=OSCX+OQC1
-      OSNX=OSNX+OQN1
-      OSPX=OSPX+OQP1
-      CNOFT=0.0
-      CPOFT=0.0
-      IF(OSCI-OSCX.GT.ZEROS(NY,NX))THEN
-      RNT=0.0
-      RPT=0.0
-      DO 965 M=1,4
-      RNT=RNT+(OSCI-OSCX)*CFOSC(M,K,LFDPTH,NY,NX)*CNOFC(M,K)
-      RPT=RPT+(OSCI-OSCX)*CFOSC(M,K,LFDPTH,NY,NX)*CPOFC(M,K)
-965   CONTINUE
-      FRNT=(OSNI-OSNX)/RNT
-      FRPT=(OSPI-OSPX)/RPT
-      DO 970 M=1,4
-      CNOF(M)=CNOFC(M,K)*FRNT
-      CPOF(M)=CPOFC(M,K)*FRPT
-      CNOFT=CNOFT+CFOSC(M,K,LFDPTH,NY,NX)*CNOF(M)
-      CPOFT=CPOFT+CFOSC(M,K,LFDPTH,NY,NX)*CPOF(M)
-970   CONTINUE
-      ELSE
-      DO 975 M=1,4
-      CNOF(M)=0.0
-      CPOF(M)=0.0
-975   CONTINUE
-      ENDIF
-      DO 2970 M=1,4
-      OSC1=CFOSC(M,K,LFDPTH,NY,NX)*(OSCI-OSCX)
-      IF(CNOFT.GT.ZERO)THEN
-      OSN1=CFOSC(M,K,LFDPTH,NY,NX)*CNOF(M)/CNOFT*(OSNI-OSNX)
-      ELSE
-      OSN1=0.0
-      ENDIF
-      IF(CPOFT.GT.ZERO)THEN
-      OSP1=CFOSC(M,K,LFDPTH,NY,NX)*CPOF(M)/CPOFT*(OSPI-OSPX)
-      ELSE
-      OSP1=0.0
-      ENDIF
-      OSC(M,K,LFDPTH,NY,NX)=OSC(M,K,LFDPTH,NY,NX)+OSC1
-      OSA(M,K,LFDPTH,NY,NX)=OSA(M,K,LFDPTH,NY,NX)+OSC1*OMCI(1,K)
-      OSN(M,K,LFDPTH,NY,NX)=OSN(M,K,LFDPTH,NY,NX)+OSN1
-      OSP(M,K,LFDPTH,NY,NX)=OSP(M,K,LFDPTH,NY,NX)+OSP1
-      IF(LFDPTH.EQ.0)THEN
-      VOLT(LFDPTH,NY,NX)=VOLT(LFDPTH,NY,NX)+OSC1*1.0E-06/BKRS(1)
-      ENDIF
-2970  CONTINUE
-      TORGF=TORGF+OSCI
-      TORGN=TORGN+OSNI
-      TORGP=TORGP+OSPI
-      UORGF(NY,NX)=UORGF(NY,NX)+OSCI
-      UFERTN(NY,NX)=UFERTN(NY,NX)+OSNI
-      UFERTP(NY,NX)=UFERTP(NY,NX)+OSPI
-      IF(IYTYP(2,I,NY,NX).LT.3)THEN
-      TNBP(NY,NX)=TNBP(NY,NX)+OSCI
-      ENDIF
-2965  CONTINUE
-      ENDIF
-C
-C     FERTILIZER UREA, NITRIFICATION INHIBITORS
-C
-C     IYTYP=fertilizer release type from fertilizer input file
-C     FERT=fertilizer type from fertilizer input file
-C     IUTYP=urea hydrolysis inhibitor type (1=no,2=yes)
-C     ZNHU0,ZNHUI=initial,current urea hydrolysis inhibition activity
-C     ZNFN0,ZNFNI=initial,current nitrification inhibition activity
-C
-      IF(FERT(3,I,NY,NX).GT.0.0.OR.FERT(7,I,NY,NX).GT.0.0)THEN
-      IF(IYTYP(0,I,NY,NX).EQ.0)THEN
-      IUTYP(NY,NX)=0
-      ELSEIF(IYTYP(0,I,NY,NX).EQ.1.OR.IYTYP(0,I,NY,NX).EQ.3)THEN
-      IUTYP(NY,NX)=1
-      ELSE
-      IUTYP(NY,NX)=2
-      ENDIF
-      DO 9964 L=0,NL(NY,NX)
-      IF(L.EQ.LFDPTH)THEN
-      ZNHU0(L,NY,NX)=1.0
-      ZNHUI(L,NY,NX)=1.0
-      ELSE
-      ZNHU0(L,NY,NX)=0.0
-      ZNHUI(L,NY,NX)=0.0
-      ENDIF
-9964  CONTINUE
-      ENDIF
-      IF(IYTYP(0,I,NY,NX).EQ.3.OR.IYTYP(0,I,NY,NX).EQ.4)THEN
-      DO 9965 L=0,NL(NY,NX)
-      IF(L.EQ.LFDPTH)THEN
-      ZNFN0(L,NY,NX)=1.0
-      ZNFNI(L,NY,NX)=1.0
-      ELSE
-      ZNFN0(L,NY,NX)=0.0
-      ZNFNI(L,NY,NX)=0.0
-      ENDIF
-9965  CONTINUE
-      ENDIF
-      ENDIF
-8995  CONTINUE
-8990  CONTINUE
-      RETURN
+      end subroutine ApplyMineralFertilizer
 
-      END subroutine hour1
+C------------------------------------------------------------------------------------------
+
+      subroutine GetChemicalConcsInSoil(L,NY,NX)
+      implicit none
+      integer, intent(in) :: L,NY,NX
+
+C     begin_execution
+
+C     CALCULATE SOIL CONCENTRATIONS OF SOLUTES, GASES
+C
+C     THETW,THETI,THETP=soil micropore water,ice,air concentration
+C     THETPZ=soil micropore+macropore air concn for output
+C
+      IF(VOLX(L,NY,NX).LE.ZEROS(NY,NX))THEN
+      THETW(L,NY,NX)=POROS(L,NY,NX)
+      THETI(L,NY,NX)=0.0
+      THETP(L,NY,NX)=0.0
+      ELSE
+      THETW(L,NY,NX)=AMAX1(0.0,AMIN1(POROS(L,NY,NX)
+     2,VOLW(L,NY,NX)/VOLY(L,NY,NX)))
+      THETI(L,NY,NX)=AMAX1(0.0,AMIN1(POROS(L,NY,NX)
+     2,VOLI(L,NY,NX)/VOLY(L,NY,NX)))
+      THETP(L,NY,NX)=AMAX1(0.0,VOLP(L,NY,NX)/VOLY(L,NY,NX))
+      ENDIF
+      THETPZ(L,NY,NX)=AMAX1(0.0,POROS(L,NY,NX)-THETW(L,NY,NX)
+     2-THETI(L,NY,NX))
+C     IF(L.EQ.7)THEN
+C     WRITE(*,1117)'BKDS',I,J,L
+C    3,BKDS(L,NY,NX),BKDSI(L,NY,NX),BKVL(L,NY,NX)
+C    4,DLYR(3,L,NY,NX),DLYRI(3,L,NY,NX)
+C    2,CORGC(L,NY,NX),ORGC(L,NY,NX)
+C    6,VOLT(L,NY,NX),VOLX(L,NY,NX),VOLA(L,NY,NX)
+C    7,VOLY(L,NY,NX),VOLW(L,NY,NX),VOLI(L,NY,NX)
+C    7,VOLWH(L,NY,NX),VOLIH(L,NY,NX)
+C    8,THETWZ(L,NY,NX),THETIZ(L,NY,NX)
+C    9,THETWZ(L,NY,NX)+THETIZ(L,NY,NX)
+1117  FORMAT(A8,3I4,30E14.6)
+C     ENDIF
+C
+C     GAS CONCENTRATIONS
+C
+C     C*G=soil gas gaseous concentration
+C     C*S=soil gas aqueous concentration
+C
+      IF(THETP(L,NY,NX).GT.THETX)THEN
+      CCO2G(L,NY,NX)=AMAX1(0.0,CO2G(L,NY,NX)/VOLP(L,NY,NX))
+      CCH4G(L,NY,NX)=AMAX1(0.0,CH4G(L,NY,NX)/VOLP(L,NY,NX))
+      COXYG(L,NY,NX)=AMAX1(0.0,OXYG(L,NY,NX)/VOLP(L,NY,NX))
+      CZ2GG(L,NY,NX)=AMAX1(0.0,Z2GG(L,NY,NX)/VOLP(L,NY,NX))
+      CZ2OG(L,NY,NX)=AMAX1(0.0,Z2OG(L,NY,NX)/VOLP(L,NY,NX))
+      CNH3G(L,NY,NX)=AMAX1(0.0,ZNH3G(L,NY,NX)/VOLP(L,NY,NX))
+      CH2GG(L,NY,NX)=AMAX1(0.0,H2GG(L,NY,NX)/VOLP(L,NY,NX))
+      ELSE
+      CCO2G(L,NY,NX)=0.0
+      CCH4G(L,NY,NX)=0.0
+      COXYG(L,NY,NX)=0.0
+      CZ2GG(L,NY,NX)=0.0
+      CZ2OG(L,NY,NX)=0.0
+      CNH3G(L,NY,NX)=0.0
+      CH2GG(L,NY,NX)=0.0
+      ENDIF
+      IF(VOLW(L,NY,NX).GT.ZEROS2(NY,NX))THEN
+      CCO2S(L,NY,NX)=AMAX1(0.0,CO2S(L,NY,NX)/VOLW(L,NY,NX))
+      CCH4S(L,NY,NX)=AMAX1(0.0,CH4S(L,NY,NX)/VOLW(L,NY,NX))
+      COXYS(L,NY,NX)=AMAX1(0.0,OXYS(L,NY,NX)/VOLW(L,NY,NX))
+      CZ2GS(L,NY,NX)=AMAX1(0.0,Z2GS(L,NY,NX)/VOLW(L,NY,NX))
+      CZ2OS(L,NY,NX)=AMAX1(0.0,Z2OS(L,NY,NX)/VOLW(L,NY,NX))
+      CH2GS(L,NY,NX)=AMAX1(0.0,H2GS(L,NY,NX)/VOLW(L,NY,NX))
+      ELSE
+      CCO2S(L,NY,NX)=0.0
+      CCH4S(L,NY,NX)=0.0
+      COXYS(L,NY,NX)=0.0
+      CZ2GS(L,NY,NX)=0.0
+      CZ2OS(L,NY,NX)=0.0
+      CH2GS(L,NY,NX)=0.0
+      ENDIF
+C
+C     CORGC=SOC concentration
+C
+      IF(BKVL(L,NY,NX).GT.ZEROS(NY,NX))THEN
+      CORGC(L,NY,NX)=AMIN1(0.55E+06,ORGC(L,NY,NX)/BKVL(L,NY,NX))
+      ELSE
+      CORGC(L,NY,NX)=0.0
+      ENDIF
+      end subroutine GetChemicalConcsInSoil
+
+C------------------------------------------------------------------------------------------
+
+      subroutine ZeroHourlyArrays(L,NY,NX)
+      implicit none
+      integer, intent(in) :: L,NY,NX
+
+      integer :: K
+C     begin_execution
+      FINH(L,NY,NX)=0.0
+      TCO2S(L,NY,NX)=0.0
+      TCO2P(L,NY,NX)=0.0
+      TCOFLA(L,NY,NX)=0.0
+      TCHFLA(L,NY,NX)=0.0
+      TLCO2P(L,NY,NX)=0.0
+      TUPOXP(L,NY,NX)=0.0
+      TUPOXS(L,NY,NX)=0.0
+      TUPCHS(L,NY,NX)=0.0
+      TUPN2S(L,NY,NX)=0.0
+      TUPN3S(L,NY,NX)=0.0
+      TUPN3B(L,NY,NX)=0.0
+      TUPHGS(L,NY,NX)=0.0
+      TOXFLA(L,NY,NX)=0.0
+      TCHFLA(L,NY,NX)=0.0
+      TN2FLA(L,NY,NX)=0.0
+      TNHFLA(L,NY,NX)=0.0
+      THGFLA(L,NY,NX)=0.0
+      TLOXYP(L,NY,NX)=0.0
+      TLCH4P(L,NY,NX)=0.0
+      TLN2OP(L,NY,NX)=0.0
+      TLNH3P(L,NY,NX)=0.0
+      TLH2GP(L,NY,NX)=0.0
+      TUPNH4(L,NY,NX)=0.0
+      TUPNO3(L,NY,NX)=0.0
+      TUPH2P(L,NY,NX)=0.0
+      TUPH1P(L,NY,NX)=0.0
+      TUPNHB(L,NY,NX)=0.0
+      TUPNOB(L,NY,NX)=0.0
+      TUPH2B(L,NY,NX)=0.0
+      TUPH1B(L,NY,NX)=0.0
+      TUPNF(L,NY,NX)=0.0
+      TRN4B(L,NY,NX)=0.0
+      TRN3B(L,NY,NX)=0.0
+      TRNOB(L,NY,NX)=0.0
+      TRN2B(L,NY,NX)=0.0
+      TRH1B(L,NY,NX)=0.0
+      TRH2B(L,NY,NX)=0.0
+      TRAL(L,NY,NX)=0.0
+      TRFE(L,NY,NX)=0.0
+      TRHY(L,NY,NX)=0.0
+      TRCA(L,NY,NX)=0.0
+      TRMG(L,NY,NX)=0.0
+      TRNA(L,NY,NX)=0.0
+      TRKA(L,NY,NX)=0.0
+      TROH(L,NY,NX)=0.0
+      TRSO4(L,NY,NX)=0.0
+      TRCO3(L,NY,NX)=0.0
+      TRHCO(L,NY,NX)=0.0
+      TRCO2(L,NY,NX)=0.0
+      TBCO2(L,NY,NX)=0.0
+      TRAL1(L,NY,NX)=0.0
+      TRAL2(L,NY,NX)=0.0
+      TRAL3(L,NY,NX)=0.0
+      TRAL4(L,NY,NX)=0.0
+      TRALS(L,NY,NX)=0.0
+      TRFE1(L,NY,NX)=0.0
+      TRFE2(L,NY,NX)=0.0
+      TRFE3(L,NY,NX)=0.0
+      TRFE4(L,NY,NX)=0.0
+      TRFES(L,NY,NX)=0.0
+      TRCAO(L,NY,NX)=0.0
+      TRCAC(L,NY,NX)=0.0
+      TRCAH(L,NY,NX)=0.0
+      TRCAS(L,NY,NX)=0.0
+      TRMGO(L,NY,NX)=0.0
+      TRMGC(L,NY,NX)=0.0
+      TRMGH(L,NY,NX)=0.0
+      TRMGS(L,NY,NX)=0.0
+      TRNAC(L,NY,NX)=0.0
+      TRNAS(L,NY,NX)=0.0
+      TRKAS(L,NY,NX)=0.0
+      TRH0P(L,NY,NX)=0.0
+      TRH3P(L,NY,NX)=0.0
+      TRC0P(L,NY,NX)=0.0
+      TRF1P(L,NY,NX)=0.0
+      TRF2P(L,NY,NX)=0.0
+      TRC1P(L,NY,NX)=0.0
+      TRC2P(L,NY,NX)=0.0
+      TRM1P(L,NY,NX)=0.0
+      TRH0B(L,NY,NX)=0.0
+      TRH3B(L,NY,NX)=0.0
+      TRF1B(L,NY,NX)=0.0
+      TRF2B(L,NY,NX)=0.0
+      TRC0B(L,NY,NX)=0.0
+      TRC1B(L,NY,NX)=0.0
+      TRC2B(L,NY,NX)=0.0
+      TRM1B(L,NY,NX)=0.0
+      TRXNB(L,NY,NX)=0.0
+      TRXHY(L,NY,NX)=0.0
+      TRXAL(L,NY,NX)=0.0
+      TRXFE(L,NY,NX)=0.0
+      TRXCA(L,NY,NX)=0.0
+      TRXMG(L,NY,NX)=0.0
+      TRXNA(L,NY,NX)=0.0
+      TRXKA(L,NY,NX)=0.0
+      TRXHC(L,NY,NX)=0.0
+      TRXAL2(L,NY,NX)=0.0
+      TRXFE2(L,NY,NX)=0.0
+      TRBH0(L,NY,NX)=0.0
+      TRBH1(L,NY,NX)=0.0
+      TRBH2(L,NY,NX)=0.0
+      TRB1P(L,NY,NX)=0.0
+      TRB2P(L,NY,NX)=0.0
+      TRALOH(L,NY,NX)=0.0
+      TRFEOH(L,NY,NX)=0.0
+      TRCACO(L,NY,NX)=0.0
+      TRCASO(L,NY,NX)=0.0
+      TRALPB(L,NY,NX)=0.0
+      TRFEPB(L,NY,NX)=0.0
+      TRCPDB(L,NY,NX)=0.0
+      TRCPHB(L,NY,NX)=0.0
+      TRCPMB(L,NY,NX)=0.0
+      XCOFXS(L,NY,NX)=0.0
+      XCHFXS(L,NY,NX)=0.0
+      XOXFXS(L,NY,NX)=0.0
+      XNGFXS(L,NY,NX)=0.0
+      XN2FXS(L,NY,NX)=0.0
+      XHGFXS(L,NY,NX)=0.0
+      XN4FXW(L,NY,NX)=0.0
+      XN3FXW(L,NY,NX)=0.0
+      XNOFXW(L,NY,NX)=0.0
+      XNXFXS(L,NY,NX)=0.0
+      XH1PXS(L,NY,NX)=0.0
+      XH2PXS(L,NY,NX)=0.0
+      XN4FXB(L,NY,NX)=0.0
+      XN3FXB(L,NY,NX)=0.0
+      XNOFXB(L,NY,NX)=0.0
+      XNXFXB(L,NY,NX)=0.0
+      XH1BXB(L,NY,NX)=0.0
+      XH2BXB(L,NY,NX)=0.0
+      XALFXS(L,NY,NX)=0.0
+      XFEFXS(L,NY,NX)=0.0
+      XHYFXS(L,NY,NX)=0.0
+      XCAFXS(L,NY,NX)=0.0
+      XMGFXS(L,NY,NX)=0.0
+      XNAFXS(L,NY,NX)=0.0
+      XKAFXS(L,NY,NX)=0.0
+      XOHFXS(L,NY,NX)=0.0
+      XSOFXS(L,NY,NX)=0.0
+      XCLFXS(L,NY,NX)=0.0
+      XC3FXS(L,NY,NX)=0.0
+      XHCFXS(L,NY,NX)=0.0
+      XAL1XS(L,NY,NX)=0.0
+      XAL2XS(L,NY,NX)=0.0
+      XAL3XS(L,NY,NX)=0.0
+      XAL4XS(L,NY,NX)=0.0
+      XALSXS(L,NY,NX)=0.0
+      XFE1XS(L,NY,NX)=0.0
+      XFE2XS(L,NY,NX)=0.0
+      XFE3XS(L,NY,NX)=0.0
+      XFE4XS(L,NY,NX)=0.0
+      XFESXS(L,NY,NX)=0.0
+      XCAOXS(L,NY,NX)=0.0
+      XCACXS(L,NY,NX)=0.0
+      XCAHXS(L,NY,NX)=0.0
+      XCASXS(L,NY,NX)=0.0
+      XMGOXS(L,NY,NX)=0.0
+      XMGCXS(L,NY,NX)=0.0
+      XMGHXS(L,NY,NX)=0.0
+      XMGSXS(L,NY,NX)=0.0
+      XNACXS(L,NY,NX)=0.0
+      XNASXS(L,NY,NX)=0.0
+      XKASXS(L,NY,NX)=0.0
+      XH0PXS(L,NY,NX)=0.0
+      XH3PXS(L,NY,NX)=0.0
+      XF1PXS(L,NY,NX)=0.0
+      XF2PXS(L,NY,NX)=0.0
+      XC0PXS(L,NY,NX)=0.0
+      XC1PXS(L,NY,NX)=0.0
+      XC2PXS(L,NY,NX)=0.0
+      XM1PXS(L,NY,NX)=0.0
+      XH0BXB(L,NY,NX)=0.0
+      XH3BXB(L,NY,NX)=0.0
+      XF1BXB(L,NY,NX)=0.0
+      XF2BXB(L,NY,NX)=0.0
+      XC0BXB(L,NY,NX)=0.0
+      XC1BXB(L,NY,NX)=0.0
+      XC2BXB(L,NY,NX)=0.0
+      XM1BXB(L,NY,NX)=0.0
+      DO 9955 K=0,4
+      XOCFXS(K,L,NY,NX)=0.0
+      XONFXS(K,L,NY,NX)=0.0
+      XOPFXS(K,L,NY,NX)=0.0
+      XOAFXS(K,L,NY,NX)=0.0
+9955  CONTINUE
+      THAW(L,NY,NX)=0.0
+      THAWH(L,NY,NX)=0.0
+      HTHAW(L,NY,NX)=0.0
+      XCOBBL(L,NY,NX)=0.0
+      XCHBBL(L,NY,NX)=0.0
+      XOXBBL(L,NY,NX)=0.0
+      XNGBBL(L,NY,NX)=0.0
+      XN2BBL(L,NY,NX)=0.0
+      XN3BBL(L,NY,NX)=0.0
+      XNBBBL(L,NY,NX)=0.0
+      XHGBBL(L,NY,NX)=0.0
+      RTDNT(L,NY,NX)=0.0
+      end subroutine ZeroHourlyArrays
+
       end module Hour1Mod

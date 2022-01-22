@@ -95,9 +95,6 @@
       real(r8) :: VFLW,VOLWPA,VOLWPB,VOLWHS,VOLWT,VLWPA1,VLWPB1
       real(r8) :: VLWPA2,VLWPB2,XN
 
-      integer :: ICHKL,IFLGB,L,L2,LL,LS,LS2,M,M1,M2,M3,M4,M5,M6
-      integer :: NX,NY,N1,N2,N,NN,N4,N5,N4B,N5B,N3,N6
-
       real(r8) :: ZAL2(0:JZ,JY,JX),ZFE2(0:JZ,JY,JX),ZHY2(0:JZ,JY,JX)
      2,ZCA2(0:JZ,JY,JX),ZMG2(0:JZ,JY,JX),ZNA2(0:JZ,JY,JX)
      3,ZKA2(0:JZ,JY,JX),ZOH2(0:JZ,JY,JX),ZSO42(0:JZ,JY,JX)
@@ -394,6 +391,8 @@
 
       SUBROUTINE trnsfrs(I,J,NHW,NHE,NVN,NVS)
 C
+C     Description:
+C
 C     THIS SUBROUTINE CALCULATES 3-DIMENSIONAL FLUXES OF ALL SOIL
 C     SALT SOLUTES
 C
@@ -401,36 +400,202 @@ C
       integer, intent(in) :: I, J
       integer, intent(in) :: NHW,NHE,NVN,NVS
 
+      integer :: NX,NY,L,M
 C     execution begins here
 
+      IF(ISALTG.EQ.0)RETURN
 C
 C     TIME STEPS FOR SOLUTE FLUX CALCULATIONS
 C
-      DO 9995 NX=NHW,NHE
-      DO 9990 NY=NVN,NVS
-      IF(ISALTG.NE.0)THEN
+      call SaltModelSoluteFlux(I,NHW,NHE,NVN,NVS)
 C
-C     HOURLY SOLUTE FLUXES FROM ATMOSPHERE TO SNOWPACK
-C     IN SNOWFALL AND IRRIGATION ACCORDING TO CONCENTRATIONS
-C     ENTERED IN WEATHER AND IRRIGATION FILES
+C     TIME STEP USED IN GAS AND SOLUTE FLUX CALCULATIONS
 C
-C     PRECW,PRECR=snow,rain
-C     VHCPWM,VHCPWX=current,minimum volumetric heat capacity of snowpack
-C     X*BLS=hourly solute flux to snowpack
-C     salt code: *HY*=H+,*OH*=OH-,*AL*=Al3+,*FE*=Fe3+,*CA*=Ca2+,*MG*=Mg2+
-C          :*NA*=Na+,*KA*=K+,*SO4*=SO42-,*CL*=Cl-,*CO3*=CO32-,*HCO3*=HCO3-
-C          :*CO2*=CO2,*ALO1*=AlOH2-,*ALOH2=AlOH2-,*ALOH3*=AlOH3
-C          :*ALOH4*=AlOH4+,*ALS*=AlSO4+,*FEO1*=FeOH2-,*FEOH2=F3OH2-
-C          :*FEOH3*=FeOH3,*FEOH4*=FeOH4+,*FES*=FeSO4+,*CAO*=CaOH
-C          :*CAC*=CaCO3,*CAH*=CaHCO3-,*CAS*=CaSO4,*MGO*=MgOH,*MGC*=MgCO3
-C          :*MHG*=MgHCO3-,*MGS*=MgSO4,*NAC*=NaCO3-,*NAS*=NaSO4-,*KAS*=KSO4-
-C     phosphorus code: *H0P*=PO43-,*H3P*=H3PO4,*F1P*=FeHPO42-,*F2P*=F1H2PO4-
-C          :*C0P*=CaPO4-,*C1P*=CaHPO4,*C2P*=CaH2PO4+,*M1P*=MgHPO4,*COO*=COOH-
-C     FLQGQ,FLQGI=water flux to snowpack from rain,irrigation
-C     C*R,C*Q=precipitation,irrigation solute concentrations
+      DO 30 M=1,NPH
 C
-      IF(PRECW(NY,NX).GT.0.0.OR.(PRECR(NY,NX).GT.0.0
-     2.AND.VHCPWM(1,1,NY,NX).GT.VHCPWX(NY,NX)))THEN
+      call SaltModelSoluteHydroFlux(I,M,NHW,NHE,NVN,NVS)
+C
+C     BOUNDARY SOLUTE AND GAS FLUXES
+C
+      call SaltModelInternalFlux(M,NHW,NHE,NVN,NVS)
+C
+C     UPDATE STATE VARIABLES FROM TOTAL FLUXES CALCULATED ABOVE
+C
+      DO 9695 NX=NHW,NHE
+      DO 9690 NY=NVN,NVS
+C
+C     STATE VARIABLES FOR SOLUTES IN MICROPORES AND MACROPORES IN
+C     SOIL SURFACE LAYER FROM OVERLAND FLOW
+C
+      call UpdateSoluteInSnow(NY,NX)
+C
+C     STATE VARIABLES FOR SOLUTES IN SURFACE RESIDUE FROM OVERLAND
+C     FLOW AND SURFACE FLUX
+      call UpdateSoluteInResidue(NY,NX)
+C
+C     STATE VARIABLES FOR GASES AND FOR SOLUTES IN MICROPORES AND
+C     MACROPORES IN SOIL LAYERS FROM SUBSURFACE FLOW, EQUILIBRIUM
+C     REACTIONS IN SOLUTE
+      call UpdateSoluteInMicMacpores(NY,NX)
+9690  CONTINUE
+9695  CONTINUE
+30    CONTINUE
+      RETURN
+
+      END subroutine trnsfrs
+C------------------------------------------------------------------------------------------
+
+      subroutine ZeroAtmosSoluteFlux(NY,NX)
+C
+C     Description:
+C
+      implicit none
+      integer, intent(in) :: NY,NX
+C     begin_execution
+      XALBLS(1,NY,NX)=0.0
+      XFEBLS(1,NY,NX)=0.0
+      XHYBLS(1,NY,NX)=0.0
+      XCABLS(1,NY,NX)=0.0
+      XMGBLS(1,NY,NX)=0.0
+      XNABLS(1,NY,NX)=0.0
+      XKABLS(1,NY,NX)=0.0
+      XOHBLS(1,NY,NX)=0.0
+      XSOBLS(1,NY,NX)=0.0
+      XCLBLS(1,NY,NX)=0.0
+      XC3BLS(1,NY,NX)=0.0
+      XHCBLS(1,NY,NX)=0.0
+      XAL1BS(1,NY,NX)=0.0
+      XAL2BS(1,NY,NX)=0.0
+      XAL3BS(1,NY,NX)=0.0
+      XAL4BS(1,NY,NX)=0.0
+      XALSBS(1,NY,NX)=0.0
+      XFE1BS(1,NY,NX)=0.0
+      XFE2BS(1,NY,NX)=0.0
+      XFE3BS(1,NY,NX)=0.0
+      XFE4BS(1,NY,NX)=0.0
+      XFESBS(1,NY,NX)=0.0
+      XCAOBS(1,NY,NX)=0.0
+      XCACBS(1,NY,NX)=0.0
+      XCAHBS(1,NY,NX)=0.0
+      XCASBS(1,NY,NX)=0.0
+      XMGOBS(1,NY,NX)=0.0
+      XMGCBS(1,NY,NX)=0.0
+      XMGHBS(1,NY,NX)=0.0
+      XMGSBS(1,NY,NX)=0.0
+      XNACBS(1,NY,NX)=0.0
+      XNASBS(1,NY,NX)=0.0
+      XKASBS(1,NY,NX)=0.0
+      XH0PBS(1,NY,NX)=0.0
+      XH3PBS(1,NY,NX)=0.0
+      XF1PBS(1,NY,NX)=0.0
+      XF2PBS(1,NY,NX)=0.0
+      XC0PBS(1,NY,NX)=0.0
+      XC1PBS(1,NY,NX)=0.0
+      XC2PBS(1,NY,NX)=0.0
+      XM1PBS(1,NY,NX)=0.0
+      XALFLS(3,0,NY,NX)=0.0
+      XFEFLS(3,0,NY,NX)=0.0
+      XHYFLS(3,0,NY,NX)=0.0
+      XCAFLS(3,0,NY,NX)=0.0
+      XMGFLS(3,0,NY,NX)=0.0
+      XNAFLS(3,0,NY,NX)=0.0
+      XKAFLS(3,0,NY,NX)=0.0
+      XOHFLS(3,0,NY,NX)=0.0
+      XSOFLS(3,0,NY,NX)=0.0
+      XCLFLS(3,0,NY,NX)=0.0
+      XC3FLS(3,0,NY,NX)=0.0
+      XHCFLS(3,0,NY,NX)=0.0
+      XAL1FS(3,0,NY,NX)=0.0
+      XAL2FS(3,0,NY,NX)=0.0
+      XAL3FS(3,0,NY,NX)=0.0
+      XAL4FS(3,0,NY,NX)=0.0
+      XALSFS(3,0,NY,NX)=0.0
+      XFE1FS(3,0,NY,NX)=0.0
+      XFE2FS(3,0,NY,NX)=0.0
+      XFE3FS(3,0,NY,NX)=0.0
+      XFE4FS(3,0,NY,NX)=0.0
+      XFESFS(3,0,NY,NX)=0.0
+      XCAOFS(3,0,NY,NX)=0.0
+      XCACFS(3,0,NY,NX)=0.0
+      XCAHFS(3,0,NY,NX)=0.0
+      XCASFS(3,0,NY,NX)=0.0
+      XMGOFS(3,0,NY,NX)=0.0
+      XMGCFS(3,0,NY,NX)=0.0
+      XMGHFS(3,0,NY,NX)=0.0
+      XMGSFS(3,0,NY,NX)=0.0
+      XNACFS(3,0,NY,NX)=0.0
+      XNASFS(3,0,NY,NX)=0.0
+      XKASFS(3,0,NY,NX)=0.0
+      XH0PFS(3,0,NY,NX)=0.0
+      XH3PFS(3,0,NY,NX)=0.0
+      XF1PFS(3,0,NY,NX)=0.0
+      XF2PFS(3,0,NY,NX)=0.0
+      XC0PFS(3,0,NY,NX)=0.0
+      XC1PFS(3,0,NY,NX)=0.0
+      XC2PFS(3,0,NY,NX)=0.0
+      XM1PFS(3,0,NY,NX)=0.0
+      XALFLS(3,NU(NY,NX),NY,NX)=0.0
+      XFEFLS(3,NU(NY,NX),NY,NX)=0.0
+      XHYFLS(3,NU(NY,NX),NY,NX)=0.0
+      XCAFLS(3,NU(NY,NX),NY,NX)=0.0
+      XMGFLS(3,NU(NY,NX),NY,NX)=0.0
+      XNAFLS(3,NU(NY,NX),NY,NX)=0.0
+      XKAFLS(3,NU(NY,NX),NY,NX)=0.0
+      XOHFLS(3,NU(NY,NX),NY,NX)=0.0
+      XSOFLS(3,NU(NY,NX),NY,NX)=0.0
+      XCLFLS(3,NU(NY,NX),NY,NX)=0.0
+      XC3FLS(3,NU(NY,NX),NY,NX)=0.0
+      XHCFLS(3,NU(NY,NX),NY,NX)=0.0
+      XAL1FS(3,NU(NY,NX),NY,NX)=0.0
+      XAL2FS(3,NU(NY,NX),NY,NX)=0.0
+      XAL3FS(3,NU(NY,NX),NY,NX)=0.0
+      XAL4FS(3,NU(NY,NX),NY,NX)=0.0
+      XALSFS(3,NU(NY,NX),NY,NX)=0.0
+      XFE1FS(3,NU(NY,NX),NY,NX)=0.0
+      XFE2FS(3,NU(NY,NX),NY,NX)=0.0
+      XFE3FS(3,NU(NY,NX),NY,NX)=0.0
+      XFE4FS(3,NU(NY,NX),NY,NX)=0.0
+      XFESFS(3,NU(NY,NX),NY,NX)=0.0
+      XCAOFS(3,NU(NY,NX),NY,NX)=0.0
+      XCACFS(3,NU(NY,NX),NY,NX)=0.0
+      XCAHFS(3,NU(NY,NX),NY,NX)=0.0
+      XCASFS(3,NU(NY,NX),NY,NX)=0.0
+      XMGOFS(3,NU(NY,NX),NY,NX)=0.0
+      XMGCFS(3,NU(NY,NX),NY,NX)=0.0
+      XMGHFS(3,NU(NY,NX),NY,NX)=0.0
+      XMGSFS(3,NU(NY,NX),NY,NX)=0.0
+      XNACFS(3,NU(NY,NX),NY,NX)=0.0
+      XNASFS(3,NU(NY,NX),NY,NX)=0.0
+      XKASFS(3,NU(NY,NX),NY,NX)=0.0
+      XH0PFS(3,NU(NY,NX),NY,NX)=0.0
+      XH3PFS(3,NU(NY,NX),NY,NX)=0.0
+      XF1PFS(3,NU(NY,NX),NY,NX)=0.0
+      XF2PFS(3,NU(NY,NX),NY,NX)=0.0
+      XC0PFS(3,NU(NY,NX),NY,NX)=0.0
+      XC1PFS(3,NU(NY,NX),NY,NX)=0.0
+      XC2PFS(3,NU(NY,NX),NY,NX)=0.0
+      XM1PFS(3,NU(NY,NX),NY,NX)=0.0
+      XH0BFB(3,NU(NY,NX),NY,NX)=0.0
+      XH3BFB(3,NU(NY,NX),NY,NX)=0.0
+      XF1BFB(3,NU(NY,NX),NY,NX)=0.0
+      XF2BFB(3,NU(NY,NX),NY,NX)=0.0
+      XC0BFB(3,NU(NY,NX),NY,NX)=0.0
+      XC1BFB(3,NU(NY,NX),NY,NX)=0.0
+      XC2BFB(3,NU(NY,NX),NY,NX)=0.0
+      XM1BFB(3,NU(NY,NX),NY,NX)=0.0
+      end subroutine ZeroAtmosSoluteFlux
+
+C------------------------------------------------------------------------------------------
+
+      subroutine AtmosSoluteFluxToSnowpack(I,NY,NX)
+C
+C     Description:
+C
+      implicit none
+      integer, intent(in) :: I,NY,NX
+
+C     begin_execution
+
       XALBLS(1,NY,NX)=FLQGQ(NY,NX)*CALR(NY,NX)+FLQGI(NY,NX)
      2*CALQ(I,NY,NX)
       XFEBLS(1,NY,NX)=FLQGQ(NY,NX)*CFER(NY,NX)+FLQGI(NY,NX)
@@ -609,13 +774,17 @@ C
       XC1BFB(3,NU(NY,NX),NY,NX)=0.0
       XC2BFB(3,NU(NY,NX),NY,NX)=0.0
       XM1BFB(3,NU(NY,NX),NY,NX)=0.0
+      end subroutine AtmosSoluteFluxToSnowpack
+
+C------------------------------------------------------------------------------------------
+
+      subroutine AtmosSoluteFluxToTopsoil(I,NY,NX)
 C
-C     HOURLY SOLUTE FLUXES FROM ATMOSPHERE TO SOIL SURFACE
-C     IN RAINFALL AND IRRIGATION ACCORDING TO CONCENTRATIONS
-C     ENTERED IN WEATHER AND IRRIGATION FILES
+C     Description:
 C
-      ELSEIF((PRECQ(NY,NX).GT.0.0.OR.PRECI(NY,NX).GT.0.0)
-     2.AND.VHCPWM(1,1,NY,NX).LE.VHCPWX(NY,NX))THEN
+      implicit none
+      integer, intent(in) :: I,NY,NX
+C     begin_execution
 C
 C     HOURLY SOLUTE FLUXES FROM ATMOSPHERE TO SNOWPACK
 C     IN SNOWFALL AND IRRIGATION IS ZERO IF SNOWPACK IS ABSENT
@@ -858,145 +1027,88 @@ C
      2*CC2PQ(I,NY,NX))*VLPOB(NU(NY,NX),NY,NX)
       XM1BFB(3,NU(NY,NX),NY,NX)=(FLQGQ(NY,NX)*CM1PR(NY,NX)+FLQGI(NY,NX)
      2*CM1PQ(I,NY,NX))*VLPOB(NU(NY,NX),NY,NX)
+      end subroutine AtmosSoluteFluxToTopsoil
+
+C------------------------------------------------------------------------------------------
+
+      subroutine InitSolutesInSnowpack(NY,NX)
 C
-C     NO SOLUTE FLUXES FROM ATMOSPHERE
+C     Description:
 C
-      ELSE
-      XALBLS(1,NY,NX)=0.0
-      XFEBLS(1,NY,NX)=0.0
-      XHYBLS(1,NY,NX)=0.0
-      XCABLS(1,NY,NX)=0.0
-      XMGBLS(1,NY,NX)=0.0
-      XNABLS(1,NY,NX)=0.0
-      XKABLS(1,NY,NX)=0.0
-      XOHBLS(1,NY,NX)=0.0
-      XSOBLS(1,NY,NX)=0.0
-      XCLBLS(1,NY,NX)=0.0
-      XC3BLS(1,NY,NX)=0.0
-      XHCBLS(1,NY,NX)=0.0
-      XAL1BS(1,NY,NX)=0.0
-      XAL2BS(1,NY,NX)=0.0
-      XAL3BS(1,NY,NX)=0.0
-      XAL4BS(1,NY,NX)=0.0
-      XALSBS(1,NY,NX)=0.0
-      XFE1BS(1,NY,NX)=0.0
-      XFE2BS(1,NY,NX)=0.0
-      XFE3BS(1,NY,NX)=0.0
-      XFE4BS(1,NY,NX)=0.0
-      XFESBS(1,NY,NX)=0.0
-      XCAOBS(1,NY,NX)=0.0
-      XCACBS(1,NY,NX)=0.0
-      XCAHBS(1,NY,NX)=0.0
-      XCASBS(1,NY,NX)=0.0
-      XMGOBS(1,NY,NX)=0.0
-      XMGCBS(1,NY,NX)=0.0
-      XMGHBS(1,NY,NX)=0.0
-      XMGSBS(1,NY,NX)=0.0
-      XNACBS(1,NY,NX)=0.0
-      XNASBS(1,NY,NX)=0.0
-      XKASBS(1,NY,NX)=0.0
-      XH0PBS(1,NY,NX)=0.0
-      XH3PBS(1,NY,NX)=0.0
-      XF1PBS(1,NY,NX)=0.0
-      XF2PBS(1,NY,NX)=0.0
-      XC0PBS(1,NY,NX)=0.0
-      XC1PBS(1,NY,NX)=0.0
-      XC2PBS(1,NY,NX)=0.0
-      XM1PBS(1,NY,NX)=0.0
-      XALFLS(3,0,NY,NX)=0.0
-      XFEFLS(3,0,NY,NX)=0.0
-      XHYFLS(3,0,NY,NX)=0.0
-      XCAFLS(3,0,NY,NX)=0.0
-      XMGFLS(3,0,NY,NX)=0.0
-      XNAFLS(3,0,NY,NX)=0.0
-      XKAFLS(3,0,NY,NX)=0.0
-      XOHFLS(3,0,NY,NX)=0.0
-      XSOFLS(3,0,NY,NX)=0.0
-      XCLFLS(3,0,NY,NX)=0.0
-      XC3FLS(3,0,NY,NX)=0.0
-      XHCFLS(3,0,NY,NX)=0.0
-      XAL1FS(3,0,NY,NX)=0.0
-      XAL2FS(3,0,NY,NX)=0.0
-      XAL3FS(3,0,NY,NX)=0.0
-      XAL4FS(3,0,NY,NX)=0.0
-      XALSFS(3,0,NY,NX)=0.0
-      XFE1FS(3,0,NY,NX)=0.0
-      XFE2FS(3,0,NY,NX)=0.0
-      XFE3FS(3,0,NY,NX)=0.0
-      XFE4FS(3,0,NY,NX)=0.0
-      XFESFS(3,0,NY,NX)=0.0
-      XCAOFS(3,0,NY,NX)=0.0
-      XCACFS(3,0,NY,NX)=0.0
-      XCAHFS(3,0,NY,NX)=0.0
-      XCASFS(3,0,NY,NX)=0.0
-      XMGOFS(3,0,NY,NX)=0.0
-      XMGCFS(3,0,NY,NX)=0.0
-      XMGHFS(3,0,NY,NX)=0.0
-      XMGSFS(3,0,NY,NX)=0.0
-      XNACFS(3,0,NY,NX)=0.0
-      XNASFS(3,0,NY,NX)=0.0
-      XKASFS(3,0,NY,NX)=0.0
-      XH0PFS(3,0,NY,NX)=0.0
-      XH3PFS(3,0,NY,NX)=0.0
-      XF1PFS(3,0,NY,NX)=0.0
-      XF2PFS(3,0,NY,NX)=0.0
-      XC0PFS(3,0,NY,NX)=0.0
-      XC1PFS(3,0,NY,NX)=0.0
-      XC2PFS(3,0,NY,NX)=0.0
-      XM1PFS(3,0,NY,NX)=0.0
-      XALFLS(3,NU(NY,NX),NY,NX)=0.0
-      XFEFLS(3,NU(NY,NX),NY,NX)=0.0
-      XHYFLS(3,NU(NY,NX),NY,NX)=0.0
-      XCAFLS(3,NU(NY,NX),NY,NX)=0.0
-      XMGFLS(3,NU(NY,NX),NY,NX)=0.0
-      XNAFLS(3,NU(NY,NX),NY,NX)=0.0
-      XKAFLS(3,NU(NY,NX),NY,NX)=0.0
-      XOHFLS(3,NU(NY,NX),NY,NX)=0.0
-      XSOFLS(3,NU(NY,NX),NY,NX)=0.0
-      XCLFLS(3,NU(NY,NX),NY,NX)=0.0
-      XC3FLS(3,NU(NY,NX),NY,NX)=0.0
-      XHCFLS(3,NU(NY,NX),NY,NX)=0.0
-      XAL1FS(3,NU(NY,NX),NY,NX)=0.0
-      XAL2FS(3,NU(NY,NX),NY,NX)=0.0
-      XAL3FS(3,NU(NY,NX),NY,NX)=0.0
-      XAL4FS(3,NU(NY,NX),NY,NX)=0.0
-      XALSFS(3,NU(NY,NX),NY,NX)=0.0
-      XFE1FS(3,NU(NY,NX),NY,NX)=0.0
-      XFE2FS(3,NU(NY,NX),NY,NX)=0.0
-      XFE3FS(3,NU(NY,NX),NY,NX)=0.0
-      XFE4FS(3,NU(NY,NX),NY,NX)=0.0
-      XFESFS(3,NU(NY,NX),NY,NX)=0.0
-      XCAOFS(3,NU(NY,NX),NY,NX)=0.0
-      XCACFS(3,NU(NY,NX),NY,NX)=0.0
-      XCAHFS(3,NU(NY,NX),NY,NX)=0.0
-      XCASFS(3,NU(NY,NX),NY,NX)=0.0
-      XMGOFS(3,NU(NY,NX),NY,NX)=0.0
-      XMGCFS(3,NU(NY,NX),NY,NX)=0.0
-      XMGHFS(3,NU(NY,NX),NY,NX)=0.0
-      XMGSFS(3,NU(NY,NX),NY,NX)=0.0
-      XNACFS(3,NU(NY,NX),NY,NX)=0.0
-      XNASFS(3,NU(NY,NX),NY,NX)=0.0
-      XKASFS(3,NU(NY,NX),NY,NX)=0.0
-      XH0PFS(3,NU(NY,NX),NY,NX)=0.0
-      XH3PFS(3,NU(NY,NX),NY,NX)=0.0
-      XF1PFS(3,NU(NY,NX),NY,NX)=0.0
-      XF2PFS(3,NU(NY,NX),NY,NX)=0.0
-      XC0PFS(3,NU(NY,NX),NY,NX)=0.0
-      XC1PFS(3,NU(NY,NX),NY,NX)=0.0
-      XC2PFS(3,NU(NY,NX),NY,NX)=0.0
-      XM1PFS(3,NU(NY,NX),NY,NX)=0.0
-      XH0BFB(3,NU(NY,NX),NY,NX)=0.0
-      XH3BFB(3,NU(NY,NX),NY,NX)=0.0
-      XF1BFB(3,NU(NY,NX),NY,NX)=0.0
-      XF2BFB(3,NU(NY,NX),NY,NX)=0.0
-      XC0BFB(3,NU(NY,NX),NY,NX)=0.0
-      XC1BFB(3,NU(NY,NX),NY,NX)=0.0
-      XC2BFB(3,NU(NY,NX),NY,NX)=0.0
-      XM1BFB(3,NU(NY,NX),NY,NX)=0.0
-      ENDIF
+      implicit none
+      integer, intent(in) :: NY,NX
+
+      integer :: L
+
+C     begin_execution
+
 C
-C     GAS AND SOLUTE FLUXES AT SUB-HOURLY FLUX TIME STEP
-C     ENTERED IN SITE FILE
+C     Z*W=solute content in snowpacl
+C     salt code: *HY*=H+,*OH*=OH-,*AL*=Al3+,*FE*=Fe3+,*CA*=Ca2+,*MG*=Mg2+
+C          :*NA*=Na+,*KA*=K+,*SO4*=SO42-,*CL*=Cl-,*CO3*=CO32-,*HCO3*=HCO3-
+C          :*CO2*=CO2,*ALO1*=AlOH2-,*ALOH2=AlOH2-,*ALOH3*=AlOH3
+C          :*ALOH4*=AlOH4+,*ALS*=AlSO4+,*FEO1*=FeOH2-,*FEOH2=F3OH2-
+C          :*FEOH3*=FeOH3,*FEOH4*=FeOH4+,*FES*=FeSO4+,*CAO*=CaOH
+C          :*CAC*=CaCO3,*CAH*=CaHCO3-,*CAS*=CaSO4,*MGO*=MgOH,*MGC*=MgCO3
+C          :*MHG*=MgHCO3-,*MGS*=MgSO4,*NAC*=NaCO3-,*NAS*=NaSO4-,*KAS*=KSO4-
+C     phosphorus code: *H0P*=PO43-,*H3P*=H3PO4,*F1P*=FeHPO42-,*F2P*=F1H2PO4-
+C          :*C0P*=CaPO4-,*C1P*=CaHPO4,*C2P*=CaH2PO4+,*M1P*=MgHPO4,*COO*=COOH-C
+      DO 20 L=1,JS
+      ZALW2(L,NY,NX)=ZALW(L,NY,NX)
+      ZFEW2(L,NY,NX)=ZFEW(L,NY,NX)
+      ZHYW2(L,NY,NX)=ZHYW(L,NY,NX)
+      ZCAW2(L,NY,NX)=ZCAW(L,NY,NX)
+      ZMGW2(L,NY,NX)=ZMGW(L,NY,NX)
+      ZNAW2(L,NY,NX)=ZNAW(L,NY,NX)
+      ZKAW2(L,NY,NX)=ZKAW(L,NY,NX)
+      ZOHW2(L,NY,NX)=ZOHW(L,NY,NX)
+      ZSO4W2(L,NY,NX)=ZSO4W(L,NY,NX)
+      ZCLW2(L,NY,NX)=ZCLW(L,NY,NX)
+      ZCO3W2(L,NY,NX)=ZCO3W(L,NY,NX)
+      ZHCO3W2(L,NY,NX)=ZHCO3W(L,NY,NX)
+      ZALH1W2(L,NY,NX)=ZALH1W(L,NY,NX)
+      ZALH2W2(L,NY,NX)=ZALH2W(L,NY,NX)
+      ZALH3W2(L,NY,NX)=ZALH3W(L,NY,NX)
+      ZALH4W2(L,NY,NX)=ZALH4W(L,NY,NX)
+      ZALSW2(L,NY,NX)=ZALSW(L,NY,NX)
+      ZFEH1W2(L,NY,NX)=ZFEH1W(L,NY,NX)
+      ZFEH2W2(L,NY,NX)=ZFEH2W(L,NY,NX)
+      ZFEH3W2(L,NY,NX)=ZFEH3W(L,NY,NX)
+      ZFEH4W2(L,NY,NX)=ZFEH4W(L,NY,NX)
+      ZFESW2(L,NY,NX)=ZFESW(L,NY,NX)
+      ZCAOW2(L,NY,NX)=ZCAOW(L,NY,NX)
+      ZCACW2(L,NY,NX)=ZCACW(L,NY,NX)
+      ZCAHW2(L,NY,NX)=ZCAHW(L,NY,NX)
+      ZCASW2(L,NY,NX)=ZCASW(L,NY,NX)
+      ZMGOW2(L,NY,NX)=ZMGOW(L,NY,NX)
+      ZMGCW2(L,NY,NX)=ZMGCW(L,NY,NX)
+      ZMGHW2(L,NY,NX)=ZMGHW(L,NY,NX)
+      ZMGSW2(L,NY,NX)=ZMGSW(L,NY,NX)
+      ZNACW2(L,NY,NX)=ZNACW(L,NY,NX)
+      ZNASW2(L,NY,NX)=ZNASW(L,NY,NX)
+      ZKASW2(L,NY,NX)=ZKASW(L,NY,NX)
+      H0PO4W2(L,NY,NX)=H0PO4W(L,NY,NX)
+      H3PO4W2(L,NY,NX)=H3PO4W(L,NY,NX)
+      ZFE1PW2(L,NY,NX)=ZFE1PW(L,NY,NX)
+      ZFE2PW2(L,NY,NX)=ZFE2PW(L,NY,NX)
+      ZCA0PW2(L,NY,NX)=ZCA0PW(L,NY,NX)
+      ZCA1PW2(L,NY,NX)=ZCA1PW(L,NY,NX)
+      ZCA2PW2(L,NY,NX)=ZCA2PW(L,NY,NX)
+      ZMG1PW2(L,NY,NX)=ZMG1PW(L,NY,NX)
+20    CONTINUE
+      end subroutine InitSolutesInSnowpack
+
+C------------------------------------------------------------------------------------------
+
+      subroutine GetSubHourFlux(NY,NX)
+C
+C     Description:
+C
+      implicit none
+      integer, intent(in) :: NY,NX
+
+C     begin_execution
+
 C
 C
 C     XNPH=1/no. of cycles h-1 for water, heat and solute flux calculations
@@ -1143,64 +1255,21 @@ C
       RC1BF2(NY,NX)=XC1BFB(3,NU(NY,NX),NY,NX)*XNPH
       RC2BF2(NY,NX)=XC2BFB(3,NU(NY,NX),NY,NX)*XNPH
       RM1BF2(NY,NX)=XM1BFB(3,NU(NY,NX),NY,NX)*XNPH
+      end subroutine GetSubHourFlux
+
+C------------------------------------------------------------------------------------------
+
+      subroutine GetSubHourlyFluxByLayer(I,NY,NX)
 C
-C     INITIAL SOLUTES IN SNOWPACK
+C     Description:
 C
-C     Z*W=solute content in snowpacl
-C     salt code: *HY*=H+,*OH*=OH-,*AL*=Al3+,*FE*=Fe3+,*CA*=Ca2+,*MG*=Mg2+
-C          :*NA*=Na+,*KA*=K+,*SO4*=SO42-,*CL*=Cl-,*CO3*=CO32-,*HCO3*=HCO3-
-C          :*CO2*=CO2,*ALO1*=AlOH2-,*ALOH2=AlOH2-,*ALOH3*=AlOH3
-C          :*ALOH4*=AlOH4+,*ALS*=AlSO4+,*FEO1*=FeOH2-,*FEOH2=F3OH2-
-C          :*FEOH3*=FeOH3,*FEOH4*=FeOH4+,*FES*=FeSO4+,*CAO*=CaOH
-C          :*CAC*=CaCO3,*CAH*=CaHCO3-,*CAS*=CaSO4,*MGO*=MgOH,*MGC*=MgCO3
-C          :*MHG*=MgHCO3-,*MGS*=MgSO4,*NAC*=NaCO3-,*NAS*=NaSO4-,*KAS*=KSO4-
-C     phosphorus code: *H0P*=PO43-,*H3P*=H3PO4,*F1P*=FeHPO42-,*F2P*=F1H2PO4-
-C          :*C0P*=CaPO4-,*C1P*=CaHPO4,*C2P*=CaH2PO4+,*M1P*=MgHPO4,*COO*=COOH-C
-      DO 20 L=1,JS
-      ZALW2(L,NY,NX)=ZALW(L,NY,NX)
-      ZFEW2(L,NY,NX)=ZFEW(L,NY,NX)
-      ZHYW2(L,NY,NX)=ZHYW(L,NY,NX)
-      ZCAW2(L,NY,NX)=ZCAW(L,NY,NX)
-      ZMGW2(L,NY,NX)=ZMGW(L,NY,NX)
-      ZNAW2(L,NY,NX)=ZNAW(L,NY,NX)
-      ZKAW2(L,NY,NX)=ZKAW(L,NY,NX)
-      ZOHW2(L,NY,NX)=ZOHW(L,NY,NX)
-      ZSO4W2(L,NY,NX)=ZSO4W(L,NY,NX)
-      ZCLW2(L,NY,NX)=ZCLW(L,NY,NX)
-      ZCO3W2(L,NY,NX)=ZCO3W(L,NY,NX)
-      ZHCO3W2(L,NY,NX)=ZHCO3W(L,NY,NX)
-      ZALH1W2(L,NY,NX)=ZALH1W(L,NY,NX)
-      ZALH2W2(L,NY,NX)=ZALH2W(L,NY,NX)
-      ZALH3W2(L,NY,NX)=ZALH3W(L,NY,NX)
-      ZALH4W2(L,NY,NX)=ZALH4W(L,NY,NX)
-      ZALSW2(L,NY,NX)=ZALSW(L,NY,NX)
-      ZFEH1W2(L,NY,NX)=ZFEH1W(L,NY,NX)
-      ZFEH2W2(L,NY,NX)=ZFEH2W(L,NY,NX)
-      ZFEH3W2(L,NY,NX)=ZFEH3W(L,NY,NX)
-      ZFEH4W2(L,NY,NX)=ZFEH4W(L,NY,NX)
-      ZFESW2(L,NY,NX)=ZFESW(L,NY,NX)
-      ZCAOW2(L,NY,NX)=ZCAOW(L,NY,NX)
-      ZCACW2(L,NY,NX)=ZCACW(L,NY,NX)
-      ZCAHW2(L,NY,NX)=ZCAHW(L,NY,NX)
-      ZCASW2(L,NY,NX)=ZCASW(L,NY,NX)
-      ZMGOW2(L,NY,NX)=ZMGOW(L,NY,NX)
-      ZMGCW2(L,NY,NX)=ZMGCW(L,NY,NX)
-      ZMGHW2(L,NY,NX)=ZMGHW(L,NY,NX)
-      ZMGSW2(L,NY,NX)=ZMGSW(L,NY,NX)
-      ZNACW2(L,NY,NX)=ZNACW(L,NY,NX)
-      ZNASW2(L,NY,NX)=ZNASW(L,NY,NX)
-      ZKASW2(L,NY,NX)=ZKASW(L,NY,NX)
-      H0PO4W2(L,NY,NX)=H0PO4W(L,NY,NX)
-      H3PO4W2(L,NY,NX)=H3PO4W(L,NY,NX)
-      ZFE1PW2(L,NY,NX)=ZFE1PW(L,NY,NX)
-      ZFE2PW2(L,NY,NX)=ZFE2PW(L,NY,NX)
-      ZCA0PW2(L,NY,NX)=ZCA0PW(L,NY,NX)
-      ZCA1PW2(L,NY,NX)=ZCA1PW(L,NY,NX)
-      ZCA2PW2(L,NY,NX)=ZCA2PW(L,NY,NX)
-      ZMG1PW2(L,NY,NX)=ZMG1PW(L,NY,NX)
-20    CONTINUE
-C
-C     SOLUTE FLUXES FROM SOLUTE.F
+      implicit none
+      integer, intent(in) :: I,NY,NX
+
+      integer :: L
+
+C     begin_execution
+
 C
 C     XNPH=1/no. of cycles h-1 for water, heat and solute flux calculations
 C     RZ*2=solute flux at time step for flux calculations
@@ -1506,18 +1575,87 @@ C
       ZC2BH2(L,NY,NX)=ZCA2BH(L,NY,NX)
       ZM1BH2(L,NY,NX)=ZMG1BH(L,NY,NX)
 10    CONTINUE
+      end subroutine GetSubHourlyFluxByLayer
+
+C------------------------------------------------------------------------------------------
+
+      subroutine SaltModelSoluteFlux(I,NHW,NHE,NVN,NVS)
+C
+C     Description:
+C
+      implicit none
+      integer, intent(in) :: I,NHW,NHE,NVN,NVS
+
+      integer :: NY,NX
+C     begin_execution
+
+      DO 9995 NX=NHW,NHE
+      DO 9990 NY=NVN,NVS
+C
+C     HOURLY SOLUTE FLUXES FROM ATMOSPHERE TO SNOWPACK
+C     IN SNOWFALL AND IRRIGATION ACCORDING TO CONCENTRATIONS
+C     ENTERED IN WEATHER AND IRRIGATION FILES
+C
+C     PRECW,PRECR=snow,rain
+C     VHCPWM,VHCPWX=current,minimum volumetric heat capacity of snowpack
+C     X*BLS=hourly solute flux to snowpack
+C     salt code: *HY*=H+,*OH*=OH-,*AL*=Al3+,*FE*=Fe3+,*CA*=Ca2+,*MG*=Mg2+
+C          :*NA*=Na+,*KA*=K+,*SO4*=SO42-,*CL*=Cl-,*CO3*=CO32-,*HCO3*=HCO3-
+C          :*CO2*=CO2,*ALO1*=AlOH2-,*ALOH2=AlOH2-,*ALOH3*=AlOH3
+C          :*ALOH4*=AlOH4+,*ALS*=AlSO4+,*FEO1*=FeOH2-,*FEOH2=F3OH2-
+C          :*FEOH3*=FeOH3,*FEOH4*=FeOH4+,*FES*=FeSO4+,*CAO*=CaOH
+C          :*CAC*=CaCO3,*CAH*=CaHCO3-,*CAS*=CaSO4,*MGO*=MgOH,*MGC*=MgCO3
+C          :*MHG*=MgHCO3-,*MGS*=MgSO4,*NAC*=NaCO3-,*NAS*=NaSO4-,*KAS*=KSO4-
+C     phosphorus code: *H0P*=PO43-,*H3P*=H3PO4,*F1P*=FeHPO42-,*F2P*=F1H2PO4-
+C          :*C0P*=CaPO4-,*C1P*=CaHPO4,*C2P*=CaH2PO4+,*M1P*=MgHPO4,*COO*=COOH-
+C     FLQGQ,FLQGI=water flux to snowpack from rain,irrigation
+C     C*R,C*Q=precipitation,irrigation solute concentrations
+C
+      IF(PRECW(NY,NX).GT.0.0.OR.(PRECR(NY,NX).GT.0.0
+     2.AND.VHCPWM(1,1,NY,NX).GT.VHCPWX(NY,NX)))THEN
+C
+      call AtmosSoluteFluxToSnowpack(I,NY,NX)
+C
+C     HOURLY SOLUTE FLUXES FROM ATMOSPHERE TO SOIL SURFACE
+C     IN RAINFALL AND IRRIGATION ACCORDING TO CONCENTRATIONS
+C     ENTERED IN WEATHER AND IRRIGATION FILES
+C
+      ELSEIF((PRECQ(NY,NX).GT.0.0.OR.PRECI(NY,NX).GT.0.0)
+     2.AND.VHCPWM(1,1,NY,NX).LE.VHCPWX(NY,NX))THEN
+C
+      call AtmosSoluteFluxToTopsoil(I,NY,NX)
+C
+C     NO SOLUTE FLUXES FROM ATMOSPHERE
+C
+      ELSE
+      call ZeroAtmosSoluteFlux(NY,NX)
       ENDIF
+C
+C     GAS AND SOLUTE FLUXES AT SUB-HOURLY FLUX TIME STEP
+C     ENTERED IN SITE FILE
+      call GetSubHourFlux(NY,NX)
+C
+C     INITIAL SOLUTES IN SNOWPACK
+      call InitSolutesInSnowpack(NY,NX)
+C
+C     SOLUTE FLUXES FROM SOLUTE.F
+      call GetSubHourlyFluxByLayer(I,NY,NX)
+
 9990  CONTINUE
 9995  CONTINUE
+      end subroutine SaltModelSoluteFlux
+
+C------------------------------------------------------------------------------------------
+
+      subroutine InitFluxAccumlatorsInRunoff(NY,NX)
 C
-C     TIME STEP USED IN GAS AND SOLUTE FLUX CALCULATIONS
+C     Description:
 C
-      DO 30 M=1,NPH
-      DO 9895 NX=NHW,NHE
-      DO 9890 NY=NVN,NVS
-      IF(ISALTG.NE.0)THEN
-C
-C     INITIALIZE SOLUTE RUNOFF NET FLUX ACCUMULATORS
+      implicit none
+      integer, intent(in) :: NY,NX
+
+C     begin_execution
+
 C
       TQRAL(NY,NX)=0.0
       TQRFE(NY,NX)=0.0
@@ -1601,9 +1739,18 @@ C
       TQSC1P(NY,NX)=0.0
       TQSC2P(NY,NX)=0.0
       TQSM1P(NY,NX)=0.0
+      end subroutine InitFluxAccumlatorsInRunoff
+
+C------------------------------------------------------------------------------------------
+
+      subroutine InitFluxAccumulatorsInSnowpack(NY,NX)
 C
-C     INITIALIZE SNOWPACK NET FLUX ACCUMULATORS
+C     Description:
 C
+      implicit none
+      integer, intent(in) :: NY,NX
+      integer :: L
+
       DO 9855 L=1,JS
       TALBLS(L,NY,NX)=0.0
       TFEBLS(L,NY,NX)=0.0
@@ -1647,9 +1794,18 @@ C
       TC2PBS(L,NY,NX)=0.0
       TM1PBS(L,NY,NX)=0.0
 9855  CONTINUE
+      end subroutine InitFluxAccumulatorsInSnowpack
+
+C------------------------------------------------------------------------------------------
+
+      subroutine InitFluxAccumulatorsInSoil(NY,NX)
 C
-C     INITIALIZE SOIL SOLUTE NET FLUX ACCUMULATORS
+C     Description:
 C
+      implicit none
+      integer, intent(in) :: NY,NX
+      integer :: L
+
       DO 9885 L=NU(NY,NX),NL(NY,NX)
       TALFLS(L,NY,NX)=0.0
       TFEFLS(L,NY,NX)=0.0
@@ -1749,8 +1905,22 @@ C
       TC1BHB(L,NY,NX)=0.0
       TC2BHB(L,NY,NX)=0.0
       TM1BHB(L,NY,NX)=0.0
+9885  CONTINUE
+      end subroutine InitFluxAccumulatorsInSoil
+
+C------------------------------------------------------------------------------------------
+
+      subroutine SoluteSinksInSoil(NY,NX)
 C
-C     ADD SINKS FROM SOLUTE.F
+C     Description:
+C
+      implicit none
+      integer, intent(in) :: NY,NX
+
+      integer :: L
+
+C     begin_execution
+
 C
 C     RZ*2=solute flux at time step for flux calculations
 C     salt code: *HY*=H+,*OH*=OH-,*AL*=Al3+,*FE*=Fe3+,*CA*=Ca2+,*MG*=Mg2+
@@ -1764,6 +1934,7 @@ C     phosphorus code: *H0P*=PO43-,*H3P*=H3PO4,*F1P*=FeHPO42-,*F2P*=F1H2PO4-
 C          :*C0P*=CaPO4-,*C1P*=CaHPO4,*C2P*=CaH2PO4+,*M1P*=MgHPO4,*COO*=COOH-
 C          :*1=non-band,*B=band
 C
+      DO 9886 L=NU(NY,NX),NL(NY,NX)
       ZAL2(L,NY,NX)=ZAL2(L,NY,NX)-RZAL2(L,NY,NX)
       ZFE2(L,NY,NX)=ZFE2(L,NY,NX)-RZFE2(L,NY,NX)
       ZHY2(L,NY,NX)=ZHY2(L,NY,NX)-RZHY2(L,NY,NX)
@@ -1813,11 +1984,21 @@ C
       ZC1PB2(L,NY,NX)=ZC1PB2(L,NY,NX)-RZC1PB2(L,NY,NX)
       ZC2PB2(L,NY,NX)=ZC2PB2(L,NY,NX)-RZC2PB2(L,NY,NX)
       ZM1PB2(L,NY,NX)=ZM1PB2(L,NY,NX)-RZM1PB2(L,NY,NX)
-9885  CONTINUE
+9886  CONTINUE
+      end subroutine SoluteSinksInSoil
+
+C------------------------------------------------------------------------------------------
+
+      subroutine SoluteFluxInSnowpack(M,NY,NX)
 C
-C     SOLUTE FLUXES FROM MELTING SNOWPACK TO
-C     SOIL SURFACE FROM SNOWMELT IN 'WATSUB' AND
-C     CONCENTRATIONS IN SNOWPACK
+C     Description:
+C
+      implicit none
+      integer, intent(in) :: M,NY,NX
+      integer :: L,ICHKL,L2
+
+C     begin_execution
+
 C
 C     VHCPWM,VHCPWX=current,minimum volumetric heat capacity of snowpack
 C     VOLWSL=snowpack water content
@@ -2169,13 +2350,17 @@ C
       RM1BFB1=0.0
       ENDIF
 9775  CONTINUE
+      end subroutine SoluteFluxInSnowpack
 
+C------------------------------------------------------------------------------------------
+
+      subroutine Residue2TopsoilSoluteAdvExch(M,NY,NX)
 C
-C     CONVECTIVE SOLUTE EXCHANGE BETWEEN RESIDUE AND SOIL SURFACE
+C     Description:
 C
-      FLWRM1=FLWRM(M,NY,NX)
-C
-C     FLWRM=litter-soil water flux from watsub.f
+      implicit none
+      integer, intent(in) :: M,NY,NX
+C     begin_execution
 C
 C     IF WATER FLUX FROM 'WATSUB' IS FROM RESIDUE TO
 C     SOIL SURFACE THEN CONVECTIVE TRANSPORT IS THE PRODUCT
@@ -2198,7 +2383,6 @@ C          :*1=non-band,*B=band
 C     VLNH4,VLNO3,VLPO4=non-band NH4,NO3,PO4 volume fraction
 C     VLNHB,VLNOB,VLPOB=band NH4,NO3,PO4 volume fraction
 C
-      IF(FLWRM1.GT.0.0)THEN
       IF(VOLWM(M,0,NY,NX).GT.ZEROS2(NY,NX))THEN
       VFLW=AMAX1(0.0,AMIN1(VFLWX,FLWRM1/VOLWM(M,0,NY,NX)))
       ELSE
@@ -2253,6 +2437,19 @@ C
       RFLC1B=VFLW*AMAX1(0.0,ZCA1P2(0,NY,NX))*VLPOB(NU(NY,NX),NY,NX)
       RFLC2B=VFLW*AMAX1(0.0,ZCA2P2(0,NY,NX))*VLPOB(NU(NY,NX),NY,NX)
       RFLM1B=VFLW*AMAX1(0.0,ZMG1P2(0,NY,NX))*VLPOB(NU(NY,NX),NY,NX)
+      end subroutine Residue2TopsoilSoluteAdvExch
+
+C------------------------------------------------------------------------------------------
+
+      subroutine Topsoil2ResidueSoluteAdvExch(M,NY,NX)
+C
+C     Description:
+C
+      implicit none
+      integer, intent(in) :: M,NY,NX
+
+C     begin_execution
+
 C
 C     IF WATER FLUX FROM 'WATSUB' IS TO RESIDUE FROM
 C     SOIL SURFACE THEN CONVECTIVE TRANSPORT IS THE PRODUCT
@@ -2274,8 +2471,6 @@ C          :*C0P*=CaPO4-,*C1P*=CaHPO4,*C2P*=CaH2PO4+,*M1P*=MgHPO4,*COO*=COOH-
 C          :*1=non-band,*B=band
 C     VLNH4,VLNO3,VLPO4=non-band NH4,NO3,PO4 volume fraction
 C     VLNHB,VLNOB,VLPOB=band NH4,NO3,PO4 volume fraction
-C
-      ELSE
       IF(VOLWM(M,NU(NY,NX),NY,NX).GT.ZEROS2(NY,NX))THEN
       VFLW=AMIN1(0.0,AMAX1(-VFLWX,FLWRM1/VOLWM(M,NU(NY,NX),NY,NX)))
       ELSE
@@ -2330,18 +2525,18 @@ C
       RFLC1B=VFLW*AMAX1(0.0,ZC1PB2(NU(NY,NX),NY,NX))
       RFLC2B=VFLW*AMAX1(0.0,ZC2PB2(NU(NY,NX),NY,NX))
       RFLM1B=VFLW*AMAX1(0.0,ZM1PB2(NU(NY,NX),NY,NX))
-      ENDIF
+      end subroutine Topsoil2ResidueSoluteAdvExch
+
+C------------------------------------------------------------------------------------------
+
+      subroutine TopsoilResidueSolutedifusExch(M,NY,NX)
 C
-C     DIFFUSIVE FLUXES OF GASES AND SOLUTES BETWEEN RESIDUE AND
-C     SOIL SURFACE FROM AQUEOUS DIFFUSIVITIES
-C     AND CONCENTRATION DIFFERENCES
+C     Description:
 C
-C     VOLT,DLYR,AREA=soil surface volume, thickness, area
-C     VOLWM=micropore water-filled porosity from watsub.f
-C
-      IF((VOLT(0,NY,NX).GT.ZEROS(NY,NX)
-     2.AND.VOLWM(M,0,NY,NX).GT.ZEROS2(NY,NX))
-     3.AND.(VOLWM(M,NU(NY,NX),NY,NX).GT.ZEROS2(NY,NX)))THEN
+      implicit none
+      integer, intent(in) :: M,NY,NX
+
+C     begin_execution
 C
 C     MICROPORE CONCENTRATIONS FROM WATER IN RESIDUE AND SOIL SURFACE
 C
@@ -2584,7 +2779,17 @@ C
       DFVC1B=DIFPO*(CCA1P1-CC1PB2)*VLPOB(NU(NY,NX),NY,NX)
       DFVC2B=DIFPO*(CCA2P1-CC2PB2)*VLPOB(NU(NY,NX),NY,NX)
       DFVM1B=DIFPO*(CMG1P1-CM1PB2)*VLPOB(NU(NY,NX),NY,NX)
-      ELSE
+      end subroutine TopsoilResidueSolutedifusExch
+
+C------------------------------------------------------------------------------------------
+
+      subroutine ZeroDifusTopsoilResidueExch
+C
+C     Description:
+C
+      implicit none
+
+C     begin_execution
       DFVAL=0.0
       DFVFE=0.0
       DFVHY=0.0
@@ -2634,127 +2839,19 @@ C
       DFVC1B=0.0
       DFVC2B=0.0
       DFVM1B=0.0
-      ENDIF
+      end subroutine ZeroDifusTopsoilResidueExch
+
+C------------------------------------------------------------------------------------------
+
+      subroutine AccumHourlyTopsoilReisdueFlux(NY,NX)
 C
-C     TOTAL MICROPORE AND MACROPORE SOLUTE TRANSPORT FLUXES BETWEEN
-C     ADJACENT GRID CELLS = CONVECTIVE + DIFFUSIVE FLUXES
+C     Description:
 C
-C
-C     R*FLS=convective + diffusive solute flux between litter, soil surface
-C     R*FLW,R*FLB=convective + diffusive solute flux into soil in non-band,band
-C     salt code: *HY*=H+,*OH*=OH-,*AL*=Al3+,*FE*=Fe3+,*CA*=Ca2+,*MG*=Mg2+
-C          :*NA*=Na+,*KA*=K+,*SO4*=SO42-,*CL*=Cl-,*CO3*=CO32-,*HCO3*=HCO3-
-C          :*CO2*=CO2,*ALO1*=AlOH2-,*ALOH2=AlOH2-,*ALOH3*=AlOH3
-C          :*ALOH4*=AlOH4+,*ALS*=AlSO4+,*FEO1*=FeOH2-,*FEOH2=F3OH2-
-C          :*FEOH3*=FeOH3,*FEOH4*=FeOH4+,*FES*=FeSO4+,*CAO*=CaOH
-C          :*CAC*=CaCO3,*CAH*=CaHCO3-,*CAS*=CaSO4,*MGO*=MgOH,*MGC*=MgCO3
-C          :*MHG*=MgHCO3-,*MGS*=MgSO4,*NAC*=NaCO3-,*NAS*=NaSO4-,*KAS*=KSO4-
-C     phosphorus code: *H0P*=PO43-,*H3P*=H3PO4,*F1P*=FeHPO42-,*F2P*=F1H2PO4-
-C          :*C0P*=CaPO4-,*C1P*=CaHPO4,*C2P*=CaH2PO4+,*M1P*=MgHPO4,*COO*=COOH-
-C          :*1=non-band,*B=band
-C     R*FL0,R*FL1=convective flux into surface litter, soil surface
-C     RFL*=convective flux between surface litter and soil surface
-C     DFV*=diffusive solute flux between litter and soil surface
-C
-      RALFLS(3,0,NY,NX)=RALFL0(NY,NX)+RALFLS0-RFLAL-DFVAL
-      RFEFLS(3,0,NY,NX)=RFEFL0(NY,NX)+RFEFLS0-RFLFE-DFVFE
-      RHYFLS(3,0,NY,NX)=RHYFL0(NY,NX)+RHYFLS0-RFLHY-DFVHY
-      RCAFLS(3,0,NY,NX)=RCAFL0(NY,NX)+RCAFLS0-RFLCA-DFVCA
-      RMGFLS(3,0,NY,NX)=RMGFL0(NY,NX)+RMGFLS0-RFLMG-DFVMG
-      RNAFLS(3,0,NY,NX)=RNAFL0(NY,NX)+RNAFLS0-RFLNA-DFVNA
-      RKAFLS(3,0,NY,NX)=RKAFL0(NY,NX)+RKAFLS0-RFLKA-DFVKA
-      ROHFLS(3,0,NY,NX)=ROHFL0(NY,NX)+ROHFLS0-RFLOH-DFVOH
-      RSOFLS(3,0,NY,NX)=RSOFL0(NY,NX)+RSOFLS0-RFLSO-DFVSO
-      RCLFLS(3,0,NY,NX)=RCLFL0(NY,NX)+RCLFLS0-RFLCL-DFVCL
-      RC3FLS(3,0,NY,NX)=RC3FL0(NY,NX)+RC3FLS0-RFLC3-DFVC3
-      RHCFLS(3,0,NY,NX)=RHCFL0(NY,NX)+RHCFLS0-RFLHC-DFVHC
-      RAL1FS(3,0,NY,NX)=RAL1F0(NY,NX)+RAL1FS0-RFLAL1-DFVAL1
-      RAL2FS(3,0,NY,NX)=RAL2F0(NY,NX)+RAL2FS0-RFLAL2-DFVAL2
-      RAL3FS(3,0,NY,NX)=RAL3F0(NY,NX)+RAL3FS0-RFLAL3-DFVAL3
-      RAL4FS(3,0,NY,NX)=RAL4F0(NY,NX)+RAL4FS0-RFLAL4-DFVAL4
-      RALSFS(3,0,NY,NX)=RALSF0(NY,NX)+RALSFS0-RFLALS-DFVALS
-      RFE1FS(3,0,NY,NX)=RFE1F0(NY,NX)+RFE1FS0-RFLFE1-DFVFE1
-      RFE2FS(3,0,NY,NX)=RFE2F0(NY,NX)+RFE2FS0-RFLFE2-DFVFE2
-      RFE3FS(3,0,NY,NX)=RFE3F0(NY,NX)+RFE3FS0-RFLFE3-DFVFE3
-      RFE4FS(3,0,NY,NX)=RFE4F0(NY,NX)+RFE4FS0-RFLFE4-DFVFE4
-      RFESFS(3,0,NY,NX)=RFESF0(NY,NX)+RFESFS0-RFLFES-DFVFES
-      RCAOFS(3,0,NY,NX)=RCAOF0(NY,NX)+RCAOFS0-RFLCAO-DFVCAO
-      RCACFS(3,0,NY,NX)=RCACF0(NY,NX)+RCACFS0-RFLCAC-DFVCAC
-      RCAHFS(3,0,NY,NX)=RCAHF0(NY,NX)+RCAHFS0-RFLCAH-DFVCAH
-      RCASFS(3,0,NY,NX)=RCASF0(NY,NX)+RCASFS0-RFLCAS-DFVCAS
-      RMGOFS(3,0,NY,NX)=RMGOF0(NY,NX)+RMGOFS0-RFLMGO-DFVMGO
-      RMGCFS(3,0,NY,NX)=RMGCF0(NY,NX)+RMGCFS0-RFLMGC-DFVMGC
-      RMGHFS(3,0,NY,NX)=RMGHF0(NY,NX)+RMGHFS0-RFLMGH-DFVMGH
-      RMGSFS(3,0,NY,NX)=RMGSF0(NY,NX)+RMGSFS0-RFLMGS-DFVMGS
-      RNACFS(3,0,NY,NX)=RNACF0(NY,NX)+RNACFS0-RFLNAC-DFVNAC
-      RNASFS(3,0,NY,NX)=RNASF0(NY,NX)+RNASFS0-RFLNAS-DFVNAS
-      RKASFS(3,0,NY,NX)=RKASF0(NY,NX)+RKASFS0-RFLKAS-DFVKAS
-      RH0PFS(3,0,NY,NX)=RH0PF0(NY,NX)+RH0PFS0-RFLH0P-DFVH0P
-     2-RFLH0B-DFVH0B
-      RH3PFS(3,0,NY,NX)=RH3PF0(NY,NX)+RH3PFS0-RFLH3P-DFVH3P
-     2-RFLH3B-DFVH3B
-      RF1PFS(3,0,NY,NX)=RF1PF0(NY,NX)+RF1PFS0-RFLF1P-DFVF1P
-     2-RFLF1B-DFVF1B
-      RF2PFS(3,0,NY,NX)=RF2PF0(NY,NX)+RF2PFS0-RFLF2P-DFVF2P
-     2-RFLF2B-DFVF2B
-      RC0PFS(3,0,NY,NX)=RC0PF0(NY,NX)+RC0PFS0-RFLC0P-DFVC0P
-     2-RFLC0B-DFVC0B
-      RC1PFS(3,0,NY,NX)=RC1PF0(NY,NX)+RC1PFS0-RFLC1P-DFVC1P
-     2-RFLC1B-DFVC1B
-      RC2PFS(3,0,NY,NX)=RC2PF0(NY,NX)+RC2PFS0-RFLC2P-DFVC2P
-     2-RFLC2B-DFVC2B
-      RM1PFS(3,0,NY,NX)=RM1PF0(NY,NX)+RM1PFS0-RFLM1P-DFVM1P
-     2-RFLM1B-DFVM1B
-      RALFLS(3,NU(NY,NX),NY,NX)=RALFL1(NY,NX)+RALFLS1+RFLAL+DFVAL
-      RFEFLS(3,NU(NY,NX),NY,NX)=RFEFL1(NY,NX)+RFEFLS1+RFLFE+DFVFE
-      RHYFLS(3,NU(NY,NX),NY,NX)=RHYFL1(NY,NX)+RHYFLS1+RFLHY+DFVHY
-      RCAFLS(3,NU(NY,NX),NY,NX)=RCAFL1(NY,NX)+RCAFLS1+RFLCA+DFVCA
-      RMGFLS(3,NU(NY,NX),NY,NX)=RMGFL1(NY,NX)+RMGFLS1+RFLMG+DFVMG
-      RNAFLS(3,NU(NY,NX),NY,NX)=RNAFL1(NY,NX)+RNAFLS1+RFLNA+DFVNA
-      RKAFLS(3,NU(NY,NX),NY,NX)=RKAFL1(NY,NX)+RKAFLS1+RFLKA+DFVKA
-      ROHFLS(3,NU(NY,NX),NY,NX)=ROHFL1(NY,NX)+ROHFLS1+RFLOH+DFVOH
-      RSOFLS(3,NU(NY,NX),NY,NX)=RSOFL1(NY,NX)+RSOFLS1+RFLSO+DFVSO
-      RCLFLS(3,NU(NY,NX),NY,NX)=RCLFL1(NY,NX)+RCLFLS1+RFLCL+DFVCL
-      RC3FLS(3,NU(NY,NX),NY,NX)=RC3FL1(NY,NX)+RC3FLS1+RFLC3+DFVC3
-      RHCFLS(3,NU(NY,NX),NY,NX)=RHCFL1(NY,NX)+RHCFLS1+RFLHC+DFVHC
-      RAL1FS(3,NU(NY,NX),NY,NX)=RAL1F1(NY,NX)+RAL1FS1+RFLAL1+DFVAL1
-      RAL2FS(3,NU(NY,NX),NY,NX)=RAL2F1(NY,NX)+RAL2FS1+RFLAL2+DFVAL2
-      RAL3FS(3,NU(NY,NX),NY,NX)=RAL3F1(NY,NX)+RAL3FS1+RFLAL3+DFVAL3
-      RAL4FS(3,NU(NY,NX),NY,NX)=RAL4F1(NY,NX)+RAL4FS1+RFLAL4+DFVAL4
-      RALSFS(3,NU(NY,NX),NY,NX)=RALSF1(NY,NX)+RALSFS1+RFLALS+DFVALS
-      RFE1FS(3,NU(NY,NX),NY,NX)=RFE1F1(NY,NX)+RFE1FS1+RFLFE1+DFVFE1
-      RFE2FS(3,NU(NY,NX),NY,NX)=RFE2F1(NY,NX)+RFE2FS1+RFLFE2+DFVFE2
-      RFE3FS(3,NU(NY,NX),NY,NX)=RFE3F1(NY,NX)+RFE3FS1+RFLFE3+DFVFE3
-      RFE4FS(3,NU(NY,NX),NY,NX)=RFE4F1(NY,NX)+RFE4FS1+RFLFE4+DFVFE4
-      RFESFS(3,NU(NY,NX),NY,NX)=RFESF1(NY,NX)+RFESFS1+RFLFES+DFVFES
-      RCAOFS(3,NU(NY,NX),NY,NX)=RCAOF1(NY,NX)+RCAOFS1+RFLCAO+DFVCAO
-      RCACFS(3,NU(NY,NX),NY,NX)=RCACF1(NY,NX)+RCACFS1+RFLCAC+DFVCAC
-      RCAHFS(3,NU(NY,NX),NY,NX)=RCAHF1(NY,NX)+RCAHFS1+RFLCAH+DFVCAH
-      RCASFS(3,NU(NY,NX),NY,NX)=RCASF1(NY,NX)+RCASFS1+RFLCAS+DFVCAS
-      RMGOFS(3,NU(NY,NX),NY,NX)=RMGOF1(NY,NX)+RMGOFS1+RFLMGO+DFVMGO
-      RMGCFS(3,NU(NY,NX),NY,NX)=RMGCF1(NY,NX)+RMGCFS1+RFLMGC+DFVMGC
-      RMGHFS(3,NU(NY,NX),NY,NX)=RMGHF1(NY,NX)+RMGHFS1+RFLMGH+DFVMGH
-      RMGSFS(3,NU(NY,NX),NY,NX)=RMGSF1(NY,NX)+RMGSFS1+RFLMGS+DFVMGS
-      RNACFS(3,NU(NY,NX),NY,NX)=RNACF1(NY,NX)+RNACFS1+RFLNAC+DFVNAC
-      RNASFS(3,NU(NY,NX),NY,NX)=RNASF1(NY,NX)+RNASFS1+RFLNAS+DFVNAS
-      RKASFS(3,NU(NY,NX),NY,NX)=RKASF1(NY,NX)+RKASFS1+RFLKAS+DFVKAS
-      RH0PFS(3,NU(NY,NX),NY,NX)=RH0PF1(NY,NX)+RH0PFS1+RFLH0P+DFVH0P
-      RH3PFS(3,NU(NY,NX),NY,NX)=RH3PF1(NY,NX)+RH3PFS1+RFLH3P+DFVH3P
-      RF1PFS(3,NU(NY,NX),NY,NX)=RF1PF1(NY,NX)+RF1PFS1+RFLF1P+DFVF1P
-      RF2PFS(3,NU(NY,NX),NY,NX)=RF2PF1(NY,NX)+RF2PFS1+RFLF2P+DFVF2P
-      RC0PFS(3,NU(NY,NX),NY,NX)=RC0PF1(NY,NX)+RC0PFS1+RFLC0P+DFVC0P
-      RC1PFS(3,NU(NY,NX),NY,NX)=RC1PF1(NY,NX)+RC1PFS1+RFLC1P+DFVC1P
-      RC2PFS(3,NU(NY,NX),NY,NX)=RC2PF1(NY,NX)+RC2PFS1+RFLC2P+DFVC2P
-      RM1PFS(3,NU(NY,NX),NY,NX)=RM1PF1(NY,NX)+RM1PFS1+RFLM1P+DFVM1P
-      RH0BFB(3,NU(NY,NX),NY,NX)=RH0BF2(NY,NX)+RH0BFB1+RFLH0B+DFVH0B
-      RH3BFB(3,NU(NY,NX),NY,NX)=RH3BF2(NY,NX)+RH3BFB1+RFLH3B+DFVH3B
-      RF1BFB(3,NU(NY,NX),NY,NX)=RF1BF2(NY,NX)+RF1BFB1+RFLF1B+DFVF1B
-      RF2BFB(3,NU(NY,NX),NY,NX)=RF2BF2(NY,NX)+RF2BFB1+RFLF2B+DFVF2B
-      RC0BFB(3,NU(NY,NX),NY,NX)=RC0BF2(NY,NX)+RC0BFB1+RFLC0B+DFVC0B
-      RC1BFB(3,NU(NY,NX),NY,NX)=RC1BF2(NY,NX)+RC1BFB1+RFLC1B+DFVC1B
-      RC2BFB(3,NU(NY,NX),NY,NX)=RC2BF2(NY,NX)+RC2BFB1+RFLC2B+DFVC2B
-      RM1BFB(3,NU(NY,NX),NY,NX)=RM1BF2(NY,NX)+RM1BFB1+RFLM1B+DFVM1B
-C
+      implicit none
+      integer, intent(in) :: NY,NX
+
+C     begin_execution
+
 C     ACCUMULATE HOURLY FLUXES FOR USE IN REDIST.F
 C
 C     X*FLS=hourly convective + diffusive solute flux
@@ -2907,16 +3004,21 @@ C
      2+RFLC2B+DFVC2B
       XM1BFB(3,NU(NY,NX),NY,NX)=XM1BFB(3,NU(NY,NX),NY,NX)+RM1BFB1
      2+RFLM1B+DFVM1B
+      end subroutine AccumHourlyTopsoilReisdueFlux
+
+C------------------------------------------------------------------------------------------
+
+      subroutine TopsoilResidueFluxAdvPlusDifus(NY,NX)
 C
-C     MACROPORE-MICROPORE SOLUTE EXCHANGE IN SOIL
-C     SURFACE LAYER FROM WATER EXCHANGE IN 'WATSUB' AND
-C     FROM MACROPORE OR MICROPORE SOLUTE CONCENTRATIONS
+C     Description:
 C
-C     FINHM=macro-micropore water transfer from watsub.f
-C     VOLWM,VOLWHM=micropore,macropore water volume
-C     RFL*=convective macropore-micropore solute transfer
-C     VLNH4,VLNO3,VLPO4=non-band NH4,NO3,PO4 volume fraction
-C     VLNHB,VLNOB,VLPOB=band NH4,NO3,PO4 volume fraction
+      implicit none
+      integer, intent(in) :: NY,NX
+
+C     begin_execution
+C
+C     R*FLS=convective + diffusive solute flux between litter, soil surface
+C     R*FLW,R*FLB=convective + diffusive solute flux into soil in non-band,band
 C     salt code: *HY*=H+,*OH*=OH-,*AL*=Al3+,*FE*=Fe3+,*CA*=Ca2+,*MG*=Mg2+
 C          :*NA*=Na+,*KA*=K+,*SO4*=SO42-,*CL*=Cl-,*CO3*=CO32-,*HCO3*=HCO3-
 C          :*CO2*=CO2,*ALO1*=AlOH2-,*ALOH2=AlOH2-,*ALOH3*=AlOH3
@@ -2927,11 +3029,121 @@ C          :*MHG*=MgHCO3-,*MGS*=MgSO4,*NAC*=NaCO3-,*NAS*=NaSO4-,*KAS*=KSO4-
 C     phosphorus code: *H0P*=PO43-,*H3P*=H3PO4,*F1P*=FeHPO42-,*F2P*=F1H2PO4-
 C          :*C0P*=CaPO4-,*C1P*=CaHPO4,*C2P*=CaH2PO4+,*M1P*=MgHPO4,*COO*=COOH-
 C          :*1=non-band,*B=band
-C     *H2,*2=macropore,micropore solute content
+C     R*FL0,R*FL1=convective flux into surface litter, soil surface
+C     RFL*=convective flux between surface litter and soil surface
+C     DFV*=diffusive solute flux between litter and soil surface
 C
-C     MACROPORE TO MICROPORE TRANSFER
+      RALFLS(3,0,NY,NX)=RALFL0(NY,NX)+RALFLS0-RFLAL-DFVAL
+      RFEFLS(3,0,NY,NX)=RFEFL0(NY,NX)+RFEFLS0-RFLFE-DFVFE
+      RHYFLS(3,0,NY,NX)=RHYFL0(NY,NX)+RHYFLS0-RFLHY-DFVHY
+      RCAFLS(3,0,NY,NX)=RCAFL0(NY,NX)+RCAFLS0-RFLCA-DFVCA
+      RMGFLS(3,0,NY,NX)=RMGFL0(NY,NX)+RMGFLS0-RFLMG-DFVMG
+      RNAFLS(3,0,NY,NX)=RNAFL0(NY,NX)+RNAFLS0-RFLNA-DFVNA
+      RKAFLS(3,0,NY,NX)=RKAFL0(NY,NX)+RKAFLS0-RFLKA-DFVKA
+      ROHFLS(3,0,NY,NX)=ROHFL0(NY,NX)+ROHFLS0-RFLOH-DFVOH
+      RSOFLS(3,0,NY,NX)=RSOFL0(NY,NX)+RSOFLS0-RFLSO-DFVSO
+      RCLFLS(3,0,NY,NX)=RCLFL0(NY,NX)+RCLFLS0-RFLCL-DFVCL
+      RC3FLS(3,0,NY,NX)=RC3FL0(NY,NX)+RC3FLS0-RFLC3-DFVC3
+      RHCFLS(3,0,NY,NX)=RHCFL0(NY,NX)+RHCFLS0-RFLHC-DFVHC
+      RAL1FS(3,0,NY,NX)=RAL1F0(NY,NX)+RAL1FS0-RFLAL1-DFVAL1
+      RAL2FS(3,0,NY,NX)=RAL2F0(NY,NX)+RAL2FS0-RFLAL2-DFVAL2
+      RAL3FS(3,0,NY,NX)=RAL3F0(NY,NX)+RAL3FS0-RFLAL3-DFVAL3
+      RAL4FS(3,0,NY,NX)=RAL4F0(NY,NX)+RAL4FS0-RFLAL4-DFVAL4
+      RALSFS(3,0,NY,NX)=RALSF0(NY,NX)+RALSFS0-RFLALS-DFVALS
+      RFE1FS(3,0,NY,NX)=RFE1F0(NY,NX)+RFE1FS0-RFLFE1-DFVFE1
+      RFE2FS(3,0,NY,NX)=RFE2F0(NY,NX)+RFE2FS0-RFLFE2-DFVFE2
+      RFE3FS(3,0,NY,NX)=RFE3F0(NY,NX)+RFE3FS0-RFLFE3-DFVFE3
+      RFE4FS(3,0,NY,NX)=RFE4F0(NY,NX)+RFE4FS0-RFLFE4-DFVFE4
+      RFESFS(3,0,NY,NX)=RFESF0(NY,NX)+RFESFS0-RFLFES-DFVFES
+      RCAOFS(3,0,NY,NX)=RCAOF0(NY,NX)+RCAOFS0-RFLCAO-DFVCAO
+      RCACFS(3,0,NY,NX)=RCACF0(NY,NX)+RCACFS0-RFLCAC-DFVCAC
+      RCAHFS(3,0,NY,NX)=RCAHF0(NY,NX)+RCAHFS0-RFLCAH-DFVCAH
+      RCASFS(3,0,NY,NX)=RCASF0(NY,NX)+RCASFS0-RFLCAS-DFVCAS
+      RMGOFS(3,0,NY,NX)=RMGOF0(NY,NX)+RMGOFS0-RFLMGO-DFVMGO
+      RMGCFS(3,0,NY,NX)=RMGCF0(NY,NX)+RMGCFS0-RFLMGC-DFVMGC
+      RMGHFS(3,0,NY,NX)=RMGHF0(NY,NX)+RMGHFS0-RFLMGH-DFVMGH
+      RMGSFS(3,0,NY,NX)=RMGSF0(NY,NX)+RMGSFS0-RFLMGS-DFVMGS
+      RNACFS(3,0,NY,NX)=RNACF0(NY,NX)+RNACFS0-RFLNAC-DFVNAC
+      RNASFS(3,0,NY,NX)=RNASF0(NY,NX)+RNASFS0-RFLNAS-DFVNAS
+      RKASFS(3,0,NY,NX)=RKASF0(NY,NX)+RKASFS0-RFLKAS-DFVKAS
+      RH0PFS(3,0,NY,NX)=RH0PF0(NY,NX)+RH0PFS0-RFLH0P-DFVH0P
+     2-RFLH0B-DFVH0B
+      RH3PFS(3,0,NY,NX)=RH3PF0(NY,NX)+RH3PFS0-RFLH3P-DFVH3P
+     2-RFLH3B-DFVH3B
+      RF1PFS(3,0,NY,NX)=RF1PF0(NY,NX)+RF1PFS0-RFLF1P-DFVF1P
+     2-RFLF1B-DFVF1B
+      RF2PFS(3,0,NY,NX)=RF2PF0(NY,NX)+RF2PFS0-RFLF2P-DFVF2P
+     2-RFLF2B-DFVF2B
+      RC0PFS(3,0,NY,NX)=RC0PF0(NY,NX)+RC0PFS0-RFLC0P-DFVC0P
+     2-RFLC0B-DFVC0B
+      RC1PFS(3,0,NY,NX)=RC1PF0(NY,NX)+RC1PFS0-RFLC1P-DFVC1P
+     2-RFLC1B-DFVC1B
+      RC2PFS(3,0,NY,NX)=RC2PF0(NY,NX)+RC2PFS0-RFLC2P-DFVC2P
+     2-RFLC2B-DFVC2B
+      RM1PFS(3,0,NY,NX)=RM1PF0(NY,NX)+RM1PFS0-RFLM1P-DFVM1P
+     2-RFLM1B-DFVM1B
+      RALFLS(3,NU(NY,NX),NY,NX)=RALFL1(NY,NX)+RALFLS1+RFLAL+DFVAL
+      RFEFLS(3,NU(NY,NX),NY,NX)=RFEFL1(NY,NX)+RFEFLS1+RFLFE+DFVFE
+      RHYFLS(3,NU(NY,NX),NY,NX)=RHYFL1(NY,NX)+RHYFLS1+RFLHY+DFVHY
+      RCAFLS(3,NU(NY,NX),NY,NX)=RCAFL1(NY,NX)+RCAFLS1+RFLCA+DFVCA
+      RMGFLS(3,NU(NY,NX),NY,NX)=RMGFL1(NY,NX)+RMGFLS1+RFLMG+DFVMG
+      RNAFLS(3,NU(NY,NX),NY,NX)=RNAFL1(NY,NX)+RNAFLS1+RFLNA+DFVNA
+      RKAFLS(3,NU(NY,NX),NY,NX)=RKAFL1(NY,NX)+RKAFLS1+RFLKA+DFVKA
+      ROHFLS(3,NU(NY,NX),NY,NX)=ROHFL1(NY,NX)+ROHFLS1+RFLOH+DFVOH
+      RSOFLS(3,NU(NY,NX),NY,NX)=RSOFL1(NY,NX)+RSOFLS1+RFLSO+DFVSO
+      RCLFLS(3,NU(NY,NX),NY,NX)=RCLFL1(NY,NX)+RCLFLS1+RFLCL+DFVCL
+      RC3FLS(3,NU(NY,NX),NY,NX)=RC3FL1(NY,NX)+RC3FLS1+RFLC3+DFVC3
+      RHCFLS(3,NU(NY,NX),NY,NX)=RHCFL1(NY,NX)+RHCFLS1+RFLHC+DFVHC
+      RAL1FS(3,NU(NY,NX),NY,NX)=RAL1F1(NY,NX)+RAL1FS1+RFLAL1+DFVAL1
+      RAL2FS(3,NU(NY,NX),NY,NX)=RAL2F1(NY,NX)+RAL2FS1+RFLAL2+DFVAL2
+      RAL3FS(3,NU(NY,NX),NY,NX)=RAL3F1(NY,NX)+RAL3FS1+RFLAL3+DFVAL3
+      RAL4FS(3,NU(NY,NX),NY,NX)=RAL4F1(NY,NX)+RAL4FS1+RFLAL4+DFVAL4
+      RALSFS(3,NU(NY,NX),NY,NX)=RALSF1(NY,NX)+RALSFS1+RFLALS+DFVALS
+      RFE1FS(3,NU(NY,NX),NY,NX)=RFE1F1(NY,NX)+RFE1FS1+RFLFE1+DFVFE1
+      RFE2FS(3,NU(NY,NX),NY,NX)=RFE2F1(NY,NX)+RFE2FS1+RFLFE2+DFVFE2
+      RFE3FS(3,NU(NY,NX),NY,NX)=RFE3F1(NY,NX)+RFE3FS1+RFLFE3+DFVFE3
+      RFE4FS(3,NU(NY,NX),NY,NX)=RFE4F1(NY,NX)+RFE4FS1+RFLFE4+DFVFE4
+      RFESFS(3,NU(NY,NX),NY,NX)=RFESF1(NY,NX)+RFESFS1+RFLFES+DFVFES
+      RCAOFS(3,NU(NY,NX),NY,NX)=RCAOF1(NY,NX)+RCAOFS1+RFLCAO+DFVCAO
+      RCACFS(3,NU(NY,NX),NY,NX)=RCACF1(NY,NX)+RCACFS1+RFLCAC+DFVCAC
+      RCAHFS(3,NU(NY,NX),NY,NX)=RCAHF1(NY,NX)+RCAHFS1+RFLCAH+DFVCAH
+      RCASFS(3,NU(NY,NX),NY,NX)=RCASF1(NY,NX)+RCASFS1+RFLCAS+DFVCAS
+      RMGOFS(3,NU(NY,NX),NY,NX)=RMGOF1(NY,NX)+RMGOFS1+RFLMGO+DFVMGO
+      RMGCFS(3,NU(NY,NX),NY,NX)=RMGCF1(NY,NX)+RMGCFS1+RFLMGC+DFVMGC
+      RMGHFS(3,NU(NY,NX),NY,NX)=RMGHF1(NY,NX)+RMGHFS1+RFLMGH+DFVMGH
+      RMGSFS(3,NU(NY,NX),NY,NX)=RMGSF1(NY,NX)+RMGSFS1+RFLMGS+DFVMGS
+      RNACFS(3,NU(NY,NX),NY,NX)=RNACF1(NY,NX)+RNACFS1+RFLNAC+DFVNAC
+      RNASFS(3,NU(NY,NX),NY,NX)=RNASF1(NY,NX)+RNASFS1+RFLNAS+DFVNAS
+      RKASFS(3,NU(NY,NX),NY,NX)=RKASF1(NY,NX)+RKASFS1+RFLKAS+DFVKAS
+      RH0PFS(3,NU(NY,NX),NY,NX)=RH0PF1(NY,NX)+RH0PFS1+RFLH0P+DFVH0P
+      RH3PFS(3,NU(NY,NX),NY,NX)=RH3PF1(NY,NX)+RH3PFS1+RFLH3P+DFVH3P
+      RF1PFS(3,NU(NY,NX),NY,NX)=RF1PF1(NY,NX)+RF1PFS1+RFLF1P+DFVF1P
+      RF2PFS(3,NU(NY,NX),NY,NX)=RF2PF1(NY,NX)+RF2PFS1+RFLF2P+DFVF2P
+      RC0PFS(3,NU(NY,NX),NY,NX)=RC0PF1(NY,NX)+RC0PFS1+RFLC0P+DFVC0P
+      RC1PFS(3,NU(NY,NX),NY,NX)=RC1PF1(NY,NX)+RC1PFS1+RFLC1P+DFVC1P
+      RC2PFS(3,NU(NY,NX),NY,NX)=RC2PF1(NY,NX)+RC2PFS1+RFLC2P+DFVC2P
+      RM1PFS(3,NU(NY,NX),NY,NX)=RM1PF1(NY,NX)+RM1PFS1+RFLM1P+DFVM1P
+      RH0BFB(3,NU(NY,NX),NY,NX)=RH0BF2(NY,NX)+RH0BFB1+RFLH0B+DFVH0B
+      RH3BFB(3,NU(NY,NX),NY,NX)=RH3BF2(NY,NX)+RH3BFB1+RFLH3B+DFVH3B
+      RF1BFB(3,NU(NY,NX),NY,NX)=RF1BF2(NY,NX)+RF1BFB1+RFLF1B+DFVF1B
+      RF2BFB(3,NU(NY,NX),NY,NX)=RF2BF2(NY,NX)+RF2BFB1+RFLF2B+DFVF2B
+      RC0BFB(3,NU(NY,NX),NY,NX)=RC0BF2(NY,NX)+RC0BFB1+RFLC0B+DFVC0B
+      RC1BFB(3,NU(NY,NX),NY,NX)=RC1BF2(NY,NX)+RC1BFB1+RFLC1B+DFVC1B
+      RC2BFB(3,NU(NY,NX),NY,NX)=RC2BF2(NY,NX)+RC2BFB1+RFLC2B+DFVC2B
+      RM1BFB(3,NU(NY,NX),NY,NX)=RM1BF2(NY,NX)+RM1BFB1+RFLM1B+DFVM1B
+      end subroutine TopsoilResidueFluxAdvPlusDifus
+
+C------------------------------------------------------------------------------------------
+
+      subroutine MacToMicPoreSoluteAdvExchange(M,NY,NX)
 C
-      IF(FINHM(M,NU(NY,NX),NY,NX).GT.0.0)THEN
+C     Description:
+C
+      implicit none
+      integer, intent(in) :: M,NY,NX
+
+C     begin_execution
+
       IF(VOLWHM(M,NU(NY,NX),NY,NX).GT.ZEROS2(NY,NX))THEN
       VFLW=AMAX1(0.0,AMIN1(VFLWX,FINHM(M,NU(NY,NX),NY,NX)
      2/VOLWHM(M,NU(NY,NX),NY,NX)))
@@ -3003,10 +3215,18 @@ C
      2*VLPOB(NU(NY,NX),NY,NX)
       RFLM1B=VFLW*AMAX1(0.0,ZM1BH2(NU(NY,NX),NY,NX))
      2*VLPOB(NU(NY,NX),NY,NX)
+      end subroutine MacToMicPoreSoluteAdvExchange
+
+C------------------------------------------------------------------------------------------
+
+      subroutine MicToMacPoreSoluteAdvExchange(M,NY,NX)
 C
-C     MICROPORE TO MACROPORE TRANSFER
+C     Description:
 C
-      ELSEIF(FINHM(M,NU(NY,NX),NY,NX).LT.0.0)THEN
+      implicit none
+      integer, intent(in) :: M,NY,NX
+
+C     begin_execution
       IF(VOLWM(M,NU(NY,NX),NY,NX).GT.ZEROS2(NY,NX))THEN
       VFLW=AMIN1(0.0,AMAX1(-VFLWX,FINHM(M,NU(NY,NX),NY,NX)
      2/VOLWM(M,NU(NY,NX),NY,NX)))
@@ -3078,10 +3298,16 @@ C
      2*VLPOB(NU(NY,NX),NY,NX)
       RFLM1B=VFLW*AMAX1(0.0,ZM1PB2(NU(NY,NX),NY,NX))
      2*VLPOB(NU(NY,NX),NY,NX)
+      end subroutine MicToMacPoreSoluteAdvExchange
+
+C------------------------------------------------------------------------------------------
+
+      subroutine ZeroMicMacPoreExchange
 C
-C     NO MACROPORE TO MICROPORE TRANSFER
+C     Description:
 C
-      ELSE
+      implicit none
+
       RFLAL=0.0
       RFLFE=0.0
       RFLHY=0.0
@@ -3131,10 +3357,18 @@ C
       RFLC1B=0.0
       RFLC2B=0.0
       RFLM1B=0.0
-      ENDIF
+      end subroutine ZeroMicMacPoreExchange
+
+C------------------------------------------------------------------------------------------
+
+      subroutine MacMicPoreSoluteDifusExchange(M,NY,NX)
 C
-C     DIFFUSIVE FLUXES OF SOLUTES BETWEEN MICROPORES AND
-C     MACROPORES FROM AQUEOUS DIFFUSIVITIES AND CONCENTRATION DIFFERENCES
+C     Description:
+C
+      implicit none
+      integer, intent(in) :: M,NY,NX
+
+C     begin_execution
 C
 C     VOLWM,VOLWHM=micropore,macropore water volume
 C     XFRS*VOLT=maximum macropore volume for solute transfer
@@ -3153,8 +3387,7 @@ C     VLNH4,VLNO3,VLPO4=non-band NH4,NO3,PO4 volume fraction
 C     VLNHB,VLNOB,VLPOB=band NH4,NO3,PO4 volume fraction
 C     XNPH=1/no. of cycles h-1 for water, heat and solute flux calculations
 C     *H2,*2=macropore,micropore solute content
-C
-      IF(VOLWHM(M,NU(NY,NX),NY,NX).GT.ZEROS2(NY,NX))THEN
+
       VOLWHS=AMIN1(XFRS*VOLT(NU(NY,NX),NY,NX)
      2,VOLWHM(M,NU(NY,NX),NY,NX))
       VOLWT=VOLWM(M,NU(NY,NX),NY,NX)+VOLWHS
@@ -3324,7 +3557,17 @@ C
      2*VOLWM(M,NU(NY,NX),NY,NX)
      2-AMAX1(0.0,ZM1PB2(NU(NY,NX),NY,NX))*VOLWHS)/VOLWT
      2*VLPOB(NU(NY,NX),NY,NX)
-      ELSE
+      end subroutine MacMicPoreSoluteDifusExchange
+
+C------------------------------------------------------------------------------------------
+
+      subroutine ZeroMacMicPoreSoluteDifusExch
+C
+C     Description:
+C
+      implicit none
+
+C     begin_execution
       DFVAL=0.0
       DFVFE=0.0
       DFVHY=0.0
@@ -3374,9 +3617,18 @@ C
       DFVC1B=0.0
       DFVC2B=0.0
       DFVM1B=0.0
-      ENDIF
+      end subroutine ZeroMacMicPoreSoluteDifusExch
+
+C------------------------------------------------------------------------------------------
+
+      subroutine MacMicPoreFluxAdvPlusDifus(NY,NX)
 C
-C     TOTAL CONVECTIVE +DIFFUSIVE TRANSFER BETWEEN MACROPOES AND MICROPORES
+C     Description:
+C
+      implicit none
+      integer, intent(in) :: NY,NX
+C     begin_execution
+
 C
 C     R*FXS=convective + diffusive solute flux between macropores and micropores
 C     RFL*=convective flux between macropores and micropores
@@ -3441,8 +3693,18 @@ C
       RC1BXB(NU(NY,NX),NY,NX)=RFLC1B+DFVC1B
       RC2BXB(NU(NY,NX),NY,NX)=RFLC2B+DFVC2B
       RM1BXB(NU(NY,NX),NY,NX)=RFLM1B+DFVM1B
+      end subroutine MacMicPoreFluxAdvPlusDifus
+
+C------------------------------------------------------------------------------------------
+
+      subroutine AccumHourlyMicMacPoreFlux(NY,NX)
 C
-C     ACCUMULATE HOURLY FLUXES FOR USE IN REDIST.F
+C     Description:
+C
+      implicit none
+      integer, intent(in) :: NY,NX
+C     begin_execution
+
 C
 C     X*FXS=hourly convective + diffusive solute flux between macropores and micropores
 C     R*FXS=total convective + diffusive solute flux between macropores and micropores
@@ -3555,33 +3817,19 @@ C
      2+RC2BXB(NU(NY,NX),NY,NX)
       XM1BXB(NU(NY,NX),NY,NX)=XM1BXB(NU(NY,NX),NY,NX)
      2+RM1BXB(NU(NY,NX),NY,NX)
+      end subroutine AccumHourlyMicMacPoreFlux
+
+C------------------------------------------------------------------------------------------
+
+      subroutine SoluteFluxBySurfaceOutflow(M,N1,N2)
 C
-C     SOLUTE TRANSPORT FROM WATER OVERLAND FLOW
-C     IN 'WATSUB' AND FROM SOLUTE CONCENTRATIONS
-C     IN SOIL SURFACE LAYER
+C     Description:
 C
-C     QRM=runoff from watsub.f
-C     RQR*0=solute in runoff
-C     salt code: *HY*=H+,*OH*=OH-,*AL*=Al3+,*FE*=Fe3+,*CA*=Ca2+,*MG*=Mg2+
-C          :*NA*=Na+,*KA*=K+,*SO4*=SO42-,*CL*=Cl-,*CO3*=CO32-,*HCO3*=HCO3-
-C          :*CO2*=CO2,*ALO1*=AlOH2-,*ALOH2=AlOH2-,*ALOH3*=AlOH3
-C          :*ALOH4*=AlOH4+,*ALS*=AlSO4+,*FEO1*=FeOH2-,*FEOH2=F3OH2-
-C          :*FEOH3*=FeOH3,*FEOH4*=FeOH4+,*FES*=FeSO4+,*CAO*=CaOH
-C          :*CAC*=CaCO3,*CAH*=CaHCO3-,*CAS*=CaSO4,*MGO*=MgOH,*MGC*=MgCO3
-C          :*MHG*=MgHCO3-,*MGS*=MgSO4,*NAC*=NaCO3-,*NAS*=NaSO4-,*KAS*=KSO4-
-C     phosphorus code: *H0P*=PO43-,*H3P*=H3PO4,*F1P*=FeHPO42-,*F2P*=F1H2PO4-
-C          :*C0P*=CaPO4-,*C1P*=CaHPO4,*C2P*=CaH2PO4+,*M1P*=MgHPO4,*COO*=COOH-
-C          :*1=non-band,*B=band
-C     VOLWM=litter water volume from watsub.f
-C     *S2=litter solute content
-C     N2,N1=NY,NX of source grid cell
-C     N5,N4=NY,NX of destination grid cell
-C     X*QRS=accumulated hourly solute in runoff
-C
-C
-      N1=NX
-      N2=NY
-      IF(QRM(M,N2,N1).GT.ZEROS(N2,N1))THEN
+      implicit none
+      integer, intent(in) :: M,N1,N2
+
+C     begin_execution
+
       IF(VOLWM(M,0,N2,N1).GT.ZEROS2(N2,N1))THEN
       VFLW=AMIN1(VFLWX,QRM(M,N2,N1)/VOLWM(M,0,N2,N1))
       ELSE
@@ -3628,7 +3876,19 @@ C
       RQRC1P0(N2,N1)=VFLW*AMAX1(0.0,ZCA1P2(0,N2,N1))
       RQRC2P0(N2,N1)=VFLW*AMAX1(0.0,ZCA2P2(0,N2,N1))
       RQRM1P0(N2,N1)=VFLW*AMAX1(0.0,ZMG1P2(0,N2,N1))
-      ELSE
+      end subroutine SoluteFluxBySurfaceOutflow
+
+C------------------------------------------------------------------------------------------
+
+      subroutine ZeroSoluteFluxbySurfaceflow(N1,N2)
+C
+C     Description:
+C
+      implicit none
+      integer, intent(in) :: N1,N2
+
+C     begin_execution
+
       RQRAL0(N2,N1)=0.0
       RQRFE0(N2,N1)=0.0
       RQRHY0(N2,N1)=0.0
@@ -3670,8 +3930,21 @@ C
       RQRC1P0(N2,N1)=0.0
       RQRC2P0(N2,N1)=0.0
       RQRM1P0(N2,N1)=0.0
-      ENDIF
+      end subroutine ZeroSoluteFluxbySurfaceflow
+
+C------------------------------------------------------------------------------------------
+
+      subroutine UpdateSoluteInSurfNeighbors(M,N1,N2,NY,NX,NHW
+     2,NHE,NVN,NVS)
 C
+C     Description:
+C
+      implicit none
+      integer, intent(in) :: M,N1,N2,NY,NX,NHW,NHE,NVN,NVS
+      integer :: N,NN,N4,N5,N4B,N5B
+
+C     begin_execution
+
 C     LOCATE INTERNAL BOUNDARIES BETWEEN ADJACENT GRID CELLS
 C
       DO 4310 N=1,2
@@ -4286,9 +4559,23 @@ C
       ENDIF
 4305  CONTINUE
 4310  CONTINUE
+      end subroutine UpdateSoluteInSurfNeighbors
+
+C------------------------------------------------------------------------------------------
+
+      subroutine UpdateSoluteInSubsurfNeighbors(M,NY,NX,NHW
+     2,NHE,NVN,NVS)
 C
-C     SOLUTE FLUXES BETWEEN ADJACENT GRID CELLS
+C     Description:
 C
+      implicit none
+      integer, intent(in) :: M,NY,NX,NHW,NHE,NVN,NVS
+
+      integer :: IFLGB,L,N1,N2,N3,N4,N5,N6
+      integer :: LL,N
+C     begin_execution
+
+
 C     N3,N2,N1=L,NY,NX of source grid cell
 C     N6,N5,N4=L,NY,NX of destination grid cell
 C
@@ -6382,135 +6669,85 @@ C
       ENDIF
 120   CONTINUE
 125   CONTINUE
-      ENDIF
-9890  CONTINUE
-9895  CONTINUE
+      end subroutine UpdateSoluteInSubsurfNeighbors
+
+C------------------------------------------------------------------------------------------
+
+      subroutine SaltModelSoluteHydroFlux(I,M,NHW,NHE,NVN,NVS)
 C
-C     BOUNDARY SOLUTE AND GAS FLUXES
+C     Description:
 C
-C     N3,N2,N1=L,NY,NX of source grid cell
-C     M6,M5,M4=L,NY,NX of destination grid cell
+      implicit none
+      integer, intent(in) :: I,M,NHW,NHE,NVN,NVS
+
+      integer :: NY,NX,N1,N2
+C     begin_execution
+
+      DO 9895 NX=NHW,NHE
+      DO 9890 NY=NVN,NVS
 C
-      DO 9595 NX=NHW,NHE
-      DO 9590 NY=NVN,NVS
-      IF(ISALTG.NE.0)THEN
-      DO 9585 L=NU(NY,NX),NL(NY,NX)
-      N1=NX
-      N2=NY
-      N3=L
+C     INITIALIZE SOLUTE RUNOFF NET FLUX ACCUMULATORS
+      call InitFluxAccumlatorsInRunoff(NY,NX)
 C
-C     LOCATE ALL EXTERNAL BOUNDARIES AND SET BOUNDARY CONDITIONS
-C     ENTERED IN 'READS'
+C     INITIALIZE SNOWPACK NET FLUX ACCUMULATORS
+      call InitFluxAccumulatorsInSnowpack(NY,NX)
 C
-      DO 9580 N=1,3
-      DO 9575 NN=1,2
-      IF(N.EQ.1)THEN
-      N4=NX+1
-      N5=NY
-      N4B=NX-1
-      N5B=NY
-      N6=L
-      IF(NN.EQ.1)THEN
-      IF(NX.EQ.NHE)THEN
-      M1=NX
-      M2=NY
-      M3=L
-      M4=NX+1
-      M5=NY
-      M6=L
-      XN=-1.0
-      RCHQF=RCHQE(M2,M1)
-      RCHGFU=RCHGEU(M2,M1)
-      RCHGFT=RCHGET(M2,M1)
+C     INITIALIZE SOIL SOLUTE NET FLUX ACCUMULATORS
+      call InitFluxAccumulatorsInSoil(NY,NX)
+C
+C     ADD SINKS FROM SOLUTE.F
+      call SoluteSinksInSoil(NY,NX)
+C
+C     SOLUTE FLUXES FROM MELTING SNOWPACK TO
+C     SOIL SURFACE FROM SNOWMELT IN 'WATSUB' AND
+C     CONCENTRATIONS IN SNOWPACK
+      call SoluteFluxInSnowpack(M,NY,NX)
+C
+C     CONVECTIVE SOLUTE EXCHANGE BETWEEN RESIDUE AND SOIL SURFACE
+C
+      FLWRM1=FLWRM(M,NY,NX)
+C
+C     FLWRM=litter-soil water flux from watsub.f
+
+      IF(FLWRM1.GT.0.0)THEN
+      call Residue2TopsoilSoluteAdvExch(M,NY,NX)
+C
       ELSE
-      GO TO 9575
-      ENDIF
-      ELSEIF(NN.EQ.2)THEN
-      IF(NX.EQ.NHW)THEN
-      M1=NX
-      M2=NY
-      M3=L
-      M4=NX
-      M5=NY
-      M6=L
-      XN=1.0
-      RCHQF=RCHQW(M5,M4)
-      RCHGFU=RCHGWU(M5,M4)
-      RCHGFT=RCHGWT(M5,M4)
-      ELSE
-      GO TO 9575
-      ENDIF
-      ENDIF
-      ELSEIF(N.EQ.2)THEN
-      N4=NX
-      N5=NY+1
-      N4B=NX
-      N5B=NY-1
-      N6=L
-      IF(NN.EQ.1)THEN
-      IF(NY.EQ.NVS)THEN
-      M1=NX
-      M2=NY
-      M3=L
-      M4=NX
-      M5=NY+1
-      M6=L
-      XN=-1.0
-      RCHQF=RCHQS(M2,M1)
-      RCHGFU=RCHGSU(M2,M1)
-      RCHGFT=RCHGST(M2,M1)
-      ELSE
-      GO TO 9575
-      ENDIF
-      ELSEIF(NN.EQ.2)THEN
-      IF(NY.EQ.NVN)THEN
-      M1=NX
-      M2=NY
-      M3=L
-      M4=NX
-      M5=NY
-      M6=L
-      XN=1.0
-      RCHQF=RCHQN(M5,M4)
-      RCHGFU=RCHGNU(M5,M4)
-      RCHGFT=RCHGNT(M5,M4)
-      ELSE
-      GO TO 9575
-      ENDIF
-      ENDIF
-      ELSEIF(N.EQ.3)THEN
-      N1=NX
-      N2=NY
-      N3=L
-      N4=NX
-      N5=NY
-      N6=L+1
-      IF(NN.EQ.1)THEN
-      IF(L.EQ.NL(NY,NX))THEN
-      M1=NX
-      M2=NY
-      M3=L
-      M4=NX
-      M5=NY
-      M6=L+1
-      XN=-1.0
-      ELSE
-      GO TO 9575
-      ENDIF
-      ELSEIF(NN.EQ.2)THEN
-      GO TO 9575
-      ENDIF
+      call Topsoil2ResidueSoluteAdvExch(M,NY,NX)
       ENDIF
 C
-C     SURFACE SOLUTE TRANSPORT FROM BOUNDARY SURFACE
-C     RUNOFF IN WATSUB AND CONCENTRATIONS IN THE SURFACE SOIL LAYER
+C     DIFFUSIVE FLUXES OF GASES AND SOLUTES BETWEEN RESIDUE AND
+C     SOIL SURFACE FROM AQUEOUS DIFFUSIVITIES
+C     AND CONCENTRATION DIFFERENCES
 C
+C     VOLT,DLYR,AREA=soil surface volume, thickness, area
+C     VOLWM=micropore water-filled porosity from watsub.f
 C
-C     SURFACE SOLUTE TRANSPORT FROM BOUNDARY SURFACE
-C     RUNOFF IN 'WATSUB' AND CONCENTRATIONS IN THE SURFACE SOIL LAYER
+      IF((VOLT(0,NY,NX).GT.ZEROS(NY,NX)
+     2.AND.VOLWM(M,0,NY,NX).GT.ZEROS2(NY,NX))
+     3.AND.(VOLWM(M,NU(NY,NX),NY,NX).GT.ZEROS2(NY,NX)))THEN
+
+      call TopsoilResidueSolutedifusExch(M,NY,NX)
+      ELSE
+      call ZeroDifusTopsoilResidueExch
+      ENDIF
 C
-C     QRM =runoff from watsub.f
-C     RQR*=solute in runoff
+C     TOTAL MICROPORE AND MACROPORE SOLUTE TRANSPORT FLUXES BETWEEN
+C     ADJACENT GRID CELLS = CONVECTIVE + DIFFUSIVE FLUXES
+
+      call TopsoilResidueFluxAdvPlusDifus(NY,NX)
+C
+      call AccumHourlyTopsoilReisdueFlux(NY,NX)
+C
+C     MACROPORE-MICROPORE SOLUTE EXCHANGE IN SOIL
+C     SURFACE LAYER FROM WATER EXCHANGE IN 'WATSUB' AND
+C     FROM MACROPORE OR MICROPORE SOLUTE CONCENTRATIONS
+C
+C     FINHM=macro-micropore water transfer from watsub.f
+C     VOLWM,VOLWHM=micropore,macropore water volume
+C     RFL*=convective macropore-micropore solute transfer
+C     VLNH4,VLNO3,VLPO4=non-band NH4,NO3,PO4 volume fraction
+C     VLNHB,VLNOB,VLPOB=band NH4,NO3,PO4 volume fraction
 C     salt code: *HY*=H+,*OH*=OH-,*AL*=Al3+,*FE*=Fe3+,*CA*=Ca2+,*MG*=Mg2+
 C          :*NA*=Na+,*KA*=K+,*SO4*=SO42-,*CL*=Cl-,*CO3*=CO32-,*HCO3*=HCO3-
 C          :*CO2*=CO2,*ALO1*=AlOH2-,*ALOH2=AlOH2-,*ALOH3*=AlOH3
@@ -6521,10 +6758,144 @@ C          :*MHG*=MgHCO3-,*MGS*=MgSO4,*NAC*=NaCO3-,*NAS*=NaSO4-,*KAS*=KSO4-
 C     phosphorus code: *H0P*=PO43-,*H3P*=H3PO4,*F1P*=FeHPO42-,*F2P*=F1H2PO4-
 C          :*C0P*=CaPO4-,*C1P*=CaHPO4,*C2P*=CaH2PO4+,*M1P*=MgHPO4,*COO*=COOH-
 C          :*1=non-band,*B=band
+C     *H2,*2=macropore,micropore solute content
 C
-      IF(L.EQ.NUM(M2,M1).AND.N.NE.3)THEN
-      IF(IRCHG(NN,N,N2,N1).EQ.0.OR.RCHQF.EQ.0.0
-     2.OR.QRM(M,N2,N1).LE.ZEROS(N2,N1))THEN
+C     MACROPORE TO MICROPORE TRANSFER
+C
+      IF(FINHM(M,NU(NY,NX),NY,NX).GT.0.0)THEN
+      call MacToMicPoreSoluteAdvExchange(M,NY,NX)
+C
+C     MICROPORE TO MACROPORE TRANSFER
+C
+      ELSEIF(FINHM(M,NU(NY,NX),NY,NX).LT.0.0)THEN
+      call MicToMacPoreSoluteAdvExchange(M,NY,NX)
+C
+C     NO MACROPORE TO MICROPORE TRANSFER
+C
+      ELSE
+      call ZeroMicMacPoreExchange
+      ENDIF
+C
+C     DIFFUSIVE FLUXES OF SOLUTES BETWEEN MICROPORES AND
+C     MACROPORES FROM AQUEOUS DIFFUSIVITIES AND CONCENTRATION DIFFERENCES
+
+C
+      IF(VOLWHM(M,NU(NY,NX),NY,NX).GT.ZEROS2(NY,NX))THEN
+      call MacMicPoreSoluteDifusExchange(M,NY,NX)
+      ELSE
+      call ZeroMacMicPoreSoluteDifusExch
+      ENDIF
+C
+C     TOTAL CONVECTIVE +DIFFUSIVE TRANSFER BETWEEN MACROPOES AND MICROPORES
+      call MacMicPoreFluxAdvPlusDifus(NY,NX)
+C
+C     ACCUMULATE HOURLY FLUXES FOR USE IN REDIST.F
+      call AccumHourlyMicMacPoreFlux(NY,NX)
+C
+C     SOLUTE TRANSPORT FROM WATER OVERLAND FLOW
+C     IN 'WATSUB' AND FROM SOLUTE CONCENTRATIONS
+C     IN SOIL SURFACE LAYER
+C
+C     QRM=runoff from watsub.f
+C     RQR*0=solute in runoff
+C     salt code: *HY*=H+,*OH*=OH-,*AL*=Al3+,*FE*=Fe3+,*CA*=Ca2+,*MG*=Mg2+
+C          :*NA*=Na+,*KA*=K+,*SO4*=SO42-,*CL*=Cl-,*CO3*=CO32-,*HCO3*=HCO3-
+C          :*CO2*=CO2,*ALO1*=AlOH2-,*ALOH2=AlOH2-,*ALOH3*=AlOH3
+C          :*ALOH4*=AlOH4+,*ALS*=AlSO4+,*FEO1*=FeOH2-,*FEOH2=F3OH2-
+C          :*FEOH3*=FeOH3,*FEOH4*=FeOH4+,*FES*=FeSO4+,*CAO*=CaOH
+C          :*CAC*=CaCO3,*CAH*=CaHCO3-,*CAS*=CaSO4,*MGO*=MgOH,*MGC*=MgCO3
+C          :*MHG*=MgHCO3-,*MGS*=MgSO4,*NAC*=NaCO3-,*NAS*=NaSO4-,*KAS*=KSO4-
+C     phosphorus code: *H0P*=PO43-,*H3P*=H3PO4,*F1P*=FeHPO42-,*F2P*=F1H2PO4-
+C          :*C0P*=CaPO4-,*C1P*=CaHPO4,*C2P*=CaH2PO4+,*M1P*=MgHPO4,*COO*=COOH-
+C          :*1=non-band,*B=band
+C     VOLWM=litter water volume from watsub.f
+C     *S2=litter solute content
+C     N2,N1=NY,NX of source grid cell
+C     N5,N4=NY,NX of destination grid cell
+C     X*QRS=accumulated hourly solute in runoff
+C
+C
+      N1=NX
+      N2=NY
+      IF(QRM(M,N2,N1).GT.ZEROS(N2,N1))THEN
+      call SoluteFluxBySurfaceOutflow(M,N1,N2)
+      ELSE
+      call ZeroSoluteFluxbySurfaceflow(N1,N2)
+      ENDIF
+C
+      call UpdateSoluteInSurfNeighbors(M,N1,N2,NY,NX,NHW,NHE,NVN,NVS)
+C
+C     SOLUTE FLUXES BETWEEN ADJACENT GRID CELLS
+      call UpdateSoluteInSubsurfNeighbors(M,NY,NX,NHW,NHE,NVN,NVS)
+
+9890  CONTINUE
+9895  CONTINUE
+      end subroutine SaltModelSoluteHydroFlux
+
+C------------------------------------------------------------------------------------------
+
+      subroutine BoundarySnowFlux(N,M5,M4)
+C
+C     Description:
+C
+      implicit none
+      integer, intent(in) :: N,M5,M4
+
+C     begin_execution
+      RQSAL(N,M5,M4)=0.0
+      RQSFE(N,M5,M4)=0.0
+      RQSHY(N,M5,M4)=0.0
+      RQSCA(N,M5,M4)=0.0
+      RQSMG(N,M5,M4)=0.0
+      RQSNA(N,M5,M4)=0.0
+      RQSKA(N,M5,M4)=0.0
+      RQSOH(N,M5,M4)=0.0
+      RQSSO(N,M5,M4)=0.0
+      RQSCL(N,M5,M4)=0.0
+      RQSC3(N,M5,M4)=0.0
+      RQSHC(N,M5,M4)=0.0
+      RQSAL1(N,M5,M4)=0.0
+      RQSAL2(N,M5,M4)=0.0
+      RQSAL3(N,M5,M4)=0.0
+      RQSAL4(N,M5,M4)=0.0
+      RQSALS(N,M5,M4)=0.0
+      RQSFE1(N,M5,M4)=0.0
+      RQSFE2(N,M5,M4)=0.0
+      RQSFE3(N,M5,M4)=0.0
+      RQSFE4(N,M5,M4)=0.0
+      RQSFES(N,M5,M4)=0.0
+      RQSCAO(N,M5,M4)=0.0
+      RQSCAC(N,M5,M4)=0.0
+      RQSCAH(N,M5,M4)=0.0
+      RQSCAS(N,M5,M4)=0.0
+      RQSMGO(N,M5,M4)=0.0
+      RQSMGC(N,M5,M4)=0.0
+      RQSMGH(N,M5,M4)=0.0
+      RQSMGS(N,M5,M4)=0.0
+      RQSNAC(N,M5,M4)=0.0
+      RQSNAS(N,M5,M4)=0.0
+      RQSKAS(N,M5,M4)=0.0
+      RQSH0P(N,M5,M4)=0.0
+      RQSH3P(N,M5,M4)=0.0
+      RQSF1P(N,M5,M4)=0.0
+      RQSF2P(N,M5,M4)=0.0
+      RQSC0P(N,M5,M4)=0.0
+      RQSC1P(N,M5,M4)=0.0
+      RQSC2P(N,M5,M4)=0.0
+      RQSM1P(N,M5,M4)=0.0
+      end subroutine BoundarySnowFlux
+
+C------------------------------------------------------------------------------------------
+
+      subroutine ZeroSoluteFluxFromRecharge(N,NN,M5,M4)
+C
+C     Description:
+C
+      implicit none
+      integer, intent(in) :: N,NN,M5,M4
+
+C     begin_execution
+
       RQRAL(N,NN,M5,M4)=0.0
       RQRFE(N,NN,M5,M4)=0.0
       RQRHY(N,NN,M5,M4)=0.0
@@ -6566,13 +6937,19 @@ C
       RQRC1P(N,NN,M5,M4)=0.0
       RQRC2P(N,NN,M5,M4)=0.0
       RQRM1P(N,NN,M5,M4)=0.0
-      ELSE
+      end subroutine ZeroSoluteFluxFromRecharge
+
+C------------------------------------------------------------------------------------------
+
+      subroutine SoluteExportThruBoundary(N1,N2,M,N,NN,M5,M4)
 C
-C     SOLUTE LOSS FROM RUNOFF DEPENDING ON ASPECT
-C     AND BOUNDARY CONDITIONS SET IN SITE FILE
+C     Description:
 C
-      IF((NN.EQ.1.AND.QRMN(M,N,NN,M5,M4).GT.ZEROS(N2,N1))
-     2.OR.(NN.EQ.2.AND.QRMN(M,N,NN,M5,M4).LT.ZEROS(N2,N1)))THEN
+      implicit none
+      integer, intent(in) :: N1,N2,M,N,NN,M5,M4
+
+C     begin_execution
+
       FQRM=QRMN(M,N,NN,M5,M4)/QRM(M,N2,N1)
       RQRAL(N,NN,M5,M4)=RQRAL0(N2,N1)*FQRM
       RQRFE(N,NN,M5,M4)=RQRFE0(N2,N1)*FQRM
@@ -6662,12 +7039,18 @@ C
       XQRC1P(N,NN,M5,M4)=XQRC1P(N,NN,M5,M4)+RQRC1P(N,NN,M5,M4)
       XQRC2P(N,NN,M5,M4)=XQRC2P(N,NN,M5,M4)+RQRC2P(N,NN,M5,M4)
       XQRM1P(N,NN,M5,M4)=XQRM1P(N,NN,M5,M4)+RQRM1P(N,NN,M5,M4)
+      end subroutine SoluteExportThruBoundary
+
+C------------------------------------------------------------------------------------------
+
+      subroutine ZeroSoluteInfluxThruBoundary(N,NN,M5,M4)
 C
-C     SOLUTE GAIN FROM RUNON DEPENDING ON ASPECT
-C     AND BOUNDARY CONDITIONS SET IN SITE FILE
+C     Description:
 C
-      ELSEIF((NN.EQ.2.AND.QRMN(M,N,NN,M5,M4).GT.ZEROS(N2,N1))
-     2.OR.(NN.EQ.1.AND.QRMN(M,N,NN,M5,M4).LT.ZEROS(N2,N1)))THEN
+      implicit none
+      integer, intent(in) :: N,NN,M5,M4
+C     begin_execution
+
       RQRAL(N,NN,M5,M4)=0.0
       RQRFE(N,NN,M5,M4)=0.0
       RQRHY(N,NN,M5,M4)=0.0
@@ -6709,119 +7092,95 @@ C
       RQRC1P(N,NN,M5,M4)=0.0
       RQRC2P(N,NN,M5,M4)=0.0
       RQRM1P(N,NN,M5,M4)=0.0
-      ELSE
-      RQRAL(N,NN,M5,M4)=0.0
-      RQRFE(N,NN,M5,M4)=0.0
-      RQRHY(N,NN,M5,M4)=0.0
-      RQRCA(N,NN,M5,M4)=0.0
-      RQRMG(N,NN,M5,M4)=0.0
-      RQRNA(N,NN,M5,M4)=0.0
-      RQRKA(N,NN,M5,M4)=0.0
-      RQROH(N,NN,M5,M4)=0.0
-      RQRSO(N,NN,M5,M4)=0.0
-      RQRCL(N,NN,M5,M4)=0.0
-      RQRC3(N,NN,M5,M4)=0.0
-      RQRHC(N,NN,M5,M4)=0.0
-      RQRAL1(N,NN,M5,M4)=0.0
-      RQRAL2(N,NN,M5,M4)=0.0
-      RQRAL3(N,NN,M5,M4)=0.0
-      RQRAL4(N,NN,M5,M4)=0.0
-      RQRALS(N,NN,M5,M4)=0.0
-      RQRFE1(N,NN,M5,M4)=0.0
-      RQRFE2(N,NN,M5,M4)=0.0
-      RQRFE3(N,NN,M5,M4)=0.0
-      RQRFE4(N,NN,M5,M4)=0.0
-      RQRFES(N,NN,M5,M4)=0.0
-      RQRCAO(N,NN,M5,M4)=0.0
-      RQRCAC(N,NN,M5,M4)=0.0
-      RQRCAH(N,NN,M5,M4)=0.0
-      RQRCAS(N,NN,M5,M4)=0.0
-      RQRMGO(N,NN,M5,M4)=0.0
-      RQRMGC(N,NN,M5,M4)=0.0
-      RQRMGH(N,NN,M5,M4)=0.0
-      RQRMGS(N,NN,M5,M4)=0.0
-      RQRNAC(N,NN,M5,M4)=0.0
-      RQRNAS(N,NN,M5,M4)=0.0
-      RQRKAS(N,NN,M5,M4)=0.0
-      RQRH0P(N,NN,M5,M4)=0.0
-      RQRH3P(N,NN,M5,M4)=0.0
-      RQRF1P(N,NN,M5,M4)=0.0
-      RQRF2P(N,NN,M5,M4)=0.0
-      RQRC0P(N,NN,M5,M4)=0.0
-      RQRC1P(N,NN,M5,M4)=0.0
-      RQRC2P(N,NN,M5,M4)=0.0
-      RQRM1P(N,NN,M5,M4)=0.0
-      ENDIF
-      ENDIF
+      end subroutine ZeroSoluteInfluxThruBoundary
+
+C------------------------------------------------------------------------------------------
+
+      subroutine SoluteGainSubsurfMicropore(M3,M2,M1,M,N,M6,M5,M4)
 C
-C     BOUNDARY SNOW FLUX
+C     Description:
 C
-      IF(NN.EQ.1)THEN
-      RQSAL(N,M5,M4)=0.0
-      RQSFE(N,M5,M4)=0.0
-      RQSHY(N,M5,M4)=0.0
-      RQSCA(N,M5,M4)=0.0
-      RQSMG(N,M5,M4)=0.0
-      RQSNA(N,M5,M4)=0.0
-      RQSKA(N,M5,M4)=0.0
-      RQSOH(N,M5,M4)=0.0
-      RQSSO(N,M5,M4)=0.0
-      RQSCL(N,M5,M4)=0.0
-      RQSC3(N,M5,M4)=0.0
-      RQSHC(N,M5,M4)=0.0
-      RQSAL1(N,M5,M4)=0.0
-      RQSAL2(N,M5,M4)=0.0
-      RQSAL3(N,M5,M4)=0.0
-      RQSAL4(N,M5,M4)=0.0
-      RQSALS(N,M5,M4)=0.0
-      RQSFE1(N,M5,M4)=0.0
-      RQSFE2(N,M5,M4)=0.0
-      RQSFE3(N,M5,M4)=0.0
-      RQSFE4(N,M5,M4)=0.0
-      RQSFES(N,M5,M4)=0.0
-      RQSCAO(N,M5,M4)=0.0
-      RQSCAC(N,M5,M4)=0.0
-      RQSCAH(N,M5,M4)=0.0
-      RQSCAS(N,M5,M4)=0.0
-      RQSMGO(N,M5,M4)=0.0
-      RQSMGC(N,M5,M4)=0.0
-      RQSMGH(N,M5,M4)=0.0
-      RQSMGS(N,M5,M4)=0.0
-      RQSNAC(N,M5,M4)=0.0
-      RQSNAS(N,M5,M4)=0.0
-      RQSKAS(N,M5,M4)=0.0
-      RQSH0P(N,M5,M4)=0.0
-      RQSH3P(N,M5,M4)=0.0
-      RQSF1P(N,M5,M4)=0.0
-      RQSF2P(N,M5,M4)=0.0
-      RQSC0P(N,M5,M4)=0.0
-      RQSC1P(N,M5,M4)=0.0
-      RQSC2P(N,M5,M4)=0.0
-      RQSM1P(N,M5,M4)=0.0
-      ENDIF
-      ENDIF
+      implicit none
+      integer, intent(in) :: M3,M2,M1,M,N,M6,M5,M4
+C     begin_execution
+      RALFLS(N,M6,M5,M4)=FLWM(M,N,M6,M5,M4)*CALU(M3,M2,M1)
+      RFEFLS(N,M6,M5,M4)=FLWM(M,N,M6,M5,M4)*CFEU(M3,M2,M1)
+      RHYFLS(N,M6,M5,M4)=FLWM(M,N,M6,M5,M4)*CHYU(M3,M2,M1)
+      RCAFLS(N,M6,M5,M4)=FLWM(M,N,M6,M5,M4)*CCAU(M3,M2,M1)
+      RMGFLS(N,M6,M5,M4)=FLWM(M,N,M6,M5,M4)*CMGU(M3,M2,M1)
+      RNAFLS(N,M6,M5,M4)=FLWM(M,N,M6,M5,M4)*CNAU(M3,M2,M1)
+      RKAFLS(N,M6,M5,M4)=FLWM(M,N,M6,M5,M4)*CKAU(M3,M2,M1)
+      ROHFLS(N,M6,M5,M4)=FLWM(M,N,M6,M5,M4)*COHU(M3,M2,M1)
+      RSOFLS(N,M6,M5,M4)=FLWM(M,N,M6,M5,M4)*CSOU(M3,M2,M1)
+      RCLFLS(N,M6,M5,M4)=FLWM(M,N,M6,M5,M4)*CCLU(M3,M2,M1)
+      RC3FLS(N,M6,M5,M4)=FLWM(M,N,M6,M5,M4)*CC3U(M3,M2,M1)
+      RHCFLS(N,M6,M5,M4)=FLWM(M,N,M6,M5,M4)*CHCU(M3,M2,M1)
+      RAL1FS(N,M6,M5,M4)=FLWM(M,N,M6,M5,M4)*CAL1U(M3,M2,M1)
+      RAL2FS(N,M6,M5,M4)=FLWM(M,N,M6,M5,M4)*CAL2U(M3,M2,M1)
+      RAL3FS(N,M6,M5,M4)=FLWM(M,N,M6,M5,M4)*CAL3U(M3,M2,M1)
+      RAL4FS(N,M6,M5,M4)=FLWM(M,N,M6,M5,M4)*CAL4U(M3,M2,M1)
+      RALSFS(N,M6,M5,M4)=FLWM(M,N,M6,M5,M4)*CALSU(M3,M2,M1)
+      RFE1FS(N,M6,M5,M4)=FLWM(M,N,M6,M5,M4)*CFE1U(M3,M2,M1)
+      RFE2FS(N,M6,M5,M4)=FLWM(M,N,M6,M5,M4)*CFE2U(M3,M2,M1)
+      RFE3FS(N,M6,M5,M4)=FLWM(M,N,M6,M5,M4)*CFE3U(M3,M2,M1)
+      RFE4FS(N,M6,M5,M4)=FLWM(M,N,M6,M5,M4)*CFE4U(M3,M2,M1)
+      RFESFS(N,M6,M5,M4)=FLWM(M,N,M6,M5,M4)*CFESU(M3,M2,M1)
+      RCAOFS(N,M6,M5,M4)=FLWM(M,N,M6,M5,M4)*CCAOU(M3,M2,M1)
+      RCACFS(N,M6,M5,M4)=FLWM(M,N,M6,M5,M4)*CCACU(M3,M2,M1)
+      RCAHFS(N,M6,M5,M4)=FLWM(M,N,M6,M5,M4)*CCAHU(M3,M2,M1)
+      RCASFS(N,M6,M5,M4)=FLWM(M,N,M6,M5,M4)*CCASU(M3,M2,M1)
+      RMGOFS(N,M6,M5,M4)=FLWM(M,N,M6,M5,M4)*CMGOU(M3,M2,M1)
+      RMGCFS(N,M6,M5,M4)=FLWM(M,N,M6,M5,M4)*CMGCU(M3,M2,M1)
+      RMGHFS(N,M6,M5,M4)=FLWM(M,N,M6,M5,M4)*CMGHU(M3,M2,M1)
+      RMGSFS(N,M6,M5,M4)=FLWM(M,N,M6,M5,M4)*CMGSU(M3,M2,M1)
+      RNACFS(N,M6,M5,M4)=FLWM(M,N,M6,M5,M4)*CNACU(M3,M2,M1)
+      RNASFS(N,M6,M5,M4)=FLWM(M,N,M6,M5,M4)*CNASU(M3,M2,M1)
+      RKASFS(N,M6,M5,M4)=FLWM(M,N,M6,M5,M4)*CKASU(M3,M2,M1)
+      RH0PFS(N,M6,M5,M4)=FLWM(M,N,M6,M5,M4)*CH0PU(M3,M2,M1)
+     2*VLPO4(M3,M2,M1)
+      RH3PFS(N,M6,M5,M4)=FLWM(M,N,M6,M5,M4)*CH3PU(M3,M2,M1)
+     2*VLPO4(M3,M2,M1)
+      RF1PFS(N,M6,M5,M4)=FLWM(M,N,M6,M5,M4)*CF1PU(M3,M2,M1)
+     2*VLPO4(M3,M2,M1)
+      RF2PFS(N,M6,M5,M4)=FLWM(M,N,M6,M5,M4)*CF2PU(M3,M2,M1)
+     2*VLPO4(M3,M2,M1)
+      RC0PFS(N,M6,M5,M4)=FLWM(M,N,M6,M5,M4)*CC0PU(M3,M2,M1)
+     2*VLPO4(M3,M2,M1)
+      RC1PFS(N,M6,M5,M4)=FLWM(M,N,M6,M5,M4)*CC1PU(M3,M2,M1)
+     2*VLPO4(M3,M2,M1)
+      RC2PFS(N,M6,M5,M4)=FLWM(M,N,M6,M5,M4)*CC2PU(M3,M2,M1)
+     2*VLPO4(M3,M2,M1)
+      RM1PFS(N,M6,M5,M4)=FLWM(M,N,M6,M5,M4)*CM1PU(M3,M2,M1)
+     2*VLPO4(M3,M2,M1)
+      RH0BFB(N,M6,M5,M4)=FLWM(M,N,M6,M5,M4)*CH0PU(M3,M2,M1)
+     2*VLPOB(M3,M2,M1)
+      RH3BFB(N,M6,M5,M4)=FLWM(M,N,M6,M5,M4)*CH3PU(M3,M2,M1)
+     2*VLPOB(M3,M2,M1)
+      RF1BFB(N,M6,M5,M4)=FLWM(M,N,M6,M5,M4)*CF1PU(M3,M2,M1)
+     2*VLPOB(M3,M2,M1)
+      RF2BFB(N,M6,M5,M4)=FLWM(M,N,M6,M5,M4)*CF2PU(M3,M2,M1)
+     2*VLPOB(M3,M2,M1)
+      RC0BFB(N,M6,M5,M4)=FLWM(M,N,M6,M5,M4)*CC0PU(M3,M2,M1)
+     2*VLPOB(M3,M2,M1)
+      RC1BFB(N,M6,M5,M4)=FLWM(M,N,M6,M5,M4)*CC1PU(M3,M2,M1)
+     2*VLPOB(M3,M2,M1)
+      RC2BFB(N,M6,M5,M4)=FLWM(M,N,M6,M5,M4)*CC2PU(M3,M2,M1)
+     2*VLPOB(M3,M2,M1)
+      RM1BFB(N,M6,M5,M4)=FLWM(M,N,M6,M5,M4)*CM1PU(M3,M2,M1)
+     2*VLPOB(M3,M2,M1)
+      end subroutine SoluteGainSubsurfMicropore
+
+C------------------------------------------------------------------------------------------
+
+      subroutine SoluteLossSubsurfMicropore(M,N,M1,M2,M3,M4,M5,M6)
 C
-C     SOLUTE LOSS WITH SUBSURFACE MICROPORE WATER LOSS
+C     Description:
 C
-C     FLWM=water flux through soil micropore from watsub.f
-C     VOLWM=micropore water-filled porosity from watsub.f
-C     R*FLS=convective solute flux through micropores
-C     R*FLW,R*FLB=convective solute flux through micropores in non-band,band
-C     salt code: *HY*=H+,*OH*=OH-,*AL*=Al3+,*FE*=Fe3+,*CA*=Ca2+,*MG*=Mg2+
-C          :*NA*=Na+,*KA*=K+,*SO4*=SO42-,*CL*=Cl-,*CO3*=CO32-,*HCO3*=HCO3-
-C          :*CO2*=CO2,*ALO1*=AlOH2-,*ALOH2=AlOH2-,*ALOH3*=AlOH3
-C          :*ALOH4*=AlOH4+,*ALS*=AlSO4+,*FEO1*=FeOH2-,*FEOH2=F3OH2-
-C          :*FEOH3*=FeOH3,*FEOH4*=FeOH4+,*FES*=FeSO4+,*CAO*=CaOH
-C          :*CAC*=CaCO3,*CAH*=CaHCO3-,*CAS*=CaSO4,*MGO*=MgOH,*MGC*=MgCO3
-C          :*MHG*=MgHCO3-,*MGS*=MgSO4,*NAC*=NaCO3-,*NAS*=NaSO4-,*KAS*=KSO4-
-C     phosphorus code: *H0P*=PO43-,*H3P*=H3PO4,*F1P*=FeHPO42-,*F2P*=F1H2PO4-
-C          :*C0P*=CaPO4-,*C1P*=CaHPO4,*C2P*=CaH2PO4+,*M1P*=MgHPO4,*COO*=COOH-
-C          :*1=non-band,*B=band
-C
-      IF(VOLX(N3,N2,N1).GT.ZEROS(NY,NX))THEN
-      IF(NCN(M2,M1).NE.3.OR.N.EQ.3)THEN
-      IF(NN.EQ.1.AND.FLWM(M,N,M6,M5,M4).GT.0.0
-     2.OR.NN.EQ.2.AND.FLWM(M,N,M6,M5,M4).LT.0.0)THEN
+      implicit none
+      integer, intent(in) :: M,N,M1,M2,M3,M4,M5,M6
+
+C     begin_execution
+
       IF(VOLWM(M,M3,M2,M1).GT.ZEROS2(M2,M1))THEN
       VFLW=AMAX1(-VFLWX,AMIN1(VFLWX,FLWM(M,N,M6,M5,M4)
      2/VOLWM(M,M3,M2,M1)))
@@ -6893,95 +7252,18 @@ C
      2*VLPOB(M3,M2,M1)
       RM1BFB(N,M6,M5,M4)=VFLW*AMAX1(0.0,ZM1PB2(M3,M2,M1))
      2*VLPOB(M3,M2,M1)
+      end subroutine SoluteLossSubsurfMicropore
+
+C------------------------------------------------------------------------------------------
+
+      subroutine SoluteLossSubsurfMacropore(M,N,M1,M2,M3,M4,M5,M6)
 C
-C     SOLUTE GAIN WITH SUBSURFACE MICROPORE WATER GAIN
+C     Description:
 C
-      ELSE
-      RALFLS(N,M6,M5,M4)=FLWM(M,N,M6,M5,M4)*CALU(M3,M2,M1)
-      RFEFLS(N,M6,M5,M4)=FLWM(M,N,M6,M5,M4)*CFEU(M3,M2,M1)
-      RHYFLS(N,M6,M5,M4)=FLWM(M,N,M6,M5,M4)*CHYU(M3,M2,M1)
-      RCAFLS(N,M6,M5,M4)=FLWM(M,N,M6,M5,M4)*CCAU(M3,M2,M1)
-      RMGFLS(N,M6,M5,M4)=FLWM(M,N,M6,M5,M4)*CMGU(M3,M2,M1)
-      RNAFLS(N,M6,M5,M4)=FLWM(M,N,M6,M5,M4)*CNAU(M3,M2,M1)
-      RKAFLS(N,M6,M5,M4)=FLWM(M,N,M6,M5,M4)*CKAU(M3,M2,M1)
-      ROHFLS(N,M6,M5,M4)=FLWM(M,N,M6,M5,M4)*COHU(M3,M2,M1)
-      RSOFLS(N,M6,M5,M4)=FLWM(M,N,M6,M5,M4)*CSOU(M3,M2,M1)
-      RCLFLS(N,M6,M5,M4)=FLWM(M,N,M6,M5,M4)*CCLU(M3,M2,M1)
-      RC3FLS(N,M6,M5,M4)=FLWM(M,N,M6,M5,M4)*CC3U(M3,M2,M1)
-      RHCFLS(N,M6,M5,M4)=FLWM(M,N,M6,M5,M4)*CHCU(M3,M2,M1)
-      RAL1FS(N,M6,M5,M4)=FLWM(M,N,M6,M5,M4)*CAL1U(M3,M2,M1)
-      RAL2FS(N,M6,M5,M4)=FLWM(M,N,M6,M5,M4)*CAL2U(M3,M2,M1)
-      RAL3FS(N,M6,M5,M4)=FLWM(M,N,M6,M5,M4)*CAL3U(M3,M2,M1)
-      RAL4FS(N,M6,M5,M4)=FLWM(M,N,M6,M5,M4)*CAL4U(M3,M2,M1)
-      RALSFS(N,M6,M5,M4)=FLWM(M,N,M6,M5,M4)*CALSU(M3,M2,M1)
-      RFE1FS(N,M6,M5,M4)=FLWM(M,N,M6,M5,M4)*CFE1U(M3,M2,M1)
-      RFE2FS(N,M6,M5,M4)=FLWM(M,N,M6,M5,M4)*CFE2U(M3,M2,M1)
-      RFE3FS(N,M6,M5,M4)=FLWM(M,N,M6,M5,M4)*CFE3U(M3,M2,M1)
-      RFE4FS(N,M6,M5,M4)=FLWM(M,N,M6,M5,M4)*CFE4U(M3,M2,M1)
-      RFESFS(N,M6,M5,M4)=FLWM(M,N,M6,M5,M4)*CFESU(M3,M2,M1)
-      RCAOFS(N,M6,M5,M4)=FLWM(M,N,M6,M5,M4)*CCAOU(M3,M2,M1)
-      RCACFS(N,M6,M5,M4)=FLWM(M,N,M6,M5,M4)*CCACU(M3,M2,M1)
-      RCAHFS(N,M6,M5,M4)=FLWM(M,N,M6,M5,M4)*CCAHU(M3,M2,M1)
-      RCASFS(N,M6,M5,M4)=FLWM(M,N,M6,M5,M4)*CCASU(M3,M2,M1)
-      RMGOFS(N,M6,M5,M4)=FLWM(M,N,M6,M5,M4)*CMGOU(M3,M2,M1)
-      RMGCFS(N,M6,M5,M4)=FLWM(M,N,M6,M5,M4)*CMGCU(M3,M2,M1)
-      RMGHFS(N,M6,M5,M4)=FLWM(M,N,M6,M5,M4)*CMGHU(M3,M2,M1)
-      RMGSFS(N,M6,M5,M4)=FLWM(M,N,M6,M5,M4)*CMGSU(M3,M2,M1)
-      RNACFS(N,M6,M5,M4)=FLWM(M,N,M6,M5,M4)*CNACU(M3,M2,M1)
-      RNASFS(N,M6,M5,M4)=FLWM(M,N,M6,M5,M4)*CNASU(M3,M2,M1)
-      RKASFS(N,M6,M5,M4)=FLWM(M,N,M6,M5,M4)*CKASU(M3,M2,M1)
-      RH0PFS(N,M6,M5,M4)=FLWM(M,N,M6,M5,M4)*CH0PU(M3,M2,M1)
-     2*VLPO4(M3,M2,M1)
-      RH3PFS(N,M6,M5,M4)=FLWM(M,N,M6,M5,M4)*CH3PU(M3,M2,M1)
-     2*VLPO4(M3,M2,M1)
-      RF1PFS(N,M6,M5,M4)=FLWM(M,N,M6,M5,M4)*CF1PU(M3,M2,M1)
-     2*VLPO4(M3,M2,M1)
-      RF2PFS(N,M6,M5,M4)=FLWM(M,N,M6,M5,M4)*CF2PU(M3,M2,M1)
-     2*VLPO4(M3,M2,M1)
-      RC0PFS(N,M6,M5,M4)=FLWM(M,N,M6,M5,M4)*CC0PU(M3,M2,M1)
-     2*VLPO4(M3,M2,M1)
-      RC1PFS(N,M6,M5,M4)=FLWM(M,N,M6,M5,M4)*CC1PU(M3,M2,M1)
-     2*VLPO4(M3,M2,M1)
-      RC2PFS(N,M6,M5,M4)=FLWM(M,N,M6,M5,M4)*CC2PU(M3,M2,M1)
-     2*VLPO4(M3,M2,M1)
-      RM1PFS(N,M6,M5,M4)=FLWM(M,N,M6,M5,M4)*CM1PU(M3,M2,M1)
-     2*VLPO4(M3,M2,M1)
-      RH0BFB(N,M6,M5,M4)=FLWM(M,N,M6,M5,M4)*CH0PU(M3,M2,M1)
-     2*VLPOB(M3,M2,M1)
-      RH3BFB(N,M6,M5,M4)=FLWM(M,N,M6,M5,M4)*CH3PU(M3,M2,M1)
-     2*VLPOB(M3,M2,M1)
-      RF1BFB(N,M6,M5,M4)=FLWM(M,N,M6,M5,M4)*CF1PU(M3,M2,M1)
-     2*VLPOB(M3,M2,M1)
-      RF2BFB(N,M6,M5,M4)=FLWM(M,N,M6,M5,M4)*CF2PU(M3,M2,M1)
-     2*VLPOB(M3,M2,M1)
-      RC0BFB(N,M6,M5,M4)=FLWM(M,N,M6,M5,M4)*CC0PU(M3,M2,M1)
-     2*VLPOB(M3,M2,M1)
-      RC1BFB(N,M6,M5,M4)=FLWM(M,N,M6,M5,M4)*CC1PU(M3,M2,M1)
-     2*VLPOB(M3,M2,M1)
-      RC2BFB(N,M6,M5,M4)=FLWM(M,N,M6,M5,M4)*CC2PU(M3,M2,M1)
-     2*VLPOB(M3,M2,M1)
-      RM1BFB(N,M6,M5,M4)=FLWM(M,N,M6,M5,M4)*CM1PU(M3,M2,M1)
-     2*VLPOB(M3,M2,M1)
-      ENDIF
-C
-C     SOLUTE LOSS WITH SUBSURFACE MACROPORE WATER LOSS
-C
-C     FLWHM=water flux through soil macropore from watsub.f
-C     VOLWHM=macropore water-filled porosity from watsub.f
-C     RFH*S=solute diffusive flux through macropore
-C     salt code: *HY*=H+,*OH*=OH-,*AL*=Al3+,*FE*=Fe3+,*CA*=Ca2+,*MG*=Mg2+
-C          :*NA*=Na+,*KA*=K+,*SO4*=SO42-,*CL*=Cl-,*CO3*=CO32-,*HCO3*=HCO3-
-C          :*CO2*=CO2,*ALO1*=AlOH2-,*ALOH2=AlOH2-,*ALOH3*=AlOH3
-C          :*ALOH4*=AlOH4+,*ALS*=AlSO4+,*FEO1*=FeOH2-,*FEOH2=F3OH2-
-C          :*FEOH3*=FeOH3,*FEOH4*=FeOH4+,*FES*=FeSO4+,*CAO*=CaOH
-C          :*CAC*=CaCO3,*CAH*=CaHCO3-,*CAS*=CaSO4,*MGO*=MgOH,*MGC*=MgCO3
-C          :*MHG*=MgHCO3-,*MGS*=MgSO4,*NAC*=NaCO3-,*NAS*=NaSO4-,*KAS*=KSO4-
-C     phosphorus code: *H0P*=PO43-,*H3P*=H3PO4,*F1P*=FeHPO42-,*F2P*=F1H2PO4-
-C          :*C0P*=CaPO4-,*C1P*=CaHPO4,*C2P*=CaH2PO4+,*M1P*=MgHPO4,*COO*=COOH-
-C          :*1=non-band,*B=band
-C
-      IF(NN.EQ.1.AND.FLWHM(M,N,M6,M5,M4).GT.0.0
-     2.OR.NN.EQ.2.AND.FLWHM(M,N,M6,M5,M4).LT.0.0)THEN
+      implicit none
+      integer, intent(in) :: M,N,M1,M2,M3,M4,M5,M6
+C     begin_execution
+
       IF(VOLWHM(M,M3,M2,M1).GT.ZEROS2(M2,M1))THEN
       VFLW=AMAX1(-VFLWX,AMIN1(VFLWX,FLWHM(M,N,M6,M5,M4)
      2/VOLWHM(M,M3,M2,M1)))
@@ -7053,10 +7335,18 @@ C
      2*VLPOB(M3,M2,M1)
       RM1BHB(N,M6,M5,M4)=VFLW*AMAX1(0.0,ZM1BH2(M3,M2,M1))
      2*VLPOB(M3,M2,M1)
+      end subroutine SoluteLossSubsurfMacropore
+
+C------------------------------------------------------------------------------------------
+
+      subroutine ZeroSolueGainSubsurfMacropore(N,M6,M5,M4)
 C
-C     NO SOLUTE GAIN IN SUBSURFACE MACROPORES
+C     Description:
 C
-      ELSE
+      implicit none
+      integer, intent(in) :: N,M6,M5,M4
+
+C     begin_execution
       RALFHS(N,M6,M5,M4)=0.0
       RFEFHS(N,M6,M5,M4)=0.0
       RHYFHS(N,M6,M5,M4)=0.0
@@ -7106,9 +7396,18 @@ C
       RC1BHB(N,M6,M5,M4)=0.0
       RC2BHB(N,M6,M5,M4)=0.0
       RM1BHB(N,M6,M5,M4)=0.0
-      ENDIF
+      end subroutine ZeroSolueGainSubsurfMacropore
+
+C------------------------------------------------------------------------------------------
+
+      subroutine AccumFluxMacMicPores(N,M6,M5,M4)
 C
-C     ACCUMULATE HOURLY FLUXES FOR USE IN REDIST.F
+C     Description:
+C
+      implicit none
+      integer, intent(in) :: N,M6,M5,M4
+C     begin_execution
+
 C
 C     X*FLS,X*FLW,X*FLB=hourly solute flux in non-band,band micropores
 C     X*FHS,X*FHW,X*FHB=hourly solute flux in non-band,band macropores
@@ -7213,16 +7512,17 @@ C
       XC1BHB(N,M6,M5,M4)=XC1BHB(N,M6,M5,M4)+RC1BHB(N,M6,M5,M4)
       XC2BHB(N,M6,M5,M4)=XC2BHB(N,M6,M5,M4)+RC2BHB(N,M6,M5,M4)
       XM1BHB(N,M6,M5,M4)=XM1BHB(N,M6,M5,M4)+RM1BHB(N,M6,M5,M4)
-      ENDIF
-      ENDIF
-9575  CONTINUE
+      end subroutine AccumFluxMacMicPores
+
+C------------------------------------------------------------------------------------------
+
+      subroutine NetOverloadFluxInWater(M,N,N1,N2,N4,N5,N4B,N5B)
 C
-C     TOTAL SOLUTE FLUXES IN EACH GRID CELL
+C     Description:
 C
-      IF(L.EQ.NUM(N2,N1))THEN
-      IF(N.NE.3)THEN
-C
-C     NET OVERLAND SOLUTE FLUX IN WATER
+      integer, intent(in) :: M,N,N1,N2,N4,N5,N4B,N5B
+      integer :: NN
+C     begin_execution
 C
 C     TQR*=net overland solute flux
 C     RQR*=overland solute flux
@@ -7236,7 +7536,6 @@ C          :*MHG*=MgHCO3-,*MGS*=MgSO4,*NAC*=NaCO3-,*NAS*=NaSO4-,*KAS*=KSO4-
 C     phosphorus code: *H0P*=PO43-,*H3P*=H3PO4,*F1P*=FeHPO42-,*F2P*=F1H2PO4-
 C          :*C0P*=CaPO4-,*C1P*=CaHPO4,*C2P*=CaH2PO4+,*M1P*=MgHPO4,*COO*=COOH-
 C          :*1=non-band,*B=band
-C
       DO 1202 NN=1,2
       TQRAL(N2,N1)=TQRAL(N2,N1)+RQRAL(N,NN,N2,N1)
       TQRFE(N2,N1)=TQRFE(N2,N1)+RQRFE(N,NN,N2,N1)
@@ -7366,9 +7665,19 @@ C
       TQRM1P(N2,N1)=TQRM1P(N2,N1)-RQRM1P(N,NN,N5B,N4B)
       ENDIF
 1202  CONTINUE
+      end subroutine NetOverloadFluxInWater
+
+C------------------------------------------------------------------------------------------
+
+      subroutine NetOverloadFLuxInSnow(N,N1,N2,N4,N5)
 C
-C     NET OVERLAND SOLUTE FLUX IN SNOW
+C     Description:
 C
+      implicit none
+      integer, intent(in) :: N,N1,N2,N4,N5
+
+C     begin_execution
+
 C     TQS*=net solute flux in snow transfer
 C     RQS*=solute flux in snow transfer
 C
@@ -7413,14 +7722,19 @@ C
       TQSC1P(N2,N1)=TQSC1P(N2,N1)+RQSC1P(N,N2,N1)-RQSC1P(N,N5,N4)
       TQSC2P(N2,N1)=TQSC2P(N2,N1)+RQSC2P(N,N2,N1)-RQSC2P(N,N5,N4)
       TQSM1P(N2,N1)=TQSM1P(N2,N1)+RQSM1P(N,N2,N1)-RQSM1P(N,N5,N4)
+      end subroutine NetOverloadFLuxInSnow
+
+C------------------------------------------------------------------------------------------
+
+      subroutine NetFluxInSnowpack(M,NY,NX,N1,N2)
 C
-C     NET SOLUTE FLUX IN SNOWPACK
+C     Description:
 C
-C     VHCPWM,VHCPWX=current,minimum volumetric heat capacity of snowpack
-C     T*BLS=net solute flux in snowpack
-C     R*BLS=solute flux in snowpack
-C
-      ELSEIF(N.EQ.3)THEN
+      integer, intent(in) :: M,NY,NX,N1,N2
+      integer :: LS,LS2
+C     begin_execution
+
+
       DO 1205 LS=1,JS
       IF(VHCPWM(M,LS,NY,NX).GT.VHCPWX(NY,NX))THEN
       LS2=MIN(JS,LS+1)
@@ -7648,10 +7962,20 @@ C    3-RM1PHS(3,NUM(N2,N1),N2,N1)-RM1BFB(3,NUM(N2,N1),N2,N1)
       ENDIF
       ENDIF
 1205  CONTINUE
-      ENDIF
-      ENDIF
+      end subroutine NetFluxInSnowpack
+
+C------------------------------------------------------------------------------------------
+
+      subroutine TotFluxInMacMicPores(N,N1,N2,N3,N4,N5,NY,NX,N6)
 C
-C     TOTAL SOLUTE FLUX IN MICROPORES AND MACROPORES
+C     Description:
+C
+      implicit none
+      integer, intent(in) :: N,N1,N2,N3,N4,N5,NY,NX
+      integer, intent(inout) :: N6
+      integer :: LL
+
+C     begin_execution
 C
 C     T*FLS=net convective + diffusive solute flux through micropores
 C     R*FLS=convective + diffusive solute flux through micropores
@@ -7669,7 +7993,7 @@ C          :*MHG*=MgHCO3-,*MGS*=MgSO4,*NAC*=NaCO3-,*NAS*=NaSO4-,*KAS*=KSO4-
 C     phosphorus code: *H0P*=PO43-,*H3P*=H3PO4,*F1P*=FeHPO42-,*F2P*=F1H2PO4-
 C          :*C0P*=CaPO4-,*C1P*=CaHPO4,*C2P*=CaH2PO4+,*M1P*=MgHPO4,*COO*=COOH-
 C          :*1=non-band,*B=band
-C
+
       IF(NCN(N2,N1).NE.3.OR.N.EQ.3)THEN
       DO 1200 LL=N6,NL(NY,NX)
       IF(VOLX(LL,N2,N1).GT.ZEROS2(N2,N1))THEN
@@ -7976,21 +8300,291 @@ C
       TM1BHB(N3,N2,N1)=0.0
       ENDIF
       ENDIF
+      end subroutine TotFluxInMacMicPores
+
+C------------------------------------------------------------------------------------------
+
+      subroutine SaltModelInternalFlux(M,NHW,NHE,NVN,NVS)
+C
+C     Description:
+C
+      implicit none
+      integer, intent(in) :: M,NHW,NHE,NVN,NVS
+      integer :: NY,NX,L,N1,N2,N3,N4,N5,N6,N4B,N5B,N,NN
+      integer :: M1,M2,M3,M4,M5,M6
+
+C     begin_execution
+C     N3,N2,N1=L,NY,NX of source grid cell
+C     M6,M5,M4=L,NY,NX of destination grid cell
+C
+
+      DO 9595 NX=NHW,NHE
+      DO 9590 NY=NVN,NVS
+      DO 9585 L=NU(NY,NX),NL(NY,NX)
+      N1=NX
+      N2=NY
+      N3=L
+C
+C     LOCATE ALL EXTERNAL BOUNDARIES AND SET BOUNDARY CONDITIONS
+C     ENTERED IN 'READS'
+C
+      DO 9580 N=1,3
+      DO 9575 NN=1,2
+      IF(N.EQ.1)THEN
+      N4=NX+1
+      N5=NY
+      N4B=NX-1
+      N5B=NY
+      N6=L
+      IF(NN.EQ.1)THEN
+      IF(NX.EQ.NHE)THEN
+      M1=NX
+      M2=NY
+      M3=L
+      M4=NX+1
+      M5=NY
+      M6=L
+      XN=-1.0
+      RCHQF=RCHQE(M2,M1)
+      RCHGFU=RCHGEU(M2,M1)
+      RCHGFT=RCHGET(M2,M1)
+      ELSE
+      GO TO 9575
+      ENDIF
+      ELSEIF(NN.EQ.2)THEN
+      IF(NX.EQ.NHW)THEN
+      M1=NX
+      M2=NY
+      M3=L
+      M4=NX
+      M5=NY
+      M6=L
+      XN=1.0
+      RCHQF=RCHQW(M5,M4)
+      RCHGFU=RCHGWU(M5,M4)
+      RCHGFT=RCHGWT(M5,M4)
+      ELSE
+      GO TO 9575
+      ENDIF
+      ENDIF
+      ELSEIF(N.EQ.2)THEN
+      N4=NX
+      N5=NY+1
+      N4B=NX
+      N5B=NY-1
+      N6=L
+      IF(NN.EQ.1)THEN
+      IF(NY.EQ.NVS)THEN
+      M1=NX
+      M2=NY
+      M3=L
+      M4=NX
+      M5=NY+1
+      M6=L
+      XN=-1.0
+      RCHQF=RCHQS(M2,M1)
+      RCHGFU=RCHGSU(M2,M1)
+      RCHGFT=RCHGST(M2,M1)
+      ELSE
+      GO TO 9575
+      ENDIF
+      ELSEIF(NN.EQ.2)THEN
+      IF(NY.EQ.NVN)THEN
+      M1=NX
+      M2=NY
+      M3=L
+      M4=NX
+      M5=NY
+      M6=L
+      XN=1.0
+      RCHQF=RCHQN(M5,M4)
+      RCHGFU=RCHGNU(M5,M4)
+      RCHGFT=RCHGNT(M5,M4)
+      ELSE
+      GO TO 9575
+      ENDIF
+      ENDIF
+      ELSEIF(N.EQ.3)THEN
+      N1=NX
+      N2=NY
+      N3=L
+      N4=NX
+      N5=NY
+      N6=L+1
+      IF(NN.EQ.1)THEN
+      IF(L.EQ.NL(NY,NX))THEN
+      M1=NX
+      M2=NY
+      M3=L
+      M4=NX
+      M5=NY
+      M6=L+1
+      XN=-1.0
+      ELSE
+      GO TO 9575
+      ENDIF
+      ELSEIF(NN.EQ.2)THEN
+      GO TO 9575
+      ENDIF
+      ENDIF
+C
+C     SURFACE SOLUTE TRANSPORT FROM BOUNDARY SURFACE
+C     RUNOFF IN WATSUB AND CONCENTRATIONS IN THE SURFACE SOIL LAYER
+C
+C
+C     SURFACE SOLUTE TRANSPORT FROM BOUNDARY SURFACE
+C     RUNOFF IN 'WATSUB' AND CONCENTRATIONS IN THE SURFACE SOIL LAYER
+C
+C     QRM =runoff from watsub.f
+C     RQR*=solute in runoff
+C     salt code: *HY*=H+,*OH*=OH-,*AL*=Al3+,*FE*=Fe3+,*CA*=Ca2+,*MG*=Mg2+
+C          :*NA*=Na+,*KA*=K+,*SO4*=SO42-,*CL*=Cl-,*CO3*=CO32-,*HCO3*=HCO3-
+C          :*CO2*=CO2,*ALO1*=AlOH2-,*ALOH2=AlOH2-,*ALOH3*=AlOH3
+C          :*ALOH4*=AlOH4+,*ALS*=AlSO4+,*FEO1*=FeOH2-,*FEOH2=F3OH2-
+C          :*FEOH3*=FeOH3,*FEOH4*=FeOH4+,*FES*=FeSO4+,*CAO*=CaOH
+C          :*CAC*=CaCO3,*CAH*=CaHCO3-,*CAS*=CaSO4,*MGO*=MgOH,*MGC*=MgCO3
+C          :*MHG*=MgHCO3-,*MGS*=MgSO4,*NAC*=NaCO3-,*NAS*=NaSO4-,*KAS*=KSO4-
+C     phosphorus code: *H0P*=PO43-,*H3P*=H3PO4,*F1P*=FeHPO42-,*F2P*=F1H2PO4-
+C          :*C0P*=CaPO4-,*C1P*=CaHPO4,*C2P*=CaH2PO4+,*M1P*=MgHPO4,*COO*=COOH-
+C          :*1=non-band,*B=band
+C
+      IF(L.EQ.NUM(M2,M1).AND.N.NE.3)THEN
+      IF(IRCHG(NN,N,N2,N1).EQ.0.OR.RCHQF.EQ.0.0
+     2.OR.QRM(M,N2,N1).LE.ZEROS(N2,N1))THEN
+      call ZeroSoluteFluxFromRecharge(N,NN,M5,M4)
+      ELSE
+C
+C     SOLUTE LOSS FROM RUNOFF DEPENDING ON ASPECT
+C     AND BOUNDARY CONDITIONS SET IN SITE FILE
+C
+      IF((NN.EQ.1.AND.QRMN(M,N,NN,M5,M4).GT.ZEROS(N2,N1))
+     2.OR.(NN.EQ.2.AND.QRMN(M,N,NN,M5,M4).LT.ZEROS(N2,N1)))THEN
+      call SoluteExportThruBoundary(N1,N2,M,N,NN,M5,M4)
+C
+C     SOLUTE GAIN FROM RUNON DEPENDING ON ASPECT
+C     AND BOUNDARY CONDITIONS SET IN SITE FILE
+C
+      ELSEIF((NN.EQ.2.AND.QRMN(M,N,NN,M5,M4).GT.ZEROS(N2,N1))
+     2.OR.(NN.EQ.1.AND.QRMN(M,N,NN,M5,M4).LT.ZEROS(N2,N1)))THEN
+      call ZeroSoluteInfluxThruBoundary(N,NN,M5,M4)
+      ELSE
+      call ZeroSoluteInfluxThruBoundary(N,NN,M5,M4)
+      ENDIF
+      ENDIF
+C
+C     BOUNDARY SNOW FLUX
+C
+      IF(NN.EQ.1)THEN
+      call BoundarySnowFlux(N,M5,M4)
+      ENDIF
+      ENDIF
+C
+C     SOLUTE LOSS WITH SUBSURFACE MICROPORE WATER LOSS
+C
+C     FLWM=water flux through soil micropore from watsub.f
+C     VOLWM=micropore water-filled porosity from watsub.f
+C     R*FLS=convective solute flux through micropores
+C     R*FLW,R*FLB=convective solute flux through micropores in non-band,band
+C     salt code: *HY*=H+,*OH*=OH-,*AL*=Al3+,*FE*=Fe3+,*CA*=Ca2+,*MG*=Mg2+
+C          :*NA*=Na+,*KA*=K+,*SO4*=SO42-,*CL*=Cl-,*CO3*=CO32-,*HCO3*=HCO3-
+C          :*CO2*=CO2,*ALO1*=AlOH2-,*ALOH2=AlOH2-,*ALOH3*=AlOH3
+C          :*ALOH4*=AlOH4+,*ALS*=AlSO4+,*FEO1*=FeOH2-,*FEOH2=F3OH2-
+C          :*FEOH3*=FeOH3,*FEOH4*=FeOH4+,*FES*=FeSO4+,*CAO*=CaOH
+C          :*CAC*=CaCO3,*CAH*=CaHCO3-,*CAS*=CaSO4,*MGO*=MgOH,*MGC*=MgCO3
+C          :*MHG*=MgHCO3-,*MGS*=MgSO4,*NAC*=NaCO3-,*NAS*=NaSO4-,*KAS*=KSO4-
+C     phosphorus code: *H0P*=PO43-,*H3P*=H3PO4,*F1P*=FeHPO42-,*F2P*=F1H2PO4-
+C          :*C0P*=CaPO4-,*C1P*=CaHPO4,*C2P*=CaH2PO4+,*M1P*=MgHPO4,*COO*=COOH-
+C          :*1=non-band,*B=band
+C
+      IF(VOLX(N3,N2,N1).GT.ZEROS(NY,NX))THEN
+
+      IF(NCN(M2,M1).NE.3.OR.N.EQ.3)THEN
+      IF(NN.EQ.1.AND.FLWM(M,N,M6,M5,M4).GT.0.0
+     2.OR.NN.EQ.2.AND.FLWM(M,N,M6,M5,M4).LT.0.0)THEN
+
+      call SoluteLossSubsurfMicropore(M,N,M1,M2,M3,M4,M5,M6)
+
+      ELSE
+C     SOLUTE GAIN WITH SUBSURFACE MICROPORE WATER GAIN
+C
+      call SoluteGainSubsurfMicropore(M3,M2,M1,M,N,M6,M5,M4)
+      ENDIF
+C
+C     SOLUTE LOSS WITH SUBSURFACE MACROPORE WATER LOSS
+C
+C     FLWHM=water flux through soil macropore from watsub.f
+C     VOLWHM=macropore water-filled porosity from watsub.f
+C     RFH*S=solute diffusive flux through macropore
+C     salt code: *HY*=H+,*OH*=OH-,*AL*=Al3+,*FE*=Fe3+,*CA*=Ca2+,*MG*=Mg2+
+C          :*NA*=Na+,*KA*=K+,*SO4*=SO42-,*CL*=Cl-,*CO3*=CO32-,*HCO3*=HCO3-
+C          :*CO2*=CO2,*ALO1*=AlOH2-,*ALOH2=AlOH2-,*ALOH3*=AlOH3
+C          :*ALOH4*=AlOH4+,*ALS*=AlSO4+,*FEO1*=FeOH2-,*FEOH2=F3OH2-
+C          :*FEOH3*=FeOH3,*FEOH4*=FeOH4+,*FES*=FeSO4+,*CAO*=CaOH
+C          :*CAC*=CaCO3,*CAH*=CaHCO3-,*CAS*=CaSO4,*MGO*=MgOH,*MGC*=MgCO3
+C          :*MHG*=MgHCO3-,*MGS*=MgSO4,*NAC*=NaCO3-,*NAS*=NaSO4-,*KAS*=KSO4-
+C     phosphorus code: *H0P*=PO43-,*H3P*=H3PO4,*F1P*=FeHPO42-,*F2P*=F1H2PO4-
+C          :*C0P*=CaPO4-,*C1P*=CaHPO4,*C2P*=CaH2PO4+,*M1P*=MgHPO4,*COO*=COOH-
+C          :*1=non-band,*B=band
+C
+      IF(NN.EQ.1.AND.FLWHM(M,N,M6,M5,M4).GT.0.0
+     2.OR.NN.EQ.2.AND.FLWHM(M,N,M6,M5,M4).LT.0.0)THEN
+
+      call SoluteLossSubsurfMacropore(M,N,M1,M2,M3,M4,M5,M6)
+
+      ELSE
+C
+C     NO SOLUTE GAIN IN SUBSURFACE MACROPORES
+C
+      call ZeroSolueGainSubsurfMacropore(N,M6,M5,M4)
+      ENDIF
+C
+C     ACCUMULATE HOURLY FLUXES FOR USE IN REDIST.F
+      call AccumFluxMacMicPores(N,M6,M5,M4)
+      ENDIF
+      ENDIF
+9575  CONTINUE
+C
+C     TOTAL SOLUTE FLUXES IN EACH GRID CELL
+C
+      IF(L.EQ.NUM(N2,N1))THEN
+      IF(N.NE.3)THEN
+C
+C     NET OVERLAND SOLUTE FLUX IN WATER
+C
+      call NetOverloadFluxInWater(M,N,N1,N2,N4,N5,N4B,N5B)
+C
+C     NET OVERLAND SOLUTE FLUX IN SNOW
+      call NetOverloadFLuxInSnow(N,N1,N2,N4,N5)
+C
+      ELSEIF(N.EQ.3)THEN
+C     NET SOLUTE FLUX IN SNOWPACK
+C
+C     VHCPWM,VHCPWX=current,minimum volumetric heat capacity of snowpack
+C     T*BLS=net solute flux in snowpack
+C     R*BLS=solute flux in snowpack
+      call NetFluxInSnowpack(M,NY,NX,N1,N2)
+      ENDIF
+      ENDIF
+C
+C     TOTAL SOLUTE FLUX IN MICROPORES AND MACROPORES
+C
+      call TotFluxInMacMicPores(N,N1,N2,N3,N4,N5,NY,NX,N6)
 9580  CONTINUE
 9585  CONTINUE
-      ENDIF
 9590  CONTINUE
 9595  CONTINUE
+      end subroutine SaltModelInternalFlux
+
+C------------------------------------------------------------------------------------------
+
+      subroutine UpdateSoluteInSnow(NY,NX)
 C
-C     UPDATE STATE VARIABLES FROM TOTAL FLUXES CALCULATED ABOVE
+C     Description:
 C
-      DO 9695 NX=NHW,NHE
-      DO 9690 NY=NVN,NVS
-      IF(ISALTG.NE.0)THEN
-C
-C     STATE VARIABLES FOR SOLUTES IN MICROPORES AND MACROPORES IN
-C     SOIL SURFACE LAYER FROM OVERLAND FLOW
-C
+      integer, intent(in) :: NY,NX
+      integer :: L
+C     begin_execution
+
 C     *W2=solute content of snowpack
 C     TQS*=net overland solute flux in snow
 C     T*BLS=net solute flux in snowpack
@@ -8089,9 +8683,16 @@ C
       ZCA2PW2(L,NY,NX)=ZCA2PW2(L,NY,NX)+TC2PBS(L,NY,NX)
       ZMG1PW2(L,NY,NX)=ZMG1PW2(L,NY,NX)+TM1PBS(L,NY,NX)
 9670  CONTINUE
+      end subroutine UpdateSoluteInSnow
+
+C------------------------------------------------------------------------------------------
+
+      subroutine UpdateSoluteInResidue(NY,NX)
 C
-C     STATE VARIABLES FOR SOLUTES IN SURFACE RESIDUE FROM OVERLAND
-C     FLOW AND SURFACE FLUX
+C     Description:
+C
+      integer, intent(in) :: NY,NX
+C     begin_execution
 C
 C     *S2=litter solute content
 C     R*DFR=gas exchange between atmosphere and surface litter water
@@ -8151,10 +8752,18 @@ C
       ZCA1P2(0,NY,NX)=ZCA1P2(0,NY,NX)+TQRC1P(NY,NX)+RC1PFS(3,0,NY,NX)
       ZCA2P2(0,NY,NX)=ZCA2P2(0,NY,NX)+TQRC2P(NY,NX)+RC2PFS(3,0,NY,NX)
       ZMG1P2(0,NY,NX)=ZMG1P2(0,NY,NX)+TQRM1P(NY,NX)+RM1PFS(3,0,NY,NX)
+      end subroutine UpdateSoluteInResidue
+
+C------------------------------------------------------------------------------------------
+
+      subroutine UpdateSoluteInMicMacpores(NY,NX)
 C
-C     STATE VARIABLES FOR GASES AND FOR SOLUTES IN MICROPORES AND
-C     MACROPORES IN SOIL LAYERS FROM SUBSURFACE FLOW, EQUILIBRIUM
-C     REACTIONS IN SOLUTE
+C     Description:
+C
+      implicit none
+      integer, intent(in) :: NY,NX
+      integer :: L
+C     begin_execution
 C
 C     *S2,*B2=micropore solute content in non-band,band
 C     salt code: *HY*=H+,*OH*=OH-,*AL*=Al3+,*FE*=Fe3+,*CA*=Ca2+,*MG*=Mg2+
@@ -8332,11 +8941,6 @@ C    3,RZAL2(L,NY,NX),TRAL(L,NY,NX)
 C     ENDIF
       ENDIF
 9685  CONTINUE
-      ENDIF
-9690  CONTINUE
-9695  CONTINUE
-30    CONTINUE
-      RETURN
+      end subroutine UpdateSoluteInMicMacpores
 
-      END subroutine trnsfrs
       end module TrnsfrsMod
