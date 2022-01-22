@@ -1,6 +1,9 @@
       module nitroMod
-C     DESCRIPTION
+C
+C     DESCRIPTION:
 C     codes to do soil biological transformations
+C
+C     USES:
       use data_kind_mod, only : r8 => SHR_KIND_R8
       implicit none
 
@@ -141,8 +144,8 @@ C
 
       real(r8) :: ACTV,ACTVM,AECX,B,CHY1,CHNO2,CHNOB,COMC,CH4G1
       real(r8) :: CH4S1,CCH4S1,COXYS1,C,CNH4X,CNH4Y,CNO3X,CNO3Y
-      real(r8) :: CH2PX,CH2PY,CH1PX,CH1PY,CGOMX,CGOMD,CGOXC,CCC
-      real(r8) :: CXC,C3C,CNC,CPC,CGOMZ,CNOMX,CPOMX,COQCK,COSC,CNR
+      real(r8) :: CH2PX,CH2PY,CH1PX,CH1PY,CGOXC
+      real(r8) :: C3C,CNC,CPC,CGOMZ,CNOMX,CPOMX,COQCK,COSC,CNR
       real(r8) :: CPR,CGROMC,DIFOX,DCKD,DFNS,DOSAK,DCORPC,DC,DN
       real(r8) :: DP,EO2Q,ECHZ,FNH4S,FNHBS,FNO3S,FNO3B,FNO2S,FNO2B
       real(r8) :: FH1PS,FH1PB,FH2PS,FH2PB,FOXYX,FNH4X,FNB4X,FNO3X
@@ -167,7 +170,7 @@ C
       real(r8) :: RDNO2X,RDN2X,RDN2T,RGOM2X,RGOMD2,RDN2OX,RGOM1X
       real(r8) :: RGOMD1,RINHP,RINHX,RINOP,RINOX,RIPOP,RIPOX,RIP1P
       real(r8) :: RIP1X,RINHPR,RINOPR,RIPOPR,RIP1PR,RMOMX,RMOMT
-      real(r8) :: RGOMT,RXOMT,RGN2P,RCCC,RCCN,RCCP,RCNO2,RCNOB,RCN2O
+      real(r8) :: RGOMT,RXOMT,RGN2P,RCNO2,RCNOB,RCN2O
       real(r8) :: RCN2B,RCNO3,RCN3B,RCOQN,RHOSCM,STK,SPOMX,THETR
       real(r8) :: THETZ,TKSO,TOSC,TOSA,TORC,TOHC,TSRH,TOMA,TOMN
       real(r8) :: TFOXYX,TFNH4X,TFNO3X,TFNO2X,TFN2OX,TFP14X,TFPO4X
@@ -182,8 +185,6 @@ C
       real(r8) :: VOLXW,VOLCX,VOLCW,VOLAX,VOLAW,XCO2,X,XFRK,XFRC
       real(r8) :: XFRN,XFRP,XFRA,XFMC,XFMN,XFMP,ZNFN4S,ZNFN4B,ZNO3SX
       real(r8) :: ZNO3BX,ZNO2SX,ZNO2BX,Z2OSX,ZNH4M,ZNHBM,ZNO3M,ZNOBM
-
-      integer :: IFLGJ,LN,MM,MX,NLL
 
       real(r8) :: CNOMA(7,0:5),CPOMA(7,0:5),OMA(7,0:5),FOMA(7,0:5)
      2,FOMN(7,0:5),RDOSC(4,0:4),RDOSN(4,0:4),RDOSP(4,0:4),RHOSC(4,0:4)
@@ -500,11 +501,14 @@ C
 C------------------------------------------------------------------------------------------
 
       subroutine SOMRemovalByDisturbance(I,J,NY,NX)
-
+C
+C     Description:
+C
       implicit none
       integer, intent(in) :: I,J,NY,NX
 
-      integer :: L,K,M,N
+      integer :: L,K,M,N,IFLGJ,NLL
+
 C     begin_execution
 
       IF(J.EQ.INT(ZNOON(NY,NX)).AND.(ITILL(I,NY,NX).EQ.21
@@ -801,7 +805,7 @@ C-------------------------------------------------------------------------------
       implicit none
       integer, intent(in) :: I,J,L,NY,NX
 
-      integer :: LL
+      integer :: LL,LN
 C     begin_execution
 
       IF(FOSCZ0.GT.ZERO)THEN
@@ -1273,11 +1277,14 @@ C
 C------------------------------------------------------------------------------------------
 
       subroutine MicrobialCatabolism(L,LL,NY,NX)
-
+C
+C     Description:
+C
       implicit none
       integer, intent(in) :: L,LL,NY,NX
 
       integer :: K,M,N
+
 C     begin_execution
 
       DO 760 K=0,5
@@ -2943,10 +2950,11 @@ C
 C------------------------------------------------------------------------------------------
 
       subroutine MethanotrophCatabolism(N,K,L,NY,NX)
+
       implicit none
       integer, intent(in) :: N,K,L,NY,NX
 
-      integer :: M
+      integer :: M,MM
 C     begin_execution
 C
 C     CH4 OXIDATION FROM SPECIFIC OXIDATION RATE, ENERGY YIELD,
@@ -3561,7 +3569,7 @@ C-------------------------------------------------------------------------------
       implicit none
       integer, intent(in) :: N,K,L,NY,NX
 
-      integer :: M
+      integer :: M,MX
 C     begin_execution
       IF(ROXYP(N,K).GT.ZEROS(NY,NX).AND.FOXYX.GT.ZERO)THEN
       IF(L.NE.0.OR.VOLX(L,NY,NX).GT.ZEROS(NY,NX))THEN
@@ -4137,6 +4145,10 @@ C-------------------------------------------------------------------------------
       integer, intent(in) :: N,K,L,NY,NX
 
       integer :: M
+      real(r8) :: RCCC,RCCN,RCCP
+      real(r8) :: CCC,CGOMX,CGOMD
+      real(r8) :: CXC
+
 C     begin_execution
 
 C     DOC, DON, DOP AND ACETATE UPTAKE DRIVEN BY GROWTH RESPIRATION

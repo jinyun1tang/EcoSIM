@@ -36,7 +36,7 @@
      6,OHCK(0:4),TOSCK(0:4),TOSNK(0:4),TOSPK(0:4),TORGL(JZ)
 C
 C     DCKR,DCKM=parameters to initialize microbial biomass from SOC
-C     OMCI,ORCI=allocation of biomass,residue to kinetic components
+C     OMCI(3,0:4),ORCI(2,0:4)=allocation of biomass,residue to kinetic components
 C     OMCK,ORCK,OQCK,OHCK=fractions of SOC in biomass,litter,DOC,adsorbed C
 C     OMCF,OMCA=hetero,autotrophic microbial biomass composition in SOC
 C     CNRH,CPRH=default N:C,P:C ratios in SOC complexes

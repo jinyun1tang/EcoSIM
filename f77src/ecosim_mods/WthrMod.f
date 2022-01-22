@@ -46,8 +46,6 @@ C
 
       real(r8) :: AMP,CLD,DTA,DHR,DTS,EMM,RADX,RADZ,VPX,XJ
 
-
-
       real(r8) :: PRECRI(JY,JX),PRECWI(JY,JX),PRECII(JY,JX)
      2,PRECUI(JY,JX),RADN(JY,JX),VPS(JY,JX)
 C
