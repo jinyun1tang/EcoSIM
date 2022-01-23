@@ -24,7 +24,8 @@ C
       use VisualMod    , only : visual
       use WatsubMod    , only : watsub
       use WthrMod      , only : wthr
-          
+      use :: timings
+      
       implicit none
 
       integer, intent(in) :: NA(1:NEX),ND(1:NEX)
@@ -39,12 +40,16 @@ C
       integer :: I,J
       integer, SAVE :: NF,NX,NTZ,NTZX, NFX
       DATA NF,NX,NTZ,NTZX/0,0,0,0/
+      real*8 :: t1, t2
+      
 C     execution begins here
-
+     
 C
 C     READ INPUT DATA FOR SITE, SOILS AND MANAGEMENT IN 'READS'
 C     AND SET UP OUTPUT AND CHECKPOINT FILES IN 'FOUTS'
 C
+      call init_timer(outdir)
+      
       IF(IGO.EQ.0)THEN
 C     WRITE(*,333)'READI'
       CALL READI(NA,ND,NT,NE,NAX,NDX,NTX,NEX,NF,NFX,NTZ
@@ -133,68 +138,94 @@ C
 C     UPDATE HOURLY VARIABLES IN 'HOUR1'
 C
 C     WRITE(*,333)'WTHR'
+      call start_timer(t1)
       CALL WTHR(I,J,NHW,NHE,NVN,NVS)
+      call end_timer('WTHR',t1)
 C     WRITE(*,333)'HOUR1'
 333   FORMAT(A8)
+      call start_timer(t1)
       CALL HOUR1(I,J,NHW,NHE,NVN,NVS)
+      call end_timer('HOUR1',t1)
 C
 C     CALCULATE SOIL ENERGY BALANCE, WATER AND HEAT FLUXES IN 'WATSUB'
 C
 C     WRITE(*,333)'WAT'
+      call start_timer(t1)
       CALL WATSUB(I,J,NHW,NHE,NVN,NVS)
+      call end_timer('WAT',t1)
 C
 C     CALCULATE SOIL BIOLOGICAL TRANSFORMATIONS IN 'NITRO'
 C
 C     WRITE(*,333)'NIT'
+      call start_timer(t1)
       CALL NITRO(I,J,NHW,NHE,NVN,NVS)
+      call end_timer('NIT',t1)
 C
 C     UPDATE PLANT PHENOLOGY IN 'HFUNC'
 C
 C     WRITE(*,333)'HFUNC'
+      call start_timer(t1)
       CALL HFUNC(I,J,NHW,NHE,NVN,NVS)
+      call end_timer('HFUNC',t1)
 C
 C     CALCULATE CANOPY CO2 UPTAKE AT FULL TURGOR, CANOPY WATER POTENTIAL,
 C     HYDRAULIC AND STOMATAL RESISTANCES,AND CANOPY ENERGY BALANCE IN 'UPTAKE'
 C     CALCULATE ROOT UPTAKE OF WATER, OXYGEN, NH4, NO3 AND PO4 IN 'UPTAKE'
 C
 C     WRITE(*,333)'UPTK'
+      call start_timer(t1)
       CALL UPTAKE(I,J,NHW,NHE,NVN,NVS)
+      call end_timer('UPTK',t1)
 C
 C     CALCULATE CANOPY CO2 UPTAKE AT AMBIENT TURGOR, AUTOTROPHIC AND GROWTH
 C     RESPIRATION, PLANT C ALLOCATION, CANOPY AND ROOT GROWTH IN 'GROSUB'
 C
 C     WRITE(*,333)'GRO'
+      call start_timer(t1)
       CALL GROSUB(I,J,NHW,NHE,NVN,NVS)
+      call end_timer('GRO',t1)
 C
 C     CALCULATE ROOT-SOIL C AND NUTRIENT EXCHANGE FOR ALL PLANT SPECIES
 C     IN 'EXTRACT'
 C
 C     WRITE(*,333)'EXTR'
+      call start_timer(t1)
       CALL EXTRACT(I,J,NHW,NHE,NVN,NVS)
+      call end_timer('EXTR',t1)
 C
 C     CALCULATE SOLUTE EQUILIBRIA IN 'SOLUTE'
 C
 C     WRITE(*,333)'SOL'
+      call start_timer(t1)
       CALL SOLUTE(I,J,NHW,NHE,NVN,NVS)
+      call end_timer('SOL',t1)
 C
 C     CALCULATE GAS AND SOLUTE FLUXES IN 'TRNSFR'
 C
 C     WRITE(*,333)'TRN'
+      call start_timer(t1)
       CALL TRNSFR(I,J,NHW,NHE,NVN,NVS)
+      call end_timer('TRN',t1)
 C
 C     CALCULATE ADDITIONAL SOLUTE FLUXES IN 'TRNSFRS' IF SALT OPTION SELECTED
 C
+      call start_timer(t1)
       CALL TRNSFRS(I,J,NHW,NHE,NVN,NVS)
+      call end_timer('TRNSFRS',t1)
 C
 C     CALCULATE SOIL SEDIMENT TRANSPORT IN 'EROSION'
 C
+      call start_timer(t1)
       CALL EROSION(I,J,NHW,NHE,NVN,NVS)
+      call end_timer('EROSION',t1)
 C
 C     UPDATE ALL SOIL STATE VARIABLES FOR WATER, HEAT, GAS, SOLUTE
 C     AND SEDIMENT FLUXES IN 'REDIST'
 C
 C     WRITE(*,333)'RED'
+      call start_timer(t1)
       CALL REDIST(I,J,NHW,NHE,NVN,NVS)
+      call end_timer('RED',t1)
 C     WRITE(*,333)'END'
 C
 C     WRITE HOURLY SOIL AND PLANT OUTPUT IN 'OUTSH' AND 'OUTPH'
@@ -213,6 +244,8 @@ C     WRITE(*,333)'VIS'
       CALL VISUAL(I,J,NHW,NHE,NVN,NVS)
       ENDIF
       ENDIF
+      call end_timer_loop()
+      
 9995  CONTINUE
       IF(DATA(19).EQ.'YES'.AND.KOUT.GT.0)THEN
 C
