@@ -118,6 +118,8 @@ C
       RETURN
       END subroutine startq
 
+C------------------------------------------------------------------------------------------       
+      
       subroutine InitShootGrowth(NZ,NY,NX)
 
       implicit none
@@ -150,6 +152,8 @@ C     IF(DATAP(NZ,NY,NX).NE.'NO')THEN
       O2I(NZ,NY,NX)=3.96E+05
       ENDIF
       end subroutine InitShootGrowth
+
+C------------------------------------------------------------------------------------------       
 
       subroutine PlantLitterFractions(NZ,NY,NX)
 
@@ -347,6 +351,8 @@ C
       ENDIF
       end subroutine PlantLitterFractions
 
+C------------------------------------------------------------------------------------------       
+      
       subroutine PFTThermalAcclimation(NZ,NY,NX)
 
       implicit none
@@ -381,6 +387,8 @@ C
       ENDIF
       end subroutine PFTThermalAcclimation
 
+C------------------------------------------------------------------------------------------ 
+      
       subroutine InitDimensionsandUptake(NZ,NY,NX)
 
       implicit none
@@ -457,6 +465,8 @@ C    2*SQRT(0.25*(1.0-PORT(N,NZ,NY,NX)))
       RTAR2X(N,NZ,NY,NX)=3.142*RRAD2X(N,NZ,NY,NX)**2
 500   CONTINUE
       end subroutine InitDimensionsandUptake
+
+C------------------------------------------------------------------------------------------       
 
       subroutine InitPlantPhenoMorphoBio(NZ,NY,NX)
 
@@ -660,6 +670,8 @@ C
       ARSTP(NZ,NY,NX)=0.0
       end subroutine InitPlantPhenoMorphoBio
 
+C------------------------------------------------------------------------------------------       
+      
       subroutine InitMassBalance(NZ,NY,NX)
 
       implicit none
@@ -717,6 +729,8 @@ C
       ENDIF
       end subroutine InitMassBalance
 
+C------------------------------------------------------------------------------------------ 
+      
       subroutine InitPlantHeatandWater(NZ,NY,NX)
 
       implicit none
@@ -744,6 +758,8 @@ C
       EP(NZ,NY,NX)=0.0
       FRADP(NZ,NY,NX)=0.0
       end subroutine InitPlantHeatandWater
+
+C------------------------------------------------------------------------------------------       
 
       subroutine InitRootMychorMorphoBio(NZ,NY,NX)
       implicit none
@@ -859,6 +875,8 @@ C
 20    CONTINUE
 40    CONTINUE
       end subroutine InitRootMychorMorphoBio
+
+C------------------------------------------------------------------------------------------       
 
       subroutine InitSeedMorphoBio(NZ,NY,NX)
       

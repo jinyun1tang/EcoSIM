@@ -1037,7 +1037,11 @@ C     ENDIF
 
 C------------------------------------------------------------------------------------------
 
-      subroutine SurfaceSinksandSources()
+      subroutine SurfaceSinksandSources(NY, NX)
+      implicit none
+
+      integer, intent(in) :: NY, NX
+      
       RCOSK2(0,NY,NX)=RCO2O(0,NY,NX)*XNPG
       RCHSK2(0,NY,NX)=RCH4O(0,NY,NX)*XNPG
       RNGSK2(0,NY,NX)=(RN2G(0,NY,NX)+XN2GS(0,NY,NX))*XNPG
