@@ -140,8 +140,8 @@ C
       DO 1200 I=1,366
       DO 1200 L=NU(NY,NX),NL(NY,NX)
       DO 2000 K=1,3
-            
-C     
+
+C
 C     INITIALIZE RAINFALL
 C
       IF(K.EQ.1.AND.I.EQ.1.AND.L.EQ.1)THEN
@@ -225,16 +225,16 @@ C
       ENDIF
 
       call InitEquilibria(K,L,NY,NX)
-      
+
 C
 C     CONVERGE TOWARDS ALL SOLUBILITY EQUILIBRIA
 C     IF SALT OPTION IS SELECTED
 C
       IF(ISALTG.NE.0)THEN
       DO 1000 M=1,MRXN
-         
-      call SolubilityEquilibiriaSalt(K, L, M)         
-         
+
+      call SolubilityEquilibiriaSalt(K,L,M,NY,NX)         
+
 1000  CONTINUE
 C
 C     CONVERGE TOWARDS ALL SOLUBILITY EQUILIBRIA
@@ -242,9 +242,9 @@ C     IF SALT OPTION IS NOT SELECTED
 C
       ELSE
       DO 1100 M=1,MRXN
-         
+
       call SolubilityEquilibriaNoSalt(K, L, M, NY, NX)
-         
+
  1100 CONTINUE
       ENDIF
 
@@ -254,21 +254,21 @@ C
  1200 CONTINUE
 
       call InitialState(NY,NX)
-      
+
  9990 CONTINUE
  9995 CONTINUE
       RETURN
 
       END subroutine starte
 
-C------------------------------------------------------------------------------------------       
-      
+C------------------------------------------------------------------------------------------
+
       subroutine InitEquilibria(K,L,NY,NX)
 
       implicit none
       integer, intent(in) :: K, L, NY, NX
-      
-C     
+
+C
 C     INITIALIZE SOLUTE EQUILIBRIA
 C
       CC3=AMAX1(0.0,CALZ)+AMAX1(0.0,CFEZ)
@@ -506,13 +506,13 @@ C    3,FXP2,FXP1,PALPO1,PFEPO1,PCAPD1,PCAPH1
       ENDIF
       end subroutine InitEquilibria
 
-C------------------------------------------------------------------------------------------       
-      
+C------------------------------------------------------------------------------------------
+
       subroutine SolubilityEquilibiriaSalt(K,L,M,NY,NX)
 
       implicit none
       integer, intent(in) :: K, L, M, NY, NX
-      
+
       CCO21=AMAX1(ZERO,CCO21)
       CCO31=CCO21*DPCO3*A0/(CHY1**2*A2)
       CHCO31=CCO21*DPCO2*A0/(CHY1*A1)
@@ -1507,8 +1507,8 @@ C    4,RXH2P,RYH2P,RH2P,RH3P,RF2P,RC2P,RH3P
       ENDIF
       end subroutine SolubilityEquilibiriaSalt
 
-C------------------------------------------------------------------------------------------ 
-      
+C------------------------------------------------------------------------------------------
+
       subroutine SolubilityEquilibriaNoSalt(K,L,M,NY,NX)
 
       implicit none
@@ -1644,13 +1644,13 @@ C    3,XOH21,XOH11
       ENDIF
       end subroutine SolubilityEquilibriaNoSalt
 
-C------------------------------------------------------------------------------------------       
-      
+C------------------------------------------------------------------------------------------
+
       subroutine SoluteConcentrations(K,I,L,NY,NX)
 
       implicit none
       integer, intent(in) :: K, I, L, NY, NX
-      
+
 C
 C     SOLUTE CONCENTRATIONS IN PRECIPITATION
 C
@@ -2043,14 +2043,14 @@ C     ENDIF
 
       end subroutine SoluteConcentrations
 
-C------------------------------------------------------------------------------------------ 
-      
+C------------------------------------------------------------------------------------------
+
       subroutine InitialState(NY,NX)
 
       implicit none
       integer, intent(in) :: NY, NX
 
-C     
+C
 C     INITIAL STATE VARIABLES FOR MINERALS IN SURFACE RESIDUE
 C
       IF(DATA(20).EQ.'NO'.AND.IGO.EQ.0)THEN
@@ -2090,8 +2090,8 @@ C
       PCPHB(0,NY,NX)=0.0
       PCPMB(0,NY,NX)=0.0
 
-      
-C      
+
+C
 C     INITIAL STATE VARIABLES FOR MINERAL N AND P IN SNOWPACK
 C
       DO 9985 L=1,JS
@@ -2214,5 +2214,5 @@ C
 9985  CONTINUE
       ENDIF
       end subroutine InitialState
-      
+
       end module StarteMod
