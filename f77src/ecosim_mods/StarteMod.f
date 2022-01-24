@@ -224,7 +224,7 @@ C
       GO TO 2000
       ENDIF
 
-      call InitEquilibria(L,NY,NX)
+      call InitEquilibria(K,L,NY,NX)
       
 C
 C     CONVERGE TOWARDS ALL SOLUBILITY EQUILIBRIA
@@ -233,7 +233,7 @@ C
       IF(ISALTG.NE.0)THEN
       DO 1000 M=1,MRXN
          
-      call SolubilityEquilibiriaSalt(M)         
+      call SolubilityEquilibiriaSalt(K, L, M)         
          
 1000  CONTINUE
 C
@@ -243,7 +243,7 @@ C
       ELSE
       DO 1100 M=1,MRXN
          
-      call SolubilityEquilibriaNoSalt(M)
+      call SolubilityEquilibriaNoSalt(K, L, M, NY, NX)
          
  1100 CONTINUE
       ENDIF
@@ -261,10 +261,12 @@ C
 
       END subroutine starte
 
-      subroutine InitEquilibria(L,NY,NX)
+C------------------------------------------------------------------------------------------       
+      
+      subroutine InitEquilibria(K,L,NY,NX)
 
       implicit none
-      integer, intent(in) :: L, NY, NX
+      integer, intent(in) :: K, L, NY, NX
       
 C     
 C     INITIALIZE SOLUTE EQUILIBRIA
@@ -504,10 +506,12 @@ C    3,FXP2,FXP1,PALPO1,PFEPO1,PCAPD1,PCAPH1
       ENDIF
       end subroutine InitEquilibria
 
-      subroutine SolubilityEquilibiriaSalt(M)
+C------------------------------------------------------------------------------------------       
+      
+      subroutine SolubilityEquilibiriaSalt(K,L,M,NY,NX)
 
       implicit none
-      integer, intent(in) :: M
+      integer, intent(in) :: K, L, M, NY, NX
       
       CCO21=AMAX1(ZERO,CCO21)
       CCO31=CCO21*DPCO3*A0/(CHY1**2*A2)
@@ -1503,10 +1507,12 @@ C    4,RXH2P,RYH2P,RH2P,RH3P,RF2P,RC2P,RH3P
       ENDIF
       end subroutine SolubilityEquilibiriaSalt
 
-      subroutine SolubilityEquilibriaNoSalt(M)
+C------------------------------------------------------------------------------------------ 
+      
+      subroutine SolubilityEquilibriaNoSalt(K,L,M,NY,NX)
 
       implicit none
-      integer, intent(in) :: M
+      integer, intent(in) :: K, L, M, NY, NX
 
       CCO21=AMAX1(ZERO,CCO21)
       CCO31=CCO21*DPCO3*A0/(CHY1**2*A2)
@@ -1638,6 +1644,8 @@ C    3,XOH21,XOH11
       ENDIF
       end subroutine SolubilityEquilibriaNoSalt
 
+C------------------------------------------------------------------------------------------       
+      
       subroutine SoluteConcentrations(K,I,L,NY,NX)
 
       implicit none
@@ -2035,6 +2043,8 @@ C     ENDIF
 
       end subroutine SoluteConcentrations
 
+C------------------------------------------------------------------------------------------ 
+      
       subroutine InitialState(NY,NX)
 
       implicit none
@@ -2203,7 +2213,6 @@ C
       ENDIF
 9985  CONTINUE
       ENDIF
-
       end subroutine InitialState
       
       end module StarteMod
