@@ -3,6 +3,7 @@
       implicit none
 
       private
+C     include_section
       include "parameters.h"
       include "filec.h"
       include "files.h"
@@ -28,7 +29,7 @@
       include "blk19b.h"
       include "blk19c.h"
       include "blk19d.h"
-
+C     end_include_section
       CHARACTER(len=3) :: CHARN1,CHARN2
       CHARACTER(len=4) :: CHARN3
       real(r8), PARAMETER :: TWILGT=0.06976
@@ -51,6 +52,7 @@ C
       integer, intent(in) :: I
       integer, intent(in) :: NHW,NHE,NVN,NVS
 C     execution begins here
+C     begin_execution
 C
 C     WRITE DATE
 C
@@ -83,8 +85,8 @@ C     501
 
       END subroutine day
 
-C-----------------------------------------------------------------------------------------
-
+C------------------------------------------------------------------------------------------ 
+      
       subroutine WriteDailyAccumulators(I, NHW, NHE, NVN, NVS)
 C     WRITE DAILY MAX MIN ACCUMULATORS FOR WEATHER VARIABLES
       

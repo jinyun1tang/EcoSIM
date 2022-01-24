@@ -73,6 +73,8 @@ C     ENDIF
       RETURN
       END subroutine extract
 
+C------------------------------------------------------------------------------------------       
+      
       subroutine TotalLitterfall(NY,NX)
 
       implicit none
@@ -111,6 +113,8 @@ C
 915   CONTINUE
       end subroutine TotalLitterfall
 
+C------------------------------------------------------------------------------------------       
+
       subroutine TotalLeafArea(NZ,NY,NX)
 C
 C     TOTAL LEAF AREA OF ALL PLANT SPECIES
@@ -129,6 +133,8 @@ C
       ARSTT(L,NY,NX)=ARSTT(L,NY,NX)+ARSTV(L,NZ,NY,NX)
 910   CONTINUE
       end subroutine TotalLeafArea
+
+C------------------------------------------------------------------------------------------       
 
       subroutine TotalGasandSoluteUptake(NZ,NY,NX)
 C
@@ -314,6 +320,8 @@ C
       RP1BX(L,NY,NX)=RP1BX(L,NY,NX)+RUPP1B(N,L,NZ,NY,NX)
 100   CONTINUE
       end subroutine TotalGasandSoluteUptake
+
+C------------------------------------------------------------------------------------------       
 
       subroutine CanopyFluxesandFixation(NZ,NY,NX)
 C
