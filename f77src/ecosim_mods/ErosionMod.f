@@ -53,7 +53,8 @@ C
 C     INTERNAL SEDIMENT FLUXES
 C
       call InternalSedimentFluxes(NHW, NHE,NVN,NVS)
-C
+
+C     
 C     EXTERNAL BOUNDARY SEDIMENT FLUXES
 C
       call ExternalSedimentFluxes(NHW,NHE,NVN,NVS)
@@ -62,6 +63,7 @@ C
       END subroutine erosion
 
 C---------------------------------------------------------------------------------------------------
+
       subroutine SedimentDetachment(NHW,NHE,NVN,NVS)
 C     INTERNAL TIME STEP AT WHICH SEDIMENT DETACHMENT AND TRANSPORT
 C     IS CALCULATED. DETACHMENT IS THE SUM OF THAT BY RAINFALL AND
@@ -70,6 +72,7 @@ C
       implicit none
 
       integer, intent(in) :: NHW,NHE,NVN,NVS
+
       DO 9895 NX=NHW,NHE
       DO 9890 NY=NVN,NVS
       IF(IERSNG.EQ.1.OR.IERSNG.EQ.3)THEN
@@ -398,6 +401,7 @@ C    2,TERSED(NY,NX),RDTSED(NY,NX)
 9690  CONTINUE
 9695  CONTINUE
       end subroutine SedimentTransport
+
 
       subroutine InternalSedimentFluxes(NHW, NHE,NVN,NVS)
       implicit none

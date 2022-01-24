@@ -1096,7 +1096,6 @@ C-------------------------------------------------------------------------------
       implicit none
       
       integer, intent(in) :: NY, NX
-
       DO 8855 K=0,4
       IF(K.LE.2)THEN
       XOCFLS(K,3,0,NY,NX)=0.0
@@ -1122,7 +1121,7 @@ C-------------------------------------------------------------------------------
 
       integer, intent(in) :: I
       integer, intent(in) :: NY,NX
-
+      
       IF(PRECW(NY,NX).GT.0.0.OR.(PRECR(NY,NX).GT.0.0
      2.AND.VHCPWM(1,1,NY,NX).GT.VHCPWX(NY,NX)))THEN
       XCOBLS(1,NY,NX)=FLQGQ(NY,NX)*CCOR(NY,NX)
@@ -1855,6 +1854,7 @@ C     ENDIF
 C------------------------------------------------------------------------------------------
       
       subroutine SoluteFluxSnowpack(M,NY,NX)
+
       implicit none
 
       integer, intent(in) :: M, NY, NX      
