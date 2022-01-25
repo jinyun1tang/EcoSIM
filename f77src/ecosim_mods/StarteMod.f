@@ -140,6 +140,7 @@ C
       DO 1200 I=1,366
       DO 1200 L=NU(NY,NX),NL(NY,NX)
       DO 2000 K=1,3
+
 C
 C     INITIALIZE RAINFALL
 C
@@ -222,6 +223,51 @@ C
       ELSE
       GO TO 2000
       ENDIF
+
+      call InitEquilibria(K,L,NY,NX)
+
+C
+C     CONVERGE TOWARDS ALL SOLUBILITY EQUILIBRIA
+C     IF SALT OPTION IS SELECTED
+C
+      IF(ISALTG.NE.0)THEN
+      DO 1000 M=1,MRXN
+
+      call SolubilityEquilibiriaSalt(K,L,M,NY,NX)         
+
+1000  CONTINUE
+C
+C     CONVERGE TOWARDS ALL SOLUBILITY EQUILIBRIA
+C     IF SALT OPTION IS NOT SELECTED
+C
+      ELSE
+      DO 1100 M=1,MRXN
+
+      call SolubilityEquilibriaNoSalt(K, L, M, NY, NX)
+
+ 1100 CONTINUE
+      ENDIF
+
+      call SoluteConcentrations(K,I,L,NY,NX)
+
+ 2000 CONTINUE
+ 1200 CONTINUE
+
+      call InitialState(NY,NX)
+
+ 9990 CONTINUE
+ 9995 CONTINUE
+      RETURN
+
+      END subroutine starte
+
+C------------------------------------------------------------------------------------------
+
+      subroutine InitEquilibria(K,L,NY,NX)
+
+      implicit none
+      integer, intent(in) :: K, L, NY, NX
+
 C
 C     INITIALIZE SOLUTE EQUILIBRIA
 C
@@ -458,12 +504,15 @@ C    2,CH3P1,CH2P1,CH1P1,CH0P1,CHY1,XHP,FHP3,FHP2,FHP1,FHP0
 C    3,FXP2,FXP1,PALPO1,PFEPO1,PCAPD1,PCAPH1
 2222  FORMAT(A8,2I4,40E12.4)
       ENDIF
-C
-C     CONVERGE TOWARDS ALL SOLUBILITY EQUILIBRIA
-C     IF SALT OPTION IS SELECTED
-C
-      IF(ISALTG.NE.0)THEN
-      DO 1000 M=1,MRXN
+      end subroutine InitEquilibria
+
+C------------------------------------------------------------------------------------------
+
+      subroutine SolubilityEquilibiriaSalt(K,L,M,NY,NX)
+
+      implicit none
+      integer, intent(in) :: K, L, M, NY, NX
+
       CCO21=AMAX1(ZERO,CCO21)
       CCO31=CCO21*DPCO3*A0/(CHY1**2*A2)
       CHCO31=CCO21*DPCO2*A0/(CHY1*A1)
@@ -1456,13 +1505,15 @@ C    2,RHA4P2,RHF0P2,RHF1P2,RHF2P2
 C    3,RHF3P2,RHF4P2,RHCAD2,3.0*RHCAH2
 C    4,RXH2P,RYH2P,RH2P,RH3P,RF2P,RC2P,RH3P
       ENDIF
-1000  CONTINUE
-C
-C     CONVERGE TOWARDS ALL SOLUBILITY EQUILIBRIA
-C     IF SALT OPTION IS NOT SELECTED
-C
-      ELSE
-      DO 1100 M=1,MRXN
+      end subroutine SolubilityEquilibiriaSalt
+
+C------------------------------------------------------------------------------------------
+
+      subroutine SolubilityEquilibriaNoSalt(K,L,M,NY,NX)
+
+      implicit none
+      integer, intent(in) :: K, L, M, NY, NX
+
       CCO21=AMAX1(ZERO,CCO21)
       CCO31=CCO21*DPCO3*A0/(CHY1**2*A2)
       CHCO31=CCO21*DPCO2*A0/(CHY1*A1)
@@ -1591,8 +1642,15 @@ C     WRITE(*,2222)'RHP1E',K,L,CH2P1,CH1P1,RHP2,RHP1
 C    2,XH2P1,XH1P1,RXH1P,RXH2P,RYH2P,RH2P,CHY1,COH1
 C    3,XOH21,XOH11
       ENDIF
-1100  CONTINUE
-      ENDIF
+      end subroutine SolubilityEquilibriaNoSalt
+
+C------------------------------------------------------------------------------------------
+
+      subroutine SoluteConcentrations(K,I,L,NY,NX)
+
+      implicit none
+      integer, intent(in) :: K, I, L, NY, NX
+
 C
 C     SOLUTE CONCENTRATIONS IN PRECIPITATION
 C
@@ -1982,8 +2040,16 @@ C    2,CH3P1,CH2P1,CH1P1,CH0P1,AHY1,XHP,FHP3,FHP2,FHP1,FHP0
 C    3,FXP2,FXP1,PALPO1,PFEPO1,PCAPD1,PCAPH1
 C     ENDIF
       ENDIF
-2000  CONTINUE
-1200  CONTINUE
+
+      end subroutine SoluteConcentrations
+
+C------------------------------------------------------------------------------------------
+
+      subroutine InitialState(NY,NX)
+
+      implicit none
+      integer, intent(in) :: NY, NX
+
 C
 C     INITIAL STATE VARIABLES FOR MINERALS IN SURFACE RESIDUE
 C
@@ -2023,6 +2089,8 @@ C
       PCPDB(0,NY,NX)=0.0
       PCPHB(0,NY,NX)=0.0
       PCPMB(0,NY,NX)=0.0
+
+
 C
 C     INITIAL STATE VARIABLES FOR MINERAL N AND P IN SNOWPACK
 C
@@ -2145,9 +2213,6 @@ C
       ENDIF
 9985  CONTINUE
       ENDIF
-9990  CONTINUE
-9995  CONTINUE
-      RETURN
+      end subroutine InitialState
 
-      END subroutine starte
       end module StarteMod

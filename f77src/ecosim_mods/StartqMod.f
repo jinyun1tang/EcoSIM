@@ -67,6 +67,65 @@ C
       NZ2X=MIN(NZ2Q,NP(NY,NX))
       DO 9985 NZ=NZ1Q,NZ2X
       IF(IFLGC(NZ,NY,NX).EQ.0)THEN
+
+      call InitShootGrowth(NZ,NY,NX)
+
+      call PlantLitterFractions(NZ,NY,NX)      
+      
+      call PFTThermalAcclimation(NZ,NY,NX)
+
+      call InitDimensionsandUptake(NZ,NY,NX)
+
+      call InitPlantPhenoMorphoBio(NZ,NY,NX)
+
+      call InitMassBalance(NZ,NY,NX)
+
+      call InitPlantHeatandWater(NZ,NY,NX)
+
+      call InitRootMychorMorphoBio(NZ,NY,NX)
+
+      call InitSeedMorphoBio(NZ,NY,NX)
+
+C     ENDIF
+      ENDIF
+      ZEROP(NZ,NY,NX)=ZERO*PP(NZ,NY,NX)
+      ZEROQ(NZ,NY,NX)=ZERO*PP(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+      ZEROL(NZ,NY,NX)=ZERO*PP(NZ,NY,NX)*1.0E+06
+9985  CONTINUE
+
+C     
+C     FILL OUT UNUSED ARRAYS
+C
+      DO 9986 NZ=NP(NY,NX)+1,5
+      TCSN0(NZ,NY,NX)=0.0
+      TZSN0(NZ,NY,NX)=0.0
+      TPSN0(NZ,NY,NX)=0.0
+      TCSNC(NZ,NY,NX)=0.0
+      TZSNC(NZ,NY,NX)=0.0
+      TPSNC(NZ,NY,NX)=0.0
+      WTSTG(NZ,NY,NX)=0.0
+      WTSTGN(NZ,NY,NX)=0.0
+      WTSTGP(NZ,NY,NX)=0.0
+      DO 6401 L=1,NL(NY,NX)
+      DO 6401 K=0,1
+      DO 6401 M=1,4
+      CSNC(M,K,L,NZ,NY,NX)=0.0
+      ZSNC(M,K,L,NZ,NY,NX)=0.0
+      PSNC(M,K,L,NZ,NY,NX)=0.0
+6401  CONTINUE
+9986  CONTINUE
+9990  CONTINUE
+9995  CONTINUE
+      RETURN
+      END subroutine startq
+
+C------------------------------------------------------------------------------------------       
+      
+      subroutine InitShootGrowth(NZ,NY,NX)
+
+      implicit none
+      integer, intent(in) :: NZ, NY, NX
+      
       IYR0(NZ,NY,NX)=IYRX(NZ,NY,NX)
       IDAY0(NZ,NY,NX)=IDAYX(NZ,NY,NX)
       IYRH(NZ,NY,NX)=IYRY(NZ,NY,NX)
@@ -93,7 +152,15 @@ C     IF(DATAP(NZ,NY,NX).NE.'NO')THEN
       ELSE
       O2I(NZ,NY,NX)=3.96E+05
       ENDIF
-C
+      end subroutine InitShootGrowth
+
+C------------------------------------------------------------------------------------------       
+
+      subroutine PlantLitterFractions(NZ,NY,NX)
+
+      implicit none
+      integer, intent(in) :: NZ,NY,NX
+C     
 C     FRACTIONS OF PLANT LITTER ALLOCATED TO KINETIC COMPONENTS
 C     PROTEIN(*,1),CH2O(*,2),CELLULOSE(*,3),LIGNIN(*,4) IN SOIL LITTER
 C
@@ -283,7 +350,16 @@ C
       FNOD(NZ,NY,NX)=AMAX1(1.0,0.04/XRLA(NZ,NY,NX))
       NNOD(NZ,NY,NX)=24
       ENDIF
-C
+      end subroutine PlantLitterFractions
+
+C------------------------------------------------------------------------------------------       
+      
+      subroutine PFTThermalAcclimation(NZ,NY,NX)
+
+      implicit none
+      integer, intent(in) :: NZ, NY, NX
+
+C     
 C     PFT THERMAL ACCLIMATION
 C
 C     ZTYP,ZTYPI=dynamic,initial thermal adaptation zone from PFT file
@@ -310,7 +386,16 @@ C
       HTC(NZ,NY,NX)=27.0+3.0*ZTYP(NZ,NY,NX)
       SSTX(NZ,NY,NX)=0.005
       ENDIF
-C
+      end subroutine PFTThermalAcclimation
+
+C------------------------------------------------------------------------------------------ 
+      
+      subroutine InitDimensionsandUptake(NZ,NY,NX)
+
+      implicit none
+      integer, intent(in) :: NZ, NY, NX
+      
+C     
 C     SEED CHARACTERISTICS
 C
 C     SDVL,SDLG,SDAR=seed volume(m3),length(m),area(m2)
@@ -380,7 +465,16 @@ C    2*SQRT(0.25*(1.0-PORT(N,NZ,NY,NX)))
       RTAR1X(N,NZ,NY,NX)=3.142*RRAD1X(N,NZ,NY,NX)**2
       RTAR2X(N,NZ,NY,NX)=3.142*RRAD2X(N,NZ,NY,NX)**2
 500   CONTINUE
-C
+      end subroutine InitDimensionsandUptake
+
+C------------------------------------------------------------------------------------------       
+
+      subroutine InitPlantPhenoMorphoBio(NZ,NY,NX)
+
+      implicit none
+      integer, intent(in) :: NZ, NY, NX
+
+C     
 C     INITIALIZE PLANT PHENOLOGY
 C
 C     PP=population (grid cell-1)
@@ -575,7 +669,16 @@ C
       ARLFP(NZ,NY,NX)=0.0
       WTRTA(NZ,NY,NX)=0.0
       ARSTP(NZ,NY,NX)=0.0
-C
+      end subroutine InitPlantPhenoMorphoBio
+
+C------------------------------------------------------------------------------------------       
+      
+      subroutine InitMassBalance(NZ,NY,NX)
+
+      implicit none
+      integer, intent(in) :: NZ, NY, NX
+      
+C     
 C     INITIALIZE MASS BALANCE CHECKS
 C
       IF(DATA(20).EQ.'NO'.AND.IGO.EQ.0)THEN
@@ -625,7 +728,16 @@ C
       WTSTGP(NZ,NY,NX)=WTSTGP(NZ,NY,NX)+WTSTDP(M,NZ,NY,NX)
 155   CONTINUE
       ENDIF
-C
+      end subroutine InitMassBalance
+
+C------------------------------------------------------------------------------------------ 
+      
+      subroutine InitPlantHeatandWater(NZ,NY,NX)
+
+      implicit none
+      integer, intent(in) :: NZ, NY, NX
+      
+C     
 C     INITIALIZE PLANT HEAT AND WATER STATUS
 C
 C     VHCPC=canopy heat capacity (MJ m-3 K-1)
@@ -646,7 +758,14 @@ C
       PSILG(NZ,NY,NX)=AMAX1(0.0,PSILT(NZ,NY,NX)-PSILO(NZ,NY,NX))
       EP(NZ,NY,NX)=0.0
       FRADP(NZ,NY,NX)=0.0
-C
+      end subroutine InitPlantHeatandWater
+
+C------------------------------------------------------------------------------------------       
+
+      subroutine InitRootMychorMorphoBio(NZ,NY,NX)
+      implicit none
+      integer, intent(in) :: NZ, NY, NX
+C     
 C     INITIALIZE ROOT(N=1),MYCORRHIZAL(N=2) MORPHOLOGY AND BIOMASS
 C
 C     PSIRT,PSIRO,PSIRG=root,myco total,osmotic,turgor water potl(MPa)
@@ -756,7 +875,16 @@ C
       ENDIF
 20    CONTINUE
 40    CONTINUE
-C
+      end subroutine InitRootMychorMorphoBio
+
+C------------------------------------------------------------------------------------------       
+
+      subroutine InitSeedMorphoBio(NZ,NY,NX)
+      
+      implicit none
+      integer, intent(in) :: NZ, NY, NX
+      
+C     
 C     INITIALIZE SEED MORPHOLOGY AND BIOMASS
 C
 C     WTRVC,WTRVN,WTRVP=C,N,P in storage reserves (g)
@@ -798,35 +926,6 @@ C
      2*CPOOLR(1,NG(NZ,NY,NX),NZ,NY,NX)
       PPOOLR(1,NG(NZ,NY,NX),NZ,NY,NX)=CPGR(NZ,NY,NX)
      2*CPOOLR(1,NG(NZ,NY,NX),NZ,NY,NX)
-C     ENDIF
-      ENDIF
-      ZEROP(NZ,NY,NX)=ZERO*PP(NZ,NY,NX)
-      ZEROQ(NZ,NY,NX)=ZERO*PP(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-      ZEROL(NZ,NY,NX)=ZERO*PP(NZ,NY,NX)*1.0E+06
-9985  CONTINUE
-C
-C     FILL OUT UNUSED ARRAYS
-C
-      DO 9986 NZ=NP(NY,NX)+1,5
-      TCSN0(NZ,NY,NX)=0.0
-      TZSN0(NZ,NY,NX)=0.0
-      TPSN0(NZ,NY,NX)=0.0
-      TCSNC(NZ,NY,NX)=0.0
-      TZSNC(NZ,NY,NX)=0.0
-      TPSNC(NZ,NY,NX)=0.0
-      WTSTG(NZ,NY,NX)=0.0
-      WTSTGN(NZ,NY,NX)=0.0
-      WTSTGP(NZ,NY,NX)=0.0
-      DO 6401 L=1,NL(NY,NX)
-      DO 6401 K=0,1
-      DO 6401 M=1,4
-      CSNC(M,K,L,NZ,NY,NX)=0.0
-      ZSNC(M,K,L,NZ,NY,NX)=0.0
-      PSNC(M,K,L,NZ,NY,NX)=0.0
-6401  CONTINUE
-9986  CONTINUE
-9990  CONTINUE
-9995  CONTINUE
-      RETURN
-      END subroutine startq
+      end subroutine InitSeedMorphoBio
+      
       end module StartqMod

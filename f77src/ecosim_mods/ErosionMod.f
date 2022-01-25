@@ -42,11 +42,37 @@ C     FROM RUNOFF IN 'WATSUB'
       integer, intent(in) :: NHW,NHE,NVN,NVS
 C     execution begins here
 C
+      DO 30 M=1,NPH
+
+      call SedimentDetachment(NHW,NHE,NVN,NVS)
+      call SedimentTransport(NHW,NHE,NVN,NVS)   
+
+ 30   CONTINUE
+      
+C
+C     INTERNAL SEDIMENT FLUXES
+C
+      call InternalSedimentFluxes(NHW, NHE,NVN,NVS)
+
+C     
+C     EXTERNAL BOUNDARY SEDIMENT FLUXES
+C
+      call ExternalSedimentFluxes(NHW,NHE,NVN,NVS)
+      RETURN
+
+      END subroutine erosion
+
+C---------------------------------------------------------------------------------------------------
+
+      subroutine SedimentDetachment(NHW,NHE,NVN,NVS)
 C     INTERNAL TIME STEP AT WHICH SEDIMENT DETACHMENT AND TRANSPORT
 C     IS CALCULATED. DETACHMENT IS THE SUM OF THAT BY RAINFALL AND
 C     OVERLAND FLOW
 C
-      DO 30 M=1,NPH
+      implicit none
+
+      integer, intent(in) :: NHW,NHE,NVN,NVS
+
       DO 9895 NX=NHW,NHE
       DO 9890 NY=NVN,NVS
       IF(IERSNG.EQ.1.OR.IERSNG.EQ.3)THEN
@@ -222,6 +248,17 @@ C     ENDIF
       ENDIF
 9890  CONTINUE
 9895  CONTINUE
+      end subroutine SedimentDetachment
+      
+      subroutine SedimentTransport(NHW,NHE,NVN,NVS)
+C     INTERNAL TIME STEP AT WHICH SEDIMENT DETACHMENT AND TRANSPORT
+C     IS CALCULATED. DETACHMENT IS THE SUM OF THAT BY RAINFALL AND
+C     OVERLAND FLOW
+C
+      implicit none
+
+      integer, intent(in) :: NHW,NHE,NVN,NVS
+
 C
 C     BOUNDARY SEDIMENT FLUXES
 C
@@ -363,10 +400,13 @@ C    2,TERSED(NY,NX),RDTSED(NY,NX)
       ENDIF
 9690  CONTINUE
 9695  CONTINUE
-30    CONTINUE
-C
-C     INTERNAL SEDIMENT FLUXES
-C
+      end subroutine SedimentTransport
+
+
+      subroutine InternalSedimentFluxes(NHW, NHE,NVN,NVS)
+      implicit none
+      integer, intent(in) :: NHW,NHE,NVN,NVS
+
       DO 9495 NX=NHW,NHE
       DO 9490 NY=NVN,NVS
       IF(IERSNG.EQ.1.OR.IERSNG.EQ.3)THEN
@@ -803,9 +843,15 @@ C
       ENDIF
 9490  CONTINUE
 9495  CONTINUE
-C
-C     EXTERNAL BOUNDARY SEDIMENT FLUXES
-C
+      end subroutine InternalSedimentFluxes
+
+C----------------------------------------------------------------------------------------------
+      
+      subroutine ExternalSedimentFluxes(NHW,NHE,NVN,NVS)
+      implicit none
+
+      integer, intent(in) :: NHW,NHE,NVN,NVS
+     
       DO 8995 NX=NHW,NHE
       DO 8990 NY=NVN,NVS
       IF((IERSNG.EQ.1.OR.IERSNG.EQ.3)
@@ -1061,7 +1107,6 @@ C     ENDIF
       ENDIF
 8990  CONTINUE
 8995  CONTINUE
-      RETURN
 
-      END subroutine erosion
+      end subroutine ExternalSedimentFluxes      
       end module ErosionMod

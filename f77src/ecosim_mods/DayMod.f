@@ -3,6 +3,7 @@
       implicit none
 
       private
+C     include_section
       include "parameters.h"
       include "filec.h"
       include "files.h"
@@ -28,7 +29,7 @@
       include "blk19b.h"
       include "blk19c.h"
       include "blk19d.h"
-
+C     end_include_section
       CHARACTER(len=3) :: CHARN1,CHARN2
       CHARACTER(len=4) :: CHARN3
       real(r8), PARAMETER :: TWILGT=0.06976
@@ -51,6 +52,7 @@ C
       integer, intent(in) :: I
       integer, intent(in) :: NHW,NHE,NVN,NVS
 C     execution begins here
+C     begin_execution
 C
 C     WRITE DATE
 C
@@ -70,14 +72,28 @@ C
       WRITE(CHARN2,'(I3)')N2+100
       WRITE(CHARN3,'(I4)')N3
       WRITE(CDATE,'(2A2,A4)')CHARN1(2:3),CHARN2(2:3),CHARN3(1:4)
-      GO TO 501
+C     GO TO 501
+      call WriteDailyAccumulators(I, NHW, NHE, NVN, NVS)
+
       ENDIF
       NN=N
 500   CONTINUE
-C
+C     501
+
+      call TillageandIrrigationEvents(I, NHW, NHE, NVN, NVS)
+      RETURN
+
+      END subroutine day
+
+C------------------------------------------------------------------------------------------ 
+      
+      subroutine WriteDailyAccumulators(I, NHW, NHE, NVN, NVS)
 C     WRITE DAILY MAX MIN ACCUMULATORS FOR WEATHER VARIABLES
-C
-501   DO 955 NX=NHW,NHE
+      
+      implicit none
+      integer, intent(in) :: I, NHW, NHE, NVN, NVS
+      
+      DO 955 NX=NHW,NHE
       DO 950 NY=NVN,NVS
       TRAD(NY,NX)=0.0
       TAMX(NY,NX)=-100.0
@@ -298,6 +314,16 @@ C
 600   CONTINUE
 950   CONTINUE
 955   CONTINUE
+
+      END subroutine WriteDailyAccumulators
+
+C-----------------------------------------------------------------------------------------
+      
+      subroutine TillageandIrrigationEvents(I, NHW, NHE, NVN, NVS)
+      implicit none
+
+      integer, intent(in) :: I, NHW, NHE, NVN, NVS
+      
       DO 9995 NX=NHW,NHE
       DO 9990 NY=NVN,NVS
 C
@@ -370,7 +396,6 @@ C    3,(RRIG(J,I,NY,NX),J=1,24)
       ENDIF
 9990  CONTINUE
 9995  CONTINUE
-      RETURN
-
-      END subroutine day
+      end subroutine TillageandIrrigationEvents
+      
       END module DayMod
