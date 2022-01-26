@@ -1,7 +1,15 @@
 # FIXME(bja, 201604) need to stop using a hard coded path. Maybe
 # switch to some sort of cmake-ified out of source tests.
+F90        = not-set
+ifeq ($(F90), not-set)
 ECOSYS = ../local/bin/ecosim.x
-
+else
+ifeq ($(F90), 1)
+	ECOSYS = ../local/bin/ecosim.f90.x
+else
+	ECOSYS = ../local/bin/ecosim.x
+endif
+endif
 RTEST = ./rtest_ecosim.py
 RTEST_ARGS = --backtrace
 RTEST_ARGS += --executable $(ECOSYS)

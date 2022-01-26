@@ -200,7 +200,11 @@ enable_testing()
 
 # Source code itself.
 include_directories("${PROJECT_SOURCE_DIR}")
+if (F90)
+add_subdirectory(f90src)
+else()
 add_subdirectory(f77src)
+endif()
 
 # Drivers for benchmarks.
 #X#add_subdirectory(drivers)

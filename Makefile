@@ -12,6 +12,7 @@ CC         = not-set
 CXX        = not-set
 FC         = not-set
 travis     = not-set
+F90        = not-set
 # This proxies everything to the builddir cmake.
 netcdfsys = not-set
 
@@ -22,6 +23,11 @@ BUILDDIR := build/$(systype)-$(cputype)
 CONFIG_FLAGS = -DUNIX=1 -Wno-dev
 
 # Process configuration options.
+ifeq ($(F90), not-set)
+	CONFIG_FLAGS += -DF90=0
+else
+	CONFIG_FLAGS += -DF90=${F90}
+endif
 
 # Travis-CI build
 ifeq ($(travis), not-set)
@@ -150,7 +156,7 @@ test: install
 	@if [ ! -f $(BUILDDIR)/Makefile ]; then \
 		more INSTALL; \
 	else \
-		$(MAKE) -C $(BUILDDIR) $@ --no-print-directory $(MAKEFLAGS); \
+		$(MAKE) -C $(BUILDDIR) $@ --no-print-directory $(MAKEFLAGS) F90=$(F90); \
 		$(MAKE) -C regression-tests $@ --no-print-directory $(MAKEFLAGS); \
 	fi
 
@@ -163,7 +169,7 @@ clean:
 
 config: distclean
 	$(run-config)
-	@export ENVCC=$(CC); export ENVCXX=$(CXX); export ENVFC=$(FC)
+#	@export ENVCC=$(CC); export ENVCXX=$(CXX); export ENVFC=$(FC)
 
 distclean:
 	@rm -rf $(BUILDDIR)

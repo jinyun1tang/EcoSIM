@@ -285,7 +285,7 @@ C      READ(3,*)Z0G,IFLGW,ZNOONG
 	  read(3,*)(datav(kk),kk=1,3)
  	  Z0G=datav(1)
  	  IFLGW=int(datav(2))
- 	  ZNOONG=datav(3)	  
+ 	  ZNOONG=datav(3)
       READ(3,*)PHRG,CN4RIG,CNORIG,CPORG,CALRG,CFERG,CCARG,CMGRG,CNARG
      2,CKARG,CSORG,CCLRG
       if(lverb)then
@@ -322,8 +322,8 @@ C      READ(3,*)Z0G,IFLGW,ZNOONG
 C 60    READ(3,*,END=110)(IDAT(K),K=1,NI),(DAT(K),K=1,NN)
 60    read(3,*,END=110)(datav(k),k=1,NI),(DAT(K),K=1,NN)
       do k = 1, ni
- 		  idat(k)=int(datav(k))
- 	  enddo 
+ 	idat(k)=int(datav(k))
+ 	enddo
 C     WRITE(*,61)(IDAT(K),K=1,NI),(DAT(K),K=1,NN)
 61    FORMAT(3I6,50E12.4)
 C
@@ -1018,6 +1018,7 @@ C
       ISTART=MAX(ISTART,IBEGIN)
       IFLG3=1
       ENDIF
+
       IF(L.NE.1)THEN
       IF(I.LE.ILAST)then
       GO60=.true.
