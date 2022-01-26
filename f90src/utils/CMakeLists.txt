@@ -1,0 +1,20 @@
+set(ECOSIM_UTIL_SOURCES
+	data_kind_mod.F90
+  abortutils.F90
+	TestMod.F90
+	clock.c
+	timings.F90
+)
+
+
+include(add_ecosim_library)
+add_ecosim_library(ecosim_util ${ECOSIM_UTIL_SOURCES})
+
+
+set(ECOSIM_LIBRARIES ecosim_util;${ECOSIM_LIBRARIES} PARENT_SCOPE)
+
+if (NOT CMAKE_INSTALL_PREFIX STREQUAL "INSTALL_DISABLED")
+  install(TARGETS ecosim_util DESTINATION lib)
+  file(GLOB HEADERS *.h)
+  install(FILES ${HEADERS} DESTINATION include/ecosim/util)
+endif()

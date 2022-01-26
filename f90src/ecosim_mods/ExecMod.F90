@@ -1,0 +1,128 @@
+
+      module ExecMod
+      use data_kind_mod, only : r8 => SHR_KIND_R8
+      use abortutils, only : endrun, padr, print_info
+      implicit none
+
+      private
+      include "parameters.h"
+      include "blkc.h"
+      include "blk2a.h"
+      include "blk2b.h"
+      include "blk2c.h"
+      include "blk16.h"
+
+      character(len=*), parameter :: subname='ExecMod'
+      real(r8), SAVE :: TLW,TLH,TLO,TLC,TLN,TLP,TLI
+      real(r8) :: DIFFQ,DIFFH,DIFFO,DIFFC,DIFFN,DIFFP,DIFFI
+
+      public :: exec
+      contains
+
+      SUBROUTINE exec(I)
+!
+!     THIS SUBROUTINE TAKES MASS BALANCE VARIABLES CALCULATED
+!     IN 'REDIST' AND PERFORMS MASS BALANCE CHECKS AT THE END
+!     OF EACH DAY OF THE MODEL RUN, AND ERRORS OF > 1UG ARE FLAGGED.
+!
+      implicit none
+
+      integer, intent(in) :: I
+!     execution begins here
+!
+!     CALCULATE MASS BALANCES FOR WATER, HEAT, O2, C, N, P AND SOLUTES
+!
+      IF(I.EQ.IBEGIN.OR.I.EQ.ISTART.OR.I.EQ.ILAST+1)THEN
+      TLW=VOLWSO-CRAIN+CRUN+CEVAP+VOLWOU
+      if(tlw/=tlw)then
+      call print_info('tlw/=tlw',(/padr('VOLWSO',10),padr('CRAIN',10), &
+      padr('CRUN',10),padr('CEVAP',10),padr('VOLWOU',10)/), &
+      (/VOLWSO,CRAIN,CRUN,CEVAP,VOLWOU/))
+      endif
+      TLH=HEATSO-HEATIN+HEATOU
+      TLO=OXYGSO-OXYGIN+OXYGOU
+      TLC=TLRSDC+TLORGC+TLCO2G-CO2GIN+TCOU-TORGF-XCSN
+      TLN=TLRSDN+TLORGN+TLN2G+TLNH4+TLNO3-ZN2GIN-TZIN+TZOU-TORGN-XZSN
+      TLP=TLRSDP+TLORGP+TLPO4-TPIN+TPOU-TORGP-XPSN
+      TLI=TION-TIONIN+TIONOU
+      ENDIF
+!
+!     CALCULATE DEVIATION SINCE MASS BALANCE WAS LAST RESET
+!
+      IF((I/IOUT)*IOUT.EQ.I)THEN
+      DIFFQ=(VOLWSO-CRAIN+CRUN+CEVAP+VOLWOU-TLW)/TAREA
+      DIFFH=(HEATSO-HEATIN+HEATOU-TLH)/TAREA
+      DIFFO=(OXYGSO-OXYGIN+OXYGOU-TLO)/TAREA
+      DIFFC=(TLRSDC+TLORGC+TLCO2G-CO2GIN+TCOU-TORGF-XCSN-TLC)/TAREA
+      DIFFN=(TLRSDN+TLORGN+TLN2G+TLNH4+TLNO3-ZN2GIN-TZIN+TZOU &
+      -TORGN-XZSN-TLN)/TAREA
+      DIFFP=(TLRSDP+TLORGP+TLPO4-TPIN+TPOU-TORGP-XPSN-TLP)/TAREA
+      DIFFI=(TION-TIONIN+TIONOU-TLI)/TAREA
+      WRITE(*,212)I,IYRC
+      WRITE(18,213)I,IYRC,DIFFQ,DIFFH,DIFFO,DIFFC,DIFFN &
+      ,DIFFP,DIFFI
+      if(diffq/=diffq)then
+      write(*,*)'DIFFQ=',DIFFQ
+      write(*,*)'VOLWSO=',VOLWSO
+      write(*,*)'CRAIN=',CRAIN
+      write(*,*)'CRUN=',CRUN
+      write(*,*)'CEVAP=',CEVAP
+      write(*,*)'VOLWOU=',VOLWOU
+      write(*,*)'TLW=',TLW
+      write(*,*)'TAREA=',TAREA
+      call endrun(msg='NaN encounterd in '//trim(subname))
+      endif
+212   FORMAT('NOW EXECUTING DAY',I6,'   OF YEAR',I6)
+213   FORMAT(2I6,10F16.6)
+!
+!     FLAG DEVIATIONS > 1UG OR 1 J IN ENTIRE MODEL LANDSCAPE,
+!     RESET MASS BALANCE
+!
+      IF(ABS(DIFFC).GT.1.0E-06)THEN
+      WRITE(18,191)I,IYRC
+191   FORMAT('CARBON BALANCE LOST ON DAY, YEAR',2I4)
+      TLC=TLRSDC+TLORGC+TLCO2G-CO2GIN+TCOU-TORGF-XCSN
+      ENDIF
+      IF(ABS(DIFFN).GT.1.0E-06)THEN
+      WRITE(18,192)I,IYRC
+192   FORMAT('NITROGEN BALANCE LOST ON DAY, YEAR',2I4)
+      TLN=TLRSDN+TLORGN+TLN2G+TLNH4+TLNO3-ZN2GIN-TZIN+TZOU-TORGN-XZSN
+      ENDIF
+      IF(ABS(DIFFP).GT.1.0E-06)THEN
+      WRITE(18,193)I,IYRC
+193   FORMAT('PHOSPHORUS BALANCE LOST ON DAY, YEAR',2I4)
+      TLP=TLRSDP+TLORGP+TLPO4-TPIN+TPOU-TORGP-XPSN
+      ENDIF
+      IF(ABS(DIFFQ).GT.1.0E-06)THEN
+      WRITE(18,194)I,IYRC
+194   FORMAT('WATER BALANCE LOST ON DAY, YEAR',2I4)
+      TLW=VOLWSO-CRAIN+CRUN+CEVAP+VOLWOU
+      ENDIF
+      IF(ABS(DIFFH).GT.1.0E-06)THEN
+      WRITE(18,195)I,IYRC
+195   FORMAT('THERMAL BALANCE LOST ON DAY, YEAR',2I4)
+      TLH=HEATSO-HEATIN+HEATOU
+      ENDIF
+      IF(ABS(DIFFO).GT.1.0E-06)THEN
+      WRITE(18,196)I,IYRC
+196   FORMAT('OXYGEN BALANCE LOST ON DAY, YEAR',2I4)
+      TLO=OXYGSO-OXYGIN+OXYGOU
+      ENDIF
+      IF(ABS(DIFFI).GT.1.0E-06)THEN
+      WRITE(18,197)I,IYRC
+197   FORMAT('ION BALANCE LOST ON DAY, YEAR',2I4)
+      TLI=TION-TIONIN+TIONOU
+      ENDIF
+      ENDIF
+      IF(IDAYR.LT.0)THEN
+      IDAYR=LYRX+IDAYR
+      ELSE
+      IDAYR=I
+      ENDIF
+      IOLD=I
+      IMNG=0
+      NYR=0
+      RETURN
+
+      END subroutine exec
+      end module ExecMod
