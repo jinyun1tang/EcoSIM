@@ -1,9 +1,10 @@
 set(ECOSIM_UTIL_SOURCES
-	data_kind_mod.F90
+  data_kind_mod.F90
+  MiniMathMod.F90
   abortutils.F90
-	TestMod.F90
-	clock.c
-	timings.F90
+  TestMod.F90
+  clock.c
+  timings.F90
 )
 
 

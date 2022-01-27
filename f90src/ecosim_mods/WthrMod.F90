@@ -4,6 +4,7 @@
 !     Description:
 !
       use data_kind_mod, only : r8 => SHR_KIND_R8
+      use MiniMathMod, only : safe_adb
       implicit none
 
       private
@@ -278,8 +279,9 @@
 !     RADZ=diffuse radiation at horizontal surface
 !     RADS,RADY,RAPS,RAPY=direct,diffuse SW,PAR in solar beam
 !
+      
       RADZ=AMIN1(RADN(NY,NX),0.5*(RADX-RADN(NY,NX)))
-      RADS(NY,NX)=(RADN(NY,NX)-RADZ)/SSIN(NY,NX)
+      RADS(NY,NX)=safe_adb(RADN(NY,NX)-RADZ,SSIN(NY,NX))
       RADS(NY,NX)=AMIN1(4.167,RADS(NY,NX))
       RADY(NY,NX)=RADZ/TYSIN
       RAPS(NY,NX)=RADS(NY,NX)*CDIR*PDIR

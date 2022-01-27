@@ -5,6 +5,7 @@ module nitroMod
 !
 ! USES:
   use data_kind_mod, only : r8 => SHR_KIND_R8
+  use minimathmod, only : safe_adb
   implicit none
 
   private
@@ -2967,7 +2968,7 @@ module nitroMod
       DO 325 MM=1,NPT
       CH4G1=CH4G1+RCH4F1
       CH4S1=CH4S1+RCH4L1+RCH4S1
-      CCH4S1=AMAX1(0.0,CH4S1/VOLWM(M,L,NY,NX))
+      CCH4S1=AMAX1(0.0,safe_adb(CH4S1,VOLWM(M,L,NY,NX)))
       FSBST=CCH4S1/(CCH4S1+CCK4)
       RVOXP1=AMIN1(AMAX1(0.0,CH4S1)/(1.0+ECHO*ECHZ) &
       ,VMXA1*FSBST)
@@ -3572,7 +3573,7 @@ module nitroMod
       OXYG1=OXYG1+ROXYFX
       OXYS1=OXYS1+ROXYLX
       COXYS1=AMIN1(COXYE(NY,NX)*SOXYL(L,NY,NX) &
-      ,AMAX1(0.0,OXYS1/(VOLWM(M,L,NY,NX)*FOXYX)))
+      ,AMAX1(0.0,safe_adb(OXYS1,(VOLWM(M,L,NY,NX)*FOXYX))))
       X=DIFOX*COXYS1
       IF(X.GT.ZEROS(NY,NX).AND.OXYS1.GT.ZEROS(NY,NX))THEN
       B=-RUPMX-DIFOX*OXKX-X
