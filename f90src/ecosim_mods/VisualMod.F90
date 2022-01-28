@@ -1,7 +1,10 @@
-
-      module VisualMod
-      use data_kind_mod, only : r8 => SHR_KIND_R8
-      implicit none
+module VisualMod
+!!
+! Description:
+!
+  use data_kind_mod, only : r8 => SHR_KIND_R8
+  use fileUtil, only : open_safe
+  implicit none
 
       private
       include "parameters.h"
@@ -37,6 +40,7 @@
       include "blk18a.h"
       include "blk18b.h"
 
+  character(len=*), parameter :: mod_filename = __FILE__
       real(r8) :: TCSNX,TTRN,TTLE,TTSH,TTGH,TTCO,TTCH
 
       integer :: L,NX,NY,N
@@ -59,7 +63,7 @@
 !     execution begins here
 
       IF(ICHECK.EQ.0)THEN
-      OPEN(16,FILE=trim(prefix)//'years',STATUS='OLD')
+  call OPEN_safe(16,PREFIX,'years','OLD',mod_filename,__LINE__)
       READ(16,*)IYR1,IYR2
 !     WRITE(*,*)IYR1,IYR2
       CLOSE(16)
@@ -302,4 +306,4 @@
       RETURN
 
       END subroutine visual
-      end module VisualMod
+end module VisualMod

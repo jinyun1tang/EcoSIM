@@ -1,14 +1,13 @@
-SUBROUTINE readi(NA,ND,NT,NE,NAX,NDX,NTX,NEX,NF,NFX,NTZ,NTZX,NHW,NHE,NVN,NVS)
+module readiMod
 !!
-! Description:
-! THIS SUBROUTINE READS ALL SOIL AND TOPOGRAPHIC INPUT FILES
+! code to read site, topographic data
 !
   use data_kind_mod, only : r8 => SHR_KIND_R8
-  implicit none
-  integer, intent(in) :: NT,NE,NAX,NDX,NTX,NEX,NTZX,NHW,NHE,NVN,NVS
-  integer, intent(out) :: NF, NFX, NTZ
-  integer, intent(in) :: NA(1:NEX),ND(1:NEX)
+  use abortutils, only : endrun
+  use fileUtil, only : open_safe
 
+  implicit none
+  private
   include "parameters.h"
   include "filec.h"
   include "files.h"
@@ -22,7 +21,6 @@ SUBROUTINE readi(NA,ND,NT,NE,NAX,NDX,NTX,NEX,NF,NFX,NTZ,NTZX,NHW,NHE,NVN,NVS)
   include "blk11a.h"
 
   character(len=*), parameter :: mod_filename = __FILE__
-  integer :: jj
   integer :: NM(JY,JX)
   real(r8) :: DHI(JX),DVI(JY)
   real(r8) :: datav(40)
@@ -39,19 +37,37 @@ SUBROUTINE readi(NA,ND,NT,NE,NAX,NDX,NTX,NEX,NF,NFX,NTZ,NTZX,NHW,NHE,NVN,NVS)
   real(r8) :: RCHGNTG,RCHGETG,RCHGSTG,RCHGWTG,RCHGDG
   real(r8) :: SL0,XI,Z2GEG,Z2OEG,ZNH3EG,SLX,SL1,SL2
 
-  integer :: IDTBLG,IETYPG,L,NX,NY,NCNG,NH1,NH2,NV1,NV2,NL1
+  integer :: IDTBLG,IETYPG,L,NCNG,NH1,NH2,NV1,NV2,NL1
   integer :: NL2
+
+
+  public :: readi
+  contains
+
+  SUBROUTINE readi(NA,ND,NT,NE,NAX,NDX,NTX,NEX,NF,NFX,NTZ,NTZX,NHW,NHE,NVN,NVS)
+!!
+! Description:
+! THIS SUBROUTINE READS ALL SOIL AND TOPOGRAPHIC INPUT FILES
+!
+  implicit none
+  integer, intent(in) :: NT,NE,NAX,NDX,NTX,NEX,NTZX,NHW,NHE,NVN,NVS
+  integer, intent(out) :: NF, NFX, NTZ
+  integer, intent(in) :: NA(1:NEX),ND(1:NEX)
+  integer :: jj,NX,NY
+  integer :: ierr
 !
 ! begin_execution
 !
-!     OPEN OUTPUT LOGFILES,AND SITE,TOPOGRAPHY FILES FROM
-!     FILE NAMES IN DATA ARRAYS LOADED IN 'MAIN'
+! OPEN OUTPUT LOGFILES,AND SITE,TOPOGRAPHY FILES FROM
+! FILE NAMES IN DATA ARRAYS LOADED IN 'MAIN'
 !
   OPEN(18,FILE=trim(outdir)//'logfile1',STATUS='UNKNOWN')
   OPEN(19,FILE=trim(outdir)//'logfile2',STATUS='UNKNOWN')
   OPEN(20,FILE=trim(outdir)//'logfile3',STATUS='UNKNOWN')
-  OPEN(1,FILE=TRIM(PREFIX)//DATA(1),STATUS='OLD')
-  OPEN(7,FILE=TRIM(PREFIX)//DATA(2),STATUS='OLD')
+
+  call OPEN_safe(1,PREFIX,DATA(1),'OLD',mod_filename,__LINE__)
+  call OPEN_safe(7,PREFIX,DATA(2),'OLD',mod_filename,__LINE__)
+
   WRITE(18,5000)' 08 JUL 2021'
 5000  FORMAT(A16)
   NF=1
@@ -65,24 +81,24 @@ SUBROUTINE readi(NA,ND,NT,NE,NAX,NDX,NTX,NEX,NF,NFX,NTZ,NTZX,NHW,NHE,NVN,NVS)
 ! :0=none
 ! :1,2=natural stationary,mobile
 ! :3,4=artificial stationary,mobile
-!     OXYEG,Z2GEG,CO2EIG,CH4EG,Z2OEG,ZNH3EG=atm O2,N2,CO2,CH4,N2O,NH3 (ppm)
-!     IETYPG,ISALTG,IERSNG=Koppen climate zone,salt,erosion options
-!     NCNG=1:lateral connections between grid cells,3:no connections
-!     DTBLIG,DTBLDIG=depth of natural,artificial (tile) water table (IDTBLG)
-!     DTBLGG=slope of natural water table relative to landscape surface
-!     RCHQNG,RCHQEG,RCHQSG,RCHQWG=boundary condns for N,E,S,W surface runoff
-!     RCHGNUG,RCHGEUG,RCHGSUG,RCHGWUG=bound condns for N,E,S,W subsurf flow
-!     RCHGNTG,RCHGETG,RCHGSTG,RCHGWTG=N,E,S,W distance to water table (m)
-!     RCHGDG=lower boundary conditions for water flow
-!     DHI=width of each W-E landscape column
-!     DVI=width of each N-S landscape row
+! OXYEG,Z2GEG,CO2EIG,CH4EG,Z2OEG,ZNH3EG=atm O2,N2,CO2,CH4,N2O,NH3 (ppm)
+! IETYPG,ISALTG,IERSNG=Koppen climate zone,salt,erosion options
+! NCNG=1:lateral connections between grid cells,3:no connections
+! DTBLIG,DTBLDIG=depth of natural,artificial (tile) water table (IDTBLG)
+! DTBLGG=slope of natural water table relative to landscape surface
+! RCHQNG,RCHQEG,RCHQSG,RCHQWG=boundary condns for N,E,S,W surface runoff
+! RCHGNUG,RCHGEUG,RCHGSUG,RCHGWUG=bound condns for N,E,S,W subsurf flow
+! RCHGNTG,RCHGETG,RCHGSTG,RCHGWTG=N,E,S,W distance to water table (m)
+! RCHGDG=lower boundary conditions for water flow
+! DHI=width of each W-E landscape column
+! DVI=width of each N-S landscape row
 !
-!      READ(1,*)ALATG,ALTIG,ATCAG,IDTBLG
+!  READ(1,*)ALATG,ALTIG,ATCAG,IDTBLG
   READ(1,*)(datav(jj),jj=1,4)
  	ALATG=datav(1)
- 	ALTIG=datav(2)
- 	ATCAG=datav(3)
- 	IDTBLG=int(datav(4))
+  ALTIG=datav(2)
+  ATCAG=datav(3)
+  IDTBLG=int(datav(4))
   READ(1,*)OXYEG,Z2GEG,CO2EIG,CH4EG,Z2OEG,ZNH3EG
   READ(1,*)IETYPG,ISALTG,IERSNG,NCNG,DTBLIG,DTBLDIG,DTBLGG
   READ(1,*)RCHQNG,RCHQEG,RCHQSG,RCHQWG,RCHGNUG,RCHGEUG,RCHGSUG &
@@ -203,7 +219,7 @@ SUBROUTINE readi(NA,ND,NT,NE,NAX,NDX,NTX,NEX,NF,NFX,NTZ,NTZX,NHW,NHE,NVN,NVS)
 ! SL1,SL2=EW,NS slope (o)
 ! DPTHSX=initial snowpack depth
 !
-50 READ(7,*,END=20)NH1,NV1,NH2,NV2,ASPX,SL0,SLX,DPTHSX
+50    READ(7,*,END=20)NH1,NV1,NH2,NV2,ASPX,SL0,SLX,DPTHSX
   READ(7,52)DATA(7)
 52    FORMAT(A16)
 !
@@ -221,7 +237,9 @@ SUBROUTINE readi(NA,ND,NT,NE,NAX,NDX,NTX,NEX,NF,NFX,NTZ,NTZX,NHW,NHE,NVN,NVS)
     write(*,'(100A)')('=',ll=1,100)
     write(*,*)'read soil file ',DATA(7)
   endif
-  OPEN(9,FILE=TRIM(PREFIX)//DATA(7),STATUS='OLD')
+
+  call OPEN_safe(9,PREFIX,DATA(7),'OLD',mod_filename,__LINE__)
+
   DO 9995 NX=NH1,NH2
     DO 9990 NY=NV1,NV2
 !
@@ -330,16 +348,16 @@ SUBROUTINE readi(NA,ND,NT,NE,NAX,NDX,NTX,NEX,NF,NFX,NTZ,NTZX,NHW,NHE,NVN,NVS)
       READ(9,*)(SCNV(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
       READ(9,*)(SCNH(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
       if(lverb)then
-      write(*,*)''
-      write(*,*)'NY,NX=',NY,NX
-      write(*,*)'Field capacity (m3 m-3): FC'
-      write(*,*)(FC(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
-      write(*,*)'Wilting point (m3 m-3): WP'
-      write(*,*)(WP(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
-      write(*,*)'Vertical Ksat (mm h-1): SCNV'
-      write(*,*)(SCNV(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
-      write(*,*)'Lateral Ksat (mm h-1): SCNH'
-      write(*,*)(SCNH(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
+        write(*,*)''
+        write(*,*)'NY,NX=',NY,NX
+        write(*,*)'Field capacity (m3 m-3): FC'
+        write(*,*)(FC(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
+        write(*,*)'Wilting point (m3 m-3): WP'
+        write(*,*)(WP(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
+        write(*,*)'Vertical Ksat (mm h-1): SCNV'
+        write(*,*)(SCNV(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
+        write(*,*)'Lateral Ksat (mm h-1): SCNH'
+        write(*,*)(SCNH(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
       endif
 !
 !     PHYSICAL PROPERTIES
@@ -352,16 +370,16 @@ SUBROUTINE readi(NA,ND,NT,NE,NAX,NDX,NTX,NEX,NF,NFX,NTZ,NTZX,NHW,NHE,NVN,NVS)
       READ(9,*)(FHOL(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
       READ(9,*)(ROCK(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
       if(lverb)then
-      write(*,*)''
-      write(*,*)'NY,NX=',NY,NX
-      write(*,*)'Sand (kg Mg-1): CSAND'
-      write(*,*)(CSAND(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
-      write(*,*)'Silt (kg Mg-1): CSILT'
-      write(*,*)(CSILT(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
-      write(*,*)'Macropore fraction (0-1): FOHL'
-      write(*,*)(FHOL(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
-      write(*,*)'Rock fraction (0-1): ROCK'
-      write(*,*)(ROCK(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
+        write(*,*)''
+        write(*,*)'NY,NX=',NY,NX
+        write(*,*)'Sand (kg Mg-1): CSAND'
+        write(*,*)(CSAND(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
+        write(*,*)'Silt (kg Mg-1): CSILT'
+        write(*,*)(CSILT(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
+        write(*,*)'Macropore fraction (0-1): FOHL'
+        write(*,*)(FHOL(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
+        write(*,*)'Rock fraction (0-1): ROCK'
+        write(*,*)(ROCK(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
       endif
 !
 !     CHEMICAL PROPERTIES
@@ -373,14 +391,14 @@ SUBROUTINE readi(NA,ND,NT,NE,NAX,NDX,NTX,NEX,NF,NFX,NTZ,NTZX,NHW,NHE,NVN,NVS)
       READ(9,*)(CEC(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
       READ(9,*)(AEC(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
       if(lverb)then
-      write(*,*)''
-      write(*,*)'NY,NX=',NY,NX
-      write(*,*)'pH'
-      write(*,*)(PH(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
-      write(*,*)'Cation exchange capacity (cmol Kg-1): CEC'
-      write(*,*)(CEC(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
-      write(*,*)'Anion exchange capacity (cmol Kg-1): AEC'
-      write(*,*)(AEC(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
+        write(*,*)''
+        write(*,*)'NY,NX=',NY,NX
+        write(*,*)'pH'
+        write(*,*)(PH(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
+        write(*,*)'Cation exchange capacity (cmol Kg-1): CEC'
+        write(*,*)(CEC(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
+        write(*,*)'Anion exchange capacity (cmol Kg-1): AEC'
+        write(*,*)(AEC(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
       endif
 !
 !     ORGANIC C, N AND P CONCENTRATIONS
@@ -393,16 +411,16 @@ SUBROUTINE readi(NA,ND,NT,NE,NAX,NDX,NTX,NEX,NF,NFX,NTZ,NTZX,NHW,NHE,NVN,NVS)
       READ(9,*)(CORGN(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
       READ(9,*)(CORGP(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
       if(lverb)then
-      write(*,*)''
-      write(*,*)'NY,NX=',NY,NX
-      write(*,*)'Total SOC (kg C/Mg soil): CORGC'
-      write(*,*)(CORGC(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
-      write(*,*)'POC (part of SOC) (kg C/Mg soil): CORGR '
-      write(*,*)(CORGR(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
-      write(*,*)'Total SON (g N/Mg soil): CORGN '
-      write(*,*)(CORGN(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
-      write(*,*)'Total SOP (g P/Mg soil): CORGP'
-      write(*,*)(CORGP(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
+        write(*,*)''
+        write(*,*)'NY,NX=',NY,NX
+        write(*,*)'Total SOC (kg C/Mg soil): CORGC'
+        write(*,*)(CORGC(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
+        write(*,*)'POC (part of SOC) (kg C/Mg soil): CORGR '
+        write(*,*)(CORGR(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
+        write(*,*)'Total SON (g N/Mg soil): CORGN '
+        write(*,*)(CORGN(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
+        write(*,*)'Total SOP (g P/Mg soil): CORGP'
+        write(*,*)(CORGP(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
       endif
 !
 !     INORGANIC N AND P CONCENTRATIONS
@@ -413,14 +431,14 @@ SUBROUTINE readi(NA,ND,NT,NE,NAX,NDX,NTX,NEX,NF,NFX,NTZ,NTZX,NHW,NHE,NVN,NVS)
       READ(9,*)(CNO3(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
       READ(9,*)(CPO4(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
       if(lverb)then
-      write(*,*)''
-      write(*,*)'NY,NX=',NY,NX
-      write(*,*)'Total soil NH4 concentration (gN Mg-1): CNH4 '
-      write(*,*)(CNH4(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
-      write(*,*)'Total soil NO3 concentration (gN Mg-1): CNO3'
-      write(*,*)(CNO3(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
-      write(*,*)'Total soil H2PO4 concentration (gP Mg-1): CPO4 '
-      write(*,*)(CPO4(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
+        write(*,*)''
+        write(*,*)'NY,NX=',NY,NX
+        write(*,*)'Total soil NH4 concentration (gN Mg-1): CNH4 '
+        write(*,*)(CNH4(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
+        write(*,*)'Total soil NO3 concentration (gN Mg-1): CNO3'
+        write(*,*)(CNO3(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
+        write(*,*)'Total soil H2PO4 concentration (gP Mg-1): CPO4 '
+        write(*,*)(CPO4(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
       endif
 !
 !     CATION AND ANION CONCENTRATIONS
@@ -437,22 +455,22 @@ SUBROUTINE readi(NA,ND,NT,NE,NAX,NDX,NTX,NEX,NF,NFX,NTZ,NTZX,NHW,NHE,NVN,NVS)
       READ(9,*)(CSO4(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
       READ(9,*)(CCL(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
       if(lverb)then
-      write(*,*)''
-      write(*,*)'NY,NX=',NY,NX
-      write(*,*)'Soluble soil Al content (g Mg-1): CAL'
-      write(*,*)(CAL(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
-      write(*,*)'Soluble soil Fe content (g Mg-1): CFE'
-      write(*,*)(CFE(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
-      write(*,*)'Soluble soil Ca content (g Mg-1): CCA'
-      write(*,*)(CCA(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
-      write(*,*)'Soluble soil Na content (g Mg-1): CNA'
-      write(*,*)(CNA(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
-      write(*,*)'Soluble soil K content (g Mg-1): CKA'
-      write(*,*)(CKA(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
-      write(*,*)'Soluble soil SO4 content (gS Mg-1): CSO4'
-      write(*,*)(CSO4(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
-      write(*,*)'Soluble soil Cl content (g Mg-1): CCL'
-      write(*,*)(CCL(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
+        write(*,*)''
+        write(*,*)'NY,NX=',NY,NX
+        write(*,*)'Soluble soil Al content (g Mg-1): CAL'
+        write(*,*)(CAL(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
+        write(*,*)'Soluble soil Fe content (g Mg-1): CFE'
+        write(*,*)(CFE(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
+        write(*,*)'Soluble soil Ca content (g Mg-1): CCA'
+        write(*,*)(CCA(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
+        write(*,*)'Soluble soil Na content (g Mg-1): CNA'
+        write(*,*)(CNA(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
+        write(*,*)'Soluble soil K content (g Mg-1): CKA'
+        write(*,*)(CKA(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
+        write(*,*)'Soluble soil SO4 content (gS Mg-1): CSO4'
+        write(*,*)(CSO4(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
+        write(*,*)'Soluble soil Cl content (g Mg-1): CCL'
+        write(*,*)(CCL(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
       endif
 !
 !     PRECIPITATED MINERAL CONCENTRATIONS
@@ -469,24 +487,24 @@ SUBROUTINE readi(NA,ND,NT,NE,NAX,NDX,NTX,NEX,NF,NFX,NTZ,NTZX,NHW,NHE,NVN,NVS)
       READ(9,*)(CCACO(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
       READ(9,*)(CCASO(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
       if(lverb)then
-      write(*,*)''
-      write(*,*)'NY,NX=',NY,NX
-      write(*,*)'Soil AlPO4 content (g Mg-1): CALPO'
-      write(*,*)(CALPO(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
-      write(*,*)'Soil FePO4 content (g Mg-1): CFEPO'
-      write(*,*)(CFEPO(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
-      write(*,*)'Soil CaHPO4 content (g Mg-1): CCAPD'
-      write(*,*)(CCAPD(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
-      write(*,*)'Soil apatite content (g Mg-1): CCAPH '
-      write(*,*)(CCAPH(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
-      write(*,*)'Soil Al(OH)3 content (g Mg-1): CALOH '
-      write(*,*)(CALOH(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
-      write(*,*)'Soil Fe(OH)3 content (g Mg-1): CFEOH '
-      write(*,*)(CFEOH(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
-      write(*,*)'Soil CaCO3 content (g Mg-1): CCACO'
-      write(*,*)(CCACO(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
-      write(*,*)'Soil CaSO4 content (g Mg-1): CCASO'
-      write(*,*)(CCASO(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
+        write(*,*)''
+        write(*,*)'NY,NX=',NY,NX
+        write(*,*)'Soil AlPO4 content (g Mg-1): CALPO'
+        write(*,*)(CALPO(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
+        write(*,*)'Soil FePO4 content (g Mg-1): CFEPO'
+        write(*,*)(CFEPO(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
+        write(*,*)'Soil CaHPO4 content (g Mg-1): CCAPD'
+        write(*,*)(CCAPD(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
+        write(*,*)'Soil apatite content (g Mg-1): CCAPH '
+        write(*,*)(CCAPH(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
+        write(*,*)'Soil Al(OH)3 content (g Mg-1): CALOH '
+        write(*,*)(CALOH(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
+        write(*,*)'Soil Fe(OH)3 content (g Mg-1): CFEOH '
+        write(*,*)(CFEOH(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
+        write(*,*)'Soil CaCO3 content (g Mg-1): CCACO'
+        write(*,*)(CCACO(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
+        write(*,*)'Soil CaSO4 content (g Mg-1): CCASO'
+        write(*,*)(CCASO(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
       endif
 !
 !     GAPON SELECTIVITY CO-EFFICIENTS
@@ -501,20 +519,20 @@ SUBROUTINE readi(NA,ND,NT,NE,NAX,NDX,NTX,NEX,NF,NFX,NTZ,NTZX,NHW,NHE,NVN,NVS)
       READ(9,*)(GKCN(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
       READ(9,*)(GKCK(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
       if(lverb)then
-      write(*,*)''
-      write(*,*)'NY,NX=',NY,NX
-      write(*,*)'Ca-NH4 Gapon selectivity coefficient: GKC4'
-      write(*,*)(GKC4(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
-      write(*,*)'Ca-H Gapon selectivity coefficient: GKCH'
-      write(*,*)(GKCH(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
-      write(*,*)'Ca-Al Gapon selectivity coefficient: GKCA'
-      write(*,*)(GKCA(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
-      write(*,*)'Ca-Mg Gapon selectivity coefficient: GKCM'
-      write(*,*)(GKCM(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
-      write(*,*)'Ca-Na Gapon selectivity coefficient: GKCN'
-      write(*,*)(GKCN(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
-      write(*,*)'Ca-K Gapon selectivity coefficient: GKCK'
-      write(*,*)(GKCK(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
+        write(*,*)''
+        write(*,*)'NY,NX=',NY,NX
+        write(*,*)'Ca-NH4 Gapon selectivity coefficient: GKC4'
+        write(*,*)(GKC4(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
+        write(*,*)'Ca-H Gapon selectivity coefficient: GKCH'
+        write(*,*)(GKCH(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
+        write(*,*)'Ca-Al Gapon selectivity coefficient: GKCA'
+        write(*,*)(GKCA(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
+        write(*,*)'Ca-Mg Gapon selectivity coefficient: GKCM'
+        write(*,*)(GKCM(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
+        write(*,*)'Ca-Na Gapon selectivity coefficient: GKCN'
+        write(*,*)(GKCN(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
+        write(*,*)'Ca-K Gapon selectivity coefficient: GKCK'
+        write(*,*)(GKCK(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
       endif
 !
 !     INITIAL WATER, ICE CONTENTS
@@ -522,10 +540,10 @@ SUBROUTINE readi(NA,ND,NT,NE,NAX,NDX,NTX,NEX,NF,NFX,NTZ,NTZX,NHW,NHE,NVN,NVS)
       READ(9,*)(THW(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
       READ(9,*)(THI(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
       if(lverb)then
-      write(*,*)'Initial soil water content (m3/m3): THW'
-      write(*,*)(THW(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
-      write(*,*)'Initial soil ice content (m3/m3): THI'
-      write(*,*)(THI(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
+        write(*,*)'Initial soil water content (m3/m3): THW'
+        write(*,*)(THW(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
+        write(*,*)'Initial soil ice content (m3/m3): THI'
+        write(*,*)(THI(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
       endif
 !
 !     THW,THI=initial water,ice:>1=satd,1=FC,0=WP,<0=0,0-1=m3 m-3
@@ -545,27 +563,27 @@ SUBROUTINE readi(NA,ND,NT,NE,NAX,NDX,NTX,NEX,NF,NFX,NTZ,NTZX,NHW,NHE,NVN,NVS)
       READ(9,*)(RSP(2,L,NY,NX),L=NU(NY,NX),NM(NY,NX))
       REWIND(9)
       if(lverb)then
-      write(*,*)''
-      write(*,*)'NY,NX=',NY,NX
-      write(*,*)'Initial fine litter C (gC m-2): RSC(1)'
-      write(*,*)(RSC(1,L,NY,NX),L=NU(NY,NX),NM(NY,NX))
-      write(*,*)'Initial fine litter N (gN m-2): RSN(1)'
-      write(*,*)(RSN(1,L,NY,NX),L=NU(NY,NX),NM(NY,NX))
-      write(*,*)'Initial fine litter P (gP m-2): RSP(1)'
-      write(*,*)(RSP(1,L,NY,NX),L=NU(NY,NX),NM(NY,NX))
-      write(*,*)'Initial woody liter C (gC m-2): RSC(0)'
-      write(*,*)(RSC(0,L,NY,NX),L=NU(NY,NX),NM(NY,NX))
-      write(*,*)'Initial woody litter N (gN m-2): RSN(0)'
-      write(*,*)(RSN(0,L,NY,NX),L=NU(NY,NX),NM(NY,NX))
-      write(*,*)'Initial woody litter P (gP m-2): RSP(0)'
-      write(*,*)(RSP(0,L,NY,NX),L=NU(NY,NX),NM(NY,NX))
-      write(*,*)'Initial manure liter C (gC m-2): RSC(2)'
-      write(*,*)(RSC(2,L,NY,NX),L=NU(NY,NX),NM(NY,NX))
-      write(*,*)'Initial manure litter N (gN m-2): RSN(2)'
-      write(*,*)(RSN(2,L,NY,NX),L=NU(NY,NX),NM(NY,NX))
-      write(*,*)'Initial manure litter P (gP m-2): RSP(2)'
-      write(*,*)(RSP(2,L,NY,NX),L=NU(NY,NX),NM(NY,NX))
-      write(*,'(100A)')('=',ll=1,100)
+        write(*,*)''
+        write(*,*)'NY,NX=',NY,NX
+        write(*,*)'Initial fine litter C (gC m-2): RSC(1)'
+        write(*,*)(RSC(1,L,NY,NX),L=NU(NY,NX),NM(NY,NX))
+        write(*,*)'Initial fine litter N (gN m-2): RSN(1)'
+        write(*,*)(RSN(1,L,NY,NX),L=NU(NY,NX),NM(NY,NX))
+        write(*,*)'Initial fine litter P (gP m-2): RSP(1)'
+        write(*,*)(RSP(1,L,NY,NX),L=NU(NY,NX),NM(NY,NX))
+        write(*,*)'Initial woody liter C (gC m-2): RSC(0)'
+        write(*,*)(RSC(0,L,NY,NX),L=NU(NY,NX),NM(NY,NX))
+        write(*,*)'Initial woody litter N (gN m-2): RSN(0)'
+        write(*,*)(RSN(0,L,NY,NX),L=NU(NY,NX),NM(NY,NX))
+        write(*,*)'Initial woody litter P (gP m-2): RSP(0)'
+        write(*,*)(RSP(0,L,NY,NX),L=NU(NY,NX),NM(NY,NX))
+        write(*,*)'Initial manure liter C (gC m-2): RSC(2)'
+        write(*,*)(RSC(2,L,NY,NX),L=NU(NY,NX),NM(NY,NX))
+        write(*,*)'Initial manure litter N (gN m-2): RSN(2)'
+        write(*,*)(RSN(2,L,NY,NX),L=NU(NY,NX),NM(NY,NX))
+        write(*,*)'Initial manure litter P (gP m-2): RSP(2)'
+        write(*,*)(RSP(2,L,NY,NX),L=NU(NY,NX),NM(NY,NX))
+        write(*,'(100A)')('=',ll=1,100)
       endif
       RSC(1,0,NY,NX)=AMAX1(1.0E-06,RSC(1,0,NY,NX))
       RSN(1,0,NY,NX)=AMAX1(0.04E-06,RSN(1,0,NY,NX))
@@ -577,128 +595,128 @@ SUBROUTINE readi(NA,ND,NT,NE,NAX,NDX,NTX,NEX,NF,NFX,NTZ,NTZX,NHW,NHE,NVN,NVS)
 !     ISOIL=flag for calculating FC(1),WP(2),SCNV(3),SCNH(4)
 !
       DO 25 L=NU(NY,NX),NM(NY,NX)
-      IF(FC(L,NY,NX).LT.0.0)THEN
-      ISOIL(1,L,NY,NX)=1
-      PSIFC(NY,NX)=-0.033
-      ELSE
-      ISOIL(1,L,NY,NX)=0
-      ENDIF
-      IF(WP(L,NY,NX).LT.0.0)THEN
-      ISOIL(2,L,NY,NX)=1
-      PSIWP(NY,NX)=-1.5
-      ELSE
-      ISOIL(2,L,NY,NX)=0
-      ENDIF
-      IF(SCNV(L,NY,NX).LT.0.0)THEN
-      ISOIL(3,L,NY,NX)=1
-      ELSE
-      ISOIL(3,L,NY,NX)=0
-      ENDIF
-      IF(SCNH(L,NY,NX).LT.0.0)THEN
-      ISOIL(4,L,NY,NX)=1
-      ELSE
-      ISOIL(4,L,NY,NX)=0
-      ENDIF
+        IF(FC(L,NY,NX).LT.0.0)THEN
+          ISOIL(1,L,NY,NX)=1
+          PSIFC(NY,NX)=-0.033
+        ELSE
+          ISOIL(1,L,NY,NX)=0
+        ENDIF
+        IF(WP(L,NY,NX).LT.0.0)THEN
+          ISOIL(2,L,NY,NX)=1
+          PSIWP(NY,NX)=-1.5
+        ELSE
+          ISOIL(2,L,NY,NX)=0
+        ENDIF
+        IF(SCNV(L,NY,NX).LT.0.0)THEN
+          ISOIL(3,L,NY,NX)=1
+        ELSE
+          ISOIL(3,L,NY,NX)=0
+        ENDIF
+        IF(SCNH(L,NY,NX).LT.0.0)THEN
+          ISOIL(4,L,NY,NX)=1
+        ELSE
+          ISOIL(4,L,NY,NX)=0
+        ENDIF
 25    CONTINUE
 !
 !     FILL OUT SOIL BOUNDARY LAYERS ABOVE ROOTING ZONE (NOT USED)
 !
       IF(NU(NY,NX).GT.1)THEN
-      DO 31 L=NU(NY,NX)-1,0,-1
-      IF(BKDSI(L+1,NY,NX).GT.0.025)THEN
-      CDPTH(L,NY,NX)=CDPTH(L+1,NY,NX)-0.01
-      ELSE
-      CDPTH(L,NY,NX)=CDPTH(L+1,NY,NX)-0.02
-      ENDIF
-      IF(L.GT.0)THEN
-      BKDSI(L,NY,NX)=BKDSI(L+1,NY,NX)
-      FC(L,NY,NX)=FC(L+1,NY,NX)
-      WP(L,NY,NX)=WP(L+1,NY,NX)
-      SCNV(L,NY,NX)=SCNV(L+1,NY,NX)
-      SCNH(L,NY,NX)=SCNH(L+1,NY,NX)
-      CSAND(L,NY,NX)=CSAND(L+1,NY,NX)
-      CSILT(L,NY,NX)=CSILT(L+1,NY,NX)
-      CCLAY(L,NY,NX)=CCLAY(L+1,NY,NX)
-      FHOL(L,NY,NX)=FHOL(L+1,NY,NX)
-      ROCK(L,NY,NX)=ROCK(L+1,NY,NX)
-      PH(L,NY,NX)=PH(L+1,NY,NX)
-      CEC(L,NY,NX)=CEC(L+1,NY,NX)
-      AEC(L,NY,NX)=AEC(L+1,NY,NX)
-      CORGC(L,NY,NX)=1.00*CORGC(L+1,NY,NX)
-      CORGR(L,NY,NX)=1.00*CORGR(L+1,NY,NX)
-      CORGN(L,NY,NX)=1.00*CORGN(L+1,NY,NX)
-      CORGP(L,NY,NX)=1.00*CORGP(L+1,NY,NX)
-      CNH4(L,NY,NX)=CNH4(L+1,NY,NX)
-      CNO3(L,NY,NX)=CNO3(L+1,NY,NX)
-      CPO4(L,NY,NX)=CPO4(L+1,NY,NX)
-      CAL(L,NY,NX)=CAL(L+1,NY,NX)
-      CFE(L,NY,NX)=CFE(L+1,NY,NX)
-      CCA(L,NY,NX)=CCA(L+1,NY,NX)
-      CMG(L,NY,NX)=CMG(L+1,NY,NX)
-      CNA(L,NY,NX)=CNA(L+1,NY,NX)
-      CKA(L,NY,NX)=CKA(L+1,NY,NX)
-      CSO4(L,NY,NX)=CSO4(L+1,NY,NX)
-      CCL(L,NY,NX)=CCL(L+1,NY,NX)
-      CALOH(L,NY,NX)=CALOH(L+1,NY,NX)
-      CFEOH(L,NY,NX)=CFEOH(L+1,NY,NX)
-      CCACO(L,NY,NX)=CCACO(L+1,NY,NX)
-      CCASO(L,NY,NX)=CCASO(L+1,NY,NX)
-      CALPO(L,NY,NX)=CALPO(L+1,NY,NX)
-      CFEPO(L,NY,NX)=CFEPO(L+1,NY,NX)
-      CCAPD(L,NY,NX)=CCAPD(L+1,NY,NX)
-      CCAPH(L,NY,NX)=CCAPH(L+1,NY,NX)
-      GKC4(L,NY,NX)=GKC4(L+1,NY,NX)
-      GKCH(L,NY,NX)=GKCH(L+1,NY,NX)
-      GKCA(L,NY,NX)=GKCA(L+1,NY,NX)
-      GKCM(L,NY,NX)=GKCM(L+1,NY,NX)
-      GKCN(L,NY,NX)=GKCN(L+1,NY,NX)
-      GKCK(L,NY,NX)=GKCK(L+1,NY,NX)
-      THW(L,NY,NX)=THW(L+1,NY,NX)
-      THI(L,NY,NX)=THI(L+1,NY,NX)
-      ISOIL(1,L,NY,NX)=ISOIL(1,L+1,NY,NX)
-      ISOIL(2,L,NY,NX)=ISOIL(2,L+1,NY,NX)
-      ISOIL(3,L,NY,NX)=ISOIL(3,L+1,NY,NX)
-      ISOIL(4,L,NY,NX)=ISOIL(4,L+1,NY,NX)
-      RSC(1,L,NY,NX)=0.0
-      RSN(1,L,NY,NX)=0.0
-      RSP(1,L,NY,NX)=0.0
-      RSC(0,L,NY,NX)=0.0
-      RSN(0,L,NY,NX)=0.0
-      RSP(0,L,NY,NX)=0.0
-      RSC(2,L,NY,NX)=0.0
-      RSN(2,L,NY,NX)=0.0
-      RSP(2,L,NY,NX)=0.0
-      ENDIF
-31    CONTINUE
+        DO 31 L=NU(NY,NX)-1,0,-1
+          IF(BKDSI(L+1,NY,NX).GT.0.025)THEN
+            CDPTH(L,NY,NX)=CDPTH(L+1,NY,NX)-0.01
+          ELSE
+            CDPTH(L,NY,NX)=CDPTH(L+1,NY,NX)-0.02
+          ENDIF
+          IF(L.GT.0)THEN
+            BKDSI(L,NY,NX)=BKDSI(L+1,NY,NX)
+            FC(L,NY,NX)=FC(L+1,NY,NX)
+            WP(L,NY,NX)=WP(L+1,NY,NX)
+            SCNV(L,NY,NX)=SCNV(L+1,NY,NX)
+            SCNH(L,NY,NX)=SCNH(L+1,NY,NX)
+            CSAND(L,NY,NX)=CSAND(L+1,NY,NX)
+            CSILT(L,NY,NX)=CSILT(L+1,NY,NX)
+            CCLAY(L,NY,NX)=CCLAY(L+1,NY,NX)
+            FHOL(L,NY,NX)=FHOL(L+1,NY,NX)
+            ROCK(L,NY,NX)=ROCK(L+1,NY,NX)
+            PH(L,NY,NX)=PH(L+1,NY,NX)
+            CEC(L,NY,NX)=CEC(L+1,NY,NX)
+            AEC(L,NY,NX)=AEC(L+1,NY,NX)
+            CORGC(L,NY,NX)=1.00*CORGC(L+1,NY,NX)
+            CORGR(L,NY,NX)=1.00*CORGR(L+1,NY,NX)
+            CORGN(L,NY,NX)=1.00*CORGN(L+1,NY,NX)
+            CORGP(L,NY,NX)=1.00*CORGP(L+1,NY,NX)
+            CNH4(L,NY,NX)=CNH4(L+1,NY,NX)
+            CNO3(L,NY,NX)=CNO3(L+1,NY,NX)
+            CPO4(L,NY,NX)=CPO4(L+1,NY,NX)
+            CAL(L,NY,NX)=CAL(L+1,NY,NX)
+            CFE(L,NY,NX)=CFE(L+1,NY,NX)
+            CCA(L,NY,NX)=CCA(L+1,NY,NX)
+            CMG(L,NY,NX)=CMG(L+1,NY,NX)
+            CNA(L,NY,NX)=CNA(L+1,NY,NX)
+            CKA(L,NY,NX)=CKA(L+1,NY,NX)
+            CSO4(L,NY,NX)=CSO4(L+1,NY,NX)
+            CCL(L,NY,NX)=CCL(L+1,NY,NX)
+            CALOH(L,NY,NX)=CALOH(L+1,NY,NX)
+            CFEOH(L,NY,NX)=CFEOH(L+1,NY,NX)
+            CCACO(L,NY,NX)=CCACO(L+1,NY,NX)
+            CCASO(L,NY,NX)=CCASO(L+1,NY,NX)
+            CALPO(L,NY,NX)=CALPO(L+1,NY,NX)
+            CFEPO(L,NY,NX)=CFEPO(L+1,NY,NX)
+            CCAPD(L,NY,NX)=CCAPD(L+1,NY,NX)
+            CCAPH(L,NY,NX)=CCAPH(L+1,NY,NX)
+            GKC4(L,NY,NX)=GKC4(L+1,NY,NX)
+            GKCH(L,NY,NX)=GKCH(L+1,NY,NX)
+            GKCA(L,NY,NX)=GKCA(L+1,NY,NX)
+            GKCM(L,NY,NX)=GKCM(L+1,NY,NX)
+            GKCN(L,NY,NX)=GKCN(L+1,NY,NX)
+            GKCK(L,NY,NX)=GKCK(L+1,NY,NX)
+            THW(L,NY,NX)=THW(L+1,NY,NX)
+            THI(L,NY,NX)=THI(L+1,NY,NX)
+            ISOIL(1,L,NY,NX)=ISOIL(1,L+1,NY,NX)
+            ISOIL(2,L,NY,NX)=ISOIL(2,L+1,NY,NX)
+            ISOIL(3,L,NY,NX)=ISOIL(3,L+1,NY,NX)
+            ISOIL(4,L,NY,NX)=ISOIL(4,L+1,NY,NX)
+            RSC(1,L,NY,NX)=0.0
+            RSN(1,L,NY,NX)=0.0
+            RSP(1,L,NY,NX)=0.0
+            RSC(0,L,NY,NX)=0.0
+            RSN(0,L,NY,NX)=0.0
+            RSP(0,L,NY,NX)=0.0
+            RSC(2,L,NY,NX)=0.0
+            RSN(2,L,NY,NX)=0.0
+            RSP(2,L,NY,NX)=0.0
+          ENDIF
+31      CONTINUE
       ENDIF
 !
 !     ADD SOIL BOUNDARY LAYERS BELOW SOIL ZONE
 !
       DO 32 L=NM(NY,NX)+1,JZ
-      CDPTH(L,NY,NX)=2.0*CDPTH(L-1,NY,NX)-1.0*CDPTH(L-2,NY,NX)
-      BKDSI(L,NY,NX)=BKDSI(L-1,NY,NX)
-      FC(L,NY,NX)=FC(L-1,NY,NX)
-      WP(L,NY,NX)=WP(L-1,NY,NX)
-      SCNV(L,NY,NX)=SCNV(L-1,NY,NX)
-      SCNH(L,NY,NX)=SCNH(L-1,NY,NX)
-      CSAND(L,NY,NX)=CSAND(L-1,NY,NX)
-      CSILT(L,NY,NX)=CSILT(L-1,NY,NX)
-      CCLAY(L,NY,NX)=CCLAY(L-1,NY,NX)
-      FHOL(L,NY,NX)=FHOL(L-1,NY,NX)
-      ROCK(L,NY,NX)=ROCK(L-1,NY,NX)
-      PH(L,NY,NX)=PH(L-1,NY,NX)
-      CEC(L,NY,NX)=CEC(L-1,NY,NX)
-      AEC(L,NY,NX)=AEC(L-1,NY,NX)
+        CDPTH(L,NY,NX)=2.0*CDPTH(L-1,NY,NX)-1.0*CDPTH(L-2,NY,NX)
+        BKDSI(L,NY,NX)=BKDSI(L-1,NY,NX)
+        FC(L,NY,NX)=FC(L-1,NY,NX)
+        WP(L,NY,NX)=WP(L-1,NY,NX)
+        SCNV(L,NY,NX)=SCNV(L-1,NY,NX)
+        SCNH(L,NY,NX)=SCNH(L-1,NY,NX)
+        CSAND(L,NY,NX)=CSAND(L-1,NY,NX)
+        CSILT(L,NY,NX)=CSILT(L-1,NY,NX)
+        CCLAY(L,NY,NX)=CCLAY(L-1,NY,NX)
+        FHOL(L,NY,NX)=FHOL(L-1,NY,NX)
+        ROCK(L,NY,NX)=ROCK(L-1,NY,NX)
+        PH(L,NY,NX)=PH(L-1,NY,NX)
+        CEC(L,NY,NX)=CEC(L-1,NY,NX)
+        AEC(L,NY,NX)=AEC(L-1,NY,NX)
 !     IF(IDTBL(NY,NX).EQ.0)THEN
-      CORGC(L,NY,NX)=0.25*CORGC(L-1,NY,NX)
-      CORGR(L,NY,NX)=0.25*CORGR(L-1,NY,NX)
-      CORGN(L,NY,NX)=0.25*CORGN(L-1,NY,NX)
-      CORGP(L,NY,NX)=0.25*CORGP(L-1,NY,NX)
+        CORGC(L,NY,NX)=0.25*CORGC(L-1,NY,NX)
+        CORGR(L,NY,NX)=0.25*CORGR(L-1,NY,NX)
+        CORGN(L,NY,NX)=0.25*CORGN(L-1,NY,NX)
+        CORGP(L,NY,NX)=0.25*CORGP(L-1,NY,NX)
 !     ELSE
-!     CORGC(L,NY,NX)=CORGC(L-1,NY,NX)
-!     CORGR(L,NY,NX)=CORGR(L-1,NY,NX)
-!     CORGN(L,NY,NX)=CORGN(L-1,NY,NX)
-!     CORGP(L,NY,NX)=CORGP(L-1,NY,NX)
+!       CORGC(L,NY,NX)=CORGC(L-1,NY,NX)
+!       CORGR(L,NY,NX)=CORGR(L-1,NY,NX)
+!       CORGN(L,NY,NX)=CORGN(L-1,NY,NX)
+!       CORGP(L,NY,NX)=CORGP(L-1,NY,NX)
 !     ENDIF
       CNH4(L,NY,NX)=CNH4(L-1,NY,NX)
       CNO3(L,NY,NX)=CNO3(L-1,NY,NX)
@@ -740,18 +758,18 @@ SUBROUTINE readi(NA,ND,NT,NE,NAX,NDX,NTX,NEX,NF,NFX,NTZ,NTZX,NHW,NHE,NVN,NVS)
       RSC(2,L,NY,NX)=0.0
       RSN(2,L,NY,NX)=0.0
       RSP(2,L,NY,NX)=0.0
-32    CONTINUE
+32  CONTINUE
 !
-!     CALCULATE DERIVED SOIL PROPERTIES FROM INPUT SOIL PROPERTIES
+!   CALCULATE DERIVED SOIL PROPERTIES FROM INPUT SOIL PROPERTIES
 !
-!     FMPR=micropore fraction excluding macropore,rock
-!     SCNV,SCNH=vertical,lateral Ksat converted to m2 MPa-1 h-1
-!     CSAND,CSILT,CCLAY=sand,silt,clay content converted to g Mg-1
-!     CORGC,CORGR=SOC,POC converted to g Mg-1
-!     CEC,AEC=cation,anion exchange capacity converted to mol Mg-1
-!     CNH4...=solute concentrations converted to mol Mg-1
+!   FMPR=micropore fraction excluding macropore,rock
+!   SCNV,SCNH=vertical,lateral Ksat converted to m2 MPa-1 h-1
+!   CSAND,CSILT,CCLAY=sand,silt,clay content converted to g Mg-1
+!   CORGC,CORGR=SOC,POC converted to g Mg-1
+!   CEC,AEC=cation,anion exchange capacity converted to mol Mg-1
+!   CNH4...=solute concentrations converted to mol Mg-1
 !
-      DO 28 L=1,NL(NY,NX)
+    DO 28 L=1,NL(NY,NX)
 !     BKDSI(L,NY,NX)=BKDSI(L,NY,NX)/(1.0-FHOL(L,NY,NX))
       BKDS(L,NY,NX)=BKDSI(L,NY,NX)
       IF(BKDS(L,NY,NX).EQ.0.0)FHOL(L,NY,NX)=0.0
@@ -761,17 +779,17 @@ SUBROUTINE readi(NA,ND,NT,NE,NAX,NDX,NTX,NEX,NF,NFX,NTZ,NTZX,NHW,NHE,NVN,NVS)
       SCNV(L,NY,NX)=0.098*SCNV(L,NY,NX)*FMPR(L,NY,NX)
       SCNH(L,NY,NX)=0.098*SCNH(L,NY,NX)*FMPR(L,NY,NX)
       CCLAY(L,NY,NX)=AMAX1(0.0,1.0E+03-(CSAND(L,NY,NX) &
-      +CSILT(L,NY,NX)))
+        +CSILT(L,NY,NX)))
       CORGC(L,NY,NX)=CORGC(L,NY,NX)*1.0E+03
       CORGR(L,NY,NX)=CORGR(L,NY,NX)*1.0E+03
       CORGCI(L,NY,NX)=CORGC(L,NY,NX)
       FHOLI(L,NY,NX)=FHOL(L,NY,NX)
       CSAND(L,NY,NX)=CSAND(L,NY,NX) &
-      *1.0E-03*AMAX1(0.0,(1.0-CORGC(L,NY,NX)/0.55E+06))
+        *1.0E-03*AMAX1(0.0,(1.0-CORGC(L,NY,NX)/0.55E+06))
       CSILT(L,NY,NX)=CSILT(L,NY,NX) &
-      *1.0E-03*AMAX1(0.0,(1.0-CORGC(L,NY,NX)/0.55E+06))
+        *1.0E-03*AMAX1(0.0,(1.0-CORGC(L,NY,NX)/0.55E+06))
       CCLAY(L,NY,NX)=CCLAY(L,NY,NX) &
-      *1.0E-03*AMAX1(0.0,(1.0-CORGC(L,NY,NX)/0.55E+06))
+        *1.0E-03*AMAX1(0.0,(1.0-CORGC(L,NY,NX)/0.55E+06))
       CEC(L,NY,NX)=CEC(L,NY,NX)*10.0
       AEC(L,NY,NX)=AEC(L,NY,NX)*10.0
       CNH4(L,NY,NX)=CNH4(L,NY,NX)/14.0
@@ -798,39 +816,41 @@ SUBROUTINE readi(NA,ND,NT,NE,NAX,NDX,NTX,NEX,NF,NFX,NTZ,NTZX,NHW,NHE,NVN,NVS)
 !     BIOCHEMISTRY 130:117-131
 !
       IF(CORGN(L,NY,NX).LT.0.0)THEN
-      CORGN(L,NY,NX)=AMIN1(0.125*CORGC(L,NY,NX) &
-      ,8.9E+02*(CORGC(L,NY,NX)/1.0E+04)**0.80)
-!     WRITE(*,1111)'CORGN',L,CORGN(L,NY,NX),CORGC(L,NY,NX)
+        CORGN(L,NY,NX)=AMIN1(0.125*CORGC(L,NY,NX) &
+          ,8.9E+02*(CORGC(L,NY,NX)/1.0E+04)**0.80)
+!       WRITE(*,1111)'CORGN',L,CORGN(L,NY,NX),CORGC(L,NY,NX)
       ENDIF
       IF(CORGP(L,NY,NX).LT.0.0)THEN
-      CORGP(L,NY,NX)=AMIN1(0.0125*CORGC(L,NY,NX) &
-      ,1.2E+02*(CORGC(L,NY,NX)/1.0E+04)**0.52)
-!     WRITE(*,1111)'CORGP',L,CORGP(L,NY,NX),CORGC(L,NY,NX)
+        CORGP(L,NY,NX)=AMIN1(0.0125*CORGC(L,NY,NX) &
+          ,1.2E+02*(CORGC(L,NY,NX)/1.0E+04)**0.52)
+!       WRITE(*,1111)'CORGP',L,CORGP(L,NY,NX),CORGC(L,NY,NX)
       ENDIF
       IF(CEC(L,NY,NX).LT.0.0)THEN
-      CEC(L,NY,NX)=10.0*(200.0*2.0*CORGC(L,NY,NX)/1.0E+06 &
-      +80.0*CCLAY(L,NY,NX)+20.0*CSILT(L,NY,NX) &
-      +5.0*CSAND(L,NY,NX))
+        CEC(L,NY,NX)=10.0*(200.0*2.0*CORGC(L,NY,NX)/1.0E+06 &
+          +80.0*CCLAY(L,NY,NX)+20.0*CSILT(L,NY,NX) &
+          +5.0*CSAND(L,NY,NX))
       ENDIF
-28    CONTINUE
-      CORGC(0,NY,NX)=0.55E+06
-      FMPR(0,NY,NX)=1.0
+28  CONTINUE
+    CORGC(0,NY,NX)=0.55E+06
+    FMPR(0,NY,NX)=1.0
 9990  CONTINUE
 9995  CONTINUE
-      CLOSE(9)
-      GO TO 50
-20    CONTINUE
-      CLOSE(7)
-      DO 9975 NX=NHW,NHE
+    CLOSE(9)
+    GO TO 50
+20  CONTINUE
+    CLOSE(7)
+    DO 9975 NX=NHW,NHE
       NL(NVS+1,NX)=NL(NVS,NX)
 !     WRITE(*,2223)'NHE',NX,NHW,NHE,NVS,NL(NVS,NX)
 9975  CONTINUE
-      DO 9970 NY=NVN,NVS
+    DO 9970 NY=NVN,NVS
       NL(NY,NHE+1)=NL(NY,NHE)
 !     WRITE(*,2223)'NVS',NY,NVN,NVS,NHE,NL(NY,NHE)
 2223  FORMAT(A8,6I4)
 9970  CONTINUE
-      NL(NVS+1,NHE+1)=NL(NVS,NHE)
-      IOLD=0
-      RETURN
+    NL(NVS+1,NHE+1)=NL(NVS,NHE)
+    IOLD=0
+    RETURN
 END SUBROUTINE readi
+
+end module readiMod

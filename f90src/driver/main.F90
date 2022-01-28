@@ -20,7 +20,7 @@ PROGRAM main
   integer :: NAX,NDX,NEX,NAY,NDY,NE,N,NTX,NT
   integer :: NHW,NVN,NHE,NVS
 
-  CHARACTER(len=80):: BUF
+  CHARACTER(len=640):: BUF
   character(len=80):: runfile
   character(len=36):: case_name
   character(len=36):: nmlfile

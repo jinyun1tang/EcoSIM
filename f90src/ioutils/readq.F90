@@ -5,6 +5,7 @@ SUBROUTINE readq(NA,ND,NT,NE,NAX,NDX,NTX,NEX,NF,NFX,NTZ,NTZX,NHW,NHE,NVN,NVS)
 !     AND MANAGEMENT FILES IDENTIFIED IN 'ROUTQ'
 !
   use data_kind_mod, only : r8 => SHR_KIND_R8
+  use fileUtil, only : open_safe
   implicit none
   integer, intent(in) :: NEX
   integer, intent(in) :: NA(1:NEX),ND(1:NEX)
@@ -19,7 +20,7 @@ SUBROUTINE readq(NA,ND,NT,NE,NAX,NDX,NTX,NEX,NF,NFX,NTZ,NTZX,NHW,NHE,NVN,NVS)
   include "blk9b.h"
   include "blk9c.h"
   include "blk17.h"
-
+  character(len=*), parameter :: mod_filename = __FILE__
   real(r8), PARAMETER :: TWILGT=0.06976
   integer :: IDX,IMO,IYR,IDY,ICUT,IDYE,IDYG,IDYS,JCUT,LPY,M
   integer :: NX,NY,NZ,NB,N,NN
@@ -42,13 +43,13 @@ SUBROUTINE readq(NA,ND,NT,NE,NAX,NDX,NTX,NEX,NF,NFX,NTZ,NTZX,NHW,NHE,NVN,NVS)
       IF(DATAP(NZ,NY,NX).NE.'NO')THEN
 !       WRITE(*,2233)'READQ',NX,NY,NZ,IETYP(NY,NX),DATAP(NZ,NY,NX)
 2233    FORMAT(A8,4I4,2A16)
-        OPEN(11,FILE=TRIM(PREFIX)//DATAP(NZ,NY,NX),STATUS='OLD')
+      call OPEN_safe(11,PREFIX,DATAP(NZ,NY,NX),'OLD',mod_filename,__LINE__)
         if(lverb)then
           write(*,*)'read parameters for pft ',NZ,' from ',DATAP(NZ,NY,NX)
         endif
       ENDIF
       IF(DATAM(NZ,NY,NX).NE.'NO')THEN
-        OPEN(12,FILE=TRIM(PREFIX)//DATAM(NZ,NY,NX),STATUS='OLD')
+      call OPEN_safe(12,PREFIX,DATAM(NZ,NY,NX),'OLD',mod_filename,__LINE__)
       ENDIF
 !
 !     READ INPUTS FOR EACH PLANT SPECIES

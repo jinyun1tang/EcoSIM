@@ -4,6 +4,7 @@ set(ECOSIM_UTIL_SOURCES
   abortutils.F90
   TestMod.F90
   clock.c
+  getfilename.c
   timings.F90
 )
 

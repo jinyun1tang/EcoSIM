@@ -24,8 +24,8 @@ SUBROUTINE soil(NA,ND,NT,NE,NAX,NDX,NTX,NEX,NHW,NHE,NVN,NVS)
       use VisualMod    , only : visual
       use WatsubMod    , only : watsub
       use WthrMod      , only : wthr
-      use :: timings
-
+      use readiMod     , only : readi
+      use timings      , only : init_timer, start_timer, end_timer,end_timer_loop
       implicit none
 
       integer, intent(in) :: NA(1:NEX),ND(1:NEX)

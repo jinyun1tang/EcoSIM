@@ -4,6 +4,8 @@
 !     THIS SUBROUTINE OPENS AND LABELS OUTPUT FILES FOR SOIL DATA
 !
       use data_kind_mod, only : r8 => SHR_KIND_R8
+  use fileUtil, only : open_safe
+
       implicit none
       integer, intent(in) :: NT,NE,NAX,NDX,NTX,NEX
       integer, intent(in) :: NF,NFX,NHW,NHE,NVN,NVS
@@ -14,6 +16,7 @@
       include "blkc.h"
       include "blk17.h"
 
+  character(len=*), parameter :: mod_filename = __FILE__
       CHARACTER(len=8) :: CDOY,DATE,HOUR
       CHARACTER(len=1) :: CHARM,CHARN,CHARZ,CHARO
       CHARACTER(len=2) :: CHARX,CHARY
@@ -21,7 +24,10 @@
       CHARACTER(len=16):: HEAD(50)
       integer :: IDY1,IDY2,IDY,LPY,LUN,L,M,NX,NY,N,k
       real(r8):: dy
-!     execution begins here
+
+
+!     begin_execution
+
 
       CDOY='DOY     '
       DATE='DATE    '
@@ -39,7 +45,7 @@
 !
       DO 1010 N=21,30
       IF(DATAC(N,NE,NEX).NE.'NO')THEN
-      OPEN(15,FILE=TRIM(PREFIX)//DATAC(N,NE,NEX),STATUS='OLD')
+        call OPEN_safe(15,PREFIX,DATAC(N,NE,NEX),'OLD',mod_filename,__LINE__)
       WRITE(CHARR,'(I4)')IYRC
       OUTS(N-20)=CHARO//CHARR//DATAC(N,NE,NEX)
       DO 9995 NX=NHW,NHE

@@ -5,6 +5,8 @@
 !     FILE NAMES FOR PLANT SPECIES AND MANAGEMENT
 !
       use data_kind_mod, only : r8 => SHR_KIND_R8
+  use fileUtil, only : open_safe
+
       implicit none
       integer, intent(in) :: NT,NE,NAX,NDX,NTX,NEX,NHW,NHE,NVN,NVS
       include "parameters.h"
@@ -13,14 +15,17 @@
       include "blkc.h"
       include "blk9c.h"
 
+  character(len=*), parameter :: mod_filename = __FILE__
       integer :: NPP(JY,JX)
-
       CHARACTER(len=16) :: DATAA(JP,JY,JX),DATAB(JP,JY,JX)
       CHARACTER(len=16) :: OUTX,OUTC,OUTM,OUTR,OUTQ
       CHARACTER(len=4) :: CHARY
       CHARACTER(len=2) :: CLIMATE
       integer :: IDATE,IYR,NX,NY,NZ,NN,NH1,NH2,NV1,NV2,NS
-!     execution begins here
+
+
+!     begin_execution
+
 !
 !     OPEN CHECKPOINT FILES FOR PLANT VARIABLES
 !
@@ -56,7 +61,7 @@
 !
       IF(DATAC(10,NE,NEX).NE.'NO')THEN
       NN=0
-      OPEN(14,FILE=TRIM(PREFIX)//DATAC(10,NE,NEX),STATUS='OLD')
+      call OPEN_safe(14,PREFIX,DATAC(10,NE,NEX),'OLD',mod_filename,__LINE__)
 50    READ(14,*,END=1000)NH1,NV1,NH2,NV2,NS
 !     NN=NN+1
       NN=1

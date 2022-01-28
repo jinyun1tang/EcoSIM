@@ -6,7 +6,7 @@ set(IOUTILS_SOURCES
 	outph.F90
 	outsd.F90
 	outsh.F90
-	readi.F90
+	readiMod.F90
 	readq.F90
 	reads.F90
 	routp.F90
@@ -17,6 +17,7 @@ set(IOUTILS_SOURCES
 	woutp.F90
 	woutq.F90
 	wouts.F90
+  fileUtil.F90
 	splitp.c
 	splits.c
 	)

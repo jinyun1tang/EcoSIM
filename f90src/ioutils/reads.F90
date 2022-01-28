@@ -4,6 +4,9 @@ SUBROUTINE reads(NA,ND,NT,NE,NAX,NDX,NTX,NEX,NF,NFX,NTZ &
 !     THIS SUBROUTINE READS ALL SOIL AND PLANT MANAGEMENT INPUT FILES
 !
   use data_kind_mod, only : r8 => SHR_KIND_R8
+  use abortutils, only : endrun
+  use fileUtil, only : open_safe
+
   implicit none
   integer, intent(in) :: NEX
   integer, intent(in) :: NA(1:NEX),ND(1:NEX)
@@ -47,17 +50,21 @@ SUBROUTINE reads(NA,ND,NT,NE,NAX,NDX,NTX,NEX,NF,NFX,NTZ &
   real(r8) :: RSC2,RSN2,RSP2,ROWX,RRH,RR,WDPTHI,Z0G,ZNOONG,Z4A
   real(r8) :: Z3A,ZUA,ZOA,Z4B,Z3B,ZUB,ZOB
 
-!     execution begins here
+
+!     begin_execution
+
 !
 !     OPEN WEATHER(3, OPTIONS(4, AND LAND MANAGEMENT(9, FILES FROM
 !     FILE NAMES IN DATA ARRAYS LOADED IN MAIN.F
 !
 !     PREFIX=path for files in current or higher level directory
 !
-  OPEN(3,FILE=TRIM(PREFIX)//DATAC(3,NE,NEX),STATUS='OLD')
-  OPEN(4,FILE=TRIM(PREFIX)//DATAC(4,NE,NEX),STATUS='OLD')
+  call OPEN_safe(3,PREFIX,DATAC(3,NE,NEX),'OLD',mod_filename,__LINE__)
+  call OPEN_safe(4,PREFIX,DATAC(4,NE,NEX),'OLD',mod_filename,__LINE__)
+
   IF(DATAC(9,NE,NEX).NE.'NO')THEN
-  OPEN(13,FILE=TRIM(PREFIX)//DATAC(9,NE,NEX),STATUS='OLD')
+  call OPEN_safe(13,PREFIX,DATAC(9,NE,NEX),'OLD',mod_filename,__LINE__)
+
   ENDIF
 !
 !     ARTIFICIAL SOIL WARMING
@@ -510,13 +517,13 @@ SUBROUTINE reads(NA,ND,NT,NE,NAX,NDX,NTX,NEX,NF,NFX,NTZ &
 150   READ(13,*,END=200)NH1,NV1,NH2,NV2
       READ(13,*)DATA(8),DATA(5),DATA(6)
       IF(DATA(8).NE.'NO')THEN
-      OPEN(10,FILE=TRIM(PREFIX)//DATA(8),STATUS='OLD')
+       call OPEN_safe(10,PREFIX,DATA(8),'OLD',mod_filename,__LINE__)
       ENDIF
       IF(DATA(5).NE.'NO')THEN
-      OPEN(8,FILE=TRIM(PREFIX)//DATA(5),STATUS='OLD')
+        call OPEN_safe(8,PREFIX,DATA(5),'OLD',mod_filename,__LINE__)
       ENDIF
       IF(DATA(6).NE.'NO')THEN
-      OPEN(2,FILE=TRIM(PREFIX)//DATA(6),STATUS='OLD')
+        call OPEN_safe(2,PREFIX,DATA(6),'OLD',mod_filename,__LINE__)
       ENDIF
 !
 !     READ TILLAGE INPUT FILE
