@@ -6,6 +6,7 @@ set(ECOSIM_UTIL_SOURCES
   clock.c
   getfilename.c
   timings.F90
+  fileUtil.F90
 )
 
 

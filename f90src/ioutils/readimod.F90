@@ -295,6 +295,7 @@ module readiMod
       NU(NY,NX)=NUI(NY,NX)
       NK(NY,NX)=NJ(NY,NX)+1
       NM(NY,NX)=NJ(NY,NX)+NL1
+      NL2=min0(JZ-NM(NY,NX),NL2)
       NLI(NY,NX)=NM(NY,NX)+NL2
       NL(NY,NX)=NLI(NY,NX)
       if(lverb)then
