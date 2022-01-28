@@ -43,3 +43,7 @@
 *.exe
 *.out
 *.app
+# folders will be exluced
+IA100/
+IA100_inputs/
+build/
