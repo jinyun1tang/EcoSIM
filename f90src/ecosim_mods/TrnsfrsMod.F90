@@ -1,7 +1,10 @@
-
-      module TrnsfrsMod
-      use data_kind_mod, only : r8 => SHR_KIND_R8
-      implicit none
+module TrnsfrsMod
+!!
+! Description:
+!
+  use data_kind_mod, only : r8 => SHR_KIND_R8
+  use minimathmod, only : test_aeqb
+  implicit none
 
       private
       include "parameters.h"
@@ -8363,7 +8366,7 @@
 !          :*1=non-band,*B=band
 !
       IF(L.EQ.NUM(M2,M1).AND.N.NE.3)THEN
-      IF(IRCHG(NN,N,N2,N1).EQ.0.OR.RCHQF.EQ.0.0 &
+      IF(IRCHG(NN,N,N2,N1).EQ.0.OR.test_aeqb(RCHQF,0.0_r8) &
       .OR.QRM(M,N2,N1).LE.ZEROS(N2,N1))THEN
       call ZeroSoluteFluxFromRecharge(N,NN,M5,M4)
       ELSE
@@ -8847,10 +8850,10 @@
 !     WRITE(*,444)'ZAL2',I,J,M,NX,NY,L,ZAL2(L,NY,NX)
 !    2,TALFLS(L,NY,NX),RALFXS(L,NY,NX),RALFLZ(L,NY,NX)
 !    3,RZAL2(L,NY,NX),TRAL(L,NY,NX)
-444   FORMAT(A8,6I4,20E12.4)
+!444   FORMAT(A8,6I4,20E12.4)
 !     ENDIF
       ENDIF
 9685  CONTINUE
       end subroutine UpdateSoluteInMicMacpores
 
-      end module TrnsfrsMod
+end module TrnsfrsMod

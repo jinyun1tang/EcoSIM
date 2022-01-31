@@ -1,36 +1,36 @@
+module ErosionMod
+  use data_kind_mod, only : r8 => SHR_KIND_R8
+  use minimathmod, only : test_aeqb
+  implicit none
 
-      module ErosionMod
-      use data_kind_mod, only : r8 => SHR_KIND_R8
-      implicit none
+  private
+  include "parameters.h"
+  include "blkc.h"
+  include "blk2a.h"
+  include "blk5.h"
+  include "blk8a.h"
+  include "blk8b.h"
+  include "blk10.h"
+  include "blk11a.h"
+  include "blk13a.h"
+  include "blk13b.h"
+  include "blk13c.h"
+  include "blk19a.h"
+  include "blk19b.h"
+  include "blk19c.h"
+  include "blk20f.h"
 
-      private
-      include "parameters.h"
-      include "blkc.h"
-      include "blk2a.h"
-      include "blk5.h"
-      include "blk8a.h"
-      include "blk8b.h"
-      include "blk10.h"
-      include "blk11a.h"
-      include "blk13a.h"
-      include "blk13b.h"
-      include "blk13c.h"
-      include "blk19a.h"
-      include "blk19b.h"
-      include "blk19c.h"
-      include "blk20f.h"
-
-      real(r8), PARAMETER :: FSINK=0.01
-      real(r8) ::  RERSED(2,2,JV,JH),TERSED(JY,JX),RDTSED(JY,JX) &
+  real(r8), PARAMETER :: FSINK=0.01_r8
+  real(r8) ::  RERSED(2,2,JV,JH),TERSED(JY,JX),RDTSED(JY,JX) &
       ,FVOLIM(JY,JX),FVOLWM(JY,JX),FERSNM(JY,JX),RERSED0(JY,JX)
-      real(r8) :: CSEDD,CSEDX,CSEDE,DETW,DETR,DEPI,DETI,FERM,FSEDER
-      real(r8) :: RCHQF,SEDX,STPR,XN
+  real(r8) :: CSEDD,CSEDX,CSEDE,DETW,DETR,DEPI,DETI,FERM,FSEDER
+  real(r8) :: RCHQF,SEDX,STPR,XN
 
-      integer :: K,M,M1,M2,M4,M5,NX,NY,N1,N2,N,NN,N4,N5,N4B,N5B
-      integer :: NO
+  integer :: K,M,M1,M2,M4,M5,NX,NY,N1,N2,N,NN,N4,N5,N4B,N5B
+  integer :: NO
 
-      public :: erosion
-      contains
+  public :: erosion
+  contains
 
       SUBROUTINE erosion(I,J,NHW,NHE,NVN,NVS)
 !
@@ -74,8 +74,8 @@
       DO 9895 NX=NHW,NHE
       DO 9890 NY=NVN,NVS
       IF(IERSNG.EQ.1.OR.IERSNG.EQ.3)THEN
-      TERSED(NY,NX)=0.0
-      RDTSED(NY,NX)=0.0
+      TERSED(NY,NX)=0._r8
+      RDTSED(NY,NX)=0._r8
       FVOLIM(NY,NX)=AMIN1(1.0,AMAX1(0.0,XVOLIM(M,NY,NX)/VOLWG(NY,NX)))
       FVOLWM(NY,NX)=AMIN1(1.0,AMAX1(0.0,XVOLWM(M,NY,NX)/VOLWG(NY,NX)))
       FERSNM(NY,NX)=(1.0-FVOLIM(NY,NX))*FVOLWM(NY,NX)
@@ -100,7 +100,7 @@
 !    2,PRECA(NY,NX)*1000.0,PRECD(NY,NX),PRECB(NY,NX),DETS(NY,NX)
 !    3,FSNX(NY,NX),FVOLIM(NY,NX),XVOLWM(M,NY,NX),ENGYPM(M,NY,NX)
 !    4,DETW,VOLWM(M,NU(NY,NX),NY,NX),VOLA(NU(NY,NX),NY,NX)
-1117  FORMAT(A8,5I4,20E12.4)
+!1117  FORMAT(A8,5I4,20E12.4)
       ENDIF
 !
 !     DEPOSITION OF SEDIMENT TO SOIL SURFACE FROM IMMOBILE SURFACE WATER
@@ -144,7 +144,7 @@
       ,VLS(NY,NX)*(CSEDX-CSEDD)*AREA(3,NU(NY,NX),NY,NX) &
       *FERSNM(NY,NX)*FMPR(NU(NY,NX),NY,NX)*XNPH)
       ELSE
-      DETI=0.0
+      DETI=0._r8
       ENDIF
       ENDIF
       RDTSED(NY,NX)=RDTSED(NY,NX)+DETI
@@ -152,7 +152,7 @@
 !    2,QRM(M,NY,NX),QRV(M,NY,NX),SEDX,XVOLWM(M,NY,NX),XVOLTM(M,NY,NX)
 !    4,VOLWG(NY,NX),STPR,CSEDX,CSEDD,VLS(NY,NX)
 !    5,DETE(NY,NX),SLOPE(0,NY,NX),ZM(NY,NX),FERSNM(NY,NX)
-1112  FORMAT(A8,5I4,30E12.4)
+!1112  FORMAT(A8,5I4,30E12.4)
       ENDIF
 !
 !     TRANSPORT OF SEDIMENT IN OVERLAND FLOW FROM SEDIMENT
@@ -163,21 +163,21 @@
 !     SEDX=SED(N2,N1)
       IF(QRM(M,N2,N1).LE.0.0 &
       .OR.BKDS(NU(N2,N1),N2,N1).LE.ZERO)THEN
-      RERSED0(N2,N1)=0.0
+      RERSED0(N2,N1)=0._r8
       ELSE
       IF(XVOLWM(M,N2,N1).GT.ZEROS2(N2,N1))THEN
       SEDX=SED(N2,N1)+RDTSED(N2,N1)
       CSEDE=AMAX1(0.0,SEDX/XVOLWM(M,N2,N1))
       RERSED0(N2,N1)=AMIN1(SEDX,CSEDE*QRM(M,N2,N1)*(1.0-FVOLIM(N2,N1)))
       ELSE
-      RERSED0(N2,N1)=0.0
+      RERSED0(N2,N1)=0._r8
       ENDIF
       ENDIF
 !     IF(RERSED0(N2,N1).GT.ZEROS(N2,N1))THEN
 !     WRITE(*,1121)'RERSED0',I,J,M,N1,N2
 !    2,RERSED0(N2,N1),QRM(M,N2,N1),XVOLWM(M,N2,N1)
 !    3,SED(N2,N1),RDTSED(N2,N1),CSEDE,FVOLIM(N2,N1)
-1121  FORMAT(A8,5I4,12E12.4)
+!1121  FORMAT(A8,5I4,12E12.4)
 !     ENDIF
 !
 !     LOCATE INTERNAL BOUNDARIES
@@ -215,10 +215,10 @@
 !     WRITE(*,1113)'INTF',I,J,M,N1,N2,N4,N5,N
 !    2,RERSED0(N2,N1),RERSED(N,2,N5,N4),XSEDER(N,2,N5,N4)
 !    3,SED(N2,N1),XVOLWM(M,N2,N1)
-1113  FORMAT(A8,8I4,30E12.4)
+!1113  FORMAT(A8,8I4,30E12.4)
 !     ENDIF
       ELSE
-      RERSED(N,2,N5,N4)=0.0
+      RERSED(N,2,N5,N4)=0._r8
       ENDIF
       IF(NN.EQ.2)THEN
       IF(N4B.GT.0.AND.N5B.GT.0)THEN
@@ -231,13 +231,13 @@
 !    3,SED(N2,N1),XVOLWM(M,N2,N1)
 !     ENDIF
       ELSE
-      RERSED(N,1,N5B,N4B)=0.0
+      RERSED(N,1,N5B,N4B)=0._r8
       ENDIF
       ENDIF
       ELSE
-      RERSED(N,2,N5,N4)=0.0
+      RERSED(N,2,N5,N4)=0._r8
       IF(N4B.GT.0.AND.N5B.GT.0)THEN
-      RERSED(N,1,N5B,N4B)=0.0
+      RERSED(N,1,N5B,N4B)=0._r8
       ENDIF
       ENDIF
 4305  CONTINUE
@@ -266,14 +266,14 @@
       N2=NY
       IF(QRM(M,N2,N1).LE.0.0 &
       .OR.BKDS(NU(N2,N1),N2,N1).LE.ZERO)THEN
-      RERSED0(N2,N1)=0.0
+      RERSED0(N2,N1)=0._r8
       ELSE
       IF(XVOLWM(M,N2,N1).GT.ZEROS2(N2,N1))THEN
       SEDX=SED(NY,NX)+RDTSED(NY,NX)
       CSEDE=AMAX1(0.0,SEDX/XVOLWM(M,N2,N1))
       RERSED0(N2,N1)=AMIN1(SEDX,CSEDE*QRM(M,N2,N1))
       ELSE
-      RERSED0(N2,N1)=0.0
+      RERSED0(N2,N1)=0._r8
       ENDIF
       ENDIF
 !
@@ -343,9 +343,9 @@
 !     IN 'WATSUB' TIMES BOUNDARY SEDIMENT CONCENTRATION IN
 !     SURFACE WATER
 !
-      IF(IRCHG(NN,N,N2,N1).EQ.0.OR.RCHQF.EQ.0.0 &
+      IF(IRCHG(NN,N,N2,N1).EQ.0.OR.test_aeqb(RCHQF,0._r8) &
       .OR.RERSED0(N2,N1).LE.ZEROS(N2,N1))THEN
-      RERSED(N,NN,M5,M4)=0.0
+      RERSED(N,NN,M5,M4)=0._r8
       ELSE
       IF(QRM(M,N2,N1).GT.ZEROS(N2,N1))THEN
       IF((NN.EQ.1.AND.QRMN(M,N,NN,M5,M4).GT.ZEROS(N2,N1)) &
@@ -355,9 +355,9 @@
       XSEDER(N,NN,M5,M4)=XSEDER(N,NN,M5,M4)+RERSED(N,NN,M5,M4)
       ELSEIF((NN.EQ.2.AND.QRMN(M,N,NN,M5,M4).GT.ZEROS(N2,N1)) &
       .OR.(NN.EQ.1.AND.QRMN(M,N,NN,M5,M4).LT.ZEROS(N2,N1)))THEN
-      RERSED(N,NN,M5,M4)=0.0
+      RERSED(N,NN,M5,M4)=0._r8
       ELSE
-      RERSED(N,NN,M5,M4)=0.0
+      RERSED(N,NN,M5,M4)=0._r8
       ENDIF
       ENDIF
       ENDIF
@@ -365,7 +365,7 @@
 !     WRITE(*,1114)'BNDY',I,J,M,N1,N2,M4,M5,N,NN,IRCHG(NN,N,N2,N1)
 !    2,RCHQF,RERSED0(N2,N1),RERSED(N,NN,M5,M4),XSEDER(N,NN,M5,M4)
 !    3,SED(M2,M1),QRM(M,N2,N1),QRMN(M,N,NN,M5,M4),XVOLWM(M,M2,M1)
-1114  FORMAT(A8,10I4,30E12.4)
+!1114  FORMAT(A8,10I4,30E12.4)
 !     ENDIF
 9575  CONTINUE
 !
@@ -393,7 +393,7 @@
       SED(NY,NX)=SED(NY,NX)+TERSED(NY,NX)+RDTSED(NY,NX)
 !     WRITE(*,1118)'SED2',I,J,M,NX,NY,SED(NY,NX)
 !    2,TERSED(NY,NX),RDTSED(NY,NX)
-1118  FORMAT(A8,5I4,12E12.4)
+!1118  FORMAT(A8,5I4,12E12.4)
       ENDIF
 9690  CONTINUE
 9695  CONTINUE
@@ -527,11 +527,13 @@
 !     ORGANIC MATTER
 !
       DO 9480 K=0,5
-      DO 9480 NO=1,7
-      DO 9480 M=1,3
+      DO NO=1,7
+      DO M=1,3
       OMCER(M,NO,K,N,2,N5,N4)=FSEDER*OMC(M,NO,K,NU(N2,N1),N2,N1)
       OMNER(M,NO,K,N,2,N5,N4)=FSEDER*OMN(M,NO,K,NU(N2,N1),N2,N1)
       OMPER(M,NO,K,N,2,N5,N4)=FSEDER*OMP(M,NO,K,NU(N2,N1),N2,N1)
+      ENDDO
+      ENDDO
 9480  CONTINUE
       DO 9475 K=0,4
       DO 9470 M=1,2
@@ -551,89 +553,91 @@
 9465  CONTINUE
 9475  CONTINUE
       ELSE
-      XSANER(N,2,N5,N4)=0.0
-      XSILER(N,2,N5,N4)=0.0
-      XCLAER(N,2,N5,N4)=0.0
-      XCECER(N,2,N5,N4)=0.0
-      XAECER(N,2,N5,N4)=0.0
+      XSANER(N,2,N5,N4)=0._r8
+      XSILER(N,2,N5,N4)=0._r8
+      XCLAER(N,2,N5,N4)=0._r8
+      XCECER(N,2,N5,N4)=0._r8
+      XAECER(N,2,N5,N4)=0._r8
 !
 !     FERTILIZER POOLS
 !
-      XNH4ER(N,2,N5,N4)=0.0
-      XNH3ER(N,2,N5,N4)=0.0
-      XNHUER(N,2,N5,N4)=0.0
-      XNO3ER(N,2,N5,N4)=0.0
-      XNH4EB(N,2,N5,N4)=0.0
-      XNH3EB(N,2,N5,N4)=0.0
-      XNHUEB(N,2,N5,N4)=0.0
-      XNO3EB(N,2,N5,N4)=0.0
+      XNH4ER(N,2,N5,N4)=0._r8
+      XNH3ER(N,2,N5,N4)=0._r8
+      XNHUER(N,2,N5,N4)=0._r8
+      XNO3ER(N,2,N5,N4)=0._r8
+      XNH4EB(N,2,N5,N4)=0._r8
+      XNH3EB(N,2,N5,N4)=0._r8
+      XNHUEB(N,2,N5,N4)=0._r8
+      XNO3EB(N,2,N5,N4)=0._r8
 !
 !     EXCHANGEABLE CATIONS AND ANIONS
 !
-      XN4ER(N,2,N5,N4)=0.0
-      XNBER(N,2,N5,N4)=0.0
-      XHYER(N,2,N5,N4)=0.0
-      XALER(N,2,N5,N4)=0.0
-      XFEER(N,2,N5,N4)=0.0
-      XCAER(N,2,N5,N4)=0.0
-      XMGER(N,2,N5,N4)=0.0
-      XNAER(N,2,N5,N4)=0.0
-      XKAER(N,2,N5,N4)=0.0
-      XHCER(N,2,N5,N4)=0.0
-      XAL2ER(N,2,N5,N4)=0.0
-      XFE2ER(N,2,N5,N4)=0.0
-      XOH0ER(N,2,N5,N4)=0.0
-      XOH1ER(N,2,N5,N4)=0.0
-      XOH2ER(N,2,N5,N4)=0.0
-      XH1PER(N,2,N5,N4)=0.0
-      XH2PER(N,2,N5,N4)=0.0
-      XOH0EB(N,2,N5,N4)=0.0
-      XOH1EB(N,2,N5,N4)=0.0
-      XOH2EB(N,2,N5,N4)=0.0
-      XH1PEB(N,2,N5,N4)=0.0
-      XH2PEB(N,2,N5,N4)=0.0
+      XN4ER(N,2,N5,N4)=0._r8
+      XNBER(N,2,N5,N4)=0._r8
+      XHYER(N,2,N5,N4)=0._r8
+      XALER(N,2,N5,N4)=0._r8
+      XFEER(N,2,N5,N4)=0._r8
+      XCAER(N,2,N5,N4)=0._r8
+      XMGER(N,2,N5,N4)=0._r8
+      XNAER(N,2,N5,N4)=0._r8
+      XKAER(N,2,N5,N4)=0._r8
+      XHCER(N,2,N5,N4)=0._r8
+      XAL2ER(N,2,N5,N4)=0._r8
+      XFE2ER(N,2,N5,N4)=0._r8
+      XOH0ER(N,2,N5,N4)=0._r8
+      XOH1ER(N,2,N5,N4)=0._r8
+      XOH2ER(N,2,N5,N4)=0._r8
+      XH1PER(N,2,N5,N4)=0._r8
+      XH2PER(N,2,N5,N4)=0._r8
+      XOH0EB(N,2,N5,N4)=0._r8
+      XOH1EB(N,2,N5,N4)=0._r8
+      XOH2EB(N,2,N5,N4)=0._r8
+      XH1PEB(N,2,N5,N4)=0._r8
+      XH2PEB(N,2,N5,N4)=0._r8
 !
 !     PRECIPITATES
 !
-      PALOER(N,2,N5,N4)=0.0
-      PFEOER(N,2,N5,N4)=0.0
-      PCACER(N,2,N5,N4)=0.0
-      PCASER(N,2,N5,N4)=0.0
-      PALPER(N,2,N5,N4)=0.0
-      PFEPER(N,2,N5,N4)=0.0
-      PCPDER(N,2,N5,N4)=0.0
-      PCPHER(N,2,N5,N4)=0.0
-      PCPMER(N,2,N5,N4)=0.0
-      PALPEB(N,2,N5,N4)=0.0
-      PFEPEB(N,2,N5,N4)=0.0
-      PCPDEB(N,2,N5,N4)=0.0
-      PCPHEB(N,2,N5,N4)=0.0
-      PCPMEB(N,2,N5,N4)=0.0
+      PALOER(N,2,N5,N4)=0._r8
+      PFEOER(N,2,N5,N4)=0._r8
+      PCACER(N,2,N5,N4)=0._r8
+      PCASER(N,2,N5,N4)=0._r8
+      PALPER(N,2,N5,N4)=0._r8
+      PFEPER(N,2,N5,N4)=0._r8
+      PCPDER(N,2,N5,N4)=0._r8
+      PCPHER(N,2,N5,N4)=0._r8
+      PCPMER(N,2,N5,N4)=0._r8
+      PALPEB(N,2,N5,N4)=0._r8
+      PFEPEB(N,2,N5,N4)=0._r8
+      PCPDEB(N,2,N5,N4)=0._r8
+      PCPHEB(N,2,N5,N4)=0._r8
+      PCPMEB(N,2,N5,N4)=0._r8
 !
 !     ORGANIC MATTER
 !
       DO 8480 K=0,5
-      DO 8480 NO=1,7
-      DO 8480 M=1,3
-      OMCER(M,NO,K,N,2,N5,N4)=0.0
-      OMNER(M,NO,K,N,2,N5,N4)=0.0
-      OMPER(M,NO,K,N,2,N5,N4)=0.0
+      DO  NO=1,7
+      DO  M=1,3
+      OMCER(M,NO,K,N,2,N5,N4)=0._r8
+      OMNER(M,NO,K,N,2,N5,N4)=0._r8
+      OMPER(M,NO,K,N,2,N5,N4)=0._r8
+      enddo
+      enddo
 8480  CONTINUE
       DO 8475 K=0,4
       DO 8470 M=1,2
-      ORCER(M,K,N,2,N5,N4)=0.0
-      ORNER(M,K,N,2,N5,N4)=0.0
-      ORPER(M,K,N,2,N5,N4)=0.0
+      ORCER(M,K,N,2,N5,N4)=0._r8
+      ORNER(M,K,N,2,N5,N4)=0._r8
+      ORPER(M,K,N,2,N5,N4)=0._r8
 8470  CONTINUE
-      OHCER(K,N,2,N5,N4)=0.0
-      OHNER(K,N,2,N5,N4)=0.0
-      OHPER(K,N,2,N5,N4)=0.0
-      OHAER(K,N,2,N5,N4)=0.0
+      OHCER(K,N,2,N5,N4)=0._r8
+      OHNER(K,N,2,N5,N4)=0._r8
+      OHPER(K,N,2,N5,N4)=0._r8
+      OHAER(K,N,2,N5,N4)=0._r8
       DO 8465 M=1,4
-      OSCER(M,K,N,2,N5,N4)=0.0
-      OSAER(M,K,N,2,N5,N4)=0.0
-      OSNER(M,K,N,2,N5,N4)=0.0
-      OSPER(M,K,N,2,N5,N4)=0.0
+      OSCER(M,K,N,2,N5,N4)=0._r8
+      OSAER(M,K,N,2,N5,N4)=0._r8
+      OSNER(M,K,N,2,N5,N4)=0._r8
+      OSPER(M,K,N,2,N5,N4)=0._r8
 8465  CONTINUE
 8475  CONTINUE
       ENDIF
@@ -723,11 +727,13 @@
 !     ORGANIC MATTER
 !
       DO 7480 K=0,5
-      DO 7480 NO=1,7
-      DO 7480 M=1,3
+      DO  NO=1,7
+      DO  M=1,3
       OMCER(M,NO,K,N,1,N5B,N4B)=FSEDER*OMC(M,NO,K,NU(N2,N1),N2,N1)
       OMNER(M,NO,K,N,1,N5B,N4B)=FSEDER*OMN(M,NO,K,NU(N2,N1),N2,N1)
       OMPER(M,NO,K,N,1,N5B,N4B)=FSEDER*OMP(M,NO,K,NU(N2,N1),N2,N1)
+      enddo
+      enddo
 7480  CONTINUE
       DO 7475 K=0,4
       DO 7470 M=1,2
@@ -747,89 +753,91 @@
 7465  CONTINUE
 7475  CONTINUE
       ELSE
-      XSANER(N,1,N5B,N4B)=0.0
-      XSILER(N,1,N5B,N4B)=0.0
-      XCLAER(N,1,N5B,N4B)=0.0
-      XCECER(N,1,N5B,N4B)=0.0
-      XAECER(N,1,N5B,N4B)=0.0
+      XSANER(N,1,N5B,N4B)=0._r8
+      XSILER(N,1,N5B,N4B)=0._r8
+      XCLAER(N,1,N5B,N4B)=0._r8
+      XCECER(N,1,N5B,N4B)=0._r8
+      XAECER(N,1,N5B,N4B)=0._r8
 !
 !     FERTILIZER POOLS
 !
-      XNH4ER(N,1,N5B,N4B)=0.0
-      XNH3ER(N,1,N5B,N4B)=0.0
-      XNHUER(N,1,N5B,N4B)=0.0
-      XNO3ER(N,1,N5B,N4B)=0.0
-      XNH4EB(N,1,N5B,N4B)=0.0
-      XNH3EB(N,1,N5B,N4B)=0.0
-      XNHUEB(N,1,N5B,N4B)=0.0
-      XNO3EB(N,1,N5B,N4B)=0.0
+      XNH4ER(N,1,N5B,N4B)=0._r8
+      XNH3ER(N,1,N5B,N4B)=0._r8
+      XNHUER(N,1,N5B,N4B)=0._r8
+      XNO3ER(N,1,N5B,N4B)=0._r8
+      XNH4EB(N,1,N5B,N4B)=0._r8
+      XNH3EB(N,1,N5B,N4B)=0._r8
+      XNHUEB(N,1,N5B,N4B)=0._r8
+      XNO3EB(N,1,N5B,N4B)=0._r8
 !
 !     EXCHANGEABLE CATIONS AND ANIONS
 !
-      XN4ER(N,1,N5B,N4B)=0.0
-      XNBER(N,1,N5B,N4B)=0.0
-      XHYER(N,1,N5B,N4B)=0.0
-      XALER(N,1,N5B,N4B)=0.0
-      XFEER(N,1,N5B,N4B)=0.0
-      XCAER(N,1,N5B,N4B)=0.0
-      XMGER(N,1,N5B,N4B)=0.0
-      XNAER(N,1,N5B,N4B)=0.0
-      XKAER(N,1,N5B,N4B)=0.0
-      XHCER(N,1,N5B,N4B)=0.0
-      XAL2ER(N,1,N5B,N4B)=0.0
-      XFE2ER(N,1,N5B,N4B)=0.0
-      XOH0ER(N,1,N5B,N4B)=0.0
-      XOH1ER(N,1,N5B,N4B)=0.0
-      XOH2ER(N,1,N5B,N4B)=0.0
-      XH1PER(N,1,N5B,N4B)=0.0
-      XH2PER(N,1,N5B,N4B)=0.0
-      XOH0EB(N,1,N5B,N4B)=0.0
-      XOH1EB(N,1,N5B,N4B)=0.0
-      XOH2EB(N,1,N5B,N4B)=0.0
-      XH1PEB(N,1,N5B,N4B)=0.0
-      XH2PEB(N,1,N5B,N4B)=0.0
+      XN4ER(N,1,N5B,N4B)=0._r8
+      XNBER(N,1,N5B,N4B)=0._r8
+      XHYER(N,1,N5B,N4B)=0._r8
+      XALER(N,1,N5B,N4B)=0._r8
+      XFEER(N,1,N5B,N4B)=0._r8
+      XCAER(N,1,N5B,N4B)=0._r8
+      XMGER(N,1,N5B,N4B)=0._r8
+      XNAER(N,1,N5B,N4B)=0._r8
+      XKAER(N,1,N5B,N4B)=0._r8
+      XHCER(N,1,N5B,N4B)=0._r8
+      XAL2ER(N,1,N5B,N4B)=0._r8
+      XFE2ER(N,1,N5B,N4B)=0._r8
+      XOH0ER(N,1,N5B,N4B)=0._r8
+      XOH1ER(N,1,N5B,N4B)=0._r8
+      XOH2ER(N,1,N5B,N4B)=0._r8
+      XH1PER(N,1,N5B,N4B)=0._r8
+      XH2PER(N,1,N5B,N4B)=0._r8
+      XOH0EB(N,1,N5B,N4B)=0._r8
+      XOH1EB(N,1,N5B,N4B)=0._r8
+      XOH2EB(N,1,N5B,N4B)=0._r8
+      XH1PEB(N,1,N5B,N4B)=0._r8
+      XH2PEB(N,1,N5B,N4B)=0._r8
 !
 !     PRECIPITATES
 !
-      PALOER(N,1,N5B,N4B)=0.0
-      PFEOER(N,1,N5B,N4B)=0.0
-      PCACER(N,1,N5B,N4B)=0.0
-      PCASER(N,1,N5B,N4B)=0.0
-      PALPER(N,1,N5B,N4B)=0.0
-      PFEPER(N,1,N5B,N4B)=0.0
-      PCPDER(N,1,N5B,N4B)=0.0
-      PCPHER(N,1,N5B,N4B)=0.0
-      PCPMER(N,1,N5B,N4B)=0.0
-      PALPEB(N,1,N5B,N4B)=0.0
-      PFEPEB(N,1,N5B,N4B)=0.0
-      PCPDEB(N,1,N5B,N4B)=0.0
-      PCPHEB(N,1,N5B,N4B)=0.0
-      PCPMEB(N,1,N5B,N4B)=0.0
+      PALOER(N,1,N5B,N4B)=0._r8
+      PFEOER(N,1,N5B,N4B)=0._r8
+      PCACER(N,1,N5B,N4B)=0._r8
+      PCASER(N,1,N5B,N4B)=0._r8
+      PALPER(N,1,N5B,N4B)=0._r8
+      PFEPER(N,1,N5B,N4B)=0._r8
+      PCPDER(N,1,N5B,N4B)=0._r8
+      PCPHER(N,1,N5B,N4B)=0._r8
+      PCPMER(N,1,N5B,N4B)=0._r8
+      PALPEB(N,1,N5B,N4B)=0._r8
+      PFEPEB(N,1,N5B,N4B)=0._r8
+      PCPDEB(N,1,N5B,N4B)=0._r8
+      PCPHEB(N,1,N5B,N4B)=0._r8
+      PCPMEB(N,1,N5B,N4B)=0._r8
 !
 !     ORGANIC MATTER
 !
       DO 6480 K=0,5
-      DO 6480 NO=1,7
-      DO 6480 M=1,3
-      OMCER(M,NO,K,N,1,N5B,N4B)=0.0
-      OMNER(M,NO,K,N,1,N5B,N4B)=0.0
-      OMPER(M,NO,K,N,1,N5B,N4B)=0.0
+      DO  NO=1,7
+      DO  M=1,3
+      OMCER(M,NO,K,N,1,N5B,N4B)=0._r8
+      OMNER(M,NO,K,N,1,N5B,N4B)=0._r8
+      OMPER(M,NO,K,N,1,N5B,N4B)=0._r8
+      enddo
+      enddo
 6480  CONTINUE
       DO 6475 K=0,4
       DO 6470 M=1,2
-      ORCER(M,K,N,1,N5B,N4B)=0.0
-      ORNER(M,K,N,1,N5B,N4B)=0.0
-      ORPER(M,K,N,1,N5B,N4B)=0.0
+      ORCER(M,K,N,1,N5B,N4B)=0._r8
+      ORNER(M,K,N,1,N5B,N4B)=0._r8
+      ORPER(M,K,N,1,N5B,N4B)=0._r8
 6470  CONTINUE
-      OHCER(K,N,1,N5B,N4B)=0.0
-      OHNER(K,N,1,N5B,N4B)=0.0
-      OHPER(K,N,1,N5B,N4B)=0.0
-      OHAER(K,N,1,N5B,N4B)=0.0
+      OHCER(K,N,1,N5B,N4B)=0._r8
+      OHNER(K,N,1,N5B,N4B)=0._r8
+      OHPER(K,N,1,N5B,N4B)=0._r8
+      OHAER(K,N,1,N5B,N4B)=0._r8
       DO 6465 M=1,4
-      OSCER(M,K,N,1,N5B,N4B)=0.0
-      OSAER(M,K,N,1,N5B,N4B)=0.0
-      OSNER(M,K,N,1,N5B,N4B)=0.0
-      OSPER(M,K,N,1,N5B,N4B)=0.0
+      OSCER(M,K,N,1,N5B,N4B)=0._r8
+      OSAER(M,K,N,1,N5B,N4B)=0._r8
+      OSNER(M,K,N,1,N5B,N4B)=0._r8
+      OSPER(M,K,N,1,N5B,N4B)=0._r8
 6465  CONTINUE
 6475  CONTINUE
       ENDIF
@@ -908,91 +916,93 @@
       ENDIF
       ENDIF
       ENDIF
-      IF(IRCHG(NN,N,N2,N1).EQ.0.OR.RCHQF.EQ.0.0 &
+      IF(IRCHG(NN,N,N2,N1).EQ.0.OR.test_aeqb(RCHQF,0._r8) &
       .OR.ABS(XSEDER(N,NN,M5,M4)).LE.ZEROS(N2,N1))THEN
-      XSANER(N,NN,M5,M4)=0.0
-      XSILER(N,NN,M5,M4)=0.0
-      XCLAER(N,NN,M5,M4)=0.0
-      XCECER(N,NN,M5,M4)=0.0
-      XAECER(N,NN,M5,M4)=0.0
+      XSANER(N,NN,M5,M4)=0._r8
+      XSILER(N,NN,M5,M4)=0._r8
+      XCLAER(N,NN,M5,M4)=0._r8
+      XCECER(N,NN,M5,M4)=0._r8
+      XAECER(N,NN,M5,M4)=0._r8
 !
 !     FERTILIZER POOLS
 !
-      XNH4ER(N,NN,M5,M4)=0.0
-      XNH3ER(N,NN,M5,M4)=0.0
-      XNHUER(N,NN,M5,M4)=0.0
-      XNO3ER(N,NN,M5,M4)=0.0
-      XNH4EB(N,NN,M5,M4)=0.0
-      XNH3EB(N,NN,M5,M4)=0.0
-      XNHUEB(N,NN,M5,M4)=0.0
-      XNO3EB(N,NN,M5,M4)=0.0
+      XNH4ER(N,NN,M5,M4)=0._r8
+      XNH3ER(N,NN,M5,M4)=0._r8
+      XNHUER(N,NN,M5,M4)=0._r8
+      XNO3ER(N,NN,M5,M4)=0._r8
+      XNH4EB(N,NN,M5,M4)=0._r8
+      XNH3EB(N,NN,M5,M4)=0._r8
+      XNHUEB(N,NN,M5,M4)=0._r8
+      XNO3EB(N,NN,M5,M4)=0._r8
 !
 !     EXCHANGEABLE CATIONS AND ANIONS
 !
-      XN4ER(N,NN,M5,M4)=0.0
-      XNBER(N,NN,M5,M4)=0.0
-      XHYER(N,NN,M5,M4)=0.0
-      XALER(N,NN,M5,M4)=0.0
-      XFEER(N,NN,M5,M4)=0.0
-      XCAER(N,NN,M5,M4)=0.0
-      XMGER(N,NN,M5,M4)=0.0
-      XNAER(N,NN,M5,M4)=0.0
-      XKAER(N,NN,M5,M4)=0.0
-      XHCER(N,NN,M5,M4)=0.0
-      XAL2ER(N,NN,M5,M4)=0.0
-      XFE2ER(N,NN,M5,M4)=0.0
-      XOH0ER(N,NN,M5,M4)=0.0
-      XOH1ER(N,NN,M5,M4)=0.0
-      XOH2ER(N,NN,M5,M4)=0.0
-      XH1PER(N,NN,M5,M4)=0.0
-      XH2PER(N,NN,M5,M4)=0.0
-      XOH0EB(N,NN,M5,M4)=0.0
-      XOH1EB(N,NN,M5,M4)=0.0
-      XOH2EB(N,NN,M5,M4)=0.0
-      XH1PEB(N,NN,M5,M4)=0.0
-      XH2PEB(N,NN,M5,M4)=0.0
+      XN4ER(N,NN,M5,M4)=0._r8
+      XNBER(N,NN,M5,M4)=0._r8
+      XHYER(N,NN,M5,M4)=0._r8
+      XALER(N,NN,M5,M4)=0._r8
+      XFEER(N,NN,M5,M4)=0._r8
+      XCAER(N,NN,M5,M4)=0._r8
+      XMGER(N,NN,M5,M4)=0._r8
+      XNAER(N,NN,M5,M4)=0._r8
+      XKAER(N,NN,M5,M4)=0._r8
+      XHCER(N,NN,M5,M4)=0._r8
+      XAL2ER(N,NN,M5,M4)=0._r8
+      XFE2ER(N,NN,M5,M4)=0._r8
+      XOH0ER(N,NN,M5,M4)=0._r8
+      XOH1ER(N,NN,M5,M4)=0._r8
+      XOH2ER(N,NN,M5,M4)=0._r8
+      XH1PER(N,NN,M5,M4)=0._r8
+      XH2PER(N,NN,M5,M4)=0._r8
+      XOH0EB(N,NN,M5,M4)=0._r8
+      XOH1EB(N,NN,M5,M4)=0._r8
+      XOH2EB(N,NN,M5,M4)=0._r8
+      XH1PEB(N,NN,M5,M4)=0._r8
+      XH2PEB(N,NN,M5,M4)=0._r8
 !
 !     PRECIPITATES
 !
-      PALOER(N,NN,M5,M4)=0.0
-      PFEOER(N,NN,M5,M4)=0.0
-      PCACER(N,NN,M5,M4)=0.0
-      PCASER(N,NN,M5,M4)=0.0
-      PALPER(N,NN,M5,M4)=0.0
-      PFEPER(N,NN,M5,M4)=0.0
-      PCPDER(N,NN,M5,M4)=0.0
-      PCPHER(N,NN,M5,M4)=0.0
-      PCPMER(N,NN,M5,M4)=0.0
-      PALPEB(N,NN,M5,M4)=0.0
-      PFEPEB(N,NN,M5,M4)=0.0
-      PCPDEB(N,NN,M5,M4)=0.0
-      PCPHEB(N,NN,M5,M4)=0.0
-      PCPMEB(N,NN,M5,M4)=0.0
+      PALOER(N,NN,M5,M4)=0._r8
+      PFEOER(N,NN,M5,M4)=0._r8
+      PCACER(N,NN,M5,M4)=0._r8
+      PCASER(N,NN,M5,M4)=0._r8
+      PALPER(N,NN,M5,M4)=0._r8
+      PFEPER(N,NN,M5,M4)=0._r8
+      PCPDER(N,NN,M5,M4)=0._r8
+      PCPHER(N,NN,M5,M4)=0._r8
+      PCPMER(N,NN,M5,M4)=0._r8
+      PALPEB(N,NN,M5,M4)=0._r8
+      PFEPEB(N,NN,M5,M4)=0._r8
+      PCPDEB(N,NN,M5,M4)=0._r8
+      PCPHEB(N,NN,M5,M4)=0._r8
+      PCPMEB(N,NN,M5,M4)=0._r8
 !
 !     ORGANIC MATTER
 !
       DO 5480 K=0,5
-      DO 5480 NO=1,7
-      DO 5480 M=1,3
-      OMCER(M,NO,K,N,NN,M5,M4)=0.0
-      OMNER(M,NO,K,N,NN,M5,M4)=0.0
-      OMPER(M,NO,K,N,NN,M5,M4)=0.0
+      DO  NO=1,7
+      DO  M=1,3
+      OMCER(M,NO,K,N,NN,M5,M4)=0._r8
+      OMNER(M,NO,K,N,NN,M5,M4)=0._r8
+      OMPER(M,NO,K,N,NN,M5,M4)=0._r8
+      enddo
+      enddo
 5480  CONTINUE
       DO 5475 K=0,4
       DO 5470 M=1,2
-      ORCER(M,K,N,NN,M5,M4)=0.0
-      ORNER(M,K,N,NN,M5,M4)=0.0
-      ORPER(M,K,N,NN,M5,M4)=0.0
+      ORCER(M,K,N,NN,M5,M4)=0._r8
+      ORNER(M,K,N,NN,M5,M4)=0._r8
+      ORPER(M,K,N,NN,M5,M4)=0._r8
 5470  CONTINUE
-      OHCER(K,N,NN,M5,M4)=0.0
-      OHNER(K,N,NN,M5,M4)=0.0
-      OHPER(K,N,NN,M5,M4)=0.0
-      OHAER(K,N,NN,M5,M4)=0.0
+      OHCER(K,N,NN,M5,M4)=0._r8
+      OHNER(K,N,NN,M5,M4)=0._r8
+      OHPER(K,N,NN,M5,M4)=0._r8
+      OHAER(K,N,NN,M5,M4)=0._r8
       DO 5465 M=1,4
-      OSCER(M,K,N,NN,M5,M4)=0.0
-      OSAER(M,K,N,NN,M5,M4)=0.0
-      OSNER(M,K,N,NN,M5,M4)=0.0
-      OSPER(M,K,N,NN,M5,M4)=0.0
+      OSCER(M,K,N,NN,M5,M4)=0._r8
+      OSAER(M,K,N,NN,M5,M4)=0._r8
+      OSNER(M,K,N,NN,M5,M4)=0._r8
+      OSPER(M,K,N,NN,M5,M4)=0._r8
 5465  CONTINUE
 5475  CONTINUE
 !
@@ -1065,11 +1075,13 @@
 !     ORGANIC MATTER
 !
       DO 4880 K=0,5
-      DO 4880 NO=1,7
-      DO 4880 M=1,3
+      DO NO=1,7
+      DO M=1,3
       OMCER(M,NO,K,N,NN,M5,M4)=FSEDER*OMC(M,NO,K,NU(N2,N1),N2,N1)
       OMNER(M,NO,K,N,NN,M5,M4)=FSEDER*OMN(M,NO,K,NU(N2,N1),N2,N1)
       OMPER(M,NO,K,N,NN,M5,M4)=FSEDER*OMP(M,NO,K,NU(N2,N1),N2,N1)
+      ENDDO
+      ENDDO
 4880  CONTINUE
       DO 4875 K=0,4
       DO 4870 M=1,2
@@ -1095,7 +1107,7 @@
 !    2,XCLAER(N,NN,M5,M4),CLAY(NU(N2,N1),N2,N1)
 !    3,ORGC(NU(N2,N1),N2,N1),DLYR(3,NU(N2,N1),N2,N1)
 !    4,BKVL(NU(N2,N1),N2,N1)
-1116  FORMAT(A8,5I4,30E12.4)
+!1116  FORMAT(A8,5I4,30E12.4)
 !     ENDIF
 8975  CONTINUE
 8980  CONTINUE

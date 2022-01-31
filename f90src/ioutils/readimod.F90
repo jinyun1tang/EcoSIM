@@ -5,7 +5,7 @@ module readiMod
   use data_kind_mod, only : r8 => SHR_KIND_R8
   use abortutils, only : endrun
   use fileUtil, only : open_safe
-
+  use minimathmod, only : test_aeqb
   implicit none
   private
   include "parameters.h"
@@ -28,6 +28,7 @@ module readiMod
   CHARACTER(len=4) :: CHARY
   CHARACTER(len=1) :: TTYPE,CTYPE,IVAR(20),VAR(50),TYP(50)
   character(len=*), parameter :: subname='readi.f'
+  character(len=3), parameter :: model_status(0:1)=(/'off','on '/)
   integer :: ll
   real(r8) :: DAT(50),DATK(50)
   real(r8), PARAMETER :: TWILGT=0.06976
@@ -95,7 +96,7 @@ module readiMod
 !
 !  READ(1,*)ALATG,ALTIG,ATCAG,IDTBLG
   READ(1,*)(datav(jj),jj=1,4)
- 	ALATG=datav(1)
+  ALATG=datav(1)
   ALTIG=datav(2)
   ATCAG=datav(3)
   IDTBLG=int(datav(4))
@@ -125,8 +126,8 @@ module readiMod
     write(*,*)'atmospheric NH3 (ppm): ZNH3EG',ZNH3EG
     write(*,'(40A)')('-',ll=1,40)
     write(*,*)'Koppen climate zone: IETYPG',IETYPG
-    write(*,*)'flag for salt model: ISALTG',ISALTG
-    write(*,*)'flag for erosion model: IERSNG',IERSNG
+    write(*,*)'flag for salt model: ISALTG',ISALTG,model_status(isaltg)
+    write(*,*)'flag for erosion model: IERSNG',IERSNG,model_status(iersng)
     write(*,*)'flag for lateral connections between grid cells (1),'// &
       ' no connections (3): NCNG',NCNG
     write(*,*)'depth of natural water table: DTBLIG',DTBLIG
@@ -773,7 +774,7 @@ module readiMod
     DO 28 L=1,NL(NY,NX)
 !     BKDSI(L,NY,NX)=BKDSI(L,NY,NX)/(1.0-FHOL(L,NY,NX))
       BKDS(L,NY,NX)=BKDSI(L,NY,NX)
-      IF(BKDS(L,NY,NX).EQ.0.0)FHOL(L,NY,NX)=0.0
+      IF(test_aeqb(BKDS(L,NY,NX),0.0_r8))FHOL(L,NY,NX)=0.0
       FMPR(L,NY,NX)=(1.0-ROCK(L,NY,NX))*(1.0-FHOL(L,NY,NX))
 !     FC(L,NY,NX)=FC(L,NY,NX)/(1.0-FHOL(L,NY,NX))
 !     WP(L,NY,NX)=WP(L,NY,NX)/(1.0-FHOL(L,NY,NX))
@@ -847,7 +848,7 @@ module readiMod
     DO 9970 NY=NVN,NVS
       NL(NY,NHE+1)=NL(NY,NHE)
 !     WRITE(*,2223)'NVS',NY,NVN,NVS,NHE,NL(NY,NHE)
-2223  FORMAT(A8,6I4)
+!2223  FORMAT(A8,6I4)
 9970  CONTINUE
     NL(NVS+1,NHE+1)=NL(NVS,NHE)
     IOLD=0

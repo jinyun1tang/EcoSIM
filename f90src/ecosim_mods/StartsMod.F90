@@ -1,35 +1,39 @@
+module StartsMod
+!!
+! Description:
+! code to initalize soil variables
 
-      module StartsMod
-      use data_kind_mod, only : r8 => SHR_KIND_R8
-      use abortutils, only : padr, print_info
-      implicit none
+  use data_kind_mod, only : r8 => SHR_KIND_R8
+  use abortutils, only : padr, print_info
+  use minimathMod, only : test_aeqb, test_aneb
+  implicit none
 
-      private
-      include "parameters.h"
-      include "blkc.h"
-      include "blk2a.h"
-      include "blk2b.h"
-      include "blk2c.h"
-      include "blk5.h"
-      include "blk8a.h"
-      include "blk8b.h"
-      include "blk11a.h"
-      include "blk11b.h"
-      include "blk13a.h"
-      include "blk13b.h"
-      include "blk13c.h"
-      include "blk16.h"
-      include "blk18a.h"
-      include "blk18b.h"
+  private
+  include "parameters.h"
+  include "blkc.h"
+  include "blk2a.h"
+  include "blk2b.h"
+  include "blk2c.h"
+  include "blk5.h"
+  include "blk8a.h"
+  include "blk8b.h"
+  include "blk11a.h"
+  include "blk11b.h"
+  include "blk13a.h"
+  include "blk13b.h"
+  include "blk13c.h"
+  include "blk16.h"
+  include "blk18a.h"
+  include "blk18b.h"
 
-      real(r8) :: ALTY,ALTZG,CDPTHG,CORGL,CORGCZ,CORGRZ,CORGNZ,CORGPZ
-      real(r8) :: CORGCM,DAZI,DGAZI,DLYRSI,FCY,FC0,FCO,FCX,FC1,FRNT
-      real(r8) :: FRPT,FOSCI,FOSNI,FOSPI,HCX,OMEGY,OMEGZ,OMC1,OMN1
-      real(r8) :: OMP1,OC,ON,OP,PTDS,RNT,RPT,RC,TORGC,TORGM,TOSCI
-      real(r8) :: TOSNI,TOSPI,TOMC,VOLSWI,VORGC,VMINL,VSAND,X,YAGL
-      real(r8) :: ZAGL
+  real(r8) :: ALTY,ALTZG,CDPTHG,CORGL,CORGCZ,CORGRZ,CORGNZ,CORGPZ
+  real(r8) :: CORGCM,DAZI,DGAZI,DLYRSI,FCY,FC0,FCO,FCX,FC1,FRNT
+  real(r8) :: FRPT,FOSCI,FOSNI,FOSPI,HCX,OMEGY,OMEGZ,OMC1,OMN1
+  real(r8) :: OMP1,OC,ON,OP,PTDS,RNT,RPT,RC,TORGC,TORGM,TOSCI
+  real(r8) :: TOSNI,TOSPI,TOMC,VOLSWI,VORGC,VMINL,VSAND,X,YAGL
+  real(r8) :: ZAGL
 
-      real(r8) :: YSIN(4),YCOS(4),YAZI(4),ZAZI(4),OSCI(0:4),OSNI(0:4) &
+  real(r8) :: YSIN(4),YCOS(4),YAZI(4),ZAZI(4),OSCI(0:4),OSNI(0:4) &
       ,ORCI(2,0:4),OSPI(0:4),OSCM(0:4),CORGCX(0:4) &
       ,CORGNX(0:4),CORGPX(0:4),CNOSCT(0:4),CPOSCT(0:4) &
       ,GSINA(JY,JX),GCOSA(JY,JX),ALTX(JV,JH),CDPTHSI(JS) &
@@ -49,8 +53,8 @@
 !     CDPTHSI=depth to bottom of snowpack layers
 !     POROQ=Penman Water Linear Reduction tortuosity used in gas flux calculations
 !
-      real(r8), PARAMETER :: DCKR=0.25,DCKM=2.5E+04,PSIPS=-0.5E-03 &
-      ,RDN=57.29577951
+  real(r8), PARAMETER :: DCKR=0.25_r8,DCKM=2.5E+04_r8,PSIPS=-0.5E-03_r8 &
+      ,RDN=57.29577951_r8
 
       DATA OMCI/0.010,0.050,0.005,0.050,0.050,0.005,0.050,0.050,0.005 &
       ,0.010,0.050,0.005,0.010,0.050,0.005/
@@ -142,7 +146,7 @@
 !
       OFFSET(NY,NX)=0.333*(12.5-AMAX1(0.0,AMIN1(25.0,ATCS(NY,NX))))
 !     WRITE(*,2222)'OFFSET',OFFSET(NY,NX),ATCS(NY,NX)
-2222  FORMAT(A8,2E12.4)
+!2222  FORMAT(A8,2E12.4)
 !
 !     INITIALIZE WATER POTENTIAL VARIABLES FOR SOIL LAYERS
 !
@@ -526,9 +530,9 @@
       IF(ISOIL(1,L,NY,NX).EQ.0.AND.ISOIL(2,L,NY,NX).EQ.0)THEN
       IF(THW(L,NY,NX).GT.1.0)THEN
       THETW(L,NY,NX)=POROS(L,NY,NX)
-      ELSEIF(THW(L,NY,NX).EQ.1.0)THEN
+      ELSEIF(test_aeqb(THW(L,NY,NX),1.0_r8))THEN
       THETW(L,NY,NX)=FC(L,NY,NX)
-      ELSEIF(THW(L,NY,NX).EQ.0.0)THEN
+      ELSEIF(test_aeqb(THW(L,NY,NX),0.0_r8))THEN
       THETW(L,NY,NX)=WP(L,NY,NX)
       ELSEIF(THW(L,NY,NX).LT.0.0)THEN
       THETW(L,NY,NX)=0.0
@@ -538,10 +542,10 @@
       IF(THI(L,NY,NX).GT.1.0)THEN
       THETI(L,NY,NX)=AMAX1(0.0,AMIN1(POROS(L,NY,NX) &
       ,POROS(L,NY,NX)-THW(L,NY,NX)))
-      ELSEIF(THI(L,NY,NX).EQ.1.0)THEN
+      ELSEIF(test_aeqb(THI(L,NY,NX),1.0_r8))THEN
       THETI(L,NY,NX)=AMAX1(0.0,AMIN1(FC(L,NY,NX) &
       ,POROS(L,NY,NX)-THW(L,NY,NX)))
-      ELSEIF(THI(L,NY,NX).EQ.0.0)THEN
+      ELSEIF(test_aeqb(THI(L,NY,NX),0.0_r8))THEN
       THETI(L,NY,NX)=AMAX1(0.0,AMIN1(WP(L,NY,NX) &
       ,POROS(L,NY,NX)-THW(L,NY,NX)))
       ELSEIF(THI(L,NY,NX).LT.0.0)THEN
@@ -564,7 +568,7 @@
 !     WRITE(*,2425)'VOLWS',NX,NY,L
 !    2,VOLW(L,NY,NX),THETW(L,NY,NX),VOLI(L,NY,NX),THETI(L,NY,NX)
 !    3,VOLX(L,NY,NX),POROS(L,NY,NX),TKS(L,NY,NX),VHCP(L,NY,NX)
-2425  FORMAT(A8,3I4,20E12.4)
+!2425  FORMAT(A8,3I4,20E12.4)
       ENDIF
       ENDIF
       TKS(L,NY,NX)=ATKS(NY,NX)
@@ -686,7 +690,7 @@
 !     IF(L.EQ.NU(NY,NX))THEN
 !     WRITE(*,2424)'OSCM',NX,NY,L,K,OSCM(K),OSCI(K),CORGCX(K)
 !    2,BKVL(L,NY,NX),CORGCX(K)*BKVL(L,NY,NX),FCX
-2424  FORMAT(A8,4I4,12E12.4)
+!2424  FORMAT(A8,4I4,12E12.4)
 !     ENDIF
       X=1.0
       KK=4
@@ -1191,7 +1195,7 @@
 !    2,CORGCX(4),CORGNX(4),CORGPX(4),DPTH(L,NY,NX),DTBLZ(NY,NX)
 !    3,CDPTH(NU(NY,NX),NY,NX),CDPTHG,CORGC(L,NY,NX),FORGC
 !    4,EXP(HCX*TORGL(L))
-5432  FORMAT(A8,I4,20E12.4)
+!5432  FORMAT(A8,I4,20E12.4)
       ENDIF
       end subroutine InitPOMKinetiComponent
 !------------------------------------------------------------------------------------------
@@ -1358,7 +1362,7 @@
       IRCHG(2,2,NY,NX)=0
       ENDIF
       SLOPE(3,NY,NX)=-1.0
-      IF(SLOPE(1,NY,NX).NE.0.0.OR.SLOPE(2,NY,NX).NE.0.0)THEN
+      IF(test_aneb(SLOPE(1,NY,NX),0.0_r8).OR.test_aneb(SLOPE(2,NY,NX),0.0_r8))THEN
       FSLOPE(1,NY,NX)=ABS(SLOPE(1,NY,NX)) &
       /(ABS(SLOPE(1,NY,NX))+ABS(SLOPE(2,NY,NX)))
       FSLOPE(2,NY,NX)=ABS(SLOPE(2,NY,NX)) &

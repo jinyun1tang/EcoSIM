@@ -7,8 +7,8 @@ set(IOUTILS_SOURCES
 	outsd.F90
 	outsh.F90
 	readimod.F90
-	readq.F90
-	reads.F90
+	readqmod.F90
+	readsmod.F90
 	routp.F90
 	routq.F90
 	routs.F90

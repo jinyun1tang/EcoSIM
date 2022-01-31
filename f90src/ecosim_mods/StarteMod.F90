@@ -1,7 +1,7 @@
-
-      module StarteMod
-      use data_kind_mod, only : r8 => SHR_KIND_R8
-      implicit none
+module StarteMod
+  use data_kind_mod, only : r8 => SHR_KIND_R8
+  use minimathmod, only : test_aeqb
+  implicit none
 
       private
       include "parameters.h"
@@ -138,7 +138,7 @@
       CZ2GM=CZ2GE(NY,NX)/14.0
       CZ2OM=CZ2OE(NY,NX)/14.0
       DO 1200 I=1,366
-      DO 1200 L=NU(NY,NX),NL(NY,NX)
+      DO  L=NU(NY,NX),NL(NY,NX)
       DO 2000 K=1,3
 !
 !     INITIALIZE RAINFALL
@@ -249,6 +249,7 @@
       call SoluteConcentrations(K,I,L,NY,NX)
 
  2000 CONTINUE
+      enddo
  1200 CONTINUE
 
       call InitialState(NY,NX)
@@ -268,14 +269,14 @@
 !     INITIALIZE SOLUTE EQUILIBRIA
 !
       CC3=AMAX1(0.0,CALZ)+AMAX1(0.0,CFEZ)
-      CA3=0.0
+      CA3=0._r8
       CC2=AMAX1(0.0,CCAZ)+CMGZ
       CA2=CSOZ
       CC1=CN4Z+CNAZ+CKAZ
       CA1=CNOZ+CCLZ+CPOZ
-      CX2=0.0
-      CX1=0.0
-      CN=0.0
+      CX2=0._r8
+      CX1=0._r8
+      CN=0._r8
 !
 !     INITIALIZE ION STRENGTH AND ACTIVITIES
 !
@@ -356,29 +357,29 @@
       CALO2=CAL1*COH1**2*A3/(DPAL1*DPAL2*A1)
       CALO3=CAL1*COH1**3*A3/(DPAL1*DPAL2*DPAL3*A0)
       CALO4=CAL1*COH1**4*A3/(DPAL1*DPAL2*DPAL3*DPAL4*A1)
-      CALS1=0.0
+      CALS1=0._r8
       CFEO1=CFE1*COH1*A3/(DPFE1*A2)
       CFEO2=CFE1*COH1**2*A3/(DPFE1*DPFE2*A1)
       CFEO3=CFE1*COH1**3*A3/(DPFE1*DPFE2*DPFE3*A0)
       CFEO4=CFE1*COH1**4*A3/(DPFE1*DPFE2*DPFE3*DPFE4*A1)
-      CFES1=0.0
+      CFES1=0._r8
       CCAO1=CCA1*COH1*A2/(DPCAO*A1)
       CCAC1=CCA1*CCO31*A2**2/(DPCAC*A0)
       CCAH1=CCA1*CHCO31*A2/DPCAH
-      CCAS1=0.0
+      CCAS1=0._r8
       CMGO1=CMG1*COH1*A2/(DPMGO*A1)
       CMGC1=CMG1*CCO31*A2**2/(DPMGC*A0)
       CMGH1=CMG1*CHCO31*A2/DPMGH
-      CMGS1=0.0
+      CMGS1=0._r8
       CNAC1=CNA1*CCO31*A2/DPNAC
-      CNAS1=0.0
-      CKAS1=0.0
-      CF1P1=0.0
-      CF2P1=0.0
-      CC0P1=0.0
-      CC1P1=0.0
-      CC2P1=0.0
-      CM1P1=0.0
+      CNAS1=0._r8
+      CKAS1=0._r8
+      CF1P1=0._r8
+      CF2P1=0._r8
+      CC0P1=0._r8
+      CC1P1=0._r8
+      CC2P1=0._r8
+      CM1P1=0._r8
 !
 !     INITIALIZE PHOSPHORUS EQUILIBRIA AMONG SOLUBLE, ADSORBED
 !     AND PRECIPITATED FORMS
@@ -426,16 +427,16 @@
 !
       XCECQ=AMAX1(CN4X,CEC(L,NY,NX))
       XN4Q=CN4X
-      XHYQ=0.0
-      XALQ=0.0
-      XFEQ=0.0
-      XCAQ=0.0
-      XMGQ=0.0
-      XNAQ=0.0
-      XKAQ=0.0
-      XHC1=0.0
-      XALO21=0.0
-      XFEO21=0.0
+      XHYQ=0._r8
+      XALQ=0._r8
+      XFEQ=0._r8
+      XCAQ=0._r8
+      XMGQ=0._r8
+      XNAQ=0._r8
+      XKAQ=0._r8
+      XHC1=0._r8
+      XALO21=0._r8
+      XFEO21=0._r8
       XCOOH=AMAX1(0.0,COOH*ORGC(L,NY,NX))
       ENDIF
       CC3=CAL1+CFE1
@@ -483,7 +484,7 @@
       IF(XTLQ.GT.ZERO)THEN
       FX=CCEC/XTLQ
       ELSE
-      FX=0.0
+      FX=0._r8
       ENDIF
       XN41=CN4X
       XHY1=FX*XHYQ
@@ -498,7 +499,7 @@
 !     WRITE(*,2222)'XOH2S',K,L,XOH21,XOH11,XOH01,XH2P1,XH1P1,XOH,XPT
 !    2,CH3P1,CH2P1,CH1P1,CH0P1,CHY1,XHP,FHP3,FHP2,FHP1,FHP0
 !    3,FXP2,FXP1,PALPO1,PFEPO1,PCAPD1,PCAPH1
-2222  FORMAT(A8,2I4,40E12.4)
+!2222  FORMAT(A8,2I4,40E12.4)
       ENDIF
       end subroutine InitEquilibria
 !------------------------------------------------------------------------------------------
@@ -633,35 +634,35 @@
 !
       IF(K.EQ.3)THEN
       PX=AMAX1(AAL1,AALO1,AALO2,AALO3,AALO4)
-      IF(PX.EQ.AAL1)THEN
+      IF(test_aeqb(PX,AAL1))THEN
       R1=AHY1
       P1=AAL1
       P2=AOH1
       NR1=3
       NP2=0
       SP=SHALO
-      ELSEIF(PX.EQ.AALO1)THEN
+      ELSEIF(test_aeqb(PX,AALO1))THEN
       R1=AHY1
       P1=AALO1
       P2=AOH1
       NR1=2
       NP2=0
       SP=SHAL1
-      ELSEIF(PX.EQ.AALO2)THEN
+      ELSEIF(test_aeqb(PX,AALO2))THEN
       R1=AHY1
       P1=AALO2
       P2=AOH1
       NR1=1
       NP2=0
       SP=SHAL2
-      ELSEIF(PX.EQ.AALO3)THEN
+      ELSEIF(test_aeqb(PX,AALO3))THEN
       R1=AHY1
       P1=AALO3
       P2=AOH1
       NR1=0
       NP2=0
       SP=SPAL3
-      ELSEIF(PX.EQ.AALO4)THEN
+      ELSEIF(test_aeqb(PX,AALO4))THEN
       R1=AOH1
       P1=AALO4
       P2=AHY1
@@ -669,25 +670,25 @@
       NP2=1
       SP=SHAL4
       ENDIF
-      RHAL1=0.0
-      RHALO1=0.0
-      RHALO2=0.0
-      RHALO3=0.0
-      RHALO4=0.0
+      RHAL1=0._r8
+      RHALO1=0._r8
+      RHALO2=0._r8
+      RHALO3=0._r8
+      RHALO4=0._r8
       R1=AMAX1(ZERO,R1)
       P1=AMAX1(ZERO,P1)
       P2=AMAX1(ZERO,P2)
       SPX=SP*R1**NR1/P2**NP2
       RPALOX=AMAX1(-PALOH1,TPD*(P1-SPX))
-      IF(PX.EQ.AAL1)THEN
+      IF(test_aeqb(PX,AAL1))THEN
       RHAL1=RPALOX
-      ELSEIF(PX.EQ.AALO1)THEN
+      ELSEIF(test_aeqb(PX,AALO1))THEN
       RHALO1=RPALOX
-      ELSEIF(PX.EQ.AALO2)THEN
+      ELSEIF(test_aeqb(PX,AALO2))THEN
       RHALO2=RPALOX
-      ELSEIF(PX.EQ.AALO3)THEN
+      ELSEIF(test_aeqb(PX,AALO3))THEN
       RHALO3=RPALOX
-      ELSEIF(PX.EQ.AALO4)THEN
+      ELSEIF(test_aeqb(PX,AALO4))THEN
       RHALO4=RPALOX
       ENDIF
 !     IF((M/25)*25.EQ.M)THEN
@@ -700,35 +701,35 @@
 !     IRON HYDROXIDE
 !
       PX=AMAX1(AFE1,AFEO1,AFEO2,AFEO3,AFEO4)
-      IF(PX.EQ.AFE1)THEN
+      IF(test_aeqb(PX,AFE1))THEN
       R1=AHY1
       P1=AFE1
       P2=AOH1
       NR1=3
       NP2=0
       SP=SHFEO
-      ELSEIF(PX.EQ.AFEO1)THEN
+      ELSEIF(test_aeqb(PX,AFEO1))THEN
       R1=AHY1
       P1=AFEO1
       P2=AOH1
       NR1=2
       NP2=0
       SP=SHFE1
-      ELSEIF(PX.EQ.AFEO2)THEN
+      ELSEIF(test_aeqb(PX,AFEO2))THEN
       R1=AHY1
       P1=AFEO2
       P2=AOH1
       NR1=1
       NP2=0
       SP=SHFE2
-      ELSEIF(PX.EQ.AFEO3)THEN
+      ELSEIF(test_aeqb(PX,AFEO3))THEN
       R1=AHY1
       P1=AFEO3
       P2=AOH1
       NR1=0
       NP2=0
       SP=SPFE3
-      ELSEIF(PX.EQ.AFEO4)THEN
+      ELSEIF(test_aeqb(PX,AFEO4))THEN
       R1=AOH1
       P1=AFEO4
       P2=AHY1
@@ -736,25 +737,25 @@
       NP2=1
       SP=SHFE4
       ENDIF
-      RHFE1=0.0
-      RHFEO1=0.0
-      RHFEO2=0.0
-      RHFEO3=0.0
-      RHFEO4=0.0
+      RHFE1=0._r8
+      RHFEO1=0._r8
+      RHFEO2=0._r8
+      RHFEO3=0._r8
+      RHFEO4=0._r8
       R1=AMAX1(ZERO,R1)
       P1=AMAX1(ZERO,P1)
       P2=AMAX1(ZERO,P2)
       SPX=SP*R1**NR1/P2**NP2
       RPFEOX=AMAX1(-PFEOH1,TPD*(P1-SPX))
-      IF(PX.EQ.AFE1)THEN
+      IF(test_aeqb(PX,AFE1))THEN
       RHFE1=RPFEOX
-      ELSEIF(PX.EQ.AFEO1)THEN
+      ELSEIF(test_aeqb(PX,AFEO1))THEN
       RHFEO1=RPFEOX
-      ELSEIF(PX.EQ.AFEO2)THEN
+      ELSEIF(test_aeqb(PX,AFEO2))THEN
       RHFEO2=RPFEOX
-      ELSEIF(PX.EQ.AFEO3)THEN
+      ELSEIF(test_aeqb(PX,AFEO3))THEN
       RHFEO3=RPFEOX
-      ELSEIF(PX.EQ.AFEO4)THEN
+      ELSEIF(test_aeqb(PX,AFEO4))THEN
       RHFEO4=RPFEOX
       ENDIF
 !     IF((M/25)*25.EQ.M)THEN
@@ -769,22 +770,22 @@
       PX=AMAX1(ACO31,AHCO31,ACO21)
       R1=AHY1
       P1=ACA1
-      IF(PX.EQ.ACO31)THEN
+      IF(test_aeqb(PX,ACO31))THEN
       P2=ACO31
       NR1=0
       SP=SPCAC
-      ELSEIF(PX.EQ.AHCO31)THEN
+      ELSEIF(test_aeqb(PX,AHCO31))THEN
       P2=AHCO31
       NR1=1
       SP=SHCAC1
-      ELSEIF(PX.EQ.ACO21)THEN
+      ELSEIF(test_aeqb(PX,ACO21))THEN
       P2=ACO21
       NR1=2
       SP=SHCAC2
       ENDIF
-      RHCAC3=0.0
-      RHCACH=0.0
-      RHCACO=0.0
+      RHCAC3=0._r8
+      RHCACH=0._r8
+      RHCACO=0._r8
       R1=AMAX1(ZERO,R1)
       P1=AMAX1(ZERO,P1)
       P2=AMAX1(ZERO,P2)
@@ -792,11 +793,11 @@
       S0=P1+P2
       S1=AMAX1(0.0,S0**2-4.0*(P1*P2-SPX))
       RPCACX=AMAX1(-PCACO1,TPD*(S0-SQRT(S1)))
-      IF(PX.EQ.ACO31)THEN
+      IF(test_aeqb(PX,ACO31))THEN
       RHCAC3=RPCACX
-      ELSEIF(PX.EQ.AHCO31)THEN
+      ELSEIF(test_aeqb(PX,AHCO31))THEN
       RHCACH=RPCACX
-      ELSEIF(PX.EQ.ACO21)THEN
+      ELSEIF(test_aeqb(PX,ACO21))THEN
       RHCACO=RPCACX
       ENDIF
 !
@@ -826,29 +827,29 @@
       PY=AMAX1(AH1P1,AH2P1)
       R1=AHY1
       P3=AHY1
-      IF(PY.EQ.AH1P1)THEN
+      IF(test_aeqb(PY,AH1P1))THEN
       P2=AH1P1
-      IF(PX.EQ.AAL1)THEN
+      IF(test_aeqb(PX,AAL1))THEN
       P1=AAL1
       NR1=1
       NP3=0
       SP=SHA0P1
-      ELSEIF(PX.EQ.AALO1)THEN
+      ELSEIF(test_aeqb(PX,AALO1))THEN
       P1=AALO1
       NR1=0
       NP3=0
       SP=SPA1P1
-      ELSEIF(PX.EQ.AALO2)THEN
+      ELSEIF(test_aeqb(PX,AALO2))THEN
       P1=AALO2
       NR1=0
       NP3=1
       SP=SHA2P1
-      ELSEIF(PX.EQ.AALO3)THEN
+      ELSEIF(test_aeqb(PX,AALO3))THEN
       P1=AALO3
       NR1=0
       NP3=2
       SP=SHA3P1
-      ELSEIF(PX.EQ.AALO4)THEN
+      ELSEIF(test_aeqb(PX,AALO4))THEN
       P1=AALO4
       NR1=0
       NP3=3
@@ -856,43 +857,43 @@
       ENDIF
       ELSE
       P2=AH2P1
-      IF(PX.EQ.AAL1)THEN
+      IF(test_aeqb(PX,AAL1))THEN
       P1=AAL1
       NR1=2
       NP3=0
       SP=SHA0P2
-      ELSEIF(PX.EQ.AALO1)THEN
+      ELSEIF(test_aeqb(PX,AALO1))THEN
       P1=AALO1
       NR1=1
       NP3=0
       SP=SHA1P2
-      ELSEIF(PX.EQ.AALO2)THEN
+      ELSEIF(test_aeqb(PX,AALO2))THEN
       P1=AALO2
       NR1=0
       NP3=0
       SP=SPA2P2
-      ELSEIF(PX.EQ.AALO3)THEN
+      ELSEIF(test_aeqb(PX,AALO3))THEN
       P1=AALO3
       NR1=0
       NP3=1
       SP=SHA3P2
-      ELSEIF(PX.EQ.AALO4)THEN
+      ELSEIF(test_aeqb(PX,AALO4))THEN
       P1=AALO4
       NR1=0
       NP3=2
       SP=SHA4P2
       ENDIF
       ENDIF
-      RHA0P1=0.0
-      RHA1P1=0.0
-      RHA2P1=0.0
-      RHA3P1=0.0
-      RHA4P1=0.0
-      RHA0P2=0.0
-      RHA1P2=0.0
-      RHA2P2=0.0
-      RHA3P2=0.0
-      RHA4P2=0.0
+      RHA0P1=0._r8
+      RHA1P1=0._r8
+      RHA2P1=0._r8
+      RHA3P1=0._r8
+      RHA4P1=0._r8
+      RHA0P2=0._r8
+      RHA1P2=0._r8
+      RHA2P2=0._r8
+      RHA3P2=0._r8
+      RHA4P2=0._r8
       R1=AMAX1(ZERO,R1)
       P1=AMAX1(ZERO,P1)
       P2=AMAX1(ZERO,P2)
@@ -901,28 +902,28 @@
       S0=P1+P2
       S1=AMAX1(0.0,S0**2-4.0*(P1*P2-SPX))
       RPALPX=AMAX1(-PALPO1,TPD*(S0-SQRT(S1)))
-      IF(PY.EQ.AH1P1)THEN
-      IF(PX.EQ.AAL1)THEN
+      IF(test_aeqb(PY,AH1P1))THEN
+      IF(test_aeqb(PX,AAL1))THEN
       RHA0P1=RPALPX
-      ELSEIF(PX.EQ.AALO1)THEN
+      ELSEIF(test_aeqb(PX,AALO1))THEN
       RHA1P1=RPALPX
-      ELSEIF(PX.EQ.AALO2)THEN
+      ELSEIF(test_aeqb(PX,AALO2))THEN
       RHA2P1=RPALPX
-      ELSEIF(PX.EQ.AALO3)THEN
+      ELSEIF(test_aeqb(PX,AALO3))THEN
       RHA3P1=RPALPX
-      ELSEIF(PX.EQ.AALO4)THEN
+      ELSEIF(test_aeqb(PX,AALO4))THEN
       RHA4P1=RPALPX
       ENDIF
       ELSE
-      IF(PX.EQ.AAL1)THEN
+      IF(test_aeqb(PX,AAL1))THEN
       RHA0P2=RPALPX
-      ELSEIF(PX.EQ.AALO1)THEN
+      ELSEIF(test_aeqb(PX,AALO1))THEN
       RHA1P2=RPALPX
-      ELSEIF(PX.EQ.AALO2)THEN
+      ELSEIF(test_aeqb(PX,AALO2))THEN
       RHA2P2=RPALPX
-      ELSEIF(PX.EQ.AALO3)THEN
+      ELSEIF(test_aeqb(PX,AALO3))THEN
       RHA3P2=RPALPX
-      ELSEIF(PX.EQ.AALO4)THEN
+      ELSEIF(test_aeqb(PX,AALO4))THEN
       RHA4P2=RPALPX
       ENDIF
       ENDIF
@@ -932,7 +933,7 @@
 !    2,AH0P1,AH1P1,AH2P1,AHY1,AOH1,RPALPX,RHA0P1,RHA1P1,RHA2P1,RHA3P1
 !    3,RHA4P1,RHA0P2,RHA1P2,RHA2P2,RHA3P2,RHA4P2,SP,SPX,AAL1*AH0P1
 !    4,SPALP
-1112  FORMAT(A8,6I5,80E12.4)
+!1112  FORMAT(A8,6I5,80E12.4)
 !     ENDIF
 !
 !     IRON PHOSPHATE (STRENGITE)
@@ -941,29 +942,29 @@
       PY=AMAX1(AH1P1,AH2P1)
       R1=AHY1
       P3=AHY1
-      IF(PY.EQ.AH1P1)THEN
+      IF(test_aeqb(PY,AH1P1))THEN
       P2=AH1P1
-      IF(PX.EQ.AFE1)THEN
+      IF(test_aeqb(PX,AFE1))THEN
       P1=AFE1
       NR1=1
       NP3=0
       SP=SHF0P1
-      ELSEIF(PX.EQ.AFEO1)THEN
+      ELSEIF(test_aeqb(PX,AFEO1))THEN
       P1=AFEO1
       NR1=0
       NP3=0
       SP=SPF1P1
-      ELSEIF(PX.EQ.AFEO2)THEN
+      ELSEIF(test_aeqb(PX,AFEO2))THEN
       P1=AFEO2
       NR1=0
       NP3=1
       SP=SHF2P1
-      ELSEIF(PX.EQ.AFEO3)THEN
+      ELSEIF(test_aeqb(PX,AFEO3))THEN
       P1=AFEO3
       NR1=0
       NP3=2
       SP=SHF3P1
-      ELSEIF(PX.EQ.AFEO4)THEN
+      ELSEIF(test_aeqb(PX,AFEO4))THEN
       P1=AFEO4
       NR1=0
       NP3=3
@@ -971,43 +972,43 @@
       ENDIF
       ELSE
       P2=AH2P1
-      IF(PX.EQ.AFE1)THEN
+      IF(test_aeqb(PX,AFE1))THEN
       P1=AFE1
       NR1=2
       NP3=0
       SP=SHF0P2
-      ELSEIF(PX.EQ.AFEO1)THEN
+      ELSEIF(test_aeqb(PX,AFEO1))THEN
       P1=AFEO1
       NR1=1
       NP3=0
       SP=SHF1P2
-      ELSEIF(PX.EQ.AFEO2)THEN
+      ELSEIF(test_aeqb(PX,AFEO2))THEN
       P1=AFEO2
       NR1=0
       NP3=0
       SP=SPF2P2
-      ELSEIF(PX.EQ.AFEO3)THEN
+      ELSEIF(test_aeqb(PX,AFEO3))THEN
       P1=AFEO3
       NR1=0
       NP3=1
       SP=SHF3P2
-      ELSEIF(PX.EQ.AFEO4)THEN
+      ELSEIF(test_aeqb(PX,AFEO4))THEN
       P1=AFEO4
       NR1=0
       NP3=2
       SP=SHF4P2
       ENDIF
       ENDIF
-      RHF0P1=0.0
-      RHF1P1=0.0
-      RHF2P1=0.0
-      RHF3P1=0.0
-      RHF4P1=0.0
-      RHF0P2=0.0
-      RHF1P2=0.0
-      RHF2P2=0.0
-      RHF3P2=0.0
-      RHF4P2=0.0
+      RHF0P1=0._r8
+      RHF1P1=0._r8
+      RHF2P1=0._r8
+      RHF3P1=0._r8
+      RHF4P1=0._r8
+      RHF0P2=0._r8
+      RHF1P2=0._r8
+      RHF2P2=0._r8
+      RHF3P2=0._r8
+      RHF4P2=0._r8
       R1=AMAX1(ZERO,R1)
       P1=AMAX1(ZERO,P1)
       P2=AMAX1(ZERO,P2)
@@ -1016,28 +1017,28 @@
       S0=P1+P2
       S1=AMAX1(0.0,S0**2-4.0*(P1*P2-SPX))
       RPFEPX=AMAX1(-PFEPO1,TPD*(S0-SQRT(S1)))
-      IF(PY.EQ.AH1P1)THEN
-      IF(PX.EQ.AFE1)THEN
+      IF(test_aeqb(PY,AH1P1))THEN
+      IF(test_aeqb(PX,AFE1))THEN
       RHF0P1=RPFEPX
-      ELSEIF(PX.EQ.AFEO1)THEN
+      ELSEIF(test_aeqb(PX,AFEO1))THEN
       RHF1P1=RPFEPX
-      ELSEIF(PX.EQ.AFEO2)THEN
+      ELSEIF(test_aeqb(PX,AFEO2))THEN
       RHF2P1=RPFEPX
-      ELSEIF(PX.EQ.AFEO3)THEN
+      ELSEIF(test_aeqb(PX,AFEO3))THEN
       RHF3P1=RPFEPX
-      ELSEIF(PX.EQ.AFEO4)THEN
+      ELSEIF(test_aeqb(PX,AFEO4))THEN
       RHF4P1=RPFEPX
       ENDIF
       ELSE
-      IF(PX.EQ.AFE1)THEN
+      IF(test_aeqb(PX,AFE1))THEN
       RHF0P2=RPFEPX
-      ELSEIF(PX.EQ.AFEO1)THEN
+      ELSEIF(test_aeqb(PX,AFEO1))THEN
       RHF1P2=RPFEPX
-      ELSEIF(PX.EQ.AFEO2)THEN
+      ELSEIF(test_aeqb(PX,AFEO2))THEN
       RHF2P2=RPFEPX
-      ELSEIF(PX.EQ.AFEO3)THEN
+      ELSEIF(test_aeqb(PX,AFEO3))THEN
       RHF3P2=RPFEPX
-      ELSEIF(PX.EQ.AFEO4)THEN
+      ELSEIF(test_aeqb(PX,AFEO4))THEN
       RHF4P2=RPFEPX
       ENDIF
       ENDIF
@@ -1054,17 +1055,17 @@
       PX=AMAX1(AH1P1,AH2P1)
       R1=AHY1
       P1=ACA1
-      IF(PX.EQ.AH1P1)THEN
+      IF(test_aeqb(PX,AH1P1))THEN
       P2=AH1P1
       NR1=0
       SP=SPCAD
-      ELSEIF(PX.EQ.AH2P1)THEN
+      ELSEIF(test_aeqb(PX,AH2P1))THEN
       P2=AH2P1
       NR1=1
       SP=SHCAD2
       ENDIF
-      RPCAD1=0.0
-      RHCAD2=0.0
+      RPCAD1=0._r8
+      RHCAD2=0._r8
       R1=AMAX1(ZERO,R1)
       P1=AMAX1(ZERO,P1)
       P2=AMAX1(ZERO,P2)
@@ -1072,9 +1073,9 @@
       S0=P1+P2
       S1=AMAX1(0.0,S0**2-4.0*(P1*P2-SPX))
       RPCADX=AMAX1(-PCAPD1,TPD*(S0-SQRT(S1)))
-      IF(PX.EQ.AH1P1)THEN
+      IF(test_aeqb(PX,AH1P1))THEN
       RPCAD1=RPCADX
-      ELSEIF(PX.EQ.AH2P1)THEN
+      ELSEIF(test_aeqb(PX,AH2P1))THEN
       RHCAD2=RPCADX
       ENDIF
 !     IF((M/10)*10.EQ.M)THEN
@@ -1088,25 +1089,25 @@
       PX=AMAX1(AH1P1,AH2P1)
       R1=AHY1
       P1=ACA1
-      IF(PX.EQ.AH1P1)THEN
+      IF(test_aeqb(PX,AH1P1))THEN
       P2=AH1P1
       NR1=4
       SP=SHCAH1
-      ELSEIF(PX.EQ.AH2P1)THEN
+      ELSEIF(test_aeqb(PX,AH2P1))THEN
       P2=AH2P1
       NR1=7
       SP=SHCAH2
       ENDIF
-      RHCAH1=0.0
-      RHCAH2=0.0
+      RHCAH1=0._r8
+      RHCAH2=0._r8
       R1=AMAX1(ZERO,R1)
       P1=AMAX1(ZERO,P1)
       P2=AMAX1(ZERO,P2)
       SPX=(SP*R1**NR1/P1**5)**0.333
       RPCAHX=AMAX1(-PCAPH1,TPD*(P2-SPX))
-      IF(PX.EQ.AH1P1)THEN
+      IF(test_aeqb(PX,AH1P1))THEN
       RHCAH1=RPCAHX
-      ELSEIF(PX.EQ.AH2P1)THEN
+      ELSEIF(test_aeqb(PX,AH2P1))THEN
       RHCAH2=RPCAHX
       ENDIF
       PALOH1=PALOH1+RPALOX
@@ -1143,11 +1144,11 @@
       XH1P1=XH1P1+RXH1P
       XH2P1=XH2P1+RXH2P+RYH2P
       ELSE
-      RXOH2=0.0
-      RXOH1=0.0
-      RXH2P=0.0
-      RYH2P=0.0
-      RXH1P=0.0
+      RXOH2=0._r8
+      RXOH1=0._r8
+      RXH2P=0._r8
+      RYH2P=0._r8
+      RXH1P=0._r8
       ENDIF
 !
 !     CATION EXCHANGE
@@ -1173,7 +1174,7 @@
       IF(XTLQ.GT.ZERO)THEN
       FX=CCEC/XTLQ
       ELSE
-      FX=0.0
+      FX=0._r8
       ENDIF
       XN4Q=FX*XN4Q
       XHYQ=FX*XHYQ
@@ -1200,14 +1201,14 @@
       XNA1=XNA1+RXNA
       XKA1=XKA1+RXKA
       ELSE
-      RXN4=0.0
-      RXHY=0.0
-      RXAL=0.0
-      RXFE=0.0
-      RXCA=0.0
-      RXMG=0.0
-      RXNA=0.0
-      RXKA=0.0
+      RXN4=0._r8
+      RXHY=0._r8
+      RXAL=0._r8
+      RXFE=0._r8
+      RXCA=0._r8
+      RXMG=0._r8
+      RXNA=0._r8
+      RXKA=0._r8
       ENDIF
 !     IF((M/25)*25.EQ.M)THEN
 !     WRITE(*,1112)'RXALI',I,NX,NY,L,K,M
@@ -1223,60 +1224,60 @@
       XFEO21=AFEO2*(XCOOH-XHC1)/(AFEO2+DPFEO)
       XCOO=AMAX1(0.0,XCOOH-XHC1-XALO21-XFEO21)
       ELSE
-      RHAL1=0.0
-      RHALO1=0.0
-      RHALO2=0.0
-      RHALO3=0.0
-      RHALO4=0.0
-      RHFE1=0.0
-      RHFEO1=0.0
-      RHFEO2=0.0
-      RHFEO3=0.0
-      RHFEO4=0.0
-      RHCAC3=0.0
-      RHCACH=0.0
-      RHCACO=0.0
-      RPCACX=0.0
-      RPCASO=0.0
-      RPCADX=0.0
-      RPCAHX=0.0
-      RHA0P1=0.0
-      RHA1P1=0.0
-      RHA2P1=0.0
-      RHA3P1=0.0
-      RHA4P1=0.0
-      RHA0P2=0.0
-      RHA1P2=0.0
-      RHA2P2=0.0
-      RHA3P2=0.0
-      RHA4P2=0.0
-      RHF0P1=0.0
-      RHF1P1=0.0
-      RHF2P1=0.0
-      RHF3P1=0.0
-      RHF4P1=0.0
-      RHF0P2=0.0
-      RHF1P2=0.0
-      RHF2P2=0.0
-      RHF3P2=0.0
-      RHF4P2=0.0
-      RPCAD1=0.0
-      RHCAD2=0.0
-      RHCAH1=0.0
-      RHCAH2=0.0
-      RXOH2=0.0
-      RXOH1=0.0
-      RXH2P=0.0
-      RYH2P=0.0
-      RXH1P=0.0
-      RXN4=0.0
-      RXHY=0.0
-      RXAL=0.0
-      RXFE=0.0
-      RXCA=0.0
-      RXMG=0.0
-      RXNA=0.0
-      RXKA=0.0
+      RHAL1=0._r8
+      RHALO1=0._r8
+      RHALO2=0._r8
+      RHALO3=0._r8
+      RHALO4=0._r8
+      RHFE1=0._r8
+      RHFEO1=0._r8
+      RHFEO2=0._r8
+      RHFEO3=0._r8
+      RHFEO4=0._r8
+      RHCAC3=0._r8
+      RHCACH=0._r8
+      RHCACO=0._r8
+      RPCACX=0._r8
+      RPCASO=0._r8
+      RPCADX=0._r8
+      RPCAHX=0._r8
+      RHA0P1=0._r8
+      RHA1P1=0._r8
+      RHA2P1=0._r8
+      RHA3P1=0._r8
+      RHA4P1=0._r8
+      RHA0P2=0._r8
+      RHA1P2=0._r8
+      RHA2P2=0._r8
+      RHA3P2=0._r8
+      RHA4P2=0._r8
+      RHF0P1=0._r8
+      RHF1P1=0._r8
+      RHF2P1=0._r8
+      RHF3P1=0._r8
+      RHF4P1=0._r8
+      RHF0P2=0._r8
+      RHF1P2=0._r8
+      RHF2P2=0._r8
+      RHF3P2=0._r8
+      RHF4P2=0._r8
+      RPCAD1=0._r8
+      RHCAD2=0._r8
+      RHCAH1=0._r8
+      RHCAH2=0._r8
+      RXOH2=0._r8
+      RXOH1=0._r8
+      RXH2P=0._r8
+      RYH2P=0._r8
+      RXH1P=0._r8
+      RXN4=0._r8
+      RXHY=0._r8
+      RXAL=0._r8
+      RXFE=0._r8
+      RXCA=0._r8
+      RXMG=0._r8
+      RXNA=0._r8
+      RXKA=0._r8
       ENDIF
 !
 !     ION SPECIATION
@@ -1558,9 +1559,9 @@
       XH1P1=XH1P1+RXH1P
       XH2P1=XH2P1+RXH2P+RYH2P
       ELSE
-      RXH2P=0.0
-      RYH2P=0.0
-      RXH1P=0.0
+      RXH2P=0._r8
+      RYH2P=0._r8
+      RXH1P=0._r8
       ENDIF
 !
 !     CATION EXCHANGE
@@ -1586,23 +1587,23 @@
       IF(XTLQ.GT.ZERO)THEN
       FX=CCEC/XTLQ
       ELSE
-      FX=0.0
+      FX=0._r8
       ENDIF
       XN4Q=FX*XN4Q
       RXN4=TSL*AMIN1((XN4Q-XN41)*CN41/XN4Q,CN41)
       XN41=XN41+RXN4
       ELSE
-      RXN4=0.0
+      RXN4=0._r8
       ENDIF
       ELSE
-      RPALPX=0.0
-      RPFEPX=0.0
-      RPCADX=0.0
-      RPCAHX=0.0
-      RXH2P=0.0
-      RYH2P=0.0
-      RXH1P=0.0
-      RXN4=0.0
+      RPALPX=0._r8
+      RPFEPX=0._r8
+      RPCADX=0._r8
+      RPCAHX=0._r8
+      RXH2P=0._r8
+      RYH2P=0._r8
+      RXH1P=0._r8
+      RXN4=0._r8
       ENDIF
 !
 !     NH4 � NH3
@@ -1759,7 +1760,7 @@
       ELSEIF(K.EQ.3.AND.I.EQ.1.AND.DATA(20).EQ.'NO'.AND.IGO.EQ.0)THEN
       CCOU=CCO21
       CCHU=CCH41
-      COXU=0.0
+      COXU=0._r8
       CNNU=CZ2G1
       CN2U=CZ2O1
       CN4U(L,NY,NX)=CN41
@@ -1822,7 +1823,7 @@
       OXYS(L,NY,NX)=COXYE(NY,NX)*SOXYX/(EXP(AOXYX*CSTR1)) &
       *EXP(0.516-0.0172*ATCA(NY,NX))*FH2O*VOLW(L,NY,NX)
       ELSE
-      OXYS(L,NY,NX)=0.0
+      OXYS(L,NY,NX)=0._r8
       ENDIF
       CO2S(L,NY,NX)=CCO2EI(NY,NX)*SCO2X/(EXP(ACO2X*CSTR1)) &
       *EXP(0.843-0.0281*ATCA(NY,NX))*FH2O*VOLW(L,NY,NX)
@@ -1847,12 +1848,12 @@
       H2POB(L,NY,NX)=CH2PU(L,NY,NX)*VOLW(L,NY,NX)*VLPOB(L,NY,NX)*31.0
       H1PO4(L,NY,NX)=CH1PU(L,NY,NX)*VOLW(L,NY,NX)*VLPO4(L,NY,NX)*31.0
       H1POB(L,NY,NX)=CH1PU(L,NY,NX)*VOLW(L,NY,NX)*VLPOB(L,NY,NX)*31.0
-      ZNO2S(L,NY,NX)=0.0
-      ZNO2B(L,NY,NX)=0.0
+      ZNO2S(L,NY,NX)=0._r8
+      ZNO2B(L,NY,NX)=0._r8
 !     WRITE(*,444)'ZNH4S',NX,NY,L,ZNH4S(L,NY,NX),CN4U(L,NY,NX)
 !    2,VOLW(L,NY,NX),VLNH4(L,NY,NX),H2PO4(L,NY,NX),CH2PU(L,NY,NX)
 !    3,VLPO4(L,NY,NX)
-444   FORMAT(A8,3I4,12E12.4)
+!444   FORMAT(A8,3I4,12E12.4)
 !
 !     INITIAL STATE VARIABLES FOR CATIONS, ANIONS AND ION PAIRS IN SOIL
 !
@@ -1908,75 +1909,75 @@
 !
 !     INITIAL STATE VARIABLES FOR ALL MATERIAL IN SOIL MACROPORES
 !
-      CO2SH(L,NY,NX)=0.0
-      CH4SH(L,NY,NX)=0.0
-      OXYSH(L,NY,NX)=0.0
-      Z2GSH(L,NY,NX)=0.0
-      Z2OSH(L,NY,NX)=0.0
-      H2GSH(L,NY,NX)=0.0
-      ZNH4SH(L,NY,NX)=0.0
-      ZNH4BH(L,NY,NX)=0.0
-      ZNH3SH(L,NY,NX)=0.0
-      ZNH3BH(L,NY,NX)=0.0
-      ZNO3SH(L,NY,NX)=0.0
-      ZNO3BH(L,NY,NX)=0.0
-      ZNO2SH(L,NY,NX)=0.0
-      ZNO2BH(L,NY,NX)=0.0
-      H2PO4H(L,NY,NX)=0.0
-      H2POBH(L,NY,NX)=0.0
-      H1PO4H(L,NY,NX)=0.0
-      H1POBH(L,NY,NX)=0.0
-      ZALH(L,NY,NX)=0.0
-      ZFEH(L,NY,NX)=0.0
-      ZHYH(L,NY,NX)=0.0
-      ZCCH(L,NY,NX)=0.0
-      ZMAH(L,NY,NX)=0.0
-      ZNAH(L,NY,NX)=0.0
-      ZKAH(L,NY,NX)=0.0
-      ZOHH(L,NY,NX)=0.0
-      ZSO4H(L,NY,NX)=0.0
-      ZCLH(L,NY,NX)=0.0
-      ZCO3H(L,NY,NX)=0.0
-      ZHCO3H(L,NY,NX)=0.0
-      ZALO1H(L,NY,NX)=0.0
-      ZALO2H(L,NY,NX)=0.0
-      ZALO3H(L,NY,NX)=0.0
-      ZALO4H(L,NY,NX)=0.0
-      ZALSH(L,NY,NX)=0.0
-      ZFEO1H(L,NY,NX)=0.0
-      ZFEO2H(L,NY,NX)=0.0
-      ZFEO3H(L,NY,NX)=0.0
-      ZFEO4H(L,NY,NX)=0.0
-      ZFESH(L,NY,NX)=0.0
-      ZCAOH(L,NY,NX)=0.0
-      ZCACH(L,NY,NX)=0.0
-      ZCAHH(L,NY,NX)=0.0
-      ZCASH(L,NY,NX)=0.0
-      ZMGOH(L,NY,NX)=0.0
-      ZMGCH(L,NY,NX)=0.0
-      ZMGHH(L,NY,NX)=0.0
-      ZMGSH(L,NY,NX)=0.0
-      ZNACH(L,NY,NX)=0.0
-      ZNASH(L,NY,NX)=0.0
-      ZKASH(L,NY,NX)=0.0
-      H0PO4H(L,NY,NX)=0.0
-      H1PO4H(L,NY,NX)=0.0
-      H3PO4H(L,NY,NX)=0.0
-      ZFE1PH(L,NY,NX)=0.0
-      ZFE2PH(L,NY,NX)=0.0
-      ZCA0PH(L,NY,NX)=0.0
-      ZCA1PH(L,NY,NX)=0.0
-      ZCA2PH(L,NY,NX)=0.0
-      ZMG1PH(L,NY,NX)=0.0
-      H0POBH(L,NY,NX)=0.0
-      H1POBH(L,NY,NX)=0.0
-      H3POBH(L,NY,NX)=0.0
-      ZFE1BH(L,NY,NX)=0.0
-      ZFE2BH(L,NY,NX)=0.0
-      ZCA0BH(L,NY,NX)=0.0
-      ZCA1BH(L,NY,NX)=0.0
-      ZCA2BH(L,NY,NX)=0.0
-      ZMG1BH(L,NY,NX)=0.0
+      CO2SH(L,NY,NX)=0._r8
+      CH4SH(L,NY,NX)=0._r8
+      OXYSH(L,NY,NX)=0._r8
+      Z2GSH(L,NY,NX)=0._r8
+      Z2OSH(L,NY,NX)=0._r8
+      H2GSH(L,NY,NX)=0._r8
+      ZNH4SH(L,NY,NX)=0._r8
+      ZNH4BH(L,NY,NX)=0._r8
+      ZNH3SH(L,NY,NX)=0._r8
+      ZNH3BH(L,NY,NX)=0._r8
+      ZNO3SH(L,NY,NX)=0._r8
+      ZNO3BH(L,NY,NX)=0._r8
+      ZNO2SH(L,NY,NX)=0._r8
+      ZNO2BH(L,NY,NX)=0._r8
+      H2PO4H(L,NY,NX)=0._r8
+      H2POBH(L,NY,NX)=0._r8
+      H1PO4H(L,NY,NX)=0._r8
+      H1POBH(L,NY,NX)=0._r8
+      ZALH(L,NY,NX)=0._r8
+      ZFEH(L,NY,NX)=0._r8
+      ZHYH(L,NY,NX)=0._r8
+      ZCCH(L,NY,NX)=0._r8
+      ZMAH(L,NY,NX)=0._r8
+      ZNAH(L,NY,NX)=0._r8
+      ZKAH(L,NY,NX)=0._r8
+      ZOHH(L,NY,NX)=0._r8
+      ZSO4H(L,NY,NX)=0._r8
+      ZCLH(L,NY,NX)=0._r8
+      ZCO3H(L,NY,NX)=0._r8
+      ZHCO3H(L,NY,NX)=0._r8
+      ZALO1H(L,NY,NX)=0._r8
+      ZALO2H(L,NY,NX)=0._r8
+      ZALO3H(L,NY,NX)=0._r8
+      ZALO4H(L,NY,NX)=0._r8
+      ZALSH(L,NY,NX)=0._r8
+      ZFEO1H(L,NY,NX)=0._r8
+      ZFEO2H(L,NY,NX)=0._r8
+      ZFEO3H(L,NY,NX)=0._r8
+      ZFEO4H(L,NY,NX)=0._r8
+      ZFESH(L,NY,NX)=0._r8
+      ZCAOH(L,NY,NX)=0._r8
+      ZCACH(L,NY,NX)=0._r8
+      ZCAHH(L,NY,NX)=0._r8
+      ZCASH(L,NY,NX)=0._r8
+      ZMGOH(L,NY,NX)=0._r8
+      ZMGCH(L,NY,NX)=0._r8
+      ZMGHH(L,NY,NX)=0._r8
+      ZMGSH(L,NY,NX)=0._r8
+      ZNACH(L,NY,NX)=0._r8
+      ZNASH(L,NY,NX)=0._r8
+      ZKASH(L,NY,NX)=0._r8
+      H0PO4H(L,NY,NX)=0._r8
+      H1PO4H(L,NY,NX)=0._r8
+      H3PO4H(L,NY,NX)=0._r8
+      ZFE1PH(L,NY,NX)=0._r8
+      ZFE2PH(L,NY,NX)=0._r8
+      ZCA0PH(L,NY,NX)=0._r8
+      ZCA1PH(L,NY,NX)=0._r8
+      ZCA2PH(L,NY,NX)=0._r8
+      ZMG1PH(L,NY,NX)=0._r8
+      H0POBH(L,NY,NX)=0._r8
+      H1POBH(L,NY,NX)=0._r8
+      H3POBH(L,NY,NX)=0._r8
+      ZFE1BH(L,NY,NX)=0._r8
+      ZFE2BH(L,NY,NX)=0._r8
+      ZCA0BH(L,NY,NX)=0._r8
+      ZCA1BH(L,NY,NX)=0._r8
+      ZCA2BH(L,NY,NX)=0._r8
+      ZMG1BH(L,NY,NX)=0._r8
 !
 !     INITIAL STATE VARIABLES FOR EXCHANGEABLE CATIONS AND ANIONS
 !
@@ -2013,15 +2014,15 @@
       PFEPO(L,NY,NX)=PFEPO1*BKVL(L,NY,NX)*VLPO4(L,NY,NX)
       PCAPD(L,NY,NX)=PCAPD1*BKVL(L,NY,NX)*VLPO4(L,NY,NX)
       PCAPH(L,NY,NX)=PCAPH1*BKVL(L,NY,NX)*VLPO4(L,NY,NX)
-      PCAPM(L,NY,NX)=0.0
+      PCAPM(L,NY,NX)=0._r8
       PALPB(L,NY,NX)=PALPO1*BKVL(L,NY,NX)*VLPOB(L,NY,NX)
       PFEPB(L,NY,NX)=PFEPO1*BKVL(L,NY,NX)*VLPOB(L,NY,NX)
       PCPDB(L,NY,NX)=PCAPD1*BKVL(L,NY,NX)*VLPOB(L,NY,NX)
       PCPHB(L,NY,NX)=PCAPH1*BKVL(L,NY,NX)*VLPOB(L,NY,NX)
-      PCPMB(L,NY,NX)=0.0
-      ECND(L,NY,NX)=0.0
-      CSTR(L,NY,NX)=0.0
-      CION(L,NY,NX)=0.0
+      PCPMB(L,NY,NX)=0._r8
+      ECND(L,NY,NX)=0._r8
+      CSTR(L,NY,NX)=0._r8
+      CION(L,NY,NX)=0._r8
       ZNH4S(L,NY,NX)=ZNH4S(L,NY,NX)+0.5*OSN(1,2,L,NY,NX)
       OSN(1,2,L,NY,NX)=OSN(1,2,L,NY,NX)-0.5*OSN(1,2,L,NY,NX)
 !     IF(K.EQ.3)THEN
@@ -2044,41 +2045,41 @@
 !     INITIAL STATE VARIABLES FOR MINERALS IN SURFACE RESIDUE
 !
       IF(DATA(20).EQ.'NO'.AND.IGO.EQ.0)THEN
-      ZNH4S(0,NY,NX)=0.0
-      ZNH3S(0,NY,NX)=0.0
-      ZNO3S(0,NY,NX)=0.0
-      ZNO2S(0,NY,NX)=0.0
-      H2PO4(0,NY,NX)=0.0
-      H1PO4(0,NY,NX)=0.0
-      ZNH4B(0,NY,NX)=0.0
-      ZNH3B(0,NY,NX)=0.0
-      ZNO3B(0,NY,NX)=0.0
-      ZNO2B(0,NY,NX)=0.0
-      H2POB(0,NY,NX)=0.0
-      H1POB(0,NY,NX)=0.0
-      XN4(0,NY,NX)=0.0
-      XNB(0,NY,NX)=0.0
-      XOH0(0,NY,NX)=0.0
-      XOH1(0,NY,NX)=0.0
-      XOH2(0,NY,NX)=0.0
-      XH1P(0,NY,NX)=0.0
-      XH2P(0,NY,NX)=0.0
-      XNB(0,NY,NX)=0.0
-      XOH0B(0,NY,NX)=0.0
-      XOH1B(0,NY,NX)=0.0
-      XOH2B(0,NY,NX)=0.0
-      XH1PB(0,NY,NX)=0.0
-      XH2PB(0,NY,NX)=0.0
-      PALPO(0,NY,NX)=0.0
-      PFEPO(0,NY,NX)=0.0
-      PCAPD(0,NY,NX)=0.0
-      PCAPH(0,NY,NX)=0.0
-      PCAPM(0,NY,NX)=0.0
-      PALPB(0,NY,NX)=0.0
-      PFEPB(0,NY,NX)=0.0
-      PCPDB(0,NY,NX)=0.0
-      PCPHB(0,NY,NX)=0.0
-      PCPMB(0,NY,NX)=0.0
+      ZNH4S(0,NY,NX)=0._r8
+      ZNH3S(0,NY,NX)=0._r8
+      ZNO3S(0,NY,NX)=0._r8
+      ZNO2S(0,NY,NX)=0._r8
+      H2PO4(0,NY,NX)=0._r8
+      H1PO4(0,NY,NX)=0._r8
+      ZNH4B(0,NY,NX)=0._r8
+      ZNH3B(0,NY,NX)=0._r8
+      ZNO3B(0,NY,NX)=0._r8
+      ZNO2B(0,NY,NX)=0._r8
+      H2POB(0,NY,NX)=0._r8
+      H1POB(0,NY,NX)=0._r8
+      XN4(0,NY,NX)=0._r8
+      XNB(0,NY,NX)=0._r8
+      XOH0(0,NY,NX)=0._r8
+      XOH1(0,NY,NX)=0._r8
+      XOH2(0,NY,NX)=0._r8
+      XH1P(0,NY,NX)=0._r8
+      XH2P(0,NY,NX)=0._r8
+      XNB(0,NY,NX)=0._r8
+      XOH0B(0,NY,NX)=0._r8
+      XOH1B(0,NY,NX)=0._r8
+      XOH2B(0,NY,NX)=0._r8
+      XH1PB(0,NY,NX)=0._r8
+      XH2PB(0,NY,NX)=0._r8
+      PALPO(0,NY,NX)=0._r8
+      PFEPO(0,NY,NX)=0._r8
+      PCAPD(0,NY,NX)=0._r8
+      PCAPH(0,NY,NX)=0._r8
+      PCAPM(0,NY,NX)=0._r8
+      PALPB(0,NY,NX)=0._r8
+      PFEPB(0,NY,NX)=0._r8
+      PCPDB(0,NY,NX)=0._r8
+      PCPHB(0,NY,NX)=0._r8
+      PCPMB(0,NY,NX)=0._r8
 !
 !     INITIAL STATE VARIABLES FOR MINERAL N AND P IN SNOWPACK
 !
@@ -2142,65 +2143,65 @@
       ZMG1PW(L,NY,NX)=VOLWW*CM1PR(NY,NX)
       ENDIF
       ELSE
-      CO2W(L,NY,NX)=0.0
-      CH4W(L,NY,NX)=0.0
-      OXYW(L,NY,NX)=0.0
-      ZNGW(L,NY,NX)=0.0
-      ZN2W(L,NY,NX)=0.0
-      ZN4W(L,NY,NX)=0.0
-      ZN3W(L,NY,NX)=0.0
-      ZNOW(L,NY,NX)=0.0
-      Z1PW(L,NY,NX)=0.0
-      ZHPW(L,NY,NX)=0.0
+      CO2W(L,NY,NX)=0._r8
+      CH4W(L,NY,NX)=0._r8
+      OXYW(L,NY,NX)=0._r8
+      ZNGW(L,NY,NX)=0._r8
+      ZN2W(L,NY,NX)=0._r8
+      ZN4W(L,NY,NX)=0._r8
+      ZN3W(L,NY,NX)=0._r8
+      ZNOW(L,NY,NX)=0._r8
+      Z1PW(L,NY,NX)=0._r8
+      ZHPW(L,NY,NX)=0._r8
 !
 !     INITIAL STATE VARIABLES FOR CATIONS AND ANIONS IN SNOWPACK
 !
       IF(ISALTG.NE.0)THEN
-      ZALW(L,NY,NX)=0.0
-      ZFEW(L,NY,NX)=0.0
-      ZHYW(L,NY,NX)=0.0
-      ZCAW(L,NY,NX)=0.0
-      ZMGW(L,NY,NX)=0.0
-      ZNAW(L,NY,NX)=0.0
-      ZKAW(L,NY,NX)=0.0
-      ZOHW(L,NY,NX)=0.0
-      ZSO4W(L,NY,NX)=0.0
-      ZCLW(L,NY,NX)=0.0
-      ZCO3W(L,NY,NX)=0.0
-      ZHCO3W(L,NY,NX)=0.0
-      ZALH1W(L,NY,NX)=0.0
-      ZALH2W(L,NY,NX)=0.0
-      ZALH3W(L,NY,NX)=0.0
-      ZALH4W(L,NY,NX)=0.0
-      ZALSW(L,NY,NX)=0.0
-      ZFEH1W(L,NY,NX)=0.0
-      ZFEH2W(L,NY,NX)=0.0
-      ZFEH3W(L,NY,NX)=0.0
-      ZFEH4W(L,NY,NX)=0.0
-      ZFESW(L,NY,NX)=0.0
-      ZCAOW(L,NY,NX)=0.0
-      ZCACW(L,NY,NX)=0.0
-      ZCAHW(L,NY,NX)=0.0
-      ZCASW(L,NY,NX)=0.0
-      ZMGOW(L,NY,NX)=0.0
-      ZMGCW(L,NY,NX)=0.0
-      ZMGHW(L,NY,NX)=0.0
-      ZMGSW(L,NY,NX)=0.0
-      ZNACW(L,NY,NX)=0.0
-      ZNASW(L,NY,NX)=0.0
-      ZKASW(L,NY,NX)=0.0
-      H0PO4W(L,NY,NX)=0.0
-      H3PO4W(L,NY,NX)=0.0
-      ZFE1PW(L,NY,NX)=0.0
-      ZFE2PW(L,NY,NX)=0.0
-      ZCA0PW(L,NY,NX)=0.0
-      ZCA1PW(L,NY,NX)=0.0
-      ZCA2PW(L,NY,NX)=0.0
-      ZMG1PW(L,NY,NX)=0.0
+      ZALW(L,NY,NX)=0._r8
+      ZFEW(L,NY,NX)=0._r8
+      ZHYW(L,NY,NX)=0._r8
+      ZCAW(L,NY,NX)=0._r8
+      ZMGW(L,NY,NX)=0._r8
+      ZNAW(L,NY,NX)=0._r8
+      ZKAW(L,NY,NX)=0._r8
+      ZOHW(L,NY,NX)=0._r8
+      ZSO4W(L,NY,NX)=0._r8
+      ZCLW(L,NY,NX)=0._r8
+      ZCO3W(L,NY,NX)=0._r8
+      ZHCO3W(L,NY,NX)=0._r8
+      ZALH1W(L,NY,NX)=0._r8
+      ZALH2W(L,NY,NX)=0._r8
+      ZALH3W(L,NY,NX)=0._r8
+      ZALH4W(L,NY,NX)=0._r8
+      ZALSW(L,NY,NX)=0._r8
+      ZFEH1W(L,NY,NX)=0._r8
+      ZFEH2W(L,NY,NX)=0._r8
+      ZFEH3W(L,NY,NX)=0._r8
+      ZFEH4W(L,NY,NX)=0._r8
+      ZFESW(L,NY,NX)=0._r8
+      ZCAOW(L,NY,NX)=0._r8
+      ZCACW(L,NY,NX)=0._r8
+      ZCAHW(L,NY,NX)=0._r8
+      ZCASW(L,NY,NX)=0._r8
+      ZMGOW(L,NY,NX)=0._r8
+      ZMGCW(L,NY,NX)=0._r8
+      ZMGHW(L,NY,NX)=0._r8
+      ZMGSW(L,NY,NX)=0._r8
+      ZNACW(L,NY,NX)=0._r8
+      ZNASW(L,NY,NX)=0._r8
+      ZKASW(L,NY,NX)=0._r8
+      H0PO4W(L,NY,NX)=0._r8
+      H3PO4W(L,NY,NX)=0._r8
+      ZFE1PW(L,NY,NX)=0._r8
+      ZFE2PW(L,NY,NX)=0._r8
+      ZCA0PW(L,NY,NX)=0._r8
+      ZCA1PW(L,NY,NX)=0._r8
+      ZCA2PW(L,NY,NX)=0._r8
+      ZMG1PW(L,NY,NX)=0._r8
       ENDIF
       ENDIF
 9985  CONTINUE
       ENDIF
       end subroutine InitialState
 
-      end module StarteMod
+end module StarteMod

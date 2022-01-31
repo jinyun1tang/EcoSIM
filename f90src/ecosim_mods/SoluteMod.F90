@@ -1,7 +1,7 @@
-
-      module SoluteMod
-      use data_kind_mod, only : r8 => SHR_KIND_R8
-      implicit none
+module SoluteMod
+  use data_kind_mod, only : r8 => SHR_KIND_R8
+  use minimathmod, only : test_aeqb
+  implicit none
 
       private
 !     include_section
@@ -243,7 +243,7 @@
       ENDIF
 !     IF(I.EQ.116)THEN
 !     WRITE(*,9984)'TRN3S',I,J,L,TRN4S(L,NY,NX),TRN3S(L,NY,NX)
-9984  FORMAT(A8,3I4,20F14.7)
+!9984  FORMAT(A8,3I4,20F14.7)
 !     ENDIF
 9985  CONTINUE
 !
@@ -297,7 +297,7 @@
 !     WRITE(*,9989)'TRN4S',I,J,TRN4S(0,NY,NX)
 !    2,RN4S,RNH4,RXN4,RSN4AA,VOLWM(NPH,0,NY,NX)
 !    3,SPNH4,ZNH4FA(0,NY,NX),THETWR
-9989  FORMAT(A8,2I4,12E12.4)
+!9989  FORMAT(A8,2I4,12E12.4)
 9990  CONTINUE
 9995  CONTINUE
       RETURN
@@ -339,7 +339,7 @@
       -RNHUI(IUTYP(NY,NX))*ZNHUI(L,NY,NX) &
       *AMAX1(RNHUI(IUTYP(NY,NX)),1.0-ZNHUI(L,NY,NX)/ZNHU0(L,NY,NX))
       ELSE
-      ZNHUI(L,NY,NX)=0.0
+      ZNHUI(L,NY,NX)=0._r8
       ENDIF
 !
 !     UREA CONCENTRATION AND HYDROLYSIS IN NON-BAND
@@ -358,7 +358,7 @@
       ELSEIF(VOLW(L,NY,NX).GT.ZEROS2(NY,NX))THEN
       CNHUA=ZNHUFA(L,NY,NX)/VOLW(L,NY,NX)
       ELSE
-      CNHUA=0.0
+      CNHUA=0._r8
       ENDIF
       DFNSA=CNHUA/(CNHUA+DUKD)
       RSNUA=AMIN1(ZNHUFA(L,NY,NX) &
@@ -379,7 +379,7 @@
       ELSEIF(VOLW(L,NY,NX).GT.ZEROS2(NY,NX))THEN
       CNHUB=ZNHUFB(L,NY,NX)/VOLW(L,NY,NX)
       ELSE
-      CNHUB=0.0
+      CNHUB=0._r8
       ENDIF
       DFNSB=CNHUB/(CNHUB+DUKD)
       RSNUB=AMIN1(ZNHUFB(L,NY,NX) &
@@ -391,7 +391,7 @@
 !    3,BKVL(L,NY,NX),SPNHU,ZNHU0(L,NY,NX),ZNHUI(L,NY,NX)
 !    4,RNHUI(IUTYP(NY,NX)),VLNH4(L,NY,NX),VLNHB(L,NY,NX)
 !    5,THETW(L,NY,NX)
-8888  FORMAT(A8,4I4,40E12.4)
+!8888  FORMAT(A8,4I4,40E12.4)
 !     ENDIF
       end subroutine UreaHydrolysis
 !------------------------------------------------------------------------
@@ -470,11 +470,11 @@
       CN31=AMAX1(0.0,ZNH3S(L,NY,NX)/VOLWNX+RN3X)
       XN41=AMAX1(0.0,XN4(L,NY,NX)/BKVLNH)
       ELSE
-      RN4X=0.0
-      RN3X=0.0
-      CN41=0.0
-      CN31=0.0
-      XN41=0.0
+      RN4X=0._r8
+      RN3X=0._r8
+      CN41=0._r8
+      CN31=0._r8
+      XN41=0._r8
       ENDIF
       IF(VOLWNB.GT.ZEROS2(NY,NX))THEN
       VOLWNX=14.0*VOLWNB
@@ -486,11 +486,11 @@
       CN3B=AMAX1(0.0,ZNH3B(L,NY,NX)/VOLWNX+R3BX)
       XN4B=AMAX1(0.0,XNB(L,NY,NX)/BKVLNB)
       ELSE
-      RNBX=0.0
-      R3BX=0.0
-      CN4B=0.0
-      CN3B=0.0
-      XN4B=0.0
+      RNBX=0._r8
+      R3BX=0._r8
+      CN4B=0._r8
+      CN3B=0._r8
+      XN4B=0._r8
       ENDIF
 !     IF(IYRC.EQ.2012.AND.I.EQ.151.AND.NX.EQ.1)THEN
 !     WRITE(*,4141)'RN4X',I,J,NX,NY,L,RN4X,RN3X,RNBX,R3BX
@@ -499,7 +499,7 @@
 !    4,XNH4B(L,NY,NX),RSN4BA,RSN4BB,TUPN3B(L,NY,NX)
 !    5,RSNUBA,RSNUBB,ZNH4S(L,NY,NX),ZNH3S(L,NY,NX)
 !    6,VOLWNX,BKVLNH
-4141  FORMAT(A8,5I4,30E12.4)
+!4141  FORMAT(A8,5I4,30E12.4)
 !     ENDIF
 !
 !     SOLUBLE, EXCHANGEABLE AND PRECIPITATED PO4 CONCENTRATIONS IN
@@ -540,22 +540,22 @@
       PCAPH1=AMAX1(0.0,PCAPH(L,NY,NX))/BKVLPO
 !     WRITE(*,8642)'CH2P1',I,J,L,CH2P1,H2PO4(L,NY,NX)
 !    2,VOLWPX,RH2PX,XH2PS(L,NY,NX),TUPH2P(L,NY,NX)
-8642  FORMAT(A8,3I4,20E12.4)
+!8642  FORMAT(A8,3I4,20E12.4)
       ELSE
-      RH1PX=0.0
-      RH2PX=0.0
-      CH1P1=0.0
-      CH2P1=0.0
-      XOH01=0.0
-      XOH11=0.0
-      XOH21=0.0
-      XH1P1=0.0
-      XH2P1=0.0
-      PALPO1=0.0
-      PFEPO1=0.0
-      PCAPM1=0.0
-      PCAPD1=0.0
-      PCAPH1=0.0
+      RH1PX=0._r8
+      RH2PX=0._r8
+      CH1P1=0._r8
+      CH2P1=0._r8
+      XOH01=0._r8
+      XOH11=0._r8
+      XOH21=0._r8
+      XH1P1=0._r8
+      XH2P1=0._r8
+      PALPO1=0._r8
+      PFEPO1=0._r8
+      PCAPM1=0._r8
+      PCAPD1=0._r8
+      PCAPH1=0._r8
       ENDIF
       IF(VOLWPB.GT.ZEROS2(NY,NX))THEN
       VOLWPX=31.0*VOLWPB
@@ -574,20 +574,20 @@
       PCAPDB=AMAX1(0.0,PCPDB(L,NY,NX))/BKVLPB
       PCAPHB=AMAX1(0.0,PCPHB(L,NY,NX))/BKVLPB
       ELSE
-      RH1BX=0.0
-      RH2BX=0.0
-      CH1PB=0.0
-      CH2PB=0.0
-      XH01B=0.0
-      XH11B=0.0
-      XH21B=0.0
-      X1P1B=0.0
-      X2P1B=0.0
-      PALPOB=0.0
-      PFEPOB=0.0
-      PCAPMB=0.0
-      PCAPDB=0.0
-      PCAPHB=0.0
+      RH1BX=0._r8
+      RH2BX=0._r8
+      CH1PB=0._r8
+      CH2PB=0._r8
+      XH01B=0._r8
+      XH11B=0._r8
+      XH21B=0._r8
+      X1P1B=0._r8
+      X2P1B=0._r8
+      PALPOB=0._r8
+      PFEPOB=0._r8
+      PCAPMB=0._r8
+      PCAPDB=0._r8
+      PCAPHB=0._r8
       ENDIF
       end subroutine UpdateSoilFertlizer
 !------------------------------------------------------------------
@@ -707,7 +707,7 @@
 !    2,CH2PA,CH2PH,SYA0P2,CAL1,COH1,SYCAH2,CCA1,CCO21,CCO31,PCAPH1
 !    3,VOLWPO,SPCAC/CCO31,CCA(L,NY,NX),H2PO4(L,NY,NX)
 !    4,VOLWM(NPH,L,NY,NX),ZCA(L,NY,NX),CCO2S(L,NY,NX)
-1117  FORMAT(A8,3I4,30E12.4)
+!1117  FORMAT(A8,3I4,30E12.4)
 !     ENDIF
 !
 !     PHOSPHORUS ANION EXCHANGE IN NON-BAND SOIL ZONE
@@ -718,7 +718,7 @@
       IF(VOLWM(NPH,L,NY,NX).GT.ZEROS2(NY,NX))THEN
       VOLWBK=AMIN1(1.0,BKVL(L,NY,NX)/VOLWM(NPH,L,NY,NX))
       ELSE
-      VOLWBK=1.0
+      VOLWBK=1._r8
       ENDIF
       IF(XAEC(L,NY,NX).GT.ZEROS(NY,NX))THEN
 !
@@ -743,9 +743,9 @@
       SPH1P=SXH1P*DPH2O/DPH2P
       RXH1P=TADA*(XOH11*CH1P1-SPH1P*XH1P1)/(XOH11+SPH1P)*VOLWBK
       ELSE
-      RXH2P=0.0
-      RYH2P=0.0
-      RXH1P=0.0
+      RXH2P=0._r8
+      RYH2P=0._r8
+      RXH1P=0._r8
       ENDIF
 !     IF((I/120)*120.EQ.I.AND.J.EQ.24.AND.L.LE.6)THEN
 !     WRITE(*,1116)'RXH2P',I,J,NX,NY,L,RXH2P
@@ -758,7 +758,7 @@
 !    2,XOH11,CH1P1,XH1P1,XOH11*(CH1P1-RXH1P)/(XH1P1+RXH1P),SPH1P
 !    3,SYH1P,DPH2O,DPH2P,XOH1(L,NY,NX),VLPO4(L,NY,NX),VLPOB(L,NY,NX)
 !    4,TKS(L,NY,NX),XOH21,XOH01
-1116  FORMAT(A8,5I4,40E12.4)
+!1116  FORMAT(A8,5I4,40E12.4)
 !     ENDIF
 !
 !     H2PO4-H+HPO4
@@ -772,22 +772,22 @@
       S1=AMAX1(0.0,S0**2-4.0*(CH1P1*CHY1-DP*CH2P1))
       RH2P=TSL*(S0-SQRT(S1))
       ELSE
-      RPALPX=0.0
-      RPFEPX=0.0
-      RPCADX=0.0
-      RPCAHX=0.0
-      RPCAMX=0.0
-      RXH2P=0.0
-      RYH2P=0.0
-      RXH1P=0.0
-      RH2P=0.0
+      RPALPX=0._r8
+      RPFEPX=0._r8
+      RPCADX=0._r8
+      RPCAHX=0._r8
+      RPCAMX=0._r8
+      RXH2P=0._r8
+      RYH2P=0._r8
+      RXH1P=0._r8
+      RH2P=0._r8
       ENDIF
 !     IF(J.EQ.1)THEN
 !     WRITE(*,2222)'PO4',I,J,L,CH2P1,PALPO1,PFEPO1,PCAPD1,PCAPH1,PCAPM1
 !    2,CH2PA,CH2PF,CH2PD,CH2PH,CH2PM,RPALPX,RPFEPX,RPCADX,RPCAHX,RPCAMX
 !    3,XH2P1,RXH2P,RYH2P
 !    3,CAL1,CFE1,CCA1,CHY1,COH1
-2222  FORMAT(A8,3I4,40E12.4)
+!2222  FORMAT(A8,3I4,40E12.4)
 !     ENDIF
 !
 !     PHOSPHORUS PRECIPITATION-DISSOLUTION IN BAND SOIL ZONE
@@ -871,12 +871,12 @@
       SPH1P=SXH1P*DPH2O/DPH2P
       RXH1B=TADA*(XH11B*CH1PB-SPH1P*X1P1B)/(XH11B+SPH1P)*VOLWBK
       ELSE
-      RXH2B=0.0
-      RYH2B=0.0
-      RXH1B=0.0
+      RXH2B=0._r8
+      RYH2B=0._r8
+      RXH1B=0._r8
       ENDIF
 !     WRITE(*,2224)'RXH1B',I,J,L,RXH1B,XH11B,CH1PB,SPH1P,X1P1B
-2224  FORMAT(A8,3I4,40E12.4)
+!2224  FORMAT(A8,3I4,40E12.4)
 !
 !     H2PO4-H+HPO4
 !
@@ -889,15 +889,15 @@
       S1=AMAX1(0.0,S0**2-4.0*(CH1PB*CHY1-DP*CH2PB))
       RH2B=TSLX*(S0-SQRT(S1))
       ELSE
-      RPALBX=0.0
-      RPFEBX=0.0
-      RPCDBX=0.0
-      RPCHBX=0.0
-      RPCMBX=0.0
-      RXH2B=0.0
-      RYH2B=0.0
-      RXH1B=0.0
-      RH2B=0.0
+      RPALBX=0._r8
+      RPFEBX=0._r8
+      RPCDBX=0._r8
+      RPCHBX=0._r8
+      RPCMBX=0._r8
+      RXH2B=0._r8
+      RYH2B=0._r8
+      RXH1B=0._r8
+      RH2B=0._r8
       ENDIF
 !
 !     CATION EXCHANGE FROM GAPON SELECTIVITY COEFFICIENTS
@@ -948,7 +948,7 @@
       IF(XTLQ.GT.ZERO)THEN
       FX=CCEC/XTLQ
       ELSE
-      FX=0.0
+      FX=0._r8
       ENDIF
       XN4Q=FX*XN4Q
       XNBQ=FX*XNBQ
@@ -961,8 +961,8 @@
       RXN4=TADC*AMAX1(AMIN1((XN4Q-XN41)*CN41/XN4Q,CN41),-XN41)
       RXNB=TADC*AMAX1(AMIN1((XNBQ-XN4B)*CN4B/XNBQ,CN4B),-XN4B)
       ELSE
-      RXN4=0.0
-      RXNB=0.0
+      RXN4=0._r8
+      RXNB=0._r8
       ENDIF
 !     IF(J.EQ.12.AND.L.EQ.0)THEN
 !     WRITE(*,2222)'RXN4',I,J,L,RXN4,CN41,XN41,CCAX,CCA1,XCAQ
@@ -980,12 +980,12 @@
       IF(VOLWNH.GT.ZEROS2(NY,NX))THEN
       RNH4=(CHY1*CN31-DPN4*CN41)/(DPN4+CHY1)
       ELSE
-      RNH4=0.0
+      RNH4=0._r8
       ENDIF
       IF(VOLWNB.GT.ZEROS2(NY,NX))THEN
       RNHB=(CHY1*CN3B-DPN4*CN4B)/(DPN4+CHY1)
       ELSE
-      RNHB=0.0
+      RNHB=0._r8
       ENDIF
 !     IF(IYRC.EQ.2012.AND.I.EQ.151.AND.NX.EQ.1)THEN
 !     WRITE(*,2222)'RNH4',I,J,L,RNH4,CHY1,CN31,DPN4,CN41
@@ -1076,7 +1076,7 @@
 !     WRITE(*,24)'RHP2',I,J,L,RHP2,RH2P,RXH2P,RYH2P
 !    2,RPALPX,RPFEPX,RPCADX,2.0*RPCAMX,3.0*RPCAHX
 !    3,TRX2P(L,NY,NX)
-24    FORMAT(A8,3I4,60E12.4)
+!24    FORMAT(A8,3I4,60E12.4)
 !     ENDIF
       end subroutine DoNoSaltChemEquilibria
 !------------------------------------------------------------------------
@@ -1094,13 +1094,13 @@
       IF(VOLWNO.GT.ZEROS2(NY,NX))THEN
       CNO1=AMAX1(0.0,ZNO3S(L,NY,NX)/(14.0*VOLWNO))
       ELSE
-      CNO1=0.0
+      CNO1=0._r8
       ENDIF
 
       IF(VOLWNZ.GT.ZEROS2(NY,NX))THEN
       CNOB=AMAX1(0.0,ZNO3B(L,NY,NX)/(14.0*VOLWNZ))
       ELSE
-      CNOB=0.0
+      CNOB=0._r8
       ENDIF
 !
 !     H CONCENTRATION
@@ -1156,39 +1156,39 @@
       CNAS1=AMAX1(0.0,ZNAS(L,NY,NX)/VOLWM(NPH,L,NY,NX))
       CKAS1=AMAX1(0.0,ZKAS(L,NY,NX)/VOLWM(NPH,L,NY,NX))
       ELSE
-      COH1=0.0
-      CAL1=0.0
-      CFE1=0.0
-      CCA1=0.0
-      CMG1=0.0
-      CNA1=0.0
-      CKA1=0.0
-      CSO41=0.0
-      CCL1=0.0
-      CCO31=0.0
-      CHCO31=0.0
-      CCO21=0.0
-      CALO1=0.0
-      CALO2=0.0
-      CALO3=0.0
-      CALO4=0.0
-      CALS1=0.0
-      CFEO1=0.0
-      CFEO2=0.0
-      CFEO3=0.0
-      CFEO4=0.0
-      CFES1=0.0
-      CCAO1=0.0
-      CCAC1=0.0
-      CCAH1=0.0
-      CCAS1=0.0
-      CMGO1=0.0
-      CMGC1=0.0
-      CMGH1=0.0
-      CMGS1=0.0
-      CNAC1=0.0
-      CNAS1=0.0
-      CKAS1=0.0
+      COH1=0._r8
+      CAL1=0._r8
+      CFE1=0._r8
+      CCA1=0._r8
+      CMG1=0._r8
+      CNA1=0._r8
+      CKA1=0._r8
+      CSO41=0._r8
+      CCL1=0._r8
+      CCO31=0._r8
+      CHCO31=0._r8
+      CCO21=0._r8
+      CALO1=0._r8
+      CALO2=0._r8
+      CALO3=0._r8
+      CALO4=0._r8
+      CALS1=0._r8
+      CFEO1=0._r8
+      CFEO2=0._r8
+      CFEO3=0._r8
+      CFEO4=0._r8
+      CFES1=0._r8
+      CCAO1=0._r8
+      CCAC1=0._r8
+      CCAH1=0._r8
+      CCAS1=0._r8
+      CMGO1=0._r8
+      CMGC1=0._r8
+      CMGH1=0._r8
+      CMGS1=0._r8
+      CNAC1=0._r8
+      CNAS1=0._r8
+      CKAS1=0._r8
       ENDIF
 !
 !     PO4 CONCENTRATIONS IN NON-BAND AND BAND SOIL ZONES
@@ -1206,14 +1206,14 @@
       CC2P1=AMAX1(0.0,ZCA2P(L,NY,NX)/VOLWPO)
       CM1P1=AMAX1(0.0,ZMG1P(L,NY,NX)/VOLWPO)
       ELSE
-      CH0P1=0.0
-      CH3P1=0.0
-      CF1P1=0.0
-      CF2P1=0.0
-      CC0P1=0.0
-      CC1P1=0.0
-      CC2P1=0.0
-      CM1P1=0.0
+      CH0P1=0._r8
+      CH3P1=0._r8
+      CF1P1=0._r8
+      CF2P1=0._r8
+      CC0P1=0._r8
+      CC1P1=0._r8
+      CC2P1=0._r8
+      CM1P1=0._r8
       ENDIF
       IF(VOLWPB.GT.ZEROS2(NY,NX))THEN
       CH0PB=AMAX1(0.0,H0POB(L,NY,NX)/VOLWPB)
@@ -1225,14 +1225,14 @@
       CC2PB=AMAX1(0.0,ZCA2PB(L,NY,NX)/VOLWPB)
       CM1PB=AMAX1(0.0,ZMG1PB(L,NY,NX)/VOLWPB)
       ELSE
-      CH0PB=0.0
-      CH3PB=0.0
-      CF1PB=0.0
-      CF2PB=0.0
-      CC0PB=0.0
-      CC1PB=0.0
-      CC2PB=0.0
-      CM1PB=0.0
+      CH0PB=0._r8
+      CH3PB=0._r8
+      CF1PB=0._r8
+      CF2PB=0._r8
+      CC0PB=0._r8
+      CC1PB=0._r8
+      CC2PB=0._r8
+      CM1PB=0._r8
       ENDIF
 !
 !     EXCHANGEABLE ION CONCENTRATIONS
@@ -1257,21 +1257,21 @@
       PCACO1=AMAX1(0.0,PCACO(L,NY,NX)/BKVLX)
       PCASO1=AMAX1(0.0,PCASO(L,NY,NX)/BKVLX)
       ELSE
-      XHY1=0.0
-      XAL1=0.0
-      XFE1=0.0
-      XCA1=0.0
-      XMG1=0.0
-      XNA1=0.0
-      XKA1=0.0
-      XHC1=0.0
-      XALO21=0.0
-      XFEO21=0.0
-      XCOOH=0.0
-      PALOH1=0.0
-      PFEOH1=0.0
-      PCACO1=0.0
-      PCASO1=0.0
+      XHY1=0._r8
+      XAL1=0._r8
+      XFE1=0._r8
+      XCA1=0._r8
+      XMG1=0._r8
+      XNA1=0._r8
+      XKA1=0._r8
+      XHC1=0._r8
+      XALO21=0._r8
+      XFEO21=0._r8
+      XCOOH=0._r8
+      PALOH1=0._r8
+      PFEOH1=0._r8
+      PCACO1=0._r8
+      PCASO1=0._r8
       ENDIF
       end subroutine PrepIonConcentrations
 !--------------------------------------------------------------------------
@@ -1294,35 +1294,35 @@
 !     ALUMINUM HYDROXIDE (GIBBSITE)
 !
       PX=AMAX1(AAL1,AALO1,AALO2,AALO3,AALO4)
-      IF(PX.EQ.AAL1)THEN
+      IF(test_aeqb(PX,AAL1))THEN
       R1=AHY1
       P1=AAL1
       P2=AOH1
       NR1=3
       NP2=0
       SP=SHALO
-      ELSEIF(PX.EQ.AALO1)THEN
+      ELSEIF(test_aeqb(PX,AALO1))THEN
       R1=AHY1
       P1=AALO1
       P2=AOH1
       NR1=2
       NP2=0
       SP=SHAL1
-      ELSEIF(PX.EQ.AALO2)THEN
+      ELSEIF(test_aeqb(PX,AALO2))THEN
       R1=AHY1
       P1=AALO2
       P2=AOH1
       NR1=1
       NP2=0
       SP=SHAL2
-      ELSEIF(PX.EQ.AALO3)THEN
+      ELSEIF(test_aeqb(PX,AALO3))THEN
       R1=AHY1
       P1=AALO3
       P2=AOH1
       NR1=0
       NP2=0
       SP=SPAL3
-      ELSEIF(PX.EQ.AALO4)THEN
+      ELSEIF(test_aeqb(PX,AALO4))THEN
       R1=AOH1
       P1=AALO4
       P2=AHY1
@@ -1330,25 +1330,25 @@
       NP2=1
       SP=SHAL4
       ENDIF
-      RHAL1=0.0
-      RHALO1=0.0
-      RHALO2=0.0
-      RHALO3=0.0
-      RHALO4=0.0
+      RHAL1=0._r8
+      RHALO1=0._r8
+      RHALO2=0._r8
+      RHALO3=0._r8
+      RHALO4=0._r8
 !     R1=AMAX1(ZERO,R1)
 !     P1=AMAX1(ZERO,P1)
 !     P2=AMAX1(ZERO,P2)
       SPX=SP*R1**NR1/P2**NP2
       RPALOX=AMAX1(-PALOH1,TPDX*(P1-SPX))
-      IF(PX.EQ.AAL1)THEN
+      IF(test_aeqb(PX,AAL1))THEN
       RHAL1=RPALOX
-      ELSEIF(PX.EQ.AALO1)THEN
+      ELSEIF(test_aeqb(PX,AALO1))THEN
       RHALO1=RPALOX
-      ELSEIF(PX.EQ.AALO2)THEN
+      ELSEIF(test_aeqb(PX,AALO2))THEN
       RHALO2=RPALOX
-      ELSEIF(PX.EQ.AALO3)THEN
+      ELSEIF(test_aeqb(PX,AALO3))THEN
       RHALO3=RPALOX
-      ELSEIF(PX.EQ.AALO4)THEN
+      ELSEIF(test_aeqb(PX,AALO4))THEN
       RHALO4=RPALOX
       ENDIF
 !     IF(I.EQ.256)THEN
@@ -1360,35 +1360,35 @@
 !     IRON HYDROXIDE
 !
       PX=AMAX1(AFE1,AFEO1,AFEO2,AFEO3,AFEO4)
-      IF(PX.EQ.AFE1)THEN
+      IF(test_aeqb(PX,AFE1))THEN
       R1=AHY1
       P1=AFE1
       P2=AOH1
       NR1=3
       NP2=0
       SP=SHFEO
-      ELSEIF(PX.EQ.AFEO1)THEN
+      ELSEIF(test_aeqb(PX,AFEO1))THEN
       R1=AHY1
       P1=AFEO1
       P2=AOH1
       NR1=2
       NP2=0
       SP=SHFE1
-      ELSEIF(PX.EQ.AFEO2)THEN
+      ELSEIF(test_aeqb(PX,AFEO2))THEN
       R1=AHY1
       P1=AFEO2
       P2=AOH1
       NR1=1
       NP2=0
       SP=SHFE2
-      ELSEIF(PX.EQ.AFEO3)THEN
+      ELSEIF(test_aeqb(PX,AFEO3))THEN
       R1=AHY1
       P1=AFEO3
       P2=AOH1
       NR1=0
       NP2=0
       SP=SPFE3
-      ELSEIF(PX.EQ.AFEO4)THEN
+      ELSEIF(test_aeqb(PX,AFEO4))THEN
       R1=AOH1
       P1=AFEO4
       P2=AHY1
@@ -1396,25 +1396,25 @@
       NP2=1
       SP=SHFE4
       ENDIF
-      RHFE1=0.0
-      RHFEO1=0.0
-      RHFEO2=0.0
-      RHFEO3=0.0
-      RHFEO4=0.0
+      RHFE1=0._r8
+      RHFEO1=0._r8
+      RHFEO2=0._r8
+      RHFEO3=0._r8
+      RHFEO4=0._r8
       R1=AMAX1(ZERO,R1)
       P1=AMAX1(ZERO,P1)
       P2=AMAX1(ZERO,P2)
       SPX=SP*R1**NR1/P2**NP2
       RPFEOX=AMAX1(-PFEOH1,TPDX*(P1-SPX))
-      IF(PX.EQ.AFE1)THEN
+      IF(test_aeqb(PX,AFE1))THEN
       RHFE1=RPFEOX
-      ELSEIF(PX.EQ.AFEO1)THEN
+      ELSEIF(test_aeqb(PX,AFEO1))THEN
       RHFEO1=RPFEOX
-      ELSEIF(PX.EQ.AFEO2)THEN
+      ELSEIF(test_aeqb(PX,AFEO2))THEN
       RHFEO2=RPFEOX
-      ELSEIF(PX.EQ.AFEO3)THEN
+      ELSEIF(test_aeqb(PX,AFEO3))THEN
       RHFEO3=RPFEOX
-      ELSEIF(PX.EQ.AFEO4)THEN
+      ELSEIF(test_aeqb(PX,AFEO4))THEN
       RHFEO4=RPFEOX
       ENDIF
 !     IF(I.EQ.180.AND.J.EQ.12)THEN
@@ -1428,22 +1428,22 @@
       PX=AMAX1(ACO31,AHCO31,ACO21)
       R1=AHY1
       P1=ACA1
-      IF(PX.EQ.ACO31)THEN
+      IF(test_aeqb(PX,ACO31))THEN
       P2=ACO31
       NR1=0
       SP=SPCAC
-      ELSEIF(PX.EQ.AHCO31)THEN
+      ELSEIF(test_aeqb(PX,AHCO31))THEN
       P2=AHCO31
       NR1=1
       SP=SHCAC1
-      ELSEIF(PX.EQ.ACO21)THEN
+      ELSEIF(test_aeqb(PX,ACO21))THEN
       P2=ACO21
       NR1=2
       SP=SHCAC2
       ENDIF
-      RHCAC3=0.0
-      RHCACH=0.0
-      RHCACO=0.0
+      RHCAC3=0._r8
+      RHCACH=0._r8
+      RHCACO=0._r8
       R1=AMAX1(ZERO,R1)
       P1=AMAX1(ZERO,P1)
       P2=AMAX1(ZERO,P2)
@@ -1451,11 +1451,11 @@
       S0=P1+P2
       S1=AMAX1(0.0,S0**2-4.0*(P1*P2-SPX))
       RPCACX=AMAX1(-PCACO1,TPDX*(S0-SQRT(S1)))
-      IF(PX.EQ.ACO31)THEN
+      IF(test_aeqb(PX,ACO31))THEN
       RHCAC3=RPCACX
-      ELSEIF(PX.EQ.AHCO31)THEN
+      ELSEIF(test_aeqb(PX,AHCO31))THEN
       RHCACH=RPCACX
-      ELSEIF(PX.EQ.ACO21)THEN
+      ELSEIF(test_aeqb(PX,ACO21))THEN
       RHCACO=RPCACX
       ENDIF
 !
@@ -1517,7 +1517,7 @@
 !    7,SPH2P,XOH21*CH2P1*A1/XH2P1,SXH2P,XOH11*CH2P1/(XH2P1*COH1)
 !    8,SPH1P,XOH11*CH1P1*A2/(XH1P1*COH1*A1)
 !    9,COH1*A1,CHY1*A1
-1119  FORMAT(A8,4I4,24E11.3)
+!1119  FORMAT(A8,4I4,24E11.3)
 !     WRITE(*,1119)'CATION',I,J,L,M,CCEC,XN41+XHY1+3*XAL1+2*(XCA1+XMG1)
 !    2+XNA1+XKA1,XN41,XHY1,XAL1,XCA1,XMG1,XNA1,XKA1,CN41,CHY1,CAL1,CCA1
 !    2,CMG1,CNA1,CKA1,(CCA1*A2)**0.5*XN41/(CN41*A1*XCA1*2)
@@ -1885,29 +1885,29 @@
       PY=AMAX1(AH1P1,AH2P1)
       R1=AHY1
       P3=AHY1
-      IF(PY.EQ.AH1P1)THEN
+      IF(test_aeqb(PY,AH1P1))THEN
       P2=AH1P1
-      IF(PX.EQ.AAL1)THEN
+      IF(test_aeqb(PX,AAL1))THEN
       P1=AAL1
       NR1=1
       NP3=0
       SP=SHA0P1
-      ELSEIF(PX.EQ.AALO1)THEN
+      ELSEIF(test_aeqb(PX,AALO1))THEN
       P1=AALO1
       NR1=0
       NP3=0
       SP=SPA1P1
-      ELSEIF(PX.EQ.AALO2)THEN
+      ELSEIF(test_aeqb(PX,AALO2))THEN
       P1=AALO2
       NR1=0
       NP3=1
       SP=SHA2P1
-      ELSEIF(PX.EQ.AALO3)THEN
+      ELSEIF(test_aeqb(PX,AALO3))THEN
       P1=AALO3
       NR1=0
       NP3=2
       SP=SHA3P1
-      ELSEIF(PX.EQ.AALO4)THEN
+      ELSEIF(test_aeqb(PX,AALO4))THEN
       P1=AALO4
       NR1=0
       NP3=3
@@ -1915,43 +1915,43 @@
       ENDIF
       ELSE
       P2=AH2P1
-      IF(PX.EQ.AAL1)THEN
+      IF(test_aeqb(PX,AAL1))THEN
       P1=AAL1
       NR1=2
       NP3=0
       SP=SHA0P2
-      ELSEIF(PX.EQ.AALO1)THEN
+      ELSEIF(test_aeqb(PX,AALO1))THEN
       P1=AALO1
       NR1=1
       NP3=0
       SP=SHA1P2
-      ELSEIF(PX.EQ.AALO2)THEN
+      ELSEIF(test_aeqb(PX,AALO2))THEN
       P1=AALO2
       NR1=0
       NP3=0
       SP=SPA2P2
-      ELSEIF(PX.EQ.AALO3)THEN
+      ELSEIF(test_aeqb(PX,AALO3))THEN
       P1=AALO3
       NR1=0
       NP3=1
       SP=SHA3P2
-      ELSEIF(PX.EQ.AALO4)THEN
+      ELSEIF(test_aeqb(PX,AALO4))THEN
       P1=AALO4
       NR1=0
       NP3=2
       SP=SHA4P2
       ENDIF
       ENDIF
-      RHA0P1=0.0
-      RHA1P1=0.0
-      RHA2P1=0.0
-      RHA3P1=0.0
-      RHA4P1=0.0
-      RHA0P2=0.0
-      RHA1P2=0.0
-      RHA2P2=0.0
-      RHA3P2=0.0
-      RHA4P2=0.0
+      RHA0P1=0._r8
+      RHA1P1=0._r8
+      RHA2P1=0._r8
+      RHA3P1=0._r8
+      RHA4P1=0._r8
+      RHA0P2=0._r8
+      RHA1P2=0._r8
+      RHA2P2=0._r8
+      RHA3P2=0._r8
+      RHA4P2=0._r8
       R1=AMAX1(ZERO,R1)
       P1=AMAX1(ZERO,P1)
       P2=AMAX1(ZERO,P2)
@@ -1960,28 +1960,28 @@
       S0=P1+P2
       S1=AMAX1(0.0,S0**2-4.0*(P1*P2-SPX))
       RPALPX=AMAX1(-PALPO1,TPDX*(S0-SQRT(S1)))
-      IF(PY.EQ.AH1P1)THEN
-      IF(PX.EQ.AAL1)THEN
+      IF(test_aeqb(PY,AH1P1))THEN
+      IF(test_aeqb(PX,AAL1))THEN
       RHA0P1=RPALPX
-      ELSEIF(PX.EQ.AALO1)THEN
+      ELSEIF(test_aeqb(PX,AALO1))THEN
       RHA1P1=RPALPX
-      ELSEIF(PX.EQ.AALO2)THEN
+      ELSEIF(test_aeqb(PX,AALO2))THEN
       RHA2P1=RPALPX
-      ELSEIF(PX.EQ.AALO3)THEN
+      ELSEIF(test_aeqb(PX,AALO3))THEN
       RHA3P1=RPALPX
-      ELSEIF(PX.EQ.AALO4)THEN
+      ELSEIF(test_aeqb(PX,AALO4))THEN
       RHA4P1=RPALPX
       ENDIF
       ELSE
-      IF(PX.EQ.AAL1)THEN
+      IF(test_aeqb(PX,AAL1))THEN
       RHA0P2=RPALPX
-      ELSEIF(PX.EQ.AALO1)THEN
+      ELSEIF(test_aeqb(PX,AALO1))THEN
       RHA1P2=RPALPX
-      ELSEIF(PX.EQ.AALO2)THEN
+      ELSEIF(test_aeqb(PX,AALO2))THEN
       RHA2P2=RPALPX
-      ELSEIF(PX.EQ.AALO3)THEN
+      ELSEIF(test_aeqb(PX,AALO3))THEN
       RHA3P2=RPALPX
-      ELSEIF(PX.EQ.AALO4)THEN
+      ELSEIF(test_aeqb(PX,AALO4))THEN
       RHA4P2=RPALPX
       ENDIF
       ENDIF
@@ -1991,7 +1991,7 @@
 !    3,RHA4P1,RHA0P2,RHA1P2,RHA2P2,RHA3P2,RHA4P2,SP,SPX,AAL1*AH0P1
 !    4,SPALP,CH0P1,CH1P1,CH2P1
 !     ENDIF
-1112  FORMAT(A8,4I5,80E12.4)
+!1112  FORMAT(A8,4I5,80E12.4)
 !     ENDIF
 !
 !     IRON PHOSPHATE (STRENGITE)
@@ -2000,29 +2000,29 @@
       PY=AMAX1(AH1P1,AH2P1)
       R1=AHY1
       P3=AHY1
-      IF(PY.EQ.AH1P1)THEN
+      IF(test_aeqb(PY,AH1P1))THEN
       P2=AH1P1
-      IF(PX.EQ.AFE1)THEN
+      IF(test_aeqb(PX,AFE1))THEN
       P1=AFE1
       NR1=1
       NP3=0
       SP=SHF0P1
-      ELSEIF(PX.EQ.AFEO1)THEN
+      ELSEIF(test_aeqb(PX,AFEO1))THEN
       P1=AFEO1
       NR1=0
       NP3=0
       SP=SPF1P1
-      ELSEIF(PX.EQ.AFEO2)THEN
+      ELSEIF(test_aeqb(PX,AFEO2))THEN
       P1=AFEO2
       NR1=0
       NP3=1
       SP=SHF2P1
-      ELSEIF(PX.EQ.AFEO3)THEN
+      ELSEIF(test_aeqb(PX,AFEO3))THEN
       P1=AFEO3
       NR1=0
       NP3=2
       SP=SHF3P1
-      ELSEIF(PX.EQ.AFEO4)THEN
+      ELSEIF(test_aeqb(PX,AFEO4))THEN
       P1=AFEO4
       NR1=0
       NP3=3
@@ -2030,43 +2030,43 @@
       ENDIF
       ELSE
       P2=AH2P1
-      IF(PX.EQ.AFE1)THEN
+      IF(test_aeqb(PX,AFE1))THEN
       P1=AFE1
       NR1=2
       NP3=0
       SP=SHF0P2
-      ELSEIF(PX.EQ.AFEO1)THEN
+      ELSEIF(test_aeqb(PX,AFEO1))THEN
       P1=AFEO1
       NR1=1
       NP3=0
       SP=SHF1P2
-      ELSEIF(PX.EQ.AFEO2)THEN
+      ELSEIF(test_aeqb(PX,AFEO2))THEN
       P1=AFEO2
       NR1=0
       NP3=0
       SP=SPF2P2
-      ELSEIF(PX.EQ.AFEO3)THEN
+      ELSEIF(test_aeqb(PX,AFEO3))THEN
       P1=AFEO3
       NR1=0
       NP3=1
       SP=SHF3P2
-      ELSEIF(PX.EQ.AFEO4)THEN
+      ELSEIF(test_aeqb(PX,AFEO4))THEN
       P1=AFEO4
       NR1=0
       NP3=2
       SP=SHF4P2
       ENDIF
       ENDIF
-      RHF0P1=0.0
-      RHF1P1=0.0
-      RHF2P1=0.0
-      RHF3P1=0.0
-      RHF4P1=0.0
-      RHF0P2=0.0
-      RHF1P2=0.0
-      RHF2P2=0.0
-      RHF3P2=0.0
-      RHF4P2=0.0
+      RHF0P1=0._r8
+      RHF1P1=0._r8
+      RHF2P1=0._r8
+      RHF3P1=0._r8
+      RHF4P1=0._r8
+      RHF0P2=0._r8
+      RHF1P2=0._r8
+      RHF2P2=0._r8
+      RHF3P2=0._r8
+      RHF4P2=0._r8
       R1=AMAX1(ZERO,R1)
       P1=AMAX1(ZERO,P1)
       P2=AMAX1(ZERO,P2)
@@ -2075,28 +2075,28 @@
       S0=P1+P2
       S1=AMAX1(0.0,S0**2-4.0*(P1*P2-SPX))
       RPFEPX=AMAX1(-PFEPO1,TPDX*(S0-SQRT(S1)))
-      IF(PY.EQ.AH1P1)THEN
-      IF(PX.EQ.AFE1)THEN
+      IF(test_aeqb(PY,AH1P1))THEN
+      IF(test_aeqb(PX,AFE1))THEN
       RHF0P1=RPFEPX
-      ELSEIF(PX.EQ.AFEO1)THEN
+      ELSEIF(test_aeqb(PX,AFEO1))THEN
       RHF1P1=RPFEPX
-      ELSEIF(PX.EQ.AFEO2)THEN
+      ELSEIF(test_aeqb(PX,AFEO2))THEN
       RHF2P1=RPFEPX
-      ELSEIF(PX.EQ.AFEO3)THEN
+      ELSEIF(test_aeqb(PX,AFEO3))THEN
       RHF3P1=RPFEPX
-      ELSEIF(PX.EQ.AFEO4)THEN
+      ELSEIF(test_aeqb(PX,AFEO4))THEN
       RHF4P1=RPFEPX
       ENDIF
       ELSE
-      IF(PX.EQ.AFE1)THEN
+      IF(test_aeqb(PX,AFE1))THEN
       RHF0P2=RPFEPX
-      ELSEIF(PX.EQ.AFEO1)THEN
+      ELSEIF(test_aeqb(PX,AFEO1))THEN
       RHF1P2=RPFEPX
-      ELSEIF(PX.EQ.AFEO2)THEN
+      ELSEIF(test_aeqb(PX,AFEO2))THEN
       RHF2P2=RPFEPX
-      ELSEIF(PX.EQ.AFEO3)THEN
+      ELSEIF(test_aeqb(PX,AFEO3))THEN
       RHF3P2=RPFEPX
-      ELSEIF(PX.EQ.AFEO4)THEN
+      ELSEIF(test_aeqb(PX,AFEO4))THEN
       RHF4P2=RPFEPX
       ENDIF
       ENDIF
@@ -2112,17 +2112,17 @@
       PX=AMAX1(AH1P1,AH2P1)
       R1=AHY1
       P1=ACA1
-      IF(PX.EQ.AH1P1)THEN
+      IF(test_aeqb(PX,AH1P1))THEN
       P2=AH1P1
       NR1=0
       SP=SPCAD
-      ELSEIF(PX.EQ.AH2P1)THEN
+      ELSEIF(test_aeqb(PX,AH2P1))THEN
       P2=AH2P1
       NR1=1
       SP=SHCAD2
       ENDIF
-      RPCAD1=0.0
-      RHCAD2=0.0
+      RPCAD1=0._r8
+      RHCAD2=0._r8
       R1=AMAX1(ZERO,R1)
       P1=AMAX1(ZERO,P1)
       P2=AMAX1(ZERO,P2)
@@ -2130,9 +2130,9 @@
       S0=P1+P2
       S1=AMAX1(0.0,S0**2-4.0*(P1*P2-SPX))
       RPCADX=AMAX1(-PCAPD1,TPDX*(S0-SQRT(S1)))
-      IF(PX.EQ.AH1P1)THEN
+      IF(test_aeqb(PX,AH1P1))THEN
       RPCAD1=RPCADX
-      ELSEIF(PX.EQ.AH2P1)THEN
+      ELSEIF(test_aeqb(PX,AH2P1))THEN
       RHCAD2=RPCADX
       ENDIF
 !     IF((M/10)*10.EQ.M)THEN
@@ -2146,25 +2146,25 @@
       PX=AMAX1(AH1P1,AH2P1)
       R1=AHY1
       P1=ACA1
-      IF(PX.EQ.AH1P1)THEN
+      IF(test_aeqb(PX,AH1P1))THEN
       P2=AH1P1
       NR1=4
       SP=SHCAH1
-      ELSEIF(PX.EQ.AH2P1)THEN
+      ELSEIF(test_aeqb(PX,AH2P1))THEN
       P2=AH2P1
       NR1=7
       SP=SHCAH2
       ENDIF
-      RHCAH1=0.0
-      RHCAH2=0.0
+      RHCAH1=0._r8
+      RHCAH2=0._r8
       R1=AMAX1(ZERO,R1)
       P1=AMAX1(ZERO,P1)
       P2=AMAX1(ZERO,P2)
       SPX=(SP*R1**NR1/P1**5)**0.333
       RPCAHX=AMAX1(-PCAPH1,TPDX*(P2-SPX))
-      IF(PX.EQ.AH1P1)THEN
+      IF(test_aeqb(PX,AH1P1))THEN
       RHCAH1=RPCAHX
-      ELSEIF(PX.EQ.AH2P1)THEN
+      ELSEIF(test_aeqb(PX,AH2P1))THEN
       RHCAH2=RPCAHX
       ENDIF
 !     IF((I/10)*10.EQ.I.AND.J.EQ.12)THEN
@@ -2195,35 +2195,35 @@
       S1=AMAX1(0.0,S0**2-4.0*(P1*P2-SPX))
       RPCAMX=AMAX1(-PCAPM1,TPDX*(S0-SQRT(S1)))
       ELSE
-      RPALPX=0.0
-      RPFEPX=0.0
-      RPCADX=0.0
-      RPCAHX=0.0
-      RHA0P1=0.0
-      RHA1P1=0.0
-      RHA2P1=0.0
-      RHA3P1=0.0
-      RHA4P1=0.0
-      RHA0P2=0.0
-      RHA1P2=0.0
-      RHA2P2=0.0
-      RHA3P2=0.0
-      RHA4P2=0.0
-      RHF0P1=0.0
-      RHF1P1=0.0
-      RHF2P1=0.0
-      RHF3P1=0.0
-      RHF4P1=0.0
-      RHF0P2=0.0
-      RHF1P2=0.0
-      RHF2P2=0.0
-      RHF3P2=0.0
-      RHF4P2=0.0
-      RPCAD1=0.0
-      RHCAD2=0.0
-      RHCAH1=0.0
-      RHCAH2=0.0
-      RPCAMX=0.0
+      RPALPX=0._r8
+      RPFEPX=0._r8
+      RPCADX=0._r8
+      RPCAHX=0._r8
+      RHA0P1=0._r8
+      RHA1P1=0._r8
+      RHA2P1=0._r8
+      RHA3P1=0._r8
+      RHA4P1=0._r8
+      RHA0P2=0._r8
+      RHA1P2=0._r8
+      RHA2P2=0._r8
+      RHA3P2=0._r8
+      RHA4P2=0._r8
+      RHF0P1=0._r8
+      RHF1P1=0._r8
+      RHF2P1=0._r8
+      RHF3P1=0._r8
+      RHF4P1=0._r8
+      RHF0P2=0._r8
+      RHF1P2=0._r8
+      RHF2P2=0._r8
+      RHF3P2=0._r8
+      RHF4P2=0._r8
+      RPCAD1=0._r8
+      RHCAD2=0._r8
+      RHCAH1=0._r8
+      RHCAH2=0._r8
+      RPCAMX=0._r8
       ENDIF
       end subroutine PhospPrecipDissolNonBand
 !------------------------------------------------------------------------------------------
@@ -2242,29 +2242,29 @@
       PY=AMAX1(AH1PB,AH2PB)
       R1=AHY1
       P3=AHY1
-      IF(PY.EQ.AH1PB)THEN
+      IF(test_aeqb(PY,AH1PB))THEN
       P2=AH1PB
-      IF(PX.EQ.AAL1)THEN
+      IF(test_aeqb(PX,AAL1))THEN
       P1=AAL1
       NR1=1
       NP3=0
       SP=SHA0P1
-      ELSEIF(PX.EQ.AALO1)THEN
+      ELSEIF(test_aeqb(PX,AALO1))THEN
       P1=AALO1
       NR1=0
       NP3=0
       SP=SPA1P1
-      ELSEIF(PX.EQ.AALO2)THEN
+      ELSEIF(test_aeqb(PX,AALO2))THEN
       P1=AALO2
       NR1=0
       NP3=1
       SP=SHA2P1
-      ELSEIF(PX.EQ.AALO3)THEN
+      ELSEIF(test_aeqb(PX,AALO3))THEN
       P1=AALO3
       NR1=0
       NP3=2
       SP=SHA3P1
-      ELSEIF(PX.EQ.AALO4)THEN
+      ELSEIF(test_aeqb(PX,AALO4))THEN
       P1=AALO4
       NR1=0
       NP3=3
@@ -2272,43 +2272,43 @@
       ENDIF
       ELSE
       P2=AH2PB
-      IF(PX.EQ.AAL1)THEN
+      IF(test_aeqb(PX,AAL1))THEN
       P1=AAL1
       NR1=2
       NP3=0
       SP=SHA0P2
-      ELSEIF(PX.EQ.AALO1)THEN
+      ELSEIF(test_aeqb(PX,AALO1))THEN
       P1=AALO1
       NR1=1
       NP3=0
       SP=SHA1P2
-      ELSEIF(PX.EQ.AALO2)THEN
+      ELSEIF(test_aeqb(PX,AALO2))THEN
       P1=AALO2
       NR1=0
       NP3=0
       SP=SPA2P2
-      ELSEIF(PX.EQ.AALO3)THEN
+      ELSEIF(test_aeqb(PX,AALO3))THEN
       P1=AALO3
       NR1=0
       NP3=1
       SP=SHA3P2
-      ELSEIF(PX.EQ.AALO4)THEN
+      ELSEIF(test_aeqb(PX,AALO4))THEN
       P1=AALO4
       NR1=0
       NP3=2
       SP=SHA4P2
       ENDIF
       ENDIF
-      RHA0B1=0.0
-      RHA1B1=0.0
-      RHA2B1=0.0
-      RHA3B1=0.0
-      RHA4B1=0.0
-      RHA0B2=0.0
-      RHA1B2=0.0
-      RHA2B2=0.0
-      RHA3B2=0.0
-      RHA4B2=0.0
+      RHA0B1=0._r8
+      RHA1B1=0._r8
+      RHA2B1=0._r8
+      RHA3B1=0._r8
+      RHA4B1=0._r8
+      RHA0B2=0._r8
+      RHA1B2=0._r8
+      RHA2B2=0._r8
+      RHA3B2=0._r8
+      RHA4B2=0._r8
       R1=AMAX1(ZERO,R1)
       P1=AMAX1(ZERO,P1)
       P2=AMAX1(ZERO,P2)
@@ -2317,28 +2317,28 @@
       S0=P1+P2
       S1=AMAX1(0.0,S0**2-4.0*(P1*P2-SPX))
       RPALBX=AMAX1(-PALPOB,TPDX*(S0-SQRT(S1)))
-      IF(PY.EQ.AH1PB)THEN
-      IF(PX.EQ.AAL1)THEN
+      IF(test_aeqb(PY,AH1PB))THEN
+      IF(test_aeqb(PX,AAL1))THEN
       RHA0B1=RPALBX
-      ELSEIF(PX.EQ.AALO1)THEN
+      ELSEIF(test_aeqb(PX,AALO1))THEN
       RHA1B1=RPALBX
-      ELSEIF(PX.EQ.AALO2)THEN
+      ELSEIF(test_aeqb(PX,AALO2))THEN
       RHA2B1=RPALBX
-      ELSEIF(PX.EQ.AALO3)THEN
+      ELSEIF(test_aeqb(PX,AALO3))THEN
       RHA3B1=RPALBX
-      ELSEIF(PX.EQ.AALO4)THEN
+      ELSEIF(test_aeqb(PX,AALO4))THEN
       RHA4B1=RPALBX
       ENDIF
       ELSE
-      IF(PX.EQ.AAL1)THEN
+      IF(test_aeqb(PX,AAL1))THEN
       RHA0B2=RPALBX
-      ELSEIF(PX.EQ.AALO1)THEN
+      ELSEIF(test_aeqb(PX,AALO1))THEN
       RHA1B2=RPALBX
-      ELSEIF(PX.EQ.AALO2)THEN
+      ELSEIF(test_aeqb(PX,AALO2))THEN
       RHA2B2=RPALBX
-      ELSEIF(PX.EQ.AALO3)THEN
+      ELSEIF(test_aeqb(PX,AALO3))THEN
       RHA3B2=RPALBX
-      ELSEIF(PX.EQ.AALO4)THEN
+      ELSEIF(test_aeqb(PX,AALO4))THEN
       RHA4B2=RPALBX
       ENDIF
       ENDIF
@@ -2349,29 +2349,29 @@
       PY=AMAX1(AH1PB,AH2PB)
       R1=AHY1
       P3=AHY1
-      IF(PY.EQ.AH1PB)THEN
+      IF(test_aeqb(PY,AH1PB))THEN
       P2=AH1PB
-      IF(PX.EQ.AFE1)THEN
+      IF(test_aeqb(PX,AFE1))THEN
       P1=AFE1
       NR1=1
       NP3=0
       SP=SHF0P1
-      ELSEIF(PX.EQ.AFEO1)THEN
+      ELSEIF(test_aeqb(PX,AFEO1))THEN
       P1=AFEO1
       NR1=0
       NP3=0
       SP=SPF1P1
-      ELSEIF(PX.EQ.AFEO2)THEN
+      ELSEIF(test_aeqb(PX,AFEO2))THEN
       P1=AFEO2
       NR1=0
       NP3=1
       SP=SHF2P1
-      ELSEIF(PX.EQ.AFEO3)THEN
+      ELSEIF(test_aeqb(PX,AFEO3))THEN
       P1=AFEO3
       NR1=0
       NP3=2
       SP=SHF3P1
-      ELSEIF(PX.EQ.AFEO4)THEN
+      ELSEIF(test_aeqb(PX,AFEO4))THEN
       P1=AFEO4
       NR1=0
       NP3=3
@@ -2379,43 +2379,43 @@
       ENDIF
       ELSE
       P2=AH2PB
-      IF(PX.EQ.AFE1)THEN
+      IF(test_aeqb(PX,AFE1))THEN
       P1=AFE1
       NR1=2
       NP3=0
       SP=SHF0P2
-      ELSEIF(PX.EQ.AFEO1)THEN
+      ELSEIF(test_aeqb(PX,AFEO1))THEN
       P1=AFEO1
       NR1=1
       NP3=0
       SP=SHF1P2
-      ELSEIF(PX.EQ.AFEO2)THEN
+      ELSEIF(test_aeqb(PX,AFEO2))THEN
       P1=AFEO2
       NR1=0
       NP3=0
       SP=SPF2P2
-      ELSEIF(PX.EQ.AFEO3)THEN
+      ELSEIF(test_aeqb(PX,AFEO3))THEN
       P1=AFEO3
       NR1=0
       NP3=1
       SP=SHF3P2
-      ELSEIF(PX.EQ.AFEO4)THEN
+      ELSEIF(test_aeqb(PX,AFEO4))THEN
       P1=AFEO4
       NR1=0
       NP3=2
       SP=SHF4P2
       ENDIF
       ENDIF
-      RHF0B1=0.0
-      RHF1B1=0.0
-      RHF2B1=0.0
-      RHF3B1=0.0
-      RHF4B1=0.0
-      RHF0B2=0.0
-      RHF1B2=0.0
-      RHF2B2=0.0
-      RHF3B2=0.0
-      RHF4B2=0.0
+      RHF0B1=0._r8
+      RHF1B1=0._r8
+      RHF2B1=0._r8
+      RHF3B1=0._r8
+      RHF4B1=0._r8
+      RHF0B2=0._r8
+      RHF1B2=0._r8
+      RHF2B2=0._r8
+      RHF3B2=0._r8
+      RHF4B2=0._r8
       R1=AMAX1(ZERO,R1)
       P1=AMAX1(ZERO,P1)
       P2=AMAX1(ZERO,P2)
@@ -2424,28 +2424,28 @@
       S0=P1+P2
       S1=AMAX1(0.0,S0**2-4.0*(P1*P2-SPX))
       RPFEBX=AMAX1(-PFEPOB,TPDX*(S0-SQRT(S1)))
-      IF(PY.EQ.AH1PB)THEN
-      IF(PX.EQ.AFE1)THEN
+      IF(test_aeqb(PY,AH1PB))THEN
+      IF(test_aeqb(PX,AFE1))THEN
       RHF0B1=RPFEBX
-      ELSEIF(PX.EQ.AFEO1)THEN
+      ELSEIF(test_aeqb(PX,AFEO1))THEN
       RHF1B1=RPFEBX
-      ELSEIF(PX.EQ.AFEO2)THEN
+      ELSEIF(test_aeqb(PX,AFEO2))THEN
       RHF2B1=RPFEBX
-      ELSEIF(PX.EQ.AFEO3)THEN
+      ELSEIF(test_aeqb(PX,AFEO3))THEN
       RHF3B1=RPFEBX
-      ELSEIF(PX.EQ.AFEO4)THEN
+      ELSEIF(test_aeqb(PX,AFEO4))THEN
       RHF4B1=RPFEBX
       ENDIF
       ELSE
-      IF(PX.EQ.AFE1)THEN
+      IF(test_aeqb(PX,AFE1))THEN
       RHF0B2=RPFEBX
-      ELSEIF(PX.EQ.AFEO1)THEN
+      ELSEIF(test_aeqb(PX,AFEO1))THEN
       RHF1B2=RPFEBX
-      ELSEIF(PX.EQ.AFEO2)THEN
+      ELSEIF(test_aeqb(PX,AFEO2))THEN
       RHF2B2=RPFEBX
-      ELSEIF(PX.EQ.AFEO3)THEN
+      ELSEIF(test_aeqb(PX,AFEO3))THEN
       RHF3B2=RPFEBX
-      ELSEIF(PX.EQ.AFEO4)THEN
+      ELSEIF(test_aeqb(PX,AFEO4))THEN
       RHF4B2=RPFEBX
       ENDIF
       ENDIF
@@ -2455,17 +2455,17 @@
       PX=AMAX1(AH1PB,AH2PB)
       R1=AHY1
       P1=ACA1
-      IF(PX.EQ.AH1PB)THEN
+      IF(test_aeqb(PX,AH1PB))THEN
       P2=AH1PB
       NR1=0
       SP=SPCAD
-      ELSEIF(PX.EQ.AH2PB)THEN
+      ELSEIF(test_aeqb(PX,AH2PB))THEN
       P2=AH2PB
       NR1=1
       SP=SHCAD2
       ENDIF
-      RPCDB1=0.0
-      RHCDB2=0.0
+      RPCDB1=0._r8
+      RHCDB2=0._r8
       R1=AMAX1(ZERO,R1)
       P1=AMAX1(ZERO,P1)
       P2=AMAX1(ZERO,P2)
@@ -2473,9 +2473,9 @@
       S0=P1+P2
       S1=AMAX1(0.0,S0**2-4.0*(P1*P2-SPX))
       RPCDBX=AMAX1(-PCAPDB,TPDX*(S0-SQRT(S1)))
-      IF(PX.EQ.AH1PB)THEN
+      IF(test_aeqb(PX,AH1PB))THEN
       RPCDB1=RPCDBX
-      ELSEIF(PX.EQ.AH2PB)THEN
+      ELSEIF(test_aeqb(PX,AH2PB))THEN
       RHCDB2=RPCDBX
       ENDIF
 !
@@ -2484,25 +2484,25 @@
       PX=AMAX1(AH1PB,AH2PB)
       R1=AHY1
       P1=ACA1
-      IF(PX.EQ.AH1PB)THEN
+      IF(test_aeqb(PX,AH1PB))THEN
       P2=AH1PB
       NR1=4
       SP=SHCAH1
-      ELSEIF(PX.EQ.AH2PB)THEN
+      ELSEIF(test_aeqb(PX,AH2PB))THEN
       P2=AH2PB
       NR1=7
       SP=SHCAH2
       ENDIF
-      RHCHB1=0.0
-      RHCHB2=0.0
+      RHCHB1=0._r8
+      RHCHB2=0._r8
       R1=AMAX1(ZERO,R1)
       P1=AMAX1(ZERO,P1)
       P2=AMAX1(ZERO,P2)
       SPX=(SP*R1**NR1/P1**5)**0.333
       RPCHBX=AMAX1(-PCAPHB,TPDX*(P2-SPX))
-      IF(PX.EQ.AH1PB)THEN
+      IF(test_aeqb(PX,AH1PB))THEN
       RHCHB1=RPCHBX
-      ELSEIF(PX.EQ.AH2PB)THEN
+      ELSEIF(test_aeqb(PX,AH2PB))THEN
       RHCHB2=RPCHBX
       ENDIF
 !
@@ -2517,35 +2517,35 @@
       S1=AMAX1(0.0,S0**2-4.0*(P1*P2-SPX))
       RPCMBX=AMAX1(-PCAPMB,TPDX*(S0-SQRT(S1)))
       ELSE
-      RPALBX=0.0
-      RPFEBX=0.0
-      RPCDBX=0.0
-      RPCHBX=0.0
-      RPCMBX=0.0
-      RHA0B1=0.0
-      RHA1B1=0.0
-      RHA2B1=0.0
-      RHA3B1=0.0
-      RHA4B1=0.0
-      RHA0B2=0.0
-      RHA1B2=0.0
-      RHA2B2=0.0
-      RHA3B2=0.0
-      RHA4B2=0.0
-      RHF0B1=0.0
-      RHF1B1=0.0
-      RHF2B1=0.0
-      RHF3B1=0.0
-      RHF4B1=0.0
-      RHF0B2=0.0
-      RHF1B2=0.0
-      RHF2B2=0.0
-      RHF3B2=0.0
-      RHF4B2=0.0
-      RPCDB1=0.0
-      RHCDB2=0.0
-      RHCHB1=0.0
-      RHCHB2=0.0
+      RPALBX=0._r8
+      RPFEBX=0._r8
+      RPCDBX=0._r8
+      RPCHBX=0._r8
+      RPCMBX=0._r8
+      RHA0B1=0._r8
+      RHA1B1=0._r8
+      RHA2B1=0._r8
+      RHA3B1=0._r8
+      RHA4B1=0._r8
+      RHA0B2=0._r8
+      RHA1B2=0._r8
+      RHA2B2=0._r8
+      RHA3B2=0._r8
+      RHA4B2=0._r8
+      RHF0B1=0._r8
+      RHF1B1=0._r8
+      RHF2B1=0._r8
+      RHF3B1=0._r8
+      RHF4B1=0._r8
+      RHF0B2=0._r8
+      RHF1B2=0._r8
+      RHF2B2=0._r8
+      RHF3B2=0._r8
+      RHF4B2=0._r8
+      RPCDB1=0._r8
+      RHCDB2=0._r8
+      RHCHB1=0._r8
+      RHCHB2=0._r8
       ENDIF
       end subroutine PhospPrecipDissolBand
 !------------------------------------------------------------------------------------------
@@ -2590,13 +2590,13 @@
       RXH1B=TADAX*(XH11B*AH1PB-SPH1P*X1P1B)/(XH11B+SPH1P)*VOLWBK
 !     WRITE(*,2226)'RXH1B',I,J,L,M,RXH1B,XH11B,XH21B,CH1PB
 !    2,SPH1P,X1P1B,RYH2B,CH2PB,SXH2P,X2P1B,COH1,CHY1,ROH
-2226  FORMAT(A8,4I4,20E12.4)
+!2226  FORMAT(A8,4I4,20E12.4)
       ELSE
-      RXO2B=0.0
-      RXO1B=0.0
-      RXH2B=0.0
-      RYH2B=0.0
-      RXH1B=0.0
+      RXO2B=0._r8
+      RXO1B=0._r8
+      RXH2B=0._r8
+      RYH2B=0._r8
+      RXH1B=0._r8
       ENDIF
       end subroutine PhospAnionExchBand
 !------------------------------------------------------------------------------------------
@@ -2621,7 +2621,7 @@
       IF(VOLWM(NPH,L,NY,NX).GT.ZEROS2(NY,NX))THEN
       VOLWBK=AMIN1(1.0,BKVL(L,NY,NX)/VOLWM(NPH,L,NY,NX))
       ELSE
-      VOLWBK=1.0
+      VOLWBK=1._r8
       ENDIF
       IF(VOLWPO.GT.ZEROS2(NY,NX) &
       .AND.XAEC(L,NY,NX).GT.ZEROS(NY,NX))THEN
@@ -2649,11 +2649,11 @@
       SPH1P=SXH1P*DPH2O/DPH2P
       RXH1P=TADAX*(XOH11*AH1P1-SPH1P*XH1P1)/(XOH11+SPH1P)*VOLWBK
       ELSE
-      RXOH2=0.0
-      RXOH1=0.0
-      RXH2P=0.0
-      RYH2P=0.0
-      RXH1P=0.0
+      RXOH2=0._r8
+      RXOH1=0._r8
+      RXH2P=0._r8
+      RYH2P=0._r8
+      RXH1P=0._r8
       ENDIF
       end subroutine PhospAnionExchNoBand
 !------------------------------------------------------------------------------------------
@@ -2700,7 +2700,7 @@
       IF(XTLQ.GT.ZERO)THEN
       FX=CCEC/XTLQ
       ELSE
-      FX=0.0
+      FX=0._r8
       ENDIF
       XN4Q=FX*XN4Q
       XNBQ=FX*XNBQ
@@ -2736,15 +2736,15 @@
 !    2,AAL1,AALX,CCEC,XCAX,GKCA(L,NY,NX),FX
 !     ENDIF
       ELSE
-      RXN4=0.0
-      RXNB=0.0
-      RXHY=0.0
-      RXAL=0.0
-      RXFE=0.0
-      RXCA=0.0
-      RXMG=0.0
-      RXNA=0.0
-      RXKA=0.0
+      RXN4=0._r8
+      RXNB=0._r8
+      RXHY=0._r8
+      RXAL=0._r8
+      RXFE=0._r8
+      RXCA=0._r8
+      RXMG=0._r8
+      RXNA=0._r8
+      RXKA=0._r8
       ENDIF
       end subroutine CationExchange
 !------------------------------------------------------------------------------------------
@@ -2779,12 +2779,12 @@
       IF(VOLWNH.GT.ZEROS2(NY,NX))THEN
       RNH4=TSLX*(AHY1*AN31-DPN4*AN41)/(DPN4+AHY1)
       ELSE
-      RNH4=0.0
+      RNH4=0._r8
       ENDIF
       IF(VOLWNB.GT.ZEROS2(NY,NX))THEN
       RNHB=TSLX*(AHY1*AN3B-DPN4*AN4B)/(DPN4+AHY1)
       ELSE
-      RNHB=0.0
+      RNHB=0._r8
       ENDIF
 !
 !     RCO2Q=CO2-HCO3+H dissociation
@@ -2920,7 +2920,7 @@
 !     WRITE(*,22)'RH2P',I,J,NX,NY,L,M,RH2P,TSLX,S0,S1,DP,DPH2P,A2
 !    2,CH1P1,CHY1,CH2P1,H2PO4(L,NY,NX),VOLWPX,RH2PX,XH2PS(L,NY,NX)
 !    3,TUPH2P(L,NY,NX)
-22    FORMAT(A8,6I4,60E12.4)
+!22    FORMAT(A8,6I4,60E12.4)
 !     ENDIF
 !
 !     RH3P=H3PO4-H+H2PO4 dissociation in non-band
@@ -2963,15 +2963,15 @@
       S1=AMAX1(0.0,S0**2-4.0*(AMG1*AH1P1-DPM1P*AM1P1))
       RM1P=TSLX*(S0-SQRT(S1))
       ELSE
-      RH1P=0.0
-      RH2P=0.0
-      RH3P=0.0
-      RF1P=0.0
-      RF2P=0.0
-      RC0P=0.0
-      RC1P=0.0
-      RC2P=0.0
-      RM1P=0.0
+      RH1P=0._r8
+      RH2P=0._r8
+      RH3P=0._r8
+      RF1P=0._r8
+      RF2P=0._r8
+      RC0P=0._r8
+      RC1P=0._r8
+      RC2P=0._r8
+      RM1P=0._r8
       ENDIF
 !
 !     PHOSPHORUS IN BAND SOIL ZONE
@@ -3026,15 +3026,15 @@
       S1=AMAX1(0.0,S0**2-4.0*(AMG1*AH1PB-DPM1P*AM1PB))
       RM1B=TSLX*(S0-SQRT(S1))
       ELSE
-      RH1B=0.0
-      RH2B=0.0
-      RH3B=0.0
-      RF1B=0.0
-      RF2B=0.0
-      RC0B=0.0
-      RC1B=0.0
-      RC2B=0.0
-      RM1B=0.0
+      RH1B=0._r8
+      RH2B=0._r8
+      RH3B=0._r8
+      RF1B=0._r8
+      RF2B=0._r8
+      RC0B=0._r8
+      RC1B=0._r8
+      RC2B=0._r8
+      RM1B=0._r8
       ENDIF
       end subroutine SoluteDissociation
 !------------------------------------------------------------------------------------------
@@ -3157,7 +3157,7 @@
 !    2,RHA2P2,RHA3P2,RHA4P2,RHF0P2
 !    3,RHF1P2,RHF2P2,RHF3P2,RHF4P2,RHCAD2
 !    4,RHCAH2,RPCAMX,RXH2P,RYH2P,RH2P,RH3P,RF2P,RC2P
-23    FORMAT(A8,6I4,60E12.4)
+!23    FORMAT(A8,6I4,60E12.4)
 !     ENDIF
 !
       end subroutine UpdateIonFluxCurentIter
@@ -3271,7 +3271,7 @@
 !     WRITE(20,1111)'COH1',I,J,L,M,COH1,ROH,RHOH
 !    2,RYH2P,RYH2B,RXH1P,RXH1B,RPALPX,RCAO,RMGO
 !    2,RPCAHX,RALO1,RALO2,RALO3,RALO4,RFEO1,RFEO2,RFEO3,RFEO4
-1111  FORMAT(A8,4I4,80E12.4)
+!1111  FORMAT(A8,4I4,80E12.4)
 !     ENDIF
 !
 !     UPDATE EXCHANGEABLE ION CONCENTRATIONS IN CURRENT
@@ -3487,8 +3487,8 @@
       DPNHB(L,NY,NX)=DLYR(3,L,NY,NX)
       ELSEIF(DPNHB(L,NY,NX).LT.0.0)THEN
       DPNHB(L-1,NY,NX)=DPNHB(L-1,NY,NX)+DPNHB(L,NY,NX)
-      DPNHB(L,NY,NX)=0.0
-      WDNHB(L,NY,NX)=0.0
+      DPNHB(L,NY,NX)=0._r8
+      WDNHB(L,NY,NX)=0._r8
       ENDIF
       ENDIF
 !
@@ -3504,9 +3504,9 @@
       VLNHB(L,NY,NX)=AMAX1(0.0,AMIN1(0.999,WDNHB(L,NY,NX) &
       /ROWN(NY,NX)*DPNHB(L,NY,NX)/DLYR(3,L,NY,NX)))
       ELSE
-      VLNHB(L,NY,NX)=0.0
+      VLNHB(L,NY,NX)=0._r8
       ENDIF
-      VLNH4(L,NY,NX)=1.0-VLNHB(L,NY,NX)
+      VLNH4(L,NY,NX)=1._r8-VLNHB(L,NY,NX)
       FVLNH4=AMIN1(0.0,(VLNH4(L,NY,NX)-XVLNH4)/XVLNH4)
 !
 !     TRANSFER NH4, NH3 FROM NON-BAND TO BAND
@@ -3527,16 +3527,16 @@
 !
 !     AMALGAMATE NH4 BAND WITH NON-BAND IF BAND NO LONGER EXISTS
 !
-      DPNHB(L,NY,NX)=0.0
-      WDNHB(L,NY,NX)=0.0
-      VLNH4(L,NY,NX)=1.0
-      VLNHB(L,NY,NX)=0.0
+      DPNHB(L,NY,NX)=0._r8
+      WDNHB(L,NY,NX)=0._r8
+      VLNH4(L,NY,NX)=1._r8
+      VLNHB(L,NY,NX)=0._r8
       ZNH4S(L,NY,NX)=ZNH4S(L,NY,NX)+ZNH4B(L,NY,NX)
       ZNH3S(L,NY,NX)=ZNH3S(L,NY,NX)+ZNH3B(L,NY,NX)
-      ZNH4B(L,NY,NX)=0.0
-      ZNH3B(L,NY,NX)=0.0
+      ZNH4B(L,NY,NX)=0._r8
+      ZNH3B(L,NY,NX)=0._r8
       XN4(L,NY,NX)=XN4(L,NY,NX)+XNB(L,NY,NX)
-      XNB(L,NY,NX)=0.0
+      XNB(L,NY,NX)=0._r8
       ENDIF
       ENDIF
       end subroutine UpdateNH3FertilizerBandinfo
@@ -3577,8 +3577,8 @@
       DPPOB(L,NY,NX)=DLYR(3,L,NY,NX)
       ELSEIF(DPPOB(L,NY,NX).LT.0.0)THEN
       DPPOB(L-1,NY,NX)=DPPOB(L-1,NY,NX)+DPPOB(L,NY,NX)
-      DPPOB(L,NY,NX)=0.0
-      WDPOB(L,NY,NX)=0.0
+      DPPOB(L,NY,NX)=0._r8
+      WDPOB(L,NY,NX)=0._r8
       ENDIF
       ENDIF
 !
@@ -3594,9 +3594,9 @@
       VLPOB(L,NY,NX)=AMAX1(0.0,AMIN1(0.999,WDPOB(L,NY,NX) &
       /ROWP(NY,NX)*DPPOB(L,NY,NX)/DLYR(3,L,NY,NX)))
       ELSE
-      VLPOB(L,NY,NX)=0.0
+      VLPOB(L,NY,NX)=0._r8
       ENDIF
-      VLPO4(L,NY,NX)=1.0-VLPOB(L,NY,NX)
+      VLPO4(L,NY,NX)=1._r8-VLPOB(L,NY,NX)
       FVLPO4=AMIN1(0.0,(VLPO4(L,NY,NX)-XVLPO4)/XVLPO4)
 !
 !     TRANSFER HPO4,H2PO4 FROM NON-BAND TO BAND
@@ -3702,10 +3702,10 @@
 !
 !     AMALGAMATE PO4 BAND WITH NON-BAND IF BAND NO LONGER EXISTS
 !
-      DPPOB(L,NY,NX)=0.0
-      WDPOB(L,NY,NX)=0.0
-      VLPOB(L,NY,NX)=0.0
-      VLPO4(L,NY,NX)=1.0
+      DPPOB(L,NY,NX)=0._r8
+      WDPOB(L,NY,NX)=0._r8
+      VLPOB(L,NY,NX)=0._r8
+      VLPO4(L,NY,NX)=1._r8
       H0PO4(L,NY,NX)=H0PO4(L,NY,NX)+H0POB(L,NY,NX)
       H1PO4(L,NY,NX)=H1PO4(L,NY,NX)+H1POB(L,NY,NX)
       H2PO4(L,NY,NX)=H2PO4(L,NY,NX)+H2POB(L,NY,NX)
@@ -3716,36 +3716,36 @@
       ZCA1P(L,NY,NX)=ZCA1P(L,NY,NX)+ZCA1PB(L,NY,NX)
       ZCA2P(L,NY,NX)=ZCA2P(L,NY,NX)+ZCA2PB(L,NY,NX)
       ZMG1P(L,NY,NX)=ZMG1P(L,NY,NX)+ZMG1PB(L,NY,NX)
-      H0POB(L,NY,NX)=0.0
-      H1POB(L,NY,NX)=0.0
-      H2POB(L,NY,NX)=0.0
-      H3POB(L,NY,NX)=0.0
-      ZFE1PB(L,NY,NX)=0.0
-      ZFE2PB(L,NY,NX)=0.0
-      ZCA0PB(L,NY,NX)=0.0
-      ZCA1PB(L,NY,NX)=0.0
-      ZCA2PB(L,NY,NX)=0.0
-      ZMG1PB(L,NY,NX)=0.0
+      H0POB(L,NY,NX)=0._r8
+      H1POB(L,NY,NX)=0._r8
+      H2POB(L,NY,NX)=0._r8
+      H3POB(L,NY,NX)=0._r8
+      ZFE1PB(L,NY,NX)=0._r8
+      ZFE2PB(L,NY,NX)=0._r8
+      ZCA0PB(L,NY,NX)=0._r8
+      ZCA1PB(L,NY,NX)=0._r8
+      ZCA2PB(L,NY,NX)=0._r8
+      ZMG1PB(L,NY,NX)=0._r8
       XOH0(L,NY,NX)=XOH0(L,NY,NX)+XOH0B(L,NY,NX)
       XOH1(L,NY,NX)=XOH1(L,NY,NX)+XOH1B(L,NY,NX)
       XOH2(L,NY,NX)=XOH2(L,NY,NX)+XOH2B(L,NY,NX)
       XH1P(L,NY,NX)=XH1P(L,NY,NX)+XH1PB(L,NY,NX)
       XH2P(L,NY,NX)=XH2P(L,NY,NX)+XH2PB(L,NY,NX)
-      XOH0B(L,NY,NX)=0.0
-      XOH1B(L,NY,NX)=0.0
-      XOH2B(L,NY,NX)=0.0
-      XH1PB(L,NY,NX)=0.0
-      XH2PB(L,NY,NX)=0.0
+      XOH0B(L,NY,NX)=0._r8
+      XOH1B(L,NY,NX)=0._r8
+      XOH2B(L,NY,NX)=0._r8
+      XH1PB(L,NY,NX)=0._r8
+      XH2PB(L,NY,NX)=0._r8
       PALPO(L,NY,NX)=PALPO(L,NY,NX)+PALPB(L,NY,NX)
       PFEPO(L,NY,NX)=PFEPO(L,NY,NX)+PFEPB(L,NY,NX)
       PCAPD(L,NY,NX)=PCAPD(L,NY,NX)+PCPDB(L,NY,NX)
       PCAPH(L,NY,NX)=PCAPH(L,NY,NX)+PCPHB(L,NY,NX)
       PCAPM(L,NY,NX)=PCAPM(L,NY,NX)+PCPMB(L,NY,NX)
-      PALPB(L,NY,NX)=0.0
-      PFEPB(L,NY,NX)=0.0
-      PCPDB(L,NY,NX)=0.0
-      PCPHB(L,NY,NX)=0.0
-      PCPMB(L,NY,NX)=0.0
+      PALPB(L,NY,NX)=0._r8
+      PFEPB(L,NY,NX)=0._r8
+      PCPDB(L,NY,NX)=0._r8
+      PCPHB(L,NY,NX)=0._r8
+      PCPMB(L,NY,NX)=0._r8
       ENDIF
       ENDIF
       end subroutine UpdatePO4FertilizerBandinfo
@@ -3788,8 +3788,8 @@
       DPNOB(L,NY,NX)=DLYR(3,L,NY,NX)
       ELSEIF(DPNOB(L,NY,NX).LT.0.0)THEN
       DPNOB(L-1,NY,NX)=DPNOB(L-1,NY,NX)+DPNOB(L,NY,NX)
-      DPNOB(L,NY,NX)=0.0
-      WDNOB(L,NY,NX)=0.0
+      DPNOB(L,NY,NX)=0._r8
+      WDNOB(L,NY,NX)=0._r8
       ENDIF
       ENDIF
 !
@@ -3805,9 +3805,9 @@
       VLNOB(L,NY,NX)=AMAX1(0.0,AMIN1(0.999,WDNOB(L,NY,NX) &
       /ROWO(NY,NX)*DPNOB(L,NY,NX)/DLYR(3,L,NY,NX)))
       ELSE
-      VLNOB(L,NY,NX)=0.0
+      VLNOB(L,NY,NX)=0._r8
       ENDIF
-      VLNO3(L,NY,NX)=1.0-VLNOB(L,NY,NX)
+      VLNO3(L,NY,NX)=1._r8-VLNOB(L,NY,NX)
       FVLNO3=AMIN1(0.0,(VLNO3(L,NY,NX)-XVLNO3)/XVLNO3)
 !
 !     TRANSFER NO3 FROM NON-BAND TO BAND
@@ -3825,14 +3825,14 @@
 !
 !     AMALGAMATE NO3 BAND WITH NON-BAND IF BAND NO LONGER EXISTS
 !
-      DPNOB(L,NY,NX)=0.0
-      WDNOB(L,NY,NX)=0.0
-      VLNO3(L,NY,NX)=1.0
-      VLNOB(L,NY,NX)=0.0
+      DPNOB(L,NY,NX)=0._r8
+      WDNOB(L,NY,NX)=0._r8
+      VLNO3(L,NY,NX)=1._r8
+      VLNOB(L,NY,NX)=0._r8
       ZNO3S(L,NY,NX)=ZNO3S(L,NY,NX)+ZNO3B(L,NY,NX)
       ZNO2S(L,NY,NX)=ZNO2S(L,NY,NX)+ZNO2B(L,NY,NX)
-      ZNO3B(L,NY,NX)=0.0
-      ZNO2B(L,NY,NX)=0.0
+      ZNO3B(L,NY,NX)=0._r8
+      ZNO2B(L,NY,NX)=0._r8
       ENDIF
       ENDIF
       end subroutine UpdateNO3FertilizerBandinfo
@@ -3872,7 +3872,7 @@
       *RNHUI(IUTYP(NY,NX))*ZNHUI(0,NY,NX) &
       *AMAX1(RNHUI(IUTYP(NY,NX)),1.0-ZNHUI(0,NY,NX)/ZNHU0(0,NY,NX))
       ELSE
-      ZNHUI(0,NY,NX)=0.0
+      ZNHUI(0,NY,NX)=0._r8
       ENDIF
 !
 !     UREA CONCENTRATION AND HYDROLYSIS IN SURFACE RESIDUE
@@ -3891,7 +3891,7 @@
       RSNUA=AMIN1(ZNHUFA(0,NY,NX) &
       ,SPNHU*TOQCK(0,NY,NX)*DFNSA*TFNQ(0,NY,NX))*(1.0-ZNHUI(0,NY,NX))
       ELSE
-      RSNUA=0.0
+      RSNUA=0._r8
       ENDIF
 !     IF(ZNHUFA(0,NY,NX).GT.ZEROS(NY,NX))THEN
 !     WRITE(*,8778)'UREA0',I,J,IUTYP(NY,NX)
@@ -3899,7 +3899,7 @@
 !    2,DFNSA,TFNQ(0,NY,NX),CNHUA,DUKD,DUKM,DUKI,TOQCK(0,NY,NX)
 !    3,BKVL(0,NY,NX),TFNQ(0,NY,NX),SPNHU,ZNHU0(0,NY,NX),ZNHUI(0,NY,NX)
 !    4,RNHUI(IUTYP(NY,NX))
-8778  FORMAT(A8,3I4,40E12.4)
+!8778  FORMAT(A8,3I4,40E12.4)
 !     ENDIF
 !
 !     NH4, NH3, UREA, NO3 DISSOLUTION IN SURFACE RESIDUE
@@ -3916,7 +3916,7 @@
       IF(VOLWRX(NY,NX).GT.ZEROS(NY,NX))THEN
       THETWR=AMIN1(1.0,VOLW(0,NY,NX)/VOLWRX(NY,NX))
       ELSE
-      THETWR=1.0
+      THETWR=1._r8
       ENDIF
       RSN4AA=SPNH4*ZNH4FA(0,NY,NX)*THETWR
       RSN3AA=SPNH3*ZNH3FA(0,NY,NX)
@@ -3940,7 +3940,7 @@
       IF(BKVLX.GT.ZEROS(NY,NX))THEN
       XN41=AMAX1(ZERO,XN4(0,NY,NX)/BKVLX)
       ELSE
-      XN41=0.0
+      XN41=0._r8
       ENDIF
 !
 !     SOLUBLE, EXCHANGEABLE AND PRECIPITATED PO4 CONCENTRATIONS
@@ -3956,15 +3956,15 @@
       CH1P1=AMAX1(0.0,H1PO4(0,NY,NX)/VOLWMP+RH1PX)
       CH2P1=AMAX1(0.0,H2PO4(0,NY,NX)/VOLWMP+RH2PX)
       ELSE
-      RN4X=0.0
-      RN3X=0.0
-      CN41=0.0
-      CN31=0.0
-      XN41=0.0
-      RH1PX=0.0
-      RH2PX=0.0
-      CH1P1=0.0
-      CH2P1=0.0
+      RN4X=0._r8
+      RN3X=0._r8
+      CN41=0._r8
+      CN31=0._r8
+      XN41=0._r8
+      RH1PX=0._r8
+      RH2PX=0._r8
+      CH1P1=0._r8
+      CH2P1=0._r8
       ENDIF
 !
 !     PHOSPHORUS TRANSFORMATIONS IN SURFACE RESIDUE
@@ -3979,11 +3979,11 @@
       PCAPD1=AMAX1(0.0,PCAPD(0,NY,NX)/BKVLX)
       PCAPH1=AMAX1(0.0,PCAPH(0,NY,NX)/BKVLX)
       ELSE
-      PALPO1=0.0
-      PFEPO1=0.0
-      PCAPM1=0.0
-      PCAPD1=0.0
-      PCAPH1=0.0
+      PALPO1=0._r8
+      PFEPO1=0._r8
+      PCAPM1=0._r8
+      PCAPD1=0._r8
+      PCAPH1=0._r8
       ENDIF
 !
 !     CALCULATE H2PO4 COPRECIPITATES FRPM LITTER PH
@@ -4050,7 +4050,7 @@
 !    2,SYA0P2,CAL1,COH1,SYCAH2,CCA1,CCO21,CCO31,PCAPH1
 !    3,VOLWM(NPH,0,NY,NX),SPCAC/CCO31,H2PO4(0,NY,NX)
 !    4,CCO20,DPCO3,CHY1,CCO2S(0,NY,NX)
-2227  FORMAT(A8,3I4,20E12.4)
+!2227  FORMAT(A8,3I4,20E12.4)
 !     ENDIF
 !
 !     PHOSPHORUS ANION EXCHANGE IN SURFACE REDISUE
@@ -4104,7 +4104,7 @@
       IF(XTLQ.GT.ZERO)THEN
       FX=CCEC0/XTLQ
       ELSE
-      FX=0.0
+      FX=0._r8
       ENDIF
       XN4Q=FX*XN4Q
 !
@@ -4124,27 +4124,27 @@
 !    3,PH(0,NY,NX),CHY1,RNH4
 !    3,CN31,DPN4,ZNH4S(0,NY,NX),XN4(0,NY,NX),14.0*RSN4AA,RN4X,BKVLX
 !    4,BKVL(0,NY,NX),VOLWM(NPH,0,NY,NX)
-2223  FORMAT(A8,2I4,30E12.4)
+!2223  FORMAT(A8,2I4,30E12.4)
 !     ENDIF
       ELSE
-      RSN4AA=0.0
-      RSN3AA=0.0
-      RSNUAA=0.0
-      RSNOAA=0.0
-      RPALPX=0.0
-      RPFEPX=0.0
-      RPCADX=0.0
-      RPCAHX=0.0
-      RPCAMX=0.0
-      RXN4=0.0
-      RNH4=0.0
-      RH2P=0.0
-      RPALPX=0.0
-      RPFEPX=0.0
-      RPCADX=0.0
-      RPCAMX=0.0
-      RPCAHX=0.0
+      RSN4AA=0._r8
+      RSN3AA=0._r8
+      RSNUAA=0._r8
+      RSNOAA=0._r8
+      RPALPX=0._r8
+      RPFEPX=0._r8
+      RPCADX=0._r8
+      RPCAHX=0._r8
+      RPCAMX=0._r8
+      RXN4=0._r8
+      RNH4=0._r8
+      RH2P=0._r8
+      RPALPX=0._r8
+      RPFEPX=0._r8
+      RPCADX=0._r8
+      RPCAMX=0._r8
+      RPCAHX=0._r8
       ENDIF
       end subroutine UpdateSoluteInSurfaceResidue
 
-      END module SoluteMod
+END module SoluteMod

@@ -124,11 +124,14 @@ PROGRAM main
 !  RUN THIS SCRIPT
 !
   DO 120 NTX=1,NDX
-    DO 120 NEX=1,NAX
-      DO 120 NT=1,ND(NEX)
-        DO 120 NE=1,NA(NEX)
+    DO  NEX=1,NAX
+      DO  NT=1,ND(NEX)
+        DO  NE=1,NA(NEX)
           CALL SOIL(NA,ND,NT,NE,NAX,NDX,NTX,NEX,NHW,NHE,NVN,NVS)
           IGO=IGO+1
+        enddo
+      enddo
+    enddo
 120   CONTINUE
 !
 !   SCRIPT COMPLETED, START NEXT SCRIPT

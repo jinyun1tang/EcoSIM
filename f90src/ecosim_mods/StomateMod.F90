@@ -109,7 +109,7 @@
 !     ELSEIF(ICTYP(NZ,NY,NX).EQ.4)THEN
 !     WRITE(20,3010)'CH2O',I,J,CH2O
 !     ENDIF
-3010  FORMAT(A8,2I4,1E12.4)
+!3010  FORMAT(A8,2I4,1E12.4)
       RETURN
       END subroutine stomate
 !------------------------------------------------------------------------------------------
@@ -187,7 +187,7 @@
 !    3,CBXN(K,NB,NZ,NY,NX),VGRO(K,NB,NZ,NY,NX),EGRO
 !    3,FDBK(NB,NZ,NY,NX),CH2O,TFN1,TFN2,TFNE,WSDN
 !    3,VCGRO(K,NB,NZ,NY,NX),VCDN,CO2I(NZ,NY,NX),CO2L(NZ,NY,NX)
-6798  FORMAT(A8,7I4,40E12.4)
+!6798  FORMAT(A8,7I4,40E12.4)
 !     ENDIF
       end subroutine C3SunlitLeaves
 !------------------------------------------------------------------------------------------
@@ -483,7 +483,7 @@
 !    3,CBXN4(K,NB,NZ,NY,NX),VGRO4(K,NB,NZ,NY,NX),EGRO4
 !    3,FDBK4(K,NB,NZ,NY,NX),CH2O,VGRO4(K,NB,NZ,NY,NX),EGRO4
 !    3,VCGR4(K,NB,NZ,NY,NX),CO2I(NZ,NY,NX),CO2L(NZ,NY,NX)
-6799  FORMAT(A8,6I4,40E12.4)
+!6799  FORMAT(A8,6I4,40E12.4)
       end subroutine C4ShadedLeaves
 !------------------------------------------------------------------------------------------
 
@@ -527,7 +527,7 @@
 !    3,SURFX(N,L,K,NB,NZ,NY,NX)
 !    3,VCGR4(K,NB,NZ,NY,NX),CO2I(NZ,NY,NX),CO2L(NZ,NY,NX),TFN1,TFN2
 !    4,TFNE,WSDN,VCDN4
-6789  FORMAT(A8,7I4,40E12.4)
+!6789  FORMAT(A8,7I4,40E12.4)
 !     ENDIF
       end subroutine C4SunlitLeaves
 !------------------------------------------------------------------------------------------
@@ -550,7 +550,7 @@
 !     WRITE(*,2125)'WSDN',I,J,NX,NY,NZ,NB,K,WSDN
 !    2,WGLF(K,NB,NZ,NY,NX),WSLF(K,NB,NZ,NY,NX)
 !    3,ARLF(K,NB,NZ,NY,NX)
-2125  FORMAT(A8,7I4,12E12.4)
+!2125  FORMAT(A8,7I4,12E12.4)
 !     ENDIF
 
       IF(WSDN.GT.ZERO)THEN
@@ -627,7 +627,7 @@
 !    2,FDBK(NB,NZ,NY,NX),VRNS(NB,NZ,NY,NX),VRNF(NB,NZ,NY,NX)
 !    3,CCPOLB(NB,NZ,NY,NX),CZPOLB(NB,NZ,NY,NX),CPPOLB(NB,NZ,NY,NX)
 !    3,FDBKX(NB,NZ,NY,NX),ATRP(NB,NZ,NY,NX)
-4242  FORMAT(A8,5I4,12E20.4)
+!4242  FORMAT(A8,5I4,12E20.4)
 !     ENDIF
 !
 !     FOR EACH NODE

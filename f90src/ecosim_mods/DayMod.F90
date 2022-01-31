@@ -33,7 +33,7 @@
 !     end_include_section
       CHARACTER(len=3) :: CHARN1,CHARN2
       CHARACTER(len=4) :: CHARN3
-      real(r8), PARAMETER :: TWILGT=0.06976
+      real(r8), PARAMETER :: TWILGT=0.06976_r8
 
       real(r8) :: CORP,DECDAY,DECLIN,DIRRA1,DIRRA2,FW,FZ
       real(r8) :: RR,TFZ,TWP,TVW,XI
@@ -63,9 +63,12 @@
       NN=0
       DO 500 M=1,12
       N=30*M+ICOR(M)
-      IF(MOD(IDATA(3),4))520,510,520
-510   IF(M.GE.2)N=N+1
-520   IF(I.LE.N)THEN
+!      IF(MOD(IDATA(3),4))520,510,520
+!510     IF(M.GE.2)N=N+1
+!520   IF(I.LE.N)THEN
+     IF(MOD(IDATA(3),4)==0 .and. M.GE.2)N=N+1
+     IF(I.LE.N)THEN
+
       N1=I-NN
       N2=M
       N3=IDATA(3)
@@ -95,13 +98,13 @@
 
       DO 955 NX=NHW,NHE
       DO 950 NY=NVN,NVS
-      TRAD(NY,NX)=0.0
+      TRAD(NY,NX)=0._r8
       TAMX(NY,NX)=-100.0
       TAMN(NY,NX)=100.0
-      HUDX(NY,NX)=0.0
+      HUDX(NY,NX)=0._r8
       HUDN(NY,NX)=100.0
-      TWIND(NY,NX)=0.0
-      TRAI(NY,NX)=0.0
+      TWIND(NY,NX)=0._r8
+      TRAI(NY,NX)=0._r8
       DO 945 L=0,JZ
       TSMX(L,NY,NX)=-9999
       TSMN(L,NY,NX)=9999
@@ -112,56 +115,56 @@
 !
       IF((ALAT(NY,NX).GE.0.0.AND.I.EQ.1) &
       .OR.(ALAT(NY,NX).LT.0.0.AND.I.EQ.1))THEN
-      UORGF(NY,NX)=0.0
-      UXCSN(NY,NX)=0.0
-      UCOP(NY,NX)=0.0
-      UDOCQ(NY,NX)=0.0
-      UDOCD(NY,NX)=0.0
-      UDICQ(NY,NX)=0.0
-      UDICD(NY,NX)=0.0
-      TNBP(NY,NX)=0.0
-      URAIN(NY,NX)=0.0
-      UEVAP(NY,NX)=0.0
-      URUN(NY,NX)=0.0
-      USEDOU(NY,NX)=0.0
-      UVOLO(NY,NX)=0.0
-      UIONOU(NY,NX)=0.0
-      UFERTN(NY,NX)=0.0
-      UXZSN(NY,NX)=0.0
-      UDONQ(NY,NX)=0.0
-      UDOND(NY,NX)=0.0
-      UDINQ(NY,NX)=0.0
-      UDIND(NY,NX)=0.0
-      UFERTP(NY,NX)=0.0
-      UXPSN(NY,NX)=0.0
-      UDOPQ(NY,NX)=0.0
-      UDOPD(NY,NX)=0.0
-      UDIPQ(NY,NX)=0.0
-      UDIPD(NY,NX)=0.0
-      UCO2G(NY,NX)=0.0
-      UCH4G(NY,NX)=0.0
-      UOXYG(NY,NX)=0.0
-      UN2OG(NY,NX)=0.0
-      UN2GG(NY,NX)=0.0
-      UNH3G(NY,NX)=0.0
-      UN2GS(NY,NX)=0.0
-      UH2GG(NY,NX)=0.0
-      UCO2F(NY,NX)=0.0
-      UCH4F(NY,NX)=0.0
-      UOXYF(NY,NX)=0.0
-      UN2OF(NY,NX)=0.0
-      UNH3F(NY,NX)=0.0
-      UPO4F(NY,NX)=0.0
-      THRE(NY,NX)=0.0
-      TGPP(NY,NX)=0.0
-      TNPP(NY,NX)=0.0
-      TRAU(NY,NX)=0.0
-      TCAN(NY,NX)=0.0
-      XHVSTC(NY,NX)=0.0
-      XHVSTN(NY,NX)=0.0
-      XHVSTP(NY,NX)=0.0
-      TRINH4(NY,NX)=0.0
-      TRIPO4(NY,NX)=0.0
+      UORGF(NY,NX)=0._r8
+      UXCSN(NY,NX)=0._r8
+      UCOP(NY,NX)=0._r8
+      UDOCQ(NY,NX)=0._r8
+      UDOCD(NY,NX)=0._r8
+      UDICQ(NY,NX)=0._r8
+      UDICD(NY,NX)=0._r8
+      TNBP(NY,NX)=0._r8
+      URAIN(NY,NX)=0._r8
+      UEVAP(NY,NX)=0._r8
+      URUN(NY,NX)=0._r8
+      USEDOU(NY,NX)=0._r8
+      UVOLO(NY,NX)=0._r8
+      UIONOU(NY,NX)=0._r8
+      UFERTN(NY,NX)=0._r8
+      UXZSN(NY,NX)=0._r8
+      UDONQ(NY,NX)=0._r8
+      UDOND(NY,NX)=0._r8
+      UDINQ(NY,NX)=0._r8
+      UDIND(NY,NX)=0._r8
+      UFERTP(NY,NX)=0._r8
+      UXPSN(NY,NX)=0._r8
+      UDOPQ(NY,NX)=0._r8
+      UDOPD(NY,NX)=0._r8
+      UDIPQ(NY,NX)=0._r8
+      UDIPD(NY,NX)=0._r8
+      UCO2G(NY,NX)=0._r8
+      UCH4G(NY,NX)=0._r8
+      UOXYG(NY,NX)=0._r8
+      UN2OG(NY,NX)=0._r8
+      UN2GG(NY,NX)=0._r8
+      UNH3G(NY,NX)=0._r8
+      UN2GS(NY,NX)=0._r8
+      UH2GG(NY,NX)=0._r8
+      UCO2F(NY,NX)=0._r8
+      UCH4F(NY,NX)=0._r8
+      UOXYF(NY,NX)=0._r8
+      UN2OF(NY,NX)=0._r8
+      UNH3F(NY,NX)=0._r8
+      UPO4F(NY,NX)=0._r8
+      THRE(NY,NX)=0._r8
+      TGPP(NY,NX)=0._r8
+      TNPP(NY,NX)=0._r8
+      TRAU(NY,NX)=0._r8
+      TCAN(NY,NX)=0._r8
+      XHVSTC(NY,NX)=0._r8
+      XHVSTN(NY,NX)=0._r8
+      XHVSTP(NY,NX)=0._r8
+      TRINH4(NY,NX)=0._r8
+      TRIPO4(NY,NX)=0._r8
       DO 960 NZ=1,NP0(NY,NX)
       RSETC(NZ,NY,NX)=RSETC(NZ,NY,NX)+CARBN(NZ,NY,NX)+TCUPTK(NZ,NY,NX) &
       -TCSNC(NZ,NY,NX)+TCO2T(NZ,NY,NX)-VCO2F(NZ,NY,NX)-VCH4F(NZ,NY,NX)
@@ -169,36 +172,36 @@
       -TZSNC(NZ,NY,NX)-VNH3F(NZ,NY,NX)-VN2OF(NZ,NY,NX)+TZUPFX(NZ,NY,NX)
       RSETP(NZ,NY,NX)=RSETP(NZ,NY,NX)+TPUPTK(NZ,NY,NX) &
       -TPSNC(NZ,NY,NX)-VPO4F(NZ,NY,NX)
-      CARBN(NZ,NY,NX)=0.0
-      TCUPTK(NZ,NY,NX)=0.0
-      TCO2T(NZ,NY,NX)=0.0
-      TCO2A(NZ,NY,NX)=0.0
-      CTRAN(NZ,NY,NX)=0.0
-      TZUPTK(NZ,NY,NX)=0.0
-      TZUPFX(NZ,NY,NX)=0.0
-      TNH3C(NZ,NY,NX)=0.0
-      TPUPTK(NZ,NY,NX)=0.0
-      VCO2F(NZ,NY,NX)=0.0
-      VCH4F(NZ,NY,NX)=0.0
-      VOXYF(NZ,NY,NX)=0.0
-      VNH3F(NZ,NY,NX)=0.0
-      VN2OF(NZ,NY,NX)=0.0
-      VPO4F(NZ,NY,NX)=0.0
+      CARBN(NZ,NY,NX)=0._r8
+      TCUPTK(NZ,NY,NX)=0._r8
+      TCO2T(NZ,NY,NX)=0._r8
+      TCO2A(NZ,NY,NX)=0._r8
+      CTRAN(NZ,NY,NX)=0._r8
+      TZUPTK(NZ,NY,NX)=0._r8
+      TZUPFX(NZ,NY,NX)=0._r8
+      TNH3C(NZ,NY,NX)=0._r8
+      TPUPTK(NZ,NY,NX)=0._r8
+      VCO2F(NZ,NY,NX)=0._r8
+      VCH4F(NZ,NY,NX)=0._r8
+      VOXYF(NZ,NY,NX)=0._r8
+      VNH3F(NZ,NY,NX)=0._r8
+      VN2OF(NZ,NY,NX)=0._r8
+      VPO4F(NZ,NY,NX)=0._r8
       THVSTC(NZ,NY,NX)=THVSTC(NZ,NY,NX)+HVSTC(NZ,NY,NX)
       THVSTN(NZ,NY,NX)=THVSTN(NZ,NY,NX)+HVSTN(NZ,NY,NX)
       THVSTP(NZ,NY,NX)=THVSTP(NZ,NY,NX)+HVSTP(NZ,NY,NX)
-      HVSTC(NZ,NY,NX)=0.0
-      HVSTN(NZ,NY,NX)=0.0
-      HVSTP(NZ,NY,NX)=0.0
-      TCSN0(NZ,NY,NX)=0.0
-      TZSN0(NZ,NY,NX)=0.0
-      TPSN0(NZ,NY,NX)=0.0
-      TCSNC(NZ,NY,NX)=0.0
-      TZSNC(NZ,NY,NX)=0.0
-      TPSNC(NZ,NY,NX)=0.0
+      HVSTC(NZ,NY,NX)=0._r8
+      HVSTN(NZ,NY,NX)=0._r8
+      HVSTP(NZ,NY,NX)=0._r8
+      TCSN0(NZ,NY,NX)=0._r8
+      TZSN0(NZ,NY,NX)=0._r8
+      TPSN0(NZ,NY,NX)=0._r8
+      TCSNC(NZ,NY,NX)=0._r8
+      TZSNC(NZ,NY,NX)=0._r8
+      TPSNC(NZ,NY,NX)=0._r8
 960   CONTINUE
       IF(IERSNG.EQ.1.OR.IERSNG.EQ.3)THEN
-      TSED(NY,NX)=0.0
+      TSED(NY,NX)=0._r8
       ENDIF
       ENDIF
 !
@@ -217,7 +220,7 @@
       IF(AZI/DEC.GE.1.0-TWILGT)THEN
       DYLN(NY,NX)=24.0
       ELSEIF(AZI/DEC.LE.-1.0+TWILGT)THEN
-      DYLN(NY,NX)=0.0
+      DYLN(NY,NX)=0._r8
       ELSE
       DYLN(NY,NX)=12.0*(1.0+2.0/3.1416*ASIN(TWILGT+AZI/DEC))
       ENDIF
@@ -247,7 +250,7 @@
       IF(DYLN(NY,NX).GT.ZERO)THEN
       RMAX=SRAD(I)/(DYLN(NY,NX)*0.658)
       ELSE
-      RMAX=0.0
+      RMAX=0._r8
       ENDIF
       ELSE
       RMAX=SRAD(I)
@@ -339,7 +342,7 @@
       ENDIF
       XCORP(NY,NX)=1.0-CORP
 !     WRITE(*,2227)'TILL',I,ITILL(I,NY,NX),CORP,XCORP(NY,NX)
-2227  FORMAT(A8,2I4,12E12.4)
+!2227  FORMAT(A8,2I4,12E12.4)
 !
 !     AUTOMATIC IRRIGATION IF SELECTED
 !
@@ -360,9 +363,9 @@
 !
       IF(DATA(6)(1:4).EQ.'auto')THEN
       IF(I.GE.IIRRA(1,NY,NX).AND.I.LE.IIRRA(2,NY,NX))THEN
-      TFZ=0.0
-      TWP=0.0
-      TVW=0.0
+      TFZ=0._r8
+      TWP=0._r8
+      TVW=0._r8
       DIRRA1=DIRRA(1,NY,NX)+CDPTH(NU(NY,NX)-1,NY,NX)
       DIRRA2=DIRRA(2,NY,NX)+CDPTH(NU(NY,NX)-1,NY,NX)
       DO 165 L=NU(NY,NX),NL(NY,NX)

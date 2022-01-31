@@ -1,12 +1,13 @@
-!
+module ExtractMod
+!!
+!Description:
 !     THIS SUBROUTINE AGGREGATES ALL SOIL-PLANT C,N,P EXCHANGES
 !     FROM 'UPTAKE' AMD 'GROSUB' AND SENDS RESULTS TO 'REDIST'
 !
-      module ExtractMod
-      use data_kind_mod, only : r8 => SHR_KIND_R8
-      implicit none
+  use data_kind_mod, only : r8 => SHR_KIND_R8
+  implicit none
 
-      private
+  private
       include "parameters.h"
       include "blkc.h"
       include "blk1cp.h"
@@ -70,46 +71,47 @@
 9990  CONTINUE
 9995  CONTINUE
       RETURN
-      END subroutine extract
+  END subroutine extract
 !------------------------------------------------------------------------------------------
 
-      subroutine TotalLitterfall(NY,NX)
+  subroutine TotalLitterfall(NY,NX)
 
-      implicit none
-      integer, intent(in) :: NY,NX
+  implicit none
+  integer, intent(in) :: NY,NX
 
-      DO 9985 NZ=1,NP0(NY,NX)
+  DO 9985 NZ=1,NP0(NY,NX)
 !
-!     TOTAL LITTERFALL OF ALL PLANT SPECIES
+!   TOTAL LITTERFALL OF ALL PLANT SPECIES
 !
-!     ZCSNC,ZZSNC,ZPSNC=total C,N,P litterfall
-!     HCSNC,HZSNC,HPSNC=hourly PFT C,N,P litterfall from grosub.f
-!     WTSTGT=total standing dead C,N,P mass
-!     WTSTG=PFT standing dead C,N,P mass
-!     CSNC,ZSNC,PSNC=cumulative PFT C,N,P litterfall from grosub.f
-!     CSNT,ZSNT,PSNT=cumulative total C,N,P litterfall
+!   ZCSNC,ZZSNC,ZPSNC=total C,N,P litterfall
+!   HCSNC,HZSNC,HPSNC=hourly PFT C,N,P litterfall from grosub.f
+!   WTSTGT=total standing dead C,N,P mass
+!   WTSTG=PFT standing dead C,N,P mass
+!   CSNC,ZSNC,PSNC=cumulative PFT C,N,P litterfall from grosub.f
+!   CSNT,ZSNT,PSNT=cumulative total C,N,P litterfall
 !
-      ZCSNC(NY,NX)=ZCSNC(NY,NX)+HCSNC(NZ,NY,NX)
-      ZZSNC(NY,NX)=ZZSNC(NY,NX)+HZSNC(NZ,NY,NX)
-      ZPSNC(NY,NX)=ZPSNC(NY,NX)+HPSNC(NZ,NY,NX)
-      WTSTGT(NY,NX)=WTSTGT(NY,NX)+WTSTG(NZ,NY,NX)
-      DO 90 L=0,NI(NZ,NY,NX)
+    ZCSNC(NY,NX)=ZCSNC(NY,NX)+HCSNC(NZ,NY,NX)
+    ZZSNC(NY,NX)=ZZSNC(NY,NX)+HZSNC(NZ,NY,NX)
+    ZPSNC(NY,NX)=ZPSNC(NY,NX)+HPSNC(NZ,NY,NX)
+    WTSTGT(NY,NX)=WTSTGT(NY,NX)+WTSTG(NZ,NY,NX)
+    DO 90 L=0,NI(NZ,NY,NX)
       DO 95 K=0,1
-      DO 95 M=1,4
-      CSNT(M,K,L,NY,NX)=CSNT(M,K,L,NY,NX)+CSNC(M,K,L,NZ,NY,NX)
-      ZSNT(M,K,L,NY,NX)=ZSNT(M,K,L,NY,NX)+ZSNC(M,K,L,NZ,NY,NX)
-      PSNT(M,K,L,NY,NX)=PSNT(M,K,L,NY,NX)+PSNC(M,K,L,NZ,NY,NX)
+        DO  M=1,4
+          CSNT(M,K,L,NY,NX)=CSNT(M,K,L,NY,NX)+CSNC(M,K,L,NZ,NY,NX)
+          ZSNT(M,K,L,NY,NX)=ZSNT(M,K,L,NY,NX)+ZSNC(M,K,L,NZ,NY,NX)
+          PSNT(M,K,L,NY,NX)=PSNT(M,K,L,NY,NX)+PSNC(M,K,L,NZ,NY,NX)
+        enddo
 95    CONTINUE
-90    CONTINUE
+90  CONTINUE
 9985  CONTINUE
-      ARLFC(NY,NX)=0.0
-      ARSTC(NY,NX)=0.0
-      DO 915 L=1,JC
-      ARLFT(L,NY,NX)=0.0
-      WGLFT(L,NY,NX)=0.0
-      ARSTT(L,NY,NX)=0.0
+  ARLFC(NY,NX)=0._r8
+  ARSTC(NY,NX)=0._r8
+  DO 915 L=1,JC
+    ARLFT(L,NY,NX)=0._r8
+    WGLFT(L,NY,NX)=0._r8
+    ARSTT(L,NY,NX)=0._r8
 915   CONTINUE
-      end subroutine TotalLitterfall
+  end subroutine TotalLitterfall
 !------------------------------------------------------------------------------------------
 
       subroutine TotalLeafArea(NZ,NY,NX)
@@ -141,7 +143,7 @@
       integer, intent(in) :: NZ, NY, NX
 
       DO 100 N=1,MY(NZ,NY,NX)
-      DO 100 L=NU(NY,NX),NI(NZ,NY,NX)
+      DO L=NU(NY,NX),NI(NZ,NY,NX)
 !
 !     TOTAL ROOT DENSITY
 !
@@ -222,7 +224,7 @@
 !    6,RCO2S(N,L,NZ,NY,NX)
 !    4,TLCH4P(L,NY,NX),CH4P(N,L,NZ,NY,NX),CH4A(N,L,NZ,NY,NX)
 !    5,RCHDFA(N,L,NZ,NY,NX),RUPCHS(N,L,NZ,NY,NX),RCHFLA(N,L,NZ,NY,NX)
-5566  FORMAT(A8,7I4,20E12.4)
+!5566  FORMAT(A8,7I4,20E12.4)
 !     ENDIF
 !
 !     TOTAL ROOT BOUNDARY GAS FLUXES
@@ -268,7 +270,7 @@
 !    2,RCHFLA(N,L,NZ,NY,NX),RUPCHS(N,L,NZ,NY,NX)
 !     WRITE(*,4141)'TUPN2S',I,J,NX,NY,L,NZ,N,TUPN2S(L,NY,NX)
 !    2,RUPN2S(N,L,NZ,NY,NX)
-4141  FORMAT(A8,7I4,12E12.4)
+!4141  FORMAT(A8,7I4,12E12.4)
 !     ENDIF
 !
 !     TOTAL ROOT C,N,P EXUDATION
@@ -314,6 +316,7 @@
       RN3BX(L,NY,NX)=RN3BX(L,NY,NX)+RUNNXP(N,L,NZ,NY,NX)
       RPOBX(L,NY,NX)=RPOBX(L,NY,NX)+RUPP2B(N,L,NZ,NY,NX)
       RP1BX(L,NY,NX)=RP1BX(L,NY,NX)+RUPP1B(N,L,NZ,NY,NX)
+      ENDDO
 100   CONTINUE
       end subroutine TotalGasandSoluteUptake
 !------------------------------------------------------------------------------------------
@@ -397,7 +400,7 @@
 !     RNH3B,RNH3C=PFT NH3 flux between atmosphere and branch,canopy
 !     TNH3C=total NH3 flux between atmosphere and canopy
 !
-      RNH3C(NZ,NY,NX)=0.0
+      RNH3C(NZ,NY,NX)=0._r8
       DO 80 NB=1,NBR(NZ,NY,NX)
       RNH3C(NZ,NY,NX)=RNH3C(NZ,NY,NX)+RNH3B(NB,NZ,NY,NX)
       TNH3C(NZ,NY,NX)=TNH3C(NZ,NY,NX)+RNH3B(NB,NZ,NY,NX)
