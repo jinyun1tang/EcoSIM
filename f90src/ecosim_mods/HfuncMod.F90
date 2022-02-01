@@ -219,6 +219,9 @@ module HfuncMod
 
   implicit none
   integer, intent(in) :: I,J,NZ,NY,NX
+
+! begin_execution
+
 !
 ! ADD BRANCH TO SHOOT IF PLANT GROWTH STAGE, SHOOT NON-STRUCTURAL
 ! CONCENTRATION PERMIT
