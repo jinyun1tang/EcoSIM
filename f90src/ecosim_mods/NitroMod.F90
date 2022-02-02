@@ -257,9 +257,9 @@ module nitroMod
     DO 9995 NX=NHW,NHE
       DO 9990 NY=NVN,NVS
 !       IF(I.EQ.1.AND.J.EQ.1)THEN
-!         TRN2ON(NY,NX)=0.0
-!         TRN2OD(NY,NX)=0.0
-!         TRN2GD(NY,NX)=0.0
+!         TRN2ON(NY,NX)=0.0_r8
+!         TRN2OD(NY,NX)=0.0_r8
+!         TRN2GD(NY,NX)=0.0_r8
 !       ENDIF
 !
 !       VOLWZ=water volume used to calculate aqueous microbial
@@ -281,82 +281,83 @@ module nitroMod
     END subroutine nitro
 !------------------------------------------------------------------------------------------
 
-    subroutine SoilBGCOneLayer(I,J,L,NY,NX)
-    implicit none
-    integer, intent(in) :: I,J,L,NY,NX
+  subroutine SoilBGCOneLayer(I,J,L,NY,NX)
+  implicit none
+  integer, intent(in) :: I,J,L,NY,NX
 
-      integer :: LL,K,KL
-      integer :: M,N
-!     begin_execution
+  integer :: LL,K,KL
+  integer :: M,N
+! begin_execution
 
-      IF(VOLX(L,NY,NX).GT.ZEROS2(NY,NX))THEN
-      IF(L.EQ.0.OR.L.GE.NU(NY,NX))THEN
-!     get KL, the number of mic-om complexes
+  IF(VOLX(L,NY,NX).GT.ZEROS2(NY,NX))THEN
+    IF(L.EQ.0.OR.L.GE.NU(NY,NX))THEN
+      ! get KL, the number of mic-om complexes
       IF(L.EQ.0)THEN
-!     surface litter layer
-      KL=2
-      IF(VOLWRX(NY,NX).GT.ZEROS2(NY,NX))THEN
-      THETR=VOLW(0,NY,NX)/VOLR(NY,NX)
-      THETZ=AMAX1(0.0,THETR-THETY(L,NY,NX))
-      VOLWZ=THETZ*VOLR(NY,NX)
-!     IF((I/30)*30.EQ.I.AND.J.EQ.15.AND.L.EQ.0)THEN
-!     WRITE(*,8825)'THETZ',I,J,L,THETR,THETZ,VOLWZ,VOLWRX(NY,NX)
-!    2,VOLW(0,NY,NX),POROS(L,NY,NX),FC(0,NY,NX),WP(0,NY,NX)
-!    3,THETY(L,NY,NX),PSISM(0,NY,NX),ORGC(0,NY,NX),VOLR(NY,NX)
-!8825  FORMAT(A8,3I4,20E12.4)
-!     ENDIF
+        ! surface litter layer
+        KL=2
+        !write(*,*)'VOLR(NY,NX)=',VOLR(NY,NX)
+        IF(VOLWRX(NY,NX).GT.ZEROS2(NY,NX))THEN
+          THETR=VOLW(0,NY,NX)/VOLR(NY,NX)
+          THETZ=AMAX1(0.0_r8,THETR-THETY(L,NY,NX))
+          VOLWZ=THETZ*VOLR(NY,NX)
+!         IF((I/30)*30.EQ.I.AND.J.EQ.15.AND.L.EQ.0)THEN
+!           WRITE(*,8825)'THETZ',I,J,L,THETR,THETZ,VOLWZ,VOLWRX(NY,NX)
+!         2,VOLW(0,NY,NX),POROS(L,NY,NX),FC(0,NY,NX),WP(0,NY,NX)
+!         3,THETY(L,NY,NX),PSISM(0,NY,NX),ORGC(0,NY,NX),VOLR(NY,NX)
+!8825       FORMAT(A8,3I4,20E12.4)
+!         ENDIF
+        ELSE
+          VOLWZ=0.0_r8
+        ENDIF
       ELSE
-      VOLWZ=0.0
-      ENDIF
-      ELSE
-!     non-surface layer
-      KL=4
-      THETZ=AMAX1(0.0,(AMIN1(AMAX1(0.5*POROS(L,NY,NX),FC(L,NY,NX)) &
-      ,THETW(L,NY,NX))-THETY(L,NY,NX)))
-      VOLWZ=THETZ*VOLY(L,NY,NX)
-!     IF((I/120)*120.EQ.I.AND.J.EQ.24.AND.L.LE.6)THEN
-!     WRITE(*,8824)'THETZ',I,J,NX,NY,L,THETZ,THETW(L,NY,NX),VOLWZ
-!    2,POROS(L,NY,NX),FC(L,NY,NX),WP(L,NY,NX),THETY(L,NY,NX)
-!    3,VOLW(L,NY,NX),VOLWH(L,NY,NX),VOLY(L,NY,NX),VOLT(L,NY,NX)
-!    4,DTBLX(NY,NX)
+  !     non-surface layer
+        KL=4
+        THETZ=AMAX1(0.0,(AMIN1(AMAX1(0.5*POROS(L,NY,NX),FC(L,NY,NX)) &
+          ,THETW(L,NY,NX))-THETY(L,NY,NX)))
+        VOLWZ=THETZ*VOLY(L,NY,NX)
+  !     IF((I/120)*120.EQ.I.AND.J.EQ.24.AND.L.LE.6)THEN
+  !     WRITE(*,8824)'THETZ',I,J,NX,NY,L,THETZ,THETW(L,NY,NX),VOLWZ
+  !    2,POROS(L,NY,NX),FC(L,NY,NX),WP(L,NY,NX),THETY(L,NY,NX)
+  !    3,VOLW(L,NY,NX),VOLWH(L,NY,NX),VOLY(L,NY,NX),VOLT(L,NY,NX)
+  !    4,DTBLX(NY,NX)
 !8824  FORMAT(A8,5I4,20E12.4)
-!     ENDIF
+  !     ENDIF
       ENDIF
 !
 !     TEMPERATURE FUNCTIONS FOR GROWTH AND MAINTENANCE
 !     WITH OFFSET FOR THERMAL ADAPTATION
 !
-
+      !write(*,*)'StageBGCEnvironCondition'
       call StageBGCEnvironCondition(KL,L,NY,NX)
 !
 !     RESPIRATION BY MICROBIAL POPULATIONS
 !
-      TFOXYX=0.0
-      TFNH4X=0.0
-      TFNO3X=0.0
-      TFNO2X=0.0
-      TFN2OX=0.0
-      TFP14X=0.0
-      TFPO4X=0.0
-      TFNH4B=0.0
-      TFNO3B=0.0
-      TFNO2B=0.0
-      TFP14B=0.0
-      TFPO4B=0.0
-      TCH4H=0.0
-      TCH4A=0.0
-      TFOQC=0.0
-      TFOQA=0.0
-      TRH2G=0.0
+      TFOXYX=0.0_r8
+      TFNH4X=0.0_r8
+      TFNO3X=0.0_r8
+      TFNO2X=0.0_r8
+      TFN2OX=0.0_r8
+      TFP14X=0.0_r8
+      TFPO4X=0.0_r8
+      TFNH4B=0.0_r8
+      TFNO3B=0.0_r8
+      TFNO2B=0.0_r8
+      TFP14B=0.0_r8
+      TFPO4B=0.0_r8
+      TCH4H=0.0_r8
+      TCH4A=0.0_r8
+      TFOQC=0.0_r8
+      TFOQA=0.0_r8
+      TRH2G=0.0_r8
       IF(L.NE.0)THEN
-      LL=L
+        LL=L
       ELSE
-      LL=NU(NY,NX)
+        LL=NU(NY,NX)
       ENDIF
-
+      !write(*,*)'MicrobialCatabolism'
       call MicrobialCatabolism(L,LL,NY,NX)
 !
-!     ChemoDenitrification
+      !write(*,*)'ChemoDenitrification'
       call ChemoDenitrification(L,NY,NX)
 !
 !     DECOMPOSITION
@@ -364,81 +365,81 @@ module nitroMod
 !     ROQCK=total respiration of DOC+DOA used to represent microbial activity
 !
       DO 1870 K=0,KL
-      ROQCK(K)=0.0
-      DO 1875 N=1,7
-      ROQCK(K)=ROQCK(K)+ROQCD(N,K)
-1875  CONTINUE
-      XOQCK(K)=0.0
-      XOQCZ(K)=0.0
-      XOQNZ(K)=0.0
-      XOQPZ(K)=0.0
-      XOQAZ(K)=0.0
-      DO 845 N=1,7
-      DO M=1,3
-      XOMCZ(M,N,K)=0.0
-      XOMNZ(M,N,K)=0.0
-      XOMPZ(M,N,K)=0.0
-      enddo
-845   CONTINUE
-!     IF((I/10)*10.EQ.I.AND.J.EQ.24.AND.L.LE.1)THEN
-!     WRITE(*,4443)'PRIM1',I,J,NX,NY,L,K,ROQCK(K)
-!    2,XOQCK(K),OQC(K,L,NY,NX),XOQCZ(K),OQN(K,L,NY,NX),XOQNZ(K)
-!    3,OQP(K,L,NY,NX),XOQPZ(K),OQA(K,L,NY,NX),XOQAZ(K)
-!     ENDIF
+        ROQCK(K)=0.0_r8
+        DO 1875 N=1,7
+          ROQCK(K)=ROQCK(K)+ROQCD(N,K)
+1875    CONTINUE
+        XOQCK(K)=0.0_r8
+        XOQCZ(K)=0.0_r8
+        XOQNZ(K)=0.0_r8
+        XOQPZ(K)=0.0_r8
+        XOQAZ(K)=0.0_r8
+        DO 845 N=1,7
+          DO M=1,3
+            XOMCZ(M,N,K)=0.0_r8
+            XOMNZ(M,N,K)=0.0_r8
+            XOMPZ(M,N,K)=0.0_r8
+          enddo
+845     CONTINUE
+        !     IF((I/10)*10.EQ.I.AND.J.EQ.24.AND.L.LE.1)THEN
+        !     WRITE(*,4443)'PRIM1',I,J,NX,NY,L,K,ROQCK(K)
+        !    2,XOQCK(K),OQC(K,L,NY,NX),XOQCZ(K),OQN(K,L,NY,NX),XOQNZ(K)
+        !    3,OQP(K,L,NY,NX),XOQPZ(K),OQA(K,L,NY,NX),XOQAZ(K)
+        !     ENDIF
 1870  CONTINUE
-!
-!     PRIMING of DOC,DON,DOP BETWEEN LITTER AND NON-LITTER C
-      call OMTransferForPriming(KL,L,NY,NX)
-!
-!     TRANSFER ALL PRIMING AMONG ALL K
-!
-!     TOQCK=total respiration of DOC+DOA in soil layer
-!     ROQCK=total respiration of DOC+DOA in substrate complex
-!     OQC,OQN,OQP,OQA=DOC,DON,DOP,acetate in micropores
-!     OMC,OMN,OMP=microbial C,N,P
-!
-      DO 1790 K=0,KL
-!     IF((I/10)*10.EQ.I.AND.J.EQ.24.AND.L.EQ.4)THEN
-!     WRITE(*,4443)'PRIM2',I,J,NX,NY,L,K,ROQCK(K)
-!    2,XOQCK(K),OQC(K,L,NY,NX),XOQCZ(K),OQN(K,L,NY,NX),XOQNZ(K)
-!    3,OQP(K,L,NY,NX),XOQPZ(K),OQA(K,L,NY,NX),XOQAZ(K),TOMK(K)
-!    3,TONK(K),TOPK(K),TONX(K),TOPX(K),CNOMX,CPOMX,FCNK(K),FCPK(K)
-!    4,TOQCK(L,NY,NX)
+        !
+        !write(*,*)'PRIMING of DOC,DON,DOP BETWEEN LITTER AND NON-LITTER C'
+        call OMTransferForPriming(KL,L,NY,NX)
+        !
+        !     TRANSFER ALL PRIMING AMONG ALL K
+        !
+        !     TOQCK=total respiration of DOC+DOA in soil layer
+        !     ROQCK=total respiration of DOC+DOA in substrate complex
+        !     OQC,OQN,OQP,OQA=DOC,DON,DOP,acetate in micropores
+        !     OMC,OMN,OMP=microbial C,N,P
+        !
+        DO 1790 K=0,KL
+          !       IF((I/10)*10.EQ.I.AND.J.EQ.24.AND.L.EQ.4)THEN
+          !     WRITE(*,4443)'PRIM2',I,J,NX,NY,L,K,ROQCK(K)
+          !    2,XOQCK(K),OQC(K,L,NY,NX),XOQCZ(K),OQN(K,L,NY,NX),XOQNZ(K)
+          !    3,OQP(K,L,NY,NX),XOQPZ(K),OQA(K,L,NY,NX),XOQAZ(K),TOMK(K)
+          !    3,TONK(K),TOPK(K),TONX(K),TOPX(K),CNOMX,CPOMX,FCNK(K),FCPK(K)
+          !    4,TOQCK(L,NY,NX)
 !4443  FORMAT(A8,6I4,20E12.4)
-!     ENDIF
+          !     ENDIF
 !
-!     DECOMPOSITION OF ORGANIC SUBSTRATES
+          !write(*,*)'DECOMPOSITION OF ORGANIC SUBSTRATES'
 !
-      call SolidOMDecomposition(K,L,NY,NX)
+          call SolidOMDecomposition(K,L,NY,NX)
 !
-!     DOC ADSORPTION - DESORPTION
+          !write(*,*)'DOC ADSORPTION - DESORPTION'
 !
-      call DOMSorption(K,L,NY,NX)
-!     IF(I.EQ.116)THEN
-!     WRITE(*,591)'CSORP',I,J,NX,NY,L,K,CSORP(K),CSORPA(K)
-!    1,OQC(K,L,NY,NX),OHC(K,L,NY,NX),OQA(K,L,NY,NX),OHA(K,L,NY,NX)
-!    2,OQC(K,L,NY,NX)/VOLWM(NPH,L,NY,NX)
-!    2,OQA(K,L,NY,NX)/VOLWM(NPH,L,NY,NX)
-!    3,OHC(K,L,NY,NX)/BKVL(L,NY,NX),OHA(K,L,NY,NX)/BKVL(L,NY,NX)
-!    4,BKVL(L,NY,NX),VOLWM(NPH,L,NY,NX),FOCA(K),FOAA(K)
-!    5,FOSRH(K,L,NY,NX),TCGOQC(K),OQCX
-!591   FORMAT(A8,6I4,40E12.4)
-!     ENDIF
-1790  CONTINUE
+          call DOMSorption(K,L,NY,NX)
+          !     IF(I.EQ.116)THEN
+          !     WRITE(*,591)'CSORP',I,J,NX,NY,L,K,CSORP(K),CSORPA(K)
+          !    1,OQC(K,L,NY,NX),OHC(K,L,NY,NX),OQA(K,L,NY,NX),OHA(K,L,NY,NX)
+          !    2,OQC(K,L,NY,NX)/VOLWM(NPH,L,NY,NX)
+          !    2,OQA(K,L,NY,NX)/VOLWM(NPH,L,NY,NX)
+          !    3,OHC(K,L,NY,NX)/BKVL(L,NY,NX),OHA(K,L,NY,NX)/BKVL(L,NY,NX)
+          !    4,BKVL(L,NY,NX),VOLWM(NPH,L,NY,NX),FOCA(K),FOAA(K)
+          !    5,FOSRH(K,L,NY,NX),TCGOQC(K),OQCX
+          !591   FORMAT(A8,6I4,40E12.4)
+          !     ENDIF
+1790    CONTINUE
+        !write(*,*)'RedistDecompositionProduct'
+        call RedistDecompositionProduct(KL,L,NY,NX)
+!
+        !write(*,*)'MICROBIAL GROWTH FROM RESPIRATION, MINERALIZATION'
 
-      call RedistDecompositionProduct(KL,L,NY,NX)
+        call MicrobialAnabolicUpdate(L,NY,NX)
 !
-!     MICROBIAL GROWTH FROM RESPIRATION, MINERALIZATION
-
-      call MicrobialAnabolicUpdate(L,NY,NX)
+        !write(*,*)'MICROBIAL COLONIZATION OF NEW LITTER'
 !
-!     MICROBIAL COLONIZATION OF NEW LITTER
-!
-      call MicrobialLitterColonization(KL,L,NY,NX)
+        call MicrobialLitterColonization(KL,L,NY,NX)
 !
 !     AGGREGATE ALL TRANSFORMATIONS CALCULATED ABOVE FOR EACH N,K
 !
-      call AggregateTransformations(L,NY,NX)
+        call AggregateTransformations(L,NY,NX)
 !     IF(ISALTG.NE.0)THEN
 !     XZHYS(L,NY,NX)=XZHYS(L,NY,NX)+0.1429*(RVOXA(1)+RVOXB(1)
 !    2-TRDN3-TRDNB)-0.0714*(TRDN2+TRD2B+TRDNO)
@@ -455,49 +456,49 @@ module nitroMod
 !     ENDIF
 !     WRITE(*,2324)'XOQCS',I,J,NX,NY,L,(XOQCS(K,L,NY,NX),K=0,4)
 !2324  FORMAT(A8,5I4,12E12.4)
-      ELSE
-      RCO2O(L,NY,NX)=0.0
-      RCH4O(L,NY,NX)=0.0
-      RH2GO(L,NY,NX)=0.0
-      RUPOXO(L,NY,NX)=0.0
-      RN2G(L,NY,NX)=0.0
-      RN2O(L,NY,NX)=0.0
-      XNH4S(L,NY,NX)=0.0
-      XNO3S(L,NY,NX)=0.0
-      XNO2S(L,NY,NX)=0.0
-      XH2PS(L,NY,NX)=0.0
-      XH1PS(L,NY,NX)=0.0
-      XNH4B(L,NY,NX)=0.0
-      XNO3B(L,NY,NX)=0.0
-      XNO2B(L,NY,NX)=0.0
-      XH2BS(L,NY,NX)=0.0
-      XH1BS(L,NY,NX)=0.0
-      XN2GS(L,NY,NX)=0.0
-      ENDIF
+    ELSE
+      RCO2O(L,NY,NX)=0.0_r8
+      RCH4O(L,NY,NX)=0.0_r8
+      RH2GO(L,NY,NX)=0.0_r8
+      RUPOXO(L,NY,NX)=0.0_r8
+      RN2G(L,NY,NX)=0.0_r8
+      RN2O(L,NY,NX)=0.0_r8
+      XNH4S(L,NY,NX)=0.0_r8
+      XNO3S(L,NY,NX)=0.0_r8
+      XNO2S(L,NY,NX)=0.0_r8
+      XH2PS(L,NY,NX)=0.0_r8
+      XH1PS(L,NY,NX)=0.0_r8
+      XNH4B(L,NY,NX)=0.0_r8
+      XNO3B(L,NY,NX)=0.0_r8
+      XNO2B(L,NY,NX)=0.0_r8
+      XH2BS(L,NY,NX)=0.0_r8
+      XH1BS(L,NY,NX)=0.0_r8
+      XN2GS(L,NY,NX)=0.0_r8
+    ENDIF
 !
 !     MIX LITTER C BETWEEN ADJACENT SOIL LAYERS L AND LL
 !
-      call VerticalLitterMixLvsLL(I,J,L,NY,NX)
-      ELSE
-      RCO2O(L,NY,NX)=0.0
-      RCH4O(L,NY,NX)=0.0
-      RH2GO(L,NY,NX)=0.0
-      RUPOXO(L,NY,NX)=0.0
-      RN2G(L,NY,NX)=0.0
-      RN2O(L,NY,NX)=0.0
-      XNH4S(L,NY,NX)=0.0
-      XNO3S(L,NY,NX)=0.0
-      XNO2S(L,NY,NX)=0.0
-      XH2PS(L,NY,NX)=0.0
-      XH1PS(L,NY,NX)=0.0
-      XNH4B(L,NY,NX)=0.0
-      XNO3B(L,NY,NX)=0.0
-      XNO2B(L,NY,NX)=0.0
-      XH2BS(L,NY,NX)=0.0
-      XH1BS(L,NY,NX)=0.0
-      XN2GS(L,NY,NX)=0.0
-      ENDIF
-      end subroutine SoilBGCOneLayer
+    call VerticalLitterMixLvsLL(I,J,L,NY,NX)
+  ELSE
+    RCO2O(L,NY,NX)=0.0_r8
+    RCH4O(L,NY,NX)=0.0_r8
+    RH2GO(L,NY,NX)=0.0_r8
+    RUPOXO(L,NY,NX)=0.0_r8
+    RN2G(L,NY,NX)=0.0_r8
+    RN2O(L,NY,NX)=0.0_r8
+    XNH4S(L,NY,NX)=0.0_r8
+    XNO3S(L,NY,NX)=0.0_r8
+    XNO2S(L,NY,NX)=0.0_r8
+    XH2PS(L,NY,NX)=0.0_r8
+    XH1PS(L,NY,NX)=0.0_r8
+    XNH4B(L,NY,NX)=0.0_r8
+    XNO3B(L,NY,NX)=0.0_r8
+    XNO2B(L,NY,NX)=0.0_r8
+    XH2BS(L,NY,NX)=0.0_r8
+    XH1BS(L,NY,NX)=0.0_r8
+    XN2GS(L,NY,NX)=0.0_r8
+  ENDIF
+  end subroutine SoilBGCOneLayer
 !------------------------------------------------------------------------------------------
 
       subroutine SOMRemovalByDisturbance(I,J,NY,NX)
@@ -539,7 +540,7 @@ module nitroMod
       IF(NLL.GE.0)THEN
       IF(ITILL(I,NY,NX).EQ.22)THEN
       IF(L.EQ.0)THEN
-      FORGCX=0.0
+      FORGCX=0.0_r8
       ELSE
       FORGCX=FORGC
       ENDIF
@@ -555,16 +556,16 @@ module nitroMod
 !    2,CORGC(L,NY,NX),ORGC(L,NY,NX)
 !    2,FORGCX,DCORPC,DCORP(I,NY,NX),VOLW(L,NY,NX),BKDS(L,NY,NX)
 !9696  FORMAT(A8,5I6,12E12.4)
-      OC=0.0
-      ON=0.0
-      OP=0.0
-      DC=0.0
-      DN=0.0
-      DP=0.0
+      OC=0.0_r8
+      ON=0.0_r8
+      OP=0.0_r8
+      DC=0.0_r8
+      DN=0.0_r8
+      DP=0.0_r8
       DO 2955 K=0,4
       DO  M=1,4
-      ONL(M,K)=0.0
-      OPL(M,K)=0.0
+      ONL(M,K)=0.0_r8
+      OPL(M,K)=0.0_r8
       enddo
 2955  CONTINUE
       DO 2970 K=0,5
@@ -831,7 +832,7 @@ module nitroMod
       IF(ORGR(L,NY,NX).GT.ZEROS(NY,NX))THEN
       FOSCXS=AMIN1(1.0,FOSCZ0/ORGR(L,NY,NX)*TOQCK(L,NY,NX))
       ELSE
-      FOSCXS=0.0
+      FOSCXS=0.0_r8
       ENDIF
       ELSE
       DO 1100 LN=L+1,NL(NY,NX)
@@ -850,12 +851,12 @@ module nitroMod
       ELSEIF(OSCXD.LT.0.0.AND.ORGR(LL,NY,NX).GT.ZEROS(NY,NX))THEN
       FOSCXD=OSCXD/ORGR(LL,NY,NX)
       ELSE
-      FOSCXD=0.0
+      FOSCXD=0.0_r8
       ENDIF
       IF(VOLT(L,NY,NX).GT.ZEROS2(NY,NX))THEN
       FOSCXS=FOSCZL*FOSCXD*TOQCK(L,NY,NX)/VOLT(L,NY,NX)
       ELSE
-      FOSCXS=0.0
+      FOSCXS=0.0_r8
       ENDIF
       ENDIF
 !     IF(L.EQ.3)THEN
@@ -1101,16 +1102,16 @@ module nitroMod
 !     OSCT=total SOC n each K, OSAT=total colonized SOC
 !     ORCT=total microbial residue, OHCT=total adsorbed C
 !
-      TOSC=0.0
-      TOSA=0.0
-      TORC=0.0
-      TOHC=0.0
+      TOSC=0.0_r8
+      TOSA=0.0_r8
+      TORC=0.0_r8
+      TOHC=0.0_r8
 !
 !     TOTAL SOLID SUBSTRATE
 !
       DO 870 K=0,KL
-      OSCT(K)=0.0
-      OSAT(K)=0.0
+      OSCT(K)=0.0_r8
+      OSAT(K)=0.0_r8
       DO 865 M=1,4
       OSCT(K)=OSCT(K)+OSC(M,K,L,NY,NX)
       OSAT(K)=OSAT(K)+OSA(M,K,L,NY,NX)
@@ -1122,7 +1123,7 @@ module nitroMod
 !     TOTAL BIORESIDUE
 !
       DO 880 K=0,KL
-      ORCT(K)=0.0
+      ORCT(K)=0.0_r8
       DO 875 M=1,2
       ORCT(K)=ORCT(K)+ORC(M,K,L,NY,NX)
 !     IF(L.EQ.4.AND.K.EQ.2)THEN
@@ -1153,8 +1154,8 @@ module nitroMod
 !     CNOMA,CPOMA=N,P contents of active biomass OMA
 !     FCN,FCP=effects of N,P limitations on biomass activity
 !
-      TOMA=0.0
-      TOMN=0.0
+      TOMA=0.0_r8
+      TOMN=0.0_r8
       DO 890 K=0,5
       IF(L.NE.0.OR.(K.NE.3.AND.K.NE.4))THEN
       DO 895 N=1,7
@@ -1185,19 +1186,19 @@ module nitroMod
       FOM2(N,K)=AMAX1(0.0,OMC2(N,K)/OMC(2,N,K,L,NY,NX))
       OMN2(N,K)=AMAX1(0.0,FOM2(N,K)*OMN(2,N,K,L,NY,NX))
       ELSE
-      FOM2(N,K)=0.0
-      OMN2(N,K)=0.0
+      FOM2(N,K)=0.0_r8
+      OMN2(N,K)=0.0_r8
       ENDIF
       ENDIF
 895   CONTINUE
       ENDIF
 890   CONTINUE
       DO 690 K=0,KL
-      TOMK(K)=0.0
-      TONK(K)=0.0
-      TOPK(K)=0.0
-      TONX(K)=0.0
-      TOPX(K)=0.0
+      TOMK(K)=0.0_r8
+      TONK(K)=0.0_r8
+      TOPK(K)=0.0_r8
+      TONX(K)=0.0_r8
+      TOPX(K)=0.0_r8
       DO 685 N=1,7
       TOMK(K)=TOMK(K)+OMA(N,K)
       TONK(K)=TONK(K)+OMA(N,K)*CNOMA(N,K)
@@ -1233,9 +1234,9 @@ module nitroMod
       COQA(K,L,NY,NX)=AMAX1(0.0,OQA(K,L,NY,NX)/VOLWM(NPH,L,NY,NX))
       ENDIF
       ELSE
-      COQC(K,L,NY,NX)=0.0
-      COQA(K,L,NY,NX)=0.0
-      OHCQ=0.0
+      COQC(K,L,NY,NX)=0.0_r8
+      COQA(K,L,NY,NX)=0.0_r8
+      OHCQ=0.0_r8
       ENDIF
 !
 !     CNQ,CPQ=DON:DOC,DOP:DOC,FOCA,FOAA=DOC,DOA:(DOC+DOA)
@@ -1244,8 +1245,8 @@ module nitroMod
       CNQ(K)=AMAX1(0.0,OQN(K,L,NY,NX)/OQC(K,L,NY,NX))
       CPQ(K)=AMAX1(0.0,OQP(K,L,NY,NX)/OQC(K,L,NY,NX))
       ELSE
-      CNQ(K)=0.0
-      CPQ(K)=0.0
+      CNQ(K)=0.0_r8
+      CPQ(K)=0.0_r8
       ENDIF
       IF(OQC(K,L,NY,NX).GT.ZEROS(NY,NX).AND.OQA(K,L,NY,NX) &
       .GT.ZEROS(NY,NX))THEN
@@ -1253,9 +1254,9 @@ module nitroMod
       FOAA(K)=1.0-FOCA(K)
       ELSEIF(OQC(K,L,NY,NX).GT.ZEROS(NY,NX))THEN
       FOCA(K)=1.0
-      FOAA(K)=0.0
+      FOAA(K)=0.0_r8
       ELSE
-      FOCA(K)=0.0
+      FOCA(K)=0.0_r8
       FOAA(K)=1.0
       ENDIF
 790   CONTINUE
@@ -1271,225 +1272,229 @@ module nitroMod
       end subroutine StageBGCEnvironCondition
 !------------------------------------------------------------------------------------------
 
-      subroutine MicrobialCatabolism(L,LL,NY,NX)
-!
-!     Description:
-!
-      implicit none
-      integer, intent(in) :: L,LL,NY,NX
+  subroutine MicrobialCatabolism(L,LL,NY,NX)
+  !
+  !  Description:
+  !
+  implicit none
+  integer, intent(in) :: L,LL,NY,NX
 
-      integer :: K,M,N
-!     begin_execution
+  integer :: K,M,N
+  !     begin_execution
 
-      DO 760 K=0,5
-      IF(L.NE.0.OR.(K.NE.3.AND.K.NE.4))THEN
-      TCGOQC(K)=0.0
-      TCGOAC(K)=0.0
-      TCGOMN(K)=0.0
-      TCGOMP(K)=0.0
+  DO 760 K=0,5
+    IF(L.NE.0.OR.(K.NE.3.AND.K.NE.4))THEN
+      TCGOQC(K)=0.0_r8
+      TCGOAC(K)=0.0_r8
+      TCGOMN(K)=0.0_r8
+      TCGOMP(K)=0.0_r8
       DO 750 N=1,7
-      IF(K.NE.5.OR.(N.LE.3.OR.N.EQ.5))THEN
-      IF(K.LE.4)THEN
-      IF(N.EQ.3)THEN
+        IF(K.NE.5.OR.(N.LE.3.OR.N.EQ.5))THEN
+          IF(K.LE.4)THEN
+            IF(N.EQ.3)THEN
+              !
+              !     WFNG=water potential (PSISM) effect on microbial respiration
+              !     OXKX=Km for O2 uptake
+              !     OXKM=Km for heterotrophic O2 uptake set in starts.f
+              !     TFNG=combined temp and water stress effect on growth respiration
+              !     TFNR=temperature effect on maintenance respiration
+              !
+              WFNG=EXP(0.1*PSISM(L,NY,NX))
+            ELSE
+              WFNG=EXP(0.2*PSISM(L,NY,NX))
+            ENDIF
+          OXKX=OXKM
+        ELSE
+          WFNG=EXP(0.2*PSISM(L,NY,NX))
+          OXKX=OXKA
+        ENDIF
+        TFNG(N,K)=TFNX*WFNG
+        TFNR(N,K)=TFNY
 !
-!     WFNG=water potential (PSISM) effect on microbial respiration
-!     OXKX=Km for O2 uptake
-!     OXKM=Km for heterotrophic O2 uptake set in starts.f
-!     TFNG=combined temp and water stress effect on growth respiration
-!     TFNR=temperature effect on maintenance respiration
+!       FOMA,FOMN=fraction of total active biomass C,N in each N and K
 !
-      WFNG=EXP(0.1*PSISM(L,NY,NX))
-      ELSE
-      WFNG=EXP(0.2*PSISM(L,NY,NX))
-      ENDIF
-      OXKX=OXKM
-      ELSE
-      WFNG=EXP(0.2*PSISM(L,NY,NX))
-      OXKX=OXKA
-      ENDIF
-      TFNG(N,K)=TFNX*WFNG
-      TFNR(N,K)=TFNY
+        IF(OMA(N,K).GT.0.0)THEN
+          IF(TOMA.GT.ZEROS(NY,NX))THEN
+            FOMA(N,K)=OMA(N,K)/TOMA
+          ELSE
+            FOMA(N,K)=1.0
+          ENDIF
+          IF(TOMN.GT.ZEROS(NY,NX))THEN
+            FOMN(N,K)=OMA(N,K)/TOMN
+          ELSE
+            FOMN(N,K)=1.0
+          ENDIF
+          IF(TOMK(K).GT.ZEROS(NY,NX))THEN
+            FOMK(N,K)=OMA(N,K)/TOMK(K)
+          ELSE
+            FOMK(N,K)=1.0
+          ENDIF
 !
-!     FOMA,FOMN=fraction of total active biomass C,N in each N and K
+          !     ADJUST MCROBIAL GROWTH AND DECOMPOSITION RATES FOR BIOMASS
+          !
+          !     COMC=microbial C concentration relative to substrate
+          !     SPOMK=effect of microbial C concentration on microbial decay
+          !     RMOMK=effect of microbial C concentration on maintenance respn
+          !
+          IF(ORGCL.GT.ZEROS(NY,NX))THEN
+            DO 765 M=1,2
+              COMC=OMC(M,N,K,L,NY,NX)/ORGCL
+              SPOMK(M)=COMC/(COMC+COMKI)
+              RMOMK(M)=COMC/(COMC+COMKM)
+765         CONTINUE
+          ELSE
+            DO 770 M=1,2
+              SPOMK(M)=1.0
+              RMOMK(M)=1.0
+770         CONTINUE
+          ENDIF
 !
-      IF(OMA(N,K).GT.0.0)THEN
-      IF(TOMA.GT.ZEROS(NY,NX))THEN
-      FOMA(N,K)=OMA(N,K)/TOMA
-      ELSE
-      FOMA(N,K)=1.0
-      ENDIF
-      IF(TOMN.GT.ZEROS(NY,NX))THEN
-      FOMN(N,K)=OMA(N,K)/TOMN
-      ELSE
-      FOMN(N,K)=1.0
-      ENDIF
-      IF(TOMK(K).GT.ZEROS(NY,NX))THEN
-      FOMK(N,K)=OMA(N,K)/TOMK(K)
-      ELSE
-      FOMK(N,K)=1.0
-      ENDIF
+          !     FACTORS CONSTRAINING DOC, ACETATE, O2, NH4, NO3, PO4 UPTAKE
+          !     AMONG COMPETING MICROBIAL AND ROOT POPULATIONS IN SOIL LAYERS
+          !write(*,*)'SubstrateCompetitionFactors'
+          call SubstrateCompetitionFactors(N,K,L,NY,NX)
 !
-!     ADJUST MCROBIAL GROWTH AND DECOMPOSITION RATES FOR BIOMASS
+          !     HETEROTROPHIC BIOMASS RESPIRATION
+          !
+          IF(K.LE.4)THEN
 !
-!     COMC=microbial C concentration relative to substrate
-!     SPOMK=effect of microbial C concentration on microbial decay
-!     RMOMK=effect of microbial C concentration on maintenance respn
+            !     RESPIRATION BY HETEROTROPHIC AEROBES:
+            !     N=(1)OBLIGATE AEROBES,(2)FACULTATIVE ANAEROBES,(3)FUNGI
+            !    (6)N2 FIXERS
+            !
+            IF(N.LE.3.OR.N.EQ.6)THEN
+              !write(*,*)'AerobicHeterotrophCatabolism'
+              call AerobicHeterotrophCatabolism(N,K,L,NY,NX)
+              !     RESPIRATION BY HETEROTROPHIC ANAEROBES:
+              !     N=(4)ACETOGENIC FERMENTERS (7) ACETOGENIC N2 FIXERS
 !
-      IF(ORGCL.GT.ZEROS(NY,NX))THEN
-      DO 765 M=1,2
-      COMC=OMC(M,N,K,L,NY,NX)/ORGCL
-      SPOMK(M)=COMC/(COMC+COMKI)
-      RMOMK(M)=COMC/(COMC+COMKM)
-765   CONTINUE
-      ELSE
-      DO 770 M=1,2
-      SPOMK(M)=1.0
-      RMOMK(M)=1.0
-770   CONTINUE
-      ENDIF
+              !     ENERGY YIELD FROM FERMENTATION DEPENDS ON H2 AND
+              !     ACETATE CONCENTRATION
 !
-!     FACTORS CONSTRAINING DOC, ACETATE, O2, NH4, NO3, PO4 UPTAKE
-!     AMONG COMPETING MICROBIAL AND ROOT POPULATIONS IN SOIL LAYERS
+              !     GH2F=energy yield of acetotrophic methanogenesis per g C
+              !     GHAX=H2 effect on energy yield of fermentation
+              !     GOAX=acetate effect on energy yield of fermentation
+              !     ECHZ=growth respiration efficiency of fermentation
 !
-      call SubstrateCompetitionFactors(N,K,L,NY,NX)
-!
-!     HETEROTROPHIC BIOMASS RESPIRATION
-!
-      IF(K.LE.4)THEN
-!
-!     RESPIRATION BY HETEROTROPHIC AEROBES:
-!     N=(1)OBLIGATE AEROBES,(2)FACULTATIVE ANAEROBES,(3)FUNGI
-!    (6)N2 FIXERS
-!
-      IF(N.LE.3.OR.N.EQ.6)THEN
-      call AerobicHeterotrophCatabolism(N,K,L,NY,NX)
-!     RESPIRATION BY HETEROTROPHIC ANAEROBES:
-!     N=(4)ACETOGENIC FERMENTERS (7) ACETOGENIC N2 FIXERS
-!
-!     ENERGY YIELD FROM FERMENTATION DEPENDS ON H2 AND
-!     ACETATE CONCENTRATION
-!
-!     GH2F=energy yield of acetotrophic methanogenesis per g C
-!     GHAX=H2 effect on energy yield of fermentation
-!     GOAX=acetate effect on energy yield of fermentation
-!     ECHZ=growth respiration efficiency of fermentation
-!
-      ELSEIF(N.EQ.4.OR.N.EQ.7)THEN
-      call AnaerobCatabolism(N,K,L,NY,NX)
-!     ENERGY YIELD FROM ACETOTROPHIC METHANOGENESIS
-!
-!     GOMX=acetate effect on energy yield
-!     ECHZ=growth respiration efficiency of aceto. methanogenesis
-!
-      ELSEIF(N.EQ.5)THEN
-      call AcetoMethanogenCatabolism(N,K,L,NY,NX)
-      ENDIF
-!
-!     RESPIRATION RATES BY AUTOTROPHS 'RGOMP' FROM SPECIFIC
-!     OXIDATION RATE, ACTIVE BIOMASS, DOC CONCENTRATION,
-!     MICROBIAL C:N:P FACTOR, AND TEMPERATURE FOLLOWED BY POTENTIAL
-!     RESPIRATION RATES 'RGOMP' WITH UNLIMITED SUBSTRATE USED FOR
-!     MICROBIAL COMPETITION FACTOR. N=(1) NH4 OXIDIZERS (2) NO2
-!     OXIDIZERS,(3) CH4 OXIDIZERS, (5) H2TROPHIC METHANOGENS
-!
-      ELSEIF(K.EQ.5)THEN
-!
-!     NH3 OXIDIZERS
-!
-      IF(N.EQ.1)THEN
-      call NH3OxidizerCatabolism(N,K,L,NY,NX)
-!     NO2 OXIDIZERS
-!
-      ELSEIF(N.EQ.2)THEN
-!
-      call NO2OxidizerCatabolism(N,K,L,NY,NX)
-!     H2TROPHIC METHANOGENS
-!
-      ELSEIF(N.EQ.5)THEN
+            ELSEIF(N.EQ.4.OR.N.EQ.7)THEN
+              !write(*,*)'AnaerobCatabolism'
+              call AnaerobCatabolism(N,K,L,NY,NX)
+              !     ENERGY YIELD FROM ACETOTROPHIC METHANOGENESIS
+              !
+              !     GOMX=acetate effect on energy yield
+              !     ECHZ=growth respiration efficiency of aceto. methanogenesis
+              !
+            ELSEIF(N.EQ.5)THEN
+              !write(*,*)'AcetoMethanogenCatabolism'
+              call AcetoMethanogenCatabolism(N,K,L,NY,NX)
+            ENDIF
+            !
+            !     RESPIRATION RATES BY AUTOTROPHS 'RGOMP' FROM SPECIFIC
+            !     OXIDATION RATE, ACTIVE BIOMASS, DOC CONCENTRATION,
+            !     MICROBIAL C:N:P FACTOR, AND TEMPERATURE FOLLOWED BY POTENTIAL
+            !     RESPIRATION RATES 'RGOMP' WITH UNLIMITED SUBSTRATE USED FOR
+            !     MICROBIAL COMPETITION FACTOR. N=(1) NH4 OXIDIZERS (2) NO2
+            !     OXIDIZERS,(3) CH4 OXIDIZERS, (5) H2TROPHIC METHANOGENS
+            !
+          ELSEIF(K.EQ.5)THEN
+            !
+            !     NH3 OXIDIZERS
+            !
+            IF(N.EQ.1)THEN
+              call NH3OxidizerCatabolism(N,K,L,NY,NX)
+              !     NO2 OXIDIZERS
+              !
+            ELSEIF(N.EQ.2)THEN
+              !write(*,*)'NO2OxidizerCatabolism'
+              call NO2OxidizerCatabolism(N,K,L,NY,NX)
+              !     H2TROPHIC METHANOGENS
+              !
+            ELSEIF(N.EQ.5)THEN
 
-      call H2MethanogensCatabolism(N,K,L,NY,NX)
-!     METHANOTROPHS
+              call H2MethanogensCatabolism(N,K,L,NY,NX)
+              !     METHANOTROPHS
 !
-      ELSEIF(N.EQ.3)THEN
-      call MethanotrophCatabolism(N,K,L,NY,NX)
-      ELSE
-      RGOMP=0.0
-      ROXYM(N,K)=0.0
-      ROXYP(N,K)=0.0
-      ROXYS(N,K,L,NY,NX)=0.0
-      ENDIF
-      ELSE
-      RGOMP=0.0
-      ROXYM(N,K)=0.0
-      ROXYP(N,K)=0.0
-      ROXYS(N,K,L,NY,NX)=0.0
-      ENDIF
+            ELSEIF(N.EQ.3)THEN
+              call MethanotrophCatabolism(N,K,L,NY,NX)
+            ELSE
+              RGOMP=0.0_r8
+              ROXYM(N,K)=0.0_r8
+              ROXYP(N,K)=0.0_r8
+              ROXYS(N,K,L,NY,NX)=0.0_r8
+            ENDIF
+          ELSE
+            RGOMP=0.0_r8
+            ROXYM(N,K)=0.0_r8
+            ROXYP(N,K)=0.0_r8
+            ROXYS(N,K,L,NY,NX)=0.0_r8
+          ENDIF
 !
-!     O2 UPTAKE BY AEROBES
+          !write(*,*)'O2 UPTAKE BY AEROBES'
+          !
+          !     RUPOX, ROXYP=O2-limited, O2-unlimited rates of O2 uptake
+          !     RUPMX=O2-unlimited rate of O2 uptake
+          !     FOXYX=fraction of O2 uptake by N,K relative to total
+          !     XNPG=1/(NPH*NPT)
+          !     ROXYF,ROXYL=net O2 gaseous, aqueous fluxes from previous hour
+          !     OLSGL=aqueous O2 diffusivity
+          !     OXYG,OXYS=gaseous, aqueous O2 amounts
+          !     FLQRQ,FLQRI=surface water flux from precipitation, irrigation
+          !     COXR,COXQ=O2 concentration in FLQRQ,FLQRI
+          !
+          RUPOX(N,K)=0.0_r8
+          IF(N.LE.3.OR.N.EQ.6)THEN
+            !  N=(1)OBLIGATE AEROBES,(2)FACULTATIVE ANAEROBES,(3)FUNGI
+            !    (6)N2 FIXERS
+            !write(*,*)'AerobsO2Uptake'
+            call AerobsO2Uptake(N,K,L,NY,NX)
+          ELSEIF(N.EQ.4.OR.N.EQ.7)THEN
+            RGOMO(N,K)=RGOMP
+            RCO2X(N,K)=0.333*RGOMO(N,K)
+            RCH3X(N,K)=0.667*RGOMO(N,K)
+            RCH4X(N,K)=0.0_r8
+            ROXYO(N,K)=ROXYM(N,K)
+            IF(K.LE.4)THEN
+              RH2GX(N,K)=0.111*RGOMO(N,K)
+            ELSE
+              RH2GX(N,K)=0.0_r8
+            ENDIF
+          ELSEIF(N.EQ.5)THEN
+            RGOMO(N,K)=RGOMP
+            IF(K.LE.4)THEN
+              RCO2X(N,K)=0.50_r8*RGOMO(N,K)
+              RCH3X(N,K)=0.0_r8
+              RCH4X(N,K)=0.50_r8*RGOMO(N,K)
+              ROXYO(N,K)=ROXYM(N,K)
+              RH2GX(N,K)=0.0_r8
+            ELSEIF(K.EQ.5)THEN
+              RCO2X(N,K)=0.0_r8
+              RCH3X(N,K)=0.0_r8
+              RCH4X(N,K)=RGOMO(N,K)
+              ROXYO(N,K)=ROXYM(N,K)
+              RH2GX(N,K)=0.0_r8
+              RH2GZ=0.667_r8*RGOMO(N,K)
+            ENDIF
+          ENDIF
 !
-!     RUPOX, ROXYP=O2-limited, O2-unlimited rates of O2 uptake
-!     RUPMX=O2-unlimited rate of O2 uptake
-!     FOXYX=fraction of O2 uptake by N,K relative to total
-!     XNPG=1/(NPH*NPT)
-!     ROXYF,ROXYL=net O2 gaseous, aqueous fluxes from previous hour
-!     OLSGL=aqueous O2 diffusivity
-!     OXYG,OXYS=gaseous, aqueous O2 amounts
-!     FLQRQ,FLQRI=surface water flux from precipitation, irrigation
-!     COXR,COXQ=O2 concentration in FLQRQ,FLQRI
+          !write(*,*)'HETEROTROPHIC DENITRIFICATION'
 !
-      RUPOX(N,K)=0.0
-      IF(N.LE.3.OR.N.EQ.6)THEN
-!     N=(1)OBLIGATE AEROBES,(2)FACULTATIVE ANAEROBES,(3)FUNGI
-!    (6)N2 FIXERS
-      call AerobsO2Uptake(N,K,L,NY,NX)
-      ELSEIF(N.EQ.4.OR.N.EQ.7)THEN
-      RGOMO(N,K)=RGOMP
-      RCO2X(N,K)=0.333*RGOMO(N,K)
-      RCH3X(N,K)=0.667*RGOMO(N,K)
-      RCH4X(N,K)=0.0
-      ROXYO(N,K)=ROXYM(N,K)
-      IF(K.LE.4)THEN
-      RH2GX(N,K)=0.111*RGOMO(N,K)
-      ELSE
-      RH2GX(N,K)=0.0
-      ENDIF
-      ELSEIF(N.EQ.5)THEN
-      RGOMO(N,K)=RGOMP
-      IF(K.LE.4)THEN
-      RCO2X(N,K)=0.50*RGOMO(N,K)
-      RCH3X(N,K)=0.00
-      RCH4X(N,K)=0.50*RGOMO(N,K)
-      ROXYO(N,K)=ROXYM(N,K)
-      RH2GX(N,K)=0.0
-      ELSEIF(K.EQ.5)THEN
-      RCO2X(N,K)=0.00
-      RCH3X(N,K)=0.00
-      RCH4X(N,K)=RGOMO(N,K)
-      ROXYO(N,K)=ROXYM(N,K)
-      RH2GX(N,K)=0.0
-      RH2GZ=0.667*RGOMO(N,K)
-      ENDIF
-      ENDIF
+          IF(K.LE.4.AND.N.EQ.2.AND.ROXYM(N,K).GT.0.0 &
+            .AND.(L.NE.0.OR.VOLX(L,NY,NX).GT.ZEROS(NY,NX)))THEN
+            call HeteroDenitrificCatabolism(N,K,L,NY,NX)
+            !     AUTOTROPHIC DENITRIFICATION
 !
-!     HETEROTROPHIC DENITRIFICATION
-!
-      IF(K.LE.4.AND.N.EQ.2.AND.ROXYM(N,K).GT.0.0 &
-      .AND.(L.NE.0.OR.VOLX(L,NY,NX).GT.ZEROS(NY,NX)))THEN
-      call HeteroDenitrificCatabolism(N,K,L,NY,NX)
-!     AUTOTROPHIC DENITRIFICATION
-!
-      ELSEIF(K.EQ.5.AND.N.EQ.1.AND.ROXYM(N,K).GT.0.0 &
+          ELSEIF(K.EQ.5.AND.N.EQ.1.AND.ROXYM(N,K).GT.0.0 &
       .AND.(L.NE.0.OR.VOLX(L,NY,NX).GT.ZEROS(NY,NX)))THEN
 
       call AutotrophDenitrificCatabolism(N,K,L,NY,NX)
       ELSE
-      RDNO3(N,K)=0.0
-      RDNOB(N,K)=0.0
-      RDNO2(N,K)=0.0
-      RDN2B(N,K)=0.0
-      RDN2O(N,K)=0.0
-      RGOMY(N,K)=0.0
-      RGOMD(N,K)=0.0
+      RDNO3(N,K)=0.0_r8
+      RDNOB(N,K)=0.0_r8
+      RDNO2(N,K)=0.0_r8
+      RDN2B(N,K)=0.0_r8
+      RDN2O(N,K)=0.0_r8
+      RGOMY(N,K)=0.0_r8
+      RGOMD(N,K)=0.0_r8
       ENDIF
 !
 !     BIOMASS DECOMPOSITION AND MINERALIZATION
@@ -1702,7 +1707,7 @@ module nitroMod
 !     OQC,OQN,OQP,OQA=DOC,DON,DOP,acetate in micropores
 !     OMC,OMN,OMP=microbial C,N,P
 !
-      TOQCK(L,NY,NX)=0.0
+      TOQCK(L,NY,NX)=0.0_r8
       DO 840 K=0,KL
       ROQCK(K)=ROQCK(K)+XOQCK(K)
       TOQCK(L,NY,NX)=TOQCK(L,NY,NX)+ROQCK(K)
@@ -1775,10 +1780,10 @@ module nitroMod
       ZSORP(K)=TSORP*(OQNX*VOLXX-OHNX*VOLXW)/(VOLXX+VOLXW)
       PSORP(K)=TSORP*(OQPX*VOLXX-OHPX*VOLXW)/(VOLXX+VOLXW)
       ELSE
-      CSORP(K)=0.0
-      CSORPA(K)=0.0
-      ZSORP(K)=0.0
-      PSORP(K)=0.0
+      CSORP(K)=0.0_r8
+      CSORPA(K)=0.0_r8
+      ZSORP(K)=0.0_r8
+      PSORP(K)=0.0_r8
       ENDIF
       end subroutine DOMSorption
 !------------------------------------------------------------------------------------------
@@ -1883,9 +1888,9 @@ module nitroMod
       ELSE
       CNS(M,K)=CNOSC(M,K,L,NY,NX)
       CPS(M,K)=CPOSC(M,K,L,NY,NX)
-      RDOSC(M,K)=0.0
-      RDOSN(M,K)=0.0
-      RDOSP(M,K)=0.0
+      RDOSC(M,K)=0.0_r8
+      RDOSN(M,K)=0.0_r8
+      RDOSP(M,K)=0.0_r8
       ENDIF
 785   CONTINUE
 !
@@ -1917,9 +1922,9 @@ module nitroMod
 805   CONTINUE
       ELSE
       DO 810 M=1,4
-      RHOSC(M,K)=0.0
-      RHOSN(M,K)=0.0
-      RHOSP(M,K)=0.0
+      RHOSC(M,K)=0.0_r8
+      RHOSN(M,K)=0.0_r8
+      RHOSP(M,K)=0.0_r8
       RCOSC(M,K)=RDOSC(M,K)
       RCOSN(M,K)=RDOSN(M,K)
       RCOSP(M,K)=RDOSP(M,K)
@@ -1927,15 +1932,15 @@ module nitroMod
       ENDIF
       ELSE
       DO 780 M=1,4
-      RDOSC(M,K)=0.0
-      RDOSN(M,K)=0.0
-      RDOSP(M,K)=0.0
-      RHOSC(M,K)=0.0
-      RHOSN(M,K)=0.0
-      RHOSP(M,K)=0.0
-      RCOSC(M,K)=0.0
-      RCOSN(M,K)=0.0
-      RCOSP(M,K)=0.0
+      RDOSC(M,K)=0.0_r8
+      RDOSN(M,K)=0.0_r8
+      RDOSP(M,K)=0.0_r8
+      RHOSC(M,K)=0.0_r8
+      RHOSN(M,K)=0.0_r8
+      RHOSP(M,K)=0.0_r8
+      RCOSC(M,K)=0.0_r8
+      RCOSN(M,K)=0.0_r8
+      RCOSP(M,K)=0.0_r8
 780   CONTINUE
       ENDIF
 !
@@ -1967,16 +1972,16 @@ module nitroMod
       RDORP(M,K)=AMAX1(0.0,AMIN1(ORP(M,K,L,NY,NX),CPR*RDORC(M,K))) &
       /FCPK(K)
       ELSE
-      RDORC(M,K)=0.0
-      RDORN(M,K)=0.0
-      RDORP(M,K)=0.0
+      RDORC(M,K)=0.0_r8
+      RDORN(M,K)=0.0_r8
+      RDORP(M,K)=0.0_r8
       ENDIF
 775   CONTINUE
       ELSE
       DO 776 M=1,2
-      RDORC(M,K)=0.0
-      RDORN(M,K)=0.0
-      RDORP(M,K)=0.0
+      RDORC(M,K)=0.0_r8
+      RDORN(M,K)=0.0_r8
+      RDORP(M,K)=0.0_r8
 776   CONTINUE
       ENDIF
 !
@@ -2010,20 +2015,20 @@ module nitroMod
       ,SPOHA*ROQCK(K)*DFNS*TFNX*OHA(K,L,NY,NX)/OSRH(K)))
 !    3*AMIN1(FCNK(K),FCPK(K))
       ELSE
-      CNH(K)=0.0
-      CPH(K)=0.0
-      RDOHC(K)=0.0
-      RDOHN(K)=0.0
-      RDOHP(K)=0.0
-      RDOHA(K)=0.0
+      CNH(K)=0.0_r8
+      CPH(K)=0.0_r8
+      RDOHC(K)=0.0_r8
+      RDOHN(K)=0.0_r8
+      RDOHP(K)=0.0_r8
+      RDOHA(K)=0.0_r8
       ENDIF
       ELSE
-      CNH(K)=0.0
-      CPH(K)=0.0
-      RDOHC(K)=0.0
-      RDOHN(K)=0.0
-      RDOHP(K)=0.0
-      RDOHA(K)=0.0
+      CNH(K)=0.0_r8
+      CPH(K)=0.0_r8
+      RDOHC(K)=0.0_r8
+      RDOHN(K)=0.0_r8
+      RDOHP(K)=0.0_r8
+      RDOHA(K)=0.0_r8
       ENDIF
       end subroutine SolidOMDecomposition
 !------------------------------------------------------------------------------------------
@@ -2052,7 +2057,7 @@ module nitroMod
       IF(K.EQ.3)THEN
       FORC(K)=1.0
       ELSE
-      FORC(K)=0.0
+      FORC(K)=0.0_r8
       ENDIF
       ENDIF
       DO 1685 N=1,7
@@ -2355,8 +2360,8 @@ module nitroMod
 !     ROQCK=total respiration of DOC+DOA used to represent microbial activity
 !
       DO 475 K=0,KL
-      OSCT(K)=0.0
-      OSAT(K)=0.0
+      OSCT(K)=0.0_r8
+      OSAT(K)=0.0_r8
       DO  M=1,4
       OSCT(K)=OSCT(K)+OSC(M,K,L,NY,NX)
       OSAT(K)=OSAT(K)+OSA(M,K,L,NY,NX)
@@ -2397,26 +2402,26 @@ module nitroMod
       integer :: K,M,N
 !     begin_execution
 
-      TRINH=0.0
-      TRINO=0.0
-      TRIPO=0.0
-      TRIP1=0.0
-      TRINB=0.0
-      TRIOB=0.0
-      TRIPB=0.0
-      TRIB1=0.0
-      TRGOM=0.0
-      TRGOC=0.0
-      TRGOD=0.0
-      TRGOA=0.0
-      TRGOH=0.0
-      TUPOX=0.0
-      TRDN3=0.0
-      TRDNB=0.0
-      TRDN2=0.0
-      TRD2B=0.0
-      TRDNO=0.0
-      TRN2F=0.0
+      TRINH=0.0_r8
+      TRINO=0.0_r8
+      TRIPO=0.0_r8
+      TRIP1=0.0_r8
+      TRINB=0.0_r8
+      TRIOB=0.0_r8
+      TRIPB=0.0_r8
+      TRIB1=0.0_r8
+      TRGOM=0.0_r8
+      TRGOC=0.0_r8
+      TRGOD=0.0_r8
+      TRGOA=0.0_r8
+      TRGOH=0.0_r8
+      TUPOX=0.0_r8
+      TRDN3=0.0_r8
+      TRDNB=0.0_r8
+      TRDN2=0.0_r8
+      TRD2B=0.0_r8
+      TRDNO=0.0_r8
+      TRN2F=0.0_r8
       DO 650 K=0,5
       IF(L.NE.0.OR.(K.NE.3.AND.K.NE.4))THEN
       DO 640 N=1,7
@@ -2765,7 +2770,7 @@ module nitroMod
       IF(VOLWZ.GT.ZEROS2(NY,NX))THEN
       VMXA=VMXX/(1.0+VMXX/(VHKI*VOLWZ))
       ELSE
-      VMXA=0.0
+      VMXA=0.0_r8
       ENDIF
       FCN4S=FNH4S*CNH4S(L,NY,NX)/(CNH4S(L,NY,NX)+ZHKM)
       FCN4B=FNHBS*CNH4B(L,NY,NX)/(CNH4B(L,NY,NX)+ZHKM)
@@ -2906,9 +2911,9 @@ module nitroMod
       H2GSX=H2GS(L,NY,NX)+0.111*TRH2G
       FSBST=CH2GS(L,NY,NX)/(CH2GS(L,NY,NX)+H2KM)
       RGOMP=AMAX1(0.0,AMIN1(1.5*H2GSX,VMXA*FSBST))
-      ROXYM(N,K)=0.0
-      ROXYP(N,K)=0.0
-      ROXYS(N,K,L,NY,NX)=0.0
+      ROXYM(N,K)=0.0_r8
+      ROXYP(N,K)=0.0_r8
+      ROXYS(N,K,L,NY,NX)=0.0_r8
       TCH4A=TCH4A+RGOMP
 !     IF((I/30)*30.EQ.I.AND.NX.EQ.3.AND.NY.EQ.1.AND.J.EQ.24)THEN
 !     WRITE(*,5553)'H2METH',I,J,NX,NY,L,K,N,RGOMP,H2GS(L,NY,NX)
@@ -2963,8 +2968,8 @@ module nitroMod
       ENDIF
       CH4S1=CH4S(L,NY,NX)
       VMXA1=VMXA*XNPG
-      RVOXP=0.0
-      RGOMP=0.0
+      RVOXP=0.0_r8
+      RGOMP=0.0_r8
 !
 !     CH4 DISSOLUTION FROM GASEOUS PHASE SOLVED IN SHORTER TIME STEP
 !     TO MAINTAIN AQUEOUS CH4 CONCENTRATION DURING OXIDATION
@@ -2986,7 +2991,7 @@ module nitroMod
       RCHDF=DFGS(M,L,NY,NX)*(AMAX1(ZEROS(NY,NX),CH4G1)*VOLWCH &
       -CH4S1*VOLPM(M,L,NY,NX))/VOLWPM
       ELSE
-      RCHDF=0.0
+      RCHDF=0.0_r8
       ENDIF
       CH4G1=CH4G1-RCHDF
       CH4S1=CH4S1+RCHDF
@@ -3006,7 +3011,7 @@ module nitroMod
       ENDIF
 320   CONTINUE
       RVOXPA=RVOXP
-      RVOXPB=0.0
+      RVOXPB=0.0_r8
 !
 !     O2 DEMAND FROM CH4 OXIDATION
 !
@@ -3052,14 +3057,14 @@ module nitroMod
       RGOGZ=RGOGY*FSBST*TFNX
       RGOGX=AMAX1(0.0,OQA(K,L,NY,NX)*FOQA*ECHZ)
       RGOMP=AMIN1(RGOGX,RGOGZ)
-      FGOCP=0.0
+      FGOCP=0.0_r8
       FGOAP=1.0
-      ROXYM(N,K)=0.0
-      ROXYP(N,K)=0.0
-      ROXYS(N,K,L,NY,NX)=0.0
-      ROQCS(N,K,L,NY,NX)=0.0
+      ROXYM(N,K)=0.0_r8
+      ROXYP(N,K)=0.0_r8
+      ROXYS(N,K,L,NY,NX)=0.0_r8
+      ROQCS(N,K,L,NY,NX)=0.0_r8
       ROQAS(N,K,L,NY,NX)=RGOGZ
-      ROQCD(N,K)=0.0
+      ROQCD(N,K)=0.0_r8
       TCH4H=TCH4H+0.5*RGOMP
 !     IF((I/30)*30.EQ.I.AND.NX.EQ.3.AND.NY.EQ.1.AND.J.EQ.24)THEN
 !     WRITE(*,5552)'ACMETH',I,J,NX,NY,L,K,N,RGOMP,RGOGZ,RGOGX,GOMM
@@ -3120,7 +3125,7 @@ module nitroMod
       FGOAP=RGOAP/RGOMP
       ELSE
       FGOCP=1.0
-      FGOAP=0.0
+      FGOAP=0.0_r8
       ENDIF
 !
 !     ENERGY YIELD AND O2 DEMAND FROM DOC AND ACETATE OXIDATION
@@ -3194,12 +3199,12 @@ module nitroMod
       RGOFX=AMAX1(0.0,OQC(K,L,NY,NX)*FOQC*ECHZ)
       RGOMP=AMIN1(RGOFX,RGOFZ)
       FGOCP=1.0
-      FGOAP=0.0
-      ROXYM(N,K)=0.0
-      ROXYP(N,K)=0.0
-      ROXYS(N,K,L,NY,NX)=0.0
+      FGOAP=0.0_r8
+      ROXYM(N,K)=0.0_r8
+      ROXYP(N,K)=0.0_r8
+      ROXYS(N,K,L,NY,NX)=0.0_r8
       ROQCS(N,K,L,NY,NX)=RGOFZ
-      ROQAS(N,K,L,NY,NX)=0.0
+      ROQAS(N,K,L,NY,NX)=0.0_r8
       ROQCD(N,K)=RGOFY
       TRH2G=TRH2G+RGOMP
 !     IF((I/120)*120.EQ.I.AND.J.EQ.24.AND.L.LE.6)THEN
@@ -3263,19 +3268,19 @@ module nitroMod
       VMXDXS=FNO3S*VMXD3*CNO3S(L,NY,NX)/(CNO3S(L,NY,NX)+Z3KM) &
       /(1.0+(CNO2S(L,NY,NX)*Z3KM)/(CNO3S(L,NY,NX)*Z2KM))
       ELSE
-      VMXDXS=0.0
+      VMXDXS=0.0_r8
       ENDIF
       IF(CNO3B(L,NY,NX).GT.ZERO)THEN
       VMXDXB=FNO3B*VMXD3*CNO3B(L,NY,NX)/(CNO3B(L,NY,NX)+Z3KM) &
       /(1.0+(CNO2B(L,NY,NX)*Z3KM)/(CNO3B(L,NY,NX)*Z2KM))
       ELSE
-      VMXDXB=0.0
+      VMXDXB=0.0_r8
       ENDIF
       VMXDXT=VMXDXS+VMXDXB
       IF(VOLWZ.GT.ZEROS2(NY,NX).AND.FOSRH(K,L,NY,NX).GT.ZERO)THEN
       FVMXDX=1.0/(1.0+VMXDXT/(VMKI*VOLWZ*FOSRH(K,L,NY,NX)))
       ELSE
-      FVMXDX=0.0
+      FVMXDX=0.0_r8
       ENDIF
       VMXD3S=VMXDXS*FVMXDX
       VMXD3B=VMXDXB*FVMXDX
@@ -3336,19 +3341,19 @@ module nitroMod
       VMXDXS=FNO2S*VMXD2*CNO2S(L,NY,NX)/(CNO2S(L,NY,NX)+Z2KM) &
       /(1.0+(CZ2OS(L,NY,NX)*Z2KM)/(CNO2S(L,NY,NX)*Z1KM))
       ELSE
-      VMXDXS=0.0
+      VMXDXS=0.0_r8
       ENDIF
       IF(CNO2B(L,NY,NX).GT.ZERO)THEN
       VMXDXB=FNO2B*VMXD2*CNO2B(L,NY,NX)/(CNO2B(L,NY,NX)+Z2KM) &
       /(1.0+(CZ2OS(L,NY,NX)*Z2KM)/(CNO2B(L,NY,NX)*Z1KM))
       ELSE
-      VMXDXB=0.0
+      VMXDXB=0.0_r8
       ENDIF
       VMXDXT=VMXDXS+VMXDXB
       IF(VOLWZ.GT.ZEROS2(NY,NX).AND.FOSRH(K,L,NY,NX).GT.ZERO)THEN
       FVMXDX=1.0/(1.0+VMXDXT/(VMKI*VOLWZ*FOSRH(K,L,NY,NX)))
       ELSE
-      FVMXDX=0.0
+      FVMXDX=0.0_r8
       ENDIF
       VMXD2S=VMXDXS*FVMXDX
       VMXD2B=VMXDXB*FVMXDX
@@ -3404,7 +3409,7 @@ module nitroMod
       IF(VOLWZ.GT.ZEROS2(NY,NX).AND.FOSRH(K,L,NY,NX).GT.ZERO)THEN
       FVMXDX=1.0/(1.0+VMXDXS/(VMKI*VOLWZ*FOSRH(K,L,NY,NX)))
       ELSE
-      FVMXDX=0.0
+      FVMXDX=0.0_r8
       ENDIF
       VMXD1S=VMXDXS*FVMXDX
       OQCZ1=AMAX1(0.0,OQCZ2-RGOMD2)
@@ -3492,7 +3497,7 @@ module nitroMod
       IF(VOLWZ.GT.ZEROS2(NY,NX))THEN
       FVMXDX=1.0/(1.0+VMXDXT/(VMKI*VOLWZ))
       ELSE
-      FVMXDX=0.0
+      FVMXDX=0.0_r8
       ENDIF
       VMXD4S=VMXDXS*FVMXDX
       VMXD4B=VMXDXB*FVMXDX
@@ -3501,11 +3506,11 @@ module nitroMod
       RDNO2(N,K)=AMAX1(0.0,AMIN1(VMXD4S,ZNO2SX))
       RDN2B(N,K)=AMAX1(0.0,AMIN1(VMXD4B,ZNO2BX))
       RDNOT=RDNO2(N,K)+RDN2B(N,K)
-      RGOMY(N,K)=0.0
+      RGOMY(N,K)=0.0_r8
       RGOMD(N,K)=RDNOT*ECNO*ENOX
-      RDNO3(N,K)=0.0
-      RDNOB(N,K)=0.0
-      RDN2O(N,K)=0.0
+      RDNO3(N,K)=0.0_r8
+      RDNOB(N,K)=0.0_r8
+      RDN2O(N,K)=0.0_r8
       RVMX2(N,K,L,NY,NX)=VMXD4S
       RVMB2(N,K,L,NY,NX)=VMXD4B
       RVOXA(N)=RVOXA(N)+0.333*RDNO2(N,K)
@@ -3526,89 +3531,93 @@ module nitroMod
       end subroutine AutotrophDenitrificCatabolism
 !------------------------------------------------------------------------------------------
 
-      subroutine AerobsO2Uptake(N,K,L,NY,NX)
-      implicit none
-      integer, intent(in) :: N,K,L,NY,NX
+  subroutine AerobsO2Uptake(N,K,L,NY,NX)
+  implicit none
+  integer, intent(in) :: N,K,L,NY,NX
 
-      integer :: M,MX
-!     begin_execution
-      IF(ROXYP(N,K).GT.ZEROS(NY,NX).AND.FOXYX.GT.ZERO)THEN
-      IF(L.NE.0.OR.VOLX(L,NY,NX).GT.ZEROS(NY,NX))THEN
-!
-!     MAXIMUM O2 UPAKE FROM POTENTIAL RESPIRATION OF EACH AEROBIC
-!     POPULATION
-!
+  integer :: M,MX
+
+  ! begin_execution
+
+  IF(ROXYP(N,K).GT.ZEROS(NY,NX).AND.FOXYX.GT.ZERO)THEN
+    IF(L.NE.0.OR.VOLX(L,NY,NX).GT.ZEROS(NY,NX))THEN
+      !
+      !write(*,*)'MAXIMUM O2 UPAKE FROM POTENTIAL RESPIRATION OF EACH AEROBIC'
+      !     POPULATION
+      !
       RUPMX=ROXYP(N,K)*XNPG
       ROXYFX=ROXYF(L,NY,NX)*XNPG*FOXYX
       OLSGL1=OLSGL(L,NY,NX)*XNPG
       IF(L.NE.0)THEN
-      OXYG1=OXYG(L,NY,NX)*FOXYX
-      ROXYLX=ROXYL(L,NY,NX)*XNPG*FOXYX
+        OXYG1=OXYG(L,NY,NX)*FOXYX
+        ROXYLX=ROXYL(L,NY,NX)*XNPG*FOXYX
       ELSE
-      OXYG1=COXYG(L,NY,NX)*VOLPM(1,L,NY,NX)*FOXYX
-      ROXYLX=(ROXYL(L,NY,NX)+FLQRQ(NY,NX)*COXR(NY,NX) &
-      +FLQRI(NY,NX)*COXQ(NY,NX))*XNPG*FOXYX
+        OXYG1=COXYG(L,NY,NX)*VOLPM(1,L,NY,NX)*FOXYX
+        ROXYLX=(ROXYL(L,NY,NX)+FLQRQ(NY,NX)*COXR(NY,NX) &
+          +FLQRI(NY,NX)*COXQ(NY,NX))*XNPG*FOXYX
       ENDIF
       OXYS1=OXYS(L,NY,NX)*FOXYX
 !
-!     O2 DISSOLUTION FROM GASEOUS PHASE SOLVED IN SHORTER TIME STEP
+      !write(*,*)'O2 DISSOLUTION FROM GASEOUS PHASE SOLVED IN SHORTER TIME STEP'
 !     TO MAINTAIN AQUEOUS O2 CONCENTRATION DURING REDUCTION
 !
       DO 420 M=1,NPH
-!
-!     ACTUAL REDUCTION OF AQUEOUS BY AEROBES CALCULATED
-!     FROM MASS FLOW PLUS DIFFUSION = ACTIVE UPTAKE
-!     COUPLED WITH DISSOLUTION OF GASEOUS O2 DURING REDUCTION
-!     OF AQUEOUS O2 FROM DISSOLUTION RATE CONSTANT 'DFGS'
-!     CALCULATED IN 'WATSUB'
-!
-!     VOLWM,VOLPM,VOLX=water, air and total volumes
-!     ORAD=microbial radius,FILM=water film thickness
-!     DIFOX=aqueous O2 diffusion, TORT=tortuosity
-!     BIOS=microbial number, OMA=active biomass
-!     SOXYL=O2 solubility, OXKX=Km for O2 uptake
-!     OXYS,COXYS=aqueous O2 amount, concentration
-!     OXYG,COXYG=gaseous O2 amount, concentration
-!     RMPOX,ROXSK=O2 uptake
-!
-      THETW1=AMAX1(0.0,VOLWM(M,L,NY,NX)/VOLY(L,NY,NX))
-      RRADO=ORAD*(FILM(M,L,NY,NX)+ORAD)/FILM(M,L,NY,NX)
-      DIFOX=TORT(M,L,NY,NX)*OLSGL1*12.57*BIOS*OMA(N,K)*RRADO
-      VOLWOX=VOLWM(M,L,NY,NX)*SOXYL(L,NY,NX)
-      VOLPOX=VOLPM(M,L,NY,NX)
-      VOLWPM=VOLWOX+VOLPOX
-      DO 425 MX=1,NPT
-      OXYG1=OXYG1+ROXYFX
-      OXYS1=OXYS1+ROXYLX
-      COXYS1=AMIN1(COXYE(NY,NX)*SOXYL(L,NY,NX) &
-      ,AMAX1(0.0,safe_adb(OXYS1,(VOLWM(M,L,NY,NX)*FOXYX))))
-      X=DIFOX*COXYS1
-      IF(X.GT.ZEROS(NY,NX).AND.OXYS1.GT.ZEROS(NY,NX))THEN
-      B=-RUPMX-DIFOX*OXKX-X
-      C=X*RUPMX
-      RMPOX=(-B-SQRT(B*B-4.0*C))/2.0
-      ELSE
-      RMPOX=0.0
-      ENDIF
-      OXYS1=OXYS1-RMPOX
-      IF(THETPM(M,L,NY,NX).GT.THETX.AND.VOLPOX.GT.ZEROS(NY,NX))THEN
-      ROXDFQ=DFGS(M,L,NY,NX)*(AMAX1(ZEROS(NY,NX),OXYG1)*VOLWOX &
-      -OXYS1*VOLPOX)/VOLWPM
-      ELSE
-      ROXDFQ=0.0
-      ENDIF
-      OXYG1=OXYG1-ROXDFQ
-      OXYS1=OXYS1+ROXDFQ
-      RUPOX(N,K)=RUPOX(N,K)+RMPOX
-      ROXSK(M,L,NY,NX)=ROXSK(M,L,NY,NX)+RMPOX
-!     IF(I.EQ.151.AND.J.EQ.24.AND.L.LE.5.AND.M.EQ.NPH.AND.MX.EQ.NPT)THEN
+        !
+        !     ACTUAL REDUCTION OF AQUEOUS BY AEROBES CALCULATED
+        !     FROM MASS FLOW PLUS DIFFUSION = ACTIVE UPTAKE
+        !     COUPLED WITH DISSOLUTION OF GASEOUS O2 DURING REDUCTION
+        !     OF AQUEOUS O2 FROM DISSOLUTION RATE CONSTANT 'DFGS'
+        !     CALCULATED IN 'WATSUB'
+        !
+        !     VOLWM,VOLPM,VOLX=water, air and total volumes
+        !     ORAD=microbial radius,FILM=water film thickness
+        !     DIFOX=aqueous O2 diffusion, TORT=tortuosity
+        !     BIOS=microbial number, OMA=active biomass
+        !     SOXYL=O2 solubility, OXKX=Km for O2 uptake
+        !     OXYS,COXYS=aqueous O2 amount, concentration
+        !     OXYG,COXYG=gaseous O2 amount, concentration
+        !     RMPOX,ROXSK=O2 uptake
+        !
+        !write(*,*)'VOLY(L,NY,NX)=',VOLY(L,NY,NX)
+        THETW1=AMAX1(0.0_r8,safe_adb(VOLWM(M,L,NY,NX),VOLY(L,NY,NX)))
+        RRADO=ORAD*(FILM(M,L,NY,NX)+ORAD)/FILM(M,L,NY,NX)
+        DIFOX=TORT(M,L,NY,NX)*OLSGL1*12.57_r8*BIOS*OMA(N,K)*RRADO
+        VOLWOX=VOLWM(M,L,NY,NX)*SOXYL(L,NY,NX)
+        VOLPOX=VOLPM(M,L,NY,NX)
+        VOLWPM=VOLWOX+VOLPOX
+        !write(*,*)'VOLWPM=',VOLWPM
+        DO 425 MX=1,NPT
+          OXYG1=OXYG1+ROXYFX
+          OXYS1=OXYS1+ROXYLX
+          COXYS1=AMIN1(COXYE(NY,NX)*SOXYL(L,NY,NX) &
+            ,AMAX1(0.0,safe_adb(OXYS1,(VOLWM(M,L,NY,NX)*FOXYX))))
+          X=DIFOX*COXYS1
+          IF(X.GT.ZEROS(NY,NX).AND.OXYS1.GT.ZEROS(NY,NX))THEN
+            B=-RUPMX-DIFOX*OXKX-X
+            C=X*RUPMX
+            RMPOX=(-B-SQRT(B*B-4.0*C))/2.0_r8
+          ELSE
+            RMPOX=0.0_r8
+          ENDIF
+          OXYS1=OXYS1-RMPOX
+          IF(THETPM(M,L,NY,NX).GT.THETX.AND.VOLPOX.GT.ZEROS(NY,NX))THEN
+            ROXDFQ=DFGS(M,L,NY,NX)*(AMAX1(ZEROS(NY,NX),OXYG1)*VOLWOX &
+              -OXYS1*VOLPOX)/VOLWPM
+          ELSE
+            ROXDFQ=0.0_r8
+          ENDIF
+          OXYG1=OXYG1-ROXDFQ
+          OXYS1=OXYS1+ROXDFQ
+          RUPOX(N,K)=RUPOX(N,K)+RMPOX
+          ROXSK(M,L,NY,NX)=ROXSK(M,L,NY,NX)+RMPOX
+!         IF(I.EQ.151.AND.J.EQ.24.AND.L.LE.5.AND.M.EQ.NPH.AND.MX.EQ.NPT)THEN
 !     WRITE(*,5545)'RMPOX',I,J,L,K,N,M,MX,OXYS1,ROXDFQ,ROXYLX,RMPOX
 !    2,DFGS(M,L,NY,NX),OXYG1,VOLWOX,VOLPOX,VOLWPM,X,B,C
 !    3,RUPMX,DIFOX,OXKX,COXYS1,FOXYX,ROXYL(L,NY,NX)
 !    4,ROXSK(M,L,NY,NX),VOLWM(M,L,NY,NX)/VOLY(L,NY,NX)
 !    5,OXYS(L,NY,NX)
 !5545  FORMAT(A8,7I4,30E16.6)
-!     ENDIF
+          !     ENDIF
 !     IF((I/120)*120.EQ.I.AND.J.EQ.24.AND.L.LE.3
 !    2.AND.K.GE.3.AND.N.EQ.3)THEN
 !     WRITE(*,5544)'OXY',I,J,L,K,N,M,MX,RUPOX(N,K),ROXYP(N,K)
@@ -3620,56 +3629,57 @@ module nitroMod
 !    7,COXYS(L,NY,NX),COXYG(L,NY,NX),ROXYY(L,NY,NX)
 !5544  FORMAT(A8,7I4,50E12.4)
 !     ENDIF
-425   CONTINUE
+425     CONTINUE
 420   CONTINUE
-!
-!     RATIO OF ACTUAL O2 UPAKE TO BIOLOGICAL DEMAND (WFN)
-!
-!     WFN=ratio of O2-limited to O2-unlimited uptake
-!     RVMX4,RVNHB,RVMX2,RVMB2=NH3,NO2 oxidation in non-band, band
-!
+      !write(*,*)'420'
+      !
+      !     RATIO OF ACTUAL O2 UPAKE TO BIOLOGICAL DEMAND (WFN)
+      !
+      !     WFN=ratio of O2-limited to O2-unlimited uptake
+      !     RVMX4,RVNHB,RVMX2,RVMB2=NH3,NO2 oxidation in non-band, band
+      !
       WFN(N,K)=AMIN1(1.0,AMAX1(0.0,RUPOX(N,K)/ROXYP(N,K)))
-!     IF(K.LE.4)THEN
-!     ROQCS(N,K,L,NY,NX)=ROQCS(N,K,L,NY,NX)*WFN(N,K)
-!     ROQAS(N,K,L,NY,NX)=ROQAS(N,K,L,NY,NX)*WFN(N,K)
-!     ROQCD(N,K)=ROQCD(N,K)*WFN(N,K)
-!     ENDIF
+      !     IF(K.LE.4)THEN
+      !     ROQCS(N,K,L,NY,NX)=ROQCS(N,K,L,NY,NX)*WFN(N,K)
+      !     ROQAS(N,K,L,NY,NX)=ROQAS(N,K,L,NY,NX)*WFN(N,K)
+      !     ROQCD(N,K)=ROQCD(N,K)*WFN(N,K)
+      !     ENDIF
       IF(K.EQ.5)THEN
-      IF(N.EQ.1)THEN
-      RVMX4(N,K,L,NY,NX)=RVMX4(N,K,L,NY,NX)*WFN(N,K)
-      RVMB4(N,K,L,NY,NX)=RVMB4(N,K,L,NY,NX)*WFN(N,K)
-      ELSEIF(N.EQ.2)THEN
-      RVMX2(N,K,L,NY,NX)=RVMX2(N,K,L,NY,NX)*WFN(N,K)
-      RVMB2(N,K,L,NY,NX)=RVMB2(N,K,L,NY,NX)*WFN(N,K)
+        IF(N.EQ.1)THEN
+          RVMX4(N,K,L,NY,NX)=RVMX4(N,K,L,NY,NX)*WFN(N,K)
+          RVMB4(N,K,L,NY,NX)=RVMB4(N,K,L,NY,NX)*WFN(N,K)
+        ELSEIF(N.EQ.2)THEN
+          RVMX2(N,K,L,NY,NX)=RVMX2(N,K,L,NY,NX)*WFN(N,K)
+          RVMB2(N,K,L,NY,NX)=RVMB2(N,K,L,NY,NX)*WFN(N,K)
+        ENDIF
       ENDIF
-      ENDIF
-      ELSE
+    ELSE
       RUPOX(N,K)=ROXYP(N,K)
       WFN(N,K)=1.0
-      ENDIF
-      ELSE
-      RUPOX(N,K)=0.0
-      WFN(N,K)=1.0
-      ENDIF
-!
-!     RESPIRATION PRODUCTS ALLOCATED TO O2, CO2, ACETATE, CH4, H2
-!
-!     RGOMO,RGOMP=O2-limited, O2-unlimited respiration
-!     RCO2X,RCH3X,RCH4X,RH2GX=CO2,acetate,CH4,H2 production from RGOMO
-!     ROXYO=O2-limited O2 uptake
-!     RVOXA,RVOXB=total O2-lmited (1)NH4,(2)NO2,(3)CH4 oxidation
-!
-      RGOMO(N,K)=RGOMP*WFN(N,K)
-      RCO2X(N,K)=RGOMO(N,K)
-      RCH3X(N,K)=0.0
-      RCH4X(N,K)=0.0
-      ROXYO(N,K)=ROXYM(N,K)*WFN(N,K)
-      RH2GX(N,K)=0.0
-      IF(K.EQ.5)THEN
-      RVOXA(N)=RVOXPA*WFN(N,K)
-      RVOXB(N)=RVOXPB*WFN(N,K)
-      ENDIF
-      end subroutine AerobsO2Uptake
+    ENDIF
+  ELSE
+    RUPOX(N,K)=0.0_r8
+    WFN(N,K)=1.0
+  ENDIF
+  !write(*,*)'RESPIRATION PRODUCTS ALLOCATED TO O2, CO2, ACETATE, CH4, H2'
+  !
+  !     RGOMO,RGOMP=O2-limited, O2-unlimited respiration
+  !     RCO2X,RCH3X,RCH4X,RH2GX=CO2,acetate,CH4,H2 production from RGOMO
+  !     ROXYO=O2-limited O2 uptake
+  !     RVOXA,RVOXB=total O2-lmited (1)NH4,(2)NO2,(3)CH4 oxidation
+  !
+  RGOMO(N,K)=RGOMP*WFN(N,K)
+  RCO2X(N,K)=RGOMO(N,K)
+  RCH3X(N,K)=0.0_r8
+  RCH4X(N,K)=0.0_r8
+  ROXYO(N,K)=ROXYM(N,K)*WFN(N,K)
+  RH2GX(N,K)=0.0_r8
+  IF(K.EQ.5)THEN
+    RVOXA(N)=RVOXPA*WFN(N,K)
+    RVOXB(N)=RVOXPB*WFN(N,K)
+  ENDIF
+  !write(*,*)'finish AerobsO2Uptake'
+  end subroutine AerobsO2Uptake
 !------------------------------------------------------------------------------------------
 
       subroutine BiomassMineralization(N,K,L,NY,NX)
@@ -3699,8 +3709,8 @@ module nitroMod
 
       RINHP=(OMC(3,N,K,L,NY,NX)*CNOMC(3,N,K)-OMN(3,N,K,L,NY,NX))
       IF(RINHP.GT.0.0)THEN
-      CNH4X=AMAX1(0.0,CNH4S(L,NY,NX)-Z4MN)
-      CNH4Y=AMAX1(0.0,CNH4B(L,NY,NX)-Z4MN)
+      CNH4X=AMAX1(0.0_r8,CNH4S(L,NY,NX)-Z4MN)
+      CNH4Y=AMAX1(0.0_r8,CNH4B(L,NY,NX)-Z4MN)
       RINHX=AMIN1(RINHP,BIOA*OMA(N,K)*TFNG(N,K)*Z4MX)
       RINHO(N,K,L,NY,NX)=FNH4S*RINHX*CNH4X/(CNH4X+Z4KU)
       RINHB(N,K,L,NY,NX)=FNHBS*RINHX*CNH4Y/(CNH4Y+Z4KU)
@@ -3711,8 +3721,8 @@ module nitroMod
       RINB4(N,K)=AMIN1(FNB4X*AMAX1(0.0,(ZNH4B(L,NY,NX)-ZNHBM)) &
       ,RINHB(N,K,L,NY,NX))
       ELSE
-      RINHO(N,K,L,NY,NX)=0.0
-      RINHB(N,K,L,NY,NX)=0.0
+      RINHO(N,K,L,NY,NX)=0.0_r8
+      RINHB(N,K,L,NY,NX)=0.0_r8
       RINH4(N,K)=RINHP*FNH4S
       RINB4(N,K)=RINHP*FNHBS
       ENDIF
@@ -3754,13 +3764,13 @@ module nitroMod
       RINOB(N,K,L,NY,NX)=FNO3B*RINOX*CNO3Y/(CNO3Y+ZOKU)
       ZNO3M=ZOMN*VOLW(L,NY,NX)*FNO3S
       ZNOBM=ZOMN*VOLW(L,NY,NX)*FNO3B
-      RINO3(N,K)=AMIN1(FNO3X*AMAX1(0.0,(ZNO3S(L,NY,NX)-ZNO3M)) &
+      RINO3(N,K)=AMIN1(FNO3X*AMAX1(0.0_r8,(ZNO3S(L,NY,NX)-ZNO3M)) &
       ,RINOO(N,K,L,NY,NX))
-      RINB3(N,K)=AMIN1(FNB3X*AMAX1(0.0,(ZNO3B(L,NY,NX)-ZNOBM)) &
+      RINB3(N,K)=AMIN1(FNB3X*AMAX1(0.0_r8,(ZNO3B(L,NY,NX)-ZNOBM)) &
       ,RINOB(N,K,L,NY,NX))
       ELSE
-      RINOO(N,K,L,NY,NX)=0.0
-      RINOB(N,K,L,NY,NX)=0.0
+      RINOO(N,K,L,NY,NX)=0.0_r8
+      RINOB(N,K,L,NY,NX)=0.0_r8
       RINO3(N,K)=RINOP*FNO3S
       RINB3(N,K)=RINOP*FNO3B
       ENDIF
@@ -3809,8 +3819,8 @@ module nitroMod
       RIPOB(N,K)=AMIN1(FPOBX*AMAX1(0.0,(H2POB(L,NY,NX)-H2PBM)) &
       ,RIPBO(N,K,L,NY,NX))
       ELSE
-      RIPOO(N,K,L,NY,NX)=0.0
-      RIPBO(N,K,L,NY,NX)=0.0
+      RIPOO(N,K,L,NY,NX)=0.0_r8
+      RIPBO(N,K,L,NY,NX)=0.0_r8
       RIPO4(N,K)=RIPOP*FH2PS
       RIPOB(N,K)=RIPOP*FH2PB
       ENDIF
@@ -3855,8 +3865,8 @@ module nitroMod
       RIP1B(N,K)=AMIN1(FP1BX*AMAX1(0.0,(H1POB(L,NY,NX)-H1PBM)) &
       ,RIPB1(N,K,L,NY,NX))
       ELSE
-      RIPO1(N,K,L,NY,NX)=0.0
-      RIPB1(N,K,L,NY,NX)=0.0
+      RIPO1(N,K,L,NY,NX)=0.0_r8
+      RIPB1(N,K,L,NY,NX)=0.0_r8
       RIP14(N,K)=RIP1P*FH1PS
       RIP1B(N,K)=RIP1P*FH1PB
       ENDIF
@@ -3900,7 +3910,7 @@ module nitroMod
       RINH4R(N,K)=AMIN1(FNH4XR(N,K)*AMAX1(0.0 &
       ,(ZNH4T(NU(NY,NX))-ZNH4M)),RINHOR(N,K,NY,NX))
       ELSE
-      RINHOR(N,K,NY,NX)=0.0
+      RINHOR(N,K,NY,NX)=0.0_r8
       RINH4R(N,K)=RINHPR
       ENDIF
       TRINH4(NY,NX)=TRINH4(NY,NX)+RINH4R(N,K)
@@ -3944,7 +3954,7 @@ module nitroMod
       RINO3R(N,K)=AMIN1(FNO3XR(N,K)*AMAX1(0.0 &
       ,(ZNO3T(NU(NY,NX))-ZNO3M)),RINOOR(N,K,NY,NX))
       ELSE
-      RINOOR(N,K,NY,NX)=0.0
+      RINOOR(N,K,NY,NX)=0.0_r8
       RINO3R(N,K)=RINOPR
       ENDIF
       TRINH4(NY,NX)=TRINH4(NY,NX)+RINO3R(N,K)
@@ -3980,7 +3990,7 @@ module nitroMod
       RIPO4R(N,K)=AMIN1(FPO4XR(N,K)*AMAX1(0.0 &
       ,(H2P4T(NU(NY,NX))-H2P4M)),RIPOOR(N,K,NY,NX))
       ELSE
-      RIPOOR(N,K,NY,NX)=0.0
+      RIPOOR(N,K,NY,NX)=0.0_r8
       RIPO4R(N,K)=RIPOPR
       ENDIF
       TRIPO4(NY,NX)=TRIPO4(NY,NX)+RIPO4R(N,K)
@@ -4018,7 +4028,7 @@ module nitroMod
       RIP14R(N,K)=AMIN1(FP14XR(N,K)*AMAX1(0.0 &
       ,(H1P4T(NU(NY,NX))-H1P4M)),RIPO1R(N,K,NY,NX))
       ELSE
-      RIPO1R(N,K,NY,NX)=0.0
+      RIPO1R(N,K,NY,NX)=0.0_r8
       RIP14R(N,K)=RIP1PR
       ENDIF
       TRIPO4(NY,NX)=TRIPO4(NY,NX)+RIP14R(N,K)
@@ -4079,7 +4089,7 @@ module nitroMod
       *CZ2GS(L,NY,NX)/(CZ2GS(L,NY,NX)+ZFKM) &
       ,OMGR*OMC(3,N,K,L,NY,NX))
       ELSE
-      RGN2F(N,K)=0.0
+      RGN2F(N,K)=0.0_r8
       ENDIF
       RN2FX(N,K)=RGN2F(N,K)*EN2F(N)
 !     IF(L.EQ.3.AND.K.EQ.1.AND.N.EQ.6)THEN
@@ -4090,8 +4100,8 @@ module nitroMod
 !5566  FORMAT(A8,7I4,30E12.4)
 !     ENDIF
       ELSE
-      RN2FX(N,K)=0.0
-      RGN2F(N,K)=0.0
+      RN2FX(N,K)=0.0_r8
+      RGN2F(N,K)=0.0_r8
       ENDIF
       end subroutine GatherMicrobialRespiration
 !------------------------------------------------------------------------------------------
@@ -4138,9 +4148,9 @@ module nitroMod
       ,CGOXC*CPQ(K)/FCP(N,K)))
       ELSE
       CGOQC(N,K)=CGOMX+CGOMD
-      CGOAC(N,K)=0.0
-      CGOMN(N,K)=0.0
-      CGOMP(N,K)=0.0
+      CGOAC(N,K)=0.0_r8
+      CGOMN(N,K)=0.0_r8
+      CGOMP(N,K)=0.0_r8
       ENDIF
       TCGOQC(K)=TCGOQC(K)+CGOQC(N,K)
       TCGOAC(K)=TCGOAC(K)+CGOAC(N,K)
@@ -4184,8 +4194,8 @@ module nitroMod
       RCCP=CPC*RCCQ
       ELSE
       RCCC=RCCZ
-      RCCN=0.0
-      RCCP=0.0
+      RCCN=0.0_r8
+      RCCP=0.0_r8
       ENDIF
 !     IF((I/120)*120.EQ.I.AND.J.EQ.24)THEN
 !     WRITE(*,5555)'RCCC',I,J,NX,NY,L,K,N,RCCC,RCCN,RCCP
@@ -4211,8 +4221,8 @@ module nitroMod
       CGOPS(M,N,K)=AMIN1(FL(M)*AMAX1(0.0,OMP(3,N,K,L,NY,NX)) &
       ,CGOMS(M,N,K)*OMP(3,N,K,L,NY,NX)/OMC(3,N,K,L,NY,NX))
       ELSE
-      CGONS(M,N,K)=0.0
-      CGOPS(M,N,K)=0.0
+      CGONS(M,N,K)=0.0_r8
+      CGOPS(M,N,K)=0.0_r8
       ENDIF
 !
 !     MICROBIAL DECOMPOSITION FROM BIOMASS, SPECIFIC DECOMPOSITION
@@ -4324,21 +4334,21 @@ module nitroMod
 730   CONTINUE
       ELSE
       DO 720 M=1,2
-      RXMMC(M,N,K)=0.0
-      RXMMN(M,N,K)=0.0
-      RXMMP(M,N,K)=0.0
-      RDMMC(M,N,K)=0.0
-      RDMMN(M,N,K)=0.0
-      RDMMP(M,N,K)=0.0
-      R3MMC(M,N,K)=0.0
-      R3MMN(M,N,K)=0.0
-      R3MMP(M,N,K)=0.0
-      RHMMC(M,N,K)=0.0
-      RHMMN(M,N,K)=0.0
-      RHMMP(M,N,K)=0.0
-      RCMMC(M,N,K)=0.0
-      RCMMN(M,N,K)=0.0
-      RCMMP(M,N,K)=0.0
+      RXMMC(M,N,K)=0.0_r8
+      RXMMN(M,N,K)=0.0_r8
+      RXMMP(M,N,K)=0.0_r8
+      RDMMC(M,N,K)=0.0_r8
+      RDMMN(M,N,K)=0.0_r8
+      RDMMP(M,N,K)=0.0_r8
+      R3MMC(M,N,K)=0.0_r8
+      R3MMN(M,N,K)=0.0_r8
+      R3MMP(M,N,K)=0.0_r8
+      RHMMC(M,N,K)=0.0_r8
+      RHMMN(M,N,K)=0.0_r8
+      RHMMP(M,N,K)=0.0_r8
+      RCMMC(M,N,K)=0.0_r8
+      RCMMN(M,N,K)=0.0_r8
+      RCMMP(M,N,K)=0.0_r8
 720   CONTINUE
       ENDIF
 
@@ -4354,84 +4364,84 @@ module nitroMod
       integer :: M
 !     begin_execution
 
-      RUPOX(N,K)=0.0
-      RGOMO(N,K)=0.0
-      RCO2X(N,K)=0.0
-      RCH3X(N,K)=0.0
-      RCH4X(N,K)=0.0
-      RGOMY(N,K)=0.0
-      RGOMD(N,K)=0.0
-      CGOMC(N,K)=0.0
-      CGOMN(N,K)=0.0
-      CGOMP(N,K)=0.0
-      CGOQC(N,K)=0.0
-      CGOAC(N,K)=0.0
-      RDNO3(N,K)=0.0
-      RDNOB(N,K)=0.0
-      RDNO2(N,K)=0.0
-      RDN2B(N,K)=0.0
-      RDN2O(N,K)=0.0
-      RN2FX(N,K)=0.0
-      RINH4(N,K)=0.0
-      RINO3(N,K)=0.0
-      RIPO4(N,K)=0.0
-      RIP14(N,K)=0.0
-      RINB4(N,K)=0.0
-      RINB3(N,K)=0.0
-      RIPOB(N,K)=0.0
-      RIP1B(N,K)=0.0
+      RUPOX(N,K)=0.0_r8
+      RGOMO(N,K)=0.0_r8
+      RCO2X(N,K)=0.0_r8
+      RCH3X(N,K)=0.0_r8
+      RCH4X(N,K)=0.0_r8
+      RGOMY(N,K)=0.0_r8
+      RGOMD(N,K)=0.0_r8
+      CGOMC(N,K)=0.0_r8
+      CGOMN(N,K)=0.0_r8
+      CGOMP(N,K)=0.0_r8
+      CGOQC(N,K)=0.0_r8
+      CGOAC(N,K)=0.0_r8
+      RDNO3(N,K)=0.0_r8
+      RDNOB(N,K)=0.0_r8
+      RDNO2(N,K)=0.0_r8
+      RDN2B(N,K)=0.0_r8
+      RDN2O(N,K)=0.0_r8
+      RN2FX(N,K)=0.0_r8
+      RINH4(N,K)=0.0_r8
+      RINO3(N,K)=0.0_r8
+      RIPO4(N,K)=0.0_r8
+      RIP14(N,K)=0.0_r8
+      RINB4(N,K)=0.0_r8
+      RINB3(N,K)=0.0_r8
+      RIPOB(N,K)=0.0_r8
+      RIP1B(N,K)=0.0_r8
       IF(L.EQ.0)THEN
-      RINH4R(N,K)=0.0
-      RINO3R(N,K)=0.0
-      RIPO4R(N,K)=0.0
-      RIP14R(N,K)=0.0
-      FNH4XR(N,K)=0.0
-      FNO3XR(N,K)=0.0
-      FPO4XR(N,K)=0.0
-      FP14XR(N,K)=0.0
+      RINH4R(N,K)=0.0_r8
+      RINO3R(N,K)=0.0_r8
+      RIPO4R(N,K)=0.0_r8
+      RIP14R(N,K)=0.0_r8
+      FNH4XR(N,K)=0.0_r8
+      FNO3XR(N,K)=0.0_r8
+      FPO4XR(N,K)=0.0_r8
+      FP14XR(N,K)=0.0_r8
       ENDIF
       DO 725 M=1,2
-      CGOMS(M,N,K)=0.0
-      CGONS(M,N,K)=0.0
-      CGOPS(M,N,K)=0.0
-      RMOMC(M,N,K)=0.0
-      RXMMC(M,N,K)=0.0
-      RXMMN(M,N,K)=0.0
-      RXMMP(M,N,K)=0.0
-      RDMMC(M,N,K)=0.0
-      RDMMN(M,N,K)=0.0
-      RDMMP(M,N,K)=0.0
-      R3MMC(M,N,K)=0.0
-      R3MMN(M,N,K)=0.0
-      R3MMP(M,N,K)=0.0
-      RHMMC(M,N,K)=0.0
-      RHMMN(M,N,K)=0.0
-      RHMMP(M,N,K)=0.0
-      RCMMC(M,N,K)=0.0
-      RCMMN(M,N,K)=0.0
-      RCMMP(M,N,K)=0.0
-      RXOMC(M,N,K)=0.0
-      RXOMN(M,N,K)=0.0
-      RXOMP(M,N,K)=0.0
-      RDOMC(M,N,K)=0.0
-      RDOMN(M,N,K)=0.0
-      RDOMP(M,N,K)=0.0
-      R3OMC(M,N,K)=0.0
-      R3OMN(M,N,K)=0.0
-      R3OMP(M,N,K)=0.0
-      RHOMC(M,N,K)=0.0
-      RHOMN(M,N,K)=0.0
-      RHOMP(M,N,K)=0.0
-      RCOMC(M,N,K)=0.0
-      RCOMN(M,N,K)=0.0
-      RCOMP(M,N,K)=0.0
+      CGOMS(M,N,K)=0.0_r8
+      CGONS(M,N,K)=0.0_r8
+      CGOPS(M,N,K)=0.0_r8
+      RMOMC(M,N,K)=0.0_r8
+      RXMMC(M,N,K)=0.0_r8
+      RXMMN(M,N,K)=0.0_r8
+      RXMMP(M,N,K)=0.0_r8
+      RDMMC(M,N,K)=0.0_r8
+      RDMMN(M,N,K)=0.0_r8
+      RDMMP(M,N,K)=0.0_r8
+      R3MMC(M,N,K)=0.0_r8
+      R3MMN(M,N,K)=0.0_r8
+      R3MMP(M,N,K)=0.0_r8
+      RHMMC(M,N,K)=0.0_r8
+      RHMMN(M,N,K)=0.0_r8
+      RHMMP(M,N,K)=0.0_r8
+      RCMMC(M,N,K)=0.0_r8
+      RCMMN(M,N,K)=0.0_r8
+      RCMMP(M,N,K)=0.0_r8
+      RXOMC(M,N,K)=0.0_r8
+      RXOMN(M,N,K)=0.0_r8
+      RXOMP(M,N,K)=0.0_r8
+      RDOMC(M,N,K)=0.0_r8
+      RDOMN(M,N,K)=0.0_r8
+      RDOMP(M,N,K)=0.0_r8
+      R3OMC(M,N,K)=0.0_r8
+      R3OMN(M,N,K)=0.0_r8
+      R3OMP(M,N,K)=0.0_r8
+      RHOMC(M,N,K)=0.0_r8
+      RHOMN(M,N,K)=0.0_r8
+      RHOMP(M,N,K)=0.0_r8
+      RCOMC(M,N,K)=0.0_r8
+      RCOMN(M,N,K)=0.0_r8
+      RCOMP(M,N,K)=0.0_r8
 725   CONTINUE
-      RH2GX(N,K)=0.0
+      RH2GX(N,K)=0.0_r8
       IF(K.EQ.5)THEN
-      RVOXA(N)=0.0
-      RVOXB(N)=0.0
+      RVOXA(N)=0.0_r8
+      RVOXB(N)=0.0_r8
       IF(N.EQ.5)THEN
-      RH2GZ=0.0
+      RH2GZ=0.0_r8
       ENDIF
       ENDIF
       end subroutine DealNoActiveMicrobes

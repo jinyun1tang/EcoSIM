@@ -469,8 +469,7 @@ module readsmod
 !
 ! DERIVE END DATES FROM TIME VARIABLES
 !
-  write(*,*)'istart=',istart,'ilast=',ilast
-  write(*,*)'TTYPE=',TTYPE,J
+
   ICHECK=0
   IF(TTYPE.EQ.'H'.AND.J.NE.24)ICHECK=1
 ! write(*,*)'TTYPE=',TTYPE

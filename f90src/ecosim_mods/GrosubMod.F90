@@ -10297,7 +10297,6 @@ end subroutine CarbNutInBranchTransfer
 215   CONTINUE
     ENDIF
 210   CONTINUE
-  write(*,*)'co2f=',CH2O3(K)
   CO2F=CO2F+CH2O3(K)
   CH2O=CH2O+CH2O3(K)
   end subroutine ComputeGPP_C3
