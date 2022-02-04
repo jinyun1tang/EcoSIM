@@ -3,7 +3,7 @@ module TrnsfrMod
 ! Description:
 !
   use data_kind_mod, only : r8 => SHR_KIND_R8
-  use minimathmod, only : test_aeqb
+  use minimathmod, only : test_aeqb,safe_adb
   implicit none
 
       private
@@ -4032,8 +4032,8 @@ module TrnsfrMod
       VOLHPB=VOLWHM(M,N6,N5,N4)*VLPOB(N6,N5,N4)
       VOLPMA(N6,N5,N4)=VOLPM(M,N6,N5,N4)*VLNH4(N6,N5,N4)
       VOLPMB(N6,N5,N4)=VOLPM(M,N6,N5,N4)*VLNHB(N6,N5,N4)
-      THETW1(N3,N2,N1)=AMAX1(0.0,VOLWM(M,N3,N2,N1)/VOLY(N3,N2,N1))
-      THETW1(N6,N5,N4)=AMAX1(0.0,VOLWM(M,N6,N5,N4)/VOLY(N6,N5,N4))
+      THETW1(N3,N2,N1)=AMAX1(0.0,safe_adb(VOLWM(M,N3,N2,N1),VOLY(N3,N2,N1)))
+      THETW1(N6,N5,N4)=AMAX1(0.0,safe_adb(VOLWM(M,N6,N5,N4),VOLY(N6,N5,N4)))
       FLVM(N6,N5,N4)=FLPM(M,N6,N5,N4)*XNPT
 !
 !     GASEOUS SOLUBILITIES
@@ -5670,7 +5670,7 @@ module TrnsfrMod
 !     S*L=solubility of gas in water from hour1.f
 !
       IF(N3.GE.NUM(N2,N1).AND.M.NE.MX)THEN
-      THETW1(N3,N2,N1)=AMAX1(0.0,VOLWM(M,N3,N2,N1)/VOLY(N3,N2,N1))
+      THETW1(N3,N2,N1)=AMAX1(0.0_r8,safe_adb(VOLWM(M,N3,N2,N1),VOLY(N3,N2,N1)))
       IF(THETW1(N3,N2,N1).GT.THETY(N3,N2,N1).AND.IFLGB.EQ.0)THEN
       SCO2X=12.0*SCO2L(N3,N2,N1)
       SCH4X=12.0*SCH4L(N3,N2,N1)

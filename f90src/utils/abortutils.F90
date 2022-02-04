@@ -21,6 +21,10 @@ module abortutils
 
   public :: padl, padr
   public :: print_info
+  interface print_info
+    module procedure print_info_arr
+    module procedure print_info_msg
+  end interface
   integer  :: iulog = 6        ! "stdout" log file unit number, default is 6
 
 CONTAINS
@@ -182,7 +186,7 @@ CONTAINS
 
   !-----------------------------------------------------------------------
 
-  subroutine print_info(msg,strarr,valarr)
+  subroutine print_info_arr(msg,strarr,valarr)
 
     !-----------------------------------------------------------------------
     ! Description:
@@ -203,8 +207,17 @@ CONTAINS
     do jj = 1 , ns1
       write(*,*)trim(strarr(jj))//'=',valarr(jj)
     enddo
+  end subroutine print_info_arr
 
-    stop
-  end subroutine print_info
+  !-----------------------------------------------------------------------
+  subroutine print_info_msg(msg,lineno)
 
+  implicit none
+  character(len=*), intent(in) :: msg
+  integer, intent(in) :: lineno
+
+  write(*,*)''
+  write(*,*)trim(msg)
+  write(*,*)'at line',lineno
+  end subroutine print_info_msg
 end module abortutils

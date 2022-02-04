@@ -3,65 +3,65 @@ module Hour1Mod
   use minimathmod, only : test_aeqb
   implicit none
 
-      private
-      include "parameters.h"
-      include "files.h"
-      include "filec.h"
-      include "blkc.h"
-      include "blk1cp.h"
-      include "blk1g.h"
-      include "blk2a.h"
-      include "blk2b.h"
-      include "blk2c.h"
-      include "blk3.h"
-      include "blk5.h"
-      include "blk6.h"
-      include "blk8a.h"
-      include "blk8b.h"
-      include "blk9a.h"
-      include "blk9b.h"
-      include "blk9c.h"
-      include "blk10.h"
-      include "blk11a.h"
-      include "blk11b.h"
-      include "blk13a.h"
-      include "blk13b.h"
-      include "blk13c.h"
-      include "blk15a.h"
-      include "blk15b.h"
-      include "blk16.h"
-      include "blk18a.h"
-      include "blk18b.h"
-      include "blk19a.h"
-      include "blk19b.h"
-      include "blk19c.h"
-      include "blk19d.h"
-      include "blk20a.h"
-      include "blk20b.h"
-      include "blk20c.h"
-      include "blk20d.h"
-      include "blk20e.h"
-      include "blk20f.h"
-      include "blk21a.h"
-      include "blk21b.h"
-      include "blk22b.h"
-      include "blk22c.h"
+  private
+  include "parameters.h"
+  include "files.h"
+  include "filec.h"
+  include "blkc.h"
+  include "blk1cp.h"
+  include "blk1g.h"
+  include "blk2a.h"
+  include "blk2b.h"
+  include "blk2c.h"
+  include "blk3.h"
+  include "blk5.h"
+  include "blk6.h"
+  include "blk8a.h"
+  include "blk8b.h"
+  include "blk9a.h"
+  include "blk9b.h"
+  include "blk9c.h"
+  include "blk10.h"
+  include "blk11a.h"
+  include "blk11b.h"
+  include "blk13a.h"
+  include "blk13b.h"
+  include "blk13c.h"
+  include "blk15a.h"
+  include "blk15b.h"
+  include "blk16.h"
+  include "blk18a.h"
+  include "blk18b.h"
+  include "blk19a.h"
+  include "blk19b.h"
+  include "blk19c.h"
+  include "blk19d.h"
+  include "blk20a.h"
+  include "blk20b.h"
+  include "blk20c.h"
+  include "blk20d.h"
+  include "blk20e.h"
+  include "blk20f.h"
+  include "blk21a.h"
+  include "blk21b.h"
+  include "blk22b.h"
+  include "blk22c.h"
 
-      real(r8) :: OFC(2),OFN(2),OFP(2),CNOF(4),CPOF(4)
-      real(r8) :: PSISK(0:100),THETK(100),TAUY(0:JC+1),RABSL(0:JC+1) &
-      ,RABPL(0:JC+1),RAFSL(0:JC+1),RAFPL(0:JC+1),RADSL(JP,JY,JX) &
-      ,RADPL(JP,JY,JX),RADS1(JP,JY,JX),RADP1(JP,JY,JX),RADS2(JP,JY,JX) &
-      ,RADP2(JP,JY,JX),RAYSL(JP,JY,JX),RAYPL(JP,JY,JX),RAYS1(JP,JY,JX) &
-      ,RAYP1(JP,JY,JX),RAYS2(JP,JY,JX),RAYP2(JP,JY,JX),RADSW(JP,JY,JX) &
-      ,RADPW(JP,JY,JX),RADW1(JP,JY,JX),RADQ1(JP,JY,JX),RADW2(JP,JY,JX) &
-      ,RADQ2(JP,JY,JX),RAYSW(JP,JY,JX),RAYPW(JP,JY,JX),RAYW1(JP,JY,JX) &
-      ,RAYQ1(JP,JY,JX),RAYW2(JP,JY,JX),RAYQ2(JP,JY,JX),RADSA(JP,JY,JX) &
-      ,RAPSA(JP,JY,JX),RDNDIR(4,4,JP,JY,JX),PARDIR(4,4,JP,JY,JX) &
-      ,RADWA(JP,JY,JX),RAPWA(JP,JY,JX),RDNDIW(4,4,JP,JY,JX) &
-      ,PARDIW(4,4,JP,JY,JX),TSURF(4,JZ,JP,JY,JX),TSURFB(4,JZ,JP,JY,JX) &
-      ,XVOLWC(0:3),ZL1(0:JZ,JY,JX),THETPZ(JZ,JY,JX),TRADC(JY,JX) &
-      ,TRAPC(JY,JX),TRADG(JY,JX),TRAPG(JY,JX),THETRX(0:2),DPTH0(JY,JX)
-      integer :: IALBS(4,4)
+  real(r8) :: OFC(2),OFN(2),OFP(2),CNOF(4),CPOF(4)
+  real(r8) :: PSISK(0:100),THETK(100),TAUY(0:JC+1),RABSL(0:JC+1) &
+    ,RABPL(0:JC+1),RAFSL(0:JC+1),RAFPL(0:JC+1),RADSL(JP,JY,JX) &
+    ,RADPL(JP,JY,JX),RADS1(JP,JY,JX),RADP1(JP,JY,JX),RADS2(JP,JY,JX) &
+    ,RADP2(JP,JY,JX),RAYSL(JP,JY,JX),RAYPL(JP,JY,JX),RAYS1(JP,JY,JX) &
+    ,RAYP1(JP,JY,JX),RAYS2(JP,JY,JX),RAYP2(JP,JY,JX),RADSW(JP,JY,JX) &
+    ,RADPW(JP,JY,JX),RADW1(JP,JY,JX),RADQ1(JP,JY,JX),RADW2(JP,JY,JX) &
+    ,RADQ2(JP,JY,JX),RAYSW(JP,JY,JX),RAYPW(JP,JY,JX),RAYW1(JP,JY,JX) &
+    ,RAYQ1(JP,JY,JX),RAYW2(JP,JY,JX),RAYQ2(JP,JY,JX),RADSA(JP,JY,JX) &
+    ,RAPSA(JP,JY,JX),RDNDIR(4,4,JP,JY,JX),PARDIR(4,4,JP,JY,JX) &
+    ,RADWA(JP,JY,JX),RAPWA(JP,JY,JX),RDNDIW(4,4,JP,JY,JX) &
+    ,PARDIW(4,4,JP,JY,JX),TSURF(4,JZ,JP,JY,JX),TSURFB(4,JZ,JP,JY,JX) &
+    ,XVOLWC(0:3),ZL1(0:JZ,JY,JX),THETPZ(JZ,JY,JX),TRADC(JY,JX) &
+    ,TRAPC(JY,JX),TRADG(JY,JX),TRAPG(JY,JX),THETRX(0:2),DPTH0(JY,JX)
+  integer :: IALBS(4,4)
 !
 !     *SG=diffusivity (m2 h-1):CG=CO2g,CL=CO2s,CH=CH4g,CQ=CH4s,OG=O2g
 !     OL=O2s,ZG=N2g,ZL=N2s,Z2=N2Og,ZV=N2Os,ZH=NH3g,ZN=NH3s,ZO=NO3
@@ -69,26 +69,26 @@ module Hour1Mod
 !     HY=H,CA=Ca,GM=Mg,AN=Na,AK=K,OH=OH,C3=CO3,HC=HCO3,SO=SO4,CL=Cl
 !     HG=H2g,HL=H2s
 !
-      real(r8), PARAMETER :: CGSG=4.68E-02,CLSG=4.25E-06 &
-      ,CHSG=7.80E-02,CQSG=7.08E-06,OGSG=6.43E-02,OLSG=8.57E-06 &
-      ,ZGSG=5.57E-02,ZLSG=7.34E-06,Z2SG=5.57E-02,ZVSG=5.72E-06 &
-      ,ZHSG=6.67E-02,ZNSG=4.00E-06,ZOSG=6.00E-06,POSG=3.00E-06 &
-      ,OCSG=1.0E-08,ONSG=1.0E-08,OPSG=1.0E-08,OASG=3.64E-06 &
-      ,WGSG=7.70E-02,ALSG=5.0E-06,FESG=5.0E-06,HYSG=5.0E-06 &
-      ,CASG=5.0E-06,GMSG=5.0E-06,ANSG=5.0E-06,AKSG=5.0E-06 &
-      ,OHSG=5.0E-06,C3SG=5.0E-06,HCSG=5.0E-06,SOSG=5.0E-06 &
-      ,CLSX=5.0E-06,HGSG=5.57E-02,HLSG=7.34E-06
+  real(r8), PARAMETER :: CGSG=4.68E-02,CLSG=4.25E-06 &
+    ,CHSG=7.80E-02,CQSG=7.08E-06,OGSG=6.43E-02,OLSG=8.57E-06 &
+    ,ZGSG=5.57E-02,ZLSG=7.34E-06,Z2SG=5.57E-02,ZVSG=5.72E-06 &
+    ,ZHSG=6.67E-02,ZNSG=4.00E-06,ZOSG=6.00E-06,POSG=3.00E-06 &
+    ,OCSG=1.0E-08,ONSG=1.0E-08,OPSG=1.0E-08,OASG=3.64E-06 &
+    ,WGSG=7.70E-02,ALSG=5.0E-06,FESG=5.0E-06,HYSG=5.0E-06 &
+    ,CASG=5.0E-06,GMSG=5.0E-06,ANSG=5.0E-06,AKSG=5.0E-06 &
+    ,OHSG=5.0E-06,C3SG=5.0E-06,HCSG=5.0E-06,SOSG=5.0E-06 &
+    ,CLSX=5.0E-06,HGSG=5.57E-02,HLSG=7.34E-06
 !
 !     SC*X=solubility (g m-3/g m-3):CO2=CO2,CH4=CH4,OXY=O2,N2G=N2g
 !     N2O=N2O,NH3=NH3,H2G=H2
 !     AC*X=activity (g m-3):CO2=CO2,CH4=CH4,OXY=O2,N2G=N2g
 !     N2O=N2O,NH3=NH3,H2G=H2
 !
-      real(r8), PARAMETER :: SCO2X=7.391E-01,SCH4X=3.156E-02 &
-      ,SOXYX=2.925E-02,SN2GX=1.510E-02,SN2OX=5.241E-01 &
-      ,SNH3X=2.852E+02,SH2GX=3.156E-02 &
-      ,ACO2X=0.14,ACH4X=0.14,AOXYX=0.31,AN2GX=0.23,AN2OX=0.23 &
-      ,ANH3X=0.07,AH2GX=0.14
+  real(r8), PARAMETER :: SCO2X=7.391E-01,SCH4X=3.156E-02 &
+    ,SOXYX=2.925E-02,SN2GX=1.510E-02,SN2OX=5.241E-01 &
+    ,SNH3X=2.852E+02,SH2GX=3.156E-02 &
+    ,ACO2X=0.14,ACH4X=0.14,AOXYX=0.31,AN2GX=0.23,AN2OX=0.23 &
+    ,ANH3X=0.07,AH2GX=0.14
 !
 !     ALBRW,ALBPW=stalk albedo for shortwave,PAR
 !     VISCW=water viscosity (Mg m-1 s)
@@ -97,108 +97,108 @@ module Hour1Mod
 !     THETPW=minimum air-filled porosity for saturation (m3 m-3)
 !     RAM=minimum boundary layer resistance (h m-1)
 !
-      real(r8), PARAMETER :: ALBRW=0.1,ALBPW=0.1,ABSRW=1.0-ALBRW &
-      ,ABSPW=1.0-ALBPW
-      real(r8), PARAMETER :: VISCW=1.0E-06,BKDSX=1.89,ZW=0.01,CFW=0.5 &
-      ,FORGW=0.25E+06,DTHETW=1.0E-06,THETPW=0.01,THETWP=1.0-THETPW &
-      ,RAM=2.78E-03
+  real(r8), PARAMETER :: ALBRW=0.1,ALBPW=0.1,ABSRW=1.0-ALBRW &
+    ,ABSPW=1.0-ALBPW
+  real(r8), PARAMETER :: VISCW=1.0E-06,BKDSX=1.89,ZW=0.01,CFW=0.5 &
+    ,FORGW=0.25E+06,DTHETW=1.0E-06,THETPW=0.01,THETWP=1.0-THETPW &
+    ,RAM=2.78E-03
 !
 !     XVOLWC=foliar water retention capacity (m3 m-2)
 !     THETRX=litter water retention capacity (m3 g C-1)
 !
-      DATA XVOLWC/5.0E-04,2.5E-04,2.5E-04,2.5E-04/
-      DATA THETRX/4.0E-06,8.0E-06,8.0E-06/
+  DATA XVOLWC/5.0E-04,2.5E-04,2.5E-04,2.5E-04/
+  DATA THETRX/4.0E-06,8.0E-06,8.0E-06/
 
-      REAL(r8) :: TFACL,TFACG,TFACW,TFACR,TFACA
-      real(r8) :: ALBW,ALBG,ART,ARL,ARX,ARLSC,ARLSG,BKVLNX,BETAG
-      real(r8) :: BETY,BETZ,BAREF,CORGCM,CORGM,COHS,CAC,CAS,CVRDF
-      real(r8) :: CACX,CASX,CORGCX,CNOFT,CPOFT,D50,DC,DGAZI,DAZI
-      real(r8) :: DZL,FVOLR,FH2O,FCX,FCLX,FCDX,FSNOW,FRADPT,FDPTHF
-      real(r8) :: FDPTHM,FRNT,FRPT,H0PO4T,H1PO4T,H2PO4T,H3PO4T,OC
-      real(r8) :: OSCI,OSNI,OSPI,OSCX,OSNX,OSPX,OMC1,OMN1,OMP1,OQC1
-      real(r8) :: OQN1,OQP1,OSC1,OSN1,OSP1,PTDS,PSDX,PSIS1,PMA,PMB
-      real(r8) :: PHA,PALPOT,PFEPOT,PCAPDT,PCAPHT,PCAPMT,PMAX,PMBX
-      real(r8) :: PHAX,RADYL,RAPYL,RADYN,RADYW,RAPYN,RAPYW,RADST
-      real(r8) :: RADWT,RADPT,RADQT,RA1ST,RA1WT,RA1PT,RA1QT,RA2ST
-      real(r8) :: RA2WT,RA2PT,RA2QT,RADSG,RADYG,RAPSG,RAPYG,RASG
-      real(r8) :: RAPG,RNT,RPT,SUM2,SUM1,SAGL,THETF,THETW1,THETWM
-      real(r8) :: THETPX,TVOLG0,TVOLWI,THETWR,TSURFY,TSURFZ,TSURFS
-      real(r8) :: TSURFX,TSURWY,TSURWZ,TSURWS,TSURWX,VISCWL,VORGC
-      real(r8) :: VMINL,VSAND,VOLIT,VOLAT,VOLITL,VOLWTL,VOLATL,VOLWRZ
-      real(r8) :: VOLIRZ,VOLWCX,WPX,WPLX,XJ,XK,XVOLW0,XVOLI0,XAREA
-      real(r8) :: XTAUS,XTAUY,XN4T,XOH0T,XOH1T,XOH2T,XH1PT,XH2PT
-      real(r8) :: YK,YAREA,ZD50,ZC3,ZA3,ZC2,ZA2,ZC1,ZA1,ZN,ZION1
-      real(r8) :: ZAZI,ZAGL,ZX,ZY,ZE,ZZ,Z4A,Z3A,ZUA,ZOA,Z4B,Z3B
-      real(r8) :: ZUB,ZOB,ZNH4T,ZNH3T,ZNO3T,ZNO2T,ZFE1PT,ZFE2PT
-      real(r8) :: ZCA0PT,ZCA1PT,ZCA2PT,ZMG1PT,Z4AX,Z3AX,ZUAX,ZOAX
-      real(r8) :: Z4BX,Z3BX,ZUBX,ZOBX
+  REAL(r8) :: TFACL,TFACG,TFACW,TFACR,TFACA
+  real(r8) :: ALBW,ALBG,ART,ARL,ARX,ARLSC,ARLSG,BKVLNX,BETAG
+  real(r8) :: BETY,BETZ,BAREF,CORGCM,CORGM,COHS,CAC,CAS,CVRDF
+  real(r8) :: CACX,CASX,CORGCX,CNOFT,CPOFT,D50,DC,DGAZI,DAZI
+  real(r8) :: DZL,FVOLR,FH2O,FCX,FCLX,FCDX,FSNOW,FRADPT,FDPTHF
+  real(r8) :: FDPTHM,FRNT,FRPT,H0PO4T,H1PO4T,H2PO4T,H3PO4T,OC
+  real(r8) :: OSCI,OSNI,OSPI,OSCX,OSNX,OSPX,OMC1,OMN1,OMP1,OQC1
+  real(r8) :: OQN1,OQP1,OSC1,OSN1,OSP1,PTDS,PSDX,PSIS1,PMA,PMB
+  real(r8) :: PHA,PALPOT,PFEPOT,PCAPDT,PCAPHT,PCAPMT,PMAX,PMBX
+  real(r8) :: PHAX,RADYL,RAPYL,RADYN,RADYW,RAPYN,RAPYW,RADST
+  real(r8) :: RADWT,RADPT,RADQT,RA1ST,RA1WT,RA1PT,RA1QT,RA2ST
+  real(r8) :: RA2WT,RA2PT,RA2QT,RADSG,RADYG,RAPSG,RAPYG,RASG
+  real(r8) :: RAPG,RNT,RPT,SUM2,SUM1,SAGL,THETF,THETW1,THETWM
+  real(r8) :: THETPX,TVOLG0,TVOLWI,THETWR,TSURFY,TSURFZ,TSURFS
+  real(r8) :: TSURFX,TSURWY,TSURWZ,TSURWS,TSURWX,VISCWL,VORGC
+  real(r8) :: VMINL,VSAND,VOLIT,VOLAT,VOLITL,VOLWTL,VOLATL,VOLWRZ
+  real(r8) :: VOLIRZ,VOLWCX,WPX,WPLX,XJ,XK,XVOLW0,XVOLI0,XAREA
+  real(r8) :: XTAUS,XTAUY,XN4T,XOH0T,XOH1T,XOH2T,XH1PT,XH2PT
+  real(r8) :: YK,YAREA,ZD50,ZC3,ZA3,ZC2,ZA2,ZC1,ZA1,ZN,ZION1
+  real(r8) :: ZAZI,ZAGL,ZX,ZY,ZE,ZZ,Z4A,Z3A,ZUA,ZOA,Z4B,Z3B
+  real(r8) :: ZUB,ZOB,ZNH4T,ZNH3T,ZNO3T,ZNO2T,ZFE1PT,ZFE2PT
+  real(r8) :: ZCA0PT,ZCA1PT,ZCA2PT,ZMG1PT,Z4AX,Z3AX,ZUAX,ZOAX
+  real(r8) :: Z4BX,Z3BX,ZUBX,ZOBX
 !     adding reals missed by the analyzer by hand
-      real(r8) :: STOPS, STOPX, STOPY, STOPZ, STOPSZ, STOPYZ
+  real(r8) :: STOPS, STOPX, STOPY, STOPZ, STOPSZ, STOPYZ
 
-      integer :: IFLGL,IFLGY,ICHKA,LFDPTH
+  integer :: IFLGL,IFLGY,ICHKA,LFDPTH
 
-      public :: hour1
-      contains
+  public :: hour1
+  contains
 
-      SUBROUTINE hour1(I,J,NHW,NHE,NVN,NVS)
+  SUBROUTINE hour1(I,J,NHW,NHE,NVN,NVS)
 !
 !     THIS SUBROUTINE REINITIALIZES HOURLY VARIABLES USED IN OTHER
 !     SUBROUTINES
 !
-      implicit none
+  implicit none
 
-      integer, intent(in) :: I, J
-      integer, intent(in) :: NHW,NHE,NVN,NVS
-      integer :: L,NX,NY
+  integer, intent(in) :: I, J
+  integer, intent(in) :: NHW,NHE,NVN,NVS
+  integer :: L,NX,NY
 
-      integer :: NZ,NR
+  integer :: NZ,NR
 !     execution begins here
 
-      XJ=J
-      DOY=I-1+XJ/24
+  XJ=J
+  DOY=I-1+XJ/24
 !
 !     RESET HOURLY SOIL ACCUMULATORS FOR WATER, HEAT, GASES, SOLUTES
 !
-      VOLWSO=0.0
-      HEATSO=0.0
-      OXYGSO=0.0
-      TLH2G=0.0
-      TSEDSO=0.0
-      TLRSDC=0.0
-      TLORGC=0.0
-      TLCO2G=0.0
-      TLRSDN=0.0
-      TLORGN=0.0
-      TLN2G=0.0
-      TLRSDP=0.0
-      TLORGP=0.0
-      TLNH4=0.0
-      TLNO3=0.0
-      TLPO4=0.0
-      TION=0.0
-      TBALC=0.0
-      TBALN=0.0
-      TBALP=0.0
-      call SetAtmosTracerConcentration(I,NHW,NHE,NVN,NVS)
+  VOLWSO=0.0
+  HEATSO=0.0
+  OXYGSO=0.0
+  TLH2G=0.0
+  TSEDSO=0.0
+  TLRSDC=0.0
+  TLORGC=0.0
+  TLCO2G=0.0
+  TLRSDN=0.0
+  TLORGN=0.0
+  TLN2G=0.0
+  TLRSDP=0.0
+  TLORGP=0.0
+  TLNH4=0.0
+  TLNO3=0.0
+  TLPO4=0.0
+  TION=0.0
+  TBALC=0.0
+  TBALN=0.0
+  TBALP=0.0
+  call SetAtmosTracerConcentration(I,NHW,NHE,NVN,NVS)
 !
 !     RESET FLUX ARRAYS USED IN OTHER SUBROUTINES
 !
-      call ResetFluxArrays(I,NHW,NHE,NVN,NVS)
+  call ResetFluxArrays(I,NHW,NHE,NVN,NVS)
 !
 !     IF SALT FLAG SET
 !
-      call ResetSaltModelArrays(NHW,NHE,NVN,NVS)
+  call ResetSaltModelArrays(NHW,NHE,NVN,NVS)
 !
 !     RESET SOIL PROPERTIES AND PEDOTRANSFER FUNCTIONS
 !     FOLLOWING ANY SOIL DISTURBANCE
 !
-      DO 9995 NX=NHW,NHE
-      DO 9990 NY=NVN,NVS
+  DO 9995 NX=NHW,NHE
+    DO 9990 NY=NVN,NVS
       IF(J.EQ.1)THEN
-      IFLGT(NY,NX)=0
-      DO 9905 NZ=1,NP(NY,NX)
-      PSILZ(NZ,NY,NX)=0.0
-9905  CONTINUE
+        IFLGT(NY,NX)=0
+        DO 9905 NZ=1,NP(NY,NX)
+          PSILZ(NZ,NY,NX)=0.0
+9905    CONTINUE
       ENDIF
 !
 !     HYDROLOGICAL PRPOERTIES OR SURFACE LITTER
@@ -212,9 +212,9 @@ module Hour1Mod
       VOLR(NY,NX)=AMAX1(0.0,RC0(0,NY,NX)*1.0E-06/BKRS(0) &
       +RC0(1,NY,NX)*1.0E-06/BKRS(1)+RC0(2,NY,NX)*1.0E-06/BKRS(2))
       IF(VOLR(NY,NX).GT.ZEROS(NY,NX))THEN
-      FVOLR=VOLWRX(NY,NX)/VOLR(NY,NX)
+        FVOLR=VOLWRX(NY,NX)/VOLR(NY,NX)
       ELSE
-      FVOLR=THETRX(1)/BKRS(1)
+        FVOLR=THETRX(1)/BKRS(1)
       ENDIF
       POROS0(NY,NX)=FVOLR
       FC(0,NY,NX)=0.500*FVOLR
@@ -246,13 +246,13 @@ module Hour1Mod
 !
       DO 9875 L=0,NL(NY,NX)
 
-      call SetArrays4PlantSoilTransfer(L,NY,NX)
+        call SetArrays4PlantSoilTransfer(L,NY,NX)
 !
 !     IF SOC FLAG IS SET
 !
-      IF(IERSNG.EQ.2.OR.IERSNG.EQ.3)THEN
-      call UpdateTotalSOC(L,NY,NX)
-      ENDIF
+        IF(IERSNG.EQ.2.OR.IERSNG.EQ.3)THEN
+          call UpdateTotalSOC(L,NY,NX)
+        ENDIF
 
 9875  CONTINUE
       IFLGL=0
@@ -260,25 +260,25 @@ module Hour1Mod
       ICHKA=0
       DO 9985 L=NUI(NY,NX),NLI(NY,NX)
 
-      call ZeroHourlyArrays(L,NY,NX)
+        call ZeroHourlyArrays(L,NY,NX)
 !
-      call GetChemicalConcsInSoil(L,NY,NX)
+        call GetChemicalConcsInSoil(L,NY,NX)
 !     WRITE(*,1113)'CORGC',I,J,NX,NY,L,CORGC(L,NY,NX)
 !    2,ORGC(L,NY,NX),BKVL(L,NY,NX),BKDS(L,NY,NX),VOLX(L,NY,NX)
 !
-      call GetSoluteConcentrations(L,NY,NX)
+        call GetSoluteConcentrations(L,NY,NX)
 
-      call PrepVars4PlantMicrobeUptake(L,NY,NX)
+        call PrepVars4PlantMicrobeUptake(L,NY,NX)
 !
-      call GetSoilHydraulicVars(L,NY,NX)
+        call GetSoilHydraulicVars(L,NY,NX)
 !
 !     CALCULATE ACTIVE LAYER DEPTH
 
-      call DiagActiveLayerDepth(L,NY,NX)
+        call DiagActiveLayerDepth(L,NY,NX)
 !
 !     OUTPUT FOR WATER TABLE DEPTH
 !
-      call GetOutput4WaterTableDepth(L,NY,NX)
+        call GetOutput4WaterTableDepth(L,NY,NX)
 9985  CONTINUE
 !
 
@@ -333,23 +333,22 @@ module Hour1Mod
 !     VOLWC=canopy surface water retention
 !
       DO 1930 NZ=1,NP(NY,NX)
-      VOLWCX=XVOLWC(IGTYP(NZ,NY,NX)) &
-      *(ARLFP(NZ,NY,NX)+ARSTP(NZ,NY,NX))
-      FLWC(NZ,NY,NX)=AMAX1(0.0,AMIN1(PRECA(NY,NX)*FRADP(NZ,NY,NX) &
-      ,VOLWCX-VOLWC(NZ,NY,NX)))
-      TFLWCI(NY,NX)=TFLWCI(NY,NX)+PRECA(NY,NX)*FRADP(NZ,NY,NX)
-      TFLWC(NY,NX)=TFLWC(NY,NX)+FLWC(NZ,NY,NX)
+        VOLWCX=XVOLWC(IGTYP(NZ,NY,NX))*(ARLFP(NZ,NY,NX)+ARSTP(NZ,NY,NX))
+        FLWC(NZ,NY,NX)=AMAX1(0.0,AMIN1(PRECA(NY,NX)*FRADP(NZ,NY,NX) &
+          ,VOLWCX-VOLWC(NZ,NY,NX)))
+        TFLWCI(NY,NX)=TFLWCI(NY,NX)+PRECA(NY,NX)*FRADP(NZ,NY,NX)
+        TFLWC(NY,NX)=TFLWC(NY,NX)+FLWC(NZ,NY,NX)
 !
 !     NUMBERS OF TOP AND BOTTOM ROOTED SOIL LAYERS
 !
 !     NG=number of uppermost rooted layer
 !     NINR=number of lowest rooted layer
 !
-      NG(NZ,NY,NX)=MAX(NG(NZ,NY,NX),NU(NY,NX))
-      NIX(NZ,NY,NX)=MAX(NIX(NZ,NY,NX),NU(NY,NX))
-      DO 9790 NR=1,10
-      NINR(NR,NZ,NY,NX)=MAX(NINR(NR,NZ,NY,NX),NU(NY,NX))
-9790  CONTINUE
+        NG(NZ,NY,NX)=MAX(NG(NZ,NY,NX),NU(NY,NX))
+        NIX(NZ,NY,NX)=MAX(NIX(NZ,NY,NX),NU(NY,NX))
+        DO 9790 NR=1,10
+          NINR(NR,NZ,NY,NX)=MAX(NINR(NR,NZ,NY,NX),NU(NY,NX))
+9790    CONTINUE
 1930  CONTINUE
 !
 !     WRITE SW AND PAR ALBEDO
@@ -368,17 +367,17 @@ module Hour1Mod
 9995  CONTINUE
 !
 !     FERTILIZER APPLICATIONS OCCUR AT SOLAR NOON
-      call ApplyFertilizerAtNoon(I,J,NHW,NHE,NVN,NVS)
-      RETURN
+  call ApplyFertilizerAtNoon(I,J,NHW,NHE,NVN,NVS)
+  RETURN
 
-      END subroutine hour1
+  END subroutine hour1
 !------------------------------------------------------------------------------------------
 
-      subroutine SetAtmosTracerConcentration(I,NHW,NHE,NVN,NVS)
-      implicit none
-      integer, intent(in) :: I,NHW,NHE,NVN,NVS
+  subroutine SetAtmosTracerConcentration(I,NHW,NHE,NVN,NVS)
+  implicit none
+  integer, intent(in) :: I,NHW,NHE,NVN,NVS
 
-      integer :: NX, NY
+  integer :: NX, NY
 !     begin_execution
 !
 !     CONCENTRATIONS OF CO2, CH4, O2, N2, N2O, NH3, H2 IN ATMOSPHERE,
@@ -388,8 +387,8 @@ module Hour1Mod
 !     gas code:*CO2*=CO2,*OXY*=O2,*CH4*=CH4,*Z2G*=N2,*Z2O*=N2O
 !             :*ZN3*=NH3,*H2G*=H2
 !
-      DO 9145 NX=NHW,NHE
-      DO 9140 NY=NVN,NVS
+  DO 9145 NX=NHW,NHE
+    DO 9140 NY=NVN,NVS
       CCO2E(NY,NX)=CO2E(NY,NX)*5.36E-04*273.15/TKA(NY,NX)
       CCH4E(NY,NX)=CH4E(NY,NX)*5.36E-04*273.15/TKA(NY,NX)
       COXYE(NY,NX)=OXYE(NY,NX)*1.43E-03*273.15/TKA(NY,NX)
@@ -398,441 +397,441 @@ module Hour1Mod
       CNH3E(NY,NX)=ZNH3E(NY,NX)*6.25E-04*273.15/TKA(NY,NX)
       CH2GE(NY,NX)=H2GE(NY,NX)*8.92E-05*273.15/TKA(NY,NX)
       CCOR(NY,NX)=CCO2E(NY,NX)*SCO2X/(EXP(ACO2X*CSTRR(NY,NX))) &
-      *EXP(0.843-0.0281*TCA(NY,NX))
+        *EXP(0.843-0.0281*TCA(NY,NX))
       CCHR(NY,NX)=CCH4E(NY,NX)*SCH4X/(EXP(ACH4X*CSTRR(NY,NX))) &
-      *EXP(0.597-0.0199*TCA(NY,NX))
+        *EXP(0.597-0.0199*TCA(NY,NX))
       COXR(NY,NX)=COXYE(NY,NX)*SOXYX/(EXP(AOXYX*CSTRR(NY,NX))) &
-      *EXP(0.516-0.0172*TCA(NY,NX))
+        *EXP(0.516-0.0172*TCA(NY,NX))
       CNNR(NY,NX)=CZ2GE(NY,NX)*SN2GX/(EXP(AN2GX*CSTRR(NY,NX))) &
-      *EXP(0.456-0.0152*TCA(NY,NX))
+        *EXP(0.456-0.0152*TCA(NY,NX))
       CN2R(NY,NX)=CZ2OE(NY,NX)*SN2OX/(EXP(AN2OX*CSTRR(NY,NX))) &
-      *EXP(0.897-0.0299*TCA(NY,NX))
+        *EXP(0.897-0.0299*TCA(NY,NX))
       CCOQ(NY,NX)=CCO2E(NY,NX)*SCO2X/(EXP(ACO2X*CSTRQ(I,NY,NX))) &
-      *EXP(0.843-0.0281*TCA(NY,NX))
+        *EXP(0.843-0.0281*TCA(NY,NX))
       CCHQ(NY,NX)=CCH4E(NY,NX)*SCH4X/(EXP(ACH4X*CSTRQ(I,NY,NX))) &
-      *EXP(0.597-0.0199*TCA(NY,NX))
+        *EXP(0.597-0.0199*TCA(NY,NX))
       COXQ(NY,NX)=COXYE(NY,NX)*SOXYX/(EXP(AOXYX*CSTRQ(I,NY,NX))) &
-      *EXP(0.516-0.0172*TCA(NY,NX))
+        *EXP(0.516-0.0172*TCA(NY,NX))
       CNNQ(NY,NX)=CZ2GE(NY,NX)*SN2GX/(EXP(AN2GX*CSTRQ(I,NY,NX))) &
-      *EXP(0.456-0.0152*TCA(NY,NX))
+        *EXP(0.456-0.0152*TCA(NY,NX))
       CN2Q(NY,NX)=CZ2OE(NY,NX)*SN2OX/(EXP(AN2OX*CSTRQ(I,NY,NX))) &
-      *EXP(0.897-0.0299*TCA(NY,NX))
+        *EXP(0.897-0.0299*TCA(NY,NX))
 9140  CONTINUE
 9145  CONTINUE
-      end subroutine SetAtmosTracerConcentration
+  end subroutine SetAtmosTracerConcentration
 !------------------------------------------------------------------------------------------
 
-      subroutine ResetFluxArrays(I,NHW,NHE,NVN,NVS)
-      implicit none
-      integer, intent(in) :: I,NHW,NHE,NVN,NVS
+  subroutine ResetFluxArrays(I,NHW,NHE,NVN,NVS)
+  implicit none
+  integer, intent(in) :: I,NHW,NHE,NVN,NVS
 
-      integer :: L,N,NX,NY,K,NN,NO,M
+  integer :: L,N,NX,NY,K,NN,NO,M
 !     begin_execution
-      DO 9895 NX=NHW,NHE+1
-      DO 9890 NY=NVN,NVS+1
+  DO 9895 NX=NHW,NHE+1
+    DO 9890 NY=NVN,NVS+1
       DO 9885 L=0,NL(NY,NX)+1
-      DO 9880 N=1,3
+        DO 9880 N=1,3
 !
 !     WATER,SNOW,SOLUTE RUNOFF
 !
-      IF(L.EQ.0.AND.N.NE.3)THEN
-      DO 9835 NN=1,2
-      QR(N,NN,NY,NX)=0.0
-      HQR(N,NN,NY,NX)=0.0
-      DO 9870 K=0,4
-      XOCQRS(K,N,NN,NY,NX)=0.0
-      XONQRS(K,N,NN,NY,NX)=0.0
-      XOPQRS(K,N,NN,NY,NX)=0.0
-      XOAQRS(K,N,NN,NY,NX)=0.0
-9870  CONTINUE
-      XCOQRS(N,NN,NY,NX)=0.0
-      XCHQRS(N,NN,NY,NX)=0.0
-      XOXQRS(N,NN,NY,NX)=0.0
-      XNGQRS(N,NN,NY,NX)=0.0
-      XN2QRS(N,NN,NY,NX)=0.0
-      XHGQRS(N,NN,NY,NX)=0.0
-      XN4QRW(N,NN,NY,NX)=0.0
-      XN3QRW(N,NN,NY,NX)=0.0
-      XNOQRW(N,NN,NY,NX)=0.0
-      XNXQRS(N,NN,NY,NX)=0.0
-      XP1QRW(N,NN,NY,NX)=0.0
-      XP4QRW(N,NN,NY,NX)=0.0
-9835  CONTINUE
-      QS(N,NY,NX)=0.0
-      QW(N,NY,NX)=0.0
-      QI(N,NY,NX)=0.0
-      HQS(N,NY,NX)=0.0
-      XCOQSS(N,NY,NX)=0.0
-      XCHQSS(N,NY,NX)=0.0
-      XOXQSS(N,NY,NX)=0.0
-      XNGQSS(N,NY,NX)=0.0
-      XN2QSS(N,NY,NX)=0.0
-      XN4QSS(N,NY,NX)=0.0
-      XN3QSS(N,NY,NX)=0.0
-      XNOQSS(N,NY,NX)=0.0
-      XP1QSS(N,NY,NX)=0.0
-      XP4QSS(N,NY,NX)=0.0
+        IF(L.EQ.0.AND.N.NE.3)THEN
+          DO 9835 NN=1,2
+            QR(N,NN,NY,NX)=0.0
+            HQR(N,NN,NY,NX)=0.0
+            DO 9870 K=0,4
+              XOCQRS(K,N,NN,NY,NX)=0.0
+              XONQRS(K,N,NN,NY,NX)=0.0
+              XOPQRS(K,N,NN,NY,NX)=0.0
+              XOAQRS(K,N,NN,NY,NX)=0.0
+9870        CONTINUE
+            XCOQRS(N,NN,NY,NX)=0.0
+            XCHQRS(N,NN,NY,NX)=0.0
+            XOXQRS(N,NN,NY,NX)=0.0
+            XNGQRS(N,NN,NY,NX)=0.0
+            XN2QRS(N,NN,NY,NX)=0.0
+            XHGQRS(N,NN,NY,NX)=0.0
+            XN4QRW(N,NN,NY,NX)=0.0
+            XN3QRW(N,NN,NY,NX)=0.0
+            XNOQRW(N,NN,NY,NX)=0.0
+            XNXQRS(N,NN,NY,NX)=0.0
+            XP1QRW(N,NN,NY,NX)=0.0
+            XP4QRW(N,NN,NY,NX)=0.0
+9835      CONTINUE
+          QS(N,NY,NX)=0.0
+          QW(N,NY,NX)=0.0
+          QI(N,NY,NX)=0.0
+          HQS(N,NY,NX)=0.0
+          XCOQSS(N,NY,NX)=0.0
+          XCHQSS(N,NY,NX)=0.0
+          XOXQSS(N,NY,NX)=0.0
+          XNGQSS(N,NY,NX)=0.0
+          XN2QSS(N,NY,NX)=0.0
+          XN4QSS(N,NY,NX)=0.0
+          XN3QSS(N,NY,NX)=0.0
+          XNOQSS(N,NY,NX)=0.0
+          XP1QSS(N,NY,NX)=0.0
+          XP4QSS(N,NY,NX)=0.0
 !
 !     IF EROSION FLAG SET
 !
-      IF(IERSNG.EQ.1.OR.IERSNG.EQ.3)THEN
-      DO 9855 NN=1,2
-      XSEDER(N,NN,NY,NX)=0.0
-      XSANER(N,NN,NY,NX)=0.0
-      XSILER(N,NN,NY,NX)=0.0
-      XCLAER(N,NN,NY,NX)=0.0
-      XCECER(N,NN,NY,NX)=0.0
-      XAECER(N,NN,NY,NX)=0.0
-      XNH4ER(N,NN,NY,NX)=0.0
-      XNH3ER(N,NN,NY,NX)=0.0
-      XNHUER(N,NN,NY,NX)=0.0
-      XNO3ER(N,NN,NY,NX)=0.0
-      XNH4EB(N,NN,NY,NX)=0.0
-      XNH3EB(N,NN,NY,NX)=0.0
-      XNHUEB(N,NN,NY,NX)=0.0
-      XNO3EB(N,NN,NY,NX)=0.0
-      XN4ER(N,NN,NY,NX)=0.0
-      XNBER(N,NN,NY,NX)=0.0
-      XHYER(N,NN,NY,NX)=0.0
-      XALER(N,NN,NY,NX)=0.0
-      XCAER(N,NN,NY,NX)=0.0
-      XMGER(N,NN,NY,NX)=0.0
-      XNAER(N,NN,NY,NX)=0.0
-      XKAER(N,NN,NY,NX)=0.0
-      XHCER(N,NN,NY,NX)=0.0
-      XAL2ER(N,NN,NY,NX)=0.0
-      XOH0ER(N,NN,NY,NX)=0.0
-      XOH1ER(N,NN,NY,NX)=0.0
-      XOH2ER(N,NN,NY,NX)=0.0
-      XH1PER(N,NN,NY,NX)=0.0
-      XH2PER(N,NN,NY,NX)=0.0
-      XOH0EB(N,NN,NY,NX)=0.0
-      XOH1EB(N,NN,NY,NX)=0.0
-      XOH2EB(N,NN,NY,NX)=0.0
-      XH1PEB(N,NN,NY,NX)=0.0
-      XH2PEB(N,NN,NY,NX)=0.0
-      PALOER(N,NN,NY,NX)=0.0
-      PFEOER(N,NN,NY,NX)=0.0
-      PCACER(N,NN,NY,NX)=0.0
-      PCASER(N,NN,NY,NX)=0.0
-      PALPER(N,NN,NY,NX)=0.0
-      PFEPER(N,NN,NY,NX)=0.0
-      PCPDER(N,NN,NY,NX)=0.0
-      PCPHER(N,NN,NY,NX)=0.0
-      PCPMER(N,NN,NY,NX)=0.0
-      PALPEB(N,NN,NY,NX)=0.0
-      PFEPEB(N,NN,NY,NX)=0.0
-      PCPDEB(N,NN,NY,NX)=0.0
-      PCPHEB(N,NN,NY,NX)=0.0
-      PCPMEB(N,NN,NY,NX)=0.0
-      DO 9480 K=0,5
-      DO  NO=1,7
-      OMCER(3,NO,K,N,NN,NY,NX)=0.0
-      DO  M=1,2
-      OMCER(M,NO,K,N,NN,NY,NX)=0.0
-      OMNER(M,NO,K,N,NN,NY,NX)=0.0
-      OMPER(M,NO,K,N,NN,NY,NX)=0.0
-      enddo
-      enddo
-9480  CONTINUE
-      DO 9475 K=0,4
-      DO 9470 M=1,2
-      ORCER(M,K,N,NN,NY,NX)=0.0
-      ORNER(M,K,N,NN,NY,NX)=0.0
-      ORPER(M,K,N,NN,NY,NX)=0.0
-9470  CONTINUE
-      OHCER(K,N,NN,NY,NX)=0.0
-      OHNER(K,N,NN,NY,NX)=0.0
-      OHPER(K,N,NN,NY,NX)=0.0
-      DO 9465 M=1,4
-      OSCER(M,K,N,NN,NY,NX)=0.0
-      OSAER(M,K,N,NN,NY,NX)=0.0
-      OSNER(M,K,N,NN,NY,NX)=0.0
-      OSPER(M,K,N,NN,NY,NX)=0.0
-9465  CONTINUE
-9475  CONTINUE
-9855  CONTINUE
-      ENDIF
-      ENDIF
+          IF(IERSNG.EQ.1.OR.IERSNG.EQ.3)THEN
+            DO 9855 NN=1,2
+              XSEDER(N,NN,NY,NX)=0.0
+              XSANER(N,NN,NY,NX)=0.0
+              XSILER(N,NN,NY,NX)=0.0
+              XCLAER(N,NN,NY,NX)=0.0
+              XCECER(N,NN,NY,NX)=0.0
+              XAECER(N,NN,NY,NX)=0.0
+              XNH4ER(N,NN,NY,NX)=0.0
+              XNH3ER(N,NN,NY,NX)=0.0
+              XNHUER(N,NN,NY,NX)=0.0
+              XNO3ER(N,NN,NY,NX)=0.0
+              XNH4EB(N,NN,NY,NX)=0.0
+              XNH3EB(N,NN,NY,NX)=0.0
+              XNHUEB(N,NN,NY,NX)=0.0
+              XNO3EB(N,NN,NY,NX)=0.0
+              XN4ER(N,NN,NY,NX)=0.0
+              XNBER(N,NN,NY,NX)=0.0
+              XHYER(N,NN,NY,NX)=0.0
+              XALER(N,NN,NY,NX)=0.0
+              XCAER(N,NN,NY,NX)=0.0
+              XMGER(N,NN,NY,NX)=0.0
+              XNAER(N,NN,NY,NX)=0.0
+              XKAER(N,NN,NY,NX)=0.0
+              XHCER(N,NN,NY,NX)=0.0
+              XAL2ER(N,NN,NY,NX)=0.0
+              XOH0ER(N,NN,NY,NX)=0.0
+              XOH1ER(N,NN,NY,NX)=0.0
+              XOH2ER(N,NN,NY,NX)=0.0
+              XH1PER(N,NN,NY,NX)=0.0
+              XH2PER(N,NN,NY,NX)=0.0
+              XOH0EB(N,NN,NY,NX)=0.0
+              XOH1EB(N,NN,NY,NX)=0.0
+              XOH2EB(N,NN,NY,NX)=0.0
+              XH1PEB(N,NN,NY,NX)=0.0
+              XH2PEB(N,NN,NY,NX)=0.0
+              PALOER(N,NN,NY,NX)=0.0
+              PFEOER(N,NN,NY,NX)=0.0
+              PCACER(N,NN,NY,NX)=0.0
+              PCASER(N,NN,NY,NX)=0.0
+              PALPER(N,NN,NY,NX)=0.0
+              PFEPER(N,NN,NY,NX)=0.0
+              PCPDER(N,NN,NY,NX)=0.0
+              PCPHER(N,NN,NY,NX)=0.0
+              PCPMER(N,NN,NY,NX)=0.0
+              PALPEB(N,NN,NY,NX)=0.0
+              PFEPEB(N,NN,NY,NX)=0.0
+              PCPDEB(N,NN,NY,NX)=0.0
+              PCPHEB(N,NN,NY,NX)=0.0
+              PCPMEB(N,NN,NY,NX)=0.0
+              DO 9480 K=0,5
+                DO  NO=1,7
+                  OMCER(3,NO,K,N,NN,NY,NX)=0.0
+                  DO  M=1,2
+                    OMCER(M,NO,K,N,NN,NY,NX)=0.0
+                    OMNER(M,NO,K,N,NN,NY,NX)=0.0
+                    OMPER(M,NO,K,N,NN,NY,NX)=0.0
+                  enddo
+                enddo
+9480          CONTINUE
+              DO 9475 K=0,4
+                DO 9470 M=1,2
+                  ORCER(M,K,N,NN,NY,NX)=0.0
+                  ORNER(M,K,N,NN,NY,NX)=0.0
+                  ORPER(M,K,N,NN,NY,NX)=0.0
+9470            CONTINUE
+                OHCER(K,N,NN,NY,NX)=0.0
+                OHNER(K,N,NN,NY,NX)=0.0
+                OHPER(K,N,NN,NY,NX)=0.0
+                DO 9465 M=1,4
+                  OSCER(M,K,N,NN,NY,NX)=0.0
+                  OSAER(M,K,N,NN,NY,NX)=0.0
+                  OSNER(M,K,N,NN,NY,NX)=0.0
+                  OSPER(M,K,N,NN,NY,NX)=0.0
+9465            CONTINUE
+9475          CONTINUE
+9855        CONTINUE
+          ENDIF
+        ENDIF
 !
 !     GAS AND SOLUTE FLUXES
 !
-      XCOFLS(N,L,NY,NX)=0.0
-      XCHFLS(N,L,NY,NX)=0.0
-      XOXFLS(N,L,NY,NX)=0.0
-      XNGFLS(N,L,NY,NX)=0.0
-      XN2FLS(N,L,NY,NX)=0.0
-      XHGFLS(N,L,NY,NX)=0.0
-      XN4FLW(N,L,NY,NX)=0.0
-      XN3FLW(N,L,NY,NX)=0.0
-      XNOFLW(N,L,NY,NX)=0.0
-      XNXFLS(N,L,NY,NX)=0.0
-      XH1PFS(N,L,NY,NX)=0.0
-      XH2PFS(N,L,NY,NX)=0.0
-      DO 9860 K=0,4
-      XOCFLS(K,N,L,NY,NX)=0.0
-      XONFLS(K,N,L,NY,NX)=0.0
-      XOPFLS(K,N,L,NY,NX)=0.0
-      XOAFLS(K,N,L,NY,NX)=0.0
-9860  CONTINUE
+        XCOFLS(N,L,NY,NX)=0.0
+        XCHFLS(N,L,NY,NX)=0.0
+        XOXFLS(N,L,NY,NX)=0.0
+        XNGFLS(N,L,NY,NX)=0.0
+        XN2FLS(N,L,NY,NX)=0.0
+        XHGFLS(N,L,NY,NX)=0.0
+        XN4FLW(N,L,NY,NX)=0.0
+        XN3FLW(N,L,NY,NX)=0.0
+        XNOFLW(N,L,NY,NX)=0.0
+        XNXFLS(N,L,NY,NX)=0.0
+        XH1PFS(N,L,NY,NX)=0.0
+        XH2PFS(N,L,NY,NX)=0.0
+        DO 9860 K=0,4
+          XOCFLS(K,N,L,NY,NX)=0.0
+          XONFLS(K,N,L,NY,NX)=0.0
+          XOPFLS(K,N,L,NY,NX)=0.0
+          XOAFLS(K,N,L,NY,NX)=0.0
+9860    CONTINUE
 9880  CONTINUE
 !
 !     BAND AND MACROPORE FLUXES
 !
       IF(L.NE.0)THEN
-      DO 9840 N=1,3
-      FLW(N,L,NY,NX)=0.0
-      FLWX(N,L,NY,NX)=0.0
-      FLWH(N,L,NY,NX)=0.0
-      HFLW(N,L,NY,NX)=0.0
-      XN4FLB(N,L,NY,NX)=0.0
-      XN3FLB(N,L,NY,NX)=0.0
-      XNOFLB(N,L,NY,NX)=0.0
-      XNXFLB(N,L,NY,NX)=0.0
-      XH1BFB(N,L,NY,NX)=0.0
-      XH2BFB(N,L,NY,NX)=0.0
-      XCOFHS(N,L,NY,NX)=0.0
-      XCHFHS(N,L,NY,NX)=0.0
-      XOXFHS(N,L,NY,NX)=0.0
-      XNGFHS(N,L,NY,NX)=0.0
-      XN2FHS(N,L,NY,NX)=0.0
-      XHGFHS(N,L,NY,NX)=0.0
-      XN4FHW(N,L,NY,NX)=0.0
-      XN3FHW(N,L,NY,NX)=0.0
-      XNOFHW(N,L,NY,NX)=0.0
-      XNXFHS(N,L,NY,NX)=0.0
-      XH1PHS(N,L,NY,NX)=0.0
-      XH2PHS(N,L,NY,NX)=0.0
-      XN4FHB(N,L,NY,NX)=0.0
-      XN3FHB(N,L,NY,NX)=0.0
-      XNOFHB(N,L,NY,NX)=0.0
-      XNXFHB(N,L,NY,NX)=0.0
-      XH1BHB(N,L,NY,NX)=0.0
-      XH2BHB(N,L,NY,NX)=0.0
-      XCOFLG(N,L,NY,NX)=0.0
-      XCHFLG(N,L,NY,NX)=0.0
-      XOXFLG(N,L,NY,NX)=0.0
-      XNGFLG(N,L,NY,NX)=0.0
-      XN2FLG(N,L,NY,NX)=0.0
-      XN3FLG(N,L,NY,NX)=0.0
-      XHGFLG(N,L,NY,NX)=0.0
-      DO 9820 K=0,4
-      XOCFHS(K,N,L,NY,NX)=0.0
-      XONFHS(K,N,L,NY,NX)=0.0
-      XOPFHS(K,N,L,NY,NX)=0.0
-      XOAFHS(K,N,L,NY,NX)=0.0
-9820  CONTINUE
-9840  CONTINUE
+        DO 9840 N=1,3
+          FLW(N,L,NY,NX)=0.0
+          FLWX(N,L,NY,NX)=0.0
+          FLWH(N,L,NY,NX)=0.0
+          HFLW(N,L,NY,NX)=0.0
+          XN4FLB(N,L,NY,NX)=0.0
+          XN3FLB(N,L,NY,NX)=0.0
+          XNOFLB(N,L,NY,NX)=0.0
+          XNXFLB(N,L,NY,NX)=0.0
+          XH1BFB(N,L,NY,NX)=0.0
+          XH2BFB(N,L,NY,NX)=0.0
+          XCOFHS(N,L,NY,NX)=0.0
+          XCHFHS(N,L,NY,NX)=0.0
+          XOXFHS(N,L,NY,NX)=0.0
+          XNGFHS(N,L,NY,NX)=0.0
+          XN2FHS(N,L,NY,NX)=0.0
+          XHGFHS(N,L,NY,NX)=0.0
+          XN4FHW(N,L,NY,NX)=0.0
+          XN3FHW(N,L,NY,NX)=0.0
+          XNOFHW(N,L,NY,NX)=0.0
+          XNXFHS(N,L,NY,NX)=0.0
+          XH1PHS(N,L,NY,NX)=0.0
+          XH2PHS(N,L,NY,NX)=0.0
+          XN4FHB(N,L,NY,NX)=0.0
+          XN3FHB(N,L,NY,NX)=0.0
+          XNOFHB(N,L,NY,NX)=0.0
+          XNXFHB(N,L,NY,NX)=0.0
+          XH1BHB(N,L,NY,NX)=0.0
+          XH2BHB(N,L,NY,NX)=0.0
+          XCOFLG(N,L,NY,NX)=0.0
+          XCHFLG(N,L,NY,NX)=0.0
+          XOXFLG(N,L,NY,NX)=0.0
+          XNGFLG(N,L,NY,NX)=0.0
+          XN2FLG(N,L,NY,NX)=0.0
+          XN3FLG(N,L,NY,NX)=0.0
+          XHGFLG(N,L,NY,NX)=0.0
+          DO 9820 K=0,4
+            XOCFHS(K,N,L,NY,NX)=0.0
+            XONFHS(K,N,L,NY,NX)=0.0
+            XOPFHS(K,N,L,NY,NX)=0.0
+            XOAFHS(K,N,L,NY,NX)=0.0
+9820      CONTINUE
+9840    CONTINUE
       ENDIF
 9885  CONTINUE
 9890  CONTINUE
 9895  CONTINUE
-      end subroutine ResetFluxArrays
+  end subroutine ResetFluxArrays
 !------------------------------------------------------------------------------------------
 
-      subroutine ResetSaltModelArrays(NHW,NHE,NVN,NVS)
-      implicit none
-      integer, intent(in) :: NHW,NHE,NVN,NVS
+  subroutine ResetSaltModelArrays(NHW,NHE,NVN,NVS)
+  implicit none
+  integer, intent(in) :: NHW,NHE,NVN,NVS
 
-      integer :: N,NX,NY,L,NN
+  integer :: N,NX,NY,L,NN
 !     begin_execution
 
-      DO 8895 NX=NHW,NHE+1
-      DO 8890 NY=NVN,NVS+1
+  DO 8895 NX=NHW,NHE+1
+    DO 8890 NY=NVN,NVS+1
       IF(ISALTG.NE.0)THEN
-      DO 8885 L=1,NL(NY,NX)+1
-      DO 8880 N=1,3
-      IF(L.EQ.1.AND.N.NE.3)THEN
-      DO 9836 NN=1,2
-      XQRAL(N,NN,NY,NX)=0.0
-      XQRFE(N,NN,NY,NX)=0.0
-      XQRHY(N,NN,NY,NX)=0.0
-      XQRCA(N,NN,NY,NX)=0.0
-      XQRMG(N,NN,NY,NX)=0.0
-      XQRNA(N,NN,NY,NX)=0.0
-      XQRKA(N,NN,NY,NX)=0.0
-      XQROH(N,NN,NY,NX)=0.0
-      XQRSO(N,NN,NY,NX)=0.0
-      XQRCL(N,NN,NY,NX)=0.0
-      XQRC3(N,NN,NY,NX)=0.0
-      XQRHC(N,NN,NY,NX)=0.0
-      XQRAL1(N,NN,NY,NX)=0.0
-      XQRAL2(N,NN,NY,NX)=0.0
-      XQRAL3(N,NN,NY,NX)=0.0
-      XQRAL4(N,NN,NY,NX)=0.0
-      XQRALS(N,NN,NY,NX)=0.0
-      XQRFE1(N,NN,NY,NX)=0.0
-      XQRFE2(N,NN,NY,NX)=0.0
-      XQRFE3(N,NN,NY,NX)=0.0
-      XQRFE4(N,NN,NY,NX)=0.0
-      XQRFES(N,NN,NY,NX)=0.0
-      XQRCAO(N,NN,NY,NX)=0.0
-      XQRCAC(N,NN,NY,NX)=0.0
-      XQRCAH(N,NN,NY,NX)=0.0
-      XQRCAS(N,NN,NY,NX)=0.0
-      XQRMGO(N,NN,NY,NX)=0.0
-      XQRMGC(N,NN,NY,NX)=0.0
-      XQRMGH(N,NN,NY,NX)=0.0
-      XQRMGS(N,NN,NY,NX)=0.0
-      XQRNAC(N,NN,NY,NX)=0.0
-      XQRNAS(N,NN,NY,NX)=0.0
-      XQRKAS(N,NN,NY,NX)=0.0
-      XQRH0P(N,NN,NY,NX)=0.0
-      XQRH3P(N,NN,NY,NX)=0.0
-      XQRF1P(N,NN,NY,NX)=0.0
-      XQRF2P(N,NN,NY,NX)=0.0
-      XQRC0P(N,NN,NY,NX)=0.0
-      XQRC1P(N,NN,NY,NX)=0.0
-      XQRC2P(N,NN,NY,NX)=0.0
-      XQRM1P(N,NN,NY,NX)=0.0
-9836  CONTINUE
-      XQSAL(N,NY,NX)=0.0
-      XQSFE(N,NY,NX)=0.0
-      XQSHY(N,NY,NX)=0.0
-      XQSCA(N,NY,NX)=0.0
-      XQSMG(N,NY,NX)=0.0
-      XQSNA(N,NY,NX)=0.0
-      XQSKA(N,NY,NX)=0.0
-      XQSOH(N,NY,NX)=0.0
-      XQSSO(N,NY,NX)=0.0
-      XQSCL(N,NY,NX)=0.0
-      XQSC3(N,NY,NX)=0.0
-      XQSHC(N,NY,NX)=0.0
-      XQSAL1(N,NY,NX)=0.0
-      XQSAL2(N,NY,NX)=0.0
-      XQSAL3(N,NY,NX)=0.0
-      XQSAL4(N,NY,NX)=0.0
-      XQSALS(N,NY,NX)=0.0
-      XQSFE1(N,NY,NX)=0.0
-      XQSFE2(N,NY,NX)=0.0
-      XQSFE3(N,NY,NX)=0.0
-      XQSFE4(N,NY,NX)=0.0
-      XQSFES(N,NY,NX)=0.0
-      XQSCAO(N,NY,NX)=0.0
-      XQSCAC(N,NY,NX)=0.0
-      XQSCAH(N,NY,NX)=0.0
-      XQSCAS(N,NY,NX)=0.0
-      XQSMGO(N,NY,NX)=0.0
-      XQSMGC(N,NY,NX)=0.0
-      XQSMGH(N,NY,NX)=0.0
-      XQSMGS(N,NY,NX)=0.0
-      XQSNAC(N,NY,NX)=0.0
-      XQSNAS(N,NY,NX)=0.0
-      XQSKAS(N,NY,NX)=0.0
-      XQSH0P(N,NY,NX)=0.0
-      XQSH1P(N,NY,NX)=0.0
-      XQSH3P(N,NY,NX)=0.0
-      XQSF1P(N,NY,NX)=0.0
-      XQSF2P(N,NY,NX)=0.0
-      XQSC0P(N,NY,NX)=0.0
-      XQSC1P(N,NY,NX)=0.0
-      XQSC2P(N,NY,NX)=0.0
-      XQSM1P(N,NY,NX)=0.0
-      ENDIF
-      XALFLS(N,L,NY,NX)=0.0
-      XFEFLS(N,L,NY,NX)=0.0
-      XHYFLS(N,L,NY,NX)=0.0
-      XCAFLS(N,L,NY,NX)=0.0
-      XMGFLS(N,L,NY,NX)=0.0
-      XNAFLS(N,L,NY,NX)=0.0
-      XKAFLS(N,L,NY,NX)=0.0
-      XOHFLS(N,L,NY,NX)=0.0
-      XSOFLS(N,L,NY,NX)=0.0
-      XCLFLS(N,L,NY,NX)=0.0
-      XC3FLS(N,L,NY,NX)=0.0
-      XHCFLS(N,L,NY,NX)=0.0
-      XAL1FS(N,L,NY,NX)=0.0
-      XAL2FS(N,L,NY,NX)=0.0
-      XAL3FS(N,L,NY,NX)=0.0
-      XAL4FS(N,L,NY,NX)=0.0
-      XALSFS(N,L,NY,NX)=0.0
-      XFE1FS(N,L,NY,NX)=0.0
-      XFE2FS(N,L,NY,NX)=0.0
-      XFE3FS(N,L,NY,NX)=0.0
-      XFE4FS(N,L,NY,NX)=0.0
-      XFESFS(N,L,NY,NX)=0.0
-      XCAOFS(N,L,NY,NX)=0.0
-      XCACFS(N,L,NY,NX)=0.0
-      XCAHFS(N,L,NY,NX)=0.0
-      XCASFS(N,L,NY,NX)=0.0
-      XMGOFS(N,L,NY,NX)=0.0
-      XMGCFS(N,L,NY,NX)=0.0
-      XMGHFS(N,L,NY,NX)=0.0
-      XMGSFS(N,L,NY,NX)=0.0
-      XNACFS(N,L,NY,NX)=0.0
-      XNASFS(N,L,NY,NX)=0.0
-      XKASFS(N,L,NY,NX)=0.0
-      XH0PFS(N,L,NY,NX)=0.0
-      XH3PFS(N,L,NY,NX)=0.0
-      XF1PFS(N,L,NY,NX)=0.0
-      XF2PFS(N,L,NY,NX)=0.0
-      XC0PFS(N,L,NY,NX)=0.0
-      XC1PFS(N,L,NY,NX)=0.0
-      XC2PFS(N,L,NY,NX)=0.0
-      XM1PFS(N,L,NY,NX)=0.0
-      XH0BFB(N,L,NY,NX)=0.0
-      XH3BFB(N,L,NY,NX)=0.0
-      XF1BFB(N,L,NY,NX)=0.0
-      XF2BFB(N,L,NY,NX)=0.0
-      XC0BFB(N,L,NY,NX)=0.0
-      XC1BFB(N,L,NY,NX)=0.0
-      XC2BFB(N,L,NY,NX)=0.0
-      XM1BFB(N,L,NY,NX)=0.0
-      XALFHS(N,L,NY,NX)=0.0
-      XFEFHS(N,L,NY,NX)=0.0
-      XHYFHS(N,L,NY,NX)=0.0
-      XCAFHS(N,L,NY,NX)=0.0
-      XMGFHS(N,L,NY,NX)=0.0
-      XNAFHS(N,L,NY,NX)=0.0
-      XKAFHS(N,L,NY,NX)=0.0
-      XOHFHS(N,L,NY,NX)=0.0
-      XSOFHS(N,L,NY,NX)=0.0
-      XCLFHS(N,L,NY,NX)=0.0
-      XC3FHS(N,L,NY,NX)=0.0
-      XHCFHS(N,L,NY,NX)=0.0
-      XAL1HS(N,L,NY,NX)=0.0
-      XAL2HS(N,L,NY,NX)=0.0
-      XAL3HS(N,L,NY,NX)=0.0
-      XAL4HS(N,L,NY,NX)=0.0
-      XALSHS(N,L,NY,NX)=0.0
-      XFE1HS(N,L,NY,NX)=0.0
-      XFE2HS(N,L,NY,NX)=0.0
-      XFE3HS(N,L,NY,NX)=0.0
-      XFE4HS(N,L,NY,NX)=0.0
-      XFESHS(N,L,NY,NX)=0.0
-      XCAOHS(N,L,NY,NX)=0.0
-      XCACHS(N,L,NY,NX)=0.0
-      XCAHHS(N,L,NY,NX)=0.0
-      XCASHS(N,L,NY,NX)=0.0
-      XMGOHS(N,L,NY,NX)=0.0
-      XMGCHS(N,L,NY,NX)=0.0
-      XMGHHS(N,L,NY,NX)=0.0
-      XMGSHS(N,L,NY,NX)=0.0
-      XNACHS(N,L,NY,NX)=0.0
-      XNASHS(N,L,NY,NX)=0.0
-      XKASHS(N,L,NY,NX)=0.0
-      XH0PHS(N,L,NY,NX)=0.0
-      XH3PHS(N,L,NY,NX)=0.0
-      XF1PHS(N,L,NY,NX)=0.0
-      XF2PHS(N,L,NY,NX)=0.0
-      XC0PHS(N,L,NY,NX)=0.0
-      XC1PHS(N,L,NY,NX)=0.0
-      XC2PHS(N,L,NY,NX)=0.0
-      XM1PHS(N,L,NY,NX)=0.0
-      XH0BHB(N,L,NY,NX)=0.0
-      XH3BHB(N,L,NY,NX)=0.0
-      XF1BHB(N,L,NY,NX)=0.0
-      XF2BHB(N,L,NY,NX)=0.0
-      XC0BHB(N,L,NY,NX)=0.0
-      XC1BHB(N,L,NY,NX)=0.0
-      XC2BHB(N,L,NY,NX)=0.0
-      XM1BHB(N,L,NY,NX)=0.0
-8880  CONTINUE
-8885  CONTINUE
+        DO 8885 L=1,NL(NY,NX)+1
+          DO 8880 N=1,3
+            IF(L.EQ.1.AND.N.NE.3)THEN
+              DO 9836 NN=1,2
+                XQRAL(N,NN,NY,NX)=0.0
+                XQRFE(N,NN,NY,NX)=0.0
+                XQRHY(N,NN,NY,NX)=0.0
+                XQRCA(N,NN,NY,NX)=0.0
+                XQRMG(N,NN,NY,NX)=0.0
+                XQRNA(N,NN,NY,NX)=0.0
+                XQRKA(N,NN,NY,NX)=0.0
+                XQROH(N,NN,NY,NX)=0.0
+                XQRSO(N,NN,NY,NX)=0.0
+                XQRCL(N,NN,NY,NX)=0.0
+                XQRC3(N,NN,NY,NX)=0.0
+                XQRHC(N,NN,NY,NX)=0.0
+                XQRAL1(N,NN,NY,NX)=0.0
+                XQRAL2(N,NN,NY,NX)=0.0
+                XQRAL3(N,NN,NY,NX)=0.0
+                XQRAL4(N,NN,NY,NX)=0.0
+                XQRALS(N,NN,NY,NX)=0.0
+                XQRFE1(N,NN,NY,NX)=0.0
+                XQRFE2(N,NN,NY,NX)=0.0
+                XQRFE3(N,NN,NY,NX)=0.0
+                XQRFE4(N,NN,NY,NX)=0.0
+                XQRFES(N,NN,NY,NX)=0.0
+                XQRCAO(N,NN,NY,NX)=0.0
+                XQRCAC(N,NN,NY,NX)=0.0
+                XQRCAH(N,NN,NY,NX)=0.0
+                XQRCAS(N,NN,NY,NX)=0.0
+                XQRMGO(N,NN,NY,NX)=0.0
+                XQRMGC(N,NN,NY,NX)=0.0
+                XQRMGH(N,NN,NY,NX)=0.0
+                XQRMGS(N,NN,NY,NX)=0.0
+                XQRNAC(N,NN,NY,NX)=0.0
+                XQRNAS(N,NN,NY,NX)=0.0
+                XQRKAS(N,NN,NY,NX)=0.0
+                XQRH0P(N,NN,NY,NX)=0.0
+                XQRH3P(N,NN,NY,NX)=0.0
+                XQRF1P(N,NN,NY,NX)=0.0
+                XQRF2P(N,NN,NY,NX)=0.0
+                XQRC0P(N,NN,NY,NX)=0.0
+                XQRC1P(N,NN,NY,NX)=0.0
+                XQRC2P(N,NN,NY,NX)=0.0
+                XQRM1P(N,NN,NY,NX)=0.0
+9836          CONTINUE
+              XQSAL(N,NY,NX)=0.0
+              XQSFE(N,NY,NX)=0.0
+              XQSHY(N,NY,NX)=0.0
+              XQSCA(N,NY,NX)=0.0
+              XQSMG(N,NY,NX)=0.0
+              XQSNA(N,NY,NX)=0.0
+              XQSKA(N,NY,NX)=0.0
+              XQSOH(N,NY,NX)=0.0
+              XQSSO(N,NY,NX)=0.0
+              XQSCL(N,NY,NX)=0.0
+              XQSC3(N,NY,NX)=0.0
+              XQSHC(N,NY,NX)=0.0
+              XQSAL1(N,NY,NX)=0.0
+              XQSAL2(N,NY,NX)=0.0
+              XQSAL3(N,NY,NX)=0.0
+              XQSAL4(N,NY,NX)=0.0
+              XQSALS(N,NY,NX)=0.0
+              XQSFE1(N,NY,NX)=0.0
+              XQSFE2(N,NY,NX)=0.0
+              XQSFE3(N,NY,NX)=0.0
+              XQSFE4(N,NY,NX)=0.0
+              XQSFES(N,NY,NX)=0.0
+              XQSCAO(N,NY,NX)=0.0
+              XQSCAC(N,NY,NX)=0.0
+              XQSCAH(N,NY,NX)=0.0
+              XQSCAS(N,NY,NX)=0.0
+              XQSMGO(N,NY,NX)=0.0
+              XQSMGC(N,NY,NX)=0.0
+              XQSMGH(N,NY,NX)=0.0
+              XQSMGS(N,NY,NX)=0.0
+              XQSNAC(N,NY,NX)=0.0
+              XQSNAS(N,NY,NX)=0.0
+              XQSKAS(N,NY,NX)=0.0
+              XQSH0P(N,NY,NX)=0.0
+              XQSH1P(N,NY,NX)=0.0
+              XQSH3P(N,NY,NX)=0.0
+              XQSF1P(N,NY,NX)=0.0
+              XQSF2P(N,NY,NX)=0.0
+              XQSC0P(N,NY,NX)=0.0
+              XQSC1P(N,NY,NX)=0.0
+              XQSC2P(N,NY,NX)=0.0
+              XQSM1P(N,NY,NX)=0.0
+            ENDIF
+            XALFLS(N,L,NY,NX)=0.0
+            XFEFLS(N,L,NY,NX)=0.0
+            XHYFLS(N,L,NY,NX)=0.0
+            XCAFLS(N,L,NY,NX)=0.0
+            XMGFLS(N,L,NY,NX)=0.0
+            XNAFLS(N,L,NY,NX)=0.0
+            XKAFLS(N,L,NY,NX)=0.0
+            XOHFLS(N,L,NY,NX)=0.0
+            XSOFLS(N,L,NY,NX)=0.0
+            XCLFLS(N,L,NY,NX)=0.0
+            XC3FLS(N,L,NY,NX)=0.0
+            XHCFLS(N,L,NY,NX)=0.0
+            XAL1FS(N,L,NY,NX)=0.0
+            XAL2FS(N,L,NY,NX)=0.0
+            XAL3FS(N,L,NY,NX)=0.0
+            XAL4FS(N,L,NY,NX)=0.0
+            XALSFS(N,L,NY,NX)=0.0
+            XFE1FS(N,L,NY,NX)=0.0
+            XFE2FS(N,L,NY,NX)=0.0
+            XFE3FS(N,L,NY,NX)=0.0
+            XFE4FS(N,L,NY,NX)=0.0
+            XFESFS(N,L,NY,NX)=0.0
+            XCAOFS(N,L,NY,NX)=0.0
+            XCACFS(N,L,NY,NX)=0.0
+            XCAHFS(N,L,NY,NX)=0.0
+            XCASFS(N,L,NY,NX)=0.0
+            XMGOFS(N,L,NY,NX)=0.0
+            XMGCFS(N,L,NY,NX)=0.0
+            XMGHFS(N,L,NY,NX)=0.0
+            XMGSFS(N,L,NY,NX)=0.0
+            XNACFS(N,L,NY,NX)=0.0
+            XNASFS(N,L,NY,NX)=0.0
+            XKASFS(N,L,NY,NX)=0.0
+            XH0PFS(N,L,NY,NX)=0.0
+            XH3PFS(N,L,NY,NX)=0.0
+            XF1PFS(N,L,NY,NX)=0.0
+            XF2PFS(N,L,NY,NX)=0.0
+            XC0PFS(N,L,NY,NX)=0.0
+            XC1PFS(N,L,NY,NX)=0.0
+            XC2PFS(N,L,NY,NX)=0.0
+            XM1PFS(N,L,NY,NX)=0.0
+            XH0BFB(N,L,NY,NX)=0.0
+            XH3BFB(N,L,NY,NX)=0.0
+            XF1BFB(N,L,NY,NX)=0.0
+            XF2BFB(N,L,NY,NX)=0.0
+            XC0BFB(N,L,NY,NX)=0.0
+            XC1BFB(N,L,NY,NX)=0.0
+            XC2BFB(N,L,NY,NX)=0.0
+            XM1BFB(N,L,NY,NX)=0.0
+            XALFHS(N,L,NY,NX)=0.0
+            XFEFHS(N,L,NY,NX)=0.0
+            XHYFHS(N,L,NY,NX)=0.0
+            XCAFHS(N,L,NY,NX)=0.0
+            XMGFHS(N,L,NY,NX)=0.0
+            XNAFHS(N,L,NY,NX)=0.0
+            XKAFHS(N,L,NY,NX)=0.0
+            XOHFHS(N,L,NY,NX)=0.0
+            XSOFHS(N,L,NY,NX)=0.0
+            XCLFHS(N,L,NY,NX)=0.0
+            XC3FHS(N,L,NY,NX)=0.0
+            XHCFHS(N,L,NY,NX)=0.0
+            XAL1HS(N,L,NY,NX)=0.0
+            XAL2HS(N,L,NY,NX)=0.0
+            XAL3HS(N,L,NY,NX)=0.0
+            XAL4HS(N,L,NY,NX)=0.0
+            XALSHS(N,L,NY,NX)=0.0
+            XFE1HS(N,L,NY,NX)=0.0
+            XFE2HS(N,L,NY,NX)=0.0
+            XFE3HS(N,L,NY,NX)=0.0
+            XFE4HS(N,L,NY,NX)=0.0
+            XFESHS(N,L,NY,NX)=0.0
+            XCAOHS(N,L,NY,NX)=0.0
+            XCACHS(N,L,NY,NX)=0.0
+            XCAHHS(N,L,NY,NX)=0.0
+            XCASHS(N,L,NY,NX)=0.0
+            XMGOHS(N,L,NY,NX)=0.0
+            XMGCHS(N,L,NY,NX)=0.0
+            XMGHHS(N,L,NY,NX)=0.0
+            XMGSHS(N,L,NY,NX)=0.0
+            XNACHS(N,L,NY,NX)=0.0
+            XNASHS(N,L,NY,NX)=0.0
+            XKASHS(N,L,NY,NX)=0.0
+            XH0PHS(N,L,NY,NX)=0.0
+            XH3PHS(N,L,NY,NX)=0.0
+            XF1PHS(N,L,NY,NX)=0.0
+            XF2PHS(N,L,NY,NX)=0.0
+            XC0PHS(N,L,NY,NX)=0.0
+            XC1PHS(N,L,NY,NX)=0.0
+            XC2PHS(N,L,NY,NX)=0.0
+            XM1PHS(N,L,NY,NX)=0.0
+            XH0BHB(N,L,NY,NX)=0.0
+            XH3BHB(N,L,NY,NX)=0.0
+            XF1BHB(N,L,NY,NX)=0.0
+            XF2BHB(N,L,NY,NX)=0.0
+            XC0BHB(N,L,NY,NX)=0.0
+            XC1BHB(N,L,NY,NX)=0.0
+            XC2BHB(N,L,NY,NX)=0.0
+            XM1BHB(N,L,NY,NX)=0.0
+8880      CONTINUE
+8885    CONTINUE
       ENDIF
 8890  CONTINUE
 8895  CONTINUE
-      end subroutine ResetSaltModelArrays
+  end subroutine ResetSaltModelArrays
 !------------------------------------------------------------------------------------------
 
       subroutine SetSoilPropertyAftDisturbance(I,J,NY,NX)
@@ -1686,59 +1685,59 @@ module Hour1Mod
       end subroutine UpdateTotalSOC
 !------------------------------------------------------------------------------------------
 
-      subroutine GetSoilHydraulicVars(L,NY,NX)
-      implicit none
-      integer, intent(in) :: L,NY,NX
+  subroutine GetSoilHydraulicVars(L,NY,NX)
+  implicit none
+  integer, intent(in) :: L,NY,NX
 
-      integer :: K
-!     begin_execution
-!     WATER POTENTIALS
+  integer :: K
+! begin_execution
+! WATER POTENTIALS
 !
-!     FC,WP=water contents at field capacity,wilting point,saturation
-!     PSISM,PSISE=matric,saturation water potential
-!     SRP=parameter for deviation from linear log-log water retention
-!     FC,WP=water contents at field capacity,wilting point from soil file
-!     FCL,WPL=log FC,WP
-!     FCD,PSD=FCL-WPL,log(POROS)-FCL
-!     FCI,WPI=FC,WP of ice
-!     THETIX=ice concentration
+! FC,WP=water contents at field capacity,wilting point,saturation
+! PSISM,PSISE=matric,saturation water potential
+! SRP=parameter for deviation from linear log-log water retention
+! FC,WP=water contents at field capacity,wilting point from soil file
+! FCL,WPL=log FC,WP
+! FCD,PSD=FCL-WPL,log(POROS)-FCL
+! FCI,WPI=FC,WP of ice
+! THETIX=ice concentration
 !
-      IF(BKVL(L,NY,NX).GT.ZEROS(NY,NX) &
-      .AND.VOLX(L,NY,NX).GT.ZEROS(NY,NX))THEN
-      THETW1=AMAX1(0.0,AMIN1(POROS(L,NY,NX) &
+  IF(BKVL(L,NY,NX).GT.ZEROS(NY,NX) &
+    .AND.VOLX(L,NY,NX).GT.ZEROS(NY,NX))THEN
+    THETW1=AMAX1(0.0,AMIN1(POROS(L,NY,NX) &
       ,VOLW(L,NY,NX)/VOLY(L,NY,NX)))
-      IF(THETW1.LT.FC(L,NY,NX))THEN
+    IF(THETW1.LT.FC(L,NY,NX))THEN
       PSISM(L,NY,NX)=AMAX1(PSIHY,-EXP(PSIMX(NY,NX) &
-      +((FCL(L,NY,NX)-LOG(THETW1)) &
-      /FCD(L,NY,NX)*PSIMD(NY,NX))))
-      ELSEIF(THETW1.LT.POROS(L,NY,NX)-DTHETW)THEN
+        +((FCL(L,NY,NX)-LOG(THETW1)) &
+        /FCD(L,NY,NX)*PSIMD(NY,NX))))
+    ELSEIF(THETW1.LT.POROS(L,NY,NX)-DTHETW)THEN
       PSISM(L,NY,NX)=-EXP(PSIMS(NY,NX) &
-      +(((PSL(L,NY,NX)-LOG(THETW1)) &
-      /PSD(L,NY,NX))**SRP(L,NY,NX)*PSISD(NY,NX)))
-      ELSE
+        +(((PSL(L,NY,NX)-LOG(THETW1)) &
+        /PSD(L,NY,NX))**SRP(L,NY,NX)*PSISD(NY,NX)))
+    ELSE
       PSISM(L,NY,NX)=PSISE(L,NY,NX)
-      ENDIF
-      ELSEIF(VOLX(L,NY,NX).GT.ZEROS2(NY,NX))THEN
-      FCX=FCI*THETI(L,NY,NX)
-      WPX=WPI*THETI(L,NY,NX)
-      FCLX=LOG(FCX)
-      WPLX=LOG(WPX)
-      PSDX=PSL(L,NY,NX)-FCLX
-      FCDX=FCLX-WPLX
-      IF(THETW(L,NY,NX).LT.FCX)THEN
+    ENDIF
+  ELSEIF(VOLX(L,NY,NX).GT.ZEROS2(NY,NX).and.THETI(L,NY,NX)>ZEROS2(NY,NX))THEN
+    FCX=FCI*THETI(L,NY,NX)
+    WPX=WPI*THETI(L,NY,NX)
+    FCLX=LOG(FCX)
+    WPLX=LOG(WPX)
+    PSDX=PSL(L,NY,NX)-FCLX
+    FCDX=FCLX-WPLX
+    IF(THETW(L,NY,NX).LT.FCX)THEN
       PSISM(L,NY,NX)=AMAX1(PSIHY,-EXP(PSIMX(NY,NX) &
-      +((FCLX-LOG(THETW(L,NY,NX))) &
-      /FCDX*PSIMD(NY,NX))))
-      ELSEIF(THETW(L,NY,NX).LT.POROS(L,NY,NX)-DTHETW)THEN
+        +((FCLX-LOG(THETW(L,NY,NX))) &
+        /FCDX*PSIMD(NY,NX))))
+    ELSEIF(THETW(L,NY,NX).LT.POROS(L,NY,NX)-DTHETW)THEN
       PSISM(L,NY,NX)=-EXP(PSIMS(NY,NX) &
-      +(((PSL(L,NY,NX)-LOG(THETW(L,NY,NX))) &
-      /PSDX)*PSISD(NY,NX)))
-      ELSE
+        +(((PSL(L,NY,NX)-LOG(THETW(L,NY,NX))) &
+        /PSDX)*PSISD(NY,NX)))
+    ELSE
       PSISM(L,NY,NX)=PSISE(L,NY,NX)
-      ENDIF
-      ELSE
-      PSISM(L,NY,NX)=PSISE(L,NY,NX)
-      ENDIF
+    ENDIF
+  ELSE
+    PSISM(L,NY,NX)=PSISE(L,NY,NX)
+  ENDIF
 !     WRITE(*,443)'PSISM',I,J,NX,NY,L,PSISM(L,NY,NX)
 !    2,THETW(L,NY,NX),THETI(L,NY,NX),FCX,WPX,POROS(L,NY,NX)
 !
@@ -1746,10 +1745,9 @@ module Hour1Mod
 !
 !     PSISM,PSISO,PSISH,PSIST=matric,osmotic,gravimetric,total water potential
 !
-      PSISO(L,NY,NX)=-8.3143E-06*TKS(L,NY,NX)*CION(L,NY,NX)
-      PSISH(L,NY,NX)=0.0098*(ALT(NY,NX)-DPTH(L,NY,NX))
-      PSIST(L,NY,NX)=AMIN1(0.0,PSISM(L,NY,NX)+PSISO(L,NY,NX) &
-      +PSISH(L,NY,NX))
+  PSISO(L,NY,NX)=-8.3143E-06*TKS(L,NY,NX)*CION(L,NY,NX)
+  PSISH(L,NY,NX)=0.0098*(ALT(NY,NX)-DPTH(L,NY,NX))
+  PSIST(L,NY,NX)=AMIN1(0.0,PSISM(L,NY,NX)+PSISO(L,NY,NX)+PSISH(L,NY,NX))
 !     IF((I/30)*30.EQ.I.AND.J.EQ.15)THEN
 !     WRITE(*,1113)'PSISM1',I,J,NX,NY,L,PSISM(L,NY,NX)
 !    2,THETW(L,NY,NX),THETW1,VOLX(L,NY,NX)
@@ -1783,10 +1781,9 @@ module Hour1Mod
 !
 !     CNDU=soil hydraulic conductivity for root uptake
 !
-      K=MAX(1,MIN(100,INT(100.0*(POROS(L,NY,NX)-THETW(L,NY,NX)) &
-      /POROS(L,NY,NX))+1))
-      CNDU(L,NY,NX)=0.5*(HCND(1,K,L,NY,NX)+HCND(3,K,L,NY,NX))
-      end subroutine GetSoilHydraulicVars
+  K=MAX(1,MIN(100,INT(100.0*(POROS(L,NY,NX)-THETW(L,NY,NX))/POROS(L,NY,NX))+1))
+  CNDU(L,NY,NX)=0.5*(HCND(1,K,L,NY,NX)+HCND(3,K,L,NY,NX))
+  end subroutine GetSoilHydraulicVars
 !------------------------------------------------------------------------------------------
 
       subroutine DiagActiveLayerDepth(L,NY,NX)

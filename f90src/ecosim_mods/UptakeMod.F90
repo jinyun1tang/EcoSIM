@@ -1,29 +1,30 @@
 module UptakeMod
-      use data_kind_mod, only : r8 => SHR_KIND_R8
-      use StomateMod   , only : stomate
-      implicit none
+  use data_kind_mod, only : r8 => SHR_KIND_R8
+  use StomateMod   , only : stomate
+  use minimathmod  , only : safe_adb
+  implicit none
 
-      private
-      include "parameters.h"
-      include "blkc.h"
-      include "blk1cp.h"
-      include "blk1cr.h"
-      include "blk1g.h"
-      include "blk1n.h"
-      include "blk1p.h"
-      include "blk2a.h"
-      include "blk2b.h"
-      include "blk2c.h"
-      include "blk3.h"
-      include "blk5.h"
-      include "blk8a.h"
-      include "blk8b.h"
-      include "blk9a.h"
-      include "blk9b.h"
-      include "blk9c.h"
-      include "blk10.h"
-      include "blk11a.h"
-      include "blk11b.h"
+  private
+  include "parameters.h"
+  include "blkc.h"
+  include "blk1cp.h"
+  include "blk1cr.h"
+  include "blk1g.h"
+  include "blk1n.h"
+  include "blk1p.h"
+  include "blk2a.h"
+  include "blk2b.h"
+  include "blk2c.h"
+  include "blk3.h"
+  include "blk5.h"
+  include "blk8a.h"
+  include "blk8b.h"
+  include "blk9a.h"
+  include "blk9b.h"
+  include "blk9c.h"
+  include "blk10.h"
+  include "blk11a.h"
+  include "blk11b.h"
       include "blk12a.h"
       include "blk12b.h"
       include "blk13a.h"
@@ -1674,7 +1675,7 @@ module UptakeMod
 !
       POSGX=POSGL(L,NY,NX)*TORT(NPH,L,NY,NX)
       PATHL=AMIN1(PATH(N,L),RRADL(N,L)+SQRT(2.0*POSGX))
-      DIFFL=POSGX*RTARR(N,L)/LOG(PATHL/RRADL(N,L))
+      DIFFL=POSGX*safe_adb(RTARR(N,L),LOG(PATHL/RRADL(N,L)))
 
       call UptakeH2PO4(N,L,NZ,NY,NX)
 
@@ -1701,38 +1702,38 @@ module UptakeMod
       end subroutine UptakeMineralPhosporhus
 !------------------------------------------------------------------------
 
-      subroutine UptakeNO3(N,L,NZ,NY,NX)
+  subroutine UptakeNO3(N,L,NZ,NY,NX)
 
-      implicit none
-      integer, intent(in) :: N,L
-      integer, intent(in) :: NZ,NY,NX
+  implicit none
+  integer, intent(in) :: N,L
+  integer, intent(in) :: NZ,NY,NX
 !
-!     PARAMETERS FOR RADIAL MASS FLOW AND DIFFUSION OF NO3
-!     FROM SOIL TO ROOT
+! PARAMETERS FOR RADIAL MASS FLOW AND DIFFUSION OF NO3
+! FROM SOIL TO ROOT
 !
-!     ZOSGL=NO3 diffusivity
-!     TORT=soil tortuosity
-!     RRADL=root radius
-!     PATH=path length of water and nutrient uptake
-!     DIFFL=NO3 diffusion per plant
+! ZOSGL=NO3 diffusivity
+! TORT=soil tortuosity
+! RRADL=root radius
+! PATH=path length of water and nutrient uptake
+! DIFFL=NO3 diffusion per plant
 !
-      ZOSGX=ZOSGL(L,NY,NX)*TORT(NPH,L,NY,NX)
-      PATHL=AMIN1(PATH(N,L),RRADL(N,L)+SQRT(2.0*ZOSGX))
-      DIFFL=ZOSGX*RTARR(N,L)/LOG(PATHL/RRADL(N,L))
+  ZOSGX=ZOSGL(L,NY,NX)*TORT(NPH,L,NY,NX)
+  PATHL=AMIN1(PATH(N,L),RRADL(N,L)+SQRT(2.0*ZOSGX))
+  DIFFL=ZOSGX*safe_adb(RTARR(N,L),LOG(PATHL/RRADL(N,L)))
 !
-!     NO3 UPTAKE IN NON-BAND SOIL ZONE
+! NO3 UPTAKE IN NON-BAND SOIL ZONE
 !
-!     VLNO3,VLNOB=fraction of soil volume in NO3 non-band,band
+! VLNO3,VLNOB=fraction of soil volume in NO3 non-band,band
 !     CNO3S=NO3 concentration in non-band
 !     UPMXZO,UPKMZO,UPMNZO=NO3 max uptake,Km,min concn from PFT file
 !     UPWTRP=root water uptake per plant
 !     RMFNO3=soil-root convective NO3 flux per plant in non-band
 !     DIFNO3=soil-root NO3 diffusion per plant in non-band
 !
-      IF(VLNO3(L,NY,NX).GT.ZERO.AND.CNO3S(L,NY,NX) &
-      .GT.UPMNZO(N,NZ,NY,NX))THEN
-      RMFNO3=UPWTRP*CNO3S(L,NY,NX)*VLNO3(L,NY,NX)
-      DIFNO3=DIFFL*VLNO3(L,NY,NX)
+  IF(VLNO3(L,NY,NX).GT.ZERO.AND.CNO3S(L,NY,NX) &
+    .GT.UPMNZO(N,NZ,NY,NX))THEN
+    RMFNO3=UPWTRP*CNO3S(L,NY,NX)*VLNO3(L,NY,NX)
+    DIFNO3=DIFFL*VLNO3(L,NY,NX)
 !
 !     NO3 UPTAKE DEMAND FROM ROOT UPTAKE PARAMETERS ENTERED IN 'READQ'
 !     AND FROM ROOT SURFACE AREA, C AND N CONSTRAINTS CALCULATED ABOVE
@@ -1866,81 +1867,81 @@ module UptakeMod
       end subroutine UptakeNO3
 !------------------------------------------------------------------------
 
-      subroutine UptakeNH4(N,L,NZ,NY,NX)
+  subroutine UptakeNH4(N,L,NZ,NY,NX)
 
-      implicit none
-      integer, intent(in) :: N,L
-      integer, intent(in) :: NZ,NY,NX
-!     begin_execution
-!     ZNSGL=NH4 diffusivity
-!     TORT=soil tortuosity
-!     PATH=path length of water and nutrient uptake
-!     RRADL=root radius
-!     DIFFL=NH4 diffusion per plant
+  implicit none
+  integer, intent(in) :: N,L
+  integer, intent(in) :: NZ,NY,NX
+! begin_execution
+! ZNSGL=NH4 diffusivity
+! TORT=soil tortuosity
+! PATH=path length of water and nutrient uptake
+! RRADL=root radius
+! DIFFL=NH4 diffusion per plant
 !
-      ZNSGX=ZNSGL(L,NY,NX)*TORT(NPH,L,NY,NX)
-      PATHL=AMIN1(PATH(N,L),RRADL(N,L)+SQRT(2.0*ZNSGX))
-      DIFFL=ZNSGX*RTARR(N,L)/LOG(PATHL/RRADL(N,L))
+  ZNSGX=ZNSGL(L,NY,NX)*TORT(NPH,L,NY,NX)
+  PATHL=AMIN1(PATH(N,L),RRADL(N,L)+SQRT(2.0*ZNSGX))
+  DIFFL=ZNSGX*safe_adb(RTARR(N,L),LOG(PATHL/RRADL(N,L)))
 !
-!     NH4 UPTAKE IN NON-BAND SOIL ZONE
+! NH4 UPTAKE IN NON-BAND SOIL ZONE
 !
-!     VLNH4,VLNHB=fraction of soil volume in NH4 non-band,band
-!     CNH4S=NH4 concentration in non-band
-!     UPMXZH,UPKMZH,UPMNZH=NH4 max uptake,Km,min concn from PFT file
-!     UPWTRP=root water uptake per plant
-!     RMFNH4=soil-root convective NH4 flux per plant in non-band
-!     DIFNH4=soil-root NH4 diffusion per plant in non-band
+! VLNH4,VLNHB=fraction of soil volume in NH4 non-band,band
+! CNH4S=NH4 concentration in non-band
+! UPMXZH,UPKMZH,UPMNZH=NH4 max uptake,Km,min concn from PFT file
+! UPWTRP=root water uptake per plant
+! RMFNH4=soil-root convective NH4 flux per plant in non-band
+! DIFNH4=soil-root NH4 diffusion per plant in non-band
 !
-      IF(VLNH4(L,NY,NX).GT.ZERO.AND.CNH4S(L,NY,NX) &
-      .GT.UPMNZH(N,NZ,NY,NX))THEN
-      RMFNH4=UPWTRP*CNH4S(L,NY,NX)*VLNH4(L,NY,NX)
-      DIFNH4=DIFFL*VLNH4(L,NY,NX)
+  IF(VLNH4(L,NY,NX).GT.ZERO.AND.CNH4S(L,NY,NX) &
+    .GT.UPMNZH(N,NZ,NY,NX))THEN
+    RMFNH4=UPWTRP*CNH4S(L,NY,NX)*VLNH4(L,NY,NX)
+    DIFNH4=DIFFL*VLNH4(L,NY,NX)
 !
-!     NH4 UPTAKE DEMAND FROM ROOT UPTAKE PARAMETERS ENTERED IN 'READQ'
-!     AND FROM ROOT SURFACE AREA, C AND N CONSTRAINTS CALCULATED ABOVE
+!   NH4 UPTAKE DEMAND FROM ROOT UPTAKE PARAMETERS ENTERED IN 'READQ'
+!   AND FROM ROOT SURFACE AREA, C AND N CONSTRAINTS CALCULATED ABOVE
 !
-!     UPMXP,UPMX=max NH4 uptake in non-band unlimited,limited by O2
-!     RTARP=root surface area per plant from grosub.f
-!     FWSRT=protein concentration relative to 5%
-!     TFN4=temperature function for root growth
-!     FCUP,FZUP=limitn to active uptake respiration from CCPOLR,CZPOLR
-!     WFR=constraint by O2 consumption on all biological processes
+!   UPMXP,UPMX=max NH4 uptake in non-band unlimited,limited by O2
+!   RTARP=root surface area per plant from grosub.f
+!   FWSRT=protein concentration relative to 5%
+!   TFN4=temperature function for root growth
+!   FCUP,FZUP=limitn to active uptake respiration from CCPOLR,CZPOLR
+!   WFR=constraint by O2 consumption on all biological processes
 !
-      UPMXP=UPMXZH(N,NZ,NY,NX)*RTARP(N,L,NZ,NY,NX) &
+    UPMXP=UPMXZH(N,NZ,NY,NX)*RTARP(N,L,NZ,NY,NX) &
       *FWSRT*TFN4(L,NZ,NY,NX)*VLNH4(L,NY,NX)*AMIN1(FCUP,FZUP)
-      UPMX=UPMXP*WFR(N,L,NZ,NY,NX)
+    UPMX=UPMXP*WFR(N,L,NZ,NY,NX)
 !
-!     SOLUTION FOR MASS FLOW + DIFFUSION OF NH4 IN AQUEOUS PHASE OF
-!     SOIL = ACTIVE UPTAKE OF NH4 BY ROOT, CONSTRAINED BY COMPETITION
-!     WITH OTHER ROOT AND MICROBIAL POPULATIONS
+!   SOLUTION FOR MASS FLOW + DIFFUSION OF NH4 IN AQUEOUS PHASE OF
+!   SOIL = ACTIVE UPTAKE OF NH4 BY ROOT, CONSTRAINED BY COMPETITION
+!   WITH OTHER ROOT AND MICROBIAL POPULATIONS
 !
-!     RMFNH4=soil-root convective NH4 flux per plant in non-band
-!     DIFNH4=soil-root NH4 diffusion per plant in non-band
-!     CNH4S=NH4 concentration in non-band
-!     UPMXZH,UPKMZH,UPMNZH=NH4 max uptake,Km,min concn from PFT file
-!     RTKNH4,RTKNHP=NH4 uptake per plant in non-band lmtd,unlmtd by O2
-!     ZNH4M,ZNH4X=minimum,maximum NH4 available for uptake in non-band
-!     FNH4X=fraction of total NH4 uptake in non-band by root,myco populn
-!     RUNNHP,RUPNH4=NH4 uptake in non-band unlimited,limited by NH4
-!     RUONH4=NH4 uptake in non-band unlimited by O2
-!     RUCNH4=NH4 uptake in non-band unlimited by nonstructural C
+!   RMFNH4=soil-root convective NH4 flux per plant in non-band
+!   DIFNH4=soil-root NH4 diffusion per plant in non-band
+!   CNH4S=NH4 concentration in non-band
+!   UPMXZH,UPKMZH,UPMNZH=NH4 max uptake,Km,min concn from PFT file
+!   RTKNH4,RTKNHP=NH4 uptake per plant in non-band lmtd,unlmtd by O2
+!   ZNH4M,ZNH4X=minimum,maximum NH4 available for uptake in non-band
+!   FNH4X=fraction of total NH4 uptake in non-band by root,myco populn
+!   RUNNHP,RUPNH4=NH4 uptake in non-band unlimited,limited by NH4
+!   RUONH4=NH4 uptake in non-band unlimited by O2
+!   RUCNH4=NH4 uptake in non-band unlimited by nonstructural C
 !
-      X=(DIFNH4+RMFNH4)*CNH4S(L,NY,NX)
-      Y=DIFNH4*UPMNZH(N,NZ,NY,NX)
-      B=-UPMX-DIFNH4*UPKMZH(N,NZ,NY,NX)-X+Y
-      C=(X-Y)*UPMX
-      RTKNH4=(-B-SQRT(B*B-4.0*C))/2.0
-      BP=-UPMXP-DIFNH4*UPKMZH(N,NZ,NY,NX)-X+Y
-      CP=(X-Y)*UPMXP
-      RTKNHP=(-BP-SQRT(BP*BP-4.0*CP))/2.0
-      ZNH4M=UPMNZH(N,NZ,NY,NX)*VOLW(L,NY,NX)*VLNH4(L,NY,NX)
-      ZNH4X=AMAX1(0.0,FNH4X*(ZNH4S(L,NY,NX)-ZNH4M))
-      RUNNHP(N,L,NZ,NY,NX)=AMAX1(0.0,RTKNH4*PP(NZ,NY,NX))
-      RUPNH4(N,L,NZ,NY,NX)=AMIN1(ZNH4X,RUNNHP(N,L,NZ,NY,NX))
-      RUONH4(N,L,NZ,NY,NX)=AMIN1(ZNH4X,AMAX1(0.0 &
+    X=(DIFNH4+RMFNH4)*CNH4S(L,NY,NX)
+    Y=DIFNH4*UPMNZH(N,NZ,NY,NX)
+    B=-UPMX-DIFNH4*UPKMZH(N,NZ,NY,NX)-X+Y
+    C=(X-Y)*UPMX
+    RTKNH4=(-B-SQRT(B*B-4.0*C))/2.0
+    BP=-UPMXP-DIFNH4*UPKMZH(N,NZ,NY,NX)-X+Y
+    CP=(X-Y)*UPMXP
+    RTKNHP=(-BP-SQRT(BP*BP-4.0*CP))/2.0
+    ZNH4M=UPMNZH(N,NZ,NY,NX)*VOLW(L,NY,NX)*VLNH4(L,NY,NX)
+    ZNH4X=AMAX1(0.0,FNH4X*(ZNH4S(L,NY,NX)-ZNH4M))
+    RUNNHP(N,L,NZ,NY,NX)=AMAX1(0.0,RTKNH4*PP(NZ,NY,NX))
+    RUPNH4(N,L,NZ,NY,NX)=AMIN1(ZNH4X,RUNNHP(N,L,NZ,NY,NX))
+    RUONH4(N,L,NZ,NY,NX)=AMIN1(ZNH4X,AMAX1(0.0 &
       ,RTKNHP*PP(NZ,NY,NX)))
-      RUCNH4(N,L,NZ,NY,NX)=RUPNH4(N,L,NZ,NY,NX)/FCUP
-!     IF(NX.EQ.1.OR.NZ.EQ.4)THEN
+    RUCNH4(N,L,NZ,NY,NX)=RUPNH4(N,L,NZ,NY,NX)/FCUP
+!   IF(NX.EQ.1.OR.NZ.EQ.4)THEN
 !     WRITE(*,1110)'UPNH4',I,J,NZ,L,N,RUNNHP(N,L,NZ,NY,NX)
 !    2,RUPNH4(N,L,NZ,NY,NX),RTKNH4,RMFNH4,X,Y,B,C,UPMX,UPMXP
 !    2,WFR(N,L,NZ,NY,NX),CNH4S(L,NY,NX),DIFNH,RTDNP(N,L,NZ,NY,NX)
@@ -1955,79 +1956,79 @@ module UptakeMod
 !    4,DIFFL,ZNSGX,RTARR(N,L),PATHL,RRADL(N,L),VLNH4(L,NY,NX)
 !1110  FORMAT(A8,5I4,100E24.16)
 !     ENDIF
-      ELSE
-      RUNNHP(N,L,NZ,NY,NX)=0.0
-      RUPNH4(N,L,NZ,NY,NX)=0.0
-      RUONH4(N,L,NZ,NY,NX)=0.0
-      RUCNH4(N,L,NZ,NY,NX)=0.0
-      ENDIF
+  ELSE
+    RUNNHP(N,L,NZ,NY,NX)=0.0
+    RUPNH4(N,L,NZ,NY,NX)=0.0
+    RUONH4(N,L,NZ,NY,NX)=0.0
+    RUCNH4(N,L,NZ,NY,NX)=0.0
+  ENDIF
 !
-!     NH4 UPTAKE IN BAND SOIL ZONE
+! NH4 UPTAKE IN BAND SOIL ZONE
 !
-!     VLNH4,VLNHB=fraction of soil volume in NH4 non-band,band
-!     CNH4B=NH4 concentration in band
-!     UPMXZH,UPKMZH,UPMNZH=NH4 max uptake,Km,min concn from PFT file
-!     UPWTRP=root water uptake per plant
-!     RMFNHB=soil-root convective NH4 flux per plant in band
-!     DIFNHB=soil-root NH4 diffusion per plant in band
+! VLNH4,VLNHB=fraction of soil volume in NH4 non-band,band
+! CNH4B=NH4 concentration in band
+! UPMXZH,UPKMZH,UPMNZH=NH4 max uptake,Km,min concn from PFT file
+! UPWTRP=root water uptake per plant
+! RMFNHB=soil-root convective NH4 flux per plant in band
+! DIFNHB=soil-root NH4 diffusion per plant in band
 !
 
-      IF(VLNHB(L,NY,NX).GT.ZERO.AND.CNH4B(L,NY,NX) &
-      .GT.UPMNZH(N,NZ,NY,NX))THEN
-      RMFNHB=UPWTRP*CNH4B(L,NY,NX)*VLNHB(L,NY,NX)
-      DIFNHB=DIFFL*VLNHB(L,NY,NX)
+  IF(VLNHB(L,NY,NX).GT.ZERO.AND.CNH4B(L,NY,NX) &
+    .GT.UPMNZH(N,NZ,NY,NX))THEN
+    RMFNHB=UPWTRP*CNH4B(L,NY,NX)*VLNHB(L,NY,NX)
+    DIFNHB=DIFFL*VLNHB(L,NY,NX)
 !
-!     NH4 UPTAKE DEMAND FROM ROOT UPTAKE PARAMETERS ENTERED IN 'READQ'
-!     AND FROM ROOT SURFACE AREA, C AND N CONSTRAINTS CALCULATED ABOVE
+!   NH4 UPTAKE DEMAND FROM ROOT UPTAKE PARAMETERS ENTERED IN 'READQ'
+!   AND FROM ROOT SURFACE AREA, C AND N CONSTRAINTS CALCULATED ABOVE
 !
-!     UPMXP,UPMX=maximum NH4 uptake in band unlimited,limited by O2
-!     RTARP=root surface area per plant from grosub.f
-!     FWSRT=protein concentration relative to 5%
-!     TFN4=temperature function for root growth
-!     FCUP,FZUP=limitn to active uptake respiration from CCPOLR,CZPOLR
-!     WFR=constraint by O2 consumption on all biological processes
+!   UPMXP,UPMX=maximum NH4 uptake in band unlimited,limited by O2
+!   RTARP=root surface area per plant from grosub.f
+!   FWSRT=protein concentration relative to 5%
+!   TFN4=temperature function for root growth
+!   FCUP,FZUP=limitn to active uptake respiration from CCPOLR,CZPOLR
+!   WFR=constraint by O2 consumption on all biological processes
 !
-      UPMXP=UPMXZH(N,NZ,NY,NX)*RTARP(N,L,NZ,NY,NX) &
+    UPMXP=UPMXZH(N,NZ,NY,NX)*RTARP(N,L,NZ,NY,NX) &
       *FWSRT*TFN4(L,NZ,NY,NX)*VLNHB(L,NY,NX)*AMIN1(FCUP,FZUP)
-      UPMX=UPMXP*WFR(N,L,NZ,NY,NX)
+    UPMX=UPMXP*WFR(N,L,NZ,NY,NX)
 !
-!     SOLUTION FOR MASS FLOW + DIFFUSION OF NH4 IN AQUEOUS PHASE OF
-!     SOIL = ACTIVE UPTAKE OF NH4 BY ROOT, CONSTRAINED BY COMPETITION
-!     WITH OTHER ROOT AND MICROBIAL POPULATIONS
+!   SOLUTION FOR MASS FLOW + DIFFUSION OF NH4 IN AQUEOUS PHASE OF
+!   SOIL = ACTIVE UPTAKE OF NH4 BY ROOT, CONSTRAINED BY COMPETITION
+!   WITH OTHER ROOT AND MICROBIAL POPULATIONS
 !
-!     RMFNHB=soil-root convective NH4 flux per plant in band
-!     DIFNHB=soil-root NH4 diffusion per plant in band
-!     CNH4B=NH4 concentration in band
-!     UPMXZH,UPKMZH,UPMNZH=NH4 max uptake,Km,min concn from PFT file
-!     RTKNHB,RTKNBP=NH4 uptake per plant in band lmtd,unlmtd by O2
-!     ZNHBM,ZNHBX=minimum,maximum NH4 available for uptake in band
-!     FNHBX=fraction of total NH4 uptake in band by root,myco populn
-!     RUNNBP,RUPNHB=NH4 uptake in band unlimited,limited by NH4
-!     RUONHB=NH4 uptake in band unlimited by O2
-!     RUCNHB=NH4 uptake in band unlimited by nonstructural C
+!   RMFNHB=soil-root convective NH4 flux per plant in band
+!   DIFNHB=soil-root NH4 diffusion per plant in band
+!   CNH4B=NH4 concentration in band
+!   UPMXZH,UPKMZH,UPMNZH=NH4 max uptake,Km,min concn from PFT file
+!   RTKNHB,RTKNBP=NH4 uptake per plant in band lmtd,unlmtd by O2
+!   ZNHBM,ZNHBX=minimum,maximum NH4 available for uptake in band
+!   FNHBX=fraction of total NH4 uptake in band by root,myco populn
+!   RUNNBP,RUPNHB=NH4 uptake in band unlimited,limited by NH4
+!   RUONHB=NH4 uptake in band unlimited by O2
+!   RUCNHB=NH4 uptake in band unlimited by nonstructural C
 !
-      X=(DIFNHB+RMFNHB)*CNH4B(L,NY,NX)
-      Y=DIFNHB*UPMNZH(N,NZ,NY,NX)
-      B=-UPMX-DIFNHB*UPKMZH(N,NZ,NY,NX)-X+Y
-      C=(X-Y)*UPMX
-      RTKNHB=(-B-SQRT(B*B-4.0*C))/2.0
-      BP=-UPMXP-DIFNHB*UPKMZH(N,NZ,NY,NX)-X+Y
-      CP=(X-Y)*UPMXP
-      RTKNBP=(-BP-SQRT(BP*BP-4.0*CP))/2.0
-      ZNHBM=UPMNZH(N,NZ,NY,NX)*VOLW(L,NY,NX)*VLNHB(L,NY,NX)
-      ZNHBX=AMAX1(0.0,FNHBX*(ZNH4B(L,NY,NX)-ZNHBM))
-      RUNNBP(N,L,NZ,NY,NX)=AMAX1(0.0,RTKNHB*PP(NZ,NY,NX))
-      RUPNHB(N,L,NZ,NY,NX)=AMIN1(ZNHBX,RUNNBP(N,L,NZ,NY,NX))
-      RUONHB(N,L,NZ,NY,NX)=AMIN1(ZNHBX,AMAX1(0.0 &
+    X=(DIFNHB+RMFNHB)*CNH4B(L,NY,NX)
+    Y=DIFNHB*UPMNZH(N,NZ,NY,NX)
+    B=-UPMX-DIFNHB*UPKMZH(N,NZ,NY,NX)-X+Y
+    C=(X-Y)*UPMX
+    RTKNHB=(-B-SQRT(B*B-4.0*C))/2.0
+    BP=-UPMXP-DIFNHB*UPKMZH(N,NZ,NY,NX)-X+Y
+    CP=(X-Y)*UPMXP
+    RTKNBP=(-BP-SQRT(BP*BP-4.0*CP))/2.0
+    ZNHBM=UPMNZH(N,NZ,NY,NX)*VOLW(L,NY,NX)*VLNHB(L,NY,NX)
+    ZNHBX=AMAX1(0.0,FNHBX*(ZNH4B(L,NY,NX)-ZNHBM))
+    RUNNBP(N,L,NZ,NY,NX)=AMAX1(0.0,RTKNHB*PP(NZ,NY,NX))
+    RUPNHB(N,L,NZ,NY,NX)=AMIN1(ZNHBX,RUNNBP(N,L,NZ,NY,NX))
+    RUONHB(N,L,NZ,NY,NX)=AMIN1(ZNHBX,AMAX1(0.0 &
       ,RTKNBP*PP(NZ,NY,NX)))
-      RUCNHB(N,L,NZ,NY,NX)=RUPNHB(N,L,NZ,NY,NX)/FCUP
-      ELSE
-      RUNNBP(N,L,NZ,NY,NX)=0.0
-      RUPNHB(N,L,NZ,NY,NX)=0.0
-      RUONHB(N,L,NZ,NY,NX)=0.0
-      RUCNHB(N,L,NZ,NY,NX)=0.0
-      ENDIF
-      end subroutine UptakeNH4
+    RUCNHB(N,L,NZ,NY,NX)=RUPNHB(N,L,NZ,NY,NX)/FCUP
+  ELSE
+    RUNNBP(N,L,NZ,NY,NX)=0.0
+    RUPNHB(N,L,NZ,NY,NX)=0.0
+    RUONHB(N,L,NZ,NY,NX)=0.0
+    RUCNHB(N,L,NZ,NY,NX)=0.0
+  ENDIF
+  end subroutine UptakeNH4
 !------------------------------------------------------------------------
 
       subroutine UptakeMineralNitrogen(N,L,NZ,NY,NX)

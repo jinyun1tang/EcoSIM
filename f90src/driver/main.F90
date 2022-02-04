@@ -141,6 +141,5 @@ PROGRAM main
 1000  continue
   if(do_rgres)then
     call regressiontest(trim(nmlfile),trim(case_name),NHW,NVN)
-  endif
-  STOP
+  endif  
 END program main
