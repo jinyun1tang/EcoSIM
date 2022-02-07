@@ -1,7 +1,8 @@
 module UptakeMod
   use data_kind_mod, only : r8 => SHR_KIND_R8
   use StomateMod   , only : stomate
-  use minimathmod  , only : safe_adb
+  use minimathmod  , only : safe_adb,vapsat
+  use EcosimConst
   implicit none
 
   private
@@ -186,7 +187,7 @@ module UptakeMod
       PSILT(NZ,NY,NX)=AMIN1(-1.0E-06,0.667*PSILT(NZ,NY,NX))
       EP(NZ,NY,NX)=0.0
       EVAPC(NZ,NY,NX)=0.0
-      HFLWC1=FLWC(NZ,NY,NX)*4.19*TKA(NY,NX)
+      HFLWC1=FLWC(NZ,NY,NX)*cpw*TKA(NY,NX)
 
       IF(ARLSS(NY,NX).GT.ZEROS(NY,NX))THEN
       FPC=ARLFS(NZ,NY,NX)/ARLSS(NY,NX)*AMIN1(1.0,0.5*ARLFC(NY,NX) &
@@ -199,7 +200,7 @@ module UptakeMod
 
       TKCX=TKC(NZ,NY,NX)
       WVPLT=AMAX1(0.0,WTLS(NZ,NY,NX)+WVSTK(NZ,NY,NX))
-      VHCPX=4.19*(WVPLT*VSTK+VOLWC(NZ,NY,NX)+VOLWP(NZ,NY,NX))
+      VHCPX=cpw*(WVPLT*VSTK+VOLWC(NZ,NY,NX)+VOLWP(NZ,NY,NX))
 !
 !     CONVERGENCE SOLUTION
 !
@@ -213,7 +214,7 @@ module UptakeMod
 !     DTKC=TKC-TKA for next hour
 !
       TKC(NZ,NY,NX)=TKCZ(NZ,NY,NX)
-      TCC(NZ,NY,NX)=TKC(NZ,NY,NX)-273.15
+      TCC(NZ,NY,NX)=TKC(NZ,NY,NX)-TC2K
       DTKC(NZ,NY,NX)=TKC(NZ,NY,NX)-TKA(NY,NX)
 !
 !     IF CONVERGENCE NOT ACHIEVED (RARE), SET DEFAULT
@@ -267,7 +268,7 @@ module UptakeMod
       ARLSC=0.0
       DO 9984 NZ=1,NP0(NY,NX)
 !     TKC(NZ,NY,NX)=TKA(NY,NX)+DTKC(NZ,NY,NX)
-!     TCC(NZ,NY,NX)=TKC(NZ,NY,NX)-273.15
+!     TCC(NZ,NY,NX)=TKC(NZ,NY,NX)-TC2K
       ARLSC=ARLSC+ARLFP(NZ,NY,NX)+ARSTP(NZ,NY,NX)
       RAD1(NZ,NY,NX)=0.0
       EFLXC(NZ,NY,NX)=0.0
@@ -539,7 +540,7 @@ module UptakeMod
       EVAPC(NZ,NY,NX)=0.0
       EP(NZ,NY,NX)=0.0
       TKC(NZ,NY,NX)=TKA(NY,NX)+DTKC(NZ,NY,NX)
-      TCC(NZ,NY,NX)=TKC(NZ,NY,NX)-273.15
+      TCC(NZ,NY,NX)=TKC(NZ,NY,NX)-TC2K
       FTHRM=EMMC*2.04E-10*FRADP(NZ,NY,NX)*AREA(3,NU(NY,NX),NY,NX)
       THRM1(NZ,NY,NX)=FTHRM*TKC(NZ,NY,NX)**4
       PSILT(NZ,NY,NX)=PSIST1(NG(NZ,NY,NX))
@@ -554,7 +555,7 @@ module UptakeMod
       RC(NZ,NY,NX)=RSMN(NZ,NY,NX)+(RSMH(NZ,NY,NX) &
       -RSMN(NZ,NY,NX))*WFNC
       RA(NZ,NY,NX)=RAZ(NZ,NY,NX)
-      VHCPC(NZ,NY,NX)=4.19*(WTSHT(NZ,NY,NX)*10.0E-06)
+      VHCPC(NZ,NY,NX)=cpw*(WTSHT(NZ,NY,NX)*10.0E-06)
       DTKC(NZ,NY,NX)=0.0
       DO 4290 N=1,MY(NZ,NY,NX)
       DO  L=NU(NY,NX),NI(NZ,NY,NX)
@@ -674,9 +675,9 @@ module UptakeMod
 !     VFLXC=convective heat flux from EFLXC
 !     VAP=latent heat of evaporation
 !
-      VPC=2.173E-03/TKC1 &
-      *0.61*EXP(5360.0*(3.661E-03-1.0/TKC1)) &
-      *EXP(18.0*PSILT(NZ,NY,NX)/(8.3143*TKC1))
+      !VPC=2.173E-03/TKC1 &
+      !*0.61*EXP(5360.0*(3.661E-03-1.0/TKC1)) &
+      vpc=vapsat(tkc1)*EXP(18.0*PSILT(NZ,NY,NX)/(8.3143*TKC1))
       EX=PAREC*(VPA(NY,NX)-VPC)
       IF(EX.GT.0.0)THEN
       EVAPC(NZ,NY,NX)=EX*RA(NZ,NY,NX)/(RA(NZ,NY,NX)+RZ)
@@ -688,7 +689,7 @@ module UptakeMod
       ENDIF
       EP(NZ,NY,NX)=EX*RA(NZ,NY,NX)/(RA(NZ,NY,NX)+RC(NZ,NY,NX))
       EFLXC(NZ,NY,NX)=(EP(NZ,NY,NX)+EVAPC(NZ,NY,NX))*VAP
-      VFLXC=EVAPC(NZ,NY,NX)*4.19*TKC1
+      VFLXC=EVAPC(NZ,NY,NX)*cpw*TKC1
 !
 !     SENSIBLE + STORAGE HEAT FROM RN, LE AND CONVECTIVE HEAT FLUXES
 !
@@ -702,7 +703,7 @@ module UptakeMod
 !     VHCPC=canopy heat capacity
 !     TKCY=equilibrium canopy temperature for HFLXS
 !
-      VHCPC(NZ,NY,NX)=VHCPX+4.19*(EVAPC(NZ,NY,NX)+FLWC(NZ,NY,NX))
+      VHCPC(NZ,NY,NX)=VHCPX+cpw*(EVAPC(NZ,NY,NX)+FLWC(NZ,NY,NX))
       TKCY=(TKCX*VHCPX+TKA(NY,NX)*PARHC+HFLXS)/(VHCPC(NZ,NY,NX)+PARHC)
       TKCY=AMIN1(TKA(NY,NX)+10.0,AMAX1(TKA(NY,NX)-10.0,TKCY))
 !
@@ -1015,7 +1016,7 @@ module UptakeMod
       ELSE
       TKC(NZ,NY,NX)=TKW(1,NY,NX)
       ENDIF
-      TCC(NZ,NY,NX)=TKC(NZ,NY,NX)-273.15
+      TCC(NZ,NY,NX)=TKC(NZ,NY,NX)-TC2K
       FTHRM=EMMC*2.04E-10*FRADP(NZ,NY,NX)*AREA(3,NU(NY,NX),NY,NX)
       THRM1(NZ,NY,NX)=FTHRM*TKC(NZ,NY,NX)**4
       PSILT(NZ,NY,NX)=PSIST1(NG(NZ,NY,NX))
@@ -1030,7 +1031,7 @@ module UptakeMod
       RC(NZ,NY,NX)=RSMN(NZ,NY,NX)+(RSMH(NZ,NY,NX) &
       -RSMN(NZ,NY,NX))*WFNC
       RA(NZ,NY,NX)=RAZ(NZ,NY,NX)
-      VHCPC(NZ,NY,NX)=4.19*(WTSHT(NZ,NY,NX)*10.0E-06)
+      VHCPC(NZ,NY,NX)=cpw*(WTSHT(NZ,NY,NX)*10.0E-06)
       DTKC(NZ,NY,NX)=0.0
       DO 4300 N=1,MY(NZ,NY,NX)
       DO  L=NU(NY,NX),NI(NZ,NY,NX)
@@ -1138,7 +1139,7 @@ module UptakeMod
       ELSE
       TKG(NZ,NY,NX)=TKC(NZ,NY,NX)
       ENDIF
-      TCG(NZ,NY,NX)=TKG(NZ,NY,NX)-273.15
+      TCG(NZ,NY,NX)=TKG(NZ,NY,NX)-TC2K
 !
 !     ARRHENIUS FUNCTION FOR CANOPY AND ROOT GROWTH WITH OFFSET
 !     FOR ZONE OF THERMAL ADAPTATION ENTERED IN 'READQ'

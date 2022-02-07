@@ -1,6 +1,6 @@
-
-      module StartqMod
-      use data_kind_mod, only : r8 => SHR_KIND_R8
+module StartqMod
+  use data_kind_mod, only : r8 => SHR_KIND_R8
+  use EcosimConst
       implicit none
 
       private
@@ -736,13 +736,13 @@
 !     TCG,TKG=canopy temperature for phenology (oC,K)
 !     PSILT,PSILO,PSILG=canopy total,osmotic,turgor water potl(MPa)
 !
-      VHCPC(NZ,NY,NX)=4.19*WTSHT(NZ,NY,NX)*10.0E-06
+      VHCPC(NZ,NY,NX)=cpw*WTSHT(NZ,NY,NX)*10.0E-06
       ENGYX(NZ,NY,NX)=0._r8
       DTKC(NZ,NY,NX)=0._r8
       TCC(NZ,NY,NX)=ATCA(NY,NX)
-      TKC(NZ,NY,NX)=TCC(NZ,NY,NX)+273.15
+      TKC(NZ,NY,NX)=TCC(NZ,NY,NX)+TC2K
       TCG(NZ,NY,NX)=TCC(NZ,NY,NX)
-      TKG(NZ,NY,NX)=TCG(NZ,NY,NX)+273.15
+      TKG(NZ,NY,NX)=TCG(NZ,NY,NX)+TC2K
       TFN3(NZ,NY,NX)=1.0
       PSILT(NZ,NY,NX)=-1.0E-03
       PSILO(NZ,NY,NX)=OSMO(NZ,NY,NX)+PSILT(NZ,NY,NX)

@@ -11,6 +11,7 @@ module minimathmod
   public :: p_adb
   public :: test_aeqb
   public :: test_aneb
+  public :: vapsat, vapsat0
   real(r8), parameter :: tiny_val=1.e-20_r8
   contains
 
@@ -66,5 +67,32 @@ module minimathmod
    ans = abs(a-b)>=tiny_val
    return
    end function test_aneb
+
+
+!------------------------------------------------------------------------------------------
+
+  function vapsat(tempK)result(ans)
+  !
+  ! Description
+  ! compute saturated vapor pressure, based on temperature tempK (in K)
+  implicit none
+  real(r8), intent(in) :: tempK
+
+  real(r8) :: ans  !(10^3 kg/m3)
+  ans=2.173E-03_r8/tempK*0.61_r8*EXP(5360.0_r8*(3.661E-03_r8-1.0_r8/tempK))
+  end function vapsat
+
+!------------------------------------------------------------------------------------------
+
+  function vapsat0(tempK)result(ans)
+  !
+  ! Description
+  ! compute saturated vapor pressure, based on temperature tempK (in K)
+  implicit none
+  real(r8), intent(in) :: tempK
+
+  real(r8) :: ans  !(kPa)
+  ans=0.61_r8*EXP(5360.0_r8*(3.661E-03_r8-1.0_r8/tempK))
+  end function vapsat0
 
 end module minimathmod

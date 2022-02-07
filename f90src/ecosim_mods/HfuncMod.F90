@@ -5,6 +5,7 @@ module HfuncMod
 
   use data_kind_mod, only : r8 => SHR_KIND_R8
   use StartqMod    , only : startq
+  use EcosimConst
   implicit none
 
   private
@@ -409,7 +410,7 @@ module HfuncMod
       .AND.(ARLSP.GT.ZEROL(NZ,NY,NX)) &
       .AND.(RTDP1(1,1,NZ,NY,NX).GT.SDPTH(NZ,NY,NX)+1.0E-06))THEN
       IDAY(1,NB1(NZ,NY,NX),NZ,NY,NX)=I
-      VHCPC(NZ,NY,NX)=4.19*(WTSHT(NZ,NY,NX)*10.0E-06+VOLWC(NZ,NY,NX))
+      VHCPC(NZ,NY,NX)=cpw*(WTSHT(NZ,NY,NX)*10.0E-06+VOLWC(NZ,NY,NX))
     ENDIF
   ENDIF
   end subroutine stage_phenology_vars

@@ -6,6 +6,7 @@ module StartsMod
   use data_kind_mod, only : r8 => SHR_KIND_R8
   use abortutils, only : padr, print_info
   use minimathMod, only : test_aeqb, test_aneb
+  use EcosimConst
   implicit none
 
   private
@@ -130,14 +131,14 @@ module StartsMod
 !     CO2=CO2,CH4=CH4,OXY=O2,Z2G=N2,Z2O=N2O,NH3=NH3,H2G=H2
 !     ATKA=mean annual air temperature (K)
 !
-      CCO2EI(NY,NX)=CO2EI(NY,NX)*5.36E-04*273.15/ATKA(NY,NX)
-      CCO2E(NY,NX)=CO2E(NY,NX)*5.36E-04*273.15/ATKA(NY,NX)
-      CCH4E(NY,NX)=CH4E(NY,NX)*5.36E-04*273.15/ATKA(NY,NX)
-      COXYE(NY,NX)=OXYE(NY,NX)*1.43E-03*273.15/ATKA(NY,NX)
-      CZ2GE(NY,NX)=Z2GE(NY,NX)*1.25E-03*273.15/ATKA(NY,NX)
-      CZ2OE(NY,NX)=Z2OE(NY,NX)*1.25E-03*273.15/ATKA(NY,NX)
-      CNH3E(NY,NX)=ZNH3E(NY,NX)*6.25E-04*273.15/ATKA(NY,NX)
-      CH2GE(NY,NX)=H2GE(NY,NX)*8.92E-05*273.15/ATKA(NY,NX)
+      CCO2EI(NY,NX)=CO2EI(NY,NX)*5.36E-04*Tref/ATKA(NY,NX)
+      CCO2E(NY,NX)=CO2E(NY,NX)*5.36E-04*Tref/ATKA(NY,NX)
+      CCH4E(NY,NX)=CH4E(NY,NX)*5.36E-04*Tref/ATKA(NY,NX)
+      COXYE(NY,NX)=OXYE(NY,NX)*1.43E-03*Tref/ATKA(NY,NX)
+      CZ2GE(NY,NX)=Z2GE(NY,NX)*1.25E-03*Tref/ATKA(NY,NX)
+      CZ2OE(NY,NX)=Z2OE(NY,NX)*1.25E-03*Tref/ATKA(NY,NX)
+      CNH3E(NY,NX)=ZNH3E(NY,NX)*6.25E-04*Tref/ATKA(NY,NX)
+      CH2GE(NY,NX)=H2GE(NY,NX)*8.92E-05*Tref/ATKA(NY,NX)
 !
 !     MICROBIAL THERMAL ADAPTATION
 !
@@ -330,8 +331,8 @@ module StartsMod
 !
       BKVLNM(NY,NX)=AMAX1(0.0,SAND(NU(NY,NX),NY,NX) &
       +SILT(NU(NY,NX),NY,NX)+CLAY(NU(NY,NX),NY,NX))
-      VHCP(0,NY,NX)=2.496E-06*ORGC(0,NY,NX)+4.19*VOLW(0,NY,NX) &
-      +1.9274*VOLI(0,NY,NX)
+      VHCP(0,NY,NX)=cpo*ORGC(0,NY,NX)+cpw*VOLW(0,NY,NX) &
+      +cpi*VOLI(0,NY,NX)
       VHCM(0,NY,NX)=0.0
       VOLAI(0,NY,NX)=0.0
 9890  CONTINUE
@@ -561,8 +562,8 @@ module StartsMod
       VOLP(L,NY,NX)=AMAX1(0.0,VOLA(L,NY,NX)-VOLW(L,NY,NX) &
       -VOLI(L,NY,NX))+AMAX1(0.0,VOLAH(L,NY,NX)-VOLWH(L,NY,NX) &
       -VOLIH(L,NY,NX))
-      VHCP(L,NY,NX)=VHCM(L,NY,NX)+4.19*(VOLW(L,NY,NX) &
-      +VOLWH(L,NY,NX))+1.9274*(VOLI(L,NY,NX)+VOLIH(L,NY,NX))
+      VHCP(L,NY,NX)=VHCM(L,NY,NX)+cpw*(VOLW(L,NY,NX) &
+      +VOLWH(L,NY,NX))+cpi*(VOLI(L,NY,NX)+VOLIH(L,NY,NX))
       THETWZ(L,NY,NX)=THETW(L,NY,NX)
       THETIZ(L,NY,NX)=THETI(L,NY,NX)
 !     WRITE(*,2425)'VOLWS',NX,NY,L
@@ -1251,10 +1252,10 @@ module StartsMod
       +VOLWSL(L,NY,NX)+VOLISL(L,NY,NX)
       VOLSI(L,NY,NX)=DLYRSI*DH(NY,NX)*DV(NY,NX)
       CDPTHS(L,NY,NX)=CDPTHS(L-1,NY,NX)+DLYRS(L,NY,NX)
-      TKW(L,NY,NX)=AMIN1(273.15,ATKA(NY,NX))
+      TKW(L,NY,NX)=AMIN1(Tref,ATKA(NY,NX))
       TCW(L,NY,NX)=AMIN1(0.0,ATCA(NY,NX))
-      VHCPW(L,NY,NX)=2.095*VOLSSL(L,NY,NX)+4.19*VOLWSL(L,NY,NX) &
-      +1.9274*VOLISL(L,NY,NX)
+      VHCPW(L,NY,NX)=cps*VOLSSL(L,NY,NX)+cpw*VOLWSL(L,NY,NX) &
+      +cpi*VOLISL(L,NY,NX)
 9580  CONTINUE
       end subroutine InitSnowLayers
 !------------------------------------------------------------------------------------------
@@ -1487,8 +1488,8 @@ module StartsMod
       XPSN=0.0
       TIONIN=0.0
       TIONOU=0.0
-      VAP=2465.0
-      VAPS=2834.0
+      VAP=2465.0_r8   !kJ/kg
+      VAPS=2834.0_r8
       OXKM=0.080
       TYSIN=0.0
       end subroutine InitControlParameters
@@ -1518,8 +1519,8 @@ module StartsMod
       IFLGT(NY,NX)=0
       ATCA(NY,NX)=ATCAI(NY,NX)
       ATCS(NY,NX)=ATCAI(NY,NX)
-      ATKA(NY,NX)=ATCA(NY,NX)+273.15
-      ATKS(NY,NX)=ATCS(NY,NX)+273.15
+      ATKA(NY,NX)=ATCA(NY,NX)+TC2K
+      ATKS(NY,NX)=ATCS(NY,NX)+TC2K
       URAIN(NY,NX)=0.0
       UCO2G(NY,NX)=0.0
       UCH4G(NY,NX)=0.0

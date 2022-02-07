@@ -5,6 +5,7 @@ module ExtractMod
 !     FROM 'UPTAKE' AMD 'GROSUB' AND SENDS RESULTS TO 'REDIST'
 !
   use data_kind_mod, only : r8 => SHR_KIND_R8
+  use EcosimConst
   implicit none
 
   private
@@ -164,7 +165,7 @@ module ExtractMod
 !
       TUPWTR(L,NY,NX)=TUPWTR(L,NY,NX)+UPWTR(N,L,NZ,NY,NX)
       TUPHT(L,NY,NX)=TUPHT(L,NY,NX)+UPWTR(N,L,NZ,NY,NX) &
-      *4.19*TKS(L,NY,NX)
+      *cpw*TKS(L,NY,NX)
 !
 !     ROOT GAS CONTENTS FROM FLUXES IN 'UPTAKE'
 !
@@ -373,11 +374,11 @@ module ExtractMod
       TVOLWC(NY,NX)=TVOLWC(NY,NX)+VOLWC(NZ,NY,NX)
       TEVAPP(NY,NX)=TEVAPP(NY,NX)+EP(NZ,NY,NX)+EVAPC(NZ,NY,NX)
       TEVAPC(NY,NX)=TEVAPC(NY,NX)+EVAPC(NZ,NY,NX)
-      ENGYC=4.19*(VOLWC(NZ,NY,NX)+FLWC(NZ,NY,NX)+EVAPC(NZ,NY,NX)) &
+      ENGYC=cpw*(VOLWC(NZ,NY,NX)+FLWC(NZ,NY,NX)+EVAPC(NZ,NY,NX)) &
       *TKC(NZ,NY,NX)
       TENGYC(NY,NX)=TENGYC(NY,NX)+ENGYC
       THFLXC(NY,NX)=THFLXC(NY,NX)+ENGYC-ENGYX(NZ,NY,NX) &
-      -(FLWC(NZ,NY,NX)*4.19*TKA(NY,NX))
+      -(FLWC(NZ,NY,NX)*cpw*TKA(NY,NX))
       ENGYX(NZ,NY,NX)=ENGYC
       THRMC(NY,NX)=THRMC(NY,NX)+THRM1(NZ,NY,NX)
       ARLFC(NY,NX)=ARLFC(NY,NX)+ARLFP(NZ,NY,NX)
