@@ -37,7 +37,7 @@ SUBROUTINE soil(NA,ND,NT,NE,NAX,NDX,NTX,NEX,NHW,NHE,NVN,NVS)
   include "filec.h"
   include "files.h"
   include "blkc.h"
-
+  include "blk11a.h"
   character(len=*), parameter :: mod_filename = __FILE__
 
   integer :: I,J
@@ -141,11 +141,13 @@ SUBROUTINE soil(NA,ND,NT,NE,NAX,NDX,NTX,NEX,NHW,NHE,NVN,NVS)
 !   UPDATE HOURLY VARIABLES IN 'HOUR1'
 !
     if(lverb)WRITE(*,333)'WTHR'
+!    if(I>=170)print*,I,J,TKS(0,NVN,NHW)
     call start_timer(t1)
     CALL WTHR(I,J,NHW,NHE,NVN,NVS)
     call end_timer('WTHR',t1)
 
     if(lverb)WRITE(*,333)'HOUR1'
+!    if(I>=170)print*,TKS(0,NVN,NHW)
     call start_timer(t1)
     CALL HOUR1(I,J,NHW,NHE,NVN,NVS)
     call end_timer('HOUR1',t1)
@@ -153,6 +155,7 @@ SUBROUTINE soil(NA,ND,NT,NE,NAX,NDX,NTX,NEX,NHW,NHE,NVN,NVS)
 !   CALCULATE SOIL ENERGY BALANCE, WATER AND HEAT FLUXES IN 'WATSUB'
 !
     if(lverb)WRITE(*,333)'WAT'
+!    if(I>=170)print*,TKS(0,NVN,NHW)
     call start_timer(t1)
     CALL WATSUB(I,J,NHW,NHE,NVN,NVS)
     call end_timer('WAT',t1)
@@ -160,6 +163,7 @@ SUBROUTINE soil(NA,ND,NT,NE,NAX,NDX,NTX,NEX,NHW,NHE,NVN,NVS)
 !   CALCULATE SOIL BIOLOGICAL TRANSFORMATIONS IN 'NITRO'
 !
     if(lverb)WRITE(*,333)'NIT'
+!    if(I>=170)print*,TKS(0,NVN,NHW)
     call start_timer(t1)
     CALL NITRO(I,J,NHW,NHE,NVN,NVS)
     call end_timer('NIT',t1)
@@ -167,6 +171,7 @@ SUBROUTINE soil(NA,ND,NT,NE,NAX,NDX,NTX,NEX,NHW,NHE,NVN,NVS)
 !   UPDATE PLANT PHENOLOGY IN 'HFUNC'
 !
     if(lverb)WRITE(*,333)'HFUNC'
+!    if(I>=170)print*,TKS(0,NVN,NHW)
     call start_timer(t1)
     CALL HFUNC(I,J,NHW,NHE,NVN,NVS)
     call end_timer('HFUNC',t1)
@@ -176,6 +181,7 @@ SUBROUTINE soil(NA,ND,NT,NE,NAX,NDX,NTX,NEX,NHW,NHE,NVN,NVS)
 !   CALCULATE ROOT UPTAKE OF WATER, OXYGEN, NH4, NO3 AND PO4 IN 'UPTAKE'
 !
     if(lverb)WRITE(*,333)'UPTK'
+!    if(I>=170)print*,TKS(0,NVN,NHW)
     call start_timer(t1)
     CALL UPTAKE(I,J,NHW,NHE,NVN,NVS)
     call end_timer('UPTK',t1)
@@ -184,6 +190,7 @@ SUBROUTINE soil(NA,ND,NT,NE,NAX,NDX,NTX,NEX,NHW,NHE,NVN,NVS)
 !   RESPIRATION, PLANT C ALLOCATION, CANOPY AND ROOT GROWTH IN 'GROSUB'
 !
     if(lverb)WRITE(*,333)'GRO'
+!    if(I>=170)print*,TKS(0,NVN,NHW)
     call start_timer(t1)
     CALL GROSUB(I,J,NHW,NHE,NVN,NVS)
     call end_timer('GRO',t1)
@@ -192,6 +199,7 @@ SUBROUTINE soil(NA,ND,NT,NE,NAX,NDX,NTX,NEX,NHW,NHE,NVN,NVS)
 !   IN 'EXTRACT'
 !
     if(lverb)WRITE(*,333)'EXTR'
+!    if(I>=170)print*,TKS(0,NVN,NHW)
     call start_timer(t1)
     CALL EXTRACT(I,J,NHW,NHE,NVN,NVS)
     call end_timer('EXTR',t1)
@@ -206,6 +214,7 @@ SUBROUTINE soil(NA,ND,NT,NE,NAX,NDX,NTX,NEX,NHW,NHE,NVN,NVS)
 !   CALCULATE GAS AND SOLUTE FLUXES IN 'TRNSFR'
 !
     if(lverb)WRITE(*,333)'TRN'
+!    if(I>=170)print*,TKS(0,NVN,NHW)
     call start_timer(t1)
     CALL TRNSFR(I,J,NHW,NHE,NVN,NVS)
     call end_timer('TRN',t1)
@@ -213,6 +222,7 @@ SUBROUTINE soil(NA,ND,NT,NE,NAX,NDX,NTX,NEX,NHW,NHE,NVN,NVS)
 !   CALCULATE ADDITIONAL SOLUTE FLUXES IN 'TRNSFRS' IF SALT OPTION SELECTED
 !
     if(lverb)WRITE(*,333)'TRNS'
+!    if(I>=170)print*,TKS(0,NVN,NHW)
     call start_timer(t1)
     CALL TRNSFRS(I,J,NHW,NHE,NVN,NVS)
     call end_timer('TRNSFRS',t1)
@@ -220,6 +230,7 @@ SUBROUTINE soil(NA,ND,NT,NE,NAX,NDX,NTX,NEX,NHW,NHE,NVN,NVS)
 !   CALCULATE SOIL SEDIMENT TRANSPORT IN 'EROSION'
 !
     if(lverb)WRITE(*,333)'EROSION'
+!    if(I>=170)print*,TKS(0,NVN,NHW)
     call start_timer(t1)
     CALL EROSION(I,J,NHW,NHE,NVN,NVS)
     call end_timer('EROSION',t1)
@@ -228,9 +239,11 @@ SUBROUTINE soil(NA,ND,NT,NE,NAX,NDX,NTX,NEX,NHW,NHE,NVN,NVS)
 !   AND SEDIMENT FLUXES IN 'REDIST'
 !
     if(lverb)WRITE(*,333)'RED'
+!    if(I>=170)print*,TKS(0,NVN,NHW)
     call start_timer(t1)
     CALL REDIST(I,J,NHW,NHE,NVN,NVS)
     call end_timer('RED',t1)
+!    if(I>=170)print*,'afred',TKS(0,NVN,NHW)
 !   WRITE(*,333)'END'
 !
 !   WRITE HOURLY SOIL AND PLANT OUTPUT IN 'OUTSH' AND 'OUTPH'

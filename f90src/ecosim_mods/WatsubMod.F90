@@ -230,15 +230,20 @@ module WatsubMod
       call WaterHeatExchThruBoundaryFlow(M,NHW,NHE,NVN,NVS)
 !
 !      if(curday==41)call print_info('UPDATE STATE VARIABLES FROM FLUXES CALCULATED ABOVE',__LINE__)
-!
+!      if(curday>=175)then
+!        write(*,*)'at line',__LINE__,'TK1(8,NVN,NHW)',TK1(8,NVN,NHW),M
+!        if(TK1(8,NVN,NHW)>1.e3)then
+!          call endrun(trim(mod_filename)//' at line',__LINE__)
+!        endif
+!      endif
       IF(M.NE.NPH)THEN
 !
-!        if(curday>=41)call print_info('UpdateStateSolutionNotNPH',__LINE__)
+!        if(curday>=175)call print_info('UpdateStateSolutionNotNPH',__LINE__)
 !        if(curday>=41)write(*,*)'HFLWRL(NY,NX)=',HFLWRL(NVN,NHW)
         call UpdateStateSolutionNotNPH(M,NHW,NHE,NVN,NVS)
       ELSE
 !
-!        if(curday>=41)call print_info('UpdateFLuxAtNPH',__LINE__)
+!        if(curday>=175)call print_info('UpdateFLuxAtNPH',__LINE__)
 !        if(curday>=41)write(*,*)'HFLWRL(NY,NX)=',HFLWRL(NVN,NHW)
         call UpdateFLuxAtNPH(NHW,NHE,NVN,NVS)
       ENDIF
@@ -394,6 +399,10 @@ module WatsubMod
     ENDIF
     FGRD(L,NY,NX)=1.0-FMAC(L,NY,NX)
     TK1(L,NY,NX)=TKS(L,NY,NX)
+    if(TK1(L,NY,NX)>1.e3_r8)then
+      write(*,*)'TKS(L,NY,NX)',L,TKS(L,NY,NX)
+      call endrun(trim(mod_filename)//' at line',__LINE__)
+    endif
     IF(L.EQ.LWDPTH)THEN
       FLU(L,NY,NX)=PRECU(NY,NX)
       HWFLU(L,NY,NX)=cpw*TKA(NY,NX)*PRECU(NY,NX)
@@ -3212,736 +3221,762 @@ module WatsubMod
   end subroutine LateralHydroExchange
 !------------------------------------------------------------------------------------------
 
-      subroutine Subsurface3DFlow(M,NY,NX,NHE,NVS)
-      implicit none
-      integer, intent(in) :: M,NY,NX,NHE,NVS
+  subroutine Subsurface3DFlow(M,NY,NX,NHE,NVS)
+  implicit none
+  integer, intent(in) :: M,NY,NX,NHE,NVS
 
-      integer :: N,N1,N2,N3,N4,N5,N6,L,LL,K1,KL
-!     begin_execution
-!
-!     WATER AND ENERGY TRANSFER THROUGH SOIL PROFILE
-!
-!     N3,N2,N1=L,NY,NX of source grid cell
-!     N6,N5,N4=L,NY,NX of destination grid cell
-!
-      IFLGH=0
-      DO 4400 L=1,NL(NY,NX)
-      N1=NX
-      N2=NY
-      N3=L
-!
-!     LOCATE INTERNAL BOUNDARIES BETWEEN ADJACENT GRID CELLS
-!
-      DO 4320 N=NCN(N2,N1),3
+  integer :: N,N1,N2,N3,N4,N5,N6,L,LL,K1,KL
+  !     begin_execution
+  !
+  !     WATER AND ENERGY TRANSFER THROUGH SOIL PROFILE
+  !
+  !     N3,N2,N1=L,NY,NX of source grid cell
+  !     N6,N5,N4=L,NY,NX of destination grid cell
+  !
+  IFLGH=0
+  DO 4400 L=1,NL(NY,NX)
+    N1=NX
+    N2=NY
+    N3=L
+    !
+    !     LOCATE INTERNAL BOUNDARIES BETWEEN ADJACENT GRID CELLS
+    !
+    DO 4320 N=NCN(N2,N1),3
       IF(N.EQ.1)THEN
-      IF(NX.EQ.NHE)THEN
-      GO TO 4320
-      ELSE
-      N4=NX+1
-      N5=NY
-      N6=L
-!
-!     ARTIFICIAL SOIL WARMING PREVENT LATERAL FLOW
-!
-!     IF(N2.EQ.2.AND.(N1.EQ.2.OR.N1.EQ.3).AND.L.LE.15)THEN
-!     GO TO 4320
-!     ENDIF
-      ENDIF
+        IF(NX.EQ.NHE)THEN
+          GO TO 4320
+        ELSE
+          N4=NX+1
+          N5=NY
+          N6=L
+    !
+          !     ARTIFICIAL SOIL WARMING PREVENT LATERAL FLOW
+          !
+          !     IF(N2.EQ.2.AND.(N1.EQ.2.OR.N1.EQ.3).AND.L.LE.15)THEN
+          !     GO TO 4320
+          !     ENDIF
+        ENDIF
       ELSEIF(N.EQ.2)THEN
-      IF(NY.EQ.NVS)THEN
-      GO TO 4320
-      ELSE
-      N4=NX
-      N5=NY+1
-      N6=L
-!
-!     ARTIFICIAL SOIL WARMING PREVENT LATERAL FLOW
-!
-!     IF(N1.EQ.3.AND.(N2.EQ.1.OR.N2.EQ.2).AND.L.LE.15)THEN
-!     GO TO 4320
-!     ENDIF
-!
-!     END ARTIFICIAL SOIL WARMING PREVENT LATERAL FLOW
-!
-      ENDIF
+        IF(NY.EQ.NVS)THEN
+          GO TO 4320
+        ELSE
+          N4=NX
+          N5=NY+1
+          N6=L
+    !
+          !     ARTIFICIAL SOIL WARMING PREVENT LATERAL FLOW
+          !
+          !     IF(N1.EQ.3.AND.(N2.EQ.1.OR.N2.EQ.2).AND.L.LE.15)THEN
+          !     GO TO 4320
+          !     ENDIF
+          !
+          !     END ARTIFICIAL SOIL WARMING PREVENT LATERAL FLOW
+          !
+        ENDIF
       ELSEIF(N.EQ.3)THEN
-      IF(L.EQ.NL(NY,NX))THEN
-      GO TO 4320
-      ELSE
-      N4=NX
-      N5=NY
-      N6=L+1
-      ENDIF
+        IF(L.EQ.NL(NY,NX))THEN
+          GO TO 4320
+        ELSE
+          N4=NX
+          N5=NY
+          N6=L+1
+        ENDIF
       ENDIF
 !
 !     SKIP NON-EXISTENT DESTINATION SOIL LAYERS
 !
       DO 1100 LL=N6,NL(NY,NX)
-      IF(VOLX(LL,N5,N4).GT.ZEROS2(N5,N4))THEN
-      N6=LL
-      GO TO 1101
-      ENDIF
+        IF(VOLX(LL,N5,N4).GT.ZEROS2(N5,N4))THEN
+          N6=LL
+          GO TO 1101
+        ENDIF
 1100  CONTINUE
 1101  CONTINUE
       IF(N3.EQ.NU(N2,N1))N6X(N2,N1)=N6
-!
-!     POROSITIES 'THETP*', WATER CONTENTS 'THETA*', AND POTENTIALS
-!     'PSIS*' FOR EACH GRID CELL
-!
-!     THETA1,THETAL=micropore water concn in source,destination cells
-!     THETY=hygroscopic water concentration
-!     POROS=soil porosity
-!     VOLXI=soil volume excluding rock, macropore
-!
+      !
+      !     POROSITIES 'THETP*', WATER CONTENTS 'THETA*', AND POTENTIALS
+      !     'PSIS*' FOR EACH GRID CELL
+      !
+      !     THETA1,THETAL=micropore water concn in source,destination cells
+      !     THETY=hygroscopic water concentration
+      !     POROS=soil porosity
+      !     VOLXI=soil volume excluding rock, macropore
+      !
       IF(VOLX(N3,N2,N1).GT.ZEROS2(N2,N1))THEN
-      IF(N3.GE.NUM(N2,N1).AND.N6.GE.NUM(N5,N4) &
-      .AND.N3.LE.NL(N2,N1).AND.N6.LE.NL(N5,N4))THEN
-      THETA1=AMAX1(THETY(N3,N2,N1),AMIN1(POROS(N3,N2,N1) &
-      ,safe_adb(VOLW1(N3,N2,N1),VOLY(N3,N2,N1))))
-      THETAL=AMAX1(THETY(N6,N5,N4),AMIN1(POROS(N6,N5,N4) &
-      ,safe_adb(VOLW1(N6,N5,N4),VOLY(N6,N5,N4))))
+        IF(N3.GE.NUM(N2,N1).AND.N6.GE.NUM(N5,N4) &
+          .AND.N3.LE.NL(N2,N1).AND.N6.LE.NL(N5,N4))THEN
+          THETA1=AMAX1(THETY(N3,N2,N1),AMIN1(POROS(N3,N2,N1) &
+            ,safe_adb(VOLW1(N3,N2,N1),VOLY(N3,N2,N1))))
+          THETAL=AMAX1(THETY(N6,N5,N4),AMIN1(POROS(N6,N5,N4) &
+            ,safe_adb(VOLW1(N6,N5,N4),VOLY(N6,N5,N4))))
+          !
+          !     WATER POTENTIAL OF UPPER LAYER
+          !
+          !     BKVL=soil mass
+          !     FC,WP=water contents at field capacity,wilting point
+          !     FCL,WPL=log FC,WP
+          !     FCD,PSD=FCL-WPL,log(POROS)-FCL
+          !     PSISA1,PSIHY,PSISE=soil matric,hygroscopic,air entry potential
+          !     PSIMX,PSIMD,PSIMS=log water potential at FC,WP,saturation
+          !     PSISD=PSIMX-PSIMS
+          !     SRP=parameter for deviation from linear log-log water retention
+          !     PSISO=osmotic potential
+          !
+          IF(BKVL(N3,N2,N1).GT.ZEROS(NY,NX))THEN
+            IF(THETA1.LT.FC(N3,N2,N1))THEN
+              PSISA1(N3,N2,N1)=AMAX1(PSIHY,-EXP(PSIMX(N2,N1) &
+                +((FCL(N3,N2,N1)-LOG(THETA1)) &
+                /FCD(N3,N2,N1)*PSIMD(N2,N1))))
+            ELSEIF(THETA1.LT.POROS(N3,N2,N1)-DTHETW)THEN
+              PSISA1(N3,N2,N1)=-EXP(PSIMS(N2,N1) &
+                +(((PSL(N3,N2,N1)-LOG(THETA1)) &
+                /PSD(N3,N2,N1))**SRP(N3,N2,N1)*PSISD(N2,N1)))
+            ELSE
+              PSISA1(N3,N2,N1)=PSISE(N3,N2,N1)
+            ENDIF
+            !
+            !     SUBSURFCE UPPER WATER LAYER
+            !
+            !     THETIX,THETWX=ice,water concentration
+            !     FCI,WPI=ice field capacity,wilting point
+            !     PSISA1=matric water potential
+            !
+          ELSEIF(VOLX(N3,N2,N1).GT.ZEROS2(N2,N1).and.&
+            THETIX(N3,N2,N1)>ZEROS2(N2,N1))THEN
+            FCX=FCI*THETIX(N3,N2,N1)
+            WPX=WPI*THETIX(N3,N2,N1)
+            FCLX=LOG(FCX)
+            WPLX=LOG(WPX)
+            PSDX=PSL(N3,N2,N1)-FCLX
+            FCDX=FCLX-WPLX
+            IF(THETWX(N3,N2,N1).LT.FCX)THEN
+              PSISA1(N3,N2,N1)=AMAX1(PSIHY,-EXP(PSIMX(N2,N1) &
+                +((FCLX-LOG(THETWX(N3,N2,N1))) &
+                /FCDX*PSIMD(NY,NX))))
+            ELSEIF(THETWX(N3,N2,N1).LT.POROS(N3,N2,N1)-DTHETW)THEN
+              PSISA1(N3,N2,N1)=-EXP(PSIMS(N2,N1) &
+                +(((PSL(N3,N2,N1)-LOG(THETWX(N3,N2,N1))) &
+                /PSDX)*PSISD(N2,N1)))
+            ELSE
+              PSISA1(N3,N2,N1)=PSISE(N3,N2,N1)
+            ENDIF
+          ELSE
+            PSISA1(N3,N2,N1)=PSISE(N3,N2,N1)
+          ENDIF
+          !     IF(N1.EQ.4.AND.N2.EQ.1.AND.N3.EQ.11)THEN
+          !     WRITE(*,1119)'PSISA1',I,J,M,N,N1,N2,N3,PSISA1(N3,N2,N1)
+          !    2,THETWX(N3,N2,N1),THETIX(N3,N2,N1),FCX,WPX
+          !    3,BKVL(N3,N2,N1),VOLX(N3,N2,N1)
+          !     ENDIF
+          !
+          !     WATER POTENTIAL OF LOWER LAYER
 !
-!     WATER POTENTIAL OF UPPER LAYER
-!
-!     BKVL=soil mass
-!     FC,WP=water contents at field capacity,wilting point
-!     FCL,WPL=log FC,WP
-!     FCD,PSD=FCL-WPL,log(POROS)-FCL
-!     PSISA1,PSIHY,PSISE=soil matric,hygroscopic,air entry potential
-!     PSIMX,PSIMD,PSIMS=log water potential at FC,WP,saturation
-!     PSISD=PSIMX-PSIMS
-!     SRP=parameter for deviation from linear log-log water retention
-!     PSISO=osmotic potential
-!
-      IF(BKVL(N3,N2,N1).GT.ZEROS(NY,NX))THEN
-      IF(THETA1.LT.FC(N3,N2,N1))THEN
-      PSISA1(N3,N2,N1)=AMAX1(PSIHY,-EXP(PSIMX(N2,N1) &
-      +((FCL(N3,N2,N1)-LOG(THETA1)) &
-      /FCD(N3,N2,N1)*PSIMD(N2,N1))))
-      ELSEIF(THETA1.LT.POROS(N3,N2,N1)-DTHETW)THEN
-      PSISA1(N3,N2,N1)=-EXP(PSIMS(N2,N1) &
-      +(((PSL(N3,N2,N1)-LOG(THETA1)) &
-      /PSD(N3,N2,N1))**SRP(N3,N2,N1)*PSISD(N2,N1)))
-      ELSE
-      PSISA1(N3,N2,N1)=PSISE(N3,N2,N1)
-      ENDIF
-!
-!     SUBSURFCE UPPER WATER LAYER
-!
-!     THETIX,THETWX=ice,water concentration
-!     FCI,WPI=ice field capacity,wilting point
-!     PSISA1=matric water potential
-!
-      ELSEIF(VOLX(N3,N2,N1).GT.ZEROS2(N2,N1).and.&
-        THETIX(N3,N2,N1)>ZEROS2(N2,N1))THEN
-      FCX=FCI*THETIX(N3,N2,N1)
-      WPX=WPI*THETIX(N3,N2,N1)
-      FCLX=LOG(FCX)
-      WPLX=LOG(WPX)
-      PSDX=PSL(N3,N2,N1)-FCLX
-      FCDX=FCLX-WPLX
-      IF(THETWX(N3,N2,N1).LT.FCX)THEN
-      PSISA1(N3,N2,N1)=AMAX1(PSIHY,-EXP(PSIMX(N2,N1) &
-      +((FCLX-LOG(THETWX(N3,N2,N1))) &
-      /FCDX*PSIMD(NY,NX))))
-      ELSEIF(THETWX(N3,N2,N1).LT.POROS(N3,N2,N1)-DTHETW)THEN
-      PSISA1(N3,N2,N1)=-EXP(PSIMS(N2,N1) &
-      +(((PSL(N3,N2,N1)-LOG(THETWX(N3,N2,N1))) &
-      /PSDX)*PSISD(N2,N1)))
-      ELSE
-      PSISA1(N3,N2,N1)=PSISE(N3,N2,N1)
-      ENDIF
-      ELSE
-      PSISA1(N3,N2,N1)=PSISE(N3,N2,N1)
-      ENDIF
-!     IF(N1.EQ.4.AND.N2.EQ.1.AND.N3.EQ.11)THEN
-!     WRITE(*,1119)'PSISA1',I,J,M,N,N1,N2,N3,PSISA1(N3,N2,N1)
-!    2,THETWX(N3,N2,N1),THETIX(N3,N2,N1),FCX,WPX
-!    3,BKVL(N3,N2,N1),VOLX(N3,N2,N1)
-!     ENDIF
-!
-!     WATER POTENTIAL OF LOWER LAYER
-!
-      IF(BKVL(N6,N5,N4).GT.ZEROS(NY,NX))THEN
-      IF(THETAL.LT.FC(N6,N5,N4))THEN
-      PSISA1(N6,N5,N4)=AMAX1(PSIHY,-EXP(PSIMX(N5,N4) &
-      +((FCL(N6,N5,N4)-LOG(THETAL)) &
-      /FCD(N6,N5,N4)*PSIMD(N5,N4))))
-      ELSEIF(THETAL.LT.POROS(N6,N5,N4)-DTHETW)THEN
-      PSISA1(N6,N5,N4)=-EXP(PSIMS(N5,N4) &
-      +(((PSL(N6,N5,N4)-LOG(THETAL)) &
-      /PSD(N6,N5,N4))**SRP(N6,N5,N4)*PSISD(N5,N4)))
-      ELSE
-      PSISA1(N6,N5,N4)=PSISE(N6,N5,N4)
-      ENDIF
-!
-!     SUBSURFCE LOWER WATER LAYER
-!
-      ELSEIF(VOLX(N6,N5,N4).GT.ZEROS2(N5,N4).and.&
-        THETIX(N6,N5,N4)>ZEROS2(N5,N4))THEN
-      FCX=FCI*THETIX(N6,N5,N4)
-      WPX=WPI*THETIX(N6,N5,N4)
-      FCLX=LOG(FCX)
-      WPLX=LOG(WPX)
-      PSDX=PSL(N6,N5,N4)-FCLX
-      FCDX=FCLX-WPLX
-      IF(THETWX(N6,N5,N4).LT.FCX)THEN
-      PSISA1(N6,N5,N4)=AMAX1(PSIHY,-EXP(PSIMX(N5,N4) &
-      +((FCLX-LOG(THETWX(N6,N5,N4))) &
-      /FCDX*PSIMD(NY,NX))))
-      ELSEIF(THETWX(N6,N5,N4).LT.POROS(N6,N5,N4)-DTHETW)THEN
-      PSISA1(N6,N5,N4)=-EXP(PSIMS(NY,NX) &
-      +(((PSL(N6,N5,N4)-LOG(THETWX(N6,N5,N4))) &
-      /PSDX)*PSISD(NY,NX)))
-      ELSE
-      PSISA1(N6,N5,N4)=PSISE(N6,N5,N4)
-      ENDIF
-      ELSE
-      PSISA1(N6,N5,N4)=PSISE(N6,N5,N4)
-      ENDIF
-!     IF(N1.EQ.4.AND.N2.EQ.1.AND.N3.EQ.11)THEN
-!     WRITE(*,1119)'PSISAL',I,J,M,N,N4,N5,N6,PSISA1(N6,N5,N4)
-!    2,THETWX(N6,N5,N4),THETIX(N6,N5,N4),FCX,WPX
-!    3,BKVL(N6,N5,N4),VOLX(N6,N5,N4)
-!     ENDIF
-!
-!     ACCOUNT FOR WETTING FRONTS WHEN CALCULATING WATER CONTENTS,
-!     MATRIC WATER POTENTIALS AND HYDRAULIC CONDUCTIVITIES USED
-!     IN WATER FLUX CALCULATIONS
-!
-!     THETW1,THETWL=water concentrations in source,destination cells
-!     CND1,CNDL=hydraulic conductivities in source,destination cells
-!     FKSAT=reduction in soil surface Ksat from rainfall energy impact
-!     PSISM1=soil matric potential
-!     VOLWX1=VOLW1 accounting for wetting front
-!
-!     DARCY FLOW IF BOTH CELLS ARE SATURATED
-!     (CURRENT WATER POTENTIAL > AIR ENTRY WATER POTENTIAL)
-!
-      IF(PSISA1(N3,N2,N1).GT.PSISA(N3,N2,N1) &
-      .AND.PSISA1(N6,N5,N4).GT.PSISA(N6,N5,N4))THEN
-      THETW1=THETA1
-      THETWL=THETAL
-      K1=MAX(1,MIN(100,INT(100.0*(POROS(N3,N2,N1) &
-      -THETW1)/POROS(N3,N2,N1))+1))
-      KL=MAX(1,MIN(100,INT(100.0*(POROS(N6,N5,N4) &
-      -THETWL)/POROS(N6,N5,N4))+1))
-      PSISM1(N3,N2,N1)=PSISA1(N3,N2,N1)
-      PSISM1(N6,N5,N4)=PSISA1(N6,N5,N4)
-!
-!     GREEN-AMPT FLOW IF ONE LAYER IS SATURATED
-!     (CURRENT WATER POTENTIAL < AIR ENTRY WATER POENTIAL)
-!
-!     GREEN-AMPT FLOW IF SOURCE CELL SATURATED
-!
-      ELSEIF(PSISA1(N3,N2,N1).GT.PSISA(N3,N2,N1))THEN
-      THETW1=THETA1
-      THETWL=AMAX1(THETY(N6,N5,N4),AMIN1(POROS(N6,N5,N4) &
-      ,safe_adb(VOLWX1(N6,N5,N4),VOLY(N6,N5,N4))))
-      K1=MAX(1,MIN(100,INT(100.0*(POROS(N3,N2,N1) &
-      -THETW1)/POROS(N3,N2,N1))+1))
-      KL=MAX(1,MIN(100,INT(100.0*(POROS(N6,N5,N4) &
-      -AMIN1(THETS(N6,N5,N4),THETWL))/POROS(N6,N5,N4))+1))
-      PSISM1(N3,N2,N1)=PSISA1(N3,N2,N1)
-      IF(BKVL(N6,N5,N4).GT.ZEROS(NY,NX))THEN
-      IF(THETWL.LT.FC(N6,N5,N4))THEN
-      PSISM1(N6,N5,N4)=AMAX1(PSIHY,-EXP(PSIMX(N5,N4) &
-      +((FCL(N6,N5,N4)-LOG(THETWL)) &
-      /FCD(N6,N5,N4)*PSIMD(N5,N4))))
-      ELSEIF(THETWL.LT.POROS(N6,N5,N4)-DTHETW)THEN
-      PSISM1(N6,N5,N4)=-EXP(PSIMS(N5,N4) &
-      +(((PSL(N6,N5,N4)-LOG(THETWL)) &
-      /PSD(N6,N5,N4))**SRP(N6,N5,N4)*PSISD(N5,N4)))
-      ELSE
-      THETWL=POROS(N6,N5,N4)
-      PSISM1(N6,N5,N4)=PSISE(N6,N5,N4)
-      ENDIF
-      ELSE
-      THETWL=POROS(N6,N5,N4)
-      PSISM1(N6,N5,N4)=PSISE(N6,N5,N4)
-      ENDIF
-!     IF(N3.EQ.NUM(NY,NX))THEN
-!     WRITE(*,1116)'GA',I,J,M,N1,N2,N3,N4,N5,N6,N
-!    3,PSISM1(N3,N2,N1),PSISM1(N6,N5,N4)
-!    3,VOLW1(N3,N2,N1),VOLW1(N6,N5,N4)
-!    3,VOLWX1(N3,N2,N1),VOLWX1(N6,N5,N4)
-!    6,THETW1,THETWL
+          IF(BKVL(N6,N5,N4).GT.ZEROS(NY,NX))THEN
+            IF(THETAL.LT.FC(N6,N5,N4))THEN
+              PSISA1(N6,N5,N4)=AMAX1(PSIHY,-EXP(PSIMX(N5,N4) &
+                +((FCL(N6,N5,N4)-LOG(THETAL)) &
+                /FCD(N6,N5,N4)*PSIMD(N5,N4))))
+            ELSEIF(THETAL.LT.POROS(N6,N5,N4)-DTHETW)THEN
+              PSISA1(N6,N5,N4)=-EXP(PSIMS(N5,N4) &
+                +(((PSL(N6,N5,N4)-LOG(THETAL)) &
+                /PSD(N6,N5,N4))**SRP(N6,N5,N4)*PSISD(N5,N4)))
+            ELSE
+              PSISA1(N6,N5,N4)=PSISE(N6,N5,N4)
+            ENDIF
+            !
+            !     SUBSURFCE LOWER WATER LAYER
+            !
+          ELSEIF(VOLX(N6,N5,N4).GT.ZEROS2(N5,N4).and.&
+            THETIX(N6,N5,N4)>ZEROS2(N5,N4))THEN
+            FCX=FCI*THETIX(N6,N5,N4)
+            WPX=WPI*THETIX(N6,N5,N4)
+            FCLX=LOG(FCX)
+            WPLX=LOG(WPX)
+            PSDX=PSL(N6,N5,N4)-FCLX
+            FCDX=FCLX-WPLX
+            IF(THETWX(N6,N5,N4).LT.FCX)THEN
+              PSISA1(N6,N5,N4)=AMAX1(PSIHY,-EXP(PSIMX(N5,N4) &
+                +((FCLX-LOG(THETWX(N6,N5,N4))) &
+                /FCDX*PSIMD(NY,NX))))
+            ELSEIF(THETWX(N6,N5,N4).LT.POROS(N6,N5,N4)-DTHETW)THEN
+              PSISA1(N6,N5,N4)=-EXP(PSIMS(NY,NX) &
+                +(((PSL(N6,N5,N4)-LOG(THETWX(N6,N5,N4))) &
+                /PSDX)*PSISD(NY,NX)))
+            ELSE
+              PSISA1(N6,N5,N4)=PSISE(N6,N5,N4)
+            ENDIF
+          ELSE
+            PSISA1(N6,N5,N4)=PSISE(N6,N5,N4)
+          ENDIF
+          !     IF(N1.EQ.4.AND.N2.EQ.1.AND.N3.EQ.11)THEN
+          !     WRITE(*,1119)'PSISAL',I,J,M,N,N4,N5,N6,PSISA1(N6,N5,N4)
+          !    2,THETWX(N6,N5,N4),THETIX(N6,N5,N4),FCX,WPX
+          !    3,BKVL(N6,N5,N4),VOLX(N6,N5,N4)
+          !     ENDIF
+          !
+          !     ACCOUNT FOR WETTING FRONTS WHEN CALCULATING WATER CONTENTS,
+          !     MATRIC WATER POTENTIALS AND HYDRAULIC CONDUCTIVITIES USED
+          !     IN WATER FLUX CALCULATIONS
+          !
+          !     THETW1,THETWL=water concentrations in source,destination cells
+          !     CND1,CNDL=hydraulic conductivities in source,destination cells
+          !     FKSAT=reduction in soil surface Ksat from rainfall energy impact
+          !     PSISM1=soil matric potential
+          !     VOLWX1=VOLW1 accounting for wetting front
+          !
+          !     DARCY FLOW IF BOTH CELLS ARE SATURATED
+          !     (CURRENT WATER POTENTIAL > AIR ENTRY WATER POTENTIAL)
+          !
+          IF(PSISA1(N3,N2,N1).GT.PSISA(N3,N2,N1) &
+            .AND.PSISA1(N6,N5,N4).GT.PSISA(N6,N5,N4))THEN
+            THETW1=THETA1
+            THETWL=THETAL
+            K1=MAX(1,MIN(100,INT(100.0*(POROS(N3,N2,N1) &
+              -THETW1)/POROS(N3,N2,N1))+1))
+            KL=MAX(1,MIN(100,INT(100.0*(POROS(N6,N5,N4) &
+              -THETWL)/POROS(N6,N5,N4))+1))
+            PSISM1(N3,N2,N1)=PSISA1(N3,N2,N1)
+            PSISM1(N6,N5,N4)=PSISA1(N6,N5,N4)
+            !
+            !     GREEN-AMPT FLOW IF ONE LAYER IS SATURATED
+            !     (CURRENT WATER POTENTIAL < AIR ENTRY WATER POENTIAL)
+            !
+            !     GREEN-AMPT FLOW IF SOURCE CELL SATURATED
+            !
+          ELSEIF(PSISA1(N3,N2,N1).GT.PSISA(N3,N2,N1))THEN
+            THETW1=THETA1
+            THETWL=AMAX1(THETY(N6,N5,N4),AMIN1(POROS(N6,N5,N4) &
+              ,safe_adb(VOLWX1(N6,N5,N4),VOLY(N6,N5,N4))))
+            K1=MAX(1,MIN(100,INT(100.0*(POROS(N3,N2,N1) &
+              -THETW1)/POROS(N3,N2,N1))+1))
+            KL=MAX(1,MIN(100,INT(100.0*(POROS(N6,N5,N4) &
+              -AMIN1(THETS(N6,N5,N4),THETWL))/POROS(N6,N5,N4))+1))
+            PSISM1(N3,N2,N1)=PSISA1(N3,N2,N1)
+            IF(BKVL(N6,N5,N4).GT.ZEROS(NY,NX))THEN
+              IF(THETWL.LT.FC(N6,N5,N4))THEN
+                PSISM1(N6,N5,N4)=AMAX1(PSIHY,-EXP(PSIMX(N5,N4) &
+                  +((FCL(N6,N5,N4)-LOG(THETWL)) &
+                  /FCD(N6,N5,N4)*PSIMD(N5,N4))))
+              ELSEIF(THETWL.LT.POROS(N6,N5,N4)-DTHETW)THEN
+                PSISM1(N6,N5,N4)=-EXP(PSIMS(N5,N4) &
+                  +(((PSL(N6,N5,N4)-LOG(THETWL)) &
+                  /PSD(N6,N5,N4))**SRP(N6,N5,N4)*PSISD(N5,N4)))
+              ELSE
+                THETWL=POROS(N6,N5,N4)
+                PSISM1(N6,N5,N4)=PSISE(N6,N5,N4)
+              ENDIF
+            ELSE
+              THETWL=POROS(N6,N5,N4)
+              PSISM1(N6,N5,N4)=PSISE(N6,N5,N4)
+            ENDIF
+            !     IF(N3.EQ.NUM(NY,NX))THEN
+            !     WRITE(*,1116)'GA',I,J,M,N1,N2,N3,N4,N5,N6,N
+            !    3,PSISM1(N3,N2,N1),PSISM1(N6,N5,N4)
+            !    3,VOLW1(N3,N2,N1),VOLW1(N6,N5,N4)
+            !    3,VOLWX1(N3,N2,N1),VOLWX1(N6,N5,N4)
+            !    6,THETW1,THETWL
 !1116  FORMAT(A8,10I4,100E12.4)
-!     ENDIF
+            !     ENDIF
+            !
+            !     GREEN-AMPT FLOW IF ADJACENT CELL SATURATED
 !
-!     GREEN-AMPT FLOW IF ADJACENT CELL SATURATED
-!
-      ELSEIF(PSISA1(N6,N5,N4).GT.PSISA(N6,N5,N4))THEN
-      THETW1=AMAX1(THETY(N3,N2,N1),AMIN1(POROS(N3,N2,N1) &
-      ,safe_adb(VOLWX1(N3,N2,N1),VOLY(N3,N2,N1))))
-      THETWL=THETAL
-      K1=MAX(1,MIN(100,INT(100.0*(POROS(N3,N2,N1) &
-      -AMIN1(THETS(N3,N2,N1),THETW1))/POROS(N3,N2,N1))+1))
-      KL=MAX(1,MIN(100,INT(100.0*(POROS(N6,N5,N4) &
-      -THETWL)/POROS(N6,N5,N4))+1))
-      IF(BKVL(N3,N2,N1).GT.ZEROS(NY,NX))THEN
-      IF(THETW1.LT.FC(N3,N2,N1))THEN
-      PSISM1(N3,N2,N1)=AMAX1(PSIHY,-EXP(PSIMX(N2,N1) &
-      +((FCL(N3,N2,N1)-LOG(THETW1)) &
-      /FCD(N3,N2,N1)*PSIMD(N2,N1))))
-      ELSEIF(THETW1.LT.POROS(N3,N2,N1)-DTHETW)THEN
-      PSISM1(N3,N2,N1)=-EXP(PSIMS(N2,N1) &
-      +(((PSL(N3,N2,N1)-LOG(THETW1)) &
-      /PSD(N3,N2,N1))**SRP(N3,N2,N1)*PSISD(N2,N1)))
-      ELSE
-      THETW1=POROS(N3,N2,N1)
-      PSISM1(N3,N2,N1)=PSISE(N3,N2,N1)
-      ENDIF
-      ELSE
-      THETW1=POROS(N3,N2,N1)
-      PSISM1(N3,N2,N1)=PSISE(N3,N2,N1)
-      ENDIF
-!
-!     RICHARDS FLOW IF NEITHER CELL IS SATURATED
-!     (CURRENT WATER POTENTIAL < AIR ENTRY WATER POTENTIAL)
-!
-      ELSE
-      THETW1=THETA1
-      THETWL=THETAL
-      K1=MAX(1,MIN(100,INT(100.0*(POROS(N3,N2,N1) &
-      -THETW1)/POROS(N3,N2,N1))+1))
-      KL=MAX(1,MIN(100,INT(100.0*(POROS(N6,N5,N4) &
-      -THETWL)/POROS(N6,N5,N4))+1))
-      PSISM1(N3,N2,N1)=PSISA1(N3,N2,N1)
-      PSISM1(N6,N5,N4)=PSISA1(N6,N5,N4)
-      ENDIF
-!
-!     HYDRAULIC CONUCTIVITY
-!
-!     CND1,CNDL=hydraulic conductivity of source,destination layer
-!     HCND=lateral(1,2),vertical(3) micropore hydraulic conductivity
-!
-      IF(N3.EQ.NUM(NY,NX))THEN
-      CND1=HCND(N,K1,N3,N2,N1)*FKSAT
-      ELSE
-      CND1=HCND(N,K1,N3,N2,N1)
-      ENDIF
-      CNDL=HCND(N,KL,N6,N5,N4)
-!
-!     TOTAL SOIL WATER POTENTIAL = MATRIC, GRAVIMETRIC + OSMOTIC
-!
-!     PSISM1,PSISH,PSISO=soil matric,gravitational,osmotic potentials
-!
-      PSIST1=PSISM1(N3,N2,N1)+PSISH(N3,N2,N1)+PSISO(N3,N2,N1)
-      PSISTL=PSISM1(N6,N5,N4)+PSISH(N6,N5,N4)+PSISO(N6,N5,N4)
-      PSISV1=PSISM1(N3,N2,N1)+PSISO(N3,N2,N1)
-      PSISVL=PSISM1(N6,N5,N4)+PSISO(N6,N5,N4)
-!     IF(N6.EQ.12)THEN
-!     WRITE(*,7272)'PSIM',I,J,M,N1,N2,N3,N4,N5,N6
-!    2,PSISM1(N3,N2,N1),PSISM1(N6,N5,N4),PSISA1(N3,N2,N1)
-!    3,PSISA1(N6,N5,N4),THETWL,THETAL
-!    2,PSIMX(N5,N4),FCL(N6,N5,N4),FCD(N6,N5,N4),PSIMD(N5,N4)
-!    3,POROS(N6,N5,N4),PSIMS(N5,N4),PSL(N6,N5,N4),PSD(N6,N5,N4)
-!    4,SRP(N6,N5,N4),PSISD(N5,N4),PSISE(N6,N5,N4)
-!    5,THETY(N6,N5,N4),POROS(N6,N5,N4),VOLW1(N6,N5,N4),VOLX(N6,N5,N4)
+          ELSEIF(PSISA1(N6,N5,N4).GT.PSISA(N6,N5,N4))THEN
+            THETW1=AMAX1(THETY(N3,N2,N1),AMIN1(POROS(N3,N2,N1) &
+              ,safe_adb(VOLWX1(N3,N2,N1),VOLY(N3,N2,N1))))
+            THETWL=THETAL
+            K1=MAX(1,MIN(100,INT(100.0*(POROS(N3,N2,N1) &
+              -AMIN1(THETS(N3,N2,N1),THETW1))/POROS(N3,N2,N1))+1))
+            KL=MAX(1,MIN(100,INT(100.0*(POROS(N6,N5,N4) &
+              -THETWL)/POROS(N6,N5,N4))+1))
+            IF(BKVL(N3,N2,N1).GT.ZEROS(NY,NX))THEN
+              IF(THETW1.LT.FC(N3,N2,N1))THEN
+                PSISM1(N3,N2,N1)=AMAX1(PSIHY,-EXP(PSIMX(N2,N1) &
+                  +((FCL(N3,N2,N1)-LOG(THETW1)) &
+                  /FCD(N3,N2,N1)*PSIMD(N2,N1))))
+              ELSEIF(THETW1.LT.POROS(N3,N2,N1)-DTHETW)THEN
+                PSISM1(N3,N2,N1)=-EXP(PSIMS(N2,N1) &
+                  +(((PSL(N3,N2,N1)-LOG(THETW1)) &
+                  /PSD(N3,N2,N1))**SRP(N3,N2,N1)*PSISD(N2,N1)))
+              ELSE
+                THETW1=POROS(N3,N2,N1)
+                PSISM1(N3,N2,N1)=PSISE(N3,N2,N1)
+              ENDIF
+            ELSE
+              THETW1=POROS(N3,N2,N1)
+              PSISM1(N3,N2,N1)=PSISE(N3,N2,N1)
+            ENDIF
+            !
+            !     RICHARDS FLOW IF NEITHER CELL IS SATURATED
+            !     (CURRENT WATER POTENTIAL < AIR ENTRY WATER POTENTIAL)
+            !
+          ELSE
+            THETW1=THETA1
+            THETWL=THETAL
+            K1=MAX(1,MIN(100,INT(100.0*(POROS(N3,N2,N1) &
+              -THETW1)/POROS(N3,N2,N1))+1))
+            KL=MAX(1,MIN(100,INT(100.0*(POROS(N6,N5,N4) &
+              -THETWL)/POROS(N6,N5,N4))+1))
+            PSISM1(N3,N2,N1)=PSISA1(N3,N2,N1)
+            PSISM1(N6,N5,N4)=PSISA1(N6,N5,N4)
+          ENDIF
+          !
+          !     HYDRAULIC CONUCTIVITY
+          !
+          !     CND1,CNDL=hydraulic conductivity of source,destination layer
+          !     HCND=lateral(1,2),vertical(3) micropore hydraulic conductivity
+          !
+          IF(N3.EQ.NUM(NY,NX))THEN
+            CND1=HCND(N,K1,N3,N2,N1)*FKSAT
+          ELSE
+            CND1=HCND(N,K1,N3,N2,N1)
+          ENDIF
+          CNDL=HCND(N,KL,N6,N5,N4)
+          !
+          !     TOTAL SOIL WATER POTENTIAL = MATRIC, GRAVIMETRIC + OSMOTIC
+          !
+          !     PSISM1,PSISH,PSISO=soil matric,gravitational,osmotic potentials
+    !
+          PSIST1=PSISM1(N3,N2,N1)+PSISH(N3,N2,N1)+PSISO(N3,N2,N1)
+          PSISTL=PSISM1(N6,N5,N4)+PSISH(N6,N5,N4)+PSISO(N6,N5,N4)
+          PSISV1=PSISM1(N3,N2,N1)+PSISO(N3,N2,N1)
+          PSISVL=PSISM1(N6,N5,N4)+PSISO(N6,N5,N4)
+          !     IF(N6.EQ.12)THEN
+          !     WRITE(*,7272)'PSIM',I,J,M,N1,N2,N3,N4,N5,N6
+          !    2,PSISM1(N3,N2,N1),PSISM1(N6,N5,N4),PSISA1(N3,N2,N1)
+          !    3,PSISA1(N6,N5,N4),THETWL,THETAL
+          !    2,PSIMX(N5,N4),FCL(N6,N5,N4),FCD(N6,N5,N4),PSIMD(N5,N4)
+          !    3,POROS(N6,N5,N4),PSIMS(N5,N4),PSL(N6,N5,N4),PSD(N6,N5,N4)
+          !    4,SRP(N6,N5,N4),PSISD(N5,N4),PSISE(N6,N5,N4)
+          !    5,THETY(N6,N5,N4),POROS(N6,N5,N4),VOLW1(N6,N5,N4),VOLX(N6,N5,N4)
 !7272  FORMAT(A8,9I4,30E12.4)
-!     ENDIF
+          !     ENDIF
+          !
+          !     HYDRAULIC CONDUCTIVITY FROM CURRENT WATER CONTENT
+          !     AND LOOKUP ARRAY GENERATED IN 'HOUR1'
+          !
+          !     CND1,CNDL=hydraulic conductivities in source,destination cells
+          !     FKSAT=reduction in soil surface Ksat from rainfall energy impact
+          !     AVCNDL=source-destination hydraulic conductance
+          !     DLYR=layer thickness
+          !
+          IF(CND1.GT.ZERO.AND.CNDL.GT.ZERO)THEN
+            AVCNDL=2.0*CND1*CNDL/(CND1*DLYR(N,N6,N5,N4) &
+              +CNDL*DLYR(N,N3,N2,N1))
+          ELSE
+            AVCNDL=0.0
+          ENDIF
+          !
+          !     WATER FLUX FROM WATER POTENTIALS, HYDRAULIC CONDUCTIVITY
+          !     CONSTRAINED BY WATER POTENTIAL GRADIENT, COUPLED WITH
+          !     CONVECTIVE HEAT FLUX FROM WATER FLUX
+          !
+          !     FLQX,FLQL=micropore water flux unlimited,limited by source water
+          !     XNPH=time step of flux calculations
+          !     VOLW2,VOLP1=water,air contents of source,destination micropores
+          !     HWFLWL=convective heat flux from micropore water flux
+          !     VOLP1Z=excess water+ice relative to porosity
+          !
+          FLQX=AVCNDL*(PSIST1-PSISTL)*AREA(N,N3,N2,N1)*XNPH
+          IF(FLQX.GE.0.0)THEN
+            IF(THETW1.GT.THETS(N3,N2,N1))THEN
+              FLQZ=FLQX+AMIN1((THETW1-THETS(N3,N2,N1)) &
+                *VOLY(N3,N2,N1),AMAX1(0.0,(THETS(N6,N5,N4)-THETWL) &
+                *VOLY(N6,N5,N4)))*XNPX
+            ELSE
+              FLQZ=FLQX
+            ENDIF
+            FLQL=AMAX1(0.0,AMIN1(FLQZ,VOLW2(N3,N2,N1)*XNPX &
+              ,VOLP1(N6,N5,N4)*XNPX))
+            FLQ2=AMAX1(0.0,AMIN1(FLQX,VOLW2(N3,N2,N1)*XNPX &
+              ,VOLP1(N6,N5,N4)*XNPX))
+            !     FLQL1=(THETW1-THETS(N3,N2,N1))*VOLY(N3,N2,N1)
+            !     FLQL2=(THETS(N6,N5,N4)-THETWL)*VOLY(N6,N5,N4)
+            !     FLQL3=FLQX+AMIN1(FLQL1,AMAX1(0.0,FLQL2))*XNPX
+            !     FLQL4=AMAX1(0.0,AMIN1(FLQL3,VOLP1(N6,N5,N4)*XNPX))
+          ELSE
+            IF(THETWL.GT.THETS(N6,N5,N4))THEN
+              FLQZ=FLQX+AMAX1((THETS(N6,N5,N4)-THETWL) &
+                *VOLY(N6,N5,N4),AMIN1(0.0,(THETW1-THETS(N3,N2,N1)) &
+                *VOLY(N3,N2,N1)))*XNPX
+            ELSE
+              FLQZ=FLQX
+            ENDIF
+            FLQL=AMIN1(0.0,AMAX1(FLQZ,-VOLW2(N6,N5,N4)*XNPX,-VOLP1(N3,N2,N1)*XNPX))
+            FLQ2=AMIN1(0.0,AMAX1(FLQX,-VOLW2(N6,N5,N4)*XNPX,-VOLP1(N3,N2,N1)*XNPX))
+            !     FLQL1=(THETS(N6,N5,N4)-THETWL)*VOLY(N6,N5,N4)
+            !     FLQL2=(THETW1-THETS(N3,N2,N1))*VOLY(N3,N2,N1)
+            !     FLQL3=FLQX+AMAX1(FLQL1,AMIN1(0.0,FLQL2))*XNPX
+            !     FLQL4=AMIN1(0.0,AMAX1(FLQL3,-VOLP1(N3,N2,N1)*XNPX))
+          ENDIF
+          IF(N.EQ.3.AND.VOLP1Z(N6,N5,N4).LT.0.0)THEN
+            FLQL=FLQL+AMIN1(0.0,AMAX1(-VOLW2(N6,N5,N4)*XNPX,VOLP1Z(N6,N5,N4)))
+            FLQ2=FLQ2+AMIN1(0.0,AMAX1(-VOLW2(N6,N5,N4)*XNPX,VOLP1Z(N6,N5,N4)))
+          ENDIF
+          IF(FLQL.GT.0.0)THEN
+            HWFLQL=cpw*TK1(N3,N2,N1)*FLQL
+          ELSE
+            HWFLQL=cpw*TK1(N6,N5,N4)*FLQL
+          ENDIF
+          VOLW2(N3,N2,N1)=VOLW2(N3,N2,N1)-FLQL
+          VOLW2(N6,N5,N4)=VOLW2(N6,N5,N4)+FLQL
 !
-!     HYDRAULIC CONDUCTIVITY FROM CURRENT WATER CONTENT
-!     AND LOOKUP ARRAY GENERATED IN 'HOUR1'
-!
-!     CND1,CNDL=hydraulic conductivities in source,destination cells
-!     FKSAT=reduction in soil surface Ksat from rainfall energy impact
-!     AVCNDL=source-destination hydraulic conductance
-!     DLYR=layer thickness
-!
-      IF(CND1.GT.ZERO.AND.CNDL.GT.ZERO)THEN
-      AVCNDL=2.0*CND1*CNDL/(CND1*DLYR(N,N6,N5,N4) &
-      +CNDL*DLYR(N,N3,N2,N1))
-      ELSE
-      AVCNDL=0.0
-      ENDIF
-!
-!     WATER FLUX FROM WATER POTENTIALS, HYDRAULIC CONDUCTIVITY
-!     CONSTRAINED BY WATER POTENTIAL GRADIENT, COUPLED WITH
-!     CONVECTIVE HEAT FLUX FROM WATER FLUX
-!
-!     FLQX,FLQL=micropore water flux unlimited,limited by source water
-!     XNPH=time step of flux calculations
-!     VOLW2,VOLP1=water,air contents of source,destination micropores
-!     HWFLWL=convective heat flux from micropore water flux
-!     VOLP1Z=excess water+ice relative to porosity
-!
-      FLQX=AVCNDL*(PSIST1-PSISTL)*AREA(N,N3,N2,N1)*XNPH
-      IF(FLQX.GE.0.0)THEN
-      IF(THETW1.GT.THETS(N3,N2,N1))THEN
-      FLQZ=FLQX+AMIN1((THETW1-THETS(N3,N2,N1)) &
-      *VOLY(N3,N2,N1),AMAX1(0.0,(THETS(N6,N5,N4)-THETWL) &
-      *VOLY(N6,N5,N4)))*XNPX
-      ELSE
-      FLQZ=FLQX
-      ENDIF
-      FLQL=AMAX1(0.0,AMIN1(FLQZ,VOLW2(N3,N2,N1)*XNPX &
-      ,VOLP1(N6,N5,N4)*XNPX))
-      FLQ2=AMAX1(0.0,AMIN1(FLQX,VOLW2(N3,N2,N1)*XNPX &
-      ,VOLP1(N6,N5,N4)*XNPX))
-!     FLQL1=(THETW1-THETS(N3,N2,N1))*VOLY(N3,N2,N1)
-!     FLQL2=(THETS(N6,N5,N4)-THETWL)*VOLY(N6,N5,N4)
-!     FLQL3=FLQX+AMIN1(FLQL1,AMAX1(0.0,FLQL2))*XNPX
-!     FLQL4=AMAX1(0.0,AMIN1(FLQL3,VOLP1(N6,N5,N4)*XNPX))
-      ELSE
-      IF(THETWL.GT.THETS(N6,N5,N4))THEN
-      FLQZ=FLQX+AMAX1((THETS(N6,N5,N4)-THETWL) &
-      *VOLY(N6,N5,N4),AMIN1(0.0,(THETW1-THETS(N3,N2,N1)) &
-      *VOLY(N3,N2,N1)))*XNPX
-      ELSE
-      FLQZ=FLQX
-      ENDIF
-      FLQL=AMIN1(0.0,AMAX1(FLQZ,-VOLW2(N6,N5,N4)*XNPX &
-      ,-VOLP1(N3,N2,N1)*XNPX))
-      FLQ2=AMIN1(0.0,AMAX1(FLQX,-VOLW2(N6,N5,N4)*XNPX &
-      ,-VOLP1(N3,N2,N1)*XNPX))
-!     FLQL1=(THETS(N6,N5,N4)-THETWL)*VOLY(N6,N5,N4)
-!     FLQL2=(THETW1-THETS(N3,N2,N1))*VOLY(N3,N2,N1)
-!     FLQL3=FLQX+AMAX1(FLQL1,AMIN1(0.0,FLQL2))*XNPX
-!     FLQL4=AMIN1(0.0,AMAX1(FLQL3,-VOLP1(N3,N2,N1)*XNPX))
-      ENDIF
-      IF(N.EQ.3.AND.VOLP1Z(N6,N5,N4).LT.0.0)THEN
-      FLQL=FLQL+AMIN1(0.0,AMAX1(-VOLW2(N6,N5,N4)*XNPX &
-      ,VOLP1Z(N6,N5,N4)))
-      FLQ2=FLQ2+AMIN1(0.0,AMAX1(-VOLW2(N6,N5,N4)*XNPX &
-      ,VOLP1Z(N6,N5,N4)))
-      ENDIF
-      IF(FLQL.GT.0.0)THEN
-      HWFLQL=cpw*TK1(N3,N2,N1)*FLQL
-      ELSE
-      HWFLQL=cpw*TK1(N6,N5,N4)*FLQL
-      ENDIF
-      VOLW2(N3,N2,N1)=VOLW2(N3,N2,N1)-FLQL
-      VOLW2(N6,N5,N4)=VOLW2(N6,N5,N4)+FLQL
-!
-!     MACROPORE FLOW FROM POISEUILLE FLOW IF MACROPORES PRESENT
-!
-!     PSISH1,PSISHL=macropore total water potl in source,destination
-!     DLYR=layer thickness
-!     VOLWH1,VOLPH1=macropore water,air content
-!
-      IF(VOLAH1(N3,N2,N1).GT.ZEROS2(N2,N1) &
-      .AND.VOLAH1(N6,N5,N4).GT.ZEROS2(N5,N4).AND.IFLGH.EQ.0)THEN
-      PSISH1=PSISH(N3,N2,N1)+0.0098*DLYR(3,N3,N2,N1) &
-      *(AMIN1(1.0,AMAX1(0.0,VOLWH1(N3,N2,N1)/VOLAH1(N3,N2,N1)))-0.5)
-      PSISHL=PSISH(N6,N5,N4)+0.0098*DLYR(3,N6,N5,N4) &
-      *(AMIN1(1.0,AMAX1(0.0,VOLWH1(N6,N5,N4)/VOLAH1(N6,N5,N4)))-0.5)
-!
-!     MACROPORE FLOW IF GRAVITATIONAL GRADIENT IS POSITIVE
-!     AND MACROPORE POROSITY EXISTS IN ADJACENT CELL
-!
-!     FLWHX,FLWHL=macropore water flux unltd,ltd by source water
-!     XNPH=time step of flux calculations
-!     VOLW2,VOLP1=water,air contents of source,destination micropores
-!     HWFLHL=convective heat flux from micropore water flux
-!
-      FLWHX=AVCNHL(N,N6,N5,N4)*(PSISH1-PSISHL)*AREA(N,N3,N2,N1)*XNPH
-      IF(N.NE.3)THEN
-      IF(PSISH1.GT.PSISHL)THEN
-      FLWHL(N,N6,N5,N4)=AMAX1(0.0,AMIN1(AMIN1(VOLWH1(N3,N2,N1) &
-      ,VOLPH1(N6,N5,N4))*XNPX,FLWHX))
-      ELSEIF(PSISH1.LT.PSISHL)THEN
-      FLWHL(N,N6,N5,N4)=AMIN1(0.0,AMAX1(AMAX1(-VOLWH1(N6,N5,N4) &
-      ,-VOLPH1(N3,N2,N1))*XNPX,FLWHX))
-      ELSE
-      FLWHL(N,N6,N5,N4)=0.0
-      ENDIF
-      ELSE
-      FLWHL(N,N6,N5,N4)=AMAX1(0.0,AMIN1(AMIN1(VOLWH1(N3,N2,N1)*XNPX &
-      +FLWHL(N,N3,N2,N1),VOLPH1(N6,N5,N4)*XNPX),FLWHX))
-      ENDIF
-      IF(N.EQ.3)THEN
-      FLWHL(N,N6,N5,N4)=FLWHL(N,N6,N5,N4)+AMIN1(0.0,VOLPH1Z(N6,N5,N4))
-      ENDIF
-      FLWHM(M,N,N6,N5,N4)=FLWHL(N,N6,N5,N4)
-!     IF(N4.EQ.1)THEN
-!     WRITE(*,5478)'FLWH',I,J,M,N1,N2,N3,IFLGH
-!    2,FLHM,FLWHX,FLWHL(N,N3,N2,N1),FLWHL(N,N6,N5,N4)
-!    2,AVCNHL(N,N6,N5,N4),PSISH(N3,N2,N1),PSISH(N6,N5,N4)
-!    3,VOLPH1(N3,N2,N1),VOLPH1(N6,N5,N4),VOLWH1(N3,N2,N1)
-!    4,VOLWH1(N6,N5,N4),VOLAH1(N3,N2,N1),VOLAH1(N6,N5,N4)
-!    5,DLYR(N,N6,N5,N4),DLYR(N,N3,N2,N1),AREA(N,N3,N2,N1)
-!    7,CNDH1(N3,N2,N1),CNDH1(N6,N5,N4),XNPH,HWFLHL
+          !     MACROPORE FLOW FROM POISEUILLE FLOW IF MACROPORES PRESENT
+          !
+          !     PSISH1,PSISHL=macropore total water potl in source,destination
+          !     DLYR=layer thickness
+          !     VOLWH1,VOLPH1=macropore water,air content
+    !
+          IF(VOLAH1(N3,N2,N1).GT.ZEROS2(N2,N1) &
+            .AND.VOLAH1(N6,N5,N4).GT.ZEROS2(N5,N4).AND.IFLGH.EQ.0)THEN
+            PSISH1=PSISH(N3,N2,N1)+0.0098*DLYR(3,N3,N2,N1) &
+              *(AMIN1(1.0,AMAX1(0.0,VOLWH1(N3,N2,N1)/VOLAH1(N3,N2,N1)))-0.5)
+            PSISHL=PSISH(N6,N5,N4)+0.0098*DLYR(3,N6,N5,N4) &
+              *(AMIN1(1.0,AMAX1(0.0,VOLWH1(N6,N5,N4)/VOLAH1(N6,N5,N4)))-0.5)
+            !
+            !     MACROPORE FLOW IF GRAVITATIONAL GRADIENT IS POSITIVE
+            !     AND MACROPORE POROSITY EXISTS IN ADJACENT CELL
+            !
+            !     FLWHX,FLWHL=macropore water flux unltd,ltd by source water
+            !     XNPH=time step of flux calculations
+            !     VOLW2,VOLP1=water,air contents of source,destination micropores
+            !     HWFLHL=convective heat flux from micropore water flux
+            !
+            FLWHX=AVCNHL(N,N6,N5,N4)*(PSISH1-PSISHL)*AREA(N,N3,N2,N1)*XNPH
+            IF(N.NE.3)THEN
+              IF(PSISH1.GT.PSISHL)THEN
+                FLWHL(N,N6,N5,N4)=AMAX1(0.0,AMIN1(AMIN1(VOLWH1(N3,N2,N1) &
+                  ,VOLPH1(N6,N5,N4))*XNPX,FLWHX))
+              ELSEIF(PSISH1.LT.PSISHL)THEN
+                FLWHL(N,N6,N5,N4)=AMIN1(0.0,AMAX1(AMAX1(-VOLWH1(N6,N5,N4) &
+                  ,-VOLPH1(N3,N2,N1))*XNPX,FLWHX))
+              ELSE
+                FLWHL(N,N6,N5,N4)=0.0
+              ENDIF
+            ELSE
+              FLWHL(N,N6,N5,N4)=AMAX1(0.0,AMIN1(AMIN1(VOLWH1(N3,N2,N1)*XNPX &
+                +FLWHL(N,N3,N2,N1),VOLPH1(N6,N5,N4)*XNPX),FLWHX))
+            ENDIF
+            IF(N.EQ.3)THEN
+              FLWHL(N,N6,N5,N4)=FLWHL(N,N6,N5,N4)+AMIN1(0.0,VOLPH1Z(N6,N5,N4))
+            ENDIF
+            FLWHM(M,N,N6,N5,N4)=FLWHL(N,N6,N5,N4)
+            !     IF(N4.EQ.1)THEN
+            !     WRITE(*,5478)'FLWH',I,J,M,N1,N2,N3,IFLGH
+            !    2,FLHM,FLWHX,FLWHL(N,N3,N2,N1),FLWHL(N,N6,N5,N4)
+            !    2,AVCNHL(N,N6,N5,N4),PSISH(N3,N2,N1),PSISH(N6,N5,N4)
+            !    3,VOLPH1(N3,N2,N1),VOLPH1(N6,N5,N4),VOLWH1(N3,N2,N1)
+            !    4,VOLWH1(N6,N5,N4),VOLAH1(N3,N2,N1),VOLAH1(N6,N5,N4)
+            !    5,DLYR(N,N6,N5,N4),DLYR(N,N3,N2,N1),AREA(N,N3,N2,N1)
+            !    7,CNDH1(N3,N2,N1),CNDH1(N6,N5,N4),XNPH,HWFLHL
 !5478  FORMAT(A8,7I4,30E12.4)
-!     ENDIF
-      ELSE
-      FLWHL(N,N6,N5,N4)=0.0
-      FLWHM(M,N,N6,N5,N4)=0.0
-      IF(VOLPH1(N6,N5,N4).LE.0.0)IFLGH=1
-      ENDIF
-      IF(FLWHL(N,N6,N5,N4).GT.0.0)THEN
-      HWFLHL=cpw*TK1(N3,N2,N1)*FLWHL(N,N6,N5,N4)
-      ELSE
-      HWFLHL=cpw*TK1(N6,N5,N4)*FLWHL(N,N6,N5,N4)
-      ENDIF
+            !     ENDIF
+          ELSE
+            FLWHL(N,N6,N5,N4)=0.0
+            FLWHM(M,N,N6,N5,N4)=0.0
+            IF(VOLPH1(N6,N5,N4).LE.0.0)IFLGH=1
+          ENDIF
+          IF(FLWHL(N,N6,N5,N4).GT.0.0)THEN
+            HWFLHL=cpw*TK1(N3,N2,N1)*FLWHL(N,N6,N5,N4)
+          ELSE
+            HWFLHL=cpw*TK1(N6,N5,N4)*FLWHL(N,N6,N5,N4)
+          ENDIF
 !
-!     VAPOR PRESSURE AND DIFFUSIVITY IN EACH GRID CELL
+          !     VAPOR PRESSURE AND DIFFUSIVITY IN EACH GRID CELL
+          !
+          !     THETPM,THETX=current, minimum air-filled porosity
+          !     TK11,TK12=interim soil temperature in source,destination
+          !     VP1,VPL=vapor concentration in source,destination
+          !     PSISV1,PSISVL=matric+osmotic water potl in source,destination
+          !     CNV1,CNV2=vapor conductivities of source, destination
+          !     POROS,POROQ=porosity, tortuosity
+          !     WGSGL=vapor diffusivity
+          !     ATCNVL=source,destination vapor conductance
+          !     DLYR=soil layer depth
+          !     FLVC,FLVX=vapor flux unlimited,limited by vapor
+          !     VPY=equilibrium vapor concentration
+          !     XNPX=time step for flux calculations
+          !     FLVL,HWFLVL=vapor flux and its convective heat flux
 !
-!     THETPM,THETX=current, minimum air-filled porosity
-!     TK11,TK12=interim soil temperature in source,destination
-!     VP1,VPL=vapor concentration in source,destination
-!     PSISV1,PSISVL=matric+osmotic water potl in source,destination
-!     CNV1,CNV2=vapor conductivities of source, destination
-!     POROS,POROQ=porosity, tortuosity
-!     WGSGL=vapor diffusivity
-!     ATCNVL=source,destination vapor conductance
-!     DLYR=soil layer depth
-!     FLVC,FLVX=vapor flux unlimited,limited by vapor
-!     VPY=equilibrium vapor concentration
-!     XNPX=time step for flux calculations
-!     FLVL,HWFLVL=vapor flux and its convective heat flux
-!
-      IF(THETPM(M,N3,N2,N1).GT.THETX &
-      .AND.THETPM(M,N6,N5,N4).GT.THETX)THEN
-      TK11=TK1(N3,N2,N1)
-      TK12=TK1(N6,N5,N4)
-      !VP1=2.173E-03/TK11 &
-      !*0.61*EXP(5360.0*(3.661E-03-1.0/TK11)) &
-      VP1=vapsat(TK11)*EXP(18.0*PSISV1/(8.3143*TK11))
-      !VPL=2.173E-03/TK12 &
-      !*0.61*EXP(5360.0*(3.661E-03-1.0/TK12)) &
-      VPL=vapsat(TK12)*EXP(18.0*PSISVL/(8.3143*TK12))
-      CNV1=WGSGL(N3,N2,N1)*THETPM(M,N3,N2,N1)*POROQ &
-        *THETPM(M,N3,N2,N1)/POROS(N3,N2,N1)
-      CNVL=WGSGL(N6,N5,N4)*THETPM(M,N6,N5,N4)*POROQ &
-        *THETPM(M,N6,N5,N4)/POROS(N6,N5,N4)
-      ATCNVL=2.0*CNV1*CNVL &
-        /(CNV1*DLYR(N,N6,N5,N4)+CNVL*DLYR(N,N3,N2,N1))
-!
-!     VAPOR FLUX FROM VAPOR PRESSURE AND DIFFUSIVITY,
-!     AND CONVECTIVE HEAT FLUX FROM VAPOR FLUX
-!
-      FLVC=ATCNVL*(VP1-VPL)*AREA(N,N3,N2,N1)*XNPH
-      VPY=(VP1*VOLPM(M,N3,N2,N1)+VPL*VOLPM(M,N6,N5,N4)) &
-      /(VOLPM(M,N3,N2,N1)+VOLPM(M,N6,N5,N4))
-      FLVX=(VP1-VPY)*VOLPM(M,N3,N2,N1)*XNPX
-      IF(FLVC.GE.0.0)THEN
-      FLVL=AMAX1(0.0,AMIN1(FLVC,FLVX))
-      HWFLVL=(cpw*TK1(N3,N2,N1)+VAP)*FLVL
-      ELSE
-      FLVL=AMIN1(0.0,AMAX1(FLVC,FLVX))
-      HWFLVL=(cpw*TK1(N6,N5,N4)+VAP)*FLVL
-      ENDIF
-      ELSE
-      FLVL=0.0
-      HWFLVL=0.0
-      ENDIF
-!
-!     FLWL=total water+vapor flux to destination
-!     FLWLX=total unsaturated water+vapor flux to destination
-!     HWFLWL=total convective heat flux from water+vapor flux
-!
-      FLWL(N,N6,N5,N4)=FLQL+FLVL
-      if(abs(FLWL(N,N6,N5,N4))>1.e20)then
-        write(*,*)'FLQL+FLVL=',FLQL,FLVL
-        write(*,*)'at line',__LINE__
-        call endrun(trim(mod_filename)//'at line',__LINE__)
-      endif
-      FLWLX(N,N6,N5,N4)=FLQ2+FLVL
-      HWFLWL=HWFLQL+HWFLVL
-!     IF(I.EQ.232.AND.N3.LE.NUM(N2,N1))THEN
-!     WRITE(*,1115)'FLWL',I,J,M,N1,N2,N3,N4,N5,N6,N,K1,KL
-!    2,FLWL(N,N3,N2,N1),FLWL(N,N6,N5,N4),FLQX,FLQZ,FLQL,FLQ2,FLVL
-!    3,PSIST1,PSISTL
-!    4,AVCNDL,CND1,CNDL,FKSAT
-!    2,VOLP1(N3,N2,N1),VOLP1(N6,N5,N4),VOLW1(N3,N2,N1)
-!    3,VOLWX1(N3,N2,N1),VOLW1(N6,N5,N4),VOLWX1(N6,N5,N4)
-!    6,THETW1,THETS(N3,N2,N1),THETWL,THETS(N6,N5,N4)
-!    7,PSISA1(N3,N2,N1),PSISA1(N6,N5,N4),PSISM1(N3,N2,N1)
-!    7,PSISM1(N6,N5,N4),PSISH(N3,N2,N1),PSISH(N6,N5,N4)
-!    3,VOLY(N3,N2,N1),VOLY(N6,N5,N4)
-!    3,FLVL,FLVX,VP1,VPL,VPY,CNV1,CNVL,ATCNVL
-!    4,VOLA1(N6,N5,N4),VOLI1(N6,N5,N4),SCNV(N3,N2,N1)
-!    5,SCNV(N6,N5,N4),VOLP1(N3,N2,N1),VOLP1(N6,N5,N4)
-!    7,VOLP1Z(N6,N5,N4),VOLT(N3,N2,N1),VOLT(N6,N5,N4)
-!    8,DLYR(N,N3,N2,N1),DLYR(N,N6,N5,N4),AREA(N,N3,N2,N1)
-!    3,HWFLWL,HWFLQL,HWFLVL
-!    9,TK1(N3,N2,N1),TK1(N6,N5,N4),TKY
-!    9,VHCP1(N3,N2,N1),VHCP1(N6,N5,N4),POROS(N6,N5,N4)
-!    9,VOLP1(N3,N2,N1),VOLX(N3,N2,N1),VOLA1(N6,N5,N4),VOLA1(N3,N2,N1)
-!    8,VOLP1(N6,N5,N4),VOLX(N6,N5,N4),FLW(N,N3,N2,N1),FLW(N,N6,N5,N4)
-!    1,THETPM(M,N3,N2,N1),THETPM(M,N6,N5,N4),THETX
-!    4,FLQL1,FLQL2,FLQL3,FLQL4
+          IF(THETPM(M,N3,N2,N1).GT.THETX &
+            .AND.THETPM(M,N6,N5,N4).GT.THETX)THEN
+            TK11=TK1(N3,N2,N1)
+            TK12=TK1(N6,N5,N4)
+            !VP1=2.173E-03/TK11 &
+            !*0.61*EXP(5360.0*(3.661E-03-1.0/TK11)) &
+            VP1=vapsat(TK11)*EXP(18.0*PSISV1/(8.3143*TK11))
+            !VPL=2.173E-03/TK12 &
+            !*0.61*EXP(5360.0*(3.661E-03-1.0/TK12)) &
+            VPL=vapsat(TK12)*EXP(18.0*PSISVL/(8.3143*TK12))
+            CNV1=WGSGL(N3,N2,N1)*THETPM(M,N3,N2,N1)*POROQ &
+              *THETPM(M,N3,N2,N1)/POROS(N3,N2,N1)
+            CNVL=WGSGL(N6,N5,N4)*THETPM(M,N6,N5,N4)*POROQ &
+              *THETPM(M,N6,N5,N4)/POROS(N6,N5,N4)
+            ATCNVL=2.0*CNV1*CNVL &
+              /(CNV1*DLYR(N,N6,N5,N4)+CNVL*DLYR(N,N3,N2,N1))
+            !
+            !     VAPOR FLUX FROM VAPOR PRESSURE AND DIFFUSIVITY,
+            !     AND CONVECTIVE HEAT FLUX FROM VAPOR FLUX
+        !
+            FLVC=ATCNVL*(VP1-VPL)*AREA(N,N3,N2,N1)*XNPH
+            VPY=(VP1*VOLPM(M,N3,N2,N1)+VPL*VOLPM(M,N6,N5,N4)) &
+              /(VOLPM(M,N3,N2,N1)+VOLPM(M,N6,N5,N4))
+            FLVX=(VP1-VPY)*VOLPM(M,N3,N2,N1)*XNPX
+            IF(FLVC.GE.0.0)THEN
+              FLVL=AMAX1(0.0,AMIN1(FLVC,FLVX))
+              HWFLVL=(cpw*TK1(N3,N2,N1)+VAP)*FLVL
+            ELSE
+              FLVL=AMIN1(0.0,AMAX1(FLVC,FLVX))
+              HWFLVL=(cpw*TK1(N6,N5,N4)+VAP)*FLVL
+            ENDIF
+          ELSE
+            FLVL=0.0
+            HWFLVL=0.0
+          ENDIF
+          !
+          !     FLWL=total water+vapor flux to destination
+          !     FLWLX=total unsaturated water+vapor flux to destination
+          !     HWFLWL=total convective heat flux from water+vapor flux
+          !
+          FLWL(N,N6,N5,N4)=FLQL+FLVL
+          if(abs(FLWL(N,N6,N5,N4))>1.e20)then
+            write(*,*)'FLQL+FLVL=',FLQL,FLVL
+            write(*,*)'at line',__LINE__
+            call endrun(trim(mod_filename)//'at line',__LINE__)
+          endif
+          FLWLX(N,N6,N5,N4)=FLQ2+FLVL
+          HWFLWL=HWFLQL+HWFLVL
+          !     IF(I.EQ.232.AND.N3.LE.NUM(N2,N1))THEN
+          !     WRITE(*,1115)'FLWL',I,J,M,N1,N2,N3,N4,N5,N6,N,K1,KL
+          !    2,FLWL(N,N3,N2,N1),FLWL(N,N6,N5,N4),FLQX,FLQZ,FLQL,FLQ2,FLVL
+          !    3,PSIST1,PSISTL
+          !    4,AVCNDL,CND1,CNDL,FKSAT
+          !    2,VOLP1(N3,N2,N1),VOLP1(N6,N5,N4),VOLW1(N3,N2,N1)
+          !    3,VOLWX1(N3,N2,N1),VOLW1(N6,N5,N4),VOLWX1(N6,N5,N4)
+          !    6,THETW1,THETS(N3,N2,N1),THETWL,THETS(N6,N5,N4)
+          !    7,PSISA1(N3,N2,N1),PSISA1(N6,N5,N4),PSISM1(N3,N2,N1)
+          !    7,PSISM1(N6,N5,N4),PSISH(N3,N2,N1),PSISH(N6,N5,N4)
+          !    3,VOLY(N3,N2,N1),VOLY(N6,N5,N4)
+          !    3,FLVL,FLVX,VP1,VPL,VPY,CNV1,CNVL,ATCNVL
+          !    4,VOLA1(N6,N5,N4),VOLI1(N6,N5,N4),SCNV(N3,N2,N1)
+          !    5,SCNV(N6,N5,N4),VOLP1(N3,N2,N1),VOLP1(N6,N5,N4)
+          !    7,VOLP1Z(N6,N5,N4),VOLT(N3,N2,N1),VOLT(N6,N5,N4)
+          !    8,DLYR(N,N3,N2,N1),DLYR(N,N6,N5,N4),AREA(N,N3,N2,N1)
+          !    3,HWFLWL,HWFLQL,HWFLVL
+          !    9,TK1(N3,N2,N1),TK1(N6,N5,N4),TKY
+          !    9,VHCP1(N3,N2,N1),VHCP1(N6,N5,N4),POROS(N6,N5,N4)
+          !    9,VOLP1(N3,N2,N1),VOLX(N3,N2,N1),VOLA1(N6,N5,N4),VOLA1(N3,N2,N1)
+          !    8,VOLP1(N6,N5,N4),VOLX(N6,N5,N4),FLW(N,N3,N2,N1),FLW(N,N6,N5,N4)
+          !    1,THETPM(M,N3,N2,N1),THETPM(M,N6,N5,N4),THETX
+          !    4,FLQL1,FLQL2,FLQL3,FLQL4
 !1115  FORMAT(A8,12I4,100E12.4)
-!     ENDIF
-!
-!     THERMAL CONDUCTIVITY IN EACH GRID CELL
-!
-!     DTH*,RYL*,DNU*,TRB*,XNUS*=turbulence effects on thermal conductivity
-!     THETWX,THETPX=water,air concentration
-!     TCNDW*,TCNDA*=thermal conductivity of water,air
-!     TCND1,TCNDL=soil thermal conductivity in source,destination
-!     WTHET*=multiplier for air concn in thermal conductivity
-!     ATCNDL=source-destination thermal conductance
-!
-      DTKX=ABS(TK1(N3,N2,N1)-TK1(N6,N5,N4))*1.0E-06
-      IF(BKDS(N3,N2,N1).GT.ZERO.OR.THETWX(N3,N2,N1) &
-      +THETIX(N3,N2,N1).GT.ZERO)THEN
-      DTHW1=AMAX1(0.0,THETWX(N3,N2,N1)-TRBW)**3
-      DTHA1=AMAX1(0.0,THETPX(N3,N2,N1)-TRBA)**3
-      RYLXW1=DTKX*DTHW1
-      RYLXA1=DTKX*DTHA1
-      RYLNW1=AMIN1(1.0E+04,RYLXW*RYLXW1)
-      RYLNA1=AMIN1(1.0E+04,RYLXA*RYLXA1)
-      XNUSW1=AMAX1(1.0,0.68+0.67*RYLNW1**0.25/DNUSW)
-      XNUSA1=AMAX1(1.0,0.68+0.67*RYLNA1**0.25/DNUSA)
-      TCNDW1=2.067E-03*XNUSW1
-      TCNDA1=9.050E-05*XNUSA1
-      WTHET1=1.467-0.467*THETPY(N3,N2,N1)
-      TCND1=(STC(N3,N2,N1)+THETWX(N3,N2,N1)*TCNDW1 &
-      +0.611*THETIX(N3,N2,N1)*7.844E-03 &
-      +WTHET1*THETPX(N3,N2,N1)*TCNDA1) &
-      /(DTC(N3,N2,N1)+THETWX(N3,N2,N1)+0.611*THETIX(N3,N2,N1) &
-      +WTHET1*THETPX(N3,N2,N1))
-      ELSE
-      TCND1=0.0
-      ENDIF
-      IF(BKDS(N6,N5,N4).GT.ZERO.OR.THETWX(N6,N5,N4) &
-      +THETIX(N6,N5,N4).GT.ZERO)THEN
-      DTHW2=AMAX1(0.0,THETWX(N6,N5,N4)-TRBW)**3
-      DTHA2=AMAX1(0.0,THETPX(N6,N5,N4)-TRBA)**3
-      RYLXW2=DTKX*DTHW2
-      RYLXA2=DTKX*DTHA2
-      RYLNW2=AMIN1(1.0E+04,RYLXW*RYLXW2)
-      RYLNA2=AMIN1(1.0E+04,RYLXA*RYLXA2)
-      XNUSW2=AMAX1(1.0,0.68+0.67*RYLNW2**0.25/DNUSW)
-      XNUSA2=AMAX1(1.0,0.68+0.67*RYLNA2**0.25/DNUSA)
-      TCNDW2=2.067E-03*XNUSW2
-      TCNDA2=9.050E-05*XNUSA2
-      WTHET2=1.467-0.467*THETPY(N6,N5,N4)
-      TCND2=(STC(N6,N5,N4)+THETWX(N6,N5,N4)*TCNDW2 &
-      +0.611*THETIX(N6,N5,N4)*7.844E-03 &
-      +WTHET2*THETPX(N6,N5,N4)*TCNDA2) &
-      /(DTC(N6,N5,N4)+THETWX(N6,N5,N4)+0.611*THETIX(N6,N5,N4) &
-      +WTHET2*THETPX(N6,N5,N4))
-      ELSE
-      TCND2=0.0
-      ENDIF
-      ATCNDL=(2.0*TCND1*TCND2)/(TCND1*DLYR(N,N6,N5,N4) &
-      +TCND2*DLYR(N,N3,N2,N1))
-!
-!     HEAT FLOW FROM THERMAL CONDUCTIVITY AND TEMPERATURE GRADIENT
-!
-!     VHCP1,VHCPW=volumetric heat capacity of soil,snowpack
-!     TK1X,TKLX=interim temperatures of source,destination
-!     HWFLVL,HFLXG=convective heat from soil vapor flux
-!     HFLXG=storage heat flux from snowpack
-!     TKY=equilibrium source-destination temperature
-!     HFLWC,HFLWX=source-destination heat flux unltd,ltd by heat
-!     ATCNDL=source-destination thermal conductance
-!     HFLWSX=source-destination conductive heat flux
-!     HFLWL=total conductive+convective source-destination heat flux
-!
-      IF(VHCP1(N3,N2,N1).GT.VHCPNX(NY,NX))THEN
-      IF(N3.EQ.NUM(NY,NX).AND.VHCPW(1,N2,N1).LE.VHCPWX(N2,N1))THEN
-      TK1X=TK1(N3,N2,N1)-(HWFLVL-HFLXG)/VHCP1(N3,N2,N1)
-      ELSE
-      TK1X=TK1(N3,N2,N1)-HWFLVL/VHCP1(N3,N2,N1)
-      ENDIF
-      ELSE
-      TK1X=TK1(N3,N2,N1)
-      ENDIF
-      IF(VHCP1(N6,N5,N4).GT.ZEROS(NY,NX))THEN
-      TKLX=TK1(N6,N5,N4)+HWFLVL/VHCP1(N6,N5,N4)
-      ELSE
-      TKLX=TK1(N6,N5,N4)
-      ENDIF
-      TKY=(VHCP1(N3,N2,N1)*TK1X+VHCP1(N6,N5,N4)*TKLX) &
-      /(VHCP1(N3,N2,N1)+VHCP1(N6,N5,N4))
-      HFLWX=(TK1X-TKY)*VHCP1(N3,N2,N1)*XNPX
-      HFLWC=ATCNDL*(TK1X-TKLX)*AREA(N,N3,N2,N1)*XNPH
-      IF(HFLWC.GE.0.0)THEN
-      HFLWSX=AMAX1(0.0,AMIN1(HFLWX,HFLWC))
-      ELSE
-      HFLWSX=AMIN1(0.0,AMAX1(HFLWX,HFLWC))
-      ENDIF
-      HFLWL(N,N6,N5,N4)=HWFLWL+HWFLHL+HFLWSX
-!     IF(N3.EQ.1)THEN
-!     WRITE(*,8765)'HFLWL',I,J,M,N1,N2,N3,N4,N5,N6,N
-!    2,HFLWL(N,N3,N2,N1),HFLWL(N,N6,N5,N4)
-!    2,HWFLWL,HWFLQL,HWFLVL,HWFLHL,HFLWC,HFLWX,HFLWSX
-!    3,ATCNDL,TK1X,TKLX,TKY,HWFLVL,TK1(N3,N2,N1),TK1(N6,N5,N4)
-!    2,TCND1,TCND2,DLYR(N,N3,N2,N1),DLYR(N,N6,N5,N4)
-!    4,VHCP1(N3,N2,N1),VHCP1(N6,N5,N4),VOLY(N3,N2,N1)
-!    5,VOLY(N6,N5,N4),VOLW1(N3,N2,N1),VOLW1(N6,N5,N4)
-!    3,THETPX(N3,N2,N1),THETIX(N3,N2,N1),THETWX(N3,N2,N1)
-!    3,THETPX(N6,N5,N4),THETIX(N6,N5,N4),THETWX(N6,N5,N4)
-!    3,THETPY(N3,N2,N1),THETPY(N6,N5,N4)
-!    4,RYLNA2,XNUSA2,XNUSW2
-!    4,STC(N6,N5,N4),DTC(N6,N5,N4)
-!    2,WTHET2,TCNDA2,TCNDW2
+          !     ENDIF
+          !
+          !     THERMAL CONDUCTIVITY IN EACH GRID CELL
+          !
+          !     DTH*,RYL*,DNU*,TRB*,XNUS*=turbulence effects on thermal conductivity
+          !     THETWX,THETPX=water,air concentration
+          !     TCNDW*,TCNDA*=thermal conductivity of water,air
+          !     TCND1,TCNDL=soil thermal conductivity in source,destination
+          !     WTHET*=multiplier for air concn in thermal conductivity
+          !     ATCNDL=source-destination thermal conductance
+      !
+          DTKX=ABS(TK1(N3,N2,N1)-TK1(N6,N5,N4))*1.0E-06
+          IF(BKDS(N3,N2,N1).GT.ZERO.OR.THETWX(N3,N2,N1) &
+            +THETIX(N3,N2,N1).GT.ZERO)THEN
+            DTHW1=AMAX1(0.0,THETWX(N3,N2,N1)-TRBW)**3
+            DTHA1=AMAX1(0.0,THETPX(N3,N2,N1)-TRBA)**3
+            RYLXW1=DTKX*DTHW1
+            RYLXA1=DTKX*DTHA1
+            RYLNW1=AMIN1(1.0E+04,RYLXW*RYLXW1)
+            RYLNA1=AMIN1(1.0E+04,RYLXA*RYLXA1)
+            XNUSW1=AMAX1(1.0,0.68+0.67*RYLNW1**0.25/DNUSW)
+            XNUSA1=AMAX1(1.0,0.68+0.67*RYLNA1**0.25/DNUSA)
+            TCNDW1=2.067E-03*XNUSW1
+            TCNDA1=9.050E-05*XNUSA1
+            WTHET1=1.467-0.467*THETPY(N3,N2,N1)
+            TCND1=(STC(N3,N2,N1)+THETWX(N3,N2,N1)*TCNDW1 &
+              +0.611*THETIX(N3,N2,N1)*7.844E-03 &
+              +WTHET1*THETPX(N3,N2,N1)*TCNDA1) &
+              /(DTC(N3,N2,N1)+THETWX(N3,N2,N1)+0.611*THETIX(N3,N2,N1) &
+              +WTHET1*THETPX(N3,N2,N1))
+          ELSE
+            TCND1=0.0
+          ENDIF
+          IF(BKDS(N6,N5,N4).GT.ZERO.OR.THETWX(N6,N5,N4) &
+            +THETIX(N6,N5,N4).GT.ZERO)THEN
+            DTHW2=AMAX1(0.0,THETWX(N6,N5,N4)-TRBW)**3
+            DTHA2=AMAX1(0.0,THETPX(N6,N5,N4)-TRBA)**3
+            RYLXW2=DTKX*DTHW2
+            RYLXA2=DTKX*DTHA2
+            RYLNW2=AMIN1(1.0E+04,RYLXW*RYLXW2)
+            RYLNA2=AMIN1(1.0E+04,RYLXA*RYLXA2)
+            XNUSW2=AMAX1(1.0,0.68+0.67*RYLNW2**0.25/DNUSW)
+            XNUSA2=AMAX1(1.0,0.68+0.67*RYLNA2**0.25/DNUSA)
+            TCNDW2=2.067E-03*XNUSW2
+            TCNDA2=9.050E-05*XNUSA2
+            WTHET2=1.467-0.467*THETPY(N6,N5,N4)
+            TCND2=(STC(N6,N5,N4)+THETWX(N6,N5,N4)*TCNDW2 &
+              +0.611*THETIX(N6,N5,N4)*7.844E-03 &
+              +WTHET2*THETPX(N6,N5,N4)*TCNDA2) &
+              /(DTC(N6,N5,N4)+THETWX(N6,N5,N4)+0.611*THETIX(N6,N5,N4) &
+              +WTHET2*THETPX(N6,N5,N4))
+          ELSE
+            TCND2=0.0
+          ENDIF
+          ATCNDL=(2.0*TCND1*TCND2)/(TCND1*DLYR(N,N6,N5,N4) &
+            +TCND2*DLYR(N,N3,N2,N1))
+          !
+          !     HEAT FLOW FROM THERMAL CONDUCTIVITY AND TEMPERATURE GRADIENT
+          !
+          !     VHCP1,VHCPW=volumetric heat capacity of soil,snowpack
+          !     TK1X,TKLX=interim temperatures of source,destination
+          !     HWFLVL,HFLXG=convective heat from soil vapor flux
+          !     HFLXG=storage heat flux from snowpack
+          !     TKY=equilibrium source-destination temperature
+          !     HFLWC,HFLWX=source-destination heat flux unltd,ltd by heat
+          !     ATCNDL=source-destination thermal conductance
+          !     HFLWSX=source-destination conductive heat flux
+          !     HFLWL=total conductive+convective source-destination heat flux
+          !
+          IF(VHCP1(N3,N2,N1).GT.VHCPNX(NY,NX))THEN
+            IF(N3.EQ.NUM(NY,NX).AND.VHCPW(1,N2,N1).LE.VHCPWX(N2,N1))THEN
+              TK1X=TK1(N3,N2,N1)-(HWFLVL-HFLXG)/VHCP1(N3,N2,N1)
+              if(abs(TK1X)>1.e5_r8)then
+                write(*,*)'TK1(N3,N2,N1)-HWFLVL/VHCP1(N3,N2,N1)',&
+                  TK1(N3,N2,N1),HWFLVL,HFLXG,VHCP1(N3,N2,N1)
+                write(*,*)'N1,n2,n3',N1,N2,N3
+                call endrun(trim(mod_filename)//' at line',__LINE__)
+              endif
+            ELSE
+              TK1X=TK1(N3,N2,N1)-HWFLVL/VHCP1(N3,N2,N1)
+              if(abs(TK1X)>1.e5_r8)then
+                write(*,*)'TK1(N3,N2,N1)-HWFLVL/VHCP1(N3,N2,N1)',&
+                  TK1(N3,N2,N1),HWFLVL,VHCP1(N3,N2,N1)
+                write(*,*)'N1,n2,n3',N1,N2,N3
+                call endrun(trim(mod_filename)//' at line',__LINE__)
+              endif
+            ENDIF
+          ELSE
+            TK1X=TK1(N3,N2,N1)
+          ENDIF
+
+          IF(VHCP1(N6,N5,N4).GT.ZEROS(NY,NX))THEN
+            TKLX=TK1(N6,N5,N4)+HWFLVL/VHCP1(N6,N5,N4)
+          ELSE
+            TKLX=TK1(N6,N5,N4)
+          ENDIF
+          TKY=(VHCP1(N3,N2,N1)*TK1X+VHCP1(N6,N5,N4)*TKLX) &
+            /(VHCP1(N3,N2,N1)+VHCP1(N6,N5,N4))
+          HFLWX=(TK1X-TKY)*VHCP1(N3,N2,N1)*XNPX
+          HFLWC=ATCNDL*(TK1X-TKLX)*AREA(N,N3,N2,N1)*XNPH
+          if(HFLWX<-1.e10_r8)then
+            write(*,*)'(TK1X-TKY)*VHCP1(N3,N2,N1)',TK1X,TKY,TKLX,VHCP1(N3,N2,N1)
+            write(*,*)'N1,N2,N3',n1,n2,n3
+            call endrun(trim(mod_filename)//' at line',__LINE__)
+          endif
+          IF(HFLWC.GE.0.0)THEN
+            HFLWSX=AMAX1(0.0,AMIN1(HFLWX,HFLWC))
+          ELSE
+            HFLWSX=AMIN1(0.0,AMAX1(HFLWX,HFLWC))
+            if(HFLWSX<-1.e10_r8)then
+              write(*,*)'HFLWX,HFLWC',HFLWX,HFLWC
+              call endrun(trim(mod_filename)//' at line',__LINE__)
+            endif
+          ENDIF
+          HFLWL(N,N6,N5,N4)=HWFLWL+HWFLHL+HFLWSX
+          if(HFLWL(N,N6,N5,N4)<-1.e10_r8)then
+            write(*,*)'HWFLWL+HWFLHL+HFLWSX',HWFLWL,HWFLHL,HFLWSX
+            call endrun(trim(mod_filename)//' at line',__LINE__)
+          endif
+          !     IF(N3.EQ.1)THEN
+          !     WRITE(*,8765)'HFLWL',I,J,M,N1,N2,N3,N4,N5,N6,N
+          !    2,HFLWL(N,N3,N2,N1),HFLWL(N,N6,N5,N4)
+          !    2,HWFLWL,HWFLQL,HWFLVL,HWFLHL,HFLWC,HFLWX,HFLWSX
+          !    3,ATCNDL,TK1X,TKLX,TKY,HWFLVL,TK1(N3,N2,N1),TK1(N6,N5,N4)
+          !    2,TCND1,TCND2,DLYR(N,N3,N2,N1),DLYR(N,N6,N5,N4)
+          !    4,VHCP1(N3,N2,N1),VHCP1(N6,N5,N4),VOLY(N3,N2,N1)
+          !    5,VOLY(N6,N5,N4),VOLW1(N3,N2,N1),VOLW1(N6,N5,N4)
+          !    3,THETPX(N3,N2,N1),THETIX(N3,N2,N1),THETWX(N3,N2,N1)
+          !    3,THETPX(N6,N5,N4),THETIX(N6,N5,N4),THETWX(N6,N5,N4)
+          !    3,THETPY(N3,N2,N1),THETPY(N6,N5,N4)
+          !    4,RYLNA2,XNUSA2,XNUSW2
+          !    4,STC(N6,N5,N4),DTC(N6,N5,N4)
+          !    2,WTHET2,TCNDA2,TCNDW2
 !8765  FORMAT(A8,10I4,60E14.6)
-!     ENDIF
-!
-!     TOTAL WATER, VAPOR AND HEAT FLUXES
-!
-!     FLW,FLWX,FLWH=total water flux through micropores,macropores
-!     HFLW=total heat flux
-!     FLWM=water flux used for solute flux calculations in trnsfr.f
-!
-      FLW(N,N6,N5,N4)=FLW(N,N6,N5,N4)+FLWL(N,N6,N5,N4)
-      FLWX(N,N6,N5,N4)=FLWX(N,N6,N5,N4)+FLWLX(N,N6,N5,N4)
-      FLWH(N,N6,N5,N4)=FLWH(N,N6,N5,N4)+FLWHL(N,N6,N5,N4)
-      HFLW(N,N6,N5,N4)=HFLW(N,N6,N5,N4)+HFLWL(N,N6,N5,N4)
-      FLWM(M,N,N6,N5,N4)=FLWL(N,N6,N5,N4)
-      IF(N.EQ.3)THEN
-!     IF(I.EQ.55)THEN
-!     WRITE(*,1115)'FLWL2',I,J,M,N1,N2,N3,N4,N5,N6,N,FLWL(N,N3,N2,N1)
-!    2,FLWL(N,N6,N5,N4),FLW(N,N3,N2,N1),FLW(N,N6,N5,N4)
-!    3,FLQL,FLVL,FLQX,FLVX,HFLWX
-!    3,CND1,CNDL,AVCNDL,AVCNVL,VP1,VPL,PSIST1,PSISTL
-!    4,UAG,VOLA1(N6,N5,N4),VOLI1(N6,N5,N4),SCNV(N6,N5,N4)
-!    5,VOLP1(N3,N2,N1),VOLP1(N6,N5,N4),TKY
-!    7,TK1(N3,N2,N1),TK1(N6,N5,N4),VOLT(N3,N2,N1),VOLT(N6,N5,N4)
-!    8,VOLW1(N6,N5,N4),VOLP1(N6,N5,N4),VOLX(N6,N5,N4),VOLW1(N3,N2,N1)
-!    9,VOLP1(N3,N2,N1),VOLX(N3,N2,N1),VOLA1(N6,N5,N4),VOLA1(N3,N2,N1)
-!    6,THETW1,THETWL,PSISA1(N3,N2,N1)
-!    7,PSISA1(N6,N5,N4),PSISM1(N3,N2,N1)
-!    7,PSISM1(N6,N5,N4),PSISH(N3,N2,N1),PSISH(N6,N5,N4)
-!    8,DLYR(N,N3,N2,N1),DLYR(N,N6,N5,N4),AREA(N,N3,N2,N1)
-!    9,VHCP1(N3,N2,N1),VHCP1(N6,N5,N4),POROS(N6,N5,N4)
-!     ENDIF
-!
-!     WATER FILM THICKNESS FOR CALCULATING GAS EXCHANGE IN TRNSFR.F
-!
-      FILM(M,N6,N5,N4)=AMAX1(1.0E-06 &
-      ,EXP(-13.833-0.857*LOG(-PSISA1(N6,N5,N4))))
-      ENDIF
-      ELSEIF(N.NE.3)THEN
-      FLWL(N,N6,N5,N4)=0.0
-      FLWLX(N,N6,N5,N4)=0.0
-      FLWHL(N,N6,N5,N4)=0.0
-      HFLWL(N,N6,N5,N4)=0.0
-      FLWM(M,N,N6,N5,N4)=0.0
-      FLWHM(M,N,N6,N5,N4)=0.0
-      ENDIF
+          !     ENDIF
+          !
+          !     TOTAL WATER, VAPOR AND HEAT FLUXES
+          !
+          !     FLW,FLWX,FLWH=total water flux through micropores,macropores
+          !     HFLW=total heat flux
+          !     FLWM=water flux used for solute flux calculations in trnsfr.f
+          !
+          FLW(N,N6,N5,N4)=FLW(N,N6,N5,N4)+FLWL(N,N6,N5,N4)
+          FLWX(N,N6,N5,N4)=FLWX(N,N6,N5,N4)+FLWLX(N,N6,N5,N4)
+          FLWH(N,N6,N5,N4)=FLWH(N,N6,N5,N4)+FLWHL(N,N6,N5,N4)
+          HFLW(N,N6,N5,N4)=HFLW(N,N6,N5,N4)+HFLWL(N,N6,N5,N4)
+          if(HFLW(N,N6,N5,N4)<-1.e10_r8)then
+            write(*,*)'HFLWL(N,N6,N5,N4)',HFLWL(N,N6,N5,N4)
+            write(*,*)'Ns=',N,N4,n5,n6
+            call endrun(trim(mod_filename)//' at line',__LINE__)
+          endif
+          FLWM(M,N,N6,N5,N4)=FLWL(N,N6,N5,N4)
+          IF(N.EQ.3)THEN
+            !     IF(I.EQ.55)THEN
+            !     WRITE(*,1115)'FLWL2',I,J,M,N1,N2,N3,N4,N5,N6,N,FLWL(N,N3,N2,N1)
+            !    2,FLWL(N,N6,N5,N4),FLW(N,N3,N2,N1),FLW(N,N6,N5,N4)
+            !    3,FLQL,FLVL,FLQX,FLVX,HFLWX
+            !    3,CND1,CNDL,AVCNDL,AVCNVL,VP1,VPL,PSIST1,PSISTL
+            !    4,UAG,VOLA1(N6,N5,N4),VOLI1(N6,N5,N4),SCNV(N6,N5,N4)
+            !    5,VOLP1(N3,N2,N1),VOLP1(N6,N5,N4),TKY
+            !    7,TK1(N3,N2,N1),TK1(N6,N5,N4),VOLT(N3,N2,N1),VOLT(N6,N5,N4)
+            !    8,VOLW1(N6,N5,N4),VOLP1(N6,N5,N4),VOLX(N6,N5,N4),VOLW1(N3,N2,N1)
+            !    9,VOLP1(N3,N2,N1),VOLX(N3,N2,N1),VOLA1(N6,N5,N4),VOLA1(N3,N2,N1)
+            !    6,THETW1,THETWL,PSISA1(N3,N2,N1)
+            !    7,PSISA1(N6,N5,N4),PSISM1(N3,N2,N1)
+            !    7,PSISM1(N6,N5,N4),PSISH(N3,N2,N1),PSISH(N6,N5,N4)
+            !    8,DLYR(N,N3,N2,N1),DLYR(N,N6,N5,N4),AREA(N,N3,N2,N1)
+            !    9,VHCP1(N3,N2,N1),VHCP1(N6,N5,N4),POROS(N6,N5,N4)
+            !     ENDIF
+            !
+            !     WATER FILM THICKNESS FOR CALCULATING GAS EXCHANGE IN TRNSFR.F
+            !
+            FILM(M,N6,N5,N4)=AMAX1(1.0E-06,EXP(-13.833-0.857*LOG(-PSISA1(N6,N5,N4))))
+          ENDIF
+        ELSEIF(N.NE.3)THEN
+          FLWL(N,N6,N5,N4)=0.0
+          FLWLX(N,N6,N5,N4)=0.0
+          FLWHL(N,N6,N5,N4)=0.0
+          HFLWL(N,N6,N5,N4)=0.0
+          FLWM(M,N,N6,N5,N4)=0.0
+          FLWHM(M,N,N6,N5,N4)=0.0
+        ENDIF
       ELSE
-      IF(N.EQ.3)THEN
-      FLWL(N,N3,N2,N1)=0.0
-      FLWLX(N,N3,N2,N1)=0.0
-      FLWHL(N,N3,N2,N1)=0.0
-      HFLWL(N,N3,N2,N1)=0.0
-      FLWHM(M,N,N3,N2,N1)=0.0
-      FLWHM(M,N,N3,N2,N1)=0.0
-      ELSE
-      FLWL(N,N6,N5,N4)=0.0
-      FLWLX(N,N6,N5,N4)=0.0
-      FLWHL(N,N6,N5,N4)=0.0
-      HFLWL(N,N6,N5,N4)=0.0
-      FLWM(M,N,N6,N5,N4)=0.0
-      FLWHM(M,N,N6,N5,N4)=0.0
-      ENDIF
-!     IF(I.EQ.336)THEN
-!     WRITE(*,1115)'FLWLX',I,J,M,N1,N2,N3,N4,N5,N6,N
-!    2,FLWL(N,N3,N2,N1),FLW(N,N3,N2,N1)
-!    2,FLWL(N,N6,N5,N4),FLW(N,N6,N5,N4)
-!    3,VOLX(N3,N2,N1),VOLX(N6,N5,N4)
-!     ENDIF
+        IF(N.EQ.3)THEN
+          FLWL(N,N3,N2,N1)=0.0
+          FLWLX(N,N3,N2,N1)=0.0
+          FLWHL(N,N3,N2,N1)=0.0
+          HFLWL(N,N3,N2,N1)=0.0
+          FLWHM(M,N,N3,N2,N1)=0.0
+          FLWHM(M,N,N3,N2,N1)=0.0
+        ELSE
+          FLWL(N,N6,N5,N4)=0.0
+          FLWLX(N,N6,N5,N4)=0.0
+          FLWHL(N,N6,N5,N4)=0.0
+          HFLWL(N,N6,N5,N4)=0.0
+          FLWM(M,N,N6,N5,N4)=0.0
+          FLWHM(M,N,N6,N5,N4)=0.0
+        ENDIF
+        !     IF(I.EQ.336)THEN
+        !     WRITE(*,1115)'FLWLX',I,J,M,N1,N2,N3,N4,N5,N6,N
+        !    2,FLWL(N,N3,N2,N1),FLW(N,N3,N2,N1)
+        !    2,FLWL(N,N6,N5,N4),FLW(N,N6,N5,N4)
+        !    3,VOLX(N3,N2,N1),VOLX(N6,N5,N4)
+        !     ENDIF
       ENDIF
 4320  CONTINUE
 4400  CONTINUE
-      end subroutine Subsurface3DFlow
+  end subroutine Subsurface3DFlow
 !------------------------------------------------------------------------------------------
 
   subroutine WaterHeatExchThruBoundaryFlow(M,NHW,NHE,NVN,NVS)
@@ -4365,8 +4400,12 @@ module WatsubMod
                 FLWHL(N,M6,M5,M4)=AMIN1(VOLWH1(L,NY,NX)*XNPX &
                  ,XN*0.0098*(-ABS(SLOPE(N,N2,N1)))*CNDH1(L,NY,NX)*AREA(3,N3,N2,N1)) &
                  *RCHGFU*RCHGFT*XNPH
-                HFLWL(N,M6,M5,M4)=cpw*TK1(N3,N2,N1) &
-                  *(FLWL(N,M6,M5,M4)+FLWHL(N,M6,M5,M4))
+                HFLWL(N,M6,M5,M4)=cpw*TK1(N3,N2,N1)*(FLWL(N,M6,M5,M4)+FLWHL(N,M6,M5,M4))
+                if(HFLWL(N,M6,M5,M4)<-1.e10_r8)then
+                  write(*,*)'cpw*TK1(N3,N2,N1)*(FLWL(N,M6,M5,M4)+FLWHL(N,M6,M5,M4))',&
+                    cpw,TK1(N3,N2,N1),FLWL(N,M6,M5,M4),FLWHL(N,M6,M5,M4)
+                  call endrun(trim(mod_filename)//' at line',__LINE__)
+                endif
                 !     IF(I.EQ.336)THEN
                 !     WRITE(*,4443)'ABV',I,J,M,N1,N2,N3,M4,M5,M6,N,NN,XN
                 !    2,FLWL(N,M6,M5,M4)
@@ -4413,6 +4452,10 @@ module WatsubMod
                   endif
                   FLWLX(N,M6,M5,M4)=XN*FLWT
                   HFLWL(N,M6,M5,M4)=cpw*TK1(N3,N2,N1)*XN*FLWT
+                  if(HFLWL(N,M6,M5,M4)<-1.e10_r8)then
+                    write(*,*)'cpw*TK1(N3,N2,N1)*XN*FLWT',cpw,TK1(N3,N2,N1),FLWT
+                    call endrun(trim(mod_filename)//' at line',__LINE__)
+                  endif
                 !     IF((I/10)*10.EQ.I.AND.J.EQ.15)THEN
                 !     WRITE(*,4445)'DISCHMI',I,J,M,N1,N2,N3,M4,M5,M6,N,NN,IFLGU
                 !    2,XN,FLWL(N,M6,M5,M4),FLWT,PSISWT,PSISWD,HCND(N,1,N3,N2,N1)
@@ -4460,8 +4503,11 @@ module WatsubMod
                   FLWTHL=AMAX1(FLWTH,AMIN1(0.0,-(VOLWH1(N3,N2,N1)*XNPX &
                     +FLWHL(3,N3,N2,N1)-FLWHL(3,N3+1,N2,N1))))
                   FLWHL(N,M6,M5,M4)=XN*FLWTHL
-                  HFLWL(N,M6,M5,M4)=HFLWL(N,M6,M5,M4) &
-                    +cpw*TK1(N3,N2,N1)*XN*FLWTHL
+                  HFLWL(N,M6,M5,M4)=HFLWL(N,M6,M5,M4)+cpw*TK1(N3,N2,N1)*XN*FLWTHL
+                  if(HFLWL(N,M6,M5,M4)<-1.e10_r8)then
+                    write(*,*)'cpw*TK1(N3,N2,N1)*XN*FLWTHL',TK1(N3,N2,N1),FLWTHL
+                    call endrun(trim(mod_filename)//' at line',__LINE__)
+                  endif
                     !     WRITE(*,4446)'DISCHMA',I,J,M,N1,N2,N3,M4,M5,M6,N,NN,IFLGUH
                     !    2,XN,FLWHL(N,M6,M5,M4),FLWTHL,FLWTH,PSISWTH,CNDH1(N3,N2,N1)
                     !    3,DPTH(N3,N2,N1),DLYR(3,N3,N2,N1),DPTHH,VOLWH1(N3,N2,N1)
@@ -4505,6 +4551,10 @@ module WatsubMod
                   endif
                   FLWLX(N,M6,M5,M4)=FLWLX(N,M6,M5,M4)+XN*FLWT
                   HFLWL(N,M6,M5,M4)=HFLWL(N,M6,M5,M4)+cpw*TK1(N3,N2,N1)*XN*FLWT
+                  if(HFLWL(N,M6,M5,M4)<-1.e10)then
+                    write(*,*)'cpw*TK1(N3,N2,N1)*XN*FLWT',TK1(N3,N2,N1),FLWT
+                    call endrun(trim(mod_filename)//' at line',__LINE__)
+                  endif
             !     IF(L.EQ.12)THEN
             !     WRITE(*,4445)'DISCHMD',I,J,M,N1,N2,N3,M4,M5,M6,N,NN,IFLGD
             !    2,XN,FLWL(N,M6,M5,M4),FLWT,PSISWT,PSISWD
@@ -4548,8 +4598,11 @@ module WatsubMod
                   FLWTHL=AMAX1(FLWTH,AMIN1(0.0 &
                     ,-(VOLWH1(N3,N2,N1)*XNPX+FLWHL(3,N3,N2,N1)-FLWHL(3,N3+1,N2,N1))))
                   FLWHL(N,M6,M5,M4)=FLWHL(N,M6,M5,M4)+XN*FLWTHL
-                  HFLWL(N,M6,M5,M4)=HFLWL(N,M6,M5,M4) &
-                    +cpw*TK1(N3,N2,N1)*XN*FLWTHL
+                  HFLWL(N,M6,M5,M4)=HFLWL(N,M6,M5,M4)+cpw*TK1(N3,N2,N1)*XN*FLWTHL
+                  if(HFLWL(N,M6,M5,M4)<-1.e10_r8)then
+                    write(*,*)'cpw*TK1(N3,N2,N1)*XN*FLWTHL',TK1(N3,N2,N1),FLWTHL
+                    call endrun(trim(mod_filename)//' at line',__LINE__)
+                  endif
                   !     IF((I/10)*10.EQ.I.AND.J.EQ.15)THEN
             !     WRITE(*,4446)'DISCHDH',I,J,M,N1,N2,N3,M4,M5,M6,N,NN,IFLGDH
             !    2,XN,FLWHL(N,M6,M5,M4),FLWTHL,FLWTH,PSISWTH,CNDH1(N3,N2,N1)
@@ -4606,8 +4659,11 @@ module WatsubMod
                     call endrun(trim(mod_filename)//'at line',__LINE__)
                   endif
                   FLWLX(N,M6,M5,M4)=FLWLX(N,M6,M5,M4)+XN*FLWUX
-                  HFLWL(N,M6,M5,M4)=HFLWL(N,M6,M5,M4)+cpw*TK1(N3,N2,N1) &
-                    *XN*FLWUL
+                  HFLWL(N,M6,M5,M4)=HFLWL(N,M6,M5,M4)+cpw*TK1(N3,N2,N1)*XN*FLWUL
+                  if(HFLWL(N,M6,M5,M4)<-1.e10)then
+                    write(*,*)'cpw*TK1(N3,N2,N1)*XN*FLWUL',TK1(N3,N2,N1),FLWUL
+                    call endrun(trim(mod_filename)//' at line',__LINE__)
+                  endif
                 !     IF(J.EQ.15)THEN
                 !     WRITE(*,4444)'RECHGMI',I,J,M,N1,N2,N3,M4,M5,M6,N,NN,IFLGU
                 !    2,XN,FLWL(N,M6,M5,M4),FLWU,FLWUL
@@ -4659,8 +4715,11 @@ module WatsubMod
                     *AREAU(N3,N2,N1)/(RCHGFU+1.0)*RCHGFT*XNPH
                   FLWUHL=AMIN1(FLWUH,VOLPH2*XNPX)
                   FLWHL(N,M6,M5,M4)=FLWHL(N,M6,M5,M4)+XN*FLWUHL
-                  HFLWL(N,M6,M5,M4)=HFLWL(N,M6,M5,M4)+cpw*TK1(N3,N2,N1) &
-                    *XN*FLWUHL
+                  HFLWL(N,M6,M5,M4)=HFLWL(N,M6,M5,M4)+cpw*TK1(N3,N2,N1)*XN*FLWUHL
+                  if(HFLWL(N,M6,M5,M4)<-1.e10_r8)then
+                    write(*,*)'cpw*TK1(N3,N2,N1)*XN*FLWUHL',TK1(N3,N2,N1),FLWUHL
+                    call endrun(trim(mod_filename)//' at line',__LINE__)
+                  endif
                 !     IF(M6.EQ.7)THEN
                 !     WRITE(*,4447)'RECHGMA',I,J,M,N1,N2,N3,M4,M5,M6,N,NN,IFLGU
                 !    2,XN,FLWHL(N,M6,M5,M4),FLWUH,FLWUHL,DPTHH,PSISUTH,VOLPH2
@@ -4955,20 +5014,24 @@ module WatsubMod
   integer :: L,NUX,LL,Ls
 
   real(r8) :: tk1pres
+
 ! begin_execution
+!  if(curday>=176)then
+!    write(*,*)'UpdateStateSolutionNotNPH at line',__LINE__,M,tk1(8,NVN,NHW)
+!  endif
   DO 9795 NX=NHW,NHE
     DO 9790 NY=NVN,NVS
-!     SNOWPACK WATER, ICE, SNOW AND TEMPERATURE
-!
-!     VOLS0,VOLW0,VOLI0=snow,water,ice volumes in snowpack
-!     TFLWS,TFLWW=net snow,water flux
-!     WFLXS,WFLXI=snow-water,ice-water freeze-thaw flux
-!     DENSI=ice density
-!     VHCPWM=snowpack volumetric heat capacity
-!     TK0=snowpack temperature
-!     THFLWW=total snowpack conductive+convective heat flux
-!     TFLX0=snowpack latent heat flux from freeze-thaw
-!
+      !     SNOWPACK WATER, ICE, SNOW AND TEMPERATURE
+      !
+      !     VOLS0,VOLW0,VOLI0=snow,water,ice volumes in snowpack
+      !     TFLWS,TFLWW=net snow,water flux
+      !     WFLXS,WFLXI=snow-water,ice-water freeze-thaw flux
+      !     DENSI=ice density
+      !     VHCPWM=snowpack volumetric heat capacity
+      !     TK0=snowpack temperature
+      !     THFLWW=total snowpack conductive+convective heat flux
+      !     TFLX0=snowpack latent heat flux from freeze-thaw
+      !
       DO 9780 L=1,JS
         VOLS0(L,NY,NX)=VOLS0(L,NY,NX)+TFLWS(L,NY,NX)-WFLXS(L,NY,NX)
         VOLW0(L,NY,NX)=VOLW0(L,NY,NX)+TFLWW(L,NY,NX)+WFLXS(L,NY,NX)+WFLXI(L,NY,NX)
@@ -4983,41 +5046,43 @@ module WatsubMod
         ELSE
           TK0(L,NY,NX)=TK0(L-1,NY,NX)
         ENDIF
-!       IF(L.EQ.1)THEN
-!         WRITE(*,7753)'TKM',I,J,M,NX,NY,L,TK0(L,NY,NX)
-!          2,THFLWW(L,NY,NX),TFLX0(L,NY,NX),HFLW0W(L,NY,NX)
-!          3,HFLWRLW,HFLWLW
-!          3,VOLS0(L,NY,NX),VOLW0(L,NY,NX),VOLI0(L,NY,NX),VOLS1(L,NY,NX)
-!          2,WFLXS(L,NY,NX),WFLXI(L,NY,NX)
-!          3,TFLWS(L,NY,NX),TFLWW(L,NY,NX),TFLWI(L,NY,NX)
-!          3,XFLWS(L,NY,NX),XFLWW(L,NY,NX),XFLWI(L,NY,NX)
-!          4,XHFLWW(L,NY,NX),HFLSW(L,NY,NX)
-!          5,VHCPWM(M+1,L,NY,NX)
+        !       IF(L.EQ.1)THEN
+        !         WRITE(*,7753)'TKM',I,J,M,NX,NY,L,TK0(L,NY,NX)
+        !          2,THFLWW(L,NY,NX),TFLX0(L,NY,NX),HFLW0W(L,NY,NX)
+        !          3,HFLWRLW,HFLWLW
+        !          3,VOLS0(L,NY,NX),VOLW0(L,NY,NX),VOLI0(L,NY,NX),VOLS1(L,NY,NX)
+        !          2,WFLXS(L,NY,NX),WFLXI(L,NY,NX)
+        !          3,TFLWS(L,NY,NX),TFLWW(L,NY,NX),TFLWI(L,NY,NX)
+        !          3,XFLWS(L,NY,NX),XFLWW(L,NY,NX),XFLWI(L,NY,NX)
+        !          4,XHFLWW(L,NY,NX),HFLSW(L,NY,NX)
+        !          5,VHCPWM(M+1,L,NY,NX)
 !7753  FORMAT(A8,6I4,80E14.6)
-!       ENDIF
+        !       ENDIF
 9780  CONTINUE
-!
-!     SNOW RUNOFF
-!
-!     TQS1,TQW1,TQI1,THQS1=net snow,water,ice, heat from snowpack runoff
-!
+!      if(curday>=176)then
+!        write(*,*)'line',__LINE__,'tk1',TK1(8,ny,nx),TK1(9,ny,nx),M
+!      endif
+      !
+      !     SNOW RUNOFF
+      !
+      !     TQS1,TQW1,TQI1,THQS1=net snow,water,ice, heat from snowpack runoff
+      !
       VOLS0(1,NY,NX)=VOLS0(1,NY,NX)+TQS1(NY,NX)
       VOLW0(1,NY,NX)=VOLW0(1,NY,NX)+TQW1(NY,NX)
       VOLI0(1,NY,NX)=VOLI0(1,NY,NX)+TQI1(NY,NX)
       ENGY0=VHCPWM(M+1,1,NY,NX)*TK0(1,NY,NX)
-      VHCPWM(M+1,1,NY,NX)=cps*VOLS0(1,NY,NX)+cpw*VOLW0(1,NY,NX) &
-        +cpi*VOLI0(1,NY,NX)
+      VHCPWM(M+1,1,NY,NX)=cps*VOLS0(1,NY,NX)+cpw*VOLW0(1,NY,NX)+cpi*VOLI0(1,NY,NX)
       IF(VHCPWM(M+1,1,NY,NX).GT.VHCPWX(NY,NX))THEN
         TK0(1,NY,NX)=(ENGY0+THQS1(NY,NX))/VHCPWM(M+1,1,NY,NX)
       ELSE
         TK0(1,NY,NX)=TKA(NY,NX)
       ENDIF
 !
-!     IF SNOWPACK DISAPPEARS ALL MATERIAL,HEAT TRANSFERRED TO SOIL SURFACE
-!
-!     VHCP1,VHCP1A,VHCP1P=total soil,soil+micropore,macropore heat capacity
-!     TK1=soil surface temperature, why not to litter layer
-!
+      !     IF SNOWPACK DISAPPEARS ALL MATERIAL,HEAT TRANSFERRED TO SOIL SURFACE
+      !
+      !     VHCP1,VHCP1A,VHCP1P=total soil,soil+micropore,macropore heat capacity
+      !     TK1=soil surface temperature, why not to litter layer
+      !
       IF(VHCPW(1,NY,NX).LE.VHCPWX(NY,NX).AND.TKA(NY,NX).GT.TFice)THEN
         FLWS=VOLS0(1,NY,NX)
         FLWW=VOLW0(1,NY,NX)
@@ -5042,6 +5107,9 @@ module WatsubMod
           TK1(NUM(NY,NX),NY,NX)=TKA(NY,NX)
         ENDIF
       ENDIF
+!      if(curday>=176)then
+!        write(*,*)'line',__LINE__,'tk1',TK1(8,ny,nx),TK1(9,ny,nx),NUM(NY,NX),NL(NY,NX)
+!      endif
       !
       ! SURFACE RESIDUE WATER AND TEMPERATURE
       !
@@ -5098,17 +5166,28 @@ module WatsubMod
       ENGYR=VHCP1(0,NY,NX)*TK1(0,NY,NX)  !initial energy content
       VHCP1(0,NY,NX)=cpo*ORGC(0,NY,NX)+cpw*VOLW1(0,NY,NX)+cpi*VOLI1(0,NY,NX)  !update heat capacity
       IF(VHCP1(0,NY,NX).GT.VHCPRX(NY,NX))THEN
+!        if(curday>=176)write(*,*)trim(mod_filename)//'at line',__LINE__,'tk',TK1(NUM(NY,NX),NY,NX)
         tk1pres=TK1(0,NY,NX)
         TK1(0,NY,NX)=(ENGYR+HFLWRL(NY,NX)+TFLXR(NY,NX) &
           +THQR1(NY,NX))/VHCP1(0,NY,NX)
         Ls=NUM(NY,NX)
-        if(abs(TK1(0,NY,NX)-TK1(Ls,NY,NX))>10._r8)then
+!        if(curday>=176)then
+!          write(*,*)trim(mod_filename)//'at line',__LINE__,'tk',TK1(0,NY,NX)
+!          write(*,*)'ENGYR,HFLWRL(NY,NX),TFLXR(NY,NX),THQR1(NY,NX),VHCP1(0,NY,NX)'
+!          write(*,*)ENGYR,HFLWRL(NY,NX),TFLXR(NY,NX),THQR1(NY,NX),VHCP1(0,NY,NX)
+!          write(*,*)VHCM(Ls,NY,NX),VOLW1(Ls,NY,NX)+VOLWH1(Ls,NY,NX),VOLI1(Ls,NY,NX)+VOLIH1(Ls,NY,NX)
+!          write(*,*)BKDS(Ls,NY,NX),VHCPRX(NY,NX),VHCP1(0,NY,NX)
+!        endif
+        if(abs(TK1(0,NY,NX)-TK1(Ls,NY,NX))>15._r8)TK1(0,NY,NX)=TK1(NUM(NY,NX),NY,NX)
           !too great difference between temepratures in residual layer and top soil layer
-          VHCP1(Ls,NY,NX)=VHCM(Ls,NY,NX)+cpw*(VOLW1(Ls,NY,NX) &
-            +VOLWH1(Ls,NY,NX))+cpi*(VOLI1(Ls,NY,NX)+VOLIH1(Ls,NY,NX))
-          TK1(0,NY,NX)=(TK1(0,NY,NX)*VHCP1(0,NY,NX)+TK1(Ls,NY,NX)*VHCP1(Ls,NY,NX)) &
-            /(VHCP1(0,NY,NX)+VHCP1(1,NY,NX))
-          TK1(Ls,NY,NX)=TK1(0,NY,NX)
+!          VHCP1(Ls,NY,NX)=VHCM(Ls,NY,NX)+cpw*(VOLW1(Ls,NY,NX) &
+!            +VOLWH1(Ls,NY,NX))+cpi*(VOLI1(Ls,NY,NX)+VOLIH1(Ls,NY,NX))
+!          TK1(0,NY,NX)=(TK1(0,NY,NX)*VHCP1(0,NY,NX)+TK1(Ls,NY,NX)*VHCP1(Ls,NY,NX)) &
+!            /(VHCP1(0,NY,NX)+VHCP1(1,NY,NX))
+!          TK1(Ls,NY,NX)=TK1(0,NY,NX)
+!          if(TK1(0,NY,NX)<0._r8)then
+!            write(*,*)'at line',__LINE__,'TK1',TK1(0,NY,NX)
+!          endif
 !          write(*,*)
 !          write(*,*)'ENGYR+HFLWRL(NY,NX)+TFLXR(NY,NX)+THQR1(NY,NX),VHCP1(0,NY,NX),ENGYR=',&
 !            (ENGYR+HFLWRL(NY,NX)+TFLXR(NY,NX)+THQR1(NY,NX)),VHCP1(0,NY,NX)
@@ -5118,10 +5197,12 @@ module WatsubMod
 !            ,cpi*VOLI1(0,NY,NX)
 !          write(*,*)'at line',__LINE__
 !          if(TK1(0,NY,NX)<200._r8)call endrun(trim(mod_filename)//'at line',__LINE__)
-        endif
+!        endif
       ELSE
         TK1(0,NY,NX)=TK1(NUM(NY,NX),NY,NX)
       ENDIF
+!      if(curday>=176)write(*,*)trim(mod_filename)//'at line',__LINE__,'tk',TK1(NUM(NY,NX),NY,NX)
+
       ! if(curday>=377)then
       !   write(*,*)'TK1(0,NY,NX)=',TK1(0,NY,NX)
       !   write(*,*)'VHCP1(0,NY,NX).GT.VHCPRX(NY,NX)',&
@@ -5165,10 +5246,15 @@ module WatsubMod
       ! VHCP1A,VHCP1B=volumetric heat capacities of soil+micropore,macropore
       ! TK1=soil temperature
       !
+      !if(curday>=176)then
+      !  write(*,*)'line',__LINE__,'tk1',TK1(8,ny,nx),TK1(9,ny,nx),M
+      !endif
       DO 9785 L=NUM(NY,NX),NL(NY,NX)
+!        if(curday>=176)then
+!          write(*,*)'at line',__LINE__,'tk',TK1(L,NY,NX),L
+!        endif
         IF(VOLT(L,NY,NX).GT.ZEROS2(NY,NX))THEN
-          VOLW1(L,NY,NX)=VOLW1(L,NY,NX)+TFLWL(L,NY,NX) &
-            +FINHL(L,NY,NX)+TWFLXL(L,NY,NX)+FLU1(L,NY,NX)
+          VOLW1(L,NY,NX)=VOLW1(L,NY,NX)+TFLWL(L,NY,NX)+FINHL(L,NY,NX)+TWFLXL(L,NY,NX)+FLU1(L,NY,NX)
           if(abs(VOLW1(L,NY,NX))>1.e20_r8)then
             write(*,*)'VOLW1(L,NY,NX)=',VOLW1(L,NY,NX),L
             write(*,*)'TFLWL=',TFLWL(L,NY,NX)
@@ -5177,12 +5263,10 @@ module WatsubMod
             write(*,*)'at line',__LINE__
             call endrun(trim(mod_filename)//'at line',__LINE__)
           endif
-          VOLWX1(L,NY,NX)=VOLWX1(L,NY,NX)+TFLWLX(L,NY,NX) &
-            +FINHL(L,NY,NX)+TWFLXL(L,NY,NX)+FLU1(L,NY,NX)
+          VOLWX1(L,NY,NX)=VOLWX1(L,NY,NX)+TFLWLX(L,NY,NX)+FINHL(L,NY,NX)+TWFLXL(L,NY,NX)+FLU1(L,NY,NX)
           VOLWX1(L,NY,NX)=AMIN1(VOLW1(L,NY,NX),VOLWX1(L,NY,NX))
           VOLI1(L,NY,NX)=VOLI1(L,NY,NX)-TWFLXL(L,NY,NX)/DENSI
-          VOLWH1(L,NY,NX)=VOLWH1(L,NY,NX)+TFLWHL(L,NY,NX) &
-            -FINHL(L,NY,NX)+TWFLXH(L,NY,NX)
+          VOLWH1(L,NY,NX)=VOLWH1(L,NY,NX)+TFLWHL(L,NY,NX)-FINHL(L,NY,NX)+TWFLXH(L,NY,NX)
           VOLIH1(L,NY,NX)=VOLIH1(L,NY,NX)-TWFLXH(L,NY,NX)/DENSI
           IF(BKDS(L,NY,NX).GT.ZERO)THEN
             VOLP1Z(L,NY,NX)=VOLA1(L,NY,NX)-VOLW1(L,NY,NX)-VOLI1(L,NY,NX)
@@ -5206,8 +5290,7 @@ module WatsubMod
           ENDIF
           VOLWM(M+1,L,NY,NX)=VOLW1(L,NY,NX)
           VOLWHM(M+1,L,NY,NX)=VOLWH1(L,NY,NX)
-          VOLPM(M+1,L,NY,NX)=VOLP1(L,NY,NX)+VOLPH1(L,NY,NX) &
-            +THETPI*(VOLI1(L,NY,NX)+VOLIH1(L,NY,NX))
+          VOLPM(M+1,L,NY,NX)=VOLP1(L,NY,NX)+VOLPH1(L,NY,NX)+THETPI*(VOLI1(L,NY,NX)+VOLIH1(L,NY,NX))
           FLPM(M,L,NY,NX)=VOLPM(M,L,NY,NX)-VOLPM(M+1,L,NY,NX)
           VOLTX=VOLY(L,NY,NX)+VOLAH1(L,NY,NX)
           THETWX(L,NY,NX)=AMAX1(0.0,(VOLW1(L,NY,NX)+VOLWH1(L,NY,NX))/VOLTX)
@@ -5222,23 +5305,28 @@ module WatsubMod
 !                write(*,*)'VOLP1 =',VOLP1(L,NY,NX),VOLPH1(L,NY,NX)
 !              endif
           ELSE
-            THETPY(L,NY,NX)=0.0
+            THETPY(L,NY,NX)=0.0_r8
           ENDIF
           IF(VOLAH1(L,NY,NX).GT.ZEROS2(NY,NX))THEN
             FMAC(L,NY,NX)=FHOL(L,NY,NX)*VOLAH1(L,NY,NX)/VOLAH(L,NY,NX)
             CNDH1(L,NY,NX)=CNDH(L,NY,NX)*(VOLAH1(L,NY,NX)/VOLAH(L,NY,NX))**2
           ELSE
-            FMAC(L,NY,NX)=0.0
-            CNDH1(L,NY,NX)=0.0
+            FMAC(L,NY,NX)=0.0_r8
+            CNDH1(L,NY,NX)=0.0_r8
           ENDIF
-          FGRD(L,NY,NX)=1.0-FMAC(L,NY,NX)
+          FGRD(L,NY,NX)=1.0_r8-FMAC(L,NY,NX)
           TKXX=TK1(L,NY,NX)
           VHXX=VHCP1(L,NY,NX)
           ENGY1=VHCP1(L,NY,NX)*TK1(L,NY,NX)
-          VHCP1(L,NY,NX)=VHCM(L,NY,NX)+cpw*(VOLW1(L,NY,NX) &
+          if(TK1(L,NY,NX)>1.e3_r8.or.TK1(L,NY,NX)<0._r8)then
+            write(*,*)'L=',L,NY,NX,NUM(NY,NX)
+            write(*,*)'BKDS(L,NY,NX)=',BKDS(L,NY,NX)
+            write(*,*)'VHCP1(L,NY,NX),TK1(L,NY,NX)',L,VHCP1(L,NY,NX),TK1(L,NY,NX)
+            call endrun(trim(mod_filename)//' at line',__LINE__)
+          endif
+          VHCP1(L,NY,NX)=VHCM(L,NY,NX)+cpw*(VOLW1(L,NY,NX)&
             +VOLWH1(L,NY,NX))+cpi*(VOLI1(L,NY,NX)+VOLIH1(L,NY,NX))
-          VHCP1A(L,NY,NX)=VHCM(L,NY,NX)+cpw*VOLW1(L,NY,NX) &
-            +cpi*VOLI1(L,NY,NX)
+          VHCP1A(L,NY,NX)=VHCM(L,NY,NX)+cpw*VOLW1(L,NY,NX)+cpi*VOLI1(L,NY,NX)
           VHCP1B(L,NY,NX)=cpw*VOLWH1(L,NY,NX)+cpi*VOLIH1(L,NY,NX)
           !
           !         BEGIN ARTIFICIAL SOIL WARMING
@@ -5260,6 +5348,13 @@ module WatsubMod
           IF(VHCP1(L,NY,NX).GT.ZEROS(NY,NX))THEN
             TK1(L,NY,NX)=(ENGY1+THFLWL(L,NY,NX)+TTFLXL(L,NY,NX) &
               +HWFLU1(L,NY,NX))/VHCP1(L,NY,NX)
+            if(abs(TK1(L,NY,NX))>1.e3_r8)then
+              write(*,*)'ENGY1+THFLWL(L,NY,NX)+TTFLXL(L,NY,NX)',&
+                ENGY1,THFLWL(L,NY,NX),TTFLXL(L,NY,NX)
+              write(*,*)'HWFLU1(L,NY,NX)),VHCP1(L,NY,NX)',&
+                HWFLU1(L,NY,NX),VHCP1(L,NY,NX)
+              call endrun(trim(mod_filename)//' at line',__LINE__)
+            endif
           ELSEIF(L.EQ.1)THEN
             TK1(L,NY,NX)=TKA(NY,NX)
           ELSE
@@ -5358,16 +5453,16 @@ module WatsubMod
 !    write(*,*)'TK1(0,NY,NX)=',TK1(0,NY,NX)
 !    write(*,*)'NoSurfResidueForEnergyBalanc'
 !  endif
-  EVAPR(NY,NX)=0.0
-  RFLXR=0.0
-  EFLXR=0.0
-  VFLXR=0.0
-  SFLXR=0.0
-  HFLXR=0.0
-  FLV1=0.0
-  HWFLV1=0.0
-  HFLCR1=0.0
-  THRMZ=0.0
+  EVAPR(NY,NX)=0.0_r8
+  RFLXR=0.0_r8
+  EFLXR=0.0_r8
+  VFLXR=0.0_r8
+  SFLXR=0.0_r8
+  HFLXR=0.0_r8
+  FLV1=0.0_r8
+  HWFLV1=0.0_r8
+  HFLCR1=0.0_r8
+  THRMZ=0.0_r8
   end subroutine NoSurfResidueForEnergyBalance
 !------------------------------------------------------------------------------------------
 
@@ -5376,7 +5471,7 @@ module WatsubMod
   integer, intent(in) :: NY,NX
 
 ! begin_execution
-  RFLXG=0.0
+  RFLXG=0.0_r8
   EFLXG=0.0_r8
   VFLXG=0.0_r8
   SFLXG=0.0_r8

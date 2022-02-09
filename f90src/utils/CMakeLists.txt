@@ -7,7 +7,7 @@ set(ECOSIM_UTIL_SOURCES
   getfilename.c
   timings.F90
   fileUtil.F90
-  EcosimConst.F90
+  EcoSimConst.F90
 )
 
 
