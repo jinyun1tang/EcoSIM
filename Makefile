@@ -13,6 +13,7 @@ CXX        = not-set
 FC         = not-set
 travis     = not-set
 F90        = not-set
+
 # This proxies everything to the builddir cmake.
 netcdfsys = not-set
 
@@ -61,6 +62,11 @@ else
   CONFIG_FLAGS += -DHAVE_MPI=0
 endif
 
+ifeq ($(CC),icc)
+  compiler=intel
+else
+  compiler=gnu
+endif
 # Shared libs?
 ifeq ($(shared), 1)
   BUILDDIR := ${BUILDDIR}-shared
@@ -156,7 +162,7 @@ test: install
 	@if [ ! -f $(BUILDDIR)/Makefile ]; then \
 		more INSTALL; \
 	else \
-		$(MAKE) -C $(BUILDDIR) $@ --no-print-directory $(MAKEFLAGS) F90=$(F90); \
+		$(MAKE) -C $(BUILDDIR) $@ --no-print-directory $(MAKEFLAGS) F90=$(F90) compiler=$(compiler); \
 		$(MAKE) -C regression-tests $@ --no-print-directory $(MAKEFLAGS); \
 	fi
 
