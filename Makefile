@@ -62,7 +62,7 @@ else
   CONFIG_FLAGS += -DHAVE_MPI=0
 endif
 
-ifeq ($(CC),icc)
+ifeq ($(FC),ifort)
   compiler=intel
 else
   compiler=gnu
@@ -162,8 +162,8 @@ test: install
 	@if [ ! -f $(BUILDDIR)/Makefile ]; then \
 		more INSTALL; \
 	else \
-		$(MAKE) -C $(BUILDDIR) $@ --no-print-directory $(MAKEFLAGS) F90=$(F90) compiler=$(compiler); \
-		$(MAKE) -C regression-tests $@ --no-print-directory $(MAKEFLAGS); \
+		$(MAKE) -C $(BUILDDIR) $@ --no-print-directory $(MAKEFLAGS) F90=$(F90); \
+		$(MAKE) -C regression-tests $@ --no-print-directory $(MAKEFLAGS) F90=$(F90) compiler=$(compiler); \
 	fi
 
 clean:

@@ -9,9 +9,9 @@
 |outph.f              |Hourly output for plant C, N, P, water and heat                                      |
 |outsd.f              |Daily output for soil C, N, P, water and heat                                        |
 |outsh.f              |Hourly output for soil C, N, P, water and heat                                       |
-|readi.f              |Read soil and topographic inputs                                                     |
-|readq.f              |Read pft and plant management inputs                                                 |
-|reads.f              |Read soil and soil management inputs                                                 |
+|readimod.f              |Read soil and topographic inputs                                                     |
+|readqmod.f              |Read pft and plant management inputs                                                 |
+|readsmod.f              |Read soil and soil management inputs                                                 |
 |routp.f              |Read pft checkpoint files                                                            |
 |routq.f              |Read plant and management checkpoint files                                           |
 |routs.f              |Read soil checkpoint files                                                           |
@@ -33,7 +33,7 @@
 |blk13d.h             |DOM variables                                                                        |
 |blk14.h              |C, N and P balance related variables                                                 |
 |blk15a.h             |Water and heat flux related variables                                                |
-|blk15b.h             |Runoff related lateral gas exchanges                                                 | 
+|blk15b.h             |Runoff related lateral gas exchanges                                                 |
 |blk16.h              |Uptake related variables                                                             |
 |blk17.h              |Doy related variables                                                                |
 |blk18a.h             |Plant-soil exchange related variables                                                |
