@@ -90,6 +90,9 @@ def commandline_options(ext_args=None):
     parser.add_argument('--timeout', nargs=1, default='90.0',
                         help='max runtime [seconds] before we timout a test.')
 
+    parser.add_argument('--compiler', nargs=1, default='intel',
+                        help='type of compilers used')
+
     parser.add_argument('--update-baseline', action='store_true',
                         help=('update the baseline regression file with '
                               'the results of the current run.'))
@@ -133,7 +136,7 @@ class RegressionTestSuite(object):
     """
     """
 
-    def __init__(self, filename, conf, timeout):
+    def __init__(self, filename, conf, timeout, compiler):
         """
         """
         name = os.path.basename(filename)
@@ -144,11 +147,10 @@ class RegressionTestSuite(object):
         # default comparison object for this test suite
         # tests will get a copy and modify as needed.
         self._comparison = Comparison(self._name, conf)
-
         self._tests = []
-        self._add_tests(conf, timeout)
+        self._add_tests(conf, timeout, compiler)
 
-    def _add_tests(self, conf, timeout):
+    def _add_tests(self, conf, timeout, compiler):
         """
         """
         os.chdir(self._test_dir)
@@ -157,7 +159,7 @@ class RegressionTestSuite(object):
             comparison = copy.deepcopy(self._comparison)
             options = conf[test_name]
             try:
-                test = RegressionTest(test_name, comparison, options, timeout)
+                test = RegressionTest(test_name, comparison, options, timeout, compiler)
                 self._tests.append(test)
             except RuntimeError as e:
                 msg = "{0} : {1}".format(self._name, e)
@@ -214,8 +216,7 @@ class RegressionTest(object):
     """
     _REGRESSION = 'regression'
     _BASELINE = 'regression.baseline'
-
-    def __init__(self, name, comparison, options, timeout):
+    def __init__(self, name, comparison, options, timeout, compiler):
         """Note: assume that we are in the test directory.
 
         We start with a None status because we want to explicitly se
@@ -231,7 +232,7 @@ class RegressionTest(object):
         self._comparison = comparison
         self._status = None
         self._timeout = 60.0
-
+        self._compiler=compiler[0]
         # setup the test
         self._comparison.set_name(self._name)
         self._process_options(options)
@@ -389,7 +390,7 @@ class RegressionTest(object):
         # NOTE(bja, 201603) relying on implicit ordering. We check
         # baseline first, so if the current regression file is missing
         # we get a failure instead of a skip status!
-        filename = '{0}.{1}'.format(self._name, self._BASELINE)
+        filename = '{0}.{1}.{2}'.format(self._name, self._BASELINE, self._compiler)
         baseline = None
         try:
             baseline = read_config_file_as_dict(filename)
@@ -424,7 +425,7 @@ class RegressionTest(object):
 
         """
         current = '{0}.{1}'.format(self._name, self._REGRESSION)
-        baseline = '{0}.{1}'.format(self._name, self._BASELINE)
+        baseline = '{0}.{1}.{2}'.format(self._name, self._BASELINE, self._compiler)
         try:
             logging.info('  mv {0} {1}'.format(current, baseline))
             if not dry_run:
@@ -1098,7 +1099,7 @@ def main(options):
 #    else:
 #        loc=subprocess.check_output(["which", "ncgen"])
 #        ncgen=str(loc.strip().decode())
-    
+
 #    convert_input_data(ncgen, input_dir, dry_run)
 #####
     print('Setting up tests.')
@@ -1107,7 +1108,7 @@ def main(options):
         os.chdir(cwd)
         logging.info(BANNER)
         config = read_config_file_as_dict(filename)
-        suite = RegressionTestSuite(filename, config, options.timeout)
+        suite = RegressionTestSuite(filename, config, options.timeout, options.compiler)
         if suite.num_tests() > 0:
             test_suites.append(suite)
         else:

@@ -1584,57 +1584,56 @@ module Hour1Mod
       end subroutine GetOutput4WaterTableDepth
 !------------------------------------------------------------------------------------------
 
-      subroutine SetSurfaceProperty4SedErosion(NY,NX)
-      implicit none
-      integer, intent(in) :: NY,NX
-!     begin_execution
-!
-!     DETS=soil detachability from rainfall impact
-!     D50=average particle size
-!     CER,XER=parameters for runoff transport capacity
-!     ZD50=particle size effect on surface roughness
-!     VLS=hourly sinking rate
-!     COHS=soil cohesion
-!     DETE=soil detachability
-!     ZM=surface roughness used in runoff velocity calculation in watsub.f
-!
-      BKVLNU(NY,NX)=AMAX1(0.0,BKVLNM(NY,NX) &
-      +1.82E-06*ORGC(NU(NY,NX),NY,NX))
-!     WRITE(*,2423)'BKVLH',I,J,NX,NY,BKVL(NU(N2,N1),N2,N1)
-!    2,BKVLNM(N2,N1),BKVLNU(N2,N1),ORGR(NU(N2,N1),N2,N1)
-!    3,ORGC(NU(N2,N1),N2,N1),SAND(NU(N2,N1),N2,N1)
-!    3,SILT(NU(N2,N1),N2,N1),CLAY(NU(N2,N1),N2,N1)
+  subroutine SetSurfaceProperty4SedErosion(NY,NX)
+  implicit none
+  integer, intent(in) :: NY,NX
+  !     begin_execution
+  !
+  !     DETS=soil detachability from rainfall impact
+  !     D50=average particle size
+  !     CER,XER=parameters for runoff transport capacity
+  !     ZD50=particle size effect on surface roughness
+  !     VLS=hourly sinking rate
+  !     COHS=soil cohesion
+  !     DETE=soil detachability
+  !     ZM=surface roughness used in runoff velocity calculation in watsub.f
+  !
+  BKVLNU(NY,NX)=AMAX1(0.0_r8,BKVLNM(NY,NX)+1.82E-06_r8*ORGC(NU(NY,NX),NY,NX))
+  !     WRITE(*,2423)'BKVLH',I,J,NX,NY,BKVL(NU(N2,N1),N2,N1)
+  !    2,BKVLNM(N2,N1),BKVLNU(N2,N1),ORGR(NU(N2,N1),N2,N1)
+  !    3,ORGC(NU(N2,N1),N2,N1),SAND(NU(N2,N1),N2,N1)
+  !    3,SILT(NU(N2,N1),N2,N1),CLAY(NU(N2,N1),N2,N1)
 !2423  FORMAT(A8,4I4,20E12.4)
-      BKVLNX=SAND(NU(NY,NX),NY,NX)+SILT(NU(NY,NX),NY,NX) &
-      +CLAY(NU(NY,NX),NY,NX)+1.82E-06*ORGC(NU(NY,NX),NY,NX)
-      IF(BKVLNX.GT.ZEROS(NY,NX))THEN
-      CORGM=1.82E-06*ORGC(NU(NY,NX),NY,NX)/BKVLNX
-      CORGC(NU(NY,NX),NY,NX)=0.55E+06*CORGM
-      CSAND(NU(NY,NX),NY,NX)=SAND(NU(NY,NX),NY,NX)/BKVLNX
-      CSILT(NU(NY,NX),NY,NX)=SILT(NU(NY,NX),NY,NX)/BKVLNX
-      CCLAY(NU(NY,NX),NY,NX)=CLAY(NU(NY,NX),NY,NX)/BKVLNX
-      ELSE
-      CORGM=0.0_r8
-      CORGC(NU(NY,NX),NY,NX)=0.0_r8
-      CSAND(NU(NY,NX),NY,NX)=0.0_r8
-      CSILT(NU(NY,NX),NY,NX)=1.0
-      CCLAY(NU(NY,NX),NY,NX)=0.0_r8
-      ENDIF
-      IF(IERSNG.EQ.2.OR.IERSNG.EQ.3)THEN
-      D50=1.0*CCLAY(NU(NY,NX),NY,NX)+10.0*CSILT(NU(NY,NX),NY,NX) &
-      +100.0*CSAND(NU(NY,NX),NY,NX)+100.0*CORGM
-      ZD50=0.041*(1.0E-06*D50)**0.167
-      ZM(NY,NX)=ZS(NY,NX)+ZD50+1.0*VOLR(NY,NX)/AREA(3,0,NY,NX)
-      CER(NY,NX)=((D50+5.0)/0.32)**(-0.6)
-      XER(NY,NX)=((D50+5.0)/300.0)**0.25
-      DETS(NY,NX)=1.0E-06*(1.0+2.0*(1.0-CSILT(NU(NY,NX),NY,NX)-CORGM))
-      COHS=2.0+10.0*(CCLAY(NU(NY,NX),NY,NX)+CORGM) &
-      +5.0*(1.0-EXP(-2.0E-06*RTDNT(NU(NY,NX),NY,NX)))
-      DETE(NY,NX)=0.79*EXP(-0.85*AMAX1(1.0,COHS))
-      PTDSNU(NY,NX)=1.30*CORGM+2.66*(1.0-CORGM)
-      VISCWL=VISCW*EXP(0.533-0.0267*TCS(0,NY,NX))
-      VLS(NY,NX)=3.6E+03*9.8*(PTDSNU(NY,NX)-1.0) &
-      *(1.0E-06*D50)**2/(18.0*VISCWL)
+  BKVLNX=SAND(NU(NY,NX),NY,NX)+SILT(NU(NY,NX),NY,NX) &
+    +CLAY(NU(NY,NX),NY,NX)+1.82E-06*ORGC(NU(NY,NX),NY,NX)
+  IF(BKVLNX.GT.ZEROS(NY,NX))THEN
+    CORGM=1.82E-06_r8*ORGC(NU(NY,NX),NY,NX)/BKVLNX
+    CORGC(NU(NY,NX),NY,NX)=0.55E+06_r8*CORGM
+    CSAND(NU(NY,NX),NY,NX)=SAND(NU(NY,NX),NY,NX)/BKVLNX
+    CSILT(NU(NY,NX),NY,NX)=SILT(NU(NY,NX),NY,NX)/BKVLNX
+    CCLAY(NU(NY,NX),NY,NX)=CLAY(NU(NY,NX),NY,NX)/BKVLNX
+  ELSE
+    CORGM=0.0_r8
+    CORGC(NU(NY,NX),NY,NX)=0.0_r8
+    CSAND(NU(NY,NX),NY,NX)=0.0_r8
+    CSILT(NU(NY,NX),NY,NX)=1.0
+    CCLAY(NU(NY,NX),NY,NX)=0.0_r8
+  ENDIF
+  IF(IERSNG.EQ.2.OR.IERSNG.EQ.3)THEN
+    D50=1.0_r8*CCLAY(NU(NY,NX),NY,NX)+10.0_r8*CSILT(NU(NY,NX),NY,NX) &
+      +100.0_r8*CSAND(NU(NY,NX),NY,NX)+100.0_r8*CORGM
+    ZD50=0.041*(1.0E-06_r8*D50)**0.167_r8
+    ZM(NY,NX)=ZS(NY,NX)+ZD50+1.0_r8*VOLR(NY,NX)/AREA(3,0,NY,NX)
+    CER(NY,NX)=((D50+5.0_r8)/0.32_r8)**(-0.6_r8)
+    XER(NY,NX)=((D50+5.0_r8)/300.0_r8)**0.25_r8
+    DETS(NY,NX)=1.0E-06_r8*(1.0_r8+2.0_r8*(1.0_r8-CSILT(NU(NY,NX),NY,NX)-CORGM))
+    COHS=2.0_r8+10.0_r8*(CCLAY(NU(NY,NX),NY,NX)+CORGM) &
+      +5.0_r8*(1.0_r8-EXP(-2.0E-06_r8*RTDNT(NU(NY,NX),NY,NX)))
+    DETE(NY,NX)=0.79_r8*EXP(-0.85_r8*AMAX1(1.0_r8,COHS))
+    PTDSNU(NY,NX)=1.30_r8*CORGM+2.66_r8*(1.0_r8-CORGM)
+    VISCWL=VISCW*EXP(0.533_r8-0.0267_r8*TCS(0,NY,NX))
+    VLS(NY,NX)=3.6E+03_r8*9.8_r8*(PTDSNU(NY,NX)-1.0_r8) &
+      *(1.0E-06_r8*D50)**2/(18.0_r8*VISCWL)
 !     WRITE(*,1118)'COHS',I,J,NX,NY,NU(NY,NX),COHS,DETE(NY,NX)
 !    2,ZM(NY,NX),VLS(NY,NX),D50,ZD50,PTDSNU(NY,NX)
 !    3,RTDNT(NU(NY,NX),NY,NX),VOLR(NY,NX)/AREA(3,0,NY,NX)
@@ -1644,47 +1643,47 @@ module Hour1Mod
 !    5,BKVL(NU(NY,NX),NY,NX),BKVLNX
 !    3,VISCWL,TCS(0,NY,NX)
 !1118  FORMAT(A8,5I4,20E12.4)
-      ENDIF
-      end subroutine SetSurfaceProperty4SedErosion
+  ENDIF
+  end subroutine SetSurfaceProperty4SedErosion
 !------------------------------------------------------------------------------------------
 
-      subroutine UpdateTotalSOC(L,NY,NX)
-      implicit none
-      integer, intent(in) :: L,NY,NX
+  subroutine UpdateTotalSOC(L,NY,NX)
+  implicit none
+  integer, intent(in) :: L,NY,NX
 
-      integer :: K,M,N
-!     begin_execution
-!
-!     TOTAL SOC FOR CALCULATING CHANGES IN SOC CALCULATED IN NITRO.F
-!
-!     OMC=microbial biomass, ORC=microbial residue
-!     OQC,OQCH=DOC in micropores,macropores
-!     OQA,OQAH=acetate in micropores,macropores
-!     OHC,OHA=adsorbed SOC,acetate
-!     OSC=SOC(K=0:woody litter, K=1:non-woody litter,
-!     K=2:manure, K=3:POC, K=4:humus)
-!
-      DC=0.0_r8
-      OC=0.0_r8
-      DO 7970 K=0,5
-      DO 7950 N=1,7
+  integer :: K,M,N
+  !     begin_execution
+  !
+  !     TOTAL SOC FOR CALCULATING CHANGES IN SOC CALCULATED IN NITRO.F
+  !
+  !     OMC=microbial biomass, ORC=microbial residue
+  !     OQC,OQCH=DOC in micropores,macropores
+  !     OQA,OQAH=acetate in micropores,macropores
+  !     OHC,OHA=adsorbed SOC,acetate
+  !     OSC=SOC(K=0:woody litter, K=1:non-woody litter,
+  !     K=2:manure, K=3:POC, K=4:humus)
+  !
+  DC=0.0_r8
+  OC=0.0_r8
+  DO 7970 K=0,5
+    DO 7950 N=1,7
       DO  M=1,3
-      OC=OC+OMC(M,N,K,L,NY,NX)
+        OC=OC+OMC(M,N,K,L,NY,NX)
       enddo
 7950  CONTINUE
 7970  CONTINUE
-      DO 7900 K=0,4
-      DO 7920 M=1,2
+  DO 7900 K=0,4
+    DO 7920 M=1,2
       OC=OC+ORC(M,K,L,NY,NX)
 7920  CONTINUE
-      OC=OC+OQC(K,L,NY,NX)+OQCH(K,L,NY,NX)+OHC(K,L,NY,NX) &
+    OC=OC+OQC(K,L,NY,NX)+OQCH(K,L,NY,NX)+OHC(K,L,NY,NX) &
       +OQA(K,L,NY,NX)+OQAH(K,L,NY,NX)+OHA(K,L,NY,NX)
-      DO 7910 M=1,4
+    DO 7910 M=1,4
       OC=OC+OSC(M,K,L,NY,NX)
 7910  CONTINUE
 7900  CONTINUE
-      ORGCX(L,NY,NX)=OC
-      end subroutine UpdateTotalSOC
+  ORGCX(L,NY,NX)=OC
+  end subroutine UpdateTotalSOC
 !------------------------------------------------------------------------------------------
 
   subroutine GetSoilHydraulicVars(L,NY,NX)
@@ -1692,17 +1691,17 @@ module Hour1Mod
   integer, intent(in) :: L,NY,NX
 
   integer :: K
-! begin_execution
-! WATER POTENTIALS
-!
-! FC,WP=water contents at field capacity,wilting point,saturation
-! PSISM,PSISE=matric,saturation water potential
-! SRP=parameter for deviation from linear log-log water retention
-! FC,WP=water contents at field capacity,wilting point from soil file
-! FCL,WPL=log FC,WP
-! FCD,PSD=FCL-WPL,log(POROS)-FCL
-! FCI,WPI=FC,WP of ice
-! THETIX=ice concentration
+  ! begin_execution
+  ! WATER POTENTIALS
+  !
+  ! FC,WP=water contents at field capacity,wilting point,saturation
+  ! PSISM,PSISE=matric,saturation water potential
+  ! SRP=parameter for deviation from linear log-log water retention
+  ! FC,WP=water contents at field capacity,wilting point from soil file
+  ! FCL,WPL=log FC,WP
+  ! FCD,PSD=FCL-WPL,log(POROS)-FCL
+  ! FCI,WPI=FC,WP of ice
+  ! THETIX=ice concentration
 !
   IF(BKVL(L,NY,NX).GT.ZEROS(NY,NX) &
     .AND.VOLX(L,NY,NX).GT.ZEROS(NY,NX))THEN

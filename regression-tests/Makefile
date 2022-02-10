@@ -1,6 +1,7 @@
 # FIXME(bja, 201604) need to stop using a hard coded path. Maybe
 # switch to some sort of cmake-ified out of source tests.
 F90        = not-set
+compiler   = not-set
 ifeq ($(F90), not-set)
 ECOSYS = ../local/bin/ecosim.x
 else
@@ -10,6 +11,12 @@ else
 	ECOSYS = ../local/bin/ecosim.x
 endif
 endif
+ifeq ($(compiler), not-set)
+COMPILER=intel
+else
+COMPILER=$(compiler)
+endif
+
 RTEST = ./rtest_ecosim.py
 RTEST_ARGS = --backtrace
 RTEST_ARGS += --executable $(ECOSYS)
@@ -20,15 +27,15 @@ COVERAGE_RUN_FLAGS = $(COVERAGERC) -m unittest discover
 test : mtest rtest
 
 update : FORCE
-	$(RTEST) $(RTEST_ARGS) --update-baseline
+	$(RTEST) $(RTEST_ARGS) --update-baseline --compiler $(COMPILER)
 rtest : FORCE
-	$(RTEST) $(RTEST_ARGS)
+	$(RTEST) $(RTEST_ARGS) --compiler $(COMPILER)
 
 # NOTE(bja, 201603) rcheck - runs the regression test manager with
 # --check-only, to recheck existing results. It does NOT run
 # sbetr. Useful for development of the regression test manager itself.
 rcheck : FORCE
-	$(RTEST) $(RTEST_ARGS) --check-only
+	$(RTEST) $(RTEST_ARGS) --check-only --compiler $(COMPILER)
 
 # NOTE(bja, 201603) run the meta-tests for the test manager.
 mtest : FORCE
