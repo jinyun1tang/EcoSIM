@@ -1,0 +1,872 @@
+<html>
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css">
+    <script src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
+    <script src="https://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
+
+    <script type="text/javascript">
+
+
+ $(document).ready(function(){
+	  function getH2Children($row) {
+	      var children = [];
+	      while($row.next().hasClass('child_dataset')) {
+		  children.push($row.next());
+		  $row = $row.next();
+	      }
+	      return children;
+	  }
+	  function getH1Children($row) {
+	      var children = [];
+	      var turning_on = $row.next().is(":hidden");
+	      while($row.next().hasClass('child_dataset') ||
+		    $row.next().hasClass('child_variable')) {
+		  if(turning_on){
+		      if( ($row.next().is(":hidden")) &&
+			  ($row.next().hasClass('child_variable'))) children.push($row.next());
+		  }else{
+		      if(!($row.next().is(":hidden"))) children.push($row.next());
+		  }
+		  $row = $row.next();
+	      }
+	      return children;
+	  }
+	  $('.parent').on('click', function() {
+	      var children = getH1Children($(this));	 
+	      $.each(children, function() {
+		  $(this).toggle();
+	      })
+	  });
+	  $('.child_variable').on('click', function() {
+	      var children = getH2Children($(this));
+	      $.each(children, function() {
+		  $(this).toggle();
+	      })
+	  });
+	  $('.child_dataset').toggle();
+      });
+
+      function pageLoad() {
+	  
+	  $("table").delegate('td','mouseover mouseleave', function(e) {
+	      var table = document.getElementById("scoresTable");
+	      if (e.type == 'mouseover') {
+		  $(this).parent().addClass("hover");
+		  table.rows[0].cells[$(this).index()].style.fontWeight = "bolder";
+	      }
+	      else {
+		  $(this).parent().removeClass("hover");
+		  table.rows[0].cells[$(this).index()].style.fontWeight = "normal";
+	      }
+	  });
+
+	  colorTable();
+      }
+      
+      function printRow(table,row,array,cmap) {
+	  if(typeof array == 'undefined'){
+	      for(var i = 1, col; col = table.rows[row].cells[i]; i++) {
+		  col.style.backgroundColor = "#808080";
+	      }
+	      return;
+	  }
+	  var nc = cmap.length;
+	  for(var col=0;col<array.length;col++){
+	      var clr = "#808080";
+	      if(array[col] > -900){
+                  var ae = Math.abs(array[col]);
+                  var ind;
+                  if(ae>=0.25){
+                     ind = Math.round(2*array[col]+4);
+                  }else{
+                     ind = Math.round(4*array[col]+4);
+                  }
+		  ind = Math.min(Math.max(ind,0),nc-1);
+		  clr = cmap[ind];
+	      }
+	      table.rows[row].cells[col+1].style.backgroundColor = clr;
+	  }
+      }
+
+     function colorTable() {
+	  	  
+        $.getJSON("scalars.json", function(data) {
+          var scalars = data;
+	  var scalar_option = document.getElementById("ScalarOption");
+          var region_option = document.getElementById("RegionOption");
+	  var scalar_name   = scalar_option.options[scalar_option.selectedIndex].value;
+	  scalar_name  += " " + region_option.options[region_option.selectedIndex].value;
+	  
+	  var PuOr = ['#b35806','#e08214','#fdb863','#fee0b6','#f7f7f7','#d8daeb','#b2abd2','#8073ac','#542788'];
+	  var GnRd = ['#b2182b','#d6604d','#f4a582','#fddbc7','#f7f7f7','#d9f0d3','#a6dba0','#5aae61','#1b7837'];
+	  var cmap = GnRd;
+	  if(document.getElementById("colorblind").checked) cmap = PuOr;
+
+	   	  var row = 1;
+	  var tab = "";
+	  var table = document.getElementById("scoresTable");
+	  for(let h1 in scalars){
+	      printRow(table,row,scalars[h1][scalar_name],cmap);
+	      row += 1;
+	      H1 = scalars[h1]["children"]
+	      for(let h2 in H1){
+		  printRow(table,row,H1[h2][scalar_name],cmap);
+		  row += 1;
+		  H2 = H1[h2]["children"]
+		  for(let v in H2){
+	              var s_name = scalar_name;
+                      if(h1 == "Relationships") {
+                        s_name = v.substring(0,v.indexOf("/")) + " Score " + region_option.options[region_option.selectedIndex].value;
+                      }else{
+                      }
+		      printRow(table,row,H2[v][s_name],cmap);
+		      row += 1;
+		  }
+	      }
+	  }
+
+ 
+	  table = document.getElementById("scoresLegend");
+	  row = 0;
+	  for(var col=0;col<cmap.length;col++){
+	      table.rows[row].cells[col].style.backgroundColor = cmap[col];
+	  }
+	});  
+      }
+    </script>
+    <style type="text/css">
+      .parent{
+      }
+      .child_variable{
+      }
+      .child_dataset{
+      }
+      table.table-header-rotated {
+          border-collapse: collapse;
+      }
+      th.rotate {
+          height: 110px;
+          white-space: nowrap;
+	  font-weight: normal;
+      }
+      th.rotate > div {
+          transform: translate(10px, 50px) rotate(-45deg);
+          width: 0px;
+      }
+      th.rotate > div > span {
+      }
+      td {
+	  height: 25px;
+	  width: 25px;
+	  border: 1px solid;
+      }
+      td.row-label { 
+	  width: 325px; 
+      }
+      a {
+	  display:block;
+	  text-decoration: none;
+      }
+      .hover {
+	  font-weight: bold;
+          border: 2px solid;
+      }
+      table tbody tr td {
+	  font-size: 24px;
+      }
+    </style>
+  </head>
+  <body onload="pageLoad()">
+	<table class="table-header-rotated" id="scoresTable">
+	  <thead>
+	  </thead>
+	  <tbody>
+<tr class="parent">
+<td class="row-label">../f90src/ecosim_mods/</td>
+<tr class="child_variable">
+<td class="row-label">&nbsp;&nbsp;&nbsp;&nbsp;StarteMod</td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/starte.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;starte</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/InitEquilibria.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;InitEquilibria</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/SolubilityEquilibiriaSalt.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SolubilityEquilibiriaSalt</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/SolubilityEquilibriaNoSalt.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SolubilityEquilibriaNoSalt</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/SoluteConcentrations.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SoluteConcentrations</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/InitialState.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;InitialState</a></td><tr class="child_variable">
+<td class="row-label">&nbsp;&nbsp;&nbsp;&nbsp;StartqMod</td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/startq.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;startq</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/InitShootGrowth.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;InitShootGrowth</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/PlantLitterFractions.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;PlantLitterFractions</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/PFTThermalAcclimation.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;PFTThermalAcclimation</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/InitDimensionsandUptake.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;InitDimensionsandUptake</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/InitPlantPhenoMorphoBio.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;InitPlantPhenoMorphoBio</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/InitMassBalance.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;InitMassBalance</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/InitPlantHeatandWater.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;InitPlantHeatandWater</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/InitRootMychorMorphoBio.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;InitRootMychorMorphoBio</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/InitSeedMorphoBio.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;InitSeedMorphoBio</a></td><tr class="child_variable">
+<td class="row-label">&nbsp;&nbsp;&nbsp;&nbsp;ExtractMod</td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/extract.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;extract</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/TotalLitterfall.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;TotalLitterfall</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/TotalLeafArea.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;TotalLeafArea</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/TotalGasandSoluteUptake.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;TotalGasandSoluteUptake</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/CanopyFluxesandFixation.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;CanopyFluxesandFixation</a></td><tr class="child_variable">
+<td class="row-label">&nbsp;&nbsp;&nbsp;&nbsp;VisualMod</td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/visual.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;visual</a></td><tr class="child_variable">
+<td class="row-label">&nbsp;&nbsp;&nbsp;&nbsp;nitroMod</td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/nitro.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;nitro</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/SoilBGCOneLayer.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SoilBGCOneLayer</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/SOMRemovalByDisturbance.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SOMRemovalByDisturbance</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/VerticalLitterMixLvsLL.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;VerticalLitterMixLvsLL</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/ApplyVerticalMix.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ApplyVerticalMix</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/StageBGCEnvironCondition.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;StageBGCEnvironCondition</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/MicrobialCatabolism.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;MicrobialCatabolism</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/ChemoDenitrification.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ChemoDenitrification</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/OMTransferForPriming.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;OMTransferForPriming</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/DOMSorption.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DOMSorption</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/SolidOMDecomposition.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SolidOMDecomposition</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/RedistDecompositionProduct.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;RedistDecompositionProduct</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/MicrobialAnabolicUpdate.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;MicrobialAnabolicUpdate</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/MicrobialLitterColonization.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;MicrobialLitterColonization</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/AggregateTransformations.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;AggregateTransformations</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/SubstrateCompetitionFactors.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SubstrateCompetitionFactors</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/NH3OxidizerCatabolism.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;NH3OxidizerCatabolism</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/NO2OxidizerCatabolism.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;NO2OxidizerCatabolism</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/H2MethanogensCatabolism.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;H2MethanogensCatabolism</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/MethanotrophCatabolism.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;MethanotrophCatabolism</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/AcetoMethanogenCatabolism.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;AcetoMethanogenCatabolism</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/AerobicHeterotrophCatabolism.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;AerobicHeterotrophCatabolism</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/AnaerobCatabolism.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;AnaerobCatabolism</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/HeteroDenitrificCatabolism.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;HeteroDenitrificCatabolism</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/AutotrophDenitrificCatabolism.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;AutotrophDenitrificCatabolism</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/AerobsO2Uptake.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;AerobsO2Uptake</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/BiomassMineralization.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;BiomassMineralization</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/GatherMicrobialRespiration.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;GatherMicrobialRespiration</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/GetMicrobialAnabolismFlux.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;GetMicrobialAnabolismFlux</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/DealNoActiveMicrobes.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DealNoActiveMicrobes</a></td><tr class="child_variable">
+<td class="row-label">&nbsp;&nbsp;&nbsp;&nbsp;grosubMod</td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/grosub.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;grosub</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/PrepLandscapeGrazing.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;PrepLandscapeGrazing</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/RemoveBiomassByDisturbance.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;RemoveBiomassByDisturbance</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/LiveDeadTransformation.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;LiveDeadTransformation</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/GrowPlant.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;GrowPlant</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/ResetDeadBranch.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ResetDeadBranch</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/LiterfallFromRootShootStorage.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;LiterfallFromRootShootStorage</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/LiterfallFromDeadRoots.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;LiterfallFromDeadRoots</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/LiterfallFromDeadBranches.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;LiterfallFromDeadBranches</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/RemoveBiomByTillage.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;RemoveBiomByTillage</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/RemoveBiomByHarvest.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;RemoveBiomByHarvest</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/RootNoduleBiomchemistry.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;RootNoduleBiomchemistry</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/RootBiochemistry.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;RootBiochemistry</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/CanopyNoduleBiochemistry.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;CanopyNoduleBiochemistry</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/C4PhotoProductTransfer.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;C4PhotoProductTransfer</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/ComputeGPP.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ComputeGPP</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/CalcPartitionCoeff.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;CalcPartitionCoeff</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/GrowOneBranch.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;GrowOneBranch</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/PhenologyReset.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;PhenologyReset</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/AllocateLeafToCanopyLayers.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;AllocateLeafToCanopyLayers</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/GrainFilling.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;GrainFilling</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/LeafClassAllocation.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;LeafClassAllocation</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/CarbNutInBranchTransfer.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;CarbNutInBranchTransfer</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/StagePlantForGrowth.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;StagePlantForGrowth</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/NonstructlBiomTransfer.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;NonstructlBiomTransfer</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/ComputeTotalBiom.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ComputeTotalBiom</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/AccumulateStates.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;AccumulateStates</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/LiterfallByDisturbance.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;LiterfallByDisturbance</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/TotalBiomRemovalByDisturbance.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;TotalBiomRemovalByDisturbance</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/ApplyDisturbanceBiomRemoval.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ApplyDisturbanceBiomRemoval</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/ResetBranchRootStates.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ResetBranchRootStates</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/ResetDeadRootStates.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ResetDeadRootStates</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/ComputeGPP_C4.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ComputeGPP_C4</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/ComputeGPP_C3.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ComputeGPP_C3</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/ComputeRAutoAfEmergence.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ComputeRAutoAfEmergence</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/ComputeRAutoBfEmergence.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ComputeRAutoBfEmergence</a></td><tr class="child_variable">
+<td class="row-label">&nbsp;&nbsp;&nbsp;&nbsp;StartsMod</td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/starts.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;starts</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/InitSoilVars.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;InitSoilVars</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/InitIrradianceGeometry.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;InitIrradianceGeometry</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/InitLitterProfile.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;InitLitterProfile</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/InitSurfResiduKinetiComponent.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;InitSurfResiduKinetiComponent</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/InitManureKinetiComponent.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;InitManureKinetiComponent</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/InitPOMKinetiComponent.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;InitPOMKinetiComponent</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/InitSnowLayers.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;InitSnowLayers</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/InitCNPRatios.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;InitCNPRatios</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/InitGridElevation.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;InitGridElevation</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/InitControlParameters.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;InitControlParameters</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/InitAccumulators.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;InitAccumulators</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/InitLayerDepths.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;InitLayerDepths</a></td><tr class="child_variable">
+<td class="row-label">&nbsp;&nbsp;&nbsp;&nbsp;StomateMod</td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/stomate.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;stomate</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/C3ShadedLeaves.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;C3ShadedLeaves</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/C3SunlitLeaves.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;C3SunlitLeaves</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/C3PhotosynsCanopyLayerL.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;C3PhotosynsCanopyLayerL</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/C3Photosynthesis.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;C3Photosynthesis</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/C4Photosynthesis.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;C4Photosynthesis</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/C4PhotosynsCanopyLayerL.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;C4PhotosynsCanopyLayerL</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/C4ShadedLeaves.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;C4ShadedLeaves</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/C4SunlitLeaves.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;C4SunlitLeaves</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/LivingBranch.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;LivingBranch</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/PhenoActiveBranch.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;PhenoActiveBranch</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/PrepPhotosynthesis.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;PrepPhotosynthesis</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/PhotoActivePFT.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;PhotoActivePFT</a></td><tr class="child_variable">
+<td class="row-label">&nbsp;&nbsp;&nbsp;&nbsp;SoluteMod</td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/solute.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;solute</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/UreaHydrolysis.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;UreaHydrolysis</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/UpdateSoilFertlizer.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;UpdateSoilFertlizer</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/DoNoSaltChemEquilibria.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DoNoSaltChemEquilibria</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/PrepIonConcentrations.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;PrepIonConcentrations</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/SolveChemEquilibria.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SolveChemEquilibria</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/DoSaltChemEquilibria.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DoSaltChemEquilibria</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/SummarizeIonFluxes.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SummarizeIonFluxes</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/GetSoluteConcentrations.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;GetSoluteConcentrations</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/IonStrengthActivity.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;IonStrengthActivity</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/PhospPrecipDissolNonBand.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;PhospPrecipDissolNonBand</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/PhospPrecipDissolBand.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;PhospPrecipDissolBand</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/PhospAnionExchBand.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;PhospAnionExchBand</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/PhospAnionExchNoBand.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;PhospAnionExchNoBand</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/CationExchange.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;CationExchange</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/SoluteDissociation.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SoluteDissociation</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/UpdateIonFluxCurentIter.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;UpdateIonFluxCurentIter</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/UpdateIonConcCurrentIter.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;UpdateIonConcCurrentIter</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/AccumulateIonFlux.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;AccumulateIonFlux</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/UpdateNH3FertilizerBandinfo.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;UpdateNH3FertilizerBandinfo</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/UpdatePO4FertilizerBandinfo.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;UpdatePO4FertilizerBandinfo</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/UpdateNO3FertilizerBandinfo.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;UpdateNO3FertilizerBandinfo</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/UpdateSoluteInSurfaceResidue.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;UpdateSoluteInSurfaceResidue</a></td><tr class="child_variable">
+<td class="row-label">&nbsp;&nbsp;&nbsp;&nbsp;ExecMod</td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/exec.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;exec</a></td><tr class="child_variable">
+<td class="row-label">&nbsp;&nbsp;&nbsp;&nbsp;TrnsfrsMod</td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/trnsfrs.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;trnsfrs</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/ZeroAtmosSoluteFlux.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ZeroAtmosSoluteFlux</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/AtmosSoluteFluxToSnowpack.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;AtmosSoluteFluxToSnowpack</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/AtmosSoluteFluxToTopsoil.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;AtmosSoluteFluxToTopsoil</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/InitSolutesInSnowpack.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;InitSolutesInSnowpack</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/GetSubHourFlux.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;GetSubHourFlux</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/GetSubHourlyFluxByLayer.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;GetSubHourlyFluxByLayer</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/SaltModelSoluteFlux.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SaltModelSoluteFlux</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/InitFluxAccumlatorsInRunoff.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;InitFluxAccumlatorsInRunoff</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/InitFluxAccumulatorsInSnowpack.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;InitFluxAccumulatorsInSnowpack</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/InitFluxAccumulatorsInSoil.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;InitFluxAccumulatorsInSoil</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/SoluteSinksInSoil.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SoluteSinksInSoil</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/SoluteFluxInSnowpack.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SoluteFluxInSnowpack</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/Residue2TopsoilSoluteAdvExch.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Residue2TopsoilSoluteAdvExch</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/Topsoil2ResidueSoluteAdvExch.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Topsoil2ResidueSoluteAdvExch</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/TopsoilResidueSolutedifusExch.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;TopsoilResidueSolutedifusExch</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/ZeroDifusTopsoilResidueExch.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ZeroDifusTopsoilResidueExch</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/AccumHourlyTopsoilReisdueFlux.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;AccumHourlyTopsoilReisdueFlux</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/TopsoilResidueFluxAdvPlusDifus.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;TopsoilResidueFluxAdvPlusDifus</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/MacToMicPoreSoluteAdvExchange.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;MacToMicPoreSoluteAdvExchange</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/MicToMacPoreSoluteAdvExchange.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;MicToMacPoreSoluteAdvExchange</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/ZeroMicMacPoreExchange.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ZeroMicMacPoreExchange</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/MacMicPoreSoluteDifusExchange.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;MacMicPoreSoluteDifusExchange</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/ZeroMacMicPoreSoluteDifusExch.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ZeroMacMicPoreSoluteDifusExch</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/MacMicPoreFluxAdvPlusDifus.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;MacMicPoreFluxAdvPlusDifus</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/AccumHourlyMicMacPoreFlux.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;AccumHourlyMicMacPoreFlux</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/SoluteFluxBySurfaceOutflow.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SoluteFluxBySurfaceOutflow</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/ZeroSoluteFluxbySurfaceflow.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ZeroSoluteFluxbySurfaceflow</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/UpdateSoluteInSurfNeighbors.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;UpdateSoluteInSurfNeighbors</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/UpdateSoluteInSubsurfNeighbors.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;UpdateSoluteInSubsurfNeighbors</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/SaltModelSoluteHydroFlux.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SaltModelSoluteHydroFlux</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/BoundarySnowFlux.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;BoundarySnowFlux</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/ZeroSoluteFluxFromRecharge.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ZeroSoluteFluxFromRecharge</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/SoluteExportThruBoundary.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SoluteExportThruBoundary</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/ZeroSoluteInfluxThruBoundary.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ZeroSoluteInfluxThruBoundary</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/SoluteGainSubsurfMicropore.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SoluteGainSubsurfMicropore</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/SoluteLossSubsurfMicropore.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SoluteLossSubsurfMicropore</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/SoluteLossSubsurfMacropore.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SoluteLossSubsurfMacropore</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/ZeroSolueGainSubsurfMacropore.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ZeroSolueGainSubsurfMacropore</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/AccumFluxMacMicPores.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;AccumFluxMacMicPores</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/NetOverloadFluxInWater.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;NetOverloadFluxInWater</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/NetOverloadFLuxInSnow.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;NetOverloadFLuxInSnow</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/NetFluxInSnowpack.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;NetFluxInSnowpack</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/TotFluxInMacMicPores.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;TotFluxInMacMicPores</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/SaltModelInternalFlux.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SaltModelInternalFlux</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/UpdateSoluteInSnow.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;UpdateSoluteInSnow</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/UpdateSoluteInResidue.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;UpdateSoluteInResidue</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/UpdateSoluteInMicMacpores.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;UpdateSoluteInMicMacpores</a></td><tr class="child_variable">
+<td class="row-label">&nbsp;&nbsp;&nbsp;&nbsp;WthrMod</td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/wthr.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;wthr</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/DailyWeather.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DailyWeather</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/HourlyWeather.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;HourlyWeather</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/CalcRadiation.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;CalcRadiation</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/ApplyClimateCorrection.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ApplyClimateCorrection</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/SummaryForOutput.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SummaryForOutput</a></td><tr class="child_variable">
+<td class="row-label">&nbsp;&nbsp;&nbsp;&nbsp;ErosionMod</td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/erosion.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;erosion</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/SedimentDetachment.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SedimentDetachment</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/SedimentTransport.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SedimentTransport</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/InternalSedimentFluxes.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;InternalSedimentFluxes</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/ExternalSedimentFluxes.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ExternalSedimentFluxes</a></td><tr class="child_variable">
+<td class="row-label">&nbsp;&nbsp;&nbsp;&nbsp;DayMod</td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/day.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;day</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/WriteDailyAccumulators.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;WriteDailyAccumulators</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/TillageandIrrigationEvents.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;TillageandIrrigationEvents</a></td><tr class="child_variable">
+<td class="row-label">&nbsp;&nbsp;&nbsp;&nbsp;HfuncMod</td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/hfunc.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;hfunc</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/set_flags.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;set_flags</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/root_shoot_branching.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;root_shoot_branching</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/stage_phenology_vars.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;stage_phenology_vars</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/pft_specific_phenology.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;pft_specific_phenology</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/living_branch_phenology.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;living_branch_phenology</a></td><tr class="child_variable">
+<td class="row-label">&nbsp;&nbsp;&nbsp;&nbsp;RedistMod</td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/redist.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;redist</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/SinkChemicals.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SinkChemicals</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/WaterHeatSoluteBySnowDrift.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;WaterHeatSoluteBySnowDrift</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/SubsurfaceBoundaryFluxes.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SubsurfaceBoundaryFluxes</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/RunoffXBoundaryFluxes.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;RunoffXBoundaryFluxes</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/ModifyExWaterTBLByDisturbance.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ModifyExWaterTBLByDisturbance</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/ZeroFluxArrays.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ZeroFluxArrays</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/ZeroFluxAccumulators.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ZeroFluxAccumulators</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/TotalFluxFromSedmentTransp.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;TotalFluxFromSedmentTransp</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/FluxBetweenGrids.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FluxBetweenGrids</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/SaltThruFluxRunoffAndSnowpack.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SaltThruFluxRunoffAndSnowpack</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/SaltFromRunoffSnowpack.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SaltFromRunoffSnowpack</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/FluxesFromRunoff.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FluxesFromRunoff</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/UpdateSnowLayers.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;UpdateSnowLayers</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/UpdateSoluteInSnow.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;UpdateSoluteInSnow</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/SnowpackDisapper.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SnowpackDisapper</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/HandleSurfaceBoundary.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;HandleSurfaceBoundary</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/OverlandFlow.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;OverlandFlow</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/ChemicalOverlandFlow.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ChemicalOverlandFlow</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/ChemicalBySnowRedistribution.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ChemicalBySnowRedistribution</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/SumupSurfaceChemicalMass.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SumupSurfaceChemicalMass</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/UpdateChemInLayers.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;UpdateChemInLayers</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/SnowpackLayering.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SnowpackLayering</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/RelayerSoilProfile.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;RelayerSoilProfile</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/ApplyMixing.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ApplyMixing</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/AddFluxToSurfaceResidue.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;AddFluxToSurfaceResidue</a></td><tr class="child_variable">
+<td class="row-label">&nbsp;&nbsp;&nbsp;&nbsp;TrnsfrMod</td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/trnsfr.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;trnsfr</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/InitFluxandStateVariables.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;InitFluxandStateVariables</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/ModelSoluteHydroFlux.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ModelSoluteHydroFlux</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/BoundaryFlux.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;BoundaryFlux</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/UpdateStateVar.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;UpdateStateVar</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/SurfaceSinksandSources.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SurfaceSinksandSources</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/StateVarforGasandSolute.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;StateVarforGasandSolute</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/SurfaceSolutefromAtmo.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SurfaceSolutefromAtmo</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/HourlySoluteFluxes.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;HourlySoluteFluxes</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/SubHourlyFluxesFromSiteFile.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SubHourlyFluxesFromSiteFile</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/ImportFluxFromOutsideModules.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ImportFluxFromOutsideModules</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/ResetandInitFluxAccumulators.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ResetandInitFluxAccumulators</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/SoluteFluxSnowpack.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SoluteFluxSnowpack</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/SoluteFluxSurface.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SoluteFluxSurface</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/ConvectiveSurfaceSoluteFlux.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ConvectiveSurfaceSoluteFlux</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/DiffusiveFluxAtSoilSurface.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DiffusiveFluxAtSoilSurface</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/TotalPoreFluxAdjacentCell.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;TotalPoreFluxAdjacentCell</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/MacroMicroTransfer.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;MacroMicroTransfer</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/OverlandFlowSnowdriftTransport.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;OverlandFlowSnowdriftTransport</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/SurfaceGasVolatilDissol.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SurfaceGasVolatilDissol</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/GasDiffusionConvection.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;GasDiffusionConvection</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/SoluteFluxAdjacentCells.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SoluteFluxAdjacentCells</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/BoundaryRunoffandSnow.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;BoundaryRunoffandSnow</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/NetOverlandFlux.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;NetOverlandFlux</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/NetFluxMicroandMacropores.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;NetFluxMicroandMacropores</a></td><tr class="child_variable">
+<td class="row-label">&nbsp;&nbsp;&nbsp;&nbsp;WatsubMod</td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/watsub.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;watsub</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/LocalCopyStateVars.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;LocalCopyStateVars</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/PrepWaterEnergyBalance.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;PrepWaterEnergyBalance</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/InitSoilHydrauics.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;InitSoilHydrauics</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/SnowSurfaceResidualIteration.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SnowSurfaceResidualIteration</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/SnowPackIteration.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SnowPackIteration</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/SolveSnowpack.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SolveSnowpack</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/SoilSurfaceResidualIteration.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SoilSurfaceResidualIteration</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/SoilSurfaceEnergyBalance.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SoilSurfaceEnergyBalance</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/PrepSoilSurfaceEnerbyBalance.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;PrepSoilSurfaceEnerbyBalance</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/PrepForIterationM.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;PrepForIterationM</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/SummaryAfterEnergyBalance.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SummaryAfterEnergyBalance</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/SurfSoilResidueWaterCapillExch.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SurfSoilResidueWaterCapillExch</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/InfiltrationRunoffPartition.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;InfiltrationRunoffPartition</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/LateralHydroExchange.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;LateralHydroExchange</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/Subsurface3DFlow.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Subsurface3DFlow</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/WaterHeatExchThruBoundaryFlow.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;WaterHeatExchThruBoundaryFlow</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/UpdateStateSolutionNotNPH.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;UpdateStateSolutionNotNPH</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/NoSurfResidueForEnergyBalance.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;NoSurfResidueForEnergyBalance</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/SnowCoveredTopSoilFlux.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SnowCoveredTopSoilFlux</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/AccumWaterVaporHeatFluxes.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;AccumWaterVaporHeatFluxes</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/UpdateFLuxAtNPH.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;UpdateFLuxAtNPH</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/ExposedSoilFlux.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ExposedSoilFlux</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/AtmosLandSurfaceExchange.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;AtmosLandSurfaceExchange</a></td><tr class="child_variable">
+<td class="row-label">&nbsp;&nbsp;&nbsp;&nbsp;Hour1Mod</td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/hour1.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;hour1</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/SetAtmosTracerConcentration.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SetAtmosTracerConcentration</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/ResetFluxArrays.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ResetFluxArrays</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/ResetSaltModelArrays.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ResetSaltModelArrays</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/SetSoilPropertyAftDisturbance.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SetSoilPropertyAftDisturbance</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/ResetSurfResidualProperty.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ResetSurfResidualProperty</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/SetLiterSoilPropAftDisturbance.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SetLiterSoilPropAftDisturbance</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/SetHourlyAccumulators.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SetHourlyAccumulators</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/SetArrays4PlantSoilTransfer.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SetArrays4PlantSoilTransfer</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/GetOutput4WaterTableDepth.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;GetOutput4WaterTableDepth</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/SetSurfaceProperty4SedErosion.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SetSurfaceProperty4SedErosion</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/UpdateTotalSOC.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;UpdateTotalSOC</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/GetSoilHydraulicVars.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;GetSoilHydraulicVars</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/DiagActiveLayerDepth.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DiagActiveLayerDepth</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/SetTracerPropertyInLiterAir.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SetTracerPropertyInLiterAir</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/GetSoluteConcentrations.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;GetSoluteConcentrations</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/PrepVars4PlantMicrobeUptake.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;PrepVars4PlantMicrobeUptake</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/GetSurfResidualProperties.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;GetSurfResidualProperties</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/MultiLayerSurfaceRadiation.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;MultiLayerSurfaceRadiation</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/DivideCanopyLayerByLAI.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DivideCanopyLayerByLAI</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/CalcBoundaryLayerProperties.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;CalcBoundaryLayerProperties</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/ApplyFertilizerAtNoon.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ApplyFertilizerAtNoon</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/ApplyUreaNitrifierInhibitor.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ApplyUreaNitrifierInhibitor</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/ApplyPlantAnimalResidue.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ApplyPlantAnimalResidue</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/ApplyMineralFertilizer.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ApplyMineralFertilizer</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/GetChemicalConcsInSoil.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;GetChemicalConcsInSoil</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/ZeroHourlyArrays.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ZeroHourlyArrays</a></td><tr class="child_variable">
+<td class="row-label">&nbsp;&nbsp;&nbsp;&nbsp;UptakeMod</td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/uptake.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;uptake</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/PrepUptake.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;PrepUptake</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/UpdateCanopyProperty.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;UpdateCanopyProperty</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/UpdateRootProperty.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;UpdateRootProperty</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/HandlingDivergence.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;HandlingDivergence</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/CalcResistance.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;CalcResistance</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/HandleBareSoil.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;HandleBareSoil</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/UpdateCanopyWater.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;UpdateCanopyWater</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/SetCanopyGrowthFuncs.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SetCanopyGrowthFuncs</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/CanopyNH3Flux.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;CanopyNH3Flux</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/ZeroUptake.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ZeroUptake</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/NoActiveNutrientUptake.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;NoActiveNutrientUptake</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/UptakeHPO4.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;UptakeHPO4</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/UptakeH2PO4.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;UptakeH2PO4</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/UptakeMineralPhosporhus.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;UptakeMineralPhosporhus</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/UptakeNO3.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;UptakeNO3</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/UptakeNH4.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;UptakeNH4</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/UptakeMineralNitrogen.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;UptakeMineralNitrogen</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/RootExudates.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;RootExudates</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/SumupNutrientUptake.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SumupNutrientUptake</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/GetUptakeCapcity.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;GetUptakeCapcity</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/RootSoilGasExchange.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;RootSoilGasExchange</a></td>
+<tr class="child_dataset">
+<td class="row-label"><a href="./subroutine_htmls/RootMycoO2NutrientUptake.html" target="_blank">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;RootMycoO2NutrientUptake</a></td></tbody>
+</table>
+</body>
+</html>
