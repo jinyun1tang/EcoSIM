@@ -19,9 +19,11 @@ set(ECOSIM_MOD_SOURCES
 	VisualMod.F90
 	WatsubMod.F90
 	WthrMod.F90
+  NitroPars.F90
+  InitEcoSIM.F90
 )
-include_directories(${CMAKE_BINARY_DIR}/f90src/ecosim_datatype/)
 include_directories(${CMAKE_BINARY_DIR}/f90src/utils/)
+include_directories(${CMAKE_BINARY_DIR}/f90src/ecosim_datatype/)
 include_directories(${CMAKE_BINARY_DIR}/f90src/ioutils/)
 include(add_ecosim_library)
 add_ecosim_library(ecosim_mods ${ECOSIM_MOD_SOURCES})

@@ -1,7 +1,6 @@
 
-      real(r8) :: ORGC(0:JZ,JY,JX),OMC(3,7,0:5,0:JZ,JY,JX) &
-      ,OMN(3,7,0:5,0:JZ,JY,JX),OMP(3,7,0:5,0:JZ,JY,JX) &
-      ,ORC(2,0:4,0:JZ,JY,JX),ORN(2,0:4,0:JZ,JY,JX),ORP(2,0:4,0:JZ,JY,JX) &
+      real(r8) :: ORGC(0:JZ,JY,JX),ORC(2,0:4,0:JZ,JY,JX)&
+      ,ORN(2,0:4,0:JZ,JY,JX),ORP(2,0:4,0:JZ,JY,JX) &
       ,OQC(0:4,0:JZ,JY,JX),OQN(0:4,0:JZ,JY,JX),OQP(0:4,0:JZ,JY,JX) &
       ,OQA(0:4,0:JZ,JY,JX),OQCH(0:4,0:JZ,JY,JX),OQNH(0:4,0:JZ,JY,JX) &
       ,OQPH(0:4,0:JZ,JY,JX),OQAH(0:4,0:JZ,JY,JX),OHC(0:4,0:JZ,JY,JX) &
@@ -25,8 +24,7 @@
       ,H1POB(0:JZ,JY,JX),H1PO4H(JZ,JY,JX),H1POBH(JZ,JY,JX)
 
 
-      COMMON/BLK13A/ORGC,OMC &
-      ,OMN,OMP &
+      COMMON/BLK13A/ORGC &
       ,ORC,ORN,ORP &
       ,OQC,OQN,OQP &
       ,OQA,OQCH,OQNH &

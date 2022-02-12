@@ -1,6 +1,8 @@
 module ErosionMod
   use data_kind_mod, only : r8 => SHR_KIND_R8
   use minimathmod, only : test_aeqb
+  use MicrobialDataType
+
   implicit none
 
   private
@@ -247,6 +249,7 @@ module ErosionMod
 9890  CONTINUE
 9895  CONTINUE
       end subroutine SedimentDetachment
+!------------------------------------------------------------------------------------------
 
       subroutine SedimentTransport(NHW,NHE,NVN,NVS)
 !     INTERNAL TIME STEP AT WHICH SEDIMENT DETACHMENT AND TRANSPORT
@@ -256,6 +259,8 @@ module ErosionMod
       implicit none
 
       integer, intent(in) :: NHW,NHE,NVN,NVS
+
+      integer :: NGL
 !
 !     BOUNDARY SEDIMENT FLUXES
 !
@@ -398,11 +403,13 @@ module ErosionMod
 9690  CONTINUE
 9695  CONTINUE
       end subroutine SedimentTransport
+!------------------------------------------------------------------------------------------
 
       subroutine InternalSedimentFluxes(NHW, NHE,NVN,NVS)
       implicit none
       integer, intent(in) :: NHW,NHE,NVN,NVS
 
+  integer :: NGL
       DO 9495 NX=NHW,NHE
       DO 9490 NY=NVN,NVS
       IF(IERSNG.EQ.1.OR.IERSNG.EQ.3)THEN
@@ -528,10 +535,12 @@ module ErosionMod
 !
       DO 9480 K=0,5
       DO NO=1,7
+      DO NGL=1,JG
       DO M=1,3
-      OMCER(M,NO,K,N,2,N5,N4)=FSEDER*OMC(M,NO,K,NU(N2,N1),N2,N1)
-      OMNER(M,NO,K,N,2,N5,N4)=FSEDER*OMN(M,NO,K,NU(N2,N1),N2,N1)
-      OMPER(M,NO,K,N,2,N5,N4)=FSEDER*OMP(M,NO,K,NU(N2,N1),N2,N1)
+      OMCER(M,NGL,NO,K,N,2,N5,N4)=FSEDER*OMC(M,NGL,NO,K,NU(N2,N1),N2,N1)
+      OMNER(M,NGL,NO,K,N,2,N5,N4)=FSEDER*OMN(M,NGL,NO,K,NU(N2,N1),N2,N1)
+      OMPER(M,NGL,NO,K,N,2,N5,N4)=FSEDER*OMP(M,NGL,NO,K,NU(N2,N1),N2,N1)
+      ENDDO
       ENDDO
       ENDDO
 9480  CONTINUE
@@ -616,11 +625,13 @@ module ErosionMod
 !
       DO 8480 K=0,5
       DO  NO=1,7
+      DO NGL=1,JG
       DO  M=1,3
-      OMCER(M,NO,K,N,2,N5,N4)=0._r8
-      OMNER(M,NO,K,N,2,N5,N4)=0._r8
-      OMPER(M,NO,K,N,2,N5,N4)=0._r8
+      OMCER(M,NGL,NO,K,N,2,N5,N4)=0._r8
+      OMNER(M,NGL,NO,K,N,2,N5,N4)=0._r8
+      OMPER(M,NGL,NO,K,N,2,N5,N4)=0._r8
       enddo
+      ENDDO
       enddo
 8480  CONTINUE
       DO 8475 K=0,4
@@ -728,12 +739,14 @@ module ErosionMod
 !
       DO 7480 K=0,5
       DO  NO=1,7
+      DO NGL=1,JG
       DO  M=1,3
-      OMCER(M,NO,K,N,1,N5B,N4B)=FSEDER*OMC(M,NO,K,NU(N2,N1),N2,N1)
-      OMNER(M,NO,K,N,1,N5B,N4B)=FSEDER*OMN(M,NO,K,NU(N2,N1),N2,N1)
-      OMPER(M,NO,K,N,1,N5B,N4B)=FSEDER*OMP(M,NO,K,NU(N2,N1),N2,N1)
+      OMCER(M,NGL,NO,K,N,1,N5B,N4B)=FSEDER*OMC(M,NGL,NO,K,NU(N2,N1),N2,N1)
+      OMNER(M,NGL,NO,K,N,1,N5B,N4B)=FSEDER*OMN(M,NGL,NO,K,NU(N2,N1),N2,N1)
+      OMPER(M,NGL,NO,K,N,1,N5B,N4B)=FSEDER*OMP(M,NGL,NO,K,NU(N2,N1),N2,N1)
       enddo
       enddo
+      ENDDO
 7480  CONTINUE
       DO 7475 K=0,4
       DO 7470 M=1,2
@@ -816,11 +829,13 @@ module ErosionMod
 !
       DO 6480 K=0,5
       DO  NO=1,7
+      DO NGL=1,JG
       DO  M=1,3
-      OMCER(M,NO,K,N,1,N5B,N4B)=0._r8
-      OMNER(M,NO,K,N,1,N5B,N4B)=0._r8
-      OMPER(M,NO,K,N,1,N5B,N4B)=0._r8
+      OMCER(M,NGL,NO,K,N,1,N5B,N4B)=0._r8
+      OMNER(M,NGL,NO,K,N,1,N5B,N4B)=0._r8
+      OMPER(M,NGL,NO,K,N,1,N5B,N4B)=0._r8
       enddo
+      ENDDO
       enddo
 6480  CONTINUE
       DO 6475 K=0,4
@@ -855,6 +870,7 @@ module ErosionMod
 
       integer, intent(in) :: NHW,NHE,NVN,NVS
 
+  integer :: NGL
       DO 8995 NX=NHW,NHE
       DO 8990 NY=NVN,NVS
       IF((IERSNG.EQ.1.OR.IERSNG.EQ.3) &
@@ -981,11 +997,13 @@ module ErosionMod
 !
       DO 5480 K=0,5
       DO  NO=1,7
+      DO NGL=1,JG
       DO  M=1,3
-      OMCER(M,NO,K,N,NN,M5,M4)=0._r8
-      OMNER(M,NO,K,N,NN,M5,M4)=0._r8
-      OMPER(M,NO,K,N,NN,M5,M4)=0._r8
+      OMCER(M,NGL,NO,K,N,NN,M5,M4)=0._r8
+      OMNER(M,NGL,NO,K,N,NN,M5,M4)=0._r8
+      OMPER(M,NGL,NO,K,N,NN,M5,M4)=0._r8
       enddo
+      ENDDO
       enddo
 5480  CONTINUE
       DO 5475 K=0,4
@@ -1076,10 +1094,12 @@ module ErosionMod
 !
       DO 4880 K=0,5
       DO NO=1,7
+      DO NGL=1,JG
       DO M=1,3
-      OMCER(M,NO,K,N,NN,M5,M4)=FSEDER*OMC(M,NO,K,NU(N2,N1),N2,N1)
-      OMNER(M,NO,K,N,NN,M5,M4)=FSEDER*OMN(M,NO,K,NU(N2,N1),N2,N1)
-      OMPER(M,NO,K,N,NN,M5,M4)=FSEDER*OMP(M,NO,K,NU(N2,N1),N2,N1)
+      OMCER(M,NGL,NO,K,N,NN,M5,M4)=FSEDER*OMC(M,NGL,NO,K,NU(N2,N1),N2,N1)
+      OMNER(M,NGL,NO,K,N,NN,M5,M4)=FSEDER*OMN(M,NGL,NO,K,NU(N2,N1),N2,N1)
+      OMPER(M,NGL,NO,K,N,NN,M5,M4)=FSEDER*OMP(M,NGL,NO,K,NU(N2,N1),N2,N1)
+      ENDDO
       ENDDO
       ENDDO
 4880  CONTINUE

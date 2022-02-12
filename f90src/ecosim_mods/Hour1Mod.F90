@@ -3,6 +3,7 @@ module Hour1Mod
   use minimathmod, only : test_aeqb
   use abortutils   , only : endrun, print_info
   use EcosimConst
+  use MicrobialDataType
   implicit none
 
   private
@@ -428,7 +429,8 @@ module Hour1Mod
   implicit none
   integer, intent(in) :: I,NHW,NHE,NVN,NVS
 
-  integer :: L,N,NX,NY,K,NN,NO,M
+  integer :: L,N,NX,NY,K,NN,NO,M,NGL
+
 !     begin_execution
   DO 9895 NX=NHW,NHE+1
     DO 9890 NY=NVN,NVS+1
@@ -529,13 +531,15 @@ module Hour1Mod
               PCPMEB(N,NN,NY,NX)=0.0_r8
               DO 9480 K=0,5
                 DO  NO=1,7
-                  OMCER(3,NO,K,N,NN,NY,NX)=0.0_r8
+                  DO NGL=1,JG
+                  OMCER(3,NGL,NO,K,N,NN,NY,NX)=0.0_r8
                   DO  M=1,2
-                    OMCER(M,NO,K,N,NN,NY,NX)=0.0_r8
-                    OMNER(M,NO,K,N,NN,NY,NX)=0.0_r8
-                    OMPER(M,NO,K,N,NN,NY,NX)=0.0_r8
+                    OMCER(M,NGL,NO,K,N,NN,NY,NX)=0.0_r8
+                    OMNER(M,NGL,NO,K,N,NN,NY,NX)=0.0_r8
+                    OMPER(M,NGL,NO,K,N,NN,NY,NX)=0.0_r8
                   enddo
                 enddo
+                ENDDO
 9480          CONTINUE
               DO 9475 K=0,4
                 DO 9470 M=1,2
@@ -1587,6 +1591,7 @@ module Hour1Mod
   subroutine SetSurfaceProperty4SedErosion(NY,NX)
   implicit none
   integer, intent(in) :: NY,NX
+
   !     begin_execution
   !
   !     DETS=soil detachability from rainfall impact
@@ -1651,7 +1656,7 @@ module Hour1Mod
   implicit none
   integer, intent(in) :: L,NY,NX
 
-  integer :: K,M,N
+  integer :: K,M,N,NGL
   !     begin_execution
   !
   !     TOTAL SOC FOR CALCULATING CHANGES IN SOC CALCULATED IN NITRO.F
@@ -1667,9 +1672,11 @@ module Hour1Mod
   OC=0.0_r8
   DO 7970 K=0,5
     DO 7950 N=1,7
-      DO  M=1,3
-        OC=OC+OMC(M,N,K,L,NY,NX)
-      enddo
+      DO NGL=1,JG
+        DO  M=1,3
+          OC=OC+OMC(M,NGL,N,K,L,NY,NX)
+        enddo
+      ENDDO
 7950  CONTINUE
 7970  CONTINUE
   DO 7900 K=0,4
@@ -3091,7 +3098,7 @@ module Hour1Mod
       implicit none
       integer, intent(in) :: I,J,NY,NX
 
-      integer :: L,K,M,N,NN
+      integer :: L,K,M,N,NN,NGL
 !     begin_execution
 !     LFDPTH=layer number
 !
@@ -3245,25 +3252,26 @@ module Hour1Mod
 !     OMCF,OMCA=hetero,autotrophic biomass composition in litter
 !
       DO 2960 N=1,7
+      DO NGL=1,JG
       DO 2961 M=1,3
       OMC1=AMAX1(0.0,AMIN1(OSCI*OMCI(M,K)*OMCF(N),OSCI-OSCX))
-      OMN1=AMAX1(0.0,AMIN1(OMC1*CNOMC(M,N,K),OSNI-OSNX))
-      OMP1=AMAX1(0.0,AMIN1(OMC1*CPOMC(M,N,K),OSPI-OSPX))
-      OMC(M,N,K,LFDPTH,NY,NX)=OMC(M,N,K,LFDPTH,NY,NX)+OMC1
-      OMN(M,N,K,LFDPTH,NY,NX)=OMN(M,N,K,LFDPTH,NY,NX)+OMN1
-      OMP(M,N,K,LFDPTH,NY,NX)=OMP(M,N,K,LFDPTH,NY,NX)+OMP1
+      OMN1=AMAX1(0.0,AMIN1(OMC1*CNOMC(M,NGL,N,K),OSNI-OSNX))
+      OMP1=AMAX1(0.0,AMIN1(OMC1*CPOMC(M,NGL,N,K),OSPI-OSPX))
+      OMC(M,NGL,N,K,LFDPTH,NY,NX)=OMC(M,NGL,N,K,LFDPTH,NY,NX)+OMC1
+      OMN(M,NGL,N,K,LFDPTH,NY,NX)=OMN(M,NGL,N,K,LFDPTH,NY,NX)+OMN1
+      OMP(M,NGL,N,K,LFDPTH,NY,NX)=OMP(M,NGL,N,K,LFDPTH,NY,NX)+OMP1
 !     WRITE(*,2345)'OMCI',I,J,LFDPTH,K,N,M
 !    2,OMC1,OMN1,OMP1,OSCI,OMCI(M,K)
-!    2,OMCF(N),OSCX,CNOMC(M,N,K),CPOMC(M,N,K),OSNI,OSPI
-!    2,OMC(M,N,K,LFDPTH,NY,NX),OMN(M,N,K,LFDPTH,NY,NX)
+!    2,OMCF(N),OSCX,CNOMC(M,NGL,N,K),CPOMC(M,NGL,N,K),OSNI,OSPI
+!    2,OMC(M,NGL,N,K,LFDPTH,NY,NX),OMN(M,NGL,N,K,LFDPTH,NY,NX)
 !2345  FORMAT(A8,6I4,20E12.4)
       OSCX=OSCX+OMC1
       OSNX=OSNX+OMN1
       OSPX=OSPX+OMP1
       DO 2962 NN=1,7
-      OMC(M,NN,5,LFDPTH,NY,NX)=OMC(M,NN,5,LFDPTH,NY,NX)+OMC1*OMCA(NN)
-      OMN(M,NN,5,LFDPTH,NY,NX)=OMN(M,NN,5,LFDPTH,NY,NX)+OMN1*OMCA(NN)
-      OMP(M,NN,5,LFDPTH,NY,NX)=OMP(M,NN,5,LFDPTH,NY,NX)+OMP1*OMCA(NN)
+      OMC(M,NGL,NN,5,LFDPTH,NY,NX)=OMC(M,NGL,NN,5,LFDPTH,NY,NX)+OMC1*OMCA(NN)
+      OMN(M,NGL,NN,5,LFDPTH,NY,NX)=OMN(M,NGL,NN,5,LFDPTH,NY,NX)+OMN1*OMCA(NN)
+      OMP(M,NGL,NN,5,LFDPTH,NY,NX)=OMP(M,NGL,NN,5,LFDPTH,NY,NX)+OMP1*OMCA(NN)
 !     WRITE(*,2346)'OMCA',I,J,LFDPTH,K,N,NN,M
 !    2,OMC1,OMCA(NN),OMC(M,NN,5,LFDPTH,NY,NX)
 !2346  FORMAT(A8,7I4,20E12.4)
@@ -3272,6 +3280,7 @@ module Hour1Mod
       OSPX=OSPX+OMP1*OMCA(NN)
 2962  CONTINUE
 2961  CONTINUE
+      ENDDO
 2960  CONTINUE
 !
 !     DOC, DON AND DOP IN RESIDUE
@@ -3331,7 +3340,7 @@ module Hour1Mod
       OSP1=0.0
       ENDIF
       OSC(M,K,LFDPTH,NY,NX)=OSC(M,K,LFDPTH,NY,NX)+OSC1
-      OSA(M,K,LFDPTH,NY,NX)=OSA(M,K,LFDPTH,NY,NX)+OSC1*OMCI(1,K)
+      OSA(M,K,LFDPTH,NY,NX)=OSA(M,K,LFDPTH,NY,NX)+OSC1*OMCI(1,K)*dble(JG)
       OSN(M,K,LFDPTH,NY,NX)=OSN(M,K,LFDPTH,NY,NX)+OSN1
       OSP(M,K,LFDPTH,NY,NX)=OSP(M,K,LFDPTH,NY,NX)+OSP1
       IF(LFDPTH.EQ.0)THEN

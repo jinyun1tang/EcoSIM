@@ -1,3 +1,9 @@
+set(ECOSIM_DATATYPE_SOURCES
+MicrobialDataType.F90
+)
+
+include_directories(${CMAKE_BINARY_DIR}/f90src/utils/)
+
 configure_file(solutepar.h  solutepar.h COPYONLY)
 configure_file(blk10.h  blk10.h  COPYONLY)
 configure_file(blk11a.h blk11a.h COPYONLY)
@@ -54,7 +60,15 @@ configure_file(filec.h  filec.h COPYONLY)
 configure_file(files.h  files.h COPYONLY)
 configure_file(parameters.h parameters.h COPYONLY)
 
+
+
+include(add_ecosim_library)
+add_ecosim_library(ecosim_datatype ${ECOSIM_DATATYPE_SOURCES})
+
+set(ECOSIM_LIBRARIES ecosim_datatype;${ECOSIM_LIBRARIES} PARENT_SCOPE)
+
 if (NOT CMAKE_INSTALL_PREFIX STREQUAL "INSTALL_DISABLED")
+  install(TARGETS ecosim_datatype DESTINATION lib)
   file(GLOB HEADERS *.h)
   install(FILES ${HEADERS} DESTINATION include/ecosim/datatype)
 endif()

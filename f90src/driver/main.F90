@@ -7,7 +7,7 @@ PROGRAM main
 !
   use data_kind_mod, only : r8 => SHR_KIND_R8
   use TestMod, only : regression
-
+  use InitEcoSIM, only :  InitModules
   implicit none
 
   include "parameters.h"
@@ -25,6 +25,7 @@ PROGRAM main
   character(len=36):: case_name
   character(len=36):: nmlfile
   logical :: is_dos
+  integer :: nmicbguilds
 !!
 ! begin_execution
 
@@ -38,7 +39,10 @@ PROGRAM main
   CALL GETARG(1,nmlfile)
   write(*,*)'read namelist'
   call readnamelist(trim(nmlfile),runfile, case_name, prefix, &
-    do_rgres,LYRG,lverb)
+    do_rgres,LYRG,lverb, nmicbguilds)
+
+  call  InitModules(nmicbguilds)
+
   write(*,*)'read runfile'
   OPEN(5,FILE=runfile,STATUS='OLD')
   IF((.NOT.(BUF(1:1).EQ.'/'.OR.BUF(1:1).EQ.'~')).AND.BUF(2:2).EQ.':')THEN
@@ -141,5 +145,5 @@ PROGRAM main
 1000  continue
   if(do_rgres)then
     call regressiontest(trim(nmlfile),trim(case_name),NHW,NVN)
-  endif  
+  endif
 END program main
