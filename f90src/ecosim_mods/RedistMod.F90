@@ -1537,9 +1537,9 @@ module RedistMod
             DO NO=1,7
               DO M=1,3
                 DO NGL=1,JG
-                  COE=COE+XN*OMCER(M,NGL,NO,K,N,NN,N5,N4)
-                  ZOE=ZOE+XN*OMNER(M,NGL,NO,K,N,NN,N5,N4)
-                  POE=POE+XN*OMPER(M,NGL,NO,K,N,NN,N5,N4)
+                  COE=COE+XN*OMCER(M+(NGL-1)*3,NO,K,N,NN,N5,N4)
+                  ZOE=ZOE+XN*OMNER(M+(NGL-1)*3,NO,K,N,NN,N5,N4)
+                  POE=POE+XN*OMPER(M+(NGL-1)*3,NO,K,N,NN,N5,N4)
                 enddo
               enddo
             enddo
@@ -2231,9 +2231,9 @@ module RedistMod
       DO NO=1,7
       DO M=1,3
       DO NGL=1,JG
-      TOMCER(M,NGL,NO,K,N2,N1)=TOMCER(M,NGL,NO,K,N2,N1)+OMCER(M,NGL,NO,K,N,NN,N2,N1)
-      TOMNER(M,NGL,NO,K,N2,N1)=TOMNER(M,NGL,NO,K,N2,N1)+OMNER(M,NGL,NO,K,N,NN,N2,N1)
-      TOMPER(M,NGL,NO,K,N2,N1)=TOMPER(M,NGL,NO,K,N2,N1)+OMPER(M,NGL,NO,K,N,NN,N2,N1)
+      TOMCER(M,NGL,NO,K,N2,N1)=TOMCER(M,NGL,NO,K,N2,N1)+OMCER(M+(NGL-1)*3,NO,K,N,NN,N2,N1)
+      TOMNER(M,NGL,NO,K,N2,N1)=TOMNER(M,NGL,NO,K,N2,N1)+OMNER(M+(NGL-1)*3,NO,K,N,NN,N2,N1)
+      TOMPER(M,NGL,NO,K,N2,N1)=TOMPER(M,NGL,NO,K,N2,N1)+OMPER(M+(NGL-1)*3,NO,K,N,NN,N2,N1)
       enddo
       enddo
       enddo
@@ -2310,9 +2310,9 @@ module RedistMod
       DO  NO=1,7
       DO  M=1,3
       DO NGL=1,JG
-      TOMCER(M,NGL,NO,K,N2,N1)=TOMCER(M,NGL,NO,K,N2,N1)-OMCER(M,NGL,NO,K,N,NN,N5,N4)
-      TOMNER(M,NGL,NO,K,N2,N1)=TOMNER(M,NGL,NO,K,N2,N1)-OMNER(M,NGL,NO,K,N,NN,N5,N4)
-      TOMPER(M,NGL,NO,K,N2,N1)=TOMPER(M,NGL,NO,K,N2,N1)-OMPER(M,NGL,NO,K,N,NN,N5,N4)
+      TOMCER(M,NGL,NO,K,N2,N1)=TOMCER(M,NGL,NO,K,N2,N1)-OMCER(M+(NGL-1)*3,NO,K,N,NN,N5,N4)
+      TOMNER(M,NGL,NO,K,N2,N1)=TOMNER(M,NGL,NO,K,N2,N1)-OMNER(M+(NGL-1)*3,NO,K,N,NN,N5,N4)
+      TOMPER(M,NGL,NO,K,N2,N1)=TOMPER(M,NGL,NO,K,N2,N1)-OMPER(M+(NGL-1)*3,NO,K,N,NN,N5,N4)
       enddo
       enddo
       enddo
@@ -2392,9 +2392,9 @@ module RedistMod
       DO  NO=1,7
       DO  M=1,3
       DO NGL=1,JG
-      TOMCER(M,NGL,NO,K,N2,N1)=TOMCER(M,NGL,NO,K,N2,N1)-OMCER(M,NGL,NO,K,N,NN,N5B,N4B)
-      TOMNER(M,NGL,NO,K,N2,N1)=TOMNER(M,NGL,NO,K,N2,N1)-OMNER(M,NGL,NO,K,N,NN,N5B,N4B)
-      TOMPER(M,NGL,NO,K,N2,N1)=TOMPER(M,NGL,NO,K,N2,N1)-OMPER(M,NGL,NO,K,N,NN,N5B,N4B)
+      TOMCER(M,NGL,NO,K,N2,N1)=TOMCER(M,NGL,NO,K,N2,N1)-OMCER(M+(NGL-1)*3,NO,K,N,NN,N5B,N4B)
+      TOMNER(M,NGL,NO,K,N2,N1)=TOMNER(M,NGL,NO,K,N2,N1)-OMNER(M+(NGL-1)*3,NO,K,N,NN,N5B,N4B)
+      TOMPER(M,NGL,NO,K,N2,N1)=TOMPER(M,NGL,NO,K,N2,N1)-OMPER(M+(NGL-1)*3,NO,K,N,NN,N5B,N4B)
       enddo
       enddo
       enddo
@@ -4905,7 +4905,7 @@ module RedistMod
     DO 8565 K=0,1
       DO  M=1,4
         OSC(M,K,L,NY,NX)=OSC(M,K,L,NY,NX)+CSNT(M,K,L,NY,NX)
-        OSA(M,K,L,NY,NX)=OSA(M,K,L,NY,NX)+CSNT(M,K,L,NY,NX)*OMCI(1,K)*dble(JG)
+        OSA(M,K,L,NY,NX)=OSA(M,K,L,NY,NX)+CSNT(M,K,L,NY,NX)*OMCI(1,K)*real(JG,r8)
         OSN(M,K,L,NY,NX)=OSN(M,K,L,NY,NX)+ZSNT(M,K,L,NY,NX)
         OSP(M,K,L,NY,NX)=OSP(M,K,L,NY,NX)+PSNT(M,K,L,NY,NX)
 !     IF((I/30)*30.EQ.I.AND.J.EQ.15)THEN
@@ -9511,7 +9511,7 @@ module RedistMod
   DO 6965 K=0,1
     DO  M=1,4
       OSC(M,K,0,NY,NX)=OSC(M,K,0,NY,NX)+CSNT(M,K,0,NY,NX)
-      OSA(M,K,0,NY,NX)=OSA(M,K,0,NY,NX)+CSNT(M,K,0,NY,NX)*OMCI(1,K)*dble(JG)
+      OSA(M,K,0,NY,NX)=OSA(M,K,0,NY,NX)+CSNT(M,K,0,NY,NX)*OMCI(1,K)*real(JG,r8)
       OSN(M,K,0,NY,NX)=OSN(M,K,0,NY,NX)+ZSNT(M,K,0,NY,NX)
       OSP(M,K,0,NY,NX)=OSP(M,K,0,NY,NX)+PSNT(M,K,0,NY,NX)
       ORGC(0,NY,NX)=ORGC(0,NY,NX)+CSNT(M,K,0,NY,NX)

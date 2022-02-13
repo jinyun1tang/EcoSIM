@@ -534,11 +534,11 @@ module Hour1Mod
               DO 9480 K=0,5
                 DO  NO=1,7
                   DO NGL=1,JG
-                  OMCER(3,NGL,NO,K,N,NN,NY,NX)=0.0_r8
+                  OMCER(3+(NGL-1)*3,NO,K,N,NN,NY,NX)=0.0_r8
                   DO  M=1,2
-                    OMCER(M,NGL,NO,K,N,NN,NY,NX)=0.0_r8
-                    OMNER(M,NGL,NO,K,N,NN,NY,NX)=0.0_r8
-                    OMPER(M,NGL,NO,K,N,NN,NY,NX)=0.0_r8
+                    OMCER(M+(NGL-1)*3,NO,K,N,NN,NY,NX)=0.0_r8
+                    OMNER(M+(NGL-1)*3,NO,K,N,NN,NY,NX)=0.0_r8
+                    OMPER(M+(NGL-1)*3,NO,K,N,NN,NY,NX)=0.0_r8
                   enddo
                 enddo
                 ENDDO
@@ -3342,7 +3342,7 @@ module Hour1Mod
       OSP1=0.0
       ENDIF
       OSC(M,K,LFDPTH,NY,NX)=OSC(M,K,LFDPTH,NY,NX)+OSC1
-      OSA(M,K,LFDPTH,NY,NX)=OSA(M,K,LFDPTH,NY,NX)+OSC1*OMCI(1,K)*dble(JG)
+      OSA(M,K,LFDPTH,NY,NX)=OSA(M,K,LFDPTH,NY,NX)+OSC1*OMCI(1,K)*real(JG,r8)
       OSN(M,K,LFDPTH,NY,NX)=OSN(M,K,LFDPTH,NY,NX)+OSN1
       OSP(M,K,LFDPTH,NY,NX)=OSP(M,K,LFDPTH,NY,NX)+OSP1
       IF(LFDPTH.EQ.0)THEN

@@ -537,9 +537,9 @@ module ErosionMod
       DO NO=1,7
       DO NGL=1,JG
       DO M=1,3
-      OMCER(M,NGL,NO,K,N,2,N5,N4)=FSEDER*OMC(M,NGL,NO,K,NU(N2,N1),N2,N1)
-      OMNER(M,NGL,NO,K,N,2,N5,N4)=FSEDER*OMN(M,NGL,NO,K,NU(N2,N1),N2,N1)
-      OMPER(M,NGL,NO,K,N,2,N5,N4)=FSEDER*OMP(M,NGL,NO,K,NU(N2,N1),N2,N1)
+      OMCER(M+(NGL-1)*3,NO,K,N,2,N5,N4)=FSEDER*OMC(M,NGL,NO,K,NU(N2,N1),N2,N1)
+      OMNER(M+(NGL-1)*3,NO,K,N,2,N5,N4)=FSEDER*OMN(M,NGL,NO,K,NU(N2,N1),N2,N1)
+      OMPER(M+(NGL-1)*3,NO,K,N,2,N5,N4)=FSEDER*OMP(M,NGL,NO,K,NU(N2,N1),N2,N1)
       ENDDO
       ENDDO
       ENDDO
@@ -627,9 +627,9 @@ module ErosionMod
       DO  NO=1,7
       DO NGL=1,JG
       DO  M=1,3
-      OMCER(M,NGL,NO,K,N,2,N5,N4)=0._r8
-      OMNER(M,NGL,NO,K,N,2,N5,N4)=0._r8
-      OMPER(M,NGL,NO,K,N,2,N5,N4)=0._r8
+      OMCER(M+(NGL-1)*3,NO,K,N,2,N5,N4)=0._r8
+      OMNER(M+(NGL-1)*3,NO,K,N,2,N5,N4)=0._r8
+      OMPER(M+(NGL-1)*3,NO,K,N,2,N5,N4)=0._r8
       enddo
       ENDDO
       enddo
@@ -741,9 +741,9 @@ module ErosionMod
       DO  NO=1,7
       DO NGL=1,JG
       DO  M=1,3
-      OMCER(M,NGL,NO,K,N,1,N5B,N4B)=FSEDER*OMC(M,NGL,NO,K,NU(N2,N1),N2,N1)
-      OMNER(M,NGL,NO,K,N,1,N5B,N4B)=FSEDER*OMN(M,NGL,NO,K,NU(N2,N1),N2,N1)
-      OMPER(M,NGL,NO,K,N,1,N5B,N4B)=FSEDER*OMP(M,NGL,NO,K,NU(N2,N1),N2,N1)
+      OMCER(M+(NGL-1)*3,NO,K,N,1,N5B,N4B)=FSEDER*OMC(M,NGL,NO,K,NU(N2,N1),N2,N1)
+      OMNER(M+(NGL-1)*3,NO,K,N,1,N5B,N4B)=FSEDER*OMN(M,NGL,NO,K,NU(N2,N1),N2,N1)
+      OMPER(M+(NGL-1)*3,NO,K,N,1,N5B,N4B)=FSEDER*OMP(M,NGL,NO,K,NU(N2,N1),N2,N1)
       enddo
       enddo
       ENDDO
@@ -831,9 +831,9 @@ module ErosionMod
       DO  NO=1,7
       DO NGL=1,JG
       DO  M=1,3
-      OMCER(M,NGL,NO,K,N,1,N5B,N4B)=0._r8
-      OMNER(M,NGL,NO,K,N,1,N5B,N4B)=0._r8
-      OMPER(M,NGL,NO,K,N,1,N5B,N4B)=0._r8
+      OMCER(M+(NGL-1)*3,NO,K,N,1,N5B,N4B)=0._r8
+      OMNER(M+(NGL-1)*3,NO,K,N,1,N5B,N4B)=0._r8
+      OMPER(M+(NGL-1)*3,NO,K,N,1,N5B,N4B)=0._r8
       enddo
       ENDDO
       enddo
@@ -999,9 +999,9 @@ module ErosionMod
       DO  NO=1,7
       DO NGL=1,JG
       DO  M=1,3
-      OMCER(M,NGL,NO,K,N,NN,M5,M4)=0._r8
-      OMNER(M,NGL,NO,K,N,NN,M5,M4)=0._r8
-      OMPER(M,NGL,NO,K,N,NN,M5,M4)=0._r8
+      OMCER(M+(NGL-1)*3,NO,K,N,NN,M5,M4)=0._r8
+      OMNER(M+(NGL-1)*3,NO,K,N,NN,M5,M4)=0._r8
+      OMPER(M+(NGL-1)*3,NO,K,N,NN,M5,M4)=0._r8
       enddo
       ENDDO
       enddo
@@ -1096,9 +1096,9 @@ module ErosionMod
       DO NO=1,7
       DO NGL=1,JG
       DO M=1,3
-      OMCER(M,NGL,NO,K,N,NN,M5,M4)=FSEDER*OMC(M,NGL,NO,K,NU(N2,N1),N2,N1)
-      OMNER(M,NGL,NO,K,N,NN,M5,M4)=FSEDER*OMN(M,NGL,NO,K,NU(N2,N1),N2,N1)
-      OMPER(M,NGL,NO,K,N,NN,M5,M4)=FSEDER*OMP(M,NGL,NO,K,NU(N2,N1),N2,N1)
+      OMCER(M+(NGL-1)*3,NO,K,N,NN,M5,M4)=FSEDER*OMC(M,NGL,NO,K,NU(N2,N1),N2,N1)
+      OMNER(M+(NGL-1)*3,NO,K,N,NN,M5,M4)=FSEDER*OMN(M,NGL,NO,K,NU(N2,N1),N2,N1)
+      OMPER(M+(NGL-1)*3,NO,K,N,NN,M5,M4)=FSEDER*OMP(M,NGL,NO,K,NU(N2,N1),N2,N1)
       ENDDO
       ENDDO
       ENDDO

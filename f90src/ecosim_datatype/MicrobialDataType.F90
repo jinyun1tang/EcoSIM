@@ -34,9 +34,9 @@ implicit none
   real(r8),allocatable :: RIPO1(:,:,:,:,:,:)
   real(r8),allocatable :: RIPB1(:,:,:,:,:,:)
   real(r8),allocatable :: RIPO1R(:,:,:,:,:)
-  real(r8),allocatable :: OMCER(:,:,:,:,:,:,:,:)
-  real(r8),allocatable :: OMNER(:,:,:,:,:,:,:,:)
-  real(r8),allocatable :: OMPER(:,:,:,:,:,:,:,:)
+  real(r8),allocatable :: OMCER(:,:,:,:,:,:,:)
+  real(r8),allocatable :: OMNER(:,:,:,:,:,:,:)
+  real(r8),allocatable :: OMPER(:,:,:,:,:,:,:)
 
   contains
 
@@ -75,9 +75,9 @@ implicit none
   allocate(RIPO1(JG,7,0:5,0:JZ,JY,JX))
   allocate(RIPB1(JG,7,0:5,0:JZ,JY,JX))
   allocate(RIPO1R(JG,7,0:5,JY,JX))
-  allocate(OMCER(3,JG,7,0:5,2,2,JV,JH))
-  allocate(OMNER(3,JG,7,0:5,2,2,JV,JH))
-  allocate(OMPER(3,JG,7,0:5,2,2,JV,JH))
+  allocate(OMCER(3*JG,7,0:5,2,2,JV,JH))
+  allocate(OMNER(3*JG,7,0:5,2,2,JV,JH))
+  allocate(OMPER(3*JG,7,0:5,2,2,JV,JH))
   end subroutine InitMicrobialData
 
 end module MicrobialDataType
