@@ -4,6 +4,7 @@ module TrnsfrsMod
 !
   use data_kind_mod, only : r8 => SHR_KIND_R8
   use minimathmod, only : test_aeqb
+  use SOMDataType
   implicit none
 
       private

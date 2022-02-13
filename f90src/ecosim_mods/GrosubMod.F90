@@ -4,6 +4,7 @@ module grosubMod
 ! module for plant biological transformations
   use minimathmod, only : test_aeqb,safe_adb
   use data_kind_mod, only : r8 => SHR_KIND_R8
+  use SOMDataType
   implicit none
 
   private

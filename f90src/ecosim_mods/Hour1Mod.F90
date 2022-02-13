@@ -1,9 +1,11 @@
 module Hour1Mod
   use data_kind_mod, only : r8 => SHR_KIND_R8
-  use minimathmod, only : test_aeqb
+  use minimathmod  , only : test_aeqb
   use abortutils   , only : endrun, print_info
   use EcosimConst
   use MicrobialDataType
+  use SOMDataType
+  use SoilChemDataType
   implicit none
 
   private

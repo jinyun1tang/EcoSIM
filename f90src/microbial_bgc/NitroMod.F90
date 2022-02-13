@@ -8,6 +8,8 @@ module nitroMod
   use minimathmod, only : safe_adb
   use MicrobialDataType
   use NitroPars
+  use SOMDataType
+  use SoilChemDataType
   implicit none
 
   private

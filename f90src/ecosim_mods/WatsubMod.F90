@@ -7,6 +7,7 @@ module WatsubMod
   use abortutils   , only : endrun, print_info
   use minimathmod  , only : test_aeqb, test_aneb,safe_adb,vapsat
   use EcosimConst
+  use SOMDataType
   implicit none
 
   private

@@ -7,6 +7,7 @@
 !     THE RUN SCRIPT
 !
       use data_kind_mod, only : r8 => SHR_KIND_R8
+  use SoilChemDataType
       implicit none
       integer, intent(in) :: I,J,NT,NE,NAX,NDX,NTX
       integer, intent(in) :: NEX,NHW,NHE,NVN,NVS

@@ -1,5 +1,6 @@
 add_subdirectory(utils)
 add_subdirectory(ecosim_datatype)
+add_subdirectory(microbial_bgc)
 add_subdirectory(ecosim_mods)
 add_subdirectory(ioutils)
 add_subdirectory(driver)

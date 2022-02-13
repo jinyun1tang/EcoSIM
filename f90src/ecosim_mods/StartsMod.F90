@@ -8,7 +8,9 @@ module StartsMod
   use minimathMod, only : test_aeqb, test_aneb
   use EcosimConst
   use MicrobialDataType
-
+  use SOMDataType
+  use SoilChemDataType
+  use InitSOMBGC
   implicit none
 
   private
@@ -29,26 +31,18 @@ module StartsMod
   include "blk18a.h"
   include "blk18b.h"
 
-  real(r8) :: ALTY,ALTZG,CDPTHG,CORGL,CORGCZ,CORGRZ,CORGNZ,CORGPZ
-  real(r8) :: CORGCM,DAZI,DGAZI,DLYRSI,FCY,FC0,FCO,FCX,FC1,FRNT
-  real(r8) :: FRPT,FOSCI,FOSNI,FOSPI,HCX,OMEGY,OMEGZ,OMC1,OMN1
-  real(r8) :: OMP1,OC,ON,OP,PTDS,RNT,RPT,RC,TORGC,TORGM,TOSCI
-  real(r8) :: TOSNI,TOSPI,TOMC,VOLSWI,VORGC,VMINL,VSAND,X,YAGL
+  real(r8) :: ALTY,ALTZG,CDPTHG
+  real(r8) :: DAZI,DGAZI,DLYRSI
+  real(r8) :: OMEGY,OMEGZ
+  real(r8) :: PTDS,TORGM
+  real(r8) :: VOLSWI,VORGC,VMINL,VSAND,YAGL
   real(r8) :: ZAGL
 
-  real(r8) :: YSIN(4),YCOS(4),YAZI(4),ZAZI(4),OSCI(0:4),OSNI(0:4) &
-    ,ORCI(2,0:4),OSPI(0:4),OSCM(0:4),CORGCX(0:4) &
-    ,CORGNX(0:4),CORGPX(0:4),CNOSCT(0:4),CPOSCT(0:4) &
+  real(r8) :: YSIN(4),YCOS(4),YAZI(4),ZAZI(4) &
     ,GSINA(JY,JX),GCOSA(JY,JX),ALTX(JV,JH),CDPTHSI(JS) &
-    ,OSCX(0:4),OSNX(0:4),OSPX(0:4),OMCK(0:4),ORCK(0:4),OQCK(0:4) &
-    ,OHCK(0:4),TOSCK(0:4),TOSNK(0:4),TOSPK(0:4),TORGL(JZ)
-  real(r8) :: OMCI1(3,0:4)
+    ,TORGL(JZ)
   !
-  !     DCKR,DCKM=parameters to initialize microbial biomass from SOC
-  !     OMCI(3,0:4),ORCI(2,0:4)=allocation of biomass,residue to kinetic components
-  !     OMCK,ORCK,OQCK,OHCK=fractions of SOC in biomass,litter,DOC,adsorbed C
-  !     OMCF,OMCA=hetero,autotrophic microbial biomass composition in SOC
-  !     CNRH,CPRH=default N:C,P:C ratios in SOC complexes
+  !
   !     BKRS=dry bulk density of woody(0),fine(1),manure(2) litter
   !     FORGC=minimum SOC for organic soil (g Mg-1)
   !      FVLWB,FCH4F=maximum SWC,CH4 emission fraction for combustion
@@ -57,21 +51,12 @@ module StartsMod
   !     CDPTHSI=depth to bottom of snowpack layers
   !     POROQ=Penman Water Linear Reduction tortuosity used in gas flux calculations
   !
-  real(r8), PARAMETER :: DCKR=0.25_r8,DCKM=2.5E+04_r8,PSIPS=-0.5E-03_r8 &
-    ,RDN=57.29577951_r8
+  real(r8), PARAMETER :: PSIPS=-0.5E-03_r8,RDN=57.29577951_r8
 
-  DATA OMCI1/0.010,0.050,0.005,0.050,0.050,0.005,0.050,0.050,0.005 &
-    ,0.010,0.050,0.005,0.010,0.050,0.005/
-  DATA ORCI/0.01,0.05,0.01,0.05,0.01,0.05,0.001,0.005,0.001,0.005/
-  DATA OMCK/0.01,0.01,0.01,0.01,0.01/
-  DATA ORCK/0.25,0.25,0.25,0.25,0.25/
-  DATA OQCK/0.005,0.005,0.005,0.005,0.005/
-  DATA OHCK/0.05,0.05,0.05,0.05,0.05/
-  DATA OMCF/0.20,0.20,0.30,0.20,0.050,0.025,0.025/
-  DATA OMCA/0.06,0.02,0.01,0.0,0.01,0.0,0.0/
-  DATA CNRH/3.33E-02,3.33E-02,3.33E-02,5.00E-02,12.50E-02/
-  DATA CPRH/3.33E-03,3.33E-03,3.33E-03,5.00E-03,12.50E-03/
+
+
   DATA BKRS/0.0333,0.0167,0.0167/
+
   DATA FORGC,FVLWB,FCH4F/0.1E+06,1.0,0.01/
   DATA PSIHY,FCI,WPI/-2500.0,0.05,0.025/
   DATA CDPTHSI/0.05,0.15,0.30,0.60,1.00/
@@ -235,7 +220,9 @@ module StartsMod
 
   integer :: NY,NX,L,N
   integer :: N1,N2,N3,N4,N5,N6
-  !     begin_execution
+
+
+  ! begin_execution
   DO 9895 NX=NHW,NHE
     DO 9890 NY=NVN,NVS
       ALTZ(NY,NX)=ALTZG
@@ -289,47 +276,11 @@ module StartsMod
           DISP(3,N3,N2,N1)=0.20*DIST(3,N3,N2,N1)**1.07
         ENDIF
 4400  CONTINUE
-        !
-        !     INITIALIZE SOM FROM ORGANIC INPUTS IN SOIL FILE FROM 'READS'
-        !
-        !     CORGC,CORGR,CORGN,CORGP=SOC,POC,SON,SOP (g Mg-1)
-        !
-        TORGC=0.0
-        DO 1190 L=NU(NY,NX),NL(NY,NX)
-          !     CORGCZ=CORGC(L,NY,NX)
-          !     CORGRZ=CORGR(L,NY,NX)
-          !     CORGNZ=CORGN(L,NY,NX)
-          !     CORGPZ=CORGP(L,NY,NX)
-          !
-          !     ALLOCATE SOC TO POC(3) AND HUMUS(4)
-          !
-          !     CORGCX(3)=CORGRZ
-          !     CORGCX(4)=AMAX1(0.0,CORGCZ-CORGCX(3))
-          !     CORGNX(3)=AMIN1(CNRH(3)*CORGCX(3),CORGNZ)
-          !     CORGNX(4)=AMAX1(0.0,CORGNZ-CORGNX(3))
-          !     CORGPX(3)=AMIN1(CPRH(3)*CORGCX(3),CORGPZ)
-          !     CORGPX(4)=AMAX1(0.0,CORGPZ-CORGPX(3))
-          CORGL=AMAX1(0.0,CORGC(L,NY,NX)-CORGR(L,NY,NX))
-          TORGL(L)=TORGC+CORGL*BKVL(L,NY,NX)/AREA(3,L,NY,NX)*0.5
-          TORGC=TORGC+CORGL*BKVL(L,NY,NX)/AREA(3,L,NY,NX)
-1190  CONTINUE
-      !
-      !     PARAMETERS TO ALLOCATE HUMUS TO LESS OR MORE RECALCITRANT FRACTIONS
-      !
-      !     TORGL=accumulated humus down to soil layer (g m-2)
-      !     TORGM=TORGL used to calculate allocation (g m-2)
-      !     HCX=shape parameter for depth effect on allocation
-      !
-      TORGM=AMAX1(2.0E+03,AMIN1(5.0E+03,0.25*TORGL(NJ(NY,NX))))
-      IF(TORGM.GT.ZERO)THEN
-        HCX=LOG(0.5)/TORGM
-      ELSE
-        HCX=0.0
-      ENDIF
+
       !
       !     ALLOCATE LITTER,SOC TO WOODY,NON-WOODY,MANURE,POC AND HUMUS
       !
-      call InitLitterProfile(NY,NX)
+      call InitSoilProfile(NY,NX)
       !
       !     SURFACE LITTER HEAT CAPACITY
       !
@@ -398,84 +349,61 @@ module StartsMod
 230 CONTINUE
   end subroutine InitIrradianceGeometry
 !------------------------------------------------------------------------------------------
-  subroutine InitLitterProfile(NY,NX)
+  subroutine InitSoilProfile(NY,NX)
+
   implicit none
   integer, intent(in) :: NY,NX
 
-  integer :: L,M,K,N,KK,NN,NGL
-  !     begin_execution
-  !     CORGCX,CORGNX,CORGPX=C,N,P concentations from woody(0),
-  !     non-woody(1), manure(2), litter, POC(3) and humus(4) (g Mg-1)
-  !     RSC,RSC,RSP=C,N,P in fine(1),woody(0),manure(2) litter (g m-2)
-  !     CORGC,CORGR,CORGN,CORGP=SOC,POC,SON,SOP (g Mg-1)
-  !     BKVL=soil mass (Mg)
-  !
-  DO 1200 L=0,NL(NY,NX)
-    IF(BKVL(L,NY,NX).GT.ZEROS(NY,NX))THEN
-      CORGCX(0)=RSC(0,L,NY,NX)*AREA(3,L,NY,NX)/BKVL(L,NY,NX)
-      CORGCX(1)=RSC(1,L,NY,NX)*AREA(3,L,NY,NX)/BKVL(L,NY,NX)
-      CORGCX(2)=RSC(2,L,NY,NX)*AREA(3,L,NY,NX)/BKVL(L,NY,NX)
-      CORGNX(0)=RSN(0,L,NY,NX)*AREA(3,L,NY,NX)/BKVL(L,NY,NX)
-      CORGNX(1)=RSN(1,L,NY,NX)*AREA(3,L,NY,NX)/BKVL(L,NY,NX)
-      CORGNX(2)=RSN(2,L,NY,NX)*AREA(3,L,NY,NX)/BKVL(L,NY,NX)
-      CORGPX(0)=RSP(0,L,NY,NX)*AREA(3,L,NY,NX)/BKVL(L,NY,NX)
-      CORGPX(1)=RSP(1,L,NY,NX)*AREA(3,L,NY,NX)/BKVL(L,NY,NX)
-      CORGPX(2)=RSP(2,L,NY,NX)*AREA(3,L,NY,NX)/BKVL(L,NY,NX)
-    ELSE
-      !if(abs(VOLT(L,NY,NX))<1.e-10_r8)then
-      !  print*,'L,NY,NX=',L,NY,NX
-      !  print*,'VOLT(L,NY,NX)=',VOLT(L,NY,NX)
-      !endif
-      CORGCX(0)=RSC(0,L,NY,NX)*AREA(3,L,NY,NX)/VOLT(L,NY,NX)
-      CORGCX(1)=RSC(1,L,NY,NX)*AREA(3,L,NY,NX)/VOLT(L,NY,NX)
-      CORGCX(2)=RSC(2,L,NY,NX)*AREA(3,L,NY,NX)/VOLT(L,NY,NX)
-      CORGNX(0)=RSN(0,L,NY,NX)*AREA(3,L,NY,NX)/VOLT(L,NY,NX)
-      CORGNX(1)=RSN(1,L,NY,NX)*AREA(3,L,NY,NX)/VOLT(L,NY,NX)
-      CORGNX(2)=RSN(2,L,NY,NX)*AREA(3,L,NY,NX)/VOLT(L,NY,NX)
-      CORGPX(0)=RSP(0,L,NY,NX)*AREA(3,L,NY,NX)/VOLT(L,NY,NX)
-      CORGPX(1)=RSP(1,L,NY,NX)*AREA(3,L,NY,NX)/VOLT(L,NY,NX)
-      CORGPX(2)=RSP(2,L,NY,NX)*AREA(3,L,NY,NX)/VOLT(L,NY,NX)
-    ENDIF
-    !
-    !     ALLOCATE SOC TO POC(3) AND HUMUS(4)
-    !
-    IF(L.GT.0)THEN
-      CORGCZ=CORGC(L,NY,NX)
-      CORGRZ=CORGR(L,NY,NX)
-      CORGNZ=CORGN(L,NY,NX)
-      CORGPZ=CORGP(L,NY,NX)
-      IF(CORGCZ.GT.ZERO)THEN
-        CORGCX(3)=CORGRZ
-        CORGCX(4)=AMAX1(0.0,CORGCZ-CORGCX(3))
-        CORGNX(3)=AMIN1(CNRH(3)*CORGCX(3),CORGNZ)
-        CORGNX(4)=AMAX1(0.0,CORGNZ-CORGNX(3))
-        CORGPX(3)=AMIN1(CPRH(3)*CORGCX(3),CORGPZ)
-        CORGPX(4)=AMAX1(0.0,CORGPZ-CORGPX(3))
+  integer  :: L,M,K,N,KK,NN,NGL
+  real(r8) :: CORGCM,HCX,TORGC
+  real(r8) :: CORGL
+!     begin_execution
+!     RSC,RSC,RSP=C,N,P in fine(1),woody(0),manure(2) litter (g m-2)
+!     CORGC,CORGR,CORGN,CORGP=SOC,POC,SON,SOP (g Mg-1)
+!     BKVL=soil mass (Mg)
+!
+
+        !
+        !     INITIALIZE SOM FROM ORGANIC INPUTS IN SOIL FILE FROM 'READS'
+        !
+        !     CORGC,CORGR,CORGN,CORGP=SOC,POC,SON,SOP (g Mg-1)
+        !
+        TORGC=0.0
+        DO 1190 L=NU(NY,NX),NL(NY,NX)
+          !     CORGCZ=CORGC(L,NY,NX)
+          !     CORGRZ=CORGR(L,NY,NX)
+          !     CORGNZ=CORGN(L,NY,NX)
+          !     CORGPZ=CORGP(L,NY,NX)
+          !
+          !     ALLOCATE SOC TO POC(3) AND HUMUS(4)
+          !
+          !     CORGCX(3)=CORGRZ
+          !     CORGCX(4)=AMAX1(0.0,CORGCZ-CORGCX(3))
+          !     CORGNX(3)=AMIN1(CNRH(3)*CORGCX(3),CORGNZ)
+          !     CORGNX(4)=AMAX1(0.0,CORGNZ-CORGNX(3))
+          !     CORGPX(3)=AMIN1(CPRH(3)*CORGCX(3),CORGPZ)
+          !     CORGPX(4)=AMAX1(0.0,CORGPZ-CORGPX(3))
+          CORGL=AMAX1(0.0,CORGC(L,NY,NX)-CORGR(L,NY,NX))
+          TORGL(L)=TORGC+CORGL*BKVL(L,NY,NX)/AREA(3,L,NY,NX)*0.5
+          TORGC=TORGC+CORGL*BKVL(L,NY,NX)/AREA(3,L,NY,NX)
+1190  CONTINUE
+      !
+      !     PARAMETERS TO ALLOCATE HUMUS TO LESS OR MORE RECALCITRANT FRACTIONS
+      !
+      !     TORGL=accumulated humus down to soil layer (g m-2)
+      !     TORGM=TORGL used to calculate allocation (g m-2)
+      !     HCX=shape parameter for depth effect on allocation
+      !
+      TORGM=AMAX1(2.0E+03,AMIN1(5.0E+03,0.25*TORGL(NJ(NY,NX))))
+      IF(TORGM.GT.ZERO)THEN
+        HCX=LOG(0.5)/TORGM
       ELSE
-        CORGCX(3)=0.0
-        CORGCX(4)=0.0
-        CORGNX(3)=0.0
-        CORGNX(4)=0.0
-        CORGPX(3)=0.0
-        CORGPX(4)=0.0
+        HCX=0.0
       ENDIF
-    ELSE
-      CORGCX(3)=0.0
-      CORGCX(4)=0.0
-      CORGNX(3)=0.0
-      CORGNX(4)=0.0
-      CORGPX(3)=0.0
-      CORGPX(4)=0.0
-    ENDIF
+
+  DO 1200 L=0,NL(NY,NX)
     !
-    !     SURFACE RESIDUE KINETIC COMPONENTS
-    call InitSurfResiduKinetiComponent(L,NY,NX)
-    !
-    !     ANIMAL MANURE
-    call InitManureKinetiComponent(L,NY,NX)
-    !
-    !     POM
-    call InitPOMKinetiComponent(L,NY,NX)
+    call InitSOMProfile(L,NY,NX,HCX,CDPTHG,TORGL(L),CORGCM)
     !
     !     LAYER WATER, ICE, AIR CONTENTS
     !
@@ -487,9 +415,9 @@ module StartsMod
     !     VOLW,VOLWH=micropore,macropore water volume(m3)
     !     VOLI,VOLIH=micropore,macropore ice volume(m3)
     !     VOLP=total air volume (m3)
-!
+    !
     PSISE(L,NY,NX)=PSIPS
-    PSISA(L,NY,NX)=-1.5E-03
+    PSISA(L,NY,NX)=-1.5E-03_r8
     ROXYF(L,NY,NX)=0.0
     RCO2F(L,NY,NX)=0.0
     ROXYL(L,NY,NX)=0.0
@@ -497,7 +425,6 @@ module StartsMod
     RCH4L(L,NY,NX)=0.0
     IF(L.GT.0)THEN
       IF(BKDS(L,NY,NX).GT.ZERO)THEN
-        CORGCM=AMIN1(0.55E+06_r8,(CORGCX(1)+CORGCX(2)+CORGCX(3)+CORGCX(4)))/0.55_r8
         PTDS=1.0E-06_r8*(1.30*CORGCM+2.66_r8*(1.0E+06_r8-CORGCM))
         POROS(L,NY,NX)=1.0_r8-(BKDS(L,NY,NX)/PTDS)
       ELSE
@@ -578,329 +505,8 @@ module StartsMod
     TCS(L,NY,NX)=ATCS(NY,NX)
     !
     !     INITIALIZE SOM VARIABLES
-    !
-    !     CNOSC,CPOSC=N:C,P:C ratios of SOC kinetic components
-    !     CFOSC=fraction of SOC in kinetic components
-    !     CNOFC,CPOFC=fractions to allocate N,P to kinetic components
-!
-    DO 975 K=0,2
-      CNOSCT(K)=0.0
-      CPOSCT(K)=0.0
-      IF(RSC(K,L,NY,NX).GT.ZEROS(NY,NX))THEN
-        RNT=0.0
-        RPT=0.0
-        DO 970 M=1,4
-          RNT=RNT+RSC(K,L,NY,NX)*CFOSC(M,K,L,NY,NX)*CNOFC(M,K)
-          RPT=RPT+RSC(K,L,NY,NX)*CFOSC(M,K,L,NY,NX)*CPOFC(M,K)
-970     CONTINUE
-        FRNT=RSN(K,L,NY,NX)/RNT
-        FRPT=RSP(K,L,NY,NX)/RPT
-        DO 960 M=1,4
-          CNOSC(M,K,L,NY,NX)=CNOFC(M,K)*FRNT
-          CPOSC(M,K,L,NY,NX)=CPOFC(M,K)*FRPT
-          CNOSCT(K)=CNOSCT(K)+CFOSC(M,K,L,NY,NX)*CNOSC(M,K,L,NY,NX)
-          CPOSCT(K)=CPOSCT(K)+CFOSC(M,K,L,NY,NX)*CPOSC(M,K,L,NY,NX)
-960     CONTINUE
-      ELSE
-        DO 965 M=1,4
-          CNOSC(M,K,L,NY,NX)=CNRH(K)
-          CPOSC(M,K,L,NY,NX)=CPRH(K)
-965     CONTINUE
-        CNOSCT(K)=CNRH(K)
-        CPOSCT(K)=CPRH(K)
-      ENDIF
-975 CONTINUE
-    DO 990 K=3,4
-      CNOSCT(K)=0.0
-      CPOSCT(K)=0.0
-      IF(CORGCX(K).GT.ZERO)THEN
-        DO 985 M=1,4
-          CNOSC(M,K,L,NY,NX)=CORGNX(K)/CORGCX(K)
-          CPOSC(M,K,L,NY,NX)=CORGPX(K)/CORGCX(K)
-          CNOSCT(K)=CNOSCT(K)+CFOSC(M,K,L,NY,NX)*CNOSC(M,K,L,NY,NX)
-          CPOSCT(K)=CPOSCT(K)+CFOSC(M,K,L,NY,NX)*CPOSC(M,K,L,NY,NX)
-985     CONTINUE
-      ELSE
-        DO 980 M=1,4
-          CNOSC(M,K,L,NY,NX)=CNRH(K)
-          CPOSC(M,K,L,NY,NX)=CPRH(K)
-980     CONTINUE
-        CNOSCT(K)=CNRH(K)
-        CPOSCT(K)=CPRH(K)
-      ENDIF
-990 CONTINUE
-    !
-    !     MICROBIAL BIOMASS,RESIDUE, DOC, ADSORBED
-    !
-    !     OSCI,OSNI,OSPI=initial SOC,SON,SOP mass in each complex (g)
-    !     OMCK,ORCK,OQCK,OHCK=fractions of SOC in biomass,litter,DOC adsorbed C
-    !     OSCM=total biomass in each complex (g)
-    !     DCKR,DCKM=parameters to initialize microbial biomass from SOC
-    !
-    TOSCI=0.0
-    TOSNI=0.0
-    TOSPI=0.0
-    DO 995 K=0,4
-      IF(L.EQ.0)THEN
-        KK=K
-      ELSE
-        KK=4
-      ENDIF
-      IF(BKVL(L,NY,NX).GT.ZEROS(NY,NX))THEN
-        OSCI(K)=CORGCX(K)*BKVL(L,NY,NX)
-        OSNI(K)=CORGNX(K)*BKVL(L,NY,NX)
-        OSPI(K)=CORGPX(K)*BKVL(L,NY,NX)
-      ELSE
-        OSCI(K)=CORGCX(K)*VOLT(L,NY,NX)
-        OSNI(K)=CORGNX(K)*VOLT(L,NY,NX)
-        OSPI(K)=CORGPX(K)*VOLT(L,NY,NX)
-      ENDIF
-      TOSCK(K)=OMCK(K)+ORCK(K)+OQCK(K)+OHCK(K)
-      TOSNK(K)=ORCK(K)*CNRH(K)+OQCK(K)*CNOSCT(KK)+OHCK(K)*CNOSCT(KK)
-      TOSPK(K)=ORCK(K)*CPRH(K)+OQCK(K)*CPOSCT(KK)+OHCK(K)*CPOSCT(KK)
-      do NGL=1,JG
-        TOSNK(K)=TOSNK(K)+OMCI(1,K)*CNOMC(1,NGL,1,K)+OMCI(2,K)*CNOMC(2,NGL,1,K)
-        TOSPK(K)=TOSPK(K)+OMCI(1,K)*CPOMC(1,NGL,1,K)+OMCI(2,K)*CPOMC(2,NGL,1,K)
-      enddo
-      TOSCI=TOSCI+OSCI(K)*TOSCK(K)
-      TOSNI=TOSNI+OSCI(K)*TOSNK(K)
-      TOSPI=TOSPI+OSCI(K)*TOSPK(K)
-      OSCX(K)=0.0
-      OSNX(K)=0.0
-      OSPX(K)=0.0
-995 CONTINUE
-    TOMC=0.0
-    DO 8995 K=0,4
-      IF(L.EQ.0)THEN
-        OSCM(K)=DCKR*CORGCX(K)*BKVL(L,NY,NX)
-        X=0.0
-        KK=K
-        FOSCI=1.0
-        FOSNI=1.0
-        FOSPI=1.0
-      ELSE
-        IF(BKVL(L,NY,NX).GT.ZEROS(NY,NX))THEN
-          IF(K.LE.2)THEN
-            OSCM(K)=DCKR*CORGCX(K)*BKVL(L,NY,NX)
-          ELSE
-            OSCM(K)=FCX*CORGCX(K)*BKVL(L,NY,NX)*DCKM/(CORGCX(4)+DCKM)
-          ENDIF
-        ELSE
-          IF(K.LE.2)THEN
-            OSCM(K)=DCKR*CORGCX(K)*VOLT(L,NY,NX)
-          ELSE
-            OSCM(K)=FCX*CORGCX(K)*VOLT(L,NY,NX)*DCKM/(CORGCX(4)+DCKM)
-          ENDIF
-        ENDIF
-        !     IF(L.EQ.NU(NY,NX))THEN
-        !     WRITE(*,2424)'OSCM',NX,NY,L,K,OSCM(K),OSCI(K),CORGCX(K)
-        !    2,BKVL(L,NY,NX),CORGCX(K)*BKVL(L,NY,NX),FCX
-!2424  FORMAT(A8,4I4,12E12.4)
-        !     ENDIF
-        X=1.0
-        KK=4
-        IF(TOSCI.GT.ZEROS(NY,NX))THEN
-          FOSCI=AMIN1(1.0,OSCI(KK)/TOSCI)
-          FOSNI=AMIN1(1.0,OSCI(KK)*CNOSCT(KK)/TOSNI)
-          FOSPI=AMIN1(1.0,OSCI(KK)*CPOSCT(KK)/TOSPI)
-        ELSE
-          FOSCI=0.0
-          FOSNI=0.0
-          FOSPI=0.0
-        ENDIF
-      ENDIF
-      !
-      !     MICROBIAL C, N AND P
-      !
-      !     OMC,OMN,OMP=microbial C,N,P
-      !     OMCI=microbial biomass content in litter
-      !     OMCF,OMCA=hetero,autotrophic biomass composition in litter
-      !     CNOMC,CPOMC=maximum N:C and P:C ratios in microbial biomass
-      !     OSCX,OSNX,OSPX=remaining unallocated SOC,SON,SOP
-      !
-      DO 7990 N=1,7
-        DO NGL=1,JG
-          DO 7985 M=1,3
-            OMC(M,NGL,N,5,L,NY,NX)=0.0
-            OMN(M,NGL,N,5,L,NY,NX)=0.0
-            OMP(M,NGL,N,5,L,NY,NX)=0.0
-7985      CONTINUE
-        enddo
-7990  CONTINUE
-      DO 8990 N=1,7
-        do NGL=1,JG
-          DO 8991 M=1,3
-            OMC1=AMAX1(0.0,OSCM(K)*OMCI(M,K)*OMCF(N)*FOSCI)
-            OMN1=AMAX1(0.0,OMC1*CNOMC(M,NGL,N,K)*FOSNI)
-            OMP1=AMAX1(0.0,OMC1*CPOMC(M,NGL,N,K)*FOSPI)
-            OMC(M,NGL,N,K,L,NY,NX)=OMC1
-            OMN(M,NGL,N,K,L,NY,NX)=OMN1
-            OMP(M,NGL,N,K,L,NY,NX)=OMP1
-            OSCX(KK)=OSCX(KK)+OMC1
-            OSNX(KK)=OSNX(KK)+OMN1
-            OSPX(KK)=OSPX(KK)+OMP1
-            DO 8992 NN=1,7
-              OMC(M,NGL,NN,5,L,NY,NX)=OMC(M,NGL,NN,5,L,NY,NX)+OMC1*OMCA(NN)
-              OMN(M,NGL,NN,5,L,NY,NX)=OMN(M,NGL,NN,5,L,NY,NX)+OMN1*OMCA(NN)
-              OMP(M,NGL,NN,5,L,NY,NX)=OMP(M,NGL,NN,5,L,NY,NX)+OMP1*OMCA(NN)
-              OSCX(KK)=OSCX(KK)+OMC1*OMCA(NN)
-              OSNX(KK)=OSNX(KK)+OMN1*OMCA(NN)
-              OSPX(KK)=OSPX(KK)+OMP1*OMCA(NN)
-8992        CONTINUE
-8991      CONTINUE
-        enddo
-8990  CONTINUE
-      !
-      !     MICROBIAL RESIDUE C, N AND P
-      !
-      !     ORC,ORN,ORP=microbial residue C,N,P
-      !     ORCI=allocation of microbial residue to kinetic components
-      !
-      DO 8985 M=1,2
-        ORC(M,K,L,NY,NX)=X*AMAX1(0.0,OSCM(K)*ORCI(M,K)*FOSCI)
-        ORN(M,K,L,NY,NX)=AMAX1(0.0,ORC(M,K,L,NY,NX)*CNOMC(M,1,1,K)*FOSNI)
-        ORP(M,K,L,NY,NX)=AMAX1(0.0,ORC(M,K,L,NY,NX)*CPOMC(M,1,1,K)*FOSPI)
-        OSCX(KK)=OSCX(KK)+ORC(M,K,L,NY,NX)
-        OSNX(KK)=OSNX(KK)+ORN(M,K,L,NY,NX)
-        OSPX(KK)=OSPX(KK)+ORP(M,K,L,NY,NX)
-8985  CONTINUE
-      !
-      !     DOC, DON AND DOP
-      !
-      !     OQC,OQN,OQP,OQA=DOC,DON,DOP,acetate in micropores (g)
-      !     OQCH,OQNH,OQPH,OQAH=DOC,DON,DOP,acetate in macropores (g)
-      !
-      OQC(K,L,NY,NX)=X*AMAX1(0.0,OSCM(K)*OQCK(K)*FOSCI)
-      OQN(K,L,NY,NX)=AMAX1(0.0,OQC(K,L,NY,NX)*CNOSCT(KK)*FOSNI)
-      OQP(K,L,NY,NX)=AMAX1(0.0,OQC(K,L,NY,NX)*CPOSCT(KK)*FOSPI)
-      OQA(K,L,NY,NX)=0.0
-      OQCH(K,L,NY,NX)=0.0
-      OQNH(K,L,NY,NX)=0.0
-      OQPH(K,L,NY,NX)=0.0
-      OQAH(K,L,NY,NX)=0.0
-      OSCX(KK)=OSCX(KK)+OQC(K,L,NY,NX)
-      OSNX(KK)=OSNX(KK)+OQN(K,L,NY,NX)
-      OSPX(KK)=OSPX(KK)+OQP(K,L,NY,NX)
-      !
-      !     ADSORBED C, N AND P
-      !
-      !     OHC,OHN,OHP,OHA=adsorbed C,N,P,acetate
-!
-      OHC(K,L,NY,NX)=X*AMAX1(0.0,OSCM(K)*OHCK(K)*FOSCI)
-      OHN(K,L,NY,NX)=AMAX1(0.0,OHC(K,L,NY,NX)*CNOSCT(KK)*FOSNI)
-      OHP(K,L,NY,NX)=AMAX1(0.0,OHC(K,L,NY,NX)*CPOSCT(KK)*FOSPI)
-      OHA(K,L,NY,NX)=0.0
-      OSCX(KK)=OSCX(KK)+OHC(K,L,NY,NX)+OHA(K,L,NY,NX)
-      OSNX(KK)=OSNX(KK)+OHN(K,L,NY,NX)
-      OSPX(KK)=OSPX(KK)+OHP(K,L,NY,NX)
-      !
-      !     HUMUS C, N AND P
-      !
-      !     OSC,OAA,OSN,OSP=SOC,colonized SOC,SON,SOP
-!
-      DO 8980 M=1,4
-        OSC(M,K,L,NY,NX)=AMAX1(0.0,CFOSC(M,K,L,NY,NX)*(OSCI(K)-OSCX(K)))
-        IF(CNOSCT(K).GT.ZERO)THEN
-          OSN(M,K,L,NY,NX)=AMAX1(0.0,CFOSC(M,K,L,NY,NX)*CNOSC(M,K,L,NY,NX) &
-            /CNOSCT(K)*(OSNI(K)-OSNX(K)))
-        ELSE
-          OSN(M,K,L,NY,NX)=0.0
-        ENDIF
-        IF(CPOSCT(K).GT.ZERO)THEN
-          OSP(M,K,L,NY,NX)=AMAX1(0.0,CFOSC(M,K,L,NY,NX)*CPOSC(M,K,L,NY,NX) &
-            /CPOSCT(K)*(OSPI(K)-OSPX(K)))
-        ELSE
-          OSP(M,K,L,NY,NX)=0.0
-        ENDIF
-        IF(K.EQ.0)THEN
-          OSA(M,K,L,NY,NX)=OSC(M,K,L,NY,NX)*OMCI(1,K)*dble(JG)
-        ELSE
-          OSA(M,K,L,NY,NX)=OSC(M,K,L,NY,NX)
-        ENDIF
-8980  CONTINUE
-8995  CONTINUE
-  !
-  !     ADD ALL LITTER,POC,HUMUS COMPONENTS TO GET TOTAL SOC
-  !
-    OC=0.0
-    ON=0.0
-    OP=0.0
-    RC=0.0
-    IF(L.EQ.0)THEN
-      DO 6975 K=0,5
-        RC0(K,NY,NX)=0.0
-6975  CONTINUE
-    ENDIF
-    DO 6990 K=0,5
-      DO  N=1,7
-        do NGL=1,JG
-          ROXYS(NGL,N,K,L,NY,NX)=0.0
-          RVMX4(NGL,N,K,L,NY,NX)=0.0
-          RVMX3(NGL,N,K,L,NY,NX)=0.0
-          RVMX2(NGL,N,K,L,NY,NX)=0.0
-          RVMX1(NGL,N,K,L,NY,NX)=0.0
-          RINHO(NGL,N,K,L,NY,NX)=0.0
-          RINOO(NGL,N,K,L,NY,NX)=0.0
-          RIPOO(NGL,N,K,L,NY,NX)=0.0
-          IF(L.EQ.0)THEN
-            RINHOR(NGL,N,K,NY,NX)=0.0
-            RINOOR(NGL,N,K,NY,NX)=0.0
-            RIPOOR(NGL,N,K,NY,NX)=0.0
-          ENDIF
-          DO  M=1,3
-            OC=OC+OMC(M,NGL,N,K,L,NY,NX)
-            ON=ON+OMN(M,NGL,N,K,L,NY,NX)
-            OP=OP+OMP(M,NGL,N,K,L,NY,NX)
-            IF(K.LE.2)THEN
-              RC=RC+OMC(M,NGL,N,K,L,NY,NX)
-            ENDIF
-            RC0(K,NY,NX)=RC0(K,NY,NX)+OMC(M,NGL,N,K,L,NY,NX)
-          ENDDO
-        ENDDO
-        enddo
-6990  CONTINUE
-    DO 6995 K=0,4
-      DO 6985 M=1,2
-        OC=OC+ORC(M,K,L,NY,NX)
-        ON=ON+ORN(M,K,L,NY,NX)
-        OP=OP+ORP(M,K,L,NY,NX)
-        IF(K.LE.2)THEN
-          RC=RC+ORC(M,K,L,NY,NX)
-        ENDIF
-        IF(L.EQ.0)THEN
-          RC0(K,NY,NX)=RC0(K,NY,NX)+ORC(M,K,L,NY,NX)
-        ENDIF
-6985  CONTINUE
-      OC=OC+OQC(K,L,NY,NX)+OQCH(K,L,NY,NX)+OHC(K,L,NY,NX) &
-        +OQA(K,L,NY,NX)+OQAH(K,L,NY,NX)+OHA(K,L,NY,NX)
-      ON=ON+OQN(K,L,NY,NX)+OQNH(K,L,NY,NX)+OHN(K,L,NY,NX)
-      OP=OP+OQP(K,L,NY,NX)+OQPH(K,L,NY,NX)+OHP(K,L,NY,NX)
-      OC=OC+OQA(K,L,NY,NX)+OQAH(K,L,NY,NX)
-      IF(K.LE.2)THEN
-        RC=RC+OQC(K,L,NY,NX)+OQCH(K,L,NY,NX)+OHC(K,L,NY,NX) &
-          +OQA(K,L,NY,NX)+OQAH(K,L,NY,NX)+OHA(K,L,NY,NX)
-        RC=RC+OQA(K,L,NY,NX)+OQAH(K,L,NY,NX)
-      ENDIF
-      IF(L.EQ.0)THEN
-        RC0(K,NY,NX)=RC0(K,NY,NX)+OQC(K,L,NY,NX)+OQCH(K,L,NY,NX) &
-          +OHC(K,L,NY,NX)+OQA(K,L,NY,NX)+OQAH(K,L,NY,NX)+OHA(K,L,NY,NX)
-      ENDIF
-      DO 6980 M=1,4
-        OC=OC+OSC(M,K,L,NY,NX)
-        ON=ON+OSN(M,K,L,NY,NX)
-        OP=OP+OSP(M,K,L,NY,NX)
-        IF(K.LE.2)THEN
-          RC=RC+OSC(M,K,L,NY,NX)
-        ENDIF
-        IF(L.EQ.0)THEN
-          RC0(K,NY,NX)=RC0(K,NY,NX)+OSC(M,K,L,NY,NX)
-        ENDIF
-6980  CONTINUE
-6995  CONTINUE
-    ORGC(L,NY,NX)=OC
-    ORGCX(L,NY,NX)=ORGC(L,NY,NX)
-    ORGR(L,NY,NX)=RC
-    ORGN(L,NY,NX)=ON
+    call InitSOMVars(L,NY,NX)
+
     !
     !     INITIALIZE FERTILIZER ARRAYS
     !
@@ -953,253 +559,8 @@ module StartsMod
     ZNFNI(L,NY,NX)=0.0
     ZNFN0(L,NY,NX)=0.0
 1200  CONTINUE
-  end subroutine InitLitterProfile
-!------------------------------------------------------------------------------------------
-  subroutine InitSurfResiduKinetiComponent(L,NY,NX)
-  implicit none
-  integer, intent(in) :: L, NY,NX
-!     begin_execution
-  IF(L.EQ.0)THEN
-    !
-    !     CFOSC=fraction of litter in protein(1),nonstructural(2)
-    !     cellulose(3) and lignin(4)
-    !
-    !     PREVIOUS COARSE WOODY RESIDUE
-    !
-    CFOSC(1,0,L,NY,NX)=0.000
-    CFOSC(2,0,L,NY,NX)=0.045
-    CFOSC(3,0,L,NY,NX)=0.660
-    CFOSC(4,0,L,NY,NX)=0.295
-    !
-    !     MAIZE
-    !
-    IF(IXTYP(1,NY,NX).EQ.1)THEN
-      CFOSC(1,1,L,NY,NX)=0.080
-      CFOSC(2,1,L,NY,NX)=0.245
-      CFOSC(3,1,L,NY,NX)=0.613
-      CFOSC(4,1,L,NY,NX)=0.062
-      !
-      !     WHEAT
-      !
-    ELSEIF(IXTYP(1,NY,NX).EQ.2)THEN
-      CFOSC(1,1,L,NY,NX)=0.125
-      CFOSC(2,1,L,NY,NX)=0.171
-      CFOSC(3,1,L,NY,NX)=0.560
-      CFOSC(4,1,L,NY,NX)=0.144
-!
-      !     SOYBEAN
-      !
-    ELSEIF(IXTYP(1,NY,NX).EQ.3)THEN
-      CFOSC(1,1,L,NY,NX)=0.138
-      CFOSC(2,1,L,NY,NX)=0.426
-      CFOSC(3,1,L,NY,NX)=0.316
-      CFOSC(4,1,L,NY,NX)=0.120
-!
-      !     NEW STRAW
-!
-    ELSEIF(IXTYP(1,NY,NX).EQ.4)THEN
-      CFOSC(1,1,L,NY,NX)=0.036
-      CFOSC(2,1,L,NY,NX)=0.044
-      CFOSC(3,1,L,NY,NX)=0.767
-      CFOSC(4,1,L,NY,NX)=0.153
-!
-      !     OLD STRAW
-!
-    ELSEIF(IXTYP(1,NY,NX).EQ.5)THEN
-      CFOSC(1,1,L,NY,NX)=0.075
-      CFOSC(2,1,L,NY,NX)=0.125
-      CFOSC(3,1,L,NY,NX)=0.550
-      CFOSC(4,1,L,NY,NX)=0.250
-!
-      !     COMPOST
-!
-    ELSEIF(IXTYP(1,NY,NX).EQ.6)THEN
-      CFOSC(1,1,L,NY,NX)=0.143
-      CFOSC(2,1,L,NY,NX)=0.015
-      CFOSC(3,1,L,NY,NX)=0.640
-      CFOSC(4,1,L,NY,NX)=0.202
-!
-      !     GREEN MANURE
-!
-    ELSEIF(IXTYP(1,NY,NX).EQ.7)THEN
-      CFOSC(1,1,L,NY,NX)=0.202
-      CFOSC(2,1,L,NY,NX)=0.013
-      CFOSC(3,1,L,NY,NX)=0.560
-      CFOSC(4,1,L,NY,NX)=0.225
-!
-      !     NEW DECIDUOUS FOREST
-!
-    ELSEIF(IXTYP(1,NY,NX).EQ.8)THEN
-      CFOSC(1,1,L,NY,NX)=0.07
-      CFOSC(2,1,L,NY,NX)=0.41
-      CFOSC(3,1,L,NY,NX)=0.36
-      CFOSC(4,1,L,NY,NX)=0.16
-!
-      !     NEW CONIFEROUS FOREST
-!
-    ELSEIF(IXTYP(1,NY,NX).EQ.9)THEN
-      CFOSC(1,1,L,NY,NX)=0.07
-      CFOSC(2,1,L,NY,NX)=0.25
-      CFOSC(3,1,L,NY,NX)=0.38
-      CFOSC(4,1,L,NY,NX)=0.30
-!
-      !     OLD DECIDUOUS FOREST
-!
-    ELSEIF(IXTYP(1,NY,NX).EQ.10)THEN
-      CFOSC(1,1,L,NY,NX)=0.02
-      CFOSC(2,1,L,NY,NX)=0.06
-      CFOSC(3,1,L,NY,NX)=0.34
-      CFOSC(4,1,L,NY,NX)=0.58
-!
-      !     OLD CONIFEROUS FOREST
-!
-    ELSEIF(IXTYP(1,NY,NX).EQ.11)THEN
-      CFOSC(1,1,L,NY,NX)=0.02
-      CFOSC(2,1,L,NY,NX)=0.06
-      CFOSC(3,1,L,NY,NX)=0.34
-      CFOSC(4,1,L,NY,NX)=0.58
-!
-      !     DEFAULT
-!
-    ELSE
-      CFOSC(1,1,L,NY,NX)=0.075
-      CFOSC(2,1,L,NY,NX)=0.125
-      CFOSC(3,1,L,NY,NX)=0.550
-      CFOSC(4,1,L,NY,NX)=0.250
-    ENDIF
-!
-    !     PREVIOUS COARSE (K=0) AND FINE (K=1) ROOTS
-!
-  ELSE
-    CFOSC(1,0,L,NY,NX)=0.00
-    CFOSC(2,0,L,NY,NX)=0.00
-    CFOSC(3,0,L,NY,NX)=0.20
-    CFOSC(4,0,L,NY,NX)=0.80
-    CFOSC(1,1,L,NY,NX)=0.02
-    CFOSC(2,1,L,NY,NX)=0.06
-    CFOSC(3,1,L,NY,NX)=0.34
-    CFOSC(4,1,L,NY,NX)=0.58
-    ENDIF
-  end subroutine InitSurfResiduKinetiComponent
-!------------------------------------------------------------------------------------------
-  subroutine InitManureKinetiComponent(L,NY,NX)
+  end subroutine InitSoilProfile
 
-  implicit none
-  integer, intent(in) :: L, NY, NX
-  !     begin_execution
-  !
-  !     RUMINANT
-!
-  IF(IXTYP(2,NY,NX).EQ.1)THEN
-    CFOSC(1,2,L,NY,NX)=0.036
-    CFOSC(2,2,L,NY,NX)=0.044
-    CFOSC(3,2,L,NY,NX)=0.630
-    CFOSC(4,2,L,NY,NX)=0.290
-!
-    !     NON-RUMINANT
-!
-  ELSEIF(IXTYP(2,NY,NX).EQ.2)THEN
-    CFOSC(1,2,L,NY,NX)=0.138
-    CFOSC(2,2,L,NY,NX)=0.401
-    CFOSC(3,2,L,NY,NX)=0.316
-    CFOSC(4,2,L,NY,NX)=0.145
-!
-    !     OTHER
-!
-  ELSE
-    CFOSC(1,2,L,NY,NX)=0.138
-    CFOSC(2,2,L,NY,NX)=0.401
-    CFOSC(3,2,L,NY,NX)=0.316
-    CFOSC(4,2,L,NY,NX)=0.145
-  ENDIF
-  end subroutine InitManureKinetiComponent
-!------------------------------------------------------------------------------------------
-  subroutine InitPOMKinetiComponent(L,NY,NX)
-  implicit none
-  integer, intent(in) :: L, NY, NX
-!     begin_execution
-!
-!     CFOSC=siNGLe kinetic fraction in POM
-!
-  IF(L.NE.0)THEN
-    CFOSC(1,3,L,NY,NX)=1.00
-    CFOSC(2,3,L,NY,NX)=0.00
-    CFOSC(3,3,L,NY,NX)=0.00
-    CFOSC(4,3,L,NY,NX)=0.00
-!
-    !     HUMUS PARTITIONED TO DIFFERENT FRACTIONS
-    !     BASED ON SOC ACCUMULATION ABOVE EACH LAYER
-    !
-    !     NATURAL SOILS
-    !
-    IF(ISOILR(NY,NX).EQ.0)THEN
-!
-      !     DRYLAND SOIL
-      !
-      !     CORGC,FORGC=SOC,minimum SOC for organic soil(g Mg-1)
-      !     DPTH,DTBLZ=depth to layer midpoint,external water table(m)
-      !     FC0=partitioning to less resistant component at DPTH=0
-      !     FCX=reduction in FC0 at DPTH
-      !     CORGCX,CORGNX,CORGPX=C,N,P concentations in humus
-!
-      IF(CORGC(L,NY,NX).LE.FORGC.OR.DPTH(L,NY,NX).LE.DTBLZ(NY,NX) &
-        +CDPTH(NU(NY,NX),NY,NX)-CDPTHG)THEN
-        FCY=0.60
-        IF(CORGCX(4).GT.1.0E-32)THEN
-          FC0=FCY*EXP(-5.0*(AMIN1(CORGNX(4),10.0*CORGPX(4))/CORGCX(4)))
-        ELSE
-          FCO=FCY
-        ENDIF
-        FCX=EXP(HCX*TORGL(L))
-        !     WETLAND
-!
-      ELSE
-        FCY=0.60
-        IF(CORGCX(4).GT.1.0E-32)THEN
-          FC0=FCY*EXP(-5.0*(AMIN1(CORGNX(4),10.0*CORGPX(4))/CORGCX(4)))
-        ELSE
-          FCO=FCY
-        ENDIF
-!     FCX=(EXP(HCX*TORGL(L)))**0.5
-        FCX=EXP(HCX*TORGL(L))
-      ENDIF
-!
-      !     RECONSTRUCTED SOILS
-!
-    ELSE
-      FCY=0.30
-      IF(CORGCX(4).GT.1.0E-32)THEN
-        FC0=FCY*EXP(-5.0*(AMIN1(CORGNX(4),10.0*CORGPX(4))/CORGCX(4)))
-      ELSE
-        FCO=FCY
-      ENDIF
-      FCX=1.0
-    ENDIF
-!
-!   PARTITION HUMUS
-!
-!   CFOSC=fraction of humus in less(1),more(2) resistant component
-!
-    FC1=FC0*FCX
-    CFOSC(1,4,L,NY,NX)=FC1
-    CFOSC(2,4,L,NY,NX)=1.0-FC1
-    CFOSC(3,4,L,NY,NX)=0.00
-    CFOSC(4,4,L,NY,NX)=0.00
-!
-!   MICROBIAL DETRITUS ALLOCATED TO HUMUS MAINTAINS
-!   HUMUS PARTITIONING TO COMPONENTS
-!
-!   CFOMC=fraction of microbial litter allocated to humus components
-!
-    CFOMC(1,L,NY,NX)=3.0*FC1/(2.0*FC1+1.0)
-    CFOMC(2,L,NY,NX)=1.0-CFOMC(1,L,NY,NX)
-!     WRITE(*,5432)'PART',L,FC0,FC1,FCX,HCX,TORGM,TORGL(L)
-!    2,CORGCX(4),CORGNX(4),CORGPX(4),DPTH(L,NY,NX),DTBLZ(NY,NX)
-!    3,CDPTH(NU(NY,NX),NY,NX),CDPTHG,CORGC(L,NY,NX),FORGC
-!    4,EXP(HCX*TORGL(L))
-!5432  FORMAT(A8,I4,20E12.4)
-  ENDIF
-  end subroutine InitPOMKinetiComponent
 !------------------------------------------------------------------------------------------
   subroutine InitSnowLayers(NY,NX)
 
@@ -1429,7 +790,7 @@ module StartsMod
   !     THETX=minimum air-filled porosity for gas flux calculations
   !     THETPI,DENSI=ice porosity,density
   !
-  OMCI=OMCI1/dble(JG)
+  call InitSOMConsts
   NPH=NPX
   NPT=NPY
   NPG=NPH*NPT

@@ -3,9 +3,10 @@ module readiMod
 ! code to read site, topographic data
 !
   use data_kind_mod, only : r8 => SHR_KIND_R8
-  use abortutils, only : endrun
-  use fileUtil, only : open_safe
-  use minimathmod, only : test_aeqb
+  use abortutils   , only : endrun
+  use fileUtil     , only : open_safe
+  use minimathmod  , only : test_aeqb
+  use SOMDataType
   implicit none
   private
   include "parameters.h"

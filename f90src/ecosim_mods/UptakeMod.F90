@@ -3,6 +3,8 @@ module UptakeMod
   use StomateMod   , only : stomate
   use minimathmod  , only : safe_adb,vapsat
   use EcosimConst
+  use SOMDataType
+  use SoilChemDataType
   implicit none
 
   private

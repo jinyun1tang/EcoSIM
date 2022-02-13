@@ -48,7 +48,6 @@ implicit none
   include "parameters.h"
 
   JG=nguilds
-  print*,'jg=',jg
   allocate(OMC(3,JG,7,0:5,0:JZ,JY,JX))
   allocate(OMN(3,JG,7,0:5,0:JZ,JY,JX))
   allocate(OMP(3,JG,7,0:5,0:JZ,JY,JX))

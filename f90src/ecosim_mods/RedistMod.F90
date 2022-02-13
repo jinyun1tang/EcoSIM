@@ -4,7 +4,8 @@ module RedistMod
   use minimathmod, only : safe_adb
   use EcosimConst
   use MicrobialDataType
-
+  use SOMDataType
+  use SoilChemDataType
   implicit none
 
   private

@@ -1,21 +1,25 @@
 module InitEcoSIM
 
-
   implicit none
   private
   public ::   InitModules
 
   contains
 
-
   subroutine InitModules(nmicbguilds)
-  use NitroMod, only : InitNitro
-  use RedistMod, only : InitRedist
+  use NitroMod         , only : InitNitro
+  use RedistMod        , only : InitRedist
   use MicrobialDataType, only : InitMicrobialData
+  use SOMDataType      , only : InitSOMData
+  use SoilChemDataType , only : InitSoilChemData
   implicit  none
   integer, intent(in) :: nmicbguilds
 
   call InitMicrobialData(nmicbguilds)
+
+  call InitSoilChemData
+
+  call InitSOMData
 
   call initNitro
 

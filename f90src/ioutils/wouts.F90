@@ -7,7 +7,8 @@
 !
   use data_kind_mod, only : r8 => SHR_KIND_R8
   use MicrobialDataType
-
+  use SOMDataType
+  use SoilChemDataType
   implicit none
   integer, intent(in) :: I,NHW,NHE,NVN,NVS
 
