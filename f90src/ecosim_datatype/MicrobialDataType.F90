@@ -37,6 +37,7 @@ implicit none
   real(r8),allocatable :: OMCER(:,:,:,:,:,:,:)
   real(r8),allocatable :: OMNER(:,:,:,:,:,:,:)
   real(r8),allocatable :: OMPER(:,:,:,:,:,:,:)
+  private :: InitAllocate
 
   contains
 
@@ -48,12 +49,21 @@ implicit none
   include "parameters.h"
 
   JG=nguilds
+  call InitAllocate()
+
+  end subroutine InitMicrobialData
+
+  subroutine InitAllocate
+
+  implicit none
+  include "parameters.h"
+
   allocate(OMC(3,JG,7,0:5,0:JZ,JY,JX))
   allocate(OMN(3,JG,7,0:5,0:JZ,JY,JX))
   allocate(OMP(3,JG,7,0:5,0:JZ,JY,JX))
-  allocate(ROXYS(7,JG,0:5,0:JZ,JY,JX))
-  allocate(ROQCS(7,JG,0:4,0:JZ,JY,JX))
-  allocate(ROQAS(7,JG,0:4,0:JZ,JY,JX))
+  allocate(ROXYS(JG,7,0:5,0:JZ,JY,JX))
+  allocate(ROQCS(JG,7,0:4,0:JZ,JY,JX))
+  allocate(ROQAS(JG,7,0:4,0:JZ,JY,JX))
   allocate(CNOMC(3,JG,7,0:5))
   allocate(CPOMC(3,JG,7,0:5))
   allocate(RINHO(JG,7,0:5,0:JZ,JY,JX))
@@ -78,6 +88,43 @@ implicit none
   allocate(OMCER(3*JG,7,0:5,2,2,JV,JH))
   allocate(OMNER(3*JG,7,0:5,2,2,JV,JH))
   allocate(OMPER(3*JG,7,0:5,2,2,JV,JH))
-  end subroutine InitMicrobialData
+  end subroutine InitAllocate
+!----------------------------------------------------------------------------------------------
+
+  subroutine DestructMicrobialData
+  implicit none
+
+  deallocate(OMC)
+  deallocate(OMN)
+  deallocate(OMP)
+  deallocate(ROXYS)
+  deallocate(ROQCS)
+  deallocate(ROQAS)
+  deallocate(CNOMC)
+  deallocate(CPOMC)
+  deallocate(RINHO)
+  deallocate(RINOO)
+  deallocate(RIPOO)
+  deallocate(RINHOR)
+  deallocate(RIPOOR)
+  deallocate(RINOOR)
+  deallocate(RVMX4)
+  deallocate(RVMX3)
+  deallocate(RVMX2)
+  deallocate(RVMB4)
+  deallocate(RVMB3)
+  deallocate(RVMB2)
+  deallocate(RVMX1)
+  deallocate(RINHB)
+  deallocate(RINOB)
+  deallocate(RIPBO)
+  deallocate(RIPO1)
+  deallocate(RIPB1)
+  deallocate(RIPO1R)
+  deallocate(OMCER)
+  deallocate(OMNER)
+  deallocate(OMPER)
+
+  end subroutine DestructMicrobialData
 
 end module MicrobialDataType

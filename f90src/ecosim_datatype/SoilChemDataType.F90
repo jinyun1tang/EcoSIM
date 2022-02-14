@@ -101,5 +101,50 @@ module SoilChemDataType
   allocate(H2GSH(JZ,JY,JX))
 
   end subroutine InitAllocate
+!------------------------------------------------------------------------------------------
 
+
+  subroutine DestructSoilChemData
+
+  implicit none
+
+    deallocate(CZ2GS)
+  deallocate(CNH4S)
+  deallocate(CNH3S)
+  deallocate(CNO3S)
+  deallocate(CPO4S)
+  deallocate(CNH4B)
+  deallocate(CNH3B)
+  deallocate(CNO3B)
+  deallocate(CPO4B)
+  deallocate(CNO2S)
+  deallocate(CNH3G)
+  deallocate(CZ2GG)
+  deallocate(CZ2OG)
+  deallocate(CZ2OS)
+  deallocate(OXYG)
+  deallocate(OXYS)
+  deallocate(OXYSH)
+  deallocate(CO2G)
+  deallocate(CO2S)
+  deallocate(CO2SH)
+  deallocate(CH4G)
+  deallocate(CH4S)
+  deallocate(CH4SH)
+  deallocate(COXYG)
+  deallocate(CCH4G)
+  deallocate(COXYS)
+  deallocate(CCO2G)
+  deallocate(CCO2S)
+  deallocate(CCH4S)
+  deallocate(CH1P4)
+  deallocate(CH1P4B)
+  deallocate(CNO2B)
+  deallocate(H2GS)
+  deallocate(CH2GS)
+  deallocate(CH2P4)
+  deallocate(CH2P4B)
+  deallocate(H2GSH)
+
+  end subroutine DestructSoilChemData
 end module SoilChemDataType

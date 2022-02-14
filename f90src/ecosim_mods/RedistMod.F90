@@ -4857,7 +4857,7 @@ module RedistMod
     !     ENDIF
     !
     !     END ARTIFICIAL SOIL WARMING
-!
+    !
     IF(VHCP(L,NY,NX).GT.ZEROS(NY,NX))THEN
       TKS(L,NY,NX)=(ENGY+THFLW(L,NY,NX)+THTHAW(L,NY,NX) &
         +TUPHT(L,NY,NX)+HWFLU(L,NY,NX))/VHCP(L,NY,NX)
@@ -4866,6 +4866,7 @@ module RedistMod
         write(*,*)'ENGY+THFLW(L,NY,NX)+THTHAW(L,NY,NX)=',ENGY,THFLW(L,NY,NX),THTHAW(L,NY,NX)
         write(*,*)'TUPHT(L,NY,NX)+HWFLU(L,NY,NX)=',TUPHT(L,NY,NX),HWFLU(L,NY,NX)
         write(*,*)'VHCP(L,NY,NX)=',VHCP(L,NY,NX)
+        write(*,*)'NUM',NUM(NY,NX),'L=',L
         call endrun(trim(mod_filename)//' at line',__LINE__)
       endif
     ELSE

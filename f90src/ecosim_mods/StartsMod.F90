@@ -53,15 +53,6 @@ module StartsMod
   !
   real(r8), PARAMETER :: PSIPS=-0.5E-03_r8,RDN=57.29577951_r8
 
-
-
-  DATA BKRS/0.0333,0.0167,0.0167/
-
-  DATA FORGC,FVLWB,FCH4F/0.1E+06,1.0,0.01/
-  DATA PSIHY,FCI,WPI/-2500.0,0.05,0.025/
-  DATA CDPTHSI/0.05,0.15,0.30,0.60,1.00/
-  DATA POROQ/0.66/
-
   public :: starts
   contains
 
@@ -93,8 +84,8 @@ module StartsMod
   !     INITIALIZE ACCUMULATORS AND MASS BALANCE CHECKS
   !     OF EACH GRID CELL
   !
-  ALTZG=0.0
-  CDPTHG=0.0
+  ALTZG=0.0_r8
+  CDPTHG=0.0_r8
   DO 9995 NX=NHW,NHE
     DO 9990 NY=NVN,NVS
 
@@ -148,7 +139,7 @@ module StartsMod
       PSIMN(NY,NX)=LOG(-PSIWP(NY,NX))
       PSISD(NY,NX)=PSIMX(NY,NX)-PSIMS(NY,NX)
       PSIMD(NY,NX)=PSIMN(NY,NX)-PSIMX(NY,NX)
-      !     BKVL(0,NY,NX)=0.0
+      !     BKVL(0,NY,NX)=0.0_r8
       !
       !     DISTRIBUTION OF OM AMONG FRACTIONS OF DIFFERING
       !     BIOLOGICAL ACTIVITY
@@ -178,19 +169,19 @@ module StartsMod
       !
       !     INITIALIZE COMMUNITY CANOPY
 !
-      ZT(NY,NX)=0.0
-      ZL(0,NY,NX)=0.0
+      ZT(NY,NX)=0.0_r8
+      ZL(0,NY,NX)=0.0_r8
       DO 1925 L=1,JC
-        ZL(L,NY,NX)=0.0
-        ARLFT(L,NY,NX)=0.0
-        ARSTT(L,NY,NX)=0.0
-        WGLFT(L,NY,NX)=0.0
+        ZL(L,NY,NX)=0.0_r8
+        ARLFT(L,NY,NX)=0.0_r8
+        ARSTT(L,NY,NX)=0.0_r8
+        WGLFT(L,NY,NX)=0.0_r8
 1925  CONTINUE
 !
-      !     INITIALIZE SEDIMENT LOAD IN EROSION MODEL
+!     INITIALIZE SEDIMENT LOAD IN EROSION MODEL
 !
       IF(IERSNG.EQ.1.OR.IERSNG.EQ.3)THEN
-        SED(NY,NX)=0.0
+        SED(NY,NX)=0.0_r8
       ENDIF
 9990  CONTINUE
 9995  CONTINUE
@@ -288,8 +279,8 @@ module StartsMod
         +SILT(NU(NY,NX),NY,NX)+CLAY(NU(NY,NX),NY,NX))
       VHCP(0,NY,NX)=cpo*ORGC(0,NY,NX)+cpw*VOLW(0,NY,NX) &
         +cpi*VOLI(0,NY,NX)
-      VHCM(0,NY,NX)=0.0
-      VOLAI(0,NY,NX)=0.0
+      VHCM(0,NY,NX)=0.0_r8
+      VOLAI(0,NY,NX)=0.0_r8
 9890  CONTINUE
 9895  CONTINUE
   end subroutine InitSoilVars
@@ -356,54 +347,60 @@ module StartsMod
 
   integer  :: L,M,K,N,KK,NN,NGL
   real(r8) :: CORGCM,HCX,TORGC
-  real(r8) :: CORGL
-!     begin_execution
-!     RSC,RSC,RSP=C,N,P in fine(1),woody(0),manure(2) litter (g m-2)
-!     CORGC,CORGR,CORGN,CORGP=SOC,POC,SON,SOP (g Mg-1)
-!     BKVL=soil mass (Mg)
+  real(r8) :: CORGL,TORGLL
+! begin_execution
+! RSC,RSC,RSP=C,N,P in fine(1),woody(0),manure(2) litter (g m-2)
+! CORGC,CORGR,CORGN,CORGP=SOC,POC,SON,SOP (g Mg-1)
+! BKVL=soil mass (Mg)
 !
 
-        !
-        !     INITIALIZE SOM FROM ORGANIC INPUTS IN SOIL FILE FROM 'READS'
-        !
-        !     CORGC,CORGR,CORGN,CORGP=SOC,POC,SON,SOP (g Mg-1)
-        !
-        TORGC=0.0
-        DO 1190 L=NU(NY,NX),NL(NY,NX)
-          !     CORGCZ=CORGC(L,NY,NX)
-          !     CORGRZ=CORGR(L,NY,NX)
-          !     CORGNZ=CORGN(L,NY,NX)
-          !     CORGPZ=CORGP(L,NY,NX)
-          !
-          !     ALLOCATE SOC TO POC(3) AND HUMUS(4)
-          !
-          !     CORGCX(3)=CORGRZ
-          !     CORGCX(4)=AMAX1(0.0,CORGCZ-CORGCX(3))
-          !     CORGNX(3)=AMIN1(CNRH(3)*CORGCX(3),CORGNZ)
-          !     CORGNX(4)=AMAX1(0.0,CORGNZ-CORGNX(3))
-          !     CORGPX(3)=AMIN1(CPRH(3)*CORGCX(3),CORGPZ)
-          !     CORGPX(4)=AMAX1(0.0,CORGPZ-CORGPX(3))
-          CORGL=AMAX1(0.0,CORGC(L,NY,NX)-CORGR(L,NY,NX))
-          TORGL(L)=TORGC+CORGL*BKVL(L,NY,NX)/AREA(3,L,NY,NX)*0.5
-          TORGC=TORGC+CORGL*BKVL(L,NY,NX)/AREA(3,L,NY,NX)
+!
+!     INITIALIZE SOM FROM ORGANIC INPUTS IN SOIL FILE FROM 'READS'
+!
+!     CORGC,CORGR,CORGN,CORGP=SOC,POC,SON,SOP (g Mg-1)
+!
+  TORGC=0.0_r8
+  DO 1190 L=NU(NY,NX),NL(NY,NX)
+    !     CORGCZ=CORGC(L,NY,NX)
+    !     CORGRZ=CORGR(L,NY,NX)
+    !     CORGNZ=CORGN(L,NY,NX)
+    !     CORGPZ=CORGP(L,NY,NX)
+    !
+    !     ALLOCATE SOC TO POC(3) AND HUMUS(4)
+    !
+    !     CORGCX(3)=CORGRZ
+    !     CORGCX(4)=AMAX1(0.0,CORGCZ-CORGCX(3))
+    !     CORGNX(3)=AMIN1(CNRH(3)*CORGCX(3),CORGNZ)
+    !     CORGNX(4)=AMAX1(0.0,CORGNZ-CORGNX(3))
+    !     CORGPX(3)=AMIN1(CPRH(3)*CORGCX(3),CORGPZ)
+    !     CORGPX(4)=AMAX1(0.0,CORGPZ-CORGPX(3))
+    CORGL=AMAX1(0.0,CORGC(L,NY,NX)-CORGR(L,NY,NX))
+    TORGL(L)=TORGC+CORGL*BKVL(L,NY,NX)/AREA(3,L,NY,NX)*0.5
+    TORGC=TORGC+CORGL*BKVL(L,NY,NX)/AREA(3,L,NY,NX)
 1190  CONTINUE
-      !
-      !     PARAMETERS TO ALLOCATE HUMUS TO LESS OR MORE RECALCITRANT FRACTIONS
-      !
-      !     TORGL=accumulated humus down to soil layer (g m-2)
-      !     TORGM=TORGL used to calculate allocation (g m-2)
-      !     HCX=shape parameter for depth effect on allocation
-      !
-      TORGM=AMAX1(2.0E+03,AMIN1(5.0E+03,0.25*TORGL(NJ(NY,NX))))
-      IF(TORGM.GT.ZERO)THEN
-        HCX=LOG(0.5)/TORGM
-      ELSE
-        HCX=0.0
-      ENDIF
+!
+!     PARAMETERS TO ALLOCATE HUMUS TO LESS OR MORE RECALCITRANT FRACTIONS
+!
+!     TORGL=accumulated humus down to soil layer (g m-2)
+!     TORGM=TORGL used to calculate allocation (g m-2)
+!     HCX=shape parameter for depth effect on allocation
+!
+  TORGM=AMAX1(2.0E+03,AMIN1(5.0E+03,0.25*TORGL(NJ(NY,NX))))
+  IF(TORGM.GT.ZERO)THEN
+    HCX=LOG(0.5)/TORGM
+  ELSE
+    HCX=0.0_r8
+  ENDIF
 
   DO 1200 L=0,NL(NY,NX)
     !
-    call InitSOMProfile(L,NY,NX,HCX,CDPTHG,TORGL(L),CORGCM)
+    if(L==0)then
+      TORGLL=0.0_r8
+    else
+      TORGLL=TORGL(L)
+    endif
+
+    call InitSOMProfile(L,NY,NX,HCX,CDPTHG,TORGLL,CORGCM)
     !
     !     LAYER WATER, ICE, AIR CONTENTS
     !
@@ -418,18 +415,18 @@ module StartsMod
     !
     PSISE(L,NY,NX)=PSIPS
     PSISA(L,NY,NX)=-1.5E-03_r8
-    ROXYF(L,NY,NX)=0.0
-    RCO2F(L,NY,NX)=0.0
-    ROXYL(L,NY,NX)=0.0
-    RCH4F(L,NY,NX)=0.0
-    RCH4L(L,NY,NX)=0.0
+    ROXYF(L,NY,NX)=0.0_r8
+    RCO2F(L,NY,NX)=0.0_r8
+    ROXYL(L,NY,NX)=0.0_r8
+    RCH4F(L,NY,NX)=0.0_r8
+    RCH4L(L,NY,NX)=0.0_r8
     IF(L.GT.0)THEN
       IF(BKDS(L,NY,NX).GT.ZERO)THEN
         PTDS=1.0E-06_r8*(1.30*CORGCM+2.66_r8*(1.0E+06_r8-CORGCM))
         POROS(L,NY,NX)=1.0_r8-(BKDS(L,NY,NX)/PTDS)
       ELSE
         !for ponding water
-        PTDS=0.0
+        PTDS=0.0_r8
         POROS(L,NY,NX)=1.0_r8
       ENDIF
       POROSI(L,NY,NX)=POROS(L,NY,NX)*FMPR(L,NY,NX)
@@ -455,7 +452,7 @@ module StartsMod
         VHCM(L,NY,NX)=((2.496*VORGC+2.385*VMINL+2.128*VSAND) &
           *FMPR(L,NY,NX)+2.128*ROCK(L,NY,NX))*VOLT(L,NY,NX)
       ELSE
-        VHCM(L,NY,NX)=0.0
+        VHCM(L,NY,NX)=0.0_r8
       ENDIF
 !
       !     INITIAL SOIL WATER AND ICE CONTENTS
@@ -468,7 +465,7 @@ module StartsMod
         ELSEIF(test_aeqb(THW(L,NY,NX),0.0_r8))THEN
           THETW(L,NY,NX)=WP(L,NY,NX)
         ELSEIF(THW(L,NY,NX).LT.0.0)THEN
-          THETW(L,NY,NX)=0.0
+          THETW(L,NY,NX)=0.0_r8
         ELSE
           THETW(L,NY,NX)=THW(L,NY,NX)
         ENDIF
@@ -479,7 +476,7 @@ module StartsMod
         ELSEIF(test_aeqb(THI(L,NY,NX),0.0_r8))THEN
           THETI(L,NY,NX)=AMAX1(0.0,AMIN1(WP(L,NY,NX),POROS(L,NY,NX)-THW(L,NY,NX)))
         ELSEIF(THI(L,NY,NX).LT.0.0)THEN
-          THETI(L,NY,NX)=0.0
+          THETI(L,NY,NX)=0.0_r8
         ELSE
           THETI(L,NY,NX)=THI(L,NY,NX)
         ENDIF
@@ -510,54 +507,54 @@ module StartsMod
     !
     !     INITIALIZE FERTILIZER ARRAYS
     !
-    ZNH4FA(L,NY,NX)=0.0
-    ZNH3FA(L,NY,NX)=0.0
-    ZNHUFA(L,NY,NX)=0.0
-    ZNO3FA(L,NY,NX)=0.0
+    ZNH4FA(L,NY,NX)=0.0_r8
+    ZNH3FA(L,NY,NX)=0.0_r8
+    ZNHUFA(L,NY,NX)=0.0_r8
+    ZNO3FA(L,NY,NX)=0.0_r8
     IF(L.GT.0)THEN
-      ZNH4FB(L,NY,NX)=0.0
-      ZNH3FB(L,NY,NX)=0.0
-      ZNHUFB(L,NY,NX)=0.0
-      ZNO3FB(L,NY,NX)=0.0
-      WDNHB(L,NY,NX)=0.0
-      DPNHB(L,NY,NX)=0.0
-      WDNOB(L,NY,NX)=0.0
-      DPNOB(L,NY,NX)=0.0
-      WDPOB(L,NY,NX)=0.0
-      DPPOB(L,NY,NX)=0.0
+      ZNH4FB(L,NY,NX)=0.0_r8
+      ZNH3FB(L,NY,NX)=0.0_r8
+      ZNHUFB(L,NY,NX)=0.0_r8
+      ZNO3FB(L,NY,NX)=0.0_r8
+      WDNHB(L,NY,NX)=0.0_r8
+      DPNHB(L,NY,NX)=0.0_r8
+      WDNOB(L,NY,NX)=0.0_r8
+      DPNOB(L,NY,NX)=0.0_r8
+      WDPOB(L,NY,NX)=0.0_r8
+      DPPOB(L,NY,NX)=0.0_r8
     ENDIF
     VLNH4(L,NY,NX)=1.0
     VLNO3(L,NY,NX)=1.0
     VLPO4(L,NY,NX)=1.0
-    VLNHB(L,NY,NX)=0.0
-    VLNOB(L,NY,NX)=0.0
-    VLPOB(L,NY,NX)=0.0
-    ROXYX(L,NY,NX)=0.0
-    RNH4X(L,NY,NX)=0.0
-    RNO3X(L,NY,NX)=0.0
-    RNO2X(L,NY,NX)=0.0
-    RN2OX(L,NY,NX)=0.0
-    RPO4X(L,NY,NX)=0.0
-    RP14X(L,NY,NX)=0.0
-    RVMXC(L,NY,NX)=0.0
-    RNHBX(L,NY,NX)=0.0
-    RN3BX(L,NY,NX)=0.0
-    RN2BX(L,NY,NX)=0.0
-    RPOBX(L,NY,NX)=0.0
-    RP1BX(L,NY,NX)=0.0
-    RVMBC(L,NY,NX)=0.0
+    VLNHB(L,NY,NX)=0.0_r8
+    VLNOB(L,NY,NX)=0.0_r8
+    VLPOB(L,NY,NX)=0.0_r8
+    ROXYX(L,NY,NX)=0.0_r8
+    RNH4X(L,NY,NX)=0.0_r8
+    RNO3X(L,NY,NX)=0.0_r8
+    RNO2X(L,NY,NX)=0.0_r8
+    RN2OX(L,NY,NX)=0.0_r8
+    RPO4X(L,NY,NX)=0.0_r8
+    RP14X(L,NY,NX)=0.0_r8
+    RVMXC(L,NY,NX)=0.0_r8
+    RNHBX(L,NY,NX)=0.0_r8
+    RN3BX(L,NY,NX)=0.0_r8
+    RN2BX(L,NY,NX)=0.0_r8
+    RPOBX(L,NY,NX)=0.0_r8
+    RP1BX(L,NY,NX)=0.0_r8
+    RVMBC(L,NY,NX)=0.0_r8
     DO 1250 K=0,4
       IF(L.GT.0)THEN
-        COCU(K,L,NY,NX)=0.0
-        CONU(K,L,NY,NX)=0.0
-        COPU(K,L,NY,NX)=0.0
-        COAU(K,L,NY,NX)=0.0
+        COCU(K,L,NY,NX)=0.0_r8
+        CONU(K,L,NY,NX)=0.0_r8
+        COPU(K,L,NY,NX)=0.0_r8
+        COAU(K,L,NY,NX)=0.0_r8
       ENDIF
 1250  CONTINUE
-    ZNHUI(L,NY,NX)=0.0
-    ZNHU0(L,NY,NX)=0.0
-    ZNFNI(L,NY,NX)=0.0
-    ZNFN0(L,NY,NX)=0.0
+    ZNHUI(L,NY,NX)=0.0_r8
+    ZNHU0(L,NY,NX)=0.0_r8
+    ZNFNI(L,NY,NX)=0.0_r8
+    ZNFN0(L,NY,NX)=0.0_r8
 1200  CONTINUE
   end subroutine InitSoilProfile
 
@@ -580,14 +577,14 @@ module StartsMod
 ! TKW,TCW=later temperature K,oC
 ! VHCPW=layer volumetric heat capacity (MJ m-3 K-1)
 !
-  CDPTHS(0,NY,NX)=0.0
+  CDPTHS(0,NY,NX)=0.0_r8
   DENS0(NY,NX)=0.10
   VOLSS(NY,NX)=DPTHS(NY,NX)*DENS0(NY,NX)*DH(NY,NX)*DV(NY,NX)
-  VOLWS(NY,NX)=0.0
-  VOLIS(NY,NX)=0.0
+  VOLWS(NY,NX)=0.0_r8
+  VOLIS(NY,NX)=0.0_r8
   VOLS(NY,NX)=VOLSS(NY,NX)/DENS0(NY,NX)+VOLWS(NY,NX)+VOLIS(NY,NX)
   DPTHA(NY,NX)=9999.0
-  VOLSWI=0.0
+  VOLSWI=0.0_r8
   DO 9580 L=1,JS
     IF(L.EQ.1)THEN
       DLYRSI=CDPTHSI(L)
@@ -597,8 +594,8 @@ module StartsMod
       DLYRS(L,NY,NX)=AMIN1(DLYRSI,AMAX1(0.0,DPTHS(NY,NX)-CDPTHSI(L-1)))
     ENDIF
     VOLSSL(L,NY,NX)=DLYRS(L,NY,NX)*DENS0(NY,NX)*DH(NY,NX)*DV(NY,NX)
-    VOLWSL(L,NY,NX)=0.0
-    VOLISL(L,NY,NX)=0.0
+    VOLWSL(L,NY,NX)=0.0_r8
+    VOLISL(L,NY,NX)=0.0_r8
     IF(L.EQ.1)THEN
       VOLSWI=VOLSWI+0.5*(VOLSSL(L,NY,NX)+VOLWSL(L,NY,NX)+VOLISL(L,NY,NX)*DENSI)
     ELSE
@@ -623,32 +620,32 @@ module StartsMod
 ! CNOFC,CPOFC=fractions to allocate N,P to kinetic components
 ! CNOMC,CPOMC=maximum N:C and P:C ratios in microbial biomass
 
-  CNOFC(1,0)=0.005
-  CNOFC(2,0)=0.005
-  CNOFC(3,0)=0.005
-  CNOFC(4,0)=0.020
-  CPOFC(1,0)=0.0005
-  CPOFC(2,0)=0.0005
-  CPOFC(3,0)=0.0005
-  CPOFC(4,0)=0.0020
-  CNOFC(1,1)=0.020
-  CNOFC(2,1)=0.020
-  CNOFC(3,1)=0.020
-  CNOFC(4,1)=0.020
-  CPOFC(1,1)=0.0020
-  CPOFC(2,1)=0.0020
-  CPOFC(3,1)=0.0020
-  CPOFC(4,1)=0.0020
-  CNOFC(1,2)=0.020
-  CNOFC(2,2)=0.020
-  CNOFC(3,2)=0.020
-  CNOFC(4,2)=0.020
-  CPOFC(1,2)=0.0020
-  CPOFC(2,2)=0.0020
-  CPOFC(3,2)=0.0020
-  CPOFC(4,2)=0.0020
-  FL(1)=0.55
-  FL(2)=0.45
+  CNOFC(1,0)=0.005_r8
+  CNOFC(2,0)=0.005_r8
+  CNOFC(3,0)=0.005_r8
+  CNOFC(4,0)=0.020_r8
+  CPOFC(1,0)=0.0005_r8
+  CPOFC(2,0)=0.0005_r8
+  CPOFC(3,0)=0.0005_r8
+  CPOFC(4,0)=0.0020_r8
+  CNOFC(1,1)=0.020_r8
+  CNOFC(2,1)=0.020_r8
+  CNOFC(3,1)=0.020_r8
+  CNOFC(4,1)=0.020_r8
+  CPOFC(1,1)=0.0020_r8
+  CPOFC(2,1)=0.0020_r8
+  CPOFC(3,1)=0.0020_r8
+  CPOFC(4,1)=0.0020_r8
+  CNOFC(1,2)=0.020_r8
+  CNOFC(2,2)=0.020_r8
+  CNOFC(3,2)=0.020_r8
+  CNOFC(4,2)=0.020_r8
+  CPOFC(1,2)=0.0020_r8
+  CPOFC(2,2)=0.0020_r8
+  CPOFC(3,2)=0.0020_r8
+  CPOFC(4,2)=0.0020_r8
+  FL(1)=0.55_r8
+  FL(2)=0.45_r8
   DO 95 K=0,5
     DO  N=1,7
       IF(K.LE.4.AND.N.EQ.3)THEN
@@ -790,23 +787,35 @@ module StartsMod
   !     THETX=minimum air-filled porosity for gas flux calculations
   !     THETPI,DENSI=ice porosity,density
   !
+  BKRS=(/0.0333_r8,0.0167_r8,0.0167_r8/)
+
+  FORGC=0.1E+06_r8
+  FVLWB=1.0_r8
+  FCH4F=0.01_r8
+  PSIHY=-2500.0_r8
+  FCI=0.05_r8
+  WPI=0.025_r8
+  CDPTHSI=(/0.05_r8,0.15_r8,0.30_r8,0.60_r8,1.00_r8/)
+  POROQ=0.66_r8
+
   call InitSOMConsts
+
   NPH=NPX
   NPT=NPY
   NPG=NPH*NPT
   NPR=30
   NPS=10
-  XNPH=1.0/NPH
-  XNPT=1.0/NPT
-  XNPG=1.0/NPG
-  XNPR=1.0/NPR
-  XNPS=1.0/NPS
+  XNPH=1.0_r8/NPH
+  XNPT=1.0_r8/NPT
+  XNPG=1.0_r8/NPG
+  XNPR=1.0_r8/NPR
+  XNPS=1.0_r8/NPS
   XNPY=XNPH*XNPS
   XNPZ=XNPH*XNPR
   XNPQ=XNPZ*XNPS
   XNPV=XNPR*XNPS
   XNPD=600.0*XNPG
-  XNPX=AMIN1(1.0,20.0*XNPH)
+  XNPX=AMIN1(1.0_r8,20.0_r8*XNPH)
   XNPA=XNPX*XNPS
   XNPB=XNPX*XNPR
   XNPC=XNPX*XNPV
@@ -814,46 +823,46 @@ module StartsMod
   !     IF(NHE.GT.NHW)NDIM=NDIM+1
   !     IF(NVS.GT.NVN)NDIM=NDIM+1
   !     XDIM=1.0/NDIM
-  ZERO=1.0E-15
-  ZERO2=1.0E-08
-  TAREA=0.0
-  THETX=1.0E-03
-  THETPI=0.00
-  DENSI=0.92-THETPI
-  DENSJ=1.0-DENSI
+  ZERO=1.0E-15_r8
+  ZERO2=1.0E-08_r8
+  TAREA=0.0_r8
+  THETX=1.0E-03_r8
+  THETPI=0.00_r8
+  DENSI=0.92_r8-THETPI
+  DENSJ=1.0_r8-DENSI
   !
   !     INITIALIZE MASS BALANCE CHECKS
   !
-  CRAIN=0.0
-  HEATIN=0.0
-  CO2GIN=0.0
-  OXYGIN=0.0
-  H2GIN=0.0
-  TZIN=0.0
-  ZN2GIN=0.0
-  TPIN=0.0
-  TORGF=0.0
-  TORGN=0.0
-  TORGP=0.0
-  VOLWOU=0.0
-  CEVAP=0.0
-  CRUN=0.0
-  HEATOU=0.0
-  OXYGOU=0.0
-  H2GOU=0.0
-  TSEDOU=0.0
-  TCOU=0.0
-  TZOU=0.0
-  TPOU=0.0
-  XCSN=0.0
-  XZSN=0.0
-  XPSN=0.0
-  TIONIN=0.0
-  TIONOU=0.0
+  CRAIN=0.0_r8
+  HEATIN=0.0_r8
+  CO2GIN=0.0_r8
+  OXYGIN=0.0_r8
+  H2GIN=0.0_r8
+  TZIN=0.0_r8
+  ZN2GIN=0.0_r8
+  TPIN=0.0_r8
+  TORGF=0.0_r8
+  TORGN=0.0_r8
+  TORGP=0.0_r8
+  VOLWOU=0.0_r8
+  CEVAP=0.0_r8
+  CRUN=0.0_r8
+  HEATOU=0.0_r8
+  OXYGOU=0.0_r8
+  H2GOU=0.0_r8
+  TSEDOU=0.0_r8
+  TCOU=0.0_r8
+  TZOU=0.0_r8
+  TPOU=0.0_r8
+  XCSN=0.0_r8
+  XZSN=0.0_r8
+  XPSN=0.0_r8
+  TIONIN=0.0_r8
+  TIONOU=0.0_r8
   VAP=2465.0_r8   !kJ/kg
   VAPS=2834.0_r8
-  OXKM=0.080
-  TYSIN=0.0
+  OXKM=0.080_r8
+  TYSIN=0.0_r8
   end subroutine InitControlParameters
 !------------------------------------------------------------------------------------------
   subroutine InitAccumulators(NY,NX)

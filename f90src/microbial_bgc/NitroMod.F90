@@ -198,8 +198,6 @@ module nitroMod
   real(r8),allocatable :: RIP14R(:,:,:)
 
 !
-
-
   REAL(r8) :: WFNG,TFNX,TFNY,CNSHZ,CPSHZ,FRM
 
   public :: nitro, initNitro
@@ -456,10 +454,12 @@ module nitroMod
         XOQPZ(K)=0.0_r8
         XOQAZ(K)=0.0_r8
         DO 845 N=1,7
-          DO M=1,3
-            XOMCZ(M,NGL,N,K)=0.0_r8
-            XOMNZ(M,NGL,N,K)=0.0_r8
-            XOMPZ(M,NGL,N,K)=0.0_r8
+          DO NGL=1,JG
+            DO M=1,3
+              XOMCZ(M,NGL,N,K)=0.0_r8
+              XOMNZ(M,NGL,N,K)=0.0_r8
+              XOMPZ(M,NGL,N,K)=0.0_r8
+            enddo
           enddo
 845     CONTINUE
         !     IF((I/10)*10.EQ.I.AND.J.EQ.24.AND.L.LE.1)THEN
@@ -2653,10 +2653,12 @@ module nitroMod
     XOQPS(K,L,NY,NX)=XOQPS(K,L,NY,NX)+RDOHP(K)
     XOQAS(K,L,NY,NX)=XOQAS(K,L,NY,NX)+RDOHA(K)
     DO 670 N=1,7
-      XOQCS(K,L,NY,NX)=XOQCS(K,L,NY,NX)-CGOQC(NGL,N,K)
-      XOQNS(K,L,NY,NX)=XOQNS(K,L,NY,NX)-CGOMN(NGL,N,K)
-      XOQPS(K,L,NY,NX)=XOQPS(K,L,NY,NX)-CGOMP(NGL,N,K)
-      XOQAS(K,L,NY,NX)=XOQAS(K,L,NY,NX)-CGOAC(NGL,N,K)+RCH3X(NGL,N,K)
+      DO NGL=1,JG
+        XOQCS(K,L,NY,NX)=XOQCS(K,L,NY,NX)-CGOQC(NGL,N,K)
+        XOQNS(K,L,NY,NX)=XOQNS(K,L,NY,NX)-CGOMN(NGL,N,K)
+        XOQPS(K,L,NY,NX)=XOQPS(K,L,NY,NX)-CGOMP(NGL,N,K)
+        XOQAS(K,L,NY,NX)=XOQAS(K,L,NY,NX)-CGOAC(NGL,N,K)+RCH3X(NGL,N,K)
+      ENDDO
 670 CONTINUE
     XOQCS(K,L,NY,NX)=XOQCS(K,L,NY,NX)-CSORP(K)
     XOQNS(K,L,NY,NX)=XOQNS(K,L,NY,NX)-ZSORP(K)

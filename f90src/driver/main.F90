@@ -6,8 +6,9 @@ PROGRAM main
 ! 'SOIL' WHICH IS THE MAIN SUBROUTINE FROM WHICH ALL OTHERS ARE CALLED
 !
   use data_kind_mod, only : r8 => SHR_KIND_R8
-  use TestMod, only : regression
-  use InitEcoSIM, only :  InitModules
+  use TestMod        , only : regression
+  use InitEcoSIM     , only :  InitModules
+  use EcoSIMDesctruct, only : DestructEcoSIM
   implicit none
 
   include "parameters.h"
@@ -146,4 +147,5 @@ PROGRAM main
   if(do_rgres)then
     call regressiontest(trim(nmlfile),trim(case_name),NHW,NVN)
   endif
+  call DestructEcoSIM
 END program main

@@ -59,8 +59,8 @@ module SOMDataType
 
   CNRH=(/3.33E-02_r8,3.33E-02_r8,3.33E-02_r8,5.00E-02_r8,12.50E-02_r8/)
   CPRH=(/3.33E-03_r8,3.33E-03_r8,3.33E-03_r8,5.00E-03_r8,12.50E-03_r8/)
-  OMCF=(/0.20,0.20,0.30,0.20,0.050,0.025,0.025/)
-  OMCA=(/0.06,0.02,0.01,0.0,0.01,0.0,0.0/)
+  OMCF=(/0.20_r8,0.20_r8,0.30_r8,0.20_r8,0.050_r8,0.025_r8,0.025_r8/)
+  OMCA=(/0.06_r8,0.02_r8,0.01_r8,0.0_r8,0.01_r8,0.0_r8,0.0_r8/)
   end subroutine InitSOMData
 !------------------------------------------------------------------------------------------
 
@@ -113,5 +113,55 @@ module SOMDataType
   allocate(CORGR(JZ,JY,JX))
   allocate(CFOMC(2,JZ,JY,JX))
   end subroutine InitAllocate
+!------------------------------------------------------------------------------------------
 
+  subroutine DestructSOMData
+
+  implicit none
+
+  deallocate(RSC)
+  deallocate(RSN)
+  deallocate(RSP)
+  deallocate(CFOSC)
+  deallocate(CNOSC)
+  deallocate(CPOSC)
+  deallocate(CNOFC)
+  deallocate(CPOFC)
+  deallocate(CNRH)
+  deallocate(CPRH)
+  deallocate(OSC)
+  deallocate(OSN)
+  deallocate(OSP)
+  deallocate(OHC)
+  deallocate(OHN)
+  deallocate(OHP)
+  deallocate(OHA)
+  deallocate(ORC)
+  deallocate(ORN)
+  deallocate(ORP)
+  deallocate(OQC)
+  deallocate(OQN)
+  deallocate(OQP)
+  deallocate(OQA)
+  deallocate(OQCH)
+  deallocate(OQNH)
+  deallocate(OQPH)
+  deallocate(OQAH)
+  deallocate(ORGC)
+  deallocate(ORGN)
+  deallocate(OMCI)
+  deallocate(OMCF)
+  deallocate(OMCA)
+  deallocate(IXTYP)
+  deallocate(RC0)
+  deallocate(ORGCX)
+  deallocate(OSA)
+  deallocate(ORGR)
+  deallocate(CORGC)
+  deallocate(CORGN)
+  deallocate(CORGP)
+  deallocate(CORGR)
+  deallocate(CFOMC)
+
+  end subroutine DestructSOMData
 end module SOMDataType

@@ -13,8 +13,8 @@ module InitSOMBGC
   include "blk2a.h"
   include "blk11a.h"
 
-!     CORGCX,CORGNX,CORGPX=C,N,P concentations from woody(0),
-!     non-woody(1), manure(2), litter, POC(3) and humus(4) (g Mg-1)
+! CORGCX,CORGNX,CORGPX=C,N,P concentations from woody(0),
+! non-woody(1), manure(2), litter, POC(3) and humus(4) (g Mg-1)
 
   real(r8) :: CORGCX(0:4)
   real(r8) :: CNOSCT(0:4),CPOSCT(0:4)
@@ -37,13 +37,14 @@ module InitSOMBGC
   subroutine InitSOMConsts
   implicit none
 
-  OHCK=(/0.05,0.05,0.05,0.05,0.05/)
-  OMCK=(/0.01,0.01,0.01,0.01,0.01/)
-  ORCK=(/0.25,0.25,0.25,0.25,0.25/)
-  OQCK=(/0.005,0.005,0.005,0.005,0.005/)
-  OMCI1=reshape((/0.010,0.050,0.005,0.050,0.050,0.005,0.050,0.050,0.005 &
-    ,0.010,0.050,0.005,0.010,0.050,0.005/),shape(OMCI1))
-  ORCI=reshape((/0.01,0.05,0.01,0.05,0.01,0.05,0.001,0.005,0.001,0.005/),shape(ORCI))
+  OHCK=(/0.05_r8,0.05_r8,0.05_r8,0.05_r8,0.05_r8/)
+  OMCK=(/0.01_r8,0.01_r8,0.01_r8,0.01_r8,0.01_r8/)
+  ORCK=(/0.25_r8,0.25_r8,0.25_r8,0.25_r8,0.25_r8/)
+  OQCK=(/0.005_r8,0.005_r8,0.005_r8,0.005_r8,0.005_r8/)
+  OMCI1=reshape((/0.010_r8,0.050_r8,0.005_r8,0.050_r8,0.050_r8,0.005_r8,0.050_r8 &
+    ,0.050_r8,0.005_r8,0.010_r8,0.050_r8,0.005_r8,0.010_r8,0.050_r8,0.005_r8/),shape(OMCI1))
+  ORCI=reshape((/0.01_r8,0.05_r8,0.01_r8,0.05_r8,0.01_r8,0.05_r8,0.001_r8,0.005_r8 &
+    ,0.001_r8,0.005_r8/),shape(ORCI))
 
 
   OMCI=OMCI1/real(JG,r8)
@@ -73,11 +74,11 @@ module InitSOMBGC
 ! begin_execution
 
   DO 975 K=0,2
-    CNOSCT(K)=0.0
-    CPOSCT(K)=0.0
+    CNOSCT(K)=0.0_r8
+    CPOSCT(K)=0.0_r8
     IF(RSC(K,L,NY,NX).GT.ZEROS(NY,NX))THEN
-      RNT=0.0
-      RPT=0.0
+      RNT=0.0_r8
+      RPT=0.0_r8
       DO 970 M=1,4
         RNT=RNT+RSC(K,L,NY,NX)*CFOSC(M,K,L,NY,NX)*CNOFC(M,K)
         RPT=RPT+RSC(K,L,NY,NX)*CFOSC(M,K,L,NY,NX)*CPOFC(M,K)
@@ -100,8 +101,8 @@ module InitSOMBGC
     ENDIF
 975 CONTINUE
   DO 990 K=3,4
-    CNOSCT(K)=0.0
-    CPOSCT(K)=0.0
+    CNOSCT(K)=0.0_r8
+    CPOSCT(K)=0.0_r8
     IF(CORGCX(K).GT.ZERO)THEN
       DO 985 M=1,4
         CNOSC(M,K,L,NY,NX)=CORGNX(K)/CORGCX(K)
@@ -126,9 +127,9 @@ module InitSOMBGC
   !     OSCM=total biomass in each complex (g)
   !     DCKR,DCKM=parameters to initialize microbial biomass from SOC
   !
-  TOSCI=0.0
-  TOSNI=0.0
-  TOSPI=0.0
+  TOSCI=0.0_r8
+  TOSNI=0.0_r8
+  TOSPI=0.0_r8
   DO 995 K=0,4
     IF(L.EQ.0)THEN
       KK=K
@@ -154,15 +155,15 @@ module InitSOMBGC
     TOSCI=TOSCI+OSCI(K)*TOSCK(K)
     TOSNI=TOSNI+OSCI(K)*TOSNK(K)
     TOSPI=TOSPI+OSCI(K)*TOSPK(K)
-    OSCX(K)=0.0
-    OSNX(K)=0.0
-    OSPX(K)=0.0
+    OSCX(K)=0.0_r8
+    OSNX(K)=0.0_r8
+    OSPX(K)=0.0_r8
 995 CONTINUE
-!  TOMC=0.0
+!  TOMC=0.0_r8
   DO 8995 K=0,4
     IF(L.EQ.0)THEN
       OSCM(K)=DCKR*CORGCX(K)*BKVL(L,NY,NX)
-      X=0.0
+      X=0.0_r8
       KK=K
       FOSCI=1.0
       FOSNI=1.0
@@ -193,9 +194,9 @@ module InitSOMBGC
         FOSNI=AMIN1(1.0,OSCI(KK)*CNOSCT(KK)/TOSNI)
         FOSPI=AMIN1(1.0,OSCI(KK)*CPOSCT(KK)/TOSPI)
       ELSE
-        FOSCI=0.0
-        FOSNI=0.0
-        FOSPI=0.0
+        FOSCI=0.0_r8
+        FOSNI=0.0_r8
+        FOSPI=0.0_r8
       ENDIF
     ENDIF
     !
@@ -210,9 +211,9 @@ module InitSOMBGC
     DO 7990 N=1,7
       DO NGL=1,JG
         DO 7985 M=1,3
-          OMC(M,NGL,N,5,L,NY,NX)=0.0
-          OMN(M,NGL,N,5,L,NY,NX)=0.0
-          OMP(M,NGL,N,5,L,NY,NX)=0.0
+          OMC(M,NGL,N,5,L,NY,NX)=0.0_r8
+          OMN(M,NGL,N,5,L,NY,NX)=0.0_r8
+          OMP(M,NGL,N,5,L,NY,NX)=0.0_r8
 7985    CONTINUE
       enddo
 7990  CONTINUE
@@ -262,11 +263,11 @@ module InitSOMBGC
     OQC(K,L,NY,NX)=X*AMAX1(0.0,OSCM(K)*OQCK(K)*FOSCI)
     OQN(K,L,NY,NX)=AMAX1(0.0,OQC(K,L,NY,NX)*CNOSCT(KK)*FOSNI)
     OQP(K,L,NY,NX)=AMAX1(0.0,OQC(K,L,NY,NX)*CPOSCT(KK)*FOSPI)
-    OQA(K,L,NY,NX)=0.0
-    OQCH(K,L,NY,NX)=0.0
-    OQNH(K,L,NY,NX)=0.0
-    OQPH(K,L,NY,NX)=0.0
-    OQAH(K,L,NY,NX)=0.0
+    OQA(K,L,NY,NX)=0.0_r8
+    OQCH(K,L,NY,NX)=0.0_r8
+    OQNH(K,L,NY,NX)=0.0_r8
+    OQPH(K,L,NY,NX)=0.0_r8
+    OQAH(K,L,NY,NX)=0.0_r8
     OSCX(KK)=OSCX(KK)+OQC(K,L,NY,NX)
     OSNX(KK)=OSNX(KK)+OQN(K,L,NY,NX)
     OSPX(KK)=OSPX(KK)+OQP(K,L,NY,NX)
@@ -278,7 +279,7 @@ module InitSOMBGC
     OHC(K,L,NY,NX)=X*AMAX1(0.0,OSCM(K)*OHCK(K)*FOSCI)
     OHN(K,L,NY,NX)=AMAX1(0.0,OHC(K,L,NY,NX)*CNOSCT(KK)*FOSNI)
     OHP(K,L,NY,NX)=AMAX1(0.0,OHC(K,L,NY,NX)*CPOSCT(KK)*FOSPI)
-    OHA(K,L,NY,NX)=0.0
+    OHA(K,L,NY,NX)=0.0_r8
     OSCX(KK)=OSCX(KK)+OHC(K,L,NY,NX)+OHA(K,L,NY,NX)
     OSNX(KK)=OSNX(KK)+OHN(K,L,NY,NX)
     OSPX(KK)=OSPX(KK)+OHP(K,L,NY,NX)
@@ -293,16 +294,16 @@ module InitSOMBGC
         OSN(M,K,L,NY,NX)=AMAX1(0.0,CFOSC(M,K,L,NY,NX)*CNOSC(M,K,L,NY,NX) &
           /CNOSCT(K)*(OSNI(K)-OSNX(K)))
       ELSE
-        OSN(M,K,L,NY,NX)=0.0
+        OSN(M,K,L,NY,NX)=0.0_r8
       ENDIF
       IF(CPOSCT(K).GT.ZERO)THEN
         OSP(M,K,L,NY,NX)=AMAX1(0.0,CFOSC(M,K,L,NY,NX)*CPOSC(M,K,L,NY,NX) &
           /CPOSCT(K)*(OSPI(K)-OSPX(K)))
       ELSE
-        OSP(M,K,L,NY,NX)=0.0
+        OSP(M,K,L,NY,NX)=0.0_r8
       ENDIF
       IF(K.EQ.0)THEN
-        OSA(M,K,L,NY,NX)=OSC(M,K,L,NY,NX)*OMCI(1,K)*dble(JG)
+        OSA(M,K,L,NY,NX)=OSC(M,K,L,NY,NX)*OMCI(1,K)*real(JG,r8)
       ELSE
         OSA(M,K,L,NY,NX)=OSC(M,K,L,NY,NX)
       ENDIF
@@ -311,30 +312,30 @@ module InitSOMBGC
   !
   !     ADD ALL LITTER,POC,HUMUS COMPONENTS TO GET TOTAL SOC
   !
-  OC=0.0
-  ON=0.0
-  OP=0.0
-  RC=0.0
+  OC=0.0_r8
+  ON=0.0_r8
+  OP=0.0_r8
+  RC=0.0_r8
   IF(L.EQ.0)THEN
     DO 6975 K=0,5
-      RC0(K,NY,NX)=0.0
+      RC0(K,NY,NX)=0.0_r8
 6975  CONTINUE
   ENDIF
   DO 6990 K=0,5
     DO  N=1,7
       do NGL=1,JG
-        ROXYS(NGL,N,K,L,NY,NX)=0.0
-        RVMX4(NGL,N,K,L,NY,NX)=0.0
-        RVMX3(NGL,N,K,L,NY,NX)=0.0
-        RVMX2(NGL,N,K,L,NY,NX)=0.0
-        RVMX1(NGL,N,K,L,NY,NX)=0.0
-        RINHO(NGL,N,K,L,NY,NX)=0.0
-        RINOO(NGL,N,K,L,NY,NX)=0.0
-        RIPOO(NGL,N,K,L,NY,NX)=0.0
+        ROXYS(NGL,N,K,L,NY,NX)=0.0_r8
+        RVMX4(NGL,N,K,L,NY,NX)=0.0_r8
+        RVMX3(NGL,N,K,L,NY,NX)=0.0_r8
+        RVMX2(NGL,N,K,L,NY,NX)=0.0_r8
+        RVMX1(NGL,N,K,L,NY,NX)=0.0_r8
+        RINHO(NGL,N,K,L,NY,NX)=0.0_r8
+        RINOO(NGL,N,K,L,NY,NX)=0.0_r8
+        RIPOO(NGL,N,K,L,NY,NX)=0.0_r8
         IF(L.EQ.0)THEN
-          RINHOR(NGL,N,K,NY,NX)=0.0
-          RINOOR(NGL,N,K,NY,NX)=0.0
-          RIPOOR(NGL,N,K,NY,NX)=0.0
+          RINHOR(NGL,N,K,NY,NX)=0.0_r8
+          RINOOR(NGL,N,K,NY,NX)=0.0_r8
+          RIPOOR(NGL,N,K,NY,NX)=0.0_r8
         ENDIF
         DO  M=1,3
           OC=OC+OMC(M,NGL,N,K,L,NY,NX)
@@ -404,120 +405,120 @@ module InitSOMBGC
     !
     !     PREVIOUS COARSE WOODY RESIDUE
     !
-    CFOSC(1,0,L,NY,NX)=0.000
-    CFOSC(2,0,L,NY,NX)=0.045
-    CFOSC(3,0,L,NY,NX)=0.660
-    CFOSC(4,0,L,NY,NX)=0.295
+    CFOSC(1,0,L,NY,NX)=0.000_r8
+    CFOSC(2,0,L,NY,NX)=0.045_r8
+    CFOSC(3,0,L,NY,NX)=0.660_r8
+    CFOSC(4,0,L,NY,NX)=0.295_r8
     !
     !     MAIZE
     !
     IF(IXTYP(1,NY,NX).EQ.1)THEN
-      CFOSC(1,1,L,NY,NX)=0.080
-      CFOSC(2,1,L,NY,NX)=0.245
-      CFOSC(3,1,L,NY,NX)=0.613
-      CFOSC(4,1,L,NY,NX)=0.062
+      CFOSC(1,1,L,NY,NX)=0.080_r8
+      CFOSC(2,1,L,NY,NX)=0.245_r8
+      CFOSC(3,1,L,NY,NX)=0.613_r8
+      CFOSC(4,1,L,NY,NX)=0.062_r8
       !
       !     WHEAT
       !
     ELSEIF(IXTYP(1,NY,NX).EQ.2)THEN
-      CFOSC(1,1,L,NY,NX)=0.125
-      CFOSC(2,1,L,NY,NX)=0.171
-      CFOSC(3,1,L,NY,NX)=0.560
-      CFOSC(4,1,L,NY,NX)=0.144
+      CFOSC(1,1,L,NY,NX)=0.125_r8
+      CFOSC(2,1,L,NY,NX)=0.171_r8
+      CFOSC(3,1,L,NY,NX)=0.560_r8
+      CFOSC(4,1,L,NY,NX)=0.144_r8
 !
       !     SOYBEAN
       !
     ELSEIF(IXTYP(1,NY,NX).EQ.3)THEN
-      CFOSC(1,1,L,NY,NX)=0.138
-      CFOSC(2,1,L,NY,NX)=0.426
-      CFOSC(3,1,L,NY,NX)=0.316
-      CFOSC(4,1,L,NY,NX)=0.120
+      CFOSC(1,1,L,NY,NX)=0.138_r8
+      CFOSC(2,1,L,NY,NX)=0.426_r8
+      CFOSC(3,1,L,NY,NX)=0.316_r8
+      CFOSC(4,1,L,NY,NX)=0.120_r8
 !
       !     NEW STRAW
 !
     ELSEIF(IXTYP(1,NY,NX).EQ.4)THEN
-      CFOSC(1,1,L,NY,NX)=0.036
-      CFOSC(2,1,L,NY,NX)=0.044
-      CFOSC(3,1,L,NY,NX)=0.767
-      CFOSC(4,1,L,NY,NX)=0.153
+      CFOSC(1,1,L,NY,NX)=0.036_r8
+      CFOSC(2,1,L,NY,NX)=0.044_r8
+      CFOSC(3,1,L,NY,NX)=0.767_r8
+      CFOSC(4,1,L,NY,NX)=0.153_r8
 !
       !     OLD STRAW
 !
     ELSEIF(IXTYP(1,NY,NX).EQ.5)THEN
-      CFOSC(1,1,L,NY,NX)=0.075
-      CFOSC(2,1,L,NY,NX)=0.125
-      CFOSC(3,1,L,NY,NX)=0.550
-      CFOSC(4,1,L,NY,NX)=0.250
+      CFOSC(1,1,L,NY,NX)=0.075_r8
+      CFOSC(2,1,L,NY,NX)=0.125_r8
+      CFOSC(3,1,L,NY,NX)=0.550_r8
+      CFOSC(4,1,L,NY,NX)=0.250_r8
 !
       !     COMPOST
 !
     ELSEIF(IXTYP(1,NY,NX).EQ.6)THEN
-      CFOSC(1,1,L,NY,NX)=0.143
-      CFOSC(2,1,L,NY,NX)=0.015
-      CFOSC(3,1,L,NY,NX)=0.640
-      CFOSC(4,1,L,NY,NX)=0.202
+      CFOSC(1,1,L,NY,NX)=0.143_r8
+      CFOSC(2,1,L,NY,NX)=0.015_r8
+      CFOSC(3,1,L,NY,NX)=0.640_r8
+      CFOSC(4,1,L,NY,NX)=0.202_r8
 !
       !     GREEN MANURE
 !
     ELSEIF(IXTYP(1,NY,NX).EQ.7)THEN
-      CFOSC(1,1,L,NY,NX)=0.202
-      CFOSC(2,1,L,NY,NX)=0.013
-      CFOSC(3,1,L,NY,NX)=0.560
-      CFOSC(4,1,L,NY,NX)=0.225
+      CFOSC(1,1,L,NY,NX)=0.202_r8
+      CFOSC(2,1,L,NY,NX)=0.013_r8
+      CFOSC(3,1,L,NY,NX)=0.560_r8
+      CFOSC(4,1,L,NY,NX)=0.225_r8
 !
       !     NEW DECIDUOUS FOREST
 !
     ELSEIF(IXTYP(1,NY,NX).EQ.8)THEN
-      CFOSC(1,1,L,NY,NX)=0.07
-      CFOSC(2,1,L,NY,NX)=0.41
-      CFOSC(3,1,L,NY,NX)=0.36
-      CFOSC(4,1,L,NY,NX)=0.16
+      CFOSC(1,1,L,NY,NX)=0.07_r8
+      CFOSC(2,1,L,NY,NX)=0.41_r8
+      CFOSC(3,1,L,NY,NX)=0.36_r8
+      CFOSC(4,1,L,NY,NX)=0.16_r8
 !
       !     NEW CONIFEROUS FOREST
 !
     ELSEIF(IXTYP(1,NY,NX).EQ.9)THEN
-      CFOSC(1,1,L,NY,NX)=0.07
-      CFOSC(2,1,L,NY,NX)=0.25
-      CFOSC(3,1,L,NY,NX)=0.38
-      CFOSC(4,1,L,NY,NX)=0.30
+      CFOSC(1,1,L,NY,NX)=0.07_r8
+      CFOSC(2,1,L,NY,NX)=0.25_r8
+      CFOSC(3,1,L,NY,NX)=0.38_r8
+      CFOSC(4,1,L,NY,NX)=0.30_r8
 !
       !     OLD DECIDUOUS FOREST
 !
     ELSEIF(IXTYP(1,NY,NX).EQ.10)THEN
-      CFOSC(1,1,L,NY,NX)=0.02
-      CFOSC(2,1,L,NY,NX)=0.06
-      CFOSC(3,1,L,NY,NX)=0.34
-      CFOSC(4,1,L,NY,NX)=0.58
+      CFOSC(1,1,L,NY,NX)=0.02_r8
+      CFOSC(2,1,L,NY,NX)=0.06_r8
+      CFOSC(3,1,L,NY,NX)=0.34_r8
+      CFOSC(4,1,L,NY,NX)=0.58_r8
 !
       !     OLD CONIFEROUS FOREST
 !
     ELSEIF(IXTYP(1,NY,NX).EQ.11)THEN
-      CFOSC(1,1,L,NY,NX)=0.02
-      CFOSC(2,1,L,NY,NX)=0.06
-      CFOSC(3,1,L,NY,NX)=0.34
-      CFOSC(4,1,L,NY,NX)=0.58
+      CFOSC(1,1,L,NY,NX)=0.02_r8
+      CFOSC(2,1,L,NY,NX)=0.06_r8
+      CFOSC(3,1,L,NY,NX)=0.34_r8
+      CFOSC(4,1,L,NY,NX)=0.58_r8
 !
       !     DEFAULT
 !
     ELSE
-      CFOSC(1,1,L,NY,NX)=0.075
-      CFOSC(2,1,L,NY,NX)=0.125
-      CFOSC(3,1,L,NY,NX)=0.550
-      CFOSC(4,1,L,NY,NX)=0.250
+      CFOSC(1,1,L,NY,NX)=0.075_r8
+      CFOSC(2,1,L,NY,NX)=0.125_r8
+      CFOSC(3,1,L,NY,NX)=0.550_r8
+      CFOSC(4,1,L,NY,NX)=0.250_r8
     ENDIF
 !
     !     PREVIOUS COARSE (K=0) AND FINE (K=1) ROOTS
 !
   ELSE
-    CFOSC(1,0,L,NY,NX)=0.00
-    CFOSC(2,0,L,NY,NX)=0.00
-    CFOSC(3,0,L,NY,NX)=0.20
-    CFOSC(4,0,L,NY,NX)=0.80
-    CFOSC(1,1,L,NY,NX)=0.02
-    CFOSC(2,1,L,NY,NX)=0.06
-    CFOSC(3,1,L,NY,NX)=0.34
-    CFOSC(4,1,L,NY,NX)=0.58
-    ENDIF
+    CFOSC(1,0,L,NY,NX)=0.00_r8
+    CFOSC(2,0,L,NY,NX)=0.00_r8
+    CFOSC(3,0,L,NY,NX)=0.20_r8
+    CFOSC(4,0,L,NY,NX)=0.80_r8
+    CFOSC(1,1,L,NY,NX)=0.02_r8
+    CFOSC(2,1,L,NY,NX)=0.06_r8
+    CFOSC(3,1,L,NY,NX)=0.34_r8
+    CFOSC(4,1,L,NY,NX)=0.58_r8
+  ENDIF
   end subroutine InitSurfResiduKinetiComponent
 !------------------------------------------------------------------------------------------
   subroutine InitManureKinetiComponent(L,NY,NX)
@@ -529,26 +530,26 @@ module InitSOMBGC
   !     RUMINANT
 !
   IF(IXTYP(2,NY,NX).EQ.1)THEN
-    CFOSC(1,2,L,NY,NX)=0.036
-    CFOSC(2,2,L,NY,NX)=0.044
-    CFOSC(3,2,L,NY,NX)=0.630
-    CFOSC(4,2,L,NY,NX)=0.290
+    CFOSC(1,2,L,NY,NX)=0.036_r8
+    CFOSC(2,2,L,NY,NX)=0.044_r8
+    CFOSC(3,2,L,NY,NX)=0.630_r8
+    CFOSC(4,2,L,NY,NX)=0.290_r8
 !
     !     NON-RUMINANT
 !
   ELSEIF(IXTYP(2,NY,NX).EQ.2)THEN
-    CFOSC(1,2,L,NY,NX)=0.138
-    CFOSC(2,2,L,NY,NX)=0.401
-    CFOSC(3,2,L,NY,NX)=0.316
-    CFOSC(4,2,L,NY,NX)=0.145
+    CFOSC(1,2,L,NY,NX)=0.138_r8
+    CFOSC(2,2,L,NY,NX)=0.401_r8
+    CFOSC(3,2,L,NY,NX)=0.316_r8
+    CFOSC(4,2,L,NY,NX)=0.145_r8
 !
-    !     OTHER
+!     OTHER
 !
   ELSE
-    CFOSC(1,2,L,NY,NX)=0.138
-    CFOSC(2,2,L,NY,NX)=0.401
-    CFOSC(3,2,L,NY,NX)=0.316
-    CFOSC(4,2,L,NY,NX)=0.145
+    CFOSC(1,2,L,NY,NX)=0.138_r8
+    CFOSC(2,2,L,NY,NX)=0.401_r8
+    CFOSC(3,2,L,NY,NX)=0.316_r8
+    CFOSC(4,2,L,NY,NX)=0.145_r8
   ENDIF
   end subroutine InitManureKinetiComponent
 !------------------------------------------------------------------------------------------
@@ -558,22 +559,22 @@ module InitSOMBGC
   real(r8), intent(in):: HCX
   real(r8), intent(in):: TORGL
   real(r8), intent(in):: CDPTHG
-  real(r8) :: FCO,FCX,FCY,FC0,FC1
+  real(r8) :: FCO,FCY,FC0,FC1
 !     begin_execution
 !
 !     CFOSC=siNGLe kinetic fraction in POM
 !
   IF(L.NE.0)THEN
-    CFOSC(1,3,L,NY,NX)=1.00
-    CFOSC(2,3,L,NY,NX)=0.00
-    CFOSC(3,3,L,NY,NX)=0.00
-    CFOSC(4,3,L,NY,NX)=0.00
+    CFOSC(1,3,L,NY,NX)=1.00_r8
+    CFOSC(2,3,L,NY,NX)=0.00_r8
+    CFOSC(3,3,L,NY,NX)=0.00_r8
+    CFOSC(4,3,L,NY,NX)=0.00_r8
 !
-    !     HUMUS PARTITIONED TO DIFFERENT FRACTIONS
-    !     BASED ON SOC ACCUMULATION ABOVE EACH LAYER
-    !
-    !     NATURAL SOILS
-    !
+!     HUMUS PARTITIONED TO DIFFERENT FRACTIONS
+!     BASED ON SOC ACCUMULATION ABOVE EACH LAYER
+!
+!     NATURAL SOILS
+!
     IF(ISOILR(NY,NX).EQ.0)THEN
 !
       !     DRYLAND SOIL
@@ -625,8 +626,8 @@ module InitSOMBGC
     FC1=FC0*FCX
     CFOSC(1,4,L,NY,NX)=FC1
     CFOSC(2,4,L,NY,NX)=1.0-FC1
-    CFOSC(3,4,L,NY,NX)=0.00
-    CFOSC(4,4,L,NY,NX)=0.00
+    CFOSC(3,4,L,NY,NX)=0.00_r8
+    CFOSC(4,4,L,NY,NX)=0.00_r8
 !
 !   MICROBIAL DETRITUS ALLOCATED TO HUMUS MAINTAINS
 !   HUMUS PARTITIONING TO COMPONENTS
@@ -725,20 +726,20 @@ module InitSOMBGC
         CORGPX(3)=AMIN1(CPRH(3)*CORGCX(3),CORGPZ)
         CORGPX(4)=AMAX1(0.0,CORGPZ-CORGPX(3))
       ELSE
-        CORGCX(3)=0.0
-        CORGCX(4)=0.0
-        CORGNX(3)=0.0
-        CORGNX(4)=0.0
-        CORGPX(3)=0.0
-        CORGPX(4)=0.0
+        CORGCX(3)=0.0_r8
+        CORGCX(4)=0.0_r8
+        CORGNX(3)=0.0_r8
+        CORGNX(4)=0.0_r8
+        CORGPX(3)=0.0_r8
+        CORGPX(4)=0.0_r8
       ENDIF
     ELSE
-      CORGCX(3)=0.0
-      CORGCX(4)=0.0
-      CORGNX(3)=0.0
-      CORGNX(4)=0.0
-      CORGPX(3)=0.0
-      CORGPX(4)=0.0
+      CORGCX(3)=0.0_r8
+      CORGCX(4)=0.0_r8
+      CORGNX(3)=0.0_r8
+      CORGNX(4)=0.0_r8
+      CORGPX(3)=0.0_r8
+      CORGPX(4)=0.0_r8
     ENDIF
   end subroutine InitLitterProfile
 

@@ -51,6 +51,7 @@ subroutine regressiontest(nmfile,case_name, NX, NY)
 
         category = 'flux'
         name = 'NH4_UPTK (g m^-3 h^-1)'
+        datv=0._r8
         do ll=1,12
           if(AREA(3,ll,NY,NX)>0._r8)then
             datv(ll)=safe_adb(RUPNH4(1,ll,NZ,NY,NX)+RUPNH4(2,ll,NZ,NY,NX) &
