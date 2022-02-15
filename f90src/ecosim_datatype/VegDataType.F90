@@ -12,8 +12,8 @@ module VegDataType
 
   implicit none
 
-!  ZSIN=real((/0.195,0.556,0.831,0.981/),r8)
-!  ZCOS=real((/0.981,0.831,0.556,0.195/),r8)
+  ZSIN=real((/0.195,0.556,0.831,0.981/),r8)
+  ZCOS=real((/0.981,0.831,0.556,0.195/),r8)
 
   end subroutine InitVegData
 end module VegDataType

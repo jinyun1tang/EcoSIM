@@ -38,11 +38,11 @@ module ExecMod
 !
   IF(I.EQ.IBEGIN.OR.I.EQ.ISTART.OR.I.EQ.ILAST+1)THEN
     TLW=VOLWSO-CRAIN+CRUN+CEVAP+VOLWOU
-    if(tlw/=tlw)then
-      call print_info('tlw/=tlw',(/padr('VOLWSO',10),padr('CRAIN',10), &
-      padr('CRUN',10),padr('CEVAP',10),padr('VOLWOU',10)/), &
-      (/VOLWSO,CRAIN,CRUN,CEVAP,VOLWOU/))
-    endif
+!    if(tlw/=tlw)then
+!      call print_info('tlw/=tlw',(/padr('VOLWSO',10),padr('CRAIN',10), &
+!      padr('CRUN',10),padr('CEVAP',10),padr('VOLWOU',10)/), &
+!      (/VOLWSO,CRAIN,CRUN,CEVAP,VOLWOU/))
+!    endif
     TLH=HEATSO-HEATIN+HEATOU
     TLO=OXYGSO-OXYGIN+OXYGOU
     TLC=TLRSDC+TLORGC+TLCO2G-CO2GIN+TCOU-TORGF-XCSN

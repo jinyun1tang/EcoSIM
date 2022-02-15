@@ -298,8 +298,8 @@ module StartsMod
   !     OMEGA,OMEGX=incident aNGLe of diffuse radn at leaf,horizontal surface
   !     IALBY:1=backscattering,2=forward scattering of sky radiation
   !
-  ZSIN=real((/0.195,0.556,0.831,0.981/),r8)
-  ZCOS=real((/0.981,0.831,0.556,0.195/),r8)
+  !ZSIN=real((/0.195,0.556,0.831,0.981/),r8)
+  !ZCOS=real((/0.981,0.831,0.556,0.195/),r8)
 
   DO 205 L=1,4
     ZAZI(L)=(L-0.5)*PICON/4.0
