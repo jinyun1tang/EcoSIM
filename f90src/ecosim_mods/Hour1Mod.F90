@@ -6,6 +6,7 @@ module Hour1Mod
   use MicrobialDataType
   use SOMDataType
   use SoilChemDataType
+  use FertilizerDataType
   implicit none
 
   private
@@ -3256,7 +3257,7 @@ module Hour1Mod
       DO 2960 N=1,7
       DO NGL=1,JG
       DO 2961 M=1,3
-      OMC1=AMAX1(0.0,AMIN1(OSCI*OMCI(M,K)*OMCF(N),OSCI-OSCX))
+      OMC1=AMAX1(0.0,AMIN1(OSCI*OMCI(M+(NGL-1)*3,K)*OMCF(N),OSCI-OSCX))
       OMN1=AMAX1(0.0,AMIN1(OMC1*CNOMC(M,NGL,N,K),OSNI-OSNX))
       OMP1=AMAX1(0.0,AMIN1(OMC1*CPOMC(M,NGL,N,K),OSPI-OSPX))
       OMC(M,NGL,N,K,LFDPTH,NY,NX)=OMC(M,NGL,N,K,LFDPTH,NY,NX)+OMC1
@@ -3342,7 +3343,9 @@ module Hour1Mod
       OSP1=0.0
       ENDIF
       OSC(M,K,LFDPTH,NY,NX)=OSC(M,K,LFDPTH,NY,NX)+OSC1
-      OSA(M,K,LFDPTH,NY,NX)=OSA(M,K,LFDPTH,NY,NX)+OSC1*OMCI(1,K)*real(JG,r8)
+      DO NGL=1,JG
+        OSA(M,K,LFDPTH,NY,NX)=OSA(M,K,LFDPTH,NY,NX)+OSC1*OMCI(1+(NGL-1)*3,K)
+      ENDDO
       OSN(M,K,LFDPTH,NY,NX)=OSN(M,K,LFDPTH,NY,NX)+OSN1
       OSP(M,K,LFDPTH,NY,NX)=OSP(M,K,LFDPTH,NY,NX)+OSP1
       IF(LFDPTH.EQ.0)THEN

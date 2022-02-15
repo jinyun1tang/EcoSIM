@@ -37,6 +37,8 @@ implicit none
   real(r8),allocatable :: OMCER(:,:,:,:,:,:,:)
   real(r8),allocatable :: OMNER(:,:,:,:,:,:,:)
   real(r8),allocatable :: OMPER(:,:,:,:,:,:,:)
+  real(r8),allocatable :: OMCI(:,:)
+  real(r8) :: FL(2)
   private :: InitAllocate
 
   contains
@@ -88,6 +90,8 @@ implicit none
   allocate(OMCER(3*JG,7,0:5,2,2,JV,JH))
   allocate(OMNER(3*JG,7,0:5,2,2,JV,JH))
   allocate(OMPER(3*JG,7,0:5,2,2,JV,JH))
+  allocate(OMCI(3*JG,0:4))
+
   end subroutine InitAllocate
 !----------------------------------------------------------------------------------------------
 
@@ -124,6 +128,7 @@ implicit none
   deallocate(OMCER)
   deallocate(OMNER)
   deallocate(OMPER)
+  deallocate(OMCI)
 
   end subroutine DestructMicrobialData
 

@@ -2,6 +2,7 @@ set(ECOSIM_DATATYPE_SOURCES
 MicrobialDataType.F90
 SOMDataType.F90
 SoilChemDataType.F90
+FertilizerDataType.F90
 )
 
 include_directories(${CMAKE_BINARY_DIR}/f90src/utils/)

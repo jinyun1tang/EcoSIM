@@ -10,6 +10,7 @@ module EcoSIMDesctruct
   use MicrobialDataType, only : DestructMicrobialData
   use SoilChemDataType , only : DestructSoilChemData
   use SOMDataType      , only : DestructSOMData
+  use FertilizerDataType, only : DestructFertilizerData
   implicit none
 
   call DestructMicrobialData
@@ -17,6 +18,9 @@ module EcoSIMDesctruct
   call DestructSoilChemData
 
   call DestructSOMData
+
+  call DestructFertilizerData
+
   end subroutine DestructEcoSIM
 
 end module EcoSIMDesctruct

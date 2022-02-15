@@ -8,6 +8,7 @@
   use MicrobialDataType
   use SOMDataType
   use SoilChemDataType
+  use FertilizerDataType
   implicit none
   integer, intent(in) :: NHW,NHE,NVN,NVS
 

@@ -3,6 +3,7 @@ module ErosionMod
   use minimathmod, only : test_aeqb
   use MicrobialDataType
   use SOMDataType
+  use FertilizerDataType
   implicit none
 
   private

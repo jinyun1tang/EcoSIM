@@ -10,6 +10,7 @@ module nitroMod
   use NitroPars
   use SOMDataType
   use SoilChemDataType
+  use FertilizerDataType
   implicit none
 
   private

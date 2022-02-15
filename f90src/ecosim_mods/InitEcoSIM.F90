@@ -12,6 +12,7 @@ module InitEcoSIM
   use MicrobialDataType, only : InitMicrobialData
   use SOMDataType      , only : InitSOMData
   use SoilChemDataType , only : InitSoilChemData
+  use FertilizerDataType, only : InitFertilizerData
   implicit  none
   integer, intent(in) :: nmicbguilds
 
@@ -20,6 +21,8 @@ module InitEcoSIM
   call InitSoilChemData
 
   call InitSOMData
+
+  call InitFertilizerData
 
   call initNitro
 

@@ -6,6 +6,7 @@ module RedistMod
   use MicrobialDataType
   use SOMDataType
   use SoilChemDataType
+  use FertilizerDataType
   implicit none
 
   private
@@ -4906,7 +4907,9 @@ module RedistMod
     DO 8565 K=0,1
       DO  M=1,4
         OSC(M,K,L,NY,NX)=OSC(M,K,L,NY,NX)+CSNT(M,K,L,NY,NX)
-        OSA(M,K,L,NY,NX)=OSA(M,K,L,NY,NX)+CSNT(M,K,L,NY,NX)*OMCI(1,K)*real(JG,r8)
+        DO NGL=1,JG
+          OSA(M,K,L,NY,NX)=OSA(M,K,L,NY,NX)+CSNT(M,K,L,NY,NX)*OMCI(1+(NGL-1)*3,K)
+        ENDDO
         OSN(M,K,L,NY,NX)=OSN(M,K,L,NY,NX)+ZSNT(M,K,L,NY,NX)
         OSP(M,K,L,NY,NX)=OSP(M,K,L,NY,NX)+PSNT(M,K,L,NY,NX)
 !     IF((I/30)*30.EQ.I.AND.J.EQ.15)THEN
@@ -9512,7 +9515,9 @@ module RedistMod
   DO 6965 K=0,1
     DO  M=1,4
       OSC(M,K,0,NY,NX)=OSC(M,K,0,NY,NX)+CSNT(M,K,0,NY,NX)
-      OSA(M,K,0,NY,NX)=OSA(M,K,0,NY,NX)+CSNT(M,K,0,NY,NX)*OMCI(1,K)*real(JG,r8)
+      DO NGL=1,JG
+        OSA(M,K,0,NY,NX)=OSA(M,K,0,NY,NX)+CSNT(M,K,0,NY,NX)*OMCI(1+(NGL-1)*3,K)
+      ENDDO
       OSN(M,K,0,NY,NX)=OSN(M,K,0,NY,NX)+ZSNT(M,K,0,NY,NX)
       OSP(M,K,0,NY,NX)=OSP(M,K,0,NY,NX)+PSNT(M,K,0,NY,NX)
       ORGC(0,NY,NX)=ORGC(0,NY,NX)+CSNT(M,K,0,NY,NX)

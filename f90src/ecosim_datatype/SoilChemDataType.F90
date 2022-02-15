@@ -42,6 +42,8 @@ module SoilChemDataType
   real(r8),allocatable :: CH2P4(:,:,:)
   real(r8),allocatable :: CH2P4B(:,:,:)
   real(r8),allocatable :: H2GSH(:,:,:)
+  real(r8),allocatable :: H2GG(:,:,:)
+  real(r8),allocatable :: CH2GG(:,:,:)
   private :: InitAllocate
 
   contains
@@ -99,6 +101,8 @@ module SoilChemDataType
   allocate(CH2P4(0:JZ,JY,JX))
   allocate(CH2P4B(0:JZ,JY,JX))
   allocate(H2GSH(JZ,JY,JX))
+  allocate(H2GG(JZ,JY,JX))
+  allocate(CH2GG(0:JZ,JY,JX))
 
   end subroutine InitAllocate
 !------------------------------------------------------------------------------------------
@@ -145,6 +149,8 @@ module SoilChemDataType
   deallocate(CH2P4)
   deallocate(CH2P4B)
   deallocate(H2GSH)
+  deallocate(H2GG)
+  deallocate(CH2GG)
 
   end subroutine DestructSoilChemData
 end module SoilChemDataType

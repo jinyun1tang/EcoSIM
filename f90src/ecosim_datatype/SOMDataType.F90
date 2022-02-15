@@ -35,7 +35,6 @@ module SOMDataType
   real(r8),allocatable :: ORGC(:,:,:)
   real(r8),allocatable :: ORGN(:,:,:)
   integer,allocatable :: IXTYP(:,:,:)
-  real(r8),allocatable :: OMCI(:,:)
   real(r8),allocatable :: OMCF(:)  !hetero microbial biomass composition in SOC
   real(r8),allocatable :: OMCA(:)  !autotrophic microbial biomass composition in SOC
   real(r8),allocatable :: RC0(:,:,:)
@@ -99,7 +98,6 @@ module SOMDataType
   allocate(OQAH(0:4,0:JZ,JY,JX))
   allocate(ORGC(0:JZ,JY,JX))
   allocate(ORGN(0:JZ,JY,JX))
-  allocate(OMCI(3,0:4))
   allocate(OMCF(7))
   allocate(OMCA(7))
   allocate(IXTYP(2,JY,JX))
@@ -149,7 +147,6 @@ module SOMDataType
   deallocate(OQAH)
   deallocate(ORGC)
   deallocate(ORGN)
-  deallocate(OMCI)
   deallocate(OMCF)
   deallocate(OMCA)
   deallocate(IXTYP)

@@ -10,6 +10,7 @@ module StartsMod
   use MicrobialDataType
   use SOMDataType
   use SoilChemDataType
+  use FertilizerDataType
   use InitSOMBGC
   implicit none
 
@@ -104,13 +105,13 @@ module StartsMod
       ENDIF
       CDPTHG=AMAX1(CDPTHG,CDPTH(NU(NY,NX),NY,NX))
 !
-      !     INITIALIZE ATMOSPHERE VARIABLES
-      !
-      !     C*E=atmospheric concentration (g m-3)
-      !     *E=atmospheric concentration from readi.f (umol mol-1)
-      !     CO2=CO2,CH4=CH4,OXY=O2,Z2G=N2,Z2O=N2O,NH3=NH3,H2G=H2
-      !     ATKA=mean annual air temperature (K)
-      !
+!     INITIALIZE ATMOSPHERE VARIABLES
+!
+!     C*E=atmospheric concentration (g m-3)
+!     *E=atmospheric concentration from readi.f (umol mol-1)
+!     CO2=CO2,CH4=CH4,OXY=O2,Z2G=N2,Z2O=N2O,NH3=NH3,H2G=H2
+!     ATKA=mean annual air temperature (K)
+!
       CCO2EI(NY,NX)=CO2EI(NY,NX)*5.36E-04_r8*Tref/ATKA(NY,NX)
       CCO2E(NY,NX)=CO2E(NY,NX)*5.36E-04_r8*Tref/ATKA(NY,NX)
       CCH4E(NY,NX)=CH4E(NY,NX)*5.36E-04_r8*Tref/ATKA(NY,NX)
@@ -119,44 +120,44 @@ module StartsMod
       CZ2OE(NY,NX)=Z2OE(NY,NX)*1.25E-03_r8*Tref/ATKA(NY,NX)
       CNH3E(NY,NX)=ZNH3E(NY,NX)*6.25E-04_r8*Tref/ATKA(NY,NX)
       CH2GE(NY,NX)=H2GE(NY,NX)*8.92E-05_r8*Tref/ATKA(NY,NX)
-      !
-      !     MICROBIAL THERMAL ADAPTATION
-      !
-      !     OFFSET=shift in Arrhenius curve used in nitro.f (oC)
-      !     ATCS=mean annual soil temperature (OC)
-      !
+!
+!     MICROBIAL THERMAL ADAPTATION
+!
+!     OFFSET=shift in Arrhenius curve used in nitro.f (oC)
+!     ATCS=mean annual soil temperature (OC)
+!
       OFFSET(NY,NX)=0.333_r8*(12.5_r8-AMAX1(0.0_r8,AMIN1(25.0_r8,ATCS(NY,NX))))
       !     WRITE(*,2222)'OFFSET',OFFSET(NY,NX),ATCS(NY,NX)
 !2222  FORMAT(A8,2E12.4)
-      !
-      !     INITIALIZE WATER POTENTIAL VARIABLES FOR SOIL LAYERS
-      !
-      !     PSIMX,PSIMN,PSIMS=log water potential at FC,WP,POROS
-      !     PSISD,PSIMD=PSIMX-PSIMS,PSIMN-PSIMX
+!
+!     INITIALIZE WATER POTENTIAL VARIABLES FOR SOIL LAYERS
+!
+!     PSIMX,PSIMN,PSIMS=log water potential at FC,WP,POROS
+!     PSISD,PSIMD=PSIMX-PSIMS,PSIMN-PSIMX
 !
       PSIMS(NY,NX)=LOG(-PSIPS)
       PSIMX(NY,NX)=LOG(-PSIFC(NY,NX))
       PSIMN(NY,NX)=LOG(-PSIWP(NY,NX))
       PSISD(NY,NX)=PSIMX(NY,NX)-PSIMS(NY,NX)
       PSIMD(NY,NX)=PSIMN(NY,NX)-PSIMX(NY,NX)
-      !     BKVL(0,NY,NX)=0.0_r8
-      !
-      !     DISTRIBUTION OF OM AMONG FRACTIONS OF DIFFERING
-      !     BIOLOGICAL ACTIVITY
-      !
+!     BKVL(0,NY,NX)=0.0_r8
+!
+!     DISTRIBUTION OF OM AMONG FRACTIONS OF DIFFERING
+!     BIOLOGICAL ACTIVITY
+!
       call InitLayerDepths(NY,NX)
 !
-      !     INITIALIZE SNOWPACK LAYERS
+!     INITIALIZE SNOWPACK LAYERS
       call InitSnowLayers(NY,NX)
-      !
-      !     SURFACE WATER STORAGE AND LOWER HEAT SINK
-      !
-      !     VHCPWX,VHCPRX,VHCPNX=minimum heat capacities for solving
-      !      snowpack,surface litter,soil layer water and heat fluxes
-      !      DPTHSK=depth at which soil heat sink-source calculated
-      !     TCNDG=assumed thermal conductivity below lower soil boundary
-      !     (MJ m-1 K-1 h-1)
-      !     TKSD=deep source/sink temperature from geothermal flux(K)
+!
+!     SURFACE WATER STORAGE AND LOWER HEAT SINK
+!
+!     VHCPWX,VHCPRX,VHCPNX=minimum heat capacities for solving
+!      snowpack,surface litter,soil layer water and heat fluxes
+!      DPTHSK=depth at which soil heat sink-source calculated
+!     TCNDG=assumed thermal conductivity below lower soil boundary
+!     (MJ m-1 K-1 h-1)
+!     TKSD=deep source/sink temperature from geothermal flux(K)
 !
       VHCPWX(NY,NX)=VHCPWMin*AREA(3,NU(NY,NX),NY,NX)
       VHCPRX(NY,NX)=VHCPRMin*AREA(3,NU(NY,NX),NY,NX)
@@ -166,8 +167,8 @@ module StartsMod
       TKS(0,NY,NX)=ATKS(NY,NX)
       TCNDG=8.1E-03_r8
       TKSD(NY,NX)=ATKS(NY,NX)+2.052E-04*DPTHSK(NY,NX)/TCNDG
-      !
-      !     INITIALIZE COMMUNITY CANOPY
+!
+!     INITIALIZE COMMUNITY CANOPY
 !
       ZT(NY,NX)=0.0_r8
       ZL(0,NY,NX)=0.0_r8
@@ -347,7 +348,8 @@ module StartsMod
 
   integer  :: L,M,K,N,KK,NN,NGL
   real(r8) :: CORGCM,HCX,TORGC
-  real(r8) :: CORGL,TORGLL
+  real(r8) :: CORGL,TORGLL,FCX
+
 ! begin_execution
 ! RSC,RSC,RSP=C,N,P in fine(1),woody(0),manure(2) litter (g m-2)
 ! CORGC,CORGR,CORGN,CORGP=SOC,POC,SON,SOP (g Mg-1)
@@ -400,7 +402,7 @@ module StartsMod
       TORGLL=TORGL(L)
     endif
 
-    call InitSOMProfile(L,NY,NX,HCX,CDPTHG,TORGLL,CORGCM)
+    call InitSOMProfile(L,NY,NX,HCX,CDPTHG,TORGLL,CORGCM,FCX)
     !
     !     LAYER WATER, ICE, AIR CONTENTS
     !
@@ -502,7 +504,7 @@ module StartsMod
     TCS(L,NY,NX)=ATCS(NY,NX)
     !
     !     INITIALIZE SOM VARIABLES
-    call InitSOMVars(L,NY,NX)
+    call InitSOMVars(L,NY,NX,FCX)
 
     !
     !     INITIALIZE FERTILIZER ARRAYS
