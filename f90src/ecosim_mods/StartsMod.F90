@@ -12,6 +12,7 @@ module StartsMod
   use SoilChemDataType
   use FertilizerDataType
   use InitSOMBGC
+  use VegDataType
   implicit none
 
   private
@@ -297,21 +298,15 @@ module StartsMod
   !     OMEGA,OMEGX=incident aNGLe of diffuse radn at leaf,horizontal surface
   !     IALBY:1=backscattering,2=forward scattering of sky radiation
   !
+  ZSIN=real((/0.195,0.556,0.831,0.981/),r8)
+  ZCOS=real((/0.981,0.831,0.556,0.195/),r8)
 
-  ZSIN(1)=0.195
-  ZSIN(2)=0.556
-  ZSIN(3)=0.831
-  ZSIN(4)=0.981
-  ZCOS(1)=0.981
-  ZCOS(2)=0.831
-  ZCOS(3)=0.556
-  ZCOS(4)=0.195
   DO 205 L=1,4
-    ZAZI(L)=(L-0.5)*3.1416/4.0
+    ZAZI(L)=(L-0.5)*PICON/4.0
 205   CONTINUE
   DO 230 N=1,4
-    YAZI(N)=3.1416*(2*N-1)/4.0
-    YAGL=3.1416/4.0
+    YAZI(N)=PICON*(2*N-1)/4.0
+    YAGL=PICON/4.0
     YSIN(N)=SIN(YAGL)
     YCOS(N)=COS(YAGL)
     TYSIN=TYSIN+YSIN(N)
@@ -329,9 +324,9 @@ module StartsMod
         IF(OMEGZ.GT.-1.5708)THEN
           ZAGL=YAGL+2.0*OMEGZ
         ELSE
-          ZAGL=YAGL-2.0*(3.1416+OMEGZ)
+          ZAGL=YAGL-2.0*(PICON+OMEGZ)
         ENDIF
-        IF(ZAGL.GT.0.0.AND.ZAGL.LT.3.1416)THEN
+        IF(ZAGL.GT.0.0.AND.ZAGL.LT.PICON)THEN
           IALBY(N,M,L)=1
         ELSE
           IALBY(N,M,L)=2

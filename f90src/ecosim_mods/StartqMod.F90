@@ -1,52 +1,52 @@
 module StartqMod
   use data_kind_mod, only : r8 => SHR_KIND_R8
   use EcosimConst
-      implicit none
+  implicit none
 
-      private
-      include "parameters.h"
-      include "filec.h"
-      include "files.h"
-      include "blkc.h"
-      include "blk1cp.h"
-      include "blk1cr.h"
-      include "blk1g.h"
-      include "blk1n.h"
-      include "blk1p.h"
-      include "blk1s.h"
-      include "blk2a.h"
-      include "blk2b.h"
-      include "blk2c.h"
-      include "blk3.h"
-      include "blk5.h"
-      include "blk8a.h"
-      include "blk8b.h"
-      include "blk9a.h"
-      include "blk9b.h"
-      include "blk9c.h"
-      include "blk11a.h"
-      include "blk11b.h"
-      include "blk12a.h"
-      include "blk12b.h"
-      include "blk14.h"
-      include "blk16.h"
-      include "blk18a.h"
-      include "blk18b.h"
+  private
+  include "parameters.h"
+  include "filec.h"
+  include "files.h"
+  include "blkc.h"
+  include "blk1cp.h"
+  include "blk1cr.h"
+  include "blk1g.h"
+  include "blk1n.h"
+  include "blk1p.h"
+  include "blk1s.h"
+  include "blk2a.h"
+  include "blk2b.h"
+  include "blk2c.h"
+  include "blk3.h"
+  include "blk5.h"
+  include "blk8a.h"
+  include "blk8b.h"
+  include "blk9a.h"
+  include "blk9b.h"
+  include "blk9c.h"
+  include "blk11a.h"
+  include "blk11b.h"
+  include "blk12a.h"
+  include "blk12b.h"
+  include "blk14.h"
+  include "blk16.h"
+  include "blk18a.h"
+  include "blk18b.h"
 
-      real(r8) :: CNOPC(4),CPOPC(4)
-      real(r8) :: CNOPCT,CPOPCT,CCO2A,CCO2P,COXYA,COXYP,FDM,WTSTDX
+  real(r8) :: CNOPC(4),CPOPC(4)
+  real(r8) :: CNOPCT,CPOPCT,CCO2A,CCO2P,COXYA,COXYP,FDM,WTSTDX
 
-      integer :: K,L,M,NX,NY,NZ2X,NZ,N,NR,NB
+  integer :: K,L,M,NX,NY,NZ2X,NZ,N,NR,NB
 
-      public :: startq
-      contains
+  public :: startq
+  contains
 
-      SUBROUTINE startq(NHWQ,NHEQ,NVNQ,NVSQ,NZ1Q,NZ2Q)
+  SUBROUTINE startq(NHWQ,NHEQ,NVNQ,NVSQ,NZ1Q,NZ2Q)
 !
 !     THIS SUBROUTINE INITIALIZES ALL PLANT VARIABLES
 !
-      implicit none
-      integer, intent(in) :: NHWQ,NHEQ,NVNQ,NVSQ,NZ1Q,NZ2Q
+  implicit none
+  integer, intent(in) :: NHWQ,NHEQ,NVNQ,NVSQ,NZ1Q,NZ2Q
 !     begin_execution
 !
 !     INITIALIZE SHOOT GROWTH VARIABLES
@@ -62,62 +62,62 @@ module StartqMod
 !     O2I=intercellular O2 concentration in C3,C4 PFT (umol mol-1)
 !
 
-      DO 9995 NX=NHWQ,NHEQ
-      DO 9990 NY=NVNQ,NVSQ
+  DO 9995 NX=NHWQ,NHEQ
+    DO 9990 NY=NVNQ,NVSQ
       NZ2X=MIN(NZ2Q,NP(NY,NX))
       DO 9985 NZ=NZ1Q,NZ2X
-      IF(IFLGC(NZ,NY,NX).EQ.0)THEN
+        IF(IFLGC(NZ,NY,NX).EQ.0)THEN
 
-      call InitShootGrowth(NZ,NY,NX)
+          call InitShootGrowth(NZ,NY,NX)
 
-      call PlantLitterFractions(NZ,NY,NX)
+          call PlantLitterFractions(NZ,NY,NX)
 
-      call PFTThermalAcclimation(NZ,NY,NX)
+          call PFTThermalAcclimation(NZ,NY,NX)
 
-      call InitDimensionsandUptake(NZ,NY,NX)
+          call InitDimensionsandUptake(NZ,NY,NX)
 
-      call InitPlantPhenoMorphoBio(NZ,NY,NX)
+          call InitPlantPhenoMorphoBio(NZ,NY,NX)
 
-      call InitMassBalance(NZ,NY,NX)
+          call InitMassBalance(NZ,NY,NX)
 
-      call InitPlantHeatandWater(NZ,NY,NX)
+          call InitPlantHeatandWater(NZ,NY,NX)
 
-      call InitRootMychorMorphoBio(NZ,NY,NX)
+          call InitRootMychorMorphoBio(NZ,NY,NX)
 
-      call InitSeedMorphoBio(NZ,NY,NX)
-!     ENDIF
-      ENDIF
-      ZEROP(NZ,NY,NX)=ZERO*PP(NZ,NY,NX)
-      ZEROQ(NZ,NY,NX)=ZERO*PP(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-      ZEROL(NZ,NY,NX)=ZERO*PP(NZ,NY,NX)*1.0E+06
+          call InitSeedMorphoBio(NZ,NY,NX)
+        !     ENDIF
+        ENDIF
+        ZEROP(NZ,NY,NX)=ZERO*PP(NZ,NY,NX)
+        ZEROQ(NZ,NY,NX)=ZERO*PP(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+        ZEROL(NZ,NY,NX)=ZERO*PP(NZ,NY,NX)*1.0E+06
 9985  CONTINUE
 !
 !     FILL OUT UNUSED ARRAYS
 !
       DO 9986 NZ=NP(NY,NX)+1,5
-      TCSN0(NZ,NY,NX)=0._r8
-      TZSN0(NZ,NY,NX)=0._r8
-      TPSN0(NZ,NY,NX)=0._r8
-      TCSNC(NZ,NY,NX)=0._r8
-      TZSNC(NZ,NY,NX)=0._r8
-      TPSNC(NZ,NY,NX)=0._r8
-      WTSTG(NZ,NY,NX)=0._r8
-      WTSTGN(NZ,NY,NX)=0._r8
-      WTSTGP(NZ,NY,NX)=0._r8
-      DO 6401 L=1,NL(NY,NX)
-      DO  K=0,1
-      DO  M=1,4
-      CSNC(M,K,L,NZ,NY,NX)=0._r8
-      ZSNC(M,K,L,NZ,NY,NX)=0._r8
-      PSNC(M,K,L,NZ,NY,NX)=0._r8
-      enddo
-      enddo
-6401  CONTINUE
+        TCSN0(NZ,NY,NX)=0._r8
+        TZSN0(NZ,NY,NX)=0._r8
+        TPSN0(NZ,NY,NX)=0._r8
+        TCSNC(NZ,NY,NX)=0._r8
+        TZSNC(NZ,NY,NX)=0._r8
+        TPSNC(NZ,NY,NX)=0._r8
+        WTSTG(NZ,NY,NX)=0._r8
+        WTSTGN(NZ,NY,NX)=0._r8
+        WTSTGP(NZ,NY,NX)=0._r8
+        DO 6401 L=1,NL(NY,NX)
+          DO  K=0,1
+            DO  M=1,4
+              CSNC(M,K,L,NZ,NY,NX)=0._r8
+              ZSNC(M,K,L,NZ,NY,NX)=0._r8
+              PSNC(M,K,L,NZ,NY,NX)=0._r8
+            enddo
+          enddo
+6401    CONTINUE
 9986  CONTINUE
 9990  CONTINUE
 9995  CONTINUE
-      RETURN
-      END subroutine startq
+  RETURN
+  END subroutine startq
 !------------------------------------------------------------------------------------------
 
       subroutine InitShootGrowth(NZ,NY,NX)
@@ -396,8 +396,8 @@ module StartqMod
 !     GRDM=seed C mass (g) from PFT file
 !
       SDVL(NZ,NY,NX)=GRDM(NZ,NY,NX)*5.0E-06
-      SDLG(NZ,NY,NX)=2.0*(0.75*SDVL(NZ,NY,NX)/3.1416)**0.33
-      SDAR(NZ,NY,NX)=4.0*3.1416*(SDLG(NZ,NY,NX)/2.0)**2
+      SDLG(NZ,NY,NX)=2.0*(0.75*SDVL(NZ,NY,NX)/PICON)**0.33
+      SDAR(NZ,NY,NX)=4.0*PICON*(SDLG(NZ,NY,NX)/2.0)**2
 !
 !     INITIALIZE ROOT(N=1),MYCORRHIZAL(N=2) DIMENSIONS, UPTAKE PARAMETERS
 !

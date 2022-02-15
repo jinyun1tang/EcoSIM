@@ -140,7 +140,7 @@ module WthrMod
       IF(IETYP(NY,NX).NE.-2)THEN
         IF(DYLN(NY,NX).GT.ZERO)THEN
           RADN(NY,NX)=AMAX1(0.0,RMAX*SIN((J-(ZNOON(NY,NX) &
-            -DYLN(NY,NX)/2.0))*3.1416/DYLN(NY,NX)))
+            -DYLN(NY,NX)/2.0))*PICON/DYLN(NY,NX)))
         ELSE
           RADN(NY,NX)=0.0
         ENDIF
@@ -152,14 +152,14 @@ module WthrMod
       !     TAVG*,AMP*=daily averages, amplitudes from day.f
       !
       IF(J.LT.(ZNOON(NY,NX)-DYLN(NY,NX)/2))THEN
-        TCA(NY,NX)=TAVG1+AMP1*SIN(((J+ZNOON(NY,NX)-3.0)*3.1416 &
+        TCA(NY,NX)=TAVG1+AMP1*SIN(((J+ZNOON(NY,NX)-3.0)*PICON &
           /(ZNOON(NY,NX)+9.0-DYLN(NY,NX)/2.0))+1.5708)
       ELSEIF(J.GT.ZNOON(NY,NX)+3)THEN
-        TCA(NY,NX)=TAVG3+AMP3*SIN(((J-ZNOON(NY,NX)-3.0)*3.1416 &
+        TCA(NY,NX)=TAVG3+AMP3*SIN(((J-ZNOON(NY,NX)-3.0)*PICON &
           /(ZNOON(NY,NX)+9.0-DYLN(NY,NX)/2.0))+1.5708)
       ELSE
         TCA(NY,NX)=TAVG2+AMP2*SIN(((J-(ZNOON(NY,NX) &
-          -DYLN(NY,NX)/2.0))*3.1416/(3.0+DYLN(NY,NX)/2.0))-1.5708)
+          -DYLN(NY,NX)/2.0))*PICON/(3.0+DYLN(NY,NX)/2.0))-1.5708)
       ENDIF
       TKA(NY,NX)=TCA(NY,NX)+TC2K
       !
@@ -168,14 +168,14 @@ module WthrMod
       !      ALTI=altitude
       !
       IF(J.LT.(ZNOON(NY,NX)-DYLN(NY,NX)/2))THEN
-        VPK(NY,NX)=VAVG1+VMP1*SIN(((J+ZNOON(NY,NX)-3.0)*3.1416 &
+        VPK(NY,NX)=VAVG1+VMP1*SIN(((J+ZNOON(NY,NX)-3.0)*PICON &
           /(ZNOON(NY,NX)+9.0-DYLN(NY,NX)/2.0))+1.5708)
       ELSEIF(J.GT.ZNOON(NY,NX)+3)THEN
-        VPK(NY,NX)=VAVG3+VMP3*SIN(((J-ZNOON(NY,NX)-3.0)*3.1416 &
+        VPK(NY,NX)=VAVG3+VMP3*SIN(((J-ZNOON(NY,NX)-3.0)*PICON &
           /(ZNOON(NY,NX)+9.0-DYLN(NY,NX)/2.0))+1.5708)
       ELSE
         VPK(NY,NX)=VAVG2+VMP2*SIN(((J-(ZNOON(NY,NX) &
-          -DYLN(NY,NX)/2.0))*3.1416 /(3.0+DYLN(NY,NX)/2.0))-1.5708)
+          -DYLN(NY,NX)/2.0))*PICON /(3.0+DYLN(NY,NX)/2.0))-1.5708)
       ENDIF
       !VPS(NY,NX)=0.61*EXP(5360.0*(3.661E-03-1.0/TKA(NY,NX))) &
       VPS(NY,NX)=vapsat0(tka(ny,nx))*EXP(-ALTI(NY,NX)/7272.0)

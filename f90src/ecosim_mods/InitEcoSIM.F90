@@ -7,14 +7,18 @@ module InitEcoSIM
   contains
 
   subroutine InitModules(nmicbguilds)
-  use NitroMod         , only : InitNitro
-  use RedistMod        , only : InitRedist
-  use MicrobialDataType, only : InitMicrobialData
-  use SOMDataType      , only : InitSOMData
-  use SoilChemDataType , only : InitSoilChemData
+  use NitroMod          , only : InitNitro
+  use RedistMod         , only : InitRedist
+  use MicrobialDataType , only : InitMicrobialData
+  use SOMDataType       , only : InitSOMData
+  use SoilChemDataType  , only : InitSoilChemData
   use FertilizerDataType, only : InitFertilizerData
+  use VegDataType       , only : InitVegData
+
   implicit  none
   integer, intent(in) :: nmicbguilds
+
+  call InitVegData
 
   call InitMicrobialData(nmicbguilds)
 

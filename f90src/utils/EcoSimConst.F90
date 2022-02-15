@@ -14,4 +14,7 @@ module EcosimConst
                                                !surface litter water and heat fluxes, [MJ/K]
   real(r8), parameter :: VHCPNMin=4.190E-03_r8 !minimum heat capacities for solving
                                                !soil water and heat fluxes, [MJ/K]
+!  real(r8), parameter :: PICON=3.14159265358979323846_r8
+  real(r8), parameter :: PICON=3.1416_r8
+  real(r8), parameter :: PICON2=PICON*0.5_r8
 end module EcosimConst

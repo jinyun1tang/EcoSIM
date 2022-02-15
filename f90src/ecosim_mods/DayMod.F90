@@ -1,6 +1,8 @@
 
       module DayMod
       use data_kind_mod, only : r8 => SHR_KIND_R8
+  use EcosimConst
+
       implicit none
 
       private
@@ -222,7 +224,7 @@
       ELSEIF(AZI/DEC.LE.-1.0+TWILGT)THEN
       DYLN(NY,NX)=0._r8
       ELSE
-      DYLN(NY,NX)=12.0*(1.0+2.0/3.1416*ASIN(TWILGT+AZI/DEC))
+      DYLN(NY,NX)=12.0*(1.0+2.0/PICON*ASIN(TWILGT+AZI/DEC))
       ENDIF
 !
 !     TIME STEP OF WEARHER DATA

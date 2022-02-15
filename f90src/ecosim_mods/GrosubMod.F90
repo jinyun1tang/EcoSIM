@@ -5,6 +5,8 @@ module grosubMod
   use minimathmod, only : test_aeqb,safe_adb
   use data_kind_mod, only : r8 => SHR_KIND_R8
   use SOMDataType
+  use EcosimConst
+  use VegDataType
   implicit none
 
   private
@@ -7597,13 +7599,13 @@ module grosubMod
 545   CONTINUE
 546   CONTINUE
       RSTK=SQRT(VSTK*(AMAX1(0.0_r8,WTSTKB(NB,NZ,NY,NX))/PP(NZ,NY,NX)) &
-        /(3.1416_r8*HTNODE(K1,NB,NZ,NY,NX)))
-      ARSTKB(NB)=3.1416_r8*HTNODE(K1,NB,NZ,NY,NX)*PP(NZ,NY,NX)*RSTK
+        /(PICON*HTNODE(K1,NB,NZ,NY,NX)))
+      ARSTKB(NB)=PICON*HTNODE(K1,NB,NZ,NY,NX)*PP(NZ,NY,NX)*RSTK
       IF(ISTYP(NZ,NY,NX).EQ.0)THEN
         WVSTKB(NB,NZ,NY,NX)=WTSTKB(NB,NZ,NY,NX)
       ELSE
         ZSTK=AMIN1(ZSTX,FSTK*RSTK)
-        ASTV=3.1416_r8*(2.0_r8*RSTK*ZSTK-ZSTK**2)
+        ASTV=PICON*(2.0_r8*RSTK*ZSTK-ZSTK**2)
         WVSTKB(NB,NZ,NY,NX)=ASTV/VSTK*HTNODE(K1,NB,NZ,NY,NX)*PP(NZ,NY,NX)
       ENDIF
     !     IF(NZ.EQ.1)THEN

@@ -7,6 +7,7 @@ module Hour1Mod
   use SOMDataType
   use SoilChemDataType
   use FertilizerDataType
+  use VegDataType
   implicit none
 
   private
@@ -1138,15 +1139,15 @@ module Hour1Mod
 !     CNDH=macropore hydraulic conductivity
 !
       HRAD(L,NY,NX)=0.5E-03
-      NHOL(L,NY,NX)=INT(VOLAH(L,NY,NX)/(3.1416*HRAD(L,NY,NX)**2 &
+      NHOL(L,NY,NX)=INT(VOLAH(L,NY,NX)/(PICON*HRAD(L,NY,NX)**2 &
       *VOLTI(L,NY,NX)))
       IF(NHOL(L,NY,NX).GT.0.0)THEN
-      PHOL(L,NY,NX)=1.0/(SQRT(3.1416*NHOL(L,NY,NX)))
+      PHOL(L,NY,NX)=1.0/(SQRT(PICON*NHOL(L,NY,NX)))
       ELSE
       PHOL(L,NY,NX)=1.0
       ENDIF
       VISCWL=VISCW*EXP(0.533-0.0267*TCS(L,NY,NX))
-      CNDH(L,NY,NX)=3.6E+03*3.1416*NHOL(L,NY,NX)*HRAD(L,NY,NX)**4 &
+      CNDH(L,NY,NX)=3.6E+03*PICON*NHOL(L,NY,NX)*HRAD(L,NY,NX)**4 &
       /(8.0*VISCWL)
 !
 !     SOIL HEAT CAPACITY AND THERMAL CONDUCTIVITY OF SOLID PHASE
@@ -2421,7 +2422,7 @@ module Hour1Mod
       !     IALBS=flag for forward vs backscattering
       !
       DO 1100 M=1,4
-        ZAZI=SAZI+(M-0.5)*3.1416/4
+        ZAZI=SAZI+(M-0.5)*PICON/4
         DAZI=COS(ZAZI-SAZI)
         DO  N=1,4
           BETY=ZCOS(N)*SSIN(NY,NX)+ZSIN(N)*SCOS*DAZI
@@ -2435,9 +2436,9 @@ module Hour1Mod
           IF(BETZ.GT.-1.5708)THEN
             ZAGL=SAGL+2.0*BETZ
           ELSE
-            ZAGL=SAGL-2.0*(3.1416+BETZ)
+            ZAGL=SAGL-2.0*(PICON+BETZ)
           ENDIF
-          IF(ZAGL.GT.0.0.AND.ZAGL.LT.3.1416)THEN
+          IF(ZAGL.GT.0.0.AND.ZAGL.LT.PICON)THEN
             IALBS(N,M)=1
           ELSE
             IALBS(N,M)=2

@@ -7,6 +7,8 @@ module readiMod
   use fileUtil     , only : open_safe
   use minimathmod  , only : test_aeqb
   use SOMDataType
+  use VegDataType
+  use EcosimConst
   implicit none
   private
   include "parameters.h"
@@ -208,7 +210,7 @@ module readiMod
       ELSEIF(AZI/DEC.LE.-1.0+TWILGT)THEN
         DYLM(NY,NX)=0.0
       ELSE
-        DYLM(NY,NX)=12.0*(1.0+2.0/3.1416*ASIN(TWILGT+AZI/DEC))
+        DYLM(NY,NX)=12.0*(1.0+2.0/PICON*ASIN(TWILGT+AZI/DEC))
       ENDIF
 9890  CONTINUE
 9895  CONTINUE
