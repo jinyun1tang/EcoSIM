@@ -2433,7 +2433,7 @@ module Hour1Mod
           ELSE
             BETZ=-ACOS(BETY)
           ENDIF
-          IF(BETZ.GT.-1.5708)THEN
+          IF(BETZ.GT.-PICON2)THEN
             ZAGL=SAGL+2.0*BETZ
           ELSE
             ZAGL=SAGL-2.0*(PICON+BETZ)

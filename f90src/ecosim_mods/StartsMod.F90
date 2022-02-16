@@ -39,8 +39,9 @@ module StartsMod
   real(r8) :: PTDS,TORGM
   real(r8) :: VOLSWI,VORGC,VMINL,VSAND,YAGL
   real(r8) :: ZAGL
-
-  real(r8) :: YSIN(4),YCOS(4),YAZI(4),ZAZI(4) &
+! JSA: # of sectors for the sky azimuth  [0,2*pi]
+! JLA: # of sectors for the leaf zimuth, [0,pi]
+  real(r8) :: YSIN(JSA),YCOS(JSA),YAZI(JSA),ZAZI(JLA) &
     ,GSINA(JY,JX),GCOSA(JY,JX),ALTX(JV,JH),CDPTHSI(JS) &
     ,TORGL(JZ)
   !
@@ -293,7 +294,7 @@ module StartsMod
   integer :: L,M,N
   !     begin_execution
   !     ZSIN,ZCOS=sine,cosine of leaf inclination class
-  !     ZAZI=leaf azimuth class
+  !     ZAZI=leaf azimuth class, it is pi because only on one side of the leaf
   !     YAZI,YSIN,YCOS=sky azimuth,sine,cosine of sky azimuth
   !     OMEGA,OMEGX=incident aNGLe of diffuse radn at leaf,horizontal surface
   !     IALBY:1=backscattering,2=forward scattering of sky radiation
@@ -301,18 +302,19 @@ module StartsMod
   !ZSIN=real((/0.195,0.556,0.831,0.981/),r8)
   !ZCOS=real((/0.981,0.831,0.556,0.195/),r8)
 
-  DO 205 L=1,4
-    ZAZI(L)=(L-0.5)*PICON/4.0
+  DO 205 L=1,JLA
+    ZAZI(L)=(L-0.5)*PICON/real(JLA,r8)
 205   CONTINUE
-  DO 230 N=1,4
-    YAZI(N)=PICON*(2*N-1)/4.0
-    YAGL=PICON/4.0
+
+  DO 230 N=1,JSA
+    YAZI(N)=PICON*(2*N-1)/real(JSA,r8)
+    YAGL=PICON/real(JSA,r8)
     YSIN(N)=SIN(YAGL)
     YCOS(N)=COS(YAGL)
     TYSIN=TYSIN+YSIN(N)
-    DO 225 L=1,4
+    DO 225 L=1,JLA
       DAZI=COS(ZAZI(L)-YAZI(N))
-      DO  M=1,4
+      DO  M=1,JLI
         OMEGY=ZCOS(M)*YSIN(N)+ZSIN(M)*YCOS(N)*DAZI
         OMEGA(N,M,L)=ABS(OMEGY)
         OMEGX(N,M,L)=OMEGA(N,M,L)/YSIN(N)
@@ -321,7 +323,7 @@ module StartsMod
         ELSE
           OMEGZ=-ACOS(OMEGY)
         ENDIF
-        IF(OMEGZ.GT.-1.5708)THEN
+        IF(OMEGZ.GT.-PICON2)THEN
           ZAGL=YAGL+2.0*OMEGZ
         ELSE
           ZAGL=YAGL-2.0*(PICON+OMEGZ)
