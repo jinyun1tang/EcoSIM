@@ -157,6 +157,7 @@ module grosubMod
 !     FVRN=fraction of hours required for leafoff to initiate remobilization
 !
 
+  integer,private :: curday,curhour
   public :: grosub
   public :: InitGrosub
   contains
@@ -165,6 +166,7 @@ module grosubMod
 
   implicit none
 
+  call InitVegPars
   RCCZ=real((/0.167,0.167,0.167,0.056/),r8)
   RCCY=real((/0.333,0.333,0.167,0.333/),r8)
   RCCX=real((/0.417,0.833,0.833,0.833/),r8)
@@ -197,6 +199,7 @@ module grosubMod
 ! begin_execution
 !     TOTAL AGB FOR GRAZING IN LANDSCAPE SECTION
 !
+  curday=I; curhour=J
   call PrepLandscapeGrazing(I,J,NHW,NHE,NVN,NVS)
 !
 !     INITIALIZE SENESCENCE ARRAYS
@@ -3042,12 +3045,13 @@ module grosubMod
         ENDIF
         IF(CCPOLN.GT.ZERO)THEN
           CCC=AMAX1(0.0,AMIN1(1.0 &
-          ,safe_adb(CZPOLN,(CZPOLN+CCPOLN*CNKI)) &
-          ,safe_adb(CPPOLN,(CPPOLN+CCPOLN*CPKI))))
+          ,safe_adb(CZPOLN,CZPOLN+CCPOLN*CNKI) &
+          ,safe_adb(CPPOLN,CPPOLN+CCPOLN*CPKI)))
+!          if(curday==73)write(*,*)CCPOLN,CCPOLN,CZPOLN,CNKI
           CNC=AMAX1(0.0,AMIN1(1.0 &
-          ,safe_adb(CCPOLN,(CCPOLN+CZPOLN/CNKI))))
+          ,safe_adb(CCPOLN,CCPOLN+CZPOLN/CNKI)))
           CPC=AMAX1(0.0,AMIN1(1.0 &
-          ,safe_adb(CCPOLN,(CCPOLN+CPPOLN/CPKI))))
+          ,safe_adb(CCPOLN,CCPOLN+CPPOLN/CPKI)))
         ELSE
           CCC=0._r8
           CNC=0._r8
@@ -3704,16 +3708,16 @@ module grosubMod
                 IF(IDAY(1,NB1(NZ,NY,NX),NZ,NY,NX).NE.0 &
                   .AND.CCPOLR(N,L,NZ,NY,NX).GT.ZERO)THEN
                   CCC=AMAX1(0.0,AMIN1(1.0 &
-                    ,safe_adb(CZPOLR(N,L,NZ,NY,NX),(CZPOLR(N,L,NZ,NY,NX) &
-                    +CCPOLR(N,L,NZ,NY,NX)*CNKI)) &
-                    ,safe_adb(CPPOLR(N,L,NZ,NY,NX),(CPPOLR(N,L,NZ,NY,NX) &
-                    +CCPOLR(N,L,NZ,NY,NX)*CPKI))))
+                    ,safe_adb(CZPOLR(N,L,NZ,NY,NX),CZPOLR(N,L,NZ,NY,NX) &
+                    +CCPOLR(N,L,NZ,NY,NX)*CNKI) &
+                    ,safe_adb(CPPOLR(N,L,NZ,NY,NX),CPPOLR(N,L,NZ,NY,NX) &
+                    +CCPOLR(N,L,NZ,NY,NX)*CPKI)))
                   CNC=AMAX1(0.0,AMIN1(1.0 &
-                    ,safe_adb(CCPOLR(N,L,NZ,NY,NX),(CCPOLR(N,L,NZ,NY,NX) &
-                    +CZPOLR(N,L,NZ,NY,NX)/CNKI))))
+                    ,safe_adb(CCPOLR(N,L,NZ,NY,NX),CCPOLR(N,L,NZ,NY,NX) &
+                    +CZPOLR(N,L,NZ,NY,NX)/CNKI)))
                   CPC=AMAX1(0.0,AMIN1(1.0 &
-                    ,safe_adb(CCPOLR(N,L,NZ,NY,NX),(CCPOLR(N,L,NZ,NY,NX) &
-                    +CPPOLR(N,L,NZ,NY,NX)/CPKI))))
+                    ,safe_adb(CCPOLR(N,L,NZ,NY,NX),CCPOLR(N,L,NZ,NY,NX) &
+                    +CPPOLR(N,L,NZ,NY,NX)/CPKI)))
                 ELSE
                   CCC=0._r8
                   CNC=0._r8
@@ -4080,16 +4084,16 @@ module grosubMod
       IF(IDAY(1,NB1(NZ,NY,NX),NZ,NY,NX).NE.0 &
       .AND.CCPOLR(N,L,NZ,NY,NX).GT.ZERO)THEN
       CCC=AMAX1(0.0,AMIN1(1.0 &
-      ,safe_adb(CZPOLR(N,L,NZ,NY,NX),(CZPOLR(N,L,NZ,NY,NX) &
-      +CCPOLR(N,L,NZ,NY,NX)*CNKI)) &
-      ,safe_adb(CPPOLR(N,L,NZ,NY,NX),(CPPOLR(N,L,NZ,NY,NX) &
-      +CCPOLR(N,L,NZ,NY,NX)*CPKI))))
+      ,safe_adb(CZPOLR(N,L,NZ,NY,NX),CZPOLR(N,L,NZ,NY,NX) &
+      +CCPOLR(N,L,NZ,NY,NX)*CNKI) &
+      ,safe_adb(CPPOLR(N,L,NZ,NY,NX),CPPOLR(N,L,NZ,NY,NX) &
+      +CCPOLR(N,L,NZ,NY,NX)*CPKI)))
       CNC=AMAX1(0.0,AMIN1(1.0 &
-      ,safe_adb(CCPOLR(N,L,NZ,NY,NX),(CCPOLR(N,L,NZ,NY,NX) &
-      +CZPOLR(N,L,NZ,NY,NX)/CNKI))))
+      ,safe_adb(CCPOLR(N,L,NZ,NY,NX),CCPOLR(N,L,NZ,NY,NX) &
+      +CZPOLR(N,L,NZ,NY,NX)/CNKI)))
       CPC=AMAX1(0.0,AMIN1(1.0 &
-      ,safe_adb(CCPOLR(N,L,NZ,NY,NX),(CCPOLR(N,L,NZ,NY,NX) &
-      +CPPOLR(N,L,NZ,NY,NX)/CPKI))))
+      ,safe_adb(CCPOLR(N,L,NZ,NY,NX),CCPOLR(N,L,NZ,NY,NX) &
+      +CPPOLR(N,L,NZ,NY,NX)/CPKI)))
       ELSE
       CCC=0._r8
       CNC=0._r8
@@ -4879,12 +4883,12 @@ module grosubMod
       ENDIF
       IF(CCPOLN.GT.ZERO)THEN
       CCC=AMAX1(0.0,AMIN1(1.0 &
-      ,safe_adb(CZPOLN,(CZPOLN+CCPOLN*CNKI)) &
-      ,safe_adb(CPPOLN,(CPPOLN+CCPOLN*CPKI))))
+      ,safe_adb(CZPOLN,CZPOLN+CCPOLN*CNKI) &
+      ,safe_adb(CPPOLN,CPPOLN+CCPOLN*CPKI)))
       CNC=AMAX1(0.0,AMIN1(1.0 &
-      ,safe_adb(CCPOLN,(CCPOLN+CZPOLN/CNKI))))
+      ,safe_adb(CCPOLN,CCPOLN+CZPOLN/CNKI)))
       CPC=AMAX1(0.0,AMIN1(1.0 &
-      ,safe_adb(CCPOLN,(CCPOLN+CPPOLN/CPKI))))
+      ,safe_adb(CCPOLN,CCPOLN+CPPOLN/CPKI)))
       ELSE
       CCC=0._r8
       CNC=0._r8
@@ -5967,16 +5971,16 @@ module grosubMod
         IF(IDAY(1,NB,NZ,NY,NX).NE.0 &
          .AND.CCPOLB(NB,NZ,NY,NX).GT.ZERO)THEN
           CCC=AMAX1(0.0,AMIN1(1.0 &
-            ,safe_adb(CZPOLB(NB,NZ,NY,NX),(CZPOLB(NB,NZ,NY,NX) &
-            +CCPOLB(NB,NZ,NY,NX)*CNKI)) &
-            ,safe_adb(CPPOLB(NB,NZ,NY,NX),(CPPOLB(NB,NZ,NY,NX) &
-            +CCPOLB(NB,NZ,NY,NX)*CPKI))))
+            ,safe_adb(CZPOLB(NB,NZ,NY,NX),CZPOLB(NB,NZ,NY,NX) &
+            +CCPOLB(NB,NZ,NY,NX)*CNKI) &
+            ,safe_adb(CPPOLB(NB,NZ,NY,NX),CPPOLB(NB,NZ,NY,NX) &
+            +CCPOLB(NB,NZ,NY,NX)*CPKI)))
           CNC=AMAX1(0.0,AMIN1(1.0 &
-            ,safe_adb(CCPOLB(NB,NZ,NY,NX),(CCPOLB(NB,NZ,NY,NX) &
-            +CZPOLB(NB,NZ,NY,NX)/CNKI))))
+            ,safe_adb(CCPOLB(NB,NZ,NY,NX),CCPOLB(NB,NZ,NY,NX) &
+            +CZPOLB(NB,NZ,NY,NX)/CNKI)))
           CPC=AMAX1(0.0,AMIN1(1.0 &
-            ,safe_adb(CCPOLB(NB,NZ,NY,NX),(CCPOLB(NB,NZ,NY,NX) &
-            +CPPOLB(NB,NZ,NY,NX)/CPKI))))
+            ,safe_adb(CCPOLB(NB,NZ,NY,NX),CCPOLB(NB,NZ,NY,NX) &
+            +CPPOLB(NB,NZ,NY,NX)/CPKI)))
         ELSE
           CCC=0._r8
           CNC=0._r8

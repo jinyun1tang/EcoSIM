@@ -1,9 +1,7 @@
 module InitVegBGC
 
   use EcosimConst
-
   implicit none
-
 
   public :: InitIrradianceGeometry
   contains
