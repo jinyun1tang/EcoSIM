@@ -416,14 +416,14 @@ module WatsubMod
       HWFLU1(L,NY,NX)=0.0_r8
     ENDIF
     IF(CDPTH(L,NY,NX).GE.DTBLX(NY,NX))THEN
-      AREAU(L,NY,NX)=AMIN1(1.0,AMAX1(0.0_r8,(CDPTH(L,NY,NX)-DTBLX(NY,NX)) &
-        /DLYR(3,L,NY,NX)))
+      AREAU(L,NY,NX)=AMIN1(1.0,AMAX1(0.0_r8,safe_adb(CDPTH(L,NY,NX)-DTBLX(NY,NX) &
+        ,DLYR(3,L,NY,NX))))
     ELSE
       AREAU(L,NY,NX)=0.0_r8
     ENDIF
     IF(CDPTH(L,NY,NX).GE.DTBLY(NY,NX))THEN
-      AREAUD(L,NY,NX)=AMIN1(1.0,AMAX1(0.0_r8,(CDPTH(L,NY,NX)-DTBLY(NY,NX)) &
-        /DLYR(3,L,NY,NX)))
+      AREAUD(L,NY,NX)=AMIN1(1.0,AMAX1(0.0_r8,safe_adb(CDPTH(L,NY,NX)-DTBLY(NY,NX) &
+        ,DLYR(3,L,NY,NX))))
     ELSE
       AREAUD(L,NY,NX)=0.0_r8
     ENDIF

@@ -63,6 +63,7 @@ module StartsMod
   !
   !     THIS SUBROUTINE INITIALIZES ALL SOIL VARIABLES
   !
+  use InitSOMBGC, only : InitMicbStoichiometry
   implicit none
   integer, intent(in) :: NHW,NHE,NVN,NVS
 
@@ -78,7 +79,7 @@ module StartsMod
   !
   !     INITIALIZE C-N AND C-P RATIOS OF RESIDUE AND SOIL
   !
-  call InitCNPRatios
+  call InitMicbStoichiometry
   !
   !     CALCULATE ELEVATION OF EACH GRID CELL
   !
@@ -305,7 +306,8 @@ module StartsMod
   DO 205 L=1,JLA
     ZAZI(L)=(L-0.5)*PICON/real(JLA,r8)
 205   CONTINUE
-
+  !JSA: number of sky azimuth sectors
+  !JLA: number of leaf azimuth sectors
   DO 230 N=1,JSA
     YAZI(N)=PICON*(2*N-1)/real(JSA,r8)
     YAGL=PICON/real(JSA,r8)
@@ -611,64 +613,7 @@ module StartsMod
     VHCPW(L,NY,NX)=cps*VOLSSL(L,NY,NX)+cpw*VOLWSL(L,NY,NX)+cpi*VOLISL(L,NY,NX)
 9580  CONTINUE
   end subroutine InitSnowLayers
-!------------------------------------------------------------------------------------------
-  subroutine InitCNPRatios
 
-  integer :: K,N,NGL
-! begin_execution
-! CNOFC,CPOFC=fractions to allocate N,P to kinetic components
-! CNOMC,CPOMC=maximum N:C and P:C ratios in microbial biomass
-
-  CNOFC(1,0)=0.005_r8
-  CNOFC(2,0)=0.005_r8
-  CNOFC(3,0)=0.005_r8
-  CNOFC(4,0)=0.020_r8
-  CPOFC(1,0)=0.0005_r8
-  CPOFC(2,0)=0.0005_r8
-  CPOFC(3,0)=0.0005_r8
-  CPOFC(4,0)=0.0020_r8
-  CNOFC(1,1)=0.020_r8
-  CNOFC(2,1)=0.020_r8
-  CNOFC(3,1)=0.020_r8
-  CNOFC(4,1)=0.020_r8
-  CPOFC(1,1)=0.0020_r8
-  CPOFC(2,1)=0.0020_r8
-  CPOFC(3,1)=0.0020_r8
-  CPOFC(4,1)=0.0020_r8
-  CNOFC(1,2)=0.020_r8
-  CNOFC(2,2)=0.020_r8
-  CNOFC(3,2)=0.020_r8
-  CNOFC(4,2)=0.020_r8
-  CPOFC(1,2)=0.0020_r8
-  CPOFC(2,2)=0.0020_r8
-  CPOFC(3,2)=0.0020_r8
-  CPOFC(4,2)=0.0020_r8
-  FL(1)=0.55_r8
-  FL(2)=0.45_r8
-  DO 95 K=0,5
-    DO  N=1,7
-      IF(K.LE.4.AND.N.EQ.3)THEN
-        DO NGL=1,JG
-          CNOMC(1,NGL,N,K)=0.15
-          CNOMC(2,NGL,N,K)=0.09
-          CPOMC(1,NGL,N,K)=0.015
-          CPOMC(2,NGL,N,K)=0.009
-        ENDDO
-      ELSE
-        do NGL=1,JG
-          CNOMC(1,NGL,N,K)=0.225
-          CNOMC(2,NGL,N,K)=0.135
-          CPOMC(1,NGL,N,K)=0.0225
-          CPOMC(2,NGL,N,K)=0.0135
-        enddo
-      ENDIF
-      do NGL=1,JG
-        CNOMC(3,NGL,N,K)=FL(1)*CNOMC(1,NGL,N,K)+FL(2)*CNOMC(2,NGL,N,K)
-        CPOMC(3,NGL,N,K)=FL(1)*CPOMC(1,NGL,N,K)+FL(2)*CPOMC(2,NGL,N,K)
-      enddo
-     enddo
-95  CONTINUE
-    end subroutine InitCNPRatios
 !------------------------------------------------------------------------------------------
   subroutine InitGridElevation(NHW,NHE,NVN,NVS)
   implicit none

@@ -28,6 +28,7 @@ module InitSOMBGC
   public :: InitSOMVars
   public :: InitSOMProfile
   public :: InitSOMConsts
+  public :: InitMicbStoichiometry
   contains
 !------------------------------------------------------------------------------------------
 
@@ -697,4 +698,44 @@ module InitSOMBGC
     ENDIF
   end subroutine InitLitterProfile
 
+!------------------------------------------------------------------------------------------
+  subroutine InitMicbStoichiometry
+
+  integer :: K,N,NGL
+! begin_execution
+! CNOFC,CPOFC=fractions to allocate N,P to kinetic components
+! CNOMC,CPOMC=maximum N:C and P:C ratios in microbial biomass
+
+  CNOFC(1:4,0)=real((/0.0050,0.0050,0.0050,0.0200/),r8)
+  CPOFC(1:4,0)=real((/0.0005,0.0005,0.0005,0.0020/),r8)
+  CNOFC(1:4,1)=real((/0.0200,0.0200,0.0200,0.0200/),r8)
+  CPOFC(1:4,1)=real((/0.0020,0.0020,0.0020,0.0020/),r8)
+  CNOFC(1:4,2)=real((/0.0200,0.0200,0.0200,0.0200/),r8)
+  CPOFC(1:4,2)=real((/0.0020,0.0020,0.0020,0.0020/),r8)
+  FL(1:2)=real((/0.55,0.45/),r8)
+
+  DO 95 K=0,5
+    DO  N=1,7
+      IF(K.LE.4.AND.N.EQ.3)THEN
+        DO NGL=1,JG
+          CNOMC(1,NGL,N,K)=0.15
+          CNOMC(2,NGL,N,K)=0.09
+          CPOMC(1,NGL,N,K)=0.015
+          CPOMC(2,NGL,N,K)=0.009
+        ENDDO
+      ELSE
+        do NGL=1,JG
+          CNOMC(1,NGL,N,K)=0.225
+          CNOMC(2,NGL,N,K)=0.135
+          CPOMC(1,NGL,N,K)=0.0225
+          CPOMC(2,NGL,N,K)=0.0135
+        enddo
+      ENDIF
+      do NGL=1,JG
+        CNOMC(3,NGL,N,K)=FL(1)*CNOMC(1,NGL,N,K)+FL(2)*CNOMC(2,NGL,N,K)
+        CPOMC(3,NGL,N,K)=FL(1)*CPOMC(1,NGL,N,K)+FL(2)*CPOMC(2,NGL,N,K)
+      enddo
+     enddo
+95  CONTINUE
+    end subroutine InitMicbStoichiometry
 end module InitSOMBGC
