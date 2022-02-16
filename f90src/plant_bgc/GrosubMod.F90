@@ -7,6 +7,7 @@ module grosubMod
   use SOMDataType
   use EcosimConst
   use VegDataType
+  use GrosubPars
   implicit none
 
   private
@@ -45,189 +46,100 @@ module grosubMod
   character(len=*), private, parameter :: mod_filename = __FILE__
 ! DIMENSION VCO2(400,366,05)
 !
-! PART1X,PART2X=modifiers to organ partitioning coefficients
-! VMXC=rate constant for nonstructural C oxidation in respiration (h-1)
-! FSNR=rate constant for litterfall at end of growing season (h-1)
-! FLG4X=number of hours with no grain filling required for physl maturity
-! FLGZX=number of hours until full senescence after physl maturity
-! XFRX=maximum storage C content for remobiln from stalk,root reserves
-! XFRY=rate const for remobiln to storage from stalk,root reserves (h-1)
-! IFLGQ,IFLGQX=current,required hours after physl maturity until start of litterfall
-! FSNK=min ratio of branch or mycorrhizae to root for calculating C transfer
-! FXFS=rate constant for remobilization of stalk C,N,P (h-1)
-! FMYC=rate constant for root-mycorrhizal C,N,P exchange (h-1)
-!
-  real(r8), PARAMETER :: PART1X=0.05_r8,PART2X=0.02_r8 &
-      ,VMXC=0.015_r8,FSNR=2.884E-03_r8,FLG4X=168.0_r8 &
-      ,FLGZX=240.0_r8,XFRX=2.5E-02_r8,XFRY=2.5E-03_r8 &
-      ,FSNK=0.05_r8,FXFS=1.0_r8,FMYC=0.1_r8
-  integer, parameter :: IFLGQX=960
-!
-!     CNKI,CPKI=nonstructural N,P inhibition constant on growth (g N,P g-1 C)
-!     RMPLT=specific maintenance respiration rate (g C g-1 N h-1)
-!     PSILM=minimum water potential for organ expansion,extension (MPa)
-!     RCMN=minimum stomatal resistance to CO2 (s m-1)
-!     RTDPX=distance behind growing point for secondary roots (m)
-!     RTLGAX=minimum average secondary root length (m)
-!     EMODR=root modulus of elasticity (MPa)
-!
-  real(r8), PARAMETER :: CNKI=1.0E-01_r8,CPKI=1.0E-02_r8
-  real(r8), PARAMETER :: RMPLT=0.010_r8,PSILM=0.1_r8,RCMN=1.560E+01_r8 &
-      ,RTDPX=0.00_r8,RTLGAX=1.0E-03_r8,EMODR=5.0_r8
-!
-!     QNTM=quantum efficiency (umol e- umol-1 PAR)
-!     CURV=shape parameter for e- transport response to PAR
-!     ELEC3,ELEC4=e- requirement for CO2 fixn by rubisco,PEP carboxylase
-!     (umol e- umol CO2)
-!     CO2KI=Ki for C3 leakage from bundle sheath to mesophyll in C4 (uM)
-!     FCO2B,FHCOB=partition decarboxylation,leakage to CO2,HCO3 in C4
-!     COMP4=C4 CO2 compensation point (uM)
-!     FDML=leaf water content (g H2O g-1 C)
-!     FBS,FMP=leaf water content in bundle sheath, mesophyll in C4 CO2 fixn
-!
-      real(r8), PARAMETER :: QNTM=0.45_r8,CURV=0.70_r8,CURV2=2.0_r8*CURV &
-      ,CURV4=4.0_r8*CURV,ELEC3=4.5_r8,ELEC4=3.0_r8,CO2KI=1.0E+03_r8,FCO2B=0.02_r8 &
-      ,FHCOB=1.0_r8-FCO2B
-      real(r8), PARAMETER :: COMP4=0.5_r8,FDML=6.0_r8,FBS=0.2_r8*FDML &
-      ,FMP=0.8_r8*FDML
-!
-!     ZPLFM=min N:C,P:C in leaves relative to max values from PFT file
-!     ZPGRM=min N:C,P:C in grain relative to max values from PFT file
-!     GY,GZ=partitioning of grazed material to removal,respiration
-!     FSTK=fraction of stalk area contributing to water,heat flow
-!     DSTK,VSTK=stalk density (Mg m-3),specific volume (m3 g-1)
-!     FRTX=fraction used to calculate woody faction of stalk,root
-!
-      real(r8),PARAMETER :: ZPLFM=0.33_r8,ZPLFD=1.0_r8-ZPLFM,ZPGRM=0.75_r8 &
-      ,ZPGRD=1.0_r8-ZPGRM,GY=1.0_r8,GZ=1.0_r8-GY
-      real(r8), PARAMETER :: FSTK=0.05_r8,ZSTX=1.0E-03_r8,DSTK=0.225_r8 &
-      ,VSTK=1.0E-06_r8/DSTK,FRTX=1.0_r8/(1.0_r8-(1.0_r8-FSTK)**2)
-!
-!     SETC,SETN,SETP=Km for nonstructural C,N,P concn on seed set (g g-1)
-!     SLA2,SSL2,SNL2=parameter for calculating leaf area expansion, petiole
-!     and internode extension vs leaf, petiole, internode growth
-!     CNMX,CPMX,CNMN,CPMN=max,min N:C,P:C for nonstructural C,N,P transfers
-!
-      real(r8), PARAMETER :: SETC=1.0E-02_r8,SETN=1.0E-03_r8,SETP=1.0E-04_r8
-      real(r8), PARAMETER :: SLA2=-0.33_r8,SSL2=-0.50_r8,SNL2=-0.67_r8
-      real(r8), PARAMETER :: CNMX=0.20_r8,CPMX=0.020_r8,CNMN=0.050_r8,CPMN=0.005_r8
-!
-!     EN2F=N fixation yield from C oxidation (g N g-1 C)
-!     VMXO=specific respiration rate by bacterial N2 fixers (g g-1 h-1)
-!     SPNDL=specific decomposition rate by canopy,root bacterial N2 fixers (g g-1 h-1)
-!     CCNGB,CCNGR=parameters to calculate nonstructural C,N,P exchange between bacteria and branch,root
-!     WTNDI=initial bacterial mass at infection (g C m-2)
-!     CZKM,CPKM=Km for nonstructural N,P uptake by bacteria (g N,P g-1 C)
-!     RCCZR,RCCYR=min,max fractions for root C recycling
-!     RCCXR,RCCQR=max fractions for root N,P recycling
-!     RCCZN,RCCYN=min,max fractions for bacteria C recycling
-!     RCCXN,RCCQN=max fractions for bacteria N,P recycling
-!     RCCZ,RCCY=min,max fractions for shoot,bacteria C recycling
-!     RCCX,RCCQ=max fractions for shoot,bacteria N,P recycling
-!
-      real(r8), PARAMETER :: EN2F=0.20_r8,VMXO=0.125_r8,SPNDLK=0.01_r8 &
-      ,SPNDL=5.0E-04_r8,CCNGR=2.5E-01_r8,CCNGB=6.0E-04_r8 &
-      ,WTNDI=1.0E-03_r8,CZKM=2.5E-03_r8,CPKM=2.5E-04_r8 &
-      ,RCCZR=0.056_r8,RCCYR=0.167_r8,RCCXR=0.833_r8,RCCQR=0.833_r8 &
-      ,RCCZN=0.167_r8,RCCYN=0.833_r8,RCCXN=0.833_r8,RCCQN=0.833_r8
 
-      integer :: ICHK1(2,JZ),NRX(2,JZ),NBZ(10)
-      real(r8) :: PART(7),TFN6(JZ),ARSTKB(10) &
-      ,FXFB(0:3),FXFR(0:3),FXRT(0:1),FXSH(0:1),FXRN(6) &
-      ,WTLSBZ(10),CPOOLZ(10),ZPOOLZ(10),PPOOLZ(10) &
-      ,ZCX(JP,JY,JX),UPNFC(JP,JY,JX),FRSV(0:3),FXFY(0:1),FXFZ(0:1)
+  integer :: ICHK1(2,JZ),NRX(2,JZ),NBZ(10)
+  real(r8) :: PART(7),TFN6(JZ),ARSTKB(10) &
+    ,FXFB(0:3),FXFR(0:3),FXRT(0:1),FXSH(0:1),FXRN(6) &
+    ,WTLSBZ(10),CPOOLZ(10),ZPOOLZ(10),PPOOLZ(10) &
+    ,ZCX(JP,JY,JX),UPNFC(JP,JY,JX),FRSV(0:3),FXFY(0:1),FXFZ(0:1)
 
-      real(r8) :: RTNT(2),RLNT(2,JZ),RTSK1(2,JZ,10),RTSK2(2,JZ,10) &
-      ,RTDPL(10,JZ),FWTR(JZ),FWTB(JP),FRTDP(0:3),RCCX(0:3),RCCQ(0:3) &
-      ,RCCZ(0:3),RCCY(0:3),EFIRE(2,5:5),WGLFBL(JZ,10,JP,JY,JX) &
-      ,WTSHTA(JZ,JY,JX),FLG4Y(0:3),ATRPX(0:1),GVMX(0:1),RTSK(0:3)
+  real(r8) :: RTNT(2),RLNT(2,JZ),RTSK1(2,JZ,10),RTSK2(2,JZ,10) &
+    ,RTDPL(10,JZ),FWTR(JZ),FWTB(JP),FRTDP(0:3),RCCX(0:3),RCCQ(0:3) &
+    ,RCCZ(0:3),RCCY(0:3),EFIRE(2,5:5),WGLFBL(JZ,10,JP,JY,JX) &
+    ,WTSHTA(JZ,JY,JX),FLG4Y(0:3),ATRPX(0:1),GVMX(0:1),RTSK(0:3)
 
-      real(r8) :: CH2O3(25),CH2O4(25),CPOOLK(10,JP,JY,JX),FHVSTK(0:25) &
-      ,FHVSHK(0:25),WFNGR(2,JZ),PSILY(0:3),FVRN(0:5)
-      real(r8) :: FWOOD(0:1),FWOODN(0:1),FWOODP(0:1) &
-      ,FWODB(0:1),FWODLN(0:1),FWODLP(0:1),FWODSN(0:1),FWODSP(0:1) &
-      ,FWODR(0:1),FWODRN(0:1),FWODRP(0:1)
+  real(r8) :: CH2O3(25),CH2O4(25),CPOOLK(10,JP,JY,JX),FHVSTK(0:25) &
+    ,FHVSHK(0:25),WFNGR(2,JZ),PSILY(0:3),FVRN(0:5)
+  real(r8) :: FWOOD(0:1),FWOODN(0:1),FWOODP(0:1) &
+    ,FWODB(0:1),FWODLN(0:1),FWODLP(0:1),FWODSN(0:1),FWODSP(0:1) &
+    ,FWODR(0:1),FWODRN(0:1),FWODRP(0:1)
 
-      real(r8) :: ACTVM,ARLFI,ALLOCL,ALLOCS,ALLOCN,ASTV,ATRPPD,ARLFY
-      real(r8) :: ARLFR,ARLFG,APSILT,CNLFW,CPLFW,CNSHW,CPSHW,CNRTW
-      real(r8) :: CPRTW,CNLFB,CNSHB,CPLFB,CPSHB,CNLFM,CPLFM,CNLFX
-      real(r8) :: CPLFX,CNSHX,CPSHX,CO2F,CH2O,CO2X,CO2C,CO2Y,CBXNX
-      real(r8) :: CNPG,CGROS,CNRDA,CGROSM,CNRDM,CPL4M,CCBS,CPL3K
-      real(r8) :: CO2LK,CCE,CCC,CNC,CPC,CPOOLT,CPOOLM,CH2OH,CWTRSV
-      real(r8) :: CWTRSN,CWTRSP,CNR,CPR,CNL,CPL,CPOOLD,CCPOLN,CZPOLN
-      real(r8) :: CPPOLN,CGNDL,CCNDLB,CUPRL,CUPRO,CUPRC,CGRORM,CGROR
-      real(r8) :: CPOOLX,CPOOLNX,CCNDLR,CPOOLB,CPOOLS,CCPOLX,CCPLNX
-      real(r8) :: CPOOLG,CPOLNG,CPOLNX,DMLFB,DMSHB,DMSHT,DMSHD,DIFF
-      real(r8) :: DATRP,DMRTD,DMRTR,ETLF4,EGRO4,EGROX,ETLF,EGRO
-      real(r8) :: ETOL,FPART1,FPART2,FPARTL,FNP,FSNC,FSNCL,FSNCS
-      real(r8) :: FNCLF,FSNAL,FSNAS,FRCC,FSNCK,FSNCR,FRACL,FGRNX
-      real(r8) :: FXFC,FXFN,FWTBR,FCNPF,FXRNX,FRTN,FSNC1,FRCO2,FSNCM
-      real(r8) :: FSNCP,FGROL,FGROZ,FWTRT,FWTC,FWTS,FHGT,FHVST,FHVSH
-      real(r8) :: FHVST4,FHGTK,FHVSTS,FHVSTG,FHVSHG,FHVSTH,FHVSTE
-      real(r8) :: FHVSHH,FHVSHE,FDM,FFIRE,FFIRN,FFIRP,FHVSN,FHVSP
-      real(r8) :: GROGR,GSL,GROLF,GROSHE,GROSTK,GRORSV,GROHSK,GROEAR
-      real(r8) :: GROSHT,GROLFN,GROSHN,GROSTN,GRORSN,GROHSN,GROEAN
-      real(r8) :: GROGRN,GROLFP,GROSHP,GROSTP,GRORSP,GROHSP,GROEAP
-      real(r8) :: GROGRP,GNOD,GRO,GRON,GROP,GSLA,GROA,GSSL,GROS
-      real(r8) :: GROH,GRMXB,GROLM,GROLC,GFNX,GRNDG,GRTWGM,GRTWTG
-      real(r8) :: GRTLGL,GRTWTL,GRTWTN,GRTWTP,GRTWTM,HTNODZ,HTBR
-      real(r8) :: HTSTK,HTLF,HTLFL,HTLFU,HTLFB,HTSTKX,PARTS,PARTX
-      real(r8) :: PTRT,PARX,PARJ,PPOOLB,PADDB,PPOOLD,PPDX,PPOOLM
-      real(r8) :: PADDN,PADD2,PADD1,PPOOLT,PTSHTR,PPOOLS,PPOOLG
-      real(r8) :: PPOLNG,PPOOLX,PPOLNX,RTK,RS,RSL,RCO2C,RMNCS,RCO2X
-      real(r8) :: RCO2Y,RCO2G,RCO2T,RCO2CM,RCO2XM,RCO2YM,RCO2GM
-      real(r8) :: RCO2TM,RCCC,RCCN,RCCP,RCO2V,RCCL,RCZL,RCPL,RCCS
-      real(r8) :: RCZS,RCPS,RCSC,RCSN,RCSP,RCCK,RCZK,RCPK,RSTK,RCNDL
-      real(r8) :: RMNDL,RXNDL,RGNDL,RSNDL,RGN2P,RGN2F,RUPNFB,RXNDLC
-      real(r8) :: RXNDLN,RXNDLP,RDNDLC,RDNDLN,RDNDLP,RCNDLC,RCNDLN
-      real(r8) :: RCNDLP,RGNDG,RXNSNC,RXNSNN,RXNSNP,RDNSNC,RDNSNN
-      real(r8) :: RDNSNP,RCNSNC,RCNSNN,RCNSNP,RTDPP,RTDPS,RTSKP
-      real(r8) :: RTSKS,RSCS2,RTLGL,RTLGZ,RMNCR,RCO2RM,RCO2R,RCCR
-      real(r8) :: RCZR,RCPR,RTN2X,RTN2Y,RTDP1X,RSCS1,RTLGX,RTLGT
-      real(r8) :: RTVL,RTAR,RCNDLM,RXNDLM,RGNDLM,RSNDLM,STK,SNCR
-      real(r8) :: SNCRM,SLA,SSL,SNL,SNCZ,SNCX,SNCF,SNCT,SNCLF,SNCSH
-      real(r8) :: SET,SPNDLI,SPNDX,TKCM,TKSM,TOTAL,TLGLF,TFRCO2
-      real(r8) :: UPNH4B,UPPO4B,UPNH4R,UPPO4R,VL,VGROX,VG,VA,VOLWPX
-      real(r8) :: WTSHTZ,WHVSBL,WTHTH0,WTHNH0,WTHPH0,WTHTH1,WTHNH1
-      real(r8) :: WTHPH1,WTHTH2,WTHNH2,WTHPH2,WTHTH3,WTHNH3,WTHPH3
-      real(r8) :: WTHTH4,WTHNH4,WTHPH4,WTHTR1,WTHNR1,WTHPR1,WTHTR2
-      real(r8) :: WTHNR2,WTHPR2,WTHTR3,WTHNR3,WTHPR3,WTHTR4,WTHNR4
-      real(r8) :: WTHPR4,WTHTX0,WTHNX0,WTHPX0,WTHTX1,WTHNX1,WTHPX1
-      real(r8) :: WTHTX2,WTHNX2,WTHPX2,WTHTX3,WTHNX3,WTHPX3,WTHTX4
-      real(r8) :: WTHNX4,WTHPX4,WTHTG,WTHNG,WTHPG,WTSHXN,WTRTM,WFNSP
-      real(r8) :: WTPLTT,WTRTRX,WTPLTX,WVSTBX,WTRTTX,WTRSBX,WTRVCX
-      real(r8) :: WTLSB1,WTNDB1,WTLSBT,WTRTX,WTRTZ,WTRTLX,WTRTTT
-      real(r8) :: WTRTT,WTRTD1,WTNDL1,WTRTDT,WTSTKT,WTRSVT,WTRSNT
-      real(r8) :: WTRSPT,WTRSVD,WTRSND,WTRSPD,WTRTD2,WTLSBX,WTLSBB
-      real(r8) :: WTRTLR,WHVSTT,WHVSLF,WHVHSH,WHVEAH,WHVGRH,WHVSCP
-      real(r8) :: WHVSTH,WHVRVH,WHVSLX,WHVSLY,WHVSCL,WHVSNL,WHVXXX
-      real(r8) :: WHVSSX,WTSHTT,WHVSHX,WHVSHY,WHVSHH,WHVSCS,WHVSNS
-      real(r8) :: WHVHSX,WHVHSY,WHVEAX,WHVEAY,WHVGRX,WHVGRY,WHVSNP
-      real(r8) :: WHVSKX,WHVSTX,WHVSTY,WHVRVX,WHVRVY,WTNDG,WTNDNG
-      real(r8) :: WTNDPG,WGLFGX,WGSHGX,WGLFGY,WGSHGY,WGLFG,WGLFNG
-      real(r8) :: WGLFPG,WHVSBS,WHVSCX,WHVSNX,WVPLT,WHVSTD,WTHTR0
-      real(r8) :: WTHNR0,WTHPR0,WTHNL0,WTHPL0,WTHNL1,WTHPL1,WTHNL2
-      real(r8) :: WTHPL2,WTHNL3,WTHPL3,WTHNL4,WTHPL4,WTHTHT,WTHTRT
-      real(r8) :: WTHNHT,WTHNRT,WTHPHT,WTHPRT,WTHTXT,WTHNXT,WTHPXT
-      real(r8) :: XHVST,XRTN1,XKSNC,XFRC,XFRN,XFRP,XFRN1,XFRP1,XLGLF
-      real(r8) :: XLOCM,XLOCC,XLOCN,XLOCP,XFRCX,XFRNX,XFRPX,XFRW
-      real(r8) :: XFRD,XHVSN,XHVSP,YLGLF,YARLF,YWGLF,YWGLFN,YWGLFP
-      real(r8) :: ZPOOLB,ZADDB,ZADDBM,ZPOOLD,ZSTK,ZNPGN,ZNPGP,ZPGRN
-      real(r8) :: ZPGRP,ZPOOLM,ZADDN,ZADD2M,ZADD2,ZADD1M,ZADD1,ZPOOLT
-      real(r8) :: ZPOOLS,ZPOOLG,ZPOLNG,ZPOOLX,ZPOLNX
+  real(r8) :: ACTVM,ARLFI,ALLOCL,ALLOCS,ALLOCN,ASTV,ATRPPD,ARLFY
+  real(r8) :: ARLFR,ARLFG,APSILT,CNLFW,CPLFW,CNSHW,CPSHW,CNRTW
+  real(r8) :: CPRTW,CNLFB,CNSHB,CPLFB,CPSHB,CNLFM,CPLFM,CNLFX
+  real(r8) :: CPLFX,CNSHX,CPSHX,CO2F,CH2O,CO2X,CO2C,CO2Y,CBXNX
+  real(r8) :: CNPG,CGROS,CNRDA,CGROSM,CNRDM,CPL4M,CCBS,CPL3K
+  real(r8) :: CO2LK,CCE,CCC,CNC,CPC,CPOOLT,CPOOLM,CH2OH,CWTRSV
+  real(r8) :: CWTRSN,CWTRSP,CNR,CPR,CNL,CPL,CPOOLD,CCPOLN,CZPOLN
+  real(r8) :: CPPOLN,CGNDL,CCNDLB,CUPRL,CUPRO,CUPRC,CGRORM,CGROR
+  real(r8) :: CPOOLX,CPOOLNX,CCNDLR,CPOOLB,CPOOLS,CCPOLX,CCPLNX
+  real(r8) :: CPOOLG,CPOLNG,CPOLNX,DMLFB,DMSHB,DMSHT,DMSHD,DIFF
+  real(r8) :: DATRP,DMRTD,DMRTR,ETLF4,EGRO4,EGROX,ETLF,EGRO
+  real(r8) :: ETOL,FPART1,FPART2,FPARTL,FNP,FSNC,FSNCL,FSNCS
+  real(r8) :: FNCLF,FSNAL,FSNAS,FRCC,FSNCK,FSNCR,FRACL,FGRNX
+  real(r8) :: FXFC,FXFN,FWTBR,FCNPF,FXRNX,FRTN,FSNC1,FRCO2,FSNCM
+  real(r8) :: FSNCP,FGROL,FGROZ,FWTRT,FWTC,FWTS,FHGT,FHVST,FHVSH
+  real(r8) :: FHVST4,FHGTK,FHVSTS,FHVSTG,FHVSHG,FHVSTH,FHVSTE
+  real(r8) :: FHVSHH,FHVSHE,FDM,FFIRE,FFIRN,FFIRP,FHVSN,FHVSP
+  real(r8) :: GROGR,GSL,GROLF,GROSHE,GROSTK,GRORSV,GROHSK,GROEAR
+  real(r8) :: GROSHT,GROLFN,GROSHN,GROSTN,GRORSN,GROHSN,GROEAN
+  real(r8) :: GROGRN,GROLFP,GROSHP,GROSTP,GRORSP,GROHSP,GROEAP
+  real(r8) :: GROGRP,GNOD,GRO,GRON,GROP,GSLA,GROA,GSSL,GROS
+  real(r8) :: GROH,GRMXB,GROLM,GROLC,GFNX,GRNDG,GRTWGM,GRTWTG
+  real(r8) :: GRTLGL,GRTWTL,GRTWTN,GRTWTP,GRTWTM,HTNODZ,HTBR
+  real(r8) :: HTSTK,HTLF,HTLFL,HTLFU,HTLFB,HTSTKX,PARTS,PARTX
+  real(r8) :: PTRT,PARX,PARJ,PPOOLB,PADDB,PPOOLD,PPDX,PPOOLM
+  real(r8) :: PADDN,PADD2,PADD1,PPOOLT,PTSHTR,PPOOLS,PPOOLG
+  real(r8) :: PPOLNG,PPOOLX,PPOLNX,RTK,RS,RSL,RCO2C,RMNCS,RCO2X
+  real(r8) :: RCO2Y,RCO2G,RCO2T,RCO2CM,RCO2XM,RCO2YM,RCO2GM
+  real(r8) :: RCO2TM,RCCC,RCCN,RCCP,RCO2V,RCCL,RCZL,RCPL,RCCS
+  real(r8) :: RCZS,RCPS,RCSC,RCSN,RCSP,RCCK,RCZK,RCPK,RSTK,RCNDL
+  real(r8) :: RMNDL,RXNDL,RGNDL,RSNDL,RGN2P,RGN2F,RUPNFB,RXNDLC
+  real(r8) :: RXNDLN,RXNDLP,RDNDLC,RDNDLN,RDNDLP,RCNDLC,RCNDLN
+  real(r8) :: RCNDLP,RGNDG,RXNSNC,RXNSNN,RXNSNP,RDNSNC,RDNSNN
+  real(r8) :: RDNSNP,RCNSNC,RCNSNN,RCNSNP,RTDPP,RTDPS,RTSKP
+  real(r8) :: RTSKS,RSCS2,RTLGL,RTLGZ,RMNCR,RCO2RM,RCO2R,RCCR
+  real(r8) :: RCZR,RCPR,RTN2X,RTN2Y,RTDP1X,RSCS1,RTLGX,RTLGT
+  real(r8) :: RTVL,RTAR,RCNDLM,RXNDLM,RGNDLM,RSNDLM,STK,SNCR
+  real(r8) :: SNCRM,SLA,SSL,SNL,SNCZ,SNCX,SNCF,SNCT,SNCLF,SNCSH
+  real(r8) :: SET,SPNDLI,SPNDX,TKCM,TKSM,TOTAL,TLGLF,TFRCO2
+  real(r8) :: UPNH4B,UPPO4B,UPNH4R,UPPO4R,VL,VGROX,VG,VA,VOLWPX
+  real(r8) :: WTSHTZ,WHVSBL,WTHTH0,WTHNH0,WTHPH0,WTHTH1,WTHNH1
+  real(r8) :: WTHPH1,WTHTH2,WTHNH2,WTHPH2,WTHTH3,WTHNH3,WTHPH3
+  real(r8) :: WTHTH4,WTHNH4,WTHPH4,WTHTR1,WTHNR1,WTHPR1,WTHTR2
+  real(r8) :: WTHNR2,WTHPR2,WTHTR3,WTHNR3,WTHPR3,WTHTR4,WTHNR4
+  real(r8) :: WTHPR4,WTHTX0,WTHNX0,WTHPX0,WTHTX1,WTHNX1,WTHPX1
+  real(r8) :: WTHTX2,WTHNX2,WTHPX2,WTHTX3,WTHNX3,WTHPX3,WTHTX4
+  real(r8) :: WTHNX4,WTHPX4,WTHTG,WTHNG,WTHPG,WTSHXN,WTRTM,WFNSP
+  real(r8) :: WTPLTT,WTRTRX,WTPLTX,WVSTBX,WTRTTX,WTRSBX,WTRVCX
+  real(r8) :: WTLSB1,WTNDB1,WTLSBT,WTRTX,WTRTZ,WTRTLX,WTRTTT
+  real(r8) :: WTRTT,WTRTD1,WTNDL1,WTRTDT,WTSTKT,WTRSVT,WTRSNT
+  real(r8) :: WTRSPT,WTRSVD,WTRSND,WTRSPD,WTRTD2,WTLSBX,WTLSBB
+  real(r8) :: WTRTLR,WHVSTT,WHVSLF,WHVHSH,WHVEAH,WHVGRH,WHVSCP
+  real(r8) :: WHVSTH,WHVRVH,WHVSLX,WHVSLY,WHVSCL,WHVSNL,WHVXXX
+  real(r8) :: WHVSSX,WTSHTT,WHVSHX,WHVSHY,WHVSHH,WHVSCS,WHVSNS
+  real(r8) :: WHVHSX,WHVHSY,WHVEAX,WHVEAY,WHVGRX,WHVGRY,WHVSNP
+  real(r8) :: WHVSKX,WHVSTX,WHVSTY,WHVRVX,WHVRVY,WTNDG,WTNDNG
+  real(r8) :: WTNDPG,WGLFGX,WGSHGX,WGLFGY,WGSHGY,WGLFG,WGLFNG
+  real(r8) :: WGLFPG,WHVSBS,WHVSCX,WHVSNX,WVPLT,WHVSTD,WTHTR0
+  real(r8) :: WTHNR0,WTHPR0,WTHNL0,WTHPL0,WTHNL1,WTHPL1,WTHNL2
+  real(r8) :: WTHPL2,WTHNL3,WTHPL3,WTHNL4,WTHPL4,WTHTHT,WTHTRT
+  real(r8) :: WTHNHT,WTHNRT,WTHPHT,WTHPRT,WTHTXT,WTHNXT,WTHPXT
+  real(r8) :: XHVST,XRTN1,XKSNC,XFRC,XFRN,XFRP,XFRN1,XFRP1,XLGLF
+  real(r8) :: XLOCM,XLOCC,XLOCN,XLOCP,XFRCX,XFRNX,XFRPX,XFRW
+  real(r8) :: XFRD,XHVSN,XHVSP,YLGLF,YARLF,YWGLF,YWGLFN,YWGLFP
+  real(r8) :: ZPOOLB,ZADDB,ZADDBM,ZPOOLD,ZSTK,ZNPGN,ZNPGP,ZPGRN
+  real(r8) :: ZPGRP,ZPOOLM,ZADDN,ZADD2M,ZADD2,ZADD1M,ZADD1,ZPOOLT
+  real(r8) :: ZPOOLS,ZPOOLG,ZPOLNG,ZPOOLX,ZPOLNX
 
-      integer :: IFLGZ,IFLGY,IDTHRN,IDTHY,K,KNOD,KK,KX,K1,K2
-      integer :: KVSTGX,KSNC,KN,KVSTG1,L,LU,LL,LHTLFU,LHTLFL,LHTBRU
-      integer :: LHTBRL,LZ,L1,LX,MNNOD,NX,NY,NZ,NN,NX1
-      integer :: M,MXNOD,NY1,NR,N,NB,NNOD1,NBY,NBL,NBX,NBK
+  integer :: IFLGZ,IFLGY,IDTHRN,IDTHY,K,KNOD,KK,KX,K1,K2
+  integer :: KVSTGX,KSNC,KN,KVSTG1,L,LU,LL,LHTLFU,LHTLFL,LHTBRU
+  integer :: LHTBRL,LZ,L1,LX,MNNOD,NX,NY,NZ,NN,NX1
+  integer :: M,MXNOD,NY1,NR,N,NB,NNOD1,NBY,NBL,NBX,NBK
 !     DATA TC4,TLK/0.0,0.0/
-      REAL(r8) :: TFN5,WFNG,WFNC,WFNS,WFNSG,WFN4,WFNB &
-      ,WFNR,WFNRG,FSNC2
+  REAL(r8) :: TFN5,WFNG,WFNC,WFNS,WFNSG,WFN4,WFNB &
+    ,WFNR,WFNRG,FSNC2
 
-      DATA RCCZ/0.167_r8,0.167_r8,0.167_r8,0.056_r8/
-      DATA RCCY/0.333_r8,0.333_r8,0.167,0.333_r8/
-      DATA RCCX/0.417_r8,0.833_r8,0.833,0.833_r8/
-      DATA RCCQ/0.417_r8,0.833_r8,0.833,0.833_r8/
 !
 !     RTSK=relative primary root sink strength 0.25=shallow,4.0=deep root profile
 !     FXRN=rate constant for plant-bacteria nonstructl C,N,P exchange (h-1)
@@ -244,22 +156,35 @@ module grosubMod
 !     GVMX=specific oxidation rate of nonstructural C during leafout at 25 C
 !     FVRN=fraction of hours required for leafoff to initiate remobilization
 !
-  DATA RTSK/0.25_r8,1.0_r8,4.0_r8,4.0_r8/
-  DATA FXRN/0.25_r8,0.125_r8,0.0625_r8,0.225_r8,0.075_r8,0.025_r8/
-  DATA FXFB/1.0E-02_r8,1.0E-02_r8,1.0E-05_r8,5.0E-05_r8/
-  DATA FXFR/1.0E-02_r8,1.0E-02_r8,1.0E-05_r8,5.0E-05_r8/
-  DATA FPART1/1.00_r8/,FPART2/0.40_r8/
-  DATA FXSH/0.50_r8,0.75_r8/,FXRT/0.50_r8,0.25_r8/
-  DATA FRSV/0.025_r8,0.025_r8,0.001_r8,0.001_r8/
-  DATA FXFY/0.025_r8,0.005_r8/,FXFZ/0.25_r8,0.05_r8/
-  DATA EFIRE/0.917_r8,0.167_r8/
-  DATA PSILY/-200.0_r8,-2.0_r8,-2.0_r8,-2.0_r8/
-  DATA FLG4Y/360.0_r8,1440.0_r8,720.0_r8,720.0_r8/
-  DATA ATRPX/68.96_r8,276.9_r8/,GVMX/0.010_r8,0.0025_r8/
-  DATA FVRN/0.75_r8,0.5_r8,0.5_r8,0.5_r8,0.5_r8,0.5_r8/
 
   public :: grosub
+  public :: InitGrosub
   contains
+
+  subroutine InitGrosub
+
+  implicit none
+
+  RCCZ=real((/0.167,0.167,0.167,0.056/),r8)
+  RCCY=real((/0.333,0.333,0.167,0.333/),r8)
+  RCCX=real((/0.417,0.833,0.833,0.833/),r8)
+  RCCQ=real((/0.417,0.833,0.833,0.833/),r8)
+
+  RTSK=real((/0.25,1.0,4.0,4.0/),r8)
+  FXRN=real((/0.25,0.125,0.0625,0.225,0.075,0.025/),r8)
+  FXFB=real((/1.0E-02,1.0E-02,1.0E-05,5.0E-05/),r8)
+  FXFR=real((/1.0E-02,1.0E-02,1.0E-05,5.0E-05/),r8)
+  FPART1=1.00_r8;FPART2=0.40_r8
+  FXSH=real((/0.50,0.75/),r8);FXRT=real((/0.50,0.25/),r8)
+  FRSV=real((/0.025,0.025,0.001,0.001/),r8)
+  FXFY=real((/0.025,0.005/),r8);FXFZ=real((/0.25,0.05/),r8)
+  EFIRE=reshape(real((/0.917,0.167/),r8),shape(EFIRE))
+  PSILY=real((/-200.0,-2.0,-2.0,-2.0/),r8)
+  FLG4Y=real((/360.0,1440.0,720.0,720.0/),r8)
+  ATRPX=real((/68.96,276.9/),r8);GVMX=real((/0.010,0.0025/),r8)
+  FVRN =real((/0.75,0.5,0.5,0.5,0.5,0.5/),r8)
+
+  end subroutine InitGrosub
 
   SUBROUTINE grosub(I,J,NHW,NHE,NVN,NVS)
 !
@@ -3070,9 +2995,9 @@ module grosubMod
       end subroutine RemoveBiomByHarvest
 !------------------------------------------------------------------------------------------
 
-      subroutine RootNoduleBiomchemistry(I,J,NZ,NY,NX)
-      implicit none
-      integer, intent(in) :: I,J,NZ,NY,NX
+  subroutine RootNoduleBiomchemistry(I,J,NZ,NY,NX)
+  implicit none
+  integer, intent(in) :: I,J,NZ,NY,NX
 !     begin_execution
 !     INTYP=N2 fixation: 1,2,3=rapid to slow root symbiosis
 !     WTNDL,WTNDLN,WTNDLP=bacterial C,N,P mass
@@ -3080,20 +3005,20 @@ module grosubMod
 !     AREA=grid cell area
 !     CNND,CPND=bacterial N:C,P:C ratio from PFT file
 !
-      IF(INTYP(NZ,NY,NX).GE.1.AND.INTYP(NZ,NY,NX).LE.3)THEN
-      DO 5400 L=NU(NY,NX),NIX(NZ,NY,NX)
+  IF(INTYP(NZ,NY,NX).GE.1.AND.INTYP(NZ,NY,NX).LE.3)THEN
+    DO 5400 L=NU(NY,NX),NIX(NZ,NY,NX)
       IF(WTRTD(1,L,NZ,NY,NX).GT.ZEROL(NZ,NY,NX))THEN
 !
 !     INITIAL INFECTION
 !
-      IF(WTNDL(L,NZ,NY,NX).LE.0.0)THEN
-      WTNDL(L,NZ,NY,NX)=WTNDL(L,NZ,NY,NX) &
-      +WTNDI*AREA(3,NU(NY,NX),NY,NX)
-      WTNDLN(L,NZ,NY,NX)=WTNDLN(L,NZ,NY,NX) &
-      +WTNDI*AREA(3,NU(NY,NX),NY,NX)*CNND(NZ,NY,NX)
-      WTNDLP(L,NZ,NY,NX)=WTNDLP(L,NZ,NY,NX) &
-      +WTNDI*AREA(3,NU(NY,NX),NY,NX)*CPND(NZ,NY,NX)
-      ENDIF
+        IF(WTNDL(L,NZ,NY,NX).LE.0.0)THEN
+          WTNDL(L,NZ,NY,NX)=WTNDL(L,NZ,NY,NX) &
+            +WTNDI*AREA(3,NU(NY,NX),NY,NX)
+          WTNDLN(L,NZ,NY,NX)=WTNDLN(L,NZ,NY,NX) &
+            +WTNDI*AREA(3,NU(NY,NX),NY,NX)*CNND(NZ,NY,NX)
+          WTNDLP(L,NZ,NY,NX)=WTNDLP(L,NZ,NY,NX) &
+            +WTNDI*AREA(3,NU(NY,NX),NY,NX)*CPND(NZ,NY,NX)
+        ENDIF
 !
 !     O2-UNCONSTRAINED RESPIRATION RATES BY HETEROTROPHIC AEROBES
 !     IN NODULE FROM SPECIFIC OXIDATION RATE, ACTIVE BIOMASS,
@@ -3106,36 +3031,36 @@ module grosubMod
 !     CNKI,CPKI=nonstructural N,P inhibition constant on growth
 !     FCNPF=N,P constraint to bacterial activity
 !
-      IF(WTNDL(L,NZ,NY,NX).GT.ZEROP(NZ,NY,NX))THEN
-      CCPOLN=AMAX1(0.0,CPOOLN(L,NZ,NY,NX)/WTNDL(L,NZ,NY,NX))
-      CZPOLN=AMAX1(0.0,ZPOOLN(L,NZ,NY,NX)/WTNDL(L,NZ,NY,NX))
-      CPPOLN=AMAX1(0.0,PPOOLN(L,NZ,NY,NX)/WTNDL(L,NZ,NY,NX))
-      ELSE
-      CCPOLN=1.0_r8
-      CZPOLN=1.0_r8
-      CPPOLN=1.0_r8
-      ENDIF
-      IF(CCPOLN.GT.ZERO)THEN
-      CCC=AMAX1(0.0,AMIN1(1.0 &
-      ,CZPOLN/(CZPOLN+CCPOLN*CNKI) &
-      ,CPPOLN/(CPPOLN+CCPOLN*CPKI)))
-      CNC=AMAX1(0.0,AMIN1(1.0 &
-      ,CCPOLN/(CCPOLN+CZPOLN/CNKI)))
-      CPC=AMAX1(0.0,AMIN1(1.0 &
-      ,CCPOLN/(CCPOLN+CPPOLN/CPKI)))
-      ELSE
-      CCC=0._r8
-      CNC=0._r8
-      CPC=0._r8
-      ENDIF
-      IF(WTNDL(L,NZ,NY,NX).GT.ZEROP(NZ,NY,NX))THEN
-      FCNPF=AMIN1(1.0 &
-      ,SQRT(WTNDLN(L,NZ,NY,NX)/(WTNDL(L,NZ,NY,NX)*CNND(NZ,NY,NX))) &
-      ,SQRT(WTNDLP(L,NZ,NY,NX)/(WTNDL(L,NZ,NY,NX)*CPND(NZ,NY,NX))))
-      ELSE
-      FCNPF=1.0_r8
-      ENDIF
-      SPNDLI=CCPOLN/(CCPOLN+SPNDLK)
+        IF(WTNDL(L,NZ,NY,NX).GT.ZEROP(NZ,NY,NX))THEN
+          CCPOLN=AMAX1(0.0,CPOOLN(L,NZ,NY,NX)/WTNDL(L,NZ,NY,NX))
+          CZPOLN=AMAX1(0.0,ZPOOLN(L,NZ,NY,NX)/WTNDL(L,NZ,NY,NX))
+          CPPOLN=AMAX1(0.0,PPOOLN(L,NZ,NY,NX)/WTNDL(L,NZ,NY,NX))
+        ELSE
+          CCPOLN=1.0_r8
+          CZPOLN=1.0_r8
+          CPPOLN=1.0_r8
+        ENDIF
+        IF(CCPOLN.GT.ZERO)THEN
+          CCC=AMAX1(0.0,AMIN1(1.0 &
+          ,safe_adb(CZPOLN,(CZPOLN+CCPOLN*CNKI)) &
+          ,safe_adb(CPPOLN,(CPPOLN+CCPOLN*CPKI))))
+          CNC=AMAX1(0.0,AMIN1(1.0 &
+          ,safe_adb(CCPOLN,(CCPOLN+CZPOLN/CNKI))))
+          CPC=AMAX1(0.0,AMIN1(1.0 &
+          ,safe_adb(CCPOLN,(CCPOLN+CPPOLN/CPKI))))
+        ELSE
+          CCC=0._r8
+          CNC=0._r8
+          CPC=0._r8
+        ENDIF
+        IF(WTNDL(L,NZ,NY,NX).GT.ZEROP(NZ,NY,NX))THEN
+          FCNPF=AMIN1(1.0 &
+            ,SQRT(WTNDLN(L,NZ,NY,NX)/(WTNDL(L,NZ,NY,NX)*CNND(NZ,NY,NX))) &
+            ,SQRT(WTNDLP(L,NZ,NY,NX)/(WTNDL(L,NZ,NY,NX)*CPND(NZ,NY,NX))))
+        ELSE
+          FCNPF=1.0_r8
+        ENDIF
+        SPNDLI=CCPOLN/(CCPOLN+SPNDLK)
 !
 !     RESPIRATION FROM NON-STRUCTURAL C DETERMINED BY TEMPERATURE,
 !     NON-STRUCTURAL C:N:P
@@ -3148,16 +3073,16 @@ module grosubMod
 !     FCNPF=N,P constraint to bacterial activity
 !     WFNGR=growth function of root water potential
 !
-      RCNDLM=AMAX1(0.0,AMIN1(CPOOLN(L,NZ,NY,NX) &
-      ,VMXO*WTNDL(L,NZ,NY,NX))*FCNPF*TFN4(L,NZ,NY,NX)*WFNGR(1,L))
-      CPOOLNX=CPOOLN(L,NZ,NY,NX)
+        RCNDLM=AMAX1(0.0,AMIN1(CPOOLN(L,NZ,NY,NX) &
+          ,VMXO*WTNDL(L,NZ,NY,NX))*FCNPF*TFN4(L,NZ,NY,NX)*WFNGR(1,L))
+        CPOOLNX=CPOOLN(L,NZ,NY,NX)
 !
 !     O2-LIMITED NODULE RESPIRATION FROM 'WFR' IN 'UPTAKE'
 !
 !     RCNDL=respiration from non-structural C ltd by O2
 !     WFR=constraint by O2 consumption on all root processes
 !
-      RCNDL=RCNDLM*WFR(1,L,NZ,NY,NX)
+        RCNDL=RCNDLM*WFR(1,L,NZ,NY,NX)
 !
 !     NODULE MAINTENANCE RESPIRATION FROM SOIL TEMPERATURE,
 !     NODULE STRUCTURAL N
@@ -3167,7 +3092,7 @@ module grosubMod
 !     TFN6=temperature function for root maintenance respiration
 !     WTNDLN=bacterial N mass
 !
-      RMNDL=AMAX1(0.0,RMPLT*TFN6(L)*WTNDLN(L,NZ,NY,NX))*SPNDLI
+        RMNDL=AMAX1(0.0,RMPLT*TFN6(L)*WTNDLN(L,NZ,NY,NX))*SPNDLI
 !
 !     NODULE GROWTH RESPIRATION FROM TOTAL - MAINTENANCE
 !     IF > 0 DRIVES GROWTH, IF < 0 DRIVES REMOBILIZATION
@@ -3176,12 +3101,12 @@ module grosubMod
 !     RGNDLM,RGNDL=growth respiration unlimited by N,P and unltd,ltd by O2
 !     RSNDLM,RSNDL=excess maintenance respiration unltd,ltd by O2
 !
-      RXNDLM=RCNDLM-RMNDL
-      RXNDL=RCNDL-RMNDL
-      RGNDLM=AMAX1(0.0,RXNDLM)
-      RGNDL=AMAX1(0.0,RXNDL)
-      RSNDLM=AMAX1(0.0,-RXNDLM)
-      RSNDL=AMAX1(0.0,-RXNDL)
+        RXNDLM=RCNDLM-RMNDL
+        RXNDL=RCNDL-RMNDL
+        RGNDLM=AMAX1(0.0,RXNDLM)
+        RGNDL=AMAX1(0.0,RXNDL)
+        RSNDLM=AMAX1(0.0,-RXNDLM)
+        RSNDL=AMAX1(0.0,-RXNDL)
 !
 !     NODULE N2 FIXATION FROM GROWTH RESPIRATION, FIXATION ENERGY
 !     REQUIREMENT AND NON-STRUCTURAL C:N:P PRODUCT INHIBITION,
@@ -3195,15 +3120,15 @@ module grosubMod
 !     RGN2F=respiration for N2 fixation
 !     RUPNF,UPNF=layer,total root N2 fixation
 !
-      RGN2P=AMAX1(0.0,WTNDL(L,NZ,NY,NX)*CNND(NZ,NY,NX) &
-      -WTNDLN(L,NZ,NY,NX))/EN2F
-      IF(RGNDL.GT.ZEROP(NZ,NY,NX))THEN
-      RGN2F=RGNDL*RGN2P/(RGNDL+RGN2P)
-      ELSE
-      RGN2F=0._r8
-      ENDIF
-      RUPNF(L,NZ,NY,NX)=RGN2F*EN2F
-      UPNF(NZ,NY,NX)=UPNF(NZ,NY,NX)+RUPNF(L,NZ,NY,NX)
+        RGN2P=AMAX1(0.0,WTNDL(L,NZ,NY,NX)*CNND(NZ,NY,NX) &
+          -WTNDLN(L,NZ,NY,NX))/EN2F
+        IF(RGNDL.GT.ZEROP(NZ,NY,NX))THEN
+          RGN2F=RGNDL*RGN2P/(RGNDL+RGN2P)
+        ELSE
+          RGN2F=0._r8
+        ENDIF
+        RUPNF(L,NZ,NY,NX)=RGN2F*EN2F
+        UPNF(NZ,NY,NX)=UPNF(NZ,NY,NX)+RUPNF(L,NZ,NY,NX)
 !
 !     NODULE C,N,P REMOBILIZATION AND DECOMPOSITION
 !
@@ -3220,19 +3145,19 @@ module grosubMod
 !     RDNDLC,RDNDLN,RDNDLP=bacterial C,N,P decomposition to litterfall
 !     RCNDLC,RCNDLN,RCNDLP=bacterial C,N,P decomposition to recycling
 !
-      RCCC=RCCZN+CCC*RCCYN
-      RCCN=CNC*RCCXN
-      RCCP=CPC*RCCQN
-      SPNDX=SPNDL*SQRT(TFN4(L,NZ,NY,NX)*WFNGR(1,L))
-      RXNDLC=SPNDX*WTNDL(L,NZ,NY,NX)
-      RXNDLN=SPNDX*WTNDLN(L,NZ,NY,NX)
-      RXNDLP=SPNDX*WTNDLP(L,NZ,NY,NX)
-      RDNDLC=RXNDLC*(1.0-RCCC)
-      RDNDLN=RXNDLN*(1.0-RCCC)*(1.0-RCCN)
-      RDNDLP=RXNDLP*(1.0-RCCC)*(1.0-RCCP)
-      RCNDLC=RXNDLC-RDNDLC
-      RCNDLN=RXNDLN-RDNDLN
-      RCNDLP=RXNDLP-RDNDLP
+        RCCC=RCCZN+CCC*RCCYN
+        RCCN=CNC*RCCXN
+        RCCP=CPC*RCCQN
+        SPNDX=SPNDL*SQRT(TFN4(L,NZ,NY,NX)*WFNGR(1,L))
+        RXNDLC=SPNDX*WTNDL(L,NZ,NY,NX)
+        RXNDLN=SPNDX*WTNDLN(L,NZ,NY,NX)
+        RXNDLP=SPNDX*WTNDLP(L,NZ,NY,NX)
+        RDNDLC=RXNDLC*(1.0-RCCC)
+        RDNDLN=RXNDLN*(1.0-RCCC)*(1.0-RCCN)
+        RDNDLP=RXNDLP*(1.0-RCCC)*(1.0-RCCP)
+        RCNDLC=RXNDLC-RDNDLC
+        RCNDLN=RXNDLN-RDNDLN
+        RCNDLP=RXNDLP-RDNDLP
 !
 !     TOTAL NON-STRUCTURAL C,N,P USED IN NODULE GROWTH
 !     AND GROWTH RESPIRATION DEPENDS ON GROWTH YIELD
@@ -3253,14 +3178,14 @@ module grosubMod
 !     CCPOLN,CZPOLN,CPPOLN=nonstructural C,N,P concn in bacteria
 !     CZKM,CPKM=Km for nonstructural N,P uptake by bacteria
 !
-      CGNDL=AMIN1(CPOOLN(L,NZ,NY,NX)-AMIN1(RMNDL,RCNDL) &
-      -RGN2F+RCNDLC,(RGNDL-RGN2F)/(1.0-DMND(NZ,NY,NX)))
-      GRNDG=CGNDL*DMND(NZ,NY,NX)
-      RGNDG=RGN2F+CGNDL*(1.0-DMND(NZ,NY,NX))
-      ZADDN=AMAX1(0.0,AMIN1(ZPOOLN(L,NZ,NY,NX) &
-      ,GRNDG*CNND(NZ,NY,NX)))*CZPOLN/(CZPOLN+CZKM)
-      PADDN=AMAX1(0.0,AMIN1(PPOOLN(L,NZ,NY,NX) &
-      ,GRNDG*CPND(NZ,NY,NX)))*CPPOLN/(CPPOLN+CPKM)
+        CGNDL=AMIN1(CPOOLN(L,NZ,NY,NX)-AMIN1(RMNDL,RCNDL) &
+          -RGN2F+RCNDLC,(RGNDL-RGN2F)/(1.0-DMND(NZ,NY,NX)))
+        GRNDG=CGNDL*DMND(NZ,NY,NX)
+        RGNDG=RGN2F+CGNDL*(1.0-DMND(NZ,NY,NX))
+        ZADDN=AMAX1(0.0,AMIN1(ZPOOLN(L,NZ,NY,NX) &
+          ,GRNDG*CNND(NZ,NY,NX)))*CZPOLN/(CZPOLN+CZKM)
+        PADDN=AMAX1(0.0,AMIN1(PPOOLN(L,NZ,NY,NX) &
+          ,GRNDG*CPND(NZ,NY,NX)))*CPPOLN/(CPPOLN+CPKM)
 !
 !     NODULE SENESCENCE
 !
@@ -3424,18 +3349,18 @@ module grosubMod
       end subroutine RootNoduleBiomchemistry
 !------------------------------------------------------------------------------------------
 
-      subroutine RootBiochemistry(I,J,NZ,NY,NX)
-      implicit none
-      integer, intent(in) :: I,J,NZ,NY,NX
+  subroutine RootBiochemistry(I,J,NZ,NY,NX)
+  implicit none
+  integer, intent(in) :: I,J,NZ,NY,NX
 !     begin_execution
 
-      NIX(NZ,NY,NX)=NG(NZ,NY,NX)
-      IDTHRN=0
+  NIX(NZ,NY,NX)=NG(NZ,NY,NX)
+  IDTHRN=0
 !
 !     FOR ROOTS (N=1) AND MYCORRHIZAE (N=2) IN EACH SOIL LAYER
 !
-      DO 4995 N=1,MY(NZ,NY,NX)
-      DO 4990 L=NU(NY,NX),NI(NZ,NY,NX)
+  DO 4995 N=1,MY(NZ,NY,NX)
+    DO 4990 L=NU(NY,NX),NI(NZ,NY,NX)
 !
 !     RESPIRATION FROM NUTRIENT UPTAKE CALCULATED IN 'UPTAKE':
 !     ACTUAL, O2-UNLIMITED AND C-UNLIMITED
@@ -3451,15 +3376,15 @@ module grosubMod
 !     RUCH2P,RUCH2B,RUCH1P,RUCH1B=uptake from non-band,band of H2PO4,HPO4 unlimited by nonstructural C
 !
       IF(VOLX(L,NY,NX).GT.ZEROS2(NY,NX))THEN
-      CUPRL=0.86*(RUPNH4(N,L,NZ,NY,NX)+RUPNHB(N,L,NZ,NY,NX) &
-      +RUPNO3(N,L,NZ,NY,NX)+RUPNOB(N,L,NZ,NY,NX)+RUPH2P(N,L,NZ,NY,NX) &
-      +RUPH2B(N,L,NZ,NY,NX)+RUPH1P(N,L,NZ,NY,NX)+RUPH1B(N,L,NZ,NY,NX))
-      CUPRO=0.86*(RUONH4(N,L,NZ,NY,NX)+RUONHB(N,L,NZ,NY,NX) &
-      +RUONO3(N,L,NZ,NY,NX)+RUONOB(N,L,NZ,NY,NX)+RUOH2P(N,L,NZ,NY,NX) &
-      +RUOH2B(N,L,NZ,NY,NX)+RUOH1P(N,L,NZ,NY,NX)+RUOH1B(N,L,NZ,NY,NX))
-      CUPRC=0.86*(RUCNH4(N,L,NZ,NY,NX)+RUCNHB(N,L,NZ,NY,NX) &
-      +RUCNO3(N,L,NZ,NY,NX)+RUCNOB(N,L,NZ,NY,NX)+RUCH2P(N,L,NZ,NY,NX) &
-      +RUCH2B(N,L,NZ,NY,NX)+RUCH1P(N,L,NZ,NY,NX)+RUCH1B(N,L,NZ,NY,NX))
+        CUPRL=0.86*(RUPNH4(N,L,NZ,NY,NX)+RUPNHB(N,L,NZ,NY,NX) &
+          +RUPNO3(N,L,NZ,NY,NX)+RUPNOB(N,L,NZ,NY,NX)+RUPH2P(N,L,NZ,NY,NX) &
+          +RUPH2B(N,L,NZ,NY,NX)+RUPH1P(N,L,NZ,NY,NX)+RUPH1B(N,L,NZ,NY,NX))
+        CUPRO=0.86*(RUONH4(N,L,NZ,NY,NX)+RUONHB(N,L,NZ,NY,NX) &
+          +RUONO3(N,L,NZ,NY,NX)+RUONOB(N,L,NZ,NY,NX)+RUOH2P(N,L,NZ,NY,NX) &
+          +RUOH2B(N,L,NZ,NY,NX)+RUOH1P(N,L,NZ,NY,NX)+RUOH1B(N,L,NZ,NY,NX))
+        CUPRC=0.86*(RUCNH4(N,L,NZ,NY,NX)+RUCNHB(N,L,NZ,NY,NX) &
+          +RUCNO3(N,L,NZ,NY,NX)+RUCNOB(N,L,NZ,NY,NX)+RUCH2P(N,L,NZ,NY,NX) &
+          +RUCH2B(N,L,NZ,NY,NX)+RUCH1P(N,L,NZ,NY,NX)+RUCH1B(N,L,NZ,NY,NX))
 !
 !     ACCUMULATE RESPIRATION IN FLUX ARRAYS
 !
@@ -3469,10 +3394,10 @@ module grosubMod
 !     CUPRO,CUPRC=CUPRL unlimited by O2,root nonstructural C
 !     CPOOLR=non-structural C mass in root
 !
-      RCO2M(N,L,NZ,NY,NX)=RCO2M(N,L,NZ,NY,NX)+CUPRO
-      RCO2N(N,L,NZ,NY,NX)=RCO2N(N,L,NZ,NY,NX)+CUPRC
-      RCO2A(N,L,NZ,NY,NX)=RCO2A(N,L,NZ,NY,NX)-CUPRL
-      CPOOLR(N,L,NZ,NY,NX)=CPOOLR(N,L,NZ,NY,NX)-CUPRL
+        RCO2M(N,L,NZ,NY,NX)=RCO2M(N,L,NZ,NY,NX)+CUPRO
+        RCO2N(N,L,NZ,NY,NX)=RCO2N(N,L,NZ,NY,NX)+CUPRC
+        RCO2A(N,L,NZ,NY,NX)=RCO2A(N,L,NZ,NY,NX)-CUPRL
+        CPOOLR(N,L,NZ,NY,NX)=CPOOLR(N,L,NZ,NY,NX)-CUPRL
 !
 !     EXUDATION AND UPTAKE OF C, N AND P TO/FROM SOIL AND ROOT
 !     OR MYCORRHIZAL NON-STRUCTURAL C,N,P POOLS
@@ -3482,17 +3407,17 @@ module grosubMod
 !     RUPNH4,RUPNHB,RUPN03,RUPNOB=uptake from non-band,band of NH4,NO3
 !     RUPH2P,RUPH2B,RUPH1P,RUPH1B=uptake from non-band,band of H2PO4,HPO4
 !
-      DO 195 K=0,4
-      CPOOLR(N,L,NZ,NY,NX)=CPOOLR(N,L,NZ,NY,NX)+RDFOMC(N,K,L,NZ,NY,NX)
-      ZPOOLR(N,L,NZ,NY,NX)=ZPOOLR(N,L,NZ,NY,NX)+RDFOMN(N,K,L,NZ,NY,NX)
-      PPOOLR(N,L,NZ,NY,NX)=PPOOLR(N,L,NZ,NY,NX)+RDFOMP(N,K,L,NZ,NY,NX)
-195   CONTINUE
-      ZPOOLR(N,L,NZ,NY,NX)=ZPOOLR(N,L,NZ,NY,NX) &
-      +RUPNH4(N,L,NZ,NY,NX)+RUPNHB(N,L,NZ,NY,NX) &
-      +RUPNO3(N,L,NZ,NY,NX)+RUPNOB(N,L,NZ,NY,NX)
-      PPOOLR(N,L,NZ,NY,NX)=PPOOLR(N,L,NZ,NY,NX) &
-      +RUPH2P(N,L,NZ,NY,NX)+RUPH2B(N,L,NZ,NY,NX) &
-      +RUPH1P(N,L,NZ,NY,NX)+RUPH1B(N,L,NZ,NY,NX)
+        DO 195 K=0,4
+          CPOOLR(N,L,NZ,NY,NX)=CPOOLR(N,L,NZ,NY,NX)+RDFOMC(N,K,L,NZ,NY,NX)
+          ZPOOLR(N,L,NZ,NY,NX)=ZPOOLR(N,L,NZ,NY,NX)+RDFOMN(N,K,L,NZ,NY,NX)
+          PPOOLR(N,L,NZ,NY,NX)=PPOOLR(N,L,NZ,NY,NX)+RDFOMP(N,K,L,NZ,NY,NX)
+195     CONTINUE
+        ZPOOLR(N,L,NZ,NY,NX)=ZPOOLR(N,L,NZ,NY,NX) &
+          +RUPNH4(N,L,NZ,NY,NX)+RUPNHB(N,L,NZ,NY,NX) &
+          +RUPNO3(N,L,NZ,NY,NX)+RUPNOB(N,L,NZ,NY,NX)
+        PPOOLR(N,L,NZ,NY,NX)=PPOOLR(N,L,NZ,NY,NX) &
+          +RUPH2P(N,L,NZ,NY,NX)+RUPH2B(N,L,NZ,NY,NX) &
+          +RUPH1P(N,L,NZ,NY,NX)+RUPH1B(N,L,NZ,NY,NX)
 !     IF(L.EQ.1)THEN
 !     WRITE(*,9881)'CUPNH4',I,J,NZ,L,N,CPOOLR(N,L,NZ,NY,NX)
 !    2,ZPOOLR(N,L,NZ,NY,NX),PPOOLR(N,L,NZ,NY,NX),CUPRL
@@ -3505,7 +3430,7 @@ module grosubMod
 !
 !     GROWTH OF EACH ROOT AXIS
 !
-      DO 4985 NR=1,NRT(NZ,NY,NX)
+        DO 4985 NR=1,NRT(NZ,NY,NX)
 !
 !     PRIMARY ROOT SINK STRENGTH FROM ROOT RADIUS AND ROOT DEPTH
 !
@@ -3519,17 +3444,17 @@ module grosubMod
 !     RRAD1,RRAD2=primary, secondary root radius
 !     RTNT,RLNT=total root sink strength
 !
-      IF(N.EQ.1)THEN
-      IF(RTDP1(N,NR,NZ,NY,NX).GT.CDPTHZ(L-1,NY,NX))THEN
-      IF(RTDP1(N,NR,NZ,NY,NX).LE.CDPTHZ(L,NY,NX))THEN
-      RTDPP=RTDP1(N,NR,NZ,NY,NX)+HTSTZ(NZ,NY,NX)
-      RTSK1(N,L,NR)=RTSK(IGTYP(NZ,NY,NX))*XRTN1 &
-      *RRAD1(N,L,NZ,NY,NX)**2/RTDPP
-      RTNT(N)=RTNT(N)+RTSK1(N,L,NR)
-      RLNT(N,L)=RLNT(N,L)+RTSK1(N,L,NR)
-      ENDIF
-      ENDIF
-      ENDIF
+          IF(N.EQ.1)THEN
+            IF(RTDP1(N,NR,NZ,NY,NX).GT.CDPTHZ(L-1,NY,NX))THEN
+              IF(RTDP1(N,NR,NZ,NY,NX).LE.CDPTHZ(L,NY,NX))THEN
+                RTDPP=RTDP1(N,NR,NZ,NY,NX)+HTSTZ(NZ,NY,NX)
+                RTSK1(N,L,NR)=RTSK(IGTYP(NZ,NY,NX))*XRTN1 &
+                  *RRAD1(N,L,NZ,NY,NX)**2/RTDPP
+                RTNT(N)=RTNT(N)+RTSK1(N,L,NR)
+                RLNT(N,L)=RLNT(N,L)+RTSK1(N,L,NR)
+              ENDIF
+            ENDIF
+          ENDIF
 !
 !     SECONDARY ROOT SINK STRENGTH FROM ROOT RADIUS, ROOT AXIS NUMBER,
 !     AND ROOT LENGTH IN SERIES WITH PRIMARY ROOT SINK STRENGTH
@@ -3549,31 +3474,30 @@ module grosubMod
 !     RTLGA=average secondary root length
 !     RTNT,RLNT=total root sink strength
 !
-      IF(N.EQ.1)THEN
-      RTDPL(NR,L)=AMAX1(0.0,RTDP1(1,NR,NZ,NY,NX)-CDPTHZ(L-1,NY,NX) &
-      -RTDPX)
-      RTDPL(NR,L)=AMAX1(0.0,AMIN1(DLYR(3,L,NY,NX),RTDPL(NR,L)) &
-      -AMAX1(0.0,SDPTH(NZ,NY,NX)-CDPTHZ(L-1,NY,NX)-HTCTL(NZ,NY,NX)))
-      RTDPS=AMAX1(SDPTH(NZ,NY,NX),CDPTHZ(L-1,NY,NX)) &
-      +0.5*RTDPL(NR,L)+HTSTZ(NZ,NY,NX)
-      IF(RTDPS.GT.ZERO)THEN
-      RTSKP=XRTN1*RRAD1(N,L,NZ,NY,NX)**2/RTDPS
-      RTSKS=RTN2(N,L,NR,NZ,NY,NX)*RRAD2(N,L,NZ,NY,NX)**2 &
-      /RTLGA(N,L,NZ,NY,NX)
-      IF(RTSKP+RTSKS.GT.ZEROP(NZ,NY,NX))THEN
-      RTSK2(N,L,NR)=RTSKP*RTSKS/(RTSKP+RTSKS)
-      ELSE
-      RTSK2(N,L,NR)=0._r8
-      ENDIF
-      ELSE
-      RTSK2(N,L,NR)=0._r8
-      ENDIF
-      ELSE
-      RTSK2(N,L,NR)=RTN2(N,L,NR,NZ,NY,NX)*RRAD2(N,L,NZ,NY,NX)**2 &
-      /RTLGA(N,L,NZ,NY,NX)
-      ENDIF
-      RTNT(N)=RTNT(N)+RTSK2(N,L,NR)
-      RLNT(N,L)=RLNT(N,L)+RTSK2(N,L,NR)
+          IF(N.EQ.1)THEN
+            RTDPL(NR,L)=AMAX1(0.0,RTDP1(1,NR,NZ,NY,NX)-CDPTHZ(L-1,NY,NX)-RTDPX)
+            RTDPL(NR,L)=AMAX1(0.0,AMIN1(DLYR(3,L,NY,NX),RTDPL(NR,L)) &
+              -AMAX1(0.0,SDPTH(NZ,NY,NX)-CDPTHZ(L-1,NY,NX)-HTCTL(NZ,NY,NX)))
+            RTDPS=AMAX1(SDPTH(NZ,NY,NX),CDPTHZ(L-1,NY,NX)) &
+              +0.5*RTDPL(NR,L)+HTSTZ(NZ,NY,NX)
+            IF(RTDPS.GT.ZERO)THEN
+              RTSKP=XRTN1*RRAD1(N,L,NZ,NY,NX)**2/RTDPS
+              RTSKS=safe_adb(RTN2(N,L,NR,NZ,NY,NX)*RRAD2(N,L,NZ,NY,NX)**2 &
+                ,RTLGA(N,L,NZ,NY,NX))
+              IF(RTSKP+RTSKS.GT.ZEROP(NZ,NY,NX))THEN
+                RTSK2(N,L,NR)=RTSKP*RTSKS/(RTSKP+RTSKS)
+              ELSE
+                RTSK2(N,L,NR)=0._r8
+              ENDIF
+            ELSE
+              RTSK2(N,L,NR)=0._r8
+            ENDIF
+          ELSE
+            RTSK2(N,L,NR)=safe_adb(RTN2(N,L,NR,NZ,NY,NX)*RRAD2(N,L,NZ,NY,NX)**2 &
+              ,RTLGA(N,L,NZ,NY,NX))
+          ENDIF
+          RTNT(N)=RTNT(N)+RTSK2(N,L,NR)
+          RLNT(N,L)=RLNT(N,L)+RTSK2(N,L,NR)
 !     IF(IYRC.EQ.2000.AND.I.LE.160)THEN
 !     WRITE(*,3341)'SINK',I,J,NX,NY,NZ,L,NR,N,RTDP1(N,NR,NZ,NY,NX)
 !    2,HTCTL(NZ,NY,NX),RTSK1(N,L,NR),RTSK2(N,L,NR),RLNT(N,L),RTNT(N)
@@ -3582,7 +3506,7 @@ module grosubMod
 !    2,RTLGA(N,L,NZ,NY,NX),CDPTHZ(L-1,NY,NX),CDPTHZ(L,NY,NX)
 !3341  FORMAT(A8,8I4,30E12.4)
 !     ENDIF
-4985  CONTINUE
+4985    CONTINUE
       ENDIF
 4990  CONTINUE
 4995  CONTINUE
@@ -3590,25 +3514,25 @@ module grosubMod
 !     RESPIRATION AND GROWTH OF ROOT, MYCORRHIZAE IN EACH LAYER
 !
       DO 5010 N=1,MY(NZ,NY,NX)
-      DO 5000 L=NU(NY,NX),NI(NZ,NY,NX)
+        DO 5000 L=NU(NY,NX),NI(NZ,NY,NX)
 !
 !     IDENTIFY NEXT LOWER ROOT LAYER
 !
 !     VOLX=soil layer volume excluding macropore, rocks
 !
-      IF(VOLX(L,NY,NX).GT.ZEROS2(NY,NX))THEN
+          IF(VOLX(L,NY,NX).GT.ZEROS2(NY,NX))THEN
 !     WRITE(*,4994)'5004',I,J,NZ,N,L,NI(NZ,NY,NX)
 !    2,NL(NY,NX),VOLX(L,NY,NX),CDPTHZ(L-1,NY,NX)
-      DO 5003 LZ=L+1,NL(NY,NX)
+            DO 5003 LZ=L+1,NL(NY,NX)
 !     WRITE(*,4994)'5003',I,J,NZ,N,L,LZ
 !    2,LZ,VOLX(L,NY,NX),CDPTHZ(LZ,NY,NX)
-      IF(VOLX(LZ,NY,NX).GT.ZEROS2(NY,NX) &
-      .OR.LZ.EQ.NL(NY,NX))THEN
-      L1=LZ
-      GO TO 5004
-      ENDIF
-5003  CONTINUE
-5004  CONTINUE
+              IF(VOLX(LZ,NY,NX).GT.ZEROS2(NY,NX) &
+                .OR.LZ.EQ.NL(NY,NX))THEN
+                L1=LZ
+                GO TO 5004
+              ENDIF
+5003        CONTINUE
+5004        CONTINUE
 !     WRITE(*,4994)'5005',I,J,NZ,N,L,LZ
 !    2,L1,VOLX(L,NY,NX),CDPTHZ(L1,NY,NX)
 !4994  FORMAT(A8,7I4,12E12.4)
@@ -3624,28 +3548,28 @@ module grosubMod
 !     PSIRT,PSIRG=root total,turgor water potential
 !     DMRT=root growth yield
 !
-      RSCS2=RSCS(L,NY,NX)*RRAD2(N,L,NZ,NY,NX)/1.0E-03
-      WFNR=AMIN1(1.0,AMAX1(0.0,PSIRG(N,L,NZ,NY,NX)-PSILM-RSCS2))
-      IF(IGTYP(NZ,NY,NX).EQ.0)THEN
-      WFNGR(N,L)=EXP(0.05*PSIRT(N,L,NZ,NY,NX))
-      WFNRG=WFNR**0.10
-      ELSE
-      WFNGR(N,L)=EXP(0.10*PSIRT(N,L,NZ,NY,NX))
-      WFNRG=WFNR**0.25
-      ENDIF
-      DMRTD=1.0_r8-DMRT(NZ,NY,NX)
-      RTLGL=0._r8
-      RTLGZ=0._r8
-      WTRTX=0._r8
-      WTRTZ=0._r8
+            RSCS2=RSCS(L,NY,NX)*RRAD2(N,L,NZ,NY,NX)/1.0E-03
+            WFNR=AMIN1(1.0,AMAX1(0.0,PSIRG(N,L,NZ,NY,NX)-PSILM-RSCS2))
+            IF(IGTYP(NZ,NY,NX).EQ.0)THEN
+              WFNGR(N,L)=EXP(0.05*PSIRT(N,L,NZ,NY,NX))
+              WFNRG=WFNR**0.10
+            ELSE
+              WFNGR(N,L)=EXP(0.10*PSIRT(N,L,NZ,NY,NX))
+              WFNRG=WFNR**0.25
+            ENDIF
+            DMRTD=1.0_r8-DMRT(NZ,NY,NX)
+            RTLGL=0._r8
+            RTLGZ=0._r8
+            WTRTX=0._r8
+            WTRTZ=0._r8
 !
 !     FOR EACH ROOT AXIS
 !
-      DO 5050 NR=1,NRT(NZ,NY,NX)
+            DO 5050 NR=1,NRT(NZ,NY,NX)
 !
 !     SECONDARY ROOT EXTENSION
 !
-      IF(L.LE.NINR(NR,NZ,NY,NX).AND.NRX(N,NR).EQ.0)THEN
+              IF(L.LE.NINR(NR,NZ,NY,NX).AND.NRX(N,NR).EQ.0)THEN
 !
 !     FRACTION OF SECONDARY ROOT SINK IN SOIL LAYER ATTRIBUTED
 !     TO CURRENT AXIS
@@ -3654,11 +3578,11 @@ module grosubMod
 !     RLNT=total root sink strength
 !     FRTN=fraction of secondary root sink strength in axis
 !
-      IF(RLNT(N,L).GT.ZEROP(NZ,NY,NX))THEN
-      FRTN=RTSK2(N,L,NR)/RLNT(N,L)
-      ELSE
-      FRTN=1.0_r8
-      ENDIF
+                IF(RLNT(N,L).GT.ZEROP(NZ,NY,NX))THEN
+                  FRTN=RTSK2(N,L,NR)/RLNT(N,L)
+                ELSE
+                  FRTN=1.0_r8
+                ENDIF
 !
 !     N,P CONSTRAINT ON SECONDARY ROOT RESPIRATION FROM
 !     NON-STRUCTURAL C:N:P
@@ -3667,13 +3591,13 @@ module grosubMod
 !     CNPG=N,P constraint on growth respiration
 !     CNKI,CPKI=nonstructural N,P inhibition constant on growth
 !
-      IF(CCPOLR(N,L,NZ,NY,NX).GT.ZERO)THEN
-      CNPG=AMIN1(CZPOLR(N,L,NZ,NY,NX)/(CZPOLR(N,L,NZ,NY,NX) &
-      +CCPOLR(N,L,NZ,NY,NX)*CNKI),CPPOLR(N,L,NZ,NY,NX) &
-      /(CPPOLR(N,L,NZ,NY,NX)+CCPOLR(N,L,NZ,NY,NX)*CPKI))
-      ELSE
-      CNPG=1.0_r8
-      ENDIF
+                IF(CCPOLR(N,L,NZ,NY,NX).GT.ZERO)THEN
+                  CNPG=AMIN1(CZPOLR(N,L,NZ,NY,NX)/(CZPOLR(N,L,NZ,NY,NX) &
+                    +CCPOLR(N,L,NZ,NY,NX)*CNKI),CPPOLR(N,L,NZ,NY,NX) &
+                    /(CPPOLR(N,L,NZ,NY,NX)+CCPOLR(N,L,NZ,NY,NX)*CPKI))
+                ELSE
+                  CNPG=1.0_r8
+                ENDIF
 !
 !     SECONDARY ROOT MAINTENANCE RESPIRATION FROM SOIL TEMPERATURE,
 !     ROOT STRUCTURAL N
@@ -3686,10 +3610,10 @@ module grosubMod
 !     IWTYP=phenology type:0=evergreen,1=cold decid,2=drought decid,3=1+2
 !     WFNGR=growth function of root water potential
 !
-      RMNCR=AMAX1(0.0,RMPLT*WTRT2N(N,L,NR,NZ,NY,NX))*TFN6(L)
-      IF(IGTYP(NZ,NY,NX).EQ.0.OR.IWTYP(NZ,NY,NX).EQ.2)THEN
-      RMNCR=RMNCR*WFNGR(N,L)
-      ENDIF
+                RMNCR=AMAX1(0.0,RMPLT*WTRT2N(N,L,NR,NZ,NY,NX))*TFN6(L)
+                IF(IGTYP(NZ,NY,NX).EQ.0.OR.IWTYP(NZ,NY,NX).EQ.2)THEN
+                  RMNCR=RMNCR*WFNGR(N,L)
+                ENDIF
 !
 !     O2-UNLIMITED SECONDARY ROOT RESPIRATION FROM NON-STRUCTURAL C
 !     CONSTRAINED BY TEMPERATURE AND NON-STRUCTURAL C:N:P
@@ -3702,9 +3626,9 @@ module grosubMod
 !     FDBKX=termination feedback inhibition on C3 CO2
 !     WFNGR=growth function of root water potential
 !
-      RCO2RM=AMAX1(0.0,VMXC*FRTN*CPOOLR(N,L,NZ,NY,NX) &
-      *TFN4(L,NZ,NY,NX))*CNPG*FDBKX(NB1(NZ,NY,NX),NZ,NY,NX) &
-      *WFNGR(N,L)
+                RCO2RM=AMAX1(0.0,VMXC*FRTN*CPOOLR(N,L,NZ,NY,NX) &
+                  *TFN4(L,NZ,NY,NX))*CNPG*FDBKX(NB1(NZ,NY,NX),NZ,NY,NX) &
+                  *WFNGR(N,L)
 !
 !     O2-LIMITED SECONDARY ROOT RESPIRATION FROM 'WFR' IN 'UPTAKE'
 !
@@ -3714,11 +3638,11 @@ module grosubMod
 !     RCO2YM,RCO2Y=growth respiration unltd,ltd by O2 and unlimited by N,P
 !     WFNRG=respiration function of root water potential
 !
-      RCO2R=RCO2RM*WFR(N,L,NZ,NY,NX)
-      RCO2XM=RCO2RM-RMNCR
-      RCO2X=RCO2R-RMNCR
-      RCO2YM=AMAX1(0.0,RCO2XM)*WFNRG
-      RCO2Y=AMAX1(0.0,RCO2X)*WFNRG
+                RCO2R=RCO2RM*WFR(N,L,NZ,NY,NX)
+                RCO2XM=RCO2RM-RMNCR
+                RCO2X=RCO2R-RMNCR
+                RCO2YM=AMAX1(0.0,RCO2XM)*WFNRG
+                RCO2Y=AMAX1(0.0,RCO2X)*WFNRG
 !
 !     SECONDARY ROOT GROWTH RESPIRATION MAY BE LIMITED BY
 !     NON-STRUCTURAL N,P AVAILABLE FOR GROWTH
@@ -3729,21 +3653,21 @@ module grosubMod
 !     FNP=growth respiration limited by non-structural N,P
 !     RCO2GM,RCO2G=growth respiration limited by N,P unltd,ltd by O2
 !
-      DMRTR=DMRTD*FRTN
-      ZPOOLB=AMAX1(0.0,ZPOOLR(N,L,NZ,NY,NX))
-      PPOOLB=AMAX1(0.0,PPOOLR(N,L,NZ,NY,NX))
-      FNP=AMIN1(ZPOOLB*DMRTR/CNRTS(NZ,NY,NX) &
-      ,PPOOLB*DMRTR/CPRTS(NZ,NY,NX))
-      IF(RCO2YM.GT.0.0)THEN
-      RCO2GM=AMIN1(RCO2YM,FNP)
-      ELSE
-      RCO2GM=0._r8
-      ENDIF
-      IF(RCO2Y.GT.0.0)THEN
-      RCO2G=AMIN1(RCO2Y,FNP*WFR(N,L,NZ,NY,NX))
-      ELSE
-      RCO2G=0._r8
-      ENDIF
+                DMRTR=DMRTD*FRTN
+                ZPOOLB=AMAX1(0.0,ZPOOLR(N,L,NZ,NY,NX))
+                PPOOLB=AMAX1(0.0,PPOOLR(N,L,NZ,NY,NX))
+                FNP=AMIN1(ZPOOLB*DMRTR/CNRTS(NZ,NY,NX) &
+                  ,PPOOLB*DMRTR/CPRTS(NZ,NY,NX))
+                IF(RCO2YM.GT.0.0)THEN
+                  RCO2GM=AMIN1(RCO2YM,FNP)
+                ELSE
+                  RCO2GM=0._r8
+                ENDIF
+                IF(RCO2Y.GT.0.0)THEN
+                  RCO2G=AMIN1(RCO2Y,FNP*WFR(N,L,NZ,NY,NX))
+                ELSE
+                  RCO2G=0._r8
+                ENDIF
 !
 !     TOTAL NON-STRUCTURAL C,N,P USED IN SECONDARY ROOT GROWTH
 !     AND GROWTH RESPIRATION DEPENDS ON GROWTH YIELD ENTERED IN 'READQ'
@@ -3756,15 +3680,15 @@ module grosubMod
 !     ZADD2M,ZADD2,PADD2=nonstructural N,P unlimited,limited by O2 used in growth
 !     CNRDM,CNRDA=respiration for N assimilation unltd,ltd by O2
 !
-      CGRORM=RCO2GM/DMRTD
-      CGROR=RCO2G/DMRTD
-      GRTWGM=CGRORM*DMRT(NZ,NY,NX)
-      GRTWTG=CGROR*DMRT(NZ,NY,NX)
-      ZADD2M=AMAX1(0.0,GRTWGM*CNRTW)
-      ZADD2=AMAX1(0.0,AMIN1(FRTN*ZPOOLR(N,L,NZ,NY,NX),GRTWTG*CNRTW))
-      PADD2=AMAX1(0.0,AMIN1(FRTN*PPOOLR(N,L,NZ,NY,NX),GRTWTG*CPRTW))
-      CNRDM=AMAX1(0.0,1.70*ZADD2M)
-      CNRDA=AMAX1(0.0,1.70*ZADD2)
+                CGRORM=RCO2GM/DMRTD
+                CGROR=RCO2G/DMRTD
+                GRTWGM=CGRORM*DMRT(NZ,NY,NX)
+                GRTWTG=CGROR*DMRT(NZ,NY,NX)
+                ZADD2M=AMAX1(0.0,GRTWGM*CNRTW)
+                ZADD2=AMAX1(0.0,AMIN1(FRTN*ZPOOLR(N,L,NZ,NY,NX),GRTWTG*CNRTW))
+                PADD2=AMAX1(0.0,AMIN1(FRTN*PPOOLR(N,L,NZ,NY,NX),GRTWTG*CPRTW))
+                CNRDM=AMAX1(0.0,1.70*ZADD2M)
+                CNRDA=AMAX1(0.0,1.70*ZADD2)
 !
 !     SECONDARY ROOT GROWTH RESPIRATION FROM TOTAL - MAINTENANCE
 !     IF > 0 DRIVES GROWTH, IF < 0 DRIVES REMOBILIZATION, ALSO
@@ -3777,27 +3701,27 @@ module grosubMod
 !     RCCZR,RCCYR=min,max fractions for root C recycling
 !     RCCXR,RCCQR=max fractions for root N,P recycling
 !
-      IF(IDAY(1,NB1(NZ,NY,NX),NZ,NY,NX).NE.0 &
-      .AND.CCPOLR(N,L,NZ,NY,NX).GT.ZERO)THEN
-      CCC=AMAX1(0.0,AMIN1(1.0 &
-      ,CZPOLR(N,L,NZ,NY,NX)/(CZPOLR(N,L,NZ,NY,NX) &
-      +CCPOLR(N,L,NZ,NY,NX)*CNKI) &
-      ,CPPOLR(N,L,NZ,NY,NX)/(CPPOLR(N,L,NZ,NY,NX) &
-      +CCPOLR(N,L,NZ,NY,NX)*CPKI)))
-      CNC=AMAX1(0.0,AMIN1(1.0 &
-      ,CCPOLR(N,L,NZ,NY,NX)/(CCPOLR(N,L,NZ,NY,NX) &
-      +CZPOLR(N,L,NZ,NY,NX)/CNKI)))
-      CPC=AMAX1(0.0,AMIN1(1.0 &
-      ,CCPOLR(N,L,NZ,NY,NX)/(CCPOLR(N,L,NZ,NY,NX) &
-      +CPPOLR(N,L,NZ,NY,NX)/CPKI)))
-      ELSE
-      CCC=0._r8
-      CNC=0._r8
-      CPC=0._r8
-      ENDIF
-      RCCC=RCCZR+CCC*RCCYR
-      RCCN=CNC*RCCXR
-      RCCP=CPC*RCCQR
+                IF(IDAY(1,NB1(NZ,NY,NX),NZ,NY,NX).NE.0 &
+                  .AND.CCPOLR(N,L,NZ,NY,NX).GT.ZERO)THEN
+                  CCC=AMAX1(0.0,AMIN1(1.0 &
+                    ,safe_adb(CZPOLR(N,L,NZ,NY,NX),(CZPOLR(N,L,NZ,NY,NX) &
+                    +CCPOLR(N,L,NZ,NY,NX)*CNKI)) &
+                    ,safe_adb(CPPOLR(N,L,NZ,NY,NX),(CPPOLR(N,L,NZ,NY,NX) &
+                    +CCPOLR(N,L,NZ,NY,NX)*CPKI))))
+                  CNC=AMAX1(0.0,AMIN1(1.0 &
+                    ,safe_adb(CCPOLR(N,L,NZ,NY,NX),(CCPOLR(N,L,NZ,NY,NX) &
+                    +CZPOLR(N,L,NZ,NY,NX)/CNKI))))
+                  CPC=AMAX1(0.0,AMIN1(1.0 &
+                    ,safe_adb(CCPOLR(N,L,NZ,NY,NX),(CCPOLR(N,L,NZ,NY,NX) &
+                    +CPPOLR(N,L,NZ,NY,NX)/CPKI))))
+                ELSE
+                  CCC=0._r8
+                  CNC=0._r8
+                  CPC=0._r8
+                ENDIF
+                RCCC=RCCZR+CCC*RCCYR
+                RCCN=CNC*RCCXR
+                RCCP=CPC*RCCQR
 !
 !     RECOVERY OF REMOBILIZABLE N,P FROM SECONDARY ROOT DURING
 !     REMOBILIZATION DEPENDS ON ROOT NON-STRUCTURAL C:N:P
@@ -4156,16 +4080,16 @@ module grosubMod
       IF(IDAY(1,NB1(NZ,NY,NX),NZ,NY,NX).NE.0 &
       .AND.CCPOLR(N,L,NZ,NY,NX).GT.ZERO)THEN
       CCC=AMAX1(0.0,AMIN1(1.0 &
-      ,CZPOLR(N,L,NZ,NY,NX)/(CZPOLR(N,L,NZ,NY,NX) &
-      +CCPOLR(N,L,NZ,NY,NX)*CNKI) &
-      ,CPPOLR(N,L,NZ,NY,NX)/(CPPOLR(N,L,NZ,NY,NX) &
-      +CCPOLR(N,L,NZ,NY,NX)*CPKI)))
+      ,safe_adb(CZPOLR(N,L,NZ,NY,NX),(CZPOLR(N,L,NZ,NY,NX) &
+      +CCPOLR(N,L,NZ,NY,NX)*CNKI)) &
+      ,safe_adb(CPPOLR(N,L,NZ,NY,NX),(CPPOLR(N,L,NZ,NY,NX) &
+      +CCPOLR(N,L,NZ,NY,NX)*CPKI))))
       CNC=AMAX1(0.0,AMIN1(1.0 &
-      ,CCPOLR(N,L,NZ,NY,NX)/(CCPOLR(N,L,NZ,NY,NX) &
-      +CZPOLR(N,L,NZ,NY,NX)/CNKI)))
+      ,safe_adb(CCPOLR(N,L,NZ,NY,NX),(CCPOLR(N,L,NZ,NY,NX) &
+      +CZPOLR(N,L,NZ,NY,NX)/CNKI))))
       CPC=AMAX1(0.0,AMIN1(1.0 &
-      ,CCPOLR(N,L,NZ,NY,NX)/(CCPOLR(N,L,NZ,NY,NX) &
-      +CPPOLR(N,L,NZ,NY,NX)/CPKI)))
+      ,safe_adb(CCPOLR(N,L,NZ,NY,NX),(CCPOLR(N,L,NZ,NY,NX) &
+      +CPPOLR(N,L,NZ,NY,NX)/CPKI))))
       ELSE
       CCC=0._r8
       CNC=0._r8
@@ -4955,12 +4879,12 @@ module grosubMod
       ENDIF
       IF(CCPOLN.GT.ZERO)THEN
       CCC=AMAX1(0.0,AMIN1(1.0 &
-      ,CZPOLN/(CZPOLN+CCPOLN*CNKI) &
-      ,CPPOLN/(CPPOLN+CCPOLN*CPKI)))
+      ,safe_adb(CZPOLN,(CZPOLN+CCPOLN*CNKI)) &
+      ,safe_adb(CPPOLN,(CPPOLN+CCPOLN*CPKI))))
       CNC=AMAX1(0.0,AMIN1(1.0 &
-      ,CCPOLN/(CCPOLN+CZPOLN/CNKI)))
+      ,safe_adb(CCPOLN,(CCPOLN+CZPOLN/CNKI))))
       CPC=AMAX1(0.0,AMIN1(1.0 &
-      ,CCPOLN/(CCPOLN+CPPOLN/CPKI)))
+      ,safe_adb(CCPOLN,(CCPOLN+CPPOLN/CPKI))))
       ELSE
       CCC=0._r8
       CNC=0._r8
@@ -6043,16 +5967,16 @@ module grosubMod
         IF(IDAY(1,NB,NZ,NY,NX).NE.0 &
          .AND.CCPOLB(NB,NZ,NY,NX).GT.ZERO)THEN
           CCC=AMAX1(0.0,AMIN1(1.0 &
-            ,CZPOLB(NB,NZ,NY,NX)/(CZPOLB(NB,NZ,NY,NX) &
-            +CCPOLB(NB,NZ,NY,NX)*CNKI) &
-            ,CPPOLB(NB,NZ,NY,NX)/(CPPOLB(NB,NZ,NY,NX) &
-            +CCPOLB(NB,NZ,NY,NX)*CPKI)))
+            ,safe_adb(CZPOLB(NB,NZ,NY,NX),(CZPOLB(NB,NZ,NY,NX) &
+            +CCPOLB(NB,NZ,NY,NX)*CNKI)) &
+            ,safe_adb(CPPOLB(NB,NZ,NY,NX),(CPPOLB(NB,NZ,NY,NX) &
+            +CCPOLB(NB,NZ,NY,NX)*CPKI))))
           CNC=AMAX1(0.0,AMIN1(1.0 &
-            ,CCPOLB(NB,NZ,NY,NX)/(CCPOLB(NB,NZ,NY,NX) &
-            +CZPOLB(NB,NZ,NY,NX)/CNKI)))
+            ,safe_adb(CCPOLB(NB,NZ,NY,NX),(CCPOLB(NB,NZ,NY,NX) &
+            +CZPOLB(NB,NZ,NY,NX)/CNKI))))
           CPC=AMAX1(0.0,AMIN1(1.0 &
-            ,CCPOLB(NB,NZ,NY,NX)/(CCPOLB(NB,NZ,NY,NX) &
-            +CPPOLB(NB,NZ,NY,NX)/CPKI)))
+            ,safe_adb(CCPOLB(NB,NZ,NY,NX),(CCPOLB(NB,NZ,NY,NX) &
+            +CPPOLB(NB,NZ,NY,NX)/CPKI))))
         ELSE
           CCC=0._r8
           CNC=0._r8

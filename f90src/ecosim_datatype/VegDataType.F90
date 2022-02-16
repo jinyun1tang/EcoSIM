@@ -6,6 +6,11 @@ module VegDataType
 
   real(r8),allocatable :: ZSIN(:)
   real(r8),allocatable :: ZCOS(:)
+  real(r8),allocatable :: OMEGA(:,:,:)
+  real(r8),allocatable :: OMEGX(:,:,:)
+  integer,allocatable :: IALBY(:,:,:)
+
+  real(r8) :: TYSIN
 
   private :: InitAllocate
 
@@ -29,6 +34,7 @@ module VegDataType
     ZSIN(N)=sin(aa)
     ZCOS(N)=cos(aa)
   ENDDO
+  TYSIN = 0._r8
   end subroutine InitVegData
 
 !------------------------------------------------------------------------------------------
@@ -40,7 +46,9 @@ module VegDataType
 
   allocate(ZSIN(JLI))
   allocate(ZCOS(JLI))
-
+  allocate(OMEGA(JSA,JLI,JLA))
+  allocate(OMEGX(JSA,JLI,JLA))
+  allocate(IALBY(JSA,JLI,JLA))
   end subroutine InitAllocate
 !------------------------------------------------------------------------------------------
 
@@ -49,6 +57,9 @@ module VegDataType
   implicit none
   deallocate(ZSIN)
   deallocate(ZCOS)
+  deallocate(OMEGA)
+  deallocate(OMEGX)
 
+  deallocate(IALBY)
   end subroutine DestructVegData
 end module VegDataType

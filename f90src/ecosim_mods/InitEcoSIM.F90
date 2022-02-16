@@ -14,7 +14,7 @@ module InitEcoSIM
   use SoilChemDataType  , only : InitSoilChemData
   use FertilizerDataType, only : InitFertilizerData
   use VegDataType       , only : InitVegData
-
+  use GrosubMod         , only : InitGrosub
   implicit  none
   integer, intent(in) :: nmicbguilds
 
@@ -27,6 +27,8 @@ module InitEcoSIM
   call InitSOMData
 
   call InitFertilizerData
+
+  call InitGrosub
 
   call initNitro
 

@@ -1,11 +1,11 @@
 module WthrMod
   !
-  !      Description:
-  !
+  ! Description:
+  ! code to process the weather forcing
   use data_kind_mod, only : r8 => SHR_KIND_R8
   use MiniMathMod, only : safe_adb,vapsat0
   use EcosimConst
-
+  use VegDataType
   implicit none
 
   private

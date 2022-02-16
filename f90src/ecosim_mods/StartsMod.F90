@@ -34,14 +34,12 @@ module StartsMod
   include "blk18b.h"
 
   real(r8) :: ALTY,ALTZG,CDPTHG
-  real(r8) :: DAZI,DGAZI,DLYRSI
-  real(r8) :: OMEGY,OMEGZ
+  real(r8) :: DGAZI,DLYRSI
   real(r8) :: PTDS,TORGM
-  real(r8) :: VOLSWI,VORGC,VMINL,VSAND,YAGL
-  real(r8) :: ZAGL
+  real(r8) :: VOLSWI,VORGC,VMINL,VSAND
 ! JSA: # of sectors for the sky azimuth  [0,2*pi]
 ! JLA: # of sectors for the leaf zimuth, [0,pi]
-  real(r8) :: YSIN(JSA),YCOS(JSA),YAZI(JSA),ZAZI(JLA) &
+  real(r8) :: YSIN(JSA),YCOS(JSA),YAZI(JSA) &
     ,GSINA(JY,JX),GCOSA(JY,JX),ALTX(JV,JH),CDPTHSI(JS) &
     ,TORGL(JZ)
   !
@@ -64,6 +62,7 @@ module StartsMod
   !     THIS SUBROUTINE INITIALIZES ALL SOIL VARIABLES
   !
   use InitSOMBGC, only : InitMicbStoichiometry
+  use InitVegBGC, only : InitIrradianceGeometry
   implicit none
   integer, intent(in) :: NHW,NHE,NVN,NVS
 
@@ -75,7 +74,7 @@ module StartsMod
   call InitControlParameters
   !
   !     IRRADIANCE INTERCEPTION GEOMETRY
-  call InitIrradianceGeometry
+  call InitIrradianceGeometry(YSIN,YCOS,YAZI)
   !
   !     INITIALIZE C-N AND C-P RATIOS OF RESIDUE AND SOIL
   !
@@ -288,57 +287,6 @@ module StartsMod
 9890  CONTINUE
 9895  CONTINUE
   end subroutine InitSoilVars
-!------------------------------------------------------------------------------------------
-  subroutine InitIrradianceGeometry
-
-  implicit none
-  integer :: L,M,N
-  !     begin_execution
-  !     ZSIN,ZCOS=sine,cosine of leaf inclination class
-  !     ZAZI=leaf azimuth class, it is pi because only on one side of the leaf
-  !     YAZI,YSIN,YCOS=sky azimuth,sine,cosine of sky azimuth
-  !     OMEGA,OMEGX=incident aNGLe of diffuse radn at leaf,horizontal surface
-  !     IALBY:1=backscattering,2=forward scattering of sky radiation
-  !
-  !ZSIN=real((/0.195,0.556,0.831,0.981/),r8)
-  !ZCOS=real((/0.981,0.831,0.556,0.195/),r8)
-
-  DO 205 L=1,JLA
-    ZAZI(L)=(L-0.5)*PICON/real(JLA,r8)
-205   CONTINUE
-  !JSA: number of sky azimuth sectors
-  !JLA: number of leaf azimuth sectors
-  DO 230 N=1,JSA
-    YAZI(N)=PICON*(2*N-1)/real(JSA,r8)
-    YAGL=PICON/real(JSA,r8)
-    YSIN(N)=SIN(YAGL)
-    YCOS(N)=COS(YAGL)
-    TYSIN=TYSIN+YSIN(N)
-    DO 225 L=1,JLA
-      DAZI=COS(ZAZI(L)-YAZI(N))
-      DO  M=1,JLI
-        OMEGY=ZCOS(M)*YSIN(N)+ZSIN(M)*YCOS(N)*DAZI
-        OMEGA(N,M,L)=ABS(OMEGY)
-        OMEGX(N,M,L)=OMEGA(N,M,L)/YSIN(N)
-        IF(ZCOS(M).GT.YSIN(N))THEN
-          OMEGZ=ACOS(OMEGY)
-        ELSE
-          OMEGZ=-ACOS(OMEGY)
-        ENDIF
-        IF(OMEGZ.GT.-PICON2)THEN
-          ZAGL=YAGL+2.0*OMEGZ
-        ELSE
-          ZAGL=YAGL-2.0*(PICON+OMEGZ)
-        ENDIF
-        IF(ZAGL.GT.0.0.AND.ZAGL.LT.PICON)THEN
-          IALBY(N,M,L)=1
-        ELSE
-          IALBY(N,M,L)=2
-        ENDIF
-      ENDDO
-225 CONTINUE
-230 CONTINUE
-  end subroutine InitIrradianceGeometry
 !------------------------------------------------------------------------------------------
   subroutine InitSoilProfile(NY,NX)
 
@@ -806,7 +754,6 @@ module StartsMod
   VAP=2465.0_r8   !kJ/kg
   VAPS=2834.0_r8
   OXKM=0.080_r8
-  TYSIN=0.0_r8
   end subroutine InitControlParameters
 !------------------------------------------------------------------------------------------
   subroutine InitAccumulators(NY,NX)

@@ -3,7 +3,6 @@ set(ECOSIM_MOD_SOURCES
 	ErosionMod.F90
 	ExecMod.F90
 	ExtractMod.F90
-	GrosubMod.F90
 	HfuncMod.F90
 	Hour1Mod.F90
 	RedistMod.F90
@@ -24,6 +23,7 @@ set(ECOSIM_MOD_SOURCES
 include_directories(${CMAKE_BINARY_DIR}/f90src/utils/)
 include_directories(${CMAKE_BINARY_DIR}/f90src/ecosim_datatype/)
 include_directories(${CMAKE_BINARY_DIR}/f90src/ioutils/)
+include_directories(${CMAKE_BINARY_DIR}/f90src/plant_bgc/)
 include_directories(${CMAKE_BINARY_DIR}/f90src/microbial_bgc/)
 include(add_ecosim_library)
 add_ecosim_library(ecosim_mods ${ECOSIM_MOD_SOURCES})
