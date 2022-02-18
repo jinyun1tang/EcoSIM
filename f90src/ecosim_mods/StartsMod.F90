@@ -67,10 +67,11 @@ module StartsMod
   integer, intent(in) :: NHW,NHE,NVN,NVS
 
   integer :: NY,NX,L,NGL
-  !     begin_execution
+
+! begin_execution
 
 
-  !     Initialize controling parameters
+  !  Initialize controlling parameters
   call InitControlParameters
   !
   !     IRRADIANCE INTERCEPTION GEOMETRY
@@ -452,61 +453,69 @@ module StartsMod
     !
     !     INITIALIZE SOM VARIABLES
     call InitSOMVars(L,NY,NX,FCX)
-
     !
-    !     INITIALIZE FERTILIZER ARRAYS
-    !
-    ZNH4FA(L,NY,NX)=0.0_r8
-    ZNH3FA(L,NY,NX)=0.0_r8
-    ZNHUFA(L,NY,NX)=0.0_r8
-    ZNO3FA(L,NY,NX)=0.0_r8
-    IF(L.GT.0)THEN
-      ZNH4FB(L,NY,NX)=0.0_r8
-      ZNH3FB(L,NY,NX)=0.0_r8
-      ZNHUFB(L,NY,NX)=0.0_r8
-      ZNO3FB(L,NY,NX)=0.0_r8
-      WDNHB(L,NY,NX)=0.0_r8
-      DPNHB(L,NY,NX)=0.0_r8
-      WDNOB(L,NY,NX)=0.0_r8
-      DPNOB(L,NY,NX)=0.0_r8
-      WDPOB(L,NY,NX)=0.0_r8
-      DPPOB(L,NY,NX)=0.0_r8
-    ENDIF
-    VLNH4(L,NY,NX)=1.0
-    VLNO3(L,NY,NX)=1.0
-    VLPO4(L,NY,NX)=1.0
-    VLNHB(L,NY,NX)=0.0_r8
-    VLNOB(L,NY,NX)=0.0_r8
-    VLPOB(L,NY,NX)=0.0_r8
-    ROXYX(L,NY,NX)=0.0_r8
-    RNH4X(L,NY,NX)=0.0_r8
-    RNO3X(L,NY,NX)=0.0_r8
-    RNO2X(L,NY,NX)=0.0_r8
-    RN2OX(L,NY,NX)=0.0_r8
-    RPO4X(L,NY,NX)=0.0_r8
-    RP14X(L,NY,NX)=0.0_r8
-    RVMXC(L,NY,NX)=0.0_r8
-    RNHBX(L,NY,NX)=0.0_r8
-    RN3BX(L,NY,NX)=0.0_r8
-    RN2BX(L,NY,NX)=0.0_r8
-    RPOBX(L,NY,NX)=0.0_r8
-    RP1BX(L,NY,NX)=0.0_r8
-    RVMBC(L,NY,NX)=0.0_r8
-    DO 1250 K=0,4
-      IF(L.GT.0)THEN
-        COCU(K,L,NY,NX)=0.0_r8
-        CONU(K,L,NY,NX)=0.0_r8
-        COPU(K,L,NY,NX)=0.0_r8
-        COAU(K,L,NY,NX)=0.0_r8
-      ENDIF
-1250  CONTINUE
-    ZNHUI(L,NY,NX)=0.0_r8
-    ZNHU0(L,NY,NX)=0.0_r8
-    ZNFNI(L,NY,NX)=0.0_r8
-    ZNFN0(L,NY,NX)=0.0_r8
 1200  CONTINUE
-  end subroutine InitSoilProfile
+    !
+    !  INITIALIZE FERTILIZER ARRAYS
+    call initFertArrays(NY,NX)
 
+  end subroutine InitSoilProfile
+!------------------------------------------------------------------------------------------
+
+  subroutine initFertArrays(NY,NX)
+  implicit none
+  integer, intent(in) :: NY,NX
+
+  integer :: L2
+
+! begin_execution
+  L2=NL(NY,NX)
+  ZNH4FA(0:L2,NY,NX)=0.0_r8
+  ZNH3FA(0:L2,NY,NX)=0.0_r8
+  ZNHUFA(0:L2,NY,NX)=0.0_r8
+  ZNO3FA(0:L2,NY,NX)=0.0_r8
+
+  VLNH4(0:L2,NY,NX)=1.0
+  VLNO3(0:L2,NY,NX)=1.0
+  VLPO4(0:L2,NY,NX)=1.0
+  VLNHB(0:L2,NY,NX)=0.0_r8
+  VLNOB(0:L2,NY,NX)=0.0_r8
+  VLPOB(0:L2,NY,NX)=0.0_r8
+  ROXYX(0:L2,NY,NX)=0.0_r8
+  RNH4X(0:L2,NY,NX)=0.0_r8
+  RNO3X(0:L2,NY,NX)=0.0_r8
+  RNO2X(0:L2,NY,NX)=0.0_r8
+  RN2OX(0:L2,NY,NX)=0.0_r8
+  RPO4X(0:L2,NY,NX)=0.0_r8
+  RP14X(0:L2,NY,NX)=0.0_r8
+  RVMXC(0:L2,NY,NX)=0.0_r8
+  RNHBX(0:L2,NY,NX)=0.0_r8
+  RN3BX(0:L2,NY,NX)=0.0_r8
+  RN2BX(0:L2,NY,NX)=0.0_r8
+  RPOBX(0:L2,NY,NX)=0.0_r8
+  RP1BX(0:L2,NY,NX)=0.0_r8
+  RVMBC(0:L2,NY,NX)=0.0_r8
+  ZNHUI(0:L2,NY,NX)=0.0_r8
+  ZNHU0(0:L2,NY,NX)=0.0_r8
+  ZNFNI(0:L2,NY,NX)=0.0_r8
+  ZNFN0(0:L2,NY,NX)=0.0_r8
+
+  ZNH4FB(1:L2,NY,NX)=0.0_r8
+  ZNH3FB(1:L2,NY,NX)=0.0_r8
+  ZNHUFB(1:L2,NY,NX)=0.0_r8
+  ZNO3FB(1:L2,NY,NX)=0.0_r8
+  WDNHB(1:L2,NY,NX)=0.0_r8
+  DPNHB(1:L2,NY,NX)=0.0_r8
+  WDNOB(1:L2,NY,NX)=0.0_r8
+  DPNOB(1:L2,NY,NX)=0.0_r8
+  WDPOB(1:L2,NY,NX)=0.0_r8
+  DPPOB(1:L2,NY,NX)=0.0_r8
+  COCU(0:4,1:L2,NY,NX)=0.0_r8
+  CONU(0:4,1:L2,NY,NX)=0.0_r8
+  COPU(0:4,1:L2,NY,NX)=0.0_r8
+  COAU(0:4,1:L2,NY,NX)=0.0_r8
+
+  end subroutine initFertArrays
 !------------------------------------------------------------------------------------------
   subroutine InitSnowLayers(NY,NX)
 
@@ -582,6 +591,7 @@ module StartsMod
     DO 9980 NY=NVN,NVS
       ZEROS(NY,NX)=ZERO*DH(NY,NX)*DV(NY,NX)
       ZEROS2(NY,NX)=ZERO2*DH(NY,NX)*DV(NY,NX)
+!     compute slopes
       GAZI(NY,NX)=ASP(NY,NX)/RDN
       GSINA(NY,NX)=ABS(SIN(GAZI(NY,NX)))
       GCOSA(NY,NX)=ABS(COS(GAZI(NY,NX)))
@@ -623,12 +633,14 @@ module StartsMod
         FSLOPE(1,NY,NX)=0.5
         FSLOPE(2,NY,NX)=0.5
       ENDIF
+!    compute incident sky aNGLe at ground surface
       GSIN(NY,NX)=SLOPE(0,NY,NX)
       GCOS(NY,NX)=SQRT(1.0-GSIN(NY,NX)**2)
       DO 240 N=1,4
         DGAZI=COS(GAZI(NY,NX)-YAZI(N))
         OMEGAG(N,NY,NX)=AMAX1(0.0,AMIN1(1.0,GCOS(NY,NX)*YSIN(N)+GSIN(NY,NX)*YCOS(N)*DGAZI))
 240   CONTINUE
+!     compute ground surface elevation
       IF(NX.EQ.NHW)THEN
         IF(NY.EQ.NVN)THEN
           ALT(NY,NX)=0.5*DH(NY,NX)*SLOPE(1,NY,NX)+0.5*DV(NY,NX)*SLOPE(2,NY,NX)

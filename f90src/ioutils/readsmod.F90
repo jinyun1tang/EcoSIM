@@ -1,8 +1,9 @@
 module readsmod
 
   use data_kind_mod, only : r8 => SHR_KIND_R8
-  use abortutils, only : endrun
-  use fileUtil, only : open_safe
+  use abortutils , only : endrun
+  use fileUtil   , only : open_safe
+  use minimathmod, only : isLeap
   implicit none
   private
   include "parameters.h"
@@ -257,28 +258,21 @@ module readsmod
   LYRC=365   ! # days for current year
   LYRX=365   ! # days for last year
   DO 575 N=1,7,3
-
-!    IF(MOD(IDATA(N+2),4))520,510,520
-!510   IF(IDATA(N+1).GT.2)LPY=1
-!    IF(N.EQ.1)LYRC=366
-    IF(MOD(IDATA(N+2),4)==0)then
+    IF(isLeap(IDATA(N+2)))then
       IF(IDATA(N+1).GT.2)LPY=1
       IF(N.EQ.1)LYRC=366
     endif
-!520 IF(IDATA(N+1).EQ.1)GO TO 525
 
-    IF(IDATA(N+1).EQ.1)GO TO 525
-    IDY=30*(IDATA(N+1)-1)+ICOR(IDATA(N+1)-1)+IDATA(N)+LPY
-    GO TO 527
-525 IDY=IDATA(N)
-527 IF(N.EQ.1)ISTART=IDY
+    IF(IDATA(N+1).EQ.1)then
+      IDY=IDATA(N)
+    else
+      IDY=30*(IDATA(N+1)-1)+ICOR(IDATA(N+1)-1)+IDATA(N)+LPY
+    endif
+    IF(N.EQ.1)ISTART=IDY
     IF(N.EQ.4)IFIN=IDY
     IF(N.EQ.7)IRUN=IDY
 
-!    IF(MOD(IDATA(N+2)-1,4))575,530,575
-!530   IF(N.EQ.1)LYRX=366
-!575   CONTINUE
-    IF(MOD(IDATA(N+2)-1,4)==0)then
+    IF(isLeap(IDATA(N+2)-1))then
       IF(N.EQ.1)LYRX=366
     endif
 575 CONTINUE
@@ -351,7 +345,8 @@ module readsmod
       DATK(K)=0.0
 55  CONTINUE
     IH=1
-60  read(3,*,END=110)(datav(k),k=1,NI),(DAT(K),K=1,NN)
+    DO while(.TRUE.)
+    read(3,*,END=110)(datav(k),k=1,NI),(DAT(K),K=1,NN)
     do k = 1, ni
       idat(k)=int(datav(k))
     enddo
@@ -362,15 +357,15 @@ module readsmod
 !
     IF(TTYPE.EQ.'D')THEN
       call readdayweather(I,L,GO110,GO60,NTX,NFX,NN)
-      IF(GO60)GO TO 60
-      IF(GO110)GO TO 110
+      IF(GO60)cycle
+      IF(GO110)EXIT
 !
 !     READ HOURLY WEATHER DATA AND CONVERT TO MODEL UNITS
 !
     ELSE
       call readhourweather(I,J,go60,L,NN)
 !     write(*,*)'goto60=',go60
-      IF(GO60)GO TO 60
+      IF(GO60)cycle
 
       IH=1
       IX=I
@@ -381,10 +376,11 @@ module readsmod
       ENDIF
 
       IF(IFLGY.EQ.1.AND.I.EQ.IYRD.AND.J.EQ.24)THEN
-        GO TO 110
+        EXIT
       ENDIF
-      GO TO 60
+      cycle
     ENDIF
+    enddo
 110 CONTINUE
 !
 ! ACCOUNT FOR LEAP YEAR
@@ -543,8 +539,8 @@ module readsmod
 !
 
     call OPEN_safe(13,PREFIX,DATAC(9,NE,NEX),'OLD',mod_filename,__LINE__)
-
-150 READ(13,*,END=200)NH1,NV1,NH2,NV2
+    do while(.TRUE.)
+    READ(13,*,END=200)NH1,NV1,NH2,NV2
     READ(13,*)DATA(8),DATA(5),DATA(6)
     IF(DATA(8).NE.'NO')THEN
       call OPEN_safe(10,PREFIX,DATA(8),'OLD',mod_filename,__LINE__)
@@ -563,32 +559,25 @@ module readsmod
 !     ITILL=soil disturbance type 1-20:tillage,21=litter removal,22=fire,23-24=drainage
 !     DCORP=intensity (fire) or depth (tillage,drainage) of disturbance
 !
-295   CONTINUE
+      do while(.TRUE.)
       READ(10,*,END=305)DY,IPLOW,DPLOW
       LPY=0
       IDY1=INT(DY/1.0E+06)
       IDY2=INT(DY/1.0E+04-IDY1*1.0E+02)
       IDY3=INT(DY-(IDY1*1.0E+06+IDY2*1.0E+04))
-!      IF(MOD(IDY3,4))3520,3510,3520
-!3510  IF(IDY2.GT.2)LPY=1
-!3520  IF(IDY2.EQ.1)GO TO 3535
-      IF(MOD(IDY3,4)==0)then
-        IF(IDY2.GT.2)LPY=1
+      IF(isLeap(IDY3).and.IDY2.GT.2)LPY=1
+      IF(IDY2.EQ.1)then
+        IDY=IDY1
+      else
+        IDY=30*(IDY2-1)+ICOR(IDY2-1)+IDY1+LPY
       endif
-      IF(IDY2.EQ.1)GO TO 3535
-      IDY=30*(IDY2-1)+ICOR(IDY2-1)+IDY1+LPY
-!     IF(IDY2.LE.6)IDY=IDY-0.5*(NTX-1)
-!     IF(IDY2.GE.7)IDY=IDY+0.5*(NTX-1)
-      GO TO 3530
-3535  IDY=IDY1
-3530  CONTINUE
       DO 8995 NX=NH1,NH2
         DO 8990 NY=NV1,NV2
           ITILL(IDY,NY,NX)=IPLOW
           DCORP(IDY,NY,NX)=DPLOW
 8990    CONTINUE
 8995  CONTINUE
-      GO TO 295
+      enddo
 305   CONTINUE
       CLOSE(10)
     ENDIF
@@ -609,7 +598,7 @@ module readsmod
 !     IRO,IR1,IR2=fertilizer,litter,manure type
 !
       call OPEN_safe(8,PREFIX,DATA(5),'OLD',mod_filename,__LINE__)
-1500  CONTINUE
+      do while(.TRUE.)
       READ(8,*,END=85)DY,Z4A,Z3A,ZUA,ZOA,Z4B,Z3B,ZUB,ZOB &
         ,PMA,PMB,PHA,CAC,CAS,RSC1,RSN1,RSP1,RSC2,RSN2,RSP2,FDPTHI &
         ,ROWX,IR0,IR1,IR2
@@ -617,19 +606,13 @@ module readsmod
       IDY1=INT(DY/1.0E+06)
       IDY2=INT(DY/1.0E+04-IDY1*1.0E+02)
       IDY3=INT(DY-(IDY1*1.0E+06+IDY2*1.0E+04))
-!      IF(MOD(IDY3,4))1520,1510,1520
-!1510  IF(IDY2.GT.2)LPY=1
-!1520  IF(IDY2.EQ.1)GO TO 1525
-       IF(MOD(IDY3,4)==0)THEN
-         IF(IDY2.GT.2)LPY=1
-       ENDIF
-       IF(IDY2.EQ.1)GO TO 1525
-      IDY=30*(IDY2-1)+ICOR(IDY2-1)+IDY1+LPY
-!     IF(IDY2.LE.6)IDY=IDY-0.5*(NTX-1)
-!     IF(IDY2.GE.7)IDY=IDY+0.5*(NTX-1)
-      GO TO 1530
-1525  IDY=IDY1
-1530  CONTINUE
+      IF(isLeap(IDY3).and.IDY2.GT.2)LPY=1
+      IF(IDY2.EQ.1)then
+        IDY=IDY1
+      else
+        IDY=30*(IDY2-1)+ICOR(IDY2-1)+IDY1+LPY
+      endif
+
       DO 8985 NX=NH1,NH2
         DO 8980 NY=NV1,NV2
 !
@@ -679,7 +662,7 @@ module readsmod
           IYTYP(2,IDY,NY,NX)=IR2
 8980    CONTINUE
 8985  CONTINUE
-      GO TO 1500
+      enddo
 85    CONTINUE
       CLOSE(8)
     ENDIF
@@ -710,34 +693,23 @@ module readsmod
         IDY1=INT(DST/1.0E+06)
         IDY2=INT(DST/1.0E+04-IDY1*1.0E+02)
         IDY3=INT(DST-(IDY1*1.0E+06+IDY2*1.0E+04))
-!        IF(MOD(IDY3,4))4520,4510,4520
-!4510  IF(IDY2.GT.2)LPY=1
-!4520  IF(IDY2.EQ.1)GO TO 4535
-        IF(MOD(IDY3,4)==0)then
-          IF(IDY2.GT.2)LPY=1
+        IF(isLeap(IDY3).and.IDY2.GT.2)LPY=1
+        IF(IDY2.EQ.1)then
+          IDYS=IDY1
+        else
+          IDYS=30*(IDY2-1)+ICOR(IDY2-1)+IDY1+LPY
         endif
-        IF(IDY2.EQ.1)GO TO 4535
-
-        IDYS=30*(IDY2-1)+ICOR(IDY2-1)+IDY1+LPY
-        GO TO 4530
-4535    IDYS=IDY1
-4530    CONTINUE
         IHRS=IDY3
         LPY=0
         IDY1=INT(DEN/1.0E+06)
         IDY2=INT(DEN/1.0E+04-IDY1*1.0E+02)
         IDY3=INT(DEN-(IDY1*1.0E+06+IDY2*1.0E+04))
-!      IF(MOD(IDY3,4))5520,5510,5520
-!5510  IF(IDY2.GT.2)LPY=1
-!5520  IF(IDY2.EQ.1)GO TO 5535
-        IF(MOD(IDY3,4)==0)then
-          IF(IDY2.GT.2)LPY=1
+        IF(isLeap(IDY3).and.IDY2.GT.2)LPY=1
+        IF(IDY2.EQ.1)then
+          IDYE=IDY1
+        else
+          IDYE=30*(IDY2-1)+ICOR(IDY2-1)+IDY1+LPY
         endif
-        IF(IDY2.EQ.1)GO TO 5535
-        IDYE=30*(IDY2-1)+ICOR(IDY2-1)+IDY1+LPY
-        GO TO 5530
-5535    IDYE=IDY1
-5530    CONTINUE
         IHRE=IDY3
 !
 !       TRANSFER INPUTS TO MODEL ARRAYS
@@ -773,7 +745,7 @@ module readsmod
 !
 !       SCHEDULED IRRIGATION
 !
-2500    CONTINUE
+        do while(.TRUE.)
 !
 !       DY,RR,JST,JEN=date DDMMYYYY,amount (mm),start and end hours
 !       PHQX,CN4QX,CNOQX,CPOQX,CALQX,CFEQX,CCAQX,CMGQX,CNAQX,CKAQX,
@@ -786,18 +758,12 @@ module readsmod
         IDY1=INT(DY/1.0E+06)
         IDY2=INT(DY/1.0E+04-IDY1*1.0E+02)
         IDY3=INT(DY-(IDY1*1.0E+06+IDY2*1.0E+04))
-!        IF(MOD(IDY3,4))2520,2510,2520
-!2510    IF(IDY2.GT.2)LPY=1
-!2520    IF(IDY2.EQ.1)GO TO 2525
-        IF(MOD(IDY3,4)==0)then
-          IF(IDY2.GT.2)LPY=1
+        IF(isLeap(IDY3).and.IDY2.GT.2)LPY=1
+        IF(IDY2.EQ.1)then
+          IDY=IDY1
+        else
+          IDY=30*(IDY2-1)+ICOR(IDY2-1)+IDY1+LPY
         endif
-        IF(IDY2.EQ.1)GO TO 2525
-
-        IDY=30*(IDY2-1)+ICOR(IDY2-1)+IDY1+LPY
-        GO TO 2530
-2525    IDY=IDY1
-2530    CONTINUE
         RRH=RR/(JEN-(JST-1))
         DO 8965 NX=NH1,NH2
           DO 8960 NY=NV1,NV2
@@ -822,12 +788,12 @@ module readsmod
             WDPTH(IDY,NY,NX)=WDPTHI
 8960      CONTINUE
 8965    CONTINUE
-        GO TO 2500
+        enddo
       ENDIF
 105   CONTINUE
     ENDIF
     CLOSE(2)
-    GO TO 150
+    enddo
 200 CONTINUE
     CLOSE(13)
   ENDIF
@@ -923,12 +889,7 @@ module readsmod
      I=N
    ELSE
      LPY=0
-!     IF(MOD(IDATA(3),4))100,115,100
-!115   IF(M.GT.2)LPY=1
-!100   IF(M.EQ.1)THEN
-     IF(MOD(IDATA(3),4)==0)then
-       IF(M.GT.2)LPY=1
-     endif
+     IF(isLeap(IDATA(3)).and.M.GT.2)LPY=1
      IF(M.EQ.1)THEN
        I=N
      ELSE
@@ -1119,7 +1080,7 @@ module readsmod
     IF(IVAR(K).EQ.'Y')THEN
       IFLGY=1
       IYRX=IDAT(K)+(NTX-1)*NFX
-      IF(MOD(IDAT(K),4)==0)then
+      IF(isLeap(IDAT(K)))then
         IYRD=366
       else
         IYRD=365
@@ -1135,9 +1096,7 @@ module readsmod
     I=N
   ELSE
     LPY=0
-    IF(MOD(IDATA(3),4)==0)then
-      IF(M.GT.2)LPY=1
-    endif
+    IF(isLeap(IDATA(3)).and.M.GT.2)LPY=1
     IF(M.EQ.1)THEN
       I=N
     ELSE

@@ -12,6 +12,7 @@ module minimathmod
   public :: test_aeqb
   public :: test_aneb
   public :: vapsat, vapsat0
+  public :: isLeap
   real(r8), parameter :: tiny_val=1.e-20_r8
   contains
 
@@ -95,4 +96,17 @@ module minimathmod
   ans=0.61_r8*EXP(5360.0_r8*(3.661E-03_r8-1.0_r8/tempK))
   end function vapsat0
 
+!------------------------------------------------------------------------------------------
+
+  function isLeap(year)result(ans)
+!
+! Description
+! Determine if it is a leap year
+
+  implicit none
+  integer, intent(in) :: year
+  logical :: ans
+
+  ans =(mod(year,400)== 0) .or. (mod(year,4)==0 .and. mod(year,100)/=0)
+  end function isLeap
 end module minimathmod

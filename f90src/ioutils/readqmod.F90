@@ -4,6 +4,7 @@ module readqmod
 ! code to read plant relevant files
   use data_kind_mod, only : r8 => SHR_KIND_R8
   use fileUtil, only : open_safe
+  use minimathmod, only : isLeap
   implicit none
   private
   include "parameters.h"
@@ -174,16 +175,14 @@ END SUBROUTINE readq
     IMO=INT(DY/1.0E+04-IDX*1.0E+02)
     IYR=INT(DY-(IDX*1.0E+06+IMO*1.0E+04))
     LPY=0
-!   IF(MOD(IYR,4))520,510,520
-!510   IF(IMO.GT.2)LPY=1
-    if(mod(iyr,4)==0 .and. IMO.GT.2)LPY=1
-!520   IF(IMO.EQ.1)GO TO 525
-    IF(IMO.EQ.1)GO TO 525
 
-    IDY=30*(IMO-1)+ICOR(IMO-1)+IDX+LPY
-    GO TO 527
-525 IDY=IDX
-527 IF(N.EQ.0)THEN
+    if(isLeap(iyr) .and. IMO.GT.2)LPY=1
+    IF(IMO.EQ.1)then
+      IDY=IDX
+    else
+      IDY=30*(IMO-1)+ICOR(IMO-1)+IDX+LPY
+    endif
+    IF(N.EQ.0)THEN
       IF(IDY.GT.0.AND.IYR.GT.0)THEN
 !       IDY=IDY-0.5*(NTX-1)
         IDAY0(NZ,NY,NX)=IDY
@@ -234,9 +233,8 @@ END SUBROUTINE readq
 !
       IF(IHVST(NZ,IDY,NY,NX).EQ.4.OR.IHVST(NZ,IDY,NY,NX).EQ.6)THEN
         NN=NN+1
-!       IF(MOD(NN,2))570,560,570
+
         if(mod(nn,2)==0)then
-!560       IDYE=IDY
           IDYE=IDY
 
           DO 580 IDYG=IDYS+1,IDYE-1

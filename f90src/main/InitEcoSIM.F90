@@ -16,8 +16,9 @@ module InitEcoSIM
   use VegDataType       , only : InitVegData
   use GrosubMod         , only : InitGrosub
   implicit  none
-  integer, intent(in) :: nmicbguilds
+  integer               , intent(in) :: nmicbguilds   !number of microbial guilds per group
 
+! begin_execution
   call InitVegData
 
   call InitMicrobialData(nmicbguilds)

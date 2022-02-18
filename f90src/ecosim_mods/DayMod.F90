@@ -2,7 +2,7 @@
       module DayMod
       use data_kind_mod, only : r8 => SHR_KIND_R8
   use EcosimConst
-
+  use minimathmod, only : isLeap
       implicit none
 
       private
@@ -65,12 +65,10 @@
       NN=0
       DO 500 M=1,12
       N=30*M+ICOR(M)
-!      IF(MOD(IDATA(3),4))520,510,520
-!510     IF(M.GE.2)N=N+1
-!520   IF(I.LE.N)THEN
-     IF(MOD(IDATA(3),4)==0 .and. M.GE.2)N=N+1
-     IF(I.LE.N)THEN
 
+!  leap year February.
+     IF(isLeap(IDATA(3)) .and. M.GE.2)N=N+1
+     IF(I.LE.N)THEN
       N1=I-NN
       N2=M
       N3=IDATA(3)
@@ -78,9 +76,8 @@
       WRITE(CHARN2,'(I3)')N2+100
       WRITE(CHARN3,'(I4)')N3
       WRITE(CDATE,'(2A2,A4)')CHARN1(2:3),CHARN2(2:3),CHARN3(1:4)
-!     GO TO 501
       call WriteDailyAccumulators(I, NHW, NHE, NVN, NVS)
-
+      exit
       ENDIF
       NN=N
 500   CONTINUE
