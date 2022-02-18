@@ -104,7 +104,8 @@ END SUBROUTINE readq
     IYR0(NZ,NY,NX)=-1E+06
     IDAYH(NZ,NY,NX)=1E+06
     IYRH(NZ,NY,NX)=1E+06
-10  IF(N.EQ.0)THEN
+    do while(.TRUE.)
+    IF(N.EQ.0)THEN
 !
 !     PLANTING
 !
@@ -257,7 +258,7 @@ END SUBROUTINE readq
       ENDIF
     ENDIF
     N=N+1
-    GO TO 10
+    enddo
 540 CLOSE(12)
   ELSE
     SDPTHI(NZ,NY,NX)=1.0E-06

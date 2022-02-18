@@ -323,6 +323,7 @@ module readiMod
         write(*,*)'number of maximum rooting layer NJ',NJ(NY,NX)
         write(*,*)'number of additional layers below NJ with data in file',NL1
         write(*,*)'number of additional layers below NJ without data in file',NL2
+        write(*,*)'number of layers involved in model calculation',NL(NY,NX)
         write(*,*)'Flag for natural(0),reconstructed(1) soil profile', ISOILR(NY,NX)
         write(*,*)
         write(*,'(A,I2,A,I2)')'read data for layers from layer NU ', &

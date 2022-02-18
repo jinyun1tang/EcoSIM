@@ -4952,17 +4952,17 @@ module WatsubMod
           .GT.ZERO*VOLT(N3,N2,N1)).OR.(TK1X.GT.TFice &
           .AND.VOLIH1(N3,N2,N1).GT.ZERO*VOLT(N3,N2,N1)))THEN
           VHCP1BX=cpw*VOLWH1X+cpi*VOLIH1(L,NY,NX)
-          TFLXH1=VHCP1BX*(TFREEZ-TK1X)/((1.0+6.2913E-03*TFREEZ) &
-            *(1.0-0.10*PSISMX))*XNPX
-          IF(TFLXH1.LT.0.0)THEN
-            TFLXH=AMAX1(-333.0*DENSI*VOLIH1(N3,N2,N1)*XNPX,TFLXH1)
+          TFLXH1=VHCP1BX*(TFREEZ-TK1X)/((1.0_r8+6.2913E-03_r8*TFREEZ) &
+            *(1.0_r8-0.10_r8*PSISMX))*XNPX
+          IF(TFLXH1.LT.0.0_r8)THEN
+            TFLXH=AMAX1(-333.0_r8*DENSI*VOLIH1(N3,N2,N1)*XNPX,TFLXH1)
           ELSE
-            TFLXH=AMIN1(333.0*VOLWH1X*XNPX,TFLXH1)
+            TFLXH=AMIN1(333.0_r8*VOLWH1X*XNPX,TFLXH1)
           ENDIF
-          WFLXLH(N3,N2,N1)=-TFLXH/333.0
+          WFLXLH(N3,N2,N1)=-TFLXH/333.0_r8
         ELSE
-          TFLXH=0.0
-          WFLXLH(N3,N2,N1)=0.0
+          TFLXH=0.0_r8
+          WFLXLH(N3,N2,N1)=0.0_r8
         ENDIF
         TFLXL(N3,N2,N1)=TFLX+TFLXH
           !

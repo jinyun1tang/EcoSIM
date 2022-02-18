@@ -114,7 +114,7 @@ module RedistMod
   real(r8) :: PXS,PI,PXB,POS,POX,POP,RAINR,SS1,SS2,SS3,SS4,SSR
   real(r8) :: SEF,SEX,SEP,SET,SSD,SHD,SO,SG,SIN,SGN,SIP,SNB
   real(r8) :: SPB,SNM0,SPM0,SIR,SII,SBU,SSW,SSS,SNM,SPM,SSB
-  real(r8) :: SD,SSH,SSF,SSX,SSP,SST,TFLWT,TCASF,TKWX,TKSX,TVHCP
+  real(r8) :: SD,SSH,SSF,SSX,SSP,SST,TFLWT,TCASF,TKWX,TVHCP
   real(r8) :: TVHCM,TVOLW,TVOLWH,TVOLI,TVOLIH,TENGY,TDVOLI,TDLYXF
   real(r8) :: TDORGC,TDYLXC,TBKDX,TFC,TWP,TSCNV,TSCNH,TSAND
   real(r8) :: TSILT,TCLAY,TXCEC,TXAEC,TGKC4,TGKCA,TGKCM,TGKCN
@@ -3810,7 +3810,9 @@ module RedistMod
   subroutine SnowpackDisapper(NY,NX)
   implicit none
   integer, intent(in) :: NY,NX
+
   integer :: L
+  real(r8) :: tksx
 !     begin_execution
 !
   IF(VHCPW(1,NY,NX).GT.0.0_r8.AND.VHCPW(1,NY,NX).LE.VHCPWX(NY,NX) &
@@ -4792,6 +4794,7 @@ module RedistMod
   integer, intent(in) :: NY,NX
 
   integer :: L,K,M,N,LL,NGL
+  real(r8):: TKS00,TKSX
   !     begin_execution
   !     UPDATE SOIL LAYER VARIABLES WITH TOTAL FLUXES
   !
@@ -4860,15 +4863,21 @@ module RedistMod
     !     END ARTIFICIAL SOIL WARMING
     !
     IF(VHCP(L,NY,NX).GT.ZEROS(NY,NX))THEN
-      TKS(L,NY,NX)=(ENGY+THFLW(L,NY,NX)+THTHAW(L,NY,NX) &
+      TKS00=(ENGY+THFLW(L,NY,NX)+THTHAW(L,NY,NX) &
         +TUPHT(L,NY,NX)+HWFLU(L,NY,NX))/VHCP(L,NY,NX)
-      if(TKS(L,NY,NX)<0._r8)then
-        write(*,*)'line',__LINE__,L,TKS(L,NY,NX)
+      
+      if(abs(TKS00-TKSX)>100._r8)then
+        TKS(L,NY,NX)=TKS(NUM(NY,NX),NY,NX)
+        write(*,*)'line',__LINE__,L,TKS(L,NY,NX),TKS(NUM(NY,NX),NY,NX)
         write(*,*)'ENGY+THFLW(L,NY,NX)+THTHAW(L,NY,NX)=',ENGY,THFLW(L,NY,NX),THTHAW(L,NY,NX)
         write(*,*)'TUPHT(L,NY,NX)+HWFLU(L,NY,NX)=',TUPHT(L,NY,NX),HWFLU(L,NY,NX)
         write(*,*)'VHCP(L,NY,NX)=',VHCP(L,NY,NX)
         write(*,*)'NUM',NUM(NY,NX),'L=',L
-        call endrun(trim(mod_filename)//' at line',__LINE__)
+        write(*,*)'water',VOLW(L,NY,NX),VOLWH(L,NY,NX)
+        write(*,*)'ice',VOLI(L,NY,NX),VOLIH(L,NY,NX)
+!        call endrun(trim(mod_filename)//' at line',__LINE__)
+      else
+        TKS(L,NY,NX)=TKS00
       endif
     ELSE
       TKS(L,NY,NX)=TKS(NUM(NY,NX),NY,NX)
@@ -6511,14 +6520,14 @@ module RedistMod
                 !    2,DDLYRX(NN),VOLX(LL,NY,NX),VOLW(LL,NY,NX),VOLI(LL,NY,NX)
                 !    2,VHCP(LL,NY,NX),VHCPNX(NY,NX)
             !5598  FORMAT(A8,9I4,12E16.8)
-                GO TO 9971
+                exit
               ENDIF
 9970        CONTINUE
           ELSE
             DDLYRX(NN)=0.0_r8
             IFLGL(L,NN)=0
           ENDIF
-9971    CONTINUE
+
         !
         !     RESET POND SURFACE LAYER NUMBER IF GAIN FROM PRECIPITATION
         !

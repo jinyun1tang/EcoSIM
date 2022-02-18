@@ -87,12 +87,12 @@ module SoilChemDataType
   allocate(CH4G(JZ,JY,JX))
   allocate(CH4S(0:JZ,JY,JX))
   allocate(CH4SH(JZ,JY,JX))
-  allocate(COXYG(0:JZ,JY,JX))
-  allocate(CCH4G(0:JZ,JY,JX))
-  allocate(COXYS(0:JZ,JY,JX))
-  allocate(CCO2G(0:JZ,JY,JX))
-  allocate(CCO2S(0:JZ,JY,JX))
-  allocate(CCH4S(0:JZ,JY,JX))
+  allocate(COXYG(0:JZ,JY,JX));COXYG=0._r8
+  allocate(CCH4G(0:JZ,JY,JX));CCH4G=0._r8
+  allocate(COXYS(0:JZ,JY,JX));COXYS=0._r8
+  allocate(CCO2G(0:JZ,JY,JX));CCO2G=0._r8
+  allocate(CCO2S(0:JZ,JY,JX));CCO2S=0._r8
+  allocate(CCH4S(0:JZ,JY,JX));CCH4S=0._r8
   allocate(CH1P4(0:JZ,JY,JX))
   allocate(CH1P4B(0:JZ,JY,JX))
   allocate(CNO2B(0:JZ,JY,JX))

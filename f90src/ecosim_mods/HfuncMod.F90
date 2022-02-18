@@ -270,11 +270,10 @@ module HfuncMod
                   ELSE
                     GROUP(NB,NZ,NY,NX)=GROUPI(NZ,NY,NX)
                   ENDIF
-                  GO TO 125
+                  exit
                 ENDIF
               ENDIF
 120         CONTINUE
-125         CONTINUE
           ENDIF
         ENDIF
       ENDIF

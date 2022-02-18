@@ -935,5 +935,6 @@ module StartsMod
 1195  CONTINUE
   CDPTH(0,NY,NX)=CDPTH(NU(NY,NX),NY,NX)-DLYR(3,NU(NY,NX),NY,NX)
   CDPTHI(NY,NX)=CDPTH(0,NY,NX)
+  AREA(3,NL(NY,NX)+1:JZ,NY,NX)=DLYR(1,NL(NY,NX),NY,NX)*DLYR(2,NL(NY,NX),NY,NX)
   end subroutine InitLayerDepths
 end module StartsMod
