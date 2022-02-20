@@ -8,6 +8,7 @@ module WatsubMod
   use minimathmod  , only : test_aeqb, test_aneb,safe_adb,vapsat
   use EcosimConst
   use SOMDataType
+  use WatsubPars
   implicit none
 
   private
@@ -122,46 +123,20 @@ module WatsubMod
 
   integer :: ICHKL,IFLGH,IFLGU,IFLGUH,IFLGD,IFLGDH
   integer :: N6X(JY,JX)
-!
-! EMMS,EMMW,EMMR=emissivities of surface soil, snow and litter
-! RACX,RARX=minimum boundary layer resistances of canopy,litter (h m-1)
-! RZ=minimum resistance to evaporation of surface water (h m-1)
-! RAM=minimum boundary layer resistance (h m-1)
-! DPTHSX=minimum snowpack depth for full cover (m)
-! Z1S,Z2SW,Z2SD,Z3SX=parameters for air-water gas transfers in soil
-! Z1R,Z2RW,Z2RD,Z3RX=parameters for air-water gas transfers in litter
-!
-  real(r8), PARAMETER :: EMMS=0.97,EMMW=0.97,EMMR=0.97 &
-    ,RACX=0.0139,RARX=0.0139,RZ=0.0139,RAM=1.39-03,DPTHSX=0.075
-  real(r8), PARAMETER :: Z1S=0.010,Z2SW=12.0,Z2SD=12.0,Z3SX=0.50 &
-    ,Z1R=0.01,Z2RW=12.0,Z2RD=12.0,Z3R=0.50
-!
-! Parameters for calculating convective effects on heat transfer
-! in porous media (air and water)
-! VISCW,VISCA=water,air viscosity (Mg m-1 s)
-! CP[w,i,s]=heat capacity of water, ice, snow, kJ/kg/K
-! CPo = heat capacity of organic matter, kJ/g/K
-  real(r8), PARAMETER :: VISCW=1.0E-06_r8,VISCA=2.0E-08_r8 &
-    ,DIFFW=1.45E-07_r8,DIFFA=2.01E-05_r8,EXPNW=2.07E-04_r8 &
-    ,EXPNA=3.66E-03_r8,GRAV=9.8_r8,RYLXW=GRAV*EXPNW/(VISCW*DIFFW) &
-    ,RYLXA=GRAV*EXPNA/(VISCA*DIFFA) &
-    ,PRNTW=VISCW/DIFFW,PRNTA=VISCA/DIFFA &
-    ,DNUSW=(1.0_r8+(0.492_r8/PRNTW)**0.5625_r8)**0.4444_r8 &
-    ,DNUSA=(1.0_r8+(0.492_r8/PRNTA)**0.5625_r8)**0.4444_r8 &
-    ,TRBW=0.375_r8,TRBA=0.000_r8
-!
-! FVOLAH=parameter for clay effect on macropore volume
-! DTHETW=difference between saturation and effective saturation
-! HCNDRR=saturated hydraulic conductivity of surface litter
-! FENGYP=rate constant for restoring surface Ksat
-!
-  real(r8), PARAMETER :: FVOLAH=0.0_r8,DTHETW=1.0E-06,HCNDRR=25.0,FENGYP=1.0E-03
 
   REAL(r8) :: RI,THETWR,THETW1,THETA1,THETAL,THETWL &
     ,TKR1,TKS1,TKY,TKW1,TK11,TK12,TK0X,TKXR,TK1X,TKX1,TFND1
   integer :: curday,curhour
-  public :: watsub
+  public :: watsub,InitWatsub
   contains
+
+  subroutine InitWatsub
+
+  implicit none
+
+  call InitWatsubPars
+
+  end subroutine InitWatsub
 !------------------------------------------------------------------------------------------
 
   SUBROUTINE watsub(I,J,NHW,NHE,NVN,NVS)

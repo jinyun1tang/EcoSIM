@@ -15,12 +15,12 @@ set(ECOSIM_MOD_SOURCES
 	TrnsfrsMod.F90
 	UptakeMod.F90
 	VisualMod.F90
-	WatsubMod.F90
 	WthrMod.F90
 )
 include_directories(${CMAKE_BINARY_DIR}/f90src/utils/)
 include_directories(${CMAKE_BINARY_DIR}/f90src/ecosim_datatype/)
 include_directories(${CMAKE_BINARY_DIR}/f90src/ioutils/)
+include_directories(${CMAKE_BINARY_DIR}/f90src/SoilHydroTherm/)
 include_directories(${CMAKE_BINARY_DIR}/f90src/plant_bgc/)
 include_directories(${CMAKE_BINARY_DIR}/f90src/microbial_bgc/)
 include(add_ecosim_library)

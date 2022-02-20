@@ -2973,9 +2973,9 @@ module Hour1Mod
   end subroutine DivideCanopyLayerByLAI
 !------------------------------------------------------------------------------------------
 
-      subroutine CalcBoundaryLayerProperties(NY,NX)
-      implicit none
-      integer, intent(in) :: NY,NX
+  subroutine CalcBoundaryLayerProperties(NY,NX)
+  implicit none
+  integer, intent(in) :: NY,NX
 !     begin_execution
 !     CANOPY ZERO PLANE AND ROUGHNESS HEIGHTS
 !
@@ -2984,30 +2984,30 @@ module Hour1Mod
 !     ZT,ZD,ZR=canopy,zero plane displacement,roughness height
 !     ZZ=reference height for wind speed
 !
-      ARLSC=ARLFC(NY,NX)+ARSTC(NY,NX)
-      IF(ARLSC.GT.ZEROS(NY,NX) &
-      .AND.ZT(NY,NX).GE.DPTHS(NY,NX)-ZERO &
-      .AND.ZT(NY,NX).GE.DPTH0(NY,NX)-ZERO)THEN
-      ARLSG=ARLSC/AREA(3,NU(NY,NX),NY,NX)
-      ZX=EXP(-0.5*ARLSG)
-      ZY=1.0-ZX
-      ZD(NY,NX)=ZT(NY,NX)*AMAX1(0.0,1.0-2.0/ARLSG*ZY)
-      ZE=ZT(NY,NX)*AMAX1(0.05,ZX*ZY)
-      ELSE
-      ZD(NY,NX)=0.0
-      ZE=0.0
-      ENDIF
-      IF(IFLGW.EQ.1)THEN
-      ZZ=Z0(NY,NX)+ZT(NY,NX)
-      ELSE
-      ZZ=AMAX1(Z0(NY,NX),ZD(NY,NX)+2.0)
-      ENDIF
-      IF(IETYP(NY,NX).GE.0)THEN
-      IF(VHCPW(1,NY,NX).GT.VHCPWX(NY,NX))THEN
+  ARLSC=ARLFC(NY,NX)+ARSTC(NY,NX)
+  IF(ARLSC.GT.ZEROS(NY,NX) &
+    .AND.ZT(NY,NX).GE.DPTHS(NY,NX)-ZERO &
+    .AND.ZT(NY,NX).GE.DPTH0(NY,NX)-ZERO)THEN
+    ARLSG=ARLSC/AREA(3,NU(NY,NX),NY,NX)
+    ZX=EXP(-0.5*ARLSG)
+    ZY=1.0-ZX
+    ZD(NY,NX)=ZT(NY,NX)*AMAX1(0.0,1.0-2.0/ARLSG*ZY)
+    ZE=ZT(NY,NX)*AMAX1(0.05,ZX*ZY)
+  ELSE
+    ZD(NY,NX)=0.0
+    ZE=0.0
+  ENDIF
+  IF(IFLGW.EQ.1)THEN
+    ZZ=Z0(NY,NX)+ZT(NY,NX)
+  ELSE
+    ZZ=AMAX1(Z0(NY,NX),ZD(NY,NX)+2.0)
+  ENDIF
+  IF(IETYP(NY,NX).GE.0)THEN
+    IF(VHCPW(1,NY,NX).GT.VHCPWX(NY,NX))THEN
       ZR(NY,NX)=AMAX1(0.001,ZE,ZW)
-      ELSE
+    ELSE
       ZR(NY,NX)=AMAX1(0.001,ZE,ZS(NY,NX))
-      ENDIF
+    ENDIF
 !
 !     CANOPY ISOTHERMAL BOUNDARY LAYER RESISTANCE
 !
@@ -3015,49 +3015,48 @@ module Hour1Mod
 !     UA=wind speed
 !     RIB=canopy isothermal Richardson number
 !
-      RAB(NY,NX)=AMAX1(RAM, &
-      (LOG((ZZ-ZD(NY,NX))/ZR(NY,NX)))**2/(0.168*UA(NY,NX)))
-      RIB(NY,NX)=1.27E+08*(ZZ-ZR(NY,NX))/(UA(NY,NX)**2*TKA(NY,NX))
-      ELSE
-      RAB(NY,NX)=RAM
-      RIB(NY,NX)=0.0
-      ENDIF
-      end subroutine CalcBoundaryLayerProperties
+    RAB(NY,NX)=AMAX1(RAM,(LOG((ZZ-ZD(NY,NX))/ZR(NY,NX)))**2/(0.168*UA(NY,NX)))
+    RIB(NY,NX)=1.27E+08*(ZZ-ZR(NY,NX))/(UA(NY,NX)**2*TKA(NY,NX))
+  ELSE
+    RAB(NY,NX)=RAM
+    RIB(NY,NX)=0.0
+  ENDIF
+  end subroutine CalcBoundaryLayerProperties
 !------------------------------------------------------------------------------------------
 
-      subroutine ApplyFertilizerAtNoon(I,J,NHW,NHE,NVN,NVS)
+  subroutine ApplyFertilizerAtNoon(I,J,NHW,NHE,NVN,NVS)
 !
-      implicit none
-      integer, intent(in) :: I,J,NHW,NHE,NVN,NVS
+  implicit none
+  integer, intent(in) :: I,J,NHW,NHE,NVN,NVS
 
-      integer :: NX,NY
+  integer :: NX,NY
 !     begin_execution
 
-      DO 8990 NX=NHW,NHE
-      DO 8995 NY=NVN,NVS
+  DO 8990 NX=NHW,NHE
+    DO 8995 NY=NVN,NVS
       IF(J.EQ.INT(ZNOON(NY,NX)))THEN
 
-      call ApplyMineralFertilizer(I,J,NY,NX)
+        call ApplyMineralFertilizer(I,J,NY,NX)
 !
 !     SOIL LAYER NUMBER IN WHICH PLANT OR ANIMAL RESIDUES ARE APPLIED
 !
-      call ApplyPlantAnimalResidue(I,J,NY,NX)
+        call ApplyPlantAnimalResidue(I,J,NY,NX)
 !
 !     FERTILIZER UREA, NITRIFICATION INHIBITORS
-      call ApplyUreaNitrifierInhibitor(I,J,NY,NX)
+        call ApplyUreaNitrifierInhibitor(I,J,NY,NX)
 
       ENDIF
 8995  CONTINUE
 8990  CONTINUE
-      end subroutine ApplyFertilizerAtNoon
+  end subroutine ApplyFertilizerAtNoon
 !------------------------------------------------------------------------------------------
 
-      subroutine ApplyUreaNitrifierInhibitor(I,J,NY,NX)
+  subroutine ApplyUreaNitrifierInhibitor(I,J,NY,NX)
 
-      implicit none
-      integer, intent(in) :: I,J,NY,NX
+  implicit none
+  integer, intent(in) :: I,J,NY,NX
 
-      integer :: L
+  integer :: L
 !     begin_execution
 !
 !     IYTYP=fertilizer release type from fertilizer input file
@@ -3066,58 +3065,57 @@ module Hour1Mod
 !     ZNHU0,ZNHUI=initial,current urea hydrolysis inhibition activity
 !     ZNFN0,ZNFNI=initial,current nitrification inhibition activity
 !
-      IF(FERT(3,I,NY,NX).GT.0.0.OR.FERT(7,I,NY,NX).GT.0.0)THEN
-      IF(IYTYP(0,I,NY,NX).EQ.0)THEN
+  IF(FERT(3,I,NY,NX).GT.0.0.OR.FERT(7,I,NY,NX).GT.0.0)THEN
+    IF(IYTYP(0,I,NY,NX).EQ.0)THEN
       IUTYP(NY,NX)=0
-      ELSEIF(IYTYP(0,I,NY,NX).EQ.1.OR.IYTYP(0,I,NY,NX).EQ.3)THEN
+    ELSEIF(IYTYP(0,I,NY,NX).EQ.1.OR.IYTYP(0,I,NY,NX).EQ.3)THEN
       IUTYP(NY,NX)=1
-      ELSE
+    ELSE
       IUTYP(NY,NX)=2
-      ENDIF
-      DO 9964 L=0,NL(NY,NX)
+    ENDIF
+    DO 9964 L=0,NL(NY,NX)
       IF(L.EQ.LFDPTH)THEN
-      ZNHU0(L,NY,NX)=1.0
-      ZNHUI(L,NY,NX)=1.0
+        ZNHU0(L,NY,NX)=1.0
+        ZNHUI(L,NY,NX)=1.0
       ELSE
-      ZNHU0(L,NY,NX)=0.0
-      ZNHUI(L,NY,NX)=0.0
+        ZNHU0(L,NY,NX)=0.0
+        ZNHUI(L,NY,NX)=0.0
       ENDIF
 9964  CONTINUE
-      ENDIF
-      IF(IYTYP(0,I,NY,NX).EQ.3.OR.IYTYP(0,I,NY,NX).EQ.4)THEN
-      DO 9965 L=0,NL(NY,NX)
+  ENDIF
+  IF(IYTYP(0,I,NY,NX).EQ.3.OR.IYTYP(0,I,NY,NX).EQ.4)THEN
+    DO 9965 L=0,NL(NY,NX)
       IF(L.EQ.LFDPTH)THEN
-      ZNFN0(L,NY,NX)=1.0
-      ZNFNI(L,NY,NX)=1.0
+        ZNFN0(L,NY,NX)=1.0
+        ZNFNI(L,NY,NX)=1.0
       ELSE
-      ZNFN0(L,NY,NX)=0.0
-      ZNFNI(L,NY,NX)=0.0
+        ZNFN0(L,NY,NX)=0.0
+        ZNFNI(L,NY,NX)=0.0
       ENDIF
 9965  CONTINUE
-      ENDIF
-      end subroutine ApplyUreaNitrifierInhibitor
+  ENDIF
+  end subroutine ApplyUreaNitrifierInhibitor
 !------------------------------------------------------------------------------------------
 
-      subroutine ApplyPlantAnimalResidue(I,J,NY,NX)
-      implicit none
-      integer, intent(in) :: I,J,NY,NX
+  subroutine ApplyPlantAnimalResidue(I,J,NY,NX)
+  implicit none
+  integer, intent(in) :: I,J,NY,NX
 
-      integer :: L,K,M,N,NN,NGL
+  integer :: L,K,M,N,NN,NGL
 !     begin_execution
 !     LFDPTH=layer number
 !
-      IF(OFC(1)+OFC(2).GT.0.0)THEN
-      DO 2985 L=0,JZ
+  IF(OFC(1)+OFC(2).GT.0.0)THEN
+    DO 2985 L=0,JZ
       FDPTHM=FDPTH(I,NY,NX)+CDPTH(NU(NY,NX)-1,NY,NX)
       IF(FDPTHM.LE.0.0)THEN
-      LFDPTH=0
-      GO TO 2980
+        LFDPTH=0
+        exit
       ELSEIF(CDPTH(L,NY,NX).GE.FDPTHM)THEN
-      LFDPTH=L
-      GO TO 2980
+        LFDPTH=L
+        exit
       ENDIF
 2985  CONTINUE
-2980  CONTINUE
 !
 !     ALLOCATION OF PLANT RESIDUE APPLICATION TO
 !     RESIDUE PROTEIN, CH2O, CELLULOSE, LIGNIN
@@ -3128,7 +3126,7 @@ module Hour1Mod
 !
 !     MAIZE
 !
-      IF(IYTYP(1,I,NY,NX).EQ.1)THEN
+    IF(IYTYP(1,I,NY,NX).EQ.1)THEN
       CFOSC(1,1,LFDPTH,NY,NX)=0.080
       CFOSC(2,1,LFDPTH,NY,NX)=0.245
       CFOSC(3,1,LFDPTH,NY,NX)=0.613
@@ -3136,7 +3134,7 @@ module Hour1Mod
 !
 !     WHEAT
 !
-      ELSEIF(IYTYP(1,I,NY,NX).EQ.2)THEN
+    ELSEIF(IYTYP(1,I,NY,NX).EQ.2)THEN
       CFOSC(1,1,LFDPTH,NY,NX)=0.125
       CFOSC(2,1,LFDPTH,NY,NX)=0.171
       CFOSC(3,1,LFDPTH,NY,NX)=0.560
@@ -3144,7 +3142,7 @@ module Hour1Mod
 !
 !     SOYBEAN
 !
-      ELSEIF(IYTYP(1,I,NY,NX).EQ.3)THEN
+    ELSEIF(IYTYP(1,I,NY,NX).EQ.3)THEN
       CFOSC(1,1,LFDPTH,NY,NX)=0.138
       CFOSC(2,1,LFDPTH,NY,NX)=0.426
       CFOSC(3,1,LFDPTH,NY,NX)=0.316
@@ -3152,7 +3150,7 @@ module Hour1Mod
 !
 !     OLD STRAW
 !
-      ELSEIF(IYTYP(1,I,NY,NX).EQ.4)THEN
+    ELSEIF(IYTYP(1,I,NY,NX).EQ.4)THEN
       CFOSC(1,1,LFDPTH,NY,NX)=0.075
       CFOSC(2,1,LFDPTH,NY,NX)=0.125
       CFOSC(3,1,LFDPTH,NY,NX)=0.550
@@ -3160,7 +3158,7 @@ module Hour1Mod
 !
 !     STRAW
 !
-      ELSEIF(IYTYP(1,I,NY,NX).EQ.5)THEN
+    ELSEIF(IYTYP(1,I,NY,NX).EQ.5)THEN
       CFOSC(1,1,LFDPTH,NY,NX)=0.036
       CFOSC(2,1,LFDPTH,NY,NX)=0.044
       CFOSC(3,1,LFDPTH,NY,NX)=0.767
@@ -3168,7 +3166,7 @@ module Hour1Mod
 !
 !     COMPOST
 !
-      ELSEIF(IYTYP(1,I,NY,NX).EQ.6)THEN
+    ELSEIF(IYTYP(1,I,NY,NX).EQ.6)THEN
       CFOSC(1,1,LFDPTH,NY,NX)=0.143
       CFOSC(2,1,LFDPTH,NY,NX)=0.015
       CFOSC(3,1,LFDPTH,NY,NX)=0.640
@@ -3176,7 +3174,7 @@ module Hour1Mod
 !
 !     GREEN MANURE
 !
-      ELSEIF(IYTYP(1,I,NY,NX).EQ.7)THEN
+    ELSEIF(IYTYP(1,I,NY,NX).EQ.7)THEN
       CFOSC(1,1,LFDPTH,NY,NX)=0.202
       CFOSC(2,1,LFDPTH,NY,NX)=0.013
       CFOSC(3,1,LFDPTH,NY,NX)=0.560
@@ -3184,24 +3182,24 @@ module Hour1Mod
 !
 !     SIMPLE SUBSTRATE
 !
-      ELSEIF(IYTYP(1,I,NY,NX).EQ.10)THEN
+    ELSEIF(IYTYP(1,I,NY,NX).EQ.10)THEN
       CFOSC(1,1,LFDPTH,NY,NX)=0.000
       CFOSC(2,1,LFDPTH,NY,NX)=1.000
       CFOSC(3,1,LFDPTH,NY,NX)=0.000
       CFOSC(4,1,LFDPTH,NY,NX)=0.000
-      ELSE
+    ELSE
       CFOSC(1,1,LFDPTH,NY,NX)=0.075
       CFOSC(2,1,LFDPTH,NY,NX)=0.125
       CFOSC(3,1,LFDPTH,NY,NX)=0.550
       CFOSC(4,1,LFDPTH,NY,NX)=0.250
-      ENDIF
+    ENDIF
 !
 !     ALLOCATION OF ANIMAL MANURE APPLICATION TO
 !     RESIDUE PROTEIN, CH2O, CELLULOSE, LIGNIN
 !
 !     RUMINANT
 !
-      IF(IYTYP(2,I,NY,NX).EQ.1)THEN
+    IF(IYTYP(2,I,NY,NX).EQ.1)THEN
       CFOSC(1,2,LFDPTH,NY,NX)=0.036
       CFOSC(2,2,LFDPTH,NY,NX)=0.044
       CFOSC(3,2,LFDPTH,NY,NX)=0.630
@@ -3209,7 +3207,7 @@ module Hour1Mod
 !
 !     NON-RUMINANT
 !
-      ELSEIF(IYTYP(2,I,NY,NX).EQ.2)THEN
+    ELSEIF(IYTYP(2,I,NY,NX).EQ.2)THEN
       CFOSC(1,2,LFDPTH,NY,NX)=0.138
       CFOSC(2,2,LFDPTH,NY,NX)=0.401
       CFOSC(3,2,LFDPTH,NY,NX)=0.316
@@ -3217,7 +3215,7 @@ module Hour1Mod
 !
 !     GRAZING
 !
-      ELSEIF(IYTYP(2,I,NY,NX).EQ.3)THEN
+    ELSEIF(IYTYP(2,I,NY,NX).EQ.3)THEN
       CFOSC(1,2,LFDPTH,NY,NX)=0.036
       CFOSC(2,2,LFDPTH,NY,NX)=0.044
       CFOSC(3,2,LFDPTH,NY,NX)=0.630
@@ -3225,25 +3223,25 @@ module Hour1Mod
 !
 !     OTHER
 !
-      ELSE
+    ELSE
       CFOSC(1,2,LFDPTH,NY,NX)=0.138
       CFOSC(2,2,LFDPTH,NY,NX)=0.401
       CFOSC(3,2,LFDPTH,NY,NX)=0.316
       CFOSC(4,2,LFDPTH,NY,NX)=0.145
-      ENDIF
+    ENDIF
 !
 !     DISTRIBUTE RESIDUE APPLICATION AMONG COMPONENTS OF RESIDUE COMPLEX
 !
 !     OFC,OFN,OFP=litter C,N,P application from fertilizer file
 !
-      DO 2965 K=1,2
+    DO 2965 K=1,2
       OSCI=OFC(K)*AREA(3,LFDPTH,NY,NX)
       OSNI=OFN(K)*AREA(3,LFDPTH,NY,NX)
       OSPI=OFP(K)*AREA(3,LFDPTH,NY,NX)
       IF(BKVL(LFDPTH,NY,NX).GT.ZEROS(NY,NX))THEN
-      CORGCX=OSCI/BKVL(LFDPTH,NY,NX)
+        CORGCX=OSCI/BKVL(LFDPTH,NY,NX)
       ELSE
-      CORGCX=0.55E+06
+        CORGCX=0.55E+06
       ENDIF
       OSCX=0.0
       OSNX=0.0
@@ -3256,35 +3254,35 @@ module Hour1Mod
 !     OMCF,OMCA=hetero,autotrophic biomass composition in litter
 !
       DO 2960 N=1,7
-      DO NGL=1,JG
-      DO 2961 M=1,3
-      OMC1=AMAX1(0.0,AMIN1(OSCI*OMCI(M+(NGL-1)*3,K)*OMCF(N),OSCI-OSCX))
-      OMN1=AMAX1(0.0,AMIN1(OMC1*CNOMC(M,NGL,N,K),OSNI-OSNX))
-      OMP1=AMAX1(0.0,AMIN1(OMC1*CPOMC(M,NGL,N,K),OSPI-OSPX))
-      OMC(M,NGL,N,K,LFDPTH,NY,NX)=OMC(M,NGL,N,K,LFDPTH,NY,NX)+OMC1
-      OMN(M,NGL,N,K,LFDPTH,NY,NX)=OMN(M,NGL,N,K,LFDPTH,NY,NX)+OMN1
-      OMP(M,NGL,N,K,LFDPTH,NY,NX)=OMP(M,NGL,N,K,LFDPTH,NY,NX)+OMP1
+        DO NGL=1,JG
+          DO 2961 M=1,3
+            OMC1=AMAX1(0.0,AMIN1(OSCI*OMCI(M+(NGL-1)*3,K)*OMCF(N),OSCI-OSCX))
+            OMN1=AMAX1(0.0,AMIN1(OMC1*CNOMC(M,NGL,N,K),OSNI-OSNX))
+            OMP1=AMAX1(0.0,AMIN1(OMC1*CPOMC(M,NGL,N,K),OSPI-OSPX))
+            OMC(M,NGL,N,K,LFDPTH,NY,NX)=OMC(M,NGL,N,K,LFDPTH,NY,NX)+OMC1
+            OMN(M,NGL,N,K,LFDPTH,NY,NX)=OMN(M,NGL,N,K,LFDPTH,NY,NX)+OMN1
+            OMP(M,NGL,N,K,LFDPTH,NY,NX)=OMP(M,NGL,N,K,LFDPTH,NY,NX)+OMP1
 !     WRITE(*,2345)'OMCI',I,J,LFDPTH,K,N,M
 !    2,OMC1,OMN1,OMP1,OSCI,OMCI(M,K)
 !    2,OMCF(N),OSCX,CNOMC(M,NGL,N,K),CPOMC(M,NGL,N,K),OSNI,OSPI
 !    2,OMC(M,NGL,N,K,LFDPTH,NY,NX),OMN(M,NGL,N,K,LFDPTH,NY,NX)
 !2345  FORMAT(A8,6I4,20E12.4)
-      OSCX=OSCX+OMC1
-      OSNX=OSNX+OMN1
-      OSPX=OSPX+OMP1
-      DO 2962 NN=1,7
-      OMC(M,NGL,NN,5,LFDPTH,NY,NX)=OMC(M,NGL,NN,5,LFDPTH,NY,NX)+OMC1*OMCA(NN)
-      OMN(M,NGL,NN,5,LFDPTH,NY,NX)=OMN(M,NGL,NN,5,LFDPTH,NY,NX)+OMN1*OMCA(NN)
-      OMP(M,NGL,NN,5,LFDPTH,NY,NX)=OMP(M,NGL,NN,5,LFDPTH,NY,NX)+OMP1*OMCA(NN)
+            OSCX=OSCX+OMC1
+            OSNX=OSNX+OMN1
+            OSPX=OSPX+OMP1
+            DO 2962 NN=1,7
+              OMC(M,NGL,NN,5,LFDPTH,NY,NX)=OMC(M,NGL,NN,5,LFDPTH,NY,NX)+OMC1*OMCA(NN)
+              OMN(M,NGL,NN,5,LFDPTH,NY,NX)=OMN(M,NGL,NN,5,LFDPTH,NY,NX)+OMN1*OMCA(NN)
+              OMP(M,NGL,NN,5,LFDPTH,NY,NX)=OMP(M,NGL,NN,5,LFDPTH,NY,NX)+OMP1*OMCA(NN)
 !     WRITE(*,2346)'OMCA',I,J,LFDPTH,K,N,NN,M
 !    2,OMC1,OMCA(NN),OMC(M,NN,5,LFDPTH,NY,NX)
 !2346  FORMAT(A8,7I4,20E12.4)
-      OSCX=OSCX+OMC1*OMCA(NN)
-      OSNX=OSNX+OMN1*OMCA(NN)
-      OSPX=OSPX+OMP1*OMCA(NN)
-2962  CONTINUE
-2961  CONTINUE
-      ENDDO
+              OSCX=OSCX+OMC1*OMCA(NN)
+              OSNX=OSNX+OMN1*OMCA(NN)
+              OSPX=OSPX+OMP1*OMCA(NN)
+2962        CONTINUE
+2961      CONTINUE
+        ENDDO
 2960  CONTINUE
 !
 !     DOC, DON AND DOP IN RESIDUE
@@ -3311,47 +3309,47 @@ module Hour1Mod
       CNOFT=0.0
       CPOFT=0.0
       IF(OSCI-OSCX.GT.ZEROS(NY,NX))THEN
-      RNT=0.0
-      RPT=0.0
-      DO 965 M=1,4
-      RNT=RNT+(OSCI-OSCX)*CFOSC(M,K,LFDPTH,NY,NX)*CNOFC(M,K)
-      RPT=RPT+(OSCI-OSCX)*CFOSC(M,K,LFDPTH,NY,NX)*CPOFC(M,K)
-965   CONTINUE
-      FRNT=(OSNI-OSNX)/RNT
-      FRPT=(OSPI-OSPX)/RPT
-      DO 970 M=1,4
-      CNOF(M)=CNOFC(M,K)*FRNT
-      CPOF(M)=CPOFC(M,K)*FRPT
-      CNOFT=CNOFT+CFOSC(M,K,LFDPTH,NY,NX)*CNOF(M)
-      CPOFT=CPOFT+CFOSC(M,K,LFDPTH,NY,NX)*CPOF(M)
-970   CONTINUE
+        RNT=0.0
+        RPT=0.0
+        DO 965 M=1,4
+          RNT=RNT+(OSCI-OSCX)*CFOSC(M,K,LFDPTH,NY,NX)*CNOFC(M,K)
+          RPT=RPT+(OSCI-OSCX)*CFOSC(M,K,LFDPTH,NY,NX)*CPOFC(M,K)
+965     CONTINUE
+        FRNT=(OSNI-OSNX)/RNT
+        FRPT=(OSPI-OSPX)/RPT
+        DO 970 M=1,4
+          CNOF(M)=CNOFC(M,K)*FRNT
+          CPOF(M)=CPOFC(M,K)*FRPT
+          CNOFT=CNOFT+CFOSC(M,K,LFDPTH,NY,NX)*CNOF(M)
+          CPOFT=CPOFT+CFOSC(M,K,LFDPTH,NY,NX)*CPOF(M)
+970     CONTINUE
       ELSE
-      DO 975 M=1,4
-      CNOF(M)=0.0
-      CPOF(M)=0.0
-975   CONTINUE
+        DO 975 M=1,4
+          CNOF(M)=0.0
+          CPOF(M)=0.0
+975     CONTINUE
       ENDIF
       DO 2970 M=1,4
-      OSC1=CFOSC(M,K,LFDPTH,NY,NX)*(OSCI-OSCX)
-      IF(CNOFT.GT.ZERO)THEN
-      OSN1=CFOSC(M,K,LFDPTH,NY,NX)*CNOF(M)/CNOFT*(OSNI-OSNX)
-      ELSE
-      OSN1=0.0
-      ENDIF
-      IF(CPOFT.GT.ZERO)THEN
-      OSP1=CFOSC(M,K,LFDPTH,NY,NX)*CPOF(M)/CPOFT*(OSPI-OSPX)
-      ELSE
-      OSP1=0.0
-      ENDIF
-      OSC(M,K,LFDPTH,NY,NX)=OSC(M,K,LFDPTH,NY,NX)+OSC1
-      DO NGL=1,JG
-        OSA(M,K,LFDPTH,NY,NX)=OSA(M,K,LFDPTH,NY,NX)+OSC1*OMCI(1+(NGL-1)*3,K)
-      ENDDO
-      OSN(M,K,LFDPTH,NY,NX)=OSN(M,K,LFDPTH,NY,NX)+OSN1
-      OSP(M,K,LFDPTH,NY,NX)=OSP(M,K,LFDPTH,NY,NX)+OSP1
-      IF(LFDPTH.EQ.0)THEN
-      VOLT(LFDPTH,NY,NX)=VOLT(LFDPTH,NY,NX)+OSC1*1.0E-06/BKRS(1)
-      ENDIF
+        OSC1=CFOSC(M,K,LFDPTH,NY,NX)*(OSCI-OSCX)
+        IF(CNOFT.GT.ZERO)THEN
+          OSN1=CFOSC(M,K,LFDPTH,NY,NX)*CNOF(M)/CNOFT*(OSNI-OSNX)
+        ELSE
+          OSN1=0.0
+        ENDIF
+        IF(CPOFT.GT.ZERO)THEN
+          OSP1=CFOSC(M,K,LFDPTH,NY,NX)*CPOF(M)/CPOFT*(OSPI-OSPX)
+        ELSE
+          OSP1=0.0
+        ENDIF
+        OSC(M,K,LFDPTH,NY,NX)=OSC(M,K,LFDPTH,NY,NX)+OSC1
+        DO NGL=1,JG
+          OSA(M,K,LFDPTH,NY,NX)=OSA(M,K,LFDPTH,NY,NX)+OSC1*OMCI(1+(NGL-1)*3,K)
+        ENDDO
+        OSN(M,K,LFDPTH,NY,NX)=OSN(M,K,LFDPTH,NY,NX)+OSN1
+        OSP(M,K,LFDPTH,NY,NX)=OSP(M,K,LFDPTH,NY,NX)+OSP1
+        IF(LFDPTH.EQ.0)THEN
+          VOLT(LFDPTH,NY,NX)=VOLT(LFDPTH,NY,NX)+OSC1*1.0E-06/BKRS(1)
+        ENDIF
 2970  CONTINUE
       TORGF=TORGF+OSCI
       TORGN=TORGN+OSNI
@@ -3360,18 +3358,18 @@ module Hour1Mod
       UFERTN(NY,NX)=UFERTN(NY,NX)+OSNI
       UFERTP(NY,NX)=UFERTP(NY,NX)+OSPI
       IF(IYTYP(2,I,NY,NX).LT.3)THEN
-      TNBP(NY,NX)=TNBP(NY,NX)+OSCI
+        TNBP(NY,NX)=TNBP(NY,NX)+OSCI
       ENDIF
 2965  CONTINUE
-      ENDIF
-      end subroutine ApplyPlantAnimalResidue
+  ENDIF
+  end subroutine ApplyPlantAnimalResidue
 !------------------------------------------------------------------------------------------
 
-      subroutine ApplyMineralFertilizer(I,J,NY,NX)
-      implicit none
-      integer, intent(in) :: I,J,NY,NX
+  subroutine ApplyMineralFertilizer(I,J,NY,NX)
+  implicit none
+  integer, intent(in) :: I,J,NY,NX
 
-      integer :: L
+  integer :: L
 !     begin_execution
 !
 !     NH4,NH3,UREA,NO3 FERTILIZER APPLICATION
@@ -3379,61 +3377,59 @@ module Hour1Mod
 !     *A,*B=broadcast,banded
 !     Z4,Z3,ZU,ZO=NH4,NH3,urea,NO3
 !
-      Z4A=FERT(1,I,NY,NX)
-      Z3A=FERT(2,I,NY,NX)
-      ZUA=FERT(3,I,NY,NX)
-      ZOA=FERT(4,I,NY,NX)
-      Z4B=FERT(5,I,NY,NX)
-      Z3B=FERT(6,I,NY,NX)
-      ZUB=FERT(7,I,NY,NX)
-      ZOB=FERT(8,I,NY,NX)
+  Z4A=FERT(1,I,NY,NX)
+  Z3A=FERT(2,I,NY,NX)
+  ZUA=FERT(3,I,NY,NX)
+  ZOA=FERT(4,I,NY,NX)
+  Z4B=FERT(5,I,NY,NX)
+  Z3B=FERT(6,I,NY,NX)
+  ZUB=FERT(7,I,NY,NX)
+  ZOB=FERT(8,I,NY,NX)
 !
 !     MONOCALCIUM PHOSPHATE OR HYDROXYAPATITE
 !
 !     PM*,PH*=Ca(H2PO4)2,apatite
 !
-      PMA=FERT(9,I,NY,NX)
-      PMB=FERT(10,I,NY,NX)
-      PHA=FERT(11,I,NY,NX)
+  PMA=FERT(9,I,NY,NX)
+  PMB=FERT(10,I,NY,NX)
+  PHA=FERT(11,I,NY,NX)
 !
 !     LIME AND GYPSUM
 !
 !     CAC,CAS=CaCO3,CaSO4
 !
-      CAC=FERT(12,I,NY,NX)
-      CAS=FERT(13,I,NY,NX)
+  CAC=FERT(12,I,NY,NX)
+  CAS=FERT(13,I,NY,NX)
 !
 !     PLANT(1) AND ANIMAL(2) RESIDUE C, N AND P
 !
-      OFC(1)=FERT(14,I,NY,NX)
-      OFN(1)=FERT(15,I,NY,NX)
-      OFP(1)=FERT(16,I,NY,NX)
-      OFC(2)=FERT(17,I,NY,NX)
-      OFN(2)=FERT(18,I,NY,NX)
-      OFP(2)=FERT(19,I,NY,NX)
+  OFC(1)=FERT(14,I,NY,NX)
+  OFN(1)=FERT(15,I,NY,NX)
+  OFP(1)=FERT(16,I,NY,NX)
+  OFC(2)=FERT(17,I,NY,NX)
+  OFN(2)=FERT(18,I,NY,NX)
+  OFP(2)=FERT(19,I,NY,NX)
 !
 !     SOIL LAYER NUMBER AT DEPTH OF FERTILIZER APPLICATION
 !
 !     LFDPTH=layer number
 !     CVRDF=fraction of fertilizer applied to surface litter
 !
-      IF(Z4A+Z3A+ZUA+ZOA+Z4B+Z3B+ZUB+ZOB &
-      +PMA+PMB+PHA+CAC+CAS.GT.0.0)THEN
-      FDPTHF=FDPTH(I,NY,NX)+CDPTH(NU(NY,NX)-1,NY,NX)
-      IF(FDPTHF.LE.0.0.AND.test_aeqb(Z4B+Z3B+ZUB+ZOB+PMB,0._r8))THEN
+  IF(Z4A+Z3A+ZUA+ZOA+Z4B+Z3B+ZUB+ZOB+PMA+PMB+PHA+CAC+CAS.GT.0.0)THEN
+    FDPTHF=FDPTH(I,NY,NX)+CDPTH(NU(NY,NX)-1,NY,NX)
+    IF(FDPTHF.LE.0.0.AND.test_aeqb(Z4B+Z3B+ZUB+ZOB+PMB,0._r8))THEN
       LFDPTH=0
       CVRDF=1.0-EXP(-0.8E-02*(ORGC(0,NY,NX)/AREA(3,0,NY,NX)))
-      ELSE
+    ELSE
       DO 65 L=NUI(NY,NX),JZ
-      IF(CDPTH(L,NY,NX).GE.FDPTHF)THEN
-      LFDPTH=L
-      CVRDF=1.0
-      GO TO 55
-      ENDIF
+        IF(CDPTH(L,NY,NX).GE.FDPTHF)THEN
+          LFDPTH=L
+          CVRDF=1.0
+          exit
+        ENDIF
 65    CONTINUE
-55    CONTINUE
-      ENDIF
-      BAREF=1.0-CVRDF
+    ENDIF
+    BAREF=1.0-CVRDF
 !
 !     RESET WIDTH AND DEPTH OF NH4 FERTILIZER BAND IF NEW BAND
 !     AND ADD REMAINS OF ANY EXISTING FERTILIZER BAND TO NEW BAND
@@ -3442,40 +3438,40 @@ module Hour1Mod
 !     DPNHB,WDNHB=depth,width of NH4 band
 !     VLNHB,VLNH4=soil volume in NH4 band,non-band
 !
-      IF((Z4B+Z3B+ZUB.GT.0.0).OR.((ZNH4B(LFDPTH,NY,NX).GT.0.0 &
+    IF((Z4B+Z3B+ZUB.GT.0.0).OR.((ZNH4B(LFDPTH,NY,NX).GT.0.0 &
       .OR.ZNH3B(LFDPTH,NY,NX).GT.0.0).AND.IFNHB(NY,NX).EQ.0))THEN
       IFNHB(NY,NX)=1
       ROWN(NY,NX)=ROWI(I,NY,NX)
       DO 50 L=NUI(NY,NX),JZ
-      IF(L.LT.LFDPTH)THEN
-      DPNHB(L,NY,NX)=DLYR(3,L,NY,NX)
-      WDNHB(L,NY,NX)=0.0
-      ELSEIF(L.EQ.LFDPTH)THEN
-      DPNHB(L,NY,NX)=AMAX1(0.025,FDPTHF-CDPTH(L-1,NY,NX))
-      WDNHB(L,NY,NX)=AMIN1(0.025,ROWN(NY,NX))
-      ELSE
-      DPNHB(L,NY,NX)=0.0
-      WDNHB(L,NY,NX)=0.0
-      ENDIF
-      IF(DLYR(3,L,NY,NX).GT.ZERO2)THEN
-      VLNHB(L,NY,NX)=AMIN1(0.999,WDNHB(L,NY,NX)/ROWN(NY,NX) &
-      *DPNHB(L,NY,NX)/DLYR(3,L,NY,NX))
-      ELSE
-      VLNHB(L,NY,NX)=0.0
-      ENDIF
-      VLNH4(L,NY,NX)=1.0-VLNHB(L,NY,NX)
-      ZNH4T=ZNH4S(L,NY,NX)+ZNH4B(L,NY,NX)
-      ZNH3T=ZNH3S(L,NY,NX)+ZNH3B(L,NY,NX)
-      XN4T=XN4(L,NY,NX)+XNB(L,NY,NX)
-      ZNH4S(L,NY,NX)=ZNH4T*VLNH4(L,NY,NX)
-      ZNH3S(L,NY,NX)=ZNH3T*VLNH4(L,NY,NX)
-      ZNH4B(L,NY,NX)=ZNH4T*VLNHB(L,NY,NX)
-      ZNH3B(L,NY,NX)=ZNH3T*VLNHB(L,NY,NX)
-      XN4(L,NY,NX)=XN4T*VLNH4(L,NY,NX)
-      XNB(L,NY,NX)=XN4T*VLNHB(L,NY,NX)
+        IF(L.LT.LFDPTH)THEN
+          DPNHB(L,NY,NX)=DLYR(3,L,NY,NX)
+          WDNHB(L,NY,NX)=0.0
+        ELSEIF(L.EQ.LFDPTH)THEN
+          DPNHB(L,NY,NX)=AMAX1(0.025,FDPTHF-CDPTH(L-1,NY,NX))
+          WDNHB(L,NY,NX)=AMIN1(0.025,ROWN(NY,NX))
+        ELSE
+          DPNHB(L,NY,NX)=0.0
+          WDNHB(L,NY,NX)=0.0
+        ENDIF
+        IF(DLYR(3,L,NY,NX).GT.ZERO2)THEN
+          VLNHB(L,NY,NX)=AMIN1(0.999,WDNHB(L,NY,NX)/ROWN(NY,NX) &
+            *DPNHB(L,NY,NX)/DLYR(3,L,NY,NX))
+        ELSE
+          VLNHB(L,NY,NX)=0.0
+        ENDIF
+        VLNH4(L,NY,NX)=1.0-VLNHB(L,NY,NX)
+        ZNH4T=ZNH4S(L,NY,NX)+ZNH4B(L,NY,NX)
+        ZNH3T=ZNH3S(L,NY,NX)+ZNH3B(L,NY,NX)
+        XN4T=XN4(L,NY,NX)+XNB(L,NY,NX)
+        ZNH4S(L,NY,NX)=ZNH4T*VLNH4(L,NY,NX)
+        ZNH3S(L,NY,NX)=ZNH3T*VLNH4(L,NY,NX)
+        ZNH4B(L,NY,NX)=ZNH4T*VLNHB(L,NY,NX)
+        ZNH3B(L,NY,NX)=ZNH3T*VLNHB(L,NY,NX)
+        XN4(L,NY,NX)=XN4T*VLNH4(L,NY,NX)
+        XNB(L,NY,NX)=XN4T*VLNHB(L,NY,NX)
 50    CONTINUE
       DPNH4(NY,NX)=DPNHB(LFDPTH,NY,NX)+CDPTH(LFDPTH-1,NY,NX)
-      ENDIF
+    ENDIF
 !
 !     RESET WIDTH AND DEPTH OF NO3 FERTILIZER BAND IF NEW BAND
 !     AND ADD REMAINS OF ANY EXISTING FERTILIZER BAND TO NEW BAND
@@ -3484,37 +3480,37 @@ module Hour1Mod
 !     DPNOB,WDNOB=depth,width of NO3 band
 !     VLNOB,VLNO3=soil volume in NO3 band,non-band
 !
-      IF((Z4B+Z3B+ZUB+ZOB.GT.0.0).OR.((ZNO3B(LFDPTH,NY,NX).GT.0.0 &
+    IF((Z4B+Z3B+ZUB+ZOB.GT.0.0).OR.((ZNO3B(LFDPTH,NY,NX).GT.0.0 &
       .OR.ZNO2B(LFDPTH,NY,NX).GT.0.0).AND.IFNOB(NY,NX).EQ.0))THEN
       IFNOB(NY,NX)=1
       ROWO(NY,NX)=ROWI(I,NY,NX)
       DO 45 L=NUI(NY,NX),JZ
-      IF(L.LT.LFDPTH)THEN
-      DPNOB(L,NY,NX)=DLYR(3,L,NY,NX)
-      WDNOB(L,NY,NX)=0.0
-      ELSEIF(L.EQ.LFDPTH)THEN
-      DPNOB(L,NY,NX)=AMAX1(0.01,FDPTHF-CDPTH(L-1,NY,NX))
-      WDNOB(L,NY,NX)=AMIN1(0.01,ROWO(NY,NX))
-      ELSE
-      DPNOB(L,NY,NX)=0.0
-      WDNOB(L,NY,NX)=0.0
-      ENDIF
-      IF(DLYR(3,L,NY,NX).GT.ZERO2)THEN
-      VLNOB(L,NY,NX)=AMIN1(0.999,WDNOB(L,NY,NX)/ROWO(NY,NX) &
-      *DPNOB(L,NY,NX)/DLYR(3,L,NY,NX))
-      ELSE
-      VLNOB(L,NY,NX)=0.0
-      ENDIF
-      VLNO3(L,NY,NX)=1.0-VLNOB(L,NY,NX)
-      ZNO3T=ZNO3S(L,NY,NX)+ZNO3B(L,NY,NX)
-      ZNO2T=ZNO2S(L,NY,NX)+ZNO2B(L,NY,NX)
-      ZNO3S(L,NY,NX)=ZNO3T*VLNO3(L,NY,NX)
-      ZNO2S(L,NY,NX)=ZNO2T*VLNO3(L,NY,NX)
-      ZNO3B(L,NY,NX)=ZNO3T*VLNOB(L,NY,NX)
-      ZNO2B(L,NY,NX)=ZNO2T*VLNOB(L,NY,NX)
+        IF(L.LT.LFDPTH)THEN
+          DPNOB(L,NY,NX)=DLYR(3,L,NY,NX)
+          WDNOB(L,NY,NX)=0.0
+        ELSEIF(L.EQ.LFDPTH)THEN
+          DPNOB(L,NY,NX)=AMAX1(0.01,FDPTHF-CDPTH(L-1,NY,NX))
+          WDNOB(L,NY,NX)=AMIN1(0.01,ROWO(NY,NX))
+        ELSE
+          DPNOB(L,NY,NX)=0.0
+          WDNOB(L,NY,NX)=0.0
+        ENDIF
+        IF(DLYR(3,L,NY,NX).GT.ZERO2)THEN
+          VLNOB(L,NY,NX)=AMIN1(0.999,WDNOB(L,NY,NX)/ROWO(NY,NX) &
+            *DPNOB(L,NY,NX)/DLYR(3,L,NY,NX))
+        ELSE
+          VLNOB(L,NY,NX)=0.0
+        ENDIF
+        VLNO3(L,NY,NX)=1.0-VLNOB(L,NY,NX)
+        ZNO3T=ZNO3S(L,NY,NX)+ZNO3B(L,NY,NX)
+        ZNO2T=ZNO2S(L,NY,NX)+ZNO2B(L,NY,NX)
+        ZNO3S(L,NY,NX)=ZNO3T*VLNO3(L,NY,NX)
+        ZNO2S(L,NY,NX)=ZNO2T*VLNO3(L,NY,NX)
+        ZNO3B(L,NY,NX)=ZNO3T*VLNOB(L,NY,NX)
+        ZNO2B(L,NY,NX)=ZNO2T*VLNOB(L,NY,NX)
 45    CONTINUE
       DPNO3(NY,NX)=DPNOB(LFDPTH,NY,NX)+CDPTH(LFDPTH-1,NY,NX)
-      ENDIF
+    ENDIF
 !
 !     RESET WIDTH AND DEPTH OF PO4 FERTILIZER BAND IF NEW BAND
 !     AND ADD REMAINS OF ANY EXISTING FERTILIZER BAND TO NEW BAND
@@ -3523,35 +3519,35 @@ module Hour1Mod
 !     DPPOB,WDPOB=depth,width of H2PO4 band
 !     VLPOB,VLPO4=soil volume in H2PO4 band,non-band
 !
-      IF((PMB.GT.0.0).OR.(H2POB(LFDPTH,NY,NX).GT.0.0 &
+    IF((PMB.GT.0.0).OR.(H2POB(LFDPTH,NY,NX).GT.0.0 &
       .AND.IFPOB(NY,NX).EQ.0))THEN
       IFPOB(NY,NX)=1
       ROWP(NY,NX)=ROWI(I,NY,NX)
       DO 40 L=NUI(NY,NX),JZ
-      IF(L.LT.LFDPTH)THEN
-      DPPOB(L,NY,NX)=DLYR(3,L,NY,NX)
-      WDPOB(L,NY,NX)=AMIN1(0.01,ROWP(NY,NX))
-      ELSEIF(L.EQ.LFDPTH)THEN
-      DPPOB(L,NY,NX)=AMAX1(0.01,FDPTHF-CDPTH(L-1,NY,NX))
-      WDPOB(L,NY,NX)=AMIN1(0.01,ROWP(NY,NX))
-      ELSE
-      DPPOB(L,NY,NX)=0.0
-      WDPOB(L,NY,NX)=0.0
-      ENDIF
-      IF(DLYR(3,L,NY,NX).GT.ZERO2)THEN
-      VLPOB(L,NY,NX)=AMIN1(0.999,WDPOB(L,NY,NX)/ROWP(NY,NX) &
-      *DPPOB(L,NY,NX)/DLYR(3,L,NY,NX))
-      ELSE
-      VLPOB(L,NY,NX)=0.0
-      ENDIF
-      VLPO4(L,NY,NX)=1.0-VLPOB(L,NY,NX)
-      H0PO4T=H0PO4(L,NY,NX)+H0POB(L,NY,NX)
-      H1PO4T=H1PO4(L,NY,NX)+H1POB(L,NY,NX)
-      H2PO4T=H2PO4(L,NY,NX)+H2POB(L,NY,NX)
-      H3PO4T=H3PO4(L,NY,NX)+H3POB(L,NY,NX)
-      ZFE1PT=ZFE1P(L,NY,NX)+ZFE1PB(L,NY,NX)
-      ZFE2PT=ZFE2P(L,NY,NX)+ZFE2PB(L,NY,NX)
-      ZCA0PT=ZCA0P(L,NY,NX)+ZCA0PB(L,NY,NX)
+        IF(L.LT.LFDPTH)THEN
+          DPPOB(L,NY,NX)=DLYR(3,L,NY,NX)
+          WDPOB(L,NY,NX)=AMIN1(0.01,ROWP(NY,NX))
+        ELSEIF(L.EQ.LFDPTH)THEN
+          DPPOB(L,NY,NX)=AMAX1(0.01,FDPTHF-CDPTH(L-1,NY,NX))
+          WDPOB(L,NY,NX)=AMIN1(0.01,ROWP(NY,NX))
+        ELSE
+          DPPOB(L,NY,NX)=0.0
+          WDPOB(L,NY,NX)=0.0
+        ENDIF
+        IF(DLYR(3,L,NY,NX).GT.ZERO2)THEN
+          VLPOB(L,NY,NX)=AMIN1(0.999,WDPOB(L,NY,NX)/ROWP(NY,NX) &
+          *DPPOB(L,NY,NX)/DLYR(3,L,NY,NX))
+        ELSE
+          VLPOB(L,NY,NX)=0.0
+        ENDIF
+        VLPO4(L,NY,NX)=1.0-VLPOB(L,NY,NX)
+        H0PO4T=H0PO4(L,NY,NX)+H0POB(L,NY,NX)
+        H1PO4T=H1PO4(L,NY,NX)+H1POB(L,NY,NX)
+        H2PO4T=H2PO4(L,NY,NX)+H2POB(L,NY,NX)
+        H3PO4T=H3PO4(L,NY,NX)+H3POB(L,NY,NX)
+        ZFE1PT=ZFE1P(L,NY,NX)+ZFE1PB(L,NY,NX)
+        ZFE2PT=ZFE2P(L,NY,NX)+ZFE2PB(L,NY,NX)
+        ZCA0PT=ZCA0P(L,NY,NX)+ZCA0PB(L,NY,NX)
       ZCA1PT=ZCA1P(L,NY,NX)+ZCA1PB(L,NY,NX)
       ZCA2PT=ZCA2P(L,NY,NX)+ZCA2PB(L,NY,NX)
       ZMG1PT=ZMG1P(L,NY,NX)+ZMG1PB(L,NY,NX)

@@ -5,6 +5,7 @@ module nitroMod
 !
 ! USES:
   use data_kind_mod, only : r8 => SHR_KIND_R8
+  use abortutils  , only : endrun
   use minimathmod, only : safe_adb
   use MicrobialDataType
   use NitroPars
@@ -39,67 +40,46 @@ module nitroMod
   save
   character(len=*), parameter :: mod_filename = __FILE__
 
-  real(r8) :: ACTV,ACTVM,AECX,B,CHY1,CHNO2,CHNOB,COMC,CH4G1
-  real(r8) :: CH4S1,CCH4S1,COXYS1,C,CNH4X,CNH4Y,CNO3X,CNO3Y
-  real(r8) :: CH2PX,CH2PY,CH1PX,CH1PY,CGOXC
-  real(r8) :: C3C,CNC,CPC,CGOMZ,CNOMX,CPOMX,COQCK,COSC,CNR
-  real(r8) :: CPR,CGROMC,DIFOX,DCKD,DFNS,DOSAK,DCORPC,DC,DN
-  real(r8) :: DP,EO2Q,ECHZ,FNH4S,FNHBS,FNO3S,FNO3B,FNO2S,FNO2B
-  real(r8) :: FH1PS,FH1PB,FH2PS,FH2PB,FOXYX,FNH4X,FNB4X,FNO3X
-  real(r8) :: FNB3X,FPO4X,FPOBX,FP14X,FP1BX,FOQC,FOQA,FSBSTC
-  real(r8) :: FSBSTA,FSBST,FGOCP,FGOAP,FNH4,FNB4,FCN4S,FCN4B
-  real(r8) :: FNO2,FNB2,FCN2S,FCN2B,FNO3,FNB3,FVMXDX,FN2O,FPH
-  real(r8) :: FOSCXS,FOSCXD,FORGCX,GH2X,GH2F,GOAX,GOAF,GHAX
-  real(r8) :: GOMX,GOMM,GH2H,H2GSX,H2POM,H2PBM,H1POM,H1PBM,H2P4M
-  real(r8) :: H1P4M,HFLXD,OXYI,ORGCL,OHCQ,OXKX,OLSGL1,OXYG1
-  real(r8) :: OXYS1,OQCZ3,OQCD3,OQCD3S,OQCD3B,OQCZ2,OQCD2,OQCD2S
-  real(r8) :: OQCD2B,OQCZ1,OQCD1,OSRT,OQCI,OQCX,OQNX,OQPX,OQAX
-  real(r8) :: OHCX,OHNX,OHPX,OHAX,ORGRL,ORGRLL,OSCXD,OMCXS,OMNXS
-  real(r8) :: OMPXS,ORCXS,ORNXS,ORPXS,OQCXS,OQCHXS,OHCXS,OQAXS
-  real(r8) :: OQAHXS,OHAXS,OQNXS,OQNHXS,OHNXS,OQPXS,OQPHXS,OHPXS
-  real(r8) :: OSCXS,OSAXS,OSNXS,OSPXS,OC,ON,OP,OCH,ONH,OPH,ONX
-  real(r8) :: OPX,OCA,OAH,RTK,RGOCY,RGOCZ,RGOAZ,RGOCX,RGOAX
-  real(r8) :: RGOCP,RGOAP,RGOMP,ROXYSX,ROQCSX,ROQASX,RGOFY,RGOFZ
-  real(r8) :: RGOFX,RGOGY,RGOGZ,RGOGX,RNNH4,RNNHB,RVOXP,RVOXPA
-  real(r8) :: RVOXPB,RNNO2,RNNOB,RCH4L1,RCH4F1,RCH4S1,RVOXP1
-  real(r8) :: RGOMP1,RCHDF,RUPMX,ROXYFX,ROXYLX,RRADO,RMPOX,ROXDFQ
-  real(r8) :: RH2GZ,ROXYD,RDNO3X,RDNOBX,RDNOX,RDNOT,RGOM3X,RGOMD3
-  real(r8) :: RDNO2X,RDN2X,RDN2T,RGOM2X,RGOMD2,RDN2OX,RGOM1X
-  real(r8) :: RGOMD1,RINHP,RINHX,RINOP,RINOX,RIPOP,RIPOX,RIP1P
-  real(r8) :: RIP1X,RINHPR,RINOPR,RIPOPR,RIP1PR,RMOMX,RMOMT
-  real(r8) :: RGOMT,RXOMT,RGN2P,RCNO2,RCNOB,RCN2O
-  real(r8) :: RCN2B,RCNO3,RCN3B,RCOQN,RHOSCM,STK,SPOMX,THETR
-  real(r8) :: THETZ,TKSO,TOSC,TOSA,TORC,TOHC,TSRH,TOMA,TOMN
+
+  real(r8) :: FOXYX,FNH4X,FNB4X,FNO3X
+  real(r8) :: FNB3X,FPO4X,FPOBX,FP14X,FP1BX,FOQC,FOQA
+  real(r8) :: FSBST,FGOCP,FGOAP
+  real(r8) :: RGOCP,RGOMP
+  real(r8) :: RVOXP,RVOXPA,RVOXPB
+  real(r8) :: RH2GZ,RVOXP1,RGOMT,RXOMT,RMOMT
+  real(r8) :: RCNO2,RCNOB,RCN2O
+  real(r8) :: RCN2B,RCNO3,RCN3B,RCOQN
+  real(r8) :: TORC,TOMA,TOMN
   real(r8) :: TFOXYX,TFNH4X,TFNO3X,TFNO2X,TFN2OX,TFP14X,TFPO4X
   real(r8) :: TFNH4B,TFNO3B,TFNO2B,TFP14B,TFPO4B,TCH4H,TCH4A
-  real(r8) :: TFOQC,TFOQA,TRH2G,THETW1,TRINH,TRINO,TRIPO,TRIP1
-  real(r8) :: TRINB,TRIOB,TRIPB,TRIB1,TRGOM,TRGOC,TRGOD,TRGOA
-  real(r8) :: TRGOH,TUPOX,TRDN3,TRDNB,TRDN2,TRD2B,TRDNO,TRN2F
-  real(r8) :: VOLWZ,VMXX,VMXA,VMX4S,VMX4B,VMX2S,VMX2B,VMXA1
-  real(r8) :: VOLWCH,VOLWPM,VOLWOX,VOLPOX,VMXD3,VMXDXS,VMXDXB
-  real(r8) :: VMXDXT,VMXD3S,VMXD3B,VMXD2,VMXD2S,VMXD2B,VMXD1
-  real(r8) :: VMXD1S,VMXD4,VMXD4S,VMXD4B,VMXC4S,VMXC4B,VOLXX
-  real(r8) :: VOLXW,VOLCX,VOLCW,VOLAX,VOLAW,XCO2,X,XFRK,XFRC
-  real(r8) :: XFRN,XFRP,XFRA,XFMC,XFMN,XFMP,ZNFN4S,ZNFN4B,ZNO3SX
-  real(r8) :: ZNO3BX,ZNO2SX,ZNO2BX,Z2OSX,ZNH4M,ZNHBM,ZNO3M,ZNOBM
+  real(r8) :: TFOQC,TFOQA,TRH2G
+  real(r8) :: TRINH
+  real(r8) :: TRIPO
+  real(r8) :: VOLWZ
+  real(r8) :: VMXA
+  real(r8) :: XCO2,VOLWPM
 
-  real(r8) :: RDOSC(4,0:4),RDOSN(4,0:4),RDOSP(4,0:4),RHOSC(4,0:4) &
-    ,RHOSN(4,0:4),RHOSP(4,0:4),RCOSC(4,0:4),RCOSN(4,0:4),RCOSP(4,0:4) &
-    ,RDORC(2,0:4),RDORN(2,0:4),RDORP(2,0:4) &
-    ,RDOHC(0:4),RDOHN(0:4),RDOHP(0:4),RDOHA(0:4),CSORP(0:4),ZSORP(0:4) &
-    ,PSORP(0:4),CSORPA(0:4),OSRH(0:4) &
-    ,TOMK(0:5),TONK(0:5),TOPK(0:5),FOCA(0:4),FOAA(0:4)
+  real(r8) :: RDOSC(4,0:4),RDOSN(4,0:4),RDOSP(4,0:4)
+  real(r8) :: RHOSC(4,0:4),RHOSN(4,0:4),RHOSP(4,0:4)
+  real(r8) :: RCOSC(4,0:4),RCOSN(4,0:4),RCOSP(4,0:4)
+  real(r8) :: RDORC(2,0:4),RDORN(2,0:4),RDORP(2,0:4)
+  real(r8) :: RDOHC(0:4),RDOHN(0:4),RDOHP(0:4),RDOHA(0:4)
+  real(r8) :: CSORP(0:4),ZSORP(0:4),PSORP(0:4),CSORPA(0:4)
+  real(r8) :: OSRH(0:4)
+  real(r8) :: TOMK(0:5),TONK(0:5),TOPK(0:5)
+  real(r8) :: FOCA(0:4),FOAA(0:4)
 
-  real(r8) :: ROQCK(0:4),XOQCK(0:4) &
-    ,ORCT(0:4),OSCT(0:4),OSAT(0:4),ZNH4T(0:JZ),ZNO3T(0:JZ) &
-    ,ZNO2T(0:JZ),H2P4T(0:JZ),CNQ(0:4),CPQ(0:4),CNH(0:4),CPH(0:4) &
-    ,CNS(4,0:4),CPS(4,0:4),FORC(0:5),SPOMK(2),RMOMK(2),H1P4T(0:JZ) &
-    ,TONX(0:5),TOPX(0:5),FCNK(0:4),FCPK(0:4) &
-    ,XOQCZ(0:4),XOQNZ(0:4),XOQPZ(0:4),XOQAZ(0:4) &
-    ,TCGOQC(0:5),TCGOAC(0:5),TCGOMN(0:5),TCGOMP(0:5) &
-    ,TRN2ON(JY,JX),TRN2OD(JY,JX),TRN2GD(JY,JX)
+  real(r8) :: ROQCK(0:4),XOQCK(0:4)
+  real(r8) :: ORCT(0:4),OSCT(0:4),OSAT(0:4)
+  real(r8) :: ZNH4T(0:JZ),ZNO3T(0:JZ),ZNO2T(0:JZ),H2P4T(0:JZ)
+  real(r8) :: CNQ(0:4),CPQ(0:4),CNH(0:4),CPH(0:4)
+  real(r8) :: CNS(4,0:4),CPS(4,0:4)
+  real(r8) :: SPOMK(2),RMOMK(2)
+  real(r8) :: H1P4T(0:JZ),TONX(0:5),TOPX(0:5)
+  real(r8) :: XOQCZ(0:4),XOQNZ(0:4),XOQPZ(0:4),XOQAZ(0:4)
+  real(r8) :: TCGOQC(0:5),TCGOAC(0:5),TCGOMN(0:5),TCGOMP(0:5)
 
-  real(r8) :: ONL(4,0:4),OPL(4,0:4)
+
   real(r8),allocatable :: CNOMA(:,:,:)
   real(r8),allocatable :: CPOMA(:,:,:)
   real(r8),allocatable :: OMA(:,:,:)
@@ -199,7 +179,7 @@ module nitroMod
   real(r8),allocatable :: RIP14R(:,:,:)
 
 !
-  REAL(r8) :: WFNG,TFNX,TFNY,CNSHZ,CPSHZ,FRM
+  REAL(r8) :: WFNG,TFNX,TFNY
 
   public :: nitro, initNitro
 
@@ -330,6 +310,8 @@ module nitroMod
   integer, intent(in) :: NHW,NHE,NVN,NVS
 
   integer :: L,NX,NY
+  real(r8) :: TRN2ON(JY,JX),TRN2OD(JY,JX),TRN2GD(JY,JX)
+
 !   begin_execution
 
   DO 9995 NX=NHW,NHE
@@ -365,6 +347,8 @@ module nitroMod
 
   integer :: LL,K,KL,NGL
   integer :: M,N
+  real(r8) :: THETR,THETZ
+
 ! begin_execution
 
   IF(VOLX(L,NY,NX).GT.ZEROS2(NY,NX))THEN
@@ -583,19 +567,26 @@ module nitroMod
   end subroutine SoilBGCOneLayer
 !------------------------------------------------------------------------------------------
 
-      subroutine SOMRemovalByDisturbance(I,J,NY,NX)
+  subroutine SOMRemovalByDisturbance(I,J,NY,NX)
 !
 !     Description:
 !
-      implicit none
-      integer, intent(in) :: I,J,NY,NX
+  implicit none
+  integer, intent(in) :: I,J,NY,NX
 
-      integer :: L,K,M,N,IFLGJ,NLL,NGL
+  integer :: L,K,M,N,IFLGJ,NLL,NGL
+  real(r8) :: DC,DN,DP
+  real(r8) :: DCORPC
+  real(r8) :: FORGCX
+  real(r8) :: HFLXD
+  real(r8) :: OC,ON,OP,OCH,ONH,OPH,ONX
+  REAL(R8) :: OPX,OCA,OAH
+  real(r8) :: ONL(4,0:4),OPL(4,0:4)
 !     begin_execution
 
-      IF(J.EQ.INT(ZNOON(NY,NX)).AND.(ITILL(I,NY,NX).EQ.21 &
-      .OR.ITILL(I,NY,NX).EQ.22))THEN
-      IF(ITILL(I,NY,NX).EQ.22)THEN
+  IF(J.EQ.INT(ZNOON(NY,NX)).AND.(ITILL(I,NY,NX).EQ.21 &
+    .OR.ITILL(I,NY,NX).EQ.22))THEN
+    IF(ITILL(I,NY,NX).EQ.22)THEN
       IFLGS(NY,NX)=1
       IFLGJ=0
       NLL=-1
@@ -604,33 +595,33 @@ module nitroMod
 !    2,FVLWB,CORGC(L,NY,NX),FORGC,DPTH(L,NY,NX),BKDS(L,NY,NX)
 !    3,VOLY(L,NY,NX),DTBLX(NY,NX),DCORP(I,NY,NX)
 !9494  FORMAT(A8,5I6,12E12.4)
-      IF(L.EQ.0.OR.L.GE.NUM(NY,NX))THEN
-      IF(IFLGJ.EQ.1)THEN
-      GO TO 2946
-      ELSEIF(THETW(L,NY,NX).GT.FVLWB.OR.CORGC(L,NY,NX).LE.FORGC)THEN
-      IFLGJ=1
-      ELSE
-      NLL=L
-      ENDIF
-      ENDIF
+        IF(L.EQ.0.OR.L.GE.NUM(NY,NX))THEN
+          IF(IFLGJ.EQ.1)THEN
+            GO TO 2946
+          ELSEIF(THETW(L,NY,NX).GT.FVLWB.OR.CORGC(L,NY,NX).LE.FORGC)THEN
+            IFLGJ=1
+          ELSE
+            NLL=L
+          ENDIF
+        ENDIF
 2945  CONTINUE
       ELSE
-      NLL=0
+        NLL=0
       ENDIF
 2946  CONTINUE
       DO 2950 L=0,NLL
-      IF(NLL.GE.0)THEN
-      IF(ITILL(I,NY,NX).EQ.22)THEN
-      IF(L.EQ.0)THEN
-      FORGCX=0.0_r8
-      ELSE
-      FORGCX=FORGC
-      ENDIF
-      DCORPC=AMIN1(0.999,DCORP(I,NY,NX))*(CORGC(L,NY,NX)-FORGCX) &
-      /(AMAX1(CORGC(L,NY,NX),0.55E+06)-FORGCX)
-      ELSE
-      DCORPC=AMIN1(0.999,DCORP(I,NY,NX))
-      ENDIF
+        IF(NLL.GE.0)THEN
+          IF(ITILL(I,NY,NX).EQ.22)THEN
+            IF(L.EQ.0)THEN
+              FORGCX=0.0_r8
+            ELSE
+              FORGCX=FORGC
+            ENDIF
+            DCORPC=AMIN1(0.999,DCORP(I,NY,NX))*(CORGC(L,NY,NX)-FORGCX) &
+              /(AMAX1(CORGC(L,NY,NX),0.55E+06)-FORGCX)
+          ELSE
+            DCORPC=AMIN1(0.999,DCORP(I,NY,NX))
+          ENDIF
 !     VOLWOU=VOLWOU+DCORPC*VOLW(L,NY,NX)
 !     HEATOU=HEATOU+DCORPC*4.19*TKS(L,NY,NX)*VOLW(L,NY,NX)
 !     VOLW(L,NY,NX)=VOLW(L,NY,NX)-DCORPC*VOLW(L,NY,NX)
@@ -638,218 +629,218 @@ module nitroMod
 !    2,CORGC(L,NY,NX),ORGC(L,NY,NX)
 !    2,FORGCX,DCORPC,DCORP(I,NY,NX),VOLW(L,NY,NX),BKDS(L,NY,NX)
 !9696  FORMAT(A8,5I6,12E12.4)
-      OC=0.0_r8
-      ON=0.0_r8
-      OP=0.0_r8
-      DC=0.0_r8
-      DN=0.0_r8
-      DP=0.0_r8
-      DO 2955 K=0,4
-      DO  M=1,4
-      ONL(M,K)=0.0_r8
-      OPL(M,K)=0.0_r8
-      enddo
-2955  CONTINUE
-      DO 2970 K=0,5
-      IF(L.NE.0.OR.(K.NE.3.AND.K.NE.4))THEN
+        OC=0.0_r8
+        ON=0.0_r8
+        OP=0.0_r8
+        DC=0.0_r8
+        DN=0.0_r8
+        DP=0.0_r8
+        DO 2955 K=0,4
+          DO  M=1,4
+            ONL(M,K)=0.0_r8
+            OPL(M,K)=0.0_r8
+          enddo
+2955    CONTINUE
+        DO 2970 K=0,5
+          IF(L.NE.0.OR.(K.NE.3.AND.K.NE.4))THEN
 !
 !     REMOVE MICROBIAL BIOMASS
 !
-      DO 2960 N=1,7
-      DO NGL=1,JG
-      DO M=1,3
-      OCH=DCORPC*OMC(M,NGL,N,K,L,NY,NX)
-      ONH=DCORPC*OMN(M,NGL,N,K,L,NY,NX)
-      OPH=DCORPC*OMP(M,NGL,N,K,L,NY,NX)
-      ONX=EFIRE(1,ITILL(I,NY,NX))*ONH
-      OPX=EFIRE(2,ITILL(I,NY,NX))*OPH
-      IF(K.LE.2)THEN
-      ONL(4,K)=ONL(4,K)+ONH-ONX
-      OPL(4,K)=OPL(4,K)+OPH-OPX
-      ELSEIF(K.LE.4)THEN
-      ONL(1,K)=ONL(1,K)+ONH-ONX
-      OPL(1,K)=OPL(1,K)+OPH-OPX
-      ELSEIF(K.EQ.5)THEN
-      ONL(4,1)=ONL(4,1)+ONH-ONX
-      OPL(4,1)=OPL(4,1)+OPH-OPX
-      ENDIF
-      OMC(M,NGL,N,K,L,NY,NX)=OMC(M,NGL,N,K,L,NY,NX)-OCH
-      OMN(M,NGL,N,K,L,NY,NX)=OMN(M,NGL,N,K,L,NY,NX)-ONH
-      OMP(M,NGL,N,K,L,NY,NX)=OMP(M,NGL,N,K,L,NY,NX)-OPH
-      DC=DC+OMC(M,NGL,N,K,L,NY,NX)
-      DN=DN+OMN(M,NGL,N,K,L,NY,NX)
-      DP=DP+OMP(M,NGL,N,K,L,NY,NX)
-      OC=OC+OCH
-      ON=ON+ONX
-      OP=OP+OPX
-      enddo
-      enddo
-2960  CONTINUE
-      ENDIF
-2970  CONTINUE
+            DO 2960 N=1,7
+              DO NGL=1,JG
+                DO M=1,3
+                  OCH=DCORPC*OMC(M,NGL,N,K,L,NY,NX)
+                  ONH=DCORPC*OMN(M,NGL,N,K,L,NY,NX)
+                  OPH=DCORPC*OMP(M,NGL,N,K,L,NY,NX)
+                  ONX=EFIRE(1,ITILL(I,NY,NX))*ONH
+                  OPX=EFIRE(2,ITILL(I,NY,NX))*OPH
+                  IF(K.LE.2)THEN
+                    ONL(4,K)=ONL(4,K)+ONH-ONX
+                    OPL(4,K)=OPL(4,K)+OPH-OPX
+                  ELSEIF(K.LE.4)THEN
+                    ONL(1,K)=ONL(1,K)+ONH-ONX
+                    OPL(1,K)=OPL(1,K)+OPH-OPX
+                  ELSEIF(K.EQ.5)THEN
+                    ONL(4,1)=ONL(4,1)+ONH-ONX
+                    OPL(4,1)=OPL(4,1)+OPH-OPX
+                  ENDIF
+                  OMC(M,NGL,N,K,L,NY,NX)=OMC(M,NGL,N,K,L,NY,NX)-OCH
+                  OMN(M,NGL,N,K,L,NY,NX)=OMN(M,NGL,N,K,L,NY,NX)-ONH
+                  OMP(M,NGL,N,K,L,NY,NX)=OMP(M,NGL,N,K,L,NY,NX)-OPH
+                  DC=DC+OMC(M,NGL,N,K,L,NY,NX)
+                  DN=DN+OMN(M,NGL,N,K,L,NY,NX)
+                  DP=DP+OMP(M,NGL,N,K,L,NY,NX)
+                  OC=OC+OCH
+                  ON=ON+ONX
+                  OP=OP+OPX
+                enddo
+              enddo
+2960        CONTINUE
+          ENDIF
+2970    CONTINUE
 !
 !     REMOVE MICROBIAL RESIDUE
 !
-      DO 2900 K=0,4
-      IF(L.NE.0.OR.(K.NE.3.AND.K.NE.4))THEN
-      DO 2940 M=1,2
-      OCH=DCORPC*ORC(M,K,L,NY,NX)
-      ONH=DCORPC*ORN(M,K,L,NY,NX)
-      OPH=DCORPC*ORP(M,K,L,NY,NX)
-      ONX=EFIRE(1,ITILL(I,NY,NX))*ONH
-      OPX=EFIRE(2,ITILL(I,NY,NX))*OPH
-      IF(K.LE.2)THEN
-      ONL(4,K)=ONL(4,K)+ONH-ONX
-      OPL(4,K)=OPL(4,K)+OPH-OPX
-      ELSE
-      ONL(1,K)=ONL(1,K)+ONH-ONX
-      OPL(1,K)=OPL(1,K)+OPH-OPX
-      ENDIF
-      ORC(M,K,L,NY,NX)=ORC(M,K,L,NY,NX)-OCH
-      ORN(M,K,L,NY,NX)=ORN(M,K,L,NY,NX)-ONH
-      ORP(M,K,L,NY,NX)=ORP(M,K,L,NY,NX)-OPH
-      DC=DC+ORC(M,K,L,NY,NX)
-      DN=DN+ORN(M,K,L,NY,NX)
-      DP=DP+ORP(M,K,L,NY,NX)
-      OC=OC+OCH
-      ON=ON+ONX
-      OP=OP+OPX
-2940  CONTINUE
+        DO 2900 K=0,4
+          IF(L.NE.0.OR.(K.NE.3.AND.K.NE.4))THEN
+            DO 2940 M=1,2
+              OCH=DCORPC*ORC(M,K,L,NY,NX)
+              ONH=DCORPC*ORN(M,K,L,NY,NX)
+              OPH=DCORPC*ORP(M,K,L,NY,NX)
+              ONX=EFIRE(1,ITILL(I,NY,NX))*ONH
+              OPX=EFIRE(2,ITILL(I,NY,NX))*OPH
+              IF(K.LE.2)THEN
+                ONL(4,K)=ONL(4,K)+ONH-ONX
+                OPL(4,K)=OPL(4,K)+OPH-OPX
+              ELSE
+                ONL(1,K)=ONL(1,K)+ONH-ONX
+                OPL(1,K)=OPL(1,K)+OPH-OPX
+              ENDIF
+              ORC(M,K,L,NY,NX)=ORC(M,K,L,NY,NX)-OCH
+              ORN(M,K,L,NY,NX)=ORN(M,K,L,NY,NX)-ONH
+              ORP(M,K,L,NY,NX)=ORP(M,K,L,NY,NX)-OPH
+              DC=DC+ORC(M,K,L,NY,NX)
+              DN=DN+ORN(M,K,L,NY,NX)
+              DP=DP+ORP(M,K,L,NY,NX)
+              OC=OC+OCH
+              ON=ON+ONX
+              OP=OP+OPX
+2940        CONTINUE
 !
 !     REMOVE DOC, DON, DOP
 !
-      OCH=DCORPC*OQC(K,L,NY,NX)
-      OCA=DCORPC*OQA(K,L,NY,NX)
-      ONH=DCORPC*OQN(K,L,NY,NX)
-      OPH=DCORPC*OQP(K,L,NY,NX)
-      ONX=EFIRE(1,ITILL(I,NY,NX))*ONH
-      OPX=EFIRE(2,ITILL(I,NY,NX))*OPH
-      IF(K.LE.2)THEN
-      ONL(4,K)=ONL(4,K)+ONH-ONX
-      OPL(4,K)=OPL(4,K)+OPH-OPX
-      ELSE
-      ONL(1,K)=ONL(1,K)+ONH-ONX
-      OPL(1,K)=OPL(1,K)+OPH-OPX
-      ENDIF
-      OQC(K,L,NY,NX)=OQC(K,L,NY,NX)-OCH
-      OQA(K,L,NY,NX)=OQA(K,L,NY,NX)-OCA
-      OQN(K,L,NY,NX)=OQN(K,L,NY,NX)-ONH
-      OQP(K,L,NY,NX)=OQP(K,L,NY,NX)-OPH
-      OC=OC+OCH+OCA
-      ON=ON+ONX
-      OP=OP+OPX
-      OCH=DCORPC*OQCH(K,L,NY,NX)
-      ONH=DCORPC*OQNH(K,L,NY,NX)
-      OPH=DCORPC*OQPH(K,L,NY,NX)
-      OAH=DCORPC*OQAH(K,L,NY,NX)
-      ONX=EFIRE(1,ITILL(I,NY,NX))*ONH
-      OPX=EFIRE(2,ITILL(I,NY,NX))*OPH
-      IF(K.LE.2)THEN
-      ONL(4,K)=ONL(4,K)+ONH-ONX
-      OPL(4,K)=OPL(4,K)+OPH-OPX
-      ELSE
-      ONL(1,K)=ONL(1,K)+ONH-ONX
-      OPL(1,K)=OPL(1,K)+OPH-OPX
-      ENDIF
-      OQCH(K,L,NY,NX)=OQCH(K,L,NY,NX)-OCH
-      OQNH(K,L,NY,NX)=OQNH(K,L,NY,NX)-ONH
-      OQPH(K,L,NY,NX)=OQPH(K,L,NY,NX)-OPH
-      OQAH(K,L,NY,NX)=OQAH(K,L,NY,NX)-OAH
-      OC=OC+OCH+OAH
-      ON=ON+ONX
-      OP=OP+OPX
+            OCH=DCORPC*OQC(K,L,NY,NX)
+            OCA=DCORPC*OQA(K,L,NY,NX)
+            ONH=DCORPC*OQN(K,L,NY,NX)
+            OPH=DCORPC*OQP(K,L,NY,NX)
+            ONX=EFIRE(1,ITILL(I,NY,NX))*ONH
+            OPX=EFIRE(2,ITILL(I,NY,NX))*OPH
+            IF(K.LE.2)THEN
+              ONL(4,K)=ONL(4,K)+ONH-ONX
+              OPL(4,K)=OPL(4,K)+OPH-OPX
+            ELSE
+              ONL(1,K)=ONL(1,K)+ONH-ONX
+              OPL(1,K)=OPL(1,K)+OPH-OPX
+            ENDIF
+            OQC(K,L,NY,NX)=OQC(K,L,NY,NX)-OCH
+            OQA(K,L,NY,NX)=OQA(K,L,NY,NX)-OCA
+            OQN(K,L,NY,NX)=OQN(K,L,NY,NX)-ONH
+            OQP(K,L,NY,NX)=OQP(K,L,NY,NX)-OPH
+            OC=OC+OCH+OCA
+            ON=ON+ONX
+            OP=OP+OPX
+            OCH=DCORPC*OQCH(K,L,NY,NX)
+            ONH=DCORPC*OQNH(K,L,NY,NX)
+            OPH=DCORPC*OQPH(K,L,NY,NX)
+            OAH=DCORPC*OQAH(K,L,NY,NX)
+            ONX=EFIRE(1,ITILL(I,NY,NX))*ONH
+            OPX=EFIRE(2,ITILL(I,NY,NX))*OPH
+            IF(K.LE.2)THEN
+              ONL(4,K)=ONL(4,K)+ONH-ONX
+              OPL(4,K)=OPL(4,K)+OPH-OPX
+            ELSE
+              ONL(1,K)=ONL(1,K)+ONH-ONX
+              OPL(1,K)=OPL(1,K)+OPH-OPX
+            ENDIF
+            OQCH(K,L,NY,NX)=OQCH(K,L,NY,NX)-OCH
+            OQNH(K,L,NY,NX)=OQNH(K,L,NY,NX)-ONH
+            OQPH(K,L,NY,NX)=OQPH(K,L,NY,NX)-OPH
+            OQAH(K,L,NY,NX)=OQAH(K,L,NY,NX)-OAH
+            OC=OC+OCH+OAH
+            ON=ON+ONX
+            OP=OP+OPX
 !
 !     REMOVE ADSORBED OM
 !
-      OCH=DCORPC*OHC(K,L,NY,NX)
-      ONH=DCORPC*OHN(K,L,NY,NX)
-      OPH=DCORPC*OHP(K,L,NY,NX)
-      OAH=DCORPC*OHA(K,L,NY,NX)
-      ONX=EFIRE(1,ITILL(I,NY,NX))*ONH
-      OPX=EFIRE(2,ITILL(I,NY,NX))*OPH
-      IF(K.LE.2)THEN
-      ONL(4,K)=ONL(4,K)+ONH-ONX
-      OPL(4,K)=OPL(4,K)+OPH-OPX
-      ELSE
-      ONL(1,K)=ONL(1,K)+ONH-ONX
-      OPL(1,K)=OPL(1,K)+OPH-OPX
-      ENDIF
-      OHC(K,L,NY,NX)=OHC(K,L,NY,NX)-OCH
-      OHN(K,L,NY,NX)=OHN(K,L,NY,NX)-ONH
-      OHP(K,L,NY,NX)=OHP(K,L,NY,NX)-OPH
-      OHA(K,L,NY,NX)=OHA(K,L,NY,NX)-OAH
-      DC=DC+OQC(K,L,NY,NX)+OQCH(K,L,NY,NX)+OHC(K,L,NY,NX) &
-      +OQA(K,L,NY,NX)+OQAH(K,L,NY,NX)+OHA(K,L,NY,NX)
-      DN=DN+OQN(K,L,NY,NX)+OQNH(K,L,NY,NX)+OHN(K,L,NY,NX)
-      DP=DP+OQP(K,L,NY,NX)+OQPH(K,L,NY,NX)+OHP(K,L,NY,NX)
-      OC=OC+OCH
-      ON=ON+ONX
-      OP=OP+OPX
+            OCH=DCORPC*OHC(K,L,NY,NX)
+            ONH=DCORPC*OHN(K,L,NY,NX)
+            OPH=DCORPC*OHP(K,L,NY,NX)
+            OAH=DCORPC*OHA(K,L,NY,NX)
+            ONX=EFIRE(1,ITILL(I,NY,NX))*ONH
+            OPX=EFIRE(2,ITILL(I,NY,NX))*OPH
+            IF(K.LE.2)THEN
+              ONL(4,K)=ONL(4,K)+ONH-ONX
+              OPL(4,K)=OPL(4,K)+OPH-OPX
+            ELSE
+              ONL(1,K)=ONL(1,K)+ONH-ONX
+              OPL(1,K)=OPL(1,K)+OPH-OPX
+            ENDIF
+            OHC(K,L,NY,NX)=OHC(K,L,NY,NX)-OCH
+            OHN(K,L,NY,NX)=OHN(K,L,NY,NX)-ONH
+            OHP(K,L,NY,NX)=OHP(K,L,NY,NX)-OPH
+            OHA(K,L,NY,NX)=OHA(K,L,NY,NX)-OAH
+            DC=DC+OQC(K,L,NY,NX)+OQCH(K,L,NY,NX)+OHC(K,L,NY,NX) &
+              +OQA(K,L,NY,NX)+OQAH(K,L,NY,NX)+OHA(K,L,NY,NX)
+            DN=DN+OQN(K,L,NY,NX)+OQNH(K,L,NY,NX)+OHN(K,L,NY,NX)
+            DP=DP+OQP(K,L,NY,NX)+OQPH(K,L,NY,NX)+OHP(K,L,NY,NX)
+            OC=OC+OCH
+            ON=ON+ONX
+            OP=OP+OPX
 !
 !     REMOVE RESIDUE
 !
-      DO 2930 M=1,4
-      OCH=DCORPC*OSC(M,K,L,NY,NX)
-      OCA=DCORPC*OSA(M,K,L,NY,NX)
-      ONH=DCORPC*OSN(M,K,L,NY,NX)
-      OPH=DCORPC*OSP(M,K,L,NY,NX)
-      ONX=EFIRE(1,ITILL(I,NY,NX))*ONH
-      OPX=EFIRE(2,ITILL(I,NY,NX))*OPH
-      ONL(M,K)=ONL(M,K)+ONH-ONX
-      OPL(M,K)=OPL(M,K)+OPH-OPX
-      OSC(M,K,L,NY,NX)=OSC(M,K,L,NY,NX)-OCH
-      OSA(M,K,L,NY,NX)=OSA(M,K,L,NY,NX)-OCA
-      OSN(M,K,L,NY,NX)=OSN(M,K,L,NY,NX)-ONH
-      OSP(M,K,L,NY,NX)=OSP(M,K,L,NY,NX)-OPH
-      DC=DC+OSC(M,K,L,NY,NX)
-      DN=DN+OSN(M,K,L,NY,NX)
-      DP=DP+OSP(M,K,L,NY,NX)
-      OC=OC+OCH
-      ON=ON+ONX
-      OP=OP+OPX
-2930  CONTINUE
-      ENDIF
-2900  CONTINUE
+            DO 2930 M=1,4
+              OCH=DCORPC*OSC(M,K,L,NY,NX)
+              OCA=DCORPC*OSA(M,K,L,NY,NX)
+              ONH=DCORPC*OSN(M,K,L,NY,NX)
+              OPH=DCORPC*OSP(M,K,L,NY,NX)
+              ONX=EFIRE(1,ITILL(I,NY,NX))*ONH
+              OPX=EFIRE(2,ITILL(I,NY,NX))*OPH
+              ONL(M,K)=ONL(M,K)+ONH-ONX
+              OPL(M,K)=OPL(M,K)+OPH-OPX
+              OSC(M,K,L,NY,NX)=OSC(M,K,L,NY,NX)-OCH
+              OSA(M,K,L,NY,NX)=OSA(M,K,L,NY,NX)-OCA
+              OSN(M,K,L,NY,NX)=OSN(M,K,L,NY,NX)-ONH
+              OSP(M,K,L,NY,NX)=OSP(M,K,L,NY,NX)-OPH
+              DC=DC+OSC(M,K,L,NY,NX)
+              DN=DN+OSN(M,K,L,NY,NX)
+              DP=DP+OSP(M,K,L,NY,NX)
+              OC=OC+OCH
+              ON=ON+ONX
+              OP=OP+OPX
+2930        CONTINUE
+          ENDIF
+2900    CONTINUE
 !
 !     ADD UNBURNED N,P TO ORG N, ORG P
 !
-      DO 2905 K=0,4
-      DO  M=1,4
-      OSN(M,K,L,NY,NX)=OSN(M,K,L,NY,NX)+ONL(M,K)
-      OSP(M,K,L,NY,NX)=OSP(M,K,L,NY,NX)+OPL(M,K)
-      DN=DN+ONL(M,K)
-      DP=DP+OPL(M,K)
-      enddo
+        DO 2905 K=0,4
+          DO  M=1,4
+            OSN(M,K,L,NY,NX)=OSN(M,K,L,NY,NX)+ONL(M,K)
+            OSP(M,K,L,NY,NX)=OSP(M,K,L,NY,NX)+OPL(M,K)
+            DN=DN+ONL(M,K)
+            DP=DP+OPL(M,K)
+          enddo
 2905  CONTINUE
 !
 !     REMOVE FERTILIZER IN RESIDUE
 !
       IF(ITILL(I,NY,NX).EQ.21)THEN
-      ON=ON+DCORPC*(ZNH4S(L,NY,NX)+ZNH3S(L,NY,NX) &
-      +ZNO3S(L,NY,NX)+ZNO2S(L,NY,NX))
-      OP=OP+DCORPC*(H1PO4(L,NY,NX)+H2PO4(L,NY,NX))
-      ZNH4S(L,NY,NX)=(1.0-DCORPC)*ZNH4S(L,NY,NX)
-      ZNH3S(L,NY,NX)=(1.0-DCORPC)*ZNH3S(L,NY,NX)
-      ZNO3S(L,NY,NX)=(1.0-DCORPC)*ZNO3S(L,NY,NX)
-      ZNO2S(L,NY,NX)=(1.0-DCORPC)*ZNO2S(L,NY,NX)
-      H1PO4(L,NY,NX)=(1.0-DCORPC)*H1PO4(L,NY,NX)
-      H2PO4(L,NY,NX)=(1.0-DCORPC)*H2PO4(L,NY,NX)
-      XN4(L,NY,NX)=(1.0-DCORPC)*XN4(L,NY,NX)
-      PALPO(L,NY,NX)=(1.0-DCORPC)*PALPO(L,NY,NX)
-      PFEPO(L,NY,NX)=(1.0-DCORPC)*PFEPO(L,NY,NX)
-      PCAPD(L,NY,NX)=(1.0-DCORPC)*PCAPD(L,NY,NX)
-      PCAPH(L,NY,NX)=(1.0-DCORPC)*PCAPH(L,NY,NX)
-      PCAPM(L,NY,NX)=(1.0-DCORPC)*PCAPM(L,NY,NX)
-      ZNH4FA(L,NY,NX)=(1.0-DCORPC)*ZNH4FA(L,NY,NX)
-      ZNH3FA(L,NY,NX)=(1.0-DCORPC)*ZNH3FA(L,NY,NX)
-      ZNHUFA(L,NY,NX)=(1.0-DCORPC)*ZNHUFA(L,NY,NX)
-      ZNO3FA(L,NY,NX)=(1.0-DCORPC)*ZNO3FA(L,NY,NX)
+        ON=ON+DCORPC*(ZNH4S(L,NY,NX)+ZNH3S(L,NY,NX) &
+          +ZNO3S(L,NY,NX)+ZNO2S(L,NY,NX))
+        OP=OP+DCORPC*(H1PO4(L,NY,NX)+H2PO4(L,NY,NX))
+        ZNH4S(L,NY,NX)=(1.0-DCORPC)*ZNH4S(L,NY,NX)
+        ZNH3S(L,NY,NX)=(1.0-DCORPC)*ZNH3S(L,NY,NX)
+        ZNO3S(L,NY,NX)=(1.0-DCORPC)*ZNO3S(L,NY,NX)
+        ZNO2S(L,NY,NX)=(1.0-DCORPC)*ZNO2S(L,NY,NX)
+        H1PO4(L,NY,NX)=(1.0-DCORPC)*H1PO4(L,NY,NX)
+        H2PO4(L,NY,NX)=(1.0-DCORPC)*H2PO4(L,NY,NX)
+        XN4(L,NY,NX)=(1.0-DCORPC)*XN4(L,NY,NX)
+        PALPO(L,NY,NX)=(1.0-DCORPC)*PALPO(L,NY,NX)
+        PFEPO(L,NY,NX)=(1.0-DCORPC)*PFEPO(L,NY,NX)
+        PCAPD(L,NY,NX)=(1.0-DCORPC)*PCAPD(L,NY,NX)
+        PCAPH(L,NY,NX)=(1.0-DCORPC)*PCAPH(L,NY,NX)
+        PCAPM(L,NY,NX)=(1.0-DCORPC)*PCAPM(L,NY,NX)
+        ZNH4FA(L,NY,NX)=(1.0-DCORPC)*ZNH4FA(L,NY,NX)
+        ZNH3FA(L,NY,NX)=(1.0-DCORPC)*ZNH3FA(L,NY,NX)
+        ZNHUFA(L,NY,NX)=(1.0-DCORPC)*ZNHUFA(L,NY,NX)
+        ZNO3FA(L,NY,NX)=(1.0-DCORPC)*ZNO3FA(L,NY,NX)
       ENDIF
       ORGC(L,NY,NX)=DC
       ORGN(L,NY,NX)=DN
       IF(L.EQ.0)THEN
-      HFLXD=4.19E-06*(ORGCX(L,NY,NX)-ORGC(L,NY,NX))*TKS(L,NY,NX)
-      HEATOU=HEATOU+HFLXD
+        HFLXD=4.19E-06*(ORGCX(L,NY,NX)-ORGC(L,NY,NX))*TKS(L,NY,NX)
+        HEATOU=HEATOU+HFLXD
       ENDIF
 !     IF(L.EQ.0)THEN
 !     VHCP(0,NY,NX)=2.496E-06*ORGC(0,NY,NX)+4.19*VOLW(0,NY,NX)
@@ -859,42 +850,44 @@ module nitroMod
 !    2+1.9274*(VOLI(L,NY,NX)+VOLIH(L,NY,NX))
 !     ENDIF
       IF(ITILL(I,NY,NX).EQ.21)THEN
-      TCOU=TCOU+OC
-      TZOU=TZOU+ON
-      TPOU=TPOU+OP
-      UDOCQ(NY,NX)=UDOCQ(NY,NX)+OC
-      UDONQ(NY,NX)=UDONQ(NY,NX)+ON
-      UDOPQ(NY,NX)=UDOPQ(NY,NX)+OP
-      TNBP(NY,NX)=TNBP(NY,NX)-OC
+        TCOU=TCOU+OC
+        TZOU=TZOU+ON
+        TPOU=TPOU+OP
+        UDOCQ(NY,NX)=UDOCQ(NY,NX)+OC
+        UDONQ(NY,NX)=UDONQ(NY,NX)+ON
+        UDOPQ(NY,NX)=UDOPQ(NY,NX)+OP
+        TNBP(NY,NX)=TNBP(NY,NX)-OC
       ELSEIF(ITILL(I,NY,NX).EQ.22)THEN
-      CO2GIN=CO2GIN-OC
-      OXYGIN=OXYGIN+2.667*OC
-      OXYGOU=OXYGOU+2.667*OC
-      TZOU=TZOU+ON
-      TPOU=TPOU+OP
-      UCO2F(NY,NX)=UCO2F(NY,NX)-(1.0-FCH4F)*OC
-      UCH4F(NY,NX)=UCH4F(NY,NX)-FCH4F*OC
-      UOXYF(NY,NX)=UOXYF(NY,NX)+(1.0-FCH4F)*2.667*OC
-      UNH3F(NY,NX)=UNH3F(NY,NX)-ON
-      UN2OF(NY,NX)=UN2OF(NY,NX)-0.0
-      UPO4F(NY,NX)=UPO4F(NY,NX)-OP
-      TNBP(NY,NX)=TNBP(NY,NX)-OC
+        CO2GIN=CO2GIN-OC
+        OXYGIN=OXYGIN+2.667*OC
+        OXYGOU=OXYGOU+2.667*OC
+        TZOU=TZOU+ON
+        TPOU=TPOU+OP
+        UCO2F(NY,NX)=UCO2F(NY,NX)-(1.0-FCH4F)*OC
+        UCH4F(NY,NX)=UCH4F(NY,NX)-FCH4F*OC
+        UOXYF(NY,NX)=UOXYF(NY,NX)+(1.0-FCH4F)*2.667*OC
+        UNH3F(NY,NX)=UNH3F(NY,NX)-ON
+        UN2OF(NY,NX)=UN2OF(NY,NX)-0.0
+        UPO4F(NY,NX)=UPO4F(NY,NX)-OP
+        TNBP(NY,NX)=TNBP(NY,NX)-OC
       ENDIF
-      ENDIF
+    ENDIF
 2950  CONTINUE
-      ENDIF
-      end subroutine SOMRemovalByDisturbance
+  ENDIF
+  end subroutine SOMRemovalByDisturbance
 !------------------------------------------------------------------------------------------
 
-      subroutine VerticalLitterMixLvsLL(I,J,L,NY,NX)
+  subroutine VerticalLitterMixLvsLL(I,J,L,NY,NX)
 
-      implicit none
-      integer, intent(in) :: I,J,L,NY,NX
-
-      integer :: LL,LN
+  implicit none
+  integer, intent(in) :: I,J,L,NY,NX
+  real(r8) :: FOSCXS,FOSCXD
+  real(r8) :: ORGRL,ORGRLL
+  real(r8) :: OSCXD
+  integer :: LL,LN
 !     begin_execution
 
-      IF(FOSCZ0.GT.ZERO)THEN
+  IF(FOSCZ0.GT.ZERO)THEN
 !     ORGR=total litter C
 !     FOSCZ0=rate constant for mixing surface litter
 !     FOSCXS=mixing fraction for surface litter
@@ -909,38 +902,37 @@ module nitroMod
 !     WRITE(*,336)'LAYER',I,J,L,TOQCK(L,NY,NX),TOMA,TFNX,TOMA*TFNX
 !336   FORMAT(A8,3I4,20E12.4)
 !     ENDIF
-      IF(L.LT.NL(NY,NX))THEN
+    IF(L.LT.NL(NY,NX))THEN
 !     get mixing rate
       IF(L.EQ.0)THEN
-      LL=NU(NY,NX)
-      IF(ORGR(L,NY,NX).GT.ZEROS(NY,NX))THEN
-      FOSCXS=AMIN1(1.0,FOSCZ0/ORGR(L,NY,NX)*TOQCK(L,NY,NX))
+        LL=NU(NY,NX)
+        IF(ORGR(L,NY,NX).GT.ZEROS(NY,NX))THEN
+          FOSCXS=AMIN1(1.0,FOSCZ0/ORGR(L,NY,NX)*TOQCK(L,NY,NX))
+        ELSE
+          FOSCXS=0.0_r8
+        ENDIF
       ELSE
-      FOSCXS=0.0_r8
-      ENDIF
-      ELSE
-      DO 1100 LN=L+1,NL(NY,NX)
-      IF(VOLX(LN,NY,NX).GT.ZEROS2(NY,NX))THEN
-      LL=LN
-      exit
-      ENDIF
-1100  CONTINUE
-      ORGRL=AMAX1(0.0,ORGR(L,NY,NX))
-      ORGRLL=AMAX1(0.0,ORGR(LL,NY,NX))
-      OSCXD=(ORGRL*VOLT(LL,NY,NX)-ORGRLL*VOLT(L,NY,NX)) &
-      /(VOLT(L,NY,NX)+VOLT(LL,NY,NX))
-      IF(OSCXD.GT.0.0.AND.ORGR(L,NY,NX).GT.ZEROS(NY,NX))THEN
-      FOSCXD=OSCXD/ORGR(L,NY,NX)
-      ELSEIF(OSCXD.LT.0.0.AND.ORGR(LL,NY,NX).GT.ZEROS(NY,NX))THEN
-      FOSCXD=OSCXD/ORGR(LL,NY,NX)
-      ELSE
-      FOSCXD=0.0_r8
-      ENDIF
-      IF(VOLT(L,NY,NX).GT.ZEROS2(NY,NX))THEN
-      FOSCXS=FOSCZL*FOSCXD*TOQCK(L,NY,NX)/VOLT(L,NY,NX)
-      ELSE
-      FOSCXS=0.0_r8
-      ENDIF
+        DO 1100 LN=L+1,NL(NY,NX)
+          IF(VOLX(LN,NY,NX).GT.ZEROS2(NY,NX))THEN
+            LL=LN
+            exit
+          ENDIF
+1100    CONTINUE
+        ORGRL=AMAX1(0.0,ORGR(L,NY,NX))
+        ORGRLL=AMAX1(0.0,ORGR(LL,NY,NX))
+        OSCXD=(ORGRL*VOLT(LL,NY,NX)-ORGRLL*VOLT(L,NY,NX))/(VOLT(L,NY,NX)+VOLT(LL,NY,NX))
+        IF(OSCXD.GT.0.0.AND.ORGR(L,NY,NX).GT.ZEROS(NY,NX))THEN
+          FOSCXD=OSCXD/ORGR(L,NY,NX)
+        ELSEIF(OSCXD.LT.0.0.AND.ORGR(LL,NY,NX).GT.ZEROS(NY,NX))THEN
+          FOSCXD=OSCXD/ORGR(LL,NY,NX)
+        ELSE
+          FOSCXD=0.0_r8
+        ENDIF
+        IF(VOLT(L,NY,NX).GT.ZEROS2(NY,NX))THEN
+          FOSCXS=FOSCZL*FOSCXD*TOQCK(L,NY,NX)/VOLT(L,NY,NX)
+        ELSE
+          FOSCXS=0.0_r8
+        ENDIF
       ENDIF
 !     IF(L.EQ.3)THEN
 !     WRITE(*,1115)'MIX',I,J,NX,NY,L,LL,FOSCXS,FOSCZ0
@@ -951,45 +943,51 @@ module nitroMod
 !     ENDIF
 !     apply mixing
       call ApplyVerticalMix(FOSCXS,L,LL,NY,NX)
-      ENDIF
+    ENDIF
 !     IF((I/1)*1.EQ.I.AND.J.EQ.19.AND.L.LE.5)THEN
 !     WRITE(*,2123)'TOTALL',I,J,NX,NY,L,TFOXYX,TFNH4X
 !    2,TFNO3X,TFPO4X,TFNH4B,TFNO3B,TFPO4B,TFNO2X,TFNO2B
 !    3,TFOQC,TFOQA
 !2123  FORMAT(A8,5I4,12E15.4)
 !     ENDIF
-      ENDIF
-      end subroutine VerticalLitterMixLvsLL
+  ENDIF
+  end subroutine VerticalLitterMixLvsLL
 !------------------------------------------------------------------------------------------
 
-      subroutine ApplyVerticalMix(FOSCXS,L,LL,NY,NX)
+  subroutine ApplyVerticalMix(FOSCXS,L,LL,NY,NX)
 
-      implicit none
-      real(r8), intent(in) :: FOSCXS
-      integer, intent(in) :: L,LL,NY,NX
+  implicit none
+  real(r8), intent(in) :: FOSCXS
+  integer, intent(in) :: L,LL,NY,NX
 
-      integer :: K,M,N,NGL
+  real(r8) :: OMCXS,OMNXS,OMPXS
+  real(r8) :: ORCXS,ORNXS,ORPXS
+  real(r8) :: OQCXS,OQCHXS,OHCXS,OQAXS
+  real(r8) :: OQAHXS,OHAXS,OQNXS,OQNHXS
+  real(r8) :: OHNXS,OQPXS,OQPHXS,OHPXS
+  real(r8) :: OSCXS,OSAXS,OSNXS,OSPXS
+  integer :: K,M,N,NGL
 !     begin_execution
-      IF(FOSCXS.GT.ZERO)THEN
-      DO 7971 K=1,2
+  IF(FOSCXS.GT.ZERO)THEN
+    DO 7971 K=1,2
       DO 7961 N=1,7
-      DO NGL=1,JG
-      DO 7962 M=1,3
-      IF(FOSCXS.GT.0.0)THEN
-      OMCXS=FOSCXS*AMAX1(0.0,OMC(M,NGL,N,K,L,NY,NX))
-      OMNXS=FOSCXS*AMAX1(0.0,OMN(M,NGL,N,K,L,NY,NX))
-      OMPXS=FOSCXS*AMAX1(0.0,OMP(M,NGL,N,K,L,NY,NX))
-      ELSE
-      OMCXS=FOSCXS*AMAX1(0.0,OMC(M,NGL,N,K,LL,NY,NX))
-      OMNXS=FOSCXS*AMAX1(0.0,OMN(M,NGL,N,K,LL,NY,NX))
-      OMPXS=FOSCXS*AMAX1(0.0,OMP(M,NGL,N,K,LL,NY,NX))
-      ENDIF
-      OMC(M,NGL,N,K,L,NY,NX)=OMC(M,NGL,N,K,L,NY,NX)-OMCXS
-      OMN(M,NGL,N,K,L,NY,NX)=OMN(M,NGL,N,K,L,NY,NX)-OMNXS
-      OMP(M,NGL,N,K,L,NY,NX)=OMP(M,NGL,N,K,L,NY,NX)-OMPXS
-      OMC(M,NGL,N,K,LL,NY,NX)=OMC(M,NGL,N,K,LL,NY,NX)+OMCXS
-      OMN(M,NGL,N,K,LL,NY,NX)=OMN(M,NGL,N,K,LL,NY,NX)+OMNXS
-      OMP(M,NGL,N,K,LL,NY,NX)=OMP(M,NGL,N,K,LL,NY,NX)+OMPXS
+        DO NGL=1,JG
+          DO 7962 M=1,3
+            IF(FOSCXS.GT.0.0)THEN
+              OMCXS=FOSCXS*AMAX1(0.0,OMC(M,NGL,N,K,L,NY,NX))
+              OMNXS=FOSCXS*AMAX1(0.0,OMN(M,NGL,N,K,L,NY,NX))
+              OMPXS=FOSCXS*AMAX1(0.0,OMP(M,NGL,N,K,L,NY,NX))
+            ELSE
+              OMCXS=FOSCXS*AMAX1(0.0,OMC(M,NGL,N,K,LL,NY,NX))
+              OMNXS=FOSCXS*AMAX1(0.0,OMN(M,NGL,N,K,LL,NY,NX))
+              OMPXS=FOSCXS*AMAX1(0.0,OMP(M,NGL,N,K,LL,NY,NX))
+            ENDIF
+            OMC(M,NGL,N,K,L,NY,NX)=OMC(M,NGL,N,K,L,NY,NX)-OMCXS
+            OMN(M,NGL,N,K,L,NY,NX)=OMN(M,NGL,N,K,L,NY,NX)-OMNXS
+            OMP(M,NGL,N,K,L,NY,NX)=OMP(M,NGL,N,K,L,NY,NX)-OMPXS
+            OMC(M,NGL,N,K,LL,NY,NX)=OMC(M,NGL,N,K,LL,NY,NX)+OMCXS
+            OMN(M,NGL,N,K,LL,NY,NX)=OMN(M,NGL,N,K,LL,NY,NX)+OMNXS
+            OMP(M,NGL,N,K,LL,NY,NX)=OMP(M,NGL,N,K,LL,NY,NX)+OMPXS
 !     IF(L.EQ.3.AND.K.EQ.1.AND.N.EQ.6)THEN
 !     WRITE(*,5558)'OMX',I,J,NX,NY,L,LL,K,N,M,OMC(M,NGL,N,K,L,NY,NX)
 !    2,OMN(M,NGL,N,K,L,NY,NX),OMP(M,NGL,N,K,L,NY,NX),OMC(M,NGL,N,K,LL,NY,NX)
@@ -997,27 +995,27 @@ module nitroMod
 !    3,OMCXS,OMNXS,OMPXS,FOSCXS
 !5558  FORMAT(A8,9I4,12E12.4)
 !     ENDIF
-7962  CONTINUE
-      ENDDO
+7962      CONTINUE
+        ENDDO
 7961  CONTINUE
 7971  CONTINUE
-      DO 7901 K=1,2
+    DO 7901 K=1,2
       DO 7941 M=1,2
-      IF(FOSCXS.GT.0.0)THEN
-      ORCXS=FOSCXS*AMAX1(0.0,ORC(M,K,L,NY,NX))
-      ORNXS=FOSCXS*AMAX1(0.0,ORN(M,K,L,NY,NX))
-      ORPXS=FOSCXS*AMAX1(0.0,ORP(M,K,L,NY,NX))
-      ELSE
-      ORCXS=FOSCXS*AMAX1(0.0,ORC(M,K,LL,NY,NX))
-      ORNXS=FOSCXS*AMAX1(0.0,ORN(M,K,LL,NY,NX))
-      ORPXS=FOSCXS*AMAX1(0.0,ORP(M,K,LL,NY,NX))
-      ENDIF
-      ORC(M,K,L,NY,NX)=ORC(M,K,L,NY,NX)-ORCXS
-      ORN(M,K,L,NY,NX)=ORN(M,K,L,NY,NX)-ORNXS
-      ORP(M,K,L,NY,NX)=ORP(M,K,L,NY,NX)-ORPXS
-      ORC(M,K,LL,NY,NX)=ORC(M,K,LL,NY,NX)+ORCXS
-      ORN(M,K,LL,NY,NX)=ORN(M,K,LL,NY,NX)+ORNXS
-      ORP(M,K,LL,NY,NX)=ORP(M,K,LL,NY,NX)+ORPXS
+        IF(FOSCXS.GT.0.0)THEN
+          ORCXS=FOSCXS*AMAX1(0.0,ORC(M,K,L,NY,NX))
+          ORNXS=FOSCXS*AMAX1(0.0,ORN(M,K,L,NY,NX))
+          ORPXS=FOSCXS*AMAX1(0.0,ORP(M,K,L,NY,NX))
+        ELSE
+          ORCXS=FOSCXS*AMAX1(0.0,ORC(M,K,LL,NY,NX))
+          ORNXS=FOSCXS*AMAX1(0.0,ORN(M,K,LL,NY,NX))
+          ORPXS=FOSCXS*AMAX1(0.0,ORP(M,K,LL,NY,NX))
+        ENDIF
+        ORC(M,K,L,NY,NX)=ORC(M,K,L,NY,NX)-ORCXS
+        ORN(M,K,L,NY,NX)=ORN(M,K,L,NY,NX)-ORNXS
+        ORP(M,K,L,NY,NX)=ORP(M,K,L,NY,NX)-ORPXS
+        ORC(M,K,LL,NY,NX)=ORC(M,K,LL,NY,NX)+ORCXS
+        ORN(M,K,LL,NY,NX)=ORN(M,K,LL,NY,NX)+ORNXS
+        ORP(M,K,LL,NY,NX)=ORP(M,K,LL,NY,NX)+ORPXS
 !     IF(L.EQ.3.AND.K.EQ.2)THEN
 !     WRITE(*,7942)'ORC',I,J,L,LL,K,M,ORC(M,K,L,NY,NX)
 !    2,ORC(M,K,LL,NY,NX),ORCXS,FOSCXS
@@ -1025,31 +1023,31 @@ module nitroMod
 !     ENDIF
 7941  CONTINUE
       IF(FOSCXS.GT.0.0)THEN
-      OQCXS=FOSCXS*AMAX1(0.0,OQC(K,L,NY,NX))
-      OQCHXS=FOSCXS*AMAX1(0.0,OQCH(K,L,NY,NX))
-      OHCXS=FOSCXS*AMAX1(0.0,OHC(K,L,NY,NX))
-      OQAXS=FOSCXS*AMAX1(0.0,OQA(K,L,NY,NX))
-      OQAHXS=FOSCXS*AMAX1(0.0,OQAH(K,L,NY,NX))
-      OHAXS=FOSCXS*AMAX1(0.0,OHA(K,L,NY,NX))
-      OQNXS=FOSCXS*AMAX1(0.0,OQN(K,L,NY,NX))
-      OQNHXS=FOSCXS*AMAX1(0.0,OQNH(K,L,NY,NX))
-      OHNXS=FOSCXS*AMAX1(0.0,OHN(K,L,NY,NX))
-      OQPXS=FOSCXS*AMAX1(0.0,OQP(K,L,NY,NX))
-      OQPHXS=FOSCXS*AMAX1(0.0,OQPH(K,L,NY,NX))
-      OHPXS=FOSCXS*AMAX1(0.0,OHP(K,L,NY,NX))
+        OQCXS=FOSCXS*AMAX1(0.0,OQC(K,L,NY,NX))
+        OQCHXS=FOSCXS*AMAX1(0.0,OQCH(K,L,NY,NX))
+        OHCXS=FOSCXS*AMAX1(0.0,OHC(K,L,NY,NX))
+        OQAXS=FOSCXS*AMAX1(0.0,OQA(K,L,NY,NX))
+        OQAHXS=FOSCXS*AMAX1(0.0,OQAH(K,L,NY,NX))
+        OHAXS=FOSCXS*AMAX1(0.0,OHA(K,L,NY,NX))
+        OQNXS=FOSCXS*AMAX1(0.0,OQN(K,L,NY,NX))
+        OQNHXS=FOSCXS*AMAX1(0.0,OQNH(K,L,NY,NX))
+        OHNXS=FOSCXS*AMAX1(0.0,OHN(K,L,NY,NX))
+        OQPXS=FOSCXS*AMAX1(0.0,OQP(K,L,NY,NX))
+        OQPHXS=FOSCXS*AMAX1(0.0,OQPH(K,L,NY,NX))
+        OHPXS=FOSCXS*AMAX1(0.0,OHP(K,L,NY,NX))
       ELSE
-      OQCXS=FOSCXS*AMAX1(0.0,OQC(K,LL,NY,NX))
-      OQCHXS=FOSCXS*AMAX1(0.0,OQCH(K,LL,NY,NX))
-      OHCXS=FOSCXS*AMAX1(0.0,OHC(K,LL,NY,NX))
-      OQAXS=FOSCXS*AMAX1(0.0,OQA(K,LL,NY,NX))
-      OQAHXS=FOSCXS*AMAX1(0.0,OQAH(K,LL,NY,NX))
-      OHAXS=FOSCXS*AMAX1(0.0,OHA(K,LL,NY,NX))
-      OQNXS=FOSCXS*AMAX1(0.0,OQN(K,LL,NY,NX))
-      OQNHXS=FOSCXS*AMAX1(0.0,OQNH(K,LL,NY,NX))
-      OHNXS=FOSCXS*AMAX1(0.0,OHN(K,LL,NY,NX))
-      OQPXS=FOSCXS*AMAX1(0.0,OQP(K,LL,NY,NX))
-      OQPHXS=FOSCXS*AMAX1(0.0,OQPH(K,LL,NY,NX))
-      OHPXS=FOSCXS*AMAX1(0.0,OHP(K,LL,NY,NX))
+        OQCXS=FOSCXS*AMAX1(0.0,OQC(K,LL,NY,NX))
+        OQCHXS=FOSCXS*AMAX1(0.0,OQCH(K,LL,NY,NX))
+        OHCXS=FOSCXS*AMAX1(0.0,OHC(K,LL,NY,NX))
+        OQAXS=FOSCXS*AMAX1(0.0,OQA(K,LL,NY,NX))
+        OQAHXS=FOSCXS*AMAX1(0.0,OQAH(K,LL,NY,NX))
+        OHAXS=FOSCXS*AMAX1(0.0,OHA(K,LL,NY,NX))
+        OQNXS=FOSCXS*AMAX1(0.0,OQN(K,LL,NY,NX))
+        OQNHXS=FOSCXS*AMAX1(0.0,OQNH(K,LL,NY,NX))
+        OHNXS=FOSCXS*AMAX1(0.0,OHN(K,LL,NY,NX))
+        OQPXS=FOSCXS*AMAX1(0.0,OQP(K,LL,NY,NX))
+        OQPHXS=FOSCXS*AMAX1(0.0,OQPH(K,LL,NY,NX))
+        OHPXS=FOSCXS*AMAX1(0.0,OHP(K,LL,NY,NX))
       ENDIF
       OQC(K,L,NY,NX)=OQC(K,L,NY,NX)-OQCXS
       OQCH(K,L,NY,NX)=OQCH(K,L,NY,NX)-OQCHXS
@@ -1076,37 +1074,42 @@ module nitroMod
       OQPH(K,LL,NY,NX)=OQPH(K,LL,NY,NX)+OQPHXS
       OHP(K,LL,NY,NX)=OHP(K,LL,NY,NX)+OHPXS
       DO 7931 M=1,4
-      IF(FOSCXS.GT.0.0)THEN
-      OSCXS=FOSCXS*AMAX1(0.0,OSC(M,K,L,NY,NX))
-      OSAXS=FOSCXS*AMAX1(0.0,OSA(M,K,L,NY,NX))
-      OSNXS=FOSCXS*AMAX1(0.0,OSN(M,K,L,NY,NX))
-      OSPXS=FOSCXS*AMAX1(0.0,OSP(M,K,L,NY,NX))
-      ELSE
-      OSCXS=FOSCXS*AMAX1(0.0,OSC(M,K,LL,NY,NX))
-      OSAXS=FOSCXS*AMAX1(0.0,OSA(M,K,LL,NY,NX))
-      OSNXS=FOSCXS*AMAX1(0.0,OSN(M,K,LL,NY,NX))
-      OSPXS=FOSCXS*AMAX1(0.0,OSP(M,K,LL,NY,NX))
-      ENDIF
-      OSC(M,K,L,NY,NX)=OSC(M,K,L,NY,NX)-OSCXS
-      OSA(M,K,L,NY,NX)=OSA(M,K,L,NY,NX)-OSAXS
-      OSN(M,K,L,NY,NX)=OSN(M,K,L,NY,NX)-OSNXS
-      OSP(M,K,L,NY,NX)=OSP(M,K,L,NY,NX)-OSPXS
-      OSC(M,K,LL,NY,NX)=OSC(M,K,LL,NY,NX)+OSCXS
-      OSA(M,K,LL,NY,NX)=OSA(M,K,LL,NY,NX)+OSAXS
-      OSN(M,K,LL,NY,NX)=OSN(M,K,LL,NY,NX)+OSNXS
-      OSP(M,K,LL,NY,NX)=OSP(M,K,LL,NY,NX)+OSPXS
+        IF(FOSCXS.GT.0.0)THEN
+          OSCXS=FOSCXS*AMAX1(0.0,OSC(M,K,L,NY,NX))
+          OSAXS=FOSCXS*AMAX1(0.0,OSA(M,K,L,NY,NX))
+          OSNXS=FOSCXS*AMAX1(0.0,OSN(M,K,L,NY,NX))
+          OSPXS=FOSCXS*AMAX1(0.0,OSP(M,K,L,NY,NX))
+        ELSE
+          OSCXS=FOSCXS*AMAX1(0.0,OSC(M,K,LL,NY,NX))
+          OSAXS=FOSCXS*AMAX1(0.0,OSA(M,K,LL,NY,NX))
+          OSNXS=FOSCXS*AMAX1(0.0,OSN(M,K,LL,NY,NX))
+          OSPXS=FOSCXS*AMAX1(0.0,OSP(M,K,LL,NY,NX))
+        ENDIF
+        OSC(M,K,L,NY,NX)=OSC(M,K,L,NY,NX)-OSCXS
+        OSA(M,K,L,NY,NX)=OSA(M,K,L,NY,NX)-OSAXS
+        OSN(M,K,L,NY,NX)=OSN(M,K,L,NY,NX)-OSNXS
+        OSP(M,K,L,NY,NX)=OSP(M,K,L,NY,NX)-OSPXS
+        OSC(M,K,LL,NY,NX)=OSC(M,K,LL,NY,NX)+OSCXS
+        OSA(M,K,LL,NY,NX)=OSA(M,K,LL,NY,NX)+OSAXS
+        OSN(M,K,LL,NY,NX)=OSN(M,K,LL,NY,NX)+OSNXS
+        OSP(M,K,LL,NY,NX)=OSP(M,K,LL,NY,NX)+OSPXS
 7931  CONTINUE
 7901  CONTINUE
-      ENDIF
-      end subroutine ApplyVerticalMix
+  ENDIF
+  end subroutine ApplyVerticalMix
 !------------------------------------------------------------------------------------------
 
   subroutine StageBGCEnvironCondition(KL,L,NY,NX)
   implicit none
   integer, intent(in) :: KL,L,NY,NX
 
-  integer :: K
-  integer :: M,N,NGL
+  integer  :: K
+  integer  :: M,N,NGL
+  real(r8) :: ACTV,ACTVM
+  real(r8) :: ORGCL
+  real(r8) :: RTK,STK,TKSO
+  real(r8) :: TOSC,TOSA,TOHC
+  real(r8) :: TSRH
 !     begin_execution
 !     TKS=soil temperature
 !     OFFSET=adjustment for acclimation based on MAT in starts.f
@@ -1127,8 +1130,8 @@ module nitroMod
 !     OXYI=inhibition of fermenters by O2
 !     ORGCL=SOC used to calculate microbial concentration
 !
-  OXYI=1.0-1.0/(1.0+EXP(1.0*(-COXYS(L,NY,NX)+2.5)))
-  ORGCL=AMIN1(1.0E+05*BKVL(L,NY,NX),ORGC(L,NY,NX))
+!  OXYI=1.0-1.0/(1.0+EXP(1.0*(-COXYS(L,NY,NX)+2.5)))
+!  ORGCL=AMIN1(1.0E+05*BKVL(L,NY,NX),ORGC(L,NY,NX))
 !
 !     TOTAL MINERAL NH4, NO3 AND PO4
 !
@@ -1139,40 +1142,40 @@ module nitroMod
 !     FNH4S=AMAX1(0.0,ZNH4S(L,NY,NX))/ZNH4T(L)
 !     FNHBS=AMAX1(0.0,ZNH4B(L,NY,NX))/ZNH4T(L)
 !     ELSE
-  FNH4S=VLNH4(L,NY,NX)
-  FNHBS=VLNHB(L,NY,NX)
+!  FNH4S=VLNH4(L,NY,NX)
+!  FNHBS=VLNHB(L,NY,NX)
 !     ENDIF
   ZNO3T(L)=AMAX1(0.0,ZNO3S(L,NY,NX))+AMAX1(0.0,ZNO3B(L,NY,NX))
 !     IF(ZNO3T(L).GT.ZEROS(NY,NX))THEN
 !     FNO3S=AMAX1(0.0,ZNO3S(L,NY,NX))/ZNO3T(L)
 !     FNO3B=AMAX1(0.0,ZNO3B(L,NY,NX))/ZNO3T(L)
 !     ELSE
-  FNO3S=VLNO3(L,NY,NX)
-  FNO3B=VLNOB(L,NY,NX)
+!  FNO3S=VLNO3(L,NY,NX)
+!  FNO3B=VLNOB(L,NY,NX)
 !     ENDIF
   ZNO2T(L)=AMAX1(0.0,ZNO2S(L,NY,NX))+AMAX1(0.0,ZNO2B(L,NY,NX))
 !     IF(ZNO2T(L).GT.ZEROS(NY,NX))THEN
 !     FNO2S=AMAX1(0.0,ZNO2S(L,NY,NX))/ZNO2T(L)
 !     FNO2B=AMAX1(0.0,ZNO2B(L,NY,NX))/ZNO2T(L)
 !     ELSE
-  FNO2S=VLNO3(L,NY,NX)
-  FNO2B=VLNOB(L,NY,NX)
+!  FNO2S=VLNO3(L,NY,NX)
+!  FNO2B=VLNOB(L,NY,NX)
 !     ENDIF
   H1P4T(L)=AMAX1(0.0,H1PO4(L,NY,NX))+AMAX1(0.0,H1POB(L,NY,NX))
 !     IF(H1P4T(L).GT.ZEROS(NY,NX))THEN
 !     FH1PS=AMAX1(0.0,H1PO4(L,NY,NX))/H1P4T(L)
 !     FH1PB=AMAX1(0.0,H1POB(L,NY,NX))/H1P4T(L)
 !     ELSE
-  FH1PS=VLPO4(L,NY,NX)
-  FH1PB=VLPOB(L,NY,NX)
+!  FH1PS=VLPO4(L,NY,NX)
+!  FH1PB=VLPOB(L,NY,NX)
 !     ENDIF
   H2P4T(L)=AMAX1(0.0,H2PO4(L,NY,NX))+AMAX1(0.0,H2POB(L,NY,NX))
 !     IF(H2P4T(L).GT.ZEROS(NY,NX))THEN
 !     FH2PS=AMAX1(0.0,H2PO4(L,NY,NX))/H2P4T(L)
 !     FH2PB=AMAX1(0.0,H2POB(L,NY,NX))/H2P4T(L)
 !     ELSE
-  FH2PS=VLPO4(L,NY,NX)
-  FH2PB=VLPOB(L,NY,NX)
+!  FH2PS=VLPO4(L,NY,NX)
+!  FH2PB=VLPOB(L,NY,NX)
 !     ENDIF
 !
 !     CCO2S=aqueous CO2 concentration
@@ -1330,7 +1333,6 @@ module nitroMod
     ELSE
       COQC(K,L,NY,NX)=0.0_r8
       COQA(K,L,NY,NX)=0.0_r8
-      OHCQ=0.0_r8
     ENDIF
 !
 !     CNQ,CPQ=DON:DOC,DOP:DOC,FOCA,FOAA=DOC,DOA:(DOC+DOA)
@@ -1355,14 +1357,7 @@ module nitroMod
     ENDIF
 790 CONTINUE
 !
-!     nitrous acid concn CHNO2 and energy yield of hydrogenotrophic
-!     methanogenesis GH2X at ambient H2 concentration CH2GS
 !
-  CHY1=AMAX1(ZERO,10.0**(-(PH(L,NY,NX)-3.0)))
-  CHNO2=CNO2S(L,NY,NX)*CHY1/0.5
-  CHNOB=CNO2B(L,NY,NX)*CHY1/0.5
-  GH2X=8.3143E-03*TKS(L,NY,NX) &
-    *LOG((AMAX1(1.0E-03,CH2GS(L,NY,NX))/H2KI)**4)
   end subroutine StageBGCEnvironCondition
 !------------------------------------------------------------------------------------------
 
@@ -1375,7 +1370,7 @@ module nitroMod
 
   integer :: K,M,N,NGL
   real(r8) :: TOMCNK(2)
-
+  REAL(R8) :: OXKX
 ! begin_execution
 
   DO 760 K=0,5
@@ -1413,7 +1408,7 @@ module nitroMod
             TFNG(NGL,N,K)=TFNX*WFNG
             TFNR(NGL,N,K)=TFNY
             IF(OMA(NGL,N,K).GT.0.0)THEN
-              call ActiveMicrobes(NGL,N,K,L,NY,NX,TOMCNK)
+              call ActiveMicrobes(NGL,N,K,L,NY,NX,TOMCNK,OXKX)
             ELSE
               call InactiveMicrobes(NGL,N,K,L)
             ENDIF
@@ -1424,12 +1419,15 @@ module nitroMod
 760 CONTINUE
   end subroutine MicrobialCatabolism
 !------------------------------------------------------------------------------------------
-  subroutine ActiveMicrobes(NGL,N,K,L,NY,NX,TOMCNK)
+  subroutine ActiveMicrobes(NGL,N,K,L,NY,NX,TOMCNK,OXKX)
   implicit none
   integer, intent(in) :: NGL,N,K,L,NY,NX
-  real(r8), intent(in):: tomcnk(2)
+  real(r8), intent(in):: OXKX,tomcnk(2)
 
-  integer :: M
+  integer  :: M
+  real(r8) :: COMC
+  real(r8) :: ECHZ
+  real(r8) :: ORGCL
 ! begin_execution
 ! FOMA,FOMN=fraction of total active biomass C,N in each N and K
 
@@ -1455,6 +1453,7 @@ module nitroMod
   !     SPOMK=effect of microbial C concentration on microbial decay
   !     RMOMK=effect of microbial C concentration on maintenance respn
   !
+  ORGCL=AMIN1(1.0E+05*BKVL(L,NY,NX),ORGC(L,NY,NX))
   IF(ORGCL.GT.ZEROS(NY,NX))THEN
     DO 765 M=1,2
       COMC=TOMCNK(M)/ORGCL
@@ -1482,8 +1481,8 @@ module nitroMod
 !   (6)N2 FIXERS
 !
     IF(N.LE.3.OR.N.EQ.6)THEN
-  !write(*,*)'AerobicHeterotrophCatabolism'
-      call AerobicHeterotrophCatabolism(NGL,N,K,L,NY,NX)
+!     write(*,*)'AerobicHeterotrophCatabolism'
+      call AerobicHeterotrophCatabolism(NGL,N,K,L,NY,NX,ECHZ)
 !     RESPIRATION BY HETEROTROPHIC ANAEROBES:
 !     N=(4)ACETOGENIC FERMENTERS (7) ACETOGENIC N2 FIXERS
 !
@@ -1496,16 +1495,16 @@ module nitroMod
 !     ECHZ=growth respiration efficiency of fermentation
 !
     ELSEIF(N.EQ.4.OR.N.EQ.7)THEN
-  !write(*,*)'AnaerobCatabolism'
-      call AnaerobCatabolism(NGL,N,K,L,NY,NX)
+!     write(*,*)'AnaerobCatabolism'
+      call AnaerobCatabolism(NGL,N,K,L,NY,NX,ECHZ)
 !     ENERGY YIELD FROM ACETOTROPHIC METHANOGENESIS
 !
 !     GOMX=acetate effect on energy yield
 !     ECHZ=growth respiration efficiency of aceto. methanogenesis
 !
     ELSEIF(N.EQ.5)THEN
-!write(*,*)'AcetoMethanogenCatabolism'
-      call AcetoMethanogenCatabolism(NGL,N,K,L,NY,NX)
+!     write(*,*)'AcetoMethanogenCatabolism'
+      call AcetoMethanogenCatabolism(NGL,N,K,L,NY,NX,ECHZ)
     ENDIF
 !
 !     RESPIRATION RATES BY AUTOTROPHS 'RGOMP' FROM SPECIFIC
@@ -1520,21 +1519,21 @@ module nitroMod
 !   NH3 OXIDIZERS
 !
     IF(N.EQ.1)THEN
-      call NH3OxidizerCatabolism(NGL,N,K,L,NY,NX)
+      call NH3OxidizerCatabolism(NGL,N,K,L,NY,NX,ECHZ)
   !     NO2 OXIDIZERS
   !
     ELSEIF(N.EQ.2)THEN
-  !write(*,*)'NO2OxidizerCatabolism'
-      call NO2OxidizerCatabolism(NGL,N,K,L,NY,NX)
+!     write(*,*)'NO2OxidizerCatabolism'
+      call NO2OxidizerCatabolism(NGL,N,K,L,NY,NX,ECHZ)
   !     H2TROPHIC METHANOGENS
   !
     ELSEIF(N.EQ.5)THEN
 
-      call H2MethanogensCatabolism(NGL,N,K,L,NY,NX)
+      call H2MethanogensCatabolism(NGL,N,K,L,NY,NX,ECHZ)
   !     METHANOTROPHS
 !
     ELSEIF(N.EQ.3)THEN
-      call MethanotrophCatabolism(NGL,N,K,L,NY,NX)
+      call MethanotrophCatabolism(NGL,N,K,L,NY,NX,ECHZ)
     ELSE
       RGOMP=0.0_r8
       ROXYM(NGL,N,K)=0.0_r8
@@ -1548,7 +1547,7 @@ module nitroMod
     ROXYS(NGL,N,K,L,NY,NX)=0.0_r8
   ENDIF
 !
-!write(*,*)'O2 UPTAKE BY AEROBES'
+!  write(*,*)'O2 UPTAKE BY AEROBES'
 !
 ! RUPOX, ROXYP=O2-limited, O2-unlimited rates of O2 uptake
 ! RUPMX=O2-unlimited rate of O2 uptake
@@ -1564,8 +1563,8 @@ module nitroMod
   IF(N.LE.3.OR.N.EQ.6)THEN
 !  N=(1)OBLIGATE AEROBES,(2)FACULTATIVE ANAEROBES,(3)FUNGI
 !    (6)N2 FIXERS
-!write(*,*)'AerobsO2Uptake'
-    call AerobsO2Uptake(NGL,N,K,L,NY,NX)
+!   write(*,*)'AerobsO2Uptake'
+    call AerobsO2Uptake(NGL,N,K,L,NY,NX,OXKX)
   ELSEIF(N.EQ.4.OR.N.EQ.7)THEN
     RGOMO(NGL,N,K)=RGOMP
     RCO2X(NGL,N,K)=0.333*RGOMO(NGL,N,K)
@@ -1595,7 +1594,7 @@ module nitroMod
     ENDIF
   ENDIF
 !
-  !write(*,*)'HETEROTROPHIC DENITRIFICATION'
+!  write(*,*)'HETEROTROPHIC DENITRIFICATION'
 !
   IF(K.LE.4.AND.N.EQ.2.AND.ROXYM(NGL,N,K).GT.0.0 &
     .AND.(L.NE.0.OR.VOLX(L,NY,NX).GT.ZEROS(NY,NX)))THEN
@@ -1622,13 +1621,18 @@ module nitroMod
 !
   call GatherMicrobialRespiration(NGL,N,K,L,NY,NX)
 !
-  call GetMicrobialAnabolismFlux(NGL,N,K,L,NY,NX)
+  call GetMicrobialAnabolismFlux(NGL,N,K,L,NY,NX,ECHZ)
   end subroutine ActiveMicrobes
 !------------------------------------------------------------------------------------------
 
   subroutine ChemoDenitrification(L,NY,NX)
   implicit none
   integer, intent(in) :: L,NY,NX
+  real(r8) :: chy1,CHNO2,CHNOB
+
+  real(r8) :: FNO3S,FNO3B
+  REAL(R8) :: FNO2,FNB2
+  real(r8) :: VMXC4S,VMXC4B
 !     begin_execution
 !
 !     FNO2,FNB2=fraction of total NO2 demand in non-band,band
@@ -1642,7 +1646,11 @@ module nitroMod
 !     RCNO3,RCN3B=NO3 production from nitrous acid reduction in non-band,band
 !     RCOQN=DON production from nitrous acid reduction
 !     RVMXC,RVMBC=demand for NO2 reduction in non-band,band
-!
+!     nitrous acid concn CHNO2
+  CHY1=AMAX1(ZERO,10.0**(-(PH(L,NY,NX)-3.0)))
+  CHNO2=CNO2S(L,NY,NX)*CHY1/0.5
+  CHNOB=CNO2B(L,NY,NX)*CHY1/0.5
+
   IF(RNO2Y(L,NY,NX).GT.ZEROS(NY,NX))THEN
     FNO2=AMAX1(FMN,RVMXC(L,NY,NX)/RNO2Y(L,NY,NX))
   ELSE
@@ -1655,6 +1663,8 @@ module nitroMod
   ENDIF
   TFNO2X=TFNO2X+FNO2
   TFNO2B=TFNO2B+FNB2
+  FNO3S=VLNO3(L,NY,NX)
+  FNO3B=VLNOB(L,NY,NX)
   VMXC4S=7.5E-02*CHNO2*VOLWM(NPH,L,NY,NX)*FNO3S*TFNX
   VMXC4B=7.5E-02*CHNOB*VOLWM(NPH,L,NY,NX)*FNO3B*TFNX
   RCNO2=AMAX1(0.0,AMIN1(ZNO2S(L,NY,NX)*FNO2,VMXC4S))
@@ -1681,7 +1691,11 @@ module nitroMod
   implicit none
   integer, intent(in) :: KL,L,NY,NX
 
-  integer :: K,M,N,KK,NGL
+  integer  :: K,M,N,KK,NGL
+  real(r8) :: OSRT
+  real(r8) :: XFRK,XFRC
+  real(r8) :: XFRN,XFRP,XFRA
+  real(r8) :: XFMC,XFMN,XFMP
 !     begin_execution
 !
 !     OSRH=total SOC in each K
@@ -1846,6 +1860,12 @@ module nitroMod
   subroutine DOMSorption(K,L,NY,NX)
   implicit none
   integer, intent(in) :: K,L,NY,NX
+  real(r8) :: AECX
+  real(r8) :: OQCX
+  real(r8) :: OQNX,OQPX,OQAX
+  real(r8) :: OHCX,OHNX,OHPX,OHAX
+  real(r8) :: VOLXX
+  real(r8) :: VOLXW,VOLCX,VOLCW,VOLAX,VOLAW
 !     begin_execution
 !     VOLWM=soil water content, FOSRH=fraction of total SOC
 !     AEC,AECX=anion exchange capacity
@@ -1903,7 +1923,16 @@ module nitroMod
   implicit none
   integer, intent(in) :: K,L,NY,NX
 
-  integer :: M
+  integer  :: M
+  real(r8) :: CNOMX,CPOMX
+  real(r8) :: COQCK,COSC
+  real(r8) :: CPR,CNR
+  real(r8) :: DCKD
+  real(r8) :: DFNS
+  real(r8) :: OQCI
+  real(r8) :: RHOSCM
+  real(r8) :: FCNK(0:4),FCPK(0:4)
+
 !     begin_execution
 !     FCPK=N,P limitation to microbial activity in each K
 !     CNOMX,CPOMX=N:C,P:C ratios relative to set maximum values
@@ -2143,6 +2172,7 @@ module nitroMod
   integer, intent(in) :: KL,L,NY,NX
 
   integer :: K,M,N,NGL
+  real(r8) :: FORC(0:5)
 !     begin_execution
 !
 !     REDISTRIBUTE AUTOTROPHIC DECOMPOSITION PRODUCTS AMONG
@@ -2314,7 +2344,8 @@ module nitroMod
   implicit none
   integer, intent(in) :: L,NY,NX
 
-  integer :: K,M,N,NGL
+  integer  :: K,M,N,NGL
+  real(r8) ::CGROMC
 !     begin_execution
 !
 !     OMC,OMN,OMP=microbial C,N,P
@@ -2460,7 +2491,8 @@ module nitroMod
   implicit none
   integer, intent(in) :: KL,L,NY,NX
 
-  integer :: K,M
+  integer  :: K,M
+  real(r8) :: DOSAK
 !     begin_execution
 !     OSCT,OSAT,OSCX=total,colonized,uncolonized SOC
 !     OSA,OSC=colonized,total litter
@@ -2507,7 +2539,17 @@ module nitroMod
   implicit none
   integer, intent(in) :: L,NY,NX
 
-  integer :: K,M,N,NGL
+  integer  :: K,M,N,NGL
+  real(r8) :: TRINO,TRIP1
+  real(r8) :: TRINB
+  real(r8) :: TRIOB
+  real(r8) :: TRIPB
+  real(r8) :: TRIB1
+  real(r8) :: TRGOM
+  real(r8) :: TRGOC
+  real(r8) :: TRGOD,TRGOA,TRGOH
+  real(r8) :: TUPOX
+  real(r8) :: TRDN3,TRDNB,TRDN2,TRD2B,TRDNO,TRN2F
 !     begin_execution
 
   TRINH=0.0_r8
@@ -2826,9 +2868,17 @@ module nitroMod
   end subroutine SubstrateCompetitionFactors
 !------------------------------------------------------------------------------------------
 
-  subroutine NH3OxidizerCatabolism(NGL,N,K,L,NY,NX)
+  subroutine NH3OxidizerCatabolism(NGL,N,K,L,NY,NX,ECHZ)
   implicit none
   integer, intent(in) :: NGL,N,K,L,NY,NX
+  real(r8),intent(out) :: ECHZ
+  real(r8) :: FNH4S,FNHBS
+  real(r8) :: FNH4,FNB4
+  real(r8) :: FCN4S,FCN4B
+  real(r8) :: RNNH4,RNNHB
+  real(r8) :: VMXX,VMX4S
+  real(r8) :: VMX4B
+  real(r8) :: ZNFN4S,ZNFN4B
 !     begin_execution
 !
 !     FACTOR TO REGULATE COMPETITION FOR NH4 AMONG DIFFERENT
@@ -2836,6 +2886,8 @@ module nitroMod
 !
 !     FNH4,FNB4=frac of total biol demand for NH4 in non-band, band
 !
+  FNH4S=VLNH4(L,NY,NX)
+  FNHBS=VLNHB(L,NY,NX)
   IF(RNH4Y(L,NY,NX).GT.ZEROS(NY,NX))THEN
     FNH4=AMAX1(FMN,RVMX4(NGL,N,K,L,NY,NX)/RNH4Y(L,NY,NX))
   ELSE
@@ -2931,15 +2983,24 @@ module nitroMod
   end subroutine NH3OxidizerCatabolism
 !------------------------------------------------------------------------------------------
 
-  subroutine NO2OxidizerCatabolism(NGL,N,K,L,NY,NX)
+  subroutine NO2OxidizerCatabolism(NGL,N,K,L,NY,NX,ECHZ)
   implicit none
   integer, intent(in) :: NGL,N,K,L,NY,NX
+  real(r8), intent(out) :: ECHZ
+
+  real(r8) :: FNH4S,FNHBS
+  REAL(R8) :: fno2,FNB2
+  real(r8) :: FCN2S,FCN2B
+  real(r8) :: RNNO2,RNNOB
+  real(r8) :: VMX2S,VMX2B
 !     begin_execution
 !     FACTOR TO REGULATE COMPETITION FOR NO2 AMONG DIFFERENT
 !     MICROBIAL POPULATIONS
 !
 !     FNO2=fraction of total biological demand for NO2 in non-band, band
 !
+  FNH4S=VLNH4(L,NY,NX)
+  FNHBS=VLNHB(L,NY,NX)
   IF(RNO2Y(L,NY,NX).GT.ZEROS(NY,NX))THEN
     FNO2=AMAX1(FMN,RVMX2(NGL,N,K,L,NY,NX)/RNO2Y(L,NY,NX))
   ELSE
@@ -3012,9 +3073,12 @@ module nitroMod
   end subroutine NO2OxidizerCatabolism
 !------------------------------------------------------------------------------------------
 
-  subroutine H2MethanogensCatabolism(NGL,N,K,L,NY,NX)
+  subroutine H2MethanogensCatabolism(NGL,N,K,L,NY,NX,ECHZ)
   implicit none
   integer, intent(in) :: NGL,N,K,L,NY,NX
+  real(r8), intent(out) :: ECHZ
+  real(r8) :: GH2X,GH2H
+  real(r8) :: H2GSX
 !     begin_execution
 !
 !     CO2 REDUCTION FROM SPECIFIC REDUCTION RATE, ENERGY YIELD,
@@ -3027,6 +3091,10 @@ module nitroMod
 !     CH2GS=H2 concentration, H2KM=Km for H2 uptake
 !     RGOMP=H2 oxidation, ROXY*=O2 demand
 !
+!     and energy yield of hydrogenotrophic
+!     methanogenesis GH2X at ambient H2 concentration CH2GS
+
+  GH2X=8.3143E-03*TKS(L,NY,NX)*LOG((AMAX1(1.0E-03,CH2GS(L,NY,NX))/H2KI)**4)
   GH2H=GH2X/12.0
   ECHZ=AMAX1(EO2X,AMIN1(1.0,1.0/(1.0+AMAX1(0.0,(GCOX+GH2H))/EOMH)))
   VMXA=TFNG(NGL,N,K)*FCNP(NGL,N,K)*XCO2*OMA(NGL,N,K)*VMXC
@@ -3048,12 +3116,16 @@ module nitroMod
   end subroutine H2MethanogensCatabolism
 !------------------------------------------------------------------------------------------
 
-  subroutine MethanotrophCatabolism(NGL,N,K,L,NY,NX)
+  subroutine MethanotrophCatabolism(NGL,N,K,L,NY,NX,ECHZ)
 
   implicit none
   integer, intent(in) :: NGL,N,K,L,NY,NX
-
-  integer :: M,MM
+  real(r8), intent(out) :: ECHZ
+  integer  :: M,MM
+  real(r8) :: CH4G1,CH4S1,CCH4S1
+  real(r8) :: RCH4L1,RCH4F1,RCH4S1
+  real(r8) :: RGOMP1,RCHDF
+  real(r8) :: VMXA1,VOLWCH
 !     begin_execution
 !
 !     CH4 OXIDATION FROM SPECIFIC OXIDATION RATE, ENERGY YIELD,
@@ -3145,9 +3217,12 @@ module nitroMod
   end subroutine MethanotrophCatabolism
 !------------------------------------------------------------------------------------------
 
-  subroutine AcetoMethanogenCatabolism(NGL,N,K,L,NY,NX)
+  subroutine AcetoMethanogenCatabolism(NGL,N,K,L,NY,NX,ECHZ)
   implicit none
   integer, intent(in) :: NGL,N,K,L,NY,NX
+  real(r8), intent(out) :: ECHZ
+  real(r8) :: GOMX,GOMM
+  real(r8) :: RGOGY,RGOGZ,RGOGX
 
 ! begin_execution
   GOMX=8.3143E-03*TKS(L,NY,NX)*LOG((AMAX1(ZERO,COQA(K,L,NY,NX))/OAKI))
@@ -3199,9 +3274,16 @@ module nitroMod
   end subroutine AcetoMethanogenCatabolism
 !------------------------------------------------------------------------------------------
 
-  subroutine AerobicHeterotrophCatabolism(NGL,N,K,L,NY,NX)
+  subroutine AerobicHeterotrophCatabolism(NGL,N,K,L,NY,NX,ECHZ)
   implicit none
   integer, intent(in) :: NGL,N,K,L,NY,NX
+  real(r8), intent(out) :: ECHZ
+  real(r8) :: EO2Q
+  real(r8) :: FSBSTC,FSBSTA
+  real(r8) :: RGOCY,RGOCZ,RGOAZ
+  real(r8) :: RGOCX,RGOAX
+  real(r8) :: RGOAP
+  real(r8) :: ROXYSX,ROQCSX,ROQASX
 !     begin_execution
 !     ENERGY YIELDS OF O2 REDOX REACTIONS
 !     E* = growth respiration efficiency calculated in PARAMETERS
@@ -3281,10 +3363,17 @@ module nitroMod
   end subroutine AerobicHeterotrophCatabolism
 !------------------------------------------------------------------------------------------
 
-  subroutine AnaerobCatabolism(NGL,N,K,L,NY,NX)
+  subroutine AnaerobCatabolism(NGL,N,K,L,NY,NX,ECHZ)
   implicit none
   integer, intent(in) :: NGL,N,K,L,NY,NX
+  real(r8), intent(out) :: ECHZ
+  real(r8) :: GH2X,GH2F
+  real(r8) :: GOAX,GOAF
+  real(r8) :: GHAX
+  REAL(R8) :: oxyi
+  real(r8) :: RGOFX,RGOFY,RGOFZ
 !     begin_execution
+  GH2X=8.3143E-03*TKS(L,NY,NX)*LOG((AMAX1(1.0E-03,CH2GS(L,NY,NX))/H2KI)**4)
   GH2F=GH2X/72.0
   GOAX=8.3143E-03*TKS(L,NY,NX) &
     *LOG((AMAX1(ZERO,COQA(K,L,NY,NX))/OAKI)**2)
@@ -3311,6 +3400,7 @@ module nitroMod
 !     RFOMP=O2-unlimited respiration of DOC
 !     ROQCD=microbial respiration used to represent microbial activity
 !
+  OXYI=1.0-1.0/(1.0+EXP(1.0*(-COXYS(L,NY,NX)+2.5)))
   FSBST=COQC(K,L,NY,NX)/(COQC(K,L,NY,NX)+OQKM)*OXYI
   RGOFY=AMAX1(0.0,FCNP(NGL,N,K)*VMXF*WFNG*OMA(NGL,N,K))
   RGOFZ=RGOFY*FSBST*TFNX
@@ -3341,13 +3431,47 @@ module nitroMod
   subroutine HeteroDenitrificCatabolism(NGL,N,K,L,NY,NX)
   implicit none
   integer, intent(in) :: NGL,N,K,L,NY,NX
-!     begin_execution
+  real(r8) :: FNO3S,FNO3B
+  real(r8) :: FNO2S,FNO2B
+  REAL(R8) :: FNO2,FNB2
+  real(r8) :: FNO3,FNB3
+  real(r8) :: FVMXDX
+  REAL(R8) :: FN2O
+  real(r8) :: OQCZ3
+  real(r8) :: OQCD3
+  real(r8) :: OQCD3S
+  real(r8) :: OQCD3B
+  real(r8) :: OQCZ2
+  real(r8) :: OQCD2
+  real(r8) :: OQCD2S
+  real(r8) :: OQCD2B
+  real(r8) :: OQCZ1
+  real(r8) :: OQCD1
+  real(r8) :: ROXYD
+  real(r8) :: RDNO3X,RDNOBX,RDNOX
+  real(r8) :: RDNOT
+  real(r8) :: RGOM3X,RGOMD3
+  real(r8) :: RDNO2X,RDN2X,RDN2T,RGOM2X,RGOMD2,RDN2OX,RGOM1X
+  real(r8) :: RGOMD1
+  real(r8) :: VMXD3
+  real(r8) :: VMXDXS
+  real(r8) :: VMXDXB
+  real(r8) :: VMXDXT
+  real(r8) :: VMXD3S,VMXD3B,VMXD2,VMXD2S,VMXD2B,VMXD1
+  real(r8) :: VMXD1S
+  real(r8) :: ZNO3SX,ZNO3BX
+  real(r8) :: ZNO2SX,ZNO2BX
+  real(r8) :: Z2OSX
+! begin_execution
 !
-!     FACTOR TO CONSTRAIN NO3 UPAKE AMONG COMPETING MICROBIAL
-!     AND ROOT POPULATIONS
+! FACTOR TO CONSTRAIN NO3 UPAKE AMONG COMPETING MICROBIAL
+! AND ROOT POPULATIONS
 !
-!     FNO3,FNB3=fraction of total biological demand for NO3
+! FNO3,FNB3=fraction of total biological demand for NO3
 !
+
+  FNO3S=VLNO3(L,NY,NX)
+  FNO3B=VLNOB(L,NY,NX)
   IF(RNO3Y(L,NY,NX).GT.ZEROS(NY,NX))THEN
     FNO3=AMAX1(FMN,RVMX3(NGL,N,K,L,NY,NX)/RNO3Y(L,NY,NX))
   ELSE
@@ -3424,6 +3548,8 @@ module nitroMod
 !
 !     FNO2,FNB2=fraction of total biological demand for NO2
 !
+  FNO2S=VLNO3(L,NY,NX)
+  FNO2B=VLNOB(L,NY,NX)
   IF(RNO2Y(L,NY,NX).GT.ZEROS(NY,NX))THEN
     FNO2=AMAX1(FMN,RVMX2(NGL,N,K,L,NY,NX)/RNO2Y(L,NY,NX))
   ELSE
@@ -3567,6 +3693,17 @@ module nitroMod
 
   implicit none
   integer, intent(in) :: NGL,N,K,L,NY,NX
+  real(r8) :: FNO2S,FNO2B
+  REAL(R8) :: FNO2,FNB2
+  real(r8) :: FVMXDX
+  real(r8) :: ROXYD,RDNOT
+  real(r8) :: VMXDXS
+  real(r8) :: VMXDXB
+  real(r8) :: VMXDXT
+  real(r8) :: VMXD4
+  real(r8) :: VMXD4S
+  real(r8) :: VMXD4B
+  real(r8) :: ZNO2SX,ZNO2BX
 !     begin_execution
 !
 !     FACTOR TO CONSTRAIN NO2 UPAKE AMONG COMPETING MICROBIAL
@@ -3607,6 +3744,8 @@ module nitroMod
 !     ECHZ=growth respiration efficiency
 !     RVOXA,RVOXB=total O2-limited (1)NH4,(2)NO2,(3)CH4 oxidation
 !
+  FNO2S=VLNO3(L,NY,NX)
+  FNO2B=VLNOB(L,NY,NX)
   ROXYD=AMAX1(0.0,ROXYM(NGL,N,K)-ROXYO(NGL,N,K))
   VMXD4=0.875*ROXYD*XCO2
   VMXDXS=FNO2S*VMXD4*CNO2S(L,NY,NX)/(CNO2S(L,NY,NX)+Z2KM)
@@ -3649,12 +3788,21 @@ module nitroMod
   end subroutine AutotrophDenitrificCatabolism
 !------------------------------------------------------------------------------------------
 
-  subroutine AerobsO2Uptake(NGL,N,K,L,NY,NX)
+  subroutine AerobsO2Uptake(NGL,N,K,L,NY,NX,OXKX)
   implicit none
   integer, intent(in) :: NGL,N,K,L,NY,NX
+  real(r8), intent(in) :: OXKX
 
-  integer :: M,MX
-
+  integer  :: M,MX
+  real(r8) :: COXYS1,DIFOX
+  real(r8) :: B,C,OLSGL1
+  real(r8) :: OXYG1,OXYS1
+  real(r8) :: RUPMX,ROXYFX
+  real(r8) :: ROXYLX
+  real(r8) :: RRADO,RMPOX,ROXDFQ
+  real(r8) :: THETW1,VOLWOX
+  real(r8) :: VOLPOX
+  real(r8) :: X
   ! begin_execution
 
   IF(ROXYP(NGL,N,K).GT.ZEROS(NY,NX).AND.FOXYX.GT.ZERO)THEN
@@ -3803,6 +3951,24 @@ module nitroMod
   subroutine BiomassMineralization(NGL,N,K,L,NY,NX)
   implicit none
   integer, intent(in) :: NGL,N,K,L,NY,NX
+
+  real(r8) :: CNH4X,CNH4Y,CNO3X,CNO3Y
+  real(r8) :: CH2PX,CH2PY
+  real(r8) :: CH1PX,CH1PY
+  real(r8) :: FNH4S,FNHBS
+  real(r8) :: FNO3S,FNO3B
+  real(r8) :: FH1PS,FH1PB
+  real(r8) :: FH2PS,FH2PB
+  real(r8) :: H2POM,H2PBM
+  real(r8) :: H1POM,H1PBM
+  real(r8) :: H1P4M,H2P4M
+  real(r8) :: RINHP
+  real(r8) :: RINHX,RINOP,RINOX,RIPOP,RIPOX,RIP1P
+  real(r8) :: RIP1X,RINHPR,RINOPR,RIPOPR,RIP1PR
+  real(r8) :: ZNH4M,ZNHBM
+  real(r8) :: ZNO3M
+  real(r8) :: ZNOBM
+
 !     begin_execution
 !     MINERALIZATION-IMMOBILIZATION OF NH4 IN SOIL FROM MICROBIAL
 !     C:N AND NH4 CONCENTRATION IN BAND AND NON-BAND SOIL ZONES
@@ -3824,7 +3990,8 @@ module nitroMod
 !     RINH4,RINB4=substrate-limited NH4 mineraln-immobiln in non-band, band
 !     TRINH4=total NH4 net mineraln (-ve) or immobiln (+ve)
 !
-
+  FNH4S=VLNH4(L,NY,NX)
+  FNHBS=VLNHB(L,NY,NX)
   RINHP=(OMC(3,NGL,N,K,L,NY,NX)*CNOMC(3,NGL,N,K)-OMN(3,NGL,N,K,L,NY,NX))
   IF(RINHP.GT.0.0)THEN
     CNH4X=AMAX1(0.0_r8,CNH4S(L,NY,NX)-Z4MN)
@@ -3873,6 +4040,8 @@ module nitroMod
 !     RINO3,RINB3=substrate-limited NO3 immobiln in non-band, band
 !     TRINH4=total net NH4+NO3 mineraln (-ve) or immobiln (+ve)
 !
+  FNO3S=VLNO3(L,NY,NX)
+  FNO3B=VLNOB(L,NY,NX)
   RINOP=AMAX1(0.0,RINHP-RINH4(NGL,N,K)-RINB4(NGL,N,K))
   IF(RINOP.GT.0.0)THEN
     CNO3X=AMAX1(0.0,CNO3S(L,NY,NX)-ZOMN)
@@ -3923,6 +4092,8 @@ module nitroMod
 !     RIPO4,RIPOB=substrate-limited H2PO4 mineraln-immobn in non-band, band
 !     TRIPO4=total H2PO4 net mineraln (-ve) or immobiln (+ve)
 !
+  FH2PS=VLPO4(L,NY,NX)
+  FH2PB=VLPOB(L,NY,NX)
   RIPOP=(OMC(3,NGL,N,K,L,NY,NX)*CPOMC(3,NGL,N,K)-OMP(3,NGL,N,K,L,NY,NX))
   IF(RIPOP.GT.0.0)THEN
     CH2PX=AMAX1(0.0,CH2P4(L,NY,NX)-HPMN)
@@ -4132,6 +4303,8 @@ module nitroMod
 !     RIP14R=substrate-limited HPO4 minereraln-immobiln
 !     TRIPO4=total HPO4 net mineraln (-ve) or immobiln (+ve)
 !
+    FH1PS=VLPO4(L,NY,NX)
+    FH1PB=VLPOB(L,NY,NX)
     RIP1PR=0.1*AMAX1(0.0,RIPOPR-RIPO4R(NGL,N,K))
     IF(RIP1PR.GT.0.0)THEN
       CH1PX=AMAX1(0.0,CH1P4(NU(NY,NX),NY,NX)-HPMN)
@@ -4155,6 +4328,8 @@ module nitroMod
   subroutine GatherMicrobialRespiration(NGL,N,K,L,NY,NX)
   implicit none
   integer, intent(in) :: NGL,N,K,L,NY,NX
+  REAL(R8) :: FPH,RMOMX
+  real(r8) :: RGN2P
 !     begin_execution
 !     pH EFFECT ON MAINTENANCE RESPIRATION
 !
@@ -4220,14 +4395,19 @@ module nitroMod
   end subroutine GatherMicrobialRespiration
 !------------------------------------------------------------------------------------------
 
-  subroutine GetMicrobialAnabolismFlux(NGL,N,K,L,NY,NX)
+  subroutine GetMicrobialAnabolismFlux(NGL,N,K,L,NY,NX,ECHZ)
   implicit none
   integer, intent(in) :: NGL,N,K,L,NY,NX
-
+  real(r8), intent(in) :: ECHZ
   integer :: M
   real(r8) :: RCCC,RCCN,RCCP
   real(r8) :: CCC,CGOMX,CGOMD
   real(r8) :: CXC
+  real(r8) :: CGOXC
+  real(r8) :: C3C,CNC,CPC
+  real(r8) :: CGOMZ
+  real(r8) :: SPOMX
+  real(r8) :: FRM
 !     begin_execution
 !     DOC, DON, DOP AND ACETATE UPTAKE DRIVEN BY GROWTH RESPIRATION
 !     FROM O2, NOX AND C REDUCTION
@@ -4248,6 +4428,7 @@ module nitroMod
 !     CNQ,CPQ=DON/DOC, DOP/DOC
 !     FCN,FCP=limitation from N,P
 !
+
   CGOMX=AMIN1(RMOMT,RGOMO(NGL,N,K))+RGN2F(NGL,N,K) &
     +(RGOMT-RGN2F(NGL,N,K))/ECHZ
   CGOMD=RGOMD(NGL,N,K)/ENOX
