@@ -3,17 +3,13 @@ set(ECOSIM_MOD_SOURCES
 	ErosionMod.F90
 	ExecMod.F90
 	ExtractMod.F90
-	HfuncMod.F90
 	Hour1Mod.F90
 	RedistMod.F90
 	SoluteMod.F90
 	StarteMod.F90
-	StartqMod.F90
 	StartsMod.F90
-	StomateMod.F90
 	TrnsfrMod.F90
 	TrnsfrsMod.F90
-	UptakeMod.F90
 	VisualMod.F90
 	WthrMod.F90
 )

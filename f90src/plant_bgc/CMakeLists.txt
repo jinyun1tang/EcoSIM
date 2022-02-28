@@ -1,6 +1,10 @@
 set(PLANT_BGC_SOURCES
   InitVegBGC.F90
+	HfuncMod.F90
+	UptakeMod.F90
+	StartqMod.F90
 	GrosubMod.F90
+	StomateMod.F90
   GrosubPars.F90
 )
 include_directories(${CMAKE_BINARY_DIR}/f90src/utils/)
