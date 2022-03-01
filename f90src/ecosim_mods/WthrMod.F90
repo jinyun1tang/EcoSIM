@@ -3,7 +3,7 @@ module WthrMod
   ! Description:
   ! code to process the weather forcing
   use data_kind_mod, only : r8 => SHR_KIND_R8
-  use MiniMathMod, only : safe_adb,vapsat0
+  use MiniMathMod, only : safe_adb,vapsat0,test_aneb,test_aeqb
   use EcosimConst
   use VegDataType
   implicit none
@@ -429,7 +429,7 @@ module WthrMod
       !     DTA,AMP,DHR=change in daily average,amplitude of air temperature
       !     DHR=diurnal effect on AMP
       !
-      IF(TDTPX(NY,NX,N).NE.0.0.OR.TDTPN(NY,NX,N).NE.0.0)THEN
+      IF(test_aneb(TDTPX(NY,NX,N),0.0_r8).OR.test_aneb(TDTPN(NY,NX,N),0.0_r8))THEN
         DTA=0.5*(TDTPX(NY,NX,N)+TDTPN(NY,NX,N))
         AMP=0.5*(TDTPX(NY,NX,N)-TDTPN(NY,NX,N))
         DHR=SIN(0.2618*(J-(ZNOON(NY,NX)+3.0))+PICON2)
@@ -477,7 +477,7 @@ module WthrMod
 !
         !     ADJUST VAPOR PRESSURE FOR TEMPERATURE CHANGE
 !
-        IF(DHUM(N).EQ.1.0)THEN
+        IF(test_aeqb(DHUM(N),1.0_r8))THEN
           VPX=VPS(NY,NX)
           !VPS(NY,NX)=0.61*EXP(5360.0*(3.661E-03-1.0/TKA(NY,NX))) &
           vps(ny,ny)=vapsat0(tka(ny,nx))*EXP(-ALTI(NY,NX)/7272.0)

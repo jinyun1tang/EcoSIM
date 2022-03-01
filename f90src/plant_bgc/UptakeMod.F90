@@ -1,7 +1,7 @@
 module UptakeMod
   use data_kind_mod, only : r8 => SHR_KIND_R8
   use StomateMod   , only : stomate
-  use minimathmod  , only : safe_adb,vapsat
+  use minimathmod  , only : safe_adb,vapsat,test_aneb
   use EcosimConst
   use SOMDataType
   use SoilChemDataType
@@ -794,7 +794,7 @@ module UptakeMod
       VOLWPZ=1.0E-06*WVPLT/FDMP
       DIFFZ=VOLWPZ-VOLWP(NZ,NY,NX)
       DIFFU=EP(NZ,NY,NX)-UPRT
-      IF(UPRT.NE.0.0)THEN
+      IF(test_aneb(UPRT,0.0_r8))THEN
       DIFF=ABS((DIFFU-DIFFZ)/UPRT)
       ELSE
       DIFF=ABS((DIFFU-DIFFZ)/VOLWPZ)
