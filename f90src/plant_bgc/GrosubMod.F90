@@ -74,17 +74,10 @@ module grosubMod
   real(r8) :: CNLFX
   real(r8) :: CPLFX,CNSHX,CPSHX
   real(r8) :: CO2F,CH2O
-  real(r8) :: CBXNX
-  real(r8) :: CNPG,CGROS,CNRDA,CGROSM,CNRDM,CPL4M,CCBS,CPL3K
-  real(r8) :: CO2LK,CCE,CCC,CNC,CPC,CPOOLT,CPOOLM,CH2OH,CWTRSV
-  real(r8) :: CWTRSN,CWTRSP,CNR,CPR,CNL,CPL,CPOOLD,CCPOLN,CZPOLN
-  real(r8) :: CPPOLN,CGNDL,CCNDLB,CUPRL,CUPRO,CUPRC,CGRORM,CGROR
-  real(r8) :: CPOOLX,CPOOLNX,CCNDLR,CPOOLB,CPOOLS,CCPOLX,CCPLNX
-  real(r8) :: CPOOLG,CPOLNG,CPOLNX,DMLFB,DMSHB,DMSHT,DMSHD,DIFF
-  real(r8) :: DATRP,DMRTD,DMRTR,ETLF4,EGRO4,EGROX,ETLF,EGRO
-  real(r8) :: ETOL,FPART1,FPART2,FPARTL,FNP,FSNC,FSNCL,FSNCS
-  real(r8) :: FNCLF,FSNAL,FSNAS,FRCC,FSNCK,FSNCR,FRACL,FGRNX
-  real(r8) :: FXFC,FXFN,FWTBR,FCNPF,FXRNX,FRTN,FSNC1,FRCO2,FSNCM
+  real(r8) :: CGROS,CNRDA
+  real(r8) :: CNRDM
+
+  real(r8) :: FWTBR,FCNPF,FXRNX,FRTN,FSNC1,FRCO2,FSNCM
   real(r8) :: FSNCP,FGROL,FGROZ,FWTRT,FWTC,FWTS,FHGT,FHVST,FHVSH
   real(r8) :: FHVST4,FHGTK,FHVSTS,FHVSTG,FHVSHG,FHVSTH,FHVSTE
   real(r8) :: FHVSHH,FHVSHE,FDM,FFIRE,FFIRN,FFIRP,FHVSN,FHVSP
@@ -181,7 +174,6 @@ module grosubMod
   FXRN=real((/0.25,0.125,0.0625,0.225,0.075,0.025/),r8)
   FXFB=real((/1.0E-02,1.0E-02,1.0E-05,5.0E-05/),r8)
   FXFR=real((/1.0E-02,1.0E-02,1.0E-05,5.0E-05/),r8)
-  FPART1=1.00_r8;FPART2=0.40_r8
   FXSH=real((/0.50,0.75/),r8);FXRT=real((/0.50,0.25/),r8)
   FRSV=real((/0.025,0.025,0.001,0.001/),r8)
   FXFY=real((/0.025,0.005/),r8);FXFZ=real((/0.25,0.05/),r8)
@@ -1633,6 +1625,12 @@ module grosubMod
   real(r8) :: FHVSHK(0:25),FHVSTK(0:25)
   real(r8) :: ARLFY,ARLFR,ARLFG
   real(r8) :: APSILT
+  real(r8) :: CPOOLX
+  real(r8) :: CCPOLX
+  real(r8) :: CPOOLG
+  real(r8) :: CPOLNG
+  real(r8) :: CPOLNX
+  real(r8) :: CCPLNX
 !     begin_execution
 !     IHVST=harvest type:0=none,1=grain,2=all above-ground
 !                       ,3=pruning,4=grazing,5=fire,6=herbivory
@@ -2713,12 +2711,12 @@ module grosubMod
       WVSTK(NZ,NY,NX)=0._r8
       ARSTP(NZ,NY,NX)=0._r8
       DO 9840 NB=1,NBR(NZ,NY,NX)
-      WTLS(NZ,NY,NX)=WTLS(NZ,NY,NX)+WTLSB(NB,NZ,NY,NX)
-      WTSTK(NZ,NY,NX)=WTSTK(NZ,NY,NX)+WTSTKB(NB,NZ,NY,NX)
-      WVSTK(NZ,NY,NX)=WVSTK(NZ,NY,NX)+WVSTKB(NB,NZ,NY,NX)
-      DO 9830 L=1,JC
-      ARSTP(NZ,NY,NX)=ARSTP(NZ,NY,NX)+ARSTK(L,NB,NZ,NY,NX)
-9830  CONTINUE
+        WTLS(NZ,NY,NX)=WTLS(NZ,NY,NX)+WTLSB(NB,NZ,NY,NX)
+        WTSTK(NZ,NY,NX)=WTSTK(NZ,NY,NX)+WTSTKB(NB,NZ,NY,NX)
+        WVSTK(NZ,NY,NX)=WVSTK(NZ,NY,NX)+WVSTKB(NB,NZ,NY,NX)
+        DO 9830 L=1,JC
+          ARSTP(NZ,NY,NX)=ARSTP(NZ,NY,NX)+ARSTK(L,NB,NZ,NY,NX)
+9830    CONTINUE
 9840  CONTINUE
 !
 !     ROOT LITTERFALL FROM HARVESTING OR FIRE
@@ -2744,91 +2742,87 @@ module grosubMod
 !     FWOOD,FWOODN,FWOODP=C,N,P woody fraction in root:0=woody,1=non-woody
 !
       IF(IHVST(NZ,I,NY,NX).NE.4.AND.IHVST(NZ,I,NY,NX).NE.6)THEN
-      XHVST=1.0_r8-THIN(NZ,I,NY,NX)
-      DO 3985 N=1,MY(NZ,NY,NX)
-      DO 3980 L=NU(NY,NX),NJ(NY,NX)
-      IF(IHVST(NZ,I,NY,NX).NE.5)THEN
-      XHVST=1.0_r8-THIN(NZ,I,NY,NX)
-      XHVSN=XHVST
-      XHVSP=XHVST
-      FFIRE=0._r8
-      FFIRN=0._r8
-      FFIRP=0._r8
-      ELSE
-      IF(THETW(L,NY,NX).GT.FVLWB.OR.CORGC(L,NY,NX).LE.FORGC &
-      .OR.ITILL(I,NY,NX).NE.22)THEN
-      XHVST=1.0_r8
-      XHVSN=XHVST
-      XHVSP=XHVST
-      FFIRE=0._r8
-      FFIRN=0._r8
-      FFIRP=0._r8
-      ELSE
-      XHVST=1.0_r8-DCORP(I,NY,NX)*EHVST(1,3,NZ,I,NY,NX) &
-      *AMIN1(1.0,(CORGC(L,NY,NX)-FORGC)/(0.55E+06-FORGC))
-      XHVSN=XHVST
-      XHVSP=XHVST
-      FFIRE=EHVST(2,3,NZ,I,NY,NX)
-      FFIRN=FFIRE*EFIRE(1,IHVST(NZ,I,NY,NX))
-      FFIRP=FFIRE*EFIRE(2,IHVST(NZ,I,NY,NX))
-      ENDIF
-      ENDIF
-      DO 3385 M=1,4
-      FHVST=(1.0-XHVST)*CFOPC(0,M,NZ,NY,NX)*CPOOLR(N,L,NZ,NY,NX)
-      FHVSN=(1.0-XHVSN)*CFOPN(0,M,NZ,NY,NX)*ZPOOLR(N,L,NZ,NY,NX)
-      FHVSP=(1.0-XHVSP)*CFOPP(0,M,NZ,NY,NX)*PPOOLR(N,L,NZ,NY,NX)
-      CSNC(M,1,L,NZ,NY,NX)=CSNC(M,1,L,NZ,NY,NX)+(1.0-FFIRE)*FHVST
-      ZSNC(M,1,L,NZ,NY,NX)=ZSNC(M,1,L,NZ,NY,NX)+(1.0-FFIRN)*FHVSN
-      PSNC(M,1,L,NZ,NY,NX)=PSNC(M,1,L,NZ,NY,NX)+(1.0-FFIRP)*FHVSP
-      VCO2F(NZ,NY,NX)=VCO2F(NZ,NY,NX)-(1.0-FCH4F)*FFIRE*FHVST
-      VCH4F(NZ,NY,NX)=VCH4F(NZ,NY,NX)-FCH4F*FFIRE*FHVST
-      VOXYF(NZ,NY,NX)=VOXYF(NZ,NY,NX)-(1.0-FCH4F)*FFIRE*FHVST*2.667
-      VNH3F(NZ,NY,NX)=VNH3F(NZ,NY,NX)-FFIRN*FHVSN
-      VN2OF(NZ,NY,NX)=VN2OF(NZ,NY,NX)-0.0
-      VPO4F(NZ,NY,NX)=VPO4F(NZ,NY,NX)-FFIRP*FHVSP
-      CNET(NZ,NY,NX)=CNET(NZ,NY,NX)-(1.0-FCH4F)*FFIRE*FHVST
-      TNBP(NY,NX)=TNBP(NY,NX)-FCH4F*FFIRE*FHVST
-      DO NR=1,NRT(NZ,NY,NX)
-      FHVST=(1.0-XHVST)*CFOPC(5,M,NZ,NY,NX)*(WTRT1(N,L,NR,NZ,NY,NX) &
-      +WTRT2(N,L,NR,NZ,NY,NX))*FWODR(0)
-      FHVSN=(1.0-XHVSN)*CFOPN(5,M,NZ,NY,NX)*(WTRT1N(N,L,NR,NZ,NY,NX) &
-      +WTRT2N(N,L,NR,NZ,NY,NX))*FWODRN(0)
-      FHVSP=(1.0-XHVSP)*CFOPP(5,M,NZ,NY,NX)*(WTRT1P(N,L,NR,NZ,NY,NX) &
-      +WTRT2P(N,L,NR,NZ,NY,NX))*FWODRP(0)
-      CSNC(M,1,L,NZ,NY,NX)=CSNC(M,1,L,NZ,NY,NX)+(1.0-FFIRE)*FHVST
-      ZSNC(M,1,L,NZ,NY,NX)=ZSNC(M,1,L,NZ,NY,NX)+(1.0-FFIRN)*FHVSN
-      PSNC(M,1,L,NZ,NY,NX)=PSNC(M,1,L,NZ,NY,NX)+(1.0-FFIRP)*FHVSP
-      VCO2F(NZ,NY,NX)=VCO2F(NZ,NY,NX)-(1.0-FCH4F)*FFIRE*FHVST
-      VCH4F(NZ,NY,NX)=VCH4F(NZ,NY,NX)-FCH4F*FFIRE*FHVST
-      VOXYF(NZ,NY,NX)=VOXYF(NZ,NY,NX)-(1.0-FCH4F)*FFIRE*FHVST*2.667
-      VNH3F(NZ,NY,NX)=VNH3F(NZ,NY,NX)-FFIRN*FHVSN
-      VN2OF(NZ,NY,NX)=VN2OF(NZ,NY,NX)-0.0
-      VPO4F(NZ,NY,NX)=VPO4F(NZ,NY,NX)-FFIRP*FHVSP
-      CNET(NZ,NY,NX)=CNET(NZ,NY,NX)-(1.0-FCH4F)*FFIRE*FHVST
-      TNBP(NY,NX)=TNBP(NY,NX)-FCH4F*FFIRE*FHVST
-      FHVST=(1.0-XHVST)*CFOPC(4,M,NZ,NY,NX)*(WTRT1(N,L,NR,NZ,NY,NX) &
-      +WTRT2(N,L,NR,NZ,NY,NX))*FWODR(1)
-      FHVSN=(1.0-XHVSN)*CFOPN(4,M,NZ,NY,NX)*(WTRT1N(N,L,NR,NZ,NY,NX) &
-      +WTRT2N(N,L,NR,NZ,NY,NX))*FWODRN(1)
-      FHVSP=(1.0-XHVSP)*CFOPP(4,M,NZ,NY,NX)*(WTRT1P(N,L,NR,NZ,NY,NX) &
-      +WTRT2P(N,L,NR,NZ,NY,NX))*FWODRP(1)
-      CSNC(M,1,L,NZ,NY,NX)=CSNC(M,1,L,NZ,NY,NX)+(1.0-FFIRE)*FHVST
-      ZSNC(M,1,L,NZ,NY,NX)=ZSNC(M,1,L,NZ,NY,NX)+(1.0-FFIRN)*FHVSN
-      PSNC(M,1,L,NZ,NY,NX)=PSNC(M,1,L,NZ,NY,NX)+(1.0-FFIRP)*FHVSP
-      VCO2F(NZ,NY,NX)=VCO2F(NZ,NY,NX)-(1.0-FCH4F)*FFIRE*FHVST
-      VCH4F(NZ,NY,NX)=VCH4F(NZ,NY,NX)-FCH4F*FFIRE*FHVST
-      VOXYF(NZ,NY,NX)=VOXYF(NZ,NY,NX)-(1.0-FCH4F)*FFIRE*FHVST*2.667
-      VNH3F(NZ,NY,NX)=VNH3F(NZ,NY,NX)-FFIRN*FHVSN
-      VN2OF(NZ,NY,NX)=VN2OF(NZ,NY,NX)-0.0
-      VPO4F(NZ,NY,NX)=VPO4F(NZ,NY,NX)-FFIRP*FHVSP
-      CNET(NZ,NY,NX)=CNET(NZ,NY,NX)-(1.0-FCH4F)*FFIRE*FHVST
-      TNBP(NY,NX)=TNBP(NY,NX)-FCH4F*FFIRE*FHVST
-      enddo
-3385  CONTINUE
-!     WRITE(*,6161)'FIRE',I,J,NZ,L,N,M,VCO2F(NZ,NY,NX),FFIRE
-!    2,FHVST,CFOPC(4,M,NZ,NY,NX),CPOOLR(N,L,NZ,NY,NX),THETW(L,NY,NX)
-!    3,CORGC(L,NY,NX)
-!6161  FORMAT(A8,6I4,20E12.4)
+        XHVST=1.0_r8-THIN(NZ,I,NY,NX)
+        DO 3985 N=1,MY(NZ,NY,NX)
+          DO 3980 L=NU(NY,NX),NJ(NY,NX)
+            IF(IHVST(NZ,I,NY,NX).NE.5)THEN
+              XHVST=1.0_r8-THIN(NZ,I,NY,NX)
+              XHVSN=XHVST
+              XHVSP=XHVST
+              FFIRE=0._r8
+              FFIRN=0._r8
+              FFIRP=0._r8
+            ELSE
+              IF(THETW(L,NY,NX).GT.FVLWB.OR.CORGC(L,NY,NX).LE.FORGC &
+                .OR.ITILL(I,NY,NX).NE.22)THEN
+                XHVST=1.0_r8
+                XHVSN=XHVST
+                XHVSP=XHVST
+                FFIRE=0._r8
+                FFIRN=0._r8
+                FFIRP=0._r8
+              ELSE
+                XHVST=1.0_r8-DCORP(I,NY,NX)*EHVST(1,3,NZ,I,NY,NX) &
+                  *AMIN1(1.0,(CORGC(L,NY,NX)-FORGC)/(0.55E+06-FORGC))
+                XHVSN=XHVST
+                XHVSP=XHVST
+                FFIRE=EHVST(2,3,NZ,I,NY,NX)
+                FFIRN=FFIRE*EFIRE(1,IHVST(NZ,I,NY,NX))
+                FFIRP=FFIRE*EFIRE(2,IHVST(NZ,I,NY,NX))
+              ENDIF
+            ENDIF
+            DO 3385 M=1,4
+              FHVST=(1.0-XHVST)*CFOPC(0,M,NZ,NY,NX)*CPOOLR(N,L,NZ,NY,NX)
+              FHVSN=(1.0-XHVSN)*CFOPN(0,M,NZ,NY,NX)*ZPOOLR(N,L,NZ,NY,NX)
+              FHVSP=(1.0-XHVSP)*CFOPP(0,M,NZ,NY,NX)*PPOOLR(N,L,NZ,NY,NX)
+              CSNC(M,1,L,NZ,NY,NX)=CSNC(M,1,L,NZ,NY,NX)+(1.0-FFIRE)*FHVST
+              ZSNC(M,1,L,NZ,NY,NX)=ZSNC(M,1,L,NZ,NY,NX)+(1.0-FFIRN)*FHVSN
+              PSNC(M,1,L,NZ,NY,NX)=PSNC(M,1,L,NZ,NY,NX)+(1.0-FFIRP)*FHVSP
+              VCO2F(NZ,NY,NX)=VCO2F(NZ,NY,NX)-(1.0-FCH4F)*FFIRE*FHVST
+              VCH4F(NZ,NY,NX)=VCH4F(NZ,NY,NX)-FCH4F*FFIRE*FHVST
+              VOXYF(NZ,NY,NX)=VOXYF(NZ,NY,NX)-(1.0-FCH4F)*FFIRE*FHVST*2.667
+              VNH3F(NZ,NY,NX)=VNH3F(NZ,NY,NX)-FFIRN*FHVSN
+              VN2OF(NZ,NY,NX)=VN2OF(NZ,NY,NX)-0.0
+              VPO4F(NZ,NY,NX)=VPO4F(NZ,NY,NX)-FFIRP*FHVSP
+              CNET(NZ,NY,NX)=CNET(NZ,NY,NX)-(1.0-FCH4F)*FFIRE*FHVST
+              TNBP(NY,NX)=TNBP(NY,NX)-FCH4F*FFIRE*FHVST
+              DO NR=1,NRT(NZ,NY,NX)
+                FHVST=(1.0-XHVST)*CFOPC(5,M,NZ,NY,NX)*(WTRT1(N,L,NR,NZ,NY,NX) &
+                  +WTRT2(N,L,NR,NZ,NY,NX))*FWODR(0)
+                FHVSN=(1.0-XHVSN)*CFOPN(5,M,NZ,NY,NX)*(WTRT1N(N,L,NR,NZ,NY,NX) &
+                  +WTRT2N(N,L,NR,NZ,NY,NX))*FWODRN(0)
+                FHVSP=(1.0-XHVSP)*CFOPP(5,M,NZ,NY,NX)*(WTRT1P(N,L,NR,NZ,NY,NX) &
+                  +WTRT2P(N,L,NR,NZ,NY,NX))*FWODRP(0)
+                CSNC(M,1,L,NZ,NY,NX)=CSNC(M,1,L,NZ,NY,NX)+(1.0-FFIRE)*FHVST
+                ZSNC(M,1,L,NZ,NY,NX)=ZSNC(M,1,L,NZ,NY,NX)+(1.0-FFIRN)*FHVSN
+                PSNC(M,1,L,NZ,NY,NX)=PSNC(M,1,L,NZ,NY,NX)+(1.0-FFIRP)*FHVSP
+                VCO2F(NZ,NY,NX)=VCO2F(NZ,NY,NX)-(1.0-FCH4F)*FFIRE*FHVST
+                VCH4F(NZ,NY,NX)=VCH4F(NZ,NY,NX)-FCH4F*FFIRE*FHVST
+                VOXYF(NZ,NY,NX)=VOXYF(NZ,NY,NX)-(1.0-FCH4F)*FFIRE*FHVST*2.667
+                VNH3F(NZ,NY,NX)=VNH3F(NZ,NY,NX)-FFIRN*FHVSN
+                VN2OF(NZ,NY,NX)=VN2OF(NZ,NY,NX)-0.0
+                VPO4F(NZ,NY,NX)=VPO4F(NZ,NY,NX)-FFIRP*FHVSP
+                CNET(NZ,NY,NX)=CNET(NZ,NY,NX)-(1.0-FCH4F)*FFIRE*FHVST
+                TNBP(NY,NX)=TNBP(NY,NX)-FCH4F*FFIRE*FHVST
+                FHVST=(1.0-XHVST)*CFOPC(4,M,NZ,NY,NX)*(WTRT1(N,L,NR,NZ,NY,NX) &
+                  +WTRT2(N,L,NR,NZ,NY,NX))*FWODR(1)
+                FHVSN=(1.0-XHVSN)*CFOPN(4,M,NZ,NY,NX)*(WTRT1N(N,L,NR,NZ,NY,NX) &
+                  +WTRT2N(N,L,NR,NZ,NY,NX))*FWODRN(1)
+                FHVSP=(1.0-XHVSP)*CFOPP(4,M,NZ,NY,NX)*(WTRT1P(N,L,NR,NZ,NY,NX) &
+                  +WTRT2P(N,L,NR,NZ,NY,NX))*FWODRP(1)
+                CSNC(M,1,L,NZ,NY,NX)=CSNC(M,1,L,NZ,NY,NX)+(1.0-FFIRE)*FHVST
+                ZSNC(M,1,L,NZ,NY,NX)=ZSNC(M,1,L,NZ,NY,NX)+(1.0-FFIRN)*FHVSN
+                PSNC(M,1,L,NZ,NY,NX)=PSNC(M,1,L,NZ,NY,NX)+(1.0-FFIRP)*FHVSP
+                VCO2F(NZ,NY,NX)=VCO2F(NZ,NY,NX)-(1.0-FCH4F)*FFIRE*FHVST
+                VCH4F(NZ,NY,NX)=VCH4F(NZ,NY,NX)-FCH4F*FFIRE*FHVST
+                VOXYF(NZ,NY,NX)=VOXYF(NZ,NY,NX)-(1.0-FCH4F)*FFIRE*FHVST*2.667
+                VNH3F(NZ,NY,NX)=VNH3F(NZ,NY,NX)-FFIRN*FHVSN
+                VN2OF(NZ,NY,NX)=VN2OF(NZ,NY,NX)-0.0
+                VPO4F(NZ,NY,NX)=VPO4F(NZ,NY,NX)-FFIRP*FHVSP
+                CNET(NZ,NY,NX)=CNET(NZ,NY,NX)-(1.0-FCH4F)*FFIRE*FHVST
+                TNBP(NY,NX)=TNBP(NY,NX)-FCH4F*FFIRE*FHVST
+              enddo
+3385        CONTINUE
 !
 !     RELEASE ROOT GAS CONTENTS DURING HARVESTING
 !
@@ -2836,30 +2830,30 @@ module grosubMod
 !     CO2P,OXYP,CH4P,Z2OP,ZH3P,H2GP=root aqueous CO2,O2,CH4,N2O,NH3,H2
 !     RCO2Z,ROXYZ,RCH4Z,RN2OZ,RNH3Z,RH2GZ=root gaseous CO2,O2,CH4,N2O,NH3,H2 loss from disturbance
 !
-      RCO2Z(NZ,NY,NX)=RCO2Z(NZ,NY,NX)-(1.0-XHVST) &
-      *(CO2A(N,L,NZ,NY,NX)+CO2P(N,L,NZ,NY,NX))
-      ROXYZ(NZ,NY,NX)=ROXYZ(NZ,NY,NX)-(1.0-XHVST) &
-      *(OXYA(N,L,NZ,NY,NX)+OXYP(N,L,NZ,NY,NX))
-      RCH4Z(NZ,NY,NX)=RCH4Z(NZ,NY,NX)-(1.0-XHVST) &
-      *(CH4A(N,L,NZ,NY,NX)+CH4P(N,L,NZ,NY,NX))
-      RN2OZ(NZ,NY,NX)=RN2OZ(NZ,NY,NX)-(1.0-XHVST) &
-      *(Z2OA(N,L,NZ,NY,NX)+Z2OP(N,L,NZ,NY,NX))
-      RNH3Z(NZ,NY,NX)=RNH3Z(NZ,NY,NX)-(1.0-XHVST) &
-      *(ZH3A(N,L,NZ,NY,NX)+ZH3P(N,L,NZ,NY,NX))
-      RH2GZ(NZ,NY,NX)=RH2GZ(NZ,NY,NX)-(1.0-XHVST) &
-      *(H2GA(N,L,NZ,NY,NX)+H2GP(N,L,NZ,NY,NX))
-      CO2A(N,L,NZ,NY,NX)=XHVST*CO2A(N,L,NZ,NY,NX)
-      OXYA(N,L,NZ,NY,NX)=XHVST*OXYA(N,L,NZ,NY,NX)
-      CH4A(N,L,NZ,NY,NX)=XHVST*CH4A(N,L,NZ,NY,NX)
-      Z2OA(N,L,NZ,NY,NX)=XHVST*Z2OA(N,L,NZ,NY,NX)
-      ZH3A(N,L,NZ,NY,NX)=XHVST*ZH3A(N,L,NZ,NY,NX)
-      H2GA(N,L,NZ,NY,NX)=XHVST*H2GA(N,L,NZ,NY,NX)
-      CO2P(N,L,NZ,NY,NX)=XHVST*CO2P(N,L,NZ,NY,NX)
-      OXYP(N,L,NZ,NY,NX)=XHVST*OXYP(N,L,NZ,NY,NX)
-      CH4P(N,L,NZ,NY,NX)=XHVST*CH4P(N,L,NZ,NY,NX)
-      Z2OP(N,L,NZ,NY,NX)=XHVST*Z2OP(N,L,NZ,NY,NX)
-      ZH3P(N,L,NZ,NY,NX)=XHVST*ZH3P(N,L,NZ,NY,NX)
-      H2GP(N,L,NZ,NY,NX)=XHVST*H2GP(N,L,NZ,NY,NX)
+            RCO2Z(NZ,NY,NX)=RCO2Z(NZ,NY,NX)-(1.0-XHVST) &
+              *(CO2A(N,L,NZ,NY,NX)+CO2P(N,L,NZ,NY,NX))
+            ROXYZ(NZ,NY,NX)=ROXYZ(NZ,NY,NX)-(1.0-XHVST) &
+              *(OXYA(N,L,NZ,NY,NX)+OXYP(N,L,NZ,NY,NX))
+            RCH4Z(NZ,NY,NX)=RCH4Z(NZ,NY,NX)-(1.0-XHVST) &
+              *(CH4A(N,L,NZ,NY,NX)+CH4P(N,L,NZ,NY,NX))
+            RN2OZ(NZ,NY,NX)=RN2OZ(NZ,NY,NX)-(1.0-XHVST) &
+              *(Z2OA(N,L,NZ,NY,NX)+Z2OP(N,L,NZ,NY,NX))
+            RNH3Z(NZ,NY,NX)=RNH3Z(NZ,NY,NX)-(1.0-XHVST) &
+              *(ZH3A(N,L,NZ,NY,NX)+ZH3P(N,L,NZ,NY,NX))
+            RH2GZ(NZ,NY,NX)=RH2GZ(NZ,NY,NX)-(1.0-XHVST) &
+              *(H2GA(N,L,NZ,NY,NX)+H2GP(N,L,NZ,NY,NX))
+            CO2A(N,L,NZ,NY,NX)=XHVST*CO2A(N,L,NZ,NY,NX)
+            OXYA(N,L,NZ,NY,NX)=XHVST*OXYA(N,L,NZ,NY,NX)
+            CH4A(N,L,NZ,NY,NX)=XHVST*CH4A(N,L,NZ,NY,NX)
+            Z2OA(N,L,NZ,NY,NX)=XHVST*Z2OA(N,L,NZ,NY,NX)
+            ZH3A(N,L,NZ,NY,NX)=XHVST*ZH3A(N,L,NZ,NY,NX)
+            H2GA(N,L,NZ,NY,NX)=XHVST*H2GA(N,L,NZ,NY,NX)
+            CO2P(N,L,NZ,NY,NX)=XHVST*CO2P(N,L,NZ,NY,NX)
+            OXYP(N,L,NZ,NY,NX)=XHVST*OXYP(N,L,NZ,NY,NX)
+            CH4P(N,L,NZ,NY,NX)=XHVST*CH4P(N,L,NZ,NY,NX)
+            Z2OP(N,L,NZ,NY,NX)=XHVST*Z2OP(N,L,NZ,NY,NX)
+            ZH3P(N,L,NZ,NY,NX)=XHVST*ZH3P(N,L,NZ,NY,NX)
+            H2GP(N,L,NZ,NY,NX)=XHVST*H2GP(N,L,NZ,NY,NX)
 !
 !     REDUCE ROOT STATE VARIABLES DURING HARVESTING
 !
@@ -2878,36 +2872,36 @@ module grosubMod
 !     RTARP=root surface area per plant
 !     RCO2M,RCO2N,RCO2A unlimited by O2,nonstructural C
 !
-      DO 3960 NR=1,NRT(NZ,NY,NX)
-      WTRT1(N,L,NR,NZ,NY,NX)=WTRT1(N,L,NR,NZ,NY,NX)*XHVST
-      WTRT2(N,L,NR,NZ,NY,NX)=WTRT2(N,L,NR,NZ,NY,NX)*XHVST
-      WTRT1N(N,L,NR,NZ,NY,NX)=WTRT1N(N,L,NR,NZ,NY,NX)*XHVSN
-      WTRT2N(N,L,NR,NZ,NY,NX)=WTRT2N(N,L,NR,NZ,NY,NX)*XHVSN
-      WTRT1P(N,L,NR,NZ,NY,NX)=WTRT1P(N,L,NR,NZ,NY,NX)*XHVSP
-      WTRT2P(N,L,NR,NZ,NY,NX)=WTRT2P(N,L,NR,NZ,NY,NX)*XHVSP
-      RTWT1(N,NR,NZ,NY,NX)=RTWT1(N,NR,NZ,NY,NX)*XHVST
-      RTWT1N(N,NR,NZ,NY,NX)=RTWT1N(N,NR,NZ,NY,NX)*XHVST
-      RTWT1P(N,NR,NZ,NY,NX)=RTWT1P(N,NR,NZ,NY,NX)*XHVST
-      RTLG1(N,L,NR,NZ,NY,NX)=RTLG1(N,L,NR,NZ,NY,NX)*XHVST
-      RTLG2(N,L,NR,NZ,NY,NX)=RTLG2(N,L,NR,NZ,NY,NX)*XHVST
-      RTN2(N,L,NR,NZ,NY,NX)=RTN2(N,L,NR,NZ,NY,NX)*XHVST
-3960  CONTINUE
-      CPOOLR(N,L,NZ,NY,NX)=CPOOLR(N,L,NZ,NY,NX)*XHVST
-      ZPOOLR(N,L,NZ,NY,NX)=ZPOOLR(N,L,NZ,NY,NX)*XHVSN
-      PPOOLR(N,L,NZ,NY,NX)=PPOOLR(N,L,NZ,NY,NX)*XHVSP
-      WTRTL(N,L,NZ,NY,NX)=WTRTL(N,L,NZ,NY,NX)*XHVST
-      WTRTD(N,L,NZ,NY,NX)=WTRTD(N,L,NZ,NY,NX)*XHVST
-      WSRTL(N,L,NZ,NY,NX)=WSRTL(N,L,NZ,NY,NX)*XHVST
-      RTN1(N,L,NZ,NY,NX)=RTN1(N,L,NZ,NY,NX)*XHVST
-      RTNL(N,L,NZ,NY,NX)=RTNL(N,L,NZ,NY,NX)*XHVST
-      RTLGP(N,L,NZ,NY,NX)=RTLGP(N,L,NZ,NY,NX)*XHVST
-      RTDNP(N,L,NZ,NY,NX)=RTDNP(N,L,NZ,NY,NX)*XHVST
-      RTVLP(N,L,NZ,NY,NX)=RTVLP(N,L,NZ,NY,NX)*XHVST
-      RTVLW(N,L,NZ,NY,NX)=RTVLW(N,L,NZ,NY,NX)*XHVST
-      RTARP(N,L,NZ,NY,NX)=RTARP(N,L,NZ,NY,NX)*XHVST
-      RCO2M(N,L,NZ,NY,NX)=RCO2M(N,L,NZ,NY,NX)*XHVST
-      RCO2N(N,L,NZ,NY,NX)=RCO2N(N,L,NZ,NY,NX)*XHVST
-      RCO2A(N,L,NZ,NY,NX)=RCO2A(N,L,NZ,NY,NX)*XHVST
+            DO 3960 NR=1,NRT(NZ,NY,NX)
+              WTRT1(N,L,NR,NZ,NY,NX)=WTRT1(N,L,NR,NZ,NY,NX)*XHVST
+              WTRT2(N,L,NR,NZ,NY,NX)=WTRT2(N,L,NR,NZ,NY,NX)*XHVST
+              WTRT1N(N,L,NR,NZ,NY,NX)=WTRT1N(N,L,NR,NZ,NY,NX)*XHVSN
+              WTRT2N(N,L,NR,NZ,NY,NX)=WTRT2N(N,L,NR,NZ,NY,NX)*XHVSN
+              WTRT1P(N,L,NR,NZ,NY,NX)=WTRT1P(N,L,NR,NZ,NY,NX)*XHVSP
+              WTRT2P(N,L,NR,NZ,NY,NX)=WTRT2P(N,L,NR,NZ,NY,NX)*XHVSP
+              RTWT1(N,NR,NZ,NY,NX)=RTWT1(N,NR,NZ,NY,NX)*XHVST
+              RTWT1N(N,NR,NZ,NY,NX)=RTWT1N(N,NR,NZ,NY,NX)*XHVST
+              RTWT1P(N,NR,NZ,NY,NX)=RTWT1P(N,NR,NZ,NY,NX)*XHVST
+              RTLG1(N,L,NR,NZ,NY,NX)=RTLG1(N,L,NR,NZ,NY,NX)*XHVST
+              RTLG2(N,L,NR,NZ,NY,NX)=RTLG2(N,L,NR,NZ,NY,NX)*XHVST
+              RTN2(N,L,NR,NZ,NY,NX)=RTN2(N,L,NR,NZ,NY,NX)*XHVST
+3960        CONTINUE
+            CPOOLR(N,L,NZ,NY,NX)=CPOOLR(N,L,NZ,NY,NX)*XHVST
+            ZPOOLR(N,L,NZ,NY,NX)=ZPOOLR(N,L,NZ,NY,NX)*XHVSN
+            PPOOLR(N,L,NZ,NY,NX)=PPOOLR(N,L,NZ,NY,NX)*XHVSP
+            WTRTL(N,L,NZ,NY,NX)=WTRTL(N,L,NZ,NY,NX)*XHVST
+            WTRTD(N,L,NZ,NY,NX)=WTRTD(N,L,NZ,NY,NX)*XHVST
+            WSRTL(N,L,NZ,NY,NX)=WSRTL(N,L,NZ,NY,NX)*XHVST
+            RTN1(N,L,NZ,NY,NX)=RTN1(N,L,NZ,NY,NX)*XHVST
+            RTNL(N,L,NZ,NY,NX)=RTNL(N,L,NZ,NY,NX)*XHVST
+            RTLGP(N,L,NZ,NY,NX)=RTLGP(N,L,NZ,NY,NX)*XHVST
+            RTDNP(N,L,NZ,NY,NX)=RTDNP(N,L,NZ,NY,NX)*XHVST
+            RTVLP(N,L,NZ,NY,NX)=RTVLP(N,L,NZ,NY,NX)*XHVST
+            RTVLW(N,L,NZ,NY,NX)=RTVLW(N,L,NZ,NY,NX)*XHVST
+            RTARP(N,L,NZ,NY,NX)=RTARP(N,L,NZ,NY,NX)*XHVST
+            RCO2M(N,L,NZ,NY,NX)=RCO2M(N,L,NZ,NY,NX)*XHVST
+            RCO2N(N,L,NZ,NY,NX)=RCO2N(N,L,NZ,NY,NX)*XHVST
+            RCO2A(N,L,NZ,NY,NX)=RCO2A(N,L,NZ,NY,NX)*XHVST
 !
 !     NODULE LITTERFALL AND STATE VARIABLES DURING HARVESTING
 !
@@ -2917,27 +2911,27 @@ module grosubMod
 !     WTNDL,WTNDLN,WTNDLP=bacterial C,N,P mass
 !     CPOOLN,ZPOOLN,PPOOLN=nonstructural C,N,P in bacteria
 !
-      IF(INTYP(NZ,NY,NX).NE.0.AND.N.EQ.1)THEN
-      DO 3395 M=1,4
-      CSNC(M,1,L,NZ,NY,NX)=CSNC(M,1,L,NZ,NY,NX)+(1.0-XHVST) &
-      *(CFOPC(4,M,NZ,NY,NX)*WTNDL(L,NZ,NY,NX) &
-      +CFOPC(0,M,NZ,NY,NX)*CPOOLN(L,NZ,NY,NX))
-      ZSNC(M,1,L,NZ,NY,NX)=ZSNC(M,1,L,NZ,NY,NX)+(1.0-XHVSN) &
-      *(CFOPN(4,M,NZ,NY,NX)*WTNDLN(L,NZ,NY,NX) &
-      +CFOPN(0,M,NZ,NY,NX)*ZPOOLN(L,NZ,NY,NX))
-      PSNC(M,1,L,NZ,NY,NX)=PSNC(M,1,L,NZ,NY,NX)+(1.0-XHVSP) &
-      *(CFOPP(4,M,NZ,NY,NX)*WTNDLP(L,NZ,NY,NX) &
-      +CFOPP(0,M,NZ,NY,NX)*PPOOLN(L,NZ,NY,NX))
-3395  CONTINUE
-      WTNDL(L,NZ,NY,NX)=WTNDL(L,NZ,NY,NX)*XHVST
-      WTNDLN(L,NZ,NY,NX)=WTNDLN(L,NZ,NY,NX)*XHVSN
-      WTNDLP(L,NZ,NY,NX)=WTNDLP(L,NZ,NY,NX)*XHVSP
-      CPOOLN(L,NZ,NY,NX)=CPOOLN(L,NZ,NY,NX)*XHVST
-      ZPOOLN(L,NZ,NY,NX)=ZPOOLN(L,NZ,NY,NX)*XHVSN
-      PPOOLN(L,NZ,NY,NX)=PPOOLN(L,NZ,NY,NX)*XHVSP
-      ENDIF
-3980  CONTINUE
-3985  CONTINUE
+            IF(INTYP(NZ,NY,NX).NE.0.AND.N.EQ.1)THEN
+              DO 3395 M=1,4
+                CSNC(M,1,L,NZ,NY,NX)=CSNC(M,1,L,NZ,NY,NX)+(1.0-XHVST) &
+                  *(CFOPC(4,M,NZ,NY,NX)*WTNDL(L,NZ,NY,NX) &
+                  +CFOPC(0,M,NZ,NY,NX)*CPOOLN(L,NZ,NY,NX))
+                ZSNC(M,1,L,NZ,NY,NX)=ZSNC(M,1,L,NZ,NY,NX)+(1.0-XHVSN) &
+                  *(CFOPN(4,M,NZ,NY,NX)*WTNDLN(L,NZ,NY,NX) &
+                  +CFOPN(0,M,NZ,NY,NX)*ZPOOLN(L,NZ,NY,NX))
+                PSNC(M,1,L,NZ,NY,NX)=PSNC(M,1,L,NZ,NY,NX)+(1.0-XHVSP) &
+                  *(CFOPP(4,M,NZ,NY,NX)*WTNDLP(L,NZ,NY,NX) &
+                  +CFOPP(0,M,NZ,NY,NX)*PPOOLN(L,NZ,NY,NX))
+3395          CONTINUE
+              WTNDL(L,NZ,NY,NX)=WTNDL(L,NZ,NY,NX)*XHVST
+              WTNDLN(L,NZ,NY,NX)=WTNDLN(L,NZ,NY,NX)*XHVSN
+              WTNDLP(L,NZ,NY,NX)=WTNDLP(L,NZ,NY,NX)*XHVSP
+              CPOOLN(L,NZ,NY,NX)=CPOOLN(L,NZ,NY,NX)*XHVST
+              ZPOOLN(L,NZ,NY,NX)=ZPOOLN(L,NZ,NY,NX)*XHVSN
+              PPOOLN(L,NZ,NY,NX)=PPOOLN(L,NZ,NY,NX)*XHVSP
+            ENDIF
+3980      CONTINUE
+3985    CONTINUE
 !
 !     STORAGE LITTERFALL AND STATE VARIABLES DURING HARVESTING
 !
@@ -2947,28 +2941,28 @@ module grosubMod
 !     XHVST,XHVSN,XHVSP=fraction of root C,N,P remaining after disturbance
 !     WTRVC,WTRVN,WTRVP=storage C,N,P
 !
-      IF(ISTYP(NZ,NY,NX).NE.0)THEN
-      DO 3400 M=1,4
-      CSNC(M,0,NG(NZ,NY,NX),NZ,NY,NX)=CSNC(M,0,NG(NZ,NY,NX),NZ,NY,NX) &
-      +((1.0-XHVST)*CFOPC(0,M,NZ,NY,NX)*WTRVC(NZ,NY,NX))*FWOOD(0)
-      ZSNC(M,0,NG(NZ,NY,NX),NZ,NY,NX)=ZSNC(M,0,NG(NZ,NY,NX),NZ,NY,NX) &
-      +((1.0-XHVSN)*CFOPN(0,M,NZ,NY,NX)*WTRVN(NZ,NY,NX))*FWOODN(0)
-      PSNC(M,0,NG(NZ,NY,NX),NZ,NY,NX)=PSNC(M,0,NG(NZ,NY,NX),NZ,NY,NX) &
-      +((1.0-XHVSP)*CFOPP(0,M,NZ,NY,NX)*WTRVP(NZ,NY,NX))*FWOODP(0)
-      CSNC(M,1,NG(NZ,NY,NX),NZ,NY,NX)=CSNC(M,1,NG(NZ,NY,NX),NZ,NY,NX) &
-      +((1.0-XHVST)*CFOPC(0,M,NZ,NY,NX)*WTRVC(NZ,NY,NX))*FWOOD(1)
-      ZSNC(M,1,NG(NZ,NY,NX),NZ,NY,NX)=ZSNC(M,1,NG(NZ,NY,NX),NZ,NY,NX) &
-      +((1.0-XHVSN)*CFOPN(0,M,NZ,NY,NX)*WTRVN(NZ,NY,NX))*FWOODN(1)
-      PSNC(M,1,NG(NZ,NY,NX),NZ,NY,NX)=PSNC(M,1,NG(NZ,NY,NX),NZ,NY,NX) &
-      +((1.0-XHVSP)*CFOPP(0,M,NZ,NY,NX)*WTRVP(NZ,NY,NX))*FWOODP(1)
-3400  CONTINUE
-      WTRVC(NZ,NY,NX)=WTRVC(NZ,NY,NX)*XHVST
-      WTRVN(NZ,NY,NX)=WTRVN(NZ,NY,NX)*XHVSN
-      WTRVP(NZ,NY,NX)=WTRVP(NZ,NY,NX)*XHVSP
-      ENDIF
-      ENDIF
-      ENDIF
-      end subroutine RemoveBiomByHarvest
+        IF(ISTYP(NZ,NY,NX).NE.0)THEN
+          DO 3400 M=1,4
+            CSNC(M,0,NG(NZ,NY,NX),NZ,NY,NX)=CSNC(M,0,NG(NZ,NY,NX),NZ,NY,NX) &
+              +((1.0-XHVST)*CFOPC(0,M,NZ,NY,NX)*WTRVC(NZ,NY,NX))*FWOOD(0)
+            ZSNC(M,0,NG(NZ,NY,NX),NZ,NY,NX)=ZSNC(M,0,NG(NZ,NY,NX),NZ,NY,NX) &
+              +((1.0-XHVSN)*CFOPN(0,M,NZ,NY,NX)*WTRVN(NZ,NY,NX))*FWOODN(0)
+            PSNC(M,0,NG(NZ,NY,NX),NZ,NY,NX)=PSNC(M,0,NG(NZ,NY,NX),NZ,NY,NX) &
+              +((1.0-XHVSP)*CFOPP(0,M,NZ,NY,NX)*WTRVP(NZ,NY,NX))*FWOODP(0)
+            CSNC(M,1,NG(NZ,NY,NX),NZ,NY,NX)=CSNC(M,1,NG(NZ,NY,NX),NZ,NY,NX) &
+              +((1.0-XHVST)*CFOPC(0,M,NZ,NY,NX)*WTRVC(NZ,NY,NX))*FWOOD(1)
+            ZSNC(M,1,NG(NZ,NY,NX),NZ,NY,NX)=ZSNC(M,1,NG(NZ,NY,NX),NZ,NY,NX) &
+              +((1.0-XHVSN)*CFOPN(0,M,NZ,NY,NX)*WTRVN(NZ,NY,NX))*FWOODN(1)
+            PSNC(M,1,NG(NZ,NY,NX),NZ,NY,NX)=PSNC(M,1,NG(NZ,NY,NX),NZ,NY,NX) &
+              +((1.0-XHVSP)*CFOPP(0,M,NZ,NY,NX)*WTRVP(NZ,NY,NX))*FWOODP(1)
+3400      CONTINUE
+          WTRVC(NZ,NY,NX)=WTRVC(NZ,NY,NX)*XHVST
+          WTRVN(NZ,NY,NX)=WTRVN(NZ,NY,NX)*XHVSN
+          WTRVP(NZ,NY,NX)=WTRVP(NZ,NY,NX)*XHVSP
+        ENDIF
+    ENDIF
+  ENDIF
+  end subroutine RemoveBiomByHarvest
 !------------------------------------------------------------------------------------------
 
   subroutine RootNoduleBiomchemistry(I,J,NZ,NY,NX,TFN6,WFNGR)
@@ -2979,6 +2973,13 @@ module grosubMod
   integer :: L,M
   real(r8) :: ZADDN
   real(r8) :: ZPOOLD
+  real(r8) :: CCC,CNC,CPC
+  real(r8) :: CPOOLT
+  real(r8) :: CPOOLD
+  real(r8) :: CCPOLN,CZPOLN
+  real(r8) :: CPPOLN
+  real(r8) :: CGNDL,CPOOLNX
+  real(r8) :: CCNDLR
 !     begin_execution
 !     INTYP=N2 fixation: 1,2,3=rapid to slow root symbiosis
 !     WTNDL,WTNDLN,WTNDLP=bacterial C,N,P mass
@@ -3320,7 +3321,7 @@ module grosubMod
   integer, intent(in) :: NZ,NY,NX
   integer :: N,L,K,NR
   REAL(R8) :: RTDPL(10,JZ)
-
+  real(r8) :: CUPRL,CUPRO,CUPRC
 !     FOR ROOTS (N=1) AND MYCORRHIZAE (N=2) IN EACH SOIL LAYER
 
   DO 4995 N=1,MY(NZ,NY,NX)
@@ -3473,89 +3474,32 @@ module grosubMod
   end subroutine SummarizeRootSink
 !------------------------------------------------------------------------------------------
 
-  subroutine RootBiochemistry(I,J,NZ,NY,NX,ICHK1,IDTHRN,NRX,TFN6,WFNGR)
+  subroutine GrowRootAxes(N,L,L1,NZ,NY,NX,NRX,WFNGR,ICHK1,WFNR,WFNRG,TFN6,DMRTD)
   implicit none
-  integer, intent(in) :: I,J,NZ,NY,NX
-  integer, intent(inout) :: ICHK1(2,JZ)
-  integer, intent(out) :: IDTHRN
-  INTEGER, Intent(inout) :: NRX(2,JZ)
+  INTEGER, INTENT(IN) :: N,L,L1,NZ,NY,NX
+  integer, intent(inout) :: NRX(2,JZ)
   real(r8), intent(in) :: TFN6(JZ)
-  real(r8), intent(out) :: WFNGR(2,JZ)
-
-  integer :: LL,LZ,L1,L,K,lx,M,NR,N
-  real(r8) :: WFNR
-  real(r8) :: WFNRG,FSNC2
+  real(r8), intent(in) :: WFNGR(2,JZ)
+  real(r8), intent(in) :: DMRTD
+  integer, intent(inout) :: ICHK1(2,JZ)
+  real(r8), intent(inout):: WFNR,WFNRG
+  real(r8) :: CNPG
+  real(r8) :: CCC,CNC,CPC
+  real(r8) :: FSNC2
   real(r8) :: ZADD1,ZADD1M,ZADD2,ZADD2M
   real(r8) :: ZPOOLB
+  real(r8) :: CGRORM
+  real(r8) :: CGROR
+  real(r8) :: DMRTR
+  real(r8) :: FNP
+  integer :: NR,M,LL,LX
+!begin_execution
 
-!     begin_execution
-
-  NIX(NZ,NY,NX)=NG(NZ,NY,NX)
-  IDTHRN=0
-!
-!
-
-  call SummarizeRootSink(NZ,NY,NX)
-
-!
-!     RESPIRATION AND GROWTH OF ROOT, MYCORRHIZAE IN EACH LAYER
-!
-      DO 5010 N=1,MY(NZ,NY,NX)
-        DO 5000 L=NU(NY,NX),NI(NZ,NY,NX)
-!
-!     IDENTIFY NEXT LOWER ROOT LAYER
-!
-!     VOLX=soil layer volume excluding macropore, rocks
-!
-          IF(VOLX(L,NY,NX).GT.ZEROS2(NY,NX))THEN
-!     WRITE(*,4994)'5004',I,J,NZ,N,L,NI(NZ,NY,NX)
-!    2,NL(NY,NX),VOLX(L,NY,NX),CDPTHZ(L-1,NY,NX)
-            DO 5003 LZ=L+1,NL(NY,NX)
-!     WRITE(*,4994)'5003',I,J,NZ,N,L,LZ
-!    2,LZ,VOLX(L,NY,NX),CDPTHZ(LZ,NY,NX)
-              IF(VOLX(LZ,NY,NX).GT.ZEROS2(NY,NX) &
-                .OR.LZ.EQ.NL(NY,NX))THEN
-                L1=LZ
-                EXIT
-              ENDIF
-5003        CONTINUE
-!     WRITE(*,4994)'5005',I,J,NZ,N,L,LZ
-!    2,L1,VOLX(L,NY,NX),CDPTHZ(L1,NY,NX)
-!4994  FORMAT(A8,7I4,12E12.4)
-!
-!     WATER STRESS CONSTRAINT ON SECONDARY ROOT EXTENSION IMPOSED
-!     BY ROOT TURGOR AND SOIL PENETRATION RESISTANCE
-!
-!     RSCS,RSCS2=soil resistance to secondary root penetration (MPa)
-!     RRAD2=secondary root radius
-!     WFNR=water function for root extension
-!     IGTYP=growth type:0=bryophyte,1=graminoid,2=shrub,tree
-!     WFNGR,WFNRG=growth,respiration function of root water potential
-!     PSIRT,PSIRG=root total,turgor water potential
-!     DMRT=root growth yield
-!
-            RSCS2=RSCS(L,NY,NX)*RRAD2(N,L,NZ,NY,NX)/1.0E-03
-            WFNR=AMIN1(1.0,AMAX1(0.0,PSIRG(N,L,NZ,NY,NX)-PSILM-RSCS2))
-            IF(IGTYP(NZ,NY,NX).EQ.0)THEN
-              WFNGR(N,L)=EXP(0.05*PSIRT(N,L,NZ,NY,NX))
-              WFNRG=WFNR**0.10
-            ELSE
-              WFNGR(N,L)=EXP(0.10*PSIRT(N,L,NZ,NY,NX))
-              WFNRG=WFNR**0.25
-            ENDIF
-            DMRTD=1.0_r8-DMRT(NZ,NY,NX)
-            RTLGL=0._r8
-            RTLGZ=0._r8
-            WTRTX=0._r8
-            WTRTZ=0._r8
-!
-!     FOR EACH ROOT AXIS
-!
-            DO 5050 NR=1,NRT(NZ,NY,NX)
+  DO 5050 NR=1,NRT(NZ,NY,NX)
 !
 !     SECONDARY ROOT EXTENSION
 !
-              IF(L.LE.NINR(NR,NZ,NY,NX).AND.NRX(N,NR).EQ.0)THEN
+    IF(L.LE.NINR(NR,NZ,NY,NX).AND.NRX(N,NR).EQ.0)THEN
 !
 !     FRACTION OF SECONDARY ROOT SINK IN SOIL LAYER ATTRIBUTED
 !     TO CURRENT AXIS
@@ -3564,11 +3508,11 @@ module grosubMod
 !     RLNT=total root sink strength
 !     FRTN=fraction of secondary root sink strength in axis
 !
-                IF(RLNT(N,L).GT.ZEROP(NZ,NY,NX))THEN
-                  FRTN=RTSK2(N,L,NR)/RLNT(N,L)
-                ELSE
-                  FRTN=1.0_r8
-                ENDIF
+      IF(RLNT(N,L).GT.ZEROP(NZ,NY,NX))THEN
+        FRTN=RTSK2(N,L,NR)/RLNT(N,L)
+      ELSE
+        FRTN=1.0_r8
+      ENDIF
 !
 !     N,P CONSTRAINT ON SECONDARY ROOT RESPIRATION FROM
 !     NON-STRUCTURAL C:N:P
@@ -3577,13 +3521,13 @@ module grosubMod
 !     CNPG=N,P constraint on growth respiration
 !     CNKI,CPKI=nonstructural N,P inhibition constant on growth
 !
-                IF(CCPOLR(N,L,NZ,NY,NX).GT.ZERO)THEN
-                  CNPG=AMIN1(CZPOLR(N,L,NZ,NY,NX)/(CZPOLR(N,L,NZ,NY,NX) &
-                    +CCPOLR(N,L,NZ,NY,NX)*CNKI),CPPOLR(N,L,NZ,NY,NX) &
-                    /(CPPOLR(N,L,NZ,NY,NX)+CCPOLR(N,L,NZ,NY,NX)*CPKI))
-                ELSE
-                  CNPG=1.0_r8
-                ENDIF
+      IF(CCPOLR(N,L,NZ,NY,NX).GT.ZERO)THEN
+        CNPG=AMIN1(CZPOLR(N,L,NZ,NY,NX)/(CZPOLR(N,L,NZ,NY,NX) &
+          +CCPOLR(N,L,NZ,NY,NX)*CNKI),CPPOLR(N,L,NZ,NY,NX) &
+          /(CPPOLR(N,L,NZ,NY,NX)+CCPOLR(N,L,NZ,NY,NX)*CPKI))
+      ELSE
+        CNPG=1.0_r8
+      ENDIF
 !
 !     SECONDARY ROOT MAINTENANCE RESPIRATION FROM SOIL TEMPERATURE,
 !     ROOT STRUCTURAL N
@@ -3596,10 +3540,10 @@ module grosubMod
 !     IWTYP=phenology type:0=evergreen,1=cold decid,2=drought decid,3=1+2
 !     WFNGR=growth function of root water potential
 !
-                RMNCR=AMAX1(0.0,RMPLT*WTRT2N(N,L,NR,NZ,NY,NX))*TFN6(L)
-                IF(IGTYP(NZ,NY,NX).EQ.0.OR.IWTYP(NZ,NY,NX).EQ.2)THEN
-                  RMNCR=RMNCR*WFNGR(N,L)
-                ENDIF
+      RMNCR=AMAX1(0.0,RMPLT*WTRT2N(N,L,NR,NZ,NY,NX))*TFN6(L)
+      IF(IGTYP(NZ,NY,NX).EQ.0.OR.IWTYP(NZ,NY,NX).EQ.2)THEN
+        RMNCR=RMNCR*WFNGR(N,L)
+      ENDIF
 !
 !     O2-UNLIMITED SECONDARY ROOT RESPIRATION FROM NON-STRUCTURAL C
 !     CONSTRAINED BY TEMPERATURE AND NON-STRUCTURAL C:N:P
@@ -3612,9 +3556,8 @@ module grosubMod
 !     FDBKX=termination feedback inhibition on C3 CO2
 !     WFNGR=growth function of root water potential
 !
-                RCO2RM=AMAX1(0.0,VMXC*FRTN*CPOOLR(N,L,NZ,NY,NX) &
-                  *TFN4(L,NZ,NY,NX))*CNPG*FDBKX(NB1(NZ,NY,NX),NZ,NY,NX) &
-                  *WFNGR(N,L)
+      RCO2RM=AMAX1(0.0,VMXC*FRTN*CPOOLR(N,L,NZ,NY,NX) &
+        *TFN4(L,NZ,NY,NX))*CNPG*FDBKX(NB1(NZ,NY,NX),NZ,NY,NX)*WFNGR(N,L)
 !
 !     O2-LIMITED SECONDARY ROOT RESPIRATION FROM 'WFR' IN 'UPTAKE'
 !
@@ -3624,11 +3567,11 @@ module grosubMod
 !     RCO2YM,RCO2Y=growth respiration unltd,ltd by O2 and unlimited by N,P
 !     WFNRG=respiration function of root water potential
 !
-                RCO2R=RCO2RM*WFR(N,L,NZ,NY,NX)
-                RCO2XM=RCO2RM-RMNCR
-                RCO2X=RCO2R-RMNCR
-                RCO2YM=AMAX1(0.0,RCO2XM)*WFNRG
-                RCO2Y=AMAX1(0.0,RCO2X)*WFNRG
+      RCO2R=RCO2RM*WFR(N,L,NZ,NY,NX)
+      RCO2XM=RCO2RM-RMNCR
+      RCO2X=RCO2R-RMNCR
+      RCO2YM=AMAX1(0.0,RCO2XM)*WFNRG
+      RCO2Y=AMAX1(0.0,RCO2X)*WFNRG
 !
 !     SECONDARY ROOT GROWTH RESPIRATION MAY BE LIMITED BY
 !     NON-STRUCTURAL N,P AVAILABLE FOR GROWTH
@@ -3639,21 +3582,21 @@ module grosubMod
 !     FNP=growth respiration limited by non-structural N,P
 !     RCO2GM,RCO2G=growth respiration limited by N,P unltd,ltd by O2
 !
-                DMRTR=DMRTD*FRTN
-                ZPOOLB=AMAX1(0.0,ZPOOLR(N,L,NZ,NY,NX))
-                PPOOLB=AMAX1(0.0,PPOOLR(N,L,NZ,NY,NX))
-                FNP=AMIN1(ZPOOLB*DMRTR/CNRTS(NZ,NY,NX) &
-                  ,PPOOLB*DMRTR/CPRTS(NZ,NY,NX))
-                IF(RCO2YM.GT.0.0)THEN
-                  RCO2GM=AMIN1(RCO2YM,FNP)
-                ELSE
-                  RCO2GM=0._r8
-                ENDIF
-                IF(RCO2Y.GT.0.0)THEN
-                  RCO2G=AMIN1(RCO2Y,FNP*WFR(N,L,NZ,NY,NX))
-                ELSE
-                  RCO2G=0._r8
-                ENDIF
+      DMRTR=DMRTD*FRTN
+      ZPOOLB=AMAX1(0.0,ZPOOLR(N,L,NZ,NY,NX))
+      PPOOLB=AMAX1(0.0,PPOOLR(N,L,NZ,NY,NX))
+      FNP=AMIN1(ZPOOLB*DMRTR/CNRTS(NZ,NY,NX) &
+        ,PPOOLB*DMRTR/CPRTS(NZ,NY,NX))
+      IF(RCO2YM.GT.0.0)THEN
+        RCO2GM=AMIN1(RCO2YM,FNP)
+      ELSE
+        RCO2GM=0._r8
+      ENDIF
+      IF(RCO2Y.GT.0.0)THEN
+        RCO2G=AMIN1(RCO2Y,FNP*WFR(N,L,NZ,NY,NX))
+      ELSE
+        RCO2G=0._r8
+      ENDIF
 !
 !     TOTAL NON-STRUCTURAL C,N,P USED IN SECONDARY ROOT GROWTH
 !     AND GROWTH RESPIRATION DEPENDS ON GROWTH YIELD ENTERED IN 'READQ'
@@ -3666,15 +3609,15 @@ module grosubMod
 !     ZADD2M,ZADD2,PADD2=nonstructural N,P unlimited,limited by O2 used in growth
 !     CNRDM,CNRDA=respiration for N assimilation unltd,ltd by O2
 !
-                CGRORM=RCO2GM/DMRTD
-                CGROR=RCO2G/DMRTD
-                GRTWGM=CGRORM*DMRT(NZ,NY,NX)
-                GRTWTG=CGROR*DMRT(NZ,NY,NX)
-                ZADD2M=AMAX1(0.0,GRTWGM*CNRTW)
-                ZADD2=AMAX1(0.0,AMIN1(FRTN*ZPOOLR(N,L,NZ,NY,NX),GRTWTG*CNRTW))
-                PADD2=AMAX1(0.0,AMIN1(FRTN*PPOOLR(N,L,NZ,NY,NX),GRTWTG*CPRTW))
-                CNRDM=AMAX1(0.0,1.70*ZADD2M)
-                CNRDA=AMAX1(0.0,1.70*ZADD2)
+      CGRORM=RCO2GM/DMRTD
+      CGROR=RCO2G/DMRTD
+      GRTWGM=CGRORM*DMRT(NZ,NY,NX)
+      GRTWTG=CGROR*DMRT(NZ,NY,NX)
+      ZADD2M=AMAX1(0.0,GRTWGM*CNRTW)
+      ZADD2=AMAX1(0.0,AMIN1(FRTN*ZPOOLR(N,L,NZ,NY,NX),GRTWTG*CNRTW))
+      PADD2=AMAX1(0.0,AMIN1(FRTN*PPOOLR(N,L,NZ,NY,NX),GRTWTG*CPRTW))
+      CNRDM=AMAX1(0.0,1.70*ZADD2M)
+      CNRDA=AMAX1(0.0,1.70*ZADD2)
 !
 !     SECONDARY ROOT GROWTH RESPIRATION FROM TOTAL - MAINTENANCE
 !     IF > 0 DRIVES GROWTH, IF < 0 DRIVES REMOBILIZATION, ALSO
@@ -3687,27 +3630,25 @@ module grosubMod
 !     RCCZR,RCCYR=min,max fractions for root C recycling
 !     RCCXR,RCCQR=max fractions for root N,P recycling
 !
-                IF(IDAY(1,NB1(NZ,NY,NX),NZ,NY,NX).NE.0 &
-                  .AND.CCPOLR(N,L,NZ,NY,NX).GT.ZERO)THEN
-                  CCC=AMAX1(0.0,AMIN1(1.0 &
-                    ,safe_adb(CZPOLR(N,L,NZ,NY,NX),CZPOLR(N,L,NZ,NY,NX) &
-                    +CCPOLR(N,L,NZ,NY,NX)*CNKI) &
-                    ,safe_adb(CPPOLR(N,L,NZ,NY,NX),CPPOLR(N,L,NZ,NY,NX) &
-                    +CCPOLR(N,L,NZ,NY,NX)*CPKI)))
-                  CNC=AMAX1(0.0,AMIN1(1.0 &
-                    ,safe_adb(CCPOLR(N,L,NZ,NY,NX),CCPOLR(N,L,NZ,NY,NX) &
-                    +CZPOLR(N,L,NZ,NY,NX)/CNKI)))
-                  CPC=AMAX1(0.0,AMIN1(1.0 &
-                    ,safe_adb(CCPOLR(N,L,NZ,NY,NX),CCPOLR(N,L,NZ,NY,NX) &
-                    +CPPOLR(N,L,NZ,NY,NX)/CPKI)))
-                ELSE
-                  CCC=0._r8
-                  CNC=0._r8
-                  CPC=0._r8
-                ENDIF
-                RCCC=RCCZR+CCC*RCCYR
-                RCCN=CNC*RCCXR
-                RCCP=CPC*RCCQR
+      IF(IDAY(1,NB1(NZ,NY,NX),NZ,NY,NX).NE.0.AND.CCPOLR(N,L,NZ,NY,NX).GT.ZERO)THEN
+        CCC=AMAX1(0.0,AMIN1(1.0,safe_adb(CZPOLR(N,L,NZ,NY,NX),CZPOLR(N,L,NZ,NY,NX) &
+          +CCPOLR(N,L,NZ,NY,NX)*CNKI) &
+          ,safe_adb(CPPOLR(N,L,NZ,NY,NX),CPPOLR(N,L,NZ,NY,NX) &
+          +CCPOLR(N,L,NZ,NY,NX)*CPKI)))
+        CNC=AMAX1(0.0,AMIN1(1.0 &
+          ,safe_adb(CCPOLR(N,L,NZ,NY,NX),CCPOLR(N,L,NZ,NY,NX) &
+          +CZPOLR(N,L,NZ,NY,NX)/CNKI)))
+        CPC=AMAX1(0.0,AMIN1(1.0 &
+          ,safe_adb(CCPOLR(N,L,NZ,NY,NX),CCPOLR(N,L,NZ,NY,NX) &
+          +CPPOLR(N,L,NZ,NY,NX)/CPKI)))
+      ELSE
+        CCC=0._r8
+        CNC=0._r8
+        CPC=0._r8
+      ENDIF
+      RCCC=RCCZR+CCC*RCCYR
+      RCCN=CNC*RCCXR
+      RCCP=CPC*RCCQR
 !
 !     RECOVERY OF REMOBILIZABLE N,P FROM SECONDARY ROOT DURING
 !     REMOBILIZATION DEPENDS ON ROOT NON-STRUCTURAL C:N:P
@@ -3720,40 +3661,39 @@ module grosubMod
 !     RCCC,RCCN,RCCP=remobilization coefficient for C,N,P
 !     FSNC2=fraction of secondary root C to be remobilized
 !
-                IF(-RCO2XM.GT.0.0)THEN
-                  IF(-RCO2XM.LT.WTRT2(N,L,NR,NZ,NY,NX)*RCCC)THEN
-                    SNCRM=-RCO2XM
-                  ELSE
-                    SNCRM=AMAX1(0.0,WTRT2(N,L,NR,NZ,NY,NX)*RCCC)
-                  ENDIF
-                ELSE
-                  SNCRM=0._r8
-                ENDIF
-                IF(-RCO2X.GT.0.0)THEN
-                  IF(-RCO2X.LT.WTRT2(N,L,NR,NZ,NY,NX)*RCCC)THEN
-                    SNCR=-RCO2X
-                  ELSE
-                    SNCR=AMAX1(0.0,WTRT2(N,L,NR,NZ,NY,NX)*RCCC)*WFR(N,L,NZ,NY,NX)
-                  ENDIF
-                ELSE
-                  SNCR=0._r8
-                ENDIF
-                IF(SNCR.GT.0.0.AND.WTRT2(N,L,NR,NZ,NY,NX) &
-                  .GT.ZEROP(NZ,NY,NX))THEN
-                  RCCR=RCCC*WTRT2(N,L,NR,NZ,NY,NX)
-                  RCZR=WTRT2N(N,L,NR,NZ,NY,NX)*(RCCN+(1.0-RCCN)*RCCR/WTRT2(N,L,NR,NZ,NY,NX))
-                  RCPR=WTRT2P(N,L,NR,NZ,NY,NX)*(RCCP+(1.0-RCCP)*RCCR/WTRT2(N,L,NR,NZ,NY,NX))
-                  IF(RCCR.GT.ZEROP(NZ,NY,NX))THEN
-                    FSNC2=AMAX1(0.0,AMIN1(1.0,SNCR/RCCR))
-                  ELSE
-                    FSNC2=1.0_r8
-                  ENDIF
-                ELSE
-                  RCCR=0._r8
-                  RCZR=0._r8
-                  RCPR=0._r8
-                  FSNC2=0._r8
-                ENDIF
+      IF(-RCO2XM.GT.0.0)THEN
+        IF(-RCO2XM.LT.WTRT2(N,L,NR,NZ,NY,NX)*RCCC)THEN
+          SNCRM=-RCO2XM
+        ELSE
+          SNCRM=AMAX1(0.0,WTRT2(N,L,NR,NZ,NY,NX)*RCCC)
+        ENDIF
+      ELSE
+        SNCRM=0._r8
+      ENDIF
+      IF(-RCO2X.GT.0.0)THEN
+        IF(-RCO2X.LT.WTRT2(N,L,NR,NZ,NY,NX)*RCCC)THEN
+          SNCR=-RCO2X
+        ELSE
+          SNCR=AMAX1(0.0,WTRT2(N,L,NR,NZ,NY,NX)*RCCC)*WFR(N,L,NZ,NY,NX)
+        ENDIF
+      ELSE
+        SNCR=0._r8
+      ENDIF
+      IF(SNCR.GT.0.0.AND.WTRT2(N,L,NR,NZ,NY,NX).GT.ZEROP(NZ,NY,NX))THEN
+        RCCR=RCCC*WTRT2(N,L,NR,NZ,NY,NX)
+        RCZR=WTRT2N(N,L,NR,NZ,NY,NX)*(RCCN+(1.0-RCCN)*RCCR/WTRT2(N,L,NR,NZ,NY,NX))
+        RCPR=WTRT2P(N,L,NR,NZ,NY,NX)*(RCCP+(1.0-RCCP)*RCCR/WTRT2(N,L,NR,NZ,NY,NX))
+        IF(RCCR.GT.ZEROP(NZ,NY,NX))THEN
+          FSNC2=AMAX1(0.0,AMIN1(1.0,SNCR/RCCR))
+        ELSE
+          FSNC2=1.0_r8
+        ENDIF
+      ELSE
+        RCCR=0._r8
+        RCZR=0._r8
+        RCPR=0._r8
+        FSNC2=0._r8
+      ENDIF
 !
 !     SECONDARY ROOT LITTERFALL CAUSED BY REMOBILIZATION
 !
@@ -3765,20 +3705,20 @@ module grosubMod
 !     RCCR,RCZR,RCPR=remobilization of C,N,P from senescing root
 !     FWOOD,FWOODN,FWOODP=C,N,P woody fraction in root:0=woody,1=non-woody
 !
-                DO 6350 M=1,4
-                  CSNC(M,0,L,NZ,NY,NX)=CSNC(M,0,L,NZ,NY,NX)+CFOPC(5,M,NZ,NY,NX) &
-                    *FSNC2*(WTRT2(N,L,NR,NZ,NY,NX)-RCCR)*FWODR(0)
-                  ZSNC(M,0,L,NZ,NY,NX)=ZSNC(M,0,L,NZ,NY,NX)+CFOPN(5,M,NZ,NY,NX) &
-                    *FSNC2*(WTRT2N(N,L,NR,NZ,NY,NX)-RCZR)*FWODRN(0)
-                  PSNC(M,0,L,NZ,NY,NX)=PSNC(M,0,L,NZ,NY,NX)+CFOPP(5,M,NZ,NY,NX) &
-                    *FSNC2*(WTRT2P(N,L,NR,NZ,NY,NX)-RCPR)*FWODRP(0)
-                  CSNC(M,1,L,NZ,NY,NX)=CSNC(M,1,L,NZ,NY,NX)+CFOPC(4,M,NZ,NY,NX) &
-                    *FSNC2*(WTRT2(N,L,NR,NZ,NY,NX)-RCCR)*FWODR(1)
-                  ZSNC(M,1,L,NZ,NY,NX)=ZSNC(M,1,L,NZ,NY,NX)+CFOPN(4,M,NZ,NY,NX) &
-                    *FSNC2*(WTRT2N(N,L,NR,NZ,NY,NX)-RCZR)*FWODRN(1)
-                  PSNC(M,1,L,NZ,NY,NX)=PSNC(M,1,L,NZ,NY,NX)+CFOPP(4,M,NZ,NY,NX) &
-                    *FSNC2*(WTRT2P(N,L,NR,NZ,NY,NX)-RCPR)*FWODRP(1)
-6350            CONTINUE
+      DO 6350 M=1,4
+        CSNC(M,0,L,NZ,NY,NX)=CSNC(M,0,L,NZ,NY,NX)+CFOPC(5,M,NZ,NY,NX) &
+          *FSNC2*(WTRT2(N,L,NR,NZ,NY,NX)-RCCR)*FWODR(0)
+        ZSNC(M,0,L,NZ,NY,NX)=ZSNC(M,0,L,NZ,NY,NX)+CFOPN(5,M,NZ,NY,NX) &
+          *FSNC2*(WTRT2N(N,L,NR,NZ,NY,NX)-RCZR)*FWODRN(0)
+        PSNC(M,0,L,NZ,NY,NX)=PSNC(M,0,L,NZ,NY,NX)+CFOPP(5,M,NZ,NY,NX) &
+          *FSNC2*(WTRT2P(N,L,NR,NZ,NY,NX)-RCPR)*FWODRP(0)
+        CSNC(M,1,L,NZ,NY,NX)=CSNC(M,1,L,NZ,NY,NX)+CFOPC(4,M,NZ,NY,NX) &
+          *FSNC2*(WTRT2(N,L,NR,NZ,NY,NX)-RCCR)*FWODR(1)
+        ZSNC(M,1,L,NZ,NY,NX)=ZSNC(M,1,L,NZ,NY,NX)+CFOPN(4,M,NZ,NY,NX) &
+          *FSNC2*(WTRT2N(N,L,NR,NZ,NY,NX)-RCZR)*FWODRN(1)
+        PSNC(M,1,L,NZ,NY,NX)=PSNC(M,1,L,NZ,NY,NX)+CFOPP(4,M,NZ,NY,NX) &
+          *FSNC2*(WTRT2P(N,L,NR,NZ,NY,NX)-RCPR)*FWODRP(1)
+6350  CONTINUE
 !
 !     CONSUMPTION OF NON-STRUCTURAL C,N,P BY SECONDARY ROOT
 !
@@ -3792,10 +3732,10 @@ module grosubMod
 !     RCCR,RCZR,RCPR=remobilization of C,N,P from senescing root
 !     ZADD2,PADD2=nonstructural N,P ltd by O2 used in growth
 !
-                CPOOLR(N,L,NZ,NY,NX)=CPOOLR(N,L,NZ,NY,NX)-AMIN1(RMNCR,RCO2R) &
-                  -CGROR-CNRDA-SNCR+FSNC2*RCCR
-                ZPOOLR(N,L,NZ,NY,NX)=ZPOOLR(N,L,NZ,NY,NX)-ZADD2+FSNC2*RCZR
-                PPOOLR(N,L,NZ,NY,NX)=PPOOLR(N,L,NZ,NY,NX)-PADD2+FSNC2*RCPR
+      CPOOLR(N,L,NZ,NY,NX)=CPOOLR(N,L,NZ,NY,NX)-AMIN1(RMNCR,RCO2R) &
+        -CGROR-CNRDA-SNCR+FSNC2*RCCR
+      ZPOOLR(N,L,NZ,NY,NX)=ZPOOLR(N,L,NZ,NY,NX)-ZADD2+FSNC2*RCZR
+      PPOOLR(N,L,NZ,NY,NX)=PPOOLR(N,L,NZ,NY,NX)-PADD2+FSNC2*RCPR
 !
 !     TOTAL SECONDARY ROOT RESPIRATION
 !
@@ -3808,11 +3748,11 @@ module grosubMod
 !     RCO2A=total root respiration
 !     RCO2M,RCO2N=RCO2A unltd by O2,nonstructural C
 !
-                RCO2TM=AMIN1(RMNCR,RCO2RM)+RCO2GM+SNCRM+CNRDM
-                RCO2T=AMIN1(RMNCR,RCO2R)+RCO2G+SNCR+CNRDA
-                RCO2M(N,L,NZ,NY,NX)=RCO2M(N,L,NZ,NY,NX)+RCO2TM
-                RCO2N(N,L,NZ,NY,NX)=RCO2N(N,L,NZ,NY,NX)+RCO2T
-                RCO2A(N,L,NZ,NY,NX)=RCO2A(N,L,NZ,NY,NX)-RCO2T
+      RCO2TM=AMIN1(RMNCR,RCO2RM)+RCO2GM+SNCRM+CNRDM
+      RCO2T=AMIN1(RMNCR,RCO2R)+RCO2G+SNCR+CNRDA
+      RCO2M(N,L,NZ,NY,NX)=RCO2M(N,L,NZ,NY,NX)+RCO2TM
+      RCO2N(N,L,NZ,NY,NX)=RCO2N(N,L,NZ,NY,NX)+RCO2T
+      RCO2A(N,L,NZ,NY,NX)=RCO2A(N,L,NZ,NY,NX)-RCO2T
 !
 !     SECONDARY ROOT EXTENSION FROM ROOT GROWTH AND ROOT TURGOR
 !
@@ -3827,11 +3767,11 @@ module grosubMod
 !     WTRT2,WTRT2N,WTRT2P=secondary root C,N,P mass
 !     ZADD2,PADD2=nonstructural N,P ltd by O2 used in growth
 !
-                GRTLGL=GRTWTG*RTLG2X(N,NZ,NY,NX)*WFNR*FWODR(1) &
-                  -FSNC2*RTLG2(N,L,NR,NZ,NY,NX)
-                GRTWTL=GRTWTG-FSNC2*WTRT2(N,L,NR,NZ,NY,NX)
-                GRTWTN=ZADD2-FSNC2*WTRT2N(N,L,NR,NZ,NY,NX)
-                GRTWTP=PADD2-FSNC2*WTRT2P(N,L,NR,NZ,NY,NX)
+      GRTLGL=GRTWTG*RTLG2X(N,NZ,NY,NX)*WFNR*FWODR(1) &
+        -FSNC2*RTLG2(N,L,NR,NZ,NY,NX)
+      GRTWTL=GRTWTG-FSNC2*WTRT2(N,L,NR,NZ,NY,NX)
+      GRTWTN=ZADD2-FSNC2*WTRT2N(N,L,NR,NZ,NY,NX)
+      GRTWTP=PADD2-FSNC2*WTRT2P(N,L,NR,NZ,NY,NX)
 !
 !     UPDATE STATE VARIABLES FOR SECONDARY ROOT LENGTH, C, N, P
 !     AND AXIS NUMBER
@@ -3845,44 +3785,19 @@ module grosubMod
 !     RTFQ=root branching frequency from PFT file
 !     RTN2,RTNL=number of secondary root axes
 !
-                RTLG2(N,L,NR,NZ,NY,NX)=RTLG2(N,L,NR,NZ,NY,NX)+GRTLGL
-                WTRT2(N,L,NR,NZ,NY,NX)=WTRT2(N,L,NR,NZ,NY,NX)+GRTWTL
-                WTRT2N(N,L,NR,NZ,NY,NX)=WTRT2N(N,L,NR,NZ,NY,NX)+GRTWTN
-                WTRT2P(N,L,NR,NZ,NY,NX)=WTRT2P(N,L,NR,NZ,NY,NX)+GRTWTP
-                WSRTL(N,L,NZ,NY,NX)=WSRTL(N,L,NZ,NY,NX) &
-                  +AMIN1(CNWS(NZ,NY,NX)*WTRT2N(N,L,NR,NZ,NY,NX) &
-                  ,CPWS(NZ,NY,NX)*WTRT2P(N,L,NR,NZ,NY,NX))
-                RTLGL=RTLGL+RTLG2(N,L,NR,NZ,NY,NX)
-                WTRTX=WTRTX+WTRT2(N,L,NR,NZ,NY,NX)
-                RTN2X=RTFQ(NZ,NY,NX)*XRTN1
-                RTN2Y=RTFQ(NZ,NY,NX)*RTN2X
-                RTN2(N,L,NR,NZ,NY,NX)=(RTN2X+RTN2Y)*DLYR(3,L,NY,NX)
-                RTNL(N,L,NZ,NY,NX)=RTNL(N,L,NZ,NY,NX)+RTN2(N,L,NR,NZ,NY,NX)
-!     IF((I/10)*10.EQ.I.AND.J.EQ.12)THEN
-!     WRITE(*,9876)'RCO22',I,J,NZ,NR,L,N,NINR(NR,NZ,NY,NX)
-!    2,RCO2TM,RCO2T,RMNCR,RCO2RM,RCO2R,RCO2GM,RCO2G
-!    3,RCO2XM,RCO2X,CGROR,SNCRM,SNCR,CNRDA,CPOOLR(N,L,NZ,NY,NX),FRTN
-!    4,TFN4(L,NZ,NY,NX),CNPG,FDBKX(NB1(NZ,NY,NX),NZ,NY,NX),WFNGR(N,L)
-!    5,TFN6(L),GRTWTG,GRTWTL,GRTLGL,RTLG2(N,L,NR,NZ,NY,NX)
-!     5,WTRT2(N,L,NR,NZ,NY,NX)
-!    4,RCO2M(N,L,NZ,NY,NX),RCO2A(N,L,NZ,NY,NX),WFR(N,L,NZ,NY,NX)
-!    8,ZPOOLR(N,L,NZ,NY,NX),PPOOLR(N,L,NZ,NY,NX)
-!    9,FSNC2,RLNT(N,L),RTSK1(N,L,NR),RTSK2(N,L,NR)
-!    4,RTN2X,RTN2Y,XRTN1
-!    5,RTDPL(NR,L),RTDNP(N,L,NZ,NY,NX)
-!    5,RTDP1(1,NR,NZ,NY,NX),CDPTHZ(L-1,NY,NX),DLYR(3,L,NY,NX)
-!    6,SDPTH(NZ,NY,NX),HTCTL(NZ,NY,NX)
-!    5,WFNRG,RSCS2,PSILM,PSIRG(N,L,NZ,NY,NX),PSIRT(N,L,NZ,NY,NX)
-!    6,FNP,RTLGP(N,L,NZ,NY,NX),ZADD2,PADD2,CUPRO,CUPRL
-!    7,RUPNH4(N,L,NZ,NY,NX),RUPNHB(N,L,NZ,NY,NX)
-!    8,RUPNO3(N,L,NZ,NY,NX),RUPNOB(N,L,NZ,NY,NX)
-!    9,RUPH2P(N,L,NZ,NY,NX),RUPH2B(N,L,NZ,NY,NX)
-!    9,RUPH1P(N,L,NZ,NY,NX),RUPH1B(N,L,NZ,NY,NX)
-!    6,RDFOMN(N,L,NZ,NY,NX),RDFOMP(N,L,NZ,NY,NX)
-!    2,RTN1(N,L,NZ,NY,NX),RTN2(N,L,NR,NZ,NY,NX)
-!    3,RTNL(N,L,NZ,NY,NX),DLYR(3,L,NY,NX)
-!9876  FORMAT(A8,7I4,100F16.8)
-!     ENDIF
+      RTLG2(N,L,NR,NZ,NY,NX)=RTLG2(N,L,NR,NZ,NY,NX)+GRTLGL
+      WTRT2(N,L,NR,NZ,NY,NX)=WTRT2(N,L,NR,NZ,NY,NX)+GRTWTL
+      WTRT2N(N,L,NR,NZ,NY,NX)=WTRT2N(N,L,NR,NZ,NY,NX)+GRTWTN
+      WTRT2P(N,L,NR,NZ,NY,NX)=WTRT2P(N,L,NR,NZ,NY,NX)+GRTWTP
+      WSRTL(N,L,NZ,NY,NX)=WSRTL(N,L,NZ,NY,NX) &
+        +AMIN1(CNWS(NZ,NY,NX)*WTRT2N(N,L,NR,NZ,NY,NX) &
+        ,CPWS(NZ,NY,NX)*WTRT2P(N,L,NR,NZ,NY,NX))
+      RTLGL=RTLGL+RTLG2(N,L,NR,NZ,NY,NX)
+      WTRTX=WTRTX+WTRT2(N,L,NR,NZ,NY,NX)
+      RTN2X=RTFQ(NZ,NY,NX)*XRTN1
+      RTN2Y=RTFQ(NZ,NY,NX)*RTN2X
+      RTN2(N,L,NR,NZ,NY,NX)=(RTN2X+RTN2Y)*DLYR(3,L,NY,NX)
+      RTNL(N,L,NZ,NY,NX)=RTNL(N,L,NZ,NY,NX)+RTN2(N,L,NR,NZ,NY,NX)
 !
 !     PRIMARY ROOT EXTENSION
 !
@@ -3893,22 +3808,16 @@ module grosubMod
 !     RTN1=number of primary root axes
 !     XRTN1=multiplier for number of primary root axes
 !
-                IF(N.EQ.1)THEN
-                  IF(BKDS(L,NY,NX).GT.ZERO)THEN
-                    RTDP1X=RTDP1(N,NR,NZ,NY,NX)-CDPTHZ(0,NY,NX)
-                  ELSE
-                    RTDP1X=RTDP1(N,NR,NZ,NY,NX)
-                  ENDIF
-                  IF(RTDP1X.GT.CDPTHZ(L-1,NY,NX).AND.ICHK1(N,NR).EQ.0)THEN
-                      RTN1(N,L,NZ,NY,NX)=RTN1(N,L,NZ,NY,NX)+XRTN1
-                      IF(RTDP1X.LE.CDPTHZ(L,NY,NX).OR.L.EQ.NJ(NY,NX))THEN
-                        ICHK1(N,NR)=1
-!     IF(J.EQ.24.AND.NZ.EQ.2)THEN
-!     WRITE(*,9874)'RTDP1',I,J,NZ,NR,L,L-1,L1,N,NINR(NR,NZ,NY,NX)
-!    2,ICHK1(N,NR),RTDP1(N,NR,NZ,NY,NX),RTDP1X,RTN1(N,L,NZ,NY,NX)
-!    3,CDPTHZ(L-1,NY,NX),CDPTHZ(L,NY,NX)
-!9874  FORMAT(A8,10I4,12E12.4)
-!     ENDIF
+      IF(N.EQ.1)THEN
+        IF(BKDS(L,NY,NX).GT.ZERO)THEN
+          RTDP1X=RTDP1(N,NR,NZ,NY,NX)-CDPTHZ(0,NY,NX)
+        ELSE
+          RTDP1X=RTDP1(N,NR,NZ,NY,NX)
+        ENDIF
+        IF(RTDP1X.GT.CDPTHZ(L-1,NY,NX).AND.ICHK1(N,NR).EQ.0)THEN
+            RTN1(N,L,NZ,NY,NX)=RTN1(N,L,NZ,NY,NX)+XRTN1
+            IF(RTDP1X.LE.CDPTHZ(L,NY,NX).OR.L.EQ.NJ(NY,NX))THEN
+              ICHK1(N,NR)=1
 !
 !     FRACTION OF PRIMARY ROOT SINK IN SOIL LAYER
 !     ATTRIBUTED TO CURRENT AXIS
@@ -3917,11 +3826,11 @@ module grosubMod
 !     RLNT=total root sink strength
 !     FRTN=fraction of primary root sink strength in axis
 !
-                        IF(RLNT(N,L).GT.ZEROP(NZ,NY,NX))THEN
-                          FRTN=RTSK1(N,L,NR)/RLNT(N,L)
-                        ELSE
-                          FRTN=1.0_r8
-                        ENDIF
+              IF(RLNT(N,L).GT.ZEROP(NZ,NY,NX))THEN
+                FRTN=RTSK1(N,L,NR)/RLNT(N,L)
+              ELSE
+                FRTN=1.0_r8
+              ENDIF
 !
 !     WATER STRESS CONSTRAINT ON SECONDARY ROOT EXTENSION IMPOSED
 !     BY ROOT TURGOR AND SOIL PENETRATION RESISTANCE
@@ -3931,13 +3840,13 @@ module grosubMod
 !     WFNR=water function for root extension
 !     WFNRG=respiration function of root water potential
 !
-                        RSCS1=RSCS(L,NY,NX)*RRAD1(N,L,NZ,NY,NX)/1.0E-03
-                        WFNR=AMIN1(1.0,AMAX1(0.0,PSIRG(N,L,NZ,NY,NX)-PSILM-RSCS1))
-                        IF(IGTYP(NZ,NY,NX).EQ.0)THEN
-                          WFNRG=WFNR**0.10
-                        ELSE
-                          WFNRG=WFNR**0.25
-                        ENDIF
+              RSCS1=RSCS(L,NY,NX)*RRAD1(N,L,NZ,NY,NX)/1.0E-03
+              WFNR=AMIN1(1.0,AMAX1(0.0,PSIRG(N,L,NZ,NY,NX)-PSILM-RSCS1))
+              IF(IGTYP(NZ,NY,NX).EQ.0)THEN
+                WFNRG=WFNR**0.10
+              ELSE
+                WFNRG=WFNR**0.25
+              ENDIF
 !
 !     N,P CONSTRAINT ON PRIMARY ROOT RESPIRATION FROM
 !     NON-STRUCTURAL C:N:P
@@ -3946,13 +3855,13 @@ module grosubMod
 !     CNPG=N,P constraint on growth respiration
 !     CNKI,CPKI=nonstructural N,P inhibition constant on growth
 !
-                        IF(CCPOLR(N,L,NZ,NY,NX).GT.ZERO)THEN
-                          CNPG=AMIN1(CZPOLR(N,L,NZ,NY,NX)/(CZPOLR(N,L,NZ,NY,NX) &
-                            +CCPOLR(N,L,NZ,NY,NX)*CNKI),CPPOLR(N,L,NZ,NY,NX) &
-                            /(CPPOLR(N,L,NZ,NY,NX)+CCPOLR(N,L,NZ,NY,NX)*CPKI))
-                        ELSE
-                          CNPG=1.0_r8
-                        ENDIF
+              IF(CCPOLR(N,L,NZ,NY,NX).GT.ZERO)THEN
+                CNPG=AMIN1(CZPOLR(N,L,NZ,NY,NX)/(CZPOLR(N,L,NZ,NY,NX) &
+                  +CCPOLR(N,L,NZ,NY,NX)*CNKI),CPPOLR(N,L,NZ,NY,NX) &
+                  /(CPPOLR(N,L,NZ,NY,NX)+CCPOLR(N,L,NZ,NY,NX)*CPKI))
+              ELSE
+                CNPG=1.0_r8
+              ENDIF
 !
 !     PRIMARY ROOT MAINTENANCE RESPIRATION FROM SOIL TEMPERATURE,
 !     ROOT STRUCTURAL N
@@ -3965,10 +3874,10 @@ module grosubMod
 !     IWTYP=phenology type:0=evergreen,1=cold decid,2=drought decid,3=1+2
 !     WFNGR=growth function of root water potential
 !
-                        RMNCR=AMAX1(0.0,RMPLT*RTWT1N(N,NR,NZ,NY,NX))*TFN6(L)
-                        IF(IGTYP(NZ,NY,NX).EQ.0.OR.IWTYP(NZ,NY,NX).EQ.2)THEN
-                          RMNCR=RMNCR*WFNGR(N,L)
-                        ENDIF
+              RMNCR=AMAX1(0.0,RMPLT*RTWT1N(N,NR,NZ,NY,NX))*TFN6(L)
+              IF(IGTYP(NZ,NY,NX).EQ.0.OR.IWTYP(NZ,NY,NX).EQ.2)THEN
+                RMNCR=RMNCR*WFNGR(N,L)
+              ENDIF
 !
 !     O2-UNLIMITED PRIMARY ROOT RESPIRATION FROM ROOT NON-STRUCTURAL C
 !     CONSTRAINED BY TEMPERATURE AND NON-STRUCTURAL C:N:P
@@ -3981,12 +3890,11 @@ module grosubMod
 !     FDBKX=termination feedback inhibition on C3 CO2
 !     WFNGR=growth function of root water potential
 !
-                        RCO2RM=AMAX1(0.0,VMXC*FRTN*CPOOLR(N,L,NZ,NY,NX) &
-                          *TFN4(L,NZ,NY,NX))*CNPG*FDBKX(NB1(NZ,NY,NX),NZ,NY,NX) &
-                          *WFNGR(N,L)
-                        IF(RTDP1X.GE.CDPTHZ(NJ(NY,NX),NY,NX))THEN
-                          RCO2RM=AMIN1(RMNCR,RCO2RM)
-                        ENDIF
+              RCO2RM=AMAX1(0.0,VMXC*FRTN*CPOOLR(N,L,NZ,NY,NX) &
+                *TFN4(L,NZ,NY,NX))*CNPG*FDBKX(NB1(NZ,NY,NX),NZ,NY,NX)*WFNGR(N,L)
+              IF(RTDP1X.GE.CDPTHZ(NJ(NY,NX),NY,NX))THEN
+                RCO2RM=AMIN1(RMNCR,RCO2RM)
+              ENDIF
 !
 !     O2-LIMITED PRIMARY ROOT RESPIRATION FROM 'WFR' IN 'UPTAKE'
 !
@@ -3996,11 +3904,11 @@ module grosubMod
 !     RCO2YM,RCO2Y=growth respiration unltd,ltd by O2 and unlimited by N,P
 !     WFNRG=respiration function of root water potential
 !
-                        RCO2R=RCO2RM*WFR(N,L,NZ,NY,NX)
-                        RCO2XM=RCO2RM-RMNCR
-                        RCO2X=RCO2R-RMNCR
-                        RCO2YM=AMAX1(0.0,RCO2XM)*WFNRG
-                        RCO2Y=AMAX1(0.0,RCO2X)*WFNRG
+              RCO2R=RCO2RM*WFR(N,L,NZ,NY,NX)
+              RCO2XM=RCO2RM-RMNCR
+              RCO2X=RCO2R-RMNCR
+              RCO2YM=AMAX1(0.0,RCO2XM)*WFNRG
+              RCO2Y=AMAX1(0.0,RCO2X)*WFNRG
 !
 !     PRIMARY ROOT GROWTH RESPIRATION MAY BE LIMITED BY
 !     NON-STRUCTURAL N,P AVAILABLE FOR GROWTH
@@ -4011,21 +3919,20 @@ module grosubMod
 !     FNP=growth respiration limited by non-structural N,P
 !     RCO2GM,RCO2G=growth respiration limited by N,P unltd,ltd by O2
 !
-                        DMRTR=DMRTD*FRTN
-                        ZPOOLB=AMAX1(0.0,ZPOOLR(N,L,NZ,NY,NX))
-                        PPOOLB=AMAX1(0.0,PPOOLR(N,L,NZ,NY,NX))
-                        FNP=AMIN1(ZPOOLB*DMRTR/CNRTS(NZ,NY,NX) &
-                          ,PPOOLB*DMRTR/CPRTS(NZ,NY,NX))
-                        IF(RCO2YM.GT.0.0)THEN
-                          RCO2GM=AMIN1(RCO2YM,FNP)
-                        ELSE
-                          RCO2GM=0._r8
-                        ENDIF
-                        IF(RCO2Y.GT.0.0)THEN
-                          RCO2G=AMIN1(RCO2Y,FNP*WFR(N,L,NZ,NY,NX))
-                        ELSE
-                          RCO2G=0._r8
-                        ENDIF
+              DMRTR=DMRTD*FRTN
+              ZPOOLB=AMAX1(0.0,ZPOOLR(N,L,NZ,NY,NX))
+              PPOOLB=AMAX1(0.0,PPOOLR(N,L,NZ,NY,NX))
+              FNP=AMIN1(ZPOOLB*DMRTR/CNRTS(NZ,NY,NX),PPOOLB*DMRTR/CPRTS(NZ,NY,NX))
+              IF(RCO2YM.GT.0.0)THEN
+                RCO2GM=AMIN1(RCO2YM,FNP)
+              ELSE
+                RCO2GM=0._r8
+              ENDIF
+              IF(RCO2Y.GT.0.0)THEN
+                RCO2G=AMIN1(RCO2Y,FNP*WFR(N,L,NZ,NY,NX))
+              ELSE
+                RCO2G=0._r8
+              ENDIF
 !
 !     TOTAL NON-STRUCTURAL C,N,P USED IN PRIMARY ROOT GROWTH
 !     AND GROWTH RESPIRATION DEPENDS ON GROWTH YIELD
@@ -4039,17 +3946,17 @@ module grosubMod
 !     ZADD1M,ZADD1,PADD1=nonstructural N,P unltd,ltd by O2 used in growth
 !     CNRDM,CNRDA=respiration for N assimilation unltd,ltd by O2
 !
-                        CGRORM=RCO2GM/DMRTD
-                        CGROR=RCO2G/DMRTD
-                        GRTWGM=CGRORM*DMRT(NZ,NY,NX)
-                        GRTWTG=CGROR*DMRT(NZ,NY,NX)
-                        ZADD1M=AMAX1(0.0,GRTWGM*CNRTW)
-                        ZADD1=AMAX1(0.0,AMIN1(FRTN*ZPOOLR(N,L,NZ,NY,NX),GRTWTG*CNRTW))
-                        PADD1=AMAX1(0.0,AMIN1(FRTN*PPOOLR(N,L,NZ,NY,NX),GRTWTG*CPRTW))
-                        CNRDM=AMAX1(0.0,1.70*ZADD1M)
-                        CNRDA=AMAX1(0.0,1.70*ZADD1)
+              CGRORM=RCO2GM/DMRTD
+              CGROR=RCO2G/DMRTD
+              GRTWGM=CGRORM*DMRT(NZ,NY,NX)
+              GRTWTG=CGROR*DMRT(NZ,NY,NX)
+              ZADD1M=AMAX1(0.0,GRTWGM*CNRTW)
+              ZADD1=AMAX1(0.0,AMIN1(FRTN*ZPOOLR(N,L,NZ,NY,NX),GRTWTG*CNRTW))
+              PADD1=AMAX1(0.0,AMIN1(FRTN*PPOOLR(N,L,NZ,NY,NX),GRTWTG*CPRTW))
+              CNRDM=AMAX1(0.0,1.70*ZADD1M)
+              CNRDA=AMAX1(0.0,1.70*ZADD1)
 
-                        call PrimRootRemobilization(N,L,NZ,NY,NX,NR)
+              call PrimRootRemobilization(N,L,NZ,NY,NX,NR)
 
 !
 !     CONSUMPTION OF NON-STRUCTURAL C,N,P BY PRIMARY ROOTS
@@ -4064,10 +3971,9 @@ module grosubMod
 !     RCCR,RCZR,RCPR=remobilization of C,N,P from senescing root
 !     ZADD1,PADD1=nonstructural N,P ltd by O2 used in growth
 !
-                        CPOOLR(N,L,NZ,NY,NX)=CPOOLR(N,L,NZ,NY,NX)-AMIN1(RMNCR,RCO2R) &
-                          -CGROR-CNRDA-SNCR+FSNC1*RCCR
-                        ZPOOLR(N,L,NZ,NY,NX)=ZPOOLR(N,L,NZ,NY,NX)-ZADD1+FSNC1*RCZR
-                        PPOOLR(N,L,NZ,NY,NX)=PPOOLR(N,L,NZ,NY,NX)-PADD1+FSNC1*RCPR
+              CPOOLR(N,L,NZ,NY,NX)=CPOOLR(N,L,NZ,NY,NX)-AMIN1(RMNCR,RCO2R)-CGROR-CNRDA-SNCR+FSNC1*RCCR
+              ZPOOLR(N,L,NZ,NY,NX)=ZPOOLR(N,L,NZ,NY,NX)-ZADD1+FSNC1*RCZR
+              PPOOLR(N,L,NZ,NY,NX)=PPOOLR(N,L,NZ,NY,NX)-PADD1+FSNC1*RCPR
 !
 !     TOTAL PRIMARY ROOT RESPIRATION
 !
@@ -4080,8 +3986,8 @@ module grosubMod
 !     RCO2A=total root respiration
 !     RCO2M,RCO2N=RCO2A unltd by O2,nonstructural C
 !
-                        RCO2TM=AMIN1(RMNCR,RCO2RM)+RCO2GM+SNCRM+CNRDM
-                        RCO2T=AMIN1(RMNCR,RCO2R)+RCO2G+SNCR+CNRDA
+              RCO2TM=AMIN1(RMNCR,RCO2RM)+RCO2GM+SNCRM+CNRDM
+              RCO2T=AMIN1(RMNCR,RCO2R)+RCO2G+SNCR+CNRDA
 !
 !     ALLOCATE PRIMARY ROOT TOTAL RESPIRATION TO ALL SOIL LAYERS
 !     THROUGH WHICH PRIMARY ROOTS GROW
@@ -4095,31 +4001,25 @@ module grosubMod
 !     RCO2M,RCO2N=RCO2A unltd by O2,nonstructural C
 !     RCO2TM,RCO2T=total C respiration unltd,ltd by O2
 !
-                        IF(RTDP1(N,NR,NZ,NY,NX).GT.CDPTHZ(NG(NZ,NY,NX),NY,NX))THEN
-                          TFRCO2=0._r8
-                          DO 5100 LL=NG(NZ,NY,NX),NINR(NR,NZ,NY,NX)
-                            IF(LL.LT.NINR(NR,NZ,NY,NX))THEN
-                              FRCO2=AMIN1(1.0,RTLG1(N,LL,NR,NZ,NY,NX) &
-                                /(RTDP1(N,NR,NZ,NY,NX)-SDPTH(NZ,NY,NX)))
-                            ELSE
-                              FRCO2=1.0_r8-TFRCO2
-                            ENDIF
-                            TFRCO2=TFRCO2+FRCO2
-                            RCO2M(N,LL,NZ,NY,NX)=RCO2M(N,LL,NZ,NY,NX)+RCO2TM*FRCO2
-                            RCO2N(N,LL,NZ,NY,NX)=RCO2N(N,LL,NZ,NY,NX)+RCO2T*FRCO2
-                            RCO2A(N,LL,NZ,NY,NX)=RCO2A(N,LL,NZ,NY,NX)-RCO2T*FRCO2
-!     IF(NZ.EQ.2)THEN
-!     WRITE(*,9877)'RCO2A',I,J,NZ,NR,L,LL,N,NG(NZ,NY,NX)
-!    2,NINR(NR,NZ,NY,NX),RCO2T,FRCO2,TFRCO2,RCO2A(N,LL,NZ,NY,NX)
-!    3,RTLG1(N,LL,NR,NZ,NY,NX),RTDP1(N,NR,NZ,NY,NX)
-!    4,SDPTH(NZ,NY,NX)
-!     ENDIF
-5100                      CONTINUE
-                        ELSE
-                          RCO2M(N,L,NZ,NY,NX)=RCO2M(N,L,NZ,NY,NX)+RCO2TM
-                          RCO2N(N,L,NZ,NY,NX)=RCO2N(N,L,NZ,NY,NX)+RCO2T
-                          RCO2A(N,L,NZ,NY,NX)=RCO2A(N,L,NZ,NY,NX)-RCO2T
-                        ENDIF
+              IF(RTDP1(N,NR,NZ,NY,NX).GT.CDPTHZ(NG(NZ,NY,NX),NY,NX))THEN
+                TFRCO2=0._r8
+                DO 5100 LL=NG(NZ,NY,NX),NINR(NR,NZ,NY,NX)
+                  IF(LL.LT.NINR(NR,NZ,NY,NX))THEN
+                    FRCO2=AMIN1(1.0,RTLG1(N,LL,NR,NZ,NY,NX) &
+                      /(RTDP1(N,NR,NZ,NY,NX)-SDPTH(NZ,NY,NX)))
+                  ELSE
+                    FRCO2=1.0_r8-TFRCO2
+                  ENDIF
+                  TFRCO2=TFRCO2+FRCO2
+                  RCO2M(N,LL,NZ,NY,NX)=RCO2M(N,LL,NZ,NY,NX)+RCO2TM*FRCO2
+                  RCO2N(N,LL,NZ,NY,NX)=RCO2N(N,LL,NZ,NY,NX)+RCO2T*FRCO2
+                  RCO2A(N,LL,NZ,NY,NX)=RCO2A(N,LL,NZ,NY,NX)-RCO2T*FRCO2
+5100            CONTINUE
+              ELSE
+                RCO2M(N,L,NZ,NY,NX)=RCO2M(N,L,NZ,NY,NX)+RCO2TM
+                RCO2N(N,L,NZ,NY,NX)=RCO2N(N,L,NZ,NY,NX)+RCO2T
+                RCO2A(N,L,NZ,NY,NX)=RCO2A(N,L,NZ,NY,NX)-RCO2T
+              ENDIF
 !
 !     ALLOCATE ANY NEGATIVE PRIMARY ROOT C,N,P GROWTH TO SECONDARY
 !     ROOTS ON THE SAME AXIS IN THE SAME LAYER UNTIL SECONDARY ROOTS
@@ -4133,49 +4033,43 @@ module grosubMod
 !     WTRT2,WTRT2N,WTRT2P=secondary root C,N,P mass
 !     RTLG2=secondary root length
 !
-                        GRTWTL=GRTWTG-FSNC1*RTWT1(N,NR,NZ,NY,NX)
-                        GRTWTN=ZADD1-FSNC1*RTWT1N(N,NR,NZ,NY,NX)
-                        GRTWTP=PADD1-FSNC1*RTWT1P(N,NR,NZ,NY,NX)
-                        IF(GRTWTL.LT.0.0)THEN
-                          LX=MAX(1,L-1)
-                          DO 5105 LL=L,LX,-1
-                            GRTWTM=GRTWTL
-                            IF(GRTWTL.LT.0.0)THEN
-                              IF(GRTWTL.GT.-WTRT2(N,LL,NR,NZ,NY,NX))THEN
-                                RTLG2(N,LL,NR,NZ,NY,NX)=RTLG2(N,LL,NR,NZ,NY,NX)+GRTWTL &
-                                  *RTLG2(N,LL,NR,NZ,NY,NX)/WTRT2(N,LL,NR,NZ,NY,NX)
-                                WTRT2(N,LL,NR,NZ,NY,NX)=WTRT2(N,LL,NR,NZ,NY,NX)+GRTWTL
-                                GRTWTL=0._r8
-                              ELSE
-                                GRTWTL=GRTWTL+WTRT2(N,LL,NR,NZ,NY,NX)
-                                RTLG2(N,LL,NR,NZ,NY,NX)=0._r8
-                                WTRT2(N,LL,NR,NZ,NY,NX)=0._r8
-                              ENDIF
-                            ENDIF
-                            IF(GRTWTN.LT.0.0)THEN
-                              IF(GRTWTN.GT.-WTRT2N(N,LL,NR,NZ,NY,NX))THEN
-                                WTRT2N(N,LL,NR,NZ,NY,NX)=WTRT2N(N,LL,NR,NZ,NY,NX)+GRTWTN
-                                GRTWTN=0._r8
-                              ELSE
-                                GRTWTN=GRTWTN+WTRT2N(N,LL,NR,NZ,NY,NX)
-                                WTRT2N(N,LL,NR,NZ,NY,NX)=0._r8
-                              ENDIF
-                            ENDIF
-                            IF(GRTWTP.LT.0.0)THEN
-                              IF(GRTWTP.GT.-WTRT2P(N,LL,NR,NZ,NY,NX))THEN
-                                WTRT2P(N,LL,NR,NZ,NY,NX)=WTRT2P(N,LL,NR,NZ,NY,NX)+GRTWTP
-                                GRTWTP=0._r8
-                              ELSE
-                                GRTWTP=GRTWTP+WTRT2P(N,LL,NR,NZ,NY,NX)
-                                WTRT2P(N,LL,NR,NZ,NY,NX)=0._r8
-                              ENDIF
-                            ENDIF
-!     WRITE(*,9876)'WTRT2',I,J,NZ,NR,LL,N
-!    2,GRTWTL,GRTWTM,GRTWTG,FSNC1,SNCR,RCCR,RTWT1(N,NR,NZ,NY,NX)
-!    3,WTRT2(1,LL,NR,NZ,NY,NX),WTRTL(1,LL,NZ,NY,NX)
-!    3,WTRT2(2,LL,NR,NZ,NY,NX),WTRTL(2,LL,NZ,NY,NX)
-!    4,RTLG2(1,LL,NR,NZ,NY,NX),RTLG1(1,LL,NR,NZ,NY,NX)
-!    4,RTLG2(2,LL,NR,NZ,NY,NX),RTLG1(2,LL,NR,NZ,NY,NX)
+              GRTWTL=GRTWTG-FSNC1*RTWT1(N,NR,NZ,NY,NX)
+              GRTWTN=ZADD1-FSNC1*RTWT1N(N,NR,NZ,NY,NX)
+              GRTWTP=PADD1-FSNC1*RTWT1P(N,NR,NZ,NY,NX)
+              IF(GRTWTL.LT.0.0)THEN
+                LX=MAX(1,L-1)
+                DO 5105 LL=L,LX,-1
+                  GRTWTM=GRTWTL
+                  IF(GRTWTL.LT.0.0)THEN
+                    IF(GRTWTL.GT.-WTRT2(N,LL,NR,NZ,NY,NX))THEN
+                      RTLG2(N,LL,NR,NZ,NY,NX)=RTLG2(N,LL,NR,NZ,NY,NX)+GRTWTL &
+                        *RTLG2(N,LL,NR,NZ,NY,NX)/WTRT2(N,LL,NR,NZ,NY,NX)
+                      WTRT2(N,LL,NR,NZ,NY,NX)=WTRT2(N,LL,NR,NZ,NY,NX)+GRTWTL
+                      GRTWTL=0._r8
+                    ELSE
+                      GRTWTL=GRTWTL+WTRT2(N,LL,NR,NZ,NY,NX)
+                      RTLG2(N,LL,NR,NZ,NY,NX)=0._r8
+                      WTRT2(N,LL,NR,NZ,NY,NX)=0._r8
+                    ENDIF
+                  ENDIF
+                  IF(GRTWTN.LT.0.0)THEN
+                    IF(GRTWTN.GT.-WTRT2N(N,LL,NR,NZ,NY,NX))THEN
+                      WTRT2N(N,LL,NR,NZ,NY,NX)=WTRT2N(N,LL,NR,NZ,NY,NX)+GRTWTN
+                      GRTWTN=0._r8
+                    ELSE
+                      GRTWTN=GRTWTN+WTRT2N(N,LL,NR,NZ,NY,NX)
+                      WTRT2N(N,LL,NR,NZ,NY,NX)=0._r8
+                    ENDIF
+                  ENDIF
+                  IF(GRTWTP.LT.0.0)THEN
+                    IF(GRTWTP.GT.-WTRT2P(N,LL,NR,NZ,NY,NX))THEN
+                      WTRT2P(N,LL,NR,NZ,NY,NX)=WTRT2P(N,LL,NR,NZ,NY,NX)+GRTWTP
+                      GRTWTP=0._r8
+                    ELSE
+                      GRTWTP=GRTWTP+WTRT2P(N,LL,NR,NZ,NY,NX)
+                      WTRT2P(N,LL,NR,NZ,NY,NX)=0._r8
+                    ENDIF
+                  ENDIF
 !
 !     CONCURRENT LOSS OF MYCORRHIZAE AND NODULES WITH LOSS
 !     OF SECONDARY ROOTS
@@ -4191,76 +4085,68 @@ module grosubMod
 !     RTLG2=mycorrhizal length
 !     CPOOLR,ZPOOLR,PPOOLR=non-structural C,N,P mass in mycorrhizae
 !
-                            IF(GRTWTM.LT.0.0)THEN
-                              IF(WTRT2(1,LL,NR,NZ,NY,NX).GT.ZEROP(NZ,NY,NX))THEN
-                                FSNCM=AMIN1(1.0,ABS(GRTWTM)/WTRT2(1,LL,NR,NZ,NY,NX))
-                              ELSE
-                                FSNCM=1.0_r8
-                              ENDIF
-                              IF(WTRTL(1,LL,NZ,NY,NX).GT.ZEROP(NZ,NY,NX))THEN
-                                FSNCP=AMIN1(1.0,ABS(GRTWTM)/WTRTL(1,LL,NZ,NY,NX))
-                              ELSE
-                                FSNCP=1.0_r8
-                              ENDIF
-                              DO 6450 M=1,4
-                                CSNC(M,0,LL,NZ,NY,NX)=CSNC(M,0,LL,NZ,NY,NX)+CFOPC(5,M,NZ,NY,NX) &
-                                  *FSNCM*AMAX1(0.0,WTRT2(2,LL,NR,NZ,NY,NX))*FWODR(0)
-                                ZSNC(M,0,LL,NZ,NY,NX)=ZSNC(M,0,LL,NZ,NY,NX)+CFOPN(5,M,NZ,NY,NX) &
-                                  *FSNCM*AMAX1(0.0,WTRT2N(2,LL,NR,NZ,NY,NX))*FWODRN(0)
-                                PSNC(M,0,LL,NZ,NY,NX)=PSNC(M,0,LL,NZ,NY,NX)+CFOPP(5,M,NZ,NY,NX) &
-                                  *FSNCM*AMAX1(0.0,WTRT2P(2,LL,NR,NZ,NY,NX))*FWODRP(0)
-                                CSNC(M,1,LL,NZ,NY,NX)=CSNC(M,1,LL,NZ,NY,NX)+CFOPC(4,M,NZ,NY,NX) &
-                                  *FSNCM*AMAX1(0.0,WTRT2(2,LL,NR,NZ,NY,NX))*FWODR(1)
-                                ZSNC(M,1,LL,NZ,NY,NX)=ZSNC(M,1,LL,NZ,NY,NX)+CFOPN(4,M,NZ,NY,NX) &
-                                  *FSNCM*AMAX1(0.0,WTRT2N(2,LL,NR,NZ,NY,NX))*FWODRN(1)
-                                PSNC(M,1,LL,NZ,NY,NX)=PSNC(M,1,LL,NZ,NY,NX)+CFOPP(4,M,NZ,NY,NX) &
-                                  *FSNCM*AMAX1(0.0,WTRT2P(2,LL,NR,NZ,NY,NX))*FWODRP(1)
-                                CSNC(M,1,LL,NZ,NY,NX)=CSNC(M,1,LL,NZ,NY,NX)+CFOPC(0,M,NZ,NY,NX) &
-                                  *FSNCP*AMAX1(0.0,CPOOLR(2,LL,NZ,NY,NX))
-                                ZSNC(M,1,LL,NZ,NY,NX)=ZSNC(M,1,LL,NZ,NY,NX)+CFOPN(0,M,NZ,NY,NX) &
-                                  *FSNCP*AMAX1(0.0,ZPOOLR(2,LL,NZ,NY,NX))
-                                PSNC(M,1,LL,NZ,NY,NX)=PSNC(M,1,LL,NZ,NY,NX)+CFOPP(0,M,NZ,NY,NX) &
-                                  *FSNCP*AMAX1(0.0,PPOOLR(2,LL,NZ,NY,NX))
-6450                          CONTINUE
-                              RTLG2(2,LL,NR,NZ,NY,NX)=AMAX1(0.0,RTLG2(2,LL,NR,NZ,NY,NX)) &
-                              *(1.0-FSNCM)
-                              WTRT2(2,LL,NR,NZ,NY,NX)=AMAX1(0.0,WTRT2(2,LL,NR,NZ,NY,NX)) &
-                              *(1.0-FSNCM)
-                              WTRT2N(2,LL,NR,NZ,NY,NX)=AMAX1(0.0,WTRT2N(2,LL,NR,NZ,NY,NX)) &
-                              *(1.0-FSNCM)
-                              WTRT2P(2,LL,NR,NZ,NY,NX)=AMAX1(0.0,WTRT2P(2,LL,NR,NZ,NY,NX)) &
-                              *(1.0-FSNCM)
-                              CPOOLR(2,LL,NZ,NY,NX)=AMAX1(0.0,CPOOLR(2,LL,NZ,NY,NX)) &
-                              *(1.0-FSNCP)
-                              ZPOOLR(2,LL,NZ,NY,NX)=AMAX1(0.0,ZPOOLR(2,LL,NZ,NY,NX)) &
-                              *(1.0-FSNCP)
-                              PPOOLR(2,LL,NZ,NY,NX)=AMAX1(0.0,PPOOLR(2,LL,NZ,NY,NX)) &
-                              *(1.0-FSNCP)
-                            ENDIF
-5105                      CONTINUE
-                        ENDIF
+                  IF(GRTWTM.LT.0.0)THEN
+                    IF(WTRT2(1,LL,NR,NZ,NY,NX).GT.ZEROP(NZ,NY,NX))THEN
+                      FSNCM=AMIN1(1.0,ABS(GRTWTM)/WTRT2(1,LL,NR,NZ,NY,NX))
+                    ELSE
+                      FSNCM=1.0_r8
+                    ENDIF
+                    IF(WTRTL(1,LL,NZ,NY,NX).GT.ZEROP(NZ,NY,NX))THEN
+                      FSNCP=AMIN1(1.0,ABS(GRTWTM)/WTRTL(1,LL,NZ,NY,NX))
+                    ELSE
+                      FSNCP=1.0_r8
+                    ENDIF
+                    DO 6450 M=1,4
+                      CSNC(M,0,LL,NZ,NY,NX)=CSNC(M,0,LL,NZ,NY,NX)+CFOPC(5,M,NZ,NY,NX) &
+                        *FSNCM*AMAX1(0.0,WTRT2(2,LL,NR,NZ,NY,NX))*FWODR(0)
+                      ZSNC(M,0,LL,NZ,NY,NX)=ZSNC(M,0,LL,NZ,NY,NX)+CFOPN(5,M,NZ,NY,NX) &
+                        *FSNCM*AMAX1(0.0,WTRT2N(2,LL,NR,NZ,NY,NX))*FWODRN(0)
+                      PSNC(M,0,LL,NZ,NY,NX)=PSNC(M,0,LL,NZ,NY,NX)+CFOPP(5,M,NZ,NY,NX) &
+                        *FSNCM*AMAX1(0.0,WTRT2P(2,LL,NR,NZ,NY,NX))*FWODRP(0)
+                      CSNC(M,1,LL,NZ,NY,NX)=CSNC(M,1,LL,NZ,NY,NX)+CFOPC(4,M,NZ,NY,NX) &
+                        *FSNCM*AMAX1(0.0,WTRT2(2,LL,NR,NZ,NY,NX))*FWODR(1)
+                      ZSNC(M,1,LL,NZ,NY,NX)=ZSNC(M,1,LL,NZ,NY,NX)+CFOPN(4,M,NZ,NY,NX) &
+                        *FSNCM*AMAX1(0.0,WTRT2N(2,LL,NR,NZ,NY,NX))*FWODRN(1)
+                      PSNC(M,1,LL,NZ,NY,NX)=PSNC(M,1,LL,NZ,NY,NX)+CFOPP(4,M,NZ,NY,NX) &
+                        *FSNCM*AMAX1(0.0,WTRT2P(2,LL,NR,NZ,NY,NX))*FWODRP(1)
+                      CSNC(M,1,LL,NZ,NY,NX)=CSNC(M,1,LL,NZ,NY,NX)+CFOPC(0,M,NZ,NY,NX) &
+                        *FSNCP*AMAX1(0.0,CPOOLR(2,LL,NZ,NY,NX))
+                      ZSNC(M,1,LL,NZ,NY,NX)=ZSNC(M,1,LL,NZ,NY,NX)+CFOPN(0,M,NZ,NY,NX) &
+                        *FSNCP*AMAX1(0.0,ZPOOLR(2,LL,NZ,NY,NX))
+                      PSNC(M,1,LL,NZ,NY,NX)=PSNC(M,1,LL,NZ,NY,NX)+CFOPP(0,M,NZ,NY,NX) &
+                        *FSNCP*AMAX1(0.0,PPOOLR(2,LL,NZ,NY,NX))
+6450                CONTINUE
+                    RTLG2(2,LL,NR,NZ,NY,NX)=AMAX1(0.0,RTLG2(2,LL,NR,NZ,NY,NX))*(1.0-FSNCM)
+                    WTRT2(2,LL,NR,NZ,NY,NX)=AMAX1(0.0,WTRT2(2,LL,NR,NZ,NY,NX))*(1.0-FSNCM)
+                    WTRT2N(2,LL,NR,NZ,NY,NX)=AMAX1(0.0,WTRT2N(2,LL,NR,NZ,NY,NX))*(1.0-FSNCM)
+                    WTRT2P(2,LL,NR,NZ,NY,NX)=AMAX1(0.0,WTRT2P(2,LL,NR,NZ,NY,NX))*(1.0-FSNCM)
+                    CPOOLR(2,LL,NZ,NY,NX)=AMAX1(0.0,CPOOLR(2,LL,NZ,NY,NX))*(1.0-FSNCP)
+                    ZPOOLR(2,LL,NZ,NY,NX)=AMAX1(0.0,ZPOOLR(2,LL,NZ,NY,NX))*(1.0-FSNCP)
+                    PPOOLR(2,LL,NZ,NY,NX)=AMAX1(0.0,PPOOLR(2,LL,NZ,NY,NX))*(1.0-FSNCP)
+                  ENDIF
+5105            CONTINUE
+              ENDIF
 
 !
-                        call PrimRootExtension(L,L1,N,NR,NZ,NY,NX,WFNR)
-                      ENDIF
-
+              call PrimRootExtension(L,L1,N,NR,NZ,NY,NX,WFNR)
+            ENDIF
 !
 !
-                      IF(L.EQ.NINR(NR,NZ,NY,NX))THEN
-                        call WithdrawPrimRoot(L,NR,NZ,NY,NX,N)
-                      ENDIF
+            IF(L.EQ.NINR(NR,NZ,NY,NX))THEN
+              call WithdrawPrimRoot(L,NR,NZ,NY,NX,N)
+            ENDIF
 
 !
 !     REMOVE ANY NEGATIVE ROOT MASS FROM NONSTRUCTURAL C
 !
-      IF(WTRT1(N,L,NR,NZ,NY,NX).LT.0.0)THEN
-      CPOOLR(N,L,NZ,NY,NX)=CPOOLR(N,L,NZ,NY,NX)+WTRT1(N,L,NR,NZ,NY,NX)
-      WTRT1(N,L,NR,NZ,NY,NX)=0._r8
-      ENDIF
-      IF(WTRT2(N,L,NR,NZ,NY,NX).LT.0.0)THEN
-      CPOOLR(N,L,NZ,NY,NX)=CPOOLR(N,L,NZ,NY,NX)+WTRT2(N,L,NR,NZ,NY,NX)
-      WTRT2(N,L,NR,NZ,NY,NX)=0._r8
-      ENDIF
+            IF(WTRT1(N,L,NR,NZ,NY,NX).LT.0.0)THEN
+              CPOOLR(N,L,NZ,NY,NX)=CPOOLR(N,L,NZ,NY,NX)+WTRT1(N,L,NR,NZ,NY,NX)
+              WTRT1(N,L,NR,NZ,NY,NX)=0._r8
+            ENDIF
+            IF(WTRT2(N,L,NR,NZ,NY,NX).LT.0.0)THEN
+              CPOOLR(N,L,NZ,NY,NX)=CPOOLR(N,L,NZ,NY,NX)+WTRT2(N,L,NR,NZ,NY,NX)
+              WTRT2(N,L,NR,NZ,NY,NX)=0._r8
+            ENDIF
 !
 !     TOTAL PRIMARY ROOT LENGTH AND MASS
 !
@@ -4270,18 +4156,103 @@ module grosubMod
 !     WTRT1=primary root C mass in soil layer
 !     NINR=deepest root layer
 !
-      RTLGZ=RTLGZ+RTLG1(N,L,NR,NZ,NY,NX)
-      WTRTZ=WTRTZ+WTRT1(N,L,NR,NZ,NY,NX)
-      NINR(NR,NZ,NY,NX)=MIN(NINR(NR,NZ,NY,NX),NJ(NY,NX))
-      IF(L.EQ.NINR(NR,NZ,NY,NX))NRX(N,NR)=1
-      ENDIF
-      ENDIF
-      RTLGZ=RTLGZ+RTLG1(N,L,NR,NZ,NY,NX)
-      WTRTZ=WTRTZ+WTRT1(N,L,NR,NZ,NY,NX)
+            RTLGZ=RTLGZ+RTLG1(N,L,NR,NZ,NY,NX)
+            WTRTZ=WTRTZ+WTRT1(N,L,NR,NZ,NY,NX)
+            NINR(NR,NZ,NY,NX)=MIN(NINR(NR,NZ,NY,NX),NJ(NY,NX))
+            IF(L.EQ.NINR(NR,NZ,NY,NX))NRX(N,NR)=1
+          ENDIF
+        ENDIF
+        RTLGZ=RTLGZ+RTLG1(N,L,NR,NZ,NY,NX)
+        WTRTZ=WTRTZ+WTRT1(N,L,NR,NZ,NY,NX)
 !     ENDIF
       ENDIF
       NIX(NZ,NY,NX)=MAX(NIX(NZ,NY,NX),NINR(NR,NZ,NY,NX))
 5050  CONTINUE
+  end subroutine GrowRootAxes
+
+!------------------------------------------------------------------------------------------
+
+  subroutine RootBiochemistry(I,J,NZ,NY,NX,ICHK1,IDTHRN,NRX,TFN6,WFNGR)
+  implicit none
+  integer, intent(in) :: I,J,NZ,NY,NX
+  integer, intent(inout) :: ICHK1(2,JZ)
+  integer, intent(out) :: IDTHRN
+  INTEGER, Intent(inout) :: NRX(2,JZ)
+  real(r8), intent(in) :: TFN6(JZ)
+  real(r8), intent(out) :: WFNGR(2,JZ)
+
+  integer :: LL,LZ,L1,L,K,lx,M,NR,N
+  real(r8) :: WFNR
+  real(r8) :: WFNRG
+  real(r8) :: CCC,CNC,CPC
+  real(r8) :: CPOOLD
+  real(r8) :: CPOOLX
+  real(r8) :: DMRTD
+!     begin_execution
+
+  NIX(NZ,NY,NX)=NG(NZ,NY,NX)
+  IDTHRN=0
+!
+!
+
+  call SummarizeRootSink(NZ,NY,NX)
+
+!
+!     RESPIRATION AND GROWTH OF ROOT, MYCORRHIZAE IN EACH LAYER
+!
+  DO 5010 N=1,MY(NZ,NY,NX)
+    DO 5000 L=NU(NY,NX),NI(NZ,NY,NX)
+!
+!     IDENTIFY NEXT LOWER ROOT LAYER
+!
+!     VOLX=soil layer volume excluding macropore, rocks
+!
+      IF(VOLX(L,NY,NX).GT.ZEROS2(NY,NX))THEN
+!     WRITE(*,4994)'5004',I,J,NZ,N,L,NI(NZ,NY,NX)
+!    2,NL(NY,NX),VOLX(L,NY,NX),CDPTHZ(L-1,NY,NX)
+        DO 5003 LZ=L+1,NL(NY,NX)
+!     WRITE(*,4994)'5003',I,J,NZ,N,L,LZ
+!    2,LZ,VOLX(L,NY,NX),CDPTHZ(LZ,NY,NX)
+          IF(VOLX(LZ,NY,NX).GT.ZEROS2(NY,NX) &
+            .OR.LZ.EQ.NL(NY,NX))THEN
+            L1=LZ
+            EXIT
+          ENDIF
+5003    CONTINUE
+!     WRITE(*,4994)'5005',I,J,NZ,N,L,LZ
+!    2,L1,VOLX(L,NY,NX),CDPTHZ(L1,NY,NX)
+!4994  FORMAT(A8,7I4,12E12.4)
+!
+!     WATER STRESS CONSTRAINT ON SECONDARY ROOT EXTENSION IMPOSED
+!     BY ROOT TURGOR AND SOIL PENETRATION RESISTANCE
+!
+!     RSCS,RSCS2=soil resistance to secondary root penetration (MPa)
+!     RRAD2=secondary root radius
+!     WFNR=water function for root extension
+!     IGTYP=growth type:0=bryophyte,1=graminoid,2=shrub,tree
+!     WFNGR,WFNRG=growth,respiration function of root water potential
+!     PSIRT,PSIRG=root total,turgor water potential
+!     DMRT=root growth yield
+!
+        RSCS2=RSCS(L,NY,NX)*RRAD2(N,L,NZ,NY,NX)/1.0E-03
+        WFNR=AMIN1(1.0,AMAX1(0.0,PSIRG(N,L,NZ,NY,NX)-PSILM-RSCS2))
+        IF(IGTYP(NZ,NY,NX).EQ.0)THEN
+          WFNGR(N,L)=EXP(0.05*PSIRT(N,L,NZ,NY,NX))
+          WFNRG=WFNR**0.10
+        ELSE
+          WFNGR(N,L)=EXP(0.10*PSIRT(N,L,NZ,NY,NX))
+          WFNRG=WFNR**0.25
+        ENDIF
+        DMRTD=1.0_r8-DMRT(NZ,NY,NX)
+        RTLGL=0._r8
+        RTLGZ=0._r8
+        WTRTX=0._r8
+        WTRTZ=0._r8
+!
+!     FOR EACH ROOT AXIS
+!
+        call GrowRootAxes(N,L,L1,NZ,NY,NX,NRX,WFNGR,ICHK1,WFNR,WFNRG,TFN6,DMRTD)
+
 !
 !     DRAW FROM ROOT NON-STRUCTURAL POOL WHEN
 !     SEASONAL STORAGE POOL IS DEPLETED
@@ -4544,6 +4515,7 @@ module grosubMod
   implicit none
   integer, intent(in) :: N,L,NZ,NY,NX,NR
   integer :: M
+  real(r8) :: CCC,CNC,CPC
 ! begin_execution
 !
 !     PRIMARY ROOT GROWTH RESPIRATION FROM TOTAL - MAINTENANCE
@@ -4812,16 +4784,21 @@ end subroutine PrimRootRemobilization
   end subroutine WithdrawPrimRoot
 !------------------------------------------------------------------------------------------
 
-      subroutine CanopyNoduleBiochemistry(I,J,NZ,NY,NX,NB)
-      implicit none
-      integer, intent(in) :: I,J,NZ,NY,NX,NB
+  subroutine CanopyNoduleBiochemistry(I,J,NZ,NY,NX,NB)
+  implicit none
+  integer, intent(in) :: I,J,NZ,NY,NX,NB
   integer :: M
   real(r8) :: ZADDN,ZPOOLD
-
+  real(r8) :: CCC,CNC,CPC
+  REAL(R8) :: cpoolt
+  real(r8) :: CPOOLD
+  real(r8) :: CCPOLN,CZPOLN
+  real(r8) :: CPPOLN,CGNDL
+  real(r8) :: CCNDLB
 !     begin_execution
 !     INTYP=N2 fixation: 4,5,6=rapid to slow canopy symbiosis
 !
-      IF(INTYP(NZ,NY,NX).GE.4)THEN
+  IF(INTYP(NZ,NY,NX).GE.4)THEN
 !
 !     INITIAL INFECTION
 !
@@ -4830,14 +4807,14 @@ end subroutine PrimRootRemobilization
 !     AREA=grid cell area
 !     CNND,CPND=bacterial N:C,P:C ratio from PFT file
 !
-      IF(WTNDB(NB,NZ,NY,NX).LE.0.0)THEN
+    IF(WTNDB(NB,NZ,NY,NX).LE.0.0)THEN
       WTNDB(NB,NZ,NY,NX)=WTNDB(NB,NZ,NY,NX) &
-      +WTNDI*AREA(3,NU(NY,NX),NY,NX)
+        +WTNDI*AREA(3,NU(NY,NX),NY,NX)
       WTNDBN(NB,NZ,NY,NX)=WTNDBN(NB,NZ,NY,NX) &
-      +WTNDI*AREA(3,NU(NY,NX),NY,NX)*CNND(NZ,NY,NX)
+        +WTNDI*AREA(3,NU(NY,NX),NY,NX)*CNND(NZ,NY,NX)
       WTNDBP(NB,NZ,NY,NX)=WTNDBP(NB,NZ,NY,NX) &
-      +WTNDI*AREA(3,NU(NY,NX),NY,NX)*CPND(NZ,NY,NX)
-      ENDIF
+        +WTNDI*AREA(3,NU(NY,NX),NY,NX)*CPND(NZ,NY,NX)
+    ENDIF
 !
 !     O2-UNCONSTRAINED RESPIRATION RATES BY HETEROTROPHIC AEROBES
 !     IN NODULE FROM SPECIFIC OXIDATION RATE, ACTIVE BIOMASS,
@@ -4850,36 +4827,33 @@ end subroutine PrimRootRemobilization
 !     CNKI,CPKI=nonstructural N,P inhibition constant on growth
 !     FCNPF=N,P constraint to bacterial activity
 !
-      IF(WTNDB(NB,NZ,NY,NX).GT.ZEROP(NZ,NY,NX))THEN
+    IF(WTNDB(NB,NZ,NY,NX).GT.ZEROP(NZ,NY,NX))THEN
       CCPOLN=AMAX1(0.0,CPOLNB(NB,NZ,NY,NX)/WTNDB(NB,NZ,NY,NX))
       CZPOLN=AMAX1(0.0,ZPOLNB(NB,NZ,NY,NX)/WTNDB(NB,NZ,NY,NX))
       CPPOLN=AMAX1(0.0,PPOLNB(NB,NZ,NY,NX)/WTNDB(NB,NZ,NY,NX))
-      ELSE
+    ELSE
       CCPOLN=1.0_r8
       CZPOLN=1.0_r8
       CPPOLN=1.0_r8
-      ENDIF
-      IF(CCPOLN.GT.ZERO)THEN
-      CCC=AMAX1(0.0,AMIN1(1.0 &
-      ,safe_adb(CZPOLN,CZPOLN+CCPOLN*CNKI) &
-      ,safe_adb(CPPOLN,CPPOLN+CCPOLN*CPKI)))
-      CNC=AMAX1(0.0,AMIN1(1.0 &
-      ,safe_adb(CCPOLN,CCPOLN+CZPOLN/CNKI)))
-      CPC=AMAX1(0.0,AMIN1(1.0 &
-      ,safe_adb(CCPOLN,CCPOLN+CPPOLN/CPKI)))
-      ELSE
+    ENDIF
+    IF(CCPOLN.GT.ZERO)THEN
+      CCC=AMAX1(0.0,AMIN1(1.0,safe_adb(CZPOLN,CZPOLN+CCPOLN*CNKI) &
+        ,safe_adb(CPPOLN,CPPOLN+CCPOLN*CPKI)))
+      CNC=AMAX1(0.0,AMIN1(1.0,safe_adb(CCPOLN,CCPOLN+CZPOLN/CNKI)))
+      CPC=AMAX1(0.0,AMIN1(1.0,safe_adb(CCPOLN,CCPOLN+CPPOLN/CPKI)))
+    ELSE
       CCC=0._r8
       CNC=0._r8
       CPC=0._r8
-      ENDIF
-      IF(WTNDB(NB,NZ,NY,NX).GT.ZEROP(NZ,NY,NX))THEN
+    ENDIF
+    IF(WTNDB(NB,NZ,NY,NX).GT.ZEROP(NZ,NY,NX))THEN
       FCNPF=AMIN1(1.0 &
-      ,SQRT(WTNDBN(NB,NZ,NY,NX)/(WTNDB(NB,NZ,NY,NX)*CNND(NZ,NY,NX))) &
-      ,SQRT(WTNDBP(NB,NZ,NY,NX)/(WTNDB(NB,NZ,NY,NX)*CPND(NZ,NY,NX))))
-      ELSE
+        ,SQRT(WTNDBN(NB,NZ,NY,NX)/(WTNDB(NB,NZ,NY,NX)*CNND(NZ,NY,NX))) &
+        ,SQRT(WTNDBP(NB,NZ,NY,NX)/(WTNDB(NB,NZ,NY,NX)*CPND(NZ,NY,NX))))
+    ELSE
       FCNPF=1.0_r8
-      ENDIF
-      SPNDLI=CCPOLN/(CCPOLN+SPNDLK)
+    ENDIF
+    SPNDLI=CCPOLN/(CCPOLN+SPNDLK)
 !
 !     RESPIRATION FROM NON-STRUCTURAL C DETERMINED BY TEMPERATURE,
 !     NON-STRUCTURAL C:N:P
@@ -4892,7 +4866,7 @@ end subroutine PrimRootRemobilization
 !     FCNPF=N,P constraint to bacterial activity
 !     WFNG=growth function of canopy water potential
 !
-      RCNDL=AMAX1(0.0,AMIN1(CPOLNB(NB,NZ,NY,NX) &
+    RCNDL=AMAX1(0.0,AMIN1(CPOLNB(NB,NZ,NY,NX) &
       ,VMXO*WTNDB(NB,NZ,NY,NX))*FCNPF*TFN3(NZ,NY,NX)*WFNG)
 !     CPOOLNX=CPOLNB(NB,NZ,NY,NX)
 !     VMXOX=VMXO*WTNDB(NB,NZ,NY,NX)*FCNPF*TFN3(NZ,NY,NX)*WFNG
@@ -4905,7 +4879,7 @@ end subroutine PrimRootRemobilization
 !     TFN5=temperature function for canopy maintenance respiration
 !     WTNDBN=bacterial N mass
 !
-      RMNDL=AMAX1(0.0,RMPLT*TFN5*WTNDBN(NB,NZ,NY,NX))*SPNDLI
+    RMNDL=AMAX1(0.0,RMPLT*TFN5*WTNDBN(NB,NZ,NY,NX))*SPNDLI
 !
 !     NODULE GROWTH RESPIRATION FROM TOTAL - MAINTENANCE
 !     IF > 0 DRIVES GROWTH, IF < 0 DRIVES REMOBILIZATION
@@ -4914,9 +4888,9 @@ end subroutine PrimRootRemobilization
 !     RGNDL=growth respiration unlimited by N,P
 !     RSNDL=excess maintenance respiration
 !
-      RXNDL=RCNDL-RMNDL
-      RGNDL=AMAX1(0.0,RXNDL)
-      RSNDL=AMAX1(0.0,-RXNDL)
+    RXNDL=RCNDL-RMNDL
+    RGNDL=AMAX1(0.0,RXNDL)
+    RSNDL=AMAX1(0.0,-RXNDL)
 !
 !     NODULE N2 FIXATION FROM GROWTH RESPIRATION, FIXATION ENERGY
 !     REQUIREMENT AND NON-STRUCTURAL C:N:P PRODUCT INHIBITION,
@@ -4930,15 +4904,14 @@ end subroutine PrimRootRemobilization
 !     RGN2F=respiration for N2 fixation
 !     RUPNFB,UPNFC=branch,total N2 fixation
 !
-      RGN2P=AMAX1(0.0,WTNDB(NB,NZ,NY,NX)*CNND(NZ,NY,NX) &
-      -WTNDBN(NB,NZ,NY,NX))/EN2F
-      IF(RGNDL.GT.ZEROP(NZ,NY,NX))THEN
+    RGN2P=AMAX1(0.0,WTNDB(NB,NZ,NY,NX)*CNND(NZ,NY,NX)-WTNDBN(NB,NZ,NY,NX))/EN2F
+    IF(RGNDL.GT.ZEROP(NZ,NY,NX))THEN
       RGN2F=RGNDL*RGN2P/(RGNDL+RGN2P)
-      ELSE
+    ELSE
       RGN2F=0._r8
-      ENDIF
-      RUPNFB=RGN2F*EN2F
-      UPNFC(NZ,NY,NX)=UPNFC(NZ,NY,NX)+RUPNFB
+    ENDIF
+    RUPNFB=RGN2F*EN2F
+    UPNFC(NZ,NY,NX)=UPNFC(NZ,NY,NX)+RUPNFB
 !
 !     NODULE C,N,P REMOBILIZATION AND DECOMPOSITION AND LEAKAGE
 !
@@ -4955,19 +4928,19 @@ end subroutine PrimRootRemobilization
 !     RDNDLC,RDNDLN,RDNDLP=bacterial C,N,P decomposition to litterfall
 !     RCNDLC,RCNDLN,RCNDLP=bacterial C,N,P decomposition to recycling
 !
-      RCCC=RCCZN+CCC*RCCYN
-      RCCN=CNC*RCCXN
-      RCCP=CPC*RCCQN
-      SPNDX=SPNDL*SQRT(TFN3(NZ,NY,NX)*WFNG)
-      RXNDLC=SPNDX*WTNDB(NB,NZ,NY,NX)
-      RXNDLN=SPNDX*WTNDBN(NB,NZ,NY,NX)
-      RXNDLP=SPNDX*WTNDBP(NB,NZ,NY,NX)
-      RDNDLC=RXNDLC*(1.0-RCCC)
-      RDNDLN=RXNDLN*(1.0-RCCC)*(1.0-RCCN)
-      RDNDLP=RXNDLP*(1.0-RCCC)*(1.0-RCCP)
-      RCNDLC=RXNDLC-RDNDLC
-      RCNDLN=RXNDLN-RDNDLN
-      RCNDLP=RXNDLP-RDNDLP
+    RCCC=RCCZN+CCC*RCCYN
+    RCCN=CNC*RCCXN
+    RCCP=CPC*RCCQN
+    SPNDX=SPNDL*SQRT(TFN3(NZ,NY,NX)*WFNG)
+    RXNDLC=SPNDX*WTNDB(NB,NZ,NY,NX)
+    RXNDLN=SPNDX*WTNDBN(NB,NZ,NY,NX)
+    RXNDLP=SPNDX*WTNDBP(NB,NZ,NY,NX)
+    RDNDLC=RXNDLC*(1.0-RCCC)
+    RDNDLN=RXNDLN*(1.0-RCCC)*(1.0-RCCN)
+    RDNDLP=RXNDLP*(1.0-RCCC)*(1.0-RCCP)
+    RCNDLC=RXNDLC-RDNDLC
+    RCNDLN=RXNDLN-RDNDLN
+    RCNDLP=RXNDLP-RDNDLP
 !
 !     TOTAL NON-STRUCTURAL C,N,P USED IN NODULE GROWTH
 !     AND GROWTH RESPIRATION DEPENDS ON GROWTH YIELD
@@ -4988,13 +4961,13 @@ end subroutine PrimRootRemobilization
 !     CCPOLN,CZPOLN,CPPOLN=nonstructural C,N,P concn in bacteria
 !     CZKM,CPKM=Km for nonstructural N,P uptake by bacteria
 !
-      CGNDL=AMIN1(CPOLNB(NB,NZ,NY,NX)-AMIN1(RMNDL,RCNDL) &
+    CGNDL=AMIN1(CPOLNB(NB,NZ,NY,NX)-AMIN1(RMNDL,RCNDL) &
       -RGN2F+RCNDLC,(RGNDL-RGN2F)/(1.0-DMND(NZ,NY,NX)))
-      GRNDG=CGNDL*DMND(NZ,NY,NX)
-      RGNDG=RGN2F+CGNDL*(1.0-DMND(NZ,NY,NX))
-      ZADDN=AMAX1(0.0,AMIN1(ZPOLNB(NB,NZ,NY,NX) &
+    GRNDG=CGNDL*DMND(NZ,NY,NX)
+    RGNDG=RGN2F+CGNDL*(1.0-DMND(NZ,NY,NX))
+    ZADDN=AMAX1(0.0,AMIN1(ZPOLNB(NB,NZ,NY,NX) &
       ,GRNDG*CNND(NZ,NY,NX)))*CZPOLN/(CZPOLN+CZKM)
-      PADDN=AMAX1(0.0,AMIN1(PPOLNB(NB,NZ,NY,NX) &
+    PADDN=AMAX1(0.0,AMIN1(PPOLNB(NB,NZ,NY,NX) &
       ,GRNDG*CPND(NZ,NY,NX)))*CPPOLN/(CPPOLN+CPKM)
 !
 !     NODULE SENESCENCE
@@ -5006,8 +4979,7 @@ end subroutine PrimRootRemobilization
 !     RDNSNC,RDNSNC,RDNSNP=bacterial C,N,P senescence to litterfall
 !     RCNSNC,RCNSNC,RCNSNP=bacterial C,N,P senescence to recycling
 !
-      IF(RSNDL.GT.0.0.AND.WTNDB(NB,NZ,NY,NX).GT.ZEROP(NZ,NY,NX) &
-      .AND.RCCC.GT.ZERO)THEN
+    IF(RSNDL.GT.0.0.AND.WTNDB(NB,NZ,NY,NX).GT.ZEROP(NZ,NY,NX).AND.RCCC.GT.ZERO)THEN
       RXNSNC=RSNDL/RCCC
       RXNSNN=RXNSNC*WTNDBN(NB,NZ,NY,NX)/WTNDB(NB,NZ,NY,NX)
       RXNSNP=RXNSNC*WTNDBP(NB,NZ,NY,NX)/WTNDB(NB,NZ,NY,NX)
@@ -5017,7 +4989,7 @@ end subroutine PrimRootRemobilization
       RCNSNC=RXNSNC-RDNSNC
       RCNSNN=RXNSNN-RDNSNN
       RCNSNP=RXNSNP-RDNSNP
-      ELSE
+    ELSE
       RXNSNC=0._r8
       RXNSNN=0._r8
       RXNSNP=0._r8
@@ -5027,7 +4999,7 @@ end subroutine PrimRootRemobilization
       RCNSNC=0._r8
       RCNSNN=0._r8
       RCNSNP=0._r8
-      ENDIF
+    ENDIF
 !
 !     TOTAL NODULE RESPIRATION
 !
@@ -5041,12 +5013,12 @@ end subroutine PrimRootRemobilization
 !     RECO=ecosystem respiration
 !     TRAU=total autotrophic respiration
 !
-      RCO2T=AMIN1(RMNDL,RCNDL)+RGNDG+RCNSNC
-      TCO2T(NZ,NY,NX)=TCO2T(NZ,NY,NX)-RCO2T
-      TCO2A(NZ,NY,NX)=TCO2A(NZ,NY,NX)-RCO2T
-      CNET(NZ,NY,NX)=CNET(NZ,NY,NX)-RCO2T
-      RECO(NY,NX)=RECO(NY,NX)-RCO2T
-      TRAU(NY,NX)=TRAU(NY,NX)-RCO2T
+    RCO2T=AMIN1(RMNDL,RCNDL)+RGNDG+RCNSNC
+    TCO2T(NZ,NY,NX)=TCO2T(NZ,NY,NX)-RCO2T
+    TCO2A(NZ,NY,NX)=TCO2A(NZ,NY,NX)-RCO2T
+    CNET(NZ,NY,NX)=CNET(NZ,NY,NX)-RCO2T
+    RECO(NY,NX)=RECO(NY,NX)-RCO2T
+    TRAU(NY,NX)=TRAU(NY,NX)-RCO2T
 !
 !     NODULE LITTERFALL CAUSED BY REMOBILIZATION
 !
@@ -5055,13 +5027,10 @@ end subroutine PrimRootRemobilization
 !     RDNDLC,RDNDLN,RDNDLP=bacterial C,N,P decomposition to litterfall
 !     RDNSNC,RDNSNC,RDNSNP=bacterial C,N,P senescence to litterfall
 !
-      DO 6470 M=1,4
-      CSNC(M,1,0,NZ,NY,NX)=CSNC(M,1,0,NZ,NY,NX)+CFOPC(1,M,NZ,NY,NX) &
-      *(RDNDLC+RDNSNC)
-      ZSNC(M,1,0,NZ,NY,NX)=ZSNC(M,1,0,NZ,NY,NX)+CFOPN(1,M,NZ,NY,NX) &
-      *(RDNDLN+RDNSNN)
-      PSNC(M,1,0,NZ,NY,NX)=PSNC(M,1,0,NZ,NY,NX)+CFOPP(1,M,NZ,NY,NX) &
-      *(RDNDLP+RDNSNP)
+    DO 6470 M=1,4
+      CSNC(M,1,0,NZ,NY,NX)=CSNC(M,1,0,NZ,NY,NX)+CFOPC(1,M,NZ,NY,NX)*(RDNDLC+RDNSNC)
+      ZSNC(M,1,0,NZ,NY,NX)=ZSNC(M,1,0,NZ,NY,NX)+CFOPN(1,M,NZ,NY,NX)*(RDNDLN+RDNSNN)
+      PSNC(M,1,0,NZ,NY,NX)=PSNC(M,1,0,NZ,NY,NX)+CFOPP(1,M,NZ,NY,NX)*(RDNDLP+RDNSNP)
 6470  CONTINUE
 !
 !     CONSUMPTION OF NON-STRUCTURAL C,N,P BY NODULE
@@ -5076,11 +5045,9 @@ end subroutine PrimRootRemobilization
 !     ZADDN,PADDN=nonstructural N,P used in growth
 !     RUPNFB=branch N2 fixation
 !
-      CPOLNB(NB,NZ,NY,NX)=CPOLNB(NB,NZ,NY,NX)-AMIN1(RMNDL,RCNDL) &
-      -RGN2F-CGNDL+RCNDLC
-      ZPOLNB(NB,NZ,NY,NX)=ZPOLNB(NB,NZ,NY,NX)-ZADDN+RCNDLN+RCNSNN &
-      +RUPNFB
-      PPOLNB(NB,NZ,NY,NX)=PPOLNB(NB,NZ,NY,NX)-PADDN+RCNDLP+RCNSNP
+    CPOLNB(NB,NZ,NY,NX)=CPOLNB(NB,NZ,NY,NX)-AMIN1(RMNDL,RCNDL)-RGN2F-CGNDL+RCNDLC
+    ZPOLNB(NB,NZ,NY,NX)=ZPOLNB(NB,NZ,NY,NX)-ZADDN+RCNDLN+RCNSNN+RUPNFB
+    PPOLNB(NB,NZ,NY,NX)=PPOLNB(NB,NZ,NY,NX)-PADDN+RCNDLP+RCNSNP
 !
 !     UPDATE STATE VARIABLES FOR NODULE C, N, P
 !
@@ -5090,9 +5057,9 @@ end subroutine PrimRootRemobilization
 !     RXNSNC,RXNSNC,RXNSNP=bacterial C,N,P loss from senescence
 !     ZADDN,PADDN=nonstructural N,P used in growth
 !
-      WTNDB(NB,NZ,NY,NX)=WTNDB(NB,NZ,NY,NX)+GRNDG-RXNDLC-RXNSNC
-      WTNDBN(NB,NZ,NY,NX)=WTNDBN(NB,NZ,NY,NX)+ZADDN-RXNDLN-RXNSNN
-      WTNDBP(NB,NZ,NY,NX)=WTNDBP(NB,NZ,NY,NX)+PADDN-RXNDLP-RXNSNP
+    WTNDB(NB,NZ,NY,NX)=WTNDB(NB,NZ,NY,NX)+GRNDG-RXNDLC-RXNSNC
+    WTNDBN(NB,NZ,NY,NX)=WTNDBN(NB,NZ,NY,NX)+ZADDN-RXNDLN-RXNSNN
+    WTNDBP(NB,NZ,NY,NX)=WTNDBP(NB,NZ,NY,NX)+PADDN-RXNDLP-RXNSNP
 !     IF((I/30)*30.EQ.I.AND.J.EQ.12)THEN
 !     WRITE(*,2121)'NODGR',I,J,NZ,NB
 !    2,RCNDL,RMNDL,RGNDL,RGN2P,RCO2T,RXNDLC,SPNDLI
@@ -5119,33 +5086,30 @@ end subroutine PrimRootRemobilization
 !     XFRC,XFRN,XFRC=nonstructural C,N,P transfer
 !     CPOLNB,ZPOLNB,PPOLNB=nonstructural C,N,P in bacteria
 !
-      IF(CPOOL(NB,NZ,NY,NX).GT.ZEROP(NZ,NY,NX) &
+    IF(CPOOL(NB,NZ,NY,NX).GT.ZEROP(NZ,NY,NX) &
       .AND.WTLSB(NB,NZ,NY,NX).GT.ZEROL(NZ,NY,NX))THEN
       CCNDLB=WTNDB(NB,NZ,NY,NX)/WTLSB(NB,NZ,NY,NX)
       WTLSB1=WTLSB(NB,NZ,NY,NX)
-      WTNDB1=AMIN1(WTLSB(NB,NZ,NY,NX) &
-      ,AMAX1(WTNDI*AREA(3,NU(NY,NX),NY,NX),WTNDB(NB,NZ,NY,NX)))
+      WTNDB1=AMIN1(WTLSB(NB,NZ,NY,NX),AMAX1(WTNDI*AREA(3,NU(NY,NX),NY,NX),WTNDB(NB,NZ,NY,NX)))
       WTLSBT=WTLSB1+WTNDB1
       IF(WTLSBT.GT.ZEROP(NZ,NY,NX))THEN
-      FXRNX=FXRN(INTYP(NZ,NY,NX))/(1.0+CCNDLB/CCNGB)
+        FXRNX=FXRN(INTYP(NZ,NY,NX))/(1.0+CCNDLB/CCNGB)
 !    2/(1.0+CCNDLB/(CCNGB*FXRN(INTYP(NZ,NY,NX))))
-      CPOOLD=(CPOOL(NB,NZ,NY,NX)*WTNDB1 &
-      -CPOLNB(NB,NZ,NY,NX)*WTLSB1)/WTLSBT
-      XFRC=FXRNX*CPOOLD
-      CPOOL(NB,NZ,NY,NX)=CPOOL(NB,NZ,NY,NX)-XFRC
-      CPOLNB(NB,NZ,NY,NX)=CPOLNB(NB,NZ,NY,NX)+XFRC
-      CPOOLT=CPOOL(NB,NZ,NY,NX)+CPOLNB(NB,NZ,NY,NX)
-      IF(CPOOLT.GT.ZEROP(NZ,NY,NX))THEN
-      ZPOOLD=(ZPOOL(NB,NZ,NY,NX)*CPOLNB(NB,NZ,NY,NX) &
-      -ZPOLNB(NB,NZ,NY,NX)*CPOOL(NB,NZ,NY,NX))/CPOOLT
-      XFRN=FXRNX*ZPOOLD
-      PPOOLD=(PPOOL(NB,NZ,NY,NX)*CPOLNB(NB,NZ,NY,NX) &
-      -PPOLNB(NB,NZ,NY,NX)*CPOOL(NB,NZ,NY,NX))/CPOOLT
-      XFRP=FXRNX*PPOOLD
-      ZPOOL(NB,NZ,NY,NX)=ZPOOL(NB,NZ,NY,NX)-XFRN
-      PPOOL(NB,NZ,NY,NX)=PPOOL(NB,NZ,NY,NX)-XFRP
-      ZPOLNB(NB,NZ,NY,NX)=ZPOLNB(NB,NZ,NY,NX)+XFRN
-      PPOLNB(NB,NZ,NY,NX)=PPOLNB(NB,NZ,NY,NX)+XFRP
+        CPOOLD=(CPOOL(NB,NZ,NY,NX)*WTNDB1-CPOLNB(NB,NZ,NY,NX)*WTLSB1)/WTLSBT
+        XFRC=FXRNX*CPOOLD
+        CPOOL(NB,NZ,NY,NX)=CPOOL(NB,NZ,NY,NX)-XFRC
+        CPOLNB(NB,NZ,NY,NX)=CPOLNB(NB,NZ,NY,NX)+XFRC
+        CPOOLT=CPOOL(NB,NZ,NY,NX)+CPOLNB(NB,NZ,NY,NX)
+        IF(CPOOLT.GT.ZEROP(NZ,NY,NX))THEN
+          ZPOOLD=(ZPOOL(NB,NZ,NY,NX)*CPOLNB(NB,NZ,NY,NX)-ZPOLNB(NB,NZ,NY,NX)*CPOOL(NB,NZ,NY,NX))/CPOOLT
+          XFRN=FXRNX*ZPOOLD
+          PPOOLD=(PPOOL(NB,NZ,NY,NX)*CPOLNB(NB,NZ,NY,NX) &
+            -PPOLNB(NB,NZ,NY,NX)*CPOOL(NB,NZ,NY,NX))/CPOOLT
+          XFRP=FXRNX*PPOOLD
+          ZPOOL(NB,NZ,NY,NX)=ZPOOL(NB,NZ,NY,NX)-XFRN
+          PPOOL(NB,NZ,NY,NX)=PPOOL(NB,NZ,NY,NX)-XFRP
+          ZPOLNB(NB,NZ,NY,NX)=ZPOLNB(NB,NZ,NY,NX)+XFRN
+          PPOLNB(NB,NZ,NY,NX)=PPOLNB(NB,NZ,NY,NX)+XFRP
 !     IF((I/30)*30.EQ.I.AND.J.EQ.12)THEN
 !     WRITE(*,2120)'NODEX',I,J,NZ,NB,IFLGA(NB,NZ,NY,NX)
 !    2,XFRC,XFRN,XFRP
@@ -5159,22 +5123,24 @@ end subroutine PrimRootRemobilization
 !    2,WTNDB(NB,NZ,NY,NX),CPOLNB(NB,NZ,NY,NX)+WTNDB(NB,NZ,NY,NX)
 !    3,RMNDL,RCNDL,RGN2F,CGNDL,RCNDLC,GRNDG,RXNDLC,RXNSNC,RCO2T
 !    4,RGNDG,RGNDL,RCNSNC
+        ENDIF
       ENDIF
-      ENDIF
-      ENDIF
-      ENDIF
-      end subroutine CanopyNoduleBiochemistry
+    ENDIF
+  ENDIF
+  end subroutine CanopyNoduleBiochemistry
 !------------------------------------------------------------------------------------------
 
-      subroutine C4PhotoProductTransfer(I,J,NZ,NY,NX,NB,CH2O3,CH2O4)
-      implicit none
-      integer, intent(in) :: I,J,NZ,NY,NX,NB
+  subroutine C4PhotoProductTransfer(I,J,NZ,NY,NX,NB,CH2O3,CH2O4)
+  implicit none
+  integer, intent(in) :: I,J,NZ,NY,NX,NB
   real(r8), intent(in) :: CH2O3(25),CH2O4(25)
   integer :: K
+  real(r8) :: CPL4M,CCBS,CPL3K,CO2LK
+
 !     begin_execution
 
-      DO 170 K=1,25
-      IF(WGLF(K,NB,NZ,NY,NX).GT.ZEROP(NZ,NY,NX))THEN
+  DO 170 K=1,25
+    IF(WGLF(K,NB,NZ,NY,NX).GT.ZEROP(NZ,NY,NX))THEN
 !
 !     MESOPHYLL TO BUNDLE SHEATH TRANSFER
 !
@@ -5187,8 +5153,8 @@ end subroutine PrimRootRemobilization
       CPOOL3(K,NB,NZ,NY,NX)=CPOOL3(K,NB,NZ,NY,NX)-CH2O3(K)
       CPOOL4(K,NB,NZ,NY,NX)=CPOOL4(K,NB,NZ,NY,NX)+CH2O4(K)
       CPL4M=1.0_r8*(CPOOL4(K,NB,NZ,NY,NX)*WGLF(K,NB,NZ,NY,NX)*FBS &
-      -CPOOL3(K,NB,NZ,NY,NX)*WGLF(K,NB,NZ,NY,NX)*FMP) &
-      /(WGLF(K,NB,NZ,NY,NX)*(FBS+FMP))
+        -CPOOL3(K,NB,NZ,NY,NX)*WGLF(K,NB,NZ,NY,NX)*FMP) &
+        /(WGLF(K,NB,NZ,NY,NX)*(FBS+FMP))
       CPOOL4(K,NB,NZ,NY,NX)=CPOOL4(K,NB,NZ,NY,NX)-CPL4M
       CPOOL3(K,NB,NZ,NY,NX)=CPOOL3(K,NB,NZ,NY,NX)+CPL4M
 !
@@ -5203,8 +5169,7 @@ end subroutine PrimRootRemobilization
 !     FCO2B,FHCOB=partition decarboxylation to CO2,HCO3
 !     CPOOL3=C4 nonstructural C mass in bundle sheath
 !
-      CCBS=AMAX1(0.0,0.083E+09*CO2B(K,NB,NZ,NY,NX) &
-      /(WGLF(K,NB,NZ,NY,NX)*FBS))
+      CCBS=AMAX1(0.0,0.083E+09*CO2B(K,NB,NZ,NY,NX)/(WGLF(K,NB,NZ,NY,NX)*FBS))
       CPL3K=2.5E-02*CPOOL3(K,NB,NZ,NY,NX)/(1.0+CCBS/CO2KI)
       CPOOL3(K,NB,NZ,NY,NX)=CPOOL3(K,NB,NZ,NY,NX)-CPL3K
       CO2B(K,NB,NZ,NY,NX)=CO2B(K,NB,NZ,NY,NX)+FCO2B*CPL3K
@@ -5244,20 +5209,20 @@ end subroutine PrimRootRemobilization
       CNET(NZ,NY,NX)=CNET(NZ,NY,NX)-CO2LK
       RECO(NY,NX)=RECO(NY,NX)-CO2LK
       TRAU(NY,NX)=TRAU(NY,NX)-CO2LK
-      ENDIF
-170   CONTINUE
-      end subroutine C4PhotoProductTransfer
+    ENDIF
+170 CONTINUE
+  end subroutine C4PhotoProductTransfer
 !------------------------------------------------------------------------------------------
 
-  subroutine ComputeGPP(I,J,NB,NZ,NY,NX,TFN6,ZADDB,CH2O3,CH2O4)
+  subroutine ComputeGPP(I,J,NB,NZ,NY,NX,TFN6,ZADDB,CH2O3,CH2O4,CNPG,DMSHD)
   implicit none
   integer, intent(in) :: I,J,NB,NZ,NY,NX
   real(r8), intent(in) :: TFN6(JZ)
+  real(r8), intent(in) :: DMSHD
   real(r8), intent(out) :: ZADDB
   real(r8), intent(out) :: CH2O3(25),CH2O4(25)
+  REAL(R8), INTENT(OUT) :: CNPG
   integer :: K
-
-
 
 ! begin_execution
 
@@ -5351,13 +5316,13 @@ end subroutine PrimRootRemobilization
 !
 !   SHOOT AUTOTROPHIC RESPIRATION AFTER EMERGENCE
 !
-    call ComputeRAutoAfEmergence(NB,NZ,NY,NX, ZADDB)
+    call ComputeRAutoAfEmergence(NB,NZ,NY,NX, ZADDB,CNPG,DMSHD)
 
 
 !   SHOOT AUTOTROPHIC RESPIRATION BEFORE EMERGENCE
 !
   ELSE
-    call ComputeRAutoBfEmergence(NB,NZ,NY,NX,TFN6,ZADDB)
+    call ComputeRAutoBfEmergence(NB,NZ,NY,NX,TFN6,ZADDB,CNPG,DMSHD)
   ENDIF
   end subroutine ComputeGPP
 !------------------------------------------------------------------------------------------
@@ -5369,7 +5334,11 @@ end subroutine PrimRootRemobilization
   REAL(R8) :: ARLFI
 
   integer :: N
+  real(r8) :: FPARTL
   real(r8) :: PSILY(0:3)
+  real(r8), parameter :: FPART1=1.00_r8
+  real(r8), parameter :: FPART2=0.40_r8
+
   PSILY=real((/-200.0,-2.0,-2.0,-2.0/),r8)
 
 !     begin_execution
@@ -5577,6 +5546,7 @@ end subroutine PrimRootRemobilization
   REAL(R8), INTENT(IN) :: TFN6(JZ)
   real(r8), intent(in) :: ZCX(JP,JY,JX)
   real(r8), intent(in) :: CNLFW,CPLFW,CNSHW,CPSHW
+  real(r8) :: DMSHD
   integer  :: K,KNOD,KK,kx,K1,K2,KVSTGX,KSNC
   integer  :: KN,MNNOD,NN,MXNOD,M,N,NNOD1
   integer  :: NBK,NBY,NBL,NBX
@@ -5587,7 +5557,17 @@ end subroutine PrimRootRemobilization
   REAL(R8) :: PART(7)
   real(r8) :: ALLOCL,ALLOCS
   REAL(R8) :: ALLOCN
-
+  REAL(R8) :: CNPG
+  real(r8) :: CCE
+  real(r8) :: CCC,CNC,CPC
+  REAL(R8) :: cpoolt
+  real(r8) :: DMLFB
+  real(r8) :: DMSHB
+  real(r8) :: DMSHT
+  real(r8) :: ETOL
+  real(r8) :: FSNC
+  real(r8) :: FSNCL
+  real(r8) :: FSNCS
 ! begin_execution
 
   WTLSB(NB,NZ,NY,NX)=AMAX1(0.0_r8,WTLFB(NB,NZ,NY,NX)+WTSHEB(NB,NZ,NY,NX))
@@ -5663,7 +5643,7 @@ end subroutine PrimRootRemobilization
 !
 !   GROSS PRIMARY PRODUCTIVITY
 !
-    call ComputeGPP(I,J,NB,NZ,NY,NX,TFN6,ZADDB,CH2O3,CH2O4)
+    call ComputeGPP(I,J,NB,NZ,NY,NX,TFN6,ZADDB,CH2O3,CH2O4,CNPG,DMSHD)
 !
 !   REMOVE C,N,P USED IN MAINTENANCE + GROWTH REPIRATION AND GROWTH
 !   FROM NON-STRUCTURAL POOLS
@@ -6405,7 +6385,10 @@ end subroutine PrimRootRemobilization
   INTEGER, intent(in)    :: nb,nz,ny,nx,KSNC
   real(r8), intent(in) :: XKSNC
   integer :: N,M,K,KK,MXNOD,MNNOD
-
+  real(r8) :: FSNCL,FSNCS
+  real(r8) :: FNCLF,FSNAL,FSNAS,FRCC
+  real(r8) :: FSNCK
+  real(r8) :: FSNCR
 ! begin_execution
 !     REMOBILIZATION AND LITTERFALL WHEN GROWTH RESPIRATION < 0
 !     STARTING FROM LOWEST LEAFED NODE AND PROCEEDING UPWARDS
@@ -7349,6 +7332,7 @@ end subroutine PrimRootRemobilization
   real(r8) :: YWGLFN,YWGLFP
   real(r8) :: YARLF,YWGLF,YLGLF,XLGLF
   real(r8) :: ARSTKB,ASTV
+  real(r8) :: FRACL
 ! begin_execution
 !   ALLOCATION OF LEAF AREA TO CANOPY LAYERS
 !
@@ -7594,7 +7578,7 @@ end subroutine AllocateLeafToCanopyLayers
   integer, intent(in) :: I,NB,NZ,NY,NX
   real(r8) :: ZPGRP,ZPGRN,ZNPGP,ZNPGN
   real(r8) :: XLOCM,XLOCC,XLOCN,XLOCP
-
+  real(r8) :: FGRNX
 ! begin_execution
 
 !
@@ -7894,6 +7878,15 @@ end subroutine AllocateLeafToCanopyLayers
   real(r8) :: ZPOOLM,ZPOOLD
   real(r8) :: XFRPX,XFRCX,XFRNX
   real(r8) :: ATRPPD
+  REAL(R8) :: cpoolt
+  real(r8) :: CPOOLM,CH2OH
+  real(r8) :: CWTRSV
+  REAL(R8) :: CWTRSN,CWTRSP
+  real(r8) :: CNR,CPR
+  real(r8) :: CNL,CPL
+  real(r8) :: CPOOLD
+  real(r8) :: DATRP
+  real(r8) :: FXFC,FXFN
   ! begin_execution
 !   TRANSFER C,N,P FROM SEASONAL STORAGE TO SHOOT AND ROOT
 !   NON-STRUCTURAL C DURING SEED GERMINATION OR LEAFOUT
@@ -8492,6 +8485,9 @@ end subroutine CarbNutInBranchTransfer
   real(r8) :: WTLSBZ(10)
   real(r8) :: CPOOLZ(10),ZPOOLZ(10),PPOOLZ(10)
   REAL(R8) :: FWTR(JZ),FWTB(JP)
+  real(r8) :: CPOOLT
+  real(r8) :: CNL,CPL,CPOOLD
+  real(r8) :: CPOOLB,CPOOLS
 !     begin_execution
 !
 !     TRANSFER NON-STRUCTURAL C,N,P AMONG BRANCH LEAVES
@@ -9707,6 +9703,13 @@ end subroutine CarbNutInBranchTransfer
   real(r8) :: WFN4
   real(r8) :: WFNB
   real(r8) :: CO2X,CO2C,CO2Y
+  real(r8) :: CBXNX
+  real(r8) :: DIFF
+  real(r8) :: ETLF4
+  real(r8) :: EGRO4
+  real(r8) :: EGROX
+  real(r8) :: ETLF
+  real(r8) :: EGRO
 ! begin_execution
 
 ! FOR EACH CANOPY LAYER
@@ -10025,6 +10028,11 @@ end subroutine CarbNutInBranchTransfer
   integer :: L,NN,M,N
   real(r8) :: WFNB
   real(r8) :: CO2X,CO2C,CO2Y
+  real(r8) :: CBXNX
+  real(r8) :: DIFF
+  real(r8) :: EGROX
+  real(r8) :: ETLF
+  real(r8) :: EGRO
 !
 ! FOR EACH CANOPY LAYER
 !
@@ -10263,12 +10271,13 @@ end subroutine CarbNutInBranchTransfer
 
 !------------------------------------------------------------------------------------------
 
-  subroutine ComputeRAutoAfEmergence(NB,NZ,NY,NX,ZADDB)
+  subroutine ComputeRAutoAfEmergence(NB,NZ,NY,NX,ZADDB,CNPG,DMSHD)
   implicit none
   integer, intent(in) :: NB,NZ,NY,NX
   real(r8), intent(out) :: ZADDB
+  real(r8), INTENT(OUT) :: CNPG
+  real(r8), intent(in) :: DMSHD
   real(r8) :: ZPOOLB
-
 ! begin_execution
 ! N,P CONSTRAINT ON RESPIRATION FROM NON-STRUCTURAL C:N:P
 !
@@ -10408,13 +10417,15 @@ end subroutine CarbNutInBranchTransfer
 
 !------------------------------------------------------------------------------------------
 
-  subroutine ComputeRAutoBfEmergence(NB,NZ,NY,NX,TFN6,ZADDB)
+  subroutine ComputeRAutoBfEmergence(NB,NZ,NY,NX,TFN6,ZADDB,CNPG,DMSHD)
   implicit none
   integer, intent(in) :: NB,NZ,NY,NX
   real(r8),intent(in) :: TFN6(JZ)
   real(r8), intent(out) :: ZADDB
-  real(r8) :: ZPOOLB,ZADDBM
-
+  real(r8), INTENT(OUT) :: CNPG
+  real(r8), intent(in) :: DMSHD
+  real(r8) :: ZPOOLB,ZADDBM,CGROSM
+  real(r8) :: FNP
 ! begin_execution
 !
 ! N,P CONSTRAINT ON RESPIRATION FROM NON-STRUCTURAL C:N:P
