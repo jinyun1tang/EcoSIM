@@ -635,12 +635,9 @@ module nitroMod
         DC=0.0_r8
         DN=0.0_r8
         DP=0.0_r8
-        DO 2955 K=0,4
-          DO  M=1,4
-            ONL(M,K)=0.0_r8
-            OPL(M,K)=0.0_r8
-          enddo
-2955    CONTINUE
+        ONL(1:4,0:4)=0._r8
+        OPL(1:4,0:4)=0._r8
+
         DO 2970 K=0,5
           IF(L.NE.0.OR.(K.NE.3.AND.K.NE.4))THEN
 !
@@ -4140,6 +4137,8 @@ module nitroMod
 !     RIP14,RIP1B=substrate-limited HPO4 mineraln-immobn in non-band, band
 !     TRIPO4=total H2PO4+HPO4 net mineraln (-ve) or immobiln (+ve)
 !
+  FH1PS=VLPO4(L,NY,NX)
+  FH1PB=VLPOB(L,NY,NX)
   RIP1P=0.1*AMAX1(0.0,RIPOP-RIPO4(NGL,N,K)-RIPOB(NGL,N,K))
   IF(RIP1P.GT.0.0)THEN
     CH1PX=AMAX1(0.0,CH1P4(L,NY,NX)-HPMN)

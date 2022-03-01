@@ -77,19 +77,7 @@ module grosubMod
   real(r8) :: CGROS,CNRDA
   real(r8) :: CNRDM
 
-  real(r8) :: FWTBR,FCNPF,FXRNX,FRTN,FSNC1,FRCO2,FSNCM
-  real(r8) :: FSNCP,FGROL,FGROZ,FWTRT,FWTC,FWTS,FHGT,FHVST,FHVSH
-  real(r8) :: FHVST4,FHGTK,FHVSTS,FHVSTG,FHVSHG,FHVSTH,FHVSTE
-  real(r8) :: FHVSHH,FHVSHE,FDM,FFIRE,FFIRN,FFIRP,FHVSN,FHVSP
-  real(r8) :: GROGR,GSL,GROLF,GROSHE,GROSTK,GRORSV,GROHSK,GROEAR
-  real(r8) :: GROSHT,GROLFN,GROSHN,GROSTN,GRORSN,GROHSN,GROEAN
-  real(r8) :: GROGRN,GROLFP,GROSHP,GROSTP,GRORSP,GROHSP,GROEAP
-  real(r8) :: GROGRP,GNOD,GRO,GRON,GROP,GSLA,GROA,GSSL,GROS
-  real(r8) :: GROH,GRMXB,GROLM,GROLC,GFNX,GRNDG,GRTWGM,GRTWTG
-  real(r8) :: GRTLGL,GRTWTL,GRTWTN,GRTWTP,GRTWTM,HTNODZ,HTBR
-  real(r8) :: HTSTK,HTLF,HTLFL,HTLFU,HTLFB,HTSTKX,PARTS,PARTX
-  real(r8) :: PTRT,PARX,PARJ,PPOOLB,PADDB,PPOOLD,PPDX,PPOOLM
-  real(r8) :: PADDN,PADD2,PADD1,PPOOLT,PTSHTR,PPOOLS,PPOOLG
+  real(r8) :: PTSHTR,PPOOLS,PPOOLG
   real(r8) :: PPOLNG,PPOOLX,PPOLNX,RTK,RS,RSL,RCO2C,RMNCS,RCO2X
   real(r8) :: RCO2Y,RCO2G,RCO2T,RCO2CM,RCO2XM,RCO2YM,RCO2GM
   real(r8) :: RCO2TM,RCCC,RCCN,RCCP,RCO2V,RCCL,RCZL,RCPL,RCCS
@@ -345,6 +333,8 @@ module grosubMod
   implicit none
   integer, intent(in) :: I,J,NZ,NY,NX
   real(r8) :: WTHPXT
+  real(r8) :: FHVST
+  real(r8) :: FHVSH
   integer :: M
 !     begin_execution
 !     IHVST=harvest type:0=none,1=grain,2=all above-ground
@@ -575,6 +565,7 @@ module grosubMod
   real(r8) :: TFN6(JZ)
   real(r8) :: WFNGR(2,JZ)
   real(r8) :: CNLFW,CPLFW,CNSHW,CPSHW
+  real(r8) :: PTRT
 ! begin_execution
   IF(IFLGC(NZ,NY,NX).EQ.1)THEN
     IF(IDTHP(NZ,NY,NX).EQ.0.OR.IDTHR(NZ,NY,NX).EQ.0)THEN
@@ -587,7 +578,7 @@ module grosubMod
 !     IDTHB=branch living flag: 0=alive,1=dead
 !
       DO 105 NB=1,NBR(NZ,NY,NX)
-        call GrowOneBranch(I,J,NB,NZ,NY,NX,TFN6,ZCX,CNLFW,CPLFW,CNSHW,CPSHW)
+        call GrowOneBranch(I,J,NB,NZ,NY,NX,TFN6,ZCX,CNLFW,CPLFW,CNSHW,CPSHW,PTRT)
 105   CONTINUE
 !
 !     ROOT GROWTH
@@ -617,7 +608,7 @@ module grosubMod
 !
       call RootNoduleBiomchemistry(I,J,NZ,NY,NX,TFN6,WFNGR)
 
-      call NonstructlBiomTransfer(I,J,NZ,NY,NX)
+      call NonstructlBiomTransfer(I,J,NZ,NY,NX,PTRT)
 !
 !
       call ComputeTotalBiom(NZ,NY,NX)
@@ -1209,6 +1200,7 @@ module grosubMod
   integer :: L,K,M,N,NR,NB
   real(r8) :: XHVST
   REAL(R8) :: APSILT
+  real(r8) :: FDM
 !     begin_execution
 !     ZNOON=hour of solar noon
 !     IBTYP=turnover:0=all abve-grd,1=all leaf+petiole,2=none,3=between 1,2
@@ -1631,6 +1623,22 @@ module grosubMod
   real(r8) :: CPOLNG
   real(r8) :: CPOLNX
   real(r8) :: CCPLNX
+  real(r8) :: FHGT
+  real(r8) :: FHVST
+  real(r8) :: FHVSH
+  real(r8) :: FHVST4
+  real(r8) :: FHGTK
+  real(r8) :: FHVSTS
+  real(r8) :: FHVSTG
+  real(r8) :: FHVSHG
+  real(r8) :: FHVSTH
+  real(r8) :: FHVSTE
+  real(r8) :: FHVSHH
+  real(r8) :: FHVSHE
+  real(r8) :: FDM
+  real(r8) :: FFIRE,FFIRN,FFIRP
+  real(r8) :: FHVSN,FHVSP
+  real(r8) :: HTSTKX
 !     begin_execution
 !     IHVST=harvest type:0=none,1=grain,2=all above-ground
 !                       ,3=pruning,4=grazing,5=fire,6=herbivory
@@ -2980,6 +2988,11 @@ module grosubMod
   real(r8) :: CPPOLN
   real(r8) :: CGNDL,CPOOLNX
   real(r8) :: CCNDLR
+  real(r8) :: FCNPF
+  real(r8) :: FXRNX
+  real(r8) :: GRNDG
+  real(r8) :: PPOOLD
+  real(r8) :: PADDN
 !     begin_execution
 !     INTYP=N2 fixation: 1,2,3=rapid to slow root symbiosis
 !     WTNDL,WTNDLN,WTNDLP=bacterial C,N,P mass
@@ -3485,14 +3498,26 @@ module grosubMod
   real(r8), intent(inout):: WFNR,WFNRG
   real(r8) :: CNPG
   real(r8) :: CCC,CNC,CPC
-  real(r8) :: FSNC2
+  real(r8) :: FSNC1,FSNC2
   real(r8) :: ZADD1,ZADD1M,ZADD2,ZADD2M
   real(r8) :: ZPOOLB
   real(r8) :: CGRORM
   real(r8) :: CGROR
   real(r8) :: DMRTR
   real(r8) :: FNP
+  real(r8) :: FRTN
+  real(r8) :: FRCO2
+  real(r8) :: FSNCM
+  real(r8) :: FSNCP
+  real(r8) :: GRTWGM
+  real(r8) :: GRTLGL
+  real(r8) :: GRTWTG
+  real(r8) :: GRTWTP,GRTWTN,GRTWTL
+  real(r8) :: GRTWTM
+  real(r8) :: PPOOLB
+  real(r8) :: PADD2,PADD1
   integer :: NR,M,LL,LX
+
 !begin_execution
 
   DO 5050 NR=1,NRT(NZ,NY,NX)
@@ -3956,7 +3981,7 @@ module grosubMod
               CNRDM=AMAX1(0.0,1.70*ZADD1M)
               CNRDA=AMAX1(0.0,1.70*ZADD1)
 
-              call PrimRootRemobilization(N,L,NZ,NY,NX,NR)
+              call PrimRootRemobilization(N,L,NZ,NY,NX,NR,FSNC1)
 
 !
 !     CONSUMPTION OF NON-STRUCTURAL C,N,P BY PRIMARY ROOTS
@@ -4128,7 +4153,7 @@ module grosubMod
               ENDIF
 
 !
-              call PrimRootExtension(L,L1,N,NR,NZ,NY,NX,WFNR)
+              call PrimRootExtension(L,L1,N,NR,NZ,NY,NX,WFNR,FRTN,GRTWTG,GRTWTL,GRTWTN,GRTWTP,GRTLGL)
             ENDIF
 !
 !
@@ -4188,6 +4213,7 @@ module grosubMod
   real(r8) :: CPOOLD
   real(r8) :: CPOOLX
   real(r8) :: DMRTD
+  real(r8) :: FWTRT
 !     begin_execution
 
   NIX(NZ,NY,NX)=NG(NZ,NY,NX)
@@ -4383,10 +4409,13 @@ module grosubMod
   end subroutine RootBiochemistry
 
 !------------------------------------------------------------------------------------------
-  subroutine PrimRootExtension(L,L1,N,NR,NZ,NY,NX,WFNR)
+  subroutine PrimRootExtension(L,L1,N,NR,NZ,NY,NX,WFNR,FRTN,GRTWTG,GRTWTL,GRTWTN,GRTWTP,GRTLGL)
   implicit none
   integer, intent(in) :: L,L1,N,NR,NZ,NY,NX
-  real(r8), intent(in):: WFNR
+  real(r8), intent(in):: WFNR,FRTN,GRTWTG,GRTWTL,GRTWTN,GRTWTP
+  real(r8), intent(out):: GRTLGL
+  real(r8) :: FGROL,FGROZ
+
 ! begin_execution
 
 !     PRIMARY ROOT EXTENSION FROM ROOT GROWTH AND ROOT TURGOR
@@ -4510,10 +4539,11 @@ module grosubMod
   end subroutine PrimRootExtension
 !------------------------------------------------------------------------------------------
 
-  subroutine PrimRootRemobilization(N,L,NZ,NY,NX,NR)
+  subroutine PrimRootRemobilization(N,L,NZ,NY,NX,NR,FSNC1)
 
   implicit none
   integer, intent(in) :: N,L,NZ,NY,NX,NR
+  real(r8), intent(out) :: FSNC1
   integer :: M
   real(r8) :: CCC,CNC,CPC
 ! begin_execution
@@ -4628,7 +4658,7 @@ end subroutine PrimRootRemobilization
   integer, intent(in) :: L,NR,NZ,NY,NX,N
 
   integer :: LL,NN
-  real(r8) :: XFRD,XFRW
+  real(r8) :: XFRD,XFRW,FRTN
 
 ! begin_execution
 !     TRANSFER PRIMARY ROOT C,N,P TO NEXT SOIL LAYER ABOVE THE
@@ -4795,6 +4825,11 @@ end subroutine PrimRootRemobilization
   real(r8) :: CCPOLN,CZPOLN
   real(r8) :: CPPOLN,CGNDL
   real(r8) :: CCNDLB
+  real(r8) :: FCNPF
+  real(r8) :: FXRNX
+  real(r8) :: GRNDG
+  real(r8) :: PPOOLD
+  real(r8) :: PADDN
 !     begin_execution
 !     INTYP=N2 fixation: 4,5,6=rapid to slow canopy symbiosis
 !
@@ -5214,12 +5249,12 @@ end subroutine PrimRootRemobilization
   end subroutine C4PhotoProductTransfer
 !------------------------------------------------------------------------------------------
 
-  subroutine ComputeGPP(I,J,NB,NZ,NY,NX,TFN6,ZADDB,CH2O3,CH2O4,CNPG,DMSHD)
+  subroutine ComputeGPP(I,J,NB,NZ,NY,NX,TFN6,ZADDB,CH2O3,CH2O4,CNPG,DMSHD,PADDB)
   implicit none
   integer, intent(in) :: I,J,NB,NZ,NY,NX
   real(r8), intent(in) :: TFN6(JZ)
   real(r8), intent(in) :: DMSHD
-  real(r8), intent(out) :: ZADDB
+  real(r8), intent(out) :: ZADDB,PADDB
   real(r8), intent(out) :: CH2O3(25),CH2O4(25)
   REAL(R8), INTENT(OUT) :: CNPG
   integer :: K
@@ -5316,25 +5351,27 @@ end subroutine PrimRootRemobilization
 !
 !   SHOOT AUTOTROPHIC RESPIRATION AFTER EMERGENCE
 !
-    call ComputeRAutoAfEmergence(NB,NZ,NY,NX, ZADDB,CNPG,DMSHD)
+    call ComputeRAutoAfEmergence(NB,NZ,NY,NX, ZADDB,CNPG,DMSHD,PADDB)
 
 
 !   SHOOT AUTOTROPHIC RESPIRATION BEFORE EMERGENCE
 !
   ELSE
-    call ComputeRAutoBfEmergence(NB,NZ,NY,NX,TFN6,ZADDB,CNPG,DMSHD)
+    call ComputeRAutoBfEmergence(NB,NZ,NY,NX,TFN6,ZADDB,CNPG,DMSHD,PADDB)
   ENDIF
   end subroutine ComputeGPP
 !------------------------------------------------------------------------------------------
 
-  subroutine CalcPartitionCoeff(I,J,NB,NZ,NY,NX,part)
+  subroutine CalcPartitionCoeff(I,J,NB,NZ,NY,NX,part,PTRT)
   implicit none
   integer, intent(in) :: I,J,NB,NZ,NY,NX
-  real(r8), intent(out):: PART(7)
+  real(r8), intent(out):: PART(7),PTRT
   REAL(R8) :: ARLFI
 
   integer :: N
   real(r8) :: FPARTL
+  real(r8) :: PARTS
+  real(r8) :: PARTX
   real(r8) :: PSILY(0:3)
   real(r8), parameter :: FPART1=1.00_r8
   real(r8), parameter :: FPART2=0.40_r8
@@ -5540,12 +5577,13 @@ end subroutine PrimRootRemobilization
   end subroutine CalcPartitionCoeff
 !------------------------------------------------------------------------------------------
 
-  subroutine GrowOneBranch(I,J,NB,NZ,NY,NX,TFN6,ZCX,CNLFW,CPLFW,CNSHW,CPSHW)
+  subroutine GrowOneBranch(I,J,NB,NZ,NY,NX,TFN6,ZCX,CNLFW,CPLFW,CNSHW,CPSHW,PTRT)
   implicit none
   integer, intent(in)  :: I,J,NB,NZ,NY,NX
   REAL(R8), INTENT(IN) :: TFN6(JZ)
   real(r8), intent(in) :: ZCX(JP,JY,JX)
   real(r8), intent(in) :: CNLFW,CPLFW,CNSHW,CPSHW
+  real(r8), intent(out) :: PTRT
   real(r8) :: DMSHD
   integer  :: K,KNOD,KK,kx,K1,K2,KVSTGX,KSNC
   integer  :: KN,MNNOD,NN,MXNOD,M,N,NNOD1
@@ -5568,12 +5606,28 @@ end subroutine PrimRootRemobilization
   real(r8) :: FSNC
   real(r8) :: FSNCL
   real(r8) :: FSNCS
+  real(r8) :: GROGR
+  real(r8) :: GROLF
+  real(r8) :: GRORSV,GROHSK,GROEAR
+  real(r8) :: GROSHT,GROSHE,GROLFN,GROSHN
+  real(r8) :: GROSTN,GRORSN,GROHSN
+  real(r8) :: GROEAN,GROSTK
+  real(r8) :: GROGRN,GROLFP
+  real(r8) :: GROSHP,GROSTP
+  real(r8) :: GRORSP,GROHSP
+  real(r8) :: GROEAP,GROGRP
+  real(r8) :: GNOD
+  REAL(R8) :: GRO,GRON,GROP
+  REAL(R8) :: GSLA,GROA
+  real(r8) :: GSSL,GROS
+  real(r8) :: GROH,PADDB
+  real(r8) :: PPOOLD
 ! begin_execution
 
   WTLSB(NB,NZ,NY,NX)=AMAX1(0.0_r8,WTLFB(NB,NZ,NY,NX)+WTSHEB(NB,NZ,NY,NX))
 
   IF(IDTHB(NB,NZ,NY,NX).EQ.0)THEN
-    call CalcPartitionCoeff(I,J,NB,NZ,NY,NX,PART)
+    call CalcPartitionCoeff(I,J,NB,NZ,NY,NX,PART,PTRT)
 !
 !   SHOOT COEFFICIENTS FOR GROWTH RESPIRATION AND N,P CONTENTS
 !   FROM GROWTH YIELDS ENTERED IN 'READQ', AND FROM PARTITIONING
@@ -5643,7 +5697,7 @@ end subroutine PrimRootRemobilization
 !
 !   GROSS PRIMARY PRODUCTIVITY
 !
-    call ComputeGPP(I,J,NB,NZ,NY,NX,TFN6,ZADDB,CH2O3,CH2O4,CNPG,DMSHD)
+    call ComputeGPP(I,J,NB,NZ,NY,NX,TFN6,ZADDB,CH2O3,CH2O4,CNPG,DMSHD,PADDB)
 !
 !   REMOVE C,N,P USED IN MAINTENANCE + GROWTH REPIRATION AND GROWTH
 !   FROM NON-STRUCTURAL POOLS
@@ -5934,14 +5988,7 @@ end subroutine PrimRootRemobilization
             ELSE
               HTNODE(K1,NB,NZ,NY,NX)=HTNODX(K1,NB,NZ,NY,NX)
             ENDIF
-        !   IF(NZ.EQ.1)THEN
-        !     WRITE(*,515)'HTNODE',I,J,NX,NY,NZ,NB,KK,K1,K2,MNNOD,MXNOD
-        !    1,NNOD(NZ,NY,NX),ARLF(K1,NB,NZ,NY,NX)
-        !    2,HTNODE(K1,NB,NZ,NY,NX),HTNODE(K2,NB,NZ,NY,NX),SNL,GRO
-        !    3,ALLOCN,WTSTKB(NB,NZ,NY,NX),WGNODE(K1,NB,NZ,NY,NX)
-        !    4,HTNODX(K1,NB,NZ,NY,NX),PP(NZ,NY,NX),GROSTK
-        !515   FORMAT(A8,12I4,20E12.4)
-        !   ENDIF
+
 510       CONTINUE
         ENDIF
 !
@@ -6115,11 +6162,6 @@ end subroutine PrimRootRemobilization
               WTSTXB(NB,NZ,NY,NX)=WTSTXB(NB,NZ,NY,NX)+WGNODE(K,NB,NZ,NY,NX)
               WTSTXN(NB,NZ,NY,NX)=WTSTXN(NB,NZ,NY,NX)+WGNODN(K,NB,NZ,NY,NX)
               WTSTXP(NB,NZ,NY,NX)=WTSTXP(NB,NZ,NY,NX)+WGNODP(K,NB,NZ,NY,NX)
-        !     IF(NZ.EQ.2)THEN
-        !     WRITE(*,2358)'WTSTXB',I,J,NZ,NB,K,WTSTXB(NB,NZ,NY,NX)
-        !    2,WTSTKB(NB,NZ,NY,NX),WGNODE(K,NB,NZ,NY,NX)
-        !2358  FORMAT(A8,5I4,12E12.4)
-        !     ENDIF
               WGNODE(K,NB,NZ,NY,NX)=0._r8
               WGNODN(K,NB,NZ,NY,NX)=0._r8
               WGNODP(K,NB,NZ,NY,NX)=0._r8
@@ -6240,11 +6282,6 @@ end subroutine PrimRootRemobilization
           KSNC=INT(0.5*(KVSTG(NB,NZ,NY,NX)-KVSTGN(NB,NZ,NY,NX)))+1
           XKSNC=KSNC
           KN=MAX(0,KVSTGN(NB,NZ,NY,NX)-1)
-    !     IF(NZ.EQ.2.OR.NZ.EQ.3)THEN
-    !     WRITE(*,1266)'SNCX0',I,J,NX,NY,NZ,NB,SNCY,SNCR,SNCX,SNCF
-    !    2,CPOOL(NB,NZ,NY,NX),WTLSB(NB,NZ,NY,NX),RCCC
-    !1266  FORMAT(A8,6I4,12E16.8)
-    !     ENDIF
     !
     !     TRANSFER NON-STRUCTURAL C,N,P FROM BRANCHES TO MAIN STEM
     !     IF MAIN STEM POOLS ARE DEPLETED
@@ -6304,7 +6341,7 @@ end subroutine PrimRootRemobilization
 !
         IF(SNCX.GT.0.0)call RemobilizeLeafLayers(KN,KSNC,NB,nz,ny,nx,XKSNC)
     ENDIF
-595 CONTINUE
+
 !
 !   DEATH IF MAIN STALK OF TREE DIES
 !
@@ -6350,7 +6387,7 @@ end subroutine PrimRootRemobilization
         ENDIF
       ENDIF
 495 CONTINUE
-!
+!   KK inherits value from loop 495, is it right?
     call AllocateLeafToCanopyLayers(NB,NZ,NY,NX,ZCX)
 
 !
@@ -6367,7 +6404,7 @@ end subroutine PrimRootRemobilization
       call LeafClassAllocation(NB,NZ,NY,NX)
     ENDIF
 
-    call GrainFilling(I,NB,NZ,NY,NX)
+    call GrainFilling(I,NB,NZ,NY,NX,GROGR,GROSTK,GROGRN,GROGRP)
 !
     call PhenologyReset(I,NB,NZ,NY,NX)
 !
@@ -6389,6 +6426,7 @@ end subroutine PrimRootRemobilization
   real(r8) :: FNCLF,FSNAL,FSNAS,FRCC
   real(r8) :: FSNCK
   real(r8) :: FSNCR
+  real(r8) :: HTNODZ
 ! begin_execution
 !     REMOBILIZATION AND LITTERFALL WHEN GROWTH RESPIRATION < 0
 !     STARTING FROM LOWEST LEAFED NODE AND PROCEEDING UPWARDS
@@ -7325,7 +7363,7 @@ end subroutine PrimRootRemobilization
   implicit none
   integer, intent(in) :: NB,NZ,NY,NX
   real(r8), intent(in) :: ZCX(JP,JY,JX)
-  integer  :: LL,LU,L,K,KK,k1,k2
+  integer  :: LL,LU,L,K,k1,k2,KK
   integer  :: KVSTGX,KVSTG1,LHTLFU,LHTLFL
   integer  :: LHTBRU,LHTBRL,N
   real(r8) :: ZSTK
@@ -7333,6 +7371,10 @@ end subroutine PrimRootRemobilization
   real(r8) :: YARLF,YWGLF,YLGLF,XLGLF
   real(r8) :: ARSTKB,ASTV
   real(r8) :: FRACL
+  real(r8) :: HTBR
+  real(r8) :: HTSTK
+  real(r8) :: HTLF,HTLFL,HTLFU
+  real(r8) :: HTLFB
 ! begin_execution
 !   ALLOCATION OF LEAF AREA TO CANOPY LAYERS
 !
@@ -7376,8 +7418,9 @@ end subroutine PrimRootRemobilization
       IF(NB.NE.NB1(NZ,NY,NX))THEN
         KVSTG1=MAX(1,KVSTG(NB1(NZ,NY,NX),NZ,NY,NX)-24)
         IF(NBTB(NB,NZ,NY,NX).GE.KVSTG1)THEN
-        K=MOD(NBTB(NB,NZ,NY,NX),25)
-        IF(K.EQ.0.AND.KK.NE.0)K=25
+          K=MOD(NBTB(NB,NZ,NY,NX),25)
+!        IF(K.EQ.0.AND.KK.NE.0)K=25
+          IF(K.EQ.0)K=25
           HTBR=HTNODE(K,NB1(NZ,NY,NX),NZ,NY,NX)
         ELSE
           HTBR=0._r8
@@ -7573,12 +7616,16 @@ end subroutine AllocateLeafToCanopyLayers
 
 !------------------------------------------------------------------------------------------
 
-  subroutine GrainFilling(I,NB,NZ,NY,NX)
+  subroutine GrainFilling(I,NB,NZ,NY,NX,GROGR,GROSTK,GROGRN,GROGRP)
   implicit none
   integer, intent(in) :: I,NB,NZ,NY,NX
+  real(r8), intent(in) :: GROGR,GROSTK,GROGRN,GROGRP
   real(r8) :: ZPGRP,ZPGRN,ZNPGP,ZNPGN
   real(r8) :: XLOCM,XLOCC,XLOCN,XLOCP
   real(r8) :: FGRNX
+  real(r8) :: GRMXB
+  real(r8) :: GROLM
+  real(r8) :: GROLC
 ! begin_execution
 
 !
@@ -7887,6 +7934,11 @@ end subroutine AllocateLeafToCanopyLayers
   real(r8) :: CPOOLD
   real(r8) :: DATRP
   real(r8) :: FXFC,FXFN
+  real(r8) :: FWTBR
+  real(r8) :: GFNX
+  real(r8) :: PPOOLD
+  real(r8) :: PPDX
+  real(r8) :: PPOOLM
   ! begin_execution
 !   TRANSFER C,N,P FROM SEASONAL STORAGE TO SHOOT AND ROOT
 !   NON-STRUCTURAL C DURING SEED GERMINATION OR LEAFOUT
@@ -8389,32 +8441,28 @@ end subroutine CarbNutInBranchTransfer
   FWODB(0)=1.0_r8-FWODB(1)
   FWOOD(0)=1.0_r8-FWOOD(1)
   FWODR(0)=1.0_r8-FWODR(1)
-!     WRITE(*,8822)'FWOOD',I,J,NX,NY,NZ,IBTYP(NZ,NY,NX),IGTYP(NZ,NY,NX)
-!    2,FWOOD(0),FWOOD(1),FWODB(0),FWODB(1),FWODR(0),FWODR(1)
-!    3,WVSTK(NZ,NY,NX),WTSTK(NZ,NY,NX)
-!8822  FORMAT(A8,7I4,12E12.4)
-      CNLFW=FWODB(0)*CNSTK(NZ,NY,NX)+FWODB(1)*CNLF(NZ,NY,NX)
-      CPLFW=FWODB(0)*CPSTK(NZ,NY,NX)+FWODB(1)*CPLF(NZ,NY,NX)
-      CNSHW=FWODB(0)*CNSTK(NZ,NY,NX)+FWODB(1)*CNSHE(NZ,NY,NX)
-      CPSHW=FWODB(0)*CPSTK(NZ,NY,NX)+FWODB(1)*CPSHE(NZ,NY,NX)
-      CNRTW=FWODR(0)*CNSTK(NZ,NY,NX)+FWODR(1)*CNRT(NZ,NY,NX)
-      CPRTW=FWODR(0)*CPSTK(NZ,NY,NX)+FWODR(1)*CPRT(NZ,NY,NX)
-      FWODLN(0)=FWODB(0)*CNSTK(NZ,NY,NX)/CNLFW
-      FWODLP(0)=FWODB(0)*CPSTK(NZ,NY,NX)/CPLFW
-      FWODSN(0)=FWODB(0)*CNSTK(NZ,NY,NX)/CNSHW
-      FWODSP(0)=FWODB(0)*CPSTK(NZ,NY,NX)/CPSHW
-      FWOODN(0)=FWOOD(0)*CNSTK(NZ,NY,NX)/CNRTW
-      FWOODP(0)=FWOOD(0)*CPSTK(NZ,NY,NX)/CPRTW
-      FWODRN(0)=FWODR(0)*CNRT(NZ,NY,NX)/CNRTW
-      FWODRP(0)=FWODR(0)*CPRT(NZ,NY,NX)/CPRTW
-      FWODLN(1)=1.0_r8-FWODLN(0)
-      FWODLP(1)=1.0_r8-FWODLP(0)
-      FWODSN(1)=1.0_r8-FWODSN(0)
-      FWODSP(1)=1.0_r8-FWODSP(0)
-      FWOODN(1)=1.0_r8-FWOODN(0)
-      FWOODP(1)=1.0_r8-FWOODP(0)
-      FWODRN(1)=1.0_r8-FWODRN(0)
-      FWODRP(1)=1.0_r8-FWODRP(0)
+  CNLFW=FWODB(0)*CNSTK(NZ,NY,NX)+FWODB(1)*CNLF(NZ,NY,NX)
+  CPLFW=FWODB(0)*CPSTK(NZ,NY,NX)+FWODB(1)*CPLF(NZ,NY,NX)
+  CNSHW=FWODB(0)*CNSTK(NZ,NY,NX)+FWODB(1)*CNSHE(NZ,NY,NX)
+  CPSHW=FWODB(0)*CPSTK(NZ,NY,NX)+FWODB(1)*CPSHE(NZ,NY,NX)
+  CNRTW=FWODR(0)*CNSTK(NZ,NY,NX)+FWODR(1)*CNRT(NZ,NY,NX)
+  CPRTW=FWODR(0)*CPSTK(NZ,NY,NX)+FWODR(1)*CPRT(NZ,NY,NX)
+  FWODLN(0)=FWODB(0)*CNSTK(NZ,NY,NX)/CNLFW
+  FWODLP(0)=FWODB(0)*CPSTK(NZ,NY,NX)/CPLFW
+  FWODSN(0)=FWODB(0)*CNSTK(NZ,NY,NX)/CNSHW
+  FWODSP(0)=FWODB(0)*CPSTK(NZ,NY,NX)/CPSHW
+  FWOODN(0)=FWOOD(0)*CNSTK(NZ,NY,NX)/CNRTW
+  FWOODP(0)=FWOOD(0)*CPSTK(NZ,NY,NX)/CPRTW
+  FWODRN(0)=FWODR(0)*CNRT(NZ,NY,NX)/CNRTW
+  FWODRP(0)=FWODR(0)*CPRT(NZ,NY,NX)/CPRTW
+  FWODLN(1)=1.0_r8-FWODLN(0)
+  FWODLP(1)=1.0_r8-FWODLP(0)
+  FWODSN(1)=1.0_r8-FWODSN(0)
+  FWODSP(1)=1.0_r8-FWODSP(0)
+  FWOODN(1)=1.0_r8-FWOODN(0)
+  FWOODP(1)=1.0_r8-FWOODP(0)
+  FWODRN(1)=1.0_r8-FWODRN(0)
+  FWODRP(1)=1.0_r8-FWODRP(0)
 !
 !     SHOOT AND ROOT TEMPERATURE FUNCTIONS FOR MAINTENANCE
 !     RESPIRATION FROM TEMPERATURES WITH OFFSETS FOR THERMAL ADAPTATION
@@ -8426,19 +8474,18 @@ end subroutine CarbNutInBranchTransfer
 !     8.3143,710.0=gas constant,enthalpy
 !     62500,195000,232500=energy of activn,high,low temp inactivn(KJ mol-1)
 !
-      TKCM=TKC(NZ,NY,NX)+OFFST(NZ,NY,NX)
-      RTK=8.3143*TKCM
-      STK=710.0*TKCM
-      ACTVM=1+EXP((195000-STK)/RTK)+EXP((STK-232500)/RTK)
-      TFN5=EXP(25.214-62500/RTK)/ACTVM
-      DO 7 L=NU(NY,NX),NJ(NY,NX)
-      TKSM=TKS(L,NY,NX)+OFFST(NZ,NY,NX)
-      RTK=8.3143*TKSM
-      STK=710.0*TKSM
-      ACTVM=1+EXP((195000-STK)/RTK)+EXP((STK-232500)/RTK)
-      TFN6(L)=EXP(25.214-62500/RTK)/ACTVM
-7     CONTINUE
-      GROGR=0._r8
+  TKCM=TKC(NZ,NY,NX)+OFFST(NZ,NY,NX)
+  RTK=8.3143*TKCM
+  STK=710.0*TKCM
+  ACTVM=1+EXP((195000-STK)/RTK)+EXP((STK-232500)/RTK)
+  TFN5=EXP(25.214-62500/RTK)/ACTVM
+  DO 7 L=NU(NY,NX),NJ(NY,NX)
+    TKSM=TKS(L,NY,NX)+OFFST(NZ,NY,NX)
+    RTK=8.3143*TKSM
+    STK=710.0*TKSM
+    ACTVM=1+EXP((195000-STK)/RTK)+EXP((STK-232500)/RTK)
+    TFN6(L)=EXP(25.214-62500/RTK)/ACTVM
+7 CONTINUE
 !
 !     PRIMARY ROOT NUMBER
 !
@@ -8446,9 +8493,8 @@ end subroutine CarbNutInBranchTransfer
 !     WTRT,PP=root mass,PFT population
 !     XRTN1=multiplier for number of primary root axes
 !
-      WTRTA(NZ,NY,NX)=AMAX1(0.999992087*WTRTA(NZ,NY,NX) &
-      ,WTRT(NZ,NY,NX)/PP(NZ,NY,NX))
-      XRTN1=AMAX1(1.0,WTRTA(NZ,NY,NX)**0.667)*PP(NZ,NY,NX)
+  WTRTA(NZ,NY,NX)=AMAX1(0.999992087*WTRTA(NZ,NY,NX),WTRT(NZ,NY,NX)/PP(NZ,NY,NX))
+  XRTN1=AMAX1(1.0,WTRTA(NZ,NY,NX)**0.667)*PP(NZ,NY,NX)
 !
 !     WATER STRESS FUNCTIONS FOR EXPANSION AND GROWTH RESPIRATION
 !     FROM CANOPY TURGOR
@@ -8460,23 +8506,23 @@ end subroutine CarbNutInBranchTransfer
 !     WFNG=growth function of canopy water potential
 !     WFNSG=expansion,extension function of canopy water potential
 !
-      WFNS=AMIN1(1.0,AMAX1(0.0,PSILG(NZ,NY,NX)-PSILM))
-      IF(IGTYP(NZ,NY,NX).EQ.0)THEN
-      WFNC=1.0_r8
-      WFNG=EXP(0.05*PSILT(NZ,NY,NX))
-      WFNSG=WFNS**0.10
-      ELSE
-      WFNC=EXP(RCS(NZ,NY,NX)*PSILG(NZ,NY,NX))
-      WFNG=EXP(0.10*PSILT(NZ,NY,NX))
-      WFNSG=WFNS**0.25
-      ENDIF
-      end subroutine StagePlantForGrowth
+  WFNS=AMIN1(1.0,AMAX1(0.0,PSILG(NZ,NY,NX)-PSILM))
+  IF(IGTYP(NZ,NY,NX).EQ.0)THEN
+    WFNC=1.0_r8
+    WFNG=EXP(0.05*PSILT(NZ,NY,NX))
+    WFNSG=WFNS**0.10
+  ELSE
+    WFNC=EXP(RCS(NZ,NY,NX)*PSILG(NZ,NY,NX))
+    WFNG=EXP(0.10*PSILT(NZ,NY,NX))
+    WFNSG=WFNS**0.25
+  ENDIF
+  end subroutine StagePlantForGrowth
 !------------------------------------------------------------------------------------------
 
-  subroutine NonstructlBiomTransfer(I,J,NZ,NY,NX)
+  subroutine NonstructlBiomTransfer(I,J,NZ,NY,NX,PTRT)
   implicit none
   integer, intent(in) :: I,J,NZ,NY,NX
-
+  real(r8), intent(in):: PTRT
   integer :: L,NB,N,NR
   real(r8) :: ZPOOLS,ZPOOLT
   real(r8) :: ZPOOLB
@@ -8488,6 +8534,11 @@ end subroutine CarbNutInBranchTransfer
   real(r8) :: CPOOLT
   real(r8) :: CNL,CPL,CPOOLD
   real(r8) :: CPOOLB,CPOOLS
+  real(r8) :: FWTC
+  real(r8) :: FWTS
+  real(r8) :: PPOOLB
+  real(r8) :: PPOOLD
+  real(r8) :: PPOOLT 
 !     begin_execution
 !
 !     TRANSFER NON-STRUCTURAL C,N,P AMONG BRANCH LEAVES
@@ -9710,6 +9761,8 @@ end subroutine CarbNutInBranchTransfer
   real(r8) :: EGROX
   real(r8) :: ETLF
   real(r8) :: EGRO
+  real(r8) :: GSL
+  real(r8) :: PARX,PARJ
 ! begin_execution
 
 ! FOR EACH CANOPY LAYER
@@ -10033,6 +10086,8 @@ end subroutine CarbNutInBranchTransfer
   real(r8) :: EGROX
   real(r8) :: ETLF
   real(r8) :: EGRO
+  real(r8) :: GSL
+  real(r8) :: PARX,PARJ
 !
 ! FOR EACH CANOPY LAYER
 !
@@ -10271,13 +10326,15 @@ end subroutine CarbNutInBranchTransfer
 
 !------------------------------------------------------------------------------------------
 
-  subroutine ComputeRAutoAfEmergence(NB,NZ,NY,NX,ZADDB,CNPG,DMSHD)
+  subroutine ComputeRAutoAfEmergence(NB,NZ,NY,NX,ZADDB,CNPG,DMSHD,PADDB)
   implicit none
   integer, intent(in) :: NB,NZ,NY,NX
   real(r8), intent(out) :: ZADDB
   real(r8), INTENT(OUT) :: CNPG
+  real(r8), intent(out) :: PADDB
   real(r8), intent(in) :: DMSHD
   real(r8) :: ZPOOLB
+  real(r8) :: PPOOLB
 ! begin_execution
 ! N,P CONSTRAINT ON RESPIRATION FROM NON-STRUCTURAL C:N:P
 !
@@ -10417,15 +10474,16 @@ end subroutine CarbNutInBranchTransfer
 
 !------------------------------------------------------------------------------------------
 
-  subroutine ComputeRAutoBfEmergence(NB,NZ,NY,NX,TFN6,ZADDB,CNPG,DMSHD)
+  subroutine ComputeRAutoBfEmergence(NB,NZ,NY,NX,TFN6,ZADDB,CNPG,DMSHD,PADDB)
   implicit none
   integer, intent(in) :: NB,NZ,NY,NX
   real(r8),intent(in) :: TFN6(JZ)
   real(r8), intent(out) :: ZADDB
-  real(r8), INTENT(OUT) :: CNPG
+  real(r8), INTENT(OUT) :: CNPG,PADDB
   real(r8), intent(in) :: DMSHD
   real(r8) :: ZPOOLB,ZADDBM,CGROSM
   real(r8) :: FNP
+  real(r8) :: PPOOLB
 ! begin_execution
 !
 ! N,P CONSTRAINT ON RESPIRATION FROM NON-STRUCTURAL C:N:P

@@ -36,9 +36,11 @@
       CHARO='0'
       CHARZ='0'
       DO 8995 NX=NHW,NHE
-      DO 8995 NY=NVN,NVS
-      DO 8995 N=1,10
+      DO   NY=NVN,NVS
+      DO   N=1,10
       OUTFILS(N,NY,NX)= '                '
+      ENDDO
+      ENDDO
 8995  CONTINUE
 !
 !     OPEN AND NAME OUTPUT FILES

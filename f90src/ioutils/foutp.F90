@@ -32,10 +32,13 @@
       CHARM='0'
       CHARO='1'
       DO 8995 NX=NHW,NHE
-      DO 8995 NY=NVN,NVS
-      DO 8995 NZ=1,NP0(NY,NX)
-      DO 8995 N=1,10
+      DO   NY=NVN,NVS
+      DO   NZ=1,NP0(NY,NX)
+      DO   N=1,10
       OUTFILP(N,NZ,NY,NX)= '                '
+      ENDDO
+      ENDDO
+      ENDDO
 8995  CONTINUE
 !
 !     OPEN AND NAME OUTPUT FILES
