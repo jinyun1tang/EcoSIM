@@ -3,9 +3,11 @@ set(PLANT_BGC_SOURCES
 	HfuncMod.F90
 	UptakeMod.F90
 	StartqMod.F90
+  PlantDisturbMod.F90
 	GrosubMod.F90
 	StomateMod.F90
   GrosubPars.F90
+  UptakePars.F90
 )
 include_directories(${CMAKE_BINARY_DIR}/f90src/utils/)
 include_directories(${CMAKE_BINARY_DIR}/f90src/ecosim_datatype/)

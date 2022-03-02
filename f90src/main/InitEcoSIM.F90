@@ -16,6 +16,9 @@ module InitEcoSIM
   use VegDataType       , only : InitVegData
   use GrosubMod         , only : InitGrosub
   use WatsubMod         , only : initWatsub
+  use PlantDisturbMod   , only : InitPlantDisturbance
+  use PhenologyDataType , only : InitPhenologyData
+  use UptakeMod         , only : InitUptake
   implicit  none
   integer               , intent(in) :: nmicbguilds   !number of microbial guilds per group
 
@@ -30,7 +33,13 @@ module InitEcoSIM
 
   call InitFertilizerData
 
+  call InitPhenologyData
+
+  call InitPlantDisturbance
+
   call InitGrosub
+
+  call InitUptake
 
   call InitWatsub
 

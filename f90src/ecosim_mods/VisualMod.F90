@@ -49,9 +49,8 @@ module VisualMod
   real(r8) :: OUT(100),SWC(JY,JX)
   real(r8), PARAMETER :: DEFAULT=-9999
 
-  DATA ICHECK/0/
-
-  integer, SAVE :: IYR1,IYR2,ICHECK
+  integer, SAVE :: IYR1,IYR2
+  integer, save :: ICHECK=0
 
   public :: visual
   contains

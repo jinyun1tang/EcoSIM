@@ -5,6 +5,7 @@ module UptakeMod
   use EcosimConst
   use SOMDataType
   use SoilChemDataType
+  use UptakePars
   implicit none
 
   private
@@ -39,6 +40,10 @@ module UptakeMod
   include "blk18a.h"
   include "blk18b.h"
   include "blk1u.h"
+! end_include_section
+
+  character(len=*), private, parameter :: mod_filename = __FILE__
+
   real(r8) :: ARLSC,ALFZ,APSILT,APSIRT,ACTV,B,BP,CCPOLT,CNH3P
   real(r8) :: C,CP,CPOOLX,CPOOLT,CO2A1,CO2P1,CO2G1,CO2S1,CH4A1
   real(r8) :: CH4P1,CH4S1,CCH4S1,CCH4P1,CN2OS1,CN2OP1,CNH3S1
@@ -89,26 +94,7 @@ module UptakeMod
     ,VOLPU(JZ),VOLWU(JZ)
 
   integer :: ILYR(2,JZ)
-  !
-  !     MXN=max number of cycles in convergence soln for water uptake
-  !     DIFFX,DIFFY=acceptance criteria in convergence soln
-  !     FMN=min PFT:total population ratio
-  !     RACM,RACX=min,max canopy boundary layer resistance (h m-1)
-  !     RZ=surface resistance to evaporation (h m-1)
-  !     EMODW=wood modulus of elasticity (MPa)
-  !     DSTK,VSTK=stalk density (Mg m-3),specific volume (m3 g-1)
-  !     SNH3X=NH3 solubility at 25 oC (g m-3 water/(g m-3 air))
-  !     EMMC=canopy emissivity
-  !     ZCKI,PCKI,ZPKI,PZKI=N,P inhibition on root,myco N,P uptake(g g-1)
-  !     FEXUC,FEXUN,FEXUP=rate constant for root C,N,P exudation (h-1)
-  !
-  integer, PARAMETER :: MXN=200
-  real(r8),PARAMETER :: DIFFX=1.0E-09,DIFFY=0.5E-02
-  real(r8),PARAMETER :: FMN=1.0E-06,RACM=0.00139,RACX=0.0278,RZ=0.0139
-  real(r8),PARAMETER :: DSTK=0.225,VSTK=1.0E-06/DSTK
-  real(r8),PARAMETER :: SNH3X=2.852E+02,EMMC=0.97,EMODW=50.0
-  real(r8),PARAMETER :: ZCKI=0.5E-01,PCKI=0.5E-02,ZPKI=ZCKI/PCKI,PZKI=PCKI/ZCKI
-  real(r8),PARAMETER :: FEXUC=0.5E-03,FEXUN=1.0E-02,FEXUP=1.0E-02
+
   REAL(r8) :: RI,TKGO,TKSO
   real(r8) :: CNDT,TKCX,VHCPX,HFLWC1,PSILH,DIFF
   real(r8) :: UPRT,VFLXC,FCUP,FZUP,FPUP,FDMP,FWSRT
@@ -117,7 +103,18 @@ module UptakeMod
   real(r8) :: TFPOBX,TFP1BX
 
   public :: uptake
+  public :: InitUptake
   contains
+
+
+  subroutine InitUptake
+
+  implicit none
+
+  call InitUptakePars
+!------------------------------------------------------------------------------------------
+
+  end subroutine InitUptake
 
   SUBROUTINE uptake(I,J,NHW,NHE,NVN,NVS)
 !
