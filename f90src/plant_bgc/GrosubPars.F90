@@ -138,6 +138,14 @@ module GrosubPars
   real(r8) :: RCCQN
 
   integer :: IFLGQX
+  REAL(R8) :: FRSV(0:3),FXFY(0:1),FXFZ(0:1)
+  real(r8) :: FXFB(0:3),FXFR(0:3),FXRT(0:1),FXSH(0:1),FXRN(6)
+  REAL(R8) :: RCCX(0:3),RCCQ(0:3)
+  REAL(R8) :: RCCZ(0:3),RCCY(0:3)
+  real(r8) :: FLG4Y(0:3)
+  real(r8) :: ATRPX(0:1)
+  real(r8) :: GVMX(0:1)
+  real(r8) :: RTSK(0:3)
 
   contains
   subroutine InitVegPars
@@ -216,6 +224,21 @@ module GrosubPars
 
   IFLGQX=960
 
+
+  RCCZ=real((/0.167,0.167,0.167,0.056/),r8)
+  RCCY=real((/0.333,0.333,0.167,0.333/),r8)
+  RCCX=real((/0.417,0.833,0.833,0.833/),r8)
+  RCCQ=real((/0.417,0.833,0.833,0.833/),r8)
+
+  RTSK=real((/0.25,1.0,4.0,4.0/),r8)
+  FXRN=real((/0.25,0.125,0.0625,0.225,0.075,0.025/),r8)
+  FXFB=real((/1.0E-02,1.0E-02,1.0E-05,5.0E-05/),r8)
+  FXFR=real((/1.0E-02,1.0E-02,1.0E-05,5.0E-05/),r8)
+  FXSH=real((/0.50,0.75/),r8);FXRT=real((/0.50,0.25/),r8)
+  FRSV=real((/0.025,0.025,0.001,0.001/),r8)
+  FXFY=real((/0.025,0.005/),r8);FXFZ=real((/0.25,0.05/),r8)
+  FLG4Y=real((/360.0,1440.0,720.0,720.0/),r8)
+  ATRPX=real((/68.96,276.9/),r8);GVMX=real((/0.010,0.0025/),r8)
   end subroutine InitVegPars
 
 
