@@ -3,6 +3,7 @@ set(ECOSIM_MOD_SOURCES
 	ErosionMod.F90
 	ExecMod.F90
 	ExtractMod.F90
+  Hour1Pars.F90
 	Hour1Mod.F90
 	RedistMod.F90
 	SoluteMod.F90

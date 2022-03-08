@@ -895,10 +895,6 @@ module nitroMod
 !     FOSCXD=mixing fraction for equilibrating subsurface litter
 !     FOSCXS=mixing fraction for subsurface litter
 !
-!     IF(I.EQ.116)THEN
-!     WRITE(*,336)'LAYER',I,J,L,TOQCK(L,NY,NX),TOMA,TFNX,TOMA*TFNX
-!336   FORMAT(A8,3I4,20E12.4)
-!     ENDIF
     IF(L.LT.NL(NY,NX))THEN
 !     get mixing rate
       IF(L.EQ.0)THEN

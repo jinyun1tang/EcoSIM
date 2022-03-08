@@ -19,6 +19,7 @@ module InitEcoSIM
   use PlantDisturbMod   , only : InitPlantDisturbance
   use PhenologyDataType , only : InitPhenologyData
   use UptakeMod         , only : InitUptake
+  use Hour1Mod          , only : InitHour1
   implicit  none
   integer               , intent(in) :: nmicbguilds   !number of microbial guilds per group
 
@@ -36,6 +37,8 @@ module InitEcoSIM
   call InitPhenologyData
 
   call InitPlantDisturbance
+
+  call InitHour1
 
   call InitGrosub
 
