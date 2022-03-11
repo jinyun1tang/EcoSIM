@@ -9,10 +9,11 @@ module Hour1Mod
   use FertilizerDataType
   use VegDataType
   use Hour1Pars
+  use GridDataType
   implicit none
 
   private
-  include "parameters.h"
+  
   include "files.h"
   include "filec.h"
   include "blkc.h"

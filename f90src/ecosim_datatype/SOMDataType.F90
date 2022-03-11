@@ -1,5 +1,6 @@
 module SOMDataType
   use data_kind_mod, only : r8 => SHR_KIND_R8
+  use GridDataType
   implicit none
   public
   save
@@ -66,7 +67,7 @@ module SOMDataType
   subroutine InitAllocate
   implicit none
 
-  include "parameters.h"
+
 
   allocate(RSC(0:2,0:JZ,JY,JX))
   allocate(RSN(0:2,0:JZ,JY,JX))

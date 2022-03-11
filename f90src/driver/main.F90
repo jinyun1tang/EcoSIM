@@ -9,9 +9,10 @@ PROGRAM main
   use TestMod        , only : regression
   use InitEcoSIM     , only :  InitModules
   use EcoSIMDesctruct, only : DestructEcoSIM
+  use GridDataType
   implicit none
 
-  include "parameters.h"
+
   include "filec.h"
   include "files.h"
   include "blkc.h"

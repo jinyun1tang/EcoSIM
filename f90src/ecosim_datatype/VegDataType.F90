@@ -1,6 +1,7 @@
 module VegDataType
   use data_kind_mod, only : r8 => SHR_KIND_R8
   use EcosimConst
+  use GridDataType
   implicit none
   public
 
@@ -19,7 +20,7 @@ module VegDataType
   subroutine  InitVegData
 
   implicit none
-  include "parameters.h"
+
   real(r8) :: da
   real(r8) :: aa
   integer :: N
@@ -41,7 +42,7 @@ module VegDataType
 
   subroutine InitAllocate
   implicit none
-  include "parameters.h"
+
   !JLS: number of leaf sectors divide the whole horizontal circle
 
   allocate(ZSIN(JLI))

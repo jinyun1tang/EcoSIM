@@ -6,10 +6,11 @@ module HfuncMod
   use data_kind_mod, only : r8 => SHR_KIND_R8
   use StartqMod    , only : startq
   use EcosimConst
+  use GridDataType
   implicit none
 
   private
-  include "parameters.h"
+
   include "filec.h"
   include "files.h"
   include "blkc.h"

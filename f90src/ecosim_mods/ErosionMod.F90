@@ -4,10 +4,11 @@ module ErosionMod
   use MicrobialDataType
   use SOMDataType
   use FertilizerDataType
+  use GridDataType
   implicit none
 
   private
-  include "parameters.h"
+
   include "blkc.h"
   include "blk2a.h"
   include "blk5.h"

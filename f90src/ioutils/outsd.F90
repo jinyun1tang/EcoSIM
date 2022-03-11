@@ -7,10 +7,11 @@
 !
   use data_kind_mod, only : r8 => SHR_KIND_R8
   use SOMDataType
+  use GridDataType
   implicit none
   integer, intent(in) :: I,NT,NE,NAX,NDX,NTX,NEX,NHW,NHE,NVN,NVS
 
-  include "parameters.h"
+
   include "filec.h"
   include "files.h"
   include "blkc.h"

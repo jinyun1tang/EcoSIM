@@ -1,5 +1,6 @@
 module MicrobialDataType
   use data_kind_mod, only : r8 => SHR_KIND_R8
+  use GridDataType
 implicit none
   public
   save
@@ -48,7 +49,7 @@ implicit none
   implicit none
   integer, intent(in) :: nguilds
 
-  include "parameters.h"
+
 
   JG=nguilds
   call InitAllocate()
@@ -58,7 +59,7 @@ implicit none
   subroutine InitAllocate
 
   implicit none
-  include "parameters.h"
+
 
   allocate(OMC(3,JG,7,0:5,0:JZ,JY,JX))
   allocate(OMN(3,JG,7,0:5,0:JZ,JY,JX))

@@ -5,10 +5,11 @@ module VisualMod
   use data_kind_mod, only : r8 => SHR_KIND_R8
   use fileUtil, only : open_safe
   use SOMDataType
+  use GridDataType
   implicit none
 
   private
-  include "parameters.h"
+
   include "filec.h"
   include "files.h"
   include "blkc.h"

@@ -6,10 +6,11 @@ module TrnsfrMod
   use minimathmod, only : test_aeqb,safe_adb
   use SOMDataType
   use SoilChemDataType
+  use GridDataType
   implicit none
 
   private
-  include "parameters.h"
+
   include "blkc.h"
   include "blk2a.h"
   include "blk2b.h"

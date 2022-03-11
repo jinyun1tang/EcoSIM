@@ -8,10 +8,11 @@
 !
       use data_kind_mod, only : r8 => SHR_KIND_R8
   use SoilChemDataType
+  use GridDataType
       implicit none
       integer, intent(in) :: I,J,NT,NE,NAX,NDX,NTX
       integer, intent(in) :: NEX,NHW,NHE,NVN,NVS
-      include "parameters.h"
+
       include "filec.h"
       include "files.h"
       include "blkc.h"

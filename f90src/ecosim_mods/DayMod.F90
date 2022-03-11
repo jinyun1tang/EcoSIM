@@ -3,11 +3,12 @@
   use data_kind_mod, only : r8 => SHR_KIND_R8
   use EcosimConst
   use minimathmod, only : isLeap
+  use GridDataType
   implicit none
 
   private
 !     include_section
-  include "parameters.h"
+
   include "filec.h"
   include "files.h"
   include "blkc.h"

@@ -7,10 +7,11 @@ module RedistMod
   use SOMDataType
   use SoilChemDataType
   use FertilizerDataType
+  use GridDataType
   implicit none
 
   private
-  include "parameters.h"
+
   include "blkc.h"
   include "blk1n.h"
   include "blk1p.h"
@@ -4848,7 +4849,7 @@ module RedistMod
     IF(VHCP(L,NY,NX).GT.ZEROS(NY,NX))THEN
       TKS00=(ENGY+THFLW(L,NY,NX)+THTHAW(L,NY,NX) &
         +TUPHT(L,NY,NX)+HWFLU(L,NY,NX))/VHCP(L,NY,NX)
-      
+
       if(abs(TKS00-TKSX)>100._r8)then
         TKS(L,NY,NX)=TKS(NUM(NY,NX),NY,NX)
         write(*,*)'line',__LINE__,L,TKS(L,NY,NX),TKS(NUM(NY,NX),NY,NX)

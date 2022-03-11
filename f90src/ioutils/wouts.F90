@@ -10,10 +10,11 @@
   use SOMDataType
   use SoilChemDataType
   use FertilizerDataType
+  use GridDataType
   implicit none
   integer, intent(in) :: I,NHW,NHE,NVN,NVS
 
-  include "parameters.h"
+
   include "filec.h"
   include "files.h"
   include "blkc.h"

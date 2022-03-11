@@ -9,10 +9,11 @@ module grosubMod
   use VegDataType
   use GrosubPars
   use PhenologyDataType
+  use GridDataType
   implicit none
 
   private
-  include "parameters.h"
+
   include "files.h"
   include "blkc.h"
   include "blk1cp.h"

@@ -1,6 +1,7 @@
 module SoilChemDataType
 
   use data_kind_mod, only : r8 => SHR_KIND_R8
+  use GridDataType
   implicit none
 
   save
@@ -61,7 +62,7 @@ module SoilChemDataType
   subroutine InitAllocate
   implicit none
 
-  include "parameters.h"
+
 
 
   allocate(CZ2GS(0:JZ,JY,JX))

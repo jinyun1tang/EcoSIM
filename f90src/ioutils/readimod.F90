@@ -9,9 +9,10 @@ module readiMod
   use SOMDataType
   use VegDataType
   use EcosimConst
+  use GridDataType
   implicit none
   private
-  include "parameters.h"
+
   include "filec.h"
   include "files.h"
   include "blkc.h"

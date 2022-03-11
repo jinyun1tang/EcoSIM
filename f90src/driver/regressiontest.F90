@@ -7,9 +7,10 @@ subroutine regressiontest(nmfile,case_name, NX, NY)
   use TestMod, only : regression
   use minimathmod, only : safe_adb
   use SoilChemDataType
+  use GridDataType
   implicit none
 
-  include "parameters.h"
+
   include "files.h"
   include "blkc.h"
   include "blk1cp.h"

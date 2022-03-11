@@ -3,10 +3,11 @@ module StarteMod
   use minimathmod, only : test_aeqb
   use SOMDataType
   use SoilChemDataType
+  use GridDataType
   implicit none
 
       private
-      include "parameters.h"
+
       include "filec.h"
       include "files.h"
       include "blkc.h"

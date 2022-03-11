@@ -6,10 +6,11 @@ module ExtractMod
 !
   use data_kind_mod, only : r8 => SHR_KIND_R8
   use EcosimConst
+  use GridDataType
   implicit none
 
   private
-      include "parameters.h"
+
       include "blkc.h"
       include "blk1cp.h"
       include "blk1cr.h"

@@ -2,11 +2,11 @@ module InitSOMBGC
   use data_kind_mod, only : r8 => SHR_KIND_R8
   use MicrobialDataType
   use SOMDataType
-
+  use GridDataType
   implicit none
 
   private
-  include "parameters.h"
+
   include "blkc.h"
   include "blk8a.h"
   include "blk8b.h"

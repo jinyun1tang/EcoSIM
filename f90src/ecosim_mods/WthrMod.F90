@@ -6,10 +6,11 @@ module WthrMod
   use MiniMathMod, only : safe_adb,vapsat0,test_aneb,test_aeqb
   use EcosimConst
   use VegDataType
+  use GridDataType
   implicit none
 
   private
-  include "parameters.h"
+
   include "blkc.h"
   include "blk1g.h"
   include "blk2a.h"

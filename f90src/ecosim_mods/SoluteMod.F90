@@ -4,11 +4,12 @@ module SoluteMod
   use SOMDataType
   use SoilChemDataType
   use FertilizerDataType
+  use GridDataType
   implicit none
 
   private
 !     include_section
-  include "parameters.h"
+
   include "blkc.h"
   include "blk2a.h"
   include "blk2b.h"

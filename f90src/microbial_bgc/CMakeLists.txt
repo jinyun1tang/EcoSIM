@@ -1,5 +1,8 @@
 set(MICROBIAL_BGC_SOURCES
   InitSOMBGC.F90
+  NitroDiagTypes.F90
+  Nitro1LayerMod.F90
+  NitroDisturbMod.F90
 	NitroMod.F90
   NitroPars.F90
 )

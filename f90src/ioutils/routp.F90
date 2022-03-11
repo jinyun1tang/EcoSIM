@@ -6,10 +6,11 @@
 !
       use data_kind_mod, only : r8 => SHR_KIND_R8
       use StartqMod    , only : startq
+  use GridDataType
       implicit none
       integer, intent(in) :: NHW,NHE,NVN,NVS
 
-      include "parameters.h"
+
       include "files.h"
       include "blkc.h"
       include "blk1cp.h"

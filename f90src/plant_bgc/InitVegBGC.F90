@@ -1,6 +1,7 @@
 module InitVegBGC
 
   use EcosimConst
+  use GridDataType
   implicit none
 
   public :: InitIrradianceGeometry
@@ -11,7 +12,7 @@ module InitVegBGC
   subroutine InitIrradianceGeometry(YSIN,YCOS,YAZI)
   use VegDataType
   implicit none
-  include "parameters.h"
+
 
   real(r8), intent(out) :: YSIN(JSA)
   real(r8), intent(out) :: YCOS(JSA)

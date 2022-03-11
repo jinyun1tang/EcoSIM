@@ -5,11 +5,12 @@
 !     FOR PLANT DATA
 !
       use data_kind_mod, only : r8 => SHR_KIND_R8
+  use GridDataType
       implicit none
       integer, intent(in) :: NT,NE,NAX,NDX,NTX,NEX
       integer, intent(in) :: NF,NFX,NHW,NHE,NVN,NVS
 
-      include "parameters.h"
+      
       include "filec.h"
       include "files.h"
       include "blkc.h"

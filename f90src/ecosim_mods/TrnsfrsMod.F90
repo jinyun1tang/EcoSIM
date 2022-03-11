@@ -5,10 +5,11 @@ module TrnsfrsMod
   use data_kind_mod, only : r8 => SHR_KIND_R8
   use minimathmod, only : test_aeqb
   use SOMDataType
+  use GridDataType
   implicit none
 
       private
-      include "parameters.h"
+
       include "blkc.h"
       include "blk2a.h"
       include "blk2b.h"

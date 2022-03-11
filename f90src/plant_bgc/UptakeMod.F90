@@ -6,10 +6,11 @@ module UptakeMod
   use SOMDataType
   use SoilChemDataType
   use UptakePars
+  use GridDataType
   implicit none
 
   private
-  include "parameters.h"
+
   include "blkc.h"
   include "blk1cp.h"
   include "blk1cr.h"

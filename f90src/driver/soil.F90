@@ -28,12 +28,13 @@ SUBROUTINE soil(NA,ND,NT,NE,NAX,NDX,NTX,NEX,NHW,NHE,NVN,NVS)
   use readqmod     , only : readq
   use readsmod     , only : reads
   use timings      , only : init_timer, start_timer, end_timer,end_timer_loop
+  use GridDataType
   implicit none
 
   integer, intent(in) :: NT,NE,NAX,NDX,NTX,NEX,NHW,NHE,NVN,NVS
   integer, intent(in) :: NA(1:NEX),ND(1:NEX)
 
-  include "parameters.h"
+
   include "filec.h"
   include "files.h"
   include "blkc.h"

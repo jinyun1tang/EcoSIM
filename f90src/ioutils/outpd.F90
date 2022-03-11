@@ -7,11 +7,12 @@
 !     THE RUN SCRIPT
 !
       use data_kind_mod, only : r8 => SHR_KIND_R8
+  use GridDataType
       implicit none
       integer, intent(in) :: I,NT,NE,NAX,NDX
       integer, intent(in) :: NTX,NEX,NHW,NHE,NVN,NVS
 
-      include "parameters.h"
+
       include "filec.h"
       include "files.h"
       include "blkc.h"
