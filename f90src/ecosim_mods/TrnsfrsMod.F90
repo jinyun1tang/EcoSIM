@@ -6,6 +6,8 @@ module TrnsfrsMod
   use minimathmod, only : test_aeqb
   use SOMDataType
   use GridDataType
+  use FlagDataType
+  use SoilPhysDataType
   implicit none
 
       private

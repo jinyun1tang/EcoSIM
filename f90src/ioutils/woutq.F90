@@ -8,6 +8,7 @@
 !
       use data_kind_mod, only : r8 => SHR_KIND_R8
   use GridDataType
+  use FlagDataType
       implicit none
       integer, intent(in) :: I,NHW,NHE,NVN,NVS
 

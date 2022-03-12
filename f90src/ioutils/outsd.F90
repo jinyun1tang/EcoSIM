@@ -8,6 +8,7 @@
   use data_kind_mod, only : r8 => SHR_KIND_R8
   use SOMDataType
   use GridDataType
+  use SoilPhysDataType
   implicit none
   integer, intent(in) :: I,NT,NE,NAX,NDX,NTX,NEX,NHW,NHE,NVN,NVS
 

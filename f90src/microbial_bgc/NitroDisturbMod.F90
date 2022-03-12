@@ -10,6 +10,8 @@ module NitroDisturbMod
   use SoilChemDataType
   use FertilizerDataType
   use GridDataType
+  use SoilPhysDataType
+  use FlagDataType
   implicit none
 
   private

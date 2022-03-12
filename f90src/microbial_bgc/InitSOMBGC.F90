@@ -3,6 +3,8 @@ module InitSOMBGC
   use MicrobialDataType
   use SOMDataType
   use GridDataType
+  use SoilPhysDataType
+  use FlagDataType
   implicit none
 
   private

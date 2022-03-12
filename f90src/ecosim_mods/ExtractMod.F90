@@ -7,6 +7,7 @@ module ExtractMod
   use data_kind_mod, only : r8 => SHR_KIND_R8
   use EcosimConst
   use GridDataType
+  use FlagDataType
   implicit none
 
   private

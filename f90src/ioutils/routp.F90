@@ -7,6 +7,7 @@
       use data_kind_mod, only : r8 => SHR_KIND_R8
       use StartqMod    , only : startq
   use GridDataType
+  use FlagDataType
       implicit none
       integer, intent(in) :: NHW,NHE,NVN,NVS
 

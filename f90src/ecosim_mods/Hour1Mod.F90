@@ -10,10 +10,12 @@ module Hour1Mod
   use VegDataType
   use Hour1Pars
   use GridDataType
+  use SoilPhysDataType
+  use FlagDataType
   implicit none
 
   private
-  
+
   include "files.h"
   include "filec.h"
   include "blkc.h"

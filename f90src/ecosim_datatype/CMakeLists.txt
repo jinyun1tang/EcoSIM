@@ -2,6 +2,8 @@ set(ECOSIM_DATATYPE_SOURCES
   GridDataType.F90
   MicrobialDataType.F90
   SOMDataType.F90
+  SoilPhysDataType.F90
+  FlagDataType.F90
   SoilChemDataType.F90
   PhenologyDataType.F90
   FertilizerDataType.F90

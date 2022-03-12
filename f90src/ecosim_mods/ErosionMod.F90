@@ -5,6 +5,8 @@ module ErosionMod
   use SOMDataType
   use FertilizerDataType
   use GridDataType
+  use FlagDataType
+  use SoilPhysDataType
   implicit none
 
   private

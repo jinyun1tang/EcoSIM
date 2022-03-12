@@ -2,6 +2,7 @@
       module StomateMod
       use data_kind_mod, only : r8 => SHR_KIND_R8
   use GridDataType
+  use FlagDataType
       implicit none
 
       private

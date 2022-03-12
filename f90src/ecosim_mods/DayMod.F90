@@ -4,6 +4,8 @@
   use EcosimConst
   use minimathmod, only : isLeap
   use GridDataType
+  use SoilPhysDataType
+  use FlagDataType
   implicit none
 
   private

@@ -5,6 +5,8 @@ module SoluteMod
   use SoilChemDataType
   use FertilizerDataType
   use GridDataType
+  use FlagDataType
+  use SoilPhysDataType
   implicit none
 
   private

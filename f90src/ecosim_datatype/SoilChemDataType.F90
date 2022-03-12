@@ -45,6 +45,10 @@ module SoilChemDataType
   real(r8),allocatable :: H2GSH(:,:,:)
   real(r8),allocatable :: H2GG(:,:,:)
   real(r8),allocatable :: CH2GG(:,:,:)
+  real(r8),allocatable :: PH(:,:,:)
+  real(r8),allocatable :: CEC(:,:,:)
+  real(r8),allocatable :: AEC(:,:,:)
+
   private :: InitAllocate
 
   contains
@@ -62,49 +66,48 @@ module SoilChemDataType
   subroutine InitAllocate
   implicit none
 
-
-
-
-  allocate(CZ2GS(0:JZ,JY,JX))
-  allocate(CNH4S(0:JZ,JY,JX))
-  allocate(CNH3S(0:JZ,JY,JX))
-  allocate(CNO3S(0:JZ,JY,JX))
-  allocate(CPO4S(JZ,JY,JX))
-  allocate(CNH4B(0:JZ,JY,JX))
-  allocate(CNH3B(0:JZ,JY,JX))
-  allocate(CNO3B(0:JZ,JY,JX))
-  allocate(CPO4B(0:JZ,JY,JX))
-  allocate(CNO2S(0:JZ,JY,JX))
-  allocate(CNH3G(0:JZ,JY,JX))
-  allocate(CZ2GG(0:JZ,JY,JX))
-  allocate(CZ2OG(0:JZ,JY,JX))
-  allocate(CZ2OS(0:JZ,JY,JX))
-  allocate(OXYG(JZ,JY,JX))
-  allocate(OXYS(0:JZ,JY,JX))
-  allocate(OXYSH(JZ,JY,JX))
-  allocate(CO2G(JZ,JY,JX))
-  allocate(CO2S(0:JZ,JY,JX))
-  allocate(CO2SH(JZ,JY,JX))
-  allocate(CH4G(JZ,JY,JX))
-  allocate(CH4S(0:JZ,JY,JX))
-  allocate(CH4SH(JZ,JY,JX))
-  allocate(COXYG(0:JZ,JY,JX));COXYG=0._r8
-  allocate(CCH4G(0:JZ,JY,JX));CCH4G=0._r8
-  allocate(COXYS(0:JZ,JY,JX));COXYS=0._r8
-  allocate(CCO2G(0:JZ,JY,JX));CCO2G=0._r8
-  allocate(CCO2S(0:JZ,JY,JX));CCO2S=0._r8
-  allocate(CCH4S(0:JZ,JY,JX));CCH4S=0._r8
-  allocate(CH1P4(0:JZ,JY,JX))
-  allocate(CH1P4B(0:JZ,JY,JX))
-  allocate(CNO2B(0:JZ,JY,JX))
-  allocate(H2GS(0:JZ,JY,JX))
-  allocate(CH2GS(0:JZ,JY,JX))
-  allocate(CH2P4(0:JZ,JY,JX))
-  allocate(CH2P4B(0:JZ,JY,JX))
-  allocate(H2GSH(JZ,JY,JX))
-  allocate(H2GG(JZ,JY,JX))
-  allocate(CH2GG(0:JZ,JY,JX))
-
+  allocate(CZ2GS(0:JZ,JY,JX));CZ2GS(0:JZ,JY,JX)=0._r8
+  allocate(CNH4S(0:JZ,JY,JX));CNH4S(0:JZ,JY,JX)=0._r8
+  allocate(CNH3S(0:JZ,JY,JX));CNH3S(0:JZ,JY,JX)=0._r8
+  allocate(CNO3S(0:JZ,JY,JX));CNO3S(0:JZ,JY,JX)=0._r8
+  allocate(CPO4S(JZ,JY,JX));CPO4S(JZ,JY,JX)=0._r8
+  allocate(CNH4B(0:JZ,JY,JX));CNH4B(0:JZ,JY,JX)=0._r8
+  allocate(CNH3B(0:JZ,JY,JX));CNH3B(0:JZ,JY,JX)=0._r8
+  allocate(CNO3B(0:JZ,JY,JX));CNO3B(0:JZ,JY,JX)=0._r8
+  allocate(CPO4B(0:JZ,JY,JX));CPO4B(0:JZ,JY,JX)=0._r8
+  allocate(CNO2S(0:JZ,JY,JX));CNO2S(0:JZ,JY,JX)=0._r8
+  allocate(CNH3G(0:JZ,JY,JX));CNH3G(0:JZ,JY,JX)=0._r8
+  allocate(CZ2GG(0:JZ,JY,JX));CZ2GG(0:JZ,JY,JX)=0._r8
+  allocate(CZ2OG(0:JZ,JY,JX));CZ2OG(0:JZ,JY,JX)=0._r8
+  allocate(CZ2OS(0:JZ,JY,JX));CZ2OS(0:JZ,JY,JX)=0._r8
+  allocate(OXYG(JZ,JY,JX));OXYG(JZ,JY,JX)=0._r8
+  allocate(OXYS(0:JZ,JY,JX));OXYS(0:JZ,JY,JX)=0._r8
+  allocate(OXYSH(JZ,JY,JX));OXYSH(JZ,JY,JX)=0._r8
+  allocate(CO2G(JZ,JY,JX));CO2G(JZ,JY,JX)=0._r8
+  allocate(CO2S(0:JZ,JY,JX));CO2S(0:JZ,JY,JX)=0._r8
+  allocate(CO2SH(JZ,JY,JX));CO2SH(JZ,JY,JX)=0._r8
+  allocate(CH4G(JZ,JY,JX));CH4G(JZ,JY,JX)=0._r8
+  allocate(CH4S(0:JZ,JY,JX));CH4S(0:JZ,JY,JX)=0._r8
+  allocate(CH4SH(JZ,JY,JX));CH4SH(JZ,JY,JX)=0._r8
+  allocate(COXYG(0:JZ,JY,JX));COXYG(0:JZ,JY,JX)=0._r8
+  allocate(CCH4G(0:JZ,JY,JX));CCH4G(0:JZ,JY,JX)=0._r8
+  allocate(COXYS(0:JZ,JY,JX));COXYS(0:JZ,JY,JX)=0._r8
+  allocate(CCO2G(0:JZ,JY,JX));CCO2G(0:JZ,JY,JX)=0._r8
+  allocate(CCO2S(0:JZ,JY,JX));CCO2S(0:JZ,JY,JX)=0._r8
+  allocate(CCH4S(0:JZ,JY,JX));CCH4S(0:JZ,JY,JX)=0._r8
+  allocate(CH1P4(0:JZ,JY,JX));CH1P4(0:JZ,JY,JX)=0._r8
+  allocate(CH1P4B(0:JZ,JY,JX));CH1P4B(0:JZ,JY,JX)=0._r8
+  allocate(CNO2B(0:JZ,JY,JX));CNO2B(0:JZ,JY,JX)=0._r8
+  allocate(H2GS(0:JZ,JY,JX));H2GS(0:JZ,JY,JX)=0._r8
+  allocate(CH2GS(0:JZ,JY,JX));CH2GS(0:JZ,JY,JX)=0._r8
+  allocate(CH2P4(0:JZ,JY,JX));CH2P4(0:JZ,JY,JX)=0._r8
+  allocate(CH2P4B(0:JZ,JY,JX));CH2P4B(0:JZ,JY,JX)=0._r8
+  allocate(H2GSH(JZ,JY,JX));H2GSH(JZ,JY,JX)=0._r8
+  allocate(H2GG(JZ,JY,JX));H2GG(JZ,JY,JX)=0._r8
+  allocate(CH2GG(0:JZ,JY,JX));CH2GG(0:JZ,JY,JX)=0._r8
+  allocate(PH(0:JZ,JY,JX));PH(0:JZ,JY,JX)=0._r8
+  allocate(CEC(JZ,JY,JX));CEC(JZ,JY,JX)=0._r8
+  allocate(AEC(JZ,JY,JX));AEC(JZ,JY,JX)=0._r8
   end subroutine InitAllocate
 !------------------------------------------------------------------------------------------
 
@@ -113,45 +116,47 @@ module SoilChemDataType
 
   implicit none
 
-    deallocate(CZ2GS)
-  deallocate(CNH4S)
-  deallocate(CNH3S)
-  deallocate(CNO3S)
-  deallocate(CPO4S)
-  deallocate(CNH4B)
-  deallocate(CNH3B)
-  deallocate(CNO3B)
-  deallocate(CPO4B)
-  deallocate(CNO2S)
-  deallocate(CNH3G)
-  deallocate(CZ2GG)
-  deallocate(CZ2OG)
-  deallocate(CZ2OS)
-  deallocate(OXYG)
-  deallocate(OXYS)
-  deallocate(OXYSH)
-  deallocate(CO2G)
-  deallocate(CO2S)
-  deallocate(CO2SH)
-  deallocate(CH4G)
-  deallocate(CH4S)
-  deallocate(CH4SH)
-  deallocate(COXYG)
-  deallocate(CCH4G)
-  deallocate(COXYS)
-  deallocate(CCO2G)
-  deallocate(CCO2S)
-  deallocate(CCH4S)
-  deallocate(CH1P4)
-  deallocate(CH1P4B)
-  deallocate(CNO2B)
-  deallocate(H2GS)
-  deallocate(CH2GS)
-  deallocate(CH2P4)
-  deallocate(CH2P4B)
-  deallocate(H2GSH)
-  deallocate(H2GG)
-  deallocate(CH2GG)
-
+  if(allocated(CZ2GS))deallocate(CZ2GS)
+  if(allocated(CNH4S))deallocate(CNH4S)
+  if(allocated(CNH3S))deallocate(CNH3S)
+  if(allocated(CNO3S))deallocate(CNO3S)
+  if(allocated(CPO4S))deallocate(CPO4S)
+  if(allocated(CNH4B))deallocate(CNH4B)
+  if(allocated(CNH3B))deallocate(CNH3B)
+  if(allocated(CNO3B))deallocate(CNO3B)
+  if(allocated(CPO4B))deallocate(CPO4B)
+  if(allocated(CNO2S))deallocate(CNO2S)
+  if(allocated(CNH3G))deallocate(CNH3G)
+  if(allocated(CZ2GG))deallocate(CZ2GG)
+  if(allocated(CZ2OG))deallocate(CZ2OG)
+  if(allocated(CZ2OS))deallocate(CZ2OS)
+  if(allocated(OXYG))deallocate(OXYG)
+  if(allocated(OXYS))deallocate(OXYS)
+  if(allocated(OXYSH))deallocate(OXYSH)
+  if(allocated(CO2G))deallocate(CO2G)
+  if(allocated(CO2S))deallocate(CO2S)
+  if(allocated(CO2SH))deallocate(CO2SH)
+  if(allocated(CH4G))deallocate(CH4G)
+  if(allocated(CH4S))deallocate(CH4S)
+  if(allocated(CH4SH))deallocate(CH4SH)
+  if(allocated(COXYG))deallocate(COXYG)
+  if(allocated(CCH4G))deallocate(CCH4G)
+  if(allocated(COXYS))deallocate(COXYS)
+  if(allocated(CCO2G))deallocate(CCO2G)
+  if(allocated(CCO2S))deallocate(CCO2S)
+  if(allocated(CCH4S))deallocate(CCH4S)
+  if(allocated(CH1P4))deallocate(CH1P4)
+  if(allocated(CH1P4B))deallocate(CH1P4B)
+  if(allocated(CNO2B))deallocate(CNO2B)
+  if(allocated(H2GS))deallocate(H2GS)
+  if(allocated(CH2GS))deallocate(CH2GS)
+  if(allocated(CH2P4))deallocate(CH2P4)
+  if(allocated(CH2P4B))deallocate(CH2P4B)
+  if(allocated(H2GSH))deallocate(H2GSH)
+  if(allocated(H2GG))deallocate(H2GG)
+  if(allocated(CH2GG))deallocate(CH2GG)
+  if(allocated(PH))deallocate(PH)
+  if(allocated(CEC))deallocate(CEC)
+  if(allocated(AEC))deallocate(AEC)
   end subroutine DestructSoilChemData
 end module SoilChemDataType

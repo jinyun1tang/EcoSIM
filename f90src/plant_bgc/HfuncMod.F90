@@ -7,6 +7,7 @@ module HfuncMod
   use StartqMod    , only : startq
   use EcosimConst
   use GridDataType
+  use FlagDataType
   implicit none
 
   private

@@ -7,6 +7,8 @@ module UptakeMod
   use SoilChemDataType
   use UptakePars
   use GridDataType
+  use SoilPhysDataType
+  use FlagDataType
   implicit none
 
   private

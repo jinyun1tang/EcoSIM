@@ -2,6 +2,7 @@ module StartqMod
   use data_kind_mod, only : r8 => SHR_KIND_R8
   use EcosimConst
   use GridDataType
+  use FlagDataType
   implicit none
 
   private
@@ -37,8 +38,6 @@ module StartqMod
   real(r8) :: CNOPC(4),CPOPC(4)
   real(r8) :: CNOPCT,CPOPCT,CCO2A,CCO2P,COXYA,COXYP,FDM,WTSTDX
 
-  integer :: K,L,M,NX,NY,NZ2X,NZ,N,NR,NB
-
   public :: startq
   contains
 
@@ -48,6 +47,8 @@ module StartqMod
 !
   implicit none
   integer, intent(in) :: NHWQ,NHEQ,NVNQ,NVSQ,NZ1Q,NZ2Q
+
+  integer :: NY,NX,K,L,M,NZ,NZ2X
 !     begin_execution
 !
 !     INITIALIZE SHOOT GROWTH VARIABLES
@@ -158,6 +159,7 @@ module StartqMod
 
   implicit none
   integer, intent(in) :: NZ,NY,NX
+  integer :: N,M
 !
 !     FRACTIONS OF PLANT LITTER ALLOCATED TO KINETIC COMPONENTS
 !     PROTEIN(*,1),CH2O(*,2),CELLULOSE(*,3),LIGNIN(*,4) IN SOIL LITTER
@@ -389,6 +391,7 @@ module StartqMod
 
       implicit none
       integer, intent(in) :: NZ, NY, NX
+  INTEGER :: L,N,NR
 !
 !     SEED CHARACTERISTICS
 !
@@ -466,6 +469,7 @@ module StartqMod
 
       implicit none
       integer, intent(in) :: NZ, NY, NX
+  integer :: K,L,M,N,NB
 !
 !     INITIALIZE PLANT PHENOLOGY
 !
@@ -671,6 +675,7 @@ module StartqMod
 
       implicit none
       integer, intent(in) :: NZ, NY, NX
+  integer :: M
 !
 !     INITIALIZE MASS BALANCE CHECKS
 !
@@ -755,6 +760,7 @@ module StartqMod
   subroutine InitRootMychorMorphoBio(NZ,NY,NX)
   implicit none
   integer, intent(in) :: NZ, NY, NX
+  integer :: K,L,M,N,NR
 !
 !     INITIALIZE ROOT(N=1),MYCORRHIZAL(N=2) MORPHOLOGY AND BIOMASS
 !

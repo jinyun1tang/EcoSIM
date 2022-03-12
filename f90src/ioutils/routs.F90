@@ -10,6 +10,8 @@
   use SoilChemDataType
   use FertilizerDataType
   use GridDataType
+  use SoilPhysDataType
+  use FlagDataType
   implicit none
   integer, intent(in) :: NHW,NHE,NVN,NVS
 

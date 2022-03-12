@@ -10,6 +10,8 @@ module grosubMod
   use GrosubPars
   use PhenologyDataType
   use GridDataType
+  use SoilPhysDataType
+  use FlagDataType
   implicit none
 
   private

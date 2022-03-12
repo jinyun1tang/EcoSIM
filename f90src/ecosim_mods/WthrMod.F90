@@ -7,6 +7,7 @@ module WthrMod
   use EcosimConst
   use VegDataType
   use GridDataType
+  use FlagDataType
   implicit none
 
   private

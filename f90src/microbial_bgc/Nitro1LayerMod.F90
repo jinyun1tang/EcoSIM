@@ -14,6 +14,7 @@ module nitro1LayerMod
   use FertilizerDataType
   use NitroDiagTypes
   use GridDataType
+  use SoilPhysDataType
   implicit none
 
   private

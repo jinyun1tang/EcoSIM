@@ -7,6 +7,7 @@ module TrnsfrMod
   use SOMDataType
   use SoilChemDataType
   use GridDataType
+  use SoilPhysDataType
   implicit none
 
   private

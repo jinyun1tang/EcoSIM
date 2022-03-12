@@ -6,6 +6,7 @@ SUBROUTINE routq(NT,NE,NAX,NDX,NTX,NEX,NHW,NHE,NVN,NVS)
       use data_kind_mod, only : r8 => SHR_KIND_R8
   use fileUtil, only : open_safe
   use GridDataType
+  use FlagDataType
   implicit none
   integer, intent(in) :: NT,NE,NAX,NDX,NTX,NEX,NHW,NHE,NVN,NVS
 

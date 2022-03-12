@@ -10,6 +10,9 @@ module readiMod
   use VegDataType
   use EcosimConst
   use GridDataType
+  use SoilPhysDataType
+  use FlagDataType
+  use SoilChemDataType
   implicit none
   private
 

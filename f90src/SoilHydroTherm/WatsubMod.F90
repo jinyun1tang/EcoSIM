@@ -10,6 +10,8 @@ module WatsubMod
   use SOMDataType
   use WatsubPars
   use GridDataType
+  use SoilPhysDataType
+  use FlagDataType
   implicit none
 
   private

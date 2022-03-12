@@ -8,6 +8,7 @@ subroutine regressiontest(nmfile,case_name, NX, NY)
   use minimathmod, only : safe_adb
   use SoilChemDataType
   use GridDataType
+  use FlagDataType
   implicit none
 
 

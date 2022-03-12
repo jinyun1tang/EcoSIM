@@ -14,6 +14,8 @@ module StartsMod
   use InitSOMBGC
   use VegDataType
   use GridDataType
+  use SoilPhysDataType
+  use FlagDataType
   implicit none
 
   private
@@ -34,15 +36,6 @@ module StartsMod
   include "blk18a.h"
   include "blk18b.h"
 
-  real(r8) :: ALTY,ALTZG,CDPTHG
-  real(r8) :: DGAZI,DLYRSI
-  real(r8) :: PTDS,TORGM
-  real(r8) :: VOLSWI,VORGC,VMINL,VSAND
-! JSA: # of sectors for the sky azimuth  [0,2*pi]
-! JLA: # of sectors for the leaf zimuth, [0,pi]
-  real(r8) :: YSIN(JSA),YCOS(JSA),YAZI(JSA) &
-    ,GSINA(JY,JX),GCOSA(JY,JX),ALTX(JV,JH),CDPTHSI(JS) &
-    ,TORGL(JZ)
   !
   !
   !     BKRS=dry bulk density of woody(0),fine(1),manure(2) litter
@@ -53,7 +46,6 @@ module StartsMod
   !     CDPTHSI=depth to bottom of snowpack layers
   !     POROQ=Penman Water Linear Reduction tortuosity used in gas flux calculations
   !
-  real(r8), PARAMETER :: PSIPS=-0.5E-03_r8,RDN=57.29577951_r8
 
   public :: starts
   contains
@@ -68,7 +60,10 @@ module StartsMod
   integer, intent(in) :: NHW,NHE,NVN,NVS
 
   integer :: NY,NX,L,NGL
-
+  REAL(R8) :: ALTY
+  real(r8) :: ALTZG
+  real(r8) :: CDPTHG
+  real(r8) :: YSIN(JSA),YCOS(JSA),YAZI(JSA)
 ! begin_execution
 
 
@@ -84,7 +79,7 @@ module StartsMod
   !
   !     CALCULATE ELEVATION OF EACH GRID CELL
   !
-  call InitGridElevation(NHW,NHE,NVN,NVS)
+  call InitGridElevation(NHW,NHE,NVN,NVS,YSIN,YCOS,YAZI,ALTY)
   !
   !     INITIALIZE ACCUMULATORS AND MASS BALANCE CHECKS
   !     OF EACH GRID CELL
@@ -193,12 +188,12 @@ module StartsMod
 !
 !     INITIALIZE GRID CELL DIMENSIONS
 !
-  call InitSoilVars(NHW,NHE,NVN,NVS)
+  call InitSoilVars(NHW,NHE,NVN,NVS,ALTZG,CDPTHG)
 
   RETURN
   END subroutine starts
 !------------------------------------------------------------------------------------------
-  subroutine InitSoilVars(NHW,NHE,NVN,NVS)
+  subroutine InitSoilVars(NHW,NHE,NVN,NVS,ALTZG,CDPTHG)
   !     N3,N2,N1=L,NY,NX of source grid cell
   !     N6,N5,N4=L,NY,NX of destination grid cell
   !      ALTZG=minimum surface elevation in landscape
@@ -213,7 +208,7 @@ module StartsMod
   !
   implicit none
   integer, intent(in) :: NHW,NHE,NVN,NVS
-
+  real(r8),intent(in) :: ALTZG,CDPTHG
   integer :: NY,NX,L,N
   integer :: N1,N2,N3,N4,N5,N6
 
@@ -276,7 +271,7 @@ module StartsMod
       !
       !     ALLOCATE LITTER,SOC TO WOODY,NON-WOODY,MANURE,POC AND HUMUS
       !
-      call InitSoilProfile(NY,NX)
+      call InitSoilProfile(NY,NX,CDPTHG)
       !
       !     SURFACE LITTER HEAT CAPACITY
       !
@@ -290,15 +285,20 @@ module StartsMod
 9895  CONTINUE
   end subroutine InitSoilVars
 !------------------------------------------------------------------------------------------
-  subroutine InitSoilProfile(NY,NX)
+  subroutine InitSoilProfile(NY,NX,CDPTHG)
 
   implicit none
   integer, intent(in) :: NY,NX
-
+  REAL(R8),INTENT(IN) :: CDPTHG
   integer  :: L,M,K,N,KK,NN,NGL
   real(r8) :: CORGCM,HCX,TORGC
   real(r8) :: CORGL,TORGLL,FCX
-
+  REAL(R8) :: PTDS
+  real(r8) :: TORGM
+  real(r8) :: VSAND
+  real(r8) :: TORGL(JZ)
+  real(r8) :: VMINL
+  real(r8) :: VORGC
 ! begin_execution
 ! RSC,RSC,RSP=C,N,P in fine(1),woody(0),manure(2) litter (g m-2)
 ! CORGC,CORGR,CORGN,CORGP=SOC,POC,SON,SOP (g Mg-1)
@@ -522,6 +522,10 @@ module StartsMod
 
   implicit none
   integer, intent(in) :: NY,NX
+
+  real(r8) :: DLYRSI
+  real(r8) :: VOLSWI
+  real(r8), parameter :: CDPTHSI(JS)=(/0.05_r8,0.15_r8,0.30_r8,0.60_r8,1.00_r8/)
   integer :: L
 ! begin_execution
 !
@@ -573,11 +577,15 @@ module StartsMod
   end subroutine InitSnowLayers
 
 !------------------------------------------------------------------------------------------
-  subroutine InitGridElevation(NHW,NHE,NVN,NVS)
+  subroutine InitGridElevation(NHW,NHE,NVN,NVS,YSIN,YCOS,YAZI,ALTY)
   implicit none
   integer, intent(in) :: NHW,NHE,NVN,NVS
-
+  real(r8),intent(in) :: YSIN(JSA),YCOS(JSA),YAZI(JSA)
+  REAL(R8),INTENT(OUT):: ALTY
   integer :: NY,NX,N,NN
+  REAL(R8) :: DGAZI
+  real(r8) :: GSINA(JY,JX),GCOSA(JY,JX)
+
 ! begin_execution
 ! GAZI=ground surface azimuth
 ! GSIN,GCOS=sine,cosine of ground surface
@@ -700,7 +708,6 @@ module StartsMod
   PSIHY=-2500.0_r8
   FCI=0.05_r8
   WPI=0.025_r8
-  CDPTHSI=(/0.05_r8,0.15_r8,0.30_r8,0.60_r8,1.00_r8/)
   POROQ=0.66_r8
 
   call InitSOMConsts

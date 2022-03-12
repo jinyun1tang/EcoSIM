@@ -8,6 +8,7 @@ module PlantDisturbMod
   use GrosubPars
   use PhenologyDataType
   use GridDataType
+  use FlagDataType
 implicit none
   private
 

@@ -4,6 +4,8 @@ module StarteMod
   use SOMDataType
   use SoilChemDataType
   use GridDataType
+  use FlagDataType
+  use SoilPhysDataType
   implicit none
 
       private

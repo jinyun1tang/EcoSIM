@@ -6,6 +6,7 @@ module readqmod
   use fileUtil, only : open_safe
   use minimathmod, only : isLeap
   use GridDataType
+  use FlagDataType
   implicit none
   private
 
