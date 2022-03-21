@@ -9,37 +9,23 @@ module PlantDisturbMod
   use PhenologyDataType
   use GridDataType
   use FlagDataType
+  use PlantDataStateType
+  use SoilWaterDataType
+  use EcoSIMCtrlDataType
+  use PlantDataRateType
+  use PlantDataCharType
+  use FertilizerDataType
+  use ClimForcDataType
+  use EcosimConst
+  use PlantMngmtDataType
+  use RootDataType
+  use CanopyDataType
+  use EcoSimSumDataType
+  use SoilBGCDataType
+  use EcosysBGCFluxType
 implicit none
   private
 
-  include "blkc.h"
-  include "blk1cp.h"
-  include "blk1cr.h"
-  include "blk1g.h"
-  include "blk1n.h"
-  include "blk1p.h"
-  include "blk1s.h"
-  include "blk2a.h"
-  include "blk2b.h"
-  include "blk2c.h"
-  include "blk3.h"
-  include "blk5.h"
-  include "blk8a.h"
-  include "blk8b.h"
-  include "blk9a.h"
-  include "blk9b.h"
-  include "blk9c.h"
-  include "blk11a.h"
-  include "blk11b.h"
-  include "blk12a.h"
-  include "blk12b.h"
-  include "blk13a.h"
-  include "blk13b.h"
-  include "blk13c.h"
-  include "blk14.h"
-  include "blk16.h"
-  include "blk18a.h"
-  include "blk18b.h"
 ! end_include_section
 
 ! disturbance variables
@@ -99,9 +85,7 @@ implicit none
   integer :: M
 
 !     begin_execution
-!     IF(J.EQ.INT(ZNOON(NY,NX)))THEN
-!        XHVST=1.0_r8
-!        WHVSBL=0._r8
+
   WTHTH0=0._r8
   WTHNH0=0._r8
   WTHPH0=0._r8
@@ -687,7 +671,7 @@ implicit none
 !------------------------------------------------------------------------------------------
 
   subroutine RemoveBiomByTillage(I,J,NZ,NY,NX,CPOOLK)
-
+  use SurfLitterDataType, only : XCORP
   implicit none
   integer , intent(in) :: I,J,NZ,NY,NX
   real(r8), intent(inout) :: CPOOLK(10,JP,JY,JX)

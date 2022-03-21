@@ -8,34 +8,21 @@ module HfuncMod
   use EcosimConst
   use GridDataType
   use FlagDataType
+  use PlantDataStateType
+  use EcoSIMCtrlDataType
+  use PlantDataCharType
+  use ClimForcDataType
+  use PhenologyDataType
+  use PlantMngmtDataType
+  use SnowDataType
+  use CanopyDataType
+  use RootDataType
+  use SOMDataType
+  use EcoSIMHistMod
   implicit none
 
   private
 
-  include "filec.h"
-  include "files.h"
-  include "blkc.h"
-  include "blk1cp.h"
-  include "blk1cr.h"
-  include "blk1g.h"
-  include "blk1n.h"
-  include "blk1p.h"
-  include "blk2a.h"
-  include "blk2b.h"
-  include "blk2c.h"
-  include "blk3.h"
-  include "blk8a.h"
-  include "blk8b.h"
-  include "blk9a.h"
-  include "blk9b.h"
-  include "blk9c.h"
-  include "blk11a.h"
-  include "blk11b.h"
-  include "blk12a.h"
-  include "blk12b.h"
-  include "blk16.h"
-  include "blk18a.h"
-  include "blk18b.h"
 
   character(len=*), parameter :: mod_filename = __FILE__
   real(r8) :: PSILY(0:3)

@@ -7,24 +7,15 @@ module ErosionMod
   use GridDataType
   use FlagDataType
   use SoilPhysDataType
+  use EcoSIMCtrlDataType
+  use SoilWaterDataType
+  use LandSurfDataType
+  use SurfSoilDataType
+  use SoilChemDataType
+  use AqueChemDatatype
   implicit none
 
   private
-
-  include "blkc.h"
-  include "blk2a.h"
-  include "blk5.h"
-  include "blk8a.h"
-  include "blk8b.h"
-  include "blk10.h"
-  include "blk11a.h"
-  include "blk13a.h"
-  include "blk13b.h"
-  include "blk13c.h"
-  include "blk19a.h"
-  include "blk19b.h"
-  include "blk19c.h"
-  include "blk20f.h"
 
   real(r8), PARAMETER :: FSINK=0.01_r8
   real(r8) ::  RERSED(2,2,JV,JH),TERSED(JY,JX),RDTSED(JY,JX) &

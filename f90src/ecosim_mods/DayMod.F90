@@ -6,41 +6,30 @@
   use GridDataType
   use SoilPhysDataType
   use FlagDataType
+  use SoilHeatDatatype
+  use SoilWaterDataType
+  use EcoSIMCtrlDataType
+  use SoilBGCDataType
+  use ClimForcDataType
+  use FertilizerDataType
+  use PhenologyDataType
+  use SurfLitterDataType, only : XCORP
+  use PlantDataRateType
+  use CanopyDataType
+  use RootDataType
+  use PlantMngmtDataType
+  use SOMDataType
+  use EcosysBGCFluxType
+  use EcoSIMHistMod
   implicit none
 
   private
-!     include_section
 
-  include "filec.h"
-  include "files.h"
-  include "blkc.h"
-  include "blk2a.h"
-  include "blk2b.h"
-  include "blk2c.h"
-  include "blk3.h"
-  include "blk6.h"
-  include "blk8a.h"
-  include "blk8b.h"
-  include "blk11a.h"
-  include "blk11b.h"
-  include "blk13a.h"
-  include "blk13b.h"
-  include "blk13c.h"
-  include "blk14.h"
-  include "blk16.h"
-  include "blk17.h"
-  include "blk18a.h"
-  include "blk18b.h"
-  include "blk19a.h"
-  include "blk19b.h"
-  include "blk19c.h"
-  include "blk19d.h"
-!     end_include_section
   CHARACTER(len=3) :: CHARN1,CHARN2
   CHARACTER(len=4) :: CHARN3
   real(r8), PARAMETER :: TWILGT=0.06976_r8
 
-  real(r8) :: CORP,DECDAY,DECLIN,DIRRA1,DIRRA2,FW,FZ
+  real(r8) :: CORP,DECDAY,DIRRA1,DIRRA2,FW,FZ
   real(r8) :: RR,TFZ,TWP,TVW,XI
 
   integer :: ITYPE,I2,I3,J,L,M,N,NN,N1,N2,N3,NX,NY,NZ
@@ -98,6 +87,8 @@
   implicit none
   integer, intent(in) :: I, NHW, NHE, NVN, NVS
 
+  real(r8) :: AZI
+  REAL(R8) :: DEC
   DO 955 NX=NHW,NHE
     DO 950 NY=NVN,NVS
       TRAD(NY,NX)=0._r8

@@ -9,27 +9,15 @@ subroutine regressiontest(nmfile,case_name, NX, NY)
   use SoilChemDataType
   use GridDataType
   use FlagDataType
+  use SoilHeatDatatype
+  use SoilWaterDataType
+  use PlantDataRateType
   implicit none
 
-
   include "files.h"
-  include "blkc.h"
-  include "blk1cp.h"
-  include "blk1cr.h"
-  include "blk1g.h"
-  include "blk1n.h"
-  include "blk1p.h"
-  include "blk3.h"
-  include "blk8a.h"
-  include "blk8b.h"
   include "blk9a.h"
   include "blk9b.h"
   include "blk9c.h"
-  include "blk11a.h"
-  include "blk12a.h"
-  include "blk12b.h"
-  include "blk13b.h"
-  include "blk14.h"
 
   character(len=*), parameter :: mod_filename = __FILE__
   character(len=*), intent(in) :: nmfile

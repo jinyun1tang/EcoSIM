@@ -5,15 +5,14 @@ module InitSOMBGC
   use GridDataType
   use SoilPhysDataType
   use FlagDataType
+  use EcoSIMCtrlDataType
+  use SoilWaterDataType
+  use EcosimConst
+  use SurfLitterDataType
   implicit none
 
   private
 
-  include "blkc.h"
-  include "blk8a.h"
-  include "blk8b.h"
-  include "blk2a.h"
-  include "blk11a.h"
 
 ! CORGCX,CORGNX,CORGPX=C,N,P concentations from woody(0),
 ! non-woody(1), manure(2), litter, POC(3) and humus(4) (g Mg-1)

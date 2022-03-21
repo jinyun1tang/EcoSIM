@@ -7,16 +7,17 @@ module readqmod
   use minimathmod, only : isLeap
   use GridDataType
   use FlagDataType
+  use EcoSIMCtrlDataType
+  use ClimForcDataType
+  use PhenologyDataType
+  use PlantDataCharType
+  use PlantMngmtDataType
+  use EcosimConst
+  use EcoSIMHistMod
+
   implicit none
   private
 
-  include "filec.h"
-  include "files.h"
-  include "blkc.h"
-  include "blk9a.h"
-  include "blk9b.h"
-  include "blk9c.h"
-  include "blk17.h"
 
   character(len=*), parameter :: mod_filename = __FILE__
   real(r8), PARAMETER :: TWILGT=0.06976

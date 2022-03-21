@@ -9,41 +9,23 @@ module UptakeMod
   use GridDataType
   use SoilPhysDataType
   use FlagDataType
+  use SoilHeatDatatype
+  use SoilWaterDataType
+  use PlantDataStateType
+  use PlantDataRateType
+  use EcoSIMCtrlDataType
+  use SoilBGCDataType
+  use PlantDataCharType
+  use ClimForcDataType
+  use LandSurfDataType
+  use PhenologyDataType
+  use SnowDataType
+  use RootDataType
+  use CanopyDataType
+  use EcosysBGCFluxType
   implicit none
 
   private
-
-  include "blkc.h"
-  include "blk1cp.h"
-  include "blk1cr.h"
-  include "blk1g.h"
-  include "blk1n.h"
-  include "blk1p.h"
-  include "blk2a.h"
-  include "blk2b.h"
-  include "blk2c.h"
-  include "blk3.h"
-  include "blk5.h"
-  include "blk8a.h"
-  include "blk8b.h"
-  include "blk9a.h"
-  include "blk9b.h"
-  include "blk9c.h"
-  include "blk10.h"
-  include "blk11a.h"
-  include "blk11b.h"
-  include "blk12a.h"
-  include "blk12b.h"
-  include "blk13a.h"
-  include "blk13b.h"
-  include "blk13c.h"
-  include "blk13d.h"
-  include "blk14.h"
-  include "blk16.h"
-  include "blk18a.h"
-  include "blk18b.h"
-  include "blk1u.h"
-! end_include_section
 
   character(len=*), private, parameter :: mod_filename = __FILE__
 

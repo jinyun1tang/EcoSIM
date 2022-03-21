@@ -3,40 +3,19 @@ module StartqMod
   use EcosimConst
   use GridDataType
   use FlagDataType
+  use PlantDataStateType
+  use EcoSIMCtrlDataType
+  use PlantDataRateType
+  use PlantDataCharType
+  use ClimForcDataType
+  use PhenologyDataType
+  use PlantMngmtDataType
+  use CanopyDataType
+  use RootDataType
+  use EcoSIMHistMod
   implicit none
 
   private
-
-  include "filec.h"
-  include "files.h"
-  include "blkc.h"
-  include "blk1cp.h"
-  include "blk1cr.h"
-  include "blk1g.h"
-  include "blk1n.h"
-  include "blk1p.h"
-  include "blk1s.h"
-  include "blk2a.h"
-  include "blk2b.h"
-  include "blk2c.h"
-  include "blk3.h"
-  include "blk5.h"
-  include "blk8a.h"
-  include "blk8b.h"
-  include "blk9a.h"
-  include "blk9b.h"
-  include "blk9c.h"
-  include "blk11a.h"
-  include "blk11b.h"
-  include "blk12a.h"
-  include "blk12b.h"
-  include "blk14.h"
-  include "blk16.h"
-  include "blk18a.h"
-  include "blk18b.h"
-
-  real(r8) :: CNOPC(4),CPOPC(4)
-  real(r8) :: CNOPCT,CPOPCT,CCO2A,CCO2P,COXYA,COXYP,FDM,WTSTDX
 
   public :: startq
   contains
@@ -134,14 +113,7 @@ module StartqMod
   PPI(NZ,NY,NX)=PPZ(NZ,NY,NX)
   PPX(NZ,NY,NX)=PPI(NZ,NY,NX)
   CF(NZ,NY,NX)=CFI(NZ,NY,NX)
-!     WRITE(*,3232)'STARTQ',IYRC,NX,NY,NZ
-!    2,IDAY0(NZ,NY,NX),IYR0(NZ,NY,NX)
-!    3,IDAYH(NZ,NY,NX),IYRH(NZ,NY,NX)
-!    4,IYRC,IDAYX(NZ,NY,NX),IDAYY(NZ,NY,NX)
-!    5,IYRX(NZ,NY,NX),IYRY(NZ,NY,NX),IFLGC(NZ,NY,NX)
-!    5,PPI(NZ,NY,NX),PPX(NZ,NY,NX),CFI(NZ,NY,NX),CF(NZ,NY,NX)
-!3232  FORMAT(A8,15I8,20E12.4)
-!     IF(DATAP(NZ,NY,NX).NE.'NO')THEN
+
   RSMH(NZ,NY,NX)=RSMX(NZ,NY,NX)/3600.0
   RCMX(NZ,NY,NX)=RSMX(NZ,NY,NX)*1.56
   CNWS(NZ,NY,NX)=2.5
@@ -160,6 +132,8 @@ module StartqMod
   implicit none
   integer, intent(in) :: NZ,NY,NX
   integer :: N,M
+  real(r8) :: CNOPC(4),CPOPC(4)
+  REAL(R8) :: CNOPCT,CPOPCT
 !
 !     FRACTIONS OF PLANT LITTER ALLOCATED TO KINETIC COMPONENTS
 !     PROTEIN(*,1),CH2O(*,2),CELLULOSE(*,3),LIGNIN(*,4) IN SOIL LITTER
@@ -353,10 +327,10 @@ module StartqMod
   end subroutine PlantLitterFractions
 !------------------------------------------------------------------------------------------
 
-      subroutine PFTThermalAcclimation(NZ,NY,NX)
+  subroutine PFTThermalAcclimation(NZ,NY,NX)
 
-      implicit none
-      integer, intent(in) :: NZ, NY, NX
+  implicit none
+  integer, intent(in) :: NZ, NY, NX
 !
 !     PFT THERMAL ACCLIMATION
 !
@@ -366,31 +340,31 @@ module StartqMod
 !     HTC=high temperature threshold for grain number loss (oC)
 !     SSTX=sensitivity to HTC (seeds oC-1 above HTC)
 !
-      TCZD=5.00
-      TCXD=12.00
-      ZTYP(NZ,NY,NX)=ZTYPI(NZ,NY,NX)
-      OFFST(NZ,NY,NX)=2.667*(2.5-ZTYP(NZ,NY,NX))
-      TCZ(NZ,NY,NX)=TCZD-OFFST(NZ,NY,NX)
-      TCX(NZ,NY,NX)=AMIN1(15.0,TCXD-OFFST(NZ,NY,NX))
-      IF(ICTYP(NZ,NY,NX).EQ.3)THEN
-      IF(DATAP(NZ,NY,NX)(1:4).EQ.'soyb')THEN
+  TCZD=5.00
+  TCXD=12.00
+  ZTYP(NZ,NY,NX)=ZTYPI(NZ,NY,NX)
+  OFFST(NZ,NY,NX)=2.667*(2.5-ZTYP(NZ,NY,NX))
+  TCZ(NZ,NY,NX)=TCZD-OFFST(NZ,NY,NX)
+  TCX(NZ,NY,NX)=AMIN1(15.0,TCXD-OFFST(NZ,NY,NX))
+  IF(ICTYP(NZ,NY,NX).EQ.3)THEN
+    IF(DATAP(NZ,NY,NX)(1:4).EQ.'soyb')THEN
       HTC(NZ,NY,NX)=30.0_r8+3.0_r8*ZTYP(NZ,NY,NX)
       SSTX(NZ,NY,NX)=0.002_r8
-      ELSE
+    ELSE
       HTC(NZ,NY,NX)=27.0_r8+3.0_r8*ZTYP(NZ,NY,NX)
       SSTX(NZ,NY,NX)=0.002_r8
-      ENDIF
-      ELSE
-      HTC(NZ,NY,NX)=27.0_r8+3.0_r8*ZTYP(NZ,NY,NX)
-      SSTX(NZ,NY,NX)=0.005_r8
-      ENDIF
-      end subroutine PFTThermalAcclimation
+    ENDIF
+  ELSE
+    HTC(NZ,NY,NX)=27.0_r8+3.0_r8*ZTYP(NZ,NY,NX)
+    SSTX(NZ,NY,NX)=0.005_r8
+  ENDIF
+  end subroutine PFTThermalAcclimation
 !------------------------------------------------------------------------------------------
 
-      subroutine InitDimensionsandUptake(NZ,NY,NX)
+  subroutine InitDimensionsandUptake(NZ,NY,NX)
 
-      implicit none
-      integer, intent(in) :: NZ, NY, NX
+  implicit none
+  integer, intent(in) :: NZ, NY, NX
   INTEGER :: L,N,NR
 !
 !     SEED CHARACTERISTICS
@@ -398,9 +372,9 @@ module StartqMod
 !     SDVL,SDLG,SDAR=seed volume(m3),length(m),area(m2)
 !     GRDM=seed C mass (g) from PFT file
 !
-      SDVL(NZ,NY,NX)=GRDM(NZ,NY,NX)*5.0E-06
-      SDLG(NZ,NY,NX)=2.0*(0.75*SDVL(NZ,NY,NX)/PICON)**0.33
-      SDAR(NZ,NY,NX)=4.0*PICON*(SDLG(NZ,NY,NX)/2.0)**2
+  SDVL(NZ,NY,NX)=GRDM(NZ,NY,NX)*5.0E-06
+  SDLG(NZ,NY,NX)=2.0*(0.75*SDVL(NZ,NY,NX)/PICON)**0.33
+  SDAR(NZ,NY,NX)=4.0*PICON*(SDLG(NZ,NY,NX)/2.0)**2
 !
 !     INITIALIZE ROOT(N=1),MYCORRHIZAL(N=2) DIMENSIONS, UPTAKE PARAMETERS
 !
@@ -415,33 +389,33 @@ module StartqMod
 !     UPMXPO,UPKMPO,UPMNPO=H2PO4 max uptake(g m-2 h-1),Km(uM),min concn (uM)
 !     RSRR,RSRA=radial,axial root resistivity (m2 MPa-1 h-1)
 !
-      SDPTH(NZ,NY,NX)=SDPTHI(NZ,NY,NX)
-      DO 9795 L=NU(NY,NX),NL(NY,NX)
-      IF(SDPTH(NZ,NY,NX).GE.CDPTHZ(L-1,NY,NX) &
+  SDPTH(NZ,NY,NX)=SDPTHI(NZ,NY,NX)
+  DO 9795 L=NU(NY,NX),NL(NY,NX)
+    IF(SDPTH(NZ,NY,NX).GE.CDPTHZ(L-1,NY,NX) &
       .AND.SDPTH(NZ,NY,NX).LT.CDPTHZ(L,NY,NX))THEN
       NG(NZ,NY,NX)=L
       NIX(NZ,NY,NX)=L
       DO 9790 NR=1,10
-      NINR(NR,NZ,NY,NX)=L
+        NINR(NR,NZ,NY,NX)=L
 9790  CONTINUE
-      ENDIF
+    ENDIF
 9795  CONTINUE
-      CNRTS(NZ,NY,NX)=CNRT(NZ,NY,NX)*DMRT(NZ,NY,NX)
-      CPRTS(NZ,NY,NX)=CPRT(NZ,NY,NX)*DMRT(NZ,NY,NX)
-      RRAD1M(2,NZ,NY,NX)=5.0E-06
-      RRAD2M(2,NZ,NY,NX)=5.0E-06
-      PORT(2,NZ,NY,NX)=PORT(1,NZ,NY,NX)
-      UPMXZH(2,NZ,NY,NX)=UPMXZH(1,NZ,NY,NX)
-      UPKMZH(2,NZ,NY,NX)=UPKMZH(1,NZ,NY,NX)
-      UPMNZH(2,NZ,NY,NX)=UPMNZH(1,NZ,NY,NX)
-      UPMXZO(2,NZ,NY,NX)=UPMXZO(1,NZ,NY,NX)
-      UPKMZO(2,NZ,NY,NX)=UPKMZO(1,NZ,NY,NX)
-      UPMNZO(2,NZ,NY,NX)=UPMNZO(1,NZ,NY,NX)
-      UPMXPO(2,NZ,NY,NX)=UPMXPO(1,NZ,NY,NX)
-      UPKMPO(2,NZ,NY,NX)=UPKMPO(1,NZ,NY,NX)
-      UPMNPO(2,NZ,NY,NX)=UPMNPO(1,NZ,NY,NX)
-      RSRR(2,NZ,NY,NX)=1.0E+04
-      RSRA(2,NZ,NY,NX)=1.0E+12
+  CNRTS(NZ,NY,NX)=CNRT(NZ,NY,NX)*DMRT(NZ,NY,NX)
+  CPRTS(NZ,NY,NX)=CPRT(NZ,NY,NX)*DMRT(NZ,NY,NX)
+  RRAD1M(2,NZ,NY,NX)=5.0E-06
+  RRAD2M(2,NZ,NY,NX)=5.0E-06
+  PORT(2,NZ,NY,NX)=PORT(1,NZ,NY,NX)
+  UPMXZH(2,NZ,NY,NX)=UPMXZH(1,NZ,NY,NX)
+  UPKMZH(2,NZ,NY,NX)=UPKMZH(1,NZ,NY,NX)
+  UPMNZH(2,NZ,NY,NX)=UPMNZH(1,NZ,NY,NX)
+  UPMXZO(2,NZ,NY,NX)=UPMXZO(1,NZ,NY,NX)
+  UPKMZO(2,NZ,NY,NX)=UPKMZO(1,NZ,NY,NX)
+  UPMNZO(2,NZ,NY,NX)=UPMNZO(1,NZ,NY,NX)
+  UPMXPO(2,NZ,NY,NX)=UPMXPO(1,NZ,NY,NX)
+  UPKMPO(2,NZ,NY,NX)=UPKMPO(1,NZ,NY,NX)
+  UPMNPO(2,NZ,NY,NX)=UPMNPO(1,NZ,NY,NX)
+  RSRR(2,NZ,NY,NX)=1.0E+04
+  RSRA(2,NZ,NY,NX)=1.0E+12
 !
 !     PORTX=tortuosity for gas transport
 !     RRADP=path length for radial diffusion within root (m)
@@ -449,145 +423,145 @@ module StartqMod
 !     RTLG1X,RTLG2X=specific primary,secondary root length (m g-1)
 !     RTAR1X,RTAR2X=specific primary,secondary root area (m2 g-1)
 !
-      DO 500 N=1,2
-      PORTX(N,NZ,NY,NX)=PORT(N,NZ,NY,NX)**1.33
-      RRADP(N,NZ,NY,NX)=LOG(1.0/SQRT(AMAX1(0.01,PORT(N,NZ,NY,NX))))
-      DMVL(N,NZ,NY,NX)=1.0E-06/(0.05*(1.0-PORT(N,NZ,NY,NX)))
-      RTLG1X(N,NZ,NY,NX)=DMVL(N,NZ,NY,NX)/(3.142*RRAD1M(N,NZ,NY,NX)**2)
-      RTLG2X(N,NZ,NY,NX)=DMVL(N,NZ,NY,NX)/(3.142*RRAD2M(N,NZ,NY,NX)**2)
-      RRAD1X(N,NZ,NY,NX)=RRAD1M(N,NZ,NY,NX)
+  DO 500 N=1,2
+    PORTX(N,NZ,NY,NX)=PORT(N,NZ,NY,NX)**1.33
+    RRADP(N,NZ,NY,NX)=LOG(1.0/SQRT(AMAX1(0.01,PORT(N,NZ,NY,NX))))
+    DMVL(N,NZ,NY,NX)=1.0E-06/(0.05*(1.0-PORT(N,NZ,NY,NX)))
+    RTLG1X(N,NZ,NY,NX)=DMVL(N,NZ,NY,NX)/(3.142*RRAD1M(N,NZ,NY,NX)**2)
+    RTLG2X(N,NZ,NY,NX)=DMVL(N,NZ,NY,NX)/(3.142*RRAD2M(N,NZ,NY,NX)**2)
+    RRAD1X(N,NZ,NY,NX)=RRAD1M(N,NZ,NY,NX)
 !    2*SQRT(0.25*(1.0-PORT(N,NZ,NY,NX)))
-      RRAD2X(N,NZ,NY,NX)=RRAD2M(N,NZ,NY,NX)
+    RRAD2X(N,NZ,NY,NX)=RRAD2M(N,NZ,NY,NX)
 !    2*SQRT(0.25*(1.0-PORT(N,NZ,NY,NX)))
-      RTAR1X(N,NZ,NY,NX)=3.142*RRAD1X(N,NZ,NY,NX)**2
-      RTAR2X(N,NZ,NY,NX)=3.142*RRAD2X(N,NZ,NY,NX)**2
-500   CONTINUE
-      end subroutine InitDimensionsandUptake
+    RTAR1X(N,NZ,NY,NX)=3.142*RRAD1X(N,NZ,NY,NX)**2
+    RTAR2X(N,NZ,NY,NX)=3.142*RRAD2X(N,NZ,NY,NX)**2
+500 CONTINUE
+  end subroutine InitDimensionsandUptake
 !------------------------------------------------------------------------------------------
 
-      subroutine InitPlantPhenoMorphoBio(NZ,NY,NX)
+  subroutine InitPlantPhenoMorphoBio(NZ,NY,NX)
 
-      implicit none
-      integer, intent(in) :: NZ, NY, NX
+  implicit none
+  integer, intent(in) :: NZ, NY, NX
   integer :: K,L,M,N,NB
 !
 !     INITIALIZE PLANT PHENOLOGY
 !
 !     PP=population (grid cell-1)
 !
-      PP(NZ,NY,NX)=PPX(NZ,NY,NX)*AREA(3,NU(NY,NX),NY,NX)
-      IFLGI(NZ,NY,NX)=0
-      IDTHP(NZ,NY,NX)=0
-      IDTHR(NZ,NY,NX)=0
-      NBT(NZ,NY,NX)=0
-      NBR(NZ,NY,NX)=0
-      HTCTL(NZ,NY,NX)=0._r8
-      ZC(NZ,NY,NX)=0._r8
-      DO 10 NB=1,10
-      IFLGA(NB,NZ,NY,NX)=0
-      IFLGE(NB,NZ,NY,NX)=0
-      IFLGF(NB,NZ,NY,NX)=0
-      IFLGR(NB,NZ,NY,NX)=0
-      IFLGQ(NB,NZ,NY,NX)=0
-      GROUP(NB,NZ,NY,NX)=GROUPI(NZ,NY,NX)
-      PSTG(NB,NZ,NY,NX)=XTLI(NZ,NY,NX)
-      PSTGI(NB,NZ,NY,NX)=PSTG(NB,NZ,NY,NX)
-      PSTGF(NB,NZ,NY,NX)=0._r8
-      VSTG(NB,NZ,NY,NX)=0._r8
-      VSTGX(NB,NZ,NY,NX)=0._r8
-      KLEAF(NB,NZ,NY,NX)=1
-      KLEAFX(NB,NZ,NY,NX)=1
-      KVSTG(NB,NZ,NY,NX)=1
-      KVSTGN(NB,NZ,NY,NX)=0
-      GSTGI(NB,NZ,NY,NX)=0._r8
-      GSTGF(NB,NZ,NY,NX)=0._r8
-      TGSTGI(NB,NZ,NY,NX)=0._r8
-      TGSTGF(NB,NZ,NY,NX)=0._r8
-      VRNY(NB,NZ,NY,NX)=0._r8
-      VRNZ(NB,NZ,NY,NX)=0._r8
-      VRNS(NB,NZ,NY,NX)=VRNY(NB,NZ,NY,NX)
-      VRNF(NB,NZ,NY,NX)=VRNZ(NB,NZ,NY,NX)
-      ATRP(NB,NZ,NY,NX)=0._r8
-      FDBK(NB,NZ,NY,NX)=1.0
-      FDBKX(NB,NZ,NY,NX)=1.0
-      FLG4(NB,NZ,NY,NX)=0
-      FLGZ(NB,NZ,NY,NX)=0
-      NBTB(NB,NZ,NY,NX)=0
-      IDTHB(NB,NZ,NY,NX)=1
-      DO 15 M=1,10
+  PP(NZ,NY,NX)=PPX(NZ,NY,NX)*AREA(3,NU(NY,NX),NY,NX)
+  IFLGI(NZ,NY,NX)=0
+  IDTHP(NZ,NY,NX)=0
+  IDTHR(NZ,NY,NX)=0
+  NBT(NZ,NY,NX)=0
+  NBR(NZ,NY,NX)=0
+  HTCTL(NZ,NY,NX)=0._r8
+  ZC(NZ,NY,NX)=0._r8
+  DO 10 NB=1,10
+    IFLGA(NB,NZ,NY,NX)=0
+    IFLGE(NB,NZ,NY,NX)=0
+    IFLGF(NB,NZ,NY,NX)=0
+    IFLGR(NB,NZ,NY,NX)=0
+    IFLGQ(NB,NZ,NY,NX)=0
+    GROUP(NB,NZ,NY,NX)=GROUPI(NZ,NY,NX)
+    PSTG(NB,NZ,NY,NX)=XTLI(NZ,NY,NX)
+    PSTGI(NB,NZ,NY,NX)=PSTG(NB,NZ,NY,NX)
+    PSTGF(NB,NZ,NY,NX)=0._r8
+    VSTG(NB,NZ,NY,NX)=0._r8
+    VSTGX(NB,NZ,NY,NX)=0._r8
+    KLEAF(NB,NZ,NY,NX)=1
+    KLEAFX(NB,NZ,NY,NX)=1
+    KVSTG(NB,NZ,NY,NX)=1
+    KVSTGN(NB,NZ,NY,NX)=0
+    GSTGI(NB,NZ,NY,NX)=0._r8
+    GSTGF(NB,NZ,NY,NX)=0._r8
+    TGSTGI(NB,NZ,NY,NX)=0._r8
+    TGSTGF(NB,NZ,NY,NX)=0._r8
+    VRNY(NB,NZ,NY,NX)=0._r8
+    VRNZ(NB,NZ,NY,NX)=0._r8
+    VRNS(NB,NZ,NY,NX)=VRNY(NB,NZ,NY,NX)
+    VRNF(NB,NZ,NY,NX)=VRNZ(NB,NZ,NY,NX)
+    ATRP(NB,NZ,NY,NX)=0._r8
+    FDBK(NB,NZ,NY,NX)=1.0
+    FDBKX(NB,NZ,NY,NX)=1.0
+    FLG4(NB,NZ,NY,NX)=0
+    FLGZ(NB,NZ,NY,NX)=0
+    NBTB(NB,NZ,NY,NX)=0
+    IDTHB(NB,NZ,NY,NX)=1
+    DO 15 M=1,10
       IDAY(M,NB,NZ,NY,NX)=0
-15    CONTINUE
-10    CONTINUE
+15  CONTINUE
+10  CONTINUE
 !
 !     INITIALIZE PLANT MORPHOLOGY AND BIOMASS
 !
-      WSTR(NZ,NY,NX)=0._r8
-      CHILL(NZ,NY,NX)=0._r8
-      DO 25 NB=1,10
-      CPOOL(NB,NZ,NY,NX)=0._r8
-      ZPOOL(NB,NZ,NY,NX)=0._r8
-      PPOOL(NB,NZ,NY,NX)=0._r8
-      CPOLNB(NB,NZ,NY,NX)=0._r8
-      ZPOLNB(NB,NZ,NY,NX)=0._r8
-      PPOLNB(NB,NZ,NY,NX)=0._r8
-      WTSHTB(NB,NZ,NY,NX)=0._r8
-      WTLFB(NB,NZ,NY,NX)=0._r8
-      WTNDB(NB,NZ,NY,NX)=0._r8
-      WTSHEB(NB,NZ,NY,NX)=0._r8
-      WTSTKB(NB,NZ,NY,NX)=0._r8
-      WVSTKB(NB,NZ,NY,NX)=0._r8
-      WTRSVB(NB,NZ,NY,NX)=0._r8
-      WTHSKB(NB,NZ,NY,NX)=0._r8
-      WTEARB(NB,NZ,NY,NX)=0._r8
-      WTGRB(NB,NZ,NY,NX)=0._r8
-      WTLSB(NB,NZ,NY,NX)=0._r8
-      WTSHTN(NB,NZ,NY,NX)=0._r8
-      WTLFBN(NB,NZ,NY,NX)=0._r8
-      WTNDBN(NB,NZ,NY,NX)=0._r8
-      WTSHBN(NB,NZ,NY,NX)=0._r8
-      WTSTBN(NB,NZ,NY,NX)=0._r8
-      WTRSBN(NB,NZ,NY,NX)=0._r8
-      WTHSBN(NB,NZ,NY,NX)=0._r8
-      WTEABN(NB,NZ,NY,NX)=0._r8
-      WTGRBN(NB,NZ,NY,NX)=0._r8
-      WTSHTP(NB,NZ,NY,NX)=0._r8
-      WTLFBP(NB,NZ,NY,NX)=0._r8
-      WTNDBP(NB,NZ,NY,NX)=0._r8
-      WTSHBP(NB,NZ,NY,NX)=0._r8
-      WTSTBP(NB,NZ,NY,NX)=0._r8
-      WTRSBP(NB,NZ,NY,NX)=0._r8
-      WTHSBP(NB,NZ,NY,NX)=0._r8
-      WTEABP(NB,NZ,NY,NX)=0._r8
-      WTGRBP(NB,NZ,NY,NX)=0._r8
-      GRNXB(NB,NZ,NY,NX)=0._r8
-      GRNOB(NB,NZ,NY,NX)=0._r8
-      GRWTB(NB,NZ,NY,NX)=0._r8
-      ARLFB(NB,NZ,NY,NX)=0._r8
-      RNH3B(NB,NZ,NY,NX)=0._r8
-      RCZLX(NB,NZ,NY,NX)=0._r8
-      RCPLX(NB,NZ,NY,NX)=0._r8
-      RCCLX(NB,NZ,NY,NX)=0._r8
-      WGLFX(NB,NZ,NY,NX)=0._r8
-      WGLFNX(NB,NZ,NY,NX)=0._r8
-      WGLFPX(NB,NZ,NY,NX)=0._r8
-      ARLFZ(NB,NZ,NY,NX)=0._r8
-      RCZSX(NB,NZ,NY,NX)=0._r8
-      RCPSX(NB,NZ,NY,NX)=0._r8
-      RCCSX(NB,NZ,NY,NX)=0._r8
-      WTSTXB(NB,NZ,NY,NX)=0._r8
-      WTSTXN(NB,NZ,NY,NX)=0._r8
-      WTSTXP(NB,NZ,NY,NX)=0._r8
-      WGSHEX(NB,NZ,NY,NX)=0._r8
-      WGSHNX(NB,NZ,NY,NX)=0._r8
-      WGSHPX(NB,NZ,NY,NX)=0._r8
-      HTSHEX(NB,NZ,NY,NX)=0._r8
-      DO 5 L=1,NL(NY,NX)
+  WSTR(NZ,NY,NX)=0._r8
+  CHILL(NZ,NY,NX)=0._r8
+  DO 25 NB=1,10
+    CPOOL(NB,NZ,NY,NX)=0._r8
+    ZPOOL(NB,NZ,NY,NX)=0._r8
+    PPOOL(NB,NZ,NY,NX)=0._r8
+    CPOLNB(NB,NZ,NY,NX)=0._r8
+    ZPOLNB(NB,NZ,NY,NX)=0._r8
+    PPOLNB(NB,NZ,NY,NX)=0._r8
+    WTSHTB(NB,NZ,NY,NX)=0._r8
+    WTLFB(NB,NZ,NY,NX)=0._r8
+    WTNDB(NB,NZ,NY,NX)=0._r8
+    WTSHEB(NB,NZ,NY,NX)=0._r8
+    WTSTKB(NB,NZ,NY,NX)=0._r8
+    WVSTKB(NB,NZ,NY,NX)=0._r8
+    WTRSVB(NB,NZ,NY,NX)=0._r8
+    WTHSKB(NB,NZ,NY,NX)=0._r8
+    WTEARB(NB,NZ,NY,NX)=0._r8
+    WTGRB(NB,NZ,NY,NX)=0._r8
+    WTLSB(NB,NZ,NY,NX)=0._r8
+    WTSHTN(NB,NZ,NY,NX)=0._r8
+    WTLFBN(NB,NZ,NY,NX)=0._r8
+    WTNDBN(NB,NZ,NY,NX)=0._r8
+    WTSHBN(NB,NZ,NY,NX)=0._r8
+    WTSTBN(NB,NZ,NY,NX)=0._r8
+    WTRSBN(NB,NZ,NY,NX)=0._r8
+    WTHSBN(NB,NZ,NY,NX)=0._r8
+    WTEABN(NB,NZ,NY,NX)=0._r8
+    WTGRBN(NB,NZ,NY,NX)=0._r8
+    WTSHTP(NB,NZ,NY,NX)=0._r8
+    WTLFBP(NB,NZ,NY,NX)=0._r8
+    WTNDBP(NB,NZ,NY,NX)=0._r8
+    WTSHBP(NB,NZ,NY,NX)=0._r8
+    WTSTBP(NB,NZ,NY,NX)=0._r8
+    WTRSBP(NB,NZ,NY,NX)=0._r8
+    WTHSBP(NB,NZ,NY,NX)=0._r8
+    WTEABP(NB,NZ,NY,NX)=0._r8
+    WTGRBP(NB,NZ,NY,NX)=0._r8
+    GRNXB(NB,NZ,NY,NX)=0._r8
+    GRNOB(NB,NZ,NY,NX)=0._r8
+    GRWTB(NB,NZ,NY,NX)=0._r8
+    ARLFB(NB,NZ,NY,NX)=0._r8
+    RNH3B(NB,NZ,NY,NX)=0._r8
+    RCZLX(NB,NZ,NY,NX)=0._r8
+    RCPLX(NB,NZ,NY,NX)=0._r8
+    RCCLX(NB,NZ,NY,NX)=0._r8
+    WGLFX(NB,NZ,NY,NX)=0._r8
+    WGLFNX(NB,NZ,NY,NX)=0._r8
+    WGLFPX(NB,NZ,NY,NX)=0._r8
+    ARLFZ(NB,NZ,NY,NX)=0._r8
+    RCZSX(NB,NZ,NY,NX)=0._r8
+    RCPSX(NB,NZ,NY,NX)=0._r8
+    RCCSX(NB,NZ,NY,NX)=0._r8
+    WTSTXB(NB,NZ,NY,NX)=0._r8
+    WTSTXN(NB,NZ,NY,NX)=0._r8
+    WTSTXP(NB,NZ,NY,NX)=0._r8
+    WGSHEX(NB,NZ,NY,NX)=0._r8
+    WGSHNX(NB,NZ,NY,NX)=0._r8
+    WGSHPX(NB,NZ,NY,NX)=0._r8
+    HTSHEX(NB,NZ,NY,NX)=0._r8
+    DO 5 L=1,NL(NY,NX)
       ARSTK(L,NB,NZ,NY,NX)=0._r8
       DO N=1,4
-      SURFB(N,L,NB,NZ,NY,NX)=0._r8
+        SURFB(N,L,NB,NZ,NY,NX)=0._r8
       enddo
-5     CONTINUE
-      DO K=0,25
+5   CONTINUE
+    DO K=0,25
       ARLF(K,NB,NZ,NY,NX)=0._r8
       HTNODE(K,NB,NZ,NY,NX)=0._r8
       HTNODX(K,NB,NZ,NY,NX)=0._r8
@@ -604,135 +578,134 @@ module StartqMod
       WGNODN(K,NB,NZ,NY,NX)=0._r8
       WGNODP(K,NB,NZ,NY,NX)=0._r8
       DO 55 L=1,NL(NY,NX)
-      ARLFL(L,K,NB,NZ,NY,NX)=0._r8
-      WGLFL(L,K,NB,NZ,NY,NX)=0._r8
-      WGLFLN(L,K,NB,NZ,NY,NX)=0._r8
-      WGLFLP(L,K,NB,NZ,NY,NX)=0._r8
+        ARLFL(L,K,NB,NZ,NY,NX)=0._r8
+        WGLFL(L,K,NB,NZ,NY,NX)=0._r8
+        WGLFLN(L,K,NB,NZ,NY,NX)=0._r8
+        WGLFLP(L,K,NB,NZ,NY,NX)=0._r8
 55    CONTINUE
       IF(K.NE.0)THEN
-      CPOOL3(K,NB,NZ,NY,NX)=0._r8
-      CO2B(K,NB,NZ,NY,NX)=0._r8
-      HCOB(K,NB,NZ,NY,NX)=0._r8
-      CPOOL4(K,NB,NZ,NY,NX)=0._r8
-      DO 45 L=1,JC
-      DO N=1,4
-      SURF(N,L,K,NB,NZ,NY,NX)=0._r8
-      enddo
-45    CONTINUE
+        CPOOL3(K,NB,NZ,NY,NX)=0._r8
+        CO2B(K,NB,NZ,NY,NX)=0._r8
+        HCOB(K,NB,NZ,NY,NX)=0._r8
+        CPOOL4(K,NB,NZ,NY,NX)=0._r8
+        DO 45 L=1,JC
+          DO N=1,4
+            SURF(N,L,K,NB,NZ,NY,NX)=0._r8
+          enddo
+45      CONTINUE
       ENDIF
-      enddo
-25    CONTINUE
-      DO 35 L=1,NL(NY,NX)
-      ARLFV(L,NZ,NY,NX)=0._r8
-      WGLFV(L,NZ,NY,NX)=0._r8
-      ARSTV(L,NZ,NY,NX)=0._r8
-35    CONTINUE
-      CPOOLP(NZ,NY,NX)=0._r8
-      ZPOOLP(NZ,NY,NX)=0._r8
-      PPOOLP(NZ,NY,NX)=0._r8
-      CCPOLP(NZ,NY,NX)=0._r8
-      CCPLNP(NZ,NY,NX)=0._r8
-      CZPOLP(NZ,NY,NX)=0._r8
-      CPPOLP(NZ,NY,NX)=0._r8
-      WTSHT(NZ,NY,NX)=0._r8
-      WTLF(NZ,NY,NX)=0._r8
-      WTSHE(NZ,NY,NX)=0._r8
-      WTSTK(NZ,NY,NX)=0._r8
-      WVSTK(NZ,NY,NX)=0._r8
-      WTRSV(NZ,NY,NX)=0._r8
-      WTHSK(NZ,NY,NX)=0._r8
-      WTEAR(NZ,NY,NX)=0._r8
-      WTGR(NZ,NY,NX)=0._r8
-      WTRT(NZ,NY,NX)=0._r8
-      WTRTS(NZ,NY,NX)=0._r8
-      WTND(NZ,NY,NX)=0._r8
-      WTLS(NZ,NY,NX)=0._r8
-      WTSHN(NZ,NY,NX)=0._r8
-      WTLFN(NZ,NY,NX)=0._r8
-      WTSHEN(NZ,NY,NX)=0._r8
-      WTSTKN(NZ,NY,NX)=0._r8
-      WTRSVN(NZ,NY,NX)=0._r8
-      WTHSKN(NZ,NY,NX)=0._r8
-      WTEARN(NZ,NY,NX)=0._r8
-      WTGRNN(NZ,NY,NX)=0._r8
-      WTNDN(NZ,NY,NX)=0._r8
-      WTSHP(NZ,NY,NX)=0._r8
-      WTLFP(NZ,NY,NX)=0._r8
-      WTSHEP(NZ,NY,NX)=0._r8
-      WTSTKP(NZ,NY,NX)=0._r8
-      WTRSVP(NZ,NY,NX)=0._r8
-      WTHSKP(NZ,NY,NX)=0._r8
-      WTEARP(NZ,NY,NX)=0._r8
-      WTGRNP(NZ,NY,NX)=0._r8
-      WTNDP(NZ,NY,NX)=0._r8
-      ARLFP(NZ,NY,NX)=0._r8
-      WTRTA(NZ,NY,NX)=0._r8
-      ARSTP(NZ,NY,NX)=0._r8
-      end subroutine InitPlantPhenoMorphoBio
+    enddo
+25  CONTINUE
+  DO 35 L=1,NL(NY,NX)
+    ARLFV(L,NZ,NY,NX)=0._r8
+    WGLFV(L,NZ,NY,NX)=0._r8
+    ARSTV(L,NZ,NY,NX)=0._r8
+35  CONTINUE
+  CPOOLP(NZ,NY,NX)=0._r8
+  ZPOOLP(NZ,NY,NX)=0._r8
+  PPOOLP(NZ,NY,NX)=0._r8
+  CCPOLP(NZ,NY,NX)=0._r8
+  CCPLNP(NZ,NY,NX)=0._r8
+  CZPOLP(NZ,NY,NX)=0._r8
+  CPPOLP(NZ,NY,NX)=0._r8
+  WTSHT(NZ,NY,NX)=0._r8
+  WTLF(NZ,NY,NX)=0._r8
+  WTSHE(NZ,NY,NX)=0._r8
+  WTSTK(NZ,NY,NX)=0._r8
+  WVSTK(NZ,NY,NX)=0._r8
+  WTRSV(NZ,NY,NX)=0._r8
+  WTHSK(NZ,NY,NX)=0._r8
+  WTEAR(NZ,NY,NX)=0._r8
+  WTGR(NZ,NY,NX)=0._r8
+  WTRT(NZ,NY,NX)=0._r8
+  WTRTS(NZ,NY,NX)=0._r8
+  WTND(NZ,NY,NX)=0._r8
+  WTLS(NZ,NY,NX)=0._r8
+  WTSHN(NZ,NY,NX)=0._r8
+  WTLFN(NZ,NY,NX)=0._r8
+  WTSHEN(NZ,NY,NX)=0._r8
+  WTSTKN(NZ,NY,NX)=0._r8
+  WTRSVN(NZ,NY,NX)=0._r8
+  WTHSKN(NZ,NY,NX)=0._r8
+  WTEARN(NZ,NY,NX)=0._r8
+  WTGRNN(NZ,NY,NX)=0._r8
+  WTNDN(NZ,NY,NX)=0._r8
+  WTSHP(NZ,NY,NX)=0._r8
+  WTLFP(NZ,NY,NX)=0._r8
+  WTSHEP(NZ,NY,NX)=0._r8
+  WTSTKP(NZ,NY,NX)=0._r8
+  WTRSVP(NZ,NY,NX)=0._r8
+  WTHSKP(NZ,NY,NX)=0._r8
+  WTEARP(NZ,NY,NX)=0._r8
+  WTGRNP(NZ,NY,NX)=0._r8
+  WTNDP(NZ,NY,NX)=0._r8
+  ARLFP(NZ,NY,NX)=0._r8
+  WTRTA(NZ,NY,NX)=0._r8
+  ARSTP(NZ,NY,NX)=0._r8
+  end subroutine InitPlantPhenoMorphoBio
 !------------------------------------------------------------------------------------------
 
-      subroutine InitMassBalance(NZ,NY,NX)
+  subroutine InitMassBalance(NZ,NY,NX)
 
-      implicit none
-      integer, intent(in) :: NZ, NY, NX
+  implicit none
+  integer, intent(in) :: NZ, NY, NX
   integer :: M
+  real(r8) :: WTSTDX
 !
 !     INITIALIZE MASS BALANCE CHECKS
 !
-      IF(DATA(20).EQ.'NO'.AND.IGO.EQ.0)THEN
-      CARBN(NZ,NY,NX)=0._r8
-      TCSN0(NZ,NY,NX)=0._r8
-      TZSN0(NZ,NY,NX)=0._r8
-      TPSN0(NZ,NY,NX)=0._r8
-      TCO2T(NZ,NY,NX)=0._r8
-      TCO2A(NZ,NY,NX)=0._r8
-      TCUPTK(NZ,NY,NX)=0._r8
-      TCSNC(NZ,NY,NX)=0._r8
-      TZUPTK(NZ,NY,NX)=0._r8
-      TZSNC(NZ,NY,NX)=0._r8
-      TPUPTK(NZ,NY,NX)=0._r8
-      TPSNC(NZ,NY,NX)=0._r8
-      TZUPFX(NZ,NY,NX)=0._r8
-      RNH3C(NZ,NY,NX)=0._r8
-      TNH3C(NZ,NY,NX)=0._r8
-      VCO2F(NZ,NY,NX)=0._r8
-      VCH4F(NZ,NY,NX)=0._r8
-      VOXYF(NZ,NY,NX)=0._r8
-      VNH3F(NZ,NY,NX)=0._r8
-      VN2OF(NZ,NY,NX)=0._r8
-      VPO4F(NZ,NY,NX)=0._r8
-      THVSTC(NZ,NY,NX)=0._r8
-      THVSTN(NZ,NY,NX)=0._r8
-      THVSTP(NZ,NY,NX)=0._r8
-      HVSTC(NZ,NY,NX)=0._r8
-      HVSTN(NZ,NY,NX)=0._r8
-      HVSTP(NZ,NY,NX)=0._r8
-      RSETC(NZ,NY,NX)=0._r8
-      RSETN(NZ,NY,NX)=0._r8
-      RSETP(NZ,NY,NX)=0._r8
-      CTRAN(NZ,NY,NX)=0._r8
-      WTSTG(NZ,NY,NX)=0._r8
-      WTSTGN(NZ,NY,NX)=0._r8
-      WTSTGP(NZ,NY,NX)=0._r8
-      WTSTDX=WTSTDI(NZ,NY,NX)*AREA(3,NU(NY,NX),NY,NX)
-      DO 155 M=1,4
+  IF(DATA(20).EQ.'NO'.AND.IGO.EQ.0)THEN
+    CARBN(NZ,NY,NX)=0._r8
+    TCSN0(NZ,NY,NX)=0._r8
+    TZSN0(NZ,NY,NX)=0._r8
+    TPSN0(NZ,NY,NX)=0._r8
+    TCO2T(NZ,NY,NX)=0._r8
+    TCO2A(NZ,NY,NX)=0._r8
+    TCUPTK(NZ,NY,NX)=0._r8
+    TCSNC(NZ,NY,NX)=0._r8
+    TZUPTK(NZ,NY,NX)=0._r8
+    TZSNC(NZ,NY,NX)=0._r8
+    TPUPTK(NZ,NY,NX)=0._r8
+    TPSNC(NZ,NY,NX)=0._r8
+    TZUPFX(NZ,NY,NX)=0._r8
+    RNH3C(NZ,NY,NX)=0._r8
+    TNH3C(NZ,NY,NX)=0._r8
+    VCO2F(NZ,NY,NX)=0._r8
+    VCH4F(NZ,NY,NX)=0._r8
+    VOXYF(NZ,NY,NX)=0._r8
+    VNH3F(NZ,NY,NX)=0._r8
+    VN2OF(NZ,NY,NX)=0._r8
+    VPO4F(NZ,NY,NX)=0._r8
+    THVSTC(NZ,NY,NX)=0._r8
+    THVSTN(NZ,NY,NX)=0._r8
+    THVSTP(NZ,NY,NX)=0._r8
+    HVSTC(NZ,NY,NX)=0._r8
+    HVSTN(NZ,NY,NX)=0._r8
+    HVSTP(NZ,NY,NX)=0._r8
+    RSETC(NZ,NY,NX)=0._r8
+    RSETN(NZ,NY,NX)=0._r8
+    RSETP(NZ,NY,NX)=0._r8
+    CTRAN(NZ,NY,NX)=0._r8
+    WTSTG(NZ,NY,NX)=0._r8
+    WTSTGN(NZ,NY,NX)=0._r8
+    WTSTGP(NZ,NY,NX)=0._r8
+    WTSTDX=WTSTDI(NZ,NY,NX)*AREA(3,NU(NY,NX),NY,NX)
+    DO 155 M=1,4
       WTSTDG(M,NZ,NY,NX)=WTSTDX*CFOPC(5,M,NZ,NY,NX)
-      WTSTDN(M,NZ,NY,NX)=WTSTDX*CNSTK(NZ,NY,NX) &
-      *CFOPN(5,M,NZ,NY,NX)
-      WTSTDP(M,NZ,NY,NX)=WTSTDX*CPSTK(NZ,NY,NX) &
-      *CFOPP(5,M,NZ,NY,NX)
+      WTSTDN(M,NZ,NY,NX)=WTSTDX*CNSTK(NZ,NY,NX)*CFOPN(5,M,NZ,NY,NX)
+      WTSTDP(M,NZ,NY,NX)=WTSTDX*CPSTK(NZ,NY,NX)*CFOPP(5,M,NZ,NY,NX)
       WTSTG(NZ,NY,NX)=WTSTG(NZ,NY,NX)+WTSTDG(M,NZ,NY,NX)
       WTSTGN(NZ,NY,NX)=WTSTGN(NZ,NY,NX)+WTSTDN(M,NZ,NY,NX)
       WTSTGP(NZ,NY,NX)=WTSTGP(NZ,NY,NX)+WTSTDP(M,NZ,NY,NX)
-155   CONTINUE
-      ENDIF
-      end subroutine InitMassBalance
+155 CONTINUE
+  ENDIF
+  end subroutine InitMassBalance
 !------------------------------------------------------------------------------------------
 
-      subroutine InitPlantHeatandWater(NZ,NY,NX)
+  subroutine InitPlantHeatandWater(NZ,NY,NX)
 
-      implicit none
-      integer, intent(in) :: NZ, NY, NX
+  implicit none
+  integer, intent(in) :: NZ, NY, NX
 !
 !     INITIALIZE PLANT HEAT AND WATER STATUS
 !
@@ -741,26 +714,30 @@ module StartqMod
 !     TCG,TKG=canopy temperature for phenology (oC,K)
 !     PSILT,PSILO,PSILG=canopy total,osmotic,turgor water potl(MPa)
 !
-      VHCPC(NZ,NY,NX)=cpw*WTSHT(NZ,NY,NX)*10.0E-06
-      ENGYX(NZ,NY,NX)=0._r8
-      DTKC(NZ,NY,NX)=0._r8
-      TCC(NZ,NY,NX)=ATCA(NY,NX)
-      TKC(NZ,NY,NX)=TCC(NZ,NY,NX)+TC2K
-      TCG(NZ,NY,NX)=TCC(NZ,NY,NX)
-      TKG(NZ,NY,NX)=TCG(NZ,NY,NX)+TC2K
-      TFN3(NZ,NY,NX)=1.0
-      PSILT(NZ,NY,NX)=-1.0E-03
-      PSILO(NZ,NY,NX)=OSMO(NZ,NY,NX)+PSILT(NZ,NY,NX)
-      PSILG(NZ,NY,NX)=AMAX1(0.0,PSILT(NZ,NY,NX)-PSILO(NZ,NY,NX))
-      EP(NZ,NY,NX)=0._r8
-      FRADP(NZ,NY,NX)=0._r8
-      end subroutine InitPlantHeatandWater
+  VHCPC(NZ,NY,NX)=cpw*WTSHT(NZ,NY,NX)*10.0E-06
+  ENGYX(NZ,NY,NX)=0._r8
+  DTKC(NZ,NY,NX)=0._r8
+  TCC(NZ,NY,NX)=ATCA(NY,NX)
+  TKC(NZ,NY,NX)=TCC(NZ,NY,NX)+TC2K
+  TCG(NZ,NY,NX)=TCC(NZ,NY,NX)
+  TKG(NZ,NY,NX)=TCG(NZ,NY,NX)+TC2K
+  TFN3(NZ,NY,NX)=1.0
+  PSILT(NZ,NY,NX)=-1.0E-03
+  PSILO(NZ,NY,NX)=OSMO(NZ,NY,NX)+PSILT(NZ,NY,NX)
+  PSILG(NZ,NY,NX)=AMAX1(0.0,PSILT(NZ,NY,NX)-PSILO(NZ,NY,NX))
+  EP(NZ,NY,NX)=0._r8
+  FRADP(NZ,NY,NX)=0._r8
+  end subroutine InitPlantHeatandWater
 !------------------------------------------------------------------------------------------
 
   subroutine InitRootMychorMorphoBio(NZ,NY,NX)
   implicit none
   integer, intent(in) :: NZ, NY, NX
   integer :: K,L,M,N,NR
+  REAL(R8) :: CCO2A
+  REAL(R8) :: CCO2P
+  REAL(R8) :: COXYA
+  REAL(R8) :: COXYP
 !
 !     INITIALIZE ROOT(N=1),MYCORRHIZAL(N=2) MORPHOLOGY AND BIOMASS
 !
@@ -884,6 +861,7 @@ module StartqMod
 
   implicit none
   integer, intent(in) :: NZ, NY, NX
+  REAL(R8) :: FDM
 !
 !     INITIALIZE SEED MORPHOLOGY AND BIOMASS
 !

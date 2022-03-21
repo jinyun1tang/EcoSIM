@@ -8,46 +8,17 @@ module WthrMod
   use VegDataType
   use GridDataType
   use FlagDataType
+  use EcoSIMCtrlDataType
+  use ClimForcDataType
+  use LandSurfDataType
+  use FertilizerDataType
+  use PhenologyDataType
+  use PlantDataCharType
+  use AqueChemDatatype
   implicit none
 
   private
 
-  include "blkc.h"
-  include "blk1g.h"
-  include "blk2a.h"
-  include "blk2b.h"
-  include "blk2c.h"
-  include "blk3.h"
-  include "blk5.h"
-  include "blk6.h"
-  include "blk8a.h"
-  include "blk8b.h"
-  include "blk9a.h"
-  include "blk9b.h"
-  include "blk9c.h"
-  include "blk10.h"
-  include "blk11a.h"
-  include "blk11b.h"
-  include "blk13a.h"
-  include "blk13b.h"
-  include "blk13c.h"
-  include "blk15a.h"
-  include "blk15b.h"
-  include "blk16.h"
-  include "blk18a.h"
-  include "blk18b.h"
-  include "blk19a.h"
-  include "blk19b.h"
-  include "blk19c.h"
-  include "blk19d.h"
-  include "blk20a.h"
-  include "blk20b.h"
-  include "blk20c.h"
-  include "blk20d.h"
-  include "blk20e.h"
-  include "blk20f.h"
-  include "blk21a.h"
-  include "blk21b.h"
 
   real(r8) :: AMP,CLD,DTA,DHR,DTS,EMM,RADX,RADZ,VPX,XJ
 
@@ -254,6 +225,8 @@ module WthrMod
   integer, intent(in) :: I,J,NHW,NHE,NVN,NVS
 
   integer :: NY,NX
+  real(r8) :: AZI  !solar azimuth
+  REAL(R8) :: DEC  !solar declination
   !     begin_execution
   !     CALCULATE DIRECT, DIFFUSE AND LONGWAVE RADIATION FROM
   !     INCOMING RADIATION READ IN 'READS', SOLAR ANGLE, HUMIDITY,
@@ -269,6 +242,9 @@ module WthrMod
 !     RADN=SW radiation at horizontal surface
 !
       IF(IETYP(NY,NX).GE.-1)THEN
+        AZI=SIN(ALAT(NY,NX)*1.7453E-02)*SIN(DECLIN*1.7453E-02)
+        DEC=COS(ALAT(NY,NX)*1.7453E-02)*COS(DECLIN*1.7453E-02)
+
         SSIN(NY,NX)=AMAX1(0.0,AZI+DEC*COS(.2618*(ZNOON(NY,NX)-(J-0.5))))
         SSINN(NY,NX)=AMAX1(0.0,AZI+DEC*COS(.2618*(ZNOON(NY,NX)-(J+0.5))))
         !     IF(SSIN(NY,NX).GT.0.0.AND.SSIN(NY,NX).LT.TWILGT)SSIN(NY,NX)=TWILGT

@@ -5,17 +5,14 @@ PROGRAM main
 ! FOR USE IN 'READS' AND 'READQ'. WHEN FINISHED THIS SUBROUTINE CALLS
 ! 'SOIL' WHICH IS THE MAIN SUBROUTINE FROM WHICH ALL OTHERS ARE CALLED
 !
-  use data_kind_mod, only : r8 => SHR_KIND_R8
-  use TestMod        , only : regression
-  use InitEcoSIM     , only :  InitModules
-  use EcoSIMDesctruct, only : DestructEcoSIM
+  use data_kind_mod     , only : r8 => SHR_KIND_R8
+  use TestMod           , only : regression
+  use InitEcoSIM        , only :  InitModules
+  use EcoSIMDesctruct   , only : DestructEcoSIM
+  use EcoSIMCtrlDataType
   use GridDataType
+  use EcoSIMHistMod
   implicit none
-
-
-  include "filec.h"
-  include "files.h"
-  include "blkc.h"
 
   character(len=*), parameter :: mod_filename = __FILE__
   integer :: NA(250),ND(250)

@@ -8,34 +8,23 @@ module TrnsfrMod
   use SoilChemDataType
   use GridDataType
   use SoilPhysDataType
+  use SoilHeatDatatype
+  use SoilWaterDataType
+  use EcoSIMCtrlDataType
+  use SoilBGCDataType
+  use ClimForcDataType
+  use FertilizerDataType
+  use EcosimConst
+  use SurfLitterDataType
+  use SnowDataType
+  use SurfSoilDataType
+  use LandSurfDataType
+  use RootDataType
+  use AqueChemDatatype
   implicit none
 
   private
 
-  include "blkc.h"
-  include "blk2a.h"
-  include "blk2b.h"
-  include "blk2c.h"
-  include "blk8a.h"
-  include "blk8b.h"
-  include "blk10.h"
-  include "blk11a.h"
-  include "blk11b.h"
-  include "blk13a.h"
-  include "blk13b.h"
-  include "blk13c.h"
-  include "blk15a.h"
-  include "blk15b.h"
-  include "blk18a.h"
-  include "blk18b.h"
-  include "blk19d.h"
-  include "blk20d.h"
-  include "blk20e.h"
-  include "blk21a.h"
-  include "blk21b.h"
-  include "blk22a.h"
-  include "blk22b.h"
-  include "blk22c.h"
 
   real(r8) :: CCO2S1,CCH4S1,COXYS1,CZ2GS1,CZ2OS1,CH2GS1,CNH4S1
   real(r8) :: CNH3S1,CNO3S1,CNO2S1,CP14S1,CPO4S1,CCO2GQ,CCH4GQ

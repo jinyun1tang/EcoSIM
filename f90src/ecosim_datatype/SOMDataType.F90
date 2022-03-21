@@ -33,21 +33,79 @@ module SOMDataType
   real(r8),allocatable :: OQNH(:,:,:,:)
   real(r8),allocatable :: OQPH(:,:,:,:)
   real(r8),allocatable :: OQAH(:,:,:,:)
-  real(r8),allocatable :: ORGC(:,:,:)
-  real(r8),allocatable :: ORGN(:,:,:)
-  integer,allocatable :: IXTYP(:,:,:)
+  real(r8),allocatable :: ORGC(:,:,:) !total soil organic C [g d-2]
+  real(r8),allocatable :: ORGN(:,:,:) !total soil organic N [g d-2]
   real(r8),allocatable :: OMCF(:)  !hetero microbial biomass composition in SOC
   real(r8),allocatable :: OMCA(:)  !autotrophic microbial biomass composition in SOC
   real(r8),allocatable :: RC0(:,:,:)
   real(r8),allocatable :: ORGCX(:,:,:)
-  real(r8),allocatable :: OSA(:,:,:,:,:)
-  real(r8),allocatable :: ORGR(:,:,:)
-  real(r8),allocatable :: CORGC(:,:,:)
-  real(r8),allocatable :: CORGN(:,:,:)
-  real(r8),allocatable :: CORGP(:,:,:)
-  real(r8),allocatable :: CORGR(:,:,:)
+  real(r8),allocatable :: OSA(:,:,:,:,:) !colonized humus C in each complex [g d-2]
+  real(r8),allocatable :: ORGR(:,:,:)  !total particulate organic C [g d-2]
+  real(r8),allocatable :: CORGC(:,:,:) !soil organic C content [g kg-1]
+  real(r8),allocatable :: CORGN(:,:,:) !soil organic N content [mg kg-1]
+  real(r8),allocatable :: CORGP(:,:,:) !soil organic P content  [mg kg-1]
+  real(r8),allocatable :: CORGR(:,:,:)  !soil particulate C content [g kg-1]
   real(r8),allocatable :: CFOMC(:,:,:,:)
-
+  real(r8) :: EPOC(0:JZ,JY,JX)                  !partitioning coefficient between POC and litter, []
+  real(r8) :: EHUM(0:JZ,JY,JX)                  !partitioning coefficient between humus and microbial residue, []
+  real(r8) :: COQC(0:4,0:JZ,JY,JX)              !DOC concentration, [g m-3]
+  real(r8) :: COQA(0:4,0:JZ,JY,JX)              !acetate concentration, [g m-3]
+  real(r8) :: FOSRH(0:4,0:JZ,JY,JX)             !fraction of total organic C in complex, [-]
+  real(r8) :: HCO2G(JY,JX)                      !soil CO2 flux, [g d-2 h-1]
+  real(r8) :: HCH4G(JY,JX)                      !soil CH4 flux, [g d-2 h-1]
+  real(r8) :: HOXYG(JY,JX)                      !soil O2 flux, [g d-2 h-1]
+  real(r8) :: HN2OG(JY,JX)                      !soil N2O flux, [g d-2 h-1]
+  real(r8) :: HNH3G(JY,JX)                      !soil NH3 flux, [g d-2 h-1]
+!  real(r8) :: URAIQ(JY,JX)
+  real(r8) :: TOMT(JY,JX)                       !total micriobial C, [g d-2]
+  real(r8) :: TONT(JY,JX)                       !total micriobial N, [g d-2]
+  real(r8) :: TOPT(JY,JX)                       !total micriobial P, [g d-2]
+  real(r8) :: URSDC(JY,JX)                      !total litter C, [g d-2]
+  real(r8) :: UORGC(JY,JX)                      !total humus C, [g d-2]
+  real(r8) :: UORGF(JY,JX)                      !total C amendment, [g d-2]
+  real(r8) :: UXCSN(JY,JX)                      !total litterfall C, [g d-2]
+  real(r8) :: UCO2S(JY,JX)                      !total soil DIC, [g d-2]
+  real(r8) :: UDOCQ(JY,JX)                      !total surface DOC flux, [g d-2]
+  real(r8) :: UDOCD(JY,JX)                      !total subsurface DOC flux, [g d-2]
+  real(r8) :: TNBP(JY,JX)                       !total NBP, [g d-2]
+  real(r8) :: URSDN(JY,JX)                      !total litter N, [g d-2]
+  real(r8) :: UORGN(JY,JX)                      !total humus N, [g d-2]
+  real(r8) :: UFERTN(JY,JX)                     !total fertilizer N amendment, [g d-2]
+  real(r8) :: UXZSN(JY,JX)                      !total litterfall N, [g d-2]
+  real(r8) :: UNH4(JY,JX)                       !total soil NH4 + NH3 content, [g d-2]
+  real(r8) :: UNO3(JY,JX)                       !total soil NO3 + NO2 content, [g d-2]
+  real(r8) :: UPO4(JY,JX)                       !total soil PO4 content, [g d-2]
+  real(r8) :: UDONQ(JY,JX)                      !total surface DON flux, [g d-2]
+  real(r8) :: UDOND(JY,JX)                      !total subsurface DON flux, [g d-2]
+  real(r8) :: UDOPQ(JY,JX)                      !total surface DOP flux, [g d-2]
+  real(r8) :: UDOPD(JY,JX)                      !total subsurface DOP flux, [g d-2]
+  real(r8) :: UPP4(JY,JX)                       !total soil precipited P, [g d-2]
+  real(r8) :: UN2GS(JY,JX)                      !total N2 fixation, [g d-2]
+  real(r8) :: URSDP(JY,JX)                      !total litter P, [g d-2]
+  real(r8) :: UORGP(JY,JX)                      !total humus P, [g d-2]
+  real(r8) :: UFERTP(JY,JX)                     !total fertilizer P amendment, [g d-2]
+  real(r8) :: UH2GG(JY,JX)                      !total H2 flux, []
+  real(r8) :: UXPSN(JY,JX)                      !total litterfall P, [g d-2]
+  real(r8) :: HN2GG(JY,JX)                      !soil N2 flux, [g d-2 h-1]
+  real(r8) :: UN2GG(JY,JX)                      !total soil N2 flux, [g d-2]
+  real(r8) :: UION(JY,JX)                       !total soil ion content, [mol d-2]
+  real(r8) :: UIONOU(JY,JX)                     !total subsurface ion flux, [mol d-2]
+  real(r8) :: UCO2G(JY,JX)                      !total soil CO2 flux, [g d-2]
+  real(r8) :: UCH4G(JY,JX)                      !total soil CH4 flux, [g d-2]
+  real(r8) :: UOXYG(JY,JX)                      !total soil O2 flux, [g d-2]
+  real(r8) :: UNH3G(JY,JX)                      !total soil NH3 flux, [g d-2]
+  real(r8) :: UN2OG(JY,JX)                      !total soil N2O flux, [g d-2]
+  real(r8) :: ZDRAIN(JY,JX)                     !total N drainage below root zone, [g d-2]
+  real(r8) :: PDRAIN(JY,JX)                     !total P drainage below root zone, [g d-2]
+  real(r8) :: UCOP(JY,JX)                       !total soil autotrophic respiration, [g d-2]
+  real(r8) :: USEDOU(JY,JX)                     !total sediment subsurface flux, [Mg d-2]
+  real(r8) :: UDICQ(JY,JX)                      !total surface DIC flux, [g d-2]
+  real(r8) :: UDICD(JY,JX)                      !total subsurface DIC flux, [g d-2]
+  real(r8) :: UDINQ(JY,JX)                      !total surface DIN flux, [g d-2]
+  real(r8) :: UDIND(JY,JX)                      !total subsurface DIN flux, [g d-2]
+  real(r8) :: UDIPQ(JY,JX)                      !total surface DIP flux, [g d-2]
+  real(r8) :: UDIPD(JY,JX)                      !total subsurface DIP flux, [g d-2]
+  real(r8) :: WTSTGT(JY,JX)                     !total standing dead C, [g d-2]
   private :: InitAllocate
   contains
 
@@ -101,7 +159,7 @@ module SOMDataType
   allocate(ORGN(0:JZ,JY,JX))
   allocate(OMCF(7))
   allocate(OMCA(7))
-  allocate(IXTYP(2,JY,JX))
+!  allocate(IXTYP(2,JY,JX))
   allocate(RC0(0:5,JY,JX))
   allocate(ORGCX(0:JZ,JY,JX))
   allocate(OSA(4,0:4,0:JZ,JY,JX))
@@ -150,7 +208,7 @@ module SOMDataType
   deallocate(ORGN)
   deallocate(OMCF)
   deallocate(OMCA)
-  deallocate(IXTYP)
+!  deallocate(IXTYP)
   deallocate(RC0)
   deallocate(ORGCX)
   deallocate(OSA)

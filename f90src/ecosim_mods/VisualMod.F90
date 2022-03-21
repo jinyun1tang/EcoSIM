@@ -6,41 +6,19 @@ module VisualMod
   use fileUtil, only : open_safe
   use SOMDataType
   use GridDataType
+  use SoilHeatDatatype
+  use SoilWaterDataType
+  use SoilPhysDataType
+  use PlantDataStateType
+  use EcoSIMCtrlDataType
+  use SnowDataType
+  use PlantDataRateType
+  use CanopyDataType
+  use EcosysBGCFluxType
+  use EcoSIMHistMod
   implicit none
 
   private
-
-  include "filec.h"
-  include "files.h"
-  include "blkc.h"
-  include "blk1cp.h"
-  include "blk1cr.h"
-  include "blk1g.h"
-  include "blk1n.h"
-  include "blk1p.h"
-  include "blk2a.h"
-  include "blk2b.h"
-  include "blk2c.h"
-  include "blk3.h"
-  include "blk5.h"
-  include "blk8a.h"
-  include "blk8b.h"
-  include "blk9a.h"
-  include "blk9b.h"
-  include "blk9c.h"
-  include "blk11a.h"
-  include "blk11b.h"
-  include "blk12a.h"
-  include "blk12b.h"
-  include "blk13a.h"
-  include "blk13b.h"
-  include "blk13c.h"
-  include "blk14.h"
-  include "blk15a.h"
-  include "blk15b.h"
-  include "blk16.h"
-  include "blk18a.h"
-  include "blk18b.h"
 
   character(len=*), parameter :: mod_filename = __FILE__
   real(r8) :: TCSNX,TTRN,TTLE,TTSH,TTGH,TTCO,TTCH

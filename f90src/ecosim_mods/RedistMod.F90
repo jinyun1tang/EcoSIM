@@ -10,50 +10,26 @@ module RedistMod
   use GridDataType
   use SoilPhysDataType
   use FlagDataType
+  use SoilHeatDatatype
+  use SoilWaterDataType
+  use PlantDataStateType
+  use EcoSIMCtrlDataType
+  use SoilBGCDataType
+  use ClimForcDataType
+  use LandSurfDataType
+  use SnowDataType
+  use PhenologyDataType
+  use SurfLitterDataType
+  use SurfSoilDataType
+  use CanopyDataType
+  use RootDataType
+  use EcoSimSumDataType
+  use EcosysBGCFluxType
+  use AqueChemDatatype
   implicit none
 
   private
 
-  include "blkc.h"
-  include "blk1n.h"
-  include "blk1p.h"
-  include "blk1cr.h"
-  include "blk2a.h"
-  include "blk2b.h"
-  include "blk2c.h"
-  include "blk3.h"
-  include "blk5.h"
-  include "blk8a.h"
-  include "blk8b.h"
-  include "blk9b.h"
-  include "blk11a.h"
-  include "blk11b.h"
-  include "blk12a.h"
-  include "blk12b.h"
-  include "blk13a.h"
-  include "blk13b.h"
-  include "blk13c.h"
-  include "blk15a.h"
-  include "blk15b.h"
-  include "blk16.h"
-  include "blk18a.h"
-  include "blk18b.h"
-  include "blk19a.h"
-  include "blk19b.h"
-  include "blk19c.h"
-  include "blk19d.h"
-  include "blk20a.h"
-  include "blk20b.h"
-  include "blk20c.h"
-  include "blk20d.h"
-  include "blk20e.h"
-  include "blk20f.h"
-  include "blk21a.h"
-  include "blk21b.h"
-  include "blk22a.h"
-  include "blk22b.h"
-  include "blk22c.h"
-  include "blktest.h"
 
   character(len=*), parameter :: mod_filename = __FILE__
   real(r8) :: CXR,COR,CXE,COE,COD,CXD,CXS,CVISC,CI,CH,CO,CX
@@ -6075,6 +6051,7 @@ module RedistMod
 
   integer :: LX,LY,LL,NN,K,M,N,NR,NZ
   integer :: L0,L1,NUX,ICHKLX,ICHKL,NGL
+  real(r8):: DENSJ
   !     begin_execution
   !     SOIL SUBSIDENCE
   !
@@ -6146,6 +6123,7 @@ module RedistMod
       !     FREEZE-THAW
       !
       IF(ABS(DVOLI(LX,NY,NX)).GT.ZEROS(NY,NX))THEN
+          DENSJ=1._r8-DENSI
           DDLYXF=DVOLI(LX,NY,NX)*DENSJ/AREA(3,LX,NY,NX)
           IF(LX.EQ.NL(NY,NX))THEN
             DDLYX(LX,4)=DDLYXF

@@ -14,31 +14,25 @@
   use FlagDataType
   use SoilChemDataType
   use SoilPhysDataType
+  use SoilHeatDatatype
+  use SoilWaterDataType
+  use ClimForcDataType
+  use LandSurfDataType
+  use PlantDataCharType
+  use SnowDataType
+  use SurfLitterDataType
+  use SurfSoilDataType
+  use PlantDataCharType
+  use CanopyDataType
+  use SoilBGCDataType
+  use PlantMngmtDataType
+  use EcoSimSumDataType
+  use RootDataType
+  use EcosysBGCFluxType
+  use EcoSIMHistMod
+
   implicit none
   integer, intent(in) :: I,NHW,NHE,NVN,NVS
-
-
-  include "filec.h"
-  include "files.h"
-  include "blkc.h"
-  include "blk2a.h"
-  include "blk2b.h"
-  include "blk2c.h"
-  include "blk5.h"
-  include "blk8a.h"
-  include "blk8b.h"
-  include "blk11a.h"
-  include "blk11b.h"
-  include "blk13a.h"
-  include "blk13b.h"
-  include "blk13c.h"
-  include "blk16.h"
-  include "blk18a.h"
-  include "blk18b.h"
-  include "blk19a.h"
-  include "blk19b.h"
-  include "blk19c.h"
-  include "blk19d.h"
 
   integer :: K,M,NX,NY,N,L,NGL
 !     execution begins here

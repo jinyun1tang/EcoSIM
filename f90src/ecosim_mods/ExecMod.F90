@@ -6,15 +6,11 @@ module ExecMod
   use abortutils, only : endrun, padr, print_info
   use GridDataType
   use FlagDataType
+  use EcoSIMCtrlDataType
+  use EcoSimSumDataType
   implicit none
 
   private
-
-  include "blkc.h"
-  include "blk2a.h"
-  include "blk2b.h"
-  include "blk2c.h"
-  include "blk16.h"
 
   character(len=*), parameter :: mod_filename = __FILE__
   real(r8), SAVE :: TLW,TLH,TLO,TLC,TLN,TLP,TLI

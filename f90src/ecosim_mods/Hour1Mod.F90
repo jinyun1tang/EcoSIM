@@ -12,51 +12,28 @@ module Hour1Mod
   use GridDataType
   use SoilPhysDataType
   use FlagDataType
+  use SoilHeatDatatype
+  use SoilWaterDataType
+  use PlantDataStateType
+  use EcoSIMCtrlDataType
+  use SoilBGCDataType
+  use PlantDataCharType
+  use ClimForcDataType
+  use LandSurfDataType
+  use PhenologyDataType
+  use SurfLitterDataType
+  use SnowDataType
+  use SurfSoilDataType
+  use CanopyDataType
+  use EcoSimSumDataType
+  use RootDataType
+  use EcosysBGCFluxType
+  use AqueChemDatatype
+  use EcoSIMHistMod
+
   implicit none
 
   private
-
-  include "files.h"
-  include "filec.h"
-  include "blkc.h"
-  include "blk1cp.h"
-  include "blk1g.h"
-  include "blk2a.h"
-  include "blk2b.h"
-  include "blk2c.h"
-  include "blk3.h"
-  include "blk5.h"
-  include "blk6.h"
-  include "blk8a.h"
-  include "blk8b.h"
-  include "blk9a.h"
-  include "blk9b.h"
-  include "blk9c.h"
-  include "blk10.h"
-  include "blk11a.h"
-  include "blk11b.h"
-  include "blk13a.h"
-  include "blk13b.h"
-  include "blk13c.h"
-  include "blk15a.h"
-  include "blk15b.h"
-  include "blk16.h"
-  include "blk18a.h"
-  include "blk18b.h"
-  include "blk19a.h"
-  include "blk19b.h"
-  include "blk19c.h"
-  include "blk19d.h"
-  include "blk20a.h"
-  include "blk20b.h"
-  include "blk20c.h"
-  include "blk20d.h"
-  include "blk20e.h"
-  include "blk20f.h"
-  include "blk21a.h"
-  include "blk21b.h"
-  include "blk22b.h"
-  include "blk22c.h"
 
   CHARACTER(LEN=*), PARAMETER :: MOD_FILENAME=__FILE__
 

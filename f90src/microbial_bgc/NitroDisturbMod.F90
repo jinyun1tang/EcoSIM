@@ -12,32 +12,15 @@ module NitroDisturbMod
   use GridDataType
   use SoilPhysDataType
   use FlagDataType
+  use SoilHeatDatatype
+  use SoilWaterDataType
+  use ClimForcDataType
+  use EcosimConst
+  use PlantMngmtDataType
+  use EcoSimSumDataType
   implicit none
 
   private
-
-
-  include "blkc.h"
-  include "blk2a.h"
-  include "blk2b.h"
-  include "blk2c.h"
-  include "blk8a.h"
-  include "blk8b.h"
-  include "blk10.h"
-  include "blk11a.h"
-  include "blk11b.h"
-  include "blk13a.h"
-  include "blk13b.h"
-  include "blk13c.h"
-  include "blk13d.h"
-  include "blk15a.h"
-  include "blk15b.h"
-  include "blk16.h"
-  include "blk18a.h"
-  include "blk18b.h"
-  include "blk19a.h"
-  include "blk19b.h"
-  include "blk21b.h"
 
   character(len=*), parameter :: mod_filename = __FILE__
 

@@ -18,5 +18,20 @@ module EcosimConst
   real(r8), parameter :: PICON2=PICON*0.5_r8
   real(r8), PARAMETER :: PSIPS=-0.5E-03_r8
   real(r8), parameter :: RDN=57.29577951_r8
+  real(r8), parameter :: VAP=2465.0_r8         !latent heat of vaporization of water, kJ/kg
+  real(r8), parameter :: VAPS=2834.0_r8        !sublimation of water, kJ/kg
+  real(r8), parameter :: TCNDG=8.1E-03_r8      !assumed thermal conductivity below lower soil boundary,[MJ m-1 h-1 K-1]
+  real(r8) :: FCI=0.05_r8                      !field capacity of ice
+  real(r8) :: WPI=0.025_r8                     !wilting point of ice
+  real(r8) :: POROQ=0.66_r8                    !soil porosity ^ 2/3
+  real(r8) :: FORGC=0.1E+06_r8                 !minimum SOC for combustion 	[g Mg-1]
+  real(r8) :: FVLWB=1.0_r8                     !maximum soil water content for combustion	[m3 m-3]
+  real(r8) :: FCH4F=0.01_r8                    !fraction of combusted C released as CH4
+  real(r8) :: PSIHY=-2500.0_r8                 !hygroscopic water potential [MPa]
+  real(r8) :: OXKM=0.080_r8                    !Km for heterotrophic O2 uptake
+  real(r8) :: THETX=1.0E-03_r8                 !minimum air-filled porosity for gas transfer	[m3 m-3]
+  real(r8), parameter :: THETPI=0.00_r8        !air content of ice	-
+  real(r8), parameter :: DENSI=0.92_r8-THETPI  !ice density
 
+  integer :: ICOR(12)=(/1,-1,0,0,1,1,2,3,3,4,4,5/)
 end module EcosimConst

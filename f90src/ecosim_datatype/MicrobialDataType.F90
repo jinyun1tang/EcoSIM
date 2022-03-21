@@ -4,6 +4,7 @@ module MicrobialDataType
 implicit none
   public
   save
+  character(len=*), private, parameter :: mod_filename = __FILE__
 
 
   integer :: JG

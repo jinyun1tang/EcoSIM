@@ -9,28 +9,18 @@
       use data_kind_mod, only : r8 => SHR_KIND_R8
   use FlagDataType
   use GridDataType
+  use PlantDataStateType
+  use PlantDataRateType
+  use PlantDataCharType
+  use ClimForcDataType
+  use CanopyDataType
+  use RootDataType
+  use EcoSIMHistMod
+
       implicit none
       integer, intent(in) :: I,J,NT,NE,NAX,NDX,NTX
       integer, intent(in) :: NEX,NHW,NHE,NVN,NVS
 
-
-      include "filec.h"
-      include "files.h"
-      include "blkc.h"
-      include "blk1cp.h"
-      include "blk1cr.h"
-      include "blk1g.h"
-      include "blk1n.h"
-      include "blk1p.h"
-      include "blk3.h"
-      include "blk8a.h"
-      include "blk8b.h"
-      include "blk9a.h"
-      include "blk9b.h"
-      include "blk9c.h"
-      include "blk12a.h"
-      include "blk12b.h"
-      include "blk14.h"
 
       real(r8) :: HEAD(50)
       integer :: K,LUN,M,N,NX,NY,NZ

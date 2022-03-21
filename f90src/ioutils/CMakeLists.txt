@@ -1,5 +1,4 @@
 set(IOUTILS_SOURCES
-	BLOCKDATA001.F90
 	foutp.F90
 	fouts.F90
 	outpd.F90

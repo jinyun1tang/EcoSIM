@@ -16,25 +16,24 @@ module StartsMod
   use GridDataType
   use SoilPhysDataType
   use FlagDataType
+  use SoilHeatDatatype
+  use SoilWaterDataType
+  use EcoSIMCtrlDataType
+  use ClimForcDataType
+  use LandSurfDataType
+  use SnowDataType
+  use PlantDataCharType
+  use SurfLitterDataType
+  use CanopyDataType
+  use SurfSoilDataType
+  use SoilBGCDataType
+  use PlantMngmtDataType
+  use EcoSimSumDataType
+  use RootDataType
+  use EcosysBGCFluxType
   implicit none
 
   private
-
-  include "blkc.h"
-  include "blk2a.h"
-  include "blk2b.h"
-  include "blk2c.h"
-  include "blk5.h"
-  include "blk8a.h"
-  include "blk8b.h"
-  include "blk11a.h"
-  include "blk11b.h"
-  include "blk13a.h"
-  include "blk13b.h"
-  include "blk13c.h"
-  include "blk16.h"
-  include "blk18a.h"
-  include "blk18b.h"
 
   !
   !
@@ -164,7 +163,6 @@ module StartsMod
       DPTHSK(NY,NX)=AMAX1(10.0_r8,CDPTH(NL(NY,NX),NY,NX)+1.0_r8)
       TCS(0,NY,NX)=ATCS(NY,NX)
       TKS(0,NY,NX)=ATKS(NY,NX)
-      TCNDG=8.1E-03_r8
       TKSD(NY,NX)=ATKS(NY,NX)+2.052E-04*DPTHSK(NY,NX)/TCNDG
 !
 !     INITIALIZE COMMUNITY CANOPY
@@ -692,6 +690,7 @@ module StartsMod
   subroutine InitControlParameters
   implicit none
   !     begin_execution
+  real(r8) :: XNPV
   !
   !     NPH=no. of cycles h-1 for water, heat and solute flux calculns
   !     NPT=number of cycles NPH-1 for gas flux calculations
@@ -702,13 +701,7 @@ module StartsMod
   !
   BKRS=(/0.0333_r8,0.0167_r8,0.0167_r8/)
 
-  FORGC=0.1E+06_r8
-  FVLWB=1.0_r8
-  FCH4F=0.01_r8
-  PSIHY=-2500.0_r8
-  FCI=0.05_r8
-  WPI=0.025_r8
-  POROQ=0.66_r8
+
 
   call InitSOMConsts
 
@@ -738,10 +731,6 @@ module StartsMod
   ZERO=1.0E-15_r8
   ZERO2=1.0E-08_r8
   TAREA=0.0_r8
-  THETX=1.0E-03_r8
-  THETPI=0.00_r8
-  DENSI=0.92_r8-THETPI
-  DENSJ=1.0_r8-DENSI
   !
   !     INITIALIZE MASS BALANCE CHECKS
   !
@@ -771,9 +760,6 @@ module StartsMod
   XPSN=0.0_r8
   TIONIN=0.0_r8
   TIONOU=0.0_r8
-  VAP=2465.0_r8   !kJ/kg
-  VAPS=2834.0_r8
-  OXKM=0.080_r8
   end subroutine InitControlParameters
 !------------------------------------------------------------------------------------------
   subroutine InitAccumulators(NY,NX)

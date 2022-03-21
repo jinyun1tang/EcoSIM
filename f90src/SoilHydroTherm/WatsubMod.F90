@@ -12,29 +12,25 @@ module WatsubMod
   use GridDataType
   use SoilPhysDataType
   use FlagDataType
+  use SoilWaterDataType
+  use SoilHeatDatatype
+  use EcoSIMCtrlDataType
+  use LandSurfDataType
+  use ClimForcDataType
+  use FertilizerDataType
+  use SnowDataType
+  use PlantDataCharType
+  use SurfLitterDataType
+  use SurfSoilDataType
+  use SurfSoilDataType
+  use CanopyDataType
+  use SoilChemDataType
+  use SoilBGCDataType
+  use AqueChemDatatype
   implicit none
 
   private
 
-  include "blkc.h"
-  include "blk2a.h"
-  include "blk2b.h"
-  include "blk2c.h"
-  include "blk5.h"
-  include "blk8a.h"
-  include "blk8b.h"
-  include "blk10.h"
-  include "blk11a.h"
-  include "blk11b.h"
-  include "blk13a.h"
-  include "blk13b.h"
-  include "blk13c.h"
-  include "blk15a.h"
-  include "blk15b.h"
-  include "blk22a.h"
-  include "blk22b.h"
-  include "blk22c.h"
-  include "blktest.h"
 
   character(len=*), parameter :: mod_filename = __FILE__
 
@@ -79,7 +75,7 @@ module WatsubMod
     ,VOLI0M(JS,JY,JX),VHCPWMM(JS,JY,JX),TK0M(JS,JY,JX)
 
   real(r8) :: ALFZ,ALBW,ATCNVW,ATCNDW,ATCNVS,ATCNDS,ATCNVR,ATCNDR
-  real(r8) :: ALBG,ALBR,AVCNDR,ALT1,ALT2,ALTB,ALTS1,ALTS2,AVCNDL
+  real(r8) :: ALBG,ALBL,AVCNDR,ALT1,ALT2,ALTB,ALTS1,ALTS2,AVCNDL
   real(r8) :: ATCNVL,ATCNDL,CNV1,CNV2,CNVR,CNDR,CND1,CNDL,CNVL
   real(r8) :: DFVR,DENSW1,DENSW2,DTKX,DTHW0,DTHA0,DTHW1,DTHA1
   real(r8) :: D,DTHW2,DTHA2,DTBLXX,DPTHH,DTBLYX,DPTHW1,DPTHW2
@@ -105,7 +101,7 @@ module WatsubMod
   real(r8) :: PARSX,PARE,PARS,PSDX,PSISV1,PSIST0,PSIST1,PSISTL
   real(r8) :: PSISVL,PSISH1,PSISHL,PSISWD,PSISWT,PSISWTH,PSISUT
   real(r8) :: PSISUTH,PSISMX,Q,QRQ1,QSX,RADGX,RAR1,RAS,RASX
-  real(r8) :: RASL,RFLXW,RFLX0,RFLXW2,RAGX,RA,RFLXG,RFLXR,RYLXW0
+  real(r8) :: RASL,RFLXW,RFLX0,RFLXW2,RAGX,RFLXG,RFLXR,RYLXW0
   real(r8) :: RYLXA0,RYLXW1,RYLXA1,RYLNW0,RYLNA0
   real(r8) :: RYLNW1,RYLNA1,RFLXR2,R,RYLXW2,RYLXA2,RYLNW2,RYLNA2
   real(r8) :: RCHQF,RCHGFU,RCHGFT,SFLXW,SFLXW2,SFLXG,SFLXR,SFLXR2
@@ -1515,6 +1511,7 @@ module WatsubMod
   integer, intent(in) :: M,NY,NX
 
   integer :: MM,L,L2
+  real(r8):: Raa
   !     begin_execution
   !     HEAT AND VAPOR FLUXES BETWEEN SNOWPACK AND ATMOSPHERE
   !
@@ -1550,7 +1547,7 @@ module WatsubMod
     RAGX=AMAX1(RAM,0.8_r8*RAGW(NY,NX),AMIN1(1.2_r8*RAGW(NY,NX),&
       RAG(NY,NX)/(1.0_r8-10.0_r8*RI)))
     RAGW(NY,NX)=RAGX
-    RA=RAGX
+    RAa=RAGX
     !
     ! PARAMETERS FOR CALCULATING LATENT AND SENSIBLE HEAT FLUXES
     !
@@ -1564,8 +1561,8 @@ module WatsubMod
     !     VAP,VAPS=latent heat of evaporation,sublimation
     !     VFLXW2=convective heat of evaporation flux
     !
-    PARE=PAREW(NY,NX)/(RA+RZ)
-    PARS=PARSW(NY,NX)/RA
+    PARE=PAREW(NY,NX)/(RAa+RZ)
+    PARS=PARSW(NY,NX)/RAa
     !VP0=2.173E-03_r8/TK0M(1,NY,NX)*0.61_r8*EXP(5360.0_r8*(3.661E-03_r8-1.0_r8/TK0M(1,NY,NX)))
     VP0=vapsat(TK0M(1,NY,NX))
     EVAPT2=PARE*(VPQ(NY,NX)-VP0)
@@ -1805,6 +1802,7 @@ module WatsubMod
 
   integer  :: NN
   real(r8) :: tk1pre
+  real(r8) :: RAa
 ! begin_execution
 
   DO 5000 NN=1,NPR
@@ -1825,9 +1823,9 @@ module WatsubMod
       RAGX=AMAX1(RAM,0.8_r8*RAGR(NY,NX),AMIN1(1.2_r8*RAGR(NY,NX) &
         ,RARG(NY,NX)/(1.0_r8-10.0_r8*RI)))
       RAGR(NY,NX)=RAGX
-      RA=RAGX
-      PARE=PARER(NY,NX)/(RA+RZ)
-      PARS=PARSR(NY,NX)/RA
+      RAa=RAGX
+      PARE=PARER(NY,NX)/(RAa+RZ)
+      PARS=PARSR(NY,NX)/RAa
 !
 !     NET RADIATION AT RESIDUE SURFACE
 !
@@ -2055,7 +2053,7 @@ module WatsubMod
 !    4,RAR1,PARE,HFLWX,HFLWC,TKXR,TK1X,TKY
 !    2,VPQ(NY,NX),VPR,EVAPR(NY,NX),EVAPR2,VOLWR2,XNPX
 !    3,HFLCR2,HWFLV2,VHCPR2,VHCP12,RFLX0,THRMZ2,VHCPRX(NY,NX)
-!    4,ALBR,RADXR(NY,NX),THRYR(NY,NX),THRMR(NY,NX),XNPZ
+!    4,ALBL,RADXR(NY,NX),THRYR(NY,NX),THRMR(NY,NX),XNPZ
 !    3,FLV1,FLV2,VPR,VP1,CNVR,CNV1,FLVC,FLVX,XNPZ,XNPR
 !    3,PSISM1(0,NY,NX),PSISV1,THETWR,VOLWRX(NY,NX),ORGC(0,NY,NX)
 !    4,VHCPRX(NY,NX),PARS,PARE,RA,RZ,RI,TKQ(NY,NX),VOLW1(0,NY,NX)
@@ -2095,7 +2093,7 @@ module WatsubMod
 !
 ! NET RADIATION AT RESIDUE SURFACE
 !
-! ALBR=litter albedo
+! ALBL=litter albedo
 ! BKVL=litter mass
 ! VOLW1,VOLI1=water,ice volume in litter
 ! RADXR,THRYR=incoming shortwave,longwave radiation
@@ -2104,9 +2102,9 @@ module WatsubMod
 ! VHCPR2,VHCP12=litter,soil heat capacity
 !
 !
-  ALBR=(0.20_r8*BKVL(0,NY,NX)+0.06_r8*VOLW1(0,NY,NX)+0.30_r8 &
+  ALBL=(0.20_r8*BKVL(0,NY,NX)+0.06_r8*VOLW1(0,NY,NX)+0.30_r8 &
     *VOLI1(0,NY,NX))/(BKVL(0,NY,NX)+VOLW1(0,NY,NX)+VOLI1(0,NY,NX))
-  RFLX0=(1.0_r8-ALBR)*RADXR(NY,NX)+THRYR(NY,NX)  !radiation incident on litter layer
+  RFLX0=(1.0_r8-ALBL)*RADXR(NY,NX)+THRYR(NY,NX)  !radiation incident on litter layer
   TKR1=TK1(0,NY,NX)                              !kelvin, initial litter layer temperature
   VOLWR2=VOLW1(0,NY,NX)                          !volumetric water content
   VHCPR2=VHCP1(0,NY,NX)                          !heat capacity, initialized with residual layer
@@ -2194,6 +2192,7 @@ module WatsubMod
   subroutine PrepSoilSurfaceEnerbyBalance(M,NY,NX)
   implicit none
   integer, intent(in) :: M,NY,NX
+  real(r8) :: RAa
 ! begin_execution
 !
 ! PHYSICAL AND HYDRAULIC PROPERTIES OF SOIL SURFACE INCLUDING
@@ -2311,7 +2310,7 @@ module WatsubMod
 ! RI=Richardsons number
 ! RIB=isothermal RI
 ! TKQ,TK1=canopy air,soil temperature
-! RAGZ,RA=soil+litter blr
+! RAGZ,RAa=soil+litter blr
 ! RAGS=isothermal blr at ground surface
 !
   THETPX0=AMAX1(ZERO,THETPX(0,NY,NX))
@@ -2320,7 +2319,7 @@ module WatsubMod
   RI=AMAX1(-0.3,AMIN1(0.075,RIB(NY,NX)*(TKQ(NY,NX)-TK1(NUM(NY,NX),NY,NX))))
   RAGX=AMAX1(RAM,0.8*RAGS(NY,NX),AMIN1(1.2*RAGS(NY,NX),RAR1/(1.0-10.0*RI)))
   RAGS(NY,NX)=RAGX
-  RA=RAGR(NY,NX)+RAGS(NY,NX)
+  RAa=RAGR(NY,NX)+RAGS(NY,NX)
 ! IF(I.EQ.63.AND.NX.EQ.1)THEN
 !     WRITE(*,7776)'RAGX',I,J,M,NX,NY,RAGZ,BARE(NY,NX),RAG(NY,NX)
 !    2,CVRDW(NY,NX),RAR1,RI,RIB(NY,NX),TKQ(NY,NX),TK1(NUM(NY,NX),NY,NX)
@@ -2343,8 +2342,8 @@ module WatsubMod
 ! VAP=latent heat of evaporation
 ! VFLXG=convective heat of evaporation flux
 !
-  PARE=PAREG(NY,NX)/(RA+RZ)
-  PARS=PARSG(NY,NX)/RA
+  PARE=PAREG(NY,NX)/(RAa+RZ)
+  PARS=PARSG(NY,NX)/RAa
   TKX1=TK1(NUM(NY,NX),NY,NX)
   !VP1=2.173E-03/TKX1 &
   !    *0.61*EXP(5360.0*(3.661E-03-1.0/TKX1)) &
@@ -4759,24 +4758,11 @@ module WatsubMod
               TQR1(N2,N1)=TQR1(N2,N1)-QR1(N,NN,N5,N4)
               THQR1(N2,N1)=THQR1(N2,N1)-HQR1(N,NN,N5,N4)
             ENDIF
-            !     IF(I.GT.350.AND.NX.EQ.1)THEN
-        !     WRITE(*,6631)'TQR1',I,J,M,N1,N2,N4,N5,N,NN
-        !    2,IFLBM(M,N,NN,N5,N4),TQR1(N2,N1),THQR1(N2,N1)
-        !    2,QR1(N,NN,N2,N1),QR1(N,NN,N5,N4)
-        !    3,QR(N,NN,N2,N1),QR(N,NN,N5,N4)
-        !    2,HQR1(N,NN,N2,N1),HQR1(N,NN,N5,N4)
-        !    3,HQR(N,NN,N2,N1),HQR(N,NN,N5,N4)
-            !6631  FORMAT(A8,10I4,12E12.4)
-            !     ENDIF
+
             IF(N4B.GT.0.AND.N5B.GT.0.AND.NN.EQ.1)THEN
               TQR1(N2,N1)=TQR1(N2,N1)-QR1(N,NN,N5B,N4B)
               THQR1(N2,N1)=THQR1(N2,N1)-HQR1(N,NN,N5B,N4B)
-        !     IF(I.GT.350.AND.NX.EQ.1)THEN
-        !     WRITE(*,6631)'TQRB1',I,J,M,N1,N2,N4B,N5B,N,NN
-        !    2,IFLBM(M,N,NN,N5B,N4B),TQR1(N2,N1),THQR1(N2,N1)
-        !    2,QR1(N,NN,N5B,N4B),HQR1(N,NN,N5B,N4B)
-        !    2,QR(N,NN,N5B,N4B),HQR(N,NN,N5B,N4B)
-        !     ENDIF
+
             ENDIF
             IF(M.EQ.NPH)THEN
               IFLBH(N,NN,N5,N4)=IFLBM(M,N,NN,N5,N4)

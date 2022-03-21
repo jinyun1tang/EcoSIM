@@ -7,33 +7,18 @@ module SoluteMod
   use GridDataType
   use FlagDataType
   use SoilPhysDataType
+  use SoilHeatDatatype
+  use SoilWaterDataType
+  use EcoSIMCtrlDataType
+  use SoilBGCDataType
+  use SurfLitterDataType
+  use RootDataType
+  use AqueChemDatatype
   implicit none
 
   private
 !     include_section
 
-  include "blkc.h"
-  include "blk2a.h"
-  include "blk2b.h"
-  include "blk2c.h"
-  include "blk8a.h"
-  include "blk8b.h"
-  include "blk10.h"
-  include "blk11a.h"
-  include "blk11b.h"
-  include "blk13a.h"
-  include "blk13b.h"
-  include "blk13c.h"
-  include "blk15a.h"
-  include "blk15b.h"
-  include "blk18a.h"
-  include "blk18b.h"
-  include "blk19a.h"
-  include "blk19b.h"
-  include "blk19c.h"
-  include "blk19d.h"
-  include "blk21a.h"
-  include "blk21b.h"
   include "solutepar.h"
 !     end_include_section
 

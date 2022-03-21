@@ -1,4 +1,0 @@
-
-      real(r8) :: TKCZ(JP,JY,JX),RAZ(JP,JY,JX),RSMN(JP,JY,JX)
-
-      COMMON/BLK1U/TKCZ,RAZ,RSMN

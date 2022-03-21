@@ -13,19 +13,16 @@ module readiMod
   use SoilPhysDataType
   use FlagDataType
   use SoilChemDataType
+  use LandSurfDataType
+  use ClimForcDataType
+  use SoilWaterDataType
+  use EcoSIMCtrlDataType
+  use SurfLitterDataType
+  use SnowDataType
+  use EcoSIMHistMod
+
   implicit none
   private
-
-  include "filec.h"
-  include "files.h"
-  include "blkc.h"
-  include "blk2a.h"
-  include "blk2b.h"
-  include "blk2c.h"
-  include "blk8a.h"
-  include "blk8b.h"
-  include "blk17.h"
-  include "blk11a.h"
 
   character(len=*), parameter :: mod_filename = __FILE__
   integer :: NM(JY,JX)
@@ -40,7 +37,7 @@ module readiMod
   real(r8) :: DAT(50),DATK(50)
   real(r8), PARAMETER :: TWILGT=0.06976
   real(r8) :: ALATG,ATCAG,AZI,ASPX,CO2EIG,CH4EG,DTBLIG,DTBLDIG
-  real(r8) :: DTBLGG,DECDAY,DECLIN,DEC,DPTHSX,OXYEG,RCHQNG,RCHQEG
+  real(r8) :: DTBLGG,DECDAY,DEC,DPTHSX,OXYEG,RCHQNG,RCHQEG
   real(r8) :: RCHQSG,RCHQWG,RCHGNUG,RCHGEUG,RCHGSUG,RCHGWUG
   real(r8) :: RCHGNTG,RCHGETG,RCHGSTG,RCHGWTG,RCHGDG
   real(r8) :: SL0,XI,Z2GEG,Z2OEG,ZNH3EG,SLX,SL1,SL2

@@ -9,28 +9,20 @@
   use SOMDataType
   use GridDataType
   use SoilPhysDataType
+  use SoilHeatDatatype
+  use SoilWaterDataType
+  use EcoSIMCtrlDataType
+  use ClimForcDataType
+  use SnowDataType
+  use SoilChemDataType
+  use PlantMngmtDataType
+  use CanopyDataType
+  use EcosysBGCFluxType
+  use EcoSIMHistMod
+
   implicit none
   integer, intent(in) :: I,NT,NE,NAX,NDX,NTX,NEX,NHW,NHE,NVN,NVS
 
-
-  include "filec.h"
-  include "files.h"
-  include "blkc.h"
-  include "blk2a.h"
-  include "blk2b.h"
-  include "blk2c.h"
-  include "blk8a.h"
-  include "blk8b.h"
-  include "blk11a.h"
-  include "blk11b.h"
-  include "blk13a.h"
-  include "blk13b.h"
-  include "blk13c.h"
-  include "blk16.h"
-  include "blk18a.h"
-  include "blk18b.h"
-  include "blk19a.h"
-  include "blk19b.h"
 
   real(r8) :: HEAD(50)
   integer :: K,LUN,M,N,NX,NY
