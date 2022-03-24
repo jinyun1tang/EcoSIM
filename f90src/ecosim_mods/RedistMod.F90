@@ -5,20 +5,20 @@ module RedistMod
   use EcosimConst
   use MicrobialDataType
   use SOMDataType
-  use SoilChemDataType
+  use ChemTranspDataType
   use FertilizerDataType
   use GridDataType
   use SoilPhysDataType
   use FlagDataType
   use SoilHeatDatatype
   use SoilWaterDataType
-  use PlantDataStateType
   use EcoSIMCtrlDataType
   use SoilBGCDataType
   use ClimForcDataType
   use LandSurfDataType
   use SnowDataType
-  use PhenologyDataType
+  use PlantTraitDataType
+  use PlantDataRateType
   use SurfLitterDataType
   use SurfSoilDataType
   use CanopyDataType
@@ -26,6 +26,9 @@ module RedistMod
   use EcoSimSumDataType
   use EcosysBGCFluxType
   use AqueChemDatatype
+  use SoilPropertyDataType
+  use IrrigationDataType
+  use SedimentDataType
   implicit none
 
   private

@@ -10,7 +10,7 @@ module nitroMod
   use MicrobialDataType
   use NitroPars
   use SOMDataType
-  use SoilChemDataType
+  use ChemTranspDataType
   use FertilizerDataType
   use NitroDiagTypes
   use nitro1LayerMod
@@ -19,6 +19,7 @@ module nitroMod
   use SoilBGCDataType
   use EcoSIMCtrlDataType
   use SoilPhysDataType
+  use SoilPropertyDataType
   implicit none
 
   private

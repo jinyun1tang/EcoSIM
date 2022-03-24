@@ -9,13 +9,16 @@ module VisualMod
   use SoilHeatDatatype
   use SoilWaterDataType
   use SoilPhysDataType
-  use PlantDataStateType
   use EcoSIMCtrlDataType
   use SnowDataType
   use PlantDataRateType
   use CanopyDataType
   use EcosysBGCFluxType
   use EcoSIMHistMod
+  use SoilPropertyDataType
+  use SoilBGCDataType
+  use RootDataType
+  use PlantTraitDataType
   implicit none
 
   private

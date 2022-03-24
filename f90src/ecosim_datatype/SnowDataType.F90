@@ -6,6 +6,7 @@ module SnowDataType
   save
   character(len=*), private, parameter :: mod_filename = __FILE__
 
+  REAL(R8) :: ALBS(JY,JX)                       !snowpack albedo
   real(r8) :: DENS0(JY,JX)                      !snowpack density, [Mg m-3]
   real(r8) :: VHCPWM(60,JS,JY,JX)               !volumetric heat capacity of snowpack
   real(r8) :: FLQWM(60,JS,JY,JX)                !snowpack water flux
@@ -25,22 +26,24 @@ module SnowDataType
   real(r8) :: XWFLXS(JS,JY,JX)                  !hourly convective heat flux from snow transfer
   real(r8) :: XWFLXI(JS,JY,JX)                  !hourly convective heat flux from ice transfer
   real(r8) :: CDPTHS(0:JS,JY,JX)                !cumulative depth to bottom of snowpack layer
-  real(r8) :: VOLSI(JS,JY,JX)
+  real(r8) :: VOLSI(JS,JY,JX)                   !Initial snowpack volume, [m3 d-2]
   real(r8) :: DPTHS(JY,JX)                      !snowpack depth, [m]
   real(r8) :: VOLSS(JY,JX)                      !snow volume in snowpack (water equivalent), [m3 d-2]
   real(r8) :: VOLWS(JY,JX)                      !water volume in snowpack, [m3 d-2]
   real(r8) :: VOLIS(JY,JX)                      !ice volume in snowpack, [m3 d-2]
   real(r8) :: VOLS(JY,JX)                       !snowpack volume, [m3 d-2]
   real(r8) :: VHCPWX(JY,JX)                     !snowpack heat capacity from previous time step, [MJ d-2 K-1]
-  real(r8) :: FLSW(JS,JY,JX)
-  real(r8) :: FLSWH(JS,JY,JX)
-  real(r8) :: HFLSW(JS,JY,JX)
-  real(r8) :: FLSWR(JS,JY,JX)
-  real(r8) :: HFLSWR(JS,JY,JX)
+  real(r8) :: FLSW(JS,JY,JX)                    !water from snowpack to soil micropores
+  real(r8) :: FLSWH(JS,JY,JX)                   !water from snowpack to soil macropores
+  real(r8) :: HFLSW(JS,JY,JX)                   !convective heat from snowpack to soil
+  real(r8) :: FLSWR(JS,JY,JX)                   !water flux from snowpack to litter
+  real(r8) :: HFLSWR(JS,JY,JX)                  !convective heat flux from snowpack to litter
   real(r8) :: QS(2,JV,JH)                       !snowpack runoff snow, [m3 d-2 h-1]
   real(r8) :: QW(2,JV,JH)                       !snowpack runoff water, [m3 d-2 h-1]
   real(r8) :: QI(2,JV,JH)                       !snowpack runoff ice, [m3 d-2 h-1]
   real(r8) :: HQS(2,JV,JH)                      !snowpack runoff heat, [MJ d-2 h-1]
+  real(r8) :: QSM(60,2,JV,JH)                   !runoff snow flux, [m3 d-2 t-1]
+
   real(r8) :: XCOQSS(2,JV,JH)                   !snowpack runoff CO2 flux, [g d-2 h-1]
   real(r8) :: XCHQSS(2,JV,JH)                   !snowpack runoff CH4 flux, [g d-2 h-1]
   real(r8) :: XOXQSS(2,JV,JH)                   !snowpack runoff O2 flux, [g d-2 h-1]
@@ -50,7 +53,7 @@ module SnowDataType
   real(r8) :: XN3QSS(2,JV,JH)                   !snowpack runoff NH3 flux, [g d-2 h-1]
   real(r8) :: XNOQSS(2,JV,JH)                   !snowpack runoff NO3 flux, [g d-2 h-1]
   real(r8) :: XP4QSS(2,JV,JH)                   !snowpack runoff PO4 flux, [g d-2 h-1]
-  real(r8) :: XP1QSS(2,JV,JH)
+  real(r8) :: XP1QSS(2,JV,JH)                   !snowpack runoff HPO4 flux, [g d-2 h-1]
 
   real(r8) :: CO2W(JS,JY,JX)                    !snowpack CO2, [mol d-2]
   real(r8) :: CH4W(JS,JY,JX)                    !snowpack CH4, [mol d-2]

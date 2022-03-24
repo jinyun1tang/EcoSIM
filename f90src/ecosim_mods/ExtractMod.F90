@@ -10,11 +10,9 @@ module ExtractMod
   use FlagDataType
   use SoilHeatDatatype
   use SoilWaterDataType
-  use PlantDataStateType
   use PlantDataRateType
-  use PlantDataCharType
   use ClimForcDataType
-  use PhenologyDataType
+  use PlantTraitDataType
   use CanopyDataType
   USE RootDataType
   use EcoSimSumDataType

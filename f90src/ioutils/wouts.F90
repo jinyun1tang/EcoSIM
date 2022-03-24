@@ -8,21 +8,20 @@
   use data_kind_mod, only : r8 => SHR_KIND_R8
   use MicrobialDataType
   use SOMDataType
-  use SoilChemDataType
+  use ChemTranspDataType
   use FertilizerDataType
   use GridDataType
   use FlagDataType
-  use SoilChemDataType
   use SoilPhysDataType
   use SoilHeatDatatype
   use SoilWaterDataType
   use ClimForcDataType
   use LandSurfDataType
-  use PlantDataCharType
+  use PlantTraitDataType
+  use PlantDataRateType
   use SnowDataType
   use SurfLitterDataType
   use SurfSoilDataType
-  use PlantDataCharType
   use CanopyDataType
   use SoilBGCDataType
   use PlantMngmtDataType
@@ -30,7 +29,10 @@
   use RootDataType
   use EcosysBGCFluxType
   use EcoSIMHistMod
-
+  use SoilPropertyDataType
+  use IrrigationDataType
+  use AqueChemDatatype
+  use SedimentDataType
   implicit none
   integer, intent(in) :: I,NHW,NHE,NVN,NVS
 

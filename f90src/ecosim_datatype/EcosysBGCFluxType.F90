@@ -1,13 +1,13 @@
 module EcosysBGCFluxType
 
-
+!
+! Ecosystm fluxes for C, N, and P budget
   use data_kind_mod, only : r8 => SHR_KIND_R8
   use GridDataType
   implicit none
   public
   save
   character(len=*), private, parameter :: mod_filename = __FILE__
-
 
   real(r8) :: TCAN(JY,JX)                       !total net CO2 fixation
   real(r8) :: TRN(JY,JX)                        !ecosystem net radiation, [MJ d-2 h-1]
@@ -23,7 +23,13 @@ module EcosysBGCFluxType
   real(r8) :: XHVSTP(JY,JX)                     !ecosystem harvest P, [g d-2]
   real(r8) :: TRINH4(JY,JX)                     !total NH4 net mineraln (-ve) or immobiln (+ve)
   real(r8) :: TRIPO4(JY,JX)                     !total H2PO4 net mineraln (-ve) or immobiln (+ve)
-
+  real(r8) :: GPP(JY,JX)                        !gross primary productivity, [g d-2 h-1]
+  real(r8) :: TCCAN(JY,JX)                      !total net CO2 fixation
+  real(r8) :: ZCSNC(JY,JX)                      !total litterfall C, [g d-2 h-1]
+  real(r8) :: ZZSNC(JY,JX)                      !total litterfall N, [g d-2 h-1]
+  real(r8) :: ZPSNC(JY,JX)                      !total litterfall P, [g d-2 h-1]
+  real(r8) :: RECO(JY,JX)                       !ecosystem respiration, [g d-2 h-1]
+  real(r8) :: TNBP(JY,JX)                       !total NBP, [g d-2]
 
   real(r8) :: RP14X(0:JZ,JY,JX)                 !HPO4 demand in non-band by all microbial,root,myco populations
   real(r8) :: RP14Y(0:JZ,JY,JX)                 !HPO4 demand in non-band by all microbial,root,myco populations

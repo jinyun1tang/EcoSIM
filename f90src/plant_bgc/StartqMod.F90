@@ -3,14 +3,13 @@ module StartqMod
   use EcosimConst
   use GridDataType
   use FlagDataType
-  use PlantDataStateType
   use EcoSIMCtrlDataType
   use PlantDataRateType
-  use PlantDataCharType
   use ClimForcDataType
-  use PhenologyDataType
+  use PlantTraitDataType
   use PlantMngmtDataType
   use CanopyDataType
+  use CanopyRadDataType
   use RootDataType
   use EcoSIMHistMod
   implicit none
@@ -557,7 +556,7 @@ module StartqMod
     HTSHEX(NB,NZ,NY,NX)=0._r8
     DO 5 L=1,NL(NY,NX)
       ARSTK(L,NB,NZ,NY,NX)=0._r8
-      DO N=1,4
+      DO N=1,JLI
         SURFB(N,L,NB,NZ,NY,NX)=0._r8
       enddo
 5   CONTINUE
@@ -589,7 +588,7 @@ module StartqMod
         HCOB(K,NB,NZ,NY,NX)=0._r8
         CPOOL4(K,NB,NZ,NY,NX)=0._r8
         DO 45 L=1,JC
-          DO N=1,4
+          DO N=1,JLI
             SURF(N,L,K,NB,NZ,NY,NX)=0._r8
           enddo
 45      CONTINUE

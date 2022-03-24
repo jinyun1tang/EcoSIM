@@ -5,16 +5,16 @@ module WthrMod
   use data_kind_mod, only : r8 => SHR_KIND_R8
   use MiniMathMod, only : safe_adb,vapsat0,test_aneb,test_aeqb
   use EcosimConst
-  use VegDataType
+  use CanopyRadDataType
   use GridDataType
   use FlagDataType
   use EcoSIMCtrlDataType
   use ClimForcDataType
   use LandSurfDataType
   use FertilizerDataType
-  use PhenologyDataType
-  use PlantDataCharType
+  use PlantTraitDataType
   use AqueChemDatatype
+  use IrrigationDataType
   implicit none
 
   private

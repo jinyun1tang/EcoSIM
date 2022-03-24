@@ -5,22 +5,20 @@ module Hour1Mod
   use EcosimConst
   use MicrobialDataType
   use SOMDataType
-  use SoilChemDataType
+  use ChemTranspDataType
   use FertilizerDataType
-  use VegDataType
+  use CanopyRadDataType
   use Hour1Pars
   use GridDataType
   use SoilPhysDataType
   use FlagDataType
   use SoilHeatDatatype
   use SoilWaterDataType
-  use PlantDataStateType
   use EcoSIMCtrlDataType
   use SoilBGCDataType
-  use PlantDataCharType
   use ClimForcDataType
   use LandSurfDataType
-  use PhenologyDataType
+  use PlantTraitDataType
   use SurfLitterDataType
   use SnowDataType
   use SurfSoilDataType
@@ -30,7 +28,10 @@ module Hour1Mod
   use EcosysBGCFluxType
   use AqueChemDatatype
   use EcoSIMHistMod
-
+  use SoilPropertyDataType
+  use IrrigationDataType
+  use SedimentDataType
+  use PlantDataRateType
   implicit none
 
   private
@@ -2208,10 +2209,10 @@ module Hour1Mod
   integer, intent(in) :: I,J,NY,NX
   real(r8), intent(in) :: DPTH0(JY,JX)
   integer :: NB,NZ,L,K,M,N,NN
-  integer :: IALBS(4,4)
+  integer :: IALBS(JLI,JSA)
   real(r8) :: TAUY(0:JC+1)
-  real(r8) :: PARDIR(4,4,JP,JY,JX)
-  real(r8) :: PARDIW(4,4,JP,JY,JX)
+  real(r8) :: PARDIR(JLI,JSA,JP,JY,JX)
+  real(r8) :: PARDIW(JLI,JSA,JP,JY,JX)
   real(r8) :: RABSL(0:JC+1)
   real(r8) :: RABPL(0:JC+1)
   real(r8) :: RAFSL(0:JC+1)
@@ -2235,8 +2236,10 @@ module Hour1Mod
   real(r8) :: RAYP1(JP,JY,JX),RAYP2(JP,JY,JX)
   real(r8) :: RAYW1(JP,JY,JX),RAYW2(JP,JY,JX)
   real(r8) :: RAYQ1(JP,JY,JX),RAYQ2(JP,JY,JX)
-  REAL(R8) :: RDNDIR(4,4,JP,JY,JX),RDNDIW(4,4,JP,JY,JX)
-  real(r8) :: TSURF(4,JZ,JP,JY,JX),TSURFB(4,JZ,JP,JY,JX)
+  real(r8) :: BETA(JLI,JSA)                         !sine of direct solar radiation on leaf surface, [-]
+  real(r8) :: BETX(JLI,JSA)                         !sine of direct solar radiation on leaf surface/sine of direct solar radiation, [-]
+  REAL(R8) :: RDNDIR(JLI,JSA,JP,JY,JX),RDNDIW(JLI,JSA,JP,JY,JX)
+  real(r8) :: TSURF(JLI,JZ,JP,JY,JX),TSURFB(JLI,JZ,JP,JY,JX)
   real(r8) :: TRADC(JY,JX),TRAPC(JY,JX),TRADG(JY,JX),TRAPG(JY,JX)
   real(r8) :: ALBW,ALBG
   real(r8) :: BETAG,BETY,BETZ
@@ -2345,10 +2348,10 @@ module Hour1Mod
       !     ZAGL=determines forward vs backscattering
       !     IALBS=flag for forward vs backscattering
       !
-      DO 1100 M=1,4
-        ZAZI=SAZI+(M-0.5)*PICON/4
+      DO 1100 M=1,JSA
+        ZAZI=SAZI+(M-0.5)*PICON/real(M,r8)
         DAZI=COS(ZAZI-SAZI)
-        DO  N=1,4
+        DO  N=1,JLI
           BETY=ZCOS(N)*SSIN(NY,NX)+ZSIN(N)*SCOS*DAZI
           BETA(N,M)=ABS(BETY)
           BETX(N,M)=BETA(N,M)/SSIN(NY,NX)
@@ -2405,7 +2408,7 @@ module Hour1Mod
 !
       DO 1150 NZ=1,NP(NY,NX)
         DO  L=1,JC
-          DO  N=1,4
+          DO  N=1,JLI
             TSURF(N,L,NZ,NY,NX)=0.0
             TSURFB(N,L,NZ,NY,NX)=0.0
           enddo
@@ -2416,12 +2419,11 @@ module Hour1Mod
           DO  L=1,JC
             IF(ZL(L-1,NY,NX).GT.DPTHS(NY,NX)-ZERO &
              .AND.ZL(L-1,NY,NX).GT.DPTH0(NY,NX)-ZERO)THEN
-              DO 1205 N=1,4
+              DO 1205 N=1,JLI
                 DO 1210 K=1,25
                   TSURF(N,L,NZ,NY,NX)=TSURF(N,L,NZ,NY,NX)+SURF(N,L,K,NB,NZ,NY,NX)
 1210            CONTINUE
-                TSURFB(N,L,NZ,NY,NX)=TSURFB(N,L,NZ,NY,NX) &
-                  +SURFB(N,L,NB,NZ,NY,NX)
+                TSURFB(N,L,NZ,NY,NX)=TSURFB(N,L,NZ,NY,NX)+SURFB(N,L,NB,NZ,NY,NX)
 1205          CONTINUE
             ENDIF
           enddo
@@ -2497,7 +2499,7 @@ module Hour1Mod
       !     TSURWS=TSURWY with shading from canopy layers above
       !     TSURWX=TSURWS m-2
       !
-            DO 1600 N=1,4
+            DO 1600 N=1,JLI
               TSURFY=TSURF(N,L,NZ,NY,NX)*CFX(NZ,NY,NX)
               TSURFZ=TSURFY*YAREA
               TSURFS=TSURFY*TAUS(L+1,NY,NX)
@@ -2511,7 +2513,7 @@ module Hour1Mod
               !
               !     STOPZ=accumulated horizontal area of intercepted direct radiation
               !
-              DO 1700 M=1,4
+              DO 1700 M=1,JSA
                 RADSL(NZ,NY,NX)=RADSL(NZ,NY,NX)+TSURFS*RDNDIR(N,M,NZ,NY,NX)
                 RADSW(NZ,NY,NX)=RADSW(NZ,NY,NX)+TSURWS*RDNDIW(N,M,NZ,NY,NX)
                 RADPL(NZ,NY,NX)=RADPL(NZ,NY,NX)+TSURFS*PARDIR(N,M,NZ,NY,NX)
@@ -2540,7 +2542,7 @@ module Hour1Mod
                 !     RADYN,RADYW,RAPYN,RAPYW=diffuse SW,PAR flux absorbed by leaf,stalk surf
                 !     OMEGA,OMEGX=incident angle of diffuse radn at leaf,horizontal surface
 !
-                DO 1750 NN=1,4
+                DO 1750 NN=1,JLA
                   RADYN=RADYL*OMEGA(M,N,NN)*ABSR(NZ,NY,NX)
                   RADYW=RADYL*OMEGA(M,N,NN)*ABSRW
                   RAPYN=RAPYL*OMEGA(M,N,NN)*ABSP(NZ,NY,NX)
@@ -2630,8 +2632,8 @@ module Hour1Mod
               RAYW2(NZ,NY,NX)=RAYW2(NZ,NY,NX)*XTAUY
               RAYP2(NZ,NY,NX)=RAYP2(NZ,NY,NX)*XTAUY
               RAYQ2(NZ,NY,NX)=RAYQ2(NZ,NY,NX)*XTAUY
-              DO 1730 N=1,4
-                DO  M=1,4
+              DO 1730 N=1,JLI
+                DO  M=1,JSA
                   PARDIF(N,M,L,NZ,NY,NX)=PARDIF(N,M,L,NZ,NY,NX)*XTAUY
                   PAR(N,M,L,NZ,NY,NX)=PARDIR(N,M,NZ,NY,NX)+PARDIF(N,M,L,NZ,NY,NX)
                 enddo
@@ -2703,7 +2705,7 @@ module Hour1Mod
       RAPYG=RAPYL*TAUY(1)+RAFPL(1)
       RASG=ABS(BETAG)*RADSG
       RAPG=ABS(BETAG)*RAPSG
-      DO 20 N=1,4
+      DO 20 N=1,JSA
         RASG=RASG+ABS(OMEGAG(N,NY,NX))*RADYG
         RAPG=RAPG+ABS(OMEGAG(N,NY,NX))*RAPYG
 20    CONTINUE
@@ -2763,11 +2765,11 @@ module Hour1Mod
             RAYSW(NZ,NY,NX)=0.0
             RAYPL(NZ,NY,NX)=0.0
             RAYPW(NZ,NY,NX)=0.0
-            DO 2600 N=1,4
+            DO 2600 N=1,JLI
               TSURFY=TSURF(N,L,NZ,NY,NX)*CFX(NZ,NY,NX)
               TSURWY=TSURFB(N,L,NZ,NY,NX)*CFW
-              DO 2700 M=1,4
-                DO 2750 NN=1,4
+              DO 2700 M=1,JSA
+                DO 2750 NN=1,JLA
                   RADYN=RADYL*OMEGA(M,N,NN)*ABSR(NZ,NY,NX)
                   RADYW=RADYL*OMEGA(M,N,NN)*ABSRW
                   RAPYN=RAPYL*OMEGA(M,N,NN)*ABSP(NZ,NY,NX)
@@ -2800,7 +2802,7 @@ module Hour1Mod
 !
     ELSE
       RASG=ABS(BETAG)*RADS(NY,NX)
-      DO 120 N=1,4
+      DO 120 N=1,JSA
         RASG=RASG+ABS(OMEGAG(N,NY,NX))*RADY(NY,NX)
 120   CONTINUE
       RADG(NY,NX)=RASG*AREA(3,NU(NY,NX),NY,NX)
@@ -2964,7 +2966,7 @@ module Hour1Mod
 
   integer :: NX,NY
   real(r8) :: OFC(2),OFN(2),OFP(2)
-  integer :: LFDPTH
+  integer :: LFDPTH = 0
 !     begin_execution
 
   DO 8990 NX=NHW,NHE

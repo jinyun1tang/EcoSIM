@@ -10,7 +10,7 @@ module InitVegBGC
 
 !------------------------------------------------------------------------------------------
   subroutine InitIrradianceGeometry(YSIN,YCOS,YAZI)
-  use VegDataType
+  use CanopyRadDataType
   implicit none
 
 

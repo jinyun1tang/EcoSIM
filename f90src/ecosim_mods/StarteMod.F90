@@ -2,7 +2,7 @@ module StarteMod
   use data_kind_mod, only : r8 => SHR_KIND_R8
   use minimathmod, only : test_aeqb
   use SOMDataType
-  use SoilChemDataType
+  use ChemTranspDataType
   use GridDataType
   use FlagDataType
   use SoilPhysDataType
@@ -15,6 +15,9 @@ module StarteMod
   use SnowDataType
   use SoilBGCDataType
   use EcoSIMHistMod
+  use SoilPropertyDataType
+  use IrrigationDataType
+  use AqueChemDatatype
   implicit none
 
   private

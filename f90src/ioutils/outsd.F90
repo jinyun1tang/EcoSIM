@@ -14,12 +14,15 @@
   use EcoSIMCtrlDataType
   use ClimForcDataType
   use SnowDataType
-  use SoilChemDataType
+  use ChemTranspDataType
+  use PlantTraitDataType
   use PlantMngmtDataType
   use CanopyDataType
   use EcosysBGCFluxType
   use EcoSIMHistMod
-
+  use SoilPropertyDataType
+  use SoilBGCDataType
+  use AqueChemDatatype
   implicit none
   integer, intent(in) :: I,NT,NE,NAX,NDX,NTX,NEX,NHW,NHE,NVN,NVS
 

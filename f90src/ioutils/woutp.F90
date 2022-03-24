@@ -9,15 +9,13 @@
   use data_kind_mod, only : r8 => SHR_KIND_R8
   use GridDataType
   use FlagDataType
-  use PlantDataStateType
   use PlantDataRateType
-  use PlantDataCharType
-  use PhenologyDataType
+  use PlantTraitDataType
   use PlantMngmtDataType
   use RootDataType
   use CanopyDataType
   use EcoSIMHistMod
-
+  use CanopyRadDataType
   implicit none
   integer, intent(in) :: I,NHW,NHE,NVN,NVS
 
@@ -177,14 +175,14 @@
                 WRITE(28,94)I,IDATA(3),NZ,(WGLFLN(L,K,NB,NZ,NY,NX),L=1,JC)
                 WRITE(28,94)I,IDATA(3),NZ,(WGLFLP(L,K,NB,NZ,NY,NX),L=1,JC)
                 IF(K.NE.0)THEN
-                  DO 9940 N=1,4
+                  DO 9940 N=1,JLI
                     WRITE(28,94)I,IDATA(3),NZ,(SURF(N,L,K,NB,NZ,NY,NX),L=1,JC)
 9940              CONTINUE
                 ENDIF
 9950          CONTINUE
               WRITE(28,94)I,IDATA(3),NZ,(ARSTK(L,NB,NZ,NY,NX),L=1,JC)
               DO  L=1,JC
-                WRITE(28,92)I,IDATA(3),NZ,(SURFB(N,L,NB,NZ,NY,NX),N=1,4)
+                WRITE(28,92)I,IDATA(3),NZ,(SURFB(N,L,NB,NZ,NY,NX),N=1,JLI)
               ENDDO
 9945        CONTINUE
             DO 9970 N=1,MY(NZ,NY,NX)

@@ -9,6 +9,7 @@ module InitSOMBGC
   use SoilWaterDataType
   use EcosimConst
   use SurfLitterDataType
+  use SoilPropertyDataType
   implicit none
 
   private

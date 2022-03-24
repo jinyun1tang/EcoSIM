@@ -12,7 +12,7 @@
   use SoilBGCDataType
   use ClimForcDataType
   use FertilizerDataType
-  use PhenologyDataType
+  use PlantTraitDataType
   use SurfLitterDataType, only : XCORP
   use PlantDataRateType
   use CanopyDataType
@@ -21,6 +21,9 @@
   use SOMDataType
   use EcosysBGCFluxType
   use EcoSIMHistMod
+  use SoilPropertyDataType
+  use IrrigationDataType
+  use SedimentDataType
   implicit none
 
   private

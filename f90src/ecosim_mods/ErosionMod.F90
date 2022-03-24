@@ -11,8 +11,10 @@ module ErosionMod
   use SoilWaterDataType
   use LandSurfDataType
   use SurfSoilDataType
-  use SoilChemDataType
+  use ChemTranspDataType
   use AqueChemDatatype
+  use SoilPropertyDataType
+  USE SedimentDataType
   implicit none
 
   private

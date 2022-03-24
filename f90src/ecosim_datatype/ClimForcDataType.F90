@@ -2,23 +2,25 @@ module ClimForcDataType
   use data_kind_mod, only : r8 => SHR_KIND_R8
   use GridDataType
 implicit none
-    real(r8) :: DECLIN
-    real(r8) :: RMAX       !maximum hourly radiation,	[MJ m-2 h-1]
-    real(r8) :: TAVG1      !parameter to calculate hourly  air temperature from daily value	[oC]
-    real(r8) :: TAVG2      !parameter to calculate hourly  air temperature from daily value	[oC]
-    real(r8) :: TAVG3      !parameter to calculate hourly  air temperature from daily value	[oC]
-    real(r8) :: AMP1       !parameter to calculate hourly  air temperature from daily value	[oC]
-    real(r8) :: AMP2       !parameter to calculate hourly  air temperature from daily value	[oC]
-    real(r8) :: AMP3       !parameter to calculate hourly  air temperature from daily value	[oC]
-    real(r8) :: VAVG1      !parameter to calculate hourly  vapor pressure from daily value	[kPa]
-    real(r8) :: VAVG2      !parameter to calculate hourly  vapor pressure from daily value	[kPa]
-    real(r8) :: VAVG3      !parameter to calculate hourly  vapor pressure from daily value	[kPa]
-    real(r8) :: VMP1       !parameter to calculate hourly  vapor pressure from daily value	[kPa]
-    real(r8) :: VMP2       !parameter to calculate hourly  vapor pressure from daily value	[kPa]
-    real(r8) :: VMP3       !parameter to calculate hourly  vapor pressure from daily value	[kPa]
-    real(r8) :: SAZI                              !solar azimuth of solar angle
-    real(r8) :: SCOS                              !cosine of solar angle
-    real(r8) :: DOY                               !day of year
+  character(len=*), private, parameter :: mod_filename = __FILE__
+
+  real(r8) :: DECLIN
+  real(r8) :: RMAX       !maximum hourly radiation,	[MJ m-2 h-1]
+  real(r8) :: TAVG1      !parameter to calculate hourly  air temperature from daily value	[oC]
+  real(r8) :: TAVG2      !parameter to calculate hourly  air temperature from daily value	[oC]
+  real(r8) :: TAVG3      !parameter to calculate hourly  air temperature from daily value	[oC]
+  real(r8) :: AMP1       !parameter to calculate hourly  air temperature from daily value	[oC]
+  real(r8) :: AMP2       !parameter to calculate hourly  air temperature from daily value	[oC]
+  real(r8) :: AMP3       !parameter to calculate hourly  air temperature from daily value	[oC]
+  real(r8) :: VAVG1      !parameter to calculate hourly  vapor pressure from daily value	[kPa]
+  real(r8) :: VAVG2      !parameter to calculate hourly  vapor pressure from daily value	[kPa]
+  real(r8) :: VAVG3      !parameter to calculate hourly  vapor pressure from daily value	[kPa]
+  real(r8) :: VMP1       !parameter to calculate hourly  vapor pressure from daily value	[kPa]
+  real(r8) :: VMP2       !parameter to calculate hourly  vapor pressure from daily value	[kPa]
+  real(r8) :: VMP3       !parameter to calculate hourly  vapor pressure from daily value	[kPa]
+  real(r8) :: SAZI                              !solar azimuth of solar angle
+  real(r8) :: SCOS                              !cosine of solar angle
+  real(r8) :: DOY                               !day of year
 
   real(r8) :: TMPX(366)                         !maximum daily air temperature, [oC]
   real(r8) :: TMPN(366)                         !minimum daily air temperature, [oC]

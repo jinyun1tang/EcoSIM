@@ -9,10 +9,10 @@ module StartsMod
   use EcosimConst
   use MicrobialDataType
   use SOMDataType
-  use SoilChemDataType
+  use ChemTranspDataType
   use FertilizerDataType
   use InitSOMBGC
-  use VegDataType
+  use CanopyRadDataType
   use GridDataType
   use SoilPhysDataType
   use FlagDataType
@@ -22,7 +22,8 @@ module StartsMod
   use ClimForcDataType
   use LandSurfDataType
   use SnowDataType
-  use PlantDataCharType
+  use PlantTraitDataType
+  use PlantDataRateType
   use SurfLitterDataType
   use CanopyDataType
   use SurfSoilDataType
@@ -31,6 +32,9 @@ module StartsMod
   use EcoSimSumDataType
   use RootDataType
   use EcosysBGCFluxType
+  use SoilPropertyDataType
+  use IrrigationDataType
+  use SedimentDataType
   implicit none
 
   private
@@ -643,7 +647,7 @@ module StartsMod
 !    compute incident sky aNGLe at ground surface
       GSIN(NY,NX)=SLOPE(0,NY,NX)
       GCOS(NY,NX)=SQRT(1.0-GSIN(NY,NX)**2)
-      DO 240 N=1,4
+      DO 240 N=1,JSA
         DGAZI=COS(GAZI(NY,NX)-YAZI(N))
         OMEGAG(N,NY,NX)=AMAX1(0.0,AMIN1(1.0,GCOS(NY,NX)*YSIN(N)+GSIN(NY,NX)*YCOS(N)*DGAZI))
 240   CONTINUE

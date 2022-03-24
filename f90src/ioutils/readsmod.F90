@@ -14,7 +14,7 @@ module readsmod
   use EcoSIMCtrlDataType
   use EcosimConst
   use EcoSIMHistMod
-
+  use IrrigationDataType
   implicit none
   private
 

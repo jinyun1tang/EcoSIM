@@ -7,7 +7,7 @@ module NitroDisturbMod
   use MicrobialDataType
   use NitroPars
   use SOMDataType
-  use SoilChemDataType
+  use ChemTranspDataType
   use FertilizerDataType
   use GridDataType
   use SoilPhysDataType
@@ -18,6 +18,9 @@ module NitroDisturbMod
   use EcosimConst
   use PlantMngmtDataType
   use EcoSimSumDataType
+  use EcosysBGCFluxType
+  use SoilBGCDataType
+  use AqueChemDatatype
   implicit none
 
   private

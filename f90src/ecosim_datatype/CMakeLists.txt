@@ -4,17 +4,15 @@ set(ECOSIM_DATATYPE_SOURCES
   SOMDataType.F90
   SoilPhysDataType.F90
   FlagDataType.F90
-  SoilChemDataType.F90
-  PhenologyDataType.F90
+  ChemTranspDataType.F90
+  PlantTraitDataType.F90
   FertilizerDataType.F90
-  VegDataType.F90
+  CanopyRadDataType.F90
   EcoSIMCtrlDataType.F90
   SoilHeatDatatype.F90
   SoilWaterDataType.F90
   SoilBGCDataType.F90
-  PlantDataStateType.F90
   PlantDataRateType.F90
-  PlantDataCharType.F90
   ClimForcDataType.F90
   LandSurfDataType.F90
   SnowDataType.F90
@@ -27,12 +25,14 @@ set(ECOSIM_DATATYPE_SOURCES
   EcosysBGCFluxType.F90
   AqueChemDatatype.F90
   EcoSIMHistMod.F90
+  SoilPropertyDataType.F90
+  IrrigationDataType.F90
+  SedimentDataType.F90
 )
 
 include_directories(${CMAKE_BINARY_DIR}/f90src/utils/)
 
 configure_file(solutepar.h  solutepar.h COPYONLY)
-
 
 include(add_ecosim_library)
 add_ecosim_library(ecosim_datatype ${ECOSIM_DATATYPE_SOURCES})

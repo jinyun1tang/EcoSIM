@@ -9,12 +9,13 @@ module readqmod
   use FlagDataType
   use EcoSIMCtrlDataType
   use ClimForcDataType
-  use PhenologyDataType
-  use PlantDataCharType
+  use CanopyDataType
+  use PlantTraitDataType
   use PlantMngmtDataType
   use EcosimConst
+  use RootDataType
   use EcoSIMHistMod
-
+  use CanopyRadDataType
   implicit none
   private
 
@@ -431,7 +432,7 @@ END SUBROUTINE readq
 !   WTSTDI=mass of dead standing biomass at planting
 !
     READ(11,*)SLA1(NZ,NY,NX),SSL1(NZ,NY,NX),SNL1(NZ,NY,NX)
-    READ(11,*)(CLASS(N,NZ,NY,NX),N=1,4),CFI(NZ,NY,NX),ANGBR(NZ,NY,NX) &
+    READ(11,*)(CLASS(N,NZ,NY,NX),N=1,JLI),CFI(NZ,NY,NX),ANGBR(NZ,NY,NX) &
       ,ANGSH(NZ,NY,NX)
     READ(11,*)STMX(NZ,NY,NX),SDMX(NZ,NY,NX),GRMX(NZ,NY,NX) &
       ,GRDM(NZ,NY,NX),GFILL(NZ,NY,NX),WTSTDI(NZ,NY,NX)
@@ -441,7 +442,7 @@ END SUBROUTINE readq
       write(*,*)'growth in petiole length vs mass: SSL1 ',SSL1(NZ,NY,NX)
       write(*,*)'growth in internode length vs mass: SNL1',SNL1(NZ,NY,NX)
       write(*,*)'fraction of leaf area in 0-22.5,45,67.5,90o '// &
-        'inclination classes: CLASS',(CLASS(N,NZ,NY,NX),N=1,4)
+        'inclination classes: CLASS',(CLASS(N,NZ,NY,NX),N=1,JLI)
       write(*,*)'initial clumping factor: CFI',CFI(NZ,NY,NX)
       write(*,*)'stem angle from horizontal: ANGBR',ANGBR(NZ,NY,NX)
       write(*,*)'petiole angle from horizontal: ANGSH',ANGSH(NZ,NY,NX)

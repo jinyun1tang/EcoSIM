@@ -2,7 +2,7 @@ module SoluteMod
   use data_kind_mod, only : r8 => SHR_KIND_R8
   use minimathmod, only : test_aeqb
   use SOMDataType
-  use SoilChemDataType
+  use ChemTranspDataType
   use FertilizerDataType
   use GridDataType
   use FlagDataType
@@ -14,6 +14,8 @@ module SoluteMod
   use SurfLitterDataType
   use RootDataType
   use AqueChemDatatype
+  use SoilPropertyDataType
+  use PlantDataRateType
   implicit none
 
   private

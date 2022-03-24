@@ -8,16 +8,14 @@
   use StartqMod    , only : startq
   use GridDataType
   use FlagDataType
-  use PlantDataStateType
   use PlantDataRateType
-  use PlantDataCharType
   use EcoSIMCtrlDataType
-  use PhenologyDataType
+  use PlantTraitDataType
   use PlantMngmtDataType
   use CanopyDataType
   use RootDataType
   use EcoSIMHistMod
-
+  use CanopyRadDataType
   implicit none
   integer, intent(in) :: NHW,NHE,NVN,NVS
 
@@ -196,7 +194,7 @@
 9950          CONTINUE
               READ(28,94)IDATE,IYR,NZ,(ARSTK(L,NB,NZ,NY,NX),L=1,JC)
               DO L=1,JC
-                READ(28,92)IDATE,IYR,NZ,(SURFB(N,L,NB,NZ,NY,NX),N=1,4)
+                READ(28,92)IDATE,IYR,NZ,(SURFB(N,L,NB,NZ,NY,NX),N=1,JLI)
               ENDDO
 9945        CONTINUE
             DO 9970 N=1,MY(NQ,NY,NX)
@@ -371,7 +369,7 @@
                 HTSHEX(NB,NZ,NY,NX)=0.0
                 DO 5 L=1,JZ
                   ARSTK(L,NB,NZ,NY,NX)=0.0
-                  DO N=1,4
+                  DO N=1,JLI
                     SURFB(N,L,NB,NZ,NY,NX)=0.0
                   ENDDO
 5               CONTINUE

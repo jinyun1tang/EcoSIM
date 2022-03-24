@@ -9,9 +9,8 @@
       use data_kind_mod, only : r8 => SHR_KIND_R8
   use FlagDataType
   use GridDataType
-  use PlantDataStateType
+  use PlantTraitDataType
   use PlantDataRateType
-  use PlantDataCharType
   use ClimForcDataType
   use CanopyDataType
   use RootDataType

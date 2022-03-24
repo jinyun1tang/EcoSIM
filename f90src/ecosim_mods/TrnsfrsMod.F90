@@ -15,11 +15,14 @@ module TrnsfrsMod
   use SurfLitterDataType
   use SnowDataType
   use SurfSoilDataType
-  use SoilChemDataType
+  use ChemTranspDataType
   use LandSurfDataType
   use SoilBGCDataType
   use RootDataType
   use AqueChemDatatype
+  use SoilPropertyDataType
+  use IrrigationDataType
+  use PlantDataRateType
   implicit none
 
   private

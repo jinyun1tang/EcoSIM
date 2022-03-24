@@ -7,12 +7,12 @@ module readiMod
   use fileUtil     , only : open_safe
   use minimathmod  , only : test_aeqb
   use SOMDataType
-  use VegDataType
+  use CanopyRadDataType
   use EcosimConst
   use GridDataType
   use SoilPhysDataType
   use FlagDataType
-  use SoilChemDataType
+  use ChemTranspDataType
   use LandSurfDataType
   use ClimForcDataType
   use SoilWaterDataType
@@ -20,7 +20,9 @@ module readiMod
   use SurfLitterDataType
   use SnowDataType
   use EcoSIMHistMod
-
+  use SoilPropertyDataType
+  use SoilBGCDataType
+  use AqueChemDatatype
   implicit none
   private
 

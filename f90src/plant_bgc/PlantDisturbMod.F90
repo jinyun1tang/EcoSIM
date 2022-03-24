@@ -6,14 +6,12 @@ module PlantDisturbMod
   use minimathmod, only : test_aeqb
   use SOMDataType
   use GrosubPars
-  use PhenologyDataType
+  use PlantTraitDataType
   use GridDataType
   use FlagDataType
-  use PlantDataStateType
   use SoilWaterDataType
   use EcoSIMCtrlDataType
   use PlantDataRateType
-  use PlantDataCharType
   use FertilizerDataType
   use ClimForcDataType
   use EcosimConst

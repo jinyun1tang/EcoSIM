@@ -6,18 +6,16 @@ module grosubMod
   use data_kind_mod, only : r8 => SHR_KIND_R8
   use SOMDataType
   use EcosimConst
-  use VegDataType
+  use CanopyRadDataType
   use GrosubPars
-  use PhenologyDataType
+  use PlantTraitDataType
   use GridDataType
   use SoilPhysDataType
   use FlagDataType
   use SoilHeatDatatype
   use SoilWaterDataType
-  use PlantDataStateType
   use EcoSIMCtrlDataType
   use PlantDataRateType
-  use PlantDataCharType
   use ClimForcDataType
   use PlantMngmtDataType
   use RootDataType
@@ -25,6 +23,7 @@ module grosubMod
   use EcoSimSumDataType
   use SoilBGCDataType
   use EcosysBGCFluxType
+  use SoilPropertyDataType
   implicit none
 
   private
@@ -5594,7 +5593,7 @@ end subroutine PrimRootRemobilization
       !     LHTLFL,LHTLFU=layer number of leaf base,tip
       !     FRACL=leaf fraction in each layer
 !
-      DO 555 N=4,1,-1
+      DO 555 N=JLI,1,-1
         YLGLF=ZSIN(N)*CLASS(N,NZ,NY,NX)*XLGLF
         HTLFL=AMIN1(ZCX(NZ,NY,NX)+0.01-YLGLF,HTLF+TLGLF)
         HTLFU=AMIN1(ZCX(NZ,NY,NX)+0.01,HTLFL+YLGLF)
@@ -5992,7 +5991,7 @@ end subroutine AllocateLeafToCanopyLayers
   ! begin_execution
   DO 900 K=1,25
     DO  L=1,JC
-      DO  N=1,4
+      DO  N=1,JLI
         SURF(N,L,K,NB,NZ,NY,NX)=0._r8
       enddo
     enddo
@@ -6005,18 +6004,11 @@ end subroutine AllocateLeafToCanopyLayers
     IF(ARLF(K,NB,NZ,NY,NX).GT.0.0)THEN
       DO 700 L=JC,1,-1
 !       ARLFXL=ARLFXL+ARLFL(L,K,NB,NZ,NY,NX)
-        DO 800 N=1,4
+        DO 800 N=1,JLI
           SURF(N,L,K,NB,NZ,NY,NX)=AMAX1(0.0_r8,CLASS(N,NZ,NY,NX) &
             *0.25_r8*ARLFL(L,K,NB,NZ,NY,NX))
   !       SURFXX=SURFXX+SURF(N,L,K,NB,NZ,NY,NX)
-  !       IF(NZ.EQ.2)THEN
-  !       WRITE(*,6363)'SURF',I,J,NX,NY,NZ,NB,K,L,N
-  !      2,ARLFL(L,K,NB,NZ,NY,NX)
-  !      2,SURF(N,L,K,NB,NZ,NY,NX),CLASS(N,NZ,NY,NX),ARLF(K,NB,NZ,NY,NX)
-  !      3,ARLFXB,ARLFXL,SURFXX,ARLF(0,NB,NZ,NY,NX)
-  !      4,ARLFB(NB,NZ,NY,NX),ZC(NZ,NY,NX)
-  !6363    FORMAT(A8,9I4,20E12.4)
-  !       ENDIF
+
 800     CONTINUE
 700   CONTINUE
     ENDIF
@@ -6030,17 +6022,19 @@ end subroutine AllocateLeafToCanopyLayers
 ! ARSTK=total branch stalk surface area in each layer
 !
   DO 910 L=1,JC
-    DO  N=1,4
+    DO  N=1,JLI
       SURFB(N,L,NB,NZ,NY,NX)=0._r8
     enddo
-910   CONTINUE
+910  CONTINUE
+
   IF(NB.EQ.NB1(NZ,NY,NX))THEN
-    N=4
+    N=JLI
   ELSE
-    N=MIN(4,INT(ASIN(ANGBR(NZ,NY,NX))/0.3927)+1)
+    N=MIN(JLI,INT(ASIN(ANGBR(NZ,NY,NX))/dangle)+1)
   ENDIF
   DO 710 L=JC,1,-1
-    SURFB(N,L,NB,NZ,NY,NX)=0.25*ARSTK(L,NB,NZ,NY,NX)
+!    SURFB(N,L,NB,NZ,NY,NX)=0.25*ARSTK(L,NB,NZ,NY,NX)
+    SURFB(N,L,NB,NZ,NY,NX)=ARSTK(L,NB,NZ,NY,NX)/real(JLI,r8)
 710   CONTINUE
   end subroutine LeafClassAllocation
 !------------------------------------------------------------------------------------------
@@ -7418,7 +7412,7 @@ end subroutine CarbNutInBranchTransfer
       WGLFLN(L,K,NB,NZ,NY,NX)=0._r8
       WGLFLP(L,K,NB,NZ,NY,NX)=0._r8
       IF(K.NE.0)THEN
-        DO 8860 N=1,4
+        DO 8860 N=1,JLI
           SURF(N,L,K,NB,NZ,NY,NX)=0._r8
 8860    CONTINUE
       ENDIF
@@ -7426,7 +7420,7 @@ end subroutine CarbNutInBranchTransfer
 8855  CONTINUE
   DO 8875 L=1,JC
     ARSTK(L,NB,NZ,NY,NX)=0._r8
-    DO  N=1,4
+    DO  N=1,JLI
       SURFB(N,L,NB,NZ,NY,NX)=0._r8
     enddo
 8875  CONTINUE
@@ -7464,8 +7458,8 @@ end subroutine CarbNutInBranchTransfer
 !
 !     FOR EACH LEAF AZIMUTH AND INCLINATION
 !
-      DO 115 N = 1,4
-        DO 120 M = 1,4
+      DO 115 N = 1,JLI
+        DO 120 M = 1,JSA
 !
 !         CO2 FIXATION IN MESOPHYLL BY SUNLIT LEAVES
 !
@@ -7792,8 +7786,8 @@ end subroutine CarbNutInBranchTransfer
 !
 !     FOR EACH LEAF AZIMUTH AND INCLINATION
 !
-      DO 215 N=1,4
-        DO 220 M=1,4
+      DO 215 N=1,JLI
+        DO 220 M=1,JSA
 !
 !         CO2 FIXATION BY SUNLIT LEAVES
 !

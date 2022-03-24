@@ -3,14 +3,13 @@
   use data_kind_mod, only : r8 => SHR_KIND_R8
   use GridDataType
   use FlagDataType
-  use PlantDataStateType
   use PlantDataRateType
   use EcoSIMCtrlDataType
-  use PlantDataCharType
   use ClimForcDataType
   use LandSurfDataType
-  use PhenologyDataType
+  use PlantTraitDataType
   use CanopyDataType
+  use CanopyRadDataType
   implicit none
 
   private
@@ -194,8 +193,8 @@
 !     begin_execution
 !     FOR EACH INCLINATION AND AZIMUTH CLASS
 !
-  DO 3600 N=1,4
-    DO 3500 M=1,4
+  DO 3600 N=1,JLI
+    DO 3500 M=1,JSA
       IF(SURFX(N,L,K,NB,NZ,NY,NX).GT.ZEROP(NZ,NY,NX))THEN
 !
 !     SUNLIT LEAVES
@@ -420,8 +419,8 @@
 !
 !     FOR EACH INCLINATION AND AZIMUTH CLASS
 !
-  DO 2600 N=1,4
-    DO 2500 M=1,4
+  DO 2600 N=1,JLI
+    DO 2500 M=1,JSA
       IF(SURFX(N,L,K,NB,NZ,NY,NX).GT.ZEROP(NZ,NY,NX))THEN
 !
 !     SUNLIT LEAVES

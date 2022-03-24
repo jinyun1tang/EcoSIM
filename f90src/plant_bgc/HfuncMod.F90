@@ -8,17 +8,17 @@ module HfuncMod
   use EcosimConst
   use GridDataType
   use FlagDataType
-  use PlantDataStateType
   use EcoSIMCtrlDataType
-  use PlantDataCharType
   use ClimForcDataType
-  use PhenologyDataType
+  use PlantTraitDataType
   use PlantMngmtDataType
+  use PlantDataRateType
   use SnowDataType
   use CanopyDataType
   use RootDataType
   use SOMDataType
   use EcoSIMHistMod
+  use EcosysBGCFluxType
   implicit none
 
   private

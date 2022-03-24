@@ -4,25 +4,25 @@ module UptakeMod
   use minimathmod  , only : safe_adb,vapsat,test_aneb
   use EcosimConst
   use SOMDataType
-  use SoilChemDataType
+  use ChemTranspDataType
   use UptakePars
   use GridDataType
   use SoilPhysDataType
   use FlagDataType
   use SoilHeatDatatype
   use SoilWaterDataType
-  use PlantDataStateType
   use PlantDataRateType
   use EcoSIMCtrlDataType
   use SoilBGCDataType
-  use PlantDataCharType
   use ClimForcDataType
   use LandSurfDataType
-  use PhenologyDataType
+  use PlantTraitDataType
   use SnowDataType
   use RootDataType
   use CanopyDataType
   use EcosysBGCFluxType
+  use SoilPropertyDataType
+  use CanopyRadDataType
   implicit none
 
   private
@@ -311,7 +311,7 @@ module UptakeMod
         KLEAFX(NB,NZ,NY,NX)=K
       ENDIF
       DO 600 L=JC,1,-1
-        DO 650 N=1,4
+        DO 650 N=1,JLI
           SURFX(N,L,K,NB,NZ,NY,NX)=SURF(N,L,K,NB,NZ,NY,NX)*CFX(NZ,NY,NX)
 650     CONTINUE
 600   CONTINUE

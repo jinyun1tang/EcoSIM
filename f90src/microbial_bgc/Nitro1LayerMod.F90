@@ -10,7 +10,7 @@ module nitro1LayerMod
   use MicrobialDataType
   use NitroPars
   use SOMDataType
-  use SoilChemDataType
+  use ChemTranspDataType
   use FertilizerDataType
   use NitroDiagTypes
   use GridDataType
@@ -24,6 +24,9 @@ module nitro1LayerMod
   use SurfLitterDataType
   use RootDataType
   use EcosysBGCFluxType
+  use SoilPropertyDataType
+  use IrrigationDataType
+  use PlantDataRateType
   implicit none
 
   private
@@ -2725,17 +2728,16 @@ module nitro1LayerMod
   real(r8) :: RGOFX,RGOFY,RGOFZ
   real(r8) :: FSBST
 !     begin_execution
-  associate(                  &
-    FCNP => nmics%FCNP,       &
-    OMA  => nmics%OMA ,       &
-    ROXYM  => nmicf%ROXYM,    &
-    ROXYP=> nmicf%ROXYP  ,    &
-    ROQCD  => nmicf%ROQCD     &
+  associate(                    &
+    FCNP   => nmics%FCNP,       &
+    OMA    => nmics%OMA ,       &
+    ROXYM  => nmicf%ROXYM,      &
+    ROXYP  => nmicf%ROXYP  ,    &
+    ROQCD  => nmicf%ROQCD       &
   )
   GH2X=8.3143E-03*TKS(L,NY,NX)*LOG((AMAX1(1.0E-03,CH2GS(L,NY,NX))/H2KI)**4)
   GH2F=GH2X/72.0
-  GOAX=8.3143E-03*TKS(L,NY,NX) &
-    *LOG((AMAX1(ZERO,COQA(K,L,NY,NX))/OAKI)**2)
+  GOAX=8.3143E-03*TKS(L,NY,NX)*LOG((AMAX1(ZERO,COQA(K,L,NY,NX))/OAKI)**2)
   GOAF=GOAX/72.0
   GHAX=GH2F+GOAF
   IF(N.EQ.4)THEN
@@ -3249,8 +3251,7 @@ module nitro1LayerMod
           ENDIF
           OXYS1=OXYS1-RMPOX
           IF(THETPM(M,L,NY,NX).GT.THETX.AND.VOLPOX.GT.ZEROS(NY,NX))THEN
-            ROXDFQ=DFGS(M,L,NY,NX)*(AMAX1(ZEROS(NY,NX),OXYG1)*VOLWOX &
-              -OXYS1*VOLPOX)/VOLWPM
+            ROXDFQ=DFGS(M,L,NY,NX)*(AMAX1(ZEROS(NY,NX),OXYG1)*VOLWOX-OXYS1*VOLPOX)/VOLWPM
           ELSE
             ROXDFQ=0.0_r8
           ENDIF
@@ -3258,25 +3259,7 @@ module nitro1LayerMod
           OXYS1=OXYS1+ROXDFQ
           RUPOX(NGL,N,K)=RUPOX(NGL,N,K)+RMPOX
           ROXSK(M,L,NY,NX)=ROXSK(M,L,NY,NX)+RMPOX
-!         IF(I.EQ.151.AND.J.EQ.24.AND.L.LE.5.AND.M.EQ.NPH.AND.MX.EQ.NPT)THEN
-!     WRITE(*,5545)'RMPOX',I,J,L,K,N,M,MX,OXYS1,ROXDFQ,ROXYLX,RMPOX
-!    2,DFGS(M,L,NY,NX),OXYG1,VOLWOX,VOLPOX,VOLWPM,X,B,C
-!    3,RUPMX,DIFOX,OXKX,COXYS1,FOXYX,ROXYL(L,NY,NX)
-!    4,ROXSK(M,L,NY,NX),VOLWM(M,L,NY,NX)/VOLY(L,NY,NX)
-!    5,OXYS(L,NY,NX)
-!5545  FORMAT(A8,7I4,30E16.6)
-          !     ENDIF
-!     IF((I/120)*120.EQ.I.AND.J.EQ.24.AND.L.LE.3
-!    2.AND.K.GE.3.AND.N.EQ.3)THEN
-!     WRITE(*,5544)'OXY',I,J,L,K,N,M,MX,RUPOX(NGL,N,K),ROXYP(NGL,N,K)
-!    2,ROXSK(M,L,NY,NX),RUPMX,RMPOX,DIFOX,OLSGL1,BIOS,OMA(NGL,N,K),X
-!    2,ROXDFQ,ROXYLX,ROXYFX,FOXYX,COXYS1,OXYS1,OXYG1,OXYS1
-!    4/(VOLWM(M,L,NY,NX)*FOXYX),OXYG1/(VOLPM(M,L,NY,NX)*FOXYX)
-!    5,THETW1,THETPM(M,L,NY,NX),DFGS(M,L,NY,NX),ROXSK(M,L,NY,NX)
-!    6,VOLPM(M,L,NY,NX),VOLWM(M,L,NY,NX),VOLA(L,NY,NX)
-!    7,COXYS(L,NY,NX),COXYG(L,NY,NX),ROXYY(L,NY,NX)
-!5544  FORMAT(A8,7I4,50E12.4)
-!     ENDIF
+
 425     CONTINUE
 420   CONTINUE
       !write(*,*)'420'

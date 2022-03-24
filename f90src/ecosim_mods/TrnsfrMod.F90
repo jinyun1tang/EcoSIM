@@ -5,7 +5,7 @@ module TrnsfrMod
   use data_kind_mod, only : r8 => SHR_KIND_R8
   use minimathmod, only : test_aeqb,safe_adb
   use SOMDataType
-  use SoilChemDataType
+  use ChemTranspDataType
   use GridDataType
   use SoilPhysDataType
   use SoilHeatDatatype
@@ -21,6 +21,9 @@ module TrnsfrMod
   use LandSurfDataType
   use RootDataType
   use AqueChemDatatype
+  use SoilPropertyDataType
+  use IrrigationDataType
+  use PlantDataRateType
   implicit none
 
   private
@@ -3472,10 +3475,10 @@ module TrnsfrMod
       end subroutine OverlandFlowSnowdriftTransport
 !------------------------------------------------------------------------------------------
 
-      subroutine SurfaceGasVolatilDissol(NY,NX)
-      implicit none
+  subroutine SurfaceGasVolatilDissol(NY,NX)
+  implicit none
 
-      integer, intent(in) :: NY, NX
+  integer, intent(in) :: NY, NX
 !
 !     VOLT=litter volume from hour1.f
 !     VOLWM,VOLPM=micropore water volume, air volume from watsub.f
@@ -3493,98 +3496,85 @@ module TrnsfrMod
 !             :N4B=NH4,N3B=NH3,NOB=NO3,N2B=NO2,P1B=HPO4,POB=H2PO4 in band
 !     R*DXR=gas exchange between atmosphere and surface litter water for gas flux calculations
 !
-      IF(VOLT(0,NY,NX).GT.ZEROS2(NY,NX) &
-      .AND.VOLPM(M,0,NY,NX).GT.ZEROS2(NY,NX) &
-      .AND.VOLWM(M,0,NY,NX).GT.ZEROS2(NY,NX))THEN
-      VOLWCO(0,NY,NX)=VOLWM(M,0,NY,NX)*SCO2L(0,NY,NX)
-      VOLWCH(0,NY,NX)=VOLWM(M,0,NY,NX)*SCH4L(0,NY,NX)
-      VOLWOX(0,NY,NX)=VOLWM(M,0,NY,NX)*SOXYL(0,NY,NX)
-      VOLWNG(0,NY,NX)=VOLWM(M,0,NY,NX)*SN2GL(0,NY,NX)
-      VOLWN2(0,NY,NX)=VOLWM(M,0,NY,NX)*SN2OL(0,NY,NX)
-      VOLWN3(0,NY,NX)=VOLWM(M,0,NY,NX)*SNH3L(0,NY,NX)
-      VOLWHG(0,NY,NX)=VOLWM(M,0,NY,NX)*SH2GL(0,NY,NX)
-      VOLWXA(0,NY,NX)=14.0*VOLWM(M,0,NY,NX)
-      CO2G0=CCO2G(0,NY,NX)*VOLPM(M,0,NY,NX)
-      CH4G0=CCH4G(0,NY,NX)*VOLPM(M,0,NY,NX)
-      OXYG0=COXYG(0,NY,NX)*VOLPM(M,0,NY,NX)
-      Z2GG0=CZ2GG(0,NY,NX)*VOLPM(M,0,NY,NX)
-      Z2OG0=CZ2OG(0,NY,NX)*VOLPM(M,0,NY,NX)
-      ZN3G0=CNH3G(0,NY,NX)*VOLPM(M,0,NY,NX)
-      H2GG0=CH2GG(0,NY,NX)*VOLPM(M,0,NY,NX)
-      VOLCOR(NY,NX)=VOLWCO(0,NY,NX)+VOLPM(M,0,NY,NX)
-      VOLCHR(NY,NX)=VOLWCH(0,NY,NX)+VOLPM(M,0,NY,NX)
-      VOLOXR(NY,NX)=VOLWOX(0,NY,NX)+VOLPM(M,0,NY,NX)
-      VOLNGR(NY,NX)=VOLWNG(0,NY,NX)+VOLPM(M,0,NY,NX)
-      VOLN2R(NY,NX)=VOLWN2(0,NY,NX)+VOLPM(M,0,NY,NX)
-      VOLN3R(NY,NX)=VOLWN3(0,NY,NX)+VOLPM(M,0,NY,NX)
-      VOLHGR(NY,NX)=VOLWHG(0,NY,NX)+VOLPM(M,0,NY,NX)
-      RCODFG(0,NY,NX)=DFGS(M,0,NY,NX) &
+  IF(VOLT(0,NY,NX).GT.ZEROS2(NY,NX) &
+    .AND.VOLPM(M,0,NY,NX).GT.ZEROS2(NY,NX) &
+    .AND.VOLWM(M,0,NY,NX).GT.ZEROS2(NY,NX))THEN
+    VOLWCO(0,NY,NX)=VOLWM(M,0,NY,NX)*SCO2L(0,NY,NX)
+    VOLWCH(0,NY,NX)=VOLWM(M,0,NY,NX)*SCH4L(0,NY,NX)
+    VOLWOX(0,NY,NX)=VOLWM(M,0,NY,NX)*SOXYL(0,NY,NX)
+    VOLWNG(0,NY,NX)=VOLWM(M,0,NY,NX)*SN2GL(0,NY,NX)
+    VOLWN2(0,NY,NX)=VOLWM(M,0,NY,NX)*SN2OL(0,NY,NX)
+    VOLWN3(0,NY,NX)=VOLWM(M,0,NY,NX)*SNH3L(0,NY,NX)
+    VOLWHG(0,NY,NX)=VOLWM(M,0,NY,NX)*SH2GL(0,NY,NX)
+    VOLWXA(0,NY,NX)=14.0*VOLWM(M,0,NY,NX)
+    CO2G0=CCO2G(0,NY,NX)*VOLPM(M,0,NY,NX)
+    CH4G0=CCH4G(0,NY,NX)*VOLPM(M,0,NY,NX)
+    OXYG0=COXYG(0,NY,NX)*VOLPM(M,0,NY,NX)
+    Z2GG0=CZ2GG(0,NY,NX)*VOLPM(M,0,NY,NX)
+    Z2OG0=CZ2OG(0,NY,NX)*VOLPM(M,0,NY,NX)
+    ZN3G0=CNH3G(0,NY,NX)*VOLPM(M,0,NY,NX)
+    H2GG0=CH2GG(0,NY,NX)*VOLPM(M,0,NY,NX)
+    VOLCOR(NY,NX)=VOLWCO(0,NY,NX)+VOLPM(M,0,NY,NX)
+    VOLCHR(NY,NX)=VOLWCH(0,NY,NX)+VOLPM(M,0,NY,NX)
+    VOLOXR(NY,NX)=VOLWOX(0,NY,NX)+VOLPM(M,0,NY,NX)
+    VOLNGR(NY,NX)=VOLWNG(0,NY,NX)+VOLPM(M,0,NY,NX)
+    VOLN2R(NY,NX)=VOLWN2(0,NY,NX)+VOLPM(M,0,NY,NX)
+    VOLN3R(NY,NX)=VOLWN3(0,NY,NX)+VOLPM(M,0,NY,NX)
+    VOLHGR(NY,NX)=VOLWHG(0,NY,NX)+VOLPM(M,0,NY,NX)
+    RCODFG(0,NY,NX)=DFGS(M,0,NY,NX) &
       *(AMAX1(ZEROS(NY,NX),CO2G0)*VOLWCO(0,NY,NX) &
       -AMAX1(ZEROS(NY,NX),CO2S2(0,NY,NX)+RCODXR) &
       *VOLPM(M,0,NY,NX))/VOLCOR(NY,NX)
-      RCHDFG(0,NY,NX)=DFGS(M,0,NY,NX) &
+    RCHDFG(0,NY,NX)=DFGS(M,0,NY,NX) &
       *(AMAX1(ZEROS(NY,NX),CH4G0)*VOLWCH(0,NY,NX) &
       -AMAX1(ZEROS(NY,NX),CH4S2(0,NY,NX)+RCHDXR) &
       *VOLPM(M,0,NY,NX))/VOLCHR(NY,NX)
-      ROXDFG(0,NY,NX)=DFGS(M,0,NY,NX) &
+    ROXDFG(0,NY,NX)=DFGS(M,0,NY,NX) &
       *(AMAX1(ZEROS(NY,NX),OXYG0)*VOLWOX(0,NY,NX) &
       -AMAX1(ZEROS(NY,NX),OXYS2(0,NY,NX)+ROXDXR) &
       *VOLPM(M,0,NY,NX))/VOLOXR(NY,NX)
-      RNGDFG(0,NY,NX)=DFGS(M,0,NY,NX) &
+    RNGDFG(0,NY,NX)=DFGS(M,0,NY,NX) &
       *(AMAX1(ZEROS(NY,NX),Z2GG0)*VOLWNG(0,NY,NX) &
       -AMAX1(ZEROS(NY,NX),Z2GS2(0,NY,NX)+RNGDXR) &
       *VOLPM(M,0,NY,NX))/VOLNGR(NY,NX)
-      RN2DFG(0,NY,NX)=DFGS(M,0,NY,NX) &
+    RN2DFG(0,NY,NX)=DFGS(M,0,NY,NX) &
       *(AMAX1(ZEROS(NY,NX),Z2OG0)*VOLWN2(0,NY,NX) &
       -AMAX1(ZEROS(NY,NX),Z2OS2(0,NY,NX)+RN2DXR) &
       *VOLPM(M,0,NY,NX))/VOLN2R(NY,NX)
-      RN3DFG(0,NY,NX)=DFGS(M,0,NY,NX) &
+    RN3DFG(0,NY,NX)=DFGS(M,0,NY,NX) &
       *(AMAX1(ZEROS(NY,NX),ZN3G0)*VOLWN3(0,NY,NX) &
       -AMAX1(ZEROS(NY,NX),ZNH3S2(0,NY,NX)+RN3DXR) &
       *VOLPM(M,0,NY,NX))/VOLN3R(NY,NX)
-      CNH3S0=AMAX1(0.0,(ZNH3S2(0,NY,NX)+RN3DFG(0,NY,NX))) &
-      /VOLWXA(0,NY,NX)
-      CNH4S0=AMAX1(0.0,ZNH4S2(0,NY,NX)) &
-      /VOLWXA(0,NY,NX)
-      RHGDFG(0,NY,NX)=DFGS(M,0,NY,NX) &
+    CNH3S0=AMAX1(0.0,(ZNH3S2(0,NY,NX)+RN3DFG(0,NY,NX)))/VOLWXA(0,NY,NX)
+    CNH4S0=AMAX1(0.0,ZNH4S2(0,NY,NX))/VOLWXA(0,NY,NX)
+    RHGDFG(0,NY,NX)=DFGS(M,0,NY,NX) &
       *(AMAX1(ZEROS(NY,NX),H2GG0)*VOLWHG(0,NY,NX) &
       -AMAX1(ZEROS(NY,NX),H2GS2(0,NY,NX)+RHGDXR) &
       *VOLPM(M,0,NY,NX))/VOLHGR(NY,NX)
-!     IF(J.EQ.24)THEN
-!     WRITE(*,323)'RCODFG',I,J,NX,NY,M,MM,RCODFG(0,NY,NX)
-!    2,DFGS(M,0,NY,NX),CO2G0,VOLWCO(0,NY,NX),CO2S2(0,NY,NX)
-!    3,VOLPM(M,0,NY,NX),VOLCOR(NY,NX),RCODXR
-!     WRITE(*,323)'RCHDFG',I,J,NX,NY,M,MM,RCHDFG(0,NY,NX)
-!    2,DFGS(M,0,NY,NX),CH4G0,VOLWCH(0,NY,NX),CH4S2(0,NY,NX)
-!    3,VOLPM(M,0,NY,NX),VOLCHR(NY,NX),RCHDXR
-!     WRITE(*,323)'ROXDFG',I,J,NX,NY,M,MM,ROXDFG(0,NY,NX)
-!    2,DFGS(M,0,NY,NX),OXYG0,VOLWOX(0,NY,NX),OXYS2(0,NY,NX)
-!    3,VOLPM(M,0,NY,NX),VOLOXR(NY,NX),ROXDXR,XOXDFG(0,NY,NX)
-!323   FORMAT(A8,6I4,30E12.4)
-!     ENDIF
+
 !
 !     ACCUMULATE HOURLY FLUXES FOR USE IN REDIST.F
 !
 !     X*DFG=hourly surface gas volatilization
 !     R*DFG=surface gas volatilization
 !
-      XCODFG(0,NY,NX)=XCODFG(0,NY,NX)+RCODFG(0,NY,NX)
-      XCHDFG(0,NY,NX)=XCHDFG(0,NY,NX)+RCHDFG(0,NY,NX)
-      XOXDFG(0,NY,NX)=XOXDFG(0,NY,NX)+ROXDFG(0,NY,NX)
-      XNGDFG(0,NY,NX)=XNGDFG(0,NY,NX)+RNGDFG(0,NY,NX)
-      XN2DFG(0,NY,NX)=XN2DFG(0,NY,NX)+RN2DFG(0,NY,NX)
-      XN3DFG(0,NY,NX)=XN3DFG(0,NY,NX)+RN3DFG(0,NY,NX)
-      XHGDFG(0,NY,NX)=XHGDFG(0,NY,NX)+RHGDFG(0,NY,NX)
-      ELSE
-      RCODFG(0,NY,NX)=0.0
-      RCHDFG(0,NY,NX)=0.0
-      ROXDFG(0,NY,NX)=0.0
-      RNGDFG(0,NY,NX)=0.0
-      RN2DFG(0,NY,NX)=0.0
-      RN3DFG(0,NY,NX)=0.0
-      RHGDFG(0,NY,NX)=0.0
-      ENDIF
-      end subroutine SurfaceGasVolatilDissol
+    XCODFG(0,NY,NX)=XCODFG(0,NY,NX)+RCODFG(0,NY,NX)
+    XCHDFG(0,NY,NX)=XCHDFG(0,NY,NX)+RCHDFG(0,NY,NX)
+    XOXDFG(0,NY,NX)=XOXDFG(0,NY,NX)+ROXDFG(0,NY,NX)
+    XNGDFG(0,NY,NX)=XNGDFG(0,NY,NX)+RNGDFG(0,NY,NX)
+    XN2DFG(0,NY,NX)=XN2DFG(0,NY,NX)+RN2DFG(0,NY,NX)
+    XN3DFG(0,NY,NX)=XN3DFG(0,NY,NX)+RN3DFG(0,NY,NX)
+    XHGDFG(0,NY,NX)=XHGDFG(0,NY,NX)+RHGDFG(0,NY,NX)
+  ELSE
+    RCODFG(0,NY,NX)=0.0
+    RCHDFG(0,NY,NX)=0.0
+    ROXDFG(0,NY,NX)=0.0
+    RNGDFG(0,NY,NX)=0.0
+    RN2DFG(0,NY,NX)=0.0
+    RN3DFG(0,NY,NX)=0.0
+    RHGDFG(0,NY,NX)=0.0
+  ENDIF
+  end subroutine SurfaceGasVolatilDissol
 !------------------------------------------------------------------------------------------
 
       subroutine GasDiffusionConvection(M,NY,NX)

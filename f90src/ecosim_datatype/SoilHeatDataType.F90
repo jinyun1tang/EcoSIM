@@ -6,6 +6,7 @@ module SoilHeatDatatype
   implicit none
 
   save
+  character(len=*), private, parameter :: mod_filename = __FILE__
 
   real(r8) :: TKSZ(366,24,JZ)
   real(r8) :: TKS(0:JZ,JY,JX)

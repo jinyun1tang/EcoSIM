@@ -19,14 +19,16 @@ module WatsubMod
   use ClimForcDataType
   use FertilizerDataType
   use SnowDataType
-  use PlantDataCharType
+  use PlantTraitDataType
   use SurfLitterDataType
   use SurfSoilDataType
   use SurfSoilDataType
   use CanopyDataType
-  use SoilChemDataType
+  use ChemTranspDataType
   use SoilBGCDataType
   use AqueChemDatatype
+  use SoilPropertyDataType
+  use IrrigationDataType
   implicit none
 
   private
@@ -156,8 +158,6 @@ module WatsubMod
 !
   curday=i
   curhour=j
-!  if(curday>=41)call print_info('PrepWaterEnergyBalance',__LINE__)
-!  if(curday>=41)write(*,*)'HFLWRL(NY,NX)=',HFLWRL(NVN,NHW)
   call PrepWaterEnergyBalance(I,J,NHW,NHE,NVN,NVS)
 !
 ! DYNAMIC LOOP FOR FLUX CALCULATIONS
@@ -166,33 +166,19 @@ module WatsubMod
     DO 9895 NX=NHW,NHE
       DO 9890 NY=NVN,NVS
 !
-!        if(curday>=41)call print_info('PrepForIterationM',__LINE__)
-!        if(curday>=41)write(*,*)'HFLWRL(NY,NX)=',HFLWRL(NY,NX)
         call PrepForIterationM(M,NY,NX)
 !
-!        if(curday>=41)call print_info('AtmosLandSurfaceExchange',__LINE__)
-!        if(curday>=41)write(*,*)'HFLWRL(NY,NX)=',HFLWRL(NY,NX)
         call AtmosLandSurfaceExchange(M,NY,NX)
 !
 !     CAPILLARY EXCHANGE OF WATER BETWEEN SOIL SURFACE AND RESIDUE
-!        if(curday>=41)call print_info('SurfSoilResidueWaterCapillExch',__LINE__)
-!        if(curday>=41)write(*,*)'HFLWRL(NY,NX)=',HFLWRL(NY,NX)
         call SurfSoilResidueWaterCapillExch(M,NY,NX)
 
-!        if(curday>=41)call print_info('InfiltrationRunoffPartition',__LINE__)
-!        if(curday>=41)write(*,*)'HFLWRL(NY,NX)=',HFLWRL(NY,NX)
         call InfiltrationRunoffPartition(M,NY,NX,N1,N2)
 !
-!        if(curday>=41)call print_info('LateralHydroExchange',__LINE__)
-!        if(curday>=41)write(*,*)'HFLWRL(NY,NX)=',HFLWRL(NY,NX)
         call LateralHydroExchange(M,NY,NX,NHE,NHW,NVS,NVN,N1,N2)
 !
-!        if(curday>=41)call print_info('AccumWaterVaporHeatFluxes',__LINE__)
-!        if(curday>=41)write(*,*)'HFLWRL(NY,NX)=',HFLWRL(NY,NX)
         call AccumWaterVaporHeatFluxes(M,NY,NX)
 
-!        if(curday>=41)call print_info('Subsurface3DFlow',__LINE__)
-!        if(curday>=41)write(*,*)'HFLWRL(NY,NX)=',HFLWRL(NY,NX)
         call Subsurface3DFlow(M,NY,NX,NHE,NVS)
 9890  CONTINUE
 9895  CONTINUE
@@ -201,25 +187,13 @@ module WatsubMod
 !
 !     XVOLT,XVOLW=excess water+ice,water in source grid cell
 !     VOLP2,VOLPH2=air-filled porosity in micropores,macropores
-!      if(curday>=41)write(*,*)'HFLWRL(NY,NX)=',HFLWRL(NVN,NHW)
       call WaterHeatExchThruBoundaryFlow(M,NHW,NHE,NVN,NVS)
 !
-!      if(curday==41)call print_info('UPDATE STATE VARIABLES FROM FLUXES CALCULATED ABOVE',__LINE__)
-!      if(curday>=175)then
-!        write(*,*)'at line',__LINE__,'TK1(8,NVN,NHW)',TK1(8,NVN,NHW),M
-!        if(TK1(8,NVN,NHW)>1.e3)then
-!          call endrun(trim(mod_filename)//' at line',__LINE__)
-!        endif
-!      endif
       IF(M.NE.NPH)THEN
 !
-!        if(curday>=175)call print_info('UpdateStateSolutionNotNPH',__LINE__)
-!        if(curday>=41)write(*,*)'HFLWRL(NY,NX)=',HFLWRL(NVN,NHW)
         call UpdateStateSolutionNotNPH(M,NHW,NHE,NVN,NVS)
       ELSE
 !
-!        if(curday>=175)call print_info('UpdateFLuxAtNPH',__LINE__)
-!        if(curday>=41)write(*,*)'HFLWRL(NY,NX)=',HFLWRL(NVN,NHW)
         call UpdateFLuxAtNPH(NHW,NHE,NVN,NVS)
       ENDIF
 3320  CONTINUE
@@ -269,10 +243,9 @@ module WatsubMod
   DO 65 L=NUM(NY,NX),NL(NY,NX)
     IF(CDPTH(L,NY,NX).GE.WDPTH(I,NY,NX))THEN
       LWDPTH=L
-      GO TO 55
+      exit
     ENDIF
 65  CONTINUE
-55  CONTINUE
   DO 30 L=NUM(NY,NX),NL(NY,NX)
 !
 !   ENTER STATE VARIABLES AND DRIVERS INTO LOCAL ARRAYS
@@ -799,7 +772,8 @@ module WatsubMod
           N3=L
           IF(N.EQ.1)THEN
             IF(NX.EQ.NHE)THEN
-              GO TO 50
+!              GO TO 50
+              cycle
             ELSE
               N4=NX+1
               N5=NY
@@ -807,7 +781,8 @@ module WatsubMod
             ENDIF
           ELSEIF(N.EQ.2)THEN
             IF(NY.EQ.NVS)THEN
-              GO TO 50
+!              GO TO 50
+              cycle
             ELSE
               N4=NX
               N5=NY+1
@@ -815,7 +790,8 @@ module WatsubMod
             ENDIF
           ELSEIF(N.EQ.3)THEN
             IF(L.EQ.NL(NY,NX))THEN
-              GO TO 50
+!              GO TO 50
+              cycle
             ELSE
               N4=NX
               N5=NY
@@ -838,7 +814,7 @@ module WatsubMod
           ELSE
             AVCNHL(N,N6,N5,N4)=0.0_r8
           ENDIF
-50      CONTINUE
+!50      CONTINUE
 40    CONTINUE
 35  CONTINUE
 9980  CONTINUE
@@ -3033,7 +3009,7 @@ module WatsubMod
       IF(N.EQ.1)THEN
         IF(NX.EQ.NHE.AND.NN.EQ.1 &
           .OR.NX.EQ.NHW.AND.NN.EQ.2)THEN
-          GO TO 4305
+          cycle
         ELSE
           N4=NX+1
           N5=NY
@@ -3042,7 +3018,8 @@ module WatsubMod
         ENDIF
       ELSEIF(N.EQ.2)THEN
         IF(NY.EQ.NVS.AND.NN.EQ.1.OR.NY.EQ.NVN.AND.NN.EQ.2)THEN
-          GO TO 4305
+!          GO TO 4305
+          cycle
         ELSE
           N4=NX
           N5=NY+1
@@ -3222,7 +3199,7 @@ module WatsubMod
     DO 4320 N=NCN(N2,N1),3
       IF(N.EQ.1)THEN
         IF(NX.EQ.NHE)THEN
-          GO TO 4320
+          cycle
         ELSE
           N4=NX+1
           N5=NY
@@ -3236,7 +3213,7 @@ module WatsubMod
         ENDIF
       ELSEIF(N.EQ.2)THEN
         IF(NY.EQ.NVS)THEN
-          GO TO 4320
+          cycle
         ELSE
           N4=NX
           N5=NY+1
@@ -3253,7 +3230,7 @@ module WatsubMod
         ENDIF
       ELSEIF(N.EQ.3)THEN
         IF(L.EQ.NL(NY,NX))THEN
-          GO TO 4320
+          cycle
         ELSE
           N4=NX
           N5=NY
@@ -3266,10 +3243,10 @@ module WatsubMod
       DO 1100 LL=N6,NL(NY,NX)
         IF(VOLX(LL,N5,N4).GT.ZEROS2(N5,N4))THEN
           N6=LL
-          GO TO 1101
+          exit
         ENDIF
 1100  CONTINUE
-1101  CONTINUE
+!1101  CONTINUE
       IF(N3.EQ.NU(N2,N1))N6X(N2,N1)=N6
       !
       !     POROSITIES 'THETP*', WATER CONTENTS 'THETA*', AND POTENTIALS
@@ -4139,7 +4116,7 @@ module WatsubMod
                   RCHGFU=RCHGEU(M2,M1)
                   RCHGFT=RCHGET(M2,M1)
                 ELSE
-                  GO TO 9575
+                  cycle
                 ENDIF
               ELSEIF(NN.EQ.2)THEN
                 IF(NX.EQ.NHW)THEN
@@ -4154,7 +4131,7 @@ module WatsubMod
                   RCHGFU=RCHGWU(M5,M4)
                   RCHGFT=RCHGWT(M5,M4)
                 ELSE
-                  GO TO 9575
+                  cycle
                 ENDIF
               ENDIF
             ELSEIF(N.EQ.2)THEN
@@ -4176,7 +4153,7 @@ module WatsubMod
                   RCHGFU=RCHGSU(M2,M1)
                   RCHGFT=RCHGST(M2,M1)
                 ELSE
-                  GO TO 9575
+                  cycle
                 ENDIF
               ELSEIF(NN.EQ.2)THEN
                 IF(NY.EQ.NVN)THEN
@@ -4191,7 +4168,7 @@ module WatsubMod
                   RCHGFU=RCHGNU(M5,M4)
                   RCHGFT=RCHGNT(M5,M4)
                 ELSE
-                  GO TO 9575
+                  cycle
                 ENDIF
               ENDIF
             ELSEIF(N.EQ.3)THEN
@@ -4210,10 +4187,10 @@ module WatsubMod
                   RCHGFU=RCHGD(M2,M1)
                   RCHGFT=1.0
                 ELSE
-                  GO TO 9575
+                  cycle
                 ENDIF
               ELSEIF(NN.EQ.2)THEN
-                GO TO 9575
+                cycle
               ENDIF
             ENDIF
 !
@@ -4789,10 +4766,10 @@ module WatsubMod
           DO 1200 LL=N6,NL(N5,N4)
             IF(VOLX(LL,N2,N1).GT.ZEROS2(N2,N1))THEN
               N6=LL
-              GO TO 1201
+              exit
             ENDIF
 1200      CONTINUE
-1201      CONTINUE
+!1201      CONTINUE
           IF(VOLX(N3,N2,N1).GT.ZEROS2(N2,N1))THEN
             TFLWL(N3,N2,N1)=TFLWL(N3,N2,N1)+FLWL(N,N3,N2,N1)-FLWL(N,N6,N5,N4)
             if(abs(TFLWL(N3,N2,N1))>1.e20_r8)then

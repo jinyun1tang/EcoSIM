@@ -7,7 +7,7 @@
   use StartsMod    , only : starts
   use MicrobialDataType
   use SOMDataType
-  use SoilChemDataType
+  use ChemTranspDataType
   use FertilizerDataType
   use GridDataType
   use SoilPhysDataType
@@ -17,7 +17,8 @@
   use LandSurfDataType
   use ClimForcDataType
   use EcoSIMCtrlDataType
-  use PlantDataCharType
+  use PlantTraitDataType
+  use PlantDataRateType
   use SnowDataType
   USE CanopyDataType
   use SurfSoilDataType
@@ -28,7 +29,10 @@
   use RootDataType
   use EcosysBGCFluxType
   use EcoSIMHistMod
-
+  use SoilPropertyDataType
+  use IrrigationDataType
+  use AqueChemDatatype
+  use SedimentDataType
   implicit none
   integer, intent(in) :: NHW,NHE,NVN,NVS
 

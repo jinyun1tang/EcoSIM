@@ -9,38 +9,38 @@ implicit none
 
   integer :: JG
 
-  real(r8),allocatable :: OMC(:,:,:,:,:,:,:)
-  real(r8),allocatable :: OMN(:,:,:,:,:,:,:)
-  real(r8),allocatable :: OMP(:,:,:,:,:,:,:)
-  real(r8),allocatable :: ROXYS(:,:,:,:,:,:)
-  real(r8),allocatable :: ROQCS(:,:,:,:,:,:)
-  real(r8),allocatable :: ROQAS(:,:,:,:,:,:)
-  real(r8),allocatable :: CNOMC(:,:,:,:)
-  real(r8),allocatable :: CPOMC(:,:,:,:)
-  real(r8),allocatable :: RINHO(:,:,:,:,:,:)
-  real(r8),allocatable :: RINOO(:,:,:,:,:,:)
-  real(r8),allocatable :: RIPOO(:,:,:,:,:,:)
-  real(r8),allocatable :: RINHOR(:,:,:,:,:)
-  real(r8),allocatable :: RIPOOR(:,:,:,:,:)
-  real(r8),allocatable :: RINOOR(:,:,:,:,:)
-  real(r8),allocatable :: RVMX4(:,:,:,:,:,:)
-  real(r8),allocatable :: RVMX3(:,:,:,:,:,:)
-  real(r8),allocatable :: RVMX2(:,:,:,:,:,:)
-  real(r8),allocatable :: RVMB4(:,:,:,:,:,:)
-  real(r8),allocatable :: RVMB3(:,:,:,:,:,:)
-  real(r8),allocatable :: RVMB2(:,:,:,:,:,:)
-  real(r8),allocatable :: RVMX1(:,:,:,:,:,:)
-  real(r8),allocatable :: RINHB(:,:,:,:,:,:)
-  real(r8),allocatable :: RINOB(:,:,:,:,:,:)
-  real(r8),allocatable :: RIPBO(:,:,:,:,:,:)
-  real(r8),allocatable :: RIPO1(:,:,:,:,:,:)
-  real(r8),allocatable :: RIPB1(:,:,:,:,:,:)
-  real(r8),allocatable :: RIPO1R(:,:,:,:,:)
-  real(r8),allocatable :: OMCER(:,:,:,:,:,:,:)
-  real(r8),allocatable :: OMNER(:,:,:,:,:,:,:)
-  real(r8),allocatable :: OMPER(:,:,:,:,:,:,:)
-  real(r8),allocatable :: OMCI(:,:)
-  real(r8) :: FL(2)
+  real(r8),allocatable :: OMC(:,:,:,:,:,:,:)    !microbial biomass C	[g d-2]
+  real(r8),allocatable :: OMN(:,:,:,:,:,:,:)    !microbial biomass N	[g d-2]
+  real(r8),allocatable :: OMP(:,:,:,:,:,:,:)    !microbial biomass P	[g d-2]
+  real(r8),allocatable :: ROXYS(:,:,:,:,:,:)    !aqueous O2 demand	[g d-2 h-1]
+  real(r8),allocatable :: ROQCS(:,:,:,:,:,:)    !net microbial DOC flux	[g d-2 h-1]
+  real(r8),allocatable :: ROQAS(:,:,:,:,:,:)    !net microbial acetate flux	[g d-2 h-1]
+  real(r8),allocatable :: CNOMC(:,:,:,:)        !maximum microbial N:C
+  real(r8),allocatable :: CPOMC(:,:,:,:)        !maximum microbial P:C
+  real(r8),allocatable :: RINHO(:,:,:,:,:,:)    !microbial NH4 demand in soil	[g d-2 h-1]
+  real(r8),allocatable :: RINOO(:,:,:,:,:,:)    !microbial NO3 demand in soil	[g d-2 h-1]
+  real(r8),allocatable :: RIPOO(:,:,:,:,:,:)    !microbial PO4 demand in soil	[g d-2 h-1]
+  real(r8),allocatable :: RINHOR(:,:,:,:,:)     !microbial NH4 demand in surface litter	[g d-2 h-1]
+  real(r8),allocatable :: RIPOOR(:,:,:,:,:)     !microbial PO4 demand in surface litter	[g d-2 h-1]
+  real(r8),allocatable :: RINOOR(:,:,:,:,:)     !microbial NO3 demand in surface litter	[g d-2 h-1]
+  real(r8),allocatable :: RVMX4(:,:,:,:,:,:)    !total microbial NH4 uptake non-band unconstrained by NH4	[g d-2 h-1]
+  real(r8),allocatable :: RVMX3(:,:,:,:,:,:)    !total microbial NO3 uptake non-band unconstrained by NO3	[g d-2 h-1]
+  real(r8),allocatable :: RVMX2(:,:,:,:,:,:)    !total microbial NO2 uptake non-band unconstrained by NO2	[g d-2 h-1]
+  real(r8),allocatable :: RVMB4(:,:,:,:,:,:)    !total microbial NH4 uptake non-band unconstrained by NH4	[g d-2 h-1]
+  real(r8),allocatable :: RVMB3(:,:,:,:,:,:)    !total microbial NO3 uptake band unconstrained by NO3	[g d-2 h-1]
+  real(r8),allocatable :: RVMB2(:,:,:,:,:,:)    !total microbial NO2 uptake band unconstrained by NH4	[g d-2 h-1]
+  real(r8),allocatable :: RVMX1(:,:,:,:,:,:)    !total microbial N2O uptake unconstrained by N2O	[g d-2 h-1]
+  real(r8),allocatable :: RINHB(:,:,:,:,:,:)    !microbial NH4 immobilization (+ve) - mineralization (-ve) band	[g d-2 h-1]
+  real(r8),allocatable :: RINOB(:,:,:,:,:,:)    !microbial NO3 immobilization (+ve) - mineralization (-ve) band	[g d-2 h-1]
+  real(r8),allocatable :: RIPBO(:,:,:,:,:,:)    !substrate-unlimited H2PO4 mineraln-immobiln
+  real(r8),allocatable :: RIPO1(:,:,:,:,:,:)    !substrate-unlimited HPO4 immobilization
+  real(r8),allocatable :: RIPB1(:,:,:,:,:,:)    !substrate-unlimited HPO4 mineraln-immobiln
+  real(r8),allocatable :: RIPO1R(:,:,:,:,:)     !substrate-unlimited HPO4 immobilization
+  real(r8),allocatable :: OMCER(:,:,:,:,:,:,:)  !microbial C  erosion 	[g d-2 h-1]
+  real(r8),allocatable :: OMNER(:,:,:,:,:,:,:)  !microbial N  erosion 	[g d-2 h-1]
+  real(r8),allocatable :: OMPER(:,:,:,:,:,:,:)  !microbial P  erosion 	[g d-2 h-1]
+  real(r8),allocatable :: OMCI(:,:)             !initializes microbial biomass
+  real(r8) :: FL(2)                             !allocation to microbial kinetic fractions
   private :: InitAllocate
 
   contains
