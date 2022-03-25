@@ -4,7 +4,7 @@ module readsmod
   use abortutils , only : endrun
   use fileUtil   , only : open_safe
   use minimathmod, only : isLeap
-  use GridDataType
+  use GridConsts
   use FlagDataType
   use EcosimConst, only : TC2K
   use FertilizerDataType
@@ -15,6 +15,7 @@ module readsmod
   use EcosimConst
   use EcoSIMHistMod
   use IrrigationDataType
+  use GridDataType
   implicit none
   private
 

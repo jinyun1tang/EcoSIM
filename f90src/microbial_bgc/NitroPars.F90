@@ -184,8 +184,8 @@ module NitroPars
   real(r8) :: SPOHC
   real(r8) :: SPOHA
   real(r8) :: RMOM
-  real(r8) :: DOSA(0:4)
-  real(r8) :: SPOSC(4,0:4)
+  real(r8) :: DOSA(0:jcplx1)
+  real(r8) :: SPOSC(4,0:jcplx1)
   real(r8) :: SPORC(2)
   real(r8) :: SPOMC(2)
   real(r8) :: EN2F(7)

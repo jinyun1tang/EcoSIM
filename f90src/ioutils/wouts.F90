@@ -10,7 +10,7 @@
   use SOMDataType
   use ChemTranspDataType
   use FertilizerDataType
-  use GridDataType
+  use GridConsts
   use FlagDataType
   use SoilPhysDataType
   use SoilHeatDatatype
@@ -33,6 +33,8 @@
   use IrrigationDataType
   use AqueChemDatatype
   use SedimentDataType
+  use GridDataType
+
   implicit none
   integer, intent(in) :: I,NHW,NHE,NVN,NVS
 

@@ -8,7 +8,7 @@
 !
   use data_kind_mod, only : r8 => SHR_KIND_R8
   use ChemTranspDataType
-  use GridDataType
+  use GridConsts
   use SoilHeatDatatype
   use SoilWaterDataType
   use ClimForcDataType
@@ -22,6 +22,7 @@
   use EcosysBGCFluxType
   use SoilBGCDataType
   use PlantDataRateType
+  use GridDataType
   implicit none
   integer, intent(in) :: I,J,NT,NE,NAX,NDX,NTX
   integer, intent(in) :: NEX,NHW,NHE,NVN,NVS

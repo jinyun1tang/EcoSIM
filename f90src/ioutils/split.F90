@@ -8,9 +8,10 @@
 !     INDICATING ITS COLUMN AND ROW POSITION.
 !
       use data_kind_mod, only : r8 => SHR_KIND_R8
-  use GridDataType
+  use GridConsts
   use ClimForcDataType, only : DOY
   use EcoSIMHistMod
+  use GridDataType
 
       implicit none
       integer, intent(in) :: NT,NE,NAX,NDX,NTX,NEX,NHW,NHE,NVN,NVS

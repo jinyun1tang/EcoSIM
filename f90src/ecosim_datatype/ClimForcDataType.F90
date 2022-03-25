@@ -1,6 +1,6 @@
 module ClimForcDataType
   use data_kind_mod, only : r8 => SHR_KIND_R8
-  use GridDataType
+  use GridConsts
 implicit none
   character(len=*), private, parameter :: mod_filename = __FILE__
 

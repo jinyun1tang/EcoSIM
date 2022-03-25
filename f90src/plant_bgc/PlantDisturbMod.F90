@@ -7,7 +7,7 @@ module PlantDisturbMod
   use SOMDataType
   use GrosubPars
   use PlantTraitDataType
-  use GridDataType
+  use GridConsts
   use FlagDataType
   use SoilWaterDataType
   use EcoSIMCtrlDataType
@@ -21,7 +21,8 @@ module PlantDisturbMod
   use EcoSimSumDataType
   use SoilBGCDataType
   use EcosysBGCFluxType
-implicit none
+  use GridDataType
+  implicit none
   private
 
 ! end_include_section

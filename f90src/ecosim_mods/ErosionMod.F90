@@ -4,7 +4,7 @@ module ErosionMod
   use MicrobialDataType
   use SOMDataType
   use FertilizerDataType
-  use GridDataType
+  use GridConsts
   use FlagDataType
   use SoilPhysDataType
   use EcoSIMCtrlDataType
@@ -15,6 +15,7 @@ module ErosionMod
   use AqueChemDatatype
   use SoilPropertyDataType
   USE SedimentDataType
+  use GridDataType
   implicit none
 
   private
@@ -551,7 +552,7 @@ module ErosionMod
       OHNER(K,N,2,N5,N4)=FSEDER*OHN(K,NU(N2,N1),N2,N1)
       OHPER(K,N,2,N5,N4)=FSEDER*OHP(K,NU(N2,N1),N2,N1)
       OHAER(K,N,2,N5,N4)=FSEDER*OHA(K,NU(N2,N1),N2,N1)
-      DO 9465 M=1,4
+      DO 9465 M=1,jsken
       OSCER(M,K,N,2,N5,N4)=FSEDER*OSC(M,K,NU(N2,N1),N2,N1)
       OSAER(M,K,N,2,N5,N4)=FSEDER*OSA(M,K,NU(N2,N1),N2,N1)
       OSNER(M,K,N,2,N5,N4)=FSEDER*OSN(M,K,NU(N2,N1),N2,N1)
@@ -641,7 +642,7 @@ module ErosionMod
       OHNER(K,N,2,N5,N4)=0._r8
       OHPER(K,N,2,N5,N4)=0._r8
       OHAER(K,N,2,N5,N4)=0._r8
-      DO 8465 M=1,4
+      DO 8465 M=1,jsken
       OSCER(M,K,N,2,N5,N4)=0._r8
       OSAER(M,K,N,2,N5,N4)=0._r8
       OSNER(M,K,N,2,N5,N4)=0._r8
@@ -755,7 +756,7 @@ module ErosionMod
       OHNER(K,N,1,N5B,N4B)=FSEDER*OHN(K,NU(N2,N1),N2,N1)
       OHPER(K,N,1,N5B,N4B)=FSEDER*OHP(K,NU(N2,N1),N2,N1)
       OHAER(K,N,1,N5B,N4B)=FSEDER*OHA(K,NU(N2,N1),N2,N1)
-      DO 7465 M=1,4
+      DO 7465 M=1,jsken
       OSCER(M,K,N,1,N5B,N4B)=FSEDER*OSC(M,K,NU(N2,N1),N2,N1)
       OSAER(M,K,N,1,N5B,N4B)=FSEDER*OSA(M,K,NU(N2,N1),N2,N1)
       OSNER(M,K,N,1,N5B,N4B)=FSEDER*OSN(M,K,NU(N2,N1),N2,N1)
@@ -845,7 +846,7 @@ module ErosionMod
       OHNER(K,N,1,N5B,N4B)=0._r8
       OHPER(K,N,1,N5B,N4B)=0._r8
       OHAER(K,N,1,N5B,N4B)=0._r8
-      DO 6465 M=1,4
+      DO 6465 M=1,jsken
       OSCER(M,K,N,1,N5B,N4B)=0._r8
       OSAER(M,K,N,1,N5B,N4B)=0._r8
       OSNER(M,K,N,1,N5B,N4B)=0._r8
@@ -1013,7 +1014,7 @@ module ErosionMod
       OHNER(K,N,NN,M5,M4)=0._r8
       OHPER(K,N,NN,M5,M4)=0._r8
       OHAER(K,N,NN,M5,M4)=0._r8
-      DO 5465 M=1,4
+      DO 5465 M=1,jsken
       OSCER(M,K,N,NN,M5,M4)=0._r8
       OSAER(M,K,N,NN,M5,M4)=0._r8
       OSNER(M,K,N,NN,M5,M4)=0._r8
@@ -1110,7 +1111,7 @@ module ErosionMod
       OHNER(K,N,NN,M5,M4)=FSEDER*OHN(K,NU(N2,N1),N2,N1)
       OHPER(K,N,NN,M5,M4)=FSEDER*OHP(K,NU(N2,N1),N2,N1)
       OHAER(K,N,NN,M5,M4)=FSEDER*OHA(K,NU(N2,N1),N2,N1)
-      DO 4865 M=1,4
+      DO 4865 M=1,jsken
       OSCER(M,K,N,NN,M5,M4)=FSEDER*OSC(M,K,NU(N2,N1),N2,N1)
       OSAER(M,K,N,NN,M5,M4)=FSEDER*OSA(M,K,NU(N2,N1),N2,N1)
       OSNER(M,K,N,NN,M5,M4)=FSEDER*OSN(M,K,NU(N2,N1),N2,N1)

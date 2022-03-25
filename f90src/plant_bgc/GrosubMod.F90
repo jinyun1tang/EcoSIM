@@ -9,7 +9,7 @@ module grosubMod
   use CanopyRadDataType
   use GrosubPars
   use PlantTraitDataType
-  use GridDataType
+  use GridConsts
   use SoilPhysDataType
   use FlagDataType
   use SoilHeatDatatype
@@ -24,6 +24,7 @@ module grosubMod
   use SoilBGCDataType
   use EcosysBGCFluxType
   use SoilPropertyDataType
+  use GridDataType
   implicit none
 
   private

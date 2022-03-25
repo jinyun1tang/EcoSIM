@@ -3,7 +3,7 @@ module StarteMod
   use minimathmod, only : test_aeqb
   use SOMDataType
   use ChemTranspDataType
-  use GridDataType
+  use GridConsts
   use FlagDataType
   use SoilPhysDataType
   use SoilHeatDatatype
@@ -18,6 +18,7 @@ module StarteMod
   use SoilPropertyDataType
   use IrrigationDataType
   use AqueChemDatatype
+  use GridDataType
   implicit none
 
   private

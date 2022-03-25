@@ -6,7 +6,7 @@ module UptakeMod
   use SOMDataType
   use ChemTranspDataType
   use UptakePars
-  use GridDataType
+  use GridConsts
   use SoilPhysDataType
   use FlagDataType
   use SoilHeatDatatype
@@ -23,6 +23,7 @@ module UptakeMod
   use EcosysBGCFluxType
   use SoilPropertyDataType
   use CanopyRadDataType
+  use GridDataType
   implicit none
 
   private

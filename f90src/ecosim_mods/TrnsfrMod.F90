@@ -6,7 +6,7 @@ module TrnsfrMod
   use minimathmod, only : test_aeqb,safe_adb
   use SOMDataType
   use ChemTranspDataType
-  use GridDataType
+  use GridConsts
   use SoilPhysDataType
   use SoilHeatDatatype
   use SoilWaterDataType
@@ -24,6 +24,7 @@ module TrnsfrMod
   use SoilPropertyDataType
   use IrrigationDataType
   use PlantDataRateType
+  use GridDataType
   implicit none
 
   private
@@ -728,7 +729,7 @@ module TrnsfrMod
 !             :NH4=NH4,NH3=NH3,NO3=NO3,NO2=NO2,P14=HPO4,PO4=H2PO4 in non-band
 !             :N4B=NH4,N3B=NH3,NOB=NO3,N2B=NO2,P1B=HPO4,POB=H2PO4 in band
 !
-      DO 9681 K=0,4
+      DO 9681 K=0,jcplx1
       OQC2(K,0,NY,NX)=OQC2(K,0,NY,NX)+ROCFLS(K,3,0,NY,NX)
       OQN2(K,0,NY,NX)=OQN2(K,0,NY,NX)+RONFLS(K,3,0,NY,NX)
       OQP2(K,0,NY,NX)=OQP2(K,0,NY,NX)+ROPFLS(K,3,0,NY,NX)
@@ -763,7 +764,7 @@ module TrnsfrMod
 !    3,ROXDFS(NY,NX)
 !442   FORMAT(A8,6I4,12E12.4)
 !     ENDIF
-      DO 9680 K=0,4
+      DO 9680 K=0,jcplx1
       OQC2(K,0,NY,NX)=OQC2(K,0,NY,NX)+TQROC(K,NY,NX)
       OQN2(K,0,NY,NX)=OQN2(K,0,NY,NX)+TQRON(K,NY,NX)
       OQP2(K,0,NY,NX)=OQP2(K,0,NY,NX)+TQROP(K,NY,NX)
@@ -836,23 +837,15 @@ module TrnsfrMod
       +RN3FBZ(L,NY,NX)+RNBBBL(L,NY,NX)
       H2GS2(L,NY,NX)=H2GS2(L,NY,NX)+THGFLS(L,NY,NX)+RHGFXS(L,NY,NX) &
       +RHGFLZ(L,NY,NX)+RHGBBL(L,NY,NX)
-      DO 9675 K=0,4
-      OQC2(K,L,NY,NX)=OQC2(K,L,NY,NX)+TOCFLS(K,L,NY,NX) &
-      +ROCFXS(K,L,NY,NX)
-      OQN2(K,L,NY,NX)=OQN2(K,L,NY,NX)+TONFLS(K,L,NY,NX) &
-      +RONFXS(K,L,NY,NX)
-      OQP2(K,L,NY,NX)=OQP2(K,L,NY,NX)+TOPFLS(K,L,NY,NX) &
-      +ROPFXS(K,L,NY,NX)
-      OQA2(K,L,NY,NX)=OQA2(K,L,NY,NX)+TOAFLS(K,L,NY,NX) &
-      +ROAFXS(K,L,NY,NX)
-      OQCH2(K,L,NY,NX)=OQCH2(K,L,NY,NX)+TOCFHS(K,L,NY,NX) &
-      -ROCFXS(K,L,NY,NX)
-      OQNH2(K,L,NY,NX)=OQNH2(K,L,NY,NX)+TONFHS(K,L,NY,NX) &
-      -RONFXS(K,L,NY,NX)
-      OQPH2(K,L,NY,NX)=OQPH2(K,L,NY,NX)+TOPFHS(K,L,NY,NX) &
-      -ROPFXS(K,L,NY,NX)
-      OQAH2(K,L,NY,NX)=OQAH2(K,L,NY,NX)+TOAFHS(K,L,NY,NX) &
-      -ROAFXS(K,L,NY,NX)
+      DO 9675 K=0,jcplx1
+      OQC2(K,L,NY,NX)=OQC2(K,L,NY,NX)+TOCFLS(K,L,NY,NX)+ROCFXS(K,L,NY,NX)
+      OQN2(K,L,NY,NX)=OQN2(K,L,NY,NX)+TONFLS(K,L,NY,NX)+RONFXS(K,L,NY,NX)
+      OQP2(K,L,NY,NX)=OQP2(K,L,NY,NX)+TOPFLS(K,L,NY,NX)+ROPFXS(K,L,NY,NX)
+      OQA2(K,L,NY,NX)=OQA2(K,L,NY,NX)+TOAFLS(K,L,NY,NX)+ROAFXS(K,L,NY,NX)
+      OQCH2(K,L,NY,NX)=OQCH2(K,L,NY,NX)+TOCFHS(K,L,NY,NX)-ROCFXS(K,L,NY,NX)
+      OQNH2(K,L,NY,NX)=OQNH2(K,L,NY,NX)+TONFHS(K,L,NY,NX)-RONFXS(K,L,NY,NX)
+      OQPH2(K,L,NY,NX)=OQPH2(K,L,NY,NX)+TOPFHS(K,L,NY,NX)-ROPFXS(K,L,NY,NX)
+      OQAH2(K,L,NY,NX)=OQAH2(K,L,NY,NX)+TOAFHS(K,L,NY,NX)-ROAFXS(K,L,NY,NX)
 9675  CONTINUE
       ZNH4S2(L,NY,NX)=ZNH4S2(L,NY,NX)+TN4FLW(L,NY,NX)+RN4FXW(L,NY,NX) &
       +RN4FLZ(L,NY,NX)
@@ -921,7 +914,7 @@ module TrnsfrMod
       H2GG2(L,NY,NX)=H2GG2(L,NY,NX)+THGFLG(L,NY,NX)-RHGDFG(L,NY,NX)
       ENDIF
 !     IF(I.EQ.121.AND.L.EQ.2)THEN
-!     DO 9676 K=0,4
+!     DO 9676 K=0,jcplx1
 !     WRITE(*,446)'OQC2',I,J,NX,NY,L,M,MM,K,OQC2(K,L,NY,NX)
 !    2,TOCFLS(K,L,NY,NX),ROCFXS(K,L,NY,NX),ROCSK2(K,L,NY,NX)
 !    2,XOQCS(K,L,NY,NX)
@@ -1041,7 +1034,7 @@ module TrnsfrMod
       RN2SK2(0,NY,NX)=RN2O(0,NY,NX)*XNPG
       RNHSK2(0,NY,NX)=0.0
       RHGSK2(0,NY,NX)=RH2GO(0,NY,NX)*XNPG
-      DO 14 K=0,4
+      DO 14 K=0,jcplx1
       ROCSK2(K,0,NY,NX)=-XOQCS(K,0,NY,NX)*XNPH
       RONSK2(K,0,NY,NX)=-XOQNS(K,0,NY,NX)*XNPH
       ROPSK2(K,0,NY,NX)=-XOQPS(K,0,NY,NX)*XNPH
@@ -1067,7 +1060,7 @@ module TrnsfrMod
       Z2GS2(0,NY,NX)=Z2GS(0,NY,NX)
       Z2OS2(0,NY,NX)=Z2OS(0,NY,NX)
       H2GS2(0,NY,NX)=H2GS(0,NY,NX)
-      DO 9979 K=0,4
+      DO 9979 K=0,jcplx1
       OQC2(K,0,NY,NX)=OQC(K,0,NY,NX)-XOQCS(K,0,NY,NX)
       OQN2(K,0,NY,NX)=OQN(K,0,NY,NX)-XOQNS(K,0,NY,NX)
       OQP2(K,0,NY,NX)=OQP(K,0,NY,NX)-XOQPS(K,0,NY,NX)
@@ -1087,7 +1080,7 @@ module TrnsfrMod
       implicit none
 
       integer, intent(in) :: NY, NX
-      DO 8855 K=0,4
+      DO 8855 K=0,jcplx1
       IF(K.LE.2)THEN
       XOCFLS(K,3,0,NY,NX)=0.0
       XONFLS(K,3,0,NY,NX)=0.0
@@ -1447,7 +1440,7 @@ module TrnsfrMod
       RN2SK2(L,NY,NX)=(RN2O(L,NY,NX)+TUPN2S(L,NY,NX))*XNPG
       RNHSK2(L,NY,NX)=-TRN3G(L,NY,NX)*XNPG
       RHGSK2(L,NY,NX)=(RH2GO(L,NY,NX)+TUPHGS(L,NY,NX))*XNPG
-      DO 15 K=0,4
+      DO 15 K=0,jcplx1
       ROCSK2(K,L,NY,NX)=-XOQCS(K,L,NY,NX)*XNPH
       RONSK2(K,L,NY,NX)=-XOQNS(K,L,NY,NX)*XNPH
       ROPSK2(K,L,NY,NX)=-XOQPS(K,L,NY,NX)*XNPH
@@ -1590,7 +1583,7 @@ module TrnsfrMod
       Z2GS2(L,NY,NX)=Z2GS(L,NY,NX)
       Z2OS2(L,NY,NX)=Z2OS(L,NY,NX)
       H2GS2(L,NY,NX)=H2GS(L,NY,NX)
-      DO 9980 K=0,4
+      DO 9980 K=0,jcplx1
       OQC2(K,L,NY,NX)=OQC(K,L,NY,NX)-XOQCS(K,L,NY,NX)
       OQN2(K,L,NY,NX)=OQN(K,L,NY,NX)-XOQNS(K,L,NY,NX)
       OQP2(K,L,NY,NX)=OQP(K,L,NY,NX)-XOQPS(K,L,NY,NX)
@@ -1668,7 +1661,7 @@ module TrnsfrMod
 !     ZN3G=gaseous NH3
 !
 
-      DO 9880 K=0,4
+      DO 9880 K=0,jcplx1
       TQROC(K,NY,NX)=0.0
       TQRON(K,NY,NX)=0.0
       TQROP(K,NY,NX)=0.0
@@ -1737,7 +1730,7 @@ module TrnsfrMod
 !
       DO 9885 L=NU(NY,NX),NL(NY,NX)
       IF(M.NE.MX)THEN
-      DO 9875 K=0,4
+      DO 9875 K=0,jcplx1
       TOCFLS(K,L,NY,NX)=0.0
       TONFLS(K,L,NY,NX)=0.0
       TOPFLS(K,L,NY,NX)=0.0
@@ -2040,7 +2033,7 @@ module TrnsfrMod
       DFGSN2=ZNSGL2(0,NY,NX)*TORT0
       DFGSN3=ZVSGL2(0,NY,NX)*TORT0
       DFGSHL=HLSGL2(0,NY,NX)*TORT0
-      DO 8810 K=0,4
+      DO 8810 K=0,jcplx1
       COQC1(K)=AMAX1(0.0,OQC2(K,0,NY,NX)/VOLWM(M,0,NY,NX))
       COQN1(K)=AMAX1(0.0,OQN2(K,0,NY,NX)/VOLWM(M,0,NY,NX))
       COQP1(K)=AMAX1(0.0,OQP2(K,0,NY,NX)/VOLWM(M,0,NY,NX))
@@ -2176,7 +2169,7 @@ module TrnsfrMod
       DFGSN2=ZNSGL2(NU(NY,NX),NY,NX)*TORT1
       DFGSN3=ZVSGL2(NU(NY,NX),NY,NX)*TORT1
       DFGSHL=HLSGL2(NU(NY,NX),NY,NX)*TORT1
-      DO 8910 K=0,4
+      DO 8910 K=0,jcplx1
       COQC2(K)=AMAX1(0.0,OQC2(K,NU(NY,NX),NY,NX) &
       /VOLWM(M,NU(NY,NX),NY,NX))
       COQN2(K)=AMAX1(0.0,OQN2(K,NU(NY,NX),NY,NX) &
@@ -2392,7 +2385,7 @@ module TrnsfrMod
       ELSE
       VFLW=VFLWX
       ENDIF
-      DO 8820 K=0,4
+      DO 8820 K=0,jcplx1
       RFLOC(K)=VFLW*AMAX1(0.0,OQC2(K,0,NY,NX))
       RFLON(K)=VFLW*AMAX1(0.0,OQN2(K,0,NY,NX))
       RFLOP(K)=VFLW*AMAX1(0.0,OQP2(K,0,NY,NX))
@@ -2438,7 +2431,7 @@ module TrnsfrMod
       ELSE
       VFLW=-VFLWX
       ENDIF
-      DO 8815 K=0,4
+      DO 8815 K=0,jcplx1
       RFLOC(K)=VFLW*AMAX1(0.0,OQC2(K,NU(NY,NX),NY,NX))
       RFLON(K)=VFLW*AMAX1(0.0,OQN2(K,NU(NY,NX),NY,NX))
       RFLOP(K)=VFLW*AMAX1(0.0,OQP2(K,NU(NY,NX),NY,NX))
@@ -2548,7 +2541,7 @@ module TrnsfrMod
 !             :*ZN3*=NH3,*H2G*=H2
 !     C*1,C*2=solute concentration in litter,soil surface
 !
-      DO 8805 K=0,4
+      DO 8805 K=0,jcplx1
       DFVOC(K)=DIFOC*(COQC1(K)-COQC2(K))
       DFVON(K)=DIFON*(COQN1(K)-COQN2(K))
       DFVOP(K)=DIFOP*(COQP1(K)-COQP2(K))
@@ -2573,7 +2566,7 @@ module TrnsfrMod
       DFVP1B=DIFPO*(CP14S1-CP14B2)*VLPOB(NU(NY,NX),NY,NX)
       DFVPOB=DIFPO*(CPO4S1-CPO4B2)*VLPOB(NU(NY,NX),NY,NX)
       ELSE
-      DO 8905 K=0,4
+      DO 8905 K=0,jcplx1
       DFVOC(K)=0.0
       DFVON(K)=0.0
       DFVOP(K)=0.0
@@ -2773,7 +2766,7 @@ module TrnsfrMod
       ELSE
       VFLW=VFLWX
       ENDIF
-      DO 9870 K=0,4
+      DO 9870 K=0,jcplx1
       RFLOC(K)=VFLW*AMAX1(0.0,OQCH2(K,NU(NY,NX),NY,NX))
       RFLON(K)=VFLW*AMAX1(0.0,OQNH2(K,NU(NY,NX),NY,NX))
       RFLOP(K)=VFLW*AMAX1(0.0,OQPH2(K,NU(NY,NX),NY,NX))
@@ -2819,7 +2812,7 @@ module TrnsfrMod
       ELSE
       VFLW=-VFLWX
       ENDIF
-      DO 9865 K=0,4
+      DO 9865 K=0,jcplx1
       RFLOC(K)=VFLW*AMAX1(0.0,OQC2(K,NU(NY,NX),NY,NX))
       RFLON(K)=VFLW*AMAX1(0.0,OQN2(K,NU(NY,NX),NY,NX))
       RFLOP(K)=VFLW*AMAX1(0.0,OQP2(K,NU(NY,NX),NY,NX))
@@ -2859,7 +2852,7 @@ module TrnsfrMod
 !     NO MACROPORE TO MICROPORE TRANSFER
 !
       ELSE
-      DO 9860 K=0,4
+      DO 9860 K=0,jcplx1
       RFLOC(K)=0.0
       RFLON(K)=0.0
       RFLOP(K)=0.0
@@ -2904,7 +2897,7 @@ module TrnsfrMod
       VOLWHS=AMIN1(XFRS*VOLT(NU(NY,NX),NY,NX) &
       ,VOLWHM(M,NU(NY,NX),NY,NX))
       VOLWT=VOLWM(M,NU(NY,NX),NY,NX)+VOLWHS
-      DO 8835 K=0,4
+      DO 8835 K=0,jcplx1
       DFVOC(K)=XNPH*(AMAX1(0.0,OQCH2(K,NU(NY,NX),NY,NX)) &
       *VOLWM(M,NU(NY,NX),NY,NX) &
       -AMAX1(0.0,OQC2(K,NU(NY,NX),NY,NX))*VOLWHS)/VOLWT
@@ -2985,7 +2978,7 @@ module TrnsfrMod
       -AMAX1(0.0,H2POB2(NU(NY,NX),NY,NX))*VOLWHS)/VOLWT &
       *VLPOB(NU(NY,NX),NY,NX)
       ELSE
-      DO 8935 K=0,4
+      DO 8935 K=0,jcplx1
       DFVOC(K)=0.0
       DFVON(K)=0.0
       DFVOP(K)=0.0
@@ -3021,7 +3014,7 @@ module TrnsfrMod
 !             :NH4=NH4,NH3=NH3,NO3=NO3,NO2=NO2,P14=HPO4,PO4=H2PO4 in non-band
 !             :N4B=NH4,N3B=NH3,NOB=NO3,N2B=NO2,P1B=HPO4,POB=H2PO4 in band
 !
-      DO 9940 K=0,4
+      DO 9940 K=0,jcplx1
       ROCFXS(K,NU(NY,NX),NY,NX)=RFLOC(K)+DFVOC(K)
       RONFXS(K,NU(NY,NX),NY,NX)=RFLON(K)+DFVON(K)
       ROPFXS(K,NU(NY,NX),NY,NX)=RFLOP(K)+DFVOP(K)
@@ -3055,7 +3048,7 @@ module TrnsfrMod
 !             :NH4=NH4,NH3=NH3,NO3=NO3,NO2=NO2,P14=HPO4,PO4=H2PO4 in non-band
 !             :N4B=NH4,N3B=NH3,NOB=NO3,N2B=NO2,P1B=HPO4,POB=H2PO4 in band
 !
-      DO 9935 K=0,4
+      DO 9935 K=0,jcplx1
       XOCFXS(K,NU(NY,NX),NY,NX)=XOCFXS(K,NU(NY,NX),NY,NX) &
       +ROCFXS(K,NU(NY,NX),NY,NX)
       XONFXS(K,NU(NY,NX),NY,NX)=XONFXS(K,NU(NY,NX),NY,NX) &
@@ -3135,7 +3128,7 @@ module TrnsfrMod
       ELSE
       VFLW=VFLWX
       ENDIF
-      DO 9835 K=0,4
+      DO 9835 K=0,jcplx1
       RQROC0(K,N2,N1)=VFLW*AMAX1(0.0,OQC2(K,0,N2,N1))
       RQRON0(K,N2,N1)=VFLW*AMAX1(0.0,OQN2(K,0,N2,N1))
       RQROP0(K,N2,N1)=VFLW*AMAX1(0.0,OQP2(K,0,N2,N1))
@@ -3154,7 +3147,7 @@ module TrnsfrMod
       RQRH1P0(N2,N1)=VFLW*AMAX1(0.0,H1PO42(0,N2,N1))
       RQRH2P0(N2,N1)=VFLW*AMAX1(0.0,H2PO42(0,N2,N1))
       ELSE
-      DO 9836 K=0,4
+      DO 9836 K=0,jcplx1
       RQROC0(K,N2,N1)=0.0
       RQRON0(K,N2,N1)=0.0
       RQROP0(K,N2,N1)=0.0
@@ -3214,7 +3207,7 @@ module TrnsfrMod
       IF(QRM(M,N2,N1).GT.ZEROS(N2,N1))THEN
       IF(NN.EQ.1)THEN
       FQRM=QRMN(M,N,2,N5,N4)/QRM(M,N2,N1)
-      DO 9840 K=0,4
+      DO 9840 K=0,jcplx1
       RQROC(K,N,2,N5,N4)=RQROC0(K,N2,N1)*FQRM
       RQRON(K,N,2,N5,N4)=RQRON0(K,N2,N1)*FQRM
       RQROP(K,N,2,N5,N4)=RQROP0(K,N2,N1)*FQRM
@@ -3238,7 +3231,7 @@ module TrnsfrMod
 !     XQR*=hourly solute in runoff
 !     RQR*=solute in runoff
 !
-      DO 9841 K=0,4
+      DO 9841 K=0,jcplx1
       XOCQRS(K,N,2,N5,N4)=XOCQRS(K,N,2,N5,N4)+RQROC(K,N,2,N5,N4)
       XONQRS(K,N,2,N5,N4)=XONQRS(K,N,2,N5,N4)+RQRON(K,N,2,N5,N4)
       XOPQRS(K,N,2,N5,N4)=XOPQRS(K,N,2,N5,N4)+RQROP(K,N,2,N5,N4)
@@ -3257,7 +3250,7 @@ module TrnsfrMod
       XP1QRW(N,2,N5,N4)=XP1QRW(N,2,N5,N4)+RQRH1P(N,2,N5,N4)
       XP4QRW(N,2,N5,N4)=XP4QRW(N,2,N5,N4)+RQRH2P(N,2,N5,N4)
       ELSE
-      DO 9842 K=0,4
+      DO 9842 K=0,jcplx1
       RQROC(K,N,2,N5,N4)=0.0
       RQRON(K,N,2,N5,N4)=0.0
       RQROP(K,N,2,N5,N4)=0.0
@@ -3282,7 +3275,7 @@ module TrnsfrMod
       IF(NN.EQ.2)THEN
       IF(N4B.GT.0.AND.N5B.GT.0)THEN
       FQRM=QRMN(M,N,1,N5B,N4B)/QRM(M,N2,N1)
-      DO 9834 K=0,4
+      DO 9834 K=0,jcplx1
       RQROC(K,N,1,N5B,N4B)=RQROC0(K,N2,N1)*FQRM
       RQRON(K,N,1,N5B,N4B)=RQRON0(K,N2,N1)*FQRM
       RQROP(K,N,1,N5B,N4B)=RQROP0(K,N2,N1)*FQRM
@@ -3300,7 +3293,7 @@ module TrnsfrMod
       RQRNO2(N,1,N5B,N4B)=RQRNO20(N2,N1)*FQRM
       RQRH1P(N,1,N5B,N4B)=RQRH1P0(N2,N1)*FQRM
       RQRH2P(N,1,N5B,N4B)=RQRH2P0(N2,N1)*FQRM
-      DO 9824 K=0,4
+      DO 9824 K=0,jcplx1
       XOCQRS(K,N,1,N5B,N4B)=XOCQRS(K,N,1,N5B,N4B)+RQROC(K,N,1,N5B,N4B)
       XONQRS(K,N,1,N5B,N4B)=XONQRS(K,N,1,N5B,N4B)+RQRON(K,N,1,N5B,N4B)
       XOPQRS(K,N,1,N5B,N4B)=XOPQRS(K,N,1,N5B,N4B)+RQROP(K,N,1,N5B,N4B)
@@ -3319,7 +3312,7 @@ module TrnsfrMod
       XP1QRW(N,1,N5B,N4B)=XP1QRW(N,1,N5B,N4B)+RQRH1P(N,1,N5B,N4B)
       XP4QRW(N,1,N5B,N4B)=XP4QRW(N,1,N5B,N4B)+RQRH2P(N,1,N5B,N4B)
       ELSE
-      DO 9833 K=0,4
+      DO 9833 K=0,jcplx1
       RQROC(K,N,1,N5B,N4B)=0.0
       RQRON(K,N,1,N5B,N4B)=0.0
       RQROP(K,N,1,N5B,N4B)=0.0
@@ -3340,7 +3333,7 @@ module TrnsfrMod
       ENDIF
       ENDIF
       ELSE
-      DO 9839 K=0,4
+      DO 9839 K=0,jcplx1
       RQROC(K,N,2,N5,N4)=0.0
       RQRON(K,N,2,N5,N4)=0.0
       RQROP(K,N,2,N5,N4)=0.0
@@ -3359,7 +3352,7 @@ module TrnsfrMod
       RQRH1P(N,2,N5,N4)=0.0
       RQRH2P(N,2,N5,N4)=0.0
       IF(N4B.GT.0.AND.N5B.GT.0)THEN
-      DO 9837 K=0,4
+      DO 9837 K=0,jcplx1
       RQROC(K,N,1,N5B,N4B)=0.0
       RQRON(K,N,1,N5B,N4B)=0.0
       RQROP(K,N,1,N5B,N4B)=0.0
@@ -4063,7 +4056,7 @@ module TrnsfrMod
       ELSE
       VFLW=VFLWX
       ENDIF
-      DO 9820 K=0,4
+      DO 9820 K=0,jcplx1
       RFLOC(K)=VFLW*AMAX1(0.0,OQC2(K,N3,N2,N1))
       RFLON(K)=VFLW*AMAX1(0.0,OQN2(K,N3,N2,N1))
       RFLOP(K)=VFLW*AMAX1(0.0,OQP2(K,N3,N2,N1))
@@ -4100,7 +4093,7 @@ module TrnsfrMod
       ELSE
       VFLW=-VFLWX
       ENDIF
-      DO 9815 K=0,4
+      DO 9815 K=0,jcplx1
       RFLOC(K)=VFLW*AMAX1(0.0,OQC2(K,N6,N5,N4))
       RFLON(K)=VFLW*AMAX1(0.0,OQN2(K,N6,N5,N4))
       RFLOP(K)=VFLW*AMAX1(0.0,OQP2(K,N6,N5,N4))
@@ -4150,7 +4143,7 @@ module TrnsfrMod
 !             :N4B=NH4,N3B=NH3,NOB=NO3,N2B=NO2,P1B=HPO4,POB=H2PO4 in band
 !     *S2,*B2=soil solute content in non-band,band
 !
-      DO 9810 K=0,4
+      DO 9810 K=0,jcplx1
       COQC1(K)=AMAX1(0.0,OQC2(K,N3,N2,N1)/VOLWM(M,N3,N2,N1))
       COQN1(K)=AMAX1(0.0,OQN2(K,N3,N2,N1)/VOLWM(M,N3,N2,N1))
       COQP1(K)=AMAX1(0.0,OQP2(K,N3,N2,N1)/VOLWM(M,N3,N2,N1))
@@ -4298,7 +4291,7 @@ module TrnsfrMod
 !     DIFFUSIVE FLUXES BETWEEN CURRENT AND ADJACENT GRID CELL
 !     MICROPORES
 !
-      DO 9805 K=0,4
+      DO 9805 K=0,jcplx1
       DFVOC(K)=DIFOC*(COQC1(K)-COQC2(K))
       DFVON(K)=DIFON*(COQN1(K)-COQN2(K))
       DFVOP(K)=DIFOP*(COQP1(K)-COQP2(K))
@@ -4335,7 +4328,7 @@ module TrnsfrMod
       DFVPOB=DIFPO*(CPO4B1-CPO4B2)*AMIN1(VLPOB(N3,N2,N1) &
       ,VLPOB(N6,N5,N4))
       ELSE
-      DO 9905 K=0,4
+      DO 9905 K=0,jcplx1
       DFVOC(K)=0.0
       DFVON(K)=0.0
       DFVOP(K)=0.0
@@ -4394,7 +4387,7 @@ module TrnsfrMod
 !     ACCOUNT FOR MACROPORE-MICROPORE EXCHANGE
 !
       IF(N.EQ.3.AND.VOLAH(N6,N5,N4).GT.VOLWHM(M,N6,N5,N4))THEN
-      DO 9800 K=0,4
+      DO 9800 K=0,jcplx1
       RFHOC(K)=VFLW*AMAX1(0.0,(OQCH2(K,N3,N2,N1) &
       -AMIN1(0.0,ROCFXS(K,NU(N2,N1),N2,N1))))
       RFHON(K)=VFLW*AMAX1(0.0,(OQNH2(K,N3,N2,N1) &
@@ -4456,7 +4449,7 @@ module TrnsfrMod
 !     OTHERWISE
 !
       ELSE
-      DO 9850 K=0,4
+      DO 9850 K=0,jcplx1
       RFHOC(K)=VFLW*AMAX1(0.0,OQCH2(K,N3,N2,N1))
       RFHON(K)=VFLW*AMAX1(0.0,OQNH2(K,N3,N2,N1))
       RFHOP(K)=VFLW*AMAX1(0.0,OQPH2(K,N3,N2,N1))
@@ -4494,7 +4487,7 @@ module TrnsfrMod
       ELSE
       VFLW=-VFLWX
       ENDIF
-      DO 9665 K=0,4
+      DO 9665 K=0,jcplx1
       RFHOC(K)=VFLW*AMAX1(0.0,OQCH2(K,N6,N5,N4))
       RFHON(K)=VFLW*AMAX1(0.0,OQNH2(K,N6,N5,N4))
       RFHOP(K)=VFLW*AMAX1(0.0,OQPH2(K,N6,N5,N4))
@@ -4522,7 +4515,7 @@ module TrnsfrMod
 !
 !     NO MACROPORE FLUX
 !
-      DO 9795 K=0,4
+      DO 9795 K=0,jcplx1
       RFHOC(K)=0.0
       RFHON(K)=0.0
       RFHOP(K)=0.0
@@ -4571,7 +4564,7 @@ module TrnsfrMod
 !             :NH4=NH4,NH3=NH3,NO3=NO3,NO2=NO2,P14=HPO4,PO4=H2PO4 in non-band
 !             :N4B=NH4,N3B=NH3,NOB=NO3,N2B=NO2,P1B=HPO4,POB=H2PO4 in band
 !
-      DO 9790 K=0,4
+      DO 9790 K=0,jcplx1
       COQCH1(K)=AMAX1(0.0,OQCH2(K,N3,N2,N1)/VOLWHM(M,N3,N2,N1))
       COQNH1(K)=AMAX1(0.0,OQNH2(K,N3,N2,N1)/VOLWHM(M,N3,N2,N1))
       COQPH1(K)=AMAX1(0.0,OQPH2(K,N3,N2,N1)/VOLWHM(M,N3,N2,N1))
@@ -4725,7 +4718,7 @@ module TrnsfrMod
 !     DIFFUSIVE FLUXES BETWEEN CURRENT AND ADJACENT GRID CELL
 !     MACROPORES
 !
-      DO 9785 K=0,4
+      DO 9785 K=0,jcplx1
       DFHOC(K)=DIFOC*(COQCH1(K)-COQCH2(K))
       DFHON(K)=DIFON*(COQNH1(K)-COQNH2(K))
       DFHOP(K)=DIFOP*(COQPH1(K)-COQPH2(K))
@@ -4765,7 +4758,7 @@ module TrnsfrMod
       DFHPOB=DIFPO*(CPO4BH1-CPO4BH2)*AMIN1(VLPOB(N3,N2,N1) &
       ,VLPOB(N6,N5,N4))
       ELSE
-      DO 9780 K=0,4
+      DO 9780 K=0,jcplx1
       DFHOC(K)=0.0
       DFHON(K)=0.0
       DFHOP(K)=0.0
@@ -4807,7 +4800,7 @@ module TrnsfrMod
 !     RFH*=convective flux through macropores
 !     DFH*=diffusive solute flux through macropores
 !
-      DO 9765 K=0,4
+      DO 9765 K=0,jcplx1
       ROCFLS(K,N,N6,N5,N4)=RFLOC(K)+DFVOC(K)
       RONFLS(K,N,N6,N5,N4)=RFLON(K)+DFVON(K)
       ROPFLS(K,N,N6,N5,N4)=RFLOP(K)+DFVOP(K)
@@ -4899,7 +4892,7 @@ module TrnsfrMod
 !     R*FHS=convective + diffusive solute flux through macropores
 !     R*FHW,X*FHB=convective + diffusive solute flux through macropores in non-band,band
 !
-      DO 9755 K=0,4
+      DO 9755 K=0,jcplx1
       XOCFLS(K,N,N6,N5,N4)=XOCFLS(K,N,N6,N5,N4)+ROCFLS(K,N,N6,N5,N4)
       XONFLS(K,N,N6,N5,N4)=XONFLS(K,N,N6,N5,N4)+RONFLS(K,N,N6,N5,N4)
       XOPFLS(K,N,N6,N5,N4)=XOPFLS(K,N,N6,N5,N4)+ROPFLS(K,N,N6,N5,N4)
@@ -4975,7 +4968,7 @@ module TrnsfrMod
       ELSE
       VFLW=VFLWX
       ENDIF
-      DO 9970 K=0,4
+      DO 9970 K=0,jcplx1
       RFLOC(K)=VFLW*AMAX1(0.0,OQCH2(K,N6,N5,N4))
       RFLON(K)=VFLW*AMAX1(0.0,OQNH2(K,N6,N5,N4))
       RFLOP(K)=VFLW*AMAX1(0.0,OQPH2(K,N6,N5,N4))
@@ -5009,7 +5002,7 @@ module TrnsfrMod
       ELSE
       VFLW=-VFLWX
       ENDIF
-      DO 9965 K=0,4
+      DO 9965 K=0,jcplx1
       RFLOC(K)=VFLW*AMAX1(0.0,OQC2(K,N6,N5,N4))
       RFLON(K)=VFLW*AMAX1(0.0,OQN2(K,N6,N5,N4))
       RFLOP(K)=VFLW*AMAX1(0.0,OQP2(K,N6,N5,N4))
@@ -5037,7 +5030,7 @@ module TrnsfrMod
 !     NO MACROPORE TO MICROPORE TRANSFER
 !
       ELSE
-      DO 9960 K=0,4
+      DO 9960 K=0,jcplx1
       RFLOC(K)=0.0
       RFLON(K)=0.0
       RFLOP(K)=0.0
@@ -5079,7 +5072,7 @@ module TrnsfrMod
       IF(VOLWHM(M,N6,N5,N4).GT.ZEROS2(N5,N4))THEN
       VOLWHS=AMIN1(XFRS*VOLT(N6,N5,N4),VOLWHM(M,N6,N5,N4))
       VOLWT=VOLWM(M,N6,N5,N4)+VOLWHS
-      DO 9955 K=0,4
+      DO 9955 K=0,jcplx1
       DFVOC(K)=XNPH*(AMAX1(0.0,OQCH2(K,N6,N5,N4))*VOLWM(M,N6,N5,N4) &
       -AMAX1(0.0,OQC2(K,N6,N5,N4))*VOLWHS)/VOLWT
       DFVON(K)=XNPH*(AMAX1(0.0,OQNH2(K,N6,N5,N4))*VOLWM(M,N6,N5,N4) &
@@ -5138,7 +5131,7 @@ module TrnsfrMod
       -AMAX1(0.0,H2POB2(N6,N5,N4))*VOLWHS)/VOLWT &
       *VLPOB(N6,N5,N4)
       ELSE
-      DO 9975 K=0,4
+      DO 9975 K=0,jcplx1
       DFVOC(K)=0.0
       DFVON(K)=0.0
       DFVOP(K)=0.0
@@ -5174,7 +5167,7 @@ module TrnsfrMod
 !     RFL*=convective flux between macro- and micropore
 !     DFV*=diffusive solute flux between macro- and micropore
 !
-      DO 9950 K=0,4
+      DO 9950 K=0,jcplx1
       ROCFXS(K,N6,N5,N4)=RFLOC(K)+DFVOC(K)
       RONFXS(K,N6,N5,N4)=RFLON(K)+DFVON(K)
       ROPFXS(K,N6,N5,N4)=RFLOP(K)+DFVOP(K)
@@ -5204,7 +5197,7 @@ module TrnsfrMod
 !     X*FXS,X*FXB= hourly convective + diffusive solute flux between macro- and micropore in non-band,band
 !     R*FXS,R*FXB=convective + diffusive solute flux between macro- and micropore in non-band,band
 !
-      DO 9945 K=0,4
+      DO 9945 K=0,jcplx1
       XOCFXS(K,N6,N5,N4)=XOCFXS(K,N6,N5,N4)+ROCFXS(K,N6,N5,N4)
       XONFXS(K,N6,N5,N4)=XONFXS(K,N6,N5,N4)+RONFXS(K,N6,N5,N4)
       XOPFXS(K,N6,N5,N4)=XOPFXS(K,N6,N5,N4)+ROPFXS(K,N6,N5,N4)
@@ -5528,7 +5521,7 @@ module TrnsfrMod
       DZ2OG(N,N6,N5,N4)=0.0
       DNH3G(N,N6,N5,N4)=0.0
       DH2GG(N,N6,N5,N4)=0.0
-      DO 9750 K=0,4
+      DO 9750 K=0,jcplx1
       ROCFLS(K,N,N6,N5,N4)=0.0
       RONFLS(K,N,N6,N5,N4)=0.0
       ROPFLS(K,N,N6,N5,N4)=0.0
@@ -5589,7 +5582,7 @@ module TrnsfrMod
       DZ2OG(N,N3,N2,N1)=0.0
       DNH3G(N,N3,N2,N1)=0.0
       DH2GG(N,N3,N2,N1)=0.0
-      DO 9751 K=0,4
+      DO 9751 K=0,jcplx1
       ROCFLS(K,N,N3,N2,N1)=0.0
       RONFLS(K,N,N3,N2,N1)=0.0
       ROPFLS(K,N,N3,N2,N1)=0.0
@@ -5782,7 +5775,7 @@ module TrnsfrMod
       IF(L.EQ.NUM(M2,M1).AND.N.NE.3)THEN
       IF(IRCHG(NN,N,N2,N1).EQ.0.OR.test_aeqb(RCHQF,0.0_r8) &
       .OR.QRM(M,N2,N1).LE.ZEROS(N2,N1))THEN
-      DO 9542 K=0,4
+      DO 9542 K=0,jcplx1
       RQROC(K,N,NN,M5,M4)=0.0
       RQRON(K,N,NN,M5,M4)=0.0
       RQROP(K,N,NN,M5,M4)=0.0
@@ -5808,7 +5801,7 @@ module TrnsfrMod
       IF((NN.EQ.1.AND.QRMN(M,N,NN,M5,M4).GT.ZEROS(N2,N1)) &
       .OR.(NN.EQ.2.AND.QRMN(M,N,NN,M5,M4).LT.ZEROS(N2,N1)))THEN
       FQRM=QRMN(M,N,NN,M5,M4)/QRM(M,N2,N1)
-      DO 9540 K=0,4
+      DO 9540 K=0,jcplx1
       RQROC(K,N,NN,M5,M4)=RQROC0(K,N2,N1)*FQRM
       RQRON(K,N,NN,M5,M4)=RQRON0(K,N2,N1)*FQRM
       RQROP(K,N,NN,M5,M4)=RQROP0(K,N2,N1)*FQRM
@@ -5832,7 +5825,7 @@ module TrnsfrMod
 !     X*QRS=hourly solute in runoff
 !     RQR*=solute in runoff
 !
-      DO 9565 K=0,4
+      DO 9565 K=0,jcplx1
       XOCQRS(K,N,NN,M5,M4)=XOCQRS(K,N,NN,M5,M4)+RQROC(K,N,NN,M5,M4)
       XONQRS(K,N,NN,M5,M4)=XONQRS(K,N,NN,M5,M4)+RQRON(K,N,NN,M5,M4)
       XOPQRS(K,N,NN,M5,M4)=XOPQRS(K,N,NN,M5,M4)+RQROP(K,N,NN,M5,M4)
@@ -5856,7 +5849,7 @@ module TrnsfrMod
 !
       ELSEIF((NN.EQ.2.AND.QRMN(M,N,NN,M5,M4).GT.ZEROS(N2,N1)) &
       .OR.(NN.EQ.1.AND.QRMN(M,N,NN,M5,M4).LT.ZEROS(N2,N1)))THEN
-      DO 9629 K=0,4
+      DO 9629 K=0,jcplx1
       RQROC(K,N,NN,M5,M4)=0.0
       RQRON(K,N,NN,M5,M4)=0.0
       RQROP(K,N,NN,M5,M4)=0.0
@@ -5880,7 +5873,7 @@ module TrnsfrMod
       XNGQRS(N,NN,M5,M4)=XNGQRS(N,NN,M5,M4)+RQRNGS(N,NN,M5,M4)
       XN2QRS(N,NN,M5,M4)=XN2QRS(N,NN,M5,M4)+RQRN2S(N,NN,M5,M4)
       ELSE
-      DO 9627 K=0,4
+      DO 9627 K=0,jcplx1
       RQROC(K,N,NN,M5,M4)=0.0
       RQRON(K,N,NN,M5,M4)=0.0
       RQROP(K,N,NN,M5,M4)=0.0
@@ -5940,7 +5933,7 @@ module TrnsfrMod
       ELSE
       VFLW=0.0
       ENDIF
-      DO 9520 K=0,4
+      DO 9520 K=0,jcplx1
       ROCFLS(K,N,M6,M5,M4)=VFLW*AMAX1(0.0,OQC2(K,M3,M2,M1))
       RONFLS(K,N,M6,M5,M4)=VFLW*AMAX1(0.0,OQN2(K,M3,M2,M1))
       ROPFLS(K,N,M6,M5,M4)=VFLW*AMAX1(0.0,OQP2(K,M3,M2,M1))
@@ -5984,7 +5977,7 @@ module TrnsfrMod
 !     SOLUTE GAIN WITH SUBSURFACE MICROPORE WATER GAIN
 !
       ELSE
-      DO 9515 K=0,4
+      DO 9515 K=0,jcplx1
       ROCFLS(K,N,M6,M5,M4)=0.0
       RONFLS(K,N,M6,M5,M4)=0.0
       ROPFLS(K,N,M6,M5,M4)=0.0
@@ -6045,7 +6038,7 @@ module TrnsfrMod
       ELSE
       VFLW=0.0
       ENDIF
-      DO 9535 K=0,4
+      DO 9535 K=0,jcplx1
       ROCFHS(K,N,M6,M5,M4)=VFLW*AMAX1(0.0,OQCH2(K,M3,M2,M1))
       RONFHS(K,N,M6,M5,M4)=VFLW*AMAX1(0.0,OQNH2(K,M3,M2,M1))
       ROPFHS(K,N,M6,M5,M4)=VFLW*AMAX1(0.0,OQPH2(K,M3,M2,M1))
@@ -6085,7 +6078,7 @@ module TrnsfrMod
 !     NO SOLUTE GAIN IN SUBSURFACE MACROPORES
 !
       ELSE
-      DO 9530 K=0,4
+      DO 9530 K=0,jcplx1
       ROCFHS(K,N,M6,M5,M4)=0.0
       RONFHS(K,N,M6,M5,M4)=0.0
       ROPFHS(K,N,M6,M5,M4)=0.0
@@ -6118,7 +6111,7 @@ module TrnsfrMod
 !     R*FLS,R*FLW,R*FLB=solute flux in non-band,band micropores
 !     R*FHS,R*FHW,R*FHB=solute flux in non-band,band macropores
 !
-      DO 9555 K=0,4
+      DO 9555 K=0,jcplx1
       XOCFLS(K,N,M6,M5,M4)=XOCFLS(K,N,M6,M5,M4)+ROCFLS(K,N,M6,M5,M4)
       XONFLS(K,N,M6,M5,M4)=XONFLS(K,N,M6,M5,M4)+RONFLS(K,N,M6,M5,M4)
       XOPFLS(K,N,M6,M5,M4)=XOPFLS(K,N,M6,M5,M4)+ROPFLS(K,N,M6,M5,M4)
@@ -6220,7 +6213,7 @@ module TrnsfrMod
       RHGFLG(N,M6,M5,M4)=0.0
       ENDIF
       ELSE
-      DO 9531 K=0,4
+      DO 9531 K=0,jcplx1
       ROCFHS(K,N,M6,M5,M4)=0.0
       RONFHS(K,N,M6,M5,M4)=0.0
       ROPFHS(K,N,M6,M5,M4)=0.0
@@ -6273,7 +6266,7 @@ module TrnsfrMod
       IF(N.NE.3)THEN
 
       DO 1202 NN=1,2
-      DO 9550 K=0,4
+      DO 9550 K=0,jcplx1
       TQROC(K,N2,N1)=TQROC(K,N2,N1)+RQROC(K,N,NN,N2,N1)
       TQRON(K,N2,N1)=TQRON(K,N2,N1)+RQRON(K,N,NN,N2,N1)
       TQROP(K,N2,N1)=TQROP(K,N2,N1)+RQROP(K,N,NN,N2,N1)
@@ -6292,7 +6285,7 @@ module TrnsfrMod
       TQRH1P(N2,N1)=TQRH1P(N2,N1)+RQRH1P(N,NN,N2,N1)
       TQRH2P(N2,N1)=TQRH2P(N2,N1)+RQRH2P(N,NN,N2,N1)
       IF(IFLBM(M,N,NN,N5,N4).EQ.0)THEN
-      DO 9551 K=0,4
+      DO 9551 K=0,jcplx1
       TQROC(K,N2,N1)=TQROC(K,N2,N1)-RQROC(K,N,NN,N5,N4)
       TQRON(K,N2,N1)=TQRON(K,N2,N1)-RQRON(K,N,NN,N5,N4)
       TQROP(K,N2,N1)=TQROP(K,N2,N1)-RQROP(K,N,NN,N5,N4)
@@ -6312,7 +6305,7 @@ module TrnsfrMod
       TQRH2P(N2,N1)=TQRH2P(N2,N1)-RQRH2P(N,NN,N5,N4)
       ENDIF
       IF(N4B.GT.0.AND.N5B.GT.0.AND.NN.EQ.1)THEN
-      DO 9552 K=0,4
+      DO 9552 K=0,jcplx1
       TQROC(K,N2,N1)=TQROC(K,N2,N1)-RQROC(K,N,NN,N5B,N4B)
       TQRON(K,N2,N1)=TQRON(K,N2,N1)-RQRON(K,N,NN,N5B,N4B)
       TQROP(K,N2,N1)=TQROP(K,N2,N1)-RQROP(K,N,NN,N5B,N4B)
@@ -6445,7 +6438,7 @@ module TrnsfrMod
 1201  CONTINUE
       IF(M.NE.MX)THEN
       IF(VOLX(N3,N2,N1).GT.ZEROS2(N2,N1))THEN
-      DO 9545 K=0,4
+      DO 9545 K=0,jcplx1
       TOCFLS(K,N3,N2,N1)=TOCFLS(K,N3,N2,N1)+ROCFLS(K,N,N3,N2,N1) &
       -ROCFLS(K,N,N6,N5,N4)
       TONFLS(K,N3,N2,N1)=TONFLS(K,N3,N2,N1)+RONFLS(K,N,N3,N2,N1) &
@@ -6543,7 +6536,7 @@ module TrnsfrMod
       TH2BHB(N3,N2,N1)=TH2BHB(N3,N2,N1)+RH2BHB(N,N3,N2,N1) &
       -RH2BHB(N,N6,N5,N4)
       ELSE
-      DO 9546 K=0,4
+      DO 9546 K=0,jcplx1
       TOCFLS(K,N3,N2,N1)=0.0
       TONFLS(K,N3,N2,N1)=0.0
       TOPFLS(K,N3,N2,N1)=0.0

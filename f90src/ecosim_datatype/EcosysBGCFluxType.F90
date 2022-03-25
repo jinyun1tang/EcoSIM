@@ -3,7 +3,7 @@ module EcosysBGCFluxType
 !
 ! Ecosystm fluxes for C, N, and P budget
   use data_kind_mod, only : r8 => SHR_KIND_R8
-  use GridDataType
+  use GridConsts
   implicit none
   public
   save

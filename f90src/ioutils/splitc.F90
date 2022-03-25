@@ -1,8 +1,9 @@
   SUBROUTINE splitc(NT,NE,NAX,NDX,NTX,NEX,NHW,NHE,NVN,NVS)
   use data_kind_mod, only : r8 => SHR_KIND_R8
   use abortutils, only : endrun
-  use GridDataType
+  use GridConsts
   use EcoSIMHistMod
+  use GridDataType
 
   implicit none
   integer, intent(in) :: NT,NE,NAX,NDX,NTX,NEX,NHW,NHE,NVN,NVS

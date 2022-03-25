@@ -7,7 +7,7 @@ module RedistMod
   use SOMDataType
   use ChemTranspDataType
   use FertilizerDataType
-  use GridDataType
+  use GridConsts
   use SoilPhysDataType
   use FlagDataType
   use SoilHeatDatatype
@@ -29,6 +29,7 @@ module RedistMod
   use SoilPropertyDataType
   use IrrigationDataType
   use SedimentDataType
+  use GridDataType
   implicit none
 
   private
@@ -133,14 +134,14 @@ module RedistMod
   integer :: IFLGLS,LG,LX,LS,LS2
 
   real(r8) :: TFLW(JZ,JY,JX),TFLWX(JZ,JY,JX),THFLW(JZ,JY,JX) &
-    ,TFLWH(JZ,JY,JX),TOCFLS(0:4,JZ,JY,JX),TONFLS(0:4,JZ,JY,JX) &
-    ,TOPFLS(0:4,JZ,JY,JX),TOAFLS(0:4,JZ,JY,JX),TCOFLS(JZ,JY,JX) &
+    ,TFLWH(JZ,JY,JX),TOCFLS(0:jcplx1,JZ,JY,JX),TONFLS(0:jcplx1,JZ,JY,JX) &
+    ,TOPFLS(0:jcplx1,JZ,JY,JX),TOAFLS(0:jcplx1,JZ,JY,JX),TCOFLS(JZ,JY,JX) &
     ,TCHFLS(JZ,JY,JX),TOXFLS(JZ,JY,JX),TNXFLB(JZ,JY,JX) &
     ,TNGFLS(JZ,JY,JX),TN2FLS(JZ,JY,JX),TN4FLS(JZ,JY,JX) &
     ,TN4FLB(JZ,JY,JX),TN3FLS(JZ,JY,JX),TN3FLB(JZ,JY,JX) &
     ,TNOFLS(JZ,JY,JX),TNOFLB(JZ,JY,JX),TPOFLS(JZ,JY,JX) &
-    ,TH2BFB(JZ,JY,JX),TNXFLS(JZ,JY,JX),TOCFHS(0:4,JZ,JY,JX) &
-    ,TONFHS(0:4,JZ,JY,JX),TOPFHS(0:4,JZ,JY,JX),TOAFHS(0:4,JZ,JY,JX) &
+    ,TH2BFB(JZ,JY,JX),TNXFLS(JZ,JY,JX),TOCFHS(0:jcplx1,JZ,JY,JX) &
+    ,TONFHS(0:jcplx1,JZ,JY,JX),TOPFHS(0:jcplx1,JZ,JY,JX),TOAFHS(0:jcplx1,JZ,JY,JX) &
     ,TCOFHS(JZ,JY,JX),TCHFHS(JZ,JY,JX),TNXFHB(JZ,JY,JX) &
     ,TOXFHS(JZ,JY,JX),TNGFHS(JZ,JY,JX),TN2FHS(JZ,JY,JX) &
     ,TN4FHS(JZ,JY,JX),TN4FHB(JZ,JY,JX),TN3FHS(JZ,JY,JX) &
@@ -155,8 +156,8 @@ module RedistMod
     ,CDPTHY(0:JZ,JY,JX)
   real(r8) :: TQR(JY,JX),THQR(JY,JX),TQS(JY,JX),TQW(JY,JX) &
     ,TQI(JY,JX),THQS(JY,JX),TFLWS(JS,JY,JX),TFLWW(JS,JY,JX) &
-    ,TFLWI(JS,JY,JX),THFLWW(JS,JY,JX),TOCQRS(0:4,JY,JX) &
-    ,TONQRS(0:4,JY,JX),TOPQRS(0:4,JY,JX),TOAQRS(0:4,JY,JX) &
+    ,TFLWI(JS,JY,JX),THFLWW(JS,JY,JX),TOCQRS(0:jcplx1,JY,JX) &
+    ,TONQRS(0:jcplx1,JY,JX),TOPQRS(0:jcplx1,JY,JX),TOAQRS(0:jcplx1,JY,JX) &
     ,TCOQRS(JY,JX),TCHQRS(JY,JX),TOXQRS(JY,JX),TQRH1P(JY,JX) &
     ,TNGQRS(JY,JX),TN2QRS(JY,JX),TN4QRS(JY,JX),TN3QRS(JY,JX) &
     ,TNOQRS(JY,JX),TPOQRS(JY,JX),TNXQRS(JY,JX),TQRAL(JY,JX) &
@@ -233,13 +234,15 @@ module RedistMod
     ,TCPDER(JY,JX),TCPHER(JY,JX),TCPMER(JY,JX),TALPEB(JY,JX) &
     ,TFEPEB(JY,JX),TCPDEB(JY,JX),TCPHEB(JY,JX),TCPMEB(JY,JX) &
     ,TFEER(JY,JX),TFE2ER(JY,JX) &
-    ,TORCER(2,0:4,JY,JX),TORNER(2,0:4,JY,JX),TORPER(2,0:4,JY,JX) &
-    ,TOHCER(0:4,JY,JX),TOHNER(0:4,JY,JX),TOHPER(0:4,JY,JX) &
-    ,TOHAER(0:4,JY,JX),TOSCER(4,0:4,JY,JX),TOSAER(4,0:4,JY,JX) &
-    ,TOSNER(4,0:4,JY,JX),TOSPER(4,0:4,JY,JX),TSEDER(JY,JX)
-  real(r8) :: TORC(2,0:4),TORN(2,0:4),TORP(2,0:4),TOQC(0:4),TOQN(0:4) &
-    ,TOQP(0:4),TOQA(0:4),TOHC(0:4),TOHN(0:4),TOHP(0:4),TOHA(0:4) &
-    ,TOSC(4,0:4),TOSA(4,0:4),TOSN(4,0:4),TOSP(4,0:4),TOSGC(4,0:2) &
+    ,TORCER(2,0:jcplx1,JY,JX),TORNER(2,0:jcplx1,JY,JX) &
+    ,TORPER(2,0:jcplx1,JY,JX),TOHCER(0:jcplx1,JY,JX),&
+    TOHNER(0:jcplx1,JY,JX),TOHPER(0:jcplx1,JY,JX) &
+    ,TOHAER(0:jcplx1,JY,JX),TOSCER(jsken,0:jcplx1,JY,JX) &
+    ,TOSAER(4,0:jcplx1,JY,JX),TOSNER(4,0:jcplx1,JY,JX),&
+    TOSPER(4,0:jcplx1,JY,JX),TSEDER(JY,JX)
+  real(r8) :: TORC(2,0:jcplx1),TORN(2,0:jcplx1),TORP(2,0:jcplx1),TOQC(0:jcplx1),TOQN(0:jcplx1) &
+    ,TOQP(0:jcplx1),TOQA(0:jcplx1),TOHC(0:jcplx1),TOHN(0:jcplx1),TOHP(0:jcplx1),TOHA(0:jcplx1) &
+    ,TOSC(4,0:jcplx1),TOSA(4,0:jcplx1),TOSN(4,0:jcplx1),TOSP(4,0:jcplx1),TOSGC(4,0:2) &
     ,TOSGA(4,0:2),TOSGN(4,0:2),TOSGP(4,0:2),TORXC(2,0:2),TORXN(2,0:2) &
     ,TORXP(2,0:2),TOQGC(0:2),TOQGN(0:2),TOQGP(0:2),TOQHC(0:2) &
     ,TOQHN(0:2),TOQHP(0:2),TOHGC(0:2),TOHGN(0:2),TOHGP(0:2) &
@@ -292,15 +295,15 @@ module RedistMod
 
   subroutine InitRedist
   implicit none
-  allocate(TOMCER(3,JG,7,0:5,JY,JX))
-  allocate(TOMNER(3,JG,7,0:5,JY,JX))
-  allocate(TOMPER(3,JG,7,0:5,JY,JX))
-  allocate(TOMC(3,JG,7,0:5))
-  allocate(TOMN(3,JG,7,0:5))
-  allocate(TOMP(3,JG,7,0:5))
-  allocate(TOMGC(3,JG,7,0:5))
-  allocate(TOMGN(3,JG,7,0:5))
-  allocate(TOMGP(3,JG,7,0:5))
+  allocate(TOMCER(3,JG,7,0:jcplx,JY,JX))
+  allocate(TOMNER(3,JG,7,0:jcplx,JY,JX))
+  allocate(TOMPER(3,JG,7,0:jcplx,JY,JX))
+  allocate(TOMC(3,JG,7,0:jcplx))
+  allocate(TOMN(3,JG,7,0:jcplx))
+  allocate(TOMP(3,JG,7,0:jcplx))
+  allocate(TOMGC(3,JG,7,0:jcplx))
+  allocate(TOMGN(3,JG,7,0:jcplx))
+  allocate(TOMGP(3,JG,7,0:jcplx))
 
   end subroutine InitRedist
   SUBROUTINE redist(I,J,NHW,NHE,NVN,NVS)
@@ -971,7 +974,7 @@ module RedistMod
 !
 !     MICROBIAL C,N,P
 !
-      DO 1970 K=0,5
+      DO 1970 K=0,jcplx
         IF(K.NE.3.AND.K.NE.4)THEN
 !         OMC,OMN,OMP=microbial C,N,P
 !         ORC,ORN,ORP=microbial residue C,N,P
@@ -1146,7 +1149,7 @@ module RedistMod
         COD=0.0_r8
         ZOD=0.0_r8
         POD=0.0_r8
-        DO 450 K=0,4
+        DO 450 K=0,jcplx1
           COD=COD+XN*(XOCFLS(K,N,N6,N5,N4)+XOAFLS(K,N,N6,N5,N4) &
             +XOCFHS(K,N,N6,N5,N4)+XOAFHS(K,N,N6,N5,N4))
           ZOD=ZOD+XN*(XONFLS(K,N,N6,N5,N4)+XONFHS(K,N,N6,N5,N4))
@@ -1356,7 +1359,7 @@ module RedistMod
       COR=0.0_r8
       ZOR=0.0_r8
       POR=0.0_r8
-      DO 2575 K=0,4
+      DO 2575 K=0,jcplx1
         COR=COR+XN*(XOCQRS(K,N,NN,N5,N4)+XOAQRS(K,N,NN,N5,N4))
         ZOR=ZOR+XN*XONQRS(K,N,NN,N5,N4)
         POR=POR+XN*XOPQRS(K,N,NN,N5,N4)
@@ -1497,7 +1500,7 @@ module RedistMod
           COE=0.0_r8
           ZOE=0.0_r8
           POE=0.0_r8
-          DO 3580 K=0,5
+          DO 3580 K=0,jcplx
             DO NO=1,7
               DO M=1,3
                 DO NGL=1,JG
@@ -1511,7 +1514,7 @@ module RedistMod
 !
     !     MICROBIAL RESIDUE C IN RUNOFF SEDIMENT
 !
-          DO 3575 K=0,4
+          DO 3575 K=0,jcplx1
             DO 3570 M=1,2
               COE=COE+XN*ORCER(M,K,N,NN,N5,N4)
               ZOE=ZOE+XN*ORNER(M,K,N,NN,N5,N4)
@@ -1892,7 +1895,7 @@ module RedistMod
       TCPDEB(NY,NX)=0.0_r8
       TCPHEB(NY,NX)=0.0_r8
       TCPMEB(NY,NX)=0.0_r8
-      DO 9480 K=0,5
+      DO 9480 K=0,jcplx
       DO  NO=1,7
       DO  M=1,3
       DO NGL=1,JG
@@ -1903,7 +1906,7 @@ module RedistMod
       ENDDO
       enddo
 9480  CONTINUE
-      DO 9475 K=0,4
+      DO 9475 K=0,jcplx1
       DO 9470 M=1,2
       TORCER(M,K,NY,NX)=0.0_r8
       TORNER(M,K,NY,NX)=0.0_r8
@@ -1913,7 +1916,7 @@ module RedistMod
       TOHNER(K,NY,NX)=0.0_r8
       TOHPER(K,NY,NX)=0.0_r8
       TOHAER(K,NY,NX)=0.0_r8
-      DO 9465 M=1,4
+      DO 9465 M=1,jsken
       TOSCER(M,K,NY,NX)=0.0_r8
       TOSAER(M,K,NY,NX)=0.0_r8
       TOSNER(M,K,NY,NX)=0.0_r8
@@ -1952,7 +1955,7 @@ module RedistMod
 !
 !     INITIALIZE GAS AND SOLUTE NET FLUX ACCUMULATORS WITHIN SOIL
 !
-      DO 8595 K=0,4
+      DO 8595 K=0,jcplx1
       TOCFLS(K,L,NY,NX)=0.0_r8
       TONFLS(K,L,NY,NX)=0.0_r8
       TOPFLS(K,L,NY,NX)=0.0_r8
@@ -2191,7 +2194,7 @@ module RedistMod
       TCPDEB(N2,N1)=TCPDEB(N2,N1)+PCPDEB(N,NN,N2,N1)
       TCPHEB(N2,N1)=TCPHEB(N2,N1)+PCPHEB(N,NN,N2,N1)
       TCPMEB(N2,N1)=TCPMEB(N2,N1)+PCPMEB(N,NN,N2,N1)
-      DO 9380 K=0,5
+      DO 9380 K=0,jcplx
       DO NO=1,7
       DO M=1,3
       DO NGL=1,JG
@@ -2202,7 +2205,7 @@ module RedistMod
       enddo
       enddo
 9380  CONTINUE
-      DO 9375 K=0,4
+      DO 9375 K=0,jcplx1
       DO 9370 M=1,2
       TORCER(M,K,N2,N1)=TORCER(M,K,N2,N1)+ORCER(M,K,N,NN,N2,N1)
       TORNER(M,K,N2,N1)=TORNER(M,K,N2,N1)+ORNER(M,K,N,NN,N2,N1)
@@ -2270,7 +2273,7 @@ module RedistMod
       TCPDEB(N2,N1)=TCPDEB(N2,N1)-PCPDEB(N,NN,N5,N4)
       TCPHEB(N2,N1)=TCPHEB(N2,N1)-PCPHEB(N,NN,N5,N4)
       TCPMEB(N2,N1)=TCPMEB(N2,N1)-PCPMEB(N,NN,N5,N4)
-      DO 7380 K=0,5
+      DO 7380 K=0,jcplx
       DO  NO=1,7
       DO  M=1,3
       DO NGL=1,JG
@@ -2281,7 +2284,7 @@ module RedistMod
       enddo
       enddo
 7380  CONTINUE
-      DO 7375 K=0,4
+      DO 7375 K=0,jcplx1
       DO 7370 M=1,2
       TORCER(M,K,N2,N1)=TORCER(M,K,N2,N1)-ORCER(M,K,N,NN,N5,N4)
       TORNER(M,K,N2,N1)=TORNER(M,K,N2,N1)-ORNER(M,K,N,NN,N5,N4)
@@ -2352,7 +2355,7 @@ module RedistMod
       TCPDEB(N2,N1)=TCPDEB(N2,N1)-PCPDEB(N,NN,N5B,N4B)
       TCPHEB(N2,N1)=TCPHEB(N2,N1)-PCPHEB(N,NN,N5B,N4B)
       TCPMEB(N2,N1)=TCPMEB(N2,N1)-PCPMEB(N,NN,N5B,N4B)
-      DO 8380 K=0,5
+      DO 8380 K=0,jcplx
       DO  NO=1,7
       DO  M=1,3
       DO NGL=1,JG
@@ -2363,7 +2366,7 @@ module RedistMod
       enddo
       enddo
 8380  CONTINUE
-      DO 8375 K=0,4
+      DO 8375 K=0,jcplx1
       DO 8370 M=1,2
       TORCER(M,K,N2,N1)=TORCER(M,K,N2,N1)-ORCER(M,K,N,NN,N5B,N4B)
       TORNER(M,K,N2,N1)=TORNER(M,K,N2,N1)-ORNER(M,K,N,NN,N5B,N4B)
@@ -2449,7 +2452,7 @@ module RedistMod
       !             :NH4=NH4,NH3=NH3,NO3=NO3,NO2=NO2,P14=HPO4,PO4=H2PO4 in non-band
       !             :N4B=NH4,N3B=NH3,NOB=NO3,N2B=NO2,P1B=HPO4,POB=H2PO4 in band
       !
-      DO 8585 K=0,4
+      DO 8585 K=0,jcplx1
         TOCFLS(K,N3,N2,N1)=TOCFLS(K,N3,N2,N1)+XOCFLS(K,N,N3,N2,N1)-XOCFLS(K,N,N6,N5,N4)
         TONFLS(K,N3,N2,N1)=TONFLS(K,N3,N2,N1)+XONFLS(K,N,N3,N2,N1)-XONFLS(K,N,N6,N5,N4)
         TOPFLS(K,N3,N2,N1)=TOPFLS(K,N3,N2,N1)+XOPFLS(K,N,N3,N2,N1)-XOPFLS(K,N,N6,N5,N4)
@@ -2633,7 +2636,7 @@ module RedistMod
       TTHAW(N3,N2,N1)=0.0_r8
       TTHAWH(N3,N2,N1)=0.0_r8
       THTHAW(N3,N2,N1)=0.0_r8
-      DO 8596 K=0,4
+      DO 8596 K=0,jcplx1
         TOCFLS(K,N3,N2,N1)=0.0_r8
         TONFLS(K,N3,N2,N1)=0.0_r8
         TOPFLS(K,N3,N2,N1)=0.0_r8
@@ -4436,7 +4439,7 @@ module RedistMod
     !   ORGANIC CONSTITUENTS
 !
     DORGP=0.0_r8
-    DO 9280 K=0,5
+    DO 9280 K=0,jcplx
       DO  NO=1,7
         DO  M=1,3
           DO NGL=1,JG
@@ -4449,7 +4452,7 @@ module RedistMod
         enddo
       enddo
 9280  CONTINUE
-    DO 9275 K=0,4
+    DO 9275 K=0,jcplx1
       DO 9270 M=1,2
         ORC(M,K,NU(NY,NX),NY,NX)=ORC(M,K,NU(NY,NX),NY,NX)+TORCER(M,K,NY,NX)
         ORN(M,K,NU(NY,NX),NY,NX)=ORN(M,K,NU(NY,NX),NY,NX)+TORNER(M,K,NY,NX)
@@ -4463,7 +4466,7 @@ module RedistMod
       OHA(K,NU(NY,NX),NY,NX)=OHA(K,NU(NY,NX),NY,NX)+TOHAER(K,NY,NX)
       DORGE(NY,NX)=DORGE(NY,NX)+TOHCER(K,NY,NX)+TOHAER(K,NY,NX)
       DORGP=DORGP+TOHPER(K,NY,NX)
-      DO 9265 M=1,4
+      DO 9265 M=1,jsken
         OSC(M,K,NU(NY,NX),NY,NX)=OSC(M,K,NU(NY,NX),NY,NX)+TOSCER(M,K,NY,NX)
         OSA(M,K,NU(NY,NX),NY,NX)=OSA(M,K,NU(NY,NX),NY,NX)+TOSAER(M,K,NY,NX)
         OSN(M,K,NU(NY,NX),NY,NX)=OSN(M,K,NU(NY,NX),NY,NX)+TOSNER(M,K,NY,NX)
@@ -4554,12 +4557,12 @@ module RedistMod
   DC=0.0_r8
   DN=0.0_r8
   DP=0.0_r8
-  DO 6975 K=0,5
+  DO 6975 K=0,jcplx
     RC0(K,NY,NX)=0.0_r8
 6975  CONTINUE
   OMCL(0,NY,NX)=0.0_r8
   OMNL(0,NY,NX)=0.0_r8
-  DO 6970 K=0,5
+  DO 6970 K=0,jcplx
     IF(K.NE.3.AND.K.NE.4)THEN
       !
       ! TOTAL MICROBIAL C,N,P
@@ -4897,23 +4900,15 @@ module RedistMod
 !
     !     DOC, DON, DOP FROM AQUEOUS TRANSPORT
 !
-    DO 8560 K=0,4
-      OQC(K,L,NY,NX)=OQC(K,L,NY,NX)+TOCFLS(K,L,NY,NX) &
-        +XOCFXS(K,L,NY,NX)
-      OQN(K,L,NY,NX)=OQN(K,L,NY,NX)+TONFLS(K,L,NY,NX) &
-        +XONFXS(K,L,NY,NX)
-      OQP(K,L,NY,NX)=OQP(K,L,NY,NX)+TOPFLS(K,L,NY,NX) &
-        +XOPFXS(K,L,NY,NX)
-      OQA(K,L,NY,NX)=OQA(K,L,NY,NX)+TOAFLS(K,L,NY,NX) &
-        +XOAFXS(K,L,NY,NX)
-      OQCH(K,L,NY,NX)=OQCH(K,L,NY,NX)+TOCFHS(K,L,NY,NX) &
-        -XOCFXS(K,L,NY,NX)
-      OQNH(K,L,NY,NX)=OQNH(K,L,NY,NX)+TONFHS(K,L,NY,NX) &
-        -XONFXS(K,L,NY,NX)
-      OQPH(K,L,NY,NX)=OQPH(K,L,NY,NX)+TOPFHS(K,L,NY,NX) &
-        -XOPFXS(K,L,NY,NX)
-      OQAH(K,L,NY,NX)=OQAH(K,L,NY,NX)+TOAFHS(K,L,NY,NX) &
-        -XOAFXS(K,L,NY,NX)
+    DO 8560 K=0,jcplx1
+      OQC(K,L,NY,NX)=OQC(K,L,NY,NX)+TOCFLS(K,L,NY,NX)+XOCFXS(K,L,NY,NX)
+      OQN(K,L,NY,NX)=OQN(K,L,NY,NX)+TONFLS(K,L,NY,NX)+XONFXS(K,L,NY,NX)
+      OQP(K,L,NY,NX)=OQP(K,L,NY,NX)+TOPFLS(K,L,NY,NX)+XOPFXS(K,L,NY,NX)
+      OQA(K,L,NY,NX)=OQA(K,L,NY,NX)+TOAFLS(K,L,NY,NX)+XOAFXS(K,L,NY,NX)
+      OQCH(K,L,NY,NX)=OQCH(K,L,NY,NX)+TOCFHS(K,L,NY,NX)-XOCFXS(K,L,NY,NX)
+      OQNH(K,L,NY,NX)=OQNH(K,L,NY,NX)+TONFHS(K,L,NY,NX)-XONFXS(K,L,NY,NX)
+      OQPH(K,L,NY,NX)=OQPH(K,L,NY,NX)+TOPFHS(K,L,NY,NX)-XOPFXS(K,L,NY,NX)
+      OQAH(K,L,NY,NX)=OQAH(K,L,NY,NX)+TOAFHS(K,L,NY,NX)-XOAFXS(K,L,NY,NX)
       !     IF(L.EQ.1)THEN
       !      WRITE(*,2627)'OQCL',I,J,NX,NY,L,K
       !    2,OQC(K,L,NY,NX),TOCFLS(K,L,NY,NX),XOCFXS(K,L,NY,NX)
@@ -4928,7 +4923,7 @@ module RedistMod
     !
     !     DOC, DON, DOP FROM PLANT EXUDATION
     !
-    DO 195 K=0,4
+    DO 195 K=0,jcplx1
       OQC(K,L,NY,NX)=OQC(K,L,NY,NX)+TDFOMC(K,L,NY,NX)
       OQN(K,L,NY,NX)=OQN(K,L,NY,NX)+TDFOMN(K,L,NY,NX)
       OQP(K,L,NY,NX)=OQP(K,L,NY,NX)+TDFOMP(K,L,NY,NX)
@@ -5256,7 +5251,7 @@ module RedistMod
     !     TOTALS FOR CALCULATING COMPETITION CONSTRAINTS ON MICROBIAL
     !     AND ROOT POPULATIONS
 !
-    DO 7990 K=0,5
+    DO 7990 K=0,jcplx
       DO 7980 N=1,7
         DO NGL=1,JG
           ROXYX(L,NY,NX)=ROXYX(L,NY,NX)+ROXYS(NGL,N,K,L,NY,NX)
@@ -5375,7 +5370,7 @@ module RedistMod
     OP=0.0_r8
     OMCL(L,NY,NX)=0.0_r8
     OMNL(L,NY,NX)=0.0_r8
-    DO 7970 K=0,5
+    DO 7970 K=0,jcplx
       IF(K.LE.2)THEN
         DO 7960 N=1,7
           DO  M=1,3
@@ -5408,7 +5403,7 @@ module RedistMod
 7950    CONTINUE
       ENDIF
 7970  CONTINUE
-    DO 7900 K=0,4
+    DO 7900 K=0,jcplx1
       IF(K.LE.2)THEN
         DO 7940 M=1,2
           DC=DC+ORC(M,K,L,NY,NX)
@@ -5453,7 +5448,7 @@ module RedistMod
       DORGC(L,NY,NX)=0.0_r8
     ENDIF
     IF(L.EQ.1)THEN
-    !     DO 4344 K=0,5
+    !     DO 4344 K=0,jcplx
     !     WRITE(*,4343)'ORGC',I,J,NX,NY,L,K,ORGC(L,NY,NX),ORGR(L,NY,NX)
     !    2,DC,OC,((OMC(M,NGL,K,L,NY,NX),M=1,3),N=1,7)
     !    3,(ORC(M,K,L,NY,NX),M=1,2),(OSC(M,K,L,NY,NX),M=1,4)
@@ -6801,7 +6796,7 @@ module RedistMod
           Z2OS(L1,NY,NX)=Z2OS(L1,NY,NX)+FX*Z2OS(L0,NY,NX)
           H2GS(L1,NY,NX)=H2GS(L1,NY,NX)+FX*H2GS(L0,NY,NX)
           IF(IFLGL(L,3).EQ.0)THEN
-            DO 7965 K=0,5
+            DO 7965 K=0,jcplx
               DO  N=1,7
                 DO  M=1,3
                   DO NGL=1,JG
@@ -6812,7 +6807,7 @@ module RedistMod
                 enddo
               enddo
 7965        CONTINUE
-            DO 7780 K=0,4
+            DO 7780 K=0,jcplx1
               DO 7775 M=1,2
                 ORC(M,K,L1,NY,NX)=ORC(M,K,L1,NY,NX)+FX*ORC(M,K,L0,NY,NX)
                 ORN(M,K,L1,NY,NX)=ORN(M,K,L1,NY,NX)+FX*ORN(M,K,L0,NY,NX)
@@ -7056,7 +7051,7 @@ module RedistMod
           Z2OS(L0,NY,NX)=FY*Z2OS(L0,NY,NX)
           H2GS(L0,NY,NX)=FY*H2GS(L0,NY,NX)
           IF(IFLGL(L,3).EQ.0)THEN
-            DO 7865 K=0,5
+            DO 7865 K=0,jcplx
               DO N=1,7
                 DO M=1,3
                   DO NGL=1,JG
@@ -7067,7 +7062,7 @@ module RedistMod
                 enddo
               enddo
 7865        CONTINUE
-            DO 7880 K=0,4
+            DO 7880 K=0,jcplx1
               DO 7875 M=1,2
                 ORC(M,K,L0,NY,NX)=FY*ORC(M,K,L0,NY,NX)
                 ORN(M,K,L0,NY,NX)=FY*ORN(M,K,L0,NY,NX)
@@ -8042,7 +8037,7 @@ module RedistMod
       FXO=AMIN1(0.5,FO*AMIN1(10.0,CORGCI(L1,NY,NX) &
       /CORGCI(L0,NY,NX)))
       ENDIF
-      DO 7966 K=0,5
+      DO 7966 K=0,jcplx
       DO  N=1,7
       DO  M=1,3
       DO NGL=1,JG
@@ -8059,7 +8054,7 @@ module RedistMod
       enddo
       enddo
 7966  CONTINUE
-      DO 7781 K=0,4
+      DO 7781 K=0,jcplx1
       DO 7776 M=1,2
       FXORC=FXO*ORC(M,K,L0,NY,NX)
       ORC(M,K,L1,NY,NX)=ORC(M,K,L1,NY,NX)+FXORC
@@ -8509,7 +8504,7 @@ module RedistMod
       TZNH3G=0.0_r8
       TH2GG=0.0_r8
       TH2GS=0.0_r8
-      DO 3990 K=0,5
+      DO 3990 K=0,jcplx
       DO  N=1,7
       DO  M=1,3
       DO NGL=1,JG
@@ -8520,7 +8515,7 @@ module RedistMod
       enddo
       enddo
 3990  CONTINUE
-      DO 3980 K=0,4
+      DO 3980 K=0,jcplx1
       DO 3975 M=1,2
       TORC(M,K)=0.0_r8
       TORN(M,K)=0.0_r8
@@ -8561,7 +8556,7 @@ module RedistMod
       DC=0.0_r8
       DN=0.0_r8
       DP=0.0_r8
-      DO 3950 K=0,5
+      DO 3950 K=0,jcplx
       IF(K.NE.3.AND.K.NE.4)THEN
       DO 3945 N=1,7
       DO  M=1,3
@@ -8862,7 +8857,7 @@ module RedistMod
       TZNH3G=TZNH3G+TI*ZNH3G(L,NY,NX)
       TH2GG=TH2GG+TI*H2GG(L,NY,NX)
       TH2GS=TH2GS+TI*H2GS(L,NY,NX)
-      DO 4985 K=0,5
+      DO 4985 K=0,jcplx
       DO  N=1,7
       DO  M=1,3
       DO NGL=1,JG
@@ -8873,7 +8868,7 @@ module RedistMod
       enddo
       enddo
 4985  CONTINUE
-      DO 4980 K=0,4
+      DO 4980 K=0,jcplx1
       DO 4975 M=1,2
       TORC(M,K)=TORC(M,K)+TI*ORC(M,K,L,NY,NX)
       TORN(M,K)=TORN(M,K)+TI*ORN(M,K,L,NY,NX)
@@ -9270,7 +9265,7 @@ module RedistMod
       Z2GSH(L,NY,NX)=XCORP(NY,NX)*Z2GSH(L,NY,NX)
       Z2OSH(L,NY,NX)=XCORP(NY,NX)*Z2OSH(L,NY,NX)
       H2GSH(L,NY,NX)=XCORP(NY,NX)*H2GSH(L,NY,NX)
-      DO 5965 K=0,5
+      DO 5965 K=0,jcplx
       DO  N=1,7
       DO  M=1,3
       DO NGL=1,JG
@@ -9284,7 +9279,7 @@ module RedistMod
       enddo
       enddo
 5965  CONTINUE
-      DO 5980 K=0,4
+      DO 5980 K=0,jcplx1
       DO 5975 M=1,2
       ORC(M,K,L,NY,NX)=TI*ORC(M,K,L,NY,NX)+CORP*(FI*TORC(M,K) &
       -TI*ORC(M,K,L,NY,NX))+TX*ORC(M,K,L,NY,NX)
@@ -9328,7 +9323,7 @@ module RedistMod
 !     ADD STATE VARIABLES IN SURFACE RESIDUE INCORPORATED
 !     WITHIN TILLAGE MIXING ZONE
 !
-      DO 5910 K=0,5
+      DO 5910 K=0,jcplx
       IF(K.NE.3.AND.K.NE.4)THEN
       DO 5915 N=1,7
       DO M=1,3
@@ -9372,7 +9367,7 @@ module RedistMod
       DC=0.0_r8
       DN=0.0_r8
       DP=0.0_r8
-      DO 5985 K=0,5
+      DO 5985 K=0,jcplx
       DO  N=1,7
       DO  M=1,3
       DO NGL=1,JG
@@ -9388,7 +9383,7 @@ module RedistMod
       enddo
       enddo
 5985  CONTINUE
-      DO 6995 K=0,4
+      DO 6995 K=0,jcplx1
       DO 6985 M=1,2
       OC=OC+ORC(M,K,L,NY,NX)
       ON=ON+ORN(M,K,L,NY,NX)
@@ -9545,7 +9540,7 @@ module RedistMod
   !     RNO2X=total demand for NO2 reduction
   !     RVMXC=demand for NO2 reduction
 !
-  DO 8990 K=0,5
+  DO 8990 K=0,jcplx
     IF(K.NE.3.AND.K.NE.4)THEN
       DO 8980 N=1,7
         DO NGL=1,JG

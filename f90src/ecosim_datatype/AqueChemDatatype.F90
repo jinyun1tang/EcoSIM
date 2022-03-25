@@ -1,6 +1,6 @@
 module AqueChemDatatype
   use data_kind_mod, only : r8 => SHR_KIND_R8
-  use GridDataType
+  use GridConsts
   implicit none
   public
   save
@@ -273,10 +273,10 @@ module AqueChemDatatype
   real(r8) :: XC2BHB(3,JD,JV,JH)                !total CaH2PO4 in macropore water flux band, [mol d-2 h-1]
   real(r8) :: XM1BHB(3,JD,JV,JH)                !total MgHPO4 in macropore water flux band, [mol d-2 h-1]
 
-  real(r8) :: XOCFXS(0:4,JZ,JY,JX)              !total DOC micropore-macropore transfer, [g d-2 h-1]
-  real(r8) :: XONFXS(0:4,JZ,JY,JX)              !total DON micropore-macropore transfer, [g d-2 h-1]
-  real(r8) :: XOPFXS(0:4,JZ,JY,JX)              !total DOP micropore-macropore transfer, [g d-2 h-1]
-  real(r8) :: XOAFXS(0:4,JZ,JY,JX)              !total acetate micropore-macropore transfer, [g d-2 h-1]
+  real(r8) :: XOCFXS(0:jcplx1,JZ,JY,JX)              !total DOC micropore-macropore transfer, [g d-2 h-1]
+  real(r8) :: XONFXS(0:jcplx1,JZ,JY,JX)              !total DON micropore-macropore transfer, [g d-2 h-1]
+  real(r8) :: XOPFXS(0:jcplx1,JZ,JY,JX)              !total DOP micropore-macropore transfer, [g d-2 h-1]
+  real(r8) :: XOAFXS(0:jcplx1,JZ,JY,JX)              !total acetate micropore-macropore transfer, [g d-2 h-1]
   real(r8) :: XCOFXS(JZ,JY,JX)                  !total CO2 micropore-macropore transfer, [g d-2 h-1]
   real(r8) :: XCHFXS(JZ,JY,JX)                  !total CH4 micropore-macropore transfer, [g d-2 h-1]
   real(r8) :: XOXFXS(JZ,JY,JX)                  !total O2 micropore-macropore transfer, [g d-2 h-1]

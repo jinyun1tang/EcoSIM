@@ -9,7 +9,7 @@ module readiMod
   use SOMDataType
   use CanopyRadDataType
   use EcosimConst
-  use GridDataType
+  use GridConsts
   use SoilPhysDataType
   use FlagDataType
   use ChemTranspDataType
@@ -23,6 +23,7 @@ module readiMod
   use SoilPropertyDataType
   use SoilBGCDataType
   use AqueChemDatatype
+  use GridDataType
   implicit none
   private
 

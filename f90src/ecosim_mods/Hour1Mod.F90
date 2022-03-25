@@ -9,7 +9,7 @@ module Hour1Mod
   use FertilizerDataType
   use CanopyRadDataType
   use Hour1Pars
-  use GridDataType
+  use GridConsts
   use SoilPhysDataType
   use FlagDataType
   use SoilHeatDatatype
@@ -32,6 +32,7 @@ module Hour1Mod
   use IrrigationDataType
   use SedimentDataType
   use PlantDataRateType
+  use GridDataType
   implicit none
 
   private
@@ -330,7 +331,7 @@ module Hour1Mod
           DO 9835 NN=1,2
             QR(N,NN,NY,NX)=0.0_r8
             HQR(N,NN,NY,NX)=0.0_r8
-            DO 9870 K=0,4
+            DO 9870 K=0,jcplx1
               XOCQRS(K,N,NN,NY,NX)=0.0_r8
               XONQRS(K,N,NN,NY,NX)=0.0_r8
               XOPQRS(K,N,NN,NY,NX)=0.0_r8
@@ -428,7 +429,7 @@ module Hour1Mod
                 enddo
                 ENDDO
 9480          CONTINUE
-              DO 9475 K=0,4
+              DO 9475 K=0,jcplx1
                 DO 9470 M=1,2
                   ORCER(M,K,N,NN,NY,NX)=0.0_r8
                   ORNER(M,K,N,NN,NY,NX)=0.0_r8
@@ -437,7 +438,7 @@ module Hour1Mod
                 OHCER(K,N,NN,NY,NX)=0.0_r8
                 OHNER(K,N,NN,NY,NX)=0.0_r8
                 OHPER(K,N,NN,NY,NX)=0.0_r8
-                DO 9465 M=1,4
+                DO 9465 M=1,jsken
                   OSCER(M,K,N,NN,NY,NX)=0.0_r8
                   OSAER(M,K,N,NN,NY,NX)=0.0_r8
                   OSNER(M,K,N,NN,NY,NX)=0.0_r8
@@ -462,7 +463,7 @@ module Hour1Mod
         XNXFLS(N,L,NY,NX)=0.0_r8
         XH1PFS(N,L,NY,NX)=0.0_r8
         XH2PFS(N,L,NY,NX)=0.0_r8
-        DO 9860 K=0,4
+        DO 9860 K=0,jcplx1
           XOCFLS(K,N,L,NY,NX)=0.0_r8
           XONFLS(K,N,L,NY,NX)=0.0_r8
           XOPFLS(K,N,L,NY,NX)=0.0_r8
@@ -509,7 +510,7 @@ module Hour1Mod
           XN2FLG(N,L,NY,NX)=0.0_r8
           XN3FLG(N,L,NY,NX)=0.0_r8
           XHGFLG(N,L,NY,NX)=0.0_r8
-          DO 9820 K=0,4
+          DO 9820 K=0,jcplx1
             XOCFHS(K,N,L,NY,NX)=0.0_r8
             XONFHS(K,N,L,NY,NX)=0.0_r8
             XOPFHS(K,N,L,NY,NX)=0.0_r8
@@ -1324,13 +1325,13 @@ module Hour1Mod
 !     begin_execution
 
   DO 9950 K=0,1
-    DO M=1,4
+    DO M=1,jsken
       CSNT(M,K,L,NY,NX)=0.0_r8
       ZSNT(M,K,L,NY,NX)=0.0_r8
       PSNT(M,K,L,NY,NX)=0.0_r8
     enddo
 9950  CONTINUE
-  DO 7775 K=0,4
+  DO 7775 K=0,jcplx1
     XOQCS(K,L,NY,NX)=0.0_r8
     XOQNS(K,L,NY,NX)=0.0_r8
     XOQPS(K,L,NY,NX)=0.0_r8
@@ -1366,7 +1367,7 @@ module Hour1Mod
   XNBDFG(L,NY,NX)=0.0_r8
   XHGDFG(L,NY,NX)=0.0_r8
   IF(L.GE.NU(NY,NX))THEN
-    DO 195 K=0,4
+    DO 195 K=0,jcplx1
       TDFOMC(K,L,NY,NX)=0.0_r8
       TDFOMN(K,L,NY,NX)=0.0_r8
       TDFOMP(K,L,NY,NX)=0.0_r8
@@ -1540,13 +1541,13 @@ module Hour1Mod
       ENDDO
 7950  CONTINUE
 7970  CONTINUE
-  DO 7900 K=0,4
+  DO 7900 K=0,jcplx1
     DO 7920 M=1,2
       OC=OC+ORC(M,K,L,NY,NX)
 7920  CONTINUE
     OC=OC+OQC(K,L,NY,NX)+OQCH(K,L,NY,NX)+OHC(K,L,NY,NX) &
       +OQA(K,L,NY,NX)+OQAH(K,L,NY,NX)+OHA(K,L,NY,NX)
-    DO 7910 M=1,4
+    DO 7910 M=1,jsken
       OC=OC+OSC(M,K,L,NY,NX)
 7910  CONTINUE
 7900  CONTINUE
@@ -1790,7 +1791,7 @@ module Hour1Mod
   RN2OX(0,NY,NX)=0.0_r8
   RP14X(0,NY,NX)=0.0_r8
   RPO4X(0,NY,NX)=0.0_r8
-  DO 5055 K=0,4
+  DO 5055 K=0,jcplx1
     ROQCY(K,0,NY,NX)=ROQCX(K,0,NY,NX)
     ROQAY(K,0,NY,NX)=ROQAX(K,0,NY,NX)
     ROQCX(K,0,NY,NX)=0.0_r8
@@ -1957,7 +1958,7 @@ module Hour1Mod
   RN2BX(L,NY,NX)=0.0_r8
   RP1BX(L,NY,NX)=0.0_r8
   RPOBX(L,NY,NX)=0.0_r8
-  DO 5050 K=0,4
+  DO 5050 K=0,jcplx1
     ROQCY(K,L,NY,NX)=ROQCX(K,L,NY,NX)
     ROQAY(K,L,NY,NX)=ROQAX(K,L,NY,NX)
     ROQCX(K,L,NY,NX)=0.0_r8
@@ -3258,25 +3259,25 @@ module Hour1Mod
       IF(OSCI-OSCX.GT.ZEROS(NY,NX))THEN
         RNT=0.0
         RPT=0.0
-        DO 965 M=1,4
+        DO 965 M=1,jsken
           RNT=RNT+(OSCI-OSCX)*CFOSC(M,K,LFDPTH,NY,NX)*CNOFC(M,K)
           RPT=RPT+(OSCI-OSCX)*CFOSC(M,K,LFDPTH,NY,NX)*CPOFC(M,K)
 965     CONTINUE
         FRNT=(OSNI-OSNX)/RNT
         FRPT=(OSPI-OSPX)/RPT
-        DO 970 M=1,4
+        DO 970 M=1,jsken
           CNOF(M)=CNOFC(M,K)*FRNT
           CPOF(M)=CPOFC(M,K)*FRPT
           CNOFT=CNOFT+CFOSC(M,K,LFDPTH,NY,NX)*CNOF(M)
           CPOFT=CPOFT+CFOSC(M,K,LFDPTH,NY,NX)*CPOF(M)
 970     CONTINUE
       ELSE
-        DO 975 M=1,4
+        DO 975 M=1,jsken
           CNOF(M)=0.0
           CPOF(M)=0.0
 975     CONTINUE
       ENDIF
-      DO 2970 M=1,4
+      DO 2970 M=1,jsken
         OSC1=CFOSC(M,K,LFDPTH,NY,NX)*(OSCI-OSCX)
         IF(CNOFT.GT.ZERO)THEN
           OSN1=CFOSC(M,K,LFDPTH,NY,NX)*CNOF(M)/CNOFT*(OSNI-OSNX)
@@ -3912,7 +3913,7 @@ module Hour1Mod
   XC1BXB(L,NY,NX)=0.0
   XC2BXB(L,NY,NX)=0.0
   XM1BXB(L,NY,NX)=0.0
-  DO 9955 K=0,4
+  DO 9955 K=0,jcplx1
     XOCFXS(K,L,NY,NX)=0.0
     XONFXS(K,L,NY,NX)=0.0
     XOPFXS(K,L,NY,NX)=0.0

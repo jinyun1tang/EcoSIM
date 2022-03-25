@@ -7,9 +7,10 @@
 !     TO INITIALIZE LATER MODEL RUNS
 !
   use data_kind_mod, only : r8 => SHR_KIND_R8
-  use GridDataType
+  use GridConsts
   use FlagDataType
   use EcoSIMHistMod
+  use GridDataType
 
   implicit none
   integer, intent(in) :: I,NHW,NHE,NVN,NVS

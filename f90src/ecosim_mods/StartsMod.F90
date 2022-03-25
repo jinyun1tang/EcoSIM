@@ -13,7 +13,7 @@ module StartsMod
   use FertilizerDataType
   use InitSOMBGC
   use CanopyRadDataType
-  use GridDataType
+  use GridConsts
   use SoilPhysDataType
   use FlagDataType
   use SoilHeatDatatype
@@ -35,6 +35,7 @@ module StartsMod
   use SoilPropertyDataType
   use IrrigationDataType
   use SedimentDataType
+  use GridDataType
   implicit none
 
   private
@@ -513,10 +514,10 @@ module StartsMod
   DPNOB(1:L2,NY,NX)=0.0_r8
   WDPOB(1:L2,NY,NX)=0.0_r8
   DPPOB(1:L2,NY,NX)=0.0_r8
-  COCU(0:4,1:L2,NY,NX)=0.0_r8
-  CONU(0:4,1:L2,NY,NX)=0.0_r8
-  COPU(0:4,1:L2,NY,NX)=0.0_r8
-  COAU(0:4,1:L2,NY,NX)=0.0_r8
+  COCU(0:jcplx1,1:L2,NY,NX)=0.0_r8
+  CONU(0:jcplx1,1:L2,NY,NX)=0.0_r8
+  COPU(0:jcplx1,1:L2,NY,NX)=0.0_r8
+  COAU(0:jcplx1,1:L2,NY,NX)=0.0_r8
 
   end subroutine initFertArrays
 !------------------------------------------------------------------------------------------

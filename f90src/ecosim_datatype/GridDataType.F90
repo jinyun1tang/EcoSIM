@@ -1,22 +1,11 @@
 module GridDataType
   use data_kind_mod, only : r8 => SHR_KIND_R8
+  use GridConsts
 implicit none
   public
   save
   character(len=*), private, parameter :: mod_filename = __FILE__
 
-  integer, PARAMETER :: JX=4
-  integer, PARAMETER :: JY=4
-  integer, PARAMETER :: JZ=20
-  integer, PARAMETER :: JH=JX+1
-  integer, PARAMETER :: JV=JY+1
-  integer, PARAMETER :: JD=JZ+1
-  integer, PARAMETER :: JP=5
-  integer, PARAMETER :: JC=10
-  integer, PARAMETER :: JS=5
-  integer, PARAMETER :: JLI=4   !# of sectors for the leaf zenith [0,pi/2]
-  integer, PARAMETER :: JLA=4   !# of sectors for the leaf azimuth, [0,pi]
-  integer, PARAMETER :: JSA=4   !# of sectors for the sky azimuth  [0,2*pi]
 
   integer :: NPX                  !number of E-W grid cells
   integer :: NPY                  !number of N-S grid cells

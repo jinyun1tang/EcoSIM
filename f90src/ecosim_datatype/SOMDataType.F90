@@ -1,51 +1,51 @@
 module SOMDataType
   use data_kind_mod, only : r8 => SHR_KIND_R8
-  use GridDataType
+  use GridConsts
   implicit none
   public
   save
   character(len=*), private, parameter :: mod_filename = __FILE__
 
-  real(r8),allocatable :: RSC(:,:,:,:)          !initial surface litter [C	g m-2]
-  real(r8),allocatable :: RSN(:,:,:,:)          !initial surface litter [N	g m-2]
-  real(r8),allocatable :: RSP(:,:,:,:)          !initial surface litter [P	g m-2]
-  real(r8),allocatable :: CFOSC(:,:,:,:,:)      !fraction of SOC in kinetic components
-  real(r8),allocatable :: CNOSC(:,:,:,:,:)      !N:C,ratios of SOC kinetic components
-  real(r8),allocatable :: CPOSC(:,:,:,:,:)      !P:C ratios of SOC kinetic components
-  real(r8),allocatable :: CNOFC(:,:)            !fractions to allocate N to kinetic components
-  real(r8),allocatable :: CPOFC(:,:)            !fractions to allocate P to kinetic components
-  real(r8),allocatable :: CNRH(:)               !default N:C ratios in SOC complexes
-  real(r8),allocatable :: CPRH(:)               !default P:C ratios in SOC complexes
-  real(r8),allocatable :: OSC(:,:,:,:,:)        !humus soil C	[g d-2]
-  real(r8),allocatable :: OSN(:,:,:,:,:)        !humus soil N	[g d-2]
-  real(r8),allocatable :: OSP(:,:,:,:,:)        !humus soil P	[g d-2]
-  real(r8),allocatable :: OHC(:,:,:,:)          !adsorbed soil C	[g d-2]
-  real(r8),allocatable :: OHN(:,:,:,:)          !adsorbed soil N	[g d-2]
-  real(r8),allocatable :: OHP(:,:,:,:)          !adsorbed soil P	[g d-2]
-  real(r8),allocatable :: OHA(:,:,:,:)          !adsorbed soil acetate	[g d-2]
-  real(r8),allocatable :: ORC(:,:,:,:,:)        !microbial residue [C	g d-2]
-  real(r8),allocatable :: ORN(:,:,:,:,:)        !microbial residue N	[g d-2]
-  real(r8),allocatable :: ORP(:,:,:,:,:)        !microbial residue P	[g d-2]
-  real(r8),allocatable :: OQC(:,:,:,:)          !dissolved organic C micropore	[g d-2]
-  real(r8),allocatable :: OQN(:,:,:,:)          !dissolved organic N micropore	[g d-2]
-  real(r8),allocatable :: OQP(:,:,:,:)          !dissolved organic P micropore	[g d-2]
-  real(r8),allocatable :: OQA(:,:,:,:)          !dissolved acetate micropore	[g d-2]
-  real(r8),allocatable :: OQCH(:,:,:,:)         !dissolved organic C macropore	[g d-2]
-  real(r8),allocatable :: OQNH(:,:,:,:)         !dissolved organic N macropore	[g d-2]
-  real(r8),allocatable :: OQPH(:,:,:,:)         !dissolved organic P macropore	[g d-2]
-  real(r8),allocatable :: OQAH(:,:,:,:)         !dissolved acetate macropore	[g d-2]
-  real(r8),allocatable :: ORGC(:,:,:)           !total soil organic C [g d-2]
-  real(r8),allocatable :: ORGN(:,:,:)           !total soil organic N [g d-2]
-  real(r8),allocatable :: OMCF(:)               !hetero microbial biomass composition in SOC
-  real(r8),allocatable :: OMCA(:)               !autotrophic microbial biomass composition in SOC
-  real(r8),allocatable :: ORGCX(:,:,:)          !SOC concentration	[g Mg-1]
-  real(r8),allocatable :: OSA(:,:,:,:,:)        !colonized humus C in each complex [g d-2]
-  real(r8),allocatable :: ORGR(:,:,:)           !total particulate organic C [g d-2]
-  real(r8),allocatable :: CORGC(:,:,:)          !soil organic C content [g kg-1]
-  real(r8),allocatable :: CORGN(:,:,:)          !soil organic N content [mg kg-1]
-  real(r8),allocatable :: CORGP(:,:,:)          !soil organic P content  [mg kg-1]
-  real(r8),allocatable :: CORGR(:,:,:)          !soil particulate C content [g kg-1]
-  real(r8),allocatable :: CFOMC(:,:,:,:)        !allocation coefficient to humus fractions
+  real(r8),allocatable :: RSC(:,:,:,:)                       !initial surface litter [C	g m-2]
+  real(r8),allocatable :: RSN(:,:,:,:)                       !initial surface litter [N	g m-2]
+  real(r8),allocatable :: RSP(:,:,:,:)                       !initial surface litter [P	g m-2]
+  real(r8),allocatable :: CFOSC(:,:,:,:,:)                   !fraction of SOC in kinetic components
+  real(r8),allocatable :: CNOSC(:,:,:,:,:)                   !N:C,ratios of SOC kinetic components
+  real(r8),allocatable :: CPOSC(:,:,:,:,:)                   !P:C ratios of SOC kinetic components
+  real(r8),allocatable :: CNOFC(:,:)                         !fractions to allocate N to kinetic components
+  real(r8),allocatable :: CPOFC(:,:)                         !fractions to allocate P to kinetic components
+  real(r8),allocatable :: CNRH(:)                            !default N:C ratios in SOC complexes
+  real(r8),allocatable :: CPRH(:)                            !default P:C ratios in SOC complexes
+  real(r8),allocatable :: OSC(:,:,:,:,:)                     !humus soil C	[g d-2]
+  real(r8),allocatable :: OSN(:,:,:,:,:)                     !humus soil N	[g d-2]
+  real(r8),allocatable :: OSP(:,:,:,:,:)                     !humus soil P	[g d-2]
+  real(r8),allocatable :: OHC(:,:,:,:)                       !adsorbed soil C	[g d-2]
+  real(r8),allocatable :: OHN(:,:,:,:)                       !adsorbed soil N	[g d-2]
+  real(r8),allocatable :: OHP(:,:,:,:)                       !adsorbed soil P	[g d-2]
+  real(r8),allocatable :: OHA(:,:,:,:)                       !adsorbed soil acetate	[g d-2]
+  real(r8),allocatable :: ORC(:,:,:,:,:)                     !microbial residue [C	g d-2]
+  real(r8),allocatable :: ORN(:,:,:,:,:)                     !microbial residue N	[g d-2]
+  real(r8),allocatable :: ORP(:,:,:,:,:)                     !microbial residue P	[g d-2]
+  real(r8),allocatable :: OQC(:,:,:,:)                       !dissolved organic C micropore	[g d-2]
+  real(r8),allocatable :: OQN(:,:,:,:)                       !dissolved organic N micropore	[g d-2]
+  real(r8),allocatable :: OQP(:,:,:,:)                       !dissolved organic P micropore	[g d-2]
+  real(r8),allocatable :: OQA(:,:,:,:)                       !dissolved acetate micropore	[g d-2]
+  real(r8),allocatable :: OQCH(:,:,:,:)                      !dissolved organic C macropore	[g d-2]
+  real(r8),allocatable :: OQNH(:,:,:,:)                      !dissolved organic N macropore	[g d-2]
+  real(r8),allocatable :: OQPH(:,:,:,:)                      !dissolved organic P macropore	[g d-2]
+  real(r8),allocatable :: OQAH(:,:,:,:)                      !dissolved acetate macropore	[g d-2]
+  real(r8),allocatable :: ORGC(:,:,:)                        !total soil organic C [g d-2]
+  real(r8),allocatable :: ORGN(:,:,:)                        !total soil organic N [g d-2]
+  real(r8),allocatable :: OMCF(:)                            !hetero microbial biomass composition in SOC
+  real(r8),allocatable :: OMCA(:)                            !autotrophic microbial biomass composition in SOC
+  real(r8),allocatable :: ORGCX(:,:,:)                       !SOC concentration	[g Mg-1]
+  real(r8),allocatable :: OSA(:,:,:,:,:)                     !colonized humus C in each complex [g d-2]
+  real(r8),allocatable :: ORGR(:,:,:)                        !total particulate organic C [g d-2]
+  real(r8),allocatable :: CORGC(:,:,:)                       !soil organic C content [g kg-1]
+  real(r8),allocatable :: CORGN(:,:,:)                       !soil organic N content [mg kg-1]
+  real(r8),allocatable :: CORGP(:,:,:)                       !soil organic P content  [mg kg-1]
+  real(r8),allocatable :: CORGR(:,:,:)                       !soil particulate C content [g kg-1]
+  real(r8),allocatable :: CFOMC(:,:,:,:)                     !allocation coefficient to humus fractions
   real(r8),allocatable ::  TOMT(:,:)                         !total micriobial C, [g d-2]
   real(r8),allocatable ::  TONT(:,:)                         !total micriobial N, [g d-2]
   real(r8),allocatable ::  TOPT(:,:)                         !total micriobial P, [g d-2]
@@ -87,37 +87,37 @@ module SOMDataType
   allocate(RSC(0:2,0:JZ,JY,JX))
   allocate(RSN(0:2,0:JZ,JY,JX))
   allocate(RSP(0:2,0:JZ,JY,JX))
-  allocate(CFOSC(4,0:4,0:JZ,JY,JX))
-  allocate(CNOSC(4,0:4,0:JZ,JY,JX))
-  allocate(CPOSC(4,0:4,0:JZ,JY,JX))
-  allocate(CNOFC(4,0:2))
-  allocate(CPOFC(4,0:2))
-  allocate(CNRH(0:4))
-  allocate(CPRH(0:4))
-  allocate(OSC(4,0:4,0:JZ,JY,JX))
-  allocate(OSN(4,0:4,0:JZ,JY,JX))
-  allocate(OSP(4,0:4,0:JZ,JY,JX))
-  allocate(OHC(0:4,0:JZ,JY,JX))
-  allocate(OHN(0:4,0:JZ,JY,JX))
-  allocate(OHP(0:4,0:JZ,JY,JX))
-  allocate(OHA(0:4,0:JZ,JY,JX))
-  allocate(ORC(2,0:4,0:JZ,JY,JX))
-  allocate(ORN(2,0:4,0:JZ,JY,JX))
-  allocate(ORP(2,0:4,0:JZ,JY,JX))
-  allocate(OQC(0:4,0:JZ,JY,JX))
-  allocate(OQN(0:4,0:JZ,JY,JX))
-  allocate(OQP(0:4,0:JZ,JY,JX))
-  allocate(OQA(0:4,0:JZ,JY,JX))
-  allocate(OQCH(0:4,0:JZ,JY,JX))
-  allocate(OQNH(0:4,0:JZ,JY,JX))
-  allocate(OQPH(0:4,0:JZ,JY,JX))
-  allocate(OQAH(0:4,0:JZ,JY,JX))
+  allocate(CFOSC(jsken,0:jcplx1,0:JZ,JY,JX))
+  allocate(CNOSC(jsken,0:jcplx1,0:JZ,JY,JX))
+  allocate(CPOSC(jsken,0:jcplx1,0:JZ,JY,JX))
+  allocate(CNOFC(jsken,0:2))
+  allocate(CPOFC(jsken,0:2))
+  allocate(CNRH(0:jcplx1))
+  allocate(CPRH(0:jcplx1))
+  allocate(OSC(jsken,0:jcplx1,0:JZ,JY,JX))
+  allocate(OSN(jsken,0:jcplx1,0:JZ,JY,JX))
+  allocate(OSP(jsken,0:jcplx1,0:JZ,JY,JX))
+  allocate(OHC(0:jcplx1,0:JZ,JY,JX))
+  allocate(OHN(0:jcplx1,0:JZ,JY,JX))
+  allocate(OHP(0:jcplx1,0:JZ,JY,JX))
+  allocate(OHA(0:jcplx1,0:JZ,JY,JX))
+  allocate(ORC(2,0:jcplx1,0:JZ,JY,JX))
+  allocate(ORN(2,0:jcplx1,0:JZ,JY,JX))
+  allocate(ORP(2,0:jcplx1,0:JZ,JY,JX))
+  allocate(OQC(0:jcplx1,0:JZ,JY,JX))
+  allocate(OQN(0:jcplx1,0:JZ,JY,JX))
+  allocate(OQP(0:jcplx1,0:JZ,JY,JX))
+  allocate(OQA(0:jcplx1,0:JZ,JY,JX))
+  allocate(OQCH(0:jcplx1,0:JZ,JY,JX))
+  allocate(OQNH(0:jcplx1,0:JZ,JY,JX))
+  allocate(OQPH(0:jcplx1,0:JZ,JY,JX))
+  allocate(OQAH(0:jcplx1,0:JZ,JY,JX))
   allocate(ORGC(0:JZ,JY,JX))
   allocate(ORGN(0:JZ,JY,JX))
   allocate(OMCF(7))
   allocate(OMCA(7))
   allocate(ORGCX(0:JZ,JY,JX))
-  allocate(OSA(4,0:4,0:JZ,JY,JX))
+  allocate(OSA(jsken,0:jcplx1,0:JZ,JY,JX))
   allocate(ORGR(0:JZ,JY,JX))
   allocate(CORGC(0:JZ,JY,JX))
   allocate(CORGN(JZ,JY,JX))
@@ -135,9 +135,9 @@ module SOMDataType
   allocate(UORGP(JY,JX));       UORGP=0._r8
   allocate(EPOC(0:JZ,JY,JX));   EPOC=0._r8
   allocate(EHUM(0:JZ,JY,JX));   EHUM=0._r8
-  allocate(COQC(0:4,0:JZ,JY,JX));COQC=0._r8
-  allocate(COQA(0:4,0:JZ,JY,JX));COQA=0._r8
-  allocate(FOSRH(0:4,0:JZ,JY,JX));FOSRH=0._r8
+  allocate(COQC(0:jcplx1,0:JZ,JY,JX));COQC=0._r8
+  allocate(COQA(0:jcplx1,0:JZ,JY,JX));COQA=0._r8
+  allocate(FOSRH(0:jcplx1,0:JZ,JY,JX));FOSRH=0._r8
   allocate(UCO2S(JY,JX));       UCO2S=0._r8
   allocate(UNH4(JY,JX));        UNH4=0._r8
   allocate(UNO3(JY,JX));        UNO3=0._r8

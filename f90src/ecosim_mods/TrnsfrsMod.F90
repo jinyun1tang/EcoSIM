@@ -5,7 +5,7 @@ module TrnsfrsMod
   use data_kind_mod, only : r8 => SHR_KIND_R8
   use minimathmod, only : test_aeqb
   use SOMDataType
-  use GridDataType
+  use GridConsts
   use FlagDataType
   use SoilPhysDataType
   use EcoSIMCtrlDataType
@@ -23,6 +23,7 @@ module TrnsfrsMod
   use SoilPropertyDataType
   use IrrigationDataType
   use PlantDataRateType
+  use GridDataType
   implicit none
 
   private

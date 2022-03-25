@@ -5,7 +5,7 @@
 !
   use data_kind_mod, only : r8 => SHR_KIND_R8
   use fileUtil, only : open_safe
-  use GridDataType
+  use GridConsts
   use EcoSIMCtrlDataType
   use EcosimConst
   use EcoSIMHistMod

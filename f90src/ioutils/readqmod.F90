@@ -5,7 +5,7 @@ module readqmod
   use data_kind_mod, only : r8 => SHR_KIND_R8
   use fileUtil, only : open_safe
   use minimathmod, only : isLeap
-  use GridDataType
+  use GridConsts
   use FlagDataType
   use EcoSIMCtrlDataType
   use ClimForcDataType
@@ -16,6 +16,7 @@ module readqmod
   use RootDataType
   use EcoSIMHistMod
   use CanopyRadDataType
+  use GridDataType
   implicit none
   private
 

@@ -4,7 +4,7 @@ module SoluteMod
   use SOMDataType
   use ChemTranspDataType
   use FertilizerDataType
-  use GridDataType
+  use GridConsts
   use FlagDataType
   use SoilPhysDataType
   use SoilHeatDatatype
@@ -16,6 +16,7 @@ module SoluteMod
   use AqueChemDatatype
   use SoilPropertyDataType
   use PlantDataRateType
+  use GridDataType
   implicit none
 
   private

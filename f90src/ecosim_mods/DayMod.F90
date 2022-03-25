@@ -3,7 +3,7 @@
   use data_kind_mod, only : r8 => SHR_KIND_R8
   use EcosimConst
   use minimathmod, only : isLeap
-  use GridDataType
+  use GridConsts
   use SoilPhysDataType
   use FlagDataType
   use SoilHeatDatatype
@@ -24,6 +24,7 @@
   use SoilPropertyDataType
   use IrrigationDataType
   use SedimentDataType
+  use GridDataType
   implicit none
 
   private

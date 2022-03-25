@@ -1,6 +1,6 @@
 module SedimentDataType
   use data_kind_mod, only : r8 => SHR_KIND_R8
-  use GridDataType
+  use GridConsts
 implicit none
 
   save
@@ -150,17 +150,17 @@ implicit none
   allocate(XFE2ER(2,2,JV,JH));  XFE2ER=0._r8
   allocate(XSEDER(2,2,JV,JH));  XSEDER=0._r8
   allocate(XFEER(2,2,JV,JH));   XFEER=0._r8
-  allocate(ORCER(2,0:4,2,2,JV,JH));ORCER=0._r8
-  allocate(ORNER(2,0:4,2,2,JV,JH));ORNER=0._r8
-  allocate(ORPER(2,0:4,2,2,JV,JH));ORPER=0._r8
-  allocate(OHCER(0:4,2,2,JV,JH));OHCER=0._r8
-  allocate(OHNER(0:4,2,2,JV,JH));OHNER=0._r8
-  allocate(OHPER(0:4,2,2,JV,JH));OHPER=0._r8
-  allocate(OHAER(0:4,2,2,JV,JH));OHAER=0._r8
-  allocate(OSCER(4,0:4,2,2,JV,JH));OSCER=0._r8
-  allocate(OSAER(4,0:4,2,2,JV,JH));OSAER=0._r8
-  allocate(OSNER(4,0:4,2,2,JV,JH));OSNER=0._r8
-  allocate(OSPER(4,0:4,2,2,JV,JH));OSPER=0._r8
+  allocate(ORCER(2,0:jcplx1,2,2,JV,JH));ORCER=0._r8
+  allocate(ORNER(2,0:jcplx1,2,2,JV,JH));ORNER=0._r8
+  allocate(ORPER(2,0:jcplx1,2,2,JV,JH));ORPER=0._r8
+  allocate(OHCER(0:jcplx1,2,2,JV,JH));OHCER=0._r8
+  allocate(OHNER(0:jcplx1,2,2,JV,JH));OHNER=0._r8
+  allocate(OHPER(0:jcplx1,2,2,JV,JH));OHPER=0._r8
+  allocate(OHAER(0:jcplx1,2,2,JV,JH));OHAER=0._r8
+  allocate(OSCER(4,0:jcplx1,2,2,JV,JH));OSCER=0._r8
+  allocate(OSAER(4,0:jcplx1,2,2,JV,JH));OSAER=0._r8
+  allocate(OSNER(4,0:jcplx1,2,2,JV,JH));OSNER=0._r8
+  allocate(OSPER(4,0:jcplx1,2,2,JV,JH));OSPER=0._r8
   end subroutine InitAllocate
 
 !----------------------------------------------------------------------

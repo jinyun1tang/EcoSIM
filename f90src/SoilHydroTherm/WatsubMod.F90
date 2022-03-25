@@ -9,7 +9,7 @@ module WatsubMod
   use EcosimConst
   use SOMDataType
   use WatsubPars
-  use GridDataType
+  use GridConsts
   use SoilPhysDataType
   use FlagDataType
   use SoilWaterDataType
@@ -29,6 +29,7 @@ module WatsubMod
   use AqueChemDatatype
   use SoilPropertyDataType
   use IrrigationDataType
+  use GridDataType
   implicit none
 
   private

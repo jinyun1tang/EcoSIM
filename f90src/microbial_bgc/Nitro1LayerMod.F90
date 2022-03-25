@@ -13,6 +13,7 @@ module nitro1LayerMod
   use ChemTranspDataType
   use FertilizerDataType
   use NitroDiagTypes
+  use GridConsts
   use GridDataType
   use SoilPhysDataType
   use SoilHeatDatatype
@@ -300,7 +301,7 @@ module nitro1LayerMod
   DO 870 K=0,KL
     OSCT(K)=0.0_r8
     OSAT(K)=0.0_r8
-    DO 865 M=1,4
+    DO 865 M=1,jsken
       OSCT(K)=OSCT(K)+OSC(M,K,L,NY,NX)
       OSAT(K)=OSAT(K)+OSA(M,K,L,NY,NX)
 865 CONTINUE
@@ -1147,8 +1148,8 @@ module nitro1LayerMod
   real(r8) :: DFNS
   real(r8) :: OQCI
   real(r8) :: RHOSCM
-  real(r8) :: FCNK(0:4),FCPK(0:4)
-  real(r8) :: CNS(4,0:4),CPS(4,0:4)
+  real(r8) :: FCNK(0:jcplx1),FCPK(0:jcplx1)
+  real(r8) :: CNS(4,0:jcplx1),CPS(4,0:jcplx1)
 
 !     begin_execution
   associate(                 &
@@ -1247,7 +1248,7 @@ module nitro1LayerMod
 !     OSRH=total SOC
 !     FCNK,FCPK=N,P limitation to microbial activity in each K
 !
-    DO 785 M=1,4
+    DO 785 M=1,jsken
       IF(OSC(M,K,L,NY,NX).GT.ZEROS(NY,NX))THEN
         CNS(M,K)=AMAX1(0.0,OSN(M,K,L,NY,NX)/OSC(M,K,L,NY,NX))
         CPS(M,K)=AMAX1(0.0,OSP(M,K,L,NY,NX)/OSC(M,K,L,NY,NX))
@@ -1284,7 +1285,7 @@ module nitro1LayerMod
         ,RDOSP(2,K)/CPRH(3),RHOSCM))
       RHOSC(3,K)=AMAX1(0.0,AMIN1(RDOSC(3,K),RDOSN(3,K)/CNRH(3) &
         ,RDOSP(3,K)/CPRH(3),RHOSCM-RHOSC(2,K)))
-      DO 805 M=1,4
+      DO 805 M=1,jsken
         RHOSN(M,K)=AMIN1(RDOSN(M,K),RHOSC(M,K)*CNRH(3))
         RHOSP(M,K)=AMIN1(RDOSP(M,K),RHOSC(M,K)*CPRH(3))
         RCOSC(M,K)=RDOSC(M,K)-RHOSC(M,K)
@@ -1292,7 +1293,7 @@ module nitro1LayerMod
         RCOSP(M,K)=RDOSP(M,K)-RHOSP(M,K)
 805   CONTINUE
     ELSE
-      DO 810 M=1,4
+      DO 810 M=1,jsken
         RHOSC(M,K)=0.0_r8
         RHOSN(M,K)=0.0_r8
         RHOSP(M,K)=0.0_r8
@@ -1302,7 +1303,7 @@ module nitro1LayerMod
 810   CONTINUE
     ENDIF
   ELSE
-    DO 780 M=1,4
+    DO 780 M=1,jsken
       RDOSC(M,K)=0.0_r8
       RDOSN(M,K)=0.0_r8
       RDOSP(M,K)=0.0_r8
@@ -1410,7 +1411,7 @@ module nitro1LayerMod
   type(NitroOMcplxFluxType), intent(inout) :: ncplxf
   type(NitroOMcplxStateType), intent(inout):: ncplxs
   integer :: K,M,N,NGL
-  real(r8) :: FORC(0:5)
+  real(r8) :: FORC(0:jcplx)
 !     begin_execution
   associate(                   &
     CGOMN  => nmicf%CGOMN,     &
@@ -1491,7 +1492,7 @@ module nitro1LayerMod
 !
 
   DO 590 K=0,KL
-    DO 580 M=1,4
+    DO 580 M=1,jsken
 !
 !     SUBSTRATE DECOMPOSITION PRODUCTS
 !
@@ -1795,7 +1796,7 @@ module nitro1LayerMod
   DO 475 K=0,KL
     OSCT(K)=0.0_r8
     OSAT(K)=0.0_r8
-    DO  M=1,4
+    DO  M=1,jsken
       OSCT(K)=OSCT(K)+OSC(M,K,L,NY,NX)
       OSAT(K)=OSAT(K)+OSA(M,K,L,NY,NX)
     enddo
@@ -1803,12 +1804,12 @@ module nitro1LayerMod
   DO 480 K=0,KL
     IF(OSCT(K).GT.ZEROS(NY,NX))THEN
       DOSAK=DOSA(K)*AMAX1(0.0,ROQCK(K))
-      DO 485 M=1,4
+      DO 485 M=1,jsken
         OSA(M,K,L,NY,NX)=AMIN1(OSC(M,K,L,NY,NX) &
           ,OSA(M,K,L,NY,NX)+DOSAK*OSC(M,K,L,NY,NX)/OSCT(K))
 485   CONTINUE
     ELSE
-      DO 490 M=1,4
+      DO 490 M=1,jsken
         OSA(M,K,L,NY,NX)=AMIN1(OSC(M,K,L,NY,NX),OSA(M,K,L,NY,NX))
 490   CONTINUE
     ENDIF
@@ -1963,7 +1964,7 @@ module nitro1LayerMod
 !     XOQCS,XOQNZ,XOQPS,XOQAS=net change in DOC,DON,DOP,acetate
 !
   DO 655 K=0,4
-    DO 660 M=1,4
+    DO 660 M=1,jsken
       XOQCS(K,L,NY,NX)=XOQCS(K,L,NY,NX)+RCOSC(M,K)
       XOQNS(K,L,NY,NX)=XOQNS(K,L,NY,NX)+RCOSN(M,K)
       XOQPS(K,L,NY,NX)=XOQPS(K,L,NY,NX)+RCOSP(M,K)

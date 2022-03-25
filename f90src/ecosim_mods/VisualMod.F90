@@ -5,7 +5,7 @@ module VisualMod
   use data_kind_mod, only : r8 => SHR_KIND_R8
   use fileUtil, only : open_safe
   use SOMDataType
-  use GridDataType
+  use GridConsts
   use SoilHeatDatatype
   use SoilWaterDataType
   use SoilPhysDataType
@@ -19,6 +19,7 @@ module VisualMod
   use SoilBGCDataType
   use RootDataType
   use PlantTraitDataType
+  use GridDataType
   implicit none
 
   private

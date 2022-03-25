@@ -5,9 +5,10 @@
 !     FOR PLANT DATA
 !
   use data_kind_mod, only : r8 => SHR_KIND_R8
-  use GridDataType
+  use GridConsts
   use EcoSIMCtrlDataType
   use EcoSIMHistMod
+  use GridDataType
   implicit none
   integer, intent(in) :: NT,NE,NAX,NDX,NTX,NEX
   integer, intent(in) :: NF,NFX,NHW,NHE,NVN,NVS

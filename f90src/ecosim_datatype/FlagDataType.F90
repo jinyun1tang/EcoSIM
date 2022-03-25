@@ -1,5 +1,5 @@
 module FlagDataType
-  use GridDataType
+  use GridConsts
 implicit none
 
   public

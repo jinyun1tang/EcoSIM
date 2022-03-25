@@ -1,7 +1,7 @@
 module InitVegBGC
 
   use EcosimConst
-  use GridDataType
+  use GridConsts
   implicit none
 
   public :: InitIrradianceGeometry

@@ -1,6 +1,6 @@
 module SurfLitterDataType
   use data_kind_mod, only : r8 => SHR_KIND_R8
-  use GridDataType
+  use GridConsts
   implicit none
   public
   save
@@ -55,7 +55,7 @@ module SurfLitterDataType
   allocate(FLQRQ(JY,JX));        FLQRQ=0._r8
   allocate(FLQRI(JY,JX));        FLQRI=0._r8
   allocate(POROS0(JY,JX));       POROS0=0._r8
-  allocate(RC0(0:5,JY,JX));      Rc0=0._r8
+  allocate(RC0(0:jcplx,JY,JX));      Rc0=0._r8
 
   end subroutine InitAllocate
 

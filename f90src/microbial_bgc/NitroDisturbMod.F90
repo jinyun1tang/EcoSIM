@@ -9,7 +9,7 @@ module NitroDisturbMod
   use SOMDataType
   use ChemTranspDataType
   use FertilizerDataType
-  use GridDataType
+  use GridConsts
   use SoilPhysDataType
   use FlagDataType
   use SoilHeatDatatype
@@ -21,6 +21,7 @@ module NitroDisturbMod
   use EcosysBGCFluxType
   use SoilBGCDataType
   use AqueChemDatatype
+  use GridDataType
   implicit none
 
   private
@@ -45,7 +46,7 @@ module NitroDisturbMod
   real(r8) :: HFLXD
   real(r8) :: OC,ON,OP,OCH,ONH,OPH,ONX
   REAL(R8) :: OPX,OCA,OAH
-  real(r8) :: ONL(4,0:4),OPL(4,0:4)
+  real(r8) :: ONL(4,0:jcplx1),OPL(4,0:jcplx1)
 !     begin_execution
 
   IF(J.EQ.INT(ZNOON(NY,NX)).AND.(ITILL(I,NY,NX).EQ.21 &
@@ -91,8 +92,8 @@ module NitroDisturbMod
         DC=0.0_r8
         DN=0.0_r8
         DP=0.0_r8
-        ONL(1:4,0:4)=0._r8
-        OPL(1:4,0:4)=0._r8
+        ONL(1:4,0:jcplx1)=0._r8
+        OPL(1:4,0:jcplx1)=0._r8
 
         DO 2970 K=0,5
           IF(L.NE.0.OR.(K.NE.3.AND.K.NE.4))THEN
@@ -232,7 +233,7 @@ module NitroDisturbMod
 !
 !     REMOVE RESIDUE
 !
-            DO 2930 M=1,4
+            DO 2930 M=1,jsken
               OCH=DCORPC*OSC(M,K,L,NY,NX)
               OCA=DCORPC*OSA(M,K,L,NY,NX)
               ONH=DCORPC*OSN(M,K,L,NY,NX)
@@ -258,7 +259,7 @@ module NitroDisturbMod
 !     ADD UNBURNED N,P TO ORG N, ORG P
 !
         DO 2905 K=0,4
-          DO  M=1,4
+          DO  M=1,jsken
             OSN(M,K,L,NY,NX)=OSN(M,K,L,NY,NX)+ONL(M,K)
             OSP(M,K,L,NY,NX)=OSP(M,K,L,NY,NX)+OPL(M,K)
             DN=DN+ONL(M,K)

@@ -6,7 +6,7 @@ module ExtractMod
 !
   use data_kind_mod, only : r8 => SHR_KIND_R8
   use EcosimConst
-  use GridDataType
+  use GridConsts
   use FlagDataType
   use SoilHeatDatatype
   use SoilWaterDataType
@@ -19,6 +19,7 @@ module ExtractMod
   use SOMDataType
   use SoilBGCDataType
   use EcosysBGCFluxType
+  use GridDataType
   implicit none
 
   private

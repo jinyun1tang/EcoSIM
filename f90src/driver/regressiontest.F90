@@ -6,12 +6,13 @@ subroutine regressiontest(nmfile,case_name, NX, NY)
   use data_kind_mod, only : r8 => SHR_KIND_R8
   use TestMod, only : regression
   use minimathmod, only : safe_adb
-  use GridDataType
+  use GridConsts
   use FlagDataType
   use SoilHeatDatatype
   use SoilWaterDataType
   use PlantDataRateType
   use SoilBGCDataType
+  use GridDataType
   implicit none
 
   include "files.h"

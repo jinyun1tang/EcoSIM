@@ -1,7 +1,7 @@
 
   module StomateMod
   use data_kind_mod, only : r8 => SHR_KIND_R8
-  use GridDataType
+  use GridConsts
   use FlagDataType
   use PlantDataRateType
   use EcoSIMCtrlDataType
@@ -10,6 +10,7 @@
   use PlantTraitDataType
   use CanopyDataType
   use CanopyRadDataType
+  use GridDataType
   implicit none
 
   private

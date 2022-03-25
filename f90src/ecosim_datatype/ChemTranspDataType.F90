@@ -1,7 +1,7 @@
 module ChemTranspDataType
 
   use data_kind_mod, only : r8 => SHR_KIND_R8
-  use GridDataType
+  use GridConsts
   implicit none
 
   save
@@ -125,10 +125,10 @@ module ChemTranspDataType
   real(r8) :: XNXQRS(2,2,JV,JH)                 !surface runoff NO2 flux, [g d-2 h-1]
   real(r8) :: XP4QRW(2,2,JV,JH)                 !surface runoff PO4 flux, [g d-2 h-1]
   real(r8) :: XP1QRW(2,2,JV,JH)                 !surface runoff HPO4 flux, [g d-2 h-1]
-  real(r8) :: XOCQRS(0:4,2,2,JV,JH)             !surface runoff DOC flux, [g d-2 h-1]
-  real(r8) :: XONQRS(0:4,2,2,JV,JH)             !surface runoff DON flux, [g d-2 h-1]
-  real(r8) :: XOPQRS(0:4,2,2,JV,JH)             !surface runoff DOP flux, [g d-2 h-1]
-  real(r8) :: XOAQRS(0:4,2,2,JV,JH)             !surface runoff acetate flux, [g d-2 h-1]
+  real(r8) :: XOCQRS(0:jcplx1,2,2,JV,JH)             !surface runoff DOC flux, [g d-2 h-1]
+  real(r8) :: XONQRS(0:jcplx1,2,2,JV,JH)             !surface runoff DON flux, [g d-2 h-1]
+  real(r8) :: XOPQRS(0:jcplx1,2,2,JV,JH)             !surface runoff DOP flux, [g d-2 h-1]
+  real(r8) :: XOAQRS(0:jcplx1,2,2,JV,JH)             !surface runoff acetate flux, [g d-2 h-1]
   private :: InitAllocate
 
   contains

@@ -5,12 +5,12 @@ SUBROUTINE routq(NT,NE,NAX,NDX,NTX,NEX,NHW,NHE,NVN,NVS)
 !
       use data_kind_mod, only : r8 => SHR_KIND_R8
   use fileUtil, only : open_safe
-  use GridDataType
+  use GridConsts
   use FlagDataType
   use EcoSIMCtrlDataType
   use PlantMngmtDataType
   use EcoSIMHistMod
-
+  use GridDataType
   implicit none
   integer, intent(in) :: NT,NE,NAX,NDX,NTX,NEX,NHW,NHE,NVN,NVS
 

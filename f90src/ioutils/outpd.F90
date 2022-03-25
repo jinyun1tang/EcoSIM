@@ -8,7 +8,7 @@
 !
   use data_kind_mod, only : r8 => SHR_KIND_R8
   use FlagDataType
-  use GridDataType
+  use GridConsts
   use EcoSIMCtrlDataType
   use ClimForcDataType
   use PlantTraitDataType
@@ -16,7 +16,7 @@
   use PlantDataRateType
   use RootDataType
   use EcoSIMHistMod
-
+  use GridDataType
   implicit none
   integer, intent(in) :: I,NT,NE,NAX,NDX
   integer, intent(in) :: NTX,NEX,NHW,NHE,NVN,NVS

@@ -1,7 +1,7 @@
 module StartqMod
   use data_kind_mod, only : r8 => SHR_KIND_R8
   use EcosimConst
-  use GridDataType
+  use GridConsts
   use FlagDataType
   use EcoSIMCtrlDataType
   use PlantDataRateType
@@ -12,6 +12,7 @@ module StartqMod
   use CanopyRadDataType
   use RootDataType
   use EcoSIMHistMod
+  use GridDataType
   implicit none
 
   private

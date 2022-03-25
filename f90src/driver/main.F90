@@ -10,7 +10,7 @@ PROGRAM main
   use InitEcoSIM        , only :  InitModules
   use EcoSIMDesctruct   , only : DestructEcoSIM
   use EcoSIMCtrlDataType
-  use GridDataType
+  use GridConsts
   use EcoSIMHistMod
   implicit none
 

@@ -15,11 +15,13 @@ module nitroMod
   use NitroDiagTypes
   use nitro1LayerMod
   use NitroDisturbMod
-  use GridDataType
+  use GridConsts
   use SoilBGCDataType
   use EcoSIMCtrlDataType
   use SoilPhysDataType
   use SoilPropertyDataType
+  use GridDataType
+
   implicit none
 
   private
@@ -270,7 +272,7 @@ module nitroMod
       OQP(K,LL,NY,NX)=OQP(K,LL,NY,NX)+OQPXS
       OQPH(K,LL,NY,NX)=OQPH(K,LL,NY,NX)+OQPHXS
       OHP(K,LL,NY,NX)=OHP(K,LL,NY,NX)+OHPXS
-      DO 7931 M=1,4
+      DO 7931 M=1,jsken
         IF(FOSCXS.GT.0.0)THEN
           OSCXS=FOSCXS*AMAX1(0.0,OSC(M,K,L,NY,NX))
           OSAXS=FOSCXS*AMAX1(0.0,OSA(M,K,L,NY,NX))

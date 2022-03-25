@@ -6,7 +6,7 @@ module HfuncMod
   use data_kind_mod, only : r8 => SHR_KIND_R8
   use StartqMod    , only : startq
   use EcosimConst
-  use GridDataType
+  use GridConsts
   use FlagDataType
   use EcoSIMCtrlDataType
   use ClimForcDataType
@@ -19,6 +19,7 @@ module HfuncMod
   use SOMDataType
   use EcoSIMHistMod
   use EcosysBGCFluxType
+  use GridDataType
   implicit none
 
   private

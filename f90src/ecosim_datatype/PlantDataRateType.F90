@@ -1,7 +1,7 @@
 module PlantDataRateType
 
   use data_kind_mod, only : r8 => SHR_KIND_R8
-  use GridDataType
+  use GridConsts
   implicit none
   character(len=*), private, parameter :: mod_filename = __FILE__
 
@@ -12,9 +12,9 @@ module PlantDataRateType
   real(r8) :: TPSN0(JP,JY,JX)                   !total surface litterfall P, [g d-2]
   real(r8) :: TCSN0(JP,JY,JX)                   !total surface litterfall C, [g d-2]
 
-  real(r8) :: RDFOMC(2,0:4,JZ,JP,JY,JX)         !root uptake (+ve) - exudation (-ve) of DOC, [g d-2 h-1]
-  real(r8) :: RDFOMN(2,0:4,JZ,JP,JY,JX)         !root uptake (+ve) - exudation (-ve) of DON, [g d-2 h-1]
-  real(r8) :: RDFOMP(2,0:4,JZ,JP,JY,JX)         !root uptake (+ve) - exudation (-ve) of DOP, [g d-2 h-1]
+  real(r8) :: RDFOMC(2,0:jcplx1,JZ,JP,JY,JX)         !root uptake (+ve) - exudation (-ve) of DOC, [g d-2 h-1]
+  real(r8) :: RDFOMN(2,0:jcplx1,JZ,JP,JY,JX)         !root uptake (+ve) - exudation (-ve) of DON, [g d-2 h-1]
+  real(r8) :: RDFOMP(2,0:jcplx1,JZ,JP,JY,JX)         !root uptake (+ve) - exudation (-ve) of DOP, [g d-2 h-1]
   real(r8) :: RUPNH4(2,JZ,JP,JY,JX)             !root uptake of NH4 non-band, [g d-2 h-1]
   real(r8) :: RUPNHB(2,JZ,JP,JY,JX)             !root uptake of NH4 band, [g d-2 h-1]
   real(r8) :: RUPNO3(2,JZ,JP,JY,JX)             !root uptake of NO3 non-band, [g d-2 h-1]
@@ -162,9 +162,9 @@ module PlantDataRateType
   real(r8) :: TUPNOB(JZ,JY,JX)                  !total root-soil NO3 flux band, [g d-2 h-1]
   real(r8) :: TUPH2B(JZ,JY,JX)                  !total root-soil PO4 flux band, [g d-2 h-1]
   real(r8) :: TUPNF(JZ,JY,JX)                   !total root N2 fixation, [g d-2 h-1]
-  real(r8) :: TDFOMC(0:4,JZ,JY,JX)              !total root C exchange, [g d-2 h-1]
-  real(r8) :: TDFOMN(0:4,JZ,JY,JX)              !total root N exchange, [g d-2 h-1]
-  real(r8) :: TDFOMP(0:4,JZ,JY,JX)              !total root P exchange, [g d-2 h-1]
+  real(r8) :: TDFOMC(0:jcplx1,JZ,JY,JX)              !total root C exchange, [g d-2 h-1]
+  real(r8) :: TDFOMN(0:jcplx1,JZ,JY,JX)              !total root N exchange, [g d-2 h-1]
+  real(r8) :: TDFOMP(0:jcplx1,JZ,JY,JX)              !total root P exchange, [g d-2 h-1]
 
   real(r8) :: TCO2P(JZ,JY,JX)                   !total root CO2 flux, [g d-2 h-1]
   real(r8) :: TUPOXP(JZ,JY,JX)                  !total root internal O2 flux, [g d-2 h-1]
@@ -191,10 +191,10 @@ module PlantDataRateType
   real(r8) :: RN2BY(0:JZ,JY,JX)                 !total root + microbial NO2 uptake band, [g d-2 h-1]
   real(r8) :: RPOBX(0:JZ,JY,JX)                 !total root + microbial PO4 uptake band, [g d-2 h-1]
   real(r8) :: RPOBY(0:JZ,JY,JX)                 !total root + microbial PO4 uptake band, [g d-2 h-1]
-  real(r8) :: ROQCX(0:4,0:JZ,JY,JX)             !total root + microbial DOC uptake, [g d-2 h-1]
-  real(r8) :: ROQCY(0:4,0:JZ,JY,JX)             !total root + microbial DOC uptake, [g d-2 h-1]
-  real(r8) :: ROQAX(0:4,0:JZ,JY,JX)             !total root + microbial acetate uptake, [g d-2 h-1]
-  real(r8) :: ROQAY(0:4,0:JZ,JY,JX)             !total root + microbial acetate uptake, [g d-2 h-1]
+  real(r8) :: ROQCX(0:jcplx1,0:JZ,JY,JX)             !total root + microbial DOC uptake, [g d-2 h-1]
+  real(r8) :: ROQCY(0:jcplx1,0:JZ,JY,JX)             !total root + microbial DOC uptake, [g d-2 h-1]
+  real(r8) :: ROQAX(0:jcplx1,0:JZ,JY,JX)             !total root + microbial acetate uptake, [g d-2 h-1]
+  real(r8) :: ROQAY(0:jcplx1,0:JZ,JY,JX)             !total root + microbial acetate uptake, [g d-2 h-1]
   real(r8) :: TH2GZ(JY,JX)                      !total root H2 flux, [g d-2]
   real(r8) :: TUPHGS(JZ,JY,JX)                  !total root-soil H2 flux, [g d-2 h-1]
   real(r8) :: THGFLA(JZ,JY,JX)                  !total root-atmosphere H2 flux, [g d-2 h-1]

@@ -2,7 +2,7 @@ module InitSOMBGC
   use data_kind_mod, only : r8 => SHR_KIND_R8
   use MicrobialDataType
   use SOMDataType
-  use GridDataType
+  use GridConsts
   use SoilPhysDataType
   use FlagDataType
   use EcoSIMCtrlDataType
@@ -10,6 +10,7 @@ module InitSOMBGC
   use EcosimConst
   use SurfLitterDataType
   use SoilPropertyDataType
+  use GridDataType
   implicit none
 
   private
@@ -18,14 +19,14 @@ module InitSOMBGC
 ! CORGCX,CORGNX,CORGPX=C,N,P concentations from woody(0),
 ! non-woody(1), manure(2), litter, POC(3) and humus(4) (g Mg-1)
 
-  real(r8) :: CORGCX(0:4),CORGNX(0:4),CORGPX(0:4)
-  real(r8) :: OHCK(0:4)              !fractions of SOC in adsorbed C
-  real(r8) :: OMCK(0:4)  !fractions of SOC in biomass
-  real(r8) :: ORCK(0:4)  !fractions of SOC in litter
-  real(r8) :: OQCK(0:4)  !fractions of SOC in DOC
-  real(r8) :: OSCX(0:4),OSNX(0:4),OSPX(0:4)
-  real(r8) :: OMCI1(3,0:4)  !allocation of biomass to kinetic components
-  real(r8) :: ORCI(2,0:4)   !allocation of residue to kinetic components
+  real(r8) :: CORGCX(0:jcplx1),CORGNX(0:jcplx1),CORGPX(0:jcplx1)
+  real(r8) :: OHCK(0:jcplx1)              !fractions of SOC in adsorbed C
+  real(r8) :: OMCK(0:jcplx1)  !fractions of SOC in biomass
+  real(r8) :: ORCK(0:jcplx1)  !fractions of SOC in litter
+  real(r8) :: OQCK(0:jcplx1)  !fractions of SOC in DOC
+  real(r8) :: OSCX(0:jcplx1),OSNX(0:jcplx1),OSPX(0:jcplx1)
+  real(r8) :: OMCI1(3,0:jcplx1)  !allocation of biomass to kinetic components
+  real(r8) :: ORCI(2,0:jcplx1)   !allocation of residue to kinetic components
 
   public :: InitSOMVars
   public :: InitSOMProfile
@@ -38,7 +39,7 @@ module InitSOMBGC
   implicit none
 
   integer :: K,NGL,M
-  real(r8) :: COMCI(3,0:4)
+  real(r8) :: COMCI(3,0:jcplx1)
   OHCK=real((/0.05,0.05,0.05,0.05,0.05/),r8)
   OMCK=real((/0.01,0.01,0.01,0.01,0.01/),r8)
   ORCK=real((/0.25,0.25,0.25,0.25,0.25/),r8)
@@ -80,11 +81,11 @@ module InitSOMBGC
   real(r8) :: RNT,RPT
   real(r8) :: FRNT,FRPT
   real(r8) :: TOSNI,TOSPI,TOSCI
-  real(r8) :: OSCI(0:4),OSNI(0:4),OSPI(0:4)
-  real(r8) :: OSCM(0:4)
-  real(r8) :: TOSCK(0:4),TOSNK(0:4),TOSPK(0:4)
+  real(r8) :: OSCI(0:jcplx1),OSNI(0:jcplx1),OSPI(0:jcplx1)
+  real(r8) :: OSCM(0:jcplx1)
+  real(r8) :: TOSCK(0:jcplx1),TOSNK(0:jcplx1),TOSPK(0:jcplx1)
   real(r8) :: RC
-  real(r8) :: CNOSCT(0:4), CPOSCT(0:4)
+  real(r8) :: CNOSCT(0:jcplx1), CPOSCT(0:jcplx1)
 ! begin_execution
 
   DO 975 K=0,2

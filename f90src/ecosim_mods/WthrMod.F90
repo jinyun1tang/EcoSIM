@@ -6,7 +6,7 @@ module WthrMod
   use MiniMathMod, only : safe_adb,vapsat0,test_aneb,test_aeqb
   use EcosimConst
   use CanopyRadDataType
-  use GridDataType
+  use GridConsts
   use FlagDataType
   use EcoSIMCtrlDataType
   use ClimForcDataType
@@ -15,6 +15,7 @@ module WthrMod
   use PlantTraitDataType
   use AqueChemDatatype
   use IrrigationDataType
+  use GridDataType
   implicit none
 
   private

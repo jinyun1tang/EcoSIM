@@ -3,7 +3,7 @@ module SoilBGCDataType
 !
 ! USES:
   use data_kind_mod, only : r8 => SHR_KIND_R8
-  use GridDataType
+  use GridConsts
 implicit none
   character(len=*), private, parameter :: mod_filename = __FILE__
 
@@ -151,10 +151,10 @@ implicit none
   real(r8) :: XH2PS(0:JZ,JY,JX)                 !net microbial PO4 exchange nonband, [g d-2 h-1]
   real(r8) :: XNH4S(0:JZ,JY,JX)                 !net microbial NH4 exchange non-band, [g d-2 h-1]
   real(r8) :: XNO3S(0:JZ,JY,JX)                 !net microbial NO3 exchange non-band, [g d-2 h-1]
-  real(r8) :: XOQCS(0:4,0:JZ,JY,JX)             !net microbial DOC flux, [g d-2 h-1]
-  real(r8) :: XOQNS(0:4,0:JZ,JY,JX)             !net microbial DON flux, [g d-2 h-1]
-  real(r8) :: XOQPS(0:4,0:JZ,JY,JX)             !net microbial DOP flux, [g d-2 h-1]
-  real(r8) :: XOQAS(0:4,0:JZ,JY,JX)             !net microbial acetate flux, [g d-2 h-1]
+  real(r8) :: XOQCS(0:jcplx1,0:JZ,JY,JX)             !net microbial DOC flux, [g d-2 h-1]
+  real(r8) :: XOQNS(0:jcplx1,0:JZ,JY,JX)             !net microbial DON flux, [g d-2 h-1]
+  real(r8) :: XOQPS(0:jcplx1,0:JZ,JY,JX)             !net microbial DOP flux, [g d-2 h-1]
+  real(r8) :: XOQAS(0:jcplx1,0:JZ,JY,JX)             !net microbial acetate flux, [g d-2 h-1]
   real(r8) :: TOQCK(0:JZ,JY,JX)                 !total respiration of DOC+DOA in soil layer
   real(r8) :: VOLQ(0:JZ,JY,JX)                  !soil water volume occupied by microial biomass, [m3 m-3]
   real(r8) :: TFNQ(0:JZ,JY,JX)                  !constraints of temperature and water potential on microbial activity, []
@@ -214,12 +214,12 @@ implicit none
   real(r8) :: XNOFLB(3,JD,JV,JH)                !aqueous NO3 flux band micropore, [g d-2 h-1]
   real(r8) :: XH2BFB(3,JD,JV,JH)                !aqueous PO4 flux band micropore, [g d-2 h-1]
   real(r8) :: XNXFLB(3,JD,JV,JH)                !aqueous NO2 flux band micropore, [g d-2 h-1]
-  real(r8) :: XOCFLS(0:4,3,0:JD,JV,JH)          !DOC flux micropore, [g d-2 h-1]
-  real(r8) :: XONFLS(0:4,3,0:JD,JV,JH)          !DON flux micropore, [g d-2 h-1]
+  real(r8) :: XOCFLS(0:jcplx1,3,0:JD,JV,JH)          !DOC flux micropore, [g d-2 h-1]
+  real(r8) :: XONFLS(0:jcplx1,3,0:JD,JV,JH)          !DON flux micropore, [g d-2 h-1]
   real(r8) :: XCHFLG(3,0:JD,JV,JH)              !gaseous CH4 flux, [g d-2 h-1]
-  real(r8) :: XOAFLS(0:4,3,0:JD,JV,JH)          !aqueous acetate flux, [g d-2 h-1]
+  real(r8) :: XOAFLS(0:jcplx1,3,0:JD,JV,JH)          !aqueous acetate flux, [g d-2 h-1]
   real(r8) :: XCOFLG(3,JD,JV,JH)                !gaseous CO2 flux, [g d-2 h-1]
-  real(r8) :: XOPFLS(0:4,3,0:JD,JV,JH)          !DOP flux micropore, [g d-2 h-1]
+  real(r8) :: XOPFLS(0:jcplx1,3,0:JD,JV,JH)          !DOP flux micropore, [g d-2 h-1]
   real(r8) :: XOXFLG(3,JD,JV,JH)                !gaseous O24 flux, [g d-2 h-1]
   real(r8) :: XNGFLG(3,JD,JV,JH)                !gaseous N2 flux, [g d-2 h-1]
   real(r8) :: XHGFLG(3,JD,JV,JH)                !gaseous H2 flux, [g d-2 h-1]
@@ -243,10 +243,10 @@ implicit none
   real(r8) :: XNOFHB(3,JD,JV,JH)                !aqueous NO3 flux band macropore, [g d-2 h-1]
   real(r8) :: XNXFHB(3,0:JD,JV,JH)              !aqueous PO4 flux band macropore, [g d-2 h-1]
   real(r8) :: XH2BHB(3,JD,JV,JH)                !aqueous NO2 flux band macropore, [g d-2 h-1]
-  real(r8) :: XOCFHS(0:4,3,JD,JV,JH)            !DOC flux macropore, [g d-2 h-1]
-  real(r8) :: XONFHS(0:4,3,JD,JV,JH)            !DON flux macropore, [g d-2 h-1]
-  real(r8) :: XOPFHS(0:4,3,JD,JV,JH)            !DOP flux macropore, [g d-2 h-1]
-  real(r8) :: XOAFHS(0:4,3,JD,JV,JH)            !acetate flux macropore, [g d-2 h-1]
+  real(r8) :: XOCFHS(0:jcplx1,3,JD,JV,JH)            !DOC flux macropore, [g d-2 h-1]
+  real(r8) :: XONFHS(0:jcplx1,3,JD,JV,JH)            !DON flux macropore, [g d-2 h-1]
+  real(r8) :: XOPFHS(0:jcplx1,3,JD,JV,JH)            !DOP flux macropore, [g d-2 h-1]
+  real(r8) :: XOAFHS(0:jcplx1,3,JD,JV,JH)            !acetate flux macropore, [g d-2 h-1]
   real(r8) :: XH1PHS(3,JD,JV,JH)                !total HPO4 in macropore water flux non-band, [mol d-2 h-1]
   real(r8) :: XH1BHB(3,JD,JV,JH)                !total HPO4 in macropore water flux band, [mol d-2 h-1]
 
