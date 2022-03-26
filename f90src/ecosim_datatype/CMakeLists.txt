@@ -10,7 +10,7 @@ set(ECOSIM_DATATYPE_SOURCES
   FertilizerDataType.F90
   CanopyRadDataType.F90
   EcoSIMCtrlDataType.F90
-  SoilHeatDatatype.F90
+  SoilHeatDataType.F90
   SoilWaterDataType.F90
   SoilBGCDataType.F90
   PlantDataRateType.F90

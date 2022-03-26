@@ -21,6 +21,16 @@ macro(set_up_platform)
   # Set defaults for the various third-party libraries. These defaults
   # are hardwired because the project can't have been defined before
   # this macro is executed, and so PROJECT_BINARY_DIR is unavailable.
+
+if (NOT EXISTS ${CMAKE_CURRENT_BINARY_DIR}/lib)
+  file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/lib)
+endif()
+
+
+if (NOT EXISTS ${CMAKE_CURRENT_BINARY_DIR}/include)
+  file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/include)
+endif()
+
   set(Z_LIBRARY "${CMAKE_CURRENT_BINARY_DIR}/lib/libz.a")
   set(Z_INCLUDE_DIR "${CMAKE_CURRENT_BINARY_DIR}/include")
   get_filename_component(Z_LIBRARY_DIR ${Z_LIBRARY} DIRECTORY)
