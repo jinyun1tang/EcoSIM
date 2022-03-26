@@ -1,2 +1,0 @@
-/usr/bin/ar qc libecosim_driver.a  CMakeFiles/ecosim_driver.dir/readnamelist.f.o CMakeFiles/ecosim_driver.dir/soil.f.o CMakeFiles/ecosim_driver.dir/regressiontest.f.o CMakeFiles/ecosim_driver.dir/main.f.o
-/usr/bin/ranlib libecosim_driver.a

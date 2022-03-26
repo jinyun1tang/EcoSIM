@@ -84,9 +84,6 @@ CMAKE_EXE_LINKER_FLAGS_RELWITHDEBINFO:STRING=
 //Enable/Disable output of compile commands during generation.
 CMAKE_EXPORT_COMPILE_COMMANDS:BOOL=OFF
 
-//Fortran compiler
-CMAKE_Fortran_COMPILER:FILEPATH=/opt/intel/oneapi/compiler/2022.0.1/linux/bin/intel64/ifort
-
 //Flags used by the Fortran compiler during all build types.
 CMAKE_Fortran_FLAGS:STRING=
 
@@ -218,7 +215,7 @@ CXX:UNINITIALIZED=icpc
 ECOSIM_PRECISION:UNINITIALIZED=not-set
 
 //No help, variable specified on the command line.
-F90:UNINITIALIZED=0
+F90:UNINITIALIZED=1
 
 //No help, variable specified on the command line.
 FC:UNINITIALIZED=ifort
@@ -327,8 +324,6 @@ CMAKE_EXE_LINKER_FLAGS_RELWITHDEBINFO-ADVANCED:INTERNAL=1
 CMAKE_EXPORT_COMPILE_COMMANDS-ADVANCED:INTERNAL=1
 //Name of external makefile project generator.
 CMAKE_EXTRA_GENERATOR:INTERNAL=
-//ADVANCED property for variable: CMAKE_Fortran_COMPILER
-CMAKE_Fortran_COMPILER-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_Fortran_FLAGS
 CMAKE_Fortran_FLAGS-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_Fortran_FLAGS_DEBUG
@@ -369,7 +364,7 @@ CMAKE_MODULE_LINKER_FLAGS_RELWITHDEBINFO-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_NM
 CMAKE_NM-ADVANCED:INTERNAL=1
 //number of local generators
-CMAKE_NUMBER_OF_MAKEFILES:INTERNAL=7
+CMAKE_NUMBER_OF_MAKEFILES:INTERNAL=11
 //ADVANCED property for variable: CMAKE_OBJCOPY
 CMAKE_OBJCOPY-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_OBJDUMP
