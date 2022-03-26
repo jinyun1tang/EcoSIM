@@ -66,8 +66,8 @@ module nitro1LayerMod
   type(NitroOMcplxStateType) :: ncplxs
 
 ! begin_execution
-  call nmicf%Init(JG)
-  call nmics%Init(JG)
+  call nmicf%Init(JG,jcplx)
+  call nmics%Init(JG,jcplx)
   call ncplxf%Init()
   call ncplxs%Init()
   call naqfdiag%ZeroOut()

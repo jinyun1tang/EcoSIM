@@ -1,6 +1,7 @@
 module SoluteMod
   use data_kind_mod, only : r8 => SHR_KIND_R8
   use minimathmod, only : test_aeqb
+  use SoluteParMod
   use SOMDataType
   use ChemTranspDataType
   use FertilizerDataType
@@ -20,10 +21,6 @@ module SoluteMod
   implicit none
 
   private
-!     include_section
-
-  include "solutepar.h"
-!     end_include_section
 
   real(r8) :: A1,A2,A3,AHY1,AOH1,AAL1,AALO1,AALO2,AALO3,AALO4
   real(r8) :: AFE1,AFEO1,AFEO2,AFEO3,AFEO4,ACA1,ACO31,AHCO31
@@ -85,7 +82,7 @@ module SoluteMod
 
   integer :: NR1,NP2,NP3
 !
-  DATA RNHUI/10.0E-02,1.0E-02,0.5E-02/
+
   real(r8) :: RSNUA, RSNUB
   real(r8) :: CN41, CN31, CN3B, CN4B, XN4B, XN41
 

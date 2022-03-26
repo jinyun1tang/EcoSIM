@@ -15,11 +15,6 @@ subroutine regressiontest(nmfile,case_name, NX, NY)
   use GridDataType
   implicit none
 
-  include "files.h"
-  include "blk9a.h"
-  include "blk9b.h"
-  include "blk9c.h"
-
   character(len=*), parameter :: mod_filename = __FILE__
   character(len=*), intent(in) :: nmfile
   character(len=*), intent(in) :: case_name

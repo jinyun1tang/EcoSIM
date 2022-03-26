@@ -4,6 +4,7 @@ module NitroPars
 ! code defining parameters for nitro
 ! USES:
   use data_kind_mod, only : r8 => SHR_KIND_R8
+  use GridConsts
   implicit none
   public
   save

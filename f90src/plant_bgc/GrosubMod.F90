@@ -25,11 +25,11 @@ module grosubMod
   use EcosysBGCFluxType
   use SoilPropertyDataType
   use GridDataType
+  use EcoSIMHistMod
   implicit none
 
   private
 
-  include "files.h"
 ! end_include_section
 
   character(len=*), private, parameter :: mod_filename = __FILE__

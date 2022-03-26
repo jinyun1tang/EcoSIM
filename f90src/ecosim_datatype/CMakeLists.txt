@@ -33,8 +33,6 @@ set(ECOSIM_DATATYPE_SOURCES
 
 include_directories(${CMAKE_BINARY_DIR}/f90src/utils/)
 
-configure_file(solutepar.h  solutepar.h COPYONLY)
-
 include(add_ecosim_library)
 add_ecosim_library(ecosim_datatype ${ECOSIM_DATATYPE_SOURCES})
 

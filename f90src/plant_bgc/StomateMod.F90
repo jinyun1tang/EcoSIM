@@ -14,34 +14,24 @@
   implicit none
 
   private
+  character(len=*), parameter :: mod_filename = __FILE__
 
-  real(r8) :: CH2O
-  REAL(R8) :: ETDN,ETLF
-  real(r8) :: EGRO,PARX,PARJ,RI,RTK,RSX,STK,TCCZ,TKCO,TFN1
-  real(r8) :: TFN2,TFNE,VCDN4,VL,VCDN,VOGRO,WSDN,XKO2L
-
-  real(r8) :: FLG4Y(0:5)
-!
-!     QNTM=quantum efficiency (umol e- umol-1 PAR)
-!     CURV=shape parameter for e- transport response to PAR
-!     ELEC3,ELEC4=e- requirement for CO2 fixn by rubisco,PEP carboxylase
-!     (umol e- umol CO2)
-!     CNKI,CPKI=nonstruct N,P inhibition constant on rubisco (g N,P g-1 C)
-!     RSMY=minimum stomatal resistance for CO2 uptake (h m-1)
-!     ATRPZ=hours to full dehardening of conifers in spring (h)
-!     COMP4=C4 CO2 compensation point (uM)
-!     FDML=leaf water content (g H2O g-1 C)
-!     FBS,FMP=leaf water content in bundle sheath, mesophyll in C4 CO2 fixn
-!     C4KI=nonstructural C inhibition constant on PEP carboxylase (uM)
-!     FLG4Y=number of hours with no grain fill to terminate annuals
-!
-  real(r8), PARAMETER :: QNTM=0.45,CURV=0.70,CURV2=2.0*CURV &
-  ,CURV4=4.0*CURV,ELEC3=4.5,ELEC4=3.0
-  real(r8), PARAMETER :: CNKI=1.0E+02,CPKI=1.0E+03
-  real(r8), PARAMETER :: RSMY=2.78E-03,ATRPZ=276.9
-  real(r8), PARAMETER :: COMP4=0.5,FDML=6.0,FBS=0.2*FDML &
-  ,FMP=0.8*FDML,C4KI=5.0E+06
-  DATA FLG4Y/336.0,672.0,672.0,672.0,672.0,672.0/
+  real(r8), PARAMETER :: QNTM=0.45_r8       !quantum efficiency (umol e- umol-1 PAR)
+  real(r8), parameter :: CURV=0.70_r8       !shape parameter for e- transport response to PAR
+  real(r8), PARAMETER :: CURV2=2.0_r8*CURV  !
+  real(r8), PARAMETER :: CURV4=4.0_r8*CURV
+  real(r8), PARAMETER :: ELEC3=4.5_r8       !e- requirement for CO2 fixed by rubisco (umol e- umol CO2)
+  real(r8), PARAMETER :: ELEC4=3.0_r8       !e- requirement for CO2 fixed by PEP carboxylase (umol e- umol CO2)
+  real(r8), PARAMETER :: CNKI=1.0E+02_r8    !nonstruct N inhibition constant on rubisco (g N g-1 C)
+  real(r8), PARAMETER :: CPKI=1.0E+03_r8    !nonstruct P inhibition constant on rubisco (g P g-1 C)
+  real(r8), PARAMETER :: RSMY=2.78E-03_r8   !minimum stomatal resistance for CO2 uptake (h m-1)
+  real(r8), PARAMETER :: ATRPZ=276.9_r8     !hours to full dehardening of conifers in spring (h)
+  real(r8), PARAMETER :: COMP4=0.5_r8       !C4 CO2 compensation point (uM)
+  real(r8), PARAMETER :: FDML=6.0_r8        !leaf water content (g H2O g-1 C)
+  real(r8), PARAMETER :: FBS=0.2_r8*FDML    !leaf water content in bundle sheath in C4 CO2 fixation
+  real(r8), PARAMETER :: FMP=0.8_r8*FDML    !leaf water content in mesophyll in C4 CO2 fixationn
+  real(r8), PARAMETER :: C4KI=5.0E+06_r8    !nonstructural C inhibition constant on PEP carboxylase (uM)
+  real(r8), parameter :: FLG4Y(0:5)=real((/336.0,672.0,672.0,672.0,672.0,672.0/),r8)  !number of hours with no grain fill to terminate annuals
 
   public :: stomate
   contains
@@ -57,6 +47,7 @@
 
   integer :: K,L,M,NB,N
   REAL(R8):: RACL
+  real(r8):: RI
 !     begin_execution
 !
 !     CANOPY TEMPERATURE + OFFSET FOR THERMAL ADAPTATION FROM 'READQ'
@@ -98,19 +89,17 @@
 !
     RSMN(NZ,NY,NX)=RSMH(NZ,NY,NX)
   ENDIF
-!     IF(ICTYP(NZ,NY,NX).EQ.3)THEN
-!     WRITE(19,3010)'CH2O',I,J,CH2O
-!     ELSEIF(ICTYP(NZ,NY,NX).EQ.4)THEN
-!     WRITE(20,3010)'CH2O',I,J,CH2O
-!     ENDIF
-!3010  FORMAT(A8,2I4,1E12.4)
+
   RETURN
   END subroutine stomate
 !------------------------------------------------------------------------------------------
 
-  subroutine C3ShadedLeaves(K,N,M,L,NB,NZ,NY,NX)
+  subroutine C3ShadedLeaves(K,N,M,L,NB,NZ,NY,NX,CH2O)
   implicit none
   integer, intent(in) :: K,N,M,L,NB,NZ,NY,NX
+  real(r8), intent(inout) :: CH2O
+  real(r8) :: ETLF,EGRO,PARX,PARJ
+  real(r8) :: VL
 !     begin_execution
 !
 !     LIGHT-LIMITED CARBOXYLATION RATES
@@ -142,9 +131,12 @@
   end subroutine C3ShadedLeaves
 !------------------------------------------------------------------------------------------
 
-  subroutine C3SunlitLeaves(K,N,M,L,NB,NZ,NY,NX)
+  subroutine C3SunlitLeaves(K,N,M,L,NB,NZ,NY,NX,CH2O)
   implicit none
   integer, intent(in) :: K,N,M,L,NB,NZ,NY,NX
+  real(r8), intent(inout) :: CH2O
+  real(r8) :: ETLF,EGRO,PARX,PARJ
+  real(r8) :: VL
 !     begin_execution
 !
 !     LIGHT-LIMITED CARBOXYLATION RATES
@@ -173,23 +165,14 @@
 !
   VL=AMIN1(VGRO(K,NB,NZ,NY,NX),EGRO)*FDBK(NB,NZ,NY,NX)
   CH2O=CH2O+VL*SURFX(N,L,K,NB,NZ,NY,NX)*TAUS(L+1,NY,NX)
-!
-!     IF(NB.EQ.1.AND.M.EQ.1.AND.N.EQ.1.AND.K.EQ.KLEAF(NB,NZ,NY,NX)-1
-!    2.AND.J.EQ.14)THEN
-!     WRITE(20,6798)'STD',I,J,L,M,N,K,NB,VL,PAR(N,M,L,NZ,NY,NX),RAPS
-!    2,TKCZ(NZ,NY,NX),CO2Q(NZ,NY,NX),ETGRO(K,NB,NZ,NY,NX)
-!    3,CBXN(K,NB,NZ,NY,NX),VGRO(K,NB,NZ,NY,NX),EGRO
-!    3,FDBK(NB,NZ,NY,NX),CH2O,TFN1,TFN2,TFNE,WSDN
-!    3,VCGRO(K,NB,NZ,NY,NX),VCDN,CO2I(NZ,NY,NX),CO2L(NZ,NY,NX)
-!6798  FORMAT(A8,7I4,40E12.4)
-!     ENDIF
+
   end subroutine C3SunlitLeaves
 !------------------------------------------------------------------------------------------
 
-  subroutine C3PhotosynsCanopyLayerL(L,K,NB,NZ,NY,NX)
+  subroutine C3PhotosynsCanopyLayerL(L,K,NB,NZ,NY,NX,CH2O)
   implicit none
   integer, intent(in) :: L,K,NB,NZ,NY,NX
-
+  real(r8), intent(inout) :: CH2O
   integer :: N,M
 !     begin_execution
 !     FOR EACH INCLINATION AND AZIMUTH CLASS
@@ -201,12 +184,12 @@
 !     SUNLIT LEAVES
 !
         IF(PAR(N,M,L,NZ,NY,NX).GT.0.0)THEN
-        call C3SunlitLeaves(K,N,M,L,NB,NZ,NY,NX)
+        call C3SunlitLeaves(K,N,M,L,NB,NZ,NY,NX,CH2O)
       ENDIF
 !
 !     SHADED LEAVES
       IF(PARDIF(N,M,L,NZ,NY,NX).GT.0.0)THEN
-        call C3ShadedLeaves(K,N,M,L,NB,NZ,NY,NX)
+        call C3ShadedLeaves(K,N,M,L,NB,NZ,NY,NX,CH2O)
       ENDIF
 !]
     ENDIF
@@ -215,11 +198,14 @@
   end subroutine C3PhotosynsCanopyLayerL
 !------------------------------------------------------------------------------------------
 
-  subroutine C3Photosynthesis(K,NB,NZ,NY,NX)
+  subroutine C3Photosynthesis(K,NB,NZ,NY,NX,CH2O,TFN1,TFN2,TFNE,XKO2L,WSDN)
   implicit none
   integer, intent(in) :: K,NB,NZ,NY,NX
-
+  real(r8), intent(inout) :: CH2O
+  real(r8), intent(in) :: TFN1,TFN2,TFNE,WSDN,XKO2L
   integer :: L
+  real(r8) :: ETDN,VCDN
+  real(r8) :: VOGRO
 !     begin_execution
 !
 !     SURFICIAL DENSITY OF RUBISCO AND ITS CHLOROPHYLL
@@ -279,20 +265,24 @@
   DO 3700 L=JC,1,-1
     IF(ARLFL(L,K,NB,NZ,NY,NX).GT.ZEROP(NZ,NY,NX))THEN
 !
-      call C3PhotosynsCanopyLayerL(L,K,NB,NZ,NY,NX)
+      call C3PhotosynsCanopyLayerL(L,K,NB,NZ,NY,NX,CH2O)
 !
     ENDIF
 3700  CONTINUE
   end subroutine C3Photosynthesis
 !------------------------------------------------------------------------------------------
 
-  subroutine C4Photosynthesis(K,NB,NZ,NY,NX)
+  subroutine C4Photosynthesis(K,NB,NZ,NY,NX,CH2O,TFN1,TFN2,TFNE,XKO2L,WSDN)
   implicit none
   integer, intent(in) :: K,NB,NZ,NY,NX
-
+  real(r8), intent(inout) :: CH2O
+  real(r8), intent(in) :: TFN1,TFN2,TFNE,XKO2L,WSDN
   integer :: L
   real(r8) :: CC4M
   real(r8) :: CCBS,ETDN4
+  real(r8) :: ETDN
+  real(r8) :: VCDN4,VCDN
+  real(r8) :: VOGRO
 !     begin_execution
 !
 !     FEEDBACK ON C4 CARBOXYLATION FROM C4 NON-STRUCTURAL C
@@ -356,7 +346,7 @@
   DO 2700 L=JC,1,-1
     IF(ARLFL(L,K,NB,NZ,NY,NX).GT.ZEROP(NZ,NY,NX))THEN
 !
-      call C4PhotosynsCanopyLayerL(L,K,NB,NZ,NY,NX)
+      call C4PhotosynsCanopyLayerL(L,K,NB,NZ,NY,NX,CH2O)
     ENDIF
 2700  CONTINUE
 !
@@ -411,10 +401,10 @@
   end subroutine C4Photosynthesis
 !------------------------------------------------------------------------------------------
 
-  subroutine C4PhotosynsCanopyLayerL(L,K,NB,NZ,NY,NX)
+  subroutine C4PhotosynsCanopyLayerL(L,K,NB,NZ,NY,NX,CH2O)
   implicit none
   integer, intent(in) :: L,K,NB,NZ,NY,NX
-
+  real(r8), intent(inout) :: CH2O
   integer :: M,N
 !     begin_execution
 !
@@ -426,12 +416,12 @@
 !
 !     SUNLIT LEAVES
         IF(PAR(N,M,L,NZ,NY,NX).GT.0.0)THEN
-          call C4SunlitLeaves(K,N,M,L,NB,NZ,NY,NX)
+          call C4SunlitLeaves(K,N,M,L,NB,NZ,NY,NX,CH2O)
         ENDIF
 !
 !     SHADED LEAVES
         IF(PARDIF(N,M,L,NZ,NY,NX).GT.0.0)THEN
-          call C4ShadedLeaves(K,N,M,L,NB,NZ,NY,NX)
+          call C4ShadedLeaves(K,N,M,L,NB,NZ,NY,NX,CH2O)
         ENDIF
       ENDIF
 2500  CONTINUE
@@ -440,11 +430,13 @@
   end subroutine C4PhotosynsCanopyLayerL
 !------------------------------------------------------------------------------------------
 
-  subroutine C4ShadedLeaves(K,N,M,L,NB,NZ,NY,NX)
+  subroutine C4ShadedLeaves(K,N,M,L,NB,NZ,NY,NX,CH2O)
 
   implicit none
   integer, intent(in) :: K,N,M,L,NB,NZ,NY,NX
-  real(r8) :: ETLF4,EGRO4
+  real(r8), intent(inout) :: CH2O
+  real(r8) :: ETLF4,EGRO4,PARX,PARJ
+  real(r8) :: VL
 !     begin_execution
 !
 !     LIGHT-LIMITED CARBOXYLATION RATES
@@ -473,19 +465,16 @@
 !
   VL=AMIN1(VGRO4(K,NB,NZ,NY,NX),EGRO4)*FDBK4(K,NB,NZ,NY,NX)
   CH2O=CH2O+VL*SURFX(N,L,K,NB,NZ,NY,NX)*TAU0(L+1,NY,NX)
-!     WRITE(*,6799)'STB',I,J,L,M,N,K,VL,PAR(N,M,L,NZ,NY,NX),RAPS
-!    2,TKCZ(NZ,NY,NX),CO2Q(NZ,NY,NX),ETGR4(K,NB,NZ,NY,NX)
-!    3,CBXN4(K,NB,NZ,NY,NX),VGRO4(K,NB,NZ,NY,NX),EGRO4
-!    3,FDBK4(K,NB,NZ,NY,NX),CH2O,VGRO4(K,NB,NZ,NY,NX),EGRO4
-!    3,VCGR4(K,NB,NZ,NY,NX),CO2I(NZ,NY,NX),CO2L(NZ,NY,NX)
-!6799  FORMAT(A8,6I4,40E12.4)
+
   end subroutine C4ShadedLeaves
 !------------------------------------------------------------------------------------------
 
-  subroutine C4SunlitLeaves(K,N,M,L,NB,NZ,NY,NX)
+  subroutine C4SunlitLeaves(K,N,M,L,NB,NZ,NY,NX,CH2O)
   implicit none
   integer, intent(in) :: K,N,M,L,NB,NZ,NY,NX
-  real(r8) :: ETLF4,EGRO4
+  real(r8), intent(inout) :: CH2O
+  real(r8) :: ETLF4,EGRO4,PARX,PARJ
+  real(r8) :: VL
 !     begin_execution
 !
 !     LIGHT-LIMITED CARBOXYLATION RATES
@@ -514,25 +503,16 @@
 !
   VL=AMIN1(VGRO4(K,NB,NZ,NY,NX),EGRO4)*FDBK4(K,NB,NZ,NY,NX)
   CH2O=CH2O+VL*SURFX(N,L,K,NB,NZ,NY,NX)*TAUS(L+1,NY,NX)
-!     IF(L.GT.NC-4.AND.NB.EQ.1.AND.M.EQ.1.AND.N.EQ.3)THEN
-!     WRITE(*,6789)'STO',I,J,L,M,N,K,L,VL
-!    2,PAR(N,M,L,NZ,NY,NX),RAPS
-!    2,TKCZ(NZ,NY,NX),CO2Q(NZ,NY,NX),ETGR4(K,NB,NZ,NY,NX)
-!    3,CBXN4(K,NB,NZ,NY,NX),VGRO4(K,NB,NZ,NY,NX),EGRO4
-!    3,FDBK4(K,NB,NZ,NY,NX),CH2O,VGRO4(K,NB,NZ,NY,NX),EGRO4
-!    3,SURFX(N,L,K,NB,NZ,NY,NX)
-!    3,VCGR4(K,NB,NZ,NY,NX),CO2I(NZ,NY,NX),CO2L(NZ,NY,NX),TFN1,TFN2
-!    4,TFNE,WSDN,VCDN4
-!6789  FORMAT(A8,7I4,40E12.4)
-!     ENDIF
   end subroutine C4SunlitLeaves
 !------------------------------------------------------------------------------------------
 
-  subroutine LivingBranch(NB,NZ,NY,NX)
+  subroutine LivingBranch(NB,NZ,NY,NX,CH2O,TFN1,TFN2,TFNE,XKO2L)
   implicit none
   integer, intent(in):: NB,NZ,NY,NX
-
+  real(r8),intent(inout) :: CH2O
+  real(r8), intent(in) :: TFN1,TFN2,TFNE,XKO2L
   integer :: K
+  real(r8) :: WSDN
 !     begin_execution
 
   DO 2800 K=1,25
@@ -542,12 +522,6 @@
     ELSE
       WSDN=0.0
     ENDIF
-!     IF((I/10)*10.EQ.I.AND.J.EQ.15)THEN
-!     WRITE(*,2125)'WSDN',I,J,NX,NY,NZ,NB,K,WSDN
-!    2,WGLF(K,NB,NZ,NY,NX),WSLF(K,NB,NZ,NY,NX)
-!    3,ARLF(K,NB,NZ,NY,NX)
-!2125  FORMAT(A8,7I4,12E12.4)
-!     ENDIF
 
     IF(WSDN.GT.ZERO)THEN
 !
@@ -555,10 +529,10 @@
 !
       IF(ICTYP(NZ,NY,NX).EQ.4)THEN
 !     C4 PHOTOSYNTHESIS
-        call C4Photosynthesis(K,NB,NZ,NY,NX)
+        call C4Photosynthesis(K,NB,NZ,NY,NX,CH2O,TFN1,TFN2,TFNE,XKO2L,WSDN)
       ELSE
 !     C3 PHOTOSYNTHESIS
-        call C3Photosynthesis(K,NB,NZ,NY,NX)
+        call C3Photosynthesis(K,NB,NZ,NY,NX,CH2O,TFN1,TFN2,TFNE,XKO2L,WSDN)
       ENDIF
 !
     ELSE
@@ -569,9 +543,11 @@
   end subroutine LivingBranch
 !------------------------------------------------------------------------------------------
 
-  subroutine PhenoActiveBranch(NB,NZ,NY,NX)
+  subroutine PhenoActiveBranch(NB,NZ,NY,NX,CH2O,TFN1,TFN2,TFNE,XKO2L)
   implicit none
   integer, intent(in) :: NB,NZ,NY,NX
+  real(r8), intent(inout) :: CH2O
+  real(r8), intent(in) :: TFN1,TFN2,TFNE,XKO2L
 !     begin_execution
 !
 !     FEEDBACK ON C3 CARBOXYLATION FROM NON-STRUCTURAL C:N:P
@@ -617,13 +593,6 @@
     FDBKX(NB,NZ,NY,NX)=1.0
   ENDIF
   FDBK(NB,NZ,NY,NX)=FDBK(NB,NZ,NY,NX)*FDBKX(NB,NZ,NY,NX)
-!     IF(NZ.EQ.4)THEN
-!     WRITE(*,4242)'FDBK',I,J,NZ,NB,IDTHB(NB,NZ,NY,NX)
-!    2,FDBK(NB,NZ,NY,NX),VRNS(NB,NZ,NY,NX),VRNF(NB,NZ,NY,NX)
-!    3,CCPOLB(NB,NZ,NY,NX),CZPOLB(NB,NZ,NY,NX),CPPOLB(NB,NZ,NY,NX)
-!    3,FDBKX(NB,NZ,NY,NX),ATRP(NB,NZ,NY,NX)
-!4242  FORMAT(A8,5I4,12E20.4)
-!     ENDIF
 !
 !     FOR EACH NODE
 !
@@ -632,15 +601,19 @@
 !     WSDN=leaf protein surficial density
 !
   IF(IDTHB(NB,NZ,NY,NX).EQ.0)THEN
-    call LivingBranch(NB,NZ,NY,NX)
+    call LivingBranch(NB,NZ,NY,NX,CH2O,TFN1,TFN2,TFNE,XKO2L)
   ENDIF
   end subroutine PhenoActiveBranch
 !------------------------------------------------------------------------------------------
 
-  subroutine PrepPhotosynthesis(NZ,NY,NX)
+  subroutine PrepPhotosynthesis(NZ,NY,NX,CH2O,TFN1,TFN2,TFNE,XKO2L)
   implicit none
   integer, intent(in) :: NZ,NY,NX
-  real(r8) :: ACTV
+  real(r8), intent(out) :: CH2O
+  real(r8), intent(out) :: TFN1,TFN2,TFNE,XKO2L
+  real(r8) :: ACTV,RTK
+  real(r8) :: STK,TCCZ
+  real(r8) :: TKCO
 !     begin_execution
 !
 !     CO2 AND O2 AQUEOUS SOLUBILITY
@@ -693,9 +666,12 @@
   integer, intent(in) :: NZ,NY,NX
 
   integer :: NB,K
+  real(r8) :: CH2O
+  real(r8) :: RSX
+  real(r8) :: TFN1,TFN2,TFNE,XKO2L
 !     begin_execution
 
-  call PrepPhotosynthesis(NZ,NY,NX)
+  call PrepPhotosynthesis(NZ,NY,NX,CH2O,TFN1,TFN2,TFNE,XKO2L)
 !
 !     FOR EACH BRANCH
 !
@@ -710,7 +686,7 @@
     IF(IWTYP(NZ,NY,NX).EQ.0.OR.VRNS(NB,NZ,NY,NX).GE.VRNL(NB,NZ,NY,NX) &
       .OR.VRNF(NB,NZ,NY,NX).LT.VRNX(NB,NZ,NY,NX))THEN
 
-      call PhenoActiveBranch(NB,NZ,NY,NX)
+      call PhenoActiveBranch(NB,NZ,NY,NX,CH2O,TFN1,TFN2,TFNE,XKO2L)
     ELSE
       FDBK(NB,NZ,NY,NX)=0.0
       FDBKX(NB,NZ,NY,NX)=1.0

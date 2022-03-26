@@ -6,7 +6,6 @@ module readsmod
   use minimathmod, only : isLeap
   use GridConsts
   use FlagDataType
-  use EcosimConst, only : TC2K
   use FertilizerDataType
   use ClimForcDataType
   use SoilWaterDataType

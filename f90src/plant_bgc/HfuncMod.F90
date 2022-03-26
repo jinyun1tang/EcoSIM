@@ -26,11 +26,11 @@ module HfuncMod
 
 
   character(len=*), parameter :: mod_filename = __FILE__
-  real(r8) :: PSILY(0:3)
-  real(r8) :: ARLSP,ACTV,OFNG,PPD,RTK,RNI,RLA,STK,TKCO,TFNP
+
+  real(r8) :: RLA,STK,TKCO,TFNP
   real(r8) :: WFNG
   integer :: KVSTGX,NB,NBTX,N
-  integer :: NBX(0:3)
+
 !
 ! PSILM=minimum canopy turgor potential for leaf expansion (MPa)
 ! PSILX=minimum canopy water potential for leafout of drought-deciduous PFT (MPa)
@@ -39,10 +39,13 @@ module HfuncMod
 ! NBX=maximum branch number for PFT defined by IBTYP in PFT file
 ! VRNE=maximum hours for leafout,leafoff
 !
-  real(r8), PARAMETER :: PSILM=0.1,PSILX=-0.2
-  real(r8) ,PARAMETER :: GSTGG=2.00,GSTGR=0.667,VRNE=3600.0
-  DATA PSILY/-200.0,-2.0,-2.0,-2.0/
-  DATA NBX /5,1,1,1/
+  real(r8), PARAMETER :: PSILM=0.1_r8
+  real(r8), parameter :: PSILX=-0.2_r8
+  real(r8) ,PARAMETER :: GSTGG=2.00_r8
+  real(r8), PARAMETER :: GSTGR=0.667_r8
+  real(r8), PARAMETER :: VRNE=3600.0_r8
+  real(r8), parameter :: PSILY(0:3)=real((/-200.0,-2.0,-2.0,-2.0/),r8)
+  integer, parameter :: NBX(0:3)=(/5,1,1,1/)
 
   public :: hfunc
   contains
@@ -294,7 +297,7 @@ module HfuncMod
   integer, intent(in) :: I,J,NZ,NY,NX
 
   integer :: NB,N,L
-
+  real(r8):: ARLSP
   RCO2Z(NZ,NY,NX)=0.0
   ROXYZ(NZ,NY,NX)=0.0
   RCH4Z(NZ,NY,NX)=0.0
@@ -389,10 +392,6 @@ module HfuncMod
 ! RTDP1=primary root depth
 ! VHCPC,WTSHT,VOLWC=canopy heat capacity,mass,water content
 !
-! WRITE(*,223)'EMERG',I,J,NZ,NB1(NZ,NY,NX)
-!   2,IDAY(1,NB1(NZ,NY,NX),NZ,NY,NX),HTCTL(NZ,NY,NX),SDPTH(NZ,NY,NX)
-!   3,ARLSP,RTDP1(1,1,NZ,NY,NX)
-!223   FORMAT(A8,5I4,12E12.4)
   IF(IDAY(1,NB1(NZ,NY,NX),NZ,NY,NX).EQ.0)THEN
     ARLSP=ARLFP(NZ,NY,NX)+ARSTP(NZ,NY,NX)
     IF((HTCTL(NZ,NY,NX).GT.SDPTH(NZ,NY,NX)) &
@@ -649,6 +648,11 @@ module HfuncMod
   implicit none
   integer, intent(in) :: I,J,NB,NZ,NY,NX
 
+  real(r8) :: ACTV,OFNG
+  real(r8) :: PPD
+  real(r8) :: RTK
+  real(r8) :: RNI
+! begin_execution
   IF(IDAY(1,NB,NZ,NY,NX).EQ.0)THEN
     IDAY(1,NB,NZ,NY,NX)=I
     IFLGA(NB,NZ,NY,NX)=1

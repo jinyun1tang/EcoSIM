@@ -1,7 +1,6 @@
 module NitroDiagTypes
   ! !PUBLIC TYPES:
   use data_kind_mod, only : r8 => SHR_KIND_R8
-
   implicit none
   save
   private
@@ -300,11 +299,12 @@ type, public :: NitroAQMFluxDiagType
   end subroutine nit_aqmf_diag
 !------------------------------------------------------------------------------------------
 
-  subroutine nit_micf_init(this, JG)
+  subroutine nit_micf_init(this,JG,jcplx)
   implicit none
   class(NitroMicFluxType) :: this
-  integer, intent(in) :: JG
-
+  integer, intent(in) :: JG,jcplx
+  integer :: jcplx1
+  jcplx1=jcplx-1
   allocate(this%RUPOX(JG,7,0:jcplx))
   allocate(this%RGN2F(JG,7,0:jcplx))
   allocate(this%RGOMO(JG,7,0:jcplx))
@@ -393,11 +393,11 @@ type, public :: NitroAQMFluxDiagType
   end subroutine nit_micf_init
 !------------------------------------------------------------------------------------------
 
-  subroutine nit_mics_init(this, JG)
+  subroutine nit_mics_init(this, JG, jcplx)
 
   implicit none
   class(NitroMicStateType) :: this
-  integer, intent(in) :: JG
+  integer, intent(in) :: JG, jcplx
 
   allocate(this%CNOMA(JG,7,0:jcplx))
   allocate(this%CPOMA(JG,7,0:jcplx))
