@@ -30,8 +30,6 @@ module grosubMod
 
   private
 
-  ! include "files.h"
-! end_include_section
 
   character(len=*), private, parameter :: mod_filename = __FILE__
 ! DIMENSION VCO2(400,366,05)
