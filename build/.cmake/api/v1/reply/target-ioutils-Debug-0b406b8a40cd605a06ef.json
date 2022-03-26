@@ -1,0 +1,439 @@
+{
+	"artifacts" : 
+	[
+		{
+			"path" : "f77src/ioutils/libioutils.so"
+		}
+	],
+	"backtrace" : 2,
+	"backtraceGraph" : 
+	{
+		"commands" : 
+		[
+			"add_library",
+			"add_ecosim_library",
+			"install",
+			"link_directories",
+			"target_link_libraries",
+			"include_directories"
+		],
+		"files" : 
+		[
+			"cmake/Modules/add_ecosim_library.cmake",
+			"f77src/ioutils/CMakeLists.txt",
+			"CMakeLists.txt"
+		],
+		"nodes" : 
+		[
+			{
+				"file" : 1
+			},
+			{
+				"command" : 1,
+				"file" : 1,
+				"line" : 27,
+				"parent" : 0
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 2,
+				"parent" : 1
+			},
+			{
+				"command" : 2,
+				"file" : 1,
+				"line" : 32,
+				"parent" : 0
+			},
+			{
+				"file" : 2
+			},
+			{
+				"command" : 3,
+				"file" : 2,
+				"line" : 195,
+				"parent" : 4
+			},
+			{
+				"command" : 4,
+				"file" : 0,
+				"line" : 4,
+				"parent" : 1
+			},
+			{
+				"command" : 5,
+				"file" : 2,
+				"line" : 193,
+				"parent" : 4
+			},
+			{
+				"command" : 5,
+				"file" : 2,
+				"line" : 194,
+				"parent" : 4
+			},
+			{
+				"command" : 5,
+				"file" : 2,
+				"line" : 202,
+				"parent" : 4
+			},
+			{
+				"command" : 5,
+				"file" : 1,
+				"line" : 23,
+				"parent" : 0
+			},
+			{
+				"command" : 5,
+				"file" : 1,
+				"line" : 24,
+				"parent" : 0
+			},
+			{
+				"command" : 5,
+				"file" : 1,
+				"line" : 25,
+				"parent" : 0
+			}
+		]
+	},
+	"compileGroups" : 
+	[
+		{
+			"compileCommandFragments" : 
+			[
+				{
+					"fragment" : " -W -Wall -std=gnu -pedantic -fcheck=all -cpp -g -fbacktrace -fmax-stack-var-size=524288  -DCPRGNU -fdefault-real-8 -Wno-unused-variable -ffpe-trap=invalid -Wno-unused-parameter -Wno-unused-function -Wuninitialized -Wno-unused-dummy-argument -ffree-line-length-none -g -fPIC  "
+				}
+			],
+			"defines" : 
+			[
+				{
+					"define" : "ioutils_EXPORTS"
+				}
+			],
+			"includes" : 
+			[
+				{
+					"backtrace" : 7,
+					"path" : "/home/hutx/EcoSIM/build"
+				},
+				{
+					"backtrace" : 8,
+					"path" : "/home/hutx/EcoSIM/build/include"
+				},
+				{
+					"backtrace" : 9,
+					"path" : "/home/hutx/EcoSIM"
+				},
+				{
+					"backtrace" : 10,
+					"path" : "/home/hutx/EcoSIM/build/f77src/ecosim_datatype"
+				},
+				{
+					"backtrace" : 11,
+					"path" : "/home/hutx/EcoSIM/build/f77src/utils"
+				},
+				{
+					"backtrace" : 12,
+					"path" : "/home/hutx/EcoSIM/build/f77src/ecosim_mods"
+				}
+			],
+			"language" : "Fortran",
+			"sourceIndexes" : 
+			[
+				0,
+				1,
+				2,
+				3,
+				4,
+				5,
+				6,
+				7,
+				8,
+				9,
+				10,
+				11,
+				12,
+				13,
+				14,
+				15,
+				16,
+				17
+			]
+		},
+		{
+			"compileCommandFragments" : 
+			[
+				{
+					"fragment" : " -std=c99 -Wall -pedantic-errors -Wextra -Werror-implicit-function-declaration -Wno-sign-compare -Wno-unused-parameter -Wno-unused-function -Wno-cast-qual -Wno-unused-but-set-variable -Wno-overlength-strings -Wno-int-to-pointer-cast -Wno-pointer-to-int-cast -Wno-discarded-qualifiers -Wno-sign-conversion -Wno-maybe-uninitialized -fPIC  -g -fPIC  "
+				}
+			],
+			"defines" : 
+			[
+				{
+					"define" : "ioutils_EXPORTS"
+				}
+			],
+			"includes" : 
+			[
+				{
+					"backtrace" : 7,
+					"path" : "/home/hutx/EcoSIM/build"
+				},
+				{
+					"backtrace" : 8,
+					"path" : "/home/hutx/EcoSIM/build/include"
+				},
+				{
+					"backtrace" : 9,
+					"path" : "/home/hutx/EcoSIM"
+				},
+				{
+					"backtrace" : 10,
+					"path" : "/home/hutx/EcoSIM/build/f77src/ecosim_datatype"
+				},
+				{
+					"backtrace" : 11,
+					"path" : "/home/hutx/EcoSIM/build/f77src/utils"
+				},
+				{
+					"backtrace" : 12,
+					"path" : "/home/hutx/EcoSIM/build/f77src/ecosim_mods"
+				}
+			],
+			"language" : "C",
+			"sourceIndexes" : 
+			[
+				18,
+				19
+			]
+		}
+	],
+	"dependencies" : 
+	[
+		{
+			"backtrace" : 6,
+			"id" : "ecosim_util::@ca1fb25ce1ef23d2d2f1"
+		},
+		{
+			"backtrace" : 6,
+			"id" : "ecosim_mods::@64f34bcb356381402314"
+		}
+	],
+	"id" : "ioutils::@16aab1ed0983dfd70188",
+	"install" : 
+	{
+		"destinations" : 
+		[
+			{
+				"backtrace" : 3,
+				"path" : "lib"
+			},
+			{
+				"backtrace" : 3,
+				"path" : "lib"
+			}
+		],
+		"prefix" : 
+		{
+			"path" : "/usr/local"
+		}
+	},
+	"link" : 
+	{
+		"commandFragments" : 
+		[
+			{
+				"fragment" : "",
+				"role" : "flags"
+			},
+			{
+				"backtrace" : 5,
+				"fragment" : "-L/home/hutx/EcoSIM/build/lib",
+				"role" : "libraryPath"
+			},
+			{
+				"fragment" : "-Wl,-rpath,/home/hutx/EcoSIM/build/lib:/home/hutx/EcoSIM/build/f77src/ecosim_mods:/home/hutx/EcoSIM/build/f77src/utils:",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 6,
+				"fragment" : "../ecosim_mods/libecosim_mods.so",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 6,
+				"fragment" : "../utils/libecosim_util.so",
+				"role" : "libraries"
+			},
+			{
+				"fragment" : "-lm",
+				"role" : "libraries"
+			}
+		],
+		"language" : "Fortran"
+	},
+	"name" : "ioutils",
+	"nameOnDisk" : "libioutils.so",
+	"paths" : 
+	{
+		"build" : "f77src/ioutils",
+		"source" : "f77src/ioutils"
+	},
+	"sourceGroups" : 
+	[
+		{
+			"name" : "Source Files",
+			"sourceIndexes" : 
+			[
+				0,
+				1,
+				2,
+				3,
+				4,
+				5,
+				6,
+				7,
+				8,
+				9,
+				10,
+				11,
+				12,
+				13,
+				14,
+				15,
+				16,
+				17,
+				18,
+				19
+			]
+		}
+	],
+	"sources" : 
+	[
+		{
+			"backtrace" : 2,
+			"compileGroupIndex" : 0,
+			"path" : "f77src/ioutils/BLOCKDATA001.f",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 2,
+			"compileGroupIndex" : 0,
+			"path" : "f77src/ioutils/foutp.f",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 2,
+			"compileGroupIndex" : 0,
+			"path" : "f77src/ioutils/fouts.f",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 2,
+			"compileGroupIndex" : 0,
+			"path" : "f77src/ioutils/outpd.f",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 2,
+			"compileGroupIndex" : 0,
+			"path" : "f77src/ioutils/outph.f",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 2,
+			"compileGroupIndex" : 0,
+			"path" : "f77src/ioutils/outsd.f",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 2,
+			"compileGroupIndex" : 0,
+			"path" : "f77src/ioutils/outsh.f",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 2,
+			"compileGroupIndex" : 0,
+			"path" : "f77src/ioutils/readi.f",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 2,
+			"compileGroupIndex" : 0,
+			"path" : "f77src/ioutils/readq.f",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 2,
+			"compileGroupIndex" : 0,
+			"path" : "f77src/ioutils/reads.f",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 2,
+			"compileGroupIndex" : 0,
+			"path" : "f77src/ioutils/routp.f",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 2,
+			"compileGroupIndex" : 0,
+			"path" : "f77src/ioutils/routq.f",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 2,
+			"compileGroupIndex" : 0,
+			"path" : "f77src/ioutils/routs.f",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 2,
+			"compileGroupIndex" : 0,
+			"path" : "f77src/ioutils/split.f",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 2,
+			"compileGroupIndex" : 0,
+			"path" : "f77src/ioutils/splitc.f",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 2,
+			"compileGroupIndex" : 0,
+			"path" : "f77src/ioutils/woutp.f",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 2,
+			"compileGroupIndex" : 0,
+			"path" : "f77src/ioutils/woutq.f",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 2,
+			"compileGroupIndex" : 0,
+			"path" : "f77src/ioutils/wouts.f",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 2,
+			"compileGroupIndex" : 1,
+			"path" : "f77src/ioutils/splitp.c",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 2,
+			"compileGroupIndex" : 1,
+			"path" : "f77src/ioutils/splits.c",
+			"sourceGroupIndex" : 0
+		}
+	],
+	"type" : "SHARED_LIBRARY"
+}

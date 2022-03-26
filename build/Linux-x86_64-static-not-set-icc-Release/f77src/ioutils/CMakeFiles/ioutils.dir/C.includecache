@@ -1,0 +1,28 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/hutx/EcoSIM/f77src/ioutils/splitp.c
+search.h
+-
+string.h
+-
+strings.h
+-
+stdlib.h
+-
+stdio.h
+-
+
+/home/hutx/EcoSIM/f77src/ioutils/splits.c
+stdio.h
+-
+string.h
+-
+stdlib.h
+-
+

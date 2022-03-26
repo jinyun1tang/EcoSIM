@@ -1,0 +1,260 @@
+{
+	"artifacts" : 
+	[
+		{
+			"path" : "f77src/driver/libecosim_driver.so"
+		}
+	],
+	"backtrace" : 2,
+	"backtraceGraph" : 
+	{
+		"commands" : 
+		[
+			"add_library",
+			"add_ecosim_library",
+			"link_directories",
+			"target_link_libraries",
+			"include_directories"
+		],
+		"files" : 
+		[
+			"cmake/Modules/add_ecosim_library.cmake",
+			"f77src/driver/CMakeLists.txt",
+			"CMakeLists.txt"
+		],
+		"nodes" : 
+		[
+			{
+				"file" : 1
+			},
+			{
+				"command" : 1,
+				"file" : 1,
+				"line" : 15,
+				"parent" : 0
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 2,
+				"parent" : 1
+			},
+			{
+				"file" : 2
+			},
+			{
+				"command" : 2,
+				"file" : 2,
+				"line" : 195,
+				"parent" : 3
+			},
+			{
+				"command" : 3,
+				"file" : 0,
+				"line" : 4,
+				"parent" : 1
+			},
+			{
+				"command" : 4,
+				"file" : 2,
+				"line" : 193,
+				"parent" : 3
+			},
+			{
+				"command" : 4,
+				"file" : 2,
+				"line" : 194,
+				"parent" : 3
+			},
+			{
+				"command" : 4,
+				"file" : 2,
+				"line" : 202,
+				"parent" : 3
+			},
+			{
+				"command" : 4,
+				"file" : 1,
+				"line" : 9,
+				"parent" : 0
+			},
+			{
+				"command" : 4,
+				"file" : 1,
+				"line" : 10,
+				"parent" : 0
+			},
+			{
+				"command" : 4,
+				"file" : 1,
+				"line" : 11,
+				"parent" : 0
+			},
+			{
+				"command" : 4,
+				"file" : 1,
+				"line" : 12,
+				"parent" : 0
+			}
+		]
+	},
+	"compileGroups" : 
+	[
+		{
+			"compileCommandFragments" : 
+			[
+				{
+					"fragment" : " -W -Wall -std=gnu -pedantic -fcheck=all -cpp -g -fbacktrace -fmax-stack-var-size=524288  -DCPRGNU -fdefault-real-8 -Wno-unused-variable -ffpe-trap=invalid -Wno-unused-parameter -Wno-unused-function -Wuninitialized -Wno-unused-dummy-argument -ffree-line-length-none -g -fPIC  "
+				}
+			],
+			"defines" : 
+			[
+				{
+					"define" : "ecosim_driver_EXPORTS"
+				}
+			],
+			"includes" : 
+			[
+				{
+					"backtrace" : 6,
+					"path" : "/home/hutx/EcoSIM/build"
+				},
+				{
+					"backtrace" : 7,
+					"path" : "/home/hutx/EcoSIM/build/include"
+				},
+				{
+					"backtrace" : 8,
+					"path" : "/home/hutx/EcoSIM"
+				},
+				{
+					"backtrace" : 9,
+					"path" : "/home/hutx/EcoSIM/build/f77src/ecosim_datatype"
+				},
+				{
+					"backtrace" : 10,
+					"path" : "/home/hutx/EcoSIM/build/f77src/utils"
+				},
+				{
+					"backtrace" : 11,
+					"path" : "/home/hutx/EcoSIM/build/f77src/ioutils"
+				},
+				{
+					"backtrace" : 12,
+					"path" : "/home/hutx/EcoSIM/build/f77src/ecosim_mods"
+				}
+			],
+			"language" : "Fortran",
+			"sourceIndexes" : 
+			[
+				0,
+				1,
+				2,
+				3
+			]
+		}
+	],
+	"dependencies" : 
+	[
+		{
+			"backtrace" : 5,
+			"id" : "ecosim_util::@ca1fb25ce1ef23d2d2f1"
+		},
+		{
+			"backtrace" : 5,
+			"id" : "ecosim_mods::@64f34bcb356381402314"
+		},
+		{
+			"backtrace" : 5,
+			"id" : "ioutils::@16aab1ed0983dfd70188"
+		}
+	],
+	"id" : "ecosim_driver::@ed4de00cffda294486b1",
+	"link" : 
+	{
+		"commandFragments" : 
+		[
+			{
+				"fragment" : "",
+				"role" : "flags"
+			},
+			{
+				"backtrace" : 4,
+				"fragment" : "-L/home/hutx/EcoSIM/build/lib",
+				"role" : "libraryPath"
+			},
+			{
+				"fragment" : "-Wl,-rpath,/home/hutx/EcoSIM/build/lib:/home/hutx/EcoSIM/build/f77src/ioutils:/home/hutx/EcoSIM/build/f77src/ecosim_mods:/home/hutx/EcoSIM/build/f77src/utils",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 5,
+				"fragment" : "../ioutils/libioutils.so",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 5,
+				"fragment" : "../ecosim_mods/libecosim_mods.so",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 5,
+				"fragment" : "../utils/libecosim_util.so",
+				"role" : "libraries"
+			},
+			{
+				"fragment" : "-lm",
+				"role" : "libraries"
+			}
+		],
+		"language" : "Fortran"
+	},
+	"name" : "ecosim_driver",
+	"nameOnDisk" : "libecosim_driver.so",
+	"paths" : 
+	{
+		"build" : "f77src/driver",
+		"source" : "f77src/driver"
+	},
+	"sourceGroups" : 
+	[
+		{
+			"name" : "Source Files",
+			"sourceIndexes" : 
+			[
+				0,
+				1,
+				2,
+				3
+			]
+		}
+	],
+	"sources" : 
+	[
+		{
+			"backtrace" : 2,
+			"compileGroupIndex" : 0,
+			"path" : "f77src/driver/readnamelist.f",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 2,
+			"compileGroupIndex" : 0,
+			"path" : "f77src/driver/soil.f",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 2,
+			"compileGroupIndex" : 0,
+			"path" : "f77src/driver/regressiontest.f",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 2,
+			"compileGroupIndex" : 0,
+			"path" : "f77src/driver/main.f",
+			"sourceGroupIndex" : 0
+		}
+	],
+	"type" : "SHARED_LIBRARY"
+}

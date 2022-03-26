@@ -1,0 +1,18 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/hutx/EcoSIM/f77src/utils/clock.c
+time.h
+-
+stdio.h
+-
+unistd.h
+-
+sys/time.h
+-
+

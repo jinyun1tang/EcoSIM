@@ -1,0 +1,2 @@
+/usr/bin/ar qc libecosim_util.a  CMakeFiles/ecosim_util.dir/data_kind_mod.F90.o CMakeFiles/ecosim_util.dir/abortutils.F90.o CMakeFiles/ecosim_util.dir/TestMod.F90.o CMakeFiles/ecosim_util.dir/clock.c.o CMakeFiles/ecosim_util.dir/timings.f.o
+/usr/bin/ranlib libecosim_util.a

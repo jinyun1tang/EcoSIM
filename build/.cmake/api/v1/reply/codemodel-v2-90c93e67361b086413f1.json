@@ -1,0 +1,189 @@
+{
+	"configurations" : 
+	[
+		{
+			"directories" : 
+			[
+				{
+					"build" : ".",
+					"childIndexes" : 
+					[
+						1
+					],
+					"hasInstallRule" : true,
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.1"
+					},
+					"projectIndex" : 0,
+					"source" : "."
+				},
+				{
+					"build" : "f77src",
+					"childIndexes" : 
+					[
+						2,
+						3,
+						4,
+						5,
+						6
+					],
+					"hasInstallRule" : true,
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.1"
+					},
+					"parentIndex" : 0,
+					"projectIndex" : 0,
+					"source" : "f77src"
+				},
+				{
+					"build" : "f77src/ecosim_datatype",
+					"hasInstallRule" : true,
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.1"
+					},
+					"parentIndex" : 1,
+					"projectIndex" : 0,
+					"source" : "f77src/ecosim_datatype"
+				},
+				{
+					"build" : "f77src/utils",
+					"hasInstallRule" : true,
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.1"
+					},
+					"parentIndex" : 1,
+					"projectIndex" : 0,
+					"source" : "f77src/utils",
+					"targetIndexes" : 
+					[
+						3
+					]
+				},
+				{
+					"build" : "f77src/ecosim_mods",
+					"hasInstallRule" : true,
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.1"
+					},
+					"parentIndex" : 1,
+					"projectIndex" : 0,
+					"source" : "f77src/ecosim_mods",
+					"targetIndexes" : 
+					[
+						2
+					]
+				},
+				{
+					"build" : "f77src/ioutils",
+					"hasInstallRule" : true,
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.1"
+					},
+					"parentIndex" : 1,
+					"projectIndex" : 0,
+					"source" : "f77src/ioutils",
+					"targetIndexes" : 
+					[
+						4
+					]
+				},
+				{
+					"build" : "f77src/driver",
+					"hasInstallRule" : true,
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.1"
+					},
+					"parentIndex" : 1,
+					"projectIndex" : 0,
+					"source" : "f77src/driver",
+					"targetIndexes" : 
+					[
+						0,
+						1
+					]
+				}
+			],
+			"name" : "Debug",
+			"projects" : 
+			[
+				{
+					"directoryIndexes" : 
+					[
+						0,
+						1,
+						2,
+						3,
+						4,
+						5,
+						6
+					],
+					"name" : "ecosim",
+					"targetIndexes" : 
+					[
+						0,
+						1,
+						2,
+						3,
+						4
+					]
+				}
+			],
+			"targets" : 
+			[
+				{
+					"directoryIndex" : 6,
+					"id" : "ecosim.x::@ed4de00cffda294486b1",
+					"jsonFile" : "target-ecosim.x-Debug-8ee5656471c3d7ad8f55.json",
+					"name" : "ecosim.x",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 6,
+					"id" : "ecosim_driver::@ed4de00cffda294486b1",
+					"jsonFile" : "target-ecosim_driver-Debug-a66fba8d5c22c272b8a0.json",
+					"name" : "ecosim_driver",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 4,
+					"id" : "ecosim_mods::@64f34bcb356381402314",
+					"jsonFile" : "target-ecosim_mods-Debug-e839e0e52aef01bcb75f.json",
+					"name" : "ecosim_mods",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 3,
+					"id" : "ecosim_util::@ca1fb25ce1ef23d2d2f1",
+					"jsonFile" : "target-ecosim_util-Debug-e8873db24e838a104401.json",
+					"name" : "ecosim_util",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 5,
+					"id" : "ioutils::@16aab1ed0983dfd70188",
+					"jsonFile" : "target-ioutils-Debug-0b406b8a40cd605a06ef.json",
+					"name" : "ioutils",
+					"projectIndex" : 0
+				}
+			]
+		}
+	],
+	"kind" : "codemodel",
+	"paths" : 
+	{
+		"build" : "/home/hutx/EcoSIM/build",
+		"source" : "/home/hutx/EcoSIM"
+	},
+	"version" : 
+	{
+		"major" : 2,
+		"minor" : 0
+	}
+}
