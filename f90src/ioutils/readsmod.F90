@@ -1,21 +1,23 @@
 module readsmod
 
   use data_kind_mod, only : r8 => SHR_KIND_R8
-  use abortutils, only : endrun
-  use fileUtil, only : open_safe
+  use abortutils , only : endrun
+  use fileUtil   , only : open_safe
+  use minimathmod, only : isLeap
+  use GridConsts
+  use FlagDataType
+  use FertilizerDataType
+  use ClimForcDataType
+  use SoilWaterDataType
+  use LandSurfDataType
+  use EcoSIMCtrlDataType
+  use EcosimConst
+  use EcoSIMHistMod
+  use IrrigationDataType
+  use GridDataType
   implicit none
   private
-  include "parameters.h"
-  include "filec.h"
-  include "files.h"
-  include "blkc.h"
-  include "blk2a.h"
-  include "blk2b.h"
-  include "blk2c.h"
-  include "blk8a.h"
-  include "blk8b.h"
-  include "blk17.h"
-  include "blktest.h"
+
 
   character(len=*), parameter :: mod_filename = __FILE__
   integer, SAVE :: N1,N2,N1X,N2X,IFLGY,IYRX,IYRD
@@ -38,10 +40,9 @@ module readsmod
   real(r8) :: datav(40)
   DATA IFLGY,IYRX,IYRD/0,0,0/
 
-  integer :: IDATE,IDY,IFLG3,IH,IX,I,ICHECK,IDY1,IDY2,IDY3,IPLOW
+  integer :: IDATE,IDY,IFLG3,IX,I,ICHECK,IDY1,IDY2,IDY3,IPLOW
   integer :: IR0,IR1,IR2,IDYS,IHRS,IDYE,IHRE,IFLGVX,J,JEN
 
-  integer :: JST,K,LPY,NH1,NH2,NV1,NV2,NI,LL
 
 
   public :: reads
@@ -61,10 +62,12 @@ module readsmod
   integer, intent(out) :: NTZX
 
 
-  integer :: kk,N,L,NN,NY,NX,NZ
-
+  integer :: kk,N,L,NN,NY,NX,NZ,K,NI
+  integer :: LL
+  integer :: LPY
+  integer :: JST,NH1,NV1,NH2,NV2
   LOGICAL :: GO110,GO60
-
+  integer :: IH
 
 ! begin_execution
 
@@ -92,7 +95,7 @@ module readsmod
 !   I=INT(DOY)+1
 ! ENDIF
 ! DO 24 L=1,20
-!   TKSZ(I,J,L)=OUT(L+13)+4.0+273.15
+!   TKSZ(I,J,L)=OUT(L+13)+4.0+TC2K
 !24    CONTINUE
 ! GO TO 23
 !27    CONTINUE
@@ -138,10 +141,8 @@ module readsmod
 25    CONTINUE
   if(lverb)then
     write(*,*)'annual changes in radiation: DRAD(1:4)',DRAD(1:4)
-    write(*,*)'annual changes in max temperature: DTMPX(1:4)' &
-      ,DTMPX(1:4)
-    write(*,*)'annual changes in min temperature: DTMPN(1:4)' &
-      ,DTMPN(1:4)
+    write(*,*)'annual changes in max temperature: DTMPX(1:4)',DTMPX(1:4)
+    write(*,*)'annual changes in min temperature: DTMPN(1:4)',DTMPN(1:4)
     write(*,*)'annual changes in humidity: DHUM(1:4)',DHUM(1:4)
     write(*,*)'annual changes in precip: DPREC(1:4)',DPREC(1:4)
     write(*,*)'annual changes in irrigation: DIRRI(1:4)',DIRRI(1:4)
@@ -161,23 +162,19 @@ module readsmod
     DCO2E(N)=DCO2E(N-1)
     DCN4R(N)=DCN4R(N-1)
     DCNOR(N)=DCNOR(N-1)
-26    CONTINUE
+26  CONTINUE
   READ(4,*)NPX,NPY,JOUT,IOUT,KOUT,ICLM
   if(lverb)then
     write(*,*)'number of cycles per hour for water,heat,'// &
       'solute flux calcns: NPX ',NPX
-    write(*,*)'number of cycles per NPX for gas flux calcns', &
-      ': NPY',NPY
+    write(*,*)'number of cycles per NPX for gas flux calcns: NPY',NPY
     write(*,*)'output frequency for hourly data: JOUT ',JOUT
     write(*,*)'output frequency for daily data: IOUT ',IOUT
-    write(*,*)'output frequency for checkpoint data: '// &
-      'KOUT ',KOUT
+    write(*,*)'output frequency for checkpoint data: KOUT ',KOUT
     write(*,*)'changes to weather data (0=none,1=step,'// &
       '2=transient): ICLM ',ICLM
   endif
   CLOSE(4)
-! OPEN WEATHER(3,
-  call OPEN_safe(3,PREFIX,DATAC(3,NE,NEX),'OLD',mod_filename,__LINE__)
 
 !
 ! INCREMENTS IN START AND END DATES FOR SUCCESSIVE SCENARIOS
@@ -257,28 +254,21 @@ module readsmod
   LYRC=365   ! # days for current year
   LYRX=365   ! # days for last year
   DO 575 N=1,7,3
-
-!    IF(MOD(IDATA(N+2),4))520,510,520
-!510   IF(IDATA(N+1).GT.2)LPY=1
-!    IF(N.EQ.1)LYRC=366
-    IF(MOD(IDATA(N+2),4)==0)then
+    IF(isLeap(IDATA(N+2)))then
       IF(IDATA(N+1).GT.2)LPY=1
       IF(N.EQ.1)LYRC=366
     endif
-!520 IF(IDATA(N+1).EQ.1)GO TO 525
 
-    IF(IDATA(N+1).EQ.1)GO TO 525
-    IDY=30*(IDATA(N+1)-1)+ICOR(IDATA(N+1)-1)+IDATA(N)+LPY
-    GO TO 527
-525 IDY=IDATA(N)
-527 IF(N.EQ.1)ISTART=IDY
+    IF(IDATA(N+1).EQ.1)then
+      IDY=IDATA(N)
+    else
+      IDY=30*(IDATA(N+1)-1)+ICOR(IDATA(N+1)-1)+IDATA(N)+LPY
+    endif
+    IF(N.EQ.1)ISTART=IDY
     IF(N.EQ.4)IFIN=IDY
     IF(N.EQ.7)IRUN=IDY
 
-!    IF(MOD(IDATA(N+2)-1,4))575,530,575
-!530   IF(N.EQ.1)LYRX=366
-!575   CONTINUE
-    IF(MOD(IDATA(N+2)-1,4)==0)then
+    IF(isLeap(IDATA(N+2)-1))then
       IF(N.EQ.1)LYRX=366
     endif
 575 CONTINUE
@@ -310,9 +300,10 @@ module readsmod
 ! IDAT,DAT=time,weather variable
 !
   IF(DATAC(3,NE,NEX).NE.'NO')THEN
+! OPEN WEATHER(3,
+    call OPEN_safe(3,PREFIX,DATAC(3,NE,NEX),'OLD',mod_filename,__LINE__)
     IFLG3=0
-    READ(3,'(2A1,2I2,50A1)')TTYPE,CTYPE,NI,NN,(IVAR(K),K=1,NI) &
-      ,(VAR(K),K=1,NN)
+    READ(3,'(2A1,2I2,50A1)')TTYPE,CTYPE,NI,NN,(IVAR(K),K=1,NI),(VAR(K),K=1,NN)
     READ(3,'(50A1)')(TYP(K),K=1,NN)
     read(3,*)(datav(kk),kk=1,3)
     Z0G=datav(1)
@@ -351,41 +342,41 @@ module readsmod
       DATK(K)=0.0
 55  CONTINUE
     IH=1
-60  read(3,*,END=110)(datav(k),k=1,NI),(DAT(K),K=1,NN)
-    do k = 1, ni
-      idat(k)=int(datav(k))
-    enddo
-!   WRITE(*,61)(IDAT(K),K=1,NI),(DAT(K),K=1,NN)
-!61  FORMAT(3I6,50E12.4)
+! the file reading loop
+    DO while(.TRUE.)
+      read(3,*,END=110)(datav(k),k=1,NI),(DAT(K),K=1,NN)
+      do k = 1, ni
+        idat(k)=int(datav(k))
+      enddo
 !
+      IF(TTYPE.EQ.'D')THEN
 !   READ DAILY WEATHER DATA AND CONVERT TO MODEL UNITS
-!
-    IF(TTYPE.EQ.'D')THEN
-      call readdayweather(I,L,GO110,GO60,NTX,NFX,NN)
-      IF(GO60)GO TO 60
-      IF(GO110)GO TO 110
-!
+        call readdayweather(I,L,GO110,GO60,NTX,NFX,NN,NI,LPY)
+        IF(GO60)cycle
+        IF(GO110)EXIT
+!!
+      ELSE
 !     READ HOURLY WEATHER DATA AND CONVERT TO MODEL UNITS
-!
-    ELSE
-      call readhourweather(I,J,go60,L,NN)
+        call readhourweather(I,J,IH,go60,L,NN,NI,LPY)
 !     write(*,*)'goto60=',go60
-      IF(GO60)GO TO 60
-
-      IH=1
-      IX=I
+        IF(GO60)cycle
+        IH=1
+        IX=I
 !     write(*,*)'344IX=',IX
-      IF(TTYPE.EQ.'3')THEN
+        IF(TTYPE.EQ.'3')THEN
 !       weather data is every 3 hrs, do interpolation
-        call interp3hourweather(I,J)
-      ENDIF
+          call interp3hourweather(I,J)
+        ENDIF
 
-      IF(IFLGY.EQ.1.AND.I.EQ.IYRD.AND.J.EQ.24)THEN
-        GO TO 110
+        IF(IFLGY.EQ.1.AND.I.EQ.IYRD.AND.J.EQ.24)THEN
+          EXIT
+        ENDIF
+        cycle
       ENDIF
-      GO TO 60
-    ENDIF
+    enddo
 110 CONTINUE
+    CLOSE(3)
+
 !
 ! ACCOUNT FOR LEAP YEAR
 !
@@ -410,6 +401,7 @@ module readsmod
       ENDIF
       IX=I+1
     ENDIF
+
   ELSE
     IFLGW=1
     Z0G=2.0
@@ -487,7 +479,6 @@ module readsmod
     NYR=1
   ENDIF
   IFLGY=0
-  CLOSE(3)
 !
 !     READ LAND MANAGEMENT FILE NAMES FOR EACH GRID CELL
 !
@@ -543,8 +534,8 @@ module readsmod
 !
 
     call OPEN_safe(13,PREFIX,DATAC(9,NE,NEX),'OLD',mod_filename,__LINE__)
-
-150 READ(13,*,END=200)NH1,NV1,NH2,NV2
+    do while(.TRUE.)
+    READ(13,*,END=200)NH1,NV1,NH2,NV2
     READ(13,*)DATA(8),DATA(5),DATA(6)
     IF(DATA(8).NE.'NO')THEN
       call OPEN_safe(10,PREFIX,DATA(8),'OLD',mod_filename,__LINE__)
@@ -563,32 +554,25 @@ module readsmod
 !     ITILL=soil disturbance type 1-20:tillage,21=litter removal,22=fire,23-24=drainage
 !     DCORP=intensity (fire) or depth (tillage,drainage) of disturbance
 !
-295   CONTINUE
+      do while(.TRUE.)
       READ(10,*,END=305)DY,IPLOW,DPLOW
       LPY=0
       IDY1=INT(DY/1.0E+06)
       IDY2=INT(DY/1.0E+04-IDY1*1.0E+02)
       IDY3=INT(DY-(IDY1*1.0E+06+IDY2*1.0E+04))
-!      IF(MOD(IDY3,4))3520,3510,3520
-!3510  IF(IDY2.GT.2)LPY=1
-!3520  IF(IDY2.EQ.1)GO TO 3535
-      IF(MOD(IDY3,4)==0)then
-        IF(IDY2.GT.2)LPY=1
+      IF(isLeap(IDY3).and.IDY2.GT.2)LPY=1
+      IF(IDY2.EQ.1)then
+        IDY=IDY1
+      else
+        IDY=30*(IDY2-1)+ICOR(IDY2-1)+IDY1+LPY
       endif
-      IF(IDY2.EQ.1)GO TO 3535
-      IDY=30*(IDY2-1)+ICOR(IDY2-1)+IDY1+LPY
-!     IF(IDY2.LE.6)IDY=IDY-0.5*(NTX-1)
-!     IF(IDY2.GE.7)IDY=IDY+0.5*(NTX-1)
-      GO TO 3530
-3535  IDY=IDY1
-3530  CONTINUE
       DO 8995 NX=NH1,NH2
         DO 8990 NY=NV1,NV2
           ITILL(IDY,NY,NX)=IPLOW
           DCORP(IDY,NY,NX)=DPLOW
 8990    CONTINUE
 8995  CONTINUE
-      GO TO 295
+      enddo
 305   CONTINUE
       CLOSE(10)
     ENDIF
@@ -609,7 +593,7 @@ module readsmod
 !     IRO,IR1,IR2=fertilizer,litter,manure type
 !
       call OPEN_safe(8,PREFIX,DATA(5),'OLD',mod_filename,__LINE__)
-1500  CONTINUE
+      do while(.TRUE.)
       READ(8,*,END=85)DY,Z4A,Z3A,ZUA,ZOA,Z4B,Z3B,ZUB,ZOB &
         ,PMA,PMB,PHA,CAC,CAS,RSC1,RSN1,RSP1,RSC2,RSN2,RSP2,FDPTHI &
         ,ROWX,IR0,IR1,IR2
@@ -617,19 +601,13 @@ module readsmod
       IDY1=INT(DY/1.0E+06)
       IDY2=INT(DY/1.0E+04-IDY1*1.0E+02)
       IDY3=INT(DY-(IDY1*1.0E+06+IDY2*1.0E+04))
-!      IF(MOD(IDY3,4))1520,1510,1520
-!1510  IF(IDY2.GT.2)LPY=1
-!1520  IF(IDY2.EQ.1)GO TO 1525
-       IF(MOD(IDY3,4)==0)THEN
-         IF(IDY2.GT.2)LPY=1
-       ENDIF
-       IF(IDY2.EQ.1)GO TO 1525
-      IDY=30*(IDY2-1)+ICOR(IDY2-1)+IDY1+LPY
-!     IF(IDY2.LE.6)IDY=IDY-0.5*(NTX-1)
-!     IF(IDY2.GE.7)IDY=IDY+0.5*(NTX-1)
-      GO TO 1530
-1525  IDY=IDY1
-1530  CONTINUE
+      IF(isLeap(IDY3).and.IDY2.GT.2)LPY=1
+      IF(IDY2.EQ.1)then
+        IDY=IDY1
+      else
+        IDY=30*(IDY2-1)+ICOR(IDY2-1)+IDY1+LPY
+      endif
+
       DO 8985 NX=NH1,NH2
         DO 8980 NY=NV1,NV2
 !
@@ -679,7 +657,7 @@ module readsmod
           IYTYP(2,IDY,NY,NX)=IR2
 8980    CONTINUE
 8985  CONTINUE
-      GO TO 1500
+      enddo
 85    CONTINUE
       CLOSE(8)
     ENDIF
@@ -710,34 +688,23 @@ module readsmod
         IDY1=INT(DST/1.0E+06)
         IDY2=INT(DST/1.0E+04-IDY1*1.0E+02)
         IDY3=INT(DST-(IDY1*1.0E+06+IDY2*1.0E+04))
-!        IF(MOD(IDY3,4))4520,4510,4520
-!4510  IF(IDY2.GT.2)LPY=1
-!4520  IF(IDY2.EQ.1)GO TO 4535
-        IF(MOD(IDY3,4)==0)then
-          IF(IDY2.GT.2)LPY=1
+        IF(isLeap(IDY3).and.IDY2.GT.2)LPY=1
+        IF(IDY2.EQ.1)then
+          IDYS=IDY1
+        else
+          IDYS=30*(IDY2-1)+ICOR(IDY2-1)+IDY1+LPY
         endif
-        IF(IDY2.EQ.1)GO TO 4535
-
-        IDYS=30*(IDY2-1)+ICOR(IDY2-1)+IDY1+LPY
-        GO TO 4530
-4535    IDYS=IDY1
-4530    CONTINUE
         IHRS=IDY3
         LPY=0
         IDY1=INT(DEN/1.0E+06)
         IDY2=INT(DEN/1.0E+04-IDY1*1.0E+02)
         IDY3=INT(DEN-(IDY1*1.0E+06+IDY2*1.0E+04))
-!      IF(MOD(IDY3,4))5520,5510,5520
-!5510  IF(IDY2.GT.2)LPY=1
-!5520  IF(IDY2.EQ.1)GO TO 5535
-        IF(MOD(IDY3,4)==0)then
-          IF(IDY2.GT.2)LPY=1
+        IF(isLeap(IDY3).and.IDY2.GT.2)LPY=1
+        IF(IDY2.EQ.1)then
+          IDYE=IDY1
+        else
+          IDYE=30*(IDY2-1)+ICOR(IDY2-1)+IDY1+LPY
         endif
-        IF(IDY2.EQ.1)GO TO 5535
-        IDYE=30*(IDY2-1)+ICOR(IDY2-1)+IDY1+LPY
-        GO TO 5530
-5535    IDYE=IDY1
-5530    CONTINUE
         IHRE=IDY3
 !
 !       TRANSFER INPUTS TO MODEL ARRAYS
@@ -773,7 +740,7 @@ module readsmod
 !
 !       SCHEDULED IRRIGATION
 !
-2500    CONTINUE
+        do while(.TRUE.)
 !
 !       DY,RR,JST,JEN=date DDMMYYYY,amount (mm),start and end hours
 !       PHQX,CN4QX,CNOQX,CPOQX,CALQX,CFEQX,CCAQX,CMGQX,CNAQX,CKAQX,
@@ -786,18 +753,12 @@ module readsmod
         IDY1=INT(DY/1.0E+06)
         IDY2=INT(DY/1.0E+04-IDY1*1.0E+02)
         IDY3=INT(DY-(IDY1*1.0E+06+IDY2*1.0E+04))
-!        IF(MOD(IDY3,4))2520,2510,2520
-!2510    IF(IDY2.GT.2)LPY=1
-!2520    IF(IDY2.EQ.1)GO TO 2525
-        IF(MOD(IDY3,4)==0)then
-          IF(IDY2.GT.2)LPY=1
+        IF(isLeap(IDY3).and.IDY2.GT.2)LPY=1
+        IF(IDY2.EQ.1)then
+          IDY=IDY1
+        else
+          IDY=30*(IDY2-1)+ICOR(IDY2-1)+IDY1+LPY
         endif
-        IF(IDY2.EQ.1)GO TO 2525
-
-        IDY=30*(IDY2-1)+ICOR(IDY2-1)+IDY1+LPY
-        GO TO 2530
-2525    IDY=IDY1
-2530    CONTINUE
         RRH=RR/(JEN-(JST-1))
         DO 8965 NX=NH1,NH2
           DO 8960 NY=NV1,NV2
@@ -822,12 +783,12 @@ module readsmod
             WDPTH(IDY,NY,NX)=WDPTHI
 8960      CONTINUE
 8965    CONTINUE
-        GO TO 2500
+        enddo
       ENDIF
 105   CONTINUE
     ENDIF
     CLOSE(2)
-    GO TO 150
+    enddo
 200 CONTINUE
     CLOSE(13)
   ENDIF
@@ -883,18 +844,23 @@ module readsmod
 
 !------------------------------------------------------------------------------------------
 
-  subroutine readhourweather(I,J,go60,L,NN)
+  subroutine readhourweather(I,J,IH,go60,L,NN,NI,LPY)
 
 !     read hourly weather data
 !
 !     DERIVE DAY I AND HOUR J FROM TIME VARIABLES IVAR
 !
   implicit none
-  integer, intent(inout) :: I,J
-  integer, intent(in) :: L,NN
+  integer, intent(inout) :: I      !julian day
+  integer, intent(inout) :: J      !hour
+  integer, intent(inout) :: IH
+  integer, intent(inout) :: LPY
+  integer, intent(in) :: L,NN,NI
   logical, intent(out) :: go60
 
-  integer :: K,M,N
+  integer :: K
+  integer :: M
+  integer :: N
 
   go60=.false.
 
@@ -902,10 +868,13 @@ module readsmod
   DO 190 K=1,NI
 !      write(*,'(A,A,A,X,I4)')'IVAR=',IVAR(K),' IDAT=',IDAT(K)
     IF(IVAR(K).EQ.'M')THEN
+!    month
       M=IDAT(K)
     ELSEIF(IVAR(K).EQ.'D')THEN
+! julian day
       N=IDAT(K)
     ELSEIF(IVAR(K).EQ.'H')THEN
+! hour
       J=IDAT(K)
     ENDIF
     IF(IVAR(K).EQ.'Y')THEN
@@ -923,12 +892,7 @@ module readsmod
      I=N
    ELSE
      LPY=0
-!     IF(MOD(IDATA(3),4))100,115,100
-!115   IF(M.GT.2)LPY=1
-!100   IF(M.EQ.1)THEN
-     IF(MOD(IDATA(3),4)==0)then
-       IF(M.GT.2)LPY=1
-     endif
+     IF(isLeap(IDATA(3)).and.M.GT.2)LPY=1
      IF(M.EQ.1)THEN
        I=N
      ELSE
@@ -981,7 +945,7 @@ module readsmod
 !     SRADH=solar radiation (MJ m-2 h-1)
 !     WINDH=windspeed (m h-1)
 !     DWPTH=vapor pressure (kPa)
-!     RAINH=precipitation (mm h-1)
+!     RAINH=precipitation (m h-1)
 !     XRADH=longwave radiation (MJ m-2 h-1)
 !
       DO 95 K=1,NN
@@ -990,9 +954,11 @@ module readsmod
 !
         IF(VAR(K).EQ.'T')THEN
           IF(TYP(K).EQ.'F')THEN
-            TMPH(J,I)=((DAT(K)+DATK(K))/IH-32.0)*0.556
+! Fahrenheit to celcius
+            TMPH(J,I)=((DAT(K)+DATK(K))/IH-32.0_r8)*0.556_r8
           ELSEIF(TYP(K).EQ.'K')THEN
-            TMPH(J,I)=(DAT(K)+DATK(K))/IH-273.16
+! Temperature given as kelvin
+            TMPH(J,I)=(DAT(K)+DATK(K))/IH-TC2K
           ELSE
             TMPH(J,I)=(DAT(K)+DATK(K))/IH
           ENDIF
@@ -1000,14 +966,18 @@ module readsmod
 !         SOLAR RADIATION
 !
         ELSEIF(VAR(K).EQ.'R')THEN
+! shortwave radiation
           IF(TYP(K).EQ.'W')THEN
-            SRADH(J,I)=AMAX1(0.0,(DAT(K)+DATK(K))/IH*0.0036)
+! W m-2 to MJ m-2 per hour (3600 seconds per hour * 1.e-6)
+            SRADH(J,I)=AMAX1(0.0,(DAT(K)+DATK(K))/IH*0.0036_r8)
           ELSEIF(TYP(K).EQ.'J')THEN
-            SRADH(J,I)=AMAX1(0.0,(DAT(K)+DATK(K))/IH*0.01)
+! 1.e4 J m-2
+            SRADH(J,I)=AMAX1(0.0,(DAT(K)+DATK(K))/IH*0.01_r8)
           ELSEIF(TYP(K).EQ.'K')THEN
-            SRADH(J,I)=AMAX1(0.0,(DAT(K)+DATK(K))/IH*0.001)
+! kJ m-2 per hour
+            SRADH(J,I)=AMAX1(0.0,(DAT(K)+DATK(K))/IH*0.001_r8)
           ELSEIF(TYP(K).EQ.'P')THEN
-            SRADH(J,I)=AMAX1(0.0,(DAT(K)+DATK(K))/IH*0.0036*0.457)
+            SRADH(J,I)=AMAX1(0.0,(DAT(K)+DATK(K))/IH*0.0036_r8*0.457_r8)
 !     ELSEIF(TYP(K).EQ.'M')THEN
 !     SRADH(J,I)=AMAX1(0.0,(DAT(K)+DATK(K))/IH*3.6*0.457)
           ELSE
@@ -1018,11 +988,14 @@ module readsmod
 !
         ELSEIF(VAR(K).EQ.'W')THEN
           IF(TYP(K).EQ.'S')THEN
-            WINDH(J,I)=(DAT(K)+DATK(K))/IH*3600.0
+! given as m s-1, into m per hour
+            WINDH(J,I)=(DAT(K)+DATK(K))/IH*3600.0_r8
           ELSEIF(TYP(K).EQ.'H')THEN
-            WINDH(J,I)=(DAT(K)+DATK(K))/IH*1000.0
+! km per hour into m per hour
+            WINDH(J,I)=(DAT(K)+DATK(K))/IH*1000.0_r8
           ELSEIF(TYP(K).EQ.'M')THEN
-            WINDH(J,I)=(DAT(K)+DATK(K))/IH*1600.0
+! mile per hour into m per hour, it should be 1609.34 though
+            WINDH(J,I)=(DAT(K)+DATK(K))/IH*1600.0_r8
           ELSE
             WINDH(J,I)=(DAT(K)+DATK(K))/IH
           ENDIF
@@ -1030,44 +1003,55 @@ module readsmod
 !
 !       VAPOR PRESSURE
 !
-        IF(TYP(K).EQ.'D')THEN
-          DWPTH(J,I)=0.61*EXP(5360.0*(3.661E-03-1.0/(273.15 &
-            +(DAT(K)+DATK(K))/IH)))
-        ELSEIF(TYP(K).EQ.'F')THEN
-          DAT(K)=(DAT(K)-32.0)*0.556
-          DWPTH(J,I)=0.61*EXP(5360.0*(3.661E-03-1.0/(273.15 &
-            +(DAT(K)+DATK(K))/IH)))
-        ELSEIF(TYP(K).EQ.'H')THEN
-          DWPTH(J,I)=0.61*EXP(5360.0*(3.661E-03-1.0/(273.15+TMPH(J,I)))) &
-            *AMAX1(0.0,AMIN1(1.0,(DAT(K)+DATK(K))/IH))
-        ELSEIF(TYP(K).EQ.'R')THEN
-          DWPTH(J,I)=0.61*EXP(5360.0*(3.661E-03-1.0/(273.15+TMPH(J,I)))) &
-            *AMAX1(0.0,AMIN1(100.0,(DAT(K)+DATK(K))/IH))*0.01
-        ELSEIF(TYP(K).EQ.'S')THEN
-          DWPTH(J,I)=AMAX1(0.0,(DAT(K)+DATK(K))/IH)*0.0289/18.0*101.325 &
-            *EXP(-ALTIG/7272.0)*288.15/(273.15+TMPH(J,I))
-        ELSEIF(TYP(K).EQ.'G')THEN
-          DWPTH(J,I)=AMAX1(0.0,(DAT(K)+DATK(K))/IH)*28.9/18.0*101.325 &
-            *EXP(-ALTIG/7272.0)*288.15/(273.15+TMPH(J,I))
-        ELSEIF(TYP(K).EQ.'M')THEN
-          DWPTH(J,I)=AMAX1(0.0,(DAT(K)+DATK(K))/IH*0.1)
-        ELSE
-          DWPTH(J,I)=AMAX1(0.0,(DAT(K)+DATK(K))/IH)
-        ENDIF
+          IF(TYP(K).EQ.'D')THEN
+! given as celcius degree
+            DWPTH(J,I)=0.61*EXP(5360.0*(3.661E-03-1.0/(TC2K+(DAT(K)+DATK(K))/IH)))
+          ELSEIF(TYP(K).EQ.'F')THEN
+! given as Fahrenheit
+            DAT(K)=(DAT(K)-32.0)*0.556
+            DWPTH(J,I)=0.61*EXP(5360.0*(3.661E-03-1.0/(TC2K+(DAT(K)+DATK(K))/IH)))
+          ELSEIF(TYP(K).EQ.'H')THEN
+! given as relative humidity, [0, 1]
+            DWPTH(J,I)=0.61*EXP(5360.0*(3.661E-03-1.0/(TC2K+TMPH(J,I)))) &
+              *AMAX1(0.0,AMIN1(1.0,(DAT(K)+DATK(K))/IH))
+          ELSEIF(TYP(K).EQ.'R')THEN
+! given as relative humidity [0, 100]
+            DWPTH(J,I)=0.61*EXP(5360.0*(3.661E-03-1.0/(TC2K+TMPH(J,I)))) &
+              *AMAX1(0.0,AMIN1(100.0,(DAT(K)+DATK(K))/IH))*0.01
+          ELSEIF(TYP(K).EQ.'S')THEN
+! what is the unit? mass mixing ratio? [0,100]
+            DWPTH(J,I)=AMAX1(0.0,(DAT(K)+DATK(K))/IH)*0.0289/18.0*101.325 &
+              *EXP(-ALTIG/7272.0)*288.15/(TC2K+TMPH(J,I))
+          ELSEIF(TYP(K).EQ.'G')THEN
+! what is the unit? mass mixing ratio? [0, 1] ALTIG is doing altitude correction,
+            DWPTH(J,I)=AMAX1(0.0,(DAT(K)+DATK(K))/IH)*28.9/18.0*101.325 &
+              *EXP(-ALTIG/7272.0)*288.15/(TC2K+TMPH(J,I))
+          ELSEIF(TYP(K).EQ.'M')THEN
+! given as hPa
+            DWPTH(J,I)=AMAX1(0.0,(DAT(K)+DATK(K))/IH*0.1)
+          ELSE
+            DWPTH(J,I)=AMAX1(0.0,(DAT(K)+DATK(K))/IH)
+          ENDIF
 !
-!       PRECIPITATION
+!       PRECIPITATION, [m h-1]
 !
       ELSEIF(VAR(K).EQ.'P')THEN
         IF(TYP(K).EQ.'M')THEN
+!   [mm m-2] (mm to m, 1.e-3)
           RAINH(J,I)=AMAX1(0.0,DAT(K)+DATK(K))/1.0E+03
         ELSEIF(TYP(K).EQ.'C')THEN
+!   [cm m-2]
           RAINH(J,I)=AMAX1(0.0,DAT(K)+DATK(K))/1.0E+02
         ELSEIF(TYP(K).EQ.'I')THEN
+!  [inch m-2] -> [m m-2]
           RAINH(J,I)=AMAX1(0.0,DAT(K)+DATK(K))*0.0254
         ELSEIF(TYP(K).EQ.'S')THEN
+!  [second m-2]
           IF(TTYPE.EQ.'H')THEN
+! given in hour
             RAINH(J,I)=AMAX1(0.0,DAT(K)+DATK(K))*3.6
           ELSE
+! given in half hour
             RAINH(J,I)=AMAX1(0.0,DAT(K)+DATK(K))*1.8
           ENDIF
         ELSE
@@ -1078,10 +1062,12 @@ module readsmod
 !
       ELSEIF(VAR(K).EQ.'L')THEN
         IF(TYP(K).EQ.'W')THEN
+! watss m-2, into MJ per hour, *3600 seconds * 1.0-6 = 0.0036
           XRADH(J,I)=AMAX1(0.0,(DAT(K)+DATK(K))/IH*0.0036)
         ELSEIF(TYP(K).EQ.'J')THEN
           XRADH(J,I)=AMAX1(0.0,(DAT(K)+DATK(K))/IH*0.01)
         ELSEIF(TYP(K).EQ.'K')THEN
+! kJ m-2, into MJ per hour, * 0.001
           XRADH(J,I)=AMAX1(0.0,(DAT(K)+DATK(K))/IH*0.001)
         ELSE
           XRADH(J,I)=AMAX1(0.0,(DAT(K)+DATK(K))/IH)
@@ -1092,7 +1078,7 @@ module readsmod
   end subroutine readhourweather
 !------------------------------------------------------------------------------------------
 
-  subroutine readdayweather(I,L,go110,go60,NTX,NFX,NN)
+  subroutine readdayweather(I,L,go110,go60,NTX,NFX,NN,NI,LPY)
 !     read daily weather data
 !
 !     DERIVE DAY I FROM TIME VARIABLES IVAR
@@ -1101,7 +1087,8 @@ module readsmod
 !
   implicit none
 
-  integer, intent(in) :: L,NTX,NFX,NN
+  integer, intent(in) :: L,NTX,NFX,NN,NI
+  integer, intent(inout) :: LPY
   integer, intent(out) :: I
   logical, intent(out) :: go110, go60
 
@@ -1119,7 +1106,7 @@ module readsmod
     IF(IVAR(K).EQ.'Y')THEN
       IFLGY=1
       IYRX=IDAT(K)+(NTX-1)*NFX
-      IF(MOD(IDAT(K),4)==0)then
+      IF(isLeap(IDAT(K)))then
         IYRD=366
       else
         IYRD=365
@@ -1135,9 +1122,7 @@ module readsmod
     I=N
   ELSE
     LPY=0
-    IF(MOD(IDATA(3),4)==0)then
-      IF(M.GT.2)LPY=1
-    endif
+    IF(isLeap(IDATA(3)).and.M.GT.2)LPY=1
     IF(M.EQ.1)THEN
       I=N
     ELSE
@@ -1218,30 +1203,30 @@ module readsmod
 !
     ELSEIF(VAR(K).EQ.'H')THEN
       IF(TYP(K).EQ.'D')THEN
-        DWPT(1,I)=0.61*EXP(5360.0*(3.661E-03-1.0/(273.15+DAT(K))))
-        DWPT(2,I)=0.61*EXP(5360.0*(3.661E-03-1.0/(273.15+DAT(K))))
+        DWPT(1,I)=0.61*EXP(5360.0*(3.661E-03-1.0/(TC2K+DAT(K))))
+        DWPT(2,I)=0.61*EXP(5360.0*(3.661E-03-1.0/(TC2K+DAT(K))))
       ELSEIF(TYP(K).EQ.'F')THEN
         DAT(K)=(DAT(K)-32.0)*0.556
-        DWPT(1,I)=0.61*EXP(5360.0*(3.661E-03-1.0/(273.15+DAT(K))))
-        DWPT(2,I)=0.61*EXP(5360.0*(3.661E-03-1.0/(273.15+DAT(K))))
+        DWPT(1,I)=0.61*EXP(5360.0*(3.661E-03-1.0/(TC2K+DAT(K))))
+        DWPT(2,I)=0.61*EXP(5360.0*(3.661E-03-1.0/(TC2K+DAT(K))))
       ELSEIF(TYP(K).EQ.'H')THEN
         DAT(K)=AMAX1(0.0,AMIN1(1.0,DAT(K)))
-        DWPT(1,I)=0.61*EXP(5360.0*(3.661E-03-1.0/(273.15+(TMPN(I)+TMPX(I))/2)))*DAT(K)
-        DWPT(2,I)=0.61*EXP(5360.0*(3.661E-03-1.0/(273.15+TMPN(I))))
+        DWPT(1,I)=0.61*EXP(5360.0*(3.661E-03-1.0/(TC2K+(TMPN(I)+TMPX(I))/2)))*DAT(K)
+        DWPT(2,I)=0.61*EXP(5360.0*(3.661E-03-1.0/(TC2K+TMPN(I))))
       ELSEIF(TYP(K).EQ.'R')THEN
         DAT(K)=AMAX1(0.0,AMIN1(100.0,DAT(K)))
-        DWPT(1,I)=0.61*EXP(5360.0*(3.661E-03-1.0/(273.15+(TMPN(I)+TMPX(I))/2)))*DAT(K)*0.01
-        DWPT(2,I)=0.61*EXP(5360.0*(3.661E-03-1.0/(273.15+TMPN(I))))
+        DWPT(1,I)=0.61*EXP(5360.0*(3.661E-03-1.0/(TC2K+(TMPN(I)+TMPX(I))/2)))*DAT(K)*0.01
+        DWPT(2,I)=0.61*EXP(5360.0*(3.661E-03-1.0/(TC2K+TMPN(I))))
       ELSEIF(TYP(K).EQ.'S')THEN
         DWPT(1,I)=AMAX1(0.0,DAT(K))*0.0289/18.0*101.325 &
-          *EXP(-ALTIG/7272.0)*288.15/(273.15+(TMPN(I)+TMPX(I))/2)
+          *EXP(-ALTIG/7272.0)*288.15/(TC2K+(TMPN(I)+TMPX(I))/2)
         DWPT(2,I)=AMAX1(0.0,DAT(K))*0.0289/18.0*101.325 &
-          *EXP(-ALTIG/7272.0)*288.15/(273.15+TMPN(I))
+          *EXP(-ALTIG/7272.0)*288.15/(TC2K+TMPN(I))
       ELSEIF(TYP(K).EQ.'G')THEN
         DWPT(1,I)=AMAX1(0.0,DAT(K))*28.9/18.0*101.325 &
-          *EXP(-ALTIG/7272.0)*288.15/(273.15+(TMPN(I)+TMPX(I))/2)
+          *EXP(-ALTIG/7272.0)*288.15/(TC2K+(TMPN(I)+TMPX(I))/2)
         DWPT(2,I)=AMAX1(0.0,DAT(K))*28.9/18.0*101.325 &
-          *EXP(-ALTIG/7272.0)*288.15/(273.15+TMPN(I))
+          *EXP(-ALTIG/7272.0)*288.15/(TC2K+TMPN(I))
       ELSEIF(TYP(K).EQ.'M')THEN
         DWPT(1,I)=AMAX1(0.0,DAT(K)*0.1)
         DWPT(2,I)=AMAX1(0.0,DAT(K)*0.1)

@@ -1,12 +1,12 @@
   SUBROUTINE splitc(NT,NE,NAX,NDX,NTX,NEX,NHW,NHE,NVN,NVS)
   use data_kind_mod, only : r8 => SHR_KIND_R8
   use abortutils, only : endrun
+  use GridConsts
+  use EcoSIMHistMod
+  use GridDataType
+
   implicit none
   integer, intent(in) :: NT,NE,NAX,NDX,NTX,NEX,NHW,NHE,NVN,NVS
-  include "parameters.h"
-  include "filec.h"
-  include "files.h"
-  include "blkc.h"
 
   character(len=1024) :: str
   integer :: nz,nx,ny,n

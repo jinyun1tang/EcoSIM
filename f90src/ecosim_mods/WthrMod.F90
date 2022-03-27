@@ -1,51 +1,25 @@
 module WthrMod
   !
-  !      Description:
-  !
+  ! Description:
+  ! code to process the weather forcing
   use data_kind_mod, only : r8 => SHR_KIND_R8
-  use MiniMathMod, only : safe_adb,vapsat0
+  use MiniMathMod, only : safe_adb,vapsat0,test_aneb,test_aeqb
   use EcosimConst
-
+  use CanopyRadDataType
+  use GridConsts
+  use FlagDataType
+  use EcoSIMCtrlDataType
+  use ClimForcDataType
+  use LandSurfDataType
+  use FertilizerDataType
+  use PlantTraitDataType
+  use AqueChemDatatype
+  use IrrigationDataType
+  use GridDataType
   implicit none
 
   private
-  include "parameters.h"
-  include "blkc.h"
-  include "blk1g.h"
-  include "blk2a.h"
-  include "blk2b.h"
-  include "blk2c.h"
-  include "blk3.h"
-  include "blk5.h"
-  include "blk6.h"
-  include "blk8a.h"
-  include "blk8b.h"
-  include "blk9a.h"
-  include "blk9b.h"
-  include "blk9c.h"
-  include "blk10.h"
-  include "blk11a.h"
-  include "blk11b.h"
-  include "blk13a.h"
-  include "blk13b.h"
-  include "blk13c.h"
-  include "blk15a.h"
-  include "blk15b.h"
-  include "blk16.h"
-  include "blk18a.h"
-  include "blk18b.h"
-  include "blk19a.h"
-  include "blk19b.h"
-  include "blk19c.h"
-  include "blk19d.h"
-  include "blk20a.h"
-  include "blk20b.h"
-  include "blk20c.h"
-  include "blk20d.h"
-  include "blk20e.h"
-  include "blk20f.h"
-  include "blk21a.h"
-  include "blk21b.h"
+
 
   real(r8) :: AMP,CLD,DTA,DHR,DTS,EMM,RADX,RADZ,VPX,XJ
 
@@ -140,7 +114,7 @@ module WthrMod
       IF(IETYP(NY,NX).NE.-2)THEN
         IF(DYLN(NY,NX).GT.ZERO)THEN
           RADN(NY,NX)=AMAX1(0.0,RMAX*SIN((J-(ZNOON(NY,NX) &
-            -DYLN(NY,NX)/2.0))*3.1416/DYLN(NY,NX)))
+            -DYLN(NY,NX)/2.0))*PICON/DYLN(NY,NX)))
         ELSE
           RADN(NY,NX)=0.0
         ENDIF
@@ -152,14 +126,14 @@ module WthrMod
       !     TAVG*,AMP*=daily averages, amplitudes from day.f
       !
       IF(J.LT.(ZNOON(NY,NX)-DYLN(NY,NX)/2))THEN
-        TCA(NY,NX)=TAVG1+AMP1*SIN(((J+ZNOON(NY,NX)-3.0)*3.1416 &
-          /(ZNOON(NY,NX)+9.0-DYLN(NY,NX)/2.0))+1.5708)
+        TCA(NY,NX)=TAVG1+AMP1*SIN(((J+ZNOON(NY,NX)-3.0)*PICON &
+          /(ZNOON(NY,NX)+9.0-DYLN(NY,NX)/2.0))+PICON2)
       ELSEIF(J.GT.ZNOON(NY,NX)+3)THEN
-        TCA(NY,NX)=TAVG3+AMP3*SIN(((J-ZNOON(NY,NX)-3.0)*3.1416 &
-          /(ZNOON(NY,NX)+9.0-DYLN(NY,NX)/2.0))+1.5708)
+        TCA(NY,NX)=TAVG3+AMP3*SIN(((J-ZNOON(NY,NX)-3.0)*PICON &
+          /(ZNOON(NY,NX)+9.0-DYLN(NY,NX)/2.0))+PICON2)
       ELSE
         TCA(NY,NX)=TAVG2+AMP2*SIN(((J-(ZNOON(NY,NX) &
-          -DYLN(NY,NX)/2.0))*3.1416/(3.0+DYLN(NY,NX)/2.0))-1.5708)
+          -DYLN(NY,NX)/2.0))*PICON/(3.0+DYLN(NY,NX)/2.0))-PICON2)
       ENDIF
       TKA(NY,NX)=TCA(NY,NX)+TC2K
       !
@@ -168,14 +142,14 @@ module WthrMod
       !      ALTI=altitude
       !
       IF(J.LT.(ZNOON(NY,NX)-DYLN(NY,NX)/2))THEN
-        VPK(NY,NX)=VAVG1+VMP1*SIN(((J+ZNOON(NY,NX)-3.0)*3.1416 &
-          /(ZNOON(NY,NX)+9.0-DYLN(NY,NX)/2.0))+1.5708)
+        VPK(NY,NX)=VAVG1+VMP1*SIN(((J+ZNOON(NY,NX)-3.0)*PICON &
+          /(ZNOON(NY,NX)+9.0-DYLN(NY,NX)/2.0))+PICON2)
       ELSEIF(J.GT.ZNOON(NY,NX)+3)THEN
-        VPK(NY,NX)=VAVG3+VMP3*SIN(((J-ZNOON(NY,NX)-3.0)*3.1416 &
-          /(ZNOON(NY,NX)+9.0-DYLN(NY,NX)/2.0))+1.5708)
+        VPK(NY,NX)=VAVG3+VMP3*SIN(((J-ZNOON(NY,NX)-3.0)*PICON &
+          /(ZNOON(NY,NX)+9.0-DYLN(NY,NX)/2.0))+PICON2)
       ELSE
         VPK(NY,NX)=VAVG2+VMP2*SIN(((J-(ZNOON(NY,NX) &
-          -DYLN(NY,NX)/2.0))*3.1416 /(3.0+DYLN(NY,NX)/2.0))-1.5708)
+          -DYLN(NY,NX)/2.0))*PICON /(3.0+DYLN(NY,NX)/2.0))-PICON2)
       ENDIF
       !VPS(NY,NX)=0.61*EXP(5360.0*(3.661E-03-1.0/TKA(NY,NX))) &
       VPS(NY,NX)=vapsat0(tka(ny,nx))*EXP(-ALTI(NY,NX)/7272.0)
@@ -252,6 +226,8 @@ module WthrMod
   integer, intent(in) :: I,J,NHW,NHE,NVN,NVS
 
   integer :: NY,NX
+  real(r8) :: AZI  !solar azimuth
+  REAL(R8) :: DEC  !solar declination
   !     begin_execution
   !     CALCULATE DIRECT, DIFFUSE AND LONGWAVE RADIATION FROM
   !     INCOMING RADIATION READ IN 'READS', SOLAR ANGLE, HUMIDITY,
@@ -267,6 +243,9 @@ module WthrMod
 !     RADN=SW radiation at horizontal surface
 !
       IF(IETYP(NY,NX).GE.-1)THEN
+        AZI=SIN(ALAT(NY,NX)*1.7453E-02)*SIN(DECLIN*1.7453E-02)
+        DEC=COS(ALAT(NY,NX)*1.7453E-02)*COS(DECLIN*1.7453E-02)
+
         SSIN(NY,NX)=AMAX1(0.0,AZI+DEC*COS(.2618*(ZNOON(NY,NX)-(J-0.5))))
         SSINN(NY,NX)=AMAX1(0.0,AZI+DEC*COS(.2618*(ZNOON(NY,NX)-(J+0.5))))
         !     IF(SSIN(NY,NX).GT.0.0.AND.SSIN(NY,NX).LT.TWILGT)SSIN(NY,NX)=TWILGT
@@ -429,10 +408,10 @@ module WthrMod
       !     DTA,AMP,DHR=change in daily average,amplitude of air temperature
       !     DHR=diurnal effect on AMP
       !
-      IF(TDTPX(NY,NX,N).NE.0.0.OR.TDTPN(NY,NX,N).NE.0.0)THEN
+      IF(test_aneb(TDTPX(NY,NX,N),0.0_r8).OR.test_aneb(TDTPN(NY,NX,N),0.0_r8))THEN
         DTA=0.5*(TDTPX(NY,NX,N)+TDTPN(NY,NX,N))
         AMP=0.5*(TDTPX(NY,NX,N)-TDTPN(NY,NX,N))
-        DHR=SIN(0.2618*(J-(ZNOON(NY,NX)+3.0))+1.5708)
+        DHR=SIN(0.2618*(J-(ZNOON(NY,NX)+3.0))+PICON2)
         TCA(NY,NX)=TCA(NY,NX)+DTA+AMP*DHR
         TKA(NY,NX)=TCA(NY,NX)+TC2K
 !
@@ -477,7 +456,7 @@ module WthrMod
 !
         !     ADJUST VAPOR PRESSURE FOR TEMPERATURE CHANGE
 !
-        IF(DHUM(N).EQ.1.0)THEN
+        IF(test_aeqb(DHUM(N),1.0_r8))THEN
           VPX=VPS(NY,NX)
           !VPS(NY,NX)=0.61*EXP(5360.0*(3.661E-03-1.0/TKA(NY,NX))) &
           vps(ny,ny)=vapsat0(tka(ny,nx))*EXP(-ALTI(NY,NX)/7272.0)

@@ -3,22 +3,29 @@ module readiMod
 ! code to read site, topographic data
 !
   use data_kind_mod, only : r8 => SHR_KIND_R8
-  use abortutils, only : endrun
-  use fileUtil, only : open_safe
-  use minimathmod, only : test_aeqb
+  use abortutils   , only : endrun
+  use fileUtil     , only : open_safe
+  use minimathmod  , only : test_aeqb
+  use SOMDataType
+  use CanopyRadDataType
+  use EcosimConst
+  use GridConsts
+  use SoilPhysDataType
+  use FlagDataType
+  use ChemTranspDataType
+  use LandSurfDataType
+  use ClimForcDataType
+  use SoilWaterDataType
+  use EcoSIMCtrlDataType
+  use SurfLitterDataType
+  use SnowDataType
+  use EcoSIMHistMod
+  use SoilPropertyDataType
+  use SoilBGCDataType
+  use AqueChemDatatype
+  use GridDataType
   implicit none
   private
-  include "parameters.h"
-  include "filec.h"
-  include "files.h"
-  include "blkc.h"
-  include "blk2a.h"
-  include "blk2b.h"
-  include "blk2c.h"
-  include "blk8a.h"
-  include "blk8b.h"
-  include "blk17.h"
-  include "blk11a.h"
 
   character(len=*), parameter :: mod_filename = __FILE__
   integer :: NM(JY,JX)
@@ -33,7 +40,7 @@ module readiMod
   real(r8) :: DAT(50),DATK(50)
   real(r8), PARAMETER :: TWILGT=0.06976
   real(r8) :: ALATG,ATCAG,AZI,ASPX,CO2EIG,CH4EG,DTBLIG,DTBLDIG
-  real(r8) :: DTBLGG,DECDAY,DECLIN,DEC,DPTHSX,OXYEG,RCHQNG,RCHQEG
+  real(r8) :: DTBLGG,DECDAY,DEC,DPTHSX,OXYEG,RCHQNG,RCHQEG
   real(r8) :: RCHQSG,RCHQWG,RCHGNUG,RCHGEUG,RCHGSUG,RCHGWUG
   real(r8) :: RCHGNTG,RCHGETG,RCHGSTG,RCHGWTG,RCHGDG
   real(r8) :: SL0,XI,Z2GEG,Z2OEG,ZNH3EG,SLX,SL1,SL2
@@ -207,7 +214,7 @@ module readiMod
       ELSEIF(AZI/DEC.LE.-1.0+TWILGT)THEN
         DYLM(NY,NX)=0.0
       ELSE
-        DYLM(NY,NX)=12.0*(1.0+2.0/3.1416*ASIN(TWILGT+AZI/DEC))
+        DYLM(NY,NX)=12.0*(1.0+2.0/PICON*ASIN(TWILGT+AZI/DEC))
       ENDIF
 9890  CONTINUE
 9895  CONTINUE
@@ -320,6 +327,7 @@ module readiMod
         write(*,*)'number of maximum rooting layer NJ',NJ(NY,NX)
         write(*,*)'number of additional layers below NJ with data in file',NL1
         write(*,*)'number of additional layers below NJ without data in file',NL2
+        write(*,*)'number of layers involved in model calculation',NL(NY,NX)
         write(*,*)'Flag for natural(0),reconstructed(1) soil profile', ISOILR(NY,NX)
         write(*,*)
         write(*,'(A,I2,A,I2)')'read data for layers from layer NU ', &

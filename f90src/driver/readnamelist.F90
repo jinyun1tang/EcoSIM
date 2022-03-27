@@ -1,5 +1,5 @@
  subroutine readnamelist(nmlfile,runfile, case_name, &
-  prefix,do_rgres,LYRG,lverb)
+  prefix,do_rgres,LYRG,lverb,nmicbguilds)
 !!
 ! Description:
 ! read control namelist
@@ -12,14 +12,16 @@
       logical              , intent(out) :: do_rgres
       integer              , intent(out) :: LYRG
       logical              , intent(out) :: lverb
+      integer              , intent(out) :: nmicbguilds
   character(len=*), parameter :: mod_filename = __FILE__
       integer, parameter :: stdout = 6
 
       logical :: do_regression_test
       integer :: num_of_simdays
       logical :: lverbose
+      integer :: num_microbial_guilds
       namelist /ecosys/case_name, prefix, runfile, do_regression_test, &
-      num_of_simdays,lverbose
+      num_of_simdays,lverbose,num_microbial_guilds
 
       !local variables
       character(len=256) :: ioerror_msg
@@ -29,6 +31,7 @@
       num_of_simdays=-1
       do_regression_test=.false.
       lverbose=.false.
+      num_microbial_guilds=1
       inquire (file=nmlfile, iostat=rc)
       if (rc /= 0) then
         write (stdout, '(3a)') 'Error: input file ', trim(nmlfile), &
@@ -60,4 +63,6 @@
   do_rgres=do_regression_test
   LYRG=num_of_simdays
   lverb=lverbose
+  nmicbguilds=num_microbial_guilds
+
 end subroutine readnamelist

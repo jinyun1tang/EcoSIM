@@ -1,5 +1,4 @@
 set(IOUTILS_SOURCES
-	BLOCKDATA001.F90
 	foutp.F90
 	fouts.F90
 	outpd.F90
@@ -20,8 +19,9 @@ set(IOUTILS_SOURCES
 	splitp.c
 	splits.c
 	)
-include_directories(${CMAKE_BINARY_DIR}/f90src/ecosim_datatype/)
 include_directories(${CMAKE_BINARY_DIR}/f90src/utils/)
+include_directories(${CMAKE_BINARY_DIR}/f90src/ecosim_datatype/)
+include_directories(${CMAKE_BINARY_DIR}/f90src/plant_bgc/)
 include_directories(${CMAKE_BINARY_DIR}/f90src/ecosim_mods/)
 include(add_ecosim_library)
 add_ecosim_library(ioutils ${IOUTILS_SOURCES})

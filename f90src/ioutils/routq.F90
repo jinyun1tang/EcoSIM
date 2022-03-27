@@ -5,14 +5,15 @@ SUBROUTINE routq(NT,NE,NAX,NDX,NTX,NEX,NHW,NHE,NVN,NVS)
 !
       use data_kind_mod, only : r8 => SHR_KIND_R8
   use fileUtil, only : open_safe
-
+  use GridConsts
+  use FlagDataType
+  use EcoSIMCtrlDataType
+  use PlantMngmtDataType
+  use EcoSIMHistMod
+  use GridDataType
   implicit none
   integer, intent(in) :: NT,NE,NAX,NDX,NTX,NEX,NHW,NHE,NVN,NVS
-  include "parameters.h"
-  include "filec.h"
-  include "files.h"
-  include "blkc.h"
-  include "blk9c.h"
+
 
   character(len=*), parameter :: mod_filename = __FILE__
   integer :: NPP(JY,JX)
