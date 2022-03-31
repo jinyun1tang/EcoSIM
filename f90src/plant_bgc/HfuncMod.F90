@@ -50,9 +50,9 @@ module HfuncMod
   public :: hfunc
   contains
 
-  SUBROUTINE hfunc(I,J,NHW,NHE,NVN,NVS)
+  subroutine hfunc(I,J,NHW,NHE,NVN,NVS)
 !
-!     THIS SUBROUTINE CALCULATES PLANT PHENOLOGY
+!     THIS subroutine CALCULATES PLANT PHENOLOGY
 !
   implicit none
 
@@ -64,10 +64,7 @@ module HfuncMod
   DO 9995 NX=NHW,NHE
     DO 9990 NY=NVN,NVS
       DO 9985 NZ=1,NP(NY,NX)
-!       WRITE(*,4444)'IFLGC',I,J,NX,NY,NZ,DATAP(NZ,NY,NX),IYRC
-!      2,IDAY0(NZ,NY,NX),IDAYH(NZ,NY,NX),IYR0(NZ,NY,NX),IYRH(NZ,NY,NX)
-!      3,IDTH(NZ,NY,NX),IFLGC(NZ,NY,NX),IFLGT(NY,NX)
-!4444  FORMAT(A8,5I8,A16,20I8)
+
         IF(DATAP(NZ,NY,NX).NE.'NO')THEN
 !
 !         PPT=total biome population
@@ -95,7 +92,7 @@ module HfuncMod
 
             call root_shoot_branching(I,J,NZ,NY,NX)
 !
-!           THE REST OF THE SUBROUTINE MODELS THE PHENOLOGY OF EACH BRANCH
+!           THE REST OF THE subroutine MODELS THE PHENOLOGY OF EACH BRANCH
 !
 !           IFLGA,IFLGE=flags for initializing leafout,leafoff
 !           VRNS=leafout hours
@@ -233,14 +230,8 @@ module HfuncMod
 ! NNOD=number of concurrently growing nodes
 ! XTLI,GROUP=node number at planting,floral initiation
 !
-! WRITE(*,224)'HFUNC',I,J,IFLGI(NZ,NY,NX),PP(NZ,NY,NX)
-!    2,TCG(NZ,NY,NX),PSIRG(1,NG(NZ,NY,NX),NZ,NY,NX)
-!    3,PSILM,ISTYP(NZ,NY,NX),IDAY(2,NB1(NZ,NY,NX),NZ,NY,NX)
-!    4,NBR(NZ,NY,NX),WTRVC(NZ,NY,NX),CCPOLP(NZ,NY,NX)
-!    5,PB(NZ,NY,NX),IDTHB(NB,NZ,NY,NX),NB1(NZ,NY,NX)
-!    6,PSTG(NB1(NZ,NY,NX),NZ,NY,NX),NBT(NZ,NY,NX)
-!    7,NNOD(NZ,NY,NX),FNOD(NZ,NY,NX),XTLI(NZ,NY,NX)
-!224   FORMAT(A8,3I6,5E12.4,3I6,3E12.4,2I6,1E12.4,2I6,2E12.4)
+
+
   IF(IFLGI(NZ,NY,NX).EQ.0)THEN
     IF(J.EQ.1.AND.PP(NZ,NY,NX).GT.0.0)THEN
       IF(PSIRG(1,NG(NZ,NY,NX),NZ,NY,NX).GT.PSILM)THEN
@@ -288,7 +279,6 @@ module HfuncMod
       ENDIF
     ENDIF
   ENDIF
-!2224  FORMAT(A8,6I4)
   end subroutine root_shoot_branching
 !------------------------------------------------------------------------------------------
 
@@ -505,12 +495,7 @@ module HfuncMod
           IFLGE(NB,NZ,NY,NX)=0
         ENDIF
       ENDIF
-!     WRITE(*,4646)'VRNS',I,J,NZ,NB,IDAY(2,NB,NZ,NY,NX)
-!    2,IFLGE(NB,NZ,NY,NX),IFLGF(NB,NZ,NY,NX),VRNS(NB,NZ,NY,NX)
-!    2,TCG(NZ,NY,NX),TCZ(NZ,NY,NX),TCX(NZ,NY,NX),PSILG(NZ,NY,NX)
-!    3,DYLN(NY,NX),DYLX(NY,NX),DYLM(NY,NX),VRNF(NB,NZ,NY,NX)
-!    4,VRNL(NB,NZ,NY,NX),VRNX(NB,NZ,NY,NX)
-!4646  FORMAT(A8,7I4,20E12.4)
+
 !
 !     CALCULATE DROUGHT DECIDUOUS PHENOLOGY BY ACCUMULATING HOURS
 !     ABOVE SPECIFIED WATER POTENTIAL DURING DORMANCY
@@ -779,14 +764,7 @@ module HfuncMod
         PPD=AMAX1(0.0,XDL(NZ,NY,NX)-DYLN(NY,NX))
         IF(IPTYP(NZ,NY,NX).EQ.1.AND.DYLN(NY,NX).GE.DYLX(NY,NX))PPD=0.0
       ENDIF
-!     IF(NZ.EQ.1)THEN
-!     WRITE(*,333)'IDAY2',I,J,NZ,NB,IDAY(2,NB,NZ,NY,NX),IDAY0(NZ,NY,NX)
-!    2,IYR0(NZ,NY,NX),IPTYP(NZ,NY,NX)
-!    2,PPD,XDL(NZ,NY,NX),DYLN(NY,NX),DYLX(NY,NX),VRNS(NB,NZ,NY,NX)
-!    3,VRNL(NB,NZ,NY,NX),PSTG(NB,NZ,NY,NX),GROUP(NB,NZ,NY,NX)
-!    4,PSTGI(NB,NZ,NY,NX),XPPD(NZ,NY,NX)
-!333   FORMAT(A8,8I4,20E12.4)
-!     ENDIF
+
       IF(IPTYP(NZ,NY,NX).EQ.0 &
         .OR.(IPTYP(NZ,NY,NX).EQ.1.AND.PPD.GT.XPPD(NZ,NY,NX)) &
         .OR.(IPTYP(NZ,NY,NX).EQ.2.AND.PPD.LT.XPPD(NZ,NY,NX)) &

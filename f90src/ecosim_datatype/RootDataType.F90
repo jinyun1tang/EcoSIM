@@ -74,7 +74,7 @@ module RootDataType
   real(r8) :: RTVLW(2,JZ,JP,JY,JX)              !root layer volume water, [m2 d-2]
   real(r8) :: RRAD1(2,JZ,JP,JY,JX)              !root layer diameter primary axes, [m ]
   real(r8) :: RTVLP(2,JZ,JP,JY,JX)              !root layer volume air, [m2 d-2]
-  real(r8) :: RTDP1(2,JZ,JP,JY,JX)              !root layer depth, [m]
+  real(r8) :: RTDP1(2,JC,JP,JY,JX)              !root layer depth, [m]
   real(r8) :: RRAD2(2,JZ,JP,JY,JX)              !root layer diameter secondary axes, [m ]
   real(r8) :: RTLG1X(2,JP,JY,JX)                !specific root length primary axes, [m g-1]
   real(r8) :: RTLG2X(2,JP,JY,JX)                !specific root length secondary axes, [m g-1]

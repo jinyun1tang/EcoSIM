@@ -36,9 +36,9 @@
   public :: stomate
   contains
 
-  Subroutine stomate(I,J,NZ,NY,NX)
+  subroutine stomate(I,J,NZ,NY,NX)
 !
-!     THIS SUBROUTINE CALCULATES CANOPY STOMATAL RESISTANCE AT MAXIMUM
+!     THIS subroutine CALCULATES CANOPY STOMATAL RESISTANCE AT MAXIMUM
 !     CANOPY TURGOR FOR USE IN ENERGY BALANCE EQUATIONS IN 'UPTAKE'
 !
   implicit none

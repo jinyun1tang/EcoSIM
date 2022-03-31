@@ -7,9 +7,6 @@ SUBROUTINE soil(NA,ND,NT,NE,NAX,NDX,NTX,NEX,NHW,NHE,NVN,NVS)
   use DayMod       , only : day
   use ErosionMod   , only : erosion
   use ExecMod      , only : exec
-  use ExtractMod   , only : extract
-  use grosubMod    , only : grosub
-  use HfuncMod     , only : hfunc
   use Hour1Mod     , only : hour1
   use nitroMod     , only : nitro
   use RedistMod    , only : redist
@@ -20,7 +17,6 @@ SUBROUTINE soil(NA,ND,NT,NE,NAX,NDX,NTX,NEX,NHW,NHE,NVN,NVS)
   use StomateMod   , only : stomate
   use TrnsfrMod    , only : trnsfr
   use TrnsfrsMod   , only : trnsfrs
-  use UptakeMod    , only : uptake
   use VisualMod    , only : visual
   use WatsubMod    , only : watsub
   use WthrMod      , only : wthr
@@ -31,6 +27,7 @@ SUBROUTINE soil(NA,ND,NT,NE,NAX,NDX,NTX,NEX,NHW,NHE,NVN,NVS)
   use GridConsts
   use EcoSIMCtrlDataType
   use EcoSIMHistMod
+  use PlantAPI     , only : PlantModel
   implicit none
 
   integer, intent(in) :: NT,NE,NAX,NDX,NTX,NEX,NHW,NHE,NVN,NVS
@@ -41,7 +38,7 @@ SUBROUTINE soil(NA,ND,NT,NE,NAX,NDX,NTX,NEX,NHW,NHE,NVN,NVS)
   integer :: I,J
   integer, SAVE :: NF,NX,NTZ,NTZX, NFX
   DATA NF,NX,NTZ,NTZX/0,0,0,0/
-  real(r8) :: t1, t2
+  real(r8) :: t1
 
 ! begin_execution
 !
@@ -166,41 +163,12 @@ SUBROUTINE soil(NA,ND,NT,NE,NAX,NDX,NTX,NEX,NHW,NHE,NVN,NVS)
     CALL NITRO(I,J,NHW,NHE,NVN,NVS)
     call end_timer('NIT',t1)
 !
-!   UPDATE PLANT PHENOLOGY IN 'HFUNC'
+!   UPDATE PLANT biogeochemistry
 !
-    if(lverb)WRITE(*,333)'HFUNC'
+    if(lverb)WRITE(*,333)'PlantModel'
 !    if(I>=170)print*,TKS(0,NVN,NHW)
-    call start_timer(t1)
-    CALL HFUNC(I,J,NHW,NHE,NVN,NVS)
-    call end_timer('HFUNC',t1)
+    call PlantModel(I,J,NHW,NHE,NVN,NVS)
 !
-!   CALCULATE CANOPY CO2 UPTAKE AT FULL TURGOR, CANOPY WATER POTENTIAL,
-!   HYDRAULIC AND STOMATAL RESISTANCES,AND CANOPY ENERGY BALANCE IN 'UPTAKE'
-!   CALCULATE ROOT UPTAKE OF WATER, OXYGEN, NH4, NO3 AND PO4 IN 'UPTAKE'
-!
-    if(lverb)WRITE(*,333)'UPTK'
-!    if(I>=170)print*,TKS(0,NVN,NHW)
-    call start_timer(t1)
-    CALL UPTAKE(I,J,NHW,NHE,NVN,NVS)
-    call end_timer('UPTK',t1)
-!
-!   CALCULATE CANOPY CO2 UPTAKE AT AMBIENT TURGOR, AUTOTROPHIC AND GROWTH
-!   RESPIRATION, PLANT C ALLOCATION, CANOPY AND ROOT GROWTH IN 'GROSUB'
-!
-    if(lverb)WRITE(*,333)'GRO'
-!    if(I>=170)print*,TKS(0,NVN,NHW)
-    call start_timer(t1)
-    CALL GROSUB(I,J,NHW,NHE,NVN,NVS)
-    call end_timer('GRO',t1)
-!
-!   CALCULATE ROOT-SOIL C AND NUTRIENT EXCHANGE FOR ALL PLANT SPECIES
-!   IN 'EXTRACT'
-!
-    if(lverb)WRITE(*,333)'EXTR'
-!    if(I>=170)print*,TKS(0,NVN,NHW)
-    call start_timer(t1)
-    CALL EXTRACT(I,J,NHW,NHE,NVN,NVS)
-    call end_timer('EXTR',t1)
 !
 !   CALCULATE SOLUTE EQUILIBRIA IN 'SOLUTE'
 !

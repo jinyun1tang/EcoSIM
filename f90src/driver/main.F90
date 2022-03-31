@@ -7,7 +7,7 @@ PROGRAM main
 !
   use data_kind_mod     , only : r8 => SHR_KIND_R8
   use TestMod           , only : regression
-  use InitEcoSIM        , only :  InitModules
+  use InitEcoSIM        , only : InitModules
   use EcoSIMDesctruct   , only : DestructEcoSIM
   use EcoSIMCtrlDataType
   use GridConsts

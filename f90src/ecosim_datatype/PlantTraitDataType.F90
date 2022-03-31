@@ -25,7 +25,7 @@ module PlantTraitDataType
   real(r8) :: FWODRP(0:1)
 
 !physical structure, height and area
-  real(r8) :: ARSTK(JZ,JC,JP,JY,JX)             !stem layer area, [m2 d-2]
+  real(r8) :: ARSTK(JC,JC,JP,JY,JX)             !stem layer area, [m2 d-2]
   real(r8) :: ARLFP(JP,JY,JX)                   !plant leaf area, [m2 d-2]
   real(r8) :: ARLFS(JP,JY,JX)                   !plant leaf area, [m2 d-2]
   real(r8) :: ARLFX(JY,JX)                      !total canopy leaf area, [m2 d-2]

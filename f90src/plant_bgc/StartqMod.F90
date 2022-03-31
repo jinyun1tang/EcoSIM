@@ -555,7 +555,7 @@ module StartqMod
     WGSHNX(NB,NZ,NY,NX)=0._r8
     WGSHPX(NB,NZ,NY,NX)=0._r8
     HTSHEX(NB,NZ,NY,NX)=0._r8
-    DO 5 L=1,NL(NY,NX)
+    DO 5 L=1,JC
       ARSTK(L,NB,NZ,NY,NX)=0._r8
       DO N=1,JLI
         SURFB(N,L,NB,NZ,NY,NX)=0._r8
@@ -596,7 +596,7 @@ module StartqMod
       ENDIF
     enddo
 25  CONTINUE
-  DO 35 L=1,NL(NY,NX)
+  DO 35 L=1,JC
     ARLFV(L,NZ,NY,NX)=0._r8
     WGLFV(L,NZ,NY,NX)=0._r8
     ARSTV(L,NZ,NY,NX)=0._r8
