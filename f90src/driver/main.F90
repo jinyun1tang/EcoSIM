@@ -126,10 +126,12 @@ PROGRAM main
 !
 !  RUN THIS SCRIPT
 !
-  DO 120 NTX=1,NDX
-    DO  NEX=1,NAX
-      DO  NT=1,ND(NEX)
-        DO  NE=1,NA(NEX)
+  DO 120 NTX=1,NDX        !repeat scenario NDX times, usually set to 1, though multiple scenes is possible
+    DO  NEX=1,NAX         !run nax scenes for scenario ntx, each scene could have periods, where each period has multiple years
+      DO  NT=1,ND(NEX)    !ND(NEX)=NDY, period NT
+        DO  NE=1,NA(NEX)  !NA(NEX)=NAY, year NE in period NT
+! run simulation for one year
+! each year has its own climate forcing, land/pft management and io setup
           CALL SOIL(NA,ND,NT,NE,NAX,NTX,NEX,NHW,NHE,NVN,NVS)
           IGO=IGO+1
         enddo

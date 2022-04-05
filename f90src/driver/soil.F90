@@ -23,6 +23,7 @@ SUBROUTINE soil(NA,ND,NT,NE,NAX,NTX,NEX,NHW,NHE,NVN,NVS)
   use readiMod     , only : readi
   use readqmod     , only : readq
   use readsmod     , only : reads
+  use Hist1Mod     , only : fouts,foutp,outpd,outph,outsd,outsh
   use timings      , only : init_timer, start_timer, end_timer,end_timer_loop
   use GridConsts
   use EcoSIMCtrlDataType
