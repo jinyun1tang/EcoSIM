@@ -1,4 +1,4 @@
-  SUBROUTINE outsd(I,NT,NE,NAX,NDX,NTX,NEX,NHW,NHE,NVN,NVS)
+  SUBROUTINE outsd(I,NT,NE,NTX,NEX,NHW,NHE,NVN,NVS)
 !
 !     THIS SUBROUTINE WRITES DAILY OUTPUT FOR SOIL
 !     C, N, P, WATER AND HEAT TO OUTPUT FILES DEPENDING
@@ -25,7 +25,7 @@
   use AqueChemDatatype
   use GridDataType
   implicit none
-  integer, intent(in) :: I,NT,NE,NAX,NDX,NTX,NEX,NHW,NHE,NVN,NVS
+  integer, intent(in) :: I,NT,NE,NTX,NEX,NHW,NHE,NVN,NVS
 
 
   real(r8) :: HEAD(50)

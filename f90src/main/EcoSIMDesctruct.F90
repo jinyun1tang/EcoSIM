@@ -18,6 +18,7 @@ module EcoSIMDesctruct
   use SoilBGCDataType, only : DestructSoilBGCData
   use SedimentDataType, only : DestructSedimentData
   use SoilWaterDataType, only : DestructSoilWater
+  use PlantAPIData  , only : DestructPlantAPIData
   implicit none
 
   call DestructMicrobialData
@@ -37,6 +38,8 @@ module EcoSIMDesctruct
   call DestructSedimentData
 
   call DestructSoilWater
+
+  call DestructPlantAPIData
   end subroutine DestructEcoSIM
 
 end module EcoSIMDesctruct

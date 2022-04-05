@@ -28,7 +28,7 @@ module readqmod
   PUBLIC :: readq
   CONTAINS
 
-  SUBROUTINE readq(NA,ND,NT,NE,NAX,NDX,NTX,NEX,NF,NFX,NTZ,NTZX,NHW,NHE,NVN,NVS)
+  SUBROUTINE readq(NA,ND,NT,NE,NTX,NEX,NF,NFX,NTZ,NTZX,NHW,NHE,NVN,NVS)
 !!
 ! Description
 ! THIS SUBROUTINE READS INPUT DATA FROM PLANT SPECIES
@@ -37,7 +37,7 @@ module readqmod
   implicit none
   integer, intent(in) :: NEX
   integer, intent(in) :: NA(1:NEX),ND(1:NEX)
-  integer, intent(in) :: NT,NE,NAX,NDX,NTX,NF,NFX,NTZ &
+  integer, intent(in) :: NT,NE,NTX,NF,NFX,NTZ &
     ,NTZX,NHW,NHE,NVN,NVS
 
 

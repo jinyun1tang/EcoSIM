@@ -80,7 +80,7 @@ module grosubMod
   integer :: L,K,M
   integer :: NX,NY,NZ
   REAL(R8) :: WTSHTA(JZ,JY,JX)
-  real(r8) :: CPOOLK(10,JP,JY,JX)
+  real(r8) :: CPOOLK(JC,JP,JY,JX)
 ! begin_execution
 !     TOTAL AGB FOR GRAZING IN LANDSCAPE SECTION
 !
@@ -287,7 +287,7 @@ module grosubMod
   integer, intent(in) :: I,J,NZ,NY,NX
   real(r8), intent(in) :: ZCX(JP,JY,JX)
   real(r8), intent(in) ::  WTSHTA(JZ,JY,JX)
-  real(r8), intent(out) :: CPOOLK(10,JP,JY,JX)
+  real(r8), intent(out) :: CPOOLK(JC,JP,JY,JX)
 
   real(r8)  :: UPNFC(JP,JY,JX)
   integer  :: ICHK1(2,JZ),IDTHRN,NB
@@ -369,7 +369,7 @@ module grosubMod
   subroutine ResetDeadBranch(I,J,NZ,NY,NX,CPOOLK)
   implicit none
   integer, intent(in) :: I,J,NZ,NY,NX
-  real(r8),intent(inout) :: CPOOLK(10,JP,JY,JX)
+  real(r8),intent(inout) :: CPOOLK(JC,JP,JY,JX)
   integer :: IDTHY
 
 !     begin_execution
@@ -453,7 +453,7 @@ module grosubMod
   subroutine LiterfallFromRootShootStorage(I,J,NZ,NY,NX,CPOOLK)
   implicit none
   integer, intent(in) :: I,J,NZ,NY,NX
-  REAL(R8),INTENT(INOUT) :: CPOOLK(10,JP,JY,JX)
+  REAL(R8),INTENT(INOUT) :: CPOOLK(JC,JP,JY,JX)
   integer :: L,M,NR,NB,N
 !     begin_execution
 !     LITTERFALL AND STATE VARIABLES FOR SEASONAL STORAGE
@@ -776,7 +776,7 @@ module grosubMod
   implicit none
   integer, intent(in) :: I,J,NZ,NY,NX
   integer, intent(inout) :: IDTHY
-  real(r8), intent(inout) :: CPOOLK(10,JP,JY,JX)
+  real(r8), intent(inout) :: CPOOLK(JC,JP,JY,JX)
   integer :: M,NB
 !     begin_execution
 
@@ -6948,7 +6948,7 @@ end subroutine CarbNutInBranchTransfer
   subroutine ComputeTotalBiom(NZ,NY,NX,CPOOLK)
 
   integer, intent(in) :: NZ,NY,NX
-  real(r8), intent(out) :: CPOOLK(10,JP,JY,JX)
+  real(r8), intent(out) :: CPOOLK(JC,JP,JY,JX)
   integer :: L,K,N,NB
 !     begin_execution
 !     TOTAL C,N,P IN EACH BRANCH
@@ -7189,7 +7189,7 @@ end subroutine CarbNutInBranchTransfer
   subroutine ResetBranchRootStates(NZ,NY,NX,CPOOLK)
   implicit none
   integer, intent(in) :: NZ,NY,NX
-  real(r8),INTENT(OUT) :: CPOOLK(10,JP,JY,JX)
+  real(r8),INTENT(OUT) :: CPOOLK(JC,JP,JY,JX)
   integer :: L,NR,N,NB
 !     begin_execution
 !     RESET BRANCH STATE VARIABLES
@@ -7270,7 +7270,7 @@ end subroutine CarbNutInBranchTransfer
 !     RESET STATE VARIABLES FROM DEAD BRANCHES
   implicit none
   integer, intent(in) :: NB,NZ,NY,NX
-  real(r8),intent(inout) :: CPOOLK(10,JP,JY,JX)
+  real(r8),intent(inout) :: CPOOLK(JC,JP,JY,JX)
   integer :: L,K,N
 !     begin_execution
 !

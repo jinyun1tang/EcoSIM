@@ -8,9 +8,12 @@ set(PLANT_BGC_SOURCES
 	StomateMod.F90
   GrosubPars.F90
   UptakePars.F90
+  StartqsMod.F90
+  HfuncsMod.F90
 )
 include_directories(${CMAKE_BINARY_DIR}/f90src/utils/)
 include_directories(${CMAKE_BINARY_DIR}/f90src/ecosim_datatype/)
+include_directories(${CMAKE_BINARY_DIR}/f90src/APIData/)
 include_directories(${CMAKE_BINARY_DIR}/f90src/ioutils/)
 include(add_ecosim_library)
 add_ecosim_library(plant_bgc ${PLANT_BGC_SOURCES})

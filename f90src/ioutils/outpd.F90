@@ -1,5 +1,5 @@
 
-  SUBROUTINE outpd(I,NT,NE,NAX,NDX,NTX,NEX,NHW,NHE,NVN,NVS)
+  SUBROUTINE outpd(I,NT,NE,NTX,NEX,NHW,NHE,NVN,NVS)
 !
 !     THIS SUBROUTINE WRITES DAILY OUTPUT FOR PLANT
 !     C, N, P, WATER AND HEAT TO OUTPUT FILES DEPENDING
@@ -18,7 +18,7 @@
   use EcoSIMHistMod
   use GridDataType
   implicit none
-  integer, intent(in) :: I,NT,NE,NAX,NDX
+  integer, intent(in) :: I,NT,NE
   integer, intent(in) :: NTX,NEX,NHW,NHE,NVN,NVS
 
 

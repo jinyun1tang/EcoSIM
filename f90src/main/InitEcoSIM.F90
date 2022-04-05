@@ -26,6 +26,8 @@ module InitEcoSIM
   use SoilBGCDataType     , only : InitSoilBGCData
   use SedimentDataType    , only : InitSedimentData
   use SoilWaterDataType   , only : InitSoilWater
+  use PlantAPIData        , only : InitPlantAPIData
+  use GridConsts
   implicit  none
   integer                 , intent(in) :: nmicbguilds   !number of microbial guilds per group
 
@@ -41,6 +43,8 @@ module InitEcoSIM
   call InitSoilWater
 
   call InitIrrigation
+
+  call InitPlantAPIData(JZ,JC,JP,JSA,jcplx1,JLI)
 
   call InitMicrobialData(nmicbguilds)
 

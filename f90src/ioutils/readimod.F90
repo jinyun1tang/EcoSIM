@@ -52,13 +52,13 @@ module readiMod
   public :: readi
   contains
 
-  SUBROUTINE readi(NA,ND,NT,NE,NAX,NDX,NTX,NEX,NF,NFX,NTZ,NTZX,NHW,NHE,NVN,NVS)
+  SUBROUTINE readi(NA,ND,NT,NE,NTX,NEX,NF,NFX,NTZ,NTZX,NHW,NHE,NVN,NVS)
 !!
 ! Description:
 ! THIS SUBROUTINE READS ALL SOIL AND TOPOGRAPHIC INPUT FILES
 !
   implicit none
-  integer, intent(in) :: NT,NE,NAX,NDX,NTX,NEX,NTZX,NHW,NHE,NVN,NVS
+  integer, intent(in) :: NT,NE,NTX,NEX,NTZX,NHW,NHE,NVN,NVS
   integer, intent(out) :: NF, NFX, NTZ
   integer, intent(in) :: NA(1:NEX),ND(1:NEX)
   integer :: jj,NX,NY

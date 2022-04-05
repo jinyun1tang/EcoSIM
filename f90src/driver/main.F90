@@ -130,7 +130,7 @@ PROGRAM main
     DO  NEX=1,NAX
       DO  NT=1,ND(NEX)
         DO  NE=1,NA(NEX)
-          CALL SOIL(NA,ND,NT,NE,NAX,NDX,NTX,NEX,NHW,NHE,NVN,NVS)
+          CALL SOIL(NA,ND,NT,NE,NAX,NTX,NEX,NHW,NHE,NVN,NVS)
           IGO=IGO+1
         enddo
       enddo

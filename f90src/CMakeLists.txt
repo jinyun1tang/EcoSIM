@@ -1,5 +1,6 @@
 add_subdirectory(utils)
 add_subdirectory(ecosim_datatype)
+add_subdirectory(APIData)
 add_subdirectory(microbial_bgc)
 add_subdirectory(plant_bgc)
 add_subdirectory(SoilHydroTherm)

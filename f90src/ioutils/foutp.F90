@@ -1,5 +1,5 @@
 
-  SUBROUTINE foutp(NT,NE,NAX,NDX,NTX,NEX,NF,NFX,NHW,NHE,NVN,NVS)
+  SUBROUTINE foutp(NT,NE,NTX,NEX,NF,NFX,NHW,NHE,NVN,NVS)
 !
 !     THIS SUBROUTINE OPENS AND LABELS OUTPUT FILES
 !     FOR PLANT DATA
@@ -10,7 +10,7 @@
   use EcoSIMHistMod
   use GridDataType
   implicit none
-  integer, intent(in) :: NT,NE,NAX,NDX,NTX,NEX
+  integer, intent(in) :: NT,NE,NTX,NEX
   integer, intent(in) :: NF,NFX,NHW,NHE,NVN,NVS
 
 

@@ -5,7 +5,9 @@ set(APIS_SOURCES
 include_directories(${ECOSIM_INCLUDE_DIRS})
 include_directories(${CMAKE_BINARY_DIR}/f90src/utils/)
 include_directories(${CMAKE_BINARY_DIR}/f90src/ecosim_datatype/)
+include_directories(${CMAKE_BINARY_DIR}/f90src/APIData/)
 include_directories(${CMAKE_BINARY_DIR}/f90src/microbial_bgc/)
+include_directories(${CMAKE_BINARY_DIR}/f90src/ecosim_mods/)
 include_directories(${CMAKE_BINARY_DIR}/f90src/plant_bgc/)
 include_directories(${CMAKE_BINARY_DIR}/f90src/ecosim_mods/)
 

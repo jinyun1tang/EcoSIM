@@ -1,4 +1,4 @@
-SUBROUTINE routq(NT,NE,NAX,NDX,NTX,NEX,NHW,NHE,NVN,NVS)
+SUBROUTINE routq(NT,NE,NTX,NEX,NHW,NHE,NVN,NVS)
 !
 !     THIS SUBROUTINE OPENS CHECKPOINT FILES AND READS
 !     FILE NAMES FOR PLANT SPECIES AND MANAGEMENT
@@ -12,7 +12,7 @@ SUBROUTINE routq(NT,NE,NAX,NDX,NTX,NEX,NHW,NHE,NVN,NVS)
   use EcoSIMHistMod
   use GridDataType
   implicit none
-  integer, intent(in) :: NT,NE,NAX,NDX,NTX,NEX,NHW,NHE,NVN,NVS
+  integer, intent(in) :: NT,NE,NTX,NEX,NHW,NHE,NVN,NVS
 
 
   character(len=*), parameter :: mod_filename = __FILE__

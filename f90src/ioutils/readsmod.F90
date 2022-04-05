@@ -48,7 +48,7 @@ module readsmod
   public :: reads
   contains
 
-  SUBROUTINE reads(NA,ND,NT,NE,NAX,NDX,NTX,NEX,NF,NFX,NTZ &
+  SUBROUTINE reads(NA,ND,NT,NE,NAX,NTX,NEX,NF,NFX,NTZ &
       ,NTZX,NHW,NHE,NVN,NVS)
 !
 ! THIS SUBROUTINE READS ALL SOIL AND PLANT MANAGEMENT INPUT FILES
@@ -57,7 +57,7 @@ module readsmod
   implicit none
   integer, intent(in) :: NEX
   integer, intent(in) :: NA(1:NEX),ND(1:NEX)
-  integer, intent(in) :: NT,NE,NAX,NDX,NTX,NHW,NHE,NVN,NVS
+  integer, intent(in) :: NT,NE,NAX,NTX,NHW,NHE,NVN,NVS
   integer, intent(inout) :: NF, NFX, NTZ
   integer, intent(out) :: NTZX
 

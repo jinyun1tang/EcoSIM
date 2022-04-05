@@ -1,5 +1,5 @@
 
-  SUBROUTINE outph(I,J,NT,NE,NAX,NDX,NTX,NEX,NHW,NHE,NVN,NVS)
+  SUBROUTINE outph(I,J,NT,NE,NTX,NEX,NHW,NHE,NVN,NVS)
 !
 !     THIS SUBROUTINE WRITES HOURLY OUTPUT FOR PLANT
 !     C, N, P, WATER AND HEAT TO OUTPUT FILES DEPENDING
@@ -18,7 +18,7 @@
   use GridDataType
 
   implicit none
-  integer, intent(in) :: I,J,NT,NE,NAX,NDX,NTX
+  integer, intent(in) :: I,J,NT,NE,NTX
   integer, intent(in) :: NEX,NHW,NHE,NVN,NVS
 
 
