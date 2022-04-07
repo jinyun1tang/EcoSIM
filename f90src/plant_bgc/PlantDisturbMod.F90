@@ -843,7 +843,7 @@ module PlantDisturbMod
             WTSTXN(NB,NZ,NY,NX)=WTSTXN(NB,NZ,NY,NX)*XHVST
             WTSTXP(NB,NZ,NY,NX)=WTSTXP(NB,NZ,NY,NX)*XHVST
             WVSTK(NZ,NY,NX)=WVSTK(NZ,NY,NX)+WVSTKB(NB,NZ,NY,NX)
-            DO 8970 K=0,25
+            DO 8970 K=0,JNODS
               IF(K.NE.0)THEN
                 CPOOL3(K,NB,NZ,NY,NX)=CPOOL3(K,NB,NZ,NY,NX)*XHVST
                 CPOOL4(K,NB,NZ,NY,NX)=CPOOL4(K,NB,NZ,NY,NX)*XHVST
@@ -1095,7 +1095,7 @@ module PlantDisturbMod
   real(r8):: ZPOOLG,ZPOLNG,ZPOOLX
   real(r8) :: ZPOLNX,XHVSN,XHVSP,XHVST
   REAL(R8) :: WGLFBL(JZ,10,JP,JY,JX)
-  real(r8) :: FHVSHK(0:25),FHVSTK(0:25)
+  real(r8) :: FHVSHK(0:JNODS),FHVSTK(0:JNODS)
   real(r8) :: ARLFY,ARLFR,ARLFG
   real(r8) :: APSILT
   real(r8) :: CPOOLX
@@ -1346,14 +1346,14 @@ module PlantDisturbMod
 !
       DO 9860 NB=1,NBR(NZ,NY,NX)
         DO  L=1,JC
-          DO  K=0,25
+          DO  K=0,JNODS
             WGLFBL(L,NB,NZ,NY,NX)=0._r8
           enddo
         enddo
 9860  CONTINUE
       DO 9870 NB=1,NBR(NZ,NY,NX)
         DO  L=1,JC
-          DO  K=0,25
+          DO  K=0,JNODS
             WGLFBL(L,NB,NZ,NY,NX)=WGLFBL(L,NB,NZ,NY,NX)+WGLFL(L,K,NB,NZ,NY,NX)
           enddo
         enddo
@@ -1496,7 +1496,7 @@ module PlantDisturbMod
         WGSHGX=0._r8
         WGLFGY=0._r8
         WGSHGY=0._r8
-        DO 9825 K=0,25
+        DO 9825 K=0,JNODS
           ARLFG=0._r8
           WGLFG=0._r8
           WGLFNG=0._r8
@@ -1802,7 +1802,7 @@ module PlantDisturbMod
 !
         IF(ICTYP(NZ,NY,NX).EQ.4.AND.CPOOLX.GT.ZEROP(NZ,NY,NX))THEN
           FHVST4=CPOOLG/CPOOLX
-          DO 9810 K=1,25
+          DO 9810 K=1,JNODS
             WTHTH0=WTHTH0+(1.0-FHVST4)*CPOOL3(K,NB,NZ,NY,NX)
             WTHTH0=WTHTH0+(1.0-FHVST4)*CPOOL4(K,NB,NZ,NY,NX)
             WTHTH0=WTHTH0+(1.0-FHVST4)*CO2B(K,NB,NZ,NY,NX)
@@ -2106,7 +2106,7 @@ module PlantDisturbMod
 !     VOLWOU,UVOLO=accumulated water loss for water balance calculation
 !
         CPOOLK(NB,NZ,NY,NX)=0._r8
-        DO 1325 K=1,25
+        DO 1325 K=1,JNODS
           CPOOLK(NB,NZ,NY,NX)=CPOOLK(NB,NZ,NY,NX) &
             +CPOOL3(K,NB,NZ,NY,NX)+CPOOL4(K,NB,NZ,NY,NX) &
             +CO2B(K,NB,NZ,NY,NX)+HCOB(K,NB,NZ,NY,NX)

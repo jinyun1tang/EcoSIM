@@ -2,7 +2,7 @@ module PlantAPIData
   use data_kind_mod, only : r8 => SHR_KIND_R8
 implicit none
   integer  :: JP1,JSA1,jcplx11
-  integer  :: JC1,JZ1,JLI1
+  integer  :: JC1,JZ1,JLI1,JNODS1
 !begin_data
   real(r8) :: ALATs1
   real(r8) :: ATCAs1
@@ -49,11 +49,11 @@ implicit none
   real(r8) :: ZEROS2s1
   real(r8) :: ZEROSs1
   real(r8) :: ZEROs1
-  real(r8) :: ZRs1
-  real(r8) :: ZTs1
-  real(r8) :: ZDs1
-  real(r8) :: TCXDs1
-  real(r8) :: TCZDs1
+  real(r8) :: ZRs1     !canopy surface roughness height, [m]
+  real(r8) :: ZTs1     !canopy height , [m]
+  real(r8) :: ZDs1     !zero plane displacement height, [m]
+  real(r8) :: TCXDs1  !basal value for threshold temperature for autumn leafoff/hardening
+  real(r8) :: TCZDs1  !basal value for threshold temperature for spring leafout/dehardening
   integer :: IYTYPs1
   integer :: IETYPs1
   integer :: IFLGTs1
@@ -62,7 +62,6 @@ implicit none
   integer :: NJs1
   integer :: NPs1
   integer :: NUs1
-
   integer :: IYRCs1                    !current year
   integer :: IGOs1                     !flag for first scenario
   integer,  allocatable :: ITILLs1(:)
@@ -721,10 +720,10 @@ implicit none
 
 
   contains
-  subroutine InitPlantAPIData(JZ,JC,JP,JSA,jcplx1,JLI)
+  subroutine InitPlantAPIData(JZ,JC,JP,JSA,jcplx1,JLI,JNODS)
 
   implicit none
-  integer, intent(in) :: JZ,JC,JP,JSA,JCplx1,JLI
+  integer, intent(in) :: JZ,JC,JP,JSA,JCplx1,JLI,JNODS
 
   JZ1=JZ
   JC1=JC
@@ -732,6 +731,7 @@ implicit none
   JSA1=JSA
   jcplx11=jcplx1
   JLI1=JLI
+  JNODS1=JNODS
   call InitAllocate()
   end subroutine InitPlantAPIData
 !----------------------------------------------------------------------
@@ -1193,8 +1193,8 @@ implicit none
   allocate(WVSTKBs1(JC1,JP1))
   allocate(ZPOOLs1(JC1,JP1))
   allocate(ZPOLNBs1(JC1,JP1))
-  allocate(SURFs1(JLI1,JC1,25,JC1,JP1))
-  allocate(SURFXs1(JLI1,JC1,25,JC1,JP1))
+  allocate(SURFs1(JLI1,JC1,JNODS1,JC1,JP1))
+  allocate(SURFXs1(JLI1,JC1,JNODS1,JC1,JP1))
   allocate(CPOOL3s1(25,JC1,JP1))
   allocate(CPOOL4s1(25,JC1,JP1))
   allocate(CO2Bs1(25,JC1,JP1))
@@ -1209,26 +1209,26 @@ implicit none
   allocate(VGROs1(25,JC1,JP1))
   allocate(VCGR4s1(25,JC1,JP1))
   allocate(VGRO4s1(25,JC1,JP1))
-  allocate(ARLF1s1(0:25,JC1,JP1))
-  allocate(HTNODXs1(0:25,JC1,JP1))
-  allocate(HTSHEs1(0:25,JC1,JP1))
-  allocate(HTNODEs1(0:25,JC1,JP1))
-  allocate(WGNODEs1(0:25,JC1,JP1))
-  allocate(WGNODNs1(0:25,JC1,JP1))
-  allocate(WGNODPs1(0:25,JC1,JP1))
-  allocate(WGLFs1(0:25,JC1,JP1))
-  allocate(WGLFNs1(0:25,JC1,JP1))
-  allocate(WGLFPs1(0:25,JC1,JP1))
-  allocate(WSLFs1(0:25,JC1,JP1))
-  allocate(WGSHEs1(0:25,JC1,JP1))
-  allocate(WGSHNs1(0:25,JC1,JP1))
-  allocate(WGSHPs1(0:25,JC1,JP1))
-  allocate(WSSHEs1(0:25,JC1,JP1))
+  allocate(ARLF1s1(0:JNODS1,JC1,JP1))
+  allocate(HTNODXs1(0:JNODS1,JC1,JP1))
+  allocate(HTSHEs1(0:JNODS1,JC1,JP1))
+  allocate(HTNODEs1(0:JNODS1,JC1,JP1))
+  allocate(WGNODEs1(0:JNODS1,JC1,JP1))
+  allocate(WGNODNs1(0:JNODS1,JC1,JP1))
+  allocate(WGNODPs1(0:JNODS1,JC1,JP1))
+  allocate(WGLFs1(0:JNODS1,JC1,JP1))
+  allocate(WGLFNs1(0:JNODS1,JC1,JP1))
+  allocate(WGLFPs1(0:JNODS1,JC1,JP1))
+  allocate(WSLFs1(0:JNODS1,JC1,JP1))
+  allocate(WGSHEs1(0:JNODS1,JC1,JP1))
+  allocate(WGSHNs1(0:JNODS1,JC1,JP1))
+  allocate(WGSHPs1(0:JNODS1,JC1,JP1))
+  allocate(WSSHEs1(0:JNODS1,JC1,JP1))
   allocate(SURFBs1(JLI1,JC1,JC1,JP1))
-  allocate(ARLFLs1(JC1,0:25,JC1,JP1))
-  allocate(WGLFLs1(JC1,0:25,JC1,JP1))
-  allocate(WGLFLNs1(JC1,0:25,JC1,JP1))
-  allocate(WGLFLPs1(JC1,0:25,JC1,JP1))
+  allocate(ARLFLs1(JC1,0:JNODS1,JC1,JP1))
+  allocate(WGLFLs1(JC1,0:JNODS1,JC1,JP1))
+  allocate(WGLFLNs1(JC1,0:JNODS1,JC1,JP1))
+  allocate(WGLFLPs1(JC1,0:JNODS1,JC1,JP1))
   allocate(ARSTKs1(JC1,JC1,JP1))
   allocate(CPOOLRs1(2,JZ1,JP1))
   allocate(CCPOLRs1(2,JZ1,JP1))

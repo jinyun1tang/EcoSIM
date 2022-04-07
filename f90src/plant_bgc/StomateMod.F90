@@ -515,7 +515,7 @@
   real(r8) :: WSDN
 !     begin_execution
 
-  DO 2800 K=1,25
+  DO 2800 K=1,JNODS
     IF(ARLF(K,NB,NZ,NY,NX).GT.ZEROP(NZ,NY,NX) &
       .AND.WGLF(K,NB,NZ,NY,NX).GT.ZEROP(NZ,NY,NX))THEN
       WSDN=WSLF(K,NB,NZ,NY,NX)/ARLF(K,NB,NZ,NY,NX)
@@ -690,7 +690,7 @@
     ELSE
       FDBK(NB,NZ,NY,NX)=0.0
       FDBKX(NB,NZ,NY,NX)=1.0
-      DO 2805 K=1,25
+      DO 2805 K=1,JNODS
         VCGR4(K,NB,NZ,NY,NX)=0.0
         VCGRO(K,NB,NZ,NY,NX)=0.0
 2805  CONTINUE

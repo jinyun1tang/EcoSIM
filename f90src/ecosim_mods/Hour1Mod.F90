@@ -2284,7 +2284,7 @@ module Hour1Mod
       DO  L=1,JC
         IF(ZL(L-1,NY,NX).GE.DPTHS(NY,NX)-ZERO &
           .AND.ZL(L-1,NY,NX).GE.DPTH0(NY,NX)-ZERO)THEN
-          DO 1130 K=1,25
+          DO 1130 K=1,JNODS
             ARLFS(NZ,NY,NX)=ARLFS(NZ,NY,NX)+ARLFL(L,K,NB,NZ,NY,NX)
             ARLSS(NY,NX)=ARLSS(NY,NX)+ARLFL(L,K,NB,NZ,NY,NX)
 1130      CONTINUE
@@ -2421,7 +2421,7 @@ module Hour1Mod
             IF(ZL(L-1,NY,NX).GT.DPTHS(NY,NX)-ZERO &
              .AND.ZL(L-1,NY,NX).GT.DPTH0(NY,NX)-ZERO)THEN
               DO 1205 N=1,JLI
-                DO 1210 K=1,25
+                DO 1210 K=1,JNODS
                   TSURF(N,L,NZ,NY,NX)=TSURF(N,L,NZ,NY,NX)+SURF(N,L,K,NB,NZ,NY,NX)
 1210            CONTINUE
                 TSURFB(N,L,NZ,NY,NX)=TSURFB(N,L,NZ,NY,NX)+SURFB(N,L,NB,NZ,NY,NX)

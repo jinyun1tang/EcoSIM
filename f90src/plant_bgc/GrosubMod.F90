@@ -3216,7 +3216,7 @@ end subroutine PrimRootRemobilization
 
 !     begin_execution
 
-  DO 170 K=1,25
+  DO 170 K=1,JNODS
     IF(WGLF(K,NB,NZ,NY,NX).GT.ZEROP(NZ,NY,NX))THEN
 !
 !     MESOPHYLL TO BUNDLE SHEATH TRANSFER
@@ -3332,7 +3332,7 @@ end subroutine PrimRootRemobilization
 !
 !         FOR EACH NODE
 !
-          DO 100 K=1,25
+          DO 100 K=1,JNODS
             CH2O3(K)=0._r8
             CH2O4(K)=0._r8
             IF(ARLF(K,NB,NZ,NY,NX).GT.ZEROP(NZ,NY,NX))THEN
@@ -3363,7 +3363,7 @@ end subroutine PrimRootRemobilization
 !
 !         CONVERT UMOL M-2 S-1 TO G C M-2 H-1
 !
-          DO 150 K=1,25
+          DO 150 K=1,JNODS
             CH2O3(K)=CH2O3(K)*0.0432
             CH2O4(K)=CH2O4(K)*0.0432
 150       CONTINUE
@@ -3371,7 +3371,7 @@ end subroutine PrimRootRemobilization
           CO2F=0._r8
           CH2O=0._r8
           IF(ICTYP(NZ,NY,NX).EQ.4)THEN
-            DO 155 K=1,25
+            DO 155 K=1,JNODS
               CH2O3(K)=0._r8
               CH2O4(K)=0._r8
 155         CONTINUE
@@ -3381,7 +3381,7 @@ end subroutine PrimRootRemobilization
         CO2F=0._r8
         CH2O=0._r8
         IF(ICTYP(NZ,NY,NX).EQ.4)THEN
-          DO 160 K=1,25
+          DO 160 K=1,JNODS
             CH2O3(K)=0._r8
             CH2O4(K)=0._r8
 160       CONTINUE
@@ -3391,7 +3391,7 @@ end subroutine PrimRootRemobilization
       CO2F=0._r8
       CH2O=0._r8
       IF(ICTYP(NZ,NY,NX).EQ.4)THEN
-        DO 165 K=1,25
+        DO 165 K=1,JNODS
           CH2O3(K)=0._r8
           CH2O4(K)=0._r8
 165     CONTINUE
@@ -3901,7 +3901,7 @@ end subroutine PrimRootRemobilization
 !     CNWS,CPWS=protein:N,protein:P ratios from startq.f
 !
       DO 490 KK=MNNOD,MXNOD
-        K=MOD(KK,25)
+        K=MOD(KK,JNODS)
         IF(K.EQ.0.AND.KK.NE.0)K=25
           WGLF(K,NB,NZ,NY,NX)=WGLF(K,NB,NZ,NY,NX)+GRO
           WGLFN(K,NB,NZ,NY,NX)=WGLFN(K,NB,NZ,NY,NX)+GRON
@@ -3960,7 +3960,7 @@ end subroutine PrimRootRemobilization
 !       CNWS,CPWS=protein:N,protein:P ratios from startq.f
 !
         DO 505 KK=MNNOD,MXNOD
-          K=MOD(KK,25)
+          K=MOD(KK,JNODS)
           IF(K.EQ.0.AND.KK.NE.0)K=25
             WGSHE(K,NB,NZ,NY,NX)=WGSHE(K,NB,NZ,NY,NX)+GRO
             WGSHN(K,NB,NZ,NY,NX)=WGSHN(K,NB,NZ,NY,NX)+GRON
@@ -4034,7 +4034,7 @@ end subroutine PrimRootRemobilization
 !
           SNL=ETOL*SNL1(NZ,NY,NX)*(WTSTKB(NB,NZ,NY,NX)/PP(NZ,NY,NX))**SNL2
           GROH=GRO/PP(NZ,NY,NX)*SNL
-          KX=MOD(MNNOD-1,25)
+          KX=MOD(MNNOD-1,JNODS)
           IF(KX.EQ.0.AND.MNNOD-1.NE.0)KX=25
 !
     !     GROWTH AT EACH CURRENT NODE
@@ -4045,9 +4045,9 @@ end subroutine PrimRootRemobilization
     !     ANGBR=sine of stalk angle from horizontal from PFT file
 !
           DO 510 KK=MNNOD,MXNOD
-            K1=MOD(KK,25)
+            K1=MOD(KK,JNODS)
             IF(K1.EQ.0.AND.KK.NE.0)K1=25
-            K2=MOD(KK-1,25)
+            K2=MOD(KK-1,JNODS)
             IF(K2.EQ.0.AND.KK-1.NE.0)K2=25
             WGNODE(K1,NB,NZ,NY,NX)=WGNODE(K1,NB,NZ,NY,NX)+GRO
             WGNODN(K1,NB,NZ,NY,NX)=WGNODN(K1,NB,NZ,NY,NX)+GRON
@@ -4105,12 +4105,12 @@ end subroutine PrimRootRemobilization
 !       FSNC=fraction of lowest leaf to be remobilized
 !
         IF(IFLGG(NB,NZ,NY,NX).EQ.1)THEN
-          KVSTGX=MAX(0,KVSTG(NB,NZ,NY,NX)-24)
+          KVSTGX=MAX(0,KVSTG(NB,NZ,NY,NX)-JNODS+1)
           IF(KVSTGX.GT.0)THEN
-            K=MOD(KVSTGX,25)
-            IF(K.EQ.0.AND.KVSTGX.GT.0)K=25
-            KX=MOD(KVSTG(NB,NZ,NY,NX),25)
-            IF(KX.EQ.0.AND.KVSTG(NB,NZ,NY,NX).NE.0)KX=25
+            K=MOD(KVSTGX,JNODS)
+            IF(K.EQ.0.AND.KVSTGX.GT.0)K=JNODS
+            KX=MOD(KVSTG(NB,NZ,NY,NX),JNODS)
+            IF(KX.EQ.0.AND.KVSTG(NB,NZ,NY,NX).NE.0)KX=JNODS
             FSNC=TFN3(NZ,NY,NX)*XRLA(NZ,NY,NX)
 !
         !   REMOBILIZATION OF LEAF C,N,P ALSO DEPENDS ON STRUCTURAL C:N:P
@@ -4432,7 +4432,7 @@ end subroutine PrimRootRemobilization
 !
     KVSTGX=MAX(0,KVSTG(NB,NZ,NY,NX)-24)
     DO 495 KK=KVSTGX,KVSTG(NB,NZ,NY,NX)
-      K=MOD(KK,25)
+      K=MOD(KK,JNODS)
       IF(K.EQ.0.AND.KK.NE.0)K=25
       IF(WGLF(K,NB,NZ,NY,NX).GT.0.0)THEN
         CPOOLT=WGLF(K,NB,NZ,NY,NX)+CPOOL(NB,NZ,NY,NX)
@@ -4526,7 +4526,7 @@ end subroutine PrimRootRemobilization
     DO 650 KK=KN,KVSTG(NB,NZ,NY,NX)
       SNCLF=0._r8
       SNCSH=0._r8
-      K=MOD(KK,25)
+      K=MOD(KK,JNODS)
       IF(K.EQ.0.AND.KK.NE.0)K=25
 !
 !       REMOBILIZATION OF LEAF C,N,P DEPENDS ON NON-STRUCTURAL C:N:P
@@ -4857,7 +4857,7 @@ end subroutine PrimRootRemobilization
       MNNOD=MAX(MIN(0,MAX(0,MXNOD-NNOD(NZ,NY,NX))),KVSTG(NB,NZ,NY,NX)-23)
       MXNOD=MAX(MXNOD,MNNOD)
       DO 1650 KK=MXNOD,MNNOD,-1
-        K=MOD(KK,25)
+        K=MOD(KK,JNODS)
         IF(K.EQ.0.AND.KK.NE.0)K=25
 !     IF(NZ.EQ.1.OR.NZ.EQ.4)THEN
     !     WRITE(*,2356)'WGNODE1',I,J,NX,NY,NZ,NB,K,KK,MXNOD,MNNOD
@@ -5055,11 +5055,11 @@ end subroutine PrimRootRemobilization
         WTSTXP(NB,NZ,NY,NX)=AMAX1(0.0,WTSTXP(NB,NZ,NY,NX) &
           -FSNCR*WTSTXP(NB,NZ,NY,NX))
         HTNODZ=0._r8
-        DO 8320 K=0,25
+        DO 8320 K=0,JNODS
           HTNODZ=AMAX1(HTNODZ,HTNODE(K,NB,NZ,NY,NX))
 8320    CONTINUE
         HTNODZ=AMAX1(0.0,HTNODZ-FSNCR*HTNODZ)
-        DO 8325 K=0,25
+        DO 8325 K=0,JNODS
           HTNODE(K,NB,NZ,NY,NX)=AMIN1(HTNODZ,HTNODE(K,NB,NZ,NY,NX))
 8325    CONTINUE
 !
@@ -5079,7 +5079,7 @@ end subroutine PrimRootRemobilization
   !     IF(NZ.EQ.1.OR.NZ.EQ.4)THEN
   !     WRITE(*,2357)'WTSTXB1',I,J,NZ,NB,K,FSNCR,SNCT
   !    3,WTSTKB(NB,NZ,NY,NX),WTSTXB(NB,NZ,NY,NX)
-  !    4,(HTNODE(K,NB,NZ,NY,NX),K=0,25)
+  !    4,(HTNODE(K,NB,NZ,NY,NX),K=0,JNODS)
   !2357  FORMAT(A8,5I4,40E12.4)
   !     ENDIF
   !
@@ -5242,7 +5242,7 @@ end subroutine PrimRootRemobilization
             WTSHEB(NB,NZ,NY,NX)=0._r8
             WTSHBN(NB,NZ,NY,NX)=0._r8
             WTSHBP(NB,NZ,NY,NX)=0._r8
-            DO 5335 K=0,25
+            DO 5335 K=0,JNODS
               ARLF(K,NB,NZ,NY,NX)=0._r8
               HTSHE(K,NB,NZ,NY,NX)=0._r8
               WGLF(K,NB,NZ,NY,NX)=0._r8
@@ -5294,7 +5294,7 @@ end subroutine PrimRootRemobilization
             WTSTXB(NB,NZ,NY,NX)=0._r8
             WTSTXN(NB,NZ,NY,NX)=0._r8
             WTSTXP(NB,NZ,NY,NX)=0._r8
-            DO 6340 K=0,25
+            DO 6340 K=0,JNODS
               HTNODE(K,NB,NZ,NY,NX)=0._r8
               HTNODX(K,NB,NZ,NY,NX)=0._r8
               WGNODE(K,NB,NZ,NY,NX)=0._r8
@@ -5381,7 +5381,7 @@ end subroutine PrimRootRemobilization
       WTSTXB(NB,NZ,NY,NX)=(1.0-FSNR)*WTSTXB(NB,NZ,NY,NX)
       WTSTXN(NB,NZ,NY,NX)=(1.0-FSNR)*WTSTXN(NB,NZ,NY,NX)
       WTSTXP(NB,NZ,NY,NX)=(1.0-FSNR)*WTSTXP(NB,NZ,NY,NX)
-      DO 2010 K=0,25
+      DO 2010 K=0,JNODS
     !     HTNODE(K,NB,NZ,NY,NX)=(1.0-FSNR)*HTNODE(K,NB,NZ,NY,NX)
         HTNODX(K,NB,NZ,NY,NX)=(1.0-FSNR)*HTNODX(K,NB,NZ,NY,NX)
         WGNODE(K,NB,NZ,NY,NX)=(1.0-FSNR)*WGNODE(K,NB,NZ,NY,NX)
@@ -5478,7 +5478,7 @@ end subroutine PrimRootRemobilization
 ! IF CANOPY HAS EMERGED
 !
   IF(HTCTL(NZ,NY,NX).GT.SDPTH(NZ,NY,NX))THEN
-    DO 540 K=0,25
+    DO 540 K=0,JNODS
       DO  L=1,JC
         ARLFL(L,K,NB,NZ,NY,NX)=0._r8
         WGLFL(L,K,NB,NZ,NY,NX)=0._r8
@@ -5502,9 +5502,9 @@ end subroutine PrimRootRemobilization
       IF(NB.NE.NB1(NZ,NY,NX))THEN
         KVSTG1=MAX(1,KVSTG(NB1(NZ,NY,NX),NZ,NY,NX)-24)
         IF(NBTB(NB,NZ,NY,NX).GE.KVSTG1)THEN
-          K=MOD(NBTB(NB,NZ,NY,NX),25)
-!        IF(K.EQ.0.AND.KK.NE.0)K=25
-          IF(K.EQ.0)K=25
+          K=MOD(NBTB(NB,NZ,NY,NX),JNODS)
+!        IF(K.EQ.0.AND.KK.NE.0)K=JNODS
+          IF(K.EQ.0)K=JNODS
           HTBR=HTNODE(K,NB1(NZ,NY,NX),NZ,NY,NX)
         ELSE
           HTBR=0._r8
@@ -5520,7 +5520,7 @@ end subroutine PrimRootRemobilization
 !   FOR ALL LEAFED NODES
 !
     DO 560 KK=KVSTGX,KVSTG(NB,NZ,NY,NX)
-      K=MOD(KK,25)
+      K=MOD(KK,JNODS)
       IF(K.EQ.0.AND.KK.NE.0)K=25
       !
       !     HEIGHT OF STALK INTERNODE + SHEATH OR PETIOLE
@@ -5615,10 +5615,10 @@ end subroutine PrimRootRemobilization
       ENDIF
 560 CONTINUE
     IF(KVSTGN(NB,NZ,NY,NX).EQ.0)KVSTGN(NB,NZ,NY,NX)=KVSTG(NB,NZ,NY,NX)
-    K1=MOD(KVSTG(NB,NZ,NY,NX),25)
-    IF(K1.EQ.0.AND.KVSTG(NB,NZ,NY,NX).NE.0)K1=25
-    K2=MOD(KVSTG(NB,NZ,NY,NX)-1,25)
-    IF(K2.EQ.0.AND.KVSTG(NB,NZ,NY,NX)-1.NE.0)K2=25
+    K1=MOD(KVSTG(NB,NZ,NY,NX),JNODS)
+    IF(K1.EQ.0.AND.KVSTG(NB,NZ,NY,NX).NE.0)K1=JNODS
+    K2=MOD(KVSTG(NB,NZ,NY,NX)-1,JNODS)
+    IF(K2.EQ.0.AND.KVSTG(NB,NZ,NY,NX)-1.NE.0)K2=JNODS
     IF(test_aeqb(HTNODE(K1,NB,NZ,NY,NX),0._r8))THEN
       HTNODE(K1,NB,NZ,NY,NX)=HTNODE(K2,NB,NZ,NY,NX)
     ENDIF
@@ -5948,7 +5948,7 @@ end subroutine AllocateLeafToCanopyLayers
 
   integer :: L,K,N
   ! begin_execution
-  DO 900 K=1,25
+  DO 900 K=1,JNODS
     DO  L=1,JC
       DO  N=1,JLI
         SURF(N,L,K,NB,NZ,NY,NX)=0._r8
@@ -5958,7 +5958,7 @@ end subroutine AllocateLeafToCanopyLayers
 ! ARLFXB=0._r8
 ! ARLFXL=0._r8
 ! SURFXX=0._r8
-  DO 500 K=1,25
+  DO 500 K=1,JNODS
 !     ARLFXB=ARLFXB+ARLF(K,NB,NZ,NY,NX)
     IF(ARLF(K,NB,NZ,NY,NX).GT.0.0)THEN
       DO 700 L=JC,1,-1
@@ -6976,7 +6976,7 @@ end subroutine CarbNutInBranchTransfer
 !
   DO 320 NB=1,NBR(NZ,NY,NX)
     CPOOLK(NB,NZ,NY,NX)=0._r8
-    DO 325 K=1,25
+    DO 325 K=1,JNODS
       CPOOLK(NB,NZ,NY,NX)=CPOOLK(NB,NZ,NY,NX) &
         +CPOOL3(K,NB,NZ,NY,NX)+CPOOL4(K,NB,NZ,NY,NX) &
         +CO2B(K,NB,NZ,NY,NX)+HCOB(K,NB,NZ,NY,NX)
@@ -7341,7 +7341,7 @@ end subroutine CarbNutInBranchTransfer
   WTSTXB(NB,NZ,NY,NX)=0._r8
   WTSTXN(NB,NZ,NY,NX)=0._r8
   WTSTXP(NB,NZ,NY,NX)=0._r8
-  DO 8855 K=0,25
+  DO 8855 K=0,JNODS
     IF(K.NE.0)THEN
       CPOOL3(K,NB,NZ,NY,NX)=0._r8
       CPOOL4(K,NB,NZ,NY,NX)=0._r8

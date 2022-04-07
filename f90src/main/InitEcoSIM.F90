@@ -44,7 +44,7 @@ module InitEcoSIM
 
   call InitIrrigation
 
-  call InitPlantAPIData(JZ,JC,JP,JSA,jcplx1,JLI)
+  call InitPlantAPIData(JZ,JC,JP,JSA,jcplx1,JLI,JNODS)
 
   call InitMicrobialData(nmicbguilds)
 

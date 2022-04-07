@@ -194,7 +194,7 @@ SUBROUTINE routq(NT,NE,NTX,NEX,NHW,NHE,NVN,NVS)
 !           SET NUMBER OF PLANT SPECIES
 !
             NN=5
-            DO 202 NZ=5,1,-1
+            DO 202 NZ=JP,1,-1
               IF(DATAP(NZ,NY,NX).EQ.'NO')THEN
                 NN=NN-1
               ELSE

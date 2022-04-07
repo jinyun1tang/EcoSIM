@@ -50,9 +50,9 @@ module PlantTraitDataType
   real(r8) :: ANGSH(JP,JY,JX)                   !sheath angle, [degree from horizontal]
   real(r8) :: RAZ(JP,JY,JX)                     !canopy roughness height, [m]
   real(r8) :: HTSTZ(JP,JY,JX)                   !canopy height, [m]
-  real(r8) :: ARLF(0:25,JC,JP,JY,JX)            !leaf area, [m2 d-2]
-  real(r8) :: HTSHE(0:25,JC,JP,JY,JX)           !sheath height, [m]
-  real(r8) :: HTNODE(0:25,JC,JP,JY,JX)          !internode height, [m]
+  real(r8) :: ARLF(0:JNODS,JC,JP,JY,JX)            !leaf area, [m2 d-2]
+  real(r8) :: HTSHE(0:JNODS,JC,JP,JY,JX)           !sheath height, [m]
+  real(r8) :: HTNODE(0:JNODS,JC,JP,JY,JX)          !internode height, [m]
   real(r8) :: ARLFB(JC,JP,JY,JX)                !branch leaf area, [m2 d-2]
   real(r8) :: ARLFZ(JC,JP,JY,JX)                !branch leaf area, [m2 d-2]
   real(r8) :: HTSHEX(JC,JP,JY,JX)               !branch height, [m]
@@ -60,7 +60,7 @@ module PlantTraitDataType
   real(r8) :: GRNXB(JC,JP,JY,JX)                !branch potential grain number, [d-2]
   real(r8) :: GRNO(JP,JY,JX)                    !canopy grain number, [d-2]
   real(r8) :: PP(JP,JY,JX)                      !plant population, [d-2]
-  real(r8) :: HTNODX(0:25,JC,JP,JY,JX)          !internode height, [m]
+  real(r8) :: HTNODX(0:JNODS,JC,JP,JY,JX)          !internode height, [m]
 
 !stoichiometry
   real(r8) :: CNLF(JP,JY,JX)                    !maximum leaf N:C ratio, [g g-1]

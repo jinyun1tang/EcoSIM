@@ -7,7 +7,7 @@ module PlantAPI
   use UptakeMod    , only : uptake
   use timings      , only : start_timer, end_timer
   use EcoSIMHistMod
-  use SnowDataType, only : TKW,DPTHS
+  use SnowDataType , only : TKW,DPTHS
   use SurfLitterDataType
   use LandSurfDataType
   use SoilPropertyDataType
@@ -130,7 +130,7 @@ implicit none
     ENDDO
   ENDDO
 
-  DO NZ=1,NP(NY,NX)
+  DO NZ=1,NP0(NY,NX)
     ARLFP(NZ,NY,NX)=ARLFPs1(NZ)
     ARSTP(NZ,NY,NX)=ARSTPs1(NZ)
     BALC(NZ,NY,NX)=BALCs1(NZ)
@@ -460,7 +460,7 @@ implicit none
       ZPOOL(NB,NZ,NY,NX)=ZPOOLs1(NB,NZ)
 
 
-      DO K=0,25
+      DO K=0,JNODS
         ARLF(K,NB,NZ,NY,NX)=ARLF1s1(K,NB,NZ)
         HTNODX(K,NB,NZ,NY,NX)=HTNODXs1(K,NB,NZ)
         HTNODE(K,NB,NZ,NY,NX)=HTNODEs1(K,NB,NZ)
@@ -482,7 +482,7 @@ implicit none
           SURFB(N,L,NB,NZ,NY,NX)=SURFBs1(N,L,NB,NZ)
         ENDDO
       ENDDO
-      DO K=0,25
+      DO K=0,JNODS
         DO  L=1,JC
           ARLFL(L,K,NB,NZ,NY,NX)=ARLFLs1(L,K,NB,NZ)
           WGLFL(L,K,NB,NZ,NY,NX)=WGLFLs1(L,K,NB,NZ)
@@ -493,7 +493,7 @@ implicit none
       DO M=1,10
         IDAY(M,NB,NZ,NY,NX)=IDAYs1(M,NB,NZ)
       ENDDO
-      DO K=1,25
+      DO K=1,JNODS
         DO  L=1,JC
           DO N=1,JLI
             SURF(N,L,K,NB,NZ,NY,NX)=SURFs1(N,L,K,NB,NZ)
@@ -701,6 +701,9 @@ implicit none
   integer, intent(in) :: I,J,NY,NX
   integer :: K,L,M,N,NB,NZ,NR
 
+  ZEROs1=ZERO
+  TCXDs1=TCXD
+  TCZDs1=TCZD
   ALATs1=ALAT(NY,NX)
   ATCAs1=ATCA(NY,NX)
   ARLSSs1=ARLSS(NY,NX)
@@ -723,6 +726,8 @@ implicit none
   IYTYPs1=IYTYP(2,I+1,NY,NX)
   IETYPs1=IETYP(NY,NX)
   IFLGTs1=IFLGT(NY,NX)
+  IYRCs1=IYRC
+  IGOs1=IGO
   NLs1=NL(NY,NX)
   NP0s1=NP0(NY,NX)
   NJs1=NJ(NY,NX)
@@ -884,7 +889,7 @@ implicit none
     ENDDO
   ENDDO
 
-  DO NZ=1,NP(NY,NX)
+  DO NZ=1,NP0(NY,NX)
     EHVSTs1(1:2,1:4,NZ,I)=EHVST(1:2,1:4,NZ,I,NY,NX)
     FLWCs1(NZ)=FLWC(NZ,NY,NX)
     IDTHs1(NZ)=IDTH(NZ,NY,NX)
@@ -1137,7 +1142,7 @@ implicit none
       DO M=1,10
         IDAYs1(M,NB,NZ)=IDAY(M,NB,NZ,NY,NX)
       ENDDO
-      DO K=1,25
+      DO K=1,JNODS
         DO  L=1,JC
           DO N=1,JLI
             SURFs1(N,L,K,NB,NZ)=SURF(N,L,K,NB,NZ,NY,NX)
@@ -1159,7 +1164,7 @@ implicit none
         VCGR4s1(K,NB,NZ)=VCGR4(K,NB,NZ,NY,NX)
         VGRO4s1(K,NB,NZ)=VGRO4(K,NB,NZ,NY,NX)
       ENDDO
-      DO K=0,25
+      DO K=0,JNODS
         ARLF1s1(K,NB,NZ)=ARLF(K,NB,NZ,NY,NX)
         HTNODXs1(K,NB,NZ)=HTNODX(K,NB,NZ,NY,NX)
         HTSHEs1(K,NB,NZ)=HTSHE(K,NB,NZ,NY,NX)
@@ -1182,7 +1187,7 @@ implicit none
         ENDDO
       ENDDO
 
-      DO K=0,25
+      DO K=0,JNODS
         DO  L=1,JC
           ARLFLs1(L,K,NB,NZ)=ARLFL(L,K,NB,NZ,NY,NX)
           WGLFLs1(L,K,NB,NZ)=WGLFL(L,K,NB,NZ,NY,NX)

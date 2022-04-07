@@ -544,7 +544,7 @@ module StartqsMod
         SURFBs1(N,L,NB,NZ)=0._r8
       enddo
 5   CONTINUE
-    DO K=0,25
+    DO K=0,JNODS1
       ARLF1s1(K,NB,NZ)=0._r8
       HTNODEs1(K,NB,NZ)=0._r8
       HTNODXs1(K,NB,NZ)=0._r8

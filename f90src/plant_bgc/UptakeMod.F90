@@ -298,7 +298,7 @@ module UptakeMod
 !     N-S POSITION NY, E-W POSITION NX(AZIMUTH M ASSUMED UNIFORM)
 !
   DO 500 NB=1,NBR(NZ,NY,NX)
-    DO 550 K=1,25
+    DO 550 K=1,JNODS
 !
 !     NUMBER OF MINIMUM LEAFED NODE USED IN GROWTH ALLOCATION
 !
@@ -572,10 +572,9 @@ module UptakeMod
 !     RA=canopy boundary layer resistance
 !     PAREC,PARHC=canopy latent,sensible heat conductance
 !
-    RI=AMAX1(-0.3,AMIN1(0.075,RIB(NY,NX)*(TKA(NY,NX)-TKC1)))
+    RI=AMAX1(-0.3_r8,AMIN1(0.075_r8,RIB(NY,NX)*(TKA(NY,NX)-TKC1)))
 
-    RA(NZ,NY,NX)=AMAX1(RACM,0.9*RA1,AMIN1(1.1*RA1 &
-      ,RAZ(NZ,NY,NX)/(1.0-10.0*RI)))
+    RA(NZ,NY,NX)=AMAX1(RACM,0.9_r8*RA1,AMIN1(1.1_r8*RA1,RAZ(NZ,NY,NX)/(1.0_r8-10.0_r8*RI)))
     RA1=RA(NZ,NY,NX)
     PAREC=PAREX/RA(NZ,NY,NX)
     PARHC=PARHX/RA(NZ,NY,NX)

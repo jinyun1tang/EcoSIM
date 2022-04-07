@@ -561,7 +561,7 @@ module StartqMod
         SURFB(N,L,NB,NZ,NY,NX)=0._r8
       enddo
 5   CONTINUE
-    DO K=0,25
+    DO K=0,JNODS
       ARLF(K,NB,NZ,NY,NX)=0._r8
       HTNODE(K,NB,NZ,NY,NX)=0._r8
       HTNODX(K,NB,NZ,NY,NX)=0._r8
