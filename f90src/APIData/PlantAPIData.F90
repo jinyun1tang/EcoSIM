@@ -52,8 +52,6 @@ implicit none
   real(r8) :: ZRs1     !canopy surface roughness height, [m]
   real(r8) :: ZTs1     !canopy height , [m]
   real(r8) :: ZDs1     !zero plane displacement height, [m]
-  real(r8) :: TCXDs1  !basal value for threshold temperature for autumn leafoff/hardening
-  real(r8) :: TCZDs1  !basal value for threshold temperature for spring leafout/dehardening
   integer :: IYTYPs1
   integer :: IETYPs1
   integer :: IFLGTs1
@@ -64,6 +62,8 @@ implicit none
   integer :: NUs1
   integer :: IYRCs1                    !current year
   integer :: IGOs1                     !flag for first scenario
+  real(r8) :: AREA3Us1
+
   integer,  allocatable :: ITILLs1(:)
   integer,  allocatable :: IDTHs1(:)
   integer,  allocatable :: IYR0s1(:)
@@ -97,7 +97,6 @@ implicit none
   integer,  allocatable :: IGTYPs1(:)
   integer,  allocatable :: IFLGIs1(:)
   integer,  allocatable :: IDATAs1(:)
-  real(r8), allocatable :: AREA3s1(:)
   real(r8), allocatable :: DCORPs1(:)
   real(r8), allocatable :: FERTs1(:,:)
   real(r8), allocatable :: ARLFTs1(:)
@@ -739,6 +738,7 @@ implicit none
   implicit none
   allocate(ITILLs1(366))
   allocate(IDTHs1(JP1))
+  allocate(IDTHPs1(JP1))
   allocate(IYR0s1(JP1))
   allocate(INTYPs1(JP1))
   allocate(IYRXs1(JP1))
@@ -768,7 +768,6 @@ implicit none
   allocate(ICTYPs1(JP1))
   allocate(IGTYPs1(JP1))
   allocate(DCORPs1(366))
-  allocate(AREA3s1(0:JZ1))
   allocate(FERTs1(1:20,366))
   allocate(ARLFTs1(JC1))
   allocate(TAUSs1(JC1))
@@ -1422,7 +1421,6 @@ implicit none
   if(allocated(DATAs1))deallocate(DATAs1)
   if(allocated(NB1s1)) deallocate(NB1s1)
   if(allocated(DCORPs1))deallocate(DCORPs1)
-  if(allocated(AREA3s1))deallocate(AREA3s1)
   if(allocated(FERTs1))deallocate(FERTs1)
   if(allocated(ARLFTs1))deallocate(ARLFTs1)
   if(allocated(TAUSs1))deallocate(TAUSs1)

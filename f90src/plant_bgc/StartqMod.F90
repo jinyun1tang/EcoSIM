@@ -331,6 +331,9 @@ module StartqMod
 
   implicit none
   integer, intent(in) :: NZ, NY, NX
+  real(r8), parameter :: TCZD = 5.0_r8        !basal value for threshold temperature for spring leafout/dehardening	oC
+  real(r8), parameter :: TCXD = 12.0_r8       !basal value for threshold temperature for autumn leafoff/hardening	oC
+
 !
 !     PFT THERMAL ACCLIMATION
 !
@@ -340,8 +343,6 @@ module StartqMod
 !     HTC=high temperature threshold for grain number loss (oC)
 !     SSTX=sensitivity to HTC (seeds oC-1 above HTC)
 !
-  TCZD=5.00
-  TCXD=12.00
   ZTYP(NZ,NY,NX)=ZTYPI(NZ,NY,NX)
   OFFST(NZ,NY,NX)=2.667*(2.5-ZTYP(NZ,NY,NX))
   TCZ(NZ,NY,NX)=TCZD-OFFST(NZ,NY,NX)
@@ -577,7 +578,7 @@ module StartqMod
       WGNODE(K,NB,NZ,NY,NX)=0._r8
       WGNODN(K,NB,NZ,NY,NX)=0._r8
       WGNODP(K,NB,NZ,NY,NX)=0._r8
-      DO 55 L=1,NL(NY,NX)
+      DO 55 L=1,JC
         ARLFL(L,K,NB,NZ,NY,NX)=0._r8
         WGLFL(L,K,NB,NZ,NY,NX)=0._r8
         WGLFLN(L,K,NB,NZ,NY,NX)=0._r8

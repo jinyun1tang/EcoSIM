@@ -6,6 +6,7 @@ module HfuncsMod
   use data_kind_mod, only : r8 => SHR_KIND_R8
   use EcosimConst
   use PlantAPIData
+  use StartqsMod, only : startqs
   implicit none
 
   private
@@ -33,10 +34,10 @@ module HfuncsMod
   real(r8), parameter :: PSILY(0:3)=real((/-200.0,-2.0,-2.0,-2.0/),r8)
   integer, parameter :: NBX(0:3)=(/5,1,1,1/)
 
-  public :: hfunc
+  public :: hfuncs
   contains
 
-  subroutine hfunc(I,J)
+  subroutine hfuncs(I,J)
 !
 !     THIS subroutine CALCULATES PLANT PHENOLOGY
 !
@@ -136,7 +137,7 @@ module HfuncsMod
       ENDIF
 9985  CONTINUE
   RETURN
-  END subroutine hfunc
+  END subroutine hfuncs
 !------------------------------------------------------------------------------------------
 
   subroutine set_flags(I,J,NZ)

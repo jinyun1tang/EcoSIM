@@ -4,6 +4,7 @@ module PlantAPI
   use ExtractMod   , only : extract
   use grosubMod    , only : grosub
   use HfuncMod     , only : hfunc
+  use HfuncsMod    , only : hfuncs
   use UptakeMod    , only : uptake
   use timings      , only : start_timer, end_timer
   use EcoSIMHistMod
@@ -42,26 +43,27 @@ implicit none
   integer, intent(in) :: I,J
   integer, intent(in) :: NHW,NHE,NVN,NVS
   real(r8) :: t1
-
+  integer :: NY,NX
 
 333   FORMAT(A8)
 
-!  DO NX=NHW,NHE
-!    DO NY=NVN,NVS
+  DO NX=NHW,NHE
+    DO NY=NVN,NVS
 
-!    call  PlantAPISend(I,J,NY,NX)
+    call  PlantAPISend(I,J,NY,NX)
 
 !   UPDATE PLANT PHENOLOGY IN 'HFUNC'
 !
     !if(lverb)WRITE(*,333)'HFUNC'
     !call start_timer(t1)
 
-      CALL HFUNC(I,J,NHW,NHE,NVN,NVS)
+      CALL HFUNCs(I,J)
     !call end_timer('HFUNC',t1)
 
-!      call PlantAPIRecv(I,J,NY,NX)
-!    ENDDO
-!  ENDDO
+      call PlantAPIRecv(I,J,NY,NX)
+    ENDDO
+  ENDDO
+!  CALL HFUNC(I,J,NHW,NHE,NVN,NVS)
 !
 !   CALCULATE CANOPY CO2 UPTAKE AT FULL TURGOR, CANOPY WATER POTENTIAL,
 !   HYDRAULIC AND STOMATAL RESISTANCES,AND CANOPY ENERGY BALANCE IN 'UPTAKE'
@@ -129,7 +131,7 @@ implicit none
       ROXSK(M,L,NY,NX)=ROXSKs1(M,L)
     ENDDO
   ENDDO
-
+  if(I==133)print*,'np',NP0(NY,NX),NP(NY,NX)
   DO NZ=1,NP0(NY,NX)
     ARLFP(NZ,NY,NX)=ARLFPs1(NZ)
     ARSTP(NZ,NY,NX)=ARSTPs1(NZ)
@@ -196,6 +198,7 @@ implicit none
     NI(NZ,NY,NX)=NIs1(NZ)
     NG(NZ,NY,NX)=NGs1(NZ)
     NB1(NZ,NY,NX)=NB1s1(NZ)
+    if(I==133)print*,'nrt',NRTs1(NZ)
     NNOD(NZ,NY,NX)=NNODs1(NZ)
     O2L(NZ,NY,NX)=O2Ls1(NZ)
     O2I(NZ,NY,NX)=O2Is1(NZ)
@@ -330,7 +333,6 @@ implicit none
     ZEROQ(NZ,NY,NX)=ZEROQs1(NZ)
     ZEROL(NZ,NY,NX)=ZEROLs1(NZ)
     ZTYP(NZ,NY,NX)=ZTYPs1(NZ)
-
     HVST(NZ,I,NY,NX)=HVSTs1(NZ,I)
     IHVST(NZ,I,NY,NX)=IHVSTs1(NZ,I)
     JHVST(NZ,I,NY,NX)=JHVSTs1(NZ,I)
@@ -622,6 +624,7 @@ implicit none
     ENDDO
 
     DO NR=1,NRT(NZ,NY,NX)
+      if(I==133)print*,'nr,',nz,NR,NINRs1(NR,NZ)
       NINR(NR,NZ,NY,NX)=NINRs1(NR,NZ)
       DO N=1,2
         RTWT1(N,NR,NZ,NY,NX)=RTWT1s1(N,NR,NZ)
@@ -645,6 +648,7 @@ implicit none
     ENDDO
 
     EHVST(1:2,1:4,NZ,I,NY,NX)=EHVSTs1(1:2,1:4,NZ,I)
+
 
     DO L=NU(NY,NX),NI(NZ,NY,NX)
       DO K=0,jcplx1
@@ -702,8 +706,6 @@ implicit none
   integer :: K,L,M,N,NB,NZ,NR
 
   ZEROs1=ZERO
-  TCXDs1=TCXD
-  TCZDs1=TCZD
   ALATs1=ALAT(NY,NX)
   ATCAs1=ATCA(NY,NX)
   ARLSSs1=ARLSS(NY,NX)
@@ -733,6 +735,7 @@ implicit none
   NJs1=NJ(NY,NX)
   NPs1=NP(NY,NX)
   NUs1=NU(NY,NX)
+  if(I==133)print*,'NL,NU',NLs1,NUs1
   OXYEs1=OXYE(NY,NX)
   PPTs1=PPT(NY,NX)
   RABs1=RAB(NY,NX)
@@ -761,12 +764,16 @@ implicit none
   ZRs1=ZR(NY,NX)
   ZTs1=ZT(NY,NX)
   ZDs1=ZD(NY,NX)
+  AREA3Us1=AREA(3,NU(NY,NX),NY,NX)
+  IDATAs1(:)=IDATA(:)
 
   DCORPs1(I)=DCORP(I,NY,NX)
   FERTs1(1:20,I+1)=FERT(1:20,I+1,NY,NX)
   ITILLs1(I)=ITILL(I,NY,NX)
 
-
+  DO L=0,JC
+    ZLs1(L)=ZL(L,NY,NX)
+  ENDDO
   DO  L=1,JC
     ARLFTs1(L)=ARLFT(L,NY,NX)
     TAUSs1(L)=TAUS(L,NY,NX)
@@ -785,13 +792,8 @@ implicit none
     DPTHZs1(L)=DPTHZ(L,NY,NX)
   ENDDo
   DO L=1,NL(NY,NX)
-    DO K=0,jcplx1
-      DO N=1,2
-        RDFOMCs1(N,K,L,NZ)=RDFOMC(N,K,L,NZ,NY,NX)
-        RDFOMNs1(N,K,L,NZ)=RDFOMN(N,K,L,NZ,NY,NX)
-        RDFOMPs1(N,K,L,NZ)=RDFOMP(N,K,L,NZ,NY,NX)
-      ENDDO
-    ENDDO
+    CO2Gs1(L)=CO2G(L,NY,NX)
+    OXYGs1(L)=OXYG(L,NY,NX)
   ENDDO
   DO L=0,NL(NY,NX)
     BKDSs1(L)=BKDS(L,NY,NX)
@@ -805,7 +807,6 @@ implicit none
     CNO3Bs1(L)=CNO3B(L,NY,NX)
     CNH4Ss1(L)=CNH4S(L,NY,NX)
     CNH4Bs1(L)=CNH4B(L,NY,NX)
-    CO2Gs1(L)=CO2G(L,NY,NX)
     CO2Ss1(L)=CO2S(L,NY,NX)
     CH4Ss1(L)=CH4S(L,NY,NX)
     CCH4Ss1(L)=CCH4S(L,NY,NX)
@@ -828,7 +829,6 @@ implicit none
     H2POBs1(L)=H2POB(L,NY,NX)
     H2GSs1(L)=H2GS(L,NY,NX)
     HLSGLs1(L)=HLSGL(L,NY,NX)
-    OXYGs1(L)=OXYG(L,NY,NX)
     OXYSs1(L)=OXYS(L,NY,NX)
     OLSGLs1(L)=OLSGL(L,NY,NX)
     POSGLs1(L)=POSGL(L,NY,NX)
@@ -867,7 +867,6 @@ implicit none
     VLNH4s1(L)=VLNH4(L,NY,NX)
     VLNHBs1(L)=VLNHB(L,NY,NX)
     ZOSGLs1(L)=ZOSGL(L,NY,NX)
-    ZLs1(L)=ZL(L,NY,NX)
     ZNO3Ss1(L)=ZNO3S(L,NY,NX)
     ZNO3Bs1(L)=ZNO3B(L,NY,NX)
     ZNSGLs1(L)=ZNSGL(L,NY,NX)
@@ -894,10 +893,88 @@ implicit none
     FLWCs1(NZ)=FLWC(NZ,NY,NX)
     IDTHs1(NZ)=IDTH(NZ,NY,NX)
     IYR0s1(NZ)=IYR0(NZ,NY,NX)
+    NNODs1(NZ)=NNOD(NZ,NY,NX)
+    IBTYPs1(NZ)=IBTYP(NZ,NY,NX)
+    IDTHPs1(NZ)=IDTHP(NZ,NY,NX)
+    IDTHRs1(NZ)=IDTHR(NZ,NY,NX)
+    IWTYPs1(NZ)=IWTYP(NZ,NY,NX)
+    IPTYPs1(NZ)=IPTYP(NZ,NY,NX)
+    ZEROQs1(NZ)=ZEROQ(NZ,NY,NX)
+    IYRXs1(NZ)=IYRX(NZ,NY,NX)
+    IDAYXs1(NZ)=IDAYX(NZ,NY,NX)
+    IDTYPs1(NZ)=IDTYP(NZ,NY,NX)
+    SSTXs1(NZ)=SSTX(NZ,NY,NX)
+    ZTYPIs1(NZ)=ZTYPI(NZ,NY,NX)
+    FRADPs1(NZ)=FRADP(NZ,NY,NX)
+    CNSTKs1(NZ)=CNSTK(NZ,NY,NX)
+    CPSTKs1(NZ)=CPSTK(NZ,NY,NX)
+    RNH3Cs1(NZ)=RNH3C(NZ,NY,NX)
+    DTKCs1(NZ)=DTKC(NZ,NY,NX)
+    ZTYPs1(NZ)=ZTYP(NZ,NY,NX)
+    IYRYs1(NZ)=IYRY(NZ,NY,NX)
+    RSMXs1(NZ)=RSMX(NZ,NY,NX)
+    WTHSKPs1(NZ)=WTHSKP(NZ,NY,NX)
+    WTRSVPs1(NZ)=WTRSVP(NZ,NY,NX)
+    HTCs1(NZ)=HTC(NZ,NY,NX)
+    GRDMs1(NZ)=GRDM(NZ,NY,NX)
+    WTLFs1(NZ)=WTLF(NZ,NY,NX)
+    EPs1(NZ)=EP(NZ,NY,NX)
+    WTEARNs1(NZ)=WTEARN(NZ,NY,NX)
+    WTEARs1(NZ)=WTEAR(NZ,NY,NX)
+    WTGRNPs1(NZ)=WTGRNP(NZ,NY,NX)
+    WTSTKPs1(NZ)=WTSTKP(NZ,NY,NX)
+    WTSHEPs1(NZ)=WTSHEP(NZ,NY,NX)
+    WTHSKNs1(NZ)=WTHSKN(NZ,NY,NX)
+    WTRSVNs1(NZ)=WTRSVN(NZ,NY,NX)
+    WTSTKNs1(NZ)=WTSTKN(NZ,NY,NX)
+    WTLFNs1(NZ)=WTLFN(NZ,NY,NX)
+    WTRTSs1(NZ)=WTRTS(NZ,NY,NX)
+    WTHSKs1(NZ)=WTHSK(NZ,NY,NX)
+    WTRSVs1(NZ)=WTRSV(NZ,NY,NX)
+    WVSTKs1(NZ)=WVSTK(NZ,NY,NX)
+    WTSTKs1(NZ)=WTSTK(NZ,NY,NX)
+    CHILLs1(NZ)=CHILL(NZ,NY,NX)
+    WTSHEs1(NZ)=WTSHE(NZ,NY,NX)
+    PSILOs1(NZ)=PSILO(NZ,NY,NX)
+    INTYPs1(NZ)=INTYP(NZ,NY,NX)
+    WTSHENs1(NZ)=WTSHEN(NZ,NY,NX)
+    OSMOs1(NZ)=OSMO(NZ,NY,NX)
+    WTGRs1(NZ)=WTGR(NZ,NY,NX)
+    WTEARPs1(NZ)=WTEARP(NZ,NY,NX)
+    WTLFPs1(NZ)=WTLFP(NZ,NY,NX)
+    TCCs1(NZ)=TCC(NZ,NY,NX)
+    CWSRTs1(NZ)=CWSRT(NZ,NY,NX)
+    WTGRNNs1(NZ)=WTGRNN(NZ,NY,NX)
+    RSMHs1(NZ)=RSMH(NZ,NY,NX)
+    ICTYPs1(NZ)=ICTYP(NZ,NY,NX)
+    WTRTAs1(NZ)=WTRTA(NZ,NY,NX)
+    CFs1(NZ)=CF(NZ,NY,NX)
+    CFIs1(NZ)=CFI(NZ,NY,NX)
+    PPIs1(NZ)=PPI(NZ,NY,NX)
+    PPXs1(NZ)=PPX(NZ,NY,NX)
+    PPZs1(NZ)=PPZ(NZ,NY,NX)
+    IDAYYs1(NZ)=IDAYY(NZ,NY,NX)
+    VOXYFs1(NZ)=VOXYF(NZ,NY,NX)
+    ENGYXs1(NZ)=ENGYX(NZ,NY,NX)
+    TCO2As1(NZ)=TCO2A(NZ,NY,NX)
+    CTRANs1(NZ)=CTRAN(NZ,NY,NX)
+    WTSTDIs1(NZ)=WTSTDI(NZ,NY,NX)
+    MYs1(NZ)=MY(NZ,NY,NX)
+    NBTs1(NZ)=NBT(NZ,NY,NX)
+    NGs1(NZ)=NG(NZ,NY,NX)
+    IFLGIs1(NZ)=IFLGI(NZ,NY,NX)
+    NIXs1(NZ)=NIX(NZ,NY,NX)
+    NRTs1(NZ)=NRT(NZ,NY,NX)
+    NB1s1(NZ)=NB1(NZ,NY,NX)
+    NBRs1(NZ)=NBR(NZ,NY,NX)
+    IGTYPs1(NZ)=IGTYP(NZ,NY,NX)
+    CPGRs1(NZ)=CPGR(NZ,NY,NX)
+    CNGRs1(NZ)=CNGR(NZ,NY,NX)
     IFLGCs1(NZ)=IFLGC(NZ,NY,NX)
     IDAY0s1(NZ)=IDAY0(NZ,NY,NX)
     IDAYHs1(NZ)=IDAYH(NZ,NY,NX)
     IYRHs1(NZ)=IYRH(NZ,NY,NX)
+    ISTYPs1(NZ)=ISTYP(NZ,NY,NX)
     HVSTs1(NZ,I)=HVST(NZ,I,NY,NX)
     IHVSTs1(NZ,I)=IHVST(NZ,I,NY,NX)
     JHVSTs1(NZ,I)=JHVST(NZ,I,NY,NX)
@@ -1040,6 +1117,16 @@ implicit none
 
     DO  N=1,JLI
       CLASSs1(N,NZ)=CLASS(N,NZ,NY,NX)
+    ENDDO
+
+    DO L=1,NL(NY,NX)
+      DO K=0,jcplx1
+        DO N=1,2
+          RDFOMCs1(N,K,L,NZ)=RDFOMC(N,K,L,NZ,NY,NX)
+          RDFOMNs1(N,K,L,NZ)=RDFOMN(N,K,L,NZ,NY,NX)
+          RDFOMPs1(N,K,L,NZ)=RDFOMP(N,K,L,NZ,NY,NX)
+        ENDDO
+      ENDDO
     ENDDO
 
     DO NB=1,NBR(NZ,NY,NX)
@@ -1185,6 +1272,7 @@ implicit none
         DO N=1,JLI
           SURFBs1(N,L,NB,NZ)=SURFB(N,L,NB,NZ,NY,NX)
         ENDDO
+
       ENDDO
 
       DO K=0,JNODS

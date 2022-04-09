@@ -37,7 +37,7 @@ module CanopyRadDataType
   dangle=PICON2/real(JLI,r8)         !the angle section width
 
   DO N = 1, JLI
-    aa=real(N-0.5,r8)*da
+    aa=real(N-0.5,r8)*dangle
     ZSIN(N)=sin(aa)
     ZCOS(N)=cos(aa)
   ENDDO

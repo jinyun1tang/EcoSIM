@@ -122,13 +122,11 @@ module PlantTraitDataType
   real(r8) :: VRNF(JC,JP,JY,JX)                 !cold requirement for autumn leafoff/hardening, [h]
   integer :: KLEAF(JC,JP,JY,JX)                 !leaf number, [-]
   integer :: KVSTGN(JC,JP,JY,JX)                !leaf growth stage counter, [-]
-  real(r8) :: KLEAFX(JC,JP,JY,JX)               !NUMBER OF MINIMUM LEAFED NODE USED IN GROWTH ALLOCATION
+  integer :: KLEAFX(JC,JP,JY,JX)               !NUMBER OF MINIMUM LEAFED NODE USED IN GROWTH ALLOCATION
   integer :: KVSTG(JC,JP,JY,JX)                 !leaf growth stage counter, [-]
   real(r8) :: XRLA(JP,JY,JX)                    !rate of leaf initiation, [h-1 at 25 oC]
   real(r8) :: WDLF(JP,JY,JX)                    !leaf length:width ratio, [-]
   real(r8) :: SLA1(JP,JY,JX)                    !leaf area:mass during growth, [m2 g-1]
-  real(r8) :: TCZD                              !basal value for threshold temperature for spring leafout/dehardening	oC
-  real(r8) :: TCXD                              !basal value for threshold temperature for autumn leafoff/hardening	oC
   real(r8) :: TCZ(JP,JY,JX)                     !threshold temperature for spring leafout/dehardening, [oC]
   real(r8) :: SSL1(JP,JY,JX)                    !petiole length:mass during growth, [m g-1]
   real(r8) :: VRNL(JC,JP,JY,JX)                 !hours above threshold temperature required for spring leafout/dehardening, [-]

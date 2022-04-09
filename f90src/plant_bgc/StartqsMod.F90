@@ -55,7 +55,7 @@ module StartqsMod
           call InitSeedMorphoBio(NZ)
         ENDIF
         ZEROPs1(NZ)=ZEROs1*PPs1(NZ)
-        ZEROQs1(NZ)=ZEROs1*PPs1(NZ)/AREA3s1(NUs1)
+        ZEROQs1(NZ)=ZEROs1*PPs1(NZ)/AREA3Us1
         ZEROLs1(NZ)=ZEROs1*PPs1(NZ)*1.0E+06_r8
 9985  CONTINUE
 !
@@ -315,6 +315,9 @@ module StartqsMod
 
   implicit none
   integer, intent(in) :: NZ
+  real(r8), parameter :: TCZD = 5.0_r8        !basal value for threshold temperature for spring leafout/dehardening	oC
+  real(r8), parameter :: TCXD = 12.0_r8       !basal value for threshold temperature for autumn leafoff/hardening	oC
+
 !
 !     PFT THERMAL ACCLIMATION
 !
@@ -324,12 +327,10 @@ module StartqsMod
 !     HTC=high temperature threshold for grain number loss (oC)
 !     SSTX=sensitivity to HTC (seeds oC-1 above HTC)
 !
-  TCZDs1=5.00_r8
-  TCXDs1=12.00_r8
   ZTYPs1(NZ)=ZTYPIs1(NZ)
   OFFSTs1(NZ)=2.667_r8*(2.5_r8-ZTYPs1(NZ))
-  TCZs1(NZ)=TCZDs1-OFFSTs1(NZ)
-  TCXs1(NZ)=AMIN1(15.0_r8,TCXDs1-OFFSTs1(NZ))
+  TCZs1(NZ)=TCZD-OFFSTs1(NZ)
+  TCXs1(NZ)=AMIN1(15.0_r8,TCXD-OFFSTs1(NZ))
   IF(ICTYPs1(NZ).EQ.3)THEN
     IF(DATAPs1(NZ)(1:4).EQ.'soyb')THEN
       HTCs1(NZ)=30.0_r8+3.0_r8*ZTYPs1(NZ)
@@ -353,7 +354,7 @@ module StartqsMod
 !
 !     SEED CHARACTERISTICS
 !
-!     SDVL,SDLG,SDAR=seed volume(m3),length(m),AREA3s1(m2)
+!     SDVL,SDLG,SDAR=seed volume(m3),length(m),AREA3Us1(m2)
 !     GRDM=seed C mass (g) from PFT file
 !
   SDVLs1(NZ)=GRDMs1(NZ)*5.0E-06
@@ -432,7 +433,7 @@ module StartqsMod
 !
 !     PP=population (grid cell-1)
 !
-  PPs1(NZ)=PPXs1(NZ)*AREA3s1(NUs1)
+  PPs1(NZ)=PPXs1(NZ)*AREA3Us1
   IFLGIs1(NZ)=0
   IDTHPs1(NZ)=0
   IDTHRs1(NZ)=0
@@ -560,7 +561,7 @@ module StartqsMod
       WGNODEs1(K,NB,NZ)=0._r8
       WGNODNs1(K,NB,NZ)=0._r8
       WGNODPs1(K,NB,NZ)=0._r8
-      DO 55 L=1,NLs1
+      DO 55 L=1,JC1
         ARLFLs1(L,K,NB,NZ)=0._r8
         WGLFLs1(L,K,NB,NZ)=0._r8
         WGLFLNs1(L,K,NB,NZ)=0._r8
@@ -672,7 +673,7 @@ module StartqsMod
     WTSTGs1(NZ)=0._r8
     WTSTGNs1(NZ)=0._r8
     WTSTGPs1(NZ)=0._r8
-    WTSTDX=WTSTDIs1(NZ)*AREA3s1(NUs1)
+    WTSTDX=WTSTDIs1(NZ)*AREA3Us1
     DO 155 M=1,4
       WTSTDGs1(M,NZ)=WTSTDX*CFOPCs1(5,M,NZ)
       WTSTDNs1(M,NZ)=WTSTDX*CNSTKs1(NZ)*CFOPNs1(5,M,NZ)

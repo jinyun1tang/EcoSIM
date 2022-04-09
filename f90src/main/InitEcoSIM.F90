@@ -27,12 +27,15 @@ module InitEcoSIM
   use SedimentDataType    , only : InitSedimentData
   use SoilWaterDataType   , only : InitSoilWater
   use PlantAPIData        , only : InitPlantAPIData
+  use PlantMngmtDataType  , only : InitPlantMngmtData
   use GridConsts
   implicit  none
   integer                 , intent(in) :: nmicbguilds   !number of microbial guilds per group
 
 ! begin_execution
   call InitCanopyRad
+
+  call InitPlantMngmtData
 
   call InitSoilProperty
 

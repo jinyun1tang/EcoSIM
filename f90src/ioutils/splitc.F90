@@ -21,7 +21,7 @@
   enddo
   enddo
   do N=1,10
-	  if(datac(N+20,NE,NEX) .NE. 'NO')then
+	  if(datac(N+20,NE,NEX).NE.'NO')then
 	    close((N+30))
       close((N+40))
 !     call splits(NHW,NHE,NVN,NVS,OUTS(N))
