@@ -27,14 +27,14 @@ module Hist1Mod
   implicit none
 
   private
-  public :: fouts, foutp, outpd, outph, outsd, outsh
+  public :: fouts,foutp, outpd, outph, outsd, outsh
   contains
 
   SUBROUTINE foutp(NT,NE,NTX,NEX,NF,NFX,NHW,NHE,NVN,NVS)
 !
 !     THIS SUBROUTINE OPENS AND LABELS OUTPUT FILES
 !     FOR PLANT DATA
-!
+! write file head for plant variable output
   implicit none
   integer, intent(in) :: NT,NE,NTX,NEX
   integer, intent(in) :: NF,NFX,NHW,NHE,NVN,NVS

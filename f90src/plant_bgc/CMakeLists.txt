@@ -6,6 +6,7 @@ set(PLANT_BGC_SOURCES
   PlantDisturbMod.F90
 	GrosubMod.F90
 	StomateMod.F90
+	StomatesMod.F90
   GrosubPars.F90
   UptakePars.F90
   StartqsMod.F90
