@@ -13,6 +13,7 @@ module abortutils
   save
 
   public :: endrun
+  public :: check_bool
   interface endrun
      module procedure endrun_vanilla
      module procedure endrun_line
@@ -220,4 +221,18 @@ CONTAINS
   write(*,*)trim(msg)
   write(*,*)'at line',lineno
   end subroutine print_info_msg
+
+  !-----------------------------------------------------------------------
+  subroutine check_bool(bool_expr, msg, lineno, modfile)
+  implicit none
+  logical, intent(in) :: bool_expr
+  character(len=*), intent(in) :: msg
+  integer, intent(in) :: lineno
+  character(len=*), intent(in) :: modfile
+
+  if(bool_expr)then
+    write(iulog,*)msg, 'at line',lineno, ' in file ',modfile
+    call endrun()
+  endif
+  end subroutine check_bool
 end module abortutils

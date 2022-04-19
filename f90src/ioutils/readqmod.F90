@@ -3,7 +3,7 @@ module readqmod
 ! Description:
 ! code to read plant relevant files
   use data_kind_mod, only : r8 => SHR_KIND_R8
-  use fileUtil, only : open_safe
+  use fileUtil, only : open_safe, check_read
   use minimathmod, only : isLeap
   use GridConsts
   use FlagDataType
@@ -280,8 +280,9 @@ END SUBROUTINE readq
   implicit none
   integer, intent(in) :: NZ,NY,NX
 
-  integer :: N, NB
+  integer :: N, NB, ierr
   real(r8) :: VRNXI,VRNLI
+  character(len=200) :: tline
 
 ! begin_execution
 
@@ -315,10 +316,13 @@ END SUBROUTINE readq
 !   ZTYPI=thermal adaptation zone:1=arctic,boreal,2=cool temperate,
 !   3=warm temperate,4=subtropical,5=tropical
 !
-    READ(11,*)ICTYP(NZ,NY,NX),IGTYP(NZ,NY,NX),ISTYP(NZ,NY,NX) &
+    read(11,'(A)')tline
+    READ(tline,*,iostat=ierr)ICTYP(NZ,NY,NX),IGTYP(NZ,NY,NX),ISTYP(NZ,NY,NX) &
       ,IDTYP(NZ,NY,NX),INTYP(NZ,NY,NX),IWTYP(NZ,NY,NX) &
       ,IPTYP(NZ,NY,NX),IBTYP(NZ,NY,NX),IRTYP(NZ,NY,NX),MY(NZ,NY,NX) &
       ,ZTYPI(NZ,NY,NX)
+    call check_read(ierr,11,__LINE__,mod_filename)
+
     if(lverb)then
       write(*,*)'PLANT FUNCTIONAL TYPE'
       write(*,*)'photosynthesis type, 3=C3, 4=C4: ICTYP ', ICTYP(NZ,NY,NX)
@@ -354,10 +358,12 @@ END SUBROUTINE readq
 !   CHL4=fraction of leaf protein in mesophyll chlorophyll(C4)
 !   FCO2=intercellular:atmospheric CO2 concentration ratio
 !
-    READ(11,*)VCMX(NZ,NY,NX),VOMX(NZ,NY,NX),VCMX4(NZ,NY,NX) &
+    read(11,'(A)')tline
+    READ(tline,*,iostat=ierr)VCMX(NZ,NY,NX),VOMX(NZ,NY,NX),VCMX4(NZ,NY,NX) &
       ,XKCO2(NZ,NY,NX),XKO2(NZ,NY,NX),XKCO24(NZ,NY,NX) &
       ,RUBP(NZ,NY,NX),PEPC(NZ,NY,NX),ETMX(NZ,NY,NX),CHL(NZ,NY,NX) &
       ,CHL4(NZ,NY,NX),FCO2(NZ,NY,NX)
+    call check_read(ierr,12,__LINE__,mod_filename)
 
     if(lverb)then
       write(*,*)'PHOTOSYNTHETIC PROPERTIES'
@@ -382,7 +388,10 @@ END SUBROUTINE readq
 !
 !   ALBP,ALBP,TAUR,TAUP=leaf SW,PAR albedo,transmission
 !
-    READ(11,*)ALBR(NZ,NY,NX),ALBP(NZ,NY,NX),TAUR(NZ,NY,NX),TAUP(NZ,NY,NX)
+    read(11,'(A)')tline
+    READ(tline,*,iostat=ierr)ALBR(NZ,NY,NX),ALBP(NZ,NY,NX),TAUR(NZ,NY,NX),TAUP(NZ,NY,NX)
+    call check_read(ierr,4,__LINE__,mod_filename)
+
     if(lverb)then
       write(*,*)'OPTICAL PROPERTIES'
       write(*,*)'leaf SW albedo: ALBR',ALBR(NZ,NY,NX)
@@ -402,10 +411,16 @@ END SUBROUTINE readq
 !   XDL=critical photoperiod (h):<0=maximum daylength from site file
 !   XPPD=photoperiod sensitivity (node h-1)
 !
-    READ(11,*)XRNI(NZ,NY,NX),XRLA(NZ,NY,NX),CTC(NZ,NY,NX)  &
+    read(11,'(A)')tline
+    READ(tline,*,iostat=ierr)XRNI(NZ,NY,NX),XRLA(NZ,NY,NX),CTC(NZ,NY,NX)  &
       ,VRNLI,VRNXI,WDLF(NZ,NY,NX),PB(NZ,NY,NX)
-    READ(11,*)GROUPX(NZ,NY,NX),XTLI(NZ,NY,NX),XDL(NZ,NY,NX) &
+    call check_read(ierr,7,__LINE__,mod_filename)
+
+    read(11,'(A)')tline
+    READ(tline,*,iostat=ierr)GROUPX(NZ,NY,NX),XTLI(NZ,NY,NX),XDL(NZ,NY,NX) &
       ,XPPD(NZ,NY,NX)
+    call check_read(ierr,4,__LINE__,mod_filename)
+
     if(lverb)then
       write(*,*)'PHENOLOGICAL PROPERTIES'
       write(*,*)'rate of node initiation at 25oC (h-1): XRNI',XRNI(NZ,NY,NX)
@@ -432,11 +447,20 @@ END SUBROUTINE readq
 !   GFILL=grain filling rate at 25 oC (g seed-1 h-1)
 !   WTSTDI=mass of dead standing biomass at planting
 !
-    READ(11,*)SLA1(NZ,NY,NX),SSL1(NZ,NY,NX),SNL1(NZ,NY,NX)
-    READ(11,*)(CLASS(N,NZ,NY,NX),N=1,JLI),CFI(NZ,NY,NX),ANGBR(NZ,NY,NX) &
+    read(11,'(A)')tline
+    READ(tline,*,iostat=ierr)SLA1(NZ,NY,NX),SSL1(NZ,NY,NX),SNL1(NZ,NY,NX)
+    call check_read(ierr,3,__LINE__,mod_filename)
+
+    read(11,'(A)')tline
+    READ(tline,*,iostat=ierr)(CLASS(N,NZ,NY,NX),N=1,JLI),CFI(NZ,NY,NX),ANGBR(NZ,NY,NX) &
       ,ANGSH(NZ,NY,NX)
-    READ(11,*)STMX(NZ,NY,NX),SDMX(NZ,NY,NX),GRMX(NZ,NY,NX) &
+    call check_read(ierr,JLI+3,__LINE__,mod_filename)
+
+    read(11,'(A)')tline
+    READ(tline,*,iostat=ierr)STMX(NZ,NY,NX),SDMX(NZ,NY,NX),GRMX(NZ,NY,NX) &
       ,GRDM(NZ,NY,NX),GFILL(NZ,NY,NX),WTSTDI(NZ,NY,NX)
+    call check_read(ierr,6,__LINE__,mod_filename)
+
     if(lverb)then
       write(*,*)'MORPHOLOGICAL PROPERTIES'
       write(*,*)'growth in leaf area vs mass: SLA1 ',SLA1(NZ,NY,NX)
@@ -467,9 +491,12 @@ END SUBROUTINE readq
 !   PTSHT=rate constant for equilibrating shoot-root nonstructural C concn
 !   RTFQ=root branching frequency (m-1)
 !
-    READ(11,*)RRAD1M(1,NZ,NY,NX),RRAD2M(1,NZ,NY,NX),PORT(1,NZ,NY,NX) &
+    read(11,'(A)')tline
+    READ(tline,*,iostat=ierr)RRAD1M(1,NZ,NY,NX),RRAD2M(1,NZ,NY,NX),PORT(1,NZ,NY,NX) &
       ,PR(NZ,NY,NX),RSRR(1,NZ,NY,NX),RSRA(1,NZ,NY,NX) &
       ,PTSHT(NZ,NY,NX),RTFQ(NZ,NY,NX)
+    call check_read(ierr,8,__LINE__,mod_filename)
+
     if(lverb)then
       write(*,*)'ROOT CHARACTERISTICS'
       write(*,*)'radius of primary roots: RRAD1M',RRAD1M(1,NZ,NY,NX)
@@ -490,9 +517,18 @@ END SUBROUTINE readq
 !   UPMXZO,UPKMZO,UPMNZO=NO3 max uptake (g m-2 h-1),Km (uM), min concn (uM)
 !   UPMXPO,UPKMPO,UPMNPO=H2PO4 max uptake (g m-2 h-1),Km (uM), min concn (uM)
 !
-    READ(11,*)UPMXZH(1,NZ,NY,NX),UPKMZH(1,NZ,NY,NX),UPMNZH(1,NZ,NY,NX)
-    READ(11,*)UPMXZO(1,NZ,NY,NX),UPKMZO(1,NZ,NY,NX),UPMNZO(1,NZ,NY,NX)
-    READ(11,*)UPMXPO(1,NZ,NY,NX),UPKMPO(1,NZ,NY,NX),UPMNPO(1,NZ,NY,NX)
+    read(11,'(A)')tline
+    READ(tline,*,iostat=ierr)UPMXZH(1,NZ,NY,NX),UPKMZH(1,NZ,NY,NX),UPMNZH(1,NZ,NY,NX)
+    call check_read(ierr,3,__LINE__,mod_filename)
+
+    read(11,'(A)')tline
+    READ(tline,*,iostat=ierr)UPMXZO(1,NZ,NY,NX),UPKMZO(1,NZ,NY,NX),UPMNZO(1,NZ,NY,NX)
+    call check_read(ierr,3,__LINE__,mod_filename)
+
+    read(11,'(A)')tline
+    READ(tline,*,iostat=ierr)UPMXPO(1,NZ,NY,NX),UPKMPO(1,NZ,NY,NX),UPMNPO(1,NZ,NY,NX)
+    call check_read(ierr,3,__LINE__,mod_filename)
+
     if(lverb)then
       write(*,*)'ROOT UPTAKE PARAMETERS'
       write(*,*)'NH4 max uptake (g m-2 h-1): UPMXZH',UPMXZH(1,NZ,NY,NX)
@@ -512,7 +548,10 @@ END SUBROUTINE readq
 !   RCS=shape parameter for stomatal resistance vs leaf turgor potential
 !   RSMX=cuticular resistance (s m-1)
 !
-    READ(11,*)OSMO(NZ,NY,NX),RCS(NZ,NY,NX),RSMX(NZ,NY,NX)
+    read(11,'(A)')tline
+    READ(tline,*,iostat=ierr)OSMO(NZ,NY,NX),RCS(NZ,NY,NX),RSMX(NZ,NY,NX)
+    call check_read(ierr,3,__LINE__,mod_filename)
+
     if(lverb)then
       write(*,*)'WATER RELATIONS'
       write(*,*)'leaf osmotic potential at zero leaf water '// &
@@ -528,20 +567,28 @@ END SUBROUTINE readq
 !     *LF=leaf,*SHE=petiole,*STK=stalk,*RSV=stalk reserve,*HSK=husk
 !     *EAR=ear,*GR=grain,*RT=root,*ND=bacteria in root nodule,canopy
 !
-    READ(11,*)DMLF(NZ,NY,NX),DMSHE(NZ,NY,NX),DMSTK(NZ,NY,NX) &
+    read(11,'(A)')tline
+    READ(tline,*,iostat=ierr)DMLF(NZ,NY,NX),DMSHE(NZ,NY,NX),DMSTK(NZ,NY,NX) &
       ,DMRSV(NZ,NY,NX),DMHSK(NZ,NY,NX),DMEAR(NZ,NY,NX) &
       ,DMGR(NZ,NY,NX),DMRT(NZ,NY,NX),DMND(NZ,NY,NX)
+    call check_read(ierr,9,__LINE__,mod_filename)
+
 !
 !   ORGAN N AND P CONCENTRATIONS
 !
 !   CN*,CP*=N:C,P:C ratios in plant organs
 !
-    READ(11,*)CNLF(NZ,NY,NX),CNSHE(NZ,NY,NX),CNSTK(NZ,NY,NX) &
+    read(11,'(A)')tline
+    READ(tline,*,iostat=ierr)CNLF(NZ,NY,NX),CNSHE(NZ,NY,NX),CNSTK(NZ,NY,NX) &
       ,CNRSV(NZ,NY,NX),CNHSK(NZ,NY,NX),CNEAR(NZ,NY,NX) &
       ,CNGR(NZ,NY,NX),CNRT(NZ,NY,NX),CNND(NZ,NY,NX)
-    READ(11,*)CPLF(NZ,NY,NX),CPSHE(NZ,NY,NX),CPSTK(NZ,NY,NX) &
+    call check_read(ierr,9,__LINE__,mod_filename)
+
+    read(11,'(A)')tline
+    READ(tline,*,iostat=ierr)CPLF(NZ,NY,NX),CPSHE(NZ,NY,NX),CPSTK(NZ,NY,NX) &
       ,CPRSV(NZ,NY,NX),CPHSK(NZ,NY,NX),CPEAR(NZ,NY,NX) &
       ,CPGR(NZ,NY,NX),CPRT(NZ,NY,NX),CPND(NZ,NY,NX)
+    call check_read(ierr,9,__LINE__,mod_filename)
 
     if(lverb)then
       write(*,*)'ORGAN GROWTH YIELDS'

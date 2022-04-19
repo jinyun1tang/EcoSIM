@@ -103,8 +103,8 @@ implicit none
   implicit none
   integer, intent(in) :: I,J,NY,NX
 
-  integer :: NB,NR,NZ,K,L,M,N
-
+  integer :: NB,NR,NZ,K,L,M,N,I1
+  I1=I+1;if(I1>366)I1=1
   IFLGT(NY,NX)=IFLGTs1
   PPT(NY,NX)=PPTs1
   RECO(NY,NX)=RECOs1
@@ -117,9 +117,9 @@ implicit none
   XHVSTC(NY,NX)=XHVSTCs1
   XHVSTN(NY,NX)=XHVSTNs1
   XHVSTP(NY,NX)=XHVSTPs1
-  FERT(17:19,I+1,NY,NX)=FERTs1(17:19,I+1)
-  FERT(3,I+1,NY,NX)=FERTs1(3,I+1)
-  IYTYP(2,I+1,NY,NX)=IYTYPs1
+  FERT(17:19,I1,NY,NX)=FERTs1(17:19,I1)
+  FERT(3,I1,NY,NX)=FERTs1(3,I1)
+  IYTYP(2,I1,NY,NX)=IYTYPs1
 
   DO L=NU(NY,NX),NL(NY,NX)
     DO K=0,jcplx1
@@ -131,7 +131,6 @@ implicit none
       ROXSK(M,L,NY,NX)=ROXSKs1(M,L)
     ENDDO
   ENDDO
-  if(I==133)print*,'np',NP0(NY,NX),NP(NY,NX)
   DO NZ=1,NP0(NY,NX)
     ARLFP(NZ,NY,NX)=ARLFPs1(NZ)
     ARSTP(NZ,NY,NX)=ARSTPs1(NZ)
@@ -198,7 +197,6 @@ implicit none
     NI(NZ,NY,NX)=NIs1(NZ)
     NG(NZ,NY,NX)=NGs1(NZ)
     NB1(NZ,NY,NX)=NB1s1(NZ)
-    if(I==133)print*,'nrt',NRTs1(NZ)
     NNOD(NZ,NY,NX)=NNODs1(NZ)
     O2L(NZ,NY,NX)=O2Ls1(NZ)
     O2I(NZ,NY,NX)=O2Is1(NZ)
@@ -624,7 +622,6 @@ implicit none
     ENDDO
 
     DO NR=1,NRT(NZ,NY,NX)
-      if(I==133)print*,'nr,',nz,NR,NINRs1(NR,NZ)
       NINR(NR,NZ,NY,NX)=NINRs1(NR,NZ)
       DO N=1,2
         RTWT1(N,NR,NZ,NY,NX)=RTWT1s1(N,NR,NZ)
@@ -703,8 +700,9 @@ implicit none
   subroutine PlantAPISend(I,J,NY,NX)
   implicit none
   integer, intent(in) :: I,J,NY,NX
-  integer :: K,L,M,N,NB,NZ,NR
+  integer :: K,L,M,N,NB,NZ,NR,I1
 
+  I1=I+1;if(I1>366)I1=1
   ZEROs1=ZERO
   ALATs1=ALAT(NY,NX)
   ATCAs1=ATCA(NY,NX)
@@ -725,7 +723,7 @@ implicit none
   DYLNs1=DYLN(NY,NX)
   DPTHSs1=DPTHS(NY,NX)
   DYLMs1=DYLM(NY,NX)
-  IYTYPs1=IYTYP(2,I+1,NY,NX)
+  IYTYPs1=IYTYP(2,I1,NY,NX)
   IETYPs1=IETYP(NY,NX)
   IFLGTs1=IFLGT(NY,NX)
   IYRCs1=IYRC
@@ -735,7 +733,6 @@ implicit none
   NJs1=NJ(NY,NX)
   NPs1=NP(NY,NX)
   NUs1=NU(NY,NX)
-  if(I==133)print*,'NL,NU',NLs1,NUs1
   OXYEs1=OXYE(NY,NX)
   PPTs1=PPT(NY,NX)
   RABs1=RAB(NY,NX)
@@ -768,7 +765,7 @@ implicit none
   IDATAs1(:)=IDATA(:)
 
   DCORPs1(I)=DCORP(I,NY,NX)
-  FERTs1(1:20,I+1)=FERT(1:20,I+1,NY,NX)
+  FERTs1(1:20,I1)=FERT(1:20,I1,NY,NX)
   ITILLs1(I)=ITILL(I,NY,NX)
 
   DO L=0,JC

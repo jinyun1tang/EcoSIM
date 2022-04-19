@@ -5,7 +5,7 @@ implicit none
   save
   character(len=*), private, parameter :: mod_filename = __FILE__
 
-  integer, PARAMETER :: JX=4
+  integer, PARAMETER :: JX=6
   integer, PARAMETER :: JY=4
   integer, PARAMETER :: JZ=20
   integer, PARAMETER :: JH=JX+1

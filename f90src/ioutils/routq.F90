@@ -71,6 +71,7 @@ SUBROUTINE routq(NT,NE,NTX,NEX,NHW,NHE,NVN,NVS)
     NN=1
     DO 4995 NX=NH1,NH2
       DO 4990 NY=NV1,NV2
+        print*,'NY,NX',NY,NX
         NP0(NY,NX)=NS
         DO 4985 NZ=1,NS
           LSG(NZ,NY,NX)=NN

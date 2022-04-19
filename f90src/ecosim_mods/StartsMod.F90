@@ -4,7 +4,7 @@ module StartsMod
 ! code to initalize soil variables
 
   use data_kind_mod, only : r8 => SHR_KIND_R8
-  use abortutils, only : padr, print_info
+  use abortutils, only : padr, print_info,check_bool
   use minimathMod, only : test_aeqb, test_aneb
   use EcosimConst
   use MicrobialDataType
@@ -50,6 +50,7 @@ module StartsMod
   !     CDPTHSI=depth to bottom of snowpack layers
   !     POROQ=Penman Water Linear Reduction tortuosity used in gas flux calculations
   !
+  character(len=*), private, parameter :: mod_filename = __FILE__
 
   public :: starts
   contains
@@ -905,6 +906,8 @@ module StartsMod
     ELSE
       IF(BKDSI(L,NY,NX).LE.ZERO)FHOL(L,NY,NX)=0.0
       DLYRI(3,L,NY,NX)=(CDPTH(L,NY,NX)-CDPTH(L-1,NY,NX))
+      call check_bool(DLYRI(3,L,NY,NX)<0._r8,'negative soil layer thickness',&
+        __LINE__,mod_filename)
 !      if(abs(DLYRI(3,L,NY,NX))<1.e-10_r8)then
 !      print*,'L,NX,NY=',L,NX,NY
 !      print*,'DLYRI(3,L,NY,NX)=',DLYRI(3,L,NY,NX)
