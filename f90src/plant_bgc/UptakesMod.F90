@@ -1,8 +1,9 @@
-)module UptakesMod
+module UptakesMod
   use data_kind_mod, only : r8 => SHR_KIND_R8
   use StomatesMod   , only : stomates
   use minimathmod  , only : safe_adb,vapsat,test_aneb
   use EcosimConst
+  use EcoSIMSolverPar
   use UptakePars
   use PlantAPIData
   implicit none
@@ -14,7 +15,6 @@
   public :: uptakes
   public :: InitUptake
   contains
-
 
   subroutine InitUptake
 
@@ -37,18 +37,18 @@
   real(r8) :: FPC
   real(r8) :: OSTRN,OSTRD,PARHC
   real(r8) :: WVPLT
-  real(r8) :: PSIST1(JZ),PATH(2,JZ)
-  real(r8) :: RRADL(2,JZ),RSRT(2,JZ)
-  real(r8) :: RSRG(2,JZ),RSR1(2,JZ)
-  real(r8) :: RSR2(2,JZ),RSSX(2,JZ)
-  real(r8) :: RSRS(2,JZ),WTRTG(JZ)
-  real(r8) :: FPQ(2,JZ,05),FPP(2,JZ,05)
-  real(r8) :: FRTDPX(JZ,05),RTARR(2,JZ)
-  real(r8) :: VOLPU(JZ),VOLWU(JZ)
+  real(r8) :: PSIST1(JZ1),PATH(2,JZ1)
+  real(r8) :: RRADL(2,JZ1),RSRT(2,JZ1)
+  real(r8) :: RSRG(2,JZ1),RSR1(2,JZ1)
+  real(r8) :: RSR2(2,JZ1),RSSX(2,JZ1)
+  real(r8) :: RSRS(2,JZ1),WTRTG(JZ1)
+  real(r8) :: FPQ(2,JZ1,JP1),FPP(2,JZ1,JP1)
+  real(r8) :: FRTDPX(JZ1,JP1),RTARR(2,JZ1)
+  real(r8) :: VOLPU(JZ1),VOLWU(JZ1)
   real(r8) :: TKCX,CNDT,HFLWC1,VHCPX
   real(r8) :: DIFF,PSILH,UPRT,VFLXC
   real(r8) :: FDMP
-  integer :: ILYR(2,JZ)
+  integer :: ILYR(2,JZ1)
 !     begin_execution
 
 
@@ -74,7 +74,7 @@
 !
 !     (AG: - originally this line had a N0B1 here )
       IF((IDAYs1(1,NB1s1(NZ),NZ).NE.0).AND.(ARLFSs1(NZ).GT.ZEROLs1(NZ) &
-        .AND.FRADPs1(NZ).GT.0.0).AND.(RTDP1s1(1,1,NZ).GT.SDPTHs1(NZ)+CDPTHZs1(0)))THEN
+        .AND.FRADPs1(NZ).GT.0.0_r8).AND.(RTDP1s1(1,1,NZ).GT.SDPTHs1(NZ)+CDPTHZs1(0)))THEN
 !
         call CalcResistance(NZ,PATH,RRADL,RTARR,RSRT,RSRG,RSR1,RSR2,RSSX,RSRS,CNDT,PSILH,ILYR)
 !
@@ -166,8 +166,7 @@
 !
 !     prepare for uptake calculation
   implicit none
-  integer, intent(in) :: NY, NX
-  real(r8), intent(out) :: PSIST1(JZ),WTRTG(JZ),VOLPU(JZ),VOLWU(JZ)
+  real(r8), intent(out) :: PSIST1(JZ1),WTRTG(JZ1),VOLPU(JZ1),VOLWU(JZ1)
   integer :: NZ, L, N
   real(r8) :: ARLSC
 
@@ -230,7 +229,7 @@
 !
 !     PSIST1=total soil water potential PSIST adjusted for surf elevn
 !     ALT=surface elevation
-!     VOLWU,VOLWM=water volume available for uptake,total water volume
+!     VOLWU,VOLWMs1=water volume available for uptake,total water volume
 !     THETY,VOLX=hygroscopic SWC,soil volume
 !     VOLPU=air volume
 !     WTRTG=total biome root mass
@@ -238,10 +237,10 @@
   DO 9000 L=NUs1,NJs1
     PSIST1(L)=PSISTs1(L)-0.0098_r8*ALTs1
     IF(BKDSs1(L).GT.ZEROs1)THEN
-      VOLWU(L)=VOLWM(NPH,L)-THETYs1(L)*VOLYs1(L)
+      VOLWU(L)=VOLWMs1(NPH,L)-THETYs1(L)*VOLYs1(L)
       VOLPU(L)=AMAX1(0.0,VOLAs1(L)-VOLWs1(L)-VOLIs1(L))
     ELSE
-      VOLWU(L)=VOLWM(NPH,L)
+      VOLWU(L)=VOLWMs1(NPH,L)
       VOLPU(L)=0.0_r8
     ENDIF
     WTRTG(L)=0.0_r8
@@ -261,7 +260,7 @@
   implicit none
   integer, intent(in) :: NZ
   real(r8) :: ALFZ
-  real(r8) :: TFRADP,RACZ(JP)
+  real(r8) :: TFRADP,RACZs1(JP1)
   integer :: NB,K,L,N,NZZ
 !
 !     APPLY CLUMPING FACTOR TO LEAF SURFACE AREA DEFINED BY
@@ -269,7 +268,7 @@
 !     N-S POSITION NY, E-W POSITION NX(AZIMUTH M ASSUMED UNIFORM)
 !
   DO 500 NB=1,NBRs1(NZ)
-    DO 550 K=1,JNODS
+    DO 550 K=1,JNODS1
 !
 !     NUMBER OF MINIMUM LEAFED NODE USED IN GROWTH ALLOCATION
 !
@@ -278,7 +277,7 @@
 !     SURFX,SURF=unself-shaded,total leaf surface area
 !     CFX=clumping factor from PFT file
 !
-      IF(ARLFs1(K,NB,NZ).GT.ZEROPs1(NZ) &
+      IF(ARLF1s1(K,NB,NZ).GT.ZEROPs1(NZ) &
         .AND.WSLFs1(K,NB,NZ).GT.ZEROPs1(NZ))THEN
         KLEAFXs1(NB,NZ)=K
       ENDIF
@@ -303,16 +302,16 @@
 !     RAB=biome canopy isothermal boundary layer resistance
 !     RACZ,RAZ=additional,total PFT canopy isothermal blr
 !
-  IF(ARLFSs1(NZ).GT.0.0)THEN
+  IF(ARLFSs1(NZ).GT.0.0_r8)THEN
     IF(IETYPs1.GE.0)THEN
       TFRADP=0.0_r8
       DO 700 NZZ=1,NPs1
-        IF(ZC(NZZ).GT.ZCs1(NZ)+ZRs1)THEN
-          TFRADP=TFRADP+FRADP(NZZ)
+        IF(ZCs1(NZZ).GT.ZCs1(NZ)+ZRs1)THEN
+          TFRADP=TFRADP+FRADPs1(NZZ)
         ENDIF
 700   CONTINUE
-      ALFZ=2.0*TFRADP
-      IF(RABs1.GT.ZERO.AND.ZTs1.GT.ZERO.AND.ALFZ.GT.ZEROs1)THEN
+      ALFZ=2.0_r8*TFRADP
+      IF(RABs1.GT.ZEROs1.AND.ZTs1.GT.ZEROs1.AND.ALFZ.GT.ZEROs1)THEN
         RACZs1(NZ)=AMIN1(RACX,AMAX1(0.0,ZTs1*EXP(ALFZ) &
           /(ALFZ/RABs1)*(EXP(-ALFZ*ZCs1(NZ)/ZTs1) &
           -EXP(-ALFZ*(ZDs1+ZRs1)/ZTs1))))
@@ -345,10 +344,10 @@
 
   implicit none
   integer, intent(in) :: NZ
-  real(r8), intent(in) :: WTRTG(JZ)
-  real(r8), intent(out) :: PATH(2,JZ),RRADL(2,JZ)
-  real(r8), intent(out) :: FPQ(2,JZ,05),FPP(2,JZ,05)
-  real(r8), intent(out) :: FRTDPX(JZ,05),RTARR(2,JZ)
+  real(r8), intent(in) :: WTRTG(JZ1)
+  real(r8), intent(out) :: PATH(2,JZ1),RRADL(2,JZ1)
+  real(r8), intent(out) :: FPQ(2,JZ1,JP1),FPP(2,JZ1,JP1)
+  real(r8), intent(out) :: FRTDPX(JZ1,JP1),RTARR(2,JZ1)
   real(r8) :: RTDPZ,RTDPX
   integer :: N,L,NR
 !     RTDPZ,RTDP1=primary root depth
@@ -375,13 +374,13 @@
           RTDPZ=AMAX1(RTDPZ,RTDP1s1(1,NR,NZ))
 2005    CONTINUE
         IF(L.EQ.NUs1)THEN
-          FRTDPX(L,NZ)=1.0
+          FRTDPX(L,NZ)=1.0_r8
         ELSE
-          IF(DLYR(3,L).GT.ZEROs1)THEN
-            RTDPX=AMAX1(0.0,RTDPZ-CDPTHZs1(L-1))
-            RTDPX=AMAX1(0.0,AMIN1(DLYR(3,L),RTDPX) &
+          IF(DLYR3S1(L).GT.ZEROs1)THEN
+            RTDPX=AMAX1(0.0_r8,RTDPZ-CDPTHZs1(L-1))
+            RTDPX=AMAX1(0.0_r8,AMIN1(DLYR3S1(L),RTDPX) &
               -AMAX1(0.0,SDPTHs1(NZ)-CDPTHZs1(L-1)-HTCTLs1(NZ)))
-            FRTDPX(L,NZ)=RTDPX/DLYR(3,L)
+            FRTDPX(L,NZ)=RTDPX/DLYR3S1(L)
           ELSE
             FRTDPX(L,NZ)=0.0_r8
           ENDIF
@@ -389,12 +388,12 @@
 
       ENDIF
       IF(WTRTG(L).GT.ZEROSs1)THEN
-        FPQs1(N,L,NZ)=AMAX1(0.0,WTRTDs1(N,L,NZ))/WTRTG(L)
+        FPQ(N,L,NZ)=AMAX1(0.0,WTRTDs1(N,L,NZ))/WTRTG(L)
       ELSE
-        FPQs1(N,L,NZ)=1.0
+        FPQ(N,L,NZ)=1.0
       ENDIF
-      FPPs1(N,L,NZ)=FMN*FPQs1(N,L,NZ)
-      IF(RTDNPs1(N,L,NZ).GT.ZERO.AND.FRTDPX(L,NZ).GT.ZEROs1)THEN
+      FPP(N,L,NZ)=FMN*FPQ(N,L,NZ)
+      IF(RTDNPs1(N,L,NZ).GT.ZEROs1.AND.FRTDPX(L,NZ).GT.ZEROs1)THEN
         RRADL(N,L)=AMAX1(RRAD2Xs1(N,NZ),SQRT((RTVLWs1(N,L,NZ) &
           /(1.0-PORTs1(N,NZ)))/(PICON*PPs1(NZ)*RTLGPs1(N,L,NZ))))
         PATH(N,L)=AMAX1(1.001*RRADL(N,L) &
@@ -415,7 +414,7 @@
   implicit none
   integer  , intent(in) :: NN, I, J
   integer  , intent(in) :: NZ
-  REAL(R8) ,INTENT(IN) :: PSIST1(JZ),DIFF
+  REAL(R8) ,INTENT(IN) :: PSIST1(JZ1),DIFF
   real(r8), intent(inout):: FDMP
   real(r8) :: APSILT,APSIRT
   real(r8) :: CCPOLT
@@ -426,7 +425,7 @@
   integer :: N,L
 
   IF(NN.GE.MXN)THEN
-    WRITE(*,9999)IYRC,I,J,NX,NY,NZ
+    WRITE(*,9999)IYRCs1,I,J,NZ
 9999  FORMAT('CONVERGENCE FOR WATER UPTAKE NOT ACHIEVED ON   ',6I4)
     IF(DIFF.GT.0.5)THEN
       RAD1s1(NZ)=0.0_r8
@@ -444,8 +443,7 @@
       FDMP=0.16+0.10*APSILT/(0.05*APSILT+2.0)
       CCPOLT=CCPOLPs1(NZ)+CZPOLPs1(NZ)+CPPOLPs1(NZ)
       OSWT=36.0+840.0*AMAX1(0.0,CCPOLT)
-      PSILOs1(NZ)=FDMP/0.16*OSMOs1(NZ) &
-        -RGAS*TKCs1(NZ)*FDMP*CCPOLT/OSWT
+      PSILOs1(NZ)=FDMP/0.16*OSMOs1(NZ)-RGAS*TKCs1(NZ)*FDMP*CCPOLT/OSWT
       PSILGs1(NZ)=AMAX1(0.0,PSILTs1(NZ)-PSILOs1(NZ))
       WFNC=EXP(RCSs1(NZ)*PSILGs1(NZ))
       RCs1(NZ)=RSMNs1(NZ)+(RSMHs1(NZ)-RSMNs1(NZ))*WFNC
@@ -475,10 +473,10 @@
   implicit none
   integer  , intent(in) :: I, J
   integer  , intent(in) :: NZ
-  real(r8) , intent(in) :: FPC,WVPLT,PSIST1(JZ)
-  real(r8) , intent(in) :: RSRS(2,JZ),FPQ(2,JZ,05),VOLPU(JZ),VOLWU(JZ)
+  real(r8) , intent(in) :: FPC,WVPLT,PSIST1(JZ1)
+  real(r8) , intent(in) :: RSRS(2,JZ1),FPQ(2,JZ1,JP1),VOLPU(JZ1),VOLWU(JZ1)
   real(r8) , intent(in) :: TKCX,CNDT,VHCPX,HFLWC1,PSILH
-  integer  , intent(in) :: ILYR(2,JZ)
+  integer  , intent(in) :: ILYR(2,JZ1)
   real(r8) , intent(out):: PARHC,DIFF,UPRT,VFLXC,FDMP
   real(r8) :: APSILT
   real(r8) :: CCPOLT
@@ -657,8 +655,8 @@
       DO N=1,MYs1(NZ)
         DO  L=NUs1,NIs1(NZ)
           IF(ILYR(N,L).EQ.1)THEN
-            UPWTRs1(N,L,NZ)=AMAX1(AMIN1(0.0,-VOLWU(L)*FPQs1(N,L,NZ)) &
-              ,AMIN1((PSILC-PSIST1(L))/RSRS(N,L),VOLPU(L)*FPQs1(N,L,NZ)))
+            UPWTRs1(N,L,NZ)=AMAX1(AMIN1(0.0,-VOLWU(L)*FPQ(N,L,NZ)) &
+              ,AMIN1((PSILC-PSIST1(L))/RSRS(N,L),VOLPU(L)*FPQ(N,L,NZ)))
             IF(UPWTRs1(N,L,NZ).GT.0.0)THEN
               UPWTRs1(N,L,NZ)=0.1*UPWTRs1(N,L,NZ)
             ENDIF
@@ -687,7 +685,12 @@
       ELSE
         DIFF=ABS((DIFFU-DIFFZ)/VOLWPZ)
       ENDIF
-      IF(DIFF.LT.5.0E-03_r8)GO TO 4250
+      IF(DIFF.LT.5.0E-03_r8)THEN
+        IF(ICHK.EQ.1)EXIT
+        ICHK=1
+        CALL STOMATEs(I,J,NZ)
+        CYCLE
+      ENDIF
       IF(ABS(VOLWPZ-VOLWPX).GT.ZEROPs1(NZ))THEN
         RSSZ=ABS((PSILTs1(NZ)-PSIL2)/(VOLWPZ-VOLWPX))
       ELSEIF(CNDT.GT.ZEROPs1(NZ))THEN
@@ -728,18 +731,18 @@
 !     OTHERWISE START NEXT ITERATION WITH CANOPY WATER POTENTIAL
 !     TRANSPIRATION, UPTAKE AND WATER CONTENT FROM CURRENT ITERATION
 !
-      IF(.not.((NN.GE.30.AND.ABS(DPSI).LT.1.0E-03).OR.NN.GE.MXN))then
+      IF(.not.((NN.GE.30.AND.ABS(DPSI).LT.1.0E-03_r8).OR.NN.GE.MXN))then
         PSIL2=PSILTs1(NZ)
         EPX=EPs1(NZ)
         UPRTX=UPRT
         VOLWPX=VOLWPZ
-        PSILTs1(NZ)=AMIN1(0.0,PSILTs1(NZ)+0.5*DPSI)
-        XC=0.50
+        PSILTs1(NZ)=AMIN1(0.0_r8,PSILTs1(NZ)+0.5_r8*DPSI)
+        XC=0.50_r8
         cycle
 !
 !     RESET MIN STOMATAL RESISTANCE IN STOMATE.F BEFORE FINAL ITERATION
 !
-      else
+      ELSE
         IF(ICHK.EQ.1)EXIT
         ICHK=1
         CALL STOMATEs(I,J,NZ)
@@ -755,13 +758,13 @@
     RSRT,RSRG,RSR1,RSR2,RSSX,RSRS,CNDT,PSILH,ILYR)
 
   implicit none
-  integer, intent(in)   :: NZ, NY, NX
-  real(r8), intent(in)  :: PATH(2,JZ),RRADL(2,JZ),RTARR(2,JZ)
-  real(r8), intent(out) :: RSRT(2,JZ),RSRG(2,JZ)
-  real(r8), intent(out) :: RSR1(2,JZ),RSR2(2,JZ)
-  real(r8), intent(out) :: RSSX(2,JZ),RSRS(2,JZ),CNDT
+  integer, intent(in)   :: NZ
+  real(r8), intent(in)  :: PATH(2,JZ1),RRADL(2,JZ1),RTARR(2,JZ1)
+  real(r8), intent(out) :: RSRT(2,JZ1),RSRG(2,JZ1)
+  real(r8), intent(out) :: RSR1(2,JZ1),RSR2(2,JZ1)
+  real(r8), intent(out) :: RSSX(2,JZ1),RSRS(2,JZ1),CNDT
   real(r8), intent(out) :: PSILH
-  integer, intent(out) :: ILYR(2,JZ)
+  integer, intent(out) :: ILYR(2,JZ1)
   real(r8) :: FRADW,FRAD1,FRAD2
   real(r8) :: RSSL,RTAR2
   integer :: N, L
@@ -781,7 +784,7 @@
 !
   !     SOIL AND ROOT HYDRAULIC RESISTANCES TO ROOT WATER UPTAKE
   !
-  !      VOLX,VOLWM,THETW=soil,water volume,content
+  !      VOLX,VOLWMs1,THETW=soil,water volume,content
   !     RTDNP,RTLGP=root length density,root length per plant
   !     CNDU=soil hydraulic conductivity for root uptake
   !     RTN1,RTNL=number of root,myco primary,secondary axes
@@ -792,15 +795,15 @@
     DO  L=NUs1,NIs1(NZ)
       !     IF(NZ.EQ.2)THEN
       !     WRITE(*,2124)'ILYR',I,J,NX,NY,NZ,L,N,RTDNPs1(N,L,NZ)
-      !    2,CNDUs1(L),RTN1(1,L,NZ),RTNLs1(N,L,NZ)
+      !    2,CNDUs1(L),RTN1s1(1,L,NZ),RTNLs1(N,L,NZ)
       !    3,THETWs1(L),ZEROPs1(NZ)
 !2124  FORMAT(A8,7I4,20E12.4)
 !      ENDIF
       IF(VOLXs1(L).GT.ZEROS2s1 &
-        .AND.VOLWM(NPH,L).GT.ZEROS2s1 &
-        .AND.RTDNPs1(N,L,NZ).GT.ZERO &
-        .AND.CNDUs1(L).GT.ZERO &
-        .AND.RTN1(1,L,NZ).GT.ZEROPs1(NZ) &
+        .AND.VOLWMs1(NPH,L).GT.ZEROS2s1 &
+        .AND.RTDNPs1(N,L,NZ).GT.ZEROs1 &
+        .AND.CNDUs1(L).GT.ZEROs1 &
+        .AND.RTN1s1(1,L,NZ).GT.ZEROPs1(NZ) &
         .AND.RTNLs1(N,L,NZ).GT.ZEROPs1(NZ) &
         .AND.THETWs1(L).GT.ZEROs1)THEN
         ILYR(N,L)=1
@@ -826,7 +829,7 @@
         !     VOLA,VOLWM=soil micropore,water volume
         !
         RTAR2=6.283*RRAD2s1(N,L,NZ)*RTLGPs1(N,L,NZ)*PPs1(NZ)
-        RSRG(N,L)=RSRRs1(N,NZ)/RTAR2*VOLAs1(L)/VOLWM(NPH,L)
+        RSRG(N,L)=RSRRs1(N,NZ)/RTAR2*VOLAs1(L)/VOLWMs1(NPH,L)
 !
         !     ROOT AXIAL RESISTANCE FROM RADII AND LENGTHS OF PRIMARY AND
         !     SECONDARY ROOTS AND FROM AXIAL RESISTIVITY ENTERED IN 'READQ'
@@ -841,8 +844,8 @@
         !     RTN1,RTNL=number of primary,secondary axes
 !
         FRAD1=(RRAD1s1(N,L,NZ)/RRAD2Ms1(N,NZ))**4
-        RSR1(N,L)=RSRAs1(N,NZ)*DPTHZs1(L)/(FRAD1*RTN1(1,L,NZ)) &
-          +RSRA(1,NZ)*HTSTZs1(NZ)/(FRADW*RTN1(1,L,NZ))
+        RSR1(N,L)=RSRAs1(N,NZ)*DPTHZs1(L)/(FRAD1*RTN1s1(1,L,NZ)) &
+          +RSRAs1(1,NZ)*HTSTZs1(NZ)/(FRADW*RTN1s1(1,L,NZ))
         FRAD2=(RRAD2s1(N,L,NZ)/RRAD2Ms1(N,NZ))**4
         RSR2(N,L)=RSRAs1(N,NZ)*RTLGAs1(N,L,NZ)/(FRAD2*RTNLs1(N,L,NZ))
       ELSE
@@ -867,11 +870,11 @@
       !     IF(NZ.EQ.1.OR.NZ.EQ.4)THEN
       !     WRITE(*,8855)'RSRT',I,J,NX,NY,NZ,L,N,RSRT(N,L),RSRG(N,L)
       !    2,RSR1(N,L),RSR2(N,L),RSSX(N,L),RSRS(N,L),DPTHZs1(L)
-      !    3,HTSTZs1(NZ),RSRA(1,NZ)*HTSTZs1(NZ)
-      !    4/(FRADW*AMAX1(PPs1(NZ),RTN1(1,L,NZ)))
+      !    3,HTSTZs1(NZ),RSRAs1(1,NZ)*HTSTZs1(NZ)
+      !    4/(FRADW*AMAX1(PPs1(NZ),RTN1s1(1,L,NZ)))
       !    4,RTNLs1(N,L,NZ),RTLGPs1(N,L,NZ)
       !    7,RTLGAs1(N,L,NZ),FRAD1,PPs1(NZ)
-      !    8,RTN1(1,L,NZ),FRADW,RTNLs1(N,L,NZ),CNDT
+      !    8,RTN1s1(1,L,NZ),FRADW,RTNLs1(N,L,NZ),CNDT
     !8855  FORMAT(A8,7I4,30E14.6)
       !     ENDIF
       ENDIF
@@ -884,7 +887,7 @@
 
   implicit none
   integer, intent(in) :: NZ
-  real(r8), intent(in) :: PSIST1(JZ)
+  real(r8), intent(in) :: PSIST1(JZ1)
   real(r8), intent(out):: FDMP
   integer :: N,L
   real(r8) :: APSILT,APSIRT
@@ -902,37 +905,35 @@
   IF(ZCs1(NZ).GE.DPTHSs1-ZEROs1)THEN
     TKCs1(NZ)=TKAs1
   ELSE
-    TKCs1(NZ)=TKW(1)
+    TKCs1(NZ)=TKWs1
   ENDIF
   TCCs1(NZ)=TKCs1(NZ)-TC2K
-  FTHRM=EMMC*2.04E-10*FRADPs1(NZ)*AREA3Us1
+  FTHRM=EMMC*2.04E-10_r8*FRADPs1(NZ)*AREA3Us1
   THRM1s1(NZ)=FTHRM*TKCs1(NZ)**4
   PSILTs1(NZ)=PSIST1(NGs1(NZ))
   APSILT=ABS(PSILTs1(NZ))
-  FDMP=0.16+0.10*APSILT/(0.05*APSILT+2.0)
+  FDMP=0.16_r8+0.10_r8*APSILT/(0.05_r8*APSILT+2.0_r8)
   CCPOLT=CCPOLPs1(NZ)+CZPOLPs1(NZ)+CPPOLPs1(NZ)
-  OSWT=36.0+840.0*AMAX1(0.0,CCPOLT)
-  PSILOs1(NZ)=FDMP/0.16*OSMOs1(NZ) &
-    -RGAS*TKCs1(NZ)*FDMP*CCPOLT/OSWT
-  PSILGs1(NZ)=AMAX1(0.0,PSILTs1(NZ)-PSILOs1(NZ))
+  OSWT=36.0_r8+840.0_r8*AMAX1(0.0_r8,CCPOLT)
+  PSILOs1(NZ)=FDMP/0.16_r8*OSMOs1(NZ)-RGAS*TKCs1(NZ)*FDMP*CCPOLT/OSWT
+  PSILGs1(NZ)=AMAX1(0.0_r8,PSILTs1(NZ)-PSILOs1(NZ))
   WFNC=EXP(RCSs1(NZ)*PSILGs1(NZ))
   RCs1(NZ)=RSMNs1(NZ)+(RSMHs1(NZ)-RSMNs1(NZ))*WFNC
   RAs1(NZ)=RAZs1(NZ)
-  VHCPCs1(NZ)=cpw*(WTSHTs1(NZ)*10.0E-06)
+  VHCPCs1(NZ)=cpw*(WTSHTs1(NZ)*10.0E-06_r8)
   DTKCs1(NZ)=0.0_r8
-  DO 4300 N=1,MYs1(NZ)
+  DO N=1,MYs1(NZ)
     DO  L=NUs1,NIs1(NZ)
       PSIRTs1(N,L,NZ)=PSIST1(L)
       APSIRT=ABS(PSIRTs1(N,L,NZ))
-      FDMR=0.16+0.10*APSIRT/(0.05*APSIRT+2.0)
+      FDMR=0.16_r8+0.10_r8*APSIRT/(0.05*APSIRT+2.0_r8)
       CCPOLT=CCPOLRs1(N,L,NZ)+CZPOLRs1(N,L,NZ)+CPPOLRs1(N,L,NZ)
-      OSWT=36.0+840.0*AMAX1(0.0,CCPOLT)
-      PSIROs1(N,L,NZ)=FDMR/0.16*OSMOs1(NZ) &
-        -RGAS*TKSs1(L)*FDMR*CCPOLT/OSWT
-      PSIRGs1(N,L,NZ)=AMAX1(0.0,PSIRTs1(N,L,NZ)-PSIROs1(N,L,NZ))
+      OSWT=36.0_r8+840.0_r8*AMAX1(0.0_r8,CCPOLT)
+      PSIROs1(N,L,NZ)=FDMR/0.16_r8*OSMOs1(NZ)-RGAS*TKSs1(L)*FDMR*CCPOLT/OSWT
+      PSIRGs1(N,L,NZ)=AMAX1(0.0_r8,PSIRTs1(N,L,NZ)-PSIROs1(N,L,NZ))
       UPWTRs1(N,L,NZ)=0.0_r8
     enddo
-4300  CONTINUE
+  ENDDO
   end subroutine HandleBareSoil
 !------------------------------------------------------------------------
 
@@ -941,10 +942,10 @@
 
   implicit none
   integer, intent(in) :: NZ
-  real(r8), intent(in) :: PARHC,PSIST1(JZ),RSRT(2,JZ)
-  real(r8), intent(in) :: RSSX(2,JZ),RSRS(2,JZ)
+  real(r8), intent(in) :: PARHC,PSIST1(JZ1),RSRT(2,JZ1)
+  real(r8), intent(in) :: RSSX(2,JZ1),RSRS(2,JZ1)
   real(r8), intent(in) :: TKCX,VHCPX,HFLWC1,UPRT,VFLXC
-  integer , intent(in) :: ILYR(2,JZ)
+  integer , intent(in) :: ILYR(2,JZ1)
   real(r8) :: APSIRT
   real(r8) :: CCPOLT
   real(r8) :: FDMR
@@ -1001,7 +1002,7 @@
 !     IF(I.EQ.284)THEN
 !     WRITE(*,1256)'PSIRT',I,J,NX,NY,NZ,NN,PSIRTs1(N,L,NZ)
 !    2,PSIST1(L),RSRT(N,L),PSILTs1(NZ),RSSX(N,L),RSRS(N,L)
-!    3,RSRG(N,L),RSR1(N,L),RSR2(N,L),RTAR2,VOLWM(NPH,L)
+!    3,RSRG(N,L),RSR1(N,L),RSR2(N,L),RTAR2,VOLWMs1(NPH,L)
 !1256  FORMAT(A8,6I4,20E12.4)
 !     ENDIF
 4510  CONTINUE
@@ -1009,7 +1010,7 @@
   end subroutine UpdateCanopyWater
 !------------------------------------------------------------------------
 
-  subroutine SetCanopyGrowthFuncss1(NZ)
+  subroutine SetCanopyGrowthFuncs(NZ)
 
   implicit none
   integer, intent(in) :: NZ
@@ -1020,10 +1021,10 @@
   !     OR CANOPY TEMPERATURE DEPENDING ON GROWTH STAGE
   !
   IF(IDAYs1(1,NB1s1(NZ),NZ).EQ.0)THEN
-    TKGs1(NZ)=TKS(NUs1)
+    TKGs1(NZ)=TKSs1(NUs1)
     !     ELSEIF((IBTYPs1(NZ).EQ.0.OR.IGTYPs1(NZ).LE.1)
     !    2.AND.IDAYs1(2,NB1s1(NZ),NZ).EQ.0)THEN
-    !     TKGs1(NZ)=TKS(NUs1)
+    !     TKGs1(NZ)=TKSs1(NUs1)
   ELSE
     TKGs1(NZ)=TKCs1(NZ)
   ENDIF
@@ -1050,7 +1051,7 @@
     RTK=RGAS*TKSO
     STK=710.0*TKSO
     ACTV=1+EXP((197500-STK)/RTK)+EXP((STK-222500)/RTK)
-    TFN4(L,NZ)=EXP(25.229-62500/RTK)/ACTV
+    TFN4s1(L,NZ)=EXP(25.229-62500/RTK)/ACTV
 100   CONTINUE
   PSILZs1(NZ)=AMIN1(PSILZs1(NZ),PSILTs1(NZ))
   !
@@ -1095,23 +1096,23 @@
   SNH3P=SNH3X*EXP(0.513-0.0171*TCCs1(NZ))
   FNH3P=1.0E-04*FDMP
   DO 105 NB=1,NBRs1(NZ)
-    IF(WTLSB(NB,NZ).GT.ZEROPs1(NZ) &
-      .AND.ARLFB(NB,NZ).GT.ZEROPs1(NZ) &
+    IF(WTLSBs1(NB,NZ).GT.ZEROPs1(NZ) &
+      .AND.ARLFBs1(NB,NZ).GT.ZEROPs1(NZ) &
       .AND.ARLFPs1(NZ).GT.ZEROPs1(NZ))THEN
-      CNH3P=AMAX1(0.0,FNH3P*CZPOLB(NB,NZ)/SNH3P)
-      ZPOOLB=AMAX1(0.0,ZPOOL(NB,NZ))
-      RNH3B(NB,NZ)=AMIN1(0.1*ZPOOLB,AMAX1((CNH3Es1-CNH3P)/(RAs1(NZ)+RCs1(NZ)) &
+      CNH3P=AMAX1(0.0,FNH3P*CZPOLBs1(NB,NZ)/SNH3P)
+      ZPOOLB=AMAX1(0.0,ZPOOLs1(NB,NZ))
+      RNH3Bs1(NB,NZ)=AMIN1(0.1*ZPOOLB,AMAX1((CNH3Es1-CNH3P)/(RAs1(NZ)+RCs1(NZ)) &
       *FRADPs1(NZ)*AREA3Us1 &
-      *ARLFB(NB,NZ)/ARLFPs1(NZ),-0.1*ZPOOLB))
+      *ARLFBs1(NB,NZ)/ARLFPs1(NZ),-0.1*ZPOOLB))
       ELSE
-      RNH3B(NB,NZ)=0.0_r8
+      RNH3Bs1(NB,NZ)=0.0_r8
       ENDIF
 
 105   CONTINUE
   end subroutine CanopyNH3Flux
 !------------------------------------------------------------------------
 
-  subroutine ZeroUptakes1(N,L,NZ)
+  subroutine ZeroUptake(N,L,NZ)
 
   implicit none
   integer, intent(in) :: N, L
@@ -1175,10 +1176,10 @@
   RUPH1Bs1(N,L,NZ)=0.0_r8
   RUOH1Bs1(N,L,NZ)=0.0_r8
   RUCH1Bs1(N,L,NZ)=0.0_r8
-  IF(N.EQ.1)RUPNF(L,NZ)=0.0_r8
+  IF(N.EQ.1)RUPNFs1(L,NZ)=0.0_r8
   end subroutine ZeroUptake
 !------------------------------------------------------------------------
-  subroutine NoActiveNutrientUptakes1(N,L,NZ)
+  subroutine NoActiveNutrientUptake(N,L,NZ)
 
   implicit none
   integer, intent(in) :: N, L
@@ -1247,7 +1248,7 @@
   !     RMFH1P=soil-root convective HPO4 flux per plant in non-band
   !     DIFH1P=soil-root HPO4 diffusion per plant in non-band
 !
-    IF(VLPO4s1(L).GT.ZERO.AND.CH1P4s1(L) &
+    IF(VLPO4s1(L).GT.ZEROs1.AND.CH1P4s1(L) &
       .GT.UPMNPOs1(N,NZ))THEN
       RMFH1P=UPWTRP*CH1P4s1(L)*VLPO4s1(L)
       DIFH1P=DIFFL*VLPO4s1(L)
@@ -1263,7 +1264,7 @@
     !     WFR=constraint by O2 consumption on all biological processes
     !
     UPMXP=0.1*UPMXPOs1(N,NZ)*RTARPs1(N,L,NZ) &
-      *FWSRT*TFN4(L,NZ)*VLPO4s1(L)*AMIN1(FCUP,FPUP)
+      *FWSRT*TFN4s1(L,NZ)*VLPO4s1(L)*AMIN1(FCUP,FPUP)
     UPMX=UPMXP*WFRs1(N,L,NZ)
     !
     !     SOLUTION FOR MASS FLOW + DIFFUSION OF HPO4 IN AQUEOUS PHASE OF
@@ -1300,7 +1301,7 @@
     !    2,H2PO4s1(L),RUPP2Ps1(N,L,NZ),UPMX,DIFPO,UPKMPOs1(N,NZ)
     !    3,UPMNPOs1(N,NZ),RMFH2P,CH2P4s1(L),UPMXP,WFRs1(N,L,NZ)
     !    4,FCUP,FZUP,FPUP,UPMXPOs1(N,NZ),RTARPs1(N,L,NZ),FWSRT
-    !    5,TFN4(L,NZ),DIFFL,FH2P,CPO4Ss1(L),CPOOLRs1(N,L,NZ)
+    !    5,TFN4s1(L,NZ),DIFFL,FH2P,CPO4Ss1(L),CPOOLRs1(N,L,NZ)
     !    6,PPOOLRs1(N,L,NZ),RTKH2P,PPs1(NZ)
     !    2,RTLGPs1(N,L,NZ)
 !2226  FORMAT(A8,5I4,40E12.4)
@@ -1321,7 +1322,7 @@
   !     RMFH1B=soil-root convective HPO4 flux per plant in band
   !     DIFH1B=soil-root HPO4 diffusion per plant in band
   !
-  IF(VLPOBs1(L).GT.ZERO.AND.CH1P4Bs1(L) &
+  IF(VLPOBs1(L).GT.ZEROs1.AND.CH1P4Bs1(L) &
     .GT.UPMNPOs1(N,NZ))THEN
     RMFH2B=UPWTRP*CH1P4Bs1(L)*VLPOBs1(L)
     DIFH1B=DIFFL*VLPOBs1(L)
@@ -1337,7 +1338,7 @@
     !     WFR=constraint by O2 consumption on all biological processes
     !
     UPMXP=0.1*UPMXPOs1(N,NZ)*RTARPs1(N,L,NZ) &
-      *FWSRT*TFN4(L,NZ)*VLPOBs1(L)*AMIN1(FCUP,FPUP)
+      *FWSRT*TFN4s1(L,NZ)*VLPOBs1(L)*AMIN1(FCUP,FPUP)
     UPMX=UPMXP*WFRs1(N,L,NZ)
     !
     !     SOLUTION FOR MASS FLOW + DIFFUSION OF HPO4 IN AQUEOUS PHASE OF
@@ -1402,7 +1403,7 @@
   !     RMFH2P=soil-root convective H2PO4 flux per plant in non-band
   !     DIFH2P=soil-root H2PO4 diffusion per plant in non-band
 !
-    IF(VLPO4s1(L).GT.ZERO.AND.CH2P4s1(L) &
+    IF(VLPO4s1(L).GT.ZEROs1.AND.CH2P4s1(L) &
       .GT.UPMNPOs1(N,NZ))THEN
       RMFH2P=UPWTRP*CH2P4s1(L)*VLPO4s1(L)
       DIFH2P=DIFFL*VLPO4s1(L)
@@ -1418,7 +1419,7 @@
       !     WFR=constraint by O2 consumption on all biological processes
 !
       UPMXP=UPMXPOs1(N,NZ)*RTARPs1(N,L,NZ) &
-        *FWSRT*TFN4(L,NZ)*VLPO4s1(L)*AMIN1(FCUP,FPUP)
+        *FWSRT*TFN4s1(L,NZ)*VLPO4s1(L)*AMIN1(FCUP,FPUP)
       UPMX=UPMXP*WFRs1(N,L,NZ)
       !
       !     SOLUTION FOR MASS FLOW + DIFFUSION OF H2PO4 IN AQUEOUS PHASE OF
@@ -1455,7 +1456,7 @@
       !    2,H2PO4s1(L),RUPP2Ps1(N,L,NZ),UPMX,DIFPO,UPKMPOs1(N,NZ)
       !    3,UPMNPOs1(N,NZ),RMFH2P,CH2P4s1(L),UPMXP,WFRs1(N,L,NZ)
       !    4,FCUP,FZUP,FPUP,UPMXPOs1(N,NZ),RTARPs1(N,L,NZ),FWSRT
-      !    5,TFN4(L,NZ),DIFFL,CPO4Ss1(L),CPOOLRs1(N,L,NZ)
+      !    5,TFN4s1(L,NZ),DIFFL,CPO4Ss1(L),CPOOLRs1(N,L,NZ)
       !    6,PPOOLRs1(N,L,NZ),RTKH2P,PPs1(NZ)
       !    2,RTLGPs1(N,L,NZ)
 !2223  FORMAT(A8,5I4,40E12.4)
@@ -1477,7 +1478,7 @@
     !     DIFH2B=soil-root H2PO4 diffusion per plant in band
     !
 
-  IF(VLPOBs1(L).GT.ZERO.AND.CH2P4Bs1(L) &
+  IF(VLPOBs1(L).GT.ZEROs1.AND.CH2P4Bs1(L) &
     .GT.UPMNPOs1(N,NZ))THEN
     RMFH2B=UPWTRP*CH2P4Bs1(L)*VLPOBs1(L)
     DIFH2B=DIFFL*VLPOBs1(L)
@@ -1493,7 +1494,7 @@
     !     WFR=constraint by O2 consumption on all biological processes
     !
     UPMXP=UPMXPOs1(N,NZ)*RTARPs1(N,L,NZ) &
-      *FWSRT*TFN4(L,NZ)*VLPOBs1(L)*AMIN1(FCUP,FPUP)
+      *FWSRT*TFN4s1(L,NZ)*VLPOBs1(L)*AMIN1(FCUP,FPUP)
     UPMX=UPMXP*WFRs1(N,L,NZ)
     !
     !     SOLUTION FOR MASS FLOW + DIFFUSION OF PO4 IN AQUEOUS PHASE OF
@@ -1540,8 +1541,8 @@
   implicit none
   integer, intent(in) :: N,L
   integer, intent(in) :: NZ
-  real(r8), intent(in):: PATH(2,JZ),RRADL(2,JZ),FPQ(2,JZ,05),FPP(2,JZ,05)
-  real(r8), intent(in):: RTARR(2,JZ),FCUP,FPUP,FWSRT,UPWTRP
+  real(r8), intent(in):: PATH(2,JZ1),RRADL(2,JZ1),FPQ(2,JZ1,JP1),FPP(2,JZ1,JP1)
+  real(r8), intent(in):: RTARR(2,JZ1),FCUP,FPUP,FWSRT,UPWTRP
   real(r8) :: TFPO4X,TFP14X,TFPOBX,TFP1BX
   real(r8) :: DIFFL
   real(r8) :: FP14X,FP1BX
@@ -1556,24 +1557,24 @@
 
 !     begin_execution
   IF(RPO4Ys1(L).GT.ZEROSs1)THEN
-    FPO4X=AMAX1(FPPs1(N,L,NZ),RUPP2Ps1(N,L,NZ)/RPO4Ys1(L))
+    FPO4X=AMAX1(FPP(N,L,NZ),RUPP2Ps1(N,L,NZ)/RPO4Ys1(L))
   ELSE
-    FPO4X=FPQs1(N,L,NZ)
+    FPO4X=FPQ(N,L,NZ)
   ENDIF
   IF(RPOBYs1(L).GT.ZEROSs1)THEN
-    FPOBX=AMAX1(FPPs1(N,L,NZ),RUPP2Bs1(N,L,NZ)/RPOBYs1(L))
+    FPOBX=AMAX1(FPP(N,L,NZ),RUPP2Bs1(N,L,NZ)/RPOBYs1(L))
   ELSE
-    FPOBX=FPQs1(N,L,NZ)
+    FPOBX=FPQ(N,L,NZ)
   ENDIF
   IF(RP14Ys1(L).GT.ZEROSs1)THEN
-    FP14X=AMAX1(FPPs1(N,L,NZ),RUPP1Ps1(N,L,NZ)/RP14Ys1(L))
+    FP14X=AMAX1(FPP(N,L,NZ),RUPP1Ps1(N,L,NZ)/RP14Ys1(L))
   ELSE
-    FP14X=FPQs1(N,L,NZ)
+    FP14X=FPQ(N,L,NZ)
   ENDIF
   IF(RP1BYs1(L).GT.ZEROSs1)THEN
-    FP1BX=AMAX1(FPPs1(N,L,NZ),RUPP1Bs1(N,L,NZ)/RP1BYs1(L))
+    FP1BX=AMAX1(FPP(N,L,NZ),RUPP1Bs1(N,L,NZ)/RP1BYs1(L))
   ELSE
-    FP1BX=FPQs1(N,L,NZ)
+    FP1BX=FPQ(N,L,NZ)
   ENDIF
 
   TFPO4X=TFPO4X+FPO4X
@@ -1582,7 +1583,7 @@
   TFPOBX=TFPOBX+FPOBX
   TFP1BX=TFP1BX+FP1BX
 
-  IF(FPUP.GT.ZERO2)THEN
+  IF(FPUP.GT.ZERO2s1)THEN
     !
     !     PARAMETERS FOR RADIAL MASS FLOW AND DIFFUSION OF H2PO4,HPO4
     !     FROM SOIL TO ROOT
@@ -1593,7 +1594,7 @@
     !     RRADL=root radius
     !     DIFFL=PO4 diffusion per plant
     !
-    POSGX=POSGLs1(L)*TORT(NPH,L)
+    POSGX=POSGLs1(L)*TORTs1(NPH,L)
     PATHL=AMIN1(PATH(N,L),RRADL(N,L)+SQRT(2.0*POSGX))
     DIFFL=POSGX*safe_adb(RTARR(N,L),LOG(PATHL/RRADL(N,L)))
 
@@ -1627,7 +1628,7 @@
   implicit none
   integer, intent(in) :: N,L
   integer, intent(in) :: NZ
-  real(r8), intent(in):: FNO3X,FNOBX,PATH(2,JZ),RRADL(2,JZ),RTARR(2,JZ)
+  real(r8), intent(in):: FNO3X,FNOBX,PATH(2,JZ1),RRADL(2,JZ1),RTARR(2,JZ1)
   real(r8), intent(in):: FCUP,FZUP,FWSRT,UPWTRP
   real(r8) :: B,C
   real(r8) :: BP,CP
@@ -1648,7 +1649,7 @@
 ! PATH=path length of water and nutrient uptake
 ! DIFFL=NO3 diffusion per plant
 !
-  ZOSGX=ZOSGLs1(L)*TORT(NPH,L)
+  ZOSGX=ZOSGLs1(L)*TORTs1(NPH,L)
   PATHL=AMIN1(PATH(N,L),RRADL(N,L)+SQRT(2.0*ZOSGX))
   DIFFL=ZOSGX*safe_adb(RTARR(N,L),LOG(PATHL/RRADL(N,L)))
   !
@@ -1661,7 +1662,7 @@
   !     RMFNO3=soil-root convective NO3 flux per plant in non-band
   !     DIFNO3=soil-root NO3 diffusion per plant in non-band
   !
-  IF(VLNO3s1(L).GT.ZERO.AND.CNO3Ss1(L) &
+  IF(VLNO3s1(L).GT.ZEROs1.AND.CNO3Ss1(L) &
     .GT.UPMNZOs1(N,NZ))THEN
     RMFNO3=UPWTRP*CNO3Ss1(L)*VLNO3s1(L)
     DIFNO3=DIFFL*VLNO3s1(L)
@@ -1677,7 +1678,7 @@
     !     WFR=constraint by O2 consumption on all biological processes
     !
     UPMXP=UPMXZOs1(N,NZ)*RTARPs1(N,L,NZ) &
-      *FWSRT*TFN4(L,NZ)*VLNO3s1(L)*AMIN1(FCUP,FZUP)
+      *FWSRT*TFN4s1(L,NZ)*VLNO3s1(L)*AMIN1(FCUP,FZUP)
     UPMX=UPMXP*WFRs1(N,L,NZ)
     !
     !     SOLUTION FOR MASS FLOW + DIFFUSION OF NO3 IN AQUEOUS PHASE OF
@@ -1740,7 +1741,7 @@
   !     DIFNOB=soil-root NO3 diffusion per plant in band
   !
 
-  IF(VLNOBs1(L).GT.ZERO.AND.CNO3Bs1(L) &
+  IF(VLNOBs1(L).GT.ZEROs1.AND.CNO3Bs1(L) &
     .GT.UPMNZOs1(N,NZ))THEN
     RMFNOB=UPWTRP*CNO3Bs1(L)*VLNOBs1(L)
     DIFNOB=DIFFL*VLNOBs1(L)
@@ -1756,7 +1757,7 @@
     !     WFR=constraint by O2 consumption on all biological processes
     !
     UPMXP=UPMXZOs1(N,NZ)*RTARPs1(N,L,NZ) &
-      *FWSRT*TFN4(L,NZ)*VLNOBs1(L)*AMIN1(FCUP,FZUP)
+      *FWSRT*TFN4s1(L,NZ)*VLNOBs1(L)*AMIN1(FCUP,FZUP)
     UPMX=UPMXP*WFRs1(N,L,NZ)
     !
     !     SOLUTION FOR MASS FLOW + DIFFUSION OF NO3 IN AQUEOUS PHASE OF
@@ -1803,8 +1804,8 @@
   implicit none
   integer , intent(in) :: N,L
   integer , intent(in) :: NZ
-  real(r8), intent(in) :: FNH4X,FNHBX,PATH(2,JZ),RRADL(2,JZ)
-  real(r8), intent(in) :: RTARR(2,JZ)
+  real(r8), intent(in) :: FNH4X,FNHBX,PATH(2,JZ1),RRADL(2,JZ1)
+  real(r8), intent(in) :: RTARR(2,JZ1)
   real(r8), intent(in) :: FCUP,FZUP,FWSRT,UPWTRP
   real(r8) :: B,C
   real(r8) :: BP,CP
@@ -1821,7 +1822,7 @@
 ! RRADL=root radius
 ! DIFFL=NH4 diffusion per plant
 !
-  ZNSGX=ZNSGLs1(L)*TORT(NPH,L)
+  ZNSGX=ZNSGLs1(L)*TORTs1(NPH,L)
   PATHL=AMIN1(PATH(N,L),RRADL(N,L)+SQRT(2.0*ZNSGX))
   DIFFL=ZNSGX*safe_adb(RTARR(N,L),LOG(PATHL/RRADL(N,L)))
 !
@@ -1834,7 +1835,7 @@
 ! RMFNH4=soil-root convective NH4 flux per plant in non-band
 ! DIFNH4=soil-root NH4 diffusion per plant in non-band
 !
-  IF(VLNH4s1(L).GT.ZERO.AND.CNH4Ss1(L).GT.UPMNZHs1(N,NZ))THEN
+  IF(VLNH4s1(L).GT.ZEROs1.AND.CNH4Ss1(L).GT.UPMNZHs1(N,NZ))THEN
     RMFNH4=UPWTRP*CNH4Ss1(L)*VLNH4s1(L)
     DIFNH4=DIFFL*VLNH4s1(L)
 !
@@ -1849,7 +1850,7 @@
 !   WFR=constraint by O2 consumption on all biological processes
 !
     UPMXP=UPMXZHs1(N,NZ)*RTARPs1(N,L,NZ) &
-      *FWSRT*TFN4(L,NZ)*VLNH4s1(L)*AMIN1(FCUP,FZUP)
+      *FWSRT*TFN4s1(L,NZ)*VLNH4s1(L)*AMIN1(FCUP,FZUP)
     UPMX=UPMXP*WFRs1(N,L,NZ)
 !
 !   SOLUTION FOR MASS FLOW + DIFFUSION OF NH4 IN AQUEOUS PHASE OF
@@ -1914,7 +1915,7 @@
 ! DIFNHB=soil-root NH4 diffusion per plant in band
 !
 
-  IF(VLNHBs1(L).GT.ZERO.AND.CNH4Bs1(L) &
+  IF(VLNHBs1(L).GT.ZEROs1.AND.CNH4Bs1(L) &
     .GT.UPMNZHs1(N,NZ))THEN
     RMFNHB=UPWTRP*CNH4Bs1(L)*VLNHBs1(L)
     DIFNHB=DIFFL*VLNHBs1(L)
@@ -1930,7 +1931,7 @@
 !   WFR=constraint by O2 consumption on all biological processes
 !
     UPMXP=UPMXZHs1(N,NZ)*RTARPs1(N,L,NZ) &
-      *FWSRT*TFN4(L,NZ)*VLNHBs1(L)*AMIN1(FCUP,FZUP)
+      *FWSRT*TFN4s1(L,NZ)*VLNHBs1(L)*AMIN1(FCUP,FZUP)
     UPMX=UPMXP*WFRs1(N,L,NZ)
 !
 !   SOLUTION FOR MASS FLOW + DIFFUSION OF NH4 IN AQUEOUS PHASE OF
@@ -1978,8 +1979,8 @@
   implicit none
   integer , intent(in) :: N,L
   integer , intent(in) :: NZ
-  real(r8), intent(in) :: PATH(2,JZ),RRADL(2,JZ),FPQ(2,JZ,05)
-  real(r8), intent(in) :: FPP(2,JZ,05),RTARR(2,JZ)
+  real(r8), intent(in) :: PATH(2,JZ1),RRADL(2,JZ1),FPQ(2,JZ1,JP1)
+  real(r8), intent(in) :: FPP(2,JZ1,JP1),RTARR(2,JZ1)
   real(r8), intent(in) :: FCUP,FZUP,FWSRT,UPWTRP
   real(r8) :: FNO3X,FNOBX,FNH4X,FNHBX
   real(r8) :: TFNH4X,TFNO3X,TFNHBX,TFNOBX
@@ -1993,25 +1994,25 @@
 
 
   IF(RNH4Ys1(L).GT.ZEROSs1)THEN
-    FNH4X=AMAX1(FPPs1(N,L,NZ),RUNNHPs1(N,L,NZ)/RNH4Ys1(L))
+    FNH4X=AMAX1(FPP(N,L,NZ),RUNNHPs1(N,L,NZ)/RNH4Ys1(L))
   ELSE
-    FNH4X=FPQs1(N,L,NZ)
+    FNH4X=FPQ(N,L,NZ)
   ENDIF
   IF(RNHBYs1(L).GT.ZEROSs1)THEN
-    FNHBX=AMAX1(FPPs1(N,L,NZ),RUNNBPs1(N,L,NZ)/RNHBYs1(L))
+    FNHBX=AMAX1(FPP(N,L,NZ),RUNNBPs1(N,L,NZ)/RNHBYs1(L))
   ELSE
-    FNHBX=FPQs1(N,L,NZ)
+    FNHBX=FPQ(N,L,NZ)
   ENDIF
 
   IF(RNO3Ys1(L).GT.ZEROSs1)THEN
-    FNO3X=AMAX1(FPPs1(N,L,NZ),RUNNOPs1(N,L,NZ)/RNO3Ys1(L))
+    FNO3X=AMAX1(FPP(N,L,NZ),RUNNOPs1(N,L,NZ)/RNO3Ys1(L))
   ELSE
-    FNO3X=FPQs1(N,L,NZ)
+    FNO3X=FPQ(N,L,NZ)
   ENDIF
   IF(RN3BYs1(L).GT.ZEROSs1)THEN
-    FNOBX=AMAX1(FPPs1(N,L,NZ),RUNNXPs1(N,L,NZ)/RN3BYs1(L))
+    FNOBX=AMAX1(FPP(N,L,NZ),RUNNXPs1(N,L,NZ)/RN3BYs1(L))
   ELSE
-    FNOBX=FPQs1(N,L,NZ)
+    FNOBX=FPQ(N,L,NZ)
   ENDIF
 
   TFNH4X=TFNH4X+FNH4X
@@ -2019,7 +2020,7 @@
   TFNHBX=TFNHBX+FNHBX
   TFNOBX=TFNOBX+FNOBX
 
-  IF(FZUP.GT.ZERO2)THEN
+  IF(FZUP.GT.ZERO2s1)THEN
 !
     !     PARAMETERS FOR RADIAL MASS FLOW AND DIFFUSION OF NH4,NO3
     !     FROM SOIL TO ROOT
@@ -2049,7 +2050,7 @@
   end subroutine UptakeMineralNitrogen
 !------------------------------------------------------------------------
 
-  subroutine RootExudatess1(N,L,NZ)
+  subroutine RootExudates(N,L,NZ)
 
   implicit none
   integer, intent(in) :: N,L
@@ -2080,7 +2081,7 @@
   !     OSTR=O2 stress indicator
   !
   DO 195 K=0,4
-    VOLWK=VOLWM(NPH,L)*FOSRHs1(K,L)
+    VOLWK=VOLWMs1(NPH,L)*FOSRHs1(K,L)
     IF(VOLWK.GT.ZEROS2s1 &
       .AND.RTVLWs1(N,L,NZ).GT.ZEROPs1(NZ))THEN
       VOLWT=VOLWK+RTVLWs1(N,L,NZ)
@@ -2110,10 +2111,10 @@
     !    2,RDFOMNs1(N,K,L,NZ),RDFOMPs1(N,K,L,NZ)
     !    3,OQCs1(K,L),OQNs1(K,L),OQPs1(K,L)
     !    2,CPOOLRs1(N,L,NZ),ZPOOLRs1(N,L,NZ),PPOOLRs1(N,L,NZ)
-    !    3,VOLWM(NPH,L),RTVLWs1(N,L,NZ),RTAR1Xs1(N,NZ)
+    !    3,VOLWMs1(NPH,L),RTVLWs1(N,L,NZ),RTAR1Xs1(N,NZ)
     !    4,RTAR2Xs1(N,NZ),RTLGPs1(N,L,NZ)*PPs1(NZ)
     !    4,WTRTDs1(N,L,NZ)
-    !    5,VOLWK,VOLWM(NPH,L),FOSRHs1(K,L)
+    !    5,VOLWK,VOLWMs1(NPH,L),FOSRHs1(K,L)
     !    5,OQCs1(K,L)/VOLWK
     !    5,OQNs1(K,L)/OQCs1(K,L)
     !    5,OQPs1(K,L)/OQCs1(K,L)
@@ -2126,7 +2127,7 @@
   end subroutine RootExudates
 !------------------------------------------------------------------------
 
-  subroutine SumupNutrientUptakes1(N,L,NZ)
+  subroutine SumupNutrientUptake(N,L,NZ)
 
   implicit none
   integer, intent(in) :: N, L
@@ -2144,7 +2145,7 @@
   !     RUPH2P,RUPH2B,RUPH1P,RUPH1B=uptake from non-band,band of H2PO4,HPO4
   !     UPNH4,UPNO3,UPH2P,UPH1P=PFT uptake of NH4,NO3,H2PO4,HPO4
   !
-  DO 295 K=0,jcplx1
+  DO 295 K=0,jcplx11
     UPOMCs1(NZ)=UPOMCs1(NZ)+RDFOMCs1(N,K,L,NZ)
     UPOMNs1(NZ)=UPOMNs1(NZ)+RDFOMNs1(N,K,L,NZ)
     UPOMPs1(NZ)=UPOMPs1(NZ)+RDFOMPs1(N,K,L,NZ)
@@ -2165,7 +2166,7 @@
   implicit none
   integer, intent(in) :: N,L
   integer, intent(in) :: NZ
-  REAL(R8), INTENT(IN):: FPQ(2,JZ,05),FPP(2,JZ,05)
+  REAL(R8), INTENT(IN):: FPQ(2,JZ1,JP1),FPP(2,JZ1,JP1)
   real(r8), intent(out):: FCUP,FZUP,FPUP,FWSRT,UPWTRP,UPWTRH,FOXYX
   !
   !     UPTAKE CAPACITY 'FWSRT' DEPENDS ON ROOT,MYCORRHIZAL
@@ -2253,9 +2254,9 @@
   !     FPQ=PFT fraction of biome root mass
   !
   IF(ROXYYs1(L).GT.ZEROSs1)THEN
-    FOXYX=AMAX1(FPPs1(N,L,NZ),ROXYPs1(N,L,NZ)/ROXYYs1(L))
+    FOXYX=AMAX1(FPP(N,L,NZ),ROXYPs1(N,L,NZ)/ROXYYs1(L))
   ELSE
-    FOXYX=FPQs1(N,L,NZ)
+    FOXYX=FPQ(N,L,NZ)
   ENDIF
   end subroutine GetUptakeCapcity
 !------------------------------------------------------------------------
@@ -2265,8 +2266,8 @@
 
   implicit none
   integer , intent(in) :: N,L,NZ
-  real(r8), intent(in) :: RRADL(2,JZ),FPQ(2,JZ,05),FRTDPX(JZ,05)
-  real(r8), intent(in) :: RTARR(2,JZ),UPWTRH,FOXYX
+  real(r8), intent(in) :: RRADL(2,JZ1),FPQ(2,JZ1,JP1),FRTDPX(JZ1,JP1)
+  real(r8), intent(in) :: RTARR(2,JZ1),UPWTRH,FOXYX
   real(r8), intent(out):: RUPOXT
   integer :: M,MX
   real(r8) :: B,C
@@ -2328,32 +2329,32 @@
 !
     CO2A1=AMAX1(ZEROPs1(NZ),CO2As1(N,L,NZ))
     CO2P1=AMAX1(ZEROPs1(NZ),CO2Ps1(N,L,NZ))
-    CO2G1=AMAX1(ZEROPs1(NZ),CO2Gs1(L)*FPQs1(N,L,NZ))
-    CO2S1=AMAX1(ZEROPs1(NZ),CO2Ss1(L)*FPQs1(N,L,NZ))
+    CO2G1=AMAX1(ZEROPs1(NZ),CO2Gs1(L)*FPQ(N,L,NZ))
+    CO2S1=AMAX1(ZEROPs1(NZ),CO2Ss1(L)*FPQ(N,L,NZ))
     OXYA1=AMAX1(ZEROPs1(NZ),OXYAs1(N,L,NZ))
     OXYP1=AMAX1(ZEROPs1(NZ),OXYPs1(N,L,NZ))
     OXYG1=AMAX1(ZEROPs1(NZ),OXYGs1(L)*FOXYX)
     OXYS1=OXYSs1(L)*FOXYX
     CH4A1=CH4As1(N,L,NZ)
     CH4P1=CH4Ps1(N,L,NZ)
-    CH4S1=CH4Ss1(L)*FPQs1(N,L,NZ)
+    CH4S1=CH4Ss1(L)*FPQ(N,L,NZ)
     CCH4S1=CCH4Ss1(L)
     CCH4P1=AMAX1(0.0,CH4P1/RTVLWs1(N,L,NZ))
     Z2OA1=Z2OAs1(N,L,NZ)
     Z2OP1=Z2OPs1(N,L,NZ)
-    Z2OS1=Z2OSs1(L)*FPQs1(N,L,NZ)
+    Z2OS1=Z2OSs1(L)*FPQ(N,L,NZ)
     CN2OS1=CZ2OSs1(L)
     CN2OP1=AMAX1(0.0,Z2OP1/RTVLWs1(N,L,NZ))
     ZH3A1=ZH3As1(N,L,NZ)
     ZH3P1=ZH3Ps1(N,L,NZ)
-    ZH3S1=ZNH3Ss1(L)*FPQs1(N,L,NZ)
-    ZH3B1=ZNH3Bs1(L)*FPQs1(N,L,NZ)
+    ZH3S1=ZNH3Ss1(L)*FPQ(N,L,NZ)
+    ZH3B1=ZNH3Bs1(L)*FPQ(N,L,NZ)
     CNH3S1=CNH3Ss1(L)
     CNH3B1=CNH3Bs1(L)
     CNH3P1=AMAX1(0.0,ZH3P1/RTVLWs1(N,L,NZ))
     H2GA1=H2GAs1(N,L,NZ)
     H2GP1=H2GPs1(N,L,NZ)
-    H2GS1=H2GSs1(L)*FPQs1(N,L,NZ)
+    H2GS1=H2GSs1(L)*FPQ(N,L,NZ)
     CH2GS1=CH2GSs1(L)
     CH2GP1=AMAX1(0.0,H2GP1/RTVLWs1(N,L,NZ))
     RTVLWA=RTVLWs1(N,L,NZ)*VLNH4s1(L)
@@ -2494,18 +2495,18 @@
 !     C*G=soil gaseous concentration
 !     VOLW*,VOLP*=VOLWMM,VOLPMM*gas solubility
 !
-      VOLWMO=VOLWM(M,L)*FOXYX
-      VOLWMM=VOLWM(M,L)*FPQs1(N,L,NZ)
-      VOLPMM=VOLPM(M,L)*FPQs1(N,L,NZ)
+      VOLWMO=VOLWMs1(M,L)*FOXYX
+      VOLWMM=VOLWMs1(M,L)*FPQ(N,L,NZ)
+      VOLPMM=VOLPMs1(M,L)*FPQ(N,L,NZ)
       VOLWSP=RTVLWs1(N,L,NZ)+VOLWMM
       VOLWMA=VOLWMM*VLNH4s1(L)
       VOLWMB=VOLWMM*VLNHBs1(L)
       VOLWSA=RTVLWA+VOLWMA
       VOLWSB=RTVLWB+VOLWMB
-      THETW1=AMAX1(0.0,VOLWM(M,L)/VOLYs1(L))
-      IF(THETW1.GT.THETYs1(L).AND.FPQs1(N,L,NZ).GT.ZEROQs1(NZ))THEN
-        THETM=TORT(M,L)*THETW1
-        RRADS=LOG((FILM(M,L)+RRADL(N,L))/RRADL(N,L))
+      THETW1=AMAX1(0.0,VOLWMs1(M,L)/VOLYs1(L))
+      IF(THETW1.GT.THETYs1(L).AND.FPQ(N,L,NZ).GT.ZEROQs1(NZ))THEN
+        THETM=TORTs1(M,L)*THETW1
+        RRADS=LOG((FILMs1(M,L)+RRADL(N,L))/RRADL(N,L))
         RTARRX=RTARR(N,L)/RRADS
         DIFOL=THETM*OLSGL1*RTARRX
         DIFCL=THETM*CQSGL1*RTARRX
@@ -2592,7 +2593,7 @@
 !     RDFOXS,RDFOXP=aqueous O2 diffusion per plant:soil-root,within root
 !
           X=(DIFOL+UPWTRH)*COXYS1+DIFOP*COXYP1
-          IF(X.GT.ZERO.AND.OXYS1.GT.ZEROPs1(NZ))THEN
+          IF(X.GT.ZEROs1.AND.OXYS1.GT.ZEROPs1(NZ))THEN
             B=-UPMXP-DIFOX*OXKM-X
             C=X*UPMXP
             RUPOXR=(-B-SQRT(B*B-4.0*C))/2.0
@@ -2601,7 +2602,7 @@
             RDFOXP=DIFOP*(COXYP1-COXYR)
           ELSE
             X=DIFOP*COXYP1
-            IF(X.GT.ZERO.AND.OXYP1.GT.ZEROPs1(NZ))THEN
+            IF(X.GT.ZEROs1.AND.OXYP1.GT.ZEROPs1(NZ))THEN
               B=-UPMXP-DIFOP*OXKM-X
               C=X*UPMXP
               RUPOXR=(-B-SQRT(B*B-4.0*C))/2.0
@@ -2729,8 +2730,8 @@
 !     VOLWMM,VOLPMM=soil micropore water,air volume
 !     VOLW*=VOLWMM*gas solubility
 !
-          IF(THETPM(M,L).GT.THETX)THEN
-            DFGSP=FPQs1(N,L,NZ)*DFGS(M,L)
+          IF(THETPMs1(M,L).GT.THETX)THEN
+            DFGSP=FPQ(N,L,NZ)*DFGSs1(M,L)
             RCODFQ=DFGSP*(AMAX1(ZEROPs1(NZ),CO2G1)*VOLWCO &
               -(AMAX1(ZEROSs1,CO2S1)-RCO2SX)*VOLPMM)/(VOLWCO+VOLPMM)
             RUPOST=RUPOSX-ROXYLX
@@ -2741,7 +2742,7 @@
                 -(AMAX1(ZEROSs1,CH4S1)-RUPCSX)*VOLPMM)/(VOLWCH+VOLPMM)
               RN2DFQ=DFGSP*(AMAX1(ZEROPs1(NZ),Z2OG1)*VOLWN2 &
                 -(AMAX1(ZEROSs1,Z2OS1)-RUPZSX)*VOLPMM)/(VOLWN2+VOLPMM)
-              IF(VOLWNH+VOLPNH.GT.ZEROP(NZ,NY,NZ))THEN
+              IF(VOLWNH+VOLPNH.GT.ZEROPs1(NZ))THEN
                 ZH3GA=ZH3G1*VLNH4s1(L)
                 RNHDFQ=AMIN1(RUPNSX,AMAX1(-RUPNSX &
                   ,DFGSP*(AMAX1(ZEROPs1(NZ),ZH3GA)*VOLWNH &
@@ -2749,7 +2750,7 @@
               ELSE
                 RNHDFQ=0.0_r8
               ENDIF
-              IF(VOLWNB+VOLPNB.GT.ZEROP(NZ,NY,NZ))THEN
+              IF(VOLWNB+VOLPNB.GT.ZEROPs1(NZ))THEN
                 ZH3GB=ZH3G1*VLNHBs1(L)
                 RNBDFQ=AMIN1(RUPNSX,AMAX1(-RUPNSX &
                   ,DFGSP*(AMAX1(ZEROPs1(NZ),ZH3GB)*VOLWNB &
@@ -2912,7 +2913,7 @@
 !
           RCO2Ps1(N,L,NZ)=RCO2Ps1(N,L,NZ)+RCO2PX+RCO2SX
           RUPOXPs1(N,L,NZ)=RUPOXPs1(N,L,NZ)+RUPOPX
-          ROXSK(M,L)=ROXSK(M,L)+RUPOSX
+          ROXSKs1(M,L)=ROXSKs1(M,L)+RUPOSX
 
 90      CONTINUE
       ENDIF
@@ -2932,7 +2933,7 @@
   ELSE
     RUPOXT=0.0_r8
     IF(L.GT.NGs1(NZ))THEN
-      WFRs1(N,L,NZ)=WFR(N,L-1,NZ)
+      WFRs1(N,L,NZ)=WFRs1(N,L-1,NZ)
     ELSE
       WFRs1(N,L,NZ)=1.0
     ENDIF
@@ -2945,8 +2946,8 @@
 
   implicit none
   integer, intent(in) :: NZ
-  real(r8), intent(in) :: PATH(2,JZ),RRADL(2,JZ),FPQ(2,JZ,05),FPP(2,JZ,05)
-  real(r8), intent(in) :: FRTDPX(JZ,05),RTARR(2,JZ)
+  real(r8), intent(in) :: PATH(2,JZ1),RRADL(2,JZ1),FPQ(2,JZ1,JP1),FPP(2,JZ1,JP1)
+  real(r8), intent(in) :: FRTDPX(JZ1,JP1),RTARR(2,JZ1)
   real(r8), intent(inout) :: OSTRN,OSTRD
   real(r8) :: TFOXYX
   real(r8) :: FCUP,FZUP,FPUP,FWSRT,UPWTRP,UPWTRH,FOXYX,RUPOXT
@@ -2956,7 +2957,7 @@
   DO 955 N=1,MYs1(NZ)
     DO 950 L=NUs1,NIs1(NZ)
       IF(VOLXs1(L).GT.ZEROS2s1 &
-        .AND.RTDNPs1(N,L,NZ).GT.ZERO &
+        .AND.RTDNPs1(N,L,NZ).GT.ZEROs1 &
         .AND.RTVLWs1(N,L,NZ).GT.ZEROPs1(NZ) &
         .AND.THETWs1(L).GT.ZEROs1)THEN
         TFOXYX=0.0_r8
@@ -2980,7 +2981,7 @@
         OSTRD=OSTRD+ROXYPs1(N,L,NZ)
         OSTRN=OSTRN+RUPOXT
 
-        call RootExudatess1(N,L,NZ)
+        call RootExudates(N,L,NZ)
 !
 !     NUTRIENT UPTAKE
 !
@@ -2989,7 +2990,7 @@
 !     FWSRT=protein concentration relative to 5%
 !     RTLGP=root,myco length per plant
 !
-        IF(WFRs1(N,L,NZ).GT.ZERO.AND.FCUP.GT.ZERO.AND.FWSRT.GT.ZERO &
+        IF(WFRs1(N,L,NZ).GT.ZEROs1.AND.FCUP.GT.ZEROs1.AND.FWSRT.GT.ZEROs1 &
           .AND.RTLGPs1(N,L,NZ).GT.ZEROPs1(NZ))THEN
 !
 !     FZUP=limitn to active uptake respiration from CZPOLR
@@ -3003,14 +3004,14 @@
             RTARR,FCUP,FPUP,FWSRT,UPWTRP)
 
         ELSE
-          call NoActiveNutrientUptakes1(N,L,NZ)
+          call NoActiveNutrientUptake(N,L,NZ)
 
         ENDIF
       ELSE
-        call ZeroUptakes1(N,L,NZ)
+        call ZeroUptake(N,L,NZ)
       ENDIF
 
-      call SumupNutrientUptakes1(N,L,NZ)
+      call SumupNutrientUptake(N,L,NZ)
 
 950 CONTINUE
 955 CONTINUE

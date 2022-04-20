@@ -5,7 +5,9 @@ module PlantAPI
   use grosubMod    , only : grosub
   use HfuncMod     , only : hfunc
   use HfuncsMod    , only : hfuncs
-  use UptakeMod    , only : uptake
+  use EcoSIMSolverPar
+  use UptakesMod    , only : uptakes
+!  use UptakeMod    , only : uptake
   use timings      , only : start_timer, end_timer
   use EcoSIMHistMod
   use SnowDataType , only : TKW,DPTHS
@@ -60,6 +62,8 @@ implicit none
       CALL HFUNCs(I,J)
     !call end_timer('HFUNC',t1)
 
+      CALL UPTAKES(I,J)
+
       call PlantAPIRecv(I,J,NY,NX)
     ENDDO
   ENDDO
@@ -69,11 +73,11 @@ implicit none
 !   HYDRAULIC AND STOMATAL RESISTANCES,AND CANOPY ENERGY BALANCE IN 'UPTAKE'
 !   CALCULATE ROOT UPTAKE OF WATER, OXYGEN, NH4, NO3 AND PO4 IN 'UPTAKE'
 !
-  if(lverb)WRITE(*,333)'UPTK'
+!  if(lverb)WRITE(*,333)'UPTK'
 !    if(I>=170)print*,TKS(0,NVN,NHW)
-  call start_timer(t1)
-  CALL UPTAKE(I,J,NHW,NHE,NVN,NVS)
-  call end_timer('UPTK',t1)
+!  call start_timer(t1)
+!  CALL UPTAKE(I,J,NHW,NHE,NVN,NVS)
+!  call end_timer('UPTK',t1)
 !
 !   CALCULATE CANOPY CO2 UPTAKE AT AMBIENT TURGOR, AUTOTROPHIC AND GROWTH
 !   RESPIRATION, PLANT C ALLOCATION, CANOPY AND ROOT GROWTH IN 'GROSUB'
@@ -104,7 +108,7 @@ implicit none
   integer, intent(in) :: I,J,NY,NX
 
   integer :: NB,NR,NZ,K,L,M,N,I1
-  I1=I+1;if(I1>366)I1=1
+  I1=I+1;if(I1>LYRC)I1=1
   IFLGT(NY,NX)=IFLGTs1
   PPT(NY,NX)=PPTs1
   RECO(NY,NX)=RECOs1
@@ -702,8 +706,9 @@ implicit none
   integer, intent(in) :: I,J,NY,NX
   integer :: K,L,M,N,NB,NZ,NR,I1
 
-  I1=I+1;if(I1>366)I1=1
+  I1=I+1;if(I1>LYRC)I1=1
   ZEROs1=ZERO
+  ZERO2s1=ZERO2
   ALATs1=ALAT(NY,NX)
   ATCAs1=ATCA(NY,NX)
   ARLSSs1=ARLSS(NY,NX)
@@ -776,6 +781,8 @@ implicit none
     TAUSs1(L)=TAUS(L,NY,NX)
     TAU0s1(L)=TAU0(L,NY,NX)
   ENDDO
+  TAUSs1(JC+1)=TAUS(JC+1,NY,NX)
+  TAU0s1(JC+1)=TAU0(JC+1,NY,NX)
   DO L=1,NL(NY,NX)
     CPO4Ss1(L)=CPO4S(L,NY,NX)
     CNDUs1(L)=CNDU(L,NY,NX)
@@ -873,7 +880,7 @@ implicit none
     ZNH3Ss1(L)=ZNH3S(L,NY,NX)
     ZNH3Bs1(L)=ZNH3B(L,NY,NX)
     ZVSGLs1(L)=ZVSGL(L,NY,NX)
-
+    DLYR3s1(L)=DLYR(3,L,NY,NX)
     DO K=0,jcplx1
       FOSRHs1(K,L)=FOSRH(K,L,NY,NX)
       OQCs1(K,L)=OQC(K,L,NY,NX)
@@ -886,6 +893,15 @@ implicit none
   ENDDO
 
   DO NZ=1,NP0(NY,NX)
+    ARLFSs1(NZ)=ARLFS(NZ,NY,NX)
+    O2Ls1(NZ)=O2L(NZ,NY,NX)
+    VOMXs1(NZ)=VOMX(NZ,NY,NX)
+    XKCO2s1(NZ)=XKCO2(NZ,NY,NX)
+    CO2Ls1(NZ)=CO2L(NZ,NY,NX)
+    RUBPs1(NZ)=RUBP(NZ,NY,NX)
+    XKO2s1(NZ)=XKO2(NZ,NY,NX)
+    VCMXs1(NZ)=VCMX(NZ,NY,NX)
+    RADCs1(NZ)=RADC(NZ,NY,NX)
     EHVSTs1(1:2,1:4,NZ,I)=EHVST(1:2,1:4,NZ,I,NY,NX)
     FLWCs1(NZ)=FLWC(NZ,NY,NX)
     IDTHs1(NZ)=IDTH(NZ,NY,NX)

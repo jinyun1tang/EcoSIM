@@ -8,6 +8,7 @@ module StartsMod
   use minimathMod, only : test_aeqb, test_aneb
   use EcosimConst
   use MicrobialDataType
+  use EcoSIMSolverPar
   use SOMDataType
   use ChemTranspDataType
   use FertilizerDataType

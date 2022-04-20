@@ -18,6 +18,7 @@ module SoluteMod
   use SoilPropertyDataType
   use PlantDataRateType
   use GridDataType
+  use EcoSIMSolverPar
   implicit none
 
   private

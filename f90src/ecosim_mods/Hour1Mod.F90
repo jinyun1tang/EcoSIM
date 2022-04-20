@@ -8,6 +8,7 @@ module Hour1Mod
   use ChemTranspDataType
   use FertilizerDataType
   use CanopyRadDataType
+  use EcoSIMSolverPar
   use Hour1Pars
   use GridConsts
   use SoilPhysDataType

@@ -18,7 +18,7 @@ module InitEcoSIM
   use WatsubMod           , only : initWatsub
   use PlantDisturbMod     , only : InitPlantDisturbance
   use PlantTraitDataType   , only : InitPlantTraits
-  use UptakeMod           , only : InitUptake
+  use UptakesMod           , only : InitUptake
   use Hour1Mod            , only : InitHour1
   use SoilPropertyDataType, only : InitSoilProperty
   use SurfLitterDataType  , only : InitSurfLitter

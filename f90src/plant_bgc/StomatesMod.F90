@@ -651,7 +651,7 @@
 
 !     begin_execution
 
-  call PrepPhotosynthesiss1(NZ,CH2O,TFN1,TFN2,TFNE,XKO2L)
+  call PrepPhotosynthesis(NZ,CH2O,TFN1,TFN2,TFNE,XKO2L)
 !
 !     FOR EACH BRANCH
 !

@@ -1,7 +1,7 @@
 set(PLANT_BGC_SOURCES
   InitVegBGC.F90
 	HfuncMod.F90
-	UptakeMod.F90
+	UptakesMod.F90
 	StartqMod.F90
   PlantDisturbMod.F90
 	GrosubMod.F90
