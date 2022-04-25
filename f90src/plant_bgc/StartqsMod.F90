@@ -1,6 +1,7 @@
 module StartqsMod
   use data_kind_mod, only : r8 => SHR_KIND_R8
   use EcosimConst
+  use EcoSIMConfig
   use PlantAPIData
   implicit none
 
@@ -55,7 +56,7 @@ module StartqsMod
           call InitSeedMorphoBio(NZ)
         ENDIF
         ZEROPs1(NZ)=ZEROs1*PPs1(NZ)
-        ZEROQs1(NZ)=ZEROs1*PPs1(NZ)/AREA3Us1
+        ZEROQs1(NZ)=ZEROs1*PPs1(NZ)/AREA3s1(NUs1)
         ZEROLs1(NZ)=ZEROs1*PPs1(NZ)*1.0E+06_r8
 9985  CONTINUE
 !
@@ -354,7 +355,7 @@ module StartqsMod
 !
 !     SEED CHARACTERISTICS
 !
-!     SDVL,SDLG,SDAR=seed volume(m3),length(m),AREA3Us1(m2)
+!     SDVL,SDLG,SDAR=seed volume(m3),length(m),AREA3s1(NUs1)(m2)
 !     GRDM=seed C mass (g) from PFT file
 !
   SDVLs1(NZ)=GRDMs1(NZ)*5.0E-06
@@ -433,7 +434,7 @@ module StartqsMod
 !
 !     PP=population (grid cell-1)
 !
-  PPs1(NZ)=PPXs1(NZ)*AREA3Us1
+  PPs1(NZ)=PPXs1(NZ)*AREA3s1(NUs1)
   IFLGIs1(NZ)=0
   IDTHPs1(NZ)=0
   IDTHRs1(NZ)=0
@@ -638,7 +639,7 @@ module StartqsMod
 !
 !     INITIALIZE MASS BALANCE CHECKS
 !
-  IF(DATAs1(20).EQ.'NO'.AND.IGOs1.EQ.0)THEN
+  IF(.not.is_restart_run.AND.is_first_year)THEN
     CARBNs1(NZ)=0._r8
     TCSN0s1(NZ)=0._r8
     TZSN0s1(NZ)=0._r8
@@ -673,7 +674,7 @@ module StartqsMod
     WTSTGs1(NZ)=0._r8
     WTSTGNs1(NZ)=0._r8
     WTSTGPs1(NZ)=0._r8
-    WTSTDX=WTSTDIs1(NZ)*AREA3Us1
+    WTSTDX=WTSTDIs1(NZ)*AREA3s1(NUs1)
     DO 155 M=1,4
       WTSTDGs1(M,NZ)=WTSTDX*CFOPCs1(5,M,NZ)
       WTSTDNs1(M,NZ)=WTSTDX*CNSTKs1(NZ)*CFOPNs1(5,M,NZ)

@@ -9,6 +9,7 @@ set(ECOSIM_UTIL_SOURCES
   fileUtil.F90
   EcoSIMSolverPar.F90
   EcoSimConst.F90
+  EcoSIMConfig.F90
 )
 
 

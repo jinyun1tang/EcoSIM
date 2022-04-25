@@ -34,7 +34,7 @@
   use AqueChemDatatype
   use SedimentDataType
   use GridDataType
-
+  use EcoSIMConfig
   implicit none
   integer, intent(in) :: NHW,NHE,NVN,NVS
 
@@ -496,7 +496,8 @@
       IDAYR=IDATE
       ISTART=IDATE+1
       IYR=IYRR
-      DATA(20)='NO'
+      DATA1(20)='NO'
+      is_restart_run=(DATA1(20)=='YES')
       CALL STARTS(NHW,NHE,NVN,NVS)
       GO TO 1000
 1000  RETURN

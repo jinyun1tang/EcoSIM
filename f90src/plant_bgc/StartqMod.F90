@@ -3,6 +3,7 @@ module StartqMod
   use EcosimConst
   use GridConsts
   use FlagDataType
+  use EcosimConst
   use EcoSIMCtrlDataType
   use PlantDataRateType
   use ClimForcDataType
@@ -13,6 +14,7 @@ module StartqMod
   use RootDataType
   use EcoSIMHistMod
   use GridDataType
+  use EcoSIMConfig
   implicit none
 
   private
@@ -655,7 +657,7 @@ module StartqMod
 !
 !     INITIALIZE MASS BALANCE CHECKS
 !
-  IF(DATA(20).EQ.'NO'.AND.IGO.EQ.0)THEN
+  IF(.not.is_restart_run.AND.is_first_year)THEN
     CARBN(NZ,NY,NX)=0._r8
     TCSN0(NZ,NY,NX)=0._r8
     TZSN0(NZ,NY,NX)=0._r8

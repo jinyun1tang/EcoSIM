@@ -15,6 +15,7 @@ module readsmod
   use EcoSIMHistMod
   use IrrigationDataType
   use GridDataType
+  use EcoSIMConfig
   implicit none
   private
 
@@ -105,7 +106,7 @@ module readsmod
 ! IDATA(1),IDATA(2),IDATA(3)=start date of scenario DDMMYYYY
 ! IDATA(4),IDATA(5),IDATA(6)=end date of scenario DDMMYYYY
 ! IDATA(7),IDATA(8),IDATA(9)=start date of run DDMMYYYY
-! DATA(18),DATA(19),DATA(20)=options for visualization in visual.f
+! DATA1(18),DATA1(19),DATA1(20)=options for visualization in visual.f
 ! generating checkpoint files,resuming from earlier checkpt files
 ! DRAD,DTMPX,DTMPN,DHUM,DPREC,DIRRI,DWIND,DCO2E,DCNR4,DCNOR
 !   =annual changes in radiation,max+min temperature,humidity,
@@ -118,9 +119,9 @@ module readsmod
   READ(4,'(2I2,I4)')IDATA(1),IDATA(2),IDATA(3)
   READ(4,'(2I2,I4)')IDATA(4),IDATA(5),IDATA(6)
   READ(4,'(2I2,I4)')IDATA(7),IDATA(8),IDATA(9)
-  READ(4,'(A3)')DATA(18)
-  READ(4,'(A3)')DATA(19)
-  READ(4,'(A3)')DATA(20)
+  READ(4,'(A3)')DATA1(18)
+  READ(4,'(A3)')DATA1(19)
+  READ(4,'(A3)')DATA1(20)
   if(lverb)then
     write(*,'(100A)')('-',ll=1,100)
     write(*,*)'read option file ',DATAC(4,NE,NEX)
@@ -131,10 +132,11 @@ module readsmod
     write(*,*)'start date of run DDMMYYYY: IDATA(7:9) ' &
       ,IDATA(7),IDATA(8),IDATA(9)
     write(*,*)'ouput hourly visualization in visual.f?: '// &
-      'DATA(18) ',DATA(18)
-    write(*,*)'write checkpoint file?: DATA(19) ',DATA(19)
-    write(*,*)'read chkpt file?: DATA(20) ',DATA(20)
+      'DATA1(18) ',DATA1(18)
+    write(*,*)'write checkpoint file?: DATA1(19) ',DATA1(19)
+    write(*,*)'read chkpt file?: DATA1(20) ',DATA1(20)
   endif
+  is_restart_run=(data1(20)=='YES')
   DO 25 N=1,4
     READ(4,*)DRAD(N),DTMPX(N),DTMPN(N),DHUM(N),DPREC(N) &
       ,DIRRI(N),DWIND(N),DCO2E(N),DCN4R(N),DCNOR(N)
@@ -183,7 +185,7 @@ module readsmod
 ! IDATA(3),IDATA(6)=start,end year of current scene
 !
   NTZX=NTZ
-  IF(IGO.EQ.0.OR.IDATA(3).NE.0)THEN
+  IF(is_first_year.OR.IDATA(3).NE.0)THEN
     IDATA(3)=IDATA(3)+(NT-1)*NF+(NTX-1)*NFX-NTZX
     IDATA(6)=IDATA(6)+(NT-1)*NF+(NTX-1)*NFX-NTZX
     IYRC=IDATA(3)
@@ -230,15 +232,15 @@ module readsmod
 ! W,N=water+heat,nutrient checkpoint files
 !
 
-  IF(IGO.EQ.0)THEN
-    IF(DATA(20).EQ.'YES')THEN
+  IF(is_first_year)THEN
+    IF(is_restart_run)THEN
       IDATE=IDATA(9)
     ELSE
       IDATE=IDATA(3)
     ENDIF
     WRITE(CHARY,'(I4)')IDATE
-    OUTW='W'//DATA(1)(1:2)//CHARY(1:4)
-    OUTN='N'//DATA(1)(1:2)//CHARY(1:4)
+    OUTW='W'//DATA1(1)(1:2)//CHARY(1:4)
+    OUTN='N'//DATA1(1)(1:2)//CHARY(1:4)
     OPEN(21,FILE=trim(outdir)//OUTW,STATUS='UNKNOWN')
     OPEN(22,FILE=trim(outdir)//OUTN,STATUS='UNKNOWN')
   ENDIF
@@ -273,8 +275,8 @@ module readsmod
     endif
 575 CONTINUE
 
-  IF(IGO.EQ.0)THEN
-    IF(DATA(20).EQ.'NO')IRUN=ISTART
+  IF(is_first_year)THEN
+    IF(.NOT.is_restart_run)IRUN=ISTART
     L=1
     ILAST=ISTART-1
     ITERM=IFIN
@@ -529,25 +531,25 @@ module readsmod
   IF(DATAC(9,NE,NEX).NE.'NO')THEN
 !
 !   NH1,NV1,NH2,NV2=N,W and S,E corners of landscape unit
-!   DATA(8),DATA(5),DATA(6)=disturbance,fertilizer,irrigation files
+!   DATA1(8),DATA1(5),DATA1(6)=disturbance,fertilizer,irrigation files
 !   PREFIX=path for files in current or higher level directory
 !
 
     call OPEN_safe(13,PREFIX,DATAC(9,NE,NEX),'OLD',mod_filename,__LINE__)
     do while(.TRUE.)
     READ(13,*,END=200)NH1,NV1,NH2,NV2
-    READ(13,*)DATA(8),DATA(5),DATA(6)
-    IF(DATA(8).NE.'NO')THEN
-      call OPEN_safe(10,PREFIX,DATA(8),'OLD',mod_filename,__LINE__)
+    READ(13,*)DATA1(8),DATA1(5),DATA1(6)
+    IF(DATA1(8).NE.'NO')THEN
+      call OPEN_safe(10,PREFIX,DATA1(8),'OLD',mod_filename,__LINE__)
     ENDIF
 
-    IF(DATA(6).NE.'NO')THEN
-      call OPEN_safe(2,PREFIX,DATA(6),'OLD',mod_filename,__LINE__)
+    IF(DATA1(6).NE.'NO')THEN
+      call OPEN_safe(2,PREFIX,DATA1(6),'OLD',mod_filename,__LINE__)
     ENDIF
 !
 !   READ TILLAGE INPUT FILE
 !
-    IF(DATA(8).NE.'NO')THEN
+    IF(DATA1(8).NE.'NO')THEN
 !
 !     DY=date DDMMYYYY
 !     IPLOW,DPLOW=intensity,depth of disturbance
@@ -579,7 +581,7 @@ module readsmod
 !
 !   READ FERTLIZER INPUT FILE
 !
-    IF(DATA(5).NE.'NO')THEN
+    IF(DATA1(5).NE.'NO')THEN
 !
 !     DY=date DDMMYYYY
 !     *A,*B=broadcast,banded fertilizer application
@@ -592,7 +594,7 @@ module readsmod
 !     ROWX=band row width
 !     IRO,IR1,IR2=fertilizer,litter,manure type
 !
-      call OPEN_safe(8,PREFIX,DATA(5),'OLD',mod_filename,__LINE__)
+      call OPEN_safe(8,PREFIX,DATA1(5),'OLD',mod_filename,__LINE__)
       do while(.TRUE.)
       READ(8,*,END=85)DY,Z4A,Z3A,ZUA,ZOA,Z4B,Z3B,ZUB,ZOB &
         ,PMA,PMB,PHA,CAC,CAS,RSC1,RSN1,RSP1,RSC2,RSN2,RSP2,FDPTHI &
@@ -664,8 +666,8 @@ module readsmod
 !
 !   READ IRRIGATION INPUT FILE
 !
-    IF(DATA(6).NE.'NO')THEN
-      IF(DATA(6)(1:4).EQ.'auto')THEN
+    IF(DATA1(6).NE.'NO')THEN
+      IF(DATA1(6)(1:4).EQ.'auto')THEN
 !
 !       AUTOMATED IRRIGATION
 !

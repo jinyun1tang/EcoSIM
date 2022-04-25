@@ -16,6 +16,7 @@ module WthrMod
   use AqueChemDatatype
   use IrrigationDataType
   use GridDataType
+  use EcoSIMConfig
   implicit none
 
   private
@@ -59,7 +60,7 @@ module WthrMod
   !     IWTHR=weather data type in first(1) or second(2) scene
   !     ITYPE=weather data type:1=daily,2=hourly
   !
-  IF(IGO.EQ.0.OR.I.LE.ILAST)THEN
+  IF(is_first_year.OR.I.LE.ILAST)THEN
     ITYPE=IWTHR(1)
   ELSE
     ITYPE=IWTHR(2)

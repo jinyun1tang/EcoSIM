@@ -12,6 +12,7 @@ PROGRAM main
   use EcoSIMCtrlDataType
   use GridConsts
   use EcoSIMHistMod
+  use EcosimConst
   implicit none
 
   character(len=*), parameter :: mod_filename = __FILE__
@@ -77,11 +78,11 @@ PROGRAM main
 !
 ! SITE FILE
 !
-  READ(5,10)DATA(1)
+  READ(5,10)DATA1(1)
 !
 ! TOPOGRAPHY FILE
 !
-  READ(5,10)DATA(2)
+  READ(5,10)DATA1(2)
 !
 ! READ THE NUMBER OF TIMES THE SCENARIOS IN THE MODEL RUN ARE TO BE EXECUTED
 !

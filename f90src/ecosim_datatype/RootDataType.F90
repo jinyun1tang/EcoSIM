@@ -104,6 +104,8 @@ module RootDataType
   real(r8) :: WTRTA(JP,JY,JX)                   !root C per plant, [g p-1]
   real(r8) :: WTRT(JP,JY,JX)                    !plant root C, [g d-2]
   real(r8) :: WTRTS(JP,JY,JX)                   !plant root structural C, [g d-2]
+  real(r8) :: WTRTSN(JP,JY,JX)                   !plant root structural C, [g d-2]
+  real(r8) :: WTRTSP(JP,JY,JX)                   !plant root structural C, [g d-2]
   real(r8) :: WSRTL(2,JZ,JP,JY,JX)              !root layer protein C, [g d-2]
   real(r8) :: WTRT1(2,JZ,JC,JP,JY,JX)           !root layer C primary axes, [g d-2]
   real(r8) :: WTRT2(2,JZ,JC,JP,JY,JX)           !root layer C secondary axes, [g d-2]

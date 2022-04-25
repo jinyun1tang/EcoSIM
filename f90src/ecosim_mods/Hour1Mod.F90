@@ -34,6 +34,7 @@ module Hour1Mod
   use SedimentDataType
   use PlantDataRateType
   use GridDataType
+  use EcoSIMConfig
   implicit none
 
   private
@@ -127,9 +128,9 @@ module Hour1Mod
 !     POROS0,FC,WP=litter porosity,field capacity,wilting point
 !
       VOLWRX(NY,NX)=AMAX1(0.0,THETRX(0)*RC0(0,NY,NX) &
-      +THETRX(1)*RC0(1,NY,NX)+THETRX(2)*RC0(2,NY,NX))
+        +THETRX(1)*RC0(1,NY,NX)+THETRX(2)*RC0(2,NY,NX))
       VOLR(NY,NX)=AMAX1(0.0,RC0(0,NY,NX)*1.0E-06/BKRS(0) &
-      +RC0(1,NY,NX)*1.0E-06/BKRS(1)+RC0(2,NY,NX)*1.0E-06/BKRS(2))
+        +RC0(1,NY,NX)*1.0E-06/BKRS(1)+RC0(2,NY,NX)*1.0E-06/BKRS(2))
       IF(VOLR(NY,NX).GT.ZEROS(NY,NX))THEN
         FVOLR=VOLWRX(NY,NX)/VOLR(NY,NX)
       ELSE
@@ -163,7 +164,7 @@ module Hour1Mod
 !     RESET ARRAYS TO TRANSFER MATERIALS WITHIN SOILS
 !     AND BETWEEN SOILS AND PLANTS
 !
-      DO 9875 L=0,NL(NY,NX)
+      DO  L=0,NL(NY,NX)
 
         call SetArrays4PlantSoilTransfer(L,NY,NX)
 !
@@ -173,7 +174,7 @@ module Hour1Mod
           call UpdateTotalSOC(L,NY,NX)
         ENDIF
 
-9875  CONTINUE
+      ENDDO
       IFLGL=0
       IFLGY=0
       ICHKA=0
@@ -832,7 +833,7 @@ module Hour1Mod
       ENDIF
       PSL(L,NY,NX)=LOG(POROS(L,NY,NX))
       IF((ISOIL(1,L,NY,NX).EQ.0.AND.ISOIL(2,L,NY,NX).EQ.0) &
-        .OR.DATA(20).EQ.'YES')THEN
+        .OR.is_restart_run)THEN
         FCL(L,NY,NX)=LOG(FC(L,NY,NX))
         WPL(L,NY,NX)=LOG(WP(L,NY,NX))
         PSD(L,NY,NX)=PSL(L,NY,NX)-FCL(L,NY,NX)
@@ -844,7 +845,7 @@ module Hour1Mod
         !
         !     THW,THI=initial soil water,ice content from soil file
         !
-        IF(DATA(20).EQ.'NO')THEN
+        IF(.not.is_restart_run)THEN
           IF(ISOIL(1,L,NY,NX).EQ.1.OR.ISOIL(2,L,NY,NX).EQ.1)THEN
             IF(CORGC(L,NY,NX).LT.FORGW)THEN
               FC(L,NY,NX)=0.2576-0.20*CSAND(L,NY,NX) &
@@ -906,7 +907,7 @@ module Hour1Mod
           ELSEIF(THI(L,NY,NX).LT.0.0)THEN
             THETI(L,NY,NX)=0.0_r8
           ENDIF
-          IF(DATA(20).EQ.'NO')THEN
+          IF(.not.is_restart_run)THEN
             VOLW(L,NY,NX)=THETW(L,NY,NX)*VOLX(L,NY,NX)
             VOLWX(L,NY,NX)=VOLW(L,NY,NX)
             VOLWH(L,NY,NX)=THETW(L,NY,NX)*VOLAH(L,NY,NX)
@@ -2985,6 +2986,7 @@ module Hour1Mod
         call ApplyUreaNitrifierInhibitor(I,J,NY,NX,LFDPTH)
 
       ENDIF
+
 8995  CONTINUE
 8990  CONTINUE
   end subroutine ApplyFertilizerAtNoon

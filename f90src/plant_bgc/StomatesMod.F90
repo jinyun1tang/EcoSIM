@@ -688,7 +688,7 @@
 !     RSMY=minimum stomatal resistance for CO2 uptake (h m-1)
 ! hourly time step
   IF(CH2O.GT.ZEROPs1(NZ))THEN
-    RSX=FRADPs1(NZ)*DCO2s1(NZ)*AREA3Us1/(CH2O*secsperhour)
+    RSX=FRADPs1(NZ)*DCO2s1(NZ)*AREA3s1(NUs1)/(CH2O*secsperhour)
   ELSE
     RSX=RSMHs1(NZ)*1.56_r8
   ENDIF

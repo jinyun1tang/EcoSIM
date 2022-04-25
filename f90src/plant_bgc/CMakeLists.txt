@@ -4,7 +4,9 @@ set(PLANT_BGC_SOURCES
 	UptakesMod.F90
 	StartqMod.F90
   PlantDisturbMod.F90
-	GrosubMod.F90
+  PlantDisturbsMod.F90
+	ExtractsMod.F90
+	GrosubsMod.F90
 	StomateMod.F90
 	StomatesMod.F90
   GrosubPars.F90

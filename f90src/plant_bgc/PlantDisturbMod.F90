@@ -59,15 +59,14 @@ module PlantDisturbMod
 
 !------------------------------------------------------------------------------------------
 
-  subroutine RemoveBiomByManagement(I,J,NZ,NY,NX,WTSHTA,CPOOLK)
+  subroutine RemoveBiomByManagement(I,J,NZ,NY,NX,CPOOLK)
   implicit none
   integer, intent(in) :: I,J,NZ,NY,NX
-  REAL(R8), intent(in) :: WTSHTA(JZ,JY,JX)
   real(r8), intent(inout) :: CPOOLK(10,JP,JY,JX)
 !     TRANSFER ABOVE-GROUND C,N,P AT HARVEST OR DISTURBANCE
 !
 
-  call RemoveBiomByHarvest(I,J,NZ,NY,NX,WTSHTA,CPOOLK)
+  call RemoveBiomByHarvest(I,J,NZ,NY,NX,CPOOLK)
 !
 !     REDUCE OR REMOVE PLANT POPULATIONS DURING TILLAGE
 !
@@ -1061,11 +1060,10 @@ module PlantDisturbMod
   end subroutine RemoveBiomByTillage
 !------------------------------------------------------------------------------------------
 
-  subroutine RemoveBiomByHarvest(I,J,NZ,NY,NX,WTSHTA,CPOOLK)
+  subroutine RemoveBiomByHarvest(I,J,NZ,NY,NX,CPOOLK)
 
   implicit none
   integer, intent(in) :: I,J,NZ,NY,NX
-  REAL(R8), intent(in) :: WTSHTA(JZ,JY,JX)
   real(r8), intent(inout) :: CPOOLK(10,JP,JY,JX)
   integer :: L,K,M,NR,N,NB,NBX
   real(r8):: ZPOOLG,ZPOLNG,ZPOOLX
@@ -2443,11 +2441,10 @@ module PlantDisturbMod
   end subroutine RemoveBiomByHarvest
 !------------------------------------------------------------------------------------------
 
-  subroutine PrepLandscapeGrazing(I,J,NHW,NHE,NVN,NVS,WTSHTA)
+  subroutine PrepLandscapeGrazing(I,J,NHW,NHE,NVN,NVS)
   implicit none
   integer, intent(in) :: I, J
   integer, intent(in) :: NHW,NHE,NVN,NVS
-  real(r8), intent(out) :: WTSHTA(JZ,JY,JX)
   integer :: NX,NY,NZ,nn,nx1,NY1
   real(r8) :: WTSHTZ
 !     begin_execution

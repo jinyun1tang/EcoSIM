@@ -14,9 +14,9 @@ module InitEcoSIM
   use ChemTranspDataType  , only : InitChemTranspData
   use FertilizerDataType  , only : InitFertilizerData
   use CanopyRadDataType   , only : InitCanopyRad
-  use GrosubMod           , only : InitGrosub
+  use GrosubsMod           , only : InitGrosub
   use WatsubMod           , only : initWatsub
-  use PlantDisturbMod     , only : InitPlantDisturbance
+  use PlantDisturbsMod     , only : InitPlantDisturbance
   use PlantTraitDataType   , only : InitPlantTraits
   use UptakesMod           , only : InitUptake
   use Hour1Mod            , only : InitHour1

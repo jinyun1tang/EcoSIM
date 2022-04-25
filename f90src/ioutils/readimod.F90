@@ -74,8 +74,8 @@ module readiMod
   OPEN(19,FILE=trim(outdir)//'logfile2',STATUS='UNKNOWN')
   OPEN(20,FILE=trim(outdir)//'logfile3',STATUS='UNKNOWN')
 
-  call OPEN_safe(1,PREFIX,DATA(1),'OLD',mod_filename,__LINE__)
-  call OPEN_safe(7,PREFIX,DATA(2),'OLD',mod_filename,__LINE__)
+  call OPEN_safe(1,PREFIX,DATA1(1),'OLD',mod_filename,__LINE__)
+  call OPEN_safe(7,PREFIX,DATA1(2),'OLD',mod_filename,__LINE__)
 
   WRITE(18,5000)' 08 JUL 2021'
 5000  FORMAT(A16)
@@ -138,7 +138,7 @@ module readiMod
 
   if(lverb)then
     write(*,*)'read data in '//trim(subname)
-    write(*,*)'read site data file: ',DATA(1)
+    write(*,*)'read site data file: ',DATA1(1)
     write(*,'(40A)')('-',ll=1,40)
     write(*,*)'Latitude (o): ALATG',ALATG
     write(*,*)'Altitude (m): ALTIG',ALTIG
@@ -249,13 +249,13 @@ module readiMod
 ! DPTHSX=initial snowpack depth
 !
 50    READ(7,*,END=20)NH1,NV1,NH2,NV2,ASPX,SL0,SLX,DPTHSX
-  READ(7,52)DATA(7)
+  READ(7,52)DATA1(7)
 52    FORMAT(A16)
 !
 ! OPEN AND READ SOIL FILE
 !
   if(lverb)then
-    write(*,*)'Read Topographic characterization file: ',DATA(2)
+    write(*,*)'Read Topographic characterization file: ',DATA1(2)
     write(*,'(40A)')('-',ll=1,40)
     write(*,*)'for NX in NH1 and NH2',NH1,NH2
     write(*,*)'NY in NV1 and NV2',NV1,NV2
@@ -264,10 +264,10 @@ module readiMod
     write(*,*)'NS slope (o): SL2',SL2
     write(*,*)'Initial snowpack depth: DPTHSX',DPTHSX
     write(*,'(100A)')('=',ll=1,100)
-    write(*,*)'read soil file ',DATA(7)
+    write(*,*)'read soil file ',DATA1(7)
   endif
 
-  call OPEN_safe(9,PREFIX,DATA(7),'OLD',mod_filename,__LINE__)
+  call OPEN_safe(9,PREFIX,DATA1(7),'OLD',mod_filename,__LINE__)
 
   DO 9995 NX=NH1,NH2
     DO 9990 NY=NV1,NV2

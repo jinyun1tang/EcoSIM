@@ -90,12 +90,13 @@ module StartsMod
   !     INITIALIZE ACCUMULATORS AND MASS BALANCE CHECKS
   !     OF EACH GRID CELL
   !
+  call InitAccumulators()
+
   ALTZG=0.0_r8
   CDPTHG=0.0_r8
   DO 9995 NX=NHW,NHE
     DO 9990 NY=NVN,NVS
 
-      call InitAccumulators(NY,NX)
       !
       !     MINIMUM SURFACE ELEVATION IN LANDSCAPE
       !
@@ -172,26 +173,19 @@ module StartsMod
       TKS(0,NY,NX)=ATKS(NY,NX)
       TKSD(NY,NX)=ATKS(NY,NX)+2.052E-04*DPTHSK(NY,NX)/TCNDG
 !
-!     INITIALIZE COMMUNITY CANOPY
-!
-      ZT(NY,NX)=0.0_r8
-      ZL(0,NY,NX)=0.0_r8
-      DO 1925 L=1,JC
-        ZL(L,NY,NX)=0.0_r8
-        ARLFT(L,NY,NX)=0.0_r8
-        ARSTT(L,NY,NX)=0.0_r8
-        WGLFT(L,NY,NX)=0.0_r8
-1925  CONTINUE
-!
-!     INITIALIZE SEDIMENT LOAD IN EROSION MODEL
-!
-      IF(IERSNG.EQ.1.OR.IERSNG.EQ.3)THEN
-        SED(NY,NX)=0.0_r8
-      ENDIF
+
 9990  CONTINUE
 9995  CONTINUE
+
 !
-!     INITIALIZE GRID CELL DIMENSIONS
+!     INITIALIZE COMMUNITY CANOPY
+!
+  ZT(:,:)=0.0_r8
+  ZL(0:JC,:,:)=0.0_r8
+  ARLFT(1:JC,:,:)=0.0_r8
+  ARSTT(1:JC,:,:)=0.0_r8
+  WGLFT(1:JC,:,:)=0.0_r8
+
 !
   call InitSoilVars(NHW,NHE,NVN,NVS,ALTZG,CDPTHG)
 
@@ -219,6 +213,14 @@ module StartsMod
 
 
   ! begin_execution
+
+!     INITIALIZE SEDIMENT LOAD IN EROSION MODEL
+!
+  IF(IERSNG.EQ.1.OR.IERSNG.EQ.3)THEN
+    SED(:,:)=0.0_r8
+  ENDIF
+!
+!     INITIALIZE GRID CELL DIMENSIONS
   DO 9895 NX=NHW,NHE
     DO 9890 NY=NVN,NVS
       ALTZ(NY,NX)=ALTZG
@@ -236,26 +238,29 @@ module StartsMod
         N1=NX
         N2=NY
         N3=L
-        DO 4320 N=NCN(N2,N1),3
+        DO N=NCN(N2,N1),3
           IF(N.EQ.1)THEN
+! in direction x, west-east
             IF(NX.EQ.NHE)THEN
-              GO TO 4320
+              cycle
             ELSE
               N4=NX+1
               N5=NY
               N6=L
             ENDIF
           ELSEIF(N.EQ.2)THEN
+! in direction y, north-south
             IF(NY.EQ.NVS)THEN
-              GO TO 4320
+              cycle
             ELSE
               N4=NX
               N5=NY+1
               N6=L
             ENDIF
           ELSEIF(N.EQ.3)THEN
+! in vertical, up-down
             IF(L.EQ.NL(NY,NX))THEN
-              GO TO 4320
+              cycle
             ELSE
               N4=NX
               N5=NY
@@ -264,12 +269,13 @@ module StartsMod
           ENDIF
           DIST(N,N6,N5,N4)=0.5*(DLYR(N,N3,N2,N1)+DLYR(N,N6,N5,N4))
           XDPTH(N,N6,N5,N4)=AREA(N,N3,N2,N1)/DIST(N,N6,N5,N4)
-          DISP(N,N6,N5,N4)=0.20*DIST(N,N6,N5,N4)**1.07
-4320    CONTINUE
+!1.07 is a scaling parameter for dispersion calculation, reference?
+          DISP(N,N6,N5,N4)=0.20*DIST(N,N6,N5,N4)**1.07_r8
+        ENDDO
         IF(L.EQ.NU(NY,NX))THEN
           DIST(3,N3,N2,N1)=0.5*DLYR(3,N3,N2,N1)
           XDPTH(3,N3,N2,N1)=AREA(3,N3,N2,N1)/DIST(3,N3,N2,N1)
-          DISP(3,N3,N2,N1)=0.20*DIST(3,N3,N2,N1)**1.07
+          DISP(3,N3,N2,N1)=0.20*DIST(3,N3,N2,N1)**1.07_r8
         ENDIF
 4400  CONTINUE
 
@@ -769,101 +775,99 @@ module StartsMod
   TIONOU=0.0_r8
   end subroutine InitControlParameters
 !------------------------------------------------------------------------------------------
-  subroutine InitAccumulators(NY,NX)
+  subroutine InitAccumulators()
   implicit none
-  integer, intent(in) :: NY, NX
-  integer :: N
+
 !     begin_execution
-  DO 600 N=1,12
-    TDTPX(NY,NX,N)=0.0
-    TDTPN(NY,NX,N)=0.0
-    TDRAD(NY,NX,N)=1.0
-    TDWND(NY,NX,N)=1.0
-    TDHUM(NY,NX,N)=1.0
-    TDPRC(NY,NX,N)=1.0
-    TDIRI(NY,NX,N)=1.0
-    TDCO2(NY,NX,N)=1.0
-    TDCN4(NY,NX,N)=1.0
-    TDCNO(NY,NX,N)=1.0
-600 CONTINUE
-  IUTYP(NY,NX)=0
-  IFNHB(NY,NX)=0
-  IFNOB(NY,NX)=0
-  IFPOB(NY,NX)=0
-  IFLGS(NY,NX)=1
-  IFLGT(NY,NX)=0
-  ATCA(NY,NX)=ATCAI(NY,NX)
-  ATCS(NY,NX)=ATCAI(NY,NX)
-  ATKA(NY,NX)=ATCA(NY,NX)+TC2K
-  ATKS(NY,NX)=ATCS(NY,NX)+TC2K
-  URAIN(NY,NX)=0.0
-  UCO2G(NY,NX)=0.0
-  UCH4G(NY,NX)=0.0
-  UOXYG(NY,NX)=0.0
-  UN2GG(NY,NX)=0.0
-  UN2OG(NY,NX)=0.0
-  UNH3G(NY,NX)=0.0
-  UN2GS(NY,NX)=0.0
-  UCO2F(NY,NX)=0.0
-  UCH4F(NY,NX)=0.0
-  UOXYF(NY,NX)=0.0
-  UN2OF(NY,NX)=0.0
-  UNH3F(NY,NX)=0.0
-  UPO4F(NY,NX)=0.0
-  UORGF(NY,NX)=0.0
-  UFERTN(NY,NX)=0.0
-  UFERTP(NY,NX)=0.0
-  UVOLO(NY,NX)=0.0
-  UEVAP(NY,NX)=0.0
-  URUN(NY,NX)=0.0
-  USEDOU(NY,NX)=0.0
-  UCOP(NY,NX)=0.0
-  UDOCQ(NY,NX)=0.0
-  UDOCD(NY,NX)=0.0
-  UDONQ(NY,NX)=0.0
-  UDOND(NY,NX)=0.0
-  UDOPQ(NY,NX)=0.0
-  UDOPD(NY,NX)=0.0
-  UDICQ(NY,NX)=0.0
-  UDICD(NY,NX)=0.0
-  UDINQ(NY,NX)=0.0
-  UDIND(NY,NX)=0.0
-  UDIPQ(NY,NX)=0.0
-  UDIPD(NY,NX)=0.0
-  UIONOU(NY,NX)=0.0
-  UXCSN(NY,NX)=0.0
-  UXZSN(NY,NX)=0.0
-  UXPSN(NY,NX)=0.0
-  UDRAIN(NY,NX)=0.0
-  ZDRAIN(NY,NX)=0.0
-  PDRAIN(NY,NX)=0.0
-  DPNH4(NY,NX)=0.0
-  DPNO3(NY,NX)=0.0
-  DPPO4(NY,NX)=0.0
-  OXYS(0,NY,NX)=0.0
-  FRADG(NY,NX)=1.0
-  THRMG(NY,NX)=0.0
-  THRMC(NY,NX)=0.0
-  TRN(NY,NX)=0.0
-  TLE(NY,NX)=0.0
-  TSH(NY,NX)=0.0
-  TGH(NY,NX)=0.0
-  TLEC(NY,NX)=0.0
-  TSHC(NY,NX)=0.0
-  TLEX(NY,NX)=0.0
-  TSHX(NY,NX)=0.0
-  TCNET(NY,NX)=0.0
-  TVOLWC(NY,NX)=0.0
-  ARLFC(NY,NX)=0.0
-  ARSTC(NY,NX)=0.0
-  TFLWC(NY,NX)=0.0
-  PPT(NY,NX)=0.0
-  DYLN(NY,NX)=12.0
-  ALBX(NY,NX)=ALBS(NY,NX)
-  XHVSTC(NY,NX)=0.0
-  XHVSTN(NY,NX)=0.0
-  XHVSTP(NY,NX)=0.0
-  ENGYP(NY,NX)=0.0
+  TDTPX(:,:,:)=0.0_r8
+  TDTPN(:,:,:)=0.0_r8
+  TDRAD(:,:,:)=1.0_r8
+  TDWND(:,:,:)=1.0_r8
+  TDHUM(:,:,:)=1.0_r8
+  TDPRC(:,:,:)=1.0_r8
+  TDIRI(:,:,:)=1.0_r8
+  TDCO2(:,:,:)=1.0_r8
+  TDCN4(:,:,:)=1.0_r8
+  TDCNO(:,:,:)=1.0_r8
+
+  IUTYP(:,:)=0
+  IFNHB(:,:)=0
+  IFNOB(:,:)=0
+  IFPOB(:,:)=0
+  IFLGS(:,:)=1
+  IFLGT(:,:)=0
+  ATCA(:,:)=ATCAI(:,:)
+  ATCS(:,:)=ATCAI(:,:)
+  ATKA(:,:)=ATCA(:,:)+TC2K
+  ATKS(:,:)=ATCS(:,:)+TC2K
+  URAIN(:,:)=0.0_r8
+  UCO2G(:,:)=0.0_r8
+  UCH4G(:,:)=0.0_r8
+  UOXYG(:,:)=0.0_r8
+  UN2GG(:,:)=0.0_r8
+  UN2OG(:,:)=0.0_r8
+  UNH3G(:,:)=0.0_r8
+  UN2GS(:,:)=0.0_r8
+  UCO2F(:,:)=0.0_r8
+  UCH4F(:,:)=0.0_r8
+  UOXYF(:,:)=0.0_r8
+  UN2OF(:,:)=0.0_r8
+  UNH3F(:,:)=0.0_r8
+  UPO4F(:,:)=0.0_r8
+  UORGF(:,:)=0.0_r8
+  UFERTN(:,:)=0.0_r8
+  UFERTP(:,:)=0.0_r8
+  UVOLO(:,:)=0.0_r8
+  UEVAP(:,:)=0.0_r8
+  URUN(:,:)=0.0_r8
+  USEDOU(:,:)=0.0_r8
+  UCOP(:,:)=0.0_r8
+  UDOCQ(:,:)=0.0_r8
+  UDOCD(:,:)=0.0_r8
+  UDONQ(:,:)=0.0_r8
+  UDOND(:,:)=0.0_r8
+  UDOPQ(:,:)=0.0_r8
+  UDOPD(:,:)=0.0_r8
+  UDICQ(:,:)=0.0_r8
+  UDICD(:,:)=0.0_r8
+  UDINQ(:,:)=0.0_r8
+  UDIND(:,:)=0.0_r8
+  UDIPQ(:,:)=0.0_r8
+  UDIPD(:,:)=0.0_r8
+  UIONOU(:,:)=0.0_r8
+  UXCSN(:,:)=0.0_r8
+  UXZSN(:,:)=0.0_r8
+  UXPSN(:,:)=0.0_r8
+  UDRAIN(:,:)=0.0_r8
+  ZDRAIN(:,:)=0.0_r8
+  PDRAIN(:,:)=0.0_r8
+  DPNH4(:,:)=0.0_r8
+  DPNO3(:,:)=0.0_r8
+  DPPO4(:,:)=0.0_r8
+  OXYS(0,:,:)=0.0_r8
+  FRADG(:,:)=1.0_r8
+  THRMG(:,:)=0.0_r8
+  THRMC(:,:)=0.0_r8
+  TRN(:,:)=0.0_r8
+  TLE(:,:)=0.0_r8
+  TSH(:,:)=0.0_r8
+  TGH(:,:)=0.0_r8
+  TLEC(:,:)=0.0_r8
+  TSHC(:,:)=0.0_r8
+  TLEX(:,:)=0.0_r8
+  TSHX(:,:)=0.0_r8
+  TCNET(:,:)=0.0_r8
+  TVOLWC(:,:)=0.0_r8
+  ARLFC(:,:)=0.0_r8
+  ARSTC(:,:)=0.0_r8
+  TFLWC(:,:)=0.0_r8
+  PPT(:,:)=0.0_r8
+  DYLN(:,:)=12.0_r8
+  ALBX(:,:)=ALBS(:,:)
+  XHVSTC(:,:)=0.0_r8
+  XHVSTN(:,:)=0.0_r8
+  XHVSTP(:,:)=0.0_r8
+  ENGYP(:,:)=0.0_r8
   end subroutine InitAccumulators
 !------------------------------------------------------------------------------------------
   subroutine InitLayerDepths(NY,NX)

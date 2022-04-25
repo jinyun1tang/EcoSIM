@@ -250,5 +250,6 @@ module CanopyDataType
   real(r8) :: WTRVX(JP,JY,JX)                   !plant stored nonstructural C at planting, [g d-2]
   real(r8) :: WTRVN(JP,JY,JX)                   !plant stored nonstructural N, [g d-2]
   real(r8) :: WTRVP(JP,JY,JX)                   !plant stored nonstructural P, [g d-2]
+  REAL(R8) :: WTSHTA(JP,JY,JX)                  !landscape average canopy shoot C, [g d-2]
 
 end module CanopyDataType
