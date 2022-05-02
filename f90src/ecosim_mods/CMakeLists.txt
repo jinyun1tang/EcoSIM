@@ -1,5 +1,6 @@
 set(ECOSIM_MOD_SOURCES
 	DayMod.F90
+  CanopyCondMod.F90
 	ErosionMod.F90
 	ExecMod.F90
   Hour1Pars.F90

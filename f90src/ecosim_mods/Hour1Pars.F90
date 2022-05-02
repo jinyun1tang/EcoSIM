@@ -16,13 +16,9 @@ module Hour1Pars
 !     AC*X=activity (g m-3):CO2=CO2,CH4=CH4,OXY=O2,N2G=N2g
 !     N2O=N2O,NH3=NH3,H2G=H2
 !
-!
-!     ALBRW,ALBPW=stalk albedo for shortwave,PAR
 !     VISCW=water viscosity (Mg m-1 s)
-!     BKDSX=maximm soil bulk density, ZW=snowpack surface roughness (m)
-!     CFW=stalk clumping factor,FORGW=minimum SOC or organic soil (g Mg-1)
+!     BKDSX=maximm soil bulk density
 !     THETPW=minimum air-filled porosity for saturation (m3 m-3)
-!     RAM=minimum boundary layer resistance (h m-1)
 !
 
   real(r8) :: CGSG
@@ -72,14 +68,8 @@ module Hour1Pars
   real(r8) :: AN2OX
   real(r8) :: ANH3X
   real(r8) :: AH2GX
-  real(r8) :: ALBRW
-  real(r8) :: ALBPW
-  real(r8) :: ABSRW
-  real(r8) :: ABSPW
   real(r8) :: VISCW
   real(r8) :: BKDSX
-  real(r8) :: ZW
-  real(r8) :: CFW
   real(r8) :: FORGW
   real(r8) :: DTHETW
   real(r8) :: THETPW
@@ -142,19 +132,12 @@ module Hour1Pars
   AN2OX=0.23
   ANH3X=0.07
   AH2GX=0.14
-  ALBRW=0.1
-  ALBPW=0.1
-  ABSRW=1.0-ALBRW
-  ABSPW=1.0-ALBPW
   VISCW=1.0E-06
   BKDSX=1.89
-  ZW=0.01
-  CFW=0.5
   FORGW=0.25E+06
   DTHETW=1.0E-06
   THETPW=0.01
   THETWP=1.0-THETPW
-  RAM=2.78E-03
 
   XVOLWC=(/5.0E-04,2.5E-04,2.5E-04,2.5E-04/)
   THETRX=(/4.0E-06,8.0E-06,8.0E-06/)

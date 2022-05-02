@@ -86,6 +86,7 @@ SUBROUTINE routq(NT,NE,NTX,NEX,NHW,NHE,NVN,NVS)
           DO 4965 NZ=1,NS
             IF(IETYP(NY,NX).GT.0)THEN
               WRITE(CLIMATE,'(I2)')IETYP(NY,NX)
+!the type of pft is specified by genra+Koppen climate zone
               DATAX(NZ)=DATAX(NZ)(1:4)//CLIMATE
             ENDIF
 4965      CONTINUE

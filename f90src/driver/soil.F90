@@ -14,7 +14,6 @@ SUBROUTINE soil(NA,ND,NT,NE,NAX,NTX,NEX,NHW,NHE,NVN,NVS)
   use StarteMod    , only : starte
   use StartqMod    , only : startq
   use StartsMod    , only : starts
-  use StomateMod   , only : stomate
   use TrnsfrMod    , only : trnsfr
   use TrnsfrsMod   , only : trnsfrs
   use VisualMod    , only : visual

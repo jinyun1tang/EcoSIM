@@ -2,7 +2,8 @@ module Hour1Mod
   use data_kind_mod, only : r8 => SHR_KIND_R8
   use minimathmod  , only : test_aeqb
   use abortutils   , only : endrun, print_info
-  use EcosimConst
+  use EcoSimConst
+  use CanopyCondMod, only : CanopyConditionModel
   use MicrobialDataType
   use SOMDataType
   use ChemTranspDataType
@@ -41,8 +42,6 @@ module Hour1Mod
 
   CHARACTER(LEN=*), PARAMETER :: MOD_FILENAME=__FILE__
 
-
-
   public :: hour1
   public :: InitHour1
   contains
@@ -71,34 +70,13 @@ module Hour1Mod
   real(r8) :: VOLWCX
   real(r8) :: XJ
   integer :: NZ,NR
-  integer :: IFLGL,IFLGY,ICHKA
 !     execution begins here
 
   XJ=J
   DOY=I-1+XJ/24
 !
-!     RESET HOURLY SOIL ACCUMULATORS FOR WATER, HEAT, GASES, SOLUTES
-!
-  VOLWSO=0.0_r8
-  HEATSO=0.0_r8
-  OXYGSO=0.0_r8
-  TLH2G=0.0_r8
-  TSEDSO=0.0_r8
-  TLRSDC=0.0_r8
-  TLORGC=0.0_r8
-  TLCO2G=0.0_r8
-  TLRSDN=0.0_r8
-  TLORGN=0.0_r8
-  TLN2G=0.0_r8
-  TLRSDP=0.0_r8
-  TLORGP=0.0_r8
-  TLNH4=0.0_r8
-  TLNO3=0.0_r8
-  TLPO4=0.0_r8
-  TION=0.0_r8
-  TBALC=0.0_r8
-  TBALN=0.0_r8
-  TBALP=0.0_r8
+  call ResetLndscapeAccumlators()
+
   call SetAtmosTracerConcentration(I,NHW,NHE,NVN,NVS)
 !
 !     RESET FLUX ARRAYS USED IN OTHER SUBROUTINES
@@ -107,7 +85,9 @@ module Hour1Mod
 !
 !     IF SALT FLAG SET
 !
-  call ResetSaltModelArrays(NHW,NHE,NVN,NVS)
+  IF(ISALTG.NE.0)THEN
+    call ResetSaltModelArrays(NHW,NHE,NVN,NVS)
+  ENDIF
 !
 !     RESET SOIL PROPERTIES AND PEDOTRANSFER FUNCTIONS
 !     FOLLOWING ANY SOIL DISTURBANCE
@@ -151,7 +131,6 @@ module Hour1Mod
 !
       call SetLiterSoilPropAftDisturbance(I,J,NY,NX)
 !
-!     END OF RESET AFTER DISTURBANCE
 !
 !     PARAMETERS FOR COHESION, EROSIVITY, AND ROUGHNESS OF SURFACE SOIL USED
 !     FOR SURFACE WATER AND SEDIMENT TRANSPORT IN 'EROSION'
@@ -164,50 +143,36 @@ module Hour1Mod
 !     RESET ARRAYS TO TRANSFER MATERIALS WITHIN SOILS
 !     AND BETWEEN SOILS AND PLANTS
 !
-      DO  L=0,NL(NY,NX)
-
-        call SetArrays4PlantSoilTransfer(L,NY,NX)
+      call SetArrays4PlantSoilTransfer(NY,NX)
 !
 !     IF SOC FLAG IS SET
 !
-        IF(IERSNG.EQ.2.OR.IERSNG.EQ.3)THEN
-          call UpdateTotalSOC(L,NY,NX)
-        ENDIF
+      IF(IERSNG.EQ.2.OR.IERSNG.EQ.3)THEN
+        call UpdateTotalSOC(NY,NX)
+      ENDIF
 
-      ENDDO
-      IFLGL=0
-      IFLGY=0
-      ICHKA=0
-      DO 9985 L=NUI(NY,NX),NLI(NY,NX)
+      call ZeroHourlyArrays(NY,NX)
 
-        call ZeroHourlyArrays(L,NY,NX)
-!
-        call GetChemicalConcsInSoil(L,NY,NX,THETPZ)
-!
-        call GetSoluteConcentrations(L,NY,NX)
+      call GetChemicalConcsInSoil(NY,NX,THETPZ)
 
-        call PrepVars4PlantMicrobeUptake(L,NY,NX)
-!
-        call GetSoilHydraulicVars(L,NY,NX)
-!
+      call GetSoluteConcentrations(NY,NX)
+
+      call PrepVars4PlantMicrobeUptake(NY,NX)
+
+      call GetSoilHydraulicVars(NY,NX)
+
 !     CALCULATE ACTIVE LAYER DEPTH
+      call DiagActiveLayerDepth(NY,NX)
 
-        call DiagActiveLayerDepth(L,NY,NX,ICHKA)
-!
 !     OUTPUT FOR WATER TABLE DEPTH
-!
-        call GetOutput4WaterTableDepth(L,NY,NX,IFLGY,THETPZ)
-9985  CONTINUE
-!
+      call GetOutput4WaterTableDepth(NY,NX,THETPZ)
+
       call GetSurfResidualProperties(NY,NX,DPTH0)
 
       call SetTracerPropertyInLiterAir(NY,NX)
 !
-      call MultiLayerSurfaceRadiation(I,J,NY,NX,DPTH0)
+      call CanopyConditionModel(I,J,NY,NX,DPTH0)
 
-      call DivideCanopyLayerByLAI(NY,NX)
-
-      call CalcBoundaryLayerProperties(NY,NX,DPTH0)
 !
 !     RESET HOURLY INDICATORS
 !
@@ -251,7 +216,7 @@ module Hour1Mod
 !
         NG(NZ,NY,NX)=MAX(NG(NZ,NY,NX),NU(NY,NX))
         NIX(NZ,NY,NX)=MAX(NIX(NZ,NY,NX),NU(NY,NX))
-        DO 9790 NR=1,10
+        DO 9790 NR=1,JC
           NINR(NR,NZ,NY,NX)=MAX(NINR(NR,NZ,NY,NX),NU(NY,NX))
 9790    CONTINUE
 1930  CONTINUE
@@ -265,6 +230,32 @@ module Hour1Mod
   call ApplyFertilizerAtNoon(I,J,NHW,NHE,NVN,NVS)
 
   END subroutine hour1
+!------------------------------------------------------------------------------------------
+  subroutine ResetLndscapeAccumlators()
+!     RESET HOURLY SOIL ACCUMULATORS FOR WATER, HEAT, GASES, SOLUTES
+!
+  implicit none
+  VOLWSO=0.0_r8
+  HEATSO=0.0_r8
+  OXYGSO=0.0_r8
+  TLH2G=0.0_r8
+  TSEDSO=0.0_r8
+  TLRSDC=0.0_r8
+  TLORGC=0.0_r8
+  TLCO2G=0.0_r8
+  TLRSDN=0.0_r8
+  TLORGN=0.0_r8
+  TLN2G=0.0_r8
+  TLRSDP=0.0_r8
+  TLORGP=0.0_r8
+  TLNH4=0.0_r8
+  TLNO3=0.0_r8
+  TLPO4=0.0_r8
+  TION=0.0_r8
+  TBALC=0.0_r8
+  TBALN=0.0_r8
+  TBALP=0.0_r8
+  end subroutine ResetLndscapeAccumlators
 !------------------------------------------------------------------------------------------
 
   subroutine SetAtmosTracerConcentration(I,NHW,NHE,NVN,NVS)
@@ -324,135 +315,55 @@ module Hour1Mod
 !     begin_execution
   DO 9895 NX=NHW,NHE+1
     DO 9890 NY=NVN,NVS+1
-      DO 9885 L=0,NL(NY,NX)+1
-        DO 9880 N=1,3
 !
 !     WATER,SNOW,SOLUTE RUNOFF
 !
-        IF(L.EQ.0.AND.N.NE.3)THEN
-          DO 9835 NN=1,2
-            QR(N,NN,NY,NX)=0.0_r8
-            HQR(N,NN,NY,NX)=0.0_r8
-            DO 9870 K=0,jcplx1
-              XOCQRS(K,N,NN,NY,NX)=0.0_r8
-              XONQRS(K,N,NN,NY,NX)=0.0_r8
-              XOPQRS(K,N,NN,NY,NX)=0.0_r8
-              XOAQRS(K,N,NN,NY,NX)=0.0_r8
-9870        CONTINUE
-            XCOQRS(N,NN,NY,NX)=0.0_r8
-            XCHQRS(N,NN,NY,NX)=0.0_r8
-            XOXQRS(N,NN,NY,NX)=0.0_r8
-            XNGQRS(N,NN,NY,NX)=0.0_r8
-            XN2QRS(N,NN,NY,NX)=0.0_r8
-            XHGQRS(N,NN,NY,NX)=0.0_r8
-            XN4QRW(N,NN,NY,NX)=0.0_r8
-            XN3QRW(N,NN,NY,NX)=0.0_r8
-            XNOQRW(N,NN,NY,NX)=0.0_r8
-            XNXQRS(N,NN,NY,NX)=0.0_r8
-            XP1QRW(N,NN,NY,NX)=0.0_r8
-            XP4QRW(N,NN,NY,NX)=0.0_r8
-9835      CONTINUE
-          QS(N,NY,NX)=0.0_r8
-          QW(N,NY,NX)=0.0_r8
-          QI(N,NY,NX)=0.0_r8
-          HQS(N,NY,NX)=0.0_r8
-          XCOQSS(N,NY,NX)=0.0_r8
-          XCHQSS(N,NY,NX)=0.0_r8
-          XOXQSS(N,NY,NX)=0.0_r8
-          XNGQSS(N,NY,NX)=0.0_r8
-          XN2QSS(N,NY,NX)=0.0_r8
-          XN4QSS(N,NY,NX)=0.0_r8
-          XN3QSS(N,NY,NX)=0.0_r8
-          XNOQSS(N,NY,NX)=0.0_r8
-          XP1QSS(N,NY,NX)=0.0_r8
-          XP4QSS(N,NY,NX)=0.0_r8
+      DO 9835 NN=1,2
+        DO N=1,2
+          QR(N,NN,NY,NX)=0.0_r8
+          HQR(N,NN,NY,NX)=0.0_r8
+          DO 9870 K=0,jcplx1
+            XOCQRS(K,N,NN,NY,NX)=0.0_r8
+            XONQRS(K,N,NN,NY,NX)=0.0_r8
+            XOPQRS(K,N,NN,NY,NX)=0.0_r8
+            XOAQRS(K,N,NN,NY,NX)=0.0_r8
+9870      CONTINUE
+          XCOQRS(N,NN,NY,NX)=0.0_r8
+          XCHQRS(N,NN,NY,NX)=0.0_r8
+          XOXQRS(N,NN,NY,NX)=0.0_r8
+          XNGQRS(N,NN,NY,NX)=0.0_r8
+          XN2QRS(N,NN,NY,NX)=0.0_r8
+          XHGQRS(N,NN,NY,NX)=0.0_r8
+          XN4QRW(N,NN,NY,NX)=0.0_r8
+          XN3QRW(N,NN,NY,NX)=0.0_r8
+          XNOQRW(N,NN,NY,NX)=0.0_r8
+          XNXQRS(N,NN,NY,NX)=0.0_r8
+          XP1QRW(N,NN,NY,NX)=0.0_r8
+          XP4QRW(N,NN,NY,NX)=0.0_r8
+        ENDDO
+9835  CONTINUE
+      DO N=1,2
+        QS(N,NY,NX)=0.0_r8
+        QW(N,NY,NX)=0.0_r8
+        QI(N,NY,NX)=0.0_r8
+        HQS(N,NY,NX)=0.0_r8
+        XCOQSS(N,NY,NX)=0.0_r8
+        XCHQSS(N,NY,NX)=0.0_r8
+        XOXQSS(N,NY,NX)=0.0_r8
+        XNGQSS(N,NY,NX)=0.0_r8
+        XN2QSS(N,NY,NX)=0.0_r8
+        XN4QSS(N,NY,NX)=0.0_r8
+        XN3QSS(N,NY,NX)=0.0_r8
+        XNOQSS(N,NY,NX)=0.0_r8
+        XP1QSS(N,NY,NX)=0.0_r8
+        XP4QSS(N,NY,NX)=0.0_r8
+      ENDDO  !9880
 !
-!     IF EROSION FLAG SET
-!
-          IF(IERSNG.EQ.1.OR.IERSNG.EQ.3)THEN
-            DO 9855 NN=1,2
-              XSEDER(N,NN,NY,NX)=0.0_r8
-              XSANER(N,NN,NY,NX)=0.0_r8
-              XSILER(N,NN,NY,NX)=0.0_r8
-              XCLAER(N,NN,NY,NX)=0.0_r8
-              XCECER(N,NN,NY,NX)=0.0_r8
-              XAECER(N,NN,NY,NX)=0.0_r8
-              XNH4ER(N,NN,NY,NX)=0.0_r8
-              XNH3ER(N,NN,NY,NX)=0.0_r8
-              XNHUER(N,NN,NY,NX)=0.0_r8
-              XNO3ER(N,NN,NY,NX)=0.0_r8
-              XNH4EB(N,NN,NY,NX)=0.0_r8
-              XNH3EB(N,NN,NY,NX)=0.0_r8
-              XNHUEB(N,NN,NY,NX)=0.0_r8
-              XNO3EB(N,NN,NY,NX)=0.0_r8
-              XN4ER(N,NN,NY,NX)=0.0_r8
-              XNBER(N,NN,NY,NX)=0.0_r8
-              XHYER(N,NN,NY,NX)=0.0_r8
-              XALER(N,NN,NY,NX)=0.0_r8
-              XCAER(N,NN,NY,NX)=0.0_r8
-              XMGER(N,NN,NY,NX)=0.0_r8
-              XNAER(N,NN,NY,NX)=0.0_r8
-              XKAER(N,NN,NY,NX)=0.0_r8
-              XHCER(N,NN,NY,NX)=0.0_r8
-              XAL2ER(N,NN,NY,NX)=0.0_r8
-              XOH0ER(N,NN,NY,NX)=0.0_r8
-              XOH1ER(N,NN,NY,NX)=0.0_r8
-              XOH2ER(N,NN,NY,NX)=0.0_r8
-              XH1PER(N,NN,NY,NX)=0.0_r8
-              XH2PER(N,NN,NY,NX)=0.0_r8
-              XOH0EB(N,NN,NY,NX)=0.0_r8
-              XOH1EB(N,NN,NY,NX)=0.0_r8
-              XOH2EB(N,NN,NY,NX)=0.0_r8
-              XH1PEB(N,NN,NY,NX)=0.0_r8
-              XH2PEB(N,NN,NY,NX)=0.0_r8
-              PALOER(N,NN,NY,NX)=0.0_r8
-              PFEOER(N,NN,NY,NX)=0.0_r8
-              PCACER(N,NN,NY,NX)=0.0_r8
-              PCASER(N,NN,NY,NX)=0.0_r8
-              PALPER(N,NN,NY,NX)=0.0_r8
-              PFEPER(N,NN,NY,NX)=0.0_r8
-              PCPDER(N,NN,NY,NX)=0.0_r8
-              PCPHER(N,NN,NY,NX)=0.0_r8
-              PCPMER(N,NN,NY,NX)=0.0_r8
-              PALPEB(N,NN,NY,NX)=0.0_r8
-              PFEPEB(N,NN,NY,NX)=0.0_r8
-              PCPDEB(N,NN,NY,NX)=0.0_r8
-              PCPHEB(N,NN,NY,NX)=0.0_r8
-              PCPMEB(N,NN,NY,NX)=0.0_r8
-              DO 9480 K=0,5
-                DO  NO=1,7
-                  DO NGL=1,JG
-                  OMCER(3+(NGL-1)*3,NO,K,N,NN,NY,NX)=0.0_r8
-                  DO  M=1,2
-                    OMCER(M+(NGL-1)*3,NO,K,N,NN,NY,NX)=0.0_r8
-                    OMNER(M+(NGL-1)*3,NO,K,N,NN,NY,NX)=0.0_r8
-                    OMPER(M+(NGL-1)*3,NO,K,N,NN,NY,NX)=0.0_r8
-                  enddo
-                enddo
-                ENDDO
-9480          CONTINUE
-              DO 9475 K=0,jcplx1
-                DO 9470 M=1,2
-                  ORCER(M,K,N,NN,NY,NX)=0.0_r8
-                  ORNER(M,K,N,NN,NY,NX)=0.0_r8
-                  ORPER(M,K,N,NN,NY,NX)=0.0_r8
-9470            CONTINUE
-                OHCER(K,N,NN,NY,NX)=0.0_r8
-                OHNER(K,N,NN,NY,NX)=0.0_r8
-                OHPER(K,N,NN,NY,NX)=0.0_r8
-                DO 9465 M=1,jsken
-                  OSCER(M,K,N,NN,NY,NX)=0.0_r8
-                  OSAER(M,K,N,NN,NY,NX)=0.0_r8
-                  OSNER(M,K,N,NN,NY,NX)=0.0_r8
-                  OSPER(M,K,N,NN,NY,NX)=0.0_r8
-9465            CONTINUE
-9475          CONTINUE
-9855        CONTINUE
-          ENDIF
-        ENDIF
 !
 !     GAS AND SOLUTE FLUXES
 !
+    DO N=1,3
+      DO  L=0,NL(NY,NX)+1
         XCOFLS(N,L,NY,NX)=0.0_r8
         XCHFLS(N,L,NY,NX)=0.0_r8
         XOXFLS(N,L,NY,NX)=0.0_r8
@@ -471,58 +382,148 @@ module Hour1Mod
           XOPFLS(K,N,L,NY,NX)=0.0_r8
           XOAFLS(K,N,L,NY,NX)=0.0_r8
 9860    CONTINUE
-9880  CONTINUE
+      ENDDO
+    ENDDO
 !
 !     BAND AND MACROPORE FLUXES
 !
-      IF(L.NE.0)THEN
-        DO 9840 N=1,3
-          FLW(N,L,NY,NX)=0.0_r8
-          FLWX(N,L,NY,NX)=0.0_r8
-          FLWH(N,L,NY,NX)=0.0_r8
-          HFLW(N,L,NY,NX)=0.0_r8
-          XN4FLB(N,L,NY,NX)=0.0_r8
-          XN3FLB(N,L,NY,NX)=0.0_r8
-          XNOFLB(N,L,NY,NX)=0.0_r8
-          XNXFLB(N,L,NY,NX)=0.0_r8
-          XH1BFB(N,L,NY,NX)=0.0_r8
-          XH2BFB(N,L,NY,NX)=0.0_r8
-          XCOFHS(N,L,NY,NX)=0.0_r8
-          XCHFHS(N,L,NY,NX)=0.0_r8
-          XOXFHS(N,L,NY,NX)=0.0_r8
-          XNGFHS(N,L,NY,NX)=0.0_r8
-          XN2FHS(N,L,NY,NX)=0.0_r8
-          XHGFHS(N,L,NY,NX)=0.0_r8
-          XN4FHW(N,L,NY,NX)=0.0_r8
-          XN3FHW(N,L,NY,NX)=0.0_r8
-          XNOFHW(N,L,NY,NX)=0.0_r8
-          XNXFHS(N,L,NY,NX)=0.0_r8
-          XH1PHS(N,L,NY,NX)=0.0_r8
-          XH2PHS(N,L,NY,NX)=0.0_r8
-          XN4FHB(N,L,NY,NX)=0.0_r8
-          XN3FHB(N,L,NY,NX)=0.0_r8
-          XNOFHB(N,L,NY,NX)=0.0_r8
-          XNXFHB(N,L,NY,NX)=0.0_r8
-          XH1BHB(N,L,NY,NX)=0.0_r8
-          XH2BHB(N,L,NY,NX)=0.0_r8
-          XCOFLG(N,L,NY,NX)=0.0_r8
-          XCHFLG(N,L,NY,NX)=0.0_r8
-          XOXFLG(N,L,NY,NX)=0.0_r8
-          XNGFLG(N,L,NY,NX)=0.0_r8
-          XN2FLG(N,L,NY,NX)=0.0_r8
-          XN3FLG(N,L,NY,NX)=0.0_r8
-          XHGFLG(N,L,NY,NX)=0.0_r8
-          DO 9820 K=0,jcplx1
-            XOCFHS(K,N,L,NY,NX)=0.0_r8
-            XONFHS(K,N,L,NY,NX)=0.0_r8
-            XOPFHS(K,N,L,NY,NX)=0.0_r8
-            XOAFHS(K,N,L,NY,NX)=0.0_r8
-9820      CONTINUE
-9840    CONTINUE
-      ENDIF
-9885  CONTINUE
+    DO L=1,NL(NY,NX)+1
+      DO 9840 N=1,3
+        FLW(N,L,NY,NX)=0.0_r8
+        FLWX(N,L,NY,NX)=0.0_r8
+        FLWH(N,L,NY,NX)=0.0_r8
+        HFLW(N,L,NY,NX)=0.0_r8
+        XN4FLB(N,L,NY,NX)=0.0_r8
+        XN3FLB(N,L,NY,NX)=0.0_r8
+        XNOFLB(N,L,NY,NX)=0.0_r8
+        XNXFLB(N,L,NY,NX)=0.0_r8
+        XH1BFB(N,L,NY,NX)=0.0_r8
+        XH2BFB(N,L,NY,NX)=0.0_r8
+        XCOFHS(N,L,NY,NX)=0.0_r8
+        XCHFHS(N,L,NY,NX)=0.0_r8
+        XOXFHS(N,L,NY,NX)=0.0_r8
+        XNGFHS(N,L,NY,NX)=0.0_r8
+        XN2FHS(N,L,NY,NX)=0.0_r8
+        XHGFHS(N,L,NY,NX)=0.0_r8
+        XN4FHW(N,L,NY,NX)=0.0_r8
+        XN3FHW(N,L,NY,NX)=0.0_r8
+        XNOFHW(N,L,NY,NX)=0.0_r8
+        XNXFHS(N,L,NY,NX)=0.0_r8
+        XH1PHS(N,L,NY,NX)=0.0_r8
+        XH2PHS(N,L,NY,NX)=0.0_r8
+        XN4FHB(N,L,NY,NX)=0.0_r8
+        XN3FHB(N,L,NY,NX)=0.0_r8
+        XNOFHB(N,L,NY,NX)=0.0_r8
+        XNXFHB(N,L,NY,NX)=0.0_r8
+        XH1BHB(N,L,NY,NX)=0.0_r8
+        XH2BHB(N,L,NY,NX)=0.0_r8
+        XCOFLG(N,L,NY,NX)=0.0_r8
+        XCHFLG(N,L,NY,NX)=0.0_r8
+        XOXFLG(N,L,NY,NX)=0.0_r8
+        XNGFLG(N,L,NY,NX)=0.0_r8
+        XN2FLG(N,L,NY,NX)=0.0_r8
+        XN3FLG(N,L,NY,NX)=0.0_r8
+        XHGFLG(N,L,NY,NX)=0.0_r8
+        DO 9820 K=0,jcplx1
+          XOCFHS(K,N,L,NY,NX)=0.0_r8
+          XONFHS(K,N,L,NY,NX)=0.0_r8
+          XOPFHS(K,N,L,NY,NX)=0.0_r8
+          XOAFHS(K,N,L,NY,NX)=0.0_r8
+9820    CONTINUE
+9840  CONTINUE
+    ENDDO
 9890  CONTINUE
 9895  CONTINUE
+
+!     IF EROSION FLAG SET
+!
+  IF(IERSNG.EQ.1.OR.IERSNG.EQ.3)THEN
+    DO NX=NHW,NHE+1
+      DO NY=NVN,NVS+1
+        DO NN=1,2
+          DO N=1,2
+            XSEDER(N,NN,NY,NX)=0.0_r8
+            XSANER(N,NN,NY,NX)=0.0_r8
+            XSILER(N,NN,NY,NX)=0.0_r8
+            XCLAER(N,NN,NY,NX)=0.0_r8
+            XCECER(N,NN,NY,NX)=0.0_r8
+            XAECER(N,NN,NY,NX)=0.0_r8
+            XNH4ER(N,NN,NY,NX)=0.0_r8
+            XNH3ER(N,NN,NY,NX)=0.0_r8
+            XNHUER(N,NN,NY,NX)=0.0_r8
+            XNO3ER(N,NN,NY,NX)=0.0_r8
+            XNH4EB(N,NN,NY,NX)=0.0_r8
+            XNH3EB(N,NN,NY,NX)=0.0_r8
+            XNHUEB(N,NN,NY,NX)=0.0_r8
+            XNO3EB(N,NN,NY,NX)=0.0_r8
+            XN4ER(N,NN,NY,NX)=0.0_r8
+            XNBER(N,NN,NY,NX)=0.0_r8
+            XHYER(N,NN,NY,NX)=0.0_r8
+            XALER(N,NN,NY,NX)=0.0_r8
+            XCAER(N,NN,NY,NX)=0.0_r8
+            XMGER(N,NN,NY,NX)=0.0_r8
+            XNAER(N,NN,NY,NX)=0.0_r8
+            XKAER(N,NN,NY,NX)=0.0_r8
+            XHCER(N,NN,NY,NX)=0.0_r8
+            XAL2ER(N,NN,NY,NX)=0.0_r8
+            XOH0ER(N,NN,NY,NX)=0.0_r8
+            XOH1ER(N,NN,NY,NX)=0.0_r8
+            XOH2ER(N,NN,NY,NX)=0.0_r8
+            XH1PER(N,NN,NY,NX)=0.0_r8
+            XH2PER(N,NN,NY,NX)=0.0_r8
+            XOH0EB(N,NN,NY,NX)=0.0_r8
+            XOH1EB(N,NN,NY,NX)=0.0_r8
+            XOH2EB(N,NN,NY,NX)=0.0_r8
+            XH1PEB(N,NN,NY,NX)=0.0_r8
+            XH2PEB(N,NN,NY,NX)=0.0_r8
+            PALOER(N,NN,NY,NX)=0.0_r8
+            PFEOER(N,NN,NY,NX)=0.0_r8
+            PCACER(N,NN,NY,NX)=0.0_r8
+            PCASER(N,NN,NY,NX)=0.0_r8
+            PALPER(N,NN,NY,NX)=0.0_r8
+            PFEPER(N,NN,NY,NX)=0.0_r8
+            PCPDER(N,NN,NY,NX)=0.0_r8
+            PCPHER(N,NN,NY,NX)=0.0_r8
+            PCPMER(N,NN,NY,NX)=0.0_r8
+            PALPEB(N,NN,NY,NX)=0.0_r8
+            PFEPEB(N,NN,NY,NX)=0.0_r8
+            PCPDEB(N,NN,NY,NX)=0.0_r8
+            PCPHEB(N,NN,NY,NX)=0.0_r8
+            PCPMEB(N,NN,NY,NX)=0.0_r8
+            DO K=0,jcplx
+              DO  NO=1,7
+                DO NGL=1,JG
+                  OMCER(3+(NGL-1)*3,NO,K,N,NN,NY,NX)=0.0_r8
+                  DO  M=1,2
+                    OMCER(M+(NGL-1)*3,NO,K,N,NN,NY,NX)=0.0_r8
+                    OMNER(M+(NGL-1)*3,NO,K,N,NN,NY,NX)=0.0_r8
+                    OMPER(M+(NGL-1)*3,NO,K,N,NN,NY,NX)=0.0_r8
+                  enddo
+                enddo
+              ENDDO
+            ENDDO
+            DO  K=0,jcplx1
+              DO  M=1,2
+                ORCER(M,K,N,NN,NY,NX)=0.0_r8
+                ORNER(M,K,N,NN,NY,NX)=0.0_r8
+                ORPER(M,K,N,NN,NY,NX)=0.0_r8
+              ENDDO
+              OHCER(K,N,NN,NY,NX)=0.0_r8
+              OHNER(K,N,NN,NY,NX)=0.0_r8
+              OHPER(K,N,NN,NY,NX)=0.0_r8
+              DO M=1,jsken
+                OSCER(M,K,N,NN,NY,NX)=0.0_r8
+                OSAER(M,K,N,NN,NY,NX)=0.0_r8
+                OSNER(M,K,N,NN,NY,NX)=0.0_r8
+                OSPER(M,K,N,NN,NY,NX)=0.0_r8
+              ENDDO
+            ENDDO
+          ENDDO
+        ENDDO
+      ENDDO
+    ENDDO
+  ENDIF
+
   end subroutine ResetFluxArrays
 !------------------------------------------------------------------------------------------
 
@@ -533,199 +534,199 @@ module Hour1Mod
   integer :: N,NX,NY,L,NN
 !     begin_execution
 
+
   DO 8895 NX=NHW,NHE+1
     DO 8890 NY=NVN,NVS+1
-      IF(ISALTG.NE.0)THEN
-        DO 8885 L=1,NL(NY,NX)+1
-          DO 8880 N=1,3
-            IF(L.EQ.1.AND.N.NE.3)THEN
-              DO 9836 NN=1,2
-                XQRAL(N,NN,NY,NX)=0.0_r8
-                XQRFE(N,NN,NY,NX)=0.0_r8
-                XQRHY(N,NN,NY,NX)=0.0_r8
-                XQRCA(N,NN,NY,NX)=0.0_r8
-                XQRMG(N,NN,NY,NX)=0.0_r8
-                XQRNA(N,NN,NY,NX)=0.0_r8
-                XQRKA(N,NN,NY,NX)=0.0_r8
-                XQROH(N,NN,NY,NX)=0.0_r8
-                XQRSO(N,NN,NY,NX)=0.0_r8
-                XQRCL(N,NN,NY,NX)=0.0_r8
-                XQRC3(N,NN,NY,NX)=0.0_r8
-                XQRHC(N,NN,NY,NX)=0.0_r8
-                XQRAL1(N,NN,NY,NX)=0.0_r8
-                XQRAL2(N,NN,NY,NX)=0.0_r8
-                XQRAL3(N,NN,NY,NX)=0.0_r8
-                XQRAL4(N,NN,NY,NX)=0.0_r8
-                XQRALS(N,NN,NY,NX)=0.0_r8
-                XQRFE1(N,NN,NY,NX)=0.0_r8
-                XQRFE2(N,NN,NY,NX)=0.0_r8
-                XQRFE3(N,NN,NY,NX)=0.0_r8
-                XQRFE4(N,NN,NY,NX)=0.0_r8
-                XQRFES(N,NN,NY,NX)=0.0_r8
-                XQRCAO(N,NN,NY,NX)=0.0_r8
-                XQRCAC(N,NN,NY,NX)=0.0_r8
-                XQRCAH(N,NN,NY,NX)=0.0_r8
-                XQRCAS(N,NN,NY,NX)=0.0_r8
-                XQRMGO(N,NN,NY,NX)=0.0_r8
-                XQRMGC(N,NN,NY,NX)=0.0_r8
-                XQRMGH(N,NN,NY,NX)=0.0_r8
-                XQRMGS(N,NN,NY,NX)=0.0_r8
-                XQRNAC(N,NN,NY,NX)=0.0_r8
-                XQRNAS(N,NN,NY,NX)=0.0_r8
-                XQRKAS(N,NN,NY,NX)=0.0_r8
-                XQRH0P(N,NN,NY,NX)=0.0_r8
-                XQRH3P(N,NN,NY,NX)=0.0_r8
-                XQRF1P(N,NN,NY,NX)=0.0_r8
-                XQRF2P(N,NN,NY,NX)=0.0_r8
-                XQRC0P(N,NN,NY,NX)=0.0_r8
-                XQRC1P(N,NN,NY,NX)=0.0_r8
-                XQRC2P(N,NN,NY,NX)=0.0_r8
-                XQRM1P(N,NN,NY,NX)=0.0_r8
-9836          CONTINUE
-              XQSAL(N,NY,NX)=0.0_r8
-              XQSFE(N,NY,NX)=0.0_r8
-              XQSHY(N,NY,NX)=0.0_r8
-              XQSCA(N,NY,NX)=0.0_r8
-              XQSMG(N,NY,NX)=0.0_r8
-              XQSNA(N,NY,NX)=0.0_r8
-              XQSKA(N,NY,NX)=0.0_r8
-              XQSOH(N,NY,NX)=0.0_r8
-              XQSSO(N,NY,NX)=0.0_r8
-              XQSCL(N,NY,NX)=0.0_r8
-              XQSC3(N,NY,NX)=0.0_r8
-              XQSHC(N,NY,NX)=0.0_r8
-              XQSAL1(N,NY,NX)=0.0_r8
-              XQSAL2(N,NY,NX)=0.0_r8
-              XQSAL3(N,NY,NX)=0.0_r8
-              XQSAL4(N,NY,NX)=0.0_r8
-              XQSALS(N,NY,NX)=0.0_r8
-              XQSFE1(N,NY,NX)=0.0_r8
-              XQSFE2(N,NY,NX)=0.0_r8
-              XQSFE3(N,NY,NX)=0.0_r8
-              XQSFE4(N,NY,NX)=0.0_r8
-              XQSFES(N,NY,NX)=0.0_r8
-              XQSCAO(N,NY,NX)=0.0_r8
-              XQSCAC(N,NY,NX)=0.0_r8
-              XQSCAH(N,NY,NX)=0.0_r8
-              XQSCAS(N,NY,NX)=0.0_r8
-              XQSMGO(N,NY,NX)=0.0_r8
-              XQSMGC(N,NY,NX)=0.0_r8
-              XQSMGH(N,NY,NX)=0.0_r8
-              XQSMGS(N,NY,NX)=0.0_r8
-              XQSNAC(N,NY,NX)=0.0_r8
-              XQSNAS(N,NY,NX)=0.0_r8
-              XQSKAS(N,NY,NX)=0.0_r8
-              XQSH0P(N,NY,NX)=0.0_r8
-              XQSH1P(N,NY,NX)=0.0_r8
-              XQSH3P(N,NY,NX)=0.0_r8
-              XQSF1P(N,NY,NX)=0.0_r8
-              XQSF2P(N,NY,NX)=0.0_r8
-              XQSC0P(N,NY,NX)=0.0_r8
-              XQSC1P(N,NY,NX)=0.0_r8
-              XQSC2P(N,NY,NX)=0.0_r8
-              XQSM1P(N,NY,NX)=0.0_r8
-            ENDIF
-            XALFLS(N,L,NY,NX)=0.0_r8
-            XFEFLS(N,L,NY,NX)=0.0_r8
-            XHYFLS(N,L,NY,NX)=0.0_r8
-            XCAFLS(N,L,NY,NX)=0.0_r8
-            XMGFLS(N,L,NY,NX)=0.0_r8
-            XNAFLS(N,L,NY,NX)=0.0_r8
-            XKAFLS(N,L,NY,NX)=0.0_r8
-            XOHFLS(N,L,NY,NX)=0.0_r8
-            XSOFLS(N,L,NY,NX)=0.0_r8
-            XCLFLS(N,L,NY,NX)=0.0_r8
-            XC3FLS(N,L,NY,NX)=0.0_r8
-            XHCFLS(N,L,NY,NX)=0.0_r8
-            XAL1FS(N,L,NY,NX)=0.0_r8
-            XAL2FS(N,L,NY,NX)=0.0_r8
-            XAL3FS(N,L,NY,NX)=0.0_r8
-            XAL4FS(N,L,NY,NX)=0.0_r8
-            XALSFS(N,L,NY,NX)=0.0_r8
-            XFE1FS(N,L,NY,NX)=0.0_r8
-            XFE2FS(N,L,NY,NX)=0.0_r8
-            XFE3FS(N,L,NY,NX)=0.0_r8
-            XFE4FS(N,L,NY,NX)=0.0_r8
-            XFESFS(N,L,NY,NX)=0.0_r8
-            XCAOFS(N,L,NY,NX)=0.0_r8
-            XCACFS(N,L,NY,NX)=0.0_r8
-            XCAHFS(N,L,NY,NX)=0.0_r8
-            XCASFS(N,L,NY,NX)=0.0_r8
-            XMGOFS(N,L,NY,NX)=0.0_r8
-            XMGCFS(N,L,NY,NX)=0.0_r8
-            XMGHFS(N,L,NY,NX)=0.0_r8
-            XMGSFS(N,L,NY,NX)=0.0_r8
-            XNACFS(N,L,NY,NX)=0.0_r8
-            XNASFS(N,L,NY,NX)=0.0_r8
-            XKASFS(N,L,NY,NX)=0.0_r8
-            XH0PFS(N,L,NY,NX)=0.0_r8
-            XH3PFS(N,L,NY,NX)=0.0_r8
-            XF1PFS(N,L,NY,NX)=0.0_r8
-            XF2PFS(N,L,NY,NX)=0.0_r8
-            XC0PFS(N,L,NY,NX)=0.0_r8
-            XC1PFS(N,L,NY,NX)=0.0_r8
-            XC2PFS(N,L,NY,NX)=0.0_r8
-            XM1PFS(N,L,NY,NX)=0.0_r8
-            XH0BFB(N,L,NY,NX)=0.0_r8
-            XH3BFB(N,L,NY,NX)=0.0_r8
-            XF1BFB(N,L,NY,NX)=0.0_r8
-            XF2BFB(N,L,NY,NX)=0.0_r8
-            XC0BFB(N,L,NY,NX)=0.0_r8
-            XC1BFB(N,L,NY,NX)=0.0_r8
-            XC2BFB(N,L,NY,NX)=0.0_r8
-            XM1BFB(N,L,NY,NX)=0.0_r8
-            XALFHS(N,L,NY,NX)=0.0_r8
-            XFEFHS(N,L,NY,NX)=0.0_r8
-            XHYFHS(N,L,NY,NX)=0.0_r8
-            XCAFHS(N,L,NY,NX)=0.0_r8
-            XMGFHS(N,L,NY,NX)=0.0_r8
-            XNAFHS(N,L,NY,NX)=0.0_r8
-            XKAFHS(N,L,NY,NX)=0.0_r8
-            XOHFHS(N,L,NY,NX)=0.0_r8
-            XSOFHS(N,L,NY,NX)=0.0_r8
-            XCLFHS(N,L,NY,NX)=0.0_r8
-            XC3FHS(N,L,NY,NX)=0.0_r8
-            XHCFHS(N,L,NY,NX)=0.0_r8
-            XAL1HS(N,L,NY,NX)=0.0_r8
-            XAL2HS(N,L,NY,NX)=0.0_r8
-            XAL3HS(N,L,NY,NX)=0.0_r8
-            XAL4HS(N,L,NY,NX)=0.0_r8
-            XALSHS(N,L,NY,NX)=0.0_r8
-            XFE1HS(N,L,NY,NX)=0.0_r8
-            XFE2HS(N,L,NY,NX)=0.0_r8
-            XFE3HS(N,L,NY,NX)=0.0_r8
-            XFE4HS(N,L,NY,NX)=0.0_r8
-            XFESHS(N,L,NY,NX)=0.0_r8
-            XCAOHS(N,L,NY,NX)=0.0_r8
-            XCACHS(N,L,NY,NX)=0.0_r8
-            XCAHHS(N,L,NY,NX)=0.0_r8
-            XCASHS(N,L,NY,NX)=0.0_r8
-            XMGOHS(N,L,NY,NX)=0.0_r8
-            XMGCHS(N,L,NY,NX)=0.0_r8
-            XMGHHS(N,L,NY,NX)=0.0_r8
-            XMGSHS(N,L,NY,NX)=0.0_r8
-            XNACHS(N,L,NY,NX)=0.0_r8
-            XNASHS(N,L,NY,NX)=0.0_r8
-            XKASHS(N,L,NY,NX)=0.0_r8
-            XH0PHS(N,L,NY,NX)=0.0_r8
-            XH3PHS(N,L,NY,NX)=0.0_r8
-            XF1PHS(N,L,NY,NX)=0.0_r8
-            XF2PHS(N,L,NY,NX)=0.0_r8
-            XC0PHS(N,L,NY,NX)=0.0_r8
-            XC1PHS(N,L,NY,NX)=0.0_r8
-            XC2PHS(N,L,NY,NX)=0.0_r8
-            XM1PHS(N,L,NY,NX)=0.0_r8
-            XH0BHB(N,L,NY,NX)=0.0_r8
-            XH3BHB(N,L,NY,NX)=0.0_r8
-            XF1BHB(N,L,NY,NX)=0.0_r8
-            XF2BHB(N,L,NY,NX)=0.0_r8
-            XC0BHB(N,L,NY,NX)=0.0_r8
-            XC1BHB(N,L,NY,NX)=0.0_r8
-            XC2BHB(N,L,NY,NX)=0.0_r8
-            XM1BHB(N,L,NY,NX)=0.0_r8
-8880      CONTINUE
-8885    CONTINUE
-      ENDIF
+      DO N=1,2
+        DO 9836 NN=1,2
+          XQRAL(N,NN,NY,NX)=0.0_r8
+          XQRFE(N,NN,NY,NX)=0.0_r8
+          XQRHY(N,NN,NY,NX)=0.0_r8
+          XQRCA(N,NN,NY,NX)=0.0_r8
+          XQRMG(N,NN,NY,NX)=0.0_r8
+          XQRNA(N,NN,NY,NX)=0.0_r8
+          XQRKA(N,NN,NY,NX)=0.0_r8
+          XQROH(N,NN,NY,NX)=0.0_r8
+          XQRSO(N,NN,NY,NX)=0.0_r8
+          XQRCL(N,NN,NY,NX)=0.0_r8
+          XQRC3(N,NN,NY,NX)=0.0_r8
+          XQRHC(N,NN,NY,NX)=0.0_r8
+          XQRAL1(N,NN,NY,NX)=0.0_r8
+          XQRAL2(N,NN,NY,NX)=0.0_r8
+          XQRAL3(N,NN,NY,NX)=0.0_r8
+          XQRAL4(N,NN,NY,NX)=0.0_r8
+          XQRALS(N,NN,NY,NX)=0.0_r8
+          XQRFE1(N,NN,NY,NX)=0.0_r8
+          XQRFE2(N,NN,NY,NX)=0.0_r8
+          XQRFE3(N,NN,NY,NX)=0.0_r8
+          XQRFE4(N,NN,NY,NX)=0.0_r8
+          XQRFES(N,NN,NY,NX)=0.0_r8
+          XQRCAO(N,NN,NY,NX)=0.0_r8
+          XQRCAC(N,NN,NY,NX)=0.0_r8
+          XQRCAH(N,NN,NY,NX)=0.0_r8
+          XQRCAS(N,NN,NY,NX)=0.0_r8
+          XQRMGO(N,NN,NY,NX)=0.0_r8
+          XQRMGC(N,NN,NY,NX)=0.0_r8
+          XQRMGH(N,NN,NY,NX)=0.0_r8
+          XQRMGS(N,NN,NY,NX)=0.0_r8
+          XQRNAC(N,NN,NY,NX)=0.0_r8
+          XQRNAS(N,NN,NY,NX)=0.0_r8
+          XQRKAS(N,NN,NY,NX)=0.0_r8
+          XQRH0P(N,NN,NY,NX)=0.0_r8
+          XQRH3P(N,NN,NY,NX)=0.0_r8
+          XQRF1P(N,NN,NY,NX)=0.0_r8
+          XQRF2P(N,NN,NY,NX)=0.0_r8
+          XQRC0P(N,NN,NY,NX)=0.0_r8
+          XQRC1P(N,NN,NY,NX)=0.0_r8
+          XQRC2P(N,NN,NY,NX)=0.0_r8
+          XQRM1P(N,NN,NY,NX)=0.0_r8
+9836    CONTINUE
+        XQSAL(N,NY,NX)=0.0_r8
+        XQSFE(N,NY,NX)=0.0_r8
+        XQSHY(N,NY,NX)=0.0_r8
+        XQSCA(N,NY,NX)=0.0_r8
+        XQSMG(N,NY,NX)=0.0_r8
+        XQSNA(N,NY,NX)=0.0_r8
+        XQSKA(N,NY,NX)=0.0_r8
+        XQSOH(N,NY,NX)=0.0_r8
+        XQSSO(N,NY,NX)=0.0_r8
+        XQSCL(N,NY,NX)=0.0_r8
+        XQSC3(N,NY,NX)=0.0_r8
+        XQSHC(N,NY,NX)=0.0_r8
+        XQSAL1(N,NY,NX)=0.0_r8
+        XQSAL2(N,NY,NX)=0.0_r8
+        XQSAL3(N,NY,NX)=0.0_r8
+        XQSAL4(N,NY,NX)=0.0_r8
+        XQSALS(N,NY,NX)=0.0_r8
+        XQSFE1(N,NY,NX)=0.0_r8
+        XQSFE2(N,NY,NX)=0.0_r8
+        XQSFE3(N,NY,NX)=0.0_r8
+        XQSFE4(N,NY,NX)=0.0_r8
+        XQSFES(N,NY,NX)=0.0_r8
+        XQSCAO(N,NY,NX)=0.0_r8
+        XQSCAC(N,NY,NX)=0.0_r8
+        XQSCAH(N,NY,NX)=0.0_r8
+        XQSCAS(N,NY,NX)=0.0_r8
+        XQSMGO(N,NY,NX)=0.0_r8
+        XQSMGC(N,NY,NX)=0.0_r8
+        XQSMGH(N,NY,NX)=0.0_r8
+        XQSMGS(N,NY,NX)=0.0_r8
+        XQSNAC(N,NY,NX)=0.0_r8
+        XQSNAS(N,NY,NX)=0.0_r8
+        XQSKAS(N,NY,NX)=0.0_r8
+        XQSH0P(N,NY,NX)=0.0_r8
+        XQSH1P(N,NY,NX)=0.0_r8
+        XQSH3P(N,NY,NX)=0.0_r8
+        XQSF1P(N,NY,NX)=0.0_r8
+        XQSF2P(N,NY,NX)=0.0_r8
+        XQSC0P(N,NY,NX)=0.0_r8
+        XQSC1P(N,NY,NX)=0.0_r8
+        XQSC2P(N,NY,NX)=0.0_r8
+        XQSM1P(N,NY,NX)=0.0_r8
+      ENDDO
+
+      DO 8885 L=1,NL(NY,NX)+1
+        DO N=1,3
+          XALFLS(N,L,NY,NX)=0.0_r8
+          XFEFLS(N,L,NY,NX)=0.0_r8
+          XHYFLS(N,L,NY,NX)=0.0_r8
+          XCAFLS(N,L,NY,NX)=0.0_r8
+          XMGFLS(N,L,NY,NX)=0.0_r8
+          XNAFLS(N,L,NY,NX)=0.0_r8
+          XKAFLS(N,L,NY,NX)=0.0_r8
+          XOHFLS(N,L,NY,NX)=0.0_r8
+          XSOFLS(N,L,NY,NX)=0.0_r8
+          XCLFLS(N,L,NY,NX)=0.0_r8
+          XC3FLS(N,L,NY,NX)=0.0_r8
+          XHCFLS(N,L,NY,NX)=0.0_r8
+          XAL1FS(N,L,NY,NX)=0.0_r8
+          XAL2FS(N,L,NY,NX)=0.0_r8
+          XAL3FS(N,L,NY,NX)=0.0_r8
+          XAL4FS(N,L,NY,NX)=0.0_r8
+          XALSFS(N,L,NY,NX)=0.0_r8
+          XFE1FS(N,L,NY,NX)=0.0_r8
+          XFE2FS(N,L,NY,NX)=0.0_r8
+          XFE3FS(N,L,NY,NX)=0.0_r8
+          XFE4FS(N,L,NY,NX)=0.0_r8
+          XFESFS(N,L,NY,NX)=0.0_r8
+          XCAOFS(N,L,NY,NX)=0.0_r8
+          XCACFS(N,L,NY,NX)=0.0_r8
+          XCAHFS(N,L,NY,NX)=0.0_r8
+          XCASFS(N,L,NY,NX)=0.0_r8
+          XMGOFS(N,L,NY,NX)=0.0_r8
+          XMGCFS(N,L,NY,NX)=0.0_r8
+          XMGHFS(N,L,NY,NX)=0.0_r8
+          XMGSFS(N,L,NY,NX)=0.0_r8
+          XNACFS(N,L,NY,NX)=0.0_r8
+          XNASFS(N,L,NY,NX)=0.0_r8
+          XKASFS(N,L,NY,NX)=0.0_r8
+          XH0PFS(N,L,NY,NX)=0.0_r8
+          XH3PFS(N,L,NY,NX)=0.0_r8
+          XF1PFS(N,L,NY,NX)=0.0_r8
+          XF2PFS(N,L,NY,NX)=0.0_r8
+          XC0PFS(N,L,NY,NX)=0.0_r8
+          XC1PFS(N,L,NY,NX)=0.0_r8
+          XC2PFS(N,L,NY,NX)=0.0_r8
+          XM1PFS(N,L,NY,NX)=0.0_r8
+          XH0BFB(N,L,NY,NX)=0.0_r8
+          XH3BFB(N,L,NY,NX)=0.0_r8
+          XF1BFB(N,L,NY,NX)=0.0_r8
+          XF2BFB(N,L,NY,NX)=0.0_r8
+          XC0BFB(N,L,NY,NX)=0.0_r8
+          XC1BFB(N,L,NY,NX)=0.0_r8
+          XC2BFB(N,L,NY,NX)=0.0_r8
+          XM1BFB(N,L,NY,NX)=0.0_r8
+          XALFHS(N,L,NY,NX)=0.0_r8
+          XFEFHS(N,L,NY,NX)=0.0_r8
+          XHYFHS(N,L,NY,NX)=0.0_r8
+          XCAFHS(N,L,NY,NX)=0.0_r8
+          XMGFHS(N,L,NY,NX)=0.0_r8
+          XNAFHS(N,L,NY,NX)=0.0_r8
+          XKAFHS(N,L,NY,NX)=0.0_r8
+          XOHFHS(N,L,NY,NX)=0.0_r8
+          XSOFHS(N,L,NY,NX)=0.0_r8
+          XCLFHS(N,L,NY,NX)=0.0_r8
+          XC3FHS(N,L,NY,NX)=0.0_r8
+          XHCFHS(N,L,NY,NX)=0.0_r8
+          XAL1HS(N,L,NY,NX)=0.0_r8
+          XAL2HS(N,L,NY,NX)=0.0_r8
+          XAL3HS(N,L,NY,NX)=0.0_r8
+          XAL4HS(N,L,NY,NX)=0.0_r8
+          XALSHS(N,L,NY,NX)=0.0_r8
+          XFE1HS(N,L,NY,NX)=0.0_r8
+          XFE2HS(N,L,NY,NX)=0.0_r8
+          XFE3HS(N,L,NY,NX)=0.0_r8
+          XFE4HS(N,L,NY,NX)=0.0_r8
+          XFESHS(N,L,NY,NX)=0.0_r8
+          XCAOHS(N,L,NY,NX)=0.0_r8
+          XCACHS(N,L,NY,NX)=0.0_r8
+          XCAHHS(N,L,NY,NX)=0.0_r8
+          XCASHS(N,L,NY,NX)=0.0_r8
+          XMGOHS(N,L,NY,NX)=0.0_r8
+          XMGCHS(N,L,NY,NX)=0.0_r8
+          XMGHHS(N,L,NY,NX)=0.0_r8
+          XMGSHS(N,L,NY,NX)=0.0_r8
+          XNACHS(N,L,NY,NX)=0.0_r8
+          XNASHS(N,L,NY,NX)=0.0_r8
+          XKASHS(N,L,NY,NX)=0.0_r8
+          XH0PHS(N,L,NY,NX)=0.0_r8
+          XH3PHS(N,L,NY,NX)=0.0_r8
+          XF1PHS(N,L,NY,NX)=0.0_r8
+          XF2PHS(N,L,NY,NX)=0.0_r8
+          XC0PHS(N,L,NY,NX)=0.0_r8
+          XC1PHS(N,L,NY,NX)=0.0_r8
+          XC2PHS(N,L,NY,NX)=0.0_r8
+          XM1PHS(N,L,NY,NX)=0.0_r8
+          XH0BHB(N,L,NY,NX)=0.0_r8
+          XH3BHB(N,L,NY,NX)=0.0_r8
+          XF1BHB(N,L,NY,NX)=0.0_r8
+          XF2BHB(N,L,NY,NX)=0.0_r8
+          XC0BHB(N,L,NY,NX)=0.0_r8
+          XC1BHB(N,L,NY,NX)=0.0_r8
+          XC2BHB(N,L,NY,NX)=0.0_r8
+          XM1BHB(N,L,NY,NX)=0.0_r8
+        ENDDO
+8885  CONTINUE
 8890  CONTINUE
 8895  CONTINUE
   end subroutine ResetSaltModelArrays
@@ -1172,6 +1173,7 @@ module Hour1Mod
 !
     IFLGS(NY,NX)=0
   ENDIF
+
   end subroutine SetLiterSoilPropAftDisturbance
 !------------------------------------------------------------------------------------------
 
@@ -1249,149 +1251,142 @@ module Hour1Mod
   ZPSNC(NY,NX)=0.0_r8
   WTSTGT(NY,NX)=0.0_r8
   PPT(NY,NX)=0.0_r8
-  DO 9865 L=1,JS
-    FLSW(L,NY,NX)=0.0_r8
-    FLSWH(L,NY,NX)=0.0_r8
-    HFLSW(L,NY,NX)=0.0_r8
-    FLSWR(L,NY,NX)=0.0_r8
-    HFLSWR(L,NY,NX)=0.0_r8
-    XFLWS(L,NY,NX)=0.0_r8
-    XFLWW(L,NY,NX)=0.0_r8
-    XFLWI(L,NY,NX)=0.0_r8
-    XHFLWW(L,NY,NX)=0.0_r8
-    XWFLXS(L,NY,NX)=0.0_r8
-    XWFLXI(L,NY,NX)=0.0_r8
-    XTHAWW(L,NY,NX)=0.0_r8
-    XCOBLS(L,NY,NX)=0.0_r8
-    XCHBLS(L,NY,NX)=0.0_r8
-    XOXBLS(L,NY,NX)=0.0_r8
-    XNGBLS(L,NY,NX)=0.0_r8
-    XN2BLS(L,NY,NX)=0.0_r8
-    XN4BLW(L,NY,NX)=0.0_r8
-    XN3BLW(L,NY,NX)=0.0_r8
-    XNOBLW(L,NY,NX)=0.0_r8
-    XH1PBS(L,NY,NX)=0.0_r8
-    XH2PBS(L,NY,NX)=0.0_r8
-    IF(ISALTG.NE.0)THEN
-      XALBLS(L,NY,NX)=0.0_r8
-      XFEBLS(L,NY,NX)=0.0_r8
-      XHYBLS(L,NY,NX)=0.0_r8
-      XCABLS(L,NY,NX)=0.0_r8
-      XMGBLS(L,NY,NX)=0.0_r8
-      XNABLS(L,NY,NX)=0.0_r8
-      XKABLS(L,NY,NX)=0.0_r8
-      XOHBLS(L,NY,NX)=0.0_r8
-      XSOBLS(L,NY,NX)=0.0_r8
-      XCLBLS(L,NY,NX)=0.0_r8
-      XC3BLS(L,NY,NX)=0.0_r8
-      XHCBLS(L,NY,NX)=0.0_r8
-      XAL1BS(L,NY,NX)=0.0_r8
-      XAL2BS(L,NY,NX)=0.0_r8
-      XAL3BS(L,NY,NX)=0.0_r8
-      XAL4BS(L,NY,NX)=0.0_r8
-      XALSBS(L,NY,NX)=0.0_r8
-      XFE1BS(L,NY,NX)=0.0_r8
-      XFE2BS(L,NY,NX)=0.0_r8
-      XFE3BS(L,NY,NX)=0.0_r8
-      XFE4BS(L,NY,NX)=0.0_r8
-      XFESBS(L,NY,NX)=0.0_r8
-      XCAOBS(L,NY,NX)=0.0_r8
-      XCACBS(L,NY,NX)=0.0_r8
-      XCAHBS(L,NY,NX)=0.0_r8
-      XCASBS(L,NY,NX)=0.0_r8
-      XMGOBS(L,NY,NX)=0.0_r8
-      XMGCBS(L,NY,NX)=0.0_r8
-      XMGHBS(L,NY,NX)=0.0_r8
-      XMGSBS(L,NY,NX)=0.0_r8
-      XNACBS(L,NY,NX)=0.0_r8
-      XNASBS(L,NY,NX)=0.0_r8
-      XKASBS(L,NY,NX)=0.0_r8
-      XH0PBS(L,NY,NX)=0.0_r8
-      XH3PBS(L,NY,NX)=0.0_r8
-      XF1PBS(L,NY,NX)=0.0_r8
-      XF2PBS(L,NY,NX)=0.0_r8
-      XC0PBS(L,NY,NX)=0.0_r8
-      XC1PBS(L,NY,NX)=0.0_r8
-      XC2PBS(L,NY,NX)=0.0_r8
-      XM1PBS(L,NY,NX)=0.0_r8
-    ENDIF
-9865  CONTINUE
+! zero arrays in the snow layers
+  FLSW(1:JS,NY,NX)=0.0_r8
+  FLSWH(1:JS,NY,NX)=0.0_r8
+  HFLSW(1:JS,NY,NX)=0.0_r8
+  FLSWR(1:JS,NY,NX)=0.0_r8
+  HFLSWR(1:JS,NY,NX)=0.0_r8
+  XFLWS(1:JS,NY,NX)=0.0_r8
+  XFLWW(1:JS,NY,NX)=0.0_r8
+  XFLWI(1:JS,NY,NX)=0.0_r8
+  XHFLWW(1:JS,NY,NX)=0.0_r8
+  XWFLXS(1:JS,NY,NX)=0.0_r8
+  XWFLXI(1:JS,NY,NX)=0.0_r8
+  XTHAWW(1:JS,NY,NX)=0.0_r8
+  XCOBLS(1:JS,NY,NX)=0.0_r8
+  XCHBLS(1:JS,NY,NX)=0.0_r8
+  XOXBLS(1:JS,NY,NX)=0.0_r8
+  XNGBLS(1:JS,NY,NX)=0.0_r8
+  XN2BLS(1:JS,NY,NX)=0.0_r8
+  XN4BLW(1:JS,NY,NX)=0.0_r8
+  XN3BLW(1:JS,NY,NX)=0.0_r8
+  XNOBLW(1:JS,NY,NX)=0.0_r8
+  XH1PBS(1:JS,NY,NX)=0.0_r8
+  XH2PBS(1:JS,NY,NX)=0.0_r8
+  IF(ISALTG.NE.0)THEN
+    XALBLS(1:JS,NY,NX)=0.0_r8
+    XFEBLS(1:JS,NY,NX)=0.0_r8
+    XHYBLS(1:JS,NY,NX)=0.0_r8
+    XCABLS(1:JS,NY,NX)=0.0_r8
+    XMGBLS(1:JS,NY,NX)=0.0_r8
+    XNABLS(1:JS,NY,NX)=0.0_r8
+    XKABLS(1:JS,NY,NX)=0.0_r8
+    XOHBLS(1:JS,NY,NX)=0.0_r8
+    XSOBLS(1:JS,NY,NX)=0.0_r8
+    XCLBLS(1:JS,NY,NX)=0.0_r8
+    XC3BLS(1:JS,NY,NX)=0.0_r8
+    XHCBLS(1:JS,NY,NX)=0.0_r8
+    XAL1BS(1:JS,NY,NX)=0.0_r8
+    XAL2BS(1:JS,NY,NX)=0.0_r8
+    XAL3BS(1:JS,NY,NX)=0.0_r8
+    XAL4BS(1:JS,NY,NX)=0.0_r8
+    XALSBS(1:JS,NY,NX)=0.0_r8
+    XFE1BS(1:JS,NY,NX)=0.0_r8
+    XFE2BS(1:JS,NY,NX)=0.0_r8
+    XFE3BS(1:JS,NY,NX)=0.0_r8
+    XFE4BS(1:JS,NY,NX)=0.0_r8
+    XFESBS(1:JS,NY,NX)=0.0_r8
+    XCAOBS(1:JS,NY,NX)=0.0_r8
+    XCACBS(1:JS,NY,NX)=0.0_r8
+    XCAHBS(1:JS,NY,NX)=0.0_r8
+    XCASBS(1:JS,NY,NX)=0.0_r8
+    XMGOBS(1:JS,NY,NX)=0.0_r8
+    XMGCBS(1:JS,NY,NX)=0.0_r8
+    XMGHBS(1:JS,NY,NX)=0.0_r8
+    XMGSBS(1:JS,NY,NX)=0.0_r8
+    XNACBS(1:JS,NY,NX)=0.0_r8
+    XNASBS(1:JS,NY,NX)=0.0_r8
+    XKASBS(1:JS,NY,NX)=0.0_r8
+    XH0PBS(1:JS,NY,NX)=0.0_r8
+    XH3PBS(1:JS,NY,NX)=0.0_r8
+    XF1PBS(1:JS,NY,NX)=0.0_r8
+    XF2PBS(1:JS,NY,NX)=0.0_r8
+    XC0PBS(1:JS,NY,NX)=0.0_r8
+    XC1PBS(1:JS,NY,NX)=0.0_r8
+    XC2PBS(1:JS,NY,NX)=0.0_r8
+    XM1PBS(1:JS,NY,NX)=0.0_r8
+  ENDIF
   end subroutine SetHourlyAccumulators
 !------------------------------------------------------------------------------------------
 
-  subroutine SetArrays4PlantSoilTransfer(L,NY,NX)
+  subroutine SetArrays4PlantSoilTransfer(NY,NX)
   implicit none
-  integer, intent(in) :: L,NY,NX
+  integer, intent(in) :: NY,NX
 
-  integer :: K,M
 !     begin_execution
 
-  DO 9950 K=0,1
-    DO M=1,jsken
-      CSNT(M,K,L,NY,NX)=0.0_r8
-      ZSNT(M,K,L,NY,NX)=0.0_r8
-      PSNT(M,K,L,NY,NX)=0.0_r8
-    enddo
-9950  CONTINUE
-  DO 7775 K=0,jcplx1
-    XOQCS(K,L,NY,NX)=0.0_r8
-    XOQNS(K,L,NY,NX)=0.0_r8
-    XOQPS(K,L,NY,NX)=0.0_r8
-    XOQAS(K,L,NY,NX)=0.0_r8
-7775  CONTINUE
-  XZHYS(L,NY,NX)=0.0_r8
-  TRN4S(L,NY,NX)=0.0_r8
-  TRN3S(L,NY,NX)=0.0_r8
-  TRN3G(L,NY,NX)=0.0_r8
-  TRNO3(L,NY,NX)=0.0_r8
-  TRNO2(L,NY,NX)=0.0_r8
-  TRH1P(L,NY,NX)=0.0_r8
-  TRH2P(L,NY,NX)=0.0_r8
-  TRXN4(L,NY,NX)=0.0_r8
-  TRXH0(L,NY,NX)=0.0_r8
-  TRXH1(L,NY,NX)=0.0_r8
-  TRXH2(L,NY,NX)=0.0_r8
-  TRX1P(L,NY,NX)=0.0_r8
-  TRX2P(L,NY,NX)=0.0_r8
-  TRALPO(L,NY,NX)=0.0_r8
-  TRFEPO(L,NY,NX)=0.0_r8
-  TRCAPD(L,NY,NX)=0.0_r8
-  TRCAPH(L,NY,NX)=0.0_r8
-  TRCAPM(L,NY,NX)=0.0_r8
-  TUPWTR(L,NY,NX)=0.0_r8
-  TUPHT(L,NY,NX)=0.0_r8
-  XCODFG(L,NY,NX)=0.0_r8
-  XCHDFG(L,NY,NX)=0.0_r8
-  XOXDFG(L,NY,NX)=0.0_r8
-  XNGDFG(L,NY,NX)=0.0_r8
-  XN2DFG(L,NY,NX)=0.0_r8
-  XN3DFG(L,NY,NX)=0.0_r8
-  XNBDFG(L,NY,NX)=0.0_r8
-  XHGDFG(L,NY,NX)=0.0_r8
-  IF(L.GE.NU(NY,NX))THEN
-    DO 195 K=0,jcplx1
-      TDFOMC(K,L,NY,NX)=0.0_r8
-      TDFOMN(K,L,NY,NX)=0.0_r8
-      TDFOMP(K,L,NY,NX)=0.0_r8
-195   CONTINUE
-  ENDIF
-  DO 9795 M=1,NPH
-    ROXSK(M,L,NY,NX)=0.0_r8
-9795  CONTINUE
+  CSNT(1:jsken,0:1,0:NL(NY,NX),NY,NX)=0.0_r8
+  ZSNT(1:jsken,0:1,0:NL(NY,NX),NY,NX)=0.0_r8
+  PSNT(1:jsken,0:1,0:NL(NY,NX),NY,NX)=0.0_r8
+
+  XOQCS(0:jcplx1,0:NL(NY,NX),NY,NX)=0.0_r8
+  XOQNS(0:jcplx1,0:NL(NY,NX),NY,NX)=0.0_r8
+  XOQPS(0:jcplx1,0:NL(NY,NX),NY,NX)=0.0_r8
+  XOQAS(0:jcplx1,0:NL(NY,NX),NY,NX)=0.0_r8
+
+  XZHYS(0:NL(NY,NX),NY,NX)=0.0_r8
+  TRN4S(0:NL(NY,NX),NY,NX)=0.0_r8
+  TRN3S(0:NL(NY,NX),NY,NX)=0.0_r8
+  TRN3G(0:NL(NY,NX),NY,NX)=0.0_r8
+  TRNO3(0:NL(NY,NX),NY,NX)=0.0_r8
+  TRNO2(0:NL(NY,NX),NY,NX)=0.0_r8
+  TRH1P(0:NL(NY,NX),NY,NX)=0.0_r8
+  TRH2P(0:NL(NY,NX),NY,NX)=0.0_r8
+  TRXN4(0:NL(NY,NX),NY,NX)=0.0_r8
+  TRXH0(0:NL(NY,NX),NY,NX)=0.0_r8
+  TRXH1(0:NL(NY,NX),NY,NX)=0.0_r8
+  TRXH2(0:NL(NY,NX),NY,NX)=0.0_r8
+  TRX1P(0:NL(NY,NX),NY,NX)=0.0_r8
+  TRX2P(0:NL(NY,NX),NY,NX)=0.0_r8
+  TRALPO(0:NL(NY,NX),NY,NX)=0.0_r8
+  TRFEPO(0:NL(NY,NX),NY,NX)=0.0_r8
+  TRCAPD(0:NL(NY,NX),NY,NX)=0.0_r8
+  TRCAPH(0:NL(NY,NX),NY,NX)=0.0_r8
+  TRCAPM(0:NL(NY,NX),NY,NX)=0.0_r8
+  TUPWTR(0:NL(NY,NX),NY,NX)=0.0_r8
+  TUPHT(0:NL(NY,NX),NY,NX)=0.0_r8
+  XCODFG(0:NL(NY,NX),NY,NX)=0.0_r8
+  XCHDFG(0:NL(NY,NX),NY,NX)=0.0_r8
+  XOXDFG(0:NL(NY,NX),NY,NX)=0.0_r8
+  XNGDFG(0:NL(NY,NX),NY,NX)=0.0_r8
+  XN2DFG(0:NL(NY,NX),NY,NX)=0.0_r8
+  XN3DFG(0:NL(NY,NX),NY,NX)=0.0_r8
+  XNBDFG(0:NL(NY,NX),NY,NX)=0.0_r8
+  XHGDFG(0:NL(NY,NX),NY,NX)=0.0_r8
+
+  TDFOMC(0:jcplx1,NU(NY,NX):NL(NY,NX),NY,NX)=0.0_r8
+  TDFOMN(0:jcplx1,NU(NY,NX):NL(NY,NX),NY,NX)=0.0_r8
+  TDFOMP(0:jcplx1,NU(NY,NX):NL(NY,NX),NY,NX)=0.0_r8
+  ROXSK(1:NPH,NU(NY,NX):NL(NY,NX),NY,NX)=0.0_r8
   end subroutine SetArrays4PlantSoilTransfer
 !------------------------------------------------------------------------------------------
 
-  subroutine GetOutput4WaterTableDepth(L,NY,NX,IFLGY,THETPZ)
+  subroutine GetOutput4WaterTableDepth(NY,NX,THETPZ)
   implicit none
-  integer, intent(in) :: L,NY,NX
-  integer, intent(inout) :: IFLGY
+  integer, intent(in) :: NY,NX
+
   real(r8), intent(in) :: THETPZ(JZ,JY,JX)
   real(r8) :: PSIS1
   real(r8) :: THETW1
   real(r8) :: THETWM
   real(r8) :: THETPX
-  integer :: LL
+  integer :: LL,L
+  integer :: IFLGY
 !     begin_execution
+
+  IFLGY=0
+  DO L=NUI(NY,NX),NLI(NY,NX)
 !     IDTBL=water table flag from site file
 !     THETPZ,THETPW=current,minimum air-filled, porosity for water table
 !     DPTH,DTBLX=depth of soil layer midpoint, water table
@@ -1443,6 +1438,7 @@ module Hour1Mod
       ENDIF
     ENDIF
   ENDIF
+  ENDDO
   end subroutine GetOutput4WaterTableDepth
 !------------------------------------------------------------------------------------------
 
@@ -1515,12 +1511,12 @@ module Hour1Mod
   end subroutine SetSurfaceProperty4SedErosion
 !------------------------------------------------------------------------------------------
 
-  subroutine UpdateTotalSOC(L,NY,NX)
+  subroutine UpdateTotalSOC(NY,NX)
   implicit none
-  integer, intent(in) :: L,NY,NX
+  integer, intent(in) :: NY,NX
 
   real(r8) :: OC
-  integer :: K,M,N,NGL
+  integer :: K,M,N,NGL,L
   !     begin_execution
   !
   !     TOTAL SOC FOR CALCULATING CHANGES IN SOC CALCULATED IN NITRO.F
@@ -1532,8 +1528,8 @@ module Hour1Mod
   !     OSC=SOC(K=0:woody litter, K=1:non-woody litter,
   !     K=2:manure, K=3:POC, K=4:humus)
   !
-!  DC=0.0_r8
   OC=0.0_r8
+  DO L=0,NL(NY,NX)
   DO 7970 K=0,5
     DO 7950 N=1,7
       DO NGL=1,JG
@@ -1543,6 +1539,7 @@ module Hour1Mod
       ENDDO
 7950  CONTINUE
 7970  CONTINUE
+
   DO 7900 K=0,jcplx1
     DO 7920 M=1,2
       OC=OC+ORC(M,K,L,NY,NX)
@@ -1554,19 +1551,22 @@ module Hour1Mod
 7910  CONTINUE
 7900  CONTINUE
   ORGCX(L,NY,NX)=OC
+  ENDDO
   end subroutine UpdateTotalSOC
 !------------------------------------------------------------------------------------------
 
-  subroutine GetSoilHydraulicVars(L,NY,NX)
+  subroutine GetSoilHydraulicVars(NY,NX)
   implicit none
-  integer, intent(in) :: L,NY,NX
+  integer, intent(in) :: NY,NX
   REAL(R8) :: FCX,FCLX
   real(r8) :: FCDX
   real(r8) :: PSDX
   real(r8) :: THETW1
   real(r8) :: WPX,WPLX
-  integer :: K
+  integer :: K,L
+
   ! begin_execution
+  DO L=NUI(NY,NX),NLI(NY,NX)
   ! WATER POTENTIALS
   !
   ! FC,WP=water contents at field capacity,wilting point,saturation
@@ -1659,18 +1659,23 @@ module Hour1Mod
 !
   K=MAX(1,MIN(100,INT(100.0*(POROS(L,NY,NX)-THETW(L,NY,NX))/POROS(L,NY,NX))+1))
   CNDU(L,NY,NX)=0.5*(HCND(1,K,L,NY,NX)+HCND(3,K,L,NY,NX))
+  ENDDO
   end subroutine GetSoilHydraulicVars
 !------------------------------------------------------------------------------------------
 
-  subroutine DiagActiveLayerDepth(L,NY,NX,ICHKA)
+  subroutine DiagActiveLayerDepth(NY,NX)
 
   implicit none
-  integer, intent(in) :: L,NY,NX
-  integer, intent(inout) :: ICHKA
+  integer, intent(in) :: NY,NX
+
   real(r8) :: VOLIT,VOLAT,VOLITL,VOLWTL,VOLATL
-  integer :: LL
+  integer :: LL,L
+  integer :: ICHKA
   logical :: goto5701
+
 !     begin_execution
+  ICHKA = 0
+  DO L=NUI(NY,NX),NLI(NY,NX)
 !
 !     VOLI,VOLIH=ice volume in micropores,macropores
 !     VOLW,VOLWH=water volume in micropores,macropores
@@ -1701,6 +1706,7 @@ module Hour1Mod
       endif
     ENDIF
   ENDIF
+  ENDDO
   end subroutine DiagActiveLayerDepth
 !------------------------------------------------------------------------------------------
 
@@ -1817,9 +1823,11 @@ module Hour1Mod
   end subroutine SetTracerPropertyInLiterAir
 !------------------------------------------------------------------------------------------
 
-  subroutine GetSoluteConcentrations(L,NY,NX)
+  subroutine GetSoluteConcentrations(NY,NX)
   implicit none
-  integer, intent(in) :: L,NY,NX
+  integer, intent(in) :: NY,NX
+
+  integer :: L
 !     begin_execution
 !     CALCULATE SOIL CONCENTRATIONS OF NH4, NH3, NO3, PO4
 !     IN BAND AND NON-BAND ZONES
@@ -1829,6 +1837,7 @@ module Hour1Mod
 !     Z*P=P ion pair amounts in non-band (see solute.f)
 !     VLNH4,VLNO3,VLPO4=fraction of soil volume in NH4,NO3,PO4 non-band
 !
+  DO L=NUI(NY,NX),NLI(NY,NX)
   IF(VOLW(L,NY,NX).GT.ZEROS2(NY,NX))THEN
     IF(VLNH4(L,NY,NX).GT.ZERO)THEN
       CNH4S(L,NY,NX)=AMAX1(0.0,ZNH4S(L,NY,NX) &
@@ -1916,19 +1925,22 @@ module Hour1Mod
     CH2P4B(L,NY,NX)=0.0_r8
     CPO4B(L,NY,NX)=0.0_r8
   ENDIF
+  ENDDO
   end subroutine GetSoluteConcentrations
 !------------------------------------------------------------------------------------------
 
-  subroutine PrepVars4PlantMicrobeUptake(L,NY,NX)
+  subroutine PrepVars4PlantMicrobeUptake(NY,NX)
   implicit none
-  integer, intent(in) :: L,NY,NX
+  integer, intent(in) :: NY,NX
   real(r8) :: TFACL,TFACG
   real(r8) :: FH2O
   real(r8) :: ZC3,ZA3,ZC2,ZA2,ZC1,ZA1
   REAL(R8) :: ZN
   real(r8) :: ZION1
-  integer :: K
+  integer :: K,L
+
 ! begin_execution
+  DO L=NUI(NY,NX),NLI(NY,NX)
 !
 ! PREPARE ARRAYS FOR TOTAL O2 UPTAKE AND NH4,NO3.NO2,N2O,HPO4,H2PO4
 ! UPTAKE IN NON-BAND,BAND AND DOC,DON,DOP,ACETATE UPTAKE
@@ -1936,35 +1948,35 @@ module Hour1Mod
 ! R*Y,R*X=total substrate uptake from previous,current hour
 ! used in nitro.f, uptake.f
 !
-  ROXYY(L,NY,NX)=ROXYX(L,NY,NX)
-  RNH4Y(L,NY,NX)=RNH4X(L,NY,NX)
-  RNO3Y(L,NY,NX)=RNO3X(L,NY,NX)
-  RNO2Y(L,NY,NX)=RNO2X(L,NY,NX)
-  RN2OY(L,NY,NX)=RN2OX(L,NY,NX)
-  RP14Y(L,NY,NX)=RP14X(L,NY,NX)
-  RPO4Y(L,NY,NX)=RPO4X(L,NY,NX)
-  RNHBY(L,NY,NX)=RNHBX(L,NY,NX)
-  RN3BY(L,NY,NX)=RN3BX(L,NY,NX)
-  RN2BY(L,NY,NX)=RN2BX(L,NY,NX)
-  RP1BY(L,NY,NX)=RP1BX(L,NY,NX)
-  RPOBY(L,NY,NX)=RPOBX(L,NY,NX)
-  ROXYX(L,NY,NX)=0.0_r8
-  RNH4X(L,NY,NX)=0.0_r8
-  RNO3X(L,NY,NX)=0.0_r8
-  RNO2X(L,NY,NX)=0.0_r8
-  RN2OX(L,NY,NX)=0.0_r8
-  RP14X(L,NY,NX)=0.0_r8
-  RPO4X(L,NY,NX)=0.0_r8
-  RNHBX(L,NY,NX)=0.0_r8
-  RN3BX(L,NY,NX)=0.0_r8
-  RN2BX(L,NY,NX)=0.0_r8
-  RP1BX(L,NY,NX)=0.0_r8
-  RPOBX(L,NY,NX)=0.0_r8
-  DO 5050 K=0,jcplx1
-    ROQCY(K,L,NY,NX)=ROQCX(K,L,NY,NX)
-    ROQAY(K,L,NY,NX)=ROQAX(K,L,NY,NX)
-    ROQCX(K,L,NY,NX)=0.0_r8
-    ROQAX(K,L,NY,NX)=0.0_r8
+    ROXYY(L,NY,NX)=ROXYX(L,NY,NX)
+    RNH4Y(L,NY,NX)=RNH4X(L,NY,NX)
+    RNO3Y(L,NY,NX)=RNO3X(L,NY,NX)
+    RNO2Y(L,NY,NX)=RNO2X(L,NY,NX)
+    RN2OY(L,NY,NX)=RN2OX(L,NY,NX)
+    RP14Y(L,NY,NX)=RP14X(L,NY,NX)
+    RPO4Y(L,NY,NX)=RPO4X(L,NY,NX)
+    RNHBY(L,NY,NX)=RNHBX(L,NY,NX)
+    RN3BY(L,NY,NX)=RN3BX(L,NY,NX)
+    RN2BY(L,NY,NX)=RN2BX(L,NY,NX)
+    RP1BY(L,NY,NX)=RP1BX(L,NY,NX)
+    RPOBY(L,NY,NX)=RPOBX(L,NY,NX)
+    ROXYX(L,NY,NX)=0.0_r8
+    RNH4X(L,NY,NX)=0.0_r8
+    RNO3X(L,NY,NX)=0.0_r8
+    RNO2X(L,NY,NX)=0.0_r8
+    RN2OX(L,NY,NX)=0.0_r8
+    RP14X(L,NY,NX)=0.0_r8
+    RPO4X(L,NY,NX)=0.0_r8
+    RNHBX(L,NY,NX)=0.0_r8
+    RN3BX(L,NY,NX)=0.0_r8
+    RN2BX(L,NY,NX)=0.0_r8
+    RP1BX(L,NY,NX)=0.0_r8
+    RPOBX(L,NY,NX)=0.0_r8
+    DO 5050 K=0,jcplx1
+      ROQCY(K,L,NY,NX)=ROQCX(K,L,NY,NX)
+      ROQAY(K,L,NY,NX)=ROQAX(K,L,NY,NX)
+      ROQCX(K,L,NY,NX)=0.0_r8
+      ROQAX(K,L,NY,NX)=0.0_r8
 5050  CONTINUE
 !
 ! DIFFUSIVITY
@@ -1974,82 +1986,82 @@ module Hour1Mod
 ! *SGL= gaseous,aqueous diffusivity for gases,solutes listed in
 ! *SG PARAMETER statement above
 !
-  if(TKS(L,NY,NX)<0._r8)THEN
-    WRITE(*,*)'TKS=',L,TKS(L,NY,NX)
-    CALL ENDRUN(TRIM(MOD_FILENAME)//' at line',__LINE__)
-  ENDIF
-  TFACG=(TKS(L,NY,NX)/298.15)**1.75
-  TFACL=(TKS(L,NY,NX)/298.15)**6
-  TFND(L,NY,NX)=TFACL
-  CGSGL(L,NY,NX)=CGSG*TFACG
-  CHSGL(L,NY,NX)=CHSG*TFACG
-  OGSGL(L,NY,NX)=OGSG*TFACG
-  ZGSGL(L,NY,NX)=ZGSG*TFACG
-  Z2SGL(L,NY,NX)=Z2SG*TFACG
-  ZHSGL(L,NY,NX)=ZHSG*TFACG
-  HGSGL(L,NY,NX)=HGSG*TFACG
-  CLSGL(L,NY,NX)=CLSG*TFACL
-  CQSGL(L,NY,NX)=CQSG*TFACL
-  OLSGL(L,NY,NX)=OLSG*TFACL
-  ZLSGL(L,NY,NX)=ZLSG*TFACL
-  ZNSGL(L,NY,NX)=ZNSG*TFACL
-  HLSGL(L,NY,NX)=HLSG*TFACL
-  ZVSGL(L,NY,NX)=ZVSG*TFACL
-  ZOSGL(L,NY,NX)=ZOSG*TFACL
-  POSGL(L,NY,NX)=POSG*TFACL
-  OCSGL(L,NY,NX)=OCSG*TFACL
-  ONSGL(L,NY,NX)=ONSG*TFACL
-  OPSGL(L,NY,NX)=OPSG*TFACL
-  OASGL(L,NY,NX)=OASG*TFACL
-  WGSGL(L,NY,NX)=WGSG*TFACG
-  IF(ISALTG.NE.0)THEN
-    ALSGL(L,NY,NX)=ALSG*TFACL
-    FESGL(L,NY,NX)=FESG*TFACL
-    HYSGL(L,NY,NX)=HYSG*TFACL
-    CASGL(L,NY,NX)=CASG*TFACL
-    GMSGL(L,NY,NX)=GMSG*TFACL
-    ANSGL(L,NY,NX)=ANSG*TFACL
-    AKSGL(L,NY,NX)=AKSG*TFACL
-    OHSGL(L,NY,NX)=OHSG*TFACL
-    C3SGL(L,NY,NX)=C3SG*TFACL
-    HCSGL(L,NY,NX)=HCSG*TFACL
-    SOSGL(L,NY,NX)=SOSG*TFACL
-    CLSXL(L,NY,NX)=CLSX*TFACL
+    if(TKS(L,NY,NX)<0._r8)THEN
+      WRITE(*,*)'TKS=',L,TKS(L,NY,NX)
+      CALL ENDRUN(TRIM(MOD_FILENAME)//' at line',__LINE__)
+    ENDIF
+    TFACG=(TKS(L,NY,NX)/298.15)**1.75
+    TFACL=(TKS(L,NY,NX)/298.15)**6
+    TFND(L,NY,NX)=TFACL
+    CGSGL(L,NY,NX)=CGSG*TFACG
+    CHSGL(L,NY,NX)=CHSG*TFACG
+    OGSGL(L,NY,NX)=OGSG*TFACG
+    ZGSGL(L,NY,NX)=ZGSG*TFACG
+    Z2SGL(L,NY,NX)=Z2SG*TFACG
+    ZHSGL(L,NY,NX)=ZHSG*TFACG
+    HGSGL(L,NY,NX)=HGSG*TFACG
+    CLSGL(L,NY,NX)=CLSG*TFACL
+    CQSGL(L,NY,NX)=CQSG*TFACL
+    OLSGL(L,NY,NX)=OLSG*TFACL
+    ZLSGL(L,NY,NX)=ZLSG*TFACL
+    ZNSGL(L,NY,NX)=ZNSG*TFACL
+    HLSGL(L,NY,NX)=HLSG*TFACL
+    ZVSGL(L,NY,NX)=ZVSG*TFACL
+    ZOSGL(L,NY,NX)=ZOSG*TFACL
+    POSGL(L,NY,NX)=POSG*TFACL
+    OCSGL(L,NY,NX)=OCSG*TFACL
+    ONSGL(L,NY,NX)=ONSG*TFACL
+    OPSGL(L,NY,NX)=OPSG*TFACL
+    OASGL(L,NY,NX)=OASG*TFACL
+    WGSGL(L,NY,NX)=WGSG*TFACG
+    IF(ISALTG.NE.0)THEN
+      ALSGL(L,NY,NX)=ALSG*TFACL
+      FESGL(L,NY,NX)=FESG*TFACL
+      HYSGL(L,NY,NX)=HYSG*TFACL
+      CASGL(L,NY,NX)=CASG*TFACL
+      GMSGL(L,NY,NX)=GMSG*TFACL
+      ANSGL(L,NY,NX)=ANSG*TFACL
+      AKSGL(L,NY,NX)=AKSG*TFACL
+      OHSGL(L,NY,NX)=OHSG*TFACL
+      C3SGL(L,NY,NX)=C3SG*TFACL
+      HCSGL(L,NY,NX)=HCSG*TFACL
+      SOSGL(L,NY,NX)=SOSG*TFACL
+      CLSXL(L,NY,NX)=CLSX*TFACL
 !
 !   TOTAL ION CONCENTRATION
 !
 !   ZC3,ZA3,ZC2,ZA2,ZC1,ZA1=total tri-,di-,univalent cations C,anions A
 !   CSTR,CION=ion strength, total ion concentration
 !
-    ZC3=ZAL(L,NY,NX)+ZFE(L,NY,NX)
-    ZA3=H0PO4(L,NY,NX)+H0POB(L,NY,NX)
-    ZC2=ZCA(L,NY,NX)+ZMG(L,NY,NX)+ZALOH1(L,NY,NX)+ZFEOH1(L,NY,NX) &
-      +ZFE2P(L,NY,NX)+ZFE2PB(L,NY,NX)
-    ZA2=ZSO4(L,NY,NX)+ZCO3(L,NY,NX)+H1PO4(L,NY,NX)+H1POB(L,NY,NX)
-    ZC1=(ZNH4S(L,NY,NX)+ZNH4B(L,NY,NX))/14.0+ZHY(L,NY,NX) &
-      +ZNA(L,NY,NX)+ZKA(L,NY,NX)+ZALOH2(L,NY,NX)+ZFEOH2(L,NY,NX) &
-      +ZALS(L,NY,NX)+ZFES(L,NY,NX)+ZCAO(L,NY,NX)+ZCAH(L,NY,NX) &
-      +ZMGO(L,NY,NX)+ZMGH(L,NY,NX)+ZFE1P(L,NY,NX)+ZFE1PB(L,NY,NX) &
-      +ZCA2P(L,NY,NX)+ZCA2PB(L,NY,NX)
-    ZA1=(ZNO3S(L,NY,NX)+ZNO3B(L,NY,NX))/14.0+ZOH(L,NY,NX) &
-      +ZHCO3(L,NY,NX)+ZCL(L,NY,NX)+ZALOH4(L,NY,NX)+ZFEOH4(L,NY,NX) &
-      +ZNAC(L,NY,NX)+ZNAS(L,NY,NX)+ZKAS(L,NY,NX)+(H2PO4(L,NY,NX) &
-      +H2POB(L,NY,NX))/31.0+ZCA0P(L,NY,NX)+ZCA0PB(L,NY,NX)
-    ZN=CO2S(L,NY,NX)/12.0+CH4S(L,NY,NX)/12.0+OXYS(L,NY,NX)/32.0 &
-      +(Z2GS(L,NY,NX)+Z2OS(L,NY,NX)+ZNH3S(L,NY,NX)+ZNH3B(L,NY,NX))/14.0 &
-      +ZALOH3(L,NY,NX)+ZFEOH3(L,NY,NX)+ZCAC(L,NY,NX)+ZCAS(L,NY,NX) &
-      +ZMGC(L,NY,NX)+ZMGS(L,NY,NX)+H3PO4(L,NY,NX)+ZCA1P(L,NY,NX) &
-      +ZMG1P(L,NY,NX)+H3POB(L,NY,NX)+ZCA1PB(L,NY,NX)+ZMG1PB(L,NY,NX)
-    ZION1=ABS(3.0*(ZC3-ZA3)+2.0*(ZC2-ZA2)+ZC1-ZA1)
-    IF(VOLW(L,NY,NX).GT.ZEROS2(NY,NX))THEN
-      CSTR(L,NY,NX)=AMAX1(0.0_r8,0.5E-03_r8*(9.0_r8*(ZC3+ZA3)+4.0_r8*(ZC2+ZA2) &
-        +ZC1+ZA1+ZION1)/VOLW(L,NY,NX))
-      CION(L,NY,NX)=AMAX1(0.0_r8,(ZC3+ZA3+ZC2+ZA2+ZC1+ZA1+ZN)/VOLW(L,NY,NX))
-    ELSE
-      CSTR(L,NY,NX)=0.0_r8
-      CION(L,NY,NX)=0.0_r8
+      ZC3=ZAL(L,NY,NX)+ZFE(L,NY,NX)
+      ZA3=H0PO4(L,NY,NX)+H0POB(L,NY,NX)
+      ZC2=ZCA(L,NY,NX)+ZMG(L,NY,NX)+ZALOH1(L,NY,NX)+ZFEOH1(L,NY,NX) &
+        +ZFE2P(L,NY,NX)+ZFE2PB(L,NY,NX)
+      ZA2=ZSO4(L,NY,NX)+ZCO3(L,NY,NX)+H1PO4(L,NY,NX)+H1POB(L,NY,NX)
+      ZC1=(ZNH4S(L,NY,NX)+ZNH4B(L,NY,NX))/14.0+ZHY(L,NY,NX) &
+        +ZNA(L,NY,NX)+ZKA(L,NY,NX)+ZALOH2(L,NY,NX)+ZFEOH2(L,NY,NX) &
+        +ZALS(L,NY,NX)+ZFES(L,NY,NX)+ZCAO(L,NY,NX)+ZCAH(L,NY,NX) &
+        +ZMGO(L,NY,NX)+ZMGH(L,NY,NX)+ZFE1P(L,NY,NX)+ZFE1PB(L,NY,NX) &
+        +ZCA2P(L,NY,NX)+ZCA2PB(L,NY,NX)
+      ZA1=(ZNO3S(L,NY,NX)+ZNO3B(L,NY,NX))/14.0+ZOH(L,NY,NX) &
+        +ZHCO3(L,NY,NX)+ZCL(L,NY,NX)+ZALOH4(L,NY,NX)+ZFEOH4(L,NY,NX) &
+        +ZNAC(L,NY,NX)+ZNAS(L,NY,NX)+ZKAS(L,NY,NX)+(H2PO4(L,NY,NX) &
+        +H2POB(L,NY,NX))/31.0+ZCA0P(L,NY,NX)+ZCA0PB(L,NY,NX)
+      ZN=CO2S(L,NY,NX)/12.0+CH4S(L,NY,NX)/12.0+OXYS(L,NY,NX)/32.0 &
+        +(Z2GS(L,NY,NX)+Z2OS(L,NY,NX)+ZNH3S(L,NY,NX)+ZNH3B(L,NY,NX))/14.0 &
+        +ZALOH3(L,NY,NX)+ZFEOH3(L,NY,NX)+ZCAC(L,NY,NX)+ZCAS(L,NY,NX) &
+        +ZMGC(L,NY,NX)+ZMGS(L,NY,NX)+H3PO4(L,NY,NX)+ZCA1P(L,NY,NX) &
+        +ZMG1P(L,NY,NX)+H3POB(L,NY,NX)+ZCA1PB(L,NY,NX)+ZMG1PB(L,NY,NX)
+      ZION1=ABS(3.0*(ZC3-ZA3)+2.0*(ZC2-ZA2)+ZC1-ZA1)
+      IF(VOLW(L,NY,NX).GT.ZEROS2(NY,NX))THEN
+        CSTR(L,NY,NX)=AMAX1(0.0_r8,0.5E-03_r8*(9.0_r8*(ZC3+ZA3)+4.0_r8*(ZC2+ZA2) &
+          +ZC1+ZA1+ZION1)/VOLW(L,NY,NX))
+        CION(L,NY,NX)=AMAX1(0.0_r8,(ZC3+ZA3+ZC2+ZA2+ZC1+ZA1+ZN)/VOLW(L,NY,NX))
+      ELSE
+        CSTR(L,NY,NX)=0.0_r8
+        CION(L,NY,NX)=0.0_r8
+      ENDIF
     ENDIF
-  ENDIF
 ! IF(L.EQ.1)THEN
 !     WRITE(*,1113)'CION',I,J,NX,NY,L,CION(L,NY,NX)
 !    2,CSTR(L,NY,NX),ZC3,ZA3,ZC2,ZA2,ZC1,ZA1,ZN,VOLW(L,NY,NX)
@@ -2066,21 +2078,22 @@ module Hour1Mod
 ! S*L=solubility of gas in water
 ! TCS=soil temperature (oC)
 !
-  FH2O=5.56E+04_r8/(5.56E+04_r8+CION(L,NY,NX))
-  SCO2L(L,NY,NX)=SCO2X/(EXP(ACO2X*CSTR(L,NY,NX))) &
+    FH2O=5.56E+04_r8/(5.56E+04_r8+CION(L,NY,NX))
+    SCO2L(L,NY,NX)=SCO2X/(EXP(ACO2X*CSTR(L,NY,NX))) &
       *EXP(0.843_r8-0.0281_r8*TCS(L,NY,NX))*FH2O
-  SCH4L(L,NY,NX)=SCH4X/(EXP(ACH4X*CSTR(L,NY,NX))) &
+    SCH4L(L,NY,NX)=SCH4X/(EXP(ACH4X*CSTR(L,NY,NX))) &
       *EXP(0.597_r8-0.0199_r8*TCS(L,NY,NX))*FH2O
-  SOXYL(L,NY,NX)=SOXYX/(EXP(AOXYX*CSTR(L,NY,NX))) &
+    SOXYL(L,NY,NX)=SOXYX/(EXP(AOXYX*CSTR(L,NY,NX))) &
       *EXP(0.516_r8-0.0172_r8*TCS(L,NY,NX))*FH2O
-  SN2GL(L,NY,NX)=SN2GX/(EXP(AN2GX*CSTR(L,NY,NX))) &
+    SN2GL(L,NY,NX)=SN2GX/(EXP(AN2GX*CSTR(L,NY,NX))) &
       *EXP(0.456_r8-0.0152_r8*TCS(L,NY,NX))*FH2O
-  SN2OL(L,NY,NX)=SN2OX/(EXP(AN2OX*CSTR(L,NY,NX))) &
+    SN2OL(L,NY,NX)=SN2OX/(EXP(AN2OX*CSTR(L,NY,NX))) &
       *EXP(0.897_r8-0.0299_r8*TCS(L,NY,NX))*FH2O
-  SNH3L(L,NY,NX)=SNH3X/(EXP(ANH3X*CSTR(L,NY,NX))) &
+    SNH3L(L,NY,NX)=SNH3X/(EXP(ANH3X*CSTR(L,NY,NX))) &
       *EXP(0.513_r8-0.0171_r8*TCS(L,NY,NX))*FH2O
-  SH2GL(L,NY,NX)=SH2GX/(EXP(AH2GX*CSTR(L,NY,NX))) &
+    SH2GL(L,NY,NX)=SH2GX/(EXP(AH2GX*CSTR(L,NY,NX))) &
       *EXP(0.597_r8-0.0199_r8*TCS(L,NY,NX))*FH2O
+  ENDDO
   end subroutine PrepVars4PlantMicrobeUptake
 !------------------------------------------------------------------------------------------
 
@@ -2205,761 +2218,7 @@ module Hour1Mod
     CH2GS(0,NY,NX)=0.0
   ENDIF
   end subroutine GetSurfResidualProperties
-!------------------------------------------------------------------------------------------
 
-  subroutine MultiLayerSurfaceRadiation(I,J,NY,NX,DPTH0)
-  implicit none
-  integer, intent(in) :: I,J,NY,NX
-  real(r8), intent(in) :: DPTH0(JY,JX)
-  integer :: NB,NZ,L,K,M,N,NN
-  integer :: IALBS(JLI,JSA)
-  real(r8) :: TAUY(0:JC+1)
-  real(r8) :: PARDIR(JLI,JSA,JP,JY,JX)
-  real(r8) :: PARDIW(JLI,JSA,JP,JY,JX)
-  real(r8) :: RABSL(0:JC+1)
-  real(r8) :: RABPL(0:JC+1)
-  real(r8) :: RAFSL(0:JC+1)
-  real(r8) :: RAFPL(0:JC+1)
-  real(r8) :: RADSL(JP,JY,JX)
-  real(r8) :: RADPL(JP,JY,JX)
-  real(r8) :: RAYSW(JP,JY,JX)
-  real(r8) :: RAYPW(JP,JY,JX)
-  real(r8) :: RADSW(JP,JY,JX)
-  real(r8) :: RADPW(JP,JY,JX)
-  real(r8) :: RADWA(JP,JY,JX)
-  real(r8) :: RADSA(JP,JY,JX)
-  real(r8) :: RAPSA(JP,JY,JX)
-  REAL(R8) :: RAPWA(JP,JY,JX)
-  real(r8) :: RADS1(JP,JY,JX),RADS2(JP,JY,JX)
-  real(r8) :: RADP1(JP,JY,JX),RADP2(JP,JY,JX)
-  real(r8) :: RADQ1(JP,JY,JX),RADQ2(JP,JY,JX)
-  real(r8) :: RADW1(JP,JY,JX),RADW2(JP,JY,JX)
-  real(r8) :: RAYSL(JP,JY,JX),RAYPL(JP,JY,JX)
-  real(r8) :: RAYS1(JP,JY,JX),RAYS2(JP,JY,JX)
-  real(r8) :: RAYP1(JP,JY,JX),RAYP2(JP,JY,JX)
-  real(r8) :: RAYW1(JP,JY,JX),RAYW2(JP,JY,JX)
-  real(r8) :: RAYQ1(JP,JY,JX),RAYQ2(JP,JY,JX)
-  real(r8) :: BETA(JLI,JSA)                         !sine of direct solar radiation on leaf surface, [-]
-  real(r8) :: BETX(JLI,JSA)                         !sine of direct solar radiation on leaf surface/sine of direct solar radiation, [-]
-  REAL(R8) :: RDNDIR(JLI,JSA,JP,JY,JX),RDNDIW(JLI,JSA,JP,JY,JX)
-  real(r8) :: TSURF(JLI,JZ,JP,JY,JX),TSURFB(JLI,JZ,JP,JY,JX)
-  real(r8) :: TRADC(JY,JX),TRAPC(JY,JX),TRADG(JY,JX),TRAPG(JY,JX)
-  real(r8) :: ALBW,ALBG
-  real(r8) :: BETAG,BETY,BETZ
-  real(r8) :: DGAZI,DAZI
-  real(r8) :: FSNOW,FRADPT
-  real(r8) :: RADYL,RADYN,RADYW
-  real(r8) :: RADST
-  real(r8) :: RADWT,RADPT,RADQT
-  real(r8) :: RADSG,RADYG
-  real(r8) :: RAPYL,RAPYN,RAPYW
-  real(r8) :: RAPSG,RAPYG,RAPG
-  real(r8) :: STOPS, STOPX, STOPY, STOPZ, STOPSZ, STOPYZ
-  real(r8) :: RA1ST,RA1WT,RA1PT,RA1QT,RA2ST
-  real(r8) :: RA2WT,RA2PT,RA2QT
-  REAL(R8) :: RASG,SAGL
-  real(r8) :: THETW1
-  real(r8) :: TSURFX,TSURFY,TSURFZ,TSURFS
-  real(r8) :: TSURWY,TSURWZ,TSURWS,TSURWX
-  real(r8) :: XTAUS,XTAUY,XAREA
-  real(r8) :: YAREA
-  REAL(R8) :: ZAZI,ZAGL
-  !     begin_execution
-  !     MULTILAYER CANOPY INTERECEPTION OF DIRECT AND DIFFUSE RADIATION
-  !     IN SW AND VISIBLE BANDS BY INCLINATION N, AZIMUTH M, LAYER L,
-  !     NODE K, BRANCH NB, PFT NZ
-  !
-  !     ARLFS,ARLSS=leaf+stalk area of combined,each PFT canopy
-  !     ZL=height to bottom of canopy layer
-  !     DPTHS,DPTH0=snowpack,surface water depths
-  !     ARLFL,ARSTK=leaf,stalk areas of PFT
-  !     RAD,RAP=vertical direct+diffuse SW,PAR
-  !     RADS,RADY,RAPS,RAPY=solar beam direct,diffuse SW,PAR
-  !     SSIN,TYSIN=sine of solar,sky angles
-  !     RADC,RADP=total SW,PAR absorbed by canopy
-  !     CFX=clumping factor for self-shading
-  !
-  ARLSS(NY,NX)=0.0
-  DO 1135 NZ=1,NP(NY,NX)
-    ARLFS(NZ,NY,NX)=0.0
-    DO  NB=1,NBR(NZ,NY,NX)
-      DO  L=1,JC
-        IF(ZL(L-1,NY,NX).GE.DPTHS(NY,NX)-ZERO &
-          .AND.ZL(L-1,NY,NX).GE.DPTH0(NY,NX)-ZERO)THEN
-          DO 1130 K=1,JNODS
-            ARLFS(NZ,NY,NX)=ARLFS(NZ,NY,NX)+ARLFL(L,K,NB,NZ,NY,NX)
-            ARLSS(NY,NX)=ARLSS(NY,NX)+ARLFL(L,K,NB,NZ,NY,NX)
-1130      CONTINUE
-          ARLFS(NZ,NY,NX)=ARLFS(NZ,NY,NX)+ARSTK(L,NB,NZ,NY,NX)
-          ARLSS(NY,NX)=ARLSS(NY,NX)+ARSTK(L,NB,NZ,NY,NX)
-        ENDIF
-      enddo
-    enddo
-1135  CONTINUE
-  IF(SSIN(NY,NX).GT.ZERO)THEN
-    RAD(NY,NX)=RADS(NY,NX)*SSIN(NY,NX)+RADY(NY,NX)*TYSIN
-    RAP(NY,NX)=RAPS(NY,NX)*SSIN(NY,NX)+RAPY(NY,NX)*TYSIN
-  ELSE
-    RADS(NY,NX)=0.0
-    RADY(NY,NX)=0.0
-    RAPS(NY,NX)=0.0
-    RAPY(NY,NX)=0.0
-    RAD(NY,NX)=0.0
-    RAP(NY,NX)=0.0
-  ENDIF
-  TRADC(NY,NX)=0.0
-  TRAPC(NY,NX)=0.0
-  DO 1025 NZ=1,NP(NY,NX)
-    RADC(NZ,NY,NX)=0.0
-    RADP(NZ,NY,NX)=0.0
-    CFX(NZ,NY,NX)=CF(NZ,NY,NX)*(1.0-0.025 &
-      *ARLFP(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX))
-1025  CONTINUE
-  !
-  !     ANGLE BETWEEN SUN AND GROUND SURFACE
-  !
-  !     SAZI,SCOS=solar azimuth,cosine of solar angle
-  !     BETAG=incident solar angle at ground surface
-  !     GCOS,GSIN=cos,sin of ground surface
-  !     ZNOON=hour of solar noon from weather file
-  !
-  IF(SSIN(NY,NX).GT.ZERO)THEN
-    SAZI=0.2618*(ZNOON(NY,NX)-J)+4.7124
-    SCOS=SQRT(1.0-SSIN(NY,NX)**2)
-    DGAZI=COS(GAZI(NY,NX)-SAZI)
-    BETAG=AMAX1(0.0,AMIN1(1.0,GCOS(NY,NX)*SSIN(NY,NX) &
-      +GSIN(NY,NX)*SCOS*DGAZI))
-    IF(ARLSS(NY,NX).GT.0.0)THEN
-      SAGL=ASIN(SSIN(NY,NX))
-      !
-      !     ABSORBED RADIATION FROM OPTICAL PROPERTIES ENTERED IN 'READS'
-      !
-      !     RADSA,RADWA,RAPSA,RAPWA=SW,PAR absorbed at leaf,stalk surface
-      !     perpendicular to incoming radiation
-      !
-      DO 1050 NZ=1,NP(NY,NX)
-        RADSA(NZ,NY,NX)=RADS(NY,NX)*ABSR(NZ,NY,NX)
-        RADWA(NZ,NY,NX)=RADS(NY,NX)*ABSRW
-        RAPSA(NZ,NY,NX)=RAPS(NY,NX)*ABSP(NZ,NY,NX)
-        RAPWA(NZ,NY,NX)=RAPS(NY,NX)*ABSPW
-1050  CONTINUE
-      !
-      !     ANGLES BETWEEN SUN OR SKY ZONES AND FOLIAR SURFACES
-      !
-      !     ZAZI=leaf azimuth
-      !     BETA,BETX=incident angle of direct radiation at leaf,horizontal surface
-      !     ZAGL=determines forward vs backscattering
-      !     IALBS=flag for forward vs backscattering
-      !
-      DO 1100 M=1,JSA
-        ZAZI=SAZI+(M-0.5)*PICON/real(M,r8)
-        DAZI=COS(ZAZI-SAZI)
-        DO  N=1,JLI
-          BETY=ZCOS(N)*SSIN(NY,NX)+ZSIN(N)*SCOS*DAZI
-          BETA(N,M)=ABS(BETY)
-          BETX(N,M)=BETA(N,M)/SSIN(NY,NX)
-          IF(ZCOS(N).GT.SSIN(NY,NX))THEN
-            BETZ=ACOS(BETY)
-          ELSE
-            BETZ=-ACOS(BETY)
-          ENDIF
-          IF(BETZ.GT.-PICON2)THEN
-            ZAGL=SAGL+2.0*BETZ
-          ELSE
-            ZAGL=SAGL-2.0*(PICON+BETZ)
-          ENDIF
-          IF(ZAGL.GT.0.0.AND.ZAGL.LT.PICON)THEN
-            IALBS(N,M)=1
-          ELSE
-            IALBS(N,M)=2
-          ENDIF
-!
-          !     INTENSITY OF ABSORBED DIRECT RADIATION AT LEAF SURFACES
-          !
-          !     RDNDIR,RDNDIW,PARDIR,PARDIW=SW,PAR flux absorbed by leaf,stalk surfaces
-          !     PAR,PARDIF=direct,diffuse PAR flux
-          !     RADYL,RAPYL=solar beam diffuse SW,PAR flux
-          !     RAFYL,RAFPL=forward scattered diffuse SW,PAR flux
-          !     TAUS,TAUY=fraction of direct,diffuse radiation transmitted
-!
-          DO  NZ=1,NP(NY,NX)
-            RDNDIR(N,M,NZ,NY,NX)=RADSA(NZ,NY,NX)*ABS(BETA(N,M))
-            RDNDIW(N,M,NZ,NY,NX)=RADWA(NZ,NY,NX)*ABS(BETA(N,M))
-            PARDIR(N,M,NZ,NY,NX)=RAPSA(NZ,NY,NX)*ABS(BETA(N,M))
-            PARDIW(N,M,NZ,NY,NX)=RAPWA(NZ,NY,NX)*ABS(BETA(N,M))
-            DO L=1,JC
-              PARDIF(N,M,L,NZ,NY,NX)=0.0
-              PAR(N,M,L,NZ,NY,NX)=PARDIR(N,M,NZ,NY,NX)
-            enddo
-          enddo
-        enddo
-1100  CONTINUE
-      XAREA=1.00/AREA(3,NU(NY,NX),NY,NX)
-      YAREA=0.25/AREA(3,NU(NY,NX),NY,NX)
-      RADYL=RADY(NY,NX)
-      RAPYL=RAPY(NY,NX)
-      TAUS(JC+1,NY,NX)=1.0
-      TAUY(JC+1)=1.0
-      RAFSL(JC+1)=0.0
-      RAFPL(JC+1)=0.0
-      STOPS=0.0
-      !
-      !     RESET ARRAYS OF SUNLIT AND SHADED LEAF AREAS IN DIFFERENT
-      !     LAYERS AND ANGLE CLASSES
-      !
-      !     TSURF,TSURFB,SURF,SURFB=leaf,stalk total,PFT surface area
-!
-      DO 1150 NZ=1,NP(NY,NX)
-        DO  L=1,JC
-          DO  N=1,JLI
-            TSURF(N,L,NZ,NY,NX)=0.0
-            TSURFB(N,L,NZ,NY,NX)=0.0
-          enddo
-        enddo
-1150  CONTINUE
-      DO 1200 NZ=1,NP(NY,NX)
-        DO  NB=1,NBR(NZ,NY,NX)
-          DO  L=1,JC
-            IF(ZL(L-1,NY,NX).GT.DPTHS(NY,NX)-ZERO &
-             .AND.ZL(L-1,NY,NX).GT.DPTH0(NY,NX)-ZERO)THEN
-              DO 1205 N=1,JLI
-                DO 1210 K=1,JNODS
-                  TSURF(N,L,NZ,NY,NX)=TSURF(N,L,NZ,NY,NX)+SURF(N,L,K,NB,NZ,NY,NX)
-1210            CONTINUE
-                TSURFB(N,L,NZ,NY,NX)=TSURFB(N,L,NZ,NY,NX)+SURFB(N,L,NB,NZ,NY,NX)
-1205          CONTINUE
-            ENDIF
-          enddo
-        enddo
-1200  CONTINUE
-      !
-      !     CALCULATE ABSORPTION, REFLECTION AND TRANSMISSION OF DIRECT AND
-      !     DIFFUSE DOWNWARD TOTAL AND VISIBLE RADIATION BY EACH SPECIES
-      !     NZ IN EACH LAYER L
-      !
-      !     RAFYL,RAFPL=forward scattered diffuse SW,PAR
-      !     RABYL,RABPL=backscattered diffuse SW,PAR
-      !     RADYL,RAPYL=solar beam diffuse SW,PAR
-      !     STOPY,STOPSZ,STOPYZ=fraction of direct,diffuse radiation intercepted
-      !
-      DO 1800 L=JC,1,-1
-        IF(ZL(L-1,NY,NX).GE.DPTHS(NY,NX)-ZERO &
-          .AND.ZL(L-1,NY,NX).GE.DPTH0(NY,NX)-ZERO)THEN
-          RADYL=RADYL*TAUY(L+1)+RAFSL(L+1)
-          RAPYL=RAPYL*TAUY(L+1)+RAFPL(L+1)
-          RAFSL(L)=0.0
-          RAFPL(L)=0.0
-          RABSL(L)=0.0
-          RABPL(L)=0.0
-          STOPY=0.0
-          STOPSZ=0.0
-          STOPYZ=0.0
-    !
-          !     RESET ACCUMULATORS OB ABSORBED, REFLECTED AND TRANSMITTED RADIATION
-          !
-          !     RADSL,RADSW,RADPL,RADPW=direct atmosph SW,PAR absbd by leaf,stalk surf
-          !     RAYSL,RAYSW,RAYPL,RAYPW=diffuse atmosph SW,PAR absbd by leaf,stalk surf
-          !     RADS1,RADW1,RADP1,RADQ1=backscattered direct SW,PAR absbd by leaf,stalk surf
-          !     RAYS1,RAYW1,RAYP1,RAYQ1=backscattered diffuse SW,PAR absbd by leaf,stalk surf
-          !     RADS2,RADW2,RADP2,RADQ2=fwd scattered direct SW,PAR absbd by leaf,stalk surf
-          !     RAYS2,RAYW2,RAYP2,RAYQ2=fwd scattered diffuse SW,PAR absbd by leaf,stalk surf
-    !
-          DO 1500 NZ=1,NP(NY,NX)
-            RADSL(NZ,NY,NX)=0.0
-            RADSW(NZ,NY,NX)=0.0
-            RADPL(NZ,NY,NX)=0.0
-            RADPW(NZ,NY,NX)=0.0
-            RAYSL(NZ,NY,NX)=0.0
-            RAYSW(NZ,NY,NX)=0.0
-            RAYPL(NZ,NY,NX)=0.0
-            RAYPW(NZ,NY,NX)=0.0
-            RADS1(NZ,NY,NX)=0.0
-            RADW1(NZ,NY,NX)=0.0
-            RADP1(NZ,NY,NX)=0.0
-            RADQ1(NZ,NY,NX)=0.0
-            RAYS1(NZ,NY,NX)=0.0
-            RAYW1(NZ,NY,NX)=0.0
-            RAYP1(NZ,NY,NX)=0.0
-            RAYQ1(NZ,NY,NX)=0.0
-            RADS2(NZ,NY,NX)=0.0
-            RADW2(NZ,NY,NX)=0.0
-            RADP2(NZ,NY,NX)=0.0
-            RADQ2(NZ,NY,NX)=0.0
-            RAYS2(NZ,NY,NX)=0.0
-            RAYW2(NZ,NY,NX)=0.0
-            RAYP2(NZ,NY,NX)=0.0
-            RAYQ2(NZ,NY,NX)=0.0
-    !
-      !     LEAF SURFACE AREA IN EACH INCLINATION CLASS N, AZIMUTH CLASS M,
-      !     LAYER L AND SPECIES NZ
-      !
-      !     TSURFY=unself-shaded leaf area
-      !     TSURFZ=unself-shaded leaf area m-2 in each azimuth class
-      !     TSURFS=TSURFY with shading from canopy layers above
-      !     TSURFX=TSURFS m-2
-      !     TSURWY=unself-shaded stalk area
-      !     TSURWZ=unself-shaded stalk area m-2 in each azimuth class
-      !     TSURWS=TSURWY with shading from canopy layers above
-      !     TSURWX=TSURWS m-2
-      !
-            DO 1600 N=1,JLI
-              TSURFY=TSURF(N,L,NZ,NY,NX)*CFX(NZ,NY,NX)
-              TSURFZ=TSURFY*YAREA
-              TSURFS=TSURFY*TAUS(L+1,NY,NX)
-              TSURFX=TSURFS*XAREA
-              TSURWY=TSURFB(N,L,NZ,NY,NX)*CFW
-              TSURWZ=TSURWY*YAREA
-              TSURWS=TSURWY*TAUS(L+1,NY,NX)
-              TSURWX=TSURWS*XAREA
-              !
-              !     ABSORPTION OF DIRECT RADIATION BY SUNLIT LEAF SURFACES
-              !
-              !     STOPZ=accumulated horizontal area of intercepted direct radiation
-              !
-              DO 1700 M=1,JSA
-                RADSL(NZ,NY,NX)=RADSL(NZ,NY,NX)+TSURFS*RDNDIR(N,M,NZ,NY,NX)
-                RADSW(NZ,NY,NX)=RADSW(NZ,NY,NX)+TSURWS*RDNDIW(N,M,NZ,NY,NX)
-                RADPL(NZ,NY,NX)=RADPL(NZ,NY,NX)+TSURFS*PARDIR(N,M,NZ,NY,NX)
-                RADPW(NZ,NY,NX)=RADPW(NZ,NY,NX)+TSURWS*PARDIW(N,M,NZ,NY,NX)
-                STOPSZ=STOPSZ+(TSURFX+TSURWX)*BETX(N,M)
-!
-          !     BACKSCATTERING OF REFLECTED DIRECT RADIATION
-          !
-                IF(IALBS(N,M).EQ.1)THEN
-                  RADS1(NZ,NY,NX)=RADS1(NZ,NY,NX)+TSURFS*RDNDIR(N,M,NZ,NY,NX)
-                  RADW1(NZ,NY,NX)=RADW1(NZ,NY,NX)+TSURWS*RDNDIW(N,M,NZ,NY,NX)
-                  RADP1(NZ,NY,NX)=RADP1(NZ,NY,NX)+TSURFS*PARDIR(N,M,NZ,NY,NX)
-                  RADQ1(NZ,NY,NX)=RADQ1(NZ,NY,NX)+TSURWS*PARDIW(N,M,NZ,NY,NX)
-                  !
-                  ! FORWARD SCATTERING OF REFLECTED DIRECT RADIATION
-                  !
-                ELSE
-                  RADS2(NZ,NY,NX)=RADS2(NZ,NY,NX)+TSURFS*RDNDIR(N,M,NZ,NY,NX)
-                  RADW2(NZ,NY,NX)=RADW2(NZ,NY,NX)+TSURWS*RDNDIW(N,M,NZ,NY,NX)
-                  RADP2(NZ,NY,NX)=RADP2(NZ,NY,NX)+TSURFS*PARDIR(N,M,NZ,NY,NX)
-                  RADQ2(NZ,NY,NX)=RADQ2(NZ,NY,NX)+TSURWS*PARDIW(N,M,NZ,NY,NX)
-                ENDIF
-    !
-                !     INTENSITY OF ABSORBED DIFFUSE RADIATION AT LEAF SURFACES
-                !
-                !     RADYN,RADYW,RAPYN,RAPYW=diffuse SW,PAR flux absorbed by leaf,stalk surf
-                !     OMEGA,OMEGX=incident angle of diffuse radn at leaf,horizontal surface
-!
-                DO 1750 NN=1,JLA
-                  RADYN=RADYL*OMEGA(M,N,NN)*ABSR(NZ,NY,NX)
-                  RADYW=RADYL*OMEGA(M,N,NN)*ABSRW
-                  RAPYN=RAPYL*OMEGA(M,N,NN)*ABSP(NZ,NY,NX)
-                  RAPYW=RAPYL*OMEGA(M,N,NN)*ABSPW
-                  PARDIF(N,M,L,NZ,NY,NX)=PARDIF(N,M,L,NZ,NY,NX)+RAPYN
-                  PAR(N,M,L,NZ,NY,NX)=PAR(N,M,L,NZ,NY,NX)+RAPYN
-!
-                  !     ABSORPTION OF DIFFUSE RADIATION BY SHADED LEAF SURFACES
-                  !
-                  !     STOPYZ=accumulated horizontal area of intercepted diffuse radiation
-                  !
-                  RAYSL(NZ,NY,NX)=RAYSL(NZ,NY,NX)+TSURFY*RADYN
-                  RAYSW(NZ,NY,NX)=RAYSW(NZ,NY,NX)+TSURWY*RADYW
-                  RAYPL(NZ,NY,NX)=RAYPL(NZ,NY,NX)+TSURFY*RAPYN
-                  RAYPW(NZ,NY,NX)=RAYPW(NZ,NY,NX)+TSURWY*RAPYW
-                  STOPYZ=STOPYZ+(TSURFZ+TSURWZ)*OMEGX(M,N,NN)
-    !
-                  !     BACKSCATTERING OF REFLECTED DIFFUSE RADIATION
-                  !
-                  IF(IALBY(M,N,NN).EQ.1)THEN
-                    RAYS1(NZ,NY,NX)=RAYS1(NZ,NY,NX)+TSURFY*RADYN
-                    RAYW1(NZ,NY,NX)=RAYW1(NZ,NY,NX)+TSURWY*RADYW
-                    RAYP1(NZ,NY,NX)=RAYP1(NZ,NY,NX)+TSURFY*RAPYN
-                    RAYQ1(NZ,NY,NX)=RAYQ1(NZ,NY,NX)+TSURWY*RAPYW
-                    !
-                    !     FORWARD SCATTERING OF REFLECTED DIFFUSE RADIATION
-                    !
-                  ELSE
-                    RAYS2(NZ,NY,NX)=RAYS2(NZ,NY,NX)+TSURFY*RADYN
-                    RAYW2(NZ,NY,NX)=RAYW2(NZ,NY,NX)+TSURWY*RADYW
-                    RAYP2(NZ,NY,NX)=RAYP2(NZ,NY,NX)+TSURFY*RAPYN
-                    RAYQ2(NZ,NY,NX)=RAYQ2(NZ,NY,NX)+TSURWY*RAPYW
-                  ENDIF
-1750            CONTINUE
-1700          CONTINUE
-1600        CONTINUE
-1500      CONTINUE
-          !
-          !     ACCUMULATED INTERCEPTION BY CANOPY LAYER
-          !
-          !     XTAUS=interception of direct radiation in current layer
-          !     STOPZ=accumulated interception of direct radiation from topmost layer
-          !     TAUS=transmission of direct radiation to next lower layer
-!
-          IF(STOPS+STOPSZ.GT.1.0)THEN
-            IF(STOPSZ.GT.ZERO)THEN
-              XTAUS=(1.0-STOPS)/((1.0-STOPS)-(1.0-STOPS-STOPSZ))
-            ELSE
-              XTAUS=0.0
-            ENDIF
-            TAUS(L+1,NY,NX)=TAUS(L+1,NY,NX)*XTAUS
-            STOPSZ=STOPSZ*XTAUS
-            DO 1510 NZ=1,NP(NY,NX)
-              RADSL(NZ,NY,NX)=RADSL(NZ,NY,NX)*XTAUS
-              RADSW(NZ,NY,NX)=RADSW(NZ,NY,NX)*XTAUS
-              RADPL(NZ,NY,NX)=RADPL(NZ,NY,NX)*XTAUS
-              RADPW(NZ,NY,NX)=RADPW(NZ,NY,NX)*XTAUS
-              RADS1(NZ,NY,NX)=RADS1(NZ,NY,NX)*XTAUS
-              RADW1(NZ,NY,NX)=RADW1(NZ,NY,NX)*XTAUS
-              RADP1(NZ,NY,NX)=RADP1(NZ,NY,NX)*XTAUS
-              RADQ1(NZ,NY,NX)=RADQ1(NZ,NY,NX)*XTAUS
-              RADS2(NZ,NY,NX)=RADS2(NZ,NY,NX)*XTAUS
-              RADW2(NZ,NY,NX)=RADW2(NZ,NY,NX)*XTAUS
-              RADP2(NZ,NY,NX)=RADP2(NZ,NY,NX)*XTAUS
-              RADQ2(NZ,NY,NX)=RADQ2(NZ,NY,NX)*XTAUS
-1510        CONTINUE
-          ENDIF
-!
-          !     XTAUY=interception of diffuse radiation in current layer
-          !     STOPYZ=accumulated interception of diffuse radiation from topmost layer
-          !     TAUY=transmission of diffuse radiation to next lower layer
-!
-          IF(STOPY+STOPYZ.GT.1.0)THEN
-            XTAUY=(1.0-STOPY)/((1.0-STOPY)-(1.0-STOPY-STOPYZ))
-            TAUY(L+1)=TAUY(L+1)*XTAUY
-            STOPYZ=STOPYZ*XTAUY
-            DO 1520 NZ=1,NP(NY,NX)
-              RAYSL(NZ,NY,NX)=RAYSL(NZ,NY,NX)*XTAUY
-              RAYSW(NZ,NY,NX)=RAYSW(NZ,NY,NX)*XTAUY
-              RAYPL(NZ,NY,NX)=RAYPL(NZ,NY,NX)*XTAUY
-              RAYPW(NZ,NY,NX)=RAYPW(NZ,NY,NX)*XTAUY
-              RAYS1(NZ,NY,NX)=RAYS1(NZ,NY,NX)*XTAUY
-              RAYW1(NZ,NY,NX)=RAYW1(NZ,NY,NX)*XTAUY
-              RAYP1(NZ,NY,NX)=RAYP1(NZ,NY,NX)*XTAUY
-              RAYQ1(NZ,NY,NX)=RAYQ1(NZ,NY,NX)*XTAUY
-              RAYS2(NZ,NY,NX)=RAYS2(NZ,NY,NX)*XTAUY
-              RAYW2(NZ,NY,NX)=RAYW2(NZ,NY,NX)*XTAUY
-              RAYP2(NZ,NY,NX)=RAYP2(NZ,NY,NX)*XTAUY
-              RAYQ2(NZ,NY,NX)=RAYQ2(NZ,NY,NX)*XTAUY
-              DO 1730 N=1,JLI
-                DO  M=1,JSA
-                  PARDIF(N,M,L,NZ,NY,NX)=PARDIF(N,M,L,NZ,NY,NX)*XTAUY
-                  PAR(N,M,L,NZ,NY,NX)=PARDIR(N,M,NZ,NY,NX)+PARDIF(N,M,L,NZ,NY,NX)
-                enddo
-1730          CONTINUE
-1520        CONTINUE
-          ENDIF
-          !
-          !     TOTAL RADIATION ABSORBED, REFLECTED AND TRANSMITTED BY ALL PFTs
-          !
-          !     RADST,RADWT,RADPT,RADQT=total atmospheric SW,PAR absorbed by leaf,stalk
-          !     RA1ST,RA1WT,RA1PT,RA1QT=total backscattered SW,PAR absd by leaf,stalk
-          !     RA2ST,RA2WT,RA2PT,RA2QT=total fwd scattered SW,PAR absd by leaf,stalk
-          !     RAFSL,RAFPL=total fwd scattered SW,PAR to next layer
-          !     RABSL,RABPL=total back scattered SW,PAR to next layer
-          !     RADC,TRADC,RADP,TRADP=total atmospheric SW,PAR absbd by each,all PFT
-          !     STOPS,STOPY=accumulated interception of direct,diffuse radiation
-          !     TAUS,TAUY=transmission of direct,diffuse radiation to next lower layer
-          !
-          DO 1530 NZ=1,NP(NY,NX)
-            RADST=RADSL(NZ,NY,NX)+RAYSL(NZ,NY,NX)
-            RADWT=RADSW(NZ,NY,NX)+RAYSW(NZ,NY,NX)
-            RADPT=RADPL(NZ,NY,NX)+RAYPL(NZ,NY,NX)
-            RADQT=RADPW(NZ,NY,NX)+RAYPW(NZ,NY,NX)
-            RA1ST=RADS1(NZ,NY,NX)+RAYS1(NZ,NY,NX)
-            RA1WT=RADW1(NZ,NY,NX)+RAYW1(NZ,NY,NX)
-            RA1PT=RADP1(NZ,NY,NX)+RAYP1(NZ,NY,NX)
-            RA1QT=RADP1(NZ,NY,NX)+RAYQ1(NZ,NY,NX)
-            RA2ST=RADS2(NZ,NY,NX)+RAYS2(NZ,NY,NX)
-            RA2WT=RADW2(NZ,NY,NX)+RAYW2(NZ,NY,NX)
-            RA2PT=RADP2(NZ,NY,NX)+RAYP2(NZ,NY,NX)
-            RA2QT=RADQ2(NZ,NY,NX)+RAYQ2(NZ,NY,NX)
-            RAFSL(L)=RAFSL(L)+(RADST*TAUR(NZ,NY,NX) &
-              +RA2ST*ALBR(NZ,NY,NX)+RA2WT*ALBRW)*YAREA
-            RAFPL(L)=RAFPL(L)+(RADPT*TAUP(NZ,NY,NX) &
-              +RA2PT*ALBP(NZ,NY,NX)+RA2QT*ALBPW)*YAREA
-            RABSL(L)=RABSL(L)+(RA1ST*ALBR(NZ,NY,NX)+RA1WT*ALBRW)*YAREA
-            RABPL(L)=RABPL(L)+(RA1PT*ALBP(NZ,NY,NX)+RA1QT*ALBPW)*YAREA
-            RADC(NZ,NY,NX)=RADC(NZ,NY,NX)+RADST+RADWT
-            RADP(NZ,NY,NX)=RADP(NZ,NY,NX)+RADPT+RADQT
-            TRADC(NY,NX)=TRADC(NY,NX)+RADST+RADWT
-            TRAPC(NY,NX)=TRAPC(NY,NX)+RADPT+RADQT
-1530      CONTINUE
-          STOPS=STOPS+STOPSZ
-          STOPY=STOPY+STOPYZ
-          TAUS(L,NY,NX)=1.0-STOPS
-          TAU0(L,NY,NX)=1.0-TAUS(L,NY,NX)
-          TAUY(L)=1.0-STOPY
-        ELSE
-          RAFSL(L)=RAFSL(L+1)
-          RAFPL(L)=RAFPL(L+1)
-          TAUS(L,NY,NX)=TAUS(L+1,NY,NX)
-          TAU0(L,NY,NX)=1.0-TAUS(L,NY,NX)
-          TAUY(L)=TAUY(L+1)
-        ENDIF
-1800  CONTINUE
-      !
-      !     DIRECT AND DIFFUSE RADIATION ABSORBED AT GROUND SURFACE
-      !
-      !     RADSG,RADYG,RAPSG,RAPYG=direct,diffuse SW,PAR at horizl ground surface
-      !     RADS,RAPS =solar beam direct SW,PAR flux
-      !     TAUS,TAUY=transmission of direct,diffuse radiation below canopy
-      !     RADYL,RAPYL=solar beam diffuse SW,PAR flux
-      !     RASG,RAPG=total SW,PAR at ground surface
-      !     BETAG,OMEGAG=incident solar,sky angle at ground surface
-!
-      RADSG=RADS(NY,NX)*TAUS(1,NY,NX)
-      RADYG=RADYL*TAUY(1)+RAFSL(1)
-      RAPSG=RAPS(NY,NX)*TAUS(1,NY,NX)
-      RAPYG=RAPYL*TAUY(1)+RAFPL(1)
-      RASG=ABS(BETAG)*RADSG
-      RAPG=ABS(BETAG)*RAPSG
-      DO 20 N=1,JSA
-        RASG=RASG+ABS(OMEGAG(N,NY,NX))*RADYG
-        RAPG=RAPG+ABS(OMEGAG(N,NY,NX))*RAPYG
-20    CONTINUE
-      RADG(NY,NX)=RASG*AREA(3,NU(NY,NX),NY,NX)
-!
-      !     RADIATION REFLECTED FROM GROUND SURFACE
-      !
-      !     VHCPW,VHCPWX=current,minimum snowpack heat capacity
-      !     ALBW,VOLSS,VOLWS,VOLIS=snowpack albedo,snow,water,ice volume
-      !     ALBG,ALBS,FSNOW=ground,soil albedo,snow cover fraction
-      !     THETW1=soil surface water content
-      !     RABSL,RADPL=SW,PAR backscatter from ground surface
-      !     TRADG,TRAPG=SW,PAR absorbed by ground surface
-!
-      IF(VHCPW(1,NY,NX).GT.VHCPWX(NY,NX))THEN
-        ALBW=(0.80*VOLSS(NY,NX)+0.30*VOLIS(NY,NX)+0.06*VOLWS(NY,NX)) &
-          /(VOLSS(NY,NX)+VOLIS(NY,NX)+VOLWS(NY,NX))
-        FSNOW=AMIN1((DPTHS(NY,NX)/0.07)**2,1.0)
-        ALBG=FSNOW*ALBW+(1.0-FSNOW)*ALBS(NY,NX)
-      ELSE
-        IF(VOLX(NU(NY,NX),NY,NX).GT.ZEROS2(NY,NX))THEN
-          THETW1=AMIN1(POROS(NU(NY,NX),NY,NX) &
-            ,VOLW(NU(NY,NX),NY,NX)/VOLY(NU(NY,NX),NY,NX))
-        ELSE
-          THETW1=0.0
-        ENDIF
-        ALBG=AMIN1(ALBX(NY,NX),ALBS(NY,NX) &
-          +AMAX1(0.0,ALBX(NY,NX)-THETW1))
-      ENDIF
-      RABSL(0)=RASG*ALBG*0.25
-      RABPL(0)=RAPG*ALBG*0.25
-      TRADG(NY,NX)=(1.0-ALBG)*RASG*AREA(3,NU(NY,NX),NY,NX)
-      TRAPG(NY,NX)=(1.0-ALBG)*RAPG*AREA(3,NU(NY,NX),NY,NX)
-!
-      !     ADD RADIATION FROM SCATTERING THROUGH CANOPY LAYERS
-      !
-      !     RABSL,RABPL=total backscattered SW,PAR to next layer
-      !     RAFSL,RAFPL=total fwd scattered SW,PAR to next layer
-      !     RADYN,RADYW,RAPYN,RAPYW=leaf,stalk SW,PAR absbd fwd+back flux
-      !     RAYSL,RAYSW,RAYPL,RAYPW=total leaf,stalk SW,PAR absbd fwd+back
-      !     RADC,TRADC,RADP,TRADP=total SW,PAR absbd by each,all PFT
-!
-      RADYL=0.0
-      RAPYL=0.0
-      TAUY(0)=1.0
-      RAFSL(0)=0.0
-      RAFPL(0)=0.0
-      DO 2800 L=1,JC
-        IF(ZL(L-1,NY,NX).GE.DPTHS(NY,NX)-ZERO &
-         .AND.ZL(L-1,NY,NX).GE.DPTH0(NY,NX)-ZERO)THEN
-          RADYL=RADYL*TAUY(L-1)+RAFSL(L-1)+RABSL(L-1)
-          RAPYL=RAPYL*TAUY(L-1)+RAFPL(L-1)+RABPL(L-1)
-          RAFSL(L)=0.0
-          RAFPL(L)=0.0
-          DO 2500 NZ=1,NP(NY,NX)
-            RAYSL(NZ,NY,NX)=0.0
-            RAYSW(NZ,NY,NX)=0.0
-            RAYPL(NZ,NY,NX)=0.0
-            RAYPW(NZ,NY,NX)=0.0
-            DO 2600 N=1,JLI
-              TSURFY=TSURF(N,L,NZ,NY,NX)*CFX(NZ,NY,NX)
-              TSURWY=TSURFB(N,L,NZ,NY,NX)*CFW
-              DO 2700 M=1,JSA
-                DO 2750 NN=1,JLA
-                  RADYN=RADYL*OMEGA(M,N,NN)*ABSR(NZ,NY,NX)
-                  RADYW=RADYL*OMEGA(M,N,NN)*ABSRW
-                  RAPYN=RAPYL*OMEGA(M,N,NN)*ABSP(NZ,NY,NX)
-                  RAPYW=RAPYL*OMEGA(M,N,NN)*ABSPW
-                  PARDIF(N,M,L,NZ,NY,NX)=PARDIF(N,M,L,NZ,NY,NX)+RAPYN
-                  PAR(N,M,L,NZ,NY,NX)=PAR(N,M,L,NZ,NY,NX)+RAPYN
-                  RAYSL(NZ,NY,NX)=RAYSL(NZ,NY,NX)+TSURFY*RADYN
-                  RAYSW(NZ,NY,NX)=RAYSW(NZ,NY,NX)+TSURWY*RADYW
-                  RAYPL(NZ,NY,NX)=RAYPL(NZ,NY,NX)+TSURFY*RAPYN
-                  RAYPW(NZ,NY,NX)=RAYPW(NZ,NY,NX)+TSURWY*RAPYW
-2750            CONTINUE
-2700          CONTINUE
-2600        CONTINUE
-            RAFSL(L)=RAFSL(L)+RAYSL(NZ,NY,NX)*TAUR(NZ,NY,NX)*YAREA
-            RAFPL(L)=RAFPL(L)+RAYPL(NZ,NY,NX)*TAUP(NZ,NY,NX)*YAREA
-            RADC(NZ,NY,NX)=RADC(NZ,NY,NX)+RAYSL(NZ,NY,NX)+RAYSW(NZ,NY,NX)
-            RADP(NZ,NY,NX)=RADP(NZ,NY,NX)+RAYPL(NZ,NY,NX)+RAYPW(NZ,NY,NX)
-            TRADC(NY,NX)=TRADC(NY,NX)+RAYSL(NZ,NY,NX)+RAYSW(NZ,NY,NX)
-            TRAPC(NY,NX)=TRAPC(NY,NX)+RAYPL(NZ,NY,NX)+RAYPW(NZ,NY,NX)
-2500      CONTINUE
-        ELSE
-          RAFSL(L)=RAFSL(L-1)
-          RAFPL(L)=RAFPL(L-1)
-          RABSL(L)=RABSL(L-1)
-          RABPL(L)=RABPL(L-1)
-        ENDIF
-2800  CONTINUE
-!
-      !     RADIATION AT GROUND SURFACE IF NO CANOPY
-!
-    ELSE
-      RASG=ABS(BETAG)*RADS(NY,NX)
-      DO 120 N=1,JSA
-        RASG=RASG+ABS(OMEGAG(N,NY,NX))*RADY(NY,NX)
-120   CONTINUE
-      RADG(NY,NX)=RASG*AREA(3,NU(NY,NX),NY,NX)
-      DO 135 NZ=1,NP(NY,NX)
-        RADC(NZ,NY,NX)=0.0
-        RADP(NZ,NY,NX)=0.0
-135   CONTINUE
-    ENDIF
-!
-    !     IF NO RADIATION
-!
-  ELSE
-    RADG(NY,NX)=0.0
-    DO 125 NZ=1,NP(NY,NX)
-      RADC(NZ,NY,NX)=0.0
-      RADP(NZ,NY,NX)=0.0
-125 CONTINUE
-  ENDIF
-  !
-  !     CANOPY AND GROUND SKY FRACTIONS USED FOR BOUNDARY LAYER CALCULNS
-  !
-  !     FRADG=fraction of radiation received by ground surface
-  !     FRADP=fraction of radiation received by each PFT canopy
-  !     ARLSS,ARLFS=leaf+stalk area of all PFTs,each PFT
-  !
-  FRADG(NY,NX)=1.0
-  IF(ARLSS(NY,NX).GT.ZEROS(NY,NX))THEN
-    FRADPT=1.0-EXP(-0.65*ARLSS(NY,NX)/AREA(3,NU(NY,NX),NY,NX))
-    DO 145 NZ=1,NP(NY,NX)
-      FRADP(NZ,NY,NX)=FRADPT*ARLFS(NZ,NY,NX)/ARLSS(NY,NX)
-      FRADG(NY,NX)=FRADG(NY,NX)-FRADP(NZ,NY,NX)
-145 CONTINUE
-  ELSE
-    FRADG(NY,NX)=1.0
-    DO 146 NZ=1,NP(NY,NX)
-      FRADP(NZ,NY,NX)=0.0
-146 CONTINUE
-  ENDIF
-  end subroutine MultiLayerSurfaceRadiation
-!------------------------------------------------------------------------------------------
-
-  subroutine DivideCanopyLayerByLAI(NY,NX)
-  implicit none
-  integer, intent(in) :: NY,NX
-
-  real(r8) :: ZL1(0:JZ,JY,JX)
-  real(r8) :: ART,ARL
-  real(r8) :: ARX
-  real(r8) :: DZL
-  integer :: NZ,L
-  !     begin_execution
-  !
-  !     DIVISION OF CANOPY INTO JC LAYERS WITH EQUAL LAI
-  !
-  !     ZT,ZC=heights of combined canopy,PFT canopy
-  !     ZL=height to bottom of each canopy layer
-  !     ARLFC,ARSTC=leaf,stalk area of combined canopy
-  !     ARLFT,ARSTT=leaf,stalk area of combined canopy layer
-  !
-  ZT(NY,NX)=0.0
-  DO 9685 NZ=1,NP(NY,NX)
-    ZT(NY,NX)=AMAX1(ZT(NY,NX),ZC(NZ,NY,NX))
-9685  CONTINUE
-  ZL(JC,NY,NX)=ZT(NY,NX)+0.01
-  ZL1(JC,NY,NX)=ZL(JC,NY,NX)
-  ZL1(0,NY,NX)=0.0
-  ART=(ARLFC(NY,NX)+ARSTC(NY,NX))/JC
-  IF(ART.GT.ZEROS(NY,NX))THEN
-    DO 2765 L=JC,2,-1
-      ARL=ARLFT(L,NY,NX)+ARSTT(L,NY,NX)
-      IF(ARL.GT.1.01*ART)THEN
-        DZL=ZL(L,NY,NX)-ZL(L-1,NY,NX)
-        ZL1(L-1,NY,NX)=ZL(L-1,NY,NX)+0.5*AMIN1(1.0,(ARL-ART)/ARL)*DZL
-      ELSEIF(ARL.LT.0.99*ART)THEN
-        ARX=ARLFT(L-1,NY,NX)+ARSTT(L-1,NY,NX)
-        DZL=ZL(L-1,NY,NX)-ZL(L-2,NY,NX)
-        IF(ARX.GT.ZEROS(NY,NX))THEN
-          ZL1(L-1,NY,NX)=ZL(L-1,NY,NX)-0.5*AMIN1(1.0,(ART-ARL)/ARX)*DZL
-        ENDIF
-      ELSE
-        ZL1(L-1,NY,NX)=ZL(L-1,NY,NX)
-      ENDIF
-      !     IF(J.EQ.12)THEN
-      !     WRITE(*,3233)'ZL',I,J,NX,NY,L,ZL1(L,NY,NX),ZL1(L-1,NY,NX)
-      !    3,ZL(L,NY,NX),ZL(L-1,NY,NX),ART,ARL,ARX
-      !    2,DZL,ARLFC(NY,NX),ARSTC(NY,NX),ARLFT(L,NY,NX),ARSTT(L,NY,NX)
-      !    3,ARLFT(L-1,NY,NX),ARSTT(L-1,NY,NX)
-      !    3,ZL(JC,NY,NX),ZT(NY,NX),ZC(1,NY,NX)
-      !3233  FORMAT(A8,5I4,30E12.4)
-      !     ENDIF
-2765  CONTINUE
-    DO 2770 L=JC,2,-1
-      ZL(L-1,NY,NX)=ZL1(L-1,NY,NX)
-!     ZL(L-1,NY,NX)=AMAX1(0.0,AMIN1(ZL(L,NY,NX)-1.0E-06
-!    2,ZL(L-1,NY,NX)))
-2770  CONTINUE
-  ENDIF
-  end subroutine DivideCanopyLayerByLAI
-!------------------------------------------------------------------------------------------
-
-  subroutine CalcBoundaryLayerProperties(NY,NX,DPTH0)
-  implicit none
-  integer, intent(in) :: NY,NX
-  real(r8), intent(in) :: DPTH0(JY,JX)
-  real(r8) :: ARLSC
-  real(r8) :: ARLSG
-  real(r8) :: ZX,ZY,ZE
-  REAL(R8) :: ZZ
-!     begin_execution
-!     CANOPY ZERO PLANE AND ROUGHNESS HEIGHTS
-!
-!     ARLFC,ARSTC=leaf,stalk area of combined canopy
-!     DPTHS,DPTH0=snowpack,surface water depths
-!     ZT,ZD,ZR=canopy,zero plane displacement,roughness height
-!     ZZ=reference height for wind speed
-!
-  ARLSC=ARLFC(NY,NX)+ARSTC(NY,NX)
-  IF(ARLSC.GT.ZEROS(NY,NX) &
-    .AND.ZT(NY,NX).GE.DPTHS(NY,NX)-ZERO &
-    .AND.ZT(NY,NX).GE.DPTH0(NY,NX)-ZERO)THEN
-    ARLSG=ARLSC/AREA(3,NU(NY,NX),NY,NX)
-    ZX=EXP(-0.5*ARLSG)
-    ZY=1.0-ZX
-    ZD(NY,NX)=ZT(NY,NX)*AMAX1(0.0,1.0-2.0/ARLSG*ZY)
-    ZE=ZT(NY,NX)*AMAX1(0.05,ZX*ZY)
-  ELSE
-    ZD(NY,NX)=0.0
-    ZE=0.0
-  ENDIF
-  IF(IFLGW.EQ.1)THEN
-    ZZ=Z0(NY,NX)+ZT(NY,NX)
-  ELSE
-    ZZ=AMAX1(Z0(NY,NX),ZD(NY,NX)+2.0)
-  ENDIF
-  IF(IETYP(NY,NX).GE.0)THEN
-    IF(VHCPW(1,NY,NX).GT.VHCPWX(NY,NX))THEN
-      ZR(NY,NX)=AMAX1(0.001,ZE,ZW)
-    ELSE
-      ZR(NY,NX)=AMAX1(0.001,ZE,ZS(NY,NX))
-    ENDIF
-!
-!     CANOPY ISOTHERMAL BOUNDARY LAYER RESISTANCE
-!
-!     RAB,RAM=biome canopy,minimum isothermal boundary layer resistance
-!     UA=wind speed
-!     RIB=canopy isothermal Richardson number
-!
-    RAB(NY,NX)=AMAX1(RAM,(LOG((ZZ-ZD(NY,NX))/ZR(NY,NX)))**2/(0.168*UA(NY,NX)))
-    RIB(NY,NX)=1.27E+08*(ZZ-ZR(NY,NX))/(UA(NY,NX)**2*TKA(NY,NX))
-  ELSE
-    RAB(NY,NX)=RAM
-    RIB(NY,NX)=0.0
-  ENDIF
-  end subroutine CalcBoundaryLayerProperties
 !------------------------------------------------------------------------------------------
 
   subroutine ApplyFertilizerAtNoon(I,J,NHW,NHE,NVN,NVS)
@@ -3649,16 +2908,20 @@ module Hour1Mod
       end subroutine ApplyMineralFertilizer
 !------------------------------------------------------------------------------------------
 
-  subroutine GetChemicalConcsInSoil(L,NY,NX,THETPZ)
+  subroutine GetChemicalConcsInSoil(NY,NX,THETPZ)
   implicit none
-  integer, intent(in) :: L,NY,NX
+  integer, intent(in) :: NY,NX
   real(r8), intent(out) :: THETPZ(JZ,JY,JX)
+  integer :: L
 !     begin_execution
+
 !     CALCULATE SOIL CONCENTRATIONS OF SOLUTES, GASES
 !
 !     THETW,THETI,THETP=soil micropore water,ice,air concentration
 !     THETPZ=soil micropore+macropore air concn for output
 !
+  DO L=NUI(NY,NX),NLI(NY,NX)
+
   IF(VOLX(L,NY,NX).LE.ZEROS(NY,NX))THEN
     THETW(L,NY,NX)=POROS(L,NY,NX)
     THETI(L,NY,NX)=0.0
@@ -3727,15 +2990,17 @@ module Hour1Mod
   ELSE
     CORGC(L,NY,NX)=0.0
   ENDIF
+  ENDDO
   end subroutine GetChemicalConcsInSoil
 !------------------------------------------------------------------------------------------
 
-  subroutine ZeroHourlyArrays(L,NY,NX)
+  subroutine ZeroHourlyArrays(NY,NX)
   implicit none
-  integer, intent(in) :: L,NY,NX
+  integer, intent(in) :: NY,NX
 
-  integer :: K
+  integer :: K,L
 !     begin_execution
+  DO L=NUI(NY,NX),NLI(NY,NX)
   FINH(L,NY,NX)=0.0
   TCO2S(L,NY,NX)=0.0
   TCO2P(L,NY,NX)=0.0
@@ -3934,6 +3199,7 @@ module Hour1Mod
   XNBBBL(L,NY,NX)=0.0
   XHGBBL(L,NY,NX)=0.0
   RTDNT(L,NY,NX)=0.0
+  ENDDO
   end subroutine ZeroHourlyArrays
 
 end module Hour1Mod
