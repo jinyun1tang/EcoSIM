@@ -8,7 +8,6 @@ module EcoSIMHistMod
   character(len=*), private, parameter :: mod_filename = __FILE__
 
   public
-  CHARACTER(len=16) :: DATA(30)
   CHARACTER(len=16) :: DATAC(30,250,250)
   CHARACTER(len=16) :: DATAP(JP,JY,JX)
   CHARACTER(len=16) :: DATAM(JP,JY,JX)
@@ -23,6 +22,7 @@ module EcoSIMHistMod
   CHARACTER(len=640):: PREFIX
   character(len=1280):: outdir
   integer :: IDATA(60),NOUTS(10),NOUTP(10)
+  CHARACTER(len=16) :: DATA1(30)               !for model io related setup
 
 
 

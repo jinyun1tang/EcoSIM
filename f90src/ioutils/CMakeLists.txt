@@ -1,10 +1,5 @@
 set(IOUTILS_SOURCES
-	foutp.F90
-	fouts.F90
-	outpd.F90
-	outph.F90
-	outsd.F90
-	outsh.F90
+	Hist1Mod.F90
 	readimod.F90
 	readqmod.F90
 	readsmod.F90

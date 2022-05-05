@@ -25,7 +25,7 @@ module PlantTraitDataType
   real(r8) :: FWODRP(0:1)
 
 !physical structure, height and area
-  real(r8) :: ARSTK(JZ,JC,JP,JY,JX)             !stem layer area, [m2 d-2]
+  real(r8) :: ARSTK(JC,JC,JP,JY,JX)             !stem layer area, [m2 d-2]
   real(r8) :: ARLFP(JP,JY,JX)                   !plant leaf area, [m2 d-2]
   real(r8) :: ARLFS(JP,JY,JX)                   !plant leaf area, [m2 d-2]
   real(r8) :: ARLFX(JY,JX)                      !total canopy leaf area, [m2 d-2]
@@ -50,9 +50,9 @@ module PlantTraitDataType
   real(r8) :: ANGSH(JP,JY,JX)                   !sheath angle, [degree from horizontal]
   real(r8) :: RAZ(JP,JY,JX)                     !canopy roughness height, [m]
   real(r8) :: HTSTZ(JP,JY,JX)                   !canopy height, [m]
-  real(r8) :: ARLF(0:25,JC,JP,JY,JX)            !leaf area, [m2 d-2]
-  real(r8) :: HTSHE(0:25,JC,JP,JY,JX)           !sheath height, [m]
-  real(r8) :: HTNODE(0:25,JC,JP,JY,JX)          !internode height, [m]
+  real(r8) :: ARLF(0:JNODS,JC,JP,JY,JX)            !leaf area, [m2 d-2]
+  real(r8) :: HTSHE(0:JNODS,JC,JP,JY,JX)           !sheath height, [m]
+  real(r8) :: HTNODE(0:JNODS,JC,JP,JY,JX)          !internode height, [m]
   real(r8) :: ARLFB(JC,JP,JY,JX)                !branch leaf area, [m2 d-2]
   real(r8) :: ARLFZ(JC,JP,JY,JX)                !branch leaf area, [m2 d-2]
   real(r8) :: HTSHEX(JC,JP,JY,JX)               !branch height, [m]
@@ -60,7 +60,7 @@ module PlantTraitDataType
   real(r8) :: GRNXB(JC,JP,JY,JX)                !branch potential grain number, [d-2]
   real(r8) :: GRNO(JP,JY,JX)                    !canopy grain number, [d-2]
   real(r8) :: PP(JP,JY,JX)                      !plant population, [d-2]
-  real(r8) :: HTNODX(0:25,JC,JP,JY,JX)          !internode height, [m]
+  real(r8) :: HTNODX(0:JNODS,JC,JP,JY,JX)          !internode height, [m]
 
 !stoichiometry
   real(r8) :: CNLF(JP,JY,JX)                    !maximum leaf N:C ratio, [g g-1]
@@ -122,13 +122,11 @@ module PlantTraitDataType
   real(r8) :: VRNF(JC,JP,JY,JX)                 !cold requirement for autumn leafoff/hardening, [h]
   integer :: KLEAF(JC,JP,JY,JX)                 !leaf number, [-]
   integer :: KVSTGN(JC,JP,JY,JX)                !leaf growth stage counter, [-]
-  real(r8) :: KLEAFX(JC,JP,JY,JX)               !NUMBER OF MINIMUM LEAFED NODE USED IN GROWTH ALLOCATION
+  integer :: KLEAFX(JC,JP,JY,JX)               !NUMBER OF MINIMUM LEAFED NODE USED IN GROWTH ALLOCATION
   integer :: KVSTG(JC,JP,JY,JX)                 !leaf growth stage counter, [-]
   real(r8) :: XRLA(JP,JY,JX)                    !rate of leaf initiation, [h-1 at 25 oC]
   real(r8) :: WDLF(JP,JY,JX)                    !leaf length:width ratio, [-]
   real(r8) :: SLA1(JP,JY,JX)                    !leaf area:mass during growth, [m2 g-1]
-  real(r8) :: TCZD                              !basal value for threshold temperature for spring leafout/dehardening	oC
-  real(r8) :: TCXD                              !basal value for threshold temperature for autumn leafoff/hardening	oC
   real(r8) :: TCZ(JP,JY,JX)                     !threshold temperature for spring leafout/dehardening, [oC]
   real(r8) :: SSL1(JP,JY,JX)                    !petiole length:mass during growth, [m g-1]
   real(r8) :: VRNL(JC,JP,JY,JX)                 !hours above threshold temperature required for spring leafout/dehardening, [-]

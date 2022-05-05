@@ -3,6 +3,7 @@ module ErosionMod
   use minimathmod, only : test_aeqb
   use MicrobialDataType
   use SOMDataType
+  use EcoSIMSolverPar
   use FertilizerDataType
   use GridConsts
   use FlagDataType

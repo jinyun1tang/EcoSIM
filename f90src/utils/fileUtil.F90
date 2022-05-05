@@ -5,6 +5,7 @@ module fileUtil
   implicit none
 
   public :: open_safe
+  public :: check_read
   contains
 
   subroutine open_safe(lun,prefix,fname,status,location,lineno,lverb)
@@ -30,4 +31,22 @@ module fileUtil
       //TRIM(pathfile), line=lineno)
   endif
   end subroutine open_safe
+
+!------------------------------------------------------------------------------------------
+
+  subroutine check_read(ios,nelm,lineno,modfile)
+  implicit none
+  integer, intent(in) :: ios
+  integer, intent(in) :: nelm
+  integer, intent(in) :: lineno
+  character(len=*), intent(in) :: modfile
+
+  if(ios>0)then
+    write(*,*)'input error'
+    call endrun('read error in '//trim(modfile),lineno)
+  elseif(ios<0)then
+    write(*,*)'number of inputs is less than ',nelm
+    call endrun('read error in '//trim(modfile),lineno)
+  endif
+  end subroutine check_read
 end module fileUtil

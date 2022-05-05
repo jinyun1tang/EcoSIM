@@ -2,7 +2,6 @@ set(ECOSIM_MOD_SOURCES
 	DayMod.F90
 	ErosionMod.F90
 	ExecMod.F90
-	ExtractMod.F90
   Hour1Pars.F90
 	Hour1Mod.F90
 	RedistMod.F90
@@ -17,6 +16,7 @@ include_directories(${CMAKE_BINARY_DIR}/f90src/utils/)
 include_directories(${CMAKE_BINARY_DIR}/f90src/ecosim_datatype/)
 include_directories(${CMAKE_BINARY_DIR}/f90src/ioutils/)
 include_directories(${CMAKE_BINARY_DIR}/f90src/SoilHydroTherm/)
+include_directories(${CMAKE_BINARY_DIR}/f90src/APIs/)
 include_directories(${CMAKE_BINARY_DIR}/f90src/plant_bgc/)
 include_directories(${CMAKE_BINARY_DIR}/f90src/microbial_bgc/)
 include(add_ecosim_library)

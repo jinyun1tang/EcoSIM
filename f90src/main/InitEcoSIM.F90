@@ -14,11 +14,11 @@ module InitEcoSIM
   use ChemTranspDataType  , only : InitChemTranspData
   use FertilizerDataType  , only : InitFertilizerData
   use CanopyRadDataType   , only : InitCanopyRad
-  use GrosubMod           , only : InitGrosub
+  use GrosubsMod           , only : InitGrosub
   use WatsubMod           , only : initWatsub
-  use PlantDisturbMod     , only : InitPlantDisturbance
+  use PlantDisturbsMod     , only : InitPlantDisturbance
   use PlantTraitDataType   , only : InitPlantTraits
-  use UptakeMod           , only : InitUptake
+  use UptakesMod           , only : InitUptake
   use Hour1Mod            , only : InitHour1
   use SoilPropertyDataType, only : InitSoilProperty
   use SurfLitterDataType  , only : InitSurfLitter
@@ -26,11 +26,16 @@ module InitEcoSIM
   use SoilBGCDataType     , only : InitSoilBGCData
   use SedimentDataType    , only : InitSedimentData
   use SoilWaterDataType   , only : InitSoilWater
+  use PlantAPIData        , only : InitPlantAPIData
+  use PlantMngmtDataType  , only : InitPlantMngmtData
+  use GridConsts
   implicit  none
   integer                 , intent(in) :: nmicbguilds   !number of microbial guilds per group
 
 ! begin_execution
   call InitCanopyRad
+
+  call InitPlantMngmtData
 
   call InitSoilProperty
 
@@ -41,6 +46,8 @@ module InitEcoSIM
   call InitSoilWater
 
   call InitIrrigation
+
+  call InitPlantAPIData(JZ,JC,JP,JSA,jcplx1,JLI,JLA,JNODS)
 
   call InitMicrobialData(nmicbguilds)
 

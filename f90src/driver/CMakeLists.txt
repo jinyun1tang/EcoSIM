@@ -13,6 +13,7 @@ include_directories(${CMAKE_BINARY_DIR}/f90src/SoilHydroTherm/)
 include_directories(${CMAKE_BINARY_DIR}/f90src/plant_bgc/)
 include_directories(${CMAKE_BINARY_DIR}/f90src/ecosim_mods/)
 include_directories(${CMAKE_BINARY_DIR}/f90src/geochem/)
+include_directories(${CMAKE_BINARY_DIR}/f90src/APIs/)
 include_directories(${CMAKE_BINARY_DIR}/f90src/main/)
 
 include(add_ecosim_library)

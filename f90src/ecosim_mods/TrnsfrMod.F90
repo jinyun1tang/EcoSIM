@@ -7,6 +7,7 @@ module TrnsfrMod
   use SOMDataType
   use ChemTranspDataType
   use GridConsts
+  use EcoSIMSolverPar
   use SoilPhysDataType
   use SoilHeatDatatype
   use SoilWaterDataType

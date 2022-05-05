@@ -1,4 +1,4 @@
-SUBROUTINE routq(NT,NE,NAX,NDX,NTX,NEX,NHW,NHE,NVN,NVS)
+SUBROUTINE routq(NT,NE,NTX,NEX,NHW,NHE,NVN,NVS)
 !
 !     THIS SUBROUTINE OPENS CHECKPOINT FILES AND READS
 !     FILE NAMES FOR PLANT SPECIES AND MANAGEMENT
@@ -11,8 +11,9 @@ SUBROUTINE routq(NT,NE,NAX,NDX,NTX,NEX,NHW,NHE,NVN,NVS)
   use PlantMngmtDataType
   use EcoSIMHistMod
   use GridDataType
+  use EcoSIMConfig
   implicit none
-  integer, intent(in) :: NT,NE,NAX,NDX,NTX,NEX,NHW,NHE,NVN,NVS
+  integer, intent(in) :: NT,NE,NTX,NEX,NHW,NHE,NVN,NVS
 
 
   character(len=*), parameter :: mod_filename = __FILE__
@@ -29,7 +30,7 @@ SUBROUTINE routq(NT,NE,NAX,NDX,NTX,NEX,NHW,NHE,NVN,NVS)
 !
 ! OPEN CHECKPOINT FILES FOR PLANT VARIABLES
 !
-  IF(IGO.EQ.0)THEN
+  IF(is_first_year)THEN
     DO 9999 NX=NHW,NHE
       DO  NY=NVN,NVS
         DO NZ=1,5
@@ -40,18 +41,18 @@ SUBROUTINE routq(NT,NE,NAX,NDX,NTX,NEX,NHW,NHE,NVN,NVS)
         enddo
       enddo
 9999  CONTINUE
-    IF(DATA(20).EQ.'YES')THEN
+    IF(is_restart_run)THEN
       IDATE=IDATA(9)
     ELSE
       IDATE=IDATA(3)
     ENDIF
 !   open checkpoint files for i/o
     WRITE(CHARY,'(I4)')IDATE
-    OUTX='P'//DATA(1)(1:2)//CHARY(1:4)
-    OUTC='C'//DATA(1)(1:2)//CHARY(1:4)
-    OUTM='M'//DATA(1)(1:2)//CHARY(1:4)
-    OUTR='R'//DATA(1)(1:2)//CHARY(1:4)
-    OUTQ='Q'//DATA(1)(1:2)//CHARY(1:4)
+    OUTX='P'//DATA1(1)(1:2)//CHARY(1:4)
+    OUTC='C'//DATA1(1)(1:2)//CHARY(1:4)
+    OUTM='M'//DATA1(1)(1:2)//CHARY(1:4)
+    OUTR='R'//DATA1(1)(1:2)//CHARY(1:4)
+    OUTQ='Q'//DATA1(1)(1:2)//CHARY(1:4)
     call OPEN_safe(26,outdir,outx,'UNKNOWN',mod_filename,__LINE__)
     call OPEN_safe(27,outdir,outc,'UNKNOWN',mod_filename,__LINE__)
     call OPEN_safe(28,outdir,outm,'UNKNOWN',mod_filename,__LINE__)
@@ -71,6 +72,7 @@ SUBROUTINE routq(NT,NE,NAX,NDX,NTX,NEX,NHW,NHE,NVN,NVS)
     NN=1
     DO 4995 NX=NH1,NH2
       DO 4990 NY=NV1,NV2
+        print*,'NY,NX',NY,NX
         NP0(NY,NX)=NS
         DO 4985 NZ=1,NS
           LSG(NZ,NY,NX)=NN
@@ -84,6 +86,7 @@ SUBROUTINE routq(NT,NE,NAX,NDX,NTX,NEX,NHW,NHE,NVN,NVS)
           DO 4965 NZ=1,NS
             IF(IETYP(NY,NX).GT.0)THEN
               WRITE(CLIMATE,'(I2)')IETYP(NY,NX)
+!the type of pft is specified by genra+Koppen climate zone
               DATAX(NZ)=DATAX(NZ)(1:4)//CLIMATE
             ENDIF
 4965      CONTINUE
@@ -91,7 +94,7 @@ SUBROUTINE routq(NT,NE,NAX,NDX,NTX,NEX,NHW,NHE,NVN,NVS)
 4975  CONTINUE
 
     ENDIF
-    IF(DATA(20).EQ.'NO')THEN
+    IF(.not. is_restart_run)THEN
       DO 8995 NX=NH1,NH2
         DO 8990 NY=NV1,NV2
           NP(NY,NX)=NS
@@ -194,7 +197,7 @@ SUBROUTINE routq(NT,NE,NAX,NDX,NTX,NEX,NHW,NHE,NVN,NVS)
 !           SET NUMBER OF PLANT SPECIES
 !
             NN=5
-            DO 202 NZ=5,1,-1
+            DO 202 NZ=JP,1,-1
               IF(DATAP(NZ,NY,NX).EQ.'NO')THEN
                 NN=NN-1
               ELSE

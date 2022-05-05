@@ -43,23 +43,23 @@ module UptakePars
   implicit none
 
   MXN=200
-  DIFFX=1.0E-09
-  DIFFY=0.5E-02
-  FMN=1.0E-06
-  RACM=0.00139
-  RACX=0.0278
-  RZ=0.0139
-  DSTK=0.225
-  VSTK=1.0E-06/DSTK
-  SNH3X=2.852E+02
-  EMMC=0.97
-  EMODW=50.0
-  ZCKI=0.5E-01
-  PCKI=0.5E-02
+  DIFFX=1.0E-09_r8
+  DIFFY=0.5E-02_r8
+  FMN=1.0E-06_r8
+  RACM=0.00139_r8
+  RACX=0.0278_r8
+  RZ=0.0139_r8
+  DSTK=0.225_r8
+  VSTK=1.0E-06_r8/DSTK
+  SNH3X=2.852E+02_r8
+  EMMC=0.97_r8
+  EMODW=50.0_r8
+  ZCKI=0.5E-01_r8
+  PCKI=0.5E-02_r8
   ZPKI=ZCKI/PCKI
   PZKI=PCKI/ZCKI
-  FEXUC=0.5E-03
-  FEXUN=1.0E-02
-  FEXUP=1.0E-02
+  FEXUC=0.5E-03_r8
+  FEXUN=1.0E-02_r8
+  FEXUP=1.0E-02_r8
   end subroutine InitUptakePars
 end module UptakePars

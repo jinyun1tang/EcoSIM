@@ -7,6 +7,7 @@ module nitro1LayerMod
   use data_kind_mod, only : r8 => SHR_KIND_R8
   use abortutils  , only : endrun
   use minimathmod, only : safe_adb
+  use EcoSIMSolverPar
   use MicrobialDataType
   use NitroPars
   use SOMDataType

@@ -3,6 +3,7 @@ module StartqMod
   use EcosimConst
   use GridConsts
   use FlagDataType
+  use EcosimConst
   use EcoSIMCtrlDataType
   use PlantDataRateType
   use ClimForcDataType
@@ -13,6 +14,7 @@ module StartqMod
   use RootDataType
   use EcoSIMHistMod
   use GridDataType
+  use EcoSIMConfig
   implicit none
 
   private
@@ -331,6 +333,9 @@ module StartqMod
 
   implicit none
   integer, intent(in) :: NZ, NY, NX
+  real(r8), parameter :: TCZD = 5.0_r8        !basal value for threshold temperature for spring leafout/dehardening	oC
+  real(r8), parameter :: TCXD = 12.0_r8       !basal value for threshold temperature for autumn leafoff/hardening	oC
+
 !
 !     PFT THERMAL ACCLIMATION
 !
@@ -340,8 +345,6 @@ module StartqMod
 !     HTC=high temperature threshold for grain number loss (oC)
 !     SSTX=sensitivity to HTC (seeds oC-1 above HTC)
 !
-  TCZD=5.00
-  TCXD=12.00
   ZTYP(NZ,NY,NX)=ZTYPI(NZ,NY,NX)
   OFFST(NZ,NY,NX)=2.667*(2.5-ZTYP(NZ,NY,NX))
   TCZ(NZ,NY,NX)=TCZD-OFFST(NZ,NY,NX)
@@ -427,14 +430,14 @@ module StartqMod
     PORTX(N,NZ,NY,NX)=PORT(N,NZ,NY,NX)**1.33
     RRADP(N,NZ,NY,NX)=LOG(1.0/SQRT(AMAX1(0.01,PORT(N,NZ,NY,NX))))
     DMVL(N,NZ,NY,NX)=1.0E-06/(0.05*(1.0-PORT(N,NZ,NY,NX)))
-    RTLG1X(N,NZ,NY,NX)=DMVL(N,NZ,NY,NX)/(3.142*RRAD1M(N,NZ,NY,NX)**2)
-    RTLG2X(N,NZ,NY,NX)=DMVL(N,NZ,NY,NX)/(3.142*RRAD2M(N,NZ,NY,NX)**2)
+    RTLG1X(N,NZ,NY,NX)=DMVL(N,NZ,NY,NX)/(PICON*RRAD1M(N,NZ,NY,NX)**2)
+    RTLG2X(N,NZ,NY,NX)=DMVL(N,NZ,NY,NX)/(PICON*RRAD2M(N,NZ,NY,NX)**2)
     RRAD1X(N,NZ,NY,NX)=RRAD1M(N,NZ,NY,NX)
 !    2*SQRT(0.25*(1.0-PORT(N,NZ,NY,NX)))
     RRAD2X(N,NZ,NY,NX)=RRAD2M(N,NZ,NY,NX)
 !    2*SQRT(0.25*(1.0-PORT(N,NZ,NY,NX)))
-    RTAR1X(N,NZ,NY,NX)=3.142*RRAD1X(N,NZ,NY,NX)**2
-    RTAR2X(N,NZ,NY,NX)=3.142*RRAD2X(N,NZ,NY,NX)**2
+    RTAR1X(N,NZ,NY,NX)=PICON*RRAD1X(N,NZ,NY,NX)**2
+    RTAR2X(N,NZ,NY,NX)=PICON*RRAD2X(N,NZ,NY,NX)**2
 500 CONTINUE
   end subroutine InitDimensionsandUptake
 !------------------------------------------------------------------------------------------
@@ -555,13 +558,13 @@ module StartqMod
     WGSHNX(NB,NZ,NY,NX)=0._r8
     WGSHPX(NB,NZ,NY,NX)=0._r8
     HTSHEX(NB,NZ,NY,NX)=0._r8
-    DO 5 L=1,NL(NY,NX)
+    DO 5 L=1,JC
       ARSTK(L,NB,NZ,NY,NX)=0._r8
       DO N=1,JLI
         SURFB(N,L,NB,NZ,NY,NX)=0._r8
       enddo
 5   CONTINUE
-    DO K=0,25
+    DO K=0,JNODS
       ARLF(K,NB,NZ,NY,NX)=0._r8
       HTNODE(K,NB,NZ,NY,NX)=0._r8
       HTNODX(K,NB,NZ,NY,NX)=0._r8
@@ -577,7 +580,7 @@ module StartqMod
       WGNODE(K,NB,NZ,NY,NX)=0._r8
       WGNODN(K,NB,NZ,NY,NX)=0._r8
       WGNODP(K,NB,NZ,NY,NX)=0._r8
-      DO 55 L=1,NL(NY,NX)
+      DO 55 L=1,JC
         ARLFL(L,K,NB,NZ,NY,NX)=0._r8
         WGLFL(L,K,NB,NZ,NY,NX)=0._r8
         WGLFLN(L,K,NB,NZ,NY,NX)=0._r8
@@ -596,7 +599,7 @@ module StartqMod
       ENDIF
     enddo
 25  CONTINUE
-  DO 35 L=1,NL(NY,NX)
+  DO 35 L=1,JC
     ARLFV(L,NZ,NY,NX)=0._r8
     WGLFV(L,NZ,NY,NX)=0._r8
     ARSTV(L,NZ,NY,NX)=0._r8
@@ -654,7 +657,7 @@ module StartqMod
 !
 !     INITIALIZE MASS BALANCE CHECKS
 !
-  IF(DATA(20).EQ.'NO'.AND.IGO.EQ.0)THEN
+  IF(.not.is_restart_run.AND.is_first_year)THEN
     CARBN(NZ,NY,NX)=0._r8
     TCSN0(NZ,NY,NX)=0._r8
     TZSN0(NZ,NY,NX)=0._r8

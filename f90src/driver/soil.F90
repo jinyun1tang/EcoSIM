@@ -1,4 +1,4 @@
-SUBROUTINE soil(NA,ND,NT,NE,NAX,NDX,NTX,NEX,NHW,NHE,NVN,NVS)
+SUBROUTINE soil(NA,ND,NT,NE,NAX,NTX,NEX,NHW,NHE,NVN,NVS)
 !!
 ! Description:
 ! THIS IS THE MAIN SUBROUTINE FROM WHICH ALL OTHERS ARE CALLED
@@ -7,9 +7,6 @@ SUBROUTINE soil(NA,ND,NT,NE,NAX,NDX,NTX,NEX,NHW,NHE,NVN,NVS)
   use DayMod       , only : day
   use ErosionMod   , only : erosion
   use ExecMod      , only : exec
-  use ExtractMod   , only : extract
-  use grosubMod    , only : grosub
-  use HfuncMod     , only : hfunc
   use Hour1Mod     , only : hour1
   use nitroMod     , only : nitro
   use RedistMod    , only : redist
@@ -17,31 +14,32 @@ SUBROUTINE soil(NA,ND,NT,NE,NAX,NDX,NTX,NEX,NHW,NHE,NVN,NVS)
   use StarteMod    , only : starte
   use StartqMod    , only : startq
   use StartsMod    , only : starts
-  use StomateMod   , only : stomate
   use TrnsfrMod    , only : trnsfr
   use TrnsfrsMod   , only : trnsfrs
-  use UptakeMod    , only : uptake
   use VisualMod    , only : visual
   use WatsubMod    , only : watsub
   use WthrMod      , only : wthr
   use readiMod     , only : readi
   use readqmod     , only : readq
   use readsmod     , only : reads
+  use Hist1Mod     , only : fouts,foutp,outpd,outph,outsd,outsh
   use timings      , only : init_timer, start_timer, end_timer,end_timer_loop
   use GridConsts
   use EcoSIMCtrlDataType
   use EcoSIMHistMod
+  use EcoSIMConfig
+  use PlantAPI     , only : PlantModel
   implicit none
 
-  integer, intent(in) :: NT,NE,NAX,NDX,NTX,NEX,NHW,NHE,NVN,NVS
+  integer, intent(in) :: NT,NE,NAX,NTX,NEX,NHW,NHE,NVN,NVS
   integer, intent(in) :: NA(1:NEX),ND(1:NEX)
 
   character(len=*), parameter :: mod_filename = __FILE__
 
   integer :: I,J
-  integer, SAVE :: NF,NX,NTZ,NTZX, NFX
-  DATA NF,NX,NTZ,NTZX/0,0,0,0/
-  real(r8) :: t1, t2
+  integer, SAVE :: NF,NX,NTZ,NTZX,NFX
+  DATA NF,NX,NTZ,NTZX,NFX/0,0,0,0,0/
+  real(r8) :: t1
 
 ! begin_execution
 !
@@ -50,29 +48,30 @@ SUBROUTINE soil(NA,ND,NT,NE,NAX,NDX,NTX,NEX,NHW,NHE,NVN,NVS)
 !
 333   FORMAT(A8)
 
+  is_first_year=IGO.EQ.0
   call init_timer(outdir)
 
-  IF(IGO.EQ.0)THEN
+  IF(is_first_year)THEN
     if(lverb)WRITE(*,333)'READI'
-    CALL READI(NA,ND,NT,NE,NAX,NDX,NTX,NEX,NF,NFX,NTZ,NTZX,NHW,NHE,NVN,NVS)
+    CALL READI(NA,ND,NT,NE,NTX,NEX,NF,NFX,NTZ,NTZX,NHW,NHE,NVN,NVS)
   ENDIF
 
   if(lverb)WRITE(*,333)'READS'
-  CALL READS(NA,ND,NT,NE,NAX,NDX,NTX,NEX,NF,NFX,NTZ,NTZX,NHW,NHE,NVN,NVS)
+  CALL READS(NA,ND,NT,NE,NAX,NTX,NEX,NF,NFX,NTZ,NTZX,NHW,NHE,NVN,NVS)
 
   if(lverb)WRITE(*,333)'FOUTS'
-  CALL FOUTS(NT,NE,NAX,NDX,NTX,NEX,NF,NFX,NHW,NHE,NVN,NVS)
+  CALL FOUTS(NT,NE,NTX,NEX,NF,NFX,NHW,NHE,NVN,NVS)
 !
 ! INITIALIZE ALL SOIL VARIABLES IN 'STARTS'
 !
-  IF((DATA(20).EQ.'YES'.AND.IGO.EQ.0).OR.IDAYR.NE.IOLD)THEN
+  IF((is_restart_run.AND.is_first_year).OR.IDAYR.NE.IOLD)THEN
     if(lverb)WRITE(*,333)'STARTS'
     CALL STARTS(NHW,NHE,NVN,NVS)
 !
 !   RECOVER VALUES OF ALL SOIL STATE VARIABLES FROM EARLIER RUN
 !   IN 'ROUTS' IF NEEDED
 !
-    IF(DATA(20).EQ.'YES')THEN
+    IF(is_restart_run)THEN
       IF((IDAYR.GE.IRUN.AND.IYRR.EQ.IDATA(9)).OR.IYRR.GT.IDATA(9))THEN
         if(lverb)WRITE(*,333)'ROUTS'
         CALL ROUTS(NHW,NHE,NVN,NVS)
@@ -83,27 +82,27 @@ SUBROUTINE soil(NA,ND,NT,NE,NAX,NDX,NTX,NEX,NHW,NHE,NVN,NVS)
 ! RECOVER PLANT SPECIES DISTRIBUTION IN 'ROUTQ'
 !
   if(lverb)WRITE(*,333)'ROUTQ'
-  CALL ROUTQ(NT,NE,NAX,NDX,NTX,NEX,NHW,NHE,NVN,NVS)
+  CALL ROUTQ(NT,NE,NTX,NEX,NHW,NHE,NVN,NVS)
 !
 !   READ INPUT DATA FOR PLANT SPECIES AND MANAGEMENT IN 'READQ'
 !   AND SET UP OUTPUT AND CHECKPOINT FILES IN 'FOUTP'
 !
   if(lverb)WRITE(*,333)'READQ'
-  CALL READQ(NA,ND,NT,NE,NAX,NDX,NTX,NEX,NF,NFX,NTZ,NTZX,NHW,NHE,NVN,NVS)
+  CALL READQ(NA,ND,NT,NE,NTX,NEX,NF,NFX,NTZ,NTZX,NHW,NHE,NVN,NVS)
 
   if(lverb)WRITE(*,333)'FOUTP'
-  CALL FOUTP(NT,NE,NAX,NDX,NTX,NEX,NF,NFX,NHW,NHE,NVN,NVS)
+  CALL FOUTP(NT,NE,NTX,NEX,NF,NFX,NHW,NHE,NVN,NVS)
 !
 ! INITIALIZE ALL PLANT VARIABLES IN 'STARTQ'
 !
-  IF((DATA(20).EQ.'YES'.AND.IGO.EQ.0).OR.IDAYR.NE.IOLD)THEN
+  IF((is_restart_run.AND.is_first_year).OR.IDAYR.NE.IOLD)THEN
     if(lverb)WRITE(*,333)'STARTQ'
     CALL STARTQ(NHW,NHE,NVN,NVS,1,5)
 !
 !   RECOVER VALUES OF ALL PLANT STATE VARIABLES FROM EARLIER RUN
 !   IN 'ROUTP' IF NEEDED
 !
-    IF(DATA(20).EQ.'YES')THEN
+    IF(is_restart_run)THEN
       IF((IDAYR.GT.IRUN.AND.IYRR.EQ.IDATA(9)).OR.IYRR.GT.IDATA(9))THEN
         if(lverb)WRITE(*,333)'ROUTP'
         CALL ROUTP(NHW,NHE,NVN,NVS)
@@ -166,41 +165,12 @@ SUBROUTINE soil(NA,ND,NT,NE,NAX,NDX,NTX,NEX,NHW,NHE,NVN,NVS)
     CALL NITRO(I,J,NHW,NHE,NVN,NVS)
     call end_timer('NIT',t1)
 !
-!   UPDATE PLANT PHENOLOGY IN 'HFUNC'
+!   UPDATE PLANT biogeochemistry
 !
-    if(lverb)WRITE(*,333)'HFUNC'
+    if(lverb)WRITE(*,333)'PlantModel'
 !    if(I>=170)print*,TKS(0,NVN,NHW)
-    call start_timer(t1)
-    CALL HFUNC(I,J,NHW,NHE,NVN,NVS)
-    call end_timer('HFUNC',t1)
+    call PlantModel(I,J,NHW,NHE,NVN,NVS)
 !
-!   CALCULATE CANOPY CO2 UPTAKE AT FULL TURGOR, CANOPY WATER POTENTIAL,
-!   HYDRAULIC AND STOMATAL RESISTANCES,AND CANOPY ENERGY BALANCE IN 'UPTAKE'
-!   CALCULATE ROOT UPTAKE OF WATER, OXYGEN, NH4, NO3 AND PO4 IN 'UPTAKE'
-!
-    if(lverb)WRITE(*,333)'UPTK'
-!    if(I>=170)print*,TKS(0,NVN,NHW)
-    call start_timer(t1)
-    CALL UPTAKE(I,J,NHW,NHE,NVN,NVS)
-    call end_timer('UPTK',t1)
-!
-!   CALCULATE CANOPY CO2 UPTAKE AT AMBIENT TURGOR, AUTOTROPHIC AND GROWTH
-!   RESPIRATION, PLANT C ALLOCATION, CANOPY AND ROOT GROWTH IN 'GROSUB'
-!
-    if(lverb)WRITE(*,333)'GRO'
-!    if(I>=170)print*,TKS(0,NVN,NHW)
-    call start_timer(t1)
-    CALL GROSUB(I,J,NHW,NHE,NVN,NVS)
-    call end_timer('GRO',t1)
-!
-!   CALCULATE ROOT-SOIL C AND NUTRIENT EXCHANGE FOR ALL PLANT SPECIES
-!   IN 'EXTRACT'
-!
-    if(lverb)WRITE(*,333)'EXTR'
-!    if(I>=170)print*,TKS(0,NVN,NHW)
-    call start_timer(t1)
-    CALL EXTRACT(I,J,NHW,NHE,NVN,NVS)
-    call end_timer('EXTR',t1)
 !
 !   CALCULATE SOLUTE EQUILIBRIA IN 'SOLUTE'
 !
@@ -248,15 +218,15 @@ SUBROUTINE soil(NA,ND,NT,NE,NAX,NDX,NTX,NEX,NHW,NHE,NVN,NVS)
 !
     IF((J/JOUT)*JOUT.EQ.J)THEN
       if(lverb)WRITE(*,333)'OUTSH'
-      CALL OUTSH(I,J,NT,NE,NAX,NDX,NTX,NEX,NHW,NHE,NVN,NVS)
+      CALL OUTSH(I,J,NT,NE,NTX,NEX,NHW,NHE,NVN,NVS)
 
       if(lverb)WRITE(*,333)'OUTPH'
-      CALL OUTPH(I,J,NT,NE,NAX,NDX,NTX,NEX,NHW,NHE,NVN,NVS)
+      CALL OUTPH(I,J,NT,NE,NTX,NEX,NHW,NHE,NVN,NVS)
     ENDIF
 !
 !   WRITE OUTPUT FOR DYNAMIC VISUALIZATION
 !
-    IF(DATA(18).EQ.'YES')THEN
+    IF(DATA1(18).EQ.'YES')THEN
       IF((J/JOUT)*JOUT.EQ.J)THEN
         if(lverb)WRITE(*,333)'VIS'
         CALL VISUAL(I,J,NHW,NHE,NVN,NVS)
@@ -265,7 +235,7 @@ SUBROUTINE soil(NA,ND,NT,NE,NAX,NDX,NTX,NEX,NHW,NHE,NVN,NVS)
     call end_timer_loop()
 
 9995  CONTINUE
-  IF(DATA(19).EQ.'YES'.AND.KOUT.GT.0)THEN
+  IF(DATA1(19).EQ.'YES'.AND.KOUT.GT.0)THEN
 !
 !   WRITE ALL SOIL AND PLANT STATE VARIABLES AND OTHER INFORMATION
 !   NEEDED TO RE-INITIALIZE THE MODEL TO CHECKPOINT FILES
@@ -285,9 +255,9 @@ SUBROUTINE soil(NA,ND,NT,NE,NAX,NDX,NTX,NEX,NHW,NHE,NVN,NVS)
 !
   IF((I/IOUT)*IOUT.EQ.I)THEN
     if(lverb)WRITE(*,333)'OUTSD'
-    CALL OUTSD(I,NT,NE,NAX,NDX,NTX,NEX,NHW,NHE,NVN,NVS)
+    CALL OUTSD(I,NT,NE,NTX,NEX,NHW,NHE,NVN,NVS)
     if(lverb)WRITE(*,333)'OUTPD'
-    CALL OUTPD(I,NT,NE,NAX,NDX,NTX,NEX,NHW,NHE,NVN,NVS)
+    CALL OUTPD(I,NT,NE,NTX,NEX,NHW,NHE,NVN,NVS)
   ENDIF
 !
 ! PERFORM MASS AND ENERGY BALANCE CHECKS IN 'EXEC'
@@ -311,9 +281,9 @@ SUBROUTINE soil(NA,ND,NT,NE,NAX,NDX,NTX,NEX,NHW,NHE,NVN,NVS)
 ! WRITE OUTPUT FILES FOR EACH GRID CELL IN 'SPLIT'
 !
 !ifdef _WIN_
-  CALL SPLIT(NT,NE,NAX,NDX,NTX,NEX,NHW,NHE,NVN,NVS)
+  CALL SPLIT(NT,NE,NTX,NEX,NHW,NHE,NVN,NVS)
 !else
-! CALL SPLITC(NT,NE,NAX,NDX,NTX,NEX,NHW,NHE,NVN,NVS)
+! CALL SPLITC(NT,NE,NTX,NEX,NHW,NHE,NVN,NVS)
 !endif
 ! WRITE(*,333)'SPLIT'
   RETURN

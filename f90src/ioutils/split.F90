@@ -1,5 +1,5 @@
 
-      SUBROUTINE split(NT,NE,NAX,NDX,NTX,NEX,NHW,NHE,NVN,NVS)
+      SUBROUTINE split(NT,NE,NTX,NEX,NHW,NHE,NVN,NVS)
 !
 !     THIS SUBROUTINE SPLITS OUTPUT FOR C, N, P, WATER AND HEAT
 !     FROM OUTPUT FILES FOR THE ENTIRE LANDSCAPE WRITTEN DURING
@@ -14,7 +14,7 @@
   use GridDataType
 
       implicit none
-      integer, intent(in) :: NT,NE,NAX,NDX,NTX,NEX,NHW,NHE,NVN,NVS
+      integer, intent(in) :: NT,NE,NTX,NEX,NHW,NHE,NVN,NVS
 
 
       CHARACTER(len=8) :: CDOY,DATE,HOUR

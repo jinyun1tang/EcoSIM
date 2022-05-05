@@ -21,6 +21,7 @@ module EcosimConst
   real(r8), parameter :: VAP=2465.0_r8         !latent heat of vaporization of water, kJ/kg
   real(r8), parameter :: VAPS=2834.0_r8        !sublimation of water, kJ/kg
   real(r8), parameter :: TCNDG=8.1E-03_r8      !assumed thermal conductivity below lower soil boundary,[MJ m-1 h-1 K-1]
+  real(r8), parameter :: RGAS=8.3143_r8        !universal gas constant, J/mole.oK
   real(r8) :: FCI=0.05_r8                      !field capacity of ice
   real(r8) :: WPI=0.025_r8                     !wilting point of ice
   real(r8) :: POROQ=0.66_r8                    !soil porosity ^ 2/3
@@ -32,6 +33,6 @@ module EcosimConst
   real(r8) :: THETX=1.0E-03_r8                 !minimum air-filled porosity for gas transfer	[m3 m-3]
   real(r8), parameter :: THETPI=0.00_r8        !air content of ice	-
   real(r8), parameter :: DENSI=0.92_r8-THETPI  !ice density
-
+  real(r8), parameter :: ZW=0.01_r8         !snowpack surface roughness (m)
   integer :: ICOR(12)=(/1,-1,0,0,1,1,2,3,3,4,4,5/)
 end module EcosimConst

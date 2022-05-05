@@ -48,6 +48,7 @@ module PlantDisturbMod
   public :: RemoveBiomassByDisturbance
   public :: RemoveBiomByManagement
   public :: InitPlantDisturbance
+  public :: PrepLandscapeGrazing
   contains
 
   subroutine InitPlantDisturbance
@@ -58,15 +59,14 @@ module PlantDisturbMod
 
 !------------------------------------------------------------------------------------------
 
-  subroutine RemoveBiomByManagement(I,J,NZ,NY,NX,WTSHTA,CPOOLK)
+  subroutine RemoveBiomByManagement(I,J,NZ,NY,NX,CPOOLK)
   implicit none
   integer, intent(in) :: I,J,NZ,NY,NX
-  REAL(R8), intent(in) :: WTSHTA(JZ,JY,JX)
   real(r8), intent(inout) :: CPOOLK(10,JP,JY,JX)
 !     TRANSFER ABOVE-GROUND C,N,P AT HARVEST OR DISTURBANCE
 !
 
-  call RemoveBiomByHarvest(I,J,NZ,NY,NX,WTSHTA,CPOOLK)
+  call RemoveBiomByHarvest(I,J,NZ,NY,NX,CPOOLK)
 !
 !     REDUCE OR REMOVE PLANT POPULATIONS DURING TILLAGE
 !
@@ -85,51 +85,21 @@ module PlantDisturbMod
 
 !     begin_execution
 
-  WTHTH0=0._r8
-  WTHNH0=0._r8
-  WTHPH0=0._r8
-  WTHTH1=0._r8
-  WTHNH1=0._r8
-  WTHPH1=0._r8
-  WTHTH2=0._r8
-  WTHNH2=0._r8
-  WTHPH2=0._r8
-  WTHTH3=0._r8
-  WTHNH3=0._r8
-  WTHPH3=0._r8
-  WTHTH4=0._r8
-  WTHNH4=0._r8
-  WTHPH4=0._r8
-  WTHTR1=0._r8
-  WTHNR1=0._r8
-  WTHPR1=0._r8
-  WTHTR2=0._r8
-  WTHNR2=0._r8
-  WTHPR2=0._r8
-  WTHTR3=0._r8
-  WTHNR3=0._r8
-  WTHPR3=0._r8
-  WTHTR4=0._r8
-  WTHNR4=0._r8
-  WTHPR4=0._r8
-  WTHTX0=0._r8
-  WTHNX0=0._r8
-  WTHPX0=0._r8
-  WTHTX1=0._r8
-  WTHNX1=0._r8
-  WTHPX1=0._r8
-  WTHTX2=0._r8
-  WTHNX2=0._r8
-  WTHPX2=0._r8
-  WTHTX3=0._r8
-  WTHNX3=0._r8
-  WTHPX3=0._r8
-  WTHTX4=0._r8
-  WTHNX4=0._r8
-  WTHPX4=0._r8
-  WTHTG=0._r8
-  WTHNG=0._r8
-  WTHPG=0._r8
+  WTHTH0=0._r8;WTHNH0=0._r8;WTHPH0=0._r8
+  WTHTH1=0._r8;WTHNH1=0._r8;WTHPH1=0._r8
+  WTHTH2=0._r8;WTHNH2=0._r8;WTHPH2=0._r8
+  WTHTH3=0._r8;WTHNH3=0._r8;WTHPH3=0._r8
+  WTHTH4=0._r8;WTHNH4=0._r8;WTHPH4=0._r8
+  WTHTR1=0._r8;WTHNR1=0._r8;WTHPR1=0._r8
+  WTHTR2=0._r8;WTHNR2=0._r8;WTHPR2=0._r8
+  WTHTR3=0._r8;WTHNR3=0._r8;WTHPR3=0._r8
+  WTHTR4=0._r8;WTHNR4=0._r8;WTHPR4=0._r8
+  WTHTX0=0._r8;WTHNX0=0._r8;WTHPX0=0._r8
+  WTHTX1=0._r8;WTHNX1=0._r8;WTHPX1=0._r8
+  WTHTX2=0._r8;WTHNX2=0._r8;WTHPX2=0._r8
+  WTHTX3=0._r8;WTHNX3=0._r8;WTHPX3=0._r8
+  WTHTX4=0._r8;WTHNX4=0._r8;WTHPX4=0._r8
+  WTHTG=0._r8;WTHNG=0._r8;WTHPG=0._r8
 !     ENDIF
 
 !     IHVST=harvest type:0=none,1=grain,2=all above-ground
@@ -204,10 +174,16 @@ module PlantDisturbMod
   real(r8) :: WTHNL2,WTHPL2
   real(r8) :: WTHNL3,WTHPL3
   real(r8) :: WTHNL4,WTHPL4
-  real(r8) :: WTHNRT,WTHPRT,WTHTXT,WTHNXT
   real(r8) :: WTHTR0,WTHNR0,WTHPR0
-  real(r8) :: WTHTRT
-  real(r8) :: WTHPXT
+  real(r8) :: WTHNRT,WTHPRT,WTHTRT
+  real(r8) :: WTHTXT,WTHNXT,WTHPXT
+
+  WTHNL0=0._r8;WTHPL0=0._r8
+  WTHNL1=0._r8;WTHPL1=0._r8
+  WTHNL2=0._r8;WTHPL2=0._r8
+  WTHNL3=0._r8;WTHPL3=0._r8
+  WTHNL4=0._r8;WTHPL4=0._r8
+  WTHTR0=0._r8;WTHNR0=0._r8;WTHPR0=0._r8
 
   call ApplyDisturbanceBiomRemoval(I,J,NZ,NY,NX,WTHTR0,WTHNR0,WTHPR0,&
     WTHNL0,WTHPL0,WTHNL1,WTHPL1,WTHNL2,WTHPL2,WTHNL3,WTHPL3,WTHNL4,WTHPL4)
@@ -842,7 +818,7 @@ module PlantDisturbMod
             WTSTXN(NB,NZ,NY,NX)=WTSTXN(NB,NZ,NY,NX)*XHVST
             WTSTXP(NB,NZ,NY,NX)=WTSTXP(NB,NZ,NY,NX)*XHVST
             WVSTK(NZ,NY,NX)=WVSTK(NZ,NY,NX)+WVSTKB(NB,NZ,NY,NX)
-            DO 8970 K=0,25
+            DO 8970 K=0,JNODS
               IF(K.NE.0)THEN
                 CPOOL3(K,NB,NZ,NY,NX)=CPOOL3(K,NB,NZ,NY,NX)*XHVST
                 CPOOL4(K,NB,NZ,NY,NX)=CPOOL4(K,NB,NZ,NY,NX)*XHVST
@@ -1084,17 +1060,16 @@ module PlantDisturbMod
   end subroutine RemoveBiomByTillage
 !------------------------------------------------------------------------------------------
 
-  subroutine RemoveBiomByHarvest(I,J,NZ,NY,NX,WTSHTA,CPOOLK)
+  subroutine RemoveBiomByHarvest(I,J,NZ,NY,NX,CPOOLK)
 
   implicit none
   integer, intent(in) :: I,J,NZ,NY,NX
-  REAL(R8), intent(in) :: WTSHTA(JZ,JY,JX)
   real(r8), intent(inout) :: CPOOLK(10,JP,JY,JX)
   integer :: L,K,M,NR,N,NB,NBX
   real(r8):: ZPOOLG,ZPOLNG,ZPOOLX
   real(r8) :: ZPOLNX,XHVSN,XHVSP,XHVST
   REAL(R8) :: WGLFBL(JZ,10,JP,JY,JX)
-  real(r8) :: FHVSHK(0:25),FHVSTK(0:25)
+  real(r8) :: FHVSHK(0:JNODS),FHVSTK(0:JNODS)
   real(r8) :: ARLFY,ARLFR,ARLFG
   real(r8) :: APSILT
   real(r8) :: CPOOLX
@@ -1345,14 +1320,14 @@ module PlantDisturbMod
 !
       DO 9860 NB=1,NBR(NZ,NY,NX)
         DO  L=1,JC
-          DO  K=0,25
+          DO  K=0,JNODS
             WGLFBL(L,NB,NZ,NY,NX)=0._r8
           enddo
         enddo
 9860  CONTINUE
       DO 9870 NB=1,NBR(NZ,NY,NX)
         DO  L=1,JC
-          DO  K=0,25
+          DO  K=0,JNODS
             WGLFBL(L,NB,NZ,NY,NX)=WGLFBL(L,NB,NZ,NY,NX)+WGLFL(L,K,NB,NZ,NY,NX)
           enddo
         enddo
@@ -1495,7 +1470,7 @@ module PlantDisturbMod
         WGSHGX=0._r8
         WGLFGY=0._r8
         WGSHGY=0._r8
-        DO 9825 K=0,25
+        DO 9825 K=0,JNODS
           ARLFG=0._r8
           WGLFG=0._r8
           WGLFNG=0._r8
@@ -1801,7 +1776,7 @@ module PlantDisturbMod
 !
         IF(ICTYP(NZ,NY,NX).EQ.4.AND.CPOOLX.GT.ZEROP(NZ,NY,NX))THEN
           FHVST4=CPOOLG/CPOOLX
-          DO 9810 K=1,25
+          DO 9810 K=1,JNODS
             WTHTH0=WTHTH0+(1.0-FHVST4)*CPOOL3(K,NB,NZ,NY,NX)
             WTHTH0=WTHTH0+(1.0-FHVST4)*CPOOL4(K,NB,NZ,NY,NX)
             WTHTH0=WTHTH0+(1.0-FHVST4)*CO2B(K,NB,NZ,NY,NX)
@@ -2105,7 +2080,7 @@ module PlantDisturbMod
 !     VOLWOU,UVOLO=accumulated water loss for water balance calculation
 !
         CPOOLK(NB,NZ,NY,NX)=0._r8
-        DO 1325 K=1,25
+        DO 1325 K=1,JNODS
           CPOOLK(NB,NZ,NY,NX)=CPOOLK(NB,NZ,NY,NX) &
             +CPOOL3(K,NB,NZ,NY,NX)+CPOOL4(K,NB,NZ,NY,NX) &
             +CO2B(K,NB,NZ,NY,NX)+HCOB(K,NB,NZ,NY,NX)
@@ -2466,4 +2441,44 @@ module PlantDisturbMod
   end subroutine RemoveBiomByHarvest
 !------------------------------------------------------------------------------------------
 
+  subroutine PrepLandscapeGrazing(I,J,NHW,NHE,NVN,NVS)
+  implicit none
+  integer, intent(in) :: I, J
+  integer, intent(in) :: NHW,NHE,NVN,NVS
+  integer :: NX,NY,NZ,nn,nx1,NY1
+  real(r8) :: WTSHTZ
+!     begin_execution
+
+  DO 2995 NX=NHW,NHE
+    DO 2990 NY=NVN,NVS
+      DO 2985 NZ=1,NP(NY,NX)
+!
+!     IHVST=harvest type:0=none,1=grain,2=all above-ground
+!                       ,3=pruning,4=grazing,5=fire,6=herbivory
+!     LSG=landscape grazing section number
+!     WTSHTZ,WTSHTA=total,average biomass in landscape grazing section
+!
+        IF(IHVST(NZ,I,NY,NX).EQ.4.OR.IHVST(NZ,I,NY,NX).EQ.6)THEN
+          WTSHTZ=0
+          NN=0
+          DO 1995 NX1=NHW,NHE
+            DO 1990 NY1=NVN,NVS
+              IF(LSG(NZ,NY1,NX1).EQ.LSG(NZ,NY,NX))THEN
+                IF(IFLGC(NZ,NY1,NX1).EQ.1)THEN
+                  WTSHTZ=WTSHTZ+WTSHT(NZ,NY1,NX1)
+                  NN=NN+1
+                ENDIF
+              ENDIF
+1990        CONTINUE
+1995      CONTINUE
+          IF(NN.GT.0)THEN
+            WTSHTA(NZ,NY,NX)=WTSHTZ/NN
+          ELSE
+            WTSHTA(NZ,NY,NX)=WTSHT(NZ,NY,NX)
+          ENDIF
+        ENDIF
+2985  CONTINUE
+2990  CONTINUE
+2995  CONTINUE
+  end subroutine PrepLandscapeGrazing
 end module PlantDisturbMod

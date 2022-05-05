@@ -25,6 +25,7 @@
   use IrrigationDataType
   use SedimentDataType
   use GridDataType
+  use EcoSIMConfig
   implicit none
 
   private
@@ -224,7 +225,7 @@
 !     TIME STEP OF WEARHER DATA
 !     ITYPE 1=daily,2=hourly
 !
-      IF(IGO.EQ.0.OR.I.LE.ILAST)THEN
+      IF(is_first_year.OR.I.LE.ILAST)THEN
         ITYPE=IWTHR(1)
       ELSE
         ITYPE=IWTHR(2)
@@ -342,7 +343,7 @@
 !
 !     AUTOMATIC IRRIGATION IF SELECTED
 !
-!     DATA(6)=irrigation file name
+!     DATA1(6)=irrigation file name
 !     IIRRA=start,finish dates(1,2),hours(3,4) of automated irrigation
 !     DIRRX=depth to which water depletion and rewatering is calculated(1)
 !     DIRRA=depth to,at which irrigation is applied(1,2)
@@ -357,7 +358,7 @@
 !     RR=total irrigation requirement
 !     RRIG=hourly irrigation amount applied in wthr.f
 !
-      IF(DATA(6)(1:4).EQ.'auto')THEN
+      IF(DATA1(6)(1:4).EQ.'auto')THEN
         IF(I.GE.IIRRA(1,NY,NX).AND.I.LE.IIRRA(2,NY,NX))THEN
           TFZ=0._r8
           TWP=0._r8

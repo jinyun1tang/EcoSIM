@@ -8,6 +8,7 @@ module TrnsfrsMod
   use GridConsts
   use FlagDataType
   use SoilPhysDataType
+  use EcoSIMSolverPar
   use EcoSIMCtrlDataType
   use ClimForcDataType
   use FertilizerDataType

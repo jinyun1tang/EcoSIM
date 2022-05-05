@@ -19,6 +19,7 @@ module StarteMod
   use IrrigationDataType
   use AqueChemDatatype
   use GridDataType
+  use EcoSIMConfig
   implicit none
 
   private
@@ -180,7 +181,7 @@ module StarteMod
 !
 !     INITIALIZE SOIL WATER
 !
-            ELSEIF(K.EQ.3.AND.I.EQ.1.AND.DATA(20).EQ.'NO'.AND.IGO.EQ.0)THEN
+            ELSEIF(K.EQ.3.AND.I.EQ.1.AND.(.not.is_restart_run).AND.is_first_year)THEN
               IF(BKVL(L,NY,NX).GT.ZEROS(NY,NX))THEN
                 BKVLX=BKVL(L,NY,NX)
               ELSE
@@ -306,7 +307,7 @@ module StarteMod
   FCO3=DPCO3*A0/(CHY1**2*A2)
   FHCO=DPCO2*A0/(CHY1*A1)
   Z=ACO2X*(2.0E-03*FCO3+0.5E-03*FHCO)
-  DO 3020 MM=1,25
+  DO 3020 MM=1,JNODS
     R=(LOG(CCO21)+Z*CCO21-CCO2Y)/CCO2Z
     IF(R.LT.1.0E-03)exit
     CCO21=CCO21/SQRT(1.0+R)
@@ -1358,7 +1359,7 @@ module StarteMod
   FCO3=DPCO3*A0/(AHY1**2*A2)
   FHCO=DPCO2*A0/(AHY1*A1)
   Z=ACO2X*(2.0E-03*FCO3+0.5E-03*FHCO)
-  DO 2120 MM=1,25
+  DO 2120 MM=1,JNODS
     R=(LOG(CCO21)+Z*CCO21-CCO2Y)/CCO2Z
     IF(R.LT.1.0E-03)exit
     CCO21=CCO21/SQRT(1.0+R)
@@ -1693,7 +1694,7 @@ module StarteMod
 !
 !     SOLUTE CONCENTRATIONS IN SOIL
 !
-      ELSEIF(K.EQ.3.AND.I.EQ.1.AND.DATA(20).EQ.'NO'.AND.IGO.EQ.0)THEN
+      ELSEIF(K.EQ.3.AND.I.EQ.1.AND.(.not.is_restart_run).AND.is_first_year)THEN
       CCOU=CCO21
       CCHU=CCH41
       COXU=0._r8
@@ -1980,7 +1981,7 @@ module StarteMod
 !
 !     INITIAL STATE VARIABLES FOR MINERALS IN SURFACE RESIDUE
 !
-      IF(DATA(20).EQ.'NO'.AND.IGO.EQ.0)THEN
+      IF(.not.is_restart_run.AND.is_first_year)THEN
       ZNH4S(0,NY,NX)=0._r8
       ZNH3S(0,NY,NX)=0._r8
       ZNO3S(0,NY,NX)=0._r8
