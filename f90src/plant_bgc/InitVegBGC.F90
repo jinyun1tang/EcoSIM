@@ -68,6 +68,4 @@ module InitVegBGC
 230 CONTINUE
   end subroutine InitIrradianceGeometry
 
-
-
 end module InitVegBGC

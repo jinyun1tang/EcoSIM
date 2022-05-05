@@ -3,7 +3,8 @@ module Hour1Mod
   use minimathmod  , only : test_aeqb
   use abortutils   , only : endrun, print_info
   use EcoSimConst
-  use CanopyCondMod, only : CanopyConditionModel
+!  use CanopyCondMod, only : CanopyConditionModel
+  use PlantAPI, only : PlantCanopyRadsModel
   use MicrobialDataType
   use SOMDataType
   use ChemTranspDataType
@@ -171,8 +172,9 @@ module Hour1Mod
 
       call SetTracerPropertyInLiterAir(NY,NX)
 !
-      call CanopyConditionModel(I,J,NY,NX,DPTH0)
+!      call CanopyConditionModel(I,J,NY,NX,DPTH0)
 
+      call PlantCanopyRadsModel(I,J,NY,NX,DPTH0(NY,NX))
 !
 !     RESET HOURLY INDICATORS
 !

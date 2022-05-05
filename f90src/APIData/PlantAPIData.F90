@@ -1,21 +1,28 @@
 module PlantAPIData
   use data_kind_mod, only : r8 => SHR_KIND_R8
 implicit none
-  integer  :: JP1,JSA1,jcplx11
+  integer  :: JP1,JSA1,jcplx11,JLA1
   integer  :: JC1,JZ1,JLI1,JNODS1
 !begin_data
+  real(r8) :: TYSINs1
+  real(r8) :: ALBSs1
   real(r8) :: ALATs1
   real(r8) :: ATCAs1
+  real(r8) :: ALBXs1
   real(r8) :: ARLSSs1
   real(r8) :: ARLFCs1
   real(r8) :: ALTs1
+  real(r8) :: VOLWSs1
   real(r8) :: CCO2EIs1
   real(r8) :: CO2EIs1
   real(r8) :: COXYEs1
   real(r8) :: RABs1
+  real(r8) :: VOLSSs1
   real(r8) :: TSHCs1
   real(r8) :: CNETXs1
   real(r8) :: ZNOONs1
+  real(r8) :: GAZIs1
+  real(r8) :: GCOSs1
   real(r8) :: CO2Es1
   real(r8) :: CCO2Es1
   real(r8) :: CCH4Es1
@@ -23,17 +30,28 @@ implicit none
   real(r8) :: CH2GEs1
   real(r8) :: CNH3Es1
   real(r8) :: DYLXs1
+  real(r8) :: RAP0s1
+  real(r8) :: RADYs1
+  real(r8) :: RADSs1
+  real(r8) :: RAPYs1
+  real(r8) :: RAPSs1
   real(r8) :: DYLNs1
   real(r8) :: DPTHSs1
   real(r8) :: DYLMs1
+  real(r8) :: ZSs1
   real(r8) :: OXYEs1
   real(r8) :: PPTs1
   real(r8) :: RIBs1
   real(r8) :: RECOs1
+  real(r8) :: POROS1s1
+  real(r8) :: UAs1
   real(r8) :: TGHs1
   real(r8) :: TBALCs1
   real(r8) :: TBALNs1
   real(r8) :: TBALPs1
+  real(r8) :: Z0s1
+  real(r8) :: VHCPWXs1
+  real(r8) :: VHCPW1s1
   real(r8) :: TCCANs1
   real(r8) :: TCH4Zs1
   real(r8) :: TENGYCs1
@@ -44,6 +62,11 @@ implicit none
   real(r8) :: TH2GZs1
   real(r8) :: THFLXCs1
   real(r8) :: TRNs1
+  real(r8) :: RAD0s1
+  real(r8) :: FRADGs1
+  real(r8) :: TRAPCs1
+  real(r8) :: RADGs1
+  real(r8) :: GSINs1
   real(r8) :: TN2OZs1
   real(r8) :: TLEs1
   real(r8) :: TOXYZs1
@@ -54,6 +77,7 @@ implicit none
   real(r8) :: ZZSNCs1
   real(r8) :: ZPSNCs1
   real(r8) :: ZCSNCs1
+  real(r8) :: VOLISs1
   real(r8) :: WTSTGTs1
   real(r8) :: ARSTCs1
   real(r8) :: TKWs1
@@ -141,12 +165,15 @@ implicit none
   real(r8), allocatable :: SNL1s1(:)
   real(r8), allocatable :: CPEARs1(:)
   real(r8), allocatable :: DMSHEs1(:)
+  real(r8), allocatable :: ABSRs1(:)
+  real(r8), allocatable :: ABSPs1(:)
   real(r8), allocatable :: CPHSKs1(:)
   real(r8), allocatable :: DMSTKs1(:)
   real(r8), allocatable :: DMHSKs1(:)
   real(r8), allocatable :: DMRSVs1(:)
   real(r8), allocatable :: DMGRs1(:)
   real(r8), allocatable :: DMEARs1(:)
+  real(r8), allocatable :: OMEGAGs1(:)
   real(r8), allocatable :: CNHSKs1(:)
   real(r8), allocatable :: CNRSVs1(:)
   real(r8), allocatable :: CNEARs1(:)
@@ -154,6 +181,7 @@ implicit none
   real(r8), allocatable :: ANGSHs1(:)
   real(r8), allocatable :: SLA1s1(:)
   real(r8), allocatable :: FCO2s1(:)
+  real(r8), allocatable :: ZCOSs1(:)
   real(r8), allocatable :: XKO2s1(:)
   real(r8), allocatable :: CPO4Ss1(:)
   real(r8), allocatable :: CNDUs1(:)
@@ -164,6 +192,8 @@ implicit none
   real(r8), allocatable :: HGSGLs1(:)
   real(r8), allocatable :: OGSGLs1(:)
   real(r8), allocatable :: ETMXs1(:)
+  real(r8), allocatable :: TAURs1(:)
+  real(r8), allocatable :: TAUPs1(:)
   real(r8), allocatable :: CHLs1(:)
   real(r8), allocatable :: PEPCs1(:)
   real(r8), allocatable :: CHL4s1(:)
@@ -226,6 +256,8 @@ implicit none
   real(r8), allocatable :: WTRTs1(:)
   real(r8), allocatable :: FMPRs1(:)
   real(r8), allocatable :: FWODBs1(:)
+  real(r8), allocatable :: ALBRs1(:)
+  real(r8), allocatable :: ALBPs1(:)
   real(r8), allocatable :: FWODLNs1(:)
   real(r8), allocatable :: FWODLPs1(:)
   real(r8), allocatable :: FWODSPs1(:)
@@ -623,6 +655,9 @@ implicit none
   real(r8), allocatable :: CO2Bs1(:,:,:)
   real(r8), allocatable :: COMPLs1(:,:,:)
   real(r8), allocatable :: CBXNs1(:,:,:)
+  real(r8), allocatable :: OMEGAs1(:,:,:)
+  integer,  allocatable :: IALBYs1(:,:,:)
+  real(r8), allocatable :: OMEGXs1(:,:,:)
   real(r8), allocatable :: CBXN4s1(:,:,:)
   real(r8), allocatable :: ETGROs1(:,:,:)
   real(r8), allocatable :: ETGR4s1(:,:,:)
@@ -857,14 +892,15 @@ implicit none
 
 
   contains
-  subroutine InitPlantAPIData(JZ,JC,JP,JSA,jcplx1,JLI,JNODS)
+  subroutine InitPlantAPIData(JZ,JC,JP,JSA,jcplx1,JLI,JLA,JNODS)
 
   implicit none
-  integer, intent(in) :: JZ,JC,JP,JSA,JCplx1,JLI,JNODS
+  integer, intent(in) :: JZ,JC,JP,JSA,JCplx1,JLI,JNODS,JLA
 
   JZ1=JZ
   JC1=JC
   JP1=JP
+  JLA1=JLA
   JSA1=JSA
   jcplx11=jcplx1
   JLI1=JLI
@@ -876,6 +912,7 @@ implicit none
   implicit none
   allocate(IDTHs1(JP1))
   allocate(FCO2s1(JP1))
+  allocate(ZCOSs1(JLI1))
   allocate(XKO2s1(JP1))
   allocate(WTRTs1(JP1))
   allocate(IDTHPs1(JP1))
@@ -923,10 +960,15 @@ implicit none
   allocate(CNRSVs1(JP1))
   allocate(CPHSKs1(JP1))
   allocate(DMSHEs1(JP1))
+  allocate(ABSRs1(JP1))
+  allocate(ABSPs1(JP1))
   allocate(DMHSKs1(JP1))
   allocate(DMSTKs1(JP1))
   allocate(DMRSVs1(JP1))
   allocate(DMEARs1(JP1))
+  allocate(ALBRs1(JP1))
+  allocate(ALBPs1(JP1))
+  allocate(OMEGAGs1(JSA1))
   allocate(DMGRs1(JP1))
   allocate(CNHSKs1(JP1))
   allocate(CNEARs1(JP1))
@@ -1185,6 +1227,8 @@ implicit none
   allocate(RSMNs1(JP1))
   allocate(ETMXs1(JP1))
   allocate(CHLs1(JP1))
+  allocate(TAUPs1(JP1))
+  allocate(TAURs1(JP1))
   allocate(PEPCs1(JP1))
   allocate(CHL4s1(JP1))
   allocate(RADCs1(JP1))
@@ -1439,6 +1483,9 @@ implicit none
   allocate(WVSTKBs1(JC1,JP1))
   allocate(ZPOOLs1(JC1,JP1))
   allocate(ZPOLNBs1(JC1,JP1))
+  allocate(OMEGAs1(JSA1,JLI1,JLA1))
+  allocate(IALBYs1(JSA1,JLI1,JLA1))
+  allocate(OMEGXs1(JSA1,JLI1,JLA1))
   allocate(SURFs1(JLI1,JC1,JNODS1,JC1,JP1))
   allocate(SURFXs1(JLI1,JC1,JNODS1,JC1,JP1))
   allocate(CPOOL3s1(JNODS1,JC1,JP1))
@@ -1640,6 +1687,7 @@ implicit none
   subroutine DestructPlantAPIData
   implicit none
   if(allocated(WTRTs1))deallocate(WTRTs1)
+  if(allocated(ZCOSs1))deallocate(ZCOSs1)
   if(allocated(FCO2s1))deallocate(FCO2s1)
   if(allocated(XKO2s1))deallocate(XKO2s1)
   if(allocated(IDTHs1))deallocate(IDTHs1)
@@ -1681,11 +1729,16 @@ implicit none
   if(allocated(CPEARs1))deallocate(CPEARs1)
   if(allocated(CPHSKs1))deallocate(CPHSKs1)
   if(allocated(DMSHEs1))deallocate(DMSHEs1)
+  if(allocated(ABSRs1))deallocate(ABSRs1)
+  if(allocated(ABSPs1))deallocate(ABSPs1)
   if(allocated(DMSTKs1))deallocate(DMSTKs1)
   if(allocated(DMGRs1))deallocate(DMGRs1)
   if(allocated(DMRSVs1))deallocate(DMRSVs1)
   if(allocated(CNHSKs1))deallocate(CNHSKs1)
   if(allocated(DMEARs1))deallocate(DMEARs1)
+  if(allocated(ALBPs1))deallocate(ALBPs1)
+  if(allocated(ALBRs1))deallocate(ALBRs1)
+  if(allocated(OMEGAGs1))deallocate(OMEGAGs1)
   if(allocated(DMHSKs1))deallocate(DMHSKs1)
   if(allocated(CNEARs1))deallocate(CNEARs1)
   if(allocated(CNRSVs1))deallocate(CNRSVs1)
@@ -1704,6 +1757,8 @@ implicit none
   if(allocated(VCMXs1))deallocate(VCMXs1)
   if(allocated(PEPCs1))deallocate(PEPCs1)
   if(allocated(CHLs1))deallocate(CHLs1)
+  if(allocated(TAURs1))deallocate(TAURs1)
+  if(allocated(TAUPs1))deallocate(TAUPs1)
   if(allocated(CHL4s1))deallocate(CHL4s1)
   if(allocated(RADCs1))deallocate(RADCs1)
   if(allocated(VCMX4s1))deallocate(VCMX4s1)
@@ -2152,6 +2207,9 @@ implicit none
   if(allocated(SURFXs1))deallocate(SURFXs1)
   if(allocated(CPOOL3s1))deallocate(CPOOL3s1)
   if(allocated(CPOOL4s1))deallocate(CPOOL4s1)
+  if(allocated(OMEGAs1))deallocate(OMEGAs1)
+  if(allocated(IALBYs1))deallocate(IALBYs1)
+  if(allocated(OMEGXs1))deallocate(OMEGXs1)
   if(allocated(CO2Bs1))deallocate(CO2Bs1)
   if(allocated(COMPLs1))deallocate(COMPLs1)
   if(allocated(CBXNs1))deallocate(CBXNs1)

@@ -9,7 +9,8 @@ module PlantAPI
   use PlantDisturbMod, only : PrepLandscapeGrazing
   use timings      , only : start_timer, end_timer
   use EcoSIMHistMod
-  use SnowDataType , only : TKW,DPTHS
+  use SnowDataType
+  use SoilPhysDataType, only : ALBX
   use SurfLitterDataType
   use LandSurfDataType
   use SoilPropertyDataType
@@ -36,7 +37,10 @@ implicit none
 
   private
   public :: PlantModel
+  public :: PlantCanopyRadsModel
+
   contains
+
 
   subroutine PlantModel(I,J,NHW,NHE,NVN,NVS)
 
@@ -111,7 +115,21 @@ implicit none
   call end_timer('EXTR',t1)
 
   end subroutine PlantModel
+!------------------------------------------------------------------------------------------
 
+  subroutine PlantCanopyRadsModel(I,J,NY,NX,DPTH0s1)
+  use CanopyCondsMod
+  implicit none
+  integer, intent(in) :: I,J,NY,NX
+  real(r8), intent(in) :: DPTH0s1
+
+  call PlantAPICanMSend(NY,NX)
+
+  call CanopyConditionModel(I,J,DPTH0s1)
+
+  call PlantAPICanMRecv(NY,NX)
+
+  end subroutine PlantCanopyRadsModel
 !------------------------------------------------------------------------------------------
 
   subroutine PlantAPIRecv(I,J,NY,NX)
@@ -1803,5 +1821,166 @@ implicit none
     ENDDO
   ENDDO
   end subroutine PlantAPISend
+
+
+!------------------------------------------------------------------------------------------
+
+  subroutine PlantAPICanMSend(NY,NX)
+  implicit none
+  integer, intent(in) :: NY,NX
+
+  integer :: L,N,M,NN,NZ,K,NB
+!  Integers
+  IETYPs1=IETYP(NY,NX)
+  NPs1=NP(NY,NX)
+  NUs1=NU(NY,NX)
+  ARSTCs1=ARSTC(NY,NX)
+  ARLFCs1=ARLFC(NY,NX)
+  ZEROSs1=ZEROS(NY,NX)
+  ZEROs1=ZERO
+  DPTHSs1=DPTHS(NY,NX)
+  TKAs1=TKA(NY,NX)
+  ZTs1=ZT(NY,NX)
+  Z0s1=Z0(NY,NX)
+  ZDs1=ZD(NY,NX)
+  UAs1=UA(NY,NX)
+  VHCPWXs1=VHCPWX(NY,NX)
+  VHCPW1s1=VHCPW(1,NY,NX)
+  DO L=1,JC
+    ARSTTs1(L)=ARSTT(L,NY,NX)
+    ARLFTs1(L)=ARLFT(L,NY,NX)
+    ZLs1(L)=ZL(L,NY,NX)
+    TAUSs1(L)=TAUS(L,NY,NX)
+  ENDDO
+  TAUSs1(JC+1)=TAUS(JC+1,NY,NX)
+
+  DO L=0,NL(NY,NX)
+    AREA3s1(L)=AREA(3,L,NY,NX)
+    VOLXs1(L)=VOLX(L,NY,NX)
+    VOLYs1(L)=VOLY(L,NY,NX)
+    VOLWs1(L)=VOLW(L,NY,NX)
+  ENDDO
+  SSINs1=SSIN(NY,NX)
+  ZNOONs1=ZNOON(NY,NX)
+  GAZIs1=GAZI(NY,NX)
+  GCOSs1=GCOS(NY,NX)
+  GSINs1=GSIN(NY,NX)
+  ARLSSs1=ARLSS(NY,NX)
+  RADYs1=RADY(NY,NX)
+  RAPYs1=RAPY(NY,NX)
+  RADSs1=RADS(NY,NX)
+  RAPSs1=RAPS(NY,NX)
+  ZSs1=ZS(NY,NX)
+  TYSINs1=TYSIN
+  VOLWSs1=VOLWS(NY,NX)
+  VOLISs1=VOLIS(NY,NX)
+  VOLSSs1=VOLSS(NY,NX)
+  ALBSs1=ALBS(NY,NX)
+  ZEROS2s1=ZEROS2(NY,NX)
+  ALBXs1=ALBX(NY,NX)
+  POROS1s1=POROS(NU(NY,NX),NY,NX)
+  DO NZ=1,NP(NY,NX)
+    ARLFPs1(NZ)=ARLFP(NZ,NY,NX)
+    ZCs1(NZ)=ZC(NZ,NY,NX)
+    CFXs1(NZ)=CFX(NZ,NY,NX)
+    ABSRs1(NZ)=ABSR(NZ,NY,NX)
+    ABSPs1(NZ)=ABSP(NZ,NY,NX)
+    TAURs1(NZ)=TAUR(NZ,NY,NX)
+    ALBRs1(NZ)=ALBR(NZ,NY,NX)
+    TAUPs1(NZ)=TAUP(NZ,NY,NX)
+    ALBPs1(NZ)=ALBP(NZ,NY,NX)
+    NBRs1(NZ)=NBR(NZ,NY,NX)
+    CFs1(NZ)=CF(NZ,NY,NX)
+    DO NB=1,NBR(NZ,NY,NX)
+      DO K=0,JNODS
+        DO  L=1,JC
+          ARLFLs1(L,K,NB,NZ)=ARLFL(L,K,NB,NZ,NY,NX)
+        ENDDO
+      ENDDO
+      DO  L=1,JC
+        ARSTKs1(L,NB,NZ)=ARSTK(L,NB,NZ,NY,NX)
+      ENDDO
+      DO K=1,JNODS
+        DO  L=1,JC
+          DO N=1,JLI
+            SURFs1(N,L,K,NB,NZ)=SURF(N,L,K,NB,NZ,NY,NX)
+          ENDDO
+        ENDDO
+      ENDDO
+      DO  L=1,JC
+        DO N=1,JLI
+          SURFBs1(N,L,NB,NZ)=SURFB(N,L,NB,NZ,NY,NX)
+        ENDDO
+      ENDDO
+    ENDDO
+  ENDDO
+  DO N=1,JSA
+    OMEGAGs1(N)=OMEGAG(N,NY,NX)
+  ENDDO
+  DO N=1,JLI
+    ZCOSs1(N)=ZCOS(N)
+    ZSINs1(N)=ZSIN(N)
+  ENDDO
+  DO NN=1,JLA
+    DO M=1,JLI
+      DO N=1,JSA
+        OMEGAs1(N,M,NN)=OMEGA(N,M,NN)
+        OMEGXs1(N,M,NN)=OMEGX(N,M,NN)
+        IALBYs1(N,M,NN)=IALBY(N,M,NN)
+      ENDDO
+    ENDDO
+  ENDDO
+
+  end subroutine PlantAPICanMSend
+
+!------------------------------------------------------------------------------------------
+
+  subroutine PlantAPICanMRecv(NY,NX)
+
+  implicit none
+  integer, intent(in) :: NY,NX
+
+  integer :: N,M,NN,L,NZ,K,NB
+
+  ZD(NY,NX)=ZDs1
+  ZR(NY,NX)=ZRs1
+  RAB(NY,NX)=RABs1
+  RIB(NY,NX)=RIBs1
+  ZT(NY,NX)=ZTs1
+  RADS(NY,NX)=RADSs1
+  RADY(NY,NX)=RADYs1
+  RAPS(NY,NX)=RAPSs1
+  RAPY(NY,NX)=RAPYs1
+  RADG(NY,NX)=RADGs1
+  FRADG(NY,NX)=FRADGs1
+  RAD(NY,NX)=RAD0s1
+  RAP(NY,NX)=RAP0s1
+
+  DO L=0,JC
+    ZL(L,NY,NX)=ZLs1(L)
+  ENDDO
+  DO L=1,JC
+    TAUS(L,NY,NX)=TAUSs1(L)
+    TAU0(L,NY,NX)=TAU0s1(L)
+  ENDDO
+  ARLSS(NY,NX)=ARLSSs1
+  DO NZ=1,NP(NY,NX)
+    ARLFS(NZ,NY,NX)=ARLFSs1(NZ)
+    RADC(NZ,NY,NX)=RADCs1(NZ)
+    RADP(NZ,NY,NX)=RADPs1(NZ)
+    CFX(NZ,NY,NX)=CFXs1(NZ)
+    FRADP(NZ,NY,NX)=FRADPs1(NZ)
+
+    DO L=1,JC
+      DO M=1,JSA
+        DO  N=1,JLI
+          PARDIF(N,M,L,NZ,NY,NX)=PARDIFs1(N,M,L,NZ)
+          PAR(N,M,L,NZ,NY,NX)=PARs1(N,M,L,NZ)
+        ENDDO
+      ENDDO
+    ENDDO
+  ENDDO
+
+  end subroutine PlantAPICanMRecv
 
 end module PlantAPI

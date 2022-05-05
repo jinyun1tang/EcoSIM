@@ -16,7 +16,6 @@ implicit none
   integer :: IERSNG                !erosion option
   integer :: ICLM                  !changes to weather data (0=none,1=step,2=transient)
   integer :: IMNG                  !flag for land management
-  integer :: IFLGW                 !flag for raising Z0G with vegn
   integer :: ISOIL(4,JZ,JY,JX)     !flag for calculating FC(1),WP(2),SCNV(3),SCNH(4)
   integer :: ISOILR(JY,JX)         !natural(0),reconstructed(1) soil profile
   integer :: IWTHR(2)              !weather data type:1=daily,2=hourly for first(L=1) or second(L=2) scene

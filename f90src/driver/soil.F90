@@ -37,8 +37,8 @@ SUBROUTINE soil(NA,ND,NT,NE,NAX,NTX,NEX,NHW,NHE,NVN,NVS)
   character(len=*), parameter :: mod_filename = __FILE__
 
   integer :: I,J
-  integer, SAVE :: NF,NX,NTZ,NTZX, NFX
-  DATA NF,NX,NTZ,NTZX/0,0,0,0/
+  integer, SAVE :: NF,NX,NTZ,NTZX,NFX
+  DATA NF,NX,NTZ,NTZX,NFX/0,0,0,0,0/
   real(r8) :: t1
 
 ! begin_execution
