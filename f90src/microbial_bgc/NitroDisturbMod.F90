@@ -95,7 +95,7 @@ module NitroDisturbMod
         ONL(1:4,0:jcplx1)=0._r8
         OPL(1:4,0:jcplx1)=0._r8
 
-        DO 2970 K=0,5
+        DO 2970 K=0,4
           IF(L.NE.0.OR.(K.NE.3.AND.K.NE.4))THEN
 !
 !     REMOVE MICROBIAL BIOMASS
@@ -114,9 +114,6 @@ module NitroDisturbMod
                   ELSEIF(K.LE.4)THEN
                     ONL(1,K)=ONL(1,K)+ONH-ONX
                     OPL(1,K)=OPL(1,K)+OPH-OPX
-                  ELSEIF(K.EQ.5)THEN
-                    ONL(4,1)=ONL(4,1)+ONH-ONX
-                    OPL(4,1)=OPL(4,1)+OPH-OPX
                   ENDIF
                   OMC(M,NGL,N,K,L,NY,NX)=OMC(M,NGL,N,K,L,NY,NX)-OCH
                   OMN(M,NGL,N,K,L,NY,NX)=OMN(M,NGL,N,K,L,NY,NX)-ONH
@@ -132,6 +129,36 @@ module NitroDisturbMod
 2960        CONTINUE
           ENDIF
 2970    CONTINUE
+
+
+!          IF(L.NE.0.OR.(K.NE.3.AND.K.NE.4))THEN
+!
+!     REMOVE MICROBIAL BIOMASS
+!
+            DO  N=1,7
+              DO NGL=1,JG
+                DO M=1,3
+                  OCH=DCORPC*OMCff(M,NGL,N,L,NY,NX)
+                  ONH=DCORPC*OMNff(M,NGL,N,L,NY,NX)
+                  OPH=DCORPC*OMPff(M,NGL,N,L,NY,NX)
+                  ONX=EFIRE(1,ITILL(I,NY,NX))*ONH
+                  OPX=EFIRE(2,ITILL(I,NY,NX))*OPH
+                  ONL(4,1)=ONL(4,1)+ONH-ONX
+                  OPL(4,1)=OPL(4,1)+OPH-OPX
+                  OMCff(M,NGL,N,L,NY,NX)=OMCff(M,NGL,N,L,NY,NX)-OCH
+                  OMNff(M,NGL,N,L,NY,NX)=OMNff(M,NGL,N,L,NY,NX)-ONH
+                  OMPff(M,NGL,N,L,NY,NX)=OMPff(M,NGL,N,L,NY,NX)-OPH
+                  DC=DC+OMCff(M,NGL,N,L,NY,NX)
+                  DN=DN+OMNff(M,NGL,N,L,NY,NX)
+                  DP=DP+OMPff(M,NGL,N,L,NY,NX)
+                  OC=OC+OCH
+                  ON=ON+ONX
+                  OP=OP+OPX
+                enddo
+              enddo
+            ENDDO
+!          ENDIF
+
 !
 !     REMOVE MICROBIAL RESIDUE
 !

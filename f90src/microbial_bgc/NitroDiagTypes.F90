@@ -68,6 +68,22 @@ type, public :: NitroAQMFluxDiagType
   real(r8),allocatable :: FOMA(:,:,:)
   real(r8),allocatable :: FOMN(:,:,:)
   real(r8),allocatable :: FOMK(:,:,:)
+
+  real(r8),allocatable :: CNOMAff(:,:)
+  real(r8),allocatable :: CPOMAff(:,:)
+  real(r8),allocatable :: OMAff(:,:)
+  real(r8),allocatable :: FOMAff(:,:)
+  real(r8),allocatable :: FOMNff(:,:)
+  real(r8),allocatable :: FOMKff(:,:)
+  real(r8),allocatable :: OMC2ff(:,:)
+  real(r8),allocatable :: TFNGff(:,:)
+  real(r8),allocatable :: TFNRff(:,:)
+  real(r8),allocatable :: OMN2ff(:,:)
+  real(r8),allocatable :: FOM2ff(:,:)
+  real(r8),allocatable :: WFNff(:,:)
+  real(r8),allocatable :: FCNff(:,:)
+  real(r8),allocatable :: FCPff(:,:)
+  real(r8),allocatable :: FCNPff(:,:)
   contains
    procedure, public :: Init => nit_mics_init
    procedure, public :: Destroy => nit_mics_destroy
@@ -158,6 +174,80 @@ type, public :: NitroAQMFluxDiagType
   real(r8),allocatable :: RIP14(:,:,:)
   real(r8),allocatable :: RIP1B(:,:,:)
   real(r8),allocatable :: RIP14R(:,:,:)
+
+  real(r8),allocatable :: RUPOXff(:,:)
+  real(r8),allocatable :: RGN2Fff(:,:)
+  real(r8),allocatable :: RGOMOff(:,:)
+  real(r8),allocatable :: ROXYMff(:,:)
+  real(r8),allocatable :: ROXYPff(:,:)
+  real(r8),allocatable :: ROXYOff(:,:)
+  real(r8),allocatable :: RDNO3ff(:,:)
+  real(r8),allocatable :: RDNOBff(:,:)
+  real(r8),allocatable :: RDNO2ff(:,:)
+  real(r8),allocatable :: RDN2Bff(:,:)
+  real(r8),allocatable :: RDN2Off(:,:)
+  real(r8),allocatable :: RGOMDff(:,:)
+  real(r8),allocatable :: RMOMCff(:,:,:)
+  real(r8),allocatable :: RINH4ff(:,:)
+  real(r8),allocatable :: RINO3ff(:,:)
+  real(r8),allocatable :: RIPO4ff(:,:)
+  real(r8),allocatable :: RINB4ff(:,:)
+  real(r8),allocatable :: RINB3ff(:,:)
+  real(r8),allocatable :: RIPOBff(:,:)
+  real(r8),allocatable :: RDOMCff(:,:,:)
+  real(r8),allocatable :: RDOMNff(:,:,:)
+  real(r8),allocatable :: RDOMPff(:,:,:)
+  real(r8),allocatable :: RHOMCff(:,:,:)
+  real(r8),allocatable :: RHOMNff(:,:,:)
+  real(r8),allocatable :: RHOMPff(:,:,:)
+  real(r8),allocatable :: RCOMCff(:,:,:)
+  real(r8),allocatable :: RCOMNff(:,:,:)
+  real(r8),allocatable :: RCOMPff(:,:,:)
+  real(r8),allocatable :: CGOMCff(:,:)
+  real(r8),allocatable :: CGOMNff(:,:)
+  real(r8),allocatable :: RH2GXff(:,:)
+  real(r8),allocatable :: CGOMPff(:,:)
+  real(r8),allocatable :: RDMMCff(:,:,:)
+  real(r8),allocatable :: RHMMCff(:,:,:)
+  real(r8),allocatable :: RCMMCff(:,:,:)
+  real(r8),allocatable :: RDMMNff(:,:,:)
+  real(r8),allocatable :: RHMMNff(:,:,:)
+  real(r8),allocatable :: RCMMNff(:,:,:)
+  real(r8),allocatable :: RDMMPff(:,:,:)
+  real(r8),allocatable :: RHMMPff(:,:,:)
+  real(r8),allocatable :: RCMMPff(:,:,:)
+  real(r8),allocatable :: RN2FXff(:,:)
+  real(r8),allocatable :: RXOMCff(:,:,:)
+  real(r8),allocatable :: RXOMNff(:,:,:)
+  real(r8),allocatable :: RXOMPff(:,:,:)
+  real(r8),allocatable :: R3OMCff(:,:,:)
+  real(r8),allocatable :: R3OMNff(:,:,:)
+  real(r8),allocatable :: R3OMPff(:,:,:)
+  real(r8),allocatable :: RXMMCff(:,:,:)
+  real(r8),allocatable :: RXMMNff(:,:,:)
+  real(r8),allocatable :: RXMMPff(:,:,:)
+  real(r8),allocatable :: R3MMCff(:,:,:)
+  real(r8),allocatable :: R3MMNff(:,:,:)
+  real(r8),allocatable :: R3MMPff(:,:,:)
+  real(r8),allocatable :: CGOQCff(:,:)
+  real(r8),allocatable :: CGOACff(:,:)
+  real(r8),allocatable :: RINH4Rff(:,:)
+  real(r8),allocatable :: RINO3Rff(:,:)
+  real(r8),allocatable :: RIPO4Rff(:,:)
+  real(r8),allocatable :: FNH4XRff(:,:)
+  real(r8),allocatable :: FNO3XRff(:,:)
+  real(r8),allocatable :: FPO4XRff(:,:)
+  real(r8),allocatable :: RGOMYff(:,:)
+  real(r8),allocatable :: CGOMSff(:,:,:)
+  real(r8),allocatable :: CGONSff(:,:,:)
+  real(r8),allocatable :: CGOPSff(:,:,:)
+  real(r8),allocatable :: FP14XRff(:,:)
+  real(r8),allocatable :: RCO2Xff(:,:)
+  real(r8),allocatable :: RCH3Xff(:,:)
+  real(r8),allocatable :: RCH4Xff(:,:)
+  real(r8),allocatable :: RIP14ff(:,:)
+  real(r8),allocatable :: RIP1Bff(:,:)
+  real(r8),allocatable :: RIP14Rff(:,:)
   contains
     procedure, public :: Init => nit_micf_init
     procedure, public :: ZeroOut => nit_micf_zero
@@ -305,89 +395,163 @@ type, public :: NitroAQMFluxDiagType
   integer, intent(in) :: JG,jcplx
   integer :: jcplx1
   jcplx1=jcplx-1
-  allocate(this%RUPOX(JG,7,0:jcplx))
-  allocate(this%RGN2F(JG,7,0:jcplx))
-  allocate(this%RGOMO(JG,7,0:jcplx))
-  allocate(this%ROXYM(JG,7,0:jcplx))
-  allocate(this%ROXYP(JG,7,0:jcplx))
-  allocate(this%ROXYO(JG,7,0:jcplx))
-  allocate(this%RDNO3(JG,7,0:jcplx))
-  allocate(this%RDNOB(JG,7,0:jcplx))
-  allocate(this%RDNO2(JG,7,0:jcplx))
-  allocate(this%RDN2B(JG,7,0:jcplx))
-  allocate(this%RDN2O(JG,7,0:jcplx))
-  allocate(this%RGOMD(JG,7,0:jcplx))
-  allocate(this%RMOMC(2,JG,7,0:jcplx))
-  allocate(this%RINH4(JG,7,0:jcplx))
-  allocate(this%RINO3(JG,7,0:jcplx))
-  allocate(this%RIPO4(JG,7,0:jcplx))
-  allocate(this%RINB4(JG,7,0:jcplx))
-  allocate(this%RINB3(JG,7,0:jcplx))
-  allocate(this%RIPOB(JG,7,0:jcplx))
-  allocate(this%RDOMC(2,JG,7,0:jcplx))
-  allocate(this%RDOMN(2,JG,7,0:jcplx))
-  allocate(this%RDOMP(2,JG,7,0:jcplx))
-  allocate(this%RHOMC(2,JG,7,0:jcplx))
-  allocate(this%RHOMN(2,JG,7,0:jcplx))
-  allocate(this%RHOMP(2,JG,7,0:jcplx))
-  allocate(this%RCOMC(2,JG,7,0:jcplx))
-  allocate(this%RCOMN(2,JG,7,0:jcplx))
-  allocate(this%RCOMP(2,JG,7,0:jcplx))
-  allocate(this%CGOMC(JG,7,0:jcplx))
-  allocate(this%CGOMN(JG,7,0:jcplx))
-  allocate(this%RH2GX(JG,7,0:jcplx))
-  allocate(this%CGOMP(JG,7,0:jcplx))
-  allocate(this%RDMMC(2,JG,7,0:jcplx))
-  allocate(this%RHMMC(2,JG,7,0:jcplx))
-  allocate(this%RCMMC(2,JG,7,0:jcplx))
-  allocate(this%RDMMN(2,JG,7,0:jcplx))
-  allocate(this%RHMMN(2,JG,7,0:jcplx))
-  allocate(this%RCMMN(2,JG,7,0:jcplx))
-  allocate(this%RDMMP(2,JG,7,0:jcplx))
-  allocate(this%RHMMP(2,JG,7,0:jcplx))
-  allocate(this%RCMMP(2,JG,7,0:jcplx))
-  allocate(this%RCCMC(2,JG,7,0:jcplx1))
-  allocate(this%RCCMN(2,JG,7,0:jcplx1))
-  allocate(this%RCCMP(2,JG,7,0:jcplx1))
-  allocate(this%RN2FX(JG,7,0:jcplx))
+  allocate(this%RUPOX(JG,7,0:jcplx1))
+  allocate(this%RGN2F(JG,7,0:jcplx1))
+  allocate(this%RGOMO(JG,7,0:jcplx1))
+  allocate(this%ROXYM(JG,7,0:jcplx1))
+  allocate(this%ROXYP(JG,7,0:jcplx1))
+  allocate(this%ROXYO(JG,7,0:jcplx1))
+  allocate(this%RDNO3(JG,7,0:jcplx1))
+  allocate(this%RDNOB(JG,7,0:jcplx1))
+  allocate(this%RDNO2(JG,7,0:jcplx1))
+  allocate(this%RDN2B(JG,7,0:jcplx1))
+  allocate(this%RDN2O(JG,7,0:jcplx1))
+  allocate(this%RGOMD(JG,7,0:jcplx1))
+  allocate(this%RMOMC(2,JG,7,0:jcplx1))
+  allocate(this%RINH4(JG,7,0:jcplx1))
+  allocate(this%RINO3(JG,7,0:jcplx1))
+  allocate(this%RIPO4(JG,7,0:jcplx1))
+  allocate(this%RINB4(JG,7,0:jcplx1))
+  allocate(this%RINB3(JG,7,0:jcplx1))
+  allocate(this%RIPOB(JG,7,0:jcplx1))
+  allocate(this%RDOMC(2,JG,7,0:jcplx1))
+  allocate(this%RDOMN(2,JG,7,0:jcplx1))
+  allocate(this%RDOMP(2,JG,7,0:jcplx1))
+  allocate(this%RHOMC(2,JG,7,0:jcplx1))
+  allocate(this%RHOMN(2,JG,7,0:jcplx1))
+  allocate(this%RHOMP(2,JG,7,0:jcplx1))
+  allocate(this%RCOMC(2,JG,7,0:jcplx1))
+  allocate(this%RCOMN(2,JG,7,0:jcplx1))
+  allocate(this%RCOMP(2,JG,7,0:jcplx1))
+  allocate(this%CGOMC(JG,7,0:jcplx1))
+  allocate(this%CGOMN(JG,7,0:jcplx1))
+  allocate(this%RH2GX(JG,7,0:jcplx1))
+  allocate(this%CGOMP(JG,7,0:jcplx1))
+  allocate(this%RDMMC(2,JG,7,0:jcplx1))
+  allocate(this%RHMMC(2,JG,7,0:jcplx1))
+  allocate(this%RCMMC(2,JG,7,0:jcplx1))
+  allocate(this%RDMMN(2,JG,7,0:jcplx1))
+  allocate(this%RHMMN(2,JG,7,0:jcplx1))
+  allocate(this%RCMMN(2,JG,7,0:jcplx1))
+  allocate(this%RDMMP(2,JG,7,0:jcplx1))
+  allocate(this%RHMMP(2,JG,7,0:jcplx1))
+  allocate(this%RCMMP(2,JG,7,0:jcplx1))
+  allocate(this%RN2FX(JG,7,0:jcplx1))
+  allocate(this%RXOMC(2,JG,7,0:jcplx1))
+  allocate(this%RXOMN(2,JG,7,0:jcplx1))
+  allocate(this%RXOMP(2,JG,7,0:jcplx1))
+  allocate(this%R3OMC(2,JG,7,0:jcplx1))
+  allocate(this%R3OMN(2,JG,7,0:jcplx1))
+  allocate(this%R3OMP(2,JG,7,0:jcplx1))
+  allocate(this%RXMMC(2,JG,7,0:jcplx1))
+  allocate(this%RXMMN(2,JG,7,0:jcplx1))
+  allocate(this%RXMMP(2,JG,7,0:jcplx1))
+  allocate(this%R3MMC(2,JG,7,0:jcplx1))
+  allocate(this%R3MMN(2,JG,7,0:jcplx1))
+  allocate(this%R3MMP(2,JG,7,0:jcplx1))
+  allocate(this%CGOQC(JG,7,0:jcplx1))
+  allocate(this%CGOAC(JG,7,0:jcplx1))
+  allocate(this%RINH4R(JG,7,0:jcplx1))
+  allocate(this%RINO3R(JG,7,0:jcplx1))
+  allocate(this%RIPO4R(JG,7,0:jcplx1))
+  allocate(this%FNH4XR(JG,7,0:jcplx1))
+  allocate(this%FNO3XR(JG,7,0:jcplx1))
+  allocate(this%FPO4XR(JG,7,0:jcplx1))
+  allocate(this%RGOMY(JG,7,0:jcplx1))
+  allocate(this%CGOMS(2,JG,7,0:jcplx1))
+  allocate(this%CGONS(2,JG,7,0:jcplx1))
+  allocate(this%CGOPS(2,JG,7,0:jcplx1))
+  allocate(this%FP14XR(JG,7,0:jcplx1))
+  allocate(this%RCO2X(JG,7,0:jcplx1))
+  allocate(this%RCH3X(JG,7,0:jcplx1))
+  allocate(this%RCH4X(JG,7,0:jcplx1))
+  allocate(this%RIP14(JG,7,0:jcplx1))
+  allocate(this%RIP1B(JG,7,0:jcplx1))
+  allocate(this%RIP14R(JG,7,0:jcplx1))
 
-  allocate(this%RXOMC(2,JG,7,0:jcplx))
-  allocate(this%RXOMN(2,JG,7,0:jcplx))
-  allocate(this%RXOMP(2,JG,7,0:jcplx))
-  allocate(this%R3OMC(2,JG,7,0:jcplx))
-  allocate(this%R3OMN(2,JG,7,0:jcplx))
-  allocate(this%R3OMP(2,JG,7,0:jcplx))
-  allocate(this%RXMMC(2,JG,7,0:jcplx))
-  allocate(this%RXMMN(2,JG,7,0:jcplx))
-  allocate(this%RXMMP(2,JG,7,0:jcplx))
-  allocate(this%R3MMC(2,JG,7,0:jcplx))
-  allocate(this%R3MMN(2,JG,7,0:jcplx))
-  allocate(this%R3MMP(2,JG,7,0:jcplx))
-  allocate(this%CGOQC(JG,7,0:jcplx))
-  allocate(this%CGOAC(JG,7,0:jcplx))
-  allocate(this%RINH4R(JG,7,0:jcplx))
-  allocate(this%RINO3R(JG,7,0:jcplx))
-  allocate(this%RIPO4R(JG,7,0:jcplx))
-  allocate(this%FNH4XR(JG,7,0:jcplx))
-  allocate(this%FNO3XR(JG,7,0:jcplx))
-  allocate(this%FPO4XR(JG,7,0:jcplx))
-  allocate(this%RGOMY(JG,7,0:jcplx))
-  allocate(this%ROQCD(JG,7,0:jcplx1))
-  allocate(this%CGOMS(2,JG,7,0:jcplx))
-  allocate(this%CGONS(2,JG,7,0:jcplx))
-  allocate(this%CGOPS(2,JG,7,0:jcplx))
-  allocate(this%FP14XR(JG,7,0:jcplx))
-  allocate(this%RCO2X(JG,7,0:jcplx))
-  allocate(this%RCH3X(JG,7,0:jcplx))
-  allocate(this%RCH4X(JG,7,0:jcplx))
   allocate(this%RVOXA(JG,7))
   allocate(this%RVOXB(JG,7))
   allocate(this%XOMCZ(3,JG,7,0:jcplx1))
   allocate(this%XOMNZ(3,JG,7,0:jcplx1))
   allocate(this%XOMPZ(3,JG,7,0:jcplx1))
-  allocate(this%RIP14(JG,7,0:jcplx))
-  allocate(this%RIP1B(JG,7,0:jcplx))
-  allocate(this%RIP14R(JG,7,0:jcplx))
+  allocate(this%ROQCD(JG,7,0:jcplx1))
+  allocate(this%RCCMC(2,JG,7,0:jcplx1))
+  allocate(this%RCCMN(2,JG,7,0:jcplx1))
+  allocate(this%RCCMP(2,JG,7,0:jcplx1))
+
+  allocate(this%RUPOXff(JG,7))
+  allocate(this%RGN2Fff(JG,7))
+  allocate(this%RGOMOff(JG,7))
+  allocate(this%ROXYMff(JG,7))
+  allocate(this%ROXYPff(JG,7))
+  allocate(this%ROXYOff(JG,7))
+  allocate(this%RDNO3ff(JG,7))
+  allocate(this%RDNOBff(JG,7))
+  allocate(this%RDNO2ff(JG,7))
+  allocate(this%RDN2Bff(JG,7))
+  allocate(this%RDN2Off(JG,7))
+  allocate(this%RGOMDff(JG,7))
+  allocate(this%RMOMCff(2,JG,7))
+  allocate(this%RINH4ff(JG,7))
+  allocate(this%RINO3ff(JG,7))
+  allocate(this%RIPO4ff(JG,7))
+  allocate(this%RINB4ff(JG,7))
+  allocate(this%RINB3ff(JG,7))
+  allocate(this%RIPOBff(JG,7))
+  allocate(this%RDOMCff(2,JG,7))
+  allocate(this%RDOMNff(2,JG,7))
+  allocate(this%RDOMPff(2,JG,7))
+  allocate(this%RHOMCff(2,JG,7))
+  allocate(this%RHOMNff(2,JG,7))
+  allocate(this%RHOMPff(2,JG,7))
+  allocate(this%RCOMCff(2,JG,7))
+  allocate(this%RCOMNff(2,JG,7))
+  allocate(this%RCOMPff(2,JG,7))
+  allocate(this%CGOMCff(JG,7))
+  allocate(this%CGOMNff(JG,7))
+  allocate(this%RH2GXff(JG,7))
+  allocate(this%CGOMPff(JG,7))
+  allocate(this%RDMMCff(2,JG,7))
+  allocate(this%RHMMCff(2,JG,7))
+  allocate(this%RCMMCff(2,JG,7))
+  allocate(this%RDMMNff(2,JG,7))
+  allocate(this%RHMMNff(2,JG,7))
+  allocate(this%RCMMNff(2,JG,7))
+  allocate(this%RDMMPff(2,JG,7))
+  allocate(this%RHMMPff(2,JG,7))
+  allocate(this%RCMMPff(2,JG,7))
+  allocate(this%RN2FXff(JG,7))
+  allocate(this%RXOMCff(2,JG,7))
+  allocate(this%RXOMNff(2,JG,7))
+  allocate(this%RXOMPff(2,JG,7))
+  allocate(this%R3OMCff(2,JG,7))
+  allocate(this%R3OMNff(2,JG,7))
+  allocate(this%R3OMPff(2,JG,7))
+  allocate(this%RXMMCff(2,JG,7))
+  allocate(this%RXMMNff(2,JG,7))
+  allocate(this%RXMMPff(2,JG,7))
+  allocate(this%R3MMCff(2,JG,7))
+  allocate(this%R3MMNff(2,JG,7))
+  allocate(this%R3MMPff(2,JG,7))
+  allocate(this%CGOQCff(JG,7))
+  allocate(this%CGOACff(JG,7))
+  allocate(this%RINH4Rff(JG,7))
+  allocate(this%RINO3Rff(JG,7))
+  allocate(this%RIPO4Rff(JG,7))
+  allocate(this%FNH4XRff(JG,7))
+  allocate(this%FNO3XRff(JG,7))
+  allocate(this%FPO4XRff(JG,7))
+  allocate(this%RGOMYff(JG,7))
+  allocate(this%CGOMSff(2,JG,7))
+  allocate(this%CGONSff(2,JG,7))
+  allocate(this%CGOPSff(2,JG,7))
+  allocate(this%FP14XRff(JG,7))
+  allocate(this%RCO2Xff(JG,7))
+  allocate(this%RCH3Xff(JG,7))
+  allocate(this%RCH4Xff(JG,7))
+  allocate(this%RIP14ff(JG,7))
+  allocate(this%RIP1Bff(JG,7))
+  allocate(this%RIP14Rff(JG,7))
 
   call this%ZeroOut()
   end subroutine nit_micf_init
@@ -398,22 +562,39 @@ type, public :: NitroAQMFluxDiagType
   implicit none
   class(NitroMicStateType) :: this
   integer, intent(in) :: JG, jcplx
+  integer :: jcplx1
+  jcplx1=jcplx-1
+  allocate(this%CNOMA(JG,7,0:jcplx1))
+  allocate(this%CPOMA(JG,7,0:jcplx1))
+  allocate(this%OMA(JG,7,0:jcplx1))
+  allocate(this%FOMA(JG,7,0:jcplx1))
+  allocate(this%FOMN(JG,7,0:jcplx1))
+  allocate(this%FOMK(JG,7,0:jcplx1))
+  allocate(this%OMC2(JG,7,0:jcplx1))
+  allocate(this%TFNG(JG,7,0:jcplx1))
+  allocate(this%TFNR(JG,7,0:jcplx1))
+  allocate(this%OMN2(JG,7,0:jcplx1))
+  allocate(this%FOM2(JG,7,0:jcplx1))
+  allocate(this%WFN(JG,7,0:jcplx1))
+  allocate(this%FCN(JG,7,0:jcplx1))
+  allocate(this%FCP(JG,7,0:jcplx1))
+  allocate(this%FCNP(JG,7,0:jcplx1))
 
-  allocate(this%CNOMA(JG,7,0:jcplx))
-  allocate(this%CPOMA(JG,7,0:jcplx))
-  allocate(this%OMA(JG,7,0:jcplx))
-  allocate(this%FOMA(JG,7,0:jcplx))
-  allocate(this%FOMN(JG,7,0:jcplx))
-  allocate(this%FOMK(JG,7,0:jcplx))
-  allocate(this%OMC2(JG,7,0:jcplx))
-  allocate(this%TFNG(JG,7,0:jcplx))
-  allocate(this%TFNR(JG,7,0:jcplx))
-  allocate(this%OMN2(JG,7,0:jcplx))
-  allocate(this%FOM2(JG,7,0:jcplx))
-  allocate(this%WFN(JG,7,0:jcplx))
-  allocate(this%FCN(JG,7,0:jcplx))
-  allocate(this%FCP(JG,7,0:jcplx))
-  allocate(this%FCNP(JG,7,0:jcplx))
+  allocate(this%CNOMAff(JG,7))
+  allocate(this%CPOMAff(JG,7))
+  allocate(this%OMAff(JG,7))
+  allocate(this%FOMAff(JG,7))
+  allocate(this%FOMNff(JG,7))
+  allocate(this%FOMKff(JG,7))
+  allocate(this%OMC2ff(JG,7))
+  allocate(this%TFNGff(JG,7))
+  allocate(this%TFNRff(JG,7))
+  allocate(this%OMN2ff(JG,7))
+  allocate(this%FOM2ff(JG,7))
+  allocate(this%WFNff(JG,7))
+  allocate(this%FCNff(JG,7))
+  allocate(this%FCPff(JG,7))
+  allocate(this%FCNPff(JG,7))
   end subroutine nit_mics_init
 !------------------------------------------------------------------------------------------
 
@@ -504,6 +685,81 @@ type, public :: NitroAQMFluxDiagType
   this%RIP14 = 0._r8
   this%RIP1B = 0._r8
   this%RIP14R = 0._r8
+
+  this%RUPOXff = 0._r8
+  this%RGN2Fff = 0._r8
+  this%RGOMOff = 0._r8
+  this%ROXYMff = 0._r8
+  this%ROXYPff = 0._r8
+  this%ROXYOff = 0._r8
+  this%RDNO3ff = 0._r8
+  this%RDNOBff = 0._r8
+  this%RDNO2ff = 0._r8
+  this%RDN2Bff = 0._r8
+  this%RDN2Off = 0._r8
+  this%RGOMDff = 0._r8
+  this%RMOMCff = 0._r8
+  this%RINH4ff = 0._r8
+  this%RINO3ff = 0._r8
+  this%RIPO4ff = 0._r8
+  this%RINB4ff = 0._r8
+  this%RINB3ff = 0._r8
+  this%RIPOBff = 0._r8
+  this%RDOMCff = 0._r8
+  this%RDOMNff = 0._r8
+  this%RDOMPff = 0._r8
+  this%RHOMCff = 0._r8
+  this%RHOMNff = 0._r8
+  this%RHOMPff = 0._r8
+  this%RCOMCff = 0._r8
+  this%RCOMNff = 0._r8
+  this%RCOMPff = 0._r8
+  this%CGOMCff = 0._r8
+  this%CGOMNff = 0._r8
+  this%RH2GXff = 0._r8
+  this%CGOMPff = 0._r8
+  this%RDMMCff = 0._r8
+  this%RHMMCff = 0._r8
+  this%RCMMCff = 0._r8
+  this%RDMMNff = 0._r8
+  this%RHMMNff = 0._r8
+  this%RCMMNff = 0._r8
+  this%RDMMPff = 0._r8
+  this%RHMMPff = 0._r8
+  this%RCMMPff = 0._r8
+  this%RN2FXff = 0._r8
+
+  this%RXOMCff = 0._r8
+  this%RXOMNff = 0._r8
+  this%RXOMPff = 0._r8
+  this%R3OMCff = 0._r8
+  this%R3OMNff = 0._r8
+  this%R3OMPff = 0._r8
+  this%RXMMCff = 0._r8
+  this%RXMMNff = 0._r8
+  this%RXMMPff = 0._r8
+  this%R3MMCff = 0._r8
+  this%R3MMNff = 0._r8
+  this%R3MMPff = 0._r8
+  this%CGOQCff = 0._r8
+  this%CGOACff = 0._r8
+  this%RINH4Rff = 0._r8
+  this%RINO3Rff = 0._r8
+  this%RIPO4Rff = 0._r8
+  this%FNH4XRff = 0._r8
+  this%FNO3XRff = 0._r8
+  this%FPO4XRff = 0._r8
+  this%RGOMYff = 0._r8
+  this%CGOMSff = 0._r8
+  this%CGONSff = 0._r8
+  this%CGOPSff = 0._r8
+  this%FP14XRff = 0._r8
+  this%RCO2Xff = 0._r8
+  this%RCH3Xff = 0._r8
+  this%RCH4Xff = 0._r8
+  this%RIP14ff = 0._r8
+  this%RIP1Bff = 0._r8
+  this%RIP14Rff = 0._r8
 
   end subroutine nit_micf_zero
 
@@ -598,6 +854,80 @@ type, public :: NitroAQMFluxDiagType
   if(allocated(this%RIP1B))deallocate(this%RIP1B)
   if(allocated(this%RIP14R))deallocate(this%RIP14R)
 
+  if(allocated(this%RUPOXff))deallocate(this%RUPOXff)
+  if(allocated(this%RGN2Fff))deallocate(this%RGN2Fff)
+  if(allocated(this%RGOMOff))deallocate(this%RGOMOff)
+  if(allocated(this%ROXYMff))deallocate(this%ROXYMff)
+  if(allocated(this%ROXYPff))deallocate(this%ROXYPff)
+  if(allocated(this%ROXYOff))deallocate(this%ROXYOff)
+  if(allocated(this%RDNO3ff))deallocate(this%RDNO3ff)
+  if(allocated(this%RDNOBff))deallocate(this%RDNOBff)
+  if(allocated(this%RDNO2ff))deallocate(this%RDNO2ff)
+  if(allocated(this%RDN2Bff))deallocate(this%RDN2Bff)
+  if(allocated(this%RDN2Off))deallocate(this%RDN2Off)
+  if(allocated(this%RGOMDff))deallocate(this%RGOMDff)
+  if(allocated(this%RMOMCff))deallocate(this%RMOMCff)
+  if(allocated(this%RINH4ff))deallocate(this%RINH4ff)
+  if(allocated(this%RINO3ff))deallocate(this%RINO3ff)
+  if(allocated(this%RIPO4ff))deallocate(this%RIPO4ff)
+  if(allocated(this%RINB4ff))deallocate(this%RINB4ff)
+  if(allocated(this%RINB3ff))deallocate(this%RINB3ff)
+  if(allocated(this%RIPOBff))deallocate(this%RIPOBff)
+  if(allocated(this%RDOMCff))deallocate(this%RDOMCff)
+  if(allocated(this%RDOMNff))deallocate(this%RDOMNff)
+  if(allocated(this%RDOMPff))deallocate(this%RDOMPff)
+  if(allocated(this%RHOMCff))deallocate(this%RHOMCff)
+  if(allocated(this%RHOMNff))deallocate(this%RHOMNff)
+  if(allocated(this%RHOMPff))deallocate(this%RHOMPff)
+  if(allocated(this%RCOMCff))deallocate(this%RCOMCff)
+  if(allocated(this%RCOMNff))deallocate(this%RCOMNff)
+  if(allocated(this%RCOMPff))deallocate(this%RCOMPff)
+  if(allocated(this%CGOMCff))deallocate(this%CGOMCff)
+  if(allocated(this%CGOMNff))deallocate(this%CGOMNff)
+  if(allocated(this%RH2GXff))deallocate(this%RH2GXff)
+  if(allocated(this%CGOMPff))deallocate(this%CGOMPff)
+  if(allocated(this%RDMMCff))deallocate(this%RDMMCff)
+  if(allocated(this%RHMMCff))deallocate(this%RHMMCff)
+  if(allocated(this%RCMMCff))deallocate(this%RCMMCff)
+  if(allocated(this%RDMMNff))deallocate(this%RDMMNff)
+  if(allocated(this%RHMMNff))deallocate(this%RHMMNff)
+  if(allocated(this%RCMMNff))deallocate(this%RCMMNff)
+  if(allocated(this%RDMMPff))deallocate(this%RDMMPff)
+  if(allocated(this%RHMMPff))deallocate(this%RHMMPff)
+  if(allocated(this%RCMMPff))deallocate(this%RCMMPff)
+  if(allocated(this%RN2FXff))deallocate(this%RN2FXff)
+  if(allocated(this%RXOMCff))deallocate(this%RXOMCff)
+  if(allocated(this%RXOMNff))deallocate(this%RXOMNff)
+  if(allocated(this%RXOMPff))deallocate(this%RXOMPff)
+  if(allocated(this%R3OMCff))deallocate(this%R3OMCff)
+  if(allocated(this%R3OMNff))deallocate(this%R3OMNff)
+  if(allocated(this%R3OMPff))deallocate(this%R3OMPff)
+  if(allocated(this%RXMMCff))deallocate(this%RXMMCff)
+  if(allocated(this%RXMMNff))deallocate(this%RXMMNff)
+  if(allocated(this%RXMMPff))deallocate(this%RXMMPff)
+  if(allocated(this%R3MMCff))deallocate(this%R3MMCff)
+  if(allocated(this%R3MMNff))deallocate(this%R3MMNff)
+  if(allocated(this%R3MMPff))deallocate(this%R3MMPff)
+  if(allocated(this%CGOQCff))deallocate(this%CGOQCff)
+  if(allocated(this%CGOACff))deallocate(this%CGOACff)
+  if(allocated(this%RINH4Rff))deallocate(this%RINH4Rff)
+  if(allocated(this%RINO3Rff))deallocate(this%RINO3Rff)
+  if(allocated(this%RIPO4Rff))deallocate(this%RIPO4Rff)
+  if(allocated(this%FNH4XRff))deallocate(this%FNH4XRff)
+  if(allocated(this%FNO3XRff))deallocate(this%FNO3XRff)
+  if(allocated(this%FPO4XRff))deallocate(this%FPO4XRff)
+  if(allocated(this%RGOMYff))deallocate(this%RGOMYff)
+  if(allocated(this%CGOMSff))deallocate(this%CGOMSff)
+  if(allocated(this%CGONSff))deallocate(this%CGONSff)
+  if(allocated(this%CGOPSff))deallocate(this%CGOPSff)
+  if(allocated(this%FP14XRff))deallocate(this%FP14XRff)
+  if(allocated(this%RCO2Xff))deallocate(this%RCO2Xff)
+  if(allocated(this%RCH3Xff))deallocate(this%RCH3Xff)
+  if(allocated(this%RCH4Xff))deallocate(this%RCH4Xff)
+  if(allocated(this%RIP14ff))deallocate(this%RIP14ff)
+  if(allocated(this%RIP1Bff))deallocate(this%RIP1Bff)
+  if(allocated(this%RIP14Rff))deallocate(this%RIP14Rff)
+
   end subroutine nit_micf_destroy
 !------------------------------------------------------------------------------------------
 
@@ -621,6 +951,21 @@ type, public :: NitroAQMFluxDiagType
   if(allocated(this%FCP))deallocate(this%FCP)
   if(allocated(this%FCNP))deallocate(this%FCNP)
 
+  if(allocated(this%CNOMAff))deallocate(this%CNOMAff)
+  if(allocated(this%CPOMAff))deallocate(this%CPOMAff)
+  if(allocated(this%OMAff))deallocate(this%OMAff)
+  if(allocated(this%FOMAff))deallocate(this%FOMAff)
+  if(allocated(this%FOMNff))deallocate(this%FOMNff)
+  if(allocated(this%FOMKff))deallocate(this%FOMKff)
+  if(allocated(this%OMC2ff))deallocate(this%OMC2ff)
+  if(allocated(this%TFNGff))deallocate(this%TFNGff)
+  if(allocated(this%TFNRff))deallocate(this%TFNRff)
+  if(allocated(this%OMN2ff))deallocate(this%OMN2ff)
+  if(allocated(this%FOM2ff))deallocate(this%FOM2ff)
+  if(allocated(this%WFNff))deallocate(this%WFNff)
+  if(allocated(this%FCNff))deallocate(this%FCNff)
+  if(allocated(this%FCPff))deallocate(this%FCPff)
+  if(allocated(this%FCNPff))deallocate(this%FCNPff)
   end subroutine nit_mics_destroy
 !------------------------------------------------------------------------------------------
   subroutine nit_omcplxf_init(this)

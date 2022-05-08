@@ -714,8 +714,6 @@ module StartsMod
   !
   BKRS=(/0.0333_r8,0.0167_r8,0.0167_r8/)
 
-
-
   call InitSOMConsts
 
   NPH=NPX

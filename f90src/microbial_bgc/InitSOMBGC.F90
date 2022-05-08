@@ -50,19 +50,21 @@ module InitSOMBGC
      ,0.001,0.005,0.001,0.005/),r8),shape(ORCI))
 
   OMCI(1:3,:)=OMCI1/real(JG,r8)
-  COMCI=OMCI(1:3,:)
-  DO K=0,4
-    DO NGL=2,JG-1
-      DO M=1,3
-        OMCI(M+(NGL-1)*3,K)=OMCI(M,K)
-        COMCI(M,K)=COMCI(M,K)+OMCI(M,K)
-      enddo
-    enddo
-    DO M=1,3
-       OMCI(M+(JG-1)*3,K)=OMCI1(M,K)-COMCI(M,K)
-    ENDDO
-  enddo
 
+  if(JG.GT.1)then
+    COMCI=OMCI(1:3,:)
+    DO K=0,4
+      DO NGL=2,JG-1
+        DO M=1,3
+          OMCI(M+(NGL-1)*3,K)=OMCI(M,K)
+          COMCI(M,K)=COMCI(M,K)+OMCI(M,K)
+        enddo
+      enddo
+      DO M=1,3
+        OMCI(M+(JG-1)*3,K)=OMCI1(M,K)-COMCI(M,K)
+      ENDDO
+    enddo
+  endif
   end subroutine InitSOMConsts
 !------------------------------------------------------------------------------------------
 
@@ -174,6 +176,7 @@ module InitSOMBGC
     OSNX(K)=0.0_r8
     OSPX(K)=0.0_r8
 995 CONTINUE
+
   DO 8995 K=0,4
     IF(L.EQ.0)THEN
       OSCM(K)=DCKR*CORGCX(K)*BKVL(L,NY,NX)
@@ -221,13 +224,14 @@ module InitSOMBGC
 !     OMCF,OMCA=hetero,autotrophic biomass composition in litter
 !     CNOMC,CPOMC=maximum N:C and P:C ratios in microbial biomass
 !     OSCX,OSNX,OSPX=remaining unallocated SOC,SON,SOP
-!
+!  The reason that initialization of complex 5 microbes is repated for each
+! complex is because complex 5 is shared by the other complexes
     DO 7990 N=1,7
       DO NGL=1,JG
         DO 7985 M=1,3
-          OMC(M,NGL,N,5,L,NY,NX)=0.0_r8
-          OMN(M,NGL,N,5,L,NY,NX)=0.0_r8
-          OMP(M,NGL,N,5,L,NY,NX)=0.0_r8
+          OMCff(M,NGL,N,L,NY,NX)=0.0_r8
+          OMNff(M,NGL,N,L,NY,NX)=0.0_r8
+          OMPff(M,NGL,N,L,NY,NX)=0.0_r8
 7985    CONTINUE
       enddo
 7990  CONTINUE
@@ -244,9 +248,9 @@ module InitSOMBGC
           OSNX(KK)=OSNX(KK)+OMN1
           OSPX(KK)=OSPX(KK)+OMP1
           DO 8992 NN=1,7
-            OMC(M,NGL,NN,5,L,NY,NX)=OMC(M,NGL,NN,5,L,NY,NX)+OMC1*OMCA(NN)
-            OMN(M,NGL,NN,5,L,NY,NX)=OMN(M,NGL,NN,5,L,NY,NX)+OMN1*OMCA(NN)
-            OMP(M,NGL,NN,5,L,NY,NX)=OMP(M,NGL,NN,5,L,NY,NX)+OMP1*OMCA(NN)
+            OMCff(M,NGL,NN,L,NY,NX)=OMCff(M,NGL,NN,L,NY,NX)+OMC1*OMCA(NN)
+            OMNff(M,NGL,NN,L,NY,NX)=OMNff(M,NGL,NN,L,NY,NX)+OMN1*OMCA(NN)
+            OMPff(M,NGL,NN,L,NY,NX)=OMPff(M,NGL,NN,L,NY,NX)+OMP1*OMCA(NN)
             OSCX(KK)=OSCX(KK)+OMC1*OMCA(NN)
             OSNX(KK)=OSNX(KK)+OMN1*OMCA(NN)
             OSPX(KK)=OSPX(KK)+OMP1*OMCA(NN)
@@ -333,11 +337,13 @@ module InitSOMBGC
   OP=0.0_r8
   RC=0.0_r8
   IF(L.EQ.0)THEN
-    DO 6975 K=0,5
+    DO 6975 K=0,4
       RC0(K,NY,NX)=0.0_r8
 6975  CONTINUE
+    RC0ff(NY,NX)=0._r8
   ENDIF
-  DO 6990 K=0,5
+
+  DO 6990 K=0,4
     DO  N=1,7
       do NGL=1,JG
         ROXYS(NGL,N,K,L,NY,NX)=0.0_r8
@@ -365,6 +371,31 @@ module InitSOMBGC
       ENDDO
     enddo
 6990  CONTINUE
+
+    DO  N=1,7
+      do NGL=1,JG
+        ROXYSff(NGL,N,L,NY,NX)=0.0_r8
+        RVMX4ff(NGL,N,L,NY,NX)=0.0_r8
+        RVMX3ff(NGL,N,L,NY,NX)=0.0_r8
+        RVMX2ff(NGL,N,L,NY,NX)=0.0_r8
+        RVMX1ff(NGL,N,L,NY,NX)=0.0_r8
+        RINHOff(NGL,N,L,NY,NX)=0.0_r8
+        RINOOff(NGL,N,L,NY,NX)=0.0_r8
+        RIPOOff(NGL,N,L,NY,NX)=0.0_r8
+        IF(L.EQ.0)THEN
+          RINHORff(NGL,N,NY,NX)=0.0_r8
+          RINOORff(NGL,N,NY,NX)=0.0_r8
+          RIPOORff(NGL,N,NY,NX)=0.0_r8
+        ENDIF
+        DO  M=1,3
+          OC=OC+OMCff(M,NGL,N,L,NY,NX)
+          ON=ON+OMNff(M,NGL,N,L,NY,NX)
+          OP=OP+OMPff(M,NGL,N,L,NY,NX)
+          RC0ff(NY,NX)=RC0(K,NY,NX)+OMCff(M,NGL,N,L,NY,NX)
+        ENDDO
+      ENDDO
+    enddo
+
   DO 6995 K=0,4
     DO 6985 M=1,2
       OC=OC+ORC(M,K,L,NY,NX)
@@ -602,11 +633,6 @@ module InitSOMBGC
 !
     CFOMC(1,L,NY,NX)=3.0*FC1/(2.0*FC1+1.0)
     CFOMC(2,L,NY,NX)=1.0-CFOMC(1,L,NY,NX)
-!     WRITE(*,5432)'PART',L,FC0,FC1,FCX,HCX,TORGM,TORGL
-!    2,CORGCX(4),CORGNX(4),CORGPX(4),DPTH(L,NY,NX),DTBLZ(NY,NX)
-!    3,CDPTH(NU(NY,NX),NY,NX),CDPTHG,CORGC(L,NY,NX),FORGC
-!    4,EXP(HCX*TORGL)
-!5432  FORMAT(A8,I4,20E12.4)
   ENDIF
   end subroutine InitPOMKinetiComponent
 
@@ -659,10 +685,6 @@ module InitSOMBGC
     CORGNX(0:2)=RSN(0:2,L,NY,NX)*scal
     CORGPX(0:2)=RSP(0:2,L,NY,NX)*scal
   ELSE
-    !if(abs(VOLT(L,NY,NX))<1.e-10_r8)then
-    !  print*,'L,NY,NX=',L,NY,NX
-    !  print*,'VOLT(L,NY,NX)=',VOLT(L,NY,NX)
-    !endif
     scal=AREA(3,L,NY,NX)/VOLT(L,NY,NX)
     CORGCX(0:2)=RSC(0:2,L,NY,NX)*scal
     CORGNX(0:2)=RSN(0:2,L,NY,NX)*scal
@@ -717,21 +739,21 @@ module InitSOMBGC
   CPOFC(1:4,2)=real((/0.0020,0.0020,0.0020,0.0020/),r8)
   FL(1:2)=real((/0.55,0.45/),r8)
 
-  DO 95 K=0,5
+  DO 95 K=0,4
     DO  N=1,7
-      IF(K.LE.4.AND.N.EQ.3)THEN
+      IF(N.EQ.3)THEN
         DO NGL=1,JG
-          CNOMC(1,NGL,N,K)=0.15
-          CNOMC(2,NGL,N,K)=0.09
-          CPOMC(1,NGL,N,K)=0.015
-          CPOMC(2,NGL,N,K)=0.009
+          CNOMC(1,NGL,N,K)=0.15_r8
+          CNOMC(2,NGL,N,K)=0.09_r8
+          CPOMC(1,NGL,N,K)=0.015_r8
+          CPOMC(2,NGL,N,K)=0.009_r8
         ENDDO
       ELSE
         do NGL=1,JG
-          CNOMC(1,NGL,N,K)=0.225
-          CNOMC(2,NGL,N,K)=0.135
-          CPOMC(1,NGL,N,K)=0.0225
-          CPOMC(2,NGL,N,K)=0.0135
+          CNOMC(1,NGL,N,K)=0.225_r8
+          CNOMC(2,NGL,N,K)=0.135_r8
+          CPOMC(1,NGL,N,K)=0.0225_r8
+          CPOMC(2,NGL,N,K)=0.0135_r8
         enddo
       ENDIF
       do NGL=1,JG
@@ -740,5 +762,20 @@ module InitSOMBGC
       enddo
      enddo
 95  CONTINUE
+
+    DO  N=1,7
+        do NGL=1,JG
+          CNOMCff(1,NGL,N)=0.225_r8
+          CNOMCff(2,NGL,N)=0.135_r8
+          CPOMCff(1,NGL,N)=0.0225_r8
+          CPOMCff(2,NGL,N)=0.0135_r8
+        enddo
+      do NGL=1,JG
+        CNOMCff(3,NGL,N)=FL(1)*CNOMCff(1,NGL,N)+FL(2)*CNOMCff(2,NGL,N)
+        CPOMCff(3,NGL,N)=FL(1)*CPOMCff(1,NGL,N)+FL(2)*CPOMCff(2,NGL,N)
+      enddo
+     enddo
+
+
     end subroutine InitMicbStoichiometry
 end module InitSOMBGC

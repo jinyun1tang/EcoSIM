@@ -903,7 +903,6 @@ implicit none
     ZSINs1(N)=ZSIN(N)
   ENDDO
 
-
   DO L=1,NL(NY,NX)
     CNDUs1(L)=CNDU(L,NY,NX)
     CGSGLs1(L)=CGSGL(L,NY,NX)
@@ -1846,6 +1845,7 @@ implicit none
   UAs1=UA(NY,NX)
   VHCPWXs1=VHCPWX(NY,NX)
   VHCPW1s1=VHCPW(1,NY,NX)
+  ZLs1(0)=ZL(0,NY,NX)
   DO L=1,JC
     ARSTTs1(L)=ARSTT(L,NY,NX)
     ARLFTs1(L)=ARLFT(L,NY,NX)
@@ -1955,7 +1955,6 @@ implicit none
   FRADG(NY,NX)=FRADGs1
   RAD(NY,NX)=RAD0s1
   RAP(NY,NX)=RAP0s1
-
   DO L=0,JC
     ZL(L,NY,NX)=ZLs1(L)
   ENDDO

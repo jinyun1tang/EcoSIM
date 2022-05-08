@@ -532,7 +532,7 @@ module ErosionMod
 !
 !     ORGANIC MATTER
 !
-      DO 9480 K=0,5
+      DO 9480 K=0,4
       DO NO=1,7
       DO NGL=1,JG
       DO M=1,3
@@ -543,6 +543,17 @@ module ErosionMod
       ENDDO
       ENDDO
 9480  CONTINUE
+
+      DO NO=1,7
+      DO NGL=1,JG
+      DO M=1,3
+      OMCERff(M+(NGL-1)*3,NO,N,2,N5,N4)=FSEDER*OMCff(M,NGL,NO,NU(N2,N1),N2,N1)
+      OMNERff(M+(NGL-1)*3,NO,N,2,N5,N4)=FSEDER*OMNff(M,NGL,NO,NU(N2,N1),N2,N1)
+      OMPERff(M+(NGL-1)*3,NO,N,2,N5,N4)=FSEDER*OMPff(M,NGL,NO,NU(N2,N1),N2,N1)
+      ENDDO
+      ENDDO
+      ENDDO
+
       DO 9475 K=0,4
       DO 9470 M=1,2
       ORCER(M,K,N,2,N5,N4)=FSEDER*ORC(M,K,NU(N2,N1),N2,N1)
@@ -736,7 +747,7 @@ module ErosionMod
 !
 !     ORGANIC MATTER
 !
-      DO 7480 K=0,5
+      DO 7480 K=0,4
       DO  NO=1,7
       DO NGL=1,JG
       DO  M=1,3
@@ -747,6 +758,16 @@ module ErosionMod
       enddo
       ENDDO
 7480  CONTINUE
+      DO  NO=1,7
+      DO NGL=1,JG
+      DO  M=1,3
+      OMCERff(M+(NGL-1)*3,NO,N,1,N5B,N4B)=FSEDER*OMCff(M,NGL,NO,NU(N2,N1),N2,N1)
+      OMNERff(M+(NGL-1)*3,NO,N,1,N5B,N4B)=FSEDER*OMNff(M,NGL,NO,NU(N2,N1),N2,N1)
+      OMPERff(M+(NGL-1)*3,NO,N,1,N5B,N4B)=FSEDER*OMPff(M,NGL,NO,NU(N2,N1),N2,N1)
+      enddo
+      enddo
+      ENDDO
+
       DO 7475 K=0,4
       DO 7470 M=1,2
       ORCER(M,K,N,1,N5B,N4B)=FSEDER*ORC(M,K,NU(N2,N1),N2,N1)
@@ -1091,7 +1112,7 @@ module ErosionMod
 !
 !     ORGANIC MATTER
 !
-      DO 4880 K=0,5
+      DO 4880 K=0,4
       DO NO=1,7
       DO NGL=1,JG
       DO M=1,3
@@ -1102,6 +1123,16 @@ module ErosionMod
       ENDDO
       ENDDO
 4880  CONTINUE
+      DO NO=1,7
+      DO NGL=1,JG
+      DO M=1,3
+      OMCERff(M+(NGL-1)*3,NO,N,NN,M5,M4)=FSEDER*OMCff(M,NGL,NO,NU(N2,N1),N2,N1)
+      OMNERff(M+(NGL-1)*3,NO,N,NN,M5,M4)=FSEDER*OMNff(M,NGL,NO,NU(N2,N1),N2,N1)
+      OMPERff(M+(NGL-1)*3,NO,N,NN,M5,M4)=FSEDER*OMPff(M,NGL,NO,NU(N2,N1),N2,N1)
+      ENDDO
+      ENDDO
+      ENDDO
+
       DO 4875 K=0,4
       DO 4870 M=1,2
       ORCER(M,K,N,NN,M5,M4)=FSEDER*ORC(M,K,NU(N2,N1),N2,N1)
@@ -1120,14 +1151,7 @@ module ErosionMod
 4865  CONTINUE
 4875  CONTINUE
       ENDIF
-!     IF(ABS(XSEDER(N,NN,M5,M4)).GT.ZEROS(M5,M4))THEN
-!     WRITE(*,1116)'EDGE',I,J,N1,N2,N,XSEDER(N,NN,M5,M4),FSEDER
-!    2,BKVLNU(N2,N1),ORGC(NU(N2,N1),N2,N1)
-!    2,XCLAER(N,NN,M5,M4),CLAY(NU(N2,N1),N2,N1)
-!    3,ORGC(NU(N2,N1),N2,N1),DLYR(3,NU(N2,N1),N2,N1)
-!    4,BKVL(NU(N2,N1),N2,N1)
-!1116  FORMAT(A8,5I4,30E12.4)
-!     ENDIF
+
 8975  CONTINUE
 8980  CONTINUE
       ENDIF

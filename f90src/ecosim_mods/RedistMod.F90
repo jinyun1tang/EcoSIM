@@ -240,8 +240,9 @@ module RedistMod
     ,TOHAER(0:jcplx1,JY,JX),TOSCER(jsken,0:jcplx1,JY,JX) &
     ,TOSAER(4,0:jcplx1,JY,JX),TOSNER(4,0:jcplx1,JY,JX),&
     TOSPER(4,0:jcplx1,JY,JX),TSEDER(JY,JX)
-  real(r8) :: TORC(2,0:jcplx1),TORN(2,0:jcplx1),TORP(2,0:jcplx1),TOQC(0:jcplx1),TOQN(0:jcplx1) &
-    ,TOQP(0:jcplx1),TOQA(0:jcplx1),TOHC(0:jcplx1),TOHN(0:jcplx1),TOHP(0:jcplx1),TOHA(0:jcplx1) &
+  real(r8) :: TORC(2,0:jcplx1),TORN(2,0:jcplx1),TORP(2,0:jcplx1) &
+    ,TOQC(0:jcplx1),TOQN(0:jcplx1),TOQP(0:jcplx1),TOQA(0:jcplx1) &
+    ,TOHC(0:jcplx1),TOHN(0:jcplx1),TOHP(0:jcplx1),TOHA(0:jcplx1) &
     ,TOSC(4,0:jcplx1),TOSA(4,0:jcplx1),TOSN(4,0:jcplx1),TOSP(4,0:jcplx1),TOSGC(4,0:2) &
     ,TOSGA(4,0:2),TOSGN(4,0:2),TOSGP(4,0:2),TORXC(2,0:2),TORXN(2,0:2) &
     ,TORXP(2,0:2),TOQGC(0:2),TOQGN(0:2),TOQGP(0:2),TOQHC(0:2) &
@@ -282,6 +283,15 @@ module RedistMod
   real(r8),allocatable :: TOMGN(:,:,:,:)
   real(r8),allocatable :: TOMGP(:,:,:,:)
 
+  real(r8),allocatable :: TOMCERff(:,:,:,:,:)
+  real(r8),allocatable :: TOMNERff(:,:,:,:,:)
+  real(r8),allocatable :: TOMPERff(:,:,:,:,:)
+  real(r8),allocatable :: TOMCff(:,:,:)
+  real(r8),allocatable :: TOMNff(:,:,:)
+  real(r8),allocatable :: TOMPff(:,:,:)
+  real(r8),allocatable :: TOMGCff(:,:,:)
+  real(r8),allocatable :: TOMGNff(:,:,:)
+  real(r8),allocatable :: TOMGPff(:,:,:)
 
   real(r8), PARAMETER :: ZEROC=0.1E-03_r8
   DATA SG/0.0/
@@ -295,17 +305,29 @@ module RedistMod
 
   subroutine InitRedist
   implicit none
-  allocate(TOMCER(3,JG,7,0:jcplx,JY,JX))
-  allocate(TOMNER(3,JG,7,0:jcplx,JY,JX))
-  allocate(TOMPER(3,JG,7,0:jcplx,JY,JX))
-  allocate(TOMC(3,JG,7,0:jcplx))
-  allocate(TOMN(3,JG,7,0:jcplx))
-  allocate(TOMP(3,JG,7,0:jcplx))
-  allocate(TOMGC(3,JG,7,0:jcplx))
-  allocate(TOMGN(3,JG,7,0:jcplx))
-  allocate(TOMGP(3,JG,7,0:jcplx))
+  allocate(TOMCER(3,JG,7,0:jcplx1,JY,JX))
+  allocate(TOMNER(3,JG,7,0:jcplx1,JY,JX))
+  allocate(TOMPER(3,JG,7,0:jcplx1,JY,JX))
+  allocate(TOMC(3,JG,7,0:jcplx1))
+  allocate(TOMN(3,JG,7,0:jcplx1))
+  allocate(TOMP(3,JG,7,0:jcplx1))
+  allocate(TOMGC(3,JG,7,0:jcplx1))
+  allocate(TOMGN(3,JG,7,0:jcplx1))
+  allocate(TOMGP(3,JG,7,0:jcplx1))
+
+  allocate(TOMCERff(3,JG,7,JY,JX))
+  allocate(TOMNERff(3,JG,7,JY,JX))
+  allocate(TOMPERff(3,JG,7,JY,JX))
+  allocate(TOMCff(3,JG,7))
+  allocate(TOMNff(3,JG,7))
+  allocate(TOMPff(3,JG,7))
+  allocate(TOMGCff(3,JG,7))
+  allocate(TOMGNff(3,JG,7))
+  allocate(TOMGPff(3,JG,7))
 
   end subroutine InitRedist
+
+
   SUBROUTINE redist(I,J,NHW,NHE,NVN,NVS)
 !
 !     THIS SUBROUTINE UPDATES SOIL STATE VARIABLES WITH WATER, HEAT,
@@ -974,7 +996,7 @@ module RedistMod
 !
 !     MICROBIAL C,N,P
 !
-      DO 1970 K=0,jcplx
+      DO 1970 K=0,jcplx1
         IF(K.NE.3.AND.K.NE.4)THEN
 !         OMC,OMN,OMP=microbial C,N,P
 !         ORC,ORN,ORP=microbial residue C,N,P
@@ -998,6 +1020,28 @@ module RedistMod
 1960      CONTINUE
         ENDIF
 1970  CONTINUE
+
+!         OMC,OMN,OMP=microbial C,N,P
+!         ORC,ORN,ORP=microbial residue C,N,P
+!         OHC,OHN,OHP,OHA=adsorbed C,N,P,acetate
+!         OSC,OAA,OSN,OSP=SOC,colonized SOC,SON,SOP
+!
+          DO N=1,7
+            DO M=1,3
+              DO NGL=1,JG
+                FOMC=FSINK*OMCff(M,NGL,N,L,NY,NX)
+                FOMN=FSINK*OMNff(M,NGL,N,L,NY,NX)
+                FOMP=FSINK*OMPff(M,NGL,N,L,NY,NX)
+                OMCff(M,NGL,N,LL,NY,NX)=OMCff(M,NGL,N,LL,NY,NX)+FOMC
+                OMNff(M,NGL,N,LL,NY,NX)=OMNff(M,NGL,N,LL,NY,NX)+FOMN
+                OMPff(M,NGL,N,LL,NY,NX)=OMPff(M,NGL,N,LL,NY,NX)+FOMP
+                OMCff(M,NGL,N,L,NY,NX)=OMCff(M,NGL,N,L,NY,NX)-FOMC
+                OMNff(M,NGL,N,L,NY,NX)=OMNff(M,NGL,N,L,NY,NX)-FOMN
+                OMPff(M,NGL,N,L,NY,NX)=OMPff(M,NGL,N,L,NY,NX)-FOMP
+              enddo
+            enddo
+          ENDDO
+
 !
 !     MICROBIAL RESIDUE C,N,P
 !
@@ -1054,6 +1098,7 @@ module RedistMod
   subroutine WaterHeatSoluteBySnowDrift(N,N4,N5,L,NY,NX)
   implicit none
   integer, intent(in) :: N,L,NY,NX,N4,N5
+
 !     begin_execution
   IF(N.NE.3.AND.L.EQ.NU(NY,NX))THEN
     WQRS=XN*(QS(N,N5,N4)+QW(N,N5,N4)+QI(N,N5,N4))
@@ -4439,7 +4484,7 @@ module RedistMod
     !   ORGANIC CONSTITUENTS
 !
     DORGP=0.0_r8
-    DO 9280 K=0,jcplx
+    DO 9280 K=0,jcplx1
       DO  NO=1,7
         DO  M=1,3
           DO NGL=1,JG
@@ -4452,6 +4497,18 @@ module RedistMod
         enddo
       enddo
 9280  CONTINUE
+      DO  NO=1,7
+        DO  M=1,3
+          DO NGL=1,JG
+            OMCff(M,NGL,NO,NU(NY,NX),NY,NX)=OMCff(M,NGL,NO,NU(NY,NX),NY,NX)+TOMCERff(M,NGL,NO,NY,NX)
+            OMNff(M,NGL,NO,NU(NY,NX),NY,NX)=OMNff(M,NGL,NO,NU(NY,NX),NY,NX)+TOMNERff(M,NGL,NO,NY,NX)
+            OMPff(M,NGL,NO,NU(NY,NX),NY,NX)=OMPff(M,NGL,NO,NU(NY,NX),NY,NX)+TOMPERff(M,NGL,NO,NY,NX)
+            DORGE(NY,NX)=DORGE(NY,NX)+TOMCERff(M,NGL,NO,NY,NX)
+            DORGP=DORGP+TOMPER(M,NGL,NO,K,NY,NX)
+          enddo
+        enddo
+      enddo
+
     DO 9275 K=0,jcplx1
       DO 9270 M=1,2
         ORC(M,K,NU(NY,NX),NY,NX)=ORC(M,K,NU(NY,NX),NY,NX)+TORCER(M,K,NY,NX)
@@ -4475,8 +4532,6 @@ module RedistMod
         DORGP=DORGP+TOSPER(M,K,NY,NX)
 9265  CONTINUE
 9275  CONTINUE
-!     WRITE(*,6637)'DORGP',I,J,NY,NX,DORGP,TSEDER(NY,NX)
-!6637  FORMAT(A8,4I4,12E12.4)
   ENDIF
   end subroutine ChemicalOverlandFlow
 !------------------------------------------------------------------------------------------
@@ -4557,12 +4612,14 @@ module RedistMod
   DC=0.0_r8
   DN=0.0_r8
   DP=0.0_r8
-  DO 6975 K=0,jcplx
+  DO 6975 K=0,jcplx1
     RC0(K,NY,NX)=0.0_r8
 6975  CONTINUE
+  RC0ff(NY,NX)=0.0_r8
+
   OMCL(0,NY,NX)=0.0_r8
   OMNL(0,NY,NX)=0.0_r8
-  DO 6970 K=0,jcplx
+  DO 6970 K=0,jcplx1
     IF(K.NE.3.AND.K.NE.4)THEN
       !
       ! TOTAL MICROBIAL C,N,P
@@ -4584,6 +4641,26 @@ module RedistMod
 6960  CONTINUE
     ENDIF
 6970  CONTINUE
+
+      !
+      ! TOTAL MICROBIAL C,N,P
+      !
+      DO N=1,7
+        DO  M=1,3
+          DO NGL=1,JG
+            DC=DC+OMCff(M,NGL,N,0,NY,NX)
+            DN=DN+OMNff(M,NGL,N,0,NY,NX)
+            DP=DP+OMPff(M,NGL,N,0,NY,NX)
+            RC0ff(NY,NX)=RC0ff(NY,NX)+OMCff(M,NGL,N,0,NY,NX)
+            TOMT(NY,NX)=TOMT(NY,NX)+OMCff(M,NGL,N,0,NY,NX)
+            TONT(NY,NX)=TONT(NY,NX)+OMNff(M,NGL,N,0,NY,NX)
+            TOPT(NY,NX)=TOPT(NY,NX)+OMPff(M,NGL,N,0,NY,NX)
+            OMCL(0,NY,NX)=OMCL(0,NY,NX)+OMCff(M,NGL,N,0,NY,NX)
+            OMNL(0,NY,NX)=OMNL(0,NY,NX)+OMNff(M,NGL,N,0,NY,NX)
+          enddo
+        enddo
+    ENDDO
+
   !
   !     TOTAL MICROBIAL RESIDUE C,N,P
   !
@@ -4640,25 +4717,7 @@ module RedistMod
   Z4F=14.0*(ZNH4FA(0,NY,NX)+ZNHUFA(0,NY,NX)+ZNH3FA(0,NY,NX))
   TLNH4=TLNH4+Z4S+Z4X+Z4F
   UNH4(NY,NX)=UNH4(NY,NX)+Z4S+Z4X
-  !     IF(I.GT.190.AND.NX.EQ.1)THEN
-  !     DO 4342 K=0,1
-  !     WRITE(*,4341)'ORGC0',I,J,NX,NY,L,K,ORGC(0,NY,NX),DC
-  !    2,((OMC(M,NGL,K,0,NY,NX),M=1,3),N=1,7)
-  !     3,(ORC(M,K,0,NY,NX),M=1,2),(OSC(M,K,0,NY,NX),M=1,4)
-  !    4,OQC(K,0,NY,NX),OQCH(K,0,NY,NX),OHC(K,0,NY,NX)
-  !    2,OQA(K,0,NY,NX),OQAH(K,0,NY,NX),OHA(K,0,NY,NX)
-  !    5,(OSA(M,K,0,NY,NX),M=1,4)
-!4341  FORMAT(A8,6I4,120E12.4)
-!4342  CONTINUE
-  !     WRITE(*,5456)'TLCO2G0',I,J,NX,NY,TLCO2G
-  !    2,CS,CO2S(0,NY,NX),CH4S(0,NY,NX)
-  !     WRITE(*,5456)'TLN2G0',I,J,NX,NY,TLN2G
-  !    2,ZG,Z2GS(0,NY,NX),Z2OS(0,NY,NX)
-  !     WRITE(*,5456)'TLNH40',I,J,NX,NY,TLNH4,UNH4(NY,NX)
-  !    2,Z4S,Z4X,Z4F,XN4(0,NY,NX)
-  !    2,ZNH4S(0,NY,NX),ZNH3S(0,NY,NX)
-!5456  FORMAT(A8,4I4,30E16.6)
-!     ENDIF
+
   ZOS=ZNO3S(0,NY,NX)+ZNO2S(0,NY,NX)
   ZOF=14.0*ZNO3FA(0,NY,NX)
   TLNO3=TLNO3+ZOS+ZOF
@@ -4681,9 +4740,7 @@ module RedistMod
     ZNA(0,NY,NX)=ZNA(0,NY,NX)+XNAFLS(3,0,NY,NX)
     ZKA(0,NY,NX)=ZKA(0,NY,NX)+XKAFLS(3,0,NY,NX)
     ZOH(0,NY,NX)=ZOH(0,NY,NX)+XOHFLS(3,0,NY,NX)
-    !     WRITE(20,3338)'ZHY0',I,J,ZHY(0,NY,NX),TQRHY(NY,NX)
-    !    2,XHYFLS(3,0,NY,NX),ZOH(0,NY,NX),TQROH(NY,NX)
-    !    4,XOHFLS(3,0,NY,NX)
+
     ZSO4(0,NY,NX)=ZSO4(0,NY,NX)+XSOFLS(3,0,NY,NX)
     ZCL(0,NY,NX)=ZCL(0,NY,NX)+XCLFLS(3,0,NY,NX)
     ZCO3(0,NY,NX)=ZCO3(0,NY,NX)+XC3FLS(3,0,NY,NX)
@@ -4736,24 +4793,7 @@ module RedistMod
     TION=TION+SSS
     UION(NY,NX)=UION(NY,NX)+SSS
   ENDIF
-  !     WRITE(20,3338)'SBN',I,J,TLNH4,TLNO3,TZIN,TZOU
-  !    2,Z4S,Z4X,Z4F,ZOS,ZOF,ZG
-  !    2,ZSI,ZGI,ZGB,Z2B,ZHB
-  !    3,ZXR,ZGR,ZOR,ZXB,TRN3S(0,NY,NX)
-  !    3,ZN4W(NY,NX),ZN3W(NY,NX),ZNOW(NY,NX),ZNGW(NY,NX),ZN2W(NY,NX)
-  !     WRITE(20,3338)'SBP',I,J,POS,POX,POP,PSS,PXR,PXB,POR
-  !    2,TLPO4,TPIN,TPOU
-  !    2,XH1PS(0,NY,NX),XH2PS(0,NY,NX),H1PO4(0,NY,NX),H2PO4(0,NY,NX)
-  !    3,XH1P(0,NY,NX),XH2P(0,NY,NX),PALPO(0,NY,NX),PFEPO(0,NY,NX)
-  !    6,PCAPD(0,NY,NX),PCAPM(0,NY,NX),PCAPH(0,NY,NX),TRH1P(0,NY,NX)
-  !    2,TRH2P(0,NY,NX),XH1PFS(3,0,NY,NX),XH2PFS(3,0,NY,NX)
-  !    3,Z1PW(NY,NX),ZHPW(NY,NX),XH1PBS(NY,NX),XH2PBS(NY,NX)
-  !     4,FLQGQ(NY,NX),FLQRQ(NY,NX)
-  !     WRITE(20,3338)'SBS',I,J,TION,TIONIN,TIONOU
-  !    2,SSW,SSS,SIR,SII,SSR,SQE,SBU
-!3338  FORMAT(A8,2I4,50F20.8)
-!3335  FORMAT(A8,3I4,50F20.8)
-  !     ENDIF
+
   end subroutine SumupSurfaceChemicalMass
 !------------------------------------------------------------------------------------------
 
@@ -5030,6 +5070,7 @@ module RedistMod
       +TRH2B(L,NY,NX) -TUPH2B(L,NY,NX)+RH2BBU(L,NY,NX) &
       +XH2BXB(L,NY,NX)
     THRE(NY,NX)=THRE(NY,NX)+RCO2O(L,NY,NX)+RCH4O(L,NY,NX)
+!    print*,'curday',RCO2O(L,NY,NX),RCH4O(L,NY,NX)
     UN2GG(NY,NX)=UN2GG(NY,NX)+RN2G(L,NY,NX)
     HN2GG(NY,NX)=HN2GG(NY,NX)+RN2G(L,NY,NX)
     !
@@ -5251,7 +5292,7 @@ module RedistMod
     !     TOTALS FOR CALCULATING COMPETITION CONSTRAINTS ON MICROBIAL
     !     AND ROOT POPULATIONS
 !
-    DO 7990 K=0,jcplx
+    DO 7990 K=0,jcplx1
       DO 7980 N=1,7
         DO NGL=1,JG
           ROXYX(L,NY,NX)=ROXYX(L,NY,NX)+ROXYS(NGL,N,K,L,NY,NX)
@@ -5266,13 +5307,28 @@ module RedistMod
           RN2BX(L,NY,NX)=RN2BX(L,NY,NX)+RVMB2(NGL,N,K,L,NY,NX)
           RPOBX(L,NY,NX)=RPOBX(L,NY,NX)+RIPBO(NGL,N,K,L,NY,NX)
           RP1BX(L,NY,NX)=RP1BX(L,NY,NX)+RIPB1(NGL,N,K,L,NY,NX)
-          IF(K.LE.4)THEN
-            ROQCX(K,L,NY,NX)=ROQCX(K,L,NY,NX)+ROQCS(NGL,N,K,L,NY,NX)
-            ROQAX(K,L,NY,NX)=ROQAX(K,L,NY,NX)+ROQAS(NGL,N,K,L,NY,NX)
-          ENDIF
+          ROQCX(K,L,NY,NX)=ROQCX(K,L,NY,NX)+ROQCS(NGL,N,K,L,NY,NX)
+          ROQAX(K,L,NY,NX)=ROQAX(K,L,NY,NX)+ROQAS(NGL,N,K,L,NY,NX)
         enddo
 7980  CONTINUE
 7990  CONTINUE
+      DO  N=1,7
+        DO NGL=1,JG
+          ROXYX(L,NY,NX)=ROXYX(L,NY,NX)+ROXYSff(NGL,N,L,NY,NX)
+          RNH4X(L,NY,NX)=RNH4X(L,NY,NX)+RVMX4ff(NGL,N,L,NY,NX)+RINHOff(NGL,N,L,NY,NX)
+          RNO3X(L,NY,NX)=RNO3X(L,NY,NX)+RVMX3ff(NGL,N,L,NY,NX)+RINOOff(NGL,N,L,NY,NX)
+          RNO2X(L,NY,NX)=RNO2X(L,NY,NX)+RVMX2ff(NGL,N,L,NY,NX)
+          RN2OX(L,NY,NX)=RN2OX(L,NY,NX)+RVMX1ff(NGL,N,L,NY,NX)
+          RPO4X(L,NY,NX)=RPO4X(L,NY,NX)+RIPOOff(NGL,N,L,NY,NX)
+          RP14X(L,NY,NX)=RP14X(L,NY,NX)+RIPO1ff(NGL,N,L,NY,NX)
+          RNHBX(L,NY,NX)=RNHBX(L,NY,NX)+RVMB4ff(NGL,N,L,NY,NX)+RINHBff(NGL,N,L,NY,NX)
+          RN3BX(L,NY,NX)=RN3BX(L,NY,NX)+RVMB3ff(NGL,N,L,NY,NX)+RINOBff(NGL,N,L,NY,NX)
+          RN2BX(L,NY,NX)=RN2BX(L,NY,NX)+RVMB2ff(NGL,N,L,NY,NX)
+          RPOBX(L,NY,NX)=RPOBX(L,NY,NX)+RIPBOff(NGL,N,L,NY,NX)
+          RP1BX(L,NY,NX)=RP1BX(L,NY,NX)+RIPB1ff(NGL,N,L,NY,NX)
+        enddo
+    ENDDO
+
     RNO2X(L,NY,NX)=RNO2X(L,NY,NX)+RVMXC(L,NY,NX)
     RN2BX(L,NY,NX)=RN2BX(L,NY,NX)+RVMBC(L,NY,NX)
     !
@@ -5370,7 +5426,8 @@ module RedistMod
     OP=0.0_r8
     OMCL(L,NY,NX)=0.0_r8
     OMNL(L,NY,NX)=0.0_r8
-    DO 7970 K=0,jcplx
+
+    DO 7970 K=0,jcplx1
       IF(K.LE.2)THEN
         DO 7960 N=1,7
           DO  M=1,3
@@ -5403,6 +5460,22 @@ module RedistMod
 7950    CONTINUE
       ENDIF
 7970  CONTINUE
+
+        DO  N=1,7
+          DO  M=1,3
+            DO NGL=1,JG
+              OC=OC+OMCff(M,NGL,N,L,NY,NX)
+              ON=ON+OMNff(M,NGL,N,L,NY,NX)
+              OP=OP+OMPff(M,NGL,N,L,NY,NX)
+              TOMT(NY,NX)=TOMT(NY,NX)+OMCff(M,NGL,N,L,NY,NX)
+              TONT(NY,NX)=TONT(NY,NX)+OMNff(M,NGL,N,L,NY,NX)
+              TOPT(NY,NX)=TOPT(NY,NX)+OMPff(M,NGL,N,L,NY,NX)
+              OMCL(L,NY,NX)=OMCL(L,NY,NX)+OMCff(M,NGL,N,L,NY,NX)
+              OMNL(L,NY,NX)=OMNL(L,NY,NX)+OMNff(M,NGL,N,L,NY,NX)
+            enddo
+          enddo
+        ENDDO
+
     DO 7900 K=0,jcplx1
       IF(K.LE.2)THEN
         DO 7940 M=1,2
@@ -5436,6 +5509,7 @@ module RedistMod
 7910    CONTINUE
       ENDIF
 7900  CONTINUE
+
     ORGC(L,NY,NX)=DC+OC
     ORGN(L,NY,NX)=DN+ON
     ORGR(L,NY,NX)=DC
@@ -5447,151 +5521,124 @@ module RedistMod
     ELSE
       DORGC(L,NY,NX)=0.0_r8
     ENDIF
-    IF(L.EQ.1)THEN
-    !     DO 4344 K=0,jcplx
-    !     WRITE(*,4343)'ORGC',I,J,NX,NY,L,K,ORGC(L,NY,NX),ORGR(L,NY,NX)
-    !    2,DC,OC,((OMC(M,NGL,K,L,NY,NX),M=1,3),N=1,7)
-    !    3,(ORC(M,K,L,NY,NX),M=1,2),(OSC(M,K,L,NY,NX),M=1,4)
-    !    4,OQC(K,L,NY,NX),OQCH(K,L,NY,NX),OHC(K,L,NY,NX)
-    !    2,OQA(K,L,NY,NX),OQAH(K,L,NY,NX),OHA(K,L,NY,NX)
-    !    5,(OSA(M,K,L,NY,NX),M=1,4)
-    !     WRITE(*,4343)'ORGN',I,J,NX,NY,L,K,ORGN(L,NY,NX),DN,ON
-    !    2,((OMN(M,NGL,K,L,NY,NX),M=1,3),N=1,7)
-    !    3,(ORN(M,K,L,NY,NX),M=1,2),(OSN(M,K,L,NY,NX),M=1,4)
-    !    4,OQN(K,L,NY,NX),OQNH(K,L,NY,NX),OHN(K,L,NY,NX)
-    !4343  FORMAT(A8,6I4,120E12.4)
-    !4344  CONTINUE
-    ENDIF
+
     TLRSDC=TLRSDC+DC
     URSDC(NY,NX)=URSDC(NY,NX)+DC
-      TLRSDN=TLRSDN+DN
-      URSDN(NY,NX)=URSDN(NY,NX)+DN
-      TLRSDP=TLRSDP+DP
-      URSDP(NY,NX)=URSDP(NY,NX)+DP
-      TLORGC=TLORGC+OC
-      UORGC(NY,NX)=UORGC(NY,NX)+OC
-      TLORGN=TLORGN+ON
-      UORGN(NY,NX)=UORGN(NY,NX)+ON
-      TLORGP=TLORGP+OP
-      UORGP(NY,NX)=UORGP(NY,NX)+OP
-      TSEDSO=TSEDSO+(DC+OC)*1.0E-06
-!     IF(L.EQ.NU(NY,NX))THEN
-!     WRITE(*,2234)'TLORGP',I,J,NX,NY,L,TLRSDP,TLORGP,DP,OP
-!2234  FORMAT(A8,5I4,20F16.6)
-!     ENDIF
+    TLRSDN=TLRSDN+DN
+    URSDN(NY,NX)=URSDN(NY,NX)+DN
+    TLRSDP=TLRSDP+DP
+    URSDP(NY,NX)=URSDP(NY,NX)+DP
+    TLORGC=TLORGC+OC
+    UORGC(NY,NX)=UORGC(NY,NX)+OC
+    TLORGN=TLORGN+ON
+    UORGN(NY,NX)=UORGN(NY,NX)+ON
+    TLORGP=TLORGP+OP
+    UORGP(NY,NX)=UORGP(NY,NX)+OP
+    TSEDSO=TSEDSO+(DC+OC)*1.0E-06
+
 !
 !     TOTAL SALT IONS
 !
-      IF(ISALTG.NE.0)THEN
+    IF(ISALTG.NE.0)THEN
       ZAL(L,NY,NX)=ZAL(L,NY,NX)+TRAL(L,NY,NX)+TALFLS(L,NY,NX) &
-      +RALFLU(L,NY,NX)+XALFXS(L,NY,NX)
+        +RALFLU(L,NY,NX)+XALFXS(L,NY,NX)
       ZFE(L,NY,NX)=ZFE(L,NY,NX)+TRFE(L,NY,NX)+TFEFLS(L,NY,NX) &
-      +RFEFLU(L,NY,NX)+XFEFXS(L,NY,NX)
+        +RFEFLU(L,NY,NX)+XFEFXS(L,NY,NX)
       ZHY(L,NY,NX)=ZHY(L,NY,NX)+TRHY(L,NY,NX)+THYFLS(L,NY,NX) &
-      +RHYFLU(L,NY,NX)+XHYFXS(L,NY,NX)+XZHYS(L,NY,NX)
+        +RHYFLU(L,NY,NX)+XHYFXS(L,NY,NX)+XZHYS(L,NY,NX)
       ZCA(L,NY,NX)=ZCA(L,NY,NX)+TRCA(L,NY,NX)+TCAFLS(L,NY,NX) &
-      +RCAFLU(L,NY,NX)+XCAFXS(L,NY,NX)
+        +RCAFLU(L,NY,NX)+XCAFXS(L,NY,NX)
       ZMG(L,NY,NX)=ZMG(L,NY,NX)+TRMG(L,NY,NX)+TMGFLS(L,NY,NX) &
-      +RMGFLU(L,NY,NX)+XMGFXS(L,NY,NX)
+        +RMGFLU(L,NY,NX)+XMGFXS(L,NY,NX)
       ZNA(L,NY,NX)=ZNA(L,NY,NX)+TRNA(L,NY,NX)+TNAFLS(L,NY,NX) &
-      +RNAFLU(L,NY,NX)+XNAFXS(L,NY,NX)
+        +RNAFLU(L,NY,NX)+XNAFXS(L,NY,NX)
       ZKA(L,NY,NX)=ZKA(L,NY,NX)+TRKA(L,NY,NX)+TKAFLS(L,NY,NX) &
-      +RKAFLU(L,NY,NX)+XKAFXS(L,NY,NX)
+        +RKAFLU(L,NY,NX)+XKAFXS(L,NY,NX)
       ZOH(L,NY,NX)=ZOH(L,NY,NX)+TROH(L,NY,NX)+TOHFLS(L,NY,NX) &
-      +ROHFLU(L,NY,NX)+XOHFXS(L,NY,NX)
-!     IF(L.EQ.1)THEN
-!     WRITE(*,5545)'ZOH',I,J,NX,NY,L
-!    2,ZOH(L,NY,NX),TROH(L,NY,NX)
-!    2,TOHFLS(L,NY,NX),ROHFLU(L,NY,NX),XOHFXS(L,NY,NX)
-!    2,ZHY(L,NY,NX),TRHY(L,NY,NX),THYFLS(L,NY,NX)
-!    2,RHYFLU(L,NY,NX),XHYFXS(L,NY,NX),XZHYS(L,NY,NX)
-!    3,XHY(L,NY,NX),TRXHY(L,NY,NX)
-!    4,ZOH(L,NY,NX)/VOLW(L,NY,NX),ZHY(L,NY,NX)/VOLW(L,NY,NX)
-!     WRITE(*,5545)'ZAL',I,J,NX,NY,L,ZAL(L,NY,NX),TRAL(L,NY,NX)
-!    2,TALFLS(L,NY,NX),RALFLU(L,NY,NX),XALFXS(L,NY,NX)
-!     ENDIF
+        +ROHFLU(L,NY,NX)+XOHFXS(L,NY,NX)
+
       ZSO4(L,NY,NX)=ZSO4(L,NY,NX)+TRSO4(L,NY,NX)+TSOFLS(L,NY,NX) &
-      +RSOFLU(L,NY,NX)+XSOFXS(L,NY,NX)
+        +RSOFLU(L,NY,NX)+XSOFXS(L,NY,NX)
       ZCL(L,NY,NX)=ZCL(L,NY,NX)+TCLFLS(L,NY,NX)+RCLFLU(L,NY,NX) &
-      +XCLFXS(L,NY,NX)
+        +XCLFXS(L,NY,NX)
       ZCO3(L,NY,NX)=ZCO3(L,NY,NX)+TRCO3(L,NY,NX)+TC3FLS(L,NY,NX) &
-      +XC3FXS(L,NY,NX)
+        +XC3FXS(L,NY,NX)
       ZHCO3(L,NY,NX)=ZHCO3(L,NY,NX)+TRHCO(L,NY,NX)+THCFLS(L,NY,NX) &
-      +XHCFXS(L,NY,NX)
+        +XHCFXS(L,NY,NX)
       ZALOH1(L,NY,NX)=ZALOH1(L,NY,NX)+TRAL1(L,NY,NX)+TAL1FS(L,NY,NX) &
-      +XAL1XS(L,NY,NX)
+        +XAL1XS(L,NY,NX)
       ZALOH2(L,NY,NX)=ZALOH2(L,NY,NX)+TRAL2(L,NY,NX)+TAL2FS(L,NY,NX) &
-      +XAL2XS(L,NY,NX)-TRXAL2(L,NY,NX)
+        +XAL2XS(L,NY,NX)-TRXAL2(L,NY,NX)
       ZALOH3(L,NY,NX)=ZALOH3(L,NY,NX)+TRAL3(L,NY,NX)+TAL3FS(L,NY,NX) &
-      +XAL3XS(L,NY,NX)
+        +XAL3XS(L,NY,NX)
       ZALOH4(L,NY,NX)=ZALOH4(L,NY,NX)+TRAL4(L,NY,NX)+TAL4FS(L,NY,NX) &
-      +XAL4XS(L,NY,NX)
+        +XAL4XS(L,NY,NX)
       ZALS(L,NY,NX)=ZALS(L,NY,NX)+TRALS(L,NY,NX)+TALSFS(L,NY,NX) &
-      +XALSXS(L,NY,NX)
+        +XALSXS(L,NY,NX)
       ZFEOH1(L,NY,NX)=ZFEOH1(L,NY,NX)+TRFE1(L,NY,NX)+TFE1FS(L,NY,NX) &
-      +XFE1XS(L,NY,NX)
+        +XFE1XS(L,NY,NX)
       ZFEOH2(L,NY,NX)=ZFEOH2(L,NY,NX)+TRFE2(L,NY,NX)+TFE2FS(L,NY,NX) &
-      +XFE2XS(L,NY,NX)-TRXFE2(L,NY,NX)
+        +XFE2XS(L,NY,NX)-TRXFE2(L,NY,NX)
       ZFEOH3(L,NY,NX)=ZFEOH3(L,NY,NX)+TRFE3(L,NY,NX)+TFE3FS(L,NY,NX) &
-      +XFE3XS(L,NY,NX)
+        +XFE3XS(L,NY,NX)
       ZFEOH4(L,NY,NX)=ZFEOH4(L,NY,NX)+TRFE4(L,NY,NX)+TFE4FS(L,NY,NX) &
-      +XFE4XS(L,NY,NX)
+        +XFE4XS(L,NY,NX)
       ZFES(L,NY,NX)=ZFES(L,NY,NX)+TRFES(L,NY,NX)+TFESFS(L,NY,NX) &
-      +XFESXS(L,NY,NX)
+        +XFESXS(L,NY,NX)
       ZCAO(L,NY,NX)=ZCAO(L,NY,NX)+TRCAO(L,NY,NX)+TCAOFS(L,NY,NX) &
-      +XCAOXS(L,NY,NX)
+        +XCAOXS(L,NY,NX)
       ZCAC(L,NY,NX)=ZCAC(L,NY,NX)+TRCAC(L,NY,NX)+TCACFS(L,NY,NX) &
-      +XCACXS(L,NY,NX)
+        +XCACXS(L,NY,NX)
       ZCAH(L,NY,NX)=ZCAH(L,NY,NX)+TRCAH(L,NY,NX)+TCAHFS(L,NY,NX) &
-      +XCAHXS(L,NY,NX)
+        +XCAHXS(L,NY,NX)
       ZCAS(L,NY,NX)=ZCAS(L,NY,NX)+TRCAS(L,NY,NX)+TCASFS(L,NY,NX) &
-      +XCASXS(L,NY,NX)
+        +XCASXS(L,NY,NX)
       ZMGO(L,NY,NX)=ZMGO(L,NY,NX)+TRMGO(L,NY,NX)+TMGOFS(L,NY,NX) &
-      +XMGOXS(L,NY,NX)
+        +XMGOXS(L,NY,NX)
       ZMGC(L,NY,NX)=ZMGC(L,NY,NX)+TRMGC(L,NY,NX)+TMGCFS(L,NY,NX) &
-      +XMGCXS(L,NY,NX)
+        +XMGCXS(L,NY,NX)
       ZMGH(L,NY,NX)=ZMGH(L,NY,NX)+TRMGH(L,NY,NX)+TMGHFS(L,NY,NX) &
-      +XMGHXS(L,NY,NX)
+        +XMGHXS(L,NY,NX)
       ZMGS(L,NY,NX)=ZMGS(L,NY,NX)+TRMGS(L,NY,NX)+TMGSFS(L,NY,NX) &
-      +XMGSXS(L,NY,NX)
+        +XMGSXS(L,NY,NX)
       ZNAC(L,NY,NX)=ZNAC(L,NY,NX)+TRNAC(L,NY,NX)+TNACFS(L,NY,NX) &
-      +XNACXS(L,NY,NX)
+        +XNACXS(L,NY,NX)
       ZNAS(L,NY,NX)=ZNAS(L,NY,NX)+TRNAS(L,NY,NX)+TNASFS(L,NY,NX) &
-      +XNASXS(L,NY,NX)
+        +XNASXS(L,NY,NX)
       ZKAS(L,NY,NX)=ZKAS(L,NY,NX)+TRKAS(L,NY,NX)+TKASFS(L,NY,NX) &
-      +XKASXS(L,NY,NX)
+        +XKASXS(L,NY,NX)
       H0PO4(L,NY,NX)=H0PO4(L,NY,NX)+TRH0P(L,NY,NX)+TH0PFS(L,NY,NX) &
-      +XH0PXS(L,NY,NX)
+        +XH0PXS(L,NY,NX)
       H3PO4(L,NY,NX)=H3PO4(L,NY,NX)+TRH3P(L,NY,NX)+TH3PFS(L,NY,NX) &
-      +XH3PXS(L,NY,NX)
+        +XH3PXS(L,NY,NX)
       ZFE1P(L,NY,NX)=ZFE1P(L,NY,NX)+TRF1P(L,NY,NX)+TF1PFS(L,NY,NX) &
-      +XF1PXS(L,NY,NX)
+        +XF1PXS(L,NY,NX)
       ZFE2P(L,NY,NX)=ZFE2P(L,NY,NX)+TRF2P(L,NY,NX)+TF2PFS(L,NY,NX) &
-      +XF2PXS(L,NY,NX)
+        +XF2PXS(L,NY,NX)
       ZCA0P(L,NY,NX)=ZCA0P(L,NY,NX)+TRC0P(L,NY,NX)+TC0PFS(L,NY,NX) &
-      +XC0PXS(L,NY,NX)
+        +XC0PXS(L,NY,NX)
       ZCA1P(L,NY,NX)=ZCA1P(L,NY,NX)+TRC1P(L,NY,NX)+TC1PFS(L,NY,NX) &
-      +XC1PXS(L,NY,NX)
+        +XC1PXS(L,NY,NX)
       ZCA2P(L,NY,NX)=ZCA2P(L,NY,NX)+TRC2P(L,NY,NX)+TC2PFS(L,NY,NX) &
-      +XC2PXS(L,NY,NX)
+        +XC2PXS(L,NY,NX)
       ZMG1P(L,NY,NX)=ZMG1P(L,NY,NX)+TRM1P(L,NY,NX)+TM1PFS(L,NY,NX) &
-      +XM1PXS(L,NY,NX)
+        +XM1PXS(L,NY,NX)
       H0POB(L,NY,NX)=H0POB(L,NY,NX)+TRH0B(L,NY,NX)+TH0BFB(L,NY,NX) &
-      +XH0BXB(L,NY,NX)
+        +XH0BXB(L,NY,NX)
       H3POB(L,NY,NX)=H3POB(L,NY,NX)+TRH3B(L,NY,NX)+TH3BFB(L,NY,NX) &
-      +XH3BXB(L,NY,NX)
+        +XH3BXB(L,NY,NX)
       ZFE1PB(L,NY,NX)=ZFE1PB(L,NY,NX)+TRF1B(L,NY,NX)+TF1BFB(L,NY,NX) &
-      +XF1BXB(L,NY,NX)
+        +XF1BXB(L,NY,NX)
       ZFE2PB(L,NY,NX)=ZFE2PB(L,NY,NX)+TRF2B(L,NY,NX)+TF2BFB(L,NY,NX) &
-      +XF2BXB(L,NY,NX)
+        +XF2BXB(L,NY,NX)
       ZCA0PB(L,NY,NX)=ZCA0PB(L,NY,NX)+TRC0B(L,NY,NX)+TC0BFB(L,NY,NX) &
-      +XC0BXB(L,NY,NX)
+        +XC0BXB(L,NY,NX)
       ZCA1PB(L,NY,NX)=ZCA1PB(L,NY,NX)+TRC1B(L,NY,NX)+TC1BFB(L,NY,NX) &
-      +XC1BXB(L,NY,NX)
+        +XC1BXB(L,NY,NX)
       ZCA2PB(L,NY,NX)=ZCA2PB(L,NY,NX)+TRC2B(L,NY,NX)+TC2BFB(L,NY,NX) &
-      +XC2BXB(L,NY,NX)
+        +XC2BXB(L,NY,NX)
       ZMG1PB(L,NY,NX)=ZMG1PB(L,NY,NX)+TRM1B(L,NY,NX)+TM1BFB(L,NY,NX) &
-      +XM1BXB(L,NY,NX)
+        +XM1BXB(L,NY,NX)
       ZALH(L,NY,NX)=ZALH(L,NY,NX)+TALFHS(L,NY,NX)-XALFXS(L,NY,NX)
       ZFEH(L,NY,NX)=ZFEH(L,NY,NX)+TFEFHS(L,NY,NX)-XFEFXS(L,NY,NX)
       ZHYH(L,NY,NX)=ZHYH(L,NY,NX)+THYFHS(L,NY,NX)-XHYFXS(L,NY,NX)
@@ -5655,100 +5702,79 @@ module RedistMod
       PFEOH(L,NY,NX)=PFEOH(L,NY,NX)+TRFEOH(L,NY,NX)
       PCACO(L,NY,NX)=PCACO(L,NY,NX)+TRCACO(L,NY,NX)
       PCASO(L,NY,NX)=PCASO(L,NY,NX)+TRCASO(L,NY,NX)
+
       PSS=31.0*(H0PO4(L,NY,NX)+H3PO4(L,NY,NX)+ZFE1P(L,NY,NX) &
-      +ZFE2P(L,NY,NX)+ZCA0P(L,NY,NX)+ZCA1P(L,NY,NX) &
-      +ZCA2P(L,NY,NX)+ZMG1P(L,NY,NX)+H0POB(L,NY,NX) &
-      +H3POB(L,NY,NX)+ZFE1PB(L,NY,NX)+ZFE2PB(L,NY,NX) &
-      +ZCA0PB(L,NY,NX)+ZCA1PB(L,NY,NX)+ZCA2PB(L,NY,NX) &
-      +ZMG1PB(L,NY,NX)+H0PO4H(L,NY,NX)+H3PO4H(L,NY,NX) &
-      +ZFE1PH(L,NY,NX)+ZFE2PH(L,NY,NX)+ZCA0PH(L,NY,NX) &
-      +ZCA1PH(L,NY,NX)+ZCA2PH(L,NY,NX)+ZMG1PH(L,NY,NX) &
-      +H0POBH(L,NY,NX)+H3POBH(L,NY,NX)+ZFE1BH(L,NY,NX) &
-      +ZFE2BH(L,NY,NX)+ZCA0BH(L,NY,NX)+ZCA1BH(L,NY,NX) &
-      +ZCA2BH(L,NY,NX)+ZMG1BH(L,NY,NX))
+        +ZFE2P(L,NY,NX)+ZCA0P(L,NY,NX)+ZCA1P(L,NY,NX) &
+        +ZCA2P(L,NY,NX)+ZMG1P(L,NY,NX)+H0POB(L,NY,NX) &
+        +H3POB(L,NY,NX)+ZFE1PB(L,NY,NX)+ZFE2PB(L,NY,NX) &
+        +ZCA0PB(L,NY,NX)+ZCA1PB(L,NY,NX)+ZCA2PB(L,NY,NX) &
+        +ZMG1PB(L,NY,NX)+H0PO4H(L,NY,NX)+H3PO4H(L,NY,NX) &
+        +ZFE1PH(L,NY,NX)+ZFE2PH(L,NY,NX)+ZCA0PH(L,NY,NX) &
+        +ZCA1PH(L,NY,NX)+ZCA2PH(L,NY,NX)+ZMG1PH(L,NY,NX) &
+        +H0POBH(L,NY,NX)+H3POBH(L,NY,NX)+ZFE1BH(L,NY,NX) &
+        +ZFE2BH(L,NY,NX)+ZCA0BH(L,NY,NX)+ZCA1BH(L,NY,NX) &
+        +ZCA2BH(L,NY,NX)+ZMG1BH(L,NY,NX))
       TLPO4=TLPO4+PSS
+
       SSS=ZAL(L,NY,NX)+ZFE(L,NY,NX)+ZHY(L,NY,NX)+ZCA(L,NY,NX) &
-      +ZMG(L,NY,NX)+ZNA(L,NY,NX)+ZKA(L,NY,NX)+ZOH(L,NY,NX) &
-      +ZSO4(L,NY,NX)+ZCL(L,NY,NX)+ZCO3(L,NY,NX)+H0PO4(L,NY,NX) &
-      +H0POB(L,NY,NX) &
-      +2.0*(ZHCO3(L,NY,NX)+ZALOH1(L,NY,NX) &
-      +ZALS(L,NY,NX)+ZFEOH1(L,NY,NX)+ZFES(L,NY,NX)+ZCAO(L,NY,NX) &
-      +ZCAC(L,NY,NX)+ZCAS(L,NY,NX)+ZMGO(L,NY,NX)+ZMGC(L,NY,NX) &
-      +ZMGS(L,NY,NX)+ZNAC(L,NY,NX)+ZNAS(L,NY,NX)+ZKAS(L,NY,NX) &
-      +ZCA0P(L,NY,NX)+ZCA0PB(L,NY,NX)) &
-      +3.0*(ZALOH2(L,NY,NX)+ZFEOH2(L,NY,NX)+ZCAH(L,NY,NX) &
-      +ZMGH(L,NY,NX)+ZFE1P(L,NY,NX)+ZCA1P(L,NY,NX)+ZMG1P(L,NY,NX) &
-      +ZFE1PB(L,NY,NX)+ZCA1PB(L,NY,NX)+ZMG1PB(L,NY,NX)) &
-      +4.0*(ZALOH3(L,NY,NX)+ZFEOH3(L,NY,NX)+H3PO4(L,NY,NX) &
-      +ZFE2P(L,NY,NX)+ZCA2P(L,NY,NX)+H3POB(L,NY,NX)+ZFE2PB(L,NY,NX) &
-      +ZCA2PB(L,NY,NX)) &
-      +5.0*(ZALOH4(L,NY,NX)+ZFEOH4(L,NY,NX))
+        +ZMG(L,NY,NX)+ZNA(L,NY,NX)+ZKA(L,NY,NX)+ZOH(L,NY,NX) &
+        +ZSO4(L,NY,NX)+ZCL(L,NY,NX)+ZCO3(L,NY,NX)+H0PO4(L,NY,NX) &
+        +H0POB(L,NY,NX) &
+        +2.0_r8*(ZHCO3(L,NY,NX)+ZALOH1(L,NY,NX) &
+        +ZALS(L,NY,NX)+ZFEOH1(L,NY,NX)+ZFES(L,NY,NX)+ZCAO(L,NY,NX) &
+        +ZCAC(L,NY,NX)+ZCAS(L,NY,NX)+ZMGO(L,NY,NX)+ZMGC(L,NY,NX) &
+        +ZMGS(L,NY,NX)+ZNAC(L,NY,NX)+ZNAS(L,NY,NX)+ZKAS(L,NY,NX) &
+        +ZCA0P(L,NY,NX)+ZCA0PB(L,NY,NX)) &
+        +3.0_r8*(ZALOH2(L,NY,NX)+ZFEOH2(L,NY,NX)+ZCAH(L,NY,NX) &
+        +ZMGH(L,NY,NX)+ZFE1P(L,NY,NX)+ZCA1P(L,NY,NX)+ZMG1P(L,NY,NX) &
+        +ZFE1PB(L,NY,NX)+ZCA1PB(L,NY,NX)+ZMG1PB(L,NY,NX)) &
+        +4.0*(ZALOH3(L,NY,NX)+ZFEOH3(L,NY,NX)+H3PO4(L,NY,NX) &
+        +ZFE2P(L,NY,NX)+ZCA2P(L,NY,NX)+H3POB(L,NY,NX)+ZFE2PB(L,NY,NX) &
+        +ZCA2PB(L,NY,NX)) &
+        +5.0*(ZALOH4(L,NY,NX)+ZFEOH4(L,NY,NX))
       SSH=ZALH(L,NY,NX)+ZFEH(L,NY,NX)+ZHYH(L,NY,NX)+ZCCH(L,NY,NX) &
-      +ZMAH(L,NY,NX)+ZNAH(L,NY,NX)+ZKAH(L,NY,NX)+ZOHH(L,NY,NX) &
-      +ZSO4H(L,NY,NX)+ZCLH(L,NY,NX)+ZCO3H(L,NY,NX) +H0PO4H(L,NY,NX) &
-      +H0POBH(L,NY,NX) &
-      +2.0*(ZHCO3H(L,NY,NX)+ZALO1H(L,NY,NX) &
-      +ZALSH(L,NY,NX)+ZFEO1H(L,NY,NX)+ZFESH(L,NY,NX)+ZCAOH(L,NY,NX) &
-      +ZCACH(L,NY,NX)+ZCASH(L,NY,NX)+ZMGOH(L,NY,NX)+ZMGCH(L,NY,NX) &
-      +ZMGSH(L,NY,NX)+ZNACH(L,NY,NX)+ZNASH(L,NY,NX)+ZKASH(L,NY,NX) &
-      +ZCA0PH(L,NY,NX)+ZCA0BH(L,NY,NX)) &
-      +3.0*(ZALO2H(L,NY,NX)+ZFEO2H(L,NY,NX)+ZCAHH(L,NY,NX) &
-      +ZMGHH(L,NY,NX)+ZFE1PH(L,NY,NX)+ZCA1PH(L,NY,NX)+ZMG1PH(L,NY,NX) &
-      +ZFE1BH(L,NY,NX)+ZCA1BH(L,NY,NX)+ZMG1BH(L,NY,NX)) &
-      +4.0*(ZALO3H(L,NY,NX)+ZFEO3H(L,NY,NX)+H3PO4H(L,NY,NX) &
-      +ZFE2PH(L,NY,NX)+ZCA2PH(L,NY,NX)+H3POBH(L,NY,NX) &
-      +ZFE2BH(L,NY,NX)+ZCA2BH(L,NY,NX)) &
-      +5.0*(ZALO4H(L,NY,NX)+ZFEO4H(L,NY,NX))
+        +ZMAH(L,NY,NX)+ZNAH(L,NY,NX)+ZKAH(L,NY,NX)+ZOHH(L,NY,NX) &
+        +ZSO4H(L,NY,NX)+ZCLH(L,NY,NX)+ZCO3H(L,NY,NX) +H0PO4H(L,NY,NX) &
+        +H0POBH(L,NY,NX) &
+        +2.0*(ZHCO3H(L,NY,NX)+ZALO1H(L,NY,NX) &
+        +ZALSH(L,NY,NX)+ZFEO1H(L,NY,NX)+ZFESH(L,NY,NX)+ZCAOH(L,NY,NX) &
+        +ZCACH(L,NY,NX)+ZCASH(L,NY,NX)+ZMGOH(L,NY,NX)+ZMGCH(L,NY,NX) &
+        +ZMGSH(L,NY,NX)+ZNACH(L,NY,NX)+ZNASH(L,NY,NX)+ZKASH(L,NY,NX) &
+        +ZCA0PH(L,NY,NX)+ZCA0BH(L,NY,NX)) &
+        +3.0*(ZALO2H(L,NY,NX)+ZFEO2H(L,NY,NX)+ZCAHH(L,NY,NX) &
+        +ZMGHH(L,NY,NX)+ZFE1PH(L,NY,NX)+ZCA1PH(L,NY,NX)+ZMG1PH(L,NY,NX) &
+        +ZFE1BH(L,NY,NX)+ZCA1BH(L,NY,NX)+ZMG1BH(L,NY,NX)) &
+        +4.0*(ZALO3H(L,NY,NX)+ZFEO3H(L,NY,NX)+H3PO4H(L,NY,NX) &
+        +ZFE2PH(L,NY,NX)+ZCA2PH(L,NY,NX)+H3POBH(L,NY,NX) &
+        +ZFE2BH(L,NY,NX)+ZCA2BH(L,NY,NX)) &
+        +5.0*(ZALO4H(L,NY,NX)+ZFEO4H(L,NY,NX))
 !
 !     TOTAL FERILIZER,EXCHANGEABLE CATIONS AND ANIONS, PRECIPITATES
 !
       SSF=ZNH3FA(L,NY,NX)+ZNHUFA(L,NY,NX)+ZNO3FA(L,NY,NX) &
-      +ZNH3FB(L,NY,NX)+ZNHUFB(L,NY,NX)+ZNO3FB(L,NY,NX) &
-      +2.0*(ZNH4FA(L,NY,NX)+ZNH4FB(L,NY,NX))
+        +ZNH3FB(L,NY,NX)+ZNHUFB(L,NY,NX)+ZNO3FB(L,NY,NX) &
+        +2.0*(ZNH4FA(L,NY,NX)+ZNH4FB(L,NY,NX))
       SSX=XHY(L,NY,NX)+XAL(L,NY,NX) &
-      +XFE(L,NY,NX)+XCA(L,NY,NX)+XMG(L,NY,NX) &
-      +XNA(L,NY,NX)+XKA(L,NY,NX)+XHC(L,NY,NX) &
-      +XOH0(L,NY,NX)+XOH0B(L,NY,NX) &
-      +2.0*(XN4(L,NY,NX)+XNB(L,NY,NX) &
-      +XOH1(L,NY,NX)+XOH1B(L,NY,NX)) &
-      +3.0*(XALO2(L,NY,NX)+XFEO2(L,NY,NX) &
-      +XOH2(L,NY,NX)+XOH2B(L,NY,NX) &
-      +XH1P(L,NY,NX)+XH1PB(L,NY,NX)) &
-      +4.0*(XH2P(L,NY,NX)+XH2PB(L,NY,NX))
+        +XFE(L,NY,NX)+XCA(L,NY,NX)+XMG(L,NY,NX) &
+        +XNA(L,NY,NX)+XKA(L,NY,NX)+XHC(L,NY,NX) &
+        +XOH0(L,NY,NX)+XOH0B(L,NY,NX) &
+        +2.0*(XN4(L,NY,NX)+XNB(L,NY,NX) &
+        +XOH1(L,NY,NX)+XOH1B(L,NY,NX)) &
+        +3.0*(XALO2(L,NY,NX)+XFEO2(L,NY,NX) &
+        +XOH2(L,NY,NX)+XOH2B(L,NY,NX) &
+        +XH1P(L,NY,NX)+XH1PB(L,NY,NX)) &
+        +4.0*(XH2P(L,NY,NX)+XH2PB(L,NY,NX))
       SSP=2.0*(PCACO(L,NY,NX)+PCASO(L,NY,NX) &
-      +PALPO(L,NY,NX)+PFEPO(L,NY,NX) &
-      +PALPB(L,NY,NX)+PFEPB(L,NY,NX)) &
-      +3.0*(PCAPD(L,NY,NX)+PCPDB(L,NY,NX)) &
-      +4.0*(PALOH(L,NY,NX)+PFEOH(L,NY,NX)) &
-      +7.0*(PCAPM(L,NY,NX)+PCPMB(L,NY,NX)) &
-      +9.0*(PCAPH(L,NY,NX)+PCPHB(L,NY,NX))
+        +PALPO(L,NY,NX)+PFEPO(L,NY,NX) &
+        +PALPB(L,NY,NX)+PFEPB(L,NY,NX)) &
+        +3.0*(PCAPD(L,NY,NX)+PCPDB(L,NY,NX)) &
+        +4.0*(PALOH(L,NY,NX)+PFEOH(L,NY,NX)) &
+        +7.0*(PCAPM(L,NY,NX)+PCPMB(L,NY,NX)) &
+        +9.0*(PCAPH(L,NY,NX)+PCPHB(L,NY,NX))
       SST=SSS+SSH+SSF+SSX+SSP
       TION=TION+SST
       UION(NY,NX)=UION(NY,NX)+SST
-!     IF(I.EQ.180.AND.J.EQ.12)THEN
-!     WRITE(*,3341)'SSS',I,J,NX,NY,L,SST,SSS,SSH,SSF,SSX,SSP,TION
-!    2 ZHY(L,NY,NX),ZAL(L,NY,NX),ZFE(L,NY,NX),ZCA(L,NY,NX)
-!    2,ZMG(L,NY,NX),ZNA(L,NY,NX),ZKA(L, NY,NX),ZOH(L,NY,NX)
-!    3,ZSO4(L,NY,NX),ZCL(L,NY,NX),ZCO3(L,NY,NX),H0PO4(L,NY,NX)
-!    4,H0POB(L,NY,NX)
-!    5,ZHCO3(L,NY,NX),ZALOH1(L,NY,NX)
-!    5,ZALS(L,NY,NX),ZFEOH1(L,NY,NX),ZFES(L,NY,NX),ZCAO(L,NY,NX)
-!    6,ZCAC(L,NY,NX),ZCAS(L,NY,NX),ZMGO(L,NY,NX),ZMGC(L,NY,NX)
-!    7,ZMGS(L,NY,NX),ZNAC(L,NY,NX),ZNAS(L,NY,NX),ZKAS(L,NY,NX)
-!    8,ZCA0P(L,NY,NX),ZCA0PB(L,NY,NX)
-!    9,ZALOH2(L,NY,NX),ZFEOH2(L,NY,NX),ZCAH(L,NY,NX)
-!    1,ZMGH(L,NY,NX),ZFE1P(L,NY,NX),ZCA1P(L,NY,NX),ZMG1P(L,NY,NX)
-!    2,ZFE1PB(L,NY,NX),ZCA1PB(L,NY,NX),ZMG1PB(L,NY,NX)
-!    3,ZALOH3(L,NY,NX),ZFEOH3(L,NY,NX),H3PO4(L,NY,NX)
-!    3,ZFE2P(L,NY,NX),ZCA2P(L,NY,NX),H3POB(L,NY,NX),ZFE2PB(L,NY,NX)
-!    5,ZCA2PB(L,NY,NX)
-!    6,ZALOH4(L,NY,NX),ZFEOH4(L,NY,NX)
-!     WRITE(*,3341)'SSX',I,J,NX,NY,L,SSX,XHY(L,NY,NX),XAL(L,NY,NX)
-!    2,XFE(L,NY,NX),XCA(L,NY,NX),XMG(L,NY,NX),XNA(L,NY,NX)
-!    3,XKA(L,NY,NX),XHC(L,NY,NX),XALO2(L,NY,NX),XFEO2(L,NY,NX)
-!    4,PCACO(L,NY,NX),PCASO(L,NY,NX),PALOH(L,NY,NX),PFEOH(L,NY,NX)
-!3341  FORMAT(A8,5I4,20F14.6)
-!     ENDIF
+
 !
 !     SOIL ELECTRICAL CONDUCTIVITY
 !
@@ -5768,32 +5794,12 @@ module RedistMod
       ECNO=0.071*AMAX1(0.0,ZNO3S(L,NY,NX)/(VOLW(L,NY,NX)*14.0))
       ECND(L,NY,NX)=ECHY+ECOH+ECAL+ECFE+ECCA+ECMG+ECNA+ECKA &
       +ECCO+ECHC+ECSO+ECCL+ECNO
-!     IF(I.EQ.180.AND.J.EQ.12)THEN
-!     WRITE(*,5656)'ECND',I,J,L
-!    2,ECND(L,NY,NX),VOLW(L,NY,NX),ECHY,ECOH,ECAL,ECFE,ECCA
-!    3,ECMG,ECNA,ECKA,ECCO,ECHC,ECSO,ECCL,ECNO
-!5656  FORMAT(A8,3I4,30E12.4)
-!     ENDIF
+
       ELSE
       ECND(L,NY,NX)=0.0_r8
       ENDIF
       ENDIF
-!     ENDIF
-!     WRITE(20,3339)'LBN',I,J,L,TLNH4,TLNO3,TZIN,TZOU
-!    2,Z4S,Z4X,Z4F,ZOS,ZOF,ZG
-!    2,ZOD,ZXD,ZGD
-!    3,ZGB,Z2B,ZHB
-!    3,XNH4S(L,NY,NX),ZNH4S(L,NY,NX)
-!    3,ZNH4SH(L,NY,NX),ZNH4B(L,NY,NX),ZNH4BH(L,NY,NX)
-!    2,ZNH3S(L,NY,NX),ZNH3SH(L,NY,NX),ZNH3B(L,NY,NX),ZNH3BH(L,NY,NX)
-!     WRITE(20,3339)'LBP',I,J,L,TLPO4,TPIN,TPOU,POD,PXD,PQD,PHD
-!    2,POS,POX,POP,PSS
-!    2,XH1PS(L,NY,NX),XH2PS(L,NY,NX),H1PO4(L,NY,NX),H2PO4(L,NY,NX)
-!    3,XH1P(L,NY,NX),XH2P(L,NY,NX),PALPO(L,NY,NX),PFEPO(L,NY,NX)
-!    6,PCAPD(L,NY,NX),PCAPM(L,NY,NX),PCAPH(L,NY,NX)
-!     WRITE(*,3339)'LBS',I,J,L,TION,TIONIN,TIONOU
-!    2,SSS,SSH,SSX,SSP,SSD,SHD,SSB
-!3339  FORMAT(A8,3I4,80E16.8)
+
 125   CONTINUE
       end subroutine UpdateChemInLayers
 !------------------------------------------------------------------------------------------
@@ -6796,7 +6802,7 @@ module RedistMod
           Z2OS(L1,NY,NX)=Z2OS(L1,NY,NX)+FX*Z2OS(L0,NY,NX)
           H2GS(L1,NY,NX)=H2GS(L1,NY,NX)+FX*H2GS(L0,NY,NX)
           IF(IFLGL(L,3).EQ.0)THEN
-            DO 7965 K=0,jcplx
+            DO 7965 K=0,jcplx1
               DO  N=1,7
                 DO  M=1,3
                   DO NGL=1,JG
@@ -6807,6 +6813,16 @@ module RedistMod
                 enddo
               enddo
 7965        CONTINUE
+              DO  N=1,7
+                DO  M=1,3
+                  DO NGL=1,JG
+                    OMCff(M,NGL,N,L1,NY,NX)=OMCff(M,NGL,N,L1,NY,NX)+FX*OMCff(M,NGL,N,L0,NY,NX)
+                    OMNff(M,NGL,N,L1,NY,NX)=OMNff(M,NGL,N,L1,NY,NX)+FX*OMNff(M,NGL,N,L0,NY,NX)
+                    OMPff(M,NGL,N,L1,NY,NX)=OMPff(M,NGL,N,L1,NY,NX)+FX*OMPff(M,NGL,N,L0,NY,NX)
+                  enddo
+                enddo
+              enddo
+
             DO 7780 K=0,jcplx1
               DO 7775 M=1,2
                 ORC(M,K,L1,NY,NX)=ORC(M,K,L1,NY,NX)+FX*ORC(M,K,L0,NY,NX)
@@ -7051,7 +7067,7 @@ module RedistMod
           Z2OS(L0,NY,NX)=FY*Z2OS(L0,NY,NX)
           H2GS(L0,NY,NX)=FY*H2GS(L0,NY,NX)
           IF(IFLGL(L,3).EQ.0)THEN
-            DO 7865 K=0,jcplx
+            DO 7865 K=0,jcplx1
               DO N=1,7
                 DO M=1,3
                   DO NGL=1,JG
@@ -7062,6 +7078,17 @@ module RedistMod
                 enddo
               enddo
 7865        CONTINUE
+
+              DO N=1,7
+                DO M=1,3
+                  DO NGL=1,JG
+                    OMCff(M,NGL,N,L0,NY,NX)=FY*OMCff(M,NGL,N,L0,NY,NX)
+                    OMNff(M,NGL,N,L0,NY,NX)=FY*OMNff(M,NGL,N,L0,NY,NX)
+                    OMPff(M,NGL,N,L0,NY,NX)=FY*OMPff(M,NGL,N,L0,NY,NX)
+                  ENDDO
+                enddo
+              enddo
+
             DO 7880 K=0,jcplx1
               DO 7875 M=1,2
                 ORC(M,K,L0,NY,NX)=FY*ORC(M,K,L0,NY,NX)
@@ -7152,67 +7179,7 @@ module RedistMod
               CDPTHY(L1,NY,NX)=CDPTHY(L0,NY,NX)
             ENDIF
           ENDIF
-          !     IF(NX.EQ.1)THEN
-          !     WRITE(*,5599)'POND2',I,J,NX,NY,L,L0,L1,NU(NY,NX),NN,FX,FY
-          !    2,DDLYRX(NN),VOLY(L0,NY,NX),VOLX(L0,NY,NX),VOLW(L0,NY,NX)
-          !    3,VOLI(L0,NY,NX),VOLY(L1,NY,NX),VOLX(L1,NY,NX),VOLW(L1,NY,NX)
-          !    4,VOLI(L1,NY,NX),CDPTH(L0,NY,NX),CDPTH(L1,NY,NX)
-          !    5,(OSC(M,1,L0,NY,NX),M=1,4),(OSC(M,1,L1,NY,NX),M=1,4)
-          !    6,DLYR(3,L0,NY,NX),DLYR(3,L1,NY,NX)
-          !    5,TKS(L0,NY,NX),TKS(L1,NY,NX)
-          !    5,VHCP(L0,NY,NX),VHCP(L1,NY,NX)
-          !    6,ZNH4S(L0,NY,NX),ZNH4B(L0,NY,NX),ZNH3S(L0,NY,NX),ZNH3B(L0,NY,NX)
-          !    6,ZNH4S(L1,NY,NX),ZNH4B(L1,NY,NX),ZNH3S(L1,NY,NX),ZNH3B(L1,NY,NX)
-          !    6,(WTRT1(1,L1,NR,1,NY,NX),NR=1,NRT(1,NY,NX))
-          !    6,(WTRT2(1,L1,NR,1,NY,NX),NR=1,NRT(1,NY,NX))
-          !    6,WTRTL(1,L1,1,NY,NX),WTNDL(L1,1,NY,NX)
-          !    6,CPOOLR(1,L1,1,NY,NX),ZPOOLR(1,L1,1,NY,NX)
-          !     6,OXYA(1,L1,1,NY,NX),OXYP(1,L1,1,NY,NX)
-          !    6,(WTRT1(1,L0,NR,1,NY,NX),NR=1,NRT(1,NY,NX))
-          !    6,(WTRT2(1,L0,NR,1,NY,NX),NR=1,NRT(1,NY,NX))
-          !     6,WTRTL(1,L0,1,NY,NX),WTNDL(L0,1,NY,NX)
-          !    6,CPOOLR(1,L0,1,NY,NX),ZPOOLR(1,L0,1,NY,NX)
-          !     6,OXYA(1,L0,1,NY,NX),OXYP(1,L0,1,NY,NX)
-          !      ENDIF
         ELSE
-        !     IF(NX.EQ.1)THEN
-        !     WRITE(*,5591)'SOIL1',I,J,NX,NY,L,L0,L1,NN,DDLYRX(NN),FX,FO
-        !    1,ZNH4SH(L0,NY,NX),ZNH4SH(L1,NY,NX)
-        !    1,BKDS(L0,NY,NX),BKDS(L1,NY,NX),FXBKDS,FXVOLW
-        !    5,ORGC(L0,NY,NX),ORGC(L1,NY,NX),CORGCI(L0,NY,NX),CORGCI(L1,NY,NX)
-        !    5,CLAY(L0,NY,NX),CLAY(L1,NY,NX),SILT(L0,NY,NX),SILT(L1,NY,NX)
-        !    5,SAND(L0,NY,NX),SAND(L1,NY,NX),ORGC(L0,NY,NX),ORGC(L1,NY,NX)
-        !    2,VOLA(L0,NY,NX),VOLW(L0,NY,NX),VOLI(L0,NY,NX),VOLP(L0,NY,NX)
-        !    3,VOLA(L1,NY,NX),VOLW(L1,NY,NX),VOLI(L1,NY,NX),VOLP(L1,NY,NX)
-        !    3,VOLX(L0,NY,NX),VOLX(L1,NY,NX),VOLY(L0,NY,NX)+VOLY(L1,NY,NX)
-        !    6,DLYR(3,L0,NY,NX),DLYR(3,L1,NY,NX)
-        !    4,VOLA(L0,NY,NX)+VOLA(L1,NY,NX),VOLW(L0,NY,NX)+VOLW(L1,NY,NX)
-        !    4,VOLI(L0,NY,NX)+VOLI(L1,NY,NX),VOLP(L0,NY,NX)+VOLP(L1,NY,NX)
-        !    4,CDPTH(L0,NY,NX),CDPTH(L1,NY,NX)
-        !    5,(OSC(M,4,L0,NY,NX),M=1,2),(OSC(M,4,L1,NY,NX),M=1,2)
-        !    6,((OSC(M,4,L0,NY,NX)+OSC(M,4,L1,NY,NX)),M=1,2)
-        !    5,(OQC(K,L0,NY,NX),K=0,4),(OQC(K,L1,NY,NX),K=0,4)
-        !    6,DLYR(3,L0,NY,NX),DLYR(3,L1,NY,NX)
-        !    5,TKS(L0,NY,NX),TKS(L1,NY,NX),VHCP(L0,NY,NX),VHCP(L1,NY,NX)
-        !    6,TKS(L0,NY,NX)*VHCP(L0,NY,NX)+TKS(L1,NY,NX)*VHCP(L1,NY,NX)
-        !    7,VHCM(L0,NY,NX),VHCM(L1,NY,NX)
-        !    6,ZNH4S(L0,NY,NX),ZNH4B(L0,NY,NX),ZNH3S(L0,NY,NX),ZNH3B(L0,NY,NX)
-        !    6,ZNH4S(L1,NY,NX),ZNH4B(L1,NY,NX),ZNH3S(L1,NY,NX),ZNH3B(L1,NY,NX)
-        !    6,OQAH(K,L,NY,NX),OQAH(K,L0,NY,NX),OQAH(K,L1,NY,NX),FXOQAH
-        !    7,CH4G(L0,NY,NX),CH4G(L1,NY,NX),FXCH4G
-        !    6,(WTRT1(1,L1,NR,2,NY,NX),NR=1,NRT(1,NY,NX))
-        !    6,(WTRT2(1,L1,NR,2,NY,NX),NR=1,NRT(1,NY,NX))
-        !    6,WTRTL(1,L1,2,NY,NX),WTNDL(L1,2,NY,NX)
-        !    6,CPOOLR(1,L1,2,NY,NX),ZPOOLR(1,L1,2,NY,NX)
-        !    6,OXYA(1,L1,2,NY,NX),OXYP(1,L1,2,NY,NX)
-        !    6,(WTRT1(1,L0,NR,2,NY,NX),NR=1,NRT(1,NY,NX))
-        !    6,(WTRT2(1,L0,NR,2,NY,NX),NR=1,NRT(1,NY,NX))
-        !    6,WTRTL(1,L0,2,NY,NX),WTNDL(L0,2,NY,NX)
-        !    6,CPOOLR(1,L0,2,NY,NX),ZPOOLR(1,L0,2,NY,NX)
-        !    6,OXYG(L0,NY,NX),OXYS(L0,NY,NX)
-        !    6,OXYG(L1,NY,NX),OXYS(L1,NY,NX)
-!5591  FORMAT(A8,8I4,60E16.8)
-!     ENDIF
 !
         !     MOVE ALL MATTER WITH CHANGES IN LAYER DEPTHS
         !
@@ -8037,7 +8004,8 @@ module RedistMod
       FXO=AMIN1(0.5,FO*AMIN1(10.0,CORGCI(L1,NY,NX) &
       /CORGCI(L0,NY,NX)))
       ENDIF
-      DO 7966 K=0,jcplx
+
+      DO 7966 K=0,jcplx1
       DO  N=1,7
       DO  M=1,3
       DO NGL=1,JG
@@ -8054,6 +8022,24 @@ module RedistMod
       enddo
       enddo
 7966  CONTINUE
+
+      DO  N=1,7
+      DO  M=1,3
+      DO NGL=1,JG
+      FXOMC=FXO*OMCff(M,NGL,N,L0,NY,NX)
+      OMCff(M,NGL,N,L1,NY,NX)=OMCff(M,NGL,N,L1,NY,NX)+FXOMC
+      OMCff(M,NGL,N,L0,NY,NX)=OMCff(M,NGL,N,L0,NY,NX)-FXOMC
+      FXOMN=FXO*OMNff(M,NGL,N,L0,NY,NX)
+      OMNff(M,NGL,N,L1,NY,NX)=OMNff(M,NGL,N,L1,NY,NX)+FXOMN
+      OMNff(M,NGL,N,L0,NY,NX)=OMNff(M,NGL,N,L0,NY,NX)-FXOMN
+      FXOMP=FXO*OMPff(M,NGL,N,L0,NY,NX)
+      OMPff(M,NGL,N,L1,NY,NX)=OMPff(M,NGL,N,L1,NY,NX)+FXOMP
+      OMPff(M,NGL,N,L0,NY,NX)=OMPff(M,NGL,N,L0,NY,NX)-FXOMP
+      enddo
+      enddo
+      enddo
+
+
       DO 7781 K=0,jcplx1
       DO 7776 M=1,2
       FXORC=FXO*ORC(M,K,L0,NY,NX)
@@ -8504,38 +8490,31 @@ module RedistMod
       TZNH3G=0.0_r8
       TH2GG=0.0_r8
       TH2GS=0.0_r8
-      DO 3990 K=0,jcplx
-      DO  N=1,7
-      DO  M=1,3
-      DO NGL=1,JG
-      TOMC(M,NGL,N,K)=0.0_r8
-      TOMN(M,NGL,N,K)=0.0_r8
-      TOMP(M,NGL,N,K)=0.0_r8
-      enddo
-      enddo
-      enddo
-3990  CONTINUE
-      DO 3980 K=0,jcplx1
-      DO 3975 M=1,2
-      TORC(M,K)=0.0_r8
-      TORN(M,K)=0.0_r8
-      TORP(M,K)=0.0_r8
-3975  CONTINUE
-      TOQC(K)=0.0_r8
-      TOQN(K)=0.0_r8
-      TOQP(K)=0.0_r8
-      TOQA(K)=0.0_r8
-      TOHC(K)=0.0_r8
-      TOHN(K)=0.0_r8
-      TOHP(K)=0.0_r8
-      TOHA(K)=0.0_r8
-      DO 3970 M=1,4
-      TOSC(M,K)=0.0_r8
-      TOSA(M,K)=0.0_r8
-      TOSN(M,K)=0.0_r8
-      TOSP(M,K)=0.0_r8
-3970  CONTINUE
-3980  CONTINUE
+
+      TOMC(:,:,:,:)=0.0_r8
+      TOMN(:,:,:,:)=0.0_r8
+      TOMP(:,:,:,:)=0.0_r8
+
+      TOMCff(:,:,:)=0.0_r8
+      TOMNff(:,:,:)=0.0_r8
+      TOMPff(:,:,:)=0.0_r8
+
+      TORC(:,:)=0.0_r8
+      TORN(:,:)=0.0_r8
+      TORP(:,:)=0.0_r8
+
+      TOQC(:)=0.0_r8
+      TOQN(:)=0.0_r8
+      TOQP(:)=0.0_r8
+      TOQA(:)=0.0_r8
+      TOHC(:)=0.0_r8
+      TOHN(:)=0.0_r8
+      TOHP(:)=0.0_r8
+      TOHA(:)=0.0_r8
+      TOSC(:,:)=0.0_r8
+      TOSA(:,:)=0.0_r8
+      TOSN(:,:)=0.0_r8
+      TOSP(:,:)=0.0_r8
       TZNFN2=0.0_r8
       TZNFNI=0.0_r8
       ZNHUX0=0.0_r8
@@ -8556,7 +8535,8 @@ module RedistMod
       DC=0.0_r8
       DN=0.0_r8
       DP=0.0_r8
-      DO 3950 K=0,jcplx
+
+      DO 3950 K=0,jcplx1
       IF(K.NE.3.AND.K.NE.4)THEN
       DO 3945 N=1,7
       DO  M=1,3
@@ -8575,6 +8555,24 @@ module RedistMod
 3945  CONTINUE
       ENDIF
 3950  CONTINUE
+
+      DO  N=1,7
+      DO  M=1,3
+      DO NGL=1,JG
+      TOMGCff(M,NGL,N)=OMCff(M,NGL,N,0,NY,NX)*CORP0
+      TOMGNff(M,NGL,N)=OMNff(M,NGL,N,0,NY,NX)*CORP0
+      TOMGPff(M,NGL,N)=OMPff(M,NGL,N,0,NY,NX)*CORP0
+      OMCff(M,NGL,N,0,NY,NX)=OMCff(M,NGL,N,0,NY,NX)*XCORP0
+      OMNff(M,NGL,N,0,NY,NX)=OMNff(M,NGL,N,0,NY,NX)*XCORP0
+      OMPff(M,NGL,N,0,NY,NX)=OMPff(M,NGL,N,0,NY,NX)*XCORP0
+      DC=DC+OMCff(M,NGL,N,0,NY,NX)
+      DN=DN+OMNff(M,NGL,N,0,NY,NX)
+      DP=DP+OMPff(M,NGL,N,0,NY,NX)
+      enddo
+      enddo
+    ENDDO
+
+
       DO 3940 K=0,2
       DO 3935 M=1,2
       TORXC(M,K)=ORC(M,K,0,NY,NX)*CORP0
@@ -8857,7 +8855,7 @@ module RedistMod
       TZNH3G=TZNH3G+TI*ZNH3G(L,NY,NX)
       TH2GG=TH2GG+TI*H2GG(L,NY,NX)
       TH2GS=TH2GS+TI*H2GS(L,NY,NX)
-      DO 4985 K=0,jcplx
+      DO 4985 K=0,jcplx1
       DO  N=1,7
       DO  M=1,3
       DO NGL=1,JG
@@ -8868,6 +8866,17 @@ module RedistMod
       enddo
       enddo
 4985  CONTINUE
+
+      DO  N=1,7
+      DO  M=1,3
+      DO NGL=1,JG
+      TOMCff(M,NGL,N)=TOMCff(M,NGL,N)+TI*OMCff(M,NGL,N,L,NY,NX)
+      TOMNff(M,NGL,N)=TOMNff(M,NGL,N)+TI*OMNff(M,NGL,N,L,NY,NX)
+      TOMPff(M,NGL,N)=TOMPff(M,NGL,N)+TI*OMPff(M,NGL,N,L,NY,NX)
+      enddo
+      enddo
+      enddo
+
       DO 4980 K=0,jcplx1
       DO 4975 M=1,2
       TORC(M,K)=TORC(M,K)+TI*ORC(M,K,L,NY,NX)
@@ -8944,10 +8953,6 @@ module RedistMod
       +TX*VOLW(L,NY,NX)+FI*TVOLWR
       VOLI(L,NY,NX)=TI*VOLI(L,NY,NX)+CORP*(FI*TVOLI-TI*VOLI(L,NY,NX)) &
       +TX*VOLI(L,NY,NX)
-!     VOLP(L,NY,NX)=TI*VOLP(L,NY,NX)+CORP*(FI*TVOLP-TI*VOLP(L,NY,NX))
-!    2+TX*VOLP(L,NY,NX)
-!     VOLA(L,NY,NX)=TI*VOLA(L,NY,NX)+CORP*(FI*TVOLA-TI*VOLA(L,NY,NX))
-!    2+TX*VOLA(L,NY,NX)
       VOLWX(L,NY,NX)=VOLW(L,NY,NX)
 !     VOLW(L,NY,NX)=VOLW(L,NY,NX)+CORP*VOLWH(L,NY,NX)
 !     VOLI(L,NY,NX)=VOLI(L,NY,NX)+CORP*VOLIH(L,NY,NX)
@@ -9265,7 +9270,8 @@ module RedistMod
       Z2GSH(L,NY,NX)=XCORP(NY,NX)*Z2GSH(L,NY,NX)
       Z2OSH(L,NY,NX)=XCORP(NY,NX)*Z2OSH(L,NY,NX)
       H2GSH(L,NY,NX)=XCORP(NY,NX)*H2GSH(L,NY,NX)
-      DO 5965 K=0,jcplx
+
+      DO 5965 K=0,jcplx1
       DO  N=1,7
       DO  M=1,3
       DO NGL=1,JG
@@ -9279,6 +9285,19 @@ module RedistMod
       enddo
       enddo
 5965  CONTINUE
+      DO  N=1,7
+      DO  M=1,3
+      DO NGL=1,JG
+      OMCff(M,NGL,N,L,NY,NX)=TI*OMCff(M,NGL,N,L,NY,NX)+CORP*(FI*TOMCff(M,NGL,N) &
+        -TI*OMCff(M,NGL,N,L,NY,NX))+TX*OMCff(M,NGL,N,L,NY,NX)
+      OMNff(M,NGL,N,L,NY,NX)=TI*OMNff(M,NGL,N,L,NY,NX)+CORP*(FI*TOMNff(M,NGL,N) &
+        -TI*OMNff(M,NGL,N,L,NY,NX))+TX*OMNff(M,NGL,N,L,NY,NX)
+      OMPff(M,NGL,N,L,NY,NX)=TI*OMPff(M,NGL,N,L,NY,NX)+CORP*(FI*TOMPff(M,NGL,N) &
+        -TI*OMPff(M,NGL,N,L,NY,NX))+TX*OMPff(M,NGL,N,L,NY,NX)
+      enddo
+      enddo
+      enddo
+
       DO 5980 K=0,jcplx1
       DO 5975 M=1,2
       ORC(M,K,L,NY,NX)=TI*ORC(M,K,L,NY,NX)+CORP*(FI*TORC(M,K) &
@@ -9323,7 +9342,7 @@ module RedistMod
 !     ADD STATE VARIABLES IN SURFACE RESIDUE INCORPORATED
 !     WITHIN TILLAGE MIXING ZONE
 !
-      DO 5910 K=0,jcplx
+      DO 5910 K=0,jcplx1
       IF(K.NE.3.AND.K.NE.4)THEN
       DO 5915 N=1,7
       DO M=1,3
@@ -9336,6 +9355,16 @@ module RedistMod
 5915  CONTINUE
       ENDIF
 5910  CONTINUE
+      DO  N=1,7
+      DO M=1,3
+      DO NGL=1,JG
+      OMCff(M,NGL,N,L,NY,NX)=OMCff(M,NGL,N,L,NY,NX)+FI*TOMGCff(M,NGL,N)
+      OMNff(M,NGL,N,L,NY,NX)=OMNff(M,NGL,N,L,NY,NX)+FI*TOMGNff(M,NGL,N)
+      OMPff(M,NGL,N,L,NY,NX)=OMPff(M,NGL,N,L,NY,NX)+FI*TOMGPff(M,NGL,N)
+      enddo
+      enddo
+      ENDDO
+
       DO 5920 K=0,2
       DO 5925 M=1,2
       ORC(M,K,L,NY,NX)=ORC(M,K,L,NY,NX)+FI*TORXC(M,K)
@@ -9367,22 +9396,40 @@ module RedistMod
       DC=0.0_r8
       DN=0.0_r8
       DP=0.0_r8
-      DO 5985 K=0,jcplx
+
+      DO 5985 K=0,jcplx1
       DO  N=1,7
       DO  M=1,3
       DO NGL=1,JG
       OC=OC+OMC(M,NGL,N,K,L,NY,NX)
       ON=ON+OMN(M,NGL,N,K,L,NY,NX)
       OP=OP+OMP(M,NGL,N,K,L,NY,NX)
-      IF(K.LE.2)THEN
-      DC=DC+OMC(M,NGL,N,K,L,NY,NX)
-      DN=DN+OMN(M,NGL,N,K,L,NY,NX)
-      DP=DP+OMP(M,NGL,N,K,L,NY,NX)
-      ENDIF
       enddo
       enddo
       enddo
 5985  CONTINUE
+
+      DO  K=0,2
+      DO  N=1,7
+      DO  M=1,3
+      DO NGL=1,JG
+      DC=DC+OMC(M,NGL,N,K,L,NY,NX)
+      DN=DN+OMN(M,NGL,N,K,L,NY,NX)
+      DP=DP+OMP(M,NGL,N,K,L,NY,NX)
+      enddo
+      enddo
+      enddo
+   ENDDO
+      DO  N=1,7
+      DO  M=1,3
+      DO NGL=1,JG
+      OC=OC+OMCff(M,NGL,N,L,NY,NX)
+      ON=ON+OMNff(M,NGL,N,L,NY,NX)
+      OP=OP+OMPff(M,NGL,N,L,NY,NX)
+      enddo
+      enddo
+      enddo
+
       DO 6995 K=0,jcplx1
       DO 6985 M=1,2
       OC=OC+ORC(M,K,L,NY,NX)
@@ -9394,6 +9441,7 @@ module RedistMod
       DP=DP+ORP(M,K,L,NY,NX)
       ENDIF
 6985  CONTINUE
+
       OC=OC+OQC(K,L,NY,NX)+OQCH(K,L,NY,NX)+OHC(K,L,NY,NX) &
       +OQA(K,L,NY,NX)+OQAH(K,L,NY,NX)+OHA(K,L,NY,NX)
       ON=ON+OQN(K,L,NY,NX)+OQNH(K,L,NY,NX)+OHN(K,L,NY,NX)
@@ -9503,13 +9551,6 @@ module RedistMod
       !endif
       CRAIN=CRAIN+RAINR
       HEATIN=HEATIN+HRAINR
-!     IF((I/30)*30.EQ.I.AND.J.EQ.15)THEN
-!     WRITE(*,8486)'OSC0',I,J,K,M,OSC(M,K,0,NY,NX)
-!    2,OSN(M,K,0,NY,NX),OSP(M,K,0,NY,NX),CSNT(M,K,0,NY,NX)
-!    3,ZSNT(M,K,0,NY,NX),PSNT(M,K,0,NY,NX)
-!    4,RAINR,HRAINR,FLWR(NY,NX),HFLWR(NY,NX)
-!8486  FORMAT(A8,4I4,20E12.4)
-!     ENDIF
     enddo
 6965  CONTINUE
   !
@@ -9540,7 +9581,7 @@ module RedistMod
   !     RNO2X=total demand for NO2 reduction
   !     RVMXC=demand for NO2 reduction
 !
-  DO 8990 K=0,jcplx
+  DO 8990 K=0,jcplx1
     IF(K.NE.3.AND.K.NE.4)THEN
       DO 8980 N=1,7
         DO NGL=1,JG
@@ -9557,14 +9598,32 @@ module RedistMod
           RNO3X(NU(NY,NX),NY,NX)=RNO3X(NU(NY,NX),NY,NX)+RINOOR(NGL,N,K,NY,NX)
           RPO4X(NU(NY,NX),NY,NX)=RPO4X(NU(NY,NX),NY,NX)+RIPOOR(NGL,N,K,NY,NX)
           RP14X(NU(NY,NX),NY,NX)=RP14X(NU(NY,NX),NY,NX)+RIPO1R(NGL,N,K,NY,NX)
-          IF(K.LE.4)THEN
-            ROQCX(K,0,NY,NX)=ROQCX(K,0,NY,NX)+ROQCS(NGL,N,K,0,NY,NX)
-            ROQAX(K,0,NY,NX)=ROQAX(K,0,NY,NX)+ROQAS(NGL,N,K,0,NY,NX)
-          ENDIF
+          ROQCX(K,0,NY,NX)=ROQCX(K,0,NY,NX)+ROQCS(NGL,N,K,0,NY,NX)
+          ROQAX(K,0,NY,NX)=ROQAX(K,0,NY,NX)+ROQAS(NGL,N,K,0,NY,NX)
         ENDDO
 8980  CONTINUE
     ENDIF
 8990  CONTINUE
+
+      DO  N=1,7
+        DO NGL=1,JG
+          ROXYX(0,NY,NX)=ROXYX(0,NY,NX)+ROXYSff(NGL,N,0,NY,NX)
+          RNH4X(0,NY,NX)=RNH4X(0,NY,NX)+RVMX4ff(NGL,N,0,NY,NX)
+          RNO3X(0,NY,NX)=RNO3X(0,NY,NX)+RVMX3ff(NGL,N,0,NY,NX)
+          RNO2X(0,NY,NX)=RNO2X(0,NY,NX)+RVMX2ff(NGL,N,0,NY,NX)
+          RN2OX(0,NY,NX)=RN2OX(0,NY,NX)+RVMX1ff(NGL,N,0,NY,NX)
+          RNH4X(0,NY,NX)=RNH4X(0,NY,NX)+RINHOff(NGL,N,0,NY,NX)
+          RNO3X(0,NY,NX)=RNO3X(0,NY,NX)+RINOOff(NGL,N,0,NY,NX)
+          RPO4X(0,NY,NX)=RPO4X(0,NY,NX)+RIPOOff(NGL,N,0,NY,NX)
+          RP14X(0,NY,NX)=RP14X(0,NY,NX)+RIPO1ff(NGL,N,0,NY,NX)
+          RNH4X(NU(NY,NX),NY,NX)=RNH4X(NU(NY,NX),NY,NX)+RINHORff(NGL,N,NY,NX)
+          RNO3X(NU(NY,NX),NY,NX)=RNO3X(NU(NY,NX),NY,NX)+RINOORff(NGL,N,NY,NX)
+          RPO4X(NU(NY,NX),NY,NX)=RPO4X(NU(NY,NX),NY,NX)+RIPOORff(NGL,N,NY,NX)
+          RP14X(NU(NY,NX),NY,NX)=RP14X(NU(NY,NX),NY,NX)+RIPO1Rff(NGL,N,NY,NX)
+
+        ENDDO
+      ENDDO
+
   RNO2X(0,NY,NX)=RNO2X(0,NY,NX)+RVMXC(0,NY,NX)
   end subroutine AddFluxToSurfaceResidue
 

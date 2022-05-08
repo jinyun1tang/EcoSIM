@@ -1068,7 +1068,7 @@ implicit none
   allocate(VLNH4s1(0:JZ1))
   allocate(VLNHBs1(0:JZ1))
   allocate(ZOSGLs1(0:JZ1))
-  allocate(ZLs1(0:JZ1))
+  allocate(ZLs1(0:JC1))
   allocate(AREA3s1(0:JZ1))
   allocate(ZNO3Ss1(0:JZ1))
   allocate(ZNO3Bs1(0:JZ1))

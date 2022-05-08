@@ -17,12 +17,14 @@ module CanopyCondsMod
   real(r8), parameter :: ABSPW=1.0_r8-ALBPW
   real(r8), parameter :: CFW=0.5_r8         !stalk clumping factor,FORGW=minimum SOC or organic soil (g Mg-1)
 
+  integer :: curday
   contains
   subroutine CanopyConditionModel(I,J,DPTH0s1)
   implicit none
   integer, intent(in) :: I,J
   real(r8), intent(in) :: DPTH0s1 !water+ice depth at surface
 
+  curday=I
   call MultiLayerSurfaceRadiation(I,J,DPTH0s1)
 
   call DivideCanopyLayerByLAI()
@@ -123,7 +125,9 @@ module CanopyCondsMod
         ARX=ARLFTs1(L-1)+ARSTTs1(L-1)
         DZL=ZLs1(L-1)-ZLs1(L-2)
         IF(ARX.GT.ZEROSs1)THEN
-          ZL1(L-1)=ZLs1(L-1)-0.5*AMIN1(1.0,(ART-ARL)/ARX)*DZL
+          ZL1(L-1)=ZLs1(L-1)-0.5_r8*AMIN1(1.0_r8,(ART-ARL)/ARX)*DZL
+        ELSE
+          ZL1(L-1)=ZLs1(L-1)
         ENDIF
       ELSE
         ZL1(L-1)=ZLs1(L-1)
@@ -217,6 +221,8 @@ module CanopyCondsMod
     ARLFSs1(NZ)=0.0
     DO  NB=1,NBRs1(NZ)
       DO  L=1,JC1
+        if(ZLs1(L-1)/=ZLs1(L-1))&
+        print*,L,ZLs1(L),ZLs1(L-1)
         IF(ZLs1(L-1).GE.DPTHSs1-ZEROs1 &
           .AND.ZLs1(L-1).GE.DPTH0s1-ZEROs1)THEN
           DO 1130 K=1,JNODS1

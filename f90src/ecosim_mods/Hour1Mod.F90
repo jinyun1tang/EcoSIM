@@ -1532,7 +1532,7 @@ module Hour1Mod
   !
   OC=0.0_r8
   DO L=0,NL(NY,NX)
-  DO 7970 K=0,5
+  DO 7970 K=0,4
     DO 7950 N=1,7
       DO NGL=1,JG
         DO  M=1,3
@@ -1541,6 +1541,14 @@ module Hour1Mod
       ENDDO
 7950  CONTINUE
 7970  CONTINUE
+
+  DO  N=1,7
+    DO NGL=1,JG
+      DO  M=1,3
+        OC=OC+OMCff(M,NGL,N,L,NY,NX)
+      enddo
+    ENDDO
+  ENDDO
 
   DO 7900 K=0,jcplx1
     DO 7920 M=1,2
@@ -2477,11 +2485,6 @@ module Hour1Mod
             OMC(M,NGL,N,K,LFDPTH,NY,NX)=OMC(M,NGL,N,K,LFDPTH,NY,NX)+OMC1
             OMN(M,NGL,N,K,LFDPTH,NY,NX)=OMN(M,NGL,N,K,LFDPTH,NY,NX)+OMN1
             OMP(M,NGL,N,K,LFDPTH,NY,NX)=OMP(M,NGL,N,K,LFDPTH,NY,NX)+OMP1
-!     WRITE(*,2345)'OMCI',I,J,LFDPTH,K,N,M
-!    2,OMC1,OMN1,OMP1,OSCI,OMCI(M,K)
-!    2,OMCF(N),OSCX,CNOMC(M,NGL,N,K),CPOMC(M,NGL,N,K),OSNI,OSPI
-!    2,OMC(M,NGL,N,K,LFDPTH,NY,NX),OMN(M,NGL,N,K,LFDPTH,NY,NX)
-!2345  FORMAT(A8,6I4,20E12.4)
             OSCX=OSCX+OMC1
             OSNX=OSNX+OMN1
             OSPX=OSPX+OMP1

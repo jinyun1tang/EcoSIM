@@ -24,6 +24,8 @@ module SurfLitterDataType
   real(r8) ,allocatable ::  FLQRI(:,:)                       !irrigation flux into surface litter, [m3 d-2 h-1]
   real(r8) ,allocatable ::  POROS0(:,:)                      !litter porosity
   real(r8) ,allocatable ::  RC0(:,:,:)                       !surface litter in each complex	g d-2
+  real(r8),allocatable :: RC0ff(:,:)
+
   private :: InitAllocate
   contains
 !----------------------------------------------------------------------
@@ -56,7 +58,7 @@ module SurfLitterDataType
   allocate(FLQRI(JY,JX));        FLQRI=0._r8
   allocate(POROS0(JY,JX));       POROS0=0._r8
   allocate(RC0(0:jcplx,JY,JX));      Rc0=0._r8
-
+  allocate(RC0ff(JY,JX)); RC0ff=0._r8
   end subroutine InitAllocate
 
 !----------------------------------------------------------------------
@@ -78,6 +80,7 @@ module SurfLitterDataType
   if (allocated(FLQRI))    deallocate(FLQRI)
   if (allocated(POROS0))   deallocate(POROS0)
   if (allocated(RC0))      deallocate(RC0)
+  if (allocated(RC0ff))     deallocate(RC0ff)
 
   end subroutine DestructSurfLitter
 
