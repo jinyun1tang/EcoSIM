@@ -12,10 +12,6 @@ module SOMDataType
   real(r8),allocatable :: CFOSC(:,:,:,:,:)                   !fraction of SOC in kinetic components
   real(r8),allocatable :: CNOSC(:,:,:,:,:)                   !N:C,ratios of SOC kinetic components
   real(r8),allocatable :: CPOSC(:,:,:,:,:)                   !P:C ratios of SOC kinetic components
-  real(r8),allocatable :: CNOFC(:,:)                         !fractions to allocate N to kinetic components
-  real(r8),allocatable :: CPOFC(:,:)                         !fractions to allocate P to kinetic components
-  real(r8),allocatable :: CNRH(:)                            !default N:C ratios in SOC complexes
-  real(r8),allocatable :: CPRH(:)                            !default P:C ratios in SOC complexes
   real(r8),allocatable :: OSC(:,:,:,:,:)                     !humus soil C	[g d-2]
   real(r8),allocatable :: OSN(:,:,:,:,:)                     !humus soil N	[g d-2]
   real(r8),allocatable :: OSP(:,:,:,:,:)                     !humus soil P	[g d-2]
@@ -36,8 +32,6 @@ module SOMDataType
   real(r8),allocatable :: OQAH(:,:,:,:)                      !dissolved acetate macropore	[g d-2]
   real(r8),allocatable :: ORGC(:,:,:)                        !total soil organic C [g d-2]
   real(r8),allocatable :: ORGN(:,:,:)                        !total soil organic N [g d-2]
-  real(r8),allocatable :: OMCF(:)                            !hetero microbial biomass composition in SOC
-  real(r8),allocatable :: OMCA(:)                            !autotrophic microbial biomass composition in SOC
   real(r8),allocatable :: ORGCX(:,:,:)                       !SOC concentration	[g Mg-1]
   real(r8),allocatable :: OSA(:,:,:,:,:)                     !colonized humus C in each complex [g d-2]
   real(r8),allocatable :: ORGR(:,:,:)                        !total particulate organic C [g d-2]
@@ -74,10 +68,6 @@ module SOMDataType
 
   call InitAllocate
 
-  CNRH=(/3.33E-02_r8,3.33E-02_r8,3.33E-02_r8,5.00E-02_r8,12.50E-02_r8/)
-  CPRH=(/3.33E-03_r8,3.33E-03_r8,3.33E-03_r8,5.00E-03_r8,12.50E-03_r8/)
-  OMCF=(/0.20_r8,0.20_r8,0.30_r8,0.20_r8,0.050_r8,0.025_r8,0.025_r8/)
-  OMCA=(/0.06_r8,0.02_r8,0.01_r8,0.0_r8,0.01_r8,0.0_r8,0.0_r8/)
   end subroutine InitSOMData
 !------------------------------------------------------------------------------------------
 
@@ -90,10 +80,6 @@ module SOMDataType
   allocate(CFOSC(jsken,0:jcplx1,0:JZ,JY,JX))
   allocate(CNOSC(jsken,0:jcplx1,0:JZ,JY,JX))
   allocate(CPOSC(jsken,0:jcplx1,0:JZ,JY,JX))
-  allocate(CNOFC(jsken,0:2))
-  allocate(CPOFC(jsken,0:2))
-  allocate(CNRH(0:jcplx1))
-  allocate(CPRH(0:jcplx1))
   allocate(OSC(jsken,0:jcplx1,0:JZ,JY,JX))
   allocate(OSN(jsken,0:jcplx1,0:JZ,JY,JX))
   allocate(OSP(jsken,0:jcplx1,0:JZ,JY,JX))
@@ -114,8 +100,6 @@ module SOMDataType
   allocate(OQAH(0:jcplx1,0:JZ,JY,JX))
   allocate(ORGC(0:JZ,JY,JX))
   allocate(ORGN(0:JZ,JY,JX))
-  allocate(OMCF(7))
-  allocate(OMCA(7))
   allocate(ORGCX(0:JZ,JY,JX))
   allocate(OSA(jsken,0:jcplx1,0:JZ,JY,JX))
   allocate(ORGR(0:JZ,JY,JX))
@@ -155,10 +139,6 @@ module SOMDataType
   if(allocated(CFOSC))deallocate(CFOSC)
   if(allocated(CNOSC))deallocate(CNOSC)
   if(allocated(CPOSC))deallocate(CPOSC)
-  if(allocated(CNOFC))deallocate(CNOFC)
-  if(allocated(CPOFC))deallocate(CPOFC)
-  if(allocated(CNRH))deallocate(CNRH)
-  if(allocated(CPRH))deallocate(CPRH)
   if(allocated(OSC))deallocate(OSC)
   if(allocated(OSN))deallocate(OSN)
   if(allocated(OSP))deallocate(OSP)
@@ -179,8 +159,6 @@ module SOMDataType
   if(allocated(OQAH))deallocate(OQAH)
   if(allocated(ORGC))deallocate(ORGC)
   if(allocated(ORGN))deallocate(ORGN)
-  if(allocated(OMCF))deallocate(OMCF)
-  if(allocated(OMCA))deallocate(OMCA)
   if(allocated(ORGCX))deallocate(ORGCX)
   if(allocated(OSA))deallocate(OSA)
   if(allocated(ORGR))deallocate(ORGR)

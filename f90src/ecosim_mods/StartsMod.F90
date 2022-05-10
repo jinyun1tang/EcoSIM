@@ -12,7 +12,7 @@ module StartsMod
   use SOMDataType
   use ChemTranspDataType
   use FertilizerDataType
-  use InitSOMBGC
+  use InitSOMBGCMod, only : InitSOMConsts,InitSOMProfile,InitSOMVars
   use CanopyRadDataType
   use GridConsts
   use SoilPhysDataType
@@ -59,8 +59,7 @@ module StartsMod
   SUBROUTINE starts(NHW,NHE,NVN,NVS)
   !
   !     THIS SUBROUTINE INITIALIZES ALL SOIL VARIABLES
-  !
-  use InitSOMBGC, only : InitMicbStoichiometry
+
   use InitVegBGC, only : InitIrradianceGeometry
   implicit none
   integer, intent(in) :: NHW,NHE,NVN,NVS
@@ -74,15 +73,10 @@ module StartsMod
 
 
   !  Initialize controlling parameters
-  call InitControlParameters
+  call InitControlParms
   !
   !     IRRADIANCE INTERCEPTION GEOMETRY
   call InitIrradianceGeometry(YSIN,YCOS,YAZI)
-  !
-  !     INITIALIZE C-N AND C-P RATIOS OF RESIDUE AND SOIL
-  !
-  call InitMicbStoichiometry
-  !
   !     CALCULATE ELEVATION OF EACH GRID CELL
   !
   call InitGridElevation(NHW,NHE,NVN,NVS,YSIN,YCOS,YAZI,ALTY)
@@ -700,7 +694,7 @@ module StartsMod
 9985  CONTINUE
   end subroutine InitGridElevation
 !------------------------------------------------------------------------------------------
-  subroutine InitControlParameters
+  subroutine InitControlParms
   implicit none
   !     begin_execution
   real(r8) :: XNPV
@@ -771,7 +765,7 @@ module StartsMod
   XPSN=0.0_r8
   TIONIN=0.0_r8
   TIONOU=0.0_r8
-  end subroutine InitControlParameters
+  end subroutine InitControlParms
 !------------------------------------------------------------------------------------------
   subroutine InitAccumulators()
   implicit none

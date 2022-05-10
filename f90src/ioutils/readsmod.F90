@@ -316,8 +316,8 @@ module readsmod
     if(lverb)then
       write(*,'(40A)')('-',ll=1,40)
       write(*,*)'read weather file head from ',DATAC(3,NE,NEX)
-      write(*,*)'time step format: TTYPE ',TTYPE
-      write(*,*)'calendar format: CTYPE ',CTYPE
+      write(*,*)'time step format: TTYPE ',TTYPE,trim(getclimttype(TTYPE))
+      write(*,*)'calendar format: CTYPE ',CTYPE,trim(getclimctype(CTYPE))
       write(*,*)'number of time variables: NI ',NI
       write(*,*)'time var type: IVAR ',(IVAR(K),K=1,NI)
       write(*,*)'number of weather data variables: NN ',NN
@@ -1259,4 +1259,37 @@ module readsmod
   GO60=.TRUE.
   end subroutine readdayweather
 
+!------------------------------------------------------------------------------------------
+
+  function getclimttype(ttype)result(ans)
+!  return climate data time step
+  implicit none
+  character(len=1), intent(in):: ttype
+  character(len=16) :: ans
+
+  select case (ttype)
+  case ('D')
+    ans='daily'
+  case ('H')
+    ans='hourly'
+  case ('3')
+    ans='3-hourly'
+  end select
+  end function getclimttype
+
+!------------------------------------------------------------------------------------------
+
+  function getclimctype(ctype)result(ans)
+! return climate calendar type
+  implicit none
+  character(len=1), intent(in) :: ctype
+  character(len=16) :: ans
+
+  select case(ctype)
+  case ('J')
+    ans='Julian day'
+  case default
+    ans='not julian day'
+  end select
+  end function getclimctype
 end module readsmod

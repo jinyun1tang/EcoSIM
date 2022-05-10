@@ -29,6 +29,7 @@ module nitro1LayerMod
   use SoilPropertyDataType
   use IrrigationDataType
   use PlantDataRateType
+  use MicBGCPars, only : micpar
   implicit none
 
   private
@@ -219,8 +220,12 @@ module nitro1LayerMod
     FOM2ff   => nmics%FOM2ff ,     &
     FCNff    => nmics%FCNff  ,     &
     FCPff    => nmics%FCPff  ,     &
-    FCNPff   => nmics%FCNPff       &
-
+    FCNPff   => nmics%FCNPff ,     &
+    CNOMCff  => micpar%CNOMCff,     &
+    CPOMCff  => micpar%CPOMCff,    &
+    CNOMC  => micpar%CNOMC,     &
+    CPOMC  => micpar%CPOMC,    &
+    FL       => micpar%FL          &
   )
 
 ! get KL, the number of mic-om complexes
@@ -1387,7 +1392,10 @@ module nitro1LayerMod
     TONX  => ncplxs%TONX,    &
     TOPX  => ncplxs%TOPX,    &
     VOLWZ =>  nmicdiag%VOLWZ,&
-    TFNX  =>  nmicdiag%TFNX  &
+    TFNX  =>  nmicdiag%TFNX ,&
+    SPOSC => micpar%SPOSC   ,&
+    CNRH  => micpar%CNRH    ,&
+    CPRH  => micpar%CPRH     &
   )
 !     FCPK=N,P limitation to microbial activity in each K
 !     CNOMX,CPOMX=N:C,P:C ratios relative to set maximum values
@@ -2097,7 +2105,8 @@ module nitro1LayerMod
   associate(                 &
     ROQCK  => ncplxf%ROQCK,  &
     OSCT  => ncplxs%OSCT,    &
-    OSAT  => ncplxs%OSAT     &
+    OSAT  => ncplxs%OSAT,    &
+    DOSA  => micpar%DOSA     &
   )
 !     OSCT,OSAT,OSCX=total,colonized,uncolonized SOC
 !     OSA,OSC=colonized,total litter
@@ -3086,12 +3095,12 @@ module nitro1LayerMod
 !     ROQCD=microbial respiration used to represent microbial activity
 !
   FSBST=COQA(K,L,NY,NX)/(COQA(K,L,NY,NX)+OQKAM)
-  RGOGY=AMAX1(0.0,FCNP(NGL,N,K)*VMXM*WFNG*OMA(NGL,N,K))
+  RGOGY=AMAX1(0.0_r8,FCNP(NGL,N,K)*VMXM*WFNG*OMA(NGL,N,K))
   RGOGZ=RGOGY*FSBST*TFNX
-  RGOGX=AMAX1(0.0,OQA(K,L,NY,NX)*FOQA*ECHZ)
+  RGOGX=AMAX1(0.0_r8,OQA(K,L,NY,NX)*FOQA*ECHZ)
   RGOMP=AMIN1(RGOGX,RGOGZ)
   FGOCP=0.0_r8
-  FGOAP=1.0
+  FGOAP=1.0_r8
   ROXYM(NGL,N,K)=0.0_r8
   ROXYP(NGL,N,K)=0.0_r8
   ROXYS(NGL,N,K,L,NY,NX)=0.0_r8
@@ -4006,7 +4015,9 @@ module nitro1LayerMod
    RIPO4R  => nmicf%RIPO4R,  &
    RIP14  => nmicf%RIP14,    &
    RIP1B  => nmicf%RIP1B,    &
-   RIP14R  => nmicf%RIP14R   &
+   RIP14R  => nmicf%RIP14R,  &
+   CNOMC  => micpar%CNOMC   , &
+   CPOMC  => micpar%CPOMC     &
   )
 !     MINERALIZATION-IMMOBILIZATION OF NH4 IN SOIL FROM MICROBIAL
 !     C:N AND NH4 CONCENTRATION IN BAND AND NON-BAND SOIL ZONES
@@ -4368,7 +4379,10 @@ module nitro1LayerMod
    RIPO4Rff  => nmicf%RIPO4Rff,  &
    RIP14ff  => nmicf%RIP14ff,    &
    RIP1Bff  => nmicf%RIP1Bff,    &
-   RIP14Rff  => nmicf%RIP14Rff   &
+   RIP14Rff  => nmicf%RIP14Rff,  &
+   CNOMCff  => micpar%CNOMCff   , &
+   CPOMCff  => micpar%CPOMCff     &
+
   )
 !     MINERALIZATION-IMMOBILIZATION OF NH4 IN SOIL FROM MICROBIAL
 !     C:N AND NH4 CONCENTRATION IN BAND AND NON-BAND SOIL ZONES
@@ -4710,7 +4724,9 @@ module nitro1LayerMod
     RMOMCff => nmicf%RMOMCff ,    &
     RGOMOff  => nmicf%RGOMOff,    &
     RGN2Fff => nmicf%RGN2Fff,  &
-    RN2FXff  => nmicf%RN2FXff     &
+    RN2FXff  => nmicf%RN2FXff,    &
+    CNOMC  => micpar%CNOMC   , &
+    CPOMC  => micpar%CPOMC     &
   )
 !     pH EFFECT ON MAINTENANCE RESPIRATION
 !
@@ -4865,7 +4881,10 @@ module nitro1LayerMod
     TCGOMN  => ncplxf%TCGOMN, &
     TCGOMP  => ncplxf%TCGOMP, &
     CNQ  => ncplxs%CNQ,       &
-    CPQ  => ncplxs%CPQ        &
+    CPQ  => ncplxs%CPQ,       &
+    CNOMC  => micpar%CNOMC,     &
+    CPOMC  => micpar%CPOMC,    &
+    FL       => micpar%FL          &
   )
 
 !     DOC, DON, DOP AND ACETATE UPTAKE DRIVEN BY GROWTH RESPIRATION
@@ -5073,7 +5092,6 @@ module nitro1LayerMod
 
 !------------------------------------------------------------------------------------------
 
-
   subroutine GetMicrobialAnabolismFluxff(NGL,N,L,NY,NX,ECHZ,FGOCP,FGOAP,&
     RGOMT,RXOMT,RMOMT,spomk,rmomk,nmicf,nmics,ncplxf,ncplxs)
   implicit none
@@ -5151,7 +5169,10 @@ module nitro1LayerMod
     TCGOMN  => ncplxf%TCGOMN, &
     TCGOMP  => ncplxf%TCGOMP, &
     CNQ  => ncplxs%CNQ,       &
-    CPQ  => ncplxs%CPQ        &
+    CPQ  => ncplxs%CPQ,       &
+    CNOMCff  => micpar%CNOMCff,     &
+    CPOMCff  => micpar%CPOMCff,    &
+    FL       => micpar%FL          &
   )
 
 !     DOC, DON, DOP AND ACETATE UPTAKE DRIVEN BY GROWTH RESPIRATION

@@ -2,6 +2,7 @@ module RedistMod
   use data_kind_mod, only : r8 => SHR_KIND_R8
   use abortutils, only : padr, print_info,endrun
   use minimathmod, only : safe_adb
+  use MicBGCPars, only : micpar
   use EcosimConst
   use MicrobialDataType
   use SOMDataType
@@ -133,15 +134,15 @@ module RedistMod
 
   integer :: IFLGLS,LG,LX,LS,LS2
 
-  real(r8) :: TFLW(JZ,JY,JX),TFLWX(JZ,JY,JX),THFLW(JZ,JY,JX) &
-    ,TFLWH(JZ,JY,JX),TOCFLS(0:jcplx1,JZ,JY,JX),TONFLS(0:jcplx1,JZ,JY,JX) &
-    ,TOPFLS(0:jcplx1,JZ,JY,JX),TOAFLS(0:jcplx1,JZ,JY,JX),TCOFLS(JZ,JY,JX) &
+  real(r8) :: TFLW(JZ,JY,JX),TFLWX(JZ,JY,JX),THFLW(JZ,JY,JX)
+  real(r8) :: TFLWH(JZ,JY,JX)
+
+  real(r8) :: TCOFLS(JZ,JY,JX) &
     ,TCHFLS(JZ,JY,JX),TOXFLS(JZ,JY,JX),TNXFLB(JZ,JY,JX) &
     ,TNGFLS(JZ,JY,JX),TN2FLS(JZ,JY,JX),TN4FLS(JZ,JY,JX) &
     ,TN4FLB(JZ,JY,JX),TN3FLS(JZ,JY,JX),TN3FLB(JZ,JY,JX) &
     ,TNOFLS(JZ,JY,JX),TNOFLB(JZ,JY,JX),TPOFLS(JZ,JY,JX) &
-    ,TH2BFB(JZ,JY,JX),TNXFLS(JZ,JY,JX),TOCFHS(0:jcplx1,JZ,JY,JX) &
-    ,TONFHS(0:jcplx1,JZ,JY,JX),TOPFHS(0:jcplx1,JZ,JY,JX),TOAFHS(0:jcplx1,JZ,JY,JX) &
+    ,TH2BFB(JZ,JY,JX),TNXFLS(JZ,JY,JX) &
     ,TCOFHS(JZ,JY,JX),TCHFHS(JZ,JY,JX),TNXFHB(JZ,JY,JX) &
     ,TOXFHS(JZ,JY,JX),TNGFHS(JZ,JY,JX),TN2FHS(JZ,JY,JX) &
     ,TN4FHS(JZ,JY,JX),TN4FHB(JZ,JY,JX),TN3FHS(JZ,JY,JX) &
@@ -156,8 +157,7 @@ module RedistMod
     ,CDPTHY(0:JZ,JY,JX)
   real(r8) :: TQR(JY,JX),THQR(JY,JX),TQS(JY,JX),TQW(JY,JX) &
     ,TQI(JY,JX),THQS(JY,JX),TFLWS(JS,JY,JX),TFLWW(JS,JY,JX) &
-    ,TFLWI(JS,JY,JX),THFLWW(JS,JY,JX),TOCQRS(0:jcplx1,JY,JX) &
-    ,TONQRS(0:jcplx1,JY,JX),TOPQRS(0:jcplx1,JY,JX),TOAQRS(0:jcplx1,JY,JX) &
+    ,TFLWI(JS,JY,JX),THFLWW(JS,JY,JX) &
     ,TCOQRS(JY,JX),TCHQRS(JY,JX),TOXQRS(JY,JX),TQRH1P(JY,JX) &
     ,TNGQRS(JY,JX),TN2QRS(JY,JX),TN4QRS(JY,JX),TN3QRS(JY,JX) &
     ,TNOQRS(JY,JX),TPOQRS(JY,JX),TNXQRS(JY,JX),TQRAL(JY,JX) &
@@ -233,17 +233,8 @@ module RedistMod
     ,TCACER(JY,JX),TCASER(JY,JX),TALPER(JY,JX),TFEPER(JY,JX) &
     ,TCPDER(JY,JX),TCPHER(JY,JX),TCPMER(JY,JX),TALPEB(JY,JX) &
     ,TFEPEB(JY,JX),TCPDEB(JY,JX),TCPHEB(JY,JX),TCPMEB(JY,JX) &
-    ,TFEER(JY,JX),TFE2ER(JY,JX) &
-    ,TORCER(2,0:jcplx1,JY,JX),TORNER(2,0:jcplx1,JY,JX) &
-    ,TORPER(2,0:jcplx1,JY,JX),TOHCER(0:jcplx1,JY,JX),&
-    TOHNER(0:jcplx1,JY,JX),TOHPER(0:jcplx1,JY,JX) &
-    ,TOHAER(0:jcplx1,JY,JX),TOSCER(jsken,0:jcplx1,JY,JX) &
-    ,TOSAER(4,0:jcplx1,JY,JX),TOSNER(4,0:jcplx1,JY,JX),&
-    TOSPER(4,0:jcplx1,JY,JX),TSEDER(JY,JX)
-  real(r8) :: TORC(2,0:jcplx1),TORN(2,0:jcplx1),TORP(2,0:jcplx1) &
-    ,TOQC(0:jcplx1),TOQN(0:jcplx1),TOQP(0:jcplx1),TOQA(0:jcplx1) &
-    ,TOHC(0:jcplx1),TOHN(0:jcplx1),TOHP(0:jcplx1),TOHA(0:jcplx1) &
-    ,TOSC(4,0:jcplx1),TOSA(4,0:jcplx1),TOSN(4,0:jcplx1),TOSP(4,0:jcplx1),TOSGC(4,0:2) &
+    ,TFEER(JY,JX),TFE2ER(JY,JX),TSEDER(JY,JX)
+  real(r8) :: TOSGC(4,0:2) &
     ,TOSGA(4,0:2),TOSGN(4,0:2),TOSGP(4,0:2),TORXC(2,0:2),TORXN(2,0:2) &
     ,TORXP(2,0:2),TOQGC(0:2),TOQGN(0:2),TOQGP(0:2),TOQHC(0:2) &
     ,TOQHN(0:2),TOQHP(0:2),TOHGC(0:2),TOHGN(0:2),TOHGP(0:2) &
@@ -293,6 +284,44 @@ module RedistMod
   real(r8),allocatable :: TOMGNff(:,:,:)
   real(r8),allocatable :: TOMGPff(:,:,:)
 
+  real(r8),allocatable ::  TOCFLS(:,:,:,:)
+  real(r8),allocatable ::  TONFLS(:,:,:,:)
+  real(r8),allocatable ::  TOPFLS(:,:,:,:)
+  real(r8),allocatable ::  TOAFLS(:,:,:,:)
+  real(r8),allocatable ::  TOCFHS(:,:,:,:)
+  real(r8),allocatable ::  TONFHS(:,:,:,:)
+  real(r8),allocatable ::  TOPFHS(:,:,:,:)
+  real(r8),allocatable ::  TOAFHS(:,:,:,:)
+  real(r8),allocatable ::  TOCQRS(:,:,:)
+  real(r8),allocatable ::  TONQRS(:,:,:)
+  real(r8),allocatable ::  TOPQRS(:,:,:)
+  real(r8),allocatable ::  TOAQRS(:,:,:)
+  real(r8),allocatable ::  TORCER(:,:,:,:)
+  real(r8),allocatable ::  TORNER(:,:,:,:)
+  real(r8),allocatable ::  TORPER(:,:,:,:)
+  real(r8),allocatable ::  TOHCER(:,:,:)
+  real(r8),allocatable ::    TOHNER(:,:,:)
+  real(r8),allocatable ::  TOHPER(:,:,:)
+  real(r8),allocatable ::  TOHAER(:,:,:)
+  real(r8),allocatable ::  TOSCER(:,:,:,:)
+  real(r8),allocatable ::  TOSAER(:,:,:,:)
+  real(r8),allocatable ::  TOSNER(:,:,:,:)
+  real(r8),allocatable ::  TOSPER(:,:,:,:)
+  real(r8),allocatable ::  TORC(:,:)
+  real(r8),allocatable ::  TORN(:,:)
+  real(r8),allocatable ::  TORP(:,:)
+  real(r8),allocatable ::  TOQC(:)
+  real(r8),allocatable ::  TOQN(:)
+  real(r8),allocatable ::  TOQP(:)
+  real(r8),allocatable ::  TOQA(:)
+  real(r8),allocatable ::  TOHC(:)
+  real(r8),allocatable ::  TOHN(:)
+  real(r8),allocatable ::  TOHP(:)
+  real(r8),allocatable ::  TOHA(:)
+  real(r8),allocatable ::  TOSC(:,:)
+  real(r8),allocatable ::  TOSA(:,:)
+  real(r8),allocatable ::  TOSN(:,:)
+  real(r8),allocatable ::  TOSP(:,:)
   real(r8), PARAMETER :: ZEROC=0.1E-03_r8
   DATA SG/0.0/
   DATA TDORGC,TDYLXC/0.0,0.0/
@@ -324,7 +353,44 @@ module RedistMod
   allocate(TOMGCff(3,JG,7))
   allocate(TOMGNff(3,JG,7))
   allocate(TOMGPff(3,JG,7))
-
+  allocate(TOCFLS(0:jcplx1,JZ,JY,JX));TOCFLS=0._r8
+  allocate(TONFLS(0:jcplx1,JZ,JY,JX));TONFLS=0._r8
+  allocate(TOPFLS(0:jcplx1,JZ,JY,JX));TOPFLS=0._r8
+  allocate(TOAFLS(0:jcplx1,JZ,JY,JX));TOAFLS=0._r8
+  allocate(TOCFHS(0:jcplx1,JZ,JY,JX));TOCFHS=0._r8
+  allocate(TONFHS(0:jcplx1,JZ,JY,JX));TONFHS=0._r8
+  allocate(TOPFHS(0:jcplx1,JZ,JY,JX));TOPFHS=0._r8
+  allocate(TOAFHS(0:jcplx1,JZ,JY,JX));TOAFHS=0._r8
+  allocate(TOCQRS(0:jcplx1,JY,JX));TOCQRS=0._r8
+  allocate(TONQRS(0:jcplx1,JY,JX));TONQRS=0._r8
+  allocate(TOPQRS(0:jcplx1,JY,JX));TOPQRS=0._r8
+  allocate(TOAQRS(0:jcplx1,JY,JX));TOAQRS=0._r8
+  allocate(TORCER(2,0:jcplx1,JY,JX));TORCER=0._r8
+  allocate(TORNER(2,0:jcplx1,JY,JX));TORNER=0._r8
+  allocate(TORPER(2,0:jcplx1,JY,JX));TORPER=0._r8
+  allocate(TOHCER(0:jcplx1,JY,JX));TOHCER=0._r8
+  allocate(TOHNER(0:jcplx1,JY,JX));TOHNER=0._r8
+  allocate(TOHPER(0:jcplx1,JY,JX));TOHPER=0._r8
+  allocate(TOHAER(0:jcplx1,JY,JX));TOHAER=0._r8
+  allocate(TOSCER(jsken,0:jcplx1,JY,JX));TOSCER=0._r8
+  allocate(TOSAER(4,0:jcplx1,JY,JX));TOSAER=0._r8
+  allocate(TOSNER(4,0:jcplx1,JY,JX));TOSNER=0._r8
+  allocate(TOSPER(4,0:jcplx1,JY,JX));TOSPER=0._r8
+  allocate(TORC(2,0:jcplx1));   TORC=0._r8
+  allocate(TORN(2,0:jcplx1));   TORN=0._r8
+  allocate(TORP(2,0:jcplx1));   TORP=0._r8
+  allocate(TOQC(0:jcplx1));     TOQC=0._r8
+  allocate(TOQN(0:jcplx1));     TOQN=0._r8
+  allocate(TOQP(0:jcplx1));     TOQP=0._r8
+  allocate(TOQA(0:jcplx1));     TOQA=0._r8
+  allocate(TOHC(0:jcplx1));     TOHC=0._r8
+  allocate(TOHN(0:jcplx1));     TOHN=0._r8
+  allocate(TOHP(0:jcplx1));     TOHP=0._r8
+  allocate(TOHA(0:jcplx1));     TOHA=0._r8
+  allocate(TOSC(jsken,0:jcplx1));TOSC=0._r8
+  allocate(TOSA(jsken,0:jcplx1));TOSA=0._r8
+  allocate(TOSN(jsken,0:jcplx1));TOSN=0._r8
+  allocate(TOSP(jsken,0:jcplx1));TOSP=0._r8
   end subroutine InitRedist
 
 
@@ -4925,7 +4991,7 @@ module RedistMod
       DO  M=1,4
         OSC(M,K,L,NY,NX)=OSC(M,K,L,NY,NX)+CSNT(M,K,L,NY,NX)
         DO NGL=1,JG
-          OSA(M,K,L,NY,NX)=OSA(M,K,L,NY,NX)+CSNT(M,K,L,NY,NX)*OMCI(1+(NGL-1)*3,K)
+          OSA(M,K,L,NY,NX)=OSA(M,K,L,NY,NX)+CSNT(M,K,L,NY,NX)*micpar%OMCI(1+(NGL-1)*3,K)
         ENDDO
         OSN(M,K,L,NY,NX)=OSN(M,K,L,NY,NX)+ZSNT(M,K,L,NY,NX)
         OSP(M,K,L,NY,NX)=OSP(M,K,L,NY,NX)+PSNT(M,K,L,NY,NX)
@@ -9535,7 +9601,7 @@ module RedistMod
     DO  M=1,4
       OSC(M,K,0,NY,NX)=OSC(M,K,0,NY,NX)+CSNT(M,K,0,NY,NX)
       DO NGL=1,JG
-        OSA(M,K,0,NY,NX)=OSA(M,K,0,NY,NX)+CSNT(M,K,0,NY,NX)*OMCI(1+(NGL-1)*3,K)
+        OSA(M,K,0,NY,NX)=OSA(M,K,0,NY,NX)+CSNT(M,K,0,NY,NX)*micpar%OMCI(1+(NGL-1)*3,K)
       ENDDO
       OSN(M,K,0,NY,NX)=OSN(M,K,0,NY,NX)+ZSNT(M,K,0,NY,NX)
       OSP(M,K,0,NY,NX)=OSP(M,K,0,NY,NX)+PSNT(M,K,0,NY,NX)

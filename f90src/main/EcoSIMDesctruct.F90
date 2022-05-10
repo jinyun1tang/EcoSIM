@@ -7,6 +7,7 @@ module EcoSIMDesctruct
   contains
 
   subroutine DestructEcoSIM
+  use AqueChemDatatype  , only : DestructAquaChem
   use MicrobialDataType , only : DestructMicrobialData
   use ChemTranspDataType  , only : DestructChemTranspData
   use SOMDataType       , only : DestructSOMData
@@ -14,12 +15,14 @@ module EcoSIMDesctruct
   use CanopyRadDataType       , only : DestructCanopyRad
   use SurfLitterDataType, only : DestructSurfLitter
   use SoilPropertyDataType, only : DestructSoilProperty
+  use PlantDataRateType, only : DestructPlantRates
   use IrrigationDataType, only : DestructIrrigation
   use SoilBGCDataType, only : DestructSoilBGCData
   use SedimentDataType, only : DestructSedimentData
   use SoilWaterDataType, only : DestructSoilWater
   use PlantAPIData  , only : DestructPlantAPIData
   use PlantMngmtDataType, only : DestructPlantMngmtData
+  use InitSOMBGCMOD, only : DestructSOMBGC
   implicit none
 
   call DestructMicrobialData
@@ -43,6 +46,12 @@ module EcoSIMDesctruct
   call DestructPlantAPIData
 
   call DestructPlantMngmtData
+
+  call  DestructPlantRates
+
+  call DestructAquaChem
+
+  call DestructSOMBGC
   end subroutine DestructEcoSIM
 
 end module EcoSIMDesctruct

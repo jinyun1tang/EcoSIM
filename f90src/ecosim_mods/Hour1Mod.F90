@@ -37,6 +37,7 @@ module Hour1Mod
   use PlantDataRateType
   use GridDataType
   use EcoSIMConfig
+  use MicBGCPars, only : micpar
   implicit none
 
   private
@@ -2479,9 +2480,9 @@ module Hour1Mod
       DO 2960 N=1,7
         DO NGL=1,JG
           DO 2961 M=1,3
-            OMC1=AMAX1(0.0,AMIN1(OSCI*OMCI(M+(NGL-1)*3,K)*OMCF(N),OSCI-OSCX))
-            OMN1=AMAX1(0.0,AMIN1(OMC1*CNOMC(M,NGL,N,K),OSNI-OSNX))
-            OMP1=AMAX1(0.0,AMIN1(OMC1*CPOMC(M,NGL,N,K),OSPI-OSPX))
+            OMC1=AMAX1(0.0,AMIN1(OSCI*micpar%OMCI(M+(NGL-1)*3,K)*micpar%OMCF(N),OSCI-OSCX))
+            OMN1=AMAX1(0.0,AMIN1(OMC1*micpar%CNOMC(M,NGL,N,K),OSNI-OSNX))
+            OMP1=AMAX1(0.0,AMIN1(OMC1*micpar%CPOMC(M,NGL,N,K),OSPI-OSPX))
             OMC(M,NGL,N,K,LFDPTH,NY,NX)=OMC(M,NGL,N,K,LFDPTH,NY,NX)+OMC1
             OMN(M,NGL,N,K,LFDPTH,NY,NX)=OMN(M,NGL,N,K,LFDPTH,NY,NX)+OMN1
             OMP(M,NGL,N,K,LFDPTH,NY,NX)=OMP(M,NGL,N,K,LFDPTH,NY,NX)+OMP1
@@ -2489,12 +2490,12 @@ module Hour1Mod
             OSNX=OSNX+OMN1
             OSPX=OSPX+OMP1
             DO 2962 NN=1,7
-              OMC(M,NGL,NN,5,LFDPTH,NY,NX)=OMC(M,NGL,NN,5,LFDPTH,NY,NX)+OMC1*OMCA(NN)
-              OMN(M,NGL,NN,5,LFDPTH,NY,NX)=OMN(M,NGL,NN,5,LFDPTH,NY,NX)+OMN1*OMCA(NN)
-              OMP(M,NGL,NN,5,LFDPTH,NY,NX)=OMP(M,NGL,NN,5,LFDPTH,NY,NX)+OMP1*OMCA(NN)
-              OSCX=OSCX+OMC1*OMCA(NN)
-              OSNX=OSNX+OMN1*OMCA(NN)
-              OSPX=OSPX+OMP1*OMCA(NN)
+              OMC(M,NGL,NN,5,LFDPTH,NY,NX)=OMC(M,NGL,NN,5,LFDPTH,NY,NX)+OMC1*micpar%OMCA(NN)
+              OMN(M,NGL,NN,5,LFDPTH,NY,NX)=OMN(M,NGL,NN,5,LFDPTH,NY,NX)+OMN1*micpar%OMCA(NN)
+              OMP(M,NGL,NN,5,LFDPTH,NY,NX)=OMP(M,NGL,NN,5,LFDPTH,NY,NX)+OMP1*micpar%OMCA(NN)
+              OSCX=OSCX+OMC1*micpar%OMCA(NN)
+              OSNX=OSNX+OMN1*micpar%OMCA(NN)
+              OSPX=OSPX+OMP1*micpar%OMCA(NN)
 2962        CONTINUE
 2961      CONTINUE
         ENDDO
@@ -2527,14 +2528,14 @@ module Hour1Mod
         RNT=0.0
         RPT=0.0
         DO 965 M=1,jsken
-          RNT=RNT+(OSCI-OSCX)*CFOSC(M,K,LFDPTH,NY,NX)*CNOFC(M,K)
-          RPT=RPT+(OSCI-OSCX)*CFOSC(M,K,LFDPTH,NY,NX)*CPOFC(M,K)
+          RNT=RNT+(OSCI-OSCX)*CFOSC(M,K,LFDPTH,NY,NX)*micpar%CNOFC(M,K)
+          RPT=RPT+(OSCI-OSCX)*CFOSC(M,K,LFDPTH,NY,NX)*micpar%CPOFC(M,K)
 965     CONTINUE
         FRNT=(OSNI-OSNX)/RNT
         FRPT=(OSPI-OSPX)/RPT
         DO 970 M=1,jsken
-          CNOF(M)=CNOFC(M,K)*FRNT
-          CPOF(M)=CPOFC(M,K)*FRPT
+          CNOF(M)=micpar%CNOFC(M,K)*FRNT
+          CPOF(M)=micpar%CPOFC(M,K)*FRPT
           CNOFT=CNOFT+CFOSC(M,K,LFDPTH,NY,NX)*CNOF(M)
           CPOFT=CPOFT+CFOSC(M,K,LFDPTH,NY,NX)*CPOF(M)
 970     CONTINUE
@@ -2558,7 +2559,7 @@ module Hour1Mod
         ENDIF
         OSC(M,K,LFDPTH,NY,NX)=OSC(M,K,LFDPTH,NY,NX)+OSC1
         DO NGL=1,JG
-          OSA(M,K,LFDPTH,NY,NX)=OSA(M,K,LFDPTH,NY,NX)+OSC1*OMCI(1+(NGL-1)*3,K)
+          OSA(M,K,LFDPTH,NY,NX)=OSA(M,K,LFDPTH,NY,NX)+OSC1*micpar%OMCI(1+(NGL-1)*3,K)
         ENDDO
         OSN(M,K,LFDPTH,NY,NX)=OSN(M,K,LFDPTH,NY,NX)+OSN1
         OSP(M,K,LFDPTH,NY,NX)=OSP(M,K,LFDPTH,NY,NX)+OSP1

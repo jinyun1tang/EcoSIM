@@ -6,17 +6,12 @@ implicit none
   save
   character(len=*), private, parameter :: mod_filename = __FILE__
 
-
-  integer :: JG
-
   real(r8),allocatable :: OMC(:,:,:,:,:,:,:)    !microbial biomass C	[g d-2]
   real(r8),allocatable :: OMN(:,:,:,:,:,:,:)    !microbial biomass N	[g d-2]
   real(r8),allocatable :: OMP(:,:,:,:,:,:,:)    !microbial biomass P	[g d-2]
   real(r8),allocatable :: ROXYS(:,:,:,:,:,:)    !aqueous O2 demand	[g d-2 h-1]
   real(r8),allocatable :: ROQCS(:,:,:,:,:,:)    !net microbial DOC flux	[g d-2 h-1]
   real(r8),allocatable :: ROQAS(:,:,:,:,:,:)    !net microbial acetate flux	[g d-2 h-1]
-  real(r8),allocatable :: CNOMC(:,:,:,:)        !maximum microbial N:C
-  real(r8),allocatable :: CPOMC(:,:,:,:)        !maximum microbial P:C
   real(r8),allocatable :: RINHO(:,:,:,:,:,:)    !microbial NH4 demand in soil	[g d-2 h-1]
   real(r8),allocatable :: RINOO(:,:,:,:,:,:)    !microbial NO3 demand in soil	[g d-2 h-1]
   real(r8),allocatable :: RIPOO(:,:,:,:,:,:)    !microbial PO4 demand in soil	[g d-2 h-1]
@@ -39,12 +34,8 @@ implicit none
   real(r8),allocatable :: OMCER(:,:,:,:,:,:,:)  !microbial C  erosion 	[g d-2 h-1]
   real(r8),allocatable :: OMNER(:,:,:,:,:,:,:)  !microbial N  erosion 	[g d-2 h-1]
   real(r8),allocatable :: OMPER(:,:,:,:,:,:,:)  !microbial P  erosion 	[g d-2 h-1]
-  real(r8),allocatable :: OMCI(:,:)             !initializes microbial biomass
-  real(r8) :: FL(2)                             !allocation to microbial kinetic fractions
 
 
-  real(r8),allocatable :: CNOMCff(:,:,:)        !maximum microbial N:C
-  real(r8),allocatable :: CPOMCff(:,:,:)        !maximum microbial P:C
   real(r8),allocatable :: OMCff(:,:,:,:,:,:)
   real(r8),allocatable :: OMNff(:,:,:,:,:,:)
   real(r8),allocatable :: OMPff(:,:,:,:,:,:)
@@ -76,31 +67,23 @@ implicit none
 
   contains
 
-  subroutine InitMicrobialData(nguilds)
+  subroutine InitMicrobialData()
 
   implicit none
-  integer, intent(in) :: nguilds
 
-
-
-  JG=nguilds
-  call InitAllocate()
+  call InitAllocate
 
   end subroutine InitMicrobialData
 
   subroutine InitAllocate
 
   implicit none
-
-
   allocate(OMC(3,JG,7,0:jcplx1,0:JZ,JY,JX))
   allocate(OMN(3,JG,7,0:jcplx1,0:JZ,JY,JX))
   allocate(OMP(3,JG,7,0:jcplx1,0:JZ,JY,JX))
   allocate(ROXYS(JG,7,0:jcplx1,0:JZ,JY,JX))
   allocate(ROQCS(JG,7,0:jcplx1,0:JZ,JY,JX))
   allocate(ROQAS(JG,7,0:jcplx1,0:JZ,JY,JX))
-  allocate(CNOMC(3,JG,7,0:jcplx1))
-  allocate(CPOMC(3,JG,7,0:jcplx1))
   allocate(RINHO(JG,7,0:jcplx1,0:JZ,JY,JX))
   allocate(RINOO(JG,7,0:jcplx1,0:JZ,JY,JX))
   allocate(RIPOO(JG,7,0:jcplx1,0:JZ,JY,JX))
@@ -123,11 +106,7 @@ implicit none
   allocate(OMCER(3*JG,7,0:jcplx1,2,2,JV,JH))
   allocate(OMNER(3*JG,7,0:jcplx1,2,2,JV,JH))
   allocate(OMPER(3*JG,7,0:jcplx1,2,2,JV,JH))
-  allocate(OMCI(3*JG,0:jcplx1))
 
-
-  allocate(CNOMCff(3,JG,7))
-  allocate(CPOMCff(3,JG,7))
   allocate(OMCff(3,JG,7,0:JZ,JY,JX))
   allocate(OMNff(3,JG,7,0:JZ,JY,JX))
   allocate(OMPff(3,JG,7,0:JZ,JY,JX))
@@ -166,8 +145,6 @@ implicit none
   if(allocated(ROXYS))deallocate(ROXYS)
   if(allocated(ROQCS))deallocate(ROQCS)
   if(allocated(ROQAS))deallocate(ROQAS)
-  if(allocated(CNOMC))deallocate(CNOMC)
-  if(allocated(CPOMC))deallocate(CPOMC)
   if(allocated(RINHO))deallocate(RINHO)
   if(allocated(RINOO))deallocate(RINOO)
   if(allocated(RIPOO))deallocate(RIPOO)
@@ -190,13 +167,10 @@ implicit none
   if(allocated(OMCER))deallocate(OMCER)
   if(allocated(OMNER))deallocate(OMNER)
   if(allocated(OMPER))deallocate(OMPER)
-  if(allocated(OMCI))deallocate(OMCI)
 
   if(allocated(OMCff))deallocate(OMCff)
   if(allocated(OMNff))deallocate(OMNff)
   if(allocated(OMPff))deallocate(OMPff)
-  if(allocated(CNOMCff))deallocate(CNOMCff)
-  if(allocated(CPOMCff))deallocate(CPOMCff)
   if(allocated(ROXYSff))deallocate(ROXYSff)
   if(allocated(RINHOff))deallocate(RINHOff)
   if(allocated(RINOOff))deallocate(RINOOff)

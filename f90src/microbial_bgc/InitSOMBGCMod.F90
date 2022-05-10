@@ -1,4 +1,4 @@
-module InitSOMBGC
+module InitSOMBGCMOD
   use data_kind_mod, only : r8 => SHR_KIND_R8
   use MicrobialDataType
   use SOMDataType
@@ -11,60 +11,47 @@ module InitSOMBGC
   use SurfLitterDataType
   use SoilPropertyDataType
   use GridDataType
+  use MicBGCPars, only : micpar
   implicit none
 
   private
 
 
-! CORGCX,CORGNX,CORGPX=C,N,P concentations from woody(0),
-! non-woody(1), manure(2), litter, POC(3) and humus(4) (g Mg-1)
-
-  real(r8) :: CORGCX(0:jcplx1),CORGNX(0:jcplx1),CORGPX(0:jcplx1)
-  real(r8) :: OHCK(0:jcplx1)              !fractions of SOC in adsorbed C
-  real(r8) :: OMCK(0:jcplx1)  !fractions of SOC in biomass
-  real(r8) :: ORCK(0:jcplx1)  !fractions of SOC in litter
-  real(r8) :: OQCK(0:jcplx1)  !fractions of SOC in DOC
-  real(r8) :: OSCX(0:jcplx1),OSNX(0:jcplx1),OSPX(0:jcplx1)
-  real(r8) :: OMCI1(3,0:jcplx1)  !allocation of biomass to kinetic components
-  real(r8) :: ORCI(2,0:jcplx1)   !allocation of residue to kinetic components
+  real(r8), allocatable :: CORGCX(:)  !C concentations from OM complexes
+  real(r8), allocatable :: CORGNX(:)  !N concentations from OM complexes
+  real(r8), allocatable :: CORGPX(:)  !P concentations from OM complexes
 
   public :: InitSOMVars
   public :: InitSOMProfile
   public :: InitSOMConsts
-  public :: InitMicbStoichiometry
+  public :: InitSOMBGC
+  public :: DestructSOMBGC
   contains
 !------------------------------------------------------------------------------------------
 
+  subroutine InitSOMBGC(nmicbguilds)
+  implicit none
+  integer, intent(in) :: nmicbguilds
+
+  call MicPar%Init(nmicbguilds)
+
+  jcplx=micpar%jcplx
+  jcplx1=micpar%jcplx1
+  JG=micpar%jguilds
+  jsken=micpar%jsken
+  allocate(CORGCX(0:jcplx1))
+  allocate(CORGNX(0:jcplx1))
+  allocate(CORGPX(0:jcplx1))
+  end subroutine InitSOMBGC
+
+!------------------------------------------------------------------------------------------
+
   subroutine InitSOMConsts
+  use MicBGCPars, only : micpar
   implicit none
 
-  integer :: K,NGL,M
-  real(r8) :: COMCI(3,0:jcplx1)
-  OHCK=real((/0.05,0.05,0.05,0.05,0.05/),r8)
-  OMCK=real((/0.01,0.01,0.01,0.01,0.01/),r8)
-  ORCK=real((/0.25,0.25,0.25,0.25,0.25/),r8)
-  OQCK=real((/0.005,0.005,0.005,0.005,0.005/),r8)
-  OMCI1=reshape(real((/0.010,0.050,0.005,0.050,0.050,0.005,0.050,0.050,0.005, &
-     0.010,0.050,0.005,0.010,0.050,0.005/),r8),shape(OMCI1))
-  ORCI=reshape(real((/0.01,0.05,0.01,0.05,0.01,0.05 &
-     ,0.001,0.005,0.001,0.005/),r8),shape(ORCI))
+  call MicPar%SetPars
 
-  OMCI(1:3,:)=OMCI1/real(JG,r8)
-
-  if(JG.GT.1)then
-    COMCI=OMCI(1:3,:)
-    DO K=0,4
-      DO NGL=2,JG-1
-        DO M=1,3
-          OMCI(M+(NGL-1)*3,K)=OMCI(M,K)
-          COMCI(M,K)=COMCI(M,K)+OMCI(M,K)
-        enddo
-      enddo
-      DO M=1,3
-        OMCI(M+(JG-1)*3,K)=OMCI1(M,K)-COMCI(M,K)
-      ENDDO
-    enddo
-  endif
   end subroutine InitSOMConsts
 !------------------------------------------------------------------------------------------
 
@@ -88,8 +75,28 @@ module InitSOMBGC
   real(r8) :: TOSCK(0:jcplx1),TOSNK(0:jcplx1),TOSPK(0:jcplx1)
   real(r8) :: RC
   real(r8) :: CNOSCT(0:jcplx1), CPOSCT(0:jcplx1)
+  real(r8) :: OSCX(0:jcplx1)
+  real(r8) :: OSNX(0:jcplx1)
+  real(r8) :: OSPX(0:jcplx1)
+
 ! begin_execution
 
+  associate(                  &
+    CNOMC   => micpar%CNOMC  ,&
+    CPOMC   => micpar%CPOMC  ,&
+    OHCK    => micpar%OHCK   ,&
+    OMCK    => micpar%OMCK   ,&
+    OQCK    => micpar%OQCK   ,&
+    ORCK    => micpar%ORCK   ,&
+    ORCI    => micpar%ORCI   ,&
+    OMCI    => micpar%OMCI   ,&
+    CNRH    => micpar%CNRH   ,&
+    CPRH    => micpar%CPRH   ,&
+    CNOFC   => micpar%CNOFC  ,&
+    CPOFC   => micpar%CPOFC  ,&
+    OMCF    => micpar%OMCF   ,&
+    OMCA    => micpar%OMCA    &
+  )
   DO 975 K=0,2
     CNOSCT(K)=0.0_r8
     CPOSCT(K)=0.0_r8
@@ -438,6 +445,7 @@ module InitSOMBGC
   ORGCX(L,NY,NX)=ORGC(L,NY,NX)
   ORGR(L,NY,NX)=RC
   ORGN(L,NY,NX)=ON
+  end associate
   end subroutine InitSOMVars
 
 !------------------------------------------------------------------------------------------
@@ -550,16 +558,18 @@ module InitSOMBGC
   ENDIF
   end subroutine InitManureKinetiComponent
 !------------------------------------------------------------------------------------------
-  subroutine InitPOMKinetiComponent(L,NY,NX,HCX,TORGL,CDPTHG,FCX)
+  subroutine InitPOMKinetiComponent(L,NY,NX,HCX,TORGL,CDPTHG,FCX,CORGCM)
   implicit none
   integer, intent(in)  :: L, NY, NX
   real(r8), intent(in) :: HCX
   real(r8), intent(in) :: TORGL
   real(r8), intent(in) :: CDPTHG
   real(r8), intent(out):: FCX
+  real(r8), intent(out):: CORGCM
   real(r8) :: FCO,FCY,FC0,FC1
 
 ! begin_execution
+
 !
 ! CFOSC=siNGLe kinetic fraction in POM
 !
@@ -634,6 +644,14 @@ module InitSOMBGC
     CFOMC(1,L,NY,NX)=3.0*FC1/(2.0*FC1+1.0)
     CFOMC(2,L,NY,NX)=1.0-CFOMC(1,L,NY,NX)
   ENDIF
+
+  IF(L.GT.0)THEN
+    IF(BKDS(L,NY,NX).GT.ZERO)THEN
+      CORGCM=AMIN1(0.55E+06_r8,(CORGCX(1)+CORGCX(2)+CORGCX(3)+CORGCX(4)))/0.55_r8
+    else
+      CORGCM=0._r8
+    endif
+  endif
   end subroutine InitPOMKinetiComponent
 
 !------------------------------------------------------------------------------------------
@@ -657,15 +675,8 @@ module InitSOMBGC
   call InitManureKinetiComponent(L,NY,NX)
   !
   !     POM
-  call InitPOMKinetiComponent(L,NY,NX,HCX,TORGL,CDPTHG,FCX)
+  call InitPOMKinetiComponent(L,NY,NX,HCX,TORGL,CDPTHG,FCX,CORGCM)
 
-  IF(L.GT.0)THEN
-    IF(BKDS(L,NY,NX).GT.ZERO)THEN
-      CORGCM=AMIN1(0.55E+06_r8,(CORGCX(1)+CORGCX(2)+CORGCX(3)+CORGCX(4)))/0.55_r8
-    else
-      CORGCM=0._r8
-    endif
-  endif
   end subroutine InitSOMProfile
 
 !------------------------------------------------------------------------------------------
@@ -678,7 +689,10 @@ module InitSOMBGC
   real(r8) :: CORGCZ,CORGNZ,CORGPZ,CORGRZ
   real(r8) :: scal
 ! begin_execution
-
+  associate(                  &
+    CNRH    => micpar%CNRH   ,&
+    CPRH    => micpar%CPRH    &
+  )
   IF(BKVL(L,NY,NX).GT.ZEROS(NY,NX))THEN
     scal=AREA(3,L,NY,NX)/BKVL(L,NY,NX)
     CORGCX(0:2)=RSC(0:2,L,NY,NX)*scal
@@ -721,61 +735,19 @@ module InitSOMBGC
       CORGPX(3)=0.0_r8
       CORGPX(4)=0.0_r8
     ENDIF
+  end associate
   end subroutine InitLitterProfile
 
+
 !------------------------------------------------------------------------------------------
-  subroutine InitMicbStoichiometry
 
-  integer :: K,N,NGL
-! begin_execution
-! CNOFC,CPOFC=fractions to allocate N,P to kinetic components
-! CNOMC,CPOMC=maximum N:C and P:C ratios in microbial biomass
+  subroutine DestructSOMBGC
+  use abortutils, only : destroy
+  implicit none
 
-  CNOFC(1:4,0)=real((/0.0050,0.0050,0.0050,0.0200/),r8)
-  CPOFC(1:4,0)=real((/0.0005,0.0005,0.0005,0.0020/),r8)
-  CNOFC(1:4,1)=real((/0.0200,0.0200,0.0200,0.0200/),r8)
-  CPOFC(1:4,1)=real((/0.0020,0.0020,0.0020,0.0020/),r8)
-  CNOFC(1:4,2)=real((/0.0200,0.0200,0.0200,0.0200/),r8)
-  CPOFC(1:4,2)=real((/0.0020,0.0020,0.0020,0.0020/),r8)
-  FL(1:2)=real((/0.55,0.45/),r8)
+  call destroy(CORGCX)
+  call destroy(CORGNX)
+  call destroy(CORGPX)
 
-  DO 95 K=0,4
-    DO  N=1,7
-      IF(N.EQ.3)THEN
-        DO NGL=1,JG
-          CNOMC(1,NGL,N,K)=0.15_r8
-          CNOMC(2,NGL,N,K)=0.09_r8
-          CPOMC(1,NGL,N,K)=0.015_r8
-          CPOMC(2,NGL,N,K)=0.009_r8
-        ENDDO
-      ELSE
-        do NGL=1,JG
-          CNOMC(1,NGL,N,K)=0.225_r8
-          CNOMC(2,NGL,N,K)=0.135_r8
-          CPOMC(1,NGL,N,K)=0.0225_r8
-          CPOMC(2,NGL,N,K)=0.0135_r8
-        enddo
-      ENDIF
-      do NGL=1,JG
-        CNOMC(3,NGL,N,K)=FL(1)*CNOMC(1,NGL,N,K)+FL(2)*CNOMC(2,NGL,N,K)
-        CPOMC(3,NGL,N,K)=FL(1)*CPOMC(1,NGL,N,K)+FL(2)*CPOMC(2,NGL,N,K)
-      enddo
-     enddo
-95  CONTINUE
-
-    DO  N=1,7
-        do NGL=1,JG
-          CNOMCff(1,NGL,N)=0.225_r8
-          CNOMCff(2,NGL,N)=0.135_r8
-          CPOMCff(1,NGL,N)=0.0225_r8
-          CPOMCff(2,NGL,N)=0.0135_r8
-        enddo
-      do NGL=1,JG
-        CNOMCff(3,NGL,N)=FL(1)*CNOMCff(1,NGL,N)+FL(2)*CNOMCff(2,NGL,N)
-        CPOMCff(3,NGL,N)=FL(1)*CPOMCff(1,NGL,N)+FL(2)*CPOMCff(2,NGL,N)
-      enddo
-     enddo
-
-
-    end subroutine InitMicbStoichiometry
-end module InitSOMBGC
+  end subroutine DestructSOMBGC
+end module InitSOMBGCMOD

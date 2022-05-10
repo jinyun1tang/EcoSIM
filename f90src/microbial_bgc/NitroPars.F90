@@ -4,7 +4,6 @@ module NitroPars
 ! code defining parameters for nitro
 ! USES:
   use data_kind_mod, only : r8 => SHR_KIND_R8
-  use GridConsts
   implicit none
   public
   save
@@ -185,13 +184,12 @@ module NitroPars
   real(r8) :: SPOHC
   real(r8) :: SPOHA
   real(r8) :: RMOM
-  real(r8) :: DOSA(0:jcplx1)
-  real(r8) :: SPOSC(4,0:jcplx1)
   real(r8) :: SPORC(2)
   real(r8) :: SPOMC(2)
   real(r8) :: EN2F(7)
   real(r8) :: EFIRE(2,21:22)
   contains
+
   subroutine initNitroPars
   implicit none
 
@@ -285,10 +283,6 @@ module NitroPars
   SPOHA=0.25_r8
   RMOM=0.010_r8
 
-  DOSA=(/0.25E-03_r8,0.25_r8,0.25_r8,0.25_r8,0.25_r8/)
-  SPOSC=reshape((/7.5_r8,7.5_r8,1.5_r8,0.5_r8,7.5_r8,7.5_r8,1.5_r8,0.5_r8 &
-    ,7.5_r8,7.5_r8,1.5_r8,0.5_r8,0.05_r8,0.00_r8,0.00_r8,0.00_r8 &
-    ,0.05_r8,0.0167_r8,0.00_r8,0.00_r8/),shape(sposc))
   SPORC=(/7.5_r8,1.5_r8/)
   SPOMC=(/1.0E-02_r8,0.1E-02_r8/)
   EN2F=(/0.0_r8,0.0_r8,0.0_r8,0.0_r8,0.0_r8,EN2X,EN2Y/)
