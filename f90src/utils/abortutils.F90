@@ -35,6 +35,7 @@ module abortutils
     module procedure destroy_5d_i
     module procedure destroy_6d_i
     module procedure destroy_7d_i
+    module procedure destroy_1d_l
   end interface destroy
   public :: padl, padr
   public :: print_info
@@ -364,5 +365,12 @@ CONTAINS
   if(allocated(arr))deallocate(arr)
 
   end subroutine destroy_7d_i
+  !-----------------------------------------------------------------------
+  subroutine destroy_1d_l(arr)
+  implicit none
+  logical, allocatable :: arr(:)
 
+  if(allocated(arr))deallocate(arr)
+
+  end subroutine destroy_1d_L
 end module abortutils

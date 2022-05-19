@@ -6,6 +6,8 @@ module NitroPars
   use data_kind_mod, only : r8 => SHR_KIND_R8
   implicit none
   public
+  character(len=*), private, parameter :: mod_filename = __FILE__
+
   save
 ! SUBSTRATE DECOMPOSITION BY MICROBIAL POPULATIONS
 !

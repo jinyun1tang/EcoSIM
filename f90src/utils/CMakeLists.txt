@@ -14,13 +14,13 @@ set(ECOSIM_UTIL_SOURCES
 
 
 include(add_ecosim_library)
-add_ecosim_library(ecosim_util ${ECOSIM_UTIL_SOURCES})
+add_ecosim_library(util ${ECOSIM_UTIL_SOURCES})
 
 
-set(ECOSIM_LIBRARIES ecosim_util;${ECOSIM_LIBRARIES} PARENT_SCOPE)
+set(ECOSIM_LIBRARIES util;${ECOSIM_LIBRARIES} PARENT_SCOPE)
 
 if (NOT CMAKE_INSTALL_PREFIX STREQUAL "INSTALL_DISABLED")
-  install(TARGETS ecosim_util DESTINATION lib)
+  install(TARGETS util DESTINATION lib)
   file(GLOB HEADERS *.h)
   install(FILES ${HEADERS} DESTINATION include/ecosim/util)
 endif()

@@ -22,4 +22,5 @@ implicit none
   integer  :: jcplx1=4 !jcplx-1
   integer  :: jsken=4 !# of kinetic components of the substrates
   integer  :: JG
+  integer  :: NFGs
 end module GridConsts

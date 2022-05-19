@@ -361,7 +361,7 @@ module TrnsfrMod
 !
 !     X*FLS,X*FHS=hourly solute flux in macropores,micropores
 !
-      call SurfaceSolutefromAtmo(NY,NX)
+      call SurfaceSolutefromAtms(NY,NX)
 !
 !     HOURLY SOLUTE FLUXES FROM ATMOSPHERE TO SNOWPACK
 !     IN SNOWFALL AND IRRIGATION ACCORDING TO CONCENTRATIONS
@@ -1077,7 +1077,7 @@ module TrnsfrMod
       end subroutine StateVarforGasandSolute
 !------------------------------------------------------------------------------------------
 
-      subroutine SurfaceSolutefromAtmo(NY,NX)
+      subroutine SurfaceSolutefromAtms(NY,NX)
       implicit none
 
       integer, intent(in) :: NY, NX
@@ -1097,7 +1097,7 @@ module TrnsfrMod
       XOPFHS(K,3,NU(NY,NX),NY,NX)=0.0
       XOAFHS(K,3,NU(NY,NX),NY,NX)=0.0
 8855  CONTINUE
-      end subroutine SurfaceSolutefromAtmo
+      end subroutine SurfaceSolutefromAtms
 !------------------------------------------------------------------------------------------
 
       subroutine HourlySoluteFluxes(I,NY,NX)

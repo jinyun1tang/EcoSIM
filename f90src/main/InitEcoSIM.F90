@@ -7,7 +7,7 @@ module InitEcoSIM
   contains
 
   subroutine InitModules(nmicbguilds)
-  use NitroMod            , only : InitNitro
+  use NitrosMod            , only : InitNitro
   use RedistMod           , only : InitRedist
   use MicrobialDataType   , only : InitMicrobialData
   use SOMDataType         , only : InitSOMData

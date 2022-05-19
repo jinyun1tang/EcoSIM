@@ -1533,8 +1533,8 @@ module Hour1Mod
   !
   OC=0.0_r8
   DO L=0,NL(NY,NX)
-  DO 7970 K=0,4
-    DO 7950 N=1,7
+  DO 7970 K=0,jcplx1
+    DO 7950 N=1,NFGs
       DO NGL=1,JG
         DO  M=1,3
           OC=OC+OMC(M,NGL,N,K,L,NY,NX)
@@ -1543,7 +1543,7 @@ module Hour1Mod
 7950  CONTINUE
 7970  CONTINUE
 
-  DO  N=1,7
+  DO  N=1,NFGs
     DO NGL=1,JG
       DO  M=1,3
         OC=OC+OMCff(M,NGL,N,L,NY,NX)

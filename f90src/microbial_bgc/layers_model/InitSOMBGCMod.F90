@@ -34,7 +34,6 @@ module InitSOMBGCMOD
   integer, intent(in) :: nmicbguilds
 
   call MicPar%Init(nmicbguilds)
-
   jcplx=micpar%jcplx
   jcplx1=micpar%jcplx1
   JG=micpar%jguilds
@@ -242,6 +241,7 @@ module InitSOMBGCMOD
 7985    CONTINUE
       enddo
 7990  CONTINUE
+
     DO 8990 N=1,7
       do NGL=1,JG
         DO 8991 M=1,3

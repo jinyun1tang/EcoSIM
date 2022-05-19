@@ -21,10 +21,10 @@ implicit none
   real(r8), allocatable :: OQCK(:)    !fractions of SOC in DOC
   real(r8), allocatable :: ORCI(:,:)   !allocation of residue to kinetic components
   real(r8), allocatable :: FL(:)       !allocation to microbial kinetic fractions
-  real(r8),allocatable :: CNOMC(:,:,:,:)        !maximum microbial N:C
-  real(r8),allocatable :: CPOMC(:,:,:,:)        !maximum microbial P:C
-  real(r8),allocatable :: CNOMCff(:,:,:)        !maximum microbial N:C
-  real(r8),allocatable :: CPOMCff(:,:,:)        !maximum microbial P:C
+  real(r8),allocatable :: CNOMC(:,:,:,:)        !maximum/minimum microbial N:C
+  real(r8),allocatable :: CPOMC(:,:,:,:)        !maximum/minimum microbial P:C
+  real(r8),allocatable :: CNOMCff(:,:,:)        !maximum/minimum microbial N:C
+  real(r8),allocatable :: CPOMCff(:,:,:)        !maximum/minimum microbial P:C
   real(r8), allocatable :: DOSA(:)
   real(r8), allocatable :: SPOSC(:,:)
   real(r8),allocatable :: CNOFC(:,:)                         !fractions to allocate N to kinetic components
@@ -33,7 +33,23 @@ implicit none
   real(r8),allocatable :: CPRH(:)                            !default P:C ratios in SOC complexes
   real(r8),allocatable :: OMCF(:)                            !hetero microbial biomass composition in SOC
   real(r8),allocatable :: OMCA(:)                            !autotrophic microbial biomass composition in SOC
-
+  logical, allocatable :: is_activef_micb(:)
+  integer :: k_woody_litr
+  integer :: k_non_woody_litr
+  integer :: k_manure
+  integer :: k_POM
+  integer :: k_humus
+  integer :: nf_amonia_oxi
+  integer :: nf_nitrite_oxi
+  integer :: nf_aero_methanot
+  integer :: nf_hydro_methang
+  integer :: n_aero_hetrophb
+  integer :: n_anero_faculb
+  integer :: n_aero_fungi
+  integer :: n_anaero_ferm
+  integer :: n_aceto_methang
+  integer :: n_aero_n2fixer
+  integer :: n_anero_n2fixer
   contains
     procedure, public  :: Init
     procedure, public  :: SetPars
@@ -57,8 +73,35 @@ contains
   this%jguilds=nmicbguilds
   this%NFGs=7
 
+  this%k_woody_litr=0
+  this%k_non_woody_litr=1
+  this%k_manure=2
+  this%k_POM=3
+  this%k_humus=4
+
+
   call this%Initallocate()
 
+!set up functional group ids
+!five om-complexes
+  this%n_aero_hetrophb=1
+  this%n_anero_faculb=2
+  this%n_aero_fungi=3
+  this%n_anaero_ferm=4
+  this%n_aceto_methang=5
+  this%n_aero_n2fixer=6
+  this%n_anero_n2fixer=7
+
+!the abstract complex
+  this%nf_amonia_oxi=1
+  this%nf_nitrite_oxi=2
+  this%nf_aero_methanot=3
+  this%nf_hydro_methang=5
+
+  this%is_activef_micb(this%nf_amonia_oxi)=.True.
+  this%is_activef_micb(this%nf_nitrite_oxi)=.True.
+  this%is_activef_micb(this%nf_aero_methanot)=.True.
+  this%is_activef_micb(this%nf_hydro_methang)=.True.
   end subroutine Init
 !------------------------------------------------------------------------------------------
 
@@ -144,8 +187,8 @@ contains
     DO  N=1,7
       IF(N.EQ.3)THEN
         DO NGL=1,JG
-          CNOMC(1,NGL,N,K)=0.15_r8
-          CNOMC(2,NGL,N,K)=0.09_r8
+          CNOMC(1,NGL,N,K)=0.15_r8           !maximum
+          CNOMC(2,NGL,N,K)=0.09_r8           !minimum
           CPOMC(1,NGL,N,K)=0.015_r8
           CPOMC(2,NGL,N,K)=0.009_r8
         ENDDO
@@ -214,6 +257,7 @@ contains
   allocate(this%OMCF(NFGs))
   allocate(this%OMCA(NFGs))
   allocate(this%FL(2))
+  allocate(this%is_activef_micb(NFGs)); this%is_activef_micb=.false.
   end subroutine InitAllocate
 !------------------------------------------------------------------------------------------
 
@@ -243,7 +287,7 @@ contains
   call destroy(this%CPRH)
   call destroy(this%OMCF)
   call destroy(this%OMCA)
-
+  call destroy(this%is_activef_micb)
   end subroutine DestructMicBGCPar
 
 end module MicBGCPars

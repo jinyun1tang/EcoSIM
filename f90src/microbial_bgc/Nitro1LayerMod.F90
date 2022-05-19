@@ -74,31 +74,30 @@ module nitro1LayerMod
   call ncplxs%Init()
   call naqfdiag%ZeroOut()
 
-  IF(L.EQ.0.OR.L.GE.NU(NY,NX))THEN
 !
-      !write(*,*)'StageBGCEnvironCondition'
-    call StageBGCEnvironCondition(L,NY,NX,KL,nmicdiag,nmics,ncplxs)
+  !write(*,*)'StageBGCEnvironCondition'
+  call StageBGCEnvironCondition(L,NY,NX,KL,nmicdiag,nmics,ncplxs)
 !
-      !write(*,*)'MicrobialCatabolism'
-    call MicrobialCatabolism(L,NY,NX,nmicdiag,naqfdiag,nmicf,nmics,ncplxf,ncplxs)
+  !write(*,*)'MicrobialCatabolism'
+  call MicrobialCatabolism(L,NY,NX,nmicdiag,naqfdiag,nmicf,nmics,ncplxf,ncplxs)
 !
-      !write(*,*)'ChemoDenitrification'
-    call ChemoDenitrification(L,NY,NX,nmicdiag,naqfdiag)
+  !write(*,*)'ChemoDenitrification'
+  call ChemoDenitrification(L,NY,NX,nmicdiag,naqfdiag)
 !
 !     DECOMPOSITION
 !
 !     ROQCK=total respiration of DOC+DOA used to represent microbial activity
 !
-    DO 1870 K=0,KL
-      DO 1875 N=1,7
-        DO NGL=1,JG
-          ncplxf%ROQCK(K)=ncplxf%ROQCK(K)+nmicf%ROQCD(NGL,N,K)
-        enddo
+  DO 1870 K=0,KL
+    DO 1875 N=1,7
+      DO NGL=1,JG
+        ncplxf%ROQCK(K)=ncplxf%ROQCK(K)+nmicf%ROQCD(NGL,N,K)
+      enddo
 1875  CONTINUE
 1870  CONTINUE
         !
         !write(*,*)'PRIMING of DOC,DON,DOP BETWEEN LITTER AND NON-LITTER C'
-    call OMTransferForPriming(KL,L,NY,NX,nmicf,nmics,ncplxf,ncplxs)
+  call OMTransferForPriming(KL,L,NY,NX,nmicf,nmics,ncplxf,ncplxs)
         !
         !     TRANSFER ALL PRIMING AMONG ALL K
         !
@@ -107,52 +106,32 @@ module nitro1LayerMod
         !     OQC,OQN,OQP,OQA=DOC,DON,DOP,acetate in micropores
         !     OMC,OMN,OMP=microbial C,N,P
         !
-    DO 1790 K=0,KL
+  DO 1790 K=0,KL
 !
           !write(*,*)'DECOMPOSITION OF ORGANIC SUBSTRATES'
 !
-      call SolidOMDecomposition(K,L,NY,NX,nmicdiag,ncplxf,ncplxs)
+    call SolidOMDecomposition(K,L,NY,NX,nmicdiag,ncplxf,ncplxs)
 !
-          !write(*,*)'DOC ADSORPTION - DESORPTION'
+        !write(*,*)'DOC ADSORPTION - DESORPTION'
 !
-      call DOMSorption(K,L,NY,NX,nmicf,ncplxf,ncplxs)
+    call DOMSorption(K,L,NY,NX,nmicf,ncplxf,ncplxs)
 
 1790  CONTINUE
-        !write(*,*)'RedistDecompositionProduct'
-      call RedistDecompositionProduct(KL,L,NY,NX,nmicdiag,nmicf,ncplxf,ncplxs)
+      !write(*,*)'RedistDecompositionProduct'
+  call RedistDecompositionProduct(KL,L,NY,NX,nmicdiag,nmicf,ncplxf,ncplxs)
 !
         !write(*,*)'MICROBIAL GROWTH FROM RESPIRATION, MINERALIZATION'
 
-      call MicrobialAnabolicUpdate(L,NY,NX,nmicf)
+  call MicrobialAnabolicUpdate(L,NY,NX,nmicf)
 !
         !write(*,*)'MICROBIAL COLONIZATION OF NEW LITTER'
 !
-      call MicrobialLitterColonization(KL,L,NY,NX,ncplxf,ncplxs)
+  call MicrobialLitterColonization(KL,L,NY,NX,ncplxf,ncplxs)
 !
 !     AGGREGATE ALL TRANSFORMATIONS CALCULATED ABOVE FOR EACH N,K
 !
-      call AggregateTransformations(L,NY,NX,nmicdiag,naqfdiag,nmicf,ncplxf)
-  ELSE
-    RCO2O(L,NY,NX)=0.0_r8
-    RCH4O(L,NY,NX)=0.0_r8
-    RH2GO(L,NY,NX)=0.0_r8
-    RUPOXO(L,NY,NX)=0.0_r8
-    RN2G(L,NY,NX)=0.0_r8
-    RN2O(L,NY,NX)=0.0_r8
-    XNH4S(L,NY,NX)=0.0_r8
-    XNO3S(L,NY,NX)=0.0_r8
-    XNO2S(L,NY,NX)=0.0_r8
-    XH2PS(L,NY,NX)=0.0_r8
-    XH1PS(L,NY,NX)=0.0_r8
-    XNH4B(L,NY,NX)=0.0_r8
-    XNO3B(L,NY,NX)=0.0_r8
-    XNO2B(L,NY,NX)=0.0_r8
-    XH2BS(L,NY,NX)=0.0_r8
-    XH1BS(L,NY,NX)=0.0_r8
-    XN2GS(L,NY,NX)=0.0_r8
-  ENDIF
+  call AggregateTransformations(L,NY,NX,nmicdiag,naqfdiag,nmicf,ncplxf)
 !
-
   call nmics%destroy()
   call nmicf%destroy()
   call ncplxf%destroy()
@@ -330,11 +309,7 @@ module nitro1LayerMod
     ORCT(K)=0.0_r8
     DO 875 M=1,2
       ORCT(K)=ORCT(K)+ORC(M,K,L,NY,NX)
-!     IF(L.EQ.4.AND.K.EQ.2)THEN
-!     WRITE(*,876)'ORCT',I,J,NX,NY,L,K,M,ORCT(K)
-!    2,ORC(M,K,L,NY,NX)
-!876   FORMAT(A8,7I4,60E12.4)
-!     ENDIF
+
 875 CONTINUE
     TORC=TORC+ORCT(K)
 !
@@ -358,7 +333,6 @@ module nitro1LayerMod
   TOMN=0.0_r8
   DO 890 K=0,5
     IF(L.NE.0.OR.(K.NE.3.AND.K.NE.4))THEN
-!        IF(K.NE.5.OR.(N.LE.3.OR.N.EQ.5))THEN
       IF(K.EQ.5)THEN
         DO N=1,7
           IF(N.LE.3.OR.N.EQ.5)THEN
@@ -370,7 +344,6 @@ module nitro1LayerMod
                 CNOMAff(NGL,N)=CNOMCff(1,NGL,N)
                 CPOMAff(NGL,N)=CPOMCff(1,NGL,N)
               ENDIF
-!              print*,'OMCk',K,OMCff(1,NGL,N,L,NY,NX)
               OMAff(NGL,N)=AMAX1(0.0,OMCff(1,NGL,N,L,NY,NX)/FL(1))
               FCNff(NGL,N)=AMIN1(1.0,AMAX1(0.50,SQRT(CNOMAff(NGL,N)/CNOMCff(1,NGL,N))))
               FCPff(NGL,N)=AMIN1(1.0,AMAX1(0.50,SQRT(CPOMAff(NGL,N)/CPOMCff(1,NGL,N))))
@@ -403,8 +376,6 @@ module nitro1LayerMod
         ENDDO
       ELSE
         DO 895 N=1,7
-!        IF(K.NE.5.OR.(N.LE.3.OR.N.EQ.5))THEN
-
           DO NGL=1,JG
             IF(OMC(1,NGL,N,K,L,NY,NX).GT.ZEROS(NY,NX))THEN
               CNOMA(NGL,N,K)=AMAX1(0.0,OMN(1,NGL,N,K,L,NY,NX)/OMC(1,NGL,N,K,L,NY,NX))
@@ -413,7 +384,6 @@ module nitro1LayerMod
               CNOMA(NGL,N,K)=CNOMC(1,NGL,N,K)
               CPOMA(NGL,N,K)=CPOMC(1,NGL,N,K)
             ENDIF
-!            print*,'OMC',K,OMC(1,NGL,N,K,L,NY,NX)
             OMA(NGL,N,K)=AMAX1(0.0,OMC(1,NGL,N,K,L,NY,NX)/FL(1))
             FCN(NGL,N,K)=AMIN1(1.0,AMAX1(0.50,SQRT(CNOMA(NGL,N,K)/CNOMC(1,NGL,N,K))))
             FCP(NGL,N,K)=AMIN1(1.0,AMAX1(0.50,SQRT(CPOMA(NGL,N,K)/CPOMC(1,NGL,N,K))))
@@ -617,7 +587,7 @@ module nitro1LayerMod
 !            print*,'OMA',K,OMA(NGL,N,K)
             IF(OMA(NGL,N,K).GT.0.0_r8)THEN
               call ActiveMicrobes(NGL,N,K,L,NY,NX,XCO2,TFNX,WFNG,TOMCNK,&
-                OXKX,TOMA,TOMN,RH2GZ,ZNH4T,ZNO3T,ZNO2T,H2P4T,H1P4T,&
+                OXKX,TOMA,TOMN,ZNH4T,ZNO3T,ZNO2T,H2P4T,H1P4T,&
                 naqfdiag,nmicf,nmics,ncplxf,ncplxs)
             ENDIF
           ENDDO
@@ -628,14 +598,13 @@ module nitro1LayerMod
   end associate
   end subroutine MicrobialCatabolism
 !------------------------------------------------------------------------------------------
-  subroutine ActiveMicrobes(NGL,N,K,L,NY,NX,XCO2,TFNX,WFNG,TOMCNK,OXKX,TOMA,TOMN,RH2GZ,&
+  subroutine ActiveMicrobes(NGL,N,K,L,NY,NX,XCO2,TFNX,WFNG,TOMCNK,OXKX,TOMA,TOMN,&
     ZNH4T,ZNO3T,ZNO2T,H2P4T,H1P4T,naqfdiag,nmicf,nmics,ncplxf,ncplxs)
   implicit none
   integer, intent(in) :: NGL,N,K,L,NY,NX
   real(r8), intent(in):: OXKX,tomcnk(2),WFNG,TFNX,XCO2
   real(r8), intent(in) :: TOMA,TOMN
   real(r8), intent(in) :: ZNH4T,ZNO3T,ZNO2T,H2P4T,H1P4T
-  real(r8), intent(out):: RH2GZ
   type(NitroAQMFluxDiagType), INTENT(INOUT) :: naqfdiag
   type(NitroMicStateType), intent(inout) :: nmics
   type(NitroMicFluxType), intent(inout) :: nmicf
@@ -945,7 +914,7 @@ module nitro1LayerMod
 ! AMONG COMPETING MICROBIAL AND ROOT POPULATIONS IN SOIL LAYERS
             !write(*,*)'SubstrateCompetitionFactors'
   call SubstrateCompetitionFactorsff(NGL,N,L,NY,NX,FOXYX,FNH4X,&
-    FNB3X,FNB4X,FNO3X,FPO4X,FPOBX,FP14X,FP1BX,FOQC,FOQA,&
+    FNB3X,FNB4X,FNO3X,FPO4X,FPOBX,FP14X,FP1BX,&
     naqfdiag,nmicf,nmics)
 !
 ! HETEROTROPHIC BIOMASS RESPIRATION
@@ -2549,14 +2518,13 @@ module nitro1LayerMod
 !------------------------------------------------------------------------------------------
 
   subroutine SubstrateCompetitionFactorsff(NGL,N,L,NY,NX,FOXYX,&
-    FNH4X,FNB3X,FNB4X,FNO3X,FPO4X,FPOBX,FP14X,FP1BX,FOQC,FOQA,&
+    FNH4X,FNB3X,FNB4X,FNO3X,FPO4X,FPOBX,FP14X,FP1BX,&
     naqfdiag,nmicf,nmics)
   implicit none
   integer, intent(in) :: NGL,N,L,NY,NX
   real(r8), intent(out):: FOXYX,FNH4X
   real(r8),intent(out) :: FNB3X,FNB4X,FNO3X
   real(r8),intent(out) :: FPO4X,FPOBX,FP14X,FP1BX
-  real(r8),intent(out) :: FOQC,FOQA
   type(NitroAQMFluxDiagType),INTENT(INOUT)::  naqfdiag
   type(NitroMicStateType), intent(inout) :: nmics
   type(NitroMicFluxType), intent(inout) :: nmicf

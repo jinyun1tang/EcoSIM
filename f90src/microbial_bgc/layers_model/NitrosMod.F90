@@ -1,4 +1,4 @@
-module nitroMod
+module nitrosMod
 !!
 ! DESCRIPTION:
 ! codes to do soil biological transformations
@@ -13,7 +13,6 @@ module nitroMod
   use ChemTranspDataType
   use FertilizerDataType
   use NitroDiagTypes
-  use nitro1LayerMod
   use NitroDisturbMod
   use GridConsts
   use SoilBGCDataType
@@ -21,7 +20,7 @@ module nitroMod
   use SoilPhysDataType
   use SoilPropertyDataType
   use GridDataType
-
+  use MicBGCMod
   implicit none
 
   private
@@ -29,8 +28,8 @@ module nitroMod
   character(len=*), parameter :: mod_filename = __FILE__
 
 !
-  public :: nitro, initNitro
-
+  public :: initNitro
+  public :: VerticalLitterMixLvsLL
   contains
 
 !------------------------------------------------------------------------------------------
@@ -42,64 +41,6 @@ module nitroMod
   call initNitro1Layer
 
   end subroutine initNitro
-
-!------------------------------------------------------------------------------------------
-
-  SUBROUTINE nitro(I,J,NHW,NHE,NVN,NVS)
-!
-!     THIS SUBROUTINE CALCULATES ALL SOIL BIOLOGICAL TRANSFORMATIONS
-!
-  implicit none
-  integer, intent(in) :: I, J
-  integer, intent(in) :: NHW,NHE,NVN,NVS
-
-  integer :: L,NX,NY
-
-!   begin_execution
-
-  DO 9995 NX=NHW,NHE
-    DO 9990 NY=NVN,NVS
-!
-!       VOLWZ=water volume used to calculate aqueous microbial
-!       concentrations that drive microbial density effects on
-!       decomposition
-      DO 998 L=0,NL(NY,NX)
-        IF(VOLX(L,NY,NX).GT.ZEROS2(NY,NX))THEN
-          call SoilBGCOneLayer(I,J,L,NY,NX)
-!     MIX LITTER C BETWEEN ADJACENT SOIL LAYERS L AND LL
-          call VerticalLitterMixLvsLL(I,J,L,NY,NX)
-
-        ELSE
-          RCO2O(L,NY,NX)=0.0_r8
-          RCH4O(L,NY,NX)=0.0_r8
-          RH2GO(L,NY,NX)=0.0_r8
-          RUPOXO(L,NY,NX)=0.0_r8
-          RN2G(L,NY,NX)=0.0_r8
-          RN2O(L,NY,NX)=0.0_r8
-          XNH4S(L,NY,NX)=0.0_r8
-          XNO3S(L,NY,NX)=0.0_r8
-          XNO2S(L,NY,NX)=0.0_r8
-          XH2PS(L,NY,NX)=0.0_r8
-          XH1PS(L,NY,NX)=0.0_r8
-          XNH4B(L,NY,NX)=0.0_r8
-          XNO3B(L,NY,NX)=0.0_r8
-          XNO2B(L,NY,NX)=0.0_r8
-          XH2BS(L,NY,NX)=0.0_r8
-          XH1BS(L,NY,NX)=0.0_r8
-          XN2GS(L,NY,NX)=0.0_r8
-        ENDIF
-
-998   CONTINUE
-!
-!       SOC LOSS IF FIRE OR REMOVAL EVENT IS ENTERED IN DISTURBANCE FILE
-!
-      call SOMRemovalByDisturbance(I,J,NY,NX)
-9990  CONTINUE
-9995  CONTINUE
-  RETURN
-  END subroutine nitro
-
-
 
 !------------------------------------------------------------------------------------------
 
@@ -297,4 +238,4 @@ module nitroMod
   ENDIF
   end subroutine ApplyVerticalMix
 
-end module nitroMod
+end module nitrosMod
