@@ -494,7 +494,7 @@ module Hour1Mod
             PCPHEB(N,NN,NY,NX)=0.0_r8
             PCPMEB(N,NN,NY,NX)=0.0_r8
             DO K=0,jcplx
-              DO  NO=1,7
+              DO  NO=1,NFGs
                 DO NGL=1,JG
                   OMCER(3+(NGL-1)*3,NO,K,N,NN,NY,NX)=0.0_r8
                   DO  M=1,2
@@ -2477,7 +2477,7 @@ module Hour1Mod
 !     OMCI=microbial biomass content in litter
 !     OMCF,OMCA=hetero,autotrophic biomass composition in litter
 !
-      DO 2960 N=1,7
+      DO 2960 N=1,NFGs
         DO NGL=1,JG
           DO 2961 M=1,3
             OMC1=AMAX1(0.0,AMIN1(OSCI*micpar%OMCI(M+(NGL-1)*3,K)*micpar%OMCF(N),OSCI-OSCX))
@@ -2489,7 +2489,7 @@ module Hour1Mod
             OSCX=OSCX+OMC1
             OSNX=OSNX+OMN1
             OSPX=OSPX+OMP1
-            DO 2962 NN=1,7
+            DO 2962 NN=1,NFGs
               OMC(M,NGL,NN,5,LFDPTH,NY,NX)=OMC(M,NGL,NN,5,LFDPTH,NY,NX)+OMC1*micpar%OMCA(NN)
               OMN(M,NGL,NN,5,LFDPTH,NY,NX)=OMN(M,NGL,NN,5,LFDPTH,NY,NX)+OMN1*micpar%OMCA(NN)
               OMP(M,NGL,NN,5,LFDPTH,NY,NX)=OMP(M,NGL,NN,5,LFDPTH,NY,NX)+OMP1*micpar%OMCA(NN)

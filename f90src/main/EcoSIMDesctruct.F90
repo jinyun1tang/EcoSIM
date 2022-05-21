@@ -23,6 +23,7 @@ module EcoSIMDesctruct
   use PlantAPIData  , only : DestructPlantAPIData
   use PlantMngmtDataType, only : DestructPlantMngmtData
   use InitSOMBGCMOD, only : DestructSOMBGC
+  use RedistMod, only : DestructRedist
   implicit none
 
   call DestructMicrobialData
@@ -52,6 +53,8 @@ module EcoSIMDesctruct
   call DestructAquaChem
 
   call DestructSOMBGC
+
+  call DestructRedist
   end subroutine DestructEcoSIM
 
 end module EcoSIMDesctruct

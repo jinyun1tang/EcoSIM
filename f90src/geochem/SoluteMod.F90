@@ -99,8 +99,10 @@ module SoluteMod
 
   integer, intent(in) :: I, J
   integer, intent(in) :: NHW, NHE, NVN, NVS
-!     local variable declaration
+
+! declaration of local variables
   integer :: L,NY,NX,NPI
+
 !     begin_execution
   NPI=INT(NPH/2)
   DO 9995 NX=NHW,NHE

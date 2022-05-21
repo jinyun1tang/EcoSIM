@@ -29,6 +29,7 @@ module TrnsfrMod
   implicit none
 
   private
+  CHARACTER(LEN=*), PARAMETER :: MOD_FILENAME=__FILE__
 
 
   real(r8) :: CCO2S1,CCH4S1,COXYS1,CZ2GS1,CZ2OS1,CH2GS1,CNH4S1

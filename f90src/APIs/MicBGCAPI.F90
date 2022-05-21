@@ -105,7 +105,6 @@ DO 9995 NX=NHW,NHE
 RETURN
 END subroutine MicrobeModel
 
-
 !------------------------------------------------------------------------------------------
 
   subroutine MicBGC1Layer(I,J,L,NY,NX)
