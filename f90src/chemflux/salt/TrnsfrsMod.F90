@@ -1515,7 +1515,7 @@ module TrnsfrsMod
       end subroutine SaltModelSoluteFlux
 !------------------------------------------------------------------------------------------
 
-      subroutine InitFluxAccumlatorsInRunoff(NY,NX)
+  subroutine InitFluxAccumlatorsInRunoff(NY,NX)
 !
 !     Description:
 !
@@ -1605,7 +1605,7 @@ module TrnsfrsMod
       TQSC1P(NY,NX)=0.0
       TQSC2P(NY,NX)=0.0
       TQSM1P(NY,NX)=0.0
-      end subroutine InitFluxAccumlatorsInRunoff
+  end subroutine InitFluxAccumlatorsInRunoff
 !------------------------------------------------------------------------------------------
 
       subroutine InitFluxAccumulatorsInSnowpack(NY,NX)
@@ -1616,7 +1616,7 @@ module TrnsfrsMod
       integer, intent(in) :: NY,NX
       integer :: L
 
-      DO 9855 L=1,JS
+  DO 9855 L=1,JS
       TALBLS(L,NY,NX)=0.0
       TFEBLS(L,NY,NX)=0.0
       THYBLS(L,NY,NX)=0.0
@@ -1659,7 +1659,7 @@ module TrnsfrsMod
       TC2PBS(L,NY,NX)=0.0
       TM1PBS(L,NY,NX)=0.0
 9855  CONTINUE
-      end subroutine InitFluxAccumulatorsInSnowpack
+  end subroutine InitFluxAccumulatorsInSnowpack
 !------------------------------------------------------------------------------------------
 
       subroutine InitFluxAccumulatorsInSoil(NY,NX)
@@ -1670,7 +1670,7 @@ module TrnsfrsMod
       integer, intent(in) :: NY,NX
       integer :: L
 
-      DO 9885 L=NU(NY,NX),NL(NY,NX)
+  DO 9885 L=NU(NY,NX),NL(NY,NX)
       TALFLS(L,NY,NX)=0.0
       TFEFLS(L,NY,NX)=0.0
       THYFLS(L,NY,NX)=0.0
@@ -7526,7 +7526,7 @@ module TrnsfrsMod
       end subroutine NetOverloadFLuxInSnow
 !------------------------------------------------------------------------------------------
 
-      subroutine NetFluxInSnowpack(M,NY,NX,N1,N2)
+  subroutine NetFluxInSnowpack(M,NY,NX,N1,N2)
 !
 !     Description:
 !
@@ -7540,18 +7540,18 @@ module TrnsfrsMod
 !
 !     IF LOWER LAYER IS IN THE SNOWPACK
 !
-      IF(LS.LT.JS.AND.VHCPWM(M,LS2,N2,N1).GT.VHCPWX(N2,N1))THEN
-      TALBLS(LS,NY,NX)=TALBLS(LS,NY,NX)+RALBLS(LS,NY,NX) &
+  IF(LS.LT.JS.AND.VHCPWM(M,LS2,N2,N1).GT.VHCPWX(N2,N1))THEN
+    TALBLS(LS,NY,NX)=TALBLS(LS,NY,NX)+RALBLS(LS,NY,NX) &
       -RALBLS(LS2,NY,NX)
-      TFEBLS(LS,NY,NX)=TFEBLS(LS,NY,NX)+RFEBLS(LS,NY,NX) &
+    TFEBLS(LS,NY,NX)=TFEBLS(LS,NY,NX)+RFEBLS(LS,NY,NX) &
       -RFEBLS(LS2,NY,NX)
-      THYBLS(LS,NY,NX)=THYBLS(LS,NY,NX)+RHYBLS(LS,NY,NX) &
+    THYBLS(LS,NY,NX)=THYBLS(LS,NY,NX)+RHYBLS(LS,NY,NX) &
       -RHYBLS(LS2,NY,NX)
-      TCABLS(LS,NY,NX)=TCABLS(LS,NY,NX)+RCABLS(LS,NY,NX) &
+    TCABLS(LS,NY,NX)=TCABLS(LS,NY,NX)+RCABLS(LS,NY,NX) &
       -RCABLS(LS2,NY,NX)
-      TMGBLS(LS,NY,NX)=TMGBLS(LS,NY,NX)+RMGBLS(LS,NY,NX) &
+    TMGBLS(LS,NY,NX)=TMGBLS(LS,NY,NX)+RMGBLS(LS,NY,NX) &
       -RMGBLS(LS2,NY,NX)
-      TNABLS(LS,NY,NX)=TNABLS(LS,NY,NX)+RNABLS(LS,NY,NX) &
+    TNABLS(LS,NY,NX)=TNABLS(LS,NY,NX)+RNABLS(LS,NY,NX) &
       -RNABLS(LS2,NY,NX)
       TKABLS(LS,NY,NX)=TKABLS(LS,NY,NX)+RKABLS(LS,NY,NX) &
       -RKABLS(LS2,NY,NX)

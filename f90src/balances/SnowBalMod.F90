@@ -19,7 +19,7 @@ implicit none
 
   character(len=*), parameter :: mod_filename = __FILE__
 
-  public :: SnowDynUpdate
+  public :: SnowDynUpdate,SnowpackLayering
   contains
 
   subroutine SnowDynUpdate(NY,NX)
@@ -370,5 +370,233 @@ implicit none
   ENDIF
 
   end subroutine UpdateSoluteInSnow
+
+!------------------------------------------------------------------------------------------
+
+  subroutine SnowpackLayering(NY,NX)
+  implicit none
+  integer, intent(in) :: NY,NX
+  real(r8) :: FX,FY
+  integer :: L,L1,L0
+  real(r8) :: ENGY0X,ENGY0,ENGY1X,ENGY1
+  real(r8) :: DDLYXS,DDLYRS
+  real(r8) :: DDLYXX,VOLSLX
+  integer :: IFLGLS
+!     begin_execution
+!
+  IF(VHCPW(1,NY,NX).GT.VHCPWX(NY,NX))THEN
+    DO 325 L=1,JS-1
+!      VOLSLX=VOLSL(L,NY,NX)
+      IF(VOLSL(L,NY,NX).GT.ZEROS2(NY,NX))THEN
+        DDLYXS=(VOLSI(L,NY,NX)-VOLSSL(L,NY,NX)/DENSS(L,NY,NX) &
+          -VOLWSL(L,NY,NX)-VOLISL(L,NY,NX))/AREA(3,L,NY,NX)
+!        DDLYXX=DDLYXS
+        IF(DDLYXS.LT.-ZERO.OR.DLYRS(L+1,NY,NX).GT.ZERO)THEN
+          DDLYRS=AMIN1(DDLYXS,DLYRS(L+1,NY,NX))
+          IFLGLS=1
+        ELSE
+          DDLYXS=(VOLSL(L,NY,NX)-VOLSSL(L,NY,NX)/DENSS(L,NY,NX) &
+            -VOLWSL(L,NY,NX)-VOLISL(L,NY,NX))/AREA(3,L,NY,NX)
+          DDLYRS=DDLYXS
+          IFLGLS=2
+        ENDIF
+      ELSE
+        DDLYRS=0.0_r8
+        IFLGLS=0
+      ENDIF
+      !
+      !     RESET SNOW LAYER DEPTHS
+      !
+      CDPTHS(L,NY,NX)=CDPTHS(L,NY,NX)+DDLYRS
+      DLYRS(L,NY,NX)=CDPTHS(L,NY,NX)-CDPTHS(L-1,NY,NX)
+!
+      !     TRANSFER STATE VARIABLES BETWEEN LAYERS
+      !
+      IF(ABS(DDLYRS).GT.ZERO)THEN
+        IF(DDLYRS.GT.0.0)THEN
+          L1=L
+          L0=L+1
+          IF(DDLYRS.LT.DDLYXS)THEN
+            FX=1.0
+          ELSE
+            FX=AMIN1(1.0,DDLYRS*AREA(3,L0,NY,NX)/VOLSL(L0,NY,NX))
+          ENDIF
+        ELSE
+          L1=L+1
+          L0=L
+          IF(VOLSL(L0,NY,NX).LT.VOLSI(L0,NY,NX))THEN
+            FX=0.0_r8
+          ELSE
+            FX=AMIN1(1.0,-DDLYRS*AREA(3,L0,NY,NX)/VOLSL(L0,NY,NX))
+          ENDIF
+        ENDIF
+        IF(FX.GT.0.0)THEN
+          FY=1.0-FX
+
+!
+!     TARGET SNOW LAYER
+!
+          VOLSSL(L1,NY,NX)=VOLSSL(L1,NY,NX)+FX*VOLSSL(L0,NY,NX)
+          VOLWSL(L1,NY,NX)=VOLWSL(L1,NY,NX)+FX*VOLWSL(L0,NY,NX)
+          VOLISL(L1,NY,NX)=VOLISL(L1,NY,NX)+FX*VOLISL(L0,NY,NX)
+          VOLSL(L1,NY,NX)=VOLSSL(L1,NY,NX)/DENSS(L1,NY,NX) &
+            +VOLWSL(L1,NY,NX)+VOLISL(L1,NY,NX)
+          ENGY1X=VHCPW(L1,NY,NX)*TKW(L1,NY,NX)
+          ENGY0X=VHCPW(L0,NY,NX)*TKW(L0,NY,NX)
+          ENGY1=ENGY1X+FX*ENGY0X
+          VHCPW(L1,NY,NX)=cps*VOLSSL(L1,NY,NX)+cpw*VOLWSL(L1,NY,NX) &
+            +cpi*VOLISL(L1,NY,NX)
+          IF(VHCPW(L1,NY,NX).GT.ZEROS(NY,NX))THEN
+            TKW(L1,NY,NX)=ENGY1/VHCPW(L1,NY,NX)
+          ELSE
+            TKW(L1,NY,NX)=TKW(L0,NY,NX)
+          ENDIF
+          TCW(L1,NY,NX)=TKW(L1,NY,NX)-TC2K
+          CO2W(L1,NY,NX)=CO2W(L1,NY,NX)+FX*CO2W(L0,NY,NX)
+          CH4W(L1,NY,NX)=CH4W(L1,NY,NX)+FX*CH4W(L0,NY,NX)
+          OXYW(L1,NY,NX)=OXYW(L1,NY,NX)+FX*OXYW(L0,NY,NX)
+          ZNGW(L1,NY,NX)=ZNGW(L1,NY,NX)+FX*ZNGW(L0,NY,NX)
+          ZN2W(L1,NY,NX)=ZN2W(L1,NY,NX)+FX*ZN2W(L0,NY,NX)
+          ZN4W(L1,NY,NX)=ZN4W(L1,NY,NX)+FX*ZN4W(L0,NY,NX)
+          ZN3W(L1,NY,NX)=ZN3W(L1,NY,NX)+FX*ZN3W(L0,NY,NX)
+          ZNOW(L1,NY,NX)=ZNOW(L1,NY,NX)+FX*ZNOW(L0,NY,NX)
+          Z1PW(L1,NY,NX)=Z1PW(L1,NY,NX)+FX*Z1PW(L0,NY,NX)
+          ZHPW(L1,NY,NX)=ZHPW(L1,NY,NX)+FX*ZHPW(L0,NY,NX)
+          IF(ISALTG.NE.0)THEN
+            ZALW(L1,NY,NX)=ZALW(L1,NY,NX)+FX*ZALW(L0,NY,NX)
+            ZFEW(L1,NY,NX)=ZFEW(L1,NY,NX)+FX*ZFEW(L0,NY,NX)
+            ZHYW(L1,NY,NX)=ZHYW(L1,NY,NX)+FX*ZHYW(L0,NY,NX)
+            ZCAW(L1,NY,NX)=ZCAW(L1,NY,NX)+FX*ZCAW(L0,NY,NX)
+            ZMGW(L1,NY,NX)=ZMGW(L1,NY,NX)+FX*ZMGW(L0,NY,NX)
+            ZNAW(L1,NY,NX)=ZNAW(L1,NY,NX)+FX*ZNAW(L0,NY,NX)
+            ZKAW(L1,NY,NX)=ZKAW(L1,NY,NX)+FX*ZKAW(L0,NY,NX)
+            ZOHW(L1,NY,NX)=ZOHW(L1,NY,NX)+FX*ZOHW(L0,NY,NX)
+            ZSO4W(L1,NY,NX)=ZSO4W(L1,NY,NX)+FX*ZSO4W(L0,NY,NX)
+            ZCLW(L1,NY,NX)=ZCLW(L1,NY,NX)+FX*ZCLW(L0,NY,NX)
+            ZCO3W(L1,NY,NX)=ZCO3W(L1,NY,NX)+FX*ZCO3W(L0,NY,NX)
+            ZHCO3W(L1,NY,NX)=ZHCO3W(L1,NY,NX)+FX*ZHCO3W(L0,NY,NX)
+            ZALH1W(L1,NY,NX)=ZALH1W(L1,NY,NX)+FX*ZALH1W(L0,NY,NX)
+            ZALH2W(L1,NY,NX)=ZALH2W(L1,NY,NX)+FX*ZALH2W(L0,NY,NX)
+            ZALH3W(L1,NY,NX)=ZALH3W(L1,NY,NX)+FX*ZALH3W(L0,NY,NX)
+            ZALH4W(L1,NY,NX)=ZALH4W(L1,NY,NX)+FX*ZALH4W(L0,NY,NX)
+            ZALSW(L1,NY,NX)=ZALSW(L1,NY,NX)+FX*ZALSW(L0,NY,NX)
+            ZFEH1W(L1,NY,NX)=ZFEH1W(L1,NY,NX)+FX*ZFEH1W(L0,NY,NX)
+            ZFEH2W(L1,NY,NX)=ZFEH2W(L1,NY,NX)+FX*ZFEH2W(L0,NY,NX)
+            ZFEH3W(L1,NY,NX)=ZFEH3W(L1,NY,NX)+FX*ZFEH3W(L0,NY,NX)
+            ZFEH4W(L1,NY,NX)=ZFEH4W(L1,NY,NX)+FX*ZFEH4W(L0,NY,NX)
+            ZFESW(L1,NY,NX)=ZFESW(L1,NY,NX)+FX*ZFESW(L0,NY,NX)
+            ZCAOW(L1,NY,NX)=ZCAOW(L1,NY,NX)+FX*ZCAOW(L0,NY,NX)
+            ZCACW(L1,NY,NX)=ZCACW(L1,NY,NX)+FX*ZCACW(L0,NY,NX)
+            ZCAHW(L1,NY,NX)=ZCAHW(L1,NY,NX)+FX*ZCAHW(L0,NY,NX)
+            ZCASW(L1,NY,NX)=ZCASW(L1,NY,NX)+FX*ZCASW(L0,NY,NX)
+            ZMGOW(L1,NY,NX)=ZMGOW(L1,NY,NX)+FX*ZMGOW(L0,NY,NX)
+            ZMGCW(L1,NY,NX)=ZMGCW(L1,NY,NX)+FX*ZMGCW(L0,NY,NX)
+            ZMGHW(L1,NY,NX)=ZMGHW(L1,NY,NX)+FX*ZMGHW(L0,NY,NX)
+            ZMGSW(L1,NY,NX)=ZMGSW(L1,NY,NX)+FX*ZMGSW(L0,NY,NX)
+            ZNACW(L1,NY,NX)=ZNACW(L1,NY,NX)+FX*ZNACW(L0,NY,NX)
+            ZNASW(L1,NY,NX)=ZNASW(L1,NY,NX)+FX*ZNASW(L0,NY,NX)
+            ZKASW(L1,NY,NX)=ZKASW(L1,NY,NX)+FX*ZKASW(L0,NY,NX)
+            H0PO4W(L1,NY,NX)=H0PO4W(L1,NY,NX)+FX*H0PO4W(L0,NY,NX)
+            H3PO4W(L1,NY,NX)=H3PO4W(L1,NY,NX)+FX*H3PO4W(L0,NY,NX)
+            ZFE1PW(L1,NY,NX)=ZFE1PW(L1,NY,NX)+FX*ZFE1PW(L0,NY,NX)
+            ZFE2PW(L1,NY,NX)=ZFE2PW(L1,NY,NX)+FX*ZFE2PW(L0,NY,NX)
+            ZCA0PW(L1,NY,NX)=ZCA0PW(L1,NY,NX)+FX*ZCA0PW(L0,NY,NX)
+            ZCA1PW(L1,NY,NX)=ZCA1PW(L1,NY,NX)+FX*ZCA1PW(L0,NY,NX)
+            ZCA2PW(L1,NY,NX)=ZCA2PW(L1,NY,NX)+FX*ZCA2PW(L0,NY,NX)
+            ZMG1PW(L1,NY,NX)=ZMG1PW(L1,NY,NX)+FX*ZMG1PW(L0,NY,NX)
+          ENDIF
+!
+!     SOURCE SNOW LAYER
+!
+          VOLSSL(L0,NY,NX)=FY*VOLSSL(L0,NY,NX)
+          VOLWSL(L0,NY,NX)=FY*VOLWSL(L0,NY,NX)
+          VOLISL(L0,NY,NX)=FY*VOLISL(L0,NY,NX)
+          VOLSL(L0,NY,NX)=VOLSSL(L0,NY,NX)/DENSS(L0,NY,NX) &
+            +VOLWSL(L0,NY,NX)+VOLISL(L0,NY,NX)
+          ENGY0=FY*ENGY0X
+          VHCPW(L0,NY,NX)=cps*VOLSSL(L0,NY,NX)+cpw*VOLWSL(L0,NY,NX) &
+            +cpi*VOLISL(L0,NY,NX)
+          IF(VHCPW(L0,NY,NX).GT.ZEROS(NY,NX))THEN
+            TKW(L0,NY,NX)=ENGY0/VHCPW(L0,NY,NX)
+          ELSE
+            TKW(L0,NY,NX)=TKW(L1,NY,NX)
+          ENDIF
+          TCW(L0,NY,NX)=TKW(L0,NY,NX)-TC2K
+          CO2W(L0,NY,NX)=FY*CO2W(L0,NY,NX)
+          CH4W(L0,NY,NX)=FY*CH4W(L0,NY,NX)
+          OXYW(L0,NY,NX)=FY*OXYW(L0,NY,NX)
+          ZNGW(L0,NY,NX)=FY*ZNGW(L0,NY,NX)
+          ZN2W(L0,NY,NX)=FY*ZN2W(L0,NY,NX)
+          ZN4W(L0,NY,NX)=FY*ZN4W(L0,NY,NX)
+          ZN3W(L0,NY,NX)=FY*ZN3W(L0,NY,NX)
+          ZNOW(L0,NY,NX)=FY*ZNOW(L0,NY,NX)
+          Z1PW(L0,NY,NX)=FY*Z1PW(L0,NY,NX)
+          ZHPW(L0,NY,NX)=FY*ZHPW(L0,NY,NX)
+          IF(ISALTG.NE.0)THEN
+            ZALW(L0,NY,NX)=FY*ZALW(L0,NY,NX)
+            ZFEW(L0,NY,NX)=FY*ZFEW(L0,NY,NX)
+            ZHYW(L0,NY,NX)=FY*ZHYW(L0,NY,NX)
+            ZCAW(L0,NY,NX)=FY*ZCAW(L0,NY,NX)
+            ZMGW(L0,NY,NX)=FY*ZMGW(L0,NY,NX)
+            ZNAW(L0,NY,NX)=FY*ZNAW(L0,NY,NX)
+            ZKAW(L0,NY,NX)=FY*ZKAW(L0,NY,NX)
+            ZOHW(L0,NY,NX)=FY*ZOHW(L0,NY,NX)
+            ZSO4W(L0,NY,NX)=FY*ZSO4W(L0,NY,NX)
+            ZCLW(L0,NY,NX)=FY*ZCLW(L0,NY,NX)
+            ZCO3W(L0,NY,NX)=FY*ZCO3W(L0,NY,NX)
+            ZHCO3W(L0,NY,NX)=FY*ZHCO3W(L0,NY,NX)
+            ZALH1W(L0,NY,NX)=FY*ZALH1W(L0,NY,NX)
+            ZALH2W(L0,NY,NX)=FY*ZALH2W(L0,NY,NX)
+            ZALH3W(L0,NY,NX)=FY*ZALH3W(L0,NY,NX)
+            ZALH4W(L0,NY,NX)=FY*ZALH4W(L0,NY,NX)
+            ZALSW(L0,NY,NX)=FY*ZALSW(L0,NY,NX)
+            ZFEH1W(L0,NY,NX)=FY*ZFEH1W(L0,NY,NX)
+            ZFEH2W(L0,NY,NX)=FY*ZFEH2W(L0,NY,NX)
+            ZFEH3W(L0,NY,NX)=FY*ZFEH3W(L0,NY,NX)
+            ZFEH4W(L0,NY,NX)=FY*ZFEH4W(L0,NY,NX)
+            ZFESW(L0,NY,NX)=FY*ZFESW(L0,NY,NX)
+            ZCAOW(L0,NY,NX)=FY*ZCAOW(L0,NY,NX)
+            ZCACW(L0,NY,NX)=FY*ZCACW(L0,NY,NX)
+            ZCAHW(L0,NY,NX)=FY*ZCAHW(L0,NY,NX)
+            ZCASW(L0,NY,NX)=FY*ZCASW(L0,NY,NX)
+            ZMGOW(L0,NY,NX)=FY*ZMGOW(L0,NY,NX)
+            ZMGCW(L0,NY,NX)=FY*ZMGCW(L0,NY,NX)
+            ZMGHW(L0,NY,NX)=FY*ZMGHW(L0,NY,NX)
+            ZMGSW(L0,NY,NX)=FY*ZMGSW(L0,NY,NX)
+            ZNACW(L0,NY,NX)=FY*ZNACW(L0,NY,NX)
+            ZNASW(L0,NY,NX)=FY*ZNASW(L0,NY,NX)
+            ZKASW(L0,NY,NX)=FY*ZKASW(L0,NY,NX)
+            H0PO4W(L0,NY,NX)=FY*H0PO4W(L0,NY,NX)
+            H3PO4W(L0,NY,NX)=FY*H3PO4W(L0,NY,NX)
+            ZFE1PW(L0,NY,NX)=FY*ZFE1PW(L0,NY,NX)
+            ZFE2PW(L0,NY,NX)=FY*ZFE2PW(L0,NY,NX)
+            ZCA0PW(L0,NY,NX)=FY*ZCA0PW(L0,NY,NX)
+            ZCA1PW(L0,NY,NX)=FY*ZCA1PW(L0,NY,NX)
+            ZCA2PW(L0,NY,NX)=FY*ZCA2PW(L0,NY,NX)
+            ZMG1PW(L0,NY,NX)=FY*ZMG1PW(L0,NY,NX)
+          ENDIF
+!     IF(VOLWSL(L0,NY,NX)+VOLISL(L0,NY,NX)
+!    2+VOLSSL(L0,NY,NX).LE.ZEROS(NY,NX))THEN
+!     CDPTHS(L1,NY,NX)=CDPTHS(L0,NY,NX)
+!     ENDIF
+!     IF(IYRC.EQ.2006.AND.I.EQ.361.AND.NX.EQ.1)THEN
+!     WRITE(*,5596)'SNOW2',I,J,NX,NY,L,NU(NY,NX),L1,L0,FX,FY
+!    3,DDLYRS,VOLSI(L0,NY,NX),VOLSL(L0,NY,NX),VOLSSL(L0,NY,NX)
+!    3,VOLWSL(L0,NY,NX),VOLISL(L0,NY,NX),VOLSI(L1,NY,NX)
+!    4,VOLSL(L1,NY,NX),VOLSSL(L1,NY,NX),VOLWSL(L1,NY,NX)
+!    4,VOLISL(L1,NY,NX),CDPTHS(L0,NY,NX),CDPTHS(L1,NY,NX)
+!    5,DENSS(L1,NY,NX),DENSS(L0,NY,NX)
+!    5,TKW(L0,NY,NX),TKW(L1,NY,NX)
+!    5,VHCPW(L0,NY,NX),VHCPW(L1,NY,NX)
+!    5,TKW(L0,NY,NX)*VHCPW(L0,NY,NX)
+!    5,VHCPW(L1,NY,NX)*TKW(L1,NY,NX)
+!    5,TKW(L0,NY,NX)*VHCPW(L0,NY,NX)
+!    5+VHCPW(L1,NY,NX)*TKW(L1,NY,NX)
+!     ENDIF
+        ENDIF
+      ENDIF
+325 CONTINUE
+  ENDIF
+  end subroutine SnowpackLayering
 
 end module SnowBalMod

@@ -38,6 +38,7 @@ module InitSOMBGCMOD
   jcplx1=micpar%jcplx1
   JG=micpar%jguilds
   jsken=micpar%jsken
+  NFGs=micpar%NFGs
   allocate(CORGCX(0:jcplx1))
   allocate(CORGNX(0:jcplx1))
   allocate(CORGPX(0:jcplx1))
@@ -102,20 +103,20 @@ module InitSOMBGCMOD
     IF(RSC(K,L,NY,NX).GT.ZEROS(NY,NX))THEN
       RNT=0.0_r8
       RPT=0.0_r8
-      DO 970 M=1,4
+      DO 970 M=1,jsken
         RNT=RNT+RSC(K,L,NY,NX)*CFOSC(M,K,L,NY,NX)*CNOFC(M,K)
         RPT=RPT+RSC(K,L,NY,NX)*CFOSC(M,K,L,NY,NX)*CPOFC(M,K)
 970   CONTINUE
       FRNT=RSN(K,L,NY,NX)/RNT
       FRPT=RSP(K,L,NY,NX)/RPT
-      DO 960 M=1,4
+      DO 960 M=1,jsken
         CNOSC(M,K,L,NY,NX)=CNOFC(M,K)*FRNT
         CPOSC(M,K,L,NY,NX)=CPOFC(M,K)*FRPT
         CNOSCT(K)=CNOSCT(K)+CFOSC(M,K,L,NY,NX)*CNOSC(M,K,L,NY,NX)
         CPOSCT(K)=CPOSCT(K)+CFOSC(M,K,L,NY,NX)*CPOSC(M,K,L,NY,NX)
 960   CONTINUE
     ELSE
-      DO 965 M=1,4
+      DO 965 M=1,jsken
         CNOSC(M,K,L,NY,NX)=CNRH(K)
         CPOSC(M,K,L,NY,NX)=CPRH(K)
 965   CONTINUE
@@ -123,18 +124,18 @@ module InitSOMBGCMOD
       CPOSCT(K)=CPRH(K)
     ENDIF
 975 CONTINUE
-  DO 990 K=3,4
+  DO 990 K=3,jcplx1
     CNOSCT(K)=0.0_r8
     CPOSCT(K)=0.0_r8
     IF(CORGCX(K).GT.ZERO)THEN
-      DO 985 M=1,4
+      DO 985 M=1,jsken
         CNOSC(M,K,L,NY,NX)=CORGNX(K)/CORGCX(K)
         CPOSC(M,K,L,NY,NX)=CORGPX(K)/CORGCX(K)
         CNOSCT(K)=CNOSCT(K)+CFOSC(M,K,L,NY,NX)*CNOSC(M,K,L,NY,NX)
         CPOSCT(K)=CPOSCT(K)+CFOSC(M,K,L,NY,NX)*CPOSC(M,K,L,NY,NX)
 985   CONTINUE
     ELSE
-      DO 980 M=1,4
+      DO 980 M=1,jsken
         CNOSC(M,K,L,NY,NX)=CNRH(K)
         CPOSC(M,K,L,NY,NX)=CPRH(K)
 980   CONTINUE
@@ -153,7 +154,7 @@ module InitSOMBGCMOD
   TOSCI=0.0_r8
   TOSNI=0.0_r8
   TOSPI=0.0_r8
-  DO 995 K=0,4
+  DO 995 K=0,jcplx1
     IF(L.EQ.0)THEN
       KK=K
     ELSE
@@ -183,7 +184,7 @@ module InitSOMBGCMOD
     OSPX(K)=0.0_r8
 995 CONTINUE
 
-  DO 8995 K=0,4
+  DO 8995 K=0,jcplx1
     IF(L.EQ.0)THEN
       OSCM(K)=DCKR*CORGCX(K)*BKVL(L,NY,NX)
       X=0.0_r8
@@ -232,7 +233,7 @@ module InitSOMBGCMOD
 !     OSCX,OSNX,OSPX=remaining unallocated SOC,SON,SOP
 !  The reason that initialization of complex 5 microbes is repated for each
 ! complex is because complex 5 is shared by the other complexes
-    DO 7990 N=1,7
+    DO 7990 N=1,NFGs
       DO NGL=1,JG
         DO 7985 M=1,3
           OMCff(M,NGL,N,L,NY,NX)=0.0_r8
@@ -242,7 +243,7 @@ module InitSOMBGCMOD
       enddo
 7990  CONTINUE
 
-    DO 8990 N=1,7
+    DO 8990 N=1,NFGs
       do NGL=1,JG
         DO 8991 M=1,3
           OMC1=AMAX1(0.0,OSCM(K)*OMCI(M,K)*OMCF(N)*FOSCI)
@@ -254,7 +255,7 @@ module InitSOMBGCMOD
           OSCX(KK)=OSCX(KK)+OMC1
           OSNX(KK)=OSNX(KK)+OMN1
           OSPX(KK)=OSPX(KK)+OMP1
-          DO 8992 NN=1,7
+          DO 8992 NN=1,NFGs
             OMCff(M,NGL,NN,L,NY,NX)=OMCff(M,NGL,NN,L,NY,NX)+OMC1*OMCA(NN)
             OMNff(M,NGL,NN,L,NY,NX)=OMNff(M,NGL,NN,L,NY,NX)+OMN1*OMCA(NN)
             OMPff(M,NGL,NN,L,NY,NX)=OMPff(M,NGL,NN,L,NY,NX)+OMP1*OMCA(NN)
@@ -313,7 +314,7 @@ module InitSOMBGCMOD
 !
 !     OSC,OAA,OSN,OSP=SOC,colonized SOC,SON,SOP
 
-    DO 8980 M=1,4
+    DO 8980 M=1,jsken
       OSC(M,K,L,NY,NX)=AMAX1(0.0,CFOSC(M,K,L,NY,NX)*(OSCI(K)-OSCX(K)))
       IF(CNOSCT(K).GT.ZERO)THEN
         OSN(M,K,L,NY,NX)=AMAX1(0.0,CFOSC(M,K,L,NY,NX)*CNOSC(M,K,L,NY,NX) &
@@ -344,14 +345,14 @@ module InitSOMBGCMOD
   OP=0.0_r8
   RC=0.0_r8
   IF(L.EQ.0)THEN
-    DO 6975 K=0,4
+    DO 6975 K=0,jcplx1
       RC0(K,NY,NX)=0.0_r8
 6975  CONTINUE
     RC0ff(NY,NX)=0._r8
   ENDIF
 
-  DO 6990 K=0,4
-    DO  N=1,7
+  DO 6990 K=0,jcplx1
+    DO  N=1,NFGs
       do NGL=1,JG
         ROXYS(NGL,N,K,L,NY,NX)=0.0_r8
         RVMX4(NGL,N,K,L,NY,NX)=0.0_r8
@@ -359,8 +360,13 @@ module InitSOMBGCMOD
         RVMX2(NGL,N,K,L,NY,NX)=0.0_r8
         RVMX1(NGL,N,K,L,NY,NX)=0.0_r8
         RINHO(NGL,N,K,L,NY,NX)=0.0_r8
+        RINHB(NGL,N,K,L,NY,NX)=0.0_r8
         RINOO(NGL,N,K,L,NY,NX)=0.0_r8
         RIPOO(NGL,N,K,L,NY,NX)=0.0_r8
+        RINOB(NGL,N,K,L,NY,NX)=0.0_r8
+        RIPBO(NGL,N,K,L,NY,NX)=0.0_r8
+        RIPO1(NGL,N,K,L,NY,NX)=0.0_r8
+        RIPB1(NGL,N,K,L,NY,NX)=0.0_r8
         IF(L.EQ.0)THEN
           RINHOR(NGL,N,K,NY,NX)=0.0_r8
           RINOOR(NGL,N,K,NY,NX)=0.0_r8
@@ -379,7 +385,7 @@ module InitSOMBGCMOD
     enddo
 6990  CONTINUE
 
-    DO  N=1,7
+    DO  N=1,NFGs
       do NGL=1,JG
         ROXYSff(NGL,N,L,NY,NX)=0.0_r8
         RVMX4ff(NGL,N,L,NY,NX)=0.0_r8
@@ -387,8 +393,13 @@ module InitSOMBGCMOD
         RVMX2ff(NGL,N,L,NY,NX)=0.0_r8
         RVMX1ff(NGL,N,L,NY,NX)=0.0_r8
         RINHOff(NGL,N,L,NY,NX)=0.0_r8
+        RINHBff(NGL,N,L,NY,NX)=0.0_r8
         RINOOff(NGL,N,L,NY,NX)=0.0_r8
+        RINOBff(NGL,N,L,NY,NX)=0.0_r8
         RIPOOff(NGL,N,L,NY,NX)=0.0_r8
+        RIPBOff(NGL,N,L,NY,NX)=0.0_r8
+        RIPO1ff(NGL,N,L,NY,NX)=0.0_r8
+        RIPB1ff(NGL,N,L,NY,NX)=0.0_r8
         IF(L.EQ.0)THEN
           RINHORff(NGL,N,NY,NX)=0.0_r8
           RINOORff(NGL,N,NY,NX)=0.0_r8
@@ -403,7 +414,7 @@ module InitSOMBGCMOD
       ENDDO
     enddo
 
-  DO 6995 K=0,4
+  DO 6995 K=0,jcplx1
     DO 6985 M=1,2
       OC=OC+ORC(M,K,L,NY,NX)
       ON=ON+ORN(M,K,L,NY,NX)
@@ -429,7 +440,7 @@ module InitSOMBGCMOD
       RC0(K,NY,NX)=RC0(K,NY,NX)+OQC(K,L,NY,NX)+OQCH(K,L,NY,NX) &
         +OHC(K,L,NY,NX)+OQA(K,L,NY,NX)+OQAH(K,L,NY,NX)+OHA(K,L,NY,NX)
     ENDIF
-    DO 6980 M=1,4
+    DO 6980 M=1,jsken
       OC=OC+OSC(M,K,L,NY,NX)
       ON=ON+OSN(M,K,L,NY,NX)
       OP=OP+OSP(M,K,L,NY,NX)

@@ -304,6 +304,25 @@ END subroutine MicrobeModel
   endif
   micflx%RVMXC=RVMXC(L,NY,NX)
   micflx%RVMBC=RVMBC(L,NY,NX)
+  micflx%RINHOff(1:JG,1:NFGs)=RINHOff(1:JG,1:NFGs,L,NY,NX)
+  micflx%RINHBff(1:JG,1:NFGs)=RINHBff(1:JG,1:NFGs,L,NY,NX)
+  micflx%RINOOff(1:JG,1:NFGs)=RINOOff(1:JG,1:NFGs,L,NY,NX)
+  micflx%RINOBff(1:JG,1:NFGs)=RINOBff(1:JG,1:NFGs,L,NY,NX)
+  micflx%RIPOOff(1:JG,1:NFGs)=RIPOOff(1:JG,1:NFGs,L,NY,NX)
+  micflx%RIPBOff(1:JG,1:NFGs)=RIPBOff(1:JG,1:NFGs,L,NY,NX)
+  micflx%RIPO1ff(1:JG,1:NFGs)=RIPO1ff(1:JG,1:NFGs,L,NY,NX)
+  micflx%RIPB1ff(1:JG,1:NFGs)=RIPB1ff(1:JG,1:NFGs,L,NY,NX)
+  micflx%ROXYSff(1:JG,1:NFGs)=ROXYSff(1:JG,1:NFGs,L,NY,NX)
+
+  micflx%RINHO(1:JG,1:NFGs,0:JCPLX1)=RINHO(1:JG,1:NFGs,0:JCPLX1,L,NY,NX)
+  micflx%RINHB(1:JG,1:NFGs,0:JCPLX1)=RINHB(1:JG,1:NFGs,0:JCPLX1,L,NY,NX)
+  micflx%RINOO(1:JG,1:NFGs,0:JCPLX1)=RINOO(1:JG,1:NFGs,0:JCPLX1,L,NY,NX)
+  micflx%RINOB(1:JG,1:NFGs,0:JCPLX1)=RINOB(1:JG,1:NFGs,0:JCPLX1,L,NY,NX)
+  micflx%RIPOO(1:JG,1:NFGs,0:JCPLX1)=RIPOO(1:JG,1:NFGs,0:JCPLX1,L,NY,NX)
+  micflx%RIPBO(1:JG,1:NFGs,0:JCPLX1)=RIPBO(1:JG,1:NFGs,0:JCPLX1,L,NY,NX)
+  micflx%RIPO1(1:JG,1:NFGs,0:JCPLX1)=RIPO1(1:JG,1:NFGs,0:JCPLX1,L,NY,NX)
+  micflx%RIPB1(1:JG,1:NFGs,0:JCPLX1)=RIPB1(1:JG,1:NFGs,0:JCPLX1,L,NY,NX)
+  micflx%ROXYS(1:JG,1:NFGs,0:JCPLX1)=ROXYS(1:JG,1:NFGs,0:JCPLX1,L,NY,NX)
 
   end subroutine MicAPISend
 
@@ -389,6 +408,8 @@ END subroutine MicrobeModel
     OSP(1,4,NU(NY,NX),NY,NX)=micstt%OSP14U
     OSP(2,4,NU(NY,NX),NY,NX)=micstt%OSP24U
   endif
+
+
   RINHOff(1:JG,1:NFGs,L,NY,NX)=micflx%RINHOff(1:JG,1:NFGs)
   RINHBff(1:JG,1:NFGs,L,NY,NX)=micflx%RINHBff(1:JG,1:NFGs)
   RINOOff(1:JG,1:NFGs,L,NY,NX)=micflx%RINOOff(1:JG,1:NFGs)

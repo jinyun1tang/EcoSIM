@@ -32,6 +32,7 @@ module InitEcoSIM
   use PlantMngmtDataType  , only : InitPlantMngmtData
   use InitSOMBGCMod       , only : InitSOMBGC
   use GridConsts
+  use TrnsfrMod, only : InitTrnsfr
   implicit  none
   integer                 , intent(in) :: nmicbguilds   !number of microbial guilds per group
 
@@ -84,5 +85,6 @@ module InitEcoSIM
 
   call InitRedist
 
+  call InitTrnsfr
   end subroutine InitModules
 end module InitEcoSIM
