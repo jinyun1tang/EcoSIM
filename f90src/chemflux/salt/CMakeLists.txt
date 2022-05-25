@@ -1,4 +1,6 @@
 set(SALT_MOD_SOURCES
+  TrnsfrsDataMod.F90
+  IngridTranspMod.F90
 	TrnsfrsMod.F90
 )
 include_directories(${CMAKE_BINARY_DIR}/f90src/utils/)
