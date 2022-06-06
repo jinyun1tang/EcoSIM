@@ -4,6 +4,12 @@ module SoluteParMod
   use data_kind_mod, only : r8 => SHR_KIND_R8
   implicit none
   real(r8), parameter :: RNHUI(0:2)=real((/10.0E-02,1.0E-02,0.5E-02/),r8)
+
+  real(r8), PARAMETER :: SCO2X=7.391E-01,SCH4X=3.156E-02 &
+    ,SOXYX=2.925E-02,SN2GX=1.510E-02,SN2OX=5.241E-01 &
+    ,SNH3X=2.852E+02,SH2GX=3.156E-02,ACO2X=0.14,ACH4X=0.14,&
+    AOXYX=0.31,AN2GX=0.23,AN2OX=0.23,ANH3X=0.07,AH2GX=0.14
+
 !
 !     DISSOLUTION AND DISSOCIATION CONSTANTS
 !
@@ -138,8 +144,8 @@ module SoluteParMod
 !     TPD,TADA,TADC,TSL=rate constants for dissoln,adsorpn,solute equilibria
 !
   integer, PARAMETER :: MRXN=1
-  real(r8), parameter :: TPD=2.5E-03_r8
-  real(r8), PARAMETER :: TPDX=TPD/MRXN
+  real(r8), parameter :: TPD=2.5E-03_r8   !1/h
+  real(r8), PARAMETER :: TPDX=TPD/MRXN    !1/h
   real(r8), PARAMETER :: TADA=5.0E-02_r8
   real(r8), PARAMETER :: TADAX=TADA/MRXN
   real(r8), PARAMETER :: TADC=5.0E-02_r8

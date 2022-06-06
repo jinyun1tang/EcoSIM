@@ -201,7 +201,7 @@ module nitroMod
 !     begin_execution
   IF(FOSCXS.GT.ZERO)THEN
     DO 7971 K=1,2
-      DO 7961 N=1,7
+      DO 7961 N=1,NFGs
         DO NGL=1,JG
           DO 7962 M=1,3
             IF(FOSCXS.GT.0.0)THEN

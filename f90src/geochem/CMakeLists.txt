@@ -1,4 +1,8 @@
 set(GEOCHEM_SOURCES
+  SoluteChemDataType.F90
+  SaltChemEquilibriaMod.F90
+  ChemEquilibriaMod.F90
+  InitSoluteMod.F90
   SoluteParMod.F90
   SoluteMod.F90
 )

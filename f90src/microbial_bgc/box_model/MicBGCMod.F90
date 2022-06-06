@@ -2174,7 +2174,7 @@ module MicBGCMod
 !
 !     XOQCS,XOQNZ,XOQPS,XOQAS=net change in DOC,DON,DOP,acetate
 !
-  DO 655 K=0,4
+  DO 655 K=0,jcplx1
     DO 660 M=1,jsken
       XOQCS(K)=XOQCS(K)+RCOSC(M,K)
       XOQNS(K)=XOQNS(K)+RCOSN(M,K)
@@ -2189,7 +2189,7 @@ module MicBGCMod
     XOQNS(K)=XOQNS(K)+RDOHN(K)
     XOQPS(K)=XOQPS(K)+RDOHP(K)
     XOQAS(K)=XOQAS(K)+RDOHA(K)
-    DO 670 N=1,7
+    DO 670 N=1,NFGs
       DO NGL=1,JG
         XOQCS(K)=XOQCS(K)-CGOQC(NGL,N,K)
         XOQNS(K)=XOQNS(K)-CGOMN(NGL,N,K)

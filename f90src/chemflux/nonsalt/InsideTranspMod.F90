@@ -601,7 +601,7 @@ module InsideTranspMod
 
   subroutine SoluteFluxSurface(M,NY,NX,FLQM)
   implicit none
-  integer, intent(in) :: NY, NX,M
+  integer, intent(in) :: NY,NX,M
   real(r8),intent(out) :: FLQM(3,JD,JV,JH)
   integer :: K
   real(r8) :: VOLWPA,VOLWPB,VOLWOB
@@ -650,8 +650,7 @@ module InsideTranspMod
 !     ZNH4S,ZNH3S,ZNO3S,ZNO2S,H1PO4,H2PO4=aqueous NH4,NH3,NO3,NO2,HPO4,H2PO4 in litter
 !     C*1=solute concentration in litter
 !
-  IF(VOLT(0,NY,NX).GT.ZEROS2(NY,NX) &
-    .AND.VOLWM(M,0,NY,NX).GT.ZEROS2(NY,NX))THEN
+  IF(VOLT(0,NY,NX).GT.ZEROS2(NY,NX).AND.VOLWM(M,0,NY,NX).GT.ZEROS2(NY,NX))THEN
     DLYR0=AMAX1(ZERO2,DLYR(3,0,NY,NX))
     TORT0=TORT(M,0,NY,NX)*AREA(3,NU(NY,NX),NY,NX)/(0.5*DLYR0)*CVRD(NY,NX)
     DFGSCO=CLSGL2(0,NY,NX)*TORT0

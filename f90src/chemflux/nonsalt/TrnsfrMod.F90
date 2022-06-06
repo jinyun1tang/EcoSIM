@@ -34,14 +34,9 @@ module TrnsfrMod
   private
   CHARACTER(LEN=*), PARAMETER :: MOD_FILENAME=__FILE__
 
-
-
-
-
   real(r8) :: XN
 
   real(r8) ::  CHY0(0:JZ,JY,JX),RHGFLZ(JZ,JY,JX)
-
 
   real(r8) :: RCOFLZ(JZ,JY,JX),RCHFLZ(JZ,JY,JX)
   real(r8) :: ROXFLZ(JZ,JY,JX),RNGFLZ(JZ,JY,JX)
@@ -65,7 +60,6 @@ module TrnsfrMod
   allocate(RQRON0(0:jcplx1,JV,JH))
   allocate(RQROA0(0:jcplx1,JV,JH))
   allocate(RQROP0(0:jcplx1,JV,JH))
-
   allocate(OQC2(0:jcplx1,0:JZ,JY,JX))
   allocate(OQN2(0:jcplx1,0:JZ,JY,JX))
   allocate(OQP2(0:jcplx1,0:JZ,JY,JX))
