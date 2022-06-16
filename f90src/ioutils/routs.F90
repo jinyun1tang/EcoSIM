@@ -100,7 +100,7 @@
         ,ROWP(NY,NX),DTBLZ(NY,NX),DTBLD(NY,NX),TNBP(NY,NX),VOLR(NY,NX) &
         ,SED(NY,NX),TGPP(NY,NX),TRAU(NY,NX),TNPP(NY,NX),THRE(NY,NX) &
         ,TCAN(NY,NX),TLEC(NY,NX),TSHC(NY,NX),DYLN(NY,NX),DYLX(NY,NX) &
-        ,DTBLX(NY,NX),DTBLY(NY,NX),(RC0(K,NY,NX),K=0,5) &
+        ,DTBLX(NY,NX),DTBLY(NY,NX),(RC0(K,NY,NX),K=0,4),RC0ff(NY,NX) &
         ,VOLSS(NY,NX),VOLWS(NY,NX),VOLIS(NY,NX),VOLS(NY,NX) &
         ,DPTHS(NY,NX),ENGYP(NY,NX)
       READ(21,91)IDATE,IYR,(VOLSSL(L,NY,NX),L=1,JS)
@@ -398,11 +398,19 @@
             READ(22,91)IDATE,IYR,RINHOR(NGL,N,K,NY,NX)
             READ(22,91)IDATE,IYR,RINOOR(NGL,N,K,NY,NX)
             READ(22,91)IDATE,IYR,RIPOOR(NGL,N,K,NY,NX)
+            IF(K.NE.5)THEN
             DO  M=1,3
               READ(22,91)IDATE,IYR,(OMC(M,NGL,N,K,L,NY,NX),L=0,NLI(NY,NX))
               READ(22,91)IDATE,IYR,(OMN(M,NGL,N,K,L,NY,NX),L=0,NLI(NY,NX))
               READ(22,91)IDATE,IYR,(OMP(M,NGL,N,K,L,NY,NX),L=0,NLI(NY,NX))
             enddo
+            ELSE
+            DO  M=1,3
+              READ(22,91)IDATE,IYR,(OMCff(M,NGL,N,L,NY,NX),L=0,NLI(NY,NX))
+              READ(22,91)IDATE,IYR,(OMNff(M,NGL,N,L,NY,NX),L=0,NLI(NY,NX))
+              READ(22,91)IDATE,IYR,(OMPff(M,NGL,N,L,NY,NX),L=0,NLI(NY,NX))
+            enddo
+            ENDIF
           enddo
         enddo
 9985  CONTINUE

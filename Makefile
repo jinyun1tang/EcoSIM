@@ -25,7 +25,7 @@ CONFIG_FLAGS = -DUNIX=1 -Wno-dev
 
 # Process configuration options.
 ifeq ($(F90), not-set)
-	CONFIG_FLAGS += -DF90=0
+	CONFIG_FLAGS += -DF90=1
 else
 	CONFIG_FLAGS += -DF90=${F90}
 endif
@@ -162,8 +162,8 @@ test: install
 	@if [ ! -f $(BUILDDIR)/Makefile ]; then \
 		more INSTALL; \
 	else \
-		$(MAKE) -C $(BUILDDIR) $@ --no-print-directory $(MAKEFLAGS) F90=$(F90); \
-		$(MAKE) -C regression-tests $@ --no-print-directory $(MAKEFLAGS) F90=$(F90) compiler=$(compiler); \
+		$(MAKE) -C $(BUILDDIR) $@ --no-print-directory $(MAKEFLAGS) F90=1; \
+		$(MAKE) -C regression-tests $@ --no-print-directory $(MAKEFLAGS) F90=1 compiler=$(compiler); \
 	fi
 
 clean:

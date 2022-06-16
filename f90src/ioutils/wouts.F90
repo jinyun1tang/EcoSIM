@@ -72,7 +72,7 @@
         ,ROWP(NY,NX),DTBLZ(NY,NX),DTBLD(NY,NX),TNBP(NY,NX),VOLR(NY,NX) &
         ,SED(NY,NX),TGPP(NY,NX),TRAU(NY,NX),TNPP(NY,NX),THRE(NY,NX) &
         ,TCAN(NY,NX),TLEC(NY,NX),TSHC(NY,NX),DYLN(NY,NX),DYLX(NY,NX) &
-        ,DTBLX(NY,NX),DTBLY(NY,NX),(RC0(K,NY,NX),K=0,5) &
+        ,DTBLX(NY,NX),DTBLY(NY,NX),(RC0(K,NY,NX),K=0,4),RC0ff(NY,NX) &
         ,VOLSS(NY,NX),VOLWS(NY,NX),VOLIS(NY,NX),VOLS(NY,NX) &
         ,DPTHS(NY,NX),ENGYP(NY,NX)
       WRITE(21,91)I,IDATA(3),(VOLSSL(L,NY,NX),L=1,JS)
@@ -370,11 +370,19 @@
             WRITE(22,91)I,IDATA(3),RINHOR(NGL,N,K,NY,NX)
             WRITE(22,91)I,IDATA(3),RINOOR(NGL,N,K,NY,NX)
             WRITE(22,91)I,IDATA(3),RIPOOR(NGL,N,K,NY,NX)
+            if(K.ne.5)then
             DO M=1,3
               WRITE(22,91)I,IDATA(3),(OMC(M,NGL,N,K,L,NY,NX),L=0,NLI(NY,NX))
               WRITE(22,91)I,IDATA(3),(OMN(M,NGL,N,K,L,NY,NX),L=0,NLI(NY,NX))
               WRITE(22,91)I,IDATA(3),(OMP(M,NGL,N,K,L,NY,NX),L=0,NLI(NY,NX))
             enddo
+            ELSE
+            DO M=1,3
+              WRITE(22,91)I,IDATA(3),(OMCff(M,NGL,N,L,NY,NX),L=0,NLI(NY,NX))
+              WRITE(22,91)I,IDATA(3),(OMNff(M,NGL,N,L,NY,NX),L=0,NLI(NY,NX))
+              WRITE(22,91)I,IDATA(3),(OMPff(M,NGL,N,L,NY,NX),L=0,NLI(NY,NX))
+            enddo
+            ENDIF
           enddo
         enddo
 9985  CONTINUE

@@ -29,6 +29,7 @@
   implicit none
 
   private
+  CHARACTER(LEN=*), PARAMETER :: MOD_FILENAME=__FILE__
 
   CHARACTER(len=3) :: CHARN1,CHARN2
   CHARACTER(len=4) :: CHARN3

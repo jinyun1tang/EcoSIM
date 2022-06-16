@@ -19,7 +19,24 @@ module abortutils
      module procedure endrun_line
      module procedure endrun_globalindex
   end interface
-
+  public :: destroy
+  interface destroy
+    module procedure destroy_1d_r
+    module procedure destroy_2d_r
+    module procedure destroy_3d_r
+    module procedure destroy_4d_r
+    module procedure destroy_5d_r
+    module procedure destroy_6d_r
+    module procedure destroy_7d_r
+    module procedure destroy_1d_i
+    module procedure destroy_2d_i
+    module procedure destroy_3d_i
+    module procedure destroy_4d_i
+    module procedure destroy_5d_i
+    module procedure destroy_6d_i
+    module procedure destroy_7d_i
+    module procedure destroy_1d_l
+  end interface destroy
   public :: padl, padr
   public :: print_info
   interface print_info
@@ -235,4 +252,125 @@ CONTAINS
     call endrun()
   endif
   end subroutine check_bool
+
+  !-----------------------------------------------------------------------
+  subroutine destroy_1d_r(arr)
+  implicit none
+  real(r8), allocatable :: arr(:)
+
+  if(allocated(arr))deallocate(arr)
+
+  end subroutine destroy_1d_r
+  !-----------------------------------------------------------------------
+  subroutine destroy_2d_r(arr)
+  implicit none
+  real(r8), allocatable :: arr(:,:)
+
+  if(allocated(arr))deallocate(arr)
+
+  end subroutine destroy_2d_r
+  !-----------------------------------------------------------------------
+  subroutine destroy_3d_r(arr)
+  implicit none
+  real(r8), allocatable :: arr(:,:,:)
+
+  if(allocated(arr))deallocate(arr)
+
+  end subroutine destroy_3d_r
+  !-----------------------------------------------------------------------
+  subroutine destroy_4d_r(arr)
+  implicit none
+  real(r8), allocatable :: arr(:,:,:,:)
+
+  if(allocated(arr))deallocate(arr)
+
+  end subroutine destroy_4d_r
+  !-----------------------------------------------------------------------
+  subroutine destroy_5d_r(arr)
+  implicit none
+  real(r8), allocatable :: arr(:,:,:,:,:)
+
+  if(allocated(arr))deallocate(arr)
+
+  end subroutine destroy_5d_r
+  !-----------------------------------------------------------------------
+  subroutine destroy_6d_r(arr)
+  implicit none
+  real(r8), allocatable :: arr(:,:,:,:,:,:)
+
+  if(allocated(arr))deallocate(arr)
+
+  end subroutine destroy_6d_r
+  !-----------------------------------------------------------------------
+  subroutine destroy_7d_r(arr)
+  implicit none
+  real(r8), allocatable :: arr(:,:,:,:,:,:,:)
+
+  if(allocated(arr))deallocate(arr)
+
+  end subroutine destroy_7d_r
+  !-----------------------------------------------------------------------
+  subroutine destroy_1d_i(arr)
+  implicit none
+  integer, allocatable :: arr(:)
+
+  if(allocated(arr))deallocate(arr)
+
+  end subroutine destroy_1d_i
+  !-----------------------------------------------------------------------
+  subroutine destroy_2d_i(arr)
+  implicit none
+  integer, allocatable :: arr(:,:)
+
+  if(allocated(arr))deallocate(arr)
+
+  end subroutine destroy_2d_i
+  !-----------------------------------------------------------------------
+  subroutine destroy_3d_i(arr)
+  implicit none
+  integer, allocatable :: arr(:,:,:)
+
+  if(allocated(arr))deallocate(arr)
+
+  end subroutine destroy_3d_i
+  !-----------------------------------------------------------------------
+  subroutine destroy_4d_i(arr)
+  implicit none
+  integer, allocatable :: arr(:,:,:,:)
+
+  if(allocated(arr))deallocate(arr)
+
+  end subroutine destroy_4d_i
+  !-----------------------------------------------------------------------
+  subroutine destroy_5d_i(arr)
+  implicit none
+  integer, allocatable :: arr(:,:,:,:,:)
+
+  if(allocated(arr))deallocate(arr)
+
+  end subroutine destroy_5d_i
+  !-----------------------------------------------------------------------
+  subroutine destroy_6d_i(arr)
+  implicit none
+  integer, allocatable :: arr(:,:,:,:,:,:)
+
+  if(allocated(arr))deallocate(arr)
+
+  end subroutine destroy_6d_i
+  !-----------------------------------------------------------------------
+  subroutine destroy_7d_i(arr)
+  implicit none
+  integer, allocatable :: arr(:,:,:,:,:,:,:)
+
+  if(allocated(arr))deallocate(arr)
+
+  end subroutine destroy_7d_i
+  !-----------------------------------------------------------------------
+  subroutine destroy_1d_l(arr)
+  implicit none
+  logical, allocatable :: arr(:)
+
+  if(allocated(arr))deallocate(arr)
+
+  end subroutine destroy_1d_L
 end module abortutils

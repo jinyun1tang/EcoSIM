@@ -117,7 +117,7 @@ module WatsubMod
   real(r8) :: TCND2,TKLX,THETAX,TFLXH1,TFLXH,TK0XX,TKXX,UAG
   real(r8) :: VOLTX,VOLWRZ,VOLIRZ,VOLAT0,VOLWT,VOLAT,VFLXW,VP0
   real(r8) :: VFLXW2,VOLP01,VP1,VOLP02,VP2,VPY,VPR,VOLS0X,VOLW0X
-  real(r8) :: VOLI0X,VHCPWMX,VOLWXG,VOLIXG,VFLXG,VFLXR,VOLWR2
+  real(r8) :: VOLI0X,VHCPWMX,VOLWXG,VOLIXG,VFLXG,VFLXR
   real(r8) :: VHCPR2,VOLW12,VHCP12,VFLXR2,VOLW1X,VHCP1X,VX,V
   real(r8) :: VPL,VOLP2,VOLPX2,VOLPH2,VOLP1X,VOLWH1X,VOLPH1X
   real(r8) :: VHCP1AX,VHCP1BX,VHCPXX,VHXX,WPX,WPLX,WTHET2,WFLXSX
@@ -1773,11 +1773,11 @@ module WatsubMod
   end subroutine SolveSnowpack
 !------------------------------------------------------------------------------------------
 
-  subroutine SoilSurfaceResidualIteration(M,NY,NX)
+  subroutine SoilSurfaceResidualIteration(M,NY,NX,VOLWR2)
 
   implicit none
   integer, intent(in) :: M,NY,NX
-
+  real(r8),intent(inout) :: VOLWR2
   integer  :: NN
   real(r8) :: tk1pre
   real(r8) :: RAa
@@ -1847,7 +1847,6 @@ module WatsubMod
 !     VAP=latent heat of evaporation
 !     VFLXR2=convective heat of evaporation flux
 !
-      !VPR=2.173E-03_r8/TKR1*0.61_r8*EXP(5360.0_r8*(3.661E-03_r8-1.0_r8/TKR1)) &
       VPR=vapsat(TKR1)*EXP(18.0_r8*PSISM1(0,NY,NX)/(8.3143_r8*TKR1))   !in litter
       if(abs(VPR)>1.e20_r8)then
         write(*,*)'TKR1=',TKR1,TK1(0,NY,NX),TK1(NUM(NY,NX),NY,NX)
@@ -1855,7 +1854,6 @@ module WatsubMod
         call endrun(trim(mod_filename)//'at line',__LINE__)
       endif
 
-      !VP1=2.173E-03_r8/TKS1*0.61_r8*EXP(5360.0_r8*(3.661E-03_r8-1.0_r8/TKS1)) &
       VP1=vapsat(TKS1)*EXP(18.0_r8*PSISV1/(8.3143_r8*TKS1))    !in soil
       EVAPR2=AMAX1(-AMAX1(0.0_r8,VOLWR2*XNPX),PARE*(VPQ(NY,NX)-VPR))
 !      if(EVAPR2/=EVAPR2.OR.abs(EVAPR2)>1.e20_r8)then
@@ -2023,29 +2021,7 @@ module WatsubMod
 !      call endrun(trim(mod_filename)//'at line',__LINE__)
     !endif
     TKS1=TKS1+(HWFLV2+HFLCR2)/VHCP12
-!   IF(I.GT.350.AND.NX.EQ.1)THEN
-!     WRITE(*,1111)'EFLXR2',I,J,M,NX,NY,NUM(NY,NX),NN
-!    2,TKR1,TKS1,TKQ(NY,NX),RFLXR2,EFLXR2,SFLXR2,VFLXR2
-!    3,HFLX02,HFLXR2,HWFLM2,HWFLV2,HFLCR2,VHCPR2,HFLXR
-!    3,RA,RAGX,RAG(NY,NX),RAB(NY,NX),RAC(NY,NX)
-!    4,RAR1,PARE,HFLWX,HFLWC,TKXR,TK1X,TKY
-!    2,VPQ(NY,NX),VPR,EVAPR(NY,NX),EVAPR2,VOLWR2,XNPX
-!    3,HFLCR2,HWFLV2,VHCPR2,VHCP12,RFLX0,THRMZ2,VHCPRX(NY,NX)
-!    4,ALBL,RADXR(NY,NX),THRYR(NY,NX),THRMR(NY,NX),XNPZ
-!    3,FLV1,FLV2,VPR,VP1,CNVR,CNV1,FLVC,FLVX,XNPZ,XNPR
-!    3,PSISM1(0,NY,NX),PSISV1,THETWR,VOLWRX(NY,NX),ORGC(0,NY,NX)
-!    4,VHCPRX(NY,NX),PARS,PARE,RA,RZ,RI,TKQ(NY,NX),VOLW1(0,NY,NX)
-!    5,VOLW1(NUM(NY,NX),NY,NX),VOLT(NUM(NY,NX),NY,NX),FLV1
-!    5,CNVR,CNV1,VOLX(0,NY,NX),POROQ,WGSGR(NY,NX)
-!    5,ATCNDR,TCNDR
-!    6,TCND1,STC(NUM(NY,NX),NY,NX),THETWX(NUM(NY,NX),NY,NX)
-!    2,THETIX(NUM(NY,NX),NY,NX),WTHET1,THETPX(NUM(NY,NX),NY,NX),TCNDA1
-!    4,DTC(NUM(NY,NX),NY,NX),VOLP1(0,NY,NX),VOLR(NY,NX)
-!    7,THETWX(0,NY,NX),THETIX(0,NY,NX),THETPY(0,NY,NX),ORGC(0,NY,NX)
-!    6,DLYR(3,0,NY,NX),DLYR(3,NUM(NY,NX),NY,NX)
-!    8,CVRD(NY,NX),XVOLW(NY,NX),VOLWG(NY,NX)
-!1111  FORMAT(A8,7I4,100E12.4)
-!     ENDIF
+
 5000  CONTINUE
   end subroutine SoilSurfaceResidualIteration
 !------------------------------------------------------------------------------------------
@@ -2055,6 +2031,7 @@ module WatsubMod
 ! Description:
   implicit none
   integer, intent(in) :: M,NY,NX
+  real(r8) :: VOLWR2
 ! begin_execution
 ! PARAMETERS FOR CALCULATING LATENT AND SENSIBLE HEAT FLUXES
 !
@@ -2109,6 +2086,7 @@ module WatsubMod
   CNVR=WGSGR(NY,NX)*THETPM(M,0,NY,NX)*POROQ*THETPM(M,0,NY,NX)/POROS(0,NY,NX)
   CNV1=WGSGL(NUM(NY,NX),NY,NX)*THETPM(M,NUM(NY,NX),NY,NX)*POROQ &
     *THETPM(M,NUM(NY,NX),NY,NX)/POROS(NUM(NY,NX),NY,NX)
+
   IF(CVRD(NY,NX).GT.ZERO)THEN
     IF(CNVR.GT.ZERO.AND.CNV1.GT.ZERO)THEN
       ATCNVR=2.0_r8*CNVR*CNV1/(CNVR*DLYR(3,NUM(NY,NX),NY,NX)+CNV1*DLYRR(NY,NX))
@@ -2163,7 +2141,7 @@ module WatsubMod
 !
 ! SMALLER TIME STEP FOR SOLVING SURFACE RESIDUE ENERGY EXCHANGE
 !
-  call SoilSurfaceResidualIteration(M,NY,NX)
+  call SoilSurfaceResidualIteration(M,NY,NX,VOLWR2)
   end subroutine SoilSurfaceEnergyBalance
 !------------------------------------------------------------------------------------------
 
@@ -2334,6 +2312,7 @@ module WatsubMod
   ELSE
     VFLXG=EVAPG(NY,NX)*cpw*TKQ(NY,NX)
   ENDIF
+  !take away water from evaporation
   VOLW2(NUM(NY,NX),NY,NX)=VOLW2(NUM(NY,NX),NY,NX)+EVAPG(NY,NX)
 !
 ! SOLVE FOR SOIL SURFACE TEMPERATURE AT WHICH ENERGY
@@ -2550,14 +2529,6 @@ module WatsubMod
     ELSE
       DFGS(M,L,NY,NX)=0.0
     ENDIF
-!   IF(I.EQ.121.AND.L.EQ.2)THEN
-!     WRITE(*,3371)'DFGS',I,J,M,NX,NY,L,DFGS(M,L,NY,NX)
-!    2,THETWA,VOLWT,VOLAT,VOLW1(L,NY,NX),VOLA1(L,NY,NX)
-!    3,VOLWH1(L,NY,NX),VOLAH1(L,NY,NX),BKDS(L,NY,NX),FHOL(L,NY,NX)
-!    3,Z3S,Z2S*(THETWA-Z3S),EXP(Z2S*(THETWA-Z3S)),Z1S**-1
-!    4,(Z1S**-1)*EXP(Z2S*(THETWA-Z3S))
-!3371  FORMAT(A8,6I4,20E14.6)
-!   ENDIF
     IF(BKDS(L,NY,NX).GT.ZERO)THEN
       THETWT=safe_adb(VOLWM(M,L,NY,NX),VOLY(L,NY,NX))
       TORT(M,L,NY,NX)=0.7*THETWT**2*(1.0-FHOL(L,NY,NX))
@@ -2571,18 +2542,7 @@ module WatsubMod
       TORTH(M,L,NY,NX)=0.0
     ENDIF
 9885  CONTINUE
-! IF(NX.EQ.4.AND.NY.EQ.5)THEN
-!     WRITE(*,3132)'FLQR1',I,J,M,NX,NY,FLY1(NY,NX),FLQ1(NY,NX)
-!    2,VHCPWM(M,1,NY,NX),VHCPWX(NY,NX)
-!    2,FLH1(NY,NX),FLYM,FLQM,FLHM,FLQR1
-!    3,FMAC(NUM(NY,NX),NY,NX),FGRD(NUM(NY,NX),NY,NX)
-!    5,VOLAH1(NUM(NY,NX),NY,NX),FVOLAH,CCLAY(NUM(NY,NX),NY,NX)
-!    4,VOLW1(NUM(NY,NX),NY,NX),VOLX(NUM(NY,NX),NY,NX),WP(L,NY,NX)
-!    2,VOLT(NUM(NY,NX),NY,NX),VOLAH1(NUM(NY,NX),NY,NX)
-!    5,VOLWRX(NY,NX),VOLW1(0,NY,NX),VOLI1(0,NY,NX)
-!    6,PSISM1(0,NY,NX),PSISM1(NUM(NY,NX),NY,NX)
-!3132  FORMAT(A8,5I4,40E12.4)
-! ENDIF
+
 !
 ! ENERGY EXCHANGE VARIABLES AT SNOW SURFACE IF PRESENT
 !
@@ -5575,42 +5535,12 @@ module WatsubMod
 ! FLWV*=total internal vapor flux in soil
 !
   FLWL(3,NUM(NY,NX),NY,NX)=FLWLW+FLWLG
-  if(abs(FLWL(3,NUM(NY,NX),NY,NX))>1.e20_r8)then
-    write(*,*)'FLWL(3,NUM(NY,NX),NY,NX)=',FLWLW,FLWLG
-    write(*,*)'at line',__LINE__
-    call endrun(trim(mod_filename)//'at line',__LINE__)
-  endif
   FLWLX(3,NUM(NY,NX),NY,NX)=FLWLXW+FLWLXG
   FLWHL(3,NUM(NY,NX),NY,NX)=FLWHLW+FLWHLG
   HFLWL(3,NUM(NY,NX),NY,NX)=HFLWLW+HFLWLG
   FLWRL(NY,NX)=FLWRLW+FLWRLG
   HFLWRL(NY,NX)=HFLWRLW+HFLWRLG
-!  if(curday>=41)then
-!    write(*,*)'wwwwwwww5445HFLWRL(NY,NX)=',HFLWRLW,HFLWRLG
-!    write(*,*)'at line',__LINE__
-!  endif
-! IF(I.GT.350.AND.NX.EQ.1)THEN
-!   WRITE(*,7756)'FLWT',I,J,M,NX,NY,NUM(NY,NX)
-!    2,FLWL(3,NUM(NY,NX),NY,NX),FLWLW,FLWLG
-!    4,FLWHL(3,NUM(NY,NX),NY,NX),FLWHLW,FLWHLG
-!    5,HFLWL(3,NUM(NY,NX),NY,NX),HFLWLW,HFLWLG
-!    6,FLWRL(NY,NX),FLWRLW,FLWRLG
-!    7,HFLWRL(NY,NX),HFLWRLW,HFLWRLG
-!    9,HFLWQG,HFLVS1,HFLWS1,HFLVR1,HFLWR1
-!    1,HFLWQR,HFLVSR,HFLWSR,HFLVR1,HFLWR1
-!    8,FLQ0S(NY,NX),FLQ0W(NY,NX),FLQ0I(NY,NX),FLQM,FLHM,FLYM
-!    9,PRECA(NY,NX)*XNPH,PRECW(NY,NX)*XNPH
-!    7,RFLXW,EFLXW,SFLXW,-HFLXW+VFLXW,RFLXG,EFLXG,SFLXG,-HFLXG+VFLXG
-!    7,RFLXR,EFLXR,SFLXR,-HFLXR+VFLXR
-!    8,FLW0S(1,NY,NX),FLQ0S(NY,NX),EVAPS(NY,NX)
-!    9,FLW0W(1,NY,NX),FLQ0W(NY,NX),EVAPW(NY,NX)
-!    1,FLW0I(1,NY,NX),FLQ0I(NY,NX)
-!    2,HFLW0W(1,NY,NX),HWFLQ0(NY,NX),HFLXW
-!    3,XFLWS(1,NY,NX),XFLWW(1,NY,NX),XFLWI(1,NY,NX),XHFLWW(1,NY,NX)
-!    8,FSNW(NY,NX),FSNX(NY,NX),CVRD(NY,NX),BARE(NY,NX)
-!    9,THETPM(M,NUM(NY,NX),NY,NX)
-!7756  FORMAT(A8,6I4,60E12.4)
-! ENDIF
+
   end subroutine AtmosLandSurfaceExchange
 
 

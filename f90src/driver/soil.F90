@@ -8,7 +8,6 @@ SUBROUTINE soil(NA,ND,NT,NE,NAX,NTX,NEX,NHW,NHE,NVN,NVS)
   use ErosionMod   , only : erosion
   use ExecMod      , only : exec
   use Hour1Mod     , only : hour1
-  use nitroMod     , only : nitro
   use RedistMod    , only : redist
   use soluteMod    , only : solute
   use StarteMod    , only : starte
@@ -29,6 +28,7 @@ SUBROUTINE soil(NA,ND,NT,NE,NAX,NTX,NEX,NHW,NHE,NVN,NVS)
   use EcoSIMHistMod
   use EcoSIMConfig
   use PlantAPI     , only : PlantModel
+  use MicBGCAPI    , only : MicrobeModel
   implicit none
 
   integer, intent(in) :: NT,NE,NAX,NTX,NEX,NHW,NHE,NVN,NVS
@@ -162,7 +162,7 @@ SUBROUTINE soil(NA,ND,NT,NE,NAX,NTX,NEX,NHW,NHE,NVN,NVS)
     if(lverb)WRITE(*,333)'NIT'
 !    if(I>=170)print*,TKS(0,NVN,NHW)
     call start_timer(t1)
-    CALL NITRO(I,J,NHW,NHE,NVN,NVS)
+    CALL MicrobeModel(I,J,NHW,NHE,NVN,NVS)
     call end_timer('NIT',t1)
 !
 !   UPDATE PLANT biogeochemistry

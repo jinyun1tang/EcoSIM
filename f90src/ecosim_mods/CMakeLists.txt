@@ -4,11 +4,8 @@ set(ECOSIM_MOD_SOURCES
 	ExecMod.F90
   Hour1Pars.F90
 	Hour1Mod.F90
-	RedistMod.F90
 	StarteMod.F90
 	StartsMod.F90
-	TrnsfrMod.F90
-	TrnsfrsMod.F90
 	VisualMod.F90
 	WthrMod.F90
 )
@@ -18,7 +15,9 @@ include_directories(${CMAKE_BINARY_DIR}/f90src/ioutils/)
 include_directories(${CMAKE_BINARY_DIR}/f90src/SoilHydroTherm/)
 include_directories(${CMAKE_BINARY_DIR}/f90src/APIs/)
 include_directories(${CMAKE_BINARY_DIR}/f90src/plant_bgc/)
-include_directories(${CMAKE_BINARY_DIR}/f90src/microbial_bgc/)
+include_directories(${CMAKE_BINARY_DIR}/f90src/geochem/)
+include_directories(${CMAKE_BINARY_DIR}/f90src/microbial_bgc/box_model)
+include_directories(${CMAKE_BINARY_DIR}/f90src/microbial_bgc/layers_model)
 include(add_ecosim_library)
 add_ecosim_library(ecosim_mods ${ECOSIM_MOD_SOURCES})
 
