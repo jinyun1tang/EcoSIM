@@ -27,7 +27,9 @@ module MicBGCAPI
 implicit none
   character(len=*), private, parameter :: mod_filename = __FILE__
 
+  integer :: curI,curJ
   public :: MicrobeModel
+
   contains
 
 !------------------------------------------------------------------------------------------
@@ -42,7 +44,7 @@ integer, intent(in) :: NHW,NHE,NVN,NVS
 integer :: L,NX,NY
 
 !   begin_execution
-
+curI=I; curJ=J
 DO 9995 NX=NHW,NHE
   DO 9990 NY=NVN,NVS
 !
@@ -139,6 +141,7 @@ END subroutine MicrobeModel
   type(micfluxtype), intent(inout) :: micflx
 
   integer :: NFGs, jcplx1, JG
+  integer :: kk
   NFGs=micpar%NFGs
   jcplx1=micpar%jcplx1
   JG=micpar%jguilds
@@ -155,7 +158,6 @@ END subroutine MicrobeModel
   micfor%VOLWRX=VOLWRX(NY,NX)
   micfor%ZEROS2=ZEROS2(NY,NX)
   micfor%ZEROS =ZEROS(NY,NX)
-
   micfor%VOLY  =VOLY(L,NY,NX)
   micfor%THETY =THETY(L,NY,NX)
   micfor%POROS =POROS(L,NY,NX)
@@ -176,6 +178,7 @@ END subroutine MicrobeModel
   micfor%OLSGL =OLSGL(L,NY,NX)
   micfor%ORGC  =ORGC(L,NY,NX)
   micfor%RNO2Y =RNO2Y(L,NY,NX)
+  micfor%RN2OY =RN2OY(L,NY,NX)
   micfor%RN2BY =RN2BY(L,NY,NX)
   micfor%ROXYY =ROXYY(L,NY,NX)
   micfor%ROXYF =ROXYF(L,NY,NX)
@@ -185,6 +188,7 @@ END subroutine MicrobeModel
   micfor%RPOBY =RPOBY(L,NY,NX)
   micfor%RP1BY =RP1BY(L,NY,NX)
   micfor%ROXYL =ROXYL(L,NY,NX)
+  micfor%CFOMC =CFOMC(1:2,L,NY,NX)
   micfor%ROQCY(0:jcplx1)=ROQCY(0:jcplx1,L,NY,NX)
   micfor%ROQAY(0:jcplx1)=ROQAY(0:jcplx1,L,NY,NX)
   micfor%litrm=(L==0)
@@ -220,6 +224,7 @@ END subroutine MicrobeModel
     micfor%RPO4YU =RPO4Y(NU(NY,NX),NY,NX)
     micfor%RP14YU =RP14Y(NU(NY,NX),NY,NX)
     micfor%VOLWU =VOLW(NU(NY,NX),NY,NX)
+    micfor%CFOMCU=CFOMC(1:2,NU(NY,NX),NY,NX)
   endif
   micstt%CNH4B =CNH4B(L,NY,NX)
   micstt%CNH4S =CNH4S(L,NY,NX)
@@ -389,6 +394,12 @@ END subroutine MicrobeModel
   RIPBO(1:JG,1:NFGs,0:JCPLX1,L,NY,NX)=micflx%RIPBO(1:JG,1:NFGs,0:JCPLX1)
   RIPO1(1:JG,1:NFGs,0:JCPLX1,L,NY,NX)=micflx%RIPO1(1:JG,1:NFGs,0:JCPLX1)
   RIPB1(1:JG,1:NFGs,0:JCPLX1,L,NY,NX)=micflx%RIPB1(1:JG,1:NFGs,0:JCPLX1)
+
+  OSC(1:jsken,0:jcplx1,L,NY,NX)=micstt%OSC(1:jsken,0:jcplx1)
+  OSA(1:jsken,0:jcplx1,L,NY,NX)=micstt%OSA(1:jsken,0:jcplx1)
+  OSN(1:jsken,0:jcplx1,L,NY,NX)=micstt%OSN(1:jsken,0:jcplx1)
+  OSP(1:jsken,0:jcplx1,L,NY,NX)=micstt%OSP(1:jsken,0:jcplx1)
+
   if(litrm)then
     RINHOR(1:JG,1:NFGs,0:JCPLX1,NY,NX)=micflx%RINHOR(1:JG,1:NFGs,0:JCPLX1)
     RINOOR(1:JG,1:NFGs,0:JCPLX1,NY,NX)=micflx%RINOOR(1:JG,1:NFGs,0:JCPLX1)
@@ -408,7 +419,6 @@ END subroutine MicrobeModel
     OSP(1,4,NU(NY,NX),NY,NX)=micstt%OSP14U
     OSP(2,4,NU(NY,NX),NY,NX)=micstt%OSP24U
   endif
-
 
   RINHOff(1:JG,1:NFGs,L,NY,NX)=micflx%RINHOff(1:JG,1:NFGs)
   RINHBff(1:JG,1:NFGs,L,NY,NX)=micflx%RINHBff(1:JG,1:NFGs)
@@ -434,10 +444,6 @@ END subroutine MicrobeModel
   OHP(0:jcplx1,L,NY,NX)=micstt%OHP(0:jcplx1)
   OHA(0:jcplx1,L,NY,NX)=micstt%OHA(0:jcplx1)
 
-  OSC(1:jsken,0:jcplx1,L,NY,NX)=micstt%OSC(1:jsken,0:jcplx1)
-  OSA(1:jsken,0:jcplx1,L,NY,NX)=micstt%OSA(1:jsken,0:jcplx1)
-  OSN(1:jsken,0:jcplx1,L,NY,NX)=micstt%OSN(1:jsken,0:jcplx1)
-  OSP(1:jsken,0:jcplx1,L,NY,NX)=micstt%OSP(1:jsken,0:jcplx1)
   ORC(1:2,0:jcplx1,L,NY,NX)=micstt%ORC(1:2,0:jcplx1)
   ORN(1:2,0:jcplx1,L,NY,NX)=micstt%ORN(1:2,0:jcplx1)
   ORP(1:2,0:jcplx1,L,NY,NX)=micstt%ORP(1:2,0:jcplx1)
