@@ -15,7 +15,7 @@ travis     = not-set
 F90        = not-set
 
 # This proxies everything to the builddir cmake.
-netcdfsys = not-set
+netcdfsys = 1
 
 cputype = $(shell uname -m | sed "s/\\ /_/g")
 systype = $(shell uname -s)
@@ -126,18 +126,17 @@ ifeq ($(sanitize), 1)
   CONFIG_FLAGS += -DADDRESS_SANITIZER=1
 endif
 
-# netcdf
+ifeq ($(netcdfsys), not-set)
+  NETCDF_FFLAGS =""
+  NETCDF_FLIBS =""
+else
+  NETCDF_FFLAGS = $(shell nc-config --prefix)/include
+  NETCDF_FLIBS = $(shell nc-config --flibs)
+endif
 
-#ifeq ($(netcdfsys), not-set)
-#  NETCDF_FFLAGS =""
-#  NETCDF_FLIBS =""
-#else
-#  NETCDF_FFLAGS = $(shell nc-config --prefix)/include
-#  NETCDF_FLIBS = $(shell nc-config --flibs)
-#endif
+CONFIG_FLAGS += -DTPL_NETCDF_INCLUDE_DIRS=" $(NETCDF_FFLAGS)"
+CONFIG_FLAGS += -DTPL_NETCDF_LIBRARIES="$(NETCDF_FLIBS)"
 
-#CONFIG_FLAGS += -DTPL_NETCDF_INCLUDE_DIRS=" $(NETCDF_FFLAGS)"
-#CONFIG_FLAGS += -DTPL_NETCDF_LIBRARIES="$(NETCDF_FLIBS)"
 
 define run-config
 @mkdir -p $(BUILDDIR)

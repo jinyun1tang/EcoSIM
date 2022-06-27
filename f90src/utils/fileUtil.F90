@@ -6,6 +6,14 @@ module fileUtil
 
   public :: open_safe
   public :: check_read
+  public :: remove_filename_extension
+  integer, parameter :: ecosim_filename_length=128
+  integer, parameter :: stdout=6
+  integer, parameter :: iulog=6
+  integer, parameter :: ecosim_string_length_long=256
+  integer , public,  parameter :: var_flux_type =1
+  integer , public,  parameter :: var_state_type=2
+  logical, save :: continue_run = .false.
   contains
 
   subroutine open_safe(lun,prefix,fname,status,location,lineno,lverb)
@@ -49,4 +57,30 @@ module fileUtil
     call endrun('read error in '//trim(modfile),lineno)
   endif
   end subroutine check_read
+
+!------------------------------------------------------------------------------------------
+
+
+  function remove_filename_extension(filename) result(basename)
+    !
+    ! Remove the extension from a file name to get a base filename.
+    !
+    ! We start at the end of the filename and assume that the extension
+    ! is marked by a period.
+    !
+    implicit none
+
+    character(len=ecosim_filename_length), intent(in) :: filename
+    character(len=ecosim_filename_length) :: basename
+    integer :: ext_index
+
+    ext_index = scan(filename, '.', .true.)
+    if (ext_index == 0) then
+       ! no period marking an extension...
+       ext_index = len(trim(filename)) + 1
+
+    end if
+    basename = filename(1:ext_index-1)
+  end function remove_filename_extension
+
 end module fileUtil
