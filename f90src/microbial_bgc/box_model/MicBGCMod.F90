@@ -739,7 +739,7 @@ module MicBGCMod
   !     SPOMK=effect of microbial C concentration on microbial decay
   !     RMOMK=effect of microbial C concentration on maintenance respn
   !
-  ORGCL=AMIN1(1.0E+05*BKVL,ORGC)
+  ORGCL=AMIN1(1.0E+05_r8*BKVL,ORGC)
   IF(ORGCL.GT.ZEROS)THEN
     DO 765 M=1,2
       COMC=TOMCNK(M)/ORGCL
@@ -2297,6 +2297,10 @@ module MicBGCMod
     RNH4Y   => micfor%RNH4Y,  &
     RNHBY   => micfor%RNHBY,  &
     RNO3Y   => micfor%RNO3Y,  &
+    RNH4YU  => micfor%RNH4YU, &
+    RNO3YU  => micfor%RNO3YU, &
+    RP14YU  => micfor%RP14YU, &
+    RPO4YU  => micfor%RPO4YU, &
     RN3BY     => micfor%RN3BY,    &
     RPO4Y     => micfor%RPO4Y,    &
     RPOBY     => micfor%RPOBY,    &
@@ -2387,23 +2391,23 @@ module MicBGCMod
 ! previous hour in surface litter, labels as for soil layers above
 !
   IF(litrm)THEN
-    IF(RNH4Y.GT.ZEROS)THEN
-      FNH4XR(NGL,N,K)=AMAX1(FMN,RINHOR(NGL,N,K)/RNH4Y)
+    IF(RNH4YU.GT.ZEROS)THEN
+      FNH4XR(NGL,N,K)=AMAX1(FMN,RINHOR(NGL,N,K)/RNH4YU)
     ELSE
       FNH4XR(NGL,N,K)=AMAX1(FMN,FOMK(NGL,N,K))
     ENDIF
-    IF(RNO3Y.GT.ZEROS)THEN
-      FNO3XR(NGL,N,K)=AMAX1(FMN,RINOOR(NGL,N,K)/RNO3Y)
+    IF(RNO3YU.GT.ZEROS)THEN
+      FNO3XR(NGL,N,K)=AMAX1(FMN,RINOOR(NGL,N,K)/RNO3YU)
     ELSE
       FNO3XR(NGL,N,K)=AMAX1(FMN,FOMK(NGL,N,K))
     ENDIF
-    IF(RPO4Y.GT.ZEROS)THEN
-      FPO4XR(NGL,N,K)=AMAX1(FMN,RIPOOR(NGL,N,K)/RPO4Y)
+    IF(RPO4YU.GT.ZEROS)THEN
+      FPO4XR(NGL,N,K)=AMAX1(FMN,RIPOOR(NGL,N,K)/RPO4YU)
     ELSE
       FPO4XR(NGL,N,K)=AMAX1(FMN,FOMK(NGL,N,K))
     ENDIF
-    IF(RP14Y.GT.ZEROS)THEN
-      FP14XR(NGL,N,K)=AMAX1(FMN,RIPO1R(NGL,N,K)/RP14Y)
+    IF(RP14YU.GT.ZEROS)THEN
+      FP14XR(NGL,N,K)=AMAX1(FMN,RIPO1R(NGL,N,K)/RP14YU)
     ELSE
       FP14XR(NGL,N,K)=AMAX1(FMN,FOMK(NGL,N,K))
     ENDIF
@@ -3102,7 +3106,6 @@ module MicBGCMod
         VOLWOX=VOLWM(M)*SOXYL
         VOLPOX=VOLPM(M)
         VOLWPM=VOLWOX+VOLPOX
-        !write(*,*)'VOLWPM=',VOLWPM
         DO 425 MX=1,NPT
           OXYG1=OXYG1+ROXYFX
           OXYS1=OXYS1+ROXYLX

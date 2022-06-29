@@ -79,7 +79,6 @@ contains
   this%k_POM=3
   this%k_humus=4
 
-
   call this%Initallocate()
 
 !set up functional group ids

@@ -255,6 +255,7 @@ END subroutine MicrobeModel
   micstt%ZNH4B=ZNH4B(L,NY,NX)
   micstt%ZNH4S=ZNH4S(L,NY,NX)
   micstt%ZNO3B=ZNO3B(L,NY,NX)
+  micstt%ZNO3S=ZNO3S(L,NY,NX)
   micstt%H1POB=H1POB(L,NY,NX)
   micstt%H1PO4=H1PO4(L,NY,NX)
   micstt%ZNO2B=ZNO2B(L,NY,NX)
