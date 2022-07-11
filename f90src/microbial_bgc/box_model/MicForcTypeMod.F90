@@ -73,7 +73,7 @@ module MicForcTypeMod
   real(r8) :: CFOMCU(2)
   real(r8), allocatable :: ROQCY(:)
   real(r8), allocatable :: ROQAY(:)
-  real(r8), allocatable :: DFGS(:)
+  real(r8), allocatable :: DFGS(:)  !rate constant for air-water gas exchange
   real(r8), allocatable :: FILM(:)
   real(r8), allocatable :: THETPM(:)
   real(r8), allocatable :: VOLWM(:)

@@ -393,7 +393,7 @@ module RedistMod
   real(r8) :: PI,PXB
   real(r8) :: SIN,SGN,SIP,SNB
   real(r8) :: SPB,SNM0,SPM0,SIR,SII,SBU
-  real(r8) :: VHCPZ,VHCPY,VHCPO
+  real(r8) :: VHCPZ,VHCPY,VHCPO,VHCPXX
   real(r8) :: WI,WO
   real(r8) :: ZSI,ZXB,ZGI
   real(r8) :: ZNGGIN,ZN2OIN,ZNH3IN
@@ -412,6 +412,7 @@ module RedistMod
   VOLI(0,NY,NX)=max(VOLI(0,NY,NX)-THAWR(NY,NX)/DENSI,0._r8)
   ENGYZ=VHCPZ*TKS(0,NY,NX)
   !update heat caapcity
+  VHCPXX=VHCP(0,NY,NX)
   VHCP(0,NY,NX)=cpo*ORGC(0,NY,NX)+cpw*VOLW(0,NY,NX)+cpi*VOLI(0,NY,NX)
   IF(VHCP(0,NY,NX).GT.VHCPRX(NY,NX))THEN
     !when there are still significant heat capacity of the residual layer
@@ -421,12 +422,9 @@ module RedistMod
     HEATIN=HEATIN+HFLXO
     Ls=NUM(NY,NX)
     !if(curday>=175)write(*,*)'at line',__LINE__,TKS(0,NY,NX),tks(Ls,ny,nx),tkspre
-    if(abs(TKS(0,NY,NX)-tks(Ls,ny,nx))>10._r8)then
-      vhcp1s=VHCM(Ls,NY,NX)+cpw*(VOLW(Ls,NY,NX)+VOLWH(Ls,NY,NX))+&
-        cpi*(VOLI(Ls,NY,NX)+VOLIH(Ls,NY,NX))
-      TKS(0,NY,NX)=(tks(0,ny,nx)*VHCP(0,NY,NX)+TKS(Ls,NY,NX)*vhcp1s)/(VHCP(0,NY,NX)+vhcp1s)
-      TKS(Ls,NY,NX)=TKS(0,NY,NX)
-
+    if(abs(VHCP(0,NY,NX)/VHCPXX-1._r8)>0.025_r8.or. &
+      abs(TKS(0,NY,NX)/tkspre-1._r8)>0.025_r8)then
+      TKS(0,NY,NX)=TKS(NUM(NY,NX),NY,NX)
     endif
   ELSE
     HEATIN=HEATIN+HFLXO+(TKS(NUM(NY,NX),NY,NX)-TKS(0,NY,NX))*VHCP(0,NY,NX)
@@ -476,7 +474,17 @@ module RedistMod
   HEATOU=HEATOU-cpw*TKA(NY,NX)*PRECU(NY,NX)
 !
 ! SURFACE BOUNDARY CO2, CH4 AND DOC FLUXES
-!
+! XCODFS: surface - atmosphere CO2 dissolution (+ve) - volatilization (-ve)
+! XCOFLG: gaseous CO2 flux, [g d-2 h-1]
+! TCO2Z: total root CO2 content
+! FLQGQ: precipitation flux into soil surface
+! FLQRQ: precipitation flux into surface litter
+! FLQGI: irrifation flux into soil surface
+! FLQRI: irrigation flux into surface litter
+! XCODFG: soil CO2 dissolution (+ve) - volatilization (-ve)
+! XCODFR: soil surface CO2 dissolution (+ve) - volatilization
+! UCO2G: total soil CO2 flux, [g d-2]
+! HCO2G: hourly soil CO2 flux, [g d-2 h-1]
   CI=XCODFS(NY,NX)+XCOFLG(3,NU(NY,NX),NY,NX)+TCO2Z(NY,NX) &
       +(FLQGQ(NY,NX)+FLQRQ(NY,NX))*CCOR(NY,NX) &
       +(FLQGI(NY,NX)+FLQRI(NY,NX))*CCOQ(NY,NX) &
@@ -1103,14 +1111,14 @@ module RedistMod
   DC=0.0_r8
   DN=0.0_r8
   DP=0.0_r8
-  DO 6975 K=0,jcplx1
+  DO K=0,jcplx1
     RC0(K,NY,NX)=0.0_r8
-6975  CONTINUE
+  ENDDO
   RC0ff(NY,NX)=0.0_r8
 
   OMCL(0,NY,NX)=0.0_r8
   OMNL(0,NY,NX)=0.0_r8
-  DO 6970 K=0,jcplx1
+  DO K=0,jcplx1
     IF(K.NE.micpar%k_POM.AND.K.NE.micpar%k_humus)THEN
       !
       ! TOTAL MICROBIAL C,N,P
@@ -1131,37 +1139,37 @@ module RedistMod
         enddo
       ENDDO
     ENDIF
-6970  CONTINUE
+  ENDDO
 
-      !
-      ! TOTAL MICROBIAL C,N,P
-      !
-      DO N=1,NFGs
-        DO  M=1,3
-          DO NGL=1,JG
-            DC=DC+OMCff(M,NGL,N,0,NY,NX)
-            DN=DN+OMNff(M,NGL,N,0,NY,NX)
-            DP=DP+OMPff(M,NGL,N,0,NY,NX)
-            RC0ff(NY,NX)=RC0ff(NY,NX)+OMCff(M,NGL,N,0,NY,NX)
-            TOMT(NY,NX)=TOMT(NY,NX)+OMCff(M,NGL,N,0,NY,NX)
-            TONT(NY,NX)=TONT(NY,NX)+OMNff(M,NGL,N,0,NY,NX)
-            TOPT(NY,NX)=TOPT(NY,NX)+OMPff(M,NGL,N,0,NY,NX)
-            OMCL(0,NY,NX)=OMCL(0,NY,NX)+OMCff(M,NGL,N,0,NY,NX)
-            OMNL(0,NY,NX)=OMNL(0,NY,NX)+OMNff(M,NGL,N,0,NY,NX)
-          enddo
-        enddo
-    ENDDO
+  !
+  ! TOTAL MICROBIAL C,N,P
+  !
+  DO N=1,NFGs
+    DO  M=1,3
+      DO NGL=1,JG
+        DC=DC+OMCff(M,NGL,N,0,NY,NX)
+        DN=DN+OMNff(M,NGL,N,0,NY,NX)
+        DP=DP+OMPff(M,NGL,N,0,NY,NX)
+        RC0ff(NY,NX)=RC0ff(NY,NX)+OMCff(M,NGL,N,0,NY,NX)
+        TOMT(NY,NX)=TOMT(NY,NX)+OMCff(M,NGL,N,0,NY,NX)
+        TONT(NY,NX)=TONT(NY,NX)+OMNff(M,NGL,N,0,NY,NX)
+        TOPT(NY,NX)=TOPT(NY,NX)+OMPff(M,NGL,N,0,NY,NX)
+        OMCL(0,NY,NX)=OMCL(0,NY,NX)+OMCff(M,NGL,N,0,NY,NX)
+        OMNL(0,NY,NX)=OMNL(0,NY,NX)+OMNff(M,NGL,N,0,NY,NX)
+      enddo
+    enddo
+  ENDDO
 
   !
   !     TOTAL MICROBIAL RESIDUE C,N,P
   !
-  DO 6900 K=0,2
-    DO 6940 M=1,2
+  DO K=0,2
+    DO  M=1,2
       DC=DC+ORC(M,K,0,NY,NX)
       DN=DN+ORN(M,K,0,NY,NX)
       DP=DP+ORP(M,K,0,NY,NX)
       RC0(K,NY,NX)=RC0(K,NY,NX)+ORC(M,K,0,NY,NX)
-6940  CONTINUE
+    ENDDO
 !
     !     TOTAL DOC, DON, DOP
 !
@@ -1174,13 +1182,14 @@ module RedistMod
 !
     !     TOTAL PLANT RESIDUE C,N,P
 !
-    DO 6930 M=1,4
+    DO  M=1,4
       DC=DC+OSC(M,K,0,NY,NX)
       DN=DN+OSN(M,K,0,NY,NX)
       DP=DP+OSP(M,K,0,NY,NX)
       RC0(K,NY,NX)=RC0(K,NY,NX)+OSC(M,K,0,NY,NX)
-6930  CONTINUE
-6900  CONTINUE
+    ENDDO
+  ENDDO
+
   ORGC(0,NY,NX)=DC
   ORGN(0,NY,NX)=DN
   ORGR(0,NY,NX)=DC
@@ -1375,20 +1384,11 @@ module RedistMod
     !     END ARTIFICIAL SOIL WARMING
     !
     IF(VHCP(L,NY,NX).GT.ZEROS(NY,NX))THEN
-      TKS00=(ENGY+THFLW(L,NY,NX)+THTHAW(L,NY,NX) &
+      TKS00=TKS(L,NY,NX)
+      TKS(L,NY,NX)=(ENGY+THFLW(L,NY,NX)+THTHAW(L,NY,NX) &
         +TUPHT(L,NY,NX)+HWFLU(L,NY,NX))/VHCP(L,NY,NX)
 
-      if(abs(TKS00-TKSX)>100._r8)then
-        TKS(L,NY,NX)=TKS(NUM(NY,NX),NY,NX)
-        write(*,*)'line',__LINE__,L,TKS(L,NY,NX),TKS(NUM(NY,NX),NY,NX)
-        write(*,*)'ENGY+THFLW(L,NY,NX)+THTHAW(L,NY,NX)=',ENGY,THFLW(L,NY,NX),THTHAW(L,NY,NX)
-        write(*,*)'TUPHT(L,NY,NX)+HWFLU(L,NY,NX)=',TUPHT(L,NY,NX),HWFLU(L,NY,NX)
-        write(*,*)'VHCP(L,NY,NX)=',VHCP(L,NY,NX)
-        write(*,*)'NUM',NUM(NY,NX),'L=',L
-        write(*,*)'water',VOLW(L,NY,NX),VOLWH(L,NY,NX)
-        write(*,*)'ice',VOLI(L,NY,NX),VOLIH(L,NY,NX)
-!        call endrun(trim(mod_filename)//' at line',__LINE__)
-      else
+      if(L==1.and.abs(TKS(L,NY,NX)/TKS00-1._r8)>0.025_r8)then
         TKS(L,NY,NX)=TKS00
       endif
     ELSE
@@ -2229,7 +2229,7 @@ module RedistMod
         +OQA(K,L,NY,NX)+OQAH(K,L,NY,NX)+OHA(K,L,NY,NX)
       DN=DN+OQN(K,L,NY,NX)+OQNH(K,L,NY,NX)+OHN(K,L,NY,NX)
       DP=DP+OQP(K,L,NY,NX)+OQPH(K,L,NY,NX)+OHP(K,L,NY,NX)
-      DO M=1,4
+      DO M=1,jsken
         DC=DC+OSC(M,K,L,NY,NX)
         DN=DN+OSN(M,K,L,NY,NX)
         DP=DP+OSP(M,K,L,NY,NX)
@@ -2244,7 +2244,7 @@ module RedistMod
         +OQA(K,L,NY,NX)+OQAH(K,L,NY,NX)+OHA(K,L,NY,NX)
       ON=ON+OQN(K,L,NY,NX)+OQNH(K,L,NY,NX)+OHN(K,L,NY,NX)
       OP=OP+OQP(K,L,NY,NX)+OQPH(K,L,NY,NX)+OHP(K,L,NY,NX)
-      DO M=1,4
+      DO M=1,jsken
         OC=OC+OSC(M,K,L,NY,NX)
         ON=ON+OSN(M,K,L,NY,NX)
         OP=OP+OSP(M,K,L,NY,NX)

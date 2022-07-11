@@ -14,6 +14,22 @@ implicit none
   integer :: jsken   !# of kinetic components of the substrates
   integer :: jguilds !# of guilds
   integer :: NFGs    !# of functional groups
+  integer :: k_woody_litr
+  integer :: k_non_woody_litr
+  integer :: k_manure
+  integer :: k_POM
+  integer :: k_humus
+  integer :: nf_amonia_oxi
+  integer :: nf_nitrite_oxi
+  integer :: nf_aero_methanot
+  integer :: nf_hydro_methang
+  integer :: n_aero_hetrophb
+  integer :: n_anero_faculb
+  integer :: n_aero_fungi
+  integer :: n_anaero_ferm
+  integer :: n_aceto_methang
+  integer :: n_aero_n2fixer
+  integer :: n_anero_n2fixer
   real(r8), allocatable :: OMCI(:,:)             !initializes microbial biomass
   real(r8), allocatable :: OHCK(:)    !fractions of SOC in adsorbed C
   real(r8), allocatable :: OMCK(:)    !fractions of SOC in biomass
@@ -34,22 +50,12 @@ implicit none
   real(r8),allocatable :: OMCF(:)                            !hetero microbial biomass composition in SOC
   real(r8),allocatable :: OMCA(:)                            !autotrophic microbial biomass composition in SOC
   logical, allocatable :: is_activef_micb(:)
-  integer :: k_woody_litr
-  integer :: k_non_woody_litr
-  integer :: k_manure
-  integer :: k_POM
-  integer :: k_humus
-  integer :: nf_amonia_oxi
-  integer :: nf_nitrite_oxi
-  integer :: nf_aero_methanot
-  integer :: nf_hydro_methang
-  integer :: n_aero_hetrophb
-  integer :: n_anero_faculb
-  integer :: n_aero_fungi
-  integer :: n_anaero_ferm
-  integer :: n_aceto_methang
-  integer :: n_aero_n2fixer
-  integer :: n_anero_n2fixer
+  character(len=16) :: kiname(0:3)
+  character(len=16) :: cplxname(0:4)
+  character(len=16) :: hmicname(7)
+  character(len=16) :: amicname(7)
+  character(len=16) :: micresb(0:1)
+  character(len=16) :: micbiom(0:2)
   contains
     procedure, public  :: Init
     procedure, public  :: SetPars
@@ -78,7 +84,34 @@ contains
   this%k_manure=2
   this%k_POM=3
   this%k_humus=4
-
+  this%kiname(1)='protein'
+  this%kiname(2)='carbhydro'
+  this%kiname(3)='cellulose'
+  this%kiname(0)='lignin'
+  this%cplxname(0)='woodylitr'
+  this%cplxname(1)='nwoodylit'
+  this%cplxname(2)='manure'
+  this%cplxname(3)='pom'
+  this%cplxname(4)='humus'
+  this%hmicname(1)='aerohetrob'
+  this%hmicname(2)='anerofaclb'
+  this%hmicname(3)='aerofungi'
+  this%hmicname(4)='aneroferm'
+  this%hmicname(5)='acetomethg'
+  this%hmicname(6)='aeron2fix'
+  this%hmicname(7)='aneron2fix'
+  this%amicname(1)='amoniaoxib'
+  this%amicname(2)='nititeoxib'
+  this%amicname(3)='aeromethtp'
+  this%amicname(5)='hydromethg'
+  this%amicname(4)='null'
+  this%amicname(6)='null'
+  this%amicname(7)='null'
+  this%micresb(1)='labile'
+  this%micresb(3)='resist'
+  this%micbiom(1)='labile'
+  this%micbiom(2)='resist'
+  this%micbiom(0)='active'
   call this%Initallocate()
 
 !set up functional group ids

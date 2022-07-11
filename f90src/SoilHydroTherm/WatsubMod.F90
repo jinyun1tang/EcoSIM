@@ -1779,7 +1779,7 @@ module WatsubMod
   integer, intent(in) :: M,NY,NX
   real(r8),intent(inout) :: VOLWR2
   integer  :: NN
-  real(r8) :: tk1pre
+  real(r8) :: tk1pre,VHCPRXX
   real(r8) :: RAa
 ! begin_execution
 
@@ -1995,31 +1995,15 @@ module WatsubMod
     VOLWR2=VOLWR2+FLYM2+EVAPR2-FLV2
     VOLW12=VOLW12+FLV2
     ENGYR=VHCPR2*TKR1
+    VHCPRXX=VHCPR2
     ! VHCPR2: heat capacity, kJ/kg/Kelvin
     VHCPR2=cpo*ORGC(0,NY,NX)+cpw*VOLWR2+cpi*VOLI1(0,NY,NX)
     VHCP12=VHCP12+cpw*FLV2
+    tk1pre=TKR1
     TKR1=(ENGYR+HFLXR2+HWFLM2-HWFLV2-HFLCR2)/VHCPR2
-    !if((TKR1-TK1(NUM(NY,NX),NY,NX))*(TKR1-TKQ(NY,NX))>0._r8)then
-     ! VHCP1(1,NY,NX)=VHCM(1,NY,NX)+cpw*(VOLW1(1,NY,NX) &
-     !   +VOLWH1(1,NY,NX))+cpi*(VOLI1(1,NY,NX)+VOLIH1(1,NY,NX))
-     ! tk1pre=TK1(1,NY,NX)
-     ! TKR1=(TKR1*VHCPR2+VHCP1(1,NY,NX)*TK1(1,NY,NX))/(VHCPR2+VHCP1(1,NY,NX))
-     ! TK1(1,NY,NX)=TKR1
-     ! TK1(0,NY,NX)=TKR1
-     ! write(*,*)'curday, NN=',curday,NN
-     ! write(*,*)'curhr =',curhour,NPR
-     ! write(*,*)'ENGYR =',ENGYR
-     ! write(*,*)'HFLXR2=',HFLXR2
-     ! write(*,*)'HWFLM2=',HWFLM2
-     ! write(*,*)'HWFLV2=',HWFLV2
-     ! write(*,*)'HFLCR2=',HFLCR2
-     ! write(*,*)'VHCPR2=',VHCPR2
-     ! write(*,*)'ORGC(0,NY,NX)=',ORGC(0,NY,NX)
-     ! write(*,*)'VOLWR2=',VOLWR2
-     ! write(*,*)'VOLI1(0,NY,NX)=',VOLI1(0,NY,NX)
-     ! write(*,*)'TKR1  =',TKR1,TK1(0,NY,NX),TK1pre
-!      call endrun(trim(mod_filename)//'at line',__LINE__)
-    !endif
+    IF(ABS(VHCPRXX/VHCPR2-1._r8)>0.025_r8.or.abs(TKR1/tk1pre-1._r8)>0.025_r8)then
+      TKR1=TK1(0,NY,NX)
+    endif
     TKS1=TKS1+(HWFLV2+HFLCR2)/VHCP12
 
 5000  CONTINUE
@@ -2411,7 +2395,7 @@ module WatsubMod
 ! TFND1=temperature effect on gas diffusivity
 ! DFGS=rate constant for air-water gas exchange
 ! Z1R,Z2RW,Z2RD,Z3RX=parameters for litter air-water gas transfers
-! XNPD=time step for gas transfer calculations
+! XNPD=time step for gas transfer calculations, it is tunable parameter
 ! TORT=tortuosity for aqueous diffusivity
 !
   VOLAT0=VOLA1(0,NY,NX)-VOLI1(0,NY,NX)
@@ -2419,9 +2403,9 @@ module WatsubMod
     THETWA=AMAX1(0.0,AMIN1(1.0_r8,VOLW1(0,NY,NX)/VOLAT0))
     TFND1=(TK1(0,NY,NX)/298.15)**6
     IF(THETWA.GT.Z3R)THEN
-      DFGS(M,0,NY,NX)=AMAX1(0.0_r8,TFND1*XNPD/((Z1R**-1)*EXP(Z2RW*(THETWA-Z3R))))
+      DFGS(M,0,NY,NX)=AMAX1(0.0_r8,TFND1*XNPD/((Z1R**(-1))*EXP(Z2RW*(THETWA-Z3R))))
     ELSE
-      DFGS(M,0,NY,NX)=AMIN1(1.0_r8,TFND1*XNPD/((Z1R**-1)*EXP(Z2RD*(THETWA-Z3R))))
+      DFGS(M,0,NY,NX)=AMIN1(1.0_r8,TFND1*XNPD/((Z1R**(-1))*EXP(Z2RD*(THETWA-Z3R))))
     ENDIF
   ELSE
     DFGS(M,0,NY,NX)=0.0_r8
@@ -4917,7 +4901,7 @@ module WatsubMod
   integer :: NY,NX
   integer :: L,NUX,LL,Ls
 
-  real(r8) :: tk1pres
+  real(r8) :: tk1pres,tk1l
 
 ! begin_execution
 !  if(curday>=176)then
@@ -5006,7 +4990,11 @@ module WatsubMod
         VHCP1B(NUM(NY,NX),NY,NX)=cpw*VOLWH1(NUM(NY,NX),NY,NX) &
           +cpi*VOLIH1(NUM(NY,NX),NY,NX)
         IF(VHCP1(NUM(NY,NX),NY,NX).GT.ZEROS(NY,NX))THEN
+          tk1pres=TK1(NUM(NY,NX),NY,NX)
           TK1(NUM(NY,NX),NY,NX)=(ENGY1+HFLWS)/VHCP1(NUM(NY,NX),NY,NX)
+          if(abs(tk1pres/TK1(NUM(NY,NX),NY,NX)-1._r8)>0.025_r8)then
+            TK1(NUM(NY,NX),NY,NX)=TKA(NY,NX)
+          endif
         ELSE
           TK1(NUM(NY,NX),NY,NX)=TKA(NY,NX)
         ENDIF
@@ -5075,58 +5063,15 @@ module WatsubMod
         TK1(0,NY,NX)=(ENGYR+HFLWRL(NY,NX)+TFLXR(NY,NX) &
           +THQR1(NY,NX))/VHCP1(0,NY,NX)
         Ls=NUM(NY,NX)
-!        if(curday>=176)then
-!          write(*,*)trim(mod_filename)//'at line',__LINE__,'tk',TK1(0,NY,NX)
-!          write(*,*)'ENGYR,HFLWRL(NY,NX),TFLXR(NY,NX),THQR1(NY,NX),VHCP1(0,NY,NX)'
-!          write(*,*)ENGYR,HFLWRL(NY,NX),TFLXR(NY,NX),THQR1(NY,NX),VHCP1(0,NY,NX)
-!          write(*,*)VHCM(Ls,NY,NX),VOLW1(Ls,NY,NX)+VOLWH1(Ls,NY,NX),VOLI1(Ls,NY,NX)+VOLIH1(Ls,NY,NX)
-!          write(*,*)BKDS(Ls,NY,NX),VHCPRX(NY,NX),VHCP1(0,NY,NX)
-!        endif
-        if(abs(TK1(0,NY,NX)-TK1(Ls,NY,NX))>15._r8)TK1(0,NY,NX)=TK1(NUM(NY,NX),NY,NX)
-          !too great difference between temepratures in residual layer and top soil layer
-!          VHCP1(Ls,NY,NX)=VHCM(Ls,NY,NX)+cpw*(VOLW1(Ls,NY,NX) &
-!            +VOLWH1(Ls,NY,NX))+cpi*(VOLI1(Ls,NY,NX)+VOLIH1(Ls,NY,NX))
-!          TK1(0,NY,NX)=(TK1(0,NY,NX)*VHCP1(0,NY,NX)+TK1(Ls,NY,NX)*VHCP1(Ls,NY,NX)) &
-!            /(VHCP1(0,NY,NX)+VHCP1(1,NY,NX))
-!          TK1(Ls,NY,NX)=TK1(0,NY,NX)
-!          if(TK1(0,NY,NX)<0._r8)then
-!            write(*,*)'at line',__LINE__,'TK1',TK1(0,NY,NX)
-!          endif
-!          write(*,*)
-!          write(*,*)'ENGYR+HFLWRL(NY,NX)+TFLXR(NY,NX)+THQR1(NY,NX),VHCP1(0,NY,NX),ENGYR=',&
-!            (ENGYR+HFLWRL(NY,NX)+TFLXR(NY,NX)+THQR1(NY,NX)),VHCP1(0,NY,NX)
-!          write(*,*)'HFLWRL(NY,NX),TFLXR(NY,NX),THQR1(NY,NX)=',HFLWRL(NY,NX),TFLXR(NY,NX),THQR1(NY,NX)
-!          write(*,*)'tk1pres, TK1(0,NY,NX)=',tk1pres,TK1(0,NY,NX)
-!          write(*,*)'ORGC(0,NY,NX),VOLW1(0,NY,NX),VOLI1(0,NY,NX)=',cpo*ORGC(0,NY,NX),cpw*VOLW1(0,NY,NX) &
-!            ,cpi*VOLI1(0,NY,NX)
-!          write(*,*)'at line',__LINE__
-!          if(TK1(0,NY,NX)<200._r8)call endrun(trim(mod_filename)//'at line',__LINE__)
-!        endif
+
+        IF(ABS(VHCP1(0,NY,NX)/VHCPXX-1._r8)>0.025_r8.or. &
+          abs(TK1(0,NY,NX)/tk1pres-1._r8)>0.025_r8)THEN
+          TK1(0,NY,NX)=TK1(NUM(NY,NX),NY,NX)
+        ENDIF
+
       ELSE
         TK1(0,NY,NX)=TK1(NUM(NY,NX),NY,NX)
       ENDIF
-!      if(curday>=176)write(*,*)trim(mod_filename)//'at line',__LINE__,'tk',TK1(NUM(NY,NX),NY,NX)
-
-      ! if(curday>=377)then
-      !   write(*,*)'TK1(0,NY,NX)=',TK1(0,NY,NX)
-      !   write(*,*)'VHCP1(0,NY,NX).GT.VHCPRX(NY,NX)',&
-      !    VHCP1(0,NY,NX).GT.VHCPRX(NY,NX)
-      ! endif
-      ! IF(I.GT.350.AND.NX.EQ.1)THEN
-      !   WRITE(*,7754)'VOLW0',I,J,M,NX,NY,NUM(NY,NX)
-      !  2,VOLW1(0,NY,NX),VOLI1(0,NY,NX),VOLP1(0,NY,NX)
-      !  3,THETWX(0,NY,NX),THETIX(0,NY,NX),THETPX(0,NY,NX)
-      !  2,FLWRL(NY,NX),WFLXR(NY,NX),TQR1(NY,NX),EVAPR(NY,NX)
-      !  4,XVOLW(NY,NX),XVOLI(NY,NX),XVOLT(NY,NX)
-      !  5,TVOLWI,VOLWRX(NY,NX)
-      !  5,FLWRLG,FLWRLW,FLYM,FLQR
-      !  3,TK1(0,NY,NX),HFLWRL(NY,NX),TFLXR(NY,NX)
-      !  3,THQR1(NY,NX),ENGYR,VHCP1(0,NY,NX),VHCPRX(NY,NX)
-      !  2,HFLWRLG,HFLWRLW,HWFLYM,HFLXR
-      !  3,VOLPM(M,0,NY,NX),VOLPM(M,NUM(NY,NX),NY,NX)
-      !  4,VOLI1(NUM(NY,NX),NY,NX),TK1(NUM(NY,NX),NY,NX)
-      !7754  FORMAT(A8,6I4,60E12.4)
-      !       ENDIF
       !
       ! SOIL LAYER WATER, ICE AND TEMPERATURE
       !
@@ -5250,14 +5195,11 @@ module WatsubMod
           !           END ARTIFICIAL SOIL WARMING
 !
           IF(VHCP1(L,NY,NX).GT.ZEROS(NY,NX))THEN
+            tk1l=TK1(L,NY,NX)
             TK1(L,NY,NX)=(ENGY1+THFLWL(L,NY,NX)+TTFLXL(L,NY,NX) &
               +HWFLU1(L,NY,NX))/VHCP1(L,NY,NX)
-            if(abs(TK1(L,NY,NX))>1.e3_r8)then
-              write(*,*)'ENGY1+THFLWL(L,NY,NX)+TTFLXL(L,NY,NX)',&
-                ENGY1,THFLWL(L,NY,NX),TTFLXL(L,NY,NX)
-              write(*,*)'HWFLU1(L,NY,NX)),VHCP1(L,NY,NX)',&
-                HWFLU1(L,NY,NX),VHCP1(L,NY,NX)
-              call endrun(trim(mod_filename)//' at line',__LINE__)
+            if(abs(TK1(L,NY,NX)/tk1l-1._r8)>0.025_r8)then
+              TK1(L,NY,NX)=tk1l
             endif
           ELSEIF(L.EQ.1)THEN
             TK1(L,NY,NX)=TKA(NY,NX)

@@ -58,9 +58,14 @@ implicit none
   real(r8) :: OLSGL2(0:JZ,JY,JX),ZNSGL2(0:JZ,JY,JX),ZLSGL2(0:JZ,JY,JX)
   real(r8) :: ZVSGL2(0:JZ,JY,JX),HLSGL2(0:JZ,JY,JX),ZOSGL2(0:JZ,JY,JX)
 
-  real(r8) :: RCODFG(0:JZ,JY,JX),RCHDFG(0:JZ,JY,JX)
-  real(r8) :: ROXDFG(0:JZ,JY,JX),RNGDFG(0:JZ,JY,JX),RN2DFG(0:JZ,JY,JX)
-  real(r8) :: RN3DFG(0:JZ,JY,JX),RNBDFG(0:JZ,JY,JX),TQROC(0:4,JY,JX)
+  real(r8) :: RCODFG(0:JZ,JY,JX)  !CO2 volatilization/dissolution within soil layer	g d-2 t-1
+  real(r8) :: RCHDFG(0:JZ,JY,JX)  !CH4 volatilization/dissolution within soil layer	g d-2 t-1
+  real(r8) :: ROXDFG(0:JZ,JY,JX)  !O2 volatilization/dissolution within soil layer	g d-2 t-1
+  real(r8) :: RNGDFG(0:JZ,JY,JX)  !N2 volatilization/dissolution within soil layer	g d-2 t-1
+  real(r8) :: RN2DFG(0:JZ,JY,JX)  !N2O volatilization/dissolution within soil layer	g d-2 t-1
+  real(r8) :: RN3DFG(0:JZ,JY,JX)  !NH3 volatilization/dissolution within soil layer non-band	g d-2 t-1
+  real(r8) :: RNBDFG(0:JZ,JY,JX)  !NH3 volatilization/dissolution within soil layer band	g d-2 t-1
+  real(r8) :: TQROC(0:4,JY,JX)
   real(r8) :: TQRON(0:4,JY,JX),TQROP(0:4,JY,JX),TQROA(0:4,JY,JX)
   real(r8) :: TQRCHS(JY,JX),TQROXS(JY,JX),TQRNGS(JY,JX),TQRN2S(JY,JX)
   real(r8) :: TQRNH4(JY,JX),TQRNH3(JY,JX),TQRNO3(JY,JX),TQRH2P(JY,JX)
