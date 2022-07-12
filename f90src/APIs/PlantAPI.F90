@@ -84,35 +84,6 @@ implicit none
   TBALN=TBALNs1
   TBALP=TBALPs1
 
-!  CALL HFUNC(I,J,NHW,NHE,NVN,NVS)
-!
-!   CALCULATE CANOPY CO2 UPTAKE AT FULL TURGOR, CANOPY WATER POTENTIAL,
-!   HYDRAULIC AND STOMATAL RESISTANCES,AND CANOPY ENERGY BALANCE IN 'UPTAKE'
-!   CALCULATE ROOT UPTAKE OF WATER, OXYGEN, NH4, NO3 AND PO4 IN 'UPTAKE'
-!
-!  if(lverb)WRITE(*,333)'UPTK'
-!    if(I>=170)print*,TKS(0,NVN,NHW)
-!  call start_timer(t1)
-!  CALL UPTAKE(I,J,NHW,NHE,NVN,NVS)
-!  call end_timer('UPTK',t1)
-!
-!   CALCULATE CANOPY CO2 UPTAKE AT AMBIENT TURGOR, AUTOTROPHIC AND GROWTH
-!   RESPIRATION, PLANT C ALLOCATION, CANOPY AND ROOT GROWTH IN 'GROSUB'
-!
-  if(lverb)WRITE(*,333)'GRO'
-!    if(I>=170)print*,TKS(0,NVN,NHW)
-!  call start_timer(t1)
-!  CALL GROSUB(I,J,NHW,NHE,NVN,NVS)
-!  call end_timer('GRO',t1)
-
-!   CALCULATE ROOT-SOIL C AND NUTRIENT EXCHANGE FOR ALL PLANT SPECIES
-!   IN 'EXTRACT'
-!
-  if(lverb)WRITE(*,333)'EXTR'
-!    if(I>=170)print*,TKS(0,NVN,NHW)
-  call start_timer(t1)
-!  CALL EXTRACT(I,J,NHW,NHE,NVN,NVS)
-  call end_timer('EXTR',t1)
 
   end subroutine PlantModel
 !------------------------------------------------------------------------------------------

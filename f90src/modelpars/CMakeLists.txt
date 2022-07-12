@@ -1,4 +1,5 @@
 set(MODELPARS_SOURCES
+  TracerPropMod.F90
   ChemTracerParsMod.F90
 )
 include_directories(${CMAKE_BINARY_DIR}/f90src/utils/)

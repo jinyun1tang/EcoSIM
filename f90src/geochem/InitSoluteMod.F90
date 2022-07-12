@@ -1,40 +1,21 @@
 module InitSoluteMod
   use data_kind_mod, only : r8 => SHR_KIND_R8
   use minimathmod, only : test_aeqb
-  use SOMDataType
-  use ChemTranspDataType
-  use GridConsts
-  use FlagDataType
-  use SoilPhysDataType
-  use SoilHeatDatatype
-  use SoilWaterDataType
-  use EcoSIMCtrlDataType
-  use ClimForcDataType
-  use FertilizerDataType
-  use EcosimConst
-  use SnowDataType
-  use SoilBGCDataType
-  use EcoSIMHistMod
-  use SoilPropertyDataType
-  use IrrigationDataType
-  use AqueChemDatatype
-  use GridDataType
-  use EcoSIMConfig
-  use SoluteParMod
   use SoluteChemDataType, only : solutedtype
   use ChemTracerParsMod
+  use SoluteParMod
   implicit none
 
   private
+  character(len=*),private, parameter :: mod_filename = __FILE__
 
   real(r8), parameter :: COOH1=2.5E-02_r8
-
   real(r8), parameter :: TAD=5.0E-02_r8
   real(r8), parameter :: CALMX=10.0_r8
   real(r8), parameter :: CFEMX=10.0_r8
+  real(r8), parameter :: ZERO=1.0E-15_r8
 
   real(r8) :: A1,A2,CCEC,XCOOH,SPOH2,SPOH1,CNO1
-
   real(r8), pointer :: CCO21
   real(r8), pointer :: CCH41
   real(r8), pointer :: COXY1
@@ -145,17 +126,30 @@ module InitSoluteMod
   real(r8), pointer :: PFEPO1
   real(r8), pointer :: PCAPD1
   real(r8), pointer :: FH2O
-
+  real(r8), pointer :: ATCA
+  real(r8), pointer :: XAEC
+  real(r8), pointer :: CEC
+  real(r8), pointer :: ORGC
+  real(r8), pointer :: VLPO4
+  real(r8), pointer :: XCEC
+  real(r8), pointer :: GKC4
+  real(r8), pointer :: GKCA
+  real(r8), pointer :: GKCH
+  real(r8), pointer :: GKCK
+  real(r8), pointer :: GKCN
+  real(r8), pointer :: GKCM
+  real(r8), pointer :: ZEROS
+  real(r8), pointer :: VOLW
 
   public :: InitSoluteModel
   contains
 
-  SUBROUTINE InitSoluteModel(K,L,NY,NX,BKVLX,solutevar)
+  SUBROUTINE InitSoluteModel(K,BKVLX,ISALTG,solutevar)
 !
 !     THIS SUBROUTINE INITIALIZES ALL SOIL CHEMISTRY VARIABLES
 !
   implicit none
-  integer, intent(in) :: K,L,NY,NX
+  integer, intent(in) :: K,ISALTG
   real(r8), intent(in) :: BKVLX
   type(solutedtype), target, intent(inout) :: solutevar
 
@@ -272,8 +266,22 @@ module InitSoluteMod
   PFEPO1    => solutevar%PFEPO1
   PCAPD1    => solutevar%PCAPD1
   FH2O      => solutevar%FH2O
+  ATCA      => solutevar%ATCA
+  XAEC      => solutevar%XAEC
+  CEC       => solutevar%CEC
+  ORGC      => solutevar%ORGC
+  VLPO4     => solutevar%VLPO4
+  XCEC      => solutevar%XCEC
+  GKC4      => solutevar%GKC4
+  GKCA      => solutevar%GKCA
+  GKCH      => solutevar%GKCH
+  GKCK      => solutevar%GKCK
+  GKCN      => solutevar%GKCN
+  GKCM      => solutevar%GKCM
+  ZEROS     => solutevar%ZEROS
+  VOLW      => solutevar%VOLW
 
-  call InitEquilibria(K,L,NY,NX,BKVLX)
+  call InitEquilibria(K,BKVLX,ISALTG)
 !
 !     CONVERGE TOWARDS ALL SOLUBILITY EQUILIBRIA
 !     IF SALT OPTION IS SELECTED
@@ -281,7 +289,7 @@ module InitSoluteMod
   IF(ISALTG.NE.0)THEN
     DO   M=1,MRXN1
 
-      call SolubilityEquilibiriaSalt(K,L,M,NY,NX,BKVLX)
+      call SolubilityEquilibiriaSalt(K,M,BKVLX)
 
     ENDDO
 !
@@ -290,18 +298,16 @@ module InitSoluteMod
 !
   ELSE
     DO  M=1,MRXN1
-
-      call SolubilityEquilibriaNoSalt(K, L, M, NY, NX,BKVLX)
-
+      call SolubilityEquilibriaNoSalt(K,M,BKVLX)
     ENDDO
   ENDIF
   end SUBROUTINE InitSoluteModel
 !------------------------------------------------------------------------------------------
 
-  subroutine InitEquilibria(K,L,NY,NX,BKVLX)
+  subroutine InitEquilibria(K,BKVLX,ISALTG)
 
   implicit none
-  integer, intent(in) :: K, L, NY, NX
+  integer, intent(in) :: K,ISALTG
   real(r8), intent(in) :: BKVLX
   integer :: MM
   real(r8) :: XNAQ,XPT,XN4Q,XMGQ,XKAQ,XHYQ,XFEQ
@@ -344,7 +350,7 @@ module InitSoluteMod
 !
 !     INITIALIZE GASES
 !
-  CCO2X=CCO2M*SCO2X/(EXP(ACO2X*CSTRZ))*EXP(0.843-0.0281*ATCA(NY,NX))*FH2O
+  CCO2X=CCO2M*SCO2X/(EXP(ACO2X*CSTRZ))*EXP(0.843-0.0281*ATCA)*FH2O
   CCO2Y=LOG(CCO2X)
   CCO2Z=ABS(CCO2Y)
   CCO21=CCO2X
@@ -357,10 +363,10 @@ module InitSoluteMod
     CCO21=CCO21/SQRT(1.0+R)
   ENDDO
 
-  CCH41=CCH4M*SCH4X/(EXP(ACH4X*CSTR1))*EXP(0.597-0.0199*ATCA(NY,NX))*FH2O
-  COXY1=COXYM*SOXYX/(EXP(AOXYX*CSTR1))*EXP(0.516-0.0172*ATCA(NY,NX))*FH2O
-  CZ2G1=CZ2GM*SN2GX/(EXP(AN2GX*CSTR1))*EXP(0.456-0.0152*ATCA(NY,NX))*FH2O
-  CZ2O1=CZ2OM*SN2OX/(EXP(AN2OX*CSTR1))*EXP(0.897-0.0299*ATCA(NY,NX))*FH2O
+  CCH41=CCH4M*SCH4X/(EXP(ACH4X*CSTR1))*EXP(0.597-0.0199*ATCA)*FH2O
+  COXY1=COXYM*SOXYX/(EXP(AOXYX*CSTR1))*EXP(0.516-0.0172*ATCA)*FH2O
+  CZ2G1=CZ2GM*SN2GX/(EXP(AN2GX*CSTR1))*EXP(0.456-0.0152*ATCA)*FH2O
+  CZ2O1=CZ2OM*SN2OX/(EXP(AN2OX*CSTR1))*EXP(0.897-0.0299*ATCA)*FH2O
   CCO31=CCO21*DPCO3*A0/(CHY1**2*A2)
   CHCO31=CCO21*DPCO2*A0/(CHY1*A1)
   CNO1=CNOZ
@@ -433,7 +439,7 @@ module InitSoluteMod
     CH0P1=CH3P1*DPH3P*DPH2P*DPH1P*A0/(CHY1**3*A3)
   ELSE
     XHP=CPOZ
-    XOH=XAEC(L,NY,NX)/BKVLX
+    XOH=XAEC/BKVLX
     FHP3=1.0/(1.0+DPH3P*A0/(CHY1*A1)+DPH3P*DPH2P*A0 &
       /(CHY1**2*A2)+DPH3P*DPH2P*DPH1P*A0/(CHY1**3*A3))
     FHP2=FHP3*DPH3P*A0/(CHY1*A1)
@@ -466,7 +472,7 @@ module InitSoluteMod
 !     INITIALIZE CATION EQILIBRIA BETWEEN SOLUBLE
 !     AND EXCHANGEABLE FORMS
 !
-    XCECQ=AMAX1(CN4X,CEC(L,NY,NX))
+    XCECQ=AMAX1(CN4X,CEC)
     XN4Q=CN4X
     XHYQ=0._r8
     XALQ=0._r8
@@ -478,7 +484,7 @@ module InitSoluteMod
     XHC1=0._r8
     XALO21=0._r8
     XFEO21=0._r8
-    XCOOH=AMAX1(0.0,COOH1*ORGC(L,NY,NX))
+    XCOOH=AMAX1(0.0,COOH1*ORGC)
   ENDIF
   CC3=CAL1+CFE1
   CA3=CH0P1
@@ -497,27 +503,27 @@ module InitSoluteMod
     PFEOH1=CFEOHX
     PCACO1=CCACOX
     PCASO1=CCASOX
-    PALPO1=CALPOX*VLPO4(L,NY,NX)
-    PFEPO1=CFEPOX*VLPO4(L,NY,NX)
-    PCAPD1=CCAPDX*VLPO4(L,NY,NX)
-    PCAPH1=CCAPHX*VLPO4(L,NY,NX)
-    CCEC=AMAX1(ZERO,XCEC(L,NY,NX)/BKVLX)
+    PALPO1=CALPOX*VLPO4
+    PFEPO1=CFEPOX*VLPO4
+    PCAPD1=CCAPDX*VLPO4
+    PCAPH1=CCAPHX*VLPO4
+    CCEC=AMAX1(ZERO,XCEC/BKVLX)
     CALX=CAL1**0.333
     CFEX=CFE1**0.333
     CCAX=CCA1**0.500
     CMGX=CMG1**0.500
-    XCAX=CCEC/(1.0+GKC4(L,NY,NX)*CN41/CCAX &
-      +GKCH(L,NY,NX)*CHY1/CCAX+GKCA(L,NY,NX)*CALX/CCAX &
-      +GKCA(L,NY,NX)*CFEX/CCAX+GKCA(L,NY,NX)*CMG1/CCAX &
-      +GKCN(L,NY,NX)*CNA1/CCAX+GKCK(L,NY,NX)*CKA1/CCAX)
+    XCAX=CCEC/(1.0+GKC4*CN41/CCAX &
+      +GKCH*CHY1/CCAX+GKCA*CALX/CCAX &
+      +GKCA*CFEX/CCAX+GKCA*CMG1/CCAX &
+      +GKCN*CNA1/CCAX+GKCK*CKA1/CCAX)
     XN4Q=CN4X
-    XHYQ=XCAX*GKCH(L,NY,NX)
-    XALQ=XCAX*GKCA(L,NY,NX)
-    XFEQ=XCAX*GKCA(L,NY,NX)
+    XHYQ=XCAX*GKCH
+    XALQ=XCAX*GKCA
+    XFEQ=XCAX*GKCA
     XCAQ=XCAX*CCAX
-    XMGQ=XCAX*GKCM(L,NY,NX)
-    XNAQ=XCAX*GKCN(L,NY,NX)
-    XKAQ=XCAX*GKCK(L,NY,NX)
+    XMGQ=XCAX*GKCM
+    XNAQ=XCAX*GKCN
+    XKAQ=XCAX*GKCK
     XTLQ=XN4Q+XHYQ+XALQ+XFEQ+XCAQ+XMGQ+XNAQ+XKAQ
     IF(XTLQ.GT.ZERO)THEN
       FX=CCEC/XTLQ
@@ -536,10 +542,10 @@ module InitSoluteMod
   end subroutine InitEquilibria
 !------------------------------------------------------------------------------------------
 
-  subroutine SolubilityEquilibiriaSalt(K,L,M,NY,NX,BKVLX)
+  subroutine SolubilityEquilibiriaSalt(K,M,BKVLX)
 
   implicit none
-  integer, intent(in) :: K, L, M, NY, NX
+  integer, intent(in) :: K,M
   real(r8), intent(in) :: BKVLX
   real(r8) :: XN4Q,XMGQ,XKAQ,XHYQ,XFEQ,XTLQ
   real(r8) :: XALQ,XCAX,SPH2P,XCAQ,SPH1P,FX
@@ -1154,12 +1160,12 @@ module InitSoluteMod
 !
 !     ANION EXCHANGE EQILIBRIA
 !
-    IF(VOLW(L,NY,NX).GT.ZEROS(NY,NX))THEN
-      VOLWBK=AMIN1(1.0,BKVLX/VOLW(L,NY,NX))
+    IF(VOLW.GT.ZEROS)THEN
+      VOLWBK=AMIN1(1.0,BKVLX/VOLW)
     ELSE
       VOLWBK=1.0
     ENDIF
-    IF(XAEC(L,NY,NX).GT.ZEROS(NY,NX))THEN
+    IF(XAEC.GT.ZEROS)THEN
       RXOH2=TAD*(XOH11*AHY1-SXOH2*XOH21)/(XOH11+SPOH2)*VOLWBK
       RXOH1=TAD*(XOH01*AHY1-SXOH1*XOH11)/(XOH01+SPOH1)*VOLWBK
       SPH2P=SXH2P*DPH2O
@@ -1185,23 +1191,23 @@ module InitSoluteMod
 !
 !     CATION EXCHANGE
 !
-    IF(XCEC(L,NY,NX).GT.ZEROS(NY,NX))THEN
+    IF(XCEC.GT.ZEROS)THEN
       AALX=AAL1**0.333
       AFEX=AFE1**0.333
       ACAX=ACA1**0.500
       AMGX=AMG1**0.500
-      XCAX=CCEC/(1.0+GKC4(L,NY,NX)*AN41/ACAX &
-      +GKCH(L,NY,NX)*AHY1/ACAX+GKCA(L,NY,NX)*AALX/ACAX &
-      +GKCA(L,NY,NX)*AFEX/ACAX+GKCM(L,NY,NX)*AMGX/ACAX &
-      +GKCN(L,NY,NX)*ANA1/ACAX+GKCK(L,NY,NX)*AKA1/ACAX)
-      XN4Q=XCAX*AN41*GKC4(L,NY,NX)
-      XHYQ=XCAX*AHY1*GKCH(L,NY,NX)
-      XALQ=XCAX*AALX*GKCA(L,NY,NX)
-      XFEQ=XCAX*AFEX*GKCA(L,NY,NX)
+      XCAX=CCEC/(1.0+GKC4*AN41/ACAX &
+      +GKCH*AHY1/ACAX+GKCA*AALX/ACAX &
+      +GKCA*AFEX/ACAX+GKCM*AMGX/ACAX &
+      +GKCN*ANA1/ACAX+GKCK*AKA1/ACAX)
+      XN4Q=XCAX*AN41*GKC4
+      XHYQ=XCAX*AHY1*GKCH
+      XALQ=XCAX*AALX*GKCA
+      XFEQ=XCAX*AFEX*GKCA
       XCAQ=XCAX*ACAX
-      XMGQ=XCAX*AMGX*GKCM(L,NY,NX)
-      XNAQ=XCAX*ANA1*GKCN(L,NY,NX)
-      XKAQ=XCAX*AKA1*GKCK(L,NY,NX)
+      XMGQ=XCAX*AMGX*GKCM
+      XNAQ=XCAX*ANA1*GKCN
+      XKAQ=XCAX*AKA1*GKCK
       XTLQ=XN4Q+XHYQ+XALQ+XFEQ+XCAQ+XMGQ+XNAQ+XKAQ
       IF(XTLQ.GT.ZERO)THEN
         FX=CCEC/XTLQ
@@ -1435,7 +1441,7 @@ module InitSoluteMod
 !
 !     ION CONCENTRATIONS
 !
-  CCO2X=CCO2M*SCO2X/(EXP(ACO2X*CSTRZ))*EXP(0.843-0.0281*ATCA(NY,NX))*FH2O
+  CCO2X=CCO2M*SCO2X/(EXP(ACO2X*CSTRZ))*EXP(0.843-0.0281*ATCA)*FH2O
   CCO2Y=LOG(CCO2X)
   CCO2Z=ABS(CCO2Y)
   CCO21=CCO2X
@@ -1447,10 +1453,10 @@ module InitSoluteMod
     IF(R.LT.1.0E-03)exit
     CCO21=CCO21/SQRT(1.0+R)
   ENDDO
-  CCH41=CCH4M*SCH4X/(EXP(ACH4X*CSTR1))*EXP(0.597-0.0199*ATCA(NY,NX))*FH2O
-  COXY1=COXYM*SOXYX/(EXP(AOXYX*CSTR1))*EXP(0.516-0.0172*ATCA(NY,NX))*FH2O
-  CZ2G1=CZ2GM*SN2GX/(EXP(AN2GX*CSTR1))*EXP(0.456-0.0152*ATCA(NY,NX))*FH2O
-  CZ2O1=CZ2OM*SN2OX/(EXP(AN2OX*CSTR1))*EXP(0.897-0.0299*ATCA(NY,NX))*FH2O
+  CCH41=CCH4M*SCH4X/(EXP(ACH4X*CSTR1))*EXP(0.597-0.0199*ATCA)*FH2O
+  COXY1=COXYM*SOXYX/(EXP(AOXYX*CSTR1))*EXP(0.516-0.0172*ATCA)*FH2O
+  CZ2G1=CZ2GM*SN2GX/(EXP(AN2GX*CSTR1))*EXP(0.456-0.0152*ATCA)*FH2O
+  CZ2O1=CZ2OM*SN2OX/(EXP(AN2OX*CSTR1))*EXP(0.897-0.0299*ATCA)*FH2O
   CN41=CN41+RN4S
   CN31=CN31+RN3S
   CAL1=CAL1+RAL
@@ -1495,7 +1501,7 @@ module InitSoluteMod
   CM1P1=CM1P1+RM1P
 !  IF(K.EQ.3.AND.(M/1)*1.EQ.M)THEN
 !     WRITE(*,1112)'A1I',I,NX,NY,L,K,M,A1,A2,A3,FSTR2,CSTR1
-!    2,CSTR2,CC3,CA3,CC2,CA2,CC1,CA1,VOLW(L,NY,NX)
+!    2,CSTR2,CC3,CA3,CC2,CA2,CC1,CA1,VOLW
 !     WRITE(*,1112)'ALPO4I',I,NX,NY,L,K,M,PALPO1,AAL1
 !    2,AALO1,AALO2,AALO3,AALO4
 !    2,AH0P1,AH1P1,AH2P1,AHY1,AOH1,RPALPX,RHA0P1,RHA1P1,RHA2P1,RHA3P1
@@ -1523,10 +1529,10 @@ module InitSoluteMod
   end subroutine SolubilityEquilibiriaSalt
 !------------------------------------------------------------------------------------------
 
-  subroutine SolubilityEquilibriaNoSalt(K,L,M,NY,NX,BKVLX)
+  subroutine SolubilityEquilibriaNoSalt(K,M,BKVLX)
 
   implicit none
-  integer, intent(in) :: K, L, M, NY, NX
+  integer, intent(in) :: K, M
   real(r8), intent(in) :: BKVLX
   real(r8) :: CH2PA,CH2PD,XNAQ,XCAQ,SPH1P
   real(r8) :: CH2PF,CH2PH,FX,RN4S,RN3S,RNH4
@@ -1569,12 +1575,12 @@ module InitSoluteMod
 !
 !     ANION EXCHANGE FLUXES
 !
-    IF(VOLW(L,NY,NX).GT.ZEROS(NY,NX))THEN
-      VOLWBK=AMIN1(1.0,BKVLX/VOLW(L,NY,NX))
+    IF(VOLW.GT.ZEROS)THEN
+      VOLWBK=AMIN1(1.0,BKVLX/VOLW)
     ELSE
       VOLWBK=1.0
     ENDIF
-    IF(XAEC(L,NY,NX).GT.ZEROS(NY,NX))THEN
+    IF(XAEC.GT.ZEROS)THEN
       SPH2P=SXH2P*DPH2O
       RXH2P=TAD*(XOH21*CH2P1-SPH2P*XH2P1)/(XOH21+SPH2P)*VOLWBK
       RYH2P=TAD*(XOH11*CH2P1-SXH2P*COH1*XH2P1) &
@@ -1593,23 +1599,23 @@ module InitSoluteMod
 !
 !     CATION EXCHANGE
 !
-    IF(XCEC(L,NY,NX).GT.ZEROS(NY,NX))THEN
+    IF(XCEC.GT.ZEROS)THEN
       CALX=CAL1**0.333
       CFEX=CFE1**0.333
       CCAX=CCA1**0.500
       CMGX=CMG1**0.500
-      XCAX=CCEC/(1.0+GKC4(L,NY,NX)*CN41/CCAX &
-        +GKCH(L,NY,NX)*CHY1/CCAX+GKCA(L,NY,NX)*CALX/CCAX &
-        +GKCA(L,NY,NX)*CFEX/CCAX+GKCM(L,NY,NX)*CMGX/CCAX &
-        +GKCN(L,NY,NX)*CNA1/CCAX+GKCK(L,NY,NX)*CKA1/CCAX)
-      XN4Q=XCAX*CN41*GKC4(L,NY,NX)
-      XHYQ=XCAX*CHY1*GKCH(L,NY,NX)
-      XALQ=XCAX*CALX*GKCA(L,NY,NX)
-      XFEQ=XCAX*CFEX*GKCA(L,NY,NX)
+      XCAX=CCEC/(1.0+GKC4*CN41/CCAX &
+        +GKCH*CHY1/CCAX+GKCA*CALX/CCAX &
+        +GKCA*CFEX/CCAX+GKCM*CMGX/CCAX &
+        +GKCN*CNA1/CCAX+GKCK*CKA1/CCAX)
+      XN4Q=XCAX*CN41*GKC4
+      XHYQ=XCAX*CHY1*GKCH
+      XALQ=XCAX*CALX*GKCA
+      XFEQ=XCAX*CFEX*GKCA
       XCAQ=XCAX*CCAX
-      XMGQ=XCAX*CMGX*GKCM(L,NY,NX)
-      XNAQ=XCAX*CNA1*GKCN(L,NY,NX)
-      XKAQ=XCAX*CKA1*GKCK(L,NY,NX)
+      XMGQ=XCAX*CMGX*GKCM
+      XNAQ=XCAX*CNA1*GKCN
+      XKAQ=XCAX*CKA1*GKCK
       XTLQ=XN4Q+XHYQ+XALQ+XFEQ+XCAQ+XMGQ+XNAQ+XKAQ
       IF(XTLQ.GT.ZERO)THEN
         FX=CCEC/XTLQ

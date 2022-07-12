@@ -25,6 +25,7 @@ module SoluteMod
   implicit none
 
   private
+  character(len=*),private, parameter :: mod_filename = __FILE__
 
   real(r8) :: BKVLNH,BKVLNB
   real(r8) :: BKVLNO,BKVLNZ,BKVLPO,BKVLPB,COMA,CNHUA
@@ -39,9 +40,7 @@ module SoluteMod
   real(r8) :: RH2PX
   real(r8) :: THETWR
   real(r8) :: VOLWMX,VOLWMP,VOLWNX,XVLNH4
-
 !
-
   real(r8) :: RSNUA, RSNUB
 
 

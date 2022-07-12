@@ -4,7 +4,8 @@ module SoluteChemDataType
   implicit none
   public
   CHARACTER(LEN=*), private, PARAMETER :: MOD_FILENAME=__FILE__
-  real(r8) :: BKVLX,VOLWPO
+  real(r8) :: BKVLX
+  real(r8) :: VOLWPO
   real(r8) :: CH2P1  !current concentration of H2PO4(-) in non-band soils
   real(r8) :: CH2PB  !current concentration of H2PO4(-) in band soils
   real(r8) :: PCAPH1 !
@@ -161,5 +162,19 @@ module SoluteChemDataType
     real(r8) :: PFEPO1
     real(r8) :: PCAPD1
     real(r8) :: FH2O
+    real(r8) :: ATCA
+    real(r8) :: XAEC
+    real(r8) :: CEC
+    real(r8) :: ORGC
+    real(r8) :: VLPO4
+    real(r8) :: XCEC
+    real(r8) :: GKC4
+    real(r8) :: GKCA
+    real(r8) :: GKCH
+    real(r8) :: GKCK
+    real(r8) :: GKCN
+    real(r8) :: GKCM
+    real(r8) :: ZEROS
+    real(r8) :: VOLW
   end type solutedtype
 end module SoluteChemDataType

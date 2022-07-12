@@ -3,6 +3,9 @@ module SoluteParMod
 !
   use data_kind_mod, only : r8 => SHR_KIND_R8
   implicit none
+  public
+  character(len=*),private, parameter :: mod_filename = __FILE__
+
   real(r8), parameter :: RNHUI(0:2)=real((/10.0E-02,1.0E-02,0.5E-02/),r8)
 
 !

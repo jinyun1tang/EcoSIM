@@ -1,5 +1,4 @@
 set(GEOCHEM_SOURCES
-  TracerPropMod.F90
   SoluteChemDataType.F90
   SaltChemEquilibriaMod.F90
   ChemEquilibriaMod.F90
