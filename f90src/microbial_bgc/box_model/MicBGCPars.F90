@@ -54,8 +54,8 @@ implicit none
   character(len=16) :: cplxname(0:4)
   character(len=16) :: hmicname(7)
   character(len=16) :: amicname(7)
-  character(len=16) :: micresb(0:1)
-  character(len=16) :: micbiom(0:2)
+  character(len=16) :: micresb(0:1)      !residual biomass name
+  character(len=16) :: micbiom(1:3)      !microbial biomass pool name
   contains
     procedure, public  :: Init
     procedure, public  :: SetPars
@@ -107,11 +107,11 @@ contains
   this%amicname(4)='null'
   this%amicname(6)='null'
   this%amicname(7)='null'
-  this%micresb(1)='labile'
-  this%micresb(3)='resist'
+  this%micresb(0)='labile'
+  this%micresb(1)='resist'
   this%micbiom(1)='labile'
   this%micbiom(2)='resist'
-  this%micbiom(0)='active'
+  this%micbiom(3)='active'
   call this%Initallocate()
 
 !set up functional group ids

@@ -7,27 +7,7 @@ module SoluteAPI
   contains
 
   subroutine SoluteAPISend1()
-      ATCAs=ATCA(NY,NX)
-      XAECs(L)=XAEC(L,NY,NX)
-      CECs(L)=CEC(L,NY,NX)
-      ORGCs(L)=ORGC(L,NY,NX)
-      VLPO4s(L)=VLPO4(L,NY,NX)
-      XCECs(L)=XCEC(L,NY,NX)
-      GKC4s(L)=GKC4(L,NY,NX)
-      GKCAs(L)=GKCA(L,NY,NX)
-      GKCHs(L)=GKCH(L,NY,NX)
-      GKCKs(L)=GKCK(L,NY,NX)
-      GKCNs(L)=GKCN(L,NY,NX)
-      GKCMs(L)=GKCM(L,NY,NX)
-      ZEROSs=ZEROS(NY,NX)
-      VOLWs(L)=VOLW(L,NY,NX)
 
-!  Integers
-
-  end subroutine SoluteAPISend1
-
-
-  subroutine SoluteAPISend1()
       ZEROS2s=ZEROS2(NY,NX)
       VOLXs(L)=VOLX(L,NY,NX)
       VOLWMs(NPH,L)=VOLWM(NPH,L,NY,NX)

@@ -690,20 +690,20 @@ contains
     unitl(jj)=
   enddo
   do jj=id_osc_b,id_osc_e
-    iknen=iknen
+    iknen=jj-id_osp_b
     icplx=floor((jj-1.e-8_r8)/jsken)
     varl(jj)='OSC_mass_'//trim(micpar%kiname(iknen))//trim(micpar%cplxname(icplx))
     unitl(jj)=
   enddo
   do jj=id_osn_b,id_osn_e
-    iknen=iknen
+    iknen=jj-id_osp_b
     icplx=floor((jj-1.e-8_r8)/jsken)
     varl(jj)='OSN_mass_'//trim(micpar%kiname(iknen))//trim(micpar%cplxname(icplx))
     unitl(jj)=
   enddo
 
   do jj=id_osp_b,id_osp_e
-    iknen=iknen
+    iknen=jj-id_osp_b
     icplx=floor((jj-1.e-8_r8)/jsken)
     varl(jj)='OSP_mass_'//trim(micpar%kiname(iknen))//trim(micpar%cplxname(icplx))
     unitl(jj)=
@@ -717,7 +717,7 @@ contains
   enddo
 
   do jj=id_orc_b,id_orc_e
-    iknen=mod(jj,2)
+    iknen=mod(jj-id_orc_b,2)
     icplx=floor((jj-1.e-8_r8)/2)
     varl(jj)='mbresdC_mass_'//trim(micpar%micresb(iknen))//trim(micpar%cplxname(icplx))
     unitl(jj)=

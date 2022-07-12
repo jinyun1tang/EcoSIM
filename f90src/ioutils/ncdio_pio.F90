@@ -1249,7 +1249,7 @@ module ncdio_pio
     !
     ! !LOCAL VARIABLES:
     integer :: status
-    real*4  :: value4
+    real(4)  :: value4
     !-----------------------------------------------------------------------
 
     value4 = value
