@@ -23,6 +23,7 @@ module StarteMod
   use InitSoluteMod
   use SoluteParMod
   use SoluteChemDataType, only : solutedtype
+  use ChemTracerParsMod
   implicit none
 
   private

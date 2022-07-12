@@ -22,6 +22,7 @@ module InitSoluteMod
   use EcoSIMConfig
   use SoluteParMod
   use SoluteChemDataType, only : solutedtype
+  use ChemTracerParsMod
   implicit none
 
   private
@@ -1654,15 +1655,6 @@ module InitSoluteMod
   CN31=CN31+RN3S
   CH1P1=CH1P1+RHP1
   CH2P1=CH2P1+RHP2
-!  IF(K.EQ.3)THEN
-!     WRITE(*,2222)'RNH4E',K,L,CN41,RN4S,RNH4,RXN4
-!    2,TSL,XN4Q,XN41,CN41,FX,XTLQ,XHYQ,XALQ,XFEQ
-!    2,XCAQ,XMGQ,XNAQ,XKAQ,CCEC,BKVLX,XCAX,CAL1,CFE1
-!    2,CCA1,CMG1
-!     WRITE(*,2222)'RHP1E',K,L,CH2P1,CH1P1,RHP2,RHP1
-!    2,XH2P1,XH1P1,RXH1P,RXH2P,RYH2P,RH2P,CHY1,COH1
-!    3,XOH21,XOH11
-!      ENDIF
   end subroutine SolubilityEquilibriaNoSalt
 
 end module InitSoluteMod

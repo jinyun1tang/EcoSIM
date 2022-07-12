@@ -1,6 +1,7 @@
 module TracerPropMod
   use data_kind_mod, only : r8 => SHR_KIND_R8
   use SoluteParMod
+  use ChemTracerParsMod
   use abortutils, only : endrun
 implicit none
   private
