@@ -13,6 +13,7 @@ module Hour1Mod
   use CanopyRadDataType
   use EcoSIMSolverPar
   use Hour1Pars
+  use ChemTracerParsMod
   use GridConsts
   use SoilPhysDataType
   use FlagDataType
@@ -276,6 +277,7 @@ module Hour1Mod
 !     gas code:*CO2*=CO2,*OXY*=O2,*CH4*=CH4,*Z2G*=N2,*Z2O*=N2O
 !             :*ZN3*=NH3,*H2G*=H2
 !
+! CSTRR: surface irrigation ion strength, [g m-3]
   DO 9145 NX=NHW,NHE
     DO 9140 NY=NVN,NVS
       CCO2E(NY,NX)=CO2E(NY,NX)*5.36E-04*TREF/TKA(NY,NX)  !gC/m3
