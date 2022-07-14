@@ -9,7 +9,7 @@ SUBROUTINE soil(NA,ND,NT,NE,NAX,NTX,NEX,NHW,NHE,NVN,NVS)
   use ExecMod      , only : exec
   use Hour1Mod     , only : hour1
   use RedistMod    , only : redist
-  use soluteMod    , only : solute
+  use GeochemAPI   , only : soluteModel
   use StarteMod    , only : starte
   use StartqMod    , only : startq
   use StartsMod    , only : starts
@@ -176,7 +176,7 @@ SUBROUTINE soil(NA,ND,NT,NE,NAX,NTX,NEX,NHW,NHE,NVN,NVS)
 !
     if(lverb)WRITE(*,333)'SOL'
     call start_timer(t1)
-    CALL SOLUTE(I,J,NHW,NHE,NVN,NVS)
+    CALL soluteModel(I,J,NHW,NHE,NVN,NVS)
     call end_timer('SOL',t1)
 !
 !   CALCULATE GAS AND SOLUTE FLUXES IN 'TRNSFR'

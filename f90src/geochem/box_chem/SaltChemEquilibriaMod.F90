@@ -2,19 +2,14 @@ module SaltChemEquilibriaMod
 
   use data_kind_mod, only : r8 => SHR_KIND_R8
   use minimathmod, only : test_aeqb
-  use AqueChemDatatype
-  use SoilBGCDataType
+  use SoluteChemDataType, only : chem_var_type, solute_flx_type
   use SoluteParMod
-  use AqueChemDatatype
-  use EcoSIMCtrlDataType
-  use SoluteChemDataType
   use EcoSIMSolverPar
-  use SOMDataType
-  use SoilWaterDataType
-  use SoilPropertyDataType
   implicit none
   private
   CHARACTER(LEN=*), PARAMETER :: MOD_FILENAME=__FILE__
+
+  real(r8), parameter :: ZERO=1.0E-15_r8
 
   real(r8) :: RAL,RAL1,RAL2,RAL3,RAL4,RALS
   real(r8) :: RB1P,RB2P,RBH0,RBH1,RBH2,RC0B,RC0P
@@ -38,7 +33,7 @@ module SaltChemEquilibriaMod
   real(r8) :: CFEO1,CFEO2,CFEO3,CFEO4,CFES1,CCAO1,CCAC1,CCAH1
   real(r8) :: CSO41,CCL1,CHCO31,CALO1,CALO2,CALO3,CALO4,CALS1
   real(r8) :: CNO1,CNOB,CAL1,CCEC,CCO21,CMG1,CNA1,CFE1,CHY1
-  real(r8) :: CCO31,CKA1,RPCACX
+  real(r8) :: CCO31,CKA1,RPCACX,RH2P,RNH4
   real(r8) :: RHCACO,RPCASO,RHA0P1,RHA1P1,RHA2P1,RHA3P1
   real(r8) :: RHFEO1,RHFEO2,RHFEO3,RHFEO4,RPFEOX,RHCAC3,RHCACH
   real(r8) :: RHA4P1,RHA0P2,RHA1P2,RHA2P2,RHA3P2,RHA4P2,RHF0P1
@@ -48,28 +43,475 @@ module SaltChemEquilibriaMod
   real(r8) :: RHA3B2,RHA4B2,RHF0B1,RHF1B1,RHF2B1,RHF3B1,RHF4B1
   real(r8) :: RHF0B2,RHF1B2,RHF2B2,RHF3B2,RHF4B2,RPCDB1,RHCDB2
   real(r8) :: RHCHB1,RHCHB2,RXOH2,RXOH1,RXO2B,RXO1B,RXHY,RXAL
-  real(r8) :: ASO41,AOH1,RH1P,RH3P
+  real(r8) :: ASO41,AOH1,RH1P,RH3P,RPALPX,RPCADX,RPCAHX,RPCAMX
   real(r8) :: ACO21,AH0P1,AH1P1,AH2P1,AH3P1,AF1P1,AF2P1
   real(r8) :: AC0P1,AC1P1,AC2P1,AM1P1,AH0PB,AH1PB,AH2PB,AH3PB
   real(r8) :: A2,AHY1,AAL1,AALO1,AALO2,AALO3,AALO4
   real(r8) :: AFE1,AFEO1,AFEO2,AFEO3,AFEO4,ACA1,ACO31,AHCO31
   real(r8) :: RPCDBX,RPCHBX,RPCMBX,RPFEBX,RSO4,RX1P,RX2P
   real(r8) :: RXFE,RXCA,RXMG,RXNA,RXKA,RXHC,RXALO2,RXFEO2,RCO2Q
-  real(r8) :: RXH1,RXH2,RXNB,CCA1,COH1,RXH1P,RXH2B
-  real(r8) :: RALO1,RALO2,RALO3,RALO4,RNHB,RXH1B
+  real(r8) :: RXH1,RXH2,RXNB,CCA1,COH1,RXH1P,RXH2B,RPFEPX
+  real(r8) :: RALO1,RALO2,RALO3,RALO4,RNHB,RXH1B,RXN4
   real(r8) :: AF1PB,AF2PB,AC0PB,AC1PB,AC2PB,AM1PB,AN41,AN4B
   real(r8) :: AN31,AN3B,AMG1,ANA1,AKA1,AALS1,AFES1,ACAO1,ACAC1
   real(r8) :: RH2B,RXH2P,RYH2B,RYH2P,AKAS1,AALX,AFEX,ACAX,AMGX
   real(r8) :: ACAS1,ACAH1,AMGO1,AMGC1,AMGH1,AMGS1,ANAC1,ANAS1
+  real(r8) :: VOLWBK
+
+  real(r8), pointer :: CH1P1
+  real(r8), pointer :: CH1PB
+  real(r8), pointer :: CH2P1
+  real(r8), pointer :: CH2PB
+  real(r8), pointer :: CN31
+  real(r8), pointer :: CN3B
+  real(r8), pointer :: CN41
+  real(r8), pointer :: CN4B
+  real(r8), pointer :: X1P1B
+  real(r8), pointer :: X2P1B
+  real(r8), pointer :: XH11B
+  real(r8), pointer :: XH1P1
+  real(r8), pointer :: XH21B
+  real(r8), pointer :: XOH21
+  real(r8), pointer :: XH2P1
+  real(r8), pointer :: PALPO1
+  real(r8), pointer :: PALPOB
+  real(r8), pointer :: PCAPD1
+  real(r8), pointer :: PCAPDB
+  real(r8), pointer :: PCAPH1
+  real(r8), pointer :: PCAPHB
+  real(r8), pointer :: PCAPM1
+  real(r8), pointer :: PCAPMB
+  real(r8), pointer :: PFEPO1
+  real(r8), pointer :: PFEPOB
+  real(r8), pointer :: ZEROS2
+  real(r8), pointer :: ZNO3S
+  real(r8), pointer :: ZNO3B
+  real(r8), pointer :: VOLWM
+  real(r8), pointer :: VOLWNH
+  real(r8), pointer :: VOLWNB
+  real(r8), pointer :: VOLWPB
+  real(r8), pointer :: VOLWPO
+  real(r8), pointer :: XZHYS
+  real(r8), pointer :: ZHY
+  real(r8), pointer :: ZEROS
+  real(r8), pointer :: XCEC
+  real(r8), pointer :: ZOH
+  real(r8), pointer :: ZAL
+  real(r8), pointer :: ZFE
+  real(r8), pointer :: ZCA
+  real(r8), pointer :: ZMG
+  real(r8), pointer :: ZNA
+  real(r8), pointer :: ZKA
+  real(r8), pointer :: ZSO4
+  real(r8), pointer :: ZCL
+  real(r8), pointer :: ZCO3
+  real(r8), pointer :: ZHCO3
+  real(r8), pointer :: CO2S
+  real(r8), pointer :: ZALOH1
+  real(r8), pointer :: ZALOH2
+  real(r8), pointer :: ZALOH3
+  real(r8), pointer :: ZALOH4
+  real(r8), pointer :: ZALS
+  real(r8), pointer :: ZFEOH1
+  real(r8), pointer :: ZFEOH2
+  real(r8), pointer :: ZFEOH3
+  real(r8), pointer :: ZFEOH4
+  real(r8), pointer :: ZFES
+  real(r8), pointer :: ZCAO
+  real(r8), pointer :: ZCAC
+  real(r8), pointer :: ZCAH
+  real(r8), pointer :: ZCAS
+  real(r8), pointer :: ZMGO
+  real(r8), pointer :: ZMGC
+  real(r8), pointer :: ZMGH
+  real(r8), pointer :: ZMGS
+  real(r8), pointer :: ZNAC
+  real(r8), pointer :: ZNAS
+  real(r8), pointer :: ZKAS
+  real(r8), pointer :: H0PO4
+  real(r8), pointer :: H3PO4
+  real(r8), pointer :: ZFE1P
+  real(r8), pointer :: ZFE2P
+  real(r8), pointer :: ZCA0P
+  real(r8), pointer :: ZCA1P
+  real(r8), pointer :: ZCA2P
+  real(r8), pointer :: ZMG1P
+  real(r8), pointer :: H0POB
+  real(r8), pointer :: H3POB
+  real(r8), pointer :: ZFE1PB
+  real(r8), pointer :: ZFE2PB
+  real(r8), pointer :: ZCA0PB
+  real(r8), pointer :: ZCA1PB
+  real(r8), pointer :: ZCA2PB
+  real(r8), pointer :: ZMG1PB
+  real(r8), pointer :: XHY
+  real(r8), pointer :: XAL
+  real(r8), pointer :: XFE
+  real(r8), pointer :: XCA
+  real(r8), pointer :: XMG
+  real(r8), pointer :: XNA
+  real(r8), pointer :: XKA
+  real(r8), pointer :: XHC
+  real(r8), pointer :: XOH11
+  real(r8), pointer :: XALO2
+  real(r8), pointer :: XFEO2
+  real(r8), pointer :: XN41
+  real(r8), pointer :: XN4B
+  real(r8), pointer :: ORGC
+  real(r8), pointer :: PALOH
+  real(r8), pointer :: PFEOH
+  real(r8), pointer :: PCACO
+  real(r8), pointer :: PCASO
+  real(r8), pointer :: PH
+  real(r8), pointer :: VLPOB
+  real(r8), pointer :: VLPO4
+  real(r8), pointer :: VLNHB
+  real(r8), pointer :: VLNH4
+  real(r8), pointer :: VLNOB
+  real(r8), pointer :: VLNO3
+  real(r8), pointer :: BKVL
+  real(r8), pointer :: BKVLX
+  real(r8), pointer :: VOLWNO
+  real(r8), pointer :: VOLWNZ
+  real(r8), pointer :: XAEC
+  real(r8), pointer :: GKC4
+  real(r8), pointer :: GKCA
+  real(r8), pointer :: GKCH
+  real(r8), pointer :: GKCM
+  real(r8), pointer :: GKCK
+  real(r8), pointer :: GKCN
+  real(r8), pointer :: XH01B
+  real(r8), pointer :: XOH01
+
+  real(r8), pointer :: TRCACO
+  real(r8), pointer :: TRNAC
+  real(r8), pointer :: TRMGC
+  real(r8), pointer :: TRCAC
+  real(r8), pointer :: TRMGH
+  real(r8), pointer :: TRCAH
+  real(r8), pointer :: TRHCO
+  real(r8), pointer :: TRXHC
+  real(r8), pointer :: TRC2P
+  real(r8), pointer :: TRF2P
+  real(r8), pointer :: TRC2B
+  real(r8), pointer :: TRF2B
+  real(r8), pointer :: TRM1P
+  real(r8), pointer :: TRC1P
+  real(r8), pointer :: TRF1P
+  real(r8), pointer :: TRM1B
+  real(r8), pointer :: TRC1B
+  real(r8), pointer :: TRF1B
+  real(r8), pointer :: TRC0B
+  real(r8), pointer :: TRH0B
+  real(r8), pointer :: TRC0P
+  real(r8), pointer :: TRH0P
+  real(r8), pointer :: TRFEPO
+  real(r8), pointer :: TRALPO
+  real(r8), pointer :: TRFEPB
+  real(r8), pointer :: TRALPB
+  real(r8), pointer :: TRCAPM
+  real(r8), pointer :: TRCAPD
+  real(r8), pointer :: TRCPMB
+  real(r8), pointer :: TRCPDB
+  real(r8), pointer :: TRCPHB
+  real(r8), pointer :: TRCAPH
+  real(r8), pointer :: TRFE1
+  real(r8), pointer :: TRAL1
+  real(r8), pointer :: TRFE2
+  real(r8), pointer :: TRAL2
+  real(r8), pointer :: TRFE3
+  real(r8), pointer :: TRAL3
+  real(r8), pointer :: TRFE4
+  real(r8), pointer :: TRAL4
+  real(r8), pointer :: TRMGO
+  real(r8), pointer :: TRCAO
+  real(r8), pointer :: TRFEOH
+  real(r8), pointer :: TRALOH
+  real(r8), pointer :: TRXFE2
+  real(r8), pointer :: TRAL
+  real(r8), pointer :: TRALS
+  real(r8), pointer :: TRB1P
+  real(r8), pointer :: TRB2P
+  real(r8), pointer :: TRBH0
+  real(r8), pointer :: TRBH1
+  real(r8), pointer :: TRBH2
+  real(r8), pointer :: TRCA
+  real(r8), pointer :: TRCAS
+  real(r8), pointer :: TRCASO
+  real(r8), pointer :: TRCO2
+  real(r8), pointer :: TRCO3
+  real(r8), pointer :: TRFE
+  real(r8), pointer :: TRFES
+  real(r8), pointer :: TRH1B
+  real(r8), pointer :: TRH2B
+  real(r8), pointer :: TRH3B
+  real(r8), pointer :: TRH1P
+  real(r8), pointer :: TRH2P
+  real(r8), pointer :: TRH3P
+  real(r8), pointer :: TRHY
+  real(r8), pointer :: TRKA
+  real(r8), pointer :: TRKAS
+  real(r8), pointer :: TRMG
+  real(r8), pointer :: TRMGS
+  real(r8), pointer :: TRN3B
+  real(r8), pointer :: TRN3S
+  real(r8), pointer :: TRN4B
+  real(r8), pointer :: TRN4S
+  real(r8), pointer :: TRNA
+  real(r8), pointer :: TRNAS
+  real(r8), pointer :: TROH
+  real(r8), pointer :: TRSO4
+  real(r8), pointer :: TRX1P
+  real(r8), pointer :: TRX2P
+  real(r8), pointer :: TRXAL
+  real(r8), pointer :: TRXAL2
+  real(r8), pointer :: TRXCA
+  real(r8), pointer :: TRXFE
+  real(r8), pointer :: TRXH0
+  real(r8), pointer :: TRXH1
+  real(r8), pointer :: TRXH2
+  real(r8), pointer :: TRXHY
+  real(r8), pointer :: TRXKA
+  real(r8), pointer :: TRXMG
+  real(r8), pointer :: TRXN4
+  real(r8), pointer :: TRXNA
+  real(r8), pointer :: TRXNB
+  real(r8), pointer :: TBCO2
+  real(r8), pointer :: TBION
+  real(r8), pointer :: TRH2O
   public :: SaltChemEquilibria
   contains
 
 !--------------------------------------------------------------------------
-  subroutine SaltChemEquilibria(L,NY,NX)
+  subroutine SaltChemEquilibria(chemvar,solflx)
 
   implicit none
-  integer, intent(in) :: L,NY,NX
+  type(solute_flx_type),target, intent(inout) :: solflx
+  type(chem_var_type),target, intent(inout) :: chemvar
+
 !     begin_execution
+
+  BKVLX  => chemvar%BKVLX
+  VOLWNZ => chemvar%VOLWNZ
+  VOLWNO => chemvar%VOLWNO
+  VOLWNB => chemvar%VOLWNB
+  VOLWNH => chemvar%VOLWNH
+  VOLWPB => chemvar%VOLWPB
+  VOLWPO => chemvar%VOLWPO
+  XOH11  => chemvar%XOH11
+  XOH21  => chemvar%XOH21
+  XN41   => chemvar%XN41
+  XN4B   => chemvar%XN4B
+  CH1P1  => chemvar%CH1P1
+  CH1PB  => chemvar%CH1PB
+  CH2P1  => chemvar%CH2P1
+  CH2PB  => chemvar%CH2PB
+  X1P1B  => chemvar%X1P1B
+  X2P1B  => chemvar%X2P1B
+  XH11B  => chemvar%XH11B
+  XH1P1  => chemvar%XH1P1
+  XH21B  => chemvar%XH21B
+  XH2P1  => chemvar%XH2P1
+  CN31   => chemvar%CN31
+  CN3B   => chemvar%CN3B
+  CN41   => chemvar%CN41
+  CN4B   => chemvar%CN4B
+  PALPO1 => chemvar%PALPO1
+  PALPOB => chemvar%PALPOB
+  PCAPD1 => chemvar%PCAPD1
+  PCAPDB => chemvar%PCAPDB
+  PCAPH1 => chemvar%PCAPH1
+  PCAPHB => chemvar%PCAPHB
+  PCAPM1 => chemvar%PCAPM1
+  PCAPMB => chemvar%PCAPMB
+  PFEPO1 => chemvar%PFEPO1
+  PFEPOB => chemvar%PFEPOB
+  ZEROS2 => chemvar%ZEROS2
+  ZNO3S  => chemvar%ZNO3S
+  ZNO3B  => chemvar%ZNO3B
+  VOLWM  => chemvar%VOLWM
+  XZHYS  => chemvar%XZHYS
+  ZHY    => chemvar%ZHY
+  ZEROS  => chemvar%ZEROS
+  XCEC   => chemvar%XCEC
+  ZOH    => chemvar%ZOH
+  ZAL    => chemvar%ZAL
+  ZFE    => chemvar%ZFE
+  ZCA    => chemvar%ZCA
+  ZMG    => chemvar%ZMG
+  ZNA    => chemvar%ZNA
+  ZKA    => chemvar%ZKA
+  ZSO4   => chemvar%ZSO4
+  ZCL    => chemvar%ZCL
+  ZCO3   => chemvar%ZCO3
+  ZHCO3  => chemvar%ZHCO3
+  CO2S   => chemvar%CO2S
+  ZALOH1 => chemvar%ZALOH1
+  ZALOH2 => chemvar%ZALOH2
+  ZALOH3 => chemvar%ZALOH3
+  ZALOH4 => chemvar%ZALOH4
+  ZALS   => chemvar%ZALS
+  ZFEOH1 => chemvar%ZFEOH1
+  ZFEOH2 => chemvar%ZFEOH2
+  ZFEOH3 => chemvar%ZFEOH3
+  ZFEOH4 => chemvar%ZFEOH4
+  ZFES   => chemvar%ZFES
+  ZCAO   => chemvar%ZCAO
+  ZCAC   => chemvar%ZCAC
+  ZCAH   => chemvar%ZCAH
+  ZCAS   => chemvar%ZCAS
+  ZMGO   => chemvar%ZMGO
+  ZMGC   => chemvar%ZMGC
+  ZMGH   => chemvar%ZMGH
+  ZMGS   => chemvar%ZMGS
+  ZNAC   => chemvar%ZNAC
+  ZNAS   => chemvar%ZNAS
+  ZKAS   => chemvar%ZKAS
+  H0PO4  => chemvar%H0PO4
+  H3PO4  => chemvar%H3PO4
+  ZFE1P  => chemvar%ZFE1P
+  ZFE2P  => chemvar%ZFE2P
+  ZCA0P  => chemvar%ZCA0P
+  ZCA1P  => chemvar%ZCA1P
+  ZCA2P  => chemvar%ZCA2P
+  ZMG1P  => chemvar%ZMG1P
+  H0POB  => chemvar%H0POB
+  H3POB  => chemvar%H3POB
+  ZFE1PB => chemvar%ZFE1PB
+  ZFE2PB => chemvar%ZFE2PB
+  ZCA0PB => chemvar%ZCA0PB
+  ZCA1PB => chemvar%ZCA1PB
+  ZCA2PB => chemvar%ZCA2PB
+  ZMG1PB => chemvar%ZMG1PB
+  XHY    => chemvar%XHY
+  XAL    => chemvar%XAL
+  XFE    => chemvar%XFE
+  XCA    => chemvar%XCA
+  XMG    => chemvar%XMG
+  XNA    => chemvar%XNA
+  XKA    => chemvar%XKA
+  XHC    => chemvar%XHC
+  XALO2  => chemvar%XALO2
+  XFEO2  => chemvar%XFEO2
+  ORGC   => chemvar%ORGC
+  PALOH  => chemvar%PALOH
+  PFEOH  => chemvar%PFEOH
+  PCACO  => chemvar%PCACO
+  PCASO  => chemvar%PCASO
+  PH     => chemvar%PH
+  VLPOB  => chemvar%VLPOB
+  VLPO4  => chemvar%VLPO4
+  VLNHB  => chemvar%VLNHB
+  VLNH4  => chemvar%VLNH4
+  VLNOB  => chemvar%VLNOB
+  VLNO3  => chemvar%VLNO3
+  BKVL   => chemvar%BKVL
+  XAEC   => chemvar%XAEC
+  GKC4   => chemvar%GKC4
+  GKCA   => chemvar%GKCA
+  GKCH   => chemvar%GKCH
+  GKCM   => chemvar%GKCM
+  GKCK   => chemvar%GKCK
+  GKCN   => chemvar%GKCN
+  XH01B  => chemvar%XH01B
+  XOH01  => chemvar%XOH01
+
+  TRCACO => solflx%TRCACO
+  TRNAC  => solflx%TRNAC
+  TRMGC  => solflx%TRMGC
+  TRCAC  => solflx%TRCAC
+  TRMGH  => solflx%TRMGH
+  TRCAH  => solflx%TRCAH
+  TRHCO  => solflx%TRHCO
+  TRXHC  => solflx%TRXHC
+  TRC2P  => solflx%TRC2P
+  TRF2P  => solflx%TRF2P
+  TRC2B  => solflx%TRC2B
+  TRF2B  => solflx%TRF2B
+  TRM1P  => solflx%TRM1P
+  TRC1P  => solflx%TRC1P
+  TRF1P  => solflx%TRF1P
+  TRM1B  => solflx%TRM1B
+  TRC1B  => solflx%TRC1B
+  TRF1B  => solflx%TRF1B
+  TRC0B  => solflx%TRC0B
+  TRH0B  => solflx%TRH0B
+  TRC0P  => solflx%TRC0P
+  TRH0P  => solflx%TRH0P
+  TRFEPO => solflx%TRFEPO
+  TRALPO => solflx%TRALPO
+  TRFEPB => solflx%TRFEPB
+  TRALPB => solflx%TRALPB
+  TRCAPM => solflx%TRCAPM
+  TRCAPD => solflx%TRCAPD
+  TRCPMB => solflx%TRCPMB
+  TRCPDB => solflx%TRCPDB
+  TRCPHB => solflx%TRCPHB
+  TRCAPH => solflx%TRCAPH
+  TRFE1  => solflx%TRFE1
+  TRAL1  => solflx%TRAL1
+  TRFE2  => solflx%TRFE2
+  TRAL2  => solflx%TRAL2
+  TRFE3  => solflx%TRFE3
+  TRAL3  => solflx%TRAL3
+  TRFE4  => solflx%TRFE4
+  TRAL4  => solflx%TRAL4
+  TRMGO  => solflx%TRMGO
+  TRCAO  => solflx%TRCAO
+  TRFEOH => solflx%TRFEOH
+  TRALOH => solflx%TRALOH
+  TRXFE2 => solflx%TRXFE2
+  TRAL   => solflx%TRAL
+  TRALS  => solflx%TRALS
+  TRB1P  => solflx%TRB1P
+  TRB2P  => solflx%TRB2P
+  TRBH0  => solflx%TRBH0
+  TRBH1  => solflx%TRBH1
+  TRBH2  => solflx%TRBH2
+  TRCA   => solflx%TRCA
+  TRCAS  => solflx%TRCAS
+  TRCASO => solflx%TRCASO
+  TRCO2  => solflx%TRCO2
+  TRCO3  => solflx%TRCO3
+  TRFE   => solflx%TRFE
+  TRFES  => solflx%TRFES
+  TRH1B  => solflx%TRH1B
+  TRH2B  => solflx%TRH2B
+  TRH3B  => solflx%TRH3B
+  TRH1P  => solflx%TRH1P
+  TRH2P  => solflx%TRH2P
+  TRH3P  => solflx%TRH3P
+  TRHY   => solflx%TRHY
+  TRKA   => solflx%TRKA
+  TRKAS  => solflx%TRKAS
+  TRMG   => solflx%TRMG
+  TRMGS  => solflx%TRMGS
+  TRN3B  => solflx%TRN3B
+  TRN3S  => solflx%TRN3S
+  TRN4B  => solflx%TRN4B
+  TRN4S  => solflx%TRN4S
+  TRNA   => solflx%TRNA
+  TRNAS  => solflx%TRNAS
+  TROH   => solflx%TROH
+  TRSO4  => solflx%TRSO4
+  TRX1P  => solflx%TRX1P
+  TRX2P  => solflx%TRX2P
+  TRXAL  => solflx%TRXAL
+  TRXAL2 => solflx%TRXAL2
+  TRXCA  => solflx%TRXCA
+  TRXFE  => solflx%TRXFE
+  TRXH0  => solflx%TRXH0
+  TRXH1  => solflx%TRXH1
+  TRXH2  => solflx%TRXH2
+  TRXHY  => solflx%TRXHY
+  TRXKA  => solflx%TRXKA
+  TRXMG  => solflx%TRXMG
+  TRXN4  => solflx%TRXN4
+  TRXNA  => solflx%TRXNA
+  TRXNB  => solflx%TRXNB
+  TBCO2  => solflx%TBCO2
+  TBION  => solflx%TBION
+  TRH2O  => solflx%TRH2O
 !
 !     salt code: *HY*=H+,*OH*=OH-,*AL*=Al3+,*FE*=Fe3+,*CA*=Ca2+,*MG*=Mg2+
 !          :*NA*=Na+,*KA*=K+,*SO4*=SO42-,*CL*=Cl-,*CO3*=CO32-,*HCO3*=HCO3-
@@ -83,21 +525,20 @@ module SaltChemEquilibriaMod
 !          :*1=non-band,*B=band
 !     C*,X*,Z*=soluble,exchangeable concentration, mass
 !
-  call PrepIonConcentrations(L,NY,NX)
+  call PrepIonConcentrations
 !
 !     CONVERGENCE TOWARDS SOLUTE EQILIBRIA
 !
-  call SolveChemEquilibria(L,NY,NX)
+  call SolveChemEquilibria
 !
 
-  call SummarizeIonFluxes(L,NY,NX)
+  call SummarizeIonFluxes
 
   end subroutine SaltChemEquilibria
 
 !------------------------------------------------------------------------
-  subroutine PrepIonConcentrations(L,NY,NX)
+  subroutine PrepIonConcentrations
   implicit none
-  integer, intent(in) :: L,NY,NX
   real(r8) :: VOLWPX
 !     begin_execution
 !     SOLUBLE NO3 CONCENTRATIONS
@@ -107,14 +548,14 @@ module SaltChemEquilibriaMod
 !     ZNO3S,ZNO3B=NO3 mass in non-band,band
 !     CNO1,CNOB=NO3 concentrations in non-band,band
 !
-  IF(VOLWNO.GT.ZEROS2(NY,NX))THEN
-    CNO1=AMAX1(0.0,ZNO3S(L,NY,NX)/(14.0*VOLWNO))
+  IF(VOLWNO.GT.ZEROS2)THEN
+    CNO1=AMAX1(0.0,ZNO3S/(14.0*VOLWNO))
   ELSE
     CNO1=0._r8
   ENDIF
 
-  IF(VOLWNZ.GT.ZEROS2(NY,NX))THEN
-    CNOB=AMAX1(0.0,ZNO3B(L,NY,NX)/(14.0*VOLWNZ))
+  IF(VOLWNZ.GT.ZEROS2)THEN
+    CNOB=AMAX1(0.0,ZNO3B/(14.0*VOLWNZ))
   ELSE
     CNOB=0._r8
   ENDIF
@@ -123,7 +564,7 @@ module SaltChemEquilibriaMod
 !
 !     XZHYS=total H+ production from nitro.f
 !
-  CHY1=AMAX1(0.0,ZHY(L,NY,NX)+XZHYS(L,NY,NX))/VOLWM(NPH,L,NY,NX)
+  CHY1=AMAX1(0.0,ZHY+XZHYS)/VOLWM
 !
 !     SOLUTE ION AND ION PAIR CONCENTRATIONS
 !
@@ -131,45 +572,45 @@ module SaltChemEquilibriaMod
 !     BKVLX=soil mass
 !     VOLWM=soil water volume
 !
-  IF(BKVLX.GT.ZEROS(NY,NX))THEN
-    CCEC=AMAX1(ZERO,XCEC(L,NY,NX)/BKVLX)
+  IF(BKVLX.GT.ZEROS)THEN
+    CCEC=AMAX1(ZERO,XCEC/BKVLX)
   ELSE
     CCEC=ZERO
   ENDIF
-  IF(VOLWM(NPH,L,NY,NX).GT.ZEROS2(NY,NX))THEN
-    COH1=AMAX1(0.0,ZOH(L,NY,NX)/VOLWM(NPH,L,NY,NX))
-    CAL1=AMAX1(0.0,ZAL(L,NY,NX)/VOLWM(NPH,L,NY,NX))
-    CFE1=AMAX1(0.0,ZFE(L,NY,NX)/VOLWM(NPH,L,NY,NX))
-    CCA1=AMAX1(0.0,ZCA(L,NY,NX)/VOLWM(NPH,L,NY,NX))
-    CMG1=AMAX1(0.0,ZMG(L,NY,NX)/VOLWM(NPH,L,NY,NX))
-    CNA1=AMAX1(0.0,ZNA(L,NY,NX)/VOLWM(NPH,L,NY,NX))
-    CKA1=AMAX1(0.0,ZKA(L,NY,NX)/VOLWM(NPH,L,NY,NX))
-    CSO41=AMAX1(0.0,ZSO4(L,NY,NX)/VOLWM(NPH,L,NY,NX))
-    CCL1=AMAX1(0.0,ZCL(L,NY,NX)/VOLWM(NPH,L,NY,NX))
-    CCO31=AMAX1(0.0,ZCO3(L,NY,NX)/VOLWM(NPH,L,NY,NX))
-    CHCO31=AMAX1(0.0,ZHCO3(L,NY,NX)/VOLWM(NPH,L,NY,NX))
-    CCO21=AMAX1(0.0,CO2S(L,NY,NX)/(12.0*VOLWM(NPH,L,NY,NX)))
-    CALO1=AMAX1(0.0,ZALOH1(L,NY,NX)/VOLWM(NPH,L,NY,NX))
-    CALO2=AMAX1(0.0,ZALOH2(L,NY,NX)/VOLWM(NPH,L,NY,NX))
-    CALO3=AMAX1(0.0,ZALOH3(L,NY,NX)/VOLWM(NPH,L,NY,NX))
-    CALO4=AMAX1(0.0,ZALOH4(L,NY,NX)/VOLWM(NPH,L,NY,NX))
-    CALS1=AMAX1(0.0,ZALS(L,NY,NX)/VOLWM(NPH,L,NY,NX))
-    CFEO1=AMAX1(0.0,ZFEOH1(L,NY,NX)/VOLWM(NPH,L,NY,NX))
-    CFEO2=AMAX1(0.0,ZFEOH2(L,NY,NX)/VOLWM(NPH,L,NY,NX))
-    CFEO3=AMAX1(0.0,ZFEOH3(L,NY,NX)/VOLWM(NPH,L,NY,NX))
-    CFEO4=AMAX1(0.0,ZFEOH4(L,NY,NX)/VOLWM(NPH,L,NY,NX))
-    CFES1=AMAX1(0.0,ZFES(L,NY,NX)/VOLWM(NPH,L,NY,NX))
-    CCAO1=AMAX1(0.0,ZCAO(L,NY,NX)/VOLWM(NPH,L,NY,NX))
-    CCAC1=AMAX1(0.0,ZCAC(L,NY,NX)/VOLWM(NPH,L,NY,NX))
-    CCAH1=AMAX1(0.0,ZCAH(L,NY,NX)/VOLWM(NPH,L,NY,NX))
-    CCAS1=AMAX1(0.0,ZCAS(L,NY,NX)/VOLWM(NPH,L,NY,NX))
-    CMGO1=AMAX1(0.0,ZMGO(L,NY,NX)/VOLWM(NPH,L,NY,NX))
-    CMGC1=AMAX1(0.0,ZMGC(L,NY,NX)/VOLWM(NPH,L,NY,NX))
-    CMGH1=AMAX1(0.0,ZMGH(L,NY,NX)/VOLWM(NPH,L,NY,NX))
-    CMGS1=AMAX1(0.0,ZMGS(L,NY,NX)/VOLWM(NPH,L,NY,NX))
-    CNAC1=AMAX1(0.0,ZNAC(L,NY,NX)/VOLWM(NPH,L,NY,NX))
-    CNAS1=AMAX1(0.0,ZNAS(L,NY,NX)/VOLWM(NPH,L,NY,NX))
-    CKAS1=AMAX1(0.0,ZKAS(L,NY,NX)/VOLWM(NPH,L,NY,NX))
+  IF(VOLWM.GT.ZEROS2)THEN
+    COH1=AMAX1(0.0,ZOH/VOLWM)
+    CAL1=AMAX1(0.0,ZAL/VOLWM)
+    CFE1=AMAX1(0.0,ZFE/VOLWM)
+    CCA1=AMAX1(0.0,ZCA/VOLWM)
+    CMG1=AMAX1(0.0,ZMG/VOLWM)
+    CNA1=AMAX1(0.0,ZNA/VOLWM)
+    CKA1=AMAX1(0.0,ZKA/VOLWM)
+    CSO41=AMAX1(0.0,ZSO4/VOLWM)
+    CCL1=AMAX1(0.0,ZCL/VOLWM)
+    CCO31=AMAX1(0.0,ZCO3/VOLWM)
+    CHCO31=AMAX1(0.0,ZHCO3/VOLWM)
+    CCO21=AMAX1(0.0,CO2S/(12.0*VOLWM))
+    CALO1=AMAX1(0.0,ZALOH1/VOLWM)
+    CALO2=AMAX1(0.0,ZALOH2/VOLWM)
+    CALO3=AMAX1(0.0,ZALOH3/VOLWM)
+    CALO4=AMAX1(0.0,ZALOH4/VOLWM)
+    CALS1=AMAX1(0.0,ZALS/VOLWM)
+    CFEO1=AMAX1(0.0,ZFEOH1/VOLWM)
+    CFEO2=AMAX1(0.0,ZFEOH2/VOLWM)
+    CFEO3=AMAX1(0.0,ZFEOH3/VOLWM)
+    CFEO4=AMAX1(0.0,ZFEOH4/VOLWM)
+    CFES1=AMAX1(0.0,ZFES/VOLWM)
+    CCAO1=AMAX1(0.0,ZCAO/VOLWM)
+    CCAC1=AMAX1(0.0,ZCAC/VOLWM)
+    CCAH1=AMAX1(0.0,ZCAH/VOLWM)
+    CCAS1=AMAX1(0.0,ZCAS/VOLWM)
+    CMGO1=AMAX1(0.0,ZMGO/VOLWM)
+    CMGC1=AMAX1(0.0,ZMGC/VOLWM)
+    CMGH1=AMAX1(0.0,ZMGH/VOLWM)
+    CMGS1=AMAX1(0.0,ZMGS/VOLWM)
+    CNAC1=AMAX1(0.0,ZNAC/VOLWM)
+    CNAS1=AMAX1(0.0,ZNAS/VOLWM)
+    CKAS1=AMAX1(0.0,ZKAS/VOLWM)
   ELSE
     COH1=0._r8
     CAL1=0._r8
@@ -210,16 +651,16 @@ module SaltChemEquilibriaMod
 !
 !     VOLWPO,VOLWPB=water volume in PO4 non-band,band
 !
-  IF(VOLWPO.GT.ZEROS2(NY,NX))THEN
+  IF(VOLWPO.GT.ZEROS2)THEN
     VOLWPX=31.0*VOLWPO
-    CH0P1=AMAX1(0.0,H0PO4(L,NY,NX)/VOLWPO)
-    CH3P1=AMAX1(0.0,H3PO4(L,NY,NX)/VOLWPO)
-    CF1P1=AMAX1(0.0,ZFE1P(L,NY,NX)/VOLWPO)
-    CF2P1=AMAX1(0.0,ZFE2P(L,NY,NX)/VOLWPO)
-    CC0P1=AMAX1(0.0,ZCA0P(L,NY,NX)/VOLWPO)
-    CC1P1=AMAX1(0.0,ZCA1P(L,NY,NX)/VOLWPO)
-    CC2P1=AMAX1(0.0,ZCA2P(L,NY,NX)/VOLWPO)
-    CM1P1=AMAX1(0.0,ZMG1P(L,NY,NX)/VOLWPO)
+    CH0P1=AMAX1(0.0,H0PO4/VOLWPO)
+    CH3P1=AMAX1(0.0,H3PO4/VOLWPO)
+    CF1P1=AMAX1(0.0,ZFE1P/VOLWPO)
+    CF2P1=AMAX1(0.0,ZFE2P/VOLWPO)
+    CC0P1=AMAX1(0.0,ZCA0P/VOLWPO)
+    CC1P1=AMAX1(0.0,ZCA1P/VOLWPO)
+    CC2P1=AMAX1(0.0,ZCA2P/VOLWPO)
+    CM1P1=AMAX1(0.0,ZMG1P/VOLWPO)
   ELSE
     CH0P1=0._r8
     CH3P1=0._r8
@@ -230,15 +671,15 @@ module SaltChemEquilibriaMod
     CC2P1=0._r8
     CM1P1=0._r8
   ENDIF
-  IF(VOLWPB.GT.ZEROS2(NY,NX))THEN
-    CH0PB=AMAX1(0.0,H0POB(L,NY,NX)/VOLWPB)
-    CH3PB=AMAX1(0.0,H3POB(L,NY,NX)/VOLWPB)
-    CF1PB=AMAX1(0.0,ZFE1PB(L,NY,NX)/VOLWPB)
-    CF2PB=AMAX1(0.0,ZFE2PB(L,NY,NX)/VOLWPB)
-    CC0PB=AMAX1(0.0,ZCA0PB(L,NY,NX)/VOLWPB)
-    CC1PB=AMAX1(0.0,ZCA1PB(L,NY,NX)/VOLWPB)
-    CC2PB=AMAX1(0.0,ZCA2PB(L,NY,NX)/VOLWPB)
-    CM1PB=AMAX1(0.0,ZMG1PB(L,NY,NX)/VOLWPB)
+  IF(VOLWPB.GT.ZEROS2)THEN
+    CH0PB=AMAX1(0.0,H0POB/VOLWPB)
+    CH3PB=AMAX1(0.0,H3POB/VOLWPB)
+    CF1PB=AMAX1(0.0,ZFE1PB/VOLWPB)
+    CF2PB=AMAX1(0.0,ZFE2PB/VOLWPB)
+    CC0PB=AMAX1(0.0,ZCA0PB/VOLWPB)
+    CC1PB=AMAX1(0.0,ZCA1PB/VOLWPB)
+    CC2PB=AMAX1(0.0,ZCA2PB/VOLWPB)
+    CM1PB=AMAX1(0.0,ZMG1PB/VOLWPB)
   ELSE
     CH0PB=0._r8
     CH3PB=0._r8
@@ -252,25 +693,25 @@ module SaltChemEquilibriaMod
 !
 !     EXCHANGEABLE ION CONCENTRATIONS
 !
-  IF(BKVLX.GT.ZEROS(NY,NX))THEN
-    XHY1=AMAX1(0.0,XHY(L,NY,NX)/BKVLX)
-    XAL1=AMAX1(0.0,XAL(L,NY,NX)/BKVLX)
-    XFE1=AMAX1(0.0,XFE(L,NY,NX)/BKVLX)
-    XCA1=AMAX1(0.0,XCA(L,NY,NX)/BKVLX)
-    XMG1=AMAX1(0.0,XMG(L,NY,NX)/BKVLX)
-    XNA1=AMAX1(0.0,XNA(L,NY,NX)/BKVLX)
-    XKA1=AMAX1(0.0,XKA(L,NY,NX)/BKVLX)
-    XHC1=AMAX1(0.0,XHC(L,NY,NX)/BKVLX)
-    XALO21=AMAX1(0.0,XALO2(L,NY,NX)/BKVLX)
-    XFEO21=AMAX1(0.0,XFEO2(L,NY,NX)/BKVLX)
-    XCOOH=AMAX1(0.0,COOH*ORGC(L,NY,NX)/BKVLX)
+  IF(BKVLX.GT.ZEROS)THEN
+    XHY1=AMAX1(0.0,XHY/BKVLX)
+    XAL1=AMAX1(0.0,XAL/BKVLX)
+    XFE1=AMAX1(0.0,XFE/BKVLX)
+    XCA1=AMAX1(0.0,XCA/BKVLX)
+    XMG1=AMAX1(0.0,XMG/BKVLX)
+    XNA1=AMAX1(0.0,XNA/BKVLX)
+    XKA1=AMAX1(0.0,XKA/BKVLX)
+    XHC1=AMAX1(0.0,XHC/BKVLX)
+    XALO21=AMAX1(0.0,XALO2/BKVLX)
+    XFEO21=AMAX1(0.0,XFEO2/BKVLX)
+    XCOOH=AMAX1(0.0,COOH*ORGC/BKVLX)
 !
 !     PRECIPITATE CONCENTRATIONS
 !
-    PALOH1=AMAX1(0.0,PALOH(L,NY,NX)/BKVLX)
-    PFEOH1=AMAX1(0.0,PFEOH(L,NY,NX)/BKVLX)
-    PCACO1=AMAX1(0.0,PCACO(L,NY,NX)/BKVLX)
-    PCASO1=AMAX1(0.0,PCASO(L,NY,NX)/BKVLX)
+    PALOH1=AMAX1(0.0,PALOH/BKVLX)
+    PFEOH1=AMAX1(0.0,PFEOH/BKVLX)
+    PCACO1=AMAX1(0.0,PCACO/BKVLX)
+    PCASO1=AMAX1(0.0,PCASO/BKVLX)
   ELSE
     XHY1=0._r8
     XAL1=0._r8
@@ -290,10 +731,9 @@ module SaltChemEquilibriaMod
   ENDIF
   end subroutine PrepIonConcentrations
 !--------------------------------------------------------------------------
-  subroutine SolveChemEquilibria(L,NY,NX)
+  subroutine SolveChemEquilibria
 
   implicit none
-  integer, intent(in) :: L,NY,NX
   real(r8) :: SP,SPX,S0,S1,P1,P2,PX
   integer :: M,NR1,NP2
 !     begin_execution
@@ -302,9 +742,9 @@ module SaltChemEquilibriaMod
 !
 !     SOLUTE CONCENTRATIONS
 !
-    call GetSoluteConcentrations(L,NY,NX)
+    call GetSoluteConcentrations
 !
-    call IonStrengthActivity(L,NY,NX)
+    call IonStrengthActivity
 !
 !     ALUMINUM HYDROXIDE (GIBBSITE)
 !
@@ -492,33 +932,33 @@ module SaltChemEquilibriaMod
 !
 !     PHOSPHORUS PRECIPITATION-DISSOLUTION IN NON-BAND SOIL ZONE
 !
-    call PhospPrecipDissolNonBand(NY,NX)
+    call PhospPrecipDissolNonBand
 !
 !     PHOSPHORUS PRECIPITATION-DISSOLUTION IN BAND SOIL ZONE
 !
-    call PhospPrecipDissolBand(NY,NX)
+    call PhospPrecipDissolBand
 !
-    call PhospAnionExchNoBand(L,NY,NX)
+    call PhospAnionExchNoBand
 !
-    call PhospAnionExchBand(L,NY,NX)
+    call PhospAnionExchBand
 !
 !     CATION EXCHANGE FROM GAPON SELECTIVITY COEFFICIENTS
 !     FOR CA-NH4, CA-H, CA-AL, CA-MG, CA-NA, CA-K
 !
-    call CationExchange(L,NY,NX)
+    call CationExchange
 !
 !     SOLUTE DISSOCIATION REACTIONS
 !
-    call SoluteDissociation(L,NY,NX)
+    call SoluteDissociation
 !
 !     TOTAL ION FLUXES FOR CURRENT ITERATION
 !     FROM ALL REACTIONS ABOVE
 !
-    call UpdateIonFluxCurentIter(L,NY,NX)
+    call UpdateIonFluxCurentIter
 
-    call UpdateIonConcCurrentIter(L,NY,NX)
+    call UpdateIonConcCurrentIter
 !
-    call AccumulateIonFlux(L,NY,NX)
+    call AccumulateIonFlux
 !
 !     GO TO NEXT ITERATION
 !
@@ -546,13 +986,12 @@ module SaltChemEquilibriaMod
       end subroutine SolveChemEquilibria
 !------------------------------------------------------------------------------------------
 
-      subroutine PhospPrecipDissolNonBand(NY,NX)
+      subroutine PhospPrecipDissolNonBand
 
       implicit none
-      integer, intent(in) :: NY,NX
   real(r8) :: SP,SPX,S0,S1,P1,P2,P3,PX,PY
   integer :: NR1,NP3
-      IF(VOLWPO.GT.ZEROS2(NY,NX))THEN
+      IF(VOLWPO.GT.ZEROS2)THEN
 !
 !     ALUMINUM PHOSPHATE (VARISCITE)
 !
@@ -844,7 +1283,7 @@ module SaltChemEquilibriaMod
       ENDIF
 !     IF((I/10)*10.EQ.I.AND.J.EQ.12)THEN
 !     WRITE(*,1112)'A1',I,L,K,M,A1,A2,A3,FSTR2,CSTR1
-!    2,CSTR2,CC3,CA3,CC2,CA2,CC1,CA1,VOLWM(NPH,L,NY,NX)
+!    2,CSTR2,CC3,CA3,CC2,CA2,CC1,CA1,VOLWM
 !     WRITE(*,1112)'APATITE',I,J,L,M,PCAPH1,ACA1,XCA1
 !    2,AH0P1,AH1P1,AH2P1,AHY1,AOH1,RPCAHX,RHCAH1,RHCAH2
 !    3,SP,SPX,ACA1**5*AH0P1**3*AOH1,SPCAH,SHCAH1,SHCAH2
@@ -903,107 +1342,106 @@ module SaltChemEquilibriaMod
       end subroutine PhospPrecipDissolNonBand
 
 !----------------------------------------------------------------------------
-      subroutine SummarizeIonFluxes(L,NY,NX)
+      subroutine SummarizeIonFluxes
 
       implicit none
-      integer, intent(in) :: L,NY,NX
 !     begin_execution
 !     CONVERT TOTAL ION FLUXES FROM CHANGES IN CONCENTRATION
 !     TO CHANGES IN MASS PER UNIT AREA FOR USE IN 'REDIST'
 !
-      TRN4S(L,NY,NX)=TRN4S(L,NY,NX)*VOLWNH
-      TRN4B(L,NY,NX)=TRN4B(L,NY,NX)*VOLWNB
-      TRN3S(L,NY,NX)=TRN3S(L,NY,NX)*VOLWNH
-      TRN3B(L,NY,NX)=TRN3B(L,NY,NX)*VOLWNB
-      TRAL(L,NY,NX)=TRAL(L,NY,NX)*VOLWM(NPH,L,NY,NX)
-      TRFE(L,NY,NX)=TRFE(L,NY,NX)*VOLWM(NPH,L,NY,NX)
-      TRHY(L,NY,NX)=TRHY(L,NY,NX)*VOLWM(NPH,L,NY,NX)
-      TRCA(L,NY,NX)=TRCA(L,NY,NX)*VOLWM(NPH,L,NY,NX)
-      TRMG(L,NY,NX)=TRMG(L,NY,NX)*VOLWM(NPH,L,NY,NX)
-      TRNA(L,NY,NX)=TRNA(L,NY,NX)*VOLWM(NPH,L,NY,NX)
-      TRKA(L,NY,NX)=TRKA(L,NY,NX)*VOLWM(NPH,L,NY,NX)
-      TROH(L,NY,NX)=TROH(L,NY,NX)*VOLWM(NPH,L,NY,NX)
-      TRSO4(L,NY,NX)=TRSO4(L,NY,NX)*VOLWM(NPH,L,NY,NX)
-      TRCO3(L,NY,NX)=TRCO3(L,NY,NX)*VOLWM(NPH,L,NY,NX)
-      TRHCO(L,NY,NX)=TRHCO(L,NY,NX)*VOLWM(NPH,L,NY,NX)
-      TRCO2(L,NY,NX)=TRCO2(L,NY,NX)*VOLWM(NPH,L,NY,NX)
-      TRAL1(L,NY,NX)=TRAL1(L,NY,NX)*VOLWM(NPH,L,NY,NX)
-      TRAL2(L,NY,NX)=TRAL2(L,NY,NX)*VOLWM(NPH,L,NY,NX)
-      TRAL3(L,NY,NX)=TRAL3(L,NY,NX)*VOLWM(NPH,L,NY,NX)
-      TRAL4(L,NY,NX)=TRAL4(L,NY,NX)*VOLWM(NPH,L,NY,NX)
-      TRALS(L,NY,NX)=TRALS(L,NY,NX)*VOLWM(NPH,L,NY,NX)
-      TRFE1(L,NY,NX)=TRFE1(L,NY,NX)*VOLWM(NPH,L,NY,NX)
-      TRFE2(L,NY,NX)=TRFE2(L,NY,NX)*VOLWM(NPH,L,NY,NX)
-      TRFE3(L,NY,NX)=TRFE3(L,NY,NX)*VOLWM(NPH,L,NY,NX)
-      TRFE4(L,NY,NX)=TRFE4(L,NY,NX)*VOLWM(NPH,L,NY,NX)
-      TRFES(L,NY,NX)=TRFES(L,NY,NX)*VOLWM(NPH,L,NY,NX)
-      TRCAO(L,NY,NX)=TRCAO(L,NY,NX)*VOLWM(NPH,L,NY,NX)
-      TRCAC(L,NY,NX)=TRCAC(L,NY,NX)*VOLWM(NPH,L,NY,NX)
-      TRCAH(L,NY,NX)=TRCAH(L,NY,NX)*VOLWM(NPH,L,NY,NX)
-      TRCAS(L,NY,NX)=TRCAS(L,NY,NX)*VOLWM(NPH,L,NY,NX)
-      TRMGO(L,NY,NX)=TRMGO(L,NY,NX)*VOLWM(NPH,L,NY,NX)
-      TRMGC(L,NY,NX)=TRMGC(L,NY,NX)*VOLWM(NPH,L,NY,NX)
-      TRMGH(L,NY,NX)=TRMGH(L,NY,NX)*VOLWM(NPH,L,NY,NX)
-      TRMGS(L,NY,NX)=TRMGS(L,NY,NX)*VOLWM(NPH,L,NY,NX)
-      TRNAC(L,NY,NX)=TRNAC(L,NY,NX)*VOLWM(NPH,L,NY,NX)
-      TRNAS(L,NY,NX)=TRNAS(L,NY,NX)*VOLWM(NPH,L,NY,NX)
-      TRKAS(L,NY,NX)=TRKAS(L,NY,NX)*VOLWM(NPH,L,NY,NX)
-      TRH0P(L,NY,NX)=TRH0P(L,NY,NX)*VOLWPO
-      TRH1P(L,NY,NX)=TRH1P(L,NY,NX)*VOLWPO
-      TRH2P(L,NY,NX)=TRH2P(L,NY,NX)*VOLWPO
-      TRH3P(L,NY,NX)=TRH3P(L,NY,NX)*VOLWPO
-      TRF1P(L,NY,NX)=TRF1P(L,NY,NX)*VOLWPO
-      TRF2P(L,NY,NX)=TRF2P(L,NY,NX)*VOLWPO
-      TRC0P(L,NY,NX)=TRC0P(L,NY,NX)*VOLWPO
-      TRC1P(L,NY,NX)=TRC1P(L,NY,NX)*VOLWPO
-      TRC2P(L,NY,NX)=TRC2P(L,NY,NX)*VOLWPO
-      TRM1P(L,NY,NX)=TRM1P(L,NY,NX)*VOLWPO
-      TRH0B(L,NY,NX)=TRH0B(L,NY,NX)*VOLWPB
-      TRH1B(L,NY,NX)=TRH1B(L,NY,NX)*VOLWPB
-      TRH2B(L,NY,NX)=TRH2B(L,NY,NX)*VOLWPB
-      TRH3B(L,NY,NX)=TRH3B(L,NY,NX)*VOLWPB
-      TRF1B(L,NY,NX)=TRF1B(L,NY,NX)*VOLWPB
-      TRF2B(L,NY,NX)=TRF2B(L,NY,NX)*VOLWPB
-      TRC0B(L,NY,NX)=TRC0B(L,NY,NX)*VOLWPB
-      TRC1B(L,NY,NX)=TRC1B(L,NY,NX)*VOLWPB
-      TRC2B(L,NY,NX)=TRC2B(L,NY,NX)*VOLWPB
-      TRM1B(L,NY,NX)=TRM1B(L,NY,NX)*VOLWPB
-      TRXN4(L,NY,NX)=TRXN4(L,NY,NX)*VOLWNH
-      TRXNB(L,NY,NX)=TRXNB(L,NY,NX)*VOLWNB
-      TRXHY(L,NY,NX)=TRXHY(L,NY,NX)*VOLWM(NPH,L,NY,NX)
-      TRXAL(L,NY,NX)=TRXAL(L,NY,NX)*VOLWM(NPH,L,NY,NX)
-      TRXFE(L,NY,NX)=TRXFE(L,NY,NX)*VOLWM(NPH,L,NY,NX)
-      TRXCA(L,NY,NX)=TRXCA(L,NY,NX)*VOLWM(NPH,L,NY,NX)
-      TRXMG(L,NY,NX)=TRXMG(L,NY,NX)*VOLWM(NPH,L,NY,NX)
-      TRXNA(L,NY,NX)=TRXNA(L,NY,NX)*VOLWM(NPH,L,NY,NX)
-      TRXKA(L,NY,NX)=TRXKA(L,NY,NX)*VOLWM(NPH,L,NY,NX)
-      TRXHC(L,NY,NX)=TRXHC(L,NY,NX)*VOLWM(NPH,L,NY,NX)
-      TRXAL2(L,NY,NX)=TRXAL2(L,NY,NX)*VOLWM(NPH,L,NY,NX)
-      TRXFE2(L,NY,NX)=TRXFE2(L,NY,NX)*VOLWM(NPH,L,NY,NX)
-      TRXH0(L,NY,NX)=TRXH0(L,NY,NX)*VOLWPO
-      TRXH1(L,NY,NX)=TRXH1(L,NY,NX)*VOLWPO
-      TRXH2(L,NY,NX)=TRXH2(L,NY,NX)*VOLWPO
-      TRX1P(L,NY,NX)=TRX1P(L,NY,NX)*VOLWPO
-      TRX2P(L,NY,NX)=TRX2P(L,NY,NX)*VOLWPO
-      TRBH0(L,NY,NX)=TRBH0(L,NY,NX)*VOLWPB
-      TRBH1(L,NY,NX)=TRBH1(L,NY,NX)*VOLWPB
-      TRBH2(L,NY,NX)=TRBH2(L,NY,NX)*VOLWPB
-      TRB1P(L,NY,NX)=TRB1P(L,NY,NX)*VOLWPB
-      TRB2P(L,NY,NX)=TRB2P(L,NY,NX)*VOLWPB
-      TRALOH(L,NY,NX)=TRALOH(L,NY,NX)*VOLWM(NPH,L,NY,NX)
-      TRFEOH(L,NY,NX)=TRFEOH(L,NY,NX)*VOLWM(NPH,L,NY,NX)
-      TRCACO(L,NY,NX)=TRCACO(L,NY,NX)*VOLWM(NPH,L,NY,NX)
-      TRCASO(L,NY,NX)=TRCASO(L,NY,NX)*VOLWM(NPH,L,NY,NX)
-      TRALPO(L,NY,NX)=TRALPO(L,NY,NX)*VOLWPO
-      TRFEPO(L,NY,NX)=TRFEPO(L,NY,NX)*VOLWPO
-      TRCAPD(L,NY,NX)=TRCAPD(L,NY,NX)*VOLWPO
-      TRCAPH(L,NY,NX)=TRCAPH(L,NY,NX)*VOLWPO
-      TRCAPM(L,NY,NX)=TRCAPM(L,NY,NX)*VOLWPO
-      TRALPB(L,NY,NX)=TRALPB(L,NY,NX)*VOLWPB
-      TRFEPB(L,NY,NX)=TRFEPB(L,NY,NX)*VOLWPB
-      TRCPDB(L,NY,NX)=TRCPDB(L,NY,NX)*VOLWPB
-      TRCPHB(L,NY,NX)=TRCPHB(L,NY,NX)*VOLWPB
-      TRCPMB(L,NY,NX)=TRCPMB(L,NY,NX)*VOLWPB
+      TRN4S=TRN4S*VOLWNH
+      TRN4B=TRN4B*VOLWNB
+      TRN3S=TRN3S*VOLWNH
+      TRN3B=TRN3B*VOLWNB
+      TRAL=TRAL*VOLWM
+      TRFE=TRFE*VOLWM
+      TRHY=TRHY*VOLWM
+      TRCA=TRCA*VOLWM
+      TRMG=TRMG*VOLWM
+      TRNA=TRNA*VOLWM
+      TRKA=TRKA*VOLWM
+      TROH=TROH*VOLWM
+      TRSO4=TRSO4*VOLWM
+      TRCO3=TRCO3*VOLWM
+      TRHCO=TRHCO*VOLWM
+      TRCO2=TRCO2*VOLWM
+      TRAL1=TRAL1*VOLWM
+      TRAL2=TRAL2*VOLWM
+      TRAL3=TRAL3*VOLWM
+      TRAL4=TRAL4*VOLWM
+      TRALS=TRALS*VOLWM
+      TRFE1=TRFE1*VOLWM
+      TRFE2=TRFE2*VOLWM
+      TRFE3=TRFE3*VOLWM
+      TRFE4=TRFE4*VOLWM
+      TRFES=TRFES*VOLWM
+      TRCAO=TRCAO*VOLWM
+      TRCAC=TRCAC*VOLWM
+      TRCAH=TRCAH*VOLWM
+      TRCAS=TRCAS*VOLWM
+      TRMGO=TRMGO*VOLWM
+      TRMGC=TRMGC*VOLWM
+      TRMGH=TRMGH*VOLWM
+      TRMGS=TRMGS*VOLWM
+      TRNAC=TRNAC*VOLWM
+      TRNAS=TRNAS*VOLWM
+      TRKAS=TRKAS*VOLWM
+      TRH0P=TRH0P*VOLWPO
+      TRH1P=TRH1P*VOLWPO
+      TRH2P=TRH2P*VOLWPO
+      TRH3P=TRH3P*VOLWPO
+      TRF1P=TRF1P*VOLWPO
+      TRF2P=TRF2P*VOLWPO
+      TRC0P=TRC0P*VOLWPO
+      TRC1P=TRC1P*VOLWPO
+      TRC2P=TRC2P*VOLWPO
+      TRM1P=TRM1P*VOLWPO
+      TRH0B=TRH0B*VOLWPB
+      TRH1B=TRH1B*VOLWPB
+      TRH2B=TRH2B*VOLWPB
+      TRH3B=TRH3B*VOLWPB
+      TRF1B=TRF1B*VOLWPB
+      TRF2B=TRF2B*VOLWPB
+      TRC0B=TRC0B*VOLWPB
+      TRC1B=TRC1B*VOLWPB
+      TRC2B=TRC2B*VOLWPB
+      TRM1B=TRM1B*VOLWPB
+      TRXN4=TRXN4*VOLWNH
+      TRXNB=TRXNB*VOLWNB
+      TRXHY=TRXHY*VOLWM
+      TRXAL=TRXAL*VOLWM
+      TRXFE=TRXFE*VOLWM
+      TRXCA=TRXCA*VOLWM
+      TRXMG=TRXMG*VOLWM
+      TRXNA=TRXNA*VOLWM
+      TRXKA=TRXKA*VOLWM
+      TRXHC=TRXHC*VOLWM
+      TRXAL2=TRXAL2*VOLWM
+      TRXFE2=TRXFE2*VOLWM
+      TRXH0=TRXH0*VOLWPO
+      TRXH1=TRXH1*VOLWPO
+      TRXH2=TRXH2*VOLWPO
+      TRX1P=TRX1P*VOLWPO
+      TRX2P=TRX2P*VOLWPO
+      TRBH0=TRBH0*VOLWPB
+      TRBH1=TRBH1*VOLWPB
+      TRBH2=TRBH2*VOLWPB
+      TRB1P=TRB1P*VOLWPB
+      TRB2P=TRB2P*VOLWPB
+      TRALOH=TRALOH*VOLWM
+      TRFEOH=TRFEOH*VOLWM
+      TRCACO=TRCACO*VOLWM
+      TRCASO=TRCASO*VOLWM
+      TRALPO=TRALPO*VOLWPO
+      TRFEPO=TRFEPO*VOLWPO
+      TRCAPD=TRCAPD*VOLWPO
+      TRCAPH=TRCAPH*VOLWPO
+      TRCAPM=TRCAPM*VOLWPO
+      TRALPB=TRALPB*VOLWPB
+      TRFEPB=TRFEPB*VOLWPB
+      TRCPDB=TRCPDB*VOLWPB
+      TRCPHB=TRCPHB*VOLWPB
+      TRCPMB=TRCPMB*VOLWPB
 !
 !     BOUNDARY SALT FLUXES FOR C, H, OH, P, AL+FE, CA, OH
 !     USED TO CHECK MATERIAL BALANCES IN REDIST.F
@@ -1012,49 +1450,48 @@ module SaltChemEquilibriaMod
 !     TRH2O=H2O net change from all solute equilibria
 !     TBION=total solute net change from all solute equilibria
 !
-      TBCO2(L,NY,NX)=TRCO3(L,NY,NX) &
-      +TRCAC(L,NY,NX)+TRMGC(L,NY,NX)+TRNAC(L,NY,NX)+TRCACO(L,NY,NX) &
-      +2.0*(TRHCO(L,NY,NX)+TRCAH(L,NY,NX)+TRMGH(L,NY,NX))
-      TRH2O(L,NY,NX)=TRHY(L,NY,NX)+TROH(L,NY,NX)+TRXHY(L,NY,NX) &
-      +TRXHC(L,NY,NX)
-      TBION(L,NY,NX)=4.0*(TRH3P(L,NY,NX)+TRH3B(L,NY,NX)) &
-      +3.0*(TRF2P(L,NY,NX)+TRC2P(L,NY,NX) &
-      +TRF2B(L,NY,NX)+TRC2B(L,NY,NX)) &
-      +2.0*(TRF1P(L,NY,NX)+TRC1P(L,NY,NX)+TRM1P(L,NY,NX) &
-      +TRF1B(L,NY,NX)+TRC1B(L,NY,NX)+TRM1B(L,NY,NX)) &
-      +TRH0P(L,NY,NX)+TRC0P(L,NY,NX)+TRH0B(L,NY,NX)+TRC0B(L,NY,NX) &
-      -(TRALPO(L,NY,NX)+TRFEPO(L,NY,NX) &
-      +TRALPB(L,NY,NX)+TRFEPB(L,NY,NX)) &
-      -(TRCAPD(L,NY,NX)+TRCAPM(L,NY,NX) &
-      +TRCPDB(L,NY,NX)+TRCPMB(L,NY,NX) &
-      +5.0*(TRCAPH(L,NY,NX)+TRCPHB(L,NY,NX))) &
-      +TRAL1(L,NY,NX)+TRFE1(L,NY,NX) &
-      +2.0*(TRAL2(L,NY,NX)+TRFE2(L,NY,NX)) &
-      +3.0*(TRAL3(L,NY,NX)+TRFE3(L,NY,NX)) &
-      +4.0*(TRAL4(L,NY,NX)+TRFE4(L,NY,NX)) &
-      +TRCAO(L,NY,NX)+TRMGO(L,NY,NX) &
-      +3.0*(TRALOH(L,NY,NX)+TRFEOH(L,NY,NX))
+      TBCO2=TRCO3 &
+      +TRCAC+TRMGC+TRNAC+TRCACO &
+      +2.0*(TRHCO+TRCAH+TRMGH)
+      TRH2O=TRHY+TROH+TRXHY &
+      +TRXHC
+      TBION=4.0*(TRH3P+TRH3B) &
+      +3.0*(TRF2P+TRC2P &
+      +TRF2B+TRC2B) &
+      +2.0*(TRF1P+TRC1P+TRM1P &
+      +TRF1B+TRC1B+TRM1B) &
+      +TRH0P+TRC0P+TRH0B+TRC0B &
+      -(TRALPO+TRFEPO &
+      +TRALPB+TRFEPB) &
+      -(TRCAPD+TRCAPM &
+      +TRCPDB+TRCPMB &
+      +5.0*(TRCAPH+TRCPHB)) &
+      +TRAL1+TRFE1 &
+      +2.0*(TRAL2+TRFE2) &
+      +3.0*(TRAL3+TRFE3) &
+      +4.0*(TRAL4+TRFE4) &
+      +TRCAO+TRMGO &
+      +3.0*(TRALOH+TRFEOH)
 !     IF(L.EQ.11)THEN
-!     WRITE(*,1111)'TRCO2',I,J,L,M,TRCO2(L,NY,NX),TRCO3(L,NY,NX)
-!    2,TRHCO(L,NY,NX),TRCAC(L,NY,NX),TRMGC(L,NY,NX)
-!    2,TRNAC(L,NY,NX),TRCAH(L,NY,NX)
-!    2,TRMGH(L,NY,NX),TRCACO(L,NY,NX),VOLWM(NPH,L,NY,NX),RCO2
+!     WRITE(*,1111)'TRCO2',I,J,L,M,TRCO2,TRCO3
+!    2,TRHCO,TRCAC,TRMGC
+!    2,TRNAC,TRCAH
+!    2,TRMGH,TRCACO,VOLWM,RCO2
 !    3,RHCO,RHCACH,RCO2Q,RCAH,RMGH,RHCO3,AHY1,AHCO31,ACO21,DPCO2
-!     WRITE(*,1111)'TBION',I,J,L,M,TBION(L,NY,NX)
+!     WRITE(*,1111)'TBION',I,J,L,M,TBION
 !     ENDIF
       end subroutine SummarizeIonFluxes
 !------------------------------------------------------------------------------------------
 
-      subroutine GetSoluteConcentrations(L,NY,NX)
+      subroutine GetSoluteConcentrations
       implicit none
-      integer, intent(in) :: L,NY,NX
 !     begin_execution
 
       CN41=AMAX1(ZERO,CN41)
       CN4B=AMAX1(ZERO,CN4B)
       CN31=AMAX1(ZERO,CN31)
       CN3B=AMAX1(ZERO,CN3B)
-      CHY1=AMAX1(ZERO,10.0**(-(PH(L,NY,NX)-3.0)))
+      CHY1=AMAX1(ZERO,10.0**(-(PH-3.0)))
       COH1=AMAX1(ZERO,DPH2O/CHY1)
       CCO31=AMAX1(ZERO,CCO31)
       CAL1=AMAX1(ZERO,CAL1)
@@ -1111,9 +1548,8 @@ module SaltChemEquilibriaMod
       end subroutine GetSoluteConcentrations
 !------------------------------------------------------------------------------------------
 
-      subroutine IonStrengthActivity(L,NY,NX)
+      subroutine IonStrengthActivity
       implicit none
-      integer, intent(in) :: L,NY,NX
   real(r8) :: CC3,CA3,CC2,CA2,CC1,CA1,CSTR1,CSTR2
   real(r8) :: A1,A3,FSTR2
 !     begin_execution
@@ -1123,16 +1559,16 @@ module SaltChemEquilibriaMod
 !     CSTR1=ion strength
 !
       CC3=CAL1+CFE1
-      CA3=CH0P1*VLPO4(L,NY,NX)+CH0PB*VLPOB(L,NY,NX)
-      CC2=CCA1+CMG1+CALO1+CFEO1+CF2P1*VLPO4(L,NY,NX) &
-      +CF2PB*VLPOB(L,NY,NX)
-      CA2=CSO41+CCO31+CH1P1*VLPO4(L,NY,NX)+CH1PB*VLPOB(L,NY,NX)
-      CC1=CN41*VLNH4(L,NY,NX)+CN4B*VLNHB(L,NY,NX)+CHY1+CNA1+CKA1 &
+      CA3=CH0P1*VLPO4+CH0PB*VLPOB
+      CC2=CCA1+CMG1+CALO1+CFEO1+CF2P1*VLPO4 &
+      +CF2PB*VLPOB
+      CA2=CSO41+CCO31+CH1P1*VLPO4+CH1PB*VLPOB
+      CC1=CN41*VLNH4+CN4B*VLNHB+CHY1+CNA1+CKA1 &
       +CALO2+CFEO2+CALS1+CFES1+CCAO1+CCAH1+CMGO1+CMGH1 &
-      +(CF1P1+CC2P1)*VLPO4(L,NY,NX)+(CF1PB+CC2PB)*VLPOB(L,NY,NX)
-      CA1=CNO1*VLNO3(L,NY,NX)+CNOB*VLNOB(L,NY,NX)+COH1+CHCO31+CCL1 &
-      +CALO4+CFEO4+CNAC1+CNAS1+CKAS1+(CH2P1+CC0P1)*VLPO4(L,NY,NX) &
-      +(CH2PB+CC0PB)*VLPOB(L,NY,NX)
+      +(CF1P1+CC2P1)*VLPO4+(CF1PB+CC2PB)*VLPOB
+      CA1=CNO1*VLNO3+CNOB*VLNOB+COH1+CHCO31+CCL1 &
+      +CALO4+CFEO4+CNAC1+CNAS1+CKAS1+(CH2P1+CC0P1)*VLPO4 &
+      +(CH2PB+CC0PB)*VLPOB
       CSTR1=AMAX1(0.0,0.5E-03*(9.0*(CC3+CA3)+4.0*(CC2+CA2) &
       +CC1+CA1))
       CSTR2=SQRT(CSTR1)
@@ -1218,15 +1654,14 @@ module SaltChemEquilibriaMod
       end subroutine IonStrengthActivity
 !------------------------------------------------------------------------------------------
 
-      subroutine PhospPrecipDissolBand(NY,NX)
+      subroutine PhospPrecipDissolBand
 
       implicit none
-      integer, intent(in) :: NY,NX
   real(r8) :: SP,SPX,S0,S1,P1,P2,P3,PX,PY
   integer :: NR1,NP3
 !     begin_execution
 
-      IF(VOLWPB.GT.ZEROS2(NY,NX))THEN
+      IF(VOLWPB.GT.ZEROS2)THEN
 !
 !     ALUMINUM PHOSPHATE (VARISCITE)
 !
@@ -1542,9 +1977,8 @@ module SaltChemEquilibriaMod
       end subroutine PhospPrecipDissolBand
 !------------------------------------------------------------------------------------------
 
-      subroutine PhospAnionExchNoBand(L,NY,NX)
+      subroutine PhospAnionExchNoBand
       implicit none
-      integer, intent(in) :: L,NY,NX
   real(r8) :: SPH1P,SPH2P
 !     begin_execution
 !     PHOSPHORUS ANION EXCHANGE IN NON-BAND SOIL ZONE
@@ -1560,13 +1994,13 @@ module SaltChemEquilibriaMod
 !     RXOH2,RXOH1=OH2,OH exchange with R-OH2,R-OH in non-band
 !     SXOH2,SXOH1=equilibrium constant for OH2,OH exchange with R-OH2,R-OH
 !
-      IF(VOLWM(NPH,L,NY,NX).GT.ZEROS2(NY,NX))THEN
-      VOLWBK=AMIN1(1.0,BKVL(L,NY,NX)/VOLWM(NPH,L,NY,NX))
+      IF(VOLWM.GT.ZEROS2)THEN
+      VOLWBK=AMIN1(1.0,BKVL/VOLWM)
       ELSE
       VOLWBK=1._r8
       ENDIF
-      IF(VOLWPO.GT.ZEROS2(NY,NX) &
-      .AND.XAEC(L,NY,NX).GT.ZEROS(NY,NX))THEN
+      IF(VOLWPO.GT.ZEROS2 &
+      .AND.XAEC.GT.ZEROS)THEN
       RXOH2=TADAX*(XOH11*AHY1-SXOH2*XOH21)/(XOH11+SXOH2)*VOLWBK
       RXOH1=TADAX*(XOH01*AHY1-SXOH1*XOH11)/(XOH01+SXOH1)*VOLWBK
 !
@@ -1600,9 +2034,8 @@ module SaltChemEquilibriaMod
       end subroutine PhospAnionExchNoBand
 !------------------------------------------------------------------------------------------
 
-      subroutine PhospAnionExchBand(L,NY,NX)
+      subroutine PhospAnionExchBand
       implicit none
-      integer, intent(in) :: L,NY,NX
   real(r8) :: SPH1P,SPH2P
 !     begin_execution
 !     PHOSPHORUS ANION EXCHANGE IN BAND SOIL ZONE
@@ -1610,8 +2043,8 @@ module SaltChemEquilibriaMod
 !     HPO4--, H+, OH- AND PROTONATED AND NON-PROTONATED -OH
 !     EXCHANGE SITES
 !
-      IF(VOLWPB.GT.ZEROS2(NY,NX) &
-      .AND.XAEC(L,NY,NX).GT.ZEROS(NY,NX))THEN
+      IF(VOLWPB.GT.ZEROS2 &
+      .AND.XAEC.GT.ZEROS)THEN
 !
 !     RXO2B,RXO1B=OH2,OH exchange with R-OH2,R-OH in band
 !     SXOH2,SXOH1=equilibrium constant for OH2,OH exchange with R-OH2,R-OH
@@ -1652,14 +2085,13 @@ module SaltChemEquilibriaMod
       end subroutine PhospAnionExchBand
 !------------------------------------------------------------------------------------------
 
-      subroutine CationExchange(L,NY,NX)
+      subroutine CationExchange
       implicit none
-      integer, intent(in) :: L,NY,NX
   real(r8) :: FX,XALQ,XCAQ,XCAXl,XKAQ,XCAX,XFEQ
   real(r8) :: XHYQ,XMGQ,XN4Q,XNBQ,XTLQ,XNAQ
 !     begin_execution
 
-      IF(XCEC(L,NY,NX).GT.ZEROS(NY,NX))THEN
+      IF(XCEC.GT.ZEROS)THEN
 !
 !     CATION CONCENTRATIONS
 !
@@ -1677,21 +2109,21 @@ module SaltChemEquilibriaMod
       AFEX=AFE1**0.333
       ACAX=ACA1**0.500
       AMGX=AMG1**0.500
-      XCAX=CCEC/(1.0+GKC4(L,NY,NX)*AN41/ACAX*VLNH4(L,NY,NX) &
-      +GKC4(L,NY,NX)*AN4B/ACAX*VLNHB(L,NY,NX) &
-      +GKCH(L,NY,NX)*AHY1/ACAX+GKCA(L,NY,NX)*AALX/ACAX &
-      +GKCA(L,NY,NX)*AFEX/ACAX+GKCM(L,NY,NX)*AMGX/ACAX &
-      +GKCN(L,NY,NX)*ANA1/ACAX+GKCK(L,NY,NX)*AKA1/ACAX)
-      XN4Q=XCAX*AN41*GKC4(L,NY,NX)
-      XNBQ=XCAX*AN4B*GKC4(L,NY,NX)
-      XHYQ=XCAX*AHY1*GKCH(L,NY,NX)
-      XALQ=XCAX*AALX*GKCA(L,NY,NX)
-      XFEQ=XCAX*AFEX*GKCA(L,NY,NX)
+      XCAX=CCEC/(1.0+GKC4*AN41/ACAX*VLNH4 &
+      +GKC4*AN4B/ACAX*VLNHB &
+      +GKCH*AHY1/ACAX+GKCA*AALX/ACAX &
+      +GKCA*AFEX/ACAX+GKCM*AMGX/ACAX &
+      +GKCN*ANA1/ACAX+GKCK*AKA1/ACAX)
+      XN4Q=XCAX*AN41*GKC4
+      XNBQ=XCAX*AN4B*GKC4
+      XHYQ=XCAX*AHY1*GKCH
+      XALQ=XCAX*AALX*GKCA
+      XFEQ=XCAX*AFEX*GKCA
       XCAQ=XCAX*ACAX
-      XMGQ=XCAX*AMGX*GKCM(L,NY,NX)
-      XNAQ=XCAX*ANA1*GKCN(L,NY,NX)
-      XKAQ=XCAX*AKA1*GKCK(L,NY,NX)
-      XTLQ=XN4Q*VLNH4(L,NY,NX)+XNBQ*VLNHB(L,NY,NX) &
+      XMGQ=XCAX*AMGX*GKCM
+      XNAQ=XCAX*ANA1*GKCN
+      XKAQ=XCAX*AKA1*GKCK
+      XTLQ=XN4Q*VLNH4+XNBQ*VLNHB &
       +XHYQ+XALQ+XFEQ+XCAQ+XMGQ+XNAQ+XKAQ
       IF(XTLQ.GT.ZERO)THEN
       FX=CCEC/XTLQ
@@ -1729,7 +2161,7 @@ module SaltChemEquilibriaMod
       RXKA=TADCX*AMIN1((XKAQ-XKA1)*AKA1/XKAQ,CKA1)
 !     IF(I.EQ.256.AND.L.EQ.1)THEN
 !     WRITE(*,1112)'RXAL',I,J,L,M,RXAL,TADCX,XALQ,XAL1,CAL1
-!    2,AAL1,AALX,CCEC,XCAX,GKCA(L,NY,NX),FX
+!    2,AAL1,AALX,CCEC,XCAX,GKCA,FX
 !     ENDIF
       ELSE
       RXN4=0._r8
@@ -1745,9 +2177,8 @@ module SaltChemEquilibriaMod
       end subroutine CationExchange
 !------------------------------------------------------------------------------------------
 
-      subroutine SoluteDissociation(L,NY,NX)
+      subroutine SoluteDissociation
       implicit none
-      integer, intent(in) :: L,NY,NX
   real(r8) :: S0,S1
 !     begin_execution
 !     for all reactions:
@@ -1773,12 +2204,12 @@ module SaltChemEquilibriaMod
 !     RNH4,RNHB-NH4-NH3+H dissociation in non-band,band
 !     DPN4=NH4 dissociation constant
 !
-      IF(VOLWNH.GT.ZEROS2(NY,NX))THEN
+      IF(VOLWNH.GT.ZEROS2)THEN
       RNH4=TSLX*(AHY1*AN31-DPN4*AN41)/(DPN4+AHY1)
       ELSE
       RNH4=0._r8
       ENDIF
-      IF(VOLWNB.GT.ZEROS2(NY,NX))THEN
+      IF(VOLWNB.GT.ZEROS2)THEN
       RNHB=TSLX*(AHY1*AN3B-DPN4*AN4B)/(DPN4+AHY1)
       ELSE
       RNHB=0._r8
@@ -1904,7 +2335,7 @@ module SaltChemEquilibriaMod
 !
 !     PHOSPHORUS IN NON-BAND SOIL ZONE
 !
-      IF(VOLWPO.GT.ZEROS2(NY,NX))THEN
+      IF(VOLWPO.GT.ZEROS2)THEN
 !
 !     RH1P=HPO4-H+PO4 dissociation in non-band
 !
@@ -1915,8 +2346,8 @@ module SaltChemEquilibriaMod
       RH2P=TSLX*(AH1P1*AHY1-DPH2P*AH2P1)/(DPH2P+AHY1)
 !     IF(NY.EQ.5.AND.L.EQ.10)THEN
 !     WRITE(*,22)'RH2P',I,J,NX,NY,L,M,RH2P,TSLX,S0,S1,DP,DPH2P,A2
-!    2,CH1P1,CHY1,CH2P1,H2PO4(L,NY,NX),VOLWPX,RH2PX,XH2PS(L,NY,NX)
-!    3,TUPH2P(L,NY,NX)
+!    2,CH1P1,CHY1,CH2P1,H2PO4,VOLWPX,RH2PX,XH2PS
+!    3,TUPH2P
 !22    FORMAT(A8,6I4,60E12.4)
 !     ENDIF
 !
@@ -1973,7 +2404,7 @@ module SaltChemEquilibriaMod
 !
 !     PHOSPHORUS IN BAND SOIL ZONE
 !
-      IF(VOLWPB.GT.ZEROS2(NY,NX))THEN
+      IF(VOLWPB.GT.ZEROS2)THEN
 !
 !     RH1B=HPO4-H+PO4 dissociation in band
 !
@@ -2036,9 +2467,8 @@ module SaltChemEquilibriaMod
       end subroutine SoluteDissociation
 !------------------------------------------------------------------------------------------
 
-      subroutine UpdateIonFluxCurentIter(L,NY,NX)
+      subroutine UpdateIonFluxCurentIter
       implicit none
-      integer, intent(in) :: L,NY,NX
 !     begin_execution
 !     RN4S,RN4B=net NH4 flux in non-band,band
 !     RN3S,RN3B=net NH3 flux in non-band,band
@@ -2056,65 +2486,65 @@ module SaltChemEquilibriaMod
       RN3S=-RNH4
       RN3B=-RNHB
       RAL=-RHAL1-RXAL-RALO1-RALS &
-      -(RHA0P1+RHA0P2)*VLPO4(L,NY,NX) &
-      -(RHA0B1+RHA0B2)*VLPOB(L,NY,NX)
+      -(RHA0P1+RHA0P2)*VLPO4 &
+      -(RHA0B1+RHA0B2)*VLPOB
       RFE=-RHFE1-RXFE-RFEO1-RFES &
-      -(RHF0P1+RHF0P2+RF1P+RF2P)*VLPO4(L,NY,NX) &
-      -(RHF0B1+RHF0B2+RF1B+RF2B)*VLPOB(L,NY,NX)
-      RHY=-RNH4*VLNH4(L,NY,NX)-RNHB*VLNHB(L,NY,NX) &
+      -(RHF0P1+RHF0P2+RF1P+RF2P)*VLPO4 &
+      -(RHF0B1+RHF0B2+RF1B+RF2B)*VLPOB
+      RHY=-RNH4*VLNH4-RNHB*VLNHB &
       -RXHY-RXHC+2.0*(RHALO1+RHFEO1+RHCACO &
-      +(RHA0P2+RHF0P2-RHA3P1-RHA4P2-RHF3P1-RHF4P2)*VLPO4(L,NY,NX) &
-      +(RHA0B2+RHF0B2-RHA3B1-RHA4B2-RHF3B1-RHF4B2)*VLPOB(L,NY,NX)) &
+      +(RHA0P2+RHF0P2-RHA3P1-RHA4P2-RHF3P1-RHF4P2)*VLPO4 &
+      +(RHA0B2+RHF0B2-RHA3B1-RHA4B2-RHF3B1-RHF4B2)*VLPOB) &
       +3.0*(RHAL1+RHFE1 &
-      -(RHA4P1+RHF4P1)*VLPO4(L,NY,NX) &
-      -(RHF4B1+RHA4B1)*VLPOB(L,NY,NX)) &
-      +4.0*(RHCAH1*VLPO4(L,NY,NX)+RHCHB1*VLPOB(L,NY,NX)) &
-      +7.0*(RHCAH2*VLPO4(L,NY,NX)+RHCHB2*VLPOB(L,NY,NX)) &
+      -(RHA4P1+RHF4P1)*VLPO4 &
+      -(RHF4B1+RHA4B1)*VLPOB) &
+      +4.0*(RHCAH1*VLPO4+RHCHB1*VLPOB) &
+      +7.0*(RHCAH2*VLPO4+RHCHB2*VLPOB) &
       +RHALO2+RHFEO2-RHALO4-RHFEO4+RHCACH-RCO2Q-RHCO3 &
       +(RHA0P1-RHA2P1+RHA1P2-RHA3P2+RHF0P1-RHF2P1+RHF1P2-RHF3P2 &
-      +RHCAD2-RXOH2-RXOH1-RH1P-RH2P-RH3P)*VLPO4(L,NY,NX) &
+      +RHCAD2-RXOH2-RXOH1-RH1P-RH2P-RH3P)*VLPO4 &
       +(RHA0B1-RHA2B1+RHA1B2-RHA3B2+RHF0B1-RHF2B1+RHF1B2-RHF3B2 &
-      +RHCDB2-RXO2B-RXO1B-RH1B-RH2B-RH3B)*VLPOB(L,NY,NX)
+      +RHCDB2-RXO2B-RXO1B-RH1B-RH2B-RH3B)*VLPOB
       RCA=-RPCACX-RPCASO-RXCA-RCAO-RCAC-RCAH-RCAS &
-      -(RPCADX+RPCAMX+RC0P+RC1P+RC2P)*VLPO4(L,NY,NX) &
-      -(RPCDBX+RPCMBX+RC0B+RC1B+RC2B)*VLPOB(L,NY,NX) &
-      -5.0*(RPCAHX*VLPO4(L,NY,NX)+RPCHBX*VLPOB(L,NY,NX))
+      -(RPCADX+RPCAMX+RC0P+RC1P+RC2P)*VLPO4 &
+      -(RPCDBX+RPCMBX+RC0B+RC1B+RC2B)*VLPOB &
+      -5.0*(RPCAHX*VLPO4+RPCHBX*VLPOB)
       RMG=-RXMG-RMGO-RMGC-RMGH-RMGS &
-      -RM1P*VLPO4(L,NY,NX)-RM1B*VLPOB(L,NY,NX)
+      -RM1P*VLPO4-RM1B*VLPOB
       RNA=-RXNA-RNAC-RNAS
       RKA=-RXKA-RKAS
       ROH=-RCAO-RMGO-RALO1 &
       -RALO2-RALO3-RALO4-RFEO1-RFEO2-RFEO3-RFEO4 &
-      -(-RYH2P-RXH1P)*VLPO4(L,NY,NX) &
-      -(-RYH2B-RXH1B)*VLPOB(L,NY,NX)
+      -(-RYH2P-RXH1P)*VLPO4 &
+      -(-RYH2B-RXH1B)*VLPOB
       RSO4=-RPCASO-RALS-RFES-RCAS-RMGS-RNAS-RKAS
       RCO3=-RHCAC3-RHCO3-RCAC-RMGC-RNAC
       RHCO=-RHCACH-RCO2Q-RCAH-RMGH+RHCO3
       RCO2=-RHCACO+RCO2Q
       RAL1=-RHALO1+RALO1-RALO2 &
-      -(RHA1P1+RHA1P2)*VLPO4(L,NY,NX) &
-      -(RHA1B1+RHA1B2)*VLPOB(L,NY,NX)
+      -(RHA1P1+RHA1P2)*VLPO4 &
+      -(RHA1B1+RHA1B2)*VLPOB
       RAL2=-RHALO2+RALO2-RALO3 &
-      -(RHA2P1+RHA2P2)*VLPO4(L,NY,NX) &
-      -(RHA2B1+RHA2B2)*VLPOB(L,NY,NX)
+      -(RHA2P1+RHA2P2)*VLPO4 &
+      -(RHA2B1+RHA2B2)*VLPOB
       RAL3=-RHALO3+RALO3-RALO4 &
-      -(RHA3P1+RHA3P2)*VLPO4(L,NY,NX) &
-      -(RHA3B1+RHA3B2)*VLPOB(L,NY,NX)
+      -(RHA3P1+RHA3P2)*VLPO4 &
+      -(RHA3B1+RHA3B2)*VLPOB
       RAL4=-RHALO4+RALO4 &
-      -(RHA4P1+RHA4P2)*VLPO4(L,NY,NX) &
-      -(RHA4B1+RHA4B2)*VLPOB(L,NY,NX)
+      -(RHA4P1+RHA4P2)*VLPO4 &
+      -(RHA4B1+RHA4B2)*VLPOB
       RFE1=-RHFEO1+RFEO1-RFEO2 &
-      -(RHF1P1+RHF1P2)*VLPO4(L,NY,NX) &
-      -(RHF1B1+RHF1B2)*VLPOB(L,NY,NX)
+      -(RHF1P1+RHF1P2)*VLPO4 &
+      -(RHF1B1+RHF1B2)*VLPOB
       RFE2=-RHFEO2+RFEO2-RFEO3 &
-      -(RHF2P1+RHF2P2)*VLPO4(L,NY,NX) &
-      -(RHF2B1+RHF2B2)*VLPOB(L,NY,NX)
+      -(RHF2P1+RHF2P2)*VLPO4 &
+      -(RHF2B1+RHF2B2)*VLPOB
       RFE3=-RHFEO3+RFEO3-RFEO4 &
-      -(RHF3P1+RHF3P2)*VLPO4(L,NY,NX) &
-      -(RHF3B1+RHF3B2)*VLPOB(L,NY,NX)
+      -(RHF3P1+RHF3P2)*VLPO4 &
+      -(RHF3B1+RHF3B2)*VLPOB
       RFE4=-RHFEO4+RFEO4 &
-      -(RHF4P1+RHF4P2)*VLPO4(L,NY,NX) &
-      -(RHF4B1+RHF4B2)*VLPOB(L,NY,NX)
+      -(RHF4P1+RHF4P2)*VLPO4 &
+      -(RHF4B1+RHF4B2)*VLPOB
       RHP0=-RH1P-RC0P
       RHP1=-RHA0P1-RHA1P1-RHA2P1-RHA3P1 &
       -RHA4P1-RHF0P1-RHF1P1-RHF2P1 &
@@ -2160,9 +2590,8 @@ module SaltChemEquilibriaMod
       end subroutine UpdateIonFluxCurentIter
 !------------------------------------------------------------------------------------------
 
-      subroutine UpdateIonConcCurrentIter(L,NY,NX)
+      subroutine UpdateIonConcCurrentIter
       implicit none
-      integer, intent(in) :: L,NY,NX
   real(r8) :: CHY2,COH2
 !     begin_execution
 !     UPDATE ION CONCENTRATIONS FOR CURRENT ITERATION
@@ -2228,7 +2657,7 @@ module SaltChemEquilibriaMod
 !
 !     RHHY,RHOH=H2O-H+OH equilibration
 !
-      CHY2=10.0**(-PH(L,NY,NX))*1.0E+03
+      CHY2=10.0**(-PH)*1.0E+03
       COH2=DPH2O/CHY2
       RHHY=CHY2-CHY1
       RHOH=COH2-COH1
@@ -2238,34 +2667,34 @@ module SaltChemEquilibriaMod
 !     WRITE(*,1111)'CO3',I,J,L,M,CCO31,CHCO31,CCO21,DPHCO,DPCO2
 !    2,A1,A2,RCO3,RHCAC3,RHCO3,RCAC,RMGC,RNAC
 !    3,RHCO,RHCACH,RCO2Q,RCAH,RMGH,RHCO3
-!    4,RCO2,RHCACO,AHY1,AHCO31,ACO21,TRCO2(L,NY,NX)
+!    4,RCO2,RHCACO,AHY1,AHCO31,ACO21,TRCO2
 !     WRITE(*,1111)'CCA1',I,J,L,M,CCA1,ACA1,AHY1,AH1P1,AH2P1,ACO31
 !    2,XCA1,AHCO31,RCA,RPCACX,RPCASO,RXCA,RCAO,RCAC,RCAH,RCAS
-!    2,(RPCADX+RPCAMX+RC0P+RC1P+RC2P)*VLPO4(L,NY,NX)
-!    3,(RPCDBX+RPCMBX+RC0B+RC1B+RC2B)*VLPOB(L,NY,NX)
-!    4,5.0*(RPCAHX*VLPO4(L,NY,NX)+RPCHBX*VLPOB(L,NY,NX))
+!    2,(RPCADX+RPCAMX+RC0P+RC1P+RC2P)*VLPO4
+!    3,(RPCDBX+RPCMBX+RC0B+RC1B+RC2B)*VLPOB
+!    4,5.0*(RPCAHX*VLPO4+RPCHBX*VLPOB)
 !     WRITE(*,1111)'CAL1',I,J,L,M,CAL1,A3,AAL1
 !    2,RAL,RHAL1,RXAL,RALO1,RALS
-!    2,RHA0P1,RHA0P2,VLPO4(L,NY,NX)
-!    3,RHA0B1,RHA0B2,VLPOB(L,NY,NX)
+!    2,RHA0P1,RHA0P2,VLPO4
+!    3,RHA0B1,RHA0B2,VLPOB
 !     WRITE(*,1111)'CFEO2',I,J,L,M,CFEO2,CFEO2*A1
 !    2,RFE2,RHFEO2,RHF2P1,RHF2P2,RHF2B1
 !    2,RHF2B2,RFEO2,RFEO3
 !     WRITE(20,1111)'CHY1',I,J,L,M,CHY1,RHY,RHHY,CN31,CN41,RNH4
 !    2,RXHY,RXHC
 !    2,2.0*(RHALO1+RHFEO1+RHCACO
-!    2+(RHA0P2+RHF0P2-RHA3P1-RHA4P2-RHF3P1-RHF4P2)*VLPO4(L,NY,NX)
-!    3+(RHA0B2+RHF0B2-RHA3B1-RHA4B2-RHF3B1-RHF4B2)*VLPOB(L,NY,NX))
+!    2+(RHA0P2+RHF0P2-RHA3P1-RHA4P2-RHF3P1-RHF4P2)*VLPO4
+!    3+(RHA0B2+RHF0B2-RHA3B1-RHA4B2-RHF3B1-RHF4B2)*VLPOB)
 !    4,3.0*(RHAL1+RHFE1
-!    5-(RHA4P1+RHF4P1)*VLPO4(L,NY,NX)
-!    6-(RHF4B1+RHA4B1)*VLPOB(L,NY,NX))
-!    7,4.0*(RHCAH1*VLPO4(L,NY,NX)+RHCHB1*VLPOB(L,NY,NX))
-!    8,7.0*(RHCAH2*VLPO4(L,NY,NX)+RHCHB2*VLPOB(L,NY,NX))
+!    5-(RHA4P1+RHF4P1)*VLPO4
+!    6-(RHF4B1+RHA4B1)*VLPOB)
+!    7,4.0*(RHCAH1*VLPO4+RHCHB1*VLPOB)
+!    8,7.0*(RHCAH2*VLPO4+RHCHB2*VLPOB)
 !    9,RHALO2,RHFEO2,RHALO4,RHFEO4,RHCACH,RCO2Q,RHCO3
 !    1,(RHA0P1-RHA2P1+RHA1P2-RHA3P2+RHF0P1-RHF2P1+RHF1P2-RHF3P2
-!    2+RHCAD2-RXOH2-RXOH1-RH1P-RH2P-RH3P)*VLPO4(L,NY,NX)
+!    2+RHCAD2-RXOH2-RXOH1-RH1P-RH2P-RH3P)*VLPO4
 !    3,(RHA0B1-RHA2B1+RHA1B2-RHA3B2+RHF0B1-RHF2B1+RHF1B2-RHF3B2
-!    4+RHCDB2-RXO2B-RXO1B-RH1B-RH2B-RH3B)*VLPOB(L,NY,NX)
+!    4+RHCDB2-RXO2B-RXO1B-RH1B-RH2B-RH3B)*VLPOB
 !     WRITE(20,1111)'COH1',I,J,L,M,COH1,ROH,RHOH
 !    2,RYH2P,RYH2B,RXH1P,RXH1B,RPALPX,RCAO,RMGO
 !    2,RPCAHX,RALO1,RALO2,RALO3,RALO4,RFEO1,RFEO2,RFEO3,RFEO4
@@ -2318,9 +2747,8 @@ module SaltChemEquilibriaMod
       end subroutine UpdateIonConcCurrentIter
 !------------------------------------------------------------------------------------------
 
-      subroutine AccumulateIonFlux(L,NY,NX)
+      subroutine AccumulateIonFlux
       implicit none
-      integer, intent(in) :: L,NY,NX
 !     begin_execution
 !     ACCUMULATE TOTAL ION FLUXES FOR ALL ITERATIONS
 !
@@ -2352,99 +2780,99 @@ module SaltChemEquilibriaMod
 !     TRALPB,TRFEPB,TRCPDB,TRCPHB,TRCPMB
 !     =total AlPO4,FePO4,CaHPO4,apatite,Ca(H2PO4)2 precipitation in band
 !
-      TRN4S(L,NY,NX)=TRN4S(L,NY,NX)+RN4S
-      TRN4B(L,NY,NX)=TRN4B(L,NY,NX)+RN4B
-      TRN3S(L,NY,NX)=TRN3S(L,NY,NX)+RN3S
-      TRN3B(L,NY,NX)=TRN3B(L,NY,NX)+RN3B
-      TRAL(L,NY,NX)=TRAL(L,NY,NX)+RAL
-      TRFE(L,NY,NX)=TRFE(L,NY,NX)+RFE
-      TRHY(L,NY,NX)=TRHY(L,NY,NX)+RHY+RHHY
-      TRCA(L,NY,NX)=TRCA(L,NY,NX)+RCA
-      TRMG(L,NY,NX)=TRMG(L,NY,NX)+RMG
-      TRNA(L,NY,NX)=TRNA(L,NY,NX)+RNA
-      TRKA(L,NY,NX)=TRKA(L,NY,NX)+RKA
-      TROH(L,NY,NX)=TROH(L,NY,NX)+ROH+RHOH
-      TRSO4(L,NY,NX)=TRSO4(L,NY,NX)+RSO4
-      TRCO3(L,NY,NX)=TRCO3(L,NY,NX)+RCO3
-      TRHCO(L,NY,NX)=TRHCO(L,NY,NX)+RHCO
-      TRCO2(L,NY,NX)=TRCO2(L,NY,NX)+RCO2
-      TRAL1(L,NY,NX)=TRAL1(L,NY,NX)+RAL1
-      TRAL2(L,NY,NX)=TRAL2(L,NY,NX)+RAL2
-      TRAL3(L,NY,NX)=TRAL3(L,NY,NX)+RAL3
-      TRAL4(L,NY,NX)=TRAL4(L,NY,NX)+RAL4
-      TRALS(L,NY,NX)=TRALS(L,NY,NX)+RALS
-      TRFE1(L,NY,NX)=TRFE1(L,NY,NX)+RFE1
-      TRFE2(L,NY,NX)=TRFE2(L,NY,NX)+RFE2
-      TRFE3(L,NY,NX)=TRFE3(L,NY,NX)+RFE3
-      TRFE4(L,NY,NX)=TRFE4(L,NY,NX)+RFE4
-      TRFES(L,NY,NX)=TRFES(L,NY,NX)+RFES
-      TRCAO(L,NY,NX)=TRCAO(L,NY,NX)+RCAO
-      TRCAC(L,NY,NX)=TRCAC(L,NY,NX)+RCAC
-      TRCAH(L,NY,NX)=TRCAH(L,NY,NX)+RCAH
-      TRCAS(L,NY,NX)=TRCAS(L,NY,NX)+RCAS
-      TRMGO(L,NY,NX)=TRMGO(L,NY,NX)+RMGO
-      TRMGC(L,NY,NX)=TRMGC(L,NY,NX)+RMGC
-      TRMGH(L,NY,NX)=TRMGH(L,NY,NX)+RMGH
-      TRMGS(L,NY,NX)=TRMGS(L,NY,NX)+RMGS
-      TRNAC(L,NY,NX)=TRNAC(L,NY,NX)+RNAC
-      TRNAS(L,NY,NX)=TRNAS(L,NY,NX)+RNAS
-      TRKAS(L,NY,NX)=TRKAS(L,NY,NX)+RKAS
-      TRH0P(L,NY,NX)=TRH0P(L,NY,NX)+RHP0
-      TRH1P(L,NY,NX)=TRH1P(L,NY,NX)+RHP1
-      TRH2P(L,NY,NX)=TRH2P(L,NY,NX)+RHP2
-      TRH3P(L,NY,NX)=TRH3P(L,NY,NX)+RHP3
-      TRF1P(L,NY,NX)=TRF1P(L,NY,NX)+RF1P
-      TRF2P(L,NY,NX)=TRF2P(L,NY,NX)+RF2P
-      TRC0P(L,NY,NX)=TRC0P(L,NY,NX)+RC0P
-      TRC1P(L,NY,NX)=TRC1P(L,NY,NX)+RC1P
-      TRC2P(L,NY,NX)=TRC2P(L,NY,NX)+RC2P
-      TRM1P(L,NY,NX)=TRM1P(L,NY,NX)+RM1P
-      TRH0B(L,NY,NX)=TRH0B(L,NY,NX)+RHB0
-      TRH1B(L,NY,NX)=TRH1B(L,NY,NX)+RHB1
-      TRH2B(L,NY,NX)=TRH2B(L,NY,NX)+RHB2
-      TRH3B(L,NY,NX)=TRH3B(L,NY,NX)+RHB3
-      TRF1B(L,NY,NX)=TRF1B(L,NY,NX)+RF1B
-      TRF2B(L,NY,NX)=TRF2B(L,NY,NX)+RF2B
-      TRC0B(L,NY,NX)=TRC0B(L,NY,NX)+RC0B
-      TRC1B(L,NY,NX)=TRC1B(L,NY,NX)+RC1B
-      TRC2B(L,NY,NX)=TRC2B(L,NY,NX)+RC2B
-      TRM1B(L,NY,NX)=TRM1B(L,NY,NX)+RM1B
-      TRXN4(L,NY,NX)=TRXN4(L,NY,NX)+RXN4
-      TRXNB(L,NY,NX)=TRXNB(L,NY,NX)+RXNB
-      TRXHY(L,NY,NX)=TRXHY(L,NY,NX)+RXHY
-      TRXAL(L,NY,NX)=TRXAL(L,NY,NX)+RXAL
-      TRXFE(L,NY,NX)=TRXFE(L,NY,NX)+RXFE
-      TRXCA(L,NY,NX)=TRXCA(L,NY,NX)+RXCA
-      TRXMG(L,NY,NX)=TRXMG(L,NY,NX)+RXMG
-      TRXNA(L,NY,NX)=TRXNA(L,NY,NX)+RXNA
-      TRXKA(L,NY,NX)=TRXKA(L,NY,NX)+RXKA
-      TRXHC(L,NY,NX)=TRXHC(L,NY,NX)+RXHC
-      TRXAL2(L,NY,NX)=TRXAL2(L,NY,NX)+RXALO2
-      TRXFE2(L,NY,NX)=TRXFE2(L,NY,NX)+RXFEO2
-      TRXH0(L,NY,NX)=TRXH0(L,NY,NX)+RXH0
-      TRXH1(L,NY,NX)=TRXH1(L,NY,NX)+RXH1
-      TRXH2(L,NY,NX)=TRXH2(L,NY,NX)+RXH2
-      TRX1P(L,NY,NX)=TRX1P(L,NY,NX)+RX1P
-      TRX2P(L,NY,NX)=TRX2P(L,NY,NX)+RX2P
-      TRBH0(L,NY,NX)=TRBH0(L,NY,NX)+RBH0
-      TRBH1(L,NY,NX)=TRBH1(L,NY,NX)+RBH1
-      TRBH2(L,NY,NX)=TRBH2(L,NY,NX)+RBH2
-      TRB1P(L,NY,NX)=TRB1P(L,NY,NX)+RB1P
-      TRB2P(L,NY,NX)=TRB2P(L,NY,NX)+RB2P
-      TRALOH(L,NY,NX)=TRALOH(L,NY,NX)+RPALOX
-      TRFEOH(L,NY,NX)=TRFEOH(L,NY,NX)+RPFEOX
-      TRCACO(L,NY,NX)=TRCACO(L,NY,NX)+RPCACX
-      TRCASO(L,NY,NX)=TRCASO(L,NY,NX)+RPCASO
-      TRALPO(L,NY,NX)=TRALPO(L,NY,NX)+RPALPX
-      TRFEPO(L,NY,NX)=TRFEPO(L,NY,NX)+RPFEPX
-      TRCAPD(L,NY,NX)=TRCAPD(L,NY,NX)+RPCADX
-      TRCAPH(L,NY,NX)=TRCAPH(L,NY,NX)+RPCAHX
-      TRCAPM(L,NY,NX)=TRCAPM(L,NY,NX)+RPCAMX
-      TRALPB(L,NY,NX)=TRALPB(L,NY,NX)+RPALBX
-      TRFEPB(L,NY,NX)=TRFEPB(L,NY,NX)+RPFEBX
-      TRCPDB(L,NY,NX)=TRCPDB(L,NY,NX)+RPCDBX
-      TRCPHB(L,NY,NX)=TRCPHB(L,NY,NX)+RPCHBX
-      TRCPMB(L,NY,NX)=TRCPMB(L,NY,NX)+RPCMBX
+      TRN4S=TRN4S+RN4S
+      TRN4B=TRN4B+RN4B
+      TRN3S=TRN3S+RN3S
+      TRN3B=TRN3B+RN3B
+      TRAL=TRAL+RAL
+      TRFE=TRFE+RFE
+      TRHY=TRHY+RHY+RHHY
+      TRCA=TRCA+RCA
+      TRMG=TRMG+RMG
+      TRNA=TRNA+RNA
+      TRKA=TRKA+RKA
+      TROH=TROH+ROH+RHOH
+      TRSO4=TRSO4+RSO4
+      TRCO3=TRCO3+RCO3
+      TRHCO=TRHCO+RHCO
+      TRCO2=TRCO2+RCO2
+      TRAL1=TRAL1+RAL1
+      TRAL2=TRAL2+RAL2
+      TRAL3=TRAL3+RAL3
+      TRAL4=TRAL4+RAL4
+      TRALS=TRALS+RALS
+      TRFE1=TRFE1+RFE1
+      TRFE2=TRFE2+RFE2
+      TRFE3=TRFE3+RFE3
+      TRFE4=TRFE4+RFE4
+      TRFES=TRFES+RFES
+      TRCAO=TRCAO+RCAO
+      TRCAC=TRCAC+RCAC
+      TRCAH=TRCAH+RCAH
+      TRCAS=TRCAS+RCAS
+      TRMGO=TRMGO+RMGO
+      TRMGC=TRMGC+RMGC
+      TRMGH=TRMGH+RMGH
+      TRMGS=TRMGS+RMGS
+      TRNAC=TRNAC+RNAC
+      TRNAS=TRNAS+RNAS
+      TRKAS=TRKAS+RKAS
+      TRH0P=TRH0P+RHP0
+      TRH1P=TRH1P+RHP1
+      TRH2P=TRH2P+RHP2
+      TRH3P=TRH3P+RHP3
+      TRF1P=TRF1P+RF1P
+      TRF2P=TRF2P+RF2P
+      TRC0P=TRC0P+RC0P
+      TRC1P=TRC1P+RC1P
+      TRC2P=TRC2P+RC2P
+      TRM1P=TRM1P+RM1P
+      TRH0B=TRH0B+RHB0
+      TRH1B=TRH1B+RHB1
+      TRH2B=TRH2B+RHB2
+      TRH3B=TRH3B+RHB3
+      TRF1B=TRF1B+RF1B
+      TRF2B=TRF2B+RF2B
+      TRC0B=TRC0B+RC0B
+      TRC1B=TRC1B+RC1B
+      TRC2B=TRC2B+RC2B
+      TRM1B=TRM1B+RM1B
+      TRXN4=TRXN4+RXN4
+      TRXNB=TRXNB+RXNB
+      TRXHY=TRXHY+RXHY
+      TRXAL=TRXAL+RXAL
+      TRXFE=TRXFE+RXFE
+      TRXCA=TRXCA+RXCA
+      TRXMG=TRXMG+RXMG
+      TRXNA=TRXNA+RXNA
+      TRXKA=TRXKA+RXKA
+      TRXHC=TRXHC+RXHC
+      TRXAL2=TRXAL2+RXALO2
+      TRXFE2=TRXFE2+RXFEO2
+      TRXH0=TRXH0+RXH0
+      TRXH1=TRXH1+RXH1
+      TRXH2=TRXH2+RXH2
+      TRX1P=TRX1P+RX1P
+      TRX2P=TRX2P+RX2P
+      TRBH0=TRBH0+RBH0
+      TRBH1=TRBH1+RBH1
+      TRBH2=TRBH2+RBH2
+      TRB1P=TRB1P+RB1P
+      TRB2P=TRB2P+RB2P
+      TRALOH=TRALOH+RPALOX
+      TRFEOH=TRFEOH+RPFEOX
+      TRCACO=TRCACO+RPCACX
+      TRCASO=TRCASO+RPCASO
+      TRALPO=TRALPO+RPALPX
+      TRFEPO=TRFEPO+RPFEPX
+      TRCAPD=TRCAPD+RPCADX
+      TRCAPH=TRCAPH+RPCAHX
+      TRCAPM=TRCAPM+RPCAMX
+      TRALPB=TRALPB+RPALBX
+      TRFEPB=TRFEPB+RPFEBX
+      TRCPDB=TRCPDB+RPCDBX
+      TRCPHB=TRCPHB+RPCHBX
+      TRCPMB=TRCPMB+RPCMBX
       end subroutine AccumulateIonFlux
 
 end module SaltChemEquilibriaMod

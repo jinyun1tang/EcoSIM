@@ -188,7 +188,6 @@ END subroutine MicrobeModel
   micfor%RPOBY =RPOBY(L,NY,NX)
   micfor%RP1BY =RP1BY(L,NY,NX)
   micfor%ROXYL =ROXYL(L,NY,NX)
-  micfor%CFOMC =CFOMC(1:2,L,NY,NX)
   micfor%ROQCY(0:jcplx1)=ROQCY(0:jcplx1,L,NY,NX)
   micfor%ROQAY(0:jcplx1)=ROQAY(0:jcplx1,L,NY,NX)
   micfor%litrm=(L==0)
@@ -225,6 +224,8 @@ END subroutine MicrobeModel
     micfor%RP14YU =RP14Y(NU(NY,NX),NY,NX)
     micfor%VOLWU =VOLW(NU(NY,NX),NY,NX)
     micfor%CFOMCU=CFOMC(1:2,NU(NY,NX),NY,NX)
+  else
+    micfor%CFOMC =CFOMC(1:2,L,NY,NX)
   endif
   micstt%CNH4B =CNH4B(L,NY,NX)
   micstt%CNH4S =CNH4S(L,NY,NX)

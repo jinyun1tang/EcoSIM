@@ -1875,7 +1875,7 @@ module RedistMod
     !2233  FORMAT(A8,5I4,30F17.8)
     !     ENDIF
     !
-    call SumOMStates(L,NY,NX,ORGC(L,NY,NX))
+    call SumOMStates(L,NY,NX,DORGC(L,NY,NX))
 !
 !     TOTAL SALT IONS
 !

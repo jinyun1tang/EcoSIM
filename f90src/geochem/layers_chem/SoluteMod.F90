@@ -27,93 +27,44 @@ module SoluteMod
   private
   character(len=*),private, parameter :: mod_filename = __FILE__
 
-  real(r8) :: BKVLNH,BKVLNB
-  real(r8) :: BKVLNO,BKVLNZ,BKVLPO,BKVLPB,COMA,CNHUA
-  real(r8) :: CCO20
-  real(r8) :: DWNH4,DPFLW,DNH4S,DNH3S,DXNH4,DWNO3,DNO3S,DNO2S
-  real(r8) :: DWPO4,DZH0P,DZH1P,DZH2P,DZH3P,DZF1P,DZF2P,DZC0P
-  real(r8) :: DZC1P,DZC2P,DZM1P,DXOH0,DXOH1,DXOH2,DXH1P,DXH2P
-  real(r8) :: DPALP,DPFEP,DPCDP,DPCHP,DPCMP,DUKD,DFNSA,DFNSB
-  real(r8) :: FLWD,FVLNH4,FVLNO3,FVLPO4
-  real(r8) :: P3,RSN4AA,RSN4BA,RSN3AA,RSN3BA,RSNUAA,RSNUBA,RSNOAA
-  real(r8) :: RSNOBA,RSN4BB,RSN3BB,RSNUBB,RSNOBB,RN4X,RN3X,RH1PX
-  real(r8) :: RH2PX
-  real(r8) :: THETWR
-  real(r8) :: VOLWMX,VOLWMP,VOLWNX,XVLNH4
-!
+  real(r8) :: RSN4AA,RSN4BA,RSN3AA,RSN3BA,RSNUAA,RSNUBA,RSNOAA
+  real(r8) :: RSNOBA,RSN4BB,RSN3BB,RSNUBB,RSNOBB
   real(r8) :: RSNUA, RSNUB
 
-
-  public :: solute
+  public :: UreaHydrolysis
+  public :: UpdateSoilFertlizer
+  public :: UpdateFertilizerBand
+  public :: GeoChemEquilibria
+  public :: updatesoluteinsurfaceresidue
   contains
 
-  SUBROUTINE solute(I,J,NHW,NHE,NVN,NVS)
-!
-!     THIS SUBROUTINE CALCULATES ALL SOLUTE TRANSFORMATIONS
-!     FROM THERMODYNAMIC EQUILIBRIA
-!
+
+!------------------------------------------------------------------------
+
+  subroutine GeoChemEquilibria(chemvar, solflx)
+
   implicit none
+  type(chem_var_type), intent(inout) :: chemvar
+  type(solute_flx_type), intent(inout) :: solflx
 
-  integer, intent(in) :: I, J
-  integer, intent(in) :: NHW, NHE, NVN, NVS
+  IF(ISALTG.NE.0)THEN
 
-! declaration of local variables
-  integer :: L,NY,NX,NPI
-  real(r8) :: RHP1,RHP2,RN3S,RN4S
-!     begin_execution
-  NPI=INT(NPH/2)
-  DO   NX=NHW,NHE
-    DO   NY=NVN,NVS
-      DO   L=NU(NY,NX),NL(NY,NX)
-        IF(VOLX(L,NY,NX).GT.ZEROS2(NY,NX) &
-          .AND.VOLWM(NPH,L,NY,NX).GT.ZEROS2(NY,NX))THEN
-!
-!     WATER VOLUME IN NON-BAND AND BAND SOIL ZONES
-!
-!     VOLWM=soil water volume
-!     VLNH4,VLNHB=fractions of soil volume in NH4 non-band,band
-!     VLNO3,VLNOB=fractions of soil volume in N03 non-band,band
-!     VLPO4,VLPOB=fractions of soil volume in H2PO4 non-band,band
-!     BKVL=soil mass
-!
-          VOLWNH=VOLWM(NPH,L,NY,NX)*VLNH4(L,NY,NX)
-          VOLWNB=VOLWM(NPH,L,NY,NX)*VLNHB(L,NY,NX)
-          VOLWNO=VOLWM(NPH,L,NY,NX)*VLNO3(L,NY,NX)
-          VOLWNZ=VOLWM(NPH,L,NY,NX)*VLNOB(L,NY,NX)
-          VOLWPO=VOLWM(NPH,L,NY,NX)*VLPO4(L,NY,NX)
-          VOLWPB=VOLWM(NPH,L,NY,NX)*VLPOB(L,NY,NX)
-          IF(BKVL(L,NY,NX).GT.ZEROS(NY,NX))THEN
-            BKVLX=BKVL(L,NY,NX)
-            BKVLNH=BKVL(L,NY,NX)*VLNH4(L,NY,NX)
-            BKVLNB=BKVL(L,NY,NX)*VLNHB(L,NY,NX)
-            BKVLNO=BKVL(L,NY,NX)*VLNO3(L,NY,NX)
-            BKVLNZ=BKVL(L,NY,NX)*VLNOB(L,NY,NX)
-            BKVLPO=BKVL(L,NY,NX)*VLPO4(L,NY,NX)
-            BKVLPB=BKVL(L,NY,NX)*VLPOB(L,NY,NX)
-          ELSE
-            BKVLX=VOLA(L,NY,NX)
-            BKVLNH=VOLWNH
-            BKVLNB=VOLWNB
-            BKVLNO=VOLWNO
-            BKVLNZ=VOLWNZ
-            BKVLPO=VOLWPO
-            BKVLPB=VOLWPB
-          ENDIF
+    call SaltChemEquilibria(chemvar,solflx)
 
-          call UpdateSoilFertlizer(L,NY,NX)
-!
-!     IF SALT OPTION SELECTED IN SITE FILE
-!     THEN SOLVE FULL SET OF EQUILIBRIA REACTIONS
-!
-!     ISALTG=salt flag from site file
-!
-          IF(ISALTG.NE.0)THEN
+  ELSE
+    call NoSaltChemEquilibria(chemvar,solflx)
+  ENDIF
 
-            call SaltChemEquilibria(L,NY,NX)
+  end subroutine GeoChemEquilibria
 
-          ELSE
-            call NoSaltChemEquilibria(L,NY,NX)
-          ENDIF
+
+!------------------------------------------------------------------------
+
+  subroutine UpdateFertilizerBand(L,NY,NX)
+
+  implicit none
+  integer, intent(in) :: L,NY,NX
+  real(r8) :: FLWD
 !
 !     CHANGE IN WIDTHS AND DEPTHS OF FERTILIZER BANDS FROM
 !     VERTICAL AND HORIZONTAL DIFFUSION DRIVEN BY CONCENTRATION
@@ -123,19 +74,19 @@ module SoluteMod
 !     FLWD=net vertical flow relative to area
 !
 !     IF(ROWI(I,NY,NX).GT.0.0)THEN
-          FLWD=0.5*(FLW(3,L,NY,NX)+FLW(3,L+1,NY,NX))/AREA(3,L,NY,NX)
+  FLWD=0.5*(FLW(3,L,NY,NX)+FLW(3,L+1,NY,NX))/AREA(3,L,NY,NX)
 !
 !     NH4 FERTILIZER BAND
 !
-          call UpdateNH3FertilizerBandinfo(L,NY,NX)
+  call UpdateNH3FertilizerBandinfo(L,NY,NX,FLWD)
 !
 !     NO3 FERTILIZER BAND
 !
-          call UpdateNO3FertilizerBandinfo(L,NY,NX)
+  call UpdateNO3FertilizerBandinfo(L,NY,NX,FLWD)
 !
 !     PO4 FERTILIZER BAND
 !
-          call UpdatePO4FertilizerBandinfo(L,NY,NX)
+  call UpdatePO4FertilizerBandinfo(L,NY,NX,FLWD)
 !     ENDIF
 !
 !     SUBTRACT FERTILIZER DISSOLUTION FROM FERTILIZER POOLS
@@ -151,14 +102,14 @@ module SoluteMod
 !     RSNUBB=rate of banded urea fertilizer dissolution in band
 !     RSNOBB=rate of banded NO3 fertilizer dissolution in band
 !
-          ZNH4FA(L,NY,NX)=ZNH4FA(L,NY,NX)-RSN4AA-RSN4BA
-          ZNH3FA(L,NY,NX)=ZNH3FA(L,NY,NX)-RSN3AA-RSN3BA
-          ZNHUFA(L,NY,NX)=ZNHUFA(L,NY,NX)-RSNUAA-RSNUBA
-          ZNO3FA(L,NY,NX)=ZNO3FA(L,NY,NX)-RSNOAA-RSNOBA
-          ZNH4FB(L,NY,NX)=ZNH4FB(L,NY,NX)-RSN4BB
-          ZNH3FB(L,NY,NX)=ZNH3FB(L,NY,NX)-RSN3BB
-          ZNHUFB(L,NY,NX)=ZNHUFB(L,NY,NX)-RSNUBB
-          ZNO3FB(L,NY,NX)=ZNO3FB(L,NY,NX)-RSNOBB
+  ZNH4FA(L,NY,NX)=ZNH4FA(L,NY,NX)-RSN4AA-RSN4BA
+  ZNH3FA(L,NY,NX)=ZNH3FA(L,NY,NX)-RSN3AA-RSN3BA
+  ZNHUFA(L,NY,NX)=ZNHUFA(L,NY,NX)-RSNUAA-RSNUBA
+  ZNO3FA(L,NY,NX)=ZNO3FA(L,NY,NX)-RSNOAA-RSNOBA
+  ZNH4FB(L,NY,NX)=ZNH4FB(L,NY,NX)-RSN4BB
+  ZNH3FB(L,NY,NX)=ZNH3FB(L,NY,NX)-RSN3BB
+  ZNHUFB(L,NY,NX)=ZNHUFB(L,NY,NX)-RSNUBB
+  ZNO3FB(L,NY,NX)=ZNO3FB(L,NY,NX)-RSNOBB
 !
 !     ADD FERTILIZER DISSOLUTION TO ION FLUXES AND CONVERT TO MASS
 !
@@ -167,100 +118,37 @@ module SoluteMod
 !     TRN3S,TRN3B=NH3 dissolution from urea in non-band,band
 !     TRNO3,TRNOB=NO3 dissolution in non-band,band
 !
-          TRN3G(L,NY,NX)=TRN3G(L,NY,NX)+RSN3AA+RSN3BA+RSN3BB
-          TRN4S(L,NY,NX)=TRN4S(L,NY,NX)+RSN4AA
-          TRN4B(L,NY,NX)=TRN4B(L,NY,NX)+RSN4BA+RSN4BB
-          TRN3S(L,NY,NX)=TRN3S(L,NY,NX)+RSNUAA
-          TRN3B(L,NY,NX)=TRN3B(L,NY,NX)+RSNUBA+RSNUBB
-          TRNO3(L,NY,NX)=TRNO3(L,NY,NX)+RSNOAA
-          TRNOB(L,NY,NX)=TRNOB(L,NY,NX)+RSNOBA+RSNOBB
-          TRCO2(L,NY,NX)=TRCO2(L,NY,NX)*12.0
-          TRN3G(L,NY,NX)=TRN3G(L,NY,NX)*14.0
-          TRN4S(L,NY,NX)=TRN4S(L,NY,NX)*14.0
-          TRN4B(L,NY,NX)=TRN4B(L,NY,NX)*14.0
-          TRN3S(L,NY,NX)=TRN3S(L,NY,NX)*14.0
-          TRN3B(L,NY,NX)=TRN3B(L,NY,NX)*14.0
-          TRNO3(L,NY,NX)=TRNO3(L,NY,NX)*14.0
-          TRNOB(L,NY,NX)=TRNOB(L,NY,NX)*14.0
-          TRNO2(L,NY,NX)=TRNO2(L,NY,NX)*14.0
-          TRN2B(L,NY,NX)=TRN2B(L,NY,NX)*14.0
-          TRH1P(L,NY,NX)=TRH1P(L,NY,NX)*31.0
-          TRH2P(L,NY,NX)=TRH2P(L,NY,NX)*31.0
-          TRH1B(L,NY,NX)=TRH1B(L,NY,NX)*31.0
-          TRH2B(L,NY,NX)=TRH2B(L,NY,NX)*31.0
-        ENDIF
-!     IF(I.EQ.116)THEN
-!     WRITE(*,9984)'TRN3S',I,J,L,TRN4S(L,NY,NX),TRN3S(L,NY,NX)
-!9984  FORMAT(A8,3I4,20F14.7)
-!     ENDIF
-      ENDDO
-!
-!     SURFACE RESIDUE
-!
-      call UpdateSoluteInSurfaceResidue(NX,NY)
-!
-!     TOTAL ION FLUXES FOR ALL REACTIONS ABOVE
-!
-!     RN4S=net NH4 flux in litter
-!     RN3S=net NH3 flux in litter
-!     RHP1,RHP2=net HPO4,H2PO4 flux in litter
-!
-      RN4S=RNH4-RXN4
-      RN3S=-RNH4
-      RHP1=-RH2P
-      RHP2=RH2P-RPALPX-RPFEPX-RPCADX-2.0*RPCAMX-3.0*RPCAHX
-!
-!     CONVERT TOTAL ION FLUXES FROM CHANGES IN CONCENTRATION
-!     TO CHANGES IN MASS PER UNIT AREA FOR USE IN 'REDIST'
-!
-!     TRN4S=total NH4 flux
-!     TRN3S=total NH3 flux
-!     TRH1P,TRH2P=net HPO4,H2PO4 flux
-!     TRNX4=total NH4 adsorption
-!     TRALPO,TRFEPO,TRCAPD,TRCAPH,TRCAPM
-!     =total AlPO4,FePO4,CaHPO4,apatite,Ca(H2PO4)2 precipitation
-!
-      TRN4S(0,NY,NX)=TRN4S(0,NY,NX)+RN4S*VOLWM(NPH,0,NY,NX)
-      TRN3S(0,NY,NX)=TRN3S(0,NY,NX)+RN3S*VOLWM(NPH,0,NY,NX)
-      TRH1P(0,NY,NX)=TRH1P(0,NY,NX)+RHP1*VOLWM(NPH,0,NY,NX)
-      TRH2P(0,NY,NX)=TRH2P(0,NY,NX)+RHP2*VOLWM(NPH,0,NY,NX)
-      TRXN4(0,NY,NX)=TRXN4(0,NY,NX)+RXN4*VOLWM(NPH,0,NY,NX)
-      TRALPO(0,NY,NX)=TRALPO(0,NY,NX)+RPALPX*VOLWM(NPH,0,NY,NX)
-      TRFEPO(0,NY,NX)=TRFEPO(0,NY,NX)+RPFEPX*VOLWM(NPH,0,NY,NX)
-      TRCAPD(0,NY,NX)=TRCAPD(0,NY,NX)+RPCADX*VOLWM(NPH,0,NY,NX)
-      TRCAPH(0,NY,NX)=TRCAPH(0,NY,NX)+RPCAHX*VOLWM(NPH,0,NY,NX)
-      TRCAPM(0,NY,NX)=TRCAPM(0,NY,NX)+RPCAMX*VOLWM(NPH,0,NY,NX)
-      ZNH4FA(0,NY,NX)=ZNH4FA(0,NY,NX)-RSN4AA
-      ZNH3FA(0,NY,NX)=ZNH3FA(0,NY,NX)-RSN3AA
-      ZNHUFA(0,NY,NX)=ZNHUFA(0,NY,NX)-RSNUAA
-      ZNO3FA(0,NY,NX)=ZNO3FA(0,NY,NX)-RSNOAA
-      TRN4S(0,NY,NX)=TRN4S(0,NY,NX)+RSN4AA
-      TRN3S(0,NY,NX)=TRN3S(0,NY,NX)+RSN3AA+RSNUAA
-      TRNO3(0,NY,NX)=TRNO3(0,NY,NX)+RSNOAA
-      TRN4S(0,NY,NX)=TRN4S(0,NY,NX)*14.0
-      TRN3S(0,NY,NX)=TRN3S(0,NY,NX)*14.0
-      TRNO3(0,NY,NX)=TRNO3(0,NY,NX)*14.0
-      TRH1P(0,NY,NX)=TRH1P(0,NY,NX)*31.0
-      TRH2P(0,NY,NX)=TRH2P(0,NY,NX)*31.0
-!     WRITE(*,9989)'TRN4S',I,J,TRN4S(0,NY,NX)
-!    2,RN4S,RNH4,RXN4,RSN4AA,VOLWM(NPH,0,NY,NX)
-!    3,SPNH4,ZNH4FA(0,NY,NX),THETWR
-!9989  FORMAT(A8,2I4,12E12.4)
-    ENDDO
-  ENDDO
-  RETURN
-  end subroutine solute
+  TRN3G(L,NY,NX)=TRN3G(L,NY,NX)+RSN3AA+RSN3BA+RSN3BB
+  TRN4S(L,NY,NX)=TRN4S(L,NY,NX)+RSN4AA
+  TRN4B(L,NY,NX)=TRN4B(L,NY,NX)+RSN4BA+RSN4BB
+  TRN3S(L,NY,NX)=TRN3S(L,NY,NX)+RSNUAA
+  TRN3B(L,NY,NX)=TRN3B(L,NY,NX)+RSNUBA+RSNUBB
+  TRNO3(L,NY,NX)=TRNO3(L,NY,NX)+RSNOAA
+  TRNOB(L,NY,NX)=TRNOB(L,NY,NX)+RSNOBA+RSNOBB
+  TRCO2(L,NY,NX)=TRCO2(L,NY,NX)*12.0
+  TRN3G(L,NY,NX)=TRN3G(L,NY,NX)*14.0
+  TRN4S(L,NY,NX)=TRN4S(L,NY,NX)*14.0
+  TRN4B(L,NY,NX)=TRN4B(L,NY,NX)*14.0
+  TRN3S(L,NY,NX)=TRN3S(L,NY,NX)*14.0
+  TRN3B(L,NY,NX)=TRN3B(L,NY,NX)*14.0
+  TRNO3(L,NY,NX)=TRNO3(L,NY,NX)*14.0
+  TRNOB(L,NY,NX)=TRNOB(L,NY,NX)*14.0
+  TRNO2(L,NY,NX)=TRNO2(L,NY,NX)*14.0
+  TRN2B(L,NY,NX)=TRN2B(L,NY,NX)*14.0
+  TRH1P(L,NY,NX)=TRH1P(L,NY,NX)*31.0
+  TRH2P(L,NY,NX)=TRH2P(L,NY,NX)*31.0
+  TRH1B(L,NY,NX)=TRH1B(L,NY,NX)*31.0
+  TRH2B(L,NY,NX)=TRH2B(L,NY,NX)*31.0
+  end subroutine UpdateFertilizerBand
+
 !------------------------------------------------------------------------
 
   subroutine UreaHydrolysis(L,NY,NX)
 
   implicit none
   integer, intent(in) :: L,NY,NX
-  real(r8) :: CNHUB
-!      real(r8), intent(out) :: RSNUA
-!      real(r8), intent(out) :: RSNUB
-!      real(r8) :: CNHUA, COMA, DUKD
-!      real(r8) :: DFNSA
+  real(r8) :: CNHUB,COMA
+  real(r8) :: DFNSB,CNHUA,DFNSA,DUKD
 !     begin_execution
 !
 !     UREA HYDROLYSIS IN BAND AND NON-BAND SOIL ZONES
@@ -282,10 +170,8 @@ module SoluteMod
 !     ZNHU0,ZNHUI=initial,current inhibition activity
 !     RNHUI=rate constants for decline in urea hydrolysis inhibition
 !
-  IF(ZNHU0(L,NY,NX).GT.ZEROS(NY,NX) &
-    .AND.ZNHUI(L,NY,NX).GT.ZEROS(NY,NX))THEN
-    ZNHUI(L,NY,NX)=ZNHUI(L,NY,NX) &
-      -RNHUI(IUTYP(NY,NX))*ZNHUI(L,NY,NX) &
+  IF(ZNHU0(L,NY,NX).GT.ZEROS(NY,NX).AND.ZNHUI(L,NY,NX).GT.ZEROS(NY,NX))THEN
+    ZNHUI(L,NY,NX)=ZNHUI(L,NY,NX)-RNHUI(IUTYP(NY,NX))*ZNHUI(L,NY,NX) &
       *AMAX1(RNHUI(IUTYP(NY,NX)),1.0-ZNHUI(L,NY,NX)/ZNHU0(L,NY,NX))
   ELSE
     ZNHUI(L,NY,NX)=0._r8
@@ -301,8 +187,7 @@ module SoluteMod
 !     TFNQ=temperature effect on microbial activity from nitro.f
 !     ZNHUI=current inhibition activity
 !
-  IF(ZNHUFA(L,NY,NX).GT.ZEROS(NY,NX) &
-    .AND.BKVL(L,NY,NX).GT.ZEROS(NY,NX))THEN
+  IF(ZNHUFA(L,NY,NX).GT.ZEROS(NY,NX).AND.BKVL(L,NY,NX).GT.ZEROS(NY,NX))THEN
     CNHUA=ZNHUFA(L,NY,NX)/BKVL(L,NY,NX)
   ELSEIF(VOLW(L,NY,NX).GT.ZEROS2(NY,NX))THEN
     CNHUA=ZNHUFA(L,NY,NX)/VOLW(L,NY,NX)
@@ -321,8 +206,7 @@ module SoluteMod
 !     SPNHU=specific rate constant for urea hydrolysis
 !     TFNQ=temperature effect on microbial activity from nitro.f
 !
-  IF(ZNHUFB(L,NY,NX).GT.ZEROS(NY,NX) &
-    .AND.BKVL(L,NY,NX).GT.ZEROS(NY,NX))THEN
+  IF(ZNHUFB(L,NY,NX).GT.ZEROS(NY,NX).AND.BKVL(L,NY,NX).GT.ZEROS(NY,NX))THEN
     CNHUB=ZNHUFB(L,NY,NX)/BKVL(L,NY,NX)
   ELSEIF(VOLW(L,NY,NX).GT.ZEROS2(NY,NX))THEN
     CNHUB=ZNHUFB(L,NY,NX)/VOLW(L,NY,NX)
@@ -343,18 +227,91 @@ module SoluteMod
   end subroutine UreaHydrolysis
 !------------------------------------------------------------------------
 
-  subroutine UpdateSoilFertlizer(L,NY,NX)
+  subroutine UpdateSoilFertlizer(L,NY,NX,chemvar)
 
   implicit none
   integer, intent(in) :: L,NY,NX
-
+  type(chem_var_type), target, intent(inout) :: chemvar
   real(r8) :: RH2BX,RNBX,R3BX,RH1BX
-  real(r8) :: VOLWPX
-!      real(r8), intent(out) :: XN4B, XN41
-!      real(r8) :: RN4X,RN3X
-!      real(r8) :: VOLWNX
-!      real(r8) :: RNBX
-!      real(r8) :: R3BX
+  real(r8) :: VOLWPX,VOLWNX
+  real(r8) :: RH2PX,RH1PX,RN3X,RN4X
+  real(r8), pointer :: VOLWNH
+  real(r8), pointer :: BKVLNH
+  real(r8), pointer :: BKVLNB
+  real(r8), pointer :: BKVLPO
+  real(r8), pointer :: BKVLPB
+  real(r8), pointer :: VOLWNB
+  real(r8), pointer :: VOLWPO
+  real(r8), pointer :: CH1P1
+  real(r8), pointer :: CH1PB
+  real(r8), pointer :: CH2P1
+  real(r8), pointer :: CH2PB
+  real(r8), pointer :: CN31
+  real(r8), pointer :: CN3B
+  real(r8), pointer :: CN41
+  real(r8), pointer :: CN4B
+  real(r8), pointer :: PALPO1
+  real(r8), pointer :: PALPOB
+  real(r8), pointer :: PCAPD1
+  real(r8), pointer :: PCAPDB
+  real(r8), pointer :: PCAPH1
+  real(r8), pointer :: PCAPHB
+  real(r8), pointer :: PCAPM1
+  real(r8), pointer :: PCAPMB
+  real(r8), pointer :: PFEPO1
+  real(r8), pointer :: PFEPOB
+  real(r8), pointer :: X1P1B
+  real(r8), pointer :: X2P1B
+  real(r8), pointer :: XH11B
+  real(r8), pointer :: XH1P1
+  real(r8), pointer :: XH21B
+  real(r8), pointer :: XH2P1
+  real(r8), pointer :: XN41
+  real(r8), pointer :: XN4B
+  real(r8), pointer :: XOH11
+  real(r8), pointer :: XOH21
+  real(r8), pointer :: XH01B
+  real(r8), pointer :: XOH01
+  real(r8), pointer :: VOLWPB
+
+  XOH01  =>  chemvar%XOH01
+  XH01B  =>  chemvar%XH01B
+  XOH21  =>  chemvar%XOH21
+  XOH11  =>  chemvar%XOH11
+  XH21B  =>  chemvar%XH21B
+  XH1P1  =>  chemvar%XH1P1
+  XH11B  =>  chemvar%XH11B
+  X1P1B  =>  chemvar%X1P1B
+  X2P1B  =>  chemvar%X2P1B
+  CH2PB  =>  chemvar%CH2PB
+  XN41   =>  chemvar%XN41
+  XN4B   =>  chemvar%XN4B
+  CN31   =>  chemvar%CN31
+  CN3B   =>  chemvar%CN3B
+  CN41   =>  chemvar%CN41
+  CN4B   =>  chemvar%CN4B
+  PALPO1 =>  chemvar%PALPO1
+  PALPOB =>  chemvar%PALPOB
+  PCAPD1 =>  chemvar%PCAPD1
+  PCAPDB =>  chemvar%PCAPDB
+  PCAPH1 =>  chemvar%PCAPH1
+  PCAPHB =>  chemvar%PCAPHB
+  PCAPM1 =>  chemvar%PCAPM1
+  PCAPMB =>  chemvar%PCAPMB
+  PFEPO1 =>  chemvar%PFEPO1
+  PFEPOB =>  chemvar%PFEPOB
+  CH2P1  =>  chemvar%CH2P1
+  CH1PB  =>  chemvar%CH1PB
+  CH1P1  =>  chemvar%CH1P1
+  XH2P1  =>  chemvar%XH2P1
+  VOLWNH =>  chemvar%VOLWNH
+  BKVLNH =>  chemvar%BKVLNH
+  BKVLNB =>  chemvar%BKVLNB
+  BKVLPO =>  chemvar%BKVLPO
+  BKVLPB =>  chemvar%BKVLPB
+  VOLWNB =>  chemvar%VOLWNB
+  VOLWPB =>  chemvar%VOLWPB
+  VOLWPO =>  chemvar%VOLWPO
 !     begin_execution
 
   call UreaHydrolysis(L,NY,NX)
@@ -522,9 +479,14 @@ module SoluteMod
 
 !------------------------------------------------------------------------------------------
 
-  subroutine UpdateNH3FertilizerBandinfo(L,NY,NX)
+  subroutine UpdateNH3FertilizerBandinfo(L,NY,NX,FLWD)
   implicit none
   integer, intent(in) :: L,NY,NX
+  real(r8), intent(in) :: FLWD
+
+  real(r8) :: XVLNH4,DWNH4,DXNH4
+  real(r8) :: DPFLW,DNH4S,DNH3S
+  real(r8) :: FVLNH4
 !     begin_execution
 !     IFNHB=banded NH4 fertilizer flag
 !     ROWN=NH4 fertilizer band row width
@@ -613,11 +575,16 @@ module SoluteMod
   end subroutine UpdateNH3FertilizerBandinfo
 !------------------------------------------------------------------------------------------
 
-  subroutine UpdatePO4FertilizerBandinfo(L,NY,NX)
+  subroutine UpdatePO4FertilizerBandinfo(L,NY,NX,FLWD)
   implicit none
   integer, intent(in) :: L,NY,NX
-  real(r8) :: XVLPO4
-
+  real(r8), intent(in) :: FLWD
+  real(r8) :: XVLPO4,DPFLW
+  real(r8) :: DWPO4,DZH0P,DZH1P
+  real(r8) :: DZH2P,DZH3P,DZF1P
+  real(r8) :: DZF2P,DZC0P
+  real(r8) :: DZC1P,DZC2P,DZM1P,DXOH0,DXOH1,DXOH2,DXH1P,DXH2P
+  real(r8) :: DPALP,DPFEP,DPCDP,DPCHP,DPCMP,FVLPO4
 !     begin_execution
 !     IFPOB=banded H2PO4 fertilizer flag
 !     ROWP=H2PO4 fertilizer band row width
@@ -824,10 +791,13 @@ module SoluteMod
   end subroutine UpdatePO4FertilizerBandinfo
 !------------------------------------------------------------------------------------------
 
-  subroutine UpdateNO3FertilizerBandinfo(L,NY,NX)
+  subroutine UpdateNO3FertilizerBandinfo(L,NY,NX,FLWD)
   implicit none
   integer, intent(in) :: L,NY,NX
-  real(r8) :: XVLNO3
+  real(r8), intent(in) :: FLWD
+  real(r8) :: XVLNO3,DWNO3,DNO3S
+  real(r8) :: DNO2S,FVLNO3,DPFLW
+
 !     begin_execution
 !     IFNOB=banded NO3 fertilizer flag
 !     ROWO=NO3 fertilizer band row width
@@ -922,6 +892,15 @@ module SoluteMod
   real(r8) :: CHY1,COH1,DP
   real(r8) :: FX,S0,S1,XALQ,XCAQ,XCAX
   real(r8) :: XFEQ,XHYQ,XN4Q,XTLQ
+  real(r8) :: VOLWMX,VOLWMP,BKVLX
+  real(r8) :: THETWR,COMA
+  real(r8) :: CNHUA
+  real(r8) :: CCO20
+  real(r8) :: RH1PX,RH2PX,DUKD,DFNSA,RN3X,RN4X
+  real(r8) :: CH1P1,CH2P1,CN31,CN41,PALPO1,PCAPD1
+  real(r8) :: PCAPH1,PCAPM1,PFEPO1,RH2P,RNH4,RPALPX
+  real(r8) :: RPCADX,RPCAHX,RPCAMX,RPFEPX,RXN4,XN41
+  real(r8) :: RHP1,RHP2,RN3S,RN4S
 !     begin_execution
 !     BKVL=litter mass
 !
@@ -1220,6 +1199,53 @@ module SoluteMod
     RPCAMX=0._r8
     RPCAHX=0._r8
   ENDIF
+!     TOTAL ION FLUXES FOR ALL REACTIONS ABOVE
+!
+!     RN4S=net NH4 flux in litter
+!     RN3S=net NH3 flux in litter
+!     RHP1,RHP2=net HPO4,H2PO4 flux in litter
+!
+      RN4S=RNH4-RXN4
+      RN3S=-RNH4
+      RHP1=-RH2P
+      RHP2=RH2P-RPALPX-RPFEPX-RPCADX-2.0*RPCAMX-3.0*RPCAHX
+!
+!     CONVERT TOTAL ION FLUXES FROM CHANGES IN CONCENTRATION
+!     TO CHANGES IN MASS PER UNIT AREA FOR USE IN 'REDIST'
+!
+!     TRN4S=total NH4 flux
+!     TRN3S=total NH3 flux
+!     TRH1P,TRH2P=net HPO4,H2PO4 flux
+!     TRNX4=total NH4 adsorption
+!     TRALPO,TRFEPO,TRCAPD,TRCAPH,TRCAPM
+!     =total AlPO4,FePO4,CaHPO4,apatite,Ca(H2PO4)2 precipitation
+!
+      TRN4S(0,NY,NX)=TRN4S(0,NY,NX)+RN4S*VOLWM(NPH,0,NY,NX)
+      TRN3S(0,NY,NX)=TRN3S(0,NY,NX)+RN3S*VOLWM(NPH,0,NY,NX)
+      TRH1P(0,NY,NX)=TRH1P(0,NY,NX)+RHP1*VOLWM(NPH,0,NY,NX)
+      TRH2P(0,NY,NX)=TRH2P(0,NY,NX)+RHP2*VOLWM(NPH,0,NY,NX)
+      TRXN4(0,NY,NX)=TRXN4(0,NY,NX)+RXN4*VOLWM(NPH,0,NY,NX)
+      TRALPO(0,NY,NX)=TRALPO(0,NY,NX)+RPALPX*VOLWM(NPH,0,NY,NX)
+      TRFEPO(0,NY,NX)=TRFEPO(0,NY,NX)+RPFEPX*VOLWM(NPH,0,NY,NX)
+      TRCAPD(0,NY,NX)=TRCAPD(0,NY,NX)+RPCADX*VOLWM(NPH,0,NY,NX)
+      TRCAPH(0,NY,NX)=TRCAPH(0,NY,NX)+RPCAHX*VOLWM(NPH,0,NY,NX)
+      TRCAPM(0,NY,NX)=TRCAPM(0,NY,NX)+RPCAMX*VOLWM(NPH,0,NY,NX)
+      ZNH4FA(0,NY,NX)=ZNH4FA(0,NY,NX)-RSN4AA
+      ZNH3FA(0,NY,NX)=ZNH3FA(0,NY,NX)-RSN3AA
+      ZNHUFA(0,NY,NX)=ZNHUFA(0,NY,NX)-RSNUAA
+      ZNO3FA(0,NY,NX)=ZNO3FA(0,NY,NX)-RSNOAA
+      TRN4S(0,NY,NX)=TRN4S(0,NY,NX)+RSN4AA
+      TRN3S(0,NY,NX)=TRN3S(0,NY,NX)+RSN3AA+RSNUAA
+      TRNO3(0,NY,NX)=TRNO3(0,NY,NX)+RSNOAA
+      TRN4S(0,NY,NX)=TRN4S(0,NY,NX)*14.0
+      TRN3S(0,NY,NX)=TRN3S(0,NY,NX)*14.0
+      TRNO3(0,NY,NX)=TRNO3(0,NY,NX)*14.0
+      TRH1P(0,NY,NX)=TRH1P(0,NY,NX)*31.0
+      TRH2P(0,NY,NX)=TRH2P(0,NY,NX)*31.0
+!     WRITE(*,9989)'TRN4S',I,J,TRN4S(0,NY,NX)
+!    2,RN4S,RNH4,RXN4,RSN4AA,VOLWM(NPH,0,NY,NX)
+!    3,SPNH4,ZNH4FA(0,NY,NX),THETWR
+!9989  FORMAT(A8,2I4,12E12.4)
   end subroutine UpdateSoluteInSurfaceResidue
 
 END module SoluteMod
