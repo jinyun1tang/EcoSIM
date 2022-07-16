@@ -13,9 +13,9 @@ CXX        = not-set
 FC         = not-set
 travis     = not-set
 F90        = not-set
+netcdfsys  = not-set
 
 # This proxies everything to the builddir cmake.
-netcdfsys = 1
 
 cputype = $(shell uname -m | sed "s/\\ /_/g")
 systype = $(shell uname -s)

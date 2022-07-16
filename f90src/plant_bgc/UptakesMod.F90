@@ -1138,7 +1138,7 @@ module UptakesMod
   RUPN3Ss1(N,L,NZ)=0.0_r8
   RCO2Ps1(N,L,NZ)=0.0_r8
   RUPOXPs1(N,L,NZ)=0.0_r8
-  DO 395 K=0,4
+  DO 395 K=0,jcplx11
     RDFOMCs1(N,K,L,NZ)=0.0_r8
     RDFOMNs1(N,K,L,NZ)=0.0_r8
     RDFOMPs1(N,K,L,NZ)=0.0_r8
@@ -2080,7 +2080,7 @@ module UptakesMod
   !      RA=canopy boundary layer resistance
   !     OSTR=O2 stress indicator
   !
-  DO 195 K=0,4
+  DO 195 K=0,jcplx11
     VOLWK=VOLWMs1(NPH,L)*FOSRHs1(K,L)
     IF(VOLWK.GT.ZEROS2s1 &
       .AND.RTVLWs1(N,L,NZ).GT.ZEROPs1(NZ))THEN
