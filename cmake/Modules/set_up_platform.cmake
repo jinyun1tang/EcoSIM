@@ -35,13 +35,13 @@ endif()
   set(Z_INCLUDE_DIR "${CMAKE_CURRENT_BINARY_DIR}/include")
   get_filename_component(Z_LIBRARY_DIR ${Z_LIBRARY} DIRECTORY)
 
-  set(CURL_LIBRARY "${CMAKE_CURRENT_BINARY_DIR}/lib/libcurl.a")
-  set(CURL_INCLUDE_DIR "${CMAKE_CURRENT_BINARY_DIR}/include")
-  get_filename_component(CURL_LIBRARY_DIR ${CURL_LIBRARY} DIRECTORY)
+#  set(CURL_LIBRARY "${CMAKE_CURRENT_BINARY_DIR}/lib/libcurl.a")
+#  set(CURL_INCLUDE_DIR "${CMAKE_CURRENT_BINARY_DIR}/include")
+#  get_filename_component(CURL_LIBRARY_DIR ${CURL_LIBRARY} DIRECTORY)
 
-  set(BLOSC_LIBRARY "${CMAKE_CURRENT_BINARY_DIR}/lib/libblosc.a")
-  set(BLOSC_INCLUDE_DIR "${CMAKE_CURRENT_BINARY_DIR}/include")
-  get_filename_component(BLOSC_LIBRARY_DIR ${BLOSC_LIBRARY} DIRECTORY)
+#  set(BLOSC_LIBRARY "${CMAKE_CURRENT_BINARY_DIR}/lib/libblosc.a")
+#  set(BLOSC_INCLUDE_DIR "${CMAKE_CURRENT_BINARY_DIR}/include")
+#  get_filename_component(BLOSC_LIBRARY_DIR ${BLOSC_LIBRARY} DIRECTORY)
 
   set(HDF5_LIB_NAME hdf5)
   set(HDF5_HL_LIB_NAME hdf5_hl)
@@ -72,13 +72,26 @@ endif()
   # Get the hostname for this machine.
   site_name(HOSTNAME)
   set(MACHINE "supported")
+
   if (HOSTNAME MATCHES "cori") # NERSC Cori phase1
     #ndk  make config debug=1 mpi=1 prefix=$SCRATCH/polymec
+    if(NOT INTEL_PATH)
+       execute_process(COMMAND module load intel)
+    endif()
     # (Intel's compilers don't do C11.).
     set(CMAKE_C_COMPILER $ENV{CC})
     set(CMAKE_CXX_COMPILER $ENV{CXX})
     set(CMAKE_Fortran_COMPILER $ENV{FC})
 
+     if(NOT NETCDF_DIR)
+       execute_process(COMMAND module load cray-netcdf)
+     endif()
+     set(ECOSIM_HAVE_NETCDF 1)
+     set(TPL_NETCDF_INCLUDE_DIRS $ENV{NETCDF_DIR}/include)
+     set(ECOSIM_TP_LIBS netcdf;${ECOSIM_TP_LIBS})
+     set(ECOSIM_TP_LIBS netcdff;${ECOSIM_TP_LIBS})
+     set(ECOSIM_LIBRARIES ${ECOSIM_LIBRARIES};${TPL_NETCDF_LIBRARIES})
+     set(ECOSIM_INCDIRS ${ECOSIM_INCDIRS};${TPL_NETCDF_INCLUDE_DIRS} PARENT_SCOPE)
     # We are cared for mathematically.
     set(NEED_LAPACK FALSE)
   elseif (HOSTNAME MATCHES "scs") # NERSC Cori phase1
@@ -120,5 +133,6 @@ endif()
     set(CMAKE_Fortran_COMPILER $ENV{FC})
     set(MACHINE "notsupported")
   endif()
+
 
 endmacro()

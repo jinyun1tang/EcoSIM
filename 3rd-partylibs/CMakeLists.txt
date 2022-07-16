@@ -2,68 +2,69 @@ include_directories(${PROJECT_BINARY_DIR}/include)
 
 if (ECOSIM_NEED_PFUNIT EQUAL 1)
 # Build pfunit, a fortran unit testing library.
-if (NOT EXISTS ${PROJECT_BINARY_DIR}/lib/libpfunit.a)
-  message("Configuring pfunit...")
-  execute_process(COMMAND cmake -E make_directory ${CMAKE_CURRENT_BINARY_DIR}/pfunit
-    RESULT_VARIABLE stat)
+  if (NOT EXISTS ${PROJECT_BINARY_DIR}/lib/libpfunit.a)
+    message("Configuring pfunit...")
+    execute_process(COMMAND cmake -E make_directory ${CMAKE_CURRENT_BINARY_DIR}/pfunit
+      RESULT_VARIABLE stat)
 
-  if (HAVE_MPI EQUAL 1)
-    message(FATAL_ERROR "BeTR pUFnit MPI build is not yet supported.")
+    if (HAVE_MPI EQUAL 1)
+      message(FATAL_ERROR "BeTR pUFnit MPI build is not yet supported.")
 
-    set(PFUNIT_CMAKE_OPTS ${PFUNIT_CMAKE_OPTS} -DMPI=YES -DMPI_MPIFC=${CMAKE_Fortran_COMPILER})
-  else()
-    set(PFUNIT_CMAKE_OPTS ${PFUNIT_CMAKE_OPTS} -DMPI=NO)
-  endif()
-
-  set(PFUNIT_CMAKE_OPTS
-    -DCMAKE_INSTALL_PREFIX=${PROJECT_BINARY_DIR}
-    -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
-    -DCMAKE_Fortran_FLAGS=${CMAKE_Fortran_FLAGS}
-    -DCMAKE_Fortran_COMPILER=${CMAKE_Fortran_COMPILER}
-    )
-  execute_process(COMMAND cmake
-    ${PFUNIT_CMAKE_OPTS}
-    ${CMAKE_CURRENT_SOURCE_DIR}/pfunit
-    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/pfunit
-    OUTPUT_VARIABLE pfunit_config.log ERROR_VARIABLE pfunit_config_err
-    RESULT_VARIABLE stat)
-
-  file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/pfunit_config.log ${pfunit_config_log})
-
-  if (NOT stat EQUAL 0)
-    if (TRAVIS_CI)
-      message("Error configuring pfunit:")
-      message(${pfunit_config_log})
-      message(FATAL_ERROR ${pfunit_config_err})
+      set(PFUNIT_CMAKE_OPTS ${PFUNIT_CMAKE_OPTS} -DMPI=YES -DMPI_MPIFC=${CMAKE_Fortran_COMPILER})
     else()
-      file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/pfunit_config_errors.log ${pfunit_config_err})
-      message(FATAL_ERROR "Configuration of pfunit library failed.")
+      set(PFUNIT_CMAKE_OPTS ${PFUNIT_CMAKE_OPTS} -DMPI=NO)
     endif()
-  endif()
 
-  message("Building and installing pfunit...")
-  execute_process(COMMAND make install -j4
+    set(PFUNIT_CMAKE_OPTS
+      -DCMAKE_INSTALL_PREFIX=${PROJECT_BINARY_DIR}
+      -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
+      -DCMAKE_Fortran_FLAGS=${CMAKE_Fortran_FLAGS}
+      -DCMAKE_Fortran_COMPILER=${CMAKE_Fortran_COMPILER}
+    )
+    execute_process(COMMAND cmake
+      ${PFUNIT_CMAKE_OPTS}
+      ${CMAKE_CURRENT_SOURCE_DIR}/pfunit
+      WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/pfunit
+      OUTPUT_VARIABLE pfunit_config.log ERROR_VARIABLE pfunit_config_err
+      RESULT_VARIABLE stat)
+
+    file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/pfunit_config.log ${pfunit_config_log})
+
+    if (NOT stat EQUAL 0)
+      if (TRAVIS_CI)
+        message("Error configuring pfunit:")
+        message(${pfunit_config_log})
+        message(FATAL_ERROR ${pfunit_config_err})
+      else()
+        file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/pfunit_config_errors.log ${pfunit_config_err})
+        message(FATAL_ERROR "Configuration of pfunit library failed.")
+      endif()
+    endif()
+
+    message("Building and installing pfunit...")
+    execute_process(COMMAND make install -j4
                   WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/pfunit
                   OUTPUT_VARIABLE pfunit_build_log ERROR_VARIABLE pfunit_build_err
                   RESULT_VARIABLE stat)
-  file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/pfunit_build.log ${pfunit_build_log})
-  if (NOT stat EQUAL 0)
-    if (TRAVIS_CI)
-      message("Error building pfunit:")
-      message(${pfunit_build_log})
-      message(FATAL_ERROR ${pfunit_build_err})
-    else()
-      file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/pfunit_build_errors.log ${pfunit_build_err})
-      message(FATAL_ERROR "Build of pfunit library failed.")
+    file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/pfunit_build.log ${pfunit_build_log})
+    if (NOT stat EQUAL 0)
+      if (TRAVIS_CI)
+        message("Error building pfunit:")
+        message(${pfunit_build_log})
+        message(FATAL_ERROR ${pfunit_build_err})
+      else()
+        file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/pfunit_build_errors.log ${pfunit_build_err})
+        message(FATAL_ERROR "Build of pfunit library failed.")
+      endif()
     endif()
   endif()
+  add_library(pfunit STATIC IMPORTED GLOBAL)
+  set_target_properties(pfunit PROPERTIES IMPORTED_LOCATION ${PROJECT_BINARY_DIR}/lib/libpfunit.a)
+  set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/3rd-party/pfunit/include/" PARENT_SCOPE)
+  set(ENV{PFUNIT} ${PROJECT_BINARY_DIR} CACHE)
+endif()
 
-endif()
-add_library(pfunit STATIC IMPORTED GLOBAL)
-set_target_properties(pfunit PROPERTIES IMPORTED_LOCATION ${PROJECT_BINARY_DIR}/lib/libpfunit.a)
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/3rd-party/pfunit/include/" PARENT_SCOPE)
-set(ENV{PFUNIT} ${PROJECT_BINARY_DIR} CACHE)
-endif()
+
 #remove netcdf dependence
 if (ECOSIM_HAVE_NETCDF EQUAL 1)
 return ()
@@ -171,8 +172,9 @@ if (EXISTS ${CURL_LIBRARY})
   endif()
   message(STATUS "CURL_INCLUDE_DIR ${CURL_INCLUDE_DIR}")
   message(STATUS "CURL_LIBRARY ${CURL_LIBRARY}")
+
+  set(ECOSIM_TP_LIBS curl;${ECOSIM_TP_LIBS})
 endif()
-set(ECOSIM_TP_LIBS curl;${ECOSIM_TP_LIBS})
 
 if (EXISTS ${BLOSC_LIBRARY})
   message("Preparing curl...")
