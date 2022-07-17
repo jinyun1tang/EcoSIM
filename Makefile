@@ -14,8 +14,8 @@ FC         = not-set
 travis     = not-set
 F90        = not-set
 netcdfsys  = not-set
-
 # This proxies everything to the builddir cmake.
+
 
 cputype = $(shell uname -m | sed "s/\\ /_/g")
 systype = $(shell uname -s)
@@ -130,8 +130,8 @@ ifeq ($(netcdfsys), not-set)
   NETCDF_FFLAGS =""
   NETCDF_FLIBS =""
 else
-  NETCDF_FFLAGS = $(shell ./nc_config --prefix)/include/
-  NETCDF_FLIBS = $(shell ./nc_config --flibs)
+  NETCDF_FFLAGS = $(shell ./nc_config --prefix --$(CC))/include/
+  NETCDF_FLIBS = $(shell ./nc_config --flibs --$(CC))
 endif
 
 CONFIG_FLAGS += -DTPL_NETCDF_INCLUDE_DIRS="$(NETCDF_FFLAGS)"
@@ -154,7 +154,7 @@ install: all
 	@if [ ! -f $(BUILDDIR)/Makefile ]; then \
 		more INSTALL; \
 	else \
-		$(MAKE) -C $(BUILDDIR) $@ --no-print-directory $(MAKEFLAGS); \
+		$(MAKE)  -C $(BUILDDIR) $@ --no-print-directory $(MAKEFLAGS); \
 	fi
 
 test: install
