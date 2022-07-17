@@ -130,11 +130,11 @@ ifeq ($(netcdfsys), not-set)
   NETCDF_FFLAGS =""
   NETCDF_FLIBS =""
 else
-  NETCDF_FFLAGS = $(shell nc-config --prefix)/include/
-  NETCDF_FLIBS = $(shell nc-config --flibs)
+  NETCDF_FFLAGS = $(shell ./nc_config --prefix)/include/
+  NETCDF_FLIBS = $(shell ./nc_config --flibs)
 endif
 
-CONFIG_FLAGS += -DTPL_NETCDF_INCLUDE_DIRS=" $(NETCDF_FFLAGS)"
+CONFIG_FLAGS += -DTPL_NETCDF_INCLUDE_DIRS="$(NETCDF_FFLAGS)"
 CONFIG_FLAGS += -DTPL_NETCDF_LIBRARIES="$(NETCDF_FLIBS)"
 
 

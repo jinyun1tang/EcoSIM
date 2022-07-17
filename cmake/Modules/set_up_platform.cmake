@@ -83,15 +83,6 @@ endif()
     set(CMAKE_CXX_COMPILER $ENV{CXX})
     set(CMAKE_Fortran_COMPILER $ENV{FC})
 
-     if(NOT NETCDF_DIR)
-       execute_process(COMMAND module load cray-netcdf)
-     endif()
-     set(ECOSIM_HAVE_NETCDF 1)
-     set(TPL_NETCDF_INCLUDE_DIRS $ENV{NETCDF_DIR}/include)
-     set(ECOSIM_TP_LIBS netcdf;${ECOSIM_TP_LIBS})
-     set(ECOSIM_TP_LIBS netcdff;${ECOSIM_TP_LIBS})
-     set(ECOSIM_LIBRARIES ${ECOSIM_LIBRARIES};${TPL_NETCDF_LIBRARIES})
-     set(ECOSIM_INCDIRS ${ECOSIM_INCDIRS};${TPL_NETCDF_INCLUDE_DIRS} PARENT_SCOPE)
     # We are cared for mathematically.
     set(NEED_LAPACK FALSE)
   elseif (HOSTNAME MATCHES "scs") # NERSC Cori phase1

@@ -1,0 +1,28 @@
+#!/bin/bash
+
+#echo $HOST
+if [[ $HOST == *"cori"* ]]; 
+then
+ # echo "run on $HOST"
+  module load PrgEnv-intel/6.0.10
+  module load cray-netcdf/4.6.3.2
+
+  ncdf_dir=/opt/cray/pe/netcdf/4.6.3.2/INTEL/19.0
+  if [[ "$1" == *"prefix"* ]];
+  then 
+    echo "$ncdf_dir"
+  elif [[ "$1" == *"flibs"* ]]; 
+  then
+    echo "-L$ncdf_dir/lib -lnetcdff -L$ncdf_dir/lib -lnetcdf"
+  else
+  echo ""
+  fi
+else
+  if [[ "$1" == *"prefix"* ]];
+  then
+  nc-config --prefix
+  elif [[ "$1" == *"flibs"* ]];
+  then
+  nc-config --flibs
+  fi
+fi
