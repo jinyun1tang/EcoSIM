@@ -17,6 +17,21 @@ then
   else
   echo ""
   fi
+elif [[ $(hostname) == *"scs"* ]];
+then
+  module load intel/2018.1.163
+  export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/global/software/sl-7.x86_64/modules/intel/2018.1.163/netcdf/4.6.1-intel-s/lib/
+  ncdf_dir=/global/software/sl-7.x86_64/modules/intel/2018.1.163/netcdf/4.6.1-intel-s/
+  if [[ "$1" == *"prefix"* ]];
+  then
+    echo "$ncdf_dir"
+  elif [[ "$1" == *"flibs"* ]];
+  then
+    /global/software/sl-7.x86_64/modules/intel/2018.1.163/netcdf/4.6.1-intel-s/bin/nf-config --flibs
+  else
+  echo ""
+  fi
+
 else
   if [[ "$1" == *"prefix"* ]];
   then
