@@ -297,23 +297,23 @@ contains
 
   call this%proc_counter()
 
-  if(timer%its_a_new_hour())then
+  if(timer%its_a_new_hour() .and. this%nh_vars>0)then
     call this%hist_write(clock_hour, this%nh_vars, this%nh_varid)
   endif
 
-  if(timer%its_a_new_day())then
+  if(timer%its_a_new_day() .and. this%nd_vars>0)then
     call this%hist_write(clock_day, this%nd_vars, this%nd_varid)
   endif
 
-  if(timer%its_a_new_week())then
+  if(timer%its_a_new_week() .and. this%nw_vars>0)then
     call this%hist_write(clock_week, this%nw_vars, this%nw_varid)
   endif
 
-  if(timer%its_a_new_month())then
+  if(timer%its_a_new_month() .and. this%nm_vars>0)then
     call this%hist_write(clock_month, this%nm_vars, this%nm_varid)
   endif
 
-  if(timer%its_a_new_year())then
+  if(timer%its_a_new_year() .and. this%ny_vars>0)then
     call this%hist_write(clock_year, this%ny_vars, this%ny_varid)
   endif
 

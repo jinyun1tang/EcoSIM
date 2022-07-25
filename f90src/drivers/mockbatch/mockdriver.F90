@@ -112,7 +112,7 @@ subroutine RunModel(namelist_buffer)
   allocate(ystatesfl(1:nvars));ystatesfl(:) = 0._r8
 !!============================================================
 ! customized model initialization
-  call initmodel(nvars, ystatesfl, err_status)
+  call initmodel(nvars, ystates0l, err_status)
 
   if(err_status%check_status())then
     call endrun(msg=err_status%print_msg())

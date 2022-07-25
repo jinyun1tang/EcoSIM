@@ -1,5 +1,8 @@
 module ChemEquilibriaMod
-
+!
+! Description
+! code to solve equilibrium chemistry, without the salt equilbrium
+! the solver assumes prescirbed pH, and therefore [OH(-)]
   use data_kind_mod, only : r8 => SHR_KIND_R8
   use SoluteParMod
   use SoluteChemDataType
@@ -262,7 +265,7 @@ module ChemEquilibriaMod
   ENDIF
 
 
-![H(+)]
+![H(+)] is prescribed
   CHY1=AMAX1(ZERO,10.0**(-(PH-3.0)))
 ! [OH(-)]
   COH1=AMAX1(ZERO,DPH2O/CHY1)
@@ -410,7 +413,7 @@ module ChemEquilibriaMod
 !  (AB) <-> A+B,  (A+x)(B+x)/((AB)-x)=K
     DP=DPH2P
     S0=CH1P1+CHY1+DP
-    S1=AMAX1(0.0,S0**2-4.0*(CH1P1*CHY1-DP*CH2P1))
+    S1=AMAX1(0._r8,S0**2-4.0_r8*(CH1P1*CHY1-DP*CH2P1))
     RH2P=TSL*(S0-SQRT(S1))
   ELSE
     RPALPX=0._r8
@@ -523,7 +526,7 @@ module ChemEquilibriaMod
 !
     DP=DPH2P
     S0=CH1PB+CHY1+DP
-    S1=AMAX1(0.0,S0**2-4.0*(CH1PB*CHY1-DP*CH2PB))
+    S1=AMAX1(0._r8,S0**2-4.0*(CH1PB*CHY1-DP*CH2PB))
     RH2B=TSLX*(S0-SQRT(S1))
   ELSE
     RPALBX=0._r8
