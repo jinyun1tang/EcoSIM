@@ -10,6 +10,7 @@ module fileUtil
   integer, parameter :: ecosim_filename_length=128
   integer, parameter :: stdout=6
   integer, parameter :: iulog=6
+  integer, parameter :: error_errmsg_len=256
   integer, parameter :: ecosim_string_length_long=256
   integer , public, parameter :: var_flux_type =1
   integer , public, parameter :: var_state_type=2
@@ -117,7 +118,7 @@ module fileUtil
 
      write(stdout, '(a, a, i7, a)') subname, ": Read buffer of ", &
           len_trim(namelist_buffer), " characters."
-
+     write(stdout, '(a)') "------------------------------"
      write(stdout, '(a)') "  If it looks like part of the namelist is missing, "
      write(stdout, '(a)') "  compare the number of characters read to the actual "
      write(stdout, '(a,a,a)') "  size of your file ($ wc -c ", trim(namelist_filename), ") and increase "

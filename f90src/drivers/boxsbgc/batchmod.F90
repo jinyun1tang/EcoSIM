@@ -1,6 +1,8 @@
 module batchmod
 
   use abortutils, only : endrun
+  use MiscUtilMod, only : addone
+
 implicit none
   private
   public :: BatchModelConfig
@@ -603,20 +605,7 @@ contains
 
   end associate
   end subroutine UpdateStateVars
-! ----------------------------------------------------------------------
 
-  function addone(itemp)result(ans)
-!
-!  DESCRIPTION
-! increase itemp by one
-  implicit none
-  integer, intent(inout) :: itemp
-
-  integer :: ans
-
-  itemp=itemp+1
-  ans=itemp
-  end function addone
 ! ----------------------------------------------------------------------
 
   subroutine getvarlist(nvars, varl, unitl, vartypes)

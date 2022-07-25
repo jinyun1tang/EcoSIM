@@ -16,7 +16,8 @@ set(ECOSIM_UTIL_SOURCES
   EcoSIMConfig.F90
   ecosim_log_mod.F90
   ecosim_time_mod.F90
-
+  MiscUtilMod.F90
+  ModelStatusType.F90
 )
 
 configure_file(shr_assert.h shr_assert.h COPYONLY)

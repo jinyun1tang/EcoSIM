@@ -1,0 +1,10 @@
+&driver_nml
+  model_name = 'mock'
+  case_id='exp1'
+/
+
+&ecosim_time
+  delta_time=3600.
+  stop_n = 30
+  stop_option='nyears'
+/

@@ -1,5 +1,6 @@
 module SoilLayerDynMod
-
+! Description:
+! subroutines to do soil relayering
   use data_kind_mod, only : r8 => SHR_KIND_R8
   use RootDataType
   use GridDataType

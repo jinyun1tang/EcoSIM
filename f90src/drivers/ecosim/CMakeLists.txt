@@ -27,7 +27,7 @@ set(ECOSIM_LIBRARIES ecosim_driver;${ECOSIM_LIBRARIES})
 
 link_libraries(${ECOSIM_LIBRARIES};${ECOSIM_TPLS})
 include(add_ecosim_executable)
-add_ecosim_executable(ecosim.f90.x main.F90)
+add_ecosim_executable(ecosim.f90.x ecosim.F90)
 
 if (NOT CMAKE_INSTALL_PREFIX STREQUAL "INSTALL_DISABLED")
   install(TARGETS ecosim.f90.x DESTINATION bin)

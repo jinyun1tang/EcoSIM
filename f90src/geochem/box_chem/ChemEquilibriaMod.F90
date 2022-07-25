@@ -46,24 +46,36 @@ module ChemEquilibriaMod
   real(r8) :: RH2P,RNH4,RPALPX,RPCADX
   real(r8) :: RPCAHX,RPCAMX,RPFEPX,RXN4
   real(r8) :: VOLWBK
+
   real(r8), pointer :: ZEROS
-  real(r8), pointer :: XCEC
   real(r8), pointer :: BKVLX
+  real(r8), pointer :: VOLWM
+  real(r8), pointer :: BKVL
+  real(r8), pointer :: ZEROS2
+  real(r8), pointer :: GKCA
+  real(r8), pointer :: GKCH
+  real(r8), pointer :: GKCM
+  real(r8), pointer :: GKCK
+  real(r8), pointer :: GKCN
+  real(r8), pointer :: GKC4
+  real(r8), pointer :: VOLWNB
+  real(r8), pointer :: VOLWNH
+  real(r8), pointer :: VOLWPB
+  real(r8), pointer :: VOLWPO
+  real(r8), pointer :: VLNH4
+  real(r8), pointer :: VLNHB
+
+  real(r8), pointer :: XCEC
   real(r8), pointer :: PH
+  real(r8), pointer :: XAEC
+
   real(r8), pointer :: CAL
   real(r8), pointer :: CFE
-  real(r8), pointer :: VOLWM
   real(r8), pointer :: ZMG
   real(r8), pointer :: ZNA
   real(r8), pointer :: ZKA
-  real(r8), pointer :: CCO2S
+  real(r8), pointer :: CO2S
   real(r8), pointer :: CCA
-  real(r8), pointer :: ZEROS2
-  real(r8), pointer :: BKVL
-  real(r8), pointer :: XAEC
-  real(r8), pointer :: VLNH4
-  real(r8), pointer :: GKC4
-  real(r8), pointer :: VLNHB
   real(r8), pointer :: CH1P1
   real(r8), pointer :: CH1PB
   real(r8), pointer :: CH2P1
@@ -92,15 +104,8 @@ module ChemEquilibriaMod
   real(r8), pointer :: PCAPMB
   real(r8), pointer :: PFEPO1
   real(r8), pointer :: PFEPOB
-  real(r8), pointer :: GKCA
-  real(r8), pointer :: GKCH
-  real(r8), pointer :: GKCM
-  real(r8), pointer :: GKCK
-  real(r8), pointer :: GKCN
-  real(r8), pointer :: VOLWNB
-  real(r8), pointer :: VOLWNH
-  real(r8), pointer :: VOLWPB
-  real(r8), pointer :: VOLWPO
+
+
   real(r8), pointer :: TRN4S
   real(r8), pointer :: TRN4B
   real(r8), pointer :: TRN3S
@@ -174,7 +179,7 @@ module ChemEquilibriaMod
   ZMG   =>  chemvar%ZMG
   ZNA   =>  chemvar%ZNA
   ZKA   =>  chemvar%ZKA
-  CCO2S =>  chemvar%CCO2S
+  CO2S  =>  chemvar%CO2S
   CCA   =>  chemvar%CCA
   ZEROS2=>  chemvar%ZEROS2
   BKVL  =>  chemvar%BKVL
@@ -236,6 +241,27 @@ module ChemEquilibriaMod
   ELSE
     CCEC=ZERO
   ENDIF
+  IF(VOLWM.GT.ZEROS2)THEN
+  ! aqueous Mg(2+)
+    CMG1=AMAX1(ZERO,ZMG/VOLWM)
+  ! aqueous Na(+)
+    CNA1=AMAX1(ZERO,ZNA/VOLWM)
+  ! aqueous K(-)
+    CKA1=AMAX1(ZERO,ZKA/VOLWM)
+
+! aqueous CO2 (H2CO3), mol/m3
+    CCO21=AMAX1(ZERO,CO2S/(12.0*VOLWM))
+
+    VOLWBK=AMIN1(1.0,BKVL/VOLWM)
+  ELSE
+    CMG1=0._r8
+    CNA1=0._r8
+    CKA1=0._r8
+    CCO21=0._r8
+    VOLWBK=1._r8
+  ENDIF
+
+
 ![H(+)]
   CHY1=AMAX1(ZERO,10.0**(-(PH-3.0)))
 ! [OH(-)]
@@ -252,16 +278,8 @@ module ChemEquilibriaMod
   ELSE
     CFE1=AMAX1(ZERO,AMIN1(CFE,SPFEO/COH1**3))
   ENDIF
-! aqueous Mg(2+)
-  CMG1=AMAX1(ZERO,ZMG/VOLWM)
-! aqueous Na(+)
-  CNA1=AMAX1(ZERO,ZNA/VOLWM)
-! aqueous K(-)
-  CKA1=AMAX1(ZERO,ZKA/VOLWM)
 !
 !     CA CONCENTRATION FROM CURRENT CO2 CONCENTRATION
-! aqueous CO2 (H2CO3), mol/m3
-  CCO21=AMAX1(ZERO,CCO2S/12.0)
 ! CO3(2-)+2H(+) <->H2CO3
   CCO31=AMAX1(ZERO,CCO21*DPCO3/CHY1**2)
 ! [Ca(2+)], Ca(2+)+CO3(2-)<->CaCO3
@@ -341,24 +359,12 @@ module ChemEquilibriaMod
     CH2PM=SQRT(SPCAM/CCA1)
 !   dissociation rate
     RPCAMX=AMAX1(-PCAPM1*SPPO4,TPD*(CH2P1-CH2PM))
-!     IF(I.GT.315)THEN
-!     WRITE(*,1117)'RPPO4',I,J,L,RPCADX,CH2P1,CH2PD,PCAPD1,RPCAHX
-!    2,CH2PA,CH2PH,SYA0P2,CAL1,COH1,SYCAH2,CCA1,CCO21,CCO31,PCAPH1
-!    3,VOLWPO,SPCAC/CCO31,CCA,H2PO4
-!    4,VOLWM,ZCA,CCO2S
-!1117  FORMAT(A8,3I4,30E12.4)
-!     ENDIF
 !
 !     PHOSPHORUS ANION EXCHANGE IN NON-BAND SOIL ZONE
 !     CALCULATED FROM EXCHANGE EQUILIBRIA AMONG H2PO4-,
 !     HPO4--, H+, OH- AND PROTONATED AND NON-PROTONATED -OH
 !     EXCHANGE SITES
 !
-    IF(VOLWM.GT.ZEROS2)THEN
-      VOLWBK=AMIN1(1.0,BKVL/VOLWM)
-    ELSE
-      VOLWBK=1._r8
-    ENDIF
 ! XAEC: anaion exchange capacity
     IF(XAEC.GT.ZEROS)THEN
 !     Anion adsorption equilibria
@@ -391,19 +397,6 @@ module ChemEquilibriaMod
       RYH2P=0._r8
       RXH1P=0._r8
     ENDIF
-!     IF((I/120)*120.EQ.I.AND.J.EQ.24.AND.L.LE.6)THEN
-!     WRITE(*,1116)'RXH2P',I,J,NX,NY,L,RXH2P
-!    2,XOH21,CH2P1,XH2P1,XOH21*(CH2P1-RXH2P)/(XH2P1+RXH2P),SPH2P
-!    3,H2PO4,RH2PX,VOLWPO
-!     WRITE(*,1116)'RYH2P',I,J,NX,NY,L,RYH2P
-!    2,XOH11,CH2P1,XH2P1,COH1,(XOH11*(CH2P1-RYH2P))
-!    3/((XH2P1+RYH2P)*COH1),SXH2P
-!     WRITE(*,1116)'RXH1P',I,J,NX,NY,L,RXH1P
-!    2,XOH11,CH1P1,XH1P1,XOH11*(CH1P1-RXH1P)/(XH1P1+RXH1P),SPH1P
-!    3,SYH1P,DPH2O,DPH2P,XOH1,VLPO4,VLPOB
-!    4,TKS,XOH21,XOH01
-!1116  FORMAT(A8,5I4,40E12.4)
-!     ENDIF
 !
 !     H2PO4(-) <-> H(+)+HPO4(2-)
 !
@@ -430,13 +423,7 @@ module ChemEquilibriaMod
     RXH1P=0._r8
     RH2P=0._r8
   ENDIF
-!     IF(J.EQ.1)THEN
-!     WRITE(*,2222)'PO4',I,J,L,CH2P1,PALPO1,PFEPO1,PCAPD1,PCAPH1,PCAPM1
-!    2,CH2PA,CH2PF,CH2PD,CH2PH,CH2PM,RPALPX,RPFEPX,RPCADX,RPCAHX,RPCAMX
-!    3,XH2P1,RXH2P,RYH2P
-!    3,CAL1,CFE1,CCA1,CHY1,COH1
-!2222  FORMAT(A8,3I4,40E12.4)
-!     ENDIF
+
 !
 !     PHOSPHORUS PRECIPITATION-DISSOLUTION IN BAND SOIL ZONE
 !
@@ -640,7 +627,7 @@ module ChemEquilibriaMod
 !
 !     RNH4,RNHB=NH4-NH3+H dissociation in non-band,band
 !     DPN4=NH4 dissociation constant
-!
+! NH4(+) <-> NH3 + H(+)
   IF(VOLWNH.GT.ZEROS2)THEN
     RNH4=(CHY1*CN31-DPN4*CN41)/(DPN4+CHY1)
   ELSE
@@ -731,15 +718,7 @@ module ChemEquilibriaMod
   TRCPDB=TRCPDB+RPCDBX*VOLWPB
   TRCPHB=TRCPHB+RPCHBX*VOLWPB
   TRCPMB=TRCPMB+RPCMBX*VOLWPB
-!     IF(IYRC.EQ.2012.AND.I.EQ.151.AND.NX.EQ.1)THEN
-!     WRITE(*,24)'RN4S',I,J,L,RN4S,RN3S,RNH4,RXN4,VOLWNH
-!     WRITE(*,24)'RHP1',I,J,L,RHP1,RH2P,RXH1P
-!    2,TRX1P,TRH2P
-!     WRITE(*,24)'RHP2',I,J,L,RHP2,RH2P,RXH2P,RYH2P
-!    2,RPALPX,RPFEPX,RPCADX,2.0*RPCAMX,3.0*RPCAHX
-!    3,TRX2P
-!24    FORMAT(A8,3I4,60E12.4)
-!     ENDIF
+
   end subroutine NoSaltChemEquilibria
 
 !--------------------------------------------------------------------------

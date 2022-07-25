@@ -110,7 +110,6 @@ module GeochemAPI
   chemvar%ZMG=ZMG(L,NY,NX)
   chemvar%ZNA=ZNA(L,NY,NX)
   chemvar%ZKA=ZKA(L,NY,NX)
-  chemvar%CCO2S=CCO2S(L,NY,NX)
   chemvar%CCA=CCA(L,NY,NX)
   chemvar%ZEROS2=ZEROS2(NY,NX)
   chemvar%BKVL=BKVL(L,NY,NX)

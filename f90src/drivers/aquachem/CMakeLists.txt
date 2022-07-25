@@ -1,12 +1,12 @@
-set(BOXSBGC_DRIVER_SOURCES
-	batchmod.F90
+set(AQUACHEM_DRIVER_SOURCES
+	batchsbgc.F90
 )
 
 include_directories(${ECOSIM_INCLUDE_DIRS})
 include_directories(${CMAKE_BINARY_DIR}/f90src/utils/)
 include_directories(${CMAKE_BINARY_DIR}/f90src/ecosim_datatype/)
 include_directories(${CMAKE_BINARY_DIR}/f90src/ioutils/)
-include_directories(${CMAKE_BINARY_DIR}/f90src/microbial_bgc/)
+include_directories(${CMAKE_BINARY_DIR}/f90src/geochem/box_chem)
 include_directories(${CMAKE_BINARY_DIR}/f90src/APIs/)
 
 include(add_ecosim_library)
@@ -17,10 +17,10 @@ set(ECOSIM_LIBRARIES boxsbgc_driver;${ECOSIM_LIBRARIES})
 
 link_libraries(${ECOSIM_LIBRARIES};${ECOSIM_TPLS})
 include(add_ecosim_executable)
-add_ecosim_executable(batchsbgc.x batchsbgc.F90)
+add_ecosim_executable(aquachem.x aquachem.F90)
 
 if (NOT CMAKE_INSTALL_PREFIX STREQUAL "INSTALL_DISABLED")
   install(TARGETS boxsbgc.x DESTINATION bin)
   file(GLOB HEADERS *.mod)
-  install(FILES ${HEADERS} DESTINATION include/ecosim/drivers/boxsbgc)
+  install(FILES ${HEADERS} DESTINATION include/ecosim/drivers/aquachem)
 endif()

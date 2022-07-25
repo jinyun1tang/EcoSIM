@@ -289,7 +289,8 @@ module StarteMod
     CSTRQ(I,NY,NX)=solutevar%CSTR1
 !
 !     SOLUTE CONCENTRATIONS IN SOIL
-!
+! for the POM complex, on the first day in the first year
+! U means surface irrigation
   ELSEIF(K.EQ.3.AND.I.EQ.1.AND.(.not.is_restart_run).AND.is_first_year)THEN
     CCOU=solutevar%CCO21
     CCHU=solutevar%CCH41
@@ -383,10 +384,6 @@ module StarteMod
     H1POB(L,NY,NX)=CH1PU(L,NY,NX)*VOLW(L,NY,NX)*VLPOB(L,NY,NX)*31.0
     ZNO2S(L,NY,NX)=0._r8
     ZNO2B(L,NY,NX)=0._r8
-!     WRITE(*,444)'ZNH4S',NX,NY,L,ZNH4S(L,NY,NX),CN4U(L,NY,NX)
-!    2,VOLW(L,NY,NX),VLNH4(L,NY,NX),H2PO4(L,NY,NX),CH2PU(L,NY,NX)
-!    3,VLPO4(L,NY,NX)
-!444   FORMAT(A8,3I4,12E12.4)
 !
 !     INITIAL STATE VARIABLES FOR CATIONS, ANIONS AND ION PAIRS IN SOIL
 !
