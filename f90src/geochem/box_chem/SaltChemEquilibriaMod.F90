@@ -185,7 +185,7 @@ module SaltChemEquilibriaMod
   real(r8), pointer :: XH2P1    !exchangeable H2PO4  non-band soil, [mol m-3]
 
 ! fluxes
-  real(r8), pointer :: TRCACO
+  real(r8), pointer :: TRCACO   !total precipitated CaCO3 transformation, [mol d-2 h-1]
   real(r8), pointer :: TRNAC
   real(r8), pointer :: TRMGC
   real(r8), pointer :: TRCAC
@@ -266,7 +266,7 @@ module SaltChemEquilibriaMod
   real(r8), pointer :: TRX1P
   real(r8), pointer :: TRX2P
   real(r8), pointer :: TRXAL
-  real(r8), pointer :: TRXAL2
+  real(r8), pointer :: TRXAL2   !total adsorbed AlOH2 transformation, [mol d-2 h-1]
   real(r8), pointer :: TRXCA
   real(r8), pointer :: TRXFE
   real(r8), pointer :: TRXH0

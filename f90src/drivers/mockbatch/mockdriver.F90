@@ -57,6 +57,7 @@ subroutine RunModel(namelist_buffer)
   character(len=*), intent(in) :: namelist_buffer
 
   character(len=hist_var_str_len) , allocatable :: varl(:)
+  character(len=hist_var_lon_str_len) , allocatable :: varlnml(:)
   character(len=hist_unit_str_len), allocatable :: unitl(:)
   character(len=hist_freq_str_len), allocatable :: freql(:)
   integer                         , allocatable :: vartypes(:)
@@ -101,8 +102,9 @@ subroutine RunModel(namelist_buffer)
 !!============================================================
 ! customized model varlist creation
   nvars=getvarllen()
-  allocate(varl(nvars)); allocate(unitl(nvars)); allocate(freql(nvars)); allocate(vartypes(nvars))
-  call getvarlist(nvars, varl, unitl, vartypes)
+  allocate(varl(nvars)); allocate(varlnml(nvars));
+  allocate(unitl(nvars)); allocate(freql(nvars)); allocate(vartypes(nvars))
+  call getvarlist(nvars, varl, varlnml, unitl, vartypes)
 !============================================================
 
 
@@ -129,7 +131,7 @@ subroutine RunModel(namelist_buffer)
   else
     write(gname,'(A)')'mockmodel'//'.'//trim(case_id)//'.'//trim(model_name)
   endif
-  call hist%init(ncols,varl, unitl, vartypes, freql, gname, dtime)
+  call hist%init(ncols, varl, varlnml, unitl, vartypes, freql, gname, dtime)
   !print*,'run the model'
   do
 

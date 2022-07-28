@@ -17,13 +17,15 @@ implicit none
   integer, parameter :: clock_year =5
 
   integer, public, parameter :: hist_var_str_len=40
+  integer, public, parameter :: hist_var_lon_str_len=120
   integer, public, parameter :: hist_unit_str_len=16
   integer, public, parameter :: hist_freq_str_len=6
   integer, private, parameter:: hist_fname_str_len=256
   type, public :: histf_type
-    character(len=40), pointer :: varnames(:) => null()
-    character(len=6) , pointer :: hrfreq(:)   => null() !'hour','day','week','month','year'
-    character(len=12), pointer :: units(:)    => null()
+    character(len=hist_var_str_len), pointer :: varnames(:) => null()
+    character(len=hist_var_lon_str_len), pointer :: varnamesl(:) => null()
+    character(len=hist_freq_str_len) , pointer :: hrfreq(:)   => null() !'hour','day','week','month','year'
+    character(len=hist_unit_str_len), pointer :: units(:)    => null()
     integer          , pointer :: var_type(:) => null() ! var_flux_type= flux, var_state_type=state
     real(r8)         , pointer :: counter(:)  => null()
     character(len=hist_fname_str_len), pointer :: ncfname(:)     => null()
@@ -110,13 +112,14 @@ contains
   end subroutine histrst
 
 !--------------------------------------------------------
-  subroutine init(this, ncols, varlist, unitlist, vartypes, hrfreq, gfname, dtime)
+  subroutine init(this, ncols, varlist, varlnmlist, unitlist, vartypes, hrfreq, gfname, dtime)
   use ncdio_pio, only : ncd_enddef, ncd_pio_closefile
   use fileUtil, only : continue_run
   implicit none
   class(histf_type), intent(inout):: this
   integer, intent(in) :: ncols
   character(len=hist_var_str_len), intent(in) :: varlist(:)
+  character(len=hist_var_lon_str_len), intent(in) :: varlnmlist(:)
   character(len=hist_unit_str_len), intent(in) :: unitlist(:)
   integer                         , intent(in) :: vartypes(:)
   character(len=hist_freq_str_len), optional, intent(in) :: hrfreq(:)
@@ -179,6 +182,7 @@ contains
   call this%initAlloc()
   this%var_type(1:this%nvars) = vartypes(1:this%nvars)
   this%varnames(1:this%nvars) = varlist(1:this%nvars)
+  this%varnamesl(1:this%nvars)= varlnmlist(1:this%nvars)
   this%units(1:this%nvars) = unitlist(1:this%nvars)
 
   nh=0
@@ -220,7 +224,8 @@ contains
 
       call this%hist_create(loc_gfname, yes_flag,trim(this%hrfreq(n)),ncid(clock_id))
       if(.not. continue_run)then
-        call this%hist_add_var(ncid(clock_id),this%varnames(n),this%units(n), trim(this%hrfreq(n)))
+        call this%hist_add_var(ncid(clock_id),this%varnames(n),this%varnamesl(n),&
+           this%units(n),trim(this%hrfreq(n)))
       endif
     enddo
 
@@ -229,7 +234,8 @@ contains
     do n = 1, this%nvars
       call this%hist_create(loc_gfname, yes_mon, 'month',ncid(clock_month))
       if(.not. continue_run)then
-        call this%hist_add_var(ncid(clock_month),this%varnames(n), this%units(n), 'month')
+        call this%hist_add_var(ncid(clock_month),this%varnames(n),this%varnamesl(n),&
+          this%units(n),'month')
       endif
       nm=nm+1
       this%nm_varid(nm) = n
@@ -253,6 +259,7 @@ contains
   integer :: n
 
   allocate(this%varnames(this%nvars));this%varnames(:)=''
+  allocate(this%varnamesl(this%nvars));this%varnames(:)=''
   allocate(this%hrfreq(this%nvars)); this%hrfreq(:)=''
   allocate(this%counter(nclocks)); this%counter(:)=0._r8
   allocate(this%var_type(this%nvars)); this%var_type(:)=0
@@ -367,19 +374,20 @@ contains
   endif
   end subroutine hist_create
 !--------------------------------------------------------
-  subroutine hist_add_var(this, ncid, varname, units, freq)
+  subroutine hist_add_var(this, ncid, varname, varnamel, units, freq)
 
   use ncdio_pio,  only : ncd_defvar,  ncd_float, file_desc_t
   use data_const_mod, only : spval => SHR_CONST_SPVAL
   implicit none
   class(histf_type) , intent(inout):: this
   character(len=*), intent(in) :: varname
+  character(len=*), intent(in) :: varnamel
   character(len=*), intent(in) :: units
   character(len=*), intent(in) :: freq
   type(file_desc_t), intent(inout):: ncid
 
   call ncd_defvar(ncid, varname, ncd_float,                       &
-        dim1name='column',dim2name=trim(freq),long_name=varname,  &
+        dim1name='column',dim2name=trim(freq),long_name=varnamel,  &
         units=units, missing_value=spval, fill_value=spval)
 
   end subroutine hist_add_var

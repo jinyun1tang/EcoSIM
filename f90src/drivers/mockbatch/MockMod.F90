@@ -36,26 +36,27 @@ implicit none
 
 ! ----------------------------------------------------------------------
 
-  subroutine getvarlist(nvars, varl, unitl, vartypes)
+  subroutine getvarlist(nvars, varl, varlnml, unitl, vartypes)
 
-  use histMod, only : hist_var_str_len,hist_unit_str_len
+  use histMod, only : hist_var_str_len,hist_unit_str_len, hist_var_lon_str_len
   use fileUtil, only :  var_flux_type, var_state_type
   implicit none
   integer, intent(in) :: nvars
   character(len=hist_var_str_len), intent(out) :: varl(:)     !variable name
+  character(len=hist_var_lon_str_len), intent(out) :: varlnml(:)     !variable name
   character(len=hist_unit_str_len),intent(out) :: unitl(:)
   integer                         ,intent(out) :: vartypes(:)
 
-  varl(1)='var1_con'; unitl(1)='mol m-3'
-  varl(2)='var2_con'; unitl(2)='mol m-3'
-  varl(3)='var3_con'; unitl(3)='mol m-3'
-  varl(4)='var4_con'; unitl(4)='mol m-3'
-  varl(5)='var5_con'; unitl(5)='mol m-3'
-  varl(6)='flx1_con'; unitl(6)='mol m-2 s-1'
-  varl(7)='flx2_con'; unitl(7)='mol m-2 s-1'
-  varl(8)='flx3_con'; unitl(8)='mol m-2 s-1'
-  varl(9)='flx4_con'; unitl(9)='mol m-2 s-1'
-  varl(10)='flx5_con';unitl(10)='mol m-2 s-1'
+  varl(1)='var1_con'; varlnml(1)='var1 concentration'; unitl(1)='mol m-3'
+  varl(2)='var2_con'; varlnml(2)='var2 concentration'; unitl(2)='mol m-3'
+  varl(3)='var3_con'; varlnml(3)='var3 concentration'; unitl(3)='mol m-3'
+  varl(4)='var4_con'; varlnml(4)='var4 concentration'; unitl(4)='mol m-3'
+  varl(5)='var5_con'; varlnml(5)='var5 concentration'; unitl(5)='mol m-3'
+  varl(6)='flx1_con'; varlnml(6)='flx1'; unitl(6)='mol m-2 s-1'
+  varl(7)='flx2_con'; varlnml(7)='flx1'; unitl(7)='mol m-2 s-1'
+  varl(8)='flx3_con'; varlnml(8)='flx1'; unitl(8)='mol m-2 s-1'
+  varl(9)='flx4_con'; varlnml(9)='flx1'; unitl(9)='mol m-2 s-1'
+  varl(10)='flx5_con';varlnml(10)='flx1'; unitl(10)='mol m-2 s-1'
 
   end subroutine getvarlist
 

@@ -3,6 +3,8 @@ module ChemEquilibriaMod
 ! Description
 ! code to solve equilibrium chemistry, without the salt equilbrium
 ! the solver assumes prescirbed pH, and therefore [OH(-)]
+! Note:
+! the model does not include H3PO4, which seems problematic, July 28, 2022
   use data_kind_mod, only : r8 => SHR_KIND_R8
   use SoluteParMod
   use SoluteChemDataType
