@@ -103,12 +103,12 @@ module PlantDisturbsMod
     IF(J.EQ.INT(ZNOONs1).AND.IHVSTs1(NZ).NE.4 &
       .AND.IHVSTs1(NZ).NE.6)THEN
       IF(test_aeqb(THINs1(NZ),0._r8))THEN
-        FHVST=AMAX1(0.0,1.0-EHVSTs1(1,4,NZ))
+        FHVST=AMAX1(0.0,1._r8-EHVSTs1(1,4,NZ))
         FHVSH=FHVST
       ELSE
-        FHVST=AMAX1(0.0,1.0-THINs1(NZ))
+        FHVST=AMAX1(0.0,1._r8-THINs1(NZ))
         IF(IHVSTs1(NZ).EQ.0)THEN
-          FHVSH=AMAX1(0.0,1.0-EHVSTs1(1,4,NZ)*THINs1(NZ))
+          FHVSH=AMAX1(0.0,1._r8-EHVSTs1(1,4,NZ)*THINs1(NZ))
         ELSE
           FHVSH=FHVST
         ENDIF
@@ -117,7 +117,7 @@ module PlantDisturbsMod
       IF(WTSTGs1(NZ).GT.ZEROPs1(NZ))THEN
         WHVSTD=HVSTs1(NZ)*THINs1(NZ)*0.45/24.0 &
           *AREA3s1(NUs1)*EHVSTs1(1,4,NZ)
-        FHVST=AMAX1(0.0,1.0-WHVSTD/WTSTGs1(NZ))
+        FHVST=AMAX1(0.0,1._r8-WHVSTD/WTSTGs1(NZ))
         FHVSH=FHVST
       ELSE
         FHVST=1.0_r8
@@ -128,9 +128,9 @@ module PlantDisturbsMod
       FHVSH=1.0_r8
     ENDIF
     DO 6475 M=1,4
-      WTHTH4=WTHTH4+(1.0-FHVSH)*WTSTDGs1(M,NZ)
-      WTHNH4=WTHNH4+(1.0-FHVSH)*WTSTDNs1(M,NZ)
-      WTHPH4=WTHPH4+(1.0-FHVSH)*WTSTDPs1(M,NZ)
+      WTHTH4=WTHTH4+(1._r8-FHVSH)*WTSTDGs1(M,NZ)
+      WTHNH4=WTHNH4+(1._r8-FHVSH)*WTSTDNs1(M,NZ)
+      WTHPH4=WTHPH4+(1._r8-FHVSH)*WTSTDPs1(M,NZ)
       WTHTX4=WTHTX4+(FHVSH-FHVST)*WTSTDGs1(M,NZ)
       WTHNX4=WTHNX4+(FHVSH-FHVST)*WTSTDNs1(M,NZ)
       WTHPX4=WTHPX4+(FHVSH-FHVST)*WTSTDPs1(M,NZ)
@@ -302,16 +302,11 @@ module PlantDisturbsMod
           +CFOPPs1(1,M,NZ)*(WTHPR1+WTHPX1-WTHPL1) &
           +CFOPPs1(2,M,NZ)*(WTHPR2+WTHPX2-WTHPL2)
         IF(IBTYPs1(NZ).EQ.0.OR.IGTYPs1(NZ).LE.1)THEN
-          CSNCs1(M,1,0,NZ)=CSNCs1(M,1,0,NZ) &
-            +CFOPCs1(3,M,NZ)*(WTHTR3+WTHTX3+WTHTR4+WTHTX4)
-          ZSNCs1(M,1,0,NZ)=ZSNCs1(M,1,0,NZ) &
-            +CFOPNs1(3,M,NZ)*(WTHNL3+WTHNL4)
-          PSNCs1(M,1,0,NZ)=PSNCs1(M,1,0,NZ) &
-            +CFOPPs1(3,M,NZ)*(WTHPL3+WTHPL4)
-          ZSNCs1(4,1,0,NZ)=ZSNCs1(4,1,0,NZ) &
-            +CFOPNs1(3,M,NZ)*(WTHNR3+WTHNX3-WTHNL3+WTHNR4+WTHNX4-WTHNL4)
-          PSNCs1(4,1,0,NZ)=PSNCs1(4,1,0,NZ) &
-            +CFOPPs1(3,M,NZ)*(WTHPR3+WTHPX3-WTHPL3+WTHPR4+WTHPX4-WTHPL4)
+          CSNCs1(M,1,0,NZ)=CSNCs1(M,1,0,NZ)+CFOPCs1(3,M,NZ)*(WTHTR3+WTHTX3+WTHTR4+WTHTX4)
+          ZSNCs1(M,1,0,NZ)=ZSNCs1(M,1,0,NZ)+CFOPNs1(3,M,NZ)*(WTHNL3+WTHNL4)
+          PSNCs1(M,1,0,NZ)=PSNCs1(M,1,0,NZ)+CFOPPs1(3,M,NZ)*(WTHPL3+WTHPL4)
+          ZSNCs1(4,1,0,NZ)=ZSNCs1(4,1,0,NZ)+CFOPNs1(3,M,NZ)*(WTHNR3+WTHNX3-WTHNL3+WTHNR4+WTHNX4-WTHNL4)
+          PSNCs1(4,1,0,NZ)=PSNCs1(4,1,0,NZ)+CFOPPs1(3,M,NZ)*(WTHPR3+WTHPX3-WTHPL3+WTHPR4+WTHPX4-WTHPL4)
         ELSE
           WTSTDGs1(M,NZ)=WTSTDGs1(M,NZ)+CFOPCs1(5,M,NZ)*(WTHTR3+WTHTX3)
           WTSTDNs1(M,NZ)=WTSTDNs1(M,NZ)+CFOPNs1(5,M,NZ)*WTHNL3
@@ -401,13 +396,13 @@ module PlantDisturbsMod
 !     TNBP=total net biome productivity
 !
     ELSE
-      VCO2Fs1(NZ)=VCO2Fs1(NZ)-(1.0-FCH4F)*(WTHTHT-WTHTRT)
+      VCO2Fs1(NZ)=VCO2Fs1(NZ)-(1._r8-FCH4F)*(WTHTHT-WTHTRT)
       VCH4Fs1(NZ)=VCH4Fs1(NZ)-FCH4F*(WTHTHT-WTHTRT)
-      VOXYFs1(NZ)=VOXYFs1(NZ)-(1.0-FCH4F)*(WTHTHT-WTHTRT)*2.667
+      VOXYFs1(NZ)=VOXYFs1(NZ)-(1._r8-FCH4F)*(WTHTHT-WTHTRT)*2.667
       VNH3Fs1(NZ)=VNH3Fs1(NZ)-WTHNHT+WTHNRT
       VN2OFs1(NZ)=VN2OFs1(NZ)-0.0
       VPO4Fs1(NZ)=VPO4Fs1(NZ)-WTHPHT+WTHPRT
-      CNETs1(NZ)=CNETs1(NZ)-(1.0-FCH4F)*(WTHTHT-WTHTRT)
+      CNETs1(NZ)=CNETs1(NZ)-(1._r8-FCH4F)*(WTHTHT-WTHTRT)
       TNBPs1=TNBPs1-FCH4F*(WTHTHT-WTHTRT)
     ENDIF
 !
@@ -468,21 +463,21 @@ module PlantDisturbsMod
 !           leaf,non-foliar,woody, standing dead removed from PFT
 !
   IF(IHVSTs1(NZ).EQ.0)THEN
-    WTHTR0=WTHTH0*(1.0-EHVSTs1(2,1,NZ))
-    WTHNR0=WTHNH0*(1.0-EHVSTs1(2,1,NZ))
-    WTHPR0=WTHPH0*(1.0-EHVSTs1(2,1,NZ))
-    WTHTR1=WTHTH1*(1.0-EHVSTs1(2,1,NZ))
-    WTHNR1=WTHNH1*(1.0-EHVSTs1(2,1,NZ))
-    WTHPR1=WTHPH1*(1.0-EHVSTs1(2,1,NZ))
-    WTHTR2=WTHTH2*(1.0-EHVSTs1(2,2,NZ))
-    WTHNR2=WTHNH2*(1.0-EHVSTs1(2,2,NZ))
-    WTHPR2=WTHPH2*(1.0-EHVSTs1(2,2,NZ))
-    WTHTR3=WTHTH3*(1.0-EHVSTs1(2,3,NZ))
-    WTHNR3=WTHNH3*(1.0-EHVSTs1(2,3,NZ))
-    WTHPR3=WTHPH3*(1.0-EHVSTs1(2,3,NZ))
-    WTHTR4=WTHTH4*(1.0-EHVSTs1(2,4,NZ))
-    WTHNR4=WTHNH4*(1.0-EHVSTs1(2,4,NZ))
-    WTHPR4=WTHPH4*(1.0-EHVSTs1(2,4,NZ))
+    WTHTR0=WTHTH0*(1._r8-EHVSTs1(2,1,NZ))
+    WTHNR0=WTHNH0*(1._r8-EHVSTs1(2,1,NZ))
+    WTHPR0=WTHPH0*(1._r8-EHVSTs1(2,1,NZ))
+    WTHTR1=WTHTH1*(1._r8-EHVSTs1(2,1,NZ))
+    WTHNR1=WTHNH1*(1._r8-EHVSTs1(2,1,NZ))
+    WTHPR1=WTHPH1*(1._r8-EHVSTs1(2,1,NZ))
+    WTHTR2=WTHTH2*(1._r8-EHVSTs1(2,2,NZ))
+    WTHNR2=WTHNH2*(1._r8-EHVSTs1(2,2,NZ))
+    WTHPR2=WTHPH2*(1._r8-EHVSTs1(2,2,NZ))
+    WTHTR3=WTHTH3*(1._r8-EHVSTs1(2,3,NZ))
+    WTHNR3=WTHNH3*(1._r8-EHVSTs1(2,3,NZ))
+    WTHPR3=WTHPH3*(1._r8-EHVSTs1(2,3,NZ))
+    WTHTR4=WTHTH4*(1._r8-EHVSTs1(2,4,NZ))
+    WTHNR4=WTHNH4*(1._r8-EHVSTs1(2,4,NZ))
+    WTHPR4=WTHPH4*(1._r8-EHVSTs1(2,4,NZ))
 !
 !     IF ONLY GRAIN C,N,P REMOVED AT HARVEST
 !
@@ -506,73 +501,69 @@ module PlantDisturbsMod
 !     IF ONLY WOOD C,N,P REMOVED AT HARVEST
 !
   ELSEIF(IHVSTs1(NZ).EQ.2)THEN
-    WTHTR0=WTHTH0*(1.0-EHVSTs1(2,1,NZ))
-    WTHNR0=WTHNH0*(1.0-EHVSTs1(2,1,NZ))
-    WTHPR0=WTHPH0*(1.0-EHVSTs1(2,1,NZ))
-    WTHTR1=WTHTH1*(1.0-EHVSTs1(2,1,NZ))
-    WTHNR1=WTHNH1*(1.0-EHVSTs1(2,1,NZ))
-    WTHPR1=WTHPH1*(1.0-EHVSTs1(2,1,NZ))
-    WTHTR2=WTHTH2*(1.0-EHVSTs1(2,2,NZ))
-    WTHNR2=WTHNH2*(1.0-EHVSTs1(2,2,NZ))
-    WTHPR2=WTHPH2*(1.0-EHVSTs1(2,2,NZ))
-    WTHTR3=WTHTH3*(1.0-EHVSTs1(2,3,NZ))
-    WTHNR3=WTHNH3*(1.0-EHVSTs1(2,3,NZ))
-    WTHPR3=WTHPH3*(1.0-EHVSTs1(2,3,NZ))
-    WTHTR4=WTHTH4*(1.0-EHVSTs1(2,4,NZ))
-    WTHNR4=WTHNH4*(1.0-EHVSTs1(2,4,NZ))
-    WTHPR4=WTHPH4*(1.0-EHVSTs1(2,4,NZ))
+    WTHTR0=WTHTH0*(1._r8-EHVSTs1(2,1,NZ))
+    WTHNR0=WTHNH0*(1._r8-EHVSTs1(2,1,NZ))
+    WTHPR0=WTHPH0*(1._r8-EHVSTs1(2,1,NZ))
+    WTHTR1=WTHTH1*(1._r8-EHVSTs1(2,1,NZ))
+    WTHNR1=WTHNH1*(1._r8-EHVSTs1(2,1,NZ))
+    WTHPR1=WTHPH1*(1._r8-EHVSTs1(2,1,NZ))
+    WTHTR2=WTHTH2*(1._r8-EHVSTs1(2,2,NZ))
+    WTHNR2=WTHNH2*(1._r8-EHVSTs1(2,2,NZ))
+    WTHPR2=WTHPH2*(1._r8-EHVSTs1(2,2,NZ))
+    WTHTR3=WTHTH3*(1._r8-EHVSTs1(2,3,NZ))
+    WTHNR3=WTHNH3*(1._r8-EHVSTs1(2,3,NZ))
+    WTHPR3=WTHPH3*(1._r8-EHVSTs1(2,3,NZ))
+    WTHTR4=WTHTH4*(1._r8-EHVSTs1(2,4,NZ))
+    WTHNR4=WTHNH4*(1._r8-EHVSTs1(2,4,NZ))
+    WTHPR4=WTHPH4*(1._r8-EHVSTs1(2,4,NZ))
 !
 !     IF ALL PLANT C,N,P REMOVED AT HARVEST (NO RESIDUE RETURNED)
 !
   ELSEIF(IHVSTs1(NZ).EQ.3)THEN
-    WTHTR0=WTHTH0*(1.0-EHVSTs1(2,1,NZ))
-    WTHNR0=WTHNH0*(1.0-EHVSTs1(2,1,NZ))
-    WTHPR0=WTHPH0*(1.0-EHVSTs1(2,1,NZ))
-    WTHTR1=WTHTH1*(1.0-EHVSTs1(2,1,NZ))
-    WTHNR1=WTHNH1*(1.0-EHVSTs1(2,1,NZ))
-    WTHPR1=WTHPH1*(1.0-EHVSTs1(2,1,NZ))
-    WTHTR2=WTHTH2*(1.0-EHVSTs1(2,2,NZ))
-    WTHNR2=WTHNH2*(1.0-EHVSTs1(2,2,NZ))
-    WTHPR2=WTHPH2*(1.0-EHVSTs1(2,2,NZ))
-    WTHTR3=WTHTH3*(1.0-EHVSTs1(2,3,NZ))
-    WTHNR3=WTHNH3*(1.0-EHVSTs1(2,3,NZ))
-    WTHPR3=WTHPH3*(1.0-EHVSTs1(2,3,NZ))
-    WTHTR4=WTHTH4*(1.0-EHVSTs1(2,4,NZ))
-    WTHNR4=WTHNH4*(1.0-EHVSTs1(2,4,NZ))
-    WTHPR4=WTHPH4*(1.0-EHVSTs1(2,4,NZ))
+    WTHTR0=WTHTH0*(1._r8-EHVSTs1(2,1,NZ))
+    WTHNR0=WTHNH0*(1._r8-EHVSTs1(2,1,NZ))
+    WTHPR0=WTHPH0*(1._r8-EHVSTs1(2,1,NZ))
+    WTHTR1=WTHTH1*(1._r8-EHVSTs1(2,1,NZ))
+    WTHNR1=WTHNH1*(1._r8-EHVSTs1(2,1,NZ))
+    WTHPR1=WTHPH1*(1._r8-EHVSTs1(2,1,NZ))
+    WTHTR2=WTHTH2*(1._r8-EHVSTs1(2,2,NZ))
+    WTHNR2=WTHNH2*(1._r8-EHVSTs1(2,2,NZ))
+    WTHPR2=WTHPH2*(1._r8-EHVSTs1(2,2,NZ))
+    WTHTR3=WTHTH3*(1._r8-EHVSTs1(2,3,NZ))
+    WTHNR3=WTHNH3*(1._r8-EHVSTs1(2,3,NZ))
+    WTHPR3=WTHPH3*(1._r8-EHVSTs1(2,3,NZ))
+    WTHTR4=WTHTH4*(1._r8-EHVSTs1(2,4,NZ))
+    WTHNR4=WTHNH4*(1._r8-EHVSTs1(2,4,NZ))
+    WTHPR4=WTHPH4*(1._r8-EHVSTs1(2,4,NZ))
 !
 !     IF PLANT C,N,P REMOVED BY GRAZING
 !
   ELSEIF(IHVSTs1(NZ).EQ.4.OR.IHVSTs1(NZ).EQ.6)THEN
-    WTHTR0=WTHTH0*(1.0-EHVSTs1(2,1,NZ))
-    WTHNR0=WTHNH0*(1.0-EHVSTs1(2,1,NZ)*0.5)
-    WTHPR0=WTHPH0*(1.0-EHVSTs1(2,1,NZ)*0.5)
-    WTHTR1=WTHTH1*(1.0-EHVSTs1(2,1,NZ))
-    WTHNR1=WTHNH1*(1.0-EHVSTs1(2,1,NZ)*0.5)
-    WTHPR1=WTHPH1*(1.0-EHVSTs1(2,1,NZ)*0.5)
-    WTHTR2=WTHTH2*(1.0-EHVSTs1(2,2,NZ))
-    WTHNR2=WTHNH2*(1.0-EHVSTs1(2,2,NZ)*0.5)
-    WTHPR2=WTHPH2*(1.0-EHVSTs1(2,2,NZ)*0.5)
-    WTHTR3=WTHTH3*(1.0-EHVSTs1(2,3,NZ))
-    WTHNR3=WTHNH3*(1.0-EHVSTs1(2,3,NZ)*0.5)
-    WTHPR3=WTHPH3*(1.0-EHVSTs1(2,3,NZ)*0.5)
-    WTHTR4=WTHTH4*(1.0-EHVSTs1(2,4,NZ))
-    WTHNR4=WTHNH4*(1.0-EHVSTs1(2,4,NZ)*0.5)
-    WTHPR4=WTHPH4*(1.0-EHVSTs1(2,4,NZ)*0.5)
+    WTHTR0=WTHTH0*(1._r8-EHVSTs1(2,1,NZ))
+    WTHNR0=WTHNH0*(1._r8-EHVSTs1(2,1,NZ)*0.5)
+    WTHPR0=WTHPH0*(1._r8-EHVSTs1(2,1,NZ)*0.5)
+    WTHTR1=WTHTH1*(1._r8-EHVSTs1(2,1,NZ))
+    WTHNR1=WTHNH1*(1._r8-EHVSTs1(2,1,NZ)*0.5)
+    WTHPR1=WTHPH1*(1._r8-EHVSTs1(2,1,NZ)*0.5)
+    WTHTR2=WTHTH2*(1._r8-EHVSTs1(2,2,NZ))
+    WTHNR2=WTHNH2*(1._r8-EHVSTs1(2,2,NZ)*0.5)
+    WTHPR2=WTHPH2*(1._r8-EHVSTs1(2,2,NZ)*0.5)
+    WTHTR3=WTHTH3*(1._r8-EHVSTs1(2,3,NZ))
+    WTHNR3=WTHNH3*(1._r8-EHVSTs1(2,3,NZ)*0.5)
+    WTHPR3=WTHPH3*(1._r8-EHVSTs1(2,3,NZ)*0.5)
+    WTHTR4=WTHTH4*(1._r8-EHVSTs1(2,4,NZ))
+    WTHNR4=WTHNH4*(1._r8-EHVSTs1(2,4,NZ)*0.5)
+    WTHPR4=WTHPH4*(1._r8-EHVSTs1(2,4,NZ)*0.5)
 !
 !     ADD MANURE FROM GRAZING TO NEXT DAY FERTILIZER
 !
 !     FERT=fertilizer type from fertilizer input file
 !     IYTYP=fertilizer release type from fertilizer input file
 !
-    FERTs1(17)=FERTs1(17) &
-      +(WTHTR0+WTHTR1+WTHTR2+WTHTR3+WTHTR4)/AREA3s1(NUs1)
-    FERTs1(18)=FERTs1(18) &
-      +(WTHNR0+WTHNR1+WTHNR2+WTHNR3+WTHNR4)/AREA3s1(NUs1)*0.5
-    FERTs1(3)=FERTs1(3) &
-      +(WTHNR0+WTHNR1+WTHNR2+WTHNR3+WTHNR4)/AREA3s1(NUs1)*0.5
-    FERTs1(19)=FERTs1(19) &
-      +(WTHPR0+WTHPR1+WTHPR2+WTHPR3+WTHPR4)/AREA3s1(NUs1)
+    FERTs1(17)=FERTs1(17)+(WTHTR0+WTHTR1+WTHTR2+WTHTR3+WTHTR4)/AREA3s1(NUs1)
+    FERTs1(18)=FERTs1(18)+(WTHNR0+WTHNR1+WTHNR2+WTHNR3+WTHNR4)/AREA3s1(NUs1)*0.5_r8
+    FERTs1(3)=FERTs1(3)+(WTHNR0+WTHNR1+WTHNR2+WTHNR3+WTHNR4)/AREA3s1(NUs1)*0.5_r8
+    FERTs1(19)=FERTs1(19)+(WTHPR0+WTHPR1+WTHPR2+WTHPR3+WTHPR4)/AREA3s1(NUs1)
     IYTYPs1=3
 !
 !     REMOVALS BY FIRE
@@ -599,31 +590,31 @@ module PlantDisturbsMod
 !     WTHTL4,WTHNL4,WTHPL4=standing dead C,N,P removed from ecosystem
 !
   ELSEIF(IHVSTs1(NZ).EQ.5)THEN
-    WTHTR0=WTHTH0*(1.0-EHVSTs1(2,1,NZ))
-    WTHNR0=WTHNH0*(1.0-EFIRE(1,IHVSTs1(NZ))*EHVSTs1(2,1,NZ))
-    WTHPR0=WTHPH0*(1.0-EFIRE(2,IHVSTs1(NZ))*EHVSTs1(2,1,NZ))
-    WTHNL0=WTHNH0*(1.0-EHVSTs1(2,1,NZ))
-    WTHPL0=WTHPH0*(1.0-EHVSTs1(2,1,NZ))
-    WTHTR1=WTHTH1*(1.0-EHVSTs1(2,1,NZ))
-    WTHNR1=WTHNH1*(1.0-EFIRE(1,IHVSTs1(NZ))*EHVSTs1(2,1,NZ))
-    WTHPR1=WTHPH1*(1.0-EFIRE(2,IHVSTs1(NZ))*EHVSTs1(2,1,NZ))
-    WTHNL1=WTHNH1*(1.0-EHVSTs1(2,1,NZ))
-    WTHPL1=WTHPH1*(1.0-EHVSTs1(2,1,NZ))
-    WTHTR2=WTHTH2*(1.0-EHVSTs1(2,2,NZ))
-    WTHNR2=WTHNH2*(1.0-EFIRE(1,IHVSTs1(NZ))*EHVSTs1(2,2,NZ))
-    WTHPR2=WTHPH2*(1.0-EFIRE(2,IHVSTs1(NZ))*EHVSTs1(2,2,NZ))
-    WTHNL2=WTHNH2*(1.0-EHVSTs1(2,2,NZ))
-    WTHPL2=WTHPH2*(1.0-EHVSTs1(2,2,NZ))
-    WTHTR3=WTHTH3*(1.0-EHVSTs1(2,3,NZ))
-    WTHNR3=WTHNH3*(1.0-EFIRE(1,IHVSTs1(NZ))*EHVSTs1(2,3,NZ))
-    WTHPR3=WTHPH3*(1.0-EFIRE(2,IHVSTs1(NZ))*EHVSTs1(2,3,NZ))
-    WTHNL3=WTHNH3*(1.0-EHVSTs1(2,3,NZ))
-    WTHPL3=WTHPH3*(1.0-EHVSTs1(2,3,NZ))
-    WTHTR4=WTHTH4*(1.0-EHVSTs1(2,4,NZ))
-    WTHNR4=WTHNH4*(1.0-EFIRE(1,IHVSTs1(NZ))*EHVSTs1(2,4,NZ))
-    WTHPR4=WTHPH4*(1.0-EFIRE(2,IHVSTs1(NZ))*EHVSTs1(2,4,NZ))
-    WTHNL4=WTHNH4*(1.0-EHVSTs1(2,4,NZ))
-    WTHPL4=WTHPH4*(1.0-EHVSTs1(2,4,NZ))
+    WTHTR0=WTHTH0*(1._r8-EHVSTs1(2,1,NZ))
+    WTHNR0=WTHNH0*(1._r8-EFIRE(1,IHVSTs1(NZ))*EHVSTs1(2,1,NZ))
+    WTHPR0=WTHPH0*(1._r8-EFIRE(2,IHVSTs1(NZ))*EHVSTs1(2,1,NZ))
+    WTHNL0=WTHNH0*(1._r8-EHVSTs1(2,1,NZ))
+    WTHPL0=WTHPH0*(1._r8-EHVSTs1(2,1,NZ))
+    WTHTR1=WTHTH1*(1._r8-EHVSTs1(2,1,NZ))
+    WTHNR1=WTHNH1*(1._r8-EFIRE(1,IHVSTs1(NZ))*EHVSTs1(2,1,NZ))
+    WTHPR1=WTHPH1*(1._r8-EFIRE(2,IHVSTs1(NZ))*EHVSTs1(2,1,NZ))
+    WTHNL1=WTHNH1*(1._r8-EHVSTs1(2,1,NZ))
+    WTHPL1=WTHPH1*(1._r8-EHVSTs1(2,1,NZ))
+    WTHTR2=WTHTH2*(1._r8-EHVSTs1(2,2,NZ))
+    WTHNR2=WTHNH2*(1._r8-EFIRE(1,IHVSTs1(NZ))*EHVSTs1(2,2,NZ))
+    WTHPR2=WTHPH2*(1._r8-EFIRE(2,IHVSTs1(NZ))*EHVSTs1(2,2,NZ))
+    WTHNL2=WTHNH2*(1._r8-EHVSTs1(2,2,NZ))
+    WTHPL2=WTHPH2*(1._r8-EHVSTs1(2,2,NZ))
+    WTHTR3=WTHTH3*(1._r8-EHVSTs1(2,3,NZ))
+    WTHNR3=WTHNH3*(1._r8-EFIRE(1,IHVSTs1(NZ))*EHVSTs1(2,3,NZ))
+    WTHPR3=WTHPH3*(1._r8-EFIRE(2,IHVSTs1(NZ))*EHVSTs1(2,3,NZ))
+    WTHNL3=WTHNH3*(1._r8-EHVSTs1(2,3,NZ))
+    WTHPL3=WTHPH3*(1._r8-EHVSTs1(2,3,NZ))
+    WTHTR4=WTHTH4*(1._r8-EHVSTs1(2,4,NZ))
+    WTHNR4=WTHNH4*(1._r8-EFIRE(1,IHVSTs1(NZ))*EHVSTs1(2,4,NZ))
+    WTHPR4=WTHPH4*(1._r8-EFIRE(2,IHVSTs1(NZ))*EHVSTs1(2,4,NZ))
+    WTHNL4=WTHNH4*(1._r8-EHVSTs1(2,4,NZ))
+    WTHPL4=WTHPH4*(1._r8-EHVSTs1(2,4,NZ))
   ENDIF
   end subroutine ApplyDisturbanceBiomRemoval
 
@@ -696,62 +687,62 @@ module PlantDisturbsMod
 !     IGTYP=growth type:0=bryophyte,1=graminoid,2=shrub,tree
 !
             DO 6380 M=1,4
-              CSNCs1(M,1,0,NZ)=CSNCs1(M,1,0,NZ)+(1.0-XHVST) &
+              CSNCs1(M,1,0,NZ)=CSNCs1(M,1,0,NZ)+(1._r8-XHVST) &
                 *(CFOPCs1(0,M,NZ)*(CPOOLs1(NB,NZ)+CPOLNBs1(NB,NZ) &
                 +CPOOLK(NB,NZ)+WTRSVBs1(NB,NZ)) &
                 +CFOPCs1(1,M,NZ)*(WTLFBs1(NB,NZ)*FWODBs1(1) &
                 +WTNDBs1(NB,NZ)) &
                 +CFOPCs1(2,M,NZ)*(WTSHEBs1(NB,NZ)*FWODBs1(1) &
                 +WTHSKBs1(NB,NZ)+WTEARBs1(NB,NZ)))
-              CSNCs1(M,0,0,NZ)=CSNCs1(M,0,0,NZ)+(1.0-XHVST) &
+              CSNCs1(M,0,0,NZ)=CSNCs1(M,0,0,NZ)+(1._r8-XHVST) &
                 *CFOPCs1(5,M,NZ)*(WTLFBs1(NB,NZ)*FWODBs1(0) &
                 +WTSHEBs1(NB,NZ)*FWODBs1(0))
-              ZSNCs1(M,1,0,NZ)=ZSNCs1(M,1,0,NZ)+(1.0-XHVST) &
+              ZSNCs1(M,1,0,NZ)=ZSNCs1(M,1,0,NZ)+(1._r8-XHVST) &
                 *(CFOPNs1(0,M,NZ)*(ZPOOLs1(NB,NZ)+ZPOLNBs1(NB,NZ) &
                 +WTRSBNs1(NB,NZ)) &
                 +CFOPNs1(1,M,NZ)*(WTLFBNs1(NB,NZ)*FWODLNs1(1) &
                 +WTNDBNs1(NB,NZ)) &
                 +CFOPNs1(2,M,NZ)*(WTSHBNs1(NB,NZ)*FWODSNs1(1) &
                 +WTHSBNs1(NB,NZ)+WTEABNs1(NB,NZ)))
-              ZSNCs1(M,0,0,NZ)=ZSNCs1(M,0,0,NZ)+(1.0-XHVST) &
+              ZSNCs1(M,0,0,NZ)=ZSNCs1(M,0,0,NZ)+(1._r8-XHVST) &
                 *CFOPNs1(5,M,NZ)*(WTLFBNs1(NB,NZ)*FWODLNs1(0) &
                 +WTSHBNs1(NB,NZ)*FWODSNs1(0))
-              PSNCs1(M,1,0,NZ)=PSNCs1(M,1,0,NZ)+(1.0-XHVST) &
+              PSNCs1(M,1,0,NZ)=PSNCs1(M,1,0,NZ)+(1._r8-XHVST) &
                 *(CFOPPs1(0,M,NZ)*(PPOOLs1(NB,NZ)+PPOLNBs1(NB,NZ) &
                 +WTRSBPs1(NB,NZ)) &
                 +CFOPPs1(1,M,NZ)*(WTLFBPs1(NB,NZ)*FWODLPs1(1) &
                 +WTNDBPs1(NB,NZ)) &
                 +CFOPPs1(2,M,NZ)*(WTSHBPs1(NB,NZ)*FWODSPs1(1) &
                 +WTHSBPs1(NB,NZ)+WTEABPs1(NB,NZ)))
-              PSNCs1(M,0,0,NZ)=PSNCs1(M,0,0,NZ)+(1.0-XHVST) &
+              PSNCs1(M,0,0,NZ)=PSNCs1(M,0,0,NZ)+(1._r8-XHVST) &
                 *CFOPPs1(5,M,NZ)*(WTLFBPs1(NB,NZ)*FWODLPs1(0) &
                 +WTSHBPs1(NB,NZ)*FWODSPs1(0))
               IF(ISTYPs1(NZ).EQ.0.AND.IWTYPs1(NZ).NE.0)THEN
-                WTRVCs1(NZ)=WTRVCs1(NZ)+(1.0-XHVST) &
+                WTRVCs1(NZ)=WTRVCs1(NZ)+(1._r8-XHVST) &
                   *CFOPCs1(2,M,NZ)*WTGRBs1(NB,NZ)
-                WTRVNs1(NZ)=WTRVNs1(NZ)+(1.0-XHVST) &
+                WTRVNs1(NZ)=WTRVNs1(NZ)+(1._r8-XHVST) &
                   *CFOPNs1(2,M,NZ)*WTGRBNs1(NB,NZ)
-                WTRVPs1(NZ)=WTRVPs1(NZ)+(1.0-XHVST) &
+                WTRVPs1(NZ)=WTRVPs1(NZ)+(1._r8-XHVST) &
                   *CFOPPs1(2,M,NZ)*WTGRBPs1(NB,NZ)
               ELSE
-                CSNCs1(M,1,0,NZ)=CSNCs1(M,1,0,NZ)+(1.0-XHVST) &
+                CSNCs1(M,1,0,NZ)=CSNCs1(M,1,0,NZ)+(1._r8-XHVST) &
                   *CFOPCs1(2,M,NZ)*WTGRBs1(NB,NZ)
-                ZSNCs1(M,1,0,NZ)=ZSNCs1(M,1,0,NZ)+(1.0-XHVST) &
+                ZSNCs1(M,1,0,NZ)=ZSNCs1(M,1,0,NZ)+(1._r8-XHVST) &
                   *CFOPNs1(2,M,NZ)*WTGRBNs1(NB,NZ)
-                PSNCs1(M,1,0,NZ)=PSNCs1(M,1,0,NZ)+(1.0-XHVST) &
+                PSNCs1(M,1,0,NZ)=PSNCs1(M,1,0,NZ)+(1._r8-XHVST) &
                   *CFOPPs1(2,M,NZ)*WTGRBPs1(NB,NZ)
               ENDIF
-              CSNCs1(M,0,0,NZ)=CSNCs1(M,0,0,NZ)+(1.0-XHVST) &
+              CSNCs1(M,0,0,NZ)=CSNCs1(M,0,0,NZ)+(1._r8-XHVST) &
                 *CFOPCs1(5,M,NZ)*WTSTKBs1(NB,NZ)*FWOODs1(0)
-              ZSNCs1(M,0,0,NZ)=ZSNCs1(M,0,0,NZ)+(1.0-XHVST) &
+              ZSNCs1(M,0,0,NZ)=ZSNCs1(M,0,0,NZ)+(1._r8-XHVST) &
                 *CFOPNs1(5,M,NZ)*WTSTBNs1(NB,NZ)*FWOODNs1(0)
-              PSNCs1(M,0,0,NZ)=PSNCs1(M,0,0,NZ)+(1.0-XHVST) &
+              PSNCs1(M,0,0,NZ)=PSNCs1(M,0,0,NZ)+(1._r8-XHVST) &
                 *CFOPPs1(5,M,NZ)*WTSTBPs1(NB,NZ)*FWOODPs1(0)
-              CSNCs1(M,1,0,NZ)=CSNCs1(M,1,0,NZ)+(1.0-XHVST) &
+              CSNCs1(M,1,0,NZ)=CSNCs1(M,1,0,NZ)+(1._r8-XHVST) &
                 *CFOPCs1(3,M,NZ)*WTSTKBs1(NB,NZ)*FWOODs1(1)
-              ZSNCs1(M,1,0,NZ)=ZSNCs1(M,1,0,NZ)+(1.0-XHVST) &
+              ZSNCs1(M,1,0,NZ)=ZSNCs1(M,1,0,NZ)+(1._r8-XHVST) &
                 *CFOPNs1(3,M,NZ)*WTSTBNs1(NB,NZ)*FWOODNs1(1)
-              PSNCs1(M,1,0,NZ)=PSNCs1(M,1,0,NZ)+(1.0-XHVST) &
+              PSNCs1(M,1,0,NZ)=PSNCs1(M,1,0,NZ)+(1._r8-XHVST) &
                 *CFOPPs1(3,M,NZ)*WTSTBPs1(NB,NZ)*FWOODPs1(1)
 6380        CONTINUE
 !
@@ -876,29 +867,29 @@ module PlantDisturbsMod
         DO 8985 N=1,MYs1(NZ)
           DO 8980 L=NUs1,NJs1
             DO 6385 M=1,4
-              CSNCs1(M,1,L,NZ)=CSNCs1(M,1,L,NZ)+(1.0-XHVST) &
+              CSNCs1(M,1,L,NZ)=CSNCs1(M,1,L,NZ)+(1._r8-XHVST) &
                 *CFOPCs1(0,M,NZ)*CPOOLRs1(N,L,NZ)
-              ZSNCs1(M,1,L,NZ)=ZSNCs1(M,1,L,NZ)+(1.0-XHVST) &
+              ZSNCs1(M,1,L,NZ)=ZSNCs1(M,1,L,NZ)+(1._r8-XHVST) &
                 *CFOPNs1(0,M,NZ)*ZPOOLRs1(N,L,NZ)
-              PSNCs1(M,1,L,NZ)=PSNCs1(M,1,L,NZ)+(1.0-XHVST) &
+              PSNCs1(M,1,L,NZ)=PSNCs1(M,1,L,NZ)+(1._r8-XHVST) &
                 *CFOPPs1(0,M,NZ)*PPOOLRs1(N,L,NZ)
               DO NR=1,NRTs1(NZ)
-                CSNCs1(M,0,L,NZ)=CSNCs1(M,0,L,NZ)+(1.0-XHVST) &
+                CSNCs1(M,0,L,NZ)=CSNCs1(M,0,L,NZ)+(1._r8-XHVST) &
                   *CFOPCs1(5,M,NZ)*(WTRT1s1(N,L,NR,NZ) &
                   +WTRT2s1(N,L,NR,NZ))*FWODRs1(0)
-                ZSNCs1(M,0,L,NZ)=ZSNCs1(M,0,L,NZ)+(1.0-XHVST) &
+                ZSNCs1(M,0,L,NZ)=ZSNCs1(M,0,L,NZ)+(1._r8-XHVST) &
                   *CFOPNs1(5,M,NZ)*(WTRT1Ns1(N,L,NR,NZ) &
                   +WTRT2Ns1(N,L,NR,NZ))*FWODRNs1(0)
-                PSNCs1(M,0,L,NZ)=PSNCs1(M,0,L,NZ)+(1.0-XHVST) &
+                PSNCs1(M,0,L,NZ)=PSNCs1(M,0,L,NZ)+(1._r8-XHVST) &
                   *CFOPPs1(5,M,NZ)*(WTRT1Ps1(N,L,NR,NZ) &
                   +WTRT2Ps1(N,L,NR,NZ))*FWODRPs1(0)
-                CSNCs1(M,1,L,NZ)=CSNCs1(M,1,L,NZ)+(1.0-XHVST) &
+                CSNCs1(M,1,L,NZ)=CSNCs1(M,1,L,NZ)+(1._r8-XHVST) &
                   *CFOPCs1(4,M,NZ)*(WTRT1s1(N,L,NR,NZ) &
                   +WTRT2s1(N,L,NR,NZ))*FWODRs1(1)
-                ZSNCs1(M,1,L,NZ)=ZSNCs1(M,1,L,NZ)+(1.0-XHVST) &
+                ZSNCs1(M,1,L,NZ)=ZSNCs1(M,1,L,NZ)+(1._r8-XHVST) &
                   *CFOPNs1(4,M,NZ)*(WTRT1Ns1(N,L,NR,NZ) &
                   +WTRT2Ns1(N,L,NR,NZ))*FWODRNs1(1)
-                PSNCs1(M,1,L,NZ)=PSNCs1(M,1,L,NZ)+(1.0-XHVST) &
+                PSNCs1(M,1,L,NZ)=PSNCs1(M,1,L,NZ)+(1._r8-XHVST) &
                   *CFOPPs1(4,M,NZ)*(WTRT1Ps1(N,L,NR,NZ) &
                   +WTRT2Ps1(N,L,NR,NZ))*FWODRPs1(1)
               ENDDO
@@ -910,17 +901,17 @@ module PlantDisturbsMod
 !     CO2P,OXYP,CH4P,Z2OP,ZH3P,H2GP=root aqueous CO2,O2,CH4,N2O,NH3,H2
 !     RCO2Z,ROXYZ,RCH4Z,RN2OZ,RNH3Z,RH2GZ=root gaseous CO2,O2,CH4,N2O,NH3,H2 loss from disturbance
 !
-            RCO2Zs1(NZ)=RCO2Zs1(NZ)-(1.0-XHVST) &
+            RCO2Zs1(NZ)=RCO2Zs1(NZ)-(1._r8-XHVST) &
               *(CO2As1(N,L,NZ)+CO2Ps1(N,L,NZ))
-            ROXYZs1(NZ)=ROXYZs1(NZ)-(1.0-XHVST) &
+            ROXYZs1(NZ)=ROXYZs1(NZ)-(1._r8-XHVST) &
               *(OXYAs1(N,L,NZ)+OXYPs1(N,L,NZ))
-            RCH4Zs1(NZ)=RCH4Zs1(NZ)-(1.0-XHVST) &
+            RCH4Zs1(NZ)=RCH4Zs1(NZ)-(1._r8-XHVST) &
               *(CH4As1(N,L,NZ)+CH4Ps1(N,L,NZ))
-            RN2OZs1(NZ)=RN2OZs1(NZ)-(1.0-XHVST) &
+            RN2OZs1(NZ)=RN2OZs1(NZ)-(1._r8-XHVST) &
               *(Z2OAs1(N,L,NZ)+Z2OPs1(N,L,NZ))
-            RNH3Zs1(NZ)=RNH3Zs1(NZ)-(1.0-XHVST) &
+            RNH3Zs1(NZ)=RNH3Zs1(NZ)-(1._r8-XHVST) &
               *(ZH3As1(N,L,NZ)+ZH3Ps1(N,L,NZ))
-            RH2GZs1(NZ)=RH2GZs1(NZ)-(1.0-XHVST) &
+            RH2GZs1(NZ)=RH2GZs1(NZ)-(1._r8-XHVST) &
               *(H2GAs1(N,L,NZ)+H2GPs1(N,L,NZ))
             CO2As1(N,L,NZ)=XHVST*CO2As1(N,L,NZ)
             OXYAs1(N,L,NZ)=XHVST*OXYAs1(N,L,NZ)
@@ -992,13 +983,13 @@ module PlantDisturbsMod
 !
             IF(INTYPs1(NZ).NE.0.AND.N.EQ.1)THEN
               DO 6395 M=1,4
-                CSNCs1(M,1,L,NZ)=CSNCs1(M,1,L,NZ)+(1.0-XHVST) &
+                CSNCs1(M,1,L,NZ)=CSNCs1(M,1,L,NZ)+(1._r8-XHVST) &
                   *(CFOPCs1(4,M,NZ)*WTNDLs1(L,NZ) &
                   +CFOPCs1(0,M,NZ)*CPOOLNs1(L,NZ))
-                ZSNCs1(M,1,L,NZ)=ZSNCs1(M,1,L,NZ)+(1.0-XHVST) &
+                ZSNCs1(M,1,L,NZ)=ZSNCs1(M,1,L,NZ)+(1._r8-XHVST) &
                   *(CFOPNs1(4,M,NZ)*WTNDLNs1(L,NZ) &
                   +CFOPNs1(0,M,NZ)*ZPOOLNs1(L,NZ))
-                PSNCs1(M,1,L,NZ)=PSNCs1(M,1,L,NZ)+(1.0-XHVST) &
+                PSNCs1(M,1,L,NZ)=PSNCs1(M,1,L,NZ)+(1._r8-XHVST) &
                   *(CFOPPs1(4,M,NZ)*WTNDLPs1(L,NZ) &
                   +CFOPPs1(0,M,NZ)*PPOOLNs1(L,NZ))
 6395          CONTINUE
@@ -1023,17 +1014,17 @@ module PlantDisturbsMod
 !
         DO 6400 M=1,4
           CSNCs1(M,0,NGs1(NZ),NZ)=CSNCs1(M,0,NGs1(NZ),NZ) &
-            +((1.0-XHVST)*CFOPCs1(0,M,NZ)*WTRVCs1(NZ))*FWOODs1(0)
+            +((1._r8-XHVST)*CFOPCs1(0,M,NZ)*WTRVCs1(NZ))*FWOODs1(0)
           ZSNCs1(M,0,NGs1(NZ),NZ)=ZSNCs1(M,0,NGs1(NZ),NZ) &
-            +((1.0-XHVST)*CFOPNs1(0,M,NZ)*WTRVNs1(NZ))*FWOODNs1(0)
+            +((1._r8-XHVST)*CFOPNs1(0,M,NZ)*WTRVNs1(NZ))*FWOODNs1(0)
           PSNCs1(M,0,NGs1(NZ),NZ)=PSNCs1(M,0,NGs1(NZ),NZ) &
-            +((1.0-XHVST)*CFOPPs1(0,M,NZ)*WTRVPs1(NZ))*FWOODPs1(0)
+            +((1._r8-XHVST)*CFOPPs1(0,M,NZ)*WTRVPs1(NZ))*FWOODPs1(0)
           CSNCs1(M,1,NGs1(NZ),NZ)=CSNCs1(M,1,NGs1(NZ),NZ) &
-            +((1.0-XHVST)*CFOPCs1(0,M,NZ)*WTRVCs1(NZ))*FWOODs1(1)
+            +((1._r8-XHVST)*CFOPCs1(0,M,NZ)*WTRVCs1(NZ))*FWOODs1(1)
           ZSNCs1(M,1,NGs1(NZ),NZ)=ZSNCs1(M,1,NGs1(NZ),NZ) &
-            +((1.0-XHVST)*CFOPNs1(0,M,NZ)*WTRVNs1(NZ))*FWOODNs1(1)
+            +((1._r8-XHVST)*CFOPNs1(0,M,NZ)*WTRVNs1(NZ))*FWOODNs1(1)
           PSNCs1(M,1,NGs1(NZ),NZ)=PSNCs1(M,1,NGs1(NZ),NZ) &
-            +((1.0-XHVST)*CFOPPs1(0,M,NZ)*WTRVPs1(NZ))*FWOODPs1(1)
+            +((1._r8-XHVST)*CFOPPs1(0,M,NZ)*WTRVPs1(NZ))*FWOODPs1(1)
 6400    CONTINUE
         WTRVCs1(NZ)=WTRVCs1(NZ)*XHVST
         WTRVNs1(NZ)=WTRVNs1(NZ)*XHVST
@@ -1117,8 +1108,8 @@ module PlantDisturbsMod
 !
     IF(IHVSTs1(NZ).NE.4.AND.IHVSTs1(NZ).NE.6)THEN
       IF(JHVSTs1(NZ).NE.2)THEN
-        PPXs1(NZ)=PPXs1(NZ)*(1.0-THINs1(NZ))
-        PPs1(NZ)=PPs1(NZ)*(1.0-THINs1(NZ))
+        PPXs1(NZ)=PPXs1(NZ)*(1._r8-THINs1(NZ))
+        PPs1(NZ)=PPs1(NZ)*(1._r8-THINs1(NZ))
       ELSE
 !     PPIs1(NZ)=AMAX1(1.0,0.5*(PPIs1(NZ)+GRNOs1(NZ)/AREA3s1(NUs1)))
         PPXs1(NZ)=PPIs1(NZ)
@@ -1128,7 +1119,7 @@ module PlantDisturbsMod
         CFs1(NZ)=CFs1(NZ)*HVSTs1(NZ)
       ENDIF
       IF(IHVSTs1(NZ).LE.2.AND.HVSTs1(NZ).LT.0.0)THEN
-        ARLFY=(1.0-ABS(HVSTs1(NZ)))*ARLFCs1
+        ARLFY=(1._r8-ABS(HVSTs1(NZ)))*ARLFCs1
         ARLFR=0._r8
         DO 9875 L=1,JC1
           IF(ZLs1(L).GT.ZLs1(L-1).AND.ARLFTs1(L).GT.ZEROSs1 &
@@ -1194,7 +1185,7 @@ module PlantDisturbsMod
 !
       WHVSLX=WHVSTT*EHVSTs1(1,1,NZ)
       WHVSLY=AMIN1(WTLFs1(NZ),WHVSLX)
-      WHVSLF=WHVSLY*(1.0-CCPOLX)
+      WHVSLF=WHVSLY*(1._r8-CCPOLX)
       WHVSCL=WHVSLY*CCPOLX
       WHVSNL=WHVSLY*CCPLNX
       WHVXXX=AMAX1(0.0,WHVSLX-WHVSLY)
@@ -1211,7 +1202,7 @@ module PlantDisturbsMod
       IF(WTSHTT.GT.ZEROPs1(NZ))THEN
         WHVSHX=WHVSSX*WTSHEs1(NZ)/WTSHTT+WHVXXX
         WHVSHY=AMIN1(WTSHEs1(NZ),WHVSHX)
-        WHVSHH=WHVSHY*(1.0-CCPOLX)
+        WHVSHH=WHVSHY*(1._r8-CCPOLX)
         WHVSCS=WHVSHY*CCPOLX
         WHVSNS=WHVSHY*CCPLNX
         WHVXXX=AMAX1(0.0,WHVSHX-WHVSHY)
@@ -1270,14 +1261,14 @@ module PlantDisturbsMod
 !
         IF(WHVXXX.GT.0.0)THEN
           WHVSLY=AMIN1(WTLFs1(NZ)-WHVSLF-WHVSCL,WHVXXX)
-          WHVSLF=WHVSLF+WHVSLY*(1.0-CCPOLX)
+          WHVSLF=WHVSLF+WHVSLY*(1._r8-CCPOLX)
           WHVSCL=WHVSCL+WHVSLY*CCPOLX
           WHVSNL=WHVSNL+WHVSLY*CCPLNX
           WHVXXX=AMAX1(0.0,WHVXXX-WHVSLY)
           IF(WTSHTT.GT.ZEROPs1(NZ))THEN
             WHVSHX=WHVXXX*WTSHEs1(NZ)/WTSHTT
             WHVSHY=AMIN1(WTSHEs1(NZ),WHVSHX)
-            WHVSHH=WHVSHH+WHVSHY*(1.0-CCPOLX)
+            WHVSHH=WHVSHH+WHVSHY*(1._r8-CCPOLX)
             WHVSCS=WHVSCS+WHVSHY*CCPOLX
             WHVSNS=WHVSNS+WHVSHY*CCPLNX
             WHVXXX=AMAX1(0.0,WHVXXX-WHVSHY)
@@ -1333,7 +1324,7 @@ module PlantDisturbsMod
       IF(IHVSTs1(NZ).NE.4.AND.IHVSTs1(NZ).NE.6)THEN
         IF(IHVSTs1(NZ).NE.3)THEN
           IF(ZLs1(L).GT.ZLs1(L-1))THEN
-            FHGT=AMAX1(0.0,AMIN1(1.0,1.0-((ZLs1(L)) &
+            FHGT=AMAX1(0.0,AMIN1(1.0,1._r8-((ZLs1(L)) &
               -HVSTs1(NZ))/(ZLs1(L)-ZLs1(L-1))))
           ELSE
             FHGT=1.0_r8
@@ -1342,12 +1333,12 @@ module PlantDisturbsMod
           FHGT=0._r8
         ENDIF
         IF(test_aeqb(THINs1(NZ),0._r8))THEN
-          FHVST=AMAX1(0.0,1.0-(1.0-FHGT)*EHVSTs1(1,1,NZ))
+          FHVST=AMAX1(0.0,1._r8-(1._r8-FHGT)*EHVSTs1(1,1,NZ))
           FHVSH=FHVST
         ELSE
-          FHVST=AMAX1(0.0,1.0-THINs1(NZ))
+          FHVST=AMAX1(0.0,1._r8-THINs1(NZ))
           IF(IHVSTs1(NZ).EQ.0)THEN
-            FHVSH=1.0_r8-(1.0-FHGT)*EHVSTs1(1,1,NZ)*THINs1(NZ)
+            FHVSH=1.0_r8-(1._r8-FHGT)*EHVSTs1(1,1,NZ)*THINs1(NZ)
           ELSE
             FHVSH=FHVST
           ENDIF
@@ -1398,16 +1389,16 @@ module PlantDisturbsMod
 !     FWODB=C woody fraction in other organs:0=woody,1=non-woody
 !     FWODLN,FWODLP=N,P woody fraction in leaf:0=woody,1=non-woody
 !
-            WHVSBL=WHVSBL-(1.0-FHVST)*WGLFLs1(L,K,NB,NZ)
-            WTHTH1=WTHTH1+(1.0-FHVSH)*WGLFLs1(L,K,NB,NZ)*FWODBs1(1)
-            WTHNH1=WTHNH1+(1.0-FHVSH)*WGLFLNs1(L,K,NB,NZ)*FWODLNs1(1)
-            WTHPH1=WTHPH1+(1.0-FHVSH)*WGLFLPs1(L,K,NB,NZ)*FWODLPs1(1)
+            WHVSBL=WHVSBL-(1._r8-FHVST)*WGLFLs1(L,K,NB,NZ)
+            WTHTH1=WTHTH1+(1._r8-FHVSH)*WGLFLs1(L,K,NB,NZ)*FWODBs1(1)
+            WTHNH1=WTHNH1+(1._r8-FHVSH)*WGLFLNs1(L,K,NB,NZ)*FWODLNs1(1)
+            WTHPH1=WTHPH1+(1._r8-FHVSH)*WGLFLPs1(L,K,NB,NZ)*FWODLPs1(1)
             WTHTX1=WTHTX1+(FHVSH-FHVST)*WGLFLs1(L,K,NB,NZ)*FWODBs1(1)
             WTHNX1=WTHNX1+(FHVSH-FHVST)*WGLFLNs1(L,K,NB,NZ)*FWODLNs1(1)
             WTHPX1=WTHPX1+(FHVSH-FHVST)*WGLFLPs1(L,K,NB,NZ)*FWODLPs1(1)
-            WTHTH3=WTHTH3+(1.0-FHVSH)*WGLFLs1(L,K,NB,NZ)*FWODBs1(0)
-            WTHNH3=WTHNH3+(1.0-FHVSH)*WGLFLNs1(L,K,NB,NZ)*FWODLNs1(0)
-            WTHPH3=WTHPH3+(1.0-FHVSH)*WGLFLPs1(L,K,NB,NZ)*FWODLPs1(0)
+            WTHTH3=WTHTH3+(1._r8-FHVSH)*WGLFLs1(L,K,NB,NZ)*FWODBs1(0)
+            WTHNH3=WTHNH3+(1._r8-FHVSH)*WGLFLNs1(L,K,NB,NZ)*FWODLNs1(0)
+            WTHPH3=WTHPH3+(1._r8-FHVSH)*WGLFLPs1(L,K,NB,NZ)*FWODLPs1(0)
             WTHTX3=WTHTX3+(FHVSH-FHVST)*WGLFLs1(L,K,NB,NZ)*FWODBs1(0)
             WTHNX3=WTHNX3+(FHVSH-FHVST)*WGLFLNs1(L,K,NB,NZ)*FWODLNs1(0)
             WTHPX3=WTHPX3+(FHVSH-FHVST)*WGLFLPs1(L,K,NB,NZ)*FWODLPs1(0)
@@ -1487,7 +1478,7 @@ module PlantDisturbsMod
           IF(IHVSTs1(NZ).NE.4.AND.IHVSTs1(NZ).NE.6)THEN
             IF(WGLFs1(K,NB,NZ).GT.ZEROPs1(NZ) &
               .AND.EHVSTs1(1,1,NZ).GT.0.0)THEN
-              FHVSTK(K)=AMAX1(0.0,AMIN1(1.0,(1.0-(1.0-AMAX1(0.0,WGLFG) &
+              FHVSTK(K)=AMAX1(0.0,AMIN1(1.0,(1._r8-(1._r8-AMAX1(0.0,WGLFG) &
                 /WGLFs1(K,NB,NZ))*EHVSTs1(1,2,NZ)/EHVSTs1(1,1,NZ))))
               FHVSHK(K)=FHVSTK(K)
           ELSE
@@ -1579,16 +1570,16 @@ module PlantDisturbsMod
                 FHVSHK(K)=0._r8
               ENDIF
             ENDIF
-            WHVSBS=WHVSBS-(1.0-FHVSTK(K))*WGSHEs1(K,NB,NZ)
-            WTHTH2=WTHTH2+(1.0-FHVSHK(K))*WGSHEs1(K,NB,NZ)*FWODBs1(1)
-            WTHNH2=WTHNH2+(1.0-FHVSHK(K))*WGSHNs1(K,NB,NZ)*FWODSNs1(1)
-            WTHPH2=WTHPH2+(1.0-FHVSHK(K))*WGSHPs1(K,NB,NZ)*FWODSPs1(1)
+            WHVSBS=WHVSBS-(1._r8-FHVSTK(K))*WGSHEs1(K,NB,NZ)
+            WTHTH2=WTHTH2+(1._r8-FHVSHK(K))*WGSHEs1(K,NB,NZ)*FWODBs1(1)
+            WTHNH2=WTHNH2+(1._r8-FHVSHK(K))*WGSHNs1(K,NB,NZ)*FWODSNs1(1)
+            WTHPH2=WTHPH2+(1._r8-FHVSHK(K))*WGSHPs1(K,NB,NZ)*FWODSPs1(1)
             WTHTX2=WTHTX2+(FHVSHK(K)-FHVSTK(K))*WGSHEs1(K,NB,NZ)*FWODBs1(1)
             WTHNX2=WTHNX2+(FHVSHK(K)-FHVSTK(K))*WGSHNs1(K,NB,NZ)*FWODSNs1(1)
             WTHPX2=WTHPX2+(FHVSHK(K)-FHVSTK(K))*WGSHPs1(K,NB,NZ)*FWODSPs1(1)
-            WTHTH3=WTHTH3+(1.0-FHVSHK(K))*WGSHEs1(K,NB,NZ)*FWODBs1(0)
-            WTHNH3=WTHNH3+(1.0-FHVSHK(K))*WGSHNs1(K,NB,NZ)*FWODSNs1(0)
-            WTHPH3=WTHPH3+(1.0-FHVSHK(K))*WGSHPs1(K,NB,NZ)*FWODSPs1(0)
+            WTHTH3=WTHTH3+(1._r8-FHVSHK(K))*WGSHEs1(K,NB,NZ)*FWODBs1(0)
+            WTHNH3=WTHNH3+(1._r8-FHVSHK(K))*WGSHNs1(K,NB,NZ)*FWODSNs1(0)
+            WTHPH3=WTHPH3+(1._r8-FHVSHK(K))*WGSHPs1(K,NB,NZ)*FWODSPs1(0)
             WTHTX3=WTHTX3+(FHVSHK(K)-FHVSTK(K))*WGSHEs1(K,NB,NZ)*FWODBs1(0)
             WTHNX3=WTHNX3+(FHVSHK(K)-FHVSTK(K))*WGSHNs1(K,NB,NZ)*FWODSNs1(0)
             WTHPX3=WTHPX3+(FHVSHK(K)-FHVSTK(K))*WGSHPs1(K,NB,NZ)*FWODSPs1(0)
@@ -1602,11 +1593,11 @@ module PlantDisturbsMod
 !
             WGSHGY=WGSHGY+WGSHEs1(K,NB,NZ)
             WTSHEBs1(NB,NZ)=WTSHEBs1(NB,NZ) &
-              -(1.0-FHVSTK(K))*WGSHEs1(K,NB,NZ)
+              -(1._r8-FHVSTK(K))*WGSHEs1(K,NB,NZ)
             WTSHBNs1(NB,NZ)=WTSHBNs1(NB,NZ) &
-              -(1.0-FHVSTK(K))*WGSHNs1(K,NB,NZ)
+              -(1._r8-FHVSTK(K))*WGSHNs1(K,NB,NZ)
             WTSHBPs1(NB,NZ)=WTSHBPs1(NB,NZ) &
-              -(1.0-FHVSTK(K))*WGSHPs1(K,NB,NZ)
+              -(1._r8-FHVSTK(K))*WGSHPs1(K,NB,NZ)
             WGSHEs1(K,NB,NZ)=FHVSTK(K)*WGSHEs1(K,NB,NZ)
             WSSHEs1(K,NB,NZ)=FHVSTK(K)*WSSHEs1(K,NB,NZ)
             WGSHNs1(K,NB,NZ)=FHVSTK(K)*WGSHNs1(K,NB,NZ)
@@ -1616,7 +1607,7 @@ module PlantDisturbsMod
               .AND.HTSHEs1(K,NB,NZ).GT.0.0)THEN
               FHGT=AMAX1(0.0,AMIN1(1.0,(HTNODEs1(K,NB,NZ) &
                 +HTSHEs1(K,NB,NZ)-HVSTs1(NZ))/HTSHEs1(K,NB,NZ)))
-              HTSHEs1(K,NB,NZ)=(1.0-FHGT)*HTSHEs1(K,NB,NZ)
+              HTSHEs1(K,NB,NZ)=(1._r8-FHGT)*HTSHEs1(K,NB,NZ)
             ELSE
               HTSHEs1(K,NB,NZ)=FHVSTK(K)*HTSHEs1(K,NB,NZ)
             ENDIF
@@ -1697,9 +1688,9 @@ module PlantDisturbsMod
               CPOLNG=AMAX1(0.0,CPOLNX-WHVSNX)
               ZPOLNG=AMAX1(0.0,ZPOLNX-WHVSNX*ZPOLNX/CPOLNBs1(NB,NZ))
               PPOLNG=AMAX1(0.0,PPOLNX-WHVSNX*PPOLNX/CPOLNBs1(NB,NZ))
-              WTNDG=WTNDBs1(NB,NZ)*(1.0-WHVSNX/CPOLNX)
-              WTNDNG=WTNDBNs1(NB,NZ)*(1.0-WHVSNX/CPOLNX)
-              WTNDPG=WTNDBPs1(NB,NZ)*(1.0-WHVSNX/CPOLNX)
+              WTNDG=WTNDBs1(NB,NZ)*(1._r8-WHVSNX/CPOLNX)
+              WTNDNG=WTNDBNs1(NB,NZ)*(1._r8-WHVSNX/CPOLNX)
+              WTNDPG=WTNDBPs1(NB,NZ)*(1._r8-WHVSNX/CPOLNX)
             ELSE
               CPOLNG=0._r8
               ZPOLNG=0._r8
@@ -1760,10 +1751,10 @@ module PlantDisturbsMod
         IF(ICTYPs1(NZ).EQ.4.AND.CPOOLX.GT.ZEROPs1(NZ))THEN
           FHVST4=CPOOLG/CPOOLX
           DO 9810 K=1,JNODS1
-            WTHTH0=WTHTH0+(1.0-FHVST4)*CPOOL3s1(K,NB,NZ)
-            WTHTH0=WTHTH0+(1.0-FHVST4)*CPOOL4s1(K,NB,NZ)
-            WTHTH0=WTHTH0+(1.0-FHVST4)*CO2Bs1(K,NB,NZ)
-            WTHTH0=WTHTH0+(1.0-FHVST4)*HCOBs1(K,NB,NZ)
+            WTHTH0=WTHTH0+(1._r8-FHVST4)*CPOOL3s1(K,NB,NZ)
+            WTHTH0=WTHTH0+(1._r8-FHVST4)*CPOOL4s1(K,NB,NZ)
+            WTHTH0=WTHTH0+(1._r8-FHVST4)*CO2Bs1(K,NB,NZ)
+            WTHTH0=WTHTH0+(1._r8-FHVST4)*HCOBs1(K,NB,NZ)
             CPOOL3s1(K,NB,NZ)=FHVST4*CPOOL3s1(K,NB,NZ)
             CPOOL4s1(K,NB,NZ)=FHVST4*CPOOL4s1(K,NB,NZ)
             CO2Bs1(K,NB,NZ)=FHVST4*CO2Bs1(K,NB,NZ)
@@ -1796,12 +1787,12 @@ module PlantDisturbsMod
               FHGT=0._r8
             ENDIF
             IF(test_aeqb(THINs1(NZ),0._r8))THEN
-              FHVST=AMAX1(0.0,1.0-(1.0-FHGT)*EHVSTs1(1,3,NZ))
+              FHVST=AMAX1(0.0,1._r8-(1._r8-FHGT)*EHVSTs1(1,3,NZ))
               FHVSH=FHVST
             ELSE
-              FHVST=AMAX1(0.0,1.0-THINs1(NZ))
+              FHVST=AMAX1(0.0,1._r8-THINs1(NZ))
               IF(IHVSTs1(NZ).EQ.0)THEN
-                FHVSH=1.0_r8-(1.0-FHGT)*EHVSTs1(1,3,NZ)*THINs1(NZ)
+                FHVSH=1.0_r8-(1._r8-FHGT)*EHVSTs1(1,3,NZ)*THINs1(NZ)
               ELSE
                 FHVSH=FHVST
               ENDIF
@@ -1812,7 +1803,7 @@ module PlantDisturbsMod
           ENDIF
         ELSE
           IF(WTSTKs1(NZ).GT.ZEROLs1(NZ))THEN
-            FHVST=AMAX1(0.0,AMIN1(1.0,1.0-WHVSTH/WTSTKs1(NZ)))
+            FHVST=AMAX1(0.0,AMIN1(1.0,1._r8-WHVSTH/WTSTKs1(NZ)))
             FHVSH=FHVST
           ELSE
             FHVST=1.0_r8
@@ -1826,9 +1817,9 @@ module PlantDisturbsMod
 !     WTHTX3,WTHNX3,WTHPX3=harvested stalk C,N,P to litter
 !     WTSTKB,WTSTBN,WTSTBP=C,N,P mass remaining in harvested stalk
 !
-        WTHTH3=WTHTH3+(1.0-FHVSH)*WTSTKBs1(NB,NZ)
-        WTHNH3=WTHNH3+(1.0-FHVSH)*WTSTBNs1(NB,NZ)
-        WTHPH3=WTHPH3+(1.0-FHVSH)*WTSTBPs1(NB,NZ)
+        WTHTH3=WTHTH3+(1._r8-FHVSH)*WTSTKBs1(NB,NZ)
+        WTHNH3=WTHNH3+(1._r8-FHVSH)*WTSTBNs1(NB,NZ)
+        WTHPH3=WTHPH3+(1._r8-FHVSH)*WTSTBPs1(NB,NZ)
         WTHTX3=WTHTX3+(FHVSH-FHVST)*WTSTKBs1(NB,NZ)
         WTHNX3=WTHNX3+(FHVSH-FHVST)*WTSTBNs1(NB,NZ)
         WTHPX3=WTHPX3+(FHVSH-FHVST)*WTSTBPs1(NB,NZ)
@@ -1868,16 +1859,16 @@ module PlantDisturbsMod
                 FHGTK=0._r8
               ENDIF
               IF(test_aeqb(THINs1(NZ),0._r8))THEN
-                FHVSTS=AMAX1(0.0,1.0-FHGTK*EHVSTs1(1,3,NZ))
+                FHVSTS=AMAX1(0.0,1._r8-FHGTK*EHVSTs1(1,3,NZ))
               ELSE
-                FHVSTS=AMAX1(0.0,1.0-THINs1(NZ))
+                FHVSTS=AMAX1(0.0,1._r8-THINs1(NZ))
               ENDIF
             ELSE
               FHVSTS=1.0_r8
             ENDIF
           ELSE
             IF(WTSTKs1(NZ).GT.ZEROPs1(NZ))THEN
-              FHVSTS=AMAX1(0.0,AMIN1(1.0,1.0-WHVSTH/WTSTKs1(NZ)))
+              FHVSTS=AMAX1(0.0,AMIN1(1.0,1._r8-WHVSTH/WTSTKs1(NZ)))
             ELSE
               FHVSTS=1.0_r8
             ENDIF
@@ -1917,7 +1908,7 @@ module PlantDisturbsMod
           ENDIF
         ELSE
           IF(WTRSVs1(NZ).GT.ZEROPs1(NZ))THEN
-            FHVST=AMAX1(0.0,AMIN1(1.0,1.0-WHVRVH/WTRSVs1(NZ)))
+            FHVST=AMAX1(0.0,AMIN1(1.0,1._r8-WHVRVH/WTRSVs1(NZ)))
             FHVSH=FHVST
           ELSE
             FHVST=0._r8
@@ -1931,9 +1922,9 @@ module PlantDisturbsMod
 !     WTHTX3,WTHNX3,WTHPX3=harvested stalk C,N,P to litter
 !     WTRSVB,WTRSBN,WTRSBP=stalk reserve C,N,P mass
 !
-        WTHTH3=WTHTH3+(1.0-FHVSH)*WTRSVBs1(NB,NZ)
-        WTHNH3=WTHNH3+(1.0-FHVSH)*WTRSBNs1(NB,NZ)
-        WTHPH3=WTHPH3+(1.0-FHVSH)*WTRSBPs1(NB,NZ)
+        WTHTH3=WTHTH3+(1._r8-FHVSH)*WTRSVBs1(NB,NZ)
+        WTHNH3=WTHNH3+(1._r8-FHVSH)*WTRSBNs1(NB,NZ)
+        WTHPH3=WTHPH3+(1._r8-FHVSH)*WTRSBPs1(NB,NZ)
         WTHTX3=WTHTX3+(FHVSH-FHVST)*WTRSVBs1(NB,NZ)
         WTHNX3=WTHNX3+(FHVSH-FHVST)*WTRSBNs1(NB,NZ)
         WTHPX3=WTHPX3+(FHVSH-FHVST)*WTRSBPs1(NB,NZ)
@@ -1979,21 +1970,21 @@ module PlantDisturbsMod
           FHVSHE=FHVSHG
         ELSE
           IF(WTHSKs1(NZ).GT.ZEROPs1(NZ))THEN
-            FHVSTH=AMAX1(0.0,AMIN1(1.0,1.0-WHVHSH/WTHSKs1(NZ)))
+            FHVSTH=AMAX1(0.0,AMIN1(1.0,1._r8-WHVHSH/WTHSKs1(NZ)))
             FHVSHH=FHVSTH
           ELSE
             FHVSTH=1.0_r8
             FHVSHH=1.0_r8
           ENDIF
           IF(WTEARs1(NZ).GT.ZEROPs1(NZ))THEN
-            FHVSTE=AMAX1(0.0,AMIN1(1.0,1.0-WHVEAH/WTEARs1(NZ)))
+            FHVSTE=AMAX1(0.0,AMIN1(1.0,1._r8-WHVEAH/WTEARs1(NZ)))
             FHVSHE=FHVSTE
           ELSE
             FHVSTE=1.0_r8
             FHVSHE=1.0_r8
           ENDIF
           IF(WTGRs1(NZ).GT.ZEROPs1(NZ))THEN
-            FHVSTG=AMAX1(0.0,AMIN1(1.0,1.0-WHVGRH/WTGRs1(NZ)))
+            FHVSTG=AMAX1(0.0,AMIN1(1.0,1._r8-WHVGRH/WTGRs1(NZ)))
             FHVSHG=FHVSTG
           ELSE
             FHVSTG=1.0_r8
@@ -2009,21 +2000,21 @@ module PlantDisturbsMod
 !     WTHSBP,WTEABP,WTGRBP=branch husk,ear,grain P mass
 !     WTHTG,WTHNG,WTHPG=grain harvested
 !
-        WTHTH2=WTHTH2+(1.0-FHVSHH)*WTHSKBs1(NB,NZ)+(1.0-FHVSHE) &
-          *WTEARBs1(NB,NZ)+(1.0-FHVSHG)*WTGRBs1(NB,NZ)
-        WTHNH2=WTHNH2+(1.0-FHVSHH)*WTHSBNs1(NB,NZ)+(1.0-FHVSHE) &
-          *WTEABNs1(NB,NZ)+(1.0-FHVSHG)*WTGRBNs1(NB,NZ)
-        WTHPH2=WTHPH2+(1.0-FHVSHH)*WTHSBPs1(NB,NZ)+(1.0-FHVSHE) &
-          *WTEABPs1(NB,NZ)+(1.0-FHVSHG)*WTGRBPs1(NB,NZ)
+        WTHTH2=WTHTH2+(1._r8-FHVSHH)*WTHSKBs1(NB,NZ)+(1._r8-FHVSHE) &
+          *WTEARBs1(NB,NZ)+(1._r8-FHVSHG)*WTGRBs1(NB,NZ)
+        WTHNH2=WTHNH2+(1._r8-FHVSHH)*WTHSBNs1(NB,NZ)+(1._r8-FHVSHE) &
+          *WTEABNs1(NB,NZ)+(1._r8-FHVSHG)*WTGRBNs1(NB,NZ)
+        WTHPH2=WTHPH2+(1._r8-FHVSHH)*WTHSBPs1(NB,NZ)+(1._r8-FHVSHE) &
+          *WTEABPs1(NB,NZ)+(1._r8-FHVSHG)*WTGRBPs1(NB,NZ)
         WTHTX2=WTHTX2+(FHVSHH-FHVSTH)*WTHSKBs1(NB,NZ)+(FHVSHE-FHVSTE) &
           *WTEARBs1(NB,NZ)+(FHVSHG-FHVSTG)*WTGRBs1(NB,NZ)
         WTHNX2=WTHNX2+(FHVSHH-FHVSTH)*WTHSBNs1(NB,NZ)+(FHVSHE-FHVSTE) &
           *WTEABNs1(NB,NZ)+(FHVSHG-FHVSTG)*WTGRBNs1(NB,NZ)
         WTHPX2=WTHPX2+(FHVSHH-FHVSTH)*WTHSBPs1(NB,NZ)+(FHVSHE-FHVSTE) &
           *WTEABPs1(NB,NZ)+(FHVSHG-FHVSTG)*WTGRBPs1(NB,NZ)
-        WTHTG=WTHTG+(1.0-FHVSTG)*WTGRBs1(NB,NZ)
-        WTHNG=WTHNG+(1.0-FHVSTG)*WTGRBNs1(NB,NZ)
-        WTHPG=WTHPG+(1.0-FHVSTG)*WTGRBPs1(NB,NZ)
+        WTHTG=WTHTG+(1._r8-FHVSTG)*WTGRBs1(NB,NZ)
+        WTHNG=WTHNG+(1._r8-FHVSTG)*WTGRBNs1(NB,NZ)
+        WTHPG=WTHPG+(1._r8-FHVSTG)*WTGRBPs1(NB,NZ)
 !
 !     REMAINING REPRODUCTIVE C,N,P
 !
@@ -2231,54 +2222,54 @@ module PlantDisturbsMod
               ENDIF
             ENDIF
             DO 3385 M=1,4
-              FHVST=(1.0-XHVST)*CFOPCs1(0,M,NZ)*CPOOLRs1(N,L,NZ)
-              FHVSN=(1.0-XHVSN)*CFOPNs1(0,M,NZ)*ZPOOLRs1(N,L,NZ)
-              FHVSP=(1.0-XHVSP)*CFOPPs1(0,M,NZ)*PPOOLRs1(N,L,NZ)
-              CSNCs1(M,1,L,NZ)=CSNCs1(M,1,L,NZ)+(1.0-FFIRE)*FHVST
-              ZSNCs1(M,1,L,NZ)=ZSNCs1(M,1,L,NZ)+(1.0-FFIRN)*FHVSN
-              PSNCs1(M,1,L,NZ)=PSNCs1(M,1,L,NZ)+(1.0-FFIRP)*FHVSP
-              VCO2Fs1(NZ)=VCO2Fs1(NZ)-(1.0-FCH4F)*FFIRE*FHVST
+              FHVST=(1._r8-XHVST)*CFOPCs1(0,M,NZ)*CPOOLRs1(N,L,NZ)
+              FHVSN=(1._r8-XHVSN)*CFOPNs1(0,M,NZ)*ZPOOLRs1(N,L,NZ)
+              FHVSP=(1._r8-XHVSP)*CFOPPs1(0,M,NZ)*PPOOLRs1(N,L,NZ)
+              CSNCs1(M,1,L,NZ)=CSNCs1(M,1,L,NZ)+(1._r8-FFIRE)*FHVST
+              ZSNCs1(M,1,L,NZ)=ZSNCs1(M,1,L,NZ)+(1._r8-FFIRN)*FHVSN
+              PSNCs1(M,1,L,NZ)=PSNCs1(M,1,L,NZ)+(1._r8-FFIRP)*FHVSP
+              VCO2Fs1(NZ)=VCO2Fs1(NZ)-(1._r8-FCH4F)*FFIRE*FHVST
               VCH4Fs1(NZ)=VCH4Fs1(NZ)-FCH4F*FFIRE*FHVST
-              VOXYFs1(NZ)=VOXYFs1(NZ)-(1.0-FCH4F)*FFIRE*FHVST*2.667
+              VOXYFs1(NZ)=VOXYFs1(NZ)-(1._r8-FCH4F)*FFIRE*FHVST*2.667
               VNH3Fs1(NZ)=VNH3Fs1(NZ)-FFIRN*FHVSN
               VN2OFs1(NZ)=VN2OFs1(NZ)-0.0
               VPO4Fs1(NZ)=VPO4Fs1(NZ)-FFIRP*FHVSP
-              CNETs1(NZ)=CNETs1(NZ)-(1.0-FCH4F)*FFIRE*FHVST
+              CNETs1(NZ)=CNETs1(NZ)-(1._r8-FCH4F)*FFIRE*FHVST
               TNBPs1=TNBPs1-FCH4F*FFIRE*FHVST
               DO NR=1,NRTs1(NZ)
-                FHVST=(1.0-XHVST)*CFOPCs1(5,M,NZ)*(WTRT1s1(N,L,NR,NZ) &
+                FHVST=(1._r8-XHVST)*CFOPCs1(5,M,NZ)*(WTRT1s1(N,L,NR,NZ) &
                   +WTRT2s1(N,L,NR,NZ))*FWODRs1(0)
-                FHVSN=(1.0-XHVSN)*CFOPNs1(5,M,NZ)*(WTRT1Ns1(N,L,NR,NZ) &
+                FHVSN=(1._r8-XHVSN)*CFOPNs1(5,M,NZ)*(WTRT1Ns1(N,L,NR,NZ) &
                   +WTRT2Ns1(N,L,NR,NZ))*FWODRNs1(0)
-                FHVSP=(1.0-XHVSP)*CFOPPs1(5,M,NZ)*(WTRT1Ps1(N,L,NR,NZ) &
+                FHVSP=(1._r8-XHVSP)*CFOPPs1(5,M,NZ)*(WTRT1Ps1(N,L,NR,NZ) &
                   +WTRT2Ps1(N,L,NR,NZ))*FWODRPs1(0)
-                CSNCs1(M,1,L,NZ)=CSNCs1(M,1,L,NZ)+(1.0-FFIRE)*FHVST
-                ZSNCs1(M,1,L,NZ)=ZSNCs1(M,1,L,NZ)+(1.0-FFIRN)*FHVSN
-                PSNCs1(M,1,L,NZ)=PSNCs1(M,1,L,NZ)+(1.0-FFIRP)*FHVSP
-                VCO2Fs1(NZ)=VCO2Fs1(NZ)-(1.0-FCH4F)*FFIRE*FHVST
+                CSNCs1(M,1,L,NZ)=CSNCs1(M,1,L,NZ)+(1._r8-FFIRE)*FHVST
+                ZSNCs1(M,1,L,NZ)=ZSNCs1(M,1,L,NZ)+(1._r8-FFIRN)*FHVSN
+                PSNCs1(M,1,L,NZ)=PSNCs1(M,1,L,NZ)+(1._r8-FFIRP)*FHVSP
+                VCO2Fs1(NZ)=VCO2Fs1(NZ)-(1._r8-FCH4F)*FFIRE*FHVST
                 VCH4Fs1(NZ)=VCH4Fs1(NZ)-FCH4F*FFIRE*FHVST
-                VOXYFs1(NZ)=VOXYFs1(NZ)-(1.0-FCH4F)*FFIRE*FHVST*2.667
+                VOXYFs1(NZ)=VOXYFs1(NZ)-(1._r8-FCH4F)*FFIRE*FHVST*2.667
                 VNH3Fs1(NZ)=VNH3Fs1(NZ)-FFIRN*FHVSN
                 VN2OFs1(NZ)=VN2OFs1(NZ)-0.0
                 VPO4Fs1(NZ)=VPO4Fs1(NZ)-FFIRP*FHVSP
-                CNETs1(NZ)=CNETs1(NZ)-(1.0-FCH4F)*FFIRE*FHVST
+                CNETs1(NZ)=CNETs1(NZ)-(1._r8-FCH4F)*FFIRE*FHVST
                 TNBPs1=TNBPs1-FCH4F*FFIRE*FHVST
-                FHVST=(1.0-XHVST)*CFOPCs1(4,M,NZ)*(WTRT1s1(N,L,NR,NZ) &
+                FHVST=(1._r8-XHVST)*CFOPCs1(4,M,NZ)*(WTRT1s1(N,L,NR,NZ) &
                   +WTRT2s1(N,L,NR,NZ))*FWODRs1(1)
-                FHVSN=(1.0-XHVSN)*CFOPNs1(4,M,NZ)*(WTRT1Ns1(N,L,NR,NZ) &
+                FHVSN=(1._r8-XHVSN)*CFOPNs1(4,M,NZ)*(WTRT1Ns1(N,L,NR,NZ) &
                   +WTRT2Ns1(N,L,NR,NZ))*FWODRNs1(1)
-                FHVSP=(1.0-XHVSP)*CFOPPs1(4,M,NZ)*(WTRT1Ps1(N,L,NR,NZ) &
+                FHVSP=(1._r8-XHVSP)*CFOPPs1(4,M,NZ)*(WTRT1Ps1(N,L,NR,NZ) &
                   +WTRT2Ps1(N,L,NR,NZ))*FWODRPs1(1)
-                CSNCs1(M,1,L,NZ)=CSNCs1(M,1,L,NZ)+(1.0-FFIRE)*FHVST
-                ZSNCs1(M,1,L,NZ)=ZSNCs1(M,1,L,NZ)+(1.0-FFIRN)*FHVSN
-                PSNCs1(M,1,L,NZ)=PSNCs1(M,1,L,NZ)+(1.0-FFIRP)*FHVSP
-                VCO2Fs1(NZ)=VCO2Fs1(NZ)-(1.0-FCH4F)*FFIRE*FHVST
+                CSNCs1(M,1,L,NZ)=CSNCs1(M,1,L,NZ)+(1._r8-FFIRE)*FHVST
+                ZSNCs1(M,1,L,NZ)=ZSNCs1(M,1,L,NZ)+(1._r8-FFIRN)*FHVSN
+                PSNCs1(M,1,L,NZ)=PSNCs1(M,1,L,NZ)+(1._r8-FFIRP)*FHVSP
+                VCO2Fs1(NZ)=VCO2Fs1(NZ)-(1._r8-FCH4F)*FFIRE*FHVST
                 VCH4Fs1(NZ)=VCH4Fs1(NZ)-FCH4F*FFIRE*FHVST
-                VOXYFs1(NZ)=VOXYFs1(NZ)-(1.0-FCH4F)*FFIRE*FHVST*2.667
+                VOXYFs1(NZ)=VOXYFs1(NZ)-(1._r8-FCH4F)*FFIRE*FHVST*2.667
                 VNH3Fs1(NZ)=VNH3Fs1(NZ)-FFIRN*FHVSN
                 VN2OFs1(NZ)=VN2OFs1(NZ)-0.0
                 VPO4Fs1(NZ)=VPO4Fs1(NZ)-FFIRP*FHVSP
-                CNETs1(NZ)=CNETs1(NZ)-(1.0-FCH4F)*FFIRE*FHVST
+                CNETs1(NZ)=CNETs1(NZ)-(1._r8-FCH4F)*FFIRE*FHVST
                 TNBPs1=TNBPs1-FCH4F*FFIRE*FHVST
               enddo
 3385        CONTINUE
@@ -2289,17 +2280,17 @@ module PlantDisturbsMod
 !     CO2P,OXYP,CH4P,Z2OP,ZH3P,H2GP=root aqueous CO2,O2,CH4,N2O,NH3,H2
 !     RCO2Z,ROXYZ,RCH4Z,RN2OZ,RNH3Z,RH2GZ=root gaseous CO2,O2,CH4,N2O,NH3,H2 loss from disturbance
 !
-            RCO2Zs1(NZ)=RCO2Zs1(NZ)-(1.0-XHVST) &
+            RCO2Zs1(NZ)=RCO2Zs1(NZ)-(1._r8-XHVST) &
               *(CO2As1(N,L,NZ)+CO2Ps1(N,L,NZ))
-            ROXYZs1(NZ)=ROXYZs1(NZ)-(1.0-XHVST) &
+            ROXYZs1(NZ)=ROXYZs1(NZ)-(1._r8-XHVST) &
               *(OXYAs1(N,L,NZ)+OXYPs1(N,L,NZ))
-            RCH4Zs1(NZ)=RCH4Zs1(NZ)-(1.0-XHVST) &
+            RCH4Zs1(NZ)=RCH4Zs1(NZ)-(1._r8-XHVST) &
               *(CH4As1(N,L,NZ)+CH4Ps1(N,L,NZ))
-            RN2OZs1(NZ)=RN2OZs1(NZ)-(1.0-XHVST) &
+            RN2OZs1(NZ)=RN2OZs1(NZ)-(1._r8-XHVST) &
               *(Z2OAs1(N,L,NZ)+Z2OPs1(N,L,NZ))
-            RNH3Zs1(NZ)=RNH3Zs1(NZ)-(1.0-XHVST) &
+            RNH3Zs1(NZ)=RNH3Zs1(NZ)-(1._r8-XHVST) &
               *(ZH3As1(N,L,NZ)+ZH3Ps1(N,L,NZ))
-            RH2GZs1(NZ)=RH2GZs1(NZ)-(1.0-XHVST) &
+            RH2GZs1(NZ)=RH2GZs1(NZ)-(1._r8-XHVST) &
               *(H2GAs1(N,L,NZ)+H2GPs1(N,L,NZ))
             CO2As1(N,L,NZ)=XHVST*CO2As1(N,L,NZ)
             OXYAs1(N,L,NZ)=XHVST*OXYAs1(N,L,NZ)
@@ -2372,13 +2363,13 @@ module PlantDisturbsMod
 !
             IF(INTYPs1(NZ).NE.0.AND.N.EQ.1)THEN
               DO 3395 M=1,4
-                CSNCs1(M,1,L,NZ)=CSNCs1(M,1,L,NZ)+(1.0-XHVST) &
+                CSNCs1(M,1,L,NZ)=CSNCs1(M,1,L,NZ)+(1._r8-XHVST) &
                   *(CFOPCs1(4,M,NZ)*WTNDLs1(L,NZ) &
                   +CFOPCs1(0,M,NZ)*CPOOLNs1(L,NZ))
-                ZSNCs1(M,1,L,NZ)=ZSNCs1(M,1,L,NZ)+(1.0-XHVSN) &
+                ZSNCs1(M,1,L,NZ)=ZSNCs1(M,1,L,NZ)+(1._r8-XHVSN) &
                   *(CFOPNs1(4,M,NZ)*WTNDLNs1(L,NZ) &
                   +CFOPNs1(0,M,NZ)*ZPOOLNs1(L,NZ))
-                PSNCs1(M,1,L,NZ)=PSNCs1(M,1,L,NZ)+(1.0-XHVSP) &
+                PSNCs1(M,1,L,NZ)=PSNCs1(M,1,L,NZ)+(1._r8-XHVSP) &
                   *(CFOPPs1(4,M,NZ)*WTNDLPs1(L,NZ) &
                   +CFOPPs1(0,M,NZ)*PPOOLNs1(L,NZ))
 3395          CONTINUE
@@ -2403,17 +2394,17 @@ module PlantDisturbsMod
         IF(ISTYPs1(NZ).NE.0)THEN
           DO 3400 M=1,4
             CSNCs1(M,0,NGs1(NZ),NZ)=CSNCs1(M,0,NGs1(NZ),NZ) &
-              +((1.0-XHVST)*CFOPCs1(0,M,NZ)*WTRVCs1(NZ))*FWOODs1(0)
+              +((1._r8-XHVST)*CFOPCs1(0,M,NZ)*WTRVCs1(NZ))*FWOODs1(0)
             ZSNCs1(M,0,NGs1(NZ),NZ)=ZSNCs1(M,0,NGs1(NZ),NZ) &
-              +((1.0-XHVSN)*CFOPNs1(0,M,NZ)*WTRVNs1(NZ))*FWOODNs1(0)
+              +((1._r8-XHVSN)*CFOPNs1(0,M,NZ)*WTRVNs1(NZ))*FWOODNs1(0)
             PSNCs1(M,0,NGs1(NZ),NZ)=PSNCs1(M,0,NGs1(NZ),NZ) &
-              +((1.0-XHVSP)*CFOPPs1(0,M,NZ)*WTRVPs1(NZ))*FWOODPs1(0)
+              +((1._r8-XHVSP)*CFOPPs1(0,M,NZ)*WTRVPs1(NZ))*FWOODPs1(0)
             CSNCs1(M,1,NGs1(NZ),NZ)=CSNCs1(M,1,NGs1(NZ),NZ) &
-              +((1.0-XHVST)*CFOPCs1(0,M,NZ)*WTRVCs1(NZ))*FWOODs1(1)
+              +((1._r8-XHVST)*CFOPCs1(0,M,NZ)*WTRVCs1(NZ))*FWOODs1(1)
             ZSNCs1(M,1,NGs1(NZ),NZ)=ZSNCs1(M,1,NGs1(NZ),NZ) &
-              +((1.0-XHVSN)*CFOPNs1(0,M,NZ)*WTRVNs1(NZ))*FWOODNs1(1)
+              +((1._r8-XHVSN)*CFOPNs1(0,M,NZ)*WTRVNs1(NZ))*FWOODNs1(1)
             PSNCs1(M,1,NGs1(NZ),NZ)=PSNCs1(M,1,NGs1(NZ),NZ) &
-              +((1.0-XHVSP)*CFOPPs1(0,M,NZ)*WTRVPs1(NZ))*FWOODPs1(1)
+              +((1._r8-XHVSP)*CFOPPs1(0,M,NZ)*WTRVPs1(NZ))*FWOODPs1(1)
 3400      CONTINUE
           WTRVCs1(NZ)=WTRVCs1(NZ)*XHVST
           WTRVNs1(NZ)=WTRVNs1(NZ)*XHVSN

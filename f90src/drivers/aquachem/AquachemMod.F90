@@ -104,8 +104,6 @@ implicit none
   integer, private :: cid_XH11B    !exchangeable OH band-soil, [mol m-3]
   integer, private :: cid_XH21B    !exchangeable OH2 band-soil, [mol m-3]
 
-  integer, private :: nvars
-
   integer, private :: fid_TRN4S    !total solute NH4 transformation non-band, [mol d-2 h-1]
   integer, private :: fid_TRN3S    !total solute NH3 transformation non-band, [mol d-2 h-1]
   integer, private :: fid_TRH1P    !total solute HPO4 transformation non-band, [mol d-2 h-1]

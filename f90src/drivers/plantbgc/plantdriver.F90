@@ -1,10 +1,8 @@
 program main
 !
-! Single layer model
-  use batchmod
   use abortutils, only : endrun
   use fileUtil
-  use data_kind_mod, only : r8 => SHR_KIND_R8
+  use PlantMod
 implicit none
   character(len=*), parameter :: mod_filename = __FILE__
 
@@ -32,37 +30,29 @@ implicit none
 end program main
 
 
+
 ! ----------------------------------------------------------------------
-  subroutine usage()
+subroutine usage()
   !DESCRIPTION
   !display something
   use fileUtil, only : stdout
-  implicit none
-  write(stdout, *) 'boxsbgc.x- standalone driver for ecosim 1-layer soilbgc library.'
-  write(stdout, *) 'usage: boxsbgc.x namelist_filename'
-  end subroutine usage
+ implicit none
+  write(stdout, *) 'plantmodel - standalone driver for plantmodel.'
+  write(stdout, *) 'usage: plantmodel namelist_filename'
+end subroutine usage
+
+
 ! ----------------------------------------------------------------------
 
-  subroutine RunModel(namelist_buffer)
-  !DESCRIPTION
-  !display something
-  use data_kind_mod       , only : r8 => SHR_KIND_R8
-  use MicFLuxTypeMod      , only : micfluxtype
-  use ModelStatusType     , only : model_status_type
-  use MicStateTraitTypeMod, only : micsttype
-  use MicForcTypeMod      , only : micforctype
-  use ecosim_Time_Mod     , only : ecosim_time_type
-  use ecosim_log_mod      , only : errMsg => shr_log_errMsg
-  use batchmod
+subroutine RunModel(namelist_buffer)
+  use ecosim_Time_Mod, only : ecosim_time_type
+  use ModelStatusType, only : model_status_type
+  use data_kind_mod  , only : r8 => SHR_KIND_R8
+  use PlantMod
   use histMod
   use fileUtil
   implicit none
   character(len=*), intent(in) :: namelist_buffer
-!
-! local argument
-  type(micforctype) :: micfor
-  type(micsttype) :: micstt
-  type(micfluxtype) :: micflx
 
   character(len=hist_var_str_len) , allocatable :: varl(:)
   character(len=hist_var_lon_str_len) , allocatable :: varlnml(:)
@@ -85,14 +75,11 @@ end program main
   character(len=hist_freq_str_len) :: hist_freq
   character(len=32) :: model_name
   character(len=32) :: case_id
-  character(len=32) :: prefix
-  logical :: salton
-  namelist /driver_nml/model_name,case_id,hist_freq,salton
+  namelist /driver_nml/model_name,case_id,hist_freq
   character(len=*), parameter :: mod_filename=__FILE__
   hist_freq='day'
-  model_name='boxsbgc'
+  model_name='plant'
   case_id='exp0'
-  salton=.false.
   if ( .true. )then
      ioerror_msg=''
      read(namelist_buffer, nml=driver_nml, iostat=nml_error, iomsg=ioerror_msg)
@@ -113,21 +100,17 @@ end program main
 !!============================================================
 ! customized model varlist creation
   nvars=getvarllen()
-  allocate(varl(nvars)); allocate(varlnml(nvars))
+  allocate(varl(nvars)); allocate(varlnml(nvars));
   allocate(unitl(nvars)); allocate(freql(nvars)); allocate(vartypes(nvars))
-  call getvarlist(nvars,varl, varlnml, unitl, vartypes)
+  call getvarlist(nvars, varl, varlnml, unitl, vartypes)
 !============================================================
+
 
   freql(:) = hist_freq
   allocate(ystatesf(1:ncols,1:nvars));ystatesf(:,:)=0._r8
-  allocate(ystates0l(1:nvars));       ystates0l(:) = 0._r8
-  allocate(ystatesfl(1:nvars));       ystatesfl(:) = 0._r8
-
-  call micfor%Init()
-  call micstt%Init()
-  call micflx%Init()
-
-
+  allocate(ystates0l(1:nvars));ystates0l(:) = 0._r8
+  allocate(ystatesfl(1:nvars));ystatesfl(:) = 0._r8
+!!============================================================
 ! customized model initialization
   call initmodel(nvars, ystates0l, err_status)
 
@@ -135,38 +118,33 @@ end program main
     call endrun(msg=err_status%print_msg())
   endif
 
+!============================================================
   !initialize timer
   call timer%Init(namelist_buffer=namelist_buffer)
-
   dtime=timer%get_step_size()
 
+! initialize history file
   if(len(trim(case_id))==0)then
-    write(gname,'(A)')'boxsbgc'//'.'//trim(model_name)
+    write(gname,'(A)')'plantmodel'//'.'//trim(model_name)
   else
-    write(gname,'(A)')'boxsbgc'//'.'//trim(case_id)//'.'//trim(model_name)
+    write(gname,'(A)')'plantmodel'//'.'//trim(case_id)//'.'//trim(model_name)
   endif
-
-  call hist%init(ncols,varl, varlnml, unitl, vartypes, freql, gname, dtime)
-
-!  call ReadForc(forc)
-
-  DO
+  call hist%init(ncols, varl, varlnml, unitl, vartypes, freql, gname, dtime)
+  !print*,'run the model'
+  do
 
     call timer%update_time_stamp()
 
-  !  call BatchModelConfig(forc,micfor,micstt,micflx, ystatesf0l,err_status)
+!!============================================================
+! customized model run
+    call runplant(nvars,ystates0l, ystatesfl, err_status)
 
-!    if(err_status%check_status())then
-!      call endrun(msg=err_status%print_msg())
-!    endif
+    if(err_status%check_status())then
+      call endrun(msg=err_status%print_msg())
+    endif
+!============================================================
 
-!   computes the fluxes
-!    call SoilBGCOneLayer(I,J,micfor,micstt,micflx)
-
-!    call UpdateStateVars(micstt,micflx,nvars,ystatesfl)
-!
-    call timer%update_time_stamp()
-
+    !print*,'hist_wrap'
     do jj = 1, nvars
       ystatesf(1,jj)=ystatesfl(jj)
     enddo
@@ -177,13 +155,9 @@ end program main
       write(iulog,*)'year ',timer%get_cur_year()
     endif
     if(timer%its_time_to_exit())exit
-
   enddo
   call timer%get_ymdhs(yymmddhhss)
 
-  call hist%histrst('aquachem.x', 'write', yymmddhhss)
+  call hist%histrst('plantmodel', 'write', yymmddhhss)
 
-  call micfor%destroy()
-  call micflx%destroy()
-  call micstt%destroy()
-  end subroutine runModel
+end subroutine RunModel

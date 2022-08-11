@@ -25,8 +25,6 @@ implicit none
 
   call namelist_to_buffer(namelist_filename, namelist_buffer)
 
-  call readNML(namelist_buffer)
-
   call RunModel(namelist_buffer)
 
 end program main

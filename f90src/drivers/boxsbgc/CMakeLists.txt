@@ -6,18 +6,18 @@ include_directories(${ECOSIM_INCLUDE_DIRS})
 include_directories(${CMAKE_BINARY_DIR}/f90src/utils/)
 include_directories(${CMAKE_BINARY_DIR}/f90src/ecosim_datatype/)
 include_directories(${CMAKE_BINARY_DIR}/f90src/ioutils/)
-include_directories(${CMAKE_BINARY_DIR}/f90src/microbial_bgc/)
+include_directories(${CMAKE_BINARY_DIR}/f90src/microbial_bgc/box_model)
 include_directories(${CMAKE_BINARY_DIR}/f90src/APIs/)
 
 include(add_ecosim_library)
-add_ecosim_library(boxsbgc_driver ${BOXSBGC_SOURCES})
+add_ecosim_library(boxsbgc_driver ${BOXSBGC_DRIVER_SOURCES})
 
 set(ECOSIM_LIBRARIES boxsbgc_driver;${ECOSIM_LIBRARIES} PARENT_SCOPE)
 set(ECOSIM_LIBRARIES boxsbgc_driver;${ECOSIM_LIBRARIES})
 
 link_libraries(${ECOSIM_LIBRARIES};${ECOSIM_TPLS})
 include(add_ecosim_executable)
-add_ecosim_executable(batchsbgc.x batchsbgc.F90)
+add_ecosim_executable(boxsbgc.x batchsbgc.F90)
 
 if (NOT CMAKE_INSTALL_PREFIX STREQUAL "INSTALL_DISABLED")
   install(TARGETS boxsbgc.x DESTINATION bin)

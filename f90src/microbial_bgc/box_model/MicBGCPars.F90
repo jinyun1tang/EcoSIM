@@ -30,6 +30,9 @@ implicit none
   integer :: n_aceto_methang
   integer :: n_aero_n2fixer
   integer :: n_anero_n2fixer
+  integer :: ndbiomcp   !number of necrobiomass components
+  integer :: nlbiomcp   !number of living biomass components
+
   real(r8), allocatable :: OMCI(:,:)             !initializes microbial biomass
   real(r8), allocatable :: OHCK(:)    !fractions of SOC in adsorbed C
   real(r8), allocatable :: OMCK(:)    !fractions of SOC in biomass
@@ -50,6 +53,7 @@ implicit none
   real(r8),allocatable :: OMCF(:)                            !hetero microbial biomass composition in SOC
   real(r8),allocatable :: OMCA(:)                            !autotrophic microbial biomass composition in SOC
   logical, allocatable :: is_activef_micb(:)
+  logical, allocatable :: is_litter(:)
   character(len=16) :: kiname(0:3)
   character(len=16) :: cplxname(0:4)
   character(len=16) :: hmicname(7)
@@ -73,21 +77,25 @@ contains
   !organic matter is grouped into five complexes, including woody(0),
   ! non-woody(1), manure(2), litter, POC(3) and humus(4) (g Mg-1)
 
+  this%ndbiomcp=2  !number of necrobiomass components
+  this%nlbiomcp=3  !number of living biomass components
+
   this%jcplx=5 !# of microbe-substrate complexes
   this%jcplx1=this%jcplx-1
   this%jsken=4 !# of kinetic components of the substrates
   this%jguilds=nmicbguilds
   this%NFGs=7
-
-  this%k_woody_litr=0
-  this%k_non_woody_litr=1
-  this%k_manure=2
+  !woody, non_woody litter and manure are defined as litter
+  allocate(this%is_litter(0:this%jcplx1));this%is_litter(:)=.false.
+  this%k_woody_litr=0;     this%is_litter(this%k_woody_litr)=.true.
+  this%k_non_woody_litr=1; this%is_litter(this%k_non_woody_litr)=.true.
+  this%k_manure=2;         this%is_litter(this%k_manure)=.true.
   this%k_POM=3
   this%k_humus=4
-  this%kiname(1)='protein'
-  this%kiname(2)='carbhydro'
-  this%kiname(3)='cellulose'
-  this%kiname(0)='lignin'
+  this%kiname(0)='protein'
+  this%kiname(1)='carbhydro'
+  this%kiname(2)='cellulose'
+  this%kiname(3)='lignin'
   this%cplxname(0)='woodylitr'
   this%cplxname(1)='nwoodylit'
   this%cplxname(2)='manure'

@@ -117,30 +117,30 @@ implicit none
   real(r8) :: DCORPs1
   real(r8) :: VOLWOUs1
   integer :: ITILLs1
-  real(r8), allocatable :: AREA3s1(:)
-  integer,  allocatable :: IDTHs1(:)
-  integer,  allocatable :: IYR0s1(:)
-  integer,  allocatable :: IDAYXs1(:)
-  integer,  allocatable :: INTYPs1(:)
-  integer,  allocatable :: IYRXs1(:)
-  integer,  allocatable :: IYRYs1(:)
-  integer,  allocatable :: IFLGCs1(:)
-  integer,  allocatable :: IDAY0s1(:)
-  integer,  allocatable :: IDAYHs1(:)
-  integer,  allocatable :: IYRHs1(:)
-  integer,  allocatable :: IWTYPs1(:)
-  integer,  allocatable :: IHVSTs1(:)
-  integer,  allocatable :: JHVSTs1(:)
-  integer,  allocatable :: NB1s1(:)
-  integer,  allocatable :: NIs1(:)
-  integer,  allocatable :: NRTs1(:)
-  integer,  allocatable :: NNODs1(:)
-  integer,  allocatable :: IBTYPs1(:)
-  integer,  allocatable :: IDTHPs1(:)
-  integer,  allocatable :: ISTYPs1(:)
-  integer,  allocatable :: ICTYPs1(:)
-  integer,  allocatable :: IDTHRs1(:)
-  integer,  allocatable :: NBTs1(:)
+  real(r8), allocatable :: AREA3s1(:)    !soil thickness
+  integer,  allocatable :: IDTHs1(:)     !flag for species death
+  integer,  allocatable :: IYR0s1(:)     !year of planting
+  integer,  allocatable :: IDAYXs1(:)    !!alternate day of planting
+  integer,  allocatable :: IYRXs1(:)     !alternate year of planting
+  integer,  allocatable :: IYRYs1(:)     !alternate year of harvest
+  integer,  allocatable :: INTYPs1(:)    !N2 fixation type
+  integer,  allocatable :: IFLGCs1(:)    !flag for living pft
+  integer,  allocatable :: IDAY0s1(:)    !day of planting
+  integer,  allocatable :: IDAYHs1(:)    !day of harvest
+  integer,  allocatable :: IYRHs1(:)     !year of harvest
+  integer,  allocatable :: IWTYPs1(:)    !climate signal for phenological progress: none, temperature, water stress
+  integer,  allocatable :: IHVSTs1(:)    !type of harvest
+  integer,  allocatable :: JHVSTs1(:)    !flag for stand replacing disturbance
+  integer,  allocatable :: IBTYPs1(:)    !phenologically-driven above-ground turnover: all, foliar only, none
+  integer,  allocatable :: IDTHPs1(:)    !flag to detect canopy death
+  integer,  allocatable :: ISTYPs1(:)    !plant growth habit: annual or perennial
+  integer,  allocatable :: ICTYPs1(:)    !plant photosynthetic type (C3 or C4)
+  integer,  allocatable :: IDTHRs1(:)    !flag to detect root system death
+  integer,  allocatable :: NB1s1(:)      !number of main branch
+  integer,  allocatable :: NIs1(:)       !maximum soil layer number for all root axes
+  integer,  allocatable :: NRTs1(:)      !root primary axis number
+  integer,  allocatable :: NNODs1(:)     !number of concurrently growing nodes
+  integer,  allocatable :: NBTs1(:)      !branch number
   integer,  allocatable :: MYs1(:)
   integer,  allocatable :: NGs1(:)
   integer,  allocatable :: NBRs1(:)

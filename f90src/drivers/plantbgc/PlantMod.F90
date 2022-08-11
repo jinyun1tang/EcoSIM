@@ -1,4 +1,4 @@
-module MockMod
+module PlantMod
  use ecosim_log_mod    , only : errMsg => shr_log_errMsg
  use histMod           , only : hist_freq_str_len
  use abortutils        , only : endrun
@@ -11,7 +11,7 @@ implicit none
   public :: getvarllen
   public :: getvarlist
   public :: initmodel
-  public :: runmock
+  public :: runplant
   contains
 
 ! ----------------------------------------------------------------------
@@ -53,7 +53,7 @@ implicit none
 
 ! ----------------------------------------------------------------------
 
-  subroutine runmock(nvars,ystates0l, ystatesfl, err_status)
+  subroutine runplant(nvars,ystates0l, ystatesfl, err_status)
 
   implicit none
   integer, intent(in) :: nvars
@@ -71,7 +71,7 @@ implicit none
   enddo
 
 
-  end subroutine runmock
+  end subroutine runplant
 
 
 ! ----------------------------------------------------------------------
@@ -91,4 +91,4 @@ implicit none
 
 ! ----------------------------------------------------------------------
 
-end module MockMod
+end module PlantMod

@@ -3870,7 +3870,7 @@ module MicBGCMod
 !     CGOMS,CGONS,CGOPS=transfer from nonstructural to structural C,N,P
 !     FL=partitioning between labile and resistant microbial components
 !     OMC,OMN,OMP=nonstructural microbial C,N,P
-!
+! M=1:labile, 2, resistant
   CGOMZ=TFNG(NGL,N,K)*OMGR*AMAX1(0.0,OMC(3,NGL,N,K))
   DO 745 M=1,2
     CGOMS(M,NGL,N,K)=FL(M)*CGOMZ
