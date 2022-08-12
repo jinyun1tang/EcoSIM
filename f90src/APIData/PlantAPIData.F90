@@ -1,123 +1,130 @@
 module PlantAPIData
   use data_kind_mod, only : r8 => SHR_KIND_R8
 implicit none
-  integer  :: JP1,JSA1,jcplx11,JLA1
-  integer  :: JC1,JZ1,JLI1,JNODS1
+! grid configuration
+  integer  :: JP1         !number of plants
+  integer  :: JSA1        !number of sectors for the sky azimuth  [0,2*pi]
+  integer  :: jcplx11     !number of organo-microbial complexes
+  integer  :: JLA1        !number of sectors for the leaf azimuth, [0,pi]
+  integer  :: JC1         !number of canopy layers
+  integer  :: JZ1         !number of soil layers
+  integer  :: JLI1        !number of sectors for the leaf zenith [0,pi/2]
+  integer  :: JNODS1      !number of canopy nodes
 !begin_data
-  real(r8) :: TYSINs1
-  real(r8) :: ALBSs1
-  real(r8) :: ALATs1
-  real(r8) :: ATCAs1
-  real(r8) :: ALBXs1
-  real(r8) :: ARLSSs1
-  real(r8) :: ARLFCs1
-  real(r8) :: ALTs1
-  real(r8) :: VOLWSs1
-  real(r8) :: CCO2EIs1
-  real(r8) :: CO2EIs1
-  real(r8) :: COXYEs1
-  real(r8) :: RABs1
-  real(r8) :: VOLSSs1
-  real(r8) :: TSHCs1
-  real(r8) :: CNETXs1
-  real(r8) :: ZNOONs1
-  real(r8) :: GAZIs1
-  real(r8) :: GCOSs1
-  real(r8) :: CO2Es1
-  real(r8) :: CCO2Es1
-  real(r8) :: CCH4Es1
-  real(r8) :: CZ2OEs1
-  real(r8) :: CH2GEs1
-  real(r8) :: CNH3Es1
-  real(r8) :: DYLXs1
-  real(r8) :: RAP0s1
-  real(r8) :: RADYs1
-  real(r8) :: RADSs1
-  real(r8) :: RAPYs1
-  real(r8) :: RAPSs1
-  real(r8) :: DYLNs1
-  real(r8) :: DPTHSs1
-  real(r8) :: DYLMs1
-  real(r8) :: ZSs1
-  real(r8) :: OXYEs1
-  real(r8) :: PPTs1
-  real(r8) :: RIBs1
-  real(r8) :: RECOs1
-  real(r8) :: POROS1s1
-  real(r8) :: UAs1
-  real(r8) :: TGHs1
-  real(r8) :: TBALCs1
-  real(r8) :: TBALNs1
-  real(r8) :: TBALPs1
-  real(r8) :: Z0s1
-  real(r8) :: VHCPWXs1
-  real(r8) :: VHCPW1s1
-  real(r8) :: TCCANs1
-  real(r8) :: TCH4Zs1
-  real(r8) :: TENGYCs1
-  real(r8) :: THRMCs1
-  real(r8) :: TEVAPPs1
-  real(r8) :: TCO2Zs1
-  real(r8) :: TEVAPCs1
-  real(r8) :: TH2GZs1
-  real(r8) :: THFLXCs1
-  real(r8) :: TRNs1
-  real(r8) :: RAD0s1
-  real(r8) :: FRADGs1
-  real(r8) :: TRAPCs1
-  real(r8) :: RADGs1
-  real(r8) :: GSINs1
-  real(r8) :: TN2OZs1
-  real(r8) :: TLEs1
-  real(r8) :: TOXYZs1
-  real(r8) :: TNH3Zs1
-  real(r8) :: TVOLWPs1
-  real(r8) :: SSINNs1
-  real(r8) :: SSINs1
-  real(r8) :: ZZSNCs1
-  real(r8) :: ZPSNCs1
-  real(r8) :: ZCSNCs1
-  real(r8) :: VOLISs1
-  real(r8) :: WTSTGTs1
-  real(r8) :: ARSTCs1
-  real(r8) :: TKWs1
-  real(r8) :: TVOLWCs1
-  real(r8) :: TSHs1
-  real(r8) :: TNBPs1
-  real(r8) :: TGPPs1
-  real(r8) :: TKAs1
-  real(r8) :: TLECs1
-  real(r8) :: THRMGXs1
-  real(r8) :: THSs1
-  real(r8) :: TRAUs1
-  real(r8) :: UVOLOs1
-  real(r8) :: VPAs1
-  real(r8) :: XHVSTCs1
-  real(r8) :: XHVSTNs1
-  real(r8) :: XHVSTPs1
-  real(r8) :: XCORPs1
-  real(r8) :: ZEROS2s1
-  real(r8) :: ZEROSs1
-  real(r8) :: ZEROs1
-  real(r8) :: ZERO2s1
-  real(r8) :: ZRs1     !canopy surface roughness height, [m]
-  real(r8) :: ZTs1     !canopy height , [m]
-  real(r8) :: ZDs1     !zero plane displacement height, [m]
-  integer :: IYTYPs1
-  integer :: IETYPs1
-  integer :: IFLGTs1
-  integer :: NLs1
-  integer :: NP0s1
-  integer :: NJs1
-  integer :: NPs1
-  integer :: NUs1
-  integer :: LYRCs1
-  integer :: IYRCs1                    !current year
-!  real(r8) :: AREA3Us1
-  real(r8) :: DCORPs1
-  real(r8) :: VOLWOUs1
-  integer :: ITILLs1
-  real(r8), allocatable :: AREA3s1(:)    !soil thickness
+  real(r8) :: TYSINs1     !sine of sky angles
+  real(r8) :: ALBSs1      !snowpack albedo
+  real(r8) :: ALATs1      !latitude	[degrees]
+  real(r8) :: ATCAs1      !mean annual air temperature, [oC]
+  real(r8) :: ALBXs1      !Surface albedo
+  real(r8) :: ARLSSs1     !stalk area of combined,each PFT canopy
+  real(r8) :: ARLFCs1     !total canopy leaf area, [m2 d-2]
+  real(r8) :: ALTs1       !altitude of grid cell, [m]
+  real(r8) :: VOLWSs1     !water volume in snowpack, [m3 d-2]
+  real(r8) :: CCO2EIs1    !initial atmospheric CO2 concentration, [g m-3]
+  real(r8) :: CO2EIs1     !initial atmospheric CO2 concentration, [umol mol-1]
+  real(r8) :: COXYEs1     !atmospheric O2 concentration, [g m-3]
+  real(r8) :: RABs1       !isothermal boundary layer resistance, [h m-1]
+  real(r8) :: VOLSSs1     !snow volume in snowpack (water equivalent), [m3 d-2]
+  real(r8) :: TSHCs1      !total sensible heat flux x boundary layer resistance, [MJ m-1]
+  real(r8) :: CNETXs1     !total net canopy CO2 exchange, [g d-2 h-1]
+  real(r8) :: ZNOONs1     !time of solar noon, [h]
+  real(r8) :: GAZIs1      !azimuth of slope, [-]
+  real(r8) :: GCOSs1      !cosine of slope, [-]
+  real(r8) :: CO2Es1      !atmospheric CO2 concentration, [umol mol-1]
+  real(r8) :: CCO2Es1     !atmospheric CO2 concentration, [g m-3]
+  real(r8) :: CCH4Es1     !atmospheric CH4 concentration, [g m-3]
+  real(r8) :: CZ2OEs1     !atmospheric N2O concentration, [g m-3]
+  real(r8) :: CH2GEs1     !atmospheric H2 concentration, [g m-3]
+  real(r8) :: CNH3Es1     !atmospheric NH3 concentration, [g m-3]
+  real(r8) :: DYLXs1      !daylength of previous day, [h]
+  real(r8) :: RAP0s1      !PAR radiation in solar beam, [umol m-2 s-1]
+  real(r8) :: RADYs1      !diffuse shortwave radiation, [W m-2]
+  real(r8) :: RADSs1      !direct shortwave radiation, [W m-2]
+  real(r8) :: RAPYs1      !diffuse PAR, [umol m-2 s-1]
+  real(r8) :: RAPSs1      !direct PAR, [umol m-2 s-1]
+  real(r8) :: DYLNs1      !daylength, [h]
+  real(r8) :: DPTHSs1     !snowpack depth, [m]
+  real(r8) :: DYLMs1      !maximum daylength, [h]
+  real(r8) :: ZSs1        !initial soil surface roughness height, [m]
+  real(r8) :: OXYEs1      !atmospheric O2 concentration, [umol mol-1]
+  real(r8) :: PPTs1       !total plant population, [d-2]
+  real(r8) :: RIBs1       !Richardson number for calculating boundary layer resistance, [-]
+  real(r8) :: RECOs1      !ecosystem respiration, [g d-2 h-1]
+  real(r8) :: POROS1s1    !soil porosity
+  real(r8) :: UAs1        !wind speed, [m h-1]
+  real(r8) :: TGHs1       !ecosystem storage heat flux, [MJ d-2 h-1]
+  real(r8) :: TBALCs1     !total plant C balance	gC d-2
+  real(r8) :: TBALNs1     !total plant N balance	gN d-2
+  real(r8) :: TBALPs1     !total plant P balance	gP d-2
+  real(r8) :: Z0s1        !wind speed measurement height, [m]
+  real(r8) :: VHCPWXs1    !snowpack heat capacity from previous time step, [MJ d-2 K-1]
+  real(r8) :: VHCPW1s1    !snowpack heat capacity, [MJ m-3 K-1]
+  real(r8) :: TCCANs1     !total net CO2 fixation, [gC d-2]
+  real(r8) :: TCH4Zs1     !total root CH4 content, [gC d-2]
+  real(r8) :: TENGYCs1    !total canopy heat content, [MJ  d-2]
+  real(r8) :: THRMCs1     !total canopy LW emission, [MJ d-2 h-1]
+  real(r8) :: TEVAPPs1    !total canopy evaporation + transpiration, [m3 d-2]
+  real(r8) :: TCO2Zs1     !total root CO2 content, [gC d-2]
+  real(r8) :: TEVAPCs1    !total canopy evaporation, [m3 d-2]
+  real(r8) :: TH2GZs1     !total root H2 flux, [g d-2]
+  real(r8) :: THFLXCs1    !total canopy heat flux, [MJ  d-2]
+  real(r8) :: TRNs1       !ecosystem net radiation, [MJ d-2 h-1]
+  real(r8) :: RAD0s1      !shortwave radiation in solar beam, [MJ m-2 h-1]
+  real(r8) :: FRADGs1     !fraction of radiation intercepted by ground surface, [-]
+  real(r8) :: RADGs1      !radiation intercepted by ground surface, [MJ m-2 h-1]
+  real(r8) :: GSINs1      !sine of slope, [-]
+  real(r8) :: TN2OZs1     !total root N2O content, [g d-2]
+  real(r8) :: TLEs1       !ecosystem latent heat flux, [MJ d-2 h-1]
+  real(r8) :: TOXYZs1     !total root O2 content, [g d-2]
+  real(r8) :: TNH3Zs1     !total root NH3 content, [g d-2]
+  real(r8) :: TVOLWPs1    !total canopy water content, [m3 d-2]
+  real(r8) :: SSINNs1     !sine of solar angle next hour, [-]
+  real(r8) :: SSINs1      !sine of solar angle, [-]
+  real(r8) :: ZZSNCs1     !total litterfall N, [g d-2 h-1]
+  real(r8) :: ZPSNCs1     !total litterfall P, [g d-2 h-1]
+  real(r8) :: ZCSNCs1     !total litterfall C, [g d-2 h-1]
+  real(r8) :: VOLISs1     !ice volume in snowpack, [m3 d-2]
+  real(r8) :: WTSTGTs1    !total standing dead C, [g d-2]
+  real(r8) :: ARSTCs1     !total canopy stem area, [m2 d-2]
+  real(r8) :: TKWs1       !snow temperature, [K]
+  real(r8) :: TVOLWCs1    !canopy surface water content, [m3 d-2]
+  real(r8) :: TSHs1       !ecosystem sensible heat flux, [MJ d-2 h-1]
+  real(r8) :: TNBPs1      !total NBP, [g d-2]
+  real(r8) :: TGPPs1      !ecosystem GPP, [g d-2 h-1]
+  real(r8) :: TKAs1       !air temperature, [K]
+  real(r8) :: TLECs1      !total latent heat flux x boundary layer resistance, [MJ m-1]
+  real(r8) :: THRMGXs1    !longwave radiation emitted by ground surface, [MJ m-2 h-1]
+  real(r8) :: THSs1       !sky longwave radiation , [MJ d-2 h-1]
+  real(r8) :: TRAUs1      !ecosystem autotrophic respiration, [g d-2 h-1]
+  real(r8) :: UVOLOs1     !total subsurface water flux, [m3 d-2]
+  real(r8) :: VPAs1       !vapor concentration, [m3 m-3]
+  real(r8) :: XHVSTCs1    !ecosystem harvest C, [gC d-2]
+  real(r8) :: XHVSTNs1    !ecosystem harvest N, [gN d-2]
+  real(r8) :: XHVSTPs1    !ecosystem harvest P, [gP d-2]
+  real(r8) :: XCORPs1     !factor for surface litter incorporation and soil mixing
+  real(r8) :: ZEROS2s1    !threshold zero
+  real(r8) :: ZEROSs1     !threshold zero
+  real(r8) :: ZEROs1      !threshold zero
+  real(r8) :: ZERO2s1     !threshold zero
+  real(r8) :: ZRs1        !canopy surface roughness height, [m]
+  real(r8) :: ZTs1        !canopy height , [m]
+  real(r8) :: ZDs1        !zero plane displacement height, [m]
+  integer :: IYTYPs1      !fertilizer release type from fertilizer input file
+  integer :: IETYPs1      !Koppen climate zone
+  integer :: IFLGTs1      !number of active PFT
+  integer :: NLs1         !lowest soil layer number
+  integer :: NP0s1        !intitial number of plant species
+  integer :: NJs1         !maximum root layer number
+  integer :: NPs1         !number of plant species
+  integer :: NUs1         !soil surface layer number
+  integer :: LYRCs1       !number of days in current year
+  integer :: IYRCs1       !current year
+  real(r8) :: DCORPs1     !soil mixing fraction with tillage, [-]
+  real(r8) :: VOLWOUs1    !total subsurface water flux	m3 d-2
+  integer :: ITILLs1      !soil disturbance type, [-]
+  character(len=16), allocatable :: DATAPs1(:) !parameter file name
+  CHARACTER(len=16), allocatable :: DATAs1(:)  !pft file
+  real(r8), allocatable :: AREA3s1(:)    !soil cross section area (vertical plan defined by its normal direction)
   integer,  allocatable :: IDTHs1(:)     !flag for species death
   integer,  allocatable :: IYR0s1(:)     !year of planting
   integer,  allocatable :: IDAYXs1(:)    !!alternate day of planting
@@ -138,758 +145,755 @@ implicit none
   integer,  allocatable :: IDTHRs1(:)    !flag to detect root system death
   integer,  allocatable :: NB1s1(:)      !number of main branch
   integer,  allocatable :: NIs1(:)       !maximum soil layer number for all root axes
+  integer,  allocatable :: NIXs1(:)      !maximum soil layer number for all root axes, [-]
   integer,  allocatable :: NRTs1(:)      !root primary axis number
   integer,  allocatable :: NNODs1(:)     !number of concurrently growing nodes
   integer,  allocatable :: NBTs1(:)      !branch number
-  integer,  allocatable :: MYs1(:)
-  integer,  allocatable :: NGs1(:)
-  integer,  allocatable :: NBRs1(:)
-  integer,  allocatable :: NIXs1(:)
-  integer,  allocatable :: IDTYPs1(:)
-  integer,  allocatable :: IPTYPs1(:)
-  integer,  allocatable :: IGTYPs1(:)
-  integer,  allocatable :: IFLGIs1(:)
-  integer,  allocatable :: IDATAs1(:)
-  real(r8), allocatable :: FERTs1(:)
-  real(r8), allocatable :: TDFOMCs1(:,:)
-  real(r8), allocatable :: TDFOMPs1(:,:)
-  real(r8), allocatable :: TDFOMNs1(:,:)
-  real(r8), allocatable :: RUPNFs1(:,:)
-  real(r8), allocatable :: ARLFTs1(:)
-  real(r8), allocatable :: ARLFSs1(:)
-  real(r8), allocatable :: RCSs1(:)
-  real(r8), allocatable :: TAUSs1(:)
-  real(r8), allocatable :: TAU0s1(:)
-  real(r8), allocatable :: ANGBRs1(:)
-  real(r8), allocatable :: SSL1s1(:)
-  real(r8), allocatable :: SNL1s1(:)
-  real(r8), allocatable :: CPEARs1(:)
-  real(r8), allocatable :: DMSHEs1(:)
-  real(r8), allocatable :: ABSRs1(:)
-  real(r8), allocatable :: ABSPs1(:)
-  real(r8), allocatable :: CPHSKs1(:)
-  real(r8), allocatable :: DMSTKs1(:)
-  real(r8), allocatable :: DMHSKs1(:)
-  real(r8), allocatable :: DMRSVs1(:)
-  real(r8), allocatable :: DMGRs1(:)
-  real(r8), allocatable :: DMEARs1(:)
-  real(r8), allocatable :: OMEGAGs1(:)
-  real(r8), allocatable :: CNHSKs1(:)
-  real(r8), allocatable :: CNRSVs1(:)
-  real(r8), allocatable :: CNEARs1(:)
-  real(r8), allocatable :: CPRSVs1(:)
-  real(r8), allocatable :: ANGSHs1(:)
-  real(r8), allocatable :: SLA1s1(:)
-  real(r8), allocatable :: FCO2s1(:)
-  real(r8), allocatable :: ZCOSs1(:)
-  real(r8), allocatable :: XKO2s1(:)
-  real(r8), allocatable :: CPO4Ss1(:)
-  real(r8), allocatable :: CNDUs1(:)
-  real(r8), allocatable :: WGLFTs1(:)
-  real(r8), allocatable :: ARSTTs1(:)
-  real(r8), allocatable :: CGSGLs1(:)
-  real(r8), allocatable :: CHSGLs1(:)
-  real(r8), allocatable :: HGSGLs1(:)
-  real(r8), allocatable :: OGSGLs1(:)
-  real(r8), allocatable :: ETMXs1(:)
-  real(r8), allocatable :: TAURs1(:)
-  real(r8), allocatable :: TAUPs1(:)
-  real(r8), allocatable :: CHLs1(:)
-  real(r8), allocatable :: PEPCs1(:)
-  real(r8), allocatable :: CHL4s1(:)
-  real(r8), allocatable :: RADCs1(:)
-  real(r8), allocatable :: RUBPs1(:)
-  real(r8), allocatable :: VCMX4s1(:)
-  real(r8), allocatable :: VOMXs1(:)
-  real(r8), allocatable :: VCMXs1(:)
-  real(r8), allocatable :: XKCO2s1(:)
-  real(r8), allocatable :: WTSTDIs1(:)
-  real(r8), allocatable :: TCCs1(:)
-  real(r8), allocatable :: CPGRs1(:)
-  real(r8), allocatable :: DTKCs1(:)
-  real(r8), allocatable :: ENGYXs1(:)
-  real(r8), allocatable :: TKCs1(:)
-  real(r8), allocatable :: PSILOs1(:)
-  real(r8), allocatable :: OSMOs1(:)
-  real(r8), allocatable :: TCO2As1(:)
-  real(r8), allocatable :: CTRANs1(:)
-  real(r8), allocatable :: CNSTKs1(:)
-  real(r8), allocatable :: ZTYPs1(:)
-  real(r8), allocatable :: ZTYPIs1(:)
-  real(r8), allocatable :: HTCs1(:)
-  real(r8), allocatable :: SSTXs1(:)
-  real(r8), allocatable :: RSCSs1(:)
-  real(r8), allocatable :: Z2SGLs1(:)
-  real(r8), allocatable :: ZHSGLs1(:)
-  real(r8), allocatable :: BKDSs1(:)
-  real(r8), allocatable :: CH2P4s1(:)
-  real(r8), allocatable :: CH1P4Bs1(:)
-  real(r8), allocatable :: CH2P4Bs1(:)
-  real(r8), allocatable :: CNO3Ss1(:)
-  real(r8), allocatable :: CH1P4s1(:)
-  real(r8), allocatable :: CNO3Bs1(:)
-  real(r8), allocatable :: CNH4Ss1(:)
-  real(r8), allocatable :: CNH4Bs1(:)
-  real(r8), allocatable :: CO2Gs1(:)
-  real(r8), allocatable :: CO2Ss1(:)
-  real(r8), allocatable :: CH4Ss1(:)
-  real(r8), allocatable :: CCH4Ss1(:)
-  real(r8), allocatable :: CZ2OSs1(:)
-  real(r8), allocatable :: CNH3Ss1(:)
-  real(r8), allocatable :: CNH3Bs1(:)
-  real(r8), allocatable :: CH2GSs1(:)
-  real(r8), allocatable :: CLSGLs1(:)
-  real(r8), allocatable :: CQSGLs1(:)
-  real(r8), allocatable :: CCH4Gs1(:)
-  real(r8), allocatable :: CZ2OGs1(:)
-  real(r8), allocatable :: CNH3Gs1(:)
-  real(r8), allocatable :: CH2GGs1(:)
-  real(r8), allocatable :: CORGCs1(:)
-  real(r8), allocatable :: RSMHs1(:)
-  real(r8), allocatable :: CFs1(:)
-  real(r8), allocatable :: CDPTHZs1(:)
-  real(r8), allocatable :: PPIs1(:)
-  real(r8), allocatable :: PPZs1(:)
-  real(r8), allocatable :: PPXs1(:)
-  real(r8), allocatable :: DPTHZs1(:)
-  real(r8), allocatable :: CFIs1(:)
-  real(r8), allocatable :: WTRTs1(:)
-  real(r8), allocatable :: FMPRs1(:)
-  real(r8), allocatable :: FWODBs1(:)
-  real(r8), allocatable :: ALBRs1(:)
-  real(r8), allocatable :: ALBPs1(:)
-  real(r8), allocatable :: FWODLNs1(:)
-  real(r8), allocatable :: FWODLPs1(:)
-  real(r8), allocatable :: FWODSPs1(:)
-  real(r8), allocatable :: FWODSNs1(:)
-  real(r8), allocatable :: FWODRNs1(:)
-  real(r8), allocatable :: FWODRPs1(:)
-  real(r8), allocatable :: FWODRs1(:)
-  real(r8), allocatable :: FWOODs1(:)
-  real(r8), allocatable :: FVRNs1(:)
-  real(r8), allocatable :: FWOODNs1(:)
-  real(r8), allocatable :: FWOODPs1(:)
-  real(r8), allocatable :: H1PO4s1(:)
-  real(r8), allocatable :: H2PO4s1(:)
-  real(r8), allocatable :: H1POBs1(:)
-  real(r8), allocatable :: H2POBs1(:)
-  real(r8), allocatable :: H2GSs1(:)
-  real(r8), allocatable :: HLSGLs1(:)
-  real(r8), allocatable :: OXYGs1(:)
-  real(r8), allocatable :: OXYSs1(:)
-  real(r8), allocatable :: OLSGLs1(:)
-  real(r8), allocatable :: POSGLs1(:)
-  real(r8), allocatable :: PSISTs1(:)
-  real(r8), allocatable :: RPO4Ys1(:)
-  real(r8), allocatable :: RPOBYs1(:)
-  real(r8), allocatable :: RP14Ys1(:)
-  real(r8), allocatable :: RP1BYs1(:)
-  real(r8), allocatable :: RNO3Ys1(:)
-  real(r8), allocatable :: RNH4Ys1(:)
-  real(r8), allocatable :: RNHBYs1(:)
-  real(r8), allocatable :: RN3BYs1(:)
-  real(r8), allocatable :: ROXYFs1(:)
-  real(r8), allocatable :: RCO2Fs1(:)
-  real(r8), allocatable :: ROXYLs1(:)
-  real(r8), allocatable :: ROXYYs1(:)
-  real(r8), allocatable :: SCO2Ls1(:)
-  real(r8), allocatable :: PSILZs1(:)
-  real(r8), allocatable :: RSMNs1(:)
-  real(r8), allocatable :: DLYR3s1(:)
-  real(r8), allocatable :: XKCO2Os1(:)
-  real(r8), allocatable :: XKCO2Ls1(:)
-  real(r8), allocatable :: WTRTSs1(:)
-  real(r8), allocatable :: WTRTSNs1(:)
-  real(r8), allocatable :: WTRTSPs1(:)
-  real(r8), allocatable :: THRM1s1(:)
-  real(r8), allocatable :: SFLXCs1(:)
-  real(r8), allocatable :: RCs1(:)
-  real(r8), allocatable :: TKCZs1(:)
-  real(r8), allocatable :: RAs1(:)
-  real(r8), allocatable :: SO2s1(:)
-  real(r8), allocatable :: RAD1s1(:)
-  real(r8), allocatable :: SOXYLs1(:)
-  real(r8), allocatable :: SCH4Ls1(:)
-  real(r8), allocatable :: SN2OLs1(:)
-  real(r8), allocatable :: SNH3Ls1(:)
-  real(r8), allocatable :: SH2GLs1(:)
-  real(r8), allocatable :: THETWs1(:)
-  real(r8), allocatable :: THETYs1(:)
-  real(r8), allocatable :: TKSs1(:)
-  real(r8), allocatable :: TFNDs1(:)
-  real(r8), allocatable :: VOLXs1(:)
-  real(r8), allocatable :: VLPOBs1(:)
-  real(r8), allocatable :: VLNO3s1(:)
-  real(r8), allocatable :: VLPO4s1(:)
-  real(r8), allocatable :: VOLYs1(:)
-  real(r8), allocatable :: VOLIs1(:)
-  real(r8), allocatable :: VOLWs1(:)
-  real(r8), allocatable :: VOLAs1(:)
-  real(r8), allocatable :: VLNOBs1(:)
-  real(r8), allocatable :: VLNH4s1(:)
-  real(r8), allocatable :: VLNHBs1(:)
-  real(r8), allocatable :: ZOSGLs1(:)
-  real(r8), allocatable :: ZLs1(:)
-  real(r8), allocatable :: ZNO3Ss1(:)
-  real(r8), allocatable :: ZNO3Bs1(:)
-  real(r8), allocatable :: ZNSGLs1(:)
-  real(r8), allocatable :: ZNH4Ss1(:)
-  real(r8), allocatable :: ZNH4Bs1(:)
-  real(r8), allocatable :: Z2OSs1(:)
-  real(r8), allocatable :: ZNH3Ss1(:)
-  real(r8), allocatable :: ZNH3Bs1(:)
-  real(r8), allocatable :: ZVSGLs1(:)
-  real(r8), allocatable :: RP1BXs1(:)
-  real(r8), allocatable :: RNO3Xs1(:)
-  real(r8), allocatable :: RNH4Xs1(:)
-  real(r8), allocatable :: RN3BXs1(:)
-  real(r8), allocatable :: RPO4Xs1(:)
-  real(r8), allocatable :: RPOBXs1(:)
-  real(r8), allocatable :: TUPNO3s1(:)
-  real(r8), allocatable :: TUPH2Bs1(:)
-  real(r8), allocatable :: TUPH1Bs1(:)
-  real(r8), allocatable :: TUPN2Ss1(:)
-  real(r8), allocatable :: TCO2Ss1(:)
-  real(r8), allocatable :: TCO2Ps1(:)
-  real(r8), allocatable :: TUPOXPs1(:)
-  real(r8), allocatable :: THGFLAs1(:)
-  real(r8), allocatable :: TLH2GPs1(:)
-  real(r8), allocatable :: TCHFLAs1(:)
-  real(r8), allocatable :: TLCH4Ps1(:)
-  real(r8), allocatable :: TLCO2Ps1(:)
-  real(r8), allocatable :: TLNH3Ps1(:)
-  real(r8), allocatable :: TUPHTs1(:)
-  real(r8), allocatable :: TUPWTRs1(:)
-  real(r8), allocatable :: RTDNTs1(:)
-  real(r8), allocatable :: TUPNFs1(:)
-  real(r8), allocatable :: TLOXYPs1(:)
-  real(r8), allocatable :: TLN2OPs1(:)
-  real(r8), allocatable :: TCOFLAs1(:)
-  real(r8), allocatable :: TNHFLAs1(:)
-  real(r8), allocatable :: TOXFLAs1(:)
-  real(r8), allocatable :: TN2FLAs1(:)
-  real(r8), allocatable :: TUPOXSs1(:)
-  real(r8), allocatable :: TUPHGSs1(:)
-  real(r8), allocatable :: TUPCHSs1(:)
-  real(r8), allocatable :: TUPN3Bs1(:)
-  real(r8), allocatable :: TUPN3Ss1(:)
-  real(r8), allocatable :: TUPH2Ps1(:)
-  real(r8), allocatable :: TUPH1Ps1(:)
-  real(r8), allocatable :: TUPNH4s1(:)
-  real(r8), allocatable :: TUPNHBs1(:)
-  real(r8), allocatable :: TUPNOBs1(:)
-  real(r8), allocatable :: ROXYXs1(:)
-  real(r8), allocatable :: RNHBXs1(:)
-  real(r8), allocatable :: RP14Xs1(:)
-  real(r8), allocatable :: CSNTs1(:,:,:)
-  real(r8), allocatable :: ZSNTs1(:,:,:)
-  real(r8), allocatable :: PSNTs1(:,:,:)
-  real(r8), allocatable :: RDFOMCs1(:,:,:,:)
-  real(r8), allocatable :: RDFOMNs1(:,:,:,:)
-  real(r8), allocatable :: RDFOMPs1(:,:,:,:)
-  real(r8), allocatable :: FOSRHs1(:,:)
-  real(r8), allocatable :: OQCs1(:,:)
-  real(r8), allocatable :: OQNs1(:,:)
-  real(r8), allocatable :: OQPs1(:,:)
-  real(r8), allocatable :: XOQCSs1(:,:)
-  real(r8), allocatable :: XOQNSs1(:,:)
-  real(r8), allocatable :: XOQPSs1(:,:)
-  real(r8), allocatable :: FLWCs1(:)
-  real(r8), allocatable :: EHVSTs1(:,:,:)
-  real(r8), allocatable :: HVSTs1(:)
-  real(r8), allocatable :: THINs1(:)
-  real(r8), allocatable :: ARSTPs1(:)
-  real(r8), allocatable :: ARLFPs1(:)
-  real(r8), allocatable :: BALCs1(:)
-  real(r8), allocatable :: BALNs1(:)
-  real(r8), allocatable :: BALPs1(:)
-  real(r8), allocatable :: CO2Is1(:)
-  real(r8), allocatable :: CCPOLPs1(:)
-  real(r8), allocatable :: CPOOLPs1(:)
-  real(r8), allocatable :: CPOLNPs1(:)
-  real(r8), allocatable :: CCPLNPs1(:)
-  real(r8), allocatable :: CZPOLPs1(:)
-  real(r8), allocatable :: CPPOLPs1(:)
-  real(r8), allocatable :: CTCs1(:)
-  real(r8), allocatable :: CNETs1(:)
-  real(r8), allocatable :: CPRTSs1(:)
-  real(r8), allocatable :: CNRTSs1(:)
-  real(r8), allocatable :: CARBNs1(:)
-  real(r8), allocatable :: CNNDs1(:)
-  real(r8), allocatable :: CPNDs1(:)
-  real(r8), allocatable :: CNRTs1(:)
-  real(r8), allocatable :: RSMXs1(:)
-  real(r8), allocatable :: CPRTs1(:)
-  real(r8), allocatable :: CNWSs1(:)
-  real(r8), allocatable :: CPWSs1(:)
-  real(r8), allocatable :: CFXs1(:)
-  real(r8), allocatable :: CWSRTs1(:)
-  real(r8), allocatable :: DCO2s1(:)
-  character(len=16), allocatable :: DATAPs1(:)
-  CHARACTER(len=16), allocatable :: DATAs1(:)
-  real(r8), allocatable :: DMNDs1(:)
-  real(r8), allocatable :: DMRTs1(:)
-  real(r8), allocatable :: FMOLs1(:)
-  real(r8), allocatable :: FNODs1(:)
-  real(r8), allocatable :: GROUPIs1(:)
-  real(r8), allocatable :: HTCTLs1(:)
-  real(r8), allocatable :: HCSNCs1(:)
-  real(r8), allocatable :: HZSNCs1(:)
-  real(r8), allocatable :: HPSNCs1(:)
-  real(r8), allocatable :: HVSTCs1(:)
-  real(r8), allocatable :: HVSTNs1(:)
-  real(r8), allocatable :: HVSTPs1(:)
-  real(r8), allocatable :: HCUPTKs1(:)
-  real(r8), allocatable :: HZUPTKs1(:)
-  real(r8), allocatable :: HPUPTKs1(:)
-  real(r8), allocatable :: HTSTZs1(:)
-  real(r8), allocatable :: OFFSTs1(:)
-  real(r8), allocatable :: OSTRs1(:)
-  real(r8), allocatable :: PPs1(:)
-  real(r8), allocatable :: PSILTs1(:)
-  real(r8), allocatable :: PBs1(:)
-  real(r8), allocatable :: PRs1(:)
-  real(r8), allocatable :: PPOOLPs1(:)
-  real(r8), allocatable :: PPOLNPs1(:)
-  real(r8), allocatable :: PSILGs1(:)
-  real(r8), allocatable :: RCMXs1(:)
-  real(r8), allocatable :: RCO2Zs1(:)
-  real(r8), allocatable :: ROXYZs1(:)
-  real(r8), allocatable :: RCH4Zs1(:)
-  real(r8), allocatable :: RN2OZs1(:)
-  real(r8), allocatable :: RNH3Zs1(:)
-  real(r8), allocatable :: RH2GZs1(:)
-  real(r8), allocatable :: RSETCs1(:)
-  real(r8), allocatable :: RSETNs1(:)
-  real(r8), allocatable :: RSETPs1(:)
-  real(r8), allocatable :: RTFQs1(:)
-  real(r8), allocatable :: RAZs1(:)
-  real(r8), allocatable :: CHILLs1(:)
-  real(r8), allocatable :: CPSTKs1(:)
-  real(r8), allocatable :: SCO2s1(:)
-  real(r8), allocatable :: CO2Qs1(:)
-  real(r8), allocatable :: O2Ls1(:)
-  real(r8), allocatable :: EVAPCs1(:)
-  real(r8), allocatable :: HFLXCs1(:)
-  real(r8), allocatable :: GRNOs1(:)
-  real(r8), allocatable :: EFLXCs1(:)
-  real(r8), allocatable :: CO2Ls1(:)
-  real(r8), allocatable :: SDPTHs1(:)
-  real(r8), allocatable :: SDPTHIs1(:)
-  real(r8), allocatable :: SDLGs1(:)
-  real(r8), allocatable :: SDVLs1(:)
-  real(r8), allocatable :: SDARs1(:)
-  real(r8), allocatable :: TCZs1(:)
-  real(r8), allocatable :: TCGs1(:)
-  real(r8), allocatable :: TCXs1(:)
-  real(r8), allocatable :: TKGs1(:)
-  real(r8), allocatable :: TFN3s1(:)
-  real(r8), allocatable :: TCSN0s1(:)
-  real(r8), allocatable :: TZSN0s1(:)
-  real(r8), allocatable :: TPSN0s1(:)
-  real(r8), allocatable :: TCSNCs1(:)
-  real(r8), allocatable :: TZSNCs1(:)
-  real(r8), allocatable :: TPSNCs1(:)
-  real(r8), allocatable :: TCO2Ts1(:)
-  real(r8), allocatable :: TCUPTKs1(:)
-  real(r8), allocatable :: THVSTCs1(:)
-  real(r8), allocatable :: TNH3Cs1(:)
-  real(r8), allocatable :: TZUPTKs1(:)
-  real(r8), allocatable :: THVSTNs1(:)
-  real(r8), allocatable :: TZUPFXs1(:)
-  real(r8), allocatable :: TPUPTKs1(:)
-  real(r8), allocatable :: THVSTPs1(:)
-  real(r8), allocatable :: UPOMCs1(:)
-  real(r8), allocatable :: UPNFs1(:)
-  real(r8), allocatable :: UPNO3s1(:)
-  real(r8), allocatable :: UPNH4s1(:)
-  real(r8), allocatable :: UPOMNs1(:)
-  real(r8), allocatable :: UPH1Ps1(:)
-  real(r8), allocatable :: UPH2Ps1(:)
-  real(r8), allocatable :: UPOMPs1(:)
-  real(r8), allocatable :: VOLWCs1(:)
-  real(r8), allocatable :: VHCPCs1(:)
-  real(r8), allocatable :: VCH4Fs1(:)
-  real(r8), allocatable :: VCO2Fs1(:)
-  real(r8), allocatable :: VN2OFs1(:)
-  real(r8), allocatable :: VNH3Fs1(:)
-  real(r8), allocatable :: VPO4Fs1(:)
-  real(r8), allocatable :: VOLWPs1(:)
-  real(r8), allocatable :: WSTRs1(:)
-  real(r8), allocatable :: WTRVXs1(:)
-  real(r8), allocatable :: WTRVCs1(:)
-  real(r8), allocatable :: WTLSs1(:)
-  real(r8), allocatable :: WTSHTs1(:)
-  real(r8), allocatable :: WTSHTAs1(:)
-  real(r8), allocatable :: WTSTGs1(:)
-  real(r8), allocatable :: WTSTGNs1(:)
-  real(r8), allocatable :: WTSTGPs1(:)
-  real(r8), allocatable :: WTNDs1(:)
-  real(r8), allocatable :: WTRTts1(:)
-  real(r8), allocatable :: WTNDNs1(:)
-  real(r8), allocatable :: WTRTNs1(:)
-  real(r8), allocatable :: WTSHNs1(:)
-  real(r8), allocatable :: WTRVNs1(:)
-  real(r8), allocatable :: WTNDPs1(:)
-  real(r8), allocatable :: WTRTPs1(:)
-  real(r8), allocatable :: WTSHPs1(:)
-  real(r8), allocatable :: WTRVPs1(:)
-  real(r8), allocatable :: XKCO24s1(:)
-  real(r8), allocatable :: XTLIs1(:)
-  real(r8), allocatable :: XRNIs1(:)
-  real(r8), allocatable :: XRLAs1(:)
-  real(r8), allocatable :: XDLs1(:)
-  real(r8), allocatable :: XPPDs1(:)
-  real(r8), allocatable :: ZPOOLPs1(:)
-  real(r8), allocatable :: ZPOLNPs1(:)
-  real(r8), allocatable :: ZEROLs1(:)
-  real(r8), allocatable :: ZEROPs1(:)
-  real(r8), allocatable :: O2Is1(:)
-  real(r8), allocatable :: ZEROQs1(:)
-  real(r8), allocatable :: ZCs1(:)
-  real(r8), allocatable :: ZNPPs1(:)
-  real(r8), allocatable :: CLASSs1(:,:)
-  real(r8), allocatable :: ATRPs1(:,:)
-  real(r8), allocatable :: ARLFZs1(:,:)
-  real(r8), allocatable :: ARLFBs1(:,:)
-  real(r8), allocatable :: CPOOLs1(:,:)
-  real(r8), allocatable :: CPOLNBs1(:,:)
-  real(r8), allocatable :: CCPOLBs1(:,:)
-  real(r8), allocatable :: CZPOLBs1(:,:)
-  real(r8), allocatable :: CPPOLBs1(:,:)
-  real(r8), allocatable :: DGSTGIs1(:,:)
-  real(r8), allocatable :: DGSTGFs1(:,:)
-  real(r8), allocatable :: FLG4s1(:,:)
-  real(r8), allocatable :: FDBKs1(:,:)
-  real(r8), allocatable :: FDBKXs1(:,:)
-  real(r8), allocatable :: FLGZs1(:,:)
-  real(r8), allocatable :: GROUPs1(:,:)
-  real(r8), allocatable :: GSTGIs1(:,:)
-  real(r8), allocatable :: GSTGFs1(:,:)
-  real(r8), allocatable :: GRNXBs1(:,:)
-  real(r8), allocatable :: GRNOBs1(:,:)
-  real(r8), allocatable :: GRWTBs1(:,:)
-  real(r8), allocatable :: HTSHEXs1(:,:)
-  integer,  allocatable :: IDTHBs1(:,:)
-  integer,  allocatable :: IFLGPs1(:,:)
-  integer,  allocatable :: IFLGFs1(:,:)
-  integer,  allocatable :: IFLGEs1(:,:)
-  integer,  allocatable :: IFLGAs1(:,:)
-  integer,  allocatable :: IFLGGs1(:,:)
-  integer,  allocatable :: IFLGRs1(:,:)
-  integer,  allocatable :: IFLGQs1(:,:)
-  integer,  allocatable :: KVSTGs1(:,:)
-  integer,  allocatable :: KLEAFs1(:,:)
-  integer,  allocatable :: KVSTGNs1(:,:)
-  integer,  allocatable :: KLEAFXs1(:,:)
-  integer,  allocatable :: NBTBs1(:,:)
-  integer,  allocatable :: IDAYs1(:,:,:)
-  integer,  allocatable :: IDAYYs1(:)
-  integer,  allocatable :: NINRs1(:,:)
-  real(r8), allocatable :: PSTGs1(:,:)
-  real(r8), allocatable :: PSTGIs1(:,:)
-  real(r8), allocatable :: PSTGFs1(:,:)
-  real(r8), allocatable :: PPOOLs1(:,:)
-  real(r8), allocatable :: PPOLNBs1(:,:)
-  real(r8), allocatable :: RCCLXs1(:,:)
-  real(r8), allocatable :: RCZLXs1(:,:)
-  real(r8), allocatable :: RCPLXs1(:,:)
-  real(r8), allocatable :: RCCSXs1(:,:)
-  real(r8), allocatable :: RCZSXs1(:,:)
-  real(r8), allocatable :: RCPSXs1(:,:)
-  real(r8), allocatable :: RNH3Bs1(:,:)
-  real(r8), allocatable :: TGSTGIs1(:,:)
-  real(r8), allocatable :: TGSTGFs1(:,:)
-  real(r8), allocatable :: VSTGXs1(:,:)
-  real(r8), allocatable :: VSTGs1(:,:)
-  real(r8), allocatable :: VRNYs1(:,:)
-  real(r8), allocatable :: VRNZs1(:,:)
-  real(r8), allocatable :: VRNSs1(:,:)
-  real(r8), allocatable :: VRNLs1(:,:)
-  real(r8), allocatable :: VRNFs1(:,:)
-  real(r8), allocatable :: VRNXs1(:,:)
-  real(r8), allocatable :: WTLSBs1(:,:)
-  real(r8), allocatable :: WTRSVBs1(:,:)
-  real(r8), allocatable :: WTLFBs1(:,:)
-  real(r8), allocatable :: WTNDBs1(:,:)
-  real(r8), allocatable :: WTSHEBs1(:,:)
-  real(r8), allocatable :: WTEARBs1(:,:)
-  real(r8), allocatable :: WTHSKBs1(:,:)
-  real(r8), allocatable :: WTRSBNs1(:,:)
-  real(r8), allocatable :: WTLFBNs1(:,:)
-  real(r8), allocatable :: WTNDBNs1(:,:)
-  real(r8), allocatable :: WTSHBNs1(:,:)
-  real(r8), allocatable :: WTEABNs1(:,:)
-  real(r8), allocatable :: WTHSBNs1(:,:)
-  real(r8), allocatable :: WTRSBPs1(:,:)
-  real(r8), allocatable :: WTLFBPs1(:,:)
-  real(r8), allocatable :: WTNDBPs1(:,:)
-  real(r8), allocatable :: WTSHBPs1(:,:)
-  real(r8), allocatable :: WTEABPs1(:,:)
-  real(r8), allocatable :: WTHSBPs1(:,:)
-  real(r8), allocatable :: WTGRBs1(:,:)
-  real(r8), allocatable :: WTGRBNs1(:,:)
-  real(r8), allocatable :: WTGRBPs1(:,:)
-  real(r8), allocatable :: WTSTKBs1(:,:)
-  real(r8), allocatable :: WTSTBNs1(:,:)
-  real(r8), allocatable :: WTSTBPs1(:,:)
-  real(r8), allocatable :: WTSHTBs1(:,:)
-  real(r8), allocatable :: WTSHTNs1(:,:)
-  real(r8), allocatable :: WTSHTPs1(:,:)
-  real(r8), allocatable :: WGLFXs1(:,:)
-  real(r8), allocatable :: WGLFNXs1(:,:)
-  real(r8), allocatable :: WGLFPXs1(:,:)
-  real(r8), allocatable :: WGSHEXs1(:,:)
-  real(r8), allocatable :: WGSHNXs1(:,:)
-  real(r8), allocatable :: WGSHPXs1(:,:)
-  real(r8), allocatable :: WTSTXBs1(:,:)
-  real(r8), allocatable :: WTSTXNs1(:,:)
-  real(r8), allocatable :: WTSTXPs1(:,:)
-  real(r8), allocatable :: WVSTKBs1(:,:)
-  real(r8), allocatable :: ZPOOLs1(:,:)
-  real(r8), allocatable :: ZPOLNBs1(:,:)
-  real(r8), allocatable :: SURFs1(:,:,:,:,:)
-  real(r8), allocatable :: SURFXs1(:,:,:,:,:)
-  real(r8), allocatable :: CPOOL3s1(:,:,:)
-  real(r8), allocatable :: CPOOL4s1(:,:,:)
-  real(r8), allocatable :: CO2Bs1(:,:,:)
-  real(r8), allocatable :: COMPLs1(:,:,:)
-  real(r8), allocatable :: CBXNs1(:,:,:)
-  real(r8), allocatable :: OMEGAs1(:,:,:)
-  integer,  allocatable :: IALBYs1(:,:,:)
-  real(r8), allocatable :: OMEGXs1(:,:,:)
-  real(r8), allocatable :: CBXN4s1(:,:,:)
-  real(r8), allocatable :: ETGROs1(:,:,:)
-  real(r8), allocatable :: ETGR4s1(:,:,:)
-  real(r8), allocatable :: FDBK4s1(:,:,:)
-  real(r8), allocatable :: HCOBs1(:,:,:)
-  real(r8), allocatable :: VCGROs1(:,:,:)
-  real(r8), allocatable :: VGROs1(:,:,:)
-  real(r8), allocatable :: VCGR4s1(:,:,:)
-  real(r8), allocatable :: VGRO4s1(:,:,:)
-  real(r8), allocatable :: ARLF1s1(:,:,:)
-  real(r8), allocatable :: HTNODXs1(:,:,:)
-  real(r8), allocatable :: HTSHEs1(:,:,:)
-  real(r8), allocatable :: HTNODEs1(:,:,:)
-  real(r8), allocatable :: WGNODEs1(:,:,:)
-  real(r8), allocatable :: WGNODNs1(:,:,:)
-  real(r8), allocatable :: WGNODPs1(:,:,:)
-  real(r8), allocatable :: WGLFs1(:,:,:)
-  real(r8), allocatable :: WGLFNs1(:,:,:)
-  real(r8), allocatable :: WGLFPs1(:,:,:)
-  real(r8), allocatable :: WSLFs1(:,:,:)
-  real(r8), allocatable :: WGSHEs1(:,:,:)
-  real(r8), allocatable :: WGSHNs1(:,:,:)
-  real(r8), allocatable :: WGSHPs1(:,:,:)
-  real(r8), allocatable :: WSSHEs1(:,:,:)
-  real(r8), allocatable :: SURFBs1(:,:,:,:)
-  real(r8), allocatable :: ARLFLs1(:,:,:,:)
-  real(r8), allocatable :: WGLFLs1(:,:,:,:)
-  real(r8), allocatable :: WGLFLNs1(:,:,:,:)
-  real(r8), allocatable :: WGLFLPs1(:,:,:,:)
-  real(r8), allocatable :: ARSTKs1(:,:,:)
-  real(r8), allocatable :: CPOOLRs1(:,:,:)
-  real(r8), allocatable :: CCPOLRs1(:,:,:)
-  real(r8), allocatable :: CZPOLRs1(:,:,:)
-  real(r8), allocatable :: CPPOLRs1(:,:,:)
-  real(r8), allocatable :: CO2Ps1(:,:,:)
-  real(r8), allocatable :: CO2As1(:,:,:)
-  real(r8), allocatable :: CH4Ps1(:,:,:)
-  real(r8), allocatable :: CH4As1(:,:,:)
-  real(r8), allocatable :: CWSRTLs1(:,:,:)
-  real(r8), allocatable :: H2GPs1(:,:,:)
-  real(r8), allocatable :: H2GAs1(:,:,:)
-  real(r8), allocatable :: OXYPs1(:,:,:)
-  real(r8), allocatable :: OXYAs1(:,:,:)
-  real(r8), allocatable :: PSIRTs1(:,:,:)
-  real(r8), allocatable :: PSIROs1(:,:,:)
-  real(r8), allocatable :: PSIRGs1(:,:,:)
-  real(r8), allocatable :: PPOOLRs1(:,:,:)
-  real(r8), allocatable :: RUPNHBs1(:,:,:)
-  real(r8), allocatable :: RUPNH4s1(:,:,:)
-  real(r8), allocatable :: RUPH2Ps1(:,:,:)
-  real(r8), allocatable :: RUPNOBs1(:,:,:)
-  real(r8), allocatable :: RUPNO3s1(:,:,:)
-  real(r8), allocatable :: RUPH1Bs1(:,:,:)
-  real(r8), allocatable :: RUPH1Ps1(:,:,:)
-  real(r8), allocatable :: RUPH2Bs1(:,:,:)
-  real(r8), allocatable :: RUONHBs1(:,:,:)
-  real(r8), allocatable :: RUONH4s1(:,:,:)
-  real(r8), allocatable :: RUOH2Ps1(:,:,:)
-  real(r8), allocatable :: RUONOBs1(:,:,:)
-  real(r8), allocatable :: RUONO3s1(:,:,:)
-  real(r8), allocatable :: RUOH1Bs1(:,:,:)
-  real(r8), allocatable :: RUOH1Ps1(:,:,:)
-  real(r8), allocatable :: RUOH2Bs1(:,:,:)
-  real(r8), allocatable :: RUCNHBs1(:,:,:)
-  real(r8), allocatable :: RUCNH4s1(:,:,:)
-  real(r8), allocatable :: RUCH2Ps1(:,:,:)
-  real(r8), allocatable :: RUCNOBs1(:,:,:)
-  real(r8), allocatable :: RUCNO3s1(:,:,:)
-  real(r8), allocatable :: RUCH1Bs1(:,:,:)
-  real(r8), allocatable :: RUCH1Ps1(:,:,:)
-  real(r8), allocatable :: RUCH2Bs1(:,:,:)
-  real(r8), allocatable :: RCO2Ms1(:,:,:)
-  real(r8), allocatable :: RCO2Ns1(:,:,:)
-  real(r8), allocatable :: RCO2As1(:,:,:)
-  real(r8), allocatable :: RTN1s1(:,:,:)
-  real(r8), allocatable :: RTNLs1(:,:,:)
-  real(r8), allocatable :: RTLGPs1(:,:,:)
-  real(r8), allocatable :: RTDNPs1(:,:,:)
-  real(r8), allocatable :: RTVLPs1(:,:,:)
-  real(r8), allocatable :: RTVLWs1(:,:,:)
-  real(r8), allocatable :: RRAD1s1(:,:,:)
-  real(r8), allocatable :: RRAD2s1(:,:,:)
-  real(r8), allocatable :: RTARPs1(:,:,:)
-  real(r8), allocatable :: RTLGAs1(:,:,:)
-  real(r8), allocatable :: RCO2Ps1(:,:,:)
-  real(r8), allocatable :: RUPOXPs1(:,:,:)
-  real(r8), allocatable :: RCO2Ss1(:,:,:)
-  real(r8), allocatable :: RUPOXSs1(:,:,:)
-  real(r8), allocatable :: RUPCHSs1(:,:,:)
-  real(r8), allocatable :: RUPN2Ss1(:,:,:)
-  real(r8), allocatable :: RUPN3Ss1(:,:,:)
-  real(r8), allocatable :: RUPN3Bs1(:,:,:)
-  real(r8), allocatable :: RUPHGSs1(:,:,:)
-  real(r8), allocatable :: RCOFLAs1(:,:,:)
-  real(r8), allocatable :: ROXFLAs1(:,:,:)
-  real(r8), allocatable :: RCHFLAs1(:,:,:)
-  real(r8), allocatable :: RN2FLAs1(:,:,:)
-  real(r8), allocatable :: RNHFLAs1(:,:,:)
-  real(r8), allocatable :: RHGFLAs1(:,:,:)
-  real(r8), allocatable :: RCODFAs1(:,:,:)
-  real(r8), allocatable :: ROXDFAs1(:,:,:)
-  real(r8), allocatable :: RCHDFAs1(:,:,:)
-  real(r8), allocatable :: RN2DFAs1(:,:,:)
-  real(r8), allocatable :: RNHDFAs1(:,:,:)
-  real(r8), allocatable :: RHGDFAs1(:,:,:)
-  real(r8), allocatable :: ROXYPs1(:,:,:)
-  real(r8), allocatable :: RUNNHPs1(:,:,:)
-  real(r8), allocatable :: RUNNBPs1(:,:,:)
-  real(r8), allocatable :: RUNNOPs1(:,:,:)
-  real(r8), allocatable :: RUNNXPs1(:,:,:)
-  real(r8), allocatable :: RUPP2Ps1(:,:,:)
-  real(r8), allocatable :: RUPP2Bs1(:,:,:)
-  real(r8), allocatable :: RUPP1Ps1(:,:,:)
-  real(r8), allocatable :: RUPP1Bs1(:,:,:)
-  real(r8), allocatable :: UPWTRs1(:,:,:)
-  real(r8), allocatable :: WFRs1(:,:,:)
-  real(r8), allocatable :: WTRTLs1(:,:,:)
-  real(r8), allocatable :: WTRTDs1(:,:,:)
-  real(r8), allocatable :: WSRTLs1(:,:,:)
-  real(r8), allocatable :: ZPOOLRs1(:,:,:)
-  real(r8), allocatable :: Z2OPs1(:,:,:)
-  real(r8), allocatable :: Z2OAs1(:,:,:)
-  real(r8), allocatable :: ZH3Ps1(:,:,:)
-  real(r8), allocatable :: ZH3As1(:,:,:)
-  real(r8), allocatable :: CPOOLNs1(:,:)
-  real(r8), allocatable :: PPOOLNs1(:,:)
-  real(r8), allocatable :: TFN4s1(:,:)
-  real(r8), allocatable :: WTNDLNs1(:,:)
-  real(r8), allocatable :: WTNDLs1(:,:)
-  real(r8), allocatable :: WTNDLPs1(:,:)
-  real(r8), allocatable :: ZPOOLNs1(:,:)
-  real(r8), allocatable :: ARSTVs1(:,:)
-  real(r8), allocatable :: ARLFVs1(:,:)
-  real(r8), allocatable :: WGLFVs1(:,:)
-  real(r8), allocatable :: DMVLs1(:,:)
-  real(r8), allocatable :: PORTs1(:,:)
-  real(r8), allocatable :: PORTXs1(:,:)
-  real(r8), allocatable :: RTAR2Xs1(:,:)
-  real(r8), allocatable :: RTAR1Xs1(:,:)
-  real(r8), allocatable :: RRAD1Xs1(:,:)
-  real(r8), allocatable :: RRAD2Xs1(:,:)
-  real(r8), allocatable :: GRDMs1(:)
-  real(r8), allocatable :: VOXYFs1(:)
-  real(r8), allocatable :: WTGRNNs1(:)
-  real(r8), allocatable :: WTSHEPs1(:)
-  real(r8), allocatable :: WVSTKs1(:)
-  real(r8), allocatable :: CNLFs1(:)
-  real(r8), allocatable :: WTLFPs1(:)
-  real(r8), allocatable :: PTSHTs1(:)
-  real(r8), allocatable :: WTLFs1(:)
-  real(r8), allocatable :: EPs1(:)
-  real(r8), allocatable :: WDLFs1(:)
-  real(r8), allocatable :: GRMXs1(:)
-  real(r8), allocatable :: GFILLs1(:)
-  integer, allocatable :: IRTYPs1(:)
-  real(r8), allocatable :: STMXs1(:)
-  real(r8), allocatable :: SDMXs1(:)
-  real(r8), allocatable :: DMLFs1(:)
-  real(r8), allocatable :: ZSINs1(:)
-  real(r8), allocatable :: RADPs1(:)
-  real(r8), allocatable :: FRADPs1(:)
-  real(r8), allocatable :: WTSHEs1(:)
-  real(r8), allocatable :: CNGRs1(:)
-  real(r8), allocatable :: WTSTKs1(:)
-  real(r8), allocatable :: CPLFs1(:)
-  real(r8), allocatable :: CPSHEs1(:)
-  real(r8), allocatable :: CNSHEs1(:)
-  real(r8), allocatable :: WTRSVs1(:)
-  real(r8), allocatable :: WTEARNs1(:)
-  real(r8), allocatable :: WTLFNs1(:)
-  real(r8), allocatable :: WTRSVNs1(:)
-  real(r8), allocatable :: WTSHENs1(:)
-  real(r8), allocatable :: WTHSKNs1(:)
-  real(r8), allocatable :: WTHSKs1(:)
-  real(r8), allocatable :: WTRTAs1(:)
-  real(r8), allocatable :: WTGRs1(:)
-  real(r8), allocatable :: WTEARs1(:)
-  real(r8), allocatable :: RNH3Cs1(:)
-  real(r8), allocatable :: WTSTKPs1(:)
-  real(r8), allocatable :: WTRSVPs1(:)
-  real(r8), allocatable :: WTEARPs1(:)
-  real(r8), allocatable :: WTHSKPs1(:)
-  real(r8), allocatable :: WTSTKNs1(:)
-  real(r8), allocatable :: WTGRNPs1(:)
-  real(r8), allocatable :: RTLG1Xs1(:,:)
-  real(r8), allocatable :: RRADPs1(:,:)
-  real(r8), allocatable :: RTLG2Xs1(:,:)
-  real(r8), allocatable :: RSRRs1(:,:)
-  real(r8), allocatable :: RSRAs1(:,:)
-  real(r8), allocatable :: RRAD1Ms1(:,:)
-  real(r8), allocatable :: RRAD2Ms1(:,:)
-  real(r8), allocatable :: UPMNPOs1(:,:)
-  real(r8), allocatable :: UPMXPOs1(:,:)
-  real(r8), allocatable :: UPKMPOs1(:,:)
-  real(r8), allocatable :: UPMNZOs1(:,:)
-  real(r8), allocatable :: UPMXZOs1(:,:)
-  real(r8), allocatable :: UPKMZOs1(:,:)
-  real(r8), allocatable :: UPMNZHs1(:,:)
-  real(r8), allocatable :: UPMXZHs1(:,:)
-  real(r8), allocatable :: UPKMZHs1(:,:)
-  real(r8), allocatable :: RTLG1s1(:,:,:,:)
-  real(r8), allocatable :: RTLG2s1(:,:,:,:)
-  real(r8), allocatable :: RTN2s1(:,:,:,:)
-  real(r8), allocatable :: WTRT2s1(:,:,:,:)
-  real(r8), allocatable :: WTRT1s1(:,:,:,:)
-  real(r8), allocatable :: WTRT2Ns1(:,:,:,:)
-  real(r8), allocatable :: WTRT1Ns1(:,:,:,:)
-  real(r8), allocatable :: WTRT2Ps1(:,:,:,:)
-  real(r8), allocatable :: WTRT1Ps1(:,:,:,:)
-  real(r8), allocatable :: RTDP1s1(:,:,:)
-  real(r8), allocatable :: RTWT1s1(:,:,:)
-  real(r8), allocatable :: RTWT1Ns1(:,:,:)
-  real(r8), allocatable :: RTWT1Ps1(:,:,:)
-  real(r8), allocatable :: WTSTDGs1(:,:)
-  real(r8), allocatable :: WTSTDNs1(:,:)
-  real(r8), allocatable :: WTSTDPs1(:,:)
-  real(r8), allocatable :: CSNCs1(:,:,:,:)
-  real(r8), allocatable :: PSNCs1(:,:,:,:)
-  real(r8), allocatable :: ZSNCs1(:,:,:,:)
-  real(r8), allocatable :: CFOPCs1(:,:,:)
-  real(r8), allocatable :: CFOPNs1(:,:,:)
-  real(r8), allocatable :: CFOPPs1(:,:,:)
-  real(r8), allocatable :: PARs1(:,:,:,:)
-  real(r8), allocatable :: PARDIFs1(:,:,:,:)
-  real(r8), allocatable :: VOLWMs1(:,:)
-  real(r8), allocatable :: VOLPMs1(:,:)
-  real(r8), allocatable :: TORTs1(:,:)
-  real(r8), allocatable :: FILMs1(:,:)
-  real(r8), allocatable :: ROXSKs1(:,:)
-  real(r8), allocatable :: THETPMs1(:,:)
-  real(r8), allocatable :: DFGSs1(:,:)
-
+  integer,  allocatable :: NBRs1(:)      !branch number
+  integer,  allocatable :: MYs1(:)       !mycorrhizal type (no or yes)
+  integer,  allocatable :: NGs1(:)       !soil layer at planting depth, [-]
+  integer,  allocatable :: IDTYPs1(:)    !plant growth habit (determinate or indeterminate)
+  integer,  allocatable :: IPTYPs1(:)    !photoperiod type (neutral, long day, short day)
+  integer,  allocatable :: IGTYPs1(:)    !plant growth type (vascular, non-vascular)
+  integer,  allocatable :: IFLGIs1(:)    !PFT initialization flag:0=no,1=yes
+  integer,  allocatable :: IDATAs1(:)    !time keeper
+  real(r8), allocatable :: FERTs1(:)     !fertilizer application, [g m-2]
+  real(r8), allocatable :: TDFOMCs1(:,:) !total root C exchange, [gC d-2 h-1]
+  real(r8), allocatable :: TDFOMNs1(:,:) !total root N exchange, [gP d-2 h-1]
+  real(r8), allocatable :: TDFOMPs1(:,:) !total root P exchange, [gP d-2 h-1]
+  real(r8), allocatable :: RUPNFs1(:,:)  !root N2 fixation, [gN d-2 h-1]
+  real(r8), allocatable :: ARLFTs1(:)    !total leaf area, [m2 d-2]
+  real(r8), allocatable :: ARLFSs1(:)    !plant leaf area, [m2 d-2]
+  real(r8), allocatable :: RCSs1(:)      !shape parameter for calculating stomatal resistance from turgor pressure, [-]
+  real(r8), allocatable :: TAUSs1(:)     !fraction of radiation intercepted by canopy layer, [-]
+  real(r8), allocatable :: TAU0s1(:)     !fraction of radiation transmitted by canopy layer, [-]
+  real(r8), allocatable :: ABSRs1(:)     !canopy shortwave absorptivity , [-]
+  real(r8), allocatable :: ABSPs1(:)     !canopy PAR absorptivity
+  real(r8), allocatable :: TAURs1(:)     !canopy shortwave transmissivity , [-]
+  real(r8), allocatable :: TAUPs1(:)     !canopy PAR transmissivity , [-]
+  real(r8), allocatable :: THRM1s1(:)    !canopy longwave radiation , [MJ d-2 h-1]
+  real(r8), allocatable :: RADCs1(:)     !canopy absorbed shortwave radiation , [MJ d-2 h-1]
+  real(r8), allocatable :: OMEGXs1(:,:,:)!sine of indirect sky radiation on leaf surface/sine of indirect sky radiation
+  real(r8), allocatable :: OMEGAGs1(:)   !sine of solar beam on leaf surface, [-]
+  real(r8), allocatable :: ZSINs1(:)     !sine of leaf angle
+  integer,  allocatable :: IALBYs1(:,:,:)     !flag for calculating backscattering of radiation in canopy
+  real(r8), allocatable :: OMEGAs1(:,:,:)     !sine of indirect sky radiation on leaf surface
+  real(r8), allocatable :: ANGBRs1(:)    !branching angle, [degree from horizontal]
+  real(r8), allocatable :: SSL1s1(:)     !petiole length:mass during growth, [m gC-1]
+  real(r8), allocatable :: SNL1s1(:)     !internode length:mass during growth, [m gC-1]
+  real(r8), allocatable :: SLA1s1(:)     !leaf area:mass during growth, [m2 gC-1]
+  real(r8), allocatable :: CPEARs1(:)    !ear P:C ratio, [gP gC-1]
+  real(r8), allocatable :: DMSHEs1(:)    !sheath growth yield, [g g-1]
+  real(r8), allocatable :: CPHSKs1(:)    !husk P:C ratio, [gP gC-1]
+  real(r8), allocatable :: DMSTKs1(:)    !stalk growth yield, [gC gC-1]
+  real(r8), allocatable :: DMHSKs1(:)    !husk growth yield, [gC gC-1]
+  real(r8), allocatable :: DMRSVs1(:)    !reserve growth yield, [gC gC-1]
+  real(r8), allocatable :: DMGRs1(:)     !grain growth yield, [gC gC-1]
+  real(r8), allocatable :: DMEARs1(:)    !ear growth yield, [gC gC-1]
+  real(r8), allocatable :: CNHSKs1(:)    !husk N:C ratio, [gN gC-1]
+  real(r8), allocatable :: CNRSVs1(:)    !reserve N:C ratio, [gN gC-1]
+  real(r8), allocatable :: CNEARs1(:)    !ear N:C ratio, [gN gC-1]
+  real(r8), allocatable :: CPRSVs1(:)    !reserve P:C ratio, [gP gC-1]
+  real(r8), allocatable :: CPGRs1(:)     !grain P:C ratio, [gP gP-1]
+  real(r8), allocatable :: CNSTKs1(:)    !stalk N:C ratio, [gN gC-1]
+  real(r8), allocatable :: ANGSHs1(:)    !sheath angle, [degree from horizontal]
+  real(r8), allocatable :: FCO2s1(:)     !Ci:Ca ratio, [-]
+  real(r8), allocatable :: ZCOSs1(:)     !cosine of leaf angle
+  real(r8), allocatable :: XKO2s1(:)     !Km for rubisco oxygenase activity, [uM]
+  real(r8), allocatable :: CPO4Ss1(:)    !PO4 concentration non-band micropore	[g m-3]
+  real(r8), allocatable :: CNDUs1(:)     !soil micropore hydraulic conductivity for root water uptake [m MPa-1 h-1]
+  real(r8), allocatable :: WGLFTs1(:)    !total leaf mass, [gC d-2]
+  real(r8), allocatable :: ARSTTs1(:)    !total stem area, [m2 d-2]
+  real(r8), allocatable :: CGSGLs1(:)    !gaseous CO2 diffusivity	[m2 h-1]
+  real(r8), allocatable :: CHSGLs1(:)    !gaseous CH4 diffusivity	[m2 h-1]
+  real(r8), allocatable :: HGSGLs1(:)    !gaseous H2 diffusivity  [m2 h-1]
+  real(r8), allocatable :: OGSGLs1(:)    !gaseous O2 diffusivity	[m2 h-1]
+  real(r8), allocatable :: Z2SGLs1(:)    !gaseous N2O diffusivity, [m2 h-1]
+  real(r8), allocatable :: ZOSGLs1(:)    !aqueous NO3 diffusivity, [m2 h-1]
+  real(r8), allocatable :: ETMXs1(:)     !cholorophyll activity , [umol g-1 h-1 at 25 oC]
+  real(r8), allocatable :: CHLs1(:)      !leaf C3 chlorophyll content, [gC gC-1]
+  real(r8), allocatable :: PEPCs1(:)     !leaf PEP carboxylase content, [gC gC-1]
+  real(r8), allocatable :: CHL4s1(:)     !leaf C4 chlorophyll content, [gC gC-1]
+  real(r8), allocatable :: RUBPs1(:)     !leaf rubisco content, [gC gC-1]
+  real(r8), allocatable :: VCMX4s1(:)    !PEP carboxylase activity, [umol g-1 h-1 at 25 oC]
+  real(r8), allocatable :: VOMXs1(:)     !rubisco oxygenase activity, [umol g-1 h-1 at 25 oC]
+  real(r8), allocatable :: VCMXs1(:)     !rubisco carboxylase activity, [umol g-1 h-1 at 25 oC]
+  real(r8), allocatable :: XKCO2s1(:)    !Km for rubisco carboxylase activity, [uM]
+  real(r8), allocatable :: WTSTDIs1(:)   !initial standing dead C, [g C m-2]
+  real(r8), allocatable :: TCCs1(:)      !canopy temperature, [oC]
+  real(r8), allocatable :: DTKCs1(:)     !change in canopy temperature, [K]
+  real(r8), allocatable :: ENGYXs1(:)    !canopy heat storage from previous time step, [MJ d-2]
+  real(r8), allocatable :: TKCs1(:)      !canopy temperature, [K]
+  real(r8), allocatable :: PSILOs1(:)    !canopy osmotic water potential, [Mpa]
+  real(r8), allocatable :: OSMOs1(:)     !canopy osmotic potential when canopy water potential = 0 MPa, [MPa]
+  real(r8), allocatable :: TCO2As1(:)    !total autotrophic respiration, [gC d-2 ]
+  real(r8), allocatable :: CTRANs1(:)    !total transpiration, [m H2O d-2]
+  real(r8), allocatable :: ZTYPs1(:)     !plant thermal adaptation zone, [-]
+  real(r8), allocatable :: ZTYPIs1(:)    !initial plant thermal adaptation zone, [-]
+  real(r8), allocatable :: HTCs1(:)      !temperature above which seed set is adversely affected, [oC]
+  real(r8), allocatable :: SSTXs1(:)     !sensitivity to HTC (seeds oC-1 above HTC)
+  real(r8), allocatable :: RSCSs1(:)     !soil hydraulic resistance, [MPa h m-2]
+  real(r8), allocatable :: ZHSGLs1(:)    !aqueous NH4 diffusivity, [m2 h-1]
+  real(r8), allocatable :: BKDSs1(:)     !soil bulk density, [Mg m-3]
+  real(r8), allocatable :: CH2P4s1(:)    !aqueous PO4 concentration non-band	[gP m-3]
+  real(r8), allocatable :: CH1P4Bs1(:)   !aqueous H1PO4 concentration band [gP m-3]
+  real(r8), allocatable :: CH2P4Bs1(:)   !aqueous PO4 concentration band	[gP m-3]
+  real(r8), allocatable :: CNO3Ss1(:)    !NO3 concentration non-band micropore	[gN m-3]
+  real(r8), allocatable :: CH1P4s1(:)    !aqueous H1PO4 concentration non-band [gP m-3]
+  real(r8), allocatable :: CNO3Bs1(:)    !NO3 concentration band micropore	[gN m-3]
+  real(r8), allocatable :: CNH4Ss1(:)    !NH4 concentration non-band micropore	[gN m-3]
+  real(r8), allocatable :: CNH4Bs1(:)    !NH4 concentration band micropore	[gN m-3]
+  real(r8), allocatable :: CO2Gs1(:)     !gaseous CO2	[g d-2]
+  real(r8), allocatable :: CO2Ss1(:)     !aqueous CO2  micropore	[gC d-2]
+  real(r8), allocatable :: CH4Ss1(:)     !aqueous CH4  micropore	[gC d-2]
+  real(r8), allocatable :: CCH4Ss1(:)    !aqueous CH4 concentration micropore	[gC m-3]
+  real(r8), allocatable :: CZ2OSs1(:)    !aqueous N2O concentration micropore	[gN m-3]
+  real(r8), allocatable :: CCH4Gs1(:)    !gaseous CH4 concentration	[gC m-3]
+  real(r8), allocatable :: CNH3Ss1(:)    !NH3 concentration non-band micropore	[gN m-3]
+  real(r8), allocatable :: CNH3Bs1(:)    !NH3 concentration band micropore	[gN m-3]
+  real(r8), allocatable :: CH2GSs1(:)    !aqueous H2 concentration	[g m-3]
+  real(r8), allocatable :: HLSGLs1(:)    !aqueous H2 diffusivity, [m2 h-1]
+  real(r8), allocatable :: CLSGLs1(:)    !aqueous CO2 diffusivity	[m2 h-1]
+  real(r8), allocatable :: CQSGLs1(:)    !aqueous CH4 diffusivity	[m2 h-1]
+  real(r8), allocatable :: CZ2OGs1(:)    !gaseous N2O concentration	[gN m-3]
+  real(r8), allocatable :: CNH3Gs1(:)    !gaseous NH3 concentration	[gN m-3]
+  real(r8), allocatable :: CH2GGs1(:)    !gaseous H2 concentration	[g m-3]
+  real(r8), allocatable :: CORGCs1(:)    !soil organic C content [gC kg soil-1]
+  real(r8), allocatable :: RSMHs1(:)     !maximum stomatal resistance to vapor, [s h-1]
+  real(r8), allocatable :: CFs1(:)       !clumping factor for self-shading in canopy layer, [-]
+  real(r8), allocatable :: CDPTHZs1(:)   !depth to bottom of soil layer from  surface of grid cell [m]
+  real(r8), allocatable :: PPIs1(:)      !initial plant population, [m-2]
+  real(r8), allocatable :: PPZs1(:)      !plant population at seeding, [m-2]
+  real(r8), allocatable :: PPXs1(:)      !plant population, [m-2]
+  real(r8), allocatable :: PPs1(:)        !plant population, [d-2]
+  real(r8), allocatable :: DPTHZs1(:)    !depth to middle of soil layer from  surface of grid cell [m]
+  real(r8), allocatable :: CFIs1(:)      !initial clumping factor for self-shading in canopy layer, [-]
+  real(r8), allocatable :: WTRTs1(:)     !plant root C, [gC d-2]
+  real(r8), allocatable :: FMPRs1(:)     !micropore fraction
+  real(r8), allocatable :: FWODBs1(:)    !woody C allocation
+  real(r8), allocatable :: ALBRs1(:)     !canopy shortwave albedo , [-]
+  real(r8), allocatable :: ALBPs1(:)     !canopy PAR albedo , [-]
+  real(r8), allocatable :: FWODLNs1(:)   !leaf N allocation
+  real(r8), allocatable :: FWODLPs1(:)   !leaf P allocation
+  real(r8), allocatable :: FWODSPs1(:)   !P woody fraction in petiole
+  real(r8), allocatable :: FWODSNs1(:)   !N woody fraction in petiole
+  real(r8), allocatable :: FWODRNs1(:)   !N woody fraction in root
+  real(r8), allocatable :: FWODRPs1(:)   !P woody fraction in root
+  real(r8), allocatable :: FWODRs1(:)    !C woody fraction in root
+  real(r8), allocatable :: FWOODs1(:)    !woody C allocation
+  real(r8), allocatable :: FVRNs1(:)     !allocation parameter
+  real(r8), allocatable :: FWOODNs1(:)   !woody N allocation
+  real(r8), allocatable :: FWOODPs1(:)   !woody P allocation
+  real(r8), allocatable :: H1PO4s1(:)    !soil aqueous HPO4 content micropore non-band, [gP d-2]
+  real(r8), allocatable :: H2PO4s1(:)    !PO4 non-band micropore, [gP d-2]
+  real(r8), allocatable :: H1POBs1(:)    !soil aqueous HPO4 content micropore band, [gP d-2]
+  real(r8), allocatable :: H2POBs1(:)    !PO4 band micropore, [gP d-2]
+  real(r8), allocatable :: H2GSs1(:)     !aqueous H2 	[g d-2]
+  real(r8), allocatable :: OXYGs1(:)     !gaseous O2 	[g d-2]
+  real(r8), allocatable :: OXYSs1(:)     !aqueous O2  micropore	[g d-2]
+  real(r8), allocatable :: OLSGLs1(:)    !aqueous CO2 diffusivity	[m2 h-1]
+  real(r8), allocatable :: POSGLs1(:)    !aqueous PO4 diffusivity, [m2 h-1]
+  real(r8), allocatable :: PSISTs1(:)    !soil micropore total water potential [MPa]
+  real(r8), allocatable :: ROXYXs1(:)    !total root + microbial O2 uptake, [g d-2 h-1]
+  real(r8), allocatable :: RNHBXs1(:)    !total root + microbial NH4 uptake band, [gN d-2 h-1]
+  real(r8), allocatable :: RP14Xs1(:)    !HPO4 demand in non-band by all microbial,root,myco populations, [gP d-2 h-1]
+  real(r8), allocatable :: RP1BXs1(:)    !HPO4 demand in band by all microbial,root,myco populations, [gP d-2 h-1]
+  real(r8), allocatable :: RNO3Xs1(:)    !total root + microbial NO3 uptake non-band, [gN d-2 h-1]
+  real(r8), allocatable :: RNH4Xs1(:)    !total root + microbial NH4 uptake non-band, [gN d-2 h-1]
+  real(r8), allocatable :: RN3BXs1(:)    !total root + microbial NO3 uptake band, [gN d-2 h-1]
+  real(r8), allocatable :: RPO4Xs1(:)    !total root + microbial PO4 uptake non-band, [gP d-2 h-1]
+  real(r8), allocatable :: RPOBXs1(:)    !total root + microbial PO4 uptake band, [gP d-2 h-1]
+  real(r8), allocatable :: RPO4Ys1(:)    !total root + microbial PO4 uptake non-band, [gP d-2 h-1]
+  real(r8), allocatable :: RPOBYs1(:)    !total root + microbial PO4 uptake band, [gP d-2 h-1]
+  real(r8), allocatable :: RP14Ys1(:)    !HPO4 demand in non-band by all microbial,root,myco populations, [gP d-2 h-1]
+  real(r8), allocatable :: RP1BYs1(:)    !HPO4 demand in band by all microbial,root,myco populations, [gP d-2 h-1]
+  real(r8), allocatable :: RNO3Ys1(:)    !total root + microbial NO3 uptake non-band, [gN d-2 h-1]
+  real(r8), allocatable :: RNH4Ys1(:)    !total root + microbial NH4 uptake non-band, [gN d-2 h-1]
+  real(r8), allocatable :: RNHBYs1(:)    !total root + microbial NH4 uptake band, [gN d-2 h-1]
+  real(r8), allocatable :: RN3BYs1(:)    !total root + microbial NO3 uptake band, [gN d-2 h-1]
+  real(r8), allocatable :: ROXYFs1(:)    !net gaseous O2 flux, [g d-2 h-1]
+  real(r8), allocatable :: RCO2Fs1(:)    !net gaseous CO2 flux, [g d-2 h-1]
+  real(r8), allocatable :: ROXYLs1(:)    !net aqueous O2 flux, [g d-2 h-1]
+  real(r8), allocatable :: ROXYYs1(:)    !total root + microbial O2 uptake, [g d-2 h-1]
+  real(r8), allocatable :: SCO2Ls1(:)    !solubility of CO2, [m3 m-3]
+  real(r8), allocatable :: PSILZs1(:)    !minimum daily canopy water potential, [MPa]
+  real(r8), allocatable :: RSMNs1(:)     !canopy minimum stomatal resistance, [s m-1]
+  real(r8), allocatable :: DLYR3s1(:)    !vertical thickness of soil layer [m]
+  real(r8), allocatable :: XKCO2Os1(:)   !leaf aqueous CO2 Km ambient O2, [uM]
+  real(r8), allocatable :: XKCO2Ls1(:)   !leaf aqueous CO2 Km no O2, [uM]
+  real(r8), allocatable :: WTRTSs1(:)    !plant root structural C, [gC d-2]
+  real(r8), allocatable :: WTRTSNs1(:)   !plant root structural N, [gN d-2]
+  real(r8), allocatable :: WTRTSPs1(:)   !plant root structural P, [gP d-2]
+  real(r8), allocatable :: SFLXCs1(:)    !canopy sensible heat flux, [MJ d-2 h-1]
+  real(r8), allocatable :: RCs1(:)       !canopy stomatal resistance, [h m-1]
+  real(r8), allocatable :: TKCZs1(:)     !canopy temperature, [K]
+  real(r8), allocatable :: RAs1(:)       !canopy boundary layer resistance, [h m-1]
+  real(r8), allocatable :: SO2s1(:)      !leaf O2 solubility, [uM /umol mol-1]
+  real(r8), allocatable :: RAD1s1(:)     !canopy net radiation , [MJ d-2 h-1]
+  real(r8), allocatable :: SOXYLs1(:)    !solubility of O2, [m3 m-3]
+  real(r8), allocatable :: SCH4Ls1(:)    !solubility of CH4, [m3 m-3]
+  real(r8), allocatable :: SN2OLs1(:)    !solubility of N2O, [m3 m-3]
+  real(r8), allocatable :: SNH3Ls1(:)    !solubility of NH3, [m3 m-3]
+  real(r8), allocatable :: SH2GLs1(:)    !solubility of H2, [m3 m-3]
+  real(r8), allocatable :: THETWs1(:)    !volumetric water content [m3 m-3]
+  real(r8), allocatable :: THETYs1(:)    !air-dry water content, [m3 m-3]
+  real(r8), allocatable :: TKSs1(:)      !mean annual soil temperature, [K]
+  real(r8), allocatable :: TFNDs1(:)     !temperature effect on diffusivity
+  real(r8), allocatable :: VOLXs1(:)     !volume of soil layer	m3 d-2
+  real(r8), allocatable :: VLPOBs1(:)    !PO4 band volume fracrion, [0-1]
+  real(r8), allocatable :: VLNO3s1(:)    !NO3 non-band volume fracrion, []
+  real(r8), allocatable :: VLPO4s1(:)    !PO4 non-band volume fracrion, []
+  real(r8), allocatable :: VLNOBs1(:)    !NO3 band volume fraction, []
+  real(r8), allocatable :: VLNH4s1(:)    !NH4 non-band volume fraction, []
+  real(r8), allocatable :: VLNHBs1(:)    !NH4 band volume fraction, []
+  real(r8), allocatable :: VOLYs1(:)     !total micropore volume [m3 d-2]
+  real(r8), allocatable :: VOLIs1(:)     !soil micropore ice content   [m3 d-2]
+  real(r8), allocatable :: VOLWs1(:)     !soil micropore water content [m3 d-2]
+  real(r8), allocatable :: VOLAs1(:)     !total volume in micropores [m3 d-2]
+  real(r8), allocatable :: ZLs1(:)       !canopy layer height , [m]
+  real(r8), allocatable :: ZNO3Ss1(:)    !NO3 non-band micropore, [gN d-2]
+  real(r8), allocatable :: ZNO3Bs1(:)    !NO3 band micropore, [Ng d-2]
+  real(r8), allocatable :: ZNSGLs1(:)    !aqueous NH3 diffusivity, [m2 h-1]
+  real(r8), allocatable :: ZVSGLs1(:)    !aqueous N2O diffusivity, [m2 h-1]
+  real(r8), allocatable :: ZNH4Ss1(:)    !NH4 non-band micropore, [gN d-2]
+  real(r8), allocatable :: ZNH4Bs1(:)    !NH4 band micropore, [gN d-2]
+  real(r8), allocatable :: Z2OSs1(:)     !aqueous N2O micropore, [gN d-2]
+  real(r8), allocatable :: ZNH3Ss1(:)    !NH3 non-band micropore, [gN d-2]
+  real(r8), allocatable :: ZNH3Bs1(:)    !NH3 band micropore, [g d-2]
+  real(r8), allocatable :: TUPNO3s1(:)   !total root-soil NO3 flux non-band, [gN d-2 h-1]
+  real(r8), allocatable :: TUPH2Bs1(:)   !total root-soil PO4 flux band, [gP d-2 h-1]
+  real(r8), allocatable :: TUPH1Bs1(:)   !soil-root exch of HPO4 in band [gP d-2 h-1]
+  real(r8), allocatable :: TUPN2Ss1(:)   !total root-soil N2O flux, [gN d-2 h-1]
+  real(r8), allocatable :: TCO2Ss1(:)    !total root-soil CO2 flux, [gC d-2 h-1]
+  real(r8), allocatable :: TCO2Ps1(:)    !total root CO2 flux, [gC d-2 h-1]
+  real(r8), allocatable :: TUPOXPs1(:)   !total root internal O2 flux, [g d-2 h-1]
+  real(r8), allocatable :: THGFLAs1(:)   !total root-atmosphere H2 flux, [g d-2 h-1]
+  real(r8), allocatable :: TLH2GPs1(:)   !total root-soil H2 flux, [g d-2 h-1]
+  real(r8), allocatable :: TCHFLAs1(:)   !total internal root CH4 flux , [gC d-2 h-1]
+  real(r8), allocatable :: TLCH4Ps1(:)   !total root internal CH4 flux, [gC d-2 h-1]
+  real(r8), allocatable :: TLCO2Ps1(:)   !total root internal CO2 flux, [gC d-2 h-1]
+  real(r8), allocatable :: TLNH3Ps1(:)   !total root internal NH3 flux, [gN d-2 h-1]
+  real(r8), allocatable :: TUPHTs1(:)    !total root heat uptake, [MJ d-2]
+  real(r8), allocatable :: TUPWTRs1(:)   !total root water uptake, [m3 d-2]
+  real(r8), allocatable :: RTDNTs1(:)    !total root length density, [m m-3]
+  real(r8), allocatable :: TUPNFs1(:)    !total root N2 fixation, [g d-2 h-1]
+  real(r8), allocatable :: TLOXYPs1(:)   !total root internal O2 flux, [g d-2 h-1]
+  real(r8), allocatable :: TLN2OPs1(:)   !total root internal N2O flux, [gN d-2 h-1]
+  real(r8), allocatable :: TCOFLAs1(:)   !total internal root CO2 flux , [gC d-2 h-1]
+  real(r8), allocatable :: TNHFLAs1(:)   !total internal root NH3 flux , [gN d-2 h-1]
+  real(r8), allocatable :: TOXFLAs1(:)   !total internal root O2 flux , [g d-2 h-1]
+  real(r8), allocatable :: TN2FLAs1(:)   !total internal root N2O flux , [gN d-2 h-1]
+  real(r8), allocatable :: TUPOXSs1(:)   !total root-soil O2 flux, [g d-2 h-1]
+  real(r8), allocatable :: TUPHGSs1(:)   !total root-soil H2 flux, [g d-2 h-1]
+  real(r8), allocatable :: TUPCHSs1(:)   !total root-soil CH4 flux, [gC d-2 h-1]
+  real(r8), allocatable :: TUPN3Bs1(:)   !total root-soil NH3 flux band, [gN d-2 h-1]
+  real(r8), allocatable :: TUPN3Ss1(:)   !total root-soil NH3 flux non-band, [gN d-2 h-1]
+  real(r8), allocatable :: TUPH2Ps1(:)   !total root-soil PO4 flux non-band, [gP d-2 h-1]
+  real(r8), allocatable :: TUPH1Ps1(:)   !soil-root exch of HPO4 in non-band, [gP d-2 h-1]
+  real(r8), allocatable :: TUPNH4s1(:)   !total root-soil NH4 flux non-band, [gN d-2 h-1]
+  real(r8), allocatable :: TUPNHBs1(:)   !total root-soil NH4 flux band, [gN d-2 h-1]
+  real(r8), allocatable :: TUPNOBs1(:)   !total root-soil NO3 flux band, [gN d-2 h-1]
+  real(r8), allocatable :: CSNTs1(:,:,:)    !total litterfall C, [gC d-2 h-1]
+  real(r8), allocatable :: ZSNTs1(:,:,:)    !total litterfall N, [gN d-2 h-1]
+  real(r8), allocatable :: PSNTs1(:,:,:)    !total litterfall P, [gP d-2 h-1]
+  real(r8), allocatable :: RDFOMCs1(:,:,:,:)  !root uptake (+ve) - exudation (-ve) of DOC, [gC d-2 h-1]
+  real(r8), allocatable :: RDFOMNs1(:,:,:,:)  !root uptake (+ve) - exudation (-ve) of DON, [gN d-2 h-1]
+  real(r8), allocatable :: RDFOMPs1(:,:,:,:)  !root uptake (+ve) - exudation (-ve) of DOP, [gP d-2 h-1]
+  real(r8), allocatable :: FOSRHs1(:,:)   !fraction of total organic C in complex, [-]
+  real(r8), allocatable :: OQCs1(:,:)     !dissolved organic C micropore	[gC d-2]
+  real(r8), allocatable :: OQNs1(:,:)     !dissolved organic N micropore	[gN d-2]
+  real(r8), allocatable :: OQPs1(:,:)     !dissolved organic P micropore	[gP d-2]
+  real(r8), allocatable :: XOQCSs1(:,:)   !net microbial DOC flux, [gC d-2 h-1]
+  real(r8), allocatable :: XOQNSs1(:,:)   !net microbial DON flux, [gN d-2 h-1]
+  real(r8), allocatable :: XOQPSs1(:,:)   !net microbial DOP flux, [gP d-2 h-1]
+  real(r8), allocatable :: FLWCs1(:)      !water flux into canopy, [m3 d-2 h-1]
+  real(r8), allocatable :: EHVSTs1(:,:,:) !harvest efficiency, [-]
+  real(r8), allocatable :: HVSTs1(:)      !harvest cutting height (+ve) or fractional LAI removal (-ve), [m or -]
+  real(r8), allocatable :: THINs1(:)      !thinning of plant population, [-]
+  real(r8), allocatable :: ARSTPs1(:)     !plant stem area, [m2 d-2]
+  real(r8), allocatable :: ARLFPs1(:)     !plant leaf area, [m2 d-2]
+  real(r8), allocatable :: BALCs1(:)      !plant C balance, [gC d-2]
+  real(r8), allocatable :: BALNs1(:)      !plant N balance, [gN d-2]
+  real(r8), allocatable :: BALPs1(:)      !plant P balance, [gP d-2]
+  real(r8), allocatable :: CO2Is1(:)      !leaf gaseous CO2 concentration, [umol m-3]
+  real(r8), allocatable :: CCPOLPs1(:)    !canopy nonstructural C concentration, [gC d-2]
+  real(r8), allocatable :: CPOOLPs1(:)    !canopy nonstructural P concentration, [gP d-2]
+  real(r8), allocatable :: CPOLNPs1(:)    !canopy nodule nonstructural P, [gP d-2]
+  real(r8), allocatable :: CCPLNPs1(:)    !nodule nonstructural C, [gC d-2]
+  real(r8), allocatable :: CZPOLPs1(:)    !canopy nonstructural N concentration, [g g-1]
+  real(r8), allocatable :: CPPOLPs1(:)    !canopy nonstructural P concentration, [g g-1]
+  real(r8), allocatable :: CTCs1(:)       !temperature below which seed set is adversely affected, [oC]
+  real(r8), allocatable :: CNETs1(:)      !canopy net CO2 exchange, [gC d-2 h-1]
+  real(r8), allocatable :: CPRTSs1(:)     !root P:C ratio x root growth yield, [-]
+  real(r8), allocatable :: CNRTSs1(:)     !root N:C ratio x root growth yield, [-]
+  real(r8), allocatable :: CARBNs1(:)     !total gross CO2 fixation, [gC d-2 ]
+  real(r8), allocatable :: RSMXs1(:)      !maximum stomatal resistance to vapor, [s m-1]
+  real(r8), allocatable :: CNNDs1(:)      !nodule N:C ratio, [gN gC-1]
+  real(r8), allocatable :: CPNDs1(:)      !nodule P:C ratio, [gP gC-1]
+  real(r8), allocatable :: CNRTs1(:)      !root N:C ratio, [gN gC-1]
+  real(r8), allocatable :: CPRTs1(:)      !root P:C ratio, [gP gC-1]
+  real(r8), allocatable :: CNWSs1(:)      !C:N ratio in remobilizable nonstructural biomass, [-]
+  real(r8), allocatable :: CPWSs1(:)      !C:P ratio in remobilizable nonstructural biomass, [-]
+  real(r8), allocatable :: CFXs1(:)       !clumping factor for self-shading in canopy layer at current LAI, [-]
+  real(r8), allocatable :: CWSRTs1(:)     !fraction of remobilizable nonstructural biomass in root, [-]
+  real(r8), allocatable :: DCO2s1(:)      !gaesous CO2 concentration difference across stomates, [umol m-3]
+  real(r8), allocatable :: DMNDs1(:)      !nodule growth yield, [g g-1]
+  real(r8), allocatable :: DMRTs1(:)      !root growth yield, [g g-1]
+  real(r8), allocatable :: FMOLs1(:)      !total gas concentration, [mol m-3]
+  real(r8), allocatable :: FNODs1(:)      !parameter for allocation of growth to nodes, [-]
+  real(r8), allocatable :: GROUPIs1(:)    !acclimated plant maturity group, [-]
+  real(r8), allocatable :: HTCTLs1(:)     !cotyledon height, [m]
+  real(r8), allocatable :: HCSNCs1(:)     !plant C litterfall, [gC d-2 h-1]
+  real(r8), allocatable :: HZSNCs1(:)     !plant N litterfall, [gN d-2 h-1]
+  real(r8), allocatable :: HPSNCs1(:)     !plant P litterfall, [gP d-2 h-1]
+  real(r8), allocatable :: HVSTCs1(:)     !plant C harvest, [gC d-2 ]
+  real(r8), allocatable :: HVSTNs1(:)     !plant N harvest, [gN d-2 ]
+  real(r8), allocatable :: HVSTPs1(:)     !plant P harvest, [gP d-2 ]
+  real(r8), allocatable :: HCUPTKs1(:)    !net root C uptake (+ve) - exudation (-ve), [gC d-2 h-1]
+  real(r8), allocatable :: HZUPTKs1(:)    !net root N uptake (+ve) - exudation (-ve), [gN d-2 h-1]
+  real(r8), allocatable :: HPUPTKs1(:)    !net root P uptake (+ve) - exudation (-ve), [gP d-2 h-1]
+  real(r8), allocatable :: HTSTZs1(:)     !canopy height, [m]
+  real(r8), allocatable :: OFFSTs1(:)     !adjustment of Arhhenius curves for plant thermal acclimation, [oC]
+  real(r8), allocatable :: OSTRs1(:)      !plant O2 stress indicator, []
+  real(r8), allocatable :: PSILTs1(:)     !canopy total water potential , [Mpa]
+  real(r8), allocatable :: PBs1(:)        !branch nonstructural C content required for new branch, [gC gC-1]
+  real(r8), allocatable :: PRs1(:)        !threshold root nonstructural C content for initiating new root axis, [gC gC-1]
+  real(r8), allocatable :: PPOOLPs1(:)    !canopy nonstructural P, [gP d-2]
+  real(r8), allocatable :: PPOLNPs1(:)    !canopy nonstructural P concentration, [gP gC-1]
+  real(r8), allocatable :: PSILGs1(:)     !canopy turgor water potential, [MPa]
+  real(r8), allocatable :: RCMXs1(:)      !maximum stomatal resistance to CO2, [s h-1]
+  real(r8), allocatable :: RCO2Zs1(:)     !gaseous CO2 flux fron root disturbance, [gC d-2 h-1]
+  real(r8), allocatable :: ROXYZs1(:)     !gaseous O2 flux fron root disturbance, [g d-2 h-1]
+  real(r8), allocatable :: RCH4Zs1(:)     !gaseous CH4 flux fron root disturbance, [g d-2 h-1]
+  real(r8), allocatable :: RN2OZs1(:)     !gaseous N2O flux fron root disturbance, [g d-2 h-1]
+  real(r8), allocatable :: RNH3Zs1(:)     !gaseous NH3 flux fron root disturbance non-band, [g d-2 h-1]
+  real(r8), allocatable :: RH2GZs1(:)     !gaseous H2 flux fron root disturbance, [g d-2 h-1]
+  real(r8), allocatable :: RSETCs1(:)     !effect of canopy C status on seed set , []
+  real(r8), allocatable :: RSETNs1(:)     !effect of canopy N status on seed set , []
+  real(r8), allocatable :: RSETPs1(:)     !effect of canopy P status on seed set , []
+  real(r8), allocatable :: RTFQs1(:)      !root brancing frequency, [m-1]
+  real(r8), allocatable :: RAZs1(:)       !canopy roughness height, [m]
+  real(r8), allocatable :: CHILLs1(:)     !chilling effect on CO2 fixation, [-]
+  real(r8), allocatable :: CPSTKs1(:)     !stalk P:C ratio, [g g-1]
+  real(r8), allocatable :: SCO2s1(:)      !leaf CO2 solubility, [uM /umol mol-1]
+  real(r8), allocatable :: CO2Qs1(:)      !canopy gaesous CO2 concentration , [umol mol-1]
+  real(r8), allocatable :: O2Ls1(:)       !leaf aqueous O2 concentration, [uM]
+  real(r8), allocatable :: EVAPCs1(:)     !canopy evaporation, [m2 d-2 h-1]
+  real(r8), allocatable :: HFLXCs1(:)     !canopy storage heat flux, [MJ d-2 h-1]
+  real(r8), allocatable :: GRNOs1(:)      !canopy grain number, [d-2]
+  real(r8), allocatable :: EFLXCs1(:)     !canopy latent heat flux, [MJ d-2 h-1]
+  real(r8), allocatable :: CO2Ls1(:)      !leaf aqueous CO2 concentration, [uM]
+  real(r8), allocatable :: SDPTHs1(:)     !seeding depth, [m]
+  real(r8), allocatable :: SDPTHIs1(:)    !planting depth, [m]
+  real(r8), allocatable :: SDLGs1(:)      !seed length, [m]
+  real(r8), allocatable :: SDVLs1(:)      !seed volume, [m3 ]
+  real(r8), allocatable :: SDARs1(:)      !seed surface area, [m2]
+  real(r8), allocatable :: TCZs1(:)       !threshold temperature for spring leafout/dehardening, [oC]
+  real(r8), allocatable :: TCGs1(:)       !canopy growth temperature, [oC]
+  real(r8), allocatable :: TCXs1(:)       !threshold temperature for autumn leafoff/hardening, [oC]
+  real(r8), allocatable :: TKGs1(:)       !canopy growth temperature, [K]
+  real(r8), allocatable :: TFN3s1(:)      !canopy temperature growth function, [-]
+  real(r8), allocatable :: TCSN0s1(:)     !total surface litterfall C, [g d-2]
+  real(r8), allocatable :: TZSN0s1(:)     !total surface litterfall N, [g d-2]
+  real(r8), allocatable :: TPSN0s1(:)     !total surface litterfall P, [g d-2]
+  real(r8), allocatable :: TCSNCs1(:)     !total plant C litterfall , [g d-2 ]
+  real(r8), allocatable :: TZSNCs1(:)     !total plant N litterfall , [g d-2 ]
+  real(r8), allocatable :: TPSNCs1(:)     !total plant P litterfall , [g d-2 ]
+  real(r8), allocatable :: TCO2Ts1(:)     !total plant respiration, [gC d-2 ]
+  real(r8), allocatable :: TCUPTKs1(:)    !total net root C uptake (+ve) - exudation (-ve), [gC d-2 ]
+  real(r8), allocatable :: THVSTCs1(:)    !total plant C harvest, [gC d-2 ]
+  real(r8), allocatable :: TNH3Cs1(:)     !total canopy NH3 flux, [gN d-2 ]
+  real(r8), allocatable :: TZUPTKs1(:)    !total net root N uptake (+ve) - exudation (-ve), [gN d-2 ]
+  real(r8), allocatable :: THVSTNs1(:)    !total plant N harvest, [g d-2 ]
+  real(r8), allocatable :: TZUPFXs1(:)    !total plant N2 fixation, [g d-2 ]
+  real(r8), allocatable :: TPUPTKs1(:)    !total net root P uptake (+ve) - exudation (-ve), [g d-2 ]
+  real(r8), allocatable :: THVSTPs1(:)    !total plant P harvest, [g d-2 ]
+  real(r8), allocatable :: UPOMCs1(:)     !total root uptake (+ve) - exudation (-ve) of DOC, [g d-2 h-1]
+  real(r8), allocatable :: UPOMNs1(:)     !total root uptake (+ve) - exudation (-ve) of DON, [g d-2 h-1]
+  real(r8), allocatable :: UPOMPs1(:)     !total root uptake (+ve) - exudation (-ve) of DOP, [g d-2 h-1]
+  real(r8), allocatable :: UPNFs1(:)      !total root N2 fixation, [g d-2 h-1]
+  real(r8), allocatable :: UPNO3s1(:)     !total root uptake of NO3, [g d-2 h-1]
+  real(r8), allocatable :: UPNH4s1(:)     !total root uptake of NH4, [g d-2 h-1]
+  real(r8), allocatable :: UPH1Ps1(:)     !total root uptake of HPO4, [g d-2 h-1]
+  real(r8), allocatable :: UPH2Ps1(:)     !total root uptake of PO4, [g d-2 h-1]
+  real(r8), allocatable :: VOLWCs1(:)     !canopy surface water content, [m3 d-2]
+  real(r8), allocatable :: VOLWPs1(:)     !canopy water content, [m3 d-2]
+  real(r8), allocatable :: VHCPCs1(:)     !canopy heat capacity, [MJ d-2 K-1]
+  real(r8), allocatable :: VCH4Fs1(:)     !plant CH4 emission from fire, [g d-2 ]
+  real(r8), allocatable :: VCO2Fs1(:)     !plant CO2 emission from fire, [g d-2 ]
+  real(r8), allocatable :: VN2OFs1(:)     !plant N2O emission from fire, [g d-2 ]
+  real(r8), allocatable :: VNH3Fs1(:)     !plant NH3 emission from fire, [g d-2 ]
+  real(r8), allocatable :: VPO4Fs1(:)     !plant PO4 emission from fire, [g d-2 ]
+  real(r8), allocatable :: WSTRs1(:)      !canopy plant water stress indicator, number of hours PSILT < PSILY, []
+  real(r8), allocatable :: WTRVXs1(:)     !plant stored nonstructural C at planting, [g d-2]
+  real(r8), allocatable :: WTRVCs1(:)     !plant stored nonstructural C, [g d-2]
+  real(r8), allocatable :: WTLSs1(:)      !canopy leaf + sheath C, [g d-2]
+  real(r8), allocatable :: WTSHTs1(:)     !canopy shoot C, [g d-2]
+  real(r8), allocatable :: WTSHTAs1(:)    !landscape average canopy shoot C, [g d-2]
+  real(r8), allocatable :: WTSTGs1(:)     !standing dead C, [g d-2]
+  real(r8), allocatable :: WTSTGNs1(:)    !standing dead N, [g d-2]
+  real(r8), allocatable :: WTSTGPs1(:)    !standing dead P, [g d-2]
+  real(r8), allocatable :: WTNDs1(:)      !root total nodule mass, [g d-2]
+  real(r8), allocatable :: WTNDPs1(:)     !total nodule P, [g d-2]
+  real(r8), allocatable :: WTRTts1(:)     !plant root C, [g d-2]
+  real(r8), allocatable :: WTRTNs1(:)     !total root N , [g d-2]
+  real(r8), allocatable :: WTRTPs1(:)     !root total P, [g d-2]
+  real(r8), allocatable :: WTNDNs1(:)     !total canopy nodule N, [g d-2]
+  real(r8), allocatable :: WTSHNs1(:)     !canopy  N, [g d-2]
+  real(r8), allocatable :: WTSHPs1(:)     !canopy total P, [g d-2]
+  real(r8), allocatable :: WTRVNs1(:)     !plant stored nonstructural N, [g d-2]
+  real(r8), allocatable :: WTRVPs1(:)     !plant stored nonstructural P, [g d-2]
+  real(r8), allocatable :: XKCO24s1(:)    !Km for PEP carboxylase activity, [uM]
+  real(r8), allocatable :: O2Is1(:)       !leaf gaseous O2 concentration, [umol m-3]
+  real(r8), allocatable :: XTLIs1(:)      !number of nodes in seed, [-]
+  real(r8), allocatable :: XRNIs1(:)      !rate of node initiation, [h-1 at 25 oC]
+  real(r8), allocatable :: XRLAs1(:)      !rate of leaf initiation, [h-1 at 25 oC]
+  real(r8), allocatable :: XDLs1(:)       !critical daylength for phenological progress, [h]
+  real(r8), allocatable :: XPPDs1(:)      !difference between current and critical daylengths used to calculate  phenological progress [h]
+  real(r8), allocatable :: ZPOOLPs1(:)    !canopy  nonstructural N, [g d-2]
+  real(r8), allocatable :: ZPOLNPs1(:)    !canopy nonstructural P concentration, [g g-1]
+  real(r8), allocatable :: ZEROLs1(:)     !threshold zero for leaf calculation
+  real(r8), allocatable :: ZEROPs1(:)     !threshold zero for p calculation
+  real(r8), allocatable :: ZEROQs1(:)     !threshold zero for uptake calculation
+  real(r8), allocatable :: ZCs1(:)        !canopy height, [m]
+  real(r8), allocatable :: ZNPPs1(:)      !total net primary productivity, [g d-2]
+  real(r8), allocatable :: CLASSs1(:,:)   !fractionction of leaves in different angle classes, [-]
+  real(r8), allocatable :: ATRPs1(:,:)    !counter for mobilizing nonstructural C during spring leafout/dehardening, [h]
+  real(r8), allocatable :: FLGZs1(:,:)    !counter for mobilizing nonstructural C during autumn leafoff/hardening, [h]
+  real(r8), allocatable :: ARLFZs1(:,:)   !branch leaf area, [m2 d-2]
+  real(r8), allocatable :: ARLFBs1(:,:)   !branch leaf area, [m2 d-2]
+  real(r8), allocatable :: CPOOLs1(:,:)   !branch nonstructural C, [g d-2]
+  real(r8), allocatable :: CPOLNBs1(:,:)  !branch nodule nonstructural C, [g d-2]
+  real(r8), allocatable :: CCPOLBs1(:,:)  !branch nonstructural C concentration, [g d-2]
+  real(r8), allocatable :: CZPOLBs1(:,:)  !branch nonstructural N concentration, [g g-1]
+  real(r8), allocatable :: CPPOLBs1(:,:)  !branch nonstructural P concentration, [g g-1]
+  real(r8), allocatable :: DGSTGIs1(:,:)  !gain in normalized node number during vegetative growth stages , [h-1]
+  real(r8), allocatable :: DGSTGFs1(:,:)  !gain in normalized node number during reproductive growth stages, [h-1]
+  real(r8), allocatable :: FLG4s1(:,:)    !flag to detect physiological maturity from  grain fill , [-]
+  real(r8), allocatable :: FDBKs1(:,:)    !branch down-regulation of CO2 fixation, [-]
+  real(r8), allocatable :: FDBKXs1(:,:)   !down-regulation of C4 photosynthesis, [-]
+  real(r8), allocatable :: GROUPs1(:,:)   !plant maturity group, [-]
+  real(r8), allocatable :: GSTGIs1(:,:)   !normalized node number during vegetative growth stages , [-]
+  real(r8), allocatable :: GSTGFs1(:,:)   !normalized node number during reproductive growth stages, [-]
+  real(r8), allocatable :: GRNXBs1(:,:)   !branch potential grain number, [d-2]
+  real(r8), allocatable :: GRNOBs1(:,:)   !branch grain number, [d-2]
+  real(r8), allocatable :: GRWTBs1(:,:)   !maximum grain C during grain fill, [g d-2]
+  real(r8), allocatable :: HTSHEXs1(:,:)  !branch height, [m]
+  integer,  allocatable :: IDTHBs1(:,:)   !flag to detect branch death , [-]
+  integer,  allocatable :: IFLGPs1(:,:)   !branch phenology flag, [-]
+  integer,  allocatable :: IFLGFs1(:,:)   !branch phenology flag, [-]
+  integer,  allocatable :: IFLGEs1(:,:)   !branch phenology flag, [-]
+  integer,  allocatable :: IFLGAs1(:,:)   !branch phenology flag, [-]
+  integer,  allocatable :: IFLGGs1(:,:)   !branch phenology flag, [-]
+  integer,  allocatable :: IFLGRs1(:,:)   !branch phenology flag, [-]
+  integer,  allocatable :: IFLGQs1(:,:)   !branch phenology flag, [h]
+  integer,  allocatable :: KVSTGs1(:,:)   !leaf growth stage counter, [-]
+  integer,  allocatable :: KLEAFs1(:,:)   !leaf number, [-]
+  integer,  allocatable :: KVSTGNs1(:,:)  !leaf growth stage counter, [-]
+  integer,  allocatable :: KLEAFXs1(:,:)  !NUMBER OF MINIMUM LEAFED NODE USED IN GROWTH ALLOCATION
+  integer,  allocatable :: NBTBs1(:,:)    !branch number, [-]
+  integer,  allocatable :: IDAYs1(:,:,:)  !plant growth stage, [-]
+  integer,  allocatable :: IDAYYs1(:)     !alternate day of harvest, [-]
+  integer,  allocatable :: NINRs1(:,:)    !maximum soil layer number for root axes, [-]
+  real(r8), allocatable :: PSTGs1(:,:)    !shoot node number, [-]
+  real(r8), allocatable :: PSTGIs1(:,:)   !shoot node number at floral initiation, [-]
+  real(r8), allocatable :: PSTGFs1(:,:)   !shoot node number at anthesis, [-]
+  real(r8), allocatable :: PPOOLs1(:,:)   !branch nonstructural P, [g d-2]
+  real(r8), allocatable :: PPOLNBs1(:,:)  !branch nonstructural P concentration, [g g-1]
+  real(r8), allocatable :: RCCLXs1(:,:)   !C translocated from leaf during senescence, [g d-2 h-1]
+  real(r8), allocatable :: RCZLXs1(:,:)   !N translocated from leaf during senescence, [g d-2 h-1]
+  real(r8), allocatable :: RCPLXs1(:,:)   !P translocated from leaf during senescence, [g d-2 h-1]
+  real(r8), allocatable :: RCCSXs1(:,:)   !C translocated from sheath during senescence, [g d-2 h-1]
+  real(r8), allocatable :: RCZSXs1(:,:)   !N translocated from sheath during senescence, [g d-2 h-1]
+  real(r8), allocatable :: RCPSXs1(:,:)   !P translocated from sheath during senescence, [g d-2 h-1]
+  real(r8), allocatable :: RNH3Bs1(:,:)   !gaseous NH3 flux fron root disturbance band, [g d-2 h-1]
+  real(r8), allocatable :: TGSTGIs1(:,:)  !normalized node number during vegetative growth stages , [-]
+  real(r8), allocatable :: TGSTGFs1(:,:)  !normalized node number during reproductive growth stages , [-]
+  real(r8), allocatable :: VSTGXs1(:,:)   !leaf number at floral initiation, [-]
+  real(r8), allocatable :: VSTGs1(:,:)    !leaf number, [-]
+  real(r8), allocatable :: VRNYs1(:,:)    !initial heat requirement for spring leafout/dehardening, [h]
+  real(r8), allocatable :: VRNZs1(:,:)    !initial cold requirement for autumn leafoff/hardening, [h]
+  real(r8), allocatable :: VRNSs1(:,:)    !heat requirement for spring leafout/dehardening, [h]
+  real(r8), allocatable :: VRNLs1(:,:)    !hours above threshold temperature required for spring leafout/dehardening, [-]
+  real(r8), allocatable :: VRNFs1(:,:)    !cold requirement for autumn leafoff/hardening, [h]
+  real(r8), allocatable :: VRNXs1(:,:)    !number of hours below set temperature required for autumn leafoff/hardening, [-]
+  real(r8), allocatable :: WTLSBs1(:,:)   !branch leaf + sheath C, [g d-2]
+  real(r8), allocatable :: WTRSVBs1(:,:)  !branch reserve C, [g d-2]
+  real(r8), allocatable :: WTLFBs1(:,:)   !branch leaf C, [g d-2]
+  real(r8), allocatable :: WTNDBs1(:,:)   !branch nodule C, [g d-2]
+  real(r8), allocatable :: WTSHEBs1(:,:)  !branch sheath C , [g d-2]
+  real(r8), allocatable :: WTEARBs1(:,:)  !branch ear C, [g d-2]
+  real(r8), allocatable :: WTHSKBs1(:,:)  !branch husk C, [g d-2]
+  real(r8), allocatable :: WTRSBNs1(:,:)  !branch reserve N, [g d-2]
+  real(r8), allocatable :: WTLFBNs1(:,:)  !branch leaf N, [g d-2]
+  real(r8), allocatable :: WTNDBNs1(:,:)  !branch nodule N, [g d-2]
+  real(r8), allocatable :: WTSHBNs1(:,:)  !branch sheath N, [g d-2]
+  real(r8), allocatable :: WTEABNs1(:,:)  !branch ear N, [g d-2]
+  real(r8), allocatable :: WTHSBNs1(:,:)  !branch husk N, [g d-2]
+  real(r8), allocatable :: WTRSBPs1(:,:)  !branch reserve P, [g d-2]
+  real(r8), allocatable :: WTLFBPs1(:,:)  !branch leaf P, [g d-2]
+  real(r8), allocatable :: WTNDBPs1(:,:)  !branch nodule P, [g d-2]
+  real(r8), allocatable :: WTSHBPs1(:,:)  !branch sheath P, [g d-2]
+  real(r8), allocatable :: WTEABPs1(:,:)  !branch ear P, [g d-2]
+  real(r8), allocatable :: WTHSBPs1(:,:)  !branch husk P, [g d-2]
+  real(r8), allocatable :: WTGRBs1(:,:)   !branch grain C, [g d-2]
+  real(r8), allocatable :: WTGRBNs1(:,:)  !branch grain N, [g d-2]
+  real(r8), allocatable :: WTGRBPs1(:,:)  !branch grain P, [g d-2]
+  real(r8), allocatable :: WTSTKBs1(:,:)  !branch stalk C, [g d-2]
+  real(r8), allocatable :: WTSTBNs1(:,:)  !branch stalk N, [g d-2]
+  real(r8), allocatable :: WTSTBPs1(:,:)  !branch stalk P, [g d-2]
+  real(r8), allocatable :: WTSHTBs1(:,:)  !branch shoot C, [g d-2]
+  real(r8), allocatable :: WTSHTNs1(:,:)  !branch N, [g d-2]
+  real(r8), allocatable :: WTSHTPs1(:,:)  !branch total P, [g d-2]
+  real(r8), allocatable :: WGLFXs1(:,:)   !branch leaf structural C, [g d-2]
+  real(r8), allocatable :: WGLFNXs1(:,:)  !branch leaf structural N, [g d-2]
+  real(r8), allocatable :: WGLFPXs1(:,:)  !branch leaf structural P, [g d-2]
+  real(r8), allocatable :: WGSHEXs1(:,:)  !branch sheath structural C, [g d-2]
+  real(r8), allocatable :: WGSHNXs1(:,:)  !branch sheath structural N, [g d-2]
+  real(r8), allocatable :: WGSHPXs1(:,:)  !branch sheath structural P, [g d-2]
+  real(r8), allocatable :: WTSTXBs1(:,:)  !branch stalk structural C, [g d-2]
+  real(r8), allocatable :: WTSTXNs1(:,:)  !branch stalk structural N, [g d-2]
+  real(r8), allocatable :: WTSTXPs1(:,:)  !branch stalk structural P, [g d-2]
+  real(r8), allocatable :: WVSTKBs1(:,:)  !branch active stalk C, [g d-2]
+  real(r8), allocatable :: ZPOOLs1(:,:)   !branch  nonstructural N, [g d-2]
+  real(r8), allocatable :: ZPOLNBs1(:,:)  !branch nonstructural N concentration, [g g-1]
+  real(r8), allocatable :: SURFs1(:,:,:,:,:)   !leaf surface area, [m2 d-2]
+  real(r8), allocatable :: SURFXs1(:,:,:,:,:)  !leaf irradiated surface area, [m2 d-2]
+  real(r8), allocatable :: CPOOL3s1(:,:,:)    !minimum sink strength for nonstructural C transfer, [g d-2]
+  real(r8), allocatable :: CPOOL4s1(:,:,:)    !leaf nonstructural C4 content in C4 photosynthesis, [g d-2]
+  real(r8), allocatable :: CO2Bs1(:,:,:)      !bundle sheath nonstructural C3 content in C4 photosynthesis, [g d-2]
+  real(r8), allocatable :: COMPLs1(:,:,:)     !CO2 compensation point, [uM]
+  real(r8), allocatable :: CBXNs1(:,:,:)      !carboxylation efficiency, [umol umol-1]
+  real(r8), allocatable :: CBXN4s1(:,:,:)     !C4 carboxylation efficiency, [umol umol-1]
+  real(r8), allocatable :: ETGROs1(:,:,:)     !maximum light carboxylation rate under saturating CO2, [umol m-2 s-1]
+  real(r8), allocatable :: ETGR4s1(:,:,:)     !maximum  light C4 carboxylation rate under saturating CO2, [umol m-2 s-1]
+  real(r8), allocatable :: FDBK4s1(:,:,:)     !down-regulation of C4 photosynthesis, [-]
+  real(r8), allocatable :: HCOBs1(:,:,:)      !bundle sheath nonstructural C3 content in C4 photosynthesis, [g d-2]
+  real(r8), allocatable :: VCGROs1(:,:,:)     !maximum dark carboxylation rate under saturating CO2, [umol m-2 s-1]
+  real(r8), allocatable :: VGROs1(:,:,:)      !carboxylation rate, [umol m-2 s-1]
+  real(r8), allocatable :: VCGR4s1(:,:,:)     !maximum dark C4 carboxylation rate under saturating CO2, [umol m-2 s-1]
+  real(r8), allocatable :: VGRO4s1(:,:,:)     !C4 carboxylation rate, [umol m-2 s-1]
+  real(r8), allocatable :: ARLF1s1(:,:,:)     !leaf area, [m2 d-2]
+  real(r8), allocatable :: HTNODXs1(:,:,:)    !internode height, [m]
+  real(r8), allocatable :: HTSHEs1(:,:,:)     !sheath height, [m]
+  real(r8), allocatable :: HTNODEs1(:,:,:)    !internode height, [m]
+  real(r8), allocatable :: WGNODEs1(:,:,:)    !internode C, [g d-2]
+  real(r8), allocatable :: WGNODNs1(:,:,:)    !internode N, [g d-2]
+  real(r8), allocatable :: WGNODPs1(:,:,:)    !nodule P, [g d-2]
+  real(r8), allocatable :: WGLFs1(:,:,:)      !leaf C, [g d-2]
+  real(r8), allocatable :: WGLFNs1(:,:,:)     !leaf N, [g d-2]
+  real(r8), allocatable :: WGLFPs1(:,:,:)     !leaf P, [g d-2]
+  real(r8), allocatable :: WSLFs1(:,:,:)      !layer leaf protein C, [g d-2]
+  real(r8), allocatable :: WGSHEs1(:,:,:)     !sheath C , [g d-2]
+  real(r8), allocatable :: WGSHNs1(:,:,:)     !sheath N, [g d-2]
+  real(r8), allocatable :: WGSHPs1(:,:,:)     !sheath P, [g d-2]
+  real(r8), allocatable :: WSSHEs1(:,:,:)     !layer sheath protein C, [g d-2]
+  real(r8), allocatable :: SURFBs1(:,:,:,:)   !stem surface area, [m2 d-2]
+  real(r8), allocatable :: ARLFLs1(:,:,:,:)   !layer leaf area, [m2 d-2]
+  real(r8), allocatable :: WGLFLs1(:,:,:,:)   !layer leaf C, [g d-2]
+  real(r8), allocatable :: WGLFLNs1(:,:,:,:)  !layer leaf N, [g d-2]
+  real(r8), allocatable :: WGLFLPs1(:,:,:,:)  !leaf layer P, [g d-2]
+  real(r8), allocatable :: ARSTKs1(:,:,:)     !stem layer area, [m2 d-2]
+  real(r8), allocatable :: CPOOLRs1(:,:,:)    !root  layer nonstructural C, [g d-2]
+  real(r8), allocatable :: CCPOLRs1(:,:,:)    !root  layer nonstructural C concentration, [g g-1]
+  real(r8), allocatable :: CZPOLRs1(:,:,:)    !root layer nonstructural N concentration, [g g-1]
+  real(r8), allocatable :: CPPOLRs1(:,:,:)    !root layer nonstructural P concentration, [g g-1]
+  real(r8), allocatable :: CO2Ps1(:,:,:)      !root aqueous CO2 content, [g d-2 ]
+  real(r8), allocatable :: CO2As1(:,:,:)      !root gaseous CO2 content, [g d-2 ]
+  real(r8), allocatable :: CH4Ps1(:,:,:)      !root aqueous CH4 content, [g d-2 ]
+  real(r8), allocatable :: CH4As1(:,:,:)      !root gaseous CH4 content, [g d-2 ]
+  real(r8), allocatable :: CWSRTLs1(:,:,:)    !root layer protein C concentration, [g g-1]
+  real(r8), allocatable :: H2GPs1(:,:,:)      !aqueous H2 content of roots, [g d-2]
+  real(r8), allocatable :: H2GAs1(:,:,:)      !gaseous H2 content of roots, [g d-2]
+  real(r8), allocatable :: OXYPs1(:,:,:)      !root aqueous O2 content, [g d-2 ]
+  real(r8), allocatable :: OXYAs1(:,:,:)      !root gaseous O2 content, [g d-2 ]
+  real(r8), allocatable :: PSIRTs1(:,:,:)     !root total water potential , [Mpa]
+  real(r8), allocatable :: PSIROs1(:,:,:)     !root osmotic water potential , [Mpa]
+  real(r8), allocatable :: PSIRGs1(:,:,:)     !root turgor water potential , [Mpa]
+  real(r8), allocatable :: PPOOLRs1(:,:,:)    !root layer nonstructural P, [g d-2]
+  real(r8), allocatable :: RUPNHBs1(:,:,:)    !root uptake of NH4 band, [g d-2 h-1]
+  real(r8), allocatable :: RUPNH4s1(:,:,:)    !root uptake of NH4 non-band, [g d-2 h-1]
+  real(r8), allocatable :: RUPH2Ps1(:,:,:)    !root uptake of PO4 non-band, [g d-2 h-1]
+  real(r8), allocatable :: RUPNOBs1(:,:,:)    !root uptake of NO3 band, [g d-2 h-1]
+  real(r8), allocatable :: RUPNO3s1(:,:,:)    !root uptake of NO3 non-band, [g d-2 h-1]
+  real(r8), allocatable :: RUPH1Bs1(:,:,:)    !root uptake of HPO4 band
+  real(r8), allocatable :: RUPH1Ps1(:,:,:)    !root uptake HPO4 non-band
+  real(r8), allocatable :: RUPH2Bs1(:,:,:)    !root uptake of PO4 band, [g d-2 h-1]
+  real(r8), allocatable :: RUONHBs1(:,:,:)    !root uptake of NH4 band unconstrained by O2, [g d-2 h-1]
+  real(r8), allocatable :: RUONH4s1(:,:,:)    !root uptake of NH4 non-band unconstrained by O2, [g d-2 h-1]
+  real(r8), allocatable :: RUOH2Ps1(:,:,:)    !root uptake of PO4 non-band unconstrained by O2, [g d-2 h-1]
+  real(r8), allocatable :: RUONOBs1(:,:,:)    !root uptake of NO3 band unconstrained by O2, [g d-2 h-1]
+  real(r8), allocatable :: RUONO3s1(:,:,:)    !root uptake of NO3 non-band unconstrained by O2, [g d-2 h-1]
+  real(r8), allocatable :: RUOH1Bs1(:,:,:)    !root HPO4 uptake in band unlimited by O2
+  real(r8), allocatable :: RUOH1Ps1(:,:,:)    !root HPO4 uptake in non-band unlimited by O2
+  real(r8), allocatable :: RUOH2Bs1(:,:,:)    !root uptake of PO4 band unconstrained by O2, [g d-2 h-1]
+  real(r8), allocatable :: RUCNHBs1(:,:,:)    !root uptake of NH4 band unconstrained by root nonstructural C, [g d-2 h-1]
+  real(r8), allocatable :: RUCNH4s1(:,:,:)    !root uptake of NH4 non-band unconstrained by root nonstructural C, [g d-2 h-1]
+  real(r8), allocatable :: RUCH2Ps1(:,:,:)    !root uptake of PO4 non-band unconstrained by root nonstructural C, [g d-2 h-1]
+  real(r8), allocatable :: RUCNOBs1(:,:,:)    !root uptake of NO3 band unconstrained by root nonstructural C, [g d-2 h-1]
+  real(r8), allocatable :: RUCNO3s1(:,:,:)    !root uptake of NO3 non-band unconstrained by root nonstructural C, [g d-2 h-1]
+  real(r8), allocatable :: RUCH1Bs1(:,:,:)    !root HPO4 uptake in band unlimited by nonstructural C
+  real(r8), allocatable :: RUCH1Ps1(:,:,:)    !root HPO4 uptake in non-band unlimited by nonstructural C
+  real(r8), allocatable :: RUCH2Bs1(:,:,:)    !root uptake of PO4 band unconstrained by root nonstructural C, [g d-2 h-1]
+  real(r8), allocatable :: RCO2Ms1(:,:,:)     !root respiration unconstrained by O2, [g d-2 h-1]
+  real(r8), allocatable :: RCO2Ns1(:,:,:)     !root CO2 efflux unconstrained by root nonstructural C, [g d-2 h-1]
+  real(r8), allocatable :: RCO2As1(:,:,:)     !root respiration constrained by O2, [g d-2 h-1]
+  real(r8), allocatable :: RTN1s1(:,:,:)      !root layer number primary axes, [d-2]
+  real(r8), allocatable :: RTNLs1(:,:,:)      !root layer number axes, [d-2]
+  real(r8), allocatable :: RTLGPs1(:,:,:)     !root layer length per plant, [m p-1]
+  real(r8), allocatable :: RTDNPs1(:,:,:)     !root layer length density, [m m-3]
+  real(r8), allocatable :: RTVLPs1(:,:,:)     !root layer volume air, [m2 d-2]
+  real(r8), allocatable :: RTVLWs1(:,:,:)     !root layer volume water, [m2 d-2]
+  real(r8), allocatable :: RRAD1s1(:,:,:)     !root layer diameter primary axes, [m ]
+  real(r8), allocatable :: RRAD2s1(:,:,:)     !root layer diameter secondary axes, [m ]
+  real(r8), allocatable :: RTARPs1(:,:,:)     !root layer area per plant, [m p-1]
+  real(r8), allocatable :: RTLGAs1(:,:,:)     !root layer average length, [m]
+  real(r8), allocatable :: RCO2Ps1(:,:,:)     !aqueous CO2 flux from roots to root water , [g d-2 h-1]
+  real(r8), allocatable :: RUPOXPs1(:,:,:)    !aqueous O2 flux from roots to root water , [g d-2 h-1]
+  real(r8), allocatable :: RCO2Ss1(:,:,:)     !aqueous CO2 flux from roots to soil water, [g d-2 h-1]
+  real(r8), allocatable :: RUPOXSs1(:,:,:)    !aqueous O2 flux from roots to soil water, [g d-2 h-1]
+  real(r8), allocatable :: RUPCHSs1(:,:,:)    !aqueous CH4 flux from roots to soil water, [g d-2 h-1]
+  real(r8), allocatable :: RUPN2Ss1(:,:,:)    !aqueous N2O flux from roots to soil water, [g d-2 h-1]
+  real(r8), allocatable :: RUPN3Ss1(:,:,:)    !aqueous NH3 flux from roots to soil water non-band, [g d-2 h-1]
+  real(r8), allocatable :: RUPN3Bs1(:,:,:)    !aqueous NH3 flux from roots to soil water band, [g d-2 h-1]
+  real(r8), allocatable :: RUPHGSs1(:,:,:)    !aqueous H2 flux from roots to soil water, [g d-2 h-1]
+  real(r8), allocatable :: RCOFLAs1(:,:,:)    !gaseous CO2 flux through roots, [g d-2 h-1]
+  real(r8), allocatable :: ROXFLAs1(:,:,:)    !gaseous O2 flux through roots, [g d-2 h-1]
+  real(r8), allocatable :: RCHFLAs1(:,:,:)    !gaseous CH4 flux through roots, [g d-2 h-1]
+  real(r8), allocatable :: RN2FLAs1(:,:,:)    !gaseous N2O flux through roots, [g d-2 h-1]
+  real(r8), allocatable :: RNHFLAs1(:,:,:)    !gaseous NH3 flux through roots, [g d-2 h-1]
+  real(r8), allocatable :: RHGFLAs1(:,:,:)    !gaseous H2 flux through roots, [g d-2 h-1]
+  real(r8), allocatable :: RCODFAs1(:,:,:)    !dissolution (+ve) - volatilization (-ve) CO2 flux in roots, [g d-2 h-1]
+  real(r8), allocatable :: ROXDFAs1(:,:,:)    !dissolution (+ve) - volatilization (-ve) O2 flux in roots, [g d-2 h-1]
+  real(r8), allocatable :: RCHDFAs1(:,:,:)    !dissolution (+ve) - volatilization (-ve) CH4 flux in roots, [g d-2 h-1]
+  real(r8), allocatable :: RN2DFAs1(:,:,:)    !dissolution (+ve) - volatilization (-ve) N2O flux in roots, [g d-2 h-1]
+  real(r8), allocatable :: RNHDFAs1(:,:,:)    !dissolution (+ve) - volatilization (-ve) NH3 flux in roots, [g d-2 h-1]
+  real(r8), allocatable :: RHGDFAs1(:,:,:)    !dissolution (+ve) - volatilization (-ve) H2 flux in roots, [g d-2 h-1]
+  real(r8), allocatable :: ROXYPs1(:,:,:)     !root  O2 demand from respiration, [g d-2 h-1]
+  real(r8), allocatable :: RUNNHPs1(:,:,:)    !root uptake of NH4 non-band unconstrained by NH4, [g d-2 h-1]
+  real(r8), allocatable :: RUNNBPs1(:,:,:)    !root uptake of NO3 band unconstrained by NO3, [g d-2 h-1]
+  real(r8), allocatable :: RUNNOPs1(:,:,:)    !root uptake of NH4 band unconstrained by NH4, [g d-2 h-1]
+  real(r8), allocatable :: RUNNXPs1(:,:,:)    !root uptake of NO3 non-band unconstrained by NO3, [g d-2 h-1]
+  real(r8), allocatable :: RUPP2Ps1(:,:,:)    !root uptake of H2PO4 non-band
+  real(r8), allocatable :: RUPP2Bs1(:,:,:)    !root uptake of H2PO4 band
+  real(r8), allocatable :: RUPP1Ps1(:,:,:)    !HPO4 demand in non-band by each root population
+  real(r8), allocatable :: RUPP1Bs1(:,:,:)    !HPO4 demand in band by each root population
+  real(r8), allocatable :: UPWTRs1(:,:,:)     !root water uptake, [m2 d-2 h-1]
+  real(r8), allocatable :: WFRs1(:,:,:)       !O2 constraint to root respiration, []
+  real(r8), allocatable :: WTRTLs1(:,:,:)     !root layer structural C, [g d-2]
+  real(r8), allocatable :: WTRTDs1(:,:,:)     !root layer C, [g d-2]
+  real(r8), allocatable :: WSRTLs1(:,:,:)     !root layer protein C, [g d-2]
+  real(r8), allocatable :: ZPOOLRs1(:,:,:)    !root layer nonstructural N, [g d-2]
+  real(r8), allocatable :: Z2OPs1(:,:,:)      !root aqueous N2O content, [g d-2 ]
+  real(r8), allocatable :: Z2OAs1(:,:,:)      !root gaseous N2O content, [g d-2 ]
+  real(r8), allocatable :: ZH3Ps1(:,:,:)      !root aqueous NH3 content, [g d-2 ]
+  real(r8), allocatable :: ZH3As1(:,:,:)      !root gaseous NH3 content, [g d-2 ]
+  real(r8), allocatable :: CPOOLNs1(:,:)      !root  layer nonstructural N, [g d-2]
+  real(r8), allocatable :: PPOOLNs1(:,:)      !nodule layer nonstructural P, [g d-2]
+  real(r8), allocatable :: TFN4s1(:,:)        !root layer temperature growth functiom, [-]
+  real(r8), allocatable :: WTNDLNs1(:,:)      !root layer nodule N, [g d-2]
+  real(r8), allocatable :: WTNDLs1(:,:)       !root layer nodule mass, [g d-2]
+  real(r8), allocatable :: WTNDLPs1(:,:)      !root layer nodule P, [g d-2]
+  real(r8), allocatable :: ZPOOLNs1(:,:)      !root nodule nonstructural N, [g d-2]
+  real(r8), allocatable :: ARSTVs1(:,:)       !canopy layer stem area, [m2 d-2]
+  real(r8), allocatable :: ARLFVs1(:,:)       !canopy layer leaf area, [m2 d-2]
+  real(r8), allocatable :: WGLFVs1(:,:)       !canopy layer leaf C, [g d-2]
+  real(r8), allocatable :: DMVLs1(:,:)        !root volume:mass ratio, [m3 g-1]
+  real(r8), allocatable :: PORTs1(:,:)        !root porosity, [m3 m-3]
+  real(r8), allocatable :: PORTXs1(:,:)       !power function of root porosity used to calculate root gaseous diffusivity, [-]
+  real(r8), allocatable :: RTAR2Xs1(:,:)      !root  cross-sectional area  secondary axes, [m2]
+  real(r8), allocatable :: RTAR1Xs1(:,:)      !root cross-sectional area primary axes, [m2]
+  real(r8), allocatable :: RRAD1Xs1(:,:)      !root diameter primary axes, [m]
+  real(r8), allocatable :: RRAD2Xs1(:,:)      !root diameter secondary axes, [m]
+  real(r8), allocatable :: GRDMs1(:)          !grain size at seeding, [g]
+  real(r8), allocatable :: VOXYFs1(:)         !plant O2 uptake from fire, [g d-2 ]
+  real(r8), allocatable :: WTGRNNs1(:)        !canopy grain N, [g d-2]
+  real(r8), allocatable :: WTSHEPs1(:)        !canopy sheath P, [g d-2]
+  real(r8), allocatable :: WVSTKs1(:)         !canopy active stalk C, [g d-2
+  real(r8), allocatable :: CNLFs1(:)          !maximum leaf N:C ratio, [g g-1]
+  real(r8), allocatable :: WTLFPs1(:)         !canopy leaf P, [g d-2]
+  real(r8), allocatable :: PTSHTs1(:)         !shoot-root rate constant for nonstructural C exchange, [h-1]
+  real(r8), allocatable :: WTLFs1(:)          !canopy leaf C, [g d-2]
+  real(r8), allocatable :: EPs1(:)            !canopy transpiration, [m2 d-2 h-1]
+  real(r8), allocatable :: WDLFs1(:)          !leaf length:width ratio, [-]
+  real(r8), allocatable :: GRMXs1(:)          !maximum grain size   , [g]
+  real(r8), allocatable :: GFILLs1(:)         !maximum rate of fill per grain, [g h-1]
+  integer , allocatable :: IRTYPs1(:)         !grain type (below or above-ground)
+  real(r8), allocatable :: STMXs1(:)          !maximum grain node number per branch, [-]
+  real(r8), allocatable :: SDMXs1(:)          !maximum grain number per node , [-]
+  real(r8), allocatable :: DMLFs1(:)          !leaf growth yield, [g g-1]
+  real(r8), allocatable :: RADPs1(:)          !canopy absorbed PAR , [umol m-2 s-1]
+  real(r8), allocatable :: FRADPs1(:)         !fraction of incoming PAR absorbed by canopy, [-]
+  real(r8), allocatable :: WTSHEs1(:)         !canopy sheath C , [g d-2]
+  real(r8), allocatable :: CNGRs1(:)          !grain N:C ratio, [g g-1]
+  real(r8), allocatable :: WTSTKs1(:)         !canopy stalk C, [g d-2]
+  real(r8), allocatable :: CPLFs1(:)          !maximum leaf P:C ratio, [g g-1]
+  real(r8), allocatable :: CPSHEs1(:)         !sheath P:C ratio, [g g-1]
+  real(r8), allocatable :: CNSHEs1(:)         !sheath N:C ratio, [g g-1]
+  real(r8), allocatable :: WTRSVs1(:)         !canopy reserve C, [g d-2]
+  real(r8), allocatable :: WTEARNs1(:)        !canopy ear N, [g d-2]
+  real(r8), allocatable :: WTLFNs1(:)         !canopy leaf N, [g d-2]
+  real(r8), allocatable :: WTRSVNs1(:)        !canopy reserve N, [g d-2]
+  real(r8), allocatable :: WTSHENs1(:)        !canopy sheath N, [g d-2]
+  real(r8), allocatable :: WTHSKNs1(:)        !canopy husk N, [g d-2]
+  real(r8), allocatable :: WTHSKs1(:)         !canopy husk C, [g d-2]
+  real(r8), allocatable :: WTRTAs1(:)         !root C per plant, [g p-1]
+  real(r8), allocatable :: WTGRs1(:)          !canopy grain C, [g d-2]
+  real(r8), allocatable :: WTEARs1(:)         !canopy ear C, [g d-2]
+  real(r8), allocatable :: RNH3Cs1(:)         !canopy NH3 flux, [g d-2 h-1]
+  real(r8), allocatable :: WTSTKPs1(:)        !canopy stalk P, [g d-2]
+  real(r8), allocatable :: WTRSVPs1(:)        !canopy reserve P, [g d-2]
+  real(r8), allocatable :: WTEARPs1(:)        !canopy ear C, [g d-2]
+  real(r8), allocatable :: WTHSKPs1(:)        !canopy husk P, [g d-2]
+  real(r8), allocatable :: WTSTKNs1(:)        !canopy stalk N, [g d-2]
+  real(r8), allocatable :: WTGRNPs1(:)        !canopy grain P, [g d-2]
+  real(r8), allocatable :: RTLG1Xs1(:,:)      !specific root length primary axes, [m g-1]
+  real(r8), allocatable :: RRADPs1(:,:)       !root internal radius, [m]
+  real(r8), allocatable :: RTLG2Xs1(:,:)      !specific root length secondary axes, [m g-1]
+  real(r8), allocatable :: RSRRs1(:,:)        !root radial resistivity, [MPa h m-2]
+  real(r8), allocatable :: RSRAs1(:,:)        !root axial resistivity, [MPa h m-4]
+  real(r8), allocatable :: RRAD1Ms1(:,:)      !maximum radius of primary roots, [m]
+  real(r8), allocatable :: RRAD2Ms1(:,:)      !maximum radius of secondary roots, [m]
+  real(r8), allocatable :: UPMNPOs1(:,:)      !minimum PO4 concentration for root NH4 uptake, [g m-3]
+  real(r8), allocatable :: UPMXPOs1(:,:)      !maximum root PO4 uptake rate, [g m-2 h-1]
+  real(r8), allocatable :: UPKMPOs1(:,:)      !Km for root PO4 uptake, [g m-3]
+  real(r8), allocatable :: UPMNZOs1(:,:)      !minimum NO3 concentration for root NH4 uptake, [g m-3]
+  real(r8), allocatable :: UPMXZOs1(:,:)      !maximum root NO3 uptake rate, [g m-2 h-1]
+  real(r8), allocatable :: UPKMZOs1(:,:)      !Km for root NO3 uptake, [g m-3]
+  real(r8), allocatable :: UPMNZHs1(:,:)      !minimum NH4 concentration for root NH4 uptake, [g m-3]
+  real(r8), allocatable :: UPMXZHs1(:,:)      !maximum root NH4 uptake rate, [g m-2 h-1]
+  real(r8), allocatable :: UPKMZHs1(:,:)      !Km for root NH4 uptake, [g m-3]
+  real(r8), allocatable :: RTLG1s1(:,:,:,:)   !root layer length primary axes, [m d-2]
+  real(r8), allocatable :: RTLG2s1(:,:,:,:)   !root layer length secondary axes, [m d-2]
+  real(r8), allocatable :: RTN2s1(:,:,:,:)    !root layer number secondary axes, [d-2]
+  real(r8), allocatable :: WTRT2s1(:,:,:,:)   !root layer C secondary axes, [g d-2]
+  real(r8), allocatable :: WTRT1s1(:,:,:,:)   !root layer C primary axes, [g d-2]
+  real(r8), allocatable :: WTRT2Ns1(:,:,:,:)  !root layer N secondary axes, [g d-2]
+  real(r8), allocatable :: WTRT1Ns1(:,:,:,:)  !root layer N primary axes, [g d-2]
+  real(r8), allocatable :: WTRT2Ps1(:,:,:,:)  !root layer P secondary axes, [g d-2]
+  real(r8), allocatable :: WTRT1Ps1(:,:,:,:)  !root layer P primary axes, [g d-2]
+  real(r8), allocatable :: RTDP1s1(:,:,:)     !root layer depth, [m]
+  real(r8), allocatable :: RTWT1s1(:,:,:)     !root C primary axes, [g d-2]
+  real(r8), allocatable :: RTWT1Ns1(:,:,:)    !root N primary axes, [g d-2]
+  real(r8), allocatable :: RTWT1Ps1(:,:,:)    !root P primary axes, [g d-2]
+  real(r8), allocatable :: WTSTDGs1(:,:)      !standing dead C fraction, [g d-2]
+  real(r8), allocatable :: WTSTDNs1(:,:)      !standing dead N fraction, [g d-2]
+  real(r8), allocatable :: WTSTDPs1(:,:)      !standing dead P fraction, [g d-2]
+  real(r8), allocatable :: CSNCs1(:,:,:,:)    !plant litterfall C, [g d-2 h-1]
+  real(r8), allocatable :: PSNCs1(:,:,:,:)    !litterfall P flux, [g d-2 h-1]
+  real(r8), allocatable :: ZSNCs1(:,:,:,:)    !total litterfall N, [g d-2 h-1]
+  real(r8), allocatable :: CFOPCs1(:,:,:)     !litter kinetic fraction, [-]
+  real(r8), allocatable :: CFOPNs1(:,:,:)     !litterfall kinetic N fraction, [-]
+  real(r8), allocatable :: CFOPPs1(:,:,:)     !litter P kinetic fraction, [-]
+  real(r8), allocatable :: PARs1(:,:,:,:)     !direct incoming PAR, [umol m-2 s-1]
+  real(r8), allocatable :: PARDIFs1(:,:,:,:)  !diffuse incoming PAR, [umol m-2 s-1]
+  real(r8), allocatable :: VOLWMs1(:,:)       !soil micropore water content, [m3 d-2]
+  real(r8), allocatable :: VOLPMs1(:,:)       !soil air content, [m3 d-2]
+  real(r8), allocatable :: TORTs1(:,:)        !soil tortuosity, []
+  real(r8), allocatable :: FILMs1(:,:)        !soil water film thickness , [m]
+  real(r8), allocatable :: ROXSKs1(:,:)       !total O2 sink, [g d-2 t-1]
+  real(r8), allocatable :: THETPMs1(:,:)      !soil air-filled porosity, [m3 m-3]
+  real(r8), allocatable :: DFGSs1(:,:)        !coefficient for dissolution - volatilization, []
 
   contains
   subroutine InitPlantAPIData(JZ,JC,JP,JSA,jcplx1,JLI,JLA,JNODS)
