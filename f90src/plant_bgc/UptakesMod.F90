@@ -170,6 +170,10 @@ module UptakesMod
   integer :: NZ, L, N
   real(r8) :: ARLSC
 
+  associate(                         &
+    RAD1s1   => plt_rad%RAD1s1     , &
+    THRM1s1  => plt_rad%THRM1s1      &
+  )
 !
 !     RESET TOTAL UPTAKE ARRAYS
 !
@@ -252,6 +256,7 @@ module UptakesMod
       enddo
 9005  CONTINUE
 9000  CONTINUE
+  end associate
   end subroutine PrepUptake
 !------------------------------------------------------------------------
   subroutine UpdateCanopyProperty(NZ)
@@ -421,9 +426,12 @@ module UptakesMod
   real(r8) :: FTHRM,FDMR
   real(r8) :: OSWT,WFNC
 
-! begin_execution
   integer :: N,L
-
+! begin_execution
+  associate(                         &
+   RAD1s1    => plt_rad%RAD1s1     , &
+   THRM1s1   => plt_rad%THRM1s1      &
+  )
   IF(NN.GE.MXN)THEN
     WRITE(*,9999)IYRCs1,I,J,NZ
 9999  FORMAT('CONVERGENCE FOR WATER UPTAKE NOT ACHIEVED ON   ',6I4)
@@ -465,6 +473,7 @@ module UptakesMod
 4290  CONTINUE
     ENDIF
   ENDIF
+  end associate
   end subroutine HandlingDivergence
 !------------------------------------------------------------------------------
   function CanopyEnergyH2OIteration(I,J,NZ,FPC,WVPLT,&
@@ -502,6 +511,13 @@ module UptakesMod
   integer :: N,L
 !     begin_execution
 
+  associate(                          &
+    RAD1s1     => plt_rad%RAD1s1    , &
+    RADCs1     => plt_rad%RADCs1    , &
+    THSs1      => plt_rad%THSs1     , &
+    THRM1s1    => plt_rad%THRM1s1   , &
+    THRMGXs1   => plt_rad%THRMGXs1    &
+  )
   CCPOLT=CCPOLPs1(NZ)+CZPOLPs1(NZ)+CPPOLPs1(NZ)
   OSWT=36.0+840.0*AMAX1(0.0,CCPOLT)
   FTHRM=EMMC*2.04E-10*FRADPs1(NZ)*AREA3s1(NUs1)
@@ -751,7 +767,7 @@ module UptakesMod
   ENDDO
 !4000  CONTINUE
 !4500  CONTINUE
-  return
+  end associate
   end function CanopyEnergyH2OIteration
 !------------------------------------------------------------------------
   subroutine CalcResistance(NZ,PATH,RRADL,RTARR,&
@@ -896,6 +912,10 @@ module UptakesMod
   real(r8) :: OSWT,WFNC
 
 ! begin_execution
+  associate(                        &
+    THRM1s1  =>  plt_rad%THRM1s1  , &
+    RAD1s1   =>  plt_rad%RAD1s1     &
+  )
   RAD1s1(NZ)=0.0_r8
   EFLXCs1(NZ)=0.0_r8
   SFLXCs1(NZ)=0.0_r8
@@ -934,6 +954,7 @@ module UptakesMod
       UPWTRs1(N,L,NZ)=0.0_r8
     enddo
   ENDDO
+  end associate
   end subroutine HandleBareSoil
 !------------------------------------------------------------------------
 

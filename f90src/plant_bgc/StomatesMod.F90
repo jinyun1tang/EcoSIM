@@ -92,6 +92,9 @@
   real(r8) :: ETLF,EGRO,PARX,PARJ
   real(r8) :: VL
 !     begin_execution
+  associate(                      &
+    TAU0s1  => plt_rad%TAU0s1     &
+  )
 !
 !     LIGHT-LIMITED CARBOXYLATION RATES
 !
@@ -119,6 +122,7 @@
 !
   VL=AMIN1(VGROs1(K,NB,NZ),EGRO)*FDBKs1(NB,NZ)
   CH2O=CH2O+VL*SURFXs1(N,L,K,NB,NZ)*TAU0s1(L+1)
+  end associate
   end subroutine C3ShadedLeaves
 !------------------------------------------------------------------------------------------
 
@@ -129,6 +133,9 @@
   real(r8) :: ETLF,EGRO,PARX,PARJ
   real(r8) :: VL
 !     begin_execution
+  associate(                         &
+    TAUSs1    =>  plt_rad%TAUSs1     &
+  )
 !
 !     LIGHT-LIMITED CARBOXYLATION RATES
 !
@@ -156,7 +163,7 @@
 !
   VL=AMIN1(VGROs1(K,NB,NZ),EGRO)*FDBKs1(NB,NZ)
   CH2O=CH2O+VL*SURFXs1(N,L,K,NB,NZ)*TAUSs1(L+1)
-
+  end associate
   end subroutine C3SunlitLeaves
 !------------------------------------------------------------------------------------------
 
@@ -418,6 +425,9 @@
   real(r8) :: ETLF4,EGRO4,PARX,PARJ
   real(r8) :: VL
 !     begin_execution
+  associate(                     &
+    TAU0s1   => plt_rad%TAU0s1   &
+  )
 !
 !     LIGHT-LIMITED CARBOXYLATION RATES
 !
@@ -445,7 +455,7 @@
 !
   VL=AMIN1(VGRO4s1(K,NB,NZ),EGRO4)*FDBK4s1(K,NB,NZ)
   CH2O=CH2O+VL*SURFXs1(N,L,K,NB,NZ)*TAU0s1(L+1)
-
+  end associate
   end subroutine C4ShadedLeaves
 !------------------------------------------------------------------------------------------
 
@@ -456,6 +466,9 @@
   real(r8) :: ETLF4,EGRO4,PARX,PARJ
   real(r8) :: VL
 !     begin_execution
+  associate(                  &
+  TAUSs1  =>  plt_rad%TAUSs1  &
+  )
 !
 !     LIGHT-LIMITED CARBOXYLATION RATES
 !
@@ -483,6 +496,7 @@
 !
   VL=AMIN1(VGRO4s1(K,NB,NZ),EGRO4)*FDBK4s1(K,NB,NZ)
   CH2O=CH2O+VL*SURFXs1(N,L,K,NB,NZ)*TAUSs1(L+1)
+  end associate
   end subroutine C4SunlitLeaves
 !------------------------------------------------------------------------------------------
 

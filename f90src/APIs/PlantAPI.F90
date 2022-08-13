@@ -104,7 +104,7 @@ implicit none
 !------------------------------------------------------------------------------------------
 
   subroutine PlantAPIRecv(I,J,NY,NX)
-
+  use PlantAPIData, only : plt_rad
   implicit none
   integer, intent(in) :: I,J,NY,NX
 
@@ -130,7 +130,7 @@ implicit none
   XHVSTN(NY,NX)=XHVSTNs1
   XHVSTP(NY,NX)=XHVSTPs1
   ARLFC(NY,NX)=ARLFCs1
-  TRN(NY,NX)=TRNs1
+  TRN(NY,NX)=plt_rad%TRNs1
   TLE(NY,NX)=TLEs1
   TGH(NY,NX)=TGHs1
   TEVAPP(NY,NX)=TEVAPPs1
@@ -329,7 +329,7 @@ implicit none
     RSETC(NZ,NY,NX)=RSETCs1(NZ)
     RSETN(NZ,NY,NX)=RSETNs1(NZ)
     RSETP(NZ,NY,NX)=RSETPs1(NZ)
-    RAD1(NZ,NY,NX)=RAD1s1(NZ)
+    RAD1(NZ,NY,NX)=plt_rad%RAD1s1(NZ)
     RAZ(NZ,NY,NX)=RAZs1(NZ)
     RC(NZ,NY,NX)=RCs1(NZ)
     RA(NZ,NY,NX)=RAs1(NZ)
@@ -362,7 +362,7 @@ implicit none
     TZUPFX(NZ,NY,NX)=TZUPFXs1(NZ)
     TKC(NZ,NY,NX)=TKCs1(NZ)
     TCC(NZ,NY,NX)=TCCs1(NZ)
-    THRM1(NZ,NY,NX)=THRM1s1(NZ)
+    THRM1(NZ,NY,NX)=plt_rad%THRM1s1(NZ)
     TKCZ(NZ,NY,NX)=TKCZs1(NZ)
     TKG(NZ,NY,NX)=TKGs1(NZ)
     TCG(NZ,NY,NX)=TCGs1(NZ)
@@ -806,6 +806,7 @@ implicit none
 !------------------------------------------------------------------------------------------
 
   subroutine PlantAPISend(I,J,NY,NX)
+  use PlantAPIData, only : plt_rad
   implicit none
   integer, intent(in) :: I,J,NY,NX
   integer :: K,L,M,N,NB,NZ,NR,I1
@@ -847,8 +848,8 @@ implicit none
   SSINs1=SSIN(NY,NX)
   TKWs1=TKW(1,NY,NX)
   TKAs1=TKA(NY,NX)
-  THRMGXs1=THRMGX(NY,NX)
-  THSs1=THS(NY,NX)
+  plt_rad%THRMGXs1=THRMGX(NY,NX)
+  plt_rad%THSs1=THS(NY,NX)
   VPAs1=VPA(NY,NX)
   XCORPs1=XCORP(NY,NX)
   ZNOONs1=ZNOON(NY,NX)
@@ -864,14 +865,14 @@ implicit none
   ZLs1(0)=ZL(0,NY,NX)
   DO  L=1,JC
     ZLs1(L)=ZL(L,NY,NX)
-    TAUSs1(L)=TAUS(L,NY,NX)
-    TAU0s1(L)=TAU0(L,NY,NX)
+    plt_rad%TAUSs1(L)=TAUS(L,NY,NX)
+    plt_rad%TAU0s1(L)=TAU0(L,NY,NX)
   ENDDO
-  TAUSs1(JC+1)=TAUS(JC+1,NY,NX)
-  TAU0s1(JC+1)=TAU0(JC+1,NY,NX)
+  plt_rad%TAUSs1(JC+1)=TAUS(JC+1,NY,NX)
+  plt_rad%TAU0s1(JC+1)=TAU0(JC+1,NY,NX)
 
   DO N=1,JLI
-    ZSINs1(N)=ZSIN(N)
+    plt_rad%ZSINs1(N)=ZSIN(N)
   ENDDO
 
   DO L=1,NL(NY,NX)
@@ -1084,7 +1085,7 @@ implicit none
 
 !plant properties end
     ARLFSs1(NZ)=ARLFS(NZ,NY,NX)
-    RADCs1(NZ)=RADC(NZ,NY,NX)
+    plt_rad%RADCs1(NZ)=RADC(NZ,NY,NX)
     FLWCs1(NZ)=FLWC(NZ,NY,NX)
     IYRXs1(NZ)=IYRX(NZ,NY,NX)
     IDAYXs1(NZ)=IDAYX(NZ,NY,NX)
@@ -1144,7 +1145,7 @@ implicit none
   XHVSTCs1=XHVSTC(NY,NX)
   XHVSTNs1=XHVSTN(NY,NX)
   XHVSTPs1=XHVSTP(NY,NX)
-  TRNs1=TRN(NY,NX)
+  plt_rad%TRNs1=TRN(NY,NX)
   TN2OZs1=TN2OZ(NY,NX)
   TEVAPCs1=TEVAPC(NY,NX)
   TLEs1=TLE(NY,NX)
@@ -1362,11 +1363,11 @@ implicit none
     RCs1(NZ)=RC(NZ,NY,NX)
     TKCs1(NZ)=TKC(NZ,NY,NX)
     SFLXCs1(NZ)=SFLXC(NZ,NY,NX)
-    RAD1s1(NZ)=RAD1(NZ,NY,NX)
+    plt_rad%RAD1s1(NZ)=RAD1(NZ,NY,NX)
+    plt_rad%THRM1s1(NZ)=THRM1(NZ,NY,NX)
     EFLXCs1(NZ)=EFLXC(NZ,NY,NX)
     EVAPCs1(NZ)=EVAPC(NZ,NY,NX)
     RSMNs1(NZ)=RSMN(NZ,NY,NX)
-    THRM1s1(NZ)=THRM1(NZ,NY,NX)
     OFFSTs1(NZ)=OFFST(NZ,NY,NX)
     OSTRs1(NZ)=OSTR(NZ,NY,NX)
     PPs1(NZ)=PP(NZ,NY,NX)
@@ -1817,13 +1818,15 @@ implicit none
   VHCPWXs1=VHCPWX(NY,NX)
   VHCPW1s1=VHCPW(1,NY,NX)
   ZLs1(0)=ZL(0,NY,NX)
+  print*,size(plt_rad%TAUSs1(:)),JC
   DO L=1,JC
     ARSTTs1(L)=ARSTT(L,NY,NX)
     ARLFTs1(L)=ARLFT(L,NY,NX)
     ZLs1(L)=ZL(L,NY,NX)
-    TAUSs1(L)=TAUS(L,NY,NX)
+    print*,TAUS(L,NY,NX)
+    plt_rad%TAUSs1(L)=TAUS(L,NY,NX)
   ENDDO
-  TAUSs1(JC+1)=TAUS(JC+1,NY,NX)
+  plt_rad%TAUSs1(JC+1)=TAUS(JC+1,NY,NX)
 
   DO L=0,NL(NY,NX)
     AREA3s1(L)=AREA(3,L,NY,NX)
@@ -1833,22 +1836,22 @@ implicit none
   ENDDO
   SSINs1=SSIN(NY,NX)
   ZNOONs1=ZNOON(NY,NX)
-  GAZIs1=GAZI(NY,NX)
-  GCOSs1=GCOS(NY,NX)
-  GSINs1=GSIN(NY,NX)
+  plt_rad%GAZIs1=GAZI(NY,NX)
+  plt_rad%GCOSs1=GCOS(NY,NX)
+  plt_rad%GSINs1=GSIN(NY,NX)
   ARLSSs1=ARLSS(NY,NX)
-  RADYs1=RADY(NY,NX)
-  RAPYs1=RAPY(NY,NX)
-  RADSs1=RADS(NY,NX)
-  RAPSs1=RAPS(NY,NX)
+  plt_rad%RADYs1=RADY(NY,NX)
+  plt_rad%RAPYs1=RAPY(NY,NX)
+  plt_rad%RADSs1=RADS(NY,NX)
+  plt_rad%RAPSs1=RAPS(NY,NX)
   ZSs1=ZS(NY,NX)
-  TYSINs1=TYSIN
   VOLWSs1=VOLWS(NY,NX)
   VOLISs1=VOLIS(NY,NX)
   VOLSSs1=VOLSS(NY,NX)
-  ALBSs1=ALBS(NY,NX)
+  plt_rad%TYSINs1=TYSIN
+  plt_rad%ALBSs1=ALBS(NY,NX)
+  plt_rad%ALBXs1=ALBX(NY,NX)
   ZEROS2s1=ZEROS2(NY,NX)
-  ALBXs1=ALBX(NY,NX)
   POROS1s1=POROS(NU(NY,NX),NY,NX)
   DO NZ=1,NP(NY,NX)
     ARLFPs1(NZ)=ARLFP(NZ,NY,NX)
@@ -1857,9 +1860,9 @@ implicit none
     ABSRs1(NZ)=ABSR(NZ,NY,NX)
     ABSPs1(NZ)=ABSP(NZ,NY,NX)
     TAURs1(NZ)=TAUR(NZ,NY,NX)
-    ALBRs1(NZ)=ALBR(NZ,NY,NX)
+    plt_rad%ALBRs1(NZ)=ALBR(NZ,NY,NX)
     TAUPs1(NZ)=TAUP(NZ,NY,NX)
-    ALBPs1(NZ)=ALBP(NZ,NY,NX)
+    plt_rad%ALBPs1(NZ)=ALBP(NZ,NY,NX)
     NBRs1(NZ)=NBR(NZ,NY,NX)
     CFs1(NZ)=CF(NZ,NY,NX)
     DO NB=1,NBR(NZ,NY,NX)
@@ -1886,18 +1889,18 @@ implicit none
     ENDDO
   ENDDO
   DO N=1,JSA
-    OMEGAGs1(N)=OMEGAG(N,NY,NX)
+    plt_rad%OMEGAGs1(N)=OMEGAG(N,NY,NX)
   ENDDO
   DO N=1,JLI
     ZCOSs1(N)=ZCOS(N)
-    ZSINs1(N)=ZSIN(N)
+    plt_rad%ZSINs1(N)=ZSIN(N)
   ENDDO
   DO NN=1,JLA
     DO M=1,JLI
       DO N=1,JSA
-        OMEGAs1(N,M,NN)=OMEGA(N,M,NN)
-        OMEGXs1(N,M,NN)=OMEGX(N,M,NN)
-        IALBYs1(N,M,NN)=IALBY(N,M,NN)
+        plt_rad%OMEGAs1(N,M,NN)=OMEGA(N,M,NN)
+        plt_rad%OMEGXs1(N,M,NN)=OMEGX(N,M,NN)
+        plt_rad%IALBYs1(N,M,NN)=IALBY(N,M,NN)
       ENDDO
     ENDDO
   ENDDO
@@ -1918,25 +1921,25 @@ implicit none
   RAB(NY,NX)=RABs1
   RIB(NY,NX)=RIBs1
   ZT(NY,NX)=ZTs1
-  RADS(NY,NX)=RADSs1
-  RADY(NY,NX)=RADYs1
-  RAPS(NY,NX)=RAPSs1
-  RAPY(NY,NX)=RAPYs1
-  RADG(NY,NX)=RADGs1
-  FRADG(NY,NX)=FRADGs1
-  RAD(NY,NX)=RAD0s1
-  RAP(NY,NX)=RAP0s1
+  RADS(NY,NX)=plt_rad%RADSs1
+  RADY(NY,NX)=plt_rad%RADYs1
+  RAPS(NY,NX)=plt_rad%RAPSs1
+  RAPY(NY,NX)=plt_rad%RAPYs1
+  RADG(NY,NX)=plt_rad%RADGs1
+  FRADG(NY,NX)=plt_rad%FRADGs1
+  RAD(NY,NX)=plt_rad%RAD0s1
+  RAP(NY,NX)=plt_rad%RAP0s1
   DO L=0,JC
     ZL(L,NY,NX)=ZLs1(L)
   ENDDO
   DO L=1,JC
-    TAUS(L,NY,NX)=TAUSs1(L)
-    TAU0(L,NY,NX)=TAU0s1(L)
+    TAUS(L,NY,NX)=plt_rad%TAUSs1(L)
+    TAU0(L,NY,NX)=plt_rad%TAU0s1(L)
   ENDDO
   ARLSS(NY,NX)=ARLSSs1
   DO NZ=1,NP(NY,NX)
     ARLFS(NZ,NY,NX)=ARLFSs1(NZ)
-    RADC(NZ,NY,NX)=RADCs1(NZ)
+    RADC(NZ,NY,NX)=plt_rad%RADCs1(NZ)
     RADP(NZ,NY,NX)=RADPs1(NZ)
     CFX(NZ,NY,NX)=CFXs1(NZ)
     FRADP(NZ,NY,NX)=FRADPs1(NZ)

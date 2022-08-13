@@ -259,7 +259,11 @@ module ExtractsMod
   integer, intent(in) :: NZ
   integer :: L, NB
   real(r8) :: ENGYC
-
+  associate(                      &
+    RAD1s1  => plt_rad%RAD1s1   , &
+    THRM1s1 => plt_rad%THRM1s1  , &
+    TRNs1   => plt_rad%TRNs1      &
+  )
   DO L=NUs1,NIs1(NZ)
     TUPNFs1(L)=TUPNFs1(L)+RUPNFs1(L,NZ)
   ENDDO
@@ -331,6 +335,7 @@ module ExtractsMod
     RNH3Cs1(NZ)=RNH3Cs1(NZ)+RNH3Bs1(NB,NZ)
     TNH3Cs1(NZ)=TNH3Cs1(NZ)+RNH3Bs1(NB,NZ)
   ENDDO
+  end associate
   end subroutine CanopyFluxesandFixation
 
   end module ExtractsMod

@@ -216,6 +216,33 @@ module CanopyCondsMod
   !     RADC,RADP=total SW,PAR absorbed by canopy
   !     CFX=clumping factor for self-shading
   !
+  associate(                     &
+    ALBRs1  => plt_rad%ALBRs1  , &
+    ALBSs1  => plt_rad%ALBSs1  , &
+    ALBXs1  => plt_rad%ALBXs1  , &
+    ALBPs1  => plt_rad%ALBPs1  , &
+    FRADGs1 => plt_rad%FRADGs1 , &
+    GAZIs1  => plt_rad%GAZIs1  , &
+    GCOSs1  => plt_rad%GCOSs1  , &
+    GSINs1  => plt_rad%GSINs1  , &
+    IALBYs1 => plt_rad%IALBYs1 , &
+    OMEGAs1 => plt_rad%OMEGAs1 , &
+    OMEGAGs1=> plt_rad%OMEGAGs1, &
+    OMEGXs1 => plt_rad%OMEGXs1 , &
+    RAD0s1  => plt_rad%RAD0s1  , &
+    RADGs1  => plt_rad%RADGs1  , &
+    RADSs1  => plt_rad%RADSs1  , &
+    RAP0s1  => plt_rad%RAP0s1  , &
+    RADCs1  => plt_rad%RADCs1  , &
+    RAPYs1  => plt_rad%RAPYs1  , &
+    RAPSs1  => plt_rad%RAPSs1  , &
+    RADYs1  => plt_rad%RADYs1  , &
+    RAD1s1  => plt_rad%RAD1s1  , &
+    TYSINs1 => plt_rad%TYSINs1 , &
+    TAU0s1  => plt_rad%TAU0s1  , &
+    TAUSs1  => plt_rad%TAUSs1  , &
+    ZSINs1  => plt_rad%ZSINs1    &
+  )
   ARLSSs1=0.0
   DO 1135 NZ=1,NPs1
     ARLFSs1(NZ)=0.0
@@ -779,5 +806,6 @@ module CanopyCondsMod
       FRADPs1(NZ)=0.0
 146 CONTINUE
   ENDIF
+  end associate
   end subroutine MultiLayerSurfaceRadiation
 end module CanopyCondsMod

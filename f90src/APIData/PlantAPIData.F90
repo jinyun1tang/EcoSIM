@@ -1,6 +1,42 @@
 module PlantAPIData
   use data_kind_mod, only : r8 => SHR_KIND_R8
 implicit none
+
+  type, public ::  radiation_type
+  real(r8) :: TYSINs1     !sine of sky angles
+  real(r8) :: ALBSs1      !snowpack albedo
+  real(r8) :: ALBXs1      !Surface albedo
+  real(r8) :: RAP0s1      !PAR radiation in solar beam, [umol m-2 s-1]
+  real(r8) :: RADYs1      !diffuse shortwave radiation, [W m-2]
+  real(r8) :: RADSs1      !direct shortwave radiation, [W m-2]
+  real(r8) :: RAPYs1      !diffuse PAR, [umol m-2 s-1]
+  real(r8) :: RAPSs1      !direct PAR, [umol m-2 s-1]
+  real(r8) :: TRNs1       !ecosystem net radiation, [MJ d-2 h-1]
+  real(r8) :: RAD0s1      !shortwave radiation in solar beam, [MJ m-2 h-1]
+  real(r8) :: FRADGs1     !fraction of radiation intercepted by ground surface, [-]
+  real(r8) :: RADGs1      !radiation intercepted by ground surface, [MJ m-2 h-1]
+  real(r8) :: GSINs1      !sine of slope, [-]
+  real(r8) :: GAZIs1      !azimuth of slope, [-]
+  real(r8) :: GCOSs1      !cosine of slope, [-]
+  real(r8) :: THRMGXs1    !longwave radiation emitted by ground surface, [MJ m-2 h-1]
+  real(r8) :: THSs1       !sky longwave radiation , [MJ d-2 h-1]
+  real(r8), pointer :: ALBRs1(:)    => null() !canopy shortwave albedo , [-]
+  real(r8), pointer :: ALBPs1(:)    => null() !canopy PAR albedo , [-]
+  real(r8), pointer :: TAUSs1(:)    => null() !fraction of radiation intercepted by canopy layer, [-]
+  real(r8), pointer :: TAU0s1(:)    => null() !fraction of radiation transmitted by canopy layer, [-]
+  real(r8), pointer :: THRM1s1(:)   => null() !canopy longwave radiation , [MJ d-2 h-1]
+  real(r8), pointer :: RADCs1(:)    => null() !canopy absorbed shortwave radiation , [MJ d-2 h-1]
+  real(r8), pointer :: OMEGXs1(:,:,:)=> null() !sine of indirect sky radiation on leaf surface/sine of indirect sky radiation
+  real(r8), pointer :: OMEGAGs1(:)   => null() !sine of solar beam on leaf surface, [-]
+  real(r8), pointer :: OMEGAs1(:,:,:)=> null() !sine of indirect sky radiation on leaf surface
+  real(r8), pointer :: ZSINs1(:)     => null() !sine of leaf angle
+  integer,  pointer :: IALBYs1(:,:,:)=> null() !flag for calculating backscattering of radiation in canopy
+  real(r8), pointer :: RAD1s1(:)     => null() !canopy net radiation , [MJ d-2 h-1]
+  contains
+    procedure, public :: Init    => plt_rad_init
+    procedure, public :: Destroy => plt_rad_destroy
+  end type radiation_type
+
 ! grid configuration
   integer  :: JP1         !number of plants
   integer  :: JSA1        !number of sectors for the sky azimuth  [0,2*pi]
@@ -11,12 +47,10 @@ implicit none
   integer  :: JLI1        !number of sectors for the leaf zenith [0,pi/2]
   integer  :: JNODS1      !number of canopy nodes
 !begin_data
-  real(r8) :: TYSINs1     !sine of sky angles
-  real(r8) :: ALBSs1      !snowpack albedo
+
   real(r8) :: ALATs1      !latitude	[degrees]
   real(r8) :: ATCAs1      !mean annual air temperature, [oC]
-  real(r8) :: ALBXs1      !Surface albedo
-  real(r8) :: ARLSSs1     !stalk area of combined,each PFT canopy
+  real(r8) :: ARLSSs1     !stalk area of combined, each PFT canopy
   real(r8) :: ARLFCs1     !total canopy leaf area, [m2 d-2]
   real(r8) :: ALTs1       !altitude of grid cell, [m]
   real(r8) :: VOLWSs1     !water volume in snowpack, [m3 d-2]
@@ -28,8 +62,6 @@ implicit none
   real(r8) :: TSHCs1      !total sensible heat flux x boundary layer resistance, [MJ m-1]
   real(r8) :: CNETXs1     !total net canopy CO2 exchange, [g d-2 h-1]
   real(r8) :: ZNOONs1     !time of solar noon, [h]
-  real(r8) :: GAZIs1      !azimuth of slope, [-]
-  real(r8) :: GCOSs1      !cosine of slope, [-]
   real(r8) :: CO2Es1      !atmospheric CO2 concentration, [umol mol-1]
   real(r8) :: CCO2Es1     !atmospheric CO2 concentration, [g m-3]
   real(r8) :: CCH4Es1     !atmospheric CH4 concentration, [g m-3]
@@ -37,11 +69,7 @@ implicit none
   real(r8) :: CH2GEs1     !atmospheric H2 concentration, [g m-3]
   real(r8) :: CNH3Es1     !atmospheric NH3 concentration, [g m-3]
   real(r8) :: DYLXs1      !daylength of previous day, [h]
-  real(r8) :: RAP0s1      !PAR radiation in solar beam, [umol m-2 s-1]
-  real(r8) :: RADYs1      !diffuse shortwave radiation, [W m-2]
-  real(r8) :: RADSs1      !direct shortwave radiation, [W m-2]
-  real(r8) :: RAPYs1      !diffuse PAR, [umol m-2 s-1]
-  real(r8) :: RAPSs1      !direct PAR, [umol m-2 s-1]
+
   real(r8) :: DYLNs1      !daylength, [h]
   real(r8) :: DPTHSs1     !snowpack depth, [m]
   real(r8) :: DYLMs1      !maximum daylength, [h]
@@ -68,11 +96,7 @@ implicit none
   real(r8) :: TEVAPCs1    !total canopy evaporation, [m3 d-2]
   real(r8) :: TH2GZs1     !total root H2 flux, [g d-2]
   real(r8) :: THFLXCs1    !total canopy heat flux, [MJ  d-2]
-  real(r8) :: TRNs1       !ecosystem net radiation, [MJ d-2 h-1]
-  real(r8) :: RAD0s1      !shortwave radiation in solar beam, [MJ m-2 h-1]
-  real(r8) :: FRADGs1     !fraction of radiation intercepted by ground surface, [-]
-  real(r8) :: RADGs1      !radiation intercepted by ground surface, [MJ m-2 h-1]
-  real(r8) :: GSINs1      !sine of slope, [-]
+
   real(r8) :: TN2OZs1     !total root N2O content, [g d-2]
   real(r8) :: TLEs1       !ecosystem latent heat flux, [MJ d-2 h-1]
   real(r8) :: TOXYZs1     !total root O2 content, [g d-2]
@@ -93,8 +117,6 @@ implicit none
   real(r8) :: TGPPs1      !ecosystem GPP, [g d-2 h-1]
   real(r8) :: TKAs1       !air temperature, [K]
   real(r8) :: TLECs1      !total latent heat flux x boundary layer resistance, [MJ m-1]
-  real(r8) :: THRMGXs1    !longwave radiation emitted by ground surface, [MJ m-2 h-1]
-  real(r8) :: THSs1       !sky longwave radiation , [MJ d-2 h-1]
   real(r8) :: TRAUs1      !ecosystem autotrophic respiration, [g d-2 h-1]
   real(r8) :: UVOLOs1     !total subsurface water flux, [m3 d-2]
   real(r8) :: VPAs1       !vapor concentration, [m3 m-3]
@@ -165,19 +187,10 @@ implicit none
   real(r8), allocatable :: ARLFTs1(:)    !total leaf area, [m2 d-2]
   real(r8), allocatable :: ARLFSs1(:)    !plant leaf area, [m2 d-2]
   real(r8), allocatable :: RCSs1(:)      !shape parameter for calculating stomatal resistance from turgor pressure, [-]
-  real(r8), allocatable :: TAUSs1(:)     !fraction of radiation intercepted by canopy layer, [-]
-  real(r8), allocatable :: TAU0s1(:)     !fraction of radiation transmitted by canopy layer, [-]
   real(r8), allocatable :: ABSRs1(:)     !canopy shortwave absorptivity , [-]
   real(r8), allocatable :: ABSPs1(:)     !canopy PAR absorptivity
   real(r8), allocatable :: TAURs1(:)     !canopy shortwave transmissivity , [-]
   real(r8), allocatable :: TAUPs1(:)     !canopy PAR transmissivity , [-]
-  real(r8), allocatable :: THRM1s1(:)    !canopy longwave radiation , [MJ d-2 h-1]
-  real(r8), allocatable :: RADCs1(:)     !canopy absorbed shortwave radiation , [MJ d-2 h-1]
-  real(r8), allocatable :: OMEGXs1(:,:,:)!sine of indirect sky radiation on leaf surface/sine of indirect sky radiation
-  real(r8), allocatable :: OMEGAGs1(:)   !sine of solar beam on leaf surface, [-]
-  real(r8), allocatable :: ZSINs1(:)     !sine of leaf angle
-  integer,  allocatable :: IALBYs1(:,:,:)     !flag for calculating backscattering of radiation in canopy
-  real(r8), allocatable :: OMEGAs1(:,:,:)     !sine of indirect sky radiation on leaf surface
   real(r8), allocatable :: ANGBRs1(:)    !branching angle, [degree from horizontal]
   real(r8), allocatable :: SSL1s1(:)     !petiole length:mass during growth, [m gC-1]
   real(r8), allocatable :: SNL1s1(:)     !internode length:mass during growth, [m gC-1]
@@ -271,8 +284,6 @@ implicit none
   real(r8), allocatable :: WTRTs1(:)     !plant root C, [gC d-2]
   real(r8), allocatable :: FMPRs1(:)     !micropore fraction
   real(r8), allocatable :: FWODBs1(:)    !woody C allocation
-  real(r8), allocatable :: ALBRs1(:)     !canopy shortwave albedo , [-]
-  real(r8), allocatable :: ALBPs1(:)     !canopy PAR albedo , [-]
   real(r8), allocatable :: FWODLNs1(:)   !leaf N allocation
   real(r8), allocatable :: FWODLPs1(:)   !leaf P allocation
   real(r8), allocatable :: FWODSPs1(:)   !P woody fraction in petiole
@@ -329,7 +340,7 @@ implicit none
   real(r8), allocatable :: TKCZs1(:)     !canopy temperature, [K]
   real(r8), allocatable :: RAs1(:)       !canopy boundary layer resistance, [h m-1]
   real(r8), allocatable :: SO2s1(:)      !leaf O2 solubility, [uM /umol mol-1]
-  real(r8), allocatable :: RAD1s1(:)     !canopy net radiation , [MJ d-2 h-1]
+
   real(r8), allocatable :: SOXYLs1(:)    !solubility of O2, [m3 m-3]
   real(r8), allocatable :: SCH4Ls1(:)    !solubility of CH4, [m3 m-3]
   real(r8), allocatable :: SN2OLs1(:)    !solubility of N2O, [m3 m-3]
@@ -895,6 +906,7 @@ implicit none
   real(r8), allocatable :: THETPMs1(:,:)      !soil air-filled porosity, [m3 m-3]
   real(r8), allocatable :: DFGSs1(:,:)        !coefficient for dissolution - volatilization, []
 
+  type(radiation_type), public, target :: plt_rad   !plant radiation type
   contains
   subroutine InitPlantAPIData(JZ,JC,JP,JSA,jcplx1,JLI,JLA,JNODS)
 
@@ -909,11 +921,16 @@ implicit none
   jcplx11=jcplx1
   JLI1=JLI
   JNODS1=JNODS
+
+  call plt_rad%Init()
+
   call InitAllocate()
   end subroutine InitPlantAPIData
 !----------------------------------------------------------------------
   subroutine InitAllocate()
   implicit none
+
+  call plt_rad%Destroy()
   allocate(IDTHs1(JP1))
   allocate(FCO2s1(JP1))
   allocate(ZCOSs1(JLI1))
@@ -954,8 +971,6 @@ implicit none
   allocate(WGLFTs1(JC1))
   allocate(ARLFTs1(JC1))
   allocate(ARSTTs1(JC1))
-  allocate(TAUSs1(JC1+1))
-  allocate(TAU0s1(JC1+1))
   allocate(DLYR3s1(0:JZ1))
   allocate(CPO4Ss1(JZ1))
   allocate(SNL1s1(JP1))
@@ -970,9 +985,6 @@ implicit none
   allocate(DMSTKs1(JP1))
   allocate(DMRSVs1(JP1))
   allocate(DMEARs1(JP1))
-  allocate(ALBRs1(JP1))
-  allocate(ALBPs1(JP1))
-  allocate(OMEGAGs1(JSA1))
   allocate(DMGRs1(JP1))
   allocate(CNHSKs1(JP1))
   allocate(CNEARs1(JP1))
@@ -1226,7 +1238,6 @@ implicit none
   allocate(SCO2s1(JP1))
   allocate(CO2Qs1(JP1))
   allocate(CO2Ls1(JP1))
-  allocate(RAD1s1(JP1))
   allocate(PSILZs1(JP1))
   allocate(RSMNs1(JP1))
   allocate(ETMXs1(JP1))
@@ -1235,7 +1246,6 @@ implicit none
   allocate(TAURs1(JP1))
   allocate(PEPCs1(JP1))
   allocate(CHL4s1(JP1))
-  allocate(RADCs1(JP1))
   allocate(VCMX4s1(JP1))
   allocate(RUBPs1(JP1))
   allocate(VCMXs1(JP1))
@@ -1247,7 +1257,6 @@ implicit none
   allocate(WTRTSPs1(JP1))
   allocate(TKCZs1(JP1))
   allocate(SFLXCs1(JP1))
-  allocate(THRM1s1(JP1))
   allocate(SO2s1(JP1))
   allocate(RAs1(JP1))
   allocate(RCs1(JP1))
@@ -1322,7 +1331,6 @@ implicit none
   allocate(EPs1(JP1))
   allocate(IRTYPs1(JP1))
   allocate(GRMXs1(JP1))
-  allocate(ZSINs1(JLI1))
   allocate(RADPs1(JP1))
   allocate(FRADPs1(JP1))
   allocate(WTSHEs1(JP1))
@@ -1487,9 +1495,6 @@ implicit none
   allocate(WVSTKBs1(JC1,JP1))
   allocate(ZPOOLs1(JC1,JP1))
   allocate(ZPOLNBs1(JC1,JP1))
-  allocate(OMEGAs1(JSA1,JLI1,JLA1))
-  allocate(IALBYs1(JSA1,JLI1,JLA1))
-  allocate(OMEGXs1(JSA1,JLI1,JLA1))
   allocate(SURFs1(JLI1,JC1,JNODS1,JC1,JP1))
   allocate(SURFXs1(JLI1,JC1,JNODS1,JC1,JP1))
   allocate(CPOOL3s1(JNODS1,JC1,JP1))
@@ -1727,8 +1732,6 @@ implicit none
   if(allocated(ARLFTs1))deallocate(ARLFTs1)
   if(allocated(ARLFSs1))deallocate(ARLFSs1)
   if(allocated(RCSs1))deallocate(RCSs1)
-  if(allocated(TAUSs1))deallocate(TAUSs1)
-  if(allocated(TAU0s1))deallocate(TAU0s1)
   if(allocated(SNL1s1))deallocate(SNL1s1)
   if(allocated(CPEARs1))deallocate(CPEARs1)
   if(allocated(CPHSKs1))deallocate(CPHSKs1)
@@ -1740,9 +1743,7 @@ implicit none
   if(allocated(DMRSVs1))deallocate(DMRSVs1)
   if(allocated(CNHSKs1))deallocate(CNHSKs1)
   if(allocated(DMEARs1))deallocate(DMEARs1)
-  if(allocated(ALBPs1))deallocate(ALBPs1)
-  if(allocated(ALBRs1))deallocate(ALBRs1)
-  if(allocated(OMEGAGs1))deallocate(OMEGAGs1)
+
   if(allocated(DMHSKs1))deallocate(DMHSKs1)
   if(allocated(CNEARs1))deallocate(CNEARs1)
   if(allocated(CNRSVs1))deallocate(CNRSVs1)
@@ -1764,7 +1765,7 @@ implicit none
   if(allocated(TAURs1))deallocate(TAURs1)
   if(allocated(TAUPs1))deallocate(TAUPs1)
   if(allocated(CHL4s1))deallocate(CHL4s1)
-  if(allocated(RADCs1))deallocate(RADCs1)
+
   if(allocated(VCMX4s1))deallocate(VCMX4s1)
   if(allocated(RUBPs1))deallocate(RUBPs1)
   if(allocated(VOMXs1))deallocate(VOMXs1)
@@ -1856,7 +1857,6 @@ implicit none
   if(allocated(WTRTts1))deallocate(WTRTts1)
   if(allocated(XKCO2Ls1))deallocate(XKCO2Ls1)
   if(allocated(TKCZs1))deallocate(TKCZs1)
-  if(allocated(THRM1s1))deallocate(THRM1s1)
   if(allocated(SO2s1))deallocate(SO2s1)
   if(allocated(RCs1))deallocate(RCs1)
   if(allocated(RAs1))deallocate(RAs1)
@@ -2211,9 +2211,6 @@ implicit none
   if(allocated(SURFXs1))deallocate(SURFXs1)
   if(allocated(CPOOL3s1))deallocate(CPOOL3s1)
   if(allocated(CPOOL4s1))deallocate(CPOOL4s1)
-  if(allocated(OMEGAs1))deallocate(OMEGAs1)
-  if(allocated(IALBYs1))deallocate(IALBYs1)
-  if(allocated(OMEGXs1))deallocate(OMEGXs1)
   if(allocated(CO2Bs1))deallocate(CO2Bs1)
   if(allocated(COMPLs1))deallocate(COMPLs1)
   if(allocated(CBXNs1))deallocate(CBXNs1)
@@ -2312,7 +2309,6 @@ implicit none
   if(allocated(RTVLPs1))deallocate(RTVLPs1)
   if(allocated(RTVLWs1))deallocate(RTVLWs1)
   if(allocated(RRAD1s1))deallocate(RRAD1s1)
-  if(allocated(RAD1s1))deallocate(RAD1s1)
   if(allocated(RRAD2s1))deallocate(RRAD2s1)
   if(allocated(RTARPs1))deallocate(RTARPs1)
   if(allocated(RTLGAs1))deallocate(RTLGAs1)
@@ -2381,7 +2377,6 @@ implicit none
   if(allocated(CNGRs1))deallocate(CNGRs1)
   if(allocated(FRADPs1))deallocate(FRADPs1)
   if(allocated(EPs1))deallocate(EPs1)
-  if(allocated(ZSINs1))deallocate(ZSINs1)
   if(allocated(WDLFs1))deallocate(WDLFs1)
   if(allocated(DMLFs1))deallocate(DMLFs1)
   if(allocated(GFILLs1))deallocate(GFILLs1)
@@ -2463,4 +2458,47 @@ implicit none
   if(allocated(THETPMs1))deallocate(THETPMs1)
   if(allocated(DFGSs1))deallocate(DFGSs1)
   end subroutine DestructPlantAPIData
+
+!------------------------------------------------------------------------
+  subroutine plt_rad_init(this)
+! DESCRIPTION
+! initialize data type for radiation_type
+  implicit none
+  class(radiation_type) :: this
+  print*,'plt_rad_init',JC1
+  allocate(this%ALBRs1(JP1))
+  allocate(this%ALBPs1(JP1))
+  allocate(this%TAUSs1(JC1+1))
+  print*,size(this%TAUSs1)
+  allocate(this%TAU0s1(JC1+1))
+  allocate(this%THRM1s1(JP1))
+  allocate(this%RADCs1(JP1))
+  allocate(this%OMEGXs1(JSA1,JLI1,JLA1))
+  allocate(this%OMEGAGs1(JSA1))
+  allocate(this%OMEGAs1(JSA1,JLI1,JLA1))
+  allocate(this%ZSINs1(JLI1))
+  allocate(this%IALBYs1(JSA1,JLI1,JLA1))
+  allocate(this%RAD1s1(JP1))
+  end subroutine plt_rad_init
+!------------------------------------------------------------------------
+  subroutine plt_rad_destroy(this)
+! DESCRIPTION
+! deallocate memory for radiation_type
+  implicit none
+  class(radiation_type) :: this
+
+  if(associated(this%ALBRs1))nullify(this%ALBRs1)
+  if(associated(this%ALBPs1))nullify(this%ALBPs1)
+  if(associated(this%TAUSs1))nullify(this%TAUSs1)
+  if(associated(this%TAU0s1))nullify(this%TAU0s1)
+  if(associated(this%THRM1s1))nullify(this%THRM1s1)
+  if(associated(this%RADCs1))nullify(this%RADCs1)
+  if(associated(this%OMEGXs1))nullify(this%OMEGXs1)
+  if(associated(this%OMEGAGs1))nullify(this%OMEGAGs1)
+  if(associated(this%ZSINs1))nullify(this%ZSINs1)
+  if(associated(this%IALBYs1))nullify(this%IALBYs1)
+  if(associated(this%OMEGAs1))nullify(this%OMEGAs1)
+  if(associated(this%RAD1s1))nullify(this%RAD1s1)
+  end subroutine plt_rad_destroy
+
 end module PlantAPIData
