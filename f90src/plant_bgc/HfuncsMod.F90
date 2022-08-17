@@ -47,7 +47,10 @@ module HfuncsMod
   INTEGER :: NZ
 
 ! begin_execution
-
+  associate(                          &
+    NBRs1   =>  plt_morph%NBRs1     , &
+    NB1s1   =>  plt_morph%NB1s1       &
+  )
   DO 9985 NZ=1,NPs1
 
     IF(DATAPs1(NZ).NE.'NO')THEN
@@ -137,6 +140,7 @@ module HfuncsMod
       ENDIF
 9985  CONTINUE
   RETURN
+  end associate
   END subroutine hfuncs
 !------------------------------------------------------------------------------------------
 
@@ -193,6 +197,16 @@ module HfuncsMod
   integer, intent(in) :: I,J,NZ
 
 ! begin_execution
+  associate(                            &
+    NRTs1     =>   plt_morph%NRTs1    , &
+    NB1s1     =>   plt_morph%NB1s1    , &
+    NBRs1     =>   plt_morph%NBRs1    , &
+    NNODs1    =>   plt_morph%NNODs1   , &
+    NBTs1     =>   plt_morph%NBTs1    , &
+    NBTBs1    =>   plt_morph%NBTBs1   , &
+    ARLFLs1   =>   plt_morph%ARLFLs1  , &
+    PSTGs1    =>   plt_morph%PSTGs1     &
+  )
 
 !
 ! ADD BRANCH TO SHOOT IF PLANT GROWTH STAGE, SHOOT NON-STRUCTURAL
@@ -260,6 +274,7 @@ module HfuncsMod
       ENDIF
     ENDIF
   ENDIF
+  end associate
   end subroutine root_shoot_branching
 !------------------------------------------------------------------------------------------
 
@@ -269,15 +284,25 @@ module HfuncsMod
 
   integer :: NB,N,L
   real(r8):: ARLSP
-  RCO2Zs1(NZ)=0.0
-  ROXYZs1(NZ)=0.0
-  RCH4Zs1(NZ)=0.0
-  RN2OZs1(NZ)=0.0
-  RNH3Zs1(NZ)=0.0
-  RH2GZs1(NZ)=0.0
-  CPOOLPs1(NZ)=0.0
-  ZPOOLPs1(NZ)=0.0
-  PPOOLPs1(NZ)=0.0
+  associate(                          &
+    NB1s1   =>  plt_morph%NB1s1     , &
+    ARLFPs1 =>  plt_morph%ARLFPs1   , &
+    NIXs1   =>  plt_morph%NIXs1     , &
+    NBRs1   =>  plt_morph%NBRs1     , &
+    NBTBs1  =>  plt_morph%NBTBs1    , &
+    SDPTHs1 =>  plt_morph%SDPTHs1   , &
+    ARSTPs1 =>  plt_morph%ARSTPs1   , &
+    NIs1    =>  plt_morph%NIs1        &
+  )
+  RCO2Zs1(NZ)=0.0_r8
+  ROXYZs1(NZ)=0.0_r8
+  RCH4Zs1(NZ)=0.0_r8
+  RN2OZs1(NZ)=0.0_r8
+  RNH3Zs1(NZ)=0.0_r8
+  RH2GZs1(NZ)=0.0_r8
+  CPOOLPs1(NZ)=0.0_r8
+  ZPOOLPs1(NZ)=0.0_r8
+  PPOOLPs1(NZ)=0.0_r8
   NIs1(NZ)=NIXs1(NZ)
   NGs1(NZ)=MIN(NIs1(NZ),MAX(NGs1(NZ),NUs1))
   NB1s1(NZ)=1
@@ -372,6 +397,7 @@ module HfuncsMod
       VHCPCs1(NZ)=cpw*(WTSHTs1(NZ)*10.0E-06+VOLWCs1(NZ))
     ENDIF
   ENDIF
+  end associate
   end subroutine stage_phenology_vars
 !------------------------------------------------------------------------------------------
 
@@ -608,6 +634,12 @@ module HfuncsMod
   real(r8) :: RNI
 
 ! begin_execution
+  associate(                            &
+    PSTGs1    =>   plt_morph%PSTGs1   , &
+    PSTGIs1   =>   plt_morph%PSTGIs1  , &
+    PSTGFs1   =>   plt_morph%PSTGFs1  , &
+    NB1s1     =>   plt_morph%NB1s1      &
+  )
   IF(IDAYs1(1,NB,NZ).EQ.0)THEN
     IDAYs1(1,NB,NZ)=I
     IFLGAs1(NB,NZ)=1
@@ -865,6 +897,7 @@ module HfuncsMod
       IDAYs1(9,NB,NZ)=I
     ENDIF
   ENDIF
+  end associate
   end subroutine living_branch_phenology
 
 end module HfuncsMod

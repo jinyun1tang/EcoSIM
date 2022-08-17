@@ -45,6 +45,13 @@ module ExtractsMod
   implicit none
   integer :: NZ,L,K,M
 
+  associate(                             &
+   NIs1       => plt_morph%NIs1        , &
+   ARSTTs1    => plt_morph%ARSTTs1     , &
+   ARLFTs1    =>  plt_morph%ARLFTs1    , &
+   ARSTCs1    =>  plt_morph%ARSTCs1    , &
+   ARLFCs1    =>  plt_morph%ARLFCs1      &
+  )
   DO NZ=1,NP0s1
 !
 !   TOTAL LITTERFALL OF ALL PLANT SPECIES
@@ -77,6 +84,7 @@ module ExtractsMod
     WGLFTs1(L)=0._r8
     ARSTTs1(L)=0._r8
   ENDDO
+  end associate
   end subroutine TotalLitterfall
 !------------------------------------------------------------------------------------------
 
@@ -92,11 +100,18 @@ module ExtractsMod
   implicit none
   integer, intent(in) :: NZ
   integer :: L
+  associate(                              &
+    ARLFTs1    =>  plt_morph%ARLFTs1    , &
+    ARSTVs1    =>  plt_morph%ARSTVs1    , &
+    ARSTTs1    => plt_morph%ARSTTs1     , &
+    ARLFVs1    => plt_morph%ARLFVs1       &
+  )
   DO L=1,JC1
     ARLFTs1(L)=ARLFTs1(L)+ARLFVs1(L,NZ)
     WGLFTs1(L)=WGLFTs1(L)+WGLFVs1(L,NZ)
     ARSTTs1(L)=ARSTTs1(L)+ARSTVs1(L,NZ)
   ENDDO
+  end associate
   end subroutine TotalLeafArea
 !------------------------------------------------------------------------------------------
 
@@ -109,6 +124,10 @@ module ExtractsMod
   integer, intent(in) :: NZ
 
   integer :: N,L,K
+
+  associate(                       &
+    NIs1    => plt_morph%NIs1      &
+  )
 
   DO N=1,MYs1(NZ)
     DO L=NUs1,NIs1(NZ)
@@ -244,6 +263,7 @@ module ExtractsMod
       RP1BXs1(L)=RP1BXs1(L)+RUPP1Bs1(N,L,NZ)
     ENDDO
   ENDDO
+  end associate
   end subroutine TotalGasandSoluteUptake
 !------------------------------------------------------------------------------------------
 
@@ -259,10 +279,16 @@ module ExtractsMod
   integer, intent(in) :: NZ
   integer :: L, NB
   real(r8) :: ENGYC
-  associate(                      &
-    RAD1s1  => plt_rad%RAD1s1   , &
-    THRM1s1 => plt_rad%THRM1s1  , &
-    TRNs1   => plt_rad%TRNs1      &
+  associate(                       &
+    ARSTCs1 => plt_morph%ARSTCs1 , &
+    ARLFCs1 => plt_morph%ARLFCs1 , &
+    NIs1    => plt_morph%NIs1    , &
+    NBRs1   => plt_morph%NBRs1   , &
+    ARSTPs1 => plt_morph%ARSTPs1 , &
+    ARLFPs1 => plt_morph%ARLFPs1 , &
+    RAD1s1  => plt_rad%RAD1s1    , &
+    THRM1s1 => plt_rad%THRM1s1   , &
+    TRNs1   => plt_rad%TRNs1       &
   )
   DO L=NUs1,NIs1(NZ)
     TUPNFs1(L)=TUPNFs1(L)+RUPNFs1(L,NZ)

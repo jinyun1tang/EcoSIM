@@ -90,7 +90,10 @@ module StartqsMod
 
   implicit none
   integer, intent(in) :: NZ
-
+  associate(                         &
+    O2Is1    =>  plt_photo%O2Is1   , &
+    NRTs1    =>  plt_morph%NRTs1     &
+  )
   IYR0s1(NZ)=IYRXs1(NZ)
   IDAY0s1(NZ)=IDAYXs1(NZ)
   IYRHs1(NZ)=IYRYs1(NZ)
@@ -105,10 +108,11 @@ module StartqsMod
   CPWSs1(NZ)=25.0_r8
   CWSRTs1(NZ)=AMIN1(CNRTs1(NZ)*CNWSs1(NZ),CPRTs1(NZ)*CPWSs1(NZ))
   IF(ICTYPs1(NZ).EQ.3)THEN
-    O2Is1(NZ)=2.10E+05
+    O2Is1(NZ)=2.10E+05_r8
   ELSE
-    O2Is1(NZ)=3.96E+05
+    O2Is1(NZ)=3.96E+05_r8
   ENDIF
+  end associate
   end subroutine InitShootGrowth
 !------------------------------------------------------------------------------------------
 
@@ -119,6 +123,10 @@ module StartqsMod
   integer :: N,M
   real(r8) :: CNOPC(4),CPOPC(4)
   REAL(R8) :: CNOPCT,CPOPCT
+
+  associate(                         &
+    NNODs1   =>  plt_morph%NNODs1    &
+  )
 !
 !     FRACTIONS OF PLANT LITTER ALLOCATED TO KINETIC COMPONENTS
 !     PROTEIN(*,1),CH2O(*,2),CELLULOSE(*,3),LIGNIN(*,4) IN SOIL LITTER
@@ -309,6 +317,7 @@ module StartqsMod
     FNODs1(NZ)=AMAX1(1.0,0.04/XRLAs1(NZ))
     NNODs1(NZ)=24
   ENDIF
+  end associate
   end subroutine PlantLitterFraction
 !------------------------------------------------------------------------------------------
 
@@ -352,6 +361,15 @@ module StartqsMod
   implicit none
   integer, intent(in) :: NZ
   INTEGER :: L,N,NR
+  associate(                             &
+    SDPTHs1    =>  plt_morph%SDPTHs1   , &
+    SDARs1     =>  plt_morph%SDARs1    , &
+    SDPTHIs1   =>  plt_morph%SDPTHIs1  , &
+    NIXs1      =>  plt_morph%NIXs1     , &
+    NINRs1     =>  plt_morph%NINRs1    , &
+    SDVLs1     =>  plt_morph%SDVLs1    , &
+    SDLGs1     =>  plt_morph%SDLGs1      &
+  )
 !
 !     SEED CHARACTERISTICS
 !
@@ -421,6 +439,7 @@ module StartqsMod
     RTAR1Xs1(N,NZ)=PICON*RRAD1Xs1(N,NZ)**2
     RTAR2Xs1(N,NZ)=PICON*RRAD2Xs1(N,NZ)**2
 500 CONTINUE
+  end associate
   end subroutine InitDimensionsandUptake
 !------------------------------------------------------------------------------------------
 
@@ -429,6 +448,34 @@ module StartqsMod
   implicit none
   integer, intent(in) :: NZ
   integer :: K,L,M,N,NB
+  associate(                           &
+    FDBKXs1   =>  plt_photo%FDBKXs1  , &
+    FDBKs1    =>  plt_photo%FDBKs1   , &
+    NBTs1     =>  plt_morph%NBTs1    , &
+    PSTGs1    =>  plt_morph%PSTGs1   , &
+    ARLFPs1   =>  plt_morph%ARLFPs1  , &
+    ARSTKs1   =>  plt_morph%ARSTKs1  , &
+    SURFBs1   =>  plt_morph%SURFBs1  , &
+    ARSTPs1   =>  plt_morph%ARSTPs1  , &
+    PSTGFs1   =>  plt_morph%PSTGFs1  , &
+    GRNXBs1   =>  plt_morph%GRNXBs1  , &
+    HTNODEs1  =>  plt_morph%HTNODEs1 , &
+    GRNOBs1   =>  plt_morph%GRNOBs1  , &
+    ARLFBs1   =>  plt_morph%ARLFBs1  , &
+    ARLFZs1   =>  plt_morph%ARLFZs1  , &
+    ARLFLs1   =>  plt_morph%ARLFLs1  , &
+    ARLFVs1   =>  plt_morph%ARLFVs1  , &
+    ARSTVs1   =>  plt_morph%ARSTVs1  , &
+    SURFs1    =>  plt_morph%SURFs1   , &
+    ARLF1s1   =>  plt_morph%ARLF1s1  , &
+    HTSHEXs1  =>  plt_morph%HTSHEXs1 , &
+    NBTBs1    =>  plt_morph%NBTBs1   , &
+    HTNODXs1  =>  plt_morph%HTNODXs1 , &
+    HTSHEs1   =>  plt_morph%HTSHEs1  , &
+    PSTGIs1   =>  plt_morph%PSTGIs1  , &
+    KLEAFXs1  =>  plt_morph%KLEAFXs1 , &
+    NBRs1     =>  plt_morph%NBRs1      &
+  )
 !
 !     INITIALIZE PLANT PHENOLOGY
 !
@@ -627,6 +674,7 @@ module StartqsMod
   ARLFPs1(NZ)=0._r8
   WTRTAs1(NZ)=0._r8
   ARSTPs1(NZ)=0._r8
+  end associate
   end subroutine InitPlantPhenoMorphoBio
 !------------------------------------------------------------------------------------------
 
@@ -691,6 +739,9 @@ module StartqsMod
 
   implicit none
   integer, intent(in) :: NZ
+  associate(                          &
+    FRADPs1    =>  plt_rad%FRADPs1    &
+  )
 !
 !     INITIALIZE PLANT HEAT AND WATER STATUS
 !
@@ -712,6 +763,7 @@ module StartqsMod
   PSILGs1(NZ)=AMAX1(0.0,PSILTs1(NZ)-PSILOs1(NZ))
   EPs1(NZ)=0._r8
   FRADPs1(NZ)=0._r8
+  end associate
   end subroutine InitPlantHeatandWater
 !------------------------------------------------------------------------------------------
 
@@ -723,6 +775,10 @@ module StartqsMod
   REAL(R8) :: CCO2P
   REAL(R8) :: COXYA
   REAL(R8) :: COXYP
+  associate(                             &
+    SDPTHs1    =>  plt_morph%SDPTHs1   , &
+    NRTs1      =>  plt_morph%NRTs1       &
+  )
 !
 !     INITIALIZE ROOT(N=1),MYCORRHIZAL(N=2) MORPHOLOGY AND BIOMASS
 !
@@ -839,6 +895,7 @@ module StartqsMod
   RUPH2Ps1(1:2,NLs1+1:JZ1,NZ)=0._r8
   RUPH2Bs1(1:2,NLs1+1:JZ1,NZ)=0._r8
   RTDNPs1(1:2,NLs1+1:JZ1,NZ)=0._r8
+  end associate
   end subroutine InitRootMychorMorphoBio
 !------------------------------------------------------------------------------------------
 

@@ -631,6 +631,16 @@ module PlantDisturbsMod
   real(r8) :: FDM,VOLWPX
   real(r8) :: WVPLT
 !     begin_execution
+  associate(                               &
+    FRADPs1    => plt_rad%FRADPs1        , &
+    NRTs1      => plt_morph%NRTs1        , &
+    NBRs1      => plt_morph%NBRs1        , &
+    ARLF1s1    => plt_morph%ARLF1s1      , &
+    ARLFBs1    => plt_morph%ARLFBs1      , &
+    GRNXBs1    => plt_morph%GRNXBs1      , &
+    GRNOBs1    => plt_morph%GRNOBs1      , &
+    ARLFLs1    => plt_morph%ARLFLs1        &
+  )
 !     ZNOON=hour of solar noon
 !     IBTYP=turnover:0=all abve-grd,1=all leaf+petiole,2=none,3=between 1,2
 !     IGTYP=growth type:0=bryophyte,1=graminoid,2=shrub,tree
@@ -1032,6 +1042,7 @@ module PlantDisturbsMod
       ENDIF
     ENDIF
   ENDIF
+  end associate
   end subroutine RemoveBiomByTillage
 !------------------------------------------------------------------------------------------
 
@@ -1083,6 +1094,29 @@ module PlantDisturbsMod
   real(r8) :: WTNDPG,WGLFGX,WGSHGX,WGLFGY,WGSHGY,WGLFG,WGLFNG
   real(r8) :: WGLFPG,WHVSBS,WHVSCX,WHVSNX,WVPLT
 !     begin_execution
+  associate(                            &
+    ARLFTs1    => plt_morph%ARLFTs1   , &
+    ZLs1       => plt_morph%ZLs1      , &
+    ARLFBs1    => plt_morph%ARLFBs1   , &
+    NBRs1      => plt_morph%NBRs1     , &
+    ARSTPs1    => plt_morph%ARSTPs1   , &
+    HTNODXs1   => plt_morph%HTNODXs1  , &
+    HTNODEs1   => plt_morph%HTNODEs1  , &
+    GRNXBs1    => plt_morph%GRNXBs1   , &
+    GRNOBs1    => plt_morph%GRNOBs1   , &
+    HTSHEs1    => plt_morph%HTSHEs1   , &
+    ARLF1s1    => plt_morph%ARLF1s1   , &
+    ARLFVs1    => plt_morph%ARLFVs1   , &
+    ARSTVs1    => plt_morph%ARSTVs1   , &
+    ARLFLs1    => plt_morph%ARLFLs1   , &
+    ARSTKs1    => plt_morph%ARSTKs1   , &
+    NRTs1      => plt_morph%NRTs1     , &
+    PSTGFs1    => plt_morph%PSTGFs1   , &
+    NB1s1      => plt_morph%NB1s1     , &
+    PSTGIs1    => plt_morph%PSTGIs1   , &
+    PSTGs1     => plt_morph%PSTGs1    , &
+    ARLFCs1    => plt_morph%ARLFCs1     &
+  )
 !     IHVST=harvest type:0=none,1=grain,2=all above-ground
 !                       ,3=pruning,4=grazing,5=fire,6=herbivory
 !
@@ -2412,6 +2446,7 @@ module PlantDisturbsMod
         ENDIF
     ENDIF
   ENDIF
+  end associate
   end subroutine RemoveBiomByHarvest
 
 end module PlantDisturbsMod

@@ -4,9 +4,9 @@ module PhotoSynsMod
   use GrosubPars
   use PlantAPIData
 implicit none
+  private
+  public :: ComputeGPP
 
-  public :: ComputeGPP_C3
-  public :: ComputeGPP_C4
   contains
 
 !------------------------------------------------------------------------------------------
@@ -31,9 +31,13 @@ implicit none
   real(r8) :: VL,VGROX
   real(r8) :: VA,VG
 !begin_execution
-  associate(                        &
-  TAU0s1       => plt_rad%TAU0s1  , &
-  TAUSs1       => plt_rad%TAUSs1    &
+  associate(                          &
+  FDBKs1       => plt_photo%FDBKs1  , &
+  XKCO2Os1     => plt_photo%XKCO2Os1, &
+  CO2Is1       => plt_photo%CO2Is1  , &
+  ARLFLs1      => plt_morph%ARLFLs1 , &
+  TAU0s1       => plt_rad%TAU0s1    , &
+  TAUSs1       => plt_rad%TAUSs1      &
   )
 
 ! FOR EACH CANOPY LAYER
@@ -146,15 +150,7 @@ implicit none
 !               ICO2I=MAX(1,MIN(400,INT(CO2X)))
 !               VCO2(ICO2I,I,NZ)=VCO2(ICO2I,I,NZ)
 !              2+(VL*SURFXs1(N,L,K,NB,NZ)*TAUSs1(L+1))*0.0432
-!               IF(NB.EQ.1.AND.M.EQ.1.AND.N.EQ.1.AND.K.EQ.KLEAFs1(NB,NZ)-1
-!              2.AND.J.EQ.12)THEN
-!               WRITE(20,3335)'VLD',IYRCs1,I,J,NZ,L,M,N,K,VL,PARs1(N,M,L,NZ)
-!              2,RAPS,TKCs1(NZ),TKA,CO2Qs1(NZ),CO2X,CO2C,FMOLs1(NZ)
-!              3/GSL,VGROX,EGROX,ETLF,CBXNX,FDBKs1(NB,NZ),WFNB,PSILGs1(NZ)
-!              4,VCGROs1(K,NB,NZ),ETGROs1(K,NB,NZ),COMPLs1(K,NB,NZ)
-!              5,SURFXs1(N,L,K,NB,NZ),TAUSs1(L+1),CH2O3(K)
-!3335            FORMAT(A8,8I4,30E12.4)
-!               ENDIF
+
               ENDIF
             ENDIF
 !
@@ -297,9 +293,12 @@ implicit none
   real(r8) :: VGROX
   real(r8) :: VA,VG
 ! begin_execution
-  associate(                        &
-  TAU0s1       => plt_rad%TAU0s1  , &
-  TAUSs1       => plt_rad%TAUSs1    &
+  associate(                          &
+  FDBKs1       => plt_photo%FDBKs1  , &
+  CO2Is1       => plt_photo%CO2Is1  , &
+  ARLFLs1      => plt_morph%ARLFLs1 , &
+  TAU0s1       => plt_rad%TAU0s1    , &
+  TAUSs1       => plt_rad%TAUSs1      &
   )
 ! FOR EACH CANOPY LAYER
 !
@@ -596,4 +595,101 @@ implicit none
   end associate
   end subroutine ComputeGPP_C4
 
+
+!------------------------------------------------------------------------------------------
+
+  subroutine ComputeGPP(NB,NZ,WFNG,WFNC,CH2O3,CH2O4,CH2O)
+  implicit none
+  integer, intent(in) :: NB,NZ
+  real(r8), intent(in) :: WFNG
+  real(r8), intent(in) :: WFNC
+  real(r8), intent(out) :: CH2O3(JNODS1),CH2O4(JNODS1)
+  real(r8), intent(out) :: CH2O
+  real(r8) :: CO2F,ZADDB,PADDB
+
+  integer :: K
+
+! begin_execution
+  associate(                           &
+    SSINs1    =>  plt_rad%SSINs1     , &
+    RADPs1    =>  plt_rad%RADPs1     , &
+    ARLF1s1   =>  plt_morph%ARLF1s1  , &
+    FDBKs1    =>  plt_photo%FDBKs1     &
+  )
+
+  IF(abs(FDBKs1(NB,NZ)).GT.0._r8)THEN
+    IF(SSINs1.GT.0.0_r8.AND.RADPs1(NZ).GT.0.0_r8.AND.CO2Qs1(NZ).GT.0.0_r8)THEN
+      CO2F=0._r8
+      CH2O=0._r8
+      IF(IGTYPs1(NZ).NE.0.OR.WFNC.GT.0.0_r8)THEN
+!
+!         FOR EACH NODE
+!
+        DO 100 K=1,JNODS1
+          CH2O3(K)=0._r8
+          CH2O4(K)=0._r8
+          IF(ARLF1s1(K,NB,NZ).GT.ZEROPs1(NZ))THEN
+!
+!             C4 PHOTOSYNTHESIS
+!
+!             ARLF,ARLFL=leaf area
+!             ICTYP=photosynthesis type:3=C3,4=C4 from PFT file
+!             VCGR4=PEP carboxylation rate unlimited by CO2
+!
+            IF(ICTYPs1(NZ).EQ.4.AND.VCGR4s1(K,NB,NZ).GT.0.0)THEN
+!
+              CALL ComputeGPP_C4(K,NB,NZ,WFNG,WFNC,CH2O3,CH2O4,CO2F,CH2O)
+!
+!               C3 PHOTOSYNTHESIS
+!
+            ELSEIF(ICTYPs1(NZ).NE.4.AND.VCGROs1(K,NB,NZ).GT.0.0)THEN
+              call ComputeGPP_C3(K,NB,NZ,WFNG,WFNC,CH2O3,CO2F,CH2O)
+
+            ENDIF
+          ENDIF
+100     CONTINUE
+!
+!         CO2F,CH2O=total CO2 fixation,CH2O production
+!
+        CO2F=CO2F*0.0432_r8
+        CH2O=CH2O*0.0432_r8
+!
+!         CONVERT UMOL M-2 S-1 TO G C M-2 H-1
+!
+        DO 150 K=1,JNODS1
+          CH2O3(K)=CH2O3(K)*0.0432
+          CH2O4(K)=CH2O4(K)*0.0432
+150     CONTINUE
+      ELSE
+        CO2F=0._r8
+        CH2O=0._r8
+        IF(ICTYPs1(NZ).EQ.4)THEN
+          DO 155 K=1,JNODS1
+            CH2O3(K)=0._r8
+            CH2O4(K)=0._r8
+155       CONTINUE
+        ENDIF
+      ENDIF
+    ELSE
+      CO2F=0._r8
+      CH2O=0._r8
+      IF(ICTYPs1(NZ).EQ.4)THEN
+        DO 160 K=1,JNODS1
+          CH2O3(K)=0._r8
+          CH2O4(K)=0._r8
+160     CONTINUE
+      ENDIF
+    ENDIF
+  ELSE
+    CO2F=0._r8
+    CH2O=0._r8
+    IF(ICTYPs1(NZ).EQ.4)THEN
+      DO 165 K=1,JNODS1
+        CH2O3(K)=0._r8
+        CH2O4(K)=0._r8
+165   CONTINUE
+    ENDIF
+  ENDIF
+  end associate
+  end subroutine ComputeGPP
 end module PhotoSynsMod

@@ -125,11 +125,11 @@ implicit none
   TSH(NY,NX)=TSHs1
   WTSTGT(NY,NX)=WTSTGTs1
   UVOLO(NY,NX)=UVOLOs1
-  ARSTC(NY,NX)=ARSTCs1
+  ARSTC(NY,NX)=plt_morph%ARSTCs1
   XHVSTC(NY,NX)=XHVSTCs1
   XHVSTN(NY,NX)=XHVSTNs1
   XHVSTP(NY,NX)=XHVSTPs1
-  ARLFC(NY,NX)=ARLFCs1
+  ARLFC(NY,NX)=plt_morph%ARLFCs1
   TRN(NY,NX)=plt_rad%TRNs1
   TLE(NY,NX)=TLEs1
   TGH(NY,NX)=TGHs1
@@ -164,8 +164,8 @@ implicit none
   VOLWOU=VOLWOUs1
   DO L=1,JC
     WGLFT(L,NY,NX)=WGLFTs1(L)
-    ARSTT(L,NY,NX)=ARSTTs1(L)
-    ARLFT(L,NY,NX)=ARLFTs1(L)
+    ARSTT(L,NY,NX)=plt_morph%ARSTTs1(L)
+    ARLFT(L,NY,NX)=plt_morph%ARLFTs1(L)
   ENDDO
   DO L=NU(NY,NX),NL(NY,NX)
     DO K=0,jcplx1
@@ -239,8 +239,8 @@ implicit none
   ENDDO
   DO NZ=1,NP0(NY,NX)
     WTRT(NZ,NY,NX)=WTRTs1(NZ)
-    ARLFP(NZ,NY,NX)=ARLFPs1(NZ)
-    ARSTP(NZ,NY,NX)=ARSTPs1(NZ)
+    ARLFP(NZ,NY,NX)=plt_morph%ARLFPs1(NZ)
+    ARSTP(NZ,NY,NX)=plt_morph%ARSTPs1(NZ)
     BALC(NZ,NY,NX)=BALCs1(NZ)
     BALN(NZ,NY,NX)=BALNs1(NZ)
     BALP(NZ,NY,NX)=BALPs1(NZ)
@@ -252,8 +252,8 @@ implicit none
     CPPOLP(NZ,NY,NX)=CPPOLPs1(NZ)
     CNET(NZ,NY,NX)=CNETs1(NZ)
     CO2Q(NZ,NY,NX)=CO2Qs1(NZ)
-    CO2I(NZ,NY,NX)=CO2Is1(NZ)
-    CO2L(NZ,NY,NX)=CO2Ls1(NZ)
+    CO2I(NZ,NY,NX)=plt_photo%CO2Is1(NZ)
+    CO2L(NZ,NY,NX)=plt_photo%CO2Ls1(NZ)
     CF(NZ,NY,NX)=CFs1(NZ)
     CNWS(NZ,NY,NX)=CNWSs1(NZ)
     CPWS(NZ,NY,NX)=CPWSs1(NZ)
@@ -270,9 +270,9 @@ implicit none
     EVAPC(NZ,NY,NX)=EVAPCs1(NZ)
     EFLXC(NZ,NY,NX)=EFLXCs1(NZ)
     FMOL(NZ,NY,NX)=FMOLs1(NZ)
-    FRADP(NZ,NY,NX)=FRADPs1(NZ)
+    FRADP(NZ,NY,NX)=plt_rad%FRADPs1(NZ)
     FNOD(NZ,NY,NX)=FNODs1(NZ)
-    GRNO(NZ,NY,NX)=GRNOs1(NZ)
+    GRNO(NZ,NY,NX)=plt_morph%GRNOs1(NZ)
     HCSNC(NZ,NY,NX)=HCSNCs1(NZ)
     HZSNC(NZ,NY,NX)=HZSNCs1(NZ)
     HPSNC(NZ,NY,NX)=HPSNCs1(NZ)
@@ -295,16 +295,16 @@ implicit none
     IFLGI(NZ,NY,NX)=IFLGIs1(NZ)
     IDAYH(NZ,NY,NX)=IDAYHs1(NZ)
     IYRH(NZ,NY,NX)=IYRHs1(NZ)
-    NIX(NZ,NY,NX)=NIXs1(NZ)
-    NBT(NZ,NY,NX)=NBTs1(NZ)
-    NBR(NZ,NY,NX)=NBRs1(NZ)
-    NRT(NZ,NY,NX)=NRTs1(NZ)
-    NI(NZ,NY,NX)=NIs1(NZ)
+    NIX(NZ,NY,NX)=plt_morph%NIXs1(NZ)
+    NBT(NZ,NY,NX)=plt_morph%NBTs1(NZ)
+    NBR(NZ,NY,NX)=plt_morph%NBRs1(NZ)
+    NRT(NZ,NY,NX)=plt_morph%NRTs1(NZ)
+    NI(NZ,NY,NX)=plt_morph%NIs1(NZ)
     NG(NZ,NY,NX)=NGs1(NZ)
-    NB1(NZ,NY,NX)=NB1s1(NZ)
-    NNOD(NZ,NY,NX)=NNODs1(NZ)
+    NB1(NZ,NY,NX)=plt_morph%NB1s1(NZ)
+    NNOD(NZ,NY,NX)=plt_morph%NNODs1(NZ)
     O2L(NZ,NY,NX)=O2Ls1(NZ)
-    O2I(NZ,NY,NX)=O2Is1(NZ)
+    O2I(NZ,NY,NX)=plt_photo%O2Is1(NZ)
     OFFST(NZ,NY,NX)=OFFSTs1(NZ)
     OSTR(NZ,NY,NX)=OSTRs1(NZ)
     PPOOLP(NZ,NY,NX)=PPOOLPs1(NZ)
@@ -333,14 +333,14 @@ implicit none
     RAZ(NZ,NY,NX)=RAZs1(NZ)
     RC(NZ,NY,NX)=RCs1(NZ)
     RA(NZ,NY,NX)=RAs1(NZ)
-    SDPTHI(NZ,NY,NX)=SDPTHIs1(NZ)
+    SDPTHI(NZ,NY,NX)=plt_morph%SDPTHIs1(NZ)
     SCO2(NZ,NY,NX)=SCO2s1(NZ)
     SO2(NZ,NY,NX)=SO2s1(NZ)
     SSTX(NZ,NY,NX)=SSTXs1(NZ)
-    SDVL(NZ,NY,NX)=SDVLs1(NZ)
-    SDLG(NZ,NY,NX)=SDLGs1(NZ)
-    SDAR(NZ,NY,NX)=SDARs1(NZ)
-    SDPTH(NZ,NY,NX)=SDPTHs1(NZ)
+    SDVL(NZ,NY,NX)=plt_morph%SDVLs1(NZ)
+    SDLG(NZ,NY,NX)=plt_morph%SDLGs1(NZ)
+    SDAR(NZ,NY,NX)=plt_morph%SDARs1(NZ)
+    SDPTH(NZ,NY,NX)=plt_morph%SDPTHs1(NZ)
     SFLXC(NZ,NY,NX)=SFLXCs1(NZ)
     TCO2T(NZ,NY,NX)=TCO2Ts1(NZ)
     TCO2A(NZ,NY,NX)=TCO2As1(NZ)
@@ -428,8 +428,8 @@ implicit none
     WTNDP(NZ,NY,NX)=WTNDPs1(NZ)
     WTLS(NZ,NY,NX)=WTLSs1(NZ)
     WTRTA(NZ,NY,NX)=WTRTAs1(NZ)
-    XKCO2L(NZ,NY,NX)=XKCO2Ls1(NZ)
-    XKCO2O(NZ,NY,NX)=XKCO2Os1(NZ)
+    XKCO2L(NZ,NY,NX)=plt_photo%XKCO2Ls1(NZ)
+    XKCO2O(NZ,NY,NX)=plt_photo%XKCO2Os1(NZ)
     ZPOOLP(NZ,NY,NX)=ZPOOLPs1(NZ)
     ZPOLNP(NZ,NY,NX)=ZPOLNPs1(NZ)
     ZC(NZ,NY,NX)=ZCs1(NZ)
@@ -453,9 +453,9 @@ implicit none
       TFN4(L,NZ,NY,NX)=TFN4s1(L,NZ)
     ENDDO
     DO L=1,JC
-      ARLFV(L,NZ,NY,NX)=ARLFVs1(L,NZ)
+      ARLFV(L,NZ,NY,NX)=plt_morph%ARLFVs1(L,NZ)
       WGLFV(L,NZ,NY,NX)=WGLFVs1(L,NZ)
-      ARSTV(L,NZ,NY,NX)=ARSTVs1(L,NZ)
+      ARSTV(L,NZ,NY,NX)=plt_morph%ARSTVs1(L,NZ)
     ENDDO
     DO L=0,JZ
       DO K=0,1
@@ -469,11 +469,11 @@ implicit none
 
     DO NB=1,NBR(NZ,NY,NX)
       DO L=1,JC
-        ARSTK(L,NB,NZ,NY,NX)=ARSTKs1(L,NB,NZ)
+        ARSTK(L,NB,NZ,NY,NX)=plt_morph%ARSTKs1(L,NB,NZ)
       ENDDO
       ATRP(NB,NZ,NY,NX)=ATRPs1(NB,NZ)
-      ARLFB(NB,NZ,NY,NX)=ARLFBs1(NB,NZ)
-      ARLFZ(NB,NZ,NY,NX)=ARLFZs1(NB,NZ)
+      ARLFB(NB,NZ,NY,NX)=plt_morph%ARLFBs1(NB,NZ)
+      ARLFZ(NB,NZ,NY,NX)=plt_morph%ARLFZs1(NB,NZ)
       CCPOLB(NB,NZ,NY,NX)=CCPOLBs1(NB,NZ)
       CZPOLB(NB,NZ,NY,NX)=CZPOLBs1(NB,NZ)
       CPPOLB(NB,NZ,NY,NX)=CPPOLBs1(NB,NZ)
@@ -482,16 +482,16 @@ implicit none
       DGSTGI(NB,NZ,NY,NX)=DGSTGIs1(NB,NZ)
       DGSTGF(NB,NZ,NY,NX)=DGSTGFs1(NB,NZ)
       FLG4(NB,NZ,NY,NX)=FLG4s1(NB,NZ)
-      FDBK(NB,NZ,NY,NX)=FDBKs1(NB,NZ)
-      FDBKX(NB,NZ,NY,NX)=FDBKXs1(NB,NZ)
+      FDBK(NB,NZ,NY,NX)=plt_photo%FDBKs1(NB,NZ)
+      FDBKX(NB,NZ,NY,NX)=plt_photo%FDBKXs1(NB,NZ)
       FLGZ(NB,NZ,NY,NX)=FLGZs1(NB,NZ)
       GROUP(NB,NZ,NY,NX)=GROUPs1(NB,NZ)
       GSTGI(NB,NZ,NY,NX)=GSTGIs1(NB,NZ)
       GSTGF(NB,NZ,NY,NX)=GSTGFs1(NB,NZ)
-      GRNXB(NB,NZ,NY,NX)=GRNXBs1(NB,NZ)
-      GRNOB(NB,NZ,NY,NX)=GRNOBs1(NB,NZ)
+      GRNXB(NB,NZ,NY,NX)=plt_morph%GRNXBs1(NB,NZ)
+      GRNOB(NB,NZ,NY,NX)=plt_morph%GRNOBs1(NB,NZ)
       GRWTB(NB,NZ,NY,NX)=GRWTBs1(NB,NZ)
-      HTSHEX(NB,NZ,NY,NX)=HTSHEXs1(NB,NZ)
+      HTSHEX(NB,NZ,NY,NX)=plt_morph%HTSHEXs1(NB,NZ)
       IFLGP(NB,NZ,NY,NX)=IFLGPs1(NB,NZ)
       IDTHB(NB,NZ,NY,NX)=IDTHBs1(NB,NZ)
       IFLGF(NB,NZ,NY,NX)=IFLGFs1(NB,NZ)
@@ -502,12 +502,12 @@ implicit none
       IFLGQ(NB,NZ,NY,NX)=IFLGQs1(NB,NZ)
       KVSTG(NB,NZ,NY,NX)=KVSTGs1(NB,NZ)
       KLEAF(NB,NZ,NY,NX)=KLEAFs1(NB,NZ)
-      KLEAFX(NB,NZ,NY,NX)=KLEAFXs1(NB,NZ)
+      KLEAFX(NB,NZ,NY,NX)=plt_morph%KLEAFXs1(NB,NZ)
       KVSTGN(NB,NZ,NY,NX)=KVSTGNs1(NB,NZ)
-      NBTB(NB,NZ,NY,NX)=NBTBs1(NB,NZ)
-      PSTG(NB,NZ,NY,NX)=PSTGs1(NB,NZ)
-      PSTGI(NB,NZ,NY,NX)=PSTGIs1(NB,NZ)
-      PSTGF(NB,NZ,NY,NX)=PSTGFs1(NB,NZ)
+      NBTB(NB,NZ,NY,NX)=plt_morph%NBTBs1(NB,NZ)
+      PSTG(NB,NZ,NY,NX)=plt_morph%PSTGs1(NB,NZ)
+      PSTGI(NB,NZ,NY,NX)=plt_morph%PSTGIs1(NB,NZ)
+      PSTGF(NB,NZ,NY,NX)=plt_morph%PSTGFs1(NB,NZ)
       PPOLNB(NB,NZ,NY,NX)=PPOLNBs1(NB,NZ)
       PPOOL(NB,NZ,NY,NX)=PPOOLs1(NB,NZ)
       RCCLX(NB,NZ,NY,NX)=RCCLXs1(NB,NZ)
@@ -568,10 +568,10 @@ implicit none
 
 
       DO K=0,JNODS
-        ARLF(K,NB,NZ,NY,NX)=ARLF1s1(K,NB,NZ)
-        HTNODX(K,NB,NZ,NY,NX)=HTNODXs1(K,NB,NZ)
-        HTNODE(K,NB,NZ,NY,NX)=HTNODEs1(K,NB,NZ)
-        HTSHE(K,NB,NZ,NY,NX)=HTSHEs1(K,NB,NZ)
+        ARLF(K,NB,NZ,NY,NX)=plt_morph%ARLF1s1(K,NB,NZ)
+        HTNODX(K,NB,NZ,NY,NX)=plt_morph%HTNODXs1(K,NB,NZ)
+        HTNODE(K,NB,NZ,NY,NX)=plt_morph%HTNODEs1(K,NB,NZ)
+        HTSHE(K,NB,NZ,NY,NX)=plt_morph%HTSHEs1(K,NB,NZ)
         WGNODE(K,NB,NZ,NY,NX)=WGNODEs1(K,NB,NZ)
         WGNODN(K,NB,NZ,NY,NX)=WGNODNs1(K,NB,NZ)
         WGNODP(K,NB,NZ,NY,NX)=WGNODPs1(K,NB,NZ)
@@ -586,12 +586,12 @@ implicit none
       ENDDO
       DO  L=1,JC
         DO N=1,JLI
-          SURFB(N,L,NB,NZ,NY,NX)=SURFBs1(N,L,NB,NZ)
+          SURFB(N,L,NB,NZ,NY,NX)=plt_morph%SURFBs1(N,L,NB,NZ)
         ENDDO
       ENDDO
       DO K=0,JNODS
         DO  L=1,JC
-          ARLFL(L,K,NB,NZ,NY,NX)=ARLFLs1(L,K,NB,NZ)
+          ARLFL(L,K,NB,NZ,NY,NX)=plt_morph%ARLFLs1(L,K,NB,NZ)
           WGLFL(L,K,NB,NZ,NY,NX)=WGLFLs1(L,K,NB,NZ)
           WGLFLN(L,K,NB,NZ,NY,NX)=WGLFLNs1(L,K,NB,NZ)
           WGLFLP(L,K,NB,NZ,NY,NX)=WGLFLPs1(L,K,NB,NZ)
@@ -603,7 +603,7 @@ implicit none
       DO K=1,JNODS
         DO  L=1,JC
           DO N=1,JLI
-            SURF(N,L,K,NB,NZ,NY,NX)=SURFs1(N,L,K,NB,NZ)
+            SURF(N,L,K,NB,NZ,NY,NX)=plt_morph%SURFs1(N,L,K,NB,NZ)
             SURFX(N,L,K,NB,NZ,NY,NX)=SURFXs1(N,L,K,NB,NZ)
           ENDDO
         ENDDO
@@ -729,7 +729,7 @@ implicit none
     ENDDO
 
     DO NR=1,NRT(NZ,NY,NX)
-      NINR(NR,NZ,NY,NX)=NINRs1(NR,NZ)
+      NINR(NR,NZ,NY,NX)=plt_morph%NINRs1(NR,NZ)
       DO N=1,2
         RTWT1(N,NR,NZ,NY,NX)=RTWT1s1(N,NR,NZ)
         RTWT1N(N,NR,NZ,NY,NX)=RTWT1Ns1(N,NR,NZ)
@@ -817,8 +817,8 @@ implicit none
   ZERO2s1=ZERO2
   ALATs1=ALAT(NY,NX)
   ATCAs1=ATCA(NY,NX)
-  ARLSSs1=ARLSS(NY,NX)
-  ARLFCs1=ARLFC(NY,NX)
+  plt_morph%ARLSSs1=ARLSS(NY,NX)
+  plt_morph%ARLFCs1=ARLFC(NY,NX)
   ALTs1=ALT(NY,NX)
   CCO2EIs1=CCO2EI(NY,NX)
   CO2EIs1=CO2EI(NY,NX)
@@ -844,8 +844,8 @@ implicit none
   OXYEs1=OXYE(NY,NX)
   RABs1=RAB(NY,NX)
   RIBs1=RIB(NY,NX)
-  SSINNs1=SSINN(NY,NX)
-  SSINs1=SSIN(NY,NX)
+  plt_rad%SSINNs1=SSINN(NY,NX)
+  plt_rad%SSINs1=SSIN(NY,NX)
   TKWs1=TKW(1,NY,NX)
   TKAs1=TKA(NY,NX)
   plt_rad%THRMGXs1=THRMGX(NY,NX)
@@ -856,15 +856,15 @@ implicit none
   ZEROS2s1=ZEROS2(NY,NX)
   ZEROSs1=ZEROS(NY,NX)
   ZRs1=ZR(NY,NX)
-  ZTs1=ZT(NY,NX)
+  plt_morph%ZTs1=ZT(NY,NX)
   ZDs1=ZD(NY,NX)
   IDATAs1(:)=IDATA(:)
   DCORPs1=DCORP(I,NY,NX)
   ITILLs1=ITILL(I,NY,NX)
 
-  ZLs1(0)=ZL(0,NY,NX)
+  plt_morph%ZLs1(0)=ZL(0,NY,NX)
   DO  L=1,JC
-    ZLs1(L)=ZL(L,NY,NX)
+    plt_morph%ZLs1(L)=ZL(L,NY,NX)
     plt_rad%TAUSs1(L)=TAUS(L,NY,NX)
     plt_rad%TAU0s1(L)=TAU0(L,NY,NX)
   ENDDO
@@ -994,17 +994,17 @@ implicit none
     IRTYPs1(NZ)=IRTYP(NZ,NY,NX)
     MYs1(NZ)=MY(NZ,NY,NX)
     ZTYPIs1(NZ)=ZTYPI(NZ,NY,NX)
-    VCMXs1(NZ)=VCMX(NZ,NY,NX)
-    VOMXs1(NZ)=VOMX(NZ,NY,NX)
-    VCMX4s1(NZ)=VCMX4(NZ,NY,NX)
-    XKCO2s1(NZ)=XKCO2(NZ,NY,NX)
-    XKO2s1(NZ)=XKO2(NZ,NY,NX)
+    plt_photo%VCMXs1(NZ)=VCMX(NZ,NY,NX)
+    plt_photo%VOMXs1(NZ)=VOMX(NZ,NY,NX)
+    plt_photo%VCMX4s1(NZ)=VCMX4(NZ,NY,NX)
+    plt_photo%XKCO2s1(NZ)=XKCO2(NZ,NY,NX)
+    plt_photo%XKO2s1(NZ)=XKO2(NZ,NY,NX)
     XKCO24s1(NZ)=XKCO24(NZ,NY,NX)
-    RUBPs1(NZ)=RUBP(NZ,NY,NX)
-    PEPCs1(NZ)=PEPC(NZ,NY,NX)
-    ETMXs1(NZ)=ETMX(NZ,NY,NX)
-    CHLs1(NZ)=CHL(NZ,NY,NX)
-    CHL4s1(NZ)=CHL4(NZ,NY,NX)
+    plt_photo%RUBPs1(NZ)=RUBP(NZ,NY,NX)
+    plt_photo%PEPCs1(NZ)=PEPC(NZ,NY,NX)
+    plt_photo%ETMXs1(NZ)=ETMX(NZ,NY,NX)
+    plt_photo%CHLs1(NZ)=CHL(NZ,NY,NX)
+    plt_photo%CHL4s1(NZ)=CHL4(NZ,NY,NX)
     FCO2s1(NZ)=FCO2(NZ,NY,NX)
 
     XRNIs1(NZ)=XRNI(NZ,NY,NX)
@@ -1015,15 +1015,15 @@ implicit none
     XTLIs1(NZ)=XTLI(NZ,NY,NX)
     XDLs1(NZ)=XDL(NZ,NY,NX)
     XPPDs1(NZ)=XPPD(NZ,NY,NX)
-    SLA1s1(NZ)=SLA1(NZ,NY,NX)
-    SSL1s1(NZ)=SSL1(NZ,NY,NX)
-    SNL1s1(NZ)=SNL1(NZ,NY,NX)
+    plt_morph%SLA1s1(NZ)=SLA1(NZ,NY,NX)
+    plt_morph%SSL1s1(NZ)=SSL1(NZ,NY,NX)
+    plt_morph%SNL1s1(NZ)=SNL1(NZ,NY,NX)
     DO  N=1,JLI
-      CLASSs1(N,NZ)=CLASS(N,NZ,NY,NX)
+      plt_morph%CLASSs1(N,NZ)=CLASS(N,NZ,NY,NX)
     ENDDO
     CFIs1(NZ)=CFI(NZ,NY,NX)
-    ANGBRs1(NZ)=ANGBR(NZ,NY,NX)
-    ANGSHs1(NZ)=ANGSH(NZ,NY,NX)
+    plt_morph%ANGBRs1(NZ)=ANGBR(NZ,NY,NX)
+    plt_morph%ANGSHs1(NZ)=ANGSH(NZ,NY,NX)
     STMXs1(NZ)=STMX(NZ,NY,NX)
     SDMXs1(NZ)=SDMX(NZ,NY,NX)
     GRMXs1(NZ)=GRMX(NZ,NY,NX)
@@ -1084,12 +1084,12 @@ implicit none
     CPNDs1(NZ)=CPND(NZ,NY,NX)
 
 !plant properties end
-    ARLFSs1(NZ)=ARLFS(NZ,NY,NX)
+    plt_morph%ARLFSs1(NZ)=ARLFS(NZ,NY,NX)
     plt_rad%RADCs1(NZ)=RADC(NZ,NY,NX)
     FLWCs1(NZ)=FLWC(NZ,NY,NX)
     IYRXs1(NZ)=IYRX(NZ,NY,NX)
     IDAYXs1(NZ)=IDAYX(NZ,NY,NX)
-    RADPs1(NZ)=RADP(NZ,NY,NX)
+    plt_rad%RADPs1(NZ)=RADP(NZ,NY,NX)
     IYRYs1(NZ)=IYRY(NZ,NY,NX)
     PPZs1(NZ)=PPZ(NZ,NY,NX)
     IDAYYs1(NZ)=IDAYY(NZ,NY,NX)
@@ -1133,7 +1133,7 @@ implicit none
   ZCSNCs1=ZCSNC(NY,NX)
   ZZSNCs1=ZZSNC(NY,NX)
   ZPSNCs1=ZPSNC(NY,NX)
-  ARSTCs1=ARSTC(NY,NX)
+  plt_morph%ARSTCs1=ARSTC(NY,NX)
   TSHs1=TSH(NY,NX)
   TVOLWCs1=TVOLWC(NY,NX)
   TNBPs1=TNBP(NY,NX)
@@ -1164,9 +1164,9 @@ implicit none
   FERTs1(1:20)=FERT(1:20,I1,NY,NX)
 
   DO  L=1,JC
-    ARSTTs1(L)=ARSTT(L,NY,NX)
+    plt_morph%ARSTTs1(L)=ARSTT(L,NY,NX)
     WGLFTs1(L)=WGLFT(L,NY,NX)
-    ARLFTs1(L)=ARLFT(L,NY,NX)
+    plt_morph%ARLFTs1(L)=ARLFT(L,NY,NX)
   ENDDO
 
   FWOODs1(:)=FWOOD(:)
@@ -1258,12 +1258,12 @@ implicit none
     O2Ls1(NZ)=O2L(NZ,NY,NX)
     WTRTs1(NZ)=WTRT(NZ,NY,NX)
 
-    CO2Ls1(NZ)=CO2L(NZ,NY,NX)
+    plt_photo%CO2Ls1(NZ)=CO2L(NZ,NY,NX)
     EHVSTs1(1:2,1:4,NZ)=EHVST(1:2,1:4,NZ,I,NY,NX)
 
     IDTHs1(NZ)=IDTH(NZ,NY,NX)
     IYR0s1(NZ)=IYR0(NZ,NY,NX)
-    NNODs1(NZ)=NNOD(NZ,NY,NX)
+    plt_morph%NNODs1(NZ)=NNOD(NZ,NY,NX)
 
     IDTHPs1(NZ)=IDTHP(NZ,NY,NX)
     IDTHRs1(NZ)=IDTHR(NZ,NY,NX)
@@ -1272,7 +1272,7 @@ implicit none
 
     ZEROQs1(NZ)=ZEROQ(NZ,NY,NX)
     SSTXs1(NZ)=SSTX(NZ,NY,NX)
-    FRADPs1(NZ)=FRADP(NZ,NY,NX)
+    plt_rad%FRADPs1(NZ)=FRADP(NZ,NY,NX)
     RNH3Cs1(NZ)=RNH3C(NZ,NY,NX)
     DTKCs1(NZ)=DTKC(NZ,NY,NX)
     ZTYPs1(NZ)=ZTYP(NZ,NY,NX)
@@ -1306,13 +1306,13 @@ implicit none
     TCO2As1(NZ)=TCO2A(NZ,NY,NX)
     CTRANs1(NZ)=CTRAN(NZ,NY,NX)
 
-    NBTs1(NZ)=NBT(NZ,NY,NX)
+    plt_morph%NBTs1(NZ)=NBT(NZ,NY,NX)
     NGs1(NZ)=NG(NZ,NY,NX)
     IFLGIs1(NZ)=IFLGI(NZ,NY,NX)
-    NIXs1(NZ)=NIX(NZ,NY,NX)
-    NRTs1(NZ)=NRT(NZ,NY,NX)
-    NB1s1(NZ)=NB1(NZ,NY,NX)
-    NBRs1(NZ)=NBR(NZ,NY,NX)
+    plt_morph%NIXs1(NZ)=NIX(NZ,NY,NX)
+    plt_morph%NRTs1(NZ)=NRT(NZ,NY,NX)
+    plt_morph%NB1s1(NZ)=NB1(NZ,NY,NX)
+    plt_morph%NBRs1(NZ)=NBR(NZ,NY,NX)
 
     IFLGCs1(NZ)=IFLGC(NZ,NY,NX)
     IDAY0s1(NZ)=IDAY0(NZ,NY,NX)
@@ -1324,13 +1324,13 @@ implicit none
     IHVSTs1(NZ)=IHVST(NZ,I,NY,NX)
     JHVSTs1(NZ)=JHVST(NZ,I,NY,NX)
     THINs1(NZ)=THIN(NZ,I,NY,NX)
-    ARSTPs1(NZ)=ARSTP(NZ,NY,NX)
-    ARLFPs1(NZ)=ARLFP(NZ,NY,NX)
+    plt_morph%ARSTPs1(NZ)=ARSTP(NZ,NY,NX)
+    plt_morph%ARLFPs1(NZ)=ARLFP(NZ,NY,NX)
     BALCs1(NZ)=BALC(NZ,NY,NX)
     BALNs1(NZ)=BALN(NZ,NY,NX)
     BALPs1(NZ)=BALP(NZ,NY,NX)
-    O2Is1(NZ)=O2I(NZ,NY,NX)
-    CO2Is1(NZ)=CO2I(NZ,NY,NX)
+    plt_photo%O2Is1(NZ)=O2I(NZ,NY,NX)
+    plt_photo%CO2Is1(NZ)=CO2I(NZ,NY,NX)
     CCPOLPs1(NZ)=CCPOLP(NZ,NY,NX)
     CPOOLPs1(NZ)=CPOOLP(NZ,NY,NX)
     CPOLNPs1(NZ)=CPOLNP(NZ,NY,NX)
@@ -1358,7 +1358,7 @@ implicit none
     HZUPTKs1(NZ)=HZUPTK(NZ,NY,NX)
     HPUPTKs1(NZ)=HPUPTK(NZ,NY,NX)
     HTSTZs1(NZ)=HTSTZ(NZ,NY,NX)
-    NIs1(NZ)=NI(NZ,NY,NX)
+    plt_morph%NIs1(NZ)=NI(NZ,NY,NX)
     RAs1(NZ)=RA(NZ,NY,NX)
     RCs1(NZ)=RC(NZ,NY,NX)
     TKCs1(NZ)=TKC(NZ,NY,NX)
@@ -1387,11 +1387,11 @@ implicit none
     RSETPs1(NZ)=RSETP(NZ,NY,NX)
     RAZs1(NZ)=RAZ(NZ,NY,NX)
     SCO2s1(NZ)=SCO2(NZ,NY,NX)
-    SDPTHs1(NZ)=SDPTH(NZ,NY,NX)
-    SDPTHIs1(NZ)=SDPTHI(NZ,NY,NX)
-    SDLGs1(NZ)=SDLG(NZ,NY,NX)
-    SDVLs1(NZ)=SDVL(NZ,NY,NX)
-    SDARs1(NZ)=SDAR(NZ,NY,NX)
+    plt_morph%SDPTHs1(NZ)=SDPTH(NZ,NY,NX)
+    plt_morph%SDPTHIs1(NZ)=SDPTHI(NZ,NY,NX)
+    plt_morph%SDLGs1(NZ)=SDLG(NZ,NY,NX)
+    plt_morph%SDVLs1(NZ)=SDVL(NZ,NY,NX)
+    plt_morph%SDARs1(NZ)=SDAR(NZ,NY,NX)
     TCZs1(NZ)=TCZ(NZ,NY,NX)
     TCGs1(NZ)=TCG(NZ,NY,NX)
     TCXs1(NZ)=TCX(NZ,NY,NX)
@@ -1404,8 +1404,8 @@ implicit none
     TZSNCs1(NZ)=TZSNC(NZ,NY,NX)
     TPSNCs1(NZ)=TPSNC(NZ,NY,NX)
     TCO2Ts1(NZ)=TCO2T(NZ,NY,NX)
-    XKCO2Ls1(NZ)=XKCO2L(NZ,NY,NX)
-    XKCO2Os1(NZ)=XKCO2O(NZ,NY,NX)
+    plt_photo%XKCO2Ls1(NZ)=XKCO2L(NZ,NY,NX)
+    plt_photo%XKCO2Os1(NZ)=XKCO2O(NZ,NY,NX)
     TCUPTKs1(NZ)=TCUPTK(NZ,NY,NX)
     THVSTCs1(NZ)=THVSTC(NZ,NY,NX)
     TNH3Cs1(NZ)=TNH3C(NZ,NY,NX)
@@ -1467,9 +1467,11 @@ implicit none
     ENDDO
 
     DO NB=1,NBR(NZ,NY,NX)
+      plt_photo%FDBKs1(NB,NZ)=FDBK(NB,NZ,NY,NX)
+      plt_photo%FDBKXs1(NB,NZ)=FDBKX(NB,NZ,NY,NX)
       ATRPs1(NB,NZ)=ATRP(NB,NZ,NY,NX)
-      ARLFZs1(NB,NZ)=ARLFZ(NB,NZ,NY,NX)
-      ARLFBs1(NB,NZ)=ARLFB(NB,NZ,NY,NX)
+      plt_morph%ARLFZs1(NB,NZ)=ARLFZ(NB,NZ,NY,NX)
+      plt_morph%ARLFBs1(NB,NZ)=ARLFB(NB,NZ,NY,NX)
       CPOOLs1(NB,NZ)=CPOOL(NB,NZ,NY,NX)
       CPOLNBs1(NB,NZ)=CPOLNB(NB,NZ,NY,NX)
       CCPOLBs1(NB,NZ)=CCPOLB(NB,NZ,NY,NX)
@@ -1478,16 +1480,14 @@ implicit none
       DGSTGIs1(NB,NZ)=DGSTGI(NB,NZ,NY,NX)
       DGSTGFs1(NB,NZ)=DGSTGF(NB,NZ,NY,NX)
       FLG4s1(NB,NZ)=FLG4(NB,NZ,NY,NX)
-      FDBKs1(NB,NZ)=FDBK(NB,NZ,NY,NX)
-      FDBKXs1(NB,NZ)=FDBKX(NB,NZ,NY,NX)
       FLGZs1(NB,NZ)=FLGZ(NB,NZ,NY,NX)
       GROUPs1(NB,NZ)=GROUP(NB,NZ,NY,NX)
       GSTGIs1(NB,NZ)=GSTGI(NB,NZ,NY,NX)
       GSTGFs1(NB,NZ)=GSTGF(NB,NZ,NY,NX)
-      GRNXBs1(NB,NZ)=GRNXB(NB,NZ,NY,NX)
-      GRNOBs1(NB,NZ)=GRNOB(NB,NZ,NY,NX)
+      plt_morph%GRNXBs1(NB,NZ)=GRNXB(NB,NZ,NY,NX)
+      plt_morph%GRNOBs1(NB,NZ)=GRNOB(NB,NZ,NY,NX)
       GRWTBs1(NB,NZ)=GRWTB(NB,NZ,NY,NX)
-      HTSHEXs1(NB,NZ)=HTSHEX(NB,NZ,NY,NX)
+      plt_morph%HTSHEXs1(NB,NZ)=HTSHEX(NB,NZ,NY,NX)
       IDTHBs1(NB,NZ)=IDTHB(NB,NZ,NY,NX)
       IFLGPs1(NB,NZ)=IFLGP(NB,NZ,NY,NX)
       IFLGFs1(NB,NZ)=IFLGF(NB,NZ,NY,NX)
@@ -1498,10 +1498,10 @@ implicit none
       IFLGQs1(NB,NZ)=IFLGQ(NB,NZ,NY,NX)
       KVSTGs1(NB,NZ)=KVSTG(NB,NZ,NY,NX)
       KVSTGNs1(NB,NZ)=KVSTGN(NB,NZ,NY,NX)
-      NBTBs1(NB,NZ)=NBTB(NB,NZ,NY,NX)
-      PSTGs1(NB,NZ)=PSTG(NB,NZ,NY,NX)
-      PSTGIs1(NB,NZ)=PSTGI(NB,NZ,NY,NX)
-      PSTGFs1(NB,NZ)=PSTGF(NB,NZ,NY,NX)
+      plt_morph%NBTBs1(NB,NZ)=NBTB(NB,NZ,NY,NX)
+      plt_morph%PSTGs1(NB,NZ)=PSTG(NB,NZ,NY,NX)
+      plt_morph%PSTGIs1(NB,NZ)=PSTGI(NB,NZ,NY,NX)
+      plt_morph%PSTGFs1(NB,NZ)=PSTGF(NB,NZ,NY,NX)
       PPOOLs1(NB,NZ)=PPOOL(NB,NZ,NY,NX)
       PPOLNBs1(NB,NZ)=PPOLNB(NB,NZ,NY,NX)
       RCCLXs1(NB,NZ)=RCCLX(NB,NZ,NY,NX)
@@ -1566,7 +1566,7 @@ implicit none
       DO K=1,JNODS
         DO  L=1,JC
           DO N=1,JLI
-            SURFs1(N,L,K,NB,NZ)=SURF(N,L,K,NB,NZ,NY,NX)
+            plt_morph%SURFs1(N,L,K,NB,NZ)=SURF(N,L,K,NB,NZ,NY,NX)
             SURFXs1(N,L,K,NB,NZ)=SURFX(N,L,K,NB,NZ,NY,NX)
           ENDDO
         ENDDO
@@ -1586,10 +1586,10 @@ implicit none
         VGRO4s1(K,NB,NZ)=VGRO4(K,NB,NZ,NY,NX)
       ENDDO
       DO K=0,JNODS
-        ARLF1s1(K,NB,NZ)=ARLF(K,NB,NZ,NY,NX)
-        HTNODXs1(K,NB,NZ)=HTNODX(K,NB,NZ,NY,NX)
-        HTSHEs1(K,NB,NZ)=HTSHE(K,NB,NZ,NY,NX)
-        HTNODEs1(K,NB,NZ)=HTNODE(K,NB,NZ,NY,NX)
+        plt_morph%ARLF1s1(K,NB,NZ)=ARLF(K,NB,NZ,NY,NX)
+        plt_morph%HTNODXs1(K,NB,NZ)=HTNODX(K,NB,NZ,NY,NX)
+        plt_morph%HTSHEs1(K,NB,NZ)=HTSHE(K,NB,NZ,NY,NX)
+        plt_morph%HTNODEs1(K,NB,NZ)=HTNODE(K,NB,NZ,NY,NX)
         WGNODEs1(K,NB,NZ)=WGNODE(K,NB,NZ,NY,NX)
         WGNODNs1(K,NB,NZ)=WGNODN(K,NB,NZ,NY,NX)
         WGNODPs1(K,NB,NZ)=WGNODP(K,NB,NZ,NY,NX)
@@ -1605,14 +1605,14 @@ implicit none
 
       DO K=0,JNODS
         DO  L=1,JC
-          ARLFLs1(L,K,NB,NZ)=ARLFL(L,K,NB,NZ,NY,NX)
+          plt_morph%ARLFLs1(L,K,NB,NZ)=ARLFL(L,K,NB,NZ,NY,NX)
           WGLFLs1(L,K,NB,NZ)=WGLFL(L,K,NB,NZ,NY,NX)
           WGLFLNs1(L,K,NB,NZ)=WGLFLN(L,K,NB,NZ,NY,NX)
           WGLFLPs1(L,K,NB,NZ)=WGLFLP(L,K,NB,NZ,NY,NX)
         ENDDO
       ENDDO
       DO  L=1,JC
-        ARSTKs1(L,NB,NZ)=ARSTK(L,NB,NZ,NY,NX)
+        plt_morph%ARSTKs1(L,NB,NZ)=ARSTK(L,NB,NZ,NY,NX)
       ENDDO
     enddo
 
@@ -1723,8 +1723,8 @@ implicit none
       ZPOOLNs1(L,NZ)=ZPOOLN(L,NZ,NY,NX)
     ENDDO
     DO L=1,JC
-      ARSTVs1(L,NZ)=ARSTV(L,NZ,NY,NX)
-      ARLFVs1(L,NZ)=ARLFV(L,NZ,NY,NX)
+      plt_morph%ARSTVs1(L,NZ)=ARSTV(L,NZ,NY,NX)
+      plt_morph%ARLFVs1(L,NZ)=ARLFV(L,NZ,NY,NX)
       WGLFVs1(L,NZ)=WGLFV(L,NZ,NY,NX)
     ENDDO
     DO N=1,MY(NZ,NY,NX)
@@ -1740,7 +1740,7 @@ implicit none
     ENDDO
 
     DO NR=1,NRT(NZ,NY,NX)
-      NINRs1(NR,NZ)=NINR(NR,NZ,NY,NX)
+      plt_morph%NINRs1(NR,NZ)=NINR(NR,NZ,NY,NX)
       DO L=1,NJ(NY,NX)
         DO N=1,MY(NZ,NY,NX)
           RTLG1s1(N,L,NR,NZ)=RTLG1(N,L,NR,NZ,NY,NX)
@@ -1805,25 +1805,23 @@ implicit none
   IETYPs1=IETYP(NY,NX)
   NPs1=NP(NY,NX)
   NUs1=NU(NY,NX)
-  ARSTCs1=ARSTC(NY,NX)
-  ARLFCs1=ARLFC(NY,NX)
+  plt_morph%ARSTCs1=ARSTC(NY,NX)
+  plt_morph%ARLFCs1=ARLFC(NY,NX)
   ZEROSs1=ZEROS(NY,NX)
   ZEROs1=ZERO
   DPTHSs1=DPTHS(NY,NX)
   TKAs1=TKA(NY,NX)
-  ZTs1=ZT(NY,NX)
+  plt_morph%ZTs1=ZT(NY,NX)
   Z0s1=Z0(NY,NX)
   ZDs1=ZD(NY,NX)
   UAs1=UA(NY,NX)
   VHCPWXs1=VHCPWX(NY,NX)
   VHCPW1s1=VHCPW(1,NY,NX)
-  ZLs1(0)=ZL(0,NY,NX)
-  print*,size(plt_rad%TAUSs1(:)),JC
+  plt_morph%ZLs1(0)=ZL(0,NY,NX)
   DO L=1,JC
-    ARSTTs1(L)=ARSTT(L,NY,NX)
-    ARLFTs1(L)=ARLFT(L,NY,NX)
-    ZLs1(L)=ZL(L,NY,NX)
-    print*,TAUS(L,NY,NX)
+    plt_morph%ARSTTs1(L)=ARSTT(L,NY,NX)
+    plt_morph%ARLFTs1(L)=ARLFT(L,NY,NX)
+    plt_morph%ZLs1(L)=ZL(L,NY,NX)
     plt_rad%TAUSs1(L)=TAUS(L,NY,NX)
   ENDDO
   plt_rad%TAUSs1(JC+1)=TAUS(JC+1,NY,NX)
@@ -1834,12 +1832,12 @@ implicit none
     VOLYs1(L)=VOLY(L,NY,NX)
     VOLWs1(L)=VOLW(L,NY,NX)
   ENDDO
-  SSINs1=SSIN(NY,NX)
+  plt_rad%SSINs1=SSIN(NY,NX)
   ZNOONs1=ZNOON(NY,NX)
+  plt_morph%ARLSSs1=ARLSS(NY,NX)
   plt_rad%GAZIs1=GAZI(NY,NX)
   plt_rad%GCOSs1=GCOS(NY,NX)
   plt_rad%GSINs1=GSIN(NY,NX)
-  ARLSSs1=ARLSS(NY,NX)
   plt_rad%RADYs1=RADY(NY,NX)
   plt_rad%RAPYs1=RAPY(NY,NX)
   plt_rad%RADSs1=RADS(NY,NX)
@@ -1854,36 +1852,36 @@ implicit none
   ZEROS2s1=ZEROS2(NY,NX)
   POROS1s1=POROS(NU(NY,NX),NY,NX)
   DO NZ=1,NP(NY,NX)
-    ARLFPs1(NZ)=ARLFP(NZ,NY,NX)
+    plt_morph%ARLFPs1(NZ)=ARLFP(NZ,NY,NX)
     ZCs1(NZ)=ZC(NZ,NY,NX)
     CFXs1(NZ)=CFX(NZ,NY,NX)
-    ABSRs1(NZ)=ABSR(NZ,NY,NX)
-    ABSPs1(NZ)=ABSP(NZ,NY,NX)
-    TAURs1(NZ)=TAUR(NZ,NY,NX)
+    plt_rad%ABSRs1(NZ)=ABSR(NZ,NY,NX)
+    plt_rad%ABSPs1(NZ)=ABSP(NZ,NY,NX)
+    plt_rad%TAURs1(NZ)=TAUR(NZ,NY,NX)
     plt_rad%ALBRs1(NZ)=ALBR(NZ,NY,NX)
-    TAUPs1(NZ)=TAUP(NZ,NY,NX)
+    plt_rad%TAUPs1(NZ)=TAUP(NZ,NY,NX)
     plt_rad%ALBPs1(NZ)=ALBP(NZ,NY,NX)
-    NBRs1(NZ)=NBR(NZ,NY,NX)
+    plt_morph%NBRs1(NZ)=NBR(NZ,NY,NX)
     CFs1(NZ)=CF(NZ,NY,NX)
     DO NB=1,NBR(NZ,NY,NX)
       DO K=0,JNODS
         DO  L=1,JC
-          ARLFLs1(L,K,NB,NZ)=ARLFL(L,K,NB,NZ,NY,NX)
+          plt_morph%ARLFLs1(L,K,NB,NZ)=ARLFL(L,K,NB,NZ,NY,NX)
         ENDDO
       ENDDO
       DO  L=1,JC
-        ARSTKs1(L,NB,NZ)=ARSTK(L,NB,NZ,NY,NX)
+        plt_morph%ARSTKs1(L,NB,NZ)=ARSTK(L,NB,NZ,NY,NX)
       ENDDO
       DO K=1,JNODS
         DO  L=1,JC
           DO N=1,JLI
-            SURFs1(N,L,K,NB,NZ)=SURF(N,L,K,NB,NZ,NY,NX)
+            plt_morph%SURFs1(N,L,K,NB,NZ)=SURF(N,L,K,NB,NZ,NY,NX)
           ENDDO
         ENDDO
       ENDDO
       DO  L=1,JC
         DO N=1,JLI
-          SURFBs1(N,L,NB,NZ)=SURFB(N,L,NB,NZ,NY,NX)
+          plt_morph%SURFBs1(N,L,NB,NZ)=SURFB(N,L,NB,NZ,NY,NX)
         ENDDO
       ENDDO
     ENDDO
@@ -1892,7 +1890,7 @@ implicit none
     plt_rad%OMEGAGs1(N)=OMEGAG(N,NY,NX)
   ENDDO
   DO N=1,JLI
-    ZCOSs1(N)=ZCOS(N)
+    plt_rad%ZCOSs1(N)=ZCOS(N)
     plt_rad%ZSINs1(N)=ZSIN(N)
   ENDDO
   DO NN=1,JLA
@@ -1920,7 +1918,7 @@ implicit none
   ZR(NY,NX)=ZRs1
   RAB(NY,NX)=RABs1
   RIB(NY,NX)=RIBs1
-  ZT(NY,NX)=ZTs1
+  ZT(NY,NX)=plt_morph%ZTs1
   RADS(NY,NX)=plt_rad%RADSs1
   RADY(NY,NX)=plt_rad%RADYs1
   RAPS(NY,NX)=plt_rad%RAPSs1
@@ -1930,19 +1928,19 @@ implicit none
   RAD(NY,NX)=plt_rad%RAD0s1
   RAP(NY,NX)=plt_rad%RAP0s1
   DO L=0,JC
-    ZL(L,NY,NX)=ZLs1(L)
+    ZL(L,NY,NX)=plt_morph%ZLs1(L)
   ENDDO
   DO L=1,JC
     TAUS(L,NY,NX)=plt_rad%TAUSs1(L)
     TAU0(L,NY,NX)=plt_rad%TAU0s1(L)
   ENDDO
-  ARLSS(NY,NX)=ARLSSs1
+  ARLSS(NY,NX)=plt_morph%ARLSSs1
   DO NZ=1,NP(NY,NX)
-    ARLFS(NZ,NY,NX)=ARLFSs1(NZ)
+    ARLFS(NZ,NY,NX)=plt_morph%ARLFSs1(NZ)
     RADC(NZ,NY,NX)=plt_rad%RADCs1(NZ)
-    RADP(NZ,NY,NX)=RADPs1(NZ)
+    RADP(NZ,NY,NX)=plt_rad%RADPs1(NZ)
     CFX(NZ,NY,NX)=CFXs1(NZ)
-    FRADP(NZ,NY,NX)=FRADPs1(NZ)
+    FRADP(NZ,NY,NX)=plt_rad%FRADPs1(NZ)
 
     DO L=1,JC
       DO M=1,JSA

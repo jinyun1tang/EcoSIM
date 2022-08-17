@@ -43,6 +43,11 @@ module CanopyCondsMod
   real(r8) :: ZX,ZY,ZE
   REAL(R8) :: ZZ
 !     begin_execution
+  associate(                          &
+    ZTs1      => plt_morph%ZTs1     , &
+    ARSTCs1   => plt_morph%ARSTCs1  , &
+    ARLFCs1   => plt_morph%ARLFCs1    &
+  )
 !     CANOPY ZERO PLANE AND ROUGHNESS HEIGHTS
 !
 !     ARLFC,ARSTC=leaf,stalk area of combined canopy
@@ -84,8 +89,9 @@ module CanopyCondsMod
     RIBs1=1.27E+08*(ZZ-ZRs1)/(UAs1**2*TKAs1)
   ELSE
     RABs1=RAM
-    RIBs1=0.0
+    RIBs1=0.0_r8
   ENDIF
+  end associate
   end subroutine CalcBoundaryLayerProperties
 
 !------------------------------------------------------------------------------------------
@@ -99,6 +105,14 @@ module CanopyCondsMod
   real(r8) :: DZL
   integer :: NZ,L
   !     begin_execution
+  associate(                          &
+    ZTs1      => plt_morph%ZTs1     , &
+    ZLs1      => plt_morph%ZLs1     , &
+    ARSTTs1   => plt_morph%ARSTTs1  , &
+    ARLFTs1   => plt_morph%ARLFTs1  , &
+    ARSTCs1   => plt_morph%ARSTCs1  , &
+    ARLFCs1   => plt_morph%ARLFCs1    &
+  )
   !
   !     DIVISION OF CANOPY INTO JC LAYERS WITH EQUAL LAI
   !
@@ -139,6 +153,7 @@ module CanopyCondsMod
 !    2,ZLs1(L-1)))
 2770  CONTINUE
   ENDIF
+  end associate
   end subroutine DivideCanopyLayerByLAI
 
 !------------------------------------------------------------------------------------------
@@ -227,6 +242,7 @@ module CanopyCondsMod
     GSINs1  => plt_rad%GSINs1  , &
     IALBYs1 => plt_rad%IALBYs1 , &
     OMEGAs1 => plt_rad%OMEGAs1 , &
+    FRADPs1 => plt_rad%FRADPs1 , &
     OMEGAGs1=> plt_rad%OMEGAGs1, &
     OMEGXs1 => plt_rad%OMEGXs1 , &
     RAD0s1  => plt_rad%RAD0s1  , &
@@ -238,10 +254,26 @@ module CanopyCondsMod
     RAPSs1  => plt_rad%RAPSs1  , &
     RADYs1  => plt_rad%RADYs1  , &
     RAD1s1  => plt_rad%RAD1s1  , &
+    SSINs1  => plt_rad%SSINs1  , &
     TYSINs1 => plt_rad%TYSINs1 , &
     TAU0s1  => plt_rad%TAU0s1  , &
     TAUSs1  => plt_rad%TAUSs1  , &
-    ZSINs1  => plt_rad%ZSINs1    &
+    ZSINs1  => plt_rad%ZSINs1  , &
+    ABSPs1  => plt_rad%ABSPs1  , &
+    ABSRs1  => plt_rad%ABSRs1  , &
+    TAUPs1  => plt_rad%TAUPs1  , &
+    TAURs1  => plt_rad%TAURs1  , &
+    RADPs1  => plt_rad%RADPs1  , &
+    ZCOSs1  => plt_rad%ZCOSs1  , &
+    ZLs1    => plt_morph%ZLs1  , &
+    NBRs1   => plt_morph%NBRs1 , &
+    SURFs1  => plt_morph%SURFs1  , &
+    SURFBs1 => plt_morph%SURFBs1 , &
+    ARLFPs1 => plt_morph%ARLFPs1 , &
+    ARLFLs1 => plt_morph%ARLFLs1 , &
+    ARSTKs1 => plt_morph%ARSTKs1 , &
+    ARLFSs1 => plt_morph%ARLFSs1 , &
+    ARLSSs1 => plt_morph%ARLSSs1   &
   )
   ARLSSs1=0.0
   DO 1135 NZ=1,NPs1
@@ -266,15 +298,15 @@ module CanopyCondsMod
     RAD0s1=RADSs1*SSINs1+RADYs1*TYSINs1
     RAP0s1=RAPSs1*SSINs1+RAPYs1*TYSINs1
   ELSE
-    RADSs1=0.0
-    RADYs1=0.0
-    RAPSs1=0.0
-    RAPYs1=0.0
-    RAD0s1=0.0
-    RAP0s1=0.0
+    RADSs1=0.0_r8
+    RADYs1=0.0_r8
+    RAPSs1=0.0_r8
+    RAPYs1=0.0_r8
+    RAD0s1=0.0_r8
+    RAP0s1=0.0_r8
   ENDIF
-  TRADC=0.0
-  TRAPC=0.0
+  TRADC=0.0_r8
+  TRAPC=0.0_r8
   DO 1025 NZ=1,NPs1
     RADCs1(NZ)=0.0
     RADPs1(NZ)=0.0

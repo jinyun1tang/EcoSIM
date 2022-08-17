@@ -50,7 +50,14 @@ module UptakesMod
   real(r8) :: FDMP
   integer :: ILYR(2,JZ1)
 !     begin_execution
-
+  associate(                         &
+    ARLFCs1  => plt_morph%ARLFCs1  , &
+    ARLSSs1  => plt_morph%ARLSSs1  , &
+    ARLFSs1  => plt_morph%ARLFSs1  , &
+    SDPTHs1  => plt_morph%SDPTHs1  , &
+    NB1s1    => plt_morph%NB1s1    , &
+    FRADPs1  => plt_rad%FRADPs1      &
+  )
 
   call PrepUptake(PSIST1,WTRTG,VOLPU,VOLWU)
 !
@@ -159,6 +166,7 @@ module UptakesMod
     ENDIF
   ENDDO
   RETURN
+  end associate
   END subroutine uptakes
 !------------------------------------------------------------------------
 
@@ -171,6 +179,8 @@ module UptakesMod
   real(r8) :: ARLSC
 
   associate(                         &
+    ARSTPs1  => plt_morph%ARSTPs1  , &
+    ARLFPs1  => plt_morph%ARLFPs1  , &
     RAD1s1   => plt_rad%RAD1s1     , &
     THRM1s1  => plt_rad%THRM1s1      &
   )
@@ -267,6 +277,16 @@ module UptakesMod
   real(r8) :: ALFZ
   real(r8) :: TFRADP,RACZ(JP1)
   integer :: NB,K,L,N,NZZ
+
+  associate(                          &
+    FRADPs1  =>  plt_rad%FRADPs1    , &
+    ARLF1s1  =>  plt_morph%ARLF1s1  , &
+    KLEAFXs1 =>  plt_morph%KLEAFXs1 , &
+    ARLFSs1  =>  plt_morph%ARLFSs1  , &
+    NBRs1    =>  plt_morph%NBRs1    , &
+    SURFs1   =>  plt_morph%SURFs1   , &
+    ZTs1     =>  plt_morph%ZTs1       &
+  )
 !
 !     APPLY CLUMPING FACTOR TO LEAF SURFACE AREA DEFINED BY
 !     INCLINATION N, LAYER L, NODE K, BRANCH NB, SPECIES NZ,
@@ -341,6 +361,7 @@ module UptakesMod
 !     DTKC=TKC-TKA from previous hour
 !
   TKCZs1(NZ)=TKAs1+DTKCs1(NZ)
+  end associate
   end subroutine UpdateCanopyProperty
 !------------------------------------------------------------------------
   subroutine UpdateRootProperty(NZ,PATH,RRADL,WTRTG,FPQ,FPP,FRTDPX,RTARR)
@@ -355,6 +376,12 @@ module UptakesMod
   real(r8), intent(out) :: FRTDPX(JZ1,JP1),RTARR(2,JZ1)
   real(r8) :: RTDPZ,RTDPX
   integer :: N,L,NR
+
+  associate(                       &
+    NRTs1  =>  plt_morph%NRTs1   , &
+    SDPTHs1 =>  plt_morph%SDPTHs1, &
+    NIs1   =>  plt_morph%NIs1      &
+  )
 !     RTDPZ,RTDP1=primary root depth
 !     FRTDPX=fraction of each soil layer with primary root
 !     DLYR=layer thickness
@@ -411,6 +438,7 @@ module UptakesMod
       ENDIF
     enddo
 2000  CONTINUE
+  end associate
   end subroutine UpdateRootProperty
 !------------------------------------------------------------------------
 
@@ -429,6 +457,8 @@ module UptakesMod
   integer :: N,L
 ! begin_execution
   associate(                         &
+   NIs1      => plt_morph%NIs1     , &
+   FRADPs1    =>  plt_rad%FRADPs1  , &
    RAD1s1    => plt_rad%RAD1s1     , &
    THRM1s1   => plt_rad%THRM1s1      &
   )
@@ -512,9 +542,11 @@ module UptakesMod
 !     begin_execution
 
   associate(                          &
+    NIs1       => plt_morph%NIs1    , &
     RAD1s1     => plt_rad%RAD1s1    , &
     RADCs1     => plt_rad%RADCs1    , &
     THSs1      => plt_rad%THSs1     , &
+    FRADPs1    =>  plt_rad%FRADPs1  , &
     THRM1s1    => plt_rad%THRM1s1   , &
     THRMGXs1   => plt_rad%THRMGXs1    &
   )
@@ -784,6 +816,9 @@ module UptakesMod
   real(r8) :: FRADW,FRAD1,FRAD2
   real(r8) :: RSSL,RTAR2
   integer :: N, L
+  associate(                        &
+    NIs1     =>  plt_morph%NIs1     &
+  )
 
   !     GRAVIMETRIC WATER POTENTIAL FROM CANOPY HEIGHT
   !
@@ -883,19 +918,11 @@ module UptakesMod
         RSRT(N,L)=RSRG(N,L)+RSR1(N,L)+RSR2(N,L)
         RSRS(N,L)=RSSX(N,L)+RSRT(N,L)
         CNDT=CNDT+1.0/RSRS(N,L)
-      !     IF(NZ.EQ.1.OR.NZ.EQ.4)THEN
-      !     WRITE(*,8855)'RSRT',I,J,NX,NY,NZ,L,N,RSRT(N,L),RSRG(N,L)
-      !    2,RSR1(N,L),RSR2(N,L),RSSX(N,L),RSRS(N,L),DPTHZs1(L)
-      !    3,HTSTZs1(NZ),RSRAs1(1,NZ)*HTSTZs1(NZ)
-      !    4/(FRADW*AMAX1(PPs1(NZ),RTN1s1(1,L,NZ)))
-      !    4,RTNLs1(N,L,NZ),RTLGPs1(N,L,NZ)
-      !    7,RTLGAs1(N,L,NZ),FRAD1,PPs1(NZ)
-      !    8,RTN1s1(1,L,NZ),FRADW,RTNLs1(N,L,NZ),CNDT
-    !8855  FORMAT(A8,7I4,30E14.6)
-      !     ENDIF
+
       ENDIF
     enddo
 3890  CONTINUE
+  end associate
   end subroutine CalcResistance
 !------------------------------------------------------------------------
 
@@ -913,6 +940,8 @@ module UptakesMod
 
 ! begin_execution
   associate(                        &
+    NIs1     =>  plt_morph%NIs1   , &
+    FRADPs1  =>  plt_rad%FRADPs1  , &
     THRM1s1  =>  plt_rad%THRM1s1  , &
     RAD1s1   =>  plt_rad%RAD1s1     &
   )
@@ -972,6 +1001,9 @@ module UptakesMod
   real(r8) :: FDMR
   real(r8) :: OSWT
   integer :: N,L
+  associate(                          &
+    NIs1       => plt_morph%NIs1      &
+  )
   !
   !     CANOPY SURFACE WATER STORAGE, SENSIBLE AND STORAGE HEAT FLUXES
   !     (NOT EXPLICITLY CALCULATED IN CONVERGENCE SOLUTION)
@@ -1020,14 +1052,9 @@ module UptakesMod
           -RGAS*TKSs1(L)*FDMR*CCPOLT/OSWT
         PSIRGs1(N,L,NZ)=AMAX1(0.0,PSIRTs1(N,L,NZ)-PSIROs1(N,L,NZ))
       ENDIF
-!     IF(I.EQ.284)THEN
-!     WRITE(*,1256)'PSIRT',I,J,NX,NY,NZ,NN,PSIRTs1(N,L,NZ)
-!    2,PSIST1(L),RSRT(N,L),PSILTs1(NZ),RSSX(N,L),RSRS(N,L)
-!    3,RSRG(N,L),RSR1(N,L),RSR2(N,L),RTAR2,VOLWMs1(NPH,L)
-!1256  FORMAT(A8,6I4,20E12.4)
-!     ENDIF
 4510  CONTINUE
 4505  CONTINUE
+  end associate
   end subroutine UpdateCanopyWater
 !------------------------------------------------------------------------
 
@@ -1037,6 +1064,10 @@ module UptakesMod
   integer, intent(in) :: NZ
   real(r8) :: ACTV,RTK,STK,TKGO,TKSO
   integer :: L
+  associate(                          &
+    NIs1     =>  plt_morph%NIs1     , &
+    NB1s1    =>  plt_morph%NB1s1      &
+  )
   !
   !     SET CANOPY GROWTH TEMPERATURE FROM SOIL SURFACE
   !     OR CANOPY TEMPERATURE DEPENDING ON GROWTH STAGE
@@ -1086,6 +1117,7 @@ module UptakesMod
   ELSE
     CHILLs1(NZ)=AMAX1(0.0,CHILLs1(NZ)-1.0)
   ENDIF
+  end associate
   end subroutine SetCanopyGrowthFuncs
 !------------------------------------------------------------------------
 
@@ -1099,6 +1131,13 @@ module UptakesMod
   real(r8) :: SNH3P
   real(r8) :: ZPOOLB
   integer :: NB
+
+  associate(                            &
+    ARLFBs1   =>  plt_morph%ARLFBs1   , &
+    NBRs1     =>  plt_morph%NBRs1     , &
+    FRADPs1   =>  plt_rad%FRADPs1     , &
+    ARLFPs1   =>  plt_morph%ARLFPs1     &
+  )
   !
   !     NH3 EXCHANGE BETWEEN CANOPY AND ATMOSPHERE FROM NH3
   !     CONCENTRATION DIFFERENCES 'CNH3E' (ATMOSPHERE FROM 'READS') AND
@@ -1123,13 +1162,13 @@ module UptakesMod
       CNH3P=AMAX1(0.0,FNH3P*CZPOLBs1(NB,NZ)/SNH3P)
       ZPOOLB=AMAX1(0.0,ZPOOLs1(NB,NZ))
       RNH3Bs1(NB,NZ)=AMIN1(0.1*ZPOOLB,AMAX1((CNH3Es1-CNH3P)/(RAs1(NZ)+RCs1(NZ)) &
-      *FRADPs1(NZ)*AREA3s1(NUs1) &
-      *ARLFBs1(NB,NZ)/ARLFPs1(NZ),-0.1*ZPOOLB))
+      *FRADPs1(NZ)*AREA3s1(NUs1)*ARLFBs1(NB,NZ)/ARLFPs1(NZ),-0.1*ZPOOLB))
       ELSE
       RNH3Bs1(NB,NZ)=0.0_r8
       ENDIF
 
 105   CONTINUE
+  end associate
   end subroutine CanopyNH3Flux
 !------------------------------------------------------------------------
 
@@ -2323,7 +2362,9 @@ module UptakesMod
   real(r8) :: ZH3PA,ZH3PB,ZH3GA,ZH3GB,Z2OPX,ZH3PX
 
 !     begin_execution
-
+  associate(                        &
+    NB1s1    =>  plt_morph%NB1s1    &
+  )
   IF(RCO2Ms1(N,L,NZ).GT.ZEROPs1(NZ) &
     .AND.RTVLWs1(N,L,NZ).GT.ZEROPs1(NZ) &
     .AND.FOXYX.GT.ZEROQs1(NZ))THEN
@@ -2959,6 +3000,7 @@ module UptakesMod
       WFRs1(N,L,NZ)=1.0
     ENDIF
   ENDIF
+  end associate
   end subroutine RootSoilGasExchange
 !------------------------------------------------------------------------------------------
 
@@ -2974,7 +3016,9 @@ module UptakesMod
   real(r8) :: FCUP,FZUP,FPUP,FWSRT,UPWTRP,UPWTRH,FOXYX,RUPOXT
   integer :: N,L
 !     begin_execution
-
+  associate(                       &
+    NIs1    =>  plt_morph%NIs1     &
+  )
   DO 955 N=1,MYs1(NZ)
     DO 950 L=NUs1,NIs1(NZ)
       IF(VOLXs1(L).GT.ZEROS2s1 &
@@ -3036,6 +3080,7 @@ module UptakesMod
 
 950 CONTINUE
 955 CONTINUE
+  end associate
   end subroutine RootMycoO2NutrientUptake
 
 end module UptakesMod
