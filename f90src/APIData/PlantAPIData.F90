@@ -146,16 +146,9 @@ implicit none
   real(r8), allocatable :: CPGRs1(:)     !grain P:C ratio, [gP gP-1]
   real(r8), allocatable :: CNSTKs1(:)    !stalk N:C ratio, [gN gC-1]
 
-  real(r8), allocatable :: CPO4Ss1(:)    !PO4 concentration non-band micropore	[g m-3]
-  real(r8), allocatable :: CNDUs1(:)     !soil micropore hydraulic conductivity for root water uptake [m MPa-1 h-1]
+
   real(r8), allocatable :: WGLFTs1(:)    !total leaf mass, [gC d-2]
 
-  real(r8), allocatable :: CGSGLs1(:)    !gaseous CO2 diffusivity	[m2 h-1]
-  real(r8), allocatable :: CHSGLs1(:)    !gaseous CH4 diffusivity	[m2 h-1]
-  real(r8), allocatable :: HGSGLs1(:)    !gaseous H2 diffusivity  [m2 h-1]
-  real(r8), allocatable :: OGSGLs1(:)    !gaseous O2 diffusivity	[m2 h-1]
-  real(r8), allocatable :: Z2SGLs1(:)    !gaseous N2O diffusivity, [m2 h-1]
-  real(r8), allocatable :: ZOSGLs1(:)    !aqueous NO3 diffusivity, [m2 h-1]
 
   real(r8), allocatable :: WTSTDIs1(:)   !initial standing dead C, [g C m-2]
   real(r8), allocatable :: TCCs1(:)      !canopy temperature, [oC]
@@ -170,33 +163,7 @@ implicit none
   real(r8), allocatable :: ZTYPIs1(:)    !initial plant thermal adaptation zone, [-]
   real(r8), allocatable :: HTCs1(:)      !temperature above which seed set is adversely affected, [oC]
   real(r8), allocatable :: SSTXs1(:)     !sensitivity to HTC (seeds oC-1 above HTC)
-  real(r8), allocatable :: RSCSs1(:)     !soil hydraulic resistance, [MPa h m-2]
-  real(r8), allocatable :: ZHSGLs1(:)    !aqueous NH4 diffusivity, [m2 h-1]
-  real(r8), allocatable :: BKDSs1(:)     !soil bulk density, [Mg m-3]
-  real(r8), allocatable :: CH2P4s1(:)    !aqueous PO4 concentration non-band	[gP m-3]
-  real(r8), allocatable :: CH1P4Bs1(:)   !aqueous H1PO4 concentration band [gP m-3]
-  real(r8), allocatable :: CH2P4Bs1(:)   !aqueous PO4 concentration band	[gP m-3]
-  real(r8), allocatable :: CNO3Ss1(:)    !NO3 concentration non-band micropore	[gN m-3]
-  real(r8), allocatable :: CH1P4s1(:)    !aqueous H1PO4 concentration non-band [gP m-3]
-  real(r8), allocatable :: CNO3Bs1(:)    !NO3 concentration band micropore	[gN m-3]
-  real(r8), allocatable :: CNH4Ss1(:)    !NH4 concentration non-band micropore	[gN m-3]
-  real(r8), allocatable :: CNH4Bs1(:)    !NH4 concentration band micropore	[gN m-3]
-  real(r8), allocatable :: CO2Gs1(:)     !gaseous CO2	[g d-2]
-  real(r8), allocatable :: CO2Ss1(:)     !aqueous CO2  micropore	[gC d-2]
-  real(r8), allocatable :: CH4Ss1(:)     !aqueous CH4  micropore	[gC d-2]
-  real(r8), allocatable :: CCH4Ss1(:)    !aqueous CH4 concentration micropore	[gC m-3]
-  real(r8), allocatable :: CZ2OSs1(:)    !aqueous N2O concentration micropore	[gN m-3]
-  real(r8), allocatable :: CCH4Gs1(:)    !gaseous CH4 concentration	[gC m-3]
-  real(r8), allocatable :: CNH3Ss1(:)    !NH3 concentration non-band micropore	[gN m-3]
-  real(r8), allocatable :: CNH3Bs1(:)    !NH3 concentration band micropore	[gN m-3]
-  real(r8), allocatable :: CH2GSs1(:)    !aqueous H2 concentration	[g m-3]
-  real(r8), allocatable :: HLSGLs1(:)    !aqueous H2 diffusivity, [m2 h-1]
-  real(r8), allocatable :: CLSGLs1(:)    !aqueous CO2 diffusivity	[m2 h-1]
-  real(r8), allocatable :: CQSGLs1(:)    !aqueous CH4 diffusivity	[m2 h-1]
-  real(r8), allocatable :: CZ2OGs1(:)    !gaseous N2O concentration	[gN m-3]
-  real(r8), allocatable :: CNH3Gs1(:)    !gaseous NH3 concentration	[gN m-3]
-  real(r8), allocatable :: CH2GGs1(:)    !gaseous H2 concentration	[g m-3]
-  real(r8), allocatable :: CORGCs1(:)    !soil organic C content [gC kg soil-1]
+
   real(r8), allocatable :: CDPTHZs1(:)   !depth to bottom of soil layer from  surface of grid cell [m]
   real(r8), allocatable :: PPIs1(:)      !initial plant population, [m-2]
   real(r8), allocatable :: PPZs1(:)      !plant population at seeding, [m-2]
@@ -218,16 +185,8 @@ implicit none
   real(r8), allocatable :: FVRNs1(:)     !allocation parameter
   real(r8), allocatable :: FWOODNs1(:)   !woody N allocation
   real(r8), allocatable :: FWOODPs1(:)   !woody P allocation
-  real(r8), allocatable :: H1PO4s1(:)    !soil aqueous HPO4 content micropore non-band, [gP d-2]
-  real(r8), allocatable :: H2PO4s1(:)    !PO4 non-band micropore, [gP d-2]
-  real(r8), allocatable :: H1POBs1(:)    !soil aqueous HPO4 content micropore band, [gP d-2]
-  real(r8), allocatable :: H2POBs1(:)    !PO4 band micropore, [gP d-2]
-  real(r8), allocatable :: H2GSs1(:)     !aqueous H2 	[g d-2]
-  real(r8), allocatable :: OXYGs1(:)     !gaseous O2 	[g d-2]
-  real(r8), allocatable :: OXYSs1(:)     !aqueous O2  micropore	[g d-2]
-  real(r8), allocatable :: OLSGLs1(:)    !aqueous CO2 diffusivity	[m2 h-1]
-  real(r8), allocatable :: POSGLs1(:)    !aqueous PO4 diffusivity, [m2 h-1]
-  real(r8), allocatable :: PSISTs1(:)    !soil micropore total water potential [MPa]
+
+
   real(r8), allocatable :: ROXYXs1(:)    !total root + microbial O2 uptake, [g d-2 h-1]
   real(r8), allocatable :: RNHBXs1(:)    !total root + microbial NH4 uptake band, [gN d-2 h-1]
   real(r8), allocatable :: RP14Xs1(:)    !HPO4 demand in non-band by all microbial,root,myco populations, [gP d-2 h-1]
@@ -249,7 +208,6 @@ implicit none
   real(r8), allocatable :: RCO2Fs1(:)    !net gaseous CO2 flux, [g d-2 h-1]
   real(r8), allocatable :: ROXYLs1(:)    !net aqueous O2 flux, [g d-2 h-1]
   real(r8), allocatable :: ROXYYs1(:)    !total root + microbial O2 uptake, [g d-2 h-1]
-  real(r8), allocatable :: SCO2Ls1(:)    !solubility of CO2, [m3 m-3]
   real(r8), allocatable :: PSILZs1(:)    !minimum daily canopy water potential, [MPa]
   real(r8), allocatable :: RSMNs1(:)     !canopy minimum stomatal resistance, [s m-1]
   real(r8), allocatable :: DLYR3s1(:)    !vertical thickness of soil layer [m]
@@ -262,35 +220,9 @@ implicit none
   real(r8), allocatable :: RAs1(:)       !canopy boundary layer resistance, [h m-1]
   real(r8), allocatable :: SO2s1(:)      !leaf O2 solubility, [uM /umol mol-1]
 
-  real(r8), allocatable :: SOXYLs1(:)    !solubility of O2, [m3 m-3]
-  real(r8), allocatable :: SCH4Ls1(:)    !solubility of CH4, [m3 m-3]
-  real(r8), allocatable :: SN2OLs1(:)    !solubility of N2O, [m3 m-3]
-  real(r8), allocatable :: SNH3Ls1(:)    !solubility of NH3, [m3 m-3]
-  real(r8), allocatable :: SH2GLs1(:)    !solubility of H2, [m3 m-3]
-  real(r8), allocatable :: THETWs1(:)    !volumetric water content [m3 m-3]
-  real(r8), allocatable :: THETYs1(:)    !air-dry water content, [m3 m-3]
   real(r8), allocatable :: TKSs1(:)      !mean annual soil temperature, [K]
   real(r8), allocatable :: TFNDs1(:)     !temperature effect on diffusivity
-  real(r8), allocatable :: VOLXs1(:)     !volume of soil layer	m3 d-2
-  real(r8), allocatable :: VLPOBs1(:)    !PO4 band volume fracrion, [0-1]
-  real(r8), allocatable :: VLNO3s1(:)    !NO3 non-band volume fracrion, []
-  real(r8), allocatable :: VLPO4s1(:)    !PO4 non-band volume fracrion, []
-  real(r8), allocatable :: VLNOBs1(:)    !NO3 band volume fraction, []
-  real(r8), allocatable :: VLNH4s1(:)    !NH4 non-band volume fraction, []
-  real(r8), allocatable :: VLNHBs1(:)    !NH4 band volume fraction, []
-  real(r8), allocatable :: VOLYs1(:)     !total micropore volume [m3 d-2]
-  real(r8), allocatable :: VOLIs1(:)     !soil micropore ice content   [m3 d-2]
-  real(r8), allocatable :: VOLWs1(:)     !soil micropore water content [m3 d-2]
-  real(r8), allocatable :: VOLAs1(:)     !total volume in micropores [m3 d-2]
-  real(r8), allocatable :: ZNO3Ss1(:)    !NO3 non-band micropore, [gN d-2]
-  real(r8), allocatable :: ZNO3Bs1(:)    !NO3 band micropore, [Ng d-2]
-  real(r8), allocatable :: ZNSGLs1(:)    !aqueous NH3 diffusivity, [m2 h-1]
-  real(r8), allocatable :: ZVSGLs1(:)    !aqueous N2O diffusivity, [m2 h-1]
-  real(r8), allocatable :: ZNH4Ss1(:)    !NH4 non-band micropore, [gN d-2]
-  real(r8), allocatable :: ZNH4Bs1(:)    !NH4 band micropore, [gN d-2]
-  real(r8), allocatable :: Z2OSs1(:)     !aqueous N2O micropore, [gN d-2]
-  real(r8), allocatable :: ZNH3Ss1(:)    !NH3 non-band micropore, [gN d-2]
-  real(r8), allocatable :: ZNH3Bs1(:)    !NH3 band micropore, [g d-2]
+
   real(r8), allocatable :: TUPNO3s1(:)   !total root-soil NO3 flux non-band, [gN d-2 h-1]
   real(r8), allocatable :: TUPH2Bs1(:)   !total root-soil PO4 flux band, [gP d-2 h-1]
   real(r8), allocatable :: TUPH1Bs1(:)   !soil-root exch of HPO4 in band [gP d-2 h-1]
@@ -331,9 +263,7 @@ implicit none
   real(r8), allocatable :: RDFOMNs1(:,:,:,:)  !root uptake (+ve) - exudation (-ve) of DON, [gN d-2 h-1]
   real(r8), allocatable :: RDFOMPs1(:,:,:,:)  !root uptake (+ve) - exudation (-ve) of DOP, [gP d-2 h-1]
   real(r8), allocatable :: FOSRHs1(:,:)   !fraction of total organic C in complex, [-]
-  real(r8), allocatable :: OQCs1(:,:)     !dissolved organic C micropore	[gC d-2]
-  real(r8), allocatable :: OQNs1(:,:)     !dissolved organic N micropore	[gN d-2]
-  real(r8), allocatable :: OQPs1(:,:)     !dissolved organic P micropore	[gP d-2]
+
   real(r8), allocatable :: XOQCSs1(:,:)   !net microbial DOC flux, [gC d-2 h-1]
   real(r8), allocatable :: XOQNSs1(:,:)   !net microbial DON flux, [gN d-2 h-1]
   real(r8), allocatable :: XOQPSs1(:,:)   !net microbial DOP flux, [gP d-2 h-1]
@@ -943,12 +873,268 @@ implicit none
     procedure, public :: Destroy =>  plt_pheno_destroy
   end type plant_pheno_type
 
+  type, public :: plant_soilchem_type
+  real(r8), pointer :: RSCSs1(:)     => null()  !soil hydraulic resistance, [MPa h m-2]
+  real(r8), pointer :: ZHSGLs1(:)    => null()  !aqueous NH4 diffusivity, [m2 h-1]
+  real(r8), pointer :: BKDSs1(:)     => null()  !soil bulk density, [Mg m-3]
+  real(r8), pointer :: CH2P4s1(:)    => null()  !aqueous PO4 concentration non-band	[gP m-3]
+  real(r8), pointer :: CH1P4Bs1(:)   => null()  !aqueous H1PO4 concentration band [gP m-3]
+  real(r8), pointer :: CH2P4Bs1(:)   => null()  !aqueous PO4 concentration band	[gP m-3]
+  real(r8), pointer :: CNO3Ss1(:)    => null()  !NO3 concentration non-band micropore	[gN m-3]
+  real(r8), pointer :: CH1P4s1(:)    => null()  !aqueous H1PO4 concentration non-band [gP m-3]
+  real(r8), pointer :: CNO3Bs1(:)    => null()  !NO3 concentration band micropore	[gN m-3]
+  real(r8), pointer :: CNH4Ss1(:)    => null()  !NH4 concentration non-band micropore	[gN m-3]
+  real(r8), pointer :: CNH4Bs1(:)    => null()  !NH4 concentration band micropore	[gN m-3]
+  real(r8), pointer :: CO2Gs1(:)     => null()  !gaseous CO2	[g d-2]
+  real(r8), pointer :: CO2Ss1(:)     => null()  !aqueous CO2  micropore	[gC d-2]
+  real(r8), pointer :: CH4Ss1(:)     => null()  !aqueous CH4  micropore	[gC d-2]
+  real(r8), pointer :: CCH4Ss1(:)    => null()  !aqueous CH4 concentration micropore	[gC m-3]
+  real(r8), pointer :: CZ2OSs1(:)    => null()  !aqueous N2O concentration micropore	[gN m-3]
+  real(r8), pointer :: CCH4Gs1(:)    => null()  !gaseous CH4 concentration	[gC m-3]
+  real(r8), pointer :: CNH3Ss1(:)    => null()  !NH3 concentration non-band micropore	[gN m-3]
+  real(r8), pointer :: CNH3Bs1(:)    => null()  !NH3 concentration band micropore	[gN m-3]
+  real(r8), pointer :: CH2GSs1(:)    => null()  !aqueous H2 concentration	[g m-3]
+  real(r8), pointer :: HLSGLs1(:)    => null()  !aqueous H2 diffusivity, [m2 h-1]
+  real(r8), pointer :: CLSGLs1(:)    => null()  !aqueous CO2 diffusivity	[m2 h-1]
+  real(r8), pointer :: CQSGLs1(:)    => null()  !aqueous CH4 diffusivity	[m2 h-1]
+  real(r8), pointer :: CZ2OGs1(:)    => null()  !gaseous N2O concentration	[gN m-3]
+  real(r8), pointer :: CNH3Gs1(:)    => null()  !gaseous NH3 concentration	[gN m-3]
+  real(r8), pointer :: CH2GGs1(:)    => null()  !gaseous H2 concentration	[g m-3]
+  real(r8), pointer :: CORGCs1(:)    => null()  !soil organic C content [gC kg soil-1]
+  real(r8), pointer :: CPO4Ss1(:)    => null()  !PO4 concentration non-band micropore	[g m-3]
+  real(r8), pointer :: CNDUs1(:)     => null()  !soil micropore hydraulic conductivity for root water uptake [m MPa-1 h-1]
+  real(r8), pointer :: CGSGLs1(:)    => null()  !gaseous CO2 diffusivity	[m2 h-1]
+  real(r8), pointer :: CHSGLs1(:)    => null()  !gaseous CH4 diffusivity	[m2 h-1]
+  real(r8), pointer :: HGSGLs1(:)    => null()  !gaseous H2 diffusivity  [m2 h-1]
+  real(r8), pointer :: OGSGLs1(:)    => null()  !gaseous O2 diffusivity	[m2 h-1]
+  real(r8), pointer :: Z2SGLs1(:)    => null()  !gaseous N2O diffusivity, [m2 h-1]
+  real(r8), pointer :: ZOSGLs1(:)    => null()  !aqueous NO3 diffusivity, [m2 h-1]
+  real(r8), pointer :: H1PO4s1(:)    => null()  !soil aqueous HPO4 content micropore non-band, [gP d-2]
+  real(r8), pointer :: H2PO4s1(:)    => null()  !PO4 non-band micropore, [gP d-2]
+  real(r8), pointer :: H1POBs1(:)    => null()  !soil aqueous HPO4 content micropore band, [gP d-2]
+  real(r8), pointer :: H2POBs1(:)    => null()  !PO4 band micropore, [gP d-2]
+  real(r8), pointer :: H2GSs1(:)     => null()  !aqueous H2 	[g d-2]
+  real(r8), pointer :: OXYGs1(:)     => null()  !gaseous O2 	[g d-2]
+  real(r8), pointer :: OXYSs1(:)     => null()  !aqueous O2  micropore	[g d-2]
+  real(r8), pointer :: OLSGLs1(:)    => null()  !aqueous CO2 diffusivity	[m2 h-1]
+  real(r8), pointer :: POSGLs1(:)    => null()  !aqueous PO4 diffusivity, [m2 h-1]
+  real(r8), pointer :: PSISTs1(:)    => null()  !soil micropore total water potential [MPa]
+  real(r8), pointer :: SCO2Ls1(:)    => null()  !solubility of CO2, [m3 m-3]
+  real(r8), pointer :: SOXYLs1(:)    => null()  !solubility of O2, [m3 m-3]
+  real(r8), pointer :: SCH4Ls1(:)    => null()  !solubility of CH4, [m3 m-3]
+  real(r8), pointer :: SN2OLs1(:)    => null()  !solubility of N2O, [m3 m-3]
+  real(r8), pointer :: SNH3Ls1(:)    => null()  !solubility of NH3, [m3 m-3]
+  real(r8), pointer :: SH2GLs1(:)    => null()  !solubility of H2, [m3 m-3]
+  real(r8), pointer :: THETWs1(:)    => null()  !volumetric water content [m3 m-3]
+  real(r8), pointer :: THETYs1(:)    => null()  !air-dry water content, [m3 m-3]
+  real(r8), pointer :: VOLXs1(:)     => null()  !volume of soil layer	m3 d-2
+  real(r8), pointer :: VLPOBs1(:)    => null()  !PO4 band volume fracrion, [0-1]
+  real(r8), pointer :: VLNO3s1(:)    => null()  !NO3 non-band volume fracrion, []
+  real(r8), pointer :: VLPO4s1(:)    => null()  !PO4 non-band volume fracrion, []
+  real(r8), pointer :: VLNOBs1(:)    => null()  !NO3 band volume fraction, []
+  real(r8), pointer :: VLNH4s1(:)    => null()  !NH4 non-band volume fraction, []
+  real(r8), pointer :: VLNHBs1(:)    => null()  !NH4 band volume fraction, []
+  real(r8), pointer :: VOLYs1(:)     => null()  !total micropore volume [m3 d-2]
+  real(r8), pointer :: VOLIs1(:)     => null()  !soil micropore ice content   [m3 d-2]
+  real(r8), pointer :: VOLWs1(:)     => null()  !soil micropore water content [m3 d-2]
+  real(r8), pointer :: VOLAs1(:)     => null()  !total volume in micropores [m3 d-2]
+  real(r8), pointer :: ZNO3Ss1(:)    => null()  !NO3 non-band micropore, [gN d-2]
+  real(r8), pointer :: ZNO3Bs1(:)    => null()  !NO3 band micropore, [Ng d-2]
+  real(r8), pointer :: ZNSGLs1(:)    => null()  !aqueous NH3 diffusivity, [m2 h-1]
+  real(r8), pointer :: ZVSGLs1(:)    => null()  !aqueous N2O diffusivity, [m2 h-1]
+  real(r8), pointer :: ZNH4Ss1(:)    => null()  !NH4 non-band micropore, [gN d-2]
+  real(r8), pointer :: ZNH4Bs1(:)    => null()  !NH4 band micropore, [gN d-2]
+  real(r8), pointer :: Z2OSs1(:)     => null()  !aqueous N2O micropore, [gN d-2]
+  real(r8), pointer :: ZNH3Ss1(:)    => null()  !NH3 non-band micropore, [gN d-2]
+  real(r8), pointer :: ZNH3Bs1(:)    => null()  !NH3 band micropore, [g d-2]
+  real(r8), pointer :: OQCs1(:,:)    => null()  !dissolved organic C micropore	[gC d-2]
+  real(r8), pointer :: OQNs1(:,:)    => null()  !dissolved organic N micropore	[gN d-2]
+  real(r8), pointer :: OQPs1(:,:)    => null()  !dissolved organic P micropore	[gP d-2]
+
+  contains
+    procedure, public :: Init => plt_soilchem_init
+    procedure, public :: Destroy => plt_soilchem_destroy
+  end type plant_soilchem_type
+
+  type(plant_soilchem_type), public, target :: plt_soilchem
   type(plant_pheno_type), public, target :: plt_pheno       !plant phenology
   type(plant_morph_type), public, target :: plt_morph       !plant morphology
   type(plant_radiation_type), public, target :: plt_rad     !plant radiation type
   type(plant_photosyns_type), public, target :: plt_photo   !plant photosynthesis type
 
   contains
+
+
+  subroutine  plt_soilchem_init(this)
+
+  implicit none
+
+  class(plant_soilchem_type) :: this
+
+  allocate(this%VLPOBs1(0:JZ1))
+  allocate(this%VLNO3s1(0:JZ1))
+  allocate(this%VLPO4s1(0:JZ1))
+  allocate(this%VOLYs1(0:JZ1))
+  allocate(this%VOLIs1(0:JZ1))
+  allocate(this%VOLWs1(0:JZ1))
+  allocate(this%VOLAs1(0:JZ1))
+  allocate(this%VLNOBs1(0:JZ1))
+  allocate(this%VLNH4s1(0:JZ1))
+  allocate(this%VLNHBs1(0:JZ1))
+  allocate(this%ZOSGLs1(0:JZ1))
+  allocate(this%OQCs1(0:jcplx11,0:JZ1))
+  allocate(this%OQNs1(0:jcplx11,0:JZ1))
+  allocate(this%OQPs1(0:jcplx11,0:JZ1))
+  allocate(this%ZNO3Ss1(0:JZ1))
+  allocate(this%ZNO3Bs1(0:JZ1))
+  allocate(this%ZNSGLs1(0:JZ1))
+  allocate(this%ZNH4Ss1(0:JZ1))
+  allocate(this%ZNH4Bs1(0:JZ1))
+  allocate(this%Z2OSs1(0:JZ1))
+  allocate(this%ZNH3Ss1(0:JZ1))
+  allocate(this%ZNH3Bs1(0:JZ1))
+  allocate(this%H1PO4s1(0:JZ1))
+  allocate(this%H2PO4s1(0:JZ1))
+  allocate(this%H1POBs1(0:JZ1))
+  allocate(this%H2POBs1(0:JZ1))
+  allocate(this%H2GSs1(0:JZ1))
+  allocate(this%HLSGLs1(0:JZ1))
+  allocate(this%OXYGs1(0:JZ1))
+  allocate(this%OXYSs1(0:JZ1))
+  allocate(this%OLSGLs1(0:JZ1))
+  allocate(this%POSGLs1(0:JZ1))
+  allocate(this%CCH4Gs1(0:JZ1))
+  allocate(this%CZ2OGs1(0:JZ1))
+  allocate(this%CNH3Gs1(0:JZ1))
+  allocate(this%CH2GGs1(0:JZ1))
+  allocate(this%CORGCs1(0:JZ1))
+  allocate(this%Z2SGLs1(JZ1))
+  allocate(this%ZHSGLs1(JZ1))
+  allocate(this%CH2P4s1(0:JZ1))
+  allocate(this%CH1P4Bs1(0:JZ1))
+  allocate(this%CH2P4Bs1(0:JZ1))
+  allocate(this%CNO3Ss1(0:JZ1))
+  allocate(this%CH1P4s1(0:JZ1))
+  allocate(this%CNO3Bs1(0:JZ1))
+  allocate(this%CNH4Ss1(0:JZ1))
+  allocate(this%CNH4Bs1(0:JZ1))
+  allocate(this%CO2Gs1(0:JZ1))
+  allocate(this%CO2Ss1(0:JZ1))
+  allocate(this%CH4Ss1(0:JZ1))
+  allocate(this%CCH4Ss1(0:JZ1))
+  allocate(this%CZ2OSs1(0:JZ1))
+  allocate(this%CNH3Ss1(0:JZ1))
+  allocate(this%CNH3Bs1(0:JZ1))
+  allocate(this%CH2GSs1(0:JZ1))
+  allocate(this%CLSGLs1(0:JZ1))
+  allocate(this%CQSGLs1(0:JZ1))
+  allocate(this%VOLXs1(0:JZ1))
+  allocate(this%THETWs1(0:JZ1))
+  allocate(this%THETYs1(0:JZ1))
+  allocate(this%SCO2Ls1(0:JZ1))
+  allocate(this%SOXYLs1(0:JZ1))
+  allocate(this%SCH4Ls1(0:JZ1))
+  allocate(this%SN2OLs1(0:JZ1))
+  allocate(this%SNH3Ls1(0:JZ1))
+  allocate(this%SH2GLs1(0:JZ1))
+  allocate(this%CGSGLs1(JZ1))
+  allocate(this%CHSGLs1(JZ1))
+  allocate(this%HGSGLs1(JZ1))
+  allocate(this%OGSGLs1(JZ1))
+  allocate(this%RSCSs1(JZ1))
+  allocate(this%BKDSs1(0:JZ1))
+  allocate(this%CNDUs1(JZ1))
+  allocate(this%CPO4Ss1(JZ1))
+  allocate(this%PSISTs1(0:JZ1))
+  allocate(this%ZVSGLs1(0:JZ1))
+  end subroutine plt_soilchem_init
+!----------------------------------------------------------------------
+
+  subroutine plt_soilchem_destroy(this)
+  implicit none
+  class(plant_soilchem_type) :: this
+!  if(allocated(ZVSGLs1))deallocate(ZVSGLs1)
+!  if(allocated(PSISTs1))deallocate(PSISTs1)
+!  if(allocated(SOXYLs1))deallocate(SOXYLs1)
+!  if(allocated(CPO4Ss1))deallocate(CPO4Ss1)
+!  if(allocated(CNDUs1))deallocate(CNDUs1)
+!  if(allocated(CGSGLs1))deallocate(CGSGLs1)
+!  if(allocated(CHSGLs1))deallocate(CHSGLs1)
+!  if(allocated(HGSGLs1))deallocate(HGSGLs1)
+!  if(allocated(OGSGLs1))deallocate(OGSGLs1)
+!  if(allocated(RSCSs1))deallocate(RSCSs1)
+!  if(allocated(SCO2Ls1))deallocate(SCO2Ls1)
+!  if(allocated(SCH4Ls1))deallocate(SCH4Ls1)
+!  if(allocated(SN2OLs1))deallocate(SN2OLs1)
+!  if(allocated(SNH3Ls1))deallocate(SNH3Ls1)
+!  if(allocated(SH2GLs1))deallocate(SH2GLs1)
+!  if(allocated(THETWs1))deallocate(THETWs1)
+!  if(allocated(THETYs1))deallocate(THETYs1)
+!  if(allocated(VOLXs1))deallocate(VOLXs1)
+!  if(allocated(CCH4Gs1))deallocate(CCH4Gs1)
+!  if(allocated(CZ2OGs1))deallocate(CZ2OGs1)
+!  if(allocated(CNH3Gs1))deallocate(CNH3Gs1)
+!  if(allocated(CH2GGs1))deallocate(CH2GGs1)
+!  if(allocated(CORGCs1))deallocate(CORGCs1)
+!  if(allocated(H1PO4s1))deallocate(H1PO4s1)
+!  if(allocated(H2PO4s1))deallocate(H2PO4s1)
+!  if(allocated(H1POBs1))deallocate(H1POBs1)
+!  if(allocated(H2POBs1))deallocate(H2POBs1)
+!  if(allocated(H2GSs1))deallocate(H2GSs1)
+!  if(allocated(HLSGLs1))deallocate(HLSGLs1)
+!  if(allocated(OXYGs1))deallocate(OXYGs1)
+!  if(allocated(OXYSs1))deallocate(OXYSs1)
+!  if(allocated(OLSGLs1))deallocate(OLSGLs1)
+!  if(allocated(POSGLs1))deallocate(POSGLs1)
+!  if(allocated(VLPOBs1))deallocate(VLPOBs1)
+!  if(allocated(VLNO3s1))deallocate(VLNO3s1)
+!  if(allocated(VLPO4s1))deallocate(VLPO4s1)
+!  if(allocated(VOLYs1))deallocate(VOLYs1)
+!  if(allocated(VOLIs1))deallocate(VOLIs1)
+!  if(allocated(VOLWs1))deallocate(VOLWs1)
+!  if(allocated(VOLAs1))deallocate(VOLAs1)
+!  if(allocated(VLNOBs1))deallocate(VLNOBs1)
+!  if(allocated(VLNH4s1))deallocate(VLNH4s1)
+!  if(allocated(VLNHBs1))deallocate(VLNHBs1)
+!  if(allocated(ZOSGLs1))deallocate(ZOSGLs1)
+
+!  if(allocated(OQCs1))deallocate(OQCs1)
+!  if(allocated(OQNs1))deallocate(OQNs1)
+!  if(allocated(OQPs1))deallocate(OQPs1)
+!  if(allocated(ZNO3Ss1))deallocate(ZNO3Ss1)
+!  if(allocated(ZNO3Bs1))deallocate(ZNO3Bs1)
+!  if(allocated(ZNSGLs1))deallocate(ZNSGLs1)
+!  if(allocated(ZNH4Ss1))deallocate(ZNH4Ss1)
+!  if(allocated(ZNH4Bs1))deallocate(ZNH4Bs1)
+!  if(allocated(Z2OSs1))deallocate(Z2OSs1)
+!  if(allocated(ZNH3Ss1))deallocate(ZNH3Ss1)
+!  if(allocated(ZNH3Bs1))deallocate(ZNH3Bs1)
+!  if(allocated(Z2SGLs1))deallocate(Z2SGLs1)
+!  if(allocated(ZHSGLs1))deallocate(ZHSGLs1)
+!  if(allocated(BKDSs1))deallocate(BKDSs1)
+!  if(allocated(CH2P4s1))deallocate(CH2P4s1)
+!  if(allocated(CH1P4Bs1))deallocate(CH1P4Bs1)
+!  if(allocated(CH2P4Bs1))deallocate(CH2P4Bs1)
+!  if(allocated(CNO3Ss1))deallocate(CNO3Ss1)
+!  if(allocated(CH1P4s1))deallocate(CH1P4s1)
+!  if(allocated(CNO3Bs1))deallocate(CNO3Bs1)
+!  if(allocated(CNH4Ss1))deallocate(CNH4Ss1)
+!  if(allocated(CNH4Bs1))deallocate(CNH4Bs1)
+!  if(allocated(CO2Gs1))deallocate(CO2Gs1)
+!  if(allocated(CO2Ss1))deallocate(CO2Ss1)
+!  if(allocated(CH4Ss1))deallocate(CH4Ss1)
+!  if(allocated(CCH4Ss1))deallocate(CCH4Ss1)
+!  if(allocated(CZ2OSs1))deallocate(CZ2OSs1)
+!  if(allocated(CNH3Ss1))deallocate(CNH3Ss1)
+!  if(allocated(CNH3Bs1))deallocate(CNH3Bs1)
+!  if(allocated(CH2GSs1))deallocate(CH2GSs1)
+!  if(allocated(CLSGLs1))deallocate(CLSGLs1)
+!  if(allocated(CQSGLs1))deallocate(CQSGLs1)
+
+  end subroutine plt_soilchem_destroy
+!----------------------------------------------------------------------
+
+
   subroutine InitPlantAPIData(JZ,JC,JP,JSA,jcplx1,JLI,JLA,JNODS)
 
   implicit none
@@ -964,6 +1150,8 @@ implicit none
   JNODS1=JNODS
 
   call plt_pheno%Init()
+
+  call plt_soilchem%Init()
 
   call plt_rad%Init()
 
@@ -999,7 +1187,6 @@ implicit none
   allocate(FERTs1(1:20))
   allocate(WGLFTs1(JC1))
   allocate(DLYR3s1(0:JZ1))
-  allocate(CPO4Ss1(JZ1))
   allocate(CPEARs1(JP1))
   allocate(CPRSVs1(JP1))
   allocate(CNRSVs1(JP1))
@@ -1012,38 +1199,7 @@ implicit none
   allocate(DMGRs1(JP1))
   allocate(CNHSKs1(JP1))
   allocate(CNEARs1(JP1))
-  allocate(CNDUs1(JZ1))
-  allocate(CGSGLs1(JZ1))
-  allocate(CHSGLs1(JZ1))
-  allocate(HGSGLs1(JZ1))
-  allocate(OGSGLs1(JZ1))
-  allocate(RSCSs1(JZ1))
-  allocate(Z2SGLs1(JZ1))
-  allocate(ZHSGLs1(JZ1))
-  allocate(BKDSs1(0:JZ1))
-  allocate(CH2P4s1(0:JZ1))
-  allocate(CH1P4Bs1(0:JZ1))
-  allocate(CH2P4Bs1(0:JZ1))
-  allocate(CNO3Ss1(0:JZ1))
-  allocate(CH1P4s1(0:JZ1))
-  allocate(CNO3Bs1(0:JZ1))
-  allocate(CNH4Ss1(0:JZ1))
-  allocate(CNH4Bs1(0:JZ1))
-  allocate(CO2Gs1(0:JZ1))
-  allocate(CO2Ss1(0:JZ1))
-  allocate(CH4Ss1(0:JZ1))
-  allocate(CCH4Ss1(0:JZ1))
-  allocate(CZ2OSs1(0:JZ1))
-  allocate(CNH3Ss1(0:JZ1))
-  allocate(CNH3Bs1(0:JZ1))
-  allocate(CH2GSs1(0:JZ1))
-  allocate(CLSGLs1(0:JZ1))
-  allocate(CQSGLs1(0:JZ1))
-  allocate(CCH4Gs1(0:JZ1))
-  allocate(CZ2OGs1(0:JZ1))
-  allocate(CNH3Gs1(0:JZ1))
-  allocate(CH2GGs1(0:JZ1))
-  allocate(CORGCs1(0:JZ1))
+
   allocate(CDPTHZs1(0:JZ1))
   allocate(DPTHZs1(0:JZ1))
   allocate(FMPRs1(0:JZ1))
@@ -1059,17 +1215,7 @@ implicit none
   allocate(FWODRPs1(0:1))
   allocate(FWOODNs1(0:1))
   allocate(FWOODPs1(0:1))
-  allocate(H1PO4s1(0:JZ1))
-  allocate(H2PO4s1(0:JZ1))
-  allocate(H1POBs1(0:JZ1))
-  allocate(H2POBs1(0:JZ1))
-  allocate(H2GSs1(0:JZ1))
-  allocate(HLSGLs1(0:JZ1))
-  allocate(OXYGs1(0:JZ1))
-  allocate(OXYSs1(0:JZ1))
-  allocate(OLSGLs1(0:JZ1))
-  allocate(POSGLs1(0:JZ1))
-  allocate(PSISTs1(0:JZ1))
+
   allocate(RPO4Ys1(0:JZ1))
   allocate(RPOBYs1(0:JZ1))
   allocate(RP14Ys1(0:JZ1))
@@ -1082,38 +1228,10 @@ implicit none
   allocate(RCO2Fs1(0:JZ1))
   allocate(ROXYLs1(0:JZ1))
   allocate(ROXYYs1(0:JZ1))
-  allocate(SCO2Ls1(0:JZ1))
-  allocate(SOXYLs1(0:JZ1))
-  allocate(SCH4Ls1(0:JZ1))
-  allocate(SN2OLs1(0:JZ1))
-  allocate(SNH3Ls1(0:JZ1))
-  allocate(SH2GLs1(0:JZ1))
-  allocate(THETWs1(0:JZ1))
-  allocate(THETYs1(0:JZ1))
   allocate(TKSs1(0:JZ1))
   allocate(TFNDs1(0:JZ1))
-  allocate(VOLXs1(0:JZ1))
-  allocate(VLPOBs1(0:JZ1))
-  allocate(VLNO3s1(0:JZ1))
-  allocate(VLPO4s1(0:JZ1))
-  allocate(VOLYs1(0:JZ1))
-  allocate(VOLIs1(0:JZ1))
-  allocate(VOLWs1(0:JZ1))
-  allocate(VOLAs1(0:JZ1))
-  allocate(VLNOBs1(0:JZ1))
-  allocate(VLNH4s1(0:JZ1))
-  allocate(VLNHBs1(0:JZ1))
-  allocate(ZOSGLs1(0:JZ1))
   allocate(AREA3s1(0:JZ1))
-  allocate(ZNO3Ss1(0:JZ1))
-  allocate(ZNO3Bs1(0:JZ1))
-  allocate(ZNSGLs1(0:JZ1))
-  allocate(ZNH4Ss1(0:JZ1))
-  allocate(ZNH4Bs1(0:JZ1))
-  allocate(Z2OSs1(0:JZ1))
-  allocate(ZNH3Ss1(0:JZ1))
-  allocate(ZNH3Bs1(0:JZ1))
-  allocate(ZVSGLs1(0:JZ1))
+
   allocate(RP1BXs1(0:JZ1))
   allocate(RNO3Xs1(0:JZ1))
   allocate(RPO4Xs1(0:JZ1))
@@ -1166,9 +1284,6 @@ implicit none
   allocate(RDFOMNs1(2,0:jcplx11,0:JZ1,JP1))
   allocate(RDFOMPs1(2,0:jcplx11,0:JZ1,JP1))
   allocate(FOSRHs1(0:jcplx11,0:JZ1))
-  allocate(OQCs1(0:jcplx11,0:JZ1))
-  allocate(OQNs1(0:jcplx11,0:JZ1))
-  allocate(OQPs1(0:jcplx11,0:JZ1))
   allocate(XOQCSs1(0:jcplx11,0:JZ1))
   allocate(XOQNSs1(0:jcplx11,0:JZ1))
   allocate(XOQPSs1(0:jcplx11,0:JZ1))
@@ -1668,45 +1783,13 @@ implicit none
   if(allocated(CNRSVs1))deallocate(CNRSVs1)
   if(allocated(CPRSVs1))deallocate(CPRSVs1)
 
-  if(allocated(CPO4Ss1))deallocate(CPO4Ss1)
-  if(allocated(CNDUs1))deallocate(CNDUs1)
-  if(allocated(CGSGLs1))deallocate(CGSGLs1)
-  if(allocated(CHSGLs1))deallocate(CHSGLs1)
-  if(allocated(HGSGLs1))deallocate(HGSGLs1)
-  if(allocated(OGSGLs1))deallocate(OGSGLs1)
 
   if(allocated(ZTYPs1))deallocate(ZTYPs1)
   if(allocated(ZTYPIs1))deallocate(ZTYPIs1)
   if(allocated(GRDMs1))deallocate(GRDMs1)
   if(allocated(HTCs1))deallocate(HTCs1)
   if(allocated(SSTXs1)) deallocate(SSTXs1)
-  if(allocated(RSCSs1))deallocate(RSCSs1)
-  if(allocated(Z2SGLs1))deallocate(Z2SGLs1)
-  if(allocated(ZHSGLs1))deallocate(ZHSGLs1)
-  if(allocated(BKDSs1))deallocate(BKDSs1)
-  if(allocated(CH2P4s1))deallocate(CH2P4s1)
-  if(allocated(CH1P4Bs1))deallocate(CH1P4Bs1)
-  if(allocated(CH2P4Bs1))deallocate(CH2P4Bs1)
-  if(allocated(CNO3Ss1))deallocate(CNO3Ss1)
-  if(allocated(CH1P4s1))deallocate(CH1P4s1)
-  if(allocated(CNO3Bs1))deallocate(CNO3Bs1)
-  if(allocated(CNH4Ss1))deallocate(CNH4Ss1)
-  if(allocated(CNH4Bs1))deallocate(CNH4Bs1)
-  if(allocated(CO2Gs1))deallocate(CO2Gs1)
-  if(allocated(CO2Ss1))deallocate(CO2Ss1)
-  if(allocated(CH4Ss1))deallocate(CH4Ss1)
-  if(allocated(CCH4Ss1))deallocate(CCH4Ss1)
-  if(allocated(CZ2OSs1))deallocate(CZ2OSs1)
-  if(allocated(CNH3Ss1))deallocate(CNH3Ss1)
-  if(allocated(CNH3Bs1))deallocate(CNH3Bs1)
-  if(allocated(CH2GSs1))deallocate(CH2GSs1)
-  if(allocated(CLSGLs1))deallocate(CLSGLs1)
-  if(allocated(CQSGLs1))deallocate(CQSGLs1)
-  if(allocated(CCH4Gs1))deallocate(CCH4Gs1)
-  if(allocated(CZ2OGs1))deallocate(CZ2OGs1)
-  if(allocated(CNH3Gs1))deallocate(CNH3Gs1)
-  if(allocated(CH2GGs1))deallocate(CH2GGs1)
-  if(allocated(CORGCs1))deallocate(CORGCs1)
+
   if(allocated(CDPTHZs1))deallocate(CDPTHZs1)
 
   if(allocated(CFIs1)) deallocate(CFIs1)
@@ -1728,17 +1811,7 @@ implicit none
   if(allocated(FWODSPs1))deallocate(FWODSPs1)
   if(allocated(FWODBs1))deallocate(FWODBs1)
   if(allocated(FWODRPs1))deallocate(FWODRPs1)
-  if(allocated(H1PO4s1))deallocate(H1PO4s1)
-  if(allocated(H2PO4s1))deallocate(H2PO4s1)
-  if(allocated(H1POBs1))deallocate(H1POBs1)
-  if(allocated(H2POBs1))deallocate(H2POBs1)
-  if(allocated(H2GSs1))deallocate(H2GSs1)
-  if(allocated(HLSGLs1))deallocate(HLSGLs1)
-  if(allocated(OXYGs1))deallocate(OXYGs1)
-  if(allocated(OXYSs1))deallocate(OXYSs1)
-  if(allocated(OLSGLs1))deallocate(OLSGLs1)
-  if(allocated(POSGLs1))deallocate(POSGLs1)
-  if(allocated(PSISTs1))deallocate(PSISTs1)
+
   if(allocated(RPO4Ys1))deallocate(RPO4Ys1)
   if(allocated(RPOBYs1))deallocate(RPOBYs1)
   if(allocated(RP14Ys1))deallocate(RP14Ys1)
@@ -1751,7 +1824,6 @@ implicit none
   if(allocated(RCO2Fs1))deallocate(RCO2Fs1)
   if(allocated(ROXYLs1))deallocate(ROXYLs1)
   if(allocated(ROXYYs1))deallocate(ROXYYs1)
-  if(allocated(SCO2Ls1))deallocate(SCO2Ls1)
   if(allocated(O2Ls1))deallocate(O2Ls1)
   if(allocated(DLYR3s1))deallocate(DLYR3s1)
   if(allocated(RSMNs1))deallocate(RSMNs1)
@@ -1765,38 +1837,13 @@ implicit none
   if(allocated(RAs1))deallocate(RAs1)
   if(allocated(SFLXCs1))deallocate(SFLXCs1)
   if(allocated(PSILZs1))deallocate(PSILZs1)
-  if(allocated(SOXYLs1))deallocate(SOXYLs1)
-  if(allocated(SCH4Ls1))deallocate(SCH4Ls1)
-  if(allocated(SN2OLs1))deallocate(SN2OLs1)
-  if(allocated(SNH3Ls1))deallocate(SNH3Ls1)
-  if(allocated(SH2GLs1))deallocate(SH2GLs1)
-  if(allocated(THETWs1))deallocate(THETWs1)
-  if(allocated(THETYs1))deallocate(THETYs1)
+
   if(allocated(TKSs1))deallocate(TKSs1)
   if(allocated(TFNDs1))deallocate(TFNDs1)
-  if(allocated(VOLXs1))deallocate(VOLXs1)
-  if(allocated(VLPOBs1))deallocate(VLPOBs1)
-  if(allocated(VLNO3s1))deallocate(VLNO3s1)
-  if(allocated(VLPO4s1))deallocate(VLPO4s1)
-  if(allocated(VOLYs1))deallocate(VOLYs1)
-  if(allocated(VOLIs1))deallocate(VOLIs1)
-  if(allocated(VOLWs1))deallocate(VOLWs1)
-  if(allocated(VOLAs1))deallocate(VOLAs1)
-  if(allocated(VLNOBs1))deallocate(VLNOBs1)
-  if(allocated(VLNH4s1))deallocate(VLNH4s1)
-  if(allocated(VLNHBs1))deallocate(VLNHBs1)
-  if(allocated(ZOSGLs1))deallocate(ZOSGLs1)
 
   if(allocated(AREA3s1))deallocate(AREA3s1)
-  if(allocated(ZNO3Ss1))deallocate(ZNO3Ss1)
-  if(allocated(ZNO3Bs1))deallocate(ZNO3Bs1)
-  if(allocated(ZNSGLs1))deallocate(ZNSGLs1)
-  if(allocated(ZNH4Ss1))deallocate(ZNH4Ss1)
-  if(allocated(ZNH4Bs1))deallocate(ZNH4Bs1)
-  if(allocated(Z2OSs1))deallocate(Z2OSs1)
-  if(allocated(ZNH3Ss1))deallocate(ZNH3Ss1)
-  if(allocated(ZNH3Bs1))deallocate(ZNH3Bs1)
-  if(allocated(ZVSGLs1))deallocate(ZVSGLs1)
+
+
   if(allocated(RP1BXs1))deallocate(RP1BXs1)
   if(allocated(RNO3Xs1))deallocate(RNO3Xs1)
   if(allocated(RP14Xs1))deallocate(RP14Xs1)
@@ -1849,9 +1896,8 @@ implicit none
   if(allocated(RDFOMNs1))deallocate(RDFOMNs1)
   if(allocated(RDFOMPs1))deallocate(RDFOMPs1)
   if(allocated(FOSRHs1))deallocate(FOSRHs1)
-  if(allocated(OQCs1))deallocate(OQCs1)
-  if(allocated(OQNs1))deallocate(OQNs1)
-  if(allocated(OQPs1))deallocate(OQPs1)
+
+
   if(allocated(XOQCSs1))deallocate(XOQCSs1)
   if(allocated(XOQNSs1))deallocate(XOQNSs1)
   if(allocated(XOQPSs1))deallocate(XOQPSs1)

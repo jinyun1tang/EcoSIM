@@ -179,11 +179,18 @@ module UptakesMod
   integer :: NZ, L, N
   real(r8) :: ARLSC
 
-  associate(                         &
-    ARSTPs1  => plt_morph%ARSTPs1  , &
-    ARLFPs1  => plt_morph%ARLFPs1  , &
-    RAD1s1   => plt_rad%RAD1s1     , &
-    THRM1s1  => plt_rad%THRM1s1      &
+  associate(                          &
+    VOLAs1   => plt_soilchem%VOLAs1 , &
+    PSISTs1  => plt_soilchem%PSISTs1, &
+    VOLIs1   => plt_soilchem%VOLIs1 , &
+    THETYs1  => plt_soilchem%THETYs1, &
+    BKDSs1   => plt_soilchem%BKDSs1 , &
+    VOLWs1   => plt_soilchem%VOLWs1 , &
+    VOLYs1   => plt_soilchem%VOLYs1 , &
+    ARSTPs1  => plt_morph%ARSTPs1   , &
+    ARLFPs1  => plt_morph%ARLFPs1   , &
+    RAD1s1   => plt_rad%RAD1s1      , &
+    THRM1s1  => plt_rad%THRM1s1       &
   )
 !
 !     RESET TOTAL UPTAKE ARRAYS
@@ -823,10 +830,14 @@ module UptakesMod
   real(r8) :: FRADW,FRAD1,FRAD2
   real(r8) :: RSSL,RTAR2
   integer :: N, L
-  associate(                        &
-    ZCs1     => plt_morph%ZCs1    , &
-    NGs1     =>   plt_morph%NGs1  , &
-    NIs1     =>  plt_morph%NIs1     &
+  associate(                          &
+    THETWs1  => plt_soilchem%THETWs1, &
+    VOLAs1   => plt_soilchem%VOLAs1 , &
+    CNDUs1   => plt_soilchem%CNDUs1 , &
+    VOLXs1   => plt_soilchem%VOLXs1 , &
+    ZCs1     => plt_morph%ZCs1      , &
+    NGs1     => plt_morph%NGs1      , &
+    NIs1     => plt_morph%NIs1        &
   )
 
   !     GRAVIMETRIC WATER POTENTIAL FROM CANOPY HEIGHT
@@ -853,12 +864,6 @@ module UptakesMod
 !
   DO 3880 N=1,MYs1(NZ)
     DO  L=NUs1,NIs1(NZ)
-      !     IF(NZ.EQ.2)THEN
-      !     WRITE(*,2124)'ILYR',I,J,NX,NY,NZ,L,N,RTDNPs1(N,L,NZ)
-      !    2,CNDUs1(L),RTN1s1(1,L,NZ),RTNLs1(N,L,NZ)
-      !    3,THETWs1(L),ZEROPs1(NZ)
-!2124  FORMAT(A8,7I4,20E12.4)
-!      ENDIF
       IF(VOLXs1(L).GT.ZEROS2s1 &
         .AND.VOLWMs1(NPH,L).GT.ZEROS2s1 &
         .AND.RTDNPs1(N,L,NZ).GT.ZEROs1 &
@@ -1312,6 +1317,15 @@ module UptakesMod
   real(r8) :: UPMX,UPMXP
   real(r8) :: X,Y
   !     begin_execution
+  associate(                             &
+    VOLWs1    => plt_soilchem%VOLWs1   , &
+    VLPO4s1   => plt_soilchem%VLPO4s1  , &
+    CH1P4s1   => plt_soilchem%CH1P4s1  , &
+    H1PO4s1   => plt_soilchem%H1PO4s1  , &
+    VLPOBs1   => plt_soilchem%VLPOBs1  , &
+    CH1P4Bs1  => plt_soilchem%CH1P4Bs1 , &
+    H1POBs1   => plt_soilchem%H1POBs1    &
+  )
   !
   !     HPO4 UPTAKE IN NON-BAND SOIL ZONE
   !
@@ -1450,6 +1464,7 @@ module UptakesMod
     RUOH1Bs1(N,L,NZ)=0.0_r8
     RUCH1Bs1(N,L,NZ)=0.0_r8
   ENDIF
+  end associate
   end subroutine UptakeHPO4
 !------------------------------------------------------------------------
 
@@ -1468,6 +1483,15 @@ module UptakesMod
   real(r8) :: RTKHPB,RMFH2B,RMFH2P,RTKH2P,RTKHPP,RTKH2B
   real(r8) :: UPMX,UPMXP,X,Y
   !
+  associate(                             &
+    H2POBs1   => plt_soilchem%H2POBs1  , &
+    VOLWs1    => plt_soilchem%VOLWs1   , &
+    H2PO4s1   => plt_soilchem%H2PO4s1  , &
+    CH2P4s1   => plt_soilchem%CH2P4s1  , &
+    VLPO4s1   => plt_soilchem%VLPO4s1  , &
+    CH2P4Bs1  => plt_soilchem%CH2P4Bs1 , &
+    VLPOBs1   => plt_soilchem%VLPOBs1    &
+  )
   !     H2PO4 UPTAKE IN NON-BAND SOIL ZONE
   !
   !     VLPO4,VLPOB=fraction of soil volume in H2PO4 non-band,band
@@ -1525,16 +1549,6 @@ module UptakesMod
       RUPH2Ps1(N,L,NZ)=AMIN1(H2POX,RUPP2Ps1(N,L,NZ))
       RUOH2Ps1(N,L,NZ)=AMIN1(H2POX,AMAX1(0.0_r8,RTKHPP*PPs1(NZ)))
       RUCH2Ps1(N,L,NZ)=RUPH2Ps1(N,L,NZ)/FCUP
-      !     IF((I/10)*10.EQ.I.AND.J.EQ.24.AND.NZ.EQ.3)THEN
-      !     WRITE(*,2223)'UPPO4',I,J,NZ,L,N,RUPH2Ps1(N,L,NZ),FPO4X
-      !    2,H2PO4s1(L),RUPP2Ps1(N,L,NZ),UPMX,DIFPO,UPKMPOs1(N,NZ)
-      !    3,UPMNPOs1(N,NZ),RMFH2P,CH2P4s1(L),UPMXP,WFRs1(N,L,NZ)
-      !    4,FCUP,FZUP,FPUP,UPMXPOs1(N,NZ),RTARPs1(N,L,NZ),FWSRT
-      !    5,TFN4s1(L,NZ),DIFFL,CPO4Ss1(L),CPOOLRs1(N,L,NZ)
-      !    6,PPOOLRs1(N,L,NZ),RTKH2P,PPs1(NZ)
-      !    2,RTLGPs1(N,L,NZ)
-!2223  FORMAT(A8,5I4,40E12.4)
-!     ENDIF
     ELSE
       RUPP2Ps1(N,L,NZ)=0.0_r8
       RUPH2Ps1(N,L,NZ)=0.0_r8
@@ -1606,6 +1620,7 @@ module UptakesMod
     RUOH2Bs1(N,L,NZ)=0.0_r8
     RUCH2Bs1(N,L,NZ)=0.0_r8
   ENDIF
+  end associate
   end subroutine UptakeH2PO4
 !------------------------------------------------------------------------
 
@@ -1623,7 +1638,9 @@ module UptakesMod
   real(r8) :: FPO4X,FPOBX
   real(r8) :: POSGX
   real(r8) :: PATHL
-
+  associate(                               &
+    POSGLs1   =>   plt_soilchem%POSGLs1    &
+  )
   TFPO4X=0.0_r8
   TFPOBX=0.0_r8
   TFP14X=0.0_r8
@@ -1694,6 +1711,7 @@ module UptakesMod
     RUOH1Bs1(N,L,NZ)=0.0_r8
     RUCH1Bs1(N,L,NZ)=0.0_r8
   ENDIF
+  end associate
   end subroutine UptakeMineralPhosporhus
 !------------------------------------------------------------------------
 
@@ -1713,6 +1731,16 @@ module UptakesMod
   real(r8) :: UPMX,UPMXP,X,Y
   real(r8) :: ZOSGX,ZNO3M,ZNO3X,ZNOBM,ZNOBX
 ! begin_execution
+  associate(                              &
+    VLNOBs1   =>  plt_soilchem%VLNOBs1  , &
+    CNO3Bs1   =>  plt_soilchem%CNO3Bs1  , &
+    ZNO3Ss1   =>  plt_soilchem%ZNO3Ss1  , &
+    ZOSGLs1   =>  plt_soilchem%ZOSGLs1  , &
+    CNO3Ss1   =>  plt_soilchem%CNO3Ss1  , &
+    VOLWs1    =>  plt_soilchem%VOLWs1   , &
+    VLNO3s1   =>  plt_soilchem%VLNO3s1  , &
+    ZNO3Bs1   =>  plt_soilchem%ZNO3Bs1    &
+  )
 !
 ! PARAMETERS FOR RADIAL MASS FLOW AND DIFFUSION OF NO3
 ! FROM SOIL TO ROOT
@@ -1785,19 +1813,6 @@ module UptakesMod
     RUONO3s1(N,L,NZ)=AMIN1(ZNO3X,AMAX1(0.0 &
       ,RTKNOP*PPs1(NZ)))
     RUCNO3s1(N,L,NZ)=RUPNO3s1(N,L,NZ)/FCUP
-    !     IF(NX.EQ.4.AND.NY.EQ.2)THEN
-    !     WRITE(*,1111)'UPNO3',I,J,NZ,L,N,RUPNO3s1(N,L,NZ),FNO3X
-    !    2,ZNO3Ss1(L),ZNO3M,RTDNPs1(N,L,NZ),RTKNO3,RMFNO3,X,Y,B,C
-    !    2,UPMX,CNO3Ss1(L),DIFNO,RUONO3s1(N,L,NZ)
-    !    3,CCPOLRs1(N,L,NZ),CZPOLRs1(N,L,NZ),CPPOLRs1(N,L,NZ)
-    !    4,THETWs1(L),TKSs1(L),RSCSs1(L),UPMXP,FWSRT
-    !    5,FZUP,FCUP,COXYSs1(L),COXYGs1(L),WFRs1(N,L,NZ)
-    !    6,CCPOLPs1(NZ),CZPOLPs1(NZ),CPPOLPs1(NZ)
-    !    7,FDBK(1,NZ),PSIST1(L),PSIRTs1(N,L,NZ)
-    !    2,ZPOOLRs1(N,L,NZ),WTRTLs1(N,L,NZ)
-    !    3,RUNNOPs1(N,L,NZ),RNO3Ys1(L)
-!1111  FORMAT(A8,5I4,40E12.4)
-!     ENDIF
   ELSE
     RUNNOPs1(N,L,NZ)=0.0_r8
     RUPNO3s1(N,L,NZ)=0.0_r8
@@ -1869,6 +1884,7 @@ module UptakesMod
     RUONOBs1(N,L,NZ)=0.0_r8
     RUCNOBs1(N,L,NZ)=0.0_r8
   ENDIF
+  end associate
   end subroutine UptakeNO3
 !------------------------------------------------------------------------
 
@@ -1890,6 +1906,16 @@ module UptakesMod
   real(r8) :: UPMX,UPMXP,X,Y
   real(r8) :: ZNHBX,ZNSGX,ZNH4M,ZNH4X,ZNHBM
 ! begin_execution
+  associate(                              &
+    ZNSGLs1   =>  plt_soilchem%ZNSGLs1  , &
+    VOLWs1    =>  plt_soilchem%VOLWs1   , &
+    VLNHBs1   =>  plt_soilchem%VLNHBs1  , &
+    ZNH4Bs1   =>  plt_soilchem%ZNH4Bs1  , &
+    CNH4Bs1   =>  plt_soilchem%CNH4Bs1  , &
+    VLNH4s1   =>  plt_soilchem%VLNH4s1  , &
+    ZNH4Ss1   =>  plt_soilchem%ZNH4Ss1  , &
+    CNH4Ss1   =>  plt_soilchem%CNH4Ss1    &
+  )
 ! ZNSGL=NH4 diffusivity
 ! TORT=soil tortuosity
 ! PATH=path length of water and nutrient uptake
@@ -1957,21 +1983,6 @@ module UptakesMod
     RUONH4s1(N,L,NZ)=AMIN1(ZNH4X,AMAX1(0.0 &
       ,RTKNHP*PPs1(NZ)))
     RUCNH4s1(N,L,NZ)=RUPNH4s1(N,L,NZ)/FCUP
-!   IF(NX.EQ.1.OR.NZ.EQ.4)THEN
-!     WRITE(*,1110)'UPNH4',I,J,NZ,L,N,RUNNHPs1(N,L,NZ)
-!    2,RUPNH4s1(N,L,NZ),RTKNH4,RMFNH4,X,Y,B,C,UPMX,UPMXP
-!    2,WFRs1(N,L,NZ),CNH4Ss1(L),DIFNH,RTDNPs1(N,L,NZ)
-!    2,WTRTDs1(N,L,NZ),CNH4Ss1(L),RDFOMNs1(N,L,NZ)
-!    3,CCPOLRs1(N,L,NZ),CZPOLRs1(N,L,NZ),CPPOLRs1(N,L,NZ)
-!    4,THETWs1(L),TKSs1(L),RSCSs1(L),UPMXP,FWSRT
-!    5,FZUP,FCUP,COXYSs1(L),COXYGs1(L)
-!    6,CCPOLPs1(NZ)
-!    7,CZPOLPs1(NZ),CPPOLPs1(NZ),FDBK(1,NZ),PSIST1(L)
-!    2,PSIRTs1(N,L,NZ),ZPOOLRs1(N,L,NZ),WTRTLs1(N,L,NZ)
-!    3,RTARPs1(N,L,NZ),RRADL(N,L),PATH(N,L)
-!    4,DIFFL,ZNSGX,RTARR(N,L),PATHL,RRADL(N,L),VLNH4s1(L)
-!1110  FORMAT(A8,5I4,100E24.16)
-!     ENDIF
   ELSE
     RUNNHPs1(N,L,NZ)=0.0_r8
     RUPNH4s1(N,L,NZ)=0.0_r8
@@ -2044,6 +2055,7 @@ module UptakesMod
     RUONHBs1(N,L,NZ)=0.0_r8
     RUCNHBs1(N,L,NZ)=0.0_r8
   ENDIF
+  end associate
   end subroutine UptakeNH4
 !------------------------------------------------------------------------
 
@@ -2136,6 +2148,11 @@ module UptakesMod
   real(r8) :: XFRC,XFRN,XFRP
   integer :: K
   !     begin_execution
+  associate(                           &
+    OQNs1   =>  plt_soilchem%OQNs1   , &
+    OQPs1   =>  plt_soilchem%OQPs1   , &
+    OQCs1   =>  plt_soilchem%OQCs1     &
+  )
   !
   !     ROOT EXUDATION OF C, N AND P DEPENDS ON CONCN DIFFERENCES
   !     BETWEEN ROOT NON-STRUCTURAL POOLS AND SOIL DISSOLVED POOLS
@@ -2180,24 +2197,9 @@ module UptakesMod
       RDFOMNs1(N,K,L,NZ)=0.0_r8
       RDFOMPs1(N,K,L,NZ)=0.0_r8
     ENDIF
-    !     IF((I/10)*10.EQ.I.AND.J.EQ.24.AND.NZ.EQ.1)THEN
-    !     WRITE(*,2224)'RDFOMC',I,J,NX,NY,L,NZ,K,N,RDFOMCs1(N,K,L,NZ)
-    !    2,RDFOMNs1(N,K,L,NZ),RDFOMPs1(N,K,L,NZ)
-    !    3,OQCs1(K,L),OQNs1(K,L),OQPs1(K,L)
-    !    2,CPOOLRs1(N,L,NZ),ZPOOLRs1(N,L,NZ),PPOOLRs1(N,L,NZ)
-    !    3,VOLWMs1(NPH,L),RTVLWs1(N,L,NZ),RTAR1Xs1(N,NZ)
-    !    4,RTAR2Xs1(N,NZ),RTLGPs1(N,L,NZ)*PPs1(NZ)
-    !    4,WTRTDs1(N,L,NZ)
-    !    5,VOLWK,VOLWMs1(NPH,L),FOSRHs1(K,L)
-    !    5,OQCs1(K,L)/VOLWK
-    !    5,OQNs1(K,L)/OQCs1(K,L)
-    !    5,OQPs1(K,L)/OQCs1(K,L)
-    !    6,CPOOLRs1(N,L,NZ)/RTVLWs1(N,L,NZ)
-    !    6,ZPOOLX/CPOOLRs1(N,L,NZ)
-    !    6,PPOOLX/CPOOLRs1(N,L,NZ)
-!2224  FORMAT(A8,8I4,30E12.4)
-!     ENDIF
+
 195   CONTINUE
+  end associate
   end subroutine RootExudates
 !------------------------------------------------------------------------
 
@@ -2376,10 +2378,50 @@ module UptakesMod
   real(r8) :: ZH3PA,ZH3PB,ZH3GA,ZH3GB,Z2OPX,ZH3PX
 
 !     begin_execution
-  associate(                         &
-    IDAYs1   =>  plt_pheno%IDAYs1  , &
-    NGs1     =>   plt_morph%NGs1   , &
-    NB1s1    =>  plt_morph%NB1s1     &
+  associate(                           &
+    CO2Gs1   =>  plt_soilchem%CO2Gs1 , &
+    CO2Ss1   =>  plt_soilchem%CO2Ss1 , &
+    ZNH3Ss1  =>  plt_soilchem%ZNH3Ss1, &
+    SN2OLs1  =>  plt_soilchem%SN2OLs1, &
+    H2GSs1   =>  plt_soilchem%H2GSs1 , &
+    CZ2OSs1  =>  plt_soilchem%CZ2OSs1, &
+    CNH3Gs1  =>  plt_soilchem%CNH3Gs1, &
+    CH2GGs1  =>  plt_soilchem%CH2GGs1, &
+    CH2GSs1  =>  plt_soilchem%CH2GSs1, &
+    CZ2OGs1  =>  plt_soilchem%CZ2OGs1, &
+    VLNH4s1  =>  plt_soilchem%VLNH4s1, &
+    HGSGLs1  =>  plt_soilchem%HGSGLs1, &
+    SCH4Ls1  =>  plt_soilchem%SCH4Ls1, &
+    CCH4Gs1  =>  plt_soilchem%CCH4Gs1, &
+    CLSGLs1  =>  plt_soilchem%CLSGLs1, &
+    THETYs1  =>  plt_soilchem%THETYs1, &
+    OLSGLs1  =>  plt_soilchem%OLSGLs1, &
+    SOXYLs1  =>  plt_soilchem%SOXYLs1, &
+    SNH3Ls1  =>  plt_soilchem%SNH3Ls1, &
+    SH2GLs1  =>  plt_soilchem%SH2GLs1, &
+    VOLYs1   =>  plt_soilchem%VOLYs1 , &
+    ZNSGLs1  =>  plt_soilchem%ZNSGLs1, &
+    Z2SGLs1  =>  plt_soilchem%Z2SGLs1, &
+    ZHSGLs1  =>  plt_soilchem%ZHSGLs1, &
+    ZVSGLs1  =>  plt_soilchem%ZVSGLs1, &
+    SCO2Ls1  =>  plt_soilchem%SCO2Ls1, &
+    HLSGLs1  =>  plt_soilchem%HLSGLs1, &
+    CQSGLs1  =>  plt_soilchem%CQSGLs1, &
+    VLNHBs1  =>  plt_soilchem%VLNHBs1, &
+    ZNH3Bs1  =>  plt_soilchem%ZNH3Bs1, &
+    CGSGLs1  =>  plt_soilchem%CGSGLs1, &
+    CNH3Bs1  =>  plt_soilchem%CNH3Bs1, &
+    CHSGLs1  =>  plt_soilchem%CHSGLs1, &
+    OGSGLs1  =>  plt_soilchem%OGSGLs1, &
+    Z2OSs1   =>  plt_soilchem%Z2OSs1 , &
+    CNH3Ss1  =>  plt_soilchem%CNH3Ss1, &
+    OXYGs1   =>  plt_soilchem%OXYGs1 , &
+    CCH4Ss1  =>  plt_soilchem%CCH4Ss1, &
+    OXYSs1   =>  plt_soilchem%OXYSs1 , &
+    CH4Ss1   =>  plt_soilchem%CH4Ss1 , &
+    IDAYs1   =>  plt_pheno%IDAYs1    , &
+    NGs1     =>   plt_morph%NGs1     , &
+    NB1s1    =>  plt_morph%NB1s1       &
   )
   IF(RCO2Ms1(N,L,NZ).GT.ZEROPs1(NZ) &
     .AND.RTVLWs1(N,L,NZ).GT.ZEROPs1(NZ) &
@@ -3032,8 +3074,10 @@ module UptakesMod
   real(r8) :: FCUP,FZUP,FPUP,FWSRT,UPWTRP,UPWTRH,FOXYX,RUPOXT
   integer :: N,L
 !     begin_execution
-  associate(                       &
-    NIs1    =>  plt_morph%NIs1     &
+  associate(                             &
+    THETWs1 =>  plt_soilchem%THETWs1   , &
+    VOLXs1  =>  plt_soilchem%VOLXs1    , &
+    NIs1    =>  plt_morph%NIs1           &
   )
   DO 955 N=1,MYs1(NZ)
     DO 950 L=NUs1,NIs1(NZ)

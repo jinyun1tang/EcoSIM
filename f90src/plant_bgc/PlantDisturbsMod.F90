@@ -1122,7 +1122,9 @@ module PlantDisturbsMod
     TGSTGIs1   =>  plt_pheno%TGSTGIs1 , &
     TGSTGFs1   =>  plt_pheno%TGSTGFs1 , &
     FLG4s1     =>  plt_pheno%FLG4s1   , &
-    NGs1       =>   plt_morph%NGs1    , &
+    CORGCs1    =>  plt_soilchem%CORGCs1, &
+    THETWs1    =>  plt_soilchem%THETWs1, &
+    NGs1       =>  plt_morph%NGs1     , &
     ZCs1       => plt_morph%ZCs1      , &
     ARLFTs1    => plt_morph%ARLFTs1   , &
     ZLs1       => plt_morph%ZLs1      , &

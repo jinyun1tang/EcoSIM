@@ -3151,6 +3151,7 @@ module grosubsMod
   real(r8) :: XFRC,XFRN,XFRP
   ! begin_execution
   associate(                          &
+    VOLXs1   =>  plt_soilchem%VOLXs1, &
     IDAYs1   =>  plt_pheno%IDAYs1   , &
     VRNXs1   =>  plt_pheno%VRNXs1   , &
     VRNSs1   =>  plt_pheno%VRNSs1   , &
@@ -3354,19 +3355,12 @@ module grosubsMod
       IF(WTRTM.GT.ZEROPs1(NZ).AND.CPOOLM.GT.ZEROPs1(NZ))THEN
         DO 51 L=NUs1,NIs1(NZ)
           FXFN=AMAX1(0.0,CPOOLRs1(1,L,NZ))/CPOOLM
-!         IF(NZ.EQ.1.OR.NZ.EQ.4)THEN
-!         WRITE(*,9879)'GERM2',I,J,NZ,L,UPNH4R,FXFN
-!        2,ZPOOLRs1(1,L,NZ),CPOOLRs1(1,L,NZ),CPOOLM
-!9879      FORMAT(A8,4I4,12E24.16)
-!         ENDIF
+
           ZPOOLRs1(1,L,NZ)=ZPOOLRs1(1,L,NZ)+FXFN*UPNH4R
           PPOOLRs1(1,L,NZ)=PPOOLRs1(1,L,NZ)+FXFN*UPPO4R
 51      CONTINUE
       ELSE
-  !     IF(NZ.EQ.1.OR.NZ.EQ.4)THEN
-  !     WRITE(*,9879)'GERM3',I,J,NZ,L,UPNH4R,FXFN
-  !    2,ZPOOLRs1(1,L,NZ),CPOOLRs1(1,L,NZ),CPOOLM
-  !     ENDIF
+
         ZPOOLRs1(1,NGs1(NZ),NZ)=ZPOOLRs1(1,NGs1(NZ),NZ)+UPNH4R
         PPOOLRs1(1,NGs1(NZ),NZ)=PPOOLRs1(1,NGs1(NZ),NZ)+UPPO4R
       ENDIF
@@ -3505,13 +3499,7 @@ module grosubsMod
       PPOOLs1(NB,NZ)=PPOOLs1(NB,NZ)-XFRP
       WTRSBPs1(NB,NZ)=WTRSBPs1(NB,NZ)+XFRP
     ENDIF
-!     IF(NZ.EQ.1)THEN
-!     WRITE(*,4488)'EXCHC',I,J,NX,NY,NZ,NB,NS,XFRC,XFRN
-!    2,FXFZ(ISTYPs1(NZ)),WTRSVBs1(NB,NZ),CPOOLs1(NB,NZ)
-!    3,WVSTKBs1(NB,NZ),WTLSBs1(NB,NZ)
-!    4,CPOOLT,CPOOLD,ZPOOLs1(NB,NZ),WTRSBNs1(NB,NZ)
-!4488  FORMAT(A8,7I4,12E12.4)
-!     ENDIF
+
     IF(ISTYPs1(NZ).EQ.0.AND.IDAYs1(8,NB,NZ).NE.0)THEN
       DO 2050 L=NUs1,NIs1(NZ)
         IF(VOLXs1(L).GT.ZEROS2s1)THEN

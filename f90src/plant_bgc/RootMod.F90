@@ -107,6 +107,8 @@ implicit none
 !     begin_execution
   associate(                                &
     IGTYPs1    =>   plt_pheno%IGTYPs1     , &
+    RSCSs1     =>   plt_soilchem%RSCSs1   , &
+    VOLXs1     =>   plt_soilchem%VOLXs1   , &
     NIs1       =>   plt_morph%NIs1        , &
     SDLGs1     =>   plt_morph%SDLGs1      , &
     NGs1       =>   plt_morph%NGs1        , &
@@ -135,9 +137,6 @@ implicit none
             EXIT
           ENDIF
 5003    CONTINUE
-!     WRITE(*,4994)'5005',I,J,NZ,N,L,LZ
-!    2,L1,VOLXs1(L),CDPTHZs1(L1)
-!4994  FORMAT(A8,7I4,12E12.4)
 !
 !     WATER STRESS CONSTRAINT ON SECONDARY ROOT EXTENSION IMPOSED
 !     BY ROOT TURGOR AND SOIL PENETRATION RESISTANCE
@@ -336,6 +335,8 @@ implicit none
     IGTYPs1   =>  plt_pheno%IGTYPs1     , &
     IWTYPs1   =>  plt_pheno%IWTYPs1     , &
     IDAYs1    =>  plt_pheno%IDAYs1      , &
+    BKDSs1    =>  plt_soilchem%BKDSs1   , &
+    RSCSs1    =>  plt_soilchem%RSCSs1   , &
     NGs1      =>   plt_morph%NGs1       , &
     NIXs1     =>  plt_morph%NIXs1       , &
     NRTs1     =>  plt_morph%NRTs1       , &
@@ -1294,7 +1295,8 @@ implicit none
 
 ! begin_execution
   associate(                             &
-    NGs1       =>   plt_morph%NGs1     , &
+    VOLXs1     =>  plt_soilchem%VOLXs1 , &
+    NGs1       =>  plt_morph%NGs1      , &
     SDPTHs1    =>  plt_morph%SDPTHs1   , &
     NINRs1     =>  plt_morph%NINRs1      &
   )
@@ -1808,6 +1810,7 @@ implicit none
 
   associate(                                 &
     IGTYPs1      =>   plt_pheno%IGTYPs1    , &
+    VOLXs1       =>  plt_soilchem%VOLXs1   , &
     SDPTHs1      =>   plt_morph%SDPTHs1    , &
     NIs1         =>   plt_morph%NIs1       , &
     NRTs1        =>   plt_morph%NRTs1        &

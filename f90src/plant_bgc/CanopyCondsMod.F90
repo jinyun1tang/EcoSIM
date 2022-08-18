@@ -266,16 +266,19 @@ module CanopyCondsMod
     TAURs1  => plt_rad%TAURs1  , &
     RADPs1  => plt_rad%RADPs1  , &
     ZCOSs1  => plt_rad%ZCOSs1  , &
-    ZLs1    => plt_morph%ZLs1  , &
-    NBRs1   => plt_morph%NBRs1 , &
-    SURFs1  => plt_morph%SURFs1  , &
-    SURFBs1 => plt_morph%SURFBs1 , &
-    ARLFPs1 => plt_morph%ARLFPs1 , &
-    ARLFLs1 => plt_morph%ARLFLs1 , &
-    ARSTKs1 => plt_morph%ARSTKs1 , &
-    ARLFSs1 => plt_morph%ARLFSs1 , &
-    CFs1    => plt_morph%CFs1    , &
-    ARLSSs1 => plt_morph%ARLSSs1   &
+    VOLXs1  => plt_soilchem%VOLXs1, &
+    VOLYs1  => plt_soilchem%VOLYs1, &
+    VOLWs1  => plt_soilchem%VOLWs1, &
+    ZLs1    => plt_morph%ZLs1     , &
+    NBRs1   => plt_morph%NBRs1    , &
+    SURFs1  => plt_morph%SURFs1   , &
+    SURFBs1 => plt_morph%SURFBs1  , &
+    ARLFPs1 => plt_morph%ARLFPs1  , &
+    ARLFLs1 => plt_morph%ARLFLs1  , &
+    ARSTKs1 => plt_morph%ARSTKs1  , &
+    ARLFSs1 => plt_morph%ARLFSs1  , &
+    CFs1    => plt_morph%CFs1     , &
+    ARLSSs1 => plt_morph%ARLSSs1    &
   )
   ARLSSs1=0.0
   DO 1135 NZ=1,NPs1
@@ -666,10 +669,8 @@ module CanopyCondsMod
             RA2WT=RADW2(NZ)+RAYW2(NZ)
             RA2PT=RADP2(NZ)+RAYP2(NZ)
             RA2QT=RADQ2(NZ)+RAYQ2(NZ)
-            RAFSL(L)=RAFSL(L)+(RADST*TAURs1(NZ) &
-              +RA2ST*ALBRs1(NZ)+RA2WT*ALBRW)*YAREA
-            RAFPL(L)=RAFPL(L)+(RADPT*TAUPs1(NZ) &
-              +RA2PT*ALBPs1(NZ)+RA2QT*ALBPW)*YAREA
+            RAFSL(L)=RAFSL(L)+(RADST*TAURs1(NZ)+RA2ST*ALBRs1(NZ)+RA2WT*ALBRW)*YAREA
+            RAFPL(L)=RAFPL(L)+(RADPT*TAUPs1(NZ)+RA2PT*ALBPs1(NZ)+RA2QT*ALBPW)*YAREA
             RABSL(L)=RABSL(L)+(RA1ST*ALBRs1(NZ)+RA1WT*ALBRW)*YAREA
             RABPL(L)=RABPL(L)+(RA1PT*ALBPs1(NZ)+RA1QT*ALBPW)*YAREA
             RADCs1(NZ)=RADCs1(NZ)+RADST+RADWT
