@@ -79,6 +79,7 @@ implicit none
   contains
    procedure, public :: Init
    procedure, public :: Destroy=> Destruct
+   procedure, public :: ZeroOut
   end type micfluxtype
 
   contains
@@ -139,8 +140,60 @@ implicit none
   allocate(this%RVMB2ff(JG,NFGs));this%RVMB2ff=0._r8
 
   end subroutine Init
+!------------------------------------------------------------------------------------------
+  subroutine ZeroOut(this)
 
+  implicit none
+  class(micfluxtype) :: this
+  integer :: jcplx1,JG,NFGs
 
+  this%ROXSK = 0._r8
+  this%XOQCS=0._r8
+  this%XOQNS=0._r8
+  this%XOQPS=0._r8
+  this%XOQAS=0._r8
+  this%ROXYS=0._r8
+  this%ROQCS=0._r8
+  this%ROQAS=0._r8
+  this%RVMX3=0._r8
+  this%RVMB3=0._r8
+  this%RVMX2=0._r8
+  this%RVMB2=0._r8
+  this%RVMX1=0._r8
+  this%RVMX4=0._r8
+  this%RVMB4=0._r8
+  this%RINHO=0._r8
+  this%RINHB=0._r8
+  this%RINOO=0._r8
+  this%RINOB=0._r8
+  this%RIPOO=0._r8
+  this%RIPBO=0._r8
+  this%RIPO1=0._r8
+  this%RIPB1=0._r8
+  this%RINHOR=0._r8
+  this%RINOOR=0._r8
+  this%RIPOOR=0._r8
+  this%RIPO1R=0._r8
+  this%ROXYSff=0._r8
+  this%RINHOff=0._r8
+  this%RINHBff=0._r8
+  this%RINOOff=0._r8
+  this%RINOBff=0._r8
+  this%RIPOOff=0._r8
+  this%RIPBOff=0._r8
+  this%RIPO1ff=0._r8
+  this%RIPB1ff=0._r8
+  this%RINHORff=0._r8
+  this%RINOORff=0._r8
+  this%RIPOORff=0._r8
+  this%RIPO1Rff=0._r8
+  this%RVMX4ff=0._r8
+  this%RVMB4ff=0._r8
+  this%RVMX2ff=0._r8
+  this%RVMB2ff=0._r8
+
+  end subroutine ZeroOut
+!------------------------------------------------------------------------------------------
   subroutine Destruct(this)
   use abortutils, only : destroy
   implicit none

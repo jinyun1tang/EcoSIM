@@ -28,7 +28,7 @@ SUBROUTINE soil(NA,ND,NT,NE,NAX,NTX,NEX,NHW,NHE,NVN,NVS)
   use EcoSIMHistMod
   use EcoSIMConfig
   use PlantAPI     , only : PlantModel
-  use MicBGCAPI    , only : MicrobeModel
+  use MicBGCAPI    , only : MicrobeModel, MicAPI_Init, MicAPI_cleanup
   implicit none
 
   integer, intent(in) :: NT,NE,NAX,NTX,NEX,NHW,NHE,NVN,NVS
@@ -114,6 +114,9 @@ SUBROUTINE soil(NA,ND,NT,NE,NAX,NTX,NEX,NHW,NHE,NVN,NVS)
 !
   if(lverb)WRITE(*,333)'STARTE'
   CALL STARTE(NHW,NHE,NVN,NVS)
+
+  call MicAPI_Init
+
 !
 !   BEGIN DAILY TIME STEP
 !
@@ -276,6 +279,9 @@ SUBROUTINE soil(NA,ND,NT,NE,NAX,NTX,NEX,NHW,NHE,NVN,NVS)
   ENDIF
   GO TO 9000
 9999  CONTINUE
+
+  call MicAPI_cleanup
+
 ! WRITE(*,333)'LOOP'
 !
 ! WRITE OUTPUT FILES FOR EACH GRID CELL IN 'SPLIT'

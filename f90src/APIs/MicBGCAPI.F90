@@ -25,13 +25,42 @@ module MicBGCAPI
   use MicBGCPars, only : micpar
   use MicBGCMod, only : SoilBGCOneLayer
 implicit none
+  save
+  private
   character(len=*), private, parameter :: mod_filename = __FILE__
 
+  type(micforctype) :: micfor
+  type(micsttype) :: micstt
+  type(micfluxtype) :: micflx
   integer :: curI,curJ
-  public :: MicrobeModel
 
+
+  public :: MicrobeModel
+  public :: MicAPI_Init
+  public :: MicAPI_cleanup
   contains
 
+!------------------------------------------------------------------------------------------
+
+  subroutine MicAPI_Init()
+
+  implicit none
+
+  call micfor%Init()
+  call micstt%Init()
+  call micflx%Init()
+
+  end subroutine MicAPI_Init
+!------------------------------------------------------------------------------------------
+  subroutine MicAPI_cleanup()
+
+  implicit none
+
+
+  call micfor%destroy()
+  call micflx%destroy()
+  call micstt%destroy()
+  end subroutine MicAPI_cleanup
 !------------------------------------------------------------------------------------------
   subroutine MicrobeModel(I,J,NHW,NHE,NVN,NVS)
 !
@@ -113,13 +142,8 @@ END subroutine MicrobeModel
 
   implicit none
   integer, intent(in) :: I,J,L,NY,NX
-  type(micforctype) :: micfor
-  type(micsttype) :: micstt
-  type(micfluxtype) :: micflx
 
-  call micfor%Init()
-  call micstt%Init()
-  call micflx%Init()
+  call micflx%ZeroOut()
 
   call MicAPISend(L,NY,NX,micfor,micstt,micflx)
 
@@ -127,9 +151,6 @@ END subroutine MicrobeModel
 
   call MicAPIRecv(L,NY,NX,micfor%litrm,micstt,micflx)
 
-  call micfor%destroy()
-  call micflx%destroy()
-  call micstt%destroy()
   end subroutine Micbgc1Layer
 !------------------------------------------------------------------------------------------
 
