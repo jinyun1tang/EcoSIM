@@ -1,6 +1,7 @@
 set(PLANT_BGC_SOURCES
   InitVegBGC.F90
 	UptakesMod.F90
+  NoduleBGCMod.F90
   RootMod.F90
 	StartqMod.F90
   PhotoSynsMod.F90

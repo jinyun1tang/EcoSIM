@@ -51,6 +51,7 @@ module UptakesMod
   integer :: ILYR(2,JZ1)
 !     begin_execution
   associate(                         &
+    IDAYs1   =>  plt_pheno%IDAYs1  , &
     ARLFCs1  => plt_morph%ARLFCs1  , &
     ARLSSs1  => plt_morph%ARLSSs1  , &
     ARLFSs1  => plt_morph%ARLFSs1  , &
@@ -282,6 +283,7 @@ module UptakesMod
     FRADPs1  =>  plt_rad%FRADPs1    , &
     ARLF1s1  =>  plt_morph%ARLF1s1  , &
     KLEAFXs1 =>  plt_morph%KLEAFXs1 , &
+    ZCs1     => plt_morph%ZCs1      , &
     ARLFSs1  =>  plt_morph%ARLFSs1  , &
     NBRs1    =>  plt_morph%NBRs1    , &
     SURFs1   =>  plt_morph%SURFs1   , &
@@ -458,7 +460,10 @@ module UptakesMod
 ! begin_execution
   associate(                         &
    NIs1      => plt_morph%NIs1     , &
-   FRADPs1    =>  plt_rad%FRADPs1  , &
+    NGs1     =>   plt_morph%NGs1   , &
+   FRADPs1   => plt_rad%FRADPs1    , &
+   RSMHs1    => plt_photo%RSMHs1   , &
+   RCSs1     => plt_photo%RCSs1    , &
    RAD1s1    => plt_rad%RAD1s1     , &
    THRM1s1   => plt_rad%THRM1s1      &
   )
@@ -543,10 +548,12 @@ module UptakesMod
 
   associate(                          &
     NIs1       => plt_morph%NIs1    , &
+    RCSs1      => plt_photo%RCSs1   , &
+    RSMHs1     => plt_photo%RSMHs1  , &
     RAD1s1     => plt_rad%RAD1s1    , &
     RADCs1     => plt_rad%RADCs1    , &
     THSs1      => plt_rad%THSs1     , &
-    FRADPs1    =>  plt_rad%FRADPs1  , &
+    FRADPs1    => plt_rad%FRADPs1   , &
     THRM1s1    => plt_rad%THRM1s1   , &
     THRMGXs1   => plt_rad%THRMGXs1    &
   )
@@ -817,6 +824,8 @@ module UptakesMod
   real(r8) :: RSSL,RTAR2
   integer :: N, L
   associate(                        &
+    ZCs1     => plt_morph%ZCs1    , &
+    NGs1     =>   plt_morph%NGs1  , &
     NIs1     =>  plt_morph%NIs1     &
   )
 
@@ -941,6 +950,10 @@ module UptakesMod
 ! begin_execution
   associate(                        &
     NIs1     =>  plt_morph%NIs1   , &
+    ZCs1     => plt_morph%ZCs1    , &
+    NGs1     =>   plt_morph%NGs1  , &
+    RCSs1    =>  plt_photo%RCSs1  , &
+    RSMHs1   =>  plt_photo%RSMHs1 , &
     FRADPs1  =>  plt_rad%FRADPs1  , &
     THRM1s1  =>  plt_rad%THRM1s1  , &
     RAD1s1   =>  plt_rad%RAD1s1     &
@@ -1065,6 +1078,7 @@ module UptakesMod
   real(r8) :: ACTV,RTK,STK,TKGO,TKSO
   integer :: L
   associate(                          &
+    IDAYs1   =>  plt_pheno%IDAYs1   , &
     NIs1     =>  plt_morph%NIs1     , &
     NB1s1    =>  plt_morph%NB1s1      &
   )
@@ -2362,8 +2376,10 @@ module UptakesMod
   real(r8) :: ZH3PA,ZH3PB,ZH3GA,ZH3GB,Z2OPX,ZH3PX
 
 !     begin_execution
-  associate(                        &
-    NB1s1    =>  plt_morph%NB1s1    &
+  associate(                         &
+    IDAYs1   =>  plt_pheno%IDAYs1  , &
+    NGs1     =>   plt_morph%NGs1   , &
+    NB1s1    =>  plt_morph%NB1s1     &
   )
   IF(RCO2Ms1(N,L,NZ).GT.ZEROPs1(NZ) &
     .AND.RTVLWs1(N,L,NZ).GT.ZEROPs1(NZ) &

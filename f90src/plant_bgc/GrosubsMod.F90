@@ -9,6 +9,7 @@ module grosubsMod
   use PlantAPIData
   use PhotoSynsMod
   use RootMod, only : RootBGCModel
+  use NoduleBGCMod
   use LitterFallMod
   implicit none
 
@@ -64,6 +65,9 @@ module grosubsMod
   integer :: NZ
   real(r8) :: CPOOLK(JC1,JP1)
 ! begin_execution
+  associate(                            &
+    ZCs1       => plt_morph%ZCs1        &
+  )
 !     TOTAL AGB FOR GRAZING IN LANDSCAPE SECTION
 !
 !
@@ -102,8 +106,9 @@ module grosubsMod
         call RemoveBiomassByDisturbance(I,J,NZ,CPOOLK)
 9985  CONTINUE
 !
-!     TRANSFORMATIONS IN LIVING OR DEAD PLANT POPULATIONS
-      call LiveDeadTransformation(I,J)
+! TRANSFORMATIONS IN LIVING OR DEAD PLANT POPULATIONS
+  call LiveDeadTransformation(I,J)
+  end associate
   END subroutine grosubs
 
 !------------------------------------------------------------------------------------------
@@ -117,6 +122,12 @@ module grosubsMod
 !     begin_execution
 
   associate(                           &
+    IGTYPs1   => plt_pheno%IGTYPs1   , &
+    IFLGIs1   => plt_pheno%IFLGIs1   , &
+    IFLGEs1   => plt_pheno%IFLGEs1   , &
+    IBTYPs1   => plt_pheno%IBTYPs1   , &
+    VRNLs1    => plt_pheno%VRNLs1    , &
+    VRNSs1    => plt_pheno%VRNSs1    , &
     SDPTHIs1  => plt_morph%SDPTHIs1  , &
     NBRs1     => plt_morph%NBRs1       &
   )
@@ -276,6 +287,9 @@ module grosubsMod
   real(r8) :: WFNS,WFNSG
 ! begin_execution
   associate(                              &
+    IGTYPs1  => plt_pheno%IGTYPs1       , &
+    IDTHRs1  => plt_pheno%IDTHRs1       , &
+    IDTHPs1  => plt_pheno%IDTHPs1       , &
     SDARs1   => plt_morph%SDARs1        , &
     SDVLs1   => plt_morph%SDVLs1        , &
     NBRs1    => plt_morph%NBRs1         , &
@@ -317,375 +331,6 @@ module grosubsMod
   end subroutine GrowPlant
 
 
-!------------------------------------------------------------------------------------------
-
-  subroutine CanopyNoduleBiochemistry(I,J,NZ,NB,TFN5,WFNG,UPNFC)
-  implicit none
-  integer, intent(in) :: I,J,NZ,NB
-  real(r8), intent(in) :: TFN5,WFNG
-  real(r8), intent(inout) :: UPNFC(JP1)
-  integer :: M
-  real(r8) :: ZADDN,ZPOOLD
-  real(r8) :: CCC,CNC,CPC
-  REAL(R8) :: cpoolt
-  real(r8) :: CPOOLD
-  real(r8) :: CCPOLN,CZPOLN
-  real(r8) :: CPPOLN,CGNDL
-  real(r8) :: CCNDLB
-  real(r8) :: FCNPF
-  real(r8) :: FXRNX
-  real(r8) :: GRNDG
-  real(r8) :: PPOOLD
-  real(r8) :: PADDN,RCO2T
-  real(r8) :: RCNDL,RMNDL,RXNDL
-  real(r8) :: RGNDL,RSNDL
-  real(r8) :: RGN2P,RGN2F
-  real(r8) :: RUPNFB
-  real(r8) :: RXNDLC,RXNDLN,RXNDLP
-  real(r8) :: RDNDLC,RDNDLN,RDNDLP
-  real(r8) :: RCNDLC,RCNDLN,RCNDLP
-  real(r8) :: RGNDG
-  real(r8) :: RXNSNC,RXNSNN,RXNSNP
-  real(r8) :: RDNSNC,RDNSNN,RDNSNP
-  real(r8) :: RCNSNC,RCNSNN,RCNSNP
-  real(r8) :: SPNDLI
-  real(r8) :: SPNDX
-  real(r8) :: WTLSB1,WTNDB1,WTLSBT
-  real(r8) :: XFRC,XFRN,XFRP
-  REAL(R8) :: RCCC,RCCN,RCCP
-!     begin_execution
-!     INTYP=N2 fixation: 4,5,6=rapid to slow canopy symbiosis
-!
-  IF(INTYPs1(NZ).GE.4)THEN
-!
-!     INITIAL INFECTION
-!
-!     WTNDB,WTNDBN,WTNDBP=bacterial C,N,P mass
-!     WTNDI=initial bacterial mass at infection
-!     AREA=grid cell area
-!     CNND,CPND=bacterial N:C,P:C ratio from PFT file
-!
-    IF(WTNDBs1(NB,NZ).LE.0.0)THEN
-      WTNDBs1(NB,NZ)=WTNDBs1(NB,NZ) &
-        +WTNDI*AREA3s1(NUs1)
-      WTNDBNs1(NB,NZ)=WTNDBNs1(NB,NZ) &
-        +WTNDI*AREA3s1(NUs1)*CNNDs1(NZ)
-      WTNDBPs1(NB,NZ)=WTNDBPs1(NB,NZ) &
-        +WTNDI*AREA3s1(NUs1)*CPNDs1(NZ)
-    ENDIF
-!
-!     O2-UNCONSTRAINED RESPIRATION RATES BY HETEROTROPHIC AEROBES
-!     IN NODULE FROM SPECIFIC OXIDATION RATE, ACTIVE BIOMASS,
-!     NON-STRUCTURAL C CONCENTRATION, MICROBIAL C:N:P FACTOR,
-!     AND TEMPERATURE
-!
-!     WTNDB,WTNDBN,WTNDBP=bacterial C,N,P mass
-!     CPOLNB,ZPOLNB,PPOLNB=nonstructural C,N,P in bacteria
-!     CCPOLN,CZPOLN,CPPOLN=nonstructural C,N,P concn in bacteria
-!     CNKI,CPKI=nonstructural N,P inhibition constant on growth
-!     FCNPF=N,P constraint to bacterial activity
-!
-    IF(WTNDBs1(NB,NZ).GT.ZEROPs1(NZ))THEN
-      CCPOLN=AMAX1(0.0,CPOLNBs1(NB,NZ)/WTNDBs1(NB,NZ))
-      CZPOLN=AMAX1(0.0,ZPOLNBs1(NB,NZ)/WTNDBs1(NB,NZ))
-      CPPOLN=AMAX1(0.0,PPOLNBs1(NB,NZ)/WTNDBs1(NB,NZ))
-    ELSE
-      CCPOLN=1.0_r8
-      CZPOLN=1.0_r8
-      CPPOLN=1.0_r8
-    ENDIF
-    IF(CCPOLN.GT.ZEROs1)THEN
-      CCC=AMAX1(0.0,AMIN1(1.0,safe_adb(CZPOLN,CZPOLN+CCPOLN*CNKI) &
-        ,safe_adb(CPPOLN,CPPOLN+CCPOLN*CPKI)))
-      CNC=AMAX1(0.0,AMIN1(1.0,safe_adb(CCPOLN,CCPOLN+CZPOLN/CNKI)))
-      CPC=AMAX1(0.0,AMIN1(1.0,safe_adb(CCPOLN,CCPOLN+CPPOLN/CPKI)))
-    ELSE
-      CCC=0._r8
-      CNC=0._r8
-      CPC=0._r8
-    ENDIF
-    IF(WTNDBs1(NB,NZ).GT.ZEROPs1(NZ))THEN
-      FCNPF=AMIN1(1.0 &
-        ,SQRT(WTNDBNs1(NB,NZ)/(WTNDBs1(NB,NZ)*CNNDs1(NZ))) &
-        ,SQRT(WTNDBPs1(NB,NZ)/(WTNDBs1(NB,NZ)*CPNDs1(NZ))))
-    ELSE
-      FCNPF=1.0_r8
-    ENDIF
-    SPNDLI=CCPOLN/(CCPOLN+SPNDLK)
-!
-!     RESPIRATION FROM NON-STRUCTURAL C DETERMINED BY TEMPERATURE,
-!     NON-STRUCTURAL C:N:P
-!
-!     RCNDL=respiration from non-structural C
-!     CPOLNB,ZPOLNB,PPOLNB=nonstructural C,N,P in bacteria
-!     VMXO=specific respiration rate by bacterial N2 fixers
-!     WTNDB=bacterial C mass
-!     TFN3=temperature function for canopy growth
-!     FCNPF=N,P constraint to bacterial activity
-!     WFNG=growth function of canopy water potential
-!
-    RCNDL=AMAX1(0.0,AMIN1(CPOLNBs1(NB,NZ) &
-      ,VMXO*WTNDBs1(NB,NZ))*FCNPF*TFN3s1(NZ)*WFNG)
-!     CPOOLNX=CPOLNBs1(NB,NZ)
-!     VMXOX=VMXO*WTNDBs1(NB,NZ)*FCNPF*TFN3s1(NZ)*WFNG
-!
-!     NODULE MAINTENANCE RESPIRATION FROM SOIL TEMPERATURE,
-!     NODULE STRUCTURAL N
-!
-!     RMNDL=bacterial maintenance respiration
-!     RMPLT=specific maintenance respiration rate (g C g-1 N h-1)
-!     TFN5=temperature function for canopy maintenance respiration
-!     WTNDBN=bacterial N mass
-!
-    RMNDL=AMAX1(0.0,RMPLT*TFN5*WTNDBNs1(NB,NZ))*SPNDLI
-!
-!     NODULE GROWTH RESPIRATION FROM TOTAL - MAINTENANCE
-!     IF > 0 DRIVES GROWTH, IF < 0 DRIVES REMOBILIZATION
-!
-!     RXNDL=difference between non-structural C respn and mntc respn
-!     RGNDL=growth respiration unlimited by N,P
-!     RSNDL=excess maintenance respiration
-!
-    RXNDL=RCNDL-RMNDL
-    RGNDL=AMAX1(0.0,RXNDL)
-    RSNDL=AMAX1(0.0,-RXNDL)
-!
-!     NODULE N2 FIXATION FROM GROWTH RESPIRATION, FIXATION ENERGY
-!     REQUIREMENT AND NON-STRUCTURAL C:N:P PRODUCT INHIBITION,
-!     CONSTRAINED BY MICROBIAL N REQUIREMENT
-!
-!     RGN2P=respiration requirement to maintain bacterial N:C ratio
-!     WTNDB,WTNDBN=bacterial C,N mass
-!     CNND=bacterial N:C ratio from PFT file
-!     EN2F=N fixation yield from C oxidation (g N g-1 C)
-!     RGNDL=growth respiration unlimited by N,P
-!     RGN2F=respiration for N2 fixation
-!     RUPNFB,UPNFC=branch,total N2 fixation
-!
-    RGN2P=AMAX1(0.0,WTNDBs1(NB,NZ)*CNNDs1(NZ)-WTNDBNs1(NB,NZ))/EN2F
-    IF(RGNDL.GT.ZEROPs1(NZ))THEN
-      RGN2F=RGNDL*RGN2P/(RGNDL+RGN2P)
-    ELSE
-      RGN2F=0._r8
-    ENDIF
-    RUPNFB=RGN2F*EN2F
-    UPNFC(NZ)=UPNFC(NZ)+RUPNFB
-!
-!     NODULE C,N,P REMOBILIZATION AND DECOMPOSITION AND LEAKAGE
-!
-!     RCCC,RCCN,RCCP=remobilization coefficient for C,N,P
-!     RCCZN,RCCYN=min,max fractions for bacteria C recycling
-!     RCCXN,RCCQN=max fractions for bacteria N,P recycling
-!     WTLSB=leaf+petiole mass
-!     CCNDLB=bacteria:leaf+petiole ratio
-!     RDNDBX=effect of CCNDLB on bacteria decomposition rate
-!     SPNDX=specific bacterial decomposition rate at current CCNDLB
-!     SPNDL=specific decomposition rate by bacterial N2 fixers
-!     WTNDB,WTNDBN,WTNDBP=bacterial C,N,P mass
-!     RXNDLC,RXNDLN,RXNDLP=bacterial C,N,P loss from decomposition
-!     RDNDLC,RDNDLN,RDNDLP=bacterial C,N,P decomposition to litterfall
-!     RCNDLC,RCNDLN,RCNDLP=bacterial C,N,P decomposition to recycling
-!
-    RCCC=RCCZN+CCC*RCCYN
-    RCCN=CNC*RCCXN
-    RCCP=CPC*RCCQN
-    SPNDX=SPNDL*SQRT(TFN3s1(NZ)*WFNG)
-    RXNDLC=SPNDX*WTNDBs1(NB,NZ)
-    RXNDLN=SPNDX*WTNDBNs1(NB,NZ)
-    RXNDLP=SPNDX*WTNDBPs1(NB,NZ)
-    RDNDLC=RXNDLC*(1.0_r8-RCCC)
-    RDNDLN=RXNDLN*(1.0_r8-RCCC)*(1.0_r8-RCCN)
-    RDNDLP=RXNDLP*(1.0_r8-RCCC)*(1.0_r8-RCCP)
-    RCNDLC=RXNDLC-RDNDLC
-    RCNDLN=RXNDLN-RDNDLN
-    RCNDLP=RXNDLP-RDNDLP
-!
-!     TOTAL NON-STRUCTURAL C,N,P USED IN NODULE GROWTH
-!     AND GROWTH RESPIRATION DEPENDS ON GROWTH YIELD
-!     ENTERED IN 'READQ'
-!
-!     CGNDL=total non-structural C used in bacterial growth and growth respiration
-!     CPOLNB,ZPOLNB,PPOLNB=nonstructural C,N,P in bacteria
-!     RMNDL=bacterial maintenance respiration
-!     RCNDL=respiration from non-structural C
-!     RCNDLC=bacterial C decomposition to recycling
-!     RGNDL=growth respiration ltd by O2
-!     RGN2F=respiration for N2 fixation
-!     GRNDG=bacterial growth
-!     DMND=bacterial growth yield
-!     RGNDG=bacterial respiration for growth and N2 fixation
-!     ZADDN,PADDN=nonstructural N,P used in growth
-!     CNND,CPND=bacterial N:C,P:C ratio from PFT file
-!     CCPOLN,CZPOLN,CPPOLN=nonstructural C,N,P concn in bacteria
-!     CZKM,CPKM=Km for nonstructural N,P uptake by bacteria
-!
-    CGNDL=AMIN1(CPOLNBs1(NB,NZ)-AMIN1(RMNDL,RCNDL) &
-      -RGN2F+RCNDLC,(RGNDL-RGN2F)/(1.0_r8-DMNDs1(NZ)))
-    GRNDG=CGNDL*DMNDs1(NZ)
-    RGNDG=RGN2F+CGNDL*(1.0_r8-DMNDs1(NZ))
-    ZADDN=AMAX1(0.0,AMIN1(ZPOLNBs1(NB,NZ) &
-      ,GRNDG*CNNDs1(NZ)))*CZPOLN/(CZPOLN+CZKM)
-    PADDN=AMAX1(0.0,AMIN1(PPOLNBs1(NB,NZ) &
-      ,GRNDG*CPNDs1(NZ)))*CPPOLN/(CPPOLN+CPKM)
-!
-!     NODULE SENESCENCE
-!
-!     RSNDL=excess maintenance respiration
-!     WTNDB,WTNDBN,WTNDBP=bacterial C,N,P mass
-!     RCCC,RCCN,RCCP=remobilization coefficient for C,N,P
-!     RXNSNC,RXNSNC,RXNSNP=bacterial C,N,P loss from senescence
-!     RDNSNC,RDNSNC,RDNSNP=bacterial C,N,P senescence to litterfall
-!     RCNSNC,RCNSNC,RCNSNP=bacterial C,N,P senescence to recycling
-!
-    IF(RSNDL.GT.0.0.AND.WTNDBs1(NB,NZ).GT.ZEROPs1(NZ).AND.RCCC.GT.ZEROs1)THEN
-      RXNSNC=RSNDL/RCCC
-      RXNSNN=RXNSNC*WTNDBNs1(NB,NZ)/WTNDBs1(NB,NZ)
-      RXNSNP=RXNSNC*WTNDBPs1(NB,NZ)/WTNDBs1(NB,NZ)
-      RDNSNC=RXNSNC*(1.0_r8-RCCC)
-      RDNSNN=RXNSNN*(1.0_r8-RCCC)*(1.0_r8-RCCN)
-      RDNSNP=RXNSNP*(1.0_r8-RCCC)*(1.0_r8-RCCP)
-      RCNSNC=RXNSNC-RDNSNC
-      RCNSNN=RXNSNN-RDNSNN
-      RCNSNP=RXNSNP-RDNSNP
-    ELSE
-      RXNSNC=0._r8
-      RXNSNN=0._r8
-      RXNSNP=0._r8
-      RDNSNC=0._r8
-      RDNSNN=0._r8
-      RDNSNP=0._r8
-      RCNSNC=0._r8
-      RCNSNN=0._r8
-      RCNSNP=0._r8
-    ENDIF
-!
-!     TOTAL NODULE RESPIRATION
-!
-!     RCO2T=total C respiration
-!     RMNDL=bacterial maintenance respiration
-!     RCNDL=respiration from non-structural C
-!     RGNDG=bacterial respiration for growth and N2 fixation
-!     RCNSNC=bacterial C senescence to recycling
-!     TCO2T,TCO2A=total,above-ground PFT respiration
-!     CNET=PFT net CO2 fixation
-!     RECO=ecosystem respiration
-!     TRAU=total autotrophic respiration
-!
-    RCO2T=AMIN1(RMNDL,RCNDL)+RGNDG+RCNSNC
-    TCO2Ts1(NZ)=TCO2Ts1(NZ)-RCO2T
-    TCO2As1(NZ)=TCO2As1(NZ)-RCO2T
-    CNETs1(NZ)=CNETs1(NZ)-RCO2T
-    RECOs1=RECOs1-RCO2T
-    TRAUs1=TRAUs1-RCO2T
-!
-!     NODULE LITTERFALL CAUSED BY REMOBILIZATION
-!
-!     CSNC,ZSNC,PSNC=C,N,P litterfall from decomposition and senescence
-!     CFOPC,CFOPN,CFOPC=fraction of litterfall C,N,P allocated to litter components
-!     RDNDLC,RDNDLN,RDNDLP=bacterial C,N,P decomposition to litterfall
-!     RDNSNC,RDNSNC,RDNSNP=bacterial C,N,P senescence to litterfall
-!
-    DO 6470 M=1,4
-      CSNCs1(M,1,0,NZ)=CSNCs1(M,1,0,NZ)+CFOPCs1(1,M,NZ)*(RDNDLC+RDNSNC)
-      ZSNCs1(M,1,0,NZ)=ZSNCs1(M,1,0,NZ)+CFOPNs1(1,M,NZ)*(RDNDLN+RDNSNN)
-      PSNCs1(M,1,0,NZ)=PSNCs1(M,1,0,NZ)+CFOPPs1(1,M,NZ)*(RDNDLP+RDNSNP)
-6470  CONTINUE
-!
-!     CONSUMPTION OF NON-STRUCTURAL C,N,P BY NODULE
-!
-!     CPOLNB,ZPOLNB,PPOLNB=nonstructural C,N,P in bacteria
-!     RMNDL=bacterial maintenance respiration
-!     RCNDL=respiration from non-structural C
-!     RGN2F=respiration for N2 fixation
-!     CGNDL=total non-structural C used in bacterial growth and growth respiration
-!     RCNDLC,RCNDLN,RCNDLP=bacterial C,N,P decomposition to recycling
-!     RCNSNC,RCNSNC,RCNSNP=bacterial C,N,P senescence to recycling
-!     ZADDN,PADDN=nonstructural N,P used in growth
-!     RUPNFB=branch N2 fixation
-!
-    CPOLNBs1(NB,NZ)=CPOLNBs1(NB,NZ)-AMIN1(RMNDL,RCNDL)-RGN2F-CGNDL+RCNDLC
-    ZPOLNBs1(NB,NZ)=ZPOLNBs1(NB,NZ)-ZADDN+RCNDLN+RCNSNN+RUPNFB
-    PPOLNBs1(NB,NZ)=PPOLNBs1(NB,NZ)-PADDN+RCNDLP+RCNSNP
-!
-!     UPDATE STATE VARIABLES FOR NODULE C, N, P
-!
-!     WTNDB,WTNDBN,WTNDBP=bacterial C,N,P mass
-!     GRNDG=bacterial growth
-!     RXNDLC,RXNDLN,RXNDLP=bacterial C,N,P loss from decomposition
-!     RXNSNC,RXNSNC,RXNSNP=bacterial C,N,P loss from senescence
-!     ZADDN,PADDN=nonstructural N,P used in growth
-!
-    WTNDBs1(NB,NZ)=WTNDBs1(NB,NZ)+GRNDG-RXNDLC-RXNSNC
-    WTNDBNs1(NB,NZ)=WTNDBNs1(NB,NZ)+ZADDN-RXNDLN-RXNSNN
-    WTNDBPs1(NB,NZ)=WTNDBPs1(NB,NZ)+PADDN-RXNDLP-RXNSNP
-!     IF((I/30)*30.EQ.I.AND.J.EQ.12)THEN
-!     WRITE(*,2121)'NODGR',I,J,NZ,NB
-!    2,RCNDL,RMNDL,RGNDL,RGN2P,RCO2T,RXNDLC,SPNDLI
-!    2,RGN2P,RGN2F,CGNDL,RSNDL,GRNDG,RGNDG,RCNSNC
-!    3,ZADDN,PADDN,RCCC,RCCN
-!    8,RCCP,RDNDLC,RDNDLN,RDNDLP,RDNDLX,WTLSBs1(NB,NZ)
-!    3,WTNDBs1(NB,NZ),WTNDBNs1(NB,NZ),WTNDBPs1(NB,NZ)
-!    4,CPOLNBs1(NB,NZ),ZPOLNBs1(NB,NZ),PPOLNBs1(NB,NZ)
-!    5,CCPOLN,CZPOLN,CPPOLN
-!    6,TFN3s1(NZ),FCNPF,WFNG,CCNDLB,RDNDBX,CPOOLNX,VMXOX
-!2121  FORMAT(A8,4I4,60F16.8)
-!     ENDIF
-!
-!     TRANSFER NON-STRUCTURAL C,N,P BETWEEN BRANCH AND NODULES
-!     FROM NON-STRUCTURAL C,N,P CONCENTRATION DIFFERENCES
-!
-!     CPOOL,ZPOOL,PPOOL=branch non-structural C,N,P mass
-!     WTLSB=leaf+petiole C mass
-!     WTNDB=bacterial C mass
-!     WTNDI=initial bacterial mass at infection
-!     FXRN=rate constant for plant-bacteria nonstructural C,N,P exchange
-!     CCNGB=parameter to calculate nonstructural C,N,P exchange
-!     CCNDLB=bacteria:leaf+petiole ratio
-!     XFRC,XFRN,XFRC=nonstructural C,N,P transfer
-!     CPOLNB,ZPOLNB,PPOLNB=nonstructural C,N,P in bacteria
-!
-    IF(CPOOLs1(NB,NZ).GT.ZEROPs1(NZ) &
-      .AND.WTLSBs1(NB,NZ).GT.ZEROLs1(NZ))THEN
-      CCNDLB=WTNDBs1(NB,NZ)/WTLSBs1(NB,NZ)
-      WTLSB1=WTLSBs1(NB,NZ)
-      WTNDB1=AMIN1(WTLSBs1(NB,NZ),AMAX1(WTNDI*AREA3s1(NUs1),WTNDBs1(NB,NZ)))
-      WTLSBT=WTLSB1+WTNDB1
-      IF(WTLSBT.GT.ZEROPs1(NZ))THEN
-        FXRNX=FXRN(INTYPs1(NZ))/(1.0+CCNDLB/CCNGB)
-!    2/(1.0+CCNDLB/(CCNGB*FXRN(INTYPs1(NZ))))
-        CPOOLD=(CPOOLs1(NB,NZ)*WTNDB1-CPOLNBs1(NB,NZ)*WTLSB1)/WTLSBT
-        XFRC=FXRNX*CPOOLD
-        CPOOLs1(NB,NZ)=CPOOLs1(NB,NZ)-XFRC
-        CPOLNBs1(NB,NZ)=CPOLNBs1(NB,NZ)+XFRC
-        CPOOLT=CPOOLs1(NB,NZ)+CPOLNBs1(NB,NZ)
-        IF(CPOOLT.GT.ZEROPs1(NZ))THEN
-          ZPOOLD=(ZPOOLs1(NB,NZ)*CPOLNBs1(NB,NZ)-ZPOLNBs1(NB,NZ)*CPOOLs1(NB,NZ))/CPOOLT
-          XFRN=FXRNX*ZPOOLD
-          PPOOLD=(PPOOLs1(NB,NZ)*CPOLNBs1(NB,NZ) &
-            -PPOLNBs1(NB,NZ)*CPOOLs1(NB,NZ))/CPOOLT
-          XFRP=FXRNX*PPOOLD
-          ZPOOLs1(NB,NZ)=ZPOOLs1(NB,NZ)-XFRN
-          PPOOLs1(NB,NZ)=PPOOLs1(NB,NZ)-XFRP
-          ZPOLNBs1(NB,NZ)=ZPOLNBs1(NB,NZ)+XFRN
-          PPOLNBs1(NB,NZ)=PPOLNBs1(NB,NZ)+XFRP
-!     IF((I/30)*30.EQ.I.AND.J.EQ.12)THEN
-!     WRITE(*,2120)'NODEX',I,J,NZ,NB,IFLGAs1(NB,NZ)
-!    2,XFRC,XFRN,XFRP
-!    3,WTLSBs1(NB,NZ),WTNDBs1(NB,NZ),CPOOLT,CCNDLB,FXRNX
-!    4,CPOLNBs1(NB,NZ),ZPOLNBs1(NB,NZ),PPOLNBs1(NB,NZ)
-!    4,CPOOLs1(NB,NZ),ZPOOLs1(NB,NZ),PPOOLs1(NB,NZ)
-!    5,WTLSB1,WTNDB1,WTLSBT
-!2120  FORMAT(A8,5I4,40E12.4)
-!     ENDIF
-!     WRITE(*,2121)'NODBAL',I,J,NZ,NB,CPOLNBs1(NB,NZ)
-!    2,WTNDBs1(NB,NZ),CPOLNBs1(NB,NZ)+WTNDBs1(NB,NZ)
-!    3,RMNDL,RCNDL,RGN2F,CGNDL,RCNDLC,GRNDG,RXNDLC,RXNSNC,RCO2T
-!    4,RGNDG,RGNDL,RCNSNC
-        ENDIF
-      ENDIF
-    ENDIF
-  ENDIF
-  end subroutine CanopyNoduleBiochemistry
 !------------------------------------------------------------------------------------------
 
   subroutine C4PhotoProductTransfer(I,J,NZ,NB,CH2O3,CH2O4)
@@ -787,6 +432,17 @@ module grosubsMod
   real(r8), parameter :: FPART2=0.40_r8
 
   associate(                              &
+    VRNXs1    =>  plt_pheno%VRNXs1      , &
+    FLGZs1    =>  plt_pheno%FLGZs1      , &
+    IDAYs1    =>  plt_pheno%IDAYs1      , &
+    IGTYPs1   =>  plt_pheno%IGTYPs1     , &
+    TGSTGFs1  =>  plt_pheno%TGSTGFs1    , &
+    IDTYPs1   =>  plt_pheno%IDTYPs1     , &
+    IBTYPs1   =>  plt_pheno%IBTYPs1     , &
+    VRNFs1    =>  plt_pheno%VRNFs1      , &
+    TGSTGIs1  =>  plt_pheno%TGSTGIs1    , &
+    ISTYPs1   =>   plt_pheno%ISTYPs1    , &
+    IWTYPs1   =>  plt_pheno%IWTYPs1     , &
     SNL1s1    =>  plt_morph%SNL1s1      , &
     ARLFPs1   =>  plt_morph%ARLFPs1     , &
     NB1s1     =>  plt_morph%NB1s1         &
@@ -1012,7 +668,9 @@ module grosubsMod
   real(r8), intent(out) :: CNRDM,CNRDA
   real(r8) :: CO2F,ZADDB,PADDB,CH2O
   integer :: K
-
+  associate(                            &
+    IDAYs1     =>  plt_pheno%IDAYs1     &
+  )
 ! begin_execution
 ! FDBK=N,P feedback inhibition on C3 CO2 fixation
 ! SSIN=sine of solar angle
@@ -1051,6 +709,7 @@ module grosubsMod
   CPOOLs1(NB,NZ)=CPOOLs1(NB,NZ)+CH2O-AMIN1(RMNCS,RCO2C)-CGROS-CNRDA
   ZPOOLs1(NB,NZ)=ZPOOLs1(NB,NZ)-ZADDB+RNH3Bs1(NB,NZ)
   PPOOLs1(NB,NZ)=PPOOLs1(NB,NZ)-PADDB
+  end associate
   end subroutine UpdatePhotosynthates
 
 !------------------------------------------------------------------------------------------
@@ -1119,6 +778,17 @@ module grosubsMod
   real(r8) :: XFRC,XFRN,XFRP
 ! begin_execution
   associate(                                &
+    IDTHBs1      =>  plt_pheno%IDTHBs1    , &
+    KVSTGNs1     =>  plt_pheno%KVSTGNs1   , &
+    XRLAs1       =>  plt_pheno%XRLAs1     , &
+    KVSTGs1      =>  plt_pheno%KVSTGs1    , &
+    IGTYPs1      =>  plt_pheno%IGTYPs1    , &
+    IFLGPs1      =>  plt_pheno%IFLGPs1    , &
+    FLGZs1       =>  plt_pheno%FLGZs1     , &
+    IDAYs1       =>  plt_pheno%IDAYs1     , &
+    IBTYPs1      =>  plt_pheno%IBTYPs1    , &
+    IFLGGs1      =>  plt_pheno%IFLGGs1    , &
+    ISTYPs1      =>  plt_pheno%ISTYPs1    , &
     SSINNs1      =>   plt_rad%SSINNs1     , &
     NB1s1        =>   plt_morph%NB1s1     , &
     NBTBs1       =>   plt_morph%NBTBs1    , &
@@ -1924,6 +1594,9 @@ module grosubsMod
   real(r8) :: SNCSH
 ! begin_execution
   associate(                                 &
+    KVSTGs1      =>   plt_pheno%KVSTGs1    , &
+    IDTHBs1      =>   plt_pheno%IDTHBs1    , &
+    ISTYPs1      =>   plt_pheno%ISTYPs1    , &
     ARLFBs1      =>   plt_morph%ARLFBs1    , &
     NNODs1       =>   plt_morph%NNODs1     , &
     HTNODEs1     =>   plt_morph%HTNODEs1   , &
@@ -2533,7 +2206,31 @@ module grosubsMod
   integer :: K,M
 ! begin_execution
   associate(                               &
+    VRNXs1     =>  plt_pheno%VRNXs1      , &
+    IWTYPs1    =>  plt_pheno%IWTYPs1     , &
+    IGTYPs1    =>  plt_pheno%IGTYPs1     , &
+    VRNFs1     =>  plt_pheno%VRNFs1      , &
+    VRNLs1     =>  plt_pheno%VRNLs1      , &
+    ISTYPs1    =>  plt_pheno%ISTYPs1     , &
+    IFLGFs1    =>  plt_pheno%IFLGFs1     , &
+    IFLGIs1    =>  plt_pheno%IFLGIs1     , &
+    IDAYs1     =>  plt_pheno%IDAYs1      , &
+    IFLGEs1    =>  plt_pheno%IFLGEs1     , &
+    IBTYPs1    =>  plt_pheno%IBTYPs1     , &
+    TGSTGIs1   =>  plt_pheno%TGSTGIs1    , &
+    TGSTGFs1   =>  plt_pheno%TGSTGFs1    , &
+    VRNSs1     =>  plt_pheno%VRNSs1      , &
+    GROUPs1    =>  plt_pheno%GROUPs1     , &
+    VSTGXs1    =>  plt_pheno%VSTGXs1     , &
+    FLG4s1     =>  plt_pheno%FLG4s1      , &
+    IFLGRs1    =>  plt_pheno%IFLGRs1     , &
+    IFLGAs1    =>  plt_pheno%IFLGAs1     , &
+    IFLGQs1    =>  plt_pheno%IFLGQs1     , &
+    KVSTGs1    =>  plt_pheno%KVSTGs1     , &
+    VSTGs1     =>  plt_morph%VSTGs1      , &
+    XTLIs1     =>  plt_morph%XTLIs1      , &
     HTSHEs1    =>  plt_morph%HTSHEs1     , &
+    KLEAFs1    =>  plt_morph%KLEAFs1     , &
     HTNODXs1   =>  plt_morph%HTNODXs1    , &
     HTNODEs1   =>  plt_morph%HTNODEs1    , &
     GRNXBs1    =>  plt_morph%GRNXBs1     , &
@@ -2863,6 +2560,11 @@ module grosubsMod
   real(r8) :: TLGLF
 ! begin_execution
   associate(                            &
+    IGTYPs1    =>  plt_pheno%IGTYPs1  , &
+    ISTYPs1    =>  plt_pheno%ISTYPs1  , &
+    KVSTGs1    =>  plt_pheno%KVSTGs1  , &
+    IBTYPs1    =>  plt_pheno%IBTYPs1  , &
+    KVSTGNs1   =>  plt_pheno%KVSTGNs1 , &
     SDPTHs1    => plt_morph%SDPTHs1   , &
     NB1s1      => plt_morph%NB1s1     , &
     ARLFLs1    => plt_morph%ARLFLs1   , &
@@ -2871,6 +2573,7 @@ module grosubsMod
     NBTBs1     => plt_morph%NBTBs1    , &
     HTNODEs1   => plt_morph%HTNODEs1  , &
     ZLs1       => plt_morph%ZLs1      , &
+    ZCs1       => plt_morph%ZCs1      , &
     CLASSs1    => plt_morph%CLASSs1   , &
     ARLF1s1    => plt_morph%ARLF1s1   , &
     ARLFVs1    => plt_morph%ARLFVs1   , &
@@ -3119,6 +2822,14 @@ module grosubsMod
   real(r8) :: SET
 ! begin_execution
   associate(                              &
+    IWTYPs1    =>  plt_pheno%IWTYPs1    , &
+    VRNFs1     =>  plt_pheno%VRNFs1     , &
+    FLG4s1     =>  plt_pheno%FLG4s1     , &
+    VRNXs1     =>  plt_pheno%VRNXs1     , &
+    ISTYPs1    =>  plt_pheno%ISTYPs1    , &
+    DGSTGFs1   =>  plt_pheno%DGSTGFs1   , &
+    IDAYs1     =>  plt_pheno%IDAYs1     , &
+    NGs1       =>  plt_morph%NGs1       , &
     GRNXBs1    =>  plt_morph%GRNXBs1    , &
     GRNOBs1    =>  plt_morph%GRNOBs1      &
   )
@@ -3282,16 +2993,6 @@ module grosubsMod
       XLOCN=0._r8
       XLOCP=0._r8
     ENDIF
-!     IF(NX.EQ.1.AND.NY.EQ.6.AND.NZ.EQ.3)THEN
-!     WRITE(*,85)'XLOC',I,J,NZ,NB,WTGRBs1(NB,NZ),WTGRBNs1(NB,NZ)
-!    2,WTRSVBs1(NB,NZ),WTRSBNs1(NB,NZ),XLOCC,XLOCN,XLOCP,XLOCM
-!    3,CNGRs1(NZ),ZPGRX,ZNPG,GROLC,GROLM,GROGR,GROGRN
-!    3,XLOCM*CNGRs1(NZ),AMAX1(0.0,WTRSBNs1(NB,NZ)*ZPGRX)
-!    4,(WTGRBs1(NB,NZ)+XLOCC)*CNGRs1(NZ)-WTGRBNs1(NB,NZ)
-!    4,GRNOBs1(NB,NZ),GRWTBs1(NB,NZ),GFILLs1(NZ)
-!    5,SQRT(TFN3s1(NZ)),FLG4s1(NB,NZ)
-!85    FORMAT(A8,4I4,20E12.4)
-!     ENDIF
 !
 !     TRANSLOCATE C,N,P FROM STALK RESERVES TO GRAIN
 !
@@ -3450,6 +3151,22 @@ module grosubsMod
   real(r8) :: XFRC,XFRN,XFRP
   ! begin_execution
   associate(                          &
+    IDAYs1   =>  plt_pheno%IDAYs1   , &
+    VRNXs1   =>  plt_pheno%VRNXs1   , &
+    VRNSs1   =>  plt_pheno%VRNSs1   , &
+    VRNLs1   =>  plt_pheno%VRNLs1   , &
+    IFLGIs1  =>  plt_pheno%IFLGIs1  , &
+    XPPDs1   =>  plt_pheno%XPPDs1   , &
+    ISTYPs1  =>  plt_pheno%ISTYPs1  , &
+    IPTYPs1  =>  plt_pheno%IPTYPs1  , &
+    XDLs1    =>  plt_pheno%XDLs1    , &
+    VRNFs1   =>  plt_pheno%VRNFs1   , &
+    IBTYPs1  =>  plt_pheno%IBTYPs1  , &
+    IGTYPs1  =>  plt_pheno%IGTYPs1  , &
+    IWTYPs1  =>  plt_pheno%IWTYPs1  , &
+    IFLGAs1  =>  plt_pheno%IFLGAs1  , &
+    ATRPs1   =>   plt_pheno%ATRPs1  , &
+    NGs1     =>   plt_morph%NGs1    , &
     NB1s1    =>  plt_morph%NB1s1    , &
     NIs1     =>  plt_morph%NIs1       &
   )
@@ -3748,13 +3465,6 @@ module grosubsMod
     WTRVNs1(NZ)=WTRVNs1(NZ)+XFRN
     PPOOLs1(NB,NZ)=PPOOLs1(NB,NZ)-XFRP
     WTRVPs1(NZ)=WTRVPs1(NZ)+XFRP
-!   IF(NZ.EQ.1)THEN
-!     WRITE(*,4490)'RSV',I,J,NZ,NB,XFRC,XFRN,WTRSVBs1(NB,NZ)
-!    2,WTRSBNs1(NB,NZ),WTRVCs1(NZ),WTRVNs1(NZ)
-!    3,CNR,CNL,CPOOLs1(NB,NZ),ZPOOLs1(NB,NZ)
-!    4,FXFB(IBTYPs1(NZ))
-!4490  FORMAT(A8,4I4,20E12.4)
-!     ENDIF
   ENDIF
 !
 !   TRANSFER NON-STRUCTURAL C,N,P FROM LEAVES AND ROOTS TO RESERVES
@@ -3883,6 +3593,9 @@ module grosubsMod
 !     begin_execution
 
   associate(                            &
+    IBTYPs1    =>  plt_pheno%IBTYPs1  , &
+    IGTYPs1    =>  plt_pheno%IGTYPs1  , &
+    RCSs1    =>  plt_photo%RCSs1      , &
     ARLFVs1  =>  plt_morph%ARLFVs1    , &
     ARSTVs1  =>  plt_morph%ARSTVs1    , &
     NRTs1    =>  plt_morph%NRTs1        &
@@ -4245,6 +3958,8 @@ module grosubsMod
   real(r8) :: RCO2T,RCO2CM
 ! begin_execution
   associate(                            &
+    IGTYPs1    =>  plt_pheno%IGTYPs1  , &
+    IWTYPs1     =>  plt_pheno%IWTYPs1 , &
     FDBKXs1     => plt_photo%FDBKXs1    &
   )
 ! N,P CONSTRAINT ON RESPIRATION FROM NON-STRUCTURAL C:N:P
@@ -4396,6 +4111,9 @@ module grosubsMod
   real(r8) :: SNCRM
 ! begin_execution
   associate(                              &
+    IGTYPs1     =>  plt_pheno%IGTYPs1   , &
+    IWTYPs1     =>  plt_pheno%IWTYPs1   , &
+    NGs1        =>  plt_morph%NGs1      , &
     FDBKXs1     =>  plt_photo%FDBKXs1     &
   )
 !

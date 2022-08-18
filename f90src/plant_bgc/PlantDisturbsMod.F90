@@ -199,6 +199,10 @@ module PlantDisturbsMod
   real(r8), intent(in) :: WTHNRT,WTHPRT,WTHTXT,WTHNXT
   integer :: m
 !     begin_execution
+  associate(                            &
+    IBTYPs1    =>  plt_pheno%IBTYPs1  , &
+    IGTYPs1    =>  plt_pheno%IGTYPs1    &
+  )
 !     IHVST=harvest type:0=none,1=grain,2=all above-ground
 !                       ,3=pruning,4=grazing,5=fire,6=herbivory
 !     CSNC,ZSNC,PSNC=C,N,P litterfall from disturbance
@@ -342,6 +346,7 @@ module PlantDisturbsMod
     TZSN0s1(NZ)=TZSNCs1(NZ)+WTHNRT+WTHNXT
     TPSN0s1(NZ)=TPSNCs1(NZ)+WTHPRT+WTHPXT
   ENDIF
+  end associate
   end subroutine LiterfallByDisturbance
 !------------------------------------------------------------------------------------------
 
@@ -632,7 +637,15 @@ module PlantDisturbsMod
   real(r8) :: WVPLT
 !     begin_execution
   associate(                               &
+    IDTHBs1    =>  plt_pheno%IDTHBs1     , &
+    ISTYPs1    =>   plt_pheno%ISTYPs1    , &
+    IGTYPs1    =>  plt_pheno%IGTYPs1     , &
+    IBTYPs1    =>  plt_pheno%IBTYPs1     , &
+    IWTYPs1    =>  plt_pheno%IWTYPs1     , &
+    IDTHRs1    =>   plt_pheno%IDTHRs1    , &
+    IDTHPs1    =>   plt_pheno%IDTHPs1    , &
     FRADPs1    => plt_rad%FRADPs1        , &
+    NGs1       =>   plt_morph%NGs1       , &
     NRTs1      => plt_morph%NRTs1        , &
     NBRs1      => plt_morph%NBRs1        , &
     ARLF1s1    => plt_morph%ARLF1s1      , &
@@ -1095,6 +1108,22 @@ module PlantDisturbsMod
   real(r8) :: WGLFPG,WHVSBS,WHVSCX,WHVSNX,WVPLT
 !     begin_execution
   associate(                            &
+    IDTHBs1    =>  plt_pheno%IDTHBs1  , &
+    IDAYs1     =>  plt_pheno%IDAYs1   , &
+    GROUPs1    =>  plt_pheno%GROUPs1  , &
+    VSTGXs1    =>  plt_pheno%VSTGXs1  , &
+    IGTYPs1    =>  plt_pheno%IGTYPs1  , &
+    IBTYPs1    =>  plt_pheno%IBTYPs1  , &
+    IFLGAs1    =>  plt_pheno%IFLGAs1  , &
+    ISTYPs1    =>  plt_pheno%ISTYPs1  , &
+    VRNXs1     =>  plt_pheno%VRNXs1   , &
+    VRNFs1     =>  plt_pheno%VRNFs1   , &
+    IWTYPs1    =>  plt_pheno%IWTYPs1  , &
+    TGSTGIs1   =>  plt_pheno%TGSTGIs1 , &
+    TGSTGFs1   =>  plt_pheno%TGSTGFs1 , &
+    FLG4s1     =>  plt_pheno%FLG4s1   , &
+    NGs1       =>   plt_morph%NGs1    , &
+    ZCs1       => plt_morph%ZCs1      , &
     ARLFTs1    => plt_morph%ARLFTs1   , &
     ZLs1       => plt_morph%ZLs1      , &
     ARLFBs1    => plt_morph%ARLFBs1   , &
@@ -1115,6 +1144,7 @@ module PlantDisturbsMod
     NB1s1      => plt_morph%NB1s1     , &
     PSTGIs1    => plt_morph%PSTGIs1   , &
     PSTGs1     => plt_morph%PSTGs1    , &
+    CFs1       => plt_morph%CFs1      , &
     ARLFCs1    => plt_morph%ARLFCs1     &
   )
 !     IHVST=harvest type:0=none,1=grain,2=all above-ground
@@ -1447,17 +1477,7 @@ module PlantDisturbsMod
               ARSTKs1(L,NB,NZ)=FHVST*ARSTKs1(L,NB,NZ)
             ENDIF
           ENDIF
-    !     IF(I.EQ.262.AND.K.EQ.5)THEN
-!     WRITE(*,6543)'GRAZ',I,J,NZ,NB,K,L,IHVSTs1(NZ)
-!    2,ZLs1(L),ZLs1(L-1),HVSTs1(NZ),FHVST,FHVSH
-!    5,WGLFBL(L,NB,NZ),WTLFs1(NZ),CPOOLPs1(NZ)
-!    6,ARLFLs1(L,K,NB,NZ),WGLFs1(K,NB,NZ),ARLF1s1(K,NB,NZ)
-!    7,HTNODEs1(K,NB,NZ)
-!    7,WTSHTAs1(NZ),WHVSBL,WHVSTT,WHVSLF,WHVSHH
-!    3,WHVHSH,WHVEAH,WHVGRH,WHVSCP,WHVSTH,WHVRVH,WHVXXX
-!    4,WTSHTT,WHVSSX,CCPOLX
-!6543  FORMAT(A8,7I4,30E12.4)
-!     ENDIF
+
 9845      CONTINUE
 9855    CONTINUE
         ARLFVs1(L,NZ)=0._r8

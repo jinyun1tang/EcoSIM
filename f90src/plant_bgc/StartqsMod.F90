@@ -92,6 +92,8 @@ module StartqsMod
   integer, intent(in) :: NZ
   associate(                         &
     O2Is1    =>  plt_photo%O2Is1   , &
+    RSMHs1   =>  plt_photo%RSMHs1  , &
+    CFs1     =>  plt_morph%CFs1    , &
     NRTs1    =>  plt_morph%NRTs1     &
   )
   IYR0s1(NZ)=IYRXs1(NZ)
@@ -124,8 +126,11 @@ module StartqsMod
   real(r8) :: CNOPC(4),CPOPC(4)
   REAL(R8) :: CNOPCT,CPOPCT
 
-  associate(                         &
-    NNODs1   =>  plt_morph%NNODs1    &
+  associate(                          &
+    XRLAs1   =>  plt_pheno%XRLAs1   , &
+    IBTYPs1  =>  plt_pheno%IBTYPs1  , &
+    IGTYPs1  =>  plt_pheno%IGTYPs1  , &
+    NNODs1   =>  plt_morph%NNODs1     &
   )
 !
 !     FRACTIONS OF PLANT LITTER ALLOCATED TO KINETIC COMPONENTS
@@ -362,6 +367,7 @@ module StartqsMod
   integer, intent(in) :: NZ
   INTEGER :: L,N,NR
   associate(                             &
+    NGs1       =>   plt_morph%NGs1     , &
     SDPTHs1    =>  plt_morph%SDPTHs1   , &
     SDARs1     =>  plt_morph%SDARs1    , &
     SDPTHIs1   =>  plt_morph%SDPTHIs1  , &
@@ -449,8 +455,38 @@ module StartqsMod
   integer, intent(in) :: NZ
   integer :: K,L,M,N,NB
   associate(                           &
+    IFLGIs1   =>  plt_pheno%IFLGIs1  , &
+    IDTHRs1   =>   plt_pheno%IDTHRs1 , &
+    IDTHPs1   =>   plt_pheno%IDTHPs1 , &
+    IFLGAs1   =>  plt_pheno%IFLGAs1  , &
+    IFLGEs1   =>  plt_pheno%IFLGEs1  , &
+    IFLGQs1   =>  plt_pheno%IFLGQs1  , &
+    IGTYPs1   =>  plt_pheno%IGTYPs1  , &
+    IFLGRs1   =>  plt_pheno%IFLGRs1  , &
+    IFLGFs1   =>  plt_pheno%IFLGFs1  , &
+    VSTGXs1   =>  plt_pheno%VSTGXs1  , &
+    GROUPs1   =>  plt_pheno%GROUPs1  , &
+    KVSTGs1   =>  plt_pheno%KVSTGs1  , &
+    KVSTGNs1  =>  plt_pheno%KVSTGNs1 , &
+    GSTGIs1   =>  plt_pheno%GSTGIs1  , &
+    GSTGFs1   =>  plt_pheno%GSTGFs1  , &
+    FLG4s1    =>  plt_pheno%FLG4s1   , &
+    FLGZs1    =>  plt_pheno%FLGZs1   , &
+    VRNYs1    =>  plt_pheno%VRNYs1   , &
+    VRNFs1    =>  plt_pheno%VRNFs1   , &
+    IDTHBs1   =>  plt_pheno%IDTHBs1  , &
+    VRNZs1    =>  plt_pheno%VRNZs1   , &
+    IDAYs1    =>  plt_pheno%IDAYs1   , &
+    VRNSs1    =>  plt_pheno%VRNSs1   , &
+    ATRPs1    =>  plt_pheno%ATRPs1   , &
+    TGSTGFs1  =>  plt_pheno%TGSTGFs1 , &
+    TGSTGIs1  =>  plt_pheno%TGSTGIs1 , &
     FDBKXs1   =>  plt_photo%FDBKXs1  , &
     FDBKs1    =>  plt_photo%FDBKs1   , &
+    VSTGs1    =>  plt_morph%VSTGs1   , &
+    ZCs1      => plt_morph%ZCs1      , &
+    KLEAFs1   => plt_morph%KLEAFs1   , &
+    XTLIs1    =>  plt_morph%XTLIs1   , &
     NBTs1     =>  plt_morph%NBTs1    , &
     PSTGs1    =>  plt_morph%PSTGs1   , &
     ARLFPs1   =>  plt_morph%ARLFPs1  , &
@@ -904,6 +940,10 @@ module StartqsMod
   implicit none
   integer, intent(in) :: NZ
   REAL(R8) :: FDM
+
+  associate(                             &
+    NGs1       =>   plt_morph%NGs1       &
+  )
 !
 !     INITIALIZE SEED MORPHOLOGY AND BIOMASS
 !
@@ -941,6 +981,8 @@ module StartqsMod
   WSRTLs1(1,NGs1(NZ),NZ)=WTRTLs1(1,NGs1(NZ),NZ)*CWSRTs1(NZ)
   ZPOOLRs1(1,NGs1(NZ),NZ)=CNGRs1(NZ)*CPOOLRs1(1,NGs1(NZ),NZ)
   PPOOLRs1(1,NGs1(NZ),NZ)=CPGRs1(NZ)*CPOOLRs1(1,NGs1(NZ),NZ)
+
+  end associate
   end subroutine InitSeedMorphoBio
 
   end module StartqsMod

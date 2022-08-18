@@ -108,6 +108,7 @@ module CanopyCondsMod
   associate(                          &
     ZTs1      => plt_morph%ZTs1     , &
     ZLs1      => plt_morph%ZLs1     , &
+    ZCs1      => plt_morph%ZCs1     , &
     ARSTTs1   => plt_morph%ARSTTs1  , &
     ARLFTs1   => plt_morph%ARLFTs1  , &
     ARSTCs1   => plt_morph%ARSTCs1  , &
@@ -273,6 +274,7 @@ module CanopyCondsMod
     ARLFLs1 => plt_morph%ARLFLs1 , &
     ARSTKs1 => plt_morph%ARSTKs1 , &
     ARLFSs1 => plt_morph%ARLFSs1 , &
+    CFs1    => plt_morph%CFs1    , &
     ARLSSs1 => plt_morph%ARLSSs1   &
   )
   ARLSSs1=0.0

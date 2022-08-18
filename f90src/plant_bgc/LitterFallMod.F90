@@ -18,6 +18,11 @@ implicit none
 
 !     begin_execution
   associate(                                 &
+    ISTYPs1      =>   plt_pheno%ISTYPs1    , &
+    IDTHRs1      =>   plt_pheno%IDTHRs1    , &
+    IDTHPs1      =>   plt_pheno%IDTHPs1    , &
+    IFLGIs1      =>   plt_pheno%IFLGIs1    , &
+    IDAYs1       =>   plt_pheno%IDAYs1     , &
     NBRs1        =>   plt_morph%NBRs1      , &
     NB1s1        =>   plt_morph%NB1s1      , &
     NBTs1        =>   plt_morph%NBTs1        &
@@ -106,6 +111,14 @@ implicit none
   integer :: L,M,NR,NB,N
 !     begin_execution
   associate(                                &
+    IFLGIs1      =>   plt_pheno%IFLGIs1   , &
+    ISTYPs1      =>   plt_pheno%ISTYPs1   , &
+    IWTYPs1      =>   plt_pheno%IWTYPs1   , &
+    IDTHRs1      =>   plt_pheno%IDTHRs1   , &
+    IGTYPs1      =>   plt_pheno%IGTYPs1   , &
+    IBTYPs1      =>   plt_pheno%IBTYPs1   , &
+    IDTHPs1      =>   plt_pheno%IDTHPs1   , &
+    NGs1         =>   plt_morph%NGs1      , &
     NBRs1        =>   plt_morph%NBRs1     , &
     NRTs1        =>   plt_morph%NRTs1       &
   )
@@ -277,9 +290,11 @@ implicit none
   integer :: L,M,NR,N
 !     begin_execution
   associate(                                &
+    IDTHRs1     =>   plt_pheno%IDTHRs1    , &
     NIXs1       =>  plt_morph%NIXs1       , &
     NINRs1      =>  plt_morph%NINRs1      , &
     SDPTHs1     =>  plt_morph%SDPTHs1     , &
+    NGs1        =>   plt_morph%NGs1       , &
     NRTs1       =>   plt_morph%NRTs1        &
   )
 !     IDTHR=PFT root living flag: 0=alive,1=dead
@@ -442,12 +457,37 @@ implicit none
   integer :: M,NB
 !     begin_execution
   associate(                                &
-    FDBKs1      =>  plt_photo%FDBKs1      , &
+    IDTHBs1     =>  plt_pheno%IDTHBs1     , &
+    GROUPs1     =>  plt_pheno%GROUPs1     , &
+    VSTGXs1     =>  plt_pheno%VSTGXs1     , &
+    KVSTGs1     =>  plt_pheno%KVSTGs1     , &
+    TGSTGIs1    =>  plt_pheno%TGSTGIs1    , &
+    TGSTGFs1    =>  plt_pheno%TGSTGFs1    , &
+    VRNSs1      =>  plt_pheno%VRNSs1      , &
+    VRNFs1      =>  plt_pheno%VRNFs1      , &
+    VRNYs1      =>  plt_pheno%VRNYs1      , &
+    VRNZs1      =>  plt_pheno%VRNZs1      , &
+    ATRPs1      =>  plt_pheno%ATRPs1      , &
+    FLG4s1      =>  plt_pheno%FLG4s1      , &
+    IFLGAs1     =>  plt_pheno%IFLGAs1     , &
+    IFLGEs1     =>  plt_pheno%IFLGEs1     , &
+    IFLGRs1     =>  plt_pheno%IFLGRs1     , &
+    IFLGQs1     =>  plt_pheno%IFLGQs1     , &
+    IFLGFs1     =>  plt_pheno%IFLGFs1     , &
+    IDAYs1      =>  plt_pheno%IDAYs1      , &
+    IBTYPs1     =>  plt_pheno%IBTYPs1     , &
+    IGTYPs1     =>  plt_pheno%IGTYPs1     , &
+    IWTYPs1     =>  plt_pheno%IWTYPs1     , &
+    ISTYPs1     =>  plt_pheno%ISTYPs1     , &
     NBRs1       =>  plt_morph%NBRs1       , &
     PSTGIs1     =>  plt_morph%PSTGIs1     , &
     PSTGs1      =>  plt_morph%PSTGs1      , &
     NBTBs1      =>  plt_morph%NBTBs1      , &
     PSTGFs1     =>  plt_morph%PSTGFs1     , &
+    XTLIs1      =>  plt_morph%XTLIs1      , &
+    VSTGs1      =>  plt_morph%VSTGs1      , &
+    KLEAFs1     =>  plt_morph%KLEAFs1     , &
+    FDBKs1      =>  plt_photo%FDBKs1      , &
     FDBKXs1     =>  plt_photo%FDBKXs1       &
   )
   DO 8845 NB=1,NBRs1(NZ)

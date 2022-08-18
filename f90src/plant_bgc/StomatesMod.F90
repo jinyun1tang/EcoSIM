@@ -43,6 +43,8 @@
   associate(                            &
     ARLFPs1    =>  plt_morph%ARLFPs1  , &
     SSINs1     =>  plt_rad%SSINs1     , &
+    FCO2s1     =>  plt_photo%FCO2s1   , &
+    RSMHs1     =>  plt_photo%RSMHs1   , &
     CO2Is1     =>  plt_photo%CO2Is1     &
   )
 !
@@ -581,6 +583,12 @@
   real(r8), intent(in) :: TFN1,TFN2,TFNE,XKO2L
 !     begin_execution
   associate(                          &
+    IWTYPs1  =>  plt_pheno%IWTYPs1  , &
+    IBTYPs1  =>  plt_pheno%IBTYPs1  , &
+    FLG4s1   =>  plt_pheno%FLG4s1   , &
+    ATRPs1   =>  plt_pheno%ATRPs1   , &
+    ISTYPs1  =>  plt_pheno%ISTYPs1  , &
+    IDTHBs1  =>  plt_pheno%IDTHBs1  , &
     FDBKXs1   => plt_photo%FDBKXs1  , &
     FDBKs1   => plt_photo%FDBKs1      &
   )
@@ -654,6 +662,7 @@
     CO2Ls1   =>  plt_photo%CO2Ls1   , &
     CO2Is1   =>  plt_photo%CO2Is1   , &
     O2Is1    =>  plt_photo%O2Is1    , &
+    RSMHs1   =>  plt_photo%RSMHs1   , &
     XKCO2Os1 =>  plt_photo%XKCO2Os1 , &
     XKCO2Ls1 =>  plt_photo%XKCO2Ls1 , &
     XKCO2s1  =>  plt_photo%XKCO2s1    &
@@ -718,9 +727,15 @@
 
 !     begin_execution
   associate(                         &
+    VRNXs1   =>  plt_pheno%VRNXs1  , &
+    VRNFs1   =>  plt_pheno%VRNFs1  , &
+    VRNLs1   =>  plt_pheno%VRNLs1  , &
+    VRNSs1   =>  plt_pheno%VRNSs1  , &
+    IWTYPs1  =>  plt_pheno%IWTYPs1  , &
     FDBKs1   => plt_photo%FDBKs1   , &
     FDBKXs1  => plt_photo%FDBKXs1  , &
     XKCO2Os1 => plt_photo%XKCO2Os1 , &
+    RSMHs1   => plt_photo%RSMHs1   , &
     FRADPs1  => plt_rad%FRADPs1    , &
     NBRs1    => plt_morph%NBRs1      &
   )

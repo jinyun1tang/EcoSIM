@@ -47,9 +47,20 @@ module HfuncsMod
   INTEGER :: NZ
 
 ! begin_execution
-  associate(                          &
-    NBRs1   =>  plt_morph%NBRs1     , &
-    NB1s1   =>  plt_morph%NB1s1       &
+  associate(                           &
+    VRNZs1    =>  plt_pheno%VRNZs1   , &
+    IFLGIs1   =>  plt_pheno%IFLGIs1  , &
+    IFLGPs1   =>  plt_pheno%IFLGPs1  , &
+    VSTGXs1   =>  plt_pheno%VSTGXs1  , &
+    VRNYs1    =>  plt_pheno%VRNYs1   , &
+    IDTHBs1   =>  plt_pheno%IDTHBs1  , &
+    IDAYs1    =>  plt_pheno%IDAYs1   , &
+    KVSTGs1   =>  plt_pheno%KVSTGs1  , &
+    IGTYPs1  =>  plt_pheno%IGTYPs1   , &
+    KLEAFs1   => plt_morph%KLEAFs1   , &
+    VSTGs1    =>  plt_morph%VSTGs1   , &
+    NBRs1    =>  plt_morph%NBRs1     , &
+    NB1s1    =>  plt_morph%NB1s1       &
   )
   DO 9985 NZ=1,NPs1
 
@@ -198,12 +209,23 @@ module HfuncsMod
 
 ! begin_execution
   associate(                            &
+    GROUPs1   =>  plt_pheno%GROUPs1   , &
+    IDAYs1    =>  plt_pheno%IDAYs1    , &
+    IFLGIs1   =>  plt_pheno%IFLGIs1   , &
+    IDTHRs1   =>   plt_pheno%IDTHRs1  , &
+    ISTYPs1    =>  plt_pheno%ISTYPs1  , &
+    IDTHBs1   =>  plt_pheno%IDTHBs1   , &
+    IDTHPs1   =>   plt_pheno%IDTHPs1  , &
+    IBTYPs1   =>  plt_pheno%IBTYPs1   , &
+    VRNSs1    =>  plt_pheno%VRNSs1    , &
     NRTs1     =>   plt_morph%NRTs1    , &
     NB1s1     =>   plt_morph%NB1s1    , &
     NBRs1     =>   plt_morph%NBRs1    , &
     NNODs1    =>   plt_morph%NNODs1   , &
     NBTs1     =>   plt_morph%NBTs1    , &
     NBTBs1    =>   plt_morph%NBTBs1   , &
+    NGs1      =>   plt_morph%NGs1     , &
+    XTLIs1    =>  plt_morph%XTLIs1    , &
     ARLFLs1   =>   plt_morph%ARLFLs1  , &
     PSTGs1    =>   plt_morph%PSTGs1     &
   )
@@ -285,8 +307,11 @@ module HfuncsMod
   integer :: NB,N,L
   real(r8):: ARLSP
   associate(                          &
+    IDTHBs1 =>  plt_pheno%IDTHBs1   , &
+    IDAYs1   =>  plt_pheno%IDAYs1   , &
     NB1s1   =>  plt_morph%NB1s1     , &
     ARLFPs1 =>  plt_morph%ARLFPs1   , &
+    NGs1    =>   plt_morph%NGs1     , &
     NIXs1   =>  plt_morph%NIXs1     , &
     NBRs1   =>  plt_morph%NBRs1     , &
     NBTBs1  =>  plt_morph%NBTBs1    , &
@@ -405,6 +430,19 @@ module HfuncsMod
   implicit none
   integer, intent(in) :: I,J,NZ
 
+  associate(                           &
+    IFLGEs1   =>  plt_pheno%IFLGEs1  , &
+    IDAYs1    =>  plt_pheno%IDAYs1   , &
+    IGTYPs1   =>  plt_pheno%IGTYPs1  , &
+    VRNZs1    =>  plt_pheno%VRNZs1   , &
+    VRNSs1    =>  plt_pheno%VRNSs1   , &
+    VRNLs1    =>  plt_pheno%VRNLs1   , &
+    IWTYPs1   =>  plt_pheno%IWTYPs1  , &
+    VRNYs1    =>  plt_pheno%VRNYs1   , &
+    VRNFs1    =>  plt_pheno%VRNFs1   , &
+    VRNXs1    =>  plt_pheno%VRNXs1   , &
+    IFLGFs1   =>  plt_pheno%IFLGFs1    &
+  )
 !
 ! CALCULATE EVERGREEN PHENOLOGY DURING LENGTHENING PHOTOPERIODS
 !
@@ -621,6 +659,7 @@ module HfuncsMod
       ENDIF
     ENDIF
   ENDIF
+  end associate
   end subroutine pft_specific_phenology
 !------------------------------------------------------------------------------------------
 
@@ -635,6 +674,32 @@ module HfuncsMod
 
 ! begin_execution
   associate(                            &
+    IDAYs1    =>  plt_pheno%IDAYs1    , &
+    XRLAs1    =>  plt_pheno%XRLAs1    , &
+    GSTGFs1   =>  plt_pheno%GSTGFs1   , &
+    ISTYPs1    =>  plt_pheno%ISTYPs1  , &
+    IFLGEs1   =>  plt_pheno%IFLGEs1   , &
+    VSTGs1    =>  plt_morph%VSTGs1    , &
+    GSTGIs1   =>  plt_pheno%GSTGIs1   , &
+    DGSTGFs1  =>  plt_pheno%DGSTGFs1  , &
+    IFLGGs1   =>  plt_pheno%IFLGGs1   , &
+    VSTGXs1   =>  plt_pheno%VSTGXs1   , &
+    IDTYPs1   =>  plt_pheno%IDTYPs1   , &
+    TGSTGFs1  =>  plt_pheno%TGSTGFs1  , &
+    XDLs1     =>  plt_pheno%XDLs1     , &
+    DGSTGIs1  =>  plt_pheno%DGSTGIs1  , &
+    XPPDs1    =>  plt_pheno%XPPDs1    , &
+    TGSTGIs1   =>  plt_pheno%TGSTGIs1 , &
+    GROUPs1   =>  plt_pheno%GROUPs1   , &
+    IWTYPs1   =>  plt_pheno%IWTYPs1   , &
+    VRNLs1    =>  plt_pheno%VRNLs1    , &
+    IPTYPs1   =>  plt_pheno%IPTYPs1   , &
+    IFLGAs1   =>  plt_pheno%IFLGAs1   , &
+    VRNSs1    =>  plt_pheno%VRNSs1    , &
+    VRNFs1    =>  plt_pheno%VRNFs1    , &
+    VRNXs1    =>  plt_pheno%VRNXs1    , &
+    XRNIs1    =>  plt_pheno%XRNIs1    , &
+    ZCs1      => plt_morph%ZCs1       , &
     PSTGs1    =>   plt_morph%PSTGs1   , &
     PSTGIs1   =>   plt_morph%PSTGIs1  , &
     PSTGFs1   =>   plt_morph%PSTGFs1  , &

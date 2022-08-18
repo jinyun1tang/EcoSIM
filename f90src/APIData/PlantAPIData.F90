@@ -119,28 +119,17 @@ implicit none
   integer,  allocatable :: IDAY0s1(:)    !day of planting
   integer,  allocatable :: IDAYHs1(:)    !day of harvest
   integer,  allocatable :: IYRHs1(:)     !year of harvest
-  integer,  allocatable :: IWTYPs1(:)    !climate signal for phenological progress: none, temperature, water stress
+
   integer,  allocatable :: IHVSTs1(:)    !type of harvest
   integer,  allocatable :: JHVSTs1(:)    !flag for stand replacing disturbance
-  integer,  allocatable :: IBTYPs1(:)    !phenologically-driven above-ground turnover: all, foliar only, none
-  integer,  allocatable :: IDTHPs1(:)    !flag to detect canopy death
-  integer,  allocatable :: ISTYPs1(:)    !plant growth habit: annual or perennial
   integer,  allocatable :: ICTYPs1(:)    !plant photosynthetic type (C3 or C4)
-  integer,  allocatable :: IDTHRs1(:)    !flag to detect root system death
   integer,  allocatable :: MYs1(:)       !mycorrhizal type (no or yes)
-  integer,  allocatable :: NGs1(:)       !soil layer at planting depth, [-]
-  integer,  allocatable :: IDTYPs1(:)    !plant growth habit (determinate or indeterminate)
-  integer,  allocatable :: IPTYPs1(:)    !photoperiod type (neutral, long day, short day)
-  integer,  allocatable :: IGTYPs1(:)    !plant growth type (vascular, non-vascular)
-  integer,  allocatable :: IFLGIs1(:)    !PFT initialization flag:0=no,1=yes
   integer,  allocatable :: IDATAs1(:)    !time keeper
   real(r8), allocatable :: FERTs1(:)     !fertilizer application, [g m-2]
   real(r8), allocatable :: TDFOMCs1(:,:) !total root C exchange, [gC d-2 h-1]
   real(r8), allocatable :: TDFOMNs1(:,:) !total root N exchange, [gP d-2 h-1]
   real(r8), allocatable :: TDFOMPs1(:,:) !total root P exchange, [gP d-2 h-1]
   real(r8), allocatable :: RUPNFs1(:,:)  !root N2 fixation, [gN d-2 h-1]
-  real(r8), allocatable :: RCSs1(:)      !shape parameter for calculating stomatal resistance from turgor pressure, [-]
-
 
   real(r8), allocatable :: CPEARs1(:)    !ear P:C ratio, [gP gC-1]
   real(r8), allocatable :: DMSHEs1(:)    !sheath growth yield, [g g-1]
@@ -157,7 +146,6 @@ implicit none
   real(r8), allocatable :: CPGRs1(:)     !grain P:C ratio, [gP gP-1]
   real(r8), allocatable :: CNSTKs1(:)    !stalk N:C ratio, [gN gC-1]
 
-  real(r8), allocatable :: FCO2s1(:)     !Ci:Ca ratio, [-]
   real(r8), allocatable :: CPO4Ss1(:)    !PO4 concentration non-band micropore	[g m-3]
   real(r8), allocatable :: CNDUs1(:)     !soil micropore hydraulic conductivity for root water uptake [m MPa-1 h-1]
   real(r8), allocatable :: WGLFTs1(:)    !total leaf mass, [gC d-2]
@@ -209,8 +197,6 @@ implicit none
   real(r8), allocatable :: CNH3Gs1(:)    !gaseous NH3 concentration	[gN m-3]
   real(r8), allocatable :: CH2GGs1(:)    !gaseous H2 concentration	[g m-3]
   real(r8), allocatable :: CORGCs1(:)    !soil organic C content [gC kg soil-1]
-  real(r8), allocatable :: RSMHs1(:)     !maximum stomatal resistance to vapor, [s h-1]
-  real(r8), allocatable :: CFs1(:)       !clumping factor for self-shading in canopy layer, [-]
   real(r8), allocatable :: CDPTHZs1(:)   !depth to bottom of soil layer from  surface of grid cell [m]
   real(r8), allocatable :: PPIs1(:)      !initial plant population, [m-2]
   real(r8), allocatable :: PPZs1(:)      !plant population at seeding, [m-2]
@@ -479,49 +465,21 @@ implicit none
   real(r8), allocatable :: WTRVNs1(:)     !plant stored nonstructural N, [g d-2]
   real(r8), allocatable :: WTRVPs1(:)     !plant stored nonstructural P, [g d-2]
   real(r8), allocatable :: XKCO24s1(:)    !Km for PEP carboxylase activity, [uM]
-  real(r8), allocatable :: XTLIs1(:)      !number of nodes in seed, [-]
-  real(r8), allocatable :: XRNIs1(:)      !rate of node initiation, [h-1 at 25 oC]
-  real(r8), allocatable :: XRLAs1(:)      !rate of leaf initiation, [h-1 at 25 oC]
-  real(r8), allocatable :: XDLs1(:)       !critical daylength for phenological progress, [h]
-  real(r8), allocatable :: XPPDs1(:)      !difference between current and critical daylengths used to calculate  phenological progress [h]
   real(r8), allocatable :: ZPOOLPs1(:)    !canopy  nonstructural N, [g d-2]
   real(r8), allocatable :: ZPOLNPs1(:)    !canopy nonstructural P concentration, [g g-1]
   real(r8), allocatable :: ZEROLs1(:)     !threshold zero for leaf calculation
   real(r8), allocatable :: ZEROPs1(:)     !threshold zero for p calculation
   real(r8), allocatable :: ZEROQs1(:)     !threshold zero for uptake calculation
-  real(r8), allocatable :: ZCs1(:)        !canopy height, [m]
   real(r8), allocatable :: ZNPPs1(:)      !total net primary productivity, [g d-2]
 
-  real(r8), allocatable :: ATRPs1(:,:)    !counter for mobilizing nonstructural C during spring leafout/dehardening, [h]
-  real(r8), allocatable :: FLGZs1(:,:)    !counter for mobilizing nonstructural C during autumn leafoff/hardening, [h]
   real(r8), allocatable :: CPOOLs1(:,:)   !branch nonstructural C, [g d-2]
   real(r8), allocatable :: CPOLNBs1(:,:)  !branch nodule nonstructural C, [g d-2]
   real(r8), allocatable :: CCPOLBs1(:,:)  !branch nonstructural C concentration, [g d-2]
   real(r8), allocatable :: CZPOLBs1(:,:)  !branch nonstructural N concentration, [g g-1]
   real(r8), allocatable :: CPPOLBs1(:,:)  !branch nonstructural P concentration, [g g-1]
-  real(r8), allocatable :: DGSTGIs1(:,:)  !gain in normalized node number during vegetative growth stages , [h-1]
-  real(r8), allocatable :: DGSTGFs1(:,:)  !gain in normalized node number during reproductive growth stages, [h-1]
-  real(r8), allocatable :: FLG4s1(:,:)    !flag to detect physiological maturity from  grain fill , [-]
-
-  real(r8), allocatable :: GROUPs1(:,:)   !plant maturity group, [-]
-  real(r8), allocatable :: GSTGIs1(:,:)   !normalized node number during vegetative growth stages , [-]
-  real(r8), allocatable :: GSTGFs1(:,:)   !normalized node number during reproductive growth stages, [-]
 
   real(r8), allocatable :: GRWTBs1(:,:)   !maximum grain C during grain fill, [g d-2]
 
-  integer,  allocatable :: IDTHBs1(:,:)   !flag to detect branch death , [-]
-  integer,  allocatable :: IFLGPs1(:,:)   !branch phenology flag, [-]
-  integer,  allocatable :: IFLGFs1(:,:)   !branch phenology flag, [-]
-  integer,  allocatable :: IFLGEs1(:,:)   !branch phenology flag, [-]
-  integer,  allocatable :: IFLGAs1(:,:)   !branch phenology flag, [-]
-  integer,  allocatable :: IFLGGs1(:,:)   !branch phenology flag, [-]
-  integer,  allocatable :: IFLGRs1(:,:)   !branch phenology flag, [-]
-  integer,  allocatable :: IFLGQs1(:,:)   !branch phenology flag, [h]
-  integer,  allocatable :: KVSTGs1(:,:)   !leaf growth stage counter, [-]
-  integer,  allocatable :: KLEAFs1(:,:)   !leaf number, [-]
-  integer,  allocatable :: KVSTGNs1(:,:)  !leaf growth stage counter, [-]
-
-  integer,  allocatable :: IDAYs1(:,:,:)  !plant growth stage, [-]
   integer,  allocatable :: IDAYYs1(:)     !alternate day of harvest, [-]
 
   real(r8), allocatable :: PPOOLs1(:,:)   !branch nonstructural P, [g d-2]
@@ -533,16 +491,6 @@ implicit none
   real(r8), allocatable :: RCZSXs1(:,:)   !N translocated from sheath during senescence, [g d-2 h-1]
   real(r8), allocatable :: RCPSXs1(:,:)   !P translocated from sheath during senescence, [g d-2 h-1]
   real(r8), allocatable :: RNH3Bs1(:,:)   !gaseous NH3 flux fron root disturbance band, [g d-2 h-1]
-  real(r8), allocatable :: TGSTGIs1(:,:)  !normalized node number during vegetative growth stages , [-]
-  real(r8), allocatable :: TGSTGFs1(:,:)  !normalized node number during reproductive growth stages , [-]
-  real(r8), allocatable :: VSTGXs1(:,:)   !leaf number at floral initiation, [-]
-  real(r8), allocatable :: VSTGs1(:,:)    !leaf number, [-]
-  real(r8), allocatable :: VRNYs1(:,:)    !initial heat requirement for spring leafout/dehardening, [h]
-  real(r8), allocatable :: VRNZs1(:,:)    !initial cold requirement for autumn leafoff/hardening, [h]
-  real(r8), allocatable :: VRNSs1(:,:)    !heat requirement for spring leafout/dehardening, [h]
-  real(r8), allocatable :: VRNLs1(:,:)    !hours above threshold temperature required for spring leafout/dehardening, [-]
-  real(r8), allocatable :: VRNFs1(:,:)    !cold requirement for autumn leafoff/hardening, [h]
-  real(r8), allocatable :: VRNXs1(:,:)    !number of hours below set temperature required for autumn leafoff/hardening, [-]
   real(r8), allocatable :: WTLSBs1(:,:)   !branch leaf + sheath C, [g d-2]
   real(r8), allocatable :: WTRSVBs1(:,:)  !branch reserve C, [g d-2]
   real(r8), allocatable :: WTLFBs1(:,:)   !branch leaf C, [g d-2]
@@ -814,31 +762,34 @@ implicit none
   real(r8), allocatable :: THETPMs1(:,:)      !soil air-filled porosity, [m3 m-3]
   real(r8), allocatable :: DFGSs1(:,:)        !coefficient for dissolution - volatilization, []
 
-  type, public :: photosyns_type
-  real(r8), pointer :: ETMXs1(:)     !cholorophyll activity , [umol g-1 h-1 at 25 oC]
-  real(r8), pointer :: CHLs1(:)      !leaf C3 chlorophyll content, [gC gC-1]
-  real(r8), pointer :: PEPCs1(:)     !leaf PEP carboxylase content, [gC gC-1]
-  real(r8), pointer :: CHL4s1(:)     !leaf C4 chlorophyll content, [gC gC-1]
-  real(r8), pointer :: RUBPs1(:)     !leaf rubisco content, [gC gC-1]
-  real(r8), pointer :: VCMX4s1(:)    !PEP carboxylase activity, [umol g-1 h-1 at 25 oC]
-  real(r8), pointer :: VOMXs1(:)     !rubisco oxygenase activity, [umol g-1 h-1 at 25 oC]
-  real(r8), pointer :: VCMXs1(:)     !rubisco carboxylase activity, [umol g-1 h-1 at 25 oC]
-  real(r8), pointer :: XKCO2s1(:)    !Km for rubisco carboxylase activity, [uM]
-  real(r8), pointer :: XKO2s1(:)     !Km for rubisco oxygenase activity, [uM]
-  real(r8), pointer :: FDBKs1(:,:)    !branch down-regulation of CO2 fixation, [-]
-  real(r8), pointer :: FDBKXs1(:,:)   !down-regulation of C4 photosynthesis, [-]
-  real(r8), pointer :: CO2Ls1(:)      !leaf aqueous CO2 concentration, [uM]
-  real(r8), pointer :: O2Is1(:)       !leaf gaseous O2 concentration, [umol m-3]
-  real(r8), pointer :: CO2Is1(:)      !leaf gaseous CO2 concentration, [umol m-3]
-  real(r8), pointer :: XKCO2Os1(:)   !leaf aqueous CO2 Km ambient O2, [uM]
-  real(r8), pointer :: XKCO2Ls1(:)   !leaf aqueous CO2 Km no O2, [uM]
+  type, public :: plant_photosyns_type
+  real(r8), pointer :: ETMXs1(:)   => null()  !cholorophyll activity , [umol g-1 h-1 at 25 oC]
+  real(r8), pointer :: CHLs1(:)    => null()  !leaf C3 chlorophyll content, [gC gC-1]
+  real(r8), pointer :: PEPCs1(:)   => null()  !leaf PEP carboxylase content, [gC gC-1]
+  real(r8), pointer :: CHL4s1(:)   => null()  !leaf C4 chlorophyll content, [gC gC-1]
+  real(r8), pointer :: RUBPs1(:)   => null()  !leaf rubisco content, [gC gC-1]
+  real(r8), pointer :: VCMX4s1(:)  => null()  !PEP carboxylase activity, [umol g-1 h-1 at 25 oC]
+  real(r8), pointer :: VOMXs1(:)   => null()  !rubisco oxygenase activity, [umol g-1 h-1 at 25 oC]
+  real(r8), pointer :: VCMXs1(:)   => null()  !rubisco carboxylase activity, [umol g-1 h-1 at 25 oC]
+  real(r8), pointer :: XKCO2s1(:)  => null()  !Km for rubisco carboxylase activity, [uM]
+  real(r8), pointer :: XKO2s1(:)   => null()  !Km for rubisco oxygenase activity, [uM]
+  real(r8), pointer :: FDBKs1(:,:) => null()   !branch down-regulation of CO2 fixation, [-]
+  real(r8), pointer :: FDBKXs1(:,:)=> null()   !down-regulation of C4 photosynthesis, [-]
+  real(r8), pointer :: CO2Ls1(:)   => null()   !leaf aqueous CO2 concentration, [uM]
+  real(r8), pointer :: O2Is1(:)    => null()   !leaf gaseous O2 concentration, [umol m-3]
+  real(r8), pointer :: CO2Is1(:)   => null()   !leaf gaseous CO2 concentration, [umol m-3]
+  real(r8), pointer :: XKCO2Os1(:) => null()  !leaf aqueous CO2 Km ambient O2, [uM]
+  real(r8), pointer :: XKCO2Ls1(:) => null()  !leaf aqueous CO2 Km no O2, [uM]
+  real(r8), pointer :: RCSs1(:)    => null()  !shape parameter for calculating stomatal resistance from turgor pressure, [-]
+  real(r8), pointer :: FCO2s1(:)   => null()  !Ci:Ca ratio, [-]
+  real(r8), pointer :: RSMHs1(:)   => null()  !maximum stomatal resistance to vapor, [s h-1]
 
   contains
     procedure, public :: Init    =>  plt_photo_init
     procedure, public :: Destroy => plt_photo_destroy
-  end type photosyns_type
+  end type plant_photosyns_type
 
-  type, public ::  radiation_type
+  type, public ::  plant_radiation_type
   real(r8) :: TYSINs1     !sine of sky angles
   real(r8) :: ALBSs1      !snowpack albedo
   real(r8) :: ALBXs1      !Surface albedo
@@ -880,67 +831,122 @@ implicit none
   contains
     procedure, public :: Init    => plt_rad_init
     procedure, public :: Destroy => plt_rad_destroy
-  end type radiation_type
+  end type plant_radiation_type
 
   type, public :: plant_morph_type
   real(r8) :: ARLSSs1                     !stalk area of combined, each PFT canopy
   real(r8) :: ARLFCs1                     !total canopy leaf area, [m2 d-2]
   real(r8) :: ARSTCs1                     !total canopy stem area, [m2 d-2]
   real(r8) :: ZTs1                        !canopy height , [m]
-  real(r8), pointer :: ZLs1(:)            !canopy layer height , [m]
-  real(r8), pointer :: ARSTPs1(:)         !plant stem area, [m2 d-2]
-  real(r8), pointer :: ARLFPs1(:)         !plant leaf area, [m2 d-2]
-  integer,  pointer :: NB1s1(:)           !number of main branch
-  integer,  pointer :: NIs1(:)            !maximum soil layer number for all root axes
-  integer,  pointer :: NIXs1(:)           !maximum soil layer number for all root axes, [-]
-  integer,  pointer :: NRTs1(:)           !root primary axis number
-  integer,  pointer :: NNODs1(:)          !number of concurrently growing nodes
-  integer,  pointer :: NBTs1(:)           !branch number
-  integer,  pointer :: NBRs1(:)           !branch number
-  integer,  pointer :: NINRs1(:,:)        !maximum soil layer number for root axes, [-]
-  real(r8), pointer :: PSTGs1(:,:)        !shoot node number, [-]
-  real(r8), pointer :: PSTGIs1(:,:)       !shoot node number at floral initiation, [-]
-  real(r8), pointer :: PSTGFs1(:,:)       !shoot node number at anthesis, [-]
-  real(r8), pointer :: ANGBRs1(:)         !branching angle, [degree from horizontal]
-  real(r8), pointer :: SURFs1(:,:,:,:,:)  !leaf surface area, [m2 d-2]
-  integer,  pointer :: KLEAFXs1(:,:)      !NUMBER OF MINIMUM LEAFED NODE USED IN GROWTH ALLOCATION
-  integer,  pointer :: NBTBs1(:,:)        !branch number, [-]
-  real(r8), pointer :: GRNXBs1(:,:)       !branch potential grain number, [d-2]
-  real(r8), pointer :: GRNOBs1(:,:)       !branch grain number, [d-2]
-  real(r8), pointer :: HTSHEXs1(:,:)      !branch height, [m]
-  real(r8), pointer :: ARLFZs1(:,:)       !branch leaf area, [m2 d-2]
-  real(r8), pointer :: ARLFBs1(:,:)       !branch leaf area, [m2 d-2]
-  real(r8), pointer :: ANGSHs1(:)         !sheath angle, [degree from horizontal]
-  real(r8), pointer :: CLASSs1(:,:)       !fractionction of leaves in different angle classes, [-]
-  real(r8), pointer :: ARSTVs1(:,:)    !canopy layer stem area, [m2 d-2]
-  real(r8), pointer :: ARLFVs1(:,:)       !canopy layer leaf area, [m2 d-2]
-  real(r8), pointer :: ARLF1s1(:,:,:)     !leaf area, [m2 d-2]
-  real(r8), pointer :: GRNOs1(:)      !canopy grain number, [d-2]
-  real(r8), pointer :: SDPTHs1(:)     !seeding depth, [m]
-  real(r8), pointer :: SDPTHIs1(:)    !planting depth, [m]
-  real(r8), pointer :: SDLGs1(:)      !seed length, [m]
-  real(r8), pointer :: SDVLs1(:)      !seed volume, [m3 ]
-  real(r8), pointer :: SDARs1(:)      !seed surface area, [m2]
-  real(r8), pointer :: ARSTTs1(:)    !total stem area, [m2 d-2]
-  real(r8), pointer :: SSL1s1(:)     !petiole length:mass during growth, [m gC-1]
-  real(r8), pointer :: SNL1s1(:)     !internode length:mass during growth, [m gC-1]
-  real(r8), pointer :: SLA1s1(:)     !leaf area:mass during growth, [m2 gC-1]
-  real(r8), pointer :: ARLFTs1(:)    !total leaf area, [m2 d-2]
-  real(r8), pointer :: ARLFSs1(:)    !plant leaf area, [m2 d-2]
-  real(r8), pointer :: HTNODXs1(:,:,:)    !internode height, [m]
-  real(r8), pointer :: HTSHEs1(:,:,:)     !sheath height, [m]
-  real(r8), pointer :: HTNODEs1(:,:,:)    !internode height, [m]
-  real(r8), pointer :: SURFBs1(:,:,:,:)   !stem surface area, [m2 d-2]
-  real(r8), pointer :: ARLFLs1(:,:,:,:)   !layer leaf area, [m2 d-2]
-  real(r8), pointer :: ARSTKs1(:,:,:)     !stem layer area, [m2 d-2]
+  real(r8), pointer :: ZLs1(:)           => null() !canopy layer height , [m]
+  real(r8), pointer :: ARSTPs1(:)        => null() !plant stem area, [m2 d-2]
+  real(r8), pointer :: ARLFPs1(:)        => null() !plant leaf area, [m2 d-2]
+  integer,  pointer :: NB1s1(:)          => null() !number of main branch
+  integer,  pointer :: NIs1(:)           => null() !maximum soil layer number for all root axes
+  integer,  pointer :: NIXs1(:)          => null() !maximum soil layer number for all root axes, [-]
+  integer,  pointer :: NRTs1(:)          => null() !root primary axis number
+  integer,  pointer :: NNODs1(:)         => null() !number of concurrently growing nodes
+  integer,  pointer :: NBTs1(:)          => null() !branch number
+  integer,  pointer :: NBRs1(:)          => null() !branch number
+  integer,  pointer :: NINRs1(:,:)       => null() !maximum soil layer number for root axes, [-]
+  real(r8), pointer :: PSTGs1(:,:)       => null() !shoot node number, [-]
+  real(r8), pointer :: PSTGIs1(:,:)      => null() !shoot node number at floral initiation, [-]
+  real(r8), pointer :: PSTGFs1(:,:)      => null() !shoot node number at anthesis, [-]
+  real(r8), pointer :: ANGBRs1(:)        => null() !branching angle, [degree from horizontal]
+  real(r8), pointer :: SURFs1(:,:,:,:,:) => null() !leaf surface area, [m2 d-2]
+  integer,  pointer :: KLEAFXs1(:,:)     => null() !NUMBER OF MINIMUM LEAFED NODE USED IN GROWTH ALLOCATION
+  integer,  pointer :: NBTBs1(:,:)       => null() !branch number, [-]
+  real(r8), pointer :: GRNXBs1(:,:)      => null() !branch potential grain number, [d-2]
+  real(r8), pointer :: GRNOBs1(:,:)      => null() !branch grain number, [d-2]
+  real(r8), pointer :: HTSHEXs1(:,:)     => null() !branch height, [m]
+  real(r8), pointer :: ARLFZs1(:,:)      => null() !branch leaf area, [m2 d-2]
+  real(r8), pointer :: ARLFBs1(:,:)      => null() !branch leaf area, [m2 d-2]
+  real(r8), pointer :: ANGSHs1(:)        => null() !sheath angle, [degree from horizontal]
+  real(r8), pointer :: CLASSs1(:,:)      => null() !fractionction of leaves in different angle classes, [-]
+  real(r8), pointer :: ARSTVs1(:,:)      => null() !canopy layer stem area, [m2 d-2]
+  real(r8), pointer :: ARLFVs1(:,:)      => null() !canopy layer leaf area, [m2 d-2]
+  real(r8), pointer :: ARLF1s1(:,:,:)    => null() !leaf area, [m2 d-2]
+  real(r8), pointer :: GRNOs1(:)         => null() !canopy grain number, [d-2]
+  real(r8), pointer :: SDPTHs1(:)        => null() !seeding depth, [m]
+  real(r8), pointer :: SDPTHIs1(:)       => null() !planting depth, [m]
+  real(r8), pointer :: SDLGs1(:)         => null() !seed length, [m]
+  real(r8), pointer :: SDVLs1(:)         => null() !seed volume, [m3 ]
+  real(r8), pointer :: SDARs1(:)         => null() !seed surface area, [m2]
+  real(r8), pointer :: ARSTTs1(:)        => null() !total stem area, [m2 d-2]
+  real(r8), pointer :: SSL1s1(:)         => null() !petiole length:mass during growth, [m gC-1]
+  real(r8), pointer :: SNL1s1(:)         => null() !internode length:mass during growth, [m gC-1]
+  real(r8), pointer :: SLA1s1(:)         => null() !leaf area:mass during growth, [m2 gC-1]
+  real(r8), pointer :: ARLFTs1(:)        => null() !total leaf area, [m2 d-2]
+  real(r8), pointer :: ARLFSs1(:)        => null() !plant leaf area, [m2 d-2]
+  real(r8), pointer :: HTNODXs1(:,:,:)   => null() !internode height, [m]
+  real(r8), pointer :: HTSHEs1(:,:,:)    => null() !sheath height, [m]
+  real(r8), pointer :: HTNODEs1(:,:,:)   => null() !internode height, [m]
+  real(r8), pointer :: SURFBs1(:,:,:,:)  => null() !stem surface area, [m2 d-2]
+  real(r8), pointer :: ARLFLs1(:,:,:,:)  => null() !layer leaf area, [m2 d-2]
+  real(r8), pointer :: ARSTKs1(:,:,:)    => null() !stem layer area, [m2 d-2]
+  real(r8), pointer :: CFs1(:)           => null() !clumping factor for self-shading in canopy layer, [-]
+  real(r8), pointer :: XTLIs1(:)         => null() !number of nodes in seed, [-]
+  real(r8), pointer :: ZCs1(:)           => null() !canopy height, [m]
+  integer,  pointer :: NGs1(:)           => null() !soil layer at planting depth, [-]
+  integer,  pointer :: KLEAFs1(:,:)      => null() !leaf number, [-]
+  real(r8), pointer :: VSTGs1(:,:)       => null() !leaf number, [-]
   contains
     procedure, public :: Init    => plt_morph_init
     procedure, public :: Destroy => plt_morph_destroy
   end type plant_morph_type
 
-  type(plant_morph_type), public, target :: plt_morph !plant morphology
-  type(radiation_type), public, target :: plt_rad     !plant radiation type
-  type(photosyns_type), public, target :: plt_photo   !plant photosynthesis type
+  type, public :: plant_pheno_type
+  real(r8), pointer :: XRNIs1(:)  => null()     !rate of node initiation, [h-1 at 25 oC]
+  real(r8), pointer :: XRLAs1(:)  => null()     !rate of leaf initiation, [h-1 at 25 oC]
+  real(r8), pointer :: XDLs1(:)   => null()     !critical daylength for phenological progress, [h]
+  real(r8), pointer :: XPPDs1(:)  => null()     !difference between current and critical daylengths used to calculate  phenological progress [h]
+  integer,  pointer :: IDTHBs1(:,:)  => null()  !flag to detect branch death , [-]
+  integer,  pointer :: IFLGPs1(:,:)  => null()  !branch phenology flag, [-]
+  integer,  pointer :: IFLGFs1(:,:)  => null()  !branch phenology flag, [-]
+  integer,  pointer :: IFLGEs1(:,:)  => null()  !branch phenology flag, [-]
+  integer,  pointer :: IFLGAs1(:,:)  => null()  !branch phenology flag, [-]
+  integer,  pointer :: IFLGGs1(:,:)  => null()  !branch phenology flag, [-]
+  integer,  pointer :: IFLGRs1(:,:)  => null()  !branch phenology flag, [-]
+  integer,  pointer :: IFLGQs1(:,:)  => null()  !branch phenology flag, [h]
+  integer,  pointer :: KVSTGs1(:,:)  => null()  !leaf growth stage counter, [-]
+  integer,  pointer :: IWTYPs1(:)    => null()  !climate signal for phenological progress: none, temperature, water stress
+  integer,  pointer :: IBTYPs1(:)    => null()  !phenologically-driven above-ground turnover: all, foliar only, none
+  integer,  pointer :: IDTHPs1(:)    => null()  !flag to detect canopy death
+  integer,  pointer :: ISTYPs1(:)    => null()  !plant growth habit: annual or perennial
+  integer,  pointer :: IDTHRs1(:)    => null()  !flag to detect root system death
+  integer,  pointer :: IDTYPs1(:)    => null()  !plant growth habit (determinate or indeterminate)
+  integer,  pointer :: IPTYPs1(:)    => null()  !photoperiod type (neutral, long day, short day)
+  integer,  pointer :: IGTYPs1(:)    => null()  !plant growth type (vascular, non-vascular)
+  integer,  pointer :: IFLGIs1(:)    => null()  !PFT initialization flag:0=no,1=yes
+  integer,  pointer :: KVSTGNs1(:,:) => null()  !leaf growth stage counter, [-]
+  integer,  pointer :: IDAYs1(:,:,:) => null()  !plant growth stage, [-]
+  real(r8), pointer :: TGSTGIs1(:,:) => null()  !normalized node number during vegetative growth stages , [-]
+  real(r8), pointer :: TGSTGFs1(:,:) => null()  !normalized node number during reproductive growth stages , [-]
+  real(r8), pointer :: VSTGXs1(:,:)  => null()  !leaf number at floral initiation, [-]
+  real(r8), pointer :: VRNYs1(:,:)   => null()  !initial heat requirement for spring leafout/dehardening, [h]
+  real(r8), pointer :: VRNZs1(:,:)   => null()  !initial cold requirement for autumn leafoff/hardening, [h]
+  real(r8), pointer :: VRNSs1(:,:)   => null()  !heat requirement for spring leafout/dehardening, [h]
+  real(r8), pointer :: VRNLs1(:,:)   => null()  !hours above threshold temperature required for spring leafout/dehardening, [-]
+  real(r8), pointer :: VRNFs1(:,:)   => null()  !cold requirement for autumn leafoff/hardening, [h]
+  real(r8), pointer :: VRNXs1(:,:)   => null()  !number of hours below set temperature required for autumn leafoff/hardening, [-]
+  real(r8), pointer :: ATRPs1(:,:)   => null()  !counter for mobilizing nonstructural C during spring leafout/dehardening, [h]
+  real(r8), pointer :: FLGZs1(:,:)   => null()  !counter for mobilizing nonstructural C during autumn leafoff/hardening, [h]
+  real(r8), pointer :: DGSTGIs1(:,:) => null()  !gain in normalized node number during vegetative growth stages , [h-1]
+  real(r8), pointer :: DGSTGFs1(:,:) => null()  !gain in normalized node number during reproductive growth stages, [h-1]
+  real(r8), pointer :: GROUPs1(:,:)  => null()  !plant maturity group, [-]
+  real(r8), pointer :: GSTGIs1(:,:)  => null()  !normalized node number during vegetative growth stages , [-]
+  real(r8), pointer :: GSTGFs1(:,:)  => null()  !normalized node number during reproductive growth stages, [-]
+  real(r8), pointer :: FLG4s1(:,:)   => null()  !flag to detect physiological maturity from  grain fill , [-]
+
+  contains
+    procedure, public :: Init    =>  plt_pheno_init
+    procedure, public :: Destroy =>  plt_pheno_destroy
+  end type plant_pheno_type
+
+  type(plant_pheno_type), public, target :: plt_pheno       !plant phenology
+  type(plant_morph_type), public, target :: plt_morph       !plant morphology
+  type(plant_radiation_type), public, target :: plt_rad     !plant radiation type
+  type(plant_photosyns_type), public, target :: plt_photo   !plant photosynthesis type
 
   contains
   subroutine InitPlantAPIData(JZ,JC,JP,JSA,jcplx1,JLI,JLA,JNODS)
@@ -957,6 +963,8 @@ implicit none
   JLI1=JLI
   JNODS1=JNODS
 
+  call plt_pheno%Init()
+
   call plt_rad%Init()
 
   call plt_photo%Init()
@@ -972,9 +980,7 @@ implicit none
   call plt_rad%Destroy()
 
   allocate(IDTHs1(JP1))
-  allocate(FCO2s1(JP1))
   allocate(WTRTs1(JP1))
-  allocate(IDTHPs1(JP1))
   allocate(IYR0s1(JP1))
   allocate(INTYPs1(JP1))
   allocate(IYRXs1(JP1))
@@ -985,20 +991,11 @@ implicit none
   allocate(IDAYHs1(JP1))
   allocate(IYRHs1(JP1))
   allocate(IHVSTs1(JP1))
-  allocate(IWTYPs1(JP1))
   allocate(JHVSTs1(JP1))
-  allocate(IDTYPs1(JP1))
-  allocate(ISTYPs1(JP1))
-  allocate(IDTHRs1(JP1))
-  allocate(IBTYPs1(JP1))
+
   allocate(MYs1(JP1))
-  allocate(NGs1(JP1))
-  allocate(IPTYPs1(JP1))
   allocate(IDATAs1(60))
-  allocate(IFLGIs1(JP1))
   allocate(ICTYPs1(JP1))
-  allocate(IGTYPs1(JP1))
-  allocate(RCSs1(JP1))
   allocate(FERTs1(1:20))
   allocate(WGLFTs1(JC1))
   allocate(DLYR3s1(0:JZ1))
@@ -1184,9 +1181,7 @@ implicit none
   allocate(BALPs1(JP1))
   allocate(PPIs1(JP1))
   allocate(PPZs1(JP1))
-  allocate(CFs1(JP1))
   allocate(PPXs1(JP1))
-  allocate(RSMHs1(JP1))
   allocate(SSTXs1(JP1))
   allocate(CCPOLPs1(JP1))
   allocate(CPOOLPs1(JP1))
@@ -1377,45 +1372,21 @@ implicit none
   allocate(WTSHPs1(JP1))
   allocate(WTRVPs1(JP1))
   allocate(XKCO24s1(JP1))
-  allocate(XTLIs1(JP1))
-  allocate(XRNIs1(JP1))
-  allocate(XRLAs1(JP1))
-  allocate(XDLs1(JP1))
-  allocate(XPPDs1(JP1))
   allocate(ZPOOLPs1(JP1))
   allocate(ZPOLNPs1(JP1))
   allocate(ZEROLs1(JP1))
   allocate(ZEROPs1(JP1))
 
   allocate(ZEROQs1(JP1))
-  allocate(ZCs1(JP1))
   allocate(ZNPPs1(JP1))
-  allocate(ATRPs1(JC1,JP1))
   allocate(CPOOLs1(JC1,JP1))
   allocate(CPOLNBs1(JC1,JP1))
   allocate(CCPOLBs1(JC1,JP1))
   allocate(CZPOLBs1(JC1,JP1))
   allocate(CPPOLBs1(JC1,JP1))
-  allocate(DGSTGIs1(JC1,JP1))
-  allocate(DGSTGFs1(JC1,JP1))
-  allocate(FLG4s1(JC1,JP1))
-  allocate(FLGZs1(JC1,JP1))
-  allocate(GROUPs1(JC1,JP1))
-  allocate(GSTGIs1(JC1,JP1))
-  allocate(GSTGFs1(JC1,JP1))
+
   allocate(GRWTBs1(JC1,JP1))
-  allocate(IDTHBs1(JC1,JP1))
-  allocate(IFLGPs1(JC1,JP1))
-  allocate(IFLGFs1(JC1,JP1))
-  allocate(IFLGEs1(JC1,JP1))
-  allocate(IFLGAs1(JC1,JP1))
-  allocate(IFLGGs1(JC1,JP1))
-  allocate(IFLGRs1(JC1,JP1))
-  allocate(IFLGQs1(JC1,JP1))
-  allocate(KVSTGs1(JC1,JP1))
-  allocate(KLEAFs1(JC1,JP1))
-  allocate(KVSTGNs1(JC1,JP1))
-  allocate(IDAYs1(10,JC1,JP1))
+
   allocate(IDAYYs1(JP1))
   allocate(PPOOLs1(JC1,JP1))
   allocate(PPOLNBs1(JC1,JP1))
@@ -1426,16 +1397,7 @@ implicit none
   allocate(RCZSXs1(JC1,JP1))
   allocate(RCPSXs1(JC1,JP1))
   allocate(RNH3Bs1(JC1,JP1))
-  allocate(TGSTGIs1(JC1,JP1))
-  allocate(TGSTGFs1(JC1,JP1))
-  allocate(VSTGXs1(JC1,JP1))
-  allocate(VSTGs1(JC1,JP1))
-  allocate(VRNYs1(JC1,JP1))
-  allocate(VRNZs1(JC1,JP1))
-  allocate(VRNSs1(JC1,JP1))
-  allocate(VRNLs1(JC1,JP1))
-  allocate(VRNFs1(JC1,JP1))
-  allocate(VRNXs1(JC1,JP1))
+
   allocate(WTLSBs1(JC1,JP1))
   allocate(WTRSVBs1(JC1,JP1))
   allocate(WTLFBs1(JC1,JP1))
@@ -1668,8 +1630,6 @@ implicit none
   implicit none
   if(allocated(WTRTs1))deallocate(WTRTs1)
 
-  if(allocated(FCO2s1))deallocate(FCO2s1)
-
   if(allocated(IDTHs1))deallocate(IDTHs1)
   if(allocated(IYR0s1))deallocate(IYR0s1)
   if(allocated(INTYPs1))deallocate(INTYPs1)
@@ -1681,25 +1641,17 @@ implicit none
   if(allocated(IDAYHs1))deallocate(IDAYHs1)
   if(allocated(IYRHs1))deallocate(IYRHs1)
   if(allocated(IHVSTs1))deallocate(IHVSTs1)
-  if(allocated(IWTYPs1))deallocate(IWTYPs1)
+
   if(allocated(JHVSTs1))deallocate(JHVSTs1)
-  if(allocated(ISTYPs1))deallocate(ISTYPs1)
   if(allocated(MYs1)) deallocate(MYs1)
 
-  if(allocated(NGs1)) deallocate(NGs1)
-
-  if(allocated(IDTYPs1))deallocate(IDTYPs1)
-  if(allocated(IPTYPs1))deallocate(IPTYPs1)
   if(allocated(IDATAs1))deallocate(IDATAs1)
-  if(allocated(IGTYPs1))deallocate(IGTYPs1)
-  if(allocated(IFLGIs1))deallocate(IFLGIs1)
+
   if(allocated(ICTYPs1))deallocate(ICTYPs1)
   if(allocated(DATAs1))deallocate(DATAs1)
 
   if(allocated(FERTs1))deallocate(FERTs1)
   if(allocated(WGLFTs1))deallocate(WGLFTs1)
-
-  if(allocated(RCSs1))deallocate(RCSs1)
 
   if(allocated(CPEARs1))deallocate(CPEARs1)
   if(allocated(CPHSKs1))deallocate(CPHSKs1)
@@ -1756,11 +1708,11 @@ implicit none
   if(allocated(CH2GGs1))deallocate(CH2GGs1)
   if(allocated(CORGCs1))deallocate(CORGCs1)
   if(allocated(CDPTHZs1))deallocate(CDPTHZs1)
-  if(allocated(RSMHs1)) deallocate(RSMHs1)
+
   if(allocated(CFIs1)) deallocate(CFIs1)
   if(allocated(PPIs1)) deallocate(PPIs1)
   if(allocated(PPZs1)) deallocate(PPZs1)
-  if(allocated(CFs1))  deallocate(CFs1)
+
   if(allocated(PPXs1)) deallocate(PPXs1)
   if(allocated(DPTHZs1))deallocate(DPTHZs1)
   if(allocated(FMPRs1))deallocate(FMPRs1)
@@ -1927,15 +1879,14 @@ implicit none
   if(allocated(CNRTs1))deallocate(CNRTs1)
   if(allocated(CWSRTs1))deallocate(CWSRTs1)
   if(allocated(RSMXs1))deallocate(RSMXs1)
-  if(allocated(IDTHPs1))deallocate(IDTHPs1)
+
   if(allocated(CPRTs1))deallocate(CPRTs1)
   if(allocated(CNWSs1))deallocate(CNWSs1)
   if(allocated(CPWSs1))deallocate(CPWSs1)
   if(allocated(CFXs1))deallocate(CFXs1)
   if(allocated(DCO2s1))deallocate(DCO2s1)
   if(allocated(DATAPs1))deallocate(DATAPs1)
-  if(allocated(IDTHRs1))deallocate(IDTHRs1)
-  if(allocated(IBTYPs1))deallocate(IBTYPs1)
+
   if(allocated(DMNDs1))deallocate(DMNDs1)
   if(allocated(DMRTs1))deallocate(DMRTs1)
   if(allocated(FMOLs1))deallocate(FMOLs1)
@@ -2034,51 +1985,23 @@ implicit none
   if(allocated(WTSHPs1))deallocate(WTSHPs1)
   if(allocated(WTRVPs1))deallocate(WTRVPs1)
   if(allocated(XKCO24s1))deallocate(XKCO24s1)
-  if(allocated(XTLIs1))deallocate(XTLIs1)
-  if(allocated(XRNIs1))deallocate(XRNIs1)
-  if(allocated(XRLAs1))deallocate(XRLAs1)
-  if(allocated(XDLs1))deallocate(XDLs1)
-  if(allocated(XPPDs1))deallocate(XPPDs1)
+
   if(allocated(ZPOOLPs1))deallocate(ZPOOLPs1)
   if(allocated(ZPOLNPs1))deallocate(ZPOLNPs1)
   if(allocated(ZEROLs1))deallocate(ZEROLs1)
   if(allocated(ZEROPs1))deallocate(ZEROPs1)
   if(allocated(ZEROQs1))deallocate(ZEROQs1)
-  if(allocated(ZCs1))deallocate(ZCs1)
 
   if(allocated(ZNPPs1))deallocate(ZNPPs1)
-
-  if(allocated(ATRPs1))deallocate(ATRPs1)
 
   if(allocated(CPOOLs1))deallocate(CPOOLs1)
   if(allocated(CPOLNBs1))deallocate(CPOLNBs1)
   if(allocated(CCPOLBs1))deallocate(CCPOLBs1)
   if(allocated(CZPOLBs1))deallocate(CZPOLBs1)
   if(allocated(CPPOLBs1))deallocate(CPPOLBs1)
-  if(allocated(DGSTGIs1))deallocate(DGSTGIs1)
-  if(allocated(DGSTGFs1))deallocate(DGSTGFs1)
-  if(allocated(FLG4s1))deallocate(FLG4s1)
-
-  if(allocated(FLGZs1))deallocate(FLGZs1)
-  if(allocated(GROUPs1))deallocate(GROUPs1)
-  if(allocated(GSTGIs1))deallocate(GSTGIs1)
-  if(allocated(GSTGFs1))deallocate(GSTGFs1)
 
   if(allocated(GRWTBs1))deallocate(GRWTBs1)
 
-  if(allocated(IDTHBs1))deallocate(IDTHBs1)
-  if(allocated(IFLGPs1))deallocate(IFLGPs1)
-  if(allocated(IFLGFs1))deallocate(IFLGFs1)
-  if(allocated(IFLGEs1))deallocate(IFLGEs1)
-  if(allocated(IFLGAs1))deallocate(IFLGAs1)
-  if(allocated(IFLGGs1))deallocate(IFLGGs1)
-  if(allocated(IFLGRs1))deallocate(IFLGRs1)
-  if(allocated(IFLGQs1))deallocate(IFLGQs1)
-  if(allocated(KVSTGs1))deallocate(KVSTGs1)
-  if(allocated(KLEAFs1))deallocate(KLEAFs1)
-  if(allocated(KVSTGNs1))deallocate(KVSTGNs1)
-
-  if(allocated(IDAYs1))deallocate(IDAYs1)
   if(allocated(IDAYYs1))deallocate(IDAYYs1)
 
   if(allocated(PPOOLs1))deallocate(PPOOLs1)
@@ -2090,16 +2013,7 @@ implicit none
   if(allocated(RCZSXs1))deallocate(RCZSXs1)
   if(allocated(RCPSXs1))deallocate(RCPSXs1)
   if(allocated(RNH3Bs1))deallocate(RNH3Bs1)
-  if(allocated(TGSTGIs1))deallocate(TGSTGIs1)
-  if(allocated(TGSTGFs1))deallocate(TGSTGFs1)
-  if(allocated(VSTGXs1))deallocate(VSTGXs1)
-  if(allocated(VSTGs1))deallocate(VSTGs1)
-  if(allocated(VRNYs1))deallocate(VRNYs1)
-  if(allocated(VRNZs1))deallocate(VRNZs1)
-  if(allocated(VRNSs1))deallocate(VRNSs1)
-  if(allocated(VRNLs1))deallocate(VRNLs1)
-  if(allocated(VRNFs1))deallocate(VRNFs1)
-  if(allocated(VRNXs1))deallocate(VRNXs1)
+
   if(allocated(WTLSBs1))deallocate(WTLSBs1)
   if(allocated(WTRSVBs1))deallocate(WTRSVBs1)
   if(allocated(WTLFBs1))deallocate(WTLFBs1)
@@ -2389,9 +2303,9 @@ implicit none
 !------------------------------------------------------------------------
   subroutine plt_rad_init(this)
 ! DESCRIPTION
-! initialize data type for radiation_type
+! initialize data type for plant_radiation_type
   implicit none
-  class(radiation_type) :: this
+  class(plant_radiation_type) :: this
 
   allocate(this%ALBRs1(JP1))
   allocate(this%ALBPs1(JP1))
@@ -2416,9 +2330,9 @@ implicit none
 !------------------------------------------------------------------------
   subroutine plt_rad_destroy(this)
 ! DESCRIPTION
-! deallocate memory for radiation_type
+! deallocate memory for plant_radiation_type
   implicit none
-  class(radiation_type) :: this
+  class(plant_radiation_type) :: this
 
 !  if(associated(this%ALBRs1))deallocate(this%ALBRs1)
 !  if(associated(this%ALBPs1))deallocate(this%ALBPs1)
@@ -2445,7 +2359,7 @@ implicit none
 !------------------------------------------------------------------------
 
   subroutine plt_photo_init(this)
-  class(photosyns_type) :: this
+  class(plant_photosyns_type) :: this
 
   allocate(this%ETMXs1(JP1))
   allocate(this%CHLs1(JP1))
@@ -2464,11 +2378,15 @@ implicit none
   allocate(this%XKCO2Os1(JP1))
   allocate(this%CO2Is1(JP1))
   allocate(this%O2Is1(JP1))
+  allocate(this%RCSs1(JP1))
+  allocate(this%FCO2s1(JP1))
+  allocate(this%RSMHs1(JP1))
+
   end subroutine plt_photo_init
 !------------------------------------------------------------------------
 
   subroutine plt_photo_destroy(this)
-  class(photosyns_type) :: this
+  class(plant_photosyns_type) :: this
 !  if(allocated(ETMXs1))deallocate(ETMXs1)
 !  if(allocated(CHLs1))deallocate(CHLs1)
 !  if(allocated(PEPCs1))deallocate(PEPCs1)
@@ -2486,14 +2404,120 @@ implicit none
 !  if(allocated(XKCO2Os1))deallocate(XKCO2Os1)
 !  if(allocated(CO2Is1))deallocate(CO2Is1)
 !  if(allocated(O2Is1))deallocate(O2Is1)
-
+!  if(allocated(RCSs1))deallocate(RCSs1)
+!  if(allocated(FCO2s1))deallocate(FCO2s1)
+!  if(allocated(RSMHs1)) deallocate(RSMHs1)
   end subroutine plt_photo_destroy
 
 !------------------------------------------------------------------------
+  subroutine plt_pheno_init(this)
+  implicit none
+  class(plant_pheno_type) :: this
+
+  allocate(this%GROUPs1(JC1,JP1))
+  allocate(this%IDTHPs1(JP1))
+  allocate(this%ATRPs1(JC1,JP1))
+  allocate(this%FLGZs1(JC1,JP1))
+  allocate(this%DGSTGIs1(JC1,JP1))
+  allocate(this%DGSTGFs1(JC1,JP1))
+  allocate(this%GSTGIs1(JC1,JP1))
+  allocate(this%GSTGFs1(JC1,JP1))
+  allocate(this%FLG4s1(JC1,JP1))
+  allocate(this%IWTYPs1(JP1))
+  allocate(this%ISTYPs1(JP1))
+  allocate(this%IBTYPs1(JP1))
+  allocate(this%IDTHRs1(JP1))
+  allocate(this%IDTYPs1(JP1))
+  allocate(this%IPTYPs1(JP1))
+  allocate(this%IFLGIs1(JP1))
+  allocate(this%IGTYPs1(JP1))
+  allocate(this%KVSTGs1(JC1,JP1))
+  allocate(this%KVSTGNs1(JC1,JP1))
+  allocate(this%IDAYs1(10,JC1,JP1))
+  allocate(this%TGSTGIs1(JC1,JP1))
+  allocate(this%TGSTGFs1(JC1,JP1))
+  allocate(this%VSTGXs1(JC1,JP1))
+  allocate(this%XRLAs1(JP1))
+  allocate(this%XRNIs1(JP1))
+  allocate(this%XDLs1(JP1))
+  allocate(this%XPPDs1(JP1))
+  allocate(this%IDTHBs1(JC1,JP1))
+  allocate(this%IFLGPs1(JC1,JP1))
+  allocate(this%IFLGFs1(JC1,JP1))
+  allocate(this%IFLGEs1(JC1,JP1))
+  allocate(this%IFLGAs1(JC1,JP1))
+  allocate(this%IFLGGs1(JC1,JP1))
+  allocate(this%IFLGRs1(JC1,JP1))
+  allocate(this%IFLGQs1(JC1,JP1))
+  allocate(this%VRNYs1(JC1,JP1))
+  allocate(this%VRNZs1(JC1,JP1))
+  allocate(this%VRNSs1(JC1,JP1))
+  allocate(this%VRNLs1(JC1,JP1))
+  allocate(this%VRNFs1(JC1,JP1))
+  allocate(this%VRNXs1(JC1,JP1))
+
+  end subroutine plt_pheno_init
+!------------------------------------------------------------------------
+
+  subroutine plt_pheno_destroy(this)
+  implicit none
+  class(plant_pheno_type) :: this
+
+
+!  if(allocated(GROUPs1))deallocate(GROUPs1)
+!  if(allocated(IDTHPs1))deallocate(IDTHPs1)
+!  if(allocated(ATRPs1))deallocate(ATRPs1)
+!  if(allocated(FLGZs1))deallocate(FLGZs1)
+!  if(allocated(DGSTGIs1))deallocate(DGSTGIs1)
+!  if(allocated(DGSTGFs1))deallocate(DGSTGFs1)
+!  if(allocated(GSTGIs1))deallocate(GSTGIs1)
+!  if(allocated(GSTGFs1))deallocate(GSTGFs1)
+!  if(allocated(FLG4s1))deallocate(FLG4s1)
+!  if(allocated(IWTYPs1))deallocate(IWTYPs1)
+!  if(allocated(IBTYPs1))deallocate(IBTYPs1)
+!  if(allocated(ISTYPs1))deallocate(ISTYPs1)
+!  if(allocated(IDTHRs1))deallocate(IDTHRs1)
+!  if(allocated(IDTYPs1))deallocate(IDTYPs1)
+!  if(allocated(IPTYPs1))deallocate(IPTYPs1)
+!  if(allocated(IGTYPs1))deallocate(IGTYPs1)
+!  if(allocated(IFLGIs1))deallocate(IFLGIs1)
+!  if(allocated(KVSTGNs1))deallocate(KVSTGNs1)
+!  if(allocated(TGSTGIs1))deallocate(TGSTGIs1)
+!  if(allocated(TGSTGFs1))deallocate(TGSTGFs1)
+!  if(allocated(VSTGXs1))deallocate(VSTGXs1)
+!  if(allocated(KVSTGs1))deallocate(KVSTGs1)
+!  if(allocated(XDLs1))deallocate(XDLs1)
+!  if(allocated(XRLAs1))deallocate(XRLAs1)
+!  if(allocated(XRNIs1))deallocate(XRNIs1)
+!  if(allocated(XPPDs1))deallocate(XPPDs1)
+!  if(allocated(IDTHBs1))deallocate(IDTHBs1)
+!  if(allocated(IFLGPs1))deallocate(IFLGPs1)
+!  if(allocated(IFLGFs1))deallocate(IFLGFs1)
+!  if(allocated(IFLGEs1))deallocate(IFLGEs1)
+!  if(allocated(IFLGAs1))deallocate(IFLGAs1)
+!  if(allocated(IFLGGs1))deallocate(IFLGGs1)
+!  if(allocated(IFLGRs1))deallocate(IFLGRs1)
+!  if(allocated(IFLGQs1))deallocate(IFLGQs1)
+!  if(allocated(VRNYs1))deallocate(VRNYs1)
+!  if(allocated(VRNZs1))deallocate(VRNZs1)
+!  if(allocated(VRNSs1))deallocate(VRNSs1)
+!  if(allocated(VRNLs1))deallocate(VRNLs1)
+!  if(allocated(VRNFs1))deallocate(VRNFs1)
+!  if(allocated(VRNXs1))deallocate(VRNXs1)
+!  if(allocated(IDAYs1))deallocate(IDAYs1)
+
+  end subroutine plt_pheno_destroy
+!------------------------------------------------------------------------
 
   subroutine plt_morph_init(this)
+  implicit none
   class(plant_morph_type) :: this
 
+  allocate(this%KLEAFs1(JC1,JP1))
+  allocate(this%VSTGs1(JC1,JP1))
+  allocate(this%NGs1(JP1))
+  allocate(this%ZCs1(JP1))
+  allocate(this%XTLIs1(JP1))
   allocate(this%ZLs1(0:JC1))
   allocate(this%ARSTPs1(JP1))
   allocate(this%ARLFPs1(JP1))
@@ -2540,14 +2564,20 @@ implicit none
   allocate(this%ARSTKs1(JC1,JC1,JP1))
   allocate(this%NIs1(JP1))
   allocate(this%GRNOBs1(JC1,JP1))
+  allocate(this%CFs1(JP1))
 
   end subroutine plt_morph_init
 
 !------------------------------------------------------------------------
 
   subroutine plt_morph_destroy(this)
+  implicit none
   class(plant_morph_type) :: this
 
+!  if(allocated(KLEAFs1))deallocate(KLEAFs1)
+!  if(allocated(NGs1)) deallocate(NGs1)
+!  if(allocated(ZCs1))deallocate(ZCs1)
+!  if(allocated(XTLIs1))deallocate(XTLIs1)
 !  if(allocated(ZLs1))deallocate(ZLs1)
 !  if(allocated(ARSTPs1))deallocate(ARSTPs1)
 !  if(allocated(ARLFPs1))deallocate(ARLFPs1)
@@ -2594,6 +2624,7 @@ implicit none
 !  if(allocated(ARSTKs1))deallocate(ARSTKs1)
 !  if(allocated(NIs1)) deallocate(NIs1)
 !  if(allocated(GRNOBs1))deallocate(GRNOBs1)
-
+!  if(allocated(CFs1))  deallocate(CFs1)
+!  if(allocated(VSTGs1))deallocate(VSTGs1)
   end subroutine plt_morph_destroy
 end module PlantAPIData
