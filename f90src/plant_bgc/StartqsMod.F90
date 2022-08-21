@@ -19,6 +19,13 @@ module StartqsMod
 
   integer :: K,L,M,NZ,NZ2X
 !     begin_execution
+
+  associate(                            &
+    WTSTGs1   => plt_biom%WTSTGs1     , &
+    WTSTGPs1  => plt_biom%WTSTGPs1    , &
+    WTSTGNs1  => plt_biom%WTSTGNs1    , &
+    IFLGCs1   => plt_pheno%IFLGCs1      &
+  )
 !
 !     INITIALIZE SHOOT GROWTH VARIABLES
 !
@@ -83,6 +90,7 @@ module StartqsMod
 6401    CONTINUE
 9986  CONTINUE
   RETURN
+  end associate
   END subroutine startqs
 !------------------------------------------------------------------------------------------
 
@@ -91,6 +99,10 @@ module StartqsMod
   implicit none
   integer, intent(in) :: NZ
   associate(                         &
+    CNWSs1   =>  plt_allom%CNWSs1  , &
+    CPWSs1   =>  plt_allom%CPWSs1  , &
+    CNRTs1   =>  plt_allom%CNRTs1  , &
+    CPRTs1   =>  plt_allom%CPRTs1  , &
     O2Is1    =>  plt_photo%O2Is1   , &
     RSMHs1   =>  plt_photo%RSMHs1  , &
     CFs1     =>  plt_morph%CFs1    , &
@@ -367,7 +379,12 @@ module StartqsMod
   integer, intent(in) :: NZ
   INTEGER :: L,N,NR
   associate(                             &
-    NGs1       =>   plt_morph%NGs1     , &
+    CNRTSs1    =>  plt_allom%CNRTSs1   , &
+    CPRTSs1    =>  plt_allom%CPRTSs1   , &
+    DMRTs1     =>  plt_allom%DMRTs1    , &
+    CNRTs1     =>  plt_allom%CNRTs1    , &
+    CPRTs1     =>  plt_allom%CPRTs1    , &
+    NGs1       =>  plt_morph%NGs1      , &
     SDPTHs1    =>  plt_morph%SDPTHs1   , &
     SDARs1     =>  plt_morph%SDARs1    , &
     SDPTHIs1   =>  plt_morph%SDPTHIs1  , &
@@ -455,9 +472,106 @@ module StartqsMod
   integer, intent(in) :: NZ
   integer :: K,L,M,N,NB
   associate(                           &
+    WTSHTBs1  =>  plt_biom%WTSHTBs1  , &
+    WTLFBs1   =>  plt_biom%WTLFBs1   , &
+    WTNDBs1   =>  plt_biom%WTNDBs1   , &
+    WVSTKBs1  =>  plt_biom%WVSTKBs1  , &
+    WTRSVBs1  =>  plt_biom%WTRSVBs1  , &
+    WTHSKBs1  =>  plt_biom%WTHSKBs1  , &
+    WTEARBs1  =>  plt_biom%WTEARBs1  , &
+    WTSHEBs1  =>  plt_biom%WTSHEBs1  , &
+    WTSTKBs1  =>  plt_biom%WTSTKBs1  , &
+    CPOOLs1   =>  plt_biom%CPOOLs1   , &
+    ZPOOLs1   =>  plt_biom%ZPOOLs1   , &
+    PPOOLs1   =>  plt_biom%PPOOLs1   , &
+    CPOLNBs1  =>  plt_biom%CPOLNBs1  , &
+    ZPOLNBs1  =>  plt_biom%ZPOLNBs1  , &
+    WGLFLs1   =>  plt_biom%WGLFLs1   , &
+    WGLFLNs1  =>  plt_biom%WGLFLNs1  , &
+    WGLFLPs1  =>  plt_biom%WGLFLPs1  , &
+    WTGRBs1   =>  plt_biom%WTGRBs1   , &
+    WTLSBs1   =>  plt_biom%WTLSBs1   , &
+    WTNDBNs1  =>  plt_biom%WTNDBNs1  , &
+    WTSTXBs1  =>  plt_biom%WTSTXBs1  , &
+    WTSTXNs1  =>  plt_biom%WTSTXNs1  , &
+    WTSTXPs1  =>  plt_biom%WTSTXPs1  , &
+    WSSHEs1   =>  plt_biom%WSSHEs1   , &
+    WGSHPs1   =>  plt_biom%WGSHPs1   , &
+    WGNODNs1  =>  plt_biom%WGNODNs1  , &
+    WGNODEs1  =>  plt_biom%WGNODEs1  , &
+    WGNODPs1  =>  plt_biom%WGNODPs1  , &
+    WSLFs1    =>  plt_biom%WSLFs1    , &
+    WGLFPs1   =>  plt_biom%WGLFPs1   , &
+    WGSHEs1   =>  plt_biom%WGSHEs1   , &
+    WGSHNs1   =>  plt_biom%WGSHNs1   , &
+    WGSHNXs1  =>  plt_biom%WGSHNXs1  , &
+    WGSHPXs1  =>  plt_biom%WGSHPXs1  , &
+    WGLFs1    =>  plt_biom%WGLFs1    , &
+    WGLFNs1   =>  plt_biom%WGLFNs1   , &
+    WGSHEXs1  =>  plt_biom%WGSHEXs1  , &
+    WTSHBNs1  =>  plt_biom%WTSHBNs1  , &
+    WTEABPs1  =>  plt_biom%WTEABPs1  , &
+    WTGRBPs1  =>  plt_biom%WTGRBPs1  , &
+    WGLFXs1   =>  plt_biom%WGLFXs1   , &
+    WGLFNXs1  =>  plt_biom%WGLFNXs1  , &
+    WGLFPXs1  =>  plt_biom%WGLFPXs1  , &
+    WTSTBNs1  =>  plt_biom%WTSTBNs1  , &
+    WTNDBPs1  =>  plt_biom%WTNDBPs1  , &
+    WTSHBPs1  =>  plt_biom%WTSHBPs1  , &
+    WTSTBPs1  =>  plt_biom%WTSTBPs1  , &
+    WTRSBPs1  =>  plt_biom%WTRSBPs1  , &
+    WTHSBPs1  =>  plt_biom%WTHSBPs1  , &
+    WTRSBNs1  =>  plt_biom%WTRSBNs1  , &
+    WTEABNs1  =>  plt_biom%WTEABNs1  , &
+    WTGRBNs1  =>  plt_biom%WTGRBNs1  , &
+    WTSHTPs1  =>  plt_biom%WTSHTPs1  , &
+    WTLFBPs1  =>  plt_biom%WTLFBPs1  , &
+    WTHSBNs1  =>  plt_biom%WTHSBNs1  , &
+    WTSHTNs1  =>  plt_biom%WTSHTNs1  , &
+    WTLFBNs1  =>  plt_biom%WTLFBNs1  , &
+    WTEARPs1  =>  plt_biom%WTEARPs1  , &
+    WTGRNPs1  =>  plt_biom%WTGRNPs1  , &
+    WTNDPs1   =>  plt_biom%WTNDPs1   , &
+    WTRTAs1   =>  plt_biom%WTRTAs1   , &
+    PPOLNBs1  =>  plt_biom%PPOLNBs1  , &
+    WTLSs1    =>  plt_biom%WTLSs1    , &
+    WTSHNs1   =>  plt_biom%WTSHNs1   , &
+    WTLFNs1   =>  plt_biom%WTLFNs1   , &
+    WTSHENs1  =>  plt_biom%WTSHENs1  , &
+    WTSTKNs1  =>  plt_biom%WTSTKNs1  , &
+    WTSHPs1   =>  plt_biom%WTSHPs1   , &
+    WTLFPs1   =>  plt_biom%WTLFPs1   , &
+    WTSHEPs1  =>  plt_biom%WTSHEPs1  , &
+    WTSTKPs1  =>  plt_biom%WTSTKPs1  , &
+    WTRSVPs1  =>  plt_biom%WTRSVPs1  , &
+    WTHSKPs1  =>  plt_biom%WTHSKPs1  , &
+    ZPOOLPs1  =>  plt_biom%ZPOOLPs1  , &
+    WTSHTs1   =>  plt_biom%WTSHTs1   , &
+    WTLFs1    =>  plt_biom%WTLFs1    , &
+    WTRSVNs1  =>  plt_biom%WTRSVNs1  , &
+    WTHSKNs1  =>  plt_biom%WTHSKNs1  , &
+    WTEARNs1  =>  plt_biom%WTEARNs1  , &
+    WTGRNNs1  =>  plt_biom%WTGRNNs1  , &
+    WTNDNs1   =>  plt_biom%WTNDNs1   , &
+    WTSTKs1   =>  plt_biom%WTSTKs1   , &
+    WTGRs1    =>  plt_biom%WTGRs1    , &
+    WTRTts1   =>  plt_biom%WTRTts1   , &
+    WTRTSs1   =>  plt_biom%WTRTSs1   , &
+    WTNDs1    =>  plt_biom%WTNDs1    , &
+    CCPOLPs1  =>  plt_biom%CCPOLPs1  , &
+    CZPOLPs1  =>  plt_biom%CZPOLPs1  , &
+    CPOOLPs1  =>  plt_biom%CPOOLPs1  , &
+    CCPLNPs1  =>  plt_biom%CCPLNPs1  , &
+    CPPOLPs1  =>  plt_biom%CPPOLPs1  , &
+    WVSTKs1   =>  plt_biom%WVSTKs1   , &
+    WTRSVs1   =>  plt_biom%WTRSVs1   , &
+    WTHSKs1   =>  plt_biom%WTHSKs1   , &
+    WTEARs1   =>  plt_biom%WTEARs1   , &
+    PPOOLPs1  =>  plt_biom%PPOOLPs1  , &
+    WTSHEs1   =>  plt_biom%WTSHEs1   , &
     IFLGIs1   =>  plt_pheno%IFLGIs1  , &
-    IDTHRs1   =>   plt_pheno%IDTHRs1 , &
-    IDTHPs1   =>   plt_pheno%IDTHPs1 , &
+    IDTHRs1   =>  plt_pheno%IDTHRs1  , &
+    IDTHPs1   =>  plt_pheno%IDTHPs1  , &
     IFLGAs1   =>  plt_pheno%IFLGAs1  , &
     IFLGEs1   =>  plt_pheno%IFLGEs1  , &
     IFLGQs1   =>  plt_pheno%IFLGQs1  , &
@@ -482,6 +596,7 @@ module StartqsMod
     TGSTGFs1  =>  plt_pheno%TGSTGFs1 , &
     TGSTGIs1  =>  plt_pheno%TGSTGIs1 , &
     FDBKXs1   =>  plt_photo%FDBKXs1  , &
+    CHILLs1   =>  plt_photo%CHILLs1  , &
     FDBKs1    =>  plt_photo%FDBKs1   , &
     VSTGs1    =>  plt_morph%VSTGs1   , &
     ZCs1      => plt_morph%ZCs1      , &
@@ -720,6 +835,19 @@ module StartqsMod
   integer, intent(in) :: NZ
   integer :: M
   real(r8) :: WTSTDX
+
+  associate(                           &
+    WTSTGs1  => plt_biom%WTSTGs1     , &
+    WTSTGPs1 => plt_biom%WTSTGPs1    , &
+    WTSTDIs1 => plt_biom%WTSTDIs1    , &
+    WTSTGNs1 => plt_biom%WTSTGNs1    , &
+    CNSTKs1  => plt_allom%CNSTKs1    , &
+    CPSTKs1  => plt_allom%CPSTKs1    , &
+    RSETCs1  => plt_pheno%RSETCs1    , &
+    RSETNs1  => plt_pheno%RSETNs1    , &
+    RSETPs1  => plt_pheno%RSETPs1      &
+
+  )
 !
 !     INITIALIZE MASS BALANCE CHECKS
 !
@@ -768,6 +896,7 @@ module StartqsMod
       WTSTGPs1(NZ)=WTSTGPs1(NZ)+WTSTDPs1(M,NZ)
 155 CONTINUE
   ENDIF
+  end associate
   end subroutine InitMassBalance
 !------------------------------------------------------------------------------------------
 
@@ -776,6 +905,7 @@ module StartqsMod
   implicit none
   integer, intent(in) :: NZ
   associate(                          &
+    WTSHTs1    =>  plt_biom%WTSHTs1 , &
     FRADPs1    =>  plt_rad%FRADPs1    &
   )
 !
@@ -812,6 +942,16 @@ module StartqsMod
   REAL(R8) :: COXYA
   REAL(R8) :: COXYP
   associate(                             &
+    CCPOLRs1   =>  plt_biom%CCPOLRs1   , &
+    CZPOLRs1   =>  plt_biom%CZPOLRs1   , &
+    CPPOLRs1   =>  plt_biom%CPPOLRs1   , &
+    CWSRTLs1   =>  plt_biom%CWSRTLs1   , &
+    WTRTLs1    =>  plt_biom%WTRTLs1    , &
+    WTRTDs1    =>  plt_biom%WTRTDs1    , &
+    WSRTLs1    =>  plt_biom%WSRTLs1    , &
+    CPOOLRs1   =>  plt_biom%CPOOLRs1   , &
+    ZPOOLRs1   =>  plt_biom%ZPOOLRs1   , &
+    PPOOLRs1   =>  plt_biom%PPOOLRs1   , &
     SDPTHs1    =>  plt_morph%SDPTHs1   , &
     NRTs1      =>  plt_morph%NRTs1       &
   )
@@ -942,6 +1082,27 @@ module StartqsMod
   REAL(R8) :: FDM
 
   associate(                             &
+    CNGRs1     =>   plt_allom%CNGRs1   , &
+    CPGRs1     =>   plt_allom%CPGRs1   , &
+    WTRVXs1    =>   plt_biom%WTRVXs1   , &
+    WTLFBNs1   =>   plt_biom%WTLFBNs1  , &
+    WTLSBs1    =>   plt_biom%WTLSBs1   , &
+    WTLSs1     =>   plt_biom%WTLSs1    , &
+    WTRTDs1    =>   plt_biom%WTRTDs1   , &
+    WTSHEBs1   =>   plt_biom%WTSHEBs1  , &
+    WTRTLs1    =>   plt_biom%WTRTLs1   , &
+    WSRTLs1    =>   plt_biom%WSRTLs1   , &
+    CPOOLRs1   =>   plt_biom%CPOOLRs1  , &
+    ZPOOLRs1   =>   plt_biom%ZPOOLRs1  , &
+    PPOOLRs1   =>   plt_biom%PPOOLRs1  , &
+    CPOOLs1    =>   plt_biom%CPOOLs1   , &
+    ZPOOLs1    =>   plt_biom%ZPOOLs1   , &
+    PPOOLs1    =>   plt_biom%PPOOLs1   , &
+    WTLFBs1    =>   plt_biom%WTLFBs1   , &
+    WTLFBPs1   =>   plt_biom%WTLFBPs1  , &
+    WTRVCs1    =>   plt_biom%WTRVCs1   , &
+    WTRVNs1    =>   plt_biom%WTRVNs1   , &
+    WTRVPs1    =>   plt_biom%WTRVPs1   , &
     NGs1       =>   plt_morph%NGs1       &
   )
 !

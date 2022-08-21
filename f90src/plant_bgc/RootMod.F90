@@ -29,6 +29,7 @@ implicit none
   real(r8) :: RTNT(2)
 
   associate(                                &
+    WTRVCs1    =>   plt_biom%WTRVCs1      , &
     ISTYPs1    =>   plt_pheno%ISTYPs1     , &
     IDTHRs1    =>   plt_pheno%IDTHRs1     , &
     IDTHPs1    =>   plt_pheno%IDTHPs1     , &
@@ -106,11 +107,18 @@ implicit none
 
 !     begin_execution
   associate(                                &
+    CPOOLRs1   =>   plt_biom%CPOOLRs1     , &
+    WTRTLs1    =>   plt_biom%WTRTLs1      , &
+    WTRTs1     =>   plt_biom%WTRTs1       , &
+    WTRVCs1    =>   plt_biom%WTRVCs1      , &
+    FWODRs1    =>   plt_allom%FWODRs1     , &
+    DMRTs1     =>   plt_allom%DMRTs1      , &
     IGTYPs1    =>   plt_pheno%IGTYPs1     , &
     RSCSs1     =>   plt_soilchem%RSCSs1   , &
     VOLXs1     =>   plt_soilchem%VOLXs1   , &
     NIs1       =>   plt_morph%NIs1        , &
     SDLGs1     =>   plt_morph%SDLGs1      , &
+    MYs1       =>   plt_morph%MYs1        , &
     NGs1       =>   plt_morph%NGs1        , &
     NIXs1      =>   plt_morph%NIXs1         &
   )
@@ -131,8 +139,7 @@ implicit none
 !
       IF(VOLXs1(L).GT.ZEROS2s1)THEN
         DO 5003 LZ=L+1,NLs1
-          IF(VOLXs1(LZ).GT.ZEROS2s1 &
-            .OR.LZ.EQ.NLs1)THEN
+          IF(VOLXs1(LZ).GT.ZEROS2s1.OR.LZ.EQ.NLs1)THEN
             L1=LZ
             EXIT
           ENDIF
@@ -150,7 +157,7 @@ implicit none
 !     DMRT=root growth yield
 !
         RSCS2=RSCSs1(L)*RRAD2s1(N,L,NZ)/1.0E-03
-        WFNR=AMIN1(1.0,AMAX1(0.0,PSIRGs1(N,L,NZ)-PSILM-RSCS2))
+        WFNR=AMIN1(1.0,AMAX1(0.0_r8,PSIRGs1(N,L,NZ)-PSILM-RSCS2))
         IF(IGTYPs1(NZ).EQ.0)THEN
           WFNGR(N,L)=EXP(0.05*PSIRTs1(N,L,NZ))
           WFNRG=WFNR**0.10
@@ -182,10 +189,10 @@ implicit none
             WTRTLX=WTRTLs1(N,L,NZ)
             WTRTTX=WTRTs1(NZ)*FWTRT
             WTRTTT=WTRTLX+WTRTTX
-            CPOOLX=AMAX1(0.0,CPOOLRs1(N,L,NZ))
-            WTRVCX=AMAX1(0.0,WTRVCs1(NZ)*FWTRT)
+            CPOOLX=AMAX1(0.0_r8,CPOOLRs1(N,L,NZ))
+            WTRVCX=AMAX1(0.0_r8,WTRVCs1(NZ)*FWTRT)
             CPOOLD=(WTRVCX*WTRTLX-CPOOLX*WTRTTX)/WTRTTT
-            XFRC=AMIN1(0.0,XFRY*CPOOLD)
+            XFRC=AMIN1(0.0_r8,XFRY*CPOOLD)
             CPOOLRs1(N,L,NZ)=CPOOLRs1(N,L,NZ)+XFRC
             WTRVCs1(NZ)=WTRVCs1(NZ)-XFRC
           ENDIF
@@ -332,12 +339,28 @@ implicit none
 
 !begin_execution
   associate(                              &
+    CCPOLRs1  =>  plt_biom%CCPOLRs1     , &
+    CZPOLRs1  =>  plt_biom%CZPOLRs1     , &
+    CPOOLRs1  =>  plt_biom%CPOOLRs1     , &
+    ZPOOLRs1  =>  plt_biom%ZPOOLRs1     , &
+    CPPOLRs1  =>  plt_biom%CPPOLRs1     , &
+    PPOOLRs1  =>  plt_biom%PPOOLRs1     , &
+    WSRTLs1   =>  plt_biom%WSRTLs1      , &
+    WTRTLs1   =>  plt_biom%WTRTLs1      , &
+    CNWSs1    =>  plt_allom%CNWSs1      , &
+    CPWSs1    =>  plt_allom%CPWSs1      , &
+    FWODRs1   =>  plt_allom%FWODRs1     , &
+    FWODRNs1  =>  plt_allom%FWODRNs1    , &
+    FWODRPs1  =>  plt_allom%FWODRPs1    , &
+    CNRTSs1   =>  plt_allom%CNRTSs1     , &
+    CPRTSs1   =>  plt_allom%CPRTSs1     , &
+    DMRTs1    =>  plt_allom%DMRTs1      , &
     IGTYPs1   =>  plt_pheno%IGTYPs1     , &
     IWTYPs1   =>  plt_pheno%IWTYPs1     , &
     IDAYs1    =>  plt_pheno%IDAYs1      , &
     BKDSs1    =>  plt_soilchem%BKDSs1   , &
     RSCSs1    =>  plt_soilchem%RSCSs1   , &
-    NGs1      =>   plt_morph%NGs1       , &
+    NGs1      =>  plt_morph%NGs1        , &
     NIXs1     =>  plt_morph%NIXs1       , &
     NRTs1     =>  plt_morph%NRTs1       , &
     SDPTHs1   =>  plt_morph%SDPTHs1     , &
@@ -394,7 +417,7 @@ implicit none
 !     IWTYP=phenology type:0=evergreen,1=cold decid,2=drought decid,3=1+2
 !     WFNGR=growth function of root water potential
 !
-      RMNCR=AMAX1(0.0,RMPLT*WTRT2Ns1(N,L,NR,NZ))*TFN6(L)
+      RMNCR=AMAX1(0.0_r8,RMPLT*WTRT2Ns1(N,L,NR,NZ))*TFN6(L)
       IF(IGTYPs1(NZ).EQ.0.OR.IWTYPs1(NZ).EQ.2)THEN
         RMNCR=RMNCR*WFNGR(N,L)
       ENDIF
@@ -410,7 +433,7 @@ implicit none
 !     FDBKX=termination feedback inhibition on C3 CO2
 !     WFNGR=growth function of root water potential
 !
-      RCO2RM=AMAX1(0.0,VMXC*FRTN*CPOOLRs1(N,L,NZ) &
+      RCO2RM=AMAX1(0.0_r8,VMXC*FRTN*CPOOLRs1(N,L,NZ) &
         *TFN4s1(L,NZ))*CNPG*FDBKXs1(NB1s1(NZ),NZ)*WFNGR(N,L)
 !
 !     O2-LIMITED SECONDARY ROOT RESPIRATION FROM 'WFR' IN 'UPTAKE'
@@ -424,8 +447,8 @@ implicit none
       RCO2R=RCO2RM*WFRs1(N,L,NZ)
       RCO2XM=RCO2RM-RMNCR
       RCO2X=RCO2R-RMNCR
-      RCO2YM=AMAX1(0.0,RCO2XM)*WFNRG
-      RCO2Y=AMAX1(0.0,RCO2X)*WFNRG
+      RCO2YM=AMAX1(0.0_r8,RCO2XM)*WFNRG
+      RCO2Y=AMAX1(0.0_r8,RCO2X)*WFNRG
 !
 !     SECONDARY ROOT GROWTH RESPIRATION MAY BE LIMITED BY
 !     NON-STRUCTURAL N,P AVAILABLE FOR GROWTH
@@ -437,10 +460,9 @@ implicit none
 !     RCO2GM,RCO2G=growth respiration limited by N,P unltd,ltd by O2
 !
       DMRTR=DMRTD*FRTN
-      ZPOOLB=AMAX1(0.0,ZPOOLRs1(N,L,NZ))
-      PPOOLB=AMAX1(0.0,PPOOLRs1(N,L,NZ))
-      FNP=AMIN1(ZPOOLB*DMRTR/CNRTSs1(NZ) &
-        ,PPOOLB*DMRTR/CPRTSs1(NZ))
+      ZPOOLB=AMAX1(0.0_r8,ZPOOLRs1(N,L,NZ))
+      PPOOLB=AMAX1(0.0_r8,PPOOLRs1(N,L,NZ))
+      FNP=AMIN1(ZPOOLB*DMRTR/CNRTSs1(NZ),PPOOLB*DMRTR/CPRTSs1(NZ))
       IF(RCO2YM.GT.0.0)THEN
         RCO2GM=AMIN1(RCO2YM,FNP)
       ELSE
@@ -467,11 +489,11 @@ implicit none
       CGROR=RCO2G/DMRTD
       GRTWGM=CGRORM*DMRTs1(NZ)
       GRTWTG=CGROR*DMRTs1(NZ)
-      ZADD2M=AMAX1(0.0,GRTWGM*CNRTW)
-      ZADD2=AMAX1(0.0,AMIN1(FRTN*ZPOOLRs1(N,L,NZ),GRTWTG*CNRTW))
-      PADD2=AMAX1(0.0,AMIN1(FRTN*PPOOLRs1(N,L,NZ),GRTWTG*CPRTW))
-      CNRDM=AMAX1(0.0,1.70*ZADD2M)
-      CNRDA=AMAX1(0.0,1.70*ZADD2)
+      ZADD2M=AMAX1(0.0_r8,GRTWGM*CNRTW)
+      ZADD2=AMAX1(0.0_r8,AMIN1(FRTN*ZPOOLRs1(N,L,NZ),GRTWTG*CNRTW))
+      PADD2=AMAX1(0.0_r8,AMIN1(FRTN*PPOOLRs1(N,L,NZ),GRTWTG*CPRTW))
+      CNRDM=AMAX1(0.0_r8,1.70*ZADD2M)
+      CNRDA=AMAX1(0.0_r8,1.70*ZADD2)
 !
 !     SECONDARY ROOT GROWTH RESPIRATION FROM TOTAL - MAINTENANCE
 !     IF > 0 DRIVES GROWTH, IF < 0 DRIVES REMOBILIZATION, ALSO
@@ -517,7 +539,7 @@ implicit none
         IF(-RCO2XM.LT.WTRT2s1(N,L,NR,NZ)*RCCC)THEN
           SNCRM=-RCO2XM
         ELSE
-          SNCRM=AMAX1(0.0,WTRT2s1(N,L,NR,NZ)*RCCC)
+          SNCRM=AMAX1(0.0_r8,WTRT2s1(N,L,NR,NZ)*RCCC)
         ENDIF
       ELSE
         SNCRM=0._r8
@@ -526,7 +548,7 @@ implicit none
         IF(-RCO2X.LT.WTRT2s1(N,L,NR,NZ)*RCCC)THEN
           SNCR=-RCO2X
         ELSE
-          SNCR=AMAX1(0.0,WTRT2s1(N,L,NR,NZ)*RCCC)*WFRs1(N,L,NZ)
+          SNCR=AMAX1(0.0_r8,WTRT2s1(N,L,NR,NZ)*RCCC)*WFRs1(N,L,NZ)
         ENDIF
       ELSE
         SNCR=0._r8
@@ -536,7 +558,7 @@ implicit none
         RCZR=WTRT2Ns1(N,L,NR,NZ)*(RCCN+(1.0_r8-RCCN)*RCCR/WTRT2s1(N,L,NR,NZ))
         RCPR=WTRT2Ps1(N,L,NR,NZ)*(RCCP+(1.0_r8-RCCP)*RCCR/WTRT2s1(N,L,NR,NZ))
         IF(RCCR.GT.ZEROPs1(NZ))THEN
-          FSNC2=AMAX1(0.0,AMIN1(1.0,SNCR/RCCR))
+          FSNC2=AMAX1(0.0_r8,AMIN1(1.0,SNCR/RCCR))
         ELSE
           FSNC2=1.0_r8
         ENDIF
@@ -693,7 +715,7 @@ implicit none
 !     WFNRG=respiration function of root water potential
 !
               RSCS1=RSCSs1(L)*RRAD1s1(N,L,NZ)/1.0E-03
-              WFNR=AMIN1(1.0,AMAX1(0.0,PSIRGs1(N,L,NZ)-PSILM-RSCS1))
+              WFNR=AMIN1(1.0,AMAX1(0.0_r8,PSIRGs1(N,L,NZ)-PSILM-RSCS1))
               IF(IGTYPs1(NZ).EQ.0)THEN
                 WFNRG=WFNR**0.10
               ELSE
@@ -726,7 +748,7 @@ implicit none
 !     IWTYP=phenology type:0=evergreen,1=cold decid,2=drought decid,3=1+2
 !     WFNGR=growth function of root water potential
 !
-              RMNCR=AMAX1(0.0,RMPLT*RTWT1Ns1(N,NR,NZ))*TFN6(L)
+              RMNCR=AMAX1(0.0_r8,RMPLT*RTWT1Ns1(N,NR,NZ))*TFN6(L)
               IF(IGTYPs1(NZ).EQ.0.OR.IWTYPs1(NZ).EQ.2)THEN
                 RMNCR=RMNCR*WFNGR(N,L)
               ENDIF
@@ -742,7 +764,7 @@ implicit none
 !     FDBKX=termination feedback inhibition on C3 CO2
 !     WFNGR=growth function of root water potential
 !
-              RCO2RM=AMAX1(0.0,VMXC*FRTN*CPOOLRs1(N,L,NZ) &
+              RCO2RM=AMAX1(0.0_r8,VMXC*FRTN*CPOOLRs1(N,L,NZ) &
                 *TFN4s1(L,NZ))*CNPG*FDBKXs1(NB1s1(NZ),NZ)*WFNGR(N,L)
               IF(RTDP1X.GE.CDPTHZs1(NJs1))THEN
                 RCO2RM=AMIN1(RMNCR,RCO2RM)
@@ -759,8 +781,8 @@ implicit none
               RCO2R=RCO2RM*WFRs1(N,L,NZ)
               RCO2XM=RCO2RM-RMNCR
               RCO2X=RCO2R-RMNCR
-              RCO2YM=AMAX1(0.0,RCO2XM)*WFNRG
-              RCO2Y=AMAX1(0.0,RCO2X)*WFNRG
+              RCO2YM=AMAX1(0.0_r8,RCO2XM)*WFNRG
+              RCO2Y=AMAX1(0.0_r8,RCO2X)*WFNRG
 !
 !     PRIMARY ROOT GROWTH RESPIRATION MAY BE LIMITED BY
 !     NON-STRUCTURAL N,P AVAILABLE FOR GROWTH
@@ -772,8 +794,8 @@ implicit none
 !     RCO2GM,RCO2G=growth respiration limited by N,P unltd,ltd by O2
 !
               DMRTR=DMRTD*FRTN
-              ZPOOLB=AMAX1(0.0,ZPOOLRs1(N,L,NZ))
-              PPOOLB=AMAX1(0.0,PPOOLRs1(N,L,NZ))
+              ZPOOLB=AMAX1(0.0_r8,ZPOOLRs1(N,L,NZ))
+              PPOOLB=AMAX1(0.0_r8,PPOOLRs1(N,L,NZ))
               FNP=AMIN1(ZPOOLB*DMRTR/CNRTSs1(NZ),PPOOLB*DMRTR/CPRTSs1(NZ))
               IF(RCO2YM.GT.0.0)THEN
                 RCO2GM=AMIN1(RCO2YM,FNP)
@@ -802,11 +824,11 @@ implicit none
               CGROR=RCO2G/DMRTD
               GRTWGM=CGRORM*DMRTs1(NZ)
               GRTWTG=CGROR*DMRTs1(NZ)
-              ZADD1M=AMAX1(0.0,GRTWGM*CNRTW)
-              ZADD1=AMAX1(0.0,AMIN1(FRTN*ZPOOLRs1(N,L,NZ),GRTWTG*CNRTW))
-              PADD1=AMAX1(0.0,AMIN1(FRTN*PPOOLRs1(N,L,NZ),GRTWTG*CPRTW))
-              CNRDM=AMAX1(0.0,1.70*ZADD1M)
-              CNRDA=AMAX1(0.0,1.70*ZADD1)
+              ZADD1M=AMAX1(0.0_r8,GRTWGM*CNRTW)
+              ZADD1=AMAX1(0.0_r8,AMIN1(FRTN*ZPOOLRs1(N,L,NZ),GRTWTG*CNRTW))
+              PADD1=AMAX1(0.0_r8,AMIN1(FRTN*PPOOLRs1(N,L,NZ),GRTWTG*CPRTW))
+              CNRDM=AMAX1(0.0_r8,1.70*ZADD1M)
+              CNRDA=AMAX1(0.0_r8,1.70*ZADD1)
 
               call PrimRootRemobilization(N,L,NZ,NR,FSNC1,RCO2X,RCO2XM)
 
@@ -950,31 +972,31 @@ implicit none
                     ENDIF
                     DO 6450 M=1,4
                       CSNCs1(M,0,LL,NZ)=CSNCs1(M,0,LL,NZ)+CFOPCs1(5,M,NZ) &
-                        *FSNCM*AMAX1(0.0,WTRT2s1(2,LL,NR,NZ))*FWODRs1(0)
+                        *FSNCM*AMAX1(0.0_r8,WTRT2s1(2,LL,NR,NZ))*FWODRs1(0)
                       ZSNCs1(M,0,LL,NZ)=ZSNCs1(M,0,LL,NZ)+CFOPNs1(5,M,NZ) &
-                        *FSNCM*AMAX1(0.0,WTRT2Ns1(2,LL,NR,NZ))*FWODRNs1(0)
+                        *FSNCM*AMAX1(0.0_r8,WTRT2Ns1(2,LL,NR,NZ))*FWODRNs1(0)
                       PSNCs1(M,0,LL,NZ)=PSNCs1(M,0,LL,NZ)+CFOPPs1(5,M,NZ) &
-                        *FSNCM*AMAX1(0.0,WTRT2Ps1(2,LL,NR,NZ))*FWODRPs1(0)
+                        *FSNCM*AMAX1(0.0_r8,WTRT2Ps1(2,LL,NR,NZ))*FWODRPs1(0)
                       CSNCs1(M,1,LL,NZ)=CSNCs1(M,1,LL,NZ)+CFOPCs1(4,M,NZ) &
-                        *FSNCM*AMAX1(0.0,WTRT2s1(2,LL,NR,NZ))*FWODRs1(1)
+                        *FSNCM*AMAX1(0.0_r8,WTRT2s1(2,LL,NR,NZ))*FWODRs1(1)
                       ZSNCs1(M,1,LL,NZ)=ZSNCs1(M,1,LL,NZ)+CFOPNs1(4,M,NZ) &
-                        *FSNCM*AMAX1(0.0,WTRT2Ns1(2,LL,NR,NZ))*FWODRNs1(1)
+                        *FSNCM*AMAX1(0.0_r8,WTRT2Ns1(2,LL,NR,NZ))*FWODRNs1(1)
                       PSNCs1(M,1,LL,NZ)=PSNCs1(M,1,LL,NZ)+CFOPPs1(4,M,NZ) &
-                        *FSNCM*AMAX1(0.0,WTRT2Ps1(2,LL,NR,NZ))*FWODRPs1(1)
+                        *FSNCM*AMAX1(0.0_r8,WTRT2Ps1(2,LL,NR,NZ))*FWODRPs1(1)
                       CSNCs1(M,1,LL,NZ)=CSNCs1(M,1,LL,NZ)+CFOPCs1(0,M,NZ) &
-                        *FSNCP*AMAX1(0.0,CPOOLRs1(2,LL,NZ))
+                        *FSNCP*AMAX1(0.0_r8,CPOOLRs1(2,LL,NZ))
                       ZSNCs1(M,1,LL,NZ)=ZSNCs1(M,1,LL,NZ)+CFOPNs1(0,M,NZ) &
-                        *FSNCP*AMAX1(0.0,ZPOOLRs1(2,LL,NZ))
+                        *FSNCP*AMAX1(0.0_r8,ZPOOLRs1(2,LL,NZ))
                       PSNCs1(M,1,LL,NZ)=PSNCs1(M,1,LL,NZ)+CFOPPs1(0,M,NZ) &
-                        *FSNCP*AMAX1(0.0,PPOOLRs1(2,LL,NZ))
+                        *FSNCP*AMAX1(0.0_r8,PPOOLRs1(2,LL,NZ))
 6450                CONTINUE
-                    RTLG2s1(2,LL,NR,NZ)=AMAX1(0.0,RTLG2s1(2,LL,NR,NZ))*(1.0_r8-FSNCM)
-                    WTRT2s1(2,LL,NR,NZ)=AMAX1(0.0,WTRT2s1(2,LL,NR,NZ))*(1.0_r8-FSNCM)
-                    WTRT2Ns1(2,LL,NR,NZ)=AMAX1(0.0,WTRT2Ns1(2,LL,NR,NZ))*(1.0_r8-FSNCM)
-                    WTRT2Ps1(2,LL,NR,NZ)=AMAX1(0.0,WTRT2Ps1(2,LL,NR,NZ))*(1.0_r8-FSNCM)
-                    CPOOLRs1(2,LL,NZ)=AMAX1(0.0,CPOOLRs1(2,LL,NZ))*(1.0_r8-FSNCP)
-                    ZPOOLRs1(2,LL,NZ)=AMAX1(0.0,ZPOOLRs1(2,LL,NZ))*(1.0_r8-FSNCP)
-                    PPOOLRs1(2,LL,NZ)=AMAX1(0.0,PPOOLRs1(2,LL,NZ))*(1.0_r8-FSNCP)
+                    RTLG2s1(2,LL,NR,NZ)=AMAX1(0.0_r8,RTLG2s1(2,LL,NR,NZ))*(1.0_r8-FSNCM)
+                    WTRT2s1(2,LL,NR,NZ)=AMAX1(0.0_r8,WTRT2s1(2,LL,NR,NZ))*(1.0_r8-FSNCM)
+                    WTRT2Ns1(2,LL,NR,NZ)=AMAX1(0.0_r8,WTRT2Ns1(2,LL,NR,NZ))*(1.0_r8-FSNCM)
+                    WTRT2Ps1(2,LL,NR,NZ)=AMAX1(0.0_r8,WTRT2Ps1(2,LL,NR,NZ))*(1.0_r8-FSNCM)
+                    CPOOLRs1(2,LL,NZ)=AMAX1(0.0_r8,CPOOLRs1(2,LL,NZ))*(1.0_r8-FSNCP)
+                    ZPOOLRs1(2,LL,NZ)=AMAX1(0.0_r8,ZPOOLRs1(2,LL,NZ))*(1.0_r8-FSNCP)
+                    PPOOLRs1(2,LL,NZ)=AMAX1(0.0_r8,PPOOLRs1(2,LL,NZ))*(1.0_r8-FSNCP)
                   ENDIF
 5105            CONTINUE
               ENDIF
@@ -1038,6 +1060,12 @@ implicit none
   real(r8) :: SNCR,SNCRM
 ! begin_execution
   associate(                              &
+    CCPOLRs1  =>  plt_biom%CCPOLRs1     , &
+    CZPOLRs1  =>  plt_biom%CZPOLRs1     , &
+    CPPOLRs1  =>  plt_biom%CPPOLRs1     , &
+    FWODRs1   =>  plt_allom%FWODRs1     , &
+    FWODRNs1  =>  plt_allom%FWODRNs1    , &
+    FWODRPs1  =>  plt_allom%FWODRPs1    , &
     IDAYs1    =>  plt_pheno%IDAYs1      , &
     NB1s1     =>  plt_morph%NB1s1         &
   )
@@ -1055,15 +1083,15 @@ implicit none
 !
   IF(IDAYs1(1,NB1s1(NZ),NZ).NE.0 &
     .AND.CCPOLRs1(N,L,NZ).GT.ZEROs1)THEN
-    CCC=AMAX1(0.0,AMIN1(1.0 &
+    CCC=AMAX1(0.0_r8,AMIN1(1.0 &
       ,safe_adb(CZPOLRs1(N,L,NZ),CZPOLRs1(N,L,NZ) &
       +CCPOLRs1(N,L,NZ)*CNKI) &
       ,safe_adb(CPPOLRs1(N,L,NZ),CPPOLRs1(N,L,NZ) &
       +CCPOLRs1(N,L,NZ)*CPKI)))
-    CNC=AMAX1(0.0,AMIN1(1.0 &
+    CNC=AMAX1(0.0_r8,AMIN1(1.0 &
       ,safe_adb(CCPOLRs1(N,L,NZ),CCPOLRs1(N,L,NZ) &
       +CZPOLRs1(N,L,NZ)/CNKI)))
-    CPC=AMAX1(0.0,AMIN1(1.0 &
+    CPC=AMAX1(0.0_r8,AMIN1(1.0 &
       ,safe_adb(CCPOLRs1(N,L,NZ),CCPOLRs1(N,L,NZ) &
       +CPPOLRs1(N,L,NZ)/CPKI)))
   ELSE
@@ -1090,7 +1118,7 @@ implicit none
     IF(-RCO2XM.LT.RTWT1s1(N,NR,NZ)*RCCC)THEN
       SNCRM=-RCO2XM
     ELSE
-      SNCRM=AMAX1(0.0,RTWT1s1(N,NR,NZ)*RCCC)
+      SNCRM=AMAX1(0.0_r8,RTWT1s1(N,NR,NZ)*RCCC)
     ENDIF
   ELSE
     SNCRM=0._r8
@@ -1099,7 +1127,7 @@ implicit none
     IF(-RCO2X.LT.RTWT1s1(N,NR,NZ)*RCCC)THEN
       SNCR=-RCO2X
     ELSE
-      SNCR=AMAX1(0.0,RTWT1s1(N,NR,NZ)*RCCC)*WFRs1(N,L,NZ)
+      SNCR=AMAX1(0.0_r8,RTWT1s1(N,NR,NZ)*RCCC)*WFRs1(N,L,NZ)
     ENDIF
   ELSE
     SNCR=0._r8
@@ -1109,7 +1137,7 @@ implicit none
     RCZR=RTWT1Ns1(N,NR,NZ)*(RCCN+(1.0_r8-RCCN)*RCCR/RTWT1s1(N,NR,NZ))
     RCPR=RTWT1Ps1(N,NR,NZ)*(RCCP+(1.0_r8-RCCP)*RCCR/RTWT1s1(N,NR,NZ))
     IF(RCCR.GT.ZEROPs1(NZ))THEN
-      FSNC1=AMAX1(0.0,AMIN1(1.0,SNCR/RCCR))
+      FSNC1=AMAX1(0.0_r8,AMIN1(1.0,SNCR/RCCR))
     ELSE
       FSNC1=1.0_r8
     ENDIF
@@ -1158,7 +1186,16 @@ implicit none
   REAL(R8) :: XFRC,XFRN,XFRP
 ! begin_execution
   associate(                                 &
-    NGs1        =>   plt_morph%NGs1        , &
+    WSRTLs1     =>  plt_biom%WSRTLs1       , &
+    WTRTDs1     =>  plt_biom%WTRTDs1       , &
+    CPOOLRs1    =>  plt_biom%CPOOLRs1      , &
+    ZPOOLRs1    =>  plt_biom%ZPOOLRs1      , &
+    PPOOLRs1    =>  plt_biom%PPOOLRs1      , &
+    CNWSs1      =>  plt_allom%CNWSs1       , &
+    CPWSs1      =>  plt_allom%CPWSs1       , &
+    FWODRs1     =>  plt_allom%FWODRs1      , &
+    FWODRPs1    =>  plt_allom%FWODRPs1     , &
+    NGs1        =>  plt_morph%NGs1         , &
     NINRs1      =>  plt_morph%NINRs1       , &
     SDPTHs1     =>  plt_morph%SDPTHs1        &
   )
@@ -1199,10 +1236,10 @@ implicit none
 !     FGROL,FGROZ=fraction of GRTLGL in current,next lower soil layer
 !
   IF(GRTLGL.GT.ZEROPs1(NZ).AND.L.LT.NJs1)THEN
-    FGROL=AMAX1(0.0,AMIN1(1.0,(CDPTHZs1(L) &
+    FGROL=AMAX1(0.0_r8,AMIN1(1.0,(CDPTHZs1(L) &
       -RTDP1s1(N,NR,NZ))/GRTLGL))
     IF(FGROL.LT.1.0)FGROL=0._r8
-    FGROZ=AMAX1(0.0,1.0_r8-FGROL)
+    FGROZ=AMAX1(0.0_r8,1.0_r8-FGROL)
   ELSE
     FGROL=1.0_r8
     FGROZ=0._r8
@@ -1273,11 +1310,6 @@ implicit none
     PSIROs1(N,L1,NZ)=PSIROs1(N,L,NZ)
     PSIRGs1(N,L1,NZ)=PSIRGs1(N,L,NZ)
     NINRs1(NR,NZ)=MAX(NGs1(NZ),L+1)
-!     IF(NZ.EQ.2)THEN
-!     WRITE(*,9877)'INFIL',I,J,NZ,NR,L,N,NINRs1(NR,NZ)
-!    2,FRTN,WTRTDs1(N,L1,NZ),CPOOLRs1(N,L1,NZ)
-!    2,FGROZ,RTDP1s1(N,NR,NZ),GRTLGL,CDPTHZs1(L)
-!     ENDIF
   ENDIF
   end associate
   end subroutine PrimRootExtension
@@ -1295,8 +1327,14 @@ implicit none
 
 ! begin_execution
   associate(                             &
+    CPOOLRs1   =>  plt_biom%CPOOLRs1   , &
+    ZPOOLRs1   =>  plt_biom%ZPOOLRs1   , &
+    PPOOLRs1   =>  plt_biom%PPOOLRs1   , &
+    WSRTLs1    =>  plt_biom%WSRTLs1    , &
+    WTRTDs1    =>  plt_biom%WTRTDs1    , &
     VOLXs1     =>  plt_soilchem%VOLXs1 , &
     NGs1       =>  plt_morph%NGs1      , &
+    MYs1       =>   plt_morph%MYs1     , &
     SDPTHs1    =>  plt_morph%SDPTHs1   , &
     NINRs1     =>  plt_morph%NINRs1      &
   )
@@ -1431,8 +1469,6 @@ implicit none
         CPOOLNs1(LL-1,NZ)=CPOOLNs1(LL-1,NZ)+XFRC
         ZPOOLNs1(LL-1,NZ)=ZPOOLNs1(LL-1,NZ)+XFRN
         PPOOLNs1(LL-1,NZ)=PPOOLNs1(LL-1,NZ)+XFRP
-!     WRITE(*,9868)'WITHDRN',I,J,NZ,NR,LL,NN,NINRs1(NR,NZ)
-!    2,WTNDLs1(LL,NZ),CPOOLNs1(LL,NZ),RTDP1s1(N,NR,NZ)
       ENDIF
       NINRs1(NR,NZ)=MAX(NGs1(NZ),LL-1)
     ELSE
@@ -1479,14 +1515,38 @@ implicit none
   real(r8) :: XFRC,XFRN,XFRP
 !     begin_execution
   associate(                                &
+    FWODBs1      =>   plt_allom%FWODBs1   , &
+    FWODRs1      =>   plt_allom%FWODRs1   , &
+    CCPOLRs1     =>   plt_biom%CCPOLRs1   , &
+    CZPOLRs1     =>   plt_biom%CZPOLRs1   , &
+    WTRTLs1      =>   plt_biom%WTRTLs1    , &
+    CPPOLRs1     =>   plt_biom%CPPOLRs1   , &
+    CPOOLRs1     =>   plt_biom%CPOOLRs1   , &
+    ZPOOLRs1     =>   plt_biom%ZPOOLRs1   , &
+    PPOOLRs1     =>   plt_biom%PPOOLRs1   , &
+    WTLSBs1      =>   plt_biom%WTLSBs1    , &
+    CPOOLs1      =>   plt_biom%CPOOLs1    , &
+    WTRTDs1      =>   plt_biom%WTRTDs1    , &
+    ZPOOLs1      =>   plt_biom%ZPOOLs1    , &
+    PPOOLs1      =>   plt_biom%PPOOLs1    , &
+    WVSTKBs1     =>   plt_biom%WVSTKBs1   , &
+    WTRSVBs1     =>   plt_biom%WTRSVBs1   , &
+    WTRSBNs1     =>   plt_biom%WTRSBNs1   , &
+    WTRVCs1      =>   plt_biom%WTRVCs1    , &
+    WTRVNs1      =>   plt_biom%WTRVNs1    , &
+    WTRVPs1      =>   plt_biom%WTRVPs1    , &
+    WTLSs1       =>   plt_biom%WTLSs1     , &
+    WTRTs1       =>   plt_biom%WTRTs1     , &
+    WTRSBPs1     =>   plt_biom%WTRSBPs1   , &
     IGTYPs1      =>   plt_pheno%IGTYPs1   , &
     IDTHBs1      =>   plt_pheno%IDTHBs1   , &
     ISTYPs1      =>   plt_pheno%ISTYPs1   , &
-    IDAYs1       =>  plt_pheno%IDAYs1     , &
+    IDAYs1       =>   plt_pheno%IDAYs1    , &
     ATRPs1       =>   plt_pheno%ATRPs1    , &
     NIXs1        =>   plt_morph%NIXs1     , &
     NINRs1       =>   plt_morph%NINRs1    , &
     NIs1         =>   plt_morph%NIs1      , &
+    MYs1         =>   plt_morph%MYs1      , &
     NRTs1        =>   plt_morph%NRTs1     , &
     NBRs1        =>   plt_morph%NBRs1       &
   )
@@ -1509,10 +1569,10 @@ implicit none
     DO 300 NB=1,NBRs1(NZ)
       IF(IDTHBs1(NB,NZ).EQ.0)THEN
         IF(ATRPs1(NB,NZ).GT.ATRPX(ISTYPs1(NZ)))THEN
-          WTLSBZ(NB)=AMAX1(0.0,WTLSBs1(NB,NZ))
-          CPOOLZ(NB)=AMAX1(0.0,CPOOLs1(NB,NZ))
-          ZPOOLZ(NB)=AMAX1(0.0,ZPOOLs1(NB,NZ))
-          PPOOLZ(NB)=AMAX1(0.0,PPOOLs1(NB,NZ))
+          WTLSBZ(NB)=AMAX1(0.0_r8,WTLSBs1(NB,NZ))
+          CPOOLZ(NB)=AMAX1(0.0_r8,CPOOLs1(NB,NZ))
+          ZPOOLZ(NB)=AMAX1(0.0_r8,ZPOOLs1(NB,NZ))
+          PPOOLZ(NB)=AMAX1(0.0_r8,PPOOLs1(NB,NZ))
           WTPLTT=WTPLTT+WTLSBZ(NB)
           CPOOLT=CPOOLT+CPOOLZ(NB)
           ZPOOLT=ZPOOLT+ZPOOLZ(NB)
@@ -1711,7 +1771,7 @@ implicit none
 !     ENDIF
   DO 290 L=NUs1,NIs1(NZ)
     IF(RTNT(1).GT.ZEROPs1(NZ))THEN
-      FWTR(L)=AMAX1(0.0,RLNT(1,L)/RTNT(1))
+      FWTR(L)=AMAX1(0.0_r8,RLNT(1,L)/RTNT(1))
     ELSE
       FWTR(L)=1.0_r8
     ENDIF
@@ -1745,7 +1805,7 @@ implicit none
   DO 310 NB=1,NBRs1(NZ)
     IF(IDTHBs1(NB,NZ).EQ.0)THEN
       IF(WTLSs1(NZ).GT.ZEROPs1(NZ))THEN
-        FWTB(NB)=AMAX1(0.0,WTLSBs1(NB,NZ)/WTLSs1(NZ))
+        FWTB(NB)=AMAX1(0.0_r8,WTLSBs1(NB,NZ)/WTLSs1(NZ))
       ELSE
         FWTB(NB)=1.0_r8
       ENDIF
@@ -1757,24 +1817,24 @@ implicit none
       DO 415 L=NUs1,NIs1(NZ)
         WTLSBX=WTLSBs1(NB,NZ)*FWODBs1(1)*FWTR(L)*FWTC
         WTRTLX=WTRTLs1(1,L,NZ)*FWODRs1(1)*FWTB(NB)*FWTS
-        WTLSBB=AMAX1(0.0,WTLSBX,FSNK*WTRTLX)
-        WTRTLR=AMAX1(0.0,WTRTLX,FSNK*WTLSBX)
+        WTLSBB=AMAX1(0.0_r8,WTLSBX,FSNK*WTRTLX)
+        WTRTLR=AMAX1(0.0_r8,WTRTLX,FSNK*WTLSBX)
         WTPLTT=WTLSBB+WTRTLR
         IF(WTPLTT.GT.ZEROPs1(NZ))THEN
-          CPOOLB=AMAX1(0.0,CPOOLs1(NB,NZ)*FWTR(L))
-          CPOOLS=AMAX1(0.0,CPOOLRs1(1,L,NZ)*FWTB(NB))
+          CPOOLB=AMAX1(0.0_r8,CPOOLs1(NB,NZ)*FWTR(L))
+          CPOOLS=AMAX1(0.0_r8,CPOOLRs1(1,L,NZ)*FWTB(NB))
           CPOOLD=(CPOOLB*WTRTLR-CPOOLS*WTLSBB)/WTPLTT
           XFRC=PTSHTR*CPOOLD
           CPOOLs1(NB,NZ)=CPOOLs1(NB,NZ)-XFRC
           CPOOLRs1(1,L,NZ)=CPOOLRs1(1,L,NZ)+XFRC
           CPOOLT=CPOOLS+CPOOLB
           IF(CPOOLT.GT.ZEROPs1(NZ))THEN
-            ZPOOLB=AMAX1(0.0,ZPOOLs1(NB,NZ)*FWTR(L))
-            ZPOOLS=AMAX1(0.0,ZPOOLRs1(1,L,NZ)*FWTB(NB))
+            ZPOOLB=AMAX1(0.0_r8,ZPOOLs1(NB,NZ)*FWTR(L))
+            ZPOOLS=AMAX1(0.0_r8,ZPOOLRs1(1,L,NZ)*FWTB(NB))
             ZPOOLD=(ZPOOLB*CPOOLS-ZPOOLS*CPOOLB)/CPOOLT
             XFRN=PTSHTR*ZPOOLD
-            PPOOLB=AMAX1(0.0,PPOOLs1(NB,NZ)*FWTR(L))
-            PPOOLS=AMAX1(0.0,PPOOLRs1(1,L,NZ)*FWTB(NB))
+            PPOOLB=AMAX1(0.0_r8,PPOOLs1(NB,NZ)*FWTR(L))
+            PPOOLS=AMAX1(0.0_r8,PPOOLRs1(1,L,NZ)*FWTB(NB))
             PPOOLD=(PPOOLB*CPOOLS-PPOOLS*CPOOLB)/CPOOLT
             XFRP=PTSHTR*PPOOLD
           ELSE
@@ -1809,8 +1869,13 @@ implicit none
   real(r8) :: RTSKS
 
   associate(                                 &
+    CPOOLRs1     =>   plt_biom%CPOOLRs1    , &
+    ZPOOLRs1     =>   plt_biom%ZPOOLRs1    , &
+    PPOOLRs1     =>   plt_biom%PPOOLRs1    , &
     IGTYPs1      =>   plt_pheno%IGTYPs1    , &
-    VOLXs1       =>  plt_soilchem%VOLXs1   , &
+    VOLXs1       =>   plt_soilchem%VOLXs1  , &
+    HTSTZs1      =>   plt_morph%HTSTZs1    , &
+    MYs1         =>   plt_morph%MYs1       , &
     SDPTHs1      =>   plt_morph%SDPTHs1    , &
     NIs1         =>   plt_morph%NIs1       , &
     NRTs1        =>   plt_morph%NRTs1        &
@@ -1928,9 +1993,9 @@ implicit none
 !     RTNT,RLNT=total root sink strength
 !
           IF(N.EQ.1)THEN
-            RTDPL(NR,L)=AMAX1(0.0,RTDP1s1(1,NR,NZ)-CDPTHZs1(L-1)-RTDPX)
-            RTDPL(NR,L)=AMAX1(0.0,AMIN1(DLYR3s1(L),RTDPL(NR,L)) &
-              -AMAX1(0.0,SDPTHs1(NZ)-CDPTHZs1(L-1)-HTCTLs1(NZ)))
+            RTDPL(NR,L)=AMAX1(0.0_r8,RTDP1s1(1,NR,NZ)-CDPTHZs1(L-1)-RTDPX)
+            RTDPL(NR,L)=AMAX1(0.0_r8,AMIN1(DLYR3s1(L),RTDPL(NR,L)) &
+              -AMAX1(0.0_r8,SDPTHs1(NZ)-CDPTHZs1(L-1)-HTCTLs1(NZ)))
             RTDPS=AMAX1(SDPTHs1(NZ),CDPTHZs1(L-1))+0.5*RTDPL(NR,L)+HTSTZs1(NZ)
             IF(RTDPS.GT.ZEROs1)THEN
               RTSKP=XRTN1*RRAD1s1(N,L,NZ)**2/RTDPS

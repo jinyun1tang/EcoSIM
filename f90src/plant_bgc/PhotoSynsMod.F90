@@ -34,8 +34,11 @@ implicit none
   associate(                          &
   IGTYPs1     =>  plt_pheno%IGTYPs1 , &
   FDBKs1       => plt_photo%FDBKs1  , &
+  CO2Qs1       => plt_photo%CO2Qs1  , &
   XKCO2Os1     => plt_photo%XKCO2Os1, &
+  SCO2s1       => plt_photo%SCO2s1  , &
   CO2Is1       => plt_photo%CO2Is1  , &
+  XKCO24s1     => plt_photo%XKCO24s1, &
   ARLFLs1      => plt_morph%ARLFLs1 , &
   TAU0s1       => plt_rad%TAU0s1    , &
   TAUSs1       => plt_rad%TAUSs1      &
@@ -252,11 +255,6 @@ implicit none
 !               ICO2I=MAX(1,MIN(400,INT(CO2X)))
 !               VCO2(ICO2I,I,NZ)=VCO2(ICO2I,I,NZ)
 !              2+(VL*SURFXs1(N,L,K,NB,NZ)*TAU0s1(L+1))*0.0432
-!               IF(J.EQ.13.AND.NB.EQ.1.AND.M.EQ.1.AND.N.EQ.1)THEN
-!               WRITE(*,3335)'VLB',IYRCs1,I,J,NZ,L,K,VL,PARDIFs1(N,M,L,NZ)
-!              2,RAPY,TKCs1(NZ),CO2Qs1(NZ),CO2X,FMOLs1(NZ)/GSL
-!              3,VCGROs1(K,NB,NZ),ETLF,FDBKs1(NB,NZ),WFNB
-!               ENDIF
               ENDIF
             ENDIF
           ENDIF
@@ -295,7 +293,10 @@ implicit none
   real(r8) :: VA,VG
 ! begin_execution
   associate(                          &
-  IGTYPs1     =>  plt_pheno%IGTYPs1 , &
+  IGTYPs1      => plt_pheno%IGTYPs1 , &
+  XKCO24s1     => plt_photo%XKCO24s1, &
+  SCO2s1       => plt_photo%SCO2s1  , &
+  CO2Qs1       => plt_photo%CO2Qs1  , &
   FDBKs1       => plt_photo%FDBKs1  , &
   CO2Is1       => plt_photo%CO2Is1  , &
   ARLFLs1      => plt_morph%ARLFLs1 , &
@@ -548,13 +549,6 @@ implicit none
 !               ICO2I=MAX(1,MIN(400,INT(CO2X)))
 !               VCO2(ICO2I,I,NZ)=VCO2(ICO2I,I,NZ)
 !              2+(VL*SURFXs1(N,L,K,NB,NZ)*TAU0s1(L+1))*0.0432
-!               WRITE(*,4455)'VLB4',IYRCs1,I,J,NZ,L,M,N,K,VL,PARs1(N,M,L,NZ)
-!              2,RAPS,TKCs1(NZ),CO2Qs1(NZ),ETGR4s1(K,NB,NZ)
-!              3,CBXN4s1(K,NB,NZ),VGRO4s1(K,NB,NZ),EGRO
-!              3,FDBK4s1(K,NB,NZ),CH2O4(K),WFN4,VGROX,EGROX
-!              4,VCGR4s1(K,NB,NZ),CO2X,CO2C,CBXNX
-!              5,RS,RSL,SURFXs1(N,L,K,NB,NZ)
-!4455            FORMAT(A8,8I4,40E12.4)
 !
 !               C3 CARBOXYLATION REACTIONS IN IN BUNDLE SHEATH OF C4 PLANTS
 !
@@ -580,11 +574,6 @@ implicit none
 !
                 CH2O3(K)=CH2O3(K)+VL*SURFXs1(N,L,K,NB,NZ) &
                   *TAU0s1(L+1)
-!               IF(J.EQ.13.AND.NB.EQ.1.AND.M.EQ.1.AND.N.EQ.1)THEN
-!               WRITE(*,4444)'VLB4',IYRCs1,I,J,NZ,L,K,VL,PARDIFs1(N,M,L,NZ)
-!              2,RAPY,TKCs1(NZ),CO2Qs1(NZ),CO2X,FMOLs1(NZ)/GSL
-!              3,VCGROs1(K,NB,NZ),ETLF,FDBKs1(NB,NZ),WFNB
-!               ENDIF
               ENDIF
             ENDIF
           ENDIF
@@ -613,6 +602,7 @@ implicit none
 
 ! begin_execution
   associate(                           &
+    CO2Qs1    => plt_photo%CO2Qs1    , &
     IGTYPs1   =>  plt_pheno%IGTYPs1  , &
     SSINs1    =>  plt_rad%SSINs1     , &
     RADPs1    =>  plt_rad%RADPs1     , &

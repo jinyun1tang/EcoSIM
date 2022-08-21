@@ -41,6 +41,7 @@
   real(r8):: RI
 !     begin_execution
   associate(                            &
+    CO2Qs1     =>  plt_photo%CO2Qs1   , &
     ARLFPs1    =>  plt_morph%ARLFPs1  , &
     SSINs1     =>  plt_rad%SSINs1     , &
     FCO2s1     =>  plt_photo%FCO2s1   , &
@@ -217,6 +218,7 @@
 !     begin_execution
   associate(                          &
     ARLFLs1   =>  plt_morph%ARLFLs1 , &
+    O2Ls1     =>  plt_photo%O2Ls1   , &
     CO2Ls1    =>  plt_photo%CO2Ls1  , &
     CHLs1     =>  plt_photo%CHLs1   , &
     XKCO2Ls1  =>  plt_photo%XKCO2Ls1, &
@@ -300,13 +302,16 @@
   real(r8) :: VOGRO
 !     begin_execution
   associate(                          &
+    WGLFs1    =>  plt_biom%WGLFs1   , &
     ARLFLs1   =>  plt_morph%ARLFLs1 , &
     FDBKXs1   =>  plt_photo%FDBKXs1 , &
     CHL4s1    =>  plt_photo%CHL4s1  , &
+    O2Ls1     =>  plt_photo%O2Ls1   , &
     CO2Ls1    =>  plt_photo%CO2Ls1  , &
     ETMXs1    =>  plt_photo%ETMXs1  , &
     VCMX4s1   =>  plt_photo%VCMX4s1 , &
     RUBPs1    =>  plt_photo%RUBPs1  , &
+    XKCO24s1  =>  plt_photo%XKCO24s1, &
     XKCO2Ls1  =>  plt_photo%XKCO2Ls1, &
     XKCO2Os1  =>  plt_photo%XKCO2Os1, &
     CHLs1     =>  plt_photo%CHLs1   , &
@@ -546,6 +551,8 @@
   real(r8) :: WSDN
 !     begin_execution
   associate(                            &
+    WGLFs1     => plt_biom%WGLFs1     , &
+    WSLFs1     => plt_biom%WSLFs1     , &
     ARLF1s1    => plt_morph%ARLF1s1     &
   )
   DO K=1,JNODS1
@@ -583,6 +590,9 @@
   real(r8), intent(in) :: TFN1,TFN2,TFNE,XKO2L
 !     begin_execution
   associate(                          &
+    CCPOLBs1 =>  plt_biom%CCPOLBs1  , &
+    CZPOLBs1 =>  plt_biom%CZPOLBs1  , &
+    CPPOLBs1 =>  plt_biom%CPPOLBs1  , &
     IWTYPs1  =>  plt_pheno%IWTYPs1  , &
     IBTYPs1  =>  plt_pheno%IBTYPs1  , &
     FLG4s1   =>  plt_pheno%FLG4s1   , &
@@ -658,7 +668,11 @@
   real(r8) :: TKCO
 !     begin_execution
   associate(                          &
+    CCPOLBs1 =>  plt_biom%CCPOLBs1  , &
     XKO2s1   =>  plt_photo%XKO2s1   , &
+    SCO2s1   =>  plt_photo%SCO2s1   , &
+    CO2Qs1   =>  plt_photo%CO2Qs1   , &
+    O2Ls1    =>  plt_photo%O2Ls1    , &
     CO2Ls1   =>  plt_photo%CO2Ls1   , &
     CO2Is1   =>  plt_photo%CO2Is1   , &
     O2Is1    =>  plt_photo%O2Is1    , &

@@ -51,7 +51,11 @@ module UptakesMod
   integer :: ILYR(2,JZ1)
 !     begin_execution
   associate(                         &
-    IDAYs1   =>  plt_pheno%IDAYs1  , &
+    WTRTDs1  => plt_biom%WTRTDs1   , &
+    WTLSs1   => plt_biom%WTLSs1    , &
+    WVSTKs1  => plt_biom%WVSTKs1   , &
+    IDAYs1   => plt_pheno%IDAYs1   , &
+    IFLGCs1  => plt_pheno%IFLGCs1  , &
     ARLFCs1  => plt_morph%ARLFCs1  , &
     ARLSSs1  => plt_morph%ARLSSs1  , &
     ARLFSs1  => plt_morph%ARLFSs1  , &
@@ -180,6 +184,7 @@ module UptakesMod
   real(r8) :: ARLSC
 
   associate(                          &
+    WTRTDs1  => plt_biom%WTRTDs1    , &
     VOLAs1   => plt_soilchem%VOLAs1 , &
     PSISTs1  => plt_soilchem%PSISTs1, &
     VOLIs1   => plt_soilchem%VOLIs1 , &
@@ -188,6 +193,7 @@ module UptakesMod
     VOLWs1   => plt_soilchem%VOLWs1 , &
     VOLYs1   => plt_soilchem%VOLYs1 , &
     ARSTPs1  => plt_morph%ARSTPs1   , &
+    MYs1     => plt_morph%MYs1      , &
     ARLFPs1  => plt_morph%ARLFPs1   , &
     RAD1s1   => plt_rad%RAD1s1      , &
     THRM1s1  => plt_rad%THRM1s1       &
@@ -287,6 +293,7 @@ module UptakesMod
   integer :: NB,K,L,N,NZZ
 
   associate(                          &
+    WSLFs1   =>  plt_biom%WSLFs1    , &
     FRADPs1  =>  plt_rad%FRADPs1    , &
     ARLF1s1  =>  plt_morph%ARLF1s1  , &
     KLEAFXs1 =>  plt_morph%KLEAFXs1 , &
@@ -386,10 +393,12 @@ module UptakesMod
   real(r8) :: RTDPZ,RTDPX
   integer :: N,L,NR
 
-  associate(                       &
-    NRTs1  =>  plt_morph%NRTs1   , &
-    SDPTHs1 =>  plt_morph%SDPTHs1, &
-    NIs1   =>  plt_morph%NIs1      &
+  associate(                          &
+    WTRTDs1  => plt_biom%WTRTDs1    , &
+    NRTs1    =>  plt_morph%NRTs1    , &
+    MYs1     => plt_morph%MYs1      , &
+    SDPTHs1  =>  plt_morph%SDPTHs1  , &
+    NIs1     =>  plt_morph%NIs1       &
   )
 !     RTDPZ,RTDP1=primary root depth
 !     FRTDPX=fraction of each soil layer with primary root
@@ -467,7 +476,15 @@ module UptakesMod
 ! begin_execution
   associate(                         &
    NIs1      => plt_morph%NIs1     , &
-    NGs1     =>   plt_morph%NGs1   , &
+   NGs1      => plt_morph%NGs1     , &
+   MYs1      => plt_morph%MYs1     , &
+   CCPOLRs1  => plt_biom%CCPOLRs1  , &
+   CZPOLRs1  => plt_biom%CZPOLRs1  , &
+   CPPOLRs1  => plt_biom%CPPOLRs1  , &
+   CCPOLPs1  => plt_biom%CCPOLPs1  , &
+   CZPOLPs1  => plt_biom%CZPOLPs1  , &
+   CPPOLPs1  => plt_biom%CPPOLPs1  , &
+   WTSHTs1   => plt_biom%WTSHTs1   , &
    FRADPs1   => plt_rad%FRADPs1    , &
    RSMHs1    => plt_photo%RSMHs1   , &
    RCSs1     => plt_photo%RCSs1    , &
@@ -554,7 +571,11 @@ module UptakesMod
 !     begin_execution
 
   associate(                          &
+    CCPOLPs1  => plt_biom%CCPOLPs1  , &
+    CZPOLPs1  => plt_biom%CZPOLPs1  , &
+    CPPOLPs1  => plt_biom%CPPOLPs1  , &
     NIs1       => plt_morph%NIs1    , &
+    MYs1       => plt_morph%MYs1    , &
     RCSs1      => plt_photo%RCSs1   , &
     RSMHs1     => plt_photo%RSMHs1  , &
     RAD1s1     => plt_rad%RAD1s1    , &
@@ -835,6 +856,8 @@ module UptakesMod
     VOLAs1   => plt_soilchem%VOLAs1 , &
     CNDUs1   => plt_soilchem%CNDUs1 , &
     VOLXs1   => plt_soilchem%VOLXs1 , &
+    HTSTZs1  => plt_morph%HTSTZs1   , &
+    MYs1     => plt_morph%MYs1      , &
     ZCs1     => plt_morph%ZCs1      , &
     NGs1     => plt_morph%NGs1      , &
     NIs1     => plt_morph%NIs1        &
@@ -953,15 +976,23 @@ module UptakesMod
   real(r8) :: OSWT,WFNC
 
 ! begin_execution
-  associate(                        &
-    NIs1     =>  plt_morph%NIs1   , &
-    ZCs1     => plt_morph%ZCs1    , &
-    NGs1     =>   plt_morph%NGs1  , &
-    RCSs1    =>  plt_photo%RCSs1  , &
-    RSMHs1   =>  plt_photo%RSMHs1 , &
-    FRADPs1  =>  plt_rad%FRADPs1  , &
-    THRM1s1  =>  plt_rad%THRM1s1  , &
-    RAD1s1   =>  plt_rad%RAD1s1     &
+  associate(                         &
+    CCPOLPs1 =>  plt_biom%CCPOLPs1 , &
+    CZPOLPs1 =>  plt_biom%CZPOLPs1 , &
+    CPPOLPs1 =>  plt_biom%CPPOLPs1 , &
+    CCPOLRs1 =>  plt_biom%CCPOLRs1 , &
+    CZPOLRs1 =>  plt_biom%CZPOLRs1 , &
+    CPPOLRs1 =>  plt_biom%CPPOLRs1 , &
+    WTSHTs1  =>  plt_biom%WTSHTs1  , &
+    NIs1     =>  plt_morph%NIs1    , &
+    ZCs1     =>  plt_morph%ZCs1    , &
+    NGs1     =>  plt_morph%NGs1    , &
+    MYs1     =>  plt_morph%MYs1    , &
+    RCSs1    =>  plt_photo%RCSs1   , &
+    RSMHs1   =>  plt_photo%RSMHs1  , &
+    FRADPs1  =>  plt_rad%FRADPs1   , &
+    THRM1s1  =>  plt_rad%THRM1s1   , &
+    RAD1s1   =>  plt_rad%RAD1s1      &
   )
   RAD1s1(NZ)=0.0_r8
   EFLXCs1(NZ)=0.0_r8
@@ -1019,8 +1050,12 @@ module UptakesMod
   real(r8) :: FDMR
   real(r8) :: OSWT
   integer :: N,L
-  associate(                          &
-    NIs1       => plt_morph%NIs1      &
+  associate(                           &
+    CCPOLRs1   => plt_biom%CCPOLRs1  , &
+    CZPOLRs1   => plt_biom%CZPOLRs1  , &
+    CPPOLRs1   => plt_biom%CPPOLRs1  , &
+    MYs1       => plt_morph%MYs1     , &
+    NIs1       => plt_morph%NIs1       &
   )
   !
   !     CANOPY SURFACE WATER STORAGE, SENSIBLE AND STORAGE HEAT FLUXES
@@ -1083,6 +1118,7 @@ module UptakesMod
   real(r8) :: ACTV,RTK,STK,TKGO,TKSO
   integer :: L
   associate(                          &
+    CHILLs1  =>  plt_photo%CHILLs1  , &
     IDAYs1   =>  plt_pheno%IDAYs1   , &
     NIs1     =>  plt_morph%NIs1     , &
     NB1s1    =>  plt_morph%NB1s1      &
@@ -1152,6 +1188,11 @@ module UptakesMod
   integer :: NB
 
   associate(                            &
+    WTLSBs1   =>  plt_biom%WTLSBs1    , &
+    ZPOOLs1   =>  plt_biom%ZPOOLs1    , &
+    CCPOLBs1  =>  plt_biom%CCPOLBs1   , &
+    CZPOLBs1  =>  plt_biom%CZPOLBs1   , &
+    CPPOLBs1  =>  plt_biom%CPPOLBs1   , &
     ARLFBs1   =>  plt_morph%ARLFBs1   , &
     NBRs1     =>  plt_morph%NBRs1     , &
     FRADPs1   =>  plt_rad%FRADPs1     , &
@@ -2149,6 +2190,9 @@ module UptakesMod
   integer :: K
   !     begin_execution
   associate(                           &
+    CPOOLRs1=>  plt_biom%CPOOLRs1    , &
+    ZPOOLRs1=>  plt_biom%ZPOOLRs1    , &
+    PPOOLRs1=>  plt_biom%PPOOLRs1    , &
     OQNs1   =>  plt_soilchem%OQNs1   , &
     OQPs1   =>  plt_soilchem%OQPs1   , &
     OQCs1   =>  plt_soilchem%OQCs1     &
@@ -2244,6 +2288,16 @@ module UptakesMod
   integer, intent(in) :: NZ
   REAL(R8), INTENT(IN):: FPQ(2,JZ1,JP1),FPP(2,JZ1,JP1)
   real(r8), intent(out):: FCUP,FZUP,FPUP,FWSRT,UPWTRP,UPWTRH,FOXYX
+
+  associate(                          &
+    CWSRTLs1  => plt_biom%CWSRTLs1  , &
+    WSRTLs1   => plt_biom%WSRTLs1   , &
+    CPPOLRs1  => plt_biom%CPPOLRs1  , &
+    CZPOLRs1  => plt_biom%CZPOLRs1  , &
+    CPOOLRs1  => plt_biom%CPOOLRs1  , &
+    CCPOLRs1  => plt_biom%CCPOLRs1  , &
+    WTRTLs1   => plt_biom%WTRTLs1     &
+  )
   !
   !     UPTAKE CAPACITY 'FWSRT' DEPENDS ON ROOT,MYCORRHIZAL
   !     PROTEIN CONTENT RELATIVE TO 5% FOR WHICH ACTIVE UPTAKE
@@ -2334,6 +2388,7 @@ module UptakesMod
   ELSE
     FOXYX=FPQ(N,L,NZ)
   ENDIF
+  end associate
   end subroutine GetUptakeCapcity
 !------------------------------------------------------------------------
 
@@ -2379,6 +2434,7 @@ module UptakesMod
 
 !     begin_execution
   associate(                           &
+    WTRTSs1  =>  plt_biom%WTRTSs1    , &
     CO2Gs1   =>  plt_soilchem%CO2Gs1 , &
     CO2Ss1   =>  plt_soilchem%CO2Ss1 , &
     ZNH3Ss1  =>  plt_soilchem%ZNH3Ss1, &
@@ -2415,7 +2471,9 @@ module UptakesMod
     OGSGLs1  =>  plt_soilchem%OGSGLs1, &
     Z2OSs1   =>  plt_soilchem%Z2OSs1 , &
     CNH3Ss1  =>  plt_soilchem%CNH3Ss1, &
+    THETPMs1 =>  plt_soilchem%THETPMs1,&
     OXYGs1   =>  plt_soilchem%OXYGs1 , &
+    DFGSs1   =>  plt_soilchem%DFGSs1 , &
     CCH4Ss1  =>  plt_soilchem%CCH4Ss1, &
     OXYSs1   =>  plt_soilchem%OXYSs1 , &
     CH4Ss1   =>  plt_soilchem%CH4Ss1 , &
@@ -3077,6 +3135,7 @@ module UptakesMod
   associate(                             &
     THETWs1 =>  plt_soilchem%THETWs1   , &
     VOLXs1  =>  plt_soilchem%VOLXs1    , &
+    MYs1    =>  plt_morph%MYs1         , &
     NIs1    =>  plt_morph%NIs1           &
   )
   DO 955 N=1,MYs1(NZ)

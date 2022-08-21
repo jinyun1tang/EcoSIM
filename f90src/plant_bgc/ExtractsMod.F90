@@ -26,7 +26,7 @@ module ExtractsMod
   call TotalLitterfall()
 
   DO NZ=1,NPs1
-    IF(IFLGCs1(NZ).EQ.1)THEN
+    IF(plt_pheno%IFLGCs1(NZ).EQ.1)THEN
 
       call TotalLeafArea(NZ)
 
@@ -46,6 +46,9 @@ module ExtractsMod
   integer :: NZ,L,K,M
 
   associate(                             &
+   WGLFTs1    => plt_biom%WGLFTs1      , &
+   WTSTGTs1   => plt_biom%WTSTGTs1     , &
+   WTSTGs1    => plt_biom%WTSTGs1      , &
    NIs1       => plt_morph%NIs1        , &
    ARSTTs1    => plt_morph%ARSTTs1     , &
    ARLFTs1    =>  plt_morph%ARLFTs1    , &
@@ -101,6 +104,7 @@ module ExtractsMod
   integer, intent(in) :: NZ
   integer :: L
   associate(                              &
+    WGLFTs1    => plt_biom%WGLFTs1      , &
     ARLFTs1    =>  plt_morph%ARLFTs1    , &
     ARSTVs1    =>  plt_morph%ARSTVs1    , &
     ARSTTs1    => plt_morph%ARSTTs1     , &
@@ -126,6 +130,7 @@ module ExtractsMod
   integer :: N,L,K
 
   associate(                       &
+    MYs1    => plt_morph%MYs1    , &
     NIs1    => plt_morph%NIs1      &
   )
 

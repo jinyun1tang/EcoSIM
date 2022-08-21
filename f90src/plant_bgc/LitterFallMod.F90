@@ -18,6 +18,8 @@ implicit none
 
 !     begin_execution
   associate(                                 &
+    WTRTs1       =>   plt_biom%WTRTs1      , &
+    WTRVCs1      =>   plt_biom%WTRVCs1     , &
     ISTYPs1      =>   plt_pheno%ISTYPs1    , &
     IDTHRs1      =>   plt_pheno%IDTHRs1    , &
     IDTHPs1      =>   plt_pheno%IDTHPs1    , &
@@ -111,6 +113,53 @@ implicit none
   integer :: L,M,NR,NB,N
 !     begin_execution
   associate(                                &
+    WTEARBs1     =>   plt_biom%WTEARBs1   , &
+    WTEABNs1     =>   plt_biom%WTEABNs1   , &
+    WTEABPs1     =>   plt_biom%WTEABPs1   , &
+    CPOOLs1      =>   plt_biom%CPOOLs1    , &
+    ZPOLNBs1     =>   plt_biom%ZPOLNBs1   , &
+    PPOOLs1      =>   plt_biom%PPOOLs1    , &
+    WTSTBPs1     =>   plt_biom%WTSTBPs1   , &
+    ZPOOLs1      =>   plt_biom%ZPOOLs1    , &
+    PPOLNBs1     =>   plt_biom%PPOLNBs1   , &
+    WTSTKBs1     =>   plt_biom%WTSTKBs1   , &
+    WTSTBNs1     =>   plt_biom%WTSTBNs1   , &
+    WTRSBPs1     =>   plt_biom%WTRSBPs1   , &
+    WTGRBNs1     =>   plt_biom%WTGRBNs1   , &
+    WTRVPs1      =>   plt_biom%WTRVPs1    , &
+    WTGRBPs1     =>   plt_biom%WTGRBPs1   , &
+    WTHSKBs1     =>   plt_biom%WTHSKBs1   , &
+    WTSHEBs1     =>   plt_biom%WTSHEBs1   , &
+    WTNDBs1      =>   plt_biom%WTNDBs1    , &
+    WTSHBPs1     =>   plt_biom%WTSHBPs1   , &
+    WTRSVBs1     =>   plt_biom%WTRSVBs1   , &
+    WTLFBNs1     =>   plt_biom%WTLFBNs1   , &
+    CPOLNBs1     =>   plt_biom%CPOLNBs1   , &
+    WTRSBNs1     =>   plt_biom%WTRSBNs1   , &
+    WTLFBPs1     =>   plt_biom%WTLFBPs1   , &
+    WTRVNs1      =>   plt_biom%WTRVNs1    , &
+    WTNDBPs1     =>   plt_biom%WTNDBPs1   , &
+    WTRVCs1      =>   plt_biom%WTRVCs1    , &
+    WTGRBs1      =>   plt_biom%WTGRBs1    , &
+    WTLFBs1      =>   plt_biom%WTLFBs1    , &
+    CPOOLRs1     =>   plt_biom%CPOOLRs1   , &
+    ZPOOLRs1     =>   plt_biom%ZPOOLRs1   , &
+    PPOOLRs1     =>   plt_biom%PPOOLRs1   , &
+    WTNDBNs1     =>   plt_biom%WTNDBNs1   , &
+    WTSHBNs1     =>   plt_biom%WTSHBNs1   , &
+    WTHSBPs1     =>   plt_biom%WTHSBPs1   , &
+    WTHSBNs1     =>   plt_biom%WTHSBNs1   , &
+    FWODLNs1     =>   plt_allom%FWODLNs1  , &
+    FWODLPs1     =>   plt_allom%FWODLPs1  , &
+    FWODBs1      =>   plt_allom%FWODBs1   , &
+    FWODSPs1     =>   plt_allom%FWODSPs1  , &
+    FWODSNs1     =>   plt_allom%FWODSNs1  , &
+    FWOODs1      =>   plt_allom%FWOODs1   , &
+    FWODRs1      =>   plt_allom%FWODRs1   , &
+    FWODRNs1     =>   plt_allom%FWODRNs1  , &
+    FWODRPs1     =>   plt_allom%FWODRPs1  , &
+    FWOODNs1     =>   plt_allom%FWOODNs1  , &
+    FWOODPs1     =>   plt_allom%FWOODPs1  , &
     IFLGIs1      =>   plt_pheno%IFLGIs1   , &
     ISTYPs1      =>   plt_pheno%ISTYPs1   , &
     IWTYPs1      =>   plt_pheno%IWTYPs1   , &
@@ -118,6 +167,7 @@ implicit none
     IGTYPs1      =>   plt_pheno%IGTYPs1   , &
     IBTYPs1      =>   plt_pheno%IBTYPs1   , &
     IDTHPs1      =>   plt_pheno%IDTHPs1   , &
+    MYs1         =>   plt_morph%MYs1      , &
     NGs1         =>   plt_morph%NGs1      , &
     NBRs1        =>   plt_morph%NBRs1     , &
     NRTs1        =>   plt_morph%NRTs1       &
@@ -180,34 +230,22 @@ implicit none
             +CFOPPs1(5,M,NZ)*(WTLFBPs1(NB,NZ)*FWODLPs1(0) &
             +WTSHBPs1(NB,NZ)*FWODSPs1(0))
           IF(ISTYPs1(NZ).EQ.0.AND.IWTYPs1(NZ).NE.0)THEN
-            WTRVCs1(NZ)=WTRVCs1(NZ) &
-              +CFOPCs1(2,M,NZ)*WTGRBs1(NB,NZ)
-            WTRVNs1(NZ)=WTRVNs1(NZ) &
-              +CFOPNs1(2,M,NZ)*WTGRBNs1(NB,NZ)
-            WTRVPs1(NZ)=WTRVPs1(NZ) &
-              +CFOPPs1(2,M,NZ)*WTGRBPs1(NB,NZ)
+            WTRVCs1(NZ)=WTRVCs1(NZ)+CFOPCs1(2,M,NZ)*WTGRBs1(NB,NZ)
+            WTRVNs1(NZ)=WTRVNs1(NZ)+CFOPNs1(2,M,NZ)*WTGRBNs1(NB,NZ)
+            WTRVPs1(NZ)=WTRVPs1(NZ)+CFOPPs1(2,M,NZ)*WTGRBPs1(NB,NZ)
           ELSE
-            CSNCs1(M,1,0,NZ)=CSNCs1(M,1,0,NZ) &
-              +CFOPCs1(2,M,NZ)*WTGRBs1(NB,NZ)
-            ZSNCs1(M,1,0,NZ)=ZSNCs1(M,1,0,NZ) &
-              +CFOPNs1(2,M,NZ)*WTGRBNs1(NB,NZ)
-            PSNCs1(M,1,0,NZ)=PSNCs1(M,1,0,NZ) &
-              +CFOPPs1(2,M,NZ)*WTGRBPs1(NB,NZ)
+            CSNCs1(M,1,0,NZ)=CSNCs1(M,1,0,NZ)+CFOPCs1(2,M,NZ)*WTGRBs1(NB,NZ)
+            ZSNCs1(M,1,0,NZ)=ZSNCs1(M,1,0,NZ)+CFOPNs1(2,M,NZ)*WTGRBNs1(NB,NZ)
+            PSNCs1(M,1,0,NZ)=PSNCs1(M,1,0,NZ)+CFOPPs1(2,M,NZ)*WTGRBPs1(NB,NZ)
           ENDIF
           IF(IBTYPs1(NZ).EQ.0.OR.IGTYPs1(NZ).LE.1)THEN
-            CSNCs1(M,1,0,NZ)=CSNCs1(M,1,0,NZ) &
-              +CFOPCs1(3,M,NZ)*WTSTKBs1(NB,NZ)
-            ZSNCs1(M,1,0,NZ)=ZSNCs1(M,1,0,NZ) &
-              +CFOPNs1(3,M,NZ)*WTSTBNs1(NB,NZ)
-            PSNCs1(M,1,0,NZ)=PSNCs1(M,1,0,NZ) &
-              +CFOPPs1(3,M,NZ)*WTSTBPs1(NB,NZ)
+            CSNCs1(M,1,0,NZ)=CSNCs1(M,1,0,NZ)+CFOPCs1(3,M,NZ)*WTSTKBs1(NB,NZ)
+            ZSNCs1(M,1,0,NZ)=ZSNCs1(M,1,0,NZ)+CFOPNs1(3,M,NZ)*WTSTBNs1(NB,NZ)
+            PSNCs1(M,1,0,NZ)=PSNCs1(M,1,0,NZ)+CFOPPs1(3,M,NZ)*WTSTBPs1(NB,NZ)
           ELSE
-            WTSTDGs1(M,NZ)=WTSTDGs1(M,NZ) &
-              +CFOPCs1(5,M,NZ)*WTSTKBs1(NB,NZ)
-            WTSTDNs1(M,NZ)=WTSTDNs1(M,NZ) &
-              +CFOPNs1(5,M,NZ)*WTSTBNs1(NB,NZ)
-            WTSTDPs1(M,NZ)=WTSTDPs1(M,NZ) &
-              +CFOPPs1(5,M,NZ)*WTSTBPs1(NB,NZ)
+            WTSTDGs1(M,NZ)=WTSTDGs1(M,NZ)+CFOPCs1(5,M,NZ)*WTSTKBs1(NB,NZ)
+            WTSTDNs1(M,NZ)=WTSTDNs1(M,NZ)+CFOPNs1(5,M,NZ)*WTSTBNs1(NB,NZ)
+            WTSTDPs1(M,NZ)=WTSTDPs1(M,NZ)+CFOPPs1(5,M,NZ)*WTSTBPs1(NB,NZ)
           ENDIF
 8825    CONTINUE
 !
@@ -224,12 +262,9 @@ implicit none
 !
         DO 6415 L=NUs1,NJs1
           DO N=1,MYs1(NZ)
-            CSNCs1(M,1,L,NZ)=CSNCs1(M,1,L,NZ)+CFOPCs1(0,M,NZ) &
-              *CPOOLRs1(N,L,NZ)
-            ZSNCs1(M,1,L,NZ)=ZSNCs1(M,1,L,NZ)+CFOPNs1(0,M,NZ) &
-              *ZPOOLRs1(N,L,NZ)
-            PSNCs1(M,1,L,NZ)=PSNCs1(M,1,L,NZ)+CFOPPs1(0,M,NZ) &
-              *PPOOLRs1(N,L,NZ)
+            CSNCs1(M,1,L,NZ)=CSNCs1(M,1,L,NZ)+CFOPCs1(0,M,NZ)*CPOOLRs1(N,L,NZ)
+            ZSNCs1(M,1,L,NZ)=ZSNCs1(M,1,L,NZ)+CFOPNs1(0,M,NZ)*ZPOOLRs1(N,L,NZ)
+            PSNCs1(M,1,L,NZ)=PSNCs1(M,1,L,NZ)+CFOPPs1(0,M,NZ)*PPOOLRs1(N,L,NZ)
             DO NR=1,NRTs1(NZ)
               CSNCs1(M,0,L,NZ)=CSNCs1(M,0,L,NZ)+CFOPCs1(5,M,NZ) &
                 *(WTRT1s1(N,L,NR,NZ)+WTRT2s1(N,L,NR,NZ))*FWODRs1(0)
@@ -290,10 +325,20 @@ implicit none
   integer :: L,M,NR,N
 !     begin_execution
   associate(                                &
+    CPOOLRs1    =>   plt_biom%CPOOLRs1    , &
+    ZPOOLRs1    =>   plt_biom%ZPOOLRs1    , &
+    PPOOLRs1    =>   plt_biom%PPOOLRs1    , &
+    WTRTDs1     =>   plt_biom%WTRTDs1     , &
+    WTRTLs1     =>   plt_biom%WTRTLs1     , &
+    WSRTLs1     =>   plt_biom%WSRTLs1     , &
+    FWODRs1     =>   plt_allom%FWODRs1    , &
+    FWODRNs1    =>   plt_allom%FWODRNs1   , &
+    FWODRPs1    =>   plt_allom%FWODRPs1   , &
     IDTHRs1     =>   plt_pheno%IDTHRs1    , &
-    NIXs1       =>  plt_morph%NIXs1       , &
-    NINRs1      =>  plt_morph%NINRs1      , &
-    SDPTHs1     =>  plt_morph%SDPTHs1     , &
+    MYs1        =>   plt_morph%MYs1       , &
+    NIXs1       =>   plt_morph%NIXs1      , &
+    NINRs1      =>   plt_morph%NINRs1     , &
+    SDPTHs1     =>   plt_morph%SDPTHs1    , &
     NGs1        =>   plt_morph%NGs1       , &
     NRTs1       =>   plt_morph%NRTs1        &
   )
@@ -457,6 +502,44 @@ implicit none
   integer :: M,NB
 !     begin_execution
   associate(                                &
+    FWODBs1     =>  plt_allom%FWODBs1     , &
+    FWODSPs1    =>  plt_allom%FWODSPs1    , &
+    FWODSNs1    =>  plt_allom%FWODSNs1    , &
+    FWODLNs1    =>  plt_allom%FWODLNs1    , &
+    FWODLPs1    =>  plt_allom%FWODLPs1    , &
+    WTEABNs1    =>  plt_biom%WTEABNs1     , &
+    CPOLNBs1    =>  plt_biom%CPOLNBs1     , &
+    ZPOLNBs1    =>  plt_biom%ZPOLNBs1     , &
+    PPOLNBs1    =>  plt_biom%PPOLNBs1     , &
+    WTSTKBs1    =>  plt_biom%WTSTKBs1     , &
+    WTHSKBs1    =>  plt_biom%WTHSKBs1     , &
+    WTSHEBs1    =>  plt_biom%WTHSKBs1     , &
+    WTHSBNs1    =>  plt_biom%WTHSBNs1     , &
+    WTHSBPs1    =>  plt_biom%WTHSBPs1     , &
+    WTSHBPs1    =>  plt_biom%WTSHBPs1     , &
+    WTNDBs1     =>  plt_biom%WTNDBs1      , &
+    WTLFBs1     =>  plt_biom%WTLFBs1      , &
+    WTLFBNs1    =>  plt_biom%WTLFBNs1     , &
+    WTLFBPs1    =>  plt_biom%WTLFBPs1     , &
+    WTNDBNs1    =>  plt_biom%WTNDBNs1     , &
+    WTNDBPs1    =>  plt_biom%WTNDBPs1     , &
+    WTSHBNs1    =>  plt_biom%WTSHBNs1     , &
+    PPOOLs1     =>  plt_biom%PPOOLs1      , &
+    WTEARBs1    =>  plt_biom%WTEARBs1     , &
+    WTEABPs1    =>  plt_biom%WTEABPs1     , &
+    WTSTBNs1    =>  plt_biom%WTSTBNs1     , &
+    WTSTBPs1    =>  plt_biom%WTSTBPs1     , &
+    ZPOOLs1     =>  plt_biom%ZPOOLs1      , &
+    CPOOLs1     =>  plt_biom%CPOOLs1      , &
+    WTRVPs1     =>  plt_biom%WTRVPs1      , &
+    WTGRBPs1    =>  plt_biom%WTGRBPs1     , &
+    WTGRBs1     =>  plt_biom%WTGRBs1      , &
+    WTRSVBs1    =>  plt_biom%WTRSVBs1     , &
+    WTRSBNs1    =>  plt_biom%WTRSBNs1     , &
+    WTRSBPs1    =>  plt_biom%WTRSBPs1     , &
+    WTGRBNs1    =>  plt_biom%WTGRBNs1     , &
+    WTRVCs1     =>  plt_biom%WTRVCs1      , &
+    WTRVNs1     =>  plt_biom%WTRVNs1      , &
     IDTHBs1     =>  plt_pheno%IDTHBs1     , &
     GROUPs1     =>  plt_pheno%GROUPs1     , &
     VSTGXs1     =>  plt_pheno%VSTGXs1     , &
@@ -646,6 +729,52 @@ implicit none
   integer :: L,NR,N,NB
 !     begin_execution
   associate(                               &
+    CPOOLs1  => plt_biom%CPOOLs1         , &
+    ZPOOLs1  => plt_biom%ZPOOLs1         , &
+    CPOLNBs1 => plt_biom%CPOLNBs1        , &
+    ZPOLNBs1 => plt_biom%ZPOLNBs1        , &
+    WTSHTBs1 => plt_biom%WTSHTBs1        , &
+    WTLFBs1  => plt_biom%WTLFBs1         , &
+    WTRSVBs1 => plt_biom%WTRSVBs1        , &
+    WTSHEBs1 => plt_biom%WTSHEBs1        , &
+    WTHSKBs1 => plt_biom%WTHSKBs1        , &
+    WTEARBs1 => plt_biom%WTEARBs1        , &
+    WTGRBs1  => plt_biom%WTGRBs1         , &
+    WVSTKBs1 => plt_biom%WVSTKBs1        , &
+    WTRSBNs1 => plt_biom%WTRSBNs1        , &
+    WTHSBNs1 => plt_biom%WTHSBNs1        , &
+    CPOOLRs1 => plt_biom%CPOOLRs1        , &
+    ZPOOLRs1 => plt_biom%ZPOOLRs1        , &
+    PPOOLRs1 => plt_biom%PPOOLRs1        , &
+    WTEABNs1 => plt_biom%WTEABNs1        , &
+    WTGRBNs1 => plt_biom%WTGRBNs1        , &
+    WTSHTPs1 => plt_biom%WTSHTPs1        , &
+    WTLFBPs1 => plt_biom%WTLFBPs1        , &
+    WTNDBPs1 => plt_biom%WTNDBPs1        , &
+    WTSHBPs1 => plt_biom%WTSHBPs1        , &
+    WTSTBPs1 => plt_biom%WTSTBPs1        , &
+    WTRSBPs1 => plt_biom%WTRSBPs1        , &
+    WTHSBPs1 => plt_biom%WTHSBPs1        , &
+    WTEABPs1 => plt_biom%WTEABPs1        , &
+    WTGRBPs1 => plt_biom%WTGRBPs1        , &
+    WTSTXBs1 => plt_biom%WTSTXBs1        , &
+    WTSTXNs1 => plt_biom%WTSTXNs1        , &
+    WTSTXPs1 => plt_biom%WTSTXPs1        , &
+    WTSTBNs1 => plt_biom%WTSTBNs1        , &
+    WTLSBs1  => plt_biom%WTLSBs1         , &
+    WTSHBNs1 => plt_biom%WTSHBNs1        , &
+    WTRVCs1  => plt_biom%WTRVCs1         , &
+    WTRVNs1  => plt_biom%WTRVNs1         , &
+    WTRVPs1  => plt_biom%WTRVPs1         , &
+    WTLFBNs1 => plt_biom%WTLFBNs1        , &
+    WTSHTNs1 => plt_biom%WTSHTNs1        , &
+    WTNDBNs1 => plt_biom%WTNDBNs1        , &
+    WTNDBs1  => plt_biom%WTNDBs1         , &
+    WTSTKBs1 => plt_biom%WTSTKBs1        , &
+    PPOLNBs1 => plt_biom%PPOLNBs1        , &
+    PPOOLs1  => plt_biom%PPOOLs1         , &
+    IDTHs1   => plt_pheno%IDTHs1         , &
+    MYs1     =>   plt_morph%MYs1         , &
     NBRs1    => plt_morph%NBRs1          , &
     NRTs1    => plt_morph%NRTs1            &
   )
@@ -733,6 +862,58 @@ implicit none
   integer :: L,K,N
 !     begin_execution
   associate(                              &
+    CPOOLs1    => plt_biom%CPOOLs1      , &
+    ZPOOLs1    => plt_biom%ZPOOLs1      , &
+    PPOOLs1    => plt_biom%PPOOLs1      , &
+    CPOLNBs1   => plt_biom%CPOLNBs1     , &
+    PPOLNBs1   => plt_biom%PPOLNBs1     , &
+    WTSHTBs1   => plt_biom%WTSHTBs1     , &
+    WTLFBs1    => plt_biom%WTLFBs1      , &
+    WTNDBs1    => plt_biom%WTNDBs1      , &
+    WTSTKBs1   => plt_biom%WTSTKBs1     , &
+    WGLFs1     => plt_biom%WGLFs1       , &
+    WTRSVBs1   => plt_biom%WTRSVBs1     , &
+    WTRSBPs1   => plt_biom%WTRSBPs1     , &
+    WTHSBPs1   => plt_biom%WTHSBPs1     , &
+    WTSTXNs1   => plt_biom%WTSTXNs1     , &
+    WTSTXPs1   => plt_biom%WTSTXPs1     , &
+    WTSTXBs1   => plt_biom%WTSTXBs1     , &
+    WTSHBPs1   => plt_biom%WTSHBPs1     , &
+    WTEABPs1   => plt_biom%WTEABPs1     , &
+    WTGRBPs1   => plt_biom%WTGRBPs1     , &
+    WTLFBPs1   => plt_biom%WTLFBPs1     , &
+    WTNDBPs1   => plt_biom%WTNDBPs1     , &
+    WTSHTNs1   => plt_biom%WTSHTNs1     , &
+    WTSHBNs1   => plt_biom%WTSHBNs1     , &
+    WTSTBPs1   => plt_biom%WTSTBPs1     , &
+    WTNDBNs1   => plt_biom%WTNDBNs1     , &
+    WTSTBNs1   => plt_biom%WTSTBNs1     , &
+    WTSHTPs1   => plt_biom%WTSHTPs1     , &
+    WTEABNs1   => plt_biom%WTEABNs1     , &
+    WTGRBNs1   => plt_biom%WTGRBNs1     , &
+    WTHSBNs1   => plt_biom%WTHSBNs1     , &
+    WTRSBNs1   => plt_biom%WTRSBNs1     , &
+    WTLFBNs1   => plt_biom%WTLFBNs1     , &
+    WVSTKBs1   => plt_biom%WVSTKBs1     , &
+    WTGRBs1    => plt_biom%WTGRBs1      , &
+    WTLSBs1    => plt_biom%WTLSBs1      , &
+    WTHSKBs1   => plt_biom%WTHSKBs1     , &
+    WTEARBs1   => plt_biom%WTEARBs1     , &
+    WSSHEs1    => plt_biom%WSSHEs1      , &
+    WGLFNs1    => plt_biom%WGLFNs1      , &
+    WSLFs1     => plt_biom%WSLFs1       , &
+    WGLFPs1    => plt_biom%WGLFPs1      , &
+    WGLFLPs1   => plt_biom%WGLFLPs1     , &
+    WGNODEs1   => plt_biom%WGNODEs1     , &
+    WGNODNs1   => plt_biom%WGNODNs1     , &
+    WGNODPs1   => plt_biom%WGNODPs1     , &
+    WGSHPs1    => plt_biom%WGSHPs1      , &
+    WGSHNs1    => plt_biom%WGSHNs1      , &
+    WGSHEs1    => plt_biom%WGSHEs1      , &
+    WGLFLNs1   => plt_biom%WGLFLNs1     , &
+    WGLFLs1    => plt_biom%WGLFLs1      , &
+    WTSHEBs1   => plt_biom%WTSHEBs1     , &
+    ZPOLNBs1   => plt_biom%ZPOLNBs1     , &
     GRNXBs1    => plt_morph%GRNXBs1     , &
     GRNOBs1    => plt_morph%GRNOBs1     , &
     ARLFBs1    => plt_morph%ARLFBs1     , &

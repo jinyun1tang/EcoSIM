@@ -68,6 +68,9 @@ module PlantDisturbsMod
   integer :: M
 
 !     begin_execution
+  associate(                            &
+    WTSTGs1    =>  plt_biom%WTSTGs1     &
+  )
 
   WTHTH0=0._r8;WTHNH0=0._r8;WTHPH0=0._r8
   WTHTH1=0._r8;WTHNH1=0._r8;WTHPH1=0._r8
@@ -145,6 +148,7 @@ module PlantDisturbsMod
     ZEROQs1(NZ)=ZEROs1*PPs1(NZ)/AREA3s1(NUs1)
     ZEROLs1(NZ)=ZEROs1*PPs1(NZ)*1.0E+06
   ENDIF
+  end associate
   end subroutine RemoveBiomassByDisturbance
 
 
@@ -200,6 +204,9 @@ module PlantDisturbsMod
   integer :: m
 !     begin_execution
   associate(                            &
+    FWOODs1    =>  plt_allom%FWOODs1  , &
+    FWOODPs1   =>  plt_allom%FWOODPs1 , &
+    FWOODNs1   =>  plt_allom%FWOODNs1 , &
     IBTYPs1    =>  plt_pheno%IBTYPs1  , &
     IGTYPs1    =>  plt_pheno%IGTYPs1    &
   )
@@ -358,6 +365,11 @@ module PlantDisturbsMod
   real(r8), intent(out):: WTHPXT,WTHTRT,WTHNRT,WTHPRT,WTHTXT,WTHNXT
   real(r8) :: WTHTHT,WTHNHT,WTHPHT
 !     begin_execution
+  associate(                            &
+    WTRVNs1    =>  plt_biom%WTRVNs1   , &
+    WTRVCs1    =>  plt_biom%WTRVCs1   , &
+    WTRVPs1    =>  plt_biom%WTRVPs1     &
+  )
 !
 !     WTHTHT,WTHNHT,WTHPHT=total C,N,P removed
 !     WTHTRT,WTHNRT,WTHPRT=total C,N,P to litter
@@ -422,19 +434,20 @@ module PlantDisturbsMod
 !     TRAU=total autotrophic respiration
 !
   ELSE
-      HVSTCs1(NZ)=HVSTCs1(NZ)+GY*(WTHTHT-WTHTRT)
-      HVSTNs1(NZ)=HVSTNs1(NZ)+WTHNHT-WTHNRT
-      HVSTPs1(NZ)=HVSTPs1(NZ)+WTHPHT-WTHPRT
-      TCO2Ts1(NZ)=TCO2Ts1(NZ)-GZ*(WTHTHT-WTHTRT)
-      TCO2As1(NZ)=TCO2As1(NZ)-GZ*(WTHTHT-WTHTRT)
+    HVSTCs1(NZ)=HVSTCs1(NZ)+GY*(WTHTHT-WTHTRT)
+    HVSTNs1(NZ)=HVSTNs1(NZ)+WTHNHT-WTHNRT
+    HVSTPs1(NZ)=HVSTPs1(NZ)+WTHPHT-WTHPRT
+    TCO2Ts1(NZ)=TCO2Ts1(NZ)-GZ*(WTHTHT-WTHTRT)
+    TCO2As1(NZ)=TCO2As1(NZ)-GZ*(WTHTHT-WTHTRT)
 !     TNBPs1=TNBPs1+GY*(WTHTRT-WTHTHT)
 !     CNETs1(NZ)=CNETs1(NZ)+GZ*(WTHTRT-WTHTHT)
-      XHVSTCs1=XHVSTCs1+GY*(WTHTHT-WTHTRT)
-      XHVSTNs1=XHVSTNs1+WTHNHT-WTHNRT
-      XHVSTPs1=XHVSTPs1+WTHPHT-WTHPRT
-      RECOs1=RECOs1-GZ*(WTHTHT-WTHTRT)
-      TRAUs1=TRAUs1-GZ*(WTHTHT-WTHTRT)
+    XHVSTCs1=XHVSTCs1+GY*(WTHTHT-WTHTRT)
+    XHVSTNs1=XHVSTNs1+WTHNHT-WTHNRT
+    XHVSTPs1=XHVSTPs1+WTHPHT-WTHPRT
+    RECOs1=RECOs1-GZ*(WTHTHT-WTHTRT)
+    TRAUs1=TRAUs1-GZ*(WTHTHT-WTHTRT)
   ENDIF
+  end associate
   end subroutine TotalBiomRemovalByDisturbance
 !------------------------------------------------------------------------------------------
 
@@ -637,15 +650,91 @@ module PlantDisturbsMod
   real(r8) :: WVPLT
 !     begin_execution
   associate(                               &
+    CPOOLRs1    =>  plt_biom%CPOOLRs1    , &
+    ZPOOLRs1    =>  plt_biom%ZPOOLRs1    , &
+    PPOOLRs1    =>  plt_biom%PPOOLRs1    , &
+    WSRTLs1    =>  plt_biom%WSRTLs1      , &
+    WTRTDs1    =>  plt_biom%WTRTDs1      , &
+    WTRTLs1    =>  plt_biom%WTRTLs1      , &
+    WTRVPs1    =>  plt_biom%WTRVPs1      , &
+    WTRVCs1    =>  plt_biom%WTRVCs1      , &
+    WTRVNs1    =>  plt_biom%WTRVNs1      , &
+    WGLFLPs1   =>  plt_biom%WGLFLPs1     , &
+    WTLFBPs1   =>  plt_biom%WTLFBPs1     , &
+    WTLFBs1    =>  plt_biom%WTLFBs1      , &
+    WTGRBNs1   =>  plt_biom%WTGRBNs1     , &
+    WTGRBs1    =>  plt_biom%WTGRBs1      , &
+    WTEARBs1   =>  plt_biom%WTEARBs1     , &
+    CPOLNBs1   =>  plt_biom%CPOLNBs1     , &
+    PPOOLs1    =>  plt_biom%PPOOLs1      , &
+    ZPOOLs1    =>  plt_biom%ZPOOLs1      , &
+    CPOOLs1    =>  plt_biom%CPOOLs1      , &
+    WTLFBNs1   =>  plt_biom%WTLFBNs1     , &
+    WTSHTNs1   =>  plt_biom%WTSHTNs1     , &
+    WTHSKBs1   =>  plt_biom%WTHSKBs1     , &
+    WTRSVBs1   =>  plt_biom%WTRSVBs1     , &
+    WTNDBs1    =>  plt_biom%WTNDBs1      , &
+    WTSHTBs1   =>  plt_biom%WTSHTBs1     , &
+    PPOLNBs1   =>  plt_biom%PPOLNBs1     , &
+    ZPOLNBs1   =>  plt_biom%ZPOLNBs1     , &
+    WTSTKBs1   =>  plt_biom%WTSTKBs1     , &
+    WTEABNs1   =>  plt_biom%WTEABNs1     , &
+    WTSHBNs1   =>  plt_biom%WTSHBNs1     , &
+    WTSTBNs1   =>  plt_biom%WTSTBNs1     , &
+    WTHSBNs1   =>  plt_biom%WTHSBNs1     , &
+    WTNDBNs1   =>  plt_biom%WTNDBNs1     , &
+    WTRSBNs1   =>  plt_biom%WTRSBNs1     , &
+    WTSHTPs1   =>  plt_biom%WTSHTPs1     , &
+    WGLFLNs1   =>  plt_biom%WGLFLNs1     , &
+    WTSHBPs1   =>  plt_biom%WTSHBPs1     , &
+    WTNDBPs1   =>  plt_biom%WTNDBPs1     , &
+    WGLFLs1    =>  plt_biom%WGLFLs1      , &
+    WGSHPs1    =>  plt_biom%WGSHPs1      , &
+    WTSHEBs1   =>  plt_biom%WTSHEBs1     , &
+    WTEABPs1   =>  plt_biom%WTEABPs1     , &
+    WTHSBPs1   =>  plt_biom%WTHSBPs1     , &
+    WTRSBPs1   =>  plt_biom%WTRSBPs1     , &
+    WTSTBPs1   =>  plt_biom%WTSTBPs1     , &
+    WGLFs1     =>  plt_biom%WGLFs1       , &
+    WTSTXNs1   =>  plt_biom%WTSTXNs1     , &
+    WTLSBs1    =>  plt_biom%WTLSBs1      , &
+    WTGRBPs1   =>  plt_biom%WTGRBPs1     , &
+    WTSTXBs1   =>  plt_biom%WTSTXBs1     , &
+    WVSTKBs1   =>  plt_biom%WVSTKBs1     , &
+    WTSTXPs1   =>  plt_biom%WTSTXPs1     , &
+    WGLFPs1    =>  plt_biom%WGLFPs1      , &
+    WSSHEs1    =>  plt_biom%WSSHEs1      , &
+    WGSHEs1    =>  plt_biom%WGSHEs1      , &
+    WSLFs1     =>  plt_biom%WSLFs1       , &
+    WGSHNs1    =>  plt_biom%WGSHNs1      , &
+    WGNODEs1   =>  plt_biom%WGNODEs1     , &
+    WGLFNs1    =>  plt_biom%WGLFNs1      , &
+    WGNODNs1   =>  plt_biom%WGNODNs1     , &
+    WGNODPs1   =>  plt_biom%WGNODPs1     , &
+    WVSTKs1    =>  plt_biom%WVSTKs1      , &
+    WTLSs1     =>  plt_biom%WTLSs1       , &
+    FWOODPs1   =>  plt_allom%FWOODPs1    , &
+    FWOODNs1   =>  plt_allom%FWOODNs1    , &
+    FWOODs1    =>  plt_allom%FWOODs1     , &
+    FWODLPs1   =>  plt_allom%FWODLPs1    , &
+    FWODSNs1   =>  plt_allom%FWODSNs1    , &
+    FWODBs1    =>  plt_allom%FWODBs1     , &
+    FWODRPs1   =>  plt_allom%FWODRPs1    , &
+    FWODSPs1   =>  plt_allom%FWODSPs1    , &
+    FWODLNs1   =>  plt_allom%FWODLNs1    , &
+    FWODRs1    =>  plt_allom%FWODRs1     , &
+    FWODRNs1   =>  plt_allom%FWODRNs1    , &
     IDTHBs1    =>  plt_pheno%IDTHBs1     , &
-    ISTYPs1    =>   plt_pheno%ISTYPs1    , &
+    ISTYPs1    =>  plt_pheno%ISTYPs1     , &
+    IDTHs1     =>  plt_pheno%IDTHs1      , &
     IGTYPs1    =>  plt_pheno%IGTYPs1     , &
     IBTYPs1    =>  plt_pheno%IBTYPs1     , &
     IWTYPs1    =>  plt_pheno%IWTYPs1     , &
-    IDTHRs1    =>   plt_pheno%IDTHRs1    , &
-    IDTHPs1    =>   plt_pheno%IDTHPs1    , &
-    FRADPs1    => plt_rad%FRADPs1        , &
-    NGs1       =>   plt_morph%NGs1       , &
+    IDTHRs1    =>  plt_pheno%IDTHRs1     , &
+    IDTHPs1    =>  plt_pheno%IDTHPs1     , &
+    FRADPs1    =>  plt_rad%FRADPs1       , &
+    NGs1       =>  plt_morph%NGs1        , &
+    MYs1       =>  plt_morph%MYs1        , &
     NRTs1      => plt_morph%NRTs1        , &
     NBRs1      => plt_morph%NBRs1        , &
     ARLF1s1    => plt_morph%ARLF1s1      , &
@@ -1108,6 +1197,83 @@ module PlantDisturbsMod
   real(r8) :: WGLFPG,WHVSBS,WHVSCX,WHVSNX,WVPLT
 !     begin_execution
   associate(                            &
+    CPOOLRs1    => plt_biom%CPOOLRs1  , &
+    ZPOOLRs1    => plt_biom%ZPOOLRs1  , &
+    PPOOLRs1    => plt_biom%PPOOLRs1  , &
+    WSRTLs1    => plt_biom%WSRTLs1    , &
+    WTRTDs1    => plt_biom%WTRTDs1    , &
+    WTRTLs1    => plt_biom%WTRTLs1    , &
+    WTRVCs1    => plt_biom%WTRVCs1    , &
+    WVSTKs1    => plt_biom%WVSTKs1    , &
+    WTLSs1     => plt_biom%WTLSs1     , &
+    WTRVPs1    => plt_biom%WTRVPs1    , &
+    WTRVNs1    => plt_biom%WTRVNs1    , &
+    WVSTKBs1   => plt_biom%WVSTKBs1   , &
+    WTNDBs1    => plt_biom%WTNDBs1    , &
+    WTNDBNs1   => plt_biom%WTNDBNs1   , &
+    WTRSVs1    => plt_biom%WTRSVs1    , &
+    WTGRBs1    => plt_biom%WTGRBs1    , &
+    WTGRBNs1   => plt_biom%WTGRBNs1   , &
+    WTSTKBs1   => plt_biom%WTSTKBs1   , &
+    WTSHTNs1   => plt_biom%WTSHTNs1   , &
+    WTSHTPs1   => plt_biom%WTSHTPs1   , &
+    WTHSBPs1   => plt_biom%WTHSBPs1   , &
+    WTSHTBs1   => plt_biom%WTSHTBs1   , &
+    WTSTBNs1   => plt_biom%WTSTBNs1   , &
+    WTHSKBs1   => plt_biom%WTHSKBs1   , &
+    WTHSBNs1   => plt_biom%WTHSBNs1   , &
+    WTEABPs1   => plt_biom%WTEABPs1   , &
+    WTEARBs1   => plt_biom%WTEARBs1   , &
+    WTEABNs1   => plt_biom%WTEABNs1   , &
+    WTGRBPs1   => plt_biom%WTGRBPs1   , &
+    WTSTXNs1   => plt_biom%WTSTXNs1   , &
+    WGNODEs1   => plt_biom%WGNODEs1   , &
+    WTRSBNs1   => plt_biom%WTRSBNs1   , &
+    WTSTXPs1   => plt_biom%WTSTXPs1   , &
+    WTNDBPs1   => plt_biom%WTNDBPs1   , &
+    WTRSBPs1   => plt_biom%WTRSBPs1   , &
+    WTLSBs1    => plt_biom%WTLSBs1    , &
+    WTSTBPs1   => plt_biom%WTSTBPs1   , &
+    WGNODNs1   => plt_biom%WGNODNs1   , &
+    WGNODPs1   => plt_biom%WGNODPs1   , &
+    WTRSVBs1   => plt_biom%WTRSVBs1   , &
+    WTSTXBs1   => plt_biom%WTSTXBs1   , &
+    CPOLNBs1   => plt_biom%CPOLNBs1   , &
+    ZPOLNBs1   => plt_biom%ZPOLNBs1   , &
+    PPOLNBs1   => plt_biom%PPOLNBs1   , &
+    WGLFLs1    => plt_biom%WGLFLs1    , &
+    WGLFLNs1   => plt_biom%WGLFLNs1   , &
+    WGLFLPs1   => plt_biom%WGLFLPs1   , &
+    WGLFPs1    => plt_biom%WGLFPs1    , &
+    WTSHEBs1   => plt_biom%WTSHEBs1   , &
+    CPOOLs1    => plt_biom%CPOOLs1    , &
+    ZPOOLs1    => plt_biom%ZPOOLs1    , &
+    PPOOLs1    => plt_biom%PPOOLs1    , &
+    WGSHEs1    => plt_biom%WGSHEs1    , &
+    WTLFBNs1   => plt_biom%WTLFBNs1   , &
+    WGLFNs1    => plt_biom%WGLFNs1    , &
+    WTLFBPs1   => plt_biom%WTLFBPs1   , &
+    WSLFs1     => plt_biom%WSLFs1     , &
+    WGLFs1     => plt_biom%WGLFs1     , &
+    WTLFBs1    => plt_biom%WTLFBs1    , &
+    WSSHEs1    => plt_biom%WSSHEs1    , &
+    WTSHBNs1   => plt_biom%WTSHBNs1   , &
+    WTSHBPs1   => plt_biom%WTSHBPs1   , &
+    WGSHNs1    => plt_biom%WGSHNs1    , &
+    WGSHPs1    => plt_biom%WGSHPs1    , &
+    WTSTKs1    => plt_biom%WTSTKs1    , &
+    FWOODNs1   => plt_allom%FWOODNs1  , &
+    FVRNs1     => plt_allom%FVRNs1    , &
+    FWODRs1    => plt_allom%FWODRs1   , &
+    FWODRPs1   => plt_allom%FWODRPs1  , &
+    FWODRNs1   => plt_allom%FWODRNs1  , &
+    FWOODPs1   => plt_allom%FWOODPs1  , &
+    FWODSNs1   => plt_allom%FWODSNs1  , &
+    FWODSPs1   => plt_allom%FWODSPs1  , &
+    FWOODs1    => plt_allom%FWOODs1   , &
+    FWODBs1    => plt_allom%FWODBs1   , &
+    FWODLNs1   => plt_allom%FWODLNs1  , &
+    FWODLPs1   => plt_allom%FWODLPs1  , &
     IDTHBs1    =>  plt_pheno%IDTHBs1  , &
     IDAYs1     =>  plt_pheno%IDAYs1   , &
     GROUPs1    =>  plt_pheno%GROUPs1  , &
@@ -1125,6 +1291,7 @@ module PlantDisturbsMod
     CORGCs1    =>  plt_soilchem%CORGCs1, &
     THETWs1    =>  plt_soilchem%THETWs1, &
     NGs1       =>  plt_morph%NGs1     , &
+    MYs1       => plt_morph%MYs1      , &
     ZCs1       => plt_morph%ZCs1      , &
     ARLFTs1    => plt_morph%ARLFTs1   , &
     ZLs1       => plt_morph%ZLs1      , &
@@ -1147,7 +1314,16 @@ module PlantDisturbsMod
     PSTGIs1    => plt_morph%PSTGIs1   , &
     PSTGs1     => plt_morph%PSTGs1    , &
     CFs1       => plt_morph%CFs1      , &
-    ARLFCs1    => plt_morph%ARLFCs1     &
+    ARLFCs1    => plt_morph%ARLFCs1   , &
+    CCPOLPs1   => plt_biom%CCPOLPs1   , &
+    CCPLNPs1   => plt_biom%CCPLNPs1   , &
+    WTLFs1     => plt_biom%WTLFs1     , &
+    WTGRs1     => plt_biom%WTGRs1     , &
+    WTSHTs1    => plt_biom%WTSHTs1    , &
+    WTHSKs1    => plt_biom%WTHSKs1    , &
+    WTEARs1    => plt_biom%WTEARs1    , &
+    WTSHEs1    => plt_biom%WTSHEs1    , &
+    WTSHTAs1   => plt_biom%WTSHTAs1     &
   )
 !     IHVST=harvest type:0=none,1=grain,2=all above-ground
 !                       ,3=pruning,4=grazing,5=fire,6=herbivory
@@ -1198,10 +1374,6 @@ module PlantDisturbsMod
             HVSTs1(NZ)=0._r8
           ENDIF
           ARLFR=ARLFR+ARLFTs1(L)
-!     WRITE(*,6544)'HVST',I,J,L,NZ,IHVSTs1(NZ),ARLFCs1
-!    2,ARLFTs1(L),ARLFY,ARLFR,ZLs1(L),ZLs1(L-1)
-!    3,ARLFVs1(L,NZ),HVSTs1(NZ)
-!6544  FORMAT(A8,5I4,20E12.4)
 9875    CONTINUE
       ENDIF
       WHVSTT=0._r8
@@ -1936,13 +2108,7 @@ module PlantDisturbsMod
             HTNODXs1(K,NB,NZ)=FHVSTS*HTNODXs1(K,NB,NZ)
             HTNODEs1(K,NB,NZ)=AMIN1(HTNODEs1(K,NB,NZ),HVSTs1(NZ))
           ENDIF
-!     IF(NZ.EQ.2)THEN
-!     WRITE(*,4811)'STK2',I,J,NX,NY,NZ,NB,K,IHVSTs1(NZ)
-!    2,HTNODXs1(K,NB,NZ),HTNODEs1(K,NB,NZ)
-!    3,HVSTs1(NZ),FHGTK,FHVSTS,ARLF1s1(K,NB,NZ)
-!    4,EHVSTs1(1,3,NZ),THINs1(NZ)
-!4811  FORMAT(A8,8I4,12E12.4)
-!     ENDIF
+
 9820    CONTINUE
 !
 !     CUT STALK RESERVES

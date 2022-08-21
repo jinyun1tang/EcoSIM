@@ -49,6 +49,21 @@ module NoduleBGCMod
   real(r8) :: XFRC,XFRN,XFRP
   REAL(R8) :: RCCC,RCCN,RCCP
 !     begin_execution
+  associate(                             &
+    DMNDs1     =>  plt_allom%DMNDs1    , &
+    CNNDs1     =>  plt_allom%CNNDs1    , &
+    CPNDs1     =>  plt_allom%CPNDs1    , &
+    WTLSBs1    =>  plt_biom%WTLSBs1    , &
+    WTNDBPs1   =>  plt_biom%WTNDBPs1   , &
+    CPOOLs1    =>  plt_biom%CPOOLs1    , &
+    PPOOLs1    =>  plt_biom%PPOOLs1    , &
+    ZPOOLs1    =>  plt_biom%ZPOOLs1    , &
+    CPOLNBs1   =>  plt_biom%CPOLNBs1   , &
+    ZPOLNBs1   =>  plt_biom%ZPOLNBs1   , &
+    PPOLNBs1   =>  plt_biom%PPOLNBs1   , &
+    WTNDBNs1   =>  plt_biom%WTNDBNs1   , &
+    WTNDBs1    =>  plt_biom%WTNDBs1      &
+  )
 !     INTYP=N2 fixation: 4,5,6=rapid to slow canopy symbiosis
 !
   IF(INTYPs1(NZ).GE.4)THEN
@@ -313,18 +328,6 @@ module NoduleBGCMod
     WTNDBs1(NB,NZ)=WTNDBs1(NB,NZ)+GRNDG-RXNDLC-RXNSNC
     WTNDBNs1(NB,NZ)=WTNDBNs1(NB,NZ)+ZADDN-RXNDLN-RXNSNN
     WTNDBPs1(NB,NZ)=WTNDBPs1(NB,NZ)+PADDN-RXNDLP-RXNSNP
-!     IF((I/30)*30.EQ.I.AND.J.EQ.12)THEN
-!     WRITE(*,2121)'NODGR',I,J,NZ,NB
-!    2,RCNDL,RMNDL,RGNDL,RGN2P,RCO2T,RXNDLC,SPNDLI
-!    2,RGN2P,RGN2F,CGNDL,RSNDL,GRNDG,RGNDG,RCNSNC
-!    3,ZADDN,PADDN,RCCC,RCCN
-!    8,RCCP,RDNDLC,RDNDLN,RDNDLP,RDNDLX,WTLSBs1(NB,NZ)
-!    3,WTNDBs1(NB,NZ),WTNDBNs1(NB,NZ),WTNDBPs1(NB,NZ)
-!    4,CPOLNBs1(NB,NZ),ZPOLNBs1(NB,NZ),PPOLNBs1(NB,NZ)
-!    5,CCPOLN,CZPOLN,CPPOLN
-!    6,TFN3s1(NZ),FCNPF,WFNG,CCNDLB,RDNDBX,CPOOLNX,VMXOX
-!2121  FORMAT(A8,4I4,60F16.8)
-!     ENDIF
 !
 !     TRANSFER NON-STRUCTURAL C,N,P BETWEEN BRANCH AND NODULES
 !     FROM NON-STRUCTURAL C,N,P CONCENTRATION DIFFERENCES
@@ -363,23 +366,11 @@ module NoduleBGCMod
           PPOOLs1(NB,NZ)=PPOOLs1(NB,NZ)-XFRP
           ZPOLNBs1(NB,NZ)=ZPOLNBs1(NB,NZ)+XFRN
           PPOLNBs1(NB,NZ)=PPOLNBs1(NB,NZ)+XFRP
-!     IF((I/30)*30.EQ.I.AND.J.EQ.12)THEN
-!     WRITE(*,2120)'NODEX',I,J,NZ,NB,IFLGAs1(NB,NZ)
-!    2,XFRC,XFRN,XFRP
-!    3,WTLSBs1(NB,NZ),WTNDBs1(NB,NZ),CPOOLT,CCNDLB,FXRNX
-!    4,CPOLNBs1(NB,NZ),ZPOLNBs1(NB,NZ),PPOLNBs1(NB,NZ)
-!    4,CPOOLs1(NB,NZ),ZPOOLs1(NB,NZ),PPOOLs1(NB,NZ)
-!    5,WTLSB1,WTNDB1,WTLSBT
-!2120  FORMAT(A8,5I4,40E12.4)
-!     ENDIF
-!     WRITE(*,2121)'NODBAL',I,J,NZ,NB,CPOLNBs1(NB,NZ)
-!    2,WTNDBs1(NB,NZ),CPOLNBs1(NB,NZ)+WTNDBs1(NB,NZ)
-!    3,RMNDL,RCNDL,RGN2F,CGNDL,RCNDLC,GRNDG,RXNDLC,RXNSNC,RCO2T
-!    4,RGNDG,RGNDL,RCNSNC
         ENDIF
       ENDIF
     ENDIF
   ENDIF
+  end associate
   end subroutine CanopyNoduleBiochemistry
 
 !------------------------------------------------------------------------------------------
@@ -425,6 +416,13 @@ module NoduleBGCMod
   real(r8) :: RCCC,RCCN,RCCP
 !     begin_execution
   associate(                               &
+    DMNDs1     =>   plt_allom%DMNDs1     , &
+    CNNDs1     =>   plt_allom%CNNDs1     , &
+    CPNDs1     =>   plt_allom%CPNDs1     , &
+    WTRTDs1    =>   plt_biom%WTRTDs1     , &
+    CPOOLRs1   =>   plt_biom%CPOOLRs1    , &
+    ZPOOLRs1   =>   plt_biom%ZPOOLRs1    , &
+    PPOOLRs1   =>   plt_biom%PPOOLRs1    , &
     NIXs1      =>   plt_morph%NIXs1        &
   )
 !     INTYP=N2 fixation: 1,2,3=rapid to slow root symbiosis
@@ -695,17 +693,6 @@ module NoduleBGCMod
         WTNDLs1(L,NZ)=WTNDLs1(L,NZ)+GRNDG-RXNDLC-RXNSNC
         WTNDLNs1(L,NZ)=WTNDLNs1(L,NZ)+ZADDN-RXNDLN-RXNSNN
         WTNDLPs1(L,NZ)=WTNDLPs1(L,NZ)+PADDN-RXNDLP-RXNSNP
-!     IF((I/30)*30.EQ.I.AND.J.EQ.12)THEN
-!     WRITE(*,2122)'NODGR',I,J,NZ,L,RCNDLM,RCNDL,RMNDL,RGNDL,RGN2P
-!    2,RGN2F,CGNDL,RSNDL,GRNDG,ZADDN,PADDN,RCCC,RCCN,RCCP
-!    8,RDNDLC,RDNDLN,RDNDLP,RCNDLC,RDNDLX,WFRs1(1,L,NZ)
-!    3,WTNDLs1(L,NZ),WTNDLNs1(L,NZ),WTNDLPs1(L,NZ)
-!    2,CPOOLNs1(L,NZ),ZPOOLNs1(L,NZ),PPOOLNs1(L,NZ)
-!    5,FCNPF,TFN4s1(L,NZ),WFNGR(1,L),PSIRTs1(1,L,NZ)
-!    5,CCPOLN,CZPOLN,CPPOLN,CPOOLNX
-!    6,VMXO*WTNDLs1(L,NZ)*TFN4s1(L,NZ)*FCNPF*WFNGR(1,L)
-!2122  FORMAT(A8,4I4,60E14.6)
-!     ENDIF
 !
 !     TRANSFER NON-STRUCTURAL C,N,P BETWEEN ROOT AND NODULES
 !     FROM NON-STRUCTURAL C,N,P CONCENTRATION DIFFERENCES

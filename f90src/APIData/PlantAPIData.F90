@@ -72,7 +72,6 @@ implicit none
   real(r8) :: ZPSNCs1     !total litterfall P, [g d-2 h-1]
   real(r8) :: ZCSNCs1     !total litterfall C, [g d-2 h-1]
   real(r8) :: VOLISs1     !ice volume in snowpack, [m3 d-2]
-  real(r8) :: WTSTGTs1    !total standing dead C, [g d-2]
   real(r8) :: TKWs1       !snow temperature, [K]
   real(r8) :: TVOLWCs1    !canopy surface water content, [m3 d-2]
   real(r8) :: TSHs1       !ecosystem sensible heat flux, [MJ d-2 h-1]
@@ -109,13 +108,12 @@ implicit none
   character(len=16), allocatable :: DATAPs1(:) !parameter file name
   CHARACTER(len=16), allocatable :: DATAs1(:)  !pft file
   real(r8), allocatable :: AREA3s1(:)    !soil cross section area (vertical plan defined by its normal direction)
-  integer,  allocatable :: IDTHs1(:)     !flag for species death
+
   integer,  allocatable :: IYR0s1(:)     !year of planting
   integer,  allocatable :: IDAYXs1(:)    !!alternate day of planting
   integer,  allocatable :: IYRXs1(:)     !alternate year of planting
   integer,  allocatable :: IYRYs1(:)     !alternate year of harvest
   integer,  allocatable :: INTYPs1(:)    !N2 fixation type
-  integer,  allocatable :: IFLGCs1(:)    !flag for living pft
   integer,  allocatable :: IDAY0s1(:)    !day of planting
   integer,  allocatable :: IDAYHs1(:)    !day of harvest
   integer,  allocatable :: IYRHs1(:)     !year of harvest
@@ -123,7 +121,6 @@ implicit none
   integer,  allocatable :: IHVSTs1(:)    !type of harvest
   integer,  allocatable :: JHVSTs1(:)    !flag for stand replacing disturbance
   integer,  allocatable :: ICTYPs1(:)    !plant photosynthetic type (C3 or C4)
-  integer,  allocatable :: MYs1(:)       !mycorrhizal type (no or yes)
   integer,  allocatable :: IDATAs1(:)    !time keeper
   real(r8), allocatable :: FERTs1(:)     !fertilizer application, [g m-2]
   real(r8), allocatable :: TDFOMCs1(:,:) !total root C exchange, [gC d-2 h-1]
@@ -131,26 +128,6 @@ implicit none
   real(r8), allocatable :: TDFOMPs1(:,:) !total root P exchange, [gP d-2 h-1]
   real(r8), allocatable :: RUPNFs1(:,:)  !root N2 fixation, [gN d-2 h-1]
 
-  real(r8), allocatable :: CPEARs1(:)    !ear P:C ratio, [gP gC-1]
-  real(r8), allocatable :: DMSHEs1(:)    !sheath growth yield, [g g-1]
-  real(r8), allocatable :: CPHSKs1(:)    !husk P:C ratio, [gP gC-1]
-  real(r8), allocatable :: DMSTKs1(:)    !stalk growth yield, [gC gC-1]
-  real(r8), allocatable :: DMHSKs1(:)    !husk growth yield, [gC gC-1]
-  real(r8), allocatable :: DMRSVs1(:)    !reserve growth yield, [gC gC-1]
-  real(r8), allocatable :: DMGRs1(:)     !grain growth yield, [gC gC-1]
-  real(r8), allocatable :: DMEARs1(:)    !ear growth yield, [gC gC-1]
-  real(r8), allocatable :: CNHSKs1(:)    !husk N:C ratio, [gN gC-1]
-  real(r8), allocatable :: CNRSVs1(:)    !reserve N:C ratio, [gN gC-1]
-  real(r8), allocatable :: CNEARs1(:)    !ear N:C ratio, [gN gC-1]
-  real(r8), allocatable :: CPRSVs1(:)    !reserve P:C ratio, [gP gC-1]
-  real(r8), allocatable :: CPGRs1(:)     !grain P:C ratio, [gP gP-1]
-  real(r8), allocatable :: CNSTKs1(:)    !stalk N:C ratio, [gN gC-1]
-
-
-  real(r8), allocatable :: WGLFTs1(:)    !total leaf mass, [gC d-2]
-
-
-  real(r8), allocatable :: WTSTDIs1(:)   !initial standing dead C, [g C m-2]
   real(r8), allocatable :: TCCs1(:)      !canopy temperature, [oC]
   real(r8), allocatable :: DTKCs1(:)     !change in canopy temperature, [K]
   real(r8), allocatable :: ENGYXs1(:)    !canopy heat storage from previous time step, [MJ d-2]
@@ -168,24 +145,10 @@ implicit none
   real(r8), allocatable :: PPIs1(:)      !initial plant population, [m-2]
   real(r8), allocatable :: PPZs1(:)      !plant population at seeding, [m-2]
   real(r8), allocatable :: PPXs1(:)      !plant population, [m-2]
-  real(r8), allocatable :: PPs1(:)        !plant population, [d-2]
+  real(r8), allocatable :: PPs1(:)       !plant population, [d-2]
   real(r8), allocatable :: DPTHZs1(:)    !depth to middle of soil layer from  surface of grid cell [m]
   real(r8), allocatable :: CFIs1(:)      !initial clumping factor for self-shading in canopy layer, [-]
-  real(r8), allocatable :: WTRTs1(:)     !plant root C, [gC d-2]
   real(r8), allocatable :: FMPRs1(:)     !micropore fraction
-  real(r8), allocatable :: FWODBs1(:)    !woody C allocation
-  real(r8), allocatable :: FWODLNs1(:)   !leaf N allocation
-  real(r8), allocatable :: FWODLPs1(:)   !leaf P allocation
-  real(r8), allocatable :: FWODSPs1(:)   !P woody fraction in petiole
-  real(r8), allocatable :: FWODSNs1(:)   !N woody fraction in petiole
-  real(r8), allocatable :: FWODRNs1(:)   !N woody fraction in root
-  real(r8), allocatable :: FWODRPs1(:)   !P woody fraction in root
-  real(r8), allocatable :: FWODRs1(:)    !C woody fraction in root
-  real(r8), allocatable :: FWOODs1(:)    !woody C allocation
-  real(r8), allocatable :: FVRNs1(:)     !allocation parameter
-  real(r8), allocatable :: FWOODNs1(:)   !woody N allocation
-  real(r8), allocatable :: FWOODPs1(:)   !woody P allocation
-
 
   real(r8), allocatable :: ROXYXs1(:)    !total root + microbial O2 uptake, [g d-2 h-1]
   real(r8), allocatable :: RNHBXs1(:)    !total root + microbial NH4 uptake band, [gN d-2 h-1]
@@ -211,9 +174,6 @@ implicit none
   real(r8), allocatable :: PSILZs1(:)    !minimum daily canopy water potential, [MPa]
   real(r8), allocatable :: RSMNs1(:)     !canopy minimum stomatal resistance, [s m-1]
   real(r8), allocatable :: DLYR3s1(:)    !vertical thickness of soil layer [m]
-  real(r8), allocatable :: WTRTSs1(:)    !plant root structural C, [gC d-2]
-  real(r8), allocatable :: WTRTSNs1(:)   !plant root structural N, [gN d-2]
-  real(r8), allocatable :: WTRTSPs1(:)   !plant root structural P, [gP d-2]
   real(r8), allocatable :: SFLXCs1(:)    !canopy sensible heat flux, [MJ d-2 h-1]
   real(r8), allocatable :: RCs1(:)       !canopy stomatal resistance, [h m-1]
   real(r8), allocatable :: TKCZs1(:)     !canopy temperature, [K]
@@ -274,29 +234,15 @@ implicit none
   real(r8), allocatable :: BALCs1(:)      !plant C balance, [gC d-2]
   real(r8), allocatable :: BALNs1(:)      !plant N balance, [gN d-2]
   real(r8), allocatable :: BALPs1(:)      !plant P balance, [gP d-2]
-  real(r8), allocatable :: CCPOLPs1(:)    !canopy nonstructural C concentration, [gC d-2]
-  real(r8), allocatable :: CPOOLPs1(:)    !canopy nonstructural P concentration, [gP d-2]
-  real(r8), allocatable :: CPOLNPs1(:)    !canopy nodule nonstructural P, [gP d-2]
-  real(r8), allocatable :: CCPLNPs1(:)    !nodule nonstructural C, [gC d-2]
-  real(r8), allocatable :: CZPOLPs1(:)    !canopy nonstructural N concentration, [g g-1]
-  real(r8), allocatable :: CPPOLPs1(:)    !canopy nonstructural P concentration, [g g-1]
+
   real(r8), allocatable :: CTCs1(:)       !temperature below which seed set is adversely affected, [oC]
   real(r8), allocatable :: CNETs1(:)      !canopy net CO2 exchange, [gC d-2 h-1]
-  real(r8), allocatable :: CPRTSs1(:)     !root P:C ratio x root growth yield, [-]
-  real(r8), allocatable :: CNRTSs1(:)     !root N:C ratio x root growth yield, [-]
   real(r8), allocatable :: CARBNs1(:)     !total gross CO2 fixation, [gC d-2 ]
   real(r8), allocatable :: RSMXs1(:)      !maximum stomatal resistance to vapor, [s m-1]
-  real(r8), allocatable :: CNNDs1(:)      !nodule N:C ratio, [gN gC-1]
-  real(r8), allocatable :: CPNDs1(:)      !nodule P:C ratio, [gP gC-1]
-  real(r8), allocatable :: CNRTs1(:)      !root N:C ratio, [gN gC-1]
-  real(r8), allocatable :: CPRTs1(:)      !root P:C ratio, [gP gC-1]
-  real(r8), allocatable :: CNWSs1(:)      !C:N ratio in remobilizable nonstructural biomass, [-]
-  real(r8), allocatable :: CPWSs1(:)      !C:P ratio in remobilizable nonstructural biomass, [-]
+
   real(r8), allocatable :: CFXs1(:)       !clumping factor for self-shading in canopy layer at current LAI, [-]
   real(r8), allocatable :: CWSRTs1(:)     !fraction of remobilizable nonstructural biomass in root, [-]
   real(r8), allocatable :: DCO2s1(:)      !gaesous CO2 concentration difference across stomates, [umol m-3]
-  real(r8), allocatable :: DMNDs1(:)      !nodule growth yield, [g g-1]
-  real(r8), allocatable :: DMRTs1(:)      !root growth yield, [g g-1]
   real(r8), allocatable :: FMOLs1(:)      !total gas concentration, [mol m-3]
   real(r8), allocatable :: FNODs1(:)      !parameter for allocation of growth to nodes, [-]
   real(r8), allocatable :: GROUPIs1(:)    !acclimated plant maturity group, [-]
@@ -310,14 +256,12 @@ implicit none
   real(r8), allocatable :: HCUPTKs1(:)    !net root C uptake (+ve) - exudation (-ve), [gC d-2 h-1]
   real(r8), allocatable :: HZUPTKs1(:)    !net root N uptake (+ve) - exudation (-ve), [gN d-2 h-1]
   real(r8), allocatable :: HPUPTKs1(:)    !net root P uptake (+ve) - exudation (-ve), [gP d-2 h-1]
-  real(r8), allocatable :: HTSTZs1(:)     !canopy height, [m]
+
   real(r8), allocatable :: OFFSTs1(:)     !adjustment of Arhhenius curves for plant thermal acclimation, [oC]
   real(r8), allocatable :: OSTRs1(:)      !plant O2 stress indicator, []
   real(r8), allocatable :: PSILTs1(:)     !canopy total water potential , [Mpa]
   real(r8), allocatable :: PBs1(:)        !branch nonstructural C content required for new branch, [gC gC-1]
   real(r8), allocatable :: PRs1(:)        !threshold root nonstructural C content for initiating new root axis, [gC gC-1]
-  real(r8), allocatable :: PPOOLPs1(:)    !canopy nonstructural P, [gP d-2]
-  real(r8), allocatable :: PPOLNPs1(:)    !canopy nonstructural P concentration, [gP gC-1]
   real(r8), allocatable :: PSILGs1(:)     !canopy turgor water potential, [MPa]
   real(r8), allocatable :: RCMXs1(:)      !maximum stomatal resistance to CO2, [s h-1]
   real(r8), allocatable :: RCO2Zs1(:)     !gaseous CO2 flux fron root disturbance, [gC d-2 h-1]
@@ -326,16 +270,9 @@ implicit none
   real(r8), allocatable :: RN2OZs1(:)     !gaseous N2O flux fron root disturbance, [g d-2 h-1]
   real(r8), allocatable :: RNH3Zs1(:)     !gaseous NH3 flux fron root disturbance non-band, [g d-2 h-1]
   real(r8), allocatable :: RH2GZs1(:)     !gaseous H2 flux fron root disturbance, [g d-2 h-1]
-  real(r8), allocatable :: RSETCs1(:)     !effect of canopy C status on seed set , []
-  real(r8), allocatable :: RSETNs1(:)     !effect of canopy N status on seed set , []
-  real(r8), allocatable :: RSETPs1(:)     !effect of canopy P status on seed set , []
   real(r8), allocatable :: RTFQs1(:)      !root brancing frequency, [m-1]
   real(r8), allocatable :: RAZs1(:)       !canopy roughness height, [m]
-  real(r8), allocatable :: CHILLs1(:)     !chilling effect on CO2 fixation, [-]
-  real(r8), allocatable :: CPSTKs1(:)     !stalk P:C ratio, [g g-1]
-  real(r8), allocatable :: SCO2s1(:)      !leaf CO2 solubility, [uM /umol mol-1]
-  real(r8), allocatable :: CO2Qs1(:)      !canopy gaesous CO2 concentration , [umol mol-1]
-  real(r8), allocatable :: O2Ls1(:)       !leaf aqueous O2 concentration, [uM]
+
   real(r8), allocatable :: EVAPCs1(:)     !canopy evaporation, [m2 d-2 h-1]
   real(r8), allocatable :: HFLXCs1(:)     !canopy storage heat flux, [MJ d-2 h-1]
   real(r8), allocatable :: EFLXCs1(:)     !canopy latent heat flux, [MJ d-2 h-1]
@@ -376,44 +313,17 @@ implicit none
   real(r8), allocatable :: VNH3Fs1(:)     !plant NH3 emission from fire, [g d-2 ]
   real(r8), allocatable :: VPO4Fs1(:)     !plant PO4 emission from fire, [g d-2 ]
   real(r8), allocatable :: WSTRs1(:)      !canopy plant water stress indicator, number of hours PSILT < PSILY, []
-  real(r8), allocatable :: WTRVXs1(:)     !plant stored nonstructural C at planting, [g d-2]
-  real(r8), allocatable :: WTRVCs1(:)     !plant stored nonstructural C, [g d-2]
-  real(r8), allocatable :: WTLSs1(:)      !canopy leaf + sheath C, [g d-2]
-  real(r8), allocatable :: WTSHTs1(:)     !canopy shoot C, [g d-2]
-  real(r8), allocatable :: WTSHTAs1(:)    !landscape average canopy shoot C, [g d-2]
-  real(r8), allocatable :: WTSTGs1(:)     !standing dead C, [g d-2]
-  real(r8), allocatable :: WTSTGNs1(:)    !standing dead N, [g d-2]
-  real(r8), allocatable :: WTSTGPs1(:)    !standing dead P, [g d-2]
-  real(r8), allocatable :: WTNDs1(:)      !root total nodule mass, [g d-2]
-  real(r8), allocatable :: WTNDPs1(:)     !total nodule P, [g d-2]
-  real(r8), allocatable :: WTRTts1(:)     !plant root C, [g d-2]
-  real(r8), allocatable :: WTRTNs1(:)     !total root N , [g d-2]
-  real(r8), allocatable :: WTRTPs1(:)     !root total P, [g d-2]
-  real(r8), allocatable :: WTNDNs1(:)     !total canopy nodule N, [g d-2]
-  real(r8), allocatable :: WTSHNs1(:)     !canopy  N, [g d-2]
-  real(r8), allocatable :: WTSHPs1(:)     !canopy total P, [g d-2]
-  real(r8), allocatable :: WTRVNs1(:)     !plant stored nonstructural N, [g d-2]
-  real(r8), allocatable :: WTRVPs1(:)     !plant stored nonstructural P, [g d-2]
-  real(r8), allocatable :: XKCO24s1(:)    !Km for PEP carboxylase activity, [uM]
-  real(r8), allocatable :: ZPOOLPs1(:)    !canopy  nonstructural N, [g d-2]
-  real(r8), allocatable :: ZPOLNPs1(:)    !canopy nonstructural P concentration, [g g-1]
+
+
   real(r8), allocatable :: ZEROLs1(:)     !threshold zero for leaf calculation
   real(r8), allocatable :: ZEROPs1(:)     !threshold zero for p calculation
   real(r8), allocatable :: ZEROQs1(:)     !threshold zero for uptake calculation
-  real(r8), allocatable :: ZNPPs1(:)      !total net primary productivity, [g d-2]
-
-  real(r8), allocatable :: CPOOLs1(:,:)   !branch nonstructural C, [g d-2]
-  real(r8), allocatable :: CPOLNBs1(:,:)  !branch nodule nonstructural C, [g d-2]
-  real(r8), allocatable :: CCPOLBs1(:,:)  !branch nonstructural C concentration, [g d-2]
-  real(r8), allocatable :: CZPOLBs1(:,:)  !branch nonstructural N concentration, [g g-1]
-  real(r8), allocatable :: CPPOLBs1(:,:)  !branch nonstructural P concentration, [g g-1]
+  real(r8), allocatable :: ZNPPs1(:)      !total net primary productivity, [gC d-2]
 
   real(r8), allocatable :: GRWTBs1(:,:)   !maximum grain C during grain fill, [g d-2]
 
   integer,  allocatable :: IDAYYs1(:)     !alternate day of harvest, [-]
 
-  real(r8), allocatable :: PPOOLs1(:,:)   !branch nonstructural P, [g d-2]
-  real(r8), allocatable :: PPOLNBs1(:,:)  !branch nonstructural P concentration, [g g-1]
   real(r8), allocatable :: RCCLXs1(:,:)   !C translocated from leaf during senescence, [g d-2 h-1]
   real(r8), allocatable :: RCZLXs1(:,:)   !N translocated from leaf during senescence, [g d-2 h-1]
   real(r8), allocatable :: RCPLXs1(:,:)   !P translocated from leaf during senescence, [g d-2 h-1]
@@ -421,46 +331,6 @@ implicit none
   real(r8), allocatable :: RCZSXs1(:,:)   !N translocated from sheath during senescence, [g d-2 h-1]
   real(r8), allocatable :: RCPSXs1(:,:)   !P translocated from sheath during senescence, [g d-2 h-1]
   real(r8), allocatable :: RNH3Bs1(:,:)   !gaseous NH3 flux fron root disturbance band, [g d-2 h-1]
-  real(r8), allocatable :: WTLSBs1(:,:)   !branch leaf + sheath C, [g d-2]
-  real(r8), allocatable :: WTRSVBs1(:,:)  !branch reserve C, [g d-2]
-  real(r8), allocatable :: WTLFBs1(:,:)   !branch leaf C, [g d-2]
-  real(r8), allocatable :: WTNDBs1(:,:)   !branch nodule C, [g d-2]
-  real(r8), allocatable :: WTSHEBs1(:,:)  !branch sheath C , [g d-2]
-  real(r8), allocatable :: WTEARBs1(:,:)  !branch ear C, [g d-2]
-  real(r8), allocatable :: WTHSKBs1(:,:)  !branch husk C, [g d-2]
-  real(r8), allocatable :: WTRSBNs1(:,:)  !branch reserve N, [g d-2]
-  real(r8), allocatable :: WTLFBNs1(:,:)  !branch leaf N, [g d-2]
-  real(r8), allocatable :: WTNDBNs1(:,:)  !branch nodule N, [g d-2]
-  real(r8), allocatable :: WTSHBNs1(:,:)  !branch sheath N, [g d-2]
-  real(r8), allocatable :: WTEABNs1(:,:)  !branch ear N, [g d-2]
-  real(r8), allocatable :: WTHSBNs1(:,:)  !branch husk N, [g d-2]
-  real(r8), allocatable :: WTRSBPs1(:,:)  !branch reserve P, [g d-2]
-  real(r8), allocatable :: WTLFBPs1(:,:)  !branch leaf P, [g d-2]
-  real(r8), allocatable :: WTNDBPs1(:,:)  !branch nodule P, [g d-2]
-  real(r8), allocatable :: WTSHBPs1(:,:)  !branch sheath P, [g d-2]
-  real(r8), allocatable :: WTEABPs1(:,:)  !branch ear P, [g d-2]
-  real(r8), allocatable :: WTHSBPs1(:,:)  !branch husk P, [g d-2]
-  real(r8), allocatable :: WTGRBs1(:,:)   !branch grain C, [g d-2]
-  real(r8), allocatable :: WTGRBNs1(:,:)  !branch grain N, [g d-2]
-  real(r8), allocatable :: WTGRBPs1(:,:)  !branch grain P, [g d-2]
-  real(r8), allocatable :: WTSTKBs1(:,:)  !branch stalk C, [g d-2]
-  real(r8), allocatable :: WTSTBNs1(:,:)  !branch stalk N, [g d-2]
-  real(r8), allocatable :: WTSTBPs1(:,:)  !branch stalk P, [g d-2]
-  real(r8), allocatable :: WTSHTBs1(:,:)  !branch shoot C, [g d-2]
-  real(r8), allocatable :: WTSHTNs1(:,:)  !branch N, [g d-2]
-  real(r8), allocatable :: WTSHTPs1(:,:)  !branch total P, [g d-2]
-  real(r8), allocatable :: WGLFXs1(:,:)   !branch leaf structural C, [g d-2]
-  real(r8), allocatable :: WGLFNXs1(:,:)  !branch leaf structural N, [g d-2]
-  real(r8), allocatable :: WGLFPXs1(:,:)  !branch leaf structural P, [g d-2]
-  real(r8), allocatable :: WGSHEXs1(:,:)  !branch sheath structural C, [g d-2]
-  real(r8), allocatable :: WGSHNXs1(:,:)  !branch sheath structural N, [g d-2]
-  real(r8), allocatable :: WGSHPXs1(:,:)  !branch sheath structural P, [g d-2]
-  real(r8), allocatable :: WTSTXBs1(:,:)  !branch stalk structural C, [g d-2]
-  real(r8), allocatable :: WTSTXNs1(:,:)  !branch stalk structural N, [g d-2]
-  real(r8), allocatable :: WTSTXPs1(:,:)  !branch stalk structural P, [g d-2]
-  real(r8), allocatable :: WVSTKBs1(:,:)  !branch active stalk C, [g d-2]
-  real(r8), allocatable :: ZPOOLs1(:,:)   !branch  nonstructural N, [g d-2]
-  real(r8), allocatable :: ZPOLNBs1(:,:)  !branch nonstructural N concentration, [g g-1]
 
   real(r8), allocatable :: SURFXs1(:,:,:,:,:)  !leaf irradiated surface area, [m2 d-2]
   real(r8), allocatable :: CPOOL3s1(:,:,:)    !minimum sink strength for nonstructural C transfer, [g d-2]
@@ -477,31 +347,11 @@ implicit none
   real(r8), allocatable :: VGROs1(:,:,:)      !carboxylation rate, [umol m-2 s-1]
   real(r8), allocatable :: VCGR4s1(:,:,:)     !maximum dark C4 carboxylation rate under saturating CO2, [umol m-2 s-1]
   real(r8), allocatable :: VGRO4s1(:,:,:)     !C4 carboxylation rate, [umol m-2 s-1]
-  real(r8), allocatable :: WGNODEs1(:,:,:)    !internode C, [g d-2]
-  real(r8), allocatable :: WGNODNs1(:,:,:)    !internode N, [g d-2]
-  real(r8), allocatable :: WGNODPs1(:,:,:)    !nodule P, [g d-2]
-  real(r8), allocatable :: WGLFs1(:,:,:)      !leaf C, [g d-2]
-  real(r8), allocatable :: WGLFNs1(:,:,:)     !leaf N, [g d-2]
-  real(r8), allocatable :: WGLFPs1(:,:,:)     !leaf P, [g d-2]
-  real(r8), allocatable :: WSLFs1(:,:,:)      !layer leaf protein C, [g d-2]
-  real(r8), allocatable :: WGSHEs1(:,:,:)     !sheath C , [g d-2]
-  real(r8), allocatable :: WGSHNs1(:,:,:)     !sheath N, [g d-2]
-  real(r8), allocatable :: WGSHPs1(:,:,:)     !sheath P, [g d-2]
-  real(r8), allocatable :: WSSHEs1(:,:,:)     !layer sheath protein C, [g d-2]
 
-  real(r8), allocatable :: WGLFLs1(:,:,:,:)   !layer leaf C, [g d-2]
-  real(r8), allocatable :: WGLFLNs1(:,:,:,:)  !layer leaf N, [g d-2]
-  real(r8), allocatable :: WGLFLPs1(:,:,:,:)  !leaf layer P, [g d-2]
-
-  real(r8), allocatable :: CPOOLRs1(:,:,:)    !root  layer nonstructural C, [g d-2]
-  real(r8), allocatable :: CCPOLRs1(:,:,:)    !root  layer nonstructural C concentration, [g g-1]
-  real(r8), allocatable :: CZPOLRs1(:,:,:)    !root layer nonstructural N concentration, [g g-1]
-  real(r8), allocatable :: CPPOLRs1(:,:,:)    !root layer nonstructural P concentration, [g g-1]
   real(r8), allocatable :: CO2Ps1(:,:,:)      !root aqueous CO2 content, [g d-2 ]
   real(r8), allocatable :: CO2As1(:,:,:)      !root gaseous CO2 content, [g d-2 ]
   real(r8), allocatable :: CH4Ps1(:,:,:)      !root aqueous CH4 content, [g d-2 ]
   real(r8), allocatable :: CH4As1(:,:,:)      !root gaseous CH4 content, [g d-2 ]
-  real(r8), allocatable :: CWSRTLs1(:,:,:)    !root layer protein C concentration, [g g-1]
   real(r8), allocatable :: H2GPs1(:,:,:)      !aqueous H2 content of roots, [g d-2]
   real(r8), allocatable :: H2GAs1(:,:,:)      !gaseous H2 content of roots, [g d-2]
   real(r8), allocatable :: OXYPs1(:,:,:)      !root aqueous O2 content, [g d-2 ]
@@ -509,7 +359,6 @@ implicit none
   real(r8), allocatable :: PSIRTs1(:,:,:)     !root total water potential , [Mpa]
   real(r8), allocatable :: PSIROs1(:,:,:)     !root osmotic water potential , [Mpa]
   real(r8), allocatable :: PSIRGs1(:,:,:)     !root turgor water potential , [Mpa]
-  real(r8), allocatable :: PPOOLRs1(:,:,:)    !root layer nonstructural P, [g d-2]
   real(r8), allocatable :: RUPNHBs1(:,:,:)    !root uptake of NH4 band, [g d-2 h-1]
   real(r8), allocatable :: RUPNH4s1(:,:,:)    !root uptake of NH4 non-band, [g d-2 h-1]
   real(r8), allocatable :: RUPH2Ps1(:,:,:)    !root uptake of PO4 non-band, [g d-2 h-1]
@@ -579,10 +428,7 @@ implicit none
   real(r8), allocatable :: RUPP1Bs1(:,:,:)    !HPO4 demand in band by each root population
   real(r8), allocatable :: UPWTRs1(:,:,:)     !root water uptake, [m2 d-2 h-1]
   real(r8), allocatable :: WFRs1(:,:,:)       !O2 constraint to root respiration, []
-  real(r8), allocatable :: WTRTLs1(:,:,:)     !root layer structural C, [g d-2]
-  real(r8), allocatable :: WTRTDs1(:,:,:)     !root layer C, [g d-2]
-  real(r8), allocatable :: WSRTLs1(:,:,:)     !root layer protein C, [g d-2]
-  real(r8), allocatable :: ZPOOLRs1(:,:,:)    !root layer nonstructural N, [g d-2]
+
   real(r8), allocatable :: Z2OPs1(:,:,:)      !root aqueous N2O content, [g d-2 ]
   real(r8), allocatable :: Z2OAs1(:,:,:)      !root gaseous N2O content, [g d-2 ]
   real(r8), allocatable :: ZH3Ps1(:,:,:)      !root aqueous NH3 content, [g d-2 ]
@@ -605,13 +451,8 @@ implicit none
   real(r8), allocatable :: RRAD2Xs1(:,:)      !root diameter secondary axes, [m]
   real(r8), allocatable :: GRDMs1(:)          !grain size at seeding, [g]
   real(r8), allocatable :: VOXYFs1(:)         !plant O2 uptake from fire, [g d-2 ]
-  real(r8), allocatable :: WTGRNNs1(:)        !canopy grain N, [g d-2]
-  real(r8), allocatable :: WTSHEPs1(:)        !canopy sheath P, [g d-2]
-  real(r8), allocatable :: WVSTKs1(:)         !canopy active stalk C, [g d-2
-  real(r8), allocatable :: CNLFs1(:)          !maximum leaf N:C ratio, [g g-1]
-  real(r8), allocatable :: WTLFPs1(:)         !canopy leaf P, [g d-2]
+
   real(r8), allocatable :: PTSHTs1(:)         !shoot-root rate constant for nonstructural C exchange, [h-1]
-  real(r8), allocatable :: WTLFs1(:)          !canopy leaf C, [g d-2]
   real(r8), allocatable :: EPs1(:)            !canopy transpiration, [m2 d-2 h-1]
   real(r8), allocatable :: WDLFs1(:)          !leaf length:width ratio, [-]
   real(r8), allocatable :: GRMXs1(:)          !maximum grain size   , [g]
@@ -619,31 +460,10 @@ implicit none
   integer , allocatable :: IRTYPs1(:)         !grain type (below or above-ground)
   real(r8), allocatable :: STMXs1(:)          !maximum grain node number per branch, [-]
   real(r8), allocatable :: SDMXs1(:)          !maximum grain number per node , [-]
-  real(r8), allocatable :: DMLFs1(:)          !leaf growth yield, [g g-1]
 
-  real(r8), allocatable :: WTSHEs1(:)         !canopy sheath C , [g d-2]
-  real(r8), allocatable :: CNGRs1(:)          !grain N:C ratio, [g g-1]
-  real(r8), allocatable :: WTSTKs1(:)         !canopy stalk C, [g d-2]
-  real(r8), allocatable :: CPLFs1(:)          !maximum leaf P:C ratio, [g g-1]
-  real(r8), allocatable :: CPSHEs1(:)         !sheath P:C ratio, [g g-1]
-  real(r8), allocatable :: CNSHEs1(:)         !sheath N:C ratio, [g g-1]
-  real(r8), allocatable :: WTRSVs1(:)         !canopy reserve C, [g d-2]
-  real(r8), allocatable :: WTEARNs1(:)        !canopy ear N, [g d-2]
-  real(r8), allocatable :: WTLFNs1(:)         !canopy leaf N, [g d-2]
-  real(r8), allocatable :: WTRSVNs1(:)        !canopy reserve N, [g d-2]
-  real(r8), allocatable :: WTSHENs1(:)        !canopy sheath N, [g d-2]
-  real(r8), allocatable :: WTHSKNs1(:)        !canopy husk N, [g d-2]
-  real(r8), allocatable :: WTHSKs1(:)         !canopy husk C, [g d-2]
-  real(r8), allocatable :: WTRTAs1(:)         !root C per plant, [g p-1]
-  real(r8), allocatable :: WTGRs1(:)          !canopy grain C, [g d-2]
-  real(r8), allocatable :: WTEARs1(:)         !canopy ear C, [g d-2]
   real(r8), allocatable :: RNH3Cs1(:)         !canopy NH3 flux, [g d-2 h-1]
-  real(r8), allocatable :: WTSTKPs1(:)        !canopy stalk P, [g d-2]
-  real(r8), allocatable :: WTRSVPs1(:)        !canopy reserve P, [g d-2]
-  real(r8), allocatable :: WTEARPs1(:)        !canopy ear C, [g d-2]
-  real(r8), allocatable :: WTHSKPs1(:)        !canopy husk P, [g d-2]
-  real(r8), allocatable :: WTSTKNs1(:)        !canopy stalk N, [g d-2]
-  real(r8), allocatable :: WTGRNPs1(:)        !canopy grain P, [g d-2]
+
+
   real(r8), allocatable :: RTLG1Xs1(:,:)      !specific root length primary axes, [m g-1]
   real(r8), allocatable :: RRADPs1(:,:)       !root internal radius, [m]
   real(r8), allocatable :: RTLG2Xs1(:,:)      !specific root length secondary axes, [m g-1]
@@ -689,8 +509,6 @@ implicit none
   real(r8), allocatable :: TORTs1(:,:)        !soil tortuosity, []
   real(r8), allocatable :: FILMs1(:,:)        !soil water film thickness , [m]
   real(r8), allocatable :: ROXSKs1(:,:)       !total O2 sink, [g d-2 t-1]
-  real(r8), allocatable :: THETPMs1(:,:)      !soil air-filled porosity, [m3 m-3]
-  real(r8), allocatable :: DFGSs1(:,:)        !coefficient for dissolution - volatilization, []
 
   type, public :: plant_photosyns_type
   real(r8), pointer :: ETMXs1(:)   => null()  !cholorophyll activity , [umol g-1 h-1 at 25 oC]
@@ -708,11 +526,16 @@ implicit none
   real(r8), pointer :: CO2Ls1(:)   => null()   !leaf aqueous CO2 concentration, [uM]
   real(r8), pointer :: O2Is1(:)    => null()   !leaf gaseous O2 concentration, [umol m-3]
   real(r8), pointer :: CO2Is1(:)   => null()   !leaf gaseous CO2 concentration, [umol m-3]
-  real(r8), pointer :: XKCO2Os1(:) => null()  !leaf aqueous CO2 Km ambient O2, [uM]
-  real(r8), pointer :: XKCO2Ls1(:) => null()  !leaf aqueous CO2 Km no O2, [uM]
-  real(r8), pointer :: RCSs1(:)    => null()  !shape parameter for calculating stomatal resistance from turgor pressure, [-]
-  real(r8), pointer :: FCO2s1(:)   => null()  !Ci:Ca ratio, [-]
-  real(r8), pointer :: RSMHs1(:)   => null()  !maximum stomatal resistance to vapor, [s h-1]
+  real(r8), pointer :: XKCO2Os1(:) => null()   !leaf aqueous CO2 Km ambient O2, [uM]
+  real(r8), pointer :: XKCO2Ls1(:) => null()   !leaf aqueous CO2 Km no O2, [uM]
+  real(r8), pointer :: RCSs1(:)    => null()   !shape parameter for calculating stomatal resistance from turgor pressure, [-]
+  real(r8), pointer :: FCO2s1(:)   => null()   !Ci:Ca ratio, [-]
+  real(r8), pointer :: RSMHs1(:)   => null()   !maximum stomatal resistance to vapor, [s h-1]
+  real(r8), pointer :: CHILLs1(:)  => null()   !chilling effect on CO2 fixation, [-]
+  real(r8), pointer :: SCO2s1(:)   => null()   !leaf CO2 solubility, [uM /umol mol-1]
+  real(r8), pointer :: CO2Qs1(:)   => null()   !canopy gaesous CO2 concentration , [umol mol-1]
+  real(r8), pointer :: O2Ls1(:)    => null()   !leaf aqueous O2 concentration, [uM]
+  real(r8), pointer :: XKCO24s1(:) => null()   !Km for PEP carboxylase activity, [uM]
 
   contains
     procedure, public :: Init    =>  plt_photo_init
@@ -768,6 +591,8 @@ implicit none
   real(r8) :: ARLFCs1                     !total canopy leaf area, [m2 d-2]
   real(r8) :: ARSTCs1                     !total canopy stem area, [m2 d-2]
   real(r8) :: ZTs1                        !canopy height , [m]
+  integer,  pointer :: MYs1(:)           => null() !mycorrhizal type (no or yes)
+  real(r8), pointer :: HTSTZs1(:)        => null() !canopy height, [m]
   real(r8), pointer :: ZLs1(:)           => null() !canopy layer height , [m]
   real(r8), pointer :: ARSTPs1(:)        => null() !plant stem area, [m2 d-2]
   real(r8), pointer :: ARLFPs1(:)        => null() !plant leaf area, [m2 d-2]
@@ -826,6 +651,11 @@ implicit none
   end type plant_morph_type
 
   type, public :: plant_pheno_type
+  integer,  pointer :: IDTHs1(:)  => null()     !flag for species death
+  integer,  pointer :: IFLGCs1(:) => null()     !flag for living pft
+  real(r8), pointer :: RSETCs1(:) => null()     !effect of canopy C status on seed set , []
+  real(r8), pointer :: RSETNs1(:) => null()     !effect of canopy N status on seed set , []
+  real(r8), pointer :: RSETPs1(:) => null()     !effect of canopy P status on seed set , []
   real(r8), pointer :: XRNIs1(:)  => null()     !rate of node initiation, [h-1 at 25 oC]
   real(r8), pointer :: XRLAs1(:)  => null()     !rate of leaf initiation, [h-1 at 25 oC]
   real(r8), pointer :: XDLs1(:)   => null()     !critical daylength for phenological progress, [h]
@@ -874,6 +704,8 @@ implicit none
   end type plant_pheno_type
 
   type, public :: plant_soilchem_type
+  real(r8), pointer :: THETPMs1(:,:) => null()  !soil air-filled porosity, [m3 m-3]
+  real(r8), pointer :: DFGSs1(:,:)   => null()  !coefficient for dissolution - volatilization, []
   real(r8), pointer :: RSCSs1(:)     => null()  !soil hydraulic resistance, [MPa h m-2]
   real(r8), pointer :: ZHSGLs1(:)    => null()  !aqueous NH4 diffusivity, [m2 h-1]
   real(r8), pointer :: BKDSs1(:)     => null()  !soil bulk density, [Mg m-3]
@@ -956,14 +788,578 @@ implicit none
     procedure, public :: Destroy => plt_soilchem_destroy
   end type plant_soilchem_type
 
-  type(plant_soilchem_type), public, target :: plt_soilchem
+  type, public :: plant_allometry_type
+  real(r8), pointer :: CPRTSs1(:)    => null()  !root P:C ratio x root growth yield, [-]
+  real(r8), pointer :: CNRTSs1(:)    => null()  !root N:C ratio x root growth yield, [-]
+  real(r8), pointer :: CNNDs1(:)     => null()  !nodule N:C ratio, [gN gC-1]
+  real(r8), pointer :: CPNDs1(:)     => null()  !nodule P:C ratio, [gP gC-1]
+  real(r8), pointer :: CNRTs1(:)     => null()  !root N:C ratio, [gN gC-1]
+  real(r8), pointer :: CPRTs1(:)     => null()  !root P:C ratio, [gP gC-1]
+  real(r8), pointer :: CNWSs1(:)     => null()  !C:N ratio in remobilizable nonstructural biomass, [-]
+  real(r8), pointer :: CPWSs1(:)     => null()  !C:P ratio in remobilizable nonstructural biomass, [-]
+  real(r8), pointer :: DMNDs1(:)     => null()  !nodule growth yield, [g g-1]
+  real(r8), pointer :: DMRTs1(:)     => null()  !root growth yield, [g g-1]
+  real(r8), pointer :: CPEARs1(:)    => null()  !ear P:C ratio, [gP gC-1]
+  real(r8), pointer :: DMSHEs1(:)    => null()  !sheath growth yield, [g g-1]
+  real(r8), pointer :: CPHSKs1(:)    => null()  !husk P:C ratio, [gP gC-1]
+  real(r8), pointer :: DMSTKs1(:)    => null()  !stalk growth yield, [gC gC-1]
+  real(r8), pointer :: DMHSKs1(:)    => null()  !husk growth yield, [gC gC-1]
+  real(r8), pointer :: DMRSVs1(:)    => null()  !reserve growth yield, [gC gC-1]
+  real(r8), pointer :: DMGRs1(:)     => null()  !grain growth yield, [gC gC-1]
+  real(r8), pointer :: DMEARs1(:)    => null()  !ear growth yield, [gC gC-1]
+  real(r8), pointer :: CNHSKs1(:)    => null()  !husk N:C ratio, [gN gC-1]
+  real(r8), pointer :: CNRSVs1(:)    => null()  !reserve N:C ratio, [gN gC-1]
+  real(r8), pointer :: CNEARs1(:)    => null()  !ear N:C ratio, [gN gC-1]
+  real(r8), pointer :: CPRSVs1(:)    => null()  !reserve P:C ratio, [gP gC-1]
+  real(r8), pointer :: CPGRs1(:)     => null()  !grain P:C ratio, [gP gP-1]
+  real(r8), pointer :: CNSTKs1(:)    => null()  !stalk N:C ratio, [gN gC-1]
+  real(r8), pointer :: FWODBs1(:)    => null()  !woody C allocation
+  real(r8), pointer :: FWODLNs1(:)   => null()  !leaf N allocation
+  real(r8), pointer :: FWODLPs1(:)   => null()  !leaf P allocation
+  real(r8), pointer :: FWODSPs1(:)   => null()  !P woody fraction in petiole
+  real(r8), pointer :: FWODSNs1(:)   => null()  !N woody fraction in petiole
+  real(r8), pointer :: FWODRNs1(:)   => null()  !N woody fraction in root
+  real(r8), pointer :: FWODRPs1(:)   => null()  !P woody fraction in root
+  real(r8), pointer :: FWODRs1(:)    => null()  !C woody fraction in root
+  real(r8), pointer :: FWOODs1(:)    => null()  !woody C allocation
+  real(r8), pointer :: FVRNs1(:)     => null()  !allocation parameter
+  real(r8), pointer :: FWOODNs1(:)   => null()  !woody N allocation
+  real(r8), pointer :: FWOODPs1(:)   => null()  !woody P allocation
+  real(r8), pointer :: DMLFs1(:)     => null()  !leaf growth yield, [g g-1]
+  real(r8), pointer :: CNGRs1(:)     => null()  !grain N:C ratio, [g g-1]
+  real(r8), pointer :: CPLFs1(:)     => null()  !maximum leaf P:C ratio, [g g-1]
+  real(r8), pointer :: CPSHEs1(:)    => null()  !sheath P:C ratio, [g g-1]
+  real(r8), pointer :: CNSHEs1(:)    => null()  !sheath N:C ratio, [g g-1]
+  real(r8), pointer :: CPSTKs1(:)    => null()  !stalk P:C ratio, [g g-1]
+  real(r8), pointer :: CNLFs1(:)     => null()  !maximum leaf N:C ratio, [g g-1]
+  contains
+    procedure, public :: Init => plt_allom_init
+    procedure, public :: Destroy => plt_allom_destroy
+  end type plant_allometry_type
+
+  type, public :: plant_biom_type
+  real(r8) :: WTSTGTs1                               !total standing dead C, [g d-2]
+  real(r8), pointer :: PPOOLPs1(:)      => null()    !canopy nonstructural P, [gP d-2]
+  real(r8), pointer :: PPOLNPs1(:)      => null()    !canopy nonstructural P concentration, [gP gC-1]
+  real(r8), pointer :: CCPOLPs1(:)      => null()    !canopy nonstructural C concentration, [gC d-2]
+  real(r8), pointer :: CPOOLPs1(:)      => null()    !canopy nonstructural P concentration, [gP d-2]
+  real(r8), pointer :: CPOLNPs1(:)      => null()    !canopy nodule nonstructural P, [gP d-2]
+  real(r8), pointer :: CCPLNPs1(:)      => null()    !nodule nonstructural C, [gC d-2]
+  real(r8), pointer :: CZPOLPs1(:)      => null()    !canopy nonstructural N concentration, [g g-1]
+  real(r8), pointer :: CPPOLPs1(:)      => null()    !canopy nonstructural P concentration, [g g-1]
+  real(r8), pointer :: PPOOLRs1(:,:,:)  => null()    !root layer nonstructural P, [g d-2]
+  real(r8), pointer :: WTRTLs1(:,:,:)   => null()    !root layer structural C, [g d-2]
+  real(r8), pointer :: WTRTDs1(:,:,:)   => null()    !root layer C, [g d-2]
+  real(r8), pointer :: WSRTLs1(:,:,:)   => null()    !root layer protein C, [g d-2]
+  real(r8), pointer :: CWSRTLs1(:,:,:)  => null()    !root layer protein C concentration, [g g-1]
+  real(r8), pointer :: ZPOOLRs1(:,:,:)  => null()    !root layer nonstructural N, [g d-2]
+  real(r8), pointer :: CPOOLRs1(:,:,:)  => null()    !root  layer nonstructural C, [g d-2]
+  real(r8), pointer :: CCPOLRs1(:,:,:)  => null()    !root  layer nonstructural C concentration, [g g-1]
+  real(r8), pointer :: CZPOLRs1(:,:,:)  => null()    !root layer nonstructural N concentration, [g g-1]
+  real(r8), pointer :: CPPOLRs1(:,:,:)  => null()    !root layer nonstructural P concentration, [g g-1]
+  real(r8), pointer :: ZPOLNPs1(:)      => null()    !canopy nonstructural P concentration, [g g-1]
+  real(r8), pointer :: CCPOLBs1(:,:)    => null()    !branch nonstructural C concentration, [g d-2]
+  real(r8), pointer :: CZPOLBs1(:,:)    => null()    !branch nonstructural N concentration, [g g-1]
+  real(r8), pointer :: CPPOLBs1(:,:)    => null()    !branch nonstructural P concentration, [g g-1]
+  real(r8), pointer :: PPOLNBs1(:,:)    => null()    !branch nonstructural P concentration, [g g-1]
+  real(r8), pointer :: WGNODEs1(:,:,:)  => null()    !internode C, [g d-2]
+  real(r8), pointer :: WGNODNs1(:,:,:)  => null()    !internode N, [g d-2]
+  real(r8), pointer :: WGNODPs1(:,:,:)  => null()    !nodule P, [g d-2]
+  real(r8), pointer :: WGLFs1(:,:,:)    => null()    !leaf C, [g d-2]
+  real(r8), pointer :: WGLFNs1(:,:,:)   => null()    !leaf N, [g d-2]
+  real(r8), pointer :: WGLFPs1(:,:,:)   => null()    !leaf P, [g d-2]
+  real(r8), pointer :: WSLFs1(:,:,:)    => null()    !layer leaf protein C, [g d-2]
+  real(r8), pointer :: WGSHEs1(:,:,:)   => null()    !sheath C , [g d-2]
+  real(r8), pointer :: WGSHNs1(:,:,:)   => null()    !sheath N, [g d-2]
+  real(r8), pointer :: WGSHPs1(:,:,:)   => null()    !sheath P, [g d-2]
+  real(r8), pointer :: WSSHEs1(:,:,:)   => null()    !layer sheath protein C, [g d-2]
+  real(r8), pointer :: WGLFLs1(:,:,:,:) => null()    !layer leaf C, [g d-2]
+  real(r8), pointer :: WGLFLNs1(:,:,:,:)=> null()    !layer leaf N, [g d-2]
+  real(r8), pointer :: WGLFLPs1(:,:,:,:)=> null()    !leaf layer P, [g d-2]
+  real(r8), pointer :: ZPOLNBs1(:,:) => null()  !branch nonstructural N concentration, [g g-1]
+  real(r8), pointer :: WGLFTs1(:)    => null()  !total leaf mass, [gC d-2]
+  real(r8), pointer :: WTSTDIs1(:)   => null()  !initial standing dead C, [g C m-2]
+  real(r8), pointer :: WTRTs1(:)     => null()  !plant root C, [gC d-2]
+  real(r8), pointer :: WTRTSs1(:)    => null()  !plant root structural C, [gC d-2]
+  real(r8), pointer :: WTRTSNs1(:)   => null()  !plant root structural N, [gN d-2]
+  real(r8), pointer :: WTRTSPs1(:)   => null()  !plant root structural P, [gP d-2]
+  real(r8), pointer :: WTRVXs1(:)    => null()  !plant stored nonstructural C at planting, [gC d-2]
+  real(r8), pointer :: WTRVCs1(:)    => null()  !plant stored nonstructural C, [gC d-2]
+  real(r8), pointer :: WTLSs1(:)     => null()  !canopy leaf + sheath C, [g d-2]
+  real(r8), pointer :: WTSHTs1(:)    => null()  !canopy shoot C, [g d-2]
+  real(r8), pointer :: WTSHTAs1(:)   => null()  !landscape average canopy shoot C, [g d-2]
+  real(r8), pointer :: WTSTGs1(:)    => null()  !standing dead C, [g d-2]
+  real(r8), pointer :: WTSTGNs1(:)   => null()  !standing dead N, [g d-2]
+  real(r8), pointer :: WTSTGPs1(:)   => null()  !standing dead P, [g d-2]
+  real(r8), pointer :: WTNDs1(:)     => null()  !root total nodule mass, [g d-2]
+  real(r8), pointer :: WTNDPs1(:)    => null()  !total nodule P, [g d-2]
+  real(r8), pointer :: WTRTts1(:)    => null()  !plant root C, [g d-2]
+  real(r8), pointer :: WTRTNs1(:)    => null()  !total root N , [g d-2]
+  real(r8), pointer :: WTRTPs1(:)    => null()  !root total P, [g d-2]
+  real(r8), pointer :: WTNDNs1(:)    => null()  !total canopy nodule N, [g d-2]
+  real(r8), pointer :: WTSHNs1(:)    => null()  !canopy  N, [g d-2]
+  real(r8), pointer :: WTSHPs1(:)    => null()  !canopy total P, [g d-2]
+  real(r8), pointer :: WTRVNs1(:)    => null()  !plant stored nonstructural N, [g d-2]
+  real(r8), pointer :: WTRVPs1(:)    => null()  !plant stored nonstructural P, [g d-2]
+  real(r8), pointer :: ZPOOLPs1(:)   => null()  !canopy  nonstructural N, [gN d-2]
+  real(r8), pointer :: PPOOLs1(:,:)  => null()  !branch nonstructural P, [g d-2]
+  real(r8), pointer :: CPOOLs1(:,:)  => null()  !branch nonstructural C, [g d-2]
+  real(r8), pointer :: ZPOOLs1(:,:)  => null()  !branch  nonstructural N, [g d-2]
+  real(r8), pointer :: CPOLNBs1(:,:) => null()  !branch nodule nonstructural C, [g d-2]
+  real(r8), pointer :: WTLSBs1(:,:)  => null()  !branch leaf + sheath C, [g d-2]
+  real(r8), pointer :: WTRSVBs1(:,:) => null()  !branch reserve C, [g d-2]
+  real(r8), pointer :: WTLFBs1(:,:)  => null()   !branch leaf C, [g d-2]
+  real(r8), pointer :: WTNDBs1(:,:)  => null()   !branch nodule C, [g d-2]
+  real(r8), pointer :: WTSHEBs1(:,:) => null()   !branch sheath C , [g d-2]
+  real(r8), pointer :: WTEARBs1(:,:) => null()   !branch ear C, [g d-2]
+  real(r8), pointer :: WTHSKBs1(:,:) => null()   !branch husk C, [g d-2]
+  real(r8), pointer :: WTRSBNs1(:,:) => null()   !branch reserve N, [g d-2]
+  real(r8), pointer :: WTLFBNs1(:,:) => null()   !branch leaf N, [g d-2]
+  real(r8), pointer :: WTNDBNs1(:,:) => null()   !branch nodule N, [g d-2]
+  real(r8), pointer :: WTSHBNs1(:,:) => null()   !branch sheath N, [g d-2]
+  real(r8), pointer :: WTEABNs1(:,:) => null()   !branch ear N, [g d-2]
+  real(r8), pointer :: WTHSBNs1(:,:) => null()   !branch husk N, [g d-2]
+  real(r8), pointer :: WTRSBPs1(:,:) => null()   !branch reserve P, [g d-2]
+  real(r8), pointer :: WTLFBPs1(:,:) => null()   !branch leaf P, [g d-2]
+  real(r8), pointer :: WTNDBPs1(:,:) => null()   !branch nodule P, [g d-2]
+  real(r8), pointer :: WTSHBPs1(:,:) => null()   !branch sheath P, [g d-2]
+  real(r8), pointer :: WTEABPs1(:,:) => null()   !branch ear P, [g d-2]
+  real(r8), pointer :: WTHSBPs1(:,:) => null()   !branch husk P, [g d-2]
+  real(r8), pointer :: WTGRBs1(:,:)  => null()   !branch grain C, [g d-2]
+  real(r8), pointer :: WTGRBNs1(:,:) => null()   !branch grain N, [g d-2]
+  real(r8), pointer :: WTGRBPs1(:,:) => null()   !branch grain P, [g d-2]
+  real(r8), pointer :: WTSTKBs1(:,:) => null()   !branch stalk C, [g d-2]
+  real(r8), pointer :: WTSTBNs1(:,:) => null()   !branch stalk N, [g d-2]
+  real(r8), pointer :: WTSTBPs1(:,:) => null()   !branch stalk P, [g d-2]
+  real(r8), pointer :: WTSHTBs1(:,:) => null()   !branch shoot C, [g d-2]
+  real(r8), pointer :: WTSHTNs1(:,:) => null()   !branch N, [g d-2]
+  real(r8), pointer :: WTSHTPs1(:,:) => null()   !branch total P, [g d-2]
+  real(r8), pointer :: WGLFXs1(:,:)  => null()   !branch leaf structural C, [g d-2]
+  real(r8), pointer :: WGLFNXs1(:,:) => null()   !branch leaf structural N, [g d-2]
+  real(r8), pointer :: WGLFPXs1(:,:) => null()   !branch leaf structural P, [g d-2]
+  real(r8), pointer :: WGSHEXs1(:,:) => null()   !branch sheath structural C, [g d-2]
+  real(r8), pointer :: WGSHNXs1(:,:) => null()   !branch sheath structural N, [g d-2]
+  real(r8), pointer :: WGSHPXs1(:,:) => null()   !branch sheath structural P, [g d-2]
+  real(r8), pointer :: WTSTXBs1(:,:) => null()   !branch stalk structural C, [g d-2]
+  real(r8), pointer :: WTSTXNs1(:,:) => null()   !branch stalk structural N, [g d-2]
+  real(r8), pointer :: WTSTXPs1(:,:) => null()   !branch stalk structural P, [g d-2]
+  real(r8), pointer :: WVSTKBs1(:,:) => null()   !branch active stalk C, [g d-2]
+  real(r8), pointer :: WTSTKs1(:)    => null()   !canopy stalk C, [g d-2]
+  real(r8), pointer :: WTGRNNs1(:)   => null()   !canopy grain N, [g d-2]
+  real(r8), pointer :: WTSHEPs1(:)   => null()   !canopy sheath P, [g d-2]
+  real(r8), pointer :: WVSTKs1(:)    => null()   !canopy active stalk C, [g d-2
+  real(r8), pointer :: WTLFPs1(:)    => null()   !canopy leaf P, [g d-2]
+  real(r8), pointer :: WTLFs1(:)     => null()   !canopy leaf C, [g d-2]
+  real(r8), pointer :: WTSHEs1(:)    => null()   !canopy sheath C , [g d-2]
+  real(r8), pointer :: WTRSVs1(:)    => null()   !canopy reserve C, [g d-2]
+  real(r8), pointer :: WTEARNs1(:)   => null()   !canopy ear N, [g d-2]
+  real(r8), pointer :: WTLFNs1(:)    => null()   !canopy leaf N, [g d-2]
+  real(r8), pointer :: WTRSVNs1(:)   => null()   !canopy reserve N, [g d-2]
+  real(r8), pointer :: WTSHENs1(:)   => null()   !canopy sheath N, [g d-2]
+  real(r8), pointer :: WTHSKNs1(:)   => null()   !canopy husk N, [g d-2]
+  real(r8), pointer :: WTHSKs1(:)    => null()   !canopy husk C, [g d-2]
+  real(r8), pointer :: WTRTAs1(:)    => null()   !root C per plant, [g p-1]
+  real(r8), pointer :: WTGRs1(:)     => null()   !canopy grain C, [g d-2]
+  real(r8), pointer :: WTEARs1(:)    => null()   !canopy ear C, [g d-2]
+  real(r8), pointer :: WTSTKPs1(:)   => null()   !canopy stalk P, [g d-2]
+  real(r8), pointer :: WTRSVPs1(:)   => null()   !canopy reserve P, [g d-2]
+  real(r8), pointer :: WTEARPs1(:)   => null()   !canopy ear C, [g d-2]
+  real(r8), pointer :: WTHSKPs1(:)   => null()   !canopy husk P, [g d-2]
+  real(r8), pointer :: WTSTKNs1(:)   => null()   !canopy stalk N, [g d-2]
+  real(r8), pointer :: WTGRNPs1(:)   => null()   !canopy grain P, [g d-2]
+  contains
+    procedure, public :: Init => plt_biom_init
+    procedure, public :: Destroy => plt_biom_destroy
+  end type plant_biom_type
+
+  type(plant_allometry_type), public :: plt_allom           !plant allometric parameters
+  type(plant_biom_type), public, target :: plt_biom         !plant biomass variables
+  type(plant_soilchem_type), public, target :: plt_soilchem !soil bgc interface with plant root
   type(plant_pheno_type), public, target :: plt_pheno       !plant phenology
   type(plant_morph_type), public, target :: plt_morph       !plant morphology
   type(plant_radiation_type), public, target :: plt_rad     !plant radiation type
   type(plant_photosyns_type), public, target :: plt_photo   !plant photosynthesis type
 
   contains
+!----------------------------------------------------------------------
 
+  subroutine plt_allom_init(this)
+  implicit none
+  class(plant_allometry_type) :: this
+
+  allocate(this%DMNDs1(JP1))
+  allocate(this%DMRTs1(JP1))
+  allocate(this%CPRTs1(JP1))
+  allocate(this%CNWSs1(JP1))
+  allocate(this%CPWSs1(JP1))
+  allocate(this%CPRTSs1(JP1))
+  allocate(this%CNRTSs1(JP1))
+  allocate(this%CNNDs1(JP1))
+  allocate(this%CPNDs1(JP1))
+  allocate(this%CNRTs1(JP1))
+  allocate(this%CPLFs1(JP1))
+  allocate(this%CPSHEs1(JP1))
+  allocate(this%CNLFs1(JP1))
+  allocate(this%CNSHEs1(JP1))
+  allocate(this%CNGRs1(JP1))
+  allocate(this%CPSTKs1(JP1))
+  allocate(this%CNSTKs1(JP1))
+  allocate(this%CPGRs1(JP1))
+  allocate(this%CPEARs1(JP1))
+  allocate(this%CPRSVs1(JP1))
+  allocate(this%CNRSVs1(JP1))
+  allocate(this%CPHSKs1(JP1))
+  allocate(this%FVRNs1(0:5))
+  allocate(this%FWOODs1(0:1))
+  allocate(this%FWODLPs1(0:1))
+  allocate(this%FWODLNs1(0:1))
+  allocate(this%FWODRs1(0:1))
+  allocate(this%FWODSPs1(0:1))
+  allocate(this%FWODBs1(0:1))
+  allocate(this%FWODSNs1(0:1))
+  allocate(this%FWODRNs1(0:1))
+  allocate(this%FWODRPs1(0:1))
+  allocate(this%FWOODNs1(0:1))
+  allocate(this%FWOODPs1(0:1))
+
+  allocate(this%DMSHEs1(JP1))
+  allocate(this%DMHSKs1(JP1))
+  allocate(this%DMSTKs1(JP1))
+  allocate(this%DMRSVs1(JP1))
+  allocate(this%DMEARs1(JP1))
+  allocate(this%DMGRs1(JP1))
+  allocate(this%CNHSKs1(JP1))
+  allocate(this%CNEARs1(JP1))
+  allocate(this%DMLFs1(JP1))
+
+  end subroutine plt_allom_init
+!----------------------------------------------------------------------
+
+  subroutine plt_allom_destroy(this)
+  implicit none
+
+  class(plant_allometry_type) :: this
+
+!  if(allocated(DMNDs1))deallocate(DMNDs1)
+!  if(allocated(DMRTs1))deallocate(DMRTs1)
+!  if(allocated(CPRTs1))deallocate(CPRTs1)
+!  if(allocated(CNWSs1))deallocate(CNWSs1)
+!  if(allocated(CPWSs1))deallocate(CPWSs1)
+!  if(allocated(CPRTSs1))deallocate(CPRTSs1)
+!  if(allocated(CNRTSs1))deallocate(CNRTSs1)
+!  if(allocated(CNNDs1))deallocate(CNNDs1)
+!  if(allocated(CPNDs1))deallocate(CPNDs1)
+!  if(allocated(CNRTs1))deallocate(CNRTs1)
+!  if(allocated(CWSRTs1))deallocate(CWSRTs1)
+!  if(allocated(CPLFs1))deallocate(CPLFs1)
+!  if(allocated(CPSHEs1))deallocate(CPSHEs1)
+!  if(allocated(CNSHEs1))deallocate(CNSHEs1)
+!  if(allocated(CNLFs1))deallocate(CNLFs1)
+!  if(allocated(DMLFs1))deallocate(DMLFs1)
+!  if(allocated(CPSTKs1))deallocate(CPSTKs1)
+!  if(allocated(CNGRs1))deallocate(CNGRs1)
+!  if(allocated(CNSTKs1))deallocate(CNSTKs1)
+!  if(allocated(CPGRs1))deallocate(CPGRs1)
+!  if(allocated(DMSHEs1))deallocate(DMSHEs1)
+!  if(allocated(DMSTKs1))deallocate(DMSTKs1)
+!  if(allocated(DMGRs1))deallocate(DMGRs1)
+!  if(allocated(DMRSVs1))deallocate(DMRSVs1)
+!  if(allocated(DMEARs1))deallocate(DMEARs1)
+!  if(allocated(DMHSKs1))deallocate(DMHSKs1)
+!  if(allocated(FVRNs1))deallocate(FVRNs1)
+!  if(allocated(FWODLPs1))deallocate(FWODLPs1)
+!  if(allocated(FWODLNs1))deallocate(FWODLNs1)
+!  if(allocated(FWOODs1))deallocate(FWOODs1)
+!  if(allocated(FWOODPs1))deallocate(FWOODPs1)
+!  if(allocated(FWOODNs1))deallocate(FWOODNs1)
+!  if(allocated(FWODRs1))deallocate(FWODRs1)
+!  if(allocated(FWODRNs1))deallocate(FWODRNs1)
+!  if(allocated(FWODSNs1))deallocate(FWODSNs1)
+!  if(allocated(FWODSPs1))deallocate(FWODSPs1)
+!  if(allocated(FWODBs1))deallocate(FWODBs1)
+!  if(allocated(FWODRPs1))deallocate(FWODRPs1)
+!  if(allocated(CPEARs1))deallocate(CPEARs1)
+!  if(allocated(CPHSKs1))deallocate(CPHSKs1)
+!  if(allocated(CNHSKs1))deallocate(CNHSKs1)
+!  if(allocated(CNEARs1))deallocate(CNEARs1)
+!  if(allocated(CNRSVs1))deallocate(CNRSVs1)
+!  if(allocated(CPRSVs1))deallocate(CPRSVs1)
+
+  end subroutine plt_allom_destroy
+!----------------------------------------------------------------------
+  subroutine plt_biom_init(this)
+  implicit none
+  class(plant_biom_type) :: this
+
+  allocate(this%CCPOLPs1(JP1))
+  allocate(this%CPOOLPs1(JP1))
+  allocate(this%CPOLNPs1(JP1))
+  allocate(this%CCPLNPs1(JP1))
+  allocate(this%CZPOLPs1(JP1))
+  allocate(this%CPPOLPs1(JP1))
+  allocate(this%PPOOLRs1(2,JZ1,JP1))
+  allocate(this%CWSRTLs1(2,JZ1,JP1))
+  allocate(this%WSRTLs1(2,JZ1,JP1))
+  allocate(this%ZPOOLRs1(2,JZ1,JP1))
+  allocate(this%WTRTLs1(2,JZ1,JP1))
+  allocate(this%WTRTDs1(2,JZ1,JP1))
+  allocate(this%CPOOLRs1(2,JZ1,JP1))
+  allocate(this%CCPOLRs1(2,JZ1,JP1))
+  allocate(this%CZPOLRs1(2,JZ1,JP1))
+  allocate(this%CPPOLRs1(2,JZ1,JP1))
+  allocate(this%CPOOLs1(JC1,JP1))
+  allocate(this%ZPOOLPs1(JP1))
+  allocate(this%ZPOLNPs1(JP1))
+  allocate(this%WVSTKs1(JP1))
+  allocate(this%WSLFs1(0:JNODS1,JC1,JP1))
+  allocate(this%WSSHEs1(0:JNODS1,JC1,JP1))
+  allocate(this%WGNODEs1(0:JNODS1,JC1,JP1))
+  allocate(this%WGNODNs1(0:JNODS1,JC1,JP1))
+  allocate(this%WGNODPs1(0:JNODS1,JC1,JP1))
+  allocate(this%WGLFs1(0:JNODS1,JC1,JP1))
+  allocate(this%WGLFNs1(0:JNODS1,JC1,JP1))
+  allocate(this%WGLFPs1(0:JNODS1,JC1,JP1))
+  allocate(this%WGSHEs1(0:JNODS1,JC1,JP1))
+  allocate(this%WGSHNs1(0:JNODS1,JC1,JP1))
+  allocate(this%WGSHPs1(0:JNODS1,JC1,JP1))
+  allocate(this%WGLFLs1(JC1,0:JNODS1,JC1,JP1))
+  allocate(this%WGLFLNs1(JC1,0:JNODS1,JC1,JP1))
+  allocate(this%WGLFLPs1(JC1,0:JNODS1,JC1,JP1))
+  allocate(this%WVSTKBs1(JC1,JP1))
+  allocate(this%ZPOOLs1(JC1,JP1))
+  allocate(this%ZPOLNBs1(JC1,JP1))
+  allocate(this%PPOOLs1(JC1,JP1))
+  allocate(this%PPOLNBs1(JC1,JP1))
+  allocate(this%CPOLNBs1(JC1,JP1))
+  allocate(this%CCPOLBs1(JC1,JP1))
+  allocate(this%CZPOLBs1(JC1,JP1))
+  allocate(this%CPPOLBs1(JC1,JP1))
+  allocate(this%WTRTSs1(JP1))
+  allocate(this%WTRTSNs1(JP1))
+  allocate(this%WTRTSPs1(JP1))
+  allocate(this%WGLFTs1(JC1))
+  allocate(this%WTRTs1(JP1))
+  allocate(this%WTRVXs1(JP1))
+  allocate(this%WTRVCs1(JP1))
+  allocate(this%WTLSs1(JP1))
+  allocate(this%WTSTGs1(JP1))
+  allocate(this%WTSTKPs1(JP1))
+  allocate(this%WTRTAs1(JP1))
+  allocate(this%WTSHEs1(JP1))
+  allocate(this%WTSTKs1(JP1))
+  allocate(this%WTEARNs1(JP1))
+  allocate(this%WTRSVs1(JP1))
+  allocate(this%WTGRs1(JP1))
+  allocate(this%WTLFNs1(JP1))
+  allocate(this%WTSHENs1(JP1))
+  allocate(this%WTRSVNs1(JP1))
+  allocate(this%WTHSKNs1(JP1))
+  allocate(this%WTHSKs1(JP1))
+  allocate(this%WTEARs1(JP1))
+  allocate(this%WTGRNNs1(JP1))
+  allocate(this%WTRSVPs1(JP1))
+  allocate(this%WTHSKPs1(JP1))
+  allocate(this%WTSTKNs1(JP1))
+  allocate(this%WTEARPs1(JP1))
+  allocate(this%WTGRNPs1(JP1))
+  allocate(this%WTSTGNs1(JP1))
+  allocate(this%WTSTGPs1(JP1))
+  allocate(this%WTNDs1(JP1))
+  allocate(this%WTRTts1(JP1))
+  allocate(this%WTNDNs1(JP1))
+  allocate(this%WTRTNs1(JP1))
+  allocate(this%WTSHNs1(JP1))
+  allocate(this%WTRVNs1(JP1))
+  allocate(this%WTNDPs1(JP1))
+  allocate(this%WTRTPs1(JP1))
+  allocate(this%WTSHPs1(JP1))
+  allocate(this%WTRVPs1(JP1))
+  allocate(this%WGLFXs1(JC1,JP1))
+  allocate(this%WGLFNXs1(JC1,JP1))
+  allocate(this%WGLFPXs1(JC1,JP1))
+  allocate(this%WGSHEXs1(JC1,JP1))
+  allocate(this%WGSHNXs1(JC1,JP1))
+  allocate(this%WGSHPXs1(JC1,JP1))
+  allocate(this%WTSHTs1(JP1))
+  allocate(this%WTSHTAs1(JP1))
+  allocate(this%WTSHEPs1(JP1))
+  allocate(this%WTLFPs1(JP1))
+  allocate(this%WTLFs1(JP1))
+  allocate(this%WTSTDIs1(JP1))
+  allocate(this%WTLSBs1(JC1,JP1))
+  allocate(this%WTRSVBs1(JC1,JP1))
+  allocate(this%WTLFBs1(JC1,JP1))
+  allocate(this%WTNDBs1(JC1,JP1))
+  allocate(this%WTSHEBs1(JC1,JP1))
+  allocate(this%WTEARBs1(JC1,JP1))
+  allocate(this%WTHSKBs1(JC1,JP1))
+  allocate(this%WTRSBNs1(JC1,JP1))
+  allocate(this%WTLFBNs1(JC1,JP1))
+  allocate(this%WTNDBNs1(JC1,JP1))
+  allocate(this%WTSHBNs1(JC1,JP1))
+  allocate(this%WTEABNs1(JC1,JP1))
+  allocate(this%WTHSBNs1(JC1,JP1))
+  allocate(this%WTRSBPs1(JC1,JP1))
+  allocate(this%WTLFBPs1(JC1,JP1))
+  allocate(this%WTNDBPs1(JC1,JP1))
+  allocate(this%WTSHBPs1(JC1,JP1))
+  allocate(this%WTEABPs1(JC1,JP1))
+  allocate(this%WTHSBPs1(JC1,JP1))
+  allocate(this%WTGRBs1(JC1,JP1))
+  allocate(this%WTGRBNs1(JC1,JP1))
+  allocate(this%WTGRBPs1(JC1,JP1))
+  allocate(this%WTSTKBs1(JC1,JP1))
+  allocate(this%WTSTBNs1(JC1,JP1))
+  allocate(this%WTSTBPs1(JC1,JP1))
+  allocate(this%WTSHTBs1(JC1,JP1))
+  allocate(this%WTSHTNs1(JC1,JP1))
+  allocate(this%WTSHTPs1(JC1,JP1))
+  allocate(this%WTSTXBs1(JC1,JP1))
+  allocate(this%WTSTXNs1(JC1,JP1))
+  allocate(this%WTSTXPs1(JC1,JP1))
+  allocate(this%PPOOLPs1(JP1))
+  allocate(this%PPOLNPs1(JP1))
+  end subroutine plt_biom_init
+!----------------------------------------------------------------------
+
+  subroutine plt_biom_destroy(this)
+
+  implicit none
+  class(plant_biom_type) :: this
+
+
+!  if(allocated(PPOOLPs1))deallocate(PPOOLPs1)
+!  if(allocated(PPOLNPs1))deallocate(PPOLNPs1)
+!  if(allocated(CCPOLPs1))deallocate(CCPOLPs1)
+!  if(allocated(CPOOLPs1))deallocate(CPOOLPs1)
+!  if(allocated(CPOLNPs1))deallocate(CPOLNPs1)
+!  if(allocated(CCPLNPs1))deallocate(CCPLNPs1)
+!  if(allocated(CZPOLPs1))deallocate(CZPOLPs1)
+!  if(allocated(CPPOLPs1))deallocate(CPPOLPs1)
+!  if(allocated(PPOOLRs1))deallocate(PPOOLRs1)
+!  if(allocated(CWSRTLs1))deallocate(CWSRTLs1)
+!  if(allocated(WSRTLs1))deallocate(WSRTLs1)
+!  if(allocated(ZPOOLRs1))deallocate(ZPOOLRs1)
+!  if(allocated(WTRTLs1))deallocate(WTRTLs1)
+!  if(allocated(WTRTDs1))deallocate(WTRTDs1)
+!  if(allocated(CPOOLRs1))deallocate(CPOOLRs1)
+!  if(allocated(CCPOLRs1))deallocate(CCPOLRs1)
+!  if(allocated(CZPOLRs1))deallocate(CZPOLRs1)
+!  if(allocated(CPPOLRs1))deallocate(CPPOLRs1)
+!  if(allocated(ZPOLNPs1))deallocate(ZPOLNPs1)
+!  if(allocated(WVSTKs1))deallocate(WVSTKs1)
+!  if(allocated(WGLFs1))deallocate(WGLFs1)
+!  if(allocated(WGLFNs1))deallocate(WGLFNs1)
+!  if(allocated(WGLFPs1))deallocate(WGLFPs1)
+!  if(allocated(WSLFs1))deallocate(WSLFs1)
+!  if(allocated(WSSHEs1))deallocate(WSSHEs1)
+!  if(allocated(WGLFLs1))deallocate(WGLFLs1)
+!  if(allocated(WGLFLNs1))deallocate(WGLFLNs1)
+!  if(allocated(WGLFLPs1))deallocate(WGLFLPs1)
+!  if(allocated(WGNODEs1))deallocate(WGNODEs1)
+!  if(allocated(WGNODNs1))deallocate(WGNODNs1)
+!  if(allocated(WGNODPs1))deallocate(WGNODPs1)
+!  if(allocated(WGSHEs1))deallocate(WGSHEs1)
+!  if(allocated(WGSHNs1))deallocate(WGSHNs1)
+!  if(allocated(WGSHPs1))deallocate(WGSHPs1)
+!  if(allocated(WVSTKBs1))deallocate(WVSTKBs1)
+!  if(allocated(ZPOOLs1))deallocate(ZPOOLs1)
+!  if(allocated(ZPOLNBs1))deallocate(ZPOLNBs1)
+!  if(allocated(PPOOLs1))deallocate(PPOOLs1)
+!  if(allocated(PPOLNBs1))deallocate(PPOLNBs1)
+!  if(allocated(CPOLNBs1))deallocate(CPOLNBs1)
+!  if(allocated(CCPOLBs1))deallocate(CCPOLBs1)
+!  if(allocated(CZPOLBs1))deallocate(CZPOLBs1)
+!  if(allocated(CPPOLBs1))deallocate(CPPOLBs1)
+!  if(allocated(WTRTSs1))deallocate(WTRTSs1)
+!  if(allocated(WTRTSNs1))deallocate(WTRTSNs1)
+!  if(allocated(WTRTSPs1))deallocate(WTRTSPs1)
+!  if(allocated(WTRTts1))deallocate(WTRTts1)
+!  if(allocated(WGLFTs1))deallocate(WGLFTs1)
+!  if(allocated(WTRTs1))deallocate(WTRTs1)
+!  if(allocated(ZPOOLPs1))deallocate(ZPOOLPs1)
+!  if(allocated(CPOOLs1))deallocate(CPOOLs1)
+!  if(allocated(WTRTAs1))deallocate(WTRTAs1)
+!  if(allocated(WTLFs1))deallocate(WTLFs1)
+!  if(allocated(WTSHEs1))deallocate(WTSHEs1)
+!  if(allocated(WTRSVs1))deallocate(WTRSVs1)
+!  if(allocated(WTSTKs1))deallocate(WTSTKs1)
+!  if(allocated(WTSHEPs1))deallocate(WTSHEPs1)
+!  if(allocated(WTLFPs1))deallocate(WTLFPs1)
+!  if(allocated(WTEARNs1))deallocate(WTEARNs1)
+!  if(allocated(WTGRs1))deallocate(WTGRs1)
+!  if(allocated(WTSHENs1))deallocate(WTSHENs1)
+!  if(allocated(WTRSVNs1))deallocate(WTRSVNs1)
+!  if(allocated(WTLFNs1))deallocate(WTLFNs1)
+!  if(allocated(WTHSKNs1))deallocate(WTHSKNs1)
+!  if(allocated(WTEARs1))deallocate(WTEARs1)
+!  if(allocated(WTHSKs1))deallocate(WTHSKs1)
+!  if(allocated(WTGRNNs1))deallocate(WTGRNNs1)
+!  if(allocated(WTSTKPs1))deallocate(WTSTKPs1)
+!  if(allocated(WTRSVPs1))deallocate(WTRSVPs1)
+!  if(allocated(WTHSKPs1))deallocate(WTHSKPs1)
+!  if(allocated(WTEARPs1))deallocate(WTEARPs1)
+!  if(allocated(WTGRNPs1)) deallocate(WTGRNPs1)
+!  if(allocated(WTSTKNs1)) deallocate(WTSTKNs1)
+!  if(allocated(WGLFXs1))deallocate(WGLFXs1)
+!  if(allocated(WGLFNXs1))deallocate(WGLFNXs1)
+!  if(allocated(WGLFPXs1))deallocate(WGLFPXs1)
+!  if(allocated(WGSHEXs1))deallocate(WGSHEXs1)
+!  if(allocated(WGSHNXs1))deallocate(WGSHNXs1)
+!  if(allocated(WGSHPXs1))deallocate(WGSHPXs1)
+!  if(allocated(WTLSBs1))deallocate(WTLSBs1)
+!  if(allocated(WTRSVBs1))deallocate(WTRSVBs1)
+!  if(allocated(WTLFBs1))deallocate(WTLFBs1)
+!  if(allocated(WTNDBs1))deallocate(WTNDBs1)
+!  if(allocated(WTSHEBs1))deallocate(WTSHEBs1)
+!  if(allocated(WTEARBs1))deallocate(WTEARBs1)
+!  if(allocated(WTHSKBs1))deallocate(WTHSKBs1)
+!  if(allocated(WTRSBNs1))deallocate(WTRSBNs1)
+!  if(allocated(WTLFBNs1))deallocate(WTLFBNs1)
+!  if(allocated(WTNDBNs1))deallocate(WTNDBNs1)
+!  if(allocated(WTSHBNs1))deallocate(WTSHBNs1)
+!  if(allocated(WTEABNs1))deallocate(WTEABNs1)
+!  if(allocated(WTHSBNs1))deallocate(WTHSBNs1)
+!  if(allocated(WTRSBPs1))deallocate(WTRSBPs1)
+!  if(allocated(WTLFBPs1))deallocate(WTLFBPs1)
+!  if(allocated(WTNDBPs1))deallocate(WTNDBPs1)
+!  if(allocated(WTSHBPs1))deallocate(WTSHBPs1)
+!  if(allocated(WTEABPs1))deallocate(WTEABPs1)
+!  if(allocated(WTHSBPs1))deallocate(WTHSBPs1)
+!  if(allocated(WTGRBs1))deallocate(WTGRBs1)
+!  if(allocated(WTGRBNs1))deallocate(WTGRBNs1)
+!  if(allocated(WTGRBPs1))deallocate(WTGRBPs1)
+!  if(allocated(WTSTKBs1))deallocate(WTSTKBs1)
+!  if(allocated(WTSTBNs1))deallocate(WTSTBNs1)
+!  if(allocated(WTSTBPs1))deallocate(WTSTBPs1)
+!  if(allocated(WTSHTBs1))deallocate(WTSHTBs1)
+!  if(allocated(WTSHTNs1))deallocate(WTSHTNs1)
+!  if(allocated(WTSHTPs1))deallocate(WTSHTPs1)
+!  if(allocated(WTSTXBs1))deallocate(WTSTXBs1)
+!  if(allocated(WTSTXNs1))deallocate(WTSTXNs1)
+!  if(allocated(WTSTXPs1))deallocate(WTSTXPs1)
+!  if(allocated(WTSTDIs1))deallocate(WTSTDIs1)
+!  if(allocated(WTRVXs1))deallocate(WTRVXs1)
+!  if(allocated(WTRVCs1))deallocate(WTRVCs1)
+!  if(allocated(WTLSs1))deallocate(WTLSs1)
+!  if(allocated(WTSHTs1))deallocate(WTSHTs1)
+!  if(allocated(WTSHTAs1))deallocate(WTSHTAs1)
+!  if(allocated(WTSTGs1))deallocate(WTSTGs1)
+!  if(allocated(WTSTGNs1))deallocate(WTSTGNs1)
+!  if(allocated(WTSTGPs1))deallocate(WTSTGPs1)
+!  if(allocated(WTNDs1))deallocate(WTNDs1)
+!  if(allocated(WTNDNs1))deallocate(WTNDNs1)
+!  if(allocated(WTRTNs1))deallocate(WTRTNs1)
+!  if(allocated(WTSHNs1))deallocate(WTSHNs1)
+!  if(allocated(WTRVNs1))deallocate(WTRVNs1)
+!  if(allocated(WTNDPs1))deallocate(WTNDPs1)
+!  if(allocated(WTRTPs1))deallocate(WTRTPs1)
+!  if(allocated(WTSHPs1))deallocate(WTSHPs1)
+!  if(allocated(WTRVPs1))deallocate(WTRVPs1)
+  end subroutine plt_biom_destroy
+
+
+!----------------------------------------------------------------------
 
   subroutine  plt_soilchem_init(this)
 
@@ -971,6 +1367,8 @@ implicit none
 
   class(plant_soilchem_type) :: this
 
+  allocate(this%THETPMs1(60,0:JZ1))
+  allocate(this%DFGSs1(60,0:JZ1))
   allocate(this%VLPOBs1(0:JZ1))
   allocate(this%VLNO3s1(0:JZ1))
   allocate(this%VLPO4s1(0:JZ1))
@@ -1053,6 +1451,9 @@ implicit none
   subroutine plt_soilchem_destroy(this)
   implicit none
   class(plant_soilchem_type) :: this
+
+!  if(allocated(THETPMs1))deallocate(THETPMs1)
+!  if(allocated(DFGSs1))deallocate(DFGSs1)
 !  if(allocated(ZVSGLs1))deallocate(ZVSGLs1)
 !  if(allocated(PSISTs1))deallocate(PSISTs1)
 !  if(allocated(SOXYLs1))deallocate(SOXYLs1)
@@ -1151,6 +1552,10 @@ implicit none
 
   call plt_pheno%Init()
 
+  call plt_allom%Init()
+
+  call plt_biom%Init()
+
   call plt_soilchem%Init()
 
   call plt_rad%Init()
@@ -1167,54 +1572,26 @@ implicit none
 
   call plt_rad%Destroy()
 
-  allocate(IDTHs1(JP1))
-  allocate(WTRTs1(JP1))
   allocate(IYR0s1(JP1))
   allocate(INTYPs1(JP1))
   allocate(IYRXs1(JP1))
   allocate(IYRYs1(JP1))
   allocate(IDAYXs1(JP1))
-  allocate(IFLGCs1(JP1))
   allocate(IDAY0s1(JP1))
   allocate(IDAYHs1(JP1))
   allocate(IYRHs1(JP1))
   allocate(IHVSTs1(JP1))
   allocate(JHVSTs1(JP1))
 
-  allocate(MYs1(JP1))
   allocate(IDATAs1(60))
   allocate(ICTYPs1(JP1))
   allocate(FERTs1(1:20))
-  allocate(WGLFTs1(JC1))
   allocate(DLYR3s1(0:JZ1))
-  allocate(CPEARs1(JP1))
-  allocate(CPRSVs1(JP1))
-  allocate(CNRSVs1(JP1))
-  allocate(CPHSKs1(JP1))
-  allocate(DMSHEs1(JP1))
-  allocate(DMHSKs1(JP1))
-  allocate(DMSTKs1(JP1))
-  allocate(DMRSVs1(JP1))
-  allocate(DMEARs1(JP1))
-  allocate(DMGRs1(JP1))
-  allocate(CNHSKs1(JP1))
-  allocate(CNEARs1(JP1))
+
 
   allocate(CDPTHZs1(0:JZ1))
   allocate(DPTHZs1(0:JZ1))
   allocate(FMPRs1(0:JZ1))
-  allocate(FVRNs1(0:5))
-  allocate(FWOODs1(0:1))
-  allocate(FWODLPs1(0:1))
-  allocate(FWODLNs1(0:1))
-  allocate(FWODRs1(0:1))
-  allocate(FWODSPs1(0:1))
-  allocate(FWODBs1(0:1))
-  allocate(FWODSNs1(0:1))
-  allocate(FWODRNs1(0:1))
-  allocate(FWODRPs1(0:1))
-  allocate(FWOODNs1(0:1))
-  allocate(FWOODPs1(0:1))
 
   allocate(RPO4Ys1(0:JZ1))
   allocate(RPOBYs1(0:JZ1))
@@ -1298,34 +1675,21 @@ implicit none
   allocate(PPZs1(JP1))
   allocate(PPXs1(JP1))
   allocate(SSTXs1(JP1))
-  allocate(CCPOLPs1(JP1))
-  allocate(CPOOLPs1(JP1))
-  allocate(CPOLNPs1(JP1))
-  allocate(CCPLNPs1(JP1))
-  allocate(CZPOLPs1(JP1))
-  allocate(CPPOLPs1(JP1))
   allocate(ZTYPs1(JP1))
   allocate(ZTYPIs1(JP1))
   allocate(CTCs1(JP1))
   allocate(CNETs1(JP1))
-  allocate(CPRTSs1(JP1))
-  allocate(CNRTSs1(JP1))
   allocate(CARBNs1(JP1))
-  allocate(CNNDs1(JP1))
-  allocate(CPNDs1(JP1))
-  allocate(CNRTs1(JP1))
+
+
   allocate(RSMXs1(JP1))
   allocate(CWSRTs1(JP1))
   allocate(CFIs1(JP1))
-  allocate(CPRTs1(JP1))
-  allocate(CNWSs1(JP1))
-  allocate(CPWSs1(JP1))
   allocate(CFXs1(JP1))
   allocate(DCO2s1(JP1))
   allocate(DATAPs1(JP1))
   allocate(DATAs1(30))
-  allocate(DMNDs1(JP1))
-  allocate(DMRTs1(JP1))
+
   allocate(FMOLs1(JP1))
   allocate(FNODs1(JP1))
   allocate(GROUPIs1(JP1))
@@ -1339,15 +1703,12 @@ implicit none
   allocate(HCUPTKs1(JP1))
   allocate(HZUPTKs1(JP1))
   allocate(HPUPTKs1(JP1))
-  allocate(HTSTZs1(JP1))
   allocate(OFFSTs1(JP1))
   allocate(OSTRs1(JP1))
   allocate(PPs1(JP1))
   allocate(PSILTs1(JP1))
   allocate(PBs1(JP1))
   allocate(PRs1(JP1))
-  allocate(PPOOLPs1(JP1))
-  allocate(PPOLNPs1(JP1))
   allocate(HTCs1(JP1))
   allocate(PSILGs1(JP1))
   allocate(RCMXs1(JP1))
@@ -1357,24 +1718,17 @@ implicit none
   allocate(RN2OZs1(JP1))
   allocate(RNH3Zs1(JP1))
   allocate(RH2GZs1(JP1))
-  allocate(RSETCs1(JP1))
-  allocate(RSETNs1(JP1))
-  allocate(RSETPs1(JP1))
+
   allocate(RTFQs1(JP1))
   allocate(RAZs1(JP1))
-  allocate(SCO2s1(JP1))
-  allocate(CO2Qs1(JP1))
   allocate(PSILZs1(JP1))
   allocate(RSMNs1(JP1))
-  allocate(WTRTSs1(JP1))
-  allocate(WTRTSNs1(JP1))
-  allocate(WTRTSPs1(JP1))
+
   allocate(TKCZs1(JP1))
   allocate(SFLXCs1(JP1))
   allocate(SO2s1(JP1))
   allocate(RAs1(JP1))
   allocate(RCs1(JP1))
-  allocate(O2Ls1(JP1))
   allocate(EVAPCs1(JP1))
   allocate(HFLXCs1(JP1))
   allocate(EFLXCs1(JP1))
@@ -1415,96 +1769,38 @@ implicit none
   allocate(VPO4Fs1(JP1))
   allocate(VOLWPs1(JP1))
   allocate(WSTRs1(JP1))
-  allocate(WTRVXs1(JP1))
-  allocate(WTRVCs1(JP1))
-  allocate(WTLSs1(JP1))
-  allocate(WTSHTs1(JP1))
-  allocate(WTSHTAs1(JP1))
-  allocate(WTSTGs1(JP1))
-  allocate(WTSTKPs1(JP1))
-  allocate(WTRTAs1(JP1))
+
   allocate(RNH3Cs1(JP1))
   allocate(VOXYFs1(JP1))
-  allocate(WTSHEPs1(JP1))
-  allocate(WTLFPs1(JP1))
-  allocate(WTLFs1(JP1))
-  allocate(CNGRs1(JP1))
-  allocate(CPSTKs1(JP1))
   allocate(WDLFs1(JP1))
-  allocate(DMLFs1(JP1))
   allocate(GFILLs1(JP1))
   allocate(STMXs1(JP1))
   allocate(SDMXs1(JP1))
   allocate(EPs1(JP1))
   allocate(IRTYPs1(JP1))
   allocate(GRMXs1(JP1))
-  allocate(WTSHEs1(JP1))
-  allocate(WTSTKs1(JP1))
-  allocate(CPLFs1(JP1))
-  allocate(CPSHEs1(JP1))
-  allocate(WVSTKs1(JP1))
   allocate(PTSHTs1(JP1))
-  allocate(CNLFs1(JP1))
-  allocate(CNSHEs1(JP1))
-  allocate(WTEARNs1(JP1))
-  allocate(WTRSVs1(JP1))
-  allocate(WTGRs1(JP1))
-  allocate(WTLFNs1(JP1))
-  allocate(WTSHENs1(JP1))
-  allocate(WTRSVNs1(JP1))
-  allocate(WTHSKNs1(JP1))
-  allocate(WTHSKs1(JP1))
-  allocate(WTSTDIs1(JP1))
+
   allocate(TCCs1(JP1))
   allocate(ENGYXs1(JP1))
-  allocate(CPGRs1(JP1))
   allocate(DTKCs1(JP1))
   allocate(TKCs1(JP1))
   allocate(OSMOs1(JP1))
   allocate(TCO2As1(JP1))
   allocate(PSILOs1(JP1))
-  allocate(CNSTKs1(JP1))
-  allocate(WTEARs1(JP1))
   allocate(CTRANs1(JP1))
-  allocate(WTGRNNs1(JP1))
-  allocate(WTRSVPs1(JP1))
-  allocate(WTHSKPs1(JP1))
-  allocate(WTSTKNs1(JP1))
-  allocate(WTEARPs1(JP1))
-  allocate(WTGRNPs1(JP1))
-  allocate(CHILLs1(JP1))
-  allocate(WTSTGNs1(JP1))
+
   allocate(GRDMs1(JP1))
-  allocate(WTSTGPs1(JP1))
-  allocate(WTNDs1(JP1))
-  allocate(WTRTts1(JP1))
-  allocate(WTNDNs1(JP1))
-  allocate(WTRTNs1(JP1))
-  allocate(WTSHNs1(JP1))
-  allocate(WTRVNs1(JP1))
-  allocate(WTNDPs1(JP1))
-  allocate(WTRTPs1(JP1))
-  allocate(WTSHPs1(JP1))
-  allocate(WTRVPs1(JP1))
-  allocate(XKCO24s1(JP1))
-  allocate(ZPOOLPs1(JP1))
-  allocate(ZPOLNPs1(JP1))
   allocate(ZEROLs1(JP1))
   allocate(ZEROPs1(JP1))
 
   allocate(ZEROQs1(JP1))
   allocate(ZNPPs1(JP1))
-  allocate(CPOOLs1(JC1,JP1))
-  allocate(CPOLNBs1(JC1,JP1))
-  allocate(CCPOLBs1(JC1,JP1))
-  allocate(CZPOLBs1(JC1,JP1))
-  allocate(CPPOLBs1(JC1,JP1))
 
   allocate(GRWTBs1(JC1,JP1))
 
   allocate(IDAYYs1(JP1))
-  allocate(PPOOLs1(JC1,JP1))
-  allocate(PPOLNBs1(JC1,JP1))
+
   allocate(RCCLXs1(JC1,JP1))
   allocate(RCZLXs1(JC1,JP1))
   allocate(RCPLXs1(JC1,JP1))
@@ -1513,46 +1809,6 @@ implicit none
   allocate(RCPSXs1(JC1,JP1))
   allocate(RNH3Bs1(JC1,JP1))
 
-  allocate(WTLSBs1(JC1,JP1))
-  allocate(WTRSVBs1(JC1,JP1))
-  allocate(WTLFBs1(JC1,JP1))
-  allocate(WTNDBs1(JC1,JP1))
-  allocate(WTSHEBs1(JC1,JP1))
-  allocate(WTEARBs1(JC1,JP1))
-  allocate(WTHSKBs1(JC1,JP1))
-  allocate(WTRSBNs1(JC1,JP1))
-  allocate(WTLFBNs1(JC1,JP1))
-  allocate(WTNDBNs1(JC1,JP1))
-  allocate(WTSHBNs1(JC1,JP1))
-  allocate(WTEABNs1(JC1,JP1))
-  allocate(WTHSBNs1(JC1,JP1))
-  allocate(WTRSBPs1(JC1,JP1))
-  allocate(WTLFBPs1(JC1,JP1))
-  allocate(WTNDBPs1(JC1,JP1))
-  allocate(WTSHBPs1(JC1,JP1))
-  allocate(WTEABPs1(JC1,JP1))
-  allocate(WTHSBPs1(JC1,JP1))
-  allocate(WTGRBs1(JC1,JP1))
-  allocate(WTGRBNs1(JC1,JP1))
-  allocate(WTGRBPs1(JC1,JP1))
-  allocate(WTSTKBs1(JC1,JP1))
-  allocate(WTSTBNs1(JC1,JP1))
-  allocate(WTSTBPs1(JC1,JP1))
-  allocate(WTSHTBs1(JC1,JP1))
-  allocate(WTSHTNs1(JC1,JP1))
-  allocate(WTSHTPs1(JC1,JP1))
-  allocate(WGLFXs1(JC1,JP1))
-  allocate(WGLFNXs1(JC1,JP1))
-  allocate(WGLFPXs1(JC1,JP1))
-  allocate(WGSHEXs1(JC1,JP1))
-  allocate(WGSHNXs1(JC1,JP1))
-  allocate(WGSHPXs1(JC1,JP1))
-  allocate(WTSTXBs1(JC1,JP1))
-  allocate(WTSTXNs1(JC1,JP1))
-  allocate(WTSTXPs1(JC1,JP1))
-  allocate(WVSTKBs1(JC1,JP1))
-  allocate(ZPOOLs1(JC1,JP1))
-  allocate(ZPOLNBs1(JC1,JP1))
   allocate(SURFXs1(JLI1,JC1,JNODS1,JC1,JP1))
   allocate(CPOOL3s1(JNODS1,JC1,JP1))
   allocate(CPOOL4s1(JNODS1,JC1,JP1))
@@ -1568,29 +1824,12 @@ implicit none
   allocate(VGROs1(JNODS1,JC1,JP1))
   allocate(VCGR4s1(JNODS1,JC1,JP1))
   allocate(VGRO4s1(JNODS1,JC1,JP1))
-  allocate(WGNODEs1(0:JNODS1,JC1,JP1))
-  allocate(WGNODNs1(0:JNODS1,JC1,JP1))
-  allocate(WGNODPs1(0:JNODS1,JC1,JP1))
-  allocate(WGLFs1(0:JNODS1,JC1,JP1))
-  allocate(WGLFNs1(0:JNODS1,JC1,JP1))
-  allocate(WGLFPs1(0:JNODS1,JC1,JP1))
-  allocate(WSLFs1(0:JNODS1,JC1,JP1))
-  allocate(WGSHEs1(0:JNODS1,JC1,JP1))
-  allocate(WGSHNs1(0:JNODS1,JC1,JP1))
-  allocate(WGSHPs1(0:JNODS1,JC1,JP1))
-  allocate(WSSHEs1(0:JNODS1,JC1,JP1))
-  allocate(WGLFLs1(JC1,0:JNODS1,JC1,JP1))
-  allocate(WGLFLNs1(JC1,0:JNODS1,JC1,JP1))
-  allocate(WGLFLPs1(JC1,0:JNODS1,JC1,JP1))
-  allocate(CPOOLRs1(2,JZ1,JP1))
-  allocate(CCPOLRs1(2,JZ1,JP1))
-  allocate(CZPOLRs1(2,JZ1,JP1))
-  allocate(CPPOLRs1(2,JZ1,JP1))
+
+
   allocate(CO2Ps1(2,JZ1,JP1))
   allocate(CO2As1(2,JZ1,JP1))
   allocate(CH4Ps1(2,JZ1,JP1))
   allocate(CH4As1(2,JZ1,JP1))
-  allocate(CWSRTLs1(2,JZ1,JP1))
   allocate(H2GPs1(2,JZ1,JP1))
   allocate(H2GAs1(2,JZ1,JP1))
   allocate(OXYPs1(2,JZ1,JP1))
@@ -1598,7 +1837,6 @@ implicit none
   allocate(PSIRTs1(2,JZ1,JP1))
   allocate(PSIROs1(2,JZ1,JP1))
   allocate(PSIRGs1(2,JZ1,JP1))
-  allocate(PPOOLRs1(2,JZ1,JP1))
   allocate(RUPNHBs1(2,JZ1,JP1))
   allocate(RUPNH4s1(2,JZ1,JP1))
   allocate(RUPH2Ps1(2,JZ1,JP1))
@@ -1668,10 +1906,7 @@ implicit none
   allocate(RUPP1Bs1(2,JZ1,JP1))
   allocate(UPWTRs1(2,JZ1,JP1))
   allocate(WFRs1(2,JZ1,JP1))
-  allocate(WTRTLs1(2,JZ1,JP1))
-  allocate(WTRTDs1(2,JZ1,JP1))
-  allocate(WSRTLs1(2,JZ1,JP1))
-  allocate(ZPOOLRs1(2,JZ1,JP1))
+
   allocate(Z2OPs1(2,JZ1,JP1))
   allocate(Z2OAs1(2,JZ1,JP1))
   allocate(ZH3Ps1(2,JZ1,JP1))
@@ -1737,28 +1972,24 @@ implicit none
   allocate(TORTs1(60,0:JZ1))
   allocate(FILMs1(60,0:JZ1))
   allocate(ROXSKs1(60,0:JZ1))
-  allocate(THETPMs1(60,0:JZ1))
-  allocate(DFGSs1(60,0:JZ1))
+
   end subroutine InitAllocate
 !----------------------------------------------------------------------
   subroutine DestructPlantAPIData
   implicit none
-  if(allocated(WTRTs1))deallocate(WTRTs1)
 
-  if(allocated(IDTHs1))deallocate(IDTHs1)
   if(allocated(IYR0s1))deallocate(IYR0s1)
   if(allocated(INTYPs1))deallocate(INTYPs1)
   if(allocated(IDAYXs1))deallocate(IDAYXs1)
   if(allocated(IYRYs1))deallocate(IYRYs1)
   if(allocated(IYRXs1))deallocate(IYRXs1)
-  if(allocated(IFLGCs1))deallocate(IFLGCs1)
+
   if(allocated(IDAY0s1))deallocate(IDAY0s1)
   if(allocated(IDAYHs1))deallocate(IDAYHs1)
   if(allocated(IYRHs1))deallocate(IYRHs1)
   if(allocated(IHVSTs1))deallocate(IHVSTs1)
 
   if(allocated(JHVSTs1))deallocate(JHVSTs1)
-  if(allocated(MYs1)) deallocate(MYs1)
 
   if(allocated(IDATAs1))deallocate(IDATAs1)
 
@@ -1766,23 +1997,6 @@ implicit none
   if(allocated(DATAs1))deallocate(DATAs1)
 
   if(allocated(FERTs1))deallocate(FERTs1)
-  if(allocated(WGLFTs1))deallocate(WGLFTs1)
-
-  if(allocated(CPEARs1))deallocate(CPEARs1)
-  if(allocated(CPHSKs1))deallocate(CPHSKs1)
-  if(allocated(DMSHEs1))deallocate(DMSHEs1)
-
-  if(allocated(DMSTKs1))deallocate(DMSTKs1)
-  if(allocated(DMGRs1))deallocate(DMGRs1)
-  if(allocated(DMRSVs1))deallocate(DMRSVs1)
-  if(allocated(CNHSKs1))deallocate(CNHSKs1)
-  if(allocated(DMEARs1))deallocate(DMEARs1)
-
-  if(allocated(DMHSKs1))deallocate(DMHSKs1)
-  if(allocated(CNEARs1))deallocate(CNEARs1)
-  if(allocated(CNRSVs1))deallocate(CNRSVs1)
-  if(allocated(CPRSVs1))deallocate(CPRSVs1)
-
 
   if(allocated(ZTYPs1))deallocate(ZTYPs1)
   if(allocated(ZTYPIs1))deallocate(ZTYPIs1)
@@ -1799,18 +2013,6 @@ implicit none
   if(allocated(PPXs1)) deallocate(PPXs1)
   if(allocated(DPTHZs1))deallocate(DPTHZs1)
   if(allocated(FMPRs1))deallocate(FMPRs1)
-  if(allocated(FWODLPs1))deallocate(FWODLPs1)
-  if(allocated(FWODLNs1))deallocate(FWODLNs1)
-  if(allocated(FWOODs1))deallocate(FWOODs1)
-  if(allocated(FVRNs1))deallocate(FVRNs1)
-  if(allocated(FWOODPs1))deallocate(FWOODPs1)
-  if(allocated(FWOODNs1))deallocate(FWOODNs1)
-  if(allocated(FWODRs1))deallocate(FWODRs1)
-  if(allocated(FWODRNs1))deallocate(FWODRNs1)
-  if(allocated(FWODSNs1))deallocate(FWODSNs1)
-  if(allocated(FWODSPs1))deallocate(FWODSPs1)
-  if(allocated(FWODBs1))deallocate(FWODBs1)
-  if(allocated(FWODRPs1))deallocate(FWODRPs1)
 
   if(allocated(RPO4Ys1))deallocate(RPO4Ys1)
   if(allocated(RPOBYs1))deallocate(RPOBYs1)
@@ -1824,13 +2026,11 @@ implicit none
   if(allocated(RCO2Fs1))deallocate(RCO2Fs1)
   if(allocated(ROXYLs1))deallocate(ROXYLs1)
   if(allocated(ROXYYs1))deallocate(ROXYYs1)
-  if(allocated(O2Ls1))deallocate(O2Ls1)
+
   if(allocated(DLYR3s1))deallocate(DLYR3s1)
   if(allocated(RSMNs1))deallocate(RSMNs1)
-  if(allocated(WTRTSs1))deallocate(WTRTSs1)
-  if(allocated(WTRTSNs1))deallocate(WTRTSNs1)
-  if(allocated(WTRTSPs1))deallocate(WTRTSPs1)
-  if(allocated(WTRTts1))deallocate(WTRTts1)
+
+
   if(allocated(TKCZs1))deallocate(TKCZs1)
   if(allocated(SO2s1))deallocate(SO2s1)
   if(allocated(RCs1))deallocate(RCs1)
@@ -1909,32 +2109,18 @@ implicit none
   if(allocated(BALNs1))deallocate(BALNs1)
   if(allocated(BALPs1))deallocate(BALPs1)
 
-  if(allocated(CCPOLPs1))deallocate(CCPOLPs1)
-  if(allocated(CPOOLPs1))deallocate(CPOOLPs1)
-  if(allocated(CPOLNPs1))deallocate(CPOLNPs1)
-  if(allocated(CCPLNPs1))deallocate(CCPLNPs1)
-  if(allocated(CZPOLPs1))deallocate(CZPOLPs1)
-  if(allocated(CPPOLPs1))deallocate(CPPOLPs1)
+
   if(allocated(CTCs1))deallocate(CTCs1)
   if(allocated(CNETs1))deallocate(CNETs1)
-  if(allocated(CPRTSs1))deallocate(CPRTSs1)
-  if(allocated(CNRTSs1))deallocate(CNRTSs1)
+
   if(allocated(CARBNs1))deallocate(CARBNs1)
-  if(allocated(CNNDs1))deallocate(CNNDs1)
-  if(allocated(CPNDs1))deallocate(CPNDs1)
-  if(allocated(CNRTs1))deallocate(CNRTs1)
-  if(allocated(CWSRTs1))deallocate(CWSRTs1)
+
   if(allocated(RSMXs1))deallocate(RSMXs1)
 
-  if(allocated(CPRTs1))deallocate(CPRTs1)
-  if(allocated(CNWSs1))deallocate(CNWSs1)
-  if(allocated(CPWSs1))deallocate(CPWSs1)
   if(allocated(CFXs1))deallocate(CFXs1)
   if(allocated(DCO2s1))deallocate(DCO2s1)
   if(allocated(DATAPs1))deallocate(DATAPs1)
 
-  if(allocated(DMNDs1))deallocate(DMNDs1)
-  if(allocated(DMRTs1))deallocate(DMRTs1)
   if(allocated(FMOLs1))deallocate(FMOLs1)
   if(allocated(FNODs1))deallocate(FNODs1)
   if(allocated(GROUPIs1))deallocate(GROUPIs1)
@@ -1948,15 +2134,15 @@ implicit none
   if(allocated(HCUPTKs1))deallocate(HCUPTKs1)
   if(allocated(HZUPTKs1))deallocate(HZUPTKs1)
   if(allocated(HPUPTKs1))deallocate(HPUPTKs1)
-  if(allocated(HTSTZs1))deallocate(HTSTZs1)
+
   if(allocated(OFFSTs1))deallocate(OFFSTs1)
   if(allocated(OSTRs1))deallocate(OSTRs1)
   if(allocated(PPs1))deallocate(PPs1)
   if(allocated(PSILTs1))deallocate(PSILTs1)
   if(allocated(PBs1))deallocate(PBs1)
   if(allocated(PRs1))deallocate(PRs1)
-  if(allocated(PPOOLPs1))deallocate(PPOOLPs1)
-  if(allocated(PPOLNPs1))deallocate(PPOLNPs1)
+
+
   if(allocated(PSILGs1))deallocate(PSILGs1)
   if(allocated(RCMXs1))deallocate(RCMXs1)
   if(allocated(RCO2Zs1))deallocate(RCO2Zs1)
@@ -1965,13 +2151,10 @@ implicit none
   if(allocated(RN2OZs1))deallocate(RN2OZs1)
   if(allocated(RNH3Zs1))deallocate(RNH3Zs1)
   if(allocated(RH2GZs1))deallocate(RH2GZs1)
-  if(allocated(RSETCs1))deallocate(RSETCs1)
-  if(allocated(RSETNs1))deallocate(RSETNs1)
-  if(allocated(RSETPs1))deallocate(RSETPs1)
+
   if(allocated(RTFQs1))deallocate(RTFQs1)
   if(allocated(RAZs1))deallocate(RAZs1)
-  if(allocated(SCO2s1))deallocate(SCO2s1)
-  if(allocated(CO2Qs1))deallocate(CO2Qs1)
+
   if(allocated(EVAPCs1))deallocate(EVAPCs1)
   if(allocated(HFLXCs1))deallocate(HFLXCs1)
   if(allocated(EFLXCs1))deallocate(EFLXCs1)
@@ -2013,45 +2196,17 @@ implicit none
   if(allocated(VPO4Fs1))deallocate(VPO4Fs1)
   if(allocated(VOLWPs1))deallocate(VOLWPs1)
   if(allocated(WSTRs1))deallocate(WSTRs1)
-  if(allocated(WTRVXs1))deallocate(WTRVXs1)
-  if(allocated(WTRVCs1))deallocate(WTRVCs1)
-  if(allocated(WTLSs1))deallocate(WTLSs1)
-  if(allocated(WTSHTs1))deallocate(WTSHTs1)
-  if(allocated(WTSHTAs1))deallocate(WTSHTAs1)
-  if(allocated(WTSTGs1))deallocate(WTSTGs1)
-  if(allocated(WTSTGNs1))deallocate(WTSTGNs1)
-  if(allocated(WTSTGPs1))deallocate(WTSTGPs1)
-  if(allocated(WTNDs1))deallocate(WTNDs1)
-  if(allocated(WTNDNs1))deallocate(WTNDNs1)
-  if(allocated(WTRTNs1))deallocate(WTRTNs1)
-  if(allocated(WTSHNs1))deallocate(WTSHNs1)
-  if(allocated(WTRVNs1))deallocate(WTRVNs1)
-  if(allocated(WTNDPs1))deallocate(WTNDPs1)
-  if(allocated(WTRTPs1))deallocate(WTRTPs1)
-  if(allocated(WTSHPs1))deallocate(WTSHPs1)
-  if(allocated(WTRVPs1))deallocate(WTRVPs1)
-  if(allocated(XKCO24s1))deallocate(XKCO24s1)
 
-  if(allocated(ZPOOLPs1))deallocate(ZPOOLPs1)
-  if(allocated(ZPOLNPs1))deallocate(ZPOLNPs1)
   if(allocated(ZEROLs1))deallocate(ZEROLs1)
   if(allocated(ZEROPs1))deallocate(ZEROPs1)
   if(allocated(ZEROQs1))deallocate(ZEROQs1)
 
   if(allocated(ZNPPs1))deallocate(ZNPPs1)
 
-  if(allocated(CPOOLs1))deallocate(CPOOLs1)
-  if(allocated(CPOLNBs1))deallocate(CPOLNBs1)
-  if(allocated(CCPOLBs1))deallocate(CCPOLBs1)
-  if(allocated(CZPOLBs1))deallocate(CZPOLBs1)
-  if(allocated(CPPOLBs1))deallocate(CPPOLBs1)
-
   if(allocated(GRWTBs1))deallocate(GRWTBs1)
 
   if(allocated(IDAYYs1))deallocate(IDAYYs1)
 
-  if(allocated(PPOOLs1))deallocate(PPOOLs1)
-  if(allocated(PPOLNBs1))deallocate(PPOLNBs1)
   if(allocated(RCCLXs1))deallocate(RCCLXs1)
   if(allocated(RCZLXs1))deallocate(RCZLXs1)
   if(allocated(RCPLXs1))deallocate(RCPLXs1)
@@ -2059,47 +2214,6 @@ implicit none
   if(allocated(RCZSXs1))deallocate(RCZSXs1)
   if(allocated(RCPSXs1))deallocate(RCPSXs1)
   if(allocated(RNH3Bs1))deallocate(RNH3Bs1)
-
-  if(allocated(WTLSBs1))deallocate(WTLSBs1)
-  if(allocated(WTRSVBs1))deallocate(WTRSVBs1)
-  if(allocated(WTLFBs1))deallocate(WTLFBs1)
-  if(allocated(WTNDBs1))deallocate(WTNDBs1)
-  if(allocated(WTSHEBs1))deallocate(WTSHEBs1)
-  if(allocated(WTEARBs1))deallocate(WTEARBs1)
-  if(allocated(WTHSKBs1))deallocate(WTHSKBs1)
-  if(allocated(WTRSBNs1))deallocate(WTRSBNs1)
-  if(allocated(WTLFBNs1))deallocate(WTLFBNs1)
-  if(allocated(WTNDBNs1))deallocate(WTNDBNs1)
-  if(allocated(WTSHBNs1))deallocate(WTSHBNs1)
-  if(allocated(WTEABNs1))deallocate(WTEABNs1)
-  if(allocated(WTHSBNs1))deallocate(WTHSBNs1)
-  if(allocated(WTRSBPs1))deallocate(WTRSBPs1)
-  if(allocated(WTLFBPs1))deallocate(WTLFBPs1)
-  if(allocated(WTNDBPs1))deallocate(WTNDBPs1)
-  if(allocated(WTSHBPs1))deallocate(WTSHBPs1)
-  if(allocated(WTEABPs1))deallocate(WTEABPs1)
-  if(allocated(WTHSBPs1))deallocate(WTHSBPs1)
-  if(allocated(WTGRBs1))deallocate(WTGRBs1)
-  if(allocated(WTGRBNs1))deallocate(WTGRBNs1)
-  if(allocated(WTGRBPs1))deallocate(WTGRBPs1)
-  if(allocated(WTSTKBs1))deallocate(WTSTKBs1)
-  if(allocated(WTSTBNs1))deallocate(WTSTBNs1)
-  if(allocated(WTSTBPs1))deallocate(WTSTBPs1)
-  if(allocated(WTSHTBs1))deallocate(WTSHTBs1)
-  if(allocated(WTSHTNs1))deallocate(WTSHTNs1)
-  if(allocated(WTSHTPs1))deallocate(WTSHTPs1)
-  if(allocated(WGLFXs1))deallocate(WGLFXs1)
-  if(allocated(WGLFNXs1))deallocate(WGLFNXs1)
-  if(allocated(WGLFPXs1))deallocate(WGLFPXs1)
-  if(allocated(WGSHEXs1))deallocate(WGSHEXs1)
-  if(allocated(WGSHNXs1))deallocate(WGSHNXs1)
-  if(allocated(WGSHPXs1))deallocate(WGSHPXs1)
-  if(allocated(WTSTXBs1))deallocate(WTSTXBs1)
-  if(allocated(WTSTXNs1))deallocate(WTSTXNs1)
-  if(allocated(WTSTXPs1))deallocate(WTSTXPs1)
-  if(allocated(WVSTKBs1))deallocate(WVSTKBs1)
-  if(allocated(ZPOOLs1))deallocate(ZPOOLs1)
-  if(allocated(ZPOLNBs1))deallocate(ZPOLNBs1)
 
   if(allocated(SURFXs1))deallocate(SURFXs1)
   if(allocated(CPOOL3s1))deallocate(CPOOL3s1)
@@ -2117,45 +2231,23 @@ implicit none
   if(allocated(VCGR4s1))deallocate(VCGR4s1)
   if(allocated(VGRO4s1))deallocate(VGRO4s1)
 
-  if(allocated(WGNODEs1))deallocate(WGNODEs1)
-  if(allocated(WGNODNs1))deallocate(WGNODNs1)
-  if(allocated(WGNODPs1))deallocate(WGNODPs1)
-  if(allocated(WGLFs1))deallocate(WGLFs1)
-  if(allocated(WGLFNs1))deallocate(WGLFNs1)
-  if(allocated(WGLFPs1))deallocate(WGLFPs1)
-  if(allocated(WSLFs1))deallocate(WSLFs1)
-  if(allocated(WGSHEs1))deallocate(WGSHEs1)
-  if(allocated(WGSHNs1))deallocate(WGSHNs1)
-  if(allocated(WGSHPs1))deallocate(WGSHPs1)
-  if(allocated(WSSHEs1))deallocate(WSSHEs1)
-
-  if(allocated(WGLFLs1))deallocate(WGLFLs1)
-  if(allocated(WGLFLNs1))deallocate(WGLFLNs1)
-  if(allocated(WGLFLPs1))deallocate(WGLFLPs1)
-
-  if(allocated(WTSTDIs1))deallocate(WTSTDIs1)
   if(allocated(OSMOs1))deallocate(OSMOs1)
   if(allocated(TCCs1))deallocate(TCCs1)
   if(allocated(DTKCs1))deallocate(DTKCs1)
   if(allocated(TKCs1))deallocate(TKCs1)
   if(allocated(WTRT1s1))deallocate(WTRT1s1)
-  if(allocated(CPGRs1))deallocate(CPGRs1)
+
   if(allocated(ENGYXs1))deallocate(ENGYXs1)
   if(allocated(PSILOs1))deallocate(PSILOs1)
-  if(allocated(CNSTKs1))deallocate(CNSTKs1)
+
   if(allocated(CTRANs1))deallocate(CTRANs1)
-  if(allocated(CHILLs1))deallocate(CHILLs1)
+
   if(allocated(TCO2As1))deallocate(TCO2As1)
-  if(allocated(CPSTKs1))deallocate(CPSTKs1)
-  if(allocated(CPOOLRs1))deallocate(CPOOLRs1)
-  if(allocated(CCPOLRs1))deallocate(CCPOLRs1)
-  if(allocated(CZPOLRs1))deallocate(CZPOLRs1)
-  if(allocated(CPPOLRs1))deallocate(CPPOLRs1)
+
   if(allocated(CO2Ps1))deallocate(CO2Ps1)
   if(allocated(CO2As1))deallocate(CO2As1)
   if(allocated(CH4Ps1))deallocate(CH4Ps1)
   if(allocated(CH4As1))deallocate(CH4As1)
-  if(allocated(CWSRTLs1))deallocate(CWSRTLs1)
   if(allocated(H2GPs1))deallocate(H2GPs1)
   if(allocated(H2GAs1))deallocate(H2GAs1)
   if(allocated(OXYPs1))deallocate(OXYPs1)
@@ -2163,7 +2255,7 @@ implicit none
   if(allocated(PSIRTs1))deallocate(PSIRTs1)
   if(allocated(PSIROs1))deallocate(PSIROs1)
   if(allocated(PSIRGs1))deallocate(PSIRGs1)
-  if(allocated(PPOOLRs1))deallocate(PPOOLRs1)
+
   if(allocated(RUPNHBs1))deallocate(RUPNHBs1)
   if(allocated(RUPNH4s1))deallocate(RUPNH4s1)
   if(allocated(RUPH2Ps1))deallocate(RUPH2Ps1)
@@ -2233,10 +2325,7 @@ implicit none
   if(allocated(RUPP1Bs1))deallocate(RUPP1Bs1)
   if(allocated(UPWTRs1))deallocate(UPWTRs1)
   if(allocated(WFRs1))deallocate(WFRs1)
-  if(allocated(WTRTLs1))deallocate(WTRTLs1)
-  if(allocated(WTRTDs1))deallocate(WTRTDs1)
-  if(allocated(WSRTLs1))deallocate(WSRTLs1)
-  if(allocated(ZPOOLRs1))deallocate(ZPOOLRs1)
+
   if(allocated(Z2OPs1))deallocate(Z2OPs1)
   if(allocated(Z2OAs1))deallocate(Z2OAs1)
   if(allocated(ZH3Ps1))deallocate(ZH3Ps1)
@@ -2258,46 +2347,21 @@ implicit none
   if(allocated(RTAR1Xs1))deallocate(RTAR1Xs1)
   if(allocated(RRAD1Xs1))deallocate(RRAD1Xs1)
   if(allocated(RRAD2Xs1))deallocate(RRAD2Xs1)
-  if(allocated(WTRTAs1))deallocate(WTRTAs1)
+
   if(allocated(VOXYFs1))deallocate(VOXYFs1)
-  if(allocated(WTSHEPs1))deallocate(WTSHEPs1)
-  if(allocated(WTLFPs1))deallocate(WTLFPs1)
-  if(allocated(CNGRs1))deallocate(CNGRs1)
 
   if(allocated(EPs1))deallocate(EPs1)
   if(allocated(WDLFs1))deallocate(WDLFs1)
-  if(allocated(DMLFs1))deallocate(DMLFs1)
   if(allocated(GFILLs1))deallocate(GFILLs1)
   if(allocated(IRTYPs1))deallocate(IRTYPs1)
   if(allocated(STMXs1))deallocate(STMXs1)
   if(allocated(SDMXs1))deallocate(SDMXs1)
   if(allocated(GRMXs1))deallocate(GRMXs1)
-  if(allocated(WTLFs1))deallocate(WTLFs1)
-  if(allocated(WTSHEs1))deallocate(WTSHEs1)
-  if(allocated(CNLFs1))deallocate(CNLFs1)
-  if(allocated(WVSTKs1))deallocate(WVSTKs1)
+
   if(allocated(PTSHTs1))deallocate(PTSHTs1)
-  if(allocated(WTRSVs1))deallocate(WTRSVs1)
-  if(allocated(WTSTKs1))deallocate(WTSTKs1)
-  if(allocated(CPLFs1))deallocate(CPLFs1)
-  if(allocated(CPSHEs1))deallocate(CPSHEs1)
-  if(allocated(CNSHEs1))deallocate(CNSHEs1)
-  if(allocated(WTEARNs1))deallocate(WTEARNs1)
-  if(allocated(WTGRs1))deallocate(WTGRs1)
-  if(allocated(WTSHENs1))deallocate(WTSHENs1)
-  if(allocated(WTRSVNs1))deallocate(WTRSVNs1)
-  if(allocated(WTLFNs1))deallocate(WTLFNs1)
-  if(allocated(WTHSKNs1))deallocate(WTHSKNs1)
-  if(allocated(WTEARs1))deallocate(WTEARs1)
-  if(allocated(WTHSKs1))deallocate(WTHSKs1)
-  if(allocated(WTGRNNs1))deallocate(WTGRNNs1)
+
   if(allocated(RNH3Cs1))deallocate(RNH3Cs1)
-  if(allocated(WTSTKPs1))deallocate(WTSTKPs1)
-  if(allocated(WTRSVPs1))deallocate(WTRSVPs1)
-  if(allocated(WTHSKPs1))deallocate(WTHSKPs1)
-  if(allocated(WTEARPs1))deallocate(WTEARPs1)
-  if(allocated(WTGRNPs1)) deallocate(WTGRNPs1)
-  if(allocated(WTSTKNs1)) deallocate(WTSTKNs1)
+
   if(allocated(RTLG1Xs1))deallocate(RTLG1Xs1)
   if(allocated(RRADPs1))deallocate(RRADPs1)
   if(allocated(RTLG2Xs1))deallocate(RTLG2Xs1)
@@ -2342,8 +2406,7 @@ implicit none
   if(allocated(TORTs1))deallocate(TORTs1)
   if(allocated(FILMs1))deallocate(FILMs1)
   if(allocated(ROXSKs1))deallocate(ROXSKs1)
-  if(allocated(THETPMs1))deallocate(THETPMs1)
-  if(allocated(DFGSs1))deallocate(DFGSs1)
+
   end subroutine DestructPlantAPIData
 
 !------------------------------------------------------------------------
@@ -2407,6 +2470,11 @@ implicit none
   subroutine plt_photo_init(this)
   class(plant_photosyns_type) :: this
 
+  allocate(this%XKCO24s1(JP1))
+  allocate(this%O2Ls1(JP1))
+  allocate(this%SCO2s1(JP1))
+  allocate(this%CO2Qs1(JP1))
+  allocate(this%CHILLs1(JP1))
   allocate(this%ETMXs1(JP1))
   allocate(this%CHLs1(JP1))
   allocate(this%PEPCs1(JP1))
@@ -2433,6 +2501,12 @@ implicit none
 
   subroutine plt_photo_destroy(this)
   class(plant_photosyns_type) :: this
+
+!  if(allocated(XKCO24s1))deallocate(XKCO24s1)
+!  if(allocated(O2Ls1))deallocate(O2Ls1)
+!  if(allocated(SCO2s1))deallocate(SCO2s1)
+!  if(allocated(CO2Qs1))deallocate(CO2Qs1)
+!  if(allocated(CHILLs1))deallocate(CHILLs1)
 !  if(allocated(ETMXs1))deallocate(ETMXs1)
 !  if(allocated(CHLs1))deallocate(CHLs1)
 !  if(allocated(PEPCs1))deallocate(PEPCs1)
@@ -2460,6 +2534,11 @@ implicit none
   implicit none
   class(plant_pheno_type) :: this
 
+  allocate(this%IFLGCs1(JP1))
+  allocate(this%IDTHs1(JP1))
+  allocate(this%RSETCs1(JP1))
+  allocate(this%RSETNs1(JP1))
+  allocate(this%RSETPs1(JP1))
   allocate(this%GROUPs1(JC1,JP1))
   allocate(this%IDTHPs1(JP1))
   allocate(this%ATRPs1(JC1,JP1))
@@ -2509,7 +2588,11 @@ implicit none
   implicit none
   class(plant_pheno_type) :: this
 
-
+!  if(allocated(IFLGCs1))deallocate(IFLGCs1)
+!  if(allocated(IDTHs1))deallocate(IDTHs1)
+!  if(allocated(RSETCs1))deallocate(RSETCs1)
+!  if(allocated(RSETNs1))deallocate(RSETNs1)
+!  if(allocated(RSETPs1))deallocate(RSETPs1)
 !  if(allocated(GROUPs1))deallocate(GROUPs1)
 !  if(allocated(IDTHPs1))deallocate(IDTHPs1)
 !  if(allocated(ATRPs1))deallocate(ATRPs1)
@@ -2559,6 +2642,9 @@ implicit none
   implicit none
   class(plant_morph_type) :: this
 
+
+  allocate(this%MYs1(JP1))
+  allocate(this%HTSTZs1(JP1))
   allocate(this%KLEAFs1(JC1,JP1))
   allocate(this%VSTGs1(JC1,JP1))
   allocate(this%NGs1(JP1))
@@ -2620,6 +2706,8 @@ implicit none
   implicit none
   class(plant_morph_type) :: this
 
+!  if(allocated(MYs1)) deallocate(MYs1)
+!  if(allocated(HTSTZs1))deallocate(HTSTZs1)
 !  if(allocated(KLEAFs1))deallocate(KLEAFs1)
 !  if(allocated(NGs1)) deallocate(NGs1)
 !  if(allocated(ZCs1))deallocate(ZCs1)
