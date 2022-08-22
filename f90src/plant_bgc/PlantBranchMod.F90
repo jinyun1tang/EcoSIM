@@ -2586,6 +2586,14 @@ module PlantBranchMod
   integer :: K,M
 ! begin_execution
   associate(                               &
+    EHVSTs1    =>  plt_distb%EHVSTs1     , &
+    IYRHs1     =>  plt_distb%IYRHs1      , &
+    HVSTs1     =>  plt_distb%HVSTs1      , &
+    IHVSTs1    =>  plt_distb%IHVSTs1     , &
+    JHVSTs1    =>  plt_distb%JHVSTs1     , &
+    IDAY0s1    =>  plt_distb%IDAY0s1     , &
+    IDAYHs1    =>  plt_distb%IDAYHs1     , &
+    IYR0s1     =>  plt_distb%IYR0s1      , &
     WTGRBs1    =>  plt_biom%WTGRBs1      , &
     WTSHTNs1   =>  plt_biom%WTSHTNs1     , &
     WTGRBNs1   =>  plt_biom%WTGRBNs1     , &
@@ -2994,6 +3002,8 @@ module PlantBranchMod
   real(r8) :: XFRC,XFRN,XFRP
   ! begin_execution
   associate(                          &
+    IDAY0s1  =>  plt_distb%IDAY0s1  , &
+    IYR0s1   =>  plt_distb%IYR0s1   , &
     FVRNs1   =>  plt_allom%FVRNs1   , &
     FWODRs1  =>  plt_allom%FWODRs1  , &
     WTRTs1   =>  plt_biom%WTRTs1    , &

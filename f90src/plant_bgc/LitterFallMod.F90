@@ -18,6 +18,9 @@ implicit none
 
 !     begin_execution
   associate(                                 &
+    IYRHs1       =>   plt_distb%IYRHs1     , &
+    JHVSTs1      =>   plt_distb%JHVSTs1    , &
+    IDAYHs1      =>   plt_distb%IDAYHs1    , &
     UVOLOs1      =>   plt_ew%UVOLOs1       , &
     WTRTs1       =>   plt_biom%WTRTs1      , &
     WTRVCs1      =>   plt_biom%WTRVCs1     , &
@@ -114,6 +117,9 @@ implicit none
   integer :: L,M,NR,NB,N
 !     begin_execution
   associate(                                &
+    JHVSTs1      =>   plt_distb%JHVSTs1   , &
+    IYR0s1       =>   plt_distb%IYR0s1    , &
+    IDAY0s1      =>   plt_distb%IDAY0s1   , &
     WTEARBs1     =>   plt_biom%WTEARBs1   , &
     WTEABNs1     =>   plt_biom%WTEABNs1   , &
     WTEABPs1     =>   plt_biom%WTEABPs1   , &
@@ -503,6 +509,7 @@ implicit none
   integer :: M,NB
 !     begin_execution
   associate(                                &
+    IHVSTs1     =>  plt_distb%IHVSTs1     , &
     FWODBs1     =>  plt_allom%FWODBs1     , &
     FWODSPs1    =>  plt_allom%FWODSPs1    , &
     FWODSNs1    =>  plt_allom%FWODSNs1    , &

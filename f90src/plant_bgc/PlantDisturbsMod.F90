@@ -69,6 +69,9 @@ module PlantDisturbsMod
 
 !     begin_execution
   associate(                            &
+    EHVSTs1    =>  plt_distb%EHVSTs1  , &
+    HVSTs1     =>  plt_distb%HVSTs1   , &
+    IHVSTs1    =>  plt_distb%IHVSTs1  , &
     WTSTGs1    =>  plt_biom%WTSTGs1     &
   )
 
@@ -204,6 +207,7 @@ module PlantDisturbsMod
   integer :: m
 !     begin_execution
   associate(                            &
+    IHVSTs1    =>  plt_distb%IHVSTs1  , &
     FWOODs1    =>  plt_allom%FWOODs1  , &
     FWOODPs1   =>  plt_allom%FWOODPs1 , &
     FWOODNs1   =>  plt_allom%FWOODNs1 , &
@@ -366,6 +370,8 @@ module PlantDisturbsMod
   real(r8) :: WTHTHT,WTHNHT,WTHPHT
 !     begin_execution
   associate(                            &
+    IHVSTs1    =>  plt_distb%IHVSTs1  , &
+    JHVSTs1    =>  plt_distb%JHVSTs1  , &
     WTRVNs1    =>  plt_biom%WTRVNs1   , &
     WTRVCs1    =>  plt_biom%WTRVCs1   , &
     WTRVPs1    =>  plt_biom%WTRVPs1     &
@@ -463,6 +469,12 @@ module PlantDisturbsMod
   real(r8), intent(out) :: WTHNL4,WTHPL4
 
 !     begin_execution
+  associate(                            &
+    EHVSTs1    =>  plt_distb%EHVSTs1  , &
+    FERTs1     =>  plt_distb%FERTs1   , &
+    IYTYPs1    =>  plt_distb%IYTYPs1  , &
+    IHVSTs1    =>  plt_distb%IHVSTs1    &
+  )
 !     IF NO PLANT C,N,P REMOVED AT HARVEST (ALL RESIDUE RETURNED)
 !
 !     IHVST=harvest type:0=none,1=grain,2=all above-ground
@@ -634,6 +646,7 @@ module PlantDisturbsMod
     WTHNL4=WTHNH4*(1._r8-EHVSTs1(2,4,NZ))
     WTHPL4=WTHPH4*(1._r8-EHVSTs1(2,4,NZ))
   ENDIF
+  end associate
   end subroutine ApplyDisturbanceBiomRemoval
 
 !------------------------------------------------------------------------------------------
@@ -650,6 +663,12 @@ module PlantDisturbsMod
   real(r8) :: WVPLT
 !     begin_execution
   associate(                               &
+    JHVSTs1    =>  plt_distb%JHVSTs1     , &
+    IDAYHs1    =>  plt_distb%IDAYHs1     , &
+    IDAY0s1    =>  plt_distb%IDAY0s1     , &
+    ITILLs1    =>  plt_distb%ITILLs1     , &
+    IYR0s1     =>  plt_distb%IYR0s1      , &
+    IYRHs1     =>  plt_distb%IYRHs1      , &
     UVOLOs1    =>  plt_ew%UVOLOs1        , &
     CPOOLRs1   =>  plt_biom%CPOOLRs1     , &
     ZPOOLRs1   =>  plt_biom%ZPOOLRs1     , &
@@ -1198,10 +1217,16 @@ module PlantDisturbsMod
   real(r8) :: WGLFPG,WHVSBS,WHVSCX,WHVSNX,WVPLT
 !     begin_execution
   associate(                            &
-    UVOLOs1   =>  plt_ew%UVOLOs1      , &
-    CPOOLRs1    => plt_biom%CPOOLRs1  , &
-    ZPOOLRs1    => plt_biom%ZPOOLRs1  , &
-    PPOOLRs1    => plt_biom%PPOOLRs1  , &
+    HVSTs1     =>  plt_distb%HVSTs1   , &
+    EHVSTs1    =>  plt_distb%EHVSTs1  , &
+    DCORPs1    =>  plt_distb%DCORPs1  , &
+    ITILLs1    =>  plt_distb%ITILLs1  , &
+    IHVSTs1    =>  plt_distb%IHVSTs1  , &
+    JHVSTs1    =>  plt_distb%JHVSTs1  , &
+    UVOLOs1    =>  plt_ew%UVOLOs1     , &
+    CPOOLRs1   => plt_biom%CPOOLRs1   , &
+    ZPOOLRs1   => plt_biom%ZPOOLRs1   , &
+    PPOOLRs1   => plt_biom%PPOOLRs1   , &
     WSRTLs1    => plt_biom%WSRTLs1    , &
     WTRTDs1    => plt_biom%WTRTDs1    , &
     WTRTLs1    => plt_biom%WTRTLs1    , &

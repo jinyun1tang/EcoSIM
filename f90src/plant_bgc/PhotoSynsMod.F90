@@ -32,7 +32,7 @@ implicit none
   real(r8) :: VA,VG
 !begin_execution
   associate(                          &
-  IGTYPs1     =>  plt_pheno%IGTYPs1 , &
+  IGTYPs1      => plt_pheno%IGTYPs1 , &
   FDBKs1       => plt_photo%FDBKs1  , &
   CO2Qs1       => plt_photo%CO2Qs1  , &
   XKCO2Os1     => plt_photo%XKCO2Os1, &
@@ -40,6 +40,8 @@ implicit none
   CO2Is1       => plt_photo%CO2Is1  , &
   XKCO24s1     => plt_photo%XKCO24s1, &
   ARLFLs1      => plt_morph%ARLFLs1 , &
+  PARDIFs1     => plt_rad%PARDIFs1  , &
+  PARs1        => plt_rad%PARs1     , &
   TAU0s1       => plt_rad%TAU0s1    , &
   TAUSs1       => plt_rad%TAUSs1      &
   )
@@ -300,6 +302,8 @@ implicit none
   FDBKs1       => plt_photo%FDBKs1  , &
   CO2Is1       => plt_photo%CO2Is1  , &
   ARLFLs1      => plt_morph%ARLFLs1 , &
+  PARDIFs1     => plt_rad%PARDIFs1  , &
+  PARs1        => plt_rad%PARs1     , &
   TAU0s1       => plt_rad%TAU0s1    , &
   TAUSs1       => plt_rad%TAUSs1      &
   )

@@ -165,6 +165,10 @@ module HfuncsMod
 
 ! begin_execution
   associate(                            &
+    IYR0s1    =>  plt_distb%IYR0s1    , &
+    IYRHs1    =>  plt_distb%IYRHs1    , &
+    IDAY0s1   =>  plt_distb%IDAY0s1   , &
+    IDAYHs1   =>  plt_distb%IDAYHs1   , &
     WTRVXs1   =>  plt_biom%WTRVXs1    , &
     IDTHs1    =>  plt_pheno%IDTHs1    , &
     IFLGCs1   =>  plt_pheno%IFLGCs1     &
@@ -713,6 +717,8 @@ module HfuncsMod
 
 ! begin_execution
   associate(                            &
+    IYR0s1    =>  plt_distb%IYR0s1    , &
+    IDAY0s1   =>  plt_distb%IDAY0s1   , &
     DPTHSs1   =>  plt_ew%DPTHSs1      , &
     IDAYs1    =>  plt_pheno%IDAYs1    , &
     XRLAs1    =>  plt_pheno%XRLAs1    , &

@@ -104,9 +104,11 @@
   real(r8) :: ETLF,EGRO,PARX,PARJ
   real(r8) :: VL
 !     begin_execution
-  associate(                       &
-    FDBKs1  => plt_photo%FDBKs1  , &
-    TAU0s1  => plt_rad%TAU0s1      &
+  associate(                        &
+    PARDIFs1 => plt_rad%PARDIFs1  , &
+    PARs1    => plt_rad%PARs1     , &
+    FDBKs1   => plt_photo%FDBKs1  , &
+    TAU0s1   => plt_rad%TAU0s1      &
   )
 !
 !     LIGHT-LIMITED CARBOXYLATION RATES
@@ -146,9 +148,10 @@
   real(r8) :: ETLF,EGRO,PARX,PARJ
   real(r8) :: VL
 !     begin_execution
-  associate(                           &
-    FDBKs1   => plt_photo%FDBKs1     , &
-    TAUSs1    =>  plt_rad%TAUSs1       &
+  associate(                            &
+    PARs1     => plt_rad%PARs1        , &
+    FDBKs1    => plt_photo%FDBKs1     , &
+    TAUSs1    =>  plt_rad%TAUSs1        &
   )
 !
 !     LIGHT-LIMITED CARBOXYLATION RATES
@@ -187,6 +190,10 @@
   real(r8), intent(inout) :: CH2O
   integer :: N,M
 !     begin_execution
+  associate(                           &
+    PARs1    => plt_rad%PARs1        , &
+    PARDIFs1 => plt_rad%PARDIFs1       &
+  )
 !     FOR EACH INCLINATION AND AZIMUTH CLASS
 !
   DO N=1,JLI1
@@ -207,6 +214,7 @@
       ENDIF
     ENDDO
   ENDDO
+  end associate
   end subroutine C3PhotosynsCanopyLayerL
 !------------------------------------------------------------------------------------------
 
@@ -439,6 +447,10 @@
   real(r8), intent(inout) :: CH2O
   integer :: M,N
 !     begin_execution
+  associate(                        &
+    PARs1    => plt_rad%PARs1     , &
+    PARDIFs1 => plt_rad%PARDIFs1    &
+  )
 !
 !     FOR EACH INCLINATION AND AZIMUTH CLASS
 !
@@ -458,7 +470,7 @@
       ENDIF
     ENDDO
   ENDDO
-
+  end associate
   end subroutine C4PhotosynsCanopyLayerL
 !------------------------------------------------------------------------------------------
 
@@ -470,8 +482,10 @@
   real(r8) :: ETLF4,EGRO4,PARX,PARJ
   real(r8) :: VL
 !     begin_execution
-  associate(                     &
-    TAU0s1   => plt_rad%TAU0s1   &
+  associate(                          &
+    PARs1    => plt_rad%PARs1       , &
+    PARDIFs1 => plt_rad%PARDIFs1    , &
+    TAU0s1   => plt_rad%TAU0s1        &
   )
 !
 !     LIGHT-LIMITED CARBOXYLATION RATES
@@ -511,8 +525,9 @@
   real(r8) :: ETLF4,EGRO4,PARX,PARJ
   real(r8) :: VL
 !     begin_execution
-  associate(                  &
-  TAUSs1  =>  plt_rad%TAUSs1  &
+  associate(                      &
+  PARs1   =>  plt_rad%PARs1     , &
+  TAUSs1  =>  plt_rad%TAUSs1      &
   )
 !
 !     LIGHT-LIMITED CARBOXYLATION RATES

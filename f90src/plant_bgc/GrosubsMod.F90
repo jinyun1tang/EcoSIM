@@ -123,6 +123,8 @@ module grosubsMod
 !     begin_execution
 
   associate(                           &
+    IDAY0s1   => plt_distb%IDAY0s1   , &
+    IYR0s1    => plt_distb%IYR0s1    , &
     WTSTGPs1  => plt_biom%WTSTGPs1   , &
     WTSHPs1   => plt_biom%WTSHPs1    , &
     WTSHNs1   => plt_biom%WTSHNs1    , &

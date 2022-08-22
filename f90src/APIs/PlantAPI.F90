@@ -149,9 +149,9 @@ implicit none
   TCCAN(NY,NX)=TCCANs1
   TCH4Z(NY,NX)=TCH4Zs1
 
-  FERT(17:19,I1,NY,NX)=FERTs1(17:19)
-  FERT(3,I1,NY,NX)=FERTs1(3)
-  IYTYP(2,I1,NY,NX)=IYTYPs1
+  FERT(17:19,I1,NY,NX)=plt_distb%FERTs1(17:19)
+  FERT(3,I1,NY,NX) =plt_distb%FERTs1(3)
+  IYTYP(2,I1,NY,NX)=plt_distb%IYTYPs1
   FWOOD(:) =plt_allom%FWOODs1(:)
   FWOODN(:)=plt_allom%FWOODNs1(:)
   FWOODP(:)=plt_allom%FWOODPs1(:)
@@ -292,11 +292,11 @@ implicit none
     IDTH(NZ,NY,NX) =plt_pheno%IDTHs1(NZ)
     IDTHP(NZ,NY,NX)=plt_pheno%IDTHPs1(NZ)
     IDTHR(NZ,NY,NX)=plt_pheno%IDTHRs1(NZ)
-    IDAY0(NZ,NY,NX)=IDAY0s1(NZ)
-    IYR0(NZ,NY,NX)=IYR0s1(NZ)
+    IDAY0(NZ,NY,NX)=plt_distb%IDAY0s1(NZ)
+    IYR0(NZ,NY,NX) =plt_distb%IYR0s1(NZ)
     IFLGI(NZ,NY,NX)=plt_pheno%IFLGIs1(NZ)
-    IDAYH(NZ,NY,NX)=IDAYHs1(NZ)
-    IYRH(NZ,NY,NX)=IYRHs1(NZ)
+    IDAYH(NZ,NY,NX)=plt_distb%IDAYHs1(NZ)
+    IYRH(NZ,NY,NX) =plt_distb%IYRHs1(NZ)
     NIX(NZ,NY,NX) =plt_morph%NIXs1(NZ)
     NBT(NZ,NY,NX) =plt_morph%NBTs1(NZ)
     NBR(NZ,NY,NX) =plt_morph%NBRs1(NZ)
@@ -440,9 +440,9 @@ implicit none
     ZEROQ(NZ,NY,NX)=ZEROQs1(NZ)
     ZEROL(NZ,NY,NX)=ZEROLs1(NZ)
     ZTYP(NZ,NY,NX)=ZTYPs1(NZ)
-    HVST(NZ,I,NY,NX)=HVSTs1(NZ)
-    IHVST(NZ,I,NY,NX)=IHVSTs1(NZ)
-    JHVST(NZ,I,NY,NX)=JHVSTs1(NZ)
+    HVST(NZ,I,NY,NX) =plt_distb%HVSTs1(NZ)
+    IHVST(NZ,I,NY,NX)=plt_distb%IHVSTs1(NZ)
+    JHVST(NZ,I,NY,NX)=plt_distb%JHVSTs1(NZ)
     THIN(NZ,I,NY,NX)=THINs1(NZ)
     DO L=1,JZ
       WTNDL(L,NZ,NY,NX)=WTNDLs1(L,NZ)
@@ -753,7 +753,7 @@ implicit none
       ENDDO
     ENDDO
 
-    EHVST(1:2,1:4,NZ,I,NY,NX)=EHVSTs1(1:2,1:4,NZ)
+    EHVST(1:2,1:4,NZ,I,NY,NX)=plt_distb%EHVSTs1(1:2,1:4,NZ)
 
 
     DO L=NU(NY,NX),NI(NZ,NY,NX)
@@ -861,8 +861,8 @@ implicit none
   plt_morph%ZTs1=ZT(NY,NX)
   plt_ew%ZDs1=ZD(NY,NX)
   IDATAs1(:)=IDATA(:)
-  DCORPs1=DCORP(I,NY,NX)
-  ITILLs1=ITILL(I,NY,NX)
+  plt_distb%DCORPs1=DCORP(I,NY,NX)
+  plt_distb%ITILLs1=ITILL(I,NY,NX)
 
   plt_morph%ZLs1(0)=ZL(0,NY,NX)
   DO  L=1,JC
@@ -943,6 +943,7 @@ implicit none
     RCO2Fs1(L)=RCO2F(L,NY,NX)
     ROXYLs1(L)=ROXYL(L,NY,NX)
     ROXYYs1(L)=ROXYY(L,NY,NX)
+    plt_ew%TKSs1(L)=TKS(L,NY,NX)
     plt_soilchem%SCO2Ls1(L)=SCO2L(L,NY,NX)
     plt_soilchem%SOXYLs1(L)=SOXYL(L,NY,NX)
     plt_soilchem%SCH4Ls1(L)=SCH4L(L,NY,NX)
@@ -951,8 +952,7 @@ implicit none
     plt_soilchem%SH2GLs1(L)=SH2GL(L,NY,NX)
     plt_soilchem%THETWs1(L)=THETW(L,NY,NX)
     plt_soilchem%THETYs1(L)=THETY(L,NY,NX)
-    plt_ew%TKSs1(L)=TKS(L,NY,NX)
-    TFNDs1(L)=TFND(L,NY,NX)
+    plt_soilchem%TFNDs1(L)=TFND(L,NY,NX)
     plt_soilchem%VOLXs1(L)=VOLX(L,NY,NX)
     plt_soilchem%VLPOBs1(L)=VLPOB(L,NY,NX)
     plt_soilchem%VLNO3s1(L)=VLNO3(L,NY,NX)
@@ -1086,13 +1086,15 @@ implicit none
     plt_allom%CPNDs1(NZ)=CPND(NZ,NY,NX)
 
 !plant properties end
+
     plt_morph%ARLFSs1(NZ)=ARLFS(NZ,NY,NX)
+    plt_distb%IYRXs1(NZ)=IYRX(NZ,NY,NX)
+    plt_distb%IDAYXs1(NZ)=IDAYX(NZ,NY,NX)
+    plt_distb%IYRYs1(NZ)=IYRY(NZ,NY,NX)
+    plt_rad%RADPs1(NZ)=RADP(NZ,NY,NX)
     plt_rad%RADCs1(NZ)=RADC(NZ,NY,NX)
     FLWCs1(NZ)=FLWC(NZ,NY,NX)
-    IYRXs1(NZ)=IYRX(NZ,NY,NX)
-    IDAYXs1(NZ)=IDAYX(NZ,NY,NX)
-    plt_rad%RADPs1(NZ)=RADP(NZ,NY,NX)
-    IYRYs1(NZ)=IYRY(NZ,NY,NX)
+
     PPZs1(NZ)=PPZ(NZ,NY,NX)
     IDAYYs1(NZ)=IDAYY(NZ,NY,NX)
     CFXs1(NZ)=CFX(NZ,NY,NX)
@@ -1109,8 +1111,8 @@ implicit none
     DO L=1,JC
       DO  M=1,JSA
         DO  N=1,JLI
-          PARs1(N,M,L,NZ)=PAR(N,M,L,NZ,NY,NX)
-          PARDIFs1(N,M,L,NZ)=PARDIF(N,M,L,NZ,NY,NX)
+          plt_rad%PARs1(N,M,L,NZ)=PAR(N,M,L,NZ,NY,NX)
+          plt_rad%PARDIFs1(N,M,L,NZ)=PARDIF(N,M,L,NZ,NY,NX)
         ENDDO
       ENDDO
     ENDDO
@@ -1163,7 +1165,7 @@ implicit none
   plt_ew%TENGYCs1=TENGYC(NY,NX)
   TCCANs1=TCCAN(NY,NX)
   TCH4Zs1=TCH4Z(NY,NX)
-  FERTs1(1:20)=FERT(1:20,I1,NY,NX)
+  plt_distb%FERTs1(1:20)=FERT(1:20,I1,NY,NX)
 
   DO  L=1,JC
     plt_morph%ARSTTs1(L)=ARSTT(L,NY,NX)
@@ -1261,10 +1263,10 @@ implicit none
     plt_biom%WTRTs1(NZ)=WTRT(NZ,NY,NX)
 
     plt_photo%CO2Ls1(NZ)=CO2L(NZ,NY,NX)
-    EHVSTs1(1:2,1:4,NZ)=EHVST(1:2,1:4,NZ,I,NY,NX)
+    plt_distb%EHVSTs1(1:2,1:4,NZ)=EHVST(1:2,1:4,NZ,I,NY,NX)
 
     plt_pheno%IDTHs1(NZ)=IDTH(NZ,NY,NX)
-    IYR0s1(NZ)=IYR0(NZ,NY,NX)
+    plt_distb%IYR0s1(NZ)=IYR0(NZ,NY,NX)
     plt_morph%NNODs1(NZ)=NNOD(NZ,NY,NX)
 
     plt_pheno%IDTHPs1(NZ)=IDTHP(NZ,NY,NX)
@@ -1317,14 +1319,14 @@ implicit none
     plt_morph%NBRs1(NZ)=NBR(NZ,NY,NX)
 
     plt_pheno%IFLGCs1(NZ)=IFLGC(NZ,NY,NX)
-    IDAY0s1(NZ)=IDAY0(NZ,NY,NX)
-    IDAYHs1(NZ)=IDAYH(NZ,NY,NX)
-    IYRHs1(NZ)=IYRH(NZ,NY,NX)
+    plt_distb%IDAY0s1(NZ)=IDAY0(NZ,NY,NX)
+    plt_distb%IDAYHs1(NZ)=IDAYH(NZ,NY,NX)
+    plt_distb%IYRHs1(NZ)=IYRH(NZ,NY,NX)
 
 
-    HVSTs1(NZ)=HVST(NZ,I,NY,NX)
-    IHVSTs1(NZ)=IHVST(NZ,I,NY,NX)
-    JHVSTs1(NZ)=JHVST(NZ,I,NY,NX)
+    plt_distb%HVSTs1(NZ)=HVST(NZ,I,NY,NX)
+    plt_distb%IHVSTs1(NZ)=IHVST(NZ,I,NY,NX)
+    plt_distb%JHVSTs1(NZ)=JHVST(NZ,I,NY,NX)
     THINs1(NZ)=THIN(NZ,I,NY,NX)
     plt_morph%ARSTPs1(NZ)=ARSTP(NZ,NY,NX)
     plt_morph%ARLFPs1(NZ)=ARLFP(NZ,NY,NX)
@@ -1946,8 +1948,8 @@ implicit none
     DO L=1,JC
       DO M=1,JSA
         DO  N=1,JLI
-          PARDIF(N,M,L,NZ,NY,NX)=PARDIFs1(N,M,L,NZ)
-          PAR(N,M,L,NZ,NY,NX)=PARs1(N,M,L,NZ)
+          PARDIF(N,M,L,NZ,NY,NX)=plt_rad%PARDIFs1(N,M,L,NZ)
+          PAR(N,M,L,NZ,NY,NX)   =plt_rad%PARs1(N,M,L,NZ)
         ENDDO
       ENDDO
     ENDDO

@@ -2481,6 +2481,7 @@ module UptakesMod
 !     begin_execution
   associate(                           &
     WTRTSs1  =>  plt_biom%WTRTSs1    , &
+    TFNDs1   =>  plt_soilchem%TFNDs1 , &
     CO2Gs1   =>  plt_soilchem%CO2Gs1 , &
     CO2Ss1   =>  plt_soilchem%CO2Ss1 , &
     ZNH3Ss1  =>  plt_soilchem%ZNH3Ss1, &

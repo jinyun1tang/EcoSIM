@@ -99,6 +99,13 @@ module StartqsMod
   implicit none
   integer, intent(in) :: NZ
   associate(                         &
+    IDAYXs1  =>  plt_distb%IDAYXs1 , &
+    IYRYs1   =>  plt_distb%IYRYs1  , &
+    IYRXs1   =>  plt_distb%IYRXs1  , &
+    IYR0s1   =>  plt_distb%IYR0s1  , &
+    IYRHs1   =>  plt_distb%IYRHs1  , &
+    IDAYHs1  =>  plt_distb%IDAYHs1 , &
+    IDAY0s1  =>  plt_distb%IDAY0s1 , &
     CNWSs1   =>  plt_allom%CNWSs1  , &
     CPWSs1   =>  plt_allom%CPWSs1  , &
     CNRTs1   =>  plt_allom%CNRTs1  , &

@@ -74,7 +74,6 @@ implicit none
   real(r8) :: ZEROs1      !threshold zero
   real(r8) :: ZERO2s1     !threshold zero
 
-  integer :: IYTYPs1      !fertilizer release type from fertilizer input file
   integer :: IETYPs1      !Koppen climate zone
   integer :: IFLGTs1      !number of active PFT
   integer :: NLs1         !lowest soil layer number
@@ -84,27 +83,17 @@ implicit none
   integer :: NUs1         !soil surface layer number
   integer :: LYRCs1       !number of days in current year
   integer :: IYRCs1       !current year
-  real(r8) :: DCORPs1     !soil mixing fraction with tillage, [-]
+
   real(r8) :: VOLWOUs1    !total subsurface water flux	m3 d-2
-  integer :: ITILLs1      !soil disturbance type, [-]
   character(len=16), allocatable :: DATAPs1(:) !parameter file name
   CHARACTER(len=16), allocatable :: DATAs1(:)  !pft file
   real(r8), allocatable :: AREA3s1(:)    !soil cross section area (vertical plan defined by its normal direction)
 
-  integer,  allocatable :: IYR0s1(:)     !year of planting
-  integer,  allocatable :: IDAYXs1(:)    !!alternate day of planting
-  integer,  allocatable :: IYRXs1(:)     !alternate year of planting
-  integer,  allocatable :: IYRYs1(:)     !alternate year of harvest
   integer,  allocatable :: INTYPs1(:)    !N2 fixation type
-  integer,  allocatable :: IDAY0s1(:)    !day of planting
-  integer,  allocatable :: IDAYHs1(:)    !day of harvest
-  integer,  allocatable :: IYRHs1(:)     !year of harvest
 
-  integer,  allocatable :: IHVSTs1(:)    !type of harvest
-  integer,  allocatable :: JHVSTs1(:)    !flag for stand replacing disturbance
   integer,  allocatable :: ICTYPs1(:)    !plant photosynthetic type (C3 or C4)
   integer,  allocatable :: IDATAs1(:)    !time keeper
-  real(r8), allocatable :: FERTs1(:)     !fertilizer application, [g m-2]
+
   real(r8), allocatable :: TDFOMCs1(:,:) !total root C exchange, [gC d-2 h-1]
   real(r8), allocatable :: TDFOMNs1(:,:) !total root N exchange, [gP d-2 h-1]
   real(r8), allocatable :: TDFOMPs1(:,:) !total root P exchange, [gP d-2 h-1]
@@ -157,8 +146,6 @@ implicit none
   real(r8), allocatable :: RAs1(:)       !canopy boundary layer resistance, [h m-1]
   real(r8), allocatable :: SO2s1(:)      !leaf O2 solubility, [uM /umol mol-1]
 
-  real(r8), allocatable :: TFNDs1(:)     !temperature effect on diffusivity
-
   real(r8), allocatable :: TUPNO3s1(:)   !total root-soil NO3 flux non-band, [gN d-2 h-1]
   real(r8), allocatable :: TUPH2Bs1(:)   !total root-soil PO4 flux band, [gP d-2 h-1]
   real(r8), allocatable :: TUPH1Bs1(:)   !soil-root exch of HPO4 in band [gP d-2 h-1]
@@ -204,8 +191,6 @@ implicit none
   real(r8), allocatable :: XOQNSs1(:,:)   !net microbial DON flux, [gN d-2 h-1]
   real(r8), allocatable :: XOQPSs1(:,:)   !net microbial DOP flux, [gP d-2 h-1]
   real(r8), allocatable :: FLWCs1(:)      !water flux into canopy, [m3 d-2 h-1]
-  real(r8), allocatable :: EHVSTs1(:,:,:) !harvest efficiency, [-]
-  real(r8), allocatable :: HVSTs1(:)      !harvest cutting height (+ve) or fractional LAI removal (-ve), [m or -]
   real(r8), allocatable :: THINs1(:)      !thinning of plant population, [-]
   real(r8), allocatable :: BALCs1(:)      !plant C balance, [gC d-2]
   real(r8), allocatable :: BALNs1(:)      !plant N balance, [gN d-2]
@@ -477,8 +462,6 @@ implicit none
   real(r8), allocatable :: CFOPCs1(:,:,:)     !litter kinetic fraction, [-]
   real(r8), allocatable :: CFOPNs1(:,:,:)     !litterfall kinetic N fraction, [-]
   real(r8), allocatable :: CFOPPs1(:,:,:)     !litter P kinetic fraction, [-]
-  real(r8), allocatable :: PARs1(:,:,:,:)     !direct incoming PAR, [umol m-2 s-1]
-  real(r8), allocatable :: PARDIFs1(:,:,:,:)  !diffuse incoming PAR, [umol m-2 s-1]
   real(r8), allocatable :: VOLWMs1(:,:)       !soil micropore water content, [m3 d-2]
   real(r8), allocatable :: VOLPMs1(:,:)       !soil air content, [m3 d-2]
   real(r8), allocatable :: TORTs1(:,:)        !soil tortuosity, []
@@ -556,6 +539,9 @@ implicit none
   real(r8), pointer :: TAUPs1(:)     => null() !canopy PAR transmissivity , [-]
   real(r8), pointer :: RADPs1(:)     => null() !canopy absorbed PAR , [umol m-2 s-1]
   real(r8), pointer :: FRADPs1(:)    => null() !fraction of incoming PAR absorbed by canopy, [-]
+  real(r8), pointer :: PARs1(:,:,:,:)=> null()     !direct incoming PAR, [umol m-2 s-1]
+  real(r8), pointer :: PARDIFs1(:,:,:,:)=> null()  !diffuse incoming PAR, [umol m-2 s-1]
+
   contains
     procedure, public :: Init    => plt_rad_init
     procedure, public :: Destroy => plt_rad_destroy
@@ -679,6 +665,7 @@ implicit none
   end type plant_pheno_type
 
   type, public :: plant_soilchem_type
+  real(r8), pointer :: TFNDs1(:)     => null()  !temperature effect on diffusivity
   real(r8), pointer :: THETPMs1(:,:) => null()  !soil air-filled porosity, [m3 m-3]
   real(r8), pointer :: DFGSs1(:,:)   => null()  !coefficient for dissolution - volatilization, []
   real(r8), pointer :: RSCSs1(:)     => null()  !soil hydraulic resistance, [MPa h m-2]
@@ -988,6 +975,29 @@ implicit none
     procedure, public :: Destroy=> plt_ew_destroy
   end type plant_ew_type
 
+  type, public :: plant_disturb_type
+
+  integer  :: IYTYPs1      !fertilizer release type from fertilizer input file
+  real(r8) :: DCORPs1      !soil mixing fraction with tillage, [-]
+  integer  :: ITILLs1      !soil disturbance type, [-]
+  real(r8), pointer :: FERTs1(:)     => null()  !fertilizer application, [g m-2]
+  integer,  pointer :: IYR0s1(:)     => null()  !year of planting
+  integer,  pointer :: IDAYXs1(:)    => null()  !alternate day of planting
+  integer,  pointer :: IYRXs1(:)     => null()  !alternate year of planting
+  integer,  pointer :: IYRYs1(:)     => null()  !alternate year of harvest
+  integer,  pointer :: IDAY0s1(:)    => null()  !day of planting
+  integer,  pointer :: IDAYHs1(:)    => null()  !day of harvest
+  integer,  pointer :: IYRHs1(:)     => null()  !year of harvest
+  integer,  pointer :: IHVSTs1(:)    => null()  !type of harvest
+  integer,  pointer :: JHVSTs1(:)    => null()  !flag for stand replacing disturbance
+  real(r8), pointer :: EHVSTs1(:,:,:)=> null()  !harvest efficiency, [-]
+  real(r8), pointer :: HVSTs1(:)     => null()  !harvest cutting height (+ve) or fractional LAI removal (-ve), [m or -]
+  contains
+    procedure, public :: Init    =>  plt_disturb_init
+    procedure, public :: Destroy => plt_disturb_destroy
+  end type plant_disturb_type
+
+  type(plant_disturb_type), public, target :: plt_distb     !plant disturbance type
   type(plant_ew_type), public, target :: plt_ew             !plant energy and water type
   type(plant_allometry_type), public, target :: plt_allom   !plant allometric parameters
   type(plant_biom_type), public, target :: plt_biom         !plant biomass variables
@@ -999,6 +1009,45 @@ implicit none
 
   contains
 
+!----------------------------------------------------------------------
+  subroutine plt_disturb_init(this)
+
+  implicit none
+  class(plant_disturb_type) :: this
+
+  allocate(this%EHVSTs1(1:2,1:4,JP1))
+  allocate(this%HVSTs1(JP1))
+  allocate(this%IYRHs1(JP1))
+  allocate(this%FERTs1(1:20))
+  allocate(this%IYR0s1(JP1))
+  allocate(this%IDAYXs1(JP1))
+  allocate(this%IYRXs1(JP1))
+  allocate(this%IYRYs1(JP1))
+  allocate(this%IDAY0s1(JP1))
+  allocate(this%IDAYHs1(JP1))
+  allocate(this%IHVSTs1(JP1))
+  allocate(this%JHVSTs1(JP1))
+
+  end subroutine plt_disturb_init
+!----------------------------------------------------------------------
+  subroutine plt_disturb_destroy(this)
+  implicit none
+  class(plant_disturb_type) :: this
+
+!  if(allocated(EHVSTs1))deallocate(EHVSTs1)
+!  if(allocated(HVSTs1))deallocate(HVSTs1)
+!  if(allocated(IYRHs1))deallocate(IYRHs1)
+!  if(allocated(IDAY0s1))deallocate(IDAY0s1)
+!  if(allocated(IDAYHs1))deallocate(IDAYHs1)
+!  if(allocated(IYRYs1))deallocate(IYRYs1)
+!  if(allocated(IDAYXs1))deallocate(IDAYXs1)
+!  if(allocated(IYR0s1))deallocate(IYR0s1)
+!  if(allocated(FERTs1))deallocate(FERTs1)
+!  if(allocated(IYRXs1))deallocate(IYRXs1)
+!  if(allocated(IHVSTs1))deallocate(IHVSTs1)
+!  if(allocated(JHVSTs1))deallocate(JHVSTs1)
+
+  end subroutine plt_disturb_destroy
 !----------------------------------------------------------------------
   subroutine  plt_ew_init(this)
 
@@ -1420,6 +1469,7 @@ implicit none
 
   class(plant_soilchem_type) :: this
 
+  allocate(this%TFNDs1(0:JZ1))
   allocate(this%THETPMs1(60,0:JZ1))
   allocate(this%DFGSs1(60,0:JZ1))
   allocate(this%VLPOBs1(0:JZ1))
@@ -1505,6 +1555,7 @@ implicit none
   implicit none
   class(plant_soilchem_type) :: this
 
+!  if(allocated(TFNDs1))deallocate(TFNDs1)
 !  if(allocated(THETPMs1))deallocate(THETPMs1)
 !  if(allocated(DFGSs1))deallocate(DFGSs1)
 !  if(allocated(ZVSGLs1))deallocate(ZVSGLs1)
@@ -1607,6 +1658,8 @@ implicit none
 
   call plt_ew%Init()
 
+  call plt_distb%Init()
+
   call plt_allom%Init()
 
   call plt_biom%Init()
@@ -1625,22 +1678,28 @@ implicit none
   subroutine InitAllocate()
   implicit none
 
+  call plt_pheno%Destroy()
+
+  call plt_ew%Destroy()
+
+  call plt_distb%Destroy()
+
+  call plt_allom%Destroy()
+
+  call plt_biom%Destroy()
+
+  call plt_soilchem%Destroy()
+
   call plt_rad%Destroy()
 
-  allocate(IYR0s1(JP1))
+  call plt_photo%Destroy()
+
+  call plt_morph%Destroy()
+
   allocate(INTYPs1(JP1))
-  allocate(IYRXs1(JP1))
-  allocate(IYRYs1(JP1))
-  allocate(IDAYXs1(JP1))
-  allocate(IDAY0s1(JP1))
-  allocate(IDAYHs1(JP1))
-  allocate(IYRHs1(JP1))
-  allocate(IHVSTs1(JP1))
-  allocate(JHVSTs1(JP1))
 
   allocate(IDATAs1(60))
   allocate(ICTYPs1(JP1))
-  allocate(FERTs1(1:20))
   allocate(DLYR3s1(0:JZ1))
 
 
@@ -1660,7 +1719,6 @@ implicit none
   allocate(RCO2Fs1(0:JZ1))
   allocate(ROXYLs1(0:JZ1))
   allocate(ROXYYs1(0:JZ1))
-  allocate(TFNDs1(0:JZ1))
   allocate(AREA3s1(0:JZ1))
 
   allocate(RP1BXs1(0:JZ1))
@@ -1719,8 +1777,6 @@ implicit none
   allocate(XOQNSs1(0:jcplx11,0:JZ1))
   allocate(XOQPSs1(0:jcplx11,0:JZ1))
   allocate(FLWCs1(JP1))
-  allocate(EHVSTs1(1:2,1:4,JP1))
-  allocate(HVSTs1(JP1))
   allocate(THINs1(JP1))
   allocate(BALCs1(JP1))
   allocate(BALNs1(JP1))
@@ -2011,8 +2067,6 @@ implicit none
   allocate(CFOPCs1(0:5,4,JP1))
   allocate(CFOPNs1(0:5,4,JP1))
   allocate(CFOPPs1(0:5,4,JP1))
-  allocate(PARs1(JLI1,JSA1,JC1,JP1))
-  allocate(PARDIFs1(JLI1,JSA1,JC1,JP1))
   allocate(VOLWMs1(60,0:JZ1))
   allocate(VOLPMs1(60,0:JZ1))
   allocate(TORTs1(60,0:JZ1))
@@ -2024,25 +2078,16 @@ implicit none
   subroutine DestructPlantAPIData
   implicit none
 
-  if(allocated(IYR0s1))deallocate(IYR0s1)
+
   if(allocated(INTYPs1))deallocate(INTYPs1)
-  if(allocated(IDAYXs1))deallocate(IDAYXs1)
-  if(allocated(IYRYs1))deallocate(IYRYs1)
-  if(allocated(IYRXs1))deallocate(IYRXs1)
 
-  if(allocated(IDAY0s1))deallocate(IDAY0s1)
-  if(allocated(IDAYHs1))deallocate(IDAYHs1)
-  if(allocated(IYRHs1))deallocate(IYRHs1)
-  if(allocated(IHVSTs1))deallocate(IHVSTs1)
 
-  if(allocated(JHVSTs1))deallocate(JHVSTs1)
 
   if(allocated(IDATAs1))deallocate(IDATAs1)
 
   if(allocated(ICTYPs1))deallocate(ICTYPs1)
   if(allocated(DATAs1))deallocate(DATAs1)
 
-  if(allocated(FERTs1))deallocate(FERTs1)
 
   if(allocated(ZTYPs1))deallocate(ZTYPs1)
   if(allocated(ZTYPIs1))deallocate(ZTYPIs1)
@@ -2083,7 +2128,6 @@ implicit none
   if(allocated(RAs1))deallocate(RAs1)
   if(allocated(SFLXCs1))deallocate(SFLXCs1)
 
-  if(allocated(TFNDs1))deallocate(TFNDs1)
 
   if(allocated(AREA3s1))deallocate(AREA3s1)
 
@@ -2146,8 +2190,6 @@ implicit none
   if(allocated(XOQNSs1))deallocate(XOQNSs1)
   if(allocated(XOQPSs1))deallocate(XOQPSs1)
   if(allocated(FLWCs1))deallocate(FLWCs1)
-  if(allocated(EHVSTs1))deallocate(EHVSTs1)
-  if(allocated(HVSTs1))deallocate(HVSTs1)
   if(allocated(THINs1))deallocate(THINs1)
   if(allocated(BALCs1))deallocate(BALCs1)
   if(allocated(BALNs1))deallocate(BALNs1)
@@ -2436,8 +2478,7 @@ implicit none
   if(allocated(CFOPCs1))deallocate(CFOPCs1)
   if(allocated(CFOPNs1))deallocate(CFOPNs1)
   if(allocated(CFOPPs1))deallocate(CFOPPs1)
-  if(allocated(PARs1))deallocate(PARs1)
-  if(allocated(PARDIFs1))deallocate(PARDIFs1)
+
   if(allocated(VOLWMs1))deallocate(VOLWMs1)
   if(allocated(VOLPMs1))deallocate(VOLPMs1)
   if(allocated(TORTs1))deallocate(TORTs1)
@@ -2453,6 +2494,8 @@ implicit none
   implicit none
   class(plant_radiation_type) :: this
 
+  allocate(this%PARs1(JLI1,JSA1,JC1,JP1))
+  allocate(this%PARDIFs1(JLI1,JSA1,JC1,JP1))
   allocate(this%ALBRs1(JP1))
   allocate(this%ALBPs1(JP1))
   allocate(this%TAUSs1(JC1+1))
@@ -2480,6 +2523,8 @@ implicit none
   implicit none
   class(plant_radiation_type) :: this
 
+!  if(allocated(PARs1))deallocate(PARs1)
+!  if(allocated(PARDIFs1))deallocate(PARDIFs1)
 !  if(associated(this%ALBRs1))deallocate(this%ALBRs1)
 !  if(associated(this%ALBPs1))deallocate(this%ALBPs1)
 !  if(associated(this%TAUSs1))deallocate(this%TAUSs1)

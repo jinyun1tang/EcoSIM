@@ -258,6 +258,8 @@ module CanopyCondsMod
     IALBYs1   => plt_rad%IALBYs1 , &
     OMEGAs1   => plt_rad%OMEGAs1 , &
     FRADPs1   => plt_rad%FRADPs1 , &
+    PARs1     => plt_rad%PARs1   , &
+    PARDIFs1  => plt_rad%PARDIFs1, &
     OMEGAGs1  => plt_rad%OMEGAGs1, &
     OMEGXs1   => plt_rad%OMEGXs1 , &
     RAD0s1    => plt_rad%RAD0s1  , &
