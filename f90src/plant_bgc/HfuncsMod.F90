@@ -713,10 +713,11 @@ module HfuncsMod
 
 ! begin_execution
   associate(                            &
+    DPTHSs1   =>  plt_ew%DPTHSs1      , &
     IDAYs1    =>  plt_pheno%IDAYs1    , &
     XRLAs1    =>  plt_pheno%XRLAs1    , &
     GSTGFs1   =>  plt_pheno%GSTGFs1   , &
-    ISTYPs1    =>  plt_pheno%ISTYPs1  , &
+    ISTYPs1   =>  plt_pheno%ISTYPs1   , &
     IFLGEs1   =>  plt_pheno%IFLGEs1   , &
     VSTGs1    =>  plt_morph%VSTGs1    , &
     GSTGIs1   =>  plt_pheno%GSTGIs1   , &
@@ -728,7 +729,7 @@ module HfuncsMod
     XDLs1     =>  plt_pheno%XDLs1     , &
     DGSTGIs1  =>  plt_pheno%DGSTGIs1  , &
     XPPDs1    =>  plt_pheno%XPPDs1    , &
-    TGSTGIs1   =>  plt_pheno%TGSTGIs1 , &
+    TGSTGIs1  =>  plt_pheno%TGSTGIs1  , &
     GROUPs1   =>  plt_pheno%GROUPs1   , &
     IWTYPs1   =>  plt_pheno%IWTYPs1   , &
     VRNLs1    =>  plt_pheno%VRNLs1    , &
@@ -738,7 +739,7 @@ module HfuncsMod
     VRNFs1    =>  plt_pheno%VRNFs1    , &
     VRNXs1    =>  plt_pheno%VRNXs1    , &
     XRNIs1    =>  plt_pheno%XRNIs1    , &
-    ZCs1      => plt_morph%ZCs1       , &
+    ZCs1      =>  plt_morph%ZCs1      , &
     PSTGs1    =>   plt_morph%PSTGs1   , &
     PSTGIs1   =>   plt_morph%PSTGIs1  , &
     PSTGFs1   =>   plt_morph%PSTGFs1  , &

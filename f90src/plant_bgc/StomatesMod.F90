@@ -41,6 +41,9 @@
   real(r8):: RI
 !     begin_execution
   associate(                            &
+    RIBs1      =>  plt_ew%RIBs1       , &
+    RAZs1      =>  plt_ew%RAZs1       , &
+    TKAs1      =>  plt_ew%TKAs1       , &
     CO2Qs1     =>  plt_photo%CO2Qs1   , &
     ARLFPs1    =>  plt_morph%ARLFPs1  , &
     SSINs1     =>  plt_rad%SSINs1     , &

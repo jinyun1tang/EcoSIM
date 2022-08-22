@@ -51,6 +51,12 @@ module UptakesMod
   integer :: ILYR(2,JZ1)
 !     begin_execution
   associate(                         &
+    TCCs1    => plt_ew%TCCs1       , &
+    TKCs1    => plt_ew%TKCs1       , &
+    TSHCs1   => plt_ew%TSHCs1      , &
+    DTKCs1   => plt_ew%DTKCs1      , &
+    TKAs1    => plt_ew%TKAs1       , &
+    TLECs1   => plt_ew%TLECs1      , &
     WTRTDs1  => plt_biom%WTRTDs1   , &
     WTLSs1   => plt_biom%WTLSs1    , &
     WVSTKs1  => plt_biom%WVSTKs1   , &
@@ -293,6 +299,12 @@ module UptakesMod
   integer :: NB,K,L,N,NZZ
 
   associate(                          &
+    RABs1    =>  plt_ew%RABs1       , &
+    TKAs1    =>  plt_ew%TKAs1       , &
+    DTKCs1   =>  plt_ew%DTKCs1      , &
+    ZDs1     =>  plt_ew%ZDs1        , &
+    ZRs1     =>  plt_ew%ZRs1        , &
+    RAZs1    =>  plt_ew%RAZs1       , &
     WSLFs1   =>  plt_biom%WSLFs1    , &
     FRADPs1  =>  plt_rad%FRADPs1    , &
     ARLF1s1  =>  plt_morph%ARLF1s1  , &
@@ -475,6 +487,14 @@ module UptakesMod
   integer :: N,L
 ! begin_execution
   associate(                         &
+   RAZs1     => plt_ew%RAZs1       , &
+   DTKCs1    => plt_ew%DTKCs1      , &
+   OSMOs1    => plt_ew%OSMOs1      , &
+   PSILOs1   => plt_ew%PSILOs1     , &
+   TKCs1     => plt_ew%TKCs1       , &
+   TKAs1     => plt_ew%TKAs1       , &
+   TKSs1     => plt_ew%TKSs1       , &
+   TCCs1     => plt_ew%TCCs1       , &
    NIs1      => plt_morph%NIs1     , &
    NGs1      => plt_morph%NGs1     , &
    MYs1      => plt_morph%MYs1     , &
@@ -571,6 +591,12 @@ module UptakesMod
 !     begin_execution
 
   associate(                          &
+    PSILOs1   => plt_ew%PSILOs1     , &
+    OSMOs1    => plt_ew%OSMOs1      , &
+    RAZs1     => plt_ew%RAZs1       , &
+    VPAs1     => plt_ew%VPAs1       , &
+    TKAs1     => plt_ew%TKAs1       , &
+    RIBs1     => plt_ew%RIBs1       , &
     CCPOLPs1  => plt_biom%CCPOLPs1  , &
     CZPOLPs1  => plt_biom%CZPOLPs1  , &
     CPPOLPs1  => plt_biom%CPPOLPs1  , &
@@ -977,6 +1003,16 @@ module UptakesMod
 
 ! begin_execution
   associate(                         &
+    TCCs1    => plt_ew%TCCs1       , &
+    OSMOs1   => plt_ew%OSMOs1      , &
+    TKWs1    => plt_ew%TKWs1       , &
+    TKCs1    => plt_ew%TKCs1       , &
+    TKSs1    => plt_ew%TKSs1       , &
+    TKAs1    => plt_ew%TKAs1       , &
+    DPTHSs1  => plt_ew%DPTHSs1     , &
+    DTKCs1   => plt_ew%DTKCs1      , &
+    RAZs1    => plt_ew%RAZs1       , &
+    PSILOs1  => plt_ew%PSILOs1     , &
     CCPOLPs1 =>  plt_biom%CCPOLPs1 , &
     CZPOLPs1 =>  plt_biom%CZPOLPs1 , &
     CPPOLPs1 =>  plt_biom%CPPOLPs1 , &
@@ -1051,6 +1087,11 @@ module UptakesMod
   real(r8) :: OSWT
   integer :: N,L
   associate(                           &
+    OSMOs1     => plt_ew%OSMOs1      , &
+    TKAs1      => plt_ew%TKAs1       , &
+    TKCs1      => plt_ew%TKCs1       , &
+    PSILZs1    => plt_ew%PSILZs1     , &
+    TKSs1      => plt_ew%TKSs1       , &
     CCPOLRs1   => plt_biom%CCPOLRs1  , &
     CZPOLRs1   => plt_biom%CZPOLRs1  , &
     CPPOLRs1   => plt_biom%CPPOLRs1  , &
@@ -1118,6 +1159,10 @@ module UptakesMod
   real(r8) :: ACTV,RTK,STK,TKGO,TKSO
   integer :: L
   associate(                          &
+    TCCs1    => plt_ew%TCCs1        , &
+    TKCs1    => plt_ew%TKCs1        , &
+    TKSs1    => plt_ew%TKSs1        , &
+    PSILZs1  => plt_ew%PSILZs1      , &
     CHILLs1  =>  plt_photo%CHILLs1  , &
     IDAYs1   =>  plt_pheno%IDAYs1   , &
     NIs1     =>  plt_morph%NIs1     , &
@@ -1188,6 +1233,7 @@ module UptakesMod
   integer :: NB
 
   associate(                            &
+    TCCs1     => plt_ew%TCCs1         , &
     WTLSBs1   =>  plt_biom%WTLSBs1    , &
     ZPOOLs1   =>  plt_biom%ZPOOLs1    , &
     CCPOLBs1  =>  plt_biom%CCPOLBs1   , &

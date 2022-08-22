@@ -364,6 +364,8 @@ module grosubsMod
 !     begin_execution
 
   associate(                            &
+    TKCs1    =>  plt_ew%TKCs1         , &
+    TKSs1    =>  plt_ew%TKSs1         , &
     WVSTKs1  =>  plt_biom%WVSTKs1     , &
     WSRTLs1  =>  plt_biom%WSRTLs1     , &
     WTRTAs1  =>  plt_biom%WTRTAs1     , &

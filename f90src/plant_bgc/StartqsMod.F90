@@ -905,6 +905,12 @@ module StartqsMod
   implicit none
   integer, intent(in) :: NZ
   associate(                          &
+    OSMOs1     =>  plt_ew%OSMOs1    , &
+    TKCs1      =>  plt_ew%TKCs1     , &
+    PSILOs1    =>  plt_ew%PSILOs1   , &
+    ENGYXs1    =>  plt_ew%ENGYXs1   , &
+    DTKCs1     =>  plt_ew%DTKCs1    , &
+    TCCs1      =>  plt_ew%TCCs1     , &
     WTSHTs1    =>  plt_biom%WTSHTs1 , &
     FRADPs1    =>  plt_rad%FRADPs1    &
   )
@@ -942,6 +948,7 @@ module StartqsMod
   REAL(R8) :: COXYA
   REAL(R8) :: COXYP
   associate(                             &
+    OSMOs1     =>  plt_ew%OSMOs1       , &
     CCPOLRs1   =>  plt_biom%CCPOLRs1   , &
     CZPOLRs1   =>  plt_biom%CZPOLRs1   , &
     CPPOLRs1   =>  plt_biom%CPPOLRs1   , &

@@ -954,6 +954,7 @@ module PlantBranchMod
   real(r8), parameter :: FPART2=0.40_r8
 
   associate(                              &
+    TCCs1     =>  plt_ew%TCCs1          , &
     WVSTKBs1  =>  plt_biom%WVSTKBs1     , &
     WTRSVBs1  =>  plt_biom%WTRSVBs1     , &
     WTSTBPs1  =>  plt_biom%WTSTBPs1     , &
@@ -2344,6 +2345,7 @@ module PlantBranchMod
   real(r8) :: SET
 ! begin_execution
   associate(                              &
+    TCCs1      =>  plt_ew%TCCs1         , &
     CCPOLBs1   =>  plt_biom%CCPOLBs1    , &
     CZPOLBs1   =>  plt_biom%CZPOLBs1    , &
     CPPOLBs1   =>  plt_biom%CPPOLBs1    , &
@@ -2377,8 +2379,6 @@ module PlantBranchMod
 !
   IF(IDAYs1(3,NB,NZ).NE.0.AND.IDAYs1(6,NB,NZ).EQ.0)THEN
     GRNXBs1(NB,NZ)=GRNXBs1(NB,NZ)+STMXs1(NZ)*AMAX1(0.0_r8,GROSTK)
-!     WRITE(*,4246)'GRNX',I,J,NZ,NB,IDAYs1(3,NB,NZ)
-!    2,GRNXBs1(NB,NZ),STMXs1(NZ),CGROS,GROSTK
   ENDIF
 !
 !   SET FINAL GRAIN NUMBER FROM C,N,P NON-STRUCTURAL POOLS AFTER ANTHESIS

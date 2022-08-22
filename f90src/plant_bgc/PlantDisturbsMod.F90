@@ -650,9 +650,10 @@ module PlantDisturbsMod
   real(r8) :: WVPLT
 !     begin_execution
   associate(                               &
-    CPOOLRs1    =>  plt_biom%CPOOLRs1    , &
-    ZPOOLRs1    =>  plt_biom%ZPOOLRs1    , &
-    PPOOLRs1    =>  plt_biom%PPOOLRs1    , &
+    UVOLOs1    =>  plt_ew%UVOLOs1        , &
+    CPOOLRs1   =>  plt_biom%CPOOLRs1     , &
+    ZPOOLRs1   =>  plt_biom%ZPOOLRs1     , &
+    PPOOLRs1   =>  plt_biom%PPOOLRs1     , &
     WSRTLs1    =>  plt_biom%WSRTLs1      , &
     WTRTDs1    =>  plt_biom%WTRTDs1      , &
     WTRTLs1    =>  plt_biom%WTRTLs1      , &
@@ -1197,6 +1198,7 @@ module PlantDisturbsMod
   real(r8) :: WGLFPG,WHVSBS,WHVSCX,WHVSNX,WVPLT
 !     begin_execution
   associate(                            &
+    UVOLOs1   =>  plt_ew%UVOLOs1      , &
     CPOOLRs1    => plt_biom%CPOOLRs1  , &
     ZPOOLRs1    => plt_biom%ZPOOLRs1  , &
     PPOOLRs1    => plt_biom%PPOOLRs1  , &
@@ -1771,9 +1773,6 @@ module PlantDisturbsMod
 !112   FORMAT(A8,8I4,12E12.4)
         IF(HTNODEs1(K,NB,NZ).GT.0.0) &
           HTSTKX=AMAX1(HTSTKX,HTNODEs1(K,NB,NZ))
-!     WRITE(*,112)'VSTG',I,J,NX,NY,NZ,NB,K,IDTHBs1(NB,NZ)
-!    2,VSTGs1(NB,NZ),FHVSTK(K),HTSTKX,HTNODEs1(K,NB,NZ)
-!    3,HVSTs1(NZ)
 !
 !     HARVESTED SHEATH OR PETIOLE C,N,P
 !

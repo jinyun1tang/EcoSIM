@@ -19,13 +19,10 @@ implicit none
   integer  :: JNODS1      !number of canopy nodes
 !begin_data
 
-  real(r8) :: VOLWSs1     !water volume in snowpack, [m3 d-2]
+
   real(r8) :: CCO2EIs1    !initial atmospheric CO2 concentration, [g m-3]
   real(r8) :: CO2EIs1     !initial atmospheric CO2 concentration, [umol mol-1]
   real(r8) :: COXYEs1     !atmospheric O2 concentration, [g m-3]
-  real(r8) :: RABs1       !isothermal boundary layer resistance, [h m-1]
-  real(r8) :: VOLSSs1     !snow volume in snowpack (water equivalent), [m3 d-2]
-  real(r8) :: TSHCs1      !total sensible heat flux x boundary layer resistance, [MJ m-1]
   real(r8) :: CNETXs1     !total net canopy CO2 exchange, [g d-2 h-1]
   real(r8) :: ZNOONs1     !time of solar noon, [h]
   real(r8) :: CO2Es1      !atmospheric CO2 concentration, [umol mol-1]
@@ -35,14 +32,11 @@ implicit none
   real(r8) :: CH2GEs1     !atmospheric H2 concentration, [g m-3]
   real(r8) :: CNH3Es1     !atmospheric NH3 concentration, [g m-3]
   real(r8) :: DYLXs1      !daylength of previous day, [h]
-
   real(r8) :: DYLNs1      !daylength, [h]
-  real(r8) :: DPTHSs1     !snowpack depth, [m]
   real(r8) :: DYLMs1      !maximum daylength, [h]
   real(r8) :: ZSs1        !initial soil surface roughness height, [m]
   real(r8) :: OXYEs1      !atmospheric O2 concentration, [umol mol-1]
   real(r8) :: PPTs1       !total plant population, [d-2]
-  real(r8) :: RIBs1       !Richardson number for calculating boundary layer resistance, [-]
   real(r8) :: RECOs1      !ecosystem respiration, [g d-2 h-1]
   real(r8) :: POROS1s1    !top layer soil porosity
   real(r8) :: UAs1        !wind speed, [m h-1]
@@ -51,37 +45,26 @@ implicit none
   real(r8) :: TBALNs1     !total plant N balance	gN d-2
   real(r8) :: TBALPs1     !total plant P balance	gP d-2
   real(r8) :: Z0s1        !wind speed measurement height, [m]
-  real(r8) :: VHCPWXs1    !snowpack heat capacity from previous time step, [MJ d-2 K-1]
-  real(r8) :: VHCPW1s1    !snowpack heat capacity, [MJ m-3 K-1]
   real(r8) :: TCCANs1     !total net CO2 fixation, [gC d-2]
   real(r8) :: TCH4Zs1     !total root CH4 content, [gC d-2]
-  real(r8) :: TENGYCs1    !total canopy heat content, [MJ  d-2]
-  real(r8) :: THRMCs1     !total canopy LW emission, [MJ d-2 h-1]
-  real(r8) :: TEVAPPs1    !total canopy evaporation + transpiration, [m3 d-2]
+
+
   real(r8) :: TCO2Zs1     !total root CO2 content, [gC d-2]
-  real(r8) :: TEVAPCs1    !total canopy evaporation, [m3 d-2]
   real(r8) :: TH2GZs1     !total root H2 flux, [g d-2]
-  real(r8) :: THFLXCs1    !total canopy heat flux, [MJ  d-2]
 
   real(r8) :: TN2OZs1     !total root N2O content, [g d-2]
-  real(r8) :: TLEs1       !ecosystem latent heat flux, [MJ d-2 h-1]
   real(r8) :: TOXYZs1     !total root O2 content, [g d-2]
   real(r8) :: TNH3Zs1     !total root NH3 content, [g d-2]
-  real(r8) :: TVOLWPs1    !total canopy water content, [m3 d-2]
+
   real(r8) :: ZZSNCs1     !total litterfall N, [g d-2 h-1]
   real(r8) :: ZPSNCs1     !total litterfall P, [g d-2 h-1]
   real(r8) :: ZCSNCs1     !total litterfall C, [g d-2 h-1]
-  real(r8) :: VOLISs1     !ice volume in snowpack, [m3 d-2]
-  real(r8) :: TKWs1       !snow temperature, [K]
-  real(r8) :: TVOLWCs1    !canopy surface water content, [m3 d-2]
-  real(r8) :: TSHs1       !ecosystem sensible heat flux, [MJ d-2 h-1]
+
   real(r8) :: TNBPs1      !total NBP, [g d-2]
   real(r8) :: TGPPs1      !ecosystem GPP, [g d-2 h-1]
-  real(r8) :: TKAs1       !air temperature, [K]
-  real(r8) :: TLECs1      !total latent heat flux x boundary layer resistance, [MJ m-1]
+
   real(r8) :: TRAUs1      !ecosystem autotrophic respiration, [g d-2 h-1]
-  real(r8) :: UVOLOs1     !total subsurface water flux, [m3 d-2]
-  real(r8) :: VPAs1       !vapor concentration, [m3 m-3]
+
   real(r8) :: XHVSTCs1    !ecosystem harvest C, [gC d-2]
   real(r8) :: XHVSTNs1    !ecosystem harvest N, [gN d-2]
   real(r8) :: XHVSTPs1    !ecosystem harvest P, [gP d-2]
@@ -90,8 +73,7 @@ implicit none
   real(r8) :: ZEROSs1     !threshold zero
   real(r8) :: ZEROs1      !threshold zero
   real(r8) :: ZERO2s1     !threshold zero
-  real(r8) :: ZRs1        !canopy surface roughness height, [m]
-  real(r8) :: ZDs1        !zero plane displacement height, [m]
+
   integer :: IYTYPs1      !fertilizer release type from fertilizer input file
   integer :: IETYPs1      !Koppen climate zone
   integer :: IFLGTs1      !number of active PFT
@@ -128,12 +110,7 @@ implicit none
   real(r8), allocatable :: TDFOMPs1(:,:) !total root P exchange, [gP d-2 h-1]
   real(r8), allocatable :: RUPNFs1(:,:)  !root N2 fixation, [gN d-2 h-1]
 
-  real(r8), allocatable :: TCCs1(:)      !canopy temperature, [oC]
-  real(r8), allocatable :: DTKCs1(:)     !change in canopy temperature, [K]
-  real(r8), allocatable :: ENGYXs1(:)    !canopy heat storage from previous time step, [MJ d-2]
-  real(r8), allocatable :: TKCs1(:)      !canopy temperature, [K]
-  real(r8), allocatable :: PSILOs1(:)    !canopy osmotic water potential, [Mpa]
-  real(r8), allocatable :: OSMOs1(:)     !canopy osmotic potential when canopy water potential = 0 MPa, [MPa]
+
   real(r8), allocatable :: TCO2As1(:)    !total autotrophic respiration, [gC d-2 ]
   real(r8), allocatable :: CTRANs1(:)    !total transpiration, [m H2O d-2]
   real(r8), allocatable :: ZTYPs1(:)     !plant thermal adaptation zone, [-]
@@ -171,7 +148,7 @@ implicit none
   real(r8), allocatable :: RCO2Fs1(:)    !net gaseous CO2 flux, [g d-2 h-1]
   real(r8), allocatable :: ROXYLs1(:)    !net aqueous O2 flux, [g d-2 h-1]
   real(r8), allocatable :: ROXYYs1(:)    !total root + microbial O2 uptake, [g d-2 h-1]
-  real(r8), allocatable :: PSILZs1(:)    !minimum daily canopy water potential, [MPa]
+
   real(r8), allocatable :: RSMNs1(:)     !canopy minimum stomatal resistance, [s m-1]
   real(r8), allocatable :: DLYR3s1(:)    !vertical thickness of soil layer [m]
   real(r8), allocatable :: SFLXCs1(:)    !canopy sensible heat flux, [MJ d-2 h-1]
@@ -180,7 +157,6 @@ implicit none
   real(r8), allocatable :: RAs1(:)       !canopy boundary layer resistance, [h m-1]
   real(r8), allocatable :: SO2s1(:)      !leaf O2 solubility, [uM /umol mol-1]
 
-  real(r8), allocatable :: TKSs1(:)      !mean annual soil temperature, [K]
   real(r8), allocatable :: TFNDs1(:)     !temperature effect on diffusivity
 
   real(r8), allocatable :: TUPNO3s1(:)   !total root-soil NO3 flux non-band, [gN d-2 h-1]
@@ -271,7 +247,6 @@ implicit none
   real(r8), allocatable :: RNH3Zs1(:)     !gaseous NH3 flux fron root disturbance non-band, [g d-2 h-1]
   real(r8), allocatable :: RH2GZs1(:)     !gaseous H2 flux fron root disturbance, [g d-2 h-1]
   real(r8), allocatable :: RTFQs1(:)      !root brancing frequency, [m-1]
-  real(r8), allocatable :: RAZs1(:)       !canopy roughness height, [m]
 
   real(r8), allocatable :: EVAPCs1(:)     !canopy evaporation, [m2 d-2 h-1]
   real(r8), allocatable :: HFLXCs1(:)     !canopy storage heat flux, [MJ d-2 h-1]
@@ -972,7 +947,49 @@ implicit none
     procedure, public :: Destroy => plt_biom_destroy
   end type plant_biom_type
 
-  type(plant_allometry_type), public :: plt_allom           !plant allometric parameters
+  type, public :: plant_ew_type
+  real(r8) :: DPTHSs1     !snowpack depth, [m]
+  real(r8) :: VOLWSs1     !water volume in snowpack, [m3 d-2]
+  real(r8) :: VOLSSs1     !snow volume in snowpack (water equivalent), [m3 d-2]
+  real(r8) :: TSHCs1      !total sensible heat flux x boundary layer resistance, [MJ m-1]
+  real(r8) :: VHCPWXs1    !snowpack heat capacity from previous time step, [MJ d-2 K-1]
+  real(r8) :: VHCPW1s1    !snowpack heat capacity, [MJ m-3 K-1]
+  real(r8) :: TENGYCs1    !total canopy heat content, [MJ  d-2]
+  real(r8) :: THRMCs1     !total canopy LW emission, [MJ d-2 h-1]
+  real(r8) :: TEVAPPs1    !total canopy evaporation + transpiration, [m3 d-2]
+  real(r8) :: TEVAPCs1    !total canopy evaporation, [m3 d-2]
+  real(r8) :: THFLXCs1    !total canopy heat flux, [MJ  d-2]
+  real(r8) :: UVOLOs1     !total subsurface water flux, [m3 d-2]
+  real(r8) :: VPAs1       !vapor concentration, [m3 m-3]
+  real(r8) :: TKAs1       !air temperature, [K]
+  real(r8) :: TVOLWPs1    !total canopy water content, [m3 d-2]
+  real(r8) :: TLEs1       !ecosystem latent heat flux, [MJ d-2 h-1]
+  real(r8) :: TLECs1      !total latent heat flux x boundary layer resistance, [MJ m-1]
+  real(r8) :: VOLISs1     !ice volume in snowpack, [m3 d-2]
+  real(r8) :: TKWs1       !snow temperature, [K]
+  real(r8) :: TVOLWCs1    !canopy surface water content, [m3 d-2]
+  real(r8) :: TSHs1       !ecosystem sensible heat flux, [MJ d-2 h-1]
+  real(r8) :: ZRs1        !canopy surface roughness height, [m]
+  real(r8) :: ZDs1        !zero plane displacement height, [m]
+  real(r8) :: RABs1       !isothermal boundary layer resistance, [h m-1]
+  real(r8) :: RIBs1       !Richardson number for calculating boundary layer resistance, [-]
+  real(r8), pointer :: RAZs1(:)    => null()    !canopy roughness height, [m]
+  real(r8), pointer :: TKSs1(:)    => null()    !mean annual soil temperature, [K]
+  real(r8), pointer :: PSILZs1(:)  => null()    !minimum daily canopy water potential, [MPa]
+  real(r8), pointer :: TCCs1(:)    => null()    !canopy temperature, [oC]
+  real(r8), pointer :: DTKCs1(:)   => null()    !change in canopy temperature, [K]
+  real(r8), pointer :: ENGYXs1(:)  => null()    !canopy heat storage from previous time step, [MJ d-2]
+  real(r8), pointer :: TKCs1(:)    => null()    !canopy temperature, [K]
+  real(r8), pointer :: PSILOs1(:)  => null()    !canopy osmotic water potential, [Mpa]
+  real(r8), pointer :: OSMOs1(:)   => null()    !canopy osmotic potential when canopy water potential = 0 MPa, [MPa]
+
+  contains
+    procedure, public :: Init => plt_ew_init
+    procedure, public :: Destroy=> plt_ew_destroy
+  end type plant_ew_type
+
+  type(plant_ew_type), public, target :: plt_ew             !plant energy and water type
+  type(plant_allometry_type), public, target :: plt_allom   !plant allometric parameters
   type(plant_biom_type), public, target :: plt_biom         !plant biomass variables
   type(plant_soilchem_type), public, target :: plt_soilchem !soil bgc interface with plant root
   type(plant_pheno_type), public, target :: plt_pheno       !plant phenology
@@ -981,6 +998,42 @@ implicit none
   type(plant_photosyns_type), public, target :: plt_photo   !plant photosynthesis type
 
   contains
+
+!----------------------------------------------------------------------
+  subroutine  plt_ew_init(this)
+
+  implicit none
+  class(plant_ew_type) :: this
+
+  allocate(this%PSILOs1(JP1))
+  allocate(this%TKSs1(0:JZ1))
+  allocate(this%OSMOs1(JP1))
+  allocate(this%RAZs1(JP1))
+  allocate(this%DTKCs1(JP1))
+  allocate(this%TKCs1(JP1))
+  allocate(this%ENGYXs1(JP1))
+  allocate(this%TCCs1(JP1))
+  allocate(this%PSILZs1(JP1))
+
+  end subroutine plt_ew_init
+!----------------------------------------------------------------------
+
+  subroutine plt_ew_destroy(this)
+  implicit none
+  class(plant_ew_type) :: this
+
+!  if(allocated(PSILOs1))deallocate(PSILOs1)
+!  if(allocated(TKSs1))deallocate(TKSs1)
+!  if(allocated(PSILZs1))deallocate(PSILZs1)
+!  if(allocated(RAZs1))deallocate(RAZs1)
+!  if(allocated(OSMOs1))deallocate(OSMOs1)
+!  if(allocated(DTKCs1))deallocate(DTKCs1)
+!  if(allocated(TKCs1))deallocate(TKCs1)
+!  if(allocated(ENGYXs1))deallocate(ENGYXs1)
+!  if(allocated(TCCs1))deallocate(TCCs1)
+
+  end subroutine plt_ew_destroy
+
 !----------------------------------------------------------------------
 
   subroutine plt_allom_init(this)
@@ -1552,6 +1605,8 @@ implicit none
 
   call plt_pheno%Init()
 
+  call plt_ew%Init()
+
   call plt_allom%Init()
 
   call plt_biom%Init()
@@ -1605,7 +1660,6 @@ implicit none
   allocate(RCO2Fs1(0:JZ1))
   allocate(ROXYLs1(0:JZ1))
   allocate(ROXYYs1(0:JZ1))
-  allocate(TKSs1(0:JZ1))
   allocate(TFNDs1(0:JZ1))
   allocate(AREA3s1(0:JZ1))
 
@@ -1720,8 +1774,6 @@ implicit none
   allocate(RH2GZs1(JP1))
 
   allocate(RTFQs1(JP1))
-  allocate(RAZs1(JP1))
-  allocate(PSILZs1(JP1))
   allocate(RSMNs1(JP1))
 
   allocate(TKCZs1(JP1))
@@ -1781,13 +1833,7 @@ implicit none
   allocate(GRMXs1(JP1))
   allocate(PTSHTs1(JP1))
 
-  allocate(TCCs1(JP1))
-  allocate(ENGYXs1(JP1))
-  allocate(DTKCs1(JP1))
-  allocate(TKCs1(JP1))
-  allocate(OSMOs1(JP1))
   allocate(TCO2As1(JP1))
-  allocate(PSILOs1(JP1))
   allocate(CTRANs1(JP1))
 
   allocate(GRDMs1(JP1))
@@ -2036,9 +2082,7 @@ implicit none
   if(allocated(RCs1))deallocate(RCs1)
   if(allocated(RAs1))deallocate(RAs1)
   if(allocated(SFLXCs1))deallocate(SFLXCs1)
-  if(allocated(PSILZs1))deallocate(PSILZs1)
 
-  if(allocated(TKSs1))deallocate(TKSs1)
   if(allocated(TFNDs1))deallocate(TFNDs1)
 
   if(allocated(AREA3s1))deallocate(AREA3s1)
@@ -2153,7 +2197,6 @@ implicit none
   if(allocated(RH2GZs1))deallocate(RH2GZs1)
 
   if(allocated(RTFQs1))deallocate(RTFQs1)
-  if(allocated(RAZs1))deallocate(RAZs1)
 
   if(allocated(EVAPCs1))deallocate(EVAPCs1)
   if(allocated(HFLXCs1))deallocate(HFLXCs1)
@@ -2231,14 +2274,8 @@ implicit none
   if(allocated(VCGR4s1))deallocate(VCGR4s1)
   if(allocated(VGRO4s1))deallocate(VGRO4s1)
 
-  if(allocated(OSMOs1))deallocate(OSMOs1)
-  if(allocated(TCCs1))deallocate(TCCs1)
-  if(allocated(DTKCs1))deallocate(DTKCs1)
-  if(allocated(TKCs1))deallocate(TKCs1)
   if(allocated(WTRT1s1))deallocate(WTRT1s1)
 
-  if(allocated(ENGYXs1))deallocate(ENGYXs1)
-  if(allocated(PSILOs1))deallocate(PSILOs1)
 
   if(allocated(CTRANs1))deallocate(CTRANs1)
 

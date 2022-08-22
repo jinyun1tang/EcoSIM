@@ -18,6 +18,7 @@ implicit none
 
 !     begin_execution
   associate(                                 &
+    UVOLOs1      =>   plt_ew%UVOLOs1       , &
     WTRTs1       =>   plt_biom%WTRTs1      , &
     WTRVCs1      =>   plt_biom%WTRVCs1     , &
     ISTYPs1      =>   plt_pheno%ISTYPs1    , &

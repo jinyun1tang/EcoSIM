@@ -130,6 +130,7 @@ module ExtractsMod
   integer :: N,L,K
 
   associate(                       &
+    TKSs1   => plt_ew%TKSs1      , &
     MYs1    => plt_morph%MYs1    , &
     NIs1    => plt_morph%NIs1      &
   )
@@ -285,6 +286,19 @@ module ExtractsMod
   integer :: L, NB
   real(r8) :: ENGYC
   associate(                       &
+    TVOLWPs1=> plt_ew%TVOLWPs1   , &
+    TKCs1   => plt_ew%TKCs1      , &
+    TKSs1   => plt_ew%TKSs1      , &
+    ENGYXs1 => plt_ew%ENGYXs1    , &
+    TSHs1   => plt_ew%TSHs1      , &
+    TEVAPCs1=> plt_ew%TEVAPCs1   , &
+    TENGYCs1=> plt_ew%TENGYCs1   , &
+    TEVAPPs1=> plt_ew%TEVAPPs1   , &
+    THFLXCs1=> plt_ew%THFLXCs1   , &
+    THRMCs1 => plt_ew%THRMCs1    , &
+    TKAs1   => plt_ew%TKAs1      , &
+    TLEs1   => plt_ew%TLEs1      , &
+    TVOLWCs1=> plt_ew%TVOLWCs1   , &
     ARSTCs1 => plt_morph%ARSTCs1 , &
     ARLFCs1 => plt_morph%ARLFCs1 , &
     NIs1    => plt_morph%NIs1    , &
