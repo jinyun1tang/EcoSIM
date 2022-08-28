@@ -106,6 +106,13 @@ module PlantBranchMod
     CPWSs1       =>  plt_allom%CPWSs1     , &
     CNRSVs1      =>  plt_allom%CNRSVs1    , &
     DMRTs1       =>  plt_allom%DMRTs1     , &
+    FNODs1       =>  plt_allom%FNODs1     , &
+    CSNCs1       =>  plt_bgcr%CSNCs1      , &
+    ZSNCs1       =>  plt_bgcr%ZSNCs1      , &
+    PSNCs1       =>  plt_bgcr%PSNCs1      , &
+    CFOPCs1      =>  plt_soilchem%CFOPCs1 , &
+    CFOPNs1      =>  plt_soilchem%CFOPNs1 , &
+    CFOPPs1      =>  plt_soilchem%CFOPPs1 , &
     WTLFBNs1     =>  plt_biom%WTLFBNs1    , &
     WTHSBNs1     =>  plt_biom%WTHSBNs1    , &
     WTSTKBs1     =>  plt_biom%WTSTKBs1    , &
@@ -153,19 +160,34 @@ module PlantBranchMod
     WGLFNs1      =>  plt_biom%WGLFNs1     , &
     ZPOOLs1      =>  plt_biom%ZPOOLs1     , &
     PPOOLs1      =>  plt_biom%PPOOLs1     , &
+    ZEROPs1      =>  plt_biom%ZEROPs1     , &
+    ZEROLs1      =>  plt_biom%ZEROLs1     , &
+    ICTYPs1      =>  plt_photo%ICTYPs1    , &
     IDTHBs1      =>  plt_pheno%IDTHBs1    , &
     KVSTGNs1     =>  plt_pheno%KVSTGNs1   , &
     XRLAs1       =>  plt_pheno%XRLAs1     , &
+    RCCLXs1      =>  plt_pheno%RCCLXs1    , &
+    RCZLXs1      =>  plt_pheno%RCZLXs1    , &
+    RCPLXs1      =>  plt_pheno%RCPLXs1    , &
     KVSTGs1      =>  plt_pheno%KVSTGs1    , &
     IGTYPs1      =>  plt_pheno%IGTYPs1    , &
+    TFN3s1       =>  plt_pheno%TFN3s1     , &
     IFLGPs1      =>  plt_pheno%IFLGPs1    , &
     FLGZs1       =>  plt_pheno%FLGZs1     , &
     IDAYs1       =>  plt_pheno%IDAYs1     , &
+    RCCSXs1      =>  plt_pheno%RCCSXs1    , &
+    RCZSXs1      =>  plt_pheno%RCZSXs1    , &
+    RCPSXs1      =>  plt_pheno%RCPSXs1    , &
     IBTYPs1      =>  plt_pheno%IBTYPs1    , &
     IFLGGs1      =>  plt_pheno%IFLGGs1    , &
     ISTYPs1      =>  plt_pheno%ISTYPs1    , &
-    SSINNs1      =>   plt_rad%SSINNs1     , &
-    NB1s1        =>   plt_morph%NB1s1     , &
+    CTCs1        =>  plt_pheno%CTCs1      , &
+    SSINNs1      =>  plt_rad%SSINNs1      , &
+    PPs1         =>  plt_site%PPs1        , &
+    ZEROs1       =>  plt_site%ZEROs1      , &
+    PSILTs1      =>  plt_ew%PSILTs1       , &
+    NB1s1        =>  plt_morph%NB1s1      , &
+    HTCTLs1      =>   plt_morph%HTCTLs1   , &
     NBTBs1       =>   plt_morph%NBTBs1    , &
     NBRs1        =>   plt_morph%NBRs1     , &
     SLA1s1       =>   plt_morph%SLA1s1    , &
@@ -955,12 +977,16 @@ module PlantBranchMod
 
   associate(                              &
     TCCs1     =>  plt_ew%TCCs1          , &
+    PSILTs1   =>  plt_ew%PSILTs1        , &
     WVSTKBs1  =>  plt_biom%WVSTKBs1     , &
     WTRSVBs1  =>  plt_biom%WTRSVBs1     , &
     WTSTBPs1  =>  plt_biom%WTSTBPs1     , &
     CZPOLBs1  =>  plt_biom%CZPOLBs1     , &
     WTHSBPs1  =>  plt_biom%WTHSBPs1     , &
     WTEABPs1  =>  plt_biom%WTEABPs1     , &
+    ZEROs1    =>  plt_site%ZEROs1       , &
+    NUs1      =>  plt_site%NUs1         , &
+    AREA3s1   =>  plt_site%AREA3s1      , &
     FVRNs1    =>  plt_allom%FVRNs1      , &
     VRNXs1    =>  plt_pheno%VRNXs1      , &
     IDAYs1    =>  plt_pheno%IDAYs1      , &
@@ -973,6 +999,9 @@ module PlantBranchMod
     TGSTGIs1  =>  plt_pheno%TGSTGIs1    , &
     ISTYPs1   =>  plt_pheno%ISTYPs1     , &
     IWTYPs1   =>  plt_pheno%IWTYPs1     , &
+    CTCs1     =>  plt_pheno%CTCs1       , &
+    RNH3Bs1   =>  plt_rbgc%RNH3Bs1      , &
+    CNETs1    =>  plt_bgcr%CNETs1       , &
     SNL1s1    =>  plt_morph%SNL1s1      , &
     ARLFPs1   =>  plt_morph%ARLFPs1     , &
     NB1s1     =>  plt_morph%NB1s1         &
@@ -1199,6 +1228,7 @@ module PlantBranchMod
   real(r8) :: CO2F,ZADDB,PADDB,CH2O
   integer :: K
   associate(                            &
+    RNH3Bs1    =>  plt_rbgc%RNH3Bs1   , &
     CPOOLs1    =>  plt_biom%CPOOLs1   , &
     ZPOOLs1    =>  plt_biom%ZPOOLs1   , &
     PPOOLs1    =>  plt_biom%PPOOLs1   , &
@@ -1255,8 +1285,18 @@ module PlantBranchMod
 
 !     begin_execution
   associate(                              &
-    WGLFs1    =>   plt_biom%WGLFs1      , &
-    CO2Ls1    =>   plt_photo%CO2Ls1       &
+    CNETs1    =>  plt_bgcr%CNETs1       , &
+    TCO2Ts1   =>  plt_bgcr%TCO2Ts1      , &
+    TCO2As1   =>  plt_bgcr%TCO2As1      , &
+    TRAUs1    =>  plt_bgcr%TRAUs1       , &
+    RECOs1    =>  plt_bgcr%RECOs1       , &
+    WGLFs1    =>  plt_biom%WGLFs1       , &
+    ZEROPs1   =>  plt_biom%ZEROPs1      , &
+    HCOBs1    =>  plt_photo%HCOBs1      , &
+    CO2Bs1    =>  plt_photo%CO2Bs1      , &
+    CPOOL3s1  =>  plt_photo%CPOOL3s1    , &
+    CPOOL4s1  =>  plt_photo%CPOOL4s1    , &
+    CO2Ls1    =>  plt_photo%CO2Ls1        &
   )
   DO 170 K=1,JNODS1
     IF(WGLFs1(K,NB,NZ).GT.ZEROPs1(NZ))THEN
@@ -1379,9 +1419,14 @@ module PlantBranchMod
     WTLFBNs1     =>  plt_biom%WTLFBNs1     , &
     WGLFNs1      =>  plt_biom%WGLFNs1      , &
     WGLFPs1      =>  plt_biom%WGLFPs1      , &
+    ZEROPs1      =>  plt_biom%ZEROPs1      , &
+    ZEROLs1      =>  plt_biom%ZEROLs1      , &
     CPOOLs1      =>  plt_biom%CPOOLs1      , &
     ZPOOLs1      =>  plt_biom%ZPOOLs1      , &
     PPOOLs1      =>  plt_biom%PPOOLs1      , &
+    PPs1         =>   plt_site%PPs1        , &
+    CPOOL3s1     =>  plt_photo%CPOOL3s1    , &
+    CPOOL4s1     =>  plt_photo%CPOOL4s1    , &
     FWOODs1      =>  plt_allom%FWOODs1     , &
     FWOODNs1     =>  plt_allom%FWOODNs1    , &
     FWODSNs1     =>  plt_allom%FWODSNs1    , &
@@ -1393,6 +1438,12 @@ module PlantBranchMod
     FWOODPs1     =>  plt_allom%FWOODPs1    , &
     CNWSs1       =>  plt_allom%CNWSs1      , &
     CPWSs1       =>  plt_allom%CPWSs1      , &
+    CSNCs1       =>  plt_bgcr%CSNCs1       , &
+    ZSNCs1       =>  plt_bgcr%ZSNCs1       , &
+    PSNCs1       =>  plt_bgcr%PSNCs1       , &
+    CFOPCs1      =>  plt_soilchem%CFOPCs1  , &
+    CFOPNs1      =>  plt_soilchem%CFOPNs1  , &
+    CFOPPs1      =>  plt_soilchem%CFOPPs1  , &
     KVSTGs1      =>   plt_pheno%KVSTGs1    , &
     IDTHBs1      =>   plt_pheno%IDTHBs1    , &
     ISTYPs1      =>   plt_pheno%ISTYPs1    , &
@@ -2010,6 +2061,7 @@ module PlantBranchMod
   associate(                            &
     WGLFLs1    =>  plt_biom%WGLFLs1   , &
     WGLFs1     =>  plt_biom%WGLFs1    , &
+    WGLFVs1    =>  plt_biom%WGLFVs1   , &
     WGLFLPs1   =>  plt_biom%WGLFLPs1  , &
     WVSTKBs1   =>  plt_biom%WVSTKBs1  , &
     WGLFPs1    =>  plt_biom%WGLFPs1   , &
@@ -2017,11 +2069,13 @@ module PlantBranchMod
     WTSTKBs1   =>  plt_biom%WTSTKBs1  , &
     WGLFLNs1   =>  plt_biom%WGLFLNs1  , &
     WSSHEs1    =>  plt_biom%WSSHEs1   , &
+    FNODs1     =>  plt_allom%FNODs1   , &
     IGTYPs1    =>  plt_pheno%IGTYPs1  , &
     ISTYPs1    =>  plt_pheno%ISTYPs1  , &
     KVSTGs1    =>  plt_pheno%KVSTGs1  , &
     IBTYPs1    =>  plt_pheno%IBTYPs1  , &
     KVSTGNs1   =>  plt_pheno%KVSTGNs1 , &
+    WDLFs1     => plt_morph%WDLFs1    , &
     SDPTHs1    => plt_morph%SDPTHs1   , &
     NB1s1      => plt_morph%NB1s1     , &
     ARLFLs1    => plt_morph%ARLFLs1   , &
@@ -2031,9 +2085,12 @@ module PlantBranchMod
     HTNODEs1   => plt_morph%HTNODEs1  , &
     ZLs1       => plt_morph%ZLs1      , &
     ZCs1       => plt_morph%ZCs1      , &
+    HTCTLs1    => plt_morph%HTCTLs1   , &
     CLASSs1    => plt_morph%CLASSs1   , &
     ARLF1s1    => plt_morph%ARLF1s1   , &
     ARLFVs1    => plt_morph%ARLFVs1   , &
+    PPs1       => plt_site%PPs1       , &
+    ZEROs1     => plt_site%ZEROs1     , &
     ZSINs1     => plt_rad%ZSINs1        &
   )
 !   ALLOCATION OF LEAF AREA TO CANOPY LAYERS
@@ -2355,17 +2412,30 @@ module PlantBranchMod
     WTGRBNs1   =>  plt_biom%WTGRBNs1    , &
     WTGRBPs1   =>  plt_biom%WTGRBPs1    , &
     WTRSBPs1   =>  plt_biom%WTRSBPs1    , &
+    ZEROPs1    =>  plt_biom%ZEROPs1     , &
+    GRWTBs1    =>  plt_allom%GRWTBs1    , &
     CNGRs1     =>  plt_allom%CNGRs1     , &
     CPGRs1     =>  plt_allom%CPGRs1     , &
+    TFN4s1     =>  plt_pheno%TFN4s1     , &
+    TFN3s1     =>  plt_pheno%TFN3s1     , &
     IWTYPs1    =>  plt_pheno%IWTYPs1    , &
     VRNFs1     =>  plt_pheno%VRNFs1     , &
     FLG4s1     =>  plt_pheno%FLG4s1     , &
     VRNXs1     =>  plt_pheno%VRNXs1     , &
+    GFILLs1    =>  plt_pheno%GFILLs1    , &
+    SSTXs1     =>  plt_pheno%SSTXs1     , &
     ISTYPs1    =>  plt_pheno%ISTYPs1    , &
+    HTCs1      =>  plt_pheno%HTCs1      , &
     DGSTGFs1   =>  plt_pheno%DGSTGFs1   , &
     IDAYs1     =>  plt_pheno%IDAYs1     , &
+    CTCs1      =>  plt_pheno%CTCs1      , &
+    PPs1       =>  plt_site%PPs1        , &
+    SDMXs1     =>  plt_morph%SDMXs1     , &
+    GRMXs1     =>  plt_morph%GRMXs1     , &
+    STMXs1     =>  plt_morph%STMXs1     , &
     NGs1       =>  plt_morph%NGs1       , &
     GRNXBs1    =>  plt_morph%GRNXBs1    , &
+    IRTYPs1    =>  plt_morph%IRTYPs1    , &
     GRNOBs1    =>  plt_morph%GRNOBs1      &
   )
 !
@@ -2441,10 +2511,7 @@ module PlantBranchMod
       GRMXB=GRMXs1(NZ)
       GRWTBs1(NB,NZ)=AMIN1(GRMXs1(NZ),GRWTBs1(NB,NZ) &
         +GRMXB*AMAX1(0.50,SET**0.25)*DGSTGFs1(NB,NZ))
-!       IF(FGRNX.LT.1.0)THEN
-!       WRITE(*,4246)'GRWT',I,J,NZ,NB,IDAYs1(8,NB,NZ),TCCs1(NZ)
-!      2,HTCs1(NZ),FGRNX,GRMXs1(NZ),GRWTBs1(NB,NZ)
-!       ENDIF
+
     ENDIF
   ENDIF
 !
@@ -2588,6 +2655,7 @@ module PlantBranchMod
   associate(                               &
     EHVSTs1    =>  plt_distb%EHVSTs1     , &
     IYRHs1     =>  plt_distb%IYRHs1      , &
+    THINs1     =>  plt_distb%THINs1      , &
     HVSTs1     =>  plt_distb%HVSTs1      , &
     IHVSTs1    =>  plt_distb%IHVSTs1     , &
     JHVSTs1    =>  plt_distb%JHVSTs1     , &
@@ -2637,6 +2705,7 @@ module PlantBranchMod
     FWODSNs1   =>  plt_allom%FWODSNs1    , &
     FWODBs1    =>  plt_allom%FWODBs1     , &
     FWODSPs1   =>  plt_allom%FWODSPs1    , &
+    GRWTBs1    => plt_allom%GRWTBs1      , &
     VRNXs1     =>  plt_pheno%VRNXs1      , &
     IWTYPs1    =>  plt_pheno%IWTYPs1     , &
     IGTYPs1    =>  plt_pheno%IGTYPs1     , &
@@ -2656,8 +2725,17 @@ module PlantBranchMod
     FLG4s1     =>  plt_pheno%FLG4s1      , &
     IFLGRs1    =>  plt_pheno%IFLGRs1     , &
     IFLGAs1    =>  plt_pheno%IFLGAs1     , &
+    GROUPIs1   =>  plt_pheno%GROUPIs1    , &
+    WSTRs1     =>   plt_pheno%WSTRs1     , &
     IFLGQs1    =>  plt_pheno%IFLGQs1     , &
     KVSTGs1    =>  plt_pheno%KVSTGs1     , &
+    CFOPCs1    =>  plt_soilchem%CFOPCs1  , &
+    CFOPNs1    =>  plt_soilchem%CFOPNs1  , &
+    CFOPPs1    =>  plt_soilchem%CFOPPs1  , &
+    IYRCs1     =>  plt_site%IYRCs1       , &
+    CSNCs1     =>  plt_bgcr%CSNCs1       , &
+    ZSNCs1     =>  plt_bgcr%ZSNCs1       , &
+    PSNCs1     =>  plt_bgcr%PSNCs1       , &
     MYs1       =>  plt_morph%MYs1        , &
     VSTGs1     =>  plt_morph%VSTGs1      , &
     XTLIs1     =>  plt_morph%XTLIs1      , &
@@ -2795,7 +2873,7 @@ module PlantBranchMod
     !
         IF((IFLGEs1(NB,NZ).EQ.0.AND.ISTYPs1(NZ).NE.0) &
           .AND.VRNSs1(NB,NZ).GE.VRNLs1(NB,NZ))THEN
-          DO 6245 M=1,JP1
+          DO 6245 M=1,4
             CSNCs1(M,1,0,NZ)=CSNCs1(M,1,0,NZ)+CFOPCs1(2,M,NZ) &
               *(WTHSKBs1(NB,NZ)+WTEARBs1(NB,NZ)+WTGRBs1(NB,NZ))
             ZSNCs1(M,1,0,NZ)=ZSNCs1(M,1,0,NZ)+CFOPNs1(2,M,NZ) &
@@ -3004,6 +3082,10 @@ module PlantBranchMod
   associate(                          &
     IDAY0s1  =>  plt_distb%IDAY0s1  , &
     IYR0s1   =>  plt_distb%IYR0s1   , &
+    IYRCs1   =>  plt_site%IYRCs1    , &
+    ZEROS2s1 => plt_site%ZEROS2s1   , &
+    DYLNs1   =>  plt_site%DYLNs1    , &
+    NUs1     =>  plt_site%NUs1      , &
     FVRNs1   =>  plt_allom%FVRNs1   , &
     FWODRs1  =>  plt_allom%FWODRs1  , &
     WTRTs1   =>  plt_biom%WTRTs1    , &
@@ -3020,6 +3102,7 @@ module PlantBranchMod
     CCPOLBs1 =>  plt_biom%CCPOLBs1  , &
     CZPOLBs1 =>  plt_biom%CZPOLBs1  , &
     WTLSBs1  =>  plt_biom%WTLSBs1   , &
+    ZEROPs1  =>  plt_biom%ZEROPs1   , &
     CPPOLBs1 =>  plt_biom%CPPOLBs1  , &
     WTRVPs1  =>  plt_biom%WTRVPs1   , &
     WTRSVBs1 =>  plt_biom%WTRSVBs1  , &
@@ -3029,6 +3112,7 @@ module PlantBranchMod
     PPOOLs1  =>  plt_biom%PPOOLs1   , &
     VOLXs1   =>  plt_soilchem%VOLXs1, &
     IDAYs1   =>  plt_pheno%IDAYs1   , &
+    TFN3s1   =>  plt_pheno%TFN3s1   , &
     VRNXs1   =>  plt_pheno%VRNXs1   , &
     VRNSs1   =>  plt_pheno%VRNSs1   , &
     VRNLs1   =>  plt_pheno%VRNLs1   , &
@@ -3429,13 +3513,22 @@ module PlantBranchMod
   real(r8) :: RCO2T,RCO2CM
 ! begin_execution
   associate(                             &
+    CNETs1      =>  plt_bgcr%CNETs1    , &
+    TCO2Ts1     =>  plt_bgcr%TCO2Ts1   , &
+    TRAUs1      =>  plt_bgcr%TRAUs1    , &
+    RECOs1      =>  plt_bgcr%RECOs1    , &
+    TGPPs1      =>  plt_bgcr%TGPPs1    , &
+    CARBNs1     =>  plt_bgcr%CARBNs1   , &
+    TCO2As1     =>  plt_bgcr%TCO2As1   , &
     CPOOLs1     =>  plt_biom%CPOOLs1   , &
     ZPOOLs1     =>  plt_biom%ZPOOLs1   , &
     PPOOLs1     =>  plt_biom%PPOOLs1   , &
     CPPOLBs1    =>  plt_biom%CPPOLBs1  , &
     CZPOLBs1    =>  plt_biom%CZPOLBs1  , &
     CCPOLBs1    =>  plt_biom%CCPOLBs1  , &
+    ZEROs1      => plt_site%ZEROs1     , &
     IGTYPs1     =>  plt_pheno%IGTYPs1  , &
+    TFN3s1      =>  plt_pheno%TFN3s1   , &
     IWTYPs1     =>  plt_pheno%IWTYPs1  , &
     FDBKXs1     =>  plt_photo%FDBKXs1    &
   )
@@ -3590,11 +3683,18 @@ module PlantBranchMod
     ZPOOLs1     =>  plt_biom%ZPOOLs1    , &
     PPOOLs1     =>  plt_biom%PPOOLs1    , &
     CCPOLBs1    =>  plt_biom%CCPOLBs1   , &
-    CPPOLBs1    =>  plt_biom%CPPOLBs1  , &
+    CPPOLBs1    =>  plt_biom%CPPOLBs1   , &
     CZPOLBs1    =>  plt_biom%CZPOLBs1   , &
     CPOOLs1     =>  plt_biom%CPOOLs1    , &
     IGTYPs1     =>  plt_pheno%IGTYPs1   , &
+    TFN4s1      =>  plt_pheno%TFN4s1    , &
+    WFRs1       =>  plt_rbgc%WFRs1      , &
     IWTYPs1     =>  plt_pheno%IWTYPs1   , &
+    CNETs1      =>  plt_bgcr%CNETs1     , &
+    RCO2Ms1     =>  plt_rbgc%RCO2Ms1    , &
+    RCO2Ns1     =>  plt_rbgc%RCO2Ns1    , &
+    RCO2As1     =>  plt_rbgc%RCO2As1    , &
+    ZEROs1      => plt_site%ZEROs1      , &
     NGs1        =>  plt_morph%NGs1      , &
     FDBKXs1     =>  plt_photo%FDBKXs1     &
   )

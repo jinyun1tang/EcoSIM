@@ -32,13 +32,24 @@ implicit none
   real(r8) :: VA,VG
 !begin_execution
   associate(                          &
+  ZEROs1       => plt_site%ZEROs1   , &
   IGTYPs1      => plt_pheno%IGTYPs1 , &
   FDBKs1       => plt_photo%FDBKs1  , &
   CO2Qs1       => plt_photo%CO2Qs1  , &
+  SURFXs1      => plt_photo%SURFXs1 , &
   XKCO2Os1     => plt_photo%XKCO2Os1, &
   SCO2s1       => plt_photo%SCO2s1  , &
+  CBXNs1       => plt_photo%CBXNs1  , &
+  ETGROs1      => plt_photo%ETGROs1 , &
+  VGROs1       => plt_photo%VGROs1  , &
   CO2Is1       => plt_photo%CO2Is1  , &
+  RCMXs1       => plt_photo%RCMXs1  , &
   XKCO24s1     => plt_photo%XKCO24s1, &
+  VCGROs1      => plt_photo%VCGROs1 , &
+  COMPLs1      => plt_photo%COMPLs1 , &
+  FMOLs1       => plt_photo%FMOLs1  , &
+  DCO2s1       => plt_photo%DCO2s1  , &
+  ZEROPs1      => plt_biom%ZEROPs1  , &
   ARLFLs1      => plt_morph%ARLFLs1 , &
   PARDIFs1     => plt_rad%PARDIFs1  , &
   PARs1        => plt_rad%PARs1     , &
@@ -296,12 +307,26 @@ implicit none
 ! begin_execution
   associate(                          &
   IGTYPs1      => plt_pheno%IGTYPs1 , &
+  ZEROPs1      => plt_biom%ZEROPs1  , &
   XKCO24s1     => plt_photo%XKCO24s1, &
+  FDBK4s1      => plt_photo%FDBK4s1 , &
   SCO2s1       => plt_photo%SCO2s1  , &
+  CBXN4s1      => plt_photo%CBXN4s1 , &
+  SURFXs1      => plt_photo%SURFXs1 , &
+  VGRO4s1      => plt_photo%VGRO4s1 , &
+  RCMXs1       => plt_photo%RCMXs1  , &
+  DCO2s1       => plt_photo%DCO2s1  , &
+  FMOLs1       => plt_photo%FMOLs1  , &
+  ETGROs1      => plt_photo%ETGROs1 , &
+  VGROs1       => plt_photo%VGROs1  , &
+  ETGR4s1      => plt_photo%ETGR4s1 , &
   CO2Qs1       => plt_photo%CO2Qs1  , &
   FDBKs1       => plt_photo%FDBKs1  , &
   CO2Is1       => plt_photo%CO2Is1  , &
+  CBXNs1       => plt_photo%CBXNs1  , &
+  VCGR4s1      => plt_photo%VCGR4s1 , &
   ARLFLs1      => plt_morph%ARLFLs1 , &
+  ZEROs1       => plt_site%ZEROs1   , &
   PARDIFs1     => plt_rad%PARDIFs1  , &
   PARs1        => plt_rad%PARs1     , &
   TAU0s1       => plt_rad%TAU0s1    , &
@@ -442,15 +467,8 @@ implicit none
 !               SURFX=unself-shaded leaf surface area
 !               TAUS=fraction of direct radiation transmitted from layer above
 !
-                CH2O3(K)=CH2O3(K)+VL*SURFXs1(N,L,K,NB,NZ) &
-                  *TAUSs1(L+1)
-!               IF(L.EQ.NC-1.AND.NB.EQ.1.AND.M.EQ.1.AND.N.EQ.1)THEN
-!               WRITE(*,4445)'VLD3',IYRCs1,I,J,NZ,L,M,N,K,VL,PARs1(N,M,L,NZ)
-!              2,RAPS,TKCs1(NZ),CO2Qs1(NZ),ETGROs1(K,NB,NZ)
-!              3,CBXNs1(K,NB,NZ),VGROs1(K,NB,NZ),EGRO
-!              3,FDBKs1(NB,NZ),WFNB
-!4445            FORMAT(A8,8I4,20E12.4)
-!               ENDIF
+                CH2O3(K)=CH2O3(K)+VL*SURFXs1(N,L,K,NB,NZ)*TAUSs1(L+1)
+
               ENDIF
             ENDIF
 !
@@ -606,10 +624,14 @@ implicit none
 
 ! begin_execution
   associate(                           &
-    CO2Qs1    => plt_photo%CO2Qs1    , &
+    CO2Qs1    =>  plt_photo%CO2Qs1   , &
+    ICTYPs1   =>  plt_photo%ICTYPs1  , &
+    VCGR4s1   =>  plt_photo%VCGR4s1  , &
+    VCGROs1   =>  plt_photo%VCGROs1  , &
     IGTYPs1   =>  plt_pheno%IGTYPs1  , &
     SSINs1    =>  plt_rad%SSINs1     , &
     RADPs1    =>  plt_rad%RADPs1     , &
+    ZEROPs1   =>  plt_biom%ZEROPs1   , &
     ARLF1s1   =>  plt_morph%ARLF1s1  , &
     FDBKs1    =>  plt_photo%FDBKs1     &
   )

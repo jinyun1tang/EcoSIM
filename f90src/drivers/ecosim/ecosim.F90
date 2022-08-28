@@ -35,18 +35,9 @@ PROGRAM main
   CALL GETCWD(BUF)
 !
 ! IDENTIFY OPERATING SYSTEM: DOS OR UNIX
-!
-  CALL GETARG(1,nmlfile)
-  write(*,*)'read namelist'
-  call readnamelist(trim(nmlfile),runfile, case_name, prefix, &
-    do_rgres,LYRG,lverb, nmicbguilds)
 
-  call  InitModules(nmicbguilds)
-
-  write(*,*)'read runfile'
-  OPEN(5,FILE=runfile,STATUS='OLD')
   IF((.NOT.(BUF(1:1).EQ.'/'.OR.BUF(1:1).EQ.'~')).AND.BUF(2:2).EQ.':')THEN
-    write(*,*)'dos system'
+    write(*,*)'Running ecosim on dos system'
     is_dos=.true.
 !   CALL GETARG(1,BUF)
 !   OPEN(5,FILE=BUF,STATUS='OLD')
@@ -55,9 +46,20 @@ PROGRAM main
     PREFIX='.\\'  ! location where input files are put
 !   make output directory
   ELSE
-    write(*,*)'unix system'
+    write(*,*)'Running ecosim on unix system'
 !   make output directory
   ENDIF
+!
+  CALL GETARG(1,nmlfile)
+
+  write(*,*)'read namelist'
+  call readnamelist(trim(nmlfile),runfile, case_name, prefix, &
+    do_rgres,LYRG,lverb, nmicbguilds)
+
+  call  InitModules(nmicbguilds)
+
+  write(*,*)'read runfile',trim(runfile)
+  OPEN(5,FILE=runfile,STATUS='OLD')
 !
 ! READ INPUT FILES
 !

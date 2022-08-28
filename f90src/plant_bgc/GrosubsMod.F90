@@ -67,6 +67,16 @@ module grosubsMod
 ! begin_execution
   associate(                            &
     IFLGCs1    => plt_pheno%IFLGCs1   , &
+    NPs1       => plt_site%NPs1       , &
+    NP0s1      => plt_site%NP0s1      , &
+    NJs1       => plt_site%NJs1       , &
+    CNETs1     => plt_bgcr%CNETs1     , &
+    HCSNCs1    => plt_bgcr%HCSNCs1    , &
+    HZSNCs1    => plt_bgcr%HZSNCs1    , &
+    HPSNCs1    => plt_bgcr%HPSNCs1    , &
+    CSNCs1     => plt_bgcr%CSNCs1     , &
+    ZSNCs1     => plt_bgcr%ZSNCs1     , &
+    PSNCs1     => plt_bgcr%PSNCs1     , &
     ZCs1       => plt_morph%ZCs1        &
   )
 !     TOTAL AGB FOR GRAZING IN LANDSCAPE SECTION
@@ -125,6 +135,20 @@ module grosubsMod
   associate(                           &
     IDAY0s1   => plt_distb%IDAY0s1   , &
     IYR0s1    => plt_distb%IYR0s1    , &
+    THVSTPs1  => plt_distb%THVSTPs1  , &
+    THVSTNs1  => plt_distb%THVSTNs1  , &
+    THVSTCs1  => plt_distb%THVSTCs1  , &
+    HVSTCs1   => plt_distb%HVSTCs1   , &
+    HVSTNs1   => plt_distb%HVSTNs1   , &
+    HVSTPs1   => plt_distb%HVSTPs1   , &
+    VPO4Fs1   => plt_distb%VPO4Fs1   , &
+    VN2OFs1   => plt_distb%VN2OFs1   , &
+    VCH4Fs1   => plt_distb%VCH4Fs1   , &
+    VCO2Fs1   => plt_distb%VCO2Fs1   , &
+    VNH3Fs1   => plt_distb%VNH3Fs1   , &
+    WTSTDGs1  => plt_biom%WTSTDGs1   , &
+    WTSTDNs1  => plt_biom%WTSTDNs1   , &
+    WTSTDPs1  => plt_biom%WTSTDPs1   , &
     WTSTGPs1  => plt_biom%WTSTGPs1   , &
     WTSHPs1   => plt_biom%WTSHPs1    , &
     WTSHNs1   => plt_biom%WTSHNs1    , &
@@ -140,6 +164,7 @@ module grosubsMod
     WTRVPs1   => plt_biom%WTRVPs1    , &
     WTSTGNs1  => plt_biom%WTSTGNs1   , &
     WTSTGs1   => plt_biom%WTSTGs1    , &
+    TFN3s1    => plt_pheno%TFN3s1    , &
     RSETCs1   => plt_pheno%RSETCs1   , &
     RSETNs1   => plt_pheno%RSETNs1   , &
     RSETPs1   => plt_pheno%RSETPs1   , &
@@ -150,6 +175,33 @@ module grosubsMod
     IBTYPs1   => plt_pheno%IBTYPs1   , &
     VRNLs1    => plt_pheno%VRNLs1    , &
     VRNSs1    => plt_pheno%VRNSs1    , &
+    BALCs1    => plt_site%BALCs1     , &
+    BALNs1    => plt_site%BALNs1     , &
+    BALPs1    => plt_site%BALPs1     , &
+    NP0s1     => plt_site%NP0s1      , &
+    NJs1      => plt_site%NJs1       , &
+    IYRCs1    => plt_site%IYRCs1     , &
+    CSNCs1    => plt_bgcr%CSNCs1     , &
+    ZSNCs1    => plt_bgcr%ZSNCs1     , &
+    PSNCs1    => plt_bgcr%PSNCs1     , &
+    ZNPPs1    => plt_bgcr%ZNPPs1     , &
+    TZUPFXs1  => plt_bgcr%TZUPFXs1   , &
+    HCSNCs1   => plt_bgcr%HCSNCs1    , &
+    HZSNCs1   => plt_bgcr%HZSNCs1    , &
+    HPSNCs1   => plt_bgcr%HPSNCs1    , &
+    TNH3Cs1   => plt_bgcr%TNH3Cs1    , &
+    TZSNCs1   => plt_bgcr%TZSNCs1    , &
+    TPSNCs1   => plt_bgcr%TPSNCs1    , &
+    TCSNCs1   => plt_bgcr%TCSNCs1    , &
+    TPSN0s1   => plt_bgcr%TPSN0s1    , &
+    TZSN0s1   => plt_bgcr%TZSN0s1    , &
+    TCSN0s1   => plt_bgcr%TCSN0s1    , &
+    TCO2Ts1   => plt_bgcr%TCO2Ts1    , &
+    CARBNs1   => plt_bgcr%CARBNs1    , &
+    TCUPTKs1  => plt_rbgc%TCUPTKs1   , &
+    TZUPTKs1  => plt_rbgc%TZUPTKs1   , &
+    TPUPTKs1  => plt_rbgc%TPUPTKs1   , &
+    CDPTHZs1  => plt_site%CDPTHZs1   , &
     SDPTHIs1  => plt_morph%SDPTHIs1  , &
     NBRs1     => plt_morph%NBRs1       &
   )
@@ -312,6 +364,17 @@ module grosubsMod
     IGTYPs1  => plt_pheno%IGTYPs1       , &
     IDTHRs1  => plt_pheno%IDTHRs1       , &
     IDTHPs1  => plt_pheno%IDTHPs1       , &
+    UPNFs1   => plt_rbgc%UPNFs1         , &
+    UPH2Ps1  => plt_rbgc%UPH2Ps1        , &
+    UPNH4s1  => plt_rbgc%UPNH4s1        , &
+    UPH1Ps1  => plt_rbgc%UPH1Ps1        , &
+    UPNO3s1  => plt_rbgc%UPNO3s1        , &
+    HPUPTKs1 => plt_rbgc%HPUPTKs1       , &
+    HZUPTKs1 => plt_rbgc%HZUPTKs1       , &
+    HCUPTKs1 => plt_rbgc%HCUPTKs1       , &
+    UPOMCs1  => plt_rbgc%UPOMCs1        , &
+    UPOMNs1  => plt_rbgc%UPOMNs1        , &
+    UPOMPs1  => plt_rbgc%UPOMPs1        , &
     SDARs1   => plt_morph%SDARs1        , &
     SDVLs1   => plt_morph%SDVLs1        , &
     NBRs1    => plt_morph%NBRs1         , &
@@ -368,13 +431,24 @@ module grosubsMod
   associate(                            &
     TKCs1    =>  plt_ew%TKCs1         , &
     TKSs1    =>  plt_ew%TKSs1         , &
+    PSILTs1  =>  plt_ew%PSILTs1       , &
+    PSILGs1  =>  plt_ew%PSILGs1       , &
+    PPs1     =>  plt_site%PPs1        , &
+    NUs1     =>  plt_site%NUs1        , &
+    NJs1     =>  plt_site%NJs1        , &
+    OFFSTs1  =>  plt_pheno%OFFSTs1    , &
+    ZEROPs1  =>  plt_biom%ZEROPs1     , &
     WVSTKs1  =>  plt_biom%WVSTKs1     , &
     WSRTLs1  =>  plt_biom%WSRTLs1     , &
     WTRTAs1  =>  plt_biom%WTRTAs1     , &
     WTSTKs1  =>  plt_biom%WTSTKs1     , &
     WTRTs1   =>  plt_biom%WTRTs1      , &
+    WGLFVs1  =>  plt_biom%WGLFVs1     , &
     IBTYPs1  =>  plt_pheno%IBTYPs1    , &
     IGTYPs1  =>  plt_pheno%IGTYPs1    , &
+    RCO2As1  =>  plt_rbgc%RCO2As1     , &
+    RCO2Ms1  =>  plt_rbgc%RCO2Ms1     , &
+    RCO2Ns1  =>  plt_rbgc%RCO2Ns1     , &
     CNRTs1   =>  plt_allom%CNRTs1     , &
     CPRTs1   =>  plt_allom%CPRTs1     , &
     FVRNs1   =>  plt_allom%FVRNs1     , &
@@ -396,6 +470,8 @@ module grosubsMod
     CNSTKs1  =>  plt_allom%CNSTKs1    , &
     CPSTKs1  =>  plt_allom%CPSTKs1    , &
     RCSs1    =>  plt_photo%RCSs1      , &
+    RTN1s1   =>  plt_morph%RTN1s1     , &
+    RTNLs1   =>  plt_morph%RTNLs1     , &
     MYs1     =>  plt_morph%MYs1       , &
     ARLFVs1  =>  plt_morph%ARLFVs1    , &
     ARSTVs1  =>  plt_morph%ARSTVs1    , &
@@ -561,6 +637,11 @@ module grosubsMod
     CPOOLs1      =>  plt_biom%CPOOLs1      , &
     ZPOOLs1      =>  plt_biom%ZPOOLs1      , &
     PPOOLs1      =>  plt_biom%PPOOLs1      , &
+    NUs1         =>  plt_site%NUs1         , &
+    CPOOL3s1     =>  plt_photo%CPOOL3s1    , &
+    CPOOL4s1     =>  plt_photo%CPOOL4s1    , &
+    HCOBs1       =>  plt_photo%HCOBs1      , &
+    CO2Bs1       =>  plt_photo%CO2Bs1      , &
     MYs1         =>  plt_morph%MYs1        , &
     NIs1         =>  plt_morph%NIs1        , &
     NBRs1        =>  plt_morph%NBRs1         &
@@ -702,6 +783,8 @@ module grosubsMod
     WTRSVNs1   =>  plt_biom%WTRSVNs1  , &
     WTHSKNs1   =>  plt_biom%WTHSKNs1  , &
     WTEARNs1   =>  plt_biom%WTEARNs1  , &
+    WTNDLs1    =>  plt_biom%WTNDLs1   , &
+    WTNDLNs1   =>  plt_biom%WTNDLNs1  , &
     WTGRNNs1   =>  plt_biom%WTGRNNs1  , &
     WTLFPs1    =>  plt_biom%WTLFPs1   , &
     WTSHEPs1   =>  plt_biom%WTSHEPs1  , &
@@ -712,6 +795,33 @@ module grosubsMod
     WTGRNPs1   =>  plt_biom%WTGRNPs1  , &
     CPOOLPs1   =>  plt_biom%CPOOLPs1  , &
     CPOLNPs1   =>  plt_biom%CPOLNPs1  , &
+    WTRT1s1    =>  plt_biom%WTRT1s1   , &
+    WTRT1Ns1   =>  plt_biom%WTRT1Ns1  , &
+    WTRT1Ps1   =>  plt_biom%WTRT1Ps1  , &
+    WTNDLPs1   =>  plt_biom%WTNDLPs1  , &
+    WTRT2s1    =>  plt_biom%WTRT2s1   , &
+    WTRT2Ns1   =>  plt_biom%WTRT2Ns1  , &
+    WTRT2Ps1   =>  plt_biom%WTRT2Ps1  , &
+    CPOOLNs1   =>  plt_biom%CPOOLNs1  , &
+    ZPOOLNs1   =>  plt_biom%ZPOOLNs1  , &
+    PPOOLNs1   =>  plt_biom%PPOOLNs1  , &
+    TZUPFXs1   =>  plt_bgcr%TZUPFXs1  , &
+    TPUPTKs1   =>  plt_rbgc%TPUPTKs1  , &
+    TZUPTKs1   =>  plt_rbgc%TZUPTKs1  , &
+    TCUPTKs1   =>  plt_rbgc%TCUPTKs1  , &
+    UPH1Ps1    =>  plt_rbgc%UPH1Ps1   , &
+    HCUPTKs1   =>  plt_rbgc%HCUPTKs1  , &
+    HZUPTKs1   =>  plt_rbgc%HZUPTKs1  , &
+    HPUPTKs1   =>  plt_rbgc%HPUPTKs1  , &
+    UPNFs1     =>  plt_rbgc%UPNFs1    , &
+    UPH2Ps1    =>  plt_rbgc%UPH2Ps1   , &
+    UPNO3s1    =>  plt_rbgc%UPNO3s1   , &
+    UPNH4s1    =>  plt_rbgc%UPNH4s1   , &
+    UPOMCs1    =>  plt_rbgc%UPOMCs1   , &
+    UPOMNs1    =>  plt_rbgc%UPOMNs1   , &
+    UPOMPs1    =>  plt_rbgc%UPOMPs1   , &
+    NJs1       =>  plt_site%NJs1      , &
+    NUs1       =>  plt_site%NUs1      , &
     NBRs1      =>  plt_morph%NBRs1    , &
     MYs1       =>  plt_morph%MYs1     , &
     NIs1       =>  plt_morph%NIs1     , &
@@ -722,6 +832,7 @@ module grosubsMod
     GRNOBs1    =>  plt_morph%GRNOBs1  , &
     ARLFPs1    =>  plt_morph%ARLFPs1  , &
     ARSTVs1    =>  plt_morph%ARSTVs1  , &
+    INTYPs1    =>  plt_morph%INTYPs1  , &
     GRNOs1     =>  plt_morph%GRNOs1     &
   )
 !

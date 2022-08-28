@@ -48,6 +48,7 @@ module HfuncsMod
 
 ! begin_execution
   associate(                           &
+    PSILTs1   =>  plt_ew%PSILTs1     , &
     VRNZs1    =>  plt_pheno%VRNZs1   , &
     IFLGIs1   =>  plt_pheno%IFLGIs1  , &
     IFLGPs1   =>  plt_pheno%IFLGPs1  , &
@@ -56,12 +57,19 @@ module HfuncsMod
     IFLGCs1   =>  plt_pheno%IFLGCs1  , &
     IDTHBs1   =>  plt_pheno%IDTHBs1  , &
     IDAYs1    =>  plt_pheno%IDAYs1   , &
+    WSTRs1    =>  plt_pheno%WSTRs1   , &
     KVSTGs1   =>  plt_pheno%KVSTGs1  , &
-    IGTYPs1  =>  plt_pheno%IGTYPs1   , &
-    KLEAFs1   => plt_morph%KLEAFs1   , &
+    IGTYPs1   =>  plt_pheno%IGTYPs1  , &
+    DYLNs1    =>  plt_site%DYLNs1    , &
+    DATAPs1   =>  plt_site%DATAPs1   , &
+    PPTs1     =>  plt_site%PPTs1     , &
+    DYLXs1    =>  plt_site%DYLXs1    , &
+    NPs1      =>  plt_site%NPs1      , &
+    PPs1      =>  plt_site%PPs1      , &
+    KLEAFs1   =>  plt_morph%KLEAFs1  , &
     VSTGs1    =>  plt_morph%VSTGs1   , &
-    NBRs1    =>  plt_morph%NBRs1     , &
-    NB1s1    =>  plt_morph%NB1s1       &
+    NBRs1     =>  plt_morph%NBRs1    , &
+    NB1s1     =>  plt_morph%NB1s1      &
   )
   DO 9985 NZ=1,NPs1
 
@@ -169,6 +177,11 @@ module HfuncsMod
     IYRHs1    =>  plt_distb%IYRHs1    , &
     IDAY0s1   =>  plt_distb%IDAY0s1   , &
     IDAYHs1   =>  plt_distb%IDAYHs1   , &
+    DATAPs1   =>  plt_site%DATAPs1    , &
+    IDATAs1   =>  plt_site%IDATAs1    , &
+    IYRCs1    =>  plt_site%IYRCs1     , &
+    IFLGTs1   =>  plt_site%IFLGTs1    , &
+    TNBPs1    =>  plt_bgcr%TNBPs1     , &
     WTRVXs1   =>  plt_biom%WTRVXs1    , &
     IDTHs1    =>  plt_pheno%IDTHs1    , &
     IFLGCs1   =>  plt_pheno%IFLGCs1     &
@@ -220,17 +233,23 @@ module HfuncsMod
 
 ! begin_execution
   associate(                            &
-    CCPOLPs1  =>  plt_biom%CCPOLPs1   , &
-    WTRVCs1   =>  plt_biom%WTRVCs1    , &
-    GROUPs1   =>  plt_pheno%GROUPs1   , &
-    IDAYs1    =>  plt_pheno%IDAYs1    , &
-    IFLGIs1   =>  plt_pheno%IFLGIs1   , &
+    CCPOLPs1  =>   plt_biom%CCPOLPs1  , &
+    WTRVCs1   =>   plt_biom%WTRVCs1   , &
+    GROUPs1   =>   plt_pheno%GROUPs1  , &
+    IDAYs1    =>   plt_pheno%IDAYs1   , &
+    IFLGIs1   =>   plt_pheno%IFLGIs1  , &
     IDTHRs1   =>   plt_pheno%IDTHRs1  , &
-    ISTYPs1   =>  plt_pheno%ISTYPs1   , &
-    IDTHBs1   =>  plt_pheno%IDTHBs1   , &
+    ISTYPs1   =>   plt_pheno%ISTYPs1  , &
+    IDTHBs1   =>   plt_pheno%IDTHBs1  , &
     IDTHPs1   =>   plt_pheno%IDTHPs1  , &
-    IBTYPs1   =>  plt_pheno%IBTYPs1   , &
-    VRNSs1    =>  plt_pheno%VRNSs1    , &
+    IBTYPs1   =>   plt_pheno%IBTYPs1  , &
+    PRs1      =>   plt_pheno%PRs1     , &
+    GROUPIs1  =>   plt_pheno%GROUPIs1 , &
+    PBs1      =>   plt_pheno%PBs1     , &
+    PPs1      =>   plt_site%PPs1      , &
+    VRNSs1    =>   plt_pheno%VRNSs1   , &
+    PSIRGs1   =>   plt_ew%PSIRGs1     , &
+    FNODs1    =>   plt_allom%FNODs1   , &
     NRTs1     =>   plt_morph%NRTs1    , &
     NB1s1     =>   plt_morph%NB1s1    , &
     NBRs1     =>   plt_morph%NBRs1    , &
@@ -238,7 +257,7 @@ module HfuncsMod
     NBTs1     =>   plt_morph%NBTs1    , &
     NBTBs1    =>   plt_morph%NBTBs1   , &
     NGs1      =>   plt_morph%NGs1     , &
-    XTLIs1    =>  plt_morph%XTLIs1    , &
+    XTLIs1    =>   plt_morph%XTLIs1   , &
     ARLFLs1   =>   plt_morph%ARLFLs1  , &
     PSTGs1    =>   plt_morph%PSTGs1     &
   )
@@ -345,29 +364,36 @@ module HfuncsMod
     CCPOLRs1 =>  plt_biom%CCPOLRs1   , &
     CZPOLRs1 =>  plt_biom%CZPOLRs1   , &
     CPPOLRs1 =>  plt_biom%CPPOLRs1   , &
+    ZEROLs1  =>  plt_biom%ZEROLs1    , &
+    ZEROPs1  =>  plt_biom%ZEROPs1    , &
     WTRTLs1  =>  plt_biom%WTRTLs1    , &
     CPOLNPs1 =>  plt_biom%CPOLNPs1   , &
     ZPOLNPs1 =>  plt_biom%ZPOLNPs1   , &
     PPOLNPs1 =>  plt_biom%PPOLNPs1   , &
+    VOLWCs1  =>  plt_ew%VOLWCs1      , &
+    VHCPCs1  =>  plt_ew%VHCPCs1      , &
+    NUs1     =>  plt_site%NUs1       , &
     IDTHBs1  =>  plt_pheno%IDTHBs1   , &
     IDAYs1   =>  plt_pheno%IDAYs1    , &
     NB1s1    =>  plt_morph%NB1s1     , &
+    RTDP1s1  =>  plt_morph%RTDP1s1   , &
     MYs1     =>  plt_morph%MYs1      , &
     ARLFPs1  =>  plt_morph%ARLFPs1   , &
-    NGs1     =>   plt_morph%NGs1     , &
+    NGs1     =>  plt_morph%NGs1      , &
     NIXs1    =>  plt_morph%NIXs1     , &
     NBRs1    =>  plt_morph%NBRs1     , &
     NBTBs1   =>  plt_morph%NBTBs1    , &
+    HTCTLs1  =>  plt_morph%HTCTLs1   , &
     SDPTHs1  =>  plt_morph%SDPTHs1   , &
     ARSTPs1  =>  plt_morph%ARSTPs1   , &
     NIs1     =>  plt_morph%NIs1        &
   )
-  RCO2Zs1(NZ)=0.0_r8
-  ROXYZs1(NZ)=0.0_r8
-  RCH4Zs1(NZ)=0.0_r8
-  RN2OZs1(NZ)=0.0_r8
-  RNH3Zs1(NZ)=0.0_r8
-  RH2GZs1(NZ)=0.0_r8
+  plt_bgcr%RCO2Zs1(NZ)=0.0_r8
+  plt_bgcr%ROXYZs1(NZ)=0.0_r8
+  plt_bgcr%RCH4Zs1(NZ)=0.0_r8
+  plt_bgcr%RN2OZs1(NZ)=0.0_r8
+  plt_bgcr%RNH3Zs1(NZ)=0.0_r8
+  plt_bgcr%RH2GZs1(NZ)=0.0_r8
   CPOOLPs1(NZ)=0.0_r8
   ZPOOLPs1(NZ)=0.0_r8
   PPOOLPs1(NZ)=0.0_r8
@@ -474,6 +500,12 @@ module HfuncsMod
   integer, intent(in) :: I,J,NZ
 
   associate(                           &
+    PSILTs1   =>  plt_ew%PSILTs1     , &
+    PSILGs1   =>  plt_ew%PSILGs1     , &
+    DYLNs1    =>  plt_site%DYLNs1    , &
+    DYLXs1    =>  plt_site%DYLXs1    , &
+    DYLMs1    =>  plt_site%DYLMs1    , &
+    ALATs1    =>  plt_site%ALATs1    , &
     IFLGEs1   =>  plt_pheno%IFLGEs1  , &
     IDAYs1    =>  plt_pheno%IDAYs1   , &
     IGTYPs1   =>  plt_pheno%IGTYPs1  , &
@@ -481,7 +513,11 @@ module HfuncsMod
     VRNSs1    =>  plt_pheno%VRNSs1   , &
     VRNLs1    =>  plt_pheno%VRNLs1   , &
     IWTYPs1   =>  plt_pheno%IWTYPs1  , &
+    TCZs1     =>  plt_pheno%TCZs1    , &
     VRNYs1    =>  plt_pheno%VRNYs1   , &
+    TCGs1     =>  plt_pheno%TCGs1    , &
+    CTCs1     =>  plt_pheno%CTCs1    , &
+    TCXs1     =>  plt_pheno%TCXs1    , &
     VRNFs1    =>  plt_pheno%VRNFs1   , &
     VRNXs1    =>  plt_pheno%VRNXs1   , &
     IFLGFs1   =>  plt_pheno%IFLGFs1    &
@@ -623,8 +659,7 @@ module HfuncsMod
 !     VRNY,VRNZ=hourly counter for lengthening,shortening photoperiods
 !     VRNE=maximum hours for leafout,leafoff
 !
-      IF(IFLGEs1(NB,NZ).EQ.1 &
-        .AND.IFLGFs1(NB,NZ).EQ.0)THEN
+      IF(IFLGEs1(NB,NZ).EQ.1.AND.IFLGFs1(NB,NZ).EQ.0)THEN
         IF(PSILTs1(NZ).LT.PSILY(IGTYPs1(NZ)))THEN
           VRNFs1(NB,NZ)=VRNFs1(NB,NZ)+1.0
         ENDIF
@@ -720,9 +755,16 @@ module HfuncsMod
     IYR0s1    =>  plt_distb%IYR0s1    , &
     IDAY0s1   =>  plt_distb%IDAY0s1   , &
     DPTHSs1   =>  plt_ew%DPTHSs1      , &
+    PSILTs1   =>  plt_ew%PSILTs1      , &
+    ZEROs1    =>  plt_site%ZEROs1     , &
+    DYLNs1    =>  plt_site%DYLNs1     , &
+    IYRCs1    =>  plt_site%IYRCs1     , &
+    DYLXs1    =>  plt_site%DYLXs1     , &
+    TKGs1     =>  plt_pheno%TKGs1     , &
     IDAYs1    =>  plt_pheno%IDAYs1    , &
     XRLAs1    =>  plt_pheno%XRLAs1    , &
     GSTGFs1   =>  plt_pheno%GSTGFs1   , &
+    OFFSTs1   =>  plt_pheno%OFFSTs1   , &
     ISTYPs1   =>  plt_pheno%ISTYPs1   , &
     IFLGEs1   =>  plt_pheno%IFLGEs1   , &
     VSTGs1    =>  plt_morph%VSTGs1    , &
@@ -741,6 +783,8 @@ module HfuncsMod
     VRNLs1    =>  plt_pheno%VRNLs1    , &
     IPTYPs1   =>  plt_pheno%IPTYPs1   , &
     IFLGAs1   =>  plt_pheno%IFLGAs1   , &
+    GROUPIs1  =>  plt_pheno%GROUPIs1  , &
+    OSTRs1    =>  plt_pheno%OSTRs1    , &
     VRNSs1    =>  plt_pheno%VRNSs1    , &
     VRNFs1    =>  plt_pheno%VRNFs1    , &
     VRNXs1    =>  plt_pheno%VRNXs1    , &

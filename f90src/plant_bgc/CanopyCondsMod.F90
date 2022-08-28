@@ -44,6 +44,14 @@ module CanopyCondsMod
   REAL(R8) :: ZZ
 !     begin_execution
   associate(                          &
+    UAs1      => plt_site%UAs1      , &
+    ZEROs1    => plt_site%ZEROs1    , &
+    AREA3s1   => plt_site%AREA3s1   , &
+    IETYPs1   => plt_site%IETYPs1   , &
+    ZSs1      => plt_site%ZSs1      , &
+    Z0s1      => plt_site%Z0s1      , &
+    ZEROSs1   => plt_site%ZEROSs1   , &
+    NUs1      => plt_site%NUs1      , &
     RABs1     => plt_ew%RABs1       , &
     ZDs1      => plt_ew%ZDs1        , &
     ZRs1      => plt_ew%ZRs1        , &
@@ -53,6 +61,7 @@ module CanopyCondsMod
     DPTHSs1   => plt_ew%DPTHSs1     , &
     VHCPW1s1  => plt_ew%VHCPW1s1    , &
     ZTs1      => plt_morph%ZTs1     , &
+    IRTYPs1   => plt_morph%IRTYPs1  , &
     ARSTCs1   => plt_morph%ARSTCs1  , &
     ARLFCs1   => plt_morph%ARLFCs1    &
   )
@@ -114,6 +123,8 @@ module CanopyCondsMod
   integer :: NZ,L
   !     begin_execution
   associate(                          &
+    NPs1      => plt_site%NPs1      , &
+    ZEROSs1   => plt_site%ZEROSs1   , &
     ZTs1      => plt_morph%ZTs1     , &
     ZLs1      => plt_morph%ZLs1     , &
     ZCs1      => plt_morph%ZCs1     , &
@@ -260,31 +271,40 @@ module CanopyCondsMod
     FRADPs1   => plt_rad%FRADPs1 , &
     PARs1     => plt_rad%PARs1   , &
     PARDIFs1  => plt_rad%PARDIFs1, &
-    OMEGAGs1  => plt_rad%OMEGAGs1, &
-    OMEGXs1   => plt_rad%OMEGXs1 , &
-    RAD0s1    => plt_rad%RAD0s1  , &
-    RADGs1    => plt_rad%RADGs1  , &
-    RADSs1    => plt_rad%RADSs1  , &
-    RAP0s1    => plt_rad%RAP0s1  , &
-    RADCs1    => plt_rad%RADCs1  , &
-    RAPYs1    => plt_rad%RAPYs1  , &
-    RAPSs1    => plt_rad%RAPSs1  , &
-    RADYs1    => plt_rad%RADYs1  , &
-    RAD1s1    => plt_rad%RAD1s1  , &
-    SSINs1    => plt_rad%SSINs1  , &
-    TYSINs1   => plt_rad%TYSINs1 , &
-    TAU0s1    => plt_rad%TAU0s1  , &
-    TAUSs1    => plt_rad%TAUSs1  , &
-    ZSINs1    => plt_rad%ZSINs1  , &
-    ABSPs1    => plt_rad%ABSPs1  , &
-    ABSRs1    => plt_rad%ABSRs1  , &
-    TAUPs1    => plt_rad%TAUPs1  , &
-    TAURs1    => plt_rad%TAURs1  , &
-    RADPs1    => plt_rad%RADPs1  , &
-    ZCOSs1    => plt_rad%ZCOSs1  , &
+    OMEGAGs1  => plt_rad%OMEGAGs1   , &
+    OMEGXs1   => plt_rad%OMEGXs1    , &
+    RAD0s1    => plt_rad%RAD0s1     , &
+    RADGs1    => plt_rad%RADGs1     , &
+    RADSs1    => plt_rad%RADSs1     , &
+    RAP0s1    => plt_rad%RAP0s1     , &
+    RADCs1    => plt_rad%RADCs1     , &
+    RAPYs1    => plt_rad%RAPYs1     , &
+    RAPSs1    => plt_rad%RAPSs1     , &
+    RADYs1    => plt_rad%RADYs1     , &
+    RAD1s1    => plt_rad%RAD1s1     , &
+    SSINs1    => plt_rad%SSINs1     , &
+    TYSINs1   => plt_rad%TYSINs1    , &
+    TAU0s1    => plt_rad%TAU0s1     , &
+    TAUSs1    => plt_rad%TAUSs1     , &
+    ZSINs1    => plt_rad%ZSINs1     , &
+    ABSPs1    => plt_rad%ABSPs1     , &
+    ABSRs1    => plt_rad%ABSRs1     , &
+    TAUPs1    => plt_rad%TAUPs1     , &
+    TAURs1    => plt_rad%TAURs1     , &
+    RADPs1    => plt_rad%RADPs1     , &
+    ZCOSs1    => plt_rad%ZCOSs1     , &
+    ZEROSs1   => plt_site%ZEROSs1   , &
+    NUs1      => plt_site%NUs1      , &
+    AREA3s1   => plt_site%AREA3s1   , &
+    NPs1      => plt_site%NPs1      , &
+    ZEROs1    => plt_site%ZEROs1    , &
+    ZEROS2s1  => plt_site%ZEROS2s1  , &
+    POROS1s1  => plt_site%POROS1s1  , &
+    ZNOONs1   => plt_site%ZNOONs1   , &
     VOLXs1    => plt_soilchem%VOLXs1, &
     VOLYs1    => plt_soilchem%VOLYs1, &
     VOLWs1    => plt_soilchem%VOLWs1, &
+    CFXs1     => plt_morph%CFXs1    , &
     ZLs1      => plt_morph%ZLs1     , &
     NBRs1     => plt_morph%NBRs1    , &
     SURFs1    => plt_morph%SURFs1   , &

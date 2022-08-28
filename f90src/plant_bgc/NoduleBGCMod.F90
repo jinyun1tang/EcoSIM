@@ -50,6 +50,22 @@ module NoduleBGCMod
   REAL(R8) :: RCCC,RCCN,RCCP
 !     begin_execution
   associate(                             &
+    NUs1       =>  plt_site%NUs1       , &
+    ZEROs1     =>  plt_site%ZEROs1     , &
+    AREA3s1    =>  plt_site%AREA3s1    , &
+    CFOPCs1    =>  plt_soilchem%CFOPCs1, &
+    CFOPNs1    =>  plt_soilchem%CFOPNs1, &
+    CFOPPs1    =>  plt_soilchem%CFOPPs1, &
+    INTYPs1    =>  plt_morph%INTYPs1   , &
+    TFN3s1     =>  plt_pheno%TFN3s1    , &
+    TCO2Ts1    =>  plt_bgcr%TCO2Ts1    , &
+    RECOs1     =>  plt_bgcr%RECOs1     , &
+    TCO2As1    =>  plt_bgcr%TCO2As1    , &
+    TRAUs1     =>  plt_bgcr%TRAUs1     , &
+    CNETs1     =>  plt_bgcr%CNETs1     , &
+    CSNCs1     =>  plt_bgcr%CSNCs1     , &
+    ZSNCs1     =>  plt_bgcr%ZSNCs1     , &
+    PSNCs1     =>  plt_bgcr%PSNCs1     , &
     DMNDs1     =>  plt_allom%DMNDs1    , &
     CNNDs1     =>  plt_allom%CNNDs1    , &
     CPNDs1     =>  plt_allom%CPNDs1    , &
@@ -61,6 +77,8 @@ module NoduleBGCMod
     CPOLNBs1   =>  plt_biom%CPOLNBs1   , &
     ZPOLNBs1   =>  plt_biom%ZPOLNBs1   , &
     PPOLNBs1   =>  plt_biom%PPOLNBs1   , &
+    ZEROPs1    =>  plt_biom%ZEROPs1    , &
+    ZEROLs1    =>  plt_biom%ZEROLs1    , &
     WTNDBNs1   =>  plt_biom%WTNDBNs1   , &
     WTNDBs1    =>  plt_biom%WTNDBs1      &
   )
@@ -416,13 +434,38 @@ module NoduleBGCMod
   real(r8) :: RCCC,RCCN,RCCP
 !     begin_execution
   associate(                               &
+    NUs1       =>   plt_site%NUs1        , &
+    AREA3s1    =>   plt_site%AREA3s1     , &
+    ZEROs1     =>   plt_site%ZEROs1      , &
+    TFN4s1     =>   plt_pheno%TFN4s1     , &
     DMNDs1     =>   plt_allom%DMNDs1     , &
     CNNDs1     =>   plt_allom%CNNDs1     , &
     CPNDs1     =>   plt_allom%CPNDs1     , &
+    RCO2Ms1    =>   plt_rbgc%RCO2Ms1     , &
+    RCO2Ns1    =>   plt_rbgc%RCO2Ns1     , &
+    WFRs1      =>   plt_rbgc%WFRs1       , &
+    RCO2As1    =>   plt_rbgc%RCO2As1     , &
+    CSNCs1     =>   plt_bgcr%CSNCs1      , &
+    ZSNCs1     =>   plt_bgcr%ZSNCs1      , &
+    PSNCs1     =>   plt_bgcr%PSNCs1      , &
+    UPNFs1     =>   plt_rbgc%UPNFs1      , &
+    RUPNFs1    =>   plt_bgcr%RUPNFs1     , &
+    ZPOOLNs1   =>   plt_biom%ZPOOLNs1    , &
+    PPOOLNs1   =>   plt_biom%PPOOLNs1    , &
     WTRTDs1    =>   plt_biom%WTRTDs1     , &
+    WTNDLNs1   =>   plt_biom%WTNDLNs1    , &
+    WTNDLs1    =>   plt_biom%WTNDLs1     , &
+    WTNDLPs1   =>   plt_biom%WTNDLPs1    , &
+    ZEROPs1    =>   plt_biom%ZEROPs1     , &
+    CPOOLNs1   =>   plt_biom%CPOOLNs1    , &
+    ZEROLs1    =>   plt_biom%ZEROLs1     , &
     CPOOLRs1   =>   plt_biom%CPOOLRs1    , &
     ZPOOLRs1   =>   plt_biom%ZPOOLRs1    , &
     PPOOLRs1   =>   plt_biom%PPOOLRs1    , &
+    CFOPCs1    =>   plt_soilchem%CFOPCs1 , &
+    CFOPNs1    =>   plt_soilchem%CFOPNs1 , &
+    CFOPPs1    =>   plt_soilchem%CFOPPs1 , &
+    INTYPs1    =>   plt_morph%INTYPs1    , &
     NIXs1      =>   plt_morph%NIXs1        &
   )
 !     INTYP=N2 fixation: 1,2,3=rapid to slow root symbiosis
