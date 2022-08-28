@@ -667,7 +667,7 @@ implicit none
 !     RCCR,RCZR,RCPR=remobilization of C,N,P from senescing root
 !     FWOOD,FWOODN,FWOODP=C,N,P woody fraction in root:0=woody,1=non-woody
 !
-      DO 6350 M=1,4
+      DO 6350 M=1,jsken
         CSNCs1(M,0,L,NZ)=CSNCs1(M,0,L,NZ)+CFOPCs1(5,M,NZ) &
           *FSNC2*(WTRT2s1(N,L,NR,NZ)-RCCR)*FWODRs1(0)
         ZSNCs1(M,0,L,NZ)=ZSNCs1(M,0,L,NZ)+CFOPNs1(5,M,NZ) &
@@ -1058,7 +1058,7 @@ implicit none
                     ELSE
                       FSNCP=1.0_r8
                     ENDIF
-                    DO 6450 M=1,4
+                    DO 6450 M=1,jsken
                       CSNCs1(M,0,LL,NZ)=CSNCs1(M,0,LL,NZ)+CFOPCs1(5,M,NZ) &
                         *FSNCM*AMAX1(0.0_r8,WTRT2s1(2,LL,NR,NZ))*FWODRs1(0)
                       ZSNCs1(M,0,LL,NZ)=ZSNCs1(M,0,LL,NZ)+CFOPNs1(5,M,NZ) &
@@ -1258,7 +1258,7 @@ implicit none
 !     RCCR,RCZR,RCPR=remobilization of C,N,P from senescing root
 !     FWOOD,FWOODN,FWOODP=C,N,P woody fraction in root:0=woody,1=non-woody
 !
-  DO 6355 M=1,4
+  DO 6355 M=1,jsken
     CSNCs1(M,0,L,NZ)=CSNCs1(M,0,L,NZ)+CFOPCs1(5,M,NZ) &
       *FSNC1*(RTWT1s1(N,NR,NZ)-RCCR)*FWODRs1(0)
     ZSNCs1(M,0,L,NZ)=ZSNCs1(M,0,L,NZ)+CFOPNs1(5,M,NZ) &

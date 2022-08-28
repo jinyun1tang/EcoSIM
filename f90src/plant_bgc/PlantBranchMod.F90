@@ -645,7 +645,7 @@ module PlantBranchMod
     !       FWODB=C woody fraction in other organs:0=woody,1=non-woody
     !       FWODLN,FWODLP=N,P woody fraction in leaf:0=woody,1=non-woody
 !
-            DO 6300 M=1,4
+            DO 6300 M=1,jsken
               CSNCs1(M,0,0,NZ)=CSNCs1(M,0,0,NZ)+CFOPCs1(5,M,NZ) &
                 *FSNCL*(WGLFXs1(NB,NZ)-RCCLXs1(NB,NZ))*FWODBs1(0)
               ZSNCs1(M,0,0,NZ)=ZSNCs1(M,0,0,NZ)+CFOPNs1(5,M,NZ) &
@@ -740,7 +740,7 @@ module PlantBranchMod
     !       FWODB=C woody fraction in other organs:0=woody,1=non-woody
     !       FWODSN,FWODSP=N,P woody fraction in petiole:0=woody,1=non-woody
 !
-            DO 6305 M=1,4
+            DO 6305 M=1,jsken
               CSNCs1(M,0,0,NZ)=CSNCs1(M,0,0,NZ)+CFOPCs1(5,M,NZ) &
                 *FSNCS*(WGSHEXs1(NB,NZ)-RCCSXs1(NB,NZ))*FWODBs1(0)
               ZSNCs1(M,0,0,NZ)=ZSNCs1(M,0,0,NZ)+CFOPNs1(5,M,NZ) &
@@ -1509,7 +1509,7 @@ module PlantBranchMod
         !     FWODLN,FWODLP=N,P woody fraction in leaf:0=woody,1=non-woody
         !     CPOOL3,CPOOL4=C4 nonstructural C mass in bundle sheath,mesophyll
         !
-        DO 6310 M=1,4
+        DO 6310 M=1,jsken
           CSNCs1(M,0,0,NZ)=CSNCs1(M,0,0,NZ)+CFOPCs1(5,M,NZ) &
             *FSNCL*(WGLFs1(K,NB,NZ)-RCCL)*FWODBs1(0)
           ZSNCs1(M,0,0,NZ)=ZSNCs1(M,0,0,NZ)+CFOPNs1(5,M,NZ) &
@@ -1587,7 +1587,7 @@ module PlantBranchMod
         !     WGLF,WGLFN,WGLFP,WSLF=node leaf C,N,P,protein mass
         !
       ELSE
-        DO 6315 M=1,4
+        DO 6315 M=1,jsken
           CSNCs1(M,0,0,NZ)=CSNCs1(M,0,0,NZ)+CFOPCs1(5,M,NZ) &
             *WGLFs1(K,NB,NZ)*FWODBs1(0)
           ZSNCs1(M,0,0,NZ)=ZSNCs1(M,0,0,NZ)+CFOPNs1(5,M,NZ) &
@@ -1658,7 +1658,7 @@ module PlantBranchMod
       !     FWODB=C woody fraction in other organs:0=woody,1=non-woody
       !     FWODSN,FWODSP=N,P woody fraction in petiole:0=woody,1=non-woody
       !
-        DO 6320 M=1,4
+        DO 6320 M=1,jsken
           CSNCs1(M,0,0,NZ)=CSNCs1(M,0,0,NZ)+CFOPCs1(5,M,NZ) &
             *FSNCS*(WGSHEs1(K,NB,NZ)-RCCS)*FWODBs1(0)
           ZSNCs1(M,0,0,NZ)=ZSNCs1(M,0,0,NZ)+CFOPNs1(5,M,NZ) &
@@ -1725,7 +1725,7 @@ module PlantBranchMod
       !     WGSHE,WGSHN,WGSHP,WSSHE=node petiole C,N,P,protein mass
       !
       ELSE
-        DO 6325 M=1,4
+        DO 6325 M=1,jsken
           CSNCs1(M,0,0,NZ)=CSNCs1(M,0,0,NZ)+CFOPCs1(5,M,NZ) &
             *WGSHEs1(K,NB,NZ)*FWODBs1(0)
           ZSNCs1(M,0,0,NZ)=ZSNCs1(M,0,0,NZ)+CFOPNs1(5,M,NZ) &
@@ -1822,7 +1822,7 @@ module PlantBranchMod
       !     RCCK,RCZK,RCPK=remobilization of C,N,P from senescing internode
       !     WGNODE,WGNODN,WGNODP=senescing internode C,N,P mass
 !
-          DO 7310 M=1,4
+          DO 7310 M=1,jsken
             CSNCs1(M,0,0,NZ)=CSNCs1(M,0,0,NZ)+CFOPCs1(3,M,NZ) &
               *FSNCK*(WGNODEs1(K,NB,NZ)-RCCK)*FWOODs1(0)
             ZSNCs1(M,0,0,NZ)=ZSNCs1(M,0,0,NZ)+CFOPNs1(3,M,NZ) &
@@ -1877,7 +1877,7 @@ module PlantBranchMod
     !       HTNODE,HTNODX=living,senescing internode length
     !
         ELSE
-          DO 7315 M=1,4
+          DO 7315 M=1,jsken
             CSNCs1(M,0,0,NZ)=CSNCs1(M,0,0,NZ)+CFOPCs1(3,M,NZ) &
               *WGNODEs1(K,NB,NZ)*FWOODs1(0)
             ZSNCs1(M,0,0,NZ)=ZSNCs1(M,0,0,NZ)+CFOPNs1(3,M,NZ) &
@@ -1928,7 +1928,7 @@ module PlantBranchMod
     !     NON-REMOBILIZABLE C,N,P BECOMES LITTERFALL ALLOCATED
     !     TO FRACTIONS SET IN 'STARTQ'
     !
-        DO 8310 M=1,4
+        DO 8310 M=1,jsken
           CSNCs1(M,0,0,NZ)=CSNCs1(M,0,0,NZ)+CFOPCs1(3,M,NZ) &
             *FSNCR*(WTSTXBs1(NB,NZ)-RCCK)*FWOODs1(0)
           ZSNCs1(M,0,0,NZ)=ZSNCs1(M,0,0,NZ)+CFOPNs1(3,M,NZ) &
@@ -1996,7 +1996,7 @@ module PlantBranchMod
   !     WTSTXB,WTSTXN,WTSTXP=residual C,N,P mass in senescing stalk
   !
     ELSE
-      DO 8315 M=1,4
+      DO 8315 M=1,jsken
         CSNCs1(M,0,0,NZ)=CSNCs1(M,0,0,NZ)+CFOPCs1(3,M,NZ) &
           *WTSTXBs1(NB,NZ)*FWOODs1(0)
         ZSNCs1(M,0,0,NZ)=ZSNCs1(M,0,0,NZ)+CFOPNs1(3,M,NZ) &
@@ -2826,7 +2826,7 @@ module PlantBranchMod
             KLEAFs1(NB,NZ)=1
             KVSTGs1(NB,NZ)=1
             FLG4s1(NB,NZ)=0._r8
-            DO 5330 M=1,4
+            DO 5330 M=1,jsken
               CSNCs1(M,0,0,NZ)=CSNCs1(M,0,0,NZ) &
                 +CFOPCs1(5,M,NZ)*WTLFBs1(NB,NZ)*FWODBs1(0) &
                 +CFOPCs1(5,M,NZ)*WTSHEBs1(NB,NZ)*FWODBs1(0)
@@ -2873,7 +2873,7 @@ module PlantBranchMod
     !
         IF((IFLGEs1(NB,NZ).EQ.0.AND.ISTYPs1(NZ).NE.0) &
           .AND.VRNSs1(NB,NZ).GE.VRNLs1(NB,NZ))THEN
-          DO 6245 M=1,4
+          DO 6245 M=1,jsken
             CSNCs1(M,1,0,NZ)=CSNCs1(M,1,0,NZ)+CFOPCs1(2,M,NZ) &
               *(WTHSKBs1(NB,NZ)+WTEARBs1(NB,NZ)+WTGRBs1(NB,NZ))
             ZSNCs1(M,1,0,NZ)=ZSNCs1(M,1,0,NZ)+CFOPNs1(2,M,NZ) &
@@ -2894,7 +2894,7 @@ module PlantBranchMod
           GRNOBs1(NB,NZ)=0._r8
           GRWTBs1(NB,NZ)=0._r8
           IF(IBTYPs1(NZ).EQ.0.OR.IGTYPs1(NZ).LE.1)THEN
-            DO 6345 M=1,4
+            DO 6345 M=1,jsken
               CSNCs1(M,1,0,NZ)=CSNCs1(M,1,0,NZ)+CFOPCs1(3,M,NZ)*WTSTKBs1(NB,NZ)
               ZSNCs1(M,1,0,NZ)=ZSNCs1(M,1,0,NZ)+CFOPNs1(3,M,NZ)*WTSTBNs1(NB,NZ)
               PSNCs1(M,1,0,NZ)=PSNCs1(M,1,0,NZ)+CFOPPs1(3,M,NZ)*WTSTBPs1(NB,NZ)
@@ -2942,7 +2942,7 @@ module PlantBranchMod
       IFLGRs1(NB,NZ)=0
       IFLGQs1(NB,NZ)=0
     ENDIF
-    DO 6330 M=1,4
+    DO 6330 M=1,jsken
       CSNCs1(M,1,0,NZ)=CSNCs1(M,1,0,NZ)+FSNR*CFOPCs1(2,M,NZ) &
         *(WTHSKBs1(NB,NZ)+WTEARBs1(NB,NZ))
       ZSNCs1(M,1,0,NZ)=ZSNCs1(M,1,0,NZ)+FSNR*CFOPNs1(2,M,NZ) &
@@ -2950,19 +2950,13 @@ module PlantBranchMod
       PSNCs1(M,1,0,NZ)=PSNCs1(M,1,0,NZ)+FSNR*CFOPPs1(2,M,NZ) &
         *(WTHSBPs1(NB,NZ)+WTEABPs1(NB,NZ))
       IF(ISTYPs1(NZ).EQ.0.AND.IWTYPs1(NZ).NE.0)THEN
-        WTRVCs1(NZ)=WTRVCs1(NZ) &
-          +FSNR*CFOPCs1(2,M,NZ)*WTGRBs1(NB,NZ)
-        WTRVNs1(NZ)=WTRVNs1(NZ) &
-          +FSNR*CFOPNs1(2,M,NZ)*WTGRBNs1(NB,NZ)
-        WTRVPs1(NZ)=WTRVPs1(NZ) &
-          +FSNR*CFOPPs1(2,M,NZ)*WTGRBPs1(NB,NZ)
+        WTRVCs1(NZ)=WTRVCs1(NZ)+FSNR*CFOPCs1(2,M,NZ)*WTGRBs1(NB,NZ)
+        WTRVNs1(NZ)=WTRVNs1(NZ)+FSNR*CFOPNs1(2,M,NZ)*WTGRBNs1(NB,NZ)
+        WTRVPs1(NZ)=WTRVPs1(NZ)+FSNR*CFOPPs1(2,M,NZ)*WTGRBPs1(NB,NZ)
       ELSE
-        CSNCs1(M,1,0,NZ)=CSNCs1(M,1,0,NZ) &
-          +FSNR*CFOPCs1(2,M,NZ)*WTGRBs1(NB,NZ)
-        ZSNCs1(M,1,0,NZ)=ZSNCs1(M,1,0,NZ) &
-          +FSNR*CFOPNs1(2,M,NZ)*WTGRBNs1(NB,NZ)
-        PSNCs1(M,1,0,NZ)=PSNCs1(M,1,0,NZ) &
-          +FSNR*CFOPPs1(2,M,NZ)*WTGRBPs1(NB,NZ)
+        CSNCs1(M,1,0,NZ)=CSNCs1(M,1,0,NZ)+FSNR*CFOPCs1(2,M,NZ)*WTGRBs1(NB,NZ)
+        ZSNCs1(M,1,0,NZ)=ZSNCs1(M,1,0,NZ)+FSNR*CFOPNs1(2,M,NZ)*WTGRBNs1(NB,NZ)
+        PSNCs1(M,1,0,NZ)=PSNCs1(M,1,0,NZ)+FSNR*CFOPPs1(2,M,NZ)*WTGRBPs1(NB,NZ)
       ENDIF
 6330  CONTINUE
     WTHSKBs1(NB,NZ)=(1.0_r8-FSNR)*WTHSKBs1(NB,NZ)
@@ -2981,7 +2975,7 @@ module PlantBranchMod
 !     STALKS BECOME LITTERFALL IN GRASSES AT END OF SEASON
 !
     IF((IBTYPs1(NZ).EQ.0.OR.IGTYPs1(NZ).LE.1).AND.ISTYPs1(NZ).NE.0)THEN
-      DO 6335 M=1,4
+      DO 6335 M=1,jsken
         CSNCs1(M,1,0,NZ)=CSNCs1(M,1,0,NZ)+FSNR*CFOPCs1(3,M,NZ)*WTSTKBs1(NB,NZ)
         ZSNCs1(M,1,0,NZ)=ZSNCs1(M,1,0,NZ)+FSNR*CFOPNs1(3,M,NZ)*WTSTBNs1(NB,NZ)
         PSNCs1(M,1,0,NZ)=PSNCs1(M,1,0,NZ)+FSNR*CFOPPs1(3,M,NZ)*WTSTBPs1(NB,NZ)

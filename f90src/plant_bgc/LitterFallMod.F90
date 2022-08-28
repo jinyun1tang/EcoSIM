@@ -230,7 +230,7 @@ implicit none
 !
   IF(IDTHPs1(NZ).EQ.1.AND.IDTHRs1(NZ).EQ.1)THEN
     IF(IFLGIs1(NZ).EQ.0)THEN
-      DO 6425 M=1,4
+      DO 6425 M=1,jsken
         DO 8825 NB=1,NBRs1(NZ)
           CSNCs1(M,1,0,NZ)=CSNCs1(M,1,0,NZ) &
             +CFOPCs1(0,M,NZ)*(CPOOLs1(NB,NZ)+CPOLNBs1(NB,NZ) &
@@ -448,7 +448,7 @@ implicit none
   IF(IDTHRs1(NZ).EQ.1)THEN
     DO 8900 N=1,MYs1(NZ)
       DO 8895 L=NUs1,NJs1
-        DO 6410 M=1,4
+        DO 6410 M=1,jsken
           CSNCs1(M,1,L,NZ)=CSNCs1(M,1,L,NZ)+CFOPCs1(0,M,NZ)*CPOOLRs1(N,L,NZ)
           ZSNCs1(M,1,L,NZ)=ZSNCs1(M,1,L,NZ)+CFOPNs1(0,M,NZ)*ZPOOLRs1(N,L,NZ)
           PSNCs1(M,1,L,NZ)=PSNCs1(M,1,L,NZ)+CFOPPs1(0,M,NZ)*PPOOLRs1(N,L,NZ)
@@ -545,7 +545,7 @@ implicit none
 !     CPOOLN,ZPOOLN,PPOOLN=nonstructural C,N,P in bacteria
 !
         IF(INTYPs1(NZ).NE.0.AND.N.EQ.1)THEN
-          DO 6420 M=1,4
+          DO 6420 M=1,jsken
             CSNCs1(M,1,L,NZ)=CSNCs1(M,1,L,NZ)+CFOPCs1(4,M,NZ) &
               *WTNDLs1(L,NZ)+CFOPCs1(0,M,NZ)*CPOOLNs1(L,NZ)
             ZSNCs1(M,1,L,NZ)=ZSNCs1(M,1,L,NZ)+CFOPNs1(4,M,NZ) &
@@ -727,7 +727,7 @@ implicit none
 !     IBTYP=turnover:0=all abve-grd,1=all leaf+petiole,2=none,3=between 1,2
 !     IGTYP=growth type:0=bryophyte,1=graminoid,2=shrub,tree
 !
-      DO 6405 M=1,4
+      DO 6405 M=1,jsken
         CSNCs1(M,1,0,NZ)=CSNCs1(M,1,0,NZ) &
           +CFOPCs1(0,M,NZ)*CPOLNBs1(NB,NZ) &
           +CFOPCs1(1,M,NZ)*(WTLFBs1(NB,NZ)*FWODBs1(1) &
@@ -789,7 +789,7 @@ implicit none
       WTRVNs1(NZ)=WTRVNs1(NZ)+ZPOOLs1(NB,NZ)
       WTRVPs1(NZ)=WTRVPs1(NZ)+PPOOLs1(NB,NZ)
       IF(IHVSTs1(NZ).NE.4.AND.IHVSTs1(NZ).NE.6)THEN
-        DO 6406 M=1,4
+        DO 6406 M=1,jsken
           CSNCs1(M,1,0,NZ)=CSNCs1(M,1,0,NZ) &
             +CFOPCs1(0,M,NZ)*WTRSVBs1(NB,NZ)
           ZSNCs1(M,1,0,NZ)=ZSNCs1(M,1,0,NZ) &

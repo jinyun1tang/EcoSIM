@@ -28,20 +28,8 @@ module StartqsMod
     ZEROs1    => plt_site%ZEROs1      , &
     AREA3s1   => plt_site%AREA3s1     , &
     ZEROQs1   => plt_rbgc%ZEROQs1     , &
-    TPSN0s1   => plt_bgcr%TPSN0s1     , &
-    TZSN0s1   => plt_bgcr%TZSN0s1     , &
-    TCSN0s1   => plt_bgcr%TCSN0s1     , &
-    CSNCs1    => plt_bgcr%CSNCs1      , &
-    ZSNCs1    => plt_bgcr%ZSNCs1      , &
-    PSNCs1    => plt_bgcr%PSNCs1      , &
-    TZSNCs1   => plt_bgcr%TZSNCs1     , &
-    TPSNCs1   => plt_bgcr%TPSNCs1     , &
-    TCSNCs1   => plt_bgcr%TCSNCs1     , &
     ZEROPs1   => plt_biom%ZEROPs1     , &
     ZEROLs1   => plt_biom%ZEROLs1     , &
-    WTSTGs1   => plt_biom%WTSTGs1     , &
-    WTSTGPs1  => plt_biom%WTSTGPs1    , &
-    WTSTGNs1  => plt_biom%WTSTGNs1    , &
     IFLGCs1   => plt_pheno%IFLGCs1      &
   )
 !
@@ -88,21 +76,21 @@ module StartqsMod
 !     FILL OUT UNUSED ARRAYS
 !
       DO 9986 NZ=NPs1+1,5
-        TCSN0s1(NZ)=0._r8
-        TZSN0s1(NZ)=0._r8
-        TPSN0s1(NZ)=0._r8
-        TCSNCs1(NZ)=0._r8
-        TZSNCs1(NZ)=0._r8
-        TPSNCs1(NZ)=0._r8
-        WTSTGs1(NZ)=0._r8
-        WTSTGNs1(NZ)=0._r8
-        WTSTGPs1(NZ)=0._r8
+        plt_bgcr%TCSN0s1(NZ)=0._r8
+        plt_bgcr%TZSN0s1(NZ)=0._r8
+        plt_bgcr%TPSN0s1(NZ)=0._r8
+        plt_bgcr%TCSNCs1(NZ)=0._r8
+        plt_bgcr%TZSNCs1(NZ)=0._r8
+        plt_bgcr%TPSNCs1(NZ)=0._r8
+        plt_biom%WTSTGs1(NZ)=0._r8
+        plt_biom%WTSTGNs1(NZ)=0._r8
+        plt_biom%WTSTGPs1(NZ)=0._r8
         DO 6401 L=1,NLs1
           DO  K=0,1
-            DO  M=1,4
-              CSNCs1(M,K,L,NZ)=0._r8
-              ZSNCs1(M,K,L,NZ)=0._r8
-              PSNCs1(M,K,L,NZ)=0._r8
+            DO  M=1,jsken
+              plt_bgcr%CSNCs1(M,K,L,NZ)=0._r8
+              plt_bgcr%ZSNCs1(M,K,L,NZ)=0._r8
+              plt_bgcr%PSNCs1(M,K,L,NZ)=0._r8
             enddo
           enddo
 6401    CONTINUE
@@ -1087,7 +1075,7 @@ module StartqsMod
 30    CONTINUE
       IF(N.EQ.1)THEN
         DO 6400 K=0,1
-          DO  M=1,4
+          DO  M=1,jsken
             plt_bgcr%CSNCs1(M,K,L,NZ)=0._r8
             plt_bgcr%ZSNCs1(M,K,L,NZ)=0._r8
             plt_bgcr%PSNCs1(M,K,L,NZ)=0._r8

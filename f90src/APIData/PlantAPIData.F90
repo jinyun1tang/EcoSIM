@@ -13,6 +13,9 @@ implicit none
   integer  :: JZ1         !number of soil layers
   integer  :: JLI1        !number of sectors for the leaf zenith [0,pi/2]
   integer  :: JNODS1      !number of canopy nodes
+  integer  :: jsken       !number of kinetic components in litter,  PROTEIN(*,1),CH2O(*,2),CELLULOSE(*,3),LIGNIN(*,4) IN SOIL LITTER
+  integer  :: Jlitgrp     !number of litter groups nonstructural(0,*),
+                          !     foliar(1,*),non-foliar(2,*),stalk(3,*),root(4,*), coarse woody (5,*)
 !begin_data
 
   type, public :: plant_siteinfo_type
@@ -1382,9 +1385,9 @@ implicit none
   allocate(this%TCSNCs1(JP1))
   allocate(this%TZSNCs1(JP1))
   allocate(this%TPSNCs1(JP1))
-  allocate(this%CSNCs1(4,0:1,0:JZ1,JP1))
-  allocate(this%PSNCs1(4,0:1,0:JZ1,JP1))
-  allocate(this%ZSNCs1(4,0:1,0:JZ1,JP1))
+  allocate(this%CSNCs1(jsken,0:1,0:JZ1,JP1))
+  allocate(this%PSNCs1(jsken,0:1,0:JZ1,JP1))
+  allocate(this%ZSNCs1(jsken,0:1,0:JZ1,JP1))
 
 
   end subroutine plt_bgcrate_init
@@ -1744,9 +1747,9 @@ implicit none
   allocate(this%WGLFVs1(JC1,JP1))
   allocate(this%CPOOLNs1(JZ1,JP1))
   allocate(this%PPOOLNs1(JZ1,JP1))
-  allocate(this%WTSTDGs1(4,JP1))
-  allocate(this%WTSTDNs1(4,JP1))
-  allocate(this%WTSTDPs1(4,JP1))
+  allocate(this%WTSTDGs1(jsken,JP1))
+  allocate(this%WTSTDNs1(jsken,JP1))
+  allocate(this%WTSTDPs1(jsken,JP1))
   allocate(this%WTRT2s1(2,JZ1,JC1,JP1))
   allocate(this%WTRT1s1(2,JZ1,JC1,JP1))
   allocate(this%WTRT2Ns1(2,JZ1,JC1,JP1))
@@ -2054,9 +2057,9 @@ implicit none
   class(plant_soilchem_type) :: this
 
   allocate(this%FOSRHs1(0:jcplx11,0:JZ1))
-  allocate(this%CFOPCs1(0:5,4,JP1))
-  allocate(this%CFOPNs1(0:5,4,JP1))
-  allocate(this%CFOPPs1(0:5,4,JP1))
+  allocate(this%CFOPCs1(0:Jlitgrp,jsken,JP1))
+  allocate(this%CFOPNs1(0:Jlitgrp,jsken,JP1))
+  allocate(this%CFOPPs1(0:Jlitgrp,jsken,JP1))
   allocate(this%TFNDs1(0:JZ1))
   allocate(this%THETPMs1(60,0:JZ1))
   allocate(this%DFGSs1(60,0:JZ1))
@@ -2241,10 +2244,12 @@ implicit none
   JP1=JP
   JLA1=JLA
   JSA1=JSA
+  JLI1   =JLI
+  JNODS1 =JNODS
+  !the following variable should be consistent with the soil bgc model
   jcplx11=jcplx1
-  JLI1=JLI
-  JNODS1=JNODS
-
+  jsken  =4
+  Jlitgrp=5
 
   call plt_site%Init()
 

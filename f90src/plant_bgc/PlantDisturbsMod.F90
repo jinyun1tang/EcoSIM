@@ -259,7 +259,7 @@ module PlantDisturbsMod
 !
   IF(IHVSTs1(NZ).NE.4.AND.IHVSTs1(NZ).NE.6)THEN
     IF(IHVSTs1(NZ).NE.5)THEN
-      DO 6375 M=1,4
+      DO 6375 M=1,jsken
         CSNCs1(M,1,0,NZ)=CSNCs1(M,1,0,NZ) &
           +CFOPCs1(0,M,NZ)*(WTHTR0+WTHTX0) &
           +CFOPCs1(1,M,NZ)*(WTHTR1+WTHTX1) &
@@ -322,7 +322,7 @@ module PlantDisturbsMod
 !     WTSTG,WTSTDN,WTSTDP=standing dead C,N,P mass
 !
     ELSE
-      DO 6485 M=1,4
+      DO 6485 M=1,jsken
         CSNCs1(M,1,0,NZ)=CSNCs1(M,1,0,NZ) &
           +CFOPCs1(0,M,NZ)*(WTHTR0+WTHTX0) &
           +CFOPCs1(1,M,NZ)*(WTHTR1+WTHTX1) &
@@ -934,7 +934,7 @@ module PlantDisturbsMod
 !     IBTYP=turnover:0=all abve-grd,1=all leaf+petiole,2=none,3=between 1,2
 !     IGTYP=growth type:0=bryophyte,1=graminoid,2=shrub,tree
 !
-            DO 6380 M=1,4
+            DO 6380 M=1,jsken
               CSNCs1(M,1,0,NZ)=CSNCs1(M,1,0,NZ)+(1._r8-XHVST) &
                 *(CFOPCs1(0,M,NZ)*(CPOOLs1(NB,NZ)+CPOLNBs1(NB,NZ) &
                 +CPOOLK(NB,NZ)+WTRSVBs1(NB,NZ)) &
@@ -1114,7 +1114,7 @@ module PlantDisturbsMod
 !
         DO 8985 N=1,MYs1(NZ)
           DO 8980 L=NUs1,NJs1
-            DO 6385 M=1,4
+            DO 6385 M=1,jsken
               CSNCs1(M,1,L,NZ)=CSNCs1(M,1,L,NZ)+(1._r8-XHVST) &
                 *CFOPCs1(0,M,NZ)*CPOOLRs1(N,L,NZ)
               ZSNCs1(M,1,L,NZ)=ZSNCs1(M,1,L,NZ)+(1._r8-XHVST) &
@@ -1230,7 +1230,7 @@ module PlantDisturbsMod
 !     CPOOLN,ZPOOLN,PPOOLN=nonstructural C,N,P in bacteria
 !
             IF(INTYPs1(NZ).NE.0.AND.N.EQ.1)THEN
-              DO 6395 M=1,4
+              DO 6395 M=1,jsken
                 CSNCs1(M,1,L,NZ)=CSNCs1(M,1,L,NZ)+(1._r8-XHVST) &
                   *(CFOPCs1(4,M,NZ)*WTNDLs1(L,NZ) &
                   +CFOPCs1(0,M,NZ)*CPOOLNs1(L,NZ))
@@ -1260,7 +1260,7 @@ module PlantDisturbsMod
 !     XHVST,XHVSN,XHVSP=fraction of root C,N,P remaining after disturbance
 !     WTRVC,WTRVN,WTRVP=storage C,N,P
 !
-        DO 6400 M=1,4
+        DO 6400 M=1,jsken
           CSNCs1(M,0,NGs1(NZ),NZ)=CSNCs1(M,0,NGs1(NZ),NZ) &
             +((1._r8-XHVST)*CFOPCs1(0,M,NZ)*WTRVCs1(NZ))*FWOODs1(0)
           ZSNCs1(M,0,NGs1(NZ),NZ)=ZSNCs1(M,0,NGs1(NZ),NZ) &
@@ -2668,7 +2668,7 @@ module PlantDisturbsMod
                 FFIRP=FFIRE*EFIRE(2,IHVSTs1(NZ))
               ENDIF
             ENDIF
-            DO 3385 M=1,4
+            DO 3385 M=1,jsken
               FHVST=(1._r8-XHVST)*CFOPCs1(0,M,NZ)*CPOOLRs1(N,L,NZ)
               FHVSN=(1._r8-XHVSN)*CFOPNs1(0,M,NZ)*ZPOOLRs1(N,L,NZ)
               FHVSP=(1._r8-XHVSP)*CFOPPs1(0,M,NZ)*PPOOLRs1(N,L,NZ)
@@ -2809,7 +2809,7 @@ module PlantDisturbsMod
 !     CPOOLN,ZPOOLN,PPOOLN=nonstructural C,N,P in bacteria
 !
             IF(INTYPs1(NZ).NE.0.AND.N.EQ.1)THEN
-              DO 3395 M=1,4
+              DO 3395 M=1,jsken
                 CSNCs1(M,1,L,NZ)=CSNCs1(M,1,L,NZ)+(1._r8-XHVST) &
                   *(CFOPCs1(4,M,NZ)*WTNDLs1(L,NZ) &
                   +CFOPCs1(0,M,NZ)*CPOOLNs1(L,NZ))
@@ -2839,7 +2839,7 @@ module PlantDisturbsMod
 !     WTRVC,WTRVN,WTRVP=storage C,N,P
 !
         IF(ISTYPs1(NZ).NE.0)THEN
-          DO 3400 M=1,4
+          DO 3400 M=1,jsken
             CSNCs1(M,0,NGs1(NZ),NZ)=CSNCs1(M,0,NGs1(NZ),NZ) &
               +((1._r8-XHVST)*CFOPCs1(0,M,NZ)*WTRVCs1(NZ))*FWOODs1(0)
             ZSNCs1(M,0,NGs1(NZ),NZ)=ZSNCs1(M,0,NGs1(NZ),NZ) &

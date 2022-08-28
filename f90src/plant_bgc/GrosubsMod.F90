@@ -88,7 +88,7 @@ module grosubsMod
       DO 9980 NZ=1,NP0s1
         DO 1 L=0,NJs1
           DO K=0,1
-            DO M=1,4
+            DO M=1,jsken
               CSNCs1(M,K,L,NZ)=0._r8
               ZSNCs1(M,K,L,NZ)=0._r8
               PSNCs1(M,K,L,NZ)=0._r8
@@ -228,7 +228,7 @@ module grosubsMod
 !     WTSTG,WTSTDN,WTSTDP=standing dead C,N,P mass
 !     CSNC,ZSNC,PSNC=C,N,P litterfall
 !
-    DO 6235 M=1,4
+    DO 6235 M=1,jsken
       XFRC=1.5814E-05*TFN3s1(NZ)*WTSTDGs1(M,NZ)
       XFRN=1.5814E-05*TFN3s1(NZ)*WTSTDNs1(M,NZ)
       XFRP=1.5814E-05*TFN3s1(NZ)*WTSTDPs1(M,NZ)
@@ -252,7 +252,7 @@ module grosubsMod
 !     TCSNC,TZSNC,TPSNC=cumulative C,N,P litterfall
 !     HCSNC,HZSNC,HPSNC=hourly C,N,P litterfall
 !
-    DO 6430 M=1,4
+    DO 6430 M=1,jsken
       DO K=0,1
         TCSN0s1(NZ)=TCSN0s1(NZ)+CSNCs1(M,K,0,NZ)
         TZSN0s1(NZ)=TZSN0s1(NZ)+ZSNCs1(M,K,0,NZ)
