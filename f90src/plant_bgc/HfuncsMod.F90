@@ -47,7 +47,30 @@ module HfuncsMod
   INTEGER :: NZ
 
 ! begin_execution
-
+  associate(                           &
+    PSILTs1   =>  plt_ew%PSILTs1     , &
+    VRNZs1    =>  plt_pheno%VRNZs1   , &
+    IFLGIs1   =>  plt_pheno%IFLGIs1  , &
+    IFLGPs1   =>  plt_pheno%IFLGPs1  , &
+    VSTGXs1   =>  plt_pheno%VSTGXs1  , &
+    VRNYs1    =>  plt_pheno%VRNYs1   , &
+    IFLGCs1   =>  plt_pheno%IFLGCs1  , &
+    IDTHBs1   =>  plt_pheno%IDTHBs1  , &
+    IDAYs1    =>  plt_pheno%IDAYs1   , &
+    WSTRs1    =>  plt_pheno%WSTRs1   , &
+    KVSTGs1   =>  plt_pheno%KVSTGs1  , &
+    IGTYPs1   =>  plt_pheno%IGTYPs1  , &
+    DYLNs1    =>  plt_site%DYLNs1    , &
+    DATAPs1   =>  plt_site%DATAPs1   , &
+    PPTs1     =>  plt_site%PPTs1     , &
+    DYLXs1    =>  plt_site%DYLXs1    , &
+    NPs1      =>  plt_site%NPs1      , &
+    PPs1      =>  plt_site%PPs1      , &
+    KLEAFs1   =>  plt_morph%KLEAFs1  , &
+    VSTGs1    =>  plt_morph%VSTGs1   , &
+    NBRs1     =>  plt_morph%NBRs1    , &
+    NB1s1     =>  plt_morph%NB1s1      &
+  )
   DO 9985 NZ=1,NPs1
 
     IF(DATAPs1(NZ).NE.'NO')THEN
@@ -137,6 +160,7 @@ module HfuncsMod
       ENDIF
 9985  CONTINUE
   RETURN
+  end associate
   END subroutine hfuncs
 !------------------------------------------------------------------------------------------
 
@@ -148,6 +172,20 @@ module HfuncsMod
   INTEGER :: L
 
 ! begin_execution
+  associate(                            &
+    IYR0s1    =>  plt_distb%IYR0s1    , &
+    IYRHs1    =>  plt_distb%IYRHs1    , &
+    IDAY0s1   =>  plt_distb%IDAY0s1   , &
+    IDAYHs1   =>  plt_distb%IDAYHs1   , &
+    DATAPs1   =>  plt_site%DATAPs1    , &
+    IDATAs1   =>  plt_site%IDATAs1    , &
+    IYRCs1    =>  plt_site%IYRCs1     , &
+    IFLGTs1   =>  plt_site%IFLGTs1    , &
+    TNBPs1    =>  plt_bgcr%TNBPs1     , &
+    WTRVXs1   =>  plt_biom%WTRVXs1    , &
+    IDTHs1    =>  plt_pheno%IDTHs1    , &
+    IFLGCs1   =>  plt_pheno%IFLGCs1     &
+  )
   IF(J.EQ.1)THEN
     IF(IDAY0s1(NZ).LE.IDAYHs1(NZ).OR.IYR0s1(NZ).LT.IYRHs1(NZ))THEN
       IF(I.GE.IDAY0s1(NZ).OR.IDATAs1(3).GT.IYR0s1(NZ))THEN
@@ -184,6 +222,7 @@ module HfuncsMod
     ENDIF
     IFLGTs1=IFLGTs1+IFLGCs1(NZ)
   ENDIF
+  end associate
   end subroutine set_flags
 !------------------------------------------------------------------------------------------
 
@@ -193,6 +232,35 @@ module HfuncsMod
   integer, intent(in) :: I,J,NZ
 
 ! begin_execution
+  associate(                            &
+    CCPOLPs1  =>   plt_biom%CCPOLPs1  , &
+    WTRVCs1   =>   plt_biom%WTRVCs1   , &
+    GROUPs1   =>   plt_pheno%GROUPs1  , &
+    IDAYs1    =>   plt_pheno%IDAYs1   , &
+    IFLGIs1   =>   plt_pheno%IFLGIs1  , &
+    IDTHRs1   =>   plt_pheno%IDTHRs1  , &
+    ISTYPs1   =>   plt_pheno%ISTYPs1  , &
+    IDTHBs1   =>   plt_pheno%IDTHBs1  , &
+    IDTHPs1   =>   plt_pheno%IDTHPs1  , &
+    IBTYPs1   =>   plt_pheno%IBTYPs1  , &
+    PRs1      =>   plt_pheno%PRs1     , &
+    GROUPIs1  =>   plt_pheno%GROUPIs1 , &
+    PBs1      =>   plt_pheno%PBs1     , &
+    PPs1      =>   plt_site%PPs1      , &
+    VRNSs1    =>   plt_pheno%VRNSs1   , &
+    PSIRGs1   =>   plt_ew%PSIRGs1     , &
+    FNODs1    =>   plt_allom%FNODs1   , &
+    NRTs1     =>   plt_morph%NRTs1    , &
+    NB1s1     =>   plt_morph%NB1s1    , &
+    NBRs1     =>   plt_morph%NBRs1    , &
+    NNODs1    =>   plt_morph%NNODs1   , &
+    NBTs1     =>   plt_morph%NBTs1    , &
+    NBTBs1    =>   plt_morph%NBTBs1   , &
+    NGs1      =>   plt_morph%NGs1     , &
+    XTLIs1    =>   plt_morph%XTLIs1   , &
+    ARLFLs1   =>   plt_morph%ARLFLs1  , &
+    PSTGs1    =>   plt_morph%PSTGs1     &
+  )
 
 !
 ! ADD BRANCH TO SHOOT IF PLANT GROWTH STAGE, SHOOT NON-STRUCTURAL
@@ -260,6 +328,7 @@ module HfuncsMod
       ENDIF
     ENDIF
   ENDIF
+  end associate
   end subroutine root_shoot_branching
 !------------------------------------------------------------------------------------------
 
@@ -269,15 +338,65 @@ module HfuncsMod
 
   integer :: NB,N,L
   real(r8):: ARLSP
-  RCO2Zs1(NZ)=0.0
-  ROXYZs1(NZ)=0.0
-  RCH4Zs1(NZ)=0.0
-  RN2OZs1(NZ)=0.0
-  RNH3Zs1(NZ)=0.0
-  RH2GZs1(NZ)=0.0
-  CPOOLPs1(NZ)=0.0
-  ZPOOLPs1(NZ)=0.0
-  PPOOLPs1(NZ)=0.0
+  associate(                           &
+    WTLSs1   =>  plt_biom%WTLSs1     , &
+    WTLSBs1  =>  plt_biom%WTLSBs1    , &
+    WTSHTs1  =>  plt_biom%WTSHTs1    , &
+    CCPLNPs1 =>  plt_biom%CCPLNPs1   , &
+    CCPOLBs1 =>  plt_biom%CCPOLBs1   , &
+    CZPOLBs1 =>  plt_biom%CZPOLBs1   , &
+    CPPOLBs1 =>  plt_biom%CPPOLBs1   , &
+    CCPOLPs1 =>  plt_biom%CCPOLPs1   , &
+    CZPOLPs1 =>  plt_biom%CZPOLPs1   , &
+    CPPOLPs1 =>  plt_biom%CPPOLPs1   , &
+    CPOOLPs1 =>  plt_biom%CPOOLPs1   , &
+    ZPOOLPs1 =>  plt_biom%ZPOOLPs1   , &
+    PPOOLPs1 =>  plt_biom%PPOOLPs1   , &
+    CPOLNBs1 =>  plt_biom%CPOLNBs1   , &
+    ZPOLNBs1 =>  plt_biom%ZPOLNBs1   , &
+    PPOLNBs1 =>  plt_biom%PPOLNBs1   , &
+    CPOOLRs1 =>  plt_biom%CPOOLRs1   , &
+    ZPOOLRs1 =>  plt_biom%ZPOOLRs1   , &
+    PPOOLRs1 =>  plt_biom%PPOOLRs1   , &
+    CPOOLs1  =>  plt_biom%CPOOLs1    , &
+    ZPOOLs1  =>  plt_biom%ZPOOLs1    , &
+    PPOOLs1  =>  plt_biom%PPOOLs1    , &
+    CCPOLRs1 =>  plt_biom%CCPOLRs1   , &
+    CZPOLRs1 =>  plt_biom%CZPOLRs1   , &
+    CPPOLRs1 =>  plt_biom%CPPOLRs1   , &
+    ZEROLs1  =>  plt_biom%ZEROLs1    , &
+    ZEROPs1  =>  plt_biom%ZEROPs1    , &
+    WTRTLs1  =>  plt_biom%WTRTLs1    , &
+    CPOLNPs1 =>  plt_biom%CPOLNPs1   , &
+    ZPOLNPs1 =>  plt_biom%ZPOLNPs1   , &
+    PPOLNPs1 =>  plt_biom%PPOLNPs1   , &
+    VOLWCs1  =>  plt_ew%VOLWCs1      , &
+    VHCPCs1  =>  plt_ew%VHCPCs1      , &
+    NUs1     =>  plt_site%NUs1       , &
+    IDTHBs1  =>  plt_pheno%IDTHBs1   , &
+    IDAYs1   =>  plt_pheno%IDAYs1    , &
+    NB1s1    =>  plt_morph%NB1s1     , &
+    RTDP1s1  =>  plt_morph%RTDP1s1   , &
+    MYs1     =>  plt_morph%MYs1      , &
+    ARLFPs1  =>  plt_morph%ARLFPs1   , &
+    NGs1     =>  plt_morph%NGs1      , &
+    NIXs1    =>  plt_morph%NIXs1     , &
+    NBRs1    =>  plt_morph%NBRs1     , &
+    NBTBs1   =>  plt_morph%NBTBs1    , &
+    HTCTLs1  =>  plt_morph%HTCTLs1   , &
+    SDPTHs1  =>  plt_morph%SDPTHs1   , &
+    ARSTPs1  =>  plt_morph%ARSTPs1   , &
+    NIs1     =>  plt_morph%NIs1        &
+  )
+  plt_bgcr%RCO2Zs1(NZ)=0.0_r8
+  plt_bgcr%ROXYZs1(NZ)=0.0_r8
+  plt_bgcr%RCH4Zs1(NZ)=0.0_r8
+  plt_bgcr%RN2OZs1(NZ)=0.0_r8
+  plt_bgcr%RNH3Zs1(NZ)=0.0_r8
+  plt_bgcr%RH2GZs1(NZ)=0.0_r8
+  CPOOLPs1(NZ)=0.0_r8
+  ZPOOLPs1(NZ)=0.0_r8
+  PPOOLPs1(NZ)=0.0_r8
   NIs1(NZ)=NIXs1(NZ)
   NGs1(NZ)=MIN(NIs1(NZ),MAX(NGs1(NZ),NUs1))
   NB1s1(NZ)=1
@@ -372,6 +491,7 @@ module HfuncsMod
       VHCPCs1(NZ)=cpw*(WTSHTs1(NZ)*10.0E-06+VOLWCs1(NZ))
     ENDIF
   ENDIF
+  end associate
   end subroutine stage_phenology_vars
 !------------------------------------------------------------------------------------------
 
@@ -379,6 +499,29 @@ module HfuncsMod
   implicit none
   integer, intent(in) :: I,J,NZ
 
+  associate(                           &
+    PSILTs1   =>  plt_ew%PSILTs1     , &
+    PSILGs1   =>  plt_ew%PSILGs1     , &
+    DYLNs1    =>  plt_site%DYLNs1    , &
+    DYLXs1    =>  plt_site%DYLXs1    , &
+    DYLMs1    =>  plt_site%DYLMs1    , &
+    ALATs1    =>  plt_site%ALATs1    , &
+    IFLGEs1   =>  plt_pheno%IFLGEs1  , &
+    IDAYs1    =>  plt_pheno%IDAYs1   , &
+    IGTYPs1   =>  plt_pheno%IGTYPs1  , &
+    VRNZs1    =>  plt_pheno%VRNZs1   , &
+    VRNSs1    =>  plt_pheno%VRNSs1   , &
+    VRNLs1    =>  plt_pheno%VRNLs1   , &
+    IWTYPs1   =>  plt_pheno%IWTYPs1  , &
+    TCZs1     =>  plt_pheno%TCZs1    , &
+    VRNYs1    =>  plt_pheno%VRNYs1   , &
+    TCGs1     =>  plt_pheno%TCGs1    , &
+    CTCs1     =>  plt_pheno%CTCs1    , &
+    TCXs1     =>  plt_pheno%TCXs1    , &
+    VRNFs1    =>  plt_pheno%VRNFs1   , &
+    VRNXs1    =>  plt_pheno%VRNXs1   , &
+    IFLGFs1   =>  plt_pheno%IFLGFs1    &
+  )
 !
 ! CALCULATE EVERGREEN PHENOLOGY DURING LENGTHENING PHOTOPERIODS
 !
@@ -516,8 +659,7 @@ module HfuncsMod
 !     VRNY,VRNZ=hourly counter for lengthening,shortening photoperiods
 !     VRNE=maximum hours for leafout,leafoff
 !
-      IF(IFLGEs1(NB,NZ).EQ.1 &
-        .AND.IFLGFs1(NB,NZ).EQ.0)THEN
+      IF(IFLGEs1(NB,NZ).EQ.1.AND.IFLGFs1(NB,NZ).EQ.0)THEN
         IF(PSILTs1(NZ).LT.PSILY(IGTYPs1(NZ)))THEN
           VRNFs1(NB,NZ)=VRNFs1(NB,NZ)+1.0
         ENDIF
@@ -595,6 +737,7 @@ module HfuncsMod
       ENDIF
     ENDIF
   ENDIF
+  end associate
   end subroutine pft_specific_phenology
 !------------------------------------------------------------------------------------------
 
@@ -608,6 +751,50 @@ module HfuncsMod
   real(r8) :: RNI
 
 ! begin_execution
+  associate(                            &
+    IYR0s1    =>  plt_distb%IYR0s1    , &
+    IDAY0s1   =>  plt_distb%IDAY0s1   , &
+    DPTHSs1   =>  plt_ew%DPTHSs1      , &
+    PSILTs1   =>  plt_ew%PSILTs1      , &
+    ZEROs1    =>  plt_site%ZEROs1     , &
+    DYLNs1    =>  plt_site%DYLNs1     , &
+    IYRCs1    =>  plt_site%IYRCs1     , &
+    DYLXs1    =>  plt_site%DYLXs1     , &
+    TKGs1     =>  plt_pheno%TKGs1     , &
+    IDAYs1    =>  plt_pheno%IDAYs1    , &
+    XRLAs1    =>  plt_pheno%XRLAs1    , &
+    GSTGFs1   =>  plt_pheno%GSTGFs1   , &
+    OFFSTs1   =>  plt_pheno%OFFSTs1   , &
+    ISTYPs1   =>  plt_pheno%ISTYPs1   , &
+    IFLGEs1   =>  plt_pheno%IFLGEs1   , &
+    VSTGs1    =>  plt_morph%VSTGs1    , &
+    GSTGIs1   =>  plt_pheno%GSTGIs1   , &
+    DGSTGFs1  =>  plt_pheno%DGSTGFs1  , &
+    IFLGGs1   =>  plt_pheno%IFLGGs1   , &
+    VSTGXs1   =>  plt_pheno%VSTGXs1   , &
+    IDTYPs1   =>  plt_pheno%IDTYPs1   , &
+    TGSTGFs1  =>  plt_pheno%TGSTGFs1  , &
+    XDLs1     =>  plt_pheno%XDLs1     , &
+    DGSTGIs1  =>  plt_pheno%DGSTGIs1  , &
+    XPPDs1    =>  plt_pheno%XPPDs1    , &
+    TGSTGIs1  =>  plt_pheno%TGSTGIs1  , &
+    GROUPs1   =>  plt_pheno%GROUPs1   , &
+    IWTYPs1   =>  plt_pheno%IWTYPs1   , &
+    VRNLs1    =>  plt_pheno%VRNLs1    , &
+    IPTYPs1   =>  plt_pheno%IPTYPs1   , &
+    IFLGAs1   =>  plt_pheno%IFLGAs1   , &
+    GROUPIs1  =>  plt_pheno%GROUPIs1  , &
+    OSTRs1    =>  plt_pheno%OSTRs1    , &
+    VRNSs1    =>  plt_pheno%VRNSs1    , &
+    VRNFs1    =>  plt_pheno%VRNFs1    , &
+    VRNXs1    =>  plt_pheno%VRNXs1    , &
+    XRNIs1    =>  plt_pheno%XRNIs1    , &
+    ZCs1      =>  plt_morph%ZCs1      , &
+    PSTGs1    =>   plt_morph%PSTGs1   , &
+    PSTGIs1   =>   plt_morph%PSTGIs1  , &
+    PSTGFs1   =>   plt_morph%PSTGFs1  , &
+    NB1s1     =>   plt_morph%NB1s1      &
+  )
   IF(IDAYs1(1,NB,NZ).EQ.0)THEN
     IDAYs1(1,NB,NZ)=I
     IFLGAs1(NB,NZ)=1
@@ -865,6 +1052,7 @@ module HfuncsMod
       IDAYs1(9,NB,NZ)=I
     ENDIF
   ENDIF
+  end associate
   end subroutine living_branch_phenology
 
 end module HfuncsMod

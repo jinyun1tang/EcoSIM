@@ -25,8 +25,8 @@ module ExtractsMod
 
   call TotalLitterfall()
 
-  DO NZ=1,NPs1
-    IF(IFLGCs1(NZ).EQ.1)THEN
+  DO NZ=1,plt_site%NPs1
+    IF(plt_pheno%IFLGCs1(NZ).EQ.1)THEN
 
       call TotalLeafArea(NZ)
 
@@ -45,6 +45,29 @@ module ExtractsMod
   implicit none
   integer :: NZ,L,K,M
 
+  associate(                             &
+   NP0s1      => plt_site%NP0s1        , &
+   WGLFTs1    => plt_biom%WGLFTs1      , &
+   WTSTGTs1   => plt_biom%WTSTGTs1     , &
+   WTSTGs1    => plt_biom%WTSTGs1      , &
+   HCSNCs1    => plt_bgcr%HCSNCs1      , &
+   HZSNCs1    => plt_bgcr%HZSNCs1      , &
+   HPSNCs1    => plt_bgcr%HPSNCs1      , &
+   ZCSNCs1    => plt_bgcr%ZCSNCs1      , &
+   ZZSNCs1    => plt_bgcr%ZZSNCs1      , &
+   ZPSNCs1    => plt_bgcr%ZPSNCs1      , &
+   CSNTs1     => plt_bgcr%CSNTs1       , &
+   ZSNTs1     => plt_bgcr%ZSNTs1       , &
+   PSNTs1     => plt_bgcr%PSNTs1       , &
+   CSNCs1     => plt_bgcr%CSNCs1       , &
+   ZSNCs1     => plt_bgcr%ZSNCs1       , &
+   PSNCs1     => plt_bgcr%PSNCs1       , &
+   NIs1       => plt_morph%NIs1        , &
+   ARSTTs1    => plt_morph%ARSTTs1     , &
+   ARLFTs1    =>  plt_morph%ARLFTs1    , &
+   ARSTCs1    =>  plt_morph%ARSTCs1    , &
+   ARLFCs1    =>  plt_morph%ARLFCs1      &
+  )
   DO NZ=1,NP0s1
 !
 !   TOTAL LITTERFALL OF ALL PLANT SPECIES
@@ -77,6 +100,7 @@ module ExtractsMod
     WGLFTs1(L)=0._r8
     ARSTTs1(L)=0._r8
   ENDDO
+  end associate
   end subroutine TotalLitterfall
 !------------------------------------------------------------------------------------------
 
@@ -92,11 +116,20 @@ module ExtractsMod
   implicit none
   integer, intent(in) :: NZ
   integer :: L
+  associate(                              &
+    WGLFVs1    => plt_biom%WGLFVs1      , &
+    WGLFTs1    => plt_biom%WGLFTs1      , &
+    ARLFTs1    =>  plt_morph%ARLFTs1    , &
+    ARSTVs1    =>  plt_morph%ARSTVs1    , &
+    ARSTTs1    => plt_morph%ARSTTs1     , &
+    ARLFVs1    => plt_morph%ARLFVs1       &
+  )
   DO L=1,JC1
     ARLFTs1(L)=ARLFTs1(L)+ARLFVs1(L,NZ)
     WGLFTs1(L)=WGLFTs1(L)+WGLFVs1(L,NZ)
     ARSTTs1(L)=ARSTTs1(L)+ARSTVs1(L,NZ)
   ENDDO
+  end associate
   end subroutine TotalLeafArea
 !------------------------------------------------------------------------------------------
 
@@ -109,6 +142,114 @@ module ExtractsMod
   integer, intent(in) :: NZ
 
   integer :: N,L,K
+
+  associate(                       &
+    NUs1    => plt_site%NUs1     , &
+    AREA3s1 => plt_site%AREA3s1  , &
+    PPs1    => plt_site%PPs1     , &
+    RUPP1Bs1=> plt_rbgc%RUPP1Bs1 , &
+    RUPP2Bs1=> plt_rbgc%RUPP2Bs1 , &
+    RUNNXPs1=> plt_rbgc%RUNNXPs1 , &
+    RCODFAs1=> plt_rbgc%RCODFAs1 , &
+    RCOFLAs1=> plt_rbgc%RCOFLAs1 , &
+    ROXFLAs1=> plt_rbgc%ROXFLAs1 , &
+    RCHFLAs1=> plt_rbgc%RCHFLAs1 , &
+    RHGDFAs1=> plt_rbgc%RHGDFAs1 , &
+    ROXDFAs1=> plt_rbgc%ROXDFAs1 , &
+    RCHDFAs1=> plt_rbgc%RCHDFAs1 , &
+    RHGFLAs1=> plt_rbgc%RHGFLAs1 , &
+    RCO2Ps1 => plt_rbgc%RCO2Ps1  , &
+    RUPCHSs1=> plt_rbgc%RUPCHSs1 , &
+    RUPOXPs1=> plt_rbgc%RUPOXPs1 , &
+    RNHDFAs1=> plt_rbgc%RNHDFAs1 , &
+    RN2FLAs1=> plt_rbgc%RN2FLAs1 , &
+    RNHFLAs1=> plt_rbgc%RNHFLAs1 , &
+    RUPN2Ss1=> plt_rbgc%RUPN2Ss1 , &
+    RUPN3Bs1=> plt_rbgc%RUPN3Bs1 , &
+    RUPHGSs1=> plt_rbgc%RUPHGSs1 , &
+    RUPN3Ss1=> plt_rbgc%RUPN3Ss1 , &
+    RUPNOBs1=> plt_rbgc%RUPNOBs1 , &
+    RCO2Ss1 => plt_rbgc%RCO2Ss1  , &
+    RUPOXSs1=> plt_rbgc%RUPOXSs1 , &
+    RUPNH4s1=> plt_rbgc%RUPNH4s1 , &
+    RUPNO3s1=> plt_rbgc%RUPNO3s1 , &
+    RUPH1Ps1=> plt_rbgc%RUPH1Ps1 , &
+    RUPH2Ps1=> plt_rbgc%RUPH2Ps1 , &
+    RUPNHBs1=> plt_rbgc%RUPNHBs1 , &
+    RUPH2Bs1=> plt_rbgc%RUPH2Bs1 , &
+    RUPH1Bs1=> plt_rbgc%RUPH1Bs1 , &
+    TNHFLAs1=> plt_rbgc%TNHFLAs1 , &
+    TCHFLAs1=> plt_rbgc%TCHFLAs1 , &
+    TLCH4Ps1=> plt_rbgc%TLCH4Ps1 , &
+    TN2FLAs1=> plt_rbgc%TN2FLAs1 , &
+    TLCO2Ps1=> plt_rbgc%TLCO2Ps1 , &
+    TLNH3Ps1=> plt_rbgc%TLNH3Ps1 , &
+    TLN2OPs1=> plt_rbgc%TLN2OPs1 , &
+    TLOXYPs1=> plt_rbgc%TLOXYPs1 , &
+    TCOFLAs1=> plt_rbgc%TCOFLAs1 , &
+    TOXFLAs1=> plt_rbgc%TOXFLAs1 , &
+    ROXYPs1 => plt_rbgc%ROXYPs1  , &
+    RDFOMCs1=> plt_rbgc%RDFOMCs1 , &
+    RUNNHPs1=> plt_rbgc%RUNNHPs1 , &
+    RDFOMNs1=> plt_rbgc%RDFOMNs1 , &
+    RUNNOPs1=> plt_rbgc%RUNNOPs1 , &
+    RDFOMPs1=> plt_rbgc%RDFOMPs1 , &
+    RUPP2Ps1=> plt_rbgc%RUPP2Ps1 , &
+    RUNNBPs1=> plt_rbgc%RUNNBPs1 , &
+    RUPP1Ps1=> plt_rbgc%RUPP1Ps1 , &
+    ZH3Ps1  => plt_rbgc%ZH3Ps1   , &
+    Z2OPs1  => plt_rbgc%Z2OPs1   , &
+    Z2OAs1  => plt_rbgc%Z2OAs1   , &
+    ZH3As1  => plt_rbgc%ZH3As1   , &
+    RN2DFAs1=> plt_rbgc%RN2DFAs1 , &
+    RNO3Xs1 => plt_bgcr%RNO3Xs1  , &
+    RNH4Xs1 => plt_bgcr%RNH4Xs1  , &
+    RPO4Xs1 => plt_bgcr%RPO4Xs1  , &
+    RN3BXs1 => plt_bgcr%RN3BXs1  , &
+    RP14Xs1 => plt_bgcr%RP14Xs1  , &
+    RNHBXs1 => plt_bgcr%RNHBXs1  , &
+    ROXYXs1 => plt_bgcr%ROXYXs1  , &
+    TDFOMPs1=> plt_bgcr%TDFOMPs1 , &
+    TDFOMNs1=> plt_bgcr%TDFOMNs1 , &
+    TDFOMCs1=> plt_bgcr%TDFOMCs1 , &
+    TUPH1Bs1=> plt_bgcr%TUPH1Bs1 , &
+    TUPH2Bs1=> plt_bgcr%TUPH2Bs1 , &
+    TUPNOBs1=> plt_bgcr%TUPNOBs1 , &
+    TUPNHBs1=> plt_bgcr%TUPNHBs1 , &
+    TUPH1Ps1=> plt_bgcr%TUPH1Ps1 , &
+    TUPNO3s1=> plt_bgcr%TUPNO3s1 , &
+    TUPH2Ps1=> plt_bgcr%TUPH2Ps1 , &
+    TUPN3Ss1=> plt_bgcr%TUPN3Ss1 , &
+    TUPN3Bs1=> plt_bgcr%TUPN3Bs1 , &
+    TUPNH4s1=> plt_bgcr%TUPNH4s1 , &
+    TUPHGSs1=> plt_bgcr%TUPHGSs1 , &
+    TUPOXSs1=> plt_bgcr%TUPOXSs1 , &
+    TUPCHSs1=> plt_bgcr%TUPCHSs1 , &
+    TUPN2Ss1=> plt_bgcr%TUPN2Ss1 , &
+    THGFLAs1=> plt_bgcr%THGFLAs1 , &
+    TUPOXPs1=> plt_bgcr%TUPOXPs1 , &
+    TLH2GPs1=> plt_bgcr%TLH2GPs1 , &
+    TCO2Ss1 => plt_bgcr%TCO2Ss1  , &
+    TCO2Ps1 => plt_bgcr%TCO2Ps1  , &
+    RPOBXs1 => plt_bgcr%RPOBXs1  , &
+    RP1BXs1 => plt_bgcr%RP1BXs1  , &
+    TKSs1   => plt_ew%TKSs1      , &
+    TUPHTs1 => plt_ew%TUPHTs1    , &
+    TUPWTRs1=> plt_ew%TUPWTRs1   , &
+    UPWTRs1 => plt_ew%UPWTRs1    , &
+    H2GPs1  => plt_rbgc%H2GPs1,&
+    CH4Ps1  => plt_rbgc%CH4Ps1,&
+    OXYPs1  => plt_rbgc%OXYPs1,&
+    CO2Ps1  => plt_rbgc%CO2Ps1,&
+    H2GAs1  => plt_rbgc%H2GAs1,&
+    CH4As1  => plt_rbgc%CH4As1,&
+    CO2As1  => plt_rbgc%CO2As1,&
+    OXYAs1  => plt_rbgc%OXYAs1,&
+    RTDNPs1 => plt_morph%RTDNPs1 , &
+    RTDNTs1 => plt_morph%RTDNTs1 , &
+    MYs1    => plt_morph%MYs1    , &
+    NIs1    => plt_morph%NIs1      &
+  )
 
   DO N=1,MYs1(NZ)
     DO L=NUs1,NIs1(NZ)
@@ -244,6 +385,7 @@ module ExtractsMod
       RP1BXs1(L)=RP1BXs1(L)+RUPP1Bs1(N,L,NZ)
     ENDDO
   ENDDO
+  end associate
   end subroutine TotalGasandSoluteUptake
 !------------------------------------------------------------------------------------------
 
@@ -259,7 +401,72 @@ module ExtractsMod
   integer, intent(in) :: NZ
   integer :: L, NB
   real(r8) :: ENGYC
-
+  associate(                       &
+    TBALCs1 => plt_site%TBALCs1  , &
+    TBALNs1 => plt_site%TBALNs1  , &
+    TBALPs1 => plt_site%TBALPs1  , &
+    BALCs1  => plt_site%BALCs1   , &
+    BALNs1  => plt_site%BALNs1   , &
+    BALPs1  => plt_site%BALPs1   , &
+    TNH3Cs1 => plt_bgcr%TNH3Cs1  , &
+    RNH3Cs1 => plt_bgcr%RNH3Cs1  , &
+    RCO2Zs1 => plt_bgcr%RCO2Zs1  , &
+    ROXYZs1 => plt_bgcr%ROXYZs1  , &
+    RCH4Zs1 => plt_bgcr%RCH4Zs1  , &
+    RN2OZs1 => plt_bgcr%RN2OZs1  , &
+    RNH3Zs1 => plt_bgcr%RNH3Zs1  , &
+    RH2GZs1 => plt_bgcr%RH2GZs1  , &
+    TCCANs1 => plt_bgcr%TCCANs1  , &
+    ZCSNCs1 => plt_bgcr%ZCSNCs1  , &
+    ZZSNCs1 => plt_bgcr%ZZSNCs1  , &
+    ZPSNCs1 => plt_bgcr%ZPSNCs1  , &
+    RUPNFs1 => plt_bgcr%RUPNFs1  , &
+    CNETs1  => plt_bgcr%CNETs1   , &
+    CTRANs1 => plt_ew%CTRANs1    , &
+    TH2GZs1 => plt_bgcr%TH2GZs1  , &
+    RNH3Bs1 => plt_rbgc%RNH3Bs1  , &
+    HCUPTKs1=> plt_rbgc%HCUPTKs1 , &
+    HZUPTKs1=> plt_rbgc%HZUPTKs1 , &
+    HPUPTKs1=> plt_rbgc%HPUPTKs1 , &
+    TUPNFs1 => plt_rbgc%TUPNFs1  , &
+    TOXYZs1 => plt_rbgc%TOXYZs1  , &
+    TCH4Zs1 => plt_rbgc%TCH4Zs1  , &
+    TCO2Zs1 => plt_rbgc%TCO2Zs1  , &
+    TN2OZs1 => plt_rbgc%TN2OZs1  , &
+    TNH3Zs1 => plt_rbgc%TNH3Zs1  , &
+    EPs1    => plt_ew%EPs1       , &
+    FLWCs1  => plt_ew%FLWCs1     , &
+    EVAPCs1 => plt_ew%EVAPCs1    , &
+    VOLWCs1 => plt_ew%VOLWCs1    , &
+    VOLWPs1 => plt_ew%VOLWPs1    , &
+    TGHs1   => plt_ew%TGHs1      , &
+    SFLXCs1 => plt_ew%SFLXCs1    , &
+    EFLXCs1 => plt_ew%EFLXCs1    , &
+    TVOLWPs1=> plt_ew%TVOLWPs1   , &
+    TKCs1   => plt_ew%TKCs1      , &
+    TKSs1   => plt_ew%TKSs1      , &
+    ENGYXs1 => plt_ew%ENGYXs1    , &
+    TSHs1   => plt_ew%TSHs1      , &
+    TEVAPCs1=> plt_ew%TEVAPCs1   , &
+    TENGYCs1=> plt_ew%TENGYCs1   , &
+    TEVAPPs1=> plt_ew%TEVAPPs1   , &
+    THFLXCs1=> plt_ew%THFLXCs1   , &
+    THRMCs1 => plt_ew%THRMCs1    , &
+    TKAs1   => plt_ew%TKAs1      , &
+    HFLXCs1 => plt_ew%HFLXCs1    , &
+    TLEs1   => plt_ew%TLEs1      , &
+    TVOLWCs1=> plt_ew%TVOLWCs1   , &
+    NUs1    => plt_site%NUs1     , &
+    ARSTCs1 => plt_morph%ARSTCs1 , &
+    ARLFCs1 => plt_morph%ARLFCs1 , &
+    NIs1    => plt_morph%NIs1    , &
+    NBRs1   => plt_morph%NBRs1   , &
+    ARSTPs1 => plt_morph%ARSTPs1 , &
+    ARLFPs1 => plt_morph%ARLFPs1 , &
+    RAD1s1  => plt_rad%RAD1s1    , &
+    THRM1s1 => plt_rad%THRM1s1   , &
+    TRNs1   => plt_rad%TRNs1       &
+  )
   DO L=NUs1,NIs1(NZ)
     TUPNFs1(L)=TUPNFs1(L)+RUPNFs1(L,NZ)
   ENDDO
@@ -331,6 +538,7 @@ module ExtractsMod
     RNH3Cs1(NZ)=RNH3Cs1(NZ)+RNH3Bs1(NB,NZ)
     TNH3Cs1(NZ)=TNH3Cs1(NZ)+RNH3Bs1(NB,NZ)
   ENDDO
+  end associate
   end subroutine CanopyFluxesandFixation
 
   end module ExtractsMod

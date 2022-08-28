@@ -1,6 +1,7 @@
 set(APIS_SOURCES
 	PlantAPI.F90
   MicBGCAPI.F90
+  GeochemAPI.F90
 )
 
 include_directories(${ECOSIM_INCLUDE_DIRS})
@@ -11,6 +12,8 @@ include_directories(${CMAKE_BINARY_DIR}/f90src/plant_bgc/)
 include_directories(${CMAKE_BINARY_DIR}/f90src/microbial_bgc/box_model)
 include_directories(${CMAKE_BINARY_DIR}/f90src/microbial_bgc/layers_model)
 include_directories(${CMAKE_BINARY_DIR}/f90src/ecosim_mods/)
+include_directories(${CMAKE_BINARY_DIR}/f90src/geochem/box_chem)
+include_directories(${CMAKE_BINARY_DIR}/f90src/geochem/layers_chem)
 
 include(add_ecosim_library)
 add_ecosim_library(APIs ${APIS_SOURCES})

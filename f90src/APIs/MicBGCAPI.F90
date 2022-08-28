@@ -25,13 +25,42 @@ module MicBGCAPI
   use MicBGCPars, only : micpar
   use MicBGCMod, only : SoilBGCOneLayer
 implicit none
+  save
+  private
   character(len=*), private, parameter :: mod_filename = __FILE__
 
+  type(micforctype) :: micfor
+  type(micsttype) :: micstt
+  type(micfluxtype) :: micflx
   integer :: curI,curJ
-  public :: MicrobeModel
 
+
+  public :: MicrobeModel
+  public :: MicAPI_Init
+  public :: MicAPI_cleanup
   contains
 
+!------------------------------------------------------------------------------------------
+
+  subroutine MicAPI_Init()
+
+  implicit none
+
+  call micfor%Init()
+  call micstt%Init()
+  call micflx%Init()
+
+  end subroutine MicAPI_Init
+!------------------------------------------------------------------------------------------
+  subroutine MicAPI_cleanup()
+
+  implicit none
+
+
+  call micfor%destroy()
+  call micflx%destroy()
+  call micstt%destroy()
+  end subroutine MicAPI_cleanup
 !------------------------------------------------------------------------------------------
   subroutine MicrobeModel(I,J,NHW,NHE,NVN,NVS)
 !
@@ -113,13 +142,8 @@ END subroutine MicrobeModel
 
   implicit none
   integer, intent(in) :: I,J,L,NY,NX
-  type(micforctype) :: micfor
-  type(micsttype) :: micstt
-  type(micfluxtype) :: micflx
 
-  call micfor%Init()
-  call micstt%Init()
-  call micflx%Init()
+  call micflx%ZeroOut()
 
   call MicAPISend(L,NY,NX,micfor,micstt,micflx)
 
@@ -127,9 +151,6 @@ END subroutine MicrobeModel
 
   call MicAPIRecv(L,NY,NX,micfor%litrm,micstt,micflx)
 
-  call micfor%destroy()
-  call micflx%destroy()
-  call micstt%destroy()
   end subroutine Micbgc1Layer
 !------------------------------------------------------------------------------------------
 
@@ -188,7 +209,6 @@ END subroutine MicrobeModel
   micfor%RPOBY =RPOBY(L,NY,NX)
   micfor%RP1BY =RP1BY(L,NY,NX)
   micfor%ROXYL =ROXYL(L,NY,NX)
-  micfor%CFOMC =CFOMC(1:2,L,NY,NX)
   micfor%ROQCY(0:jcplx1)=ROQCY(0:jcplx1,L,NY,NX)
   micfor%ROQAY(0:jcplx1)=ROQAY(0:jcplx1,L,NY,NX)
   micfor%litrm=(L==0)
@@ -225,6 +245,8 @@ END subroutine MicrobeModel
     micfor%RP14YU =RP14Y(NU(NY,NX),NY,NX)
     micfor%VOLWU =VOLW(NU(NY,NX),NY,NX)
     micfor%CFOMCU=CFOMC(1:2,NU(NY,NX),NY,NX)
+  else
+    micfor%CFOMC =CFOMC(1:2,L,NY,NX)
   endif
   micstt%CNH4B =CNH4B(L,NY,NX)
   micstt%CNH4S =CNH4S(L,NY,NX)
@@ -255,6 +277,7 @@ END subroutine MicrobeModel
   micstt%ZNH4B=ZNH4B(L,NY,NX)
   micstt%ZNH4S=ZNH4S(L,NY,NX)
   micstt%ZNO3B=ZNO3B(L,NY,NX)
+  micstt%ZNO3S=ZNO3S(L,NY,NX)
   micstt%H1POB=H1POB(L,NY,NX)
   micstt%H1PO4=H1PO4(L,NY,NX)
   micstt%ZNO2B=ZNO2B(L,NY,NX)

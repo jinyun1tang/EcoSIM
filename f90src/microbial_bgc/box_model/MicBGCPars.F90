@@ -14,6 +14,25 @@ implicit none
   integer :: jsken   !# of kinetic components of the substrates
   integer :: jguilds !# of guilds
   integer :: NFGs    !# of functional groups
+  integer :: k_woody_litr
+  integer :: k_non_woody_litr
+  integer :: k_manure
+  integer :: k_POM
+  integer :: k_humus
+  integer :: nf_amonia_oxi
+  integer :: nf_nitrite_oxi
+  integer :: nf_aero_methanot
+  integer :: nf_hydro_methang
+  integer :: n_aero_hetrophb
+  integer :: n_anero_faculb
+  integer :: n_aero_fungi
+  integer :: n_anaero_ferm
+  integer :: n_aceto_methang
+  integer :: n_aero_n2fixer
+  integer :: n_anero_n2fixer
+  integer :: ndbiomcp   !number of necrobiomass components
+  integer :: nlbiomcp   !number of living biomass components
+
   real(r8), allocatable :: OMCI(:,:)             !initializes microbial biomass
   real(r8), allocatable :: OHCK(:)    !fractions of SOC in adsorbed C
   real(r8), allocatable :: OMCK(:)    !fractions of SOC in biomass
@@ -34,22 +53,13 @@ implicit none
   real(r8),allocatable :: OMCF(:)                            !hetero microbial biomass composition in SOC
   real(r8),allocatable :: OMCA(:)                            !autotrophic microbial biomass composition in SOC
   logical, allocatable :: is_activef_micb(:)
-  integer :: k_woody_litr
-  integer :: k_non_woody_litr
-  integer :: k_manure
-  integer :: k_POM
-  integer :: k_humus
-  integer :: nf_amonia_oxi
-  integer :: nf_nitrite_oxi
-  integer :: nf_aero_methanot
-  integer :: nf_hydro_methang
-  integer :: n_aero_hetrophb
-  integer :: n_anero_faculb
-  integer :: n_aero_fungi
-  integer :: n_anaero_ferm
-  integer :: n_aceto_methang
-  integer :: n_aero_n2fixer
-  integer :: n_anero_n2fixer
+  logical, allocatable :: is_litter(:)
+  character(len=16) :: kiname(0:3)
+  character(len=16) :: cplxname(0:4)
+  character(len=16) :: hmicname(7)
+  character(len=16) :: amicname(7)
+  character(len=16) :: micresb(0:1)      !residual biomass name
+  character(len=16) :: micbiom(1:3)      !microbial biomass pool name
   contains
     procedure, public  :: Init
     procedure, public  :: SetPars
@@ -67,19 +77,49 @@ contains
   !organic matter is grouped into five complexes, including woody(0),
   ! non-woody(1), manure(2), litter, POC(3) and humus(4) (g Mg-1)
 
+  this%ndbiomcp=2  !number of necrobiomass components
+  this%nlbiomcp=3  !number of living biomass components
+
   this%jcplx=5 !# of microbe-substrate complexes
   this%jcplx1=this%jcplx-1
   this%jsken=4 !# of kinetic components of the substrates
   this%jguilds=nmicbguilds
   this%NFGs=7
-
-  this%k_woody_litr=0
-  this%k_non_woody_litr=1
-  this%k_manure=2
+  !woody, non_woody litter and manure are defined as litter
+  allocate(this%is_litter(0:this%jcplx1));this%is_litter(:)=.false.
+  this%k_woody_litr=0;     this%is_litter(this%k_woody_litr)=.true.
+  this%k_non_woody_litr=1; this%is_litter(this%k_non_woody_litr)=.true.
+  this%k_manure=2;         this%is_litter(this%k_manure)=.true.
   this%k_POM=3
   this%k_humus=4
-
-
+  this%kiname(0)='protein'
+  this%kiname(1)='carbhydro'
+  this%kiname(2)='cellulose'
+  this%kiname(3)='lignin'
+  this%cplxname(0)='woodylitr'
+  this%cplxname(1)='nwoodylit'
+  this%cplxname(2)='manure'
+  this%cplxname(3)='pom'
+  this%cplxname(4)='humus'
+  this%hmicname(1)='aerohetrob'
+  this%hmicname(2)='anerofaclb'
+  this%hmicname(3)='aerofungi'
+  this%hmicname(4)='aneroferm'
+  this%hmicname(5)='acetomethg'
+  this%hmicname(6)='aeron2fix'
+  this%hmicname(7)='aneron2fix'
+  this%amicname(1)='amoniaoxib'
+  this%amicname(2)='nititeoxib'
+  this%amicname(3)='aeromethtp'
+  this%amicname(5)='hydromethg'
+  this%amicname(4)='null'
+  this%amicname(6)='null'
+  this%amicname(7)='null'
+  this%micresb(0)='labile'
+  this%micresb(1)='resist'
+  this%micbiom(1)='labile'
+  this%micbiom(2)='resist'
+  this%micbiom(3)='active'
   call this%Initallocate()
 
 !set up functional group ids

@@ -35,4 +35,5 @@ module EcosimConst
   real(r8), parameter :: DENSI=0.92_r8-THETPI  !ice density
   real(r8), parameter :: ZW=0.01_r8         !snowpack surface roughness (m)
   integer :: ICOR(12)=(/1,-1,0,0,1,1,2,3,3,4,4,5/)
+
 end module EcosimConst

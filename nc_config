@@ -1,0 +1,59 @@
+#!/bin/bash
+
+#echo $HOST
+if [[ $HOST == *"cori"* ]]; 
+then
+ # echo "run on $HOST"
+  module load PrgEnv-intel/6.0.10
+  module load cray-netcdf/4.6.3.2
+
+  ncdf_dir=/opt/cray/pe/netcdf/4.6.3.2/INTEL/19.0
+  if [[ "$1" == *"prefix"* ]];
+  then 
+    echo "$ncdf_dir"
+  elif [[ "$1" == *"flibs"* ]]; 
+  then
+    echo "-L$ncdf_dir/lib -lnetcdff -L$ncdf_dir/lib -lnetcdf"
+  else
+  echo ""
+  fi
+elif [[ $(hostname) == *"scs"* ]];
+then
+  if [[ "$2" == *"gcc"* ]];
+  then
+    ncdf_dir=/global/software/sl-7.x86_64/modules/gcc/6.3.0/netcdf/4.4.1.1-gcc-s/
+    export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$ncdf_dir/lib
+    if [[ "$1" == *"prefix"* ]];
+    then
+      echo "$ncdf_dir"
+    elif [[ "$1" == *"flibs"* ]];
+    then
+      $ncdf_dir/bin/nf-config --flibs
+    else
+      echo ""
+    fi
+
+
+  else
+    module load intel/2018.1.163
+    ncdf_dir=/global/software/sl-7.x86_64/modules/intel/2018.1.163/netcdf/4.6.1-intel-s/
+    export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$ncdf_dir/lib
+    if [[ "$1" == *"prefix"* ]];
+    then
+      echo "$ncdf_dir"
+    elif [[ "$1" == *"flibs"* ]];
+    then
+      /global/software/sl-7.x86_64/modules/intel/2018.1.163/netcdf/4.6.1-intel-s/bin/nf-config --flibs
+    else
+      echo ""
+    fi
+  fi
+else
+  if [[ "$1" == *"prefix"* ]];
+  then
+  nc-config --prefix
+  elif [[ "$1" == *"flibs"* ]];
+  then
+  nc-config --flibs
+  fi
+fi

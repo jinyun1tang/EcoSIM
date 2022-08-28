@@ -40,6 +40,23 @@
   REAL(R8):: RACL
   real(r8):: RI
 !     begin_execution
+  associate(                            &
+    RIBs1      =>  plt_ew%RIBs1       , &
+    RAZs1      =>  plt_ew%RAZs1       , &
+    TKAs1      =>  plt_ew%TKAs1       , &
+    TKCZs1     =>  plt_ew%TKCZs1      , &
+    CO2Es1     =>  plt_site%CO2Es1    , &
+    CO2Qs1     =>  plt_photo%CO2Qs1   , &
+    ARLFPs1    =>  plt_morph%ARLFPs1  , &
+    ZEROPs1    =>  plt_biom%ZEROPs1   , &
+    CNETXs1    =>  plt_bgcr%CNETXs1   , &
+    SSINs1     =>  plt_rad%SSINs1     , &
+    FMOLs1     =>  plt_photo%FMOLs1   , &
+    RSMNs1     =>  plt_photo%RSMNs1   , &
+    FCO2s1     =>  plt_photo%FCO2s1   , &
+    RSMHs1     =>  plt_photo%RSMHs1   , &
+    CO2Is1     =>  plt_photo%CO2Is1     &
+  )
 !
 !     CANOPY TEMPERATURE + OFFSET FOR THERMAL ADAPTATION FROM 'READQ'
 !
@@ -82,6 +99,7 @@
   ENDIF
 
   RETURN
+  end associate
   END subroutine stomates
 !------------------------------------------------------------------------------------------
 
@@ -92,6 +110,16 @@
   real(r8) :: ETLF,EGRO,PARX,PARJ
   real(r8) :: VL
 !     begin_execution
+  associate(                        &
+    PARDIFs1 => plt_rad%PARDIFs1  , &
+    PARs1    => plt_rad%PARs1     , &
+    VGROs1   => plt_photo%VGROs1  , &
+    SURFXs1  => plt_photo%SURFXs1 , &
+    FDBKs1   => plt_photo%FDBKs1  , &
+    CBXNs1   => plt_photo%CBXNs1  , &
+    ETGROs1  => plt_photo%ETGROs1 , &
+    TAU0s1   => plt_rad%TAU0s1      &
+  )
 !
 !     LIGHT-LIMITED CARBOXYLATION RATES
 !
@@ -119,6 +147,7 @@
 !
   VL=AMIN1(VGROs1(K,NB,NZ),EGRO)*FDBKs1(NB,NZ)
   CH2O=CH2O+VL*SURFXs1(N,L,K,NB,NZ)*TAU0s1(L+1)
+  end associate
   end subroutine C3ShadedLeaves
 !------------------------------------------------------------------------------------------
 
@@ -129,6 +158,15 @@
   real(r8) :: ETLF,EGRO,PARX,PARJ
   real(r8) :: VL
 !     begin_execution
+  associate(                            &
+    PARs1     => plt_rad%PARs1        , &
+    VGROs1    => plt_photo%VGROs1     , &
+    CBXNs1    => plt_photo%CBXNs1     , &
+    ETGROs1   => plt_photo%ETGROs1    , &
+    SURFXs1   => plt_photo%SURFXs1    , &
+    FDBKs1    => plt_photo%FDBKs1     , &
+    TAUSs1    =>  plt_rad%TAUSs1        &
+  )
 !
 !     LIGHT-LIMITED CARBOXYLATION RATES
 !
@@ -156,7 +194,7 @@
 !
   VL=AMIN1(VGROs1(K,NB,NZ),EGRO)*FDBKs1(NB,NZ)
   CH2O=CH2O+VL*SURFXs1(N,L,K,NB,NZ)*TAUSs1(L+1)
-
+  end associate
   end subroutine C3SunlitLeaves
 !------------------------------------------------------------------------------------------
 
@@ -166,6 +204,12 @@
   real(r8), intent(inout) :: CH2O
   integer :: N,M
 !     begin_execution
+  associate(                           &
+    ZEROPs1  => plt_biom%ZEROPs1     , &
+    SURFXs1  => plt_photo%SURFXs1    , &
+    PARs1    => plt_rad%PARs1        , &
+    PARDIFs1 => plt_rad%PARDIFs1       &
+  )
 !     FOR EACH INCLINATION AND AZIMUTH CLASS
 !
   DO N=1,JLI1
@@ -186,6 +230,7 @@
       ENDIF
     ENDDO
   ENDDO
+  end associate
   end subroutine C3PhotosynsCanopyLayerL
 !------------------------------------------------------------------------------------------
 
@@ -198,6 +243,24 @@
   real(r8) :: ETDN,VCDN
   real(r8) :: VOGRO
 !     begin_execution
+  associate(                          &
+    ARLFLs1   =>  plt_morph%ARLFLs1 , &
+    ZEROPs1   =>  plt_biom%ZEROPs1  , &
+    O2Ls1     =>  plt_photo%O2Ls1   , &
+    CO2Ls1    =>  plt_photo%CO2Ls1  , &
+    CHLs1     =>  plt_photo%CHLs1   , &
+    VCGROs1   =>  plt_photo%VCGROs1 , &
+    XKCO2Ls1  =>  plt_photo%XKCO2Ls1, &
+    XKCO2Os1  =>  plt_photo%XKCO2Os1, &
+    ETMXs1    =>  plt_photo%ETMXs1  , &
+    ETGROs1   =>  plt_photo%ETGROs1 , &
+    VGROs1    =>  plt_photo%VGROs1  , &
+    VCMXs1    =>  plt_photo%VCMXs1  , &
+    CBXNs1    =>  plt_photo%CBXNs1  , &
+    VOMXs1    =>  plt_photo%VOMXs1  , &
+    COMPLs1   =>  plt_photo%COMPLs1 , &
+    RUBPs1    =>  plt_photo%RUBPs1    &
+  )
 !
 !     SURFICIAL DENSITY OF RUBISCO AND ITS CHLOROPHYLL
 !
@@ -255,6 +318,7 @@
       call C3PhotosynsCanopyLayerL(L,K,NB,NZ,CH2O)
     ENDIF
   ENDDO
+  end associate
   end subroutine C3Photosynthesis
 !------------------------------------------------------------------------------------------
 
@@ -270,6 +334,37 @@
   real(r8) :: VCDN4,VCDN
   real(r8) :: VOGRO
 !     begin_execution
+  associate(                          &
+    WGLFs1    =>  plt_biom%WGLFs1   , &
+    ZEROPs1   =>  plt_biom%ZEROPs1  , &
+    ARLFLs1   =>  plt_morph%ARLFLs1 , &
+    FDBKXs1   =>  plt_photo%FDBKXs1 , &
+    CHL4s1    =>  plt_photo%CHL4s1  , &
+    O2Ls1     =>  plt_photo%O2Ls1   , &
+    CO2Ls1    =>  plt_photo%CO2Ls1  , &
+    ETMXs1    =>  plt_photo%ETMXs1  , &
+    VCMX4s1   =>  plt_photo%VCMX4s1 , &
+    RUBPs1    =>  plt_photo%RUBPs1  , &
+    XKCO24s1  =>  plt_photo%XKCO24s1, &
+    CO2Bs1    =>  plt_photo%CO2Bs1  , &
+    CPOOL4s1  =>  plt_photo%CPOOL4s1, &
+    XKCO2Ls1  =>  plt_photo%XKCO2Ls1, &
+    FDBK4s1   =>  plt_photo%FDBK4s1 , &
+    XKCO2Os1  =>  plt_photo%XKCO2Os1, &
+    CHLs1     =>  plt_photo%CHLs1   , &
+    CBXNs1    =>  plt_photo%CBXNs1  , &
+    VCMXs1    =>  plt_photo%VCMXs1  , &
+    ETGROs1   =>  plt_photo%ETGROs1 , &
+    VGROs1    =>  plt_photo%VGROs1  , &
+    VCGROs1   =>  plt_photo%VCGROs1 , &
+    COMPLs1   =>  plt_photo%COMPLs1 , &
+    VCGR4s1   =>  plt_photo%VCGR4s1 , &
+    VGRO4s1   =>  plt_photo%VGRO4s1 , &
+    VOMXs1    =>  plt_photo%VOMXs1  , &
+    CBXN4s1   =>  plt_photo%CBXN4s1 , &
+    ETGR4s1   =>  plt_photo%ETGR4s1 , &
+    PEPCs1    =>  plt_photo%PEPCs1    &
+  )
 !
 !     FEEDBACK ON C4 CARBOXYLATION FROM C4 NON-STRUCTURAL C
 !
@@ -377,7 +472,7 @@
 !
   ETGROs1(K,NB,NZ)=ETMXs1(NZ)*TFNE*ETDN
   CBXNs1(K,NB,NZ)=AMAX1(0.0_r8,(CCBS-COMPLs1(K,NB,NZ))/(ELEC3*CCBS+10.5*COMPLs1(K,NB,NZ)))
-
+  end associate
   end subroutine C4Photosynthesis
 !------------------------------------------------------------------------------------------
 
@@ -387,6 +482,12 @@
   real(r8), intent(inout) :: CH2O
   integer :: M,N
 !     begin_execution
+  associate(                        &
+    SURFXs1  => plt_photo%SURFXs1 , &
+    ZEROPs1  =>  plt_biom%ZEROPs1 , &
+    PARs1    => plt_rad%PARs1     , &
+    PARDIFs1 => plt_rad%PARDIFs1    &
+  )
 !
 !     FOR EACH INCLINATION AND AZIMUTH CLASS
 !
@@ -406,7 +507,7 @@
       ENDIF
     ENDDO
   ENDDO
-
+  end associate
   end subroutine C4PhotosynsCanopyLayerL
 !------------------------------------------------------------------------------------------
 
@@ -418,6 +519,16 @@
   real(r8) :: ETLF4,EGRO4,PARX,PARJ
   real(r8) :: VL
 !     begin_execution
+  associate(                          &
+    SURFXs1  => plt_photo%SURFXs1   , &
+    FDBK4s1  => plt_photo%FDBK4s1   , &
+    CBXN4s1  => plt_photo%CBXN4s1   , &
+    VGRO4s1  => plt_photo%VGRO4s1   , &
+    ETGR4s1  => plt_photo%ETGR4s1   , &
+    PARs1    => plt_rad%PARs1       , &
+    PARDIFs1 => plt_rad%PARDIFs1    , &
+    TAU0s1   => plt_rad%TAU0s1        &
+  )
 !
 !     LIGHT-LIMITED CARBOXYLATION RATES
 !
@@ -445,7 +556,7 @@
 !
   VL=AMIN1(VGRO4s1(K,NB,NZ),EGRO4)*FDBK4s1(K,NB,NZ)
   CH2O=CH2O+VL*SURFXs1(N,L,K,NB,NZ)*TAU0s1(L+1)
-
+  end associate
   end subroutine C4ShadedLeaves
 !------------------------------------------------------------------------------------------
 
@@ -456,6 +567,15 @@
   real(r8) :: ETLF4,EGRO4,PARX,PARJ
   real(r8) :: VL
 !     begin_execution
+  associate(                       &
+  SURFXs1  =>  plt_photo%SURFXs1 , &
+  CBXN4s1  =>  plt_photo%CBXN4s1 , &
+  ETGR4s1  =>  plt_photo%ETGR4s1 , &
+  FDBK4s1  =>  plt_photo%FDBK4s1 , &
+  VGRO4s1  =>  plt_photo%VGRO4s1 , &
+  PARs1    =>  plt_rad%PARs1     , &
+  TAUSs1   =>  plt_rad%TAUSs1      &
+  )
 !
 !     LIGHT-LIMITED CARBOXYLATION RATES
 !
@@ -483,6 +603,7 @@
 !
   VL=AMIN1(VGRO4s1(K,NB,NZ),EGRO4)*FDBK4s1(K,NB,NZ)
   CH2O=CH2O+VL*SURFXs1(N,L,K,NB,NZ)*TAUSs1(L+1)
+  end associate
   end subroutine C4SunlitLeaves
 !------------------------------------------------------------------------------------------
 
@@ -494,7 +615,16 @@
   integer :: K
   real(r8) :: WSDN
 !     begin_execution
-
+  associate(                            &
+    ICTYPs1    => plt_photo%ICTYPs1   , &
+    VCGR4s1    => plt_photo%VCGR4s1   , &
+    VCGROs1    => plt_photo%VCGROs1   , &
+    ZEROs1     => plt_site%ZEROs1     , &
+    WGLFs1     => plt_biom%WGLFs1     , &
+    ZEROPs1    => plt_biom%ZEROPs1    , &
+    WSLFs1     => plt_biom%WSLFs1     , &
+    ARLF1s1    => plt_morph%ARLF1s1     &
+  )
   DO K=1,JNODS1
     IF(ARLF1s1(K,NB,NZ).GT.ZEROPs1(NZ).AND.WGLFs1(K,NB,NZ).GT.ZEROPs1(NZ))THEN
       WSDN=WSLFs1(K,NB,NZ)/ARLF1s1(K,NB,NZ)
@@ -519,6 +649,7 @@
       VCGROs1(K,NB,NZ)=0.0
     ENDIF
   ENDDO
+  end associate
   end subroutine LivingBranch
 !------------------------------------------------------------------------------------------
 
@@ -528,6 +659,20 @@
   real(r8), intent(inout) :: CH2O
   real(r8), intent(in) :: TFN1,TFN2,TFNE,XKO2L
 !     begin_execution
+  associate(                          &
+    CCPOLBs1 =>  plt_biom%CCPOLBs1  , &
+    CZPOLBs1 =>  plt_biom%CZPOLBs1  , &
+    CPPOLBs1 =>  plt_biom%CPPOLBs1  , &
+    IWTYPs1  =>  plt_pheno%IWTYPs1  , &
+    IBTYPs1  =>  plt_pheno%IBTYPs1  , &
+    FLG4s1   =>  plt_pheno%FLG4s1   , &
+    ATRPs1   =>  plt_pheno%ATRPs1   , &
+    ISTYPs1  =>  plt_pheno%ISTYPs1  , &
+    IDTHBs1  =>  plt_pheno%IDTHBs1  , &
+    ZEROs1   =>  plt_site%ZEROs1    , &
+    FDBKXs1  => plt_photo%FDBKXs1   , &
+    FDBKs1   => plt_photo%FDBKs1      &
+  )
 !
 !     FEEDBACK ON C3 CARBOXYLATION FROM NON-STRUCTURAL C:N:P
 !
@@ -580,6 +725,7 @@
   IF(IDTHBs1(NB,NZ).EQ.0)THEN
     call LivingBranch(NB,NZ,CH2O,TFN1,TFN2,TFNE,XKO2L)
   ENDIF
+  end associate
   end subroutine PhenoActiveBranch
 !------------------------------------------------------------------------------------------
 
@@ -592,6 +738,26 @@
   real(r8) :: STK,TCCZ
   real(r8) :: TKCO
 !     begin_execution
+  associate(                          &
+    CCPOLBs1 =>  plt_biom%CCPOLBs1  , &
+    TKCZs1   =>  plt_ew%TKCZs1      , &
+    OFFSTs1  =>  plt_pheno%OFFSTs1  , &
+    XKO2s1   =>  plt_photo%XKO2s1   , &
+    SCO2s1   =>  plt_photo%SCO2s1   , &
+    CO2Qs1   =>  plt_photo%CO2Qs1   , &
+    O2Ls1    =>  plt_photo%O2Ls1    , &
+    FMOLs1   =>  plt_photo%FMOLs1   , &
+    DCO2s1   =>  plt_photo%DCO2s1   , &
+    CO2Ls1   =>  plt_photo%CO2Ls1   , &
+    SO2s1    =>  plt_photo%SO2s1    , &
+    CO2Is1   =>  plt_photo%CO2Is1   , &
+    O2Is1    =>  plt_photo%O2Is1    , &
+    RSMHs1   =>  plt_photo%RSMHs1   , &
+    XKCO2Os1 =>  plt_photo%XKCO2Os1 , &
+    XKCO2Ls1 =>  plt_photo%XKCO2Ls1 , &
+    XKCO2s1  =>  plt_photo%XKCO2s1    &
+
+  )
 !
 !     CO2 AND O2 AQUEOUS SOLUBILITY
 !
@@ -635,6 +801,7 @@
   XKCO2Ls1(NZ)=XKCO2s1(NZ)*EXP(16.136_r8-40000._r8/RTK)
   XKO2L=XKO2s1(NZ)*EXP(8.067_r8-20000._r8/RTK)
   XKCO2Os1(NZ)=XKCO2Ls1(NZ)*(1.0_r8+O2Ls1(NZ)/XKO2L)
+  end associate
   end subroutine PrepPhotosynthesis
 !------------------------------------------------------------------------------------------
 
@@ -648,8 +815,27 @@
   real(r8) :: TFN1,TFN2,TFNE,XKO2L
   real(r8), parameter :: secsperhour=3600.0_r8
 
-
 !     begin_execution
+  associate(                          &
+    VRNXs1   =>  plt_pheno%VRNXs1   , &
+    VRNFs1   =>  plt_pheno%VRNFs1   , &
+    VRNLs1   =>  plt_pheno%VRNLs1   , &
+    VRNSs1   =>  plt_pheno%VRNSs1   , &
+    IWTYPs1  =>  plt_pheno%IWTYPs1  , &
+    ZEROPs1  =>  plt_biom%ZEROPs1   , &
+    NUs1     =>  plt_site%NUs1      , &
+    AREA3s1  =>  plt_site%AREA3s1   , &
+    VCGROs1  =>  plt_photo%VCGROs1  , &
+    FDBKs1   =>  plt_photo%FDBKs1   , &
+    FDBKXs1  =>  plt_photo%FDBKXs1  , &
+    XKCO2Os1 =>  plt_photo%XKCO2Os1 , &
+    VCGR4s1  =>  plt_photo%VCGR4s1  , &
+    RSMNs1   =>  plt_photo%RSMNs1   , &
+    DCO2s1   =>  plt_photo%DCO2s1   , &
+    RSMHs1   =>  plt_photo%RSMHs1   , &
+    FRADPs1  =>  plt_rad%FRADPs1    , &
+    NBRs1    =>  plt_morph%NBRs1      &
+  )
 
   call PrepPhotosynthesis(NZ,CH2O,TFN1,TFN2,TFNE,XKO2L)
 !
@@ -693,6 +879,7 @@
     RSX=RSMHs1(NZ)*1.56_r8
   ENDIF
   RSMNs1(NZ)=AMIN1(RSMHs1(NZ),AMAX1(RSMY,RSX*0.641_r8))
+  end associate
   end subroutine PhotoActivePFT
 
 end module stomatesMod

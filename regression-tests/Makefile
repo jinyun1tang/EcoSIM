@@ -1,16 +1,8 @@
 # FIXME(bja, 201604) need to stop using a hard coded path. Maybe
 # switch to some sort of cmake-ified out of source tests.
-F90        = not-set
 compiler   = not-set
-ifeq ($(F90), not-set)
-ECOSYS = ../local/bin/ecosim.x
-else
-ifeq ($(F90), 1)
-	ECOSYS = ../local/bin/ecosim.f90.x
-else
-	ECOSYS = ../local/bin/ecosim.x
-endif
-endif
+
+ECOSIM = ../local/bin/ecosim.f90.x
 ifeq ($(compiler), not-set)
 COMPILER=intel
 else
@@ -19,7 +11,7 @@ endif
 
 RTEST = ./rtest_ecosim.py
 RTEST_ARGS = --backtrace
-RTEST_ARGS += --executable $(ECOSYS)
+RTEST_ARGS += --executable $(ECOSIM)
 
 COVERAGERC = --rcfile mtest/.coveragerc
 COVERAGE_RUN_FLAGS = $(COVERAGERC) -m unittest discover

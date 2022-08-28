@@ -58,6 +58,8 @@ module SOMDataType
   real(r8),allocatable ::  UNH4(:,:)                         !total soil NH4 + NH3 content, [g d-2]
   real(r8),allocatable ::  UNO3(:,:)                         !total soil NO3 + NO2 content, [g d-2]
   real(r8),allocatable ::  UPO4(:,:)                         !total soil PO4 content, [g d-2]
+  REAL(R8),ALLOCATABLE ::  OMCL(:,:,:)
+  REAL(R8),ALLOCATABLE ::  OMNL(:,:,:)
 
   private :: InitAllocate
   contains
@@ -126,6 +128,8 @@ module SOMDataType
   allocate(UNH4(JY,JX));        UNH4=0._r8
   allocate(UNO3(JY,JX));        UNO3=0._r8
   allocate(UPO4(JY,JX));        UPO4=0._r8
+  ALLOCATE(OMCL(0:JZ,JY,JX));   OMCL=0._r8
+  ALLOCATE(OMNL(0:JZ,JY,JX));   OMNL=0._r8
   end subroutine InitAllocate
 !------------------------------------------------------------------------------------------
 
@@ -185,5 +189,7 @@ module SOMDataType
   if (allocated(UNH4))     deallocate(UNH4)
   if (allocated(UNO3))     deallocate(UNO3)
   if (allocated(UPO4))     deallocate(UPO4)
+  if(allocated(OMCL))   deallocate(OMCL)
+  if(allocated(OMNL)) deallocate(OMNL)
   end subroutine DestructSOMData
 end module SOMDataType

@@ -2,6 +2,7 @@ module Hour1Mod
   use data_kind_mod, only : r8 => SHR_KIND_R8
   use minimathmod  , only : test_aeqb
   use abortutils   , only : endrun, print_info
+  use TracerPropMod
   use EcoSimConst
 !  use CanopyCondMod, only : CanopyConditionModel
   use PlantAPI, only : PlantCanopyRadsModel
@@ -12,6 +13,7 @@ module Hour1Mod
   use CanopyRadDataType
   use EcoSIMSolverPar
   use Hour1Pars
+  use ChemTracerParsMod
   use GridConsts
   use SoilPhysDataType
   use FlagDataType
@@ -275,35 +277,59 @@ module Hour1Mod
 !     gas code:*CO2*=CO2,*OXY*=O2,*CH4*=CH4,*Z2G*=N2,*Z2O*=N2O
 !             :*ZN3*=NH3,*H2G*=H2
 !
+! CSTRR: surface irrigation ion strength, [g m-3]
   DO 9145 NX=NHW,NHE
     DO 9140 NY=NVN,NVS
-      CCO2E(NY,NX)=CO2E(NY,NX)*5.36E-04*TREF/TKA(NY,NX)
-      CCH4E(NY,NX)=CH4E(NY,NX)*5.36E-04*TREF/TKA(NY,NX)
-      COXYE(NY,NX)=OXYE(NY,NX)*1.43E-03*TREF/TKA(NY,NX)
-      CZ2GE(NY,NX)=Z2GE(NY,NX)*1.25E-03*TREF/TKA(NY,NX)
-      CZ2OE(NY,NX)=Z2OE(NY,NX)*1.25E-03*TREF/TKA(NY,NX)
-      CNH3E(NY,NX)=ZNH3E(NY,NX)*6.25E-04*TREF/TKA(NY,NX)
-      CH2GE(NY,NX)=H2GE(NY,NX)*8.92E-05*TREF/TKA(NY,NX)
-      CCOR(NY,NX)=CCO2E(NY,NX)*SCO2X/(EXP(ACO2X*CSTRR(NY,NX))) &
-        *EXP(0.843-0.0281*TCA(NY,NX))
-      CCHR(NY,NX)=CCH4E(NY,NX)*SCH4X/(EXP(ACH4X*CSTRR(NY,NX))) &
-        *EXP(0.597-0.0199*TCA(NY,NX))
-      COXR(NY,NX)=COXYE(NY,NX)*SOXYX/(EXP(AOXYX*CSTRR(NY,NX))) &
-        *EXP(0.516-0.0172*TCA(NY,NX))
-      CNNR(NY,NX)=CZ2GE(NY,NX)*SN2GX/(EXP(AN2GX*CSTRR(NY,NX))) &
-        *EXP(0.456-0.0152*TCA(NY,NX))
-      CN2R(NY,NX)=CZ2OE(NY,NX)*SN2OX/(EXP(AN2OX*CSTRR(NY,NX))) &
-        *EXP(0.897-0.0299*TCA(NY,NX))
-      CCOQ(NY,NX)=CCO2E(NY,NX)*SCO2X/(EXP(ACO2X*CSTRQ(I,NY,NX))) &
-        *EXP(0.843-0.0281*TCA(NY,NX))
-      CCHQ(NY,NX)=CCH4E(NY,NX)*SCH4X/(EXP(ACH4X*CSTRQ(I,NY,NX))) &
-        *EXP(0.597-0.0199*TCA(NY,NX))
-      COXQ(NY,NX)=COXYE(NY,NX)*SOXYX/(EXP(AOXYX*CSTRQ(I,NY,NX))) &
-        *EXP(0.516-0.0172*TCA(NY,NX))
-      CNNQ(NY,NX)=CZ2GE(NY,NX)*SN2GX/(EXP(AN2GX*CSTRQ(I,NY,NX))) &
-        *EXP(0.456-0.0152*TCA(NY,NX))
-      CN2Q(NY,NX)=CZ2OE(NY,NX)*SN2OX/(EXP(AN2OX*CSTRQ(I,NY,NX))) &
-        *EXP(0.897-0.0299*TCA(NY,NX))
+      CCO2E(NY,NX)=CO2E(NY,NX)*5.36E-04*TREF/TKA(NY,NX)  !gC/m3
+      CCH4E(NY,NX)=CH4E(NY,NX)*5.36E-04*TREF/TKA(NY,NX)  !gC/m3
+      COXYE(NY,NX)=OXYE(NY,NX)*1.43E-03*TREF/TKA(NY,NX)  !gO/m3
+      CZ2GE(NY,NX)=Z2GE(NY,NX)*1.25E-03*TREF/TKA(NY,NX)  !gN/m3
+      CZ2OE(NY,NX)=Z2OE(NY,NX)*1.25E-03*TREF/TKA(NY,NX)  !gN/m3
+      CNH3E(NY,NX)=ZNH3E(NY,NX)*6.25E-04*TREF/TKA(NY,NX) !gN/m3
+      CH2GE(NY,NX)=H2GE(NY,NX)*8.92E-05*TREF/TKA(NY,NX)  !gH/m3
+      CCOR(NY,NX)=CCO2E(NY,NX)*gas_solubility(id_co2g,TCA(NY,NX)) &
+         /(EXP(ACO2X*CSTRR(NY,NX)))
+      CCHR(NY,NX)=CCH4E(NY,NX)*gas_solubility(id_ch4g,TCA(NY,NX)) &
+        /(EXP(ACH4X*CSTRR(NY,NX)))
+      COXR(NY,NX)=COXYE(NY,NX)*gas_solubility(id_o2g, TCA(NY,NX)) &
+        /(EXP(AOXYX*CSTRR(NY,NX)))
+      CNNR(NY,NX)=CZ2GE(NY,NX)*gas_solubility(id_n2g, TCA(NY,NX)) &
+        /(EXP(AN2GX*CSTRR(NY,NX)))
+      CN2R(NY,NX)=CZ2OE(NY,NX)*gas_solubility(id_n2og, TCA(NY,NX)) &
+        /(EXP(AN2OX*CSTRR(NY,NX)))
+      CCOQ(NY,NX)=CCO2E(NY,NX)*gas_solubility(id_co2g, TCA(NY,NX)) &
+        /(EXP(ACO2X*CSTRQ(I,NY,NX)))
+      CCHQ(NY,NX)=CCH4E(NY,NX)*gas_solubility(id_ch4g, TCA(NY,NX)) &
+        /(EXP(ACH4X*CSTRQ(I,NY,NX)))
+      COXQ(NY,NX)=COXYE(NY,NX)*gas_solubility(id_o2g, TCA(NY,NX)) &
+        /(EXP(AOXYX*CSTRQ(I,NY,NX)))
+      CNNQ(NY,NX)=CZ2GE(NY,NX)*gas_solubility(id_n2g, TCA(NY,NX)) &
+        /(EXP(AN2GX*CSTRQ(I,NY,NX)))
+      CN2Q(NY,NX)=CZ2OE(NY,NX)*gas_solubility(id_n2og, TCA(NY,NX)) &
+        /(EXP(AN2OX*CSTRQ(I,NY,NX)))
+
+
+!      CCOR(NY,NX)=CCO2E(NY,NX)*SCO2X/(EXP(ACO2X*CSTRR(NY,NX))) &
+!        *EXP(0.843-0.0281*TCA(NY,NX))
+!      CCHR(NY,NX)=CCH4E(NY,NX)*SCH4X/(EXP(ACH4X*CSTRR(NY,NX))) &
+!        *EXP(0.597-0.0199*TCA(NY,NX))
+!      COXR(NY,NX)=COXYE(NY,NX)*SOXYX/(EXP(AOXYX*CSTRR(NY,NX))) &
+!        *EXP(0.516-0.0172*TCA(NY,NX))
+!      CNNR(NY,NX)=CZ2GE(NY,NX)*SN2GX/(EXP(AN2GX*CSTRR(NY,NX))) &
+!        *EXP(0.456-0.0152*TCA(NY,NX))
+!      CN2R(NY,NX)=CZ2OE(NY,NX)*SN2OX/(EXP(AN2OX*CSTRR(NY,NX))) &
+!        *EXP(0.897-0.0299*TCA(NY,NX))
+!      CCOQ(NY,NX)=CCO2E(NY,NX)*SCO2X/(EXP(ACO2X*CSTRQ(I,NY,NX))) &
+!        *EXP(0.843-0.0281*TCA(NY,NX))
+!      CCHQ(NY,NX)=CCH4E(NY,NX)*SCH4X/(EXP(ACH4X*CSTRQ(I,NY,NX))) &
+!        *EXP(0.597-0.0199*TCA(NY,NX))
+!      COXQ(NY,NX)=COXYE(NY,NX)*SOXYX/(EXP(AOXYX*CSTRQ(I,NY,NX))) &
+!        *EXP(0.516-0.0172*TCA(NY,NX))
+!      CNNQ(NY,NX)=CZ2GE(NY,NX)*SN2GX/(EXP(AN2GX*CSTRQ(I,NY,NX))) &
+!        *EXP(0.456-0.0152*TCA(NY,NX))
+!      CN2Q(NY,NX)=CZ2OE(NY,NX)*SN2OX/(EXP(AN2OX*CSTRQ(I,NY,NX))) &
+!        *EXP(0.897-0.0299*TCA(NY,NX))
+
 9140  CONTINUE
 9145  CONTINUE
   end subroutine SetAtmosTracerConcentration
@@ -1751,13 +1777,13 @@ module Hour1Mod
   CNO3B(0,NY,NX)=0.0_r8
   CNO2B(0,NY,NX)=0.0_r8
   CH2P4B(0,NY,NX)=0.0_r8
-  SCO2L(0,NY,NX)=SCO2X*EXP(0.843-0.0281*TCS(0,NY,NX))
-  SCH4L(0,NY,NX)=SCH4X*EXP(0.597-0.0199*TCS(0,NY,NX))
-  SOXYL(0,NY,NX)=SOXYX*EXP(0.516-0.0172*TCS(0,NY,NX))
-  SN2GL(0,NY,NX)=SN2GX*EXP(0.456-0.0152*TCS(0,NY,NX))
-  SN2OL(0,NY,NX)=SN2OX*EXP(0.897-0.0299*TCS(0,NY,NX))
-  SNH3L(0,NY,NX)=SNH3X*EXP(0.513-0.0171*TCS(0,NY,NX))
-  SH2GL(0,NY,NX)=SH2GX*EXP(0.597-0.0199*TCS(0,NY,NX))
+  SCO2L(0,NY,NX)=gas_solubility(id_co2g,TCS(0,NY,NX))
+  SCH4L(0,NY,NX)=gas_solubility(id_ch4g,TCS(0,NY,NX))
+  SOXYL(0,NY,NX)=gas_solubility(id_o2g,TCS(0,NY,NX))
+  SN2GL(0,NY,NX)=gas_solubility(id_n2g,TCS(0,NY,NX))
+  SN2OL(0,NY,NX)=gas_solubility(id_n2og,TCS(0,NY,NX))
+  SNH3L(0,NY,NX)=gas_solubility(id_nh3g,TCS(0,NY,NX))
+  SH2GL(0,NY,NX)=gas_solubility(id_h2g,TCS(0,NY,NX))
   IF(VOLW(0,NY,NX).GT.ZEROS2(NY,NX))THEN
     CCO2S(0,NY,NX)=AMAX1(0.0,CO2S(0,NY,NX)/VOLW(0,NY,NX))
     CCH4S(0,NY,NX)=AMAX1(0.0,CH4S(0,NY,NX)/VOLW(0,NY,NX))
@@ -2088,22 +2114,38 @@ module Hour1Mod
 !
 ! S*L=solubility of gas in water
 ! TCS=soil temperature (oC)
-!
+! 5.56E+04_r8 := mole H2O / m3
     FH2O=5.56E+04_r8/(5.56E+04_r8+CION(L,NY,NX))
-    SCO2L(L,NY,NX)=SCO2X/(EXP(ACO2X*CSTR(L,NY,NX))) &
-      *EXP(0.843_r8-0.0281_r8*TCS(L,NY,NX))*FH2O
-    SCH4L(L,NY,NX)=SCH4X/(EXP(ACH4X*CSTR(L,NY,NX))) &
-      *EXP(0.597_r8-0.0199_r8*TCS(L,NY,NX))*FH2O
-    SOXYL(L,NY,NX)=SOXYX/(EXP(AOXYX*CSTR(L,NY,NX))) &
-      *EXP(0.516_r8-0.0172_r8*TCS(L,NY,NX))*FH2O
-    SN2GL(L,NY,NX)=SN2GX/(EXP(AN2GX*CSTR(L,NY,NX))) &
-      *EXP(0.456_r8-0.0152_r8*TCS(L,NY,NX))*FH2O
-    SN2OL(L,NY,NX)=SN2OX/(EXP(AN2OX*CSTR(L,NY,NX))) &
-      *EXP(0.897_r8-0.0299_r8*TCS(L,NY,NX))*FH2O
-    SNH3L(L,NY,NX)=SNH3X/(EXP(ANH3X*CSTR(L,NY,NX))) &
-      *EXP(0.513_r8-0.0171_r8*TCS(L,NY,NX))*FH2O
-    SH2GL(L,NY,NX)=SH2GX/(EXP(AH2GX*CSTR(L,NY,NX))) &
-      *EXP(0.597_r8-0.0199_r8*TCS(L,NY,NX))*FH2O
+
+    SCO2L(L,NY,NX)=gas_solubility(id_co2g,TCS(L,NY,NX)) &
+      /(EXP(ACO2X*CSTR(L,NY,NX)))*FH2O
+    SCH4L(L,NY,NX)=gas_solubility(id_ch4g,TCS(L,NY,NX)) &
+      /(EXP(ACH4X*CSTR(L,NY,NX)))*FH2O
+    SOXYL(L,NY,NX)=gas_solubility(id_o2g, TCS(L,NY,NX)) &
+      /(EXP(AOXYX*CSTR(L,NY,NX)))*FH2O
+    SN2GL(L,NY,NX)=gas_solubility(id_n2g, TCS(L,NY,NX)) &
+      /(EXP(AN2GX*CSTR(L,NY,NX)))*FH2O
+    SN2OL(L,NY,NX)=gas_solubility(id_n2og,TCS(L,NY,NX)) &
+      /(EXP(AN2OX*CSTR(L,NY,NX)))*FH2O
+    SNH3L(L,NY,NX)=gas_solubility(id_nh3g,TCS(L,NY,NX)) &
+      /(EXP(ANH3X*CSTR(L,NY,NX)))*FH2O
+    SH2GL(L,NY,NX)=gas_solubility(id_h2g, TCS(L,NY,NX)) &
+      /(EXP(AH2GX*CSTR(L,NY,NX)))*FH2O
+
+!    SCO2L(L,NY,NX)=SCO2X/(EXP(ACO2X*CSTR(L,NY,NX))) &
+!      *EXP(0.843_r8-0.0281_r8*TCS(L,NY,NX))*FH2O
+!    SCH4L(L,NY,NX)=SCH4X/(EXP(ACH4X*CSTR(L,NY,NX))) &
+!      *EXP(0.597_r8-0.0199_r8*TCS(L,NY,NX))*FH2O
+!    SOXYL(L,NY,NX)=SOXYX/(EXP(AOXYX*CSTR(L,NY,NX))) &
+!      *EXP(0.516_r8-0.0172_r8*TCS(L,NY,NX))*FH2O
+!    SN2GL(L,NY,NX)=SN2GX/(EXP(AN2GX*CSTR(L,NY,NX))) &
+!      *EXP(0.456_r8-0.0152_r8*TCS(L,NY,NX))*FH2O
+!    SN2OL(L,NY,NX)=SN2OX/(EXP(AN2OX*CSTR(L,NY,NX))) &
+!      *EXP(0.897_r8-0.0299_r8*TCS(L,NY,NX))*FH2O
+!    SNH3L(L,NY,NX)=SNH3X/(EXP(ANH3X*CSTR(L,NY,NX))) &
+!      *EXP(0.513_r8-0.0171_r8*TCS(L,NY,NX))*FH2O
+!    SH2GL(L,NY,NX)=SH2GX/(EXP(AH2GX*CSTR(L,NY,NX))) &
+!      *EXP(0.597_r8-0.0199_r8*TCS(L,NY,NX))*FH2O
   ENDDO
   end subroutine PrepVars4PlantMicrobeUptake
 !------------------------------------------------------------------------------------------

@@ -1,5 +1,9 @@
 set(ECOSIM_UTIL_SOURCES
   data_kind_mod.F90
+  data_const_mod.F90
+  shr_assert_mod.F90
+  shr_infnan_mod.F90
+  LinearAlgebraMod.F90
   MiniMathMod.F90
   abortutils.F90
   TestMod.F90
@@ -10,8 +14,14 @@ set(ECOSIM_UTIL_SOURCES
   EcoSIMSolverPar.F90
   EcoSimConst.F90
   EcoSIMConfig.F90
+  ecosim_log_mod.F90
+  ecosim_time_mod.F90
+  MiscUtilMod.F90
+  ModelStatusType.F90
 )
 
+configure_file(shr_assert.h shr_assert.h COPYONLY)
+configure_file(dtypes.h dtypes.h COPYONLY)
 
 include(add_ecosim_library)
 add_ecosim_library(util ${ECOSIM_UTIL_SOURCES})

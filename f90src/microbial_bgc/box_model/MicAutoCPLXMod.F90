@@ -266,6 +266,10 @@ module MicAutoCPLXMod
     RPOBY     => micfor%RPOBY,    &
     RP14Y     => micfor%RP14Y,    &
     RP1BY     => micfor%RP1BY,    &
+    RNH4YU    => micfor%RNH4YU,   &
+    RNO3YU    => micfor%RNO3YU,   &
+    RP14YU    => micfor%RP14YU,   &
+    RPO4YU    => micfor%RPO4YU,   &
     ROQCY     => micfor%ROQCY,    &
     ROQAY     => micfor%ROQAY,    &
     BKVL0     => micfor%BKVL0,   &
@@ -359,23 +363,23 @@ module MicAutoCPLXMod
 ! previous hour in surface litter, labels as for soil layers above
 !
   IF(litrm)THEN
-    IF(RNH4Y.GT.ZEROS)THEN
-      FNH4XRff(NGL,N)=AMAX1(FMN,RINHORff(NGL,N)/RNH4Y)
+    IF(RNH4YU.GT.ZEROS)THEN
+      FNH4XRff(NGL,N)=AMAX1(FMN,RINHORff(NGL,N)/RNH4YU)
     ELSE
       FNH4XRff(NGL,N)=AMAX1(FMN,FOMKff(NGL,N))
     ENDIF
-    IF(RNO3Y.GT.ZEROS)THEN
-      FNO3XRff(NGL,N)=AMAX1(FMN,RINOORff(NGL,N)/RNO3Y)
+    IF(RNO3YU.GT.ZEROS)THEN
+      FNO3XRff(NGL,N)=AMAX1(FMN,RINOORff(NGL,N)/RNO3YU)
     ELSE
       FNO3XRff(NGL,N)=AMAX1(FMN,FOMKff(NGL,N))
     ENDIF
-    IF(RPO4Y.GT.ZEROS)THEN
-      FPO4XRff(NGL,N)=AMAX1(FMN,RIPOORff(NGL,N)/RPO4Y)
+    IF(RPO4YU.GT.ZEROS)THEN
+      FPO4XRff(NGL,N)=AMAX1(FMN,RIPOORff(NGL,N)/RPO4YU)
     ELSE
       FPO4XRff(NGL,N)=AMAX1(FMN,FOMKff(NGL,N))
     ENDIF
-    IF(RP14Y.GT.ZEROS)THEN
-      FP14XRff(NGL,N)=AMAX1(FMN,RIPO1Rff(NGL,N)/RP14Y)
+    IF(RP14YU.GT.ZEROS)THEN
+      FP14XRff(NGL,N)=AMAX1(FMN,RIPO1Rff(NGL,N)/RP14YU)
     ELSE
       FP14XRff(NGL,N)=AMAX1(FMN,FOMKff(NGL,N))
     ENDIF

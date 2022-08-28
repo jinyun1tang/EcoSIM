@@ -6,6 +6,7 @@ set(BALANCES_MOD_SOURCES
   RunoffBalMod.F90
   ErosionBalMod.F90
 	RedistMod.F90
+  TillageMixMod.F90
 )
 include_directories(${CMAKE_BINARY_DIR}/f90src/utils/)
 include_directories(${CMAKE_BINARY_DIR}/f90src/ecosim_datatype/)

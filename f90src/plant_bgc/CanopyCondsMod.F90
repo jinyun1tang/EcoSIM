@@ -43,6 +43,28 @@ module CanopyCondsMod
   real(r8) :: ZX,ZY,ZE
   REAL(R8) :: ZZ
 !     begin_execution
+  associate(                          &
+    UAs1      => plt_site%UAs1      , &
+    ZEROs1    => plt_site%ZEROs1    , &
+    AREA3s1   => plt_site%AREA3s1   , &
+    IETYPs1   => plt_site%IETYPs1   , &
+    ZSs1      => plt_site%ZSs1      , &
+    Z0s1      => plt_site%Z0s1      , &
+    ZEROSs1   => plt_site%ZEROSs1   , &
+    NUs1      => plt_site%NUs1      , &
+    RABs1     => plt_ew%RABs1       , &
+    ZDs1      => plt_ew%ZDs1        , &
+    ZRs1      => plt_ew%ZRs1        , &
+    RIBs1     => plt_ew%RIBs1       , &
+    TKAs1     => plt_ew%TKAs1       , &
+    VHCPWXs1  => plt_ew%VHCPWXs1    , &
+    DPTHSs1   => plt_ew%DPTHSs1     , &
+    VHCPW1s1  => plt_ew%VHCPW1s1    , &
+    ZTs1      => plt_morph%ZTs1     , &
+    IRTYPs1   => plt_morph%IRTYPs1  , &
+    ARSTCs1   => plt_morph%ARSTCs1  , &
+    ARLFCs1   => plt_morph%ARLFCs1    &
+  )
 !     CANOPY ZERO PLANE AND ROUGHNESS HEIGHTS
 !
 !     ARLFC,ARSTC=leaf,stalk area of combined canopy
@@ -84,8 +106,9 @@ module CanopyCondsMod
     RIBs1=1.27E+08*(ZZ-ZRs1)/(UAs1**2*TKAs1)
   ELSE
     RABs1=RAM
-    RIBs1=0.0
+    RIBs1=0.0_r8
   ENDIF
+  end associate
   end subroutine CalcBoundaryLayerProperties
 
 !------------------------------------------------------------------------------------------
@@ -99,6 +122,17 @@ module CanopyCondsMod
   real(r8) :: DZL
   integer :: NZ,L
   !     begin_execution
+  associate(                          &
+    NPs1      => plt_site%NPs1      , &
+    ZEROSs1   => plt_site%ZEROSs1   , &
+    ZTs1      => plt_morph%ZTs1     , &
+    ZLs1      => plt_morph%ZLs1     , &
+    ZCs1      => plt_morph%ZCs1     , &
+    ARSTTs1   => plt_morph%ARSTTs1  , &
+    ARLFTs1   => plt_morph%ARLFTs1  , &
+    ARSTCs1   => plt_morph%ARSTCs1  , &
+    ARLFCs1   => plt_morph%ARLFCs1    &
+  )
   !
   !     DIVISION OF CANOPY INTO JC LAYERS WITH EQUAL LAI
   !
@@ -139,6 +173,7 @@ module CanopyCondsMod
 !    2,ZLs1(L-1)))
 2770  CONTINUE
   ENDIF
+  end associate
   end subroutine DivideCanopyLayerByLAI
 
 !------------------------------------------------------------------------------------------
@@ -216,6 +251,71 @@ module CanopyCondsMod
   !     RADC,RADP=total SW,PAR absorbed by canopy
   !     CFX=clumping factor for self-shading
   !
+  associate(                       &
+    VHCPW1s1  => plt_ew%VHCPW1s1 , &
+    VOLISs1   => plt_ew%VOLISs1  , &
+    VOLSSs1   => plt_ew%VOLSSs1  , &
+    VOLWSs1   => plt_ew%VOLWSs1  , &
+    VHCPWXs1  => plt_ew%VHCPWXs1 , &
+    DPTHSs1   => plt_ew%DPTHSs1  , &
+    ALBRs1    => plt_rad%ALBRs1  , &
+    ALBSs1    => plt_rad%ALBSs1  , &
+    ALBXs1    => plt_rad%ALBXs1  , &
+    ALBPs1    => plt_rad%ALBPs1  , &
+    FRADGs1   => plt_rad%FRADGs1 , &
+    GAZIs1    => plt_rad%GAZIs1  , &
+    GCOSs1    => plt_rad%GCOSs1  , &
+    GSINs1    => plt_rad%GSINs1  , &
+    IALBYs1   => plt_rad%IALBYs1 , &
+    OMEGAs1   => plt_rad%OMEGAs1 , &
+    FRADPs1   => plt_rad%FRADPs1 , &
+    PARs1     => plt_rad%PARs1   , &
+    PARDIFs1  => plt_rad%PARDIFs1, &
+    OMEGAGs1  => plt_rad%OMEGAGs1   , &
+    OMEGXs1   => plt_rad%OMEGXs1    , &
+    RAD0s1    => plt_rad%RAD0s1     , &
+    RADGs1    => plt_rad%RADGs1     , &
+    RADSs1    => plt_rad%RADSs1     , &
+    RAP0s1    => plt_rad%RAP0s1     , &
+    RADCs1    => plt_rad%RADCs1     , &
+    RAPYs1    => plt_rad%RAPYs1     , &
+    RAPSs1    => plt_rad%RAPSs1     , &
+    RADYs1    => plt_rad%RADYs1     , &
+    RAD1s1    => plt_rad%RAD1s1     , &
+    SSINs1    => plt_rad%SSINs1     , &
+    TYSINs1   => plt_rad%TYSINs1    , &
+    TAU0s1    => plt_rad%TAU0s1     , &
+    TAUSs1    => plt_rad%TAUSs1     , &
+    ZSINs1    => plt_rad%ZSINs1     , &
+    ABSPs1    => plt_rad%ABSPs1     , &
+    ABSRs1    => plt_rad%ABSRs1     , &
+    TAUPs1    => plt_rad%TAUPs1     , &
+    TAURs1    => plt_rad%TAURs1     , &
+    RADPs1    => plt_rad%RADPs1     , &
+    ZCOSs1    => plt_rad%ZCOSs1     , &
+    ZEROSs1   => plt_site%ZEROSs1   , &
+    NUs1      => plt_site%NUs1      , &
+    AREA3s1   => plt_site%AREA3s1   , &
+    NPs1      => plt_site%NPs1      , &
+    ZEROs1    => plt_site%ZEROs1    , &
+    ZEROS2s1  => plt_site%ZEROS2s1  , &
+    POROS1s1  => plt_site%POROS1s1  , &
+    ZNOONs1   => plt_site%ZNOONs1   , &
+    VOLXs1    => plt_soilchem%VOLXs1, &
+    VOLYs1    => plt_soilchem%VOLYs1, &
+    VOLWs1    => plt_soilchem%VOLWs1, &
+    CFXs1     => plt_morph%CFXs1    , &
+    ZLs1      => plt_morph%ZLs1     , &
+    NBRs1     => plt_morph%NBRs1    , &
+    SURFs1    => plt_morph%SURFs1   , &
+    SURFBs1   => plt_morph%SURFBs1  , &
+    ARLFPs1   => plt_morph%ARLFPs1  , &
+    ARLFLs1   => plt_morph%ARLFLs1  , &
+    ARSTKs1   => plt_morph%ARSTKs1  , &
+    ARLFSs1   => plt_morph%ARLFSs1  , &
+    CFs1      => plt_morph%CFs1     , &
+    ARLSSs1   => plt_morph%ARLSSs1    &
+  )
   ARLSSs1=0.0
   DO 1135 NZ=1,NPs1
     ARLFSs1(NZ)=0.0
@@ -239,15 +339,15 @@ module CanopyCondsMod
     RAD0s1=RADSs1*SSINs1+RADYs1*TYSINs1
     RAP0s1=RAPSs1*SSINs1+RAPYs1*TYSINs1
   ELSE
-    RADSs1=0.0
-    RADYs1=0.0
-    RAPSs1=0.0
-    RAPYs1=0.0
-    RAD0s1=0.0
-    RAP0s1=0.0
+    RADSs1=0.0_r8
+    RADYs1=0.0_r8
+    RAPSs1=0.0_r8
+    RAPYs1=0.0_r8
+    RAD0s1=0.0_r8
+    RAP0s1=0.0_r8
   ENDIF
-  TRADC=0.0
-  TRAPC=0.0
+  TRADC=0.0_r8
+  TRAPC=0.0_r8
   DO 1025 NZ=1,NPs1
     RADCs1(NZ)=0.0
     RADPs1(NZ)=0.0
@@ -605,10 +705,8 @@ module CanopyCondsMod
             RA2WT=RADW2(NZ)+RAYW2(NZ)
             RA2PT=RADP2(NZ)+RAYP2(NZ)
             RA2QT=RADQ2(NZ)+RAYQ2(NZ)
-            RAFSL(L)=RAFSL(L)+(RADST*TAURs1(NZ) &
-              +RA2ST*ALBRs1(NZ)+RA2WT*ALBRW)*YAREA
-            RAFPL(L)=RAFPL(L)+(RADPT*TAUPs1(NZ) &
-              +RA2PT*ALBPs1(NZ)+RA2QT*ALBPW)*YAREA
+            RAFSL(L)=RAFSL(L)+(RADST*TAURs1(NZ)+RA2ST*ALBRs1(NZ)+RA2WT*ALBRW)*YAREA
+            RAFPL(L)=RAFPL(L)+(RADPT*TAUPs1(NZ)+RA2PT*ALBPs1(NZ)+RA2QT*ALBPW)*YAREA
             RABSL(L)=RABSL(L)+(RA1ST*ALBRs1(NZ)+RA1WT*ALBRW)*YAREA
             RABPL(L)=RABPL(L)+(RA1PT*ALBPs1(NZ)+RA1QT*ALBPW)*YAREA
             RADCs1(NZ)=RADCs1(NZ)+RADST+RADWT
@@ -779,5 +877,6 @@ module CanopyCondsMod
       FRADPs1(NZ)=0.0
 146 CONTINUE
   ENDIF
+  end associate
   end subroutine MultiLayerSurfaceRadiation
 end module CanopyCondsMod

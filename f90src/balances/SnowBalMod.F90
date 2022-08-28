@@ -101,9 +101,12 @@ implicit none
     VHCP(NUM(NY,NX),NY,NX)=VHCM(NUM(NY,NX),NY,NX) &
       +cpw*(VOLW(NUM(NY,NX),NY,NX)+VOLWH(NUM(NY,NX),NY,NX)) &
       +cpi*(VOLI(NUM(NY,NX),NY,NX)+VOLIH(NUM(NY,NX),NY,NX))
-    TKSX=TKS(NUM(NY,NX),NY,NX)
     IF(VHCP(NUM(NY,NX),NY,NX).GT.ZEROS(NY,NX))THEN
+      TKSX=TKS(NUM(NY,NX),NY,NX)
       TKS(NUM(NY,NX),NY,NX)=(ENGY+HFLWS)/VHCP(NUM(NY,NX),NY,NX)
+      if(abs(TKS(NUM(NY,NX),NY,NX)/tksx-1._r8)>0.025_r8)then
+        TKS(NUM(NY,NX),NY,NX)=TKSX
+      endif
     ELSE
       TKS(NUM(NY,NX),NY,NX)=TKA(NY,NX)
     ENDIF

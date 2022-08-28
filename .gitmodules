@@ -1,0 +1,18 @@
+[submodule "3rd-partylibs/hdf5"]
+	path = 3rd-partylibs/hdf5
+	url = https://github.com/jinyun1tang/hdf5.git
+[submodule "3rd-partylibs/netcdf-c"]
+	path = 3rd-partylibs/netcdf-c
+	url = https://github.com/jinyun1tang/netcdf-c.git
+[submodule "3rd-partylibs/netcdf-fortran"]
+	path = 3rd-partylibs/netcdf-fortran
+	url = https://github.com/jinyun1tang/netcdf-fortran.git
+[submodule "3rd-partylibs/zlib"]
+	path = 3rd-partylibs/zlib
+	url = https://github.com/jinyun1tang/zlib.git
+[submodule "3rd-partylibs/curl"]
+	path = 3rd-partylibs/curl
+	url = https://github.com/jinyun1tang/curl.git
+[submodule "3rd-partylibs/c-blosc"]
+	path = 3rd-partylibs/c-blosc
+	url = https://github.com/jinyun1tang/c-blosc.git

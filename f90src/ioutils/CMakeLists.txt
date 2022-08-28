@@ -13,6 +13,8 @@ set(IOUTILS_SOURCES
 	wouts.F90
 	splitp.c
 	splits.c
+  ncdio_pio.F90
+  histMod.F90
 	)
 include_directories(${CMAKE_BINARY_DIR}/f90src/utils/)
 include_directories(${CMAKE_BINARY_DIR}/f90src/ecosim_datatype/)

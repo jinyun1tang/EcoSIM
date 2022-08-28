@@ -1,6 +1,9 @@
 module TestMod
+! DESCRIPTION
+! codes to do regression tests
   use data_kind_mod, only : r8 => SHR_KIND_R8
-  use abortutils, only : endrun  
+  use abortutils, only : endrun
+  use fileUtil, only : error_errmsg_len
 implicit none
 
   private
@@ -10,7 +13,6 @@ implicit none
   save
 
   integer, parameter :: ecosys_filename_length=256
-  integer, parameter :: error_errmsg_len=256
 
   integer, parameter :: stdout = 6
   integer, parameter :: ecosim_var_name_length = 36

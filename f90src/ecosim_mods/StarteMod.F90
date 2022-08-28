@@ -2,6 +2,7 @@ module StarteMod
   use data_kind_mod, only : r8 => SHR_KIND_R8
   use minimathmod, only : test_aeqb
   use SOMDataType
+  use TracerPropMod
   use ChemTranspDataType
   use GridConsts
   use FlagDataType
@@ -23,6 +24,7 @@ module StarteMod
   use InitSoluteMod
   use SoluteParMod
   use SoluteChemDataType, only : solutedtype
+  use ChemTracerParsMod
   implicit none
 
   private
@@ -39,8 +41,7 @@ module StarteMod
   implicit none
   integer, intent(in) :: NHW,NHE,NVN,NVS
   type(solutedtype)  :: solutevar
-  REAL(R8) :: PH1,BKVLX
-  real(r8) :: CNOX,CPOX
+  REAL(R8) :: BKVLX
 !     begin_execution
 !
 !     INITIALIZE CATION AND ANION CONCENTRATIONS
@@ -54,35 +55,16 @@ module StarteMod
       solutevar%COXYM=COXYE(NY,NX)/32.0_r8
       solutevar%CZ2GM=CZ2GE(NY,NX)/14.0_r8
       solutevar%CZ2OM=CZ2OE(NY,NX)/14.0_r8
+      solutevar%ATCA  = ATCA(NY,NX)
+      solutevar%ZEROS = ZEROS(NY,NX)
+
       DO I=1,366
         DO  L=NU(NY,NX),NL(NY,NX)
           DO K=1,3
             BKVLX=0._r8
 !
-!     INITIALIZE RAINFALL
-!
-            IF(K.EQ.1.AND.I.EQ.1.AND.L.EQ.1)THEN
-              PH1=PHR(NY,NX)
-              solutevar%CHY1=10.0_r8**(-(PHR(NY,NX)-3.0_r8))
-              solutevar%COH1=DPH2O/solutevar%CHY1
-              solutevar%CN4Z=CN4R(NY,NX)
-              solutevar%CNOZ=CNOR(NY,NX)
-              solutevar%CPOZ=CPOR(NY,NX)
-              solutevar%CALZ=CALR(NY,NX)
-              solutevar%CFEZ=CFER(NY,NX)
-              solutevar%CCAZ=CCAR(NY,NX)
-              solutevar%CMGZ=CMGR(NY,NX)
-              solutevar%CNAZ=CNAR(NY,NX)
-              solutevar%CKAZ=CKAR(NY,NX)
-              solutevar%CSOZ=CSOR(NY,NX)
-              solutevar%CCLZ=CCLR(NY,NX)
-!
+            IF(K.EQ.2.AND.L.EQ.1)THEN
 !     INITIALIZE IRRIGATION WATER
-!
-            ELSEIF(K.EQ.2.AND.L.EQ.1)THEN
-              PH1=PHQ(I,NY,NX)
-              solutevar%CHY1=10.0_r8**(-(PHQ(I,NY,NX)-3.0_r8))
-              solutevar%COH1=DPH2O/solutevar%CHY1
               solutevar%CN4Z=CN4Q(I,NY,NX)
               solutevar%CNOZ=CNOQ(I,NY,NX)
               solutevar%CPOZ=CPOQ(I,NY,NX)
@@ -94,54 +76,88 @@ module StarteMod
               solutevar%CKAZ=CKAQ(I,NY,NX)
               solutevar%CSOZ=CSOQ(I,NY,NX)
               solutevar%CCLZ=CCLQ(I,NY,NX)
+              solutevar%CHY1=10.0_r8**(-(PHQ(I,NY,NX)-3.0_r8))
+              solutevar%COH1=DPH2O/solutevar%CHY1
+            ELSE
+              IF(I.EQ.1)then
+                IF(K.EQ.1.AND.L.EQ.1)THEN
+!!     INITIALIZE RAINFALL
+                  solutevar%CHY1=10.0_r8**(-(PHR(NY,NX)-3.0_r8))
+                  solutevar%COH1=DPH2O/solutevar%CHY1
+                  solutevar%CN4Z=CN4R(NY,NX)
+                  solutevar%CNOZ=CNOR(NY,NX)
+                  solutevar%CPOZ=CPOR(NY,NX)
+                  solutevar%CALZ=CALR(NY,NX)
+                  solutevar%CFEZ=CFER(NY,NX)
+                  solutevar%CCAZ=CCAR(NY,NX)
+                  solutevar%CMGZ=CMGR(NY,NX)
+                  solutevar%CNAZ=CNAR(NY,NX)
+                  solutevar%CKAZ=CKAR(NY,NX)
+                  solutevar%CSOZ=CSOR(NY,NX)
+                  solutevar%CCLZ=CCLR(NY,NX)
+!               ELSEIF(K.EQ.3.AND.(.not.is_restart_run).AND.is_first_year)THEN
 !
 !     INITIALIZE SOIL WATER
-!
-            ELSEIF(K.EQ.3.AND.I.EQ.1.AND.(.not.is_restart_run).AND.is_first_year)THEN
-              IF(BKVL(L,NY,NX).GT.ZEROS(NY,NX))THEN
-                BKVLX=BKVL(L,NY,NX)
+
+                  IF(BKVL(L,NY,NX).GT.ZEROS(NY,NX))THEN
+                    BKVLX=BKVL(L,NY,NX)
+                  ELSE
+                    BKVLX=VOLA(L,NY,NX)
+                  ENDIF
+                  XCEC(L,NY,NX)=AMAX1(CNH4(L,NY,NX),CEC(L,NY,NX))*BKVLX
+                  XAEC(L,NY,NX)=AMAX1(CPO4(L,NY,NX),AEC(L,NY,NX))*BKVLX
+                  solutevar%CN4X=CNH4(L,NY,NX)
+                  solutevar%CALX=CAL(L,NY,NX)
+                  solutevar%CFEX=CFE(L,NY,NX)
+                  solutevar%CCAX=CCA(L,NY,NX)
+                  solutevar%CMGX=CMG(L,NY,NX)
+                  solutevar%CNAX=CNA(L,NY,NX)
+                  solutevar%CKAX=CKA(L,NY,NX)
+                  solutevar%CSOX=CSO4(L,NY,NX)
+                  solutevar%CCLX=CCL(L,NY,NX)
+                  solutevar%CALPOX=CALPO(L,NY,NX)
+                  solutevar%CFEPOX=CFEPO(L,NY,NX)
+                  solutevar%CCAPDX=CCAPD(L,NY,NX)
+                  solutevar%CCAPHX=CCAPH(L,NY,NX)
+                  solutevar%CALOHX=CALOH(L,NY,NX)
+                  solutevar%CFEOHX=CFEOH(L,NY,NX)
+                  solutevar%CCACOX=CCACO(L,NY,NX)
+                  solutevar%CCASOX=CCASO(L,NY,NX)
+                  solutevar%CHY1=10.0_r8**(-(PH(L,NY,NX)-3.0_r8))
+                  solutevar%CNOZ=CNO3(L,NY,NX)
+                  solutevar%CPOZ=CPO4(L,NY,NX)
+                  solutevar%COH1=DPH2O/solutevar%CHY1
+                  solutevar%CN4Z=solutevar%CN4X
+                  solutevar%CALZ=solutevar%CALX
+                  solutevar%CFEZ=solutevar%CFEX
+                  solutevar%CCAZ=solutevar%CCAX
+                  solutevar%CMGZ=solutevar%CMGX
+                  solutevar%CNAZ=solutevar%CNAX
+                  solutevar%CKAZ=solutevar%CKAX
+                  solutevar%CSOZ=solutevar%CSOX
+                  solutevar%CCLZ=solutevar%CCLX
+                ELSE
+                  cycle
+                ENDIF
               ELSE
-                BKVLX=VOLA(L,NY,NX)
+                cycle
               ENDIF
-              solutevar%CN4X=CNH4(L,NY,NX)
-              CNOX=CNO3(L,NY,NX)
-              CPOX=CPO4(L,NY,NX)
-              solutevar%CALX=CAL(L,NY,NX)
-              solutevar%CFEX=CFE(L,NY,NX)
-              solutevar%CCAX=CCA(L,NY,NX)
-              solutevar%CMGX=CMG(L,NY,NX)
-              solutevar%CNAX=CNA(L,NY,NX)
-              solutevar%CKAX=CKA(L,NY,NX)
-              solutevar%CSOX=CSO4(L,NY,NX)
-              solutevar%CCLX=CCL(L,NY,NX)
-              solutevar%CALPOX=CALPO(L,NY,NX)
-              solutevar%CFEPOX=CFEPO(L,NY,NX)
-              solutevar%CCAPDX=CCAPD(L,NY,NX)
-              solutevar%CCAPHX=CCAPH(L,NY,NX)
-              solutevar%CALOHX=CALOH(L,NY,NX)
-              solutevar%CFEOHX=CFEOH(L,NY,NX)
-              solutevar%CCACOX=CCACO(L,NY,NX)
-              solutevar%CCASOX=CCASO(L,NY,NX)
-              XCEC(L,NY,NX)=AMAX1(solutevar%CN4X,CEC(L,NY,NX))*BKVLX
-              XAEC(L,NY,NX)=AMAX1(CPOX,AEC(L,NY,NX))*BKVLX
-              solutevar%CHY1=10.0_r8**(-(PH(L,NY,NX)-3.0_r8))
-              solutevar%COH1=DPH2O/solutevar%CHY1
-              solutevar%CN4Z=solutevar%CN4X
-              solutevar%CNOZ=CNOX
-              solutevar%CPOZ=CPOX
-              solutevar%CALZ=solutevar%CALX
-              solutevar%CFEZ=solutevar%CFEX
-              solutevar%CCAZ=solutevar%CCAX
-              solutevar%CMGZ=solutevar%CMGX
-              solutevar%CNAZ=solutevar%CNAX
-              solutevar%CKAZ=solutevar%CKAX
-              solutevar%CSOZ=solutevar%CSOX
-              solutevar%CCLZ=solutevar%CCLX
-            ELSE
-              cycle
             ENDIF
 
-            call InitSoluteModel(K,L,NY,NX,BKVLX,solutevar)
+            solutevar%XAEC  = XAEC(L,NY,NX)
+            solutevar%CEC   = CEC(L,NY,NX)
+            solutevar%ORGC  = ORGC(L,NY,NX)
+            solutevar%VLPO4 = VLPO4(L,NY,NX)
+            solutevar%XCEC  = XCEC(L,NY,NX)
+            solutevar%GKC4  = GKC4(L,NY,NX)
+            solutevar%GKCA  = GKCA(L,NY,NX)
+            solutevar%GKCH  = GKCH(L,NY,NX)
+            solutevar%GKCK  = GKCK(L,NY,NX)
+            solutevar%GKCN  = GKCN(L,NY,NX)
+            solutevar%GKCM  = GKCM(L,NY,NX)
+            solutevar%VOLW = VOLW(L,NY,NX)
+
+            call InitSoluteModel(K,BKVLX,ISALTG,solutevar)
 
             call SoluteConcentrations(K,I,L,NY,NX,solutevar)
           ENDDO
@@ -164,7 +180,7 @@ module StarteMod
 !
 !     SOLUTE CONCENTRATIONS IN PRECIPITATION
 !
-  IF(K.EQ.1.AND.I.EQ.1.AND.L.EQ.1)THEN
+  IF(K.EQ.1.AND.L.EQ.1.AND.I.EQ.1)THEN
     CCOR(NY,NX)=solutevar%CCO21
     CCHR(NY,NX)=solutevar%CCH41
     COXR(NY,NX)=solutevar%COXY1
@@ -273,7 +289,8 @@ module StarteMod
     CSTRQ(I,NY,NX)=solutevar%CSTR1
 !
 !     SOLUTE CONCENTRATIONS IN SOIL
-!
+! for the POM complex, on the first day in the first year
+! U means surface irrigation
   ELSEIF(K.EQ.3.AND.I.EQ.1.AND.(.not.is_restart_run).AND.is_first_year)THEN
     CCOU=solutevar%CCO21
     CCHU=solutevar%CCH41
@@ -337,21 +354,21 @@ module StarteMod
     ZNH3G(L,NY,NX)=CNH3E(NY,NX)*VOLP(L,NY,NX)
     H2GG(L,NY,NX)=CH2GE(NY,NX)*VOLP(L,NY,NX)
     IF(CDPTH(L-1,NY,NX).LT.DTBLZ(NY,NX))THEN
-      OXYS(L,NY,NX)=COXYE(NY,NX)*SOXYX/(EXP(AOXYX*solutevar%CSTR1)) &
-        *EXP(0.516-0.0172*ATCA(NY,NX))*solutevar%FH2O*VOLW(L,NY,NX)
+      OXYS(L,NY,NX)=COXYE(NY,NX)*gas_solubility(id_o2g, ATCA(NY,NX)) &
+        /(EXP(AOXYX*solutevar%CSTR1))*solutevar%FH2O*VOLW(L,NY,NX)
     ELSE
       OXYS(L,NY,NX)=0._r8
     ENDIF
-    CO2S(L,NY,NX)=CCO2EI(NY,NX)*SCO2X/(EXP(ACO2X*solutevar%CSTR1)) &
-      *EXP(0.843-0.0281*ATCA(NY,NX))*solutevar%FH2O*VOLW(L,NY,NX)
-    CH4S(L,NY,NX)=CCH4E(NY,NX)*SCH4X/(EXP(ACH4X*solutevar%CSTR1)) &
-      *EXP(0.597-0.0199*ATCA(NY,NX))*solutevar%FH2O*VOLW(L,NY,NX)
-    Z2GS(L,NY,NX)=CZ2GE(NY,NX)*SN2GX/(EXP(AN2GX*solutevar%CSTR1)) &
-      *EXP(0.456-0.0152*ATCA(NY,NX))*solutevar%FH2O*VOLW(L,NY,NX)
-    Z2OS(L,NY,NX)=CZ2OE(NY,NX)*SN2OX/(EXP(AN2OX*solutevar%CSTR1)) &
-      *EXP(0.897-0.0299*ATCA(NY,NX))*solutevar%FH2O*VOLW(L,NY,NX)
-    H2GS(L,NY,NX)=CH2GE(NY,NX)*SH2GX/(EXP(AH2GX*solutevar%CSTR1)) &
-      *EXP(0.597-0.0199*ATCA(NY,NX))*solutevar%FH2O*VOLW(L,NY,NX)
+    CO2S(L,NY,NX)=CCO2EI(NY,NX)*gas_solubility(id_co2g, ATCA(NY,NX)) &
+      /(EXP(ACO2X*solutevar%CSTR1))*solutevar%FH2O*VOLW(L,NY,NX)
+    CH4S(L,NY,NX)=CCH4E(NY,NX)*gas_solubility(id_ch4g, ATCA(NY,NX)) &
+      /(EXP(ACH4X*solutevar%CSTR1))*solutevar%FH2O*VOLW(L,NY,NX)
+    Z2GS(L,NY,NX)=CZ2GE(NY,NX)*gas_solubility(id_n2g, ATCA(NY,NX)) &
+      /(EXP(AN2GX*solutevar%CSTR1))*solutevar%FH2O*VOLW(L,NY,NX)
+    Z2OS(L,NY,NX)=CZ2OE(NY,NX)*gas_solubility(id_n2og, ATCA(NY,NX)) &
+      /(EXP(AN2OX*solutevar%CSTR1))*solutevar%FH2O*VOLW(L,NY,NX)
+    H2GS(L,NY,NX)=CH2GE(NY,NX)*gas_solubility(id_h2g, ATCA(NY,NX)) &
+      /(EXP(AH2GX*solutevar%CSTR1))*solutevar%FH2O*VOLW(L,NY,NX)
 !
 !     INITIAL STATE VARIABLES FOR MINERAL N AND P IN SOIL
 !
@@ -367,10 +384,6 @@ module StarteMod
     H1POB(L,NY,NX)=CH1PU(L,NY,NX)*VOLW(L,NY,NX)*VLPOB(L,NY,NX)*31.0
     ZNO2S(L,NY,NX)=0._r8
     ZNO2B(L,NY,NX)=0._r8
-!     WRITE(*,444)'ZNH4S',NX,NY,L,ZNH4S(L,NY,NX),CN4U(L,NY,NX)
-!    2,VOLW(L,NY,NX),VLNH4(L,NY,NX),H2PO4(L,NY,NX),CH2PU(L,NY,NX)
-!    3,VLPO4(L,NY,NX)
-!444   FORMAT(A8,3I4,12E12.4)
 !
 !     INITIAL STATE VARIABLES FOR CATIONS, ANIONS AND ION PAIRS IN SOIL
 !
@@ -542,13 +555,6 @@ module StarteMod
     CION(L,NY,NX)=0._r8
     ZNH4S(L,NY,NX)=ZNH4S(L,NY,NX)+0.5*OSN(1,2,L,NY,NX)
     OSN(1,2,L,NY,NX)=OSN(1,2,L,NY,NX)-0.5*OSN(1,2,L,NY,NX)
-!     IF(K.EQ.3)THEN
-!     WRITE(*,2222)'XN4F',K,L,XN4(L,NY,NX),XN4Q,BKVL(L,NY,NX)
-!    2,VLNH4(L,NY,NX)
-!     WRITE(*,2222)'XOH2F',K,L,XOH21,XOH11,XOH01,XH2P1,XH1P1,XOH,XPT
-!    2,CH3P1,CH2P1,CH1P1,CH0P1,AHY1,XHP,FHP3,FHP2,FHP1,FHP0
-!    3,FXP2,FXP1,PALPO1,PFEPO1,PCAPD1,PCAPH1
-!     ENDIF
   ENDIF
 
   end subroutine SoluteConcentrations

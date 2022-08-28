@@ -19,6 +19,19 @@ module StartqsMod
 
   integer :: K,L,M,NZ,NZ2X
 !     begin_execution
+
+  associate(                            &
+    PPs1      => plt_site%PPs1        , &
+    NUs1      => plt_site%NUs1        , &
+    NPs1      => plt_site%NPs1        , &
+    NLs1      => plt_site%NLs1        , &
+    ZEROs1    => plt_site%ZEROs1      , &
+    AREA3s1   => plt_site%AREA3s1     , &
+    ZEROQs1   => plt_rbgc%ZEROQs1     , &
+    ZEROPs1   => plt_biom%ZEROPs1     , &
+    ZEROLs1   => plt_biom%ZEROLs1     , &
+    IFLGCs1   => plt_pheno%IFLGCs1      &
+  )
 !
 !     INITIALIZE SHOOT GROWTH VARIABLES
 !
@@ -63,26 +76,27 @@ module StartqsMod
 !     FILL OUT UNUSED ARRAYS
 !
       DO 9986 NZ=NPs1+1,5
-        TCSN0s1(NZ)=0._r8
-        TZSN0s1(NZ)=0._r8
-        TPSN0s1(NZ)=0._r8
-        TCSNCs1(NZ)=0._r8
-        TZSNCs1(NZ)=0._r8
-        TPSNCs1(NZ)=0._r8
-        WTSTGs1(NZ)=0._r8
-        WTSTGNs1(NZ)=0._r8
-        WTSTGPs1(NZ)=0._r8
+        plt_bgcr%TCSN0s1(NZ)=0._r8
+        plt_bgcr%TZSN0s1(NZ)=0._r8
+        plt_bgcr%TPSN0s1(NZ)=0._r8
+        plt_bgcr%TCSNCs1(NZ)=0._r8
+        plt_bgcr%TZSNCs1(NZ)=0._r8
+        plt_bgcr%TPSNCs1(NZ)=0._r8
+        plt_biom%WTSTGs1(NZ)=0._r8
+        plt_biom%WTSTGNs1(NZ)=0._r8
+        plt_biom%WTSTGPs1(NZ)=0._r8
         DO 6401 L=1,NLs1
           DO  K=0,1
-            DO  M=1,4
-              CSNCs1(M,K,L,NZ)=0._r8
-              ZSNCs1(M,K,L,NZ)=0._r8
-              PSNCs1(M,K,L,NZ)=0._r8
+            DO  M=1,jsken
+              plt_bgcr%CSNCs1(M,K,L,NZ)=0._r8
+              plt_bgcr%ZSNCs1(M,K,L,NZ)=0._r8
+              plt_bgcr%PSNCs1(M,K,L,NZ)=0._r8
             enddo
           enddo
 6401    CONTINUE
 9986  CONTINUE
   RETURN
+  end associate
   END subroutine startqs
 !------------------------------------------------------------------------------------------
 
@@ -90,7 +104,32 @@ module StartqsMod
 
   implicit none
   integer, intent(in) :: NZ
-
+  associate(                         &
+    IDAYXs1  =>  plt_distb%IDAYXs1 , &
+    IYRYs1   =>  plt_distb%IYRYs1  , &
+    IYRXs1   =>  plt_distb%IYRXs1  , &
+    IYR0s1   =>  plt_distb%IYR0s1  , &
+    IYRHs1   =>  plt_distb%IYRHs1  , &
+    IDAYHs1  =>  plt_distb%IDAYHs1 , &
+    IDAY0s1  =>  plt_distb%IDAY0s1 , &
+    IDAYYs1  =>  plt_distb%IDAYYs1 , &
+    RSMXs1   =>  plt_photo%RSMXs1  , &
+    PPIs1    =>  plt_site%PPIs1    , &
+    PPXs1    =>  plt_site%PPXs1    , &
+    PPZs1    =>  plt_site%PPZs1    , &
+    CWSRTs1  =>  plt_allom%CWSRTs1 , &
+    CNWSs1   =>  plt_allom%CNWSs1  , &
+    CPWSs1   =>  plt_allom%CPWSs1  , &
+    CNRTs1   =>  plt_allom%CNRTs1  , &
+    CPRTs1   =>  plt_allom%CPRTs1  , &
+    O2Is1    =>  plt_photo%O2Is1   , &
+    RCMXs1   =>  plt_photo%RCMXs1  , &
+    ICTYPs1  =>  plt_photo%ICTYPs1 , &
+    RSMHs1   =>  plt_photo%RSMHs1  , &
+    CFIs1    =>  plt_morph%CFIs1   , &
+    CFs1     =>  plt_morph%CFs1    , &
+    NRTs1    =>  plt_morph%NRTs1     &
+  )
   IYR0s1(NZ)=IYRXs1(NZ)
   IDAY0s1(NZ)=IDAYXs1(NZ)
   IYRHs1(NZ)=IYRYs1(NZ)
@@ -105,10 +144,11 @@ module StartqsMod
   CPWSs1(NZ)=25.0_r8
   CWSRTs1(NZ)=AMIN1(CNRTs1(NZ)*CNWSs1(NZ),CPRTs1(NZ)*CPWSs1(NZ))
   IF(ICTYPs1(NZ).EQ.3)THEN
-    O2Is1(NZ)=2.10E+05
+    O2Is1(NZ)=2.10E+05_r8
   ELSE
-    O2Is1(NZ)=3.96E+05
+    O2Is1(NZ)=3.96E+05_r8
   ENDIF
+  end associate
   end subroutine InitShootGrowth
 !------------------------------------------------------------------------------------------
 
@@ -119,6 +159,19 @@ module StartqsMod
   integer :: N,M
   real(r8) :: CNOPC(4),CPOPC(4)
   REAL(R8) :: CNOPCT,CPOPCT
+
+  associate(                             &
+    XRLAs1   =>  plt_pheno%XRLAs1      , &
+    IBTYPs1  =>  plt_pheno%IBTYPs1     , &
+    IGTYPs1  =>  plt_pheno%IGTYPs1     , &
+    GROUPIs1 =>  plt_pheno%GROUPIs1    , &
+    CFOPCs1  =>  plt_soilchem%CFOPCs1  , &
+    CFOPNs1  =>  plt_soilchem%CFOPNs1  , &
+    CFOPPs1  =>  plt_soilchem%CFOPPs1  , &
+    FNODs1   =>  plt_allom%FNODs1      , &
+    INTYPs1  =>  plt_morph%INTYPs1     , &
+    NNODs1   =>  plt_morph%NNODs1        &
+  )
 !
 !     FRACTIONS OF PLANT LITTER ALLOCATED TO KINETIC COMPONENTS
 !     PROTEIN(*,1),CH2O(*,2),CELLULOSE(*,3),LIGNIN(*,4) IN SOIL LITTER
@@ -309,6 +362,7 @@ module StartqsMod
     FNODs1(NZ)=AMAX1(1.0,0.04/XRLAs1(NZ))
     NNODs1(NZ)=24
   ENDIF
+  end associate
   end subroutine PlantLitterFraction
 !------------------------------------------------------------------------------------------
 
@@ -319,6 +373,17 @@ module StartqsMod
   real(r8), parameter :: TCZD = 5.0_r8        !basal value for threshold temperature for spring leafout/dehardening	oC
   real(r8), parameter :: TCXD = 12.0_r8       !basal value for threshold temperature for autumn leafoff/hardening	oC
 
+  associate(                            &
+    DATAPs1    =>  plt_site%DATAPs1   , &
+    ICTYPs1    =>  plt_photo%ICTYPs1  , &
+    HTCs1      =>  plt_pheno%HTCs1    , &
+    TCXs1      =>  plt_pheno%TCXs1    , &
+    TCZs1      =>  plt_pheno%TCZs1    , &
+    OFFSTs1    =>  plt_pheno%OFFSTs1  , &
+    ZTYPIs1    =>  plt_pheno%ZTYPIs1  , &
+    ZTYPs1     =>  plt_pheno%ZTYPs1   , &
+    SSTXs1     =>  plt_pheno%SSTXs1     &
+  )
 !
 !     PFT THERMAL ACCLIMATION
 !
@@ -344,6 +409,7 @@ module StartqsMod
     HTCs1(NZ)=27.0_r8+3.0_r8*ZTYPs1(NZ)
     SSTXs1(NZ)=0.005_r8
   ENDIF
+  end associate
   end subroutine PFTThermalAcclimation
 !------------------------------------------------------------------------------------------
 
@@ -352,6 +418,48 @@ module StartqsMod
   implicit none
   integer, intent(in) :: NZ
   INTEGER :: L,N,NR
+  associate(                             &
+    CNRTSs1    =>  plt_allom%CNRTSs1   , &
+    CPRTSs1    =>  plt_allom%CPRTSs1   , &
+    DMRTs1     =>  plt_allom%DMRTs1    , &
+    CNRTs1     =>  plt_allom%CNRTs1    , &
+    CPRTs1     =>  plt_allom%CPRTs1    , &
+    UPMNPOs1   =>  plt_rbgc%UPMNPOs1   , &
+    UPKMPOs1   =>  plt_rbgc%UPKMPOs1   , &
+    UPMXPOs1   =>  plt_rbgc%UPMXPOs1   , &
+    UPMNZOs1   =>  plt_rbgc%UPMNZOs1   , &
+    UPKMZOs1   =>  plt_rbgc%UPKMZOs1   , &
+    UPMXZOs1   =>  plt_rbgc%UPMXZOs1   , &
+    UPMNZHs1   =>  plt_rbgc%UPMNZHs1   , &
+    UPMXZHs1   =>  plt_rbgc%UPMXZHs1   , &
+    UPKMZHs1   =>  plt_rbgc%UPKMZHs1   , &
+    CDPTHZs1   =>  plt_site%CDPTHZs1   , &
+    NUs1       =>  plt_site%NUs1       , &
+    NLs1       =>  plt_site%NLs1       , &
+    NGs1       =>  plt_morph%NGs1      , &
+    SDPTHs1    =>  plt_morph%SDPTHs1   , &
+    SDARs1     =>  plt_morph%SDARs1    , &
+    GRDMs1     =>  plt_morph%GRDMs1    , &
+    SDPTHIs1   =>  plt_morph%SDPTHIs1  , &
+    RRAD2Xs1   =>  plt_morph%RRAD2Xs1  , &
+    RTAR2Xs1   =>  plt_morph%RTAR2Xs1  , &
+    RRAD1Xs1   =>  plt_morph%RRAD1Xs1  , &
+    RTAR1Xs1   =>  plt_morph%RTAR1Xs1  , &
+    RRAD2Ms1   =>  plt_morph%RRAD2Ms1  , &
+    RRAD1Ms1   =>  plt_morph%RRAD1Ms1  , &
+    RTLG2Xs1   =>  plt_morph%RTLG2Xs1  , &
+    NIXs1      =>  plt_morph%NIXs1     , &
+    RSRRs1     =>  plt_morph%RSRRs1    , &
+    RTLG1Xs1   =>  plt_morph%RTLG1Xs1  , &
+    PORTs1     =>  plt_morph%PORTs1    , &
+    PORTXs1    =>  plt_morph%PORTXs1   , &
+    RRADPs1    =>  plt_morph%RRADPs1   , &
+    DMVLs1     =>  plt_morph%DMVLs1    , &
+    RSRAs1     =>  plt_morph%RSRAs1    , &
+    NINRs1     =>  plt_morph%NINRs1    , &
+    SDVLs1     =>  plt_morph%SDVLs1    , &
+    SDLGs1     =>  plt_morph%SDLGs1      &
+  )
 !
 !     SEED CHARACTERISTICS
 !
@@ -421,6 +529,7 @@ module StartqsMod
     RTAR1Xs1(N,NZ)=PICON*RRAD1Xs1(N,NZ)**2
     RTAR2Xs1(N,NZ)=PICON*RRAD2Xs1(N,NZ)**2
 500 CONTINUE
+  end associate
   end subroutine InitDimensionsandUptake
 !------------------------------------------------------------------------------------------
 
@@ -429,25 +538,87 @@ module StartqsMod
   implicit none
   integer, intent(in) :: NZ
   integer :: K,L,M,N,NB
+  associate(                           &
+    NUs1      =>  plt_site%NUs1      , &
+    PPXs1     =>  plt_site%PPXs1     , &
+    PPs1      =>  plt_site%PPs1      , &
+    ALATs1    =>  plt_site%ALATs1    , &
+    AREA3s1   =>  plt_site%AREA3s1   , &
+    IGTYPs1   =>  plt_pheno%IGTYPs1  , &
+    VSTGXs1   =>  plt_pheno%VSTGXs1  , &
+    GROUPs1   =>  plt_pheno%GROUPs1  , &
+    KVSTGs1   =>  plt_pheno%KVSTGs1  , &
+    KVSTGNs1  =>  plt_pheno%KVSTGNs1 , &
+    GSTGIs1   =>  plt_pheno%GSTGIs1  , &
+    GSTGFs1   =>  plt_pheno%GSTGFs1  , &
+    FLG4s1    =>  plt_pheno%FLG4s1   , &
+    FLGZs1    =>  plt_pheno%FLGZs1   , &
+    VRNYs1    =>  plt_pheno%VRNYs1   , &
+    VRNFs1    =>  plt_pheno%VRNFs1   , &
+    IDTHBs1   =>  plt_pheno%IDTHBs1  , &
+    VRNZs1    =>  plt_pheno%VRNZs1   , &
+    IDAYs1    =>  plt_pheno%IDAYs1   , &
+    VRNSs1    =>  plt_pheno%VRNSs1   , &
+    ATRPs1    =>  plt_pheno%ATRPs1   , &
+    WSTRs1    =>  plt_pheno%WSTRs1   , &
+    GROUPIs1  =>  plt_pheno%GROUPIs1 , &
+    RCCSXs1   =>  plt_pheno%RCCSXs1  , &
+    TGSTGFs1  =>  plt_pheno%TGSTGFs1 , &
+    TGSTGIs1  =>  plt_pheno%TGSTGIs1 , &
+    FDBKXs1   =>  plt_photo%FDBKXs1  , &
+    CPOOL3s1  =>  plt_photo%CPOOL3s1 , &
+    CPOOL4s1  =>  plt_photo%CPOOL4s1 , &
+    CHILLs1   =>  plt_photo%CHILLs1  , &
+    FDBKs1    =>  plt_photo%FDBKs1   , &
+    HCOBs1    =>  plt_photo%HCOBs1   , &
+    CO2Bs1    =>  plt_photo%CO2Bs1   , &
+    VSTGs1    =>  plt_morph%VSTGs1   , &
+    ZCs1      =>  plt_morph%ZCs1     , &
+    KLEAFs1   =>  plt_morph%KLEAFs1  , &
+    XTLIs1    =>  plt_morph%XTLIs1   , &
+    NBTs1     =>  plt_morph%NBTs1    , &
+    PSTGs1    =>  plt_morph%PSTGs1   , &
+    ARLFPs1   =>  plt_morph%ARLFPs1  , &
+    ARSTKs1   =>  plt_morph%ARSTKs1  , &
+    SURFBs1   =>  plt_morph%SURFBs1  , &
+    ARSTPs1   =>  plt_morph%ARSTPs1  , &
+    PSTGFs1   =>  plt_morph%PSTGFs1  , &
+    GRNXBs1   =>  plt_morph%GRNXBs1  , &
+    HTNODEs1  =>  plt_morph%HTNODEs1 , &
+    GRNOBs1   =>  plt_morph%GRNOBs1  , &
+    ARLFBs1   =>  plt_morph%ARLFBs1  , &
+    ARLFZs1   =>  plt_morph%ARLFZs1  , &
+    ARLFLs1   =>  plt_morph%ARLFLs1  , &
+    ARLFVs1   =>  plt_morph%ARLFVs1  , &
+    ARSTVs1   =>  plt_morph%ARSTVs1  , &
+    SURFs1    =>  plt_morph%SURFs1   , &
+    ARLF1s1   =>  plt_morph%ARLF1s1  , &
+    HTSHEXs1  =>  plt_morph%HTSHEXs1 , &
+    HTCTLs1   =>  plt_morph%HTCTLs1  , &
+    NBTBs1    =>  plt_morph%NBTBs1   , &
+    PSTGIs1   =>  plt_morph%PSTGIs1  , &
+    KLEAFXs1  =>  plt_morph%KLEAFXs1 , &
+    NBRs1     =>  plt_morph%NBRs1      &
+  )
 !
 !     INITIALIZE PLANT PHENOLOGY
 !
 !     PP=population (grid cell-1)
 !
   PPs1(NZ)=PPXs1(NZ)*AREA3s1(NUs1)
-  IFLGIs1(NZ)=0
-  IDTHPs1(NZ)=0
-  IDTHRs1(NZ)=0
+  plt_pheno%IFLGIs1(NZ)=0
+  plt_pheno%IDTHPs1(NZ)=0
+  plt_pheno%IDTHRs1(NZ)=0
   NBTs1(NZ)=0
   NBRs1(NZ)=0
   HTCTLs1(NZ)=0._r8
   ZCs1(NZ)=0._r8
   DO 10 NB=1,10
-    IFLGAs1(NB,NZ)=0
-    IFLGEs1(NB,NZ)=0
-    IFLGFs1(NB,NZ)=0
-    IFLGRs1(NB,NZ)=0
-    IFLGQs1(NB,NZ)=0
+    plt_pheno%IFLGAs1(NB,NZ)=0
+    plt_pheno%IFLGEs1(NB,NZ)=0
+    plt_pheno%IFLGFs1(NB,NZ)=0
+    plt_pheno%IFLGRs1(NB,NZ)=0
+    plt_pheno%IFLGQs1(NB,NZ)=0
     GROUPs1(NB,NZ)=GROUPIs1(NZ)
     PSTGs1(NB,NZ)=XTLIs1(NZ)
     PSTGIs1(NB,NZ)=PSTGs1(NB,NZ)
@@ -472,7 +643,7 @@ module StartqsMod
     FLG4s1(NB,NZ)=0
     FLGZs1(NB,NZ)=0
     NBTBs1(NB,NZ)=0
-    IDTHBs1(NB,NZ)=1
+    plt_pheno%IDTHBs1(NB,NZ)=1
     DO 15 M=1,10
       IDAYs1(M,NB,NZ)=0
 15  CONTINUE
@@ -483,62 +654,62 @@ module StartqsMod
   WSTRs1(NZ)=0._r8
   CHILLs1(NZ)=0._r8
   DO 25 NB=1,10
-    CPOOLs1(NB,NZ)=0._r8
-    ZPOOLs1(NB,NZ)=0._r8
-    PPOOLs1(NB,NZ)=0._r8
-    CPOLNBs1(NB,NZ)=0._r8
-    ZPOLNBs1(NB,NZ)=0._r8
-    PPOLNBs1(NB,NZ)=0._r8
-    WTSHTBs1(NB,NZ)=0._r8
-    WTLFBs1(NB,NZ)=0._r8
-    WTNDBs1(NB,NZ)=0._r8
-    WTSHEBs1(NB,NZ)=0._r8
-    WTSTKBs1(NB,NZ)=0._r8
-    WVSTKBs1(NB,NZ)=0._r8
-    WTRSVBs1(NB,NZ)=0._r8
-    WTHSKBs1(NB,NZ)=0._r8
-    WTEARBs1(NB,NZ)=0._r8
-    WTGRBs1(NB,NZ)=0._r8
-    WTLSBs1(NB,NZ)=0._r8
-    WTSHTNs1(NB,NZ)=0._r8
-    WTLFBNs1(NB,NZ)=0._r8
-    WTNDBNs1(NB,NZ)=0._r8
-    WTSHBNs1(NB,NZ)=0._r8
-    WTSTBNs1(NB,NZ)=0._r8
-    WTRSBNs1(NB,NZ)=0._r8
-    WTHSBNs1(NB,NZ)=0._r8
-    WTEABNs1(NB,NZ)=0._r8
-    WTGRBNs1(NB,NZ)=0._r8
-    WTSHTPs1(NB,NZ)=0._r8
-    WTLFBPs1(NB,NZ)=0._r8
-    WTNDBPs1(NB,NZ)=0._r8
-    WTSHBPs1(NB,NZ)=0._r8
-    WTSTBPs1(NB,NZ)=0._r8
-    WTRSBPs1(NB,NZ)=0._r8
-    WTHSBPs1(NB,NZ)=0._r8
-    WTEABPs1(NB,NZ)=0._r8
-    WTGRBPs1(NB,NZ)=0._r8
+    plt_biom%CPOOLs1(NB,NZ)=0._r8
+    plt_biom%ZPOOLs1(NB,NZ)=0._r8
+    plt_biom%PPOOLs1(NB,NZ)=0._r8
+    plt_biom%CPOLNBs1(NB,NZ)=0._r8
+    plt_biom%ZPOLNBs1(NB,NZ)=0._r8
+    plt_biom%PPOLNBs1(NB,NZ)=0._r8
+    plt_biom%WTSHTBs1(NB,NZ)=0._r8
+    plt_biom%WTLFBs1(NB,NZ)=0._r8
+    plt_biom%WTNDBs1(NB,NZ)=0._r8
+    plt_biom%WTSHEBs1(NB,NZ)=0._r8
+    plt_biom%WTSTKBs1(NB,NZ)=0._r8
+    plt_biom%WVSTKBs1(NB,NZ)=0._r8
+    plt_biom%WTRSVBs1(NB,NZ)=0._r8
+    plt_biom%WTHSKBs1(NB,NZ)=0._r8
+    plt_biom%WTEARBs1(NB,NZ)=0._r8
+    plt_biom%WTGRBs1(NB,NZ)=0._r8
+    plt_biom%WTLSBs1(NB,NZ)=0._r8
+    plt_biom%WTSHTNs1(NB,NZ)=0._r8
+    plt_biom%WTLFBNs1(NB,NZ)=0._r8
+    plt_biom%WTNDBNs1(NB,NZ)=0._r8
+    plt_biom%WTSHBNs1(NB,NZ)=0._r8
+    plt_biom%WTSTBNs1(NB,NZ)=0._r8
+    plt_biom%WTRSBNs1(NB,NZ)=0._r8
+    plt_biom%WTHSBNs1(NB,NZ)=0._r8
+    plt_biom%WTEABNs1(NB,NZ)=0._r8
+    plt_biom%WTGRBNs1(NB,NZ)=0._r8
+    plt_biom%WTSHTPs1(NB,NZ)=0._r8
+    plt_biom%WTLFBPs1(NB,NZ)=0._r8
+    plt_biom%WTNDBPs1(NB,NZ)=0._r8
+    plt_biom%WTSHBPs1(NB,NZ)=0._r8
+    plt_biom%WTSTBPs1(NB,NZ)=0._r8
+    plt_biom%WTRSBPs1(NB,NZ)=0._r8
+    plt_biom%WTHSBPs1(NB,NZ)=0._r8
+    plt_biom%WTEABPs1(NB,NZ)=0._r8
+    plt_biom%WTGRBPs1(NB,NZ)=0._r8
     GRNXBs1(NB,NZ)=0._r8
     GRNOBs1(NB,NZ)=0._r8
-    GRWTBs1(NB,NZ)=0._r8
+    plt_allom%GRWTBs1(NB,NZ)=0._r8
     ARLFBs1(NB,NZ)=0._r8
-    RNH3Bs1(NB,NZ)=0._r8
-    RCZLXs1(NB,NZ)=0._r8
-    RCPLXs1(NB,NZ)=0._r8
-    RCCLXs1(NB,NZ)=0._r8
-    WGLFXs1(NB,NZ)=0._r8
-    WGLFNXs1(NB,NZ)=0._r8
-    WGLFPXs1(NB,NZ)=0._r8
+    plt_rbgc%RNH3Bs1(NB,NZ)=0._r8
+    plt_pheno%RCZLXs1(NB,NZ)=0._r8
+    plt_pheno%RCPLXs1(NB,NZ)=0._r8
+    plt_pheno%RCCLXs1(NB,NZ)=0._r8
+    plt_biom%WGLFXs1(NB,NZ)=0._r8
+    plt_biom%WGLFNXs1(NB,NZ)=0._r8
+    plt_biom%WGLFPXs1(NB,NZ)=0._r8
     ARLFZs1(NB,NZ)=0._r8
-    RCZSXs1(NB,NZ)=0._r8
-    RCPSXs1(NB,NZ)=0._r8
-    RCCSXs1(NB,NZ)=0._r8
-    WTSTXBs1(NB,NZ)=0._r8
-    WTSTXNs1(NB,NZ)=0._r8
-    WTSTXPs1(NB,NZ)=0._r8
-    WGSHEXs1(NB,NZ)=0._r8
-    WGSHNXs1(NB,NZ)=0._r8
-    WGSHPXs1(NB,NZ)=0._r8
+    plt_pheno%RCZSXs1(NB,NZ)=0._r8
+    plt_pheno%RCPSXs1(NB,NZ)=0._r8
+    plt_pheno%RCCSXs1(NB,NZ)=0._r8
+    plt_biom%WTSTXBs1(NB,NZ)=0._r8
+    plt_biom%WTSTXNs1(NB,NZ)=0._r8
+    plt_biom%WTSTXPs1(NB,NZ)=0._r8
+    plt_biom%WGSHEXs1(NB,NZ)=0._r8
+    plt_biom%WGSHNXs1(NB,NZ)=0._r8
+    plt_biom%WGSHPXs1(NB,NZ)=0._r8
     HTSHEXs1(NB,NZ)=0._r8
     DO 5 L=1,JC1
       ARSTKs1(L,NB,NZ)=0._r8
@@ -549,24 +720,24 @@ module StartqsMod
     DO K=0,JNODS1
       ARLF1s1(K,NB,NZ)=0._r8
       HTNODEs1(K,NB,NZ)=0._r8
-      HTNODXs1(K,NB,NZ)=0._r8
-      HTSHEs1(K,NB,NZ)=0._r8
-      WGLFs1(K,NB,NZ)=0._r8
-      WSLFs1(K,NB,NZ)=0._r8
-      WGLFNs1(K,NB,NZ)=0._r8
-      WGLFPs1(K,NB,NZ)=0._r8
-      WGSHEs1(K,NB,NZ)=0._r8
-      WSSHEs1(K,NB,NZ)=0._r8
-      WGSHNs1(K,NB,NZ)=0._r8
-      WGSHPs1(K,NB,NZ)=0._r8
-      WGNODEs1(K,NB,NZ)=0._r8
-      WGNODNs1(K,NB,NZ)=0._r8
-      WGNODPs1(K,NB,NZ)=0._r8
+      plt_morph%HTNODXs1(K,NB,NZ)=0._r8
+      plt_morph%HTSHEs1(K,NB,NZ)=0._r8
+      plt_biom%WGLFs1(K,NB,NZ)=0._r8
+      plt_biom%WSLFs1(K,NB,NZ)=0._r8
+      plt_biom%WGLFNs1(K,NB,NZ)=0._r8
+      plt_biom%WGLFPs1(K,NB,NZ)=0._r8
+      plt_biom%WGSHEs1(K,NB,NZ)=0._r8
+      plt_biom%WSSHEs1(K,NB,NZ)=0._r8
+      plt_biom%WGSHNs1(K,NB,NZ)=0._r8
+      plt_biom%WGSHPs1(K,NB,NZ)=0._r8
+      plt_biom%WGNODEs1(K,NB,NZ)=0._r8
+      plt_biom%WGNODNs1(K,NB,NZ)=0._r8
+      plt_biom%WGNODPs1(K,NB,NZ)=0._r8
       DO 55 L=1,JC1
         ARLFLs1(L,K,NB,NZ)=0._r8
-        WGLFLs1(L,K,NB,NZ)=0._r8
-        WGLFLNs1(L,K,NB,NZ)=0._r8
-        WGLFLPs1(L,K,NB,NZ)=0._r8
+        plt_biom%WGLFLs1(L,K,NB,NZ)=0._r8
+        plt_biom%WGLFLNs1(L,K,NB,NZ)=0._r8
+        plt_biom%WGLFLPs1(L,K,NB,NZ)=0._r8
 55    CONTINUE
       IF(K.NE.0)THEN
         CPOOL3s1(K,NB,NZ)=0._r8
@@ -583,50 +754,51 @@ module StartqsMod
 25  CONTINUE
   DO 35 L=1,JC1
     ARLFVs1(L,NZ)=0._r8
-    WGLFVs1(L,NZ)=0._r8
+    plt_biom%WGLFVs1(L,NZ)=0._r8
     ARSTVs1(L,NZ)=0._r8
 35  CONTINUE
-  CPOOLPs1(NZ)=0._r8
-  ZPOOLPs1(NZ)=0._r8
-  PPOOLPs1(NZ)=0._r8
-  CCPOLPs1(NZ)=0._r8
-  CCPLNPs1(NZ)=0._r8
-  CZPOLPs1(NZ)=0._r8
-  CPPOLPs1(NZ)=0._r8
-  WTSHTs1(NZ)=0._r8
-  WTLFs1(NZ)=0._r8
-  WTSHEs1(NZ)=0._r8
-  WTSTKs1(NZ)=0._r8
-  WVSTKs1(NZ)=0._r8
-  WTRSVs1(NZ)=0._r8
-  WTHSKs1(NZ)=0._r8
-  WTEARs1(NZ)=0._r8
-  WTGRs1(NZ)=0._r8
-  WTRTts1(NZ)=0._r8
-  WTRTSs1(NZ)=0._r8
-  WTNDs1(NZ)=0._r8
-  WTLSs1(NZ)=0._r8
-  WTSHNs1(NZ)=0._r8
-  WTLFNs1(NZ)=0._r8
-  WTSHENs1(NZ)=0._r8
-  WTSTKNs1(NZ)=0._r8
-  WTRSVNs1(NZ)=0._r8
-  WTHSKNs1(NZ)=0._r8
-  WTEARNs1(NZ)=0._r8
-  WTGRNNs1(NZ)=0._r8
-  WTNDNs1(NZ)=0._r8
-  WTSHPs1(NZ)=0._r8
-  WTLFPs1(NZ)=0._r8
-  WTSHEPs1(NZ)=0._r8
-  WTSTKPs1(NZ)=0._r8
-  WTRSVPs1(NZ)=0._r8
-  WTHSKPs1(NZ)=0._r8
-  WTEARPs1(NZ)=0._r8
-  WTGRNPs1(NZ)=0._r8
-  WTNDPs1(NZ)=0._r8
+  plt_biom%CPOOLPs1(NZ)=0._r8
+  plt_biom%ZPOOLPs1(NZ)=0._r8
+  plt_biom%PPOOLPs1(NZ)=0._r8
+  plt_biom%CCPOLPs1(NZ)=0._r8
+  plt_biom%CCPLNPs1(NZ)=0._r8
+  plt_biom%CZPOLPs1(NZ)=0._r8
+  plt_biom%CPPOLPs1(NZ)=0._r8
+  plt_biom%WTSHTs1(NZ)=0._r8
+  plt_biom%WTLFs1(NZ)=0._r8
+  plt_biom%WTSHEs1(NZ)=0._r8
+  plt_biom%WTSTKs1(NZ)=0._r8
+  plt_biom%WVSTKs1(NZ)=0._r8
+  plt_biom%WTRSVs1(NZ)=0._r8
+  plt_biom%WTHSKs1(NZ)=0._r8
+  plt_biom%WTEARs1(NZ)=0._r8
+  plt_biom%WTGRs1(NZ)=0._r8
+  plt_biom%WTRTts1(NZ)=0._r8
+  plt_biom%WTRTSs1(NZ)=0._r8
+  plt_biom%WTNDs1(NZ)=0._r8
+  plt_biom%WTLSs1(NZ)=0._r8
+  plt_biom%WTSHNs1(NZ)=0._r8
+  plt_biom%WTLFNs1(NZ)=0._r8
+  plt_biom%WTSHENs1(NZ)=0._r8
+  plt_biom%WTSTKNs1(NZ)=0._r8
+  plt_biom%WTRSVNs1(NZ)=0._r8
+  plt_biom%WTHSKNs1(NZ)=0._r8
+  plt_biom%WTEARNs1(NZ)=0._r8
+  plt_biom%WTGRNNs1(NZ)=0._r8
+  plt_biom%WTNDNs1(NZ)=0._r8
+  plt_biom%WTSHPs1(NZ)=0._r8
+  plt_biom%WTLFPs1(NZ)=0._r8
+  plt_biom%WTSHEPs1(NZ)=0._r8
+  plt_biom%WTSTKPs1(NZ)=0._r8
+  plt_biom%WTRSVPs1(NZ)=0._r8
+  plt_biom%WTHSKPs1(NZ)=0._r8
+  plt_biom%WTEARPs1(NZ)=0._r8
+  plt_biom%WTGRNPs1(NZ)=0._r8
+  plt_biom%WTNDPs1(NZ)=0._r8
   ARLFPs1(NZ)=0._r8
-  WTRTAs1(NZ)=0._r8
+  plt_biom%WTRTAs1(NZ)=0._r8
   ARSTPs1(NZ)=0._r8
+  end associate
   end subroutine InitPlantPhenoMorphoBio
 !------------------------------------------------------------------------------------------
 
@@ -636,6 +808,45 @@ module StartqsMod
   integer, intent(in) :: NZ
   integer :: M
   real(r8) :: WTSTDX
+
+  associate(                           &
+    NUs1     => plt_site%NUs1        , &
+    AREA3s1  => plt_site%AREA3s1     , &
+    CFOPCs1  => plt_soilchem%CFOPCs1 , &
+    CFOPNs1  => plt_soilchem%CFOPNs1 , &
+    CFOPPs1  => plt_soilchem%CFOPPs1 , &
+    CTRANs1  => plt_ew%CTRANs1       , &
+    WTSTDGs1 => plt_biom%WTSTDGs1    , &
+    WTSTDNs1 => plt_biom%WTSTDNs1    , &
+    WTSTDPs1 => plt_biom%WTSTDPs1    , &
+    WTSTGs1  => plt_biom%WTSTGs1     , &
+    WTSTGPs1 => plt_biom%WTSTGPs1    , &
+    WTSTDIs1 => plt_biom%WTSTDIs1    , &
+    WTSTGNs1 => plt_biom%WTSTGNs1    , &
+    WTRTAs1  => plt_biom%WTRTAs1     , &
+    CNSTKs1  => plt_allom%CNSTKs1    , &
+    CPSTKs1  => plt_allom%CPSTKs1    , &
+    TCUPTKs1 => plt_rbgc%TCUPTKs1    , &
+    TZUPTKs1 => plt_rbgc%TZUPTKs1    , &
+    TPUPTKs1 => plt_rbgc%TPUPTKs1    , &
+    TNH3Cs1  => plt_bgcr%TNH3Cs1     , &
+    RNH3Cs1  => plt_bgcr%RNH3Cs1     , &
+    TPSN0s1  => plt_bgcr%TPSN0s1     , &
+    TZSN0s1  => plt_bgcr%TZSN0s1     , &
+    TCSN0s1  => plt_bgcr%TCSN0s1     , &
+    CARBNs1  => plt_bgcr%CARBNs1     , &
+    TCO2As1  => plt_bgcr%TCO2As1     , &
+    TCO2Ts1  => plt_bgcr%TCO2Ts1     , &
+    TZUPFXs1 => plt_bgcr%TZUPFXs1    , &
+    TZSNCs1  => plt_bgcr%TZSNCs1     , &
+    TPSNCs1  => plt_bgcr%TPSNCs1     , &
+    TCSNCs1  => plt_bgcr%TCSNCs1     , &
+    ARSTPs1  => plt_morph%ARSTPs1    , &
+    RSETCs1  => plt_pheno%RSETCs1    , &
+    RSETNs1  => plt_pheno%RSETNs1    , &
+    RSETPs1  => plt_pheno%RSETPs1      &
+
+  )
 !
 !     INITIALIZE MASS BALANCE CHECKS
 !
@@ -655,18 +866,18 @@ module StartqsMod
     TZUPFXs1(NZ)=0._r8
     RNH3Cs1(NZ)=0._r8
     TNH3Cs1(NZ)=0._r8
-    VCO2Fs1(NZ)=0._r8
-    VCH4Fs1(NZ)=0._r8
-    VOXYFs1(NZ)=0._r8
-    VNH3Fs1(NZ)=0._r8
-    VN2OFs1(NZ)=0._r8
-    VPO4Fs1(NZ)=0._r8
-    THVSTCs1(NZ)=0._r8
-    THVSTNs1(NZ)=0._r8
-    THVSTPs1(NZ)=0._r8
-    HVSTCs1(NZ)=0._r8
-    HVSTNs1(NZ)=0._r8
-    HVSTPs1(NZ)=0._r8
+    plt_distb%VCO2Fs1(NZ)=0._r8
+    plt_distb%VCH4Fs1(NZ)=0._r8
+    plt_distb%VOXYFs1(NZ)=0._r8
+    plt_distb%VNH3Fs1(NZ)=0._r8
+    plt_distb%VN2OFs1(NZ)=0._r8
+    plt_distb%VPO4Fs1(NZ)=0._r8
+    plt_distb%THVSTCs1(NZ)=0._r8
+    plt_distb%THVSTNs1(NZ)=0._r8
+    plt_distb%THVSTPs1(NZ)=0._r8
+    plt_distb%HVSTCs1(NZ)=0._r8
+    plt_distb%HVSTNs1(NZ)=0._r8
+    plt_distb%HVSTPs1(NZ)=0._r8
     RSETCs1(NZ)=0._r8
     RSETNs1(NZ)=0._r8
     RSETPs1(NZ)=0._r8
@@ -684,6 +895,7 @@ module StartqsMod
       WTSTGPs1(NZ)=WTSTGPs1(NZ)+WTSTDPs1(M,NZ)
 155 CONTINUE
   ENDIF
+  end associate
   end subroutine InitMassBalance
 !------------------------------------------------------------------------------------------
 
@@ -691,6 +903,24 @@ module StartqsMod
 
   implicit none
   integer, intent(in) :: NZ
+  associate(                          &
+    ATCAs1     =>  plt_site%ATCAs1  , &
+    OSMOs1     =>  plt_ew%OSMOs1    , &
+    TKCs1      =>  plt_ew%TKCs1     , &
+    EPs1       =>  plt_ew%EPs1      , &
+    VHCPCs1    =>  plt_ew%VHCPCs1   , &
+    PSILTs1    =>  plt_ew%PSILTs1   , &
+    PSILGs1    =>  plt_ew%PSILGs1   , &
+    PSILOs1    =>  plt_ew%PSILOs1   , &
+    ENGYXs1    =>  plt_ew%ENGYXs1   , &
+    DTKCs1     =>  plt_ew%DTKCs1    , &
+    TCCs1      =>  plt_ew%TCCs1     , &
+    TKGs1      =>  plt_pheno%TKGs1  , &
+    TCGs1      =>  plt_pheno%TCGs1  , &
+    TFN3s1     =>  plt_pheno%TFN3s1 , &
+    WTSHTs1    =>  plt_biom%WTSHTs1 , &
+    FRADPs1    =>  plt_rad%FRADPs1    &
+  )
 !
 !     INITIALIZE PLANT HEAT AND WATER STATUS
 !
@@ -712,6 +942,7 @@ module StartqsMod
   PSILGs1(NZ)=AMAX1(0.0,PSILTs1(NZ)-PSILOs1(NZ))
   EPs1(NZ)=0._r8
   FRADPs1(NZ)=0._r8
+  end associate
   end subroutine InitPlantHeatandWater
 !------------------------------------------------------------------------------------------
 
@@ -723,6 +954,33 @@ module StartqsMod
   REAL(R8) :: CCO2P
   REAL(R8) :: COXYA
   REAL(R8) :: COXYP
+  associate(                             &
+    OSMOs1     =>  plt_ew%OSMOs1       , &
+    PSILTs1    =>  plt_ew%PSILTs1      , &
+    PSIRTs1    =>  plt_ew%PSIRTs1      , &
+    PSIRGs1    =>  plt_ew%PSIRGs1      , &
+    PSIROs1    =>  plt_ew%PSIROs1      , &
+    RUPNFs1    =>  plt_bgcr%RUPNFs1    , &
+    CO2Ps1     =>  plt_rbgc%CO2Ps1     , &
+    CO2As1     =>  plt_rbgc%CO2As1     , &
+    OXYEs1     =>  plt_site%OXYEs1     , &
+    COXYEs1    =>  plt_site%COXYEs1    , &
+    CO2EIs1    =>  plt_site%CO2EIs1    , &
+    NLs1       =>  plt_site%NLs1       , &
+    ATCAs1     =>  plt_site%ATCAs1     , &
+    CCO2EIs1   =>  plt_site%CCO2EIs1   , &
+    CWSRTs1    =>  plt_allom%CWSRTs1   , &
+    CWSRTLs1   =>  plt_biom%CWSRTLs1   , &
+    WSRTLs1    =>  plt_biom%WSRTLs1    , &
+    SDPTHs1    =>  plt_morph%SDPTHs1   , &
+    RTVLWs1    =>  plt_morph%RTVLWs1   , &
+    RTVLPs1    =>  plt_morph%RTVLPs1   , &
+    RRAD2s1    =>  plt_morph%RRAD2s1   , &
+    RRAD1s1    =>  plt_morph%RRAD1s1   , &
+    RRAD1Ms1   =>  plt_morph%RRAD1Ms1  , &
+    RRAD2Ms1   =>  plt_morph%RRAD2Ms1  , &
+    NRTs1      =>  plt_morph%NRTs1       &
+  )
 !
 !     INITIALIZE ROOT(N=1),MYCORRHIZAL(N=2) MORPHOLOGY AND BIOMASS
 !
@@ -731,114 +989,115 @@ module StartqsMod
 !     OXYA,OXYP=root,myco gaseous,aqueous O2 content (g)
 !
   NRTs1(NZ)=0
-  UPNH4s1(NZ)=0._r8
-  UPNO3s1(NZ)=0._r8
-  UPH2Ps1(NZ)=0._r8
-  UPH1Ps1(NZ)=0._r8
-  UPNFs1(NZ)=0._r8
+  plt_rbgc%UPNH4s1(NZ)=0._r8
+  plt_rbgc%UPNO3s1(NZ)=0._r8
+  plt_rbgc%UPH2Ps1(NZ)=0._r8
+  plt_rbgc%UPH1Ps1(NZ)=0._r8
+  plt_rbgc%UPNFs1(NZ)=0._r8
   DO 40 N=1,2
     DO 20 L=1,NLs1
-      UPWTRs1(N,L,NZ)=0._r8
+      plt_ew%UPWTRs1(N,L,NZ)=0._r8
       PSIRTs1(N,L,NZ)=-0.01
       PSIROs1(N,L,NZ)=OSMOs1(NZ)+PSIRTs1(N,L,NZ)
       PSIRGs1(N,L,NZ)=AMAX1(0.0_r8,PSIRTs1(N,L,NZ)-PSIROs1(N,L,NZ))
-      CPOOLRs1(N,L,NZ)=0._r8
-      ZPOOLRs1(N,L,NZ)=0._r8
-      PPOOLRs1(N,L,NZ)=0._r8
-      CCPOLRs1(N,L,NZ)=0._r8
-      CZPOLRs1(N,L,NZ)=0._r8
-      CPPOLRs1(N,L,NZ)=0._r8
+      plt_biom%CPOOLRs1(N,L,NZ)=0._r8
+      plt_biom%ZPOOLRs1(N,L,NZ)=0._r8
+      plt_biom%PPOOLRs1(N,L,NZ)=0._r8
+      plt_biom%CCPOLRs1(N,L,NZ)=0._r8
+      plt_biom%CZPOLRs1(N,L,NZ)=0._r8
+      plt_biom%CPPOLRs1(N,L,NZ)=0._r8
       CWSRTLs1(N,L,NZ)=CWSRTs1(NZ)
-      WTRTLs1(N,L,NZ)=0._r8
-      WTRTDs1(N,L,NZ)=0._r8
+      plt_biom%WTRTLs1(N,L,NZ)=0._r8
+      plt_biom%WTRTDs1(N,L,NZ)=0._r8
       WSRTLs1(N,L,NZ)=0._r8
-      RTN1s1(N,L,NZ)=0._r8
-      RTNLs1(N,L,NZ)=0._r8
-      RTLGPs1(N,L,NZ)=0._r8
-      RTDNPs1(N,L,NZ)=0._r8
+      plt_morph%RTN1s1(N,L,NZ)=0._r8
+      plt_morph%RTNLs1(N,L,NZ)=0._r8
+      plt_morph%RTLGPs1(N,L,NZ)=0._r8
+      plt_morph%RTDNPs1(N,L,NZ)=0._r8
       RTVLPs1(N,L,NZ)=0._r8
       RTVLWs1(N,L,NZ)=0._r8
       RRAD1s1(N,L,NZ)=RRAD1Ms1(N,NZ)
       RRAD2s1(N,L,NZ)=RRAD2Ms1(N,NZ)
-      RTARPs1(N,L,NZ)=0._r8
-      RTLGAs1(N,L,NZ)=1.0E-03
-      RUPNH4s1(N,L,NZ)=0._r8
-      RUPNO3s1(N,L,NZ)=0._r8
-      RUPH2Ps1(N,L,NZ)=0._r8
-      RUPH1Ps1(N,L,NZ)=0._r8
-      RUPNHBs1(N,L,NZ)=0._r8
-      RUPNOBs1(N,L,NZ)=0._r8
-      RUPH2Bs1(N,L,NZ)=0._r8
-      RUPH1Bs1(N,L,NZ)=0._r8
-      ROXYPs1(N,L,NZ)=0._r8
-      RUNNHPs1(N,L,NZ)=0._r8
-      RUNNBPs1(N,L,NZ)=0._r8
-      RUNNOPs1(N,L,NZ)=0._r8
-      RUNNXPs1(N,L,NZ)=0._r8
-      RUPP2Ps1(N,L,NZ)=0._r8
-      RUPP1Ps1(N,L,NZ)=0._r8
-      RUPP2Bs1(N,L,NZ)=0._r8
-      RUPP1Bs1(N,L,NZ)=0._r8
+      plt_morph%RTARPs1(N,L,NZ)=0._r8
+      plt_morph%RTLGAs1(N,L,NZ)=1.0E-03
+      plt_rbgc%RUPNH4s1(N,L,NZ)=0._r8
+      plt_rbgc%RUPNO3s1(N,L,NZ)=0._r8
+      plt_rbgc%RUPH2Ps1(N,L,NZ)=0._r8
+      plt_rbgc%RUPH1Ps1(N,L,NZ)=0._r8
+      plt_rbgc%RUPNHBs1(N,L,NZ)=0._r8
+      plt_rbgc%RUPNOBs1(N,L,NZ)=0._r8
+      plt_rbgc%RUPH2Bs1(N,L,NZ)=0._r8
+      plt_rbgc%RUPH1Bs1(N,L,NZ)=0._r8
+      plt_rbgc%ROXYPs1(N,L,NZ)=0._r8
+      plt_rbgc%RUNNHPs1(N,L,NZ)=0._r8
+      plt_rbgc%RUNNBPs1(N,L,NZ)=0._r8
+      plt_rbgc%RUNNOPs1(N,L,NZ)=0._r8
+      plt_rbgc%RUNNXPs1(N,L,NZ)=0._r8
+      plt_rbgc%RUPP2Ps1(N,L,NZ)=0._r8
+      plt_rbgc%RUPP1Ps1(N,L,NZ)=0._r8
+      plt_rbgc%RUPP2Bs1(N,L,NZ)=0._r8
+      plt_rbgc%RUPP1Bs1(N,L,NZ)=0._r8
       CCO2A=CCO2EIs1
       CCO2P=0.030*EXP(-2.621_r8-0.0317_r8*ATCAs1)*CO2EIs1
       CO2As1(N,L,NZ)=CCO2A*RTVLPs1(N,L,NZ)
       CO2Ps1(N,L,NZ)=CCO2P*RTVLWs1(N,L,NZ)
-      RCOFLAs1(N,L,NZ)=0._r8
-      RCODFAs1(N,L,NZ)=0._r8
-      RCO2Ss1(N,L,NZ)=0._r8
-      RCO2Ps1(N,L,NZ)=0._r8
+      plt_rbgc%RCOFLAs1(N,L,NZ)=0._r8
+      plt_rbgc%RCODFAs1(N,L,NZ)=0._r8
+      plt_rbgc%RCO2Ss1(N,L,NZ)=0._r8
+      plt_rbgc%RCO2Ps1(N,L,NZ)=0._r8
       COXYA=COXYEs1
       COXYP=0.032*EXP(-6.175_r8-0.0211_r8*ATCAs1)*OXYEs1
-      OXYAs1(N,L,NZ)=COXYA*RTVLPs1(N,L,NZ)
-      OXYPs1(N,L,NZ)=COXYP*RTVLWs1(N,L,NZ)
-      CH4As1(N,L,NZ)=0._r8
-      CH4Ps1(N,L,NZ)=0._r8
-      Z2OAs1(N,L,NZ)=0._r8
-      Z2OPs1(N,L,NZ)=0._r8
-      ZH3As1(N,L,NZ)=0._r8
-      ZH3Ps1(N,L,NZ)=0._r8
-      H2GAs1(N,L,NZ)=0._r8
-      H2GPs1(N,L,NZ)=0._r8
-      WFRs1(N,L,NZ)=1.0
+      plt_rbgc%OXYAs1(N,L,NZ)=COXYA*RTVLPs1(N,L,NZ)
+      plt_rbgc%OXYPs1(N,L,NZ)=COXYP*RTVLWs1(N,L,NZ)
+      plt_rbgc%CH4As1(N,L,NZ)=0._r8
+      plt_rbgc%CH4Ps1(N,L,NZ)=0._r8
+      plt_rbgc%Z2OAs1(N,L,NZ)=0._r8
+      plt_rbgc%Z2OPs1(N,L,NZ)=0._r8
+      plt_rbgc%ZH3As1(N,L,NZ)=0._r8
+      plt_rbgc%ZH3Ps1(N,L,NZ)=0._r8
+      plt_rbgc%H2GAs1(N,L,NZ)=0._r8
+      plt_rbgc%H2GPs1(N,L,NZ)=0._r8
+      plt_rbgc%WFRs1(N,L,NZ)=1.0
       DO 30 NR=1,JC1
-        RTN2s1(N,L,NR,NZ)=0._r8
-        RTLG1s1(N,L,NR,NZ)=0._r8
-        WTRT1s1(N,L,NR,NZ)=0._r8
-        WTRT1Ns1(N,L,NR,NZ)=0._r8
-        WTRT1Ps1(N,L,NR,NZ)=0._r8
-        RTLG2s1(N,L,NR,NZ)=0._r8
-        WTRT2s1(N,L,NR,NZ)=0._r8
-        WTRT2Ns1(N,L,NR,NZ)=0._r8
-        WTRT2Ps1(N,L,NR,NZ)=0._r8
-        RTDP1s1(N,NR,NZ)=SDPTHs1(NZ)
-        RTWT1s1(N,NR,NZ)=0._r8
-        RTWT1Ns1(N,NR,NZ)=0._r8
-        RTWT1Ps1(N,NR,NZ)=0._r8
+        plt_morph%RTN2s1(N,L,NR,NZ)=0._r8
+        plt_morph%RTLG1s1(N,L,NR,NZ)=0._r8
+        plt_morph%RTLG2s1(N,L,NR,NZ)=0._r8
+        plt_morph%RTDP1s1(N,NR,NZ)=SDPTHs1(NZ)
+        plt_biom%WTRT1s1(N,L,NR,NZ)=0._r8
+        plt_biom%WTRT1Ns1(N,L,NR,NZ)=0._r8
+        plt_biom%WTRT1Ps1(N,L,NR,NZ)=0._r8
+        plt_biom%WTRT2s1(N,L,NR,NZ)=0._r8
+        plt_biom%WTRT2Ns1(N,L,NR,NZ)=0._r8
+        plt_biom%WTRT2Ps1(N,L,NR,NZ)=0._r8
+        plt_biom%RTWT1s1(N,NR,NZ)=0._r8
+        plt_biom%RTWT1Ns1(N,NR,NZ)=0._r8
+        plt_biom%RTWT1Ps1(N,NR,NZ)=0._r8
 30    CONTINUE
       IF(N.EQ.1)THEN
         DO 6400 K=0,1
-          DO  M=1,4
-            CSNCs1(M,K,L,NZ)=0._r8
-            ZSNCs1(M,K,L,NZ)=0._r8
-            PSNCs1(M,K,L,NZ)=0._r8
+          DO  M=1,jsken
+            plt_bgcr%CSNCs1(M,K,L,NZ)=0._r8
+            plt_bgcr%ZSNCs1(M,K,L,NZ)=0._r8
+            plt_bgcr%PSNCs1(M,K,L,NZ)=0._r8
           enddo
 6400    CONTINUE
-        CPOOLNs1(L,NZ)=0._r8
-        ZPOOLNs1(L,NZ)=0._r8
-        PPOOLNs1(L,NZ)=0._r8
-        WTNDLs1(L,NZ)=0._r8
-        WTNDLNs1(L,NZ)=0._r8
-        WTNDLPs1(L,NZ)=0._r8
+        plt_biom%CPOOLNs1(L,NZ)=0._r8
+        plt_biom%ZPOOLNs1(L,NZ)=0._r8
+        plt_biom%PPOOLNs1(L,NZ)=0._r8
+        plt_biom%WTNDLs1(L,NZ)=0._r8
+        plt_biom%WTNDLNs1(L,NZ)=0._r8
+        plt_biom%WTNDLPs1(L,NZ)=0._r8
         RUPNFs1(L,NZ)=0._r8
       ENDIF
 20  CONTINUE
 40  CONTINUE
 
-  RUPNH4s1(1:2,NLs1+1:JZ1,NZ)=0._r8
-  RUPNHBs1(1:2,NLs1+1:JZ1,NZ)=0._r8
-  RUPH2Ps1(1:2,NLs1+1:JZ1,NZ)=0._r8
-  RUPH2Bs1(1:2,NLs1+1:JZ1,NZ)=0._r8
-  RTDNPs1(1:2,NLs1+1:JZ1,NZ)=0._r8
+  plt_rbgc%RUPNH4s1(1:2,NLs1+1:JZ1,NZ)=0._r8
+  plt_rbgc%RUPNHBs1(1:2,NLs1+1:JZ1,NZ)=0._r8
+  plt_rbgc%RUPH2Ps1(1:2,NLs1+1:JZ1,NZ)=0._r8
+  plt_rbgc%RUPH2Bs1(1:2,NLs1+1:JZ1,NZ)=0._r8
+  plt_morph%RTDNPs1(1:2,NLs1+1:JZ1,NZ)=0._r8
+  end associate
   end subroutine InitRootMychorMorphoBio
 !------------------------------------------------------------------------------------------
 
@@ -847,6 +1106,44 @@ module StartqsMod
   implicit none
   integer, intent(in) :: NZ
   REAL(R8) :: FDM
+
+  associate(                             &
+    PPs1       =>   plt_site%PPs1      , &
+    PSILTs1    =>   plt_ew%PSILTs1     , &
+    VOLWCs1    =>   plt_ew%VOLWCs1     , &
+    VOLWPs1    =>   plt_ew%VOLWPs1     , &
+    CWSRTs1    =>   plt_allom%CWSRTs1  , &
+    CNGRs1     =>   plt_allom%CNGRs1   , &
+    CPGRs1     =>   plt_allom%CPGRs1   , &
+    RTWT1s1    =>   plt_biom%RTWT1s1   , &
+    RTWT1Ns1   =>   plt_biom%RTWT1Ns1  , &
+    RTWT1Ps1   =>   plt_biom%RTWT1Ps1  , &
+    WTRVXs1    =>   plt_biom%WTRVXs1   , &
+    WTRT1s1    =>   plt_biom%WTRT1s1   , &
+    WTRT1Ns1   =>   plt_biom%WTRT1Ns1  , &
+    WTRT1Ps1   =>   plt_biom%WTRT1Ps1  , &
+    WTLFBNs1   =>   plt_biom%WTLFBNs1  , &
+    WTLSBs1    =>   plt_biom%WTLSBs1   , &
+    WTLSs1     =>   plt_biom%WTLSs1    , &
+    WTRTDs1    =>   plt_biom%WTRTDs1   , &
+    WTSHEBs1   =>   plt_biom%WTSHEBs1  , &
+    WTRTLs1    =>   plt_biom%WTRTLs1   , &
+    WSRTLs1    =>   plt_biom%WSRTLs1   , &
+    CPOOLRs1   =>   plt_biom%CPOOLRs1  , &
+    ZPOOLRs1   =>   plt_biom%ZPOOLRs1  , &
+    PPOOLRs1   =>   plt_biom%PPOOLRs1  , &
+    CPOOLs1    =>   plt_biom%CPOOLs1   , &
+    ZPOOLs1    =>   plt_biom%ZPOOLs1   , &
+    PPOOLs1    =>   plt_biom%PPOOLs1   , &
+    WTLFBs1    =>   plt_biom%WTLFBs1   , &
+    WTLFBPs1   =>   plt_biom%WTLFBPs1  , &
+    WTRVCs1    =>   plt_biom%WTRVCs1   , &
+    WTRVNs1    =>   plt_biom%WTRVNs1   , &
+    WTRVPs1    =>   plt_biom%WTRVPs1   , &
+    GRDMs1     =>   plt_morph%GRDMs1   , &
+    RTDP1s1    =>   plt_morph%RTDP1s1  , &
+    NGs1       =>   plt_morph%NGs1       &
+  )
 !
 !     INITIALIZE SEED MORPHOLOGY AND BIOMASS
 !
@@ -884,6 +1181,8 @@ module StartqsMod
   WSRTLs1(1,NGs1(NZ),NZ)=WTRTLs1(1,NGs1(NZ),NZ)*CWSRTs1(NZ)
   ZPOOLRs1(1,NGs1(NZ),NZ)=CNGRs1(NZ)*CPOOLRs1(1,NGs1(NZ),NZ)
   PPOOLRs1(1,NGs1(NZ),NZ)=CPGRs1(NZ)*CPOOLRs1(1,NGs1(NZ),NZ)
+
+  end associate
   end subroutine InitSeedMorphoBio
 
   end module StartqsMod
