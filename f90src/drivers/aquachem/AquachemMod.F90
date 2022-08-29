@@ -1340,7 +1340,9 @@ contains
 ! ----------------------------------------------------------------------
 
   subroutine initmodel_nosalt(nvars, ystatesfl,err_status)
-
+!
+! DESCRIPTION:
+!
   implicit none
   integer, intent(in) :: nvars
   real(r8), intent(inout) :: ystatesfl(nvars)
