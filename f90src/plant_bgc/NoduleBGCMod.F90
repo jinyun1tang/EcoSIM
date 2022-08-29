@@ -7,7 +7,7 @@ module NoduleBGCMod
   use GrosubPars
   implicit none
   private
-
+  character(len=*),private, parameter :: mod_filename = __FILE__
   public :: CanopyNoduleBiochemistry
   public :: RootNoduleBiomchemistry
   contains

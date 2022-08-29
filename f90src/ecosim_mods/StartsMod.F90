@@ -40,7 +40,7 @@ module StartsMod
   implicit none
 
   private
-
+  character(len=*),private, parameter :: mod_filename = __FILE__
   !
   !
   !     BKRS=dry bulk density of woody(0),fine(1),manure(2) litter
@@ -51,7 +51,6 @@ module StartsMod
   !     CDPTHSI=depth to bottom of snowpack layers
   !     POROQ=Penman Water Linear Reduction tortuosity used in gas flux calculations
   !
-  character(len=*), private, parameter :: mod_filename = __FILE__
 
   public :: starts
   contains

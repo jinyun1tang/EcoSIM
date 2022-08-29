@@ -35,7 +35,6 @@ module WatsubMod
 
   private
 
-
   character(len=*), parameter :: mod_filename = __FILE__
 
   real(r8) :: VOLWX1(JZ,JY,JX),VPQ(JY,JX),TKQ(JY,JX) &

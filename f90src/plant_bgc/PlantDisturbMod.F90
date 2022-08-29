@@ -24,7 +24,7 @@ module PlantDisturbMod
   use GridDataType
   implicit none
   private
-
+  character(len=*),private, parameter :: mod_filename = __FILE__
 ! end_include_section
 
   public :: PrepLandscapeGrazing

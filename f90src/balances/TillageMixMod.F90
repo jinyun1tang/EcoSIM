@@ -19,7 +19,7 @@ module TillageMixMod
   use EcoSIMCtrlDataType
   USE EcoSimSumDataType
   implicit none
-
+  character(len=*),private, parameter :: mod_filename = __FILE__
   public :: ApplyTillageMixing
   contains
 

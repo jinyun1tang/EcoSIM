@@ -7,7 +7,7 @@ module RootMod
   use NoduleBGCMod
 implicit none
   private
-
+  character(len=*),private, parameter :: mod_filename = __FILE__
   public :: RootBGCModel
   contains
 

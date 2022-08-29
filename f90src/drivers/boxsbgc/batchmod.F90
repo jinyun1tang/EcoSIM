@@ -11,6 +11,7 @@ module batchmod
   use fileUtil
 implicit none
   private
+  character(len=*),private, parameter :: mod_filename = __FILE__
 !  public :: BatchModelConfig
   public :: getvarllen, getvarlist,initmodel
   logical :: Litlayer

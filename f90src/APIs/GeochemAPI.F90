@@ -12,7 +12,7 @@ module GeochemAPI
   use SoilWaterDataType
   use GridDataType
   implicit none
-
+  character(len=*),private, parameter :: mod_filename = __FILE__
   public :: soluteModel
   contains
 

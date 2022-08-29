@@ -28,7 +28,7 @@ module StarteMod
   implicit none
 
   private
-
+  character(len=*),private, parameter :: mod_filename = __FILE__
   integer :: I,K,L,MM,M,NX,NY,NR1,NP2,NP3
 
   public :: starte

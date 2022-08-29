@@ -12,9 +12,8 @@ module PlantBranchMod
   use NoduleBGCMod
   use LitterFallMod
   implicit none
-
   private
-
+  character(len=*),private, parameter :: mod_filename = __FILE__
   public :: GrowOneBranch
   contains
 !------------------------------------------------------------------------------------------

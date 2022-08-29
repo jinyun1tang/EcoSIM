@@ -493,19 +493,18 @@ END SUBROUTINE readq
 !
     read(11,'(A)')tline
     READ(tline,*,iostat=ierr)RRAD1M(1,NZ,NY,NX),RRAD2M(1,NZ,NY,NX),PORT(1,NZ,NY,NX) &
-      ,PR(NZ,NY,NX),RSRR(1,NZ,NY,NX),RSRA(1,NZ,NY,NX) &
-      ,PTSHT(NZ,NY,NX),RTFQ(NZ,NY,NX)
+      ,PR(NZ,NY,NX),RSRR(1,NZ,NY,NX),RSRA(1,NZ,NY,NX),PTSHT(NZ,NY,NX),RTFQ(NZ,NY,NX)
     call check_read(ierr,8,__LINE__,mod_filename)
 
     if(lverb)then
       write(*,*)'ROOT CHARACTERISTICS'
       write(*,*)'radius of primary roots: RRAD1M',RRAD1M(1,NZ,NY,NX)
       write(*,*)'radius of secondary roots: RRAD2M',RRAD2M(1,NZ,NY,NX)
-      write(*,*)'root porosity: PORT',PORT(1,NZ,NY,NX)
+      write(*,*)'primary/fine root porosity: PORT',PORT(1,NZ,NY,NX)
       write(*,*)'nonstructural C concentration needed for root'// &
         ' branching: PR',PR(NZ,NY,NX)
-      write(*,*)'radial root resistivity (m2 MPa-1 h-1): RSRR',RSRR(1,NZ,NY,NX)
-      write(*,*)'axial root resistivity (m2 MPa-1 h-1): RSRA',RSRA(1,NZ,NY,NX)
+      write(*,*)'radial root resistivity for water uptake (m2 MPa-1 h-1): RSRR',RSRR(1,NZ,NY,NX)
+      write(*,*)'axial root resistivity for water uptake (m2 MPa-1 h-1): RSRA',RSRA(1,NZ,NY,NX)
       write(*,*)'rate constant for equilibrating shoot-root '// &
         'nonstructural C concn: PTSHT',PTSHT(NZ,NY,NX)
       write(*,*)'root branching frequency (m-1): RTFQ',RTFQ(NZ,NY,NX)

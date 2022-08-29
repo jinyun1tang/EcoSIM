@@ -20,7 +20,7 @@ module ErosionMod
   implicit none
 
   private
-
+  character(len=*),private, parameter :: mod_filename = __FILE__
   real(r8), PARAMETER :: FSINK=0.01_r8
   real(r8) ::  RERSED(2,2,JV,JH),TERSED(JY,JX),RDTSED(JY,JX) &
       ,FVOLIM(JY,JX),FVOLWM(JY,JX),FERSNM(JY,JX),RERSED0(JY,JX)

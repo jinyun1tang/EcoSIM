@@ -2,7 +2,7 @@ module ForcTypeMod
   use data_kind_mod     , only : r8 => SHR_KIND_R8
 implicit none
 
-
+  character(len=*),private, parameter :: mod_filename = __FILE__
   type, public :: forc_type
     real(r8) :: CCH4E       !atmospheric CH4 concentration, [g m-3]
     real(r8) :: COXYE       !atmospheric O2 concentration, [g m-3]

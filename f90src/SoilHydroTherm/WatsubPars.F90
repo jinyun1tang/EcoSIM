@@ -5,6 +5,7 @@ module WatsubPars
   implicit none
   public
   save
+  character(len=*),private, parameter :: mod_filename = __FILE__
 !
 ! EMMS,EMMW,EMMR=emissivities of surface soil, snow and litter
 ! RACX,RARX=minimum boundary layer resistances of canopy,litter (h m-1)

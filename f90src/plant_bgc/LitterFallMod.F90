@@ -6,6 +6,7 @@ module LitterFallMod
   use PlantAPIData
 implicit none
   private
+  character(len=*),private, parameter :: mod_filename = __FILE__
   public :: ResetDeadBranch
   contains
 !------------------------------------------------------------------------------------------

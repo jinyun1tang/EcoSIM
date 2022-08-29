@@ -3,7 +3,7 @@ module InitVegBGC
   use EcosimConst
   use GridConsts
   implicit none
-
+  character(len=*),private, parameter :: mod_filename = __FILE__
   public :: InitIrradianceGeometry
   contains
 

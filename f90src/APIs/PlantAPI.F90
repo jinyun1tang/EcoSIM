@@ -36,6 +36,7 @@ module PlantAPI
 implicit none
 
   private
+  character(len=*),private, parameter :: mod_filename = __FILE__
   public :: PlantModel
   public :: PlantCanopyRadsModel
 

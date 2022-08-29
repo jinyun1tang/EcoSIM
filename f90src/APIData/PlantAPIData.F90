@@ -2,6 +2,7 @@ module PlantAPIData
   use data_kind_mod, only : r8 => SHR_KIND_R8
 implicit none
   save
+  character(len=*),private, parameter :: mod_filename = __FILE__
   public
 
 ! grid configuration

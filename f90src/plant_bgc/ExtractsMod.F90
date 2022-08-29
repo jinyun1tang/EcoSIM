@@ -11,6 +11,7 @@ module ExtractsMod
   implicit none
 
   private
+  character(len=*),private, parameter :: mod_filename = __FILE__
 
   public :: extracts
   contains
