@@ -32,35 +32,35 @@ implicit none
   real(r8) :: VA,VG
 !begin_execution
   associate(                          &
-  ZEROs1       => plt_site%ZEROs1   , &
-  IGTYPs1      => plt_pheno%IGTYPs1 , &
-  FDBKs1       => plt_photo%FDBKs1  , &
-  CO2Qs1       => plt_photo%CO2Qs1  , &
-  SURFXs1      => plt_photo%SURFXs1 , &
-  XKCO2Os1     => plt_photo%XKCO2Os1, &
-  SCO2s1       => plt_photo%SCO2s1  , &
-  CBXNs1       => plt_photo%CBXNs1  , &
-  ETGROs1      => plt_photo%ETGROs1 , &
-  VGROs1       => plt_photo%VGROs1  , &
-  CO2Is1       => plt_photo%CO2Is1  , &
-  RCMXs1       => plt_photo%RCMXs1  , &
-  XKCO24s1     => plt_photo%XKCO24s1, &
-  VCGROs1      => plt_photo%VCGROs1 , &
-  COMPLs1      => plt_photo%COMPLs1 , &
-  FMOLs1       => plt_photo%FMOLs1  , &
-  DCO2s1       => plt_photo%DCO2s1  , &
-  ZEROPs1      => plt_biom%ZEROPs1  , &
-  ARLFLs1      => plt_morph%ARLFLs1 , &
-  PARDIFs1     => plt_rad%PARDIFs1  , &
-  PARs1        => plt_rad%PARs1     , &
-  TAU0s1       => plt_rad%TAU0s1    , &
-  TAUSs1       => plt_rad%TAUSs1      &
+  ZERO       => plt_site%ZERO   , &
+  IGTYP      => plt_pheno%IGTYP , &
+  FDBK       => plt_photo%FDBK  , &
+  CO2Q       => plt_photo%CO2Q  , &
+  SURFX      => plt_photo%SURFX , &
+  XKCO2O     => plt_photo%XKCO2O, &
+  SCO2       => plt_photo%SCO2  , &
+  CBXN       => plt_photo%CBXN  , &
+  ETGRO      => plt_photo%ETGRO , &
+  VGRO       => plt_photo%VGRO  , &
+  CO2I       => plt_photo%CO2I  , &
+  RCMX       => plt_photo%RCMX  , &
+  XKCO24     => plt_photo%XKCO24, &
+  VCGRO      => plt_photo%VCGRO , &
+  COMPL      => plt_photo%COMPL , &
+  FMOL       => plt_photo%FMOL  , &
+  DCO2       => plt_photo%DCO2  , &
+  ZEROP      => plt_biom%ZEROP  , &
+  ARLFL      => plt_morph%ARLFL , &
+  PARDIF     => plt_rad%PARDIF  , &
+  PAR        => plt_rad%PAR     , &
+  TAU0       => plt_rad%TAU0    , &
+  TAUS       => plt_rad%TAUS      &
   )
 
 ! FOR EACH CANOPY LAYER
 !
   DO 210 L=JC1,1,-1
-    IF(ARLFLs1(L,K,NB,NZ).GT.ZEROPs1(NZ))THEN
+    IF(ARLFL(L,K,NB,NZ).GT.ZEROP(NZ))THEN
 !
 !     FOR EACH LEAF AZIMUTH AND INCLINATION
 !
@@ -71,8 +71,8 @@ implicit none
 !
 !         SURFX=unself-shaded leaf surface area
 !
-          IF(SURFXs1(N,L,K,NB,NZ).GT.ZEROPs1(NZ))THEN
-            IF(PARs1(N,M,L,NZ).GT.0.0)THEN
+          IF(SURFX(N,L,K,NB,NZ).GT.ZEROP(NZ))THEN
+            IF(PAR(N,M,L,NZ).GT.0.0)THEN
 !
 !             C3 CARBOXYLATION REACTIONS IN MESOPHYLL
 !
@@ -87,11 +87,11 @@ implicit none
 !             VGRO=rubisco carboxylation rate limited by CO2 from stomate.f
 !             FDBK=N,P feedback inhibition on C4 CO2 fixation
 !
-              PARX=QNTM*PARs1(N,M,L,NZ)
-              PARJ=PARX+ETGROs1(K,NB,NZ)
-              ETLF=(PARJ-SQRT(PARJ**2-CURV4*PARX*ETGROs1(K,NB,NZ)))/CURV2
-              EGRO=ETLF*CBXNs1(K,NB,NZ)
-              VL=AMIN1(VGROs1(K,NB,NZ),EGRO)*FDBKs1(NB,NZ)
+              PARX=QNTM*PAR(N,M,L,NZ)
+              PARJ=PARX+ETGRO(K,NB,NZ)
+              ETLF=(PARJ-SQRT(PARJ**2-CURV4*PARX*ETGRO(K,NB,NZ)))/CURV2
+              EGRO=ETLF*CBXN(K,NB,NZ)
+              VL=AMIN1(VGRO(K,NB,NZ),EGRO)*FDBK(NB,NZ)
 !
 !             STOMATAL EFFECT OF WATER DEFICIT IN MESOPHYLL
 !
@@ -103,17 +103,17 @@ implicit none
 !             WFNC=stomatal resistance function of canopy turgor
 !             FMOL=number of moles of air per m3
 !
-              IF(VL.GT.ZEROs1)THEN
-                RS=AMIN1(RCMXs1(NZ),AMAX1(RCMN,DCO2s1(NZ)/VL))
-                RSL=RS+(RCMXs1(NZ)-RS)*WFNC
-                GSL=1.0_r8/RSL*FMOLs1(NZ)
+              IF(VL.GT.ZERO)THEN
+                RS=AMIN1(RCMX(NZ),AMAX1(RCMN,DCO2(NZ)/VL))
+                RSL=RS+(RCMX(NZ)-RS)*WFNC
+                GSL=1.0_r8/RSL*FMOL(NZ)
 !
 !               EFFECT OF WATER DEFICIT IN MESOPHYLL
 !
 !               IGTYP=growth type:0=bryophyte,1=graminoid,2=shrub,tree
 !               WFNB=non-stomatal effects of water stress on CO2 fixation
 !
-                IF(IGTYPs1(NZ).NE.0)THEN
+                IF(IGTYP(NZ).NE.0)THEN
                   WFNB=SQRT(RS/RSL)
                 ELSE
                   WFNB=WFNG
@@ -136,20 +136,20 @@ implicit none
 !               VG=CO2 diffusion rate limited by water stress
 !               GSL=leaf stomatal conductance (mol m-2 s-1)
 !
-                CO2X=CO2Is1(NZ)
+                CO2X=CO2I(NZ)
                 DO 225 NN=1,100
-                  CO2C=CO2X*SCO2s1(NZ)
-                  CO2Y=AMAX1(0.0,CO2C-COMPLs1(K,NB,NZ))
-                  CBXNX=CO2Y/(ELEC3*CO2C+10.5*COMPLs1(K,NB,NZ))
-                  VGROX=VCGROs1(K,NB,NZ)*CO2Y/(CO2C+XKCO2Os1(NZ))
+                  CO2C=CO2X*SCO2(NZ)
+                  CO2Y=AMAX1(0.0,CO2C-COMPL(K,NB,NZ))
+                  CBXNX=CO2Y/(ELEC3*CO2C+10.5*COMPL(K,NB,NZ))
+                  VGROX=VCGRO(K,NB,NZ)*CO2Y/(CO2C+XKCO2O(NZ))
                   EGROX=ETLF*CBXNX
-                  VL=AMIN1(VGROX,EGROX)*WFNB*FDBKs1(NB,NZ)
-                  VG=(CO2Qs1(NZ)-CO2X)*GSL
-                  IF(VL+VG.GT.ZEROs1)THEN
+                  VL=AMIN1(VGROX,EGROX)*WFNB*FDBK(NB,NZ)
+                  VG=(CO2Q(NZ)-CO2X)*GSL
+                  IF(VL+VG.GT.ZERO)THEN
                     DIFF=(VL-VG)/(VL+VG)
                     IF(ABS(DIFF).LT.0.005)exit
                     VA=0.95*VG+0.05*VL
-                    CO2X=CO2Qs1(NZ)-VA/GSL
+                    CO2X=CO2Q(NZ)-VA/GSL
                   ELSE
                     VL=0._r8
                     exit
@@ -162,23 +162,23 @@ implicit none
 !               SURFX=unself-shaded leaf surface area
 !               TAUS=fraction of direct radiation transmitted from layer above
 !
-                CH2O3(K)=CH2O3(K)+VL*SURFXs1(N,L,K,NB,NZ) &
-                  *TAUSs1(L+1)
+                CH2O3(K)=CH2O3(K)+VL*SURFX(N,L,K,NB,NZ) &
+                  *TAUS(L+1)
 !               ICO2I=MAX(1,MIN(400,INT(CO2X)))
 !               VCO2(ICO2I,I,NZ)=VCO2(ICO2I,I,NZ)
-!              2+(VL*SURFXs1(N,L,K,NB,NZ)*TAUSs1(L+1))*0.0432
+!              2+(VL*SURFX(N,L,K,NB,NZ)*TAUS(L+1))*0.0432
 
               ENDIF
             ENDIF
 !
 !           CO2 FIXATION IN MESOPHYLL BY SHADED LEAVES
 !
-            IF(PARDIFs1(N,M,L,NZ).GT.0.0)THEN
+            IF(PARDIF(N,M,L,NZ).GT.0.0)THEN
 !
 !             C3 CARBOXYLATION REACTIONS USING VARIABLES FROM 'STOMATE'
 !
 !             QNTM=quantum efficiency
-!             PARDIFs1=diffuse PAR flux
+!             PARDIF=diffuse PAR flux
 !             ETGRO=light saturated e- transport rate from stomate.f
 !             ETLF=light-limited e- transport rate
 !             CURV=shape parameter for e- transport response to PAR
@@ -188,11 +188,11 @@ implicit none
 !             VGRO=rubisco carboxylation rate limited by CO2 from stomate.f
 !             FDBK=N,P feedback inhibition on C3 CO2 fixation
 !
-              PARX=QNTM*PARDIFs1(N,M,L,NZ)
-              PARJ=PARX+ETGROs1(K,NB,NZ)
-              ETLF=(PARJ-SQRT(PARJ**2-CURV4*PARX*ETGROs1(K,NB,NZ)))/CURV2
-              EGRO=ETLF*CBXNs1(K,NB,NZ)
-              VL=AMIN1(VGROs1(K,NB,NZ),EGRO)*FDBKs1(NB,NZ)
+              PARX=QNTM*PARDIF(N,M,L,NZ)
+              PARJ=PARX+ETGRO(K,NB,NZ)
+              ETLF=(PARJ-SQRT(PARJ**2-CURV4*PARX*ETGRO(K,NB,NZ)))/CURV2
+              EGRO=ETLF*CBXN(K,NB,NZ)
+              VL=AMIN1(VGRO(K,NB,NZ),EGRO)*FDBK(NB,NZ)
 !
 !             STOMATAL EFFECT OF WATER DEFICIT IN MESOPHYLL
 !
@@ -204,17 +204,17 @@ implicit none
 !             WFNC=stomatal resistance function of canopy turgor
 !             FMOL=number of moles of air per m3
 !
-              IF(VL.GT.ZEROs1)THEN
-                RS=AMIN1(RCMXs1(NZ),AMAX1(RCMN,DCO2s1(NZ)/VL))
-                RSL=RS+(RCMXs1(NZ)-RS)*WFNC
-                GSL=1.0_r8/RSL*FMOLs1(NZ)
+              IF(VL.GT.ZERO)THEN
+                RS=AMIN1(RCMX(NZ),AMAX1(RCMN,DCO2(NZ)/VL))
+                RSL=RS+(RCMX(NZ)-RS)*WFNC
+                GSL=1.0_r8/RSL*FMOL(NZ)
 !
 !               EFFECT OF WATER DEFICIT IN MESOPHYLL
 !
 !               IGTYP=growth type:0=bryophyte,1=graminoid,2=shrub,tree
 !               WFNB=non-stomatal effects of water stress on C3 CO2 fixation
 !
-                IF(IGTYPs1(NZ).NE.0)THEN
+                IF(IGTYP(NZ).NE.0)THEN
                   WFNB=SQRT(RS/RSL)
                 ELSE
                   WFNB=WFNG
@@ -237,20 +237,20 @@ implicit none
 !               VG=CO2 diffusion rate limited by water stress
 !               GSL=leaf stomatal conductance (mol m-2 s-1)
 !
-                CO2X=CO2Is1(NZ)
+                CO2X=CO2I(NZ)
                 DO 235 NN=1,100
-                  CO2C=CO2X*SCO2s1(NZ)
-                  CO2Y=AMAX1(0.0,CO2C-COMPLs1(K,NB,NZ))
-                  CBXNX=CO2Y/(ELEC3*CO2C+10.5*COMPLs1(K,NB,NZ))
-                  VGROX=VCGROs1(K,NB,NZ)*CO2Y/(CO2C+XKCO2Os1(NZ))
+                  CO2C=CO2X*SCO2(NZ)
+                  CO2Y=AMAX1(0.0,CO2C-COMPL(K,NB,NZ))
+                  CBXNX=CO2Y/(ELEC3*CO2C+10.5*COMPL(K,NB,NZ))
+                  VGROX=VCGRO(K,NB,NZ)*CO2Y/(CO2C+XKCO2O(NZ))
                   EGROX=ETLF*CBXNX
-                  VL=AMIN1(VGROX,EGROX)*WFNB*FDBKs1(NB,NZ)
-                  VG=(CO2Qs1(NZ)-CO2X)*GSL
-                  IF(VL+VG.GT.ZEROs1)THEN
+                  VL=AMIN1(VGROX,EGROX)*WFNB*FDBK(NB,NZ)
+                  VG=(CO2Q(NZ)-CO2X)*GSL
+                  IF(VL+VG.GT.ZERO)THEN
                     DIFF=(VL-VG)/(VL+VG)
                     IF(ABS(DIFF).LT.0.005)exit
                     VA=0.95*VG+0.05*VL
-                    CO2X=CO2Qs1(NZ)-VA/GSL
+                    CO2X=CO2Q(NZ)-VA/GSL
                   ELSE
                     VL=0._r8
                     exit
@@ -261,13 +261,13 @@ implicit none
 !
 !               CH2O3=total C3 CO2 fixation
 !               SURFX=unself-shaded leaf surface area
-!               TAU0s1=fraction of diffuse radiation transmitted from layer above
+!               TAU0=fraction of diffuse radiation transmitted from layer above
 !
-                CH2O3(K)=CH2O3(K)+VL*SURFXs1(N,L,K,NB,NZ) &
-                  *TAU0s1(L+1)
+                CH2O3(K)=CH2O3(K)+VL*SURFX(N,L,K,NB,NZ) &
+                  *TAU0(L+1)
 !               ICO2I=MAX(1,MIN(400,INT(CO2X)))
 !               VCO2(ICO2I,I,NZ)=VCO2(ICO2I,I,NZ)
-!              2+(VL*SURFXs1(N,L,K,NB,NZ)*TAU0s1(L+1))*0.0432
+!              2+(VL*SURFX(N,L,K,NB,NZ)*TAU0(L+1))*0.0432
               ENDIF
             ENDIF
           ENDIF
@@ -306,36 +306,36 @@ implicit none
   real(r8) :: VA,VG
 ! begin_execution
   associate(                          &
-  IGTYPs1      => plt_pheno%IGTYPs1 , &
-  ZEROPs1      => plt_biom%ZEROPs1  , &
-  XKCO24s1     => plt_photo%XKCO24s1, &
-  FDBK4s1      => plt_photo%FDBK4s1 , &
-  SCO2s1       => plt_photo%SCO2s1  , &
-  CBXN4s1      => plt_photo%CBXN4s1 , &
-  SURFXs1      => plt_photo%SURFXs1 , &
-  VGRO4s1      => plt_photo%VGRO4s1 , &
-  RCMXs1       => plt_photo%RCMXs1  , &
-  DCO2s1       => plt_photo%DCO2s1  , &
-  FMOLs1       => plt_photo%FMOLs1  , &
-  ETGROs1      => plt_photo%ETGROs1 , &
-  VGROs1       => plt_photo%VGROs1  , &
-  ETGR4s1      => plt_photo%ETGR4s1 , &
-  CO2Qs1       => plt_photo%CO2Qs1  , &
-  FDBKs1       => plt_photo%FDBKs1  , &
-  CO2Is1       => plt_photo%CO2Is1  , &
-  CBXNs1       => plt_photo%CBXNs1  , &
-  VCGR4s1      => plt_photo%VCGR4s1 , &
-  ARLFLs1      => plt_morph%ARLFLs1 , &
-  ZEROs1       => plt_site%ZEROs1   , &
-  PARDIFs1     => plt_rad%PARDIFs1  , &
-  PARs1        => plt_rad%PARs1     , &
-  TAU0s1       => plt_rad%TAU0s1    , &
-  TAUSs1       => plt_rad%TAUSs1      &
+  IGTYP      => plt_pheno%IGTYP , &
+  ZEROP      => plt_biom%ZEROP  , &
+  XKCO24     => plt_photo%XKCO24, &
+  FDBK4      => plt_photo%FDBK4 , &
+  SCO2       => plt_photo%SCO2  , &
+  CBXN4      => plt_photo%CBXN4 , &
+  SURFX      => plt_photo%SURFX , &
+  VGRO4      => plt_photo%VGRO4 , &
+  RCMX       => plt_photo%RCMX  , &
+  DCO2       => plt_photo%DCO2  , &
+  FMOL       => plt_photo%FMOL  , &
+  ETGRO      => plt_photo%ETGRO , &
+  VGRO       => plt_photo%VGRO  , &
+  ETGR4      => plt_photo%ETGR4 , &
+  CO2Q       => plt_photo%CO2Q  , &
+  FDBK       => plt_photo%FDBK  , &
+  CO2I       => plt_photo%CO2I  , &
+  CBXN       => plt_photo%CBXN  , &
+  VCGR4      => plt_photo%VCGR4 , &
+  ARLFL      => plt_morph%ARLFL , &
+  ZERO       => plt_site%ZERO   , &
+  PARDIF     => plt_rad%PARDIF  , &
+  PAR        => plt_rad%PAR     , &
+  TAU0       => plt_rad%TAU0    , &
+  TAUS       => plt_rad%TAUS      &
   )
 ! FOR EACH CANOPY LAYER
 !
   DO 110 L=JC1,1,-1
-    IF(ARLFLs1(L,K,NB,NZ).GT.ZEROPs1(NZ))THEN
+    IF(ARLFL(L,K,NB,NZ).GT.ZEROP(NZ))THEN
 !
 !     FOR EACH LEAF AZIMUTH AND INCLINATION
 !
@@ -346,8 +346,8 @@ implicit none
 !
 !         SURFX=unself-shaded leaf surface area
 !
-          IF(SURFXs1(N,L,K,NB,NZ).GT.ZEROPs1(NZ))THEN
-            IF(PARs1(N,M,L,NZ).GT.0.0)THEN
+          IF(SURFX(N,L,K,NB,NZ).GT.ZEROP(NZ))THEN
+            IF(PAR(N,M,L,NZ).GT.0.0)THEN
 !
 !             C4 CARBOXYLATION REACTIONS IN MESOPHYLL
 !
@@ -362,11 +362,11 @@ implicit none
 !             VGRO4=PEP carboxylation rate limited by CO2 from stomate.f
 !             FDBK4=N,P feedback inhibition on C4 CO2 fixation
 !
-              PARX=QNTM*PARs1(N,M,L,NZ)
-              PARJ=PARX+ETGR4s1(K,NB,NZ)
-              ETLF4=(PARJ-SQRT(PARJ**2-CURV4*PARX*ETGR4s1(K,NB,NZ)))/CURV2
-              EGRO4=ETLF4*CBXN4s1(K,NB,NZ)
-              VL=AMIN1(VGRO4s1(K,NB,NZ),EGRO4)*FDBK4s1(K,NB,NZ)
+              PARX=QNTM*PAR(N,M,L,NZ)
+              PARJ=PARX+ETGR4(K,NB,NZ)
+              ETLF4=(PARJ-SQRT(PARJ**2-CURV4*PARX*ETGR4(K,NB,NZ)))/CURV2
+              EGRO4=ETLF4*CBXN4(K,NB,NZ)
+              VL=AMIN1(VGRO4(K,NB,NZ),EGRO4)*FDBK4(K,NB,NZ)
 !
 !             STOMATAL EFFECT OF WATER DEFICIT IN MESOPHYLL
 !
@@ -378,17 +378,17 @@ implicit none
 !             WFNC=stomatal resistance function of canopy turgor
 !             FMOL=number of moles of air per m3
 !
-              IF(VL.GT.ZEROs1)THEN
-                RS=AMIN1(RCMXs1(NZ),AMAX1(RCMN,DCO2s1(NZ)/VL))
-                RSL=RS+(RCMXs1(NZ)-RS)*WFNC
-                GSL=1.0_r8/RSL*FMOLs1(NZ)
+              IF(VL.GT.ZERO)THEN
+                RS=AMIN1(RCMX(NZ),AMAX1(RCMN,DCO2(NZ)/VL))
+                RSL=RS+(RCMX(NZ)-RS)*WFNC
+                GSL=1.0_r8/RSL*FMOL(NZ)
 !
 !               EFFECT OF WATER DEFICIT IN MESOPHYLL
 !
 !               IGTYP=growth type:0=bryophyte,1=graminoid,2=shrub,tree
 !               WFNB=non-stomatal effects of water stress on C4,C3 CO2 fixation
 !
-                IF(IGTYPs1(NZ).NE.0)THEN
+                IF(IGTYP(NZ).NE.0)THEN
                   WFN4=RS/RSL
                   WFNB=SQRT(RS/RSL)
                 ELSE
@@ -413,20 +413,20 @@ implicit none
 !               VG=CO2 diffusion rate limited by water stress
 !               GSL=leaf stomatal conductance (mol m-2 s-1)
 !
-                CO2X=CO2Is1(NZ)
+                CO2X=CO2I(NZ)
                 DO 125 NN=1,100
-                  CO2C=CO2X*SCO2s1(NZ)
+                  CO2C=CO2X*SCO2(NZ)
                   CO2Y=AMAX1(0.0,CO2C-COMP4)
                   CBXNX=CO2Y/(ELEC4*CO2C+10.5*COMP4)
-                  VGROX=VCGR4s1(K,NB,NZ)*CO2Y/(CO2C+XKCO24s1(NZ))
+                  VGROX=VCGR4(K,NB,NZ)*CO2Y/(CO2C+XKCO24(NZ))
                   EGROX=ETLF4*CBXNX
-                  VL=AMIN1(VGROX,EGROX)*WFN4*FDBK4s1(K,NB,NZ)
-                  VG=(CO2Qs1(NZ)-CO2X)*GSL
-                  IF(VL+VG.GT.ZEROs1)THEN
+                  VL=AMIN1(VGROX,EGROX)*WFN4*FDBK4(K,NB,NZ)
+                  VG=(CO2Q(NZ)-CO2X)*GSL
+                  IF(VL+VG.GT.ZERO)THEN
                     DIFF=(VL-VG)/(VL+VG)
                     IF(ABS(DIFF).LT.0.005)exit
                     VA=0.95*VG+0.05*VL
-                    CO2X=CO2Qs1(NZ)-VA/GSL
+                    CO2X=CO2Q(NZ)-VA/GSL
                   ELSE
                     VL=0._r8
                     exit
@@ -439,11 +439,11 @@ implicit none
 !               SURFX=unself-shaded leaf surface area
 !               TAUS=fraction of direct radiation transmitted from layer above
 !
-                CH2O4(K)=CH2O4(K)+VL*SURFXs1(N,L,K,NB,NZ) &
-                  *TAUSs1(L+1)
+                CH2O4(K)=CH2O4(K)+VL*SURFX(N,L,K,NB,NZ) &
+                  *TAUS(L+1)
 !               ICO2I=MAX(1,MIN(400,INT(CO2X)))
 !               VCO2(ICO2I,I,NZ)=VCO2(ICO2I,I,NZ)
-!              2+(VL*SURFXs1(N,L,K,NB,NZ)*TAUSs1(L+1))*0.0432
+!              2+(VL*SURFX(N,L,K,NB,NZ)*TAUS(L+1))*0.0432
 !
 !               C3 CARBOXYLATION REACTIONS IN BUNDLE SHEATH OF C4 PLANTS
 !
@@ -456,10 +456,10 @@ implicit none
 !               VGRO=rubisco carboxylation rate limited by CO2 from stomate.f
 !               FDBK=N,P feedback inhibition on C3 CO2 fixation
 !
-                PARJ=PARX+ETGROs1(K,NB,NZ)
-                ETLF=(PARJ-SQRT(PARJ**2-CURV4*PARX*ETGROs1(K,NB,NZ)))/CURV2
-                EGRO=ETLF*CBXNs1(K,NB,NZ)
-                VL=AMIN1(VGROs1(K,NB,NZ),EGRO)*WFNB*FDBKs1(NB,NZ)
+                PARJ=PARX+ETGRO(K,NB,NZ)
+                ETLF=(PARJ-SQRT(PARJ**2-CURV4*PARX*ETGRO(K,NB,NZ)))/CURV2
+                EGRO=ETLF*CBXN(K,NB,NZ)
+                VL=AMIN1(VGRO(K,NB,NZ),EGRO)*WFNB*FDBK(NB,NZ)
 !
 !               ACCUMULATE C3 FIXATION PRODUCT IN BUNDLE SHEATH
 !
@@ -467,19 +467,19 @@ implicit none
 !               SURFX=unself-shaded leaf surface area
 !               TAUS=fraction of direct radiation transmitted from layer above
 !
-                CH2O3(K)=CH2O3(K)+VL*SURFXs1(N,L,K,NB,NZ)*TAUSs1(L+1)
+                CH2O3(K)=CH2O3(K)+VL*SURFX(N,L,K,NB,NZ)*TAUS(L+1)
 
               ENDIF
             ENDIF
 !
 !           CO2 FIXATION IN MESOPHYLL BY SHADED LEAVES
 !
-            IF(PARDIFs1(N,M,L,NZ).GT.0.0)THEN
+            IF(PARDIF(N,M,L,NZ).GT.0.0)THEN
 !
 !           C4 CARBOXYLATION REACTIONS IN MESOPHYLL
 !
 !           QNTM=quantum efficiency
-!           PARDIFs1=diffuse PAR flux
+!           PARDIF=diffuse PAR flux
 !           ETGR4=light saturated e- transport rate from stomate.f
 !           ETLF4=light-limited e- transport rate
 !           CURV=shape parameter for e- transport response to PAR
@@ -489,11 +489,11 @@ implicit none
 !           VGRO4=PEP carboxylation rate limited by CO2 from stomate.f
 !           FDBK4=N,P feedback inhibition on C4 CO2 fixation
 !
-              PARX=QNTM*PARDIFs1(N,M,L,NZ)
-              PARJ=PARX+ETGR4s1(K,NB,NZ)
-              ETLF4=(PARJ-SQRT(PARJ**2-CURV4*PARX*ETGR4s1(K,NB,NZ)))/CURV2
-              EGRO4=ETLF4*CBXN4s1(K,NB,NZ)
-              VL=AMIN1(VGRO4s1(K,NB,NZ),EGRO4)*FDBK4s1(K,NB,NZ)
+              PARX=QNTM*PARDIF(N,M,L,NZ)
+              PARJ=PARX+ETGR4(K,NB,NZ)
+              ETLF4=(PARJ-SQRT(PARJ**2-CURV4*PARX*ETGR4(K,NB,NZ)))/CURV2
+              EGRO4=ETLF4*CBXN4(K,NB,NZ)
+              VL=AMIN1(VGRO4(K,NB,NZ),EGRO4)*FDBK4(K,NB,NZ)
 !
 !             STOMATAL EFFECT OF WATER DEFICIT IN MESOPHYLL
 !
@@ -505,17 +505,17 @@ implicit none
 !             WFNC=stomatal resistance function of canopy turgor
 !             FMOL=number of moles of air per m3
 !
-              IF(VL.GT.ZEROs1)THEN
-                RS=AMIN1(RCMXs1(NZ),AMAX1(RCMN,DCO2s1(NZ)/VL))
-                RSL=RS+(RCMXs1(NZ)-RS)*WFNC
-                GSL=1.0_r8/RSL*FMOLs1(NZ)
+              IF(VL.GT.ZERO)THEN
+                RS=AMIN1(RCMX(NZ),AMAX1(RCMN,DCO2(NZ)/VL))
+                RSL=RS+(RCMX(NZ)-RS)*WFNC
+                GSL=1.0_r8/RSL*FMOL(NZ)
 !
 !               EFFECT OF WATER DEFICIT IN MESOPHYLL
 !
 !               IGTYP=growth type:0=bryophyte,1=graminoid,2=shrub,tree
 !               WFN4,WFNB=non-stomatal effects of water stress on C4,C3 CO2 fixation
 !
-                IF(IGTYPs1(NZ).NE.0)THEN
+                IF(IGTYP(NZ).NE.0)THEN
                   WFN4=(RS/RSL)**1.00
                   WFNB=SQRT(RS/RSL)
                 ELSE
@@ -540,20 +540,20 @@ implicit none
 !               VG=CO2 diffusion rate limited by water stress
 !               GSL=leaf stomatal conductance (mol m-2 s-1)
 !
-                CO2X=CO2Is1(NZ)
+                CO2X=CO2I(NZ)
                 DO 135 NN=1,100
-                  CO2C=CO2X*SCO2s1(NZ)
+                  CO2C=CO2X*SCO2(NZ)
                   CO2Y=AMAX1(0.0,CO2C-COMP4)
                   CBXNX=CO2Y/(ELEC4*CO2C+10.5*COMP4)
-                  VGROX=VCGR4s1(K,NB,NZ)*CO2Y/(CO2C+XKCO24s1(NZ))
+                  VGROX=VCGR4(K,NB,NZ)*CO2Y/(CO2C+XKCO24(NZ))
                   EGROX=ETLF4*CBXNX
-                  VL=AMIN1(VGROX,EGROX)*WFN4*FDBK4s1(K,NB,NZ)
-                  VG=(CO2Qs1(NZ)-CO2X)*GSL
-                  IF(VL+VG.GT.ZEROs1)THEN
+                  VL=AMIN1(VGROX,EGROX)*WFN4*FDBK4(K,NB,NZ)
+                  VG=(CO2Q(NZ)-CO2X)*GSL
+                  IF(VL+VG.GT.ZERO)THEN
                     DIFF=(VL-VG)/(VL+VG)
                     IF(ABS(DIFF).LT.0.005)exit
                     VA=0.95*VG+0.05*VL
-                    CO2X=CO2Qs1(NZ)-VA/GSL
+                    CO2X=CO2Q(NZ)-VA/GSL
                   ELSE
                     VL=0._r8
                     exit
@@ -564,13 +564,13 @@ implicit none
 !
 !               CH2O4=total C4 CO2 fixation
 !               SURFX=unself-shaded leaf surface area
-!               TAU0s1=fraction of diffuse radiation transmitted from layer above
+!               TAU0=fraction of diffuse radiation transmitted from layer above
 !
-                CH2O4(K)=CH2O4(K)+VL*SURFXs1(N,L,K,NB,NZ) &
-                  *TAU0s1(L+1)
+                CH2O4(K)=CH2O4(K)+VL*SURFX(N,L,K,NB,NZ) &
+                  *TAU0(L+1)
 !               ICO2I=MAX(1,MIN(400,INT(CO2X)))
 !               VCO2(ICO2I,I,NZ)=VCO2(ICO2I,I,NZ)
-!              2+(VL*SURFXs1(N,L,K,NB,NZ)*TAU0s1(L+1))*0.0432
+!              2+(VL*SURFX(N,L,K,NB,NZ)*TAU0(L+1))*0.0432
 !
 !               C3 CARBOXYLATION REACTIONS IN IN BUNDLE SHEATH OF C4 PLANTS
 !
@@ -583,19 +583,19 @@ implicit none
 !               VGRO=rubisco carboxylation rate limited by CO2 from stomate.f
 !               FDBK=N,P feedback inhibition on C3 CO2 fixation
 !
-                PARJ=PARX+ETGROs1(K,NB,NZ)
-                ETLF=(PARJ-SQRT(PARJ**2-CURV4*PARX*ETGROs1(K,NB,NZ)))/CURV2
-                EGRO=ETLF*CBXNs1(K,NB,NZ)
-                VL=AMIN1(VGROs1(K,NB,NZ),EGRO)*WFNB*FDBKs1(NB,NZ)
+                PARJ=PARX+ETGRO(K,NB,NZ)
+                ETLF=(PARJ-SQRT(PARJ**2-CURV4*PARX*ETGRO(K,NB,NZ)))/CURV2
+                EGRO=ETLF*CBXN(K,NB,NZ)
+                VL=AMIN1(VGRO(K,NB,NZ),EGRO)*WFNB*FDBK(NB,NZ)
 !
 !               ACCUMULATE C3 FIXATION PRODUCT IN BUNDLE SHEATH
 !
 !               CH2O3=total C3 CO2 fixation
 !               SURFX=unself-shaded leaf surface area
-!               TAU0s1=fraction of diffuse radiation transmitted from layer above
+!               TAU0=fraction of diffuse radiation transmitted from layer above
 !
-                CH2O3(K)=CH2O3(K)+VL*SURFXs1(N,L,K,NB,NZ) &
-                  *TAU0s1(L+1)
+                CH2O3(K)=CH2O3(K)+VL*SURFX(N,L,K,NB,NZ) &
+                  *TAU0(L+1)
               ENDIF
             ENDIF
           ENDIF
@@ -624,30 +624,30 @@ implicit none
 
 ! begin_execution
   associate(                           &
-    CO2Qs1    =>  plt_photo%CO2Qs1   , &
-    ICTYPs1   =>  plt_photo%ICTYPs1  , &
-    VCGR4s1   =>  plt_photo%VCGR4s1  , &
-    VCGROs1   =>  plt_photo%VCGROs1  , &
-    IGTYPs1   =>  plt_pheno%IGTYPs1  , &
-    SSINs1    =>  plt_rad%SSINs1     , &
-    RADPs1    =>  plt_rad%RADPs1     , &
-    ZEROPs1   =>  plt_biom%ZEROPs1   , &
-    ARLF1s1   =>  plt_morph%ARLF1s1  , &
-    FDBKs1    =>  plt_photo%FDBKs1     &
+    CO2Q    =>  plt_photo%CO2Q   , &
+    ICTYP   =>  plt_photo%ICTYP  , &
+    VCGR4   =>  plt_photo%VCGR4  , &
+    VCGRO   =>  plt_photo%VCGRO  , &
+    IGTYP   =>  plt_pheno%IGTYP  , &
+    SSIN    =>  plt_rad%SSIN     , &
+    RADP    =>  plt_rad%RADP     , &
+    ZEROP   =>  plt_biom%ZEROP   , &
+    ARLF1   =>  plt_morph%ARLF1  , &
+    FDBK    =>  plt_photo%FDBK     &
   )
 
-  IF(abs(FDBKs1(NB,NZ)).GT.0._r8)THEN
-    IF(SSINs1.GT.0.0_r8.AND.RADPs1(NZ).GT.0.0_r8.AND.CO2Qs1(NZ).GT.0.0_r8)THEN
+  IF(abs(FDBK(NB,NZ)).GT.0._r8)THEN
+    IF(SSIN.GT.0.0_r8.AND.RADP(NZ).GT.0.0_r8.AND.CO2Q(NZ).GT.0.0_r8)THEN
       CO2F=0._r8
       CH2O=0._r8
-      IF(IGTYPs1(NZ).NE.0.OR.WFNC.GT.0.0_r8)THEN
+      IF(IGTYP(NZ).NE.0.OR.WFNC.GT.0.0_r8)THEN
 !
 !         FOR EACH NODE
 !
         DO 100 K=1,JNODS1
           CH2O3(K)=0._r8
           CH2O4(K)=0._r8
-          IF(ARLF1s1(K,NB,NZ).GT.ZEROPs1(NZ))THEN
+          IF(ARLF1(K,NB,NZ).GT.ZEROP(NZ))THEN
 !
 !             C4 PHOTOSYNTHESIS
 !
@@ -655,13 +655,13 @@ implicit none
 !             ICTYP=photosynthesis type:3=C3,4=C4 from PFT file
 !             VCGR4=PEP carboxylation rate unlimited by CO2
 !
-            IF(ICTYPs1(NZ).EQ.4.AND.VCGR4s1(K,NB,NZ).GT.0.0)THEN
+            IF(ICTYP(NZ).EQ.4.AND.VCGR4(K,NB,NZ).GT.0.0)THEN
 !
               CALL ComputeGPP_C4(K,NB,NZ,WFNG,WFNC,CH2O3,CH2O4,CO2F,CH2O)
 !
 !               C3 PHOTOSYNTHESIS
 !
-            ELSEIF(ICTYPs1(NZ).NE.4.AND.VCGROs1(K,NB,NZ).GT.0.0)THEN
+            ELSEIF(ICTYP(NZ).NE.4.AND.VCGRO(K,NB,NZ).GT.0.0)THEN
               call ComputeGPP_C3(K,NB,NZ,WFNG,WFNC,CH2O3,CO2F,CH2O)
 
             ENDIF
@@ -682,7 +682,7 @@ implicit none
       ELSE
         CO2F=0._r8
         CH2O=0._r8
-        IF(ICTYPs1(NZ).EQ.4)THEN
+        IF(ICTYP(NZ).EQ.4)THEN
           DO 155 K=1,JNODS1
             CH2O3(K)=0._r8
             CH2O4(K)=0._r8
@@ -692,7 +692,7 @@ implicit none
     ELSE
       CO2F=0._r8
       CH2O=0._r8
-      IF(ICTYPs1(NZ).EQ.4)THEN
+      IF(ICTYP(NZ).EQ.4)THEN
         DO 160 K=1,JNODS1
           CH2O3(K)=0._r8
           CH2O4(K)=0._r8
@@ -702,7 +702,7 @@ implicit none
   ELSE
     CO2F=0._r8
     CH2O=0._r8
-    IF(ICTYPs1(NZ).EQ.4)THEN
+    IF(ICTYP(NZ).EQ.4)THEN
       DO 165 K=1,JNODS1
         CH2O3(K)=0._r8
         CH2O4(K)=0._r8

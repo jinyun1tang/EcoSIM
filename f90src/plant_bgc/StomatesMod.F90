@@ -41,21 +41,21 @@
   real(r8):: RI
 !     begin_execution
   associate(                            &
-    RIBs1      =>  plt_ew%RIBs1       , &
-    RAZs1      =>  plt_ew%RAZs1       , &
-    TKAs1      =>  plt_ew%TKAs1       , &
-    TKCZs1     =>  plt_ew%TKCZs1      , &
-    CO2Es1     =>  plt_site%CO2Es1    , &
-    CO2Qs1     =>  plt_photo%CO2Qs1   , &
-    ARLFPs1    =>  plt_morph%ARLFPs1  , &
-    ZEROPs1    =>  plt_biom%ZEROPs1   , &
-    CNETXs1    =>  plt_bgcr%CNETXs1   , &
-    SSINs1     =>  plt_rad%SSINs1     , &
-    FMOLs1     =>  plt_photo%FMOLs1   , &
-    RSMNs1     =>  plt_photo%RSMNs1   , &
-    FCO2s1     =>  plt_photo%FCO2s1   , &
-    RSMHs1     =>  plt_photo%RSMHs1   , &
-    CO2Is1     =>  plt_photo%CO2Is1     &
+    RIB      =>  plt_ew%RIB       , &
+    RAZ      =>  plt_ew%RAZ       , &
+    TKA      =>  plt_ew%TKA       , &
+    TKCZ     =>  plt_ew%TKCZ      , &
+    CO2E     =>  plt_site%CO2E    , &
+    CO2Q     =>  plt_photo%CO2Q   , &
+    ARLFP    =>  plt_morph%ARLFP  , &
+    ZEROP    =>  plt_biom%ZEROP   , &
+    CNETX    =>  plt_bgcr%CNETX   , &
+    SSIN     =>  plt_rad%SSIN     , &
+    FMOL     =>  plt_photo%FMOL   , &
+    RSMN     =>  plt_photo%RSMN   , &
+    FCO2     =>  plt_photo%FCO2   , &
+    RSMH     =>  plt_photo%RSMH   , &
+    CO2I     =>  plt_photo%CO2I     &
   )
 !
 !     CANOPY TEMPERATURE + OFFSET FOR THERMAL ADAPTATION FROM 'READQ'
@@ -69,17 +69,17 @@
 !     RACL=canopy boundary layer resistance to CO2
 !     FMOL=number of moles of air per m3
 !
-  RI=AMAX1(-0.3,AMIN1(0.075,RIBs1*(TKAs1-TKCZs1(NZ))))
-  RACL=1.34*AMAX1(5.56E-03,RAZs1(NZ)/(1.0-10.0*RI))
-  FMOLs1(NZ)=1.2194E+04/TKCZs1(NZ)
+  RI=AMAX1(-0.3,AMIN1(0.075,RIB*(TKA-TKCZ(NZ))))
+  RACL=1.34*AMAX1(5.56E-03,RAZ(NZ)/(1.0-10.0*RI))
+  FMOL(NZ)=1.2194E+04/TKCZ(NZ)
 !
 !     CANOPY CO2 CONCENTRATION FROM CO2 INFLUXES AND EFFLUXES
 !
 !     CO2Q,CO2E=CO2 concentrations in canopy air,atmosphere, umol mol-1 (ppmv)
 !     CNETX=net CO2 flux in canopy air from soil,plants, g d-2 h-1
 !
-  CO2Qs1(NZ)=CO2Es1-8.33E+04_r8*CNETXs1*RACL/FMOLs1(NZ)
-  CO2Qs1(NZ)=AMIN1(CO2Es1+200.0_r8,AMAX1(0.0_r8,CO2Es1-200.0_r8,CO2Qs1(NZ)))
+  CO2Q(NZ)=CO2E-8.33E+04_r8*CNETX*RACL/FMOL(NZ)
+  CO2Q(NZ)=AMIN1(CO2E+200.0_r8,AMAX1(0.0_r8,CO2E-200.0_r8,CO2Q(NZ)))
 !
 !     MESOPHYLL CO2 CONCENTRATION FROM CI:CA RATIO ENTERED IN 'READQ'
 !
@@ -88,14 +88,14 @@
 !     SSIN=sine of solar angle
 !     ARLFP=PFT leaf area
 !
-  CO2Is1(NZ)=FCO2s1(NZ)*CO2Qs1(NZ)
+  CO2I(NZ)=FCO2(NZ)*CO2Q(NZ)
 
-  IF(SSINs1.GT.0.0.AND.ARLFPs1(NZ).GT.ZEROPs1(NZ))THEN
+  IF(SSIN.GT.0.0.AND.ARLFP(NZ).GT.ZEROP(NZ))THEN
 !
     call PhotoActivePFT(NZ)
   ELSE
 !
-    RSMNs1(NZ)=RSMHs1(NZ)
+    RSMN(NZ)=RSMH(NZ)
   ENDIF
 
   RETURN
@@ -111,14 +111,14 @@
   real(r8) :: VL
 !     begin_execution
   associate(                        &
-    PARDIFs1 => plt_rad%PARDIFs1  , &
-    PARs1    => plt_rad%PARs1     , &
-    VGROs1   => plt_photo%VGROs1  , &
-    SURFXs1  => plt_photo%SURFXs1 , &
-    FDBKs1   => plt_photo%FDBKs1  , &
-    CBXNs1   => plt_photo%CBXNs1  , &
-    ETGROs1  => plt_photo%ETGROs1 , &
-    TAU0s1   => plt_rad%TAU0s1      &
+    PARDIF => plt_rad%PARDIF  , &
+    PAR    => plt_rad%PAR     , &
+    VGRO   => plt_photo%VGRO  , &
+    SURFX  => plt_photo%SURFX , &
+    FDBK   => plt_photo%FDBK  , &
+    CBXN   => plt_photo%CBXN  , &
+    ETGRO  => plt_photo%ETGRO , &
+    TAU0   => plt_rad%TAU0      &
   )
 !
 !     LIGHT-LIMITED CARBOXYLATION RATES
@@ -130,10 +130,10 @@
 !     CURV=shape parameter for e- transport response to PAR
 !     EGRO=light-limited rubisco carboxylation rate
 !
-  PARX=QNTM*PARDIFs1(N,M,L,NZ)
-  PARJ=PARX+ETGROs1(K,NB,NZ)
-  ETLF=(PARJ-SQRT(PARJ**2-CURV4*PARX*ETGROs1(K,NB,NZ)))/CURV2
-  EGRO=ETLF*CBXNs1(K,NB,NZ)
+  PARX=QNTM*PARDIF(N,M,L,NZ)
+  PARJ=PARX+ETGRO(K,NB,NZ)
+  ETLF=(PARJ-SQRT(PARJ**2-CURV4*PARX*ETGRO(K,NB,NZ)))/CURV2
+  EGRO=ETLF*CBXN(K,NB,NZ)
 !
 !     C3 CARBOXYLATION RATE AND ACCUMULATED PRODUCT
 !
@@ -145,8 +145,8 @@
 !     SURFX=unself-shaded leaf surface area
 !     TAU0=fraction of diffuse radiation transmitted from layer above
 !
-  VL=AMIN1(VGROs1(K,NB,NZ),EGRO)*FDBKs1(NB,NZ)
-  CH2O=CH2O+VL*SURFXs1(N,L,K,NB,NZ)*TAU0s1(L+1)
+  VL=AMIN1(VGRO(K,NB,NZ),EGRO)*FDBK(NB,NZ)
+  CH2O=CH2O+VL*SURFX(N,L,K,NB,NZ)*TAU0(L+1)
   end associate
   end subroutine C3ShadedLeaves
 !------------------------------------------------------------------------------------------
@@ -159,13 +159,13 @@
   real(r8) :: VL
 !     begin_execution
   associate(                            &
-    PARs1     => plt_rad%PARs1        , &
-    VGROs1    => plt_photo%VGROs1     , &
-    CBXNs1    => plt_photo%CBXNs1     , &
-    ETGROs1   => plt_photo%ETGROs1    , &
-    SURFXs1   => plt_photo%SURFXs1    , &
-    FDBKs1    => plt_photo%FDBKs1     , &
-    TAUSs1    =>  plt_rad%TAUSs1        &
+    PAR     => plt_rad%PAR        , &
+    VGRO    => plt_photo%VGRO     , &
+    CBXN    => plt_photo%CBXN     , &
+    ETGRO   => plt_photo%ETGRO    , &
+    SURFX   => plt_photo%SURFX    , &
+    FDBK    => plt_photo%FDBK     , &
+    TAUS    =>  plt_rad%TAUS        &
   )
 !
 !     LIGHT-LIMITED CARBOXYLATION RATES
@@ -177,10 +177,10 @@
 !     CURV=shape parameter for e- transport response to PAR
 !     EGRO=light-limited rubisco carboxylation rate
 !
-  PARX=QNTM*PARs1(N,M,L,NZ)
-  PARJ=PARX+ETGROs1(K,NB,NZ)
-  ETLF=(PARJ-SQRT(PARJ**2-CURV4*PARX*ETGROs1(K,NB,NZ)))/CURV2
-  EGRO=ETLF*CBXNs1(K,NB,NZ)
+  PARX=QNTM*PAR(N,M,L,NZ)
+  PARJ=PARX+ETGRO(K,NB,NZ)
+  ETLF=(PARJ-SQRT(PARJ**2-CURV4*PARX*ETGRO(K,NB,NZ)))/CURV2
+  EGRO=ETLF*CBXN(K,NB,NZ)
 !
 !     C3 CARBOXYLATION RATE AND ACCUMULATED PRODUCT
 !
@@ -192,8 +192,8 @@
 !     SURFX=unself-shaded leaf surface area
 !     TAUS=fraction of direct radiation transmitted from layer above
 !
-  VL=AMIN1(VGROs1(K,NB,NZ),EGRO)*FDBKs1(NB,NZ)
-  CH2O=CH2O+VL*SURFXs1(N,L,K,NB,NZ)*TAUSs1(L+1)
+  VL=AMIN1(VGRO(K,NB,NZ),EGRO)*FDBK(NB,NZ)
+  CH2O=CH2O+VL*SURFX(N,L,K,NB,NZ)*TAUS(L+1)
   end associate
   end subroutine C3SunlitLeaves
 !------------------------------------------------------------------------------------------
@@ -205,25 +205,25 @@
   integer :: N,M
 !     begin_execution
   associate(                           &
-    ZEROPs1  => plt_biom%ZEROPs1     , &
-    SURFXs1  => plt_photo%SURFXs1    , &
-    PARs1    => plt_rad%PARs1        , &
-    PARDIFs1 => plt_rad%PARDIFs1       &
+    ZEROP  => plt_biom%ZEROP     , &
+    SURFX  => plt_photo%SURFX    , &
+    PAR    => plt_rad%PAR        , &
+    PARDIF => plt_rad%PARDIF       &
   )
 !     FOR EACH INCLINATION AND AZIMUTH CLASS
 !
   DO N=1,JLI1
     DO M=1,JSA1
-      IF(SURFXs1(N,L,K,NB,NZ).GT.ZEROPs1(NZ))THEN
+      IF(SURFX(N,L,K,NB,NZ).GT.ZEROP(NZ))THEN
 !
 !     SUNLIT LEAVES
 !
-        IF(PARs1(N,M,L,NZ).GT.0.0_r8)THEN
+        IF(PAR(N,M,L,NZ).GT.0.0_r8)THEN
           call C3SunlitLeaves(K,N,M,L,NB,NZ,CH2O)
         ENDIF
 !
 !     SHADED LEAVES
-        IF(PARDIFs1(N,M,L,NZ).GT.0.0_r8)THEN
+        IF(PARDIF(N,M,L,NZ).GT.0.0_r8)THEN
           call C3ShadedLeaves(K,N,M,L,NB,NZ,CH2O)
         ENDIF
 !
@@ -244,22 +244,22 @@
   real(r8) :: VOGRO
 !     begin_execution
   associate(                          &
-    ARLFLs1   =>  plt_morph%ARLFLs1 , &
-    ZEROPs1   =>  plt_biom%ZEROPs1  , &
-    O2Ls1     =>  plt_photo%O2Ls1   , &
-    CO2Ls1    =>  plt_photo%CO2Ls1  , &
-    CHLs1     =>  plt_photo%CHLs1   , &
-    VCGROs1   =>  plt_photo%VCGROs1 , &
-    XKCO2Ls1  =>  plt_photo%XKCO2Ls1, &
-    XKCO2Os1  =>  plt_photo%XKCO2Os1, &
-    ETMXs1    =>  plt_photo%ETMXs1  , &
-    ETGROs1   =>  plt_photo%ETGROs1 , &
-    VGROs1    =>  plt_photo%VGROs1  , &
-    VCMXs1    =>  plt_photo%VCMXs1  , &
-    CBXNs1    =>  plt_photo%CBXNs1  , &
-    VOMXs1    =>  plt_photo%VOMXs1  , &
-    COMPLs1   =>  plt_photo%COMPLs1 , &
-    RUBPs1    =>  plt_photo%RUBPs1    &
+    ARLFL   =>  plt_morph%ARLFL , &
+    ZEROP   =>  plt_biom%ZEROP  , &
+    O2L     =>  plt_photo%O2L   , &
+    CO2L    =>  plt_photo%CO2L  , &
+    CHL     =>  plt_photo%CHL   , &
+    VCGRO   =>  plt_photo%VCGRO , &
+    XKCO2L  =>  plt_photo%XKCO2L, &
+    XKCO2O  =>  plt_photo%XKCO2O, &
+    ETMX    =>  plt_photo%ETMX  , &
+    ETGRO   =>  plt_photo%ETGRO , &
+    VGRO    =>  plt_photo%VGRO  , &
+    VCMX    =>  plt_photo%VCMX  , &
+    CBXN    =>  plt_photo%CBXN  , &
+    VOMX    =>  plt_photo%VOMX  , &
+    COMPL   =>  plt_photo%COMPL , &
+    RUBP    =>  plt_photo%RUBP    &
   )
 !
 !     SURFICIAL DENSITY OF RUBISCO AND ITS CHLOROPHYLL
@@ -270,8 +270,8 @@
 !     CHL=fraction of leaf protein in mesophyll chlorophyll
 !     WSDN=leaf protein surficial density
 !
-  VCDN=RUBPs1(NZ)*WSDN
-  ETDN=CHLs1(NZ)*WSDN
+  VCDN=RUBP(NZ)*WSDN
+  ETDN=CHL(NZ)*WSDN
 !
 !     CO2-LIMITED C3 CARBOXYLATION RATES
 !
@@ -287,11 +287,11 @@
 !     XKO2L=Km for rubisco oxygenation
 !     VGRO=rubisco carboxylation rate limited by CO2
 !
-  VCGROs1(K,NB,NZ)=VCMXs1(NZ)*TFN1*VCDN
-  VOGRO=VOMXs1(NZ)*TFN2*VCDN
-  COMPLs1(K,NB,NZ)=0.5_r8*O2Ls1(NZ)*VOGRO*XKCO2Ls1(NZ)/(VCGROs1(K,NB,NZ)*XKO2L)
-  VGROs1(K,NB,NZ)=AMAX1(0.0_r8,VCGROs1(K,NB,NZ)*(CO2Ls1(NZ)-COMPLs1(K,NB,NZ)) &
-    /(CO2Ls1(NZ)+XKCO2Os1(NZ)))
+  VCGRO(K,NB,NZ)=VCMX(NZ)*TFN1*VCDN
+  VOGRO=VOMX(NZ)*TFN2*VCDN
+  COMPL(K,NB,NZ)=0.5_r8*O2L(NZ)*VOGRO*XKCO2L(NZ)/(VCGRO(K,NB,NZ)*XKO2L)
+  VGRO(K,NB,NZ)=AMAX1(0.0_r8,VCGRO(K,NB,NZ)*(CO2L(NZ)-COMPL(K,NB,NZ)) &
+    /(CO2L(NZ)+XKCO2O(NZ)))
 !
 !     C3 ELECTRON TRANSFER RATES
 !
@@ -304,9 +304,9 @@
 !     COMPL=C3 CO2 compensation point (uM)
 !     ELEC3=e- requirement for CO2 fixn by rubisco
 !
-  ETGROs1(K,NB,NZ)=ETMXs1(NZ)*TFNE*ETDN
-  CBXNs1(K,NB,NZ)=AMAX1(0.0_r8,(CO2Ls1(NZ)-COMPLs1(K,NB,NZ))/(ELEC3*CO2Ls1(NZ) &
-    +10.5_r8*COMPLs1(K,NB,NZ)))
+  ETGRO(K,NB,NZ)=ETMX(NZ)*TFNE*ETDN
+  CBXN(K,NB,NZ)=AMAX1(0.0_r8,(CO2L(NZ)-COMPL(K,NB,NZ))/(ELEC3*CO2L(NZ) &
+    +10.5_r8*COMPL(K,NB,NZ)))
 !
 !     FOR EACH CANOPY LAYER
 !
@@ -314,7 +314,7 @@
 !     SURFX=unself-shaded leaf surface area
 !
   DO L=JC1,1,-1
-    IF(ARLFLs1(L,K,NB,NZ).GT.ZEROPs1(NZ))THEN
+    IF(ARLFL(L,K,NB,NZ).GT.ZEROP(NZ))THEN
       call C3PhotosynsCanopyLayerL(L,K,NB,NZ,CH2O)
     ENDIF
   ENDDO
@@ -335,35 +335,35 @@
   real(r8) :: VOGRO
 !     begin_execution
   associate(                          &
-    WGLFs1    =>  plt_biom%WGLFs1   , &
-    ZEROPs1   =>  plt_biom%ZEROPs1  , &
-    ARLFLs1   =>  plt_morph%ARLFLs1 , &
-    FDBKXs1   =>  plt_photo%FDBKXs1 , &
-    CHL4s1    =>  plt_photo%CHL4s1  , &
-    O2Ls1     =>  plt_photo%O2Ls1   , &
-    CO2Ls1    =>  plt_photo%CO2Ls1  , &
-    ETMXs1    =>  plt_photo%ETMXs1  , &
-    VCMX4s1   =>  plt_photo%VCMX4s1 , &
-    RUBPs1    =>  plt_photo%RUBPs1  , &
-    XKCO24s1  =>  plt_photo%XKCO24s1, &
-    CO2Bs1    =>  plt_photo%CO2Bs1  , &
-    CPOOL4s1  =>  plt_photo%CPOOL4s1, &
-    XKCO2Ls1  =>  plt_photo%XKCO2Ls1, &
-    FDBK4s1   =>  plt_photo%FDBK4s1 , &
-    XKCO2Os1  =>  plt_photo%XKCO2Os1, &
-    CHLs1     =>  plt_photo%CHLs1   , &
-    CBXNs1    =>  plt_photo%CBXNs1  , &
-    VCMXs1    =>  plt_photo%VCMXs1  , &
-    ETGROs1   =>  plt_photo%ETGROs1 , &
-    VGROs1    =>  plt_photo%VGROs1  , &
-    VCGROs1   =>  plt_photo%VCGROs1 , &
-    COMPLs1   =>  plt_photo%COMPLs1 , &
-    VCGR4s1   =>  plt_photo%VCGR4s1 , &
-    VGRO4s1   =>  plt_photo%VGRO4s1 , &
-    VOMXs1    =>  plt_photo%VOMXs1  , &
-    CBXN4s1   =>  plt_photo%CBXN4s1 , &
-    ETGR4s1   =>  plt_photo%ETGR4s1 , &
-    PEPCs1    =>  plt_photo%PEPCs1    &
+    WGLF    =>  plt_biom%WGLF   , &
+    ZEROP   =>  plt_biom%ZEROP  , &
+    ARLFL   =>  plt_morph%ARLFL , &
+    FDBKX   =>  plt_photo%FDBKX , &
+    CHL4    =>  plt_photo%CHL4  , &
+    O2L     =>  plt_photo%O2L   , &
+    CO2L    =>  plt_photo%CO2L  , &
+    ETMX    =>  plt_photo%ETMX  , &
+    VCMX4   =>  plt_photo%VCMX4 , &
+    RUBP    =>  plt_photo%RUBP  , &
+    XKCO24  =>  plt_photo%XKCO24, &
+    CO2B    =>  plt_photo%CO2B  , &
+    CPOOL4  =>  plt_photo%CPOOL4, &
+    XKCO2L  =>  plt_photo%XKCO2L, &
+    FDBK4   =>  plt_photo%FDBK4 , &
+    XKCO2O  =>  plt_photo%XKCO2O, &
+    CHL     =>  plt_photo%CHL   , &
+    CBXN    =>  plt_photo%CBXN  , &
+    VCMX    =>  plt_photo%VCMX  , &
+    ETGRO   =>  plt_photo%ETGRO , &
+    VGRO    =>  plt_photo%VGRO  , &
+    VCGRO   =>  plt_photo%VCGRO , &
+    COMPL   =>  plt_photo%COMPL , &
+    VCGR4   =>  plt_photo%VCGR4 , &
+    VGRO4   =>  plt_photo%VGRO4 , &
+    VOMX    =>  plt_photo%VOMX  , &
+    CBXN4   =>  plt_photo%CBXN4 , &
+    ETGR4   =>  plt_photo%ETGR4 , &
+    PEPC    =>  plt_photo%PEPC    &
   )
 !
 !     FEEDBACK ON C4 CARBOXYLATION FROM C4 NON-STRUCTURAL C
@@ -374,10 +374,10 @@
 !     FBS,FMP=leaf water content in bundle sheath, mesophyll
 !     FDBK4=N,P feedback inhibition on C4 CO2 fixation
 !
-  CC4M=AMAX1(0.0_r8,0.021E+09_r8*CPOOL4s1(K,NB,NZ)/(WGLFs1(K,NB,NZ)*FMP))
-  CCBS=AMAX1(0.0_r8,0.083E+09_r8*CO2Bs1(K,NB,NZ)/(WGLFs1(K,NB,NZ)*FBS))
-  FDBK4s1(K,NB,NZ)=1.0_r8/(1.0_r8+CC4M/C4KI)
-  FDBK4s1(K,NB,NZ)=FDBK4s1(K,NB,NZ)*FDBKXs1(NB,NZ)
+  CC4M=AMAX1(0.0_r8,0.021E+09_r8*CPOOL4(K,NB,NZ)/(WGLF(K,NB,NZ)*FMP))
+  CCBS=AMAX1(0.0_r8,0.083E+09_r8*CO2B(K,NB,NZ)/(WGLF(K,NB,NZ)*FBS))
+  FDBK4(K,NB,NZ)=1.0_r8/(1.0_r8+CC4M/C4KI)
+  FDBK4(K,NB,NZ)=FDBK4(K,NB,NZ)*FDBKX(NB,NZ)
 !
 !     SURFICIAL DENSITY OF PEPC AND ITS CHLOROPHYLL
 !
@@ -387,8 +387,8 @@
 !     CHL4=fraction of leaf protein in mesophyll chlorophyll
 !     WSDN=leaf protein surficial density
 !
-  VCDN4=PEPCs1(NZ)*WSDN
-  ETDN4=CHL4s1(NZ)*WSDN
+  VCDN4=PEPC(NZ)*WSDN
+  ETDN4=CHL4(NZ)*WSDN
 !
 !     CO2-LIMITED C4 CARBOXYLATION RATES
 !
@@ -400,8 +400,8 @@
 !     COMP4=C4 CO2 compensation point (uM)
 !     XKCO24=Km for VCMX4 from PFT file (uM)
 !
-  VCGR4s1(K,NB,NZ)=VCMX4s1(NZ)*TFN1*VCDN4
-  VGRO4s1(K,NB,NZ)=AMAX1(0.0_r8,VCGR4s1(K,NB,NZ)*(CO2Ls1(NZ)-COMP4)/(CO2Ls1(NZ)+XKCO24s1(NZ)))
+  VCGR4(K,NB,NZ)=VCMX4(NZ)*TFN1*VCDN4
+  VGRO4(K,NB,NZ)=AMAX1(0.0_r8,VCGR4(K,NB,NZ)*(CO2L(NZ)-COMP4)/(CO2L(NZ)+XKCO24(NZ)))
 !
 !     C4 ELECTRON TRANSFER RATES
 !
@@ -414,8 +414,8 @@
 !     COMP4=C4 CO2 compensation point (uM)
 !     ELEC4=e- requirement for CO2 fixn by PEP carboxylase
 !
-  ETGR4s1(K,NB,NZ)=ETMXs1(NZ)*TFNE*ETDN4
-  CBXN4s1(K,NB,NZ)=AMAX1(0.0_r8,(CO2Ls1(NZ)-COMP4)/(ELEC4*CO2Ls1(NZ)+10.5_r8*COMP4))
+  ETGR4(K,NB,NZ)=ETMX(NZ)*TFNE*ETDN4
+  CBXN4(K,NB,NZ)=AMAX1(0.0_r8,(CO2L(NZ)-COMP4)/(ELEC4*CO2L(NZ)+10.5_r8*COMP4))
 !
 !     FOR EACH CANOPY LAYER
 !
@@ -423,7 +423,7 @@
 !     SURFX=unself-shaded leaf surface area
 !
   DO L=JC1,1,-1
-    IF(ARLFLs1(L,K,NB,NZ).GT.ZEROPs1(NZ))THEN
+    IF(ARLFL(L,K,NB,NZ).GT.ZEROP(NZ))THEN
       call C4PhotosynsCanopyLayerL(L,K,NB,NZ,CH2O)
     ENDIF
   ENDDO
@@ -436,8 +436,8 @@
 !     CHL=fraction of leaf protein in bundle sheath chlorophyll
 !     WSDN=leaf protein surficial density
 !
-  VCDN=RUBPs1(NZ)*WSDN
-  ETDN=CHLs1(NZ)*WSDN
+  VCDN=RUBP(NZ)*WSDN
+  ETDN=CHL(NZ)*WSDN
 !
 !     CO2-LIMITED C3 CARBOXYLATION RATES
 !
@@ -454,10 +454,10 @@
 !     VGRO=rubisco carboxylation rate limited by CO2
 !     CCBS=C4 nonstruct C concn in bundle sheath (uM)
 !
-  VCGROs1(K,NB,NZ)=VCMXs1(NZ)*TFN1*VCDN
-  VOGRO=VOMXs1(NZ)*TFN2*VCDN
-  COMPLs1(K,NB,NZ)=0.5_r8*O2Ls1(NZ)*VOGRO*XKCO2Ls1(NZ)/(VCGROs1(K,NB,NZ)*XKO2L)
-  VGROs1(K,NB,NZ)=AMAX1(0.0_r8,VCGROs1(K,NB,NZ)*(CCBS-COMPLs1(K,NB,NZ))/(CCBS+XKCO2Os1(NZ)))
+  VCGRO(K,NB,NZ)=VCMX(NZ)*TFN1*VCDN
+  VOGRO=VOMX(NZ)*TFN2*VCDN
+  COMPL(K,NB,NZ)=0.5_r8*O2L(NZ)*VOGRO*XKCO2L(NZ)/(VCGRO(K,NB,NZ)*XKO2L)
+  VGRO(K,NB,NZ)=AMAX1(0.0_r8,VCGRO(K,NB,NZ)*(CCBS-COMPL(K,NB,NZ))/(CCBS+XKCO2O(NZ)))
 !
 !     C3 ELECTRON TRANSFER RATES
 !
@@ -470,8 +470,8 @@
 !     COMPL=C3 CO2 compensation point (uM)
 !     ELEC3=e- requirement for CO2 fixn by rubisco
 !
-  ETGROs1(K,NB,NZ)=ETMXs1(NZ)*TFNE*ETDN
-  CBXNs1(K,NB,NZ)=AMAX1(0.0_r8,(CCBS-COMPLs1(K,NB,NZ))/(ELEC3*CCBS+10.5*COMPLs1(K,NB,NZ)))
+  ETGRO(K,NB,NZ)=ETMX(NZ)*TFNE*ETDN
+  CBXN(K,NB,NZ)=AMAX1(0.0_r8,(CCBS-COMPL(K,NB,NZ))/(ELEC3*CCBS+10.5*COMPL(K,NB,NZ)))
   end associate
   end subroutine C4Photosynthesis
 !------------------------------------------------------------------------------------------
@@ -483,25 +483,25 @@
   integer :: M,N
 !     begin_execution
   associate(                        &
-    SURFXs1  => plt_photo%SURFXs1 , &
-    ZEROPs1  =>  plt_biom%ZEROPs1 , &
-    PARs1    => plt_rad%PARs1     , &
-    PARDIFs1 => plt_rad%PARDIFs1    &
+    SURFX  => plt_photo%SURFX , &
+    ZEROP  =>  plt_biom%ZEROP , &
+    PAR    => plt_rad%PAR     , &
+    PARDIF => plt_rad%PARDIF    &
   )
 !
 !     FOR EACH INCLINATION AND AZIMUTH CLASS
 !
   DO  N=1,JLI1
     DO  M=1,JSA1
-      IF(SURFXs1(N,L,K,NB,NZ).GT.ZEROPs1(NZ))THEN
+      IF(SURFX(N,L,K,NB,NZ).GT.ZEROP(NZ))THEN
 !
 !     SUNLIT LEAVES
-        IF(PARs1(N,M,L,NZ).GT.0.0_r8)THEN
+        IF(PAR(N,M,L,NZ).GT.0.0_r8)THEN
           call C4SunlitLeaves(K,N,M,L,NB,NZ,CH2O)
         ENDIF
 !
 !     SHADED LEAVES
-        IF(PARDIFs1(N,M,L,NZ).GT.0.0_r8)THEN
+        IF(PARDIF(N,M,L,NZ).GT.0.0_r8)THEN
           call C4ShadedLeaves(K,N,M,L,NB,NZ,CH2O)
         ENDIF
       ENDIF
@@ -520,14 +520,14 @@
   real(r8) :: VL
 !     begin_execution
   associate(                          &
-    SURFXs1  => plt_photo%SURFXs1   , &
-    FDBK4s1  => plt_photo%FDBK4s1   , &
-    CBXN4s1  => plt_photo%CBXN4s1   , &
-    VGRO4s1  => plt_photo%VGRO4s1   , &
-    ETGR4s1  => plt_photo%ETGR4s1   , &
-    PARs1    => plt_rad%PARs1       , &
-    PARDIFs1 => plt_rad%PARDIFs1    , &
-    TAU0s1   => plt_rad%TAU0s1        &
+    SURFX  => plt_photo%SURFX   , &
+    FDBK4  => plt_photo%FDBK4   , &
+    CBXN4  => plt_photo%CBXN4   , &
+    VGRO4  => plt_photo%VGRO4   , &
+    ETGR4  => plt_photo%ETGR4   , &
+    PAR    => plt_rad%PAR       , &
+    PARDIF => plt_rad%PARDIF    , &
+    TAU0   => plt_rad%TAU0        &
   )
 !
 !     LIGHT-LIMITED CARBOXYLATION RATES
@@ -539,10 +539,10 @@
 !     CURV=shape parameter for e- transport response to PAR
 !     EGRO4=light-limited PEP carboxylation rate
 !
-  PARX=QNTM*PARDIFs1(N,M,L,NZ)
-  PARJ=PARX+ETGR4s1(K,NB,NZ)
-  ETLF4=(PARJ-SQRT(PARJ**2-CURV4*PARX*ETGR4s1(K,NB,NZ)))/CURV2
-  EGRO4=ETLF4*CBXN4s1(K,NB,NZ)
+  PARX=QNTM*PARDIF(N,M,L,NZ)
+  PARJ=PARX+ETGR4(K,NB,NZ)
+  ETLF4=(PARJ-SQRT(PARJ**2-CURV4*PARX*ETGR4(K,NB,NZ)))/CURV2
+  EGRO4=ETLF4*CBXN4(K,NB,NZ)
 !
 !     C4 CARBOXYLATION RATE AND ACCUMULATED PRODUCT
 !
@@ -554,8 +554,8 @@
 !     SURFX=unself-shaded leaf surface area
 !     TAU0=fraction of diffuse radiation transmitted from layer above
 !
-  VL=AMIN1(VGRO4s1(K,NB,NZ),EGRO4)*FDBK4s1(K,NB,NZ)
-  CH2O=CH2O+VL*SURFXs1(N,L,K,NB,NZ)*TAU0s1(L+1)
+  VL=AMIN1(VGRO4(K,NB,NZ),EGRO4)*FDBK4(K,NB,NZ)
+  CH2O=CH2O+VL*SURFX(N,L,K,NB,NZ)*TAU0(L+1)
   end associate
   end subroutine C4ShadedLeaves
 !------------------------------------------------------------------------------------------
@@ -568,13 +568,13 @@
   real(r8) :: VL
 !     begin_execution
   associate(                       &
-  SURFXs1  =>  plt_photo%SURFXs1 , &
-  CBXN4s1  =>  plt_photo%CBXN4s1 , &
-  ETGR4s1  =>  plt_photo%ETGR4s1 , &
-  FDBK4s1  =>  plt_photo%FDBK4s1 , &
-  VGRO4s1  =>  plt_photo%VGRO4s1 , &
-  PARs1    =>  plt_rad%PARs1     , &
-  TAUSs1   =>  plt_rad%TAUSs1      &
+  SURFX  =>  plt_photo%SURFX , &
+  CBXN4  =>  plt_photo%CBXN4 , &
+  ETGR4  =>  plt_photo%ETGR4 , &
+  FDBK4  =>  plt_photo%FDBK4 , &
+  VGRO4  =>  plt_photo%VGRO4 , &
+  PAR    =>  plt_rad%PAR     , &
+  TAUS   =>  plt_rad%TAUS      &
   )
 !
 !     LIGHT-LIMITED CARBOXYLATION RATES
@@ -586,10 +586,10 @@
 !     CURV=shape parameter for e- transport response to PAR
 !     EGRO4=light-limited PEP carboxylation rate
 !
-  PARX=QNTM*PARs1(N,M,L,NZ)
-  PARJ=PARX+ETGR4s1(K,NB,NZ)
-  ETLF4=(PARJ-SQRT(PARJ**2-CURV4*PARX*ETGR4s1(K,NB,NZ)))/CURV2
-  EGRO4=ETLF4*CBXN4s1(K,NB,NZ)
+  PARX=QNTM*PAR(N,M,L,NZ)
+  PARJ=PARX+ETGR4(K,NB,NZ)
+  ETLF4=(PARJ-SQRT(PARJ**2-CURV4*PARX*ETGR4(K,NB,NZ)))/CURV2
+  EGRO4=ETLF4*CBXN4(K,NB,NZ)
 !
 !     C4 CARBOXYLATION RATE AND ACCUMULATED PRODUCT
 !
@@ -601,8 +601,8 @@
 !     SURFX=unself-shaded leaf surface area
 !     TAUS=fraction of direct radiation transmitted from layer above
 !
-  VL=AMIN1(VGRO4s1(K,NB,NZ),EGRO4)*FDBK4s1(K,NB,NZ)
-  CH2O=CH2O+VL*SURFXs1(N,L,K,NB,NZ)*TAUSs1(L+1)
+  VL=AMIN1(VGRO4(K,NB,NZ),EGRO4)*FDBK4(K,NB,NZ)
+  CH2O=CH2O+VL*SURFX(N,L,K,NB,NZ)*TAUS(L+1)
   end associate
   end subroutine C4SunlitLeaves
 !------------------------------------------------------------------------------------------
@@ -616,27 +616,27 @@
   real(r8) :: WSDN
 !     begin_execution
   associate(                            &
-    ICTYPs1    => plt_photo%ICTYPs1   , &
-    VCGR4s1    => plt_photo%VCGR4s1   , &
-    VCGROs1    => plt_photo%VCGROs1   , &
-    ZEROs1     => plt_site%ZEROs1     , &
-    WGLFs1     => plt_biom%WGLFs1     , &
-    ZEROPs1    => plt_biom%ZEROPs1    , &
-    WSLFs1     => plt_biom%WSLFs1     , &
-    ARLF1s1    => plt_morph%ARLF1s1     &
+    ICTYP    => plt_photo%ICTYP   , &
+    VCGR4    => plt_photo%VCGR4   , &
+    VCGRO    => plt_photo%VCGRO   , &
+    ZERO     => plt_site%ZERO     , &
+    WGLF     => plt_biom%WGLF     , &
+    ZEROP    => plt_biom%ZEROP    , &
+    WSLF     => plt_biom%WSLF     , &
+    ARLF1    => plt_morph%ARLF1     &
   )
   DO K=1,JNODS1
-    IF(ARLF1s1(K,NB,NZ).GT.ZEROPs1(NZ).AND.WGLFs1(K,NB,NZ).GT.ZEROPs1(NZ))THEN
-      WSDN=WSLFs1(K,NB,NZ)/ARLF1s1(K,NB,NZ)
+    IF(ARLF1(K,NB,NZ).GT.ZEROP(NZ).AND.WGLF(K,NB,NZ).GT.ZEROP(NZ))THEN
+      WSDN=WSLF(K,NB,NZ)/ARLF1(K,NB,NZ)
     ELSE
       WSDN=0.0
     ENDIF
 
-    IF(WSDN.GT.ZEROs1)THEN
+    IF(WSDN.GT.ZERO)THEN
 !
 !     ICTYP=photosynthesis type:3=C3,4=C4 from PFT file
 !
-      IF(ICTYPs1(NZ).EQ.4)THEN
+      IF(ICTYP(NZ).EQ.4)THEN
 !     C4 PHOTOSYNTHESIS
         call C4Photosynthesis(K,NB,NZ,CH2O,TFN1,TFN2,TFNE,XKO2L,WSDN)
       ELSE
@@ -645,8 +645,8 @@
       ENDIF
 !
     ELSE
-      VCGR4s1(K,NB,NZ)=0.0
-      VCGROs1(K,NB,NZ)=0.0
+      VCGR4(K,NB,NZ)=0.0
+      VCGRO(K,NB,NZ)=0.0
     ENDIF
   ENDDO
   end associate
@@ -660,18 +660,18 @@
   real(r8), intent(in) :: TFN1,TFN2,TFNE,XKO2L
 !     begin_execution
   associate(                          &
-    CCPOLBs1 =>  plt_biom%CCPOLBs1  , &
-    CZPOLBs1 =>  plt_biom%CZPOLBs1  , &
-    CPPOLBs1 =>  plt_biom%CPPOLBs1  , &
-    IWTYPs1  =>  plt_pheno%IWTYPs1  , &
-    IBTYPs1  =>  plt_pheno%IBTYPs1  , &
-    FLG4s1   =>  plt_pheno%FLG4s1   , &
-    ATRPs1   =>  plt_pheno%ATRPs1   , &
-    ISTYPs1  =>  plt_pheno%ISTYPs1  , &
-    IDTHBs1  =>  plt_pheno%IDTHBs1  , &
-    ZEROs1   =>  plt_site%ZEROs1    , &
-    FDBKXs1  => plt_photo%FDBKXs1   , &
-    FDBKs1   => plt_photo%FDBKs1      &
+    CCPOLB =>  plt_biom%CCPOLB  , &
+    CZPOLB =>  plt_biom%CZPOLB  , &
+    CPPOLB =>  plt_biom%CPPOLB  , &
+    IWTYP  =>  plt_pheno%IWTYP  , &
+    IBTYP  =>  plt_pheno%IBTYP  , &
+    FLG4   =>  plt_pheno%FLG4   , &
+    ATRP   =>  plt_pheno%ATRP   , &
+    ISTYP  =>  plt_pheno%ISTYP  , &
+    IDTHB  =>  plt_pheno%IDTHB  , &
+    ZERO   =>  plt_site%ZERO    , &
+    FDBKX  => plt_photo%FDBKX   , &
+    FDBK   => plt_photo%FDBK      &
   )
 !
 !     FEEDBACK ON C3 CARBOXYLATION FROM NON-STRUCTURAL C:N:P
@@ -680,27 +680,27 @@
 !     FDBK=N,P feedback inhibition on C3 CO2 fixation
 !     CNKI,CPKI=nonstructural N,P inhibition constant on rubisco
 !
-  IF(CCPOLBs1(NB,NZ).GT.ZEROs1)THEN
-    FDBKs1(NB,NZ)=AMIN1(CZPOLBs1(NB,NZ)/(CZPOLBs1(NB,NZ)+CCPOLBs1(NB,NZ)/CNKI) &
-      ,CPPOLBs1(NB,NZ)/(CPPOLBs1(NB,NZ)+CCPOLBs1(NB,NZ)/CPKI))
+  IF(CCPOLB(NB,NZ).GT.ZERO)THEN
+    FDBK(NB,NZ)=AMIN1(CZPOLB(NB,NZ)/(CZPOLB(NB,NZ)+CCPOLB(NB,NZ)/CNKI) &
+      ,CPPOLB(NB,NZ)/(CPPOLB(NB,NZ)+CCPOLB(NB,NZ)/CPKI))
   ELSE
-    FDBKs1(NB,NZ)=1.0
+    FDBK(NB,NZ)=1.0
   ENDIF
 !
 !     CHILLING
 !
 !     CHILL=accumulated chilling hours used to limit CO2 fixn
 !
-!     FDBKs1(NB,NZ)=FDBKs1(NB,NZ)/(1.0_r8+0.25_r8*CHILLs1(NZ))
+!     FDBK(NB,NZ)=FDBK(NB,NZ)/(1.0_r8+0.25_r8*CHILL(NZ))
 !
 !     DEHARDENING OF EVERGREENS IN SPRING
 !
 !     ATRP=hours above threshold temperature for dehardening since leafout
 !     ATRPZ=hours to full dehardening of conifers in spring
 !
-  IF(IWTYPs1(NZ).NE.0.AND.IBTYPs1(NZ).GE.2)THEN
-    FDBKs1(NB,NZ)=FDBKs1(NB,NZ)*AMAX1(0.0_r8,AMIN1(1.0_r8 &
-      ,ATRPs1(NB,NZ)/(0.9_r8*ATRPZ)))
+  IF(IWTYP(NZ).NE.0.AND.IBTYP(NZ).GE.2)THEN
+    FDBK(NB,NZ)=FDBK(NB,NZ)*AMAX1(0.0_r8,AMIN1(1.0_r8 &
+      ,ATRP(NB,NZ)/(0.9_r8*ATRPZ)))
   ENDIF
 !
 !     TERMINATION OF ANNUALS
@@ -709,12 +709,12 @@
 !     FLG4=number of hours with no grain fill after start of grain fill
 !     FLG4Y=number of hours with no grain fill to terminate annuals
 !
-  IF(ISTYPs1(NZ).EQ.0.AND.FLG4s1(NB,NZ).GT.0.0)THEN
-    FDBKXs1(NB,NZ)=AMAX1(0.0_r8,1.0_r8-FLG4s1(NB,NZ)/FLG4Y(IWTYPs1(NZ)))
+  IF(ISTYP(NZ).EQ.0.AND.FLG4(NB,NZ).GT.0.0)THEN
+    FDBKX(NB,NZ)=AMAX1(0.0_r8,1.0_r8-FLG4(NB,NZ)/FLG4Y(IWTYP(NZ)))
   ELSE
-    FDBKXs1(NB,NZ)=1.0
+    FDBKX(NB,NZ)=1.0
   ENDIF
-  FDBKs1(NB,NZ)=FDBKs1(NB,NZ)*FDBKXs1(NB,NZ)
+  FDBK(NB,NZ)=FDBK(NB,NZ)*FDBKX(NB,NZ)
 !
 !     FOR EACH NODE
 !
@@ -722,7 +722,7 @@
 !     ARLF,WGLF,WSLF=leaf area,C mass,protein mass
 !     WSDN=leaf protein surficial density
 !
-  IF(IDTHBs1(NB,NZ).EQ.0)THEN
+  IF(IDTHB(NB,NZ).EQ.0)THEN
     call LivingBranch(NB,NZ,CH2O,TFN1,TFN2,TFNE,XKO2L)
   ENDIF
   end associate
@@ -739,23 +739,23 @@
   real(r8) :: TKCO
 !     begin_execution
   associate(                          &
-    CCPOLBs1 =>  plt_biom%CCPOLBs1  , &
-    TKCZs1   =>  plt_ew%TKCZs1      , &
-    OFFSTs1  =>  plt_pheno%OFFSTs1  , &
-    XKO2s1   =>  plt_photo%XKO2s1   , &
-    SCO2s1   =>  plt_photo%SCO2s1   , &
-    CO2Qs1   =>  plt_photo%CO2Qs1   , &
-    O2Ls1    =>  plt_photo%O2Ls1    , &
-    FMOLs1   =>  plt_photo%FMOLs1   , &
-    DCO2s1   =>  plt_photo%DCO2s1   , &
-    CO2Ls1   =>  plt_photo%CO2Ls1   , &
-    SO2s1    =>  plt_photo%SO2s1    , &
-    CO2Is1   =>  plt_photo%CO2Is1   , &
-    O2Is1    =>  plt_photo%O2Is1    , &
-    RSMHs1   =>  plt_photo%RSMHs1   , &
-    XKCO2Os1 =>  plt_photo%XKCO2Os1 , &
-    XKCO2Ls1 =>  plt_photo%XKCO2Ls1 , &
-    XKCO2s1  =>  plt_photo%XKCO2s1    &
+    CCPOLB =>  plt_biom%CCPOLB  , &
+    TKCZ   =>  plt_ew%TKCZ      , &
+    OFFST  =>  plt_pheno%OFFST  , &
+    XKO2   =>  plt_photo%XKO2   , &
+    SCO2   =>  plt_photo%SCO2   , &
+    CO2Q   =>  plt_photo%CO2Q   , &
+    O2L    =>  plt_photo%O2L    , &
+    FMOL   =>  plt_photo%FMOL   , &
+    DCO2   =>  plt_photo%DCO2   , &
+    CO2L   =>  plt_photo%CO2L   , &
+    SO2    =>  plt_photo%SO2    , &
+    CO2I   =>  plt_photo%CO2I   , &
+    O2I    =>  plt_photo%O2I    , &
+    RSMH   =>  plt_photo%RSMH   , &
+    XKCO2O =>  plt_photo%XKCO2O , &
+    XKCO2L =>  plt_photo%XKCO2L , &
+    XKCO2  =>  plt_photo%XKCO2    &
 
   )
 !
@@ -766,12 +766,12 @@
 !     CO2L,O2L=intercellular CO2,O2 concentrations (uM)
 !     DCO2=difference between atmosph and intercellular CO2 concn (umol m-3)
 !
-  TCCZ=TKCZs1(NZ)-TC2K
-  SCO2s1(NZ)=EXP(-2.621_r8-0.0317_r8*TCCZ)
-  SO2s1(NZ)=EXP(-6.175_r8-0.0211_r8*TCCZ)
-  CO2Ls1(NZ)=CO2Is1(NZ)*SCO2s1(NZ)
-  O2Ls1(NZ)=O2Is1(NZ)*SO2s1(NZ)
-  DCO2s1(NZ)=FMOLs1(NZ)*(CO2Qs1(NZ)-CO2Is1(NZ))
+  TCCZ=TKCZ(NZ)-TC2K
+  SCO2(NZ)=EXP(-2.621_r8-0.0317_r8*TCCZ)
+  SO2(NZ)=EXP(-6.175_r8-0.0211_r8*TCCZ)
+  CO2L(NZ)=CO2I(NZ)*SCO2(NZ)
+  O2L(NZ)=O2I(NZ)*SO2(NZ)
+  DCO2(NZ)=FMOL(NZ)*(CO2Q(NZ)-CO2I(NZ))
 !
 !     ARRHENIUS FUNCTIONS FOR CARBOXYLATION AND OXYGENATION
 !
@@ -785,7 +785,7 @@
 !     oxygenation,e- transport
 !
   CH2O=0.0_r8
-  TKCO=TKCZs1(NZ)+OFFSTs1(NZ)
+  TKCO=TKCZ(NZ)+OFFST(NZ)
   RTK=RGAS*TKCO
   STK=710.0_r8*TKCO
   ACTV=1+EXP((197500._r8-STK)/RTK)+EXP((STK-222500._r8)/RTK)
@@ -798,9 +798,9 @@
 !     XKCO2L,XKCO2O=Km for rubisco carboxylation without,with O2
 !     XKO2L=Km for rubisco oxygenation
 !
-  XKCO2Ls1(NZ)=XKCO2s1(NZ)*EXP(16.136_r8-40000._r8/RTK)
-  XKO2L=XKO2s1(NZ)*EXP(8.067_r8-20000._r8/RTK)
-  XKCO2Os1(NZ)=XKCO2Ls1(NZ)*(1.0_r8+O2Ls1(NZ)/XKO2L)
+  XKCO2L(NZ)=XKCO2(NZ)*EXP(16.136_r8-40000._r8/RTK)
+  XKO2L=XKO2(NZ)*EXP(8.067_r8-20000._r8/RTK)
+  XKCO2O(NZ)=XKCO2L(NZ)*(1.0_r8+O2L(NZ)/XKO2L)
   end associate
   end subroutine PrepPhotosynthesis
 !------------------------------------------------------------------------------------------
@@ -817,31 +817,31 @@
 
 !     begin_execution
   associate(                          &
-    VRNXs1   =>  plt_pheno%VRNXs1   , &
-    VRNFs1   =>  plt_pheno%VRNFs1   , &
-    VRNLs1   =>  plt_pheno%VRNLs1   , &
-    VRNSs1   =>  plt_pheno%VRNSs1   , &
-    IWTYPs1  =>  plt_pheno%IWTYPs1  , &
-    ZEROPs1  =>  plt_biom%ZEROPs1   , &
-    NUs1     =>  plt_site%NUs1      , &
-    AREA3s1  =>  plt_site%AREA3s1   , &
-    VCGROs1  =>  plt_photo%VCGROs1  , &
-    FDBKs1   =>  plt_photo%FDBKs1   , &
-    FDBKXs1  =>  plt_photo%FDBKXs1  , &
-    XKCO2Os1 =>  plt_photo%XKCO2Os1 , &
-    VCGR4s1  =>  plt_photo%VCGR4s1  , &
-    RSMNs1   =>  plt_photo%RSMNs1   , &
-    DCO2s1   =>  plt_photo%DCO2s1   , &
-    RSMHs1   =>  plt_photo%RSMHs1   , &
-    FRADPs1  =>  plt_rad%FRADPs1    , &
-    NBRs1    =>  plt_morph%NBRs1      &
+    VRNX   =>  plt_pheno%VRNX   , &
+    VRNF   =>  plt_pheno%VRNF   , &
+    VRNL   =>  plt_pheno%VRNL   , &
+    VRNS   =>  plt_pheno%VRNS   , &
+    IWTYP  =>  plt_pheno%IWTYP  , &
+    ZEROP  =>  plt_biom%ZEROP   , &
+    NU     =>  plt_site%NU      , &
+    AREA3  =>  plt_site%AREA3   , &
+    VCGRO  =>  plt_photo%VCGRO  , &
+    FDBK   =>  plt_photo%FDBK   , &
+    FDBKX  =>  plt_photo%FDBKX  , &
+    XKCO2O =>  plt_photo%XKCO2O , &
+    VCGR4  =>  plt_photo%VCGR4  , &
+    RSMN   =>  plt_photo%RSMN   , &
+    DCO2   =>  plt_photo%DCO2   , &
+    RSMH   =>  plt_photo%RSMH   , &
+    FRADP  =>  plt_rad%FRADP    , &
+    NBR    =>  plt_morph%NBR      &
   )
 
   call PrepPhotosynthesis(NZ,CH2O,TFN1,TFN2,TFNE,XKO2L)
 !
 !     FOR EACH BRANCH
 !
-  DO NB=1,NBRs1(NZ)
+  DO NB=1,NBR(NZ)
 !
 !     FEEDBACK ON CO2 FIXATION
 !
@@ -849,16 +849,16 @@
 !     VRNS,VRNL=leafout hours,hours required for leafout
 !     VRNF,VRNX=leafoff hours,hours required for leafoff
 !
-    IF(IWTYPs1(NZ).EQ.0.OR.VRNSs1(NB,NZ).GE.VRNLs1(NB,NZ) &
-      .OR.VRNFs1(NB,NZ).LT.VRNXs1(NB,NZ))THEN
+    IF(IWTYP(NZ).EQ.0.OR.VRNS(NB,NZ).GE.VRNL(NB,NZ) &
+      .OR.VRNF(NB,NZ).LT.VRNX(NB,NZ))THEN
 
       call PhenoActiveBranch(NB,NZ,CH2O,TFN1,TFN2,TFNE,XKO2L)
     ELSE
-      FDBKs1(NB,NZ)=0.0_r8
-      FDBKXs1(NB,NZ)=1.0_r8
+      FDBK(NB,NZ)=0.0_r8
+      FDBKX(NB,NZ)=1.0_r8
       DO K=1,JNODS1
-        VCGR4s1(K,NB,NZ)=0.0_r8
-        VCGROs1(K,NB,NZ)=0.0_r8
+        VCGR4(K,NB,NZ)=0.0_r8
+        VCGRO(K,NB,NZ)=0.0_r8
       ENDDO
     ENDIF
   ENDDO
@@ -873,12 +873,12 @@
 !     AREA=area of grid cell
 !     RSMY=minimum stomatal resistance for CO2 uptake (h m-1)
 ! hourly time step
-  IF(CH2O.GT.ZEROPs1(NZ))THEN
-    RSX=FRADPs1(NZ)*DCO2s1(NZ)*AREA3s1(NUs1)/(CH2O*secsperhour)
+  IF(CH2O.GT.ZEROP(NZ))THEN
+    RSX=FRADP(NZ)*DCO2(NZ)*AREA3(NU)/(CH2O*secsperhour)
   ELSE
-    RSX=RSMHs1(NZ)*1.56_r8
+    RSX=RSMH(NZ)*1.56_r8
   ENDIF
-  RSMNs1(NZ)=AMIN1(RSMHs1(NZ),AMAX1(RSMY,RSX*0.641_r8))
+  RSMN(NZ)=AMIN1(RSMH(NZ),AMAX1(RSMY,RSX*0.641_r8))
   end associate
   end subroutine PhotoActivePFT
 

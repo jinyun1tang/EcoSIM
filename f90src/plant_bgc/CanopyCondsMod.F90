@@ -19,51 +19,51 @@ module CanopyCondsMod
 
   integer :: curday
   contains
-  subroutine CanopyConditionModel(I,J,DPTH0s1)
+  subroutine CanopyConditionModel(I,J,DPTH0)
   implicit none
   integer, intent(in) :: I,J
-  real(r8), intent(in) :: DPTH0s1 !water+ice depth at surface
+  real(r8), intent(in) :: DPTH0 !water+ice depth at surface
 
   curday=I
-  call MultiLayerSurfaceRadiation(I,J,DPTH0s1)
+  call MultiLayerSurfaceRadiation(I,J,DPTH0)
 
   call DivideCanopyLayerByLAI()
 
-  call CalcBoundaryLayerProperties(DPTH0s1)
+  call CalcBoundaryLayerProperties(DPTH0)
 
   end subroutine CanopyConditionModel
 
 !------------------------------------------------------------------------------------------
 
-  subroutine CalcBoundaryLayerProperties(DPTH0s1)
+  subroutine CalcBoundaryLayerProperties(DPTH0)
   implicit none
-  real(r8), intent(in) :: DPTH0s1
+  real(r8), intent(in) :: DPTH0
   real(r8) :: ARLSC
   real(r8) :: ARLSG
   real(r8) :: ZX,ZY,ZE
   REAL(R8) :: ZZ
 !     begin_execution
   associate(                          &
-    UAs1      => plt_site%UAs1      , &
-    ZEROs1    => plt_site%ZEROs1    , &
-    AREA3s1   => plt_site%AREA3s1   , &
-    IETYPs1   => plt_site%IETYPs1   , &
-    ZSs1      => plt_site%ZSs1      , &
-    Z0s1      => plt_site%Z0s1      , &
-    ZEROSs1   => plt_site%ZEROSs1   , &
-    NUs1      => plt_site%NUs1      , &
-    RABs1     => plt_ew%RABs1       , &
-    ZDs1      => plt_ew%ZDs1        , &
-    ZRs1      => plt_ew%ZRs1        , &
-    RIBs1     => plt_ew%RIBs1       , &
-    TKAs1     => plt_ew%TKAs1       , &
-    VHCPWXs1  => plt_ew%VHCPWXs1    , &
-    DPTHSs1   => plt_ew%DPTHSs1     , &
-    VHCPW1s1  => plt_ew%VHCPW1s1    , &
-    ZTs1      => plt_morph%ZTs1     , &
-    IRTYPs1   => plt_morph%IRTYPs1  , &
-    ARSTCs1   => plt_morph%ARSTCs1  , &
-    ARLFCs1   => plt_morph%ARLFCs1    &
+    UA      => plt_site%UA      , &
+    ZERO    => plt_site%ZERO    , &
+    AREA3   => plt_site%AREA3   , &
+    IETYP   => plt_site%IETYP   , &
+    ZS      => plt_site%ZS      , &
+    Z0      => plt_site%Z0      , &
+    ZEROS   => plt_site%ZEROS   , &
+    NU      => plt_site%NU      , &
+    RAB     => plt_ew%RAB       , &
+    ZD      => plt_ew%ZD        , &
+    ZR      => plt_ew%ZR        , &
+    RIB     => plt_ew%RIB       , &
+    TKA     => plt_ew%TKA       , &
+    VHCPWX  => plt_ew%VHCPWX    , &
+    DPTHS   => plt_ew%DPTHS     , &
+    VHCPW1  => plt_ew%VHCPW1    , &
+    ZT      => plt_morph%ZT     , &
+    IRTYP   => plt_morph%IRTYP  , &
+    ARSTC   => plt_morph%ARSTC  , &
+    ARLFC   => plt_morph%ARLFC    &
   )
 !     CANOPY ZERO PLANE AND ROUGHNESS HEIGHTS
 !
@@ -72,28 +72,28 @@ module CanopyCondsMod
 !     ZT,ZD,ZR=canopy,zero plane displacement,roughness height
 !     ZZ=reference height for wind speed
 !
-  ARLSC=ARLFCs1+ARSTCs1
-  IF(ARLSC.GT.ZEROSs1.AND.ZTs1.GE.DPTHSs1-ZEROs1 &
-    .AND.ZTs1.GE.DPTH0s1-ZEROs1)THEN
-    ARLSG=ARLSC/AREA3s1(NUs1)
+  ARLSC=ARLFC+ARSTC
+  IF(ARLSC.GT.ZEROS.AND.ZT.GE.DPTHS-ZERO &
+    .AND.ZT.GE.DPTH0-ZERO)THEN
+    ARLSG=ARLSC/AREA3(NU)
     ZX=EXP(-0.5*ARLSG)
     ZY=1.0-ZX
-    ZDs1=ZTs1*AMAX1(0.0_r8,1.0_r8-2.0_r8/ARLSG*ZY)
-    ZE=ZTs1*AMAX1(0.05_r8,ZX*ZY)
+    ZD=ZT*AMAX1(0.0_r8,1.0_r8-2.0_r8/ARLSG*ZY)
+    ZE=ZT*AMAX1(0.05_r8,ZX*ZY)
   ELSE
-    ZDs1=0.0_r8
+    ZD=0.0_r8
     ZE=0.0_r8
   ENDIF
   IF(IFLGW.EQ.1)THEN
-    ZZ=Z0s1+ZTs1
+    ZZ=Z0+ZT
   ELSE
-    ZZ=AMAX1(Z0s1,ZDs1+2.0_r8)
+    ZZ=AMAX1(Z0,ZD+2.0_r8)
   ENDIF
-  IF(IETYPs1.GE.0)THEN
-    IF(VHCPW1s1.GT.VHCPWXs1)THEN
-      ZRs1=AMAX1(0.001,ZE,ZW)
+  IF(IETYP.GE.0)THEN
+    IF(VHCPW1.GT.VHCPWX)THEN
+      ZR=AMAX1(0.001,ZE,ZW)
     ELSE
-      ZRs1=AMAX1(0.001,ZE,ZSs1)
+      ZR=AMAX1(0.001,ZE,ZS)
     ENDIF
 !
 !     CANOPY ISOTHERMAL BOUNDARY LAYER RESISTANCE
@@ -102,11 +102,11 @@ module CanopyCondsMod
 !     UA=wind speed
 !     RIB=canopy isothermal Richardson number
 !
-    RABs1=AMAX1(RAM,(LOG((ZZ-ZDs1)/ZRs1))**2/(0.168*UAs1))
-    RIBs1=1.27E+08*(ZZ-ZRs1)/(UAs1**2*TKAs1)
+    RAB=AMAX1(RAM,(LOG((ZZ-ZD)/ZR))**2/(0.168*UA))
+    RIB=1.27E+08*(ZZ-ZR)/(UA**2*TKA)
   ELSE
-    RABs1=RAM
-    RIBs1=0.0_r8
+    RAB=RAM
+    RIB=0.0_r8
   ENDIF
   end associate
   end subroutine CalcBoundaryLayerProperties
@@ -122,16 +122,16 @@ module CanopyCondsMod
   real(r8) :: DZL
   integer :: NZ,L
   !     begin_execution
-  associate(                          &
-    NPs1      => plt_site%NPs1      , &
-    ZEROSs1   => plt_site%ZEROSs1   , &
-    ZTs1      => plt_morph%ZTs1     , &
-    ZLs1      => plt_morph%ZLs1     , &
-    ZCs1      => plt_morph%ZCs1     , &
-    ARSTTs1   => plt_morph%ARSTTs1  , &
-    ARLFTs1   => plt_morph%ARLFTs1  , &
-    ARSTCs1   => plt_morph%ARSTCs1  , &
-    ARLFCs1   => plt_morph%ARLFCs1    &
+  associate(                      &
+    NP      => plt_site%NP      , &
+    ZEROS   => plt_site%ZEROS   , &
+    ZT      => plt_morph%ZT     , &
+    ZL      => plt_morph%ZL     , &
+    ZC      => plt_morph%ZC     , &
+    ARSTT   => plt_morph%ARSTT  , &
+    ARLFT   => plt_morph%ARLFT  , &
+    ARSTC   => plt_morph%ARSTC  , &
+    ARLFC   => plt_morph%ARLFC    &
   )
   !
   !     DIVISION OF CANOPY INTO JC LAYERS WITH EQUAL LAI
@@ -141,36 +141,36 @@ module CanopyCondsMod
   !     ARLFC,ARSTC=leaf,stalk area of combined canopy
   !     ARLFT,ARSTT=leaf,stalk area of combined canopy layer
   !
-  ZTs1=0.0
-  DO 9685 NZ=1,NPs1
-    ZTs1=AMAX1(ZTs1,ZCs1(NZ))
+  ZT=0.0
+  DO 9685 NZ=1,NP
+    ZT=AMAX1(ZT,ZC(NZ))
 9685  CONTINUE
-  ZLs1(JC1)=ZTs1+0.01
-  ZL1(JC1)=ZLs1(JC1)
+  ZL(JC1)=ZT+0.01
+  ZL1(JC1)=ZL(JC1)
   ZL1(0)=0.0
-  ART=(ARLFCs1+ARSTCs1)/JC1
-  IF(ART.GT.ZEROSs1)THEN
+  ART=(ARLFC+ARSTC)/JC1
+  IF(ART.GT.ZEROS)THEN
     DO 2765 L=JC1,2,-1
-      ARL=ARLFTs1(L)+ARSTTs1(L)
+      ARL=ARLFT(L)+ARSTT(L)
       IF(ARL.GT.1.01*ART)THEN
-        DZL=ZLs1(L)-ZLs1(L-1)
-        ZL1(L-1)=ZLs1(L-1)+0.5*AMIN1(1.0,(ARL-ART)/ARL)*DZL
+        DZL=ZL(L)-ZL(L-1)
+        ZL1(L-1)=ZL(L-1)+0.5*AMIN1(1.0,(ARL-ART)/ARL)*DZL
       ELSEIF(ARL.LT.0.99*ART)THEN
-        ARX=ARLFTs1(L-1)+ARSTTs1(L-1)
-        DZL=ZLs1(L-1)-ZLs1(L-2)
-        IF(ARX.GT.ZEROSs1)THEN
-          ZL1(L-1)=ZLs1(L-1)-0.5_r8*AMIN1(1.0_r8,(ART-ARL)/ARX)*DZL
+        ARX=ARLFT(L-1)+ARSTT(L-1)
+        DZL=ZL(L-1)-ZL(L-2)
+        IF(ARX.GT.ZEROS)THEN
+          ZL1(L-1)=ZL(L-1)-0.5_r8*AMIN1(1.0_r8,(ART-ARL)/ARX)*DZL
         ELSE
-          ZL1(L-1)=ZLs1(L-1)
+          ZL1(L-1)=ZL(L-1)
         ENDIF
       ELSE
-        ZL1(L-1)=ZLs1(L-1)
+        ZL1(L-1)=ZL(L-1)
       ENDIF
 2765  CONTINUE
     DO 2770 L=JC1,2,-1
-      ZLs1(L-1)=ZL1(L-1)
-!     ZLs1(L-1)=AMAX1(0.0,AMIN1(ZLs1(L)-1.0E-06
-!    2,ZLs1(L-1)))
+      ZL(L-1)=ZL1(L-1)
+!     ZL(L-1)=AMAX1(0.0,AMIN1(ZL(L)-1.0E-06
+!    2,ZL(L-1)))
 2770  CONTINUE
   ENDIF
   end associate
@@ -178,10 +178,10 @@ module CanopyCondsMod
 
 !------------------------------------------------------------------------------------------
 
-  subroutine MultiLayerSurfaceRadiation(I,J,DPTH0s1)
+  subroutine MultiLayerSurfaceRadiation(I,J,DPTH0)
   implicit none
   integer, intent(in) :: I,J
-  real(r8), intent(in) :: DPTH0s1
+  real(r8), intent(in) :: DPTH0
   integer :: NB,NZ,L,K,M,N,NN
   integer :: IALBS(JLI1,JSA1)
   real(r8) :: TAUY(0:JC1+1)
@@ -252,106 +252,106 @@ module CanopyCondsMod
   !     CFX=clumping factor for self-shading
   !
   associate(                       &
-    VHCPW1s1  => plt_ew%VHCPW1s1 , &
-    VOLISs1   => plt_ew%VOLISs1  , &
-    VOLSSs1   => plt_ew%VOLSSs1  , &
-    VOLWSs1   => plt_ew%VOLWSs1  , &
-    VHCPWXs1  => plt_ew%VHCPWXs1 , &
-    DPTHSs1   => plt_ew%DPTHSs1  , &
-    ALBRs1    => plt_rad%ALBRs1  , &
-    ALBSs1    => plt_rad%ALBSs1  , &
-    ALBXs1    => plt_rad%ALBXs1  , &
-    ALBPs1    => plt_rad%ALBPs1  , &
-    FRADGs1   => plt_rad%FRADGs1 , &
-    GAZIs1    => plt_rad%GAZIs1  , &
-    GCOSs1    => plt_rad%GCOSs1  , &
-    GSINs1    => plt_rad%GSINs1  , &
-    IALBYs1   => plt_rad%IALBYs1 , &
-    OMEGAs1   => plt_rad%OMEGAs1 , &
-    FRADPs1   => plt_rad%FRADPs1 , &
-    PARs1     => plt_rad%PARs1   , &
-    PARDIFs1  => plt_rad%PARDIFs1, &
-    OMEGAGs1  => plt_rad%OMEGAGs1   , &
-    OMEGXs1   => plt_rad%OMEGXs1    , &
-    RAD0s1    => plt_rad%RAD0s1     , &
-    RADGs1    => plt_rad%RADGs1     , &
-    RADSs1    => plt_rad%RADSs1     , &
-    RAP0s1    => plt_rad%RAP0s1     , &
-    RADCs1    => plt_rad%RADCs1     , &
-    RAPYs1    => plt_rad%RAPYs1     , &
-    RAPSs1    => plt_rad%RAPSs1     , &
-    RADYs1    => plt_rad%RADYs1     , &
-    RAD1s1    => plt_rad%RAD1s1     , &
-    SSINs1    => plt_rad%SSINs1     , &
-    TYSINs1   => plt_rad%TYSINs1    , &
-    TAU0s1    => plt_rad%TAU0s1     , &
-    TAUSs1    => plt_rad%TAUSs1     , &
-    ZSINs1    => plt_rad%ZSINs1     , &
-    ABSPs1    => plt_rad%ABSPs1     , &
-    ABSRs1    => plt_rad%ABSRs1     , &
-    TAUPs1    => plt_rad%TAUPs1     , &
-    TAURs1    => plt_rad%TAURs1     , &
-    RADPs1    => plt_rad%RADPs1     , &
-    ZCOSs1    => plt_rad%ZCOSs1     , &
-    ZEROSs1   => plt_site%ZEROSs1   , &
-    NUs1      => plt_site%NUs1      , &
-    AREA3s1   => plt_site%AREA3s1   , &
-    NPs1      => plt_site%NPs1      , &
-    ZEROs1    => plt_site%ZEROs1    , &
-    ZEROS2s1  => plt_site%ZEROS2s1  , &
-    POROS1s1  => plt_site%POROS1s1  , &
-    ZNOONs1   => plt_site%ZNOONs1   , &
-    VOLXs1    => plt_soilchem%VOLXs1, &
-    VOLYs1    => plt_soilchem%VOLYs1, &
-    VOLWs1    => plt_soilchem%VOLWs1, &
-    CFXs1     => plt_morph%CFXs1    , &
-    ZLs1      => plt_morph%ZLs1     , &
-    NBRs1     => plt_morph%NBRs1    , &
-    SURFs1    => plt_morph%SURFs1   , &
-    SURFBs1   => plt_morph%SURFBs1  , &
-    ARLFPs1   => plt_morph%ARLFPs1  , &
-    ARLFLs1   => plt_morph%ARLFLs1  , &
-    ARSTKs1   => plt_morph%ARSTKs1  , &
-    ARLFSs1   => plt_morph%ARLFSs1  , &
-    CFs1      => plt_morph%CFs1     , &
-    ARLSSs1   => plt_morph%ARLSSs1    &
+    VHCPW1  => plt_ew%VHCPW1 , &
+    VOLIS   => plt_ew%VOLIS  , &
+    VOLSS   => plt_ew%VOLSS  , &
+    VOLWS   => plt_ew%VOLWS  , &
+    VHCPWX  => plt_ew%VHCPWX , &
+    DPTHS   => plt_ew%DPTHS  , &
+    ALBR    => plt_rad%ALBR  , &
+    ALBS    => plt_rad%ALBS  , &
+    ALBX    => plt_rad%ALBX  , &
+    ALBP    => plt_rad%ALBP  , &
+    FRADG   => plt_rad%FRADG , &
+    GAZI    => plt_rad%GAZI  , &
+    GCOS    => plt_rad%GCOS  , &
+    GSIN    => plt_rad%GSIN  , &
+    IALBY   => plt_rad%IALBY , &
+    OMEGA   => plt_rad%OMEGA , &
+    FRADP   => plt_rad%FRADP , &
+    PAR     => plt_rad%PAR   , &
+    PARDIF  => plt_rad%PARDIF, &
+    OMEGAG  => plt_rad%OMEGAG   , &
+    OMEGX   => plt_rad%OMEGX    , &
+    RAD0    => plt_rad%RAD0     , &
+    RADG    => plt_rad%RADG     , &
+    RADS    => plt_rad%RADS     , &
+    RAP0    => plt_rad%RAP0     , &
+    RADC    => plt_rad%RADC     , &
+    RAPY    => plt_rad%RAPY     , &
+    RAPS    => plt_rad%RAPS     , &
+    RADY    => plt_rad%RADY     , &
+    RAD1    => plt_rad%RAD1     , &
+    SSIN    => plt_rad%SSIN     , &
+    TYSIN   => plt_rad%TYSIN    , &
+    TAU0    => plt_rad%TAU0     , &
+    TAUS    => plt_rad%TAUS     , &
+    ZSIN    => plt_rad%ZSIN     , &
+    ABSP    => plt_rad%ABSP     , &
+    ABSR    => plt_rad%ABSR     , &
+    TAUP    => plt_rad%TAUP     , &
+    TAUR    => plt_rad%TAUR     , &
+    RADP    => plt_rad%RADP     , &
+    ZCOS    => plt_rad%ZCOS     , &
+    ZEROS   => plt_site%ZEROS   , &
+    NU      => plt_site%NU      , &
+    AREA3   => plt_site%AREA3   , &
+    NP      => plt_site%NP      , &
+    ZERO    => plt_site%ZERO    , &
+    ZEROS2  => plt_site%ZEROS2  , &
+    POROS1  => plt_site%POROS1  , &
+    ZNOON   => plt_site%ZNOON   , &
+    VOLX    => plt_soilchem%VOLX, &
+    VOLY    => plt_soilchem%VOLY, &
+    VOLW    => plt_soilchem%VOLW, &
+    CFX     => plt_morph%CFX    , &
+    ZL      => plt_morph%ZL     , &
+    NBR     => plt_morph%NBR    , &
+    SURF    => plt_morph%SURF   , &
+    SURFB   => plt_morph%SURFB  , &
+    ARLFP   => plt_morph%ARLFP  , &
+    ARLFL   => plt_morph%ARLFL  , &
+    ARSTK   => plt_morph%ARSTK  , &
+    ARLFS   => plt_morph%ARLFS  , &
+    CF      => plt_morph%CF     , &
+    ARLSS   => plt_morph%ARLSS    &
   )
-  ARLSSs1=0.0
-  DO 1135 NZ=1,NPs1
-    ARLFSs1(NZ)=0.0
-    DO  NB=1,NBRs1(NZ)
+  ARLSS=0.0
+  DO 1135 NZ=1,NP
+    ARLFS(NZ)=0.0
+    DO  NB=1,NBR(NZ)
       DO  L=1,JC1
-        if(ZLs1(L-1)/=ZLs1(L-1))&
-        print*,L,ZLs1(L),ZLs1(L-1)
-        IF(ZLs1(L-1).GE.DPTHSs1-ZEROs1 &
-          .AND.ZLs1(L-1).GE.DPTH0s1-ZEROs1)THEN
+        if(ZL(L-1)/=ZL(L-1))&
+        print*,L,ZL(L),ZL(L-1)
+        IF(ZL(L-1).GE.DPTHS-ZERO &
+          .AND.ZL(L-1).GE.DPTH0-ZERO)THEN
           DO 1130 K=1,JNODS1
-            ARLFSs1(NZ)=ARLFSs1(NZ)+ARLFLs1(L,K,NB,NZ)
-            ARLSSs1=ARLSSs1+ARLFLs1(L,K,NB,NZ)
+            ARLFS(NZ)=ARLFS(NZ)+ARLFL(L,K,NB,NZ)
+            ARLSS=ARLSS+ARLFL(L,K,NB,NZ)
 1130      CONTINUE
-          ARLFSs1(NZ)=ARLFSs1(NZ)+ARSTKs1(L,NB,NZ)
-          ARLSSs1=ARLSSs1+ARSTKs1(L,NB,NZ)
+          ARLFS(NZ)=ARLFS(NZ)+ARSTK(L,NB,NZ)
+          ARLSS=ARLSS+ARSTK(L,NB,NZ)
         ENDIF
       enddo
     enddo
 1135  CONTINUE
-  IF(SSINs1.GT.ZEROs1)THEN
-    RAD0s1=RADSs1*SSINs1+RADYs1*TYSINs1
-    RAP0s1=RAPSs1*SSINs1+RAPYs1*TYSINs1
+  IF(SSIN.GT.ZERO)THEN
+    RAD0=RADS*SSIN+RADY*TYSIN
+    RAP0=RAPS*SSIN+RAPY*TYSIN
   ELSE
-    RADSs1=0.0_r8
-    RADYs1=0.0_r8
-    RAPSs1=0.0_r8
-    RAPYs1=0.0_r8
-    RAD0s1=0.0_r8
-    RAP0s1=0.0_r8
+    RADS=0.0_r8
+    RADY=0.0_r8
+    RAPS=0.0_r8
+    RAPY=0.0_r8
+    RAD0=0.0_r8
+    RAP0=0.0_r8
   ENDIF
   TRADC=0.0_r8
   TRAPC=0.0_r8
-  DO 1025 NZ=1,NPs1
-    RADCs1(NZ)=0.0
-    RADPs1(NZ)=0.0
-    CFXs1(NZ)=CFs1(NZ)*(1.0_r8-0.025_r8*ARLFPs1(NZ)/AREA3s1(NUs1))
+  DO 1025 NZ=1,NP
+    RADC(NZ)=0.0
+    RADP(NZ)=0.0
+    CFX(NZ)=CF(NZ)*(1.0_r8-0.025_r8*ARLFP(NZ)/AREA3(NU))
 1025  CONTINUE
   !
   !     ANGLE BETWEEN SUN AND GROUND SURFACE
@@ -361,25 +361,25 @@ module CanopyCondsMod
   !     GCOS,GSIN=cos,sin of ground surface
   !     ZNOON=hour of solar noon from weather file
   !     0.2618=pi/12 (hrs)
-  IF(SSINs1.GT.ZEROs1)THEN
-    SAZI=0.2618_r8*(ZNOONs1-J)+4.7124_r8
-    SCOS=SQRT(1.0-SSINs1**2)
-    DGAZI=COS(GAZIs1-SAZI)
-    BETAG=AMAX1(0.0,AMIN1(1.0,GCOSs1*SSINs1 &
-      +GSINs1*SCOS*DGAZI))
-    IF(ARLSSs1.GT.0.0)THEN
-      SAGL=ASIN(SSINs1)
+  IF(SSIN.GT.ZERO)THEN
+    SAZI=0.2618_r8*(ZNOON-J)+4.7124_r8
+    SCOS=SQRT(1.0-SSIN**2)
+    DGAZI=COS(GAZI-SAZI)
+    BETAG=AMAX1(0.0,AMIN1(1.0,GCOS*SSIN &
+      +GSIN*SCOS*DGAZI))
+    IF(ARLSS.GT.0.0)THEN
+      SAGL=ASIN(SSIN)
       !
       !     ABSORBED RADIATION FROM OPTICAL PROPERTIES ENTERED IN 'READS'
       !
       !     RADSA,RADWA,RAPSA,RAPWA=SW,PAR absorbed at leaf,stalk surface
       !     perpendicular to incoming radiation
       !
-      DO 1050 NZ=1,NPs1
-        RADSA(NZ)=RADSs1*ABSRs1(NZ)
-        RADWA(NZ)=RADSs1*ABSRW
-        RAPSA(NZ)=RAPSs1*ABSPs1(NZ)
-        RAPWA(NZ)=RAPSs1*ABSPW
+      DO 1050 NZ=1,NP
+        RADSA(NZ)=RADS*ABSR(NZ)
+        RADWA(NZ)=RADS*ABSRW
+        RAPSA(NZ)=RAPS*ABSP(NZ)
+        RAPWA(NZ)=RAPS*ABSPW
 1050  CONTINUE
       !
       !     ANGLES BETWEEN SUN OR SKY ZONES AND FOLIAR SURFACES
@@ -393,10 +393,10 @@ module CanopyCondsMod
         ZAZI=SAZI+(M-0.5)*PICON/real(M,r8)
         DAZI=COS(ZAZI-SAZI)
         DO  N=1,JLI1
-          BETY=ZCOSs1(N)*SSINs1+ZSINs1(N)*SCOS*DAZI
+          BETY=ZCOS(N)*SSIN+ZSIN(N)*SCOS*DAZI
           BETA(N,M)=ABS(BETY)
-          BETX(N,M)=BETA(N,M)/SSINs1
-          IF(ZCOSs1(N).GT.SSINs1)THEN
+          BETX(N,M)=BETA(N,M)/SSIN
+          IF(ZCOS(N).GT.SSIN)THEN
             BETZ=ACOS(BETY)
           ELSE
             BETZ=-ACOS(BETY)
@@ -420,23 +420,23 @@ module CanopyCondsMod
           !     RAFYL,RAFPL=forward scattered diffuse SW,PAR flux
           !     TAUS,TAUY=fraction of direct,diffuse radiation transmitted
 !
-          DO  NZ=1,NPs1
+          DO  NZ=1,NP
             RDNDIR(N,M,NZ)=RADSA(NZ)*ABS(BETA(N,M))
             RDNDIW(N,M,NZ)=RADWA(NZ)*ABS(BETA(N,M))
             PARDIR(N,M,NZ)=RAPSA(NZ)*ABS(BETA(N,M))
             PARDIW(N,M,NZ)=RAPWA(NZ)*ABS(BETA(N,M))
             DO L=1,JC1
-              PARDIFs1(N,M,L,NZ)=0.0
-              PARs1(N,M,L,NZ)=PARDIR(N,M,NZ)
+              PARDIF(N,M,L,NZ)=0.0
+              PAR(N,M,L,NZ)=PARDIR(N,M,NZ)
             enddo
           enddo
         enddo
 1100  CONTINUE
-      XAREA=1.00/AREA3s1(NUs1)
-      YAREA=0.25/AREA3s1(NUs1)
-      RADYL=RADYs1
-      RAPYL=RAPYs1
-      TAUSs1(JC1+1)=1.0
+      XAREA=1.00/AREA3(NU)
+      YAREA=0.25/AREA3(NU)
+      RADYL=RADY
+      RAPYL=RAPY
+      TAUS(JC1+1)=1.0
       TAUY(JC1+1)=1.0
       RAFSL(JC1+1)=0.0
       RAFPL(JC1+1)=0.0
@@ -447,7 +447,7 @@ module CanopyCondsMod
       !
       !     TSURF,TSURFB,SURF,SURFB=leaf,stalk total,PFT surface area
 !
-      DO 1150 NZ=1,NPs1
+      DO 1150 NZ=1,NP
         DO  L=1,JC1
           DO  N=1,JLI1
             TSURF(N,L,NZ)=0.0
@@ -455,15 +455,15 @@ module CanopyCondsMod
           enddo
         enddo
 1150  CONTINUE
-      DO 1200 NZ=1,NPs1
-        DO  NB=1,NBRs1(NZ)
+      DO 1200 NZ=1,NP
+        DO  NB=1,NBR(NZ)
           DO  L=1,JC1
-            IF(ZLs1(L-1).GT.DPTHSs1-ZEROs1.AND.ZLs1(L-1).GT.DPTH0s1-ZEROs1)THEN
+            IF(ZL(L-1).GT.DPTHS-ZERO.AND.ZL(L-1).GT.DPTH0-ZERO)THEN
               DO 1205 N=1,JLI1
                 DO 1210 K=1,JNODS1
-                  TSURF(N,L,NZ)=TSURF(N,L,NZ)+SURFs1(N,L,K,NB,NZ)
+                  TSURF(N,L,NZ)=TSURF(N,L,NZ)+SURF(N,L,K,NB,NZ)
 1210            CONTINUE
-                TSURFB(N,L,NZ)=TSURFB(N,L,NZ)+SURFBs1(N,L,NB,NZ)
+                TSURFB(N,L,NZ)=TSURFB(N,L,NZ)+SURFB(N,L,NB,NZ)
 1205          CONTINUE
             ENDIF
           enddo
@@ -480,8 +480,8 @@ module CanopyCondsMod
       !     STOPY,STOPSZ,STOPYZ=fraction of direct,diffuse radiation intercepted
       !
       DO 1800 L=JC1,1,-1
-        IF(ZLs1(L-1).GE.DPTHSs1-ZEROs1 &
-          .AND.ZLs1(L-1).GE.DPTH0s1-ZEROs1)THEN
+        IF(ZL(L-1).GE.DPTHS-ZERO &
+          .AND.ZL(L-1).GE.DPTH0-ZERO)THEN
           RADYL=RADYL*TAUY(L+1)+RAFSL(L+1)
           RAPYL=RAPYL*TAUY(L+1)+RAFPL(L+1)
           RAFSL(L)=0.0
@@ -501,7 +501,7 @@ module CanopyCondsMod
           !     RADS2,RADW2,RADP2,RADQ2=fwd scattered direct SW,PAR absbd by leaf,stalk surf
           !     RAYS2,RAYW2,RAYP2,RAYQ2=fwd scattered diffuse SW,PAR absbd by leaf,stalk surf
     !
-          DO 1500 NZ=1,NPs1
+          DO 1500 NZ=1,NP
             RADSL(NZ)=0.0
             RADSW(NZ)=0.0
             RADPL(NZ)=0.0
@@ -540,13 +540,13 @@ module CanopyCondsMod
       !     TSURWX=TSURWS m-2
       !
             DO 1600 N=1,JLI1
-              TSURFY=TSURF(N,L,NZ)*CFXs1(NZ)
+              TSURFY=TSURF(N,L,NZ)*CFX(NZ)
               TSURFZ=TSURFY*YAREA
-              TSURFS=TSURFY*TAUSs1(L+1)
+              TSURFS=TSURFY*TAUS(L+1)
               TSURFX=TSURFS*XAREA
               TSURWY=TSURFB(N,L,NZ)*CFW
               TSURWZ=TSURWY*YAREA
-              TSURWS=TSURWY*TAUSs1(L+1)
+              TSURWS=TSURWY*TAUS(L+1)
               TSURWX=TSURWS*XAREA
               !
               !     ABSORPTION OF DIRECT RADIATION BY SUNLIT LEAF SURFACES
@@ -583,12 +583,12 @@ module CanopyCondsMod
                 !     OMEGA,OMEGX=incident angle of diffuse radn at leaf,horizontal surface
 !
                 DO 1750 NN=1,JLA1
-                  RADYN=RADYL*OMEGAs1(M,N,NN)*ABSRs1(NZ)
-                  RADYW=RADYL*OMEGAs1(M,N,NN)*ABSRW
-                  RAPYN=RAPYL*OMEGAs1(M,N,NN)*ABSPs1(NZ)
-                  RAPYW=RAPYL*OMEGAs1(M,N,NN)*ABSPW
-                  PARDIFs1(N,M,L,NZ)=PARDIFs1(N,M,L,NZ)+RAPYN
-                  PARs1(N,M,L,NZ)=PARs1(N,M,L,NZ)+RAPYN
+                  RADYN=RADYL*OMEGA(M,N,NN)*ABSR(NZ)
+                  RADYW=RADYL*OMEGA(M,N,NN)*ABSRW
+                  RAPYN=RAPYL*OMEGA(M,N,NN)*ABSP(NZ)
+                  RAPYW=RAPYL*OMEGA(M,N,NN)*ABSPW
+                  PARDIF(N,M,L,NZ)=PARDIF(N,M,L,NZ)+RAPYN
+                  PAR(N,M,L,NZ)=PAR(N,M,L,NZ)+RAPYN
 !
                   !     ABSORPTION OF DIFFUSE RADIATION BY SHADED LEAF SURFACES
                   !
@@ -598,11 +598,11 @@ module CanopyCondsMod
                   RAYSW(NZ)=RAYSW(NZ)+TSURWY*RADYW
                   RAYPL(NZ)=RAYPL(NZ)+TSURFY*RAPYN
                   RAYPW(NZ)=RAYPW(NZ)+TSURWY*RAPYW
-                  STOPYZ=STOPYZ+(TSURFZ+TSURWZ)*OMEGXs1(M,N,NN)
+                  STOPYZ=STOPYZ+(TSURFZ+TSURWZ)*OMEGX(M,N,NN)
     !
                   !     BACKSCATTERING OF REFLECTED DIFFUSE RADIATION
                   !
-                  IF(IALBYs1(M,N,NN).EQ.1)THEN
+                  IF(IALBY(M,N,NN).EQ.1)THEN
                     RAYS1(NZ)=RAYS1(NZ)+TSURFY*RADYN
                     RAYW1(NZ)=RAYW1(NZ)+TSURWY*RADYW
                     RAYP1(NZ)=RAYP1(NZ)+TSURFY*RAPYN
@@ -628,14 +628,14 @@ module CanopyCondsMod
           !     TAUS=transmission of direct radiation to next lower layer
 !
           IF(STOPS+STOPSZ.GT.1.0)THEN
-            IF(STOPSZ.GT.ZEROs1)THEN
+            IF(STOPSZ.GT.ZERO)THEN
               XTAUS=(1.0-STOPS)/((1.0-STOPS)-(1.0-STOPS-STOPSZ))
             ELSE
               XTAUS=0.0
             ENDIF
-            TAUSs1(L+1)=TAUSs1(L+1)*XTAUS
+            TAUS(L+1)=TAUS(L+1)*XTAUS
             STOPSZ=STOPSZ*XTAUS
-            DO 1510 NZ=1,NPs1
+            DO 1510 NZ=1,NP
               RADSL(NZ)=RADSL(NZ)*XTAUS
               RADSW(NZ)=RADSW(NZ)*XTAUS
               RADPL(NZ)=RADPL(NZ)*XTAUS
@@ -659,7 +659,7 @@ module CanopyCondsMod
             XTAUY=(1.0-STOPY)/((1.0-STOPY)-(1.0-STOPY-STOPYZ))
             TAUY(L+1)=TAUY(L+1)*XTAUY
             STOPYZ=STOPYZ*XTAUY
-            DO 1520 NZ=1,NPs1
+            DO 1520 NZ=1,NP
               RAYSL(NZ)=RAYSL(NZ)*XTAUY
               RAYSW(NZ)=RAYSW(NZ)*XTAUY
               RAYPL(NZ)=RAYPL(NZ)*XTAUY
@@ -674,8 +674,8 @@ module CanopyCondsMod
               RAYQ2(NZ)=RAYQ2(NZ)*XTAUY
               DO 1730 N=1,JLI1
                 DO  M=1,JSA1
-                  PARDIFs1(N,M,L,NZ)=PARDIFs1(N,M,L,NZ)*XTAUY
-                  PARs1(N,M,L,NZ)=PARDIR(N,M,NZ)+PARDIFs1(N,M,L,NZ)
+                  PARDIF(N,M,L,NZ)=PARDIF(N,M,L,NZ)*XTAUY
+                  PAR(N,M,L,NZ)=PARDIR(N,M,NZ)+PARDIF(N,M,L,NZ)
                 enddo
 1730          CONTINUE
 1520        CONTINUE
@@ -692,7 +692,7 @@ module CanopyCondsMod
           !     STOPS,STOPY=accumulated interception of direct,diffuse radiation
           !     TAUS,TAUY=transmission of direct,diffuse radiation to next lower layer
           !
-          DO 1530 NZ=1,NPs1
+          DO 1530 NZ=1,NP
             RADST=RADSL(NZ)+RAYSL(NZ)
             RADWT=RADSW(NZ)+RAYSW(NZ)
             RADPT=RADPL(NZ)+RAYPL(NZ)
@@ -705,25 +705,25 @@ module CanopyCondsMod
             RA2WT=RADW2(NZ)+RAYW2(NZ)
             RA2PT=RADP2(NZ)+RAYP2(NZ)
             RA2QT=RADQ2(NZ)+RAYQ2(NZ)
-            RAFSL(L)=RAFSL(L)+(RADST*TAURs1(NZ)+RA2ST*ALBRs1(NZ)+RA2WT*ALBRW)*YAREA
-            RAFPL(L)=RAFPL(L)+(RADPT*TAUPs1(NZ)+RA2PT*ALBPs1(NZ)+RA2QT*ALBPW)*YAREA
-            RABSL(L)=RABSL(L)+(RA1ST*ALBRs1(NZ)+RA1WT*ALBRW)*YAREA
-            RABPL(L)=RABPL(L)+(RA1PT*ALBPs1(NZ)+RA1QT*ALBPW)*YAREA
-            RADCs1(NZ)=RADCs1(NZ)+RADST+RADWT
-            RADPs1(NZ)=RADPs1(NZ)+RADPT+RADQT
+            RAFSL(L)=RAFSL(L)+(RADST*TAUR(NZ)+RA2ST*ALBR(NZ)+RA2WT*ALBRW)*YAREA
+            RAFPL(L)=RAFPL(L)+(RADPT*TAUP(NZ)+RA2PT*ALBP(NZ)+RA2QT*ALBPW)*YAREA
+            RABSL(L)=RABSL(L)+(RA1ST*ALBR(NZ)+RA1WT*ALBRW)*YAREA
+            RABPL(L)=RABPL(L)+(RA1PT*ALBP(NZ)+RA1QT*ALBPW)*YAREA
+            RADC(NZ)=RADC(NZ)+RADST+RADWT
+            RADP(NZ)=RADP(NZ)+RADPT+RADQT
             TRADC=TRADC+RADST+RADWT
             TRAPC=TRAPC+RADPT+RADQT
 1530      CONTINUE
           STOPS=STOPS+STOPSZ
           STOPY=STOPY+STOPYZ
-          TAUSs1(L)=1.0-STOPS
-          TAU0s1(L)=1.0-TAUSs1(L)
+          TAUS(L)=1.0-STOPS
+          TAU0(L)=1.0-TAUS(L)
           TAUY(L)=1.0-STOPY
         ELSE
           RAFSL(L)=RAFSL(L+1)
           RAFPL(L)=RAFPL(L+1)
-          TAUSs1(L)=TAUSs1(L+1)
-          TAU0s1(L)=1.0-TAUSs1(L)
+          TAUS(L)=TAUS(L+1)
+          TAU0(L)=1.0-TAUS(L)
           TAUY(L)=TAUY(L+1)
         ENDIF
 1800  CONTINUE
@@ -737,17 +737,17 @@ module CanopyCondsMod
       !     RASG,RAPG=total SW,PAR at ground surface
       !     BETAG,OMEGAG=incident solar,sky angle at ground surface
 !
-      RADSG=RADSs1*TAUSs1(1)
+      RADSG=RADS*TAUS(1)
       RADYG=RADYL*TAUY(1)+RAFSL(1)
-      RAPSG=RAPSs1*TAUSs1(1)
+      RAPSG=RAPS*TAUS(1)
       RAPYG=RAPYL*TAUY(1)+RAFPL(1)
       RASG=ABS(BETAG)*RADSG
       RAPG=ABS(BETAG)*RAPSG
       DO 20 N=1,JSA1
-        RASG=RASG+ABS(OMEGAGs1(N))*RADYG
-        RAPG=RAPG+ABS(OMEGAGs1(N))*RAPYG
+        RASG=RASG+ABS(OMEGAG(N))*RADYG
+        RAPG=RAPG+ABS(OMEGAG(N))*RAPYG
 20    CONTINUE
-      RADGs1=RASG*AREA3s1(NUs1)
+      RADG=RASG*AREA3(NU)
 !
       !     RADIATION REFLECTED FROM GROUND SURFACE
       !
@@ -758,23 +758,23 @@ module CanopyCondsMod
       !     RABSL,RADPL=SW,PAR backscatter from ground surface
       !     TRADG,TRAPG=SW,PAR absorbed by ground surface
 !
-      IF(VHCPW1s1.GT.VHCPWXs1)THEN
-        ALBW=(0.80_r8*VOLSSs1+0.30_r8*VOLISs1+0.06_r8*VOLWSs1) &
-          /(VOLSSs1+VOLISs1+VOLWSs1)
-        FSNOW=AMIN1((DPTHSs1/0.07)**2,1.0_r8)
-        ALBG=FSNOW*ALBW+(1.0_r8-FSNOW)*ALBSs1
+      IF(VHCPW1.GT.VHCPWX)THEN
+        ALBW=(0.80_r8*VOLSS+0.30_r8*VOLIS+0.06_r8*VOLWS) &
+          /(VOLSS+VOLIS+VOLWS)
+        FSNOW=AMIN1((DPTHS/0.07)**2,1.0_r8)
+        ALBG=FSNOW*ALBW+(1.0_r8-FSNOW)*ALBS
       ELSE
-        IF(VOLXs1(NUs1).GT.ZEROS2s1)THEN
-          THETW1=AMIN1(POROS1s1,VOLWs1(NUs1)/VOLYs1(NUs1))
+        IF(VOLX(NU).GT.ZEROS2)THEN
+          THETW1=AMIN1(POROS1,VOLW(NU)/VOLY(NU))
         ELSE
           THETW1=0.0
         ENDIF
-        ALBG=AMIN1(ALBXs1,ALBSs1+AMAX1(0.0_r8,ALBXs1-THETW1))
+        ALBG=AMIN1(ALBX,ALBS+AMAX1(0.0_r8,ALBX-THETW1))
       ENDIF
       RABSL(0)=RASG*ALBG*0.25_r8
       RABPL(0)=RAPG*ALBG*0.25_r8
-      TRADG=(1.0_r8-ALBG)*RASG*AREA3s1(NUs1)
-      TRAPG=(1.0_r8-ALBG)*RAPG*AREA3s1(NUs1)
+      TRADG=(1.0_r8-ALBG)*RASG*AREA3(NU)
+      TRAPG=(1.0_r8-ALBG)*RAPG*AREA3(NU)
 !
       !     ADD RADIATION FROM SCATTERING THROUGH CANOPY LAYERS
       !
@@ -790,28 +790,28 @@ module CanopyCondsMod
       RAFSL(0)=0.0
       RAFPL(0)=0.0
       DO 2800 L=1,JC1
-        IF(ZLs1(L-1).GE.DPTHSs1-ZEROs1 &
-         .AND.ZLs1(L-1).GE.DPTH0s1-ZEROs1)THEN
+        IF(ZL(L-1).GE.DPTHS-ZERO &
+         .AND.ZL(L-1).GE.DPTH0-ZERO)THEN
           RADYL=RADYL*TAUY(L-1)+RAFSL(L-1)+RABSL(L-1)
           RAPYL=RAPYL*TAUY(L-1)+RAFPL(L-1)+RABPL(L-1)
           RAFSL(L)=0.0
           RAFPL(L)=0.0
-          DO 2500 NZ=1,NPs1
+          DO 2500 NZ=1,NP
             RAYSL(NZ)=0.0
             RAYSW(NZ)=0.0
             RAYPL(NZ)=0.0
             RAYPW(NZ)=0.0
             DO 2600 N=1,JLI1
-              TSURFY=TSURF(N,L,NZ)*CFXs1(NZ)
+              TSURFY=TSURF(N,L,NZ)*CFX(NZ)
               TSURWY=TSURFB(N,L,NZ)*CFW
               DO 2700 M=1,JSA1
                 DO 2750 NN=1,JLA1
-                  RADYN=RADYL*OMEGAs1(M,N,NN)*ABSRs1(NZ)
-                  RADYW=RADYL*OMEGAs1(M,N,NN)*ABSRW
-                  RAPYN=RAPYL*OMEGAs1(M,N,NN)*ABSPs1(NZ)
-                  RAPYW=RAPYL*OMEGAs1(M,N,NN)*ABSPW
-                  PARDIFs1(N,M,L,NZ)=PARDIFs1(N,M,L,NZ)+RAPYN
-                  PARs1(N,M,L,NZ)=PARs1(N,M,L,NZ)+RAPYN
+                  RADYN=RADYL*OMEGA(M,N,NN)*ABSR(NZ)
+                  RADYW=RADYL*OMEGA(M,N,NN)*ABSRW
+                  RAPYN=RAPYL*OMEGA(M,N,NN)*ABSP(NZ)
+                  RAPYW=RAPYL*OMEGA(M,N,NN)*ABSPW
+                  PARDIF(N,M,L,NZ)=PARDIF(N,M,L,NZ)+RAPYN
+                  PAR(N,M,L,NZ)=PAR(N,M,L,NZ)+RAPYN
                   RAYSL(NZ)=RAYSL(NZ)+TSURFY*RADYN
                   RAYSW(NZ)=RAYSW(NZ)+TSURWY*RADYW
                   RAYPL(NZ)=RAYPL(NZ)+TSURFY*RAPYN
@@ -819,10 +819,10 @@ module CanopyCondsMod
 2750            CONTINUE
 2700          CONTINUE
 2600        CONTINUE
-            RAFSL(L)=RAFSL(L)+RAYSL(NZ)*TAURs1(NZ)*YAREA
-            RAFPL(L)=RAFPL(L)+RAYPL(NZ)*TAUPs1(NZ)*YAREA
-            RADCs1(NZ)=RADCs1(NZ)+RAYSL(NZ)+RAYSW(NZ)
-            RADPs1(NZ)=RADPs1(NZ)+RAYPL(NZ)+RAYPW(NZ)
+            RAFSL(L)=RAFSL(L)+RAYSL(NZ)*TAUR(NZ)*YAREA
+            RAFPL(L)=RAFPL(L)+RAYPL(NZ)*TAUP(NZ)*YAREA
+            RADC(NZ)=RADC(NZ)+RAYSL(NZ)+RAYSW(NZ)
+            RADP(NZ)=RADP(NZ)+RAYPL(NZ)+RAYPW(NZ)
             TRADC=TRADC+RAYSL(NZ)+RAYSW(NZ)
             TRAPC=TRAPC+RAYPL(NZ)+RAYPW(NZ)
 2500      CONTINUE
@@ -837,24 +837,24 @@ module CanopyCondsMod
       !     RADIATION AT GROUND SURFACE IF NO CANOPY
 !
     ELSE
-      RASG=ABS(BETAG)*RADSs1
+      RASG=ABS(BETAG)*RADS
       DO 120 N=1,JSA1
-        RASG=RASG+ABS(OMEGAGs1(N))*RADYs1
+        RASG=RASG+ABS(OMEGAG(N))*RADY
 120   CONTINUE
-      RADGs1=RASG*AREA3s1(NUs1)
-      DO 135 NZ=1,NPs1
-        RADCs1(NZ)=0.0
-        RADPs1(NZ)=0.0
+      RADG=RASG*AREA3(NU)
+      DO 135 NZ=1,NP
+        RADC(NZ)=0.0
+        RADP(NZ)=0.0
 135   CONTINUE
     ENDIF
 !
     !     IF NO RADIATION
 !
   ELSE
-    RADGs1=0.0
-    DO 125 NZ=1,NPs1
-      RADCs1(NZ)=0.0
-      RADPs1(NZ)=0.0
+    RADG=0.0
+    DO 125 NZ=1,NP
+      RADC(NZ)=0.0
+      RADP(NZ)=0.0
 125 CONTINUE
   ENDIF
   !
@@ -864,17 +864,17 @@ module CanopyCondsMod
   !     FRADP=fraction of radiation received by each PFT canopy
   !     ARLSS,ARLFS=leaf+stalk area of all PFTs,each PFT
   !
-  FRADGs1=1.0
-  IF(ARLSSs1.GT.ZEROSs1)THEN
-    FRADPT=1.0-EXP(-0.65*ARLSSs1/AREA3s1(NUs1))
-    DO 145 NZ=1,NPs1
-      FRADPs1(NZ)=FRADPT*ARLFSs1(NZ)/ARLSSs1
-      FRADGs1=FRADGs1-FRADPs1(NZ)
+  FRADG=1.0
+  IF(ARLSS.GT.ZEROS)THEN
+    FRADPT=1.0-EXP(-0.65*ARLSS/AREA3(NU))
+    DO 145 NZ=1,NP
+      FRADP(NZ)=FRADPT*ARLFS(NZ)/ARLSS
+      FRADG=FRADG-FRADP(NZ)
 145 CONTINUE
   ELSE
-    FRADGs1=1.0
-    DO 146 NZ=1,NPs1
-      FRADPs1(NZ)=0.0
+    FRADG=1.0
+    DO 146 NZ=1,NP
+      FRADP(NZ)=0.0
 146 CONTINUE
   ENDIF
   end associate
