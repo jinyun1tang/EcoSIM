@@ -1,4 +1,6 @@
 set(AQUACHEM_DRIVER_SOURCES
+  ChemIDMod.F90
+  AquaSaltChemMod.F90
 	AquachemMod.F90
 )
 

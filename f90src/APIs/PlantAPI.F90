@@ -203,8 +203,8 @@ implicit none
   ENDDO
 
   DO L=1,JZ
-    TUPNF(L,NY,NX)=plt_rbgc%TUPNF(L)
-    RTDNT(L,NY,NX)=plt_morph%RTDNT(L)
+    TUPNF(L,NY,NX) =plt_rbgc%TUPNF(L)
+    RTDNT(L,NY,NX) =plt_morph%RTDNT(L)
     TLOXYP(L,NY,NX)=plt_rbgc%TLOXYP(L)
     TLCO2P(L,NY,NX)=plt_rbgc%TLCO2P(L)
     TLCH4P(L,NY,NX)=plt_rbgc%TLCH4P(L)

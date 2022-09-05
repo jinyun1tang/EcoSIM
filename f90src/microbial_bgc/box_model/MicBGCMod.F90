@@ -33,7 +33,9 @@ module MicBGCMod
 !------------------------------------------------------------------------------------------
 
   subroutine initNitro1Layer
-
+!
+! DESCRIPTION:
+! initialize single layer microibal bgc model
   implicit none
 
   jcplx =micpar%jcplx
@@ -47,9 +49,8 @@ module MicBGCMod
 
 !------------------------------------------------------------------------------------------
 
-  subroutine SoilBGCOneLayer(I,J,micfor,micstt,micflx)
+  subroutine SoilBGCOneLayer(micfor,micstt,micflx)
   implicit none
-  integer, intent(in) :: I,J
   type(micforctype), intent(in) :: micfor
   type(micsttype), intent(inout) :: micstt
   type(micfluxtype), intent(inout) :: micflx
@@ -85,13 +86,13 @@ module MicBGCMod
 !
 !     ROQCK=total respiration of DOC+DOA used to represent microbial activity
 !
-  DO 1870 K=0,KL
-    DO 1875 N=1,7
+  DO  K=0,KL
+    DO  N=1,7
       DO NGL=1,JG
         ncplxf%ROQCK(K)=ncplxf%ROQCK(K)+nmicf%ROQCD(NGL,N,K)
       enddo
-1875  CONTINUE
-1870  CONTINUE
+    ENDDO
+  ENDDO
         !
         !write(*,*)'PRIMING of DOC,DON,DOP BETWEEN LITTER AND NON-LITTER C'
   call OMTransferForPriming(KL,micfor,micstt,nmicf,nmics,ncplxf,ncplxs)
@@ -103,7 +104,7 @@ module MicBGCMod
         !     OQC,OQN,OQP,OQA=DOC,DON,DOP,acetate in micropores
         !     OMC,OMN,OMP=microbial C,N,P
         !
-  DO 1790 K=0,KL
+  DO K=0,KL
 !
           !write(*,*)'DECOMPOSITION OF ORGANIC SUBSTRATES'
 !
@@ -113,7 +114,7 @@ module MicBGCMod
 !
     call DOMSorption(K,micfor,micstt,nmicf,ncplxf,ncplxs)
 
-1790  CONTINUE
+  ENDDO
         !write(*,*)'RedistDecompositionProduct'
   call RedistDecompositionProduct(micfor,KL,nmicdiag,nmicf,ncplxf,ncplxs,micstt)
 !
@@ -1336,13 +1337,6 @@ module MicBGCMod
     ENDIF
     DFNS=COSC/(COSC+DCKD)
     OQCI=1.0/(1.0+COQC(K)/OQKI)
-!     IF(litrm.AND.J.EQ.15)THEN
-!     WRITE(*,4242)'COSC',I,J,L,K,DFNS,COSC,COQCK,DCKD,OSRH(K)
-!    2,OSAT(K),OSCT(K),ORCT(K),OHC(K),BKVL,ROQCK(K)
-!    3,VOLWZ,VOLWRX,VOLW(0),FCR
-!    4,THETY
-!4242  FORMAT(A8,4I4,30E12.4)
-!     ENDIF
 !
 !     C, N, P DECOMPOSITION RATE OF SOLID SUBSTRATES 'RDOS*' FROM
 !     RATE CONSTANT, TOTAL ACTIVE BIOMASS, DENSITY FACTOR,
@@ -3856,11 +3850,6 @@ module MicBGCMod
     RCCN=0.0_r8
     RCCP=0.0_r8
   ENDIF
-!     IF((I/120)*120.EQ.I.AND.J.EQ.24)THEN
-!     WRITE(*,5555)'RCCC',I,J,NX,NY,L,K,N,RCCC,RCCN,RCCP
-!    2,OMC(3,NGL,N,K),OMN(3,NGL,N,K),OMP(3,NGL,N,K)
-!    3,CCC,C3C,CNC,CPC
-!     ENDIF
 !
 !     MICROBIAL ASSIMILATION OF NONSTRUCTURAL C,N,P
 !

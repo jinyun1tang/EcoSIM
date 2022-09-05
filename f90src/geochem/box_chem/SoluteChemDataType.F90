@@ -255,7 +255,6 @@ module SoluteChemDataType
   real(r8) :: VOLWNH
   real(r8) :: VOLWPB
   real(r8) :: VOLWPO
-  real(r8) :: ZEROS
   real(r8) :: XCEC
   real(r8) :: PH
   real(r8) :: CAL
@@ -266,7 +265,6 @@ module SoluteChemDataType
   real(r8) :: ZKA
   real(r8) :: CCO2S
   real(r8) :: CCA
-  real(r8) :: ZEROS2
   real(r8) :: BKVL
   real(r8) :: XAEC
   real(r8) :: GKC4

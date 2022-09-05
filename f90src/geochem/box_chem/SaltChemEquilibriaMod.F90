@@ -10,6 +10,8 @@ module SaltChemEquilibriaMod
   CHARACTER(LEN=*), PARAMETER :: MOD_FILENAME=__FILE__
 
   real(r8), parameter :: ZERO=1.0E-15_r8
+  real(r8), parameter :: ZEROS = 1.0E-015_r8
+  real(r8), parameter :: ZEROS2= 1.0E-008_r8
 
   real(r8) :: RAL,RAL1,RAL2,RAL3,RAL4,RALS
   real(r8) :: RB1P,RB2P,RBH0,RBH1,RBH2,RC0B,RC0P
@@ -58,13 +60,11 @@ module SaltChemEquilibriaMod
   real(r8) :: ACAS1,ACAH1,AMGO1,AMGC1,AMGH1,AMGS1,ANAC1,ANAS1
   real(r8) :: VOLWBK
 
-  real(r8), pointer :: ZEROS2
   real(r8), pointer :: VOLWM
   real(r8), pointer :: VOLWNH
   real(r8), pointer :: VOLWNB
   real(r8), pointer :: VOLWPB
   real(r8), pointer :: VOLWPO
-  real(r8), pointer :: ZEROS
   real(r8), pointer :: VLPOB
   real(r8), pointer :: VLPO4
   real(r8), pointer :: VLNHB
@@ -328,13 +328,11 @@ module SaltChemEquilibriaMod
   PCAPMB => chemvar%PCAPMB
   PFEPO1 => chemvar%PFEPO1
   PFEPOB => chemvar%PFEPOB
-  ZEROS2 => chemvar%ZEROS2
   ZNO3S  => chemvar%ZNO3S
   ZNO3B  => chemvar%ZNO3B
   VOLWM  => chemvar%VOLWM
   XZHYS  => chemvar%XZHYS
   ZHY    => chemvar%ZHY
-  ZEROS  => chemvar%ZEROS
   XCEC   => chemvar%XCEC
   ZOH    => chemvar%ZOH
   ZAL    => chemvar%ZAL

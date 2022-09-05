@@ -33,7 +33,10 @@ module EcosimConst
   real(r8) :: THETX=1.0E-03_r8                 !minimum air-filled porosity for gas transfer	[m3 m-3]
   real(r8), parameter :: THETPI=0.00_r8        !air content of ice	-
   real(r8), parameter :: DENSI=0.92_r8-THETPI  !ice density
-  real(r8), parameter :: ZW=0.01_r8         !snowpack surface roughness (m)
+  real(r8), parameter :: ZW=0.01_r8            !snowpack surface roughness [m]
+  real(r8), parameter :: Catomw=12._r8         !C 12 molar mass,[g/mol]
+  real(r8), parameter :: Natomw=14._r8         !N 14 molar mass [g/mol]
+  real(r8), parameter :: Patomw=31._r8         !P 31 molar mass [g/mol]
   integer :: ICOR(12)=(/1,-1,0,0,1,1,2,3,3,4,4,5/)
 
 end module EcosimConst

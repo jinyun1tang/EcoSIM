@@ -167,7 +167,7 @@ module readsmod
 26  CONTINUE
   READ(4,*)NPX,NPY,JOUT,IOUT,KOUT,ICLM
   if(lverb)then
-    write(*,*)'number of cycles per hour for water,heat,'// &
+    write(*,*)'number of cycles per hour for water, heat, and '// &
       'solute flux calcns: NPX ',NPX
     write(*,*)'number of cycles per NPX for gas flux calcns: NPY',NPY
     write(*,*)'output frequency for hourly data: JOUT ',JOUT

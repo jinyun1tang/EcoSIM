@@ -698,10 +698,10 @@ module StartsMod
   !     begin_execution
   real(r8) :: XNPV
   !
-  !     NPH=no. of cycles h-1 for water, heat and solute flux calculns
-  !     NPT=number of cycles NPH-1 for gas flux calculations
-  !     NPG=number of cycles h-1 for gas flux calculations
-  !     NPR,NPS=number of cycles NPH-1 for litter,snowpack flux calculns
+  !     NPH=no. of cycles per hour for water, heat and solute flux calculns
+  !     NPT=number of cycles per water iteration for gas flux calculations
+  !     NPG=number of cycles per hour for gas flux calculations
+  !     NPR,NPS=number of cycles NPH-1 for litter, snowpack flux calculns
   !     THETX=minimum air-filled porosity for gas flux calculations
   !     THETPI,DENSI=ice porosity,density
   !

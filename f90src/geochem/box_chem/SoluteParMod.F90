@@ -164,10 +164,10 @@ module SoluteParMod
   real(r8), PARAMETER :: A0=1.0_r8
   real(r8), PARAMETER :: COOH=2.5E-04_r8
   real(r8), PARAMETER :: CCAMX=10.0_r8
-  real(r8), PARAMETER :: SPNH4=1.0E-00_r8
-  real(r8), PARAMETER :: SPNH3=1.0E-00_r8
-  real(r8), PARAMETER :: SPNHU=1.0E-01_r8
-  real(r8), PARAMETER :: SPNO3=1.0E-00_r8
-  real(r8), PARAMETER :: SPPO4=5.0E-02_r8
+  real(r8), PARAMETER :: SPNH4=1.0E-00_r8    ![1/h]
+  real(r8), PARAMETER :: SPNH3=1.0E-00_r8    ![1/h]
+  real(r8), PARAMETER :: SPNHU=1.0E-01_r8    ![1/h]
+  real(r8), PARAMETER :: SPNO3=1.0E-00_r8    ![1/h]
+  real(r8), PARAMETER :: SPPO4=5.0E-02_r8    ![1/h]
 
 end module SoluteParMod

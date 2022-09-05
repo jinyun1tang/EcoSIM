@@ -101,7 +101,6 @@ module GeochemAPI
   type(solute_flx_type), intent(inout) :: solflx
   type(chem_var_type), intent(inout) :: chemvar
 
-  chemvar%ZEROS=ZEROS(NY,NX)
   chemvar%XCEC=XCEC(L,NY,NX)
   chemvar%PH=PH(L,NY,NX)
   chemvar%CAL=CAL(L,NY,NX)
@@ -111,7 +110,6 @@ module GeochemAPI
   chemvar%ZNA=ZNA(L,NY,NX)
   chemvar%ZKA=ZKA(L,NY,NX)
   chemvar%CCA=CCA(L,NY,NX)
-  chemvar%ZEROS2=ZEROS2(NY,NX)
   chemvar%BKVL=BKVL(L,NY,NX)
   chemvar%XAEC=XAEC(L,NY,NX)
   chemvar%VLNH4=VLNH4(L,NY,NX)

@@ -54,12 +54,14 @@ end program main
   use ecosim_Time_Mod     , only : ecosim_time_type
   use ecosim_log_mod      , only : errMsg => shr_log_errMsg
   use batchmod
+  use ForcTypeMod         , only : forc_type
   use histMod
   use fileUtil
   implicit none
   character(len=*), intent(in) :: namelist_buffer
 !
 ! local argument
+  type(forc_type)   :: forc
   type(micforctype) :: micfor
   type(micsttype) :: micstt
   type(micfluxtype) :: micflx
@@ -154,21 +156,22 @@ end program main
 
     call timer%update_time_stamp()
 
-  !  call BatchModelConfig(forc,micfor,micstt,micflx, ystatesf0l,err_status)
+!   setup forcing, e.g., add litter/om/nutrients, set up temperature/moisture
+!
+    call BatchModelConfig(nvars,ystates0l,forc,micfor,micstt,micflx,err_status)
 
-!    if(err_status%check_status())then
-!      call endrun(msg=err_status%print_msg())
-!    endif
+    if(err_status%check_status())then
+      call endrun(msg=err_status%print_msg())
+    endif
 
 !   computes the fluxes
-!    call SoilBGCOneLayer(I,J,micfor,micstt,micflx)
+!     call RunMicBGC(nvars,ystates0l, ystatesfl, err_status)
 
-!    call UpdateStateVars(micstt,micflx,nvars,ystatesfl)
-!
     call timer%update_time_stamp()
 
     do jj = 1, nvars
       ystatesf(1,jj)=ystatesfl(jj)
+      ystates0l(jj) =ystatesfl(jj)
     enddo
 
     call hist%hist_wrap(ystatesf, timer)

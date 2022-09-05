@@ -147,7 +147,7 @@ END subroutine MicrobeModel
 
   call MicAPISend(L,NY,NX,micfor,micstt,micflx)
 
-  call SoilBGCOneLayer(I,J,micfor,micstt,micflx)
+  call SoilBGCOneLayer(micfor,micstt,micflx)
 
   call MicAPIRecv(L,NY,NX,micfor%litrm,micstt,micflx)
 
