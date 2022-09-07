@@ -5,7 +5,7 @@ module minimathmod
 
   use data_kind_mod, only : r8 => SHR_KIND_R8
   implicit none
-
+  character(len=*),private, parameter :: mod_filename = __FILE__
   private
   public :: safe_adb
   public :: p_adb

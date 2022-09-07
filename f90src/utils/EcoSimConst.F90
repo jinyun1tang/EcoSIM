@@ -1,6 +1,7 @@
 module EcosimConst
   use data_kind_mod, only : r8 => SHR_KIND_R8
   implicit none
+  character(len=*),private, parameter :: mod_filename = __FILE__
   real(r8), parameter :: Cpw=4.19_r8           !heat capacity for water
   real(r8), parameter :: cpi=1.9274_r8         !heat capacity for ice
   real(r8), parameter :: cpo=2.496E-06_r8      !heat capacity for organic matter

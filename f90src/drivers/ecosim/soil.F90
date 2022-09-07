@@ -29,6 +29,8 @@ SUBROUTINE soil(NA,ND,NT,NE,NAX,NTX,NEX,NHW,NHE,NVN,NVS)
   use EcoSIMConfig
   use PlantAPI     , only : PlantModel
   use MicBGCAPI    , only : MicrobeModel, MicAPI_Init, MicAPI_cleanup
+  use ForcWriterMod , only : do_bgcforc_write,WriteBBGCForc
+
   implicit none
 
   integer, intent(in) :: NT,NE,NAX,NTX,NEX,NHW,NHE,NVN,NVS
@@ -277,6 +279,10 @@ SUBROUTINE soil(NA,ND,NT,NE,NAX,NTX,NEX,NHW,NHE,NVN,NVS)
     if(lverb)WRITE(*,333)'ROUTP'
     CALL ROUTP(NHW,NHE,NVN,NVS)
   ENDIF
+
+  if(do_bgcforc_write)then
+    call WriteBBGCForc(I,IYRR)
+  endif
   GO TO 9000
 9999  CONTINUE
 

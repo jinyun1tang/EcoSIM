@@ -36,14 +36,6 @@ module WatsubPars
   real(r8) :: RZ
   real(r8) :: RAM
   real(r8) :: DPTHSX
-  real(r8) :: Z1S
-  real(r8) :: Z2SW
-  real(r8) :: Z2SD
-  real(r8) :: Z3SX
-  real(r8) :: Z1R
-  real(r8) :: Z2RW
-  real(r8) :: Z2RD
-  real(r8) :: Z3R
   real(r8) :: VISCW
   real(r8) :: VISCA
   real(r8) :: DIFFW
@@ -76,14 +68,6 @@ module WatsubPars
   RZ=0.0139_r8
   RAM=1.39E-03_r8   !this value differs from that in Hour1Mod.F90
   DPTHSX=0.075_r8
-  Z1S=0.010_r8
-  Z2SW=12.0_r8
-  Z2SD=12.0_r8
-  Z3SX=0.50_r8
-  Z1R=0.01_r8
-  Z2RW=12.0_r8
-  Z2RD=12.0_r8
-  Z3R=0.50_r8
   VISCW=1.0E-06_r8
   VISCA=2.0E-08_r8
   DIFFW=1.45E-07_r8

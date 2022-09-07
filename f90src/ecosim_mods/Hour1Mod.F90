@@ -4,6 +4,7 @@ module Hour1Mod
   use abortutils   , only : endrun, print_info
   use TracerPropMod
   use EcoSimConst
+  use MiniFuncMod
 !  use CanopyCondMod, only : CanopyConditionModel
   use PlantAPI, only : PlantCanopyRadsModel
   use MicrobialDataType
@@ -1527,15 +1528,6 @@ module Hour1Mod
     VISCWL=VISCW*EXP(0.533_r8-0.0267_r8*TCS(0,NY,NX))
     VLS(NY,NX)=3.6E+03_r8*9.8_r8*(PTDSNU(NY,NX)-1.0_r8) &
       *(1.0E-06_r8*D50)**2/(18.0_r8*VISCWL)
-!     WRITE(*,1118)'COHS',I,J,NX,NY,NU(NY,NX),COHS,DETE(NY,NX)
-!    2,ZM(NY,NX),VLS(NY,NX),D50,ZD50,PTDSNU(NY,NX)
-!    3,RTDNT(NU(NY,NX),NY,NX),VOLR(NY,NX)/AREA(3,0,NY,NX)
-!    3,ORGC(0,NY,NX)
-!    3,CCLAY(NU(NY,NX),NY,NX),CSILT(NU(NY,NX),NY,NX)
-!    4,CSAND(NU(NY,NX),NY,NX),CORGM,CORGC(NU(NY,NX),NY,NX)
-!    5,BKVL(NU(NY,NX),NY,NX),BKVLNX
-!    3,VISCWL,TCS(0,NY,NX)
-!1118  FORMAT(A8,5I4,20E12.4)
   ENDIF
   end subroutine SetSurfaceProperty4SedErosion
 !------------------------------------------------------------------------------------------
@@ -1651,8 +1643,6 @@ module Hour1Mod
   ELSE
     PSISM(L,NY,NX)=PSISE(L,NY,NX)
   ENDIF
-!     WRITE(*,443)'PSISM',I,J,NX,NY,L,PSISM(L,NY,NX)
-!    2,THETW(L,NY,NX),THETI(L,NY,NX),FCX,WPX,POROS(L,NY,NX)
 !
 !     SOIL OSMOTIC, GRAVIMETRIC AND MATRIC WATER POTENTIALS
 !
@@ -1661,16 +1651,7 @@ module Hour1Mod
   PSISO(L,NY,NX)=-8.3143E-06*TKS(L,NY,NX)*CION(L,NY,NX)
   PSISH(L,NY,NX)=0.0098*(ALT(NY,NX)-DPTH(L,NY,NX))
   PSIST(L,NY,NX)=AMIN1(0.0,PSISM(L,NY,NX)+PSISO(L,NY,NX)+PSISH(L,NY,NX))
-!     IF((I/30)*30.EQ.I.AND.J.EQ.15)THEN
-!     WRITE(*,1113)'PSISM1',I,J,NX,NY,L,PSISM(L,NY,NX)
-!    2,THETW(L,NY,NX),THETW1,VOLX(L,NY,NX)
-!    2,FC(L,NY,NX),WP(L,NY,NX),POROS(L,NY,NX),VOLP(L,NY,NX)
-!    3,VOLW(L,NY,NX),VOLI(L,NY,NX),VOLA(L,NY,NX),VOLT(L,NY,NX)
-!    4,CDPTH(L,NY,NX),DPTH(L,NY,NX),CDPTHZ(L,NY,NX),DPTHZ(L,NY,NX)
-!    5,DLYR(3,L,NY,NX),PSIST(L,NY,NX),PSISO(L,NY,NX)
-!    2,PSISH(L,NY,NX),TKS(L,NY,NX),CION(L,NY,NX)
-!1113  FORMAT(A8,5I4,50E12.4)
-!     ENDIF
+
 !
 !     SOIL RESISTANCE TO ROOT PENETRATION
 !
@@ -1686,9 +1667,6 @@ module Hour1Mod
 !     ELSE
       RSCS(L,NY,NX)=0.0_r8
 !     ENDIF
-!     WRITE(*,2442)'RSCS',I,J,NX,NY,L,RSCS(L,NY,NX),THETW(L,NY,NX)
-!    2,BKDS(L,NY,NX),CCLAY(L,NY,NX),CORGC(L,NY,NX)
-!2442  FORMAT(A8,5I4,12E12.4)
 !
 !     SOIL HYDRAULIC CONDUCTIVITIES FROM AMBIENT SOIL WATER CONTENTS
 !
@@ -1804,7 +1782,7 @@ module Hour1Mod
 !     *SGL= gaseous,aqueous diffusivity for gases,solutes listed in
 !     *SG PARAMETER statement above
 !
-  TFACL=(TKS(0,NY,NX)/298.15)**6
+  TFACL=TEFAQUDIF(TKS(0,NY,NX))
   TFND(0,NY,NX)=TFACL
   CQSGL(0,NY,NX)=CQSG*TFACL
   OLSGL(0,NY,NX)=OLSG*TFACL
@@ -1845,18 +1823,14 @@ module Hour1Mod
 !
 !     WGSGA,WGSGR,WGSGW=vapor diffusivity in air,litter,snowpack
 !
-  TFACA=(TKA(NY,NX)/298.15)**1.75
+  TFACA=TEFGASDIF(TKA(NY,NX))
   WGSGA(NY,NX)=WGSG*TFACA
-  if(TKS(0,NY,NX)<0._r8)then
-    write(*,*)'TKS(0,NY,NX)=',TKS(0,NY,NX)
-    call endrun(trim(mod_filename)//' at line',__LINE__)
-  endif
-  TFACR=(TKS(0,NY,NX)/298.15)**1.75
+  TFACR=TEFGASDIF(TKS(0,NY,NX))
   WGSGR(NY,NX)=WGSG*TFACR
-  DO 5060 L=1,JS
-    TFACW=(TKW(L,NY,NX)/298.15)**1.75
+  DO  L=1,JS
+    TFACW=TEFGASDIF(TKW(L,NY,NX))
     WGSGW(L,NY,NX)=WGSG*TFACW
-5060  CONTINUE
+  ENDDO
   end subroutine SetTracerPropertyInLiterAir
 !------------------------------------------------------------------------------------------
 
@@ -2023,12 +1997,8 @@ module Hour1Mod
 ! *SGL= gaseous,aqueous diffusivity for gases,solutes listed in
 ! *SG PARAMETER statement above
 !
-    if(TKS(L,NY,NX)<0._r8)THEN
-      WRITE(*,*)'TKS=',L,TKS(L,NY,NX)
-      CALL ENDRUN(TRIM(MOD_FILENAME)//' at line',__LINE__)
-    ENDIF
-    TFACG=(TKS(L,NY,NX)/298.15)**1.75
-    TFACL=(TKS(L,NY,NX)/298.15)**6
+    TFACG=TEFGASDIF(TKS(L,NY,NX))
+    TFACL=TEFAQUDIF(TKS(L,NY,NX))
     TFND(L,NY,NX)=TFACL
     CGSGL(L,NY,NX)=CGSG*TFACG
     CHSGL(L,NY,NX)=CHSG*TFACG

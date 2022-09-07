@@ -4,6 +4,7 @@ implicit none
 
   character(len=*),private, parameter :: mod_filename = __FILE__
   type, public :: forc_type
+!primary variables
     real(r8) :: CCH4E       !atmospheric CH4 concentration, [g m-3]
     real(r8) :: COXYE       !atmospheric O2 concentration, [g m-3]
     real(r8) :: COXQ        !surface irrigation  O2 concentration, [g m-3]
@@ -12,7 +13,6 @@ implicit none
     real(r8) :: FLQRQ       !precipitation flux into surface litter, [m3 d-2 h-1]
     real(r8) :: OFFSET      !offset for calculating temperature in Arrhenius curves, [oC]
 
-    real(r8) :: TFND        !temperature effect on diffusivity
     real(r8) :: THETY       !air-dry water content, [m3 m-3]
     real(r8) :: TKS         !temperature in kelvin, [K]
     real(r8) :: THETW       !volumetric water content [m3 m-3]
@@ -31,21 +31,6 @@ implicit none
     real(r8) :: PSISM       !soil micropore matric water potential, [MPa]
     real(r8) :: OLSGL       !aqueous O2 diffusivity, [m2 h-1], set in hour1
     real(r8) :: ORGC        !total soil organic C [g d-2]
-    real(r8) :: ROXYY       !total root + microbial O2 uptake from previous hour, [g d-2 h-1], updated in hour1
-    real(r8) :: RN2OY       !total root + microbial N2O uptake from previous hour, [g d-2 h-1]
-    real(r8) :: RNO2Y       !total root + microbial NO2 uptake non-band from previous hour, [g d-2 h-1]
-    real(r8) :: RN2BY       !total root + microbial NO2 uptake band from previous hour, [g d-2 h-1]
-    real(r8) :: RNHBY       !total root + microbial NH4 uptake band from previous hour, [g d-2 h-1]
-    real(r8) :: RN3BY       !total root + microbial NO3 uptake band from previous hour, [g d-2 h-1]
-    real(r8) :: RPOBY       !total root + microbial PO4 uptake band from previous hour, [g d-2 h-1]
-    real(r8) :: RP1BY       !HPO4 demand in band by all microbial, root, myco populations from previous hour
-    real(r8) :: RNH4Y       !total root + microbial NH4 uptake non-band from previous hour, [g d-2 h-1]
-    real(r8) :: RNO3Y       !total root + microbial NO3 uptake non-band from previous hour, [g d-2 h-1]
-    real(r8) :: RPO4Y       !total root + microbial PO4 uptake non-band from previous hour, [g d-2 h-1]
-    real(r8) :: RP14Y       !HPO4 demand in non-band by all microbial, root, myco populations from previous hour
-    real(r8) :: ROXYF       !net gaseous O2 flux, [g d-2 h-1], updated in redist.f
-    real(r8) :: RCH4L       !net aqueous CH4 flux, [g d-2 h-1], updated in redist.f
-    real(r8) :: ROXYL       !net aqueous O2 flux from previous hour, [g d-2 h-1], updated in redist.f
     real(r8) :: CFOMC(1:2)  !allocation coefficient to humus fractions
 
     real(r8) :: CNH4B       !NH4 concentration band micropore	[g m-3], derived from ZNH4B
@@ -68,11 +53,13 @@ implicit none
     real(r8) :: ZNO2B       !NO2  band micropore, [g d-2]
     real(r8) :: CNO2S       !NO2 concentration non-band micropore	[g m-3], derived from ZNO2S
     real(r8) :: ZNO2S       !NO2  non-band micropore, [g d-2]
-    real(r8), allocatable :: DFGS(:)   !coefficient for dissolution - volatilization, []
-    real(r8), allocatable :: FILM(:)   !soil water film thickness , [m]
-    real(r8), allocatable :: THETPM(:) !soil air-filled porosity, [m3 m-3]
-    real(r8), allocatable :: TORT(:)   !soil tortuosity, []
-    real(r8), allocatable :: VOLPM(:)  !soil air content, [m3 d-2]
+    real(r8) :: DFGS        !coefficient for dissolution - volatilization, []
+    real(r8) :: THETPM      !soil air-filled porosity, [m3 m-3]
+
+!derived variables
+    real(r8) :: FILM        !soil water film thickness , [m]
+    real(r8) :: TORT        !soil tortuosity, []
+    real(r8) :: VOLPM       !soil air content, [m3 d-2]
 
     real(r8) :: EPOC      !partitioning coefficient between POC and litter, [], hour1.f
     real(r8) :: EHUM      !partitioning coefficient between humus and microbial residue, [], hour1.f
@@ -92,21 +79,42 @@ implicit none
     real(r8) :: ZNFN0     !initial nitrification inhibition activity
     real(r8) :: ZNFNI     !current nitrification inhibition activity
 
- !litter layer
-    real(r8) :: VOLR   !surface litter volume, [m3 d-2]
-    real(r8) :: VOLWRX !surface litter water holding capacity, [m3 d-2]
- !non litter layer
-    real(r8) :: VOLY   !micropore volume, [m3 d-2]
-    real(r8) :: POROS  !soil porosity, [m3 m-3]
-    real(r8) :: FC     !water contents at field capacity, [m3 m-3]
+    real(r8) :: VOLY      !micropore volume, [m3 d-2]
+    real(r8) :: POROS     !soil porosity, [m3 m-3]
+    real(r8) :: FC        !water contents at field capacity, [m3 m-3]
+    real(r8) :: TFND      !temperature effect on aqueous diffusivity
 
+ !litter layer
+    real(r8) :: VOLR      !surface litter volume, [m3 d-2]
+    real(r8) :: VOLWRX    !surface litter water holding capacity, [m3 d-2]
+ !non litter layer
+!    real(r8) :: ROXYY       !total root + microbial O2 uptake from previous hour, [g d-2 h-1], updated in hour1
+!    real(r8) :: RN2OY       !total root + microbial N2O uptake from previous hour, [g d-2 h-1]
+!    real(r8) :: RNO2Y       !total root + microbial NO2 uptake non-band from previous hour, [g d-2 h-1]
+!    real(r8) :: RN2BY       !total root + microbial NO2 uptake band from previous hour, [g d-2 h-1]
+!    real(r8) :: RNHBY       !total root + microbial NH4 uptake band from previous hour, [g d-2 h-1]
+!    real(r8) :: RN3BY       !total root + microbial NO3 uptake band from previous hour, [g d-2 h-1]
+!    real(r8) :: RPOBY       !total root + microbial PO4 uptake band from previous hour, [g d-2 h-1]
+!    real(r8) :: RP1BY       !HPO4 demand in band by all microbial, root, myco populations from previous hour
+!    real(r8) :: RNH4Y       !total root + microbial NH4 uptake non-band from previous hour, [g d-2 h-1]
+!    real(r8) :: RNO3Y       !total root + microbial NO3 uptake non-band from previous hour, [g d-2 h-1]
+!    real(r8) :: RPO4Y       !total root + microbial PO4 uptake non-band from previous hour, [g d-2 h-1]
+!    real(r8) :: RP14Y       !HPO4 demand in non-band by all microbial, root, myco populations from previous hour
+!    real(r8) :: ROXYF       !net gaseous O2 flux, [g d-2 h-1], updated in redist.f
+!    real(r8) :: RCH4L       !net aqueous CH4 flux, [g d-2 h-1], updated in redist.f
+!    real(r8) :: ROXYL       !net aqueous O2 flux from previous hour, [g d-2 h-1], updated in redist.f
   end type forc_type
 
   contains
 
-  subroutine ReadForc()
+
+!------------------------------------------------------------------------------------------
+
+  subroutine ReadForc(forc)
 
   implicit none
+  type(forc_type), intent(inout) :: forc
+
 
 
   end subroutine ReadForc

@@ -37,6 +37,7 @@ module StartsMod
   use IrrigationDataType
   use SedimentDataType
   use GridDataType
+  use MiniFuncMod
   implicit none
 
   private
@@ -125,9 +126,8 @@ module StartsMod
 !     OFFSET=shift in Arrhenius curve used in nitro.f (oC)
 !     ATCS=mean annual soil temperature (OC)
 !
-      OFFSET(NY,NX)=0.333_r8*(12.5_r8-AMAX1(0.0_r8,AMIN1(25.0_r8,ATCS(NY,NX))))
-      !     WRITE(*,2222)'OFFSET',OFFSET(NY,NX),ATCS(NY,NX)
-!2222  FORMAT(A8,2E12.4)
+      OFFSET(NY,NX)=fOFFSET(ATCS(NY,NX))
+
 !
 !     INITIALIZE WATER POTENTIAL VARIABLES FOR SOIL LAYERS
 !
@@ -401,7 +401,7 @@ module StartsMod
       SILT(L,NY,NX)=CSILT(L,NY,NX)*BKVL(L,NY,NX)
       CLAY(L,NY,NX)=CCLAY(L,NY,NX)*BKVL(L,NY,NX)
       IF(BKDS(L,NY,NX).GT.ZERO)THEN
-        VORGC=CORGCM*1.0E-06*BKDS(L,NY,NX)/PTDS
+        VORGC=CORGCM*1.0E-06_r8*BKDS(L,NY,NX)/PTDS
         VMINL=(CSILT(L,NY,NX)+CCLAY(L,NY,NX))*BKDS(L,NY,NX)/PTDS
         VSAND=CSAND(L,NY,NX)*BKDS(L,NY,NX)/PTDS
         VHCM(L,NY,NX)=((2.496*VORGC+2.385*VMINL+2.128*VSAND) &

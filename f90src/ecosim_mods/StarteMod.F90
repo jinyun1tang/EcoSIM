@@ -81,7 +81,7 @@ module StarteMod
             ELSE
               IF(I.EQ.1)then
                 IF(K.EQ.1.AND.L.EQ.1)THEN
-!!     INITIALIZE RAINFALL
+!     INITIALIZE RAINFALL
                   solutevar%CHY1=10.0_r8**(-(PHR(NY,NX)-3.0_r8))
                   solutevar%COH1=DPH2O/solutevar%CHY1
                   solutevar%CN4Z=CN4R(NY,NX)
