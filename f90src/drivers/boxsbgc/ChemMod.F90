@@ -9,11 +9,13 @@ implicit none
   contains
 ! ----------------------------------------------------------------------
 
-  subroutine RunModel_nosalt(micfor,nvars,ystates0l, ystatesfl, err_status)
+  subroutine RunModel_nosalt(forc,micfor,nvars,ystates0l, ystatesfl, err_status)
   use ChemEquilibriaMod
   use ModelStatusType     , only : model_status_type
   use SoluteChemDataType, only : chem_var_type, solute_flx_type
+  use ForcTypeMod         , only : forc_type
   implicit none
+  type(forc_type), intent(in) :: forc
   type(micforctype), intent(in)    :: micfor
   integer,  intent(in)  :: nvars
   real(r8), intent(in)  :: ystates0l(nvars)
@@ -28,7 +30,7 @@ implicit none
 
   call err_status%reset()
 
-  call SetChemVar(micfor,nvars, ystates0l, chemvar)
+  call SetChemVar(forc,micfor,nvars, ystates0l, chemvar)
 
   call NoSaltChemEquilibria(chemvar,solflx)
 
@@ -162,11 +164,13 @@ implicit none
   ystatesfl(fid_TRCPMB)=solflx%TRCPMB
   end subroutine RetrieveYstatef
 ! ----------------------------------------------------------------------
-  subroutine SetChemVar(micfor,nvars, ystates0l, chemvar)
+  subroutine SetChemVar(forc,micfor,nvars, ystates0l, chemvar)
 !
   use SoluteChemDataType, only : chem_var_type
+  use ForcTypeMod         , only : forc_type
   implicit none
   type(micforctype), intent(in)    :: micfor
+  type(forc_type), intent(in) :: forc
   integer,  intent(in)  :: nvars
   real(r8), intent(in)  :: ystates0l(nvars)
   type(chem_var_type), intent(out)   :: chemvar
@@ -186,37 +190,37 @@ implicit none
   chemvar%GKCK = GKCK
   chemvar%GKCN = GKCN
 
-  chemvar%BKVLX   =4.08E-002_r8
-  chemvar%BKVL    =4.08E-002_r8
-  chemvar%VOLWM   =1.54E-002_r8
-  chemvar%VOLWPO  =1.53E-002_r8
-  chemvar%VOLWPB  =5.06E-005_r8
-  chemvar%VOLWNH  =1.51E-002_r8
-  chemvar%VOLWNB  =3.16E-004_r8
-  chemvar%XCEC    =0.724_r8
-  chemvar%PH      =5.33_r8
-  chemvar%VLNH4   =0.98_r8
-  chemvar%VLNHB   =0.02_r8
+  chemvar%BKVLX   =forc%BKVL
+  chemvar%BKVL    =forc%BKVL
+  chemvar%VOLWM   =forc%VOLW
+  chemvar%VOLWPO  =forc%VOLW*forc%VLPO4
+  chemvar%VOLWPB  =forc%VOLW*forc%VLPOB
+  chemvar%VOLWNH  =forc%VOLW*forc%VLNH4
+  chemvar%VOLWNB  =forc%VOLW*forc%VLNHB
+  chemvar%XCEC    =forc%XCEC
+  chemvar%PH      =forc%pH
+  chemvar%VLNH4   =forc%VLNH4
+  chemvar%VLNHB   =forc%VLNHB
 
-  chemvar%CAL     =37.04_r8
-  chemvar%CFE     =0.0_r8
-  chemvar%CCA     =2.5_r8
-  chemvar%XAEC    =0.116_r8
+  chemvar%CAL     =forc%CAL
+  chemvar%CFE     =forc%CFE
+  chemvar%CCA     =forc%CCA
+  chemvar%XAEC    =forc%XAEC
 
-  chemvar%ZMG     =0._r8
-  chemvar%ZNA     =0._r8
-  chemvar%ZKA     =0._r8
-  chemvar%CO2S    =2.31E-002_r8
+  chemvar%ZMG     =forc%ZMG
+  chemvar%ZNA     =forc%ZNA
+  chemvar%ZKA     =forc%ZKA
+  chemvar%CO2S    =ystates0l(cid_CO2S)
 
 ! those below are variable
 
   chemvar%XOH11   =ystates0l(cid_XOH11)
   chemvar%XN41    =ystates0l(cid_XN41)
   chemvar%XN4B    =ystates0l(cid_XN4B)
-  chemvar%CH1PB   =ystates0l(cid_CH1PB)
-  chemvar%CH1P1   =ystates0l(cid_CH1P1)
-  chemvar%CH2P1   =ystates0l(cid_CH2P1)
-  chemvar%CH2PB   =ystates0l(cid_CH2PB)
+  chemvar%CH1PB   =ystates0l(cid_CH1PB)  !H1POB
+  chemvar%CH1P1   =ystates0l(cid_CH1P1)  !H1PO4
+  chemvar%CH2P1   =ystates0l(cid_CH2P1)  !H2PO4
+  chemvar%CH2PB   =ystates0l(cid_CH2PB)  !H2POB
   chemvar%X1P1B   =ystates0l(cid_X1P1B)
   chemvar%X2P1B   =ystates0l(cid_X2P1B)
   chemvar%XH11B   =ystates0l(cid_XH11B)
@@ -224,10 +228,10 @@ implicit none
   chemvar%XH21B   =ystates0l(cid_XH21B)
   chemvar%XH2P1   =ystates0l(cid_XH2P1)
   chemvar%XOH21   =ystates0l(cid_XOH21)
-  chemvar%CN31    =ystates0l(cid_CN31)
-  chemvar%CN3B    =ystates0l(cid_CN3B)
-  chemvar%CN41    =ystates0l(cid_CN41)
-  chemvar%CN4B    =ystates0l(cid_CN4B)
+  chemvar%CN31    =ystates0l(cid_CN31)    !ZNH3S
+  chemvar%CN3B    =ystates0l(cid_CN3B)    !ZNH3B
+  chemvar%CN41    =ystates0l(cid_CN41)    !ZNH4S
+  chemvar%CN4B    =ystates0l(cid_CN4B)    !ZNH4B
   chemvar%PALPO1  =ystates0l(cid_PALPO1)
   chemvar%PALPOB  =ystates0l(cid_PALPOB)
   chemvar%PCAPD1  =ystates0l(cid_PCAPD1)

@@ -390,6 +390,7 @@ module InitSOMBGCMOD
         ROXYSff(NGL,N,L,NY,NX)=0.0_r8
         RVMX4ff(NGL,N,L,NY,NX)=0.0_r8
         RVMX3ff(NGL,N,L,NY,NX)=0.0_r8
+        RVMB3ff(NGL,N,L,NY,NX)=0.0_r8
         RVMX2ff(NGL,N,L,NY,NX)=0.0_r8
         RVMX1ff(NGL,N,L,NY,NX)=0.0_r8
         RINHOff(NGL,N,L,NY,NX)=0.0_r8

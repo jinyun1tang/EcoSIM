@@ -980,8 +980,8 @@ module MicAutoCPLXMod
   RDN2Off(NGL,N)=0.0_r8
   RVMX2ff(NGL,N)=VMXD4S
   RVMB2ff(NGL,N)=VMXD4B
-  RVOXA(NGL,N)=RVOXA(NGL,N)+0.333*RDNO2ff(NGL,N)
-  RVOXB(NGL,N)=RVOXB(NGL,N)+0.333*RDN2Bff(NGL,N)
+  RVOXA(NGL,N)=RVOXA(NGL,N)+0.333_r8*RDNO2ff(NGL,N)
+  RVOXB(NGL,N)=RVOXB(NGL,N)+0.333_r8*RDN2Bff(NGL,N)
 !     TRN2ON=TRN2ON+RDNO2ff(NGL,N)+RDN2Bff(NGL,N)
   end associate
   end subroutine AutotrophDenitrificCatabolism

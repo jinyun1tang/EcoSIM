@@ -1805,7 +1805,7 @@ module RedistMod
   OMNL(L,NY,NX)=0.0_r8
 
   DO K=0,jcplx1
-    IF(K.LE.2)THEN
+    IF(K.LE.2)THEN  !K=0,1,2: woody litr, nonwoody litr, and manure
       DO N=1,NFGs
         DO  M=1,3
           DO NGL=1,JG
@@ -1886,7 +1886,7 @@ module RedistMod
       ENDDO
     ENDIF
   ENDDO
-
+  !litter plus non-litter
   ORGC(L,NY,NX)=DC+OC
   ORGN(L,NY,NX)=DN+ON
   ORGR(L,NY,NX)=DC

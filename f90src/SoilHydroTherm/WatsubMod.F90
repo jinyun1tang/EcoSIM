@@ -350,13 +350,13 @@ module WatsubMod
       HWFLU1(L,NY,NX)=0.0_r8
     ENDIF
     IF(CDPTH(L,NY,NX).GE.DTBLX(NY,NX))THEN
-      AREAU(L,NY,NX)=AMIN1(1.0,AMAX1(0.0_r8,safe_adb(CDPTH(L,NY,NX)-DTBLX(NY,NX) &
+      AREAU(L,NY,NX)=AMIN1(1.0_r8,AMAX1(0.0_r8,safe_adb(CDPTH(L,NY,NX)-DTBLX(NY,NX) &
         ,DLYR(3,L,NY,NX))))
     ELSE
       AREAU(L,NY,NX)=0.0_r8
     ENDIF
     IF(CDPTH(L,NY,NX).GE.DTBLY(NY,NX))THEN
-      AREAUD(L,NY,NX)=AMIN1(1.0,AMAX1(0.0_r8,safe_adb(CDPTH(L,NY,NX)-DTBLY(NY,NX) &
+      AREAUD(L,NY,NX)=AMIN1(1.0_r8,AMAX1(0.0_r8,safe_adb(CDPTH(L,NY,NX)-DTBLY(NY,NX) &
         ,DLYR(3,L,NY,NX))))
     ELSE
       AREAUD(L,NY,NX)=0.0_r8
@@ -885,14 +885,6 @@ module WatsubMod
     ENDIF
     TKXR=TKXR-HFLVR1X/VHCP1(0,NY,NX)
     TK1X=TK1X+HFLVR1X/VHCP1(NUM(NY,NX),NY,NX)
-!     IF(NY.EQ.6)THEN
-!     WRITE(*,7752)'TK1X',I,J,M,MM,NX,NY,NN
-!    2,FLVC,FLVX,VP1,VPR,VPY,ATCNVS,FSNW(NY,NX),BARE(NY,NX)
-!    3,VOLP01,VOLPM(M,NUM(NY,NX),NY,NX),TK1X,TKXR,TK1(0,NY,NX)
-!    4,HFLVR1X,VHCP1(NUM(NY,NX),NY,NX),VHCP1(0,NY,NX)
-!    3,VOLPM(M,0,NY,NX),VOLPM(M,NUM(NY,NX),NY,NX),VOLP01
-!    2,THETPM(M,0,NY,NX)
-!     ENDIF
 !
 !     HEAT FLUX BETWEEN SURFACE RESIDUE AND SOIL SURFACE
 !
@@ -927,20 +919,7 @@ module WatsubMod
     TK0X=TK0X-HFLVSRX/VHCPWMM(L,NY,NX)
     TKXR=TKXR+(HFLVSRX-HFLWR1X)/VHCP1(0,NY,NX)
     TK1X=TK1X+HFLWR1X/VHCP1(NUM(NY,NX),NY,NX)
-!     IF(I.EQ.53)THEN
-!     WRITE(*,1114)'FLVR0',I,J,M,N,NX,NY
-!    2,FLVSR,FLVSRX,FLVC,FLVX,ATCNVR,VP0,VPR,VPY,FSNW(NY,NX),CVRD(NY,NX)
-!    3,XNPQ,THETPM(M,0,NY,NX),VOLP01,XNPX,XNPV
-!    2,TK0M(1,NY,NX),TK1(0,NY,NX)
-!    2,TK1(NUM(NY,NX),NY,NX),TK0X,TKXR,TK1X,FLVR1,HWFLVR1,FLVS1
-!    4,HWFLVS1,HFLC0R1,HFLCR11,FLVR,HWFLVR,FLVS,HWFLVS
-!    3,HFLC0R,HFLCR1,VPQ(NY,NX),VP0,VPR,VP1,PSISM1(0,NY,NX),PSISV1
-!    5,AVCNVR,ATCNDR,AVCNVS,ATCNDS,VHCPWMM(L,NY,NX),VHCP1(0,NY,NX)
-!    6,VHCP1(NUM(NY,NX),NY,NX),DLYRR(NY,NX),DLYRS0(NY,NX),CNV01,CNVR1
-!    7,CNV11,CNV1,THETPX(NUM(NY,NX),NY,NX),POROQ
-!    2,WGSGL(NUM(NY,NX),NY,NX),CVRD(NY,NX),HFLXR,HFLVS1,HFLCR1
-!1114  FORMAT(A8,6I4,60E12.4)
-!     ENDIF
+
 4000  CONTINUE
   end subroutine SnowSurfaceResidualIteration
 !------------------------------------------------------------------------------------------
@@ -1183,12 +1162,6 @@ module WatsubMod
               THETW1=POROS(NUM(NY,NX),NY,NX)
               PSISM1(NUM(NY,NX),NY,NX)=PSISE(NUM(NY,NX),NY,NX)
             ENDIF
-            !     WRITE(*,1119)'PSISMS',I,J,M,N,NX,NY,NUM(NY,NX)
-            !    2,PSISM(NUM(NY,NX),NY,NX),THETW1,VOLW1(NUM(NY,NX),NY,NX)
-            !    3,VOLX(NUM(NY,NX),NY,NX)
-            !    2,THETW(NUM(NY,NX),NY,NX),THETI(NUM(NY,NX),NY,NX)
-            !    3,FCX,WPX,POROS(NUM(NY,NX),NY,NX)
-            !1119  FORMAT(A8,7I4,20E12.4)
           ELSE
             THETW1=POROS(NUM(NY,NX),NY,NX)
             PSISM1(NUM(NY,NX),NY,NX)=PSISE(NUM(NY,NX),NY,NX)
@@ -1275,18 +1248,6 @@ module WatsubMod
           ELSE
             HFLWS1=AMIN1(0.0_r8,AMAX1(HFLWX,HFLWC))
           ENDIF
-          ! IF(J.EQ.15.AND.M.EQ.NPH)THEN
-          ! WRITE(*,1113)'HFLWS1',I,J,M,MM,L,FLVS1,FLVX,HFLVS1
-          ! 2,HFLWS1,ATCNVS,VP1,VP2,CNV1,CNV2,PSISV1
-          ! 3,HFLWX,HFLWC,ATCNDS,TKW(L,NY,NX),TK1(NUM(NY,NX),NY,NX)
-          ! 4,THETPX(NUM(NY,NX),NY,NX),WGSGL(NUM(NY,NX),NY,NX)
-          ! 5,VHCPWMM(L,NY,NX),TCND1W,TCNDS,PSISV1,TKY,TK0M(L,NY,NX),TKWX1
-          ! 6,VOLP1(NUM(NY,NX),NY,NX),VOLPH1(NUM(NY,NX),NY,NX)
-          ! 6,VOLT(NUM(NY,NX),NY,NX),VOLA1(NUM(NY,NX),NY,NX)
-          ! 7,VOLW1(NUM(NY,NX),NY,NX),VOLI1(NUM(NY,NX),NY,NX)
-          ! 8,POROS(NUM(NY,NX),NY,NX)
-          !1113  FORMAT(A8,5I4,60E14.6)
-          ! ENDIF
           !
           ! HEAT FLUX AMONG SNOWPACK, SURFACE RESIDUE AND SURFACE SOIL
           !
@@ -1317,27 +1278,25 @@ module WatsubMod
             TK0X=TK0M(L,NY,NX)
             TKXR=TK1(0,NY,NX)
             TK1X=TK1(NUM(NY,NX),NY,NX)
-            CNVR=WGSGR(NY,NX)*THETPM(M,0,NY,NX)*POROQ &
-              *THETPM(M,0,NY,NX)/POROS(0,NY,NX)
+            CNVR=WGSGR(NY,NX)*THETPM(M,0,NY,NX)*POROQ*THETPM(M,0,NY,NX)/POROS(0,NY,NX)
             IF(CVRD(NY,NX).GT.ZERO)THEN
               IF(CNV1.GT.ZERO.AND.CNVR.GT.ZERO)THEN
-                ATCNVR=2.0*CNVR*CNV1/(CNV1*DLYRR(NY,NX)+CNVR*DLYRS0(L,NY,NX))
+                ATCNVR=2.0_r8*CNVR*CNV1/(CNV1*DLYRR(NY,NX)+CNVR*DLYRS0(L,NY,NX))
               ELSE
-                ATCNVR=2.0*CNV1/(DLYRR(NY,NX)+DLYRS0(L,NY,NX))
+                ATCNVR=2.0_r8*CNV1/(DLYRR(NY,NX)+DLYRS0(L,NY,NX))
               ENDIF
               IF(CNVR.GT.ZERO.AND.CNV2.GT.ZERO)THEN
-                ATCNVS=2.0*CNVR*CNV2 &
-                  /(CNVR*DLYR(3,NUM(NY,NX),NY,NX)+CNV2*DLYRR(NY,NX))
+                ATCNVS=2.0_r8*CNVR*CNV2/(CNVR*DLYR(3,NUM(NY,NX),NY,NX)+CNV2*DLYRR(NY,NX))
               ELSE
-                ATCNVS=2.0*CNV2/(DLYR(3,NUM(NY,NX),NY,NX)+DLYRR(NY,NX))
+                ATCNVS=2.0_r8*CNV2/(DLYR(3,NUM(NY,NX),NY,NX)+DLYRR(NY,NX))
               ENDIF
-              THETRR=AMAX1(0.0_r8,1.0-THETPX(0,NY,NX)-THETWX(0,NY,NX)-THETIX(0,NY,NX))
-              TCNDR=(0.779*THETRR*9.050E-04+0.622*THETWX(0,NY,NX) &
-                *2.067E-03+0.380*THETIX(0,NY,NX)*7.844E-03+THETPX(0,NY,NX) &
-                *9.050E-05)/(0.779*THETRR+0.622*THETWX(0,NY,NX) &
-                +0.380*THETIX(0,NY,NX)+THETPX(0,NY,NX))
+              THETRR=AMAX1(0.0_r8,1.0_r8-THETPX(0,NY,NX)-THETWX(0,NY,NX)-THETIX(0,NY,NX))
+              TCNDR=(0.779_r8*THETRR*9.050E-04_r8+0.622_r8*THETWX(0,NY,NX) &
+                *2.067E-03_r8+0.380_r8*THETIX(0,NY,NX)*7.844E-03_r8+THETPX(0,NY,NX) &
+                *9.050E-05_r8)/(0.779_r8*THETRR+0.622_r8*THETWX(0,NY,NX) &
+                +0.380_r8*THETIX(0,NY,NX)+THETPX(0,NY,NX))
               IF(TCND1W.GT.ZERO.AND.TCNDR.GT.ZERO)THEN
-                ATCNDR=2.0*TCND1W*TCNDR/(TCND1W*DLYRR(NY,NX)+TCNDR*DLYRS0(L,NY,NX))
+                ATCNDR=2.0_r8*TCND1W*TCNDR/(TCND1W*DLYRR(NY,NX)+TCNDR*DLYRS0(L,NY,NX))
               ELSE
                 ATCNDR=0.0_r8
               ENDIF
@@ -1394,33 +1353,7 @@ module WatsubMod
           HFLSW(L,NY,NX)=HFLSW(L,NY,NX)+HFLWLT
           FLSWR(L,NY,NX)=FLSWR(L,NY,NX)+FLWRT
           HFLSWR(L,NY,NX)=HFLSWR(L,NY,NX)+HFLWRT
-          !     IF(I.EQ.53)THEN
-          !     WRITE(*,7752)'FLWLW',I,J,M,MM,NX,NY,L
-          !    2,FLWLW,FLWLT,FLWQGS,FLVS1,FLVR1,FLSW(L,NY,NX)
-          !    2,FLWRLW,FLWRT,FLWQR,FLVSR,FLVR1,FLWQX,FLWQG,FLSWR(L,NY,NX)
-          !    2,FLWQX,FLWQGX,BARE(NY,NX),VOLW0M(L,NY,NX),VOLS0M(L,NY,NX)
-          !    2,HFLWLW,HFLWLT,HFLWQG,HFLVS1,HFLWS1,HFLVR1,HFLWR1
-          !    3,HFLSW(L,NY,NX)
-          !    3,HFLWRLW,HFLWRT,HFLWQR,HFLVSR,HFLWSR,HFLVR1,HFLWR1
-          !    3,HFLSWR(L,NY,NX)
-          !    2,VOLP01,THETPM(M,NUM(NY,NX),NY,NX),THETX
-          !    3,CNV2,VP2,TK1(NUM(NY,NX),NY,NX),ATCNVS,FLVC,VPY,FLVX
-          !    4,VP1,VP2,TK1X,PSISV1,HFLVR1X,HFLWR1X
-          !    5,VHCP1(NUM(NY,NX),NY,NX)
-          !    3,HFLWRLW,HFLWLW,VP0,VPR,VPY
-          !    3,THETPX(NUM(NY,NX),NY,NX),FLWQX,BARE(NY,NX)
-          !    4,VOLW0M(L,NY,NX),VOLS0M(L,NY,NX)
-          !    2,HFLWX,HFLWC,ATCNDS,TK0M(L,NY,NX),TKWX1
-          !    2,TCND1W,TCNDS,DLYR(3,NUM(NY,NX),NY,NX),DLYRS0(L,NY,NX)
-          !    2,THETWX(NUM(NY,NX),NY,NX),THETIX(NUM(NY,NX),NY,NX)
-          !    3,WTHET2,THETPX(NUM(NY,NX),NY,NX),VOLP1(NUM(NY,NX),NY,NX)
-          !    2,VOLPH1(NUM(NY,NX),NY,NX),VOLA1(NUM(NY,NX),NY,NX)
-          !    2,VOLW1(NUM(NY,NX),NY,NX),VOLI1(NUM(NY,NX),NY,NX),BARE(NY,NX)
-          !    3,FLQRM(M,NY,NX),FLWQR,FLQSM(M,NY,NX),FLWQGS
-          !    4,FLQHM(M,NY,NX),FLWQG,VOLS0M(L,NY,NX),VOLW0M(L,NY,NX)
-          !    5,VOLI0M(L,NY,NX),DLYRS0(L,NY,NX),FLWQX,TK0M(L,NY,NX)
-          !7752  FORMAT(A8,7I4,40E12.4)
-          !     ENDIF
+
           ICHKL=1
         ENDIF
       ENDIF
@@ -1765,8 +1698,7 @@ module WatsubMod
       ELSE
         THETWR=POROS0(NY,NX)
       ENDIF
-      IF(VOLR(NY,NX).GT.ZEROS(NY,NX) &
-        .AND.VOLW1(0,NY,NX).GT.ZEROS2(NY,NX))THEN
+      IF(VOLR(NY,NX).GT.ZEROS(NY,NX).AND.VOLW1(0,NY,NX).GT.ZEROS2(NY,NX))THEN
         THETWR=AMIN1(VOLWRX(NY,NX),VOLW1(0,NY,NX))/VOLR(NY,NX)
         IF(THETWR.LT.FC(0,NY,NX))THEN
           PSISM1(0,NY,NX)=AMAX1(PSIHY,-EXP(PSIMX(NY,NX) &
@@ -2054,12 +1986,6 @@ module WatsubMod
     /(0.779_r8*THETRR+0.622_r8*THETWX(0,NY,NX) &
     +0.380_r8*THETIX(0,NY,NX)+WTHET0*THETPX(0,NY,NX))
 
-!  if(curday>=40)then
-!    write(*,*)'curhour=',curhour
-!    write(*,*)'THETIX =',THETIX(NUM(NY,NX),NY,NX)
-!    write(*,*)'WTHET1 =',WTHET1
-!    write(*,*)'THETPX =',THETPX(NUM(NY,NX),NY,NX)
-!  endif
   TCND1=(STC(NUM(NY,NX),NY,NX)+THETWX(NUM(NY,NX),NY,NX)*TCNDW1 &
     +0.611_r8*THETIX(NUM(NY,NX),NY,NX)*7.844E-03_r8 &
     +WTHET1*THETPX(NUM(NY,NX),NY,NX)*TCNDA1) &
@@ -2295,7 +2221,7 @@ module WatsubMod
   TQI1(NY,NX)=0.0_r8
   THQS1(NY,NX)=0.0_r8
   IF(VHCP1(0,NY,NX).GT.VHCPRX(NY,NX))THEN
-    BAREW(NY,NX)=AMAX1(0.0_r8,BARE(NY,NX)-AMIN1(1.0,AMAX1(0.0_r8,XVOLT(NY,NX)/VOLWD(NY,NX))))
+    BAREW(NY,NX)=AMAX1(0.0_r8,BARE(NY,NX)-AMIN1(1.0_r8,AMAX1(0.0_r8,XVOLT(NY,NX)/VOLWD(NY,NX))))
   ELSE
     BAREW(NY,NX)=1.0
   ENDIF
@@ -2354,7 +2280,7 @@ module WatsubMod
     DFGS(M,0,NY,NX)=0.0_r8
   ENDIF
   IF(VOLWRX(NY,NX).GT.ZEROS(NY,NX))THEN
-    THETWT=AMIN1(1.0,VOLW(0,NY,NX)/VOLWRX(NY,NX))
+    THETWT=AMIN1(1.0_r8,VOLW(0,NY,NX)/VOLWRX(NY,NX))
   ELSE
     THETWT=1.0
   ENDIF
@@ -2435,7 +2361,7 @@ module WatsubMod
     VOLWT=VOLW1(L,NY,NX)+VOLWH1(L,NY,NX)
     VOLAT=VOLA1(L,NY,NX)+VOLAH1(L,NY,NX)-VOLI1(L,NY,NX)-VOLIH1(L,NY,NX)
     IF(VOLAT.GT.ZEROS2(NY,NX).AND.VOLPM(M,L,NY,NX).GT.ZEROS2(NY,NX))THEN
-      THETWA=AMAX1(0.0_r8,AMIN1(1.0,VOLWT/VOLAT))
+      THETWA=AMAX1(0.0_r8,AMIN1(1.0_r8,VOLWT/VOLAT))
       TFND1=TEFAQUDIF(TK1(0,NY,NX))
       Z3S=FC(L,NY,NX)/POROS(L,NY,NX)
       scalar=TFND1*XNPD
@@ -3345,9 +3271,9 @@ module WatsubMod
           IF(VOLAH1(N3,N2,N1).GT.ZEROS2(N2,N1) &
             .AND.VOLAH1(N6,N5,N4).GT.ZEROS2(N5,N4).AND.IFLGH.EQ.0)THEN
             PSISH1=PSISH(N3,N2,N1)+0.0098*DLYR(3,N3,N2,N1) &
-              *(AMIN1(1.0,AMAX1(0.0_r8,VOLWH1(N3,N2,N1)/VOLAH1(N3,N2,N1)))-0.5)
+              *(AMIN1(1.0_r8,AMAX1(0.0_r8,VOLWH1(N3,N2,N1)/VOLAH1(N3,N2,N1)))-0.5)
             PSISHL=PSISH(N6,N5,N4)+0.0098*DLYR(3,N6,N5,N4) &
-              *(AMIN1(1.0,AMAX1(0.0_r8,VOLWH1(N6,N5,N4)/VOLAH1(N6,N5,N4)))-0.5)
+              *(AMIN1(1.0_r8,AMAX1(0.0_r8,VOLWH1(N6,N5,N4)/VOLAH1(N6,N5,N4)))-0.5)
             !
             !     MACROPORE FLOW IF GRAVITATIONAL GRADIENT IS POSITIVE
             !     AND MACROPORE POROSITY EXISTS IN ADJACENT CELL
@@ -3467,10 +3393,10 @@ module WatsubMod
             DTHA1=AMAX1(0.0_r8,THETPX(N3,N2,N1)-TRBA)**3
             RYLXW1=DTKX*DTHW1
             RYLXA1=DTKX*DTHA1
-            RYLNW1=AMIN1(1.0E+04,RYLXW*RYLXW1)
-            RYLNA1=AMIN1(1.0E+04,RYLXA*RYLXA1)
-            XNUSW1=AMAX1(1.0,0.68+0.67*RYLNW1**0.25/DNUSW)
-            XNUSA1=AMAX1(1.0,0.68+0.67*RYLNA1**0.25/DNUSA)
+            RYLNW1=AMIN1(1.0E+04_r8,RYLXW*RYLXW1)
+            RYLNA1=AMIN1(1.0E+04_r8,RYLXA*RYLXA1)
+            XNUSW1=AMAX1(1.0_r8,0.68+0.67*RYLNW1**0.25/DNUSW)
+            XNUSA1=AMAX1(1.0_r8,0.68+0.67*RYLNA1**0.25/DNUSA)
             TCNDW1=2.067E-03*XNUSW1
             TCNDA1=9.050E-05*XNUSA1
             WTHET1=1.467-0.467*THETPY(N3,N2,N1)
@@ -3488,10 +3414,10 @@ module WatsubMod
             DTHA2=AMAX1(0.0_r8,THETPX(N6,N5,N4)-TRBA)**3
             RYLXW2=DTKX*DTHW2
             RYLXA2=DTKX*DTHA2
-            RYLNW2=AMIN1(1.0E+04,RYLXW*RYLXW2)
-            RYLNA2=AMIN1(1.0E+04,RYLXA*RYLXA2)
-            XNUSW2=AMAX1(1.0,0.68+0.67*RYLNW2**0.25/DNUSW)
-            XNUSA2=AMAX1(1.0,0.68+0.67*RYLNA2**0.25/DNUSA)
+            RYLNW2=AMIN1(1.0E+04_r8,RYLXW*RYLXW2)
+            RYLNA2=AMIN1(1.0E+04_r8,RYLXA*RYLXA2)
+            XNUSW2=AMAX1(1.0_r8,0.68+0.67*RYLNW2**0.25/DNUSW)
+            XNUSA2=AMAX1(1.0_r8,0.68+0.67*RYLNA2**0.25/DNUSA)
             TCNDW2=2.067E-03*XNUSW2
             TCNDA2=9.050E-05*XNUSA2
             WTHET2=1.467-0.467*THETPY(N6,N5,N4)
@@ -4784,12 +4710,8 @@ module WatsubMod
           VOLWH1(L,NY,NX)=VOLWH1(L,NY,NX)+TFLWHL(L,NY,NX)-FINHL(L,NY,NX)+TWFLXH(L,NY,NX)
           VOLIH1(L,NY,NX)=VOLIH1(L,NY,NX)-TWFLXH(L,NY,NX)/DENSI
           IF(BKDS(L,NY,NX).GT.ZERO)THEN
+ ! air-filled space
             VOLP1Z(L,NY,NX)=VOLA1(L,NY,NX)-VOLW1(L,NY,NX)-VOLI1(L,NY,NX)
-            if(abs(VOLP1Z(L,NY,NX))>1.e20_r8)then
-              write(*,*)'VOLA1=',VOLA1(L,NY,NX),L
-              write(*,*)'VOLW1=',VOLW1(L,NY,NX)
-              write(*,*)'VOLI1=',VOLI1(L,NY,NX)
-            endif
             VOLP1(L,NY,NX)=AMAX1(0.0_r8,VOLP1Z(L,NY,NX))
             VOLPH1Z(L,NY,NX)=VOLAH1(L,NY,NX)-VOLWH1(L,NY,NX)-VOLIH1(L,NY,NX)
             VOLPH1(L,NY,NX)=AMAX1(0.0_r8,VOLPH1Z(L,NY,NX))
@@ -4879,43 +4801,6 @@ module WatsubMod
           FLPM(M,L,NY,NX)=VOLPM(M,L,NY,NX)
           THETPM(M+1,L,NY,NX)=0.0
         ENDIF
-        !         IF(L.LE.NUM(NY,NX)+1)THEN
-        !           WRITE(*,3377)'VOLW1',I,J,M,NX,NY,L,N6X(NY,NX)
-        !             2,VOLW1(L,NY,NX),VOLWX1(L,NY,NX)
-        !             3,VOLI1(L,NY,NX),VOLA1(L,NY,NX),VOLP1(L,NY,NX)
-        !             2,TFLWL(L,NY,NX),TFLWLX(L,NY,NX)
-        !             3,TWFLXL(L,NY,NX),FINHL(L,NY,NX),FLU1(L,NY,NX)
-        !             3,VOLWH1(L,NY,NX),VOLIH1(L,NY,NX),VOLAH1(L,NY,NX),VOLPH1(L,NY,NX)
-        !             4,VOLA1(L,NY,NX)-VOLW1(L,NY,NX)-VOLI1(L,NY,NX)
-        !             5,VOLPM(M,L,NY,NX),VOLPM(M+1,L,NY,NX)
-        !             5,PSISM1(L,NY,NX),THETPX(L,NY,NX)
-        !             6,FLWL(3,L,NY,NX),FLWL(3,L+1,NY,NX)
-        !             7,FLWL(2,L,NY,NX),FLWL(2,L,NY+1,NX)
-        !             8,FLWL(1,L,NY,NX),FLWL(1,L,NY,NX+1)
-        !             6,FLWLX(3,L,NY,NX),FLWLX(3,L+1,NY,NX)
-        !             7,FLWLX(2,L,NY,NX),FLWLX(2,L,NY+1,NX)
-        !             8,FLWLX(1,L,NY,NX),FLWLX(1,L,NY,NX+1)
-        !             6,FLW(3,L,NY,NX),FLW(3,L+1,NY,NX)
-        !             7,FLW(2,L,NY,NX),FLW(2,L,NY+1,NX)
-        !             8,FLW(1,L,NY,NX),FLW(1,L,NY,NX+1)
-        !             9,WFLXL(L,NY,NX),THAW(L,NY,NX)
-        !             9,FLPM(M,L,NY,NX),FLSW(L,NY,NX)
-        !           WRITE(*,3377)'VOLWH1',I,J,M,NX,NY,L,N6X(NY,NX),VOLWH1(L,NY,NX)
-        !             2,TFLWHL(L,NY,NX),FINHL(L,NY,NX),VOLIH1(L,NY,NX)
-        !             4,TWFLXH(L,NY,NX),TQR1(NY,NX),VOLPH1(L,NY,NX)
-        !             6,FLWHL(3,L,NY,NX),FLWHL(3,L+1,NY,NX)
-        !             7,FLWHL(2,L,NY,NX),FLWHL(2,L,NY+1,NX)
-        !             8,FLWHL(1,L,NY,NX),FLWHL(1,L,NY,NX+1)
-        !             3,VHCM(L,NY,NX),VOLW1(L,NY,NX),VOLWH1(L,NY,NX),VOLI1(L,NY,NX)
-        !             4,THETW(L,NY,NX),THETI(L,NY,NX),FINHL(L,NY,NX),THQR1(NY,NX)
-        !             5,HFLWL(3,L,NY,NX),HFLWL(3,N6X(NY,NX),NY,NX)
-        !             6,HFLWL(1,L,NY,NX),HFLWL(1,L,NY,NX+1)
-        !           WRITE(*,3377)'TK1',I,J,M,NX,NY,L,N6X(NY,NX),TK1(L,NY,NX)
-        !             2,THFLWL(L,NY,NX),TTFLXL(L,NY,NX),HWFLU1(L,NY,NX)
-        !             3,VHCP1(L,NY,NX),HFLWL(3,L,NY,NX),HFLWL(3,L+1,NY,NX)
-        !             4,HFLWLW,HFLWLG,TKXX,VHXX,ENGY1,TK1(0,NY,NX)
-        !3377  FORMAT(A8,7I4,40E12.4)
-        !         ENDIF
 
 9785  CONTINUE
       !
@@ -4925,8 +4810,8 @@ module WatsubMod
       !       NUM=new surface layer number after complete lake evaporation
       !       FLWNU,FLWHNU,HFLWNU=lake surface water flux, heat flux if lake surface disappears
 !
-      IF(BKDS(NUM(NY,NX),NY,NX).LE.ZERO &
-        .AND.VHCP1(NUM(NY,NX),NY,NX).LE.VHCPNX(NY,NX))THEN
+      IF(BKDS(NUM(NY,NX),NY,NX).LE.ZERO.AND.&
+        VHCP1(NUM(NY,NX),NY,NX).LE.VHCPNX(NY,NX))THEN
         NUX=NUM(NY,NX)
         DO 9970 LL=NUX+1,NL(NY,NX)
           IF(VOLX(LL,NY,NX).GT.ZEROS2(NY,NX))THEN

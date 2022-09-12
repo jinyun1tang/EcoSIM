@@ -4,6 +4,8 @@ implicit none
   save
   character(len=*),private, parameter :: mod_filename = __FILE__
 
+  integer :: cid_ZNH3B     !NH3 band micropore, [gN d-2]
+  integer :: cid_ZNH3S     !NH3 non-band micropore, [gN d-2]
   integer :: cid_ZNH4B     !NH4 band micropore, [g d-2]
   integer :: cid_ZNH4S     !NH4 non-band micropore, [g d-2]
   integer :: cid_H1POB     !soil aqueous HPO4 content micropore band, [g d-2]
@@ -49,6 +51,7 @@ implicit none
   integer :: cid_omnff_b,cid_omnff_e   !autotrophic microbial biomass N	[gN d-2]
   integer :: cid_ompff_b,cid_ompff_e   !autotrophic microbial biomass C	[gC d-2]
 
+  integer :: fid_ROXYF               !net gaseous O2 flux from previous hour, [g d-2 h-1]
   integer :: fid_ROXYY               !total root + microbial O2 uptake, [g d-2 h-1]
   integer :: fid_RNH4Y               !total root + microbial NH4(+) uptake non-band, [gN d-2 h-1]
   integer :: fid_RNO3Y               !total root + microbial NO3(-) uptake non-band, [gN d-2 h-1]
@@ -63,6 +66,13 @@ implicit none
   integer :: fid_RP1BY               !HPO4 demand in band by all microbial,root,myco populations [gP d-2 h-1]
   integer :: fid_ROQCY_b,fid_ROQCY_e !total root + microbial DOC uptake, [gC d-2 h-1]
   integer :: fid_ROQAY_b,fid_ROQAY_e !total root + microbial acetate uptake, [gC d-2 h-1]
-
-
+  integer :: fid_RINHO_b,fid_RINHO_e
+  integer :: fid_RINHB_b,fid_RINHB_e
+  integer :: fid_RINOO_b,fid_RINOO_e
+  integer :: fid_RINOB_b,fid_RINOB_e
+  integer :: fid_RIPOO_b,fid_RIPOO_e
+  integer :: fid_RIPBO_b,fid_RIPBO_e
+  integer :: fid_RIPO1_b,fid_RIPO1_e
+  integer :: fid_RIPB1_b,fid_RIPB1_e
+  integer :: fid_ROXYS_b,fid_ROXYS_e
 end module MicIDMod

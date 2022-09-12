@@ -892,7 +892,7 @@ module ncdio_pio
 
         call check_var(ncid, trim(varname), vardesc, readvar)
 
-        call check_ret( nf90_get_var(ncid%fh, vardesc%varid, data),'ncd_getvar_real_sp_all_2d')
+        call check_ret( nf90_get_var(ncid%fh, vardesc%varid, data),'ncd_getvar_real_sp_all_3d')
 
         end subroutine ncd_getvar_real_sp_all_3d
         !----------------------------------------------------------------------
@@ -915,7 +915,7 @@ module ncdio_pio
 
           call check_var(ncid, trim(varname), vardesc, readvar)
 
-          call check_ret( nf90_get_var(ncid%fh, vardesc%varid, data),'ncd_getvar_real_sp_all_2d')
+          call check_ret( nf90_get_var(ncid%fh, vardesc%varid, data),'ncd_getvar_real_sp_all_4d')
 
           end subroutine ncd_getvar_real_sp_all_4d
 !----------------------------------------------------------------------

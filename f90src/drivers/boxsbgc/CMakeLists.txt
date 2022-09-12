@@ -8,6 +8,7 @@ set(BOXSBGC_DRIVER_SOURCES
 include_directories(${ECOSIM_INCLUDE_DIRS})
 include_directories(${CMAKE_BINARY_DIR}/f90src/utils/)
 include_directories(${CMAKE_BINARY_DIR}/f90src/ecosim_datatype/)
+include_directories(${CMAKE_BINARY_DIR}/f90src/modelpars/)
 include_directories(${CMAKE_BINARY_DIR}/f90src/ioutils/)
 include_directories(${CMAKE_BINARY_DIR}/f90src/geochem/box_chem)
 include_directories(${CMAKE_BINARY_DIR}/f90src/drivers/aquachem)

@@ -13,8 +13,10 @@ implicit none
   real(r8), intent(in) :: PSISM
   logical, optional, intent(in) :: is_top_layer
   real(r8) :: ans
-
-  if(PRESENT(is_top_layer) .and. is_top_layer)then
+  logical :: is_top_layer_loc
+  is_top_layer_loc=.false.
+  if(PRESENT(is_top_layer))is_top_layer_loc=is_top_layer
+  if(is_top_layer_loc)then
     ans=AMAX1(1.0E-06_r8,EXP(-13.650_r8-0.857_r8*LOG(-PSISM)))
   else
     ans=AMAX1(1.0E-06_r8,EXP(-13.833_r8-0.857_r8*LOG(-PSISM)))
@@ -86,11 +88,12 @@ implicit none
   real(r8), parameter :: Z2RD=12.0_r8
   real(r8), parameter :: Z3R=0.50_r8
   real(r8) :: Z3S
-
+  logical :: is_litter_loc
 ! Z1S,Z2SW,Z2SD,Z3SX=parameters for air-water gas transfers in soil
 ! Z1R,Z2RW,Z2RD,Z3RX=parameters for air-water gas transfers in litter
-
-  if(present(is_litter) .and. is_litter)then
+  is_litter_loc=.false.
+  if(present(is_litter))is_litter_loc=is_litter
+  if(is_litter_loc)then
     IF(THETWA.GT.Z3R)THEN
       ans=AMAX1(0.0_r8,scalar/((Z1R**(-1._r8))*EXP(Z2RW*(THETWA-Z3R))))
     ELSE

@@ -1,5 +1,6 @@
 set(NONSALT_MOD_SOURCES
   TransfrDataMod.F90
+  SurfaceFluxMod.F90
   InsideTranspMod.F90
   BoundaryTranspMod.F90
 	TrnsfrMod.F90

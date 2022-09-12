@@ -784,23 +784,27 @@ module readiMod
 !
       DO 25 L=NU(NY,NX),NM(NY,NX)
         IF(FC(L,NY,NX).LT.0.0)THEN
+          !computing field capacity
           ISOIL(1,L,NY,NX)=1
           PSIFC(NY,NX)=-0.033
         ELSE
           ISOIL(1,L,NY,NX)=0
         ENDIF
         IF(WP(L,NY,NX).LT.0.0)THEN
+          !computing wilting point
           ISOIL(2,L,NY,NX)=1
           PSIWP(NY,NX)=-1.5
         ELSE
           ISOIL(2,L,NY,NX)=0
         ENDIF
         IF(SCNV(L,NY,NX).LT.0.0)THEN
+          !soil vertical saturated hydraulic conductivity
           ISOIL(3,L,NY,NX)=1
         ELSE
           ISOIL(3,L,NY,NX)=0
         ENDIF
         IF(SCNH(L,NY,NX).LT.0.0)THEN
+          !soil horizontal saturated hydraulic conductivity
           ISOIL(4,L,NY,NX)=1
         ELSE
           ISOIL(4,L,NY,NX)=0
@@ -881,7 +885,7 @@ module readiMod
 !     ADD SOIL BOUNDARY LAYERS BELOW SOIL ZONE
 !
       DO 32 L=NM(NY,NX)+1,JZ
-        CDPTH(L,NY,NX)=2.0*CDPTH(L-1,NY,NX)-1.0*CDPTH(L-2,NY,NX)
+        CDPTH(L,NY,NX)=2.0_r8*CDPTH(L-1,NY,NX)-1.0*CDPTH(L-2,NY,NX)
         BKDSI(L,NY,NX)=BKDSI(L-1,NY,NX)
         FC(L,NY,NX)=FC(L-1,NY,NX)
         WP(L,NY,NX)=WP(L-1,NY,NX)

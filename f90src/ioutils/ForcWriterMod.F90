@@ -1,92 +1,18 @@
 module ForcWriterMod
   use SOMDataType          , only : ORGC,CFOMC
-  use SoilPhysDataType     , only : FC
+  use SoilPhysDataType
   use SOMDataType
   USE MicrobialDataType
   use SoilBGCDataType
   use GridDataType
   use AqueChemDatatype
   use SoilPropertyDataType
+  use ClimForcDataType
+  use SoilWaterDataType
   use ncdio_pio
   use data_const_mod, only : spval  => SHR_CONST_SPVAL
 implicit none
 
-!    real(r8) :: CCH4E       !atmospheric CH4 concentration, [g m-3]
-!    real(r8) :: COXYE       !atmospheric O2 concentration, [g m-3]
-!    real(r8) :: COXQ        !surface irrigation  O2 concentration, [g m-3]
-!    real(r8) :: COXR        !precipitation  O2 concentration, [g m-3]
-!    real(r8) :: FLQRI       !irrigation flux into surface litter, [m3 d-2 h-1]
-!    real(r8) :: FLQRQ       !precipitation flux into surface litter, [m3 d-2 h-1]
-!    real(r8) :: OFFSET      !offset for calculating temperature in Arrhenius curves, [oC]
-
-!    real(r8) :: THETY       !air-dry water content, [m3 m-3]
-!    real(r8) :: TKS         !temperature in kelvin, [K]
-!    real(r8) :: THETW       !volumetric water content [m3 m-3]
-!    real(r8) :: pH          !pH value
-!    real(r8) :: BKVL        !mass of soil layer	Mg d-2
-!    real(r8) :: VOLX        !volume of soil layer	m3 d-2
-!    real(r8) :: VOLW        !soil micropore water content [m3 d-2]
-
-!    real(r8) :: VLNOB       !NO3 band volume fracrion, [-]
-!    real(r8) :: VLNO3       !NO3 non-band volume fraction,[-] := 1-VLNOB
-!    real(r8) :: VLNHB       !NH4 band volume fraction, [-]
-!    real(r8) :: VLNH4       !NH4 non-band volume fraction, [-]:=1-VLNHB
-!    real(r8) :: VLPOB       !PO4 band volume fracrion, [-]
-!    real(r8) :: VLPO4       !PO4 non-band volume fraction,[-]:=1-VLPOB
-
-!    real(r8) :: PSISM       !soil micropore matric water potential, [MPa]
-!    real(r8) :: OLSGL       !aqueous O2 diffusivity, [m2 h-1], set in hour1
-!    real(r8) :: ORGC        !total soil organic C [g d-2]
-!    real(r8) :: CFOMC(1:2)  !allocation coefficient to humus fractions
-
-!    real(r8) :: CNH4B       !NH4 concentration band micropore	[g m-3], derived from ZNH4B
-!    real(r8) :: ZNH4B       !NH4 band micropore, [g d-2]
-!    real(r8) :: CNH4S       !NH4 concentration non-band micropore	[g m-3], derived from ZNH4S
-!    real(r8) :: ZNH4S       !NH4 non-band micropore, [g d-2]
-!    real(r8) :: CNO3B       !NO3 concentration band micropore	[g m-3], derived from ZNO3B
-!    real(r8) :: ZNO3B       !NO3 band micropore, [g d-2]
-!    real(r8) :: CNO3S       !NO3 concentration non-band micropore	[g m-3], derived from ZNO3S
-!    real(r8) :: ZNO3S       !NO3 band micropore, [g d-2]
-!    real(r8) :: CH2P4       !aqueous PO4 concentration non-band	[g m-3], derived from H2PO4
-!    real(r8) :: H2PO4       !PO4 non-band micropore, [g d-2]
-!    real(r8) :: CH2P4B      !aqueous PO4 concentration band	[g m-3], derived from H2POB
-!    real(r8) :: H2POB       !PO4 band micropore, [g d-2]
-!    real(r8) :: CH1P4       !aqueous H1PO4 concentration non-band [g m-3], derived from H1PO4
-!    real(r8) :: H1PO4       !soil aqueous HPO4 content micropore non-band, [mol d-2]
-!    real(r8) :: CH1P4B      !aqueous H1PO4 concentration band [g m-3], derived from H1POB
-!    real(r8) :: H1POB       !soil aqueous HPO4 content micropore band, [mol d-2]
-!    real(r8) :: CNO2B       !aqueous HNO2 concentration band [g m-3], derived from ZNO2B
-!    real(r8) :: ZNO2B       !NO2  band micropore, [g d-2]
-!    real(r8) :: CNO2S       !NO2 concentration non-band micropore	[g m-3], derived from ZNO2S
-!    real(r8) :: ZNO2S       !NO2 (nitrate) non-band micropore, [g d-2]
-!    real(r8) :: DFGS        !coefficient for dissolution - volatilization, []
-!    real(r8) :: FILM        !soil water film thickness , [m]
-!    real(r8) :: THETPM      !soil air-filled porosity, [m3 m-3]
-!    real(r8) :: TORT        !soil tortuosity, []
-!    real(r8) :: VOLPM       !soil air content, [m3 d-2]
-
-!    real(r8) :: EPOC      !partitioning coefficient between POC and litter, [], hour1.f
-!    real(r8) :: EHUM      !partitioning coefficient between humus and microbial residue, [], hour1.f
-!    real(r8) :: CCO2S     !aqueous CO2 concentration micropore	[g m-3]
-!    real(r8) :: CZ2OS     !aqueous N2O concentration micropore	[g m-3]
-!    real(r8) :: Z2OS      !aqueous N2O micropore, [g d-2]
-!    real(r8) :: COXYS     !aqueous O2 concentration micropore	[g m-3]
-!    real(r8) :: OXYS      !aqueous O2  micropore	[g d-2]
-!    real(r8) :: COXYG     !gaseous O2 concentration	[g m-3]
-!    real(r8) :: CZ2GS     !aqueous N2 concentration micropore	[g m-3]
-!    real(r8) :: CH2GS     !aqueous H2 concentration	[g m-3]
-!    real(r8) :: H2GS      !aqueous H2 	[g d-2]
-!    real(r8) :: CCH4G     !gaseous CH4 concentration	[g m-3]
-!    real(r8) :: CH4S      !aqueous CO2  micropore	[g d-2]
-!    real(r8) :: SCH4L     !solubility of CH4, [m3 m-3]
-!    real(r8) :: SOXYL     !solubility of O2, [m3 m-3]
-!    real(r8) :: ZNFN0     !initial nitrification inhibition activity
-!    real(r8) :: ZNFNI     !current nitrification inhibition activity
-
-!    real(r8) :: VOLY      !micropore volume, [m3 d-2]
-!    real(r8) :: POROS     !soil porosity, [m3 m-3]
-!    real(r8) :: FC        !water contents at field capacity, [m3 m-3]
-!    real(r8) :: CCLAY
   type, public :: bgc_forc_config_type
     logical :: laddband
     integer :: year
@@ -144,6 +70,10 @@ implicit none
             units='none', missing_value=spval, fill_value=spval)
     call ncd_defvar(ncf, 'FC', ncd_float, long_name='water contents at field capacity',  &
             units='none', missing_value=spval, fill_value=spval)
+    call ncd_defvar(ncf, 'SRP', ncd_float, long_name='shape parameter for water desorption',  &
+            units='none', missing_value=spval, fill_value=spval)
+    call ncd_defvar(ncf, 'WP', ncd_float, long_name='water contents at wilting point',  &
+            units='none', missing_value=spval, fill_value=spval)
     call ncd_defvar(ncf, 'EHUM',ncd_float, &
             long_name='partitioning coefficient between humus and microbial residue',  &
             units='none', missing_value=spval, fill_value=spval)
@@ -151,8 +81,12 @@ implicit none
             units='m', missing_value=spval, fill_value=spval)
     call ncd_defvar(ncf, 'CEC', ncd_float, long_name='soil cation exchange capacity',  &
             units='cmol kg-1', missing_value=spval, fill_value=spval)
+    call ncd_defvar(ncf, 'XCEC', ncd_float, long_name='soil cation exchange capacity',  &
+            units='mol d-2', missing_value=spval, fill_value=spval)
     call ncd_defvar(ncf, 'AEC', ncd_float, long_name='soil anion exchange capacity',  &
             units='cmol kg-1', missing_value=spval, fill_value=spval)
+    call ncd_defvar(ncf, 'XAEC', ncd_float, long_name='soil anion exchange capacity',  &
+            units='mol d-2', missing_value=spval, fill_value=spval)
     call ncd_defvar(ncf, 'CFE', ncd_float, long_name='soil Fe content',  &
             units='mg kg-1', missing_value=spval, fill_value=spval)
     call ncd_defvar(ncf, 'CCA', ncd_float, long_name='soil Ca content',  &
@@ -167,12 +101,23 @@ implicit none
             units='mg kg-1', missing_value=spval, fill_value=spval)
     call ncd_defvar(ncf, 'CCL', ncd_float, long_name='soil Cl content',  &
             units='mg kg-1', missing_value=spval, fill_value=spval)
+    call ncd_defvar(ncf, 'CAL', ncd_float, long_name='soil Al content',  &
+            units='mg kg-1', missing_value=spval, fill_value=spval)
+    call ncd_defvar(ncf, 'ZMG', ncd_float, long_name='soil aqueous Mg content micropore',  &
+            units='mol d-2', missing_value=spval, fill_value=spval)
+    call ncd_defvar(ncf, 'ZNA', ncd_float, long_name='soil aqueous Na content micropore',  &
+            units='mol d-2', missing_value=spval, fill_value=spval)
+    call ncd_defvar(ncf, 'ZKA', ncd_float, long_name='soil aqueous K content micropore',  &
+            units='mol d-2', missing_value=spval, fill_value=spval)
     call ncd_defvar(ncf, 'CALPO', ncd_float, long_name='soil AlPO4 content',  &
             units='mg kg-1', missing_value=spval, fill_value=spval)
     call ncd_defvar(ncf, 'CFEPO', ncd_float, long_name='soil FePO4 content',  &
             units='mg kg-1', missing_value=spval, fill_value=spval)
     call ncd_defvar(ncf, 'CCAPD', ncd_float, long_name='soil CaHPO4 content',  &
             units='mg kg-1', missing_value=spval, fill_value=spval)
+    call ncd_defvar(ncf, 'EPOC', ncd_float, &
+            long_name='partitioning coefficient between POC and litter',  &
+            units='none', missing_value=spval, fill_value=spval)
     call ncd_defvar(ncf, 'CCAPH', ncd_float, long_name='soil apatite content',  &
             units='mg kg-1', missing_value=spval, fill_value=spval)
     call ncd_defvar(ncf, 'CALOH', ncd_float, long_name='soil AlOH3 content',  &
@@ -207,6 +152,8 @@ implicit none
     call ncd_defvar(ncf, 'OHP', ncd_float, dim1name='jcplx',&
             long_name='adsorbed soil P',  &
             units='gP d-2', missing_value=spval, fill_value=spval)
+    call ncd_defvar(ncf, 'ATCS',ncd_float,long_name='Mean annual temperature',  &
+            units='oC', missing_value=spval, fill_value=spval)
 
     call ncd_defvar(ncf, 'CNOSC', ncd_float, dim1name='jsken',&
             dim2name='jcplx',long_name='N:C ratios of SOM kinetic components in each complex',  &
@@ -266,6 +213,26 @@ implicit none
     call ncd_defvar(ncf, 'BKDS', ncd_float,long_name='soil bulk density',&
             units='Mg m-3', missing_value=spval, fill_value=spval)
 
+    call ncd_defvar(ncf, 'THETY', ncd_float,long_name='air-dry water content',&
+            units='m3 m-3', missing_value=spval, fill_value=spval)
+
+    call ncd_defvar(ncf, 'PSIMX', ncd_float,long_name='log water potential at field capacity',&
+            units='log(MPa)', missing_value=spval, fill_value=spval)
+
+    call ncd_defvar(ncf, 'PSIMS', ncd_float,long_name='log water potential at saturation',&
+            units='log(MPa)', missing_value=spval, fill_value=spval)
+
+    call ncd_defvar(ncf, 'PSIMD', ncd_float, &
+            long_name='log water potential at wilting point - log water potential at field capacity',&
+            units='log(MPa)', missing_value=spval, fill_value=spval)
+
+    call ncd_defvar(ncf, 'PSISD', ncd_float, &
+            long_name='log water potential at saturation - log water potential at field capacity',&
+            units='log(MPa)', missing_value=spval, fill_value=spval)
+
+    call ncd_defvar(ncf, 'PSISE', ncd_float, long_name='water potential at saturation',&
+            units='MPa', missing_value=spval, fill_value=spval)
+
     call ncd_defvar(ncf, 'ZNH4S', ncd_float,long_name='NH4 in micropore',  &
             units='gN d-2', missing_value=spval, fill_value=spval)
     call ncd_defvar(ncf, 'ZNO3S', ncd_float,long_name='NO3(-) in micropore',  &
@@ -276,6 +243,8 @@ implicit none
             units='gP d-2', missing_value=spval, fill_value=spval)
     call ncd_defvar(ncf, 'H1PO4', ncd_float,long_name='H1PO4 in micropore',  &
             units='gP d-2', missing_value=spval, fill_value=spval)
+    call ncd_defvar(ncf,'ATKA', ncd_float, long_name='mean annual air temperature',&
+            units='K', missing_value=spval, fill_value=spval)
     call ncd_enddef(ncf)
 
     call ncd_putvar(ncf,'pH',PH(L,NY,NX))
@@ -286,10 +255,22 @@ implicit none
     call ncd_putvar(ncf,'BKVL',BKVL(L,NY,NX))
     call ncd_putvar(ncf,'POROS',POROS(L,NY,NX))
     call ncd_putvar(ncf,'FC',FC(L,NY,NX))
+    call ncd_putvar(ncf,'ATKA',ATKA(NY,NX))
+    call ncd_putvar(ncf,'WP',WP(L,NY,NX))
+    call ncd_putvar(ncf,'SRP',SRP(L,NY,NX))
     call ncd_putvar(ncf,'EHUM',EHUM(L,NY,NX))
+    call ncd_putvar(ncf,'EPOC',EPOC(L,NY,NX))
+    call ncd_putvar(ncf,'THETY',THETY(L,NY,NX))
+    call ncd_putvar(ncf,'PSIMX',PSIMX(NY,NX))
+    call ncd_putvar(ncf,'PSIMD',PSIMD(NY,NX))
+    call ncd_putvar(ncf,'PSIMS',PSIMS(NY,NX))
+    call ncd_putvar(ncf,'PSISD',PSISD(NY,NX))
+    call ncd_putvar(ncf,'PSISE',PSISE(L,NY,NX))
     call ncd_putvar(ncf,'DLYR3',DLYR(3,L,NY,NX))
     call ncd_putvar(ncf,'CEC',CEC(L,NY,NX))
+    call ncd_putvar(ncf,'XCEC',XCEC(L,NY,NX))
     call ncd_putvar(ncf,'AEC',AEC(L,NY,NX))
+    call ncd_putvar(ncf,'XAEC',XAEC(L,NY,NX))
     call ncd_putvar(ncf,'CFE',CFE(L,NY,NX))
     call ncd_putvar(ncf,'CCA',CCA(L,NY,NX))
     call ncd_putvar(ncf,'CMG',CMG(L,NY,NX))
@@ -297,6 +278,10 @@ implicit none
     call ncd_putvar(ncf,'CKA',CKA(L,NY,NX))
     call ncd_putvar(ncf,'CSO4',CSO4(L,NY,NX))
     call ncd_putvar(ncf,'CCL',CCL(L,NY,NX))
+    call ncd_putvar(ncf,'CAL',CAL(L,NY,NX))
+    call ncd_putvar(ncf,'ZMG',ZMG(L,NY,NX))
+    call ncd_putvar(ncf,'ZNA',ZNA(L,NY,NX))
+    call ncd_putvar(ncf,'ZKA',ZNA(L,NY,NX))
     call ncd_putvar(ncf,'CALPO',CALPO(L,NY,NX))
     call ncd_putvar(ncf,'CFEPO',CFEPO(L,NY,NX))
     call ncd_putvar(ncf,'CCAPD',CCAPD(L,NY,NX))
@@ -306,6 +291,7 @@ implicit none
     call ncd_putvar(ncf,'CCACO',CCACO(L,NY,NX))
     call ncd_putvar(ncf,'CCASO',CCASO(L,NY,NX))
     call ncd_putvar(ncf,'BKDS',BKDS(L,NY,NX))
+
     call ncd_putvar(ncf,'FOSRH',FOSRH(:,L,NY,NX))
     call ncd_putvar(ncf,'OQC',OQC(:,L,NY,NX))
     call ncd_putvar(ncf,'OQN',OQN(:,L,NY,NX))
@@ -317,7 +303,7 @@ implicit none
 
     call ncd_putvar(ncf,'CNOSC',CNOSC(:,:,L,NY,NX))
     call ncd_putvar(ncf,'CPOSC',CPOSC(:,:,L,NY,NX))
-
+    call ncd_putvar(ncf,'ATCS',ATCS(NY,NX))
     call ncd_putvar(ncf,'OSC',OSC(:,:,L,NY,NX))
     call ncd_putvar(ncf,'OSA',OSA(:,:,L,NY,NX))
     call ncd_putvar(ncf,'OSN',OSN(:,:,L,NY,NX))

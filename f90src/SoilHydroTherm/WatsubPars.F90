@@ -28,32 +28,32 @@ module WatsubPars
 ! FENGYP=rate constant for restoring surface Ksat
 !
 
-  real(r8) :: EMMS
-  real(r8) :: EMMW
-  real(r8) :: EMMR
-  real(r8) :: RACX
-  real(r8) :: RARX
+  real(r8) :: EMMS    !soil emissivity
+  real(r8) :: EMMW    !snowpack emissivity
+  real(r8) :: EMMR    !surfce litter emissivity
+  real(r8) :: RACX    !total canopy boundary later resistance h/m
+  real(r8) :: RARX    !
   real(r8) :: RZ
-  real(r8) :: RAM
+  real(r8) :: RAM     !miminum boundary layer resistance h/m
   real(r8) :: DPTHSX
-  real(r8) :: VISCW
-  real(r8) :: VISCA
-  real(r8) :: DIFFW
-  real(r8) :: DIFFA
-  real(r8) :: EXPNW
-  real(r8) :: EXPNA
-  real(r8) :: GRAV
+  real(r8) :: VISCW   !water viscosity
+  real(r8) :: VISCA   !air viscosity
+  real(r8) :: DIFFW   !parameter used to calculate Nusselt number for water
+  real(r8) :: DIFFA   !parameter used to calculate Nusselt number for air
+  real(r8) :: EXPNW   !parameter used to calculate Nusselt number for water
+  real(r8) :: EXPNA   !parameter used to calculate Nusselt number for air
+  real(r8) :: GRAV    !gravity of accleration, [m/s2]
   real(r8) :: RYLXW
   real(r8) :: RYLXA
   real(r8) :: PRNTW
   real(r8) :: PRNTA
   real(r8) :: DNUSW
   real(r8) :: DNUSA
-  real(r8) :: TRBW
-  real(r8) :: TRBA
-  real(r8) :: FVOLAH
-  real(r8) :: DTHETW
-  real(r8) :: HCNDRR
+  real(r8) :: TRBW    !threshold water-filled porosity for convective effects on heat transfer	m3 m-3
+  real(r8) :: TRBA    !threshold air-filled porosity for convective effects on heat transfer	m3 m-3
+  real(r8) :: FVOLAH  !accounts for clay shrinkage-swelling effect on macropore volume
+  real(r8) :: DTHETW  !parameter used to calculate Ksat 	m3 m-3
+  real(r8) :: HCNDRR  !surface litter hydraulic conductivity	m MPa-1 h-1
   real(r8) :: FENGYP
 
   contains
