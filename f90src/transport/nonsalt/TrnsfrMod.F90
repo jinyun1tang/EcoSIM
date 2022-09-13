@@ -138,8 +138,10 @@ module TrnsfrMod
 
 
 !
-!     TIME STEP USED IN GAS AND SOLUTE FLUX CALCULATIONS
-!
+! TIME STEP USED IN GAS AND SOLUTE FLUX CALCULATIONS
+! NPH=no. of cycles per hour for water, heat and solute flux calculations
+! NPG=number of cycles per hour for gas flux calculations
+! XNPT=1/number of cycles NPH-1 for gas flux calculations
   MX=0
   DO  MM=1,NPG
     M=MIN(NPH,INT((MM-1)*XNPT)+1)

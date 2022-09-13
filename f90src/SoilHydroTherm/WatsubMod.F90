@@ -332,7 +332,7 @@ module WatsubMod
       FMAC(L,NY,NX)=0.0_r8
       CNDH1(L,NY,NX)=0.0_r8
     ENDIF
-    FGRD(L,NY,NX)=1.0-FMAC(L,NY,NX)
+    FGRD(L,NY,NX)=1.0_r8-FMAC(L,NY,NX)
     TK1(L,NY,NX)=TKS(L,NY,NX)
     if(TK1(L,NY,NX)>1.e3_r8)then
       write(*,*)'TKS(L,NY,NX)',L,TKS(L,NY,NX)
@@ -402,7 +402,7 @@ module WatsubMod
     THETWX(0,NY,NX)=AMAX1(0.0_r8,VOLW1(0,NY,NX)/VOLR(NY,NX))
     THETIX(0,NY,NX)=AMAX1(0.0_r8,VOLI1(0,NY,NX)/VOLR(NY,NX))
     THETPX(0,NY,NX)=AMAX1(0.0_r8,VOLP1(0,NY,NX)/VOLR(NY,NX)) &
-      *AMAX1(0.0_r8,(1.0-XVOLT(NY,NX)/VOLWD(NY,NX)))
+      *AMAX1(0.0_r8,(1.0_r8-XVOLT(NY,NX)/VOLWD(NY,NX)))
   ELSE
     THETWX(0,NY,NX)=0.0_r8
     THETIX(0,NY,NX)=0.0_r8
@@ -519,7 +519,7 @@ module WatsubMod
         FLQRI(NY,NX)=0.0_r8
         FLQGQ(NY,NX)=PRECQ(NY,NX)
         FLQGI(NY,NX)=PRECI(NY,NX)
-      ELSEIF((PRECQ(NY,NX).GT.0.0.OR.PRECI(NY,NX).GT.0.0) &
+      ELSEIF((PRECQ(NY,NX).GT.0.0.OR.PRECI(NY,NX).GT.0.0_r8) &
         .AND.VHCPW(1,NY,NX).LE.VHCPWX(NY,NX))THEN
         FLQRQ(NY,NX)=FLWQBX*PRECQ(NY,NX)/(PRECQ(NY,NX)+PRECI(NY,NX))
         FLQRI(NY,NX)=FLWQBX*PRECI(NY,NX)/(PRECQ(NY,NX)+PRECI(NY,NX))
@@ -824,7 +824,7 @@ module WatsubMod
     TKY=(TK0X*VHCPWMM(L,NY,NX)+TKXR*VHCP1(0,NY,NX))/(VHCPWMM(L,NY,NX)+VHCP1(0,NY,NX))
     HFLWX=(TK0X-TKY)*VHCPWMM(L,NY,NX)*XNPC
     HFLWC=ATCNDR*(TK0X-TKXR)*AREA(3,NUM(NY,NX),NY,NX)*FSNW(NY,NX)*CVRD(NY,NX)*XNPQ
-    IF(HFLWC.GE.0.0)THEN
+    IF(HFLWC.GE.0.0_r8)THEN
       HFLWSRX=AMAX1(0.0_r8,AMIN1(HFLWX,HFLWC))
     ELSE
       HFLWSRX=AMIN1(0.0_r8,AMAX1(HFLWX,HFLWC))
@@ -862,7 +862,7 @@ module WatsubMod
       VPY=(VPR*VOLPM(M,0,NY,NX)+VP1*VOLPM(M,NUM(NY,NX),NY,NX)) &
         /(VOLPM(M,0,NY,NX)+VOLPM(M,NUM(NY,NX),NY,NX))
       FLVX=(VPR-VPY)*VOLPM(M,0,NY,NX)*XNPC
-      IF(FLVC.GE.0.0)THEN
+      IF(FLVC.GE.0.0_r8)THEN
         FLVR1X=AMAX1(0.0_r8,AMIN1(FLVC,FLVX,VOLW0M(L,NY,NX)*XNPB))
         if(abs(FLVR1X)>1.0e20_r8)then
           write(*,*)'FLVC,FLVX,VOLW0M(L,NY,NX)*XNPB=',FLVC,FLVX,VOLW0M(L,NY,NX)*XNPB
@@ -896,7 +896,7 @@ module WatsubMod
       /(VHCP1(0,NY,NX)+VHCP1(NUM(NY,NX),NY,NX))
     HFLWX=(TKXR-TKY)*VHCP1(0,NY,NX)*XNPC
     HFLWC=ATCNDS*(TKXR-TK1X)*AREA(3,NUM(NY,NX),NY,NX)*FSNW(NY,NX)*CVRD(NY,NX)*XNPQ
-    IF(HFLWC.GE.0.0)THEN
+    IF(HFLWC.GE.0.0_r8)THEN
       HFLWR1X=AMAX1(0.0_r8,AMIN1(HFLWX,HFLWC))
     ELSE
       HFLWR1X=AMIN1(0.0_r8,AMAX1(HFLWX,HFLWC))
@@ -1015,7 +1015,7 @@ module WatsubMod
           FLVC=ATCNVW*(VP1-VP2)*AREA(3,NUM(NY,NX),NY,NX)*FSNW(NY,NX)*XNPY
           VPY=(VP1*VOLP01+VP2*VOLP02)/(VOLP01+VOLP02)
           FLVX=(VP1-VPY)*VOLP01*XNPA
-          IF(FLVC.GE.0.0)THEN
+          IF(FLVC.GE.0.0_r8)THEN
             FLVSS=AMAX1(0.0_r8,AMIN1(FLVC,FLVX,VOLW0M(L,NY,NX)*XNPX))
             HFLVSS=(cpw*TK0M(L,NY,NX)+VAP)*FLVSS
           ELSE
@@ -1056,7 +1056,7 @@ module WatsubMod
         HFLWX=(TK0M(L,NY,NX)-TKY)*VHCPWMM(L,NY,NX)*XNPA
         HFLWC=ATCNDW*(TK0M(L,NY,NX)-TK0M(L2,NY,NX)) &
           *AREA(3,NUM(NY,NX),NY,NX)*FSNW(NY,NX)*XNPY
-        IF(HFLWC.GE.0.0)THEN
+        IF(HFLWC.GE.0.0_r8)THEN
           HFLWSS=AMAX1(0.0_r8,AMIN1(HFLWX,HFLWC))
         ELSE
           HFLWSS=AMIN1(0.0_r8,AMAX1(HFLWX,HFLWC))
@@ -1386,7 +1386,7 @@ module WatsubMod
 
     ALBW=(0.85_r8*VOLS0M(1,NY,NX)+0.30_r8*VOLI0M(1,NY,NX)+0.06_r8*VOLW0M(1,NY,NX)) &
       /(VOLS0M(1,NY,NX)+VOLI0M(1,NY,NX)+VOLW0M(1,NY,NX))
-    RFLX0=(1.0-ALBW)*RADXW(NY,NX)+THRYW(NY,NX)    !incoming radiation, short + longwave
+    RFLX0=(1.0_r8-ALBW)*RADXW(NY,NX)+THRYW(NY,NX)    !incoming radiation, short + longwave
     THRMX=THRMW(NY,NX)*TK0M(1,NY,NX)**4           !emitting longwave radiation,
     RFLXW2=RFLX0-THRMX                            !net radiation
     !
@@ -1778,7 +1778,7 @@ module WatsubMod
           write(*,*)'(VPR-VPY)*VOLPM(M,0,NY,NX)',VPR,VPY,VOLPM(M,0,NY,NX)
           call endrun(trim(mod_filename)//' at line',__LINE__)
         endif
-        IF(FLVC.GE.0.0)THEN
+        IF(FLVC.GE.0.0_r8)THEN
           !from litter to soil
           FLV2=AMAX1(0.0_r8,AMIN1(FLVC,FLVX))
           if(abs(FLV2)>1.e20_r8)then
@@ -1816,7 +1816,7 @@ module WatsubMod
       !   write(*,*)'TKS1  =',TKS1
       !   write(*,*)'VHCP12=',VHCP12
       ! endif
-      IF(HFLWC.GE.0.0)THEN
+      IF(HFLWC.GE.0.0_r8)THEN
         HFLCR2=AMAX1(0.0_r8,AMIN1(HFLWX,HFLWC))
       ELSE
         HFLCR2=AMIN1(0.0_r8,AMAX1(HFLWX,HFLWC))
@@ -2106,7 +2106,7 @@ module WatsubMod
   ELSE
     ALBG=ALBS(NY,NX)
   ENDIF
-  RFLX0=(1.0-ALBG)*RADXG(NY,NX)+THRYG(NY,NX)
+  RFLX0=(1.0_r8-ALBG)*RADXG(NY,NX)+THRYG(NY,NX)
   THRMA=THRMS(NY,NX)*TK1(NUM(NY,NX),NY,NX)**4
   RFLXG=RFLX0-THRMA
 !
@@ -2128,7 +2128,7 @@ module WatsubMod
   DFVR=THETPX0*POROQ*THETPX0/POROS(0,NY,NX)
   RAR1=RAG(NY,NX)+RAR(NY,NX)/DFVR
   RI=AMAX1(-0.3,AMIN1(0.075,RIB(NY,NX)*(TKQ(NY,NX)-TK1(NUM(NY,NX),NY,NX))))
-  RAGX=AMAX1(RAM,0.8*RAGS(NY,NX),AMIN1(1.2*RAGS(NY,NX),RAR1/(1.0-10.0*RI)))
+  RAGX=AMAX1(RAM,0.8*RAGS(NY,NX),AMIN1(1.2*RAGS(NY,NX),RAR1/(1.0_r8-10.0*RI)))
   RAGS(NY,NX)=RAGX
   RAa=RAGR(NY,NX)+RAGS(NY,NX)
 ! IF(I.EQ.63.AND.NX.EQ.1)THEN
@@ -2162,7 +2162,7 @@ module WatsubMod
   EVAPG(NY,NX)=AMAX1(PARE*(VPQ(NY,NX)-VP1) &
       ,-AMAX1(0.0_r8,VOLW2(NUM(NY,NX),NY,NX)*XNPX))
   EFLXG=EVAPG(NY,NX)*VAP
-  IF(EVAPG(NY,NX).LT.0.0)THEN
+  IF(EVAPG(NY,NX).LT.0.0_r8)THEN
     VFLXG=EVAPG(NY,NX)*cpw*TK1(NUM(NY,NX),NY,NX)
   ELSE
     VFLXG=EVAPG(NY,NX)*cpw*TKQ(NY,NX)
@@ -2225,7 +2225,7 @@ module WatsubMod
   ELSE
     BAREW(NY,NX)=1.0
   ENDIF
-  CVRDW(NY,NX)=1.0-BAREW(NY,NX)
+  CVRDW(NY,NX)=1.0_r8-BAREW(NY,NX)
   RAGS(NY,NX)=1.0/(BAREW(NY,NX)/RAGR(NY,NX)+CVRDW(NY,NX)/RAR1)
   PARG(M,NY,NX)=AREA(3,NUM(NY,NX),NY,NX)*XNPH/(RAGS(NY,NX)+RAS)
 !
@@ -2371,7 +2371,7 @@ module WatsubMod
     ENDIF
     IF(BKDS(L,NY,NX).GT.ZERO)THEN
       THETWT=safe_adb(VOLWM(M,L,NY,NX),VOLY(L,NY,NX))
-      TORT(M,L,NY,NX)=TortMicporew(THETWT)*(1.0-FHOL(L,NY,NX))
+      TORT(M,L,NY,NX)=TortMicporew(THETWT)*(1.0_r8-FHOL(L,NY,NX))
     ELSE
 !   standing water has tortuosity 0.7?
       TORT(M,L,NY,NX)=0.7
@@ -2555,7 +2555,7 @@ module WatsubMod
       +PSISO(NUM(NY,NX),NY,NX)
     FLQX=AVCNDR*(PSIST0-PSIST1) &
       *AREA(3,NUM(NY,NX),NY,NX)*CVRDW(NY,NX)*XNPH
-    IF(FLQX.GE.0.0)THEN
+    IF(FLQX.GE.0.0_r8)THEN
       IF(THETWR.GT.THETS(0,NY,NX))THEN
         FLQZ=FLQX+AMIN1((THETWR-THETS(0,NY,NX)) &
           *VOLR(NY,NX),AMAX1(0.0_r8,(THETS(NUM(NY,NX),NY,NX)-THETW1) &
@@ -2576,13 +2576,13 @@ module WatsubMod
       FLQR=AMIN1(0.0_r8,AMAX1(FLQZ,-VOLW1(NUM(NY,NX),NY,NX)*XNPX,-VOLP1(0,NY,NX)))
       FLQ2=AMIN1(0.0_r8,AMAX1(FLQX,-VOLW1(NUM(NY,NX),NY,NX)*XNPX,-VOLP1(0,NY,NX)))
     ENDIF
-    IF(VOLP1Z(NUM(NY,NX),NY,NX).LT.0.0)THEN
+    IF(VOLP1Z(NUM(NY,NX),NY,NX).LT.0.0_r8)THEN
       FLQR=FLQR+AMIN1(0.0_r8,AMAX1(-VOLW1(NUM(NY,NX),NY,NX)*XNPX &
         ,VOLP1Z(NUM(NY,NX),NY,NX)))
       FLQ2=FLQ2+AMIN1(0.0_r8,AMAX1(-VOLW1(NUM(NY,NX),NY,NX)*XNPX &
         ,VOLP1Z(NUM(NY,NX),NY,NX)))
     ENDIF
-    IF(FLQR.GT.0.0)THEN
+    IF(FLQR.GT.0.0_r8)THEN
       HFLQR=cpw*TK1(0,NY,NX)*FLQR
     ELSE
       HFLQR=cpw*TK1(NUM(NY,NX),NY,NX)*FLQR
@@ -3069,11 +3069,6 @@ module WatsubMod
           ELSE
             PSISA1(N6,N5,N4)=PSISE(N6,N5,N4)
           ENDIF
-          !     IF(N1.EQ.4.AND.N2.EQ.1.AND.N3.EQ.11)THEN
-          !     WRITE(*,1119)'PSISAL',I,J,M,N,N4,N5,N6,PSISA1(N6,N5,N4)
-          !    2,THETWX(N6,N5,N4),THETIX(N6,N5,N4),FCX,WPX
-          !    3,BKVL(N6,N5,N4),VOLX(N6,N5,N4)
-          !     ENDIF
           !
           !     ACCOUNT FOR WETTING FRONTS WHEN CALCULATING WATER CONTENTS,
           !     MATRIC WATER POTENTIALS AND HYDRAULIC CONDUCTIVITIES USED
@@ -3219,7 +3214,7 @@ module WatsubMod
           !     VOLP1Z=excess water+ice relative to porosity
           !
           FLQX=AVCNDL*(PSIST1-PSISTL)*AREA(N,N3,N2,N1)*XNPH
-          IF(FLQX.GE.0.0)THEN
+          IF(FLQX.GE.0.0_r8)THEN
             IF(THETW1.GT.THETS(N3,N2,N1))THEN
               FLQZ=FLQX+AMIN1((THETW1-THETS(N3,N2,N1)) &
                 *VOLY(N3,N2,N1),AMAX1(0.0_r8,(THETS(N6,N5,N4)-THETWL) &
@@ -3250,11 +3245,11 @@ module WatsubMod
             !     FLQL3=FLQX+AMAX1(FLQL1,AMIN1(0.0_r8,FLQL2))*XNPX
             !     FLQL4=AMIN1(0.0_r8,AMAX1(FLQL3,-VOLP1(N3,N2,N1)*XNPX))
           ENDIF
-          IF(N.EQ.3.AND.VOLP1Z(N6,N5,N4).LT.0.0)THEN
+          IF(N.EQ.3.AND.VOLP1Z(N6,N5,N4).LT.0.0_r8)THEN
             FLQL=FLQL+AMIN1(0.0_r8,AMAX1(-VOLW2(N6,N5,N4)*XNPX,VOLP1Z(N6,N5,N4)))
             FLQ2=FLQ2+AMIN1(0.0_r8,AMAX1(-VOLW2(N6,N5,N4)*XNPX,VOLP1Z(N6,N5,N4)))
           ENDIF
-          IF(FLQL.GT.0.0)THEN
+          IF(FLQL.GT.0.0_r8)THEN
             HWFLQL=cpw*TK1(N3,N2,N1)*FLQL
           ELSE
             HWFLQL=cpw*TK1(N6,N5,N4)*FLQL
@@ -3270,9 +3265,9 @@ module WatsubMod
     !
           IF(VOLAH1(N3,N2,N1).GT.ZEROS2(N2,N1) &
             .AND.VOLAH1(N6,N5,N4).GT.ZEROS2(N5,N4).AND.IFLGH.EQ.0)THEN
-            PSISH1=PSISH(N3,N2,N1)+0.0098*DLYR(3,N3,N2,N1) &
+            PSISH1=PSISH(N3,N2,N1)+0.0098_r8*DLYR(3,N3,N2,N1) &
               *(AMIN1(1.0_r8,AMAX1(0.0_r8,VOLWH1(N3,N2,N1)/VOLAH1(N3,N2,N1)))-0.5)
-            PSISHL=PSISH(N6,N5,N4)+0.0098*DLYR(3,N6,N5,N4) &
+            PSISHL=PSISH(N6,N5,N4)+0.0098_r8*DLYR(3,N6,N5,N4) &
               *(AMIN1(1.0_r8,AMAX1(0.0_r8,VOLWH1(N6,N5,N4)/VOLAH1(N6,N5,N4)))-0.5)
             !
             !     MACROPORE FLOW IF GRAVITATIONAL GRADIENT IS POSITIVE
@@ -3305,9 +3300,9 @@ module WatsubMod
           ELSE
             FLWHL(N,N6,N5,N4)=0.0
             FLWHM(M,N,N6,N5,N4)=0.0
-            IF(VOLPH1(N6,N5,N4).LE.0.0)IFLGH=1
+            IF(VOLPH1(N6,N5,N4).LE.0.0_r8)IFLGH=1
           ENDIF
-          IF(FLWHL(N,N6,N5,N4).GT.0.0)THEN
+          IF(FLWHL(N,N6,N5,N4).GT.0.0_r8)THEN
             HWFLHL=cpw*TK1(N3,N2,N1)*FLWHL(N,N6,N5,N4)
           ELSE
             HWFLHL=cpw*TK1(N6,N5,N4)*FLWHL(N,N6,N5,N4)
@@ -3353,7 +3348,7 @@ module WatsubMod
             VPY=(VP1*VOLPM(M,N3,N2,N1)+VPL*VOLPM(M,N6,N5,N4)) &
               /(VOLPM(M,N3,N2,N1)+VOLPM(M,N6,N5,N4))
             FLVX=(VP1-VPY)*VOLPM(M,N3,N2,N1)*XNPX
-            IF(FLVC.GE.0.0)THEN
+            IF(FLVC.GE.0.0_r8)THEN
               FLVL=AMAX1(0.0_r8,AMIN1(FLVC,FLVX))
               HWFLVL=(cpw*TK1(N3,N2,N1)+VAP)*FLVL
             ELSE
@@ -3370,11 +3365,6 @@ module WatsubMod
           !     HWFLWL=total convective heat flux from water+vapor flux
           !
           FLWL(N,N6,N5,N4)=FLQL+FLVL
-          if(abs(FLWL(N,N6,N5,N4))>1.e20)then
-            write(*,*)'FLQL+FLVL=',FLQL,FLVL
-            write(*,*)'at line',__LINE__
-            call endrun(trim(mod_filename)//'at line',__LINE__)
-          endif
           FLWLX(N,N6,N5,N4)=FLQ2+FLVL
           HWFLWL=HWFLQL+HWFLVL
           !
@@ -3429,8 +3419,7 @@ module WatsubMod
           ELSE
             TCND2=0.0
           ENDIF
-          ATCNDL=(2.0*TCND1*TCND2)/(TCND1*DLYR(N,N6,N5,N4) &
-            +TCND2*DLYR(N,N3,N2,N1))
+          ATCNDL=(2.0*TCND1*TCND2)/(TCND1*DLYR(N,N6,N5,N4)+TCND2*DLYR(N,N3,N2,N1))
           !
           !     HEAT FLOW FROM THERMAL CONDUCTIVITY AND TEMPERATURE GRADIENT
           !
@@ -3475,25 +3464,12 @@ module WatsubMod
             /(VHCP1(N3,N2,N1)+VHCP1(N6,N5,N4))
           HFLWX=(TK1X-TKY)*VHCP1(N3,N2,N1)*XNPX
           HFLWC=ATCNDL*(TK1X-TKLX)*AREA(N,N3,N2,N1)*XNPH
-          if(HFLWX<-1.e10_r8)then
-            write(*,*)'(TK1X-TKY)*VHCP1(N3,N2,N1)',TK1X,TKY,TKLX,VHCP1(N3,N2,N1)
-            write(*,*)'N1,N2,N3',n1,n2,n3
-            call endrun(trim(mod_filename)//' at line',__LINE__)
-          endif
-          IF(HFLWC.GE.0.0)THEN
+          IF(HFLWC.GE.0.0_r8)THEN
             HFLWSX=AMAX1(0.0_r8,AMIN1(HFLWX,HFLWC))
           ELSE
             HFLWSX=AMIN1(0.0_r8,AMAX1(HFLWX,HFLWC))
-            if(HFLWSX<-1.e10_r8)then
-              write(*,*)'HFLWX,HFLWC',HFLWX,HFLWC
-              call endrun(trim(mod_filename)//' at line',__LINE__)
-            endif
           ENDIF
           HFLWL(N,N6,N5,N4)=HWFLWL+HWFLHL+HFLWSX
-          if(HFLWL(N,N6,N5,N4)<-1.e10_r8)then
-            write(*,*)'HWFLWL+HWFLHL+HFLWSX',HWFLWL,HWFLHL,HFLWSX
-            call endrun(trim(mod_filename)//' at line',__LINE__)
-          endif
 
           !
           !     TOTAL WATER, VAPOR AND HEAT FLUXES
@@ -3506,11 +3482,6 @@ module WatsubMod
           FLWX(N,N6,N5,N4)=FLWX(N,N6,N5,N4)+FLWLX(N,N6,N5,N4)
           FLWH(N,N6,N5,N4)=FLWH(N,N6,N5,N4)+FLWHL(N,N6,N5,N4)
           HFLW(N,N6,N5,N4)=HFLW(N,N6,N5,N4)+HFLWL(N,N6,N5,N4)
-          if(HFLW(N,N6,N5,N4)<-1.e10_r8)then
-            write(*,*)'HFLWL(N,N6,N5,N4)',HFLWL(N,N6,N5,N4)
-            write(*,*)'Ns=',N,N4,n5,n6
-            call endrun(trim(mod_filename)//' at line',__LINE__)
-          endif
           FLWM(M,N,N6,N5,N4)=FLWL(N,N6,N5,N4)
           IF(N.EQ.3)THEN
             !
@@ -3578,12 +3549,12 @@ module WatsubMod
 !     IFLGU=micropore discharge flag to natural water table
 !
         IF(IDTBL(NY,NX).NE.0.AND.DPTH(L,NY,NX).LT.DTBLX(NY,NX))THEN
-          IF(PSISM1(L,NY,NX).GT.0.0098*(DPTH(L,NY,NX)-DTBLX(NY,NX)))THEN
+          IF(PSISM1(L,NY,NX).GT.0.0098_r8*(DPTH(L,NY,NX)-DTBLX(NY,NX)))THEN
             IFLGU=0
             DO 9565 LL=MIN(L+1,NL(NY,NX)),NL(NY,NX)
               DTBLXX=DTBLX(NY,NX)+PSISE(LL,NY,NX)/0.0098
               IF(DPTH(LL,NY,NX).LT.DTBLXX)THEN
-                IF((PSISM1(LL,NY,NX).LE.0.0098*(DPTH(LL,NY,NX)-DTBLXX) &
+                IF((PSISM1(LL,NY,NX).LE.0.0098_r8*(DPTH(LL,NY,NX)-DTBLXX) &
                   .AND.L.NE.NL(NY,NX)).OR.DPTH(LL,NY,NX).GT.DPTHA(NY,NX))THEN
                   IFLGU=1
                 ENDIF
@@ -3634,13 +3605,13 @@ module WatsubMod
 !     IFLGD=micropore discharge flag to artificial water table
 !
         IF(IDTBL(NY,NX).GE.3.AND.DPTH(L,NY,NX).LT.DTBLY(NY,NX))THEN
-          IF(PSISM1(L,NY,NX).GT.0.0098*(DPTH(L,NY,NX)-DTBLY(NY,NX)))THEN
+          IF(PSISM1(L,NY,NX).GT.0.0098_r8*(DPTH(L,NY,NX)-DTBLY(NY,NX)))THEN
             IFLGD=0
             IF(L.LT.NL(NY,NX))THEN
               DO 9568 LL=L+1,NL(NY,NX)
                 DTBLYX=DTBLY(NY,NX)+PSISE(LL,NY,NX)/0.0098
                 IF(DPTH(LL,NY,NX).LT.DTBLYX)THEN
-                  IF((PSISM1(LL,NY,NX).LE.0.0098*(DPTH(LL,NY,NX)-DTBLYX) &
+                  IF((PSISM1(LL,NY,NX).LE.0.0098_r8*(DPTH(LL,NY,NX)-DTBLYX) &
                     .AND.L.NE.NL(NY,NX)).OR.DPTH(LL,NY,NX).GT.DPTHA(NY,NX))THEN
                     IFLGD=1
                   ENDIF
@@ -3805,8 +3776,7 @@ module WatsubMod
             IF(L.EQ.NUM(N2,N1).AND.N.NE.3 &
               .AND.(CDPTH(NU(N2,N1)-1,N2,N1).LE.CDPTHI(N2,N1) &
               .OR.BKDS(NUI(N2,N1),N2,N1).GT.ZERO))THEN
-!     WRITE(*,7744)'QRCHK',I,J,M,N1,N2,N4,N5,M4,M5,N,NN
-!    1,IRCHG(NN,N,N2,N1),RCHQF,QRM(M,N2,N1)
+
               IF(IRCHG(NN,N,N2,N1).EQ.0.OR.test_aeqb(RCHQF,0._r8) &
                 .OR.ABS(QRM(M,N2,N1)).LT.ZEROS(N2,N1))THEN
                 QR1(N,NN,M5,M4)=0.0
@@ -3837,18 +3807,7 @@ module WatsubMod
                   HQR1(N,NN,M5,M4)=cpw*TK1(0,N2,N1)*QR1(N,NN,M5,M4)
                   QR(N,NN,M5,M4)=QR(N,NN,M5,M4)+QR1(N,NN,M5,M4)
                   HQR(N,NN,M5,M4)=HQR(N,NN,M5,M4)+HQR1(N,NN,M5,M4)
-                ! F(N1.EQ.1.AND.N2.EQ.1)THEN
-                !     WRITE(*,7744)'QRBND',I,J,M,N1,N2,N4,N5,M4,M5,N,NN
-                !    1,IRCHG(NN,N,N2,N1),QRM(M,N2,N1)
-                !    2,QR1(N,NN,M5,M4),QR(N,NN,M5,M4)
-                !    2,ALT1,ALT2,ALTG(N2,N1),FSLOPE(N,N2,N1)
-                !    3,VOLWG(N2,N1),VOLWRX(N2,N1),ZM(N2,N1),ZS(N2,N1)
-                !    4,VOLW1(0,N2,N1),VOLI1(0,N2,N1),DLYR(N,NUM(N2,N1),N2,N1)
-                !    5,XVOLT(N2,N1)-VOLWG(N2,N1),DTBLX(N2,N1)
-                !    6,DTBLX(N2,N1)-CDPTH(NU(N2,N1)-1,N2,N1)+DPTHW1
-                ! 7,XVOLTM(M,N2,N1),XVOLWM(M,N2,N1)
-!7744  FORMAT(A8,12I4,40E12.4)
-                ! ENDIF
+
                 !
                 ! RUNON
 !
@@ -3856,15 +3815,15 @@ module WatsubMod
                 VX=AMIN1(0.0_r8,(DTBLX(N2,N1)-CDPTH(NU(N2,N1)-1,N2,N1)+DPTHW1) &
                   *AREA(3,NUM(N2,N1),N2,N1))
                 QRM(M,N2,N1)=VX*XNPX
-                QRV(M,N2,N1)=0.0
+                QRV(M,N2,N1)=0.0_r8
                 QR1(N,NN,M5,M4)=-XN*QRM(M,N2,N1)*FSLOPE(N,N2,N1)*RCHQF
                 HQR1(N,NN,M5,M4)=cpw*TK1(0,N2,N1)*QR1(N,NN,M5,M4)
                 QR(N,NN,M5,M4)=QR(N,NN,M5,M4)+QR1(N,NN,M5,M4)
                 HQR(N,NN,M5,M4)=HQR(N,NN,M5,M4)+HQR1(N,NN,M5,M4)
 
               ELSE
-                QR1(N,NN,M5,M4)=0.0
-                HQR1(N,NN,M5,M4)=0.0
+                QR1(N,NN,M5,M4)=0.0_r8
+                HQR1(N,NN,M5,M4)=0.0_r8
               ENDIF
               QRMN(M,N,NN,M5,M4)=QR1(N,NN,M5,M4)
               IFLBM(M,N,NN,M5,M4)=0
@@ -3877,10 +3836,10 @@ module WatsubMod
         !     HQS=cumulative hourly convective heat transfer from snow,water,ice transfer
 !
               IF(NN.EQ.1)THEN
-                QS1(N,M5,M4)=0.0
-                QW1(N,M5,M4)=0.0
-                QI1(N,M5,M4)=0.0
-                HQS1(N,M5,M4)=0.0
+                QS1(N,M5,M4)=0.0_r8
+                QW1(N,M5,M4)=0.0_r8
+                QI1(N,M5,M4)=0.0_r8
+                HQS1(N,M5,M4)=0.0_r8
 !     QS(N,M5,M4)=QS(N,M5,M4)+QS1(N,M5,M4)
 !     QW(N,M5,M4)=QW(N,M5,M4)+QW1(N,M5,M4)
 !     QI(N,M5,M4)=QI(N,M5,M4)+QI1(N,M5,M4)
@@ -3890,8 +3849,8 @@ module WatsubMod
             ENDIF
           ELSE
             IF(N.NE.3)THEN
-              QR1(N,NN,M5,M4)=0.0
-              HQR1(N,NN,M5,M4)=0.0
+              QR1(N,NN,M5,M4)=0.0_r8
+              HQR1(N,NN,M5,M4)=0.0_r8
             ENDIF
           ENDIF
 !
@@ -3931,7 +3890,7 @@ module WatsubMod
                 ENDIF
                 CNDL=HCND(N,KL,N3,N2,N1)
                 FLWL(N,M6,M5,M4)=AMIN1(VOLW1(N3,N2,N1)*XNPX &
-                  ,XN*0.0098*(-ABS(SLOPE(N,N2,N1)))*CND1*AREA(3,N3,N2,N1)) &
+                  ,XN*0.0098_r8*(-ABS(SLOPE(N,N2,N1)))*CND1*AREA(3,N3,N2,N1)) &
                   *RCHGFU*RCHGFT*XNPH
                 if(abs(FLWL(N,M6,M5,M4))>1.e20)then
                   write(*,*)'VOLW1(N3,N2,N1)*XNPX=',VOLW1(N3,N2,N1),XNPX
@@ -3942,24 +3901,9 @@ module WatsubMod
                 endif
                 FLWLX(N,M6,M5,M4)=FLWL(N,M6,M5,M4)
                 FLWHL(N,M6,M5,M4)=AMIN1(VOLWH1(L,NY,NX)*XNPX &
-                 ,XN*0.0098*(-ABS(SLOPE(N,N2,N1)))*CNDH1(L,NY,NX)*AREA(3,N3,N2,N1)) &
+                 ,XN*0.0098_r8*(-ABS(SLOPE(N,N2,N1)))*CNDH1(L,NY,NX)*AREA(3,N3,N2,N1)) &
                  *RCHGFU*RCHGFT*XNPH
                 HFLWL(N,M6,M5,M4)=cpw*TK1(N3,N2,N1)*(FLWL(N,M6,M5,M4)+FLWHL(N,M6,M5,M4))
-                if(HFLWL(N,M6,M5,M4)<-1.e10_r8)then
-                  write(*,*)'cpw*TK1(N3,N2,N1)*(FLWL(N,M6,M5,M4)+FLWHL(N,M6,M5,M4))',&
-                    cpw,TK1(N3,N2,N1),FLWL(N,M6,M5,M4),FLWHL(N,M6,M5,M4)
-                  call endrun(trim(mod_filename)//' at line',__LINE__)
-                endif
-                !     IF(I.EQ.336)THEN
-                !     WRITE(*,4443)'ABV',I,J,M,N1,N2,N3,M4,M5,M6,N,NN,XN
-                !    2,FLWL(N,M6,M5,M4)
-                !    2,VOLP2,RCHGFU,VOLX(N3,N2,N1),VOLW1(N3,N2,N1)
-                !    3,VOLWH1(N3,N2,N1),VOLPH1(N3,N2,N1),VOLPH2,VOLI1(N3,N2,N1)
-                !    4,VOLIH1(N3,N2,N1),VOLP1(N3,N2,N1),HFLWL(N,M6,M5,M4)
-                !    5,PSISM1(N3,N2,N1),PSISE(N3,N2,N1),FLWHL(N,M6,M5,M4),DTBLD(N2,N1)
-                !    6,SLOPE(N,N2,N1)
-                !4443  FORMAT(A8,11I4,30E12.4)
-                !     ENDIF
               ELSE
 !
           !     MICROPORE DISCHARGE ABOVE WATER TABLE
@@ -3981,26 +3925,16 @@ module WatsubMod
 !
                 IF(IFLGU.EQ.0.AND.test_aneb(RCHGFT,0._r8))THEN
                   PSISWD=XN*0.005*SLOPE(N,N2,N1)*DLYR(N,N3,N2,N1) &
-                    *(1.0-DTBLG(N2,N1))
+                    *(1.0_r8-DTBLG(N2,N1))
                   PSISWT=AMIN1(0.0_r8,-PSISA1(N3,N2,N1)-0.03*PSISO(N3,N2,N1) &
-                    +0.0098*(DPTH(N3,N2,N1)-DTBLX(N2,N1)) &
-                    -0.0098*AMAX1(0.0_r8,DPTH(N3,N2,N1)-DPTHT(N2,N1)))
-                  IF(PSISWT.LT.0.0)PSISWT=PSISWT-PSISWD
+                    +0.0098_r8*(DPTH(N3,N2,N1)-DTBLX(N2,N1)) &
+                    -0.0098_r8*AMAX1(0.0_r8,DPTH(N3,N2,N1)-DPTHT(N2,N1)))
+                  IF(PSISWT.LT.0.0_r8)PSISWT=PSISWT-PSISWD
                   FLWT=PSISWT*HCND(N,1,N3,N2,N1)*AREA(N,N3,N2,N1) &
-                    *(1.0-AREAU(N3,N2,N1))/(RCHGFU+1.0)*RCHGFT*XNPH
+                    *(1.0_r8-AREAU(N3,N2,N1))/(RCHGFU+1.0)*RCHGFT*XNPH
                   FLWL(N,M6,M5,M4)=XN*FLWT
-                  if(abs(FLWL(N,M6,M5,M4))>1.e20)then
-                    write(*,*)'XN*FLWT=',XN,FLWT
-                    write(*,*)'at line',__LINE__
-                    call endrun(trim(mod_filename)//'at line',__LINE__)
-                  endif
                   FLWLX(N,M6,M5,M4)=XN*FLWT
                   HFLWL(N,M6,M5,M4)=cpw*TK1(N3,N2,N1)*XN*FLWT
-                  if(HFLWL(N,M6,M5,M4)<-1.e10_r8)then
-                    write(*,*)'cpw*TK1(N3,N2,N1)*XN*FLWT',cpw,TK1(N3,N2,N1),FLWT
-                    call endrun(trim(mod_filename)//' at line',__LINE__)
-                  endif
-
                 ELSE
                   FLWL(N,M6,M5,M4)=0.0
                   FLWLX(N,M6,M5,M4)=0.0
@@ -4029,26 +3963,17 @@ module WatsubMod
                 IF(IFLGUH.EQ.0.AND.test_aneb(RCHGFT,0._r8) &
                   .AND.VOLAH1(N3,N2,N1).GT.ZEROS2(N2,N1))THEN
                   PSISWD=XN*0.005*SLOPE(N,N2,N1)*DLYR(N,N3,N2,N1) &
-                    *(1.0-DTBLG(N2,N1))
+                    *(1.0_r8-DTBLG(N2,N1))
                   PSISWTH=-0.03*PSISO(N3,N2,N1) &
-                    +0.0098*(DPTHH-DTBLX(N2,N1)) &
-                    -0.0098*AMAX1(0.0_r8,DPTHH-DPTHT(N2,N1))
-                  IF(PSISWTH.LT.0.0)PSISWTH=PSISWTH-PSISWD
+                    +0.0098_r8*(DPTHH-DTBLX(N2,N1)) &
+                    -0.0098_r8*AMAX1(0.0_r8,DPTHH-DPTHT(N2,N1))
+                  IF(PSISWTH.LT.0.0_r8)PSISWTH=PSISWTH-PSISWD
                   FLWTH=PSISWTH*CNDH1(N3,N2,N1)*AREA(N,N3,N2,N1) &
-                    *(1.0-AREAU(N3,N2,N1))/(RCHGFU+1.0)*RCHGFT*XNPH
+                    *(1.0_r8-AREAU(N3,N2,N1))/(RCHGFU+1.0)*RCHGFT*XNPH
                   FLWTHL=AMAX1(FLWTH,AMIN1(0.0_r8,-(VOLWH1(N3,N2,N1)*XNPX &
                     +FLWHL(3,N3,N2,N1)-FLWHL(3,N3+1,N2,N1))))
                   FLWHL(N,M6,M5,M4)=XN*FLWTHL
                   HFLWL(N,M6,M5,M4)=HFLWL(N,M6,M5,M4)+cpw*TK1(N3,N2,N1)*XN*FLWTHL
-                  if(HFLWL(N,M6,M5,M4)<-1.e10_r8)then
-                    write(*,*)'cpw*TK1(N3,N2,N1)*XN*FLWTHL',TK1(N3,N2,N1),FLWTHL
-                    call endrun(trim(mod_filename)//' at line',__LINE__)
-                  endif
-                    !     WRITE(*,4446)'DISCHMA',I,J,M,N1,N2,N3,M4,M5,M6,N,NN,IFLGUH
-                    !    2,XN,FLWHL(N,M6,M5,M4),FLWTHL,FLWTH,PSISWTH,CNDH1(N3,N2,N1)
-                    !    3,DPTH(N3,N2,N1),DLYR(3,N3,N2,N1),DPTHH,VOLWH1(N3,N2,N1)
-                    !    4,VOLIH1(L,NY,NX),VOLAH1(N3,N2,N1),DTBLX(N2,N1),PSISWD
-                    !4446  FORMAT(A8,12I4,30E14.6)
                 ELSE
                   FLWHL(N,M6,M5,M4)=0.0
                 ENDIF
@@ -4072,25 +3997,16 @@ module WatsubMod
 !
                 IF(IFLGD.EQ.0.AND.test_aneb(RCHGFT,0._r8))THEN
                   PSISWD=XN*0.005*SLOPE(N,N2,N1)*DLYR(N,N3,N2,N1) &
-                    *(1.0-DTBLG(N2,N1))
+                    *(1.0_r8-DTBLG(N2,N1))
                   PSISWT=AMIN1(0.0_r8,-PSISA1(N3,N2,N1)-0.03*PSISO(N3,N2,N1) &
-                    +0.0098*(DPTH(N3,N2,N1)-DTBLY(N2,N1)) &
-                    -0.0098*AMAX1(0.0_r8,DPTH(N3,N2,N1)-DPTHT(N2,N1)))
-                  IF(PSISWT.LT.0.0)PSISWT=PSISWT-PSISWD
+                    +0.0098_r8*(DPTH(N3,N2,N1)-DTBLY(N2,N1)) &
+                    -0.0098_r8*AMAX1(0.0_r8,DPTH(N3,N2,N1)-DPTHT(N2,N1)))
+                  IF(PSISWT.LT.0.0_r8)PSISWT=PSISWT-PSISWD
                   FLWT=PSISWT*HCND(N,1,N3,N2,N1)*AREA(N,N3,N2,N1) &
-                    *(1.0-AREAUD(N3,N2,N1))/(RCHGFU+1.0)*RCHGFT*XNPH
+                    *(1.0_r8-AREAUD(N3,N2,N1))/(RCHGFU+1.0)*RCHGFT*XNPH
                   FLWL(N,M6,M5,M4)=FLWL(N,M6,M5,M4)+XN*FLWT
-                  if(abs(FLWL(N,M6,M5,M4))>1.e20)then
-                    write(*,*)'aXN*FLWT=',XN,FLWT
-                    write(*,*)'at line',__LINE__
-                    call endrun(trim(mod_filename)//'at line',__LINE__)
-                  endif
                   FLWLX(N,M6,M5,M4)=FLWLX(N,M6,M5,M4)+XN*FLWT
                   HFLWL(N,M6,M5,M4)=HFLWL(N,M6,M5,M4)+cpw*TK1(N3,N2,N1)*XN*FLWT
-                  if(HFLWL(N,M6,M5,M4)<-1.e10)then
-                    write(*,*)'cpw*TK1(N3,N2,N1)*XN*FLWT',TK1(N3,N2,N1),FLWT
-                    call endrun(trim(mod_filename)//' at line',__LINE__)
-                  endif
                 ENDIF
             !
             !     MACROPORE DISCHARGE ABOVE TILE DRAIN
@@ -4114,30 +4030,18 @@ module WatsubMod
 !
                 IF(IFLGDH.EQ.0.AND.test_aneb(RCHGFT,0._r8) &
                   .AND.VOLAH1(N3,N2,N1).GT.ZEROS2(N2,N1))THEN
-                  PSISWD=XN*0.005*SLOPE(N,N2,N1)*DLYR(N,N3,N2,N1) &
-                    *(1.0-DTBLG(N2,N1))
-                  PSISWTH=-0.03*PSISO(N3,N2,N1) &
-                    +0.0098*(DPTHH-DTBLY(N2,N1)) &
-                    -0.0098*AMAX1(0.0_r8,DPTHH-DPTHT(N2,N1))
-                  IF(PSISWTH.LT.0.0)PSISWTH=PSISWTH-PSISWD
+                  PSISWD=XN*0.005_r8*SLOPE(N,N2,N1)*DLYR(N,N3,N2,N1) &
+                    *(1.0_r8-DTBLG(N2,N1))
+                  PSISWTH=-0.03_r8*PSISO(N3,N2,N1) &
+                    +0.0098_r8*(DPTHH-DTBLY(N2,N1)) &
+                    -0.0098_r8*AMAX1(0.0_r8,DPTHH-DPTHT(N2,N1))
+                  IF(PSISWTH.LT.0.0_r8)PSISWTH=PSISWTH-PSISWD
                   FLWTH=PSISWTH*CNDH1(N3,N2,N1)*AREA(N,N3,N2,N1) &
-                    *(1.0-AREAUD(N3,N2,N1))/(RCHGFU+1.0)*RCHGFT*XNPH
-                  FLWTHL=AMAX1(FLWTH,AMIN1(0.0 &
+                    *(1.0_r8-AREAUD(N3,N2,N1))/(RCHGFU+1.0_r8)*RCHGFT*XNPH
+                  FLWTHL=AMAX1(FLWTH,AMIN1(0.0_r8 &
                     ,-(VOLWH1(N3,N2,N1)*XNPX+FLWHL(3,N3,N2,N1)-FLWHL(3,N3+1,N2,N1))))
                   FLWHL(N,M6,M5,M4)=FLWHL(N,M6,M5,M4)+XN*FLWTHL
                   HFLWL(N,M6,M5,M4)=HFLWL(N,M6,M5,M4)+cpw*TK1(N3,N2,N1)*XN*FLWTHL
-                  if(HFLWL(N,M6,M5,M4)<-1.e10_r8)then
-                    write(*,*)'cpw*TK1(N3,N2,N1)*XN*FLWTHL',TK1(N3,N2,N1),FLWTHL
-                    call endrun(trim(mod_filename)//' at line',__LINE__)
-                  endif
-                  !     IF((I/10)*10.EQ.I.AND.J.EQ.15)THEN
-            !     WRITE(*,4446)'DISCHDH',I,J,M,N1,N2,N3,M4,M5,M6,N,NN,IFLGDH
-            !    2,XN,FLWHL(N,M6,M5,M4),FLWTHL,FLWTH,PSISWTH,CNDH1(N3,N2,N1)
-            !    3,DPTH(N3,N2,N1),DLYR(3,N3,N2,N1),DPTHH,VOLWH1(N3,N2,N1)
-            !    4,VOLIH1(L,NY,NX),VOLAH1(N3,N2,N1),DTBLY(N2,N1),PSISWD
-            !    2,0.0098*(DPTHH-DTBLY(N2,N1))
-            !    3,0.0098*AMAX1(0.0_r8,DPTHH-DPTHT(N2,N1))
-            !     ENDIF
                 ENDIF
 !
             !     MICROPORE RECHARGE BELOW WATER TABLE
@@ -4163,13 +4067,13 @@ module WatsubMod
                   .AND.DPTHA(N2,N1).GT.DTBLX(N2,N1) &
                   .AND.DPTH(N3,N2,N1).LT.DPTHA(N2,N1) &
                   .AND.(VOLP2.GT.ZEROS2(N2,N1).OR.BKDS(N3,N2,N1).LE.ZERO) &
-                  .AND.VOLP1Z(N3,N2,N1).GT.0.0 &
+                  .AND.VOLP1Z(N3,N2,N1).GT.0.0_r8 &
                   .AND.test_aneb(RCHGFT,0._r8))THEN
-                  PSISWD=XN*0.005*SLOPE(N,N2,N1)*DLYR(N,N3,N2,N1) &
-                    *(1.0-DTBLG(N2,N1))
+                  PSISWD=XN*0.005_r8*SLOPE(N,N2,N1)*DLYR(N,N3,N2,N1) &
+                    *(1.0_r8-DTBLG(N2,N1))
                   PSISUT=AMAX1(0.0_r8,-PSISA1(N3,N2,N1)-0.03*PSISO(N3,N2,N1) &
-                    +0.0098*(DPTH(N3,N2,N1)-DTBLX(N2,N1)))
-                  IF(PSISUT.GT.0.0)PSISUT=PSISUT+PSISWD
+                    +0.0098_r8*(DPTH(N3,N2,N1)-DTBLX(N2,N1)))
+                  IF(PSISUT.GT.0.0_r8)PSISUT=PSISUT+PSISWD
                   FLWU=PSISUT*HCND(N,1,N3,N2,N1)*AREA(N,N3,N2,N1) &
                     *AREAU(N3,N2,N1)/(RCHGFU+1.0)*RCHGFT*XNPH
                   IF(BKDS(N3,N2,N1).GT.ZERO)THEN
@@ -4180,17 +4084,8 @@ module WatsubMod
                     FLWUX=FLWU
                   ENDIF
                   FLWL(N,M6,M5,M4)=FLWL(N,M6,M5,M4)+XN*FLWUL
-                  if(abs(FLWL(N,M6,M5,M4))>1.e20_r8)then
-                    write(*,*)'bXN*FLWUL=',XN,FLWUL
-                    write(*,*)'at line',__LINE__
-                    call endrun(trim(mod_filename)//'at line',__LINE__)
-                  endif
                   FLWLX(N,M6,M5,M4)=FLWLX(N,M6,M5,M4)+XN*FLWUX
                   HFLWL(N,M6,M5,M4)=HFLWL(N,M6,M5,M4)+cpw*TK1(N3,N2,N1)*XN*FLWUL
-                  if(HFLWL(N,M6,M5,M4)<-1.e10)then
-                    write(*,*)'cpw*TK1(N3,N2,N1)*XN*FLWUL',TK1(N3,N2,N1),FLWUL
-                    call endrun(trim(mod_filename)//' at line',__LINE__)
-                  endif
                   VOLP2=VOLP2-XN*FLWL(N,M6,M5,M4)
                   VOLPX2=VOLPX2-XN*FLWLX(N,M6,M5,M4)
                 ENDIF
@@ -4219,29 +4114,14 @@ module WatsubMod
                   .AND.VOLPH2.GT.ZEROS2(NY,NX) &
                   .AND.test_aneb(RCHGFT,0.0_r8))THEN
                   PSISWD=XN*0.005*SLOPE(N,N2,N1)*DLYR(N,N3,N2,N1) &
-                    *(1.0-DTBLG(N2,N1))
-                  PSISUTH=-0.03*PSISO(N3,N2,N1) &
-                    +0.0098*(DPTHH-DTBLX(N2,N1))
-                  IF(PSISUTH.GT.0.0)PSISUTH=PSISUTH+PSISWD
+                    *(1.0_r8-DTBLG(N2,N1))
+                  PSISUTH=-0.03_r8*PSISO(N3,N2,N1)+0.0098_r8*(DPTHH-DTBLX(N2,N1))
+                  IF(PSISUTH.GT.0.0_r8)PSISUTH=PSISUTH+PSISWD
                   FLWUH=PSISUTH*CNDH1(N3,N2,N1)*AREA(N,N3,N2,N1) &
                     *AREAU(N3,N2,N1)/(RCHGFU+1.0)*RCHGFT*XNPH
                   FLWUHL=AMIN1(FLWUH,VOLPH2*XNPX)
                   FLWHL(N,M6,M5,M4)=FLWHL(N,M6,M5,M4)+XN*FLWUHL
                   HFLWL(N,M6,M5,M4)=HFLWL(N,M6,M5,M4)+cpw*TK1(N3,N2,N1)*XN*FLWUHL
-                  if(HFLWL(N,M6,M5,M4)<-1.e10_r8)then
-                    write(*,*)'cpw*TK1(N3,N2,N1)*XN*FLWUHL',TK1(N3,N2,N1),FLWUHL
-                    call endrun(trim(mod_filename)//' at line',__LINE__)
-                  endif
-                !     IF(M6.EQ.7)THEN
-                !     WRITE(*,4447)'RECHGMA',I,J,M,N1,N2,N3,M4,M5,M6,N,NN,IFLGU
-                !    2,XN,FLWHL(N,M6,M5,M4),FLWUH,FLWUHL,DPTHH,PSISUTH,VOLPH2
-                !    3,CNDH1(N3,N2,N1),DTBLX(N2,N1),CDPTH(N3,N2,N1),DPTHT(N2,N1)
-                !    6,DTBLD(N2,N1),DPTH(N3,N2,N1),VOLWH1(N3,N2,N1),VOLPH1(N3,N2,N1)
-                !    8,FLWHL(3,N3,N2,N1),FLWHL(3,N3+1,N2,N1),RCHGFU,AREA(N,N3,N2,N1)
-                !    9,DLYR(N,N3,N2,N1),DLYR(3,N3,N2,N1),PSISWD
-                !    1,SLOPE(N,N2,N1),AREAU(N3,N2,N1)
-                !4447  FORMAT(A8,12I4,40E14.6)
-                !     ENDIF
                   VOLPH2=VOLPH2-XN*FLWHL(N,M6,M5,M4)
                 ENDIF
               ENDIF
@@ -4329,24 +4209,9 @@ module WatsubMod
 !1201      CONTINUE
           IF(VOLX(N3,N2,N1).GT.ZEROS2(N2,N1))THEN
             TFLWL(N3,N2,N1)=TFLWL(N3,N2,N1)+FLWL(N,N3,N2,N1)-FLWL(N,N6,N5,N4)
-            if(abs(TFLWL(N3,N2,N1))>1.e20_r8)then
-              write(*,*)'TFLWL(N3,N2,N1)=',TFLWL(N3,N2,N1)
-              write(*,*)'FLWL(N,N3,N2,N1)=',FLWL(N,N3,N2,N1),FLWL(N,N6,N5,N4)
-              write(*,*)'N3,n2,n1',n,n3,n2,n1
-              write(*,*)'at line',__LINE__
-              call endrun(trim(mod_filename)//'at line',__LINE__)
-            endif
             TFLWLX(N3,N2,N1)=TFLWLX(N3,N2,N1)+FLWLX(N,N3,N2,N1)-FLWLX(N,N6,N5,N4)
             TFLWHL(N3,N2,N1)=TFLWHL(N3,N2,N1)+FLWHL(N,N3,N2,N1)-FLWHL(N,N6,N5,N4)
             THFLWL(N3,N2,N1)=THFLWL(N3,N2,N1)+HFLWL(N,N3,N2,N1)-HFLWL(N,N6,N5,N4)
-    !     IF(N3.EQ.1)THEN
-    !     WRITE(*,3378)'THFLW',I,J,M,N1,N2,N3,N4,N5,N6,N
-    !    2,TFLWL(N3,N2,N1),FLWL(N,N3,N2,N1),FLWL(N,N6,N5,N4)
-    !    2,THFLWL(N3,N2,N1),HFLWL(N,N3,N2,N1),HFLWL(N,N6,N5,N4)
-    !    2,FLW(N,N3,N2,N1),FLW(N,N6,N5,N4)
-    !    2,HFLW(N,N3,N2,N1),HFLW(N,N6,N5,N4)
-    !3378  FORMAT(A8,10I4,20E14.6)
-    !     ENDIF
           ELSE
             TFLWL(N3,N2,N1)=0.0
             TFLWLX(N3,N2,N1)=0.0
@@ -4376,7 +4241,7 @@ module WatsubMod
         VOLP1X=AMAX1(0.0_r8,VOLA1(N3,N2,N1)-VOLW1X-VOLI1(N3,N2,N1))
         VOLWH1X=VOLWH1(N3,N2,N1)+TFLWHL(N3,N2,N1)
         VOLPH1X=AMAX1(0.0_r8,VOLAH1(N3,N2,N1)-VOLWH1X-VOLIH1(N3,N2,N1))
-        IF(FINHX.GT.0.0)THEN
+        IF(FINHX.GT.0.0_r8)THEN
           FINHL(N3,N2,N1)=AMAX1(0.0_r8,AMIN1(FINHX,VOLWH1X,VOLP1X))
         ELSE
           FINHL(N3,N2,N1)=AMIN1(0.0_r8,AMAX1(FINHX,-VOLPH1X,-VOLW1X))
@@ -4420,7 +4285,7 @@ module WatsubMod
           .AND.VOLI1(N3,N2,N1).GT.ZERO*VOLT(N3,N2,N1)))THEN
           VHCP1AX=VHCM(N3,N2,N1)+cpw*VOLW1X+cpi*VOLI1(N3,N2,N1)
           TFLX1=VHCP1AX*(TFREEZ-TK1X)/((1.0+6.2913E-03*TFREEZ) &
-            *(1.0-0.10*PSISMX))*XNPX
+            *(1.0_r8-0.10*PSISMX))*XNPX
           IF(TFLX1.LT.0.0_r8)THEN
             TFLX=AMAX1(-333.0*DENSI*VOLI1(N3,N2,N1)*XNPX,TFLX1)
           ELSE
@@ -4813,27 +4678,17 @@ module WatsubMod
       IF(BKDS(NUM(NY,NX),NY,NX).LE.ZERO.AND.&
         VHCP1(NUM(NY,NX),NY,NX).LE.VHCPNX(NY,NX))THEN
         NUX=NUM(NY,NX)
-        DO 9970 LL=NUX+1,NL(NY,NX)
+        DO  LL=NUX+1,NL(NY,NX)
           IF(VOLX(LL,NY,NX).GT.ZEROS2(NY,NX))THEN
             NUM(NY,NX)=LL
             FLWNX(NY,NX)=FLW(3,NUM(NY,NX),NY,NX)
             FLWXNX(NY,NX)=FLWX(3,NUM(NY,NX),NY,NX)
             FLWHNX(NY,NX)=FLWH(3,NUM(NY,NX),NY,NX)
             HFLWNX(NY,NX)=HFLW(3,NUM(NY,NX),NY,NX)
-            ! WRITE(*,5598)'SURFM',I,J,M,NX,NY,LL,NUX,NUM(NY,NX)
-            ! 2,FLWNX(NY,NX)
-            ! 2,VOLW1(NUX,NY,NX),VOLW1(NUM(NY,NX),NY,NX)
-            ! 2,VHCP1(NUX,NY,NX),VHCP1(NUM(NY,NX),NY,NX)
-            ! 2,TK1(NUX,NY,NX),TK1(NUM(NY,NX),NY,NX)
-            ! 3,FLW(3,NUX,NY,NX),FLW(3,NUM(NY,NX),NY,NX)
-            ! 3,HFLW(3,NUX,NY,NX),HFLW(3,NUM(NY,NX),NY,NX)
-            ! 4,VHCPNX(NY,NX),VHCP1(0,NY,NX)
-            !5598          FORMAT(A8,8I4,20E12.4)
-            GO TO 9971
+            exit
           ENDIF
-9970    CONTINUE
+        ENDDO
       ENDIF
-9971  CONTINUE
 9790  CONTINUE
 9795  CONTINUE
 
@@ -4911,36 +4766,19 @@ module WatsubMod
 !
   THAWR(NY,NX)=THAWR(NY,NX)+WFLXR(NY,NX)
   HTHAWR(NY,NX)=HTHAWR(NY,NX)+TFLXR(NY,NX)
-  FLW(3,NUM(NY,NX),NY,NX)=FLW(3,NUM(NY,NX),NY,NX) &
-    +FLWL(3,NUM(NY,NX),NY,NX)
-  FLWX(3,NUM(NY,NX),NY,NX)=FLWX(3,NUM(NY,NX),NY,NX) &
-    +FLWLX(3,NUM(NY,NX),NY,NX)
-  FLWH(3,NUM(NY,NX),NY,NX)=FLWH(3,NUM(NY,NX),NY,NX) &
-    +FLWHL(3,NUM(NY,NX),NY,NX)
-  HFLW(3,NUM(NY,NX),NY,NX)=HFLW(3,NUM(NY,NX),NY,NX) &
-    +HFLWL(3,NUM(NY,NX),NY,NX)
+  FLW(3,NUM(NY,NX),NY,NX)=FLW(3,NUM(NY,NX),NY,NX)+FLWL(3,NUM(NY,NX),NY,NX)
+  FLWX(3,NUM(NY,NX),NY,NX)=FLWX(3,NUM(NY,NX),NY,NX)+FLWLX(3,NUM(NY,NX),NY,NX)
+  FLWH(3,NUM(NY,NX),NY,NX)=FLWH(3,NUM(NY,NX),NY,NX)+FLWHL(3,NUM(NY,NX),NY,NX)
+  HFLW(3,NUM(NY,NX),NY,NX)=HFLW(3,NUM(NY,NX),NY,NX)+HFLWL(3,NUM(NY,NX),NY,NX)
   FLWR(NY,NX)=FLWR(NY,NX)+FLWRL(NY,NX)
   HFLWR(NY,NX)=HFLWR(NY,NX)+HFLWRL(NY,NX)
-!  if(HFLWR(NY,NX)<-1.4_r8)then
-!    write(*,*)
-!    write(*,*)'******HFLWR(NY,NX)+HFLWRL(NY,NX)',HFLWR(NY,NX),HFLWRL(NY,NX)
-!    call print_info(trim(mod_filename)//' at line',__LINE__)
-!  endif
   HEATI(NY,NX)=HEATI(NY,NX)+RFLXG+RFLXR+RFLXW
   HEATS(NY,NX)=HEATS(NY,NX)+SFLXG+SFLXR+SFLXW
   HEATE(NY,NX)=HEATE(NY,NX)+EFLXG+EFLXR+EFLXW
   HEATV(NY,NX)=HEATV(NY,NX)+VFLXG+VFLXR+VFLXW
   HEATH(NY,NX)=HEATH(NY,NX)+RFLXG+RFLXR+RFLXW &
     +SFLXG+SFLXR+SFLXW+EFLXG+EFLXR+EFLXW+VFLXG+VFLXR+VFLXW
-  TEVAPG(NY,NX)=TEVAPG(NY,NX)+EVAPG(NY,NX)+EVAPR(NY,NX) &
-    +EVAPS(NY,NX)+EVAPW(NY,NX)
-!  if(TEVAPG(NY,NX)/=TEVAPG(NY,NX))then
-!    write(*,*)'EVAPG=',EVAPG(NY,NX)
-!    write(*,*)'EVAPR=',EVAPR(NY,NX)
-!    write(*,*)'EVAPS=',EVAPS(NY,NX)
-!    write(*,*)'EVAPW=',EVAPW(NY,NX)
-!    call endrun(msg='NaN encounterd in '//mod_filename,line=__LINE__)
-!  endif
+  TEVAPG(NY,NX)=TEVAPG(NY,NX)+EVAPG(NY,NX)+EVAPR(NY,NX)+EVAPS(NY,NX)+EVAPW(NY,NX)
   FLWM(M,3,NUM(NY,NX),NY,NX)=FLWL(3,NUM(NY,NX),NY,NX)
   FLWHM(M,3,NUM(NY,NX),NY,NX)=FLWHL(3,NUM(NY,NX),NY,NX)
   end subroutine AccumWaterVaporHeatFluxes
