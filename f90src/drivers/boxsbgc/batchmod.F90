@@ -1006,11 +1006,137 @@ contains
 
   call RunModel_nosalt(forc,micfor,nvars,ystates0l, ystatesfl, err_status)
 
+  call CalcSurflux(forc,micfor, nvars, ystates0l,err_status)
+
   call UpdateStateVars(micfor,micstt,micflx,nvars,ystates0l,ystatesfl)
 !
   call UpdateSOMORGM(micfor,micstt)
   end subroutine RunMicBGC
+! ----------------------------------------------------------------------
+  subroutine CalcSurflux(forc,micfor, nvars, ystates0l,err_status)
+  use ForcTypeMod         , only : forc_type
+  implicit none
+  type(forc_type), intent(in) :: forc
+  type(micforctype), intent(in)    :: micfor
+  integer,  intent(in)  :: nvars
+  real(r8), intent(in)  :: ystates0l(nvars)
+  type(model_status_type), intent(out) :: err_status
 
+  real(r8) :: DFVCOG,DFVCHG,DFVOXG,DFVNGG
+  real(r8) :: DFVN2G,DFVN3G,DFVHGG
+  real(r8) :: VOLWCO,VOLWCH,VOLWOX
+  real(r8) :: VOLWNG,VOLWN2,VOLWN3
+  real(r8) :: VOLWNB,VOLWHG,VOLCOT
+  real(r8) :: VOLCHT,VOLOXT,VOLNGT
+  real(r8) :: VOLN2T,VOLN3T,VOLNBT
+  real(r8) :: VOLHGT
+  real(r8) :: CCO2G2,CCH4G2,COXYG2
+  real(r8) :: CZ2GG2,CZ2OG2,CNH3G2
+  real(r8) :: CH2GG2
+
+  call err_status%reset()
+
+  associate(                   &
+    ZEROS2 =>  micfor%ZEROS2 , &
+    ZEROS  =>  micfor%ZEROS  , &
+    VOLWM  =>  forc%VOLW     , &
+    VOLPM  =>  forc%VOLPM    , &
+    PARG   =>  forc%PARG       &
+  )
+
+  if(VOLWM > micfor%ZEROS2)then
+  ! dissolution/volatilization is computed as the difference between current dissolved concentration and
+  ! the atmospheric equilibrium concentration, with some dissolution rate
+!   between atmosphere and topsoil
+!    CCO2GQ=(PARG*forc%CCO2E*forc%SCO2L+DFGSCO*CCO2S2)/(DFGSCO+PARG)
+!    CCH4GQ=(PARG*forc%CCH4E*forc%SCH4L+DFGSCH*CCH4S2)/(DFGSCH+PARG)
+!    COXYGQ=(PARG*forc%COXYE*forc%SOXYL+DFGSOX*COXYS2)/(DFGSOX+PARG)
+!    CZ2GGQ=(PARG*forc%CZ2GE*forc%SN2GL+DFGSNG*CZ2GS2)/(DFGSNG+PARG)
+!    CZ2OGQ=(PARG*forc%CZ2OE*forc%SN2OL+DFGSN2*CZ2OS2)/(DFGSN2+PARG)
+!    CZN3GQ=(PARG*forc%CNH3E*forc%SNH3L+DFGSN3*CNH3S2)/(DFGSN3+PARG)
+!    CZN3BQ=(PARG*forc%CNH3E*forc%SNH3L+DFGSN3*CNH3B2)/(DFGSN3+PARG)
+!    CH2GGQ=(PARG*forc%CH2GE*forc%SH2GL+DFGSHL*CH2GS2)/(DFGSHL+PARG)
+
+!    RCODFS=(CCO2GQ-CCO2S2)*AMIN1(VOLWM,DFGSCO)
+!    RCHDFS=(CCH4GQ-CCH4S2)*AMIN1(VOLWM,DFGSCH)
+!    ROXDFS=(COXYGQ-COXYS2)*AMIN1(VOLWM,DFGSOX)
+!    RNGDFS=(CZ2GGQ-CZ2GS2)*AMIN1(VOLWM,DFGSNG)
+!    RN2DFS=(CZ2OGQ-CZ2OS2)*AMIN1(VOLWM,DFGSN2)
+!    RN3DFS=(CZN3GQ-CNH3S2)*AMIN1(VOLWM*VLNH4,DFGSN3)
+!    RNBDFS=(CZN3BQ-CNH3B2)*AMIN1(VOLWM*VLNHB,DFGSN3)
+!    RHGDFS=(CH2GGQ-CH2GS2)*AMIN1(VOLWM,DFGSHL)
+
+!    RCODXS=RCODFS*XNPT
+!    RCHDXS=RCHDFS*XNPT
+!    ROXDXS=ROXDFS*XNPT
+!    RNGDXS=RNGDFS*XNPT
+!    RN2DXS=RN2DFS*XNPT
+!    RN3DXS=RN3DFS*XNPT
+!    RNBDXS=RNBDFS*XNPT
+!    RHGDXS=RHGDFS*XNPT
+
+  ! RCODFG
+  ! between gaseous and aqueous phases in soil
+!    VOLPMA=VOLPM*forc%VLNH4
+!    VOLPMB=VOLPM*forc%VLNHB
+!    VOLWCO=VOLWM*forc%SCO2L
+!    VOLWCH=VOLWM*forc%SCH4L
+!    VOLWOX=VOLWM*forc%SOXYL
+!    VOLWNG=VOLWM*forc%SN2GL
+!    VOLWN2=VOLWM*forc%SN2OL
+!    VOLWN3=VOLWMA*forc%SNH3L
+!    VOLWNB=VOLWMB*forc%SNH3L
+!    VOLWHG=VOLWM*forc%SH2GL
+!    VOLCOT=VOLWCO+VOLPM
+!    VOLCHT=VOLWCH+VOLPM
+!    VOLOXT=VOLWOX+VOLPM
+!    VOLNGT=VOLWNG+VOLPM
+!    VOLN2T=VOLWN2+VOLPM
+!    VOLN3T=VOLWN3+VOLPMA
+!    VOLNBT=VOLWNB+VOLPMB
+!    VOLHGT=VOLWHG+VOLPM
+!    RCODFG=DFGS*(AMAX1(ZEROS,CO2G2)*VOLWCO-AMAX1(ZEROS,CO2S2+RCODXS)*VOLPM)/VOLCOT
+!    RCHDFG=DFGS*(AMAX1(ZEROS,CH4G2)*VOLWCH-AMAX1(ZEROS,CH4S2+RCHDXS)*VOLPM)/VOLCHT
+!    ROXDFG=DFGS*(AMAX1(ZEROS,OXYG2)*VOLWOX-AMAX1(ZEROS,OXYS2+ROXDXS)*VOLPM)/VOLOXT
+!    RNGDFG=DFGS*(AMAX1(ZEROS,Z2GG2)*VOLWNG-AMAX1(ZEROS,Z2GS2+RNGDXS)*VOLPM)/VOLNGT
+!    RN2DFG=DFGS*(AMAX1(ZEROS,Z2OG2)*VOLWN2-AMAX1(ZEROS,Z2OS2+RN2DXS)*VOLPM)/VOLN2T
+!    IF(VOLN3T.GT.ZEROS2.AND.VOLWXA.GT.ZEROS2)THEN
+!      RN3DFG=DFGS*(AMAX1(ZEROS,ZN3G2)*VOLWN3-AMAX1(ZEROS,ZNH3S2+RN3DXS)*VOLPMA)/VOLN3T
+!      CNH3S0=AMAX1(0.0_r8,(ZNH3S2+RN3DFG)/VOLWXA)
+!      CNH4S0=AMAX1(0.0_r8,ZNH4S2)/VOLWXA
+    ELSE
+!      RN3DFG=0.0_r8
+    ENDIF
+!    IF(VOLNBT.GT.ZEROS2.AND.VOLWXB.GT.ZEROS2)THEN
+!      RNBDFG=DFGS*(AMAX1(ZEROS,ZN3G2)*VOLWNB-AMAX1(ZEROS,ZNH3B2+RNBDXS)*VOLPMB)/VOLNBT
+!      CNH3B0=AMAX1(0.0_r8,(ZNH3B2+RNBDFG)/VOLWXB)
+!      CNH4B0=AMAX1(0.0_r8,ZNH4B2)/VOLWXB
+!    ELSE
+!      RNBDFG=0.0_r8
+!    ENDIF
+!    RHGDFG=DFGS*(AMAX1(ZEROS,H2GG2)*VOLWHG-AMAX1(ZEROS,H2GS2+RHGDXS)*VOLPM)/VOLHGT
+
+!  endif
+
+  !gaseous flux
+!  CCO2G2=AMAX1(0.0_r8,CO2G2/VOLPM)
+!  CCH4G2=AMAX1(0.0_r8,CH4G2/VOLPM)
+!  COXYG2=AMAX1(0.0_r8,OXYG2/VOLPM)
+!  CZ2GG2=AMAX1(0.0_r8,Z2GG2/VOLPM)
+!  CZ2OG2=AMAX1(0.0_r8,Z2OG2/VOLPM)
+!  CNH3G2=AMAX1(0.0_r8,ZN3G2/VOLPM)
+!  CH2GG2=AMAX1(0.0_r8,H2GG2/VOLPM)
+
+  DFVCOG=forc%DCO2GQ*(forc%CCO2E-CCO2G2)
+  DFVCHG=forc%DCH4GQ*(forc%CCH4E-CCH4G2)
+  DFVOXG=forc%DOXYGQ*(forc%COXYE-COXYG2)
+  DFVNGG=forc%DZ2GGQ*(forc%CZ2GE-CZ2GG2)
+  DFVN2G=forc%DZ2OGQ*(forc%CZ2OE-CZ2OG2)
+  DFVN3G=forc%DNH3GQ*(forc%CNH3E-CNH3G2)
+  DFVHGG=forc%DH2GGQ*(forc%CH2GE-CH2GG2)
+
+  end associate
+  end subroutine CalcSurflux
 ! ----------------------------------------------------------------------
 
   subroutine UpdateSOMORGM(micfor,micstt)

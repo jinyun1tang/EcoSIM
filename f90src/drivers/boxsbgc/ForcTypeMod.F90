@@ -2,6 +2,7 @@ module ForcTypeMod
   use data_kind_mod     , only : r8 => SHR_KIND_R8
   use EcoSimConst
   use TracerPropMod
+  use EcoSIMSolverPar
   use ChemTracerParsMod
   use MiniFuncMod
 implicit none
@@ -13,6 +14,7 @@ implicit none
 !===============================================================================
 !primary variables
     real(r8) :: DLYR3       !soil layer thickness
+    real(r8) :: AREA3       !cross section area
     real(r8) :: CEC         !
     real(r8) :: XCEC        !a variable derived from CEC and CNH4
     real(r8) :: AEC         !
@@ -87,6 +89,15 @@ implicit none
     real(r8) :: THETW        !volumetric water content [m3 m-3]
 !===============================================================================
 !  derived variables
+    real(r8) :: PARG
+    real(r8) :: DCO2GQ
+    real(r8) :: DCH4GQ
+    real(r8) :: DOXYGQ
+    real(r8) :: DZ2GGQ
+    real(r8) :: DZ2OGQ
+    real(r8) :: DNH3GQ
+    real(r8) :: DH2GGQ
+
     real(r8) :: OFFSET      !offset for calculating temperature in Arrhenius curves, [oC]
 
     real(r8) :: THETY       !air-dry water content, [m3 m-3]
@@ -109,6 +120,14 @@ implicit none
     real(r8) :: ZNSGL       !aqueous NH3 diffusivity, [m2 h-1]
     real(r8) :: ZVSGL       !aqueous N2O diffusivity, [m2 h-1]
     real(r8) :: HLSGL       !aqueous H2 diffusivity, [m2 h-1]
+
+    real(r8) :: CGSGL       !gaseous CO2 diffusivity
+    real(r8) :: CHSGL       !gaseous CH4 diffusivity
+    real(r8) :: OGSGL       !gaseous O2 diffusivity
+    real(r8) :: ZGSGL       !gaseous N2 diffusivity
+    real(r8) :: Z2SGL       !gaseous N2O diffusivity
+    real(r8) :: ZHSGL       !gaseous NH3 diffusivity
+    real(r8) :: HGSGL       !gaseous H2 diffusivity
 
     real(r8) :: CO2E                      !initial atmospheric CO2 concentration, [umol mol-1]
     real(r8) :: OXYE                       !atmospheric O2 concentration, [umol mol-1]
@@ -163,11 +182,11 @@ implicit none
     real(r8) :: CH4S      !aqueous CO2  micropore	[g d-2]
     real(r8) :: SCH4L     !solubility of CH4, [m3 m-3]
     real(r8) :: SOXYL     !solubility of O2, [m3 m-3]
-    real(r8) :: SCO2L
-    real(r8) :: SN2GL
-    real(r8) :: SN2OL
-    real(r8) :: SNH3L
-    real(r8) :: SH2GL
+    real(r8) :: SCO2L     !solubility of CO2, [m3 m-3]
+    real(r8) :: SN2GL     !solubility of N2, [m3 m-3]
+    real(r8) :: SN2OL     !solubility of N2O, [m3 m-3]
+    real(r8) :: SNH3L     !solubility of NH3, [m3 m-3]
+    real(r8) :: SH2GL     !solubility of H2, [m3 m-3]
     real(r8) :: ZNFN0     !initial nitrification inhibition activity
     real(r8) :: ZNFNI     !current nitrification inhibition activity
 
@@ -313,7 +332,7 @@ implicit none
   forc%ZNFN0=0._r8
   forc%ZNFNI=0._r8
   forc%VOLA=forc%POROS*forc%VOLY
-
+  forc%AREA3=1._r8
   forc%CNH4B=0._r8       !NH4 concentration band micropore	[g m-3], derived from ZNH4B
   forc%ZNH4B=0._r8       !NH4 band micropore, [g d-2]
   forc%CNO3B=0._r8       !NO3 concentration band micropore	[g m-3], derived from ZNO3B
@@ -340,6 +359,26 @@ implicit none
 
   real(r8) :: FCL, WPL,PSL,FCD,PSD
   real(r8) :: scalar, Z3S, TCS
+  real(r8) :: TFACG
+  real(r8) :: DFLG2
+  real(r8) :: PARG
+  real(r8) :: PARGCO
+  real(r8) :: PARGCH
+  real(r8) :: PARGOX
+  real(r8) :: PARGNG
+  real(r8) :: PARGN2
+  real(r8) :: PARGN3
+  real(r8) :: PARGH2
+
+  real(r8) :: DCO2G
+  real(r8) :: DCH4G
+  real(r8) :: DOXYG
+  real(r8) :: DZ2GG
+  real(r8) :: DZ2OG
+  real(r8) :: DNH3G
+  real(r8) :: DH2GG
+  real(r8) :: PARGM
+
   real(r8), parameter :: DTHETW=1.0E-06_r8
   real(r8), parameter :: XNPD=20._r8
   !since the model if configured for incubation
@@ -378,20 +417,17 @@ implicit none
   endif
 
   if(first .or. forctype ==0 .or. forctype==2)then
-    !variable temperature
-    forc%TFND=TEFAQUDIF(TKS)
-    forc%OLSGL=OLSG*forc%TFND
-    forc%CLSGL=CLSG*forc%TFND       !aqueous CO2 diffusivity	[m2 h-1]
-    forc%CQSGL=CQSG*forc%TFND       !aqueous CH4 diffusivity	m2 h-1
-    forc%ZLSGL=ZLSG*forc%TFND       !aqueous N2 diffusivity, [m2 h-1]
-    forc%ZNSGL=ZNSG*forc%TFND       !aqueous NH3 diffusivity, [m2 h-1]
-    forc%ZVSGL=ZVSG*forc%TFND       !aqueous N2O diffusivity, [m2 h-1]
-    forc%HLSGL=HLSG*forc%TFND       !aqueous H2 diffusivity, [m2 h-1]
-
 
     TCS=TKS-TC2K
     forc%SCH4L=gas_solubility(id_ch4g,TCS)
     forc%SOXYL=gas_solubility(id_o2g, TCS)
+    forc%SCO2L=gas_solubility(id_co2g, TCS)     !solubility of CO2, [m3 m-3]
+    forc%SN2GL=gas_solubility(id_n2g, TCS)      !solubility of N2, [m3 m-3]
+    forc%SN2OL=gas_solubility(id_n2og, TCS)     !solubility of N2O, [m3 m-3]
+    forc%SNH3L=gas_solubility(id_nh3g, TCS)     !solubility of NH3, [m3 m-3]
+    forc%SH2GL=gas_solubility(id_h2g, TCS)       !solubility of H2, [m3 m-3]
+
+
     forc%CCO2E=forc%CO2E*5.36E-04_r8*Tref/TKS    ![gC/m3]
     forc%CCH4E=forc%CH4E*5.36E-04_r8*Tref/TKS    ![gC/m3]
     forc%COXYE=forc%OXYE*1.43E-03_r8*Tref/TKS    ![gO/m3]
@@ -399,12 +435,62 @@ implicit none
     forc%CZ2OE=forc%Z2OE*1.25E-03_r8*Tref/TKS    ![gN/m3]
     forc%CNH3E=forc%ZNH3E*6.25E-04_r8*Tref/TKS   ![gN/m3]
     forc%CH2GE=forc%H2GE*8.92E-05_r8*Tref/TKS    ![gH/m3]
+
+    !variable temperature
+    forc%TFND=TEFAQUDIF(TKS)
+    forc%OLSGL=OLSG*forc%TFND       !aqueous O2 diffusivity [m2 h-1]
+    forc%CLSGL=CLSG*forc%TFND       !aqueous CO2 diffusivity	[m2 h-1]
+    forc%CQSGL=CQSG*forc%TFND       !aqueous CH4 diffusivity	m2 h-1
+    forc%ZLSGL=ZLSG*forc%TFND       !aqueous N2 diffusivity, [m2 h-1]
+    forc%ZNSGL=ZNSG*forc%TFND       !aqueous NH3 diffusivity, [m2 h-1]
+    forc%ZVSGL=ZVSG*forc%TFND       !aqueous N2O diffusivity, [m2 h-1]
+    forc%HLSGL=HLSG*forc%TFND       !aqueous H2 diffusivity, [m2 h-1]
+
   endif
 
   if (first .or. forctype <=2)then
     Z3S=forc%FC/forc%POROS
     scalar=forc%TFND*XNPD
     forc%DFGS=fDFGS(scalar,THETW,Z3S)
+
+    DFLG2=2.0_r8*AMAX1(0.0_r8,forc%THETPM)*POROQ &
+      *forc%THETPM/forc%POROS*forc%AREA3/forc%DLYR3
+    TFACG=TEFGASDIF(forc%TKS)
+    forc%CGSGL=CGSG*TFACG*DFLG2
+    forc%CHSGL=CHSG*TFACG*DFLG2
+    forc%OGSGL=OGSG*TFACG*DFLG2
+    forc%ZGSGL=ZGSG*TFACG*DFLG2
+    forc%Z2SGL=Z2SG*TFACG*DFLG2
+    forc%ZHSGL=ZHSG*TFACG*DFLG2
+    forc%HGSGL=HGSG*TFACG*DFLG2
+
+    PARGM=forc%AREA3*XNPH/(0.0139_r8+1.39E-03_r8)*XNPT
+    !GASEOUS BOUNDARY LAYER CONDUCTANCES
+    PARGCO=PARGM*0.74_r8
+    PARGCH=PARGM*1.04_r8
+    PARGOX=PARGM*0.83_r8
+    PARGNG=PARGM*0.86_r8
+    PARGN2=PARGM*0.74_r8
+    PARGN3=PARGM*1.02_r8
+    PARGH2=PARGM*2.08_r8
+
+    DCO2G=forc%CGSGL*XNPG
+    DCH4G=forc%CHSGL*XNPG
+    DOXYG=forc%OGSGL*XNPG
+    DZ2GG=forc%ZGSGL*XNPG
+    DZ2OG=forc%Z2SGL*XNPG
+    DNH3G=forc%ZHSGL*XNPG
+    DH2GG=forc%HGSGL*XNPG
+
+
+    forc%DCO2GQ=DCO2G*PARGCO/(DCO2G+PARGCO)
+    forc%DCH4GQ=DCH4G*PARGCH/(DCH4G+PARGCH)
+    forc%DOXYGQ=DOXYG*PARGOX/(DOXYG+PARGOX)
+    forc%DZ2GGQ=DZ2GG*PARGNG/(DZ2GG+PARGNG)
+    forc%DZ2OGQ=DZ2OG*PARGN2/(DZ2OG+PARGN2)
+    forc%DNH3GQ=DNH3G*PARGN3/(DNH3G+PARGN3)
+    forc%DH2GGQ=DH2GG*PARGH2/(DH2GG+PARGH2)
+
   endif
 
   forc%ROXYY=0._r8

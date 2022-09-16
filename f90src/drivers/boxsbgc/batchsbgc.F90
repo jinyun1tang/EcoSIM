@@ -135,7 +135,7 @@ end program main
 
 ! set up solver
 
-  NPH=1;NPG=5;XNPG=1.0_r8/NPG
+  NPH=1;NPT=5;NPG=NPT*NPH;XNPG=1.0_r8/NPG;XNPH=1._r8/NPH;XNPT=1.0_r8/NPT
 
   ncols=1
 !!============================================================

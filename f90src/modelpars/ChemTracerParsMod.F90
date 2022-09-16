@@ -31,7 +31,7 @@ module ChemTracerParsMod
   real(r8), parameter :: ZLSG=7.34E-06_r8  !aqueous N2 diffusivity	m2 h-1
   real(r8), parameter :: Z2SG=5.57E-02_r8  !gaseous N2O diffusivity	m2 h-1
   real(r8), parameter :: ZVSG=5.72E-06_r8  !aqueous N2O diffusivity	m2 h-1
-  real(r8), parameter :: ZHSG=6.67E-02_r8  !aqueous NH4 diffusivity	m2 h-1
+  real(r8), parameter :: ZHSG=6.67E-02_r8  !gaseous NH3 diffusivity	m2 h-1
   real(r8), parameter :: ZNSG=4.00E-06_r8  !aqueous NH3 diffusivity	m2 h-1
   real(r8), parameter :: ZOSG=6.00E-06_r8  !aqueous NO3 diffusivity	m2 h-1
   real(r8), parameter :: POSG=3.00E-06_r8  !aqueous PO4 diffusivity	m2 h-1

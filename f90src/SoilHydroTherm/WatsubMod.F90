@@ -596,8 +596,7 @@ module WatsubMod
 !     AREA=surface area of grid cell
 !
       ALFZ=2.0_r8*(1.0_r8-FRADG(NY,NX))
-      IF(RAB(NY,NX).GT.ZERO.AND.ZT(NY,NX).GT.ZS(NY,NX) &
-        .AND.ALFZ.GT.ZERO)THEN
+      IF(RAB(NY,NX).GT.ZERO.AND.ZT(NY,NX).GT.ZS(NY,NX).AND.ALFZ.GT.ZERO)THEN
         RAC(NY,NX)=AMIN1(RACX,AMAX1(0.0_r8,ZT(NY,NX)*EXP(ALFZ) &
           /(ALFZ/RAB(NY,NX))*AMAX1(0.0_r8,EXP(-ALFZ*ZS(NY,NX)/ZT(NY,NX)) &
           -EXP(-ALFZ*(ZD(NY,NX)+ZR(NY,NX))/ZT(NY,NX)))))
