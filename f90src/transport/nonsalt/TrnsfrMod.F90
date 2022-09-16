@@ -136,7 +136,6 @@ module TrnsfrMod
 
   call InitFluxandStateVariables(I,NHW,NHE,NVN,NVS)
 
-
 !
 ! TIME STEP USED IN GAS AND SOLUTE FLUX CALCULATIONS
 ! NPH=no. of cycles per hour for water, heat and solute flux calculations
@@ -146,7 +145,7 @@ module TrnsfrMod
   DO  MM=1,NPG
     M=MIN(NPH,INT((MM-1)*XNPT)+1)
 
-    call ModelSoluteHydroFlux(M,MX,NHW, NHE, NVN, NVS)
+    call ModelTracerHydroFlux(M,MX,NHW, NHE, NVN, NVS)
 !
 !     BOUNDARY SOLUTE AND GAS FLUXES
 !

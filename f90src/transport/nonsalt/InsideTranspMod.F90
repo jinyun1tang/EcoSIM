@@ -39,7 +39,7 @@ module InsideTranspMod
   real(r8),allocatable :: COQAH1(:)
   real(r8),allocatable :: COQAH2(:)
 
-  public :: ModelSoluteHydroFlux
+  public :: ModelTracerHydroFlux
   public :: InitInsTp
   public :: DestructInsTp
   contains
@@ -119,7 +119,7 @@ module InsideTranspMod
   end subroutine DestructInsTp
 !------------------------------------------------------------------------------------------
 
-  subroutine ModelSoluteHydroFlux(M,MX, NHW, NHE, NVN, NVS)
+  subroutine ModelTracerHydroFlux(M,MX, NHW, NHE, NVN, NVS)
   implicit none
 
   integer, intent(in) :: M,MX, NHW, NHE, NVN, NVS
@@ -154,7 +154,7 @@ module InsideTranspMod
 !     EQUIVALENTS DEPENDING ON SOLUBILITY FROM 'HOUR1'
 !     AND TRANSFER COEFFICIENT 'DFGS' FROM 'WATSUB'
 !
-      call SurfaceGasVolatilDissol(M,NY,NX)
+      call LitterGasVolatilDissol(M,NY,NX)
 !
 !     SURFACE GAS EXCHANGE FROM GAS DIFFUSIVITY THROUGH
 !     SOIL SURFACE LAYER AND THROUGH ATMOSPHERE BOUNDARY
@@ -167,11 +167,11 @@ module InsideTranspMod
 !
 !     SOLUTE FLUXES BETWEEN ADJACENT GRID CELLS
 !
-      call SoluteFluxAdjacentCells(M,MX,NY,NX,NHE,NVS)
+      call TracerExchInBetweenCells(M,MX,NY,NX,NHE,NVS)
 
     ENDDO
   ENDDO
-  end subroutine ModelSoluteHydroFlux
+  end subroutine ModelTracerHydroFlux
 !------------------------------------------------------------------------------------------
 
   subroutine ResetFluxAccumulators(M,NY,NX,MX)
@@ -374,7 +374,11 @@ module InsideTranspMod
 
 !------------------------------------------------------------------------------------------
 
-  subroutine SoluteFluxAdjacentCells(M,MX,NY,NX,NHE,NVS)
+  subroutine TracerExchInBetweenCells(M,MX,NY,NX,NHE,NVS)
+!
+! DESCRIPTION
+! exchanges tracers within (gaseous vs aqueous phase) and between
+! grid cells.
   implicit none
 
   integer, intent(in) :: M,MX, NY, NX, NHE, NVS
@@ -448,8 +452,8 @@ module InsideTranspMod
           IF(M.NE.MX)THEN
             VOLWMA(N6,N5,N4)=VOLWM(M,N6,N5,N4)*VLNH4(N6,N5,N4)
             VOLWMB(N6,N5,N4)=VOLWM(M,N6,N5,N4)*VLNHB(N6,N5,N4)
-            VOLWXA(N6,N5,N4)=14.0_r8*VOLWMA(N6,N5,N4)
-            VOLWXB(N6,N5,N4)=14.0_r8*VOLWMB(N6,N5,N4)
+            VOLWXA(N6,N5,N4)=natomw*VOLWMA(N6,N5,N4)
+            VOLWXB(N6,N5,N4)=natomw*VOLWMB(N6,N5,N4)
 
             VOLPMA(N6,N5,N4)=VOLPM(M,N6,N5,N4)*VLNH4(N6,N5,N4)
             VOLPMB(N6,N5,N4)=VOLPM(M,N6,N5,N4)*VLNHB(N6,N5,N4)
@@ -481,7 +485,7 @@ module InsideTranspMod
 !     GASEOUS TRANSPORT FROM GASEOUS DIFFUSIVITY AND CONCENTRATION
 !     DIFFERENCES BETWEEN ADJACENT GRID CELLS
 !
-          call GasTransport(M,N,N1,N2,N3,N4,N5,N6,FLQM)
+          call GaseousTransport(M,N,N1,N2,N3,N4,N5,N6,FLQM)
 
         ELSEIF(N.NE.3)THEN
           call ZeroTransport1(N,N1,N2,N3,N4,N5,N6)
@@ -497,7 +501,7 @@ module InsideTranspMod
     call BubbleEfflux(M,N1,N2,N3,NY,NX,MX,IFLGB)
 
 125 CONTINUE
-  end subroutine SoluteFluxAdjacentCells
+  end subroutine TracerExchInBetweenCells
 
 ! ----------------------------------------------------------------------
 
@@ -1866,7 +1870,7 @@ module InsideTranspMod
       SOXYX=32.0_r8*SOXYL(N3,N2,N1)
       SN2GX=28.0_r8*SN2GL(N3,N2,N1)
       SN2OX=28.0_r8*SN2OL(N3,N2,N1)
-      SNH3X=14.0_r8*SNH3L(N3,N2,N1)
+      SNH3X=natomw*SNH3L(N3,N2,N1)
       SH2GX=2.0_r8*SH2GL(N3,N2,N1)
 !
 !     GASEOUS EQUIVALENT PARTIAL CONCENTRATIONS
@@ -2086,6 +2090,7 @@ module InsideTranspMod
 !     FROM 'WATSUB' AND GAS CONCENTRATIONS IN THE ADJACENT GRID CELLS
 !     DEPENDING ON WATER FLUX DIRECTION
 !
+!     by assuming volume conservation, gases and water flow in opposite direction
 !     FLQM=total water flux into soil micropore+macropore from watsub.f
 !     VOLPM=air-filled porosity
 !     RFL*G=convective gas flux
@@ -2135,7 +2140,7 @@ module InsideTranspMod
   end subroutine GasAdvTransport
 
 ! ----------------------------------------------------------------------
-  subroutine GasTransport(M,N,N1,N2,N3,N4,N5,N6,FLQM)
+  subroutine GaseousTransport(M,N,N1,N2,N3,N4,N5,N6,FLQM)
 
   implicit none
   integer, intent(in) :: M,N,N1,N2,N3,N4,N5,N6
@@ -2176,7 +2181,7 @@ module InsideTranspMod
     RHGFLG(N,N6,N5,N4)=0.0_r8
   ENDIF
   call VolatilizationDissolution(M,N,N1,N2,N3,N4,N5,N6)
-  end subroutine GasTransport
+  end subroutine GaseousTransport
 
 ! ----------------------------------------------------------------------
   subroutine VolatilizationDissolution(M,N,N1,N2,N3,N4,N5,N6)

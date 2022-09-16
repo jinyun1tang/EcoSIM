@@ -41,7 +41,7 @@ implicit none
   real(r8) :: RH1PFS1,RH2PFS1
 
   public :: SoluteFluxSurface
-  public :: SurfaceGasVolatilDissol
+  public :: LitterGasVolatilDissol
   public :: SurfSoilFluxGasDifAdv
   public :: SoluteFluxSnowpackDisch
 contains
@@ -101,7 +101,7 @@ contains
 !     SOIL SURFACE FROM AQUEOUS DIFFUSIVITIES
 !     AND CONCENTRATION DIFFERENCES
 !
-  call DiffusiveFluxAtSoilSurface(M,NY,NX,FLWRM1)
+  call LitterSurfSoilExchange(M,NY,NX,FLWRM1)
 
 !     DIFFUSIVE FLUXES BETWEEN CURRENT AND ADJACENT GRID CELL
 !     MICROPORES
@@ -235,7 +235,7 @@ contains
   end subroutine ConvectiveSurfaceSoluteFlux
 !------------------------------------------------------------------------------------------
 
-  subroutine DiffusiveFluxAtSoilSurface(M,NY,NX,FLWRM1)
+  subroutine LitterSurfSoilExchange(M,NY,NX,FLWRM1)
   implicit none
 
   integer, intent(in) :: M, NY, NX
@@ -375,7 +375,7 @@ contains
     DFVP1B=0.0_r8
     DFVPOB=0.0_r8
   ENDIF
-  end subroutine DiffusiveFluxAtSoilSurface
+  end subroutine LitterSurfSoilExchange
 
 
 !------------------------------------------------------------------------------------------
@@ -1152,7 +1152,7 @@ contains
   end subroutine OverlandFlowSnowdriftTransport
 !------------------------------------------------------------------------------------------
 
-  subroutine SurfaceGasVolatilDissol(M,NY,NX)
+  subroutine LitterGasVolatilDissol(M,NY,NX)
   implicit none
 
   integer, intent(in) :: M,NY, NX
@@ -1257,7 +1257,7 @@ contains
     RN3DFG(0,NY,NX)=0.0_r8
     RHGDFG(0,NY,NX)=0.0_r8
   ENDIF
-  end subroutine SurfaceGasVolatilDissol
+  end subroutine LitterGasVolatilDissol
 
 !------------------------------------------------------------------------------------------
 
