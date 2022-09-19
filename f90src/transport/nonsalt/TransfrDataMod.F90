@@ -4,6 +4,7 @@ module TransfrDataMod
 implicit none
   public
   CHARACTER(LEN=*),private,PARAMETER :: MOD_FILENAME=__FILE__
+  real(r8), parameter :: XFRS=0.05_r8
   real(r8),allocatable :: RFLOC(:)
   real(r8),allocatable :: RFLON(:)
   real(r8),allocatable :: RFLOP(:)

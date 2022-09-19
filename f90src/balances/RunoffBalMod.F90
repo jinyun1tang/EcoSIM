@@ -12,6 +12,7 @@ module RunoffBalMod
   USE AqueChemDatatype
   USE EcoSIMCtrlDataType
   USE GridDataType
+  use EcoSIMConfig, only : jcplx => jcplxc
 implicit none
   private
   character(len=*), parameter :: mod_filename = __FILE__
@@ -184,10 +185,6 @@ implicit none
       OXYGOU=OXYGOU-OXR
       HGR=XN*XHGQRS(N,NN,N5,N4)
       H2GOU=H2GOU+HGR
-!     WRITE(*,6636)'XPO',I,J,N4,N5,N,XN
-!    2,COR,CXR,ZOR,ZXR,POR,PXR
-!    2,XP4QRW(N,NN,N5,N4),XP1QRW(N,NN,N5,N4)
-!6636  FORMAT(A8,5I4,40E12.4)
 !
 !     RUNOFF BOUNDARY FLUXES OF SOLUTES
 !
@@ -308,12 +305,12 @@ implicit none
           ZOE=0.0_r8
           POE=0.0_r8
           DO 3580 K=0,jcplx
-            DO NO=1,7
-              DO M=1,3
+            DO NO=1,NFGs
+              DO M=1,nlbiomcp
                 DO NGL=1,JG
-                  COE=COE+XN*OMCER(M+(NGL-1)*3,NO,K,N,NN,N5,N4)
-                  ZOE=ZOE+XN*OMNER(M+(NGL-1)*3,NO,K,N,NN,N5,N4)
-                  POE=POE+XN*OMPER(M+(NGL-1)*3,NO,K,N,NN,N5,N4)
+                  COE=COE+XN*OMCER(M+(NGL-1)*nlbiomcp,NO,K,N,NN,N5,N4)
+                  ZOE=ZOE+XN*OMNER(M+(NGL-1)*nlbiomcp,NO,K,N,NN,N5,N4)
+                  POE=POE+XN*OMPER(M+(NGL-1)*nlbiomcp,NO,K,N,NN,N5,N4)
                 enddo
               enddo
             enddo
@@ -322,7 +319,7 @@ implicit none
     !     MICROBIAL RESIDUE C IN RUNOFF SEDIMENT
 !
           DO 3575 K=0,jcplx1
-            DO 3570 M=1,2
+            DO 3570 M=1,ndbiomcp
               COE=COE+XN*ORCER(M,K,N,NN,N5,N4)
               ZOE=ZOE+XN*ORNER(M,K,N,NN,N5,N4)
               POE=POE+XN*ORPER(M,K,N,NN,N5,N4)
@@ -333,7 +330,7 @@ implicit none
             COE=COE+XN*(OHCER(K,N,NN,N5,N4)+OHAER(K,N,NN,N5,N4))
             ZOE=ZOE+XN*OHNER(K,N,NN,N5,N4)
             POE=POE+XN*OHPER(K,N,NN,N5,N4)
-            DO 3565 M=1,4
+            DO 3565 M=1,jsken
               COE=COE+XN*OSCER(M,K,N,NN,N5,N4)
               ZOE=ZOE+XN*OSNER(M,K,N,NN,N5,N4)
               POE=POE+XN*OSPER(M,K,N,NN,N5,N4)
@@ -571,29 +568,7 @@ implicit none
         SO=SSD+SHD
         TIONOU=TIONOU-SO
         UIONOU(N2,N1)=UIONOU(N2,N1)-SO
-!     IF(I.EQ.180.AND.J.EQ.12)THEN
-!     WRITE(*,3337)'SSD',I,J,N,N6,N5,N4,SSD
-!    2,XALFLS(N,N6,N5,N4),XFEFLS(N,N6,N5,N4),XHYFLS(N,N6,N5,N4)
-!    2,XCAFLS(N,N6,N5,N4),XMGFLS(N,N6,N5,N4),XNAFLS(N,N6,N5,N4)
-!    3,XKAFLS(N,N6,N5,N4),XOHFLS(N,N6,N5,N4),XSOFLS(N,N6,N5,N4)
-!    4,XCLFLS(N,N6,N5,N4),XC3FLS(N,N6,N5,N4),XH0PFS(N,N6,N5,N4)
-!    5,XH0BFB(N,N6,N5,N4)
-!    6,XHCFLS(N,N6,N5,N4),XAL1FS(N,N6,N5,N4)
-!    6,XALSFS(N,N6,N5,N4),XFE1FS(N,N6,N5,N4),XFESFS(N,N6,N5,N4)
-!    7,XCAOFS(N,N6,N5,N4),XCACFS(N,N6,N5,N4)
-!    8,XCASFS(N,N6,N5,N4),XMGOFS(N,N6,N5,N4),XMGCFS(N,N6,N5,N4)
-!    9,XMGSFS(N,N6,N5,N4),XNACFS(N,N6,N5,N4),XNASFS(N,N6,N5,N4)
-!    1,XKASFS(N,N6,N5,N4),XC0PFS(N,N6,N5,N4),XC0BFB(N,N6,N5,N4)
-!    3,XAL2FS(N,N6,N5,N4)
-!    3,XFE2FS(N,N6,N5,N4),XCAHFS(N,N6,N5,N4),XMGHFS(N,N6,N5,N4)
-!    4,XF1PFS(N,N6,N5,N4),XC1PFS(N,N6,N5,N4),XM1PFS(N,N6,N5,N4)
-!    5,XF1BFB(N,N6,N5,N4),XC1BFB(N,N6,N5,N4),XM1BFB(N,N6,N5,N4)
-!    6,XAL3FS(N,N6,N5,N4),XFE3FS(N,N6,N5,N4),XH3PFS(N,N6,N5,N4)
-!    7,XF2PFS(N,N6,N5,N4),XC2PFS(N,N6,N5,N4),XH3BFB(N,N6,N5,N4)
-!    8,XF2BFB(N,N6,N5,N4),XC2BFB(N,N6,N5,N4)
-!    9,XAL4FS(N,N6,N5,N4),XFE4FS(N,N6,N5,N4)
-!3337  FORMAT(A8,6I4,80E12.4)
-!     ENDIF
+
 !
 !     SUBSURFACE FLUX ELECTRICAL CONDUCTIVITY
 !

@@ -18,7 +18,8 @@ module SoilLayerDynMod
   use SurfSoilDataType
   use SurfLitterDataType
   use EcosimConst
-  USE TFlxTypeMod, ONLY : TSEDER,TDLYXF,TDYLXC,TDVOLI,TDORGC
+  use EcoSIMConfig, only : ndbiomcp => ndbiomcpc
+  USE TFlxTypeMod , ONLY : TSEDER,TDLYXF,TDYLXC,TDVOLI,TDORGC
 implicit none
 
 
@@ -785,7 +786,7 @@ implicit none
   IF(IFLGL(L,3).EQ.0)THEN
     DO  K=0,jcplx1
       DO  N=1,NFGs
-        DO  M=1,3
+        DO  M=1,nlbiomcp
           DO NGL=1,JG
             OMC(M,NGL,N,K,L1,NY,NX)=OMC(M,NGL,N,K,L1,NY,NX)+FX*OMC(M,NGL,N,K,L0,NY,NX)
             OMN(M,NGL,N,K,L1,NY,NX)=OMN(M,NGL,N,K,L1,NY,NX)+FX*OMN(M,NGL,N,K,L0,NY,NX)
@@ -795,7 +796,7 @@ implicit none
       enddo
     ENDDO
     DO  N=1,NFGs
-      DO  M=1,3
+      DO  M=1,nlbiomcp
         DO NGL=1,JG
           OMCff(M,NGL,N,L1,NY,NX)=OMCff(M,NGL,N,L1,NY,NX)+FX*OMCff(M,NGL,N,L0,NY,NX)
           OMNff(M,NGL,N,L1,NY,NX)=OMNff(M,NGL,N,L1,NY,NX)+FX*OMNff(M,NGL,N,L0,NY,NX)
@@ -805,7 +806,7 @@ implicit none
     enddo
 
     DO K=0,jcplx1
-      DO  M=1,2
+      DO  M=1,ndbiomcp
         ORC(M,K,L1,NY,NX)=ORC(M,K,L1,NY,NX)+FX*ORC(M,K,L0,NY,NX)
         ORN(M,K,L1,NY,NX)=ORN(M,K,L1,NY,NX)+FX*ORN(M,K,L0,NY,NX)
         ORP(M,K,L1,NY,NX)=ORP(M,K,L1,NY,NX)+FX*ORP(M,K,L0,NY,NX)
@@ -1050,7 +1051,7 @@ implicit none
   IF(IFLGL(L,3).EQ.0)THEN
     DO  K=0,jcplx1
        DO N=1,NFGs
-        DO M=1,3
+        DO M=1,nlbiomcp
           DO NGL=1,JG
             OMC(M,NGL,N,K,L0,NY,NX)=FY*OMC(M,NGL,N,K,L0,NY,NX)
             OMN(M,NGL,N,K,L0,NY,NX)=FY*OMN(M,NGL,N,K,L0,NY,NX)
@@ -1061,7 +1062,7 @@ implicit none
     ENDDO
 
     DO N=1,NFGs
-      DO M=1,3
+      DO M=1,nlbiomcp
         DO NGL=1,JG
           OMCff(M,NGL,N,L0,NY,NX)=FY*OMCff(M,NGL,N,L0,NY,NX)
           OMNff(M,NGL,N,L0,NY,NX)=FY*OMNff(M,NGL,N,L0,NY,NX)
@@ -1071,7 +1072,7 @@ implicit none
     enddo
 
     DO K=0,jcplx1
-      DO  M=1,2
+      DO  M=1,ndbiomcp
         ORC(M,K,L0,NY,NX)=FY*ORC(M,K,L0,NY,NX)
         ORN(M,K,L0,NY,NX)=FY*ORN(M,K,L0,NY,NX)
         ORP(M,K,L0,NY,NX)=FY*ORP(M,K,L0,NY,NX)
@@ -1197,7 +1198,7 @@ implicit none
 
     DO  K=0,jcplx1
       DO  N=1,NFGs
-        DO  M=1,3
+        DO  M=1,nlbiomcp
           DO NGL=1,JG
             FXOMC=FXO*OMC(M,NGL,N,K,L0,NY,NX)
             OMC(M,NGL,N,K,L1,NY,NX)=OMC(M,NGL,N,K,L1,NY,NX)+FXOMC
@@ -1214,7 +1215,7 @@ implicit none
     ENDDO
 
     DO  N=1,NFGs
-      DO  M=1,3
+      DO  M=1,nlbiomcp
         DO NGL=1,JG
           FXOMC=FXO*OMCff(M,NGL,N,L0,NY,NX)
           OMCff(M,NGL,N,L1,NY,NX)=OMCff(M,NGL,N,L1,NY,NX)+FXOMC
@@ -1230,7 +1231,7 @@ implicit none
     enddo
 
     DO  K=0,jcplx1
-      DO  M=1,2
+      DO  M=1,ndbiomcp
         FXORC=FXO*ORC(M,K,L0,NY,NX)
         ORC(M,K,L1,NY,NX)=ORC(M,K,L1,NY,NX)+FXORC
         ORC(M,K,L0,NY,NX)=ORC(M,K,L0,NY,NX)-FXORC

@@ -470,11 +470,11 @@ module RedistMod
   !
   !     SURFACE BOUNDARY PO4 AND DOP FLUXES
   !
-  PI=31.0_r8*((FLQGQ(NY,NX)+FLQRQ(NY,NX)) &
+  PI=patomw*((FLQGQ(NY,NX)+FLQRQ(NY,NX)) &
       *(CPOR(NY,NX)+CH1PR(NY,NX)) &
       +(FLQGI(NY,NX)+FLQRI(NY,NX)) &
       *(CPOQ(I,NY,NX)+CH1PQ(I,NY,NX)))
-  PXB=-31.0_r8*PRECU(NY,NX)*(CPOQ(I,NY,NX)+CH1PQ(I,NY,NX))
+  PXB=-patomw*PRECU(NY,NX)*(CPOQ(I,NY,NX)+CH1PQ(I,NY,NX))
   TPIN=TPIN+PI
   TPOU=TPOU+PXB
   PDRAIN(NY,NX)=PDRAIN(NY,NX)+XH2PFS(3,NK(NY,NX),NY,NX) &
@@ -494,17 +494,15 @@ module RedistMod
       +XN2FLG(3,NU(NY,NX),NY,NX))+XN3FLG(3,NU(NY,NX),NY,NX) &
       +2.0_r8*TN2OZ(NY,NX)+TNH3Z(NY,NX) &
       +2.0_r8*(XN2DFG(0,NY,NX)+XNGDFG(0,NY,NX))+XN3DFG(0,NY,NX) &
-      +2.0_r8*(XNGDFR(NY,NX)+XN2DFR(NY,NX))+XN3DFR(NY,NX))/14.0_r8
-  SIP=((FLQGQ(NY,NX)+FLQRQ(NY,NX)) &
-      *(3.0_r8*CPOR(NY,NX)+2.0_r8*CH1PR(NY,NX)) &
-      +(FLQGI(NY,NX)+FLQRI(NY,NX)) &
-      *(3.0_r8*CPOQ(I,NY,NX)+2.0_r8*CH1PQ(I,NY,NX)))
+      +2.0_r8*(XNGDFR(NY,NX)+XN2DFR(NY,NX))+XN3DFR(NY,NX))/natomw
+  SIP=((FLQGQ(NY,NX)+FLQRQ(NY,NX))*(3.0_r8*CPOR(NY,NX)+2.0_r8*CH1PR(NY,NX)) &
+      +(FLQGI(NY,NX)+FLQRI(NY,NX))*(3.0_r8*CPOQ(I,NY,NX)+2.0_r8*CH1PQ(I,NY,NX)))
   SNB=-PRECU(NY,NX)*(CNNQ(NY,NX)+CN2Q(NY,NX))-PRECU(NY,NX) &
       *(2.0_r8*CN4Q(I,NY,NX)+CN3Q(I,NY,NX)+CNOQ(I,NY,NX))
       SPB=-PRECU(NY,NX)*(3.0*CPOQ(I,NY,NX)+2.0*CH1PQ(I,NY,NX))
   SNM0=(2.0_r8*XNH4S(0,NY,NX)+XNO3S(0,NY,NX)+XNO2S(0,NY,NX) &
-      -2.0_r8*XN2GS(0,NY,NX))/14.0_r8
-  SPM0=(2.0_r8*XH1PS(0,NY,NX)+3.0_r8*XH2PS(0,NY,NX))/31.0_r8
+      -2.0_r8*XN2GS(0,NY,NX))/natomw
+  SPM0=(2.0_r8*XH1PS(0,NY,NX)+3.0_r8*XH2PS(0,NY,NX))/patomw
   !
   !     ACCUMULATE PLANT LITTERFALL FLUXES
   !
@@ -721,17 +719,16 @@ module RedistMod
 
   integer :: K,NO,M,NGL
 
-  real(r8) :: TOMCERff(3,JG,NFGs,JY,JX)
-  real(r8) :: TOMNERff(3,JG,NFGs,JY,JX)
-  real(r8) :: TOMPERff(3,JG,NFGs,JY,JX)
+  real(r8) :: TOMCERff(nlbiomcp,JG,NFGs,JY,JX)
+  real(r8) :: TOMNERff(nlbiomcp,JG,NFGs,JY,JX)
+  real(r8) :: TOMPERff(nlbiomcp,JG,NFGs,JY,JX)
   REAL(R8) :: DORGP
 
   ! begin_execution
   !
   ! INTERNAL SURFACE SEDIMENT TRANSPORT
   !
-  IF((IERSNG.EQ.1.OR.IERSNG.EQ.3) &
-    .AND.ABS(TSEDER(NY,NX)).GT.ZEROS(NY,NX))THEN
+  IF((IERSNG.EQ.1.OR.IERSNG.EQ.3).AND.ABS(TSEDER(NY,NX)).GT.ZEROS(NY,NX))THEN
     TSED(NY,NX)=TSED(NY,NX)+TSEDER(NY,NX)
     !
     !     SOIL MINERAL FRACTIONS
@@ -800,7 +797,7 @@ module RedistMod
     DORGP=0.0_r8
     DO 9280 K=0,jcplx1
       DO  NO=1,NFGs
-        DO  M=1,3
+        DO  M=1,nlbiomcp
           DO NGL=1,JG
             OMC(M,NGL,NO,K,NU(NY,NX),NY,NX)=OMC(M,NGL,NO,K,NU(NY,NX),NY,NX)+TOMCER(M,NGL,NO,K,NY,NX)
             OMN(M,NGL,NO,K,NU(NY,NX),NY,NX)=OMN(M,NGL,NO,K,NU(NY,NX),NY,NX)+TOMNER(M,NGL,NO,K,NY,NX)
@@ -812,7 +809,7 @@ module RedistMod
       enddo
 9280  CONTINUE
       DO  NO=1,NFGs
-        DO  M=1,3
+        DO  M=1,nlbiomcp
           DO NGL=1,JG
             OMCff(M,NGL,NO,NU(NY,NX),NY,NX)=OMCff(M,NGL,NO,NU(NY,NX),NY,NX)+TOMCERff(M,NGL,NO,NY,NX)
             OMNff(M,NGL,NO,NU(NY,NX),NY,NX)=OMNff(M,NGL,NO,NU(NY,NX),NY,NX)+TOMNERff(M,NGL,NO,NY,NX)
@@ -824,7 +821,7 @@ module RedistMod
       enddo
 
     DO 9275 K=0,jcplx1
-      DO 9270 M=1,2
+      DO 9270 M=1,ndbiomcp
         ORC(M,K,NU(NY,NX),NY,NX)=ORC(M,K,NU(NY,NX),NY,NX)+TORCER(M,K,NY,NX)
         ORN(M,K,NU(NY,NX),NY,NX)=ORN(M,K,NU(NY,NX),NY,NX)+TORNER(M,K,NY,NX)
         ORP(M,K,NU(NY,NX),NY,NX)=ORP(M,K,NU(NY,NX),NY,NX)+TORPER(M,K,NY,NX)
@@ -944,7 +941,7 @@ module RedistMod
       ! TOTAL MICROBIAL C,N,P
       !
       DO  N=1,NFGs
-        DO  M=1,3
+        DO  M=1,nlbiomcp
           DO NGL=1,JG
             DC=DC+OMC(M,NGL,N,K,0,NY,NX)
             DN=DN+OMN(M,NGL,N,K,0,NY,NX)
@@ -965,7 +962,7 @@ module RedistMod
   ! TOTAL MICROBIAL C,N,P
   !
   DO N=1,NFGs
-    DO  M=1,3
+    DO  M=1,nlbiomcp
       DO NGL=1,JG
         DC=DC+OMCff(M,NGL,N,0,NY,NX)
         DN=DN+OMNff(M,NGL,N,0,NY,NX)
@@ -984,7 +981,7 @@ module RedistMod
   !     TOTAL MICROBIAL RESIDUE C,N,P
   !
   DO K=0,2
-    DO  M=1,2
+    DO  M=1,ndbiomcp
       DC=DC+ORC(M,K,0,NY,NX)
       DN=DN+ORN(M,K,0,NY,NX)
       DP=DP+ORP(M,K,0,NY,NX)
@@ -1002,7 +999,7 @@ module RedistMod
 !
     !     TOTAL PLANT RESIDUE C,N,P
 !
-    DO  M=1,4
+    DO  M=1,jsken
       DC=DC+OSC(M,K,0,NY,NX)
       DN=DN+OSN(M,K,0,NY,NX)
       DP=DP+OSP(M,K,0,NY,NX)
@@ -1033,20 +1030,20 @@ module RedistMod
   ZG=Z2GS(0,NY,NX)+Z2OS(0,NY,NX)
   TLN2G=TLN2G+ZG
   Z4S=ZNH4S(0,NY,NX)+ZNH3S(0,NY,NX)
-  Z4X=14.0*XN4(0,NY,NX)
-  Z4F=14.0*(ZNH4FA(0,NY,NX)+ZNHUFA(0,NY,NX)+ZNH3FA(0,NY,NX))
+  Z4X=natomw*XN4(0,NY,NX)
+  Z4F=natomw*(ZNH4FA(0,NY,NX)+ZNHUFA(0,NY,NX)+ZNH3FA(0,NY,NX))
   TLNH4=TLNH4+Z4S+Z4X+Z4F
   UNH4(NY,NX)=UNH4(NY,NX)+Z4S+Z4X
 
   ZOS=ZNO3S(0,NY,NX)+ZNO2S(0,NY,NX)
-  ZOF=14.0*ZNO3FA(0,NY,NX)
+  ZOF=natomw*ZNO3FA(0,NY,NX)
   TLNO3=TLNO3+ZOS+ZOF
   UNO3(NY,NX)=UNO3(NY,NX)+ZOS
   POS=H1PO4(0,NY,NX)+H2PO4(0,NY,NX)
-  POX=31.0*(XH1P(0,NY,NX)+XH2P(0,NY,NX))
-  POP=31.0*(PALPO(0,NY,NX)+PFEPO(0,NY,NX) &
-    +PCAPD(0,NY,NX))+62.0*PCAPM(0,NY,NX) &
-    +93.0*PCAPH(0,NY,NX)
+  POX=patomw*(XH1P(0,NY,NX)+XH2P(0,NY,NX))
+  POP=patomw*(PALPO(0,NY,NX)+PFEPO(0,NY,NX) &
+    +PCAPD(0,NY,NX))+2._r8*patomw*PCAPM(0,NY,NX) &
+    +3._r8*patomw*PCAPH(0,NY,NX)
   TLPO4=TLPO4+POS+POX+POP
   UPO4(NY,NX)=UPO4(NY,NX)+POX
   UPP4(NY,NX)=UPP4(NY,NX)+POP
@@ -1105,7 +1102,7 @@ module RedistMod
   ZCA1P(0,NY,NX)=ZCA1P(0,NY,NX)+XC1PFS(3,0,NY,NX)
   ZCA2P(0,NY,NX)=ZCA2P(0,NY,NX)+XC2PFS(3,0,NY,NX)
   ZMG1P(0,NY,NX)=ZMG1P(0,NY,NX)+XM1PFS(3,0,NY,NX)
-  PSS=31.0*(H0PO4(0,NY,NX)+H3PO4(0,NY,NX)+ZFE1P(0,NY,NX) &
+  PSS=patomw*(H0PO4(0,NY,NX)+H3PO4(0,NY,NX)+ZFE1P(0,NY,NX) &
     +ZFE2P(0,NY,NX)+ZCA0P(0,NY,NX)+ZCA1P(0,NY,NX) &
     +ZCA2P(0,NY,NX)+ZMG1P(0,NY,NX))
   TLPO4=TLPO4+PSS
@@ -1464,10 +1461,10 @@ module RedistMod
     SNM=(2.0*(XNH4S(L,NY,NX)+XNH4B(L,NY,NX)-TUPNH4(L,NY,NX) &
       -TUPNHB(L,NY,NX)-XN2GS(L,NY,NX))-TUPN3S(L,NY,NX)-TUPN3B(L,NY,NX) &
       +XNO3S(L,NY,NX)+XNO3B(L,NY,NX)-TUPNO3(L,NY,NX)-TUPNOB(L,NY,NX) &
-      +XNO2S(L,NY,NX)+XNO2B(L,NY,NX))/14.0
+      +XNO2S(L,NY,NX)+XNO2B(L,NY,NX))/natomw
     SPM=(2.0*(XH1PS(L,NY,NX)+XH1BS(L,NY,NX)-TUPH1P(L,NY,NX) &
       -TUPH1B(L,NY,NX))+3.0*(XH2PS(L,NY,NX)+XH2BS(L,NY,NX) &
-      -TUPH2P(L,NY,NX)-TUPH2B(L,NY,NX)))/31.0
+      -TUPH2P(L,NY,NX)-TUPH2B(L,NY,NX)))/patomw
     SSB=TRH2O(L,NY,NX)+TBCO2(L,NY,NX)+XZHYS(L,NY,NX) &
       +TBION(L,NY,NX)
       TIONOU=TIONOU-SSB
@@ -1527,12 +1524,12 @@ module RedistMod
     POS=H2PO4(L,NY,NX)+H2PO4H(L,NY,NX)+H2POB(L,NY,NX) &
       +H2POBH(L,NY,NX)+H1PO4(L,NY,NX)+H1PO4H(L,NY,NX) &
       +H1POB(L,NY,NX)+H1POBH(L,NY,NX)
-    POX=31.0*(XH1P(L,NY,NX)+XH2P(L,NY,NX) &
+    POX=patomw*(XH1P(L,NY,NX)+XH2P(L,NY,NX) &
       +XH1PB(L,NY,NX)+XH2PB(L,NY,NX))
-    POP=31.0*(PALPO(L,NY,NX)+PFEPO(L,NY,NX)+PCAPD(L,NY,NX) &
+    POP=patomw*(PALPO(L,NY,NX)+PFEPO(L,NY,NX)+PCAPD(L,NY,NX) &
       +PALPB(L,NY,NX)+PFEPB(L,NY,NX)+PCPDB(L,NY,NX)) &
-      +62.0*(PCAPM(L,NY,NX)+PCPMB(L,NY,NX)) &
-      +93.0*(PCAPH(L,NY,NX)+PCPHB(L,NY,NX))
+      +2._r8*patomw*(PCAPM(L,NY,NX)+PCPMB(L,NY,NX)) &
+      +3._r8*patomw*(PCAPH(L,NY,NX)+PCPHB(L,NY,NX))
     TLPO4=TLPO4+POS+POX+POP
     UPO4(NY,NX)=UPO4(NY,NX)+POX
     UPP4(NY,NX)=UPP4(NY,NX)+POP
@@ -1681,7 +1678,7 @@ module RedistMod
   PCACO(L,NY,NX)=PCACO(L,NY,NX)+TRCACO(L,NY,NX)
   PCASO(L,NY,NX)=PCASO(L,NY,NX)+TRCASO(L,NY,NX)
 
-  PSS=31.0*(H0PO4(L,NY,NX)+H3PO4(L,NY,NX)+ZFE1P(L,NY,NX) &
+  PSS=patomw*(H0PO4(L,NY,NX)+H3PO4(L,NY,NX)+ZFE1P(L,NY,NX) &
     +ZFE2P(L,NY,NX)+ZCA0P(L,NY,NX)+ZCA1P(L,NY,NX) &
     +ZCA2P(L,NY,NX)+ZMG1P(L,NY,NX)+H0POB(L,NY,NX) &
     +H3POB(L,NY,NX)+ZFE1PB(L,NY,NX)+ZFE2PB(L,NY,NX) &
@@ -1769,7 +1766,7 @@ module RedistMod
     ECHC=0.044_r8*AMAX1(0.0_r8,ZHCO3(L,NY,NX)/VOLW(L,NY,NX))
     ECSO=0.080_r8*AMAX1(0.0_r8,ZSO4(L,NY,NX)*2.0_r8/VOLW(L,NY,NX))
     ECCL=0.076_r8*AMAX1(0.0_r8,ZCL(L,NY,NX)/VOLW(L,NY,NX))
-    ECNO=0.071_r8*AMAX1(0.0_r8,ZNO3S(L,NY,NX)/(VOLW(L,NY,NX)*14.0_r8))
+    ECNO=0.071_r8*AMAX1(0.0_r8,ZNO3S(L,NY,NX)/(VOLW(L,NY,NX)*natomw))
     ECND(L,NY,NX)=ECHY+ECOH+ECAL+ECFE+ECCA+ECMG+ECNA+ECKA &
       +ECCO+ECHC+ECSO+ECCL+ECNO
 
@@ -1807,7 +1804,7 @@ module RedistMod
   DO K=0,jcplx1
     IF(K.LE.2)THEN  !K=0,1,2: woody litr, nonwoody litr, and manure
       DO N=1,NFGs
-        DO  M=1,3
+        DO  M=1,nlbiomcp
           DO NGL=1,JG
             DC=DC+OMC(M,NGL,N,K,L,NY,NX)
             DN=DN+OMN(M,NGL,N,K,L,NY,NX)
@@ -1822,7 +1819,7 @@ module RedistMod
       ENDDO
     ELSE
       DO N=1,NFGs
-        DO  M=1,3
+        DO  M=1,nlbiomcp
           DO NGL=1,JG
             OC=OC+OMC(M,NGL,N,K,L,NY,NX)
             ON=ON+OMN(M,NGL,N,K,L,NY,NX)
@@ -1839,7 +1836,7 @@ module RedistMod
   ENDDO
 
   DO  N=1,NFGs
-    DO  M=1,3
+    DO  M=1,nlbiomcp
       DO NGL=1,JG
         OC=OC+OMCff(M,NGL,N,L,NY,NX)
         ON=ON+OMNff(M,NGL,N,L,NY,NX)
@@ -1855,7 +1852,7 @@ module RedistMod
 
   DO K=0,jcplx1
     IF(K.LE.2)THEN
-      DO M=1,2
+      DO M=1,ndbiomcp
         DC=DC+ORC(M,K,L,NY,NX)
         DN=DN+ORN(M,K,L,NY,NX)
         DP=DP+ORP(M,K,L,NY,NX)
@@ -1870,7 +1867,7 @@ module RedistMod
         DP=DP+OSP(M,K,L,NY,NX)
       ENDDO
     ELSE
-      DO M=1,2
+      DO M=1,ndbiomcp
         OC=OC+ORC(M,K,L,NY,NX)
         ON=ON+ORN(M,K,L,NY,NX)
         OP=OP+ORP(M,K,L,NY,NX)

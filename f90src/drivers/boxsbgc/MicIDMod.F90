@@ -3,7 +3,14 @@ use ChemIDMod
 implicit none
   save
   character(len=*),private, parameter :: mod_filename = __FILE__
-
+  integer :: cid_CO2G      !gaseous tracer CO2
+  integer :: cid_CH4G      !gaseous tracer CH4
+  integer :: cid_OXYG      !gaseous tracer O2
+  integer :: cid_Z2GG      !gaseous tracer N2
+  integer :: cid_Z2OG      !gaseous tracer N2O
+  integer :: cid_ZN3G      !gaseous tracer NH3
+  integer :: cid_H2GG      !gaseous tracer H2
+  integer :: cid_Z2GS      !aqueous N2
   integer :: cid_ZNH3B     !NH3 band micropore, [gN d-2]
   integer :: cid_ZNH3S     !NH3 non-band micropore, [gN d-2]
   integer :: cid_ZNH4B     !NH4 band micropore, [g d-2]

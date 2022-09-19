@@ -3,6 +3,7 @@ module MicBGCPars
 ! define microbial parameters
   use data_kind_mod, only : r8 => SHR_KIND_R8
   use abortutils, only : destroy
+  use EcoSIMConfig
 implicit none
   private
 
@@ -54,12 +55,12 @@ implicit none
   real(r8),allocatable :: OMCA(:)                            !autotrophic microbial biomass composition in SOC
   logical, allocatable :: is_activef_micb(:)
   logical, allocatable :: is_litter(:)
-  character(len=16) :: kiname(0:3)
-  character(len=16) :: cplxname(0:4)
-  character(len=16) :: hmicname(7)
-  character(len=16) :: amicname(7)
-  character(len=16) :: micresb(0:1)      !residual biomass name
-  character(len=16) :: micbiom(1:3)      !microbial biomass pool name
+  character(len=16) :: kiname(0:jskenc-1)
+  character(len=16) :: cplxname(0:jcplx1c)
+  character(len=16) :: hmicname(NFGsc)
+  character(len=16) :: amicname(NFGsc)
+  character(len=16) :: micresb(0:ndbiomcpc-1)      !residual biomass name
+  character(len=16) :: micbiom(1:nlbiomcpc)        !microbial biomass pool name
   contains
     procedure, public  :: Init
     procedure, public  :: SetPars
@@ -77,14 +78,15 @@ contains
   !organic matter is grouped into five complexes, including woody(0),
   ! non-woody(1), manure(2), litter, POC(3) and humus(4) (g Mg-1)
 
-  this%ndbiomcp=2  !number of necrobiomass components
-  this%nlbiomcp=3  !number of living biomass components
+  this%ndbiomcp=ndbiomcpc  !number of necrobiomass components
+  this%nlbiomcp=nlbiomcpc  !number of living biomass components
 
-  this%jcplx=5 !# of microbe-substrate complexes
+  this%jcplx=jcplxc         !# of microbe-substrate complexes
   this%jcplx1=this%jcplx-1
-  this%jsken=4 !# of kinetic components of the substrates
+  this%jsken=jskenc        !# of kinetic components of the substrates
   this%jguilds=nmicbguilds
-  this%NFGs=7
+  this%NFGs=NFGsc
+
   !woody, non_woody litter and manure are defined as litter
   allocate(this%is_litter(0:this%jcplx1));this%is_litter(:)=.false.
   this%k_woody_litr=0;     this%is_litter(this%k_woody_litr)=.true.
@@ -150,8 +152,8 @@ contains
   implicit none
   class(MicParType) :: this
 
-  real(r8) :: COMCI(3,0:this%jcplx1)
-  real(r8) :: OMCI1(3,0:this%jcplx1)  !allocation of biomass to kinetic components
+  real(r8) :: COMCI(nlbiomcpc,0:this%jcplx1)
+  real(r8) :: OMCI1(nlbiomcpc,0:this%jcplx1)  !allocation of biomass to kinetic components
   integer :: K,M,NGL,N
   associate(               &
     OHCK  => this%OHCK     , &
@@ -197,15 +199,15 @@ contains
   OMCI(1:3,:)=OMCI1/real(JG,r8)
 
   if(this%jguilds.GT.1)then
-    COMCI=OMCI(1:3,:)
-    DO K=0,4
+    COMCI=OMCI(1:nlbiomcpc,:)
+    DO K=0,jcplx1c
       DO NGL=2,this%jguilds-1
-        DO M=1,3
-          OMCI(M+(NGL-1)*3,K)=OMCI(M,K)
+        DO M=1,nlbiomcpc
+          OMCI(M+(NGL-1)*nlbiomcpc,K)=OMCI(M,K)
           COMCI(M,K)=COMCI(M,K)+OMCI(M,K)
         enddo
       enddo
-      DO M=1,3
+      DO M=1,nlbiomcpc
         OMCI(M+(JG-1)*3,K)=OMCI1(M,K)-COMCI(M,K)
       ENDDO
     enddo
@@ -215,12 +217,12 @@ contains
 ! CNOFC,CPOFC=fractions to allocate N,P to kinetic components
 ! CNOMC,CPOMC=maximum N:C and P:C ratios in microbial biomass
 
-  CNOFC(1:4,0)=real((/0.0050,0.0050,0.0050,0.0200/),r8)
-  CPOFC(1:4,0)=real((/0.0005,0.0005,0.0005,0.0020/),r8)
-  CNOFC(1:4,1)=real((/0.0200,0.0200,0.0200,0.0200/),r8)
-  CPOFC(1:4,1)=real((/0.0020,0.0020,0.0020,0.0020/),r8)
-  CNOFC(1:4,2)=real((/0.0200,0.0200,0.0200,0.0200/),r8)
-  CPOFC(1:4,2)=real((/0.0020,0.0020,0.0020,0.0020/),r8)
+  CNOFC(1:jskenc,0)=real((/0.0050,0.0050,0.0050,0.0200/),r8)  !woody
+  CPOFC(1:jskenc,0)=real((/0.0005,0.0005,0.0005,0.0020/),r8)  !woody
+  CNOFC(1:jskenc,1)=real((/0.0200,0.0200,0.0200,0.0200/),r8)  !non-woody
+  CPOFC(1:jskenc,1)=real((/0.0020,0.0020,0.0020,0.0020/),r8)  !non-woody
+  CNOFC(1:jskenc,2)=real((/0.0200,0.0200,0.0200,0.0200/),r8)   !manure
+  CPOFC(1:jskenc,2)=real((/0.0020,0.0020,0.0020,0.0020/),r8)   !manure
   FL(1:2)=real((/0.55,0.45/),r8)
 
   DO 95 K=0,4
@@ -284,12 +286,12 @@ contains
   allocate(this%OMCK(0:jcplx1))
   allocate(this%ORCK(0:jcplx1))
   allocate(this%OQCK(0:jcplx1))
-  allocate(this%ORCI(2,0:jcplx1))
-  allocate(this%OMCI(3*jguilds,0:jcplx1))
-  allocate(this%CNOMC(3,jguilds,NFGs,0:jcplx1))
-  allocate(this%CPOMC(3,jguilds,NFGs,0:jcplx1))
-  allocate(this%CNOMCff(3,jguilds,NFGs))
-  allocate(this%CPOMCff(3,jguilds,NFGs))
+  allocate(this%ORCI(ndbiomcpc,0:jcplx1))
+  allocate(this%OMCI(nlbiomcpc*jguilds,0:jcplx1))
+  allocate(this%CNOMC(nlbiomcpc,jguilds,NFGs,0:jcplx1))
+  allocate(this%CPOMC(nlbiomcpc,jguilds,NFGs,0:jcplx1))
+  allocate(this%CNOMCff(nlbiomcpc,jguilds,NFGs))
+  allocate(this%CPOMCff(nlbiomcpc,jguilds,NFGs))
   allocate(this%CNOFC(jsken,0:2))
   allocate(this%CPOFC(jsken,0:2))
   allocate(this%CNRH(0:jcplx1))

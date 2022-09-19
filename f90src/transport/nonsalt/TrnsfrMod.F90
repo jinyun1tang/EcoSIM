@@ -295,95 +295,10 @@ module TrnsfrMod
         IF(M.NE.MX)THEN
 !
 !     STATE VARIABLES FOR SOLUTES IN SNOWPACK
+          call UpdateStateVarInSnowpack(NY,NX)
 !
-!     *W2=solute content of snowpack
-!     TQS*=net overland solute flux in snow
-!     T*BLS=net solute flux in snowpack
-!     solute code:CO=CO2,CH=CH4,OX=O2,NG=N2,N2=N2O,HG=H2
-!             :N4=NH4,N3=NH3,NO=NO3,1P=HPO4,HP=H2PO4
-!
-          CO2W2(1,NY,NX)=CO2W2(1,NY,NX)+TQSCOS(NY,NX)
-          CH4W2(1,NY,NX)=CH4W2(1,NY,NX)+TQSCHS(NY,NX)
-          OXYW2(1,NY,NX)=OXYW2(1,NY,NX)+TQSOXS(NY,NX)
-          ZNGW2(1,NY,NX)=ZNGW2(1,NY,NX)+TQSNGS(NY,NX)
-          ZN2W2(1,NY,NX)=ZN2W2(1,NY,NX)+TQSN2S(NY,NX)
-          ZN4W2(1,NY,NX)=ZN4W2(1,NY,NX)+TQSNH4(NY,NX)
-          ZN3W2(1,NY,NX)=ZN3W2(1,NY,NX)+TQSNH3(NY,NX)
-          ZNOW2(1,NY,NX)=ZNOW2(1,NY,NX)+TQSNO3(NY,NX)
-          Z1PW2(1,NY,NX)=Z1PW2(1,NY,NX)+TQSH1P(NY,NX)
-          ZHPW2(1,NY,NX)=ZHPW2(1,NY,NX)+TQSH2P(NY,NX)
-          DO  L=1,JS
-            CO2W2(L,NY,NX)=CO2W2(L,NY,NX)+TCOBLS(L,NY,NX)
-            CH4W2(L,NY,NX)=CH4W2(L,NY,NX)+TCHBLS(L,NY,NX)
-            OXYW2(L,NY,NX)=OXYW2(L,NY,NX)+TOXBLS(L,NY,NX)
-            ZNGW2(L,NY,NX)=ZNGW2(L,NY,NX)+TNGBLS(L,NY,NX)
-            ZN2W2(L,NY,NX)=ZN2W2(L,NY,NX)+TN2BLS(L,NY,NX)
-            ZN4W2(L,NY,NX)=ZN4W2(L,NY,NX)+TN4BLW(L,NY,NX)
-            ZN3W2(L,NY,NX)=ZN3W2(L,NY,NX)+TN3BLW(L,NY,NX)
-            ZNOW2(L,NY,NX)=ZNOW2(L,NY,NX)+TNOBLW(L,NY,NX)
-            Z1PW2(L,NY,NX)=Z1PW2(L,NY,NX)+TH1PBS(L,NY,NX)
-            ZHPW2(L,NY,NX)=ZHPW2(L,NY,NX)+TH2PBS(L,NY,NX)
-          ENDDO
-!
-!     STATE VARIABLES FOR SOLUTES IN SURFACE RESIDUE AND IN
-!     MICROPORES AND MACROPORES IN SOIL SURFACE LAYER FROM OVERLAND
-!     FLOW AND SURFACE VOLATILIZATION-DISSOLUTION
-!
-!     *S2=litter solute content
-!     R*DFR=gas exchange between atmosphere and surface litter water
-!     R*DFS=gas exchange between atmosphere and soil surface water
-!     R*FLS=convective + diffusive solute flux into litter,soil surface
-!     R*FLW,R*FLB=convective + diffusive solute flux into litter from non-band,band
-!     TQR*=net overland solute flux
-!     solute code:CO=CO2,CH=CH4,OX=O2,NG=N2,N2=N2O,HG=H2
-!             :OC=DOC,ON=DON,OP=DOP,OA=acetate
-!             :NH4=NH4,NH3=NH3,NO3=NO3,NO2=NO2,P14=HPO4,PO4=H2PO4 in non-band
-!             :N4B=NH4,N3B=NH3,NOB=NO3,N2B=NO2,P1B=HPO4,POB=H2PO4 in band
-!
-          DO  K=0,jcplx1
-            OQC2(K,0,NY,NX)=OQC2(K,0,NY,NX)+ROCFLS(K,3,0,NY,NX)
-            OQN2(K,0,NY,NX)=OQN2(K,0,NY,NX)+RONFLS(K,3,0,NY,NX)
-            OQP2(K,0,NY,NX)=OQP2(K,0,NY,NX)+ROPFLS(K,3,0,NY,NX)
-            OQA2(K,0,NY,NX)=OQA2(K,0,NY,NX)+ROAFLS(K,3,0,NY,NX)
-          ENDDO
-          CO2S2(0,NY,NX)=CO2S2(0,NY,NX)+RCODFR(NY,NX)+RCOFLS(3,0,NY,NX)
-          CH4S2(0,NY,NX)=CH4S2(0,NY,NX)+RCHDFR(NY,NX)+RCHFLS(3,0,NY,NX)
-          OXYS2(0,NY,NX)=OXYS2(0,NY,NX)+ROXDFR(NY,NX)+ROXFLS(3,0,NY,NX)
-          Z2GS2(0,NY,NX)=Z2GS2(0,NY,NX)+RNGDFR(NY,NX)+RNGFLS(3,0,NY,NX)
-          Z2OS2(0,NY,NX)=Z2OS2(0,NY,NX)+RN2DFR(NY,NX)+RN2FLS(3,0,NY,NX)
-          H2GS2(0,NY,NX)=H2GS2(0,NY,NX)+RHGDFR(NY,NX)+RHGFLS(3,0,NY,NX)
-          ZNH4S2(0,NY,NX)=ZNH4S2(0,NY,NX)+RN4FLW(3,0,NY,NX)
-          ZNH3S2(0,NY,NX)=ZNH3S2(0,NY,NX)+RN3DFR(NY,NX)+RN3FLW(3,0,NY,NX)
-          ZNO3S2(0,NY,NX)=ZNO3S2(0,NY,NX)+RNOFLW(3,0,NY,NX)
-          ZNO2S2(0,NY,NX)=ZNO2S2(0,NY,NX)+RNXFLS(3,0,NY,NX)
-          H1PO42(0,NY,NX)=H1PO42(0,NY,NX)+RH1PFS(3,0,NY,NX)
-          H2PO42(0,NY,NX)=H2PO42(0,NY,NX)+RH2PFS(3,0,NY,NX)
-          CO2S2(NU(NY,NX),NY,NX)=CO2S2(NU(NY,NX),NY,NX)+RCODFS(NY,NX)
-          CH4S2(NU(NY,NX),NY,NX)=CH4S2(NU(NY,NX),NY,NX)+RCHDFS(NY,NX)
-          OXYS2(NU(NY,NX),NY,NX)=OXYS2(NU(NY,NX),NY,NX)+ROXDFS(NY,NX)
-          Z2GS2(NU(NY,NX),NY,NX)=Z2GS2(NU(NY,NX),NY,NX)+RNGDFS(NY,NX)
-          Z2OS2(NU(NY,NX),NY,NX)=Z2OS2(NU(NY,NX),NY,NX)+RN2DFS(NY,NX)
-          ZNH3S2(NU(NY,NX),NY,NX)=ZNH3S2(NU(NY,NX),NY,NX)+RN3DFS(NY,NX)
-          ZNH3B2(NU(NY,NX),NY,NX)=ZNH3B2(NU(NY,NX),NY,NX)+RNBDFS(NY,NX)
-          H2GS2(NU(NY,NX),NY,NX)=H2GS2(NU(NY,NX),NY,NX)+RHGDFS(NY,NX)
-          DO 9680 K=0,jcplx1
-            OQC2(K,0,NY,NX)=OQC2(K,0,NY,NX)+TQROC(K,NY,NX)
-            OQN2(K,0,NY,NX)=OQN2(K,0,NY,NX)+TQRON(K,NY,NX)
-            OQP2(K,0,NY,NX)=OQP2(K,0,NY,NX)+TQROP(K,NY,NX)
-            OQA2(K,0,NY,NX)=OQA2(K,0,NY,NX)+TQROA(K,NY,NX)
-9680  CONTINUE
-          CO2S2(0,NY,NX)=CO2S2(0,NY,NX)+TQRCOS(NY,NX)
-          CH4S2(0,NY,NX)=CH4S2(0,NY,NX)+TQRCHS(NY,NX)
-          OXYS2(0,NY,NX)=OXYS2(0,NY,NX)+TQROXS(NY,NX)
-          Z2GS2(0,NY,NX)=Z2GS2(0,NY,NX)+TQRNGS(NY,NX)
-          Z2OS2(0,NY,NX)=Z2OS2(0,NY,NX)+TQRN2S(NY,NX)
-          H2GS2(0,NY,NX)=H2GS2(0,NY,NX)+TQRHGS(NY,NX)
-          ZNH4S2(0,NY,NX)=ZNH4S2(0,NY,NX)+TQRNH4(NY,NX)
-          ZNH3S2(0,NY,NX)=ZNH3S2(0,NY,NX)+TQRNH3(NY,NX)
-          ZNO3S2(0,NY,NX)=ZNO3S2(0,NY,NX)+TQRNO3(NY,NX)
-          ZNO2S2(0,NY,NX)=ZNO2S2(0,NY,NX)+TQRNO2(NY,NX)
-          H1PO42(0,NY,NX)=H1PO42(0,NY,NX)+TQRH1P(NY,NX)
-          H2PO42(0,NY,NX)=H2PO42(0,NY,NX)+TQRH2P(NY,NX)
+          call UpdateStateVarInResidue(NY,NX)
+
         ENDIF
 !
         call UpdateSolutesInSoilLayers(M,MX,NY,NX)
@@ -406,6 +321,110 @@ module TrnsfrMod
 9695  CONTINUE
   ENDIF
   end subroutine UpdateStateVar
+!------------------------------------------------------------------------------------------
+
+  subroutine UpdateStateVarInSnowpack(NY,NX)
+  implicit none
+  integer, intent(in) :: NY,NX
+  integer :: L
+!
+!     *W2=solute content of snowpack
+!     TQS*=net overland solute flux in snow
+!     T*BLS=net solute flux in snowpack
+!     solute code:CO=CO2,CH=CH4,OX=O2,NG=N2,N2=N2O,HG=H2
+!             :N4=NH4,N3=NH3,NO=NO3,1P=HPO4,HP=H2PO4
+!
+  CO2W2(1,NY,NX)=CO2W2(1,NY,NX)+TQSCOS(NY,NX)
+  CH4W2(1,NY,NX)=CH4W2(1,NY,NX)+TQSCHS(NY,NX)
+  OXYW2(1,NY,NX)=OXYW2(1,NY,NX)+TQSOXS(NY,NX)
+  ZNGW2(1,NY,NX)=ZNGW2(1,NY,NX)+TQSNGS(NY,NX)
+  ZN2W2(1,NY,NX)=ZN2W2(1,NY,NX)+TQSN2S(NY,NX)
+  ZN4W2(1,NY,NX)=ZN4W2(1,NY,NX)+TQSNH4(NY,NX)
+  ZN3W2(1,NY,NX)=ZN3W2(1,NY,NX)+TQSNH3(NY,NX)
+  ZNOW2(1,NY,NX)=ZNOW2(1,NY,NX)+TQSNO3(NY,NX)
+  Z1PW2(1,NY,NX)=Z1PW2(1,NY,NX)+TQSH1P(NY,NX)
+  ZHPW2(1,NY,NX)=ZHPW2(1,NY,NX)+TQSH2P(NY,NX)
+  DO  L=1,JS
+    CO2W2(L,NY,NX)=CO2W2(L,NY,NX)+TCOBLS(L,NY,NX)
+    CH4W2(L,NY,NX)=CH4W2(L,NY,NX)+TCHBLS(L,NY,NX)
+    OXYW2(L,NY,NX)=OXYW2(L,NY,NX)+TOXBLS(L,NY,NX)
+    ZNGW2(L,NY,NX)=ZNGW2(L,NY,NX)+TNGBLS(L,NY,NX)
+    ZN2W2(L,NY,NX)=ZN2W2(L,NY,NX)+TN2BLS(L,NY,NX)
+    ZN4W2(L,NY,NX)=ZN4W2(L,NY,NX)+TN4BLW(L,NY,NX)
+    ZN3W2(L,NY,NX)=ZN3W2(L,NY,NX)+TN3BLW(L,NY,NX)
+    ZNOW2(L,NY,NX)=ZNOW2(L,NY,NX)+TNOBLW(L,NY,NX)
+    Z1PW2(L,NY,NX)=Z1PW2(L,NY,NX)+TH1PBS(L,NY,NX)
+    ZHPW2(L,NY,NX)=ZHPW2(L,NY,NX)+TH2PBS(L,NY,NX)
+  ENDDO
+  end subroutine UpdateStateVarInSnowpack
+
+!------------------------------------------------------------------------------------------
+
+  subroutine UpdateStateVarInResidue(NY,NX)
+  implicit none
+  integer, intent(in) :: NY,NX
+
+  integer :: K
+!     STATE VARIABLES FOR SOLUTES IN SURFACE RESIDUE AND IN
+!     MICROPORES AND MACROPORES IN SOIL SURFACE LAYER FROM OVERLAND
+!     FLOW AND SURFACE VOLATILIZATION-DISSOLUTION
+!
+!     *S2=litter solute content
+!     R*DFR=gas exchange between atmosphere and surface litter water
+!     R*DFS=gas exchange between atmosphere and soil surface water
+!     R*FLS=convective + diffusive solute flux into litter,soil surface
+!     R*FLW,R*FLB=convective + diffusive solute flux into litter from non-band,band
+!     TQR*=net overland solute flux
+!     solute code:CO=CO2,CH=CH4,OX=O2,NG=N2,N2=N2O,HG=H2
+!             :OC=DOC,ON=DON,OP=DOP,OA=acetate
+!             :NH4=NH4,NH3=NH3,NO3=NO3,NO2=NO2,P14=HPO4,PO4=H2PO4 in non-band
+!             :N4B=NH4,N3B=NH3,NOB=NO3,N2B=NO2,P1B=HPO4,POB=H2PO4 in band
+!
+  DO  K=0,jcplx1
+    OQC2(K,0,NY,NX)=OQC2(K,0,NY,NX)+ROCFLS(K,3,0,NY,NX)
+    OQN2(K,0,NY,NX)=OQN2(K,0,NY,NX)+RONFLS(K,3,0,NY,NX)
+    OQP2(K,0,NY,NX)=OQP2(K,0,NY,NX)+ROPFLS(K,3,0,NY,NX)
+    OQA2(K,0,NY,NX)=OQA2(K,0,NY,NX)+ROAFLS(K,3,0,NY,NX)
+  ENDDO
+  CO2S2(0,NY,NX)=CO2S2(0,NY,NX)+RCODFR(NY,NX)+RCOFLS(3,0,NY,NX)
+  CH4S2(0,NY,NX)=CH4S2(0,NY,NX)+RCHDFR(NY,NX)+RCHFLS(3,0,NY,NX)
+  OXYS2(0,NY,NX)=OXYS2(0,NY,NX)+ROXDFR(NY,NX)+ROXFLS(3,0,NY,NX)
+  Z2GS2(0,NY,NX)=Z2GS2(0,NY,NX)+RNGDFR(NY,NX)+RNGFLS(3,0,NY,NX)
+  Z2OS2(0,NY,NX)=Z2OS2(0,NY,NX)+RN2DFR(NY,NX)+RN2FLS(3,0,NY,NX)
+  H2GS2(0,NY,NX)=H2GS2(0,NY,NX)+RHGDFR(NY,NX)+RHGFLS(3,0,NY,NX)
+  ZNH4S2(0,NY,NX)=ZNH4S2(0,NY,NX)+RN4FLW(3,0,NY,NX)
+  ZNH3S2(0,NY,NX)=ZNH3S2(0,NY,NX)+RN3DFR(NY,NX)+RN3FLW(3,0,NY,NX)
+  ZNO3S2(0,NY,NX)=ZNO3S2(0,NY,NX)+RNOFLW(3,0,NY,NX)
+  ZNO2S2(0,NY,NX)=ZNO2S2(0,NY,NX)+RNXFLS(3,0,NY,NX)
+  H1PO42(0,NY,NX)=H1PO42(0,NY,NX)+RH1PFS(3,0,NY,NX)
+  H2PO42(0,NY,NX)=H2PO42(0,NY,NX)+RH2PFS(3,0,NY,NX)
+  CO2S2(NU(NY,NX),NY,NX)=CO2S2(NU(NY,NX),NY,NX)+RCODFS(NY,NX)
+  CH4S2(NU(NY,NX),NY,NX)=CH4S2(NU(NY,NX),NY,NX)+RCHDFS(NY,NX)
+  OXYS2(NU(NY,NX),NY,NX)=OXYS2(NU(NY,NX),NY,NX)+ROXDFS(NY,NX)
+  Z2GS2(NU(NY,NX),NY,NX)=Z2GS2(NU(NY,NX),NY,NX)+RNGDFS(NY,NX)
+  Z2OS2(NU(NY,NX),NY,NX)=Z2OS2(NU(NY,NX),NY,NX)+RN2DFS(NY,NX)
+  ZNH3S2(NU(NY,NX),NY,NX)=ZNH3S2(NU(NY,NX),NY,NX)+RN3DFS(NY,NX)
+  ZNH3B2(NU(NY,NX),NY,NX)=ZNH3B2(NU(NY,NX),NY,NX)+RNBDFS(NY,NX)
+  H2GS2(NU(NY,NX),NY,NX)=H2GS2(NU(NY,NX),NY,NX)+RHGDFS(NY,NX)
+  DO 9680 K=0,jcplx1
+    OQC2(K,0,NY,NX)=OQC2(K,0,NY,NX)+TQROC(K,NY,NX)
+    OQN2(K,0,NY,NX)=OQN2(K,0,NY,NX)+TQRON(K,NY,NX)
+    OQP2(K,0,NY,NX)=OQP2(K,0,NY,NX)+TQROP(K,NY,NX)
+    OQA2(K,0,NY,NX)=OQA2(K,0,NY,NX)+TQROA(K,NY,NX)
+9680  CONTINUE
+  CO2S2(0,NY,NX)=CO2S2(0,NY,NX)+TQRCOS(NY,NX)
+  CH4S2(0,NY,NX)=CH4S2(0,NY,NX)+TQRCHS(NY,NX)
+  OXYS2(0,NY,NX)=OXYS2(0,NY,NX)+TQROXS(NY,NX)
+  Z2GS2(0,NY,NX)=Z2GS2(0,NY,NX)+TQRNGS(NY,NX)
+  Z2OS2(0,NY,NX)=Z2OS2(0,NY,NX)+TQRN2S(NY,NX)
+  H2GS2(0,NY,NX)=H2GS2(0,NY,NX)+TQRHGS(NY,NX)
+  ZNH4S2(0,NY,NX)=ZNH4S2(0,NY,NX)+TQRNH4(NY,NX)
+  ZNH3S2(0,NY,NX)=ZNH3S2(0,NY,NX)+TQRNH3(NY,NX)
+  ZNO3S2(0,NY,NX)=ZNO3S2(0,NY,NX)+TQRNO3(NY,NX)
+  ZNO2S2(0,NY,NX)=ZNO2S2(0,NY,NX)+TQRNO2(NY,NX)
+  H1PO42(0,NY,NX)=H1PO42(0,NY,NX)+TQRH1P(NY,NX)
+  H2PO42(0,NY,NX)=H2PO42(0,NY,NX)+TQRH2P(NY,NX)
+  end subroutine UpdateStateVarInResidue
 
 !------------------------------------------------------------------------------------------
 

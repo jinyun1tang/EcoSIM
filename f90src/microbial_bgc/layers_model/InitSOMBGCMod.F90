@@ -12,6 +12,7 @@ module InitSOMBGCMOD
   use SoilPropertyDataType
   use GridDataType
   use MicBGCPars, only : micpar
+
   implicit none
 
   private
@@ -34,11 +35,9 @@ module InitSOMBGCMOD
   integer, intent(in) :: nmicbguilds
 
   call MicPar%Init(nmicbguilds)
-  jcplx=micpar%jcplx
-  jcplx1=micpar%jcplx1
+
+
   JG=micpar%jguilds
-  jsken=micpar%jsken
-  NFGs=micpar%NFGs
   allocate(CORGCX(0:jcplx1))
   allocate(CORGNX(0:jcplx1))
   allocate(CORGPX(0:jcplx1))

@@ -192,8 +192,8 @@ implicit none
 !         OHC,OHN,OHP,OHA=adsorbed C,N,P,acetate
 !         OSC,OAA,OSN,OSP=SOC,colonized SOC,SON,SOP
 !
-          DO 1960 N=1,7
-            DO M=1,3
+          DO 1960 N=1,NFGs
+            DO M=1,nlbiomcp
               DO NGL=1,JG
                 FOMC=FSINK*OMC(M,NGL,N,K,L,NY,NX)
                 FOMN=FSINK*OMN(M,NGL,N,K,L,NY,NX)
@@ -215,8 +215,8 @@ implicit none
 !         OHC,OHN,OHP,OHA=adsorbed C,N,P,acetate
 !         OSC,OAA,OSN,OSP=SOC,colonized SOC,SON,SOP
 !
-          DO N=1,7
-            DO M=1,3
+          DO N=1,NFGs
+            DO M=1,nlbiomcp
               DO NGL=1,JG
                 FOMC=FSINK*OMCff(M,NGL,N,L,NY,NX)
                 FOMN=FSINK*OMNff(M,NGL,N,L,NY,NX)
@@ -235,7 +235,7 @@ implicit none
 !     MICROBIAL RESIDUE C,N,P
 !
       DO 1900 K=0,2
-        DO 1940 M=1,2
+        DO 1940 M=1,ndbiomcp
           FORC=FSINK*ORC(M,K,L,NY,NX)
           FORN=FSINK*ORN(M,K,L,NY,NX)
           FORP=FSINK*ORP(M,K,L,NY,NX)
@@ -264,7 +264,7 @@ implicit none
 !
 !       SOC,N,P
 !
-        DO 1930 M=1,4
+        DO 1930 M=1,jsken
           FOSC=FSINK*OSC(M,K,L,NY,NX)
           FOSA=FSINK*OSA(M,K,L,NY,NX)
           FOSN=FSINK*OSN(M,K,L,NY,NX)

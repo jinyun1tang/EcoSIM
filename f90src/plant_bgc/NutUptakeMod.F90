@@ -134,10 +134,8 @@ module NutUptakeMod
 
   DO 955 N=1,MY(NZ)
     DO 950 L=NU,NI(NZ)
-      IF(VOLX(L).GT.ZEROS2 &
-        .AND.RTDNP(N,L,NZ).GT.ZERO &
-        .AND.RTVLW(N,L,NZ).GT.ZEROP(NZ) &
-        .AND.THETW(L).GT.ZERO)THEN
+      IF(VOLX(L).GT.ZEROS2.AND.RTDNP(N,L,NZ).GT.ZERO &
+        .AND.RTVLW(N,L,NZ).GT.ZEROP(NZ).AND.THETW(L).GT.ZERO)THEN
         TFOXYX=0.0_r8
         call GetUptakeCapcity(N,L,NZ,FPQ,FPP,FCUP,FZUP,FPUP,&
           FWSRT,UPWTRP,UPWTRH,FOXYX)
@@ -1237,7 +1235,7 @@ module NutUptakeMod
   real(r8) :: XFRC,XFRN,XFRP
   integer :: K
   !     begin_execution
-  associate(                           &
+  associate(                       &
     CPOOLR=>  plt_biom%CPOOLR    , &
     ZPOOLR=>  plt_biom%ZPOOLR    , &
     PPOOLR=>  plt_biom%PPOOLR    , &
@@ -1274,14 +1272,12 @@ module NutUptakeMod
   !
   DO 195 K=0,jcplx11
     VOLWK=VOLWM(NPH,L)*FOSRH(K,L)
-    IF(VOLWK.GT.ZEROS2 &
-      .AND.RTVLW(N,L,NZ).GT.ZEROP(NZ))THEN
+    IF(VOLWK.GT.ZEROS2.AND.RTVLW(N,L,NZ).GT.ZEROP(NZ))THEN
       VOLWT=VOLWK+RTVLW(N,L,NZ)
       CPOOLX=AMIN1(1.25E+03*RTVLW(N,L,NZ),CPOOLR(N,L,NZ))
       XFRC=(OQC(K,L)*RTVLW(N,L,NZ)-CPOOLX*VOLWK)/VOLWT
       RDFOMC(N,K,L,NZ)=FEXUC*XFRC
-      IF(OQC(K,L).GT.ZEROS &
-        .AND.CPOOLR(N,L,NZ).GT.ZEROP(NZ))THEN
+      IF(OQC(K,L).GT.ZEROS.AND.CPOOLR(N,L,NZ).GT.ZEROP(NZ))THEN
         CPOOLT=OQC(K,L)+CPOOLR(N,L,NZ)
         ZPOOLX=0.1*ZPOOLR(N,L,NZ)
         PPOOLX=0.1*PPOOLR(N,L,NZ)

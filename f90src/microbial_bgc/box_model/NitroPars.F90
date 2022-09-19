@@ -285,8 +285,8 @@ module NitroPars
   SPOHA=0.25_r8
   RMOM=0.010_r8
 
-  SPORC=(/7.5_r8,1.5_r8/)
-  SPOMC=(/1.0E-02_r8,0.1E-02_r8/)
+  SPORC=(/7.5_r8,1.5_r8/)    !hydrolysis of microbial residue
+  SPOMC=(/1.0E-02_r8,0.1E-02_r8/) !basal mortality rates
   EN2F=(/0.0_r8,0.0_r8,0.0_r8,0.0_r8,0.0_r8,EN2X,EN2Y/)
   EFIRE=reshape((/1.0_r8,1.0_r8,0.917_r8,0.167_r8/),shape(EFIRE))
 

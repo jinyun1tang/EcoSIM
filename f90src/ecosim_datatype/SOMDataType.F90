@@ -1,6 +1,7 @@
 module SOMDataType
   use data_kind_mod, only : r8 => SHR_KIND_R8
   use GridConsts
+  use EcoSIMConfig, only : jcplx1=> jcplx1c,jsken=>jskenc
   implicit none
   public
   save

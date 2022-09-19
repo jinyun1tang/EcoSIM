@@ -10,6 +10,7 @@ module ForcWriterMod
   use ClimForcDataType
   use SoilWaterDataType
   use ncdio_pio
+  use EcoSIMConfig, only : jcplx => jcplxc
   use data_const_mod, only : spval  => SHR_CONST_SPVAL
 implicit none
 
