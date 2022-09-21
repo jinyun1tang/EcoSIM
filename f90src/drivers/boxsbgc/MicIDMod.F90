@@ -11,6 +11,7 @@ implicit none
   integer :: cid_ZN3G      !gaseous tracer NH3
   integer :: cid_H2GG      !gaseous tracer H2
   integer :: cid_Z2GS      !aqueous N2
+  integer :: cid_ZNH3G     !gaseous NH3 IN soil, [gN d-2]
   integer :: cid_ZNH3B     !NH3 band micropore, [gN d-2]
   integer :: cid_ZNH3S     !NH3 non-band micropore, [gN d-2]
   integer :: cid_ZNH4B     !NH4 band micropore, [g d-2]
