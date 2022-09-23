@@ -1,5 +1,5 @@
 module batchmod
-
+!j6aG$1bZcd5xgo1eAroLF36nN^
   use abortutils     , only : endrun
   use MiscUtilMod    , only : addone
   use data_kind_mod  , only : r8 => SHR_KIND_R8
@@ -22,12 +22,17 @@ implicit none
 
   public :: getvarllen, getvarlist,initmodel
   public :: BatchModelConfig
-
+  public :: RunMicBGC
 contains
 
   function getvarllen()result(nvars)
   implicit none
   integer :: nvars
+  integer :: nmicbguilds
+
+  nmicbguilds=1
+  call micpar%Init(nmicbguilds)
+  call micpar%SetPars()
 
   call Initboxbgc(nvars)
 
@@ -36,14 +41,14 @@ contains
   subroutine initmodel(nvars, ystates0l, err_status)
 !
 ! set initial conditions for the boxsbgc
-
+  use MicBGCMod, only : initNitro1Layer
   implicit none
   integer, intent(in) :: nvars
   real(r8), intent(inout) :: ystates0l(nvars)
   type(model_status_type), intent(out) :: err_status
 
   call err_status%reset()
-
+  call initNitro1Layer
 
   end subroutine initmodel
 
@@ -87,10 +92,10 @@ contains
 
   micfor%CCH4E =forc%CCH4E
   micfor%COXYE =forc%COXYE
-  micfor%COXQ  =0._r8
-  micfor%COXR  =0._r8
-  micfor%FLQRI =0._r8
-  micfor%FLQRQ =0._r8
+  micfor%COXQ  =0._r8      !oxygen concentration in surface irrigation
+  micfor%COXR  =0._r8      !oxygen concentration in precipitation
+  micfor%FLQRI =0._r8      !irrigation flux into surface litter
+  micfor%FLQRQ =0._r8      !precipitation flux into surface litter
   micfor%OFFSET=forc%OFFSET
   micfor%VOLR  =forc%VOLR
   micfor%VOLWRX=forc%VOLWRX
@@ -131,6 +136,8 @@ contains
   micfor%litrm=.false.
   micfor%Lsurf=.True.
   if(micfor%litrm)then
+!   the following haven't been turned on
+!
     micstt%ZNH4TU=AMAX1(0.0,forc%ZNH4S)
     micstt%ZNO3TU=AMAX1(0.0,forc%ZNO3S)
     micstt%H1P4TU=AMAX1(0.0,forc%H1PO4)
@@ -160,7 +167,7 @@ contains
     micfor%CFOMCU=forc%CFOMC(1:ndbiomcp)
   else
     micfor%AEC=forc%AEC
-    micstt%OXYG=ystates0l(cid_COXYG)*forc%VOLPM
+    micstt%OXYG=ystates0l(cid_COXYG)*forc%VOLP
   endif
   micstt%CNH4B =forc%CNH4B
   micstt%CNO3B =forc%CNO3B
@@ -176,7 +183,7 @@ contains
   micfor%RPO4Y =ystates0l(fid_RPO4Y)
   micfor%RP14Y =ystates0l(fid_RP14Y)
   micfor%VOLW  =forc%VOLW
-
+  micfor%VOLP  =forc%VOLP
   if(micfor%Lsurf)then
     micfor%BKVL0=forc%BKVL
   endif
@@ -185,7 +192,7 @@ contains
   micfor%THETPM(1:NPH)=forc%THETPM
   micfor%VOLWM(1:NPH) =forc%VOLW
   micfor%TORT(1:NPH)  =forc%TORT
-  micfor%VOLPM(1:NPH) =forc%VOLPM
+  micfor%VOLPM(1:NPH) =forc%VOLP
 
   micstt%EPOC=forc%EPOC
   micstt%EHUM=forc%EHUM
@@ -235,6 +242,7 @@ contains
   micstt%ORP(1:ndbiomcp,0:jcplx1)=reshape(ystates0l(cid_orp_b:cid_orp_e),(/ndbiomcp,jcplx/))
   micstt%CNOSC(1:jsken,0:jcplx1)=forc%CNOSC(1:jsken,0:jcplx1)
   micstt%CPOSC(1:jsken,0:jcplx1)=forc%CPOSC(1:jsken,0:jcplx1)
+
   micstt%OMC(1:nlbiomcp,1:JG,1:NFGs,0:jcplx1)=reshape(ystates0l(cid_omc_b:cid_omc_e),&
     (/nlbiomcp,JG,NFGs,jcplx/))
   micstt%OMN(1:nlbiomcp,1:JG,1:NFGs,0:jcplx1)=reshape(ystates0l(cid_omn_b:cid_omn_e),&
@@ -381,6 +389,7 @@ contains
   cid_ompff_b=addone(itemp);cid_ompff_e=cid_ompff_b+nlbiomcp*JG*NFGs-1;itemp=cid_ompff_e
 
   fid_ROXYY=addone(itemp)
+  fid_ROXYF=addone(itemp)
   fid_RNH4Y=addone(itemp)
   fid_RNO3Y=addone(itemp)
   fid_RNO2Y=addone(itemp)
@@ -394,15 +403,47 @@ contains
   fid_RP1BY=addone(itemp)
   fid_ROQCY_b=addone(itemp);fid_ROQCY_e=fid_ROQCY_b+jcplx1;itemp=fid_ROQCY_e
   fid_ROQAY_b=addone(itemp);fid_ROQAY_e=fid_ROQAY_b+jcplx1;itemp=fid_ROQAY_e
-  fid_RINHO_b=addone(itemp);fid_RINHO_e=fid_RINHO_b+jcplx1;itemp=fid_RINHO_e
-  fid_RINHB_b=addone(itemp);fid_RINHB_e=fid_RINHB_b+jcplx1;itemp=fid_RINHB_e
-  fid_RINOO_b=addone(itemp);fid_RINOO_e=fid_RINOO_b+jcplx1;itemp=fid_RINOO_e
-  fid_RINOB_b=addone(itemp);fid_RINOB_e=fid_RINOB_b+jcplx1;itemp=fid_RINOB_e
-  fid_RIPOO_b=addone(itemp);fid_RIPOO_e=fid_RIPOO_b+jcplx1;itemp=fid_RIPOO_e
-  fid_RIPBO_b=addone(itemp);fid_RIPBO_e=fid_RIPBO_b+jcplx1;itemp=fid_RIPBO_e
-  fid_RIPO1_b=addone(itemp);fid_RIPO1_e=fid_RIPO1_b+jcplx1;itemp=fid_RIPO1_e
-  fid_RIPB1_b=addone(itemp);fid_RIPB1_e=fid_RIPB1_b+jcplx1;itemp=fid_RIPB1_e
-  fid_ROXYS_b=addone(itemp);fid_ROXYS_e=fid_ROXYS_b+jcplx1;itemp=fid_ROXYS_e
+  fid_RINHO_b=addone(itemp);fid_RINHO_e=fid_RINHO_b+JG*NFGs*jcplx-1;itemp=fid_RINHO_e
+  fid_RINHB_b=addone(itemp);fid_RINHB_e=fid_RINHB_b+JG*NFGs*jcplx-1;itemp=fid_RINHB_e
+  fid_RINOO_b=addone(itemp);fid_RINOO_e=fid_RINOO_b+JG*NFGs*jcplx-1;itemp=fid_RINOO_e
+  fid_RINOB_b=addone(itemp);fid_RINOB_e=fid_RINOB_b+JG*NFGs*jcplx-1;itemp=fid_RINOB_e
+  fid_RIPOO_b=addone(itemp);fid_RIPOO_e=fid_RIPOO_b+JG*NFGs*jcplx-1;itemp=fid_RIPOO_e
+  fid_RIPBO_b=addone(itemp);fid_RIPBO_e=fid_RIPBO_b+JG*NFGs*jcplx-1;itemp=fid_RIPBO_e
+  fid_RIPO1_b=addone(itemp);fid_RIPO1_e=fid_RIPO1_b+JG*NFGs*jcplx-1;itemp=fid_RIPO1_e
+  fid_RIPB1_b=addone(itemp);fid_RIPB1_e=fid_RIPB1_b+JG*NFGs*jcplx-1;itemp=fid_RIPB1_e
+  fid_ROXYS_b=addone(itemp);fid_ROXYS_e=fid_ROXYS_b+JG*NFGs*jcplx-1;itemp=fid_ROXYS_e
+
+  fid_XCODFS=addone(itemp)
+  fid_XCHDFS=addone(itemp)
+  fid_XOXDFS=addone(itemp)
+  fid_XNGDFS=addone(itemp)
+  fid_XN2DFS=addone(itemp)
+  fid_XN3DFS=addone(itemp)
+  fid_XNBDFS=addone(itemp)
+  fid_XHGDFS=addone(itemp)
+  fid_XCODFG=addone(itemp)
+  fid_XCHDFG=addone(itemp)
+  fid_XOXDFG=addone(itemp)
+  fid_XNGDFG=addone(itemp)
+  fid_XN2DFG=addone(itemp)
+  fid_XN3DFG=addone(itemp)
+  fid_XNBDFG=addone(itemp)
+  fid_XHGDFG=addone(itemp)
+  fid_XCOFLG=addone(itemp)
+  fid_XCHFLG=addone(itemp)
+  fid_XOXFLG=addone(itemp)
+  fid_XNGFLG=addone(itemp)
+  fid_XN2FLG=addone(itemp)
+  fid_XN3FLG=addone(itemp)
+  fid_XHGFLG=addone(itemp)
+
+  cid_CO2G=addone(itemp)
+  cid_CH4G=addone(itemp)
+  cid_OXYG=addone(itemp)
+  cid_Z2GG=addone(itemp)
+  cid_Z2OG=addone(itemp)
+  cid_H2GG=addone(itemp)
+  cid_ZNH3G=addone(itemp)
 
   cid_ZNH4B=addone(itemp)
   cid_ZNH4S=addone(itemp)
@@ -410,6 +451,7 @@ contains
   cid_ZNH3S=addone(itemp)
   cid_ZNO3B=addone(itemp)
   cid_ZNO3S=addone(itemp)
+  cid_Z2GS =addone(itemp)
   cid_H1POB=addone(itemp)
   cid_H1PO4=addone(itemp)
   cid_ZNO2B=addone(itemp)
@@ -462,7 +504,7 @@ contains
 !atmospheric gaseous CO2,CH4,O2,NH3,N2,N2O,H2
 !
   ystatesfl(cid_ZNH3B)=ystates0l(cid_ZNH3B)+ystatesfl(fid_TRN3B)+micflx%XNH4B
-  ystatesfl(cid_ZNH3S)=ystates0l(cid_ZNH3S)+ystatesfl(fid_TRN4S)+micflx%XNH4S
+  ystatesfl(cid_ZNH3S)=ystates0l(cid_ZNH3S)+ystatesfl(fid_TRN3S)+micflx%XNH4S
   ystatesfl(cid_ZNH4B)=ystates0l(cid_ZNH4B)+ystatesfl(fid_TRN3B)+micflx%XNH4B
   ystatesfl(cid_ZNH4S)=ystates0l(cid_ZNH4S)+ystatesfl(fid_TRN4S)+micflx%XNH4S
   ystatesfl(cid_H1POB)=ystates0l(cid_H1POB)+ystatesfl(fid_TRH1B)+micflx%XH1BS
@@ -475,21 +517,42 @@ contains
   ystatesfl(cid_ZNO2S)=ystates0l(cid_ZNO2S)+micflx%XNO2S
 
   ystatesfl(cid_CO2S) =ystates0l(cid_CO2S)-micflx%RCO2O
-  ystatesfl(cid_CNO2S)=ystatesfl(cid_ZNO2S)/(VOLW*micfor%VLNO3)
-  ystatesfl(cid_CNO2B)=ystatesfl(cid_ZNO2B)/(VOLW*micfor%VLNOB)
   ystatesfl(cid_Z2OS) =ystates0l(cid_Z2OS)-micflx%RN2O
   ystatesfl(cid_OXYS) =ystates0l(cid_OXYS)-micflx%RUPOXO
   ystatesfl(cid_H2GS) =ystates0l(cid_H2GS)-micflx%RH2GO
   ystatesfl(cid_CH4S) =ystates0l(cid_CH4S)-micflx%RCH4O
+
+  ystatesfl(cid_ZNFN0)=micstt%ZNFN0
+  ystatesfl(cid_ZNFNI)=micstt%ZNFNI
+
+  ystatesfl(cid_CO2S)=ystatesfl(cid_CO2S)+ystatesfl(fid_XCODFS)+ystatesfl(fid_XCODFG)
+  ystatesfl(cid_CH4S)=ystatesfl(cid_CH4S)+ystatesfl(fid_XCHDFS)+ystatesfl(fid_XCHDFG)
+  ystatesfl(cid_OXYS)=ystatesfl(cid_OXYS)+ystatesfl(fid_XOXDFS)+ystatesfl(fid_XOXDFG)
+  ystatesfl(cid_Z2GS)=ystatesfl(cid_Z2GS)+ystatesfl(fid_XNGDFS)+ystatesfl(fid_XNGDFG)
+  ystatesfl(cid_Z2OS)=ystatesfl(cid_Z2OS)+ystatesfl(fid_XN2DFS)+ystatesfl(fid_XN2DFG)
+  ystatesfl(cid_ZNH3S)=ystatesfl(cid_ZNH3S)+ystatesfl(fid_XN3DFS)+ystatesfl(fid_XN3DFG)
+  ystatesfl(cid_ZNH3B)=ystatesfl(cid_ZNH3B)+ystatesfl(fid_XNBDFS)+ystatesfl(fid_XNBDFG)
+  ystatesfl(cid_H2GS)=ystatesfl(cid_H2GS)+ystatesfl(fid_XHGDFS)+ystatesfl(fid_XHGDFG)
+
+  ystatesfl(cid_CO2G)=ystates0l(cid_CO2G)-ystatesfl(fid_XCODFG)+ystatesfl(fid_XHGDFG)
+  ystatesfl(cid_CH4G)=ystates0l(cid_CH4G)-ystatesfl(fid_XCHDFG)+ystatesfl(fid_XCHFLG)
+  ystatesfl(cid_OXYG)=ystates0l(cid_OXYG)-ystatesfl(fid_XOXDFG)+ystatesfl(fid_XOXFLG)
+  ystatesfl(cid_Z2GG)=ystates0l(cid_Z2GG)-ystatesfl(fid_XNGDFG)+ystatesfl(fid_XNGFLG)
+  ystatesfl(cid_Z2OG)=ystates0l(cid_Z2OG)-ystatesfl(fid_XN2DFG)+ystatesfl(fid_XN2FLG)
+  ystatesfl(cid_ZNH3G)=ystates0l(cid_ZNH3G)-ystatesfl(fid_XN3DFG)-ystatesfl(fid_XNBDFG) &
+    +ystatesfl(fid_XN3FLG)
+  ystatesfl(cid_H2GG)=ystates0l(cid_H2GG)-ystatesfl(fid_XHGDFG)+ystatesfl(fid_XHGFLG)
+  ystatesfl(fid_ROXYF)=ystatesfl(fid_XOXDFG)
+
+  ystatesfl(cid_CNO2S)=ystatesfl(cid_ZNO2S)/(VOLW*micfor%VLNO3)
+  if(micfor%VLNOB>0._r8)ystatesfl(cid_CNO2B)=ystatesfl(cid_ZNO2B)/(VOLW*micfor%VLNOB)
   ystatesfl(cid_CCO2S)=ystatesfl(cid_CO2S)/micfor%VOLW
   ystatesfl(cid_CZ2OS)=ystatesfl(cid_Z2OS)/micfor%VOLW
   ystatesfl(cid_CH2GS)=ystatesfl(cid_H2GS)/micfor%VOLW
   ystatesfl(cid_COXYS)=ystatesfl(cid_OXYS)/micfor%VOLW
-  ystatesfl(cid_COXYG)=micstt%COXYG
-  ystatesfl(cid_CZ2GS)=micstt%CZ2GS
-  ystatesfl(cid_CCH4G)=micstt%CCH4G
-  ystatesfl(cid_ZNFN0)=micstt%ZNFN0
-  ystatesfl(cid_ZNFNI)=micstt%ZNFNI
+  ystatesfl(cid_COXYG)=ystatesfl(cid_OXYG)/micfor%VOLP
+  ystatesfl(cid_CZ2GS)=ystatesfl(cid_Z2GS)/micfor%VOLP
+  ystatesfl(cid_CCH4G)=ystatesfl(cid_CH4G)/micfor%VOLP
 
 ! the following variables are updated in the microbial model
   ystatesfl(cid_oqc_b:cid_oqc_e)=micstt%OQC(0:jcplx1)
@@ -658,11 +721,15 @@ contains
   varl(cid_COXYS)='COXYS';varlnml(cid_COXYS)='soil micropore aqueous O2 concentration'
   unitl(cid_COXYS)='g m-3';vartypes(cid_COXYS)=var_state_type
 
+
   varl(cid_OXYS) ='OXYS';varlnml(cid_OXYS)='soil micropore aqueous O2 mass'
   unitl(cid_OXYS)='g d-2';vartypes(cid_OXYS)=var_state_type
 
   varl(cid_COXYG)='COXYG';varlnml(cid_COXYG)='soil micropore gaseous O2 concentration'
   unitl(cid_COXYG)='g m-3';vartypes(cid_COXYG)=var_state_type
+
+  varl(cid_Z2GS)='Z2GS';varlnml(cid_Z2GS)='soil micropore aqueous N2 mass'
+  unitl(cid_Z2GS)='gN d-2';vartypes(cid_Z2GS)=var_state_type
 
   varl(cid_CZ2GS)='CZ2GS';varlnml(cid_CZ2GS)='soil micropore aqueous N2 concentration'
   unitl(cid_CZ2GS)='gN m-3';vartypes(cid_CZ2GS)=var_state_type
@@ -684,6 +751,27 @@ contains
 
   varl(cid_ZNFNI)='ZNFNI';varlnml(cid_ZNFNI)='current nitrification inhibition activity'
   unitl(cid_ZNFNI)='none';vartypes(cid_ZNFNI)=var_state_type
+
+  varl(cid_CO2G)='CO2G';varlnml(cid_CO2G)='gaseous CO2 mass'
+  unitl(cid_CO2G)='gC d-2';vartypes(cid_CO2G)=var_state_type
+
+  varl(cid_CH4G)='CH4G';varlnml(cid_CH4G)='gaseous CH4 mass'
+  unitl(cid_CH4G)='gC d-2';vartypes(cid_CH4G)=var_state_type
+
+  varl(cid_OXYG)='OXYG';varlnml(cid_OXYG)='gaseous oxygen mass'
+  unitl(cid_OXYG)='gO d-2';vartypes(cid_OXYG)=var_state_type
+
+  varl(cid_Z2GG)='Z2GG';varlnml(cid_Z2GG)='gaseous N2 mass'
+  unitl(cid_Z2GG)='gN d-2';vartypes(cid_Z2GG)=var_state_type
+
+  varl(cid_Z2OG)='Z2OG';varlnml(cid_Z2OG)='gaseous N2O mass'
+  unitl(cid_Z2OG)='gN d-2';vartypes(cid_Z2OG)=var_state_type
+
+  varl(cid_H2GG)='H2GG';varlnml(cid_H2GG)='gaseous H2 mass'
+  unitl(cid_H2GG)='gH d-2';vartypes(cid_H2GG)=var_state_type
+
+  varl(cid_ZNH3G)='ZNH3G';varlnml(cid_ZNH3G)='gaseous NH3 mass'
+  unitl(cid_ZNH3G)='gN d-2';vartypes(cid_ZNH3G)=var_state_type
 
   do jj=cid_oqc_b,cid_oqc_e
     write(varl(jj),'(A,I1)')'OQC',jj-cid_oqc_b
@@ -763,7 +851,7 @@ contains
   enddo
 
   do jj=cid_osa_b,cid_osa_e
-    iknen=jj-cid_osc_b
+    iknen=jj-cid_osa_b
     icplx=floor((iknen+1-1.e-3_r8)/jsken)
     iknen=mod(iknen,jsken)
     write(varl(jj),'(A,I1,I1)')'OSA',iknen+1,icplx
@@ -774,7 +862,7 @@ contains
 
   do jj=cid_orc_b,cid_orc_e
     iknen=jj-cid_orc_b
-    icplx=floor((iknen-1.e-3_r8)/ndbiomcp)
+    icplx=floor((iknen+1-1.e-3_r8)/ndbiomcp)
     iknen=mod(iknen,ndbiomcp)
     write(varl(jj),'(A,I1,I1)')'ORC',iknen+1,icplx
     varlnml(jj)='microbial residue C as '//trim(micpar%micresb(iknen))//' in complex '//trim(micpar%cplxname(icplx))
@@ -783,8 +871,8 @@ contains
   enddo
 
   do jj=cid_orn_b,cid_orn_e
-    iknen=jj-cid_orc_b
-    icplx=floor((iknen-1.e-3_r8)/ndbiomcp)
+    iknen=jj-cid_orn_b
+    icplx=floor((iknen+1-1.e-3_r8)/ndbiomcp)
     iknen=mod(iknen,ndbiomcp)
     write(varl(jj),'(A,I1,I1)')'ORN',iknen+1,icplx
     varlnml(jj)='microbial residue N as '//trim(micpar%micresb(iknen))//' in complex '//trim(micpar%cplxname(icplx))
@@ -793,8 +881,8 @@ contains
   enddo
 
   do jj=cid_orp_b,cid_orp_e
-    iknen=jj-cid_orc_b
-    icplx=floor((iknen-1.e-3_r8)/ndbiomcp)
+    iknen=jj-cid_orp_b
+    icplx=floor((iknen+1-1.e-3_r8)/ndbiomcp)
     iknen=mod(iknen,ndbiomcp)
     write(varl(jj),'(A,I1,I1)')'ORP',iknen+1,icplx
     varlnml(jj)='microbial residue P as '//trim(micpar%micresb(iknen))//' in complex '//trim(micpar%cplxname(icplx))
@@ -872,6 +960,9 @@ contains
   varl(fid_ROXYY)='ROXYY';varlnml(fid_ROXYY)='total root + microbial O2 uptake potential'
   unitl(fid_ROXYY)='g d-2 h-1'; vartypes(fid_ROXYY)=var_flux_type
 
+  varl(fid_ROXYF)='ROXYF';varlnml(fid_ROXYF)='net gaseous O2 flux from previous hour'
+  unitl(fid_ROXYF)='g d-2 h-1'; vartypes(fid_ROXYF)=var_flux_type
+
   varl(fid_RNH4Y)='RNH4Y';varlnml(fid_RNH4Y)='total root + microbial NH4 uptake potential non-band soil'
   unitl(fid_RNH4Y)='gN d-2 h-1'; vartypes(fid_RNH4Y)=var_flux_type
 
@@ -905,6 +996,75 @@ contains
   varl(fid_RP1BY)='RP1BY';varlnml(fid_RP1BY)='total root + microbial HPO4 uptake potential band soil';
   unitl(fid_RP1BY)='gP d-2 h-1'; vartypes(fid_RP1BY)=var_flux_type
 
+  varl(fid_XCODFS)='XCODFS';varlnml(fid_XCODFS)='CO2 dissolution (+)-volatiziation (-) with respect to atmosphere'
+  unitl(fid_XCODFS)='gC d-2 h-1'; vartypes(fid_XCODFS)=var_flux_type
+
+  varl(fid_XCHDFS)='XCHDFS';varlnml(fid_XCHDFS)='CH4 dissolution (+)-volatiziation (-) with respect to atmosphere'
+  unitl(fid_XCHDFS)='gC d-2 h-1';vartypes(fid_XCHDFS)=var_flux_type
+
+  varl(fid_XOXDFS)='XOXDFS';varlnml(fid_XOXDFS)='O2 dissolution (+)-volatiziation (-) with respect to atmosphere'
+  unitl(fid_XOXDFS)='gO d-2 h-1';vartypes(fid_XOXDFS)=var_flux_type
+
+  varl(fid_XNGDFS)='XNGDFS';varlnml(fid_XNGDFS)='N2 dissolution (+)-volatiziation (-) with respect to atmosphere'
+  unitl(fid_XNGDFS)='gN d-2 h-1';vartypes(fid_XNGDFS)=var_flux_type
+
+  varl(fid_XN2DFS)='XN2DFS';varlnml(fid_XN2DFS)='N2O dissolution (+)-volatiziation (-) with respect to atmosphere'
+  unitl(fid_XN2DFS)='gN d-2 h-1';vartypes(fid_XN2DFS)=var_flux_type
+
+  varl(fid_XN3DFS)='XN3DFS';varlnml(fid_XN3DFS)='NH3 dissolution (+)-volatiziation (-) with respect to atmosphere in non-band soil'
+  unitl(fid_XN3DFS)='gN d-2 h-1';vartypes(fid_XN3DFS)=var_flux_type
+
+  varl(fid_XNBDFS)='XNBDFS';varlnml(fid_XNBDFS)='NH3 dissolution (+)-volatiziation (-) with respect to atmosphere in band soil'
+  unitl(fid_XNBDFS)='gN d-2 h-1';vartypes(fid_XNBDFS)=var_flux_type
+
+  varl(fid_XHGDFS)='XHGDFS';varlnml(fid_XHGDFS)='H2 dissolution (+)-volatiziation (-) with respect to atmosphere'
+  unitl(fid_XHGDFS)='gH d-2 h-1';vartypes(fid_XHGDFS)=var_flux_type
+
+  varl(fid_XCODFG)='XCODFG';varlnml(fid_XCODFG)='CO2 dissolution (+)-volatiziation (-) in soil'
+  unitl(fid_XCODFG)='gC d-2 h-1';vartypes(fid_XCODFG)=var_flux_type
+
+  varl(fid_XCHDFG)='XCHDFG';varlnml(fid_XCHDFG)='CH4 dissolution (+)-volatiziation (-) in soil'
+  unitl(fid_XCHDFG)='gC d-2 h-1';vartypes(fid_XCHDFG)=var_flux_type
+
+  varl(fid_XOXDFG)='XOXDFG';varlnml(fid_XOXDFG)='O2 dissolution (+)-volatiziation (-) in soil'
+  unitl(fid_XOXDFG)='gO d-2 h-1';vartypes(fid_XOXDFG)=var_flux_type
+
+  varl(fid_XNGDFG)='XNGDFG';varlnml(fid_XNGDFG)='N2 dissolution (+)-volatiziation (-) in soil'
+  unitl(fid_XNGDFG)='gN d-2 h-1';vartypes(fid_XNGDFG)=var_flux_type
+
+  varl(fid_XN2DFG)='XN2DFG';varlnml(fid_XN2DFG)='N2O dissolution (+)-volatiziation (-) in soil'
+  unitl(fid_XN2DFG)='gN d-2 h-1';vartypes(fid_XN2DFG)=var_flux_type
+
+  varl(fid_XN3DFG)='XN3DFG';varlnml(fid_XN3DFG)='NH3 dissolution (+)-volatiziation (-) in soil'
+  unitl(fid_XN3DFG)='gN d-2 h-1';vartypes(fid_XN3DFG)=var_flux_type
+
+  varl(fid_XNBDFG)='XNBDFG';varlnml(fid_XNBDFG)='NH3 dissolution (+)-volatiziation (-) in band soil'
+  unitl(fid_XNBDFG)='gN d-2 h-1';vartypes(fid_XNBDFG)=var_flux_type
+
+  varl(fid_XHGDFG)='XHGDFG';varlnml(fid_XHGDFG)='H2 dissolution (+)-volatiziation (-) in soil'
+  unitl(fid_XHGDFG)='gH d-2 h-1';vartypes(fid_XHGDFG)=var_flux_type
+
+  varl(fid_XCOFLG)='XCOFLG';varlnml(fid_XCOFLG)='CO2 gaseous exchange with atmosphere (-) into atmosphere'
+  unitl(fid_XCOFLG)='gC d-2 h-1';vartypes(fid_XCOFLG)=var_flux_type
+
+  varl(fid_XCHFLG)='XCHFLG';varlnml(fid_XCHFLG)='CH4 gaseous exchange with atmosphere (-) into atmosphere'
+  unitl(fid_XCHFLG)='gC d-2 h-1';vartypes(fid_XCHFLG)=var_flux_type
+
+  varl(fid_XOXFLG)='XOXFLG';varlnml(fid_XOXFLG)='O2 gaseous exchange with atmosphere (-) into atmosphere'
+  unitl(fid_XOXFLG)='gO d-2 h-1';vartypes(fid_XOXFLG)=var_flux_type
+
+  varl(fid_XNGFLG)='XNGFLG';varlnml(fid_XNGFLG)='N2 gaseous exchange with atmosphere (-) into atmosphere'
+  unitl(fid_XNGFLG)='gN d-2 h-1';vartypes(fid_XNGFLG)=var_flux_type
+
+  varl(fid_XN2FLG)='XN2FLG';varlnml(fid_XN2FLG)='N2O gaseous exchange with atmosphere (-) into atmosphere'
+  unitl(fid_XN2FLG)='gN d-2 h-1';vartypes(fid_XN2FLG)=var_flux_type
+
+  varl(fid_XN3FLG)='XN3FLG';varlnml(fid_XN3FLG)='N3H gaseous exchange with atmosphere (-) into atmosphere'
+  unitl(fid_XN3FLG)='gN d-2 h-1';vartypes(fid_XN3FLG)=var_flux_type
+
+  varl(fid_XHGFLG)='XHGFLG';varlnml(fid_XHGFLG)='H2 gaseous exchange with atmosphere (-) into atmosphere'
+  unitl(fid_XHGFLG)='gH d-2 h-1';vartypes(fid_XHGFLG)=var_flux_type
+
   do jj =fid_ROQCY_b,fid_ROQCY_e
     write(varl(jj),'(A,I2.2)')'ROQCY',jj-fid_ROQCY_b
     varlnml(jj)='total root + microbial DOC uptake in complex ' &
@@ -915,71 +1075,139 @@ contains
   do jj =fid_ROQAY_b,fid_ROQAY_e
     write(varl(jj),'(A,I2.2)')'ROQAY',jj-fid_ROQAY_b
     varlnml(jj)='total root + microbial acetate uptake in complex ' &
-      //micpar%cplxname(jj-fid_ROQCY_b)
+      //micpar%cplxname(jj-fid_ROQAY_b)
     vartypes(jj)=var_flux_type
     unitl(jj)='gC d-2 h-1'
   enddo
 
-  do jj=fid_RINHO_b,fid_RINHO_e
-    write(varl(jj),'(A,I2.2)')'RINHO',jj-fid_RINHO_b
-    varlnml(jj)='microbial NH4 demand in soil' &
-      //micpar%cplxname(jj-fid_RINHO_b)
+  ll=0
+  DO k=0,jcplx1
+  DO N=1,NFGs
+  DO NGL=1,JG
+    jj=fid_RINHO_b+ll
+    write(varl(jj),'(A,I2.2)')'RINHO',ll
+    varlnml(jj)='microbial NH4 demand in soil' //micpar%cplxname(k)
     vartypes(jj)=var_flux_type
     unitl(jj)='gN d-2 h-1'
+    ll=ll+1
   enddo
-  do jj=fid_RINHB_b,fid_RINHB_e
-    write(varl(jj),'(A,I2.2)')'RINHB',jj-fid_RINHB_b
+  enddo
+  enddo
+
+  ll=0
+  DO k=0,jcplx1
+  DO N=1,NFGs
+  DO NGL=1,JG
+    jj=fid_RINHB_b+ll
+    write(varl(jj),'(A,I2.2)')'RINHB',ll
     varlnml(jj)='microbial NH4 immobilization (+ve) - mineralization (-ve) band' &
-      //micpar%cplxname(jj-fid_RINHB_b)
+      //micpar%cplxname(k)
     vartypes(jj)=var_flux_type
     unitl(jj)='gN d-2 h-1'
+    ll=ll+1
   enddo
-  do jj=fid_RINOO_b,fid_RINOO_e
-    write(varl(jj),'(A,I2.2)')'RINOO',jj-fid_RINOO_b
-    varlnml(jj)='microbial NO3 demand in soil' &
-      //micpar%cplxname(jj-fid_RINOO_b)
-    vartypes(jj)=var_flux_type
-    unitl(jj)='gN d-2 h-1'
+  enddo
   enddo
 
-  do jj=fid_RINOB_b,fid_RINOB_e
-    write(varl(jj),'(A,I2.2)')'RINOB',jj-fid_RINOB_b
+  ll=0
+  DO k=0,jcplx1
+  DO N=1,NFGs
+  DO NGL=1,JG
+    jj=fid_RINOO_b+ll
+    write(varl(jj),'(A,I2.2)')'RINOO',ll
+    varlnml(jj)='microbial NO3 demand in soil'//micpar%cplxname(k)
+    vartypes(jj)=var_flux_type
+    unitl(jj)='gN d-2 h-1'
+    ll=ll+1
+  enddo
+  enddo
+  enddo
+
+  ll=0
+  DO k=0,jcplx1
+  DO N=1,NFGs
+  DO NGL=1,JG
+    jj=fid_RINOB_b+ll
+    write(varl(jj),'(A,I2.2)')'RINOB',ll
     varlnml(jj)='microbial NO3 immobilization (+ve) - mineralization (-ve) band' &
-      //micpar%cplxname(jj-fid_RINOB_b)
+      //micpar%cplxname(k)
     vartypes(jj)=var_flux_type
     unitl(jj)='gN d-2 h-1'
+    ll=ll+1
+  enddo
+  enddo
   enddo
 
-  do jj=fid_RIPOO_b,fid_RIPOO_e
-    write(varl(jj),'(A,I2.2)')'RIPOO',jj-fid_RIPOO_b
-    varlnml(jj)='microbial PO4 demand in soil'//micpar%cplxname(jj-fid_RIPOO_b)
+  ll=0
+  DO k=0,jcplx1
+  DO N=1,NFGs
+  DO NGL=1,JG
+    jj=fid_RIPOO_b+ll
+    write(varl(jj),'(A,I2.2)')'RIPOO',ll
+    varlnml(jj)='microbial PO4 demand in soil'//micpar%cplxname(k)
     vartypes(jj)=var_flux_type
     unitl(jj)='gP d-2 h-1'
+    ll=ll+1
   enddo
-  do jj=fid_RIPBO_b,fid_RIPBO_e
-    write(varl(jj),'(A,I2.2)')'RIPBO',jj-fid_RIPBO_b
-    varlnml(jj)='substrate-unlimited H2PO4 mineralization-immobilization'//micpar%cplxname(jj-fid_RIPBO_b)
+  enddo
+  enddo
+
+  ll=0
+  DO k=0,jcplx1
+  DO N=1,NFGs
+  DO NGL=1,JG
+    jj=fid_RIPBO_b+ll
+    write(varl(jj),'(A,I2.2)')'RIPBO',ll
+    varlnml(jj)='substrate-unlimited H2PO4 mineralization-immobilization'//micpar%cplxname(k)
     vartypes(jj)=var_flux_type
     unitl(jj)='gP d-2 h-1'
+    ll=ll+1
   enddo
-  do jj=fid_RIPO1_b,fid_RIPO1_e
-    write(varl(jj),'(A,I2.2)')'RIPO1',jj-fid_RIPO1_b
-    varlnml(jj)='substrate-unlimited HPO4 immobilization'//micpar%cplxname(jj-fid_RIPO1_b)
+  enddo
+  enddo
+
+  ll=0
+  DO k=0,jcplx1
+  DO N=1,NFGs
+  DO NGL=1,JG
+    jj=fid_RIPO1_b+ll
+    write(varl(jj),'(A,I2.2)')'RIPO1',ll
+    varlnml(jj)='substrate-unlimited HPO4 immobilization'//micpar%cplxname(k)
     vartypes(jj)=var_flux_type
     unitl(jj)='gP d-2 h-1'
+    ll=ll+1
   enddo
-  do jj=fid_RIPB1_b,fid_RIPB1_e
-    write(varl(jj),'(A,I2.2)')'RIPB1',jj-fid_RIPB1_b
-    varlnml(jj)='substrate-unlimited HPO4 mineralization-immobilization'//micpar%cplxname(jj-fid_RIPB1_b)
+  enddo
+  enddo
+
+  ll=0
+  DO k=0,jcplx1
+  DO N=1,NFGs
+  DO NGL=1,JG
+    jj=fid_RIPB1_b+ll
+    write(varl(jj),'(A,I2.2)')'RIPB1',ll
+    varlnml(jj)='substrate-unlimited HPO4 mineralization-immobilization'//micpar%cplxname(k)
     vartypes(jj)=var_flux_type
     unitl(jj)='gP d-2 h-1'
+    ll=ll+1
   enddo
-  do jj=fid_ROXYS_b,fid_ROXYS_e
-    write(varl(jj),'(A,I2.2)')'ROXYS',jj-fid_ROXYS_b
-    varlnml(jj)='aqueous O2 demand'//micpar%cplxname(jj-fid_ROXYS_b)
+  enddo
+  enddo
+
+  ll=0
+  DO k=0,jcplx1
+  DO N=1,NFGs
+  DO NGL=1,JG
+    jj=fid_ROXYS_b+ll
+    write(varl(jj),'(A,I2.2)')'ROXYS',ll
+    varlnml(jj)='aqueous O2 demand'//micpar%cplxname(k)
     vartypes(jj)=var_flux_type
     unitl(jj)='gO d-2 h-1'
+    ll=ll+1
   enddo
+  enddo
+  enddo
+
   end associate
   end subroutine getvarlist
 ! ----------------------------------------------------------------------
@@ -1007,20 +1235,29 @@ contains
 
   call RunModel_nosalt(forc,micfor,nvars,ystates0l, ystatesfl, err_status)
 
-  call CalcSurflux(forc,micfor, nvars, ystates0l,err_status)
+  call CalcSurflux(forc,micfor, nvars, ystates0l,ystatesfl,err_status)
 
   call UpdateStateVars(micfor,micstt,micflx,nvars,ystates0l,ystatesfl)
 !
   call UpdateSOMORGM(micfor,micstt)
   end subroutine RunMicBGC
 ! ----------------------------------------------------------------------
-  subroutine CalcSurflux(forc,micfor, nvars, ystates0l,err_status)
+  subroutine CalcSurflux(forc,micfor, nvars, ystates0l,ystatesfl,err_status)
+!
+!  DESCRIPTION
+! calcualte fluxes due to gaseous exchange with respect to atmosphere
+! dissolution-volatilization between gasesous and disolved phases in soil
+! dissolution-volatiziation with respect to atmopshere
+! no micropore-macropore exchange is considered.
   use ForcTypeMod         , only : forc_type
+  use EcoSimConst
+!
   implicit none
   type(forc_type), intent(in) :: forc
   type(micforctype), intent(in)    :: micfor
   integer,  intent(in)  :: nvars
   real(r8), intent(in)  :: ystates0l(nvars)
+  real(r8), intent(inout) :: ystatesfl(nvars)
   type(model_status_type), intent(out) :: err_status
 
   real(r8) :: DFVCOG,DFVCHG,DFVOXG,DFVNGG
@@ -1071,6 +1308,19 @@ contains
   real(r8) :: RN2DFG,RN3DFG,RNBDFG
   real(r8) :: RNGDFG,ROXDFG
   real(r8) :: VOLWXA,VOLWXB
+  real(r8) :: XCODFS,XCHDFS
+  real(r8) :: XOXDFS,XNGDFS
+  real(r8) :: XN2DFS,XN3DFS
+  real(r8) :: XNBDFS,XHGDFS
+  real(r8) :: XCODFG,XCHDFG
+  real(r8) :: XOXDFG,XNGDFG
+  real(r8) :: XN2DFG,XN3DFG
+  real(r8) :: XNBDFG,XHGDFG
+  real(r8) :: XCOFLG,XCHFLG
+  real(r8) :: XOXFLG,XNGFLG
+  real(r8) :: XN2FLG,XN3FLG
+  real(r8) :: XHGFLG
+
   integer  :: MM,M
   call err_status%reset()
 
@@ -1078,20 +1328,45 @@ contains
     ZEROS2 =>  micfor%ZEROS2 , &
     ZEROS  =>  micfor%ZEROS  , &
     VOLWM  =>  forc%VOLW     , &
-    VOLPM  =>  forc%VOLPM    , &
+    VOLPM  =>  forc%VOLP     , &
     PARG   =>  forc%PARG       &
   )
 
+  XCODFS=0._r8
+  XCHDFS=0._r8
+  XOXDFS=0._r8
+  XNGDFS=0._r8
+  XN2DFS=0._r8
+  XN3DFS=0._r8
+  XNBDFS=0._r8
+  XHGDFS=0._r8
+
+  XCODFG=0._r8
+  XCHDFG=0._r8
+  XOXDFG=0._r8
+  XNGDFG=0._r8
+  XN2DFG=0._r8
+  XN3DFG=0._r8
+  XNBDFG=0._r8
+  XHGDFG=0._r8
+
+  XCOFLG=0._r8
+  XCHFLG=0._r8
+  XOXFLG=0._r8
+  XNGFLG=0._r8
+  XN2FLG=0._r8
+  XN3FLG=0._r8
+  XHGFLG=0._r8
   if(VOLPM>ZEROS2)then
       !gaseous flux between atmosphere and soil
 
-    CO2G2=AZMAX1(ystates0l(cid_CO2G)/VOLPM)
-    CH4G2=AZMAX1(ystates0l(cid_CH4G)/VOLPM)
-    OXYG2=AZMAX1(ystates0l(cid_OXYG)/VOLPM)
-    Z2GG2=AZMAX1(ystates0l(cid_Z2GG)/VOLPM)
-    Z2OG2=AZMAX1(ystates0l(cid_Z2OG)/VOLPM)
-    H2GG2=AZMAX1(ystates0l(cid_H2GG)/VOLPM)
-    ZN3G2=AZMAX1(ystates0l(cid_ZNH3G)/VOLPM)
+    CO2G2=AZMAX1(ystates0l(cid_CO2G))
+    CH4G2=AZMAX1(ystates0l(cid_CH4G))
+    OXYG2=AZMAX1(ystates0l(cid_OXYG))
+    Z2GG2=AZMAX1(ystates0l(cid_Z2GG))
+    Z2OG2=AZMAX1(ystates0l(cid_Z2OG))
+    H2GG2=AZMAX1(ystates0l(cid_H2GG))
+    ZN3G2=AZMAX1(ystates0l(cid_ZNH3G))
   endif
 
   if(VOLWM > micfor%ZEROS2)then
@@ -1128,6 +1403,13 @@ contains
       DFVN2G=forc%DZ2OGQ*(forc%CZ2OE-CZ2OG2)
       DFVN3G=forc%DNH3GQ*(forc%CNH3E-CNH3G2)
       DFVHGG=forc%DH2GGQ*(forc%CH2GE-CH2GG2)
+      XCOFLG=XCOFLG+DFVCOG
+      XCHFLG=XCHFLG+DFVCHG
+      XOXFLG=XOXFLG+DFVOXG
+      XNGFLG=XNGFLG+DFVNGG
+      XN2FLG=XN2FLG+DFVN2G
+      XN3FLG=XN3FLG+DFVN3G
+      XHGFLG=XHGFLG+DFVHGG
 
     endif
 
@@ -1162,7 +1444,7 @@ contains
 
 !   between atmosphere and topsoil
       DLYR1=forc%DLYR3
-      TORT1=forc%TORT*forc%AREA3/(0.5*DLYR1)
+      TORT1=forc%TORT*forc%AREA3/(0.5_r8*DLYR1)
       DFGSCO=forc%CLSGL*TORT1*XNPH
       DFGSCH=forc%CQSGL*TORT1*XNPH
       DFGSOX=forc%OLSGL*TORT1*XNPH
@@ -1189,6 +1471,16 @@ contains
       RNBDFS=(CZN3BQ-CNH3B2)*AMIN1(VOLWM*forc%VLNHB,DFGSN3)
       RHGDFS=(CH2GGQ-CH2GS2)*AMIN1(VOLWM,DFGSHL)
 
+!     accumulate atmospheric dissolution/volatilization
+      XCODFS=XCODFS+RCODFS
+      XCHDFS=XCHDFS+RCHDFS
+      XOXDFS=XOXDFS+ROXDFS
+      XNGDFS=XNGDFS+RNGDFS
+      XN2DFS=XN2DFS+RN2DFS
+      XN3DFS=XN3DFS+RN3DFS
+      XNBDFS=XNBDFS+RNBDFS
+      XHGDFS=XHGDFS+RHGDFS
+
       RCODXS=RCODFS*XNPT
       RCHDXS=RCHDFS*XNPT
       ROXDXS=ROXDFS*XNPT
@@ -1199,6 +1491,8 @@ contains
       RHGDXS=RHGDFS*XNPT
 
   ! dissolution between gaseous and aqueous phases in soil
+      VOLWXA=natomw*VOLWMA
+      VOLWXB=natomw*VOLWMB
       VOLPMA=VOLPM*forc%VLNH4
       VOLPMB=VOLPM*forc%VLNHB
       VOLWCO=VOLWM*forc%SCO2L
@@ -1222,6 +1516,16 @@ contains
       ROXDFG=forc%DFGS*(AMAX1(ZEROS,OXYG2)*VOLWOX-AMAX1(ZEROS,OXYS2+ROXDXS)*VOLPM)/VOLOXT
       RNGDFG=forc%DFGS*(AMAX1(ZEROS,Z2GG2)*VOLWNG-AMAX1(ZEROS,Z2GS2+RNGDXS)*VOLPM)/VOLNGT
       RN2DFG=forc%DFGS*(AMAX1(ZEROS,Z2OG2)*VOLWN2-AMAX1(ZEROS,Z2OS2+RN2DXS)*VOLPM)/VOLN2T
+
+      XCODFG=XCODFG+RCODFG
+      XCHDFG=XCHDFG+RCHDFG
+      XOXDFG=XOXDFG+ROXDFG
+      XNGDFG=XNGDFG+RNGDFG
+      XN2DFG=XN2DFG+RN2DFG
+      XN3DFG=XN3DFG+RN3DFG
+      XNBDFG=XNBDFG+RNBDFG
+      XHGDFG=XHGDFG+RHGDFG
+
       IF(VOLN3T.GT.ZEROS2.AND.VOLWXA.GT.ZEROS2)THEN
         RN3DFG=forc%DFGS*(AMAX1(ZEROS,ZN3G2)*VOLWN3-AMAX1(ZEROS,ZNH3S2+RN3DXS)*VOLPMA)/VOLN3T
         CNH3S0=AZMAX1((ZNH3S2+RN3DFG)/VOLWXA)
@@ -1264,6 +1568,61 @@ contains
       H2GG2=H2GG2-RHGDFG
     endif
   enddo
+
+  ystatesfl(fid_XCODFS)=XCODFS
+  ystatesfl(fid_XCHDFS)=XCHDFS
+  ystatesfl(fid_XOXDFS)=XOXDFS
+  ystatesfl(fid_XNGDFS)=XNGDFS
+  ystatesfl(fid_XN2DFS)=XN2DFS
+  ystatesfl(fid_XN3DFS)=XN3DFS
+  ystatesfl(fid_XNBDFS)=XNBDFS
+  ystatesfl(fid_XHGDFS)=XHGDFS
+
+  ystatesfl(fid_XCODFG)=XCODFG
+  ystatesfl(fid_XCHDFG)=XCHDFG
+  ystatesfl(fid_XOXDFG)=XOXDFG
+  ystatesfl(fid_XNGDFG)=XNGDFG
+  ystatesfl(fid_XN2DFG)=XN2DFG
+  ystatesfl(fid_XN3DFG)=XN3DFG
+  ystatesfl(fid_XNBDFG)=XNBDFG
+  ystatesfl(fid_XHGDFG)=XHGDFG
+
+  ystatesfl(fid_XCOFLG)=XCOFLG
+  ystatesfl(fid_XCHFLG)=XCHFLG
+  ystatesfl(fid_XOXFLG)=XOXFLG
+  ystatesfl(fid_XNGFLG)=XNGFLG
+  ystatesfl(fid_XN2FLG)=XN2FLG
+  ystatesfl(fid_XN3FLG)=XN3FLG
+  ystatesfl(fid_XHGFLG)=XHGFLG
+
+
+
+!  CO2S(NU(NY,NX),NY,NX)=CO2S(NU(NY,NX),NY,NX)+XCODFS(NY,NX)
+!  CH4S(NU(NY,NX),NY,NX)=CH4S(NU(NY,NX),NY,NX)+XCHDFS(NY,NX)
+!  OXYS(NU(NY,NX),NY,NX)=OXYS(NU(NY,NX),NY,NX)+XOXDFS(NY,NX)
+!  Z2GS(NU(NY,NX),NY,NX)=Z2GS(NU(NY,NX),NY,NX)+XNGDFS(NY,NX)
+!  Z2OS(NU(NY,NX),NY,NX)=Z2OS(NU(NY,NX),NY,NX)+XN2DFS(NY,NX)
+!  ZNH3S(NU(NY,NX),NY,NX)=ZNH3S(NU(NY,NX),NY,NX)+XN3DFS(NY,NX)
+!  ZNH3B(NU(NY,NX),NY,NX)=ZNH3B(NU(NY,NX),NY,NX)+XNBDFS(NY,NX)
+!  H2GS(NU(NY,NX),NY,NX)=H2GS(NU(NY,NX),NY,NX)+XHGDFS(NY,NX)
+
+
+!    CO2S(L,NY,NX)=CO2S(L,NY,NX)+XCODFG(L,NY,NX)-RCO2O(L,NY,NX)
+!    CH4S(L,NY,NX)=CH4S(L,NY,NX)+XCHDFG(L,NY,NX)-RCH4O(L,NY,NX)
+!    OXYS(L,NY,NX)=OXYS(L,NY,NX)+XOXDFG(L,NY,NX)-RUPOXO(L,NY,NX
+!    Z2GS(L,NY,NX)=Z2GS(L,NY,NX)+XNGDFG(L,NY,NX)-RN2G(L,NY,NX)-XN2GS(L,NY,NX)
+!    Z2OS(L,NY,NX)=Z2OS(L,NY,NX)+XN2DFG(L,NY,NX)-RN2O(L,NY,NX)
+!    H2GS(L,NY,NX)=H2GS(L,NY,NX)+XHGDFG(L,NY,NX)-RH2GO(L,NY,NX)
+!    ZNH3S(L,NY,NX)=ZNH3S(L,NY,NX)+XN3DFG(L,NY,NX)+TRN3S(L,NY,NX)
+
+!    CO2G(L,NY,NX)=CO2G(L,NY,NX)-XCODFG(L,NY,NX)+XCOFLG
+!    CH4G(L,NY,NX)=CH4G(L,NY,NX)-XCHDFG(L,NY,NX)+XCHFLG
+!    OXYG(L,NY,NX)=OXYG(L,NY,NX)-XOXDFG(L,NY,NX)+XOXFLG
+!    Z2GG(L,NY,NX)=Z2GG(L,NY,NX)-XNGDFG(L,NY,NX)+XNGFLG
+!    Z2OG(L,NY,NX)=Z2OG(L,NY,NX)-XN2DFG(L,NY,NX)+XN2FLG
+!    ZNH3G(L,NY,NX)=ZNH3G(L,NY,NX)-XN3DFG(L,NY,NX)-XNBDFG(L,NY,NX)+XN3FLG
+!    H2GG(L,NY,NX)=H2GG(L,NY,NX)-XHGDFG(L,NY,NX)+XHGFLG
+
 
   end associate
   end subroutine CalcSurflux

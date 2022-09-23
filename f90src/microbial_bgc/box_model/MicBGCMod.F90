@@ -24,7 +24,7 @@ module MicBGCMod
   save
   character(len=*), parameter :: mod_filename = __FILE__
 
-  integer :: jcplx,jcplx1,NFGs,JG,jsken
+  integer :: jcplx,jcplx1,NFGs,JG,jsken,ndbiomcp,nlbiomcp
 !
   public :: initNitro1Layer, SoilBGCOneLayer
 
@@ -43,6 +43,8 @@ module MicBGCMod
   NFGs  =micpar%NFGs
   JG    =micpar%jguilds
   jsken =micpar%jsken
+  ndbiomcp = micpar%ndbiomcp
+  nlbiomcp = micpar%nlbiomcp
   call initNitroPars
 
   end subroutine initNitro1Layer
@@ -265,7 +267,6 @@ module MicBGCMod
   IF(litrm)THEN
     ! surface litter layer
     KL=2
-    !write(*,*)'VOLR=',VOLR
     IF(VOLWRX.GT.ZEROS2)THEN
       THETR=VOLW0/VOLR
       THETZ=AMAX1(0.0_r8,THETR-THETY)
@@ -332,25 +333,25 @@ module MicBGCMod
 !
 !     TOTAL SOLID SUBSTRATE
 !
-  DO 870 K=0,KL
+  DO  K=0,KL
     OSCT(K)=0.0_r8
     OSAT(K)=0.0_r8
 
-    DO 865 M=1,jsken
+    DO M=1,jsken
       OSCT(K)=OSCT(K)+OSC(M,K)
       OSAT(K)=OSAT(K)+OSA(M,K)
-865 CONTINUE
+    enddo
     TOSC=TOSC+OSCT(K)
     TOSA=TOSA+OSAT(K)
-870   CONTINUE
+  enddo
 !
 !     TOTAL BIORESIDUE
 !
-  DO 880 K=0,KL
+  DO  K=0,KL
     ORCT(K)=0.0_r8
-    DO 875 M=1,2
+    DO  M=1,ndbiomcp
       ORCT(K)=ORCT(K)+ORC(M,K)
-875 CONTINUE
+    ENDDO
     TORC=TORC+ORCT(K)
 !
 !     TOTAL ADSORBED AND DISSOLVED SUBSTRATE
@@ -358,7 +359,7 @@ module MicBGCMod
 !     OSRH=total SOC
 !
     TOHC=TOHC+OHC(K)+OHA(K)
-880 CONTINUE
+  enddo
 
   DO 860 K=0,KL
     OSRH(K)=OSAT(K)+ORCT(K)+OHC(K)+OHA(K)

@@ -102,7 +102,7 @@ implicit none
 
     real(r8) :: THETY       !air-dry water content, [m3 m-3]
     real(r8) :: VOLW        !soil micropore water content [m3 d-2]
-    real(r8) :: VOLPM       !soil air content, [m3 d-2]
+    real(r8) :: VOLP        !soil air content, [m3 d-2]
     real(r8) :: VOLA        !total volume in micropores [m3 d-2]
 
     real(r8) :: VLNOB       !NO3 band volume fracrion, [-]
@@ -380,7 +380,7 @@ implicit none
   real(r8) :: PARGM
 
   real(r8), parameter :: DTHETW=1.0E-06_r8
-  real(r8), parameter :: XNPD=20._r8
+  real(r8) :: XNPD
   !since the model if configured for incubation
   !the primary variable forcing is temperature, and moisture
   associate(                     &
@@ -394,7 +394,8 @@ implicit none
     TKS   => forc%TKS            &
   )
 
-
+  TKS=298._r8
+  THETW=0.65_r8
   if (first .or. forctype<=1)then
 !  variable moisture
     FCL=log(forc%FC)
@@ -413,7 +414,7 @@ implicit none
     forc%TORT=TortMicporew(THETW)
     forc%THETPM=1._r8-THETW
     forc%VOLW=forc%THETPM*forc%POROS*forc%VOLY
-    forc%VOLPM=forc%VOLA-forc%VOLW
+    forc%VOLP=forc%VOLA-forc%VOLW
   endif
 
   if(first .or. forctype ==0 .or. forctype==2)then
@@ -450,6 +451,7 @@ implicit none
 
   if (first .or. forctype <=2)then
     Z3S=forc%FC/forc%POROS
+    XNPD=600.0_r8*XNPG
     scalar=forc%TFND*XNPD
     forc%DFGS=fDFGS(scalar,THETW,Z3S)
 

@@ -271,7 +271,7 @@ END subroutine MicrobeModel
   micfor%VOLWM(1:NPH)=VOLWM(1:NPH,L,NY,NX)
   micfor%TORT(1:NPH)=TORT(1:NPH,L,NY,NX)
   micfor%VOLPM(1:NPH)=VOLPM(1:NPH,L,NY,NX)
-
+  micfor%VOLP=VOLP(L,NY,NX)
   micstt%EPOC=EPOC(L,NY,NX)
   micstt%EHUM=EHUM(L,NY,NX)
   micstt%ZNH4B=ZNH4B(L,NY,NX)

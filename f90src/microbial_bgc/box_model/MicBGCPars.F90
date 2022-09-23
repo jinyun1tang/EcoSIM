@@ -225,9 +225,9 @@ contains
   CPOFC(1:jskenc,2)=real((/0.0020,0.0020,0.0020,0.0020/),r8)   !manure
   FL(1:2)=real((/0.55,0.45/),r8)
 
-  DO 95 K=0,4
-    DO  N=1,7
-      IF(N.EQ.3)THEN
+  DO 95 K=0,this%jcplx1
+    DO  N=1,this%NFGs
+      IF(N.EQ.this%n_aero_fungi)THEN
         DO NGL=1,JG
           CNOMC(1,NGL,N,K)=0.15_r8           !maximum
           CNOMC(2,NGL,N,K)=0.09_r8           !minimum
@@ -249,7 +249,7 @@ contains
      enddo
 95  CONTINUE
 
-    DO  N=1,7
+    DO  N=1,this%NFGs
         do NGL=1,JG
           CNOMCff(1,NGL,N)=0.225_r8
           CNOMCff(2,NGL,N)=0.135_r8

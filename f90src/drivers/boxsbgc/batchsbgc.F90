@@ -54,7 +54,7 @@ end program main
   use ecosim_Time_Mod     , only : ecosim_time_type
   use ecosim_log_mod      , only : errMsg => shr_log_errMsg
   use batchmod
-  use ForcTypeMod         , only : forc_type,ReadForc
+  use ForcTypeMod         , only : forc_type,ReadForc,UpdateForc
   use histMod
   use fileUtil
   use EcoSIMSolverPar
@@ -98,9 +98,9 @@ end program main
   real(r8) :: ZNH3E                      !atmospheric NH3 concentration, [umol mol-1],ppmv
   real(r8) :: CH4E                       !atmospheric CH4 concentration, [umol mol-1],ppmv
   real(r8) :: H2GE                       !atmospheric H2 concentration, [umol mol-1],ppmv
-
+  integer :: forctype                    ! 0: (transient), 1: T const, 2: water const, 3: T and water const
   namelist /driver_nml/model_name,case_id,hist_freq,salton,forc_file,&
-    CO2E,OXYE,Z2OE,Z2GE,ZNH3E,CH4E,H2GE
+    CO2E,OXYE,Z2OE,Z2GE,ZNH3E,CH4E,H2GE,forctype
 
   character(len=*), parameter :: mod_filename=__FILE__
   hist_freq='day'
@@ -116,6 +116,7 @@ end program main
   Z2OE= 0.3_r8
   ZNH3E=0.005_r8
   H2GE=1.e-3_r8
+  forctype=0
 
   if ( .true. )then
      ioerror_msg=''
@@ -135,7 +136,7 @@ end program main
 
 ! set up solver
 
-  NPH=1;NPT=5;NPG=NPT*NPH;XNPG=1.0_r8/NPG;XNPH=1._r8/NPH;XNPT=1.0_r8/NPT
+  NPH=1;NPT=15;NPG=NPT*NPH;XNPG=1.0_r8/NPG;XNPH=1._r8/NPH;XNPT=1.0_r8/NPT
 
   ncols=1
 !!============================================================
@@ -151,13 +152,14 @@ end program main
   allocate(ystates0l(1:nvars));       ystates0l(:) = 0._r8
   allocate(ystatesfl(1:nvars));       ystatesfl(:) = 0._r8
 
+
+! customized model initialization
+  call initmodel(nvars, ystates0l, err_status)
+
   call micfor%Init()
   call micstt%Init()
   call micflx%Init()
 
-
-! customized model initialization
-  call initmodel(nvars, ystates0l, err_status)
 
   if(err_status%check_status())then
     call endrun(msg=err_status%print_msg())
@@ -193,14 +195,16 @@ end program main
 
 !   setup forcing, e.g., add litter/om/nutrients, set up temperature/moisture
 !
-!    call BatchModelConfig(nvars,ystates0l,forc,micfor,micstt,micflx,err_status)
+    call UpdateForc(forc,forctype)
 
-!    if(err_status%check_status())then
-!      call endrun(msg=err_status%print_msg())
-!    endif
+    call BatchModelConfig(nvars,ystates0l,forc,micfor,micstt,micflx,err_status)
+
+    if(err_status%check_status())then
+      call endrun(msg=err_status%print_msg())
+    endif
 
 !   computes the fluxes
-!     call RunMicBGC(nvars, ystates0l, ystatesfl, forc,micfor,micstt,micflx, err_status)
+     call RunMicBGC(nvars, ystates0l, ystatesfl, forc,micfor,micstt,micflx, err_status)
 
     call timer%update_time_stamp()
 
@@ -220,7 +224,7 @@ end program main
   enddo
   call timer%get_ymdhs(yymmddhhss)
 
-  call hist%histrst('aquachem.x', 'write', yymmddhhss)
+  call hist%histrst('boxsbgc.x', 'write', yymmddhhss)
 
   call micfor%destroy()
   call micflx%destroy()

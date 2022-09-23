@@ -17,6 +17,7 @@ module WthrMod
   use IrrigationDataType
   use GridDataType
   use EcoSIMConfig
+  use MiniMathMod, only : AZMAX1
   implicit none
 
   private
@@ -103,8 +104,8 @@ module WthrMod
   integer :: NY,NX
   !     begin_execution
 
-  DO 9915 NX=NHW,NHE
-    DO 9910 NY=NVN,NVS
+  DO  NX=NHW,NHE
+    DO  NY=NVN,NVS
       !
       !     IETYP=Koppen climate zone:-2=phytotron
       !     RADN=hourky SW radiation
@@ -114,7 +115,7 @@ module WthrMod
 !
       IF(IETYP(NY,NX).NE.-2)THEN
         IF(DYLN(NY,NX).GT.ZERO)THEN
-          RADN(NY,NX)=AMAX1(0.0,RMAX*SIN((J-(ZNOON(NY,NX) &
+          RADN(NY,NX)=AZMAX1(RMAX*SIN((J-(ZNOON(NY,NX) &
             -DYLN(NY,NX)/2.0))*PICON/DYLN(NY,NX)))
         ELSE
           RADN(NY,NX)=0.0
@@ -176,8 +177,8 @@ module WthrMod
         PRECRI(NY,NX)=0.0
         PRECWI(NY,NX)=0.0
       ENDIF
-9910  CONTINUE
-9915  CONTINUE
+    ENDDO
+  enddo
 !
   end subroutine DailyWeather
 !------------------------------------------------------------------------------------------
@@ -247,12 +248,12 @@ module WthrMod
         AZI=SIN(ALAT(NY,NX)*1.7453E-02)*SIN(DECLIN*1.7453E-02)
         DEC=COS(ALAT(NY,NX)*1.7453E-02)*COS(DECLIN*1.7453E-02)
 
-        SSIN(NY,NX)=AMAX1(0.0,AZI+DEC*COS(.2618*(ZNOON(NY,NX)-(J-0.5))))
-        SSINN(NY,NX)=AMAX1(0.0,AZI+DEC*COS(.2618*(ZNOON(NY,NX)-(J+0.5))))
+        SSIN(NY,NX)=AZMAX1(AZI+DEC*COS(.2618*(ZNOON(NY,NX)-(J-0.5))))
+        SSINN(NY,NX)=AZMAX1(AZI+DEC*COS(.2618*(ZNOON(NY,NX)-(J+0.5))))
         !     IF(SSIN(NY,NX).GT.0.0.AND.SSIN(NY,NX).LT.TWILGT)SSIN(NY,NX)=TWILGT
         IF(RADN(NY,NX).LE.0.0)SSIN(NY,NX)=0.0
         IF(SSIN(NY,NX).LE.-TWILGT)RADN(NY,NX)=0.0
-        RADX=4.896*AMAX1(0.0,SSIN(NY,NX))
+        RADX=4.896*AZMAX1(SSIN(NY,NX))
         RADN(NY,NX)=AMIN1(RADX,RADN(NY,NX))
 !
         !     DIRECT VS DIFFUSE RADIATION IN SOLAR OR SKY BEAMS
@@ -430,7 +431,7 @@ module WthrMod
           DTS=0.5*DTA
           ATCA(NY,NX)=ATCAI(NY,NX)+DTA
           ATCS(NY,NX)=ATCAI(NY,NX)+DTS
-          OFFSET(NY,NX)=0.33*(12.5-AMAX1(0.0,AMIN1(25.0,ATCS(NY,NX))))
+          OFFSET(NY,NX)=0.33*(12.5-AZMAX1(AMIN1(25.0,ATCS(NY,NX))))
           DO 9900 NZ=1,NP(NY,NX)
             ZTYP(NZ,NY,NX)=ZTYPI(NZ,NY,NX)+0.30/2.667*DTA
             OFFST(NZ,NY,NX)=2.667*(2.5-ZTYP(NZ,NY,NX))

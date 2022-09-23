@@ -63,16 +63,23 @@ implicit none
   ystatesfl(cid_XN41)=ystates0l(cid_XN41)+solflx%TRXN4/chemvar%VOLWNH
   ystatesfl(fid_TRXN4)=solflx%TRXN4
 
-  !ZNH4B=ZNH4B+TRN4B*Natomw
-  ystatesfl(cid_CN4B)=ystates0l(cid_CN4B)+solflx%TRN3B/chemvar%VOLWNB
-  ystatesfl(fid_TRN3B)=solflx%TRN3B
+  if(chemvar%VOLWNB>0._r8)THEN
+    !ZNH4B=ZNH4B+TRN4B*Natomw
+    ystatesfl(cid_CN4B)=ystates0l(cid_CN4B)+solflx%TRN3B/chemvar%VOLWNB
 
-  !ZNH3B=ZNH3B+TRN3B*Natomw
-  ystatesfl(cid_CN3B)=ystates0l(cid_CN3B)+solflx%TRN3B/chemvar%VOLWNB
-  ystatesfl(fid_TRN3B)=solflx%TRN3B
+    !ZNH3B=ZNH3B+TRN3B*Natomw
+    ystatesfl(cid_CN3B)=ystates0l(cid_CN3B)+solflx%TRN3B/chemvar%VOLWNB
 
-  !XNB  = XNB+TRXNB
-  ystatesfl(cid_XN4B)=ystates0l(cid_XN4B)+solflx%TRXNB/chemvar%VOLWNB
+    !XNB  = XNB+TRXNB
+    ystatesfl(cid_XN4B)=ystates0l(cid_XN4B)+solflx%TRXNB/chemvar%VOLWNB
+
+  else
+    ystatesfl(cid_CN4B)=ystates0l(cid_CN4B)
+    ystatesfl(cid_CN3B)=ystates0l(cid_CN3B)
+    ystatesfl(cid_XN4B)=ystates0l(cid_XN4B)
+  endif
+  ystatesfl(fid_TRN3B)=solflx%TRN3B
+  ystatesfl(fid_TRN3B)=solflx%TRN3B
   ystatesfl(fid_TRXNB)=solflx%TRXNB
 
   !H1PO4=H1PO4+TRH1P*Patomw
@@ -119,48 +126,64 @@ implicit none
   ystatesfl(cid_PCAPM1)=ystates0l(cid_PCAPM1)+solflx%TRCAPM/chemvar%VOLWPO
   ystatesfl(fid_TRCAPM)=solflx%TRCAPM
 
-  !H1POB=H1POB+TRH1B*Patomw
-  ystatesfl(cid_CH1PB)=ystates0l(cid_CH1PB)+solflx%TRH1B/chemvar%VOLWPB
+
+  if(chemvar%VOLWPB>0._r8)then
+    !H1POB=H1POB+TRH1B*Patomw
+    ystatesfl(cid_CH1PB)=ystates0l(cid_CH1PB)+solflx%TRH1B/chemvar%VOLWPB
+
+    !H2POB=H2POB+TRH2B*Patomw
+    ystatesfl(cid_CH2PB)=ystates0l(cid_CH2PB)+solflx%TRH2B/chemvar%VOLWPB
+
+    !XOH1B=XOH1B+TRBH1
+    ystatesfl(cid_XH11B)=ystates0l(cid_XH11B)+solflx%TRBH1/chemvar%VOLWPB
+
+    !XOH2B=XOH2B+TRBH2
+    ystatesfl(cid_XH21B)=ystates0l(cid_XH21B)+solflx%TRBH2/chemvar%VOLWPB
+
+    !XH1PB=XH1PB+TRB1P
+    ystatesfl(cid_X1P1B)=ystates0l(cid_X1P1B)+solflx%TRB1P/chemvar%VOLWPB
+
+    !XH2PB=XH2PB+TRB2P
+    ystatesfl(cid_X2P1B)=ystates0l(cid_X2P1B)+solflx%TRB2P/chemvar%VOLWPB
+
+    !PALPB=PALPB+TRALPB
+    ystatesfl(cid_PALPOB)=ystates0l(cid_PALPOB)+solflx%TRALPB/chemvar%VOLWPB
+
+    !PFEPB=PFEPB+TRFEPB
+    ystatesfl(cid_PFEPOB)=ystates0l(cid_PFEPOB)+solflx%TRFEPB/chemvar%VOLWPB
+
+    !PCPDB=PCPDB+TRCPDB
+    ystatesfl(cid_PCAPDB)=ystates0l(cid_PCAPDB)+solflx%TRCPDB/chemvar%VOLWPB
+
+    !PCPHB=PCPHB+TRCPHB
+    ystatesfl(cid_PCAPHB)=ystates0l(cid_PCAPHB)+solflx%TRCPHB/chemvar%VOLWPB
+
+    !PCPMB=PCPMB+TRCPMB
+    ystatesfl(cid_PCAPMB)=ystates0l(cid_PCAPMB)+solflx%TRCPMB/chemvar%VOLWPB
+
+  else
+    ystatesfl(cid_CH1PB)=ystates0l(cid_CH1PB)
+    ystatesfl(cid_CH2PB)=ystates0l(cid_CH2PB)
+    ystatesfl(cid_XH11B)=ystates0l(cid_XH11B)
+    ystatesfl(cid_XH21B)=ystates0l(cid_XH21B)
+    ystatesfl(cid_X1P1B)=ystates0l(cid_X1P1B)
+    ystatesfl(cid_X2P1B)=ystates0l(cid_X2P1B)
+    ystatesfl(cid_PALPOB)=ystates0l(cid_PALPOB)
+    ystatesfl(cid_PFEPOB)=ystates0l(cid_PFEPOB)
+    ystatesfl(cid_PCAPDB)=ystates0l(cid_PCAPDB)
+    ystatesfl(cid_PCAPHB)=ystates0l(cid_PCAPHB)
+    ystatesfl(cid_PCAPMB)=ystates0l(cid_PCAPMB)
+  endif
   ystatesfl(fid_TRH1B)=solflx%TRH1B
-
-  !H2POB=H2POB+TRH2B*Patomw
-  ystatesfl(cid_CH2PB)=ystates0l(cid_CH2PB)+solflx%TRH2B/chemvar%VOLWPB
   ystatesfl(fid_TRH2B)=solflx%TRH2B
-
-  !XOH1B=XOH1B+TRBH1
-  ystatesfl(cid_XH11B)=ystates0l(cid_XH11B)+solflx%TRBH1/chemvar%VOLWPB
   ystatesfl(fid_TRBH1)=solflx%TRBH1
-
-  !XOH2B=XOH2B+TRBH2
-  ystatesfl(cid_XH21B)=ystates0l(cid_XH21B)+solflx%TRBH2/chemvar%VOLWPB
   ystatesfl(fid_TRBH2)=solflx%TRBH2
-
-  !XH1PB=XH1PB+TRB1P
-  ystatesfl(cid_X1P1B)=ystates0l(cid_X1P1B)+solflx%TRB1P/chemvar%VOLWPB
   ystatesfl(fid_TRB1P)=solflx%TRB1P
-
-  !XH2PB=XH2PB+TRB2P
-  ystatesfl(cid_X2P1B)=ystates0l(cid_X2P1B)+solflx%TRB2P/chemvar%VOLWPB
   ystatesfl(fid_TRB2P)=solflx%TRB2P
-
-  !PALPB=PALPB+TRALPB
-  ystatesfl(cid_PALPOB)=ystates0l(cid_PALPOB)+solflx%TRALPB/chemvar%VOLWPB
   ystatesfl(fid_TRALPB)=solflx%TRALPB
-
-  !PFEPB=PFEPB+TRFEPB
-  ystatesfl(cid_PFEPOB)=ystates0l(cid_PFEPOB)+solflx%TRFEPB/chemvar%VOLWPB
   ystatesfl(fid_TRFEPB)=solflx%TRFEPB
-
-  !PCPDB=PCPDB+TRCPDB
-  ystatesfl(cid_PCAPDB)=ystates0l(cid_PCAPDB)+solflx%TRCPDB/chemvar%VOLWPB
   ystatesfl(fid_TRCPDB)=solflx%TRCPDB
-
-  !PCPHB=PCPHB+TRCPHB
-  ystatesfl(cid_PCAPHB)=ystates0l(cid_PCAPHB)+solflx%TRCPHB/chemvar%VOLWPB
   ystatesfl(fid_TRCPHB)=solflx%TRCPHB
-
-  !PCPMB=PCPMB+TRCPMB
-  ystatesfl(cid_PCAPMB)=ystates0l(cid_PCAPMB)+solflx%TRCPMB/chemvar%VOLWPB
   ystatesfl(fid_TRCPMB)=solflx%TRCPMB
   end subroutine RetrieveYstatef
 ! ----------------------------------------------------------------------

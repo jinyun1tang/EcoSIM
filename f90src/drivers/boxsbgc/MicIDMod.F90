@@ -59,6 +59,31 @@ implicit none
   integer :: cid_omnff_b,cid_omnff_e   !autotrophic microbial biomass N	[gN d-2]
   integer :: cid_ompff_b,cid_ompff_e   !autotrophic microbial biomass C	[gC d-2]
 
+  integer :: fid_XCODFS             !CO2 dissolution (+)-volatiziation (-) with respect to atmosphere
+  integer :: fid_XCHDFS             !CH4 dissolution (+)-volatiziation (-) with respect to atmosphere
+  integer :: fid_XOXDFS             !O2  dissolution (+)-volatiziation (-) with respect to atmosphere
+  integer :: fid_XNGDFS             !N2  dissolution (+)-volatiziation (-) with respect to atmosphere
+  integer :: fid_XN2DFS             !N2O dissolution (+)-volatiziation (-) with respect to atmosphere
+  integer :: fid_XN3DFS             !NH3 dissolution (+)-volatiziation (-) with respect to atmosphere in non-band soil
+  integer :: fid_XNBDFS             !NH3 dissolution (+)-volatiziation (-) with respect to atmosphere in band soil
+  integer :: fid_XHGDFS             !H2  dissolution (+)-volatiziation (-) with respect to atmosphere
+  integer :: fid_XCODFG             !CO2 dissolution (+)-volatiziation (-) in soil
+  integer :: fid_XCHDFG             !CH4 dissolution (+)-volatiziation (-) in soil
+  integer :: fid_XOXDFG             !O2 dissolution (+)-volatiziation (-) in soil
+  integer :: fid_XNGDFG             !N2 dissolution (+)-volatiziation (-) in soil
+  integer :: fid_XN2DFG             !N2O dissolution (+)-volatiziation (-) in soil
+  integer :: fid_XN3DFG             !NH3 dissolution (+)-volatiziation (-) in soil
+  integer :: fid_XNBDFG             !NH3 dissolution (+)-volatiziation (-) in band soil
+  integer :: fid_XHGDFG             !H2 dissolution (+)-volatiziation (-) in soil
+  integer :: fid_XCOFLG             !CO2 gaseous exchange with atmosphere (-) into atmosphere
+  integer :: fid_XCHFLG             !CH4 gaseous exchange with atmosphere (-) into atmosphere
+  integer :: fid_XOXFLG             !O2 gaseous exchange with atmosphere (-) into atmosphere
+  integer :: fid_XNGFLG             !N2 gaseous exchange with atmosphere (-) into atmosphere
+  integer :: fid_XN2FLG             !N2O gaseous exchange with atmosphere (-) into atmosphere
+  integer :: fid_XN3FLG             !N3H gaseous exchange with atmosphere (-) into atmosphere
+  integer :: fid_XHGFLG             !H2 gaseous exchange with atmosphere (-) into atmosphere
+
+
   integer :: fid_ROXYF               !net gaseous O2 flux from previous hour, [g d-2 h-1]
   integer :: fid_ROXYY               !total root + microbial O2 uptake, [g d-2 h-1]
   integer :: fid_RNH4Y               !total root + microbial NH4(+) uptake non-band, [gN d-2 h-1]

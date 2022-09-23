@@ -23,6 +23,7 @@ module MicForcTypeMod
   real(r8) :: ZEROS2
   real(r8) :: ZEROS
   real(r8) :: VOLW
+  real(r8) :: VOLP
   real(r8) :: VOLW0
   real(r8) :: VOLY
   real(r8) :: THETY
@@ -69,8 +70,8 @@ module MicForcTypeMod
   real(r8) :: RP14YU
   real(r8) :: ROXYL
   real(r8) :: VOLWU
-  real(r8) :: CFOMC(2)
-  real(r8) :: CFOMCU(2)
+  real(r8), allocatable :: CFOMC(:)
+  real(r8), allocatable :: CFOMCU(:)
   real(r8), allocatable :: ROQCY(:)
   real(r8), allocatable :: ROQAY(:)
   real(r8), allocatable :: DFGS(:)  !rate constant for air-water gas exchange
@@ -93,6 +94,8 @@ module MicForcTypeMod
   class(micforctype) :: this
   integer :: jcplx1
   jcplx1=micpar%jcplx1
+  allocate(this%CFOMC(1:micpar%ndbiomcp))
+  allocate(this%CFOMCU(1:micpar%ndbiomcp))
   allocate(this%ROQCY(0:jcplx1))
   allocate(this%ROQAY(0:jcplx1))
   allocate(this%VOLWM(NPH))
@@ -118,6 +121,9 @@ module MicForcTypeMod
   call destroy(this%DFGS)
   call destroy(this%ROQCY)
   call destroy(this%ROQAY)
+  call destroy(this%CFOMC)
+  call destroy(this%CFOMCU)
+
   end subroutine Destruct
 
 end module MicForcTypeMod
