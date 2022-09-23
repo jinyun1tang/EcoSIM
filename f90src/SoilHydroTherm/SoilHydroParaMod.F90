@@ -16,7 +16,7 @@ module SoilHydroParaMod
   use EcoSIMConfig
   use WatsubPars
   use SurfLitterDataType
-  use minimathmod  , only : test_aeqb
+  use minimathmod  , only : test_aeqb,AZMAX1,AZMIN1
 implicit none
   private
   character(len=*), parameter :: mod_filename = __FILE__
@@ -73,11 +73,9 @@ contains
     FCDX=FCLX-WPLX
     IF(THETW(L,NY,NX).LT.FCX)THEN
       PSISM(L,NY,NX)=AMAX1(PSIHY,-EXP(PSIMX(NY,NX) &
-        +((FCLX-LOG(THETW(L,NY,NX))) &
-        /FCDX*PSIMD(NY,NX))))
+        +((FCLX-LOG(THETW(L,NY,NX)))/FCDX*PSIMD(NY,NX))))
     ELSEIF(THETW(L,NY,NX).LT.POROS(L,NY,NX)-DTHETW)THEN
-      PSISM(L,NY,NX)=-EXP(PSIMS(NY,NX) &
-        +(((PSL(L,NY,NX)-LOG(THETW(L,NY,NX))) &
+      PSISM(L,NY,NX)=-EXP(PSIMS(NY,NX)+(((PSL(L,NY,NX)-LOG(THETW(L,NY,NX))) &
         /PSDX)*PSISD(NY,NX)))
     ELSE
       PSISM(L,NY,NX)=PSISE(L,NY,NX)
@@ -90,9 +88,9 @@ contains
 !
 !     PSISM,PSISO,PSISH,PSIST=matric,osmotic,gravimetric,total water potential
 !
-  PSISO(L,NY,NX)=-8.3143E-06*TKS(L,NY,NX)*CION(L,NY,NX)
-  PSISH(L,NY,NX)=0.0098*(ALT(NY,NX)-DPTH(L,NY,NX))
-  PSIST(L,NY,NX)=AMIN1(0.0,PSISM(L,NY,NX)+PSISO(L,NY,NX)+PSISH(L,NY,NX))
+  PSISO(L,NY,NX)=-8.3143E-06_r8*TKS(L,NY,NX)*CION(L,NY,NX)
+  PSISH(L,NY,NX)=0.0098_r8*(ALT(NY,NX)-DPTH(L,NY,NX))
+  PSIST(L,NY,NX)=AZMIN1(PSISM(L,NY,NX)+PSISO(L,NY,NX)+PSISH(L,NY,NX))
 
 !
 !     SOIL RESISTANCE TO ROOT PENETRATION
@@ -203,11 +201,11 @@ contains
         THETW(L,NY,NX)=0.0_r8
       ENDIF
       IF(THI(L,NY,NX).GT.1.0_r8.OR.DPTH(L,NY,NX).GE.DTBLZ(NY,NX))THEN
-        THETI(L,NY,NX)=AMAX1(0.0_r8,AMIN1(POROS(L,NY,NX),POROS(L,NY,NX)-THW(L,NY,NX)))
+        THETI(L,NY,NX)=AZMAX1(AMIN1(POROS(L,NY,NX),POROS(L,NY,NX)-THW(L,NY,NX)))
       ELSEIF(test_aeqb(THI(L,NY,NX),1._r8))THEN
-        THETI(L,NY,NX)=AMAX1(0.0_r8,AMIN1(FC(L,NY,NX),POROS(L,NY,NX)-THW(L,NY,NX)))
+        THETI(L,NY,NX)=AZMAX1(AMIN1(FC(L,NY,NX),POROS(L,NY,NX)-THW(L,NY,NX)))
       ELSEIF(test_aeqb(THI(L,NY,NX),0._r8))THEN
-        THETI(L,NY,NX)=AMAX1(0.0_r8,AMIN1(WP(L,NY,NX),POROS(L,NY,NX)-THW(L,NY,NX)))
+        THETI(L,NY,NX)=AZMAX1(AMIN1(WP(L,NY,NX),POROS(L,NY,NX)-THW(L,NY,NX)))
       ELSEIF(THI(L,NY,NX).LT.0.0_r8)THEN
         THETI(L,NY,NX)=0.0_r8
       ENDIF

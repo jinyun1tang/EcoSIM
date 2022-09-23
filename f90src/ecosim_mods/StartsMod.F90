@@ -5,7 +5,7 @@ module StartsMod
 
   use data_kind_mod, only : r8 => SHR_KIND_R8
   use abortutils, only : padr, print_info,check_bool
-  use minimathMod, only : test_aeqb, test_aneb
+  use minimathMod, only : test_aeqb, test_aneb, AZMAX1
   use EcosimConst
   use MicrobialDataType
   use EcoSIMSolverPar
@@ -220,7 +220,7 @@ module StartsMod
       IF(BKDS(NU(NY,NX),NY,NX).GT.0.0_r8)THEN
         DTBLZ(NY,NX)=DTBLI(NY,NX)-(ALTZ(NY,NX)-ALT(NY,NX)) &
           *(1.0_r8-DTBLG(NY,NX))
-        DTBLD(NY,NX)=AMAX1(0.0_r8,DTBLDI(NY,NX)-(ALTZ(NY,NX)-ALT(NY,NX)) &
+        DTBLD(NY,NX)=AZMAX1(DTBLDI(NY,NX)-(ALTZ(NY,NX)-ALT(NY,NX)) &
           *(1.0_r8-DTBLG(NY,NX)))
       ELSE
         DTBLZ(NY,NX)=0.0_r8

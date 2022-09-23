@@ -269,18 +269,6 @@ contains
   end subroutine BatchModelConfig
 
 ! ----------------------------------------------------------------------
-!  subroutine ReadForc(forc)
-!
-! DESCRIPTION
-! read forcing data
-
-!  use MicForcTypeMod, only : micforctype
-!  implicit none
-!  type(forc_type), intent(in) :: forc
-
-
-!  end subroutine ReadForc
-! ----------------------------------------------------------------------
 
 
   subroutine Initboxbgc(nvars)
