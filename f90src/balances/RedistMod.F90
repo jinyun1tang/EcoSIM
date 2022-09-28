@@ -251,8 +251,6 @@ module RedistMod
   end subroutine UpdateSnowChemFlux
 !------------------------------------------------------------------------------------------
 
-!------------------------------------------------------------------------------------------
-
   subroutine ModifyExWTBLByDisturbance(I,J,NY,NX)
   implicit none
   integer, intent(in) :: I,J,NY,NX
@@ -287,7 +285,7 @@ module RedistMod
     ENDIF
     DTBLDI(NY,NX)=DCORPW
     DTBLD(NY,NX)=AMAX1(0.0_r8,DTBLDI(NY,NX)-(ALTZ(NY,NX)-ALT(NY,NX)) &
-      *(1.0-DTBLG(NY,NX)))
+      *(1.0_r8-DTBLG(NY,NX)))
     DTBLY(NY,NX)=DTBLD(NY,NX)
   ENDIF
 !

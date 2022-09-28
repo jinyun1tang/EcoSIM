@@ -22,7 +22,6 @@ module readqmod
 
 
   character(len=*), parameter :: mod_filename = __FILE__
-  real(r8), PARAMETER :: TWILGT=0.06976
 
   integer :: IDX,IMO,IYR,IDY,ICUT,IDYE,IDYG,IDYS,JCUT,LPY
   PUBLIC :: readq

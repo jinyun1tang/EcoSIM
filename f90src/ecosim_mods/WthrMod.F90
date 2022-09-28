@@ -17,6 +17,7 @@ module WthrMod
   use IrrigationDataType
   use GridDataType
   use EcoSIMConfig
+  use EcosimConst, only : TWILGT
   use MiniMathMod, only : AZMAX1
   implicit none
 
@@ -33,7 +34,7 @@ module WthrMod
   !     TSNOW=temperature below which precipitation is snow (oC)
   !
   real(r8), PARAMETER :: CDIR=0.42,CDIF=0.58,PDIR=1269.4,PDIF=1269.4
-  real(r8), PARAMETER :: TSNOW=-0.25,TWILGT=0.06976
+  real(r8), PARAMETER :: TSNOW=-0.25
 
   public :: wthr
   contains
@@ -89,7 +90,6 @@ module WthrMod
 !
 
   call SummaryForOutput(NHW,NHE,NVN,NVS)
-  RETURN
 
   END subroutine wthr
 !------------------------------------------------------------------------------------------
@@ -116,12 +116,12 @@ module WthrMod
       IF(IETYP(NY,NX).NE.-2)THEN
         IF(DYLN(NY,NX).GT.ZERO)THEN
           RADN(NY,NX)=AZMAX1(RMAX*SIN((J-(ZNOON(NY,NX) &
-            -DYLN(NY,NX)/2.0))*PICON/DYLN(NY,NX)))
+            -DYLN(NY,NX)/2.0_r8))*PICON/DYLN(NY,NX)))
         ELSE
-          RADN(NY,NX)=0.0
+          RADN(NY,NX)=0.0_r8
         ENDIF
       ELSE
-        RADN(NY,NX)=RMAX/24.0
+        RADN(NY,NX)=RMAX/24.0_r8
       ENDIF
       !
       !     TCA,TKA=air temperature (oC,K)
@@ -167,15 +167,15 @@ module WthrMod
       IF(J.GE.13.AND.J.LE.24)THEN
         IF(TCA(NY,NX).GT.TSNOW)THEN
           PRECRI(NY,NX)=RAIN(I)/12.0
-          PRECWI(NY,NX)=0.0
+          PRECWI(NY,NX)=0.0_r8
         ELSE
-          PRECRI(NY,NX)=0.0
+          PRECRI(NY,NX)=0.0_r8
           PRECWI(NY,NX)=RAIN(I)/12.0
-    !     IF(PRECWI(NY,NX).LT.0.25E-03)PRECWI(NY,NX)=0.0
+    !     IF(PRECWI(NY,NX).LT.0.25E-03)PRECWI(NY,NX)=0.0_r8
         ENDIF
       ELSE
-        PRECRI(NY,NX)=0.0
-        PRECWI(NY,NX)=0.0
+        PRECRI(NY,NX)=0.0_r8
+        PRECWI(NY,NX)=0.0_r8
       ENDIF
     ENDDO
   enddo
@@ -191,8 +191,8 @@ module WthrMod
   integer :: NY,NX
   !     begin_execution
 
-  DO 9935 NX=NHW,NHE
-    DO 9930 NY=NVN,NVS
+  DO  NX=NHW,NHE
+    DO NY=NVN,NVS
  !
       !     RADN=SW radiation at horizontal surface
       !     TCA,TKA=air temperature (oC,K)
@@ -204,19 +204,18 @@ module WthrMod
       RADN(NY,NX)=SRADH(J,I)
       TCA(NY,NX)=TMPH(J,I)
       TKA(NY,NX)=TCA(NY,NX)+TC2K
-      !VPS(NY,NX)=0.61*EXP(5360.0*(3.661E-03-1.0/TKA(NY,NX))) &
-      vps(ny,nx)=vapsat0(tka(ny,nx))*EXP(-ALTI(NY,NX)/7272.0)
+      vps(ny,nx)=vapsat0(tka(ny,nx))*EXP(-ALTI(NY,NX)/7272.0_r8)
       VPK(NY,NX)=AMIN1(DWPTH(J,I),VPS(NY,NX))
       UA(NY,NX)=AMAX1(3600.0,WINDH(J,I))
       IF(TCA(NY,NX).GT.TSNOW)THEN
         PRECRI(NY,NX)=RAINH(J,I)
-        PRECWI(NY,NX)=0.0
+        PRECWI(NY,NX)=0.0_r8
       ELSE
-        PRECRI(NY,NX)=0.0
+        PRECRI(NY,NX)=0.0_r8
         PRECWI(NY,NX)=RAINH(J,I)
       ENDIF
-9930  CONTINUE
-9935  CONTINUE
+    enddo
+  enddo
   end subroutine HourlyWeather
 !------------------------------------------------------------------------------------------
 
@@ -235,8 +234,8 @@ module WthrMod
   !     INCOMING RADIATION READ IN 'READS', SOLAR ANGLE, HUMIDITY,
   !     TEMPERATURE AND CLOUDINESS
   !
-  DO 9965 NX=NHW,NHE
-    DO 9960 NY=NVN,NVS
+  DO NX=NHW,NHE
+    DO  NY=NVN,NVS
 !
 !     IF OUTDOORS
 !
@@ -248,12 +247,12 @@ module WthrMod
         AZI=SIN(ALAT(NY,NX)*1.7453E-02)*SIN(DECLIN*1.7453E-02)
         DEC=COS(ALAT(NY,NX)*1.7453E-02)*COS(DECLIN*1.7453E-02)
 
-        SSIN(NY,NX)=AZMAX1(AZI+DEC*COS(.2618*(ZNOON(NY,NX)-(J-0.5))))
-        SSINN(NY,NX)=AZMAX1(AZI+DEC*COS(.2618*(ZNOON(NY,NX)-(J+0.5))))
+        SSIN(NY,NX)=AZMAX1(AZI+DEC*COS(.2618_r8*(ZNOON(NY,NX)-(J-0.5_r8))))
+        SSINN(NY,NX)=AZMAX1(AZI+DEC*COS(.2618_r8*(ZNOON(NY,NX)-(J+0.5_r8))))
         !     IF(SSIN(NY,NX).GT.0.0.AND.SSIN(NY,NX).LT.TWILGT)SSIN(NY,NX)=TWILGT
-        IF(RADN(NY,NX).LE.0.0)SSIN(NY,NX)=0.0
-        IF(SSIN(NY,NX).LE.-TWILGT)RADN(NY,NX)=0.0
-        RADX=4.896*AZMAX1(SSIN(NY,NX))
+        IF(RADN(NY,NX).LE.0.0)SSIN(NY,NX)=0.0_r8
+        IF(SSIN(NY,NX).LE.-TWILGT)RADN(NY,NX)=0.0_r8
+        RADX=4.896_r8*AZMAX1(SSIN(NY,NX))
         RADN(NY,NX)=AMIN1(RADX,RADN(NY,NX))
 !
         !     DIRECT VS DIFFUSE RADIATION IN SOLAR OR SKY BEAMS
@@ -262,9 +261,9 @@ module WthrMod
         !     RADS,RADY,RAPS,RAPY=direct,diffuse SW,PAR in solar beam
 !
 
-        RADZ=AMIN1(RADN(NY,NX),0.5*(RADX-RADN(NY,NX)))
+        RADZ=AMIN1(RADN(NY,NX),0.5_r8*(RADX-RADN(NY,NX)))
         RADS(NY,NX)=safe_adb(RADN(NY,NX)-RADZ,SSIN(NY,NX))
-        RADS(NY,NX)=AMIN1(4.167,RADS(NY,NX))
+        RADS(NY,NX)=AMIN1(4.167_r8,RADS(NY,NX))
         RADY(NY,NX)=RADZ/TYSIN
         RAPS(NY,NX)=RADS(NY,NX)*CDIR*PDIR
         RAPY(NY,NX)=RADY(NY,NX)*CDIF*PDIF
@@ -287,12 +286,12 @@ module WthrMod
         !
       ELSE
         IF(RADN(NY,NX).LE.0.0)THEN
-          SSIN(NY,NX)=0.0
+          SSIN(NY,NX)=0.0_r8
         ELSE
           SSIN(NY,NX)=1.0
         ENDIF
         SSINN(NY,NX)=1.0
-        CLD=0.0
+        CLD=0.0_r8
         EMM=0.96
       ENDIF
 !
@@ -336,13 +335,13 @@ module WthrMod
       WDPTHD=WDPTH(I,NY,NX)+CDPTH(NU(NY,NX)-1,NY,NX)
 !     IF(WDPTHD.LE.CDPTH(NU(NY,NX),NY,NX))THEN
       PRECII(NY,NX)=RRIG(J,I,NY,NX)
-      PRECUI(NY,NX)=0.0
+      PRECUI(NY,NX)=0.0_r8
 !     ELSE
-!     PRECII(NY,NX)=0.0
+!     PRECII(NY,NX)=0.0_r8
 !     PRECUI(NY,NX)=RRIG(J,I,NY,NX)
 !     ENDIF
-9960  CONTINUE
-9965  CONTINUE
+    ENDDO
+  ENDDO
   end subroutine CalcRadiation
 !------------------------------------------------------------------------------------------
 
@@ -411,9 +410,9 @@ module WthrMod
       !     DHR=diurnal effect on AMP
       !
       IF(test_aneb(TDTPX(NY,NX,N),0.0_r8).OR.test_aneb(TDTPN(NY,NX,N),0.0_r8))THEN
-        DTA=0.5*(TDTPX(NY,NX,N)+TDTPN(NY,NX,N))
-        AMP=0.5*(TDTPX(NY,NX,N)-TDTPN(NY,NX,N))
-        DHR=SIN(0.2618*(J-(ZNOON(NY,NX)+3.0))+PICON2)
+        DTA=0.5_r8*(TDTPX(NY,NX,N)+TDTPN(NY,NX,N))
+        AMP=0.5_r8*(TDTPX(NY,NX,N)-TDTPN(NY,NX,N))
+        DHR=SIN(0.2618_r8*(J-(ZNOON(NY,NX)+3.0_r8))+PICON2)
         TCA(NY,NX)=TCA(NY,NX)+DTA+AMP*DHR
         TKA(NY,NX)=TCA(NY,NX)+TC2K
 !
@@ -428,11 +427,11 @@ module WthrMod
         !     GROUPI,XTLI=node number at floral initiation,planting (maturity group)
 !
         IF(ICLM.EQ.2.AND.J.EQ.1)THEN
-          DTS=0.5*DTA
+          DTS=0.5_r8*DTA
           ATCA(NY,NX)=ATCAI(NY,NX)+DTA
           ATCS(NY,NX)=ATCAI(NY,NX)+DTS
           OFFSET(NY,NX)=0.33*(12.5-AZMAX1(AMIN1(25.0,ATCS(NY,NX))))
-          DO 9900 NZ=1,NP(NY,NX)
+          DO NZ=1,NP(NY,NX)
             ZTYP(NZ,NY,NX)=ZTYPI(NZ,NY,NX)+0.30/2.667*DTA
             OFFST(NZ,NY,NX)=2.667*(2.5-ZTYP(NZ,NY,NX))
             !     TCZ(NZ,NY,NX)=TCZD-OFFST(NZ,NY,NX)
@@ -447,13 +446,8 @@ module WthrMod
               GROUPI(NZ,NY,NX)=GROUPI(NZ,NY,NX)/25.0
             ENDIF
             GROUPI(NZ,NY,NX)=GROUPI(NZ,NY,NX)-XTLI(NZ,NY,NX)
-            !     IF(I.EQ.180)THEN
-            !     WRITE(*,1111)'OFFSET',IYRC,I,J,NZ,N,OFFSET(NY,NX),OFFST(NZ,NY,NX)
-            !    2,DTA,DTS,ATCA(NY,NX),ATCS(NY,NX),ZTYP(NZ,NY,NX)
-            !    3,GROUPI(NZ,NY,NX),TDTPX(NY,NX,N),TDTPN(NY,NX,N)
-!1111  FORMAT(A8,5I4,12E12.4)
-            !     ENDIF
-9900      CONTINUE
+
+          ENDDO
         ENDIF
 !
         !     ADJUST VAPOR PRESSURE FOR TEMPERATURE CHANGE
@@ -503,8 +497,8 @@ module WthrMod
   !
   !     begin_execution
 
-  DO 9945 NX=NHW,NHE
-    DO 9940 NY=NVN,NVS
+  DO NX=NHW,NHE
+    DO  NY=NVN,NVS
       IF(SSIN(NY,NX).GT.0.0)TRAD(NY,NX)=TRAD(NY,NX)+RADS(NY,NX) &
         *SSIN(NY,NX)+RADY(NY,NX)*TYSIN
       TAMX(NY,NX)=AMAX1(TAMX(NY,NX),TCA(NY,NX))
@@ -532,8 +526,8 @@ module WthrMod
       PRECA(NY,NX)=PRECR(NY,NX)+PRECI(NY,NX)
       PRECQ(NY,NX)=PRECR(NY,NX)+PRECW(NY,NX)
       THS(NY,NX)=THSX(NY,NX)*AREA(3,NU(NY,NX),NY,NX)
-9940  CONTINUE
-9945  CONTINUE
+    ENDDO
+  ENDDO
   end subroutine SummaryForOutput
 
 end module WthrMod

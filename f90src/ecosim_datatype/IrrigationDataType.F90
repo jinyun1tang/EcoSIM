@@ -212,15 +212,7 @@ module IrrigationDataType
   subroutine InitAllocate
 
   implicit none
-  allocate(IIRRA(4,JY,JX));     IIRRA=0
-  allocate(RRIG(24,366,JY,JX)); RRIG=0._r8
-  allocate(WDPTH(366,JY,JX));   WDPTH=0._r8
-  allocate(PRECU(JY,JX));       PRECU=0._r8
-  allocate(PRECI(JY,JX));       PRECI=0._r8
-  allocate(FIRRA(JY,JX));       FIRRA=0._r8
-  allocate(CIRRA(JY,JX));       CIRRA=0._r8
-  allocate(DIRRA(2,JY,JX));     DIRRA=0._r8
-  allocate(TDIRI(JY,JX,12));    TDIRI=0._r8
+
   allocate(PHQ(366,JY,JX));     PHQ=0._r8
   allocate(CN4Q(366,JY,JX));    CN4Q=0._r8
   allocate(CN3Q(366,JY,JX));    CN3Q=0._r8
@@ -269,6 +261,16 @@ module IrrigationDataType
   allocate(CC2PQ(366,JY,JX));   CC2PQ=0._r8
   allocate(CM1PQ(366,JY,JX));   CM1PQ=0._r8
   allocate(CSTRQ(366,JY,JX));   CSTRQ=0._r8
+  allocate(RRIG(24,366,JY,JX)); RRIG=0._r8
+  allocate(WDPTH(366,JY,JX));   WDPTH=0._r8
+
+  allocate(IIRRA(4,JY,JX));     IIRRA=0
+  allocate(PRECU(JY,JX));       PRECU=0._r8
+  allocate(PRECI(JY,JX));       PRECI=0._r8
+  allocate(FIRRA(JY,JX));       FIRRA=0._r8
+  allocate(CIRRA(JY,JX));       CIRRA=0._r8
+  allocate(DIRRA(2,JY,JX));     DIRRA=0._r8
+  allocate(TDIRI(JY,JX,12));    TDIRI=0._r8
   allocate(CSTRR(JY,JX));       CSTRR=0._r8
   allocate(CCOQ(JY,JX));        CCOQ=0._r8
   allocate(CCHQ(JY,JX));        CCHQ=0._r8
@@ -397,15 +399,9 @@ module IrrigationDataType
 
 !----------------------------------------------------------------------
   subroutine DestructIrrigation
-  if (allocated(IIRRA))    deallocate(IIRRA)
-  if (allocated(RRIG))     deallocate(RRIG)
-  if (allocated(WDPTH))    deallocate(WDPTH)
-  if (allocated(PRECU))    deallocate(PRECU)
-  if (allocated(PRECI))    deallocate(PRECI)
-  if (allocated(FIRRA))    deallocate(FIRRA)
-  if (allocated(CIRRA))    deallocate(CIRRA)
-  if (allocated(DIRRA))    deallocate(DIRRA)
-  if (allocated(TDIRI))    deallocate(TDIRI)
+
+  implicit none
+
   if (allocated(PHQ))      deallocate(PHQ)
   if (allocated(CN4Q))     deallocate(CN4Q)
   if (allocated(CN3Q))     deallocate(CN3Q)
@@ -454,6 +450,17 @@ module IrrigationDataType
   if (allocated(CC2PQ))    deallocate(CC2PQ)
   if (allocated(CM1PQ))    deallocate(CM1PQ)
   if (allocated(CSTRQ))    deallocate(CSTRQ)
+  if (allocated(RRIG))     deallocate(RRIG)
+  if (allocated(WDPTH))    deallocate(WDPTH)
+
+  if (allocated(IIRRA))    deallocate(IIRRA)
+  if (allocated(PRECU))    deallocate(PRECU)
+  if (allocated(PRECI))    deallocate(PRECI)
+  if (allocated(FIRRA))    deallocate(FIRRA)
+  if (allocated(CIRRA))    deallocate(CIRRA)
+  if (allocated(DIRRA))    deallocate(DIRRA)
+  if (allocated(TDIRI))    deallocate(TDIRI)
+
   if (allocated(CSTRR))    deallocate(CSTRR)
   if (allocated(CCOQ))     deallocate(CCOQ)
   if (allocated(CCHQ))     deallocate(CCHQ)

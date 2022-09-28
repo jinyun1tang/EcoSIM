@@ -39,5 +39,5 @@ module EcosimConst
   real(r8), parameter :: Natomw=14._r8         !N 14 molar mass [g/mol]
   real(r8), parameter :: Patomw=31._r8         !P 31 molar mass [g/mol]
   integer :: ICOR(12)=(/1,-1,0,0,1,1,2,3,3,4,4,5/)
-
+  real(r8), parameter :: TWILGT=0.06976_r8
 end module EcosimConst

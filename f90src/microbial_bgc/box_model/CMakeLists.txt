@@ -6,11 +6,11 @@ set(BOX_MODEL_SOURCES
   MicForcTypeMod.F90
   MicStateTraitTypeMod.F90
   NitroDiagTypes.F90
-  NitroPars.F90
 )
 include_directories(${CMAKE_BINARY_DIR}/f90src/utils/)
 include_directories(${CMAKE_BINARY_DIR}/f90src/ecosim_datatype/)
 include_directories(${CMAKE_BINARY_DIR}/f90src/ioutils/)
+include_directories(${CMAKE_BINARY_DIR}/f90src/modelpars/)
 include(add_ecosim_library)
 add_ecosim_library(box_model ${BOX_MODEL_SOURCES})
 

@@ -29,11 +29,11 @@ implicit none
   integer :: jj
 
   call err_status%reset()
-
+!  print*,'SetChemVar'
   call SetChemVar(forc,micfor,nvars, ystates0l, chemvar)
-
+!  print*,'NoSaltChemEquilibria'
   call NoSaltChemEquilibria(chemvar,solflx)
-
+!  print*,'RetrieveYstatef'
   call RetrieveYstatef(nvars, ystates0l, ystatesfl, chemvar, solflx)
 
   end subroutine RunModel_nosalt

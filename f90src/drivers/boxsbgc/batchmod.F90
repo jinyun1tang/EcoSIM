@@ -14,6 +14,8 @@ module batchmod
   use MicIDMod
   use ChemIDMod
   use ChemIDMod  , only : getchemvarlist => getvarlist_nosalt
+  use ForcTypeMod         , only : forc_type
+
 implicit none
   private
   character(len=*),private, parameter :: mod_filename = __FILE__
@@ -38,18 +40,60 @@ contains
 
   end function getvarllen
 ! ----------------------------------------------------------------------
-  subroutine initmodel(nvars, ystates0l, err_status)
+  subroutine initmodel(nvars, ystates0l, forc, err_status)
 !
 ! set initial conditions for the boxsbgc
   use MicBGCMod, only : initNitro1Layer
   implicit none
   integer, intent(in) :: nvars
+  type(forc_type), intent(in) :: forc
   real(r8), intent(inout) :: ystates0l(nvars)
   type(model_status_type), intent(out) :: err_status
 
   call err_status%reset()
   call initNitro1Layer
 
+
+  associate(                      &
+    nlbiomcp => micpar%nlbiomcp , &
+    ndbiomcp => micpar%ndbiomcp , &
+    jsken    => micpar%jsken    , &
+    NFGs     => micpar%NFGs     , &
+    jcplx    => micpar%jcplx    , &
+    jcplx1   => micpar%jcplx1   , &
+    JG       => micpar%jguilds    &
+  )
+
+  ystates0l(cid_oqc_b:cid_oqc_e)=forc%OQC(0:jcplx1)
+  ystates0l(cid_oqn_b:cid_oqn_e)=forc%OQN(0:jcplx1)
+  ystates0l(cid_oqp_b:cid_oqp_e)=forc%OQP(0:jcplx1)
+  ystates0l(cid_oqa_b:cid_oqa_e)=forc%OQA(0:jcplx1)
+  ystates0l(cid_ohc_b:cid_ohc_e)=forc%OHC(0:jcplx1)
+  ystates0l(cid_ohn_b:cid_ohn_e)=forc%OHN(0:jcplx1)
+  ystates0l(cid_ohp_b:cid_ohp_e)=forc%OHP(0:jcplx1)
+  ystates0l(cid_oha_b:cid_oha_e)=forc%OHA(0:jcplx1)
+  ystates0l(cid_osc_b:cid_osc_e)=reshape(forc%OSC(1:jsken,0:jcplx1),(/jsken*jcplx/))
+  ystates0l(cid_osa_b:cid_osa_e)=reshape(forc%OSA(1:jsken,0:jcplx1),(/jsken*jcplx/))
+  ystates0l(cid_osn_b:cid_osn_e)=reshape(forc%OSN(1:jsken,0:jcplx1),(/jsken*jcplx/))
+  ystates0l(cid_osp_b:cid_osp_e)=reshape(forc%OSP(1:jsken,0:jcplx1),(/jsken*jcplx/))
+  ystates0l(cid_orc_b:cid_orc_e)=reshape(forc%ORC(1:ndbiomcp,0:jcplx1),(/ndbiomcp*jcplx/))
+  ystates0l(cid_orn_b:cid_orn_e)=reshape(forc%ORN(1:ndbiomcp,0:jcplx1),(/ndbiomcp*jcplx/))
+  ystates0l(cid_orp_b:cid_orp_e)=reshape(forc%ORP(1:ndbiomcp,0:jcplx1),(/ndbiomcp*jcplx/))
+
+  ystates0l(cid_omc_b:cid_omc_e)=reshape(forc%OMC(1:nlbiomcp,1:JG,1:NFGs,0:jcplx1),&
+    (/nlbiomcp*JG*NFGs*jcplx/))
+  ystates0l(cid_omn_b:cid_omn_e)=reshape(forc%OMN(1:nlbiomcp,1:JG,1:NFGs,0:jcplx1),&
+    (/nlbiomcp*JG*NFGs*jcplx/))
+  ystates0l(cid_omp_b:cid_omp_e)=reshape(forc%OMP(1:nlbiomcp,1:JG,1:NFGs,0:jcplx1),&
+    (/nlbiomcp*JG*NFGs*jcplx/))
+  ystates0l(cid_omcff_b:cid_omcff_e)=reshape(forc%OMCff(1:nlbiomcp,1:JG,1:NFGs),&
+    (/nlbiomcp*JG*NFGs/))
+  ystates0l(cid_omnff_b:cid_omnff_e)=reshape(forc%OMNff(1:nlbiomcp,1:JG,1:NFGs),&
+    (/nlbiomcp*JG*NFGs/))
+  ystates0l(cid_ompff_b:cid_ompff_e)=reshape(forc%OMPff(1:nlbiomcp,1:JG,1:NFGs),&
+    (/nlbiomcp*JG*NFGs/))
+
+  end associate
   end subroutine initmodel
 
 ! ----------------------------------------------------------------------
@@ -61,7 +105,6 @@ contains
   use MicStateTraitTypeMod, only : micsttype
   use MicForcTypeMod      , only : micforctype
   use MicBGCPars          , only : micpar
-  use ForcTypeMod         , only : forc_type
   implicit none
   integer, intent(in) :: nvars
   real(r8), intent(in) :: ystates0l(nvars)
@@ -136,7 +179,7 @@ contains
   micfor%litrm=.false.
   micfor%Lsurf=.True.
   if(micfor%litrm)then
-!   the following haven't been turned on
+!   the following hasn't been turned on yet
 !
     micstt%ZNH4TU=AMAX1(0.0,forc%ZNH4S)
     micstt%ZNO3TU=AMAX1(0.0,forc%ZNO3S)
@@ -454,6 +497,7 @@ contains
   cid_COXYS=addone(itemp)
   cid_OXYS =addone(itemp)
   cid_COXYG=addone(itemp)
+  cid_CZ2GG=addone(itemp)
   cid_CZ2GS=addone(itemp)
   cid_CH2GS=addone(itemp)
   cid_H2GS =addone(itemp)
@@ -509,7 +553,7 @@ contains
   ystatesfl(cid_OXYS) =ystates0l(cid_OXYS)-micflx%RUPOXO
   ystatesfl(cid_H2GS) =ystates0l(cid_H2GS)-micflx%RH2GO
   ystatesfl(cid_CH4S) =ystates0l(cid_CH4S)-micflx%RCH4O
-
+  ystatesfl(cid_Z2GS) =ystates0l(cid_Z2GS)-micflx%RN2G-micflx%XN2GS
   ystatesfl(cid_ZNFN0)=micstt%ZNFN0
   ystatesfl(cid_ZNFNI)=micstt%ZNFNI
 
@@ -538,8 +582,9 @@ contains
   ystatesfl(cid_CZ2OS)=ystatesfl(cid_Z2OS)/micfor%VOLW
   ystatesfl(cid_CH2GS)=ystatesfl(cid_H2GS)/micfor%VOLW
   ystatesfl(cid_COXYS)=ystatesfl(cid_OXYS)/micfor%VOLW
+  ystatesfl(cid_CZ2GS)=ystatesfl(cid_Z2GS)/micfor%VOLW
+  ystatesfl(cid_CZ2GG)=ystatesfl(cid_Z2GG)/micfor%VOLP
   ystatesfl(cid_COXYG)=ystatesfl(cid_OXYG)/micfor%VOLP
-  ystatesfl(cid_CZ2GS)=ystatesfl(cid_Z2GS)/micfor%VOLP
   ystatesfl(cid_CCH4G)=ystatesfl(cid_CH4G)/micfor%VOLP
 
 ! the following variables are updated in the microbial model
@@ -716,6 +761,10 @@ contains
   varl(cid_COXYG)='COXYG';varlnml(cid_COXYG)='soil micropore gaseous O2 concentration'
   unitl(cid_COXYG)='g m-3';vartypes(cid_COXYG)=var_state_type
 
+  varl(cid_CZ2GG)='CZ2GG';varlnml(cid_CZ2GG)='soil micropore gaseous N2 concentration'
+  unitl(cid_CZ2GG)='g m-3';vartypes(cid_CZ2GG)=var_state_type
+
+
   varl(cid_Z2GS)='Z2GS';varlnml(cid_Z2GS)='soil micropore aqueous N2 mass'
   unitl(cid_Z2GS)='gN d-2';vartypes(cid_Z2GS)=var_state_type
 
@@ -804,7 +853,7 @@ contains
     vartypes(jj)=var_state_type
   enddo
   do jj=cid_oha_b,cid_oha_e
-    write(varl(jj),'(A,I1)')'OHA',jj-cid_ohp_b
+    write(varl(jj),'(A,I1)')'OHA',jj-cid_oha_b
     varlnml(jj)='adsorbed soil acetate mass in complex'//trim(micpar%cplxname(jj-cid_oha_b))
     unitl(jj)='gC d-2'
     vartypes(jj)=var_state_type
@@ -1204,7 +1253,6 @@ contains
 !
   use ChemMod
   use MicBGCMod           , only : SoilBGCOneLayer
-  use ForcTypeMod         , only : forc_type
   implicit none
   integer, intent(in) :: nvars
   real(r8), intent(in) :: ystates0l(nvars)
@@ -1218,16 +1266,19 @@ contains
   call err_status%reset()
 
   ystatesfl=0._r8
-
-  call SoilBGCOneLayer(micfor,micstt,micflx)
-
-  call RunModel_nosalt(forc,micfor,nvars,ystates0l, ystatesfl, err_status)
-
+  if(.not.forc%disvolonly)then
+!    print*,'SoilBGCOneLayer'
+    call SoilBGCOneLayer(micfor,micstt,micflx)
+!    print*,'RunModel_nosalt'
+    call RunModel_nosalt(forc,micfor,nvars,ystates0l, ystatesfl, err_status)
+  endif
+!  print*,'CalcSurflux'
   call CalcSurflux(forc,micfor, nvars, ystates0l,ystatesfl,err_status)
-
+!  print*,'UpdateStateVars'
   call UpdateStateVars(micfor,micstt,micflx,nvars,ystates0l,ystatesfl)
 !
   call UpdateSOMORGM(micfor,micstt)
+!  print*,'RunMicBGC'
   end subroutine RunMicBGC
 ! ----------------------------------------------------------------------
   subroutine CalcSurflux(forc,micfor, nvars, ystates0l,ystatesfl,err_status)
@@ -1237,7 +1288,6 @@ contains
 ! dissolution-volatilization between gasesous and disolved phases in soil
 ! dissolution-volatiziation with respect to atmopshere
 ! no micropore-macropore exchange is considered.
-  use ForcTypeMod         , only : forc_type
   use EcoSimConst
 !
   implicit none
@@ -1370,6 +1420,14 @@ contains
     ZNH4B2=AZMAX1(ystates0l(cid_ZNH4B))
 
   endif
+  DFVCOG=0._r8
+  DFVCHG=0._r8
+  DFVOXG=0._r8
+  DFVNGG=0._r8
+  DFVN2G=0._r8
+  DFVN3G=0._r8
+  DFVHGG=0._r8
+
   DO MM=1,NPG
     M=MIN(NPH,INT((MM-1)*XNPT)+1)
 
@@ -1398,6 +1456,7 @@ contains
       XN2FLG=XN2FLG+DFVN2G
       XN3FLG=XN3FLG+DFVN3G
       XHGFLG=XHGFLG+DFVHGG
+
 
     endif
 
@@ -1499,12 +1558,13 @@ contains
       VOLN3T=VOLWN3+VOLPMA
       VOLNBT=VOLWNB+VOLPMB
       VOLHGT=VOLWHG+VOLPM
+
       RCODFG=forc%DFGS*(AMAX1(ZEROS,CO2G2)*VOLWCO-AMAX1(ZEROS,CO2S2+RCODXS)*VOLPM)/VOLCOT
       RCHDFG=forc%DFGS*(AMAX1(ZEROS,CH4G2)*VOLWCH-AMAX1(ZEROS,CH4S2+RCHDXS)*VOLPM)/VOLCHT
       ROXDFG=forc%DFGS*(AMAX1(ZEROS,OXYG2)*VOLWOX-AMAX1(ZEROS,OXYS2+ROXDXS)*VOLPM)/VOLOXT
       RNGDFG=forc%DFGS*(AMAX1(ZEROS,Z2GG2)*VOLWNG-AMAX1(ZEROS,Z2GS2+RNGDXS)*VOLPM)/VOLNGT
       RN2DFG=forc%DFGS*(AMAX1(ZEROS,Z2OG2)*VOLWN2-AMAX1(ZEROS,Z2OS2+RN2DXS)*VOLPM)/VOLN2T
-
+      RHGDFG=forc%DFGS*(AMAX1(ZEROS,H2GG2)*VOLWHG-AMAX1(ZEROS,H2GS2+RHGDXS)*VOLPM)/VOLHGT
       XCODFG=XCODFG+RCODFG
       XCHDFG=XCHDFG+RCHDFG
       XOXDFG=XOXDFG+ROXDFG
@@ -1528,7 +1588,6 @@ contains
       ELSE
         RNBDFG=0.0_r8
       ENDIF
-      RHGDFG=forc%DFGS*(AMAX1(ZEROS,H2GG2)*VOLWHG-AMAX1(ZEROS,H2GS2+RHGDXS)*VOLPM)/VOLHGT
 
       CO2S2=CO2S2+RCODFS
       CH4S2=CH4S2+RCHDFS
@@ -1547,13 +1606,14 @@ contains
       ZNH3S2=ZNH3S2+RN3DFG
       ZNH3B2=ZNH3B2+RNBDFG
       H2GS2=H2GS2+RHGDFG
-      CO2G2=CO2G2-RCODFG
-      CH4G2=CH4G2-RCHDFG
-      OXYG2=OXYG2-ROXDFG
-      Z2GG2=Z2GG2-RNGDFG
-      Z2OG2=Z2OG2-RN2DFG
-      ZN3G2=ZN3G2-RN3DFG-RNBDFG
-      H2GG2=H2GG2-RHGDFG
+
+      CO2G2=CO2G2-RCODFG+DFVCOG
+      CH4G2=CH4G2-RCHDFG+DFVCHG
+      OXYG2=OXYG2-ROXDFG+DFVOXG
+      Z2GG2=Z2GG2-RNGDFG+DFVNGG
+      Z2OG2=Z2OG2-RN2DFG+DFVN2G
+      ZN3G2=ZN3G2-RN3DFG-RNBDFG+DFVN3G
+      H2GG2=H2GG2-RHGDFG+DFVHGG
     endif
   enddo
 

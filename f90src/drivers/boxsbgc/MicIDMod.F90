@@ -30,9 +30,10 @@ implicit none
   integer :: cid_COXYS     !aqueous O2 concentration micropore	[g m-3]
   integer :: cid_OXYS      !aqueous O2 mass in micropore	[g m-2]
   integer :: cid_COXYG     !gaseous O2 concentration	[g m-3]
-  integer :: cid_CZ2GS     !gaseous N2 concentration [g m-3]
-  integer :: cid_CH2GS     !gaseous H2 concentration [g m-3]
-  integer :: cid_H2GS      !gaseous H2 mass [g m-3]
+  integer :: cid_CZ2GG     !gaseous N2 concentration [g m-3]
+  integer :: cid_CZ2GS     !aqueous N2 concentration [g m-3]
+  integer :: cid_CH2GS     !aqueous H2 concentration [g m-3]
+  integer :: cid_H2GS      !aqueous H2 mass [g m-3]
   integer :: cid_CCH4G     !gaseous CH4 concentration in micropore [g m-3]
   integer :: cid_CH4S      !aqueous CH4 mass in  micropore	[g d-2]
   integer :: cid_ZNFN0     !initial nitrification inhibition activity

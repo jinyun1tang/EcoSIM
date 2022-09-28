@@ -143,6 +143,8 @@ module ChemEquilibriaMod
   real(r8), pointer :: TRAL
 
 !     begin_execution
+  call solflx%SetZero()
+
   VOLWNB => chemvar%VOLWNB
   VOLWNH => chemvar%VOLWNH
   VOLWPB => chemvar%VOLWPB
@@ -330,7 +332,7 @@ module ChemEquilibriaMod
     CH2PD=SYCAD2/(CCA1*COH1)
     RPCADX=AMAX1(-PCAPD1,TPD*(CH2P1-CH2PD))
 !
-!     HYDROXYAPATITE
+!     print*,'HYDROXYAPATITE'
 !
 !     CH2PH,CH2P1=equilibrium,current H2PO4 concentration in non-band
 !     SYCAH2=solubility product derived from SPALO
@@ -339,11 +341,12 @@ module ChemEquilibriaMod
 !  PCAPH1: precipitated Ca5(PO4)3OH
 !  Ca5(PO4)3OH+6H2O<->5Ca(2+) +7OH(-)+3H2PO4(-)
 !
-    CH2PH=(SYCAH2/(CCA1**5*COH1**7))**0.333
-!   dissocilation rate
+    CH2PH=(SYCAH2/(CCA1**5*COH1**7))**0.333_r8
+
+!    print*,'dissocilation rate',PCAPH1,TPD,CH2P1,CH2PH
     RPCAHX=AMAX1(-PCAPH1,TPD*(CH2P1-CH2PH))
 !
-!     MONOCALCIUM PHOSPHATE
+!     print*,'MONOCALCIUM PHOSPHATE'
 !
 !     CH2PM,CH2P1=equilibrium,current H2PO4 concentration in non-band
 !     SPCAM=solubility product for Ca(H2PO4)2
@@ -359,7 +362,7 @@ module ChemEquilibriaMod
 !     HPO4--, H+, OH- AND PROTONATED AND NON-PROTONATED -OH
 !     EXCHANGE SITES
 !
-! XAEC: anaion exchange capacity
+!    print*,'XAEC: anaion exchange capacity'
     IF(XAEC.GT.ZEROS)THEN
 !     Anion adsorption equilibria
 !     H2PO4 EXCHANGE IN NON-BAND SOIL ZONE FROM CONVERGENCE
@@ -392,7 +395,7 @@ module ChemEquilibriaMod
       RXH1P=0._r8
     ENDIF
 !
-!     H2PO4(-) <-> H(+)+HPO4(2-)
+!    print*,'H2PO4(-) <-> H(+)+HPO4(2-)'
 !
 !     DPH2P=dissociation constant
 !     S1=equilibrium concentration in non-band
@@ -439,10 +442,10 @@ module ChemEquilibriaMod
 !     SYF0P2=solubility product derived from SPALO
 !     RPFEBX=H2PO4 dissolution from FePO4 in band
 ! Fe(3+) is shared between band and non-band soils
-    CH2PF=SYF0P2/(CFE1*COH1**2)
+    CH2PF=SYF0P2/(CFE1*COH1**2._r8)
     RPFEBX=AMAX1(-PFEPOB,TPD*(CH2PB-CH2PF))
 !
-!     DICALCIUM PHOSPHATE
+!     print*,'DICALCIUM PHOSPHATE'
 !
 !     CH2PD,CH2PB=equilibrium,current H2PO4 concentration in band
 !     SYCAD2=solubility product derived from SPALO
@@ -457,10 +460,10 @@ module ChemEquilibriaMod
 !     SYCAH2=solubility product derived from SPALO
 !     RPCHBX=H2PO4 dissolution from apatite in band
 !
-    CH2PH=(SYCAH2/(CCA1**5*COH1**7))**0.333
+    CH2PH=(SYCAH2/(CCA1**5*COH1**7))**0.333_r8
     RPCHBX=AMAX1(-PCAPHB,TPD*(CH2PB-CH2PH))
 !
-!     MONOCALCIUM PHOSPHATE
+!     print*,'MONOCALCIUM PHOSPHATE'
 !
 !     CH2PM,CH2PB=equilibrium,current H2PO4 concentration in band
 !     SPCAM=solubility product for Ca(H2PO4)2
@@ -616,7 +619,7 @@ module ChemEquilibriaMod
     XN4Q=FX*XN4Q
     XNBQ=FX*XNBQ
 !
-!     NH4 EXCHANGE IN NON-BAND AND BAND SOIL ZONES
+!    print*,'NH4 EXCHANGE IN NON-BAND AND BAND SOIL ZONES'
 !
 !     RXN4,RXNB=NH4 adsorption in non-band,band
 !     TADC=adsorption rate constant

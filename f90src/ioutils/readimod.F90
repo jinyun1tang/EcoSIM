@@ -38,7 +38,6 @@ module readiMod
   character(len=3), parameter :: model_status(0:1)=(/'off','on '/)
   integer :: ll
   real(r8) :: DAT(50),DATK(50)
-  real(r8), PARAMETER :: TWILGT=0.06976
   real(r8) :: ALATG,ATCAG,AZI,ASPX,CO2EIG,CH4EG,DTBLIG,DTBLDIG
   real(r8) :: DTBLGG,DECDAY,DEC,DPTHSX,OXYEG,RCHQNG,RCHQEG
   real(r8) :: RCHQSG,RCHQWG,RCHGNUG,RCHGEUG,RCHGSUG,RCHGWUG

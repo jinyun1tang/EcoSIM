@@ -99,16 +99,19 @@ end program main
   real(r8) :: CH4E                       !atmospheric CH4 concentration, [umol mol-1],ppmv
   real(r8) :: H2GE                       !atmospheric H2 concentration, [umol mol-1],ppmv
   integer :: forctype                    ! 0: (transient), 1: T const, 2: water const, 3: T and water const
+  logical :: disvolonly                  !dissolution/volatilization only
   namelist /driver_nml/model_name,case_id,hist_freq,salton,forc_file,&
-    CO2E,OXYE,Z2OE,Z2GE,ZNH3E,CH4E,H2GE,forctype
+    CO2E,OXYE,Z2OE,Z2GE,ZNH3E,CH4E,H2GE,forctype,disvolonly
 
   character(len=*), parameter :: mod_filename=__FILE__
+
   hist_freq='day'
   model_name='boxsbgc'
   case_id='exp0'
   salton=.false.
   forc_file='bbforc.nc'
 
+  disvolonly=.false.
   OXYE=2.1E+05_r8
   Z2GE=7.8E+05_r8
   CO2E=370.0_r8
@@ -153,12 +156,23 @@ end program main
   allocate(ystatesfl(1:nvars));       ystatesfl(:) = 0._r8
 
 
-! customized model initialization
-  call initmodel(nvars, ystates0l, err_status)
+  forc%OXYE =OXYE
+  forc%Z2GE =Z2GE
+  forc%CO2E =CO2E
+  forc%CH4E =CH4E
+  forc%Z2OE =Z2OE
+  forc%ZNH3E=ZNH3E
+  forc%H2GE =H2GE
+  forc%disvolonly=disvolonly
+
+  call ReadForc(forc,forc_file)
 
   call micfor%Init()
   call micstt%Init()
   call micflx%Init()
+
+! customized model initialization
+  call initmodel(nvars, ystates0l, forc, err_status)
 
 
   if(err_status%check_status())then
@@ -178,16 +192,6 @@ end program main
 
   call hist%init(ncols,varl, varlnml, unitl, vartypes, freql, gname, dtime)
 
-  forc%OXYE =OXYE
-  forc%Z2GE =Z2GE
-  forc%CO2E =CO2E
-  forc%CH4E =CH4E
-  forc%Z2OE =Z2OE
-  forc%ZNH3E=ZNH3E
-  forc%H2GE =H2GE
-
-
-  call ReadForc(forc,forc_file)
 
   DO
 
@@ -203,8 +207,7 @@ end program main
       call endrun(msg=err_status%print_msg())
     endif
 
-!   computes the fluxes
-     call RunMicBGC(nvars, ystates0l, ystatesfl, forc,micfor,micstt,micflx, err_status)
+    call RunMicBGC(nvars, ystates0l, ystatesfl, forc,micfor,micstt,micflx, err_status)
 
     call timer%update_time_stamp()
 

@@ -70,9 +70,14 @@ implicit none
     real(r8), allocatable :: ORC(:,:)
     real(r8), allocatable :: ORN(:,:)
     real(r8), allocatable :: ORP(:,:)
+    real(r8), allocatable :: OHA(:)
     real(r8), allocatable :: OHC(:)
     real(r8), allocatable :: OHN(:)
     real(r8), allocatable :: OHP(:)
+    real(r8), allocatable :: OQC(:)
+    real(r8), allocatable :: OQN(:)
+    real(r8), allocatable :: OQP(:)
+    real(r8), allocatable :: OQA(:)
     real(r8), allocatable :: OMC(:,:,:,:)
     real(r8), allocatable :: OMN(:,:,:,:)
     real(r8), allocatable :: OMP(:,:,:,:)
@@ -211,6 +216,7 @@ implicit none
     real(r8) :: ROXYF       !net gaseous O2 flux, [g d-2 h-1], updated in redist.f
     real(r8) :: RCH4L       !net aqueous CH4 flux, [g d-2 h-1], updated in redist.f
     real(r8) :: ROXYL       !net aqueous O2 flux from previous hour, [g d-2 h-1], updated in redist.f
+    logical  :: disvolonly  !flag to only do dissolution/volatilization
   end type forc_type
 
   contains
@@ -238,6 +244,10 @@ implicit none
   allocate(forc%OMC(nlbiomcp,JG,NFGs,0:jcplx1))
   allocate(forc%OMN(nlbiomcp,JG,NFGs,0:jcplx1))
   allocate(forc%OMP(nlbiomcp,JG,NFGs,0:jcplx1))
+  allocate(forc%OQC(0:jcplx1))
+  allocate(forc%OQN(0:jcplx1))
+  allocate(forc%OQP(0:jcplx1))
+  allocate(forc%OQA(0:jcplx1))
   allocate(forc%OSC(jsken,0:jcplx1))
   allocate(forc%OSA(jsken,0:jcplx1))
   allocate(forc%OSN(jsken,0:jcplx1))
@@ -251,6 +261,7 @@ implicit none
   allocate(forc%OHC(0:jcplx1))
   allocate(forc%OHN(0:jcplx1))
   allocate(forc%OHP(0:jcplx1))
+  allocate(forc%OHA(0:jcplx1))
   allocate(forc%CFOMC(ndbiomcp))
   allocate(forc%CNOSC(1:jsken,0:jcplx1))
   allocate(forc%CPOSC(1:jsken,0:jcplx1))
@@ -313,6 +324,11 @@ implicit none
   call ncd_getvar(ncf,'OHC',forc%OHC)
   call ncd_getvar(ncf,'OHN',forc%OHN)
   call ncd_getvar(ncf,'OHP',forc%OHP)
+  call ncd_getvar(ncf,'OHA',forc%OHA)
+  call ncd_getvar(ncf,'OQA',forc%OQA)
+  call ncd_getvar(ncf,'OQC',forc%OQC)
+  call ncd_getvar(ncf,'OQN',forc%OQN)
+  call ncd_getvar(ncf,'OQP',forc%OQP)
   call ncd_getvar(ncf,'THETY',forc%THETY)
   call ncd_getvar(ncf,'PSIMX',forc%PSIMX)
   call ncd_getvar(ncf,'PSIMD',forc%PSIMD)

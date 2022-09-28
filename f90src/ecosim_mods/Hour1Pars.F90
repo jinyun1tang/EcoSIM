@@ -4,10 +4,10 @@ module Hour1Pars
   public
   save
   character(len=*),private, parameter :: mod_filename = __FILE__
-!     BKDSX=maximm soil bulk density
-!     THETPW=minimum air-filled porosity for saturation (m3 m-3)
-  real(r8) :: BKDSX
-  real(r8) :: THETPW
+
+
+  real(r8) :: BKDSX  !     BKDSX=maximm soil bulk density
+  real(r8) :: THETPW !     THETPW=minimum air-filled porosity for saturation (m3 m-3)
   real(r8) :: THETWP
   real(r8) :: XVOLWC(0:3),THETRX(0:2)
 !

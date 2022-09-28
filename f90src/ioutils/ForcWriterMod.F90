@@ -144,6 +144,9 @@ implicit none
     call ncd_defvar(ncf, 'OQA', ncd_float, dim1name='jcplx',&
             long_name='dissolved acetate micropore',  &
             units='gC d-2', missing_value=spval, fill_value=spval)
+    call ncd_defvar(ncf, 'OHA', ncd_float, dim1name='jcplx',&
+            long_name='adsorbed acetate',  &
+            units='gC d-2', missing_value=spval, fill_value=spval)
     call ncd_defvar(ncf, 'OHC', ncd_float, dim1name='jcplx',&
             long_name='adsorbed soil C',  &
             units='gC d-2', missing_value=spval, fill_value=spval)
@@ -298,6 +301,7 @@ implicit none
     call ncd_putvar(ncf,'OQN',OQN(:,L,NY,NX))
     call ncd_putvar(ncf,'OQP',OQP(:,L,NY,NX))
     call ncd_putvar(ncf,'OQA',OQA(:,L,NY,NX))
+    call ncd_putvar(ncf,'OHA',OHC(:,L,NY,NX))
     call ncd_putvar(ncf,'OHC',OHC(:,L,NY,NX))
     call ncd_putvar(ncf,'OHN',OHN(:,L,NY,NX))
     call ncd_putvar(ncf,'OHP',OHP(:,L,NY,NX))

@@ -1,4 +1,6 @@
 set(MODELPARS_SOURCES
+  NitroPars.F90
+  GrosubPars.F90
   TracerPropMod.F90
   ChemTracerParsMod.F90
 )

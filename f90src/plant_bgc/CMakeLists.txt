@@ -9,13 +9,11 @@ set(PLANT_BGC_SOURCES
 	StartqMod.F90
   PhotoSynsMod.F90
   LitterFallMod.F90
-  PlantDisturbMod.F90
   PlantDisturbsMod.F90
 	ExtractsMod.F90
 	GrosubsMod.F90
 	StomatesMod.F90
   CanopyCondsMod.F90
-  GrosubPars.F90
   UptakePars.F90
   StartqsMod.F90
   HfuncsMod.F90
@@ -23,6 +21,7 @@ set(PLANT_BGC_SOURCES
 include_directories(${CMAKE_BINARY_DIR}/f90src/utils/)
 include_directories(${CMAKE_BINARY_DIR}/f90src/ecosim_datatype/)
 include_directories(${CMAKE_BINARY_DIR}/f90src/APIData/)
+include_directories(${CMAKE_BINARY_DIR}/f90src/modelpars/)
 include_directories(${CMAKE_BINARY_DIR}/f90src/ioutils/)
 include(add_ecosim_library)
 add_ecosim_library(plant_bgc ${PLANT_BGC_SOURCES})

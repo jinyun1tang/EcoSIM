@@ -33,7 +33,6 @@ module readsmod
   CHARACTER(len=1) :: TTYPE,CTYPE,IVAR(20),VAR(50),TYP(50)
   integer :: IDAT(20)
   real(r8) :: DAT(50),DATK(50),OUT(50)
-  real(r8), PARAMETER :: TWILGT=0.06976
   real(r8) :: datav(40)
   DATA IFLGY,IYRX,IYRD/0,0,0/
 
