@@ -4,7 +4,7 @@ module CanopyRadDataType
   use GridConsts
   implicit none
   public
-
+  character(len=*),private, parameter :: mod_filename = __FILE__
   real(r8),allocatable :: ZSIN(:)                        !sine of leaf angle	-
   real(r8),allocatable :: ZCOS(:)                        !cosine of leaf angle	-
   real(r8),allocatable :: OMEGA(:,:,:)                   !sine of indirect sky radiation on leaf surface

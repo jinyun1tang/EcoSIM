@@ -2,7 +2,7 @@ module EcoSIMDesctruct
 
   implicit none
 
-
+  character(len=*),private, parameter :: mod_filename = __FILE__
   public :: DestructEcoSIM
   contains
 

@@ -7,6 +7,7 @@ module ChemEquilibriaMod
 ! the model does not include H3PO4, which seems problematic, July 28, 2022
   use data_kind_mod, only : r8 => SHR_KIND_R8
   use SoluteParMod
+  use EcosimConst
   use SoluteChemDataType
   use EcoSIMCtrlDataType
   use EcoSIMSolverPar
@@ -51,12 +52,12 @@ module ChemEquilibriaMod
   real(r8) :: RH2P,RNH4,RPALPX,RPCADX
   real(r8) :: RPCAHX,RPCAMX,RPFEPX,RXN4
   real(r8) :: VOLWBK
+  real(r8), parameter :: ZEROS = 1.0E-015_r8
+  real(r8), parameter :: ZEROS2= 1.0E-008_r8
 
-  real(r8), pointer :: ZEROS
   real(r8), pointer :: BKVLX
   real(r8), pointer :: VOLWM
   real(r8), pointer :: BKVL
-  real(r8), pointer :: ZEROS2
   real(r8), pointer :: GKCA
   real(r8), pointer :: GKCH
   real(r8), pointer :: GKCM
@@ -142,6 +143,8 @@ module ChemEquilibriaMod
   real(r8), pointer :: TRAL
 
 !     begin_execution
+  call solflx%SetZero()
+
   VOLWNB => chemvar%VOLWNB
   VOLWNH => chemvar%VOLWNH
   VOLWPB => chemvar%VOLWPB
@@ -174,7 +177,6 @@ module ChemEquilibriaMod
   PCAPMB=> chemvar%PCAPMB
   PFEPO1=> chemvar%PFEPO1
   PFEPOB=> chemvar%PFEPOB
-  ZEROS =>  chemvar%ZEROS
   BKVLX =>  chemvar%BKVLX
   XCEC  =>  chemvar%XCEC
   PH    =>  chemvar%PH
@@ -186,7 +188,6 @@ module ChemEquilibriaMod
   ZKA   =>  chemvar%ZKA
   CO2S  =>  chemvar%CO2S
   CCA   =>  chemvar%CCA
-  ZEROS2=>  chemvar%ZEROS2
   BKVL  =>  chemvar%BKVL
   XAEC  =>  chemvar%XAEC
   VLNH4 =>  chemvar%VLNH4
@@ -239,7 +240,7 @@ module ChemEquilibriaMod
 !     DP*=dissociation constant from PARAMETER above
 !     SP*=solubility product from PARAMETER above
 !     C*<0.0=solve for C* from equilibrium with other solutes
-!
+!  call PrintChemVar(chemvar)
 
   IF(BKVLX.GT.ZEROS)THEN
     CCEC=AMAX1(ZERO,XCEC/BKVLX)
@@ -255,7 +256,7 @@ module ChemEquilibriaMod
     CKA1=AMAX1(ZERO,ZKA/VOLWM)
 
 ! aqueous CO2 (H2CO3), mol/m3
-    CCO21=AMAX1(ZERO,CO2S/(12.0*VOLWM))
+    CCO21=AMAX1(ZERO,CO2S/(Catomw*VOLWM))
 
     VOLWBK=AMIN1(1.0,BKVL/VOLWM)
   ELSE
@@ -304,28 +305,22 @@ module ChemEquilibriaMod
 !     CH2PA,CH2P1=equilibrium, current H2PO4 concentration in non-band
 !     SYA0P2=solubility product derived from SPALO
 !     RPALPX=H2PO4 dissolution from AlPO4 in non-band
+!
 !   PALP01: precipitated Al(PO4)
 !   AlPO4+2H2O <-> 2OH(-)+H2PO4(-)+Al(3+)
     CH2PA=SYA0P2/(CAL1*COH1**2)
     RPALPX=AMAX1(-PALPO1,TPD*(CH2P1-CH2PA))
-!     IF((I/30)*30.EQ.I.AND.J.EQ.12)THEN
-!     WRITE(*,1117)'RPALPX',I,J,L,CH2P1,CH2PA,SYA0P2,CAL1,COH1,PALPO1
-!    2,RPALPX,CAL1*CH2P1*COH1**2
-!     ENDIF
 !
 !     IRON PHOSPHATE (STRENGITE)
 !
 !     CH2PF,CH2P1=equilibrium,current H2PO4 concentration in non-band
 !     SYF0P2=solubility product derived from SPALO
 !     RPFEPX=H2PO4 dissolution from FePO4 in non-band
+!
 !   PFEP01: precipitated FePO4
 !   FePO4+2H2O <-> Fe(3+)+2OH(-) + H2PO4(-)
     CH2PF=SYF0P2/(CFE1*COH1**2)
     RPFEPX=AMAX1(-PFEPO1,TPD*(CH2P1-CH2PF))
-!     IF((I/30)*30.EQ.I.AND.J.EQ.12)THEN
-!     WRITE(*,1117)'RPFEPX',I,J,L,CH2P1,CH2PF,SYF0P2,CFE1,COH1,PFEPO1
-!    3,RPFEPX,CFE1*CH2P1*COH1**2
-!     ENDIF
 !
 !     DICALCIUM PHOSPHATE (CaHPO4)
 !
@@ -337,24 +332,21 @@ module ChemEquilibriaMod
     CH2PD=SYCAD2/(CCA1*COH1)
     RPCADX=AMAX1(-PCAPD1,TPD*(CH2P1-CH2PD))
 !
-!     HYDROXYAPATITE
+!     print*,'HYDROXYAPATITE'
 !
 !     CH2PH,CH2P1=equilibrium,current H2PO4 concentration in non-band
 !     SYCAH2=solubility product derived from SPALO
 !     RPCAHX=H2PO4 dissolution from apatite in non-band
+!
 !  PCAPH1: precipitated Ca5(PO4)3OH
 !  Ca5(PO4)3OH+6H2O<->5Ca(2+) +7OH(-)+3H2PO4(-)
 !
-    CH2PH=(SYCAH2/(CCA1**5*COH1**7))**0.333
-!   dissocilation rate
+    CH2PH=(SYCAH2/(CCA1**5*COH1**7))**0.333_r8
+
+!    print*,'dissocilation rate',PCAPH1,TPD,CH2P1,CH2PH
     RPCAHX=AMAX1(-PCAPH1,TPD*(CH2P1-CH2PH))
-!     IF((I/30)*30.EQ.i.AND.J.EQ.12)THEN
-!     WRITE(*,1117)'RPCAHX',I,J,L,CH2P1,CH2PH,SYCAH2,CCA1,COH1,SPCAC
-!    2,DPCO3,CCO31,CCO21,CHY1,PH,PCAPH1,RPCAHX
-!    3,CCA1**5*CH2P1**3*COH1**7
-!     ENDIF
 !
-!     MONOCALCIUM PHOSPHATE
+!     print*,'MONOCALCIUM PHOSPHATE'
 !
 !     CH2PM,CH2P1=equilibrium,current H2PO4 concentration in non-band
 !     SPCAM=solubility product for Ca(H2PO4)2
@@ -370,7 +362,7 @@ module ChemEquilibriaMod
 !     HPO4--, H+, OH- AND PROTONATED AND NON-PROTONATED -OH
 !     EXCHANGE SITES
 !
-! XAEC: anaion exchange capacity
+!    print*,'XAEC: anaion exchange capacity'
     IF(XAEC.GT.ZEROS)THEN
 !     Anion adsorption equilibria
 !     H2PO4 EXCHANGE IN NON-BAND SOIL ZONE FROM CONVERGENCE
@@ -403,11 +395,11 @@ module ChemEquilibriaMod
       RXH1P=0._r8
     ENDIF
 !
-!     H2PO4(-) <-> H(+)+HPO4(2-)
+!    print*,'H2PO4(-) <-> H(+)+HPO4(2-)'
 !
 !     DPH2P=dissociation constant
 !     S1=equilibrium concentration in non-band
-!     RH2P=H2PO4-H+HPO4 dissociation in non-band
+!     RH2P=H2PO4- <-> H(+) + HPO4(--) dissociation in non-band
 !   The problem is equivalent to solving a quadratic equation, with S1 being the \Delta
 ! of the following equation
 !  x^2+(A+B+K)x+AB-KC=0
@@ -450,10 +442,10 @@ module ChemEquilibriaMod
 !     SYF0P2=solubility product derived from SPALO
 !     RPFEBX=H2PO4 dissolution from FePO4 in band
 ! Fe(3+) is shared between band and non-band soils
-    CH2PF=SYF0P2/(CFE1*COH1**2)
+    CH2PF=SYF0P2/(CFE1*COH1**2._r8)
     RPFEBX=AMAX1(-PFEPOB,TPD*(CH2PB-CH2PF))
 !
-!     DICALCIUM PHOSPHATE
+!     print*,'DICALCIUM PHOSPHATE'
 !
 !     CH2PD,CH2PB=equilibrium,current H2PO4 concentration in band
 !     SYCAD2=solubility product derived from SPALO
@@ -468,10 +460,10 @@ module ChemEquilibriaMod
 !     SYCAH2=solubility product derived from SPALO
 !     RPCHBX=H2PO4 dissolution from apatite in band
 !
-    CH2PH=(SYCAH2/(CCA1**5*COH1**7))**0.333
+    CH2PH=(SYCAH2/(CCA1**5*COH1**7))**0.333_r8
     RPCHBX=AMAX1(-PCAPHB,TPD*(CH2PB-CH2PH))
 !
-!     MONOCALCIUM PHOSPHATE
+!     print*,'MONOCALCIUM PHOSPHATE'
 !
 !     CH2PM,CH2PB=equilibrium,current H2PO4 concentration in band
 !     SPCAM=solubility product for Ca(H2PO4)2
@@ -498,7 +490,10 @@ module ChemEquilibriaMod
 !
 !     SPH2P,SXH2P=equilibrium constant for H2PO4 exchange with R-OH2,R-OH
 !     RXH2B,RYH2B=H2PO4 exchange with R-OH2,R-OH in band
-!
+!     R-H2PO4 <-> R-OH2+H2PO4(-)
+!   CH2PB: H2PO4(-)
+!   X2P1B: R-H2PO4
+!   XH21B: R-OH2
       SPH2P=SXH2P*DPH2O
       RXH2B=TADA*(XH21B*CH2PB-SPH2P*X2P1B)/(XH21B+SPH2P)*VOLWBK
       RYH2B=TADA*(XH11B*CH2PB-SXH2P*X2P1B*COH1)/(XH11B+SXH2P)*VOLWBK
@@ -517,8 +512,6 @@ module ChemEquilibriaMod
       RYH2B=0._r8
       RXH1B=0._r8
     ENDIF
-!     WRITE(*,2224)'RXH1B',I,J,L,RXH1B,XH11B,CH1PB,SPH1P,X1P1B
-!2224  FORMAT(A8,3I4,40E12.4)
 !
 !     H2PO4-H+HPO4
 !
@@ -558,28 +551,37 @@ module ChemEquilibriaMod
 !     CA-NH4,CA-H,CA-AL,CA-MG,CA-NA,CA-K
 !     X*Q=equilibrium exchangeable concentrations
 !     XTLQ=total equilibrium exchangeable concentration
-!   non-band X-NH4
+!   non-band X-NH4 + H(+) <-> X-H + NH4(+)
     CN41=AMAX1(ZERO,CN41)
+
 !   band X-NH4 <-> X-H + NH4(+)
     CN4B=AMAX1(ZERO,CN4B)
+
 !   X-Al <-> X-H + (1/3)Al(3+)
     CALX=AMAX1(ZERO,CAL1)**0.333
+
 !   X-Fe <-> X-H + (1/3)Fe(3+)
     CFEX=AMAX1(ZERO,CFE1)**0.333
+
 !   X-Ca <-> X-H + (1/2)Ca(2+)
     CCAX=AMAX1(ZERO,CCA1)**0.500
+
 !   X-Mg <-> X-H + (1/2)Mg(2+)
     CMGX=AMAX1(ZERO,CMG1)**0.500
+
 !   X-Na <-> X-H + Na(+)
     CNA1=AMAX1(ZERO,CNA1)
+
 !   X-K  <-> X-H + K(+)
     CKA1=AMAX1(ZERO,CKA1)
 !
-!     EQUILIBRIUM X-CA CONCENTRATION FROM CEC AND CATION
-!     CONCENTRATIONS
+!   EQUILIBRIUM X-CA CONCENTRATION FROM CEC AND CATION
+!   CONCENTRATIONS
+!
+!   The following equation can be found in Robbins et al. (1980)
 !   XCAX designates X-Ca
 !   Given a general reaction
-!   X-H + 1/n A(n+) <-> X-A(n+)
+!   X-H + 1/n A(n+) <-> X-A(n+) + H(+)
 !   X-A(n+)/[(A)^(1/n)*(X-H)]=GK
 !   X-A(n+)=GK*(A)^(1/n)*(X-H)
     XCAX=CCEC/(1.0+GKC4*CN41/CCAX*VLNH4 &
@@ -588,19 +590,27 @@ module ChemEquilibriaMod
       +GKCA*CFEX/CCAX+GKCM*CMGX/CCAX &
       +GKCN*CNA1/CCAX+GKCK*CKA1/CCAX)
 !   X-H+NH4(+) <-> X-NH4 + H(+)
+!   XN4Q: equilibrium exchangeable NH4(+) non-band soil
     XN4Q=XCAX*CN41*GKC4
+
+!   XNBq: equilibrium exchangeable NH4(+) band soil
     XNBQ=XCAX*CN4B*GKC4
+!   XHYQ: equilibrium exchangeable H(+) in soil
     XHYQ=XCAX*CHY1*GKCH
+
 !   3X-H+Al(3+) <-> X-Al+ 3H(+)
+!   XALQ: equilibrium exchangeable Al(3+) in soil
     XALQ=XCAX*CALX*GKCA
+
 !   3X-H+Fe(3+) <-> X-Fe + 3(H+)
+!   XFEQ: equilibrium exchangeable Fe(3+) soil
     XFEQ=XCAX*CFEX*GKCA
+
     XCAQ=XCAX*CCAX
     XMGQ=XCAX*CMGX*GKCM
     XNAQ=XCAX*CNA1*GKCN
     XKAQ=XCAX*CKA1*GKCK
-    XTLQ=XN4Q*VLNH4+XNBQ*VLNHB &
-      +XHYQ+XALQ+XFEQ+XCAQ+XMGQ+XNAQ+XKAQ
+    XTLQ=XN4Q*VLNH4+XNBQ*VLNHB+XHYQ+XALQ+XFEQ+XCAQ+XMGQ+XNAQ+XKAQ
     IF(XTLQ.GT.ZERO)THEN
       FX=CCEC/XTLQ
     ELSE
@@ -609,30 +619,29 @@ module ChemEquilibriaMod
     XN4Q=FX*XN4Q
     XNBQ=FX*XNBQ
 !
-!     NH4 EXCHANGE IN NON-BAND AND BAND SOIL ZONES
+!    print*,'NH4 EXCHANGE IN NON-BAND AND BAND SOIL ZONES'
 !
 !     RXN4,RXNB=NH4 adsorption in non-band,band
 !     TADC=adsorption rate constant
-!
+!  if RNX4>0, XN41 will be increased
     RXN4=TADC*AMAX1(AMIN1((XN4Q-XN41)*CN41/XN4Q,CN41),-XN41)
     RXNB=TADC*AMAX1(AMIN1((XNBQ-XN4B)*CN4B/XNBQ,CN4B),-XN4B)
   ELSE
     RXN4=0._r8
     RXNB=0._r8
   ENDIF
-!     IF(J.EQ.12.AND.L.EQ.0)THEN
-!     WRITE(*,2222)'RXN4',I,J,L,RXN4,CN41,XN41,CCAX,CCA1,XCAQ
-!    2,CCEC,XCAX,FN4X,FCAQ,GKC4,PH,VOLWBK
-!    3,XN4Q,XTLQ,FX
-!    3,(CCA1)**0.5*XN41/(CN41*XCAQ),ZCA,BKVLX
-!    4,CN4B,CHY1,CALX,CFEX,CMGX,CNA1,CKA1
-!     ENDIF
 !
 !     NH4-NH3+H IN NON-BAND AND BAND SOIL ZONES
 !
 !     RNH4,RNHB=NH4-NH3+H dissociation in non-band,band
 !     DPN4=NH4 dissociation constant
 ! NH4(+) <-> NH3 + H(+)
+! K=[NH3]*[H(+)]/[NH4(+)]
+! H(+): CHY1
+! CN31: NH3
+! CN41: NH4(+)
+! DPN4: K
+! RNH4: if RNH4 > 0., then the equilibrium should move to association, and NH4(+) will be increased
   IF(VOLWNH.GT.ZEROS2)THEN
     RNH4=(CHY1*CN31-DPN4*CN41)/(DPN4+CHY1)
   ELSE
@@ -643,13 +652,6 @@ module ChemEquilibriaMod
   ELSE
     RNHB=0._r8
   ENDIF
-!     IF(IYRC.EQ.2012.AND.I.EQ.151.AND.NX.EQ.1)THEN
-!     WRITE(*,2222)'RNH4',I,J,L,RNH4,CHY1,CN31,DPN4,CN41
-!    2,RXN4,XN41,VOLWNH,RNHB,CN3B,CN4B,VOLWNB,RXNB,XN4B,FN4X
-!    2,CN41*VOLWNH,XN41*VOLWNH,CN4B*VOLWNB,XN4B*VOLWNB
-!    3,(CCA1)**0.5*XN41/(CN41*XCAQ),(CCA1)**0.5*XN4B/(CN4B*XCAQ)
-!    4,RN4X,RN3X,RNBX,R3BX,ZEROS2
-!     ENDIF
 !
 !     TOTAL ION FLUXES FOR ALL REACTIONS ABOVE
 !
@@ -666,9 +668,9 @@ module ChemEquilibriaMod
   RN3S=-RNH4
   RN3B=-RNHB
   RHP1=-RH2P-RXH1P
-  RHP2=RH2P-RXH2P-RYH2P-RPALPX-RPFEPX-RPCADX-2.0*RPCAMX-3.0*RPCAHX
+  RHP2=RH2P-RXH2P-RYH2P-RPALPX-RPFEPX-RPCADX-2.0_r8*RPCAMX-3.0_r8*RPCAHX
   RHB1=-RH2B-RXH1B
-  RHB2=RH2B-RXH2B-RYH2B-RPALBX-RPFEBX-RPCDBX-2.0*RPCMBX-3.0*RPCHBX
+  RHB2=RH2B-RXH2B-RYH2B-RPALBX-RPFEBX-RPCDBX-2.0_r8*RPCMBX-3.0_r8*RPCHBX
   RXH1=-RYH2P-RXH1P
   RXH2=-RXH2P
   RX1P=RXH1P
@@ -696,28 +698,28 @@ module ChemEquilibriaMod
 !     =total AlPO4,FePO4,CaHPO4,apatite,Ca(H2PO4)2 precipitation in band
 !
   TRN4S=TRN4S+RN4S*VOLWNH
-  TRN4B=TRN4B+RN4B*VOLWNB
   TRN3S=TRN3S+RN3S*VOLWNH
+  TRXN4=TRXN4+RXN4*VOLWNH
+  TRN4B=TRN4B+RN4B*VOLWNB
   TRN3B=TRN3B+RN3B*VOLWNB
+  TRXNB=TRXNB+RXNB*VOLWNB
   TRH1P=TRH1P+RHP1*VOLWPO
   TRH2P=TRH2P+RHP2*VOLWPO
-  TRH1B=TRH1B+RHB1*VOLWPB
-  TRH2B=TRH2B+RHB2*VOLWPB
-  TRXN4=TRXN4+RXN4*VOLWNH
-  TRXNB=TRXNB+RXNB*VOLWNB
   TRXH1=TRXH1+RXH1*VOLWPO
   TRXH2=TRXH2+RXH2*VOLWPO
   TRX1P=TRX1P+RX1P*VOLWPO
   TRX2P=TRX2P+RX2P*VOLWPO
-  TRBH1=TRBH1+RBH1*VOLWPB
-  TRBH2=TRBH2+RBH2*VOLWPB
-  TRB1P=TRB1P+RB1P*VOLWPB
-  TRB2P=TRB2P+RB2P*VOLWPB
   TRALPO=TRALPO+RPALPX*VOLWPO
   TRFEPO=TRFEPO+RPFEPX*VOLWPO
   TRCAPD=TRCAPD+RPCADX*VOLWPO
   TRCAPH=TRCAPH+RPCAHX*VOLWPO
   TRCAPM=TRCAPM+RPCAMX*VOLWPO
+  TRH1B=TRH1B+RHB1*VOLWPB
+  TRH2B=TRH2B+RHB2*VOLWPB
+  TRBH1=TRBH1+RBH1*VOLWPB
+  TRBH2=TRBH2+RBH2*VOLWPB
+  TRB1P=TRB1P+RB1P*VOLWPB
+  TRB2P=TRB2P+RB2P*VOLWPB
   TRALPB=TRALPB+RPALBX*VOLWPB
   TRFEPB=TRFEPB+RPFEBX*VOLWPB
   TRCPDB=TRCPDB+RPCDBX*VOLWPB
@@ -727,4 +729,61 @@ module ChemEquilibriaMod
   end subroutine NoSaltChemEquilibria
 
 !--------------------------------------------------------------------------
+  subroutine PrintChemVar(chemvar)
+  implicit none
+  type(chem_var_type), target, intent(in) :: chemvar
+
+  write(*,*)'XCEC'  ,chemvar%XCEC
+  write(*,*)'BKVLX' ,chemvar%BKVLX
+  write(*,*)'BKVL'  ,chemvar%BKVL
+  write(*,*)'VOLWM' ,chemvar%VOLWM
+  write(*,*)'VOLWPO',chemvar%VOLWPO
+  write(*,*)'VOLWPB',chemvar%VOLWPB
+  write(*,*)'VOLWNH',chemvar%VOLWNH
+  write(*,*)'VOLWNB',chemvar%VOLWNB
+  write(*,*)'VLNH4' ,chemvar%VLNH4
+  write(*,*)'VLNHB' ,chemvar%VLNHB
+  write(*,*)'ZMG'   ,chemvar%ZMG
+  write(*,*)'ZNA'   ,chemvar%ZNA
+  write(*,*)'ZKA'   ,chemvar%ZKA
+  write(*,*)'XAEC'  ,chemvar%XAEC
+  write(*,*)'CO2S'  ,chemvar%CO2S
+  write(*,*)'PH'    ,chemvar%PH
+  write(*,*)'CHY1'  ,10.0**(-(chemvar%PH-3.0))
+  write(*,*)'CAL'   ,chemvar%CAL
+  write(*,*)'CFE'   ,chemvar%CFE
+  write(*,*)'CCA'   ,chemvar%CCA
+  write(*,*)'CH2P1' ,chemvar%CH2P1
+  write(*,*)'PALPO1',chemvar%PALPO1
+  write(*,*)'PFEPO1',chemvar%PFEPO1
+  write(*,*)'PCAPD1',chemvar%PCAPD1
+  write(*,*)'PCAPH1',chemvar%PCAPH1
+  write(*,*)'PCAPM1',chemvar%PCAPM1
+  write(*,*)'XOH21' ,chemvar%XOH21
+  write(*,*)'XH2P1' ,chemvar%XH2P1
+  write(*,*)'XOH11' ,chemvar%XOH11
+  write(*,*)'XH1P1' ,chemvar%XH1P1
+  write(*,*)'CH1PB' ,chemvar%CH1PB
+  write(*,*)'CH1P1' ,chemvar%CH1P1
+  write(*,*)'CH2PB' ,chemvar%CH2PB
+  write(*,*)'PALPOB',chemvar%PALPOB
+  write(*,*)'PFEPOB',chemvar%PFEPOB
+  write(*,*)'PCAPDB',chemvar%PCAPDB
+  write(*,*)'PCAPHB',chemvar%PCAPHB
+  write(*,*)'PCAPMB',chemvar%PCAPMB
+  write(*,*)'XH21B' ,chemvar%XH21B
+  write(*,*)'X2P1B' ,chemvar%X2P1B
+  write(*,*)'XH11B' ,chemvar%XH11B
+  write(*,*)'X1P1B' ,chemvar%X1P1B
+  write(*,*)'CH1PB' ,chemvar%CH1PB
+  write(*,*)'CN31'  ,chemvar%CN31
+  write(*,*)'CN3B'  ,chemvar%CN3B
+  write(*,*)'CN41'  ,chemvar%CN41
+  write(*,*)'CN4B'  ,chemvar%CN4B
+  write(*,*)'XN41'  ,chemvar%XN41
+  write(*,*)'XN4B'  ,chemvar%XN4B
+  IF(chemvar%VOLWNH>0. .AND. chemvar%VOLWNB>0. &
+    .AND. chemvar%VOLWPO>0. .AND. chemvar%VOLWPB>0.)PAUSE
+  end subroutine PrintChemVar
+
 end module ChemEquilibriaMod

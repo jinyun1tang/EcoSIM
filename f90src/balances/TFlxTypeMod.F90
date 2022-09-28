@@ -3,6 +3,7 @@ module TFlxTypeMod
   use GridDataType
   use data_kind_mod, only : r8 => SHR_KIND_R8
   use abortutils, only : destroy
+  use EcoSIMConfig, only : jcplx1 => jcplx1c,jsken=>jskenc,NFGs=>NFGsc
 implicit none
 
   character(len=*), private, parameter :: mod_filename = __FILE__
@@ -174,9 +175,9 @@ implicit none
 
   implicit none
 
-  allocate(TOMCER(3,JG,7,0:jcplx1,JY,JX))
-  allocate(TOMNER(3,JG,7,0:jcplx1,JY,JX))
-  allocate(TOMPER(3,JG,7,0:jcplx1,JY,JX))
+  allocate(TOMCER(3,JG,NFGs,0:jcplx1,JY,JX))
+  allocate(TOMNER(3,JG,NFGs,0:jcplx1,JY,JX))
+  allocate(TOMPER(3,JG,NFGs,0:jcplx1,JY,JX))
   allocate(TOCFLS(0:jcplx1,JZ,JY,JX));TOCFLS=0._r8
   allocate(TONFLS(0:jcplx1,JZ,JY,JX));TONFLS=0._r8
   allocate(TOPFLS(0:jcplx1,JZ,JY,JX));TOPFLS=0._r8
@@ -197,9 +198,9 @@ implicit none
   allocate(TOHPER(0:jcplx1,JY,JX));TOHPER=0._r8
   allocate(TOHAER(0:jcplx1,JY,JX));TOHAER=0._r8
   allocate(TOSCER(jsken,0:jcplx1,JY,JX));TOSCER=0._r8
-  allocate(TOSAER(4,0:jcplx1,JY,JX));TOSAER=0._r8
-  allocate(TOSNER(4,0:jcplx1,JY,JX));TOSNER=0._r8
-  allocate(TOSPER(4,0:jcplx1,JY,JX));TOSPER=0._r8
+  allocate(TOSAER(jsken,0:jcplx1,JY,JX));TOSAER=0._r8
+  allocate(TOSNER(jsken,0:jcplx1,JY,JX));TOSNER=0._r8
+  allocate(TOSPER(jsken,0:jcplx1,JY,JX));TOSPER=0._r8
   end subroutine InitTflxType
 
 

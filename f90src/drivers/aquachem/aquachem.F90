@@ -144,16 +144,16 @@ subroutine RunModel(namelist_buffer)
 
 !!============================================================
 ! customized model run
-!    call runmock(nvars,ystates0l, ystatesfl, err_status)
-
-!    if(err_status%check_status())then
-!      call endrun(msg=err_status%print_msg())
-!    endif
+     call Runchem(nvars,ystates0l, ystatesfl, err_status, salton)
+    if(err_status%check_status())then
+      call endrun(msg=err_status%print_msg())
+    endif
 !============================================================
 
     !print*,'hist_wrap'
     do jj = 1, nvars
       ystatesf(1,jj)=ystatesfl(jj)
+      ystates0l(jj) =ystatesfl(jj)
     enddo
 
     call hist%hist_wrap(ystatesf, timer)

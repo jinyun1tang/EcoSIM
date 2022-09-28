@@ -27,6 +27,7 @@ module Hist1Mod
   implicit none
 
   private
+  character(len=*),private, parameter :: mod_filename = __FILE__
   public :: fouts,foutp, outpd, outph, outsd, outsh
   contains
 

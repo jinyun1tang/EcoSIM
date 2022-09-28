@@ -77,7 +77,7 @@ module StartqMod
 !
 !     FILL OUT UNUSED ARRAYS
 !
-      DO 9986 NZ=NP(NY,NX)+1,5
+      DO 9986 NZ=NP(NY,NX)+1,JP
         TCSN0(NZ,NY,NX)=0._r8
         TZSN0(NZ,NY,NX)=0._r8
         TPSN0(NZ,NY,NX)=0._r8

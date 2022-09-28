@@ -16,6 +16,7 @@ module LateralTranspMod
   use FlagDataType
   USE SoilHeatDataType
   use EcoSimConst
+  use EcoSIMConfig, only : jcplx => jcplxc,NFGs=>NFGsc
 implicit none
   private
   character(len=*), parameter :: mod_filename = __FILE__
@@ -1413,18 +1414,18 @@ implicit none
       TCPHEB(N2,N1)=TCPHEB(N2,N1)+PCPHEB(N,NN,N2,N1)
       TCPMEB(N2,N1)=TCPMEB(N2,N1)+PCPMEB(N,NN,N2,N1)
       DO 9380 K=0,jcplx
-      DO NO=1,7
-      DO M=1,3
+      DO NO=1,NFGs
+      DO M=1,nlbiomcp
       DO NGL=1,JG
-      TOMCER(M,NGL,NO,K,N2,N1)=TOMCER(M,NGL,NO,K,N2,N1)+OMCER(M+(NGL-1)*3,NO,K,N,NN,N2,N1)
-      TOMNER(M,NGL,NO,K,N2,N1)=TOMNER(M,NGL,NO,K,N2,N1)+OMNER(M+(NGL-1)*3,NO,K,N,NN,N2,N1)
-      TOMPER(M,NGL,NO,K,N2,N1)=TOMPER(M,NGL,NO,K,N2,N1)+OMPER(M+(NGL-1)*3,NO,K,N,NN,N2,N1)
+      TOMCER(M,NGL,NO,K,N2,N1)=TOMCER(M,NGL,NO,K,N2,N1)+OMCER(M+(NGL-1)*nlbiomcp,NO,K,N,NN,N2,N1)
+      TOMNER(M,NGL,NO,K,N2,N1)=TOMNER(M,NGL,NO,K,N2,N1)+OMNER(M+(NGL-1)*nlbiomcp,NO,K,N,NN,N2,N1)
+      TOMPER(M,NGL,NO,K,N2,N1)=TOMPER(M,NGL,NO,K,N2,N1)+OMPER(M+(NGL-1)*nlbiomcp,NO,K,N,NN,N2,N1)
       enddo
       enddo
       enddo
 9380  CONTINUE
       DO 9375 K=0,jcplx1
-      DO 9370 M=1,2
+      DO 9370 M=1,ndbiomcp
       TORCER(M,K,N2,N1)=TORCER(M,K,N2,N1)+ORCER(M,K,N,NN,N2,N1)
       TORNER(M,K,N2,N1)=TORNER(M,K,N2,N1)+ORNER(M,K,N,NN,N2,N1)
       TORPER(M,K,N2,N1)=TORPER(M,K,N2,N1)+ORPER(M,K,N,NN,N2,N1)
@@ -1433,7 +1434,7 @@ implicit none
       TOHNER(K,N2,N1)=TOHNER(K,N2,N1)+OHNER(K,N,NN,N2,N1)
       TOHPER(K,N2,N1)=TOHPER(K,N2,N1)+OHPER(K,N,NN,N2,N1)
       TOHAER(K,N2,N1)=TOHAER(K,N2,N1)+OHAER(K,N,NN,N2,N1)
-      DO 9365 M=1,4
+      DO 9365 M=1,jsken
       TOSCER(M,K,N2,N1)=TOSCER(M,K,N2,N1)+OSCER(M,K,N,NN,N2,N1)
       TOSAER(M,K,N2,N1)=TOSAER(M,K,N2,N1)+OSAER(M,K,N,NN,N2,N1)
       TOSNER(M,K,N2,N1)=TOSNER(M,K,N2,N1)+OSNER(M,K,N,NN,N2,N1)

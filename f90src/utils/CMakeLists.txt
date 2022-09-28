@@ -5,6 +5,7 @@ set(ECOSIM_UTIL_SOURCES
   shr_infnan_mod.F90
   LinearAlgebraMod.F90
   MiniMathMod.F90
+  MiniFuncMod.F90
   abortutils.F90
   TestMod.F90
   clock.c

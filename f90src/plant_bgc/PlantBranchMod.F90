@@ -12,9 +12,8 @@ module PlantBranchMod
   use NoduleBGCMod
   use LitterFallMod
   implicit none
-
   private
-
+  character(len=*),private, parameter :: mod_filename = __FILE__
   public :: GrowOneBranch
   contains
 !------------------------------------------------------------------------------------------
@@ -2763,7 +2762,7 @@ module PlantBranchMod
 !   IFLGF=flag for enabling leafoff:0=enable,1=disable
 !   VRNF,VRNX=leafoff hours,hours required for leafoff
 !
-  IF(ISTYP(NZ).NE.0.OR.(ISTYP(NZ).EQ.0.AND.IWTYP(NZ).NE.0))THEN
+  IF(ISTYP(NZ).NE.0.OR.(ISTYP(NZ).EQ.0.AND.IWTYP(NZ).GT.1))THEN
     IF((IFLGE(NB,NZ).EQ.0.AND.VRNS(NB,NZ).GE.VRNL(NB,NZ)) &
       .OR.(IFLGF(NB,NZ).EQ.0.AND.VRNF(NB,NZ).GE.VRNX(NB,NZ)))THEN
 !

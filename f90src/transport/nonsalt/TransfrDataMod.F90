@@ -4,7 +4,27 @@ module TransfrDataMod
 implicit none
   public
   CHARACTER(LEN=*),private,PARAMETER :: MOD_FILENAME=__FILE__
-
+  real(r8), parameter :: XFRS=0.05_r8
+  real(r8),allocatable :: RFLOC(:)
+  real(r8),allocatable :: RFLON(:)
+  real(r8),allocatable :: RFLOP(:)
+  real(r8),allocatable :: RFLOA(:)
+  real(r8),allocatable :: DFVOC(:)
+  real(r8),allocatable :: DFVON(:)
+  real(r8),allocatable :: DFVOP(:)
+  real(r8),allocatable :: DFVOA(:)
+  real(r8),allocatable :: DFHOC(:)
+  real(r8),allocatable :: DFHON(:)
+  real(r8),allocatable :: DFHOP(:)
+  real(r8),allocatable :: DFHOA(:)
+  real(r8),allocatable :: COQC1(:)
+  real(r8),allocatable :: COQC2(:)
+  real(r8),allocatable :: COQN1(:)
+  real(r8),allocatable :: COQN2(:)
+  real(r8),allocatable :: COQP1(:)
+  real(r8),allocatable :: COQP2(:)
+  real(r8),allocatable :: COQA1(:)
+  real(r8),allocatable :: COQA2(:)
   real(r8), allocatable :: OQC2(:,:,:,:)
   real(r8), allocatable :: OQN2(:,:,:,:)
   real(r8), allocatable :: OQP2(:,:,:,:)

@@ -5,7 +5,7 @@ module StartsMod
 
   use data_kind_mod, only : r8 => SHR_KIND_R8
   use abortutils, only : padr, print_info,check_bool
-  use minimathMod, only : test_aeqb, test_aneb
+  use minimathMod, only : test_aeqb, test_aneb, AZMAX1
   use EcosimConst
   use MicrobialDataType
   use EcoSIMSolverPar
@@ -37,10 +37,11 @@ module StartsMod
   use IrrigationDataType
   use SedimentDataType
   use GridDataType
+  use MiniFuncMod
   implicit none
 
   private
-
+  character(len=*),private, parameter :: mod_filename = __FILE__
   !
   !
   !     BKRS=dry bulk density of woody(0),fine(1),manure(2) litter
@@ -51,7 +52,6 @@ module StartsMod
   !     CDPTHSI=depth to bottom of snowpack layers
   !     POROQ=Penman Water Linear Reduction tortuosity used in gas flux calculations
   !
-  character(len=*), private, parameter :: mod_filename = __FILE__
 
   public :: starts
   contains
@@ -126,9 +126,8 @@ module StartsMod
 !     OFFSET=shift in Arrhenius curve used in nitro.f (oC)
 !     ATCS=mean annual soil temperature (OC)
 !
-      OFFSET(NY,NX)=0.333_r8*(12.5_r8-AMAX1(0.0_r8,AMIN1(25.0_r8,ATCS(NY,NX))))
-      !     WRITE(*,2222)'OFFSET',OFFSET(NY,NX),ATCS(NY,NX)
-!2222  FORMAT(A8,2E12.4)
+      OFFSET(NY,NX)=fOFFSET(ATCS(NY,NX))
+
 !
 !     INITIALIZE WATER POTENTIAL VARIABLES FOR SOIL LAYERS
 !
@@ -221,7 +220,7 @@ module StartsMod
       IF(BKDS(NU(NY,NX),NY,NX).GT.0.0_r8)THEN
         DTBLZ(NY,NX)=DTBLI(NY,NX)-(ALTZ(NY,NX)-ALT(NY,NX)) &
           *(1.0_r8-DTBLG(NY,NX))
-        DTBLD(NY,NX)=AMAX1(0.0_r8,DTBLDI(NY,NX)-(ALTZ(NY,NX)-ALT(NY,NX)) &
+        DTBLD(NY,NX)=AZMAX1(DTBLDI(NY,NX)-(ALTZ(NY,NX)-ALT(NY,NX)) &
           *(1.0_r8-DTBLG(NY,NX)))
       ELSE
         DTBLZ(NY,NX)=0.0_r8
@@ -402,7 +401,7 @@ module StartsMod
       SILT(L,NY,NX)=CSILT(L,NY,NX)*BKVL(L,NY,NX)
       CLAY(L,NY,NX)=CCLAY(L,NY,NX)*BKVL(L,NY,NX)
       IF(BKDS(L,NY,NX).GT.ZERO)THEN
-        VORGC=CORGCM*1.0E-06*BKDS(L,NY,NX)/PTDS
+        VORGC=CORGCM*1.0E-06_r8*BKDS(L,NY,NX)/PTDS
         VMINL=(CSILT(L,NY,NX)+CCLAY(L,NY,NX))*BKDS(L,NY,NX)/PTDS
         VSAND=CSAND(L,NY,NX)*BKDS(L,NY,NX)/PTDS
         VHCM(L,NY,NX)=((2.496*VORGC+2.385*VMINL+2.128*VSAND) &
@@ -699,10 +698,10 @@ module StartsMod
   !     begin_execution
   real(r8) :: XNPV
   !
-  !     NPH=no. of cycles h-1 for water, heat and solute flux calculns
-  !     NPT=number of cycles NPH-1 for gas flux calculations
-  !     NPG=number of cycles h-1 for gas flux calculations
-  !     NPR,NPS=number of cycles NPH-1 for litter,snowpack flux calculns
+  !     NPH=no. of cycles per hour for water, heat and solute flux calculns
+  !     NPT=number of cycles per water iteration for gas flux calculations
+  !     NPG=number of cycles per hour for gas flux calculations
+  !     NPR,NPS=number of cycles NPH-1 for litter, snowpack flux calculns
   !     THETX=minimum air-filled porosity for gas flux calculations
   !     THETPI,DENSI=ice porosity,density
   !

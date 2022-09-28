@@ -32,9 +32,6 @@ module TrnsfrsMod
   private
   CHARACTER(LEN=*), PARAMETER :: MOD_FILENAME=__FILE__
 
-
-
-
   real(r8) :: RCHQF,RCHGFU,RCHGFT
   real(r8) :: XN
 

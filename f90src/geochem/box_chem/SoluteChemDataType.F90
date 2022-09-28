@@ -229,6 +229,8 @@ module SoluteChemDataType
     real(r8) :: TRH2O
     real(r8) :: TBION
     real(r8) :: TBCO2
+  contains
+    procedure, public :: SetZero
   end type solute_flx_type
 
   type, public :: chem_var_type
@@ -255,7 +257,6 @@ module SoluteChemDataType
   real(r8) :: VOLWNH
   real(r8) :: VOLWPB
   real(r8) :: VOLWPO
-  real(r8) :: ZEROS
   real(r8) :: XCEC
   real(r8) :: PH
   real(r8) :: CAL
@@ -266,7 +267,6 @@ module SoluteChemDataType
   real(r8) :: ZKA
   real(r8) :: CCO2S
   real(r8) :: CCA
-  real(r8) :: ZEROS2
   real(r8) :: BKVL
   real(r8) :: XAEC
   real(r8) :: GKC4
@@ -367,4 +367,108 @@ module SoluteChemDataType
   real(r8) :: BKVLNO
   real(r8) :: BKVLNZ
   end type chem_var_type
+contains
+
+  subroutine SetZero(solflx)
+  implicit none
+  class(solute_flx_type)  :: solflx
+
+  solflx%TRN4S = 0._r8
+  solflx%TRN4B = 0._r8
+  solflx%TRN3S = 0._r8
+  solflx%TRN3B = 0._r8
+  solflx%TRH1P = 0._r8
+  solflx%TRH2P = 0._r8
+  solflx%TRH1B = 0._r8
+  solflx%TRH2B = 0._r8
+  solflx%TRXN4 = 0._r8
+  solflx%TRXNB = 0._r8
+  solflx%TRXH1 = 0._r8
+  solflx%TRXH2 = 0._r8
+  solflx%TRX1P = 0._r8
+  solflx%TRX2P = 0._r8
+  solflx%TRBH1 = 0._r8
+  solflx%TRBH2 = 0._r8
+  solflx%TRB1P = 0._r8
+  solflx%TRB2P = 0._r8
+  solflx%TRALPO= 0._r8
+  solflx%TRFEPO= 0._r8
+  solflx%TRCAPD= 0._r8
+  solflx%TRCAPH= 0._r8
+  solflx%TRCAPM= 0._r8
+  solflx%TRALPB= 0._r8
+  solflx%TRFEPB= 0._r8
+  solflx%TRCPDB= 0._r8
+  solflx%TRCPHB= 0._r8
+  solflx%TRCPMB= 0._r8
+  solflx%TRAL  = 0._r8
+  solflx%TRFE  = 0._r8
+  solflx%TRHY  = 0._r8
+  solflx%TRCA  = 0._r8
+  solflx%TRMG  = 0._r8
+  solflx%TRNA  = 0._r8
+  solflx%TRKA  = 0._r8
+  solflx%TROH  = 0._r8
+  solflx%TRSO4 = 0._r8
+  solflx%TRCO3 = 0._r8
+  solflx%TRHCO = 0._r8
+  solflx%TRCO2 = 0._r8
+  solflx%TRAL1 = 0._r8
+  solflx%TRAL2 = 0._r8
+  solflx%TRAL3 = 0._r8
+  solflx%TRAL4 = 0._r8
+  solflx%TRALS = 0._r8
+  solflx%TRFE1 = 0._r8
+  solflx%TRFE2 = 0._r8
+  solflx%TRFE3 = 0._r8
+  solflx%TRFE4 = 0._r8
+  solflx%TRFES = 0._r8
+  solflx%TRCAO = 0._r8
+  solflx%TRCAC = 0._r8
+  solflx%TRCAH = 0._r8
+  solflx%TRCAS = 0._r8
+  solflx%TRMGO = 0._r8
+  solflx%TRMGC = 0._r8
+  solflx%TRMGH = 0._r8
+  solflx%TRMGS = 0._r8
+  solflx%TRNAC = 0._r8
+  solflx%TRNAS = 0._r8
+  solflx%TRKAS = 0._r8
+  solflx%TRH0P = 0._r8
+  solflx%TRH3P = 0._r8
+  solflx%TRF1P = 0._r8
+  solflx%TRF2P = 0._r8
+  solflx%TRC0P = 0._r8
+  solflx%TRC1P = 0._r8
+  solflx%TRC2P = 0._r8
+  solflx%TRM1P = 0._r8
+  solflx%TRH0B = 0._r8
+  solflx%TRH3B = 0._r8
+  solflx%TRF1B = 0._r8
+  solflx%TRF2B = 0._r8
+  solflx%TRC0B = 0._r8
+  solflx%TRC1B = 0._r8
+  solflx%TRC2B = 0._r8
+  solflx%TRM1B = 0._r8
+  solflx%TRXHY = 0._r8
+  solflx%TRXAL = 0._r8
+  solflx%TRXFE = 0._r8
+  solflx%TRXCA = 0._r8
+  solflx%TRXMG = 0._r8
+  solflx%TRXNA = 0._r8
+  solflx%TRXKA = 0._r8
+  solflx%TRXHC = 0._r8
+  solflx%TRXAL2= 0._r8
+  solflx%TRXFE2= 0._r8
+  solflx%TRXH0 = 0._r8
+  solflx%TRBH0 = 0._r8
+  solflx%TRALOH= 0._r8
+  solflx%TRFEOH= 0._r8
+  solflx%TRCACO= 0._r8
+  solflx%TRCASO= 0._r8
+  solflx%TRH2O = 0._r8
+  solflx%TBION = 0._r8
+  solflx%TBCO2 = 0._r8
+
+  end subroutine SetZero
 end module SoluteChemDataType

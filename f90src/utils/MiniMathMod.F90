@@ -5,7 +5,7 @@ module minimathmod
 
   use data_kind_mod, only : r8 => SHR_KIND_R8
   implicit none
-
+  character(len=*),private, parameter :: mod_filename = __FILE__
   private
   public :: safe_adb
   public :: p_adb
@@ -13,6 +13,8 @@ module minimathmod
   public :: test_aneb
   public :: vapsat, vapsat0
   public :: isLeap
+  public :: AZMAX1,AZMIN1
+
   real(r8), parameter :: tiny_val=1.e-20_r8
   contains
 
@@ -109,4 +111,27 @@ module minimathmod
 
   ans =(mod(year,400)== 0) .or. (mod(year,4)==0 .and. mod(year,100)/=0)
   end function isLeap
+!------------------------------------------------------------------------------------------
+
+  function AZMAX1(val)result(ans)
+  implicit none
+  real(r8), intent(in) :: val
+
+  real(r8) :: ans
+
+  ans=AMAX1(0.0_r8,val)
+
+  end function AZMAX1
+!------------------------------------------------------------------------------------------
+
+  function AZMIN1(val)result(ans)
+  implicit none
+  real(r8), intent(in) :: val
+
+  real(r8) :: ans
+
+  ans=AMIN1(0.0_r8,val)
+
+  end function AZMIN1
+
 end module minimathmod

@@ -1,5 +1,6 @@
 set(ECOSIM_DRIVER_SOURCES
 	readnamelist.F90
+  EcoSIMAPI.F90
 	soil.F90
 	regressiontest.F90
 )
@@ -12,6 +13,7 @@ include_directories(${CMAKE_BINARY_DIR}/f90src/microbial_bgc/)
 include_directories(${CMAKE_BINARY_DIR}/f90src/SoilHydroTherm/)
 include_directories(${CMAKE_BINARY_DIR}/f90src/plant_bgc/)
 include_directories(${CMAKE_BINARY_DIR}/f90src/geochem/layers_chem)
+include_directories(${CMAKE_BINARY_DIR}/f90src/disturbances/)
 include_directories(${CMAKE_BINARY_DIR}/f90src/ecosim_mods/)
 include_directories(${CMAKE_BINARY_DIR}/f90src/transport/nonsalt)
 include_directories(${CMAKE_BINARY_DIR}/f90src/transport/salt)

@@ -5,6 +5,8 @@ implicit none
   public
   save
   character(len=*), private, parameter :: mod_filename = __FILE__
+  integer :: IYTYP(0:2,366,JY,JX)  !fertilizer release type from fertilizer input file
+  integer :: ITILL(366,JY,JX)      !soil disturbance type, [-]
 
   integer :: IETYP(JY,JX)          !Koppen climate zone
   integer :: IFLGV(JY,JX)          !flag for irrigation criterion,0=SWC,1=canopy water potential
@@ -20,9 +22,7 @@ implicit none
   integer :: ISOILR(JY,JX)         !natural(0),reconstructed(1) soil profile
   integer :: IWTHR(2)              !weather data type:1=daily,2=hourly for first(L=1) or second(L=2) scene
   integer :: IUTYP(JY,JX)          !urea hydrolysis inhibitor type (1=no,2=yes)
-  integer :: IYTYP(0:2,366,JY,JX)  !fertilizer release type from fertilizer input file
-  integer :: ITILL(366,JY,JX)      !soil disturbance type, [-]
-
+  integer :: ITILL1(JY,JX)         !soil disturbance type, [-]
   integer :: IFLGC(JP,JY,JX)       ! flag for living pft
   integer :: IFLGI(JP,JY,JX)       !PFT initialization flag:0=no,1=yes
   integer :: ICTYP(JP,JY,JX)       !plant photosynthetic type (C3 or C4)
@@ -36,6 +36,5 @@ implicit none
   integer :: IRTYP(JP,JY,JX)       !grain type (below or above-ground)
   integer :: MY(JP,JY,JX)          !mycorrhizal type (no or yes)
   integer :: IDTBL(JY,JX)         !water table flag from site file
-
 
 end module FlagDataType

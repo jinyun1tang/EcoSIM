@@ -1,10 +1,11 @@
 module Hour1Mod
   use data_kind_mod, only : r8 => SHR_KIND_R8
-  use minimathmod  , only : test_aeqb
+  use minimathmod  , only : test_aeqb,AZMAX1,AZMIN1
   use abortutils   , only : endrun, print_info
   use TracerPropMod
   use EcoSimConst
-!  use CanopyCondMod, only : CanopyConditionModel
+  use MiniFuncMod
+  use SoilHydroParaMod
   use PlantAPI, only : PlantCanopyRadsModel
   use MicrobialDataType
   use SOMDataType
@@ -38,7 +39,8 @@ module Hour1Mod
   use SedimentDataType
   use PlantDataRateType
   use GridDataType
-  use EcoSIMConfig
+  use EcoSIMConfig, only : jcplx1 => jcplx1c,jcplx=>jcplxc,nlbiomcp=>nlbiomcpc
+  use EcoSIMConfig, only : ndbiomcp=>ndbiomcpc,jsken=>jskenc
   use MicBGCPars, only : micpar
   implicit none
 
@@ -96,13 +98,13 @@ module Hour1Mod
 !     RESET SOIL PROPERTIES AND PEDOTRANSFER FUNCTIONS
 !     FOLLOWING ANY SOIL DISTURBANCE
 !
-  DO 9995 NX=NHW,NHE
-    DO 9990 NY=NVN,NVS
+  DO  NX=NHW,NHE
+    DO  NY=NVN,NVS
       IF(J.EQ.1)THEN
         IFLGT(NY,NX)=0
-        DO 9905 NZ=1,NP(NY,NX)
+        DO  NZ=1,NP(NY,NX)
           PSILZ(NZ,NY,NX)=0.0_r8
-9905    CONTINUE
+        ENDDO
       ENDIF
 !
 !     HYDROLOGICAL PRPOERTIES OR SURFACE LITTER
@@ -111,24 +113,24 @@ module Hour1Mod
 !     VOLR=dry litter volume
 !     POROS0,FC,WP=litter porosity,field capacity,wilting point
 !
-      VOLWRX(NY,NX)=AMAX1(0.0,THETRX(0)*RC0(0,NY,NX) &
+      VOLWRX(NY,NX)=AZMAX1(THETRX(0)*RC0(0,NY,NX) &
         +THETRX(1)*RC0(1,NY,NX)+THETRX(2)*RC0(2,NY,NX))
-      VOLR(NY,NX)=AMAX1(0.0,RC0(0,NY,NX)*1.0E-06/BKRS(0) &
-        +RC0(1,NY,NX)*1.0E-06/BKRS(1)+RC0(2,NY,NX)*1.0E-06/BKRS(2))
+      VOLR(NY,NX)=AZMAX1(RC0(0,NY,NX)*1.0E-06/BKRS(0) &
+        +RC0(1,NY,NX)*1.0E-06/BKRS(1)+RC0(2,NY,NX)*1.0E-06_r8/BKRS(2))
       IF(VOLR(NY,NX).GT.ZEROS(NY,NX))THEN
         FVOLR=VOLWRX(NY,NX)/VOLR(NY,NX)
       ELSE
         FVOLR=THETRX(1)/BKRS(1)
       ENDIF
       POROS0(NY,NX)=FVOLR
-      FC(0,NY,NX)=0.500*FVOLR
-      WP(0,NY,NX)=0.125*FVOLR
+      FC(0,NY,NX)=0.500_r8*FVOLR
+      WP(0,NY,NX)=0.125_r8*FVOLR
       PSL(0,NY,NX)=LOG(POROS0(NY,NX))
       FCL(0,NY,NX)=LOG(FC(0,NY,NX))
       WPL(0,NY,NX)=LOG(WP(0,NY,NX))
       PSD(0,NY,NX)=PSL(0,NY,NX)-FCL(0,NY,NX)
       FCD(0,NY,NX)=FCL(0,NY,NX)-WPL(0,NY,NX)
-      SRP(0,NY,NX)=1.00
+      SRP(0,NY,NX)=1.00_r8
 !
 !     RESET SURFACE LITTER PHYSICAL PROPERTIES (DENSITY, TEXTURE)
 !     AFTER DISTURBANCES (E.G. TILLAGE, EROSION)
@@ -207,9 +209,9 @@ module Hour1Mod
 !     FRADP=fraction of radiation received by each PFT canopy
 !     VOLWC=canopy surface water retention
 !
-      DO 1930 NZ=1,NP(NY,NX)
+      DO  NZ=1,NP(NY,NX)
         VOLWCX=XVOLWC(IGTYP(NZ,NY,NX))*(ARLFP(NZ,NY,NX)+ARSTP(NZ,NY,NX))
-        FLWC(NZ,NY,NX)=AMAX1(0.0,AMIN1(PRECA(NY,NX)*FRADP(NZ,NY,NX) &
+        FLWC(NZ,NY,NX)=AZMAX1(AMIN1(PRECA(NY,NX)*FRADP(NZ,NY,NX) &
           ,VOLWCX-VOLWC(NZ,NY,NX)))
         TFLWCI(NY,NX)=TFLWCI(NY,NX)+PRECA(NY,NX)*FRADP(NZ,NY,NX)
         TFLWC(NY,NX)=TFLWC(NY,NX)+FLWC(NZ,NY,NX)
@@ -221,15 +223,15 @@ module Hour1Mod
 !
         NG(NZ,NY,NX)=MAX(NG(NZ,NY,NX),NU(NY,NX))
         NIX(NZ,NY,NX)=MAX(NIX(NZ,NY,NX),NU(NY,NX))
-        DO 9790 NR=1,JC
+        DO  NR=1,JC
           NINR(NR,NZ,NY,NX)=MAX(NINR(NR,NZ,NY,NX),NU(NY,NX))
-9790    CONTINUE
-1930  CONTINUE
+        ENDDO
+      ENDDO
 !
 !     WRITE SW AND PAR ALBEDO
 
-9990  CONTINUE
-9995  CONTINUE
+    ENDDO
+  ENDDO
 !
 !     FERTILIZER APPLICATIONS OCCUR AT SOLAR NOON
   call ApplyFertilizerAtNoon(I,J,NHW,NHE,NVN,NVS)
@@ -278,15 +280,15 @@ module Hour1Mod
 !             :*ZN3*=NH3,*H2G*=H2
 !
 ! CSTRR: surface irrigation ion strength, [g m-3]
-  DO 9145 NX=NHW,NHE
-    DO 9140 NY=NVN,NVS
-      CCO2E(NY,NX)=CO2E(NY,NX)*5.36E-04*TREF/TKA(NY,NX)  !gC/m3
-      CCH4E(NY,NX)=CH4E(NY,NX)*5.36E-04*TREF/TKA(NY,NX)  !gC/m3
-      COXYE(NY,NX)=OXYE(NY,NX)*1.43E-03*TREF/TKA(NY,NX)  !gO/m3
-      CZ2GE(NY,NX)=Z2GE(NY,NX)*1.25E-03*TREF/TKA(NY,NX)  !gN/m3
-      CZ2OE(NY,NX)=Z2OE(NY,NX)*1.25E-03*TREF/TKA(NY,NX)  !gN/m3
-      CNH3E(NY,NX)=ZNH3E(NY,NX)*6.25E-04*TREF/TKA(NY,NX) !gN/m3
-      CH2GE(NY,NX)=H2GE(NY,NX)*8.92E-05*TREF/TKA(NY,NX)  !gH/m3
+  DO NX=NHW,NHE
+    DO NY=NVN,NVS
+      CCO2E(NY,NX)=CO2E(NY,NX)*5.36E-04_r8*TREF/TKA(NY,NX)  !gC/m3
+      CCH4E(NY,NX)=CH4E(NY,NX)*5.36E-04_r8*TREF/TKA(NY,NX)  !gC/m3
+      COXYE(NY,NX)=OXYE(NY,NX)*1.43E-03_r8*TREF/TKA(NY,NX)  !gO/m3
+      CZ2GE(NY,NX)=Z2GE(NY,NX)*1.25E-03_r8*TREF/TKA(NY,NX)  !gN/m3
+      CZ2OE(NY,NX)=Z2OE(NY,NX)*1.25E-03_r8*TREF/TKA(NY,NX)  !gN/m3
+      CNH3E(NY,NX)=ZNH3E(NY,NX)*6.25E-04_r8*TREF/TKA(NY,NX) !gN/m3
+      CH2GE(NY,NX)=H2GE(NY,NX)*8.92E-05_r8*TREF/TKA(NY,NX)  !gH/m3
       CCOR(NY,NX)=CCO2E(NY,NX)*gas_solubility(id_co2g,TCA(NY,NX)) &
          /(EXP(ACO2X*CSTRR(NY,NX)))
       CCHR(NY,NX)=CCH4E(NY,NX)*gas_solubility(id_ch4g,TCA(NY,NX)) &
@@ -308,30 +310,8 @@ module Hour1Mod
       CN2Q(NY,NX)=CZ2OE(NY,NX)*gas_solubility(id_n2og, TCA(NY,NX)) &
         /(EXP(AN2OX*CSTRQ(I,NY,NX)))
 
-
-!      CCOR(NY,NX)=CCO2E(NY,NX)*SCO2X/(EXP(ACO2X*CSTRR(NY,NX))) &
-!        *EXP(0.843-0.0281*TCA(NY,NX))
-!      CCHR(NY,NX)=CCH4E(NY,NX)*SCH4X/(EXP(ACH4X*CSTRR(NY,NX))) &
-!        *EXP(0.597-0.0199*TCA(NY,NX))
-!      COXR(NY,NX)=COXYE(NY,NX)*SOXYX/(EXP(AOXYX*CSTRR(NY,NX))) &
-!        *EXP(0.516-0.0172*TCA(NY,NX))
-!      CNNR(NY,NX)=CZ2GE(NY,NX)*SN2GX/(EXP(AN2GX*CSTRR(NY,NX))) &
-!        *EXP(0.456-0.0152*TCA(NY,NX))
-!      CN2R(NY,NX)=CZ2OE(NY,NX)*SN2OX/(EXP(AN2OX*CSTRR(NY,NX))) &
-!        *EXP(0.897-0.0299*TCA(NY,NX))
-!      CCOQ(NY,NX)=CCO2E(NY,NX)*SCO2X/(EXP(ACO2X*CSTRQ(I,NY,NX))) &
-!        *EXP(0.843-0.0281*TCA(NY,NX))
-!      CCHQ(NY,NX)=CCH4E(NY,NX)*SCH4X/(EXP(ACH4X*CSTRQ(I,NY,NX))) &
-!        *EXP(0.597-0.0199*TCA(NY,NX))
-!      COXQ(NY,NX)=COXYE(NY,NX)*SOXYX/(EXP(AOXYX*CSTRQ(I,NY,NX))) &
-!        *EXP(0.516-0.0172*TCA(NY,NX))
-!      CNNQ(NY,NX)=CZ2GE(NY,NX)*SN2GX/(EXP(AN2GX*CSTRQ(I,NY,NX))) &
-!        *EXP(0.456-0.0152*TCA(NY,NX))
-!      CN2Q(NY,NX)=CZ2OE(NY,NX)*SN2OX/(EXP(AN2OX*CSTRQ(I,NY,NX))) &
-!        *EXP(0.897-0.0299*TCA(NY,NX))
-
-9140  CONTINUE
-9145  CONTINUE
+    ENDDO
+  ENDDO
   end subroutine SetAtmosTracerConcentration
 !------------------------------------------------------------------------------------------
 
@@ -342,21 +322,21 @@ module Hour1Mod
   integer :: L,N,NX,NY,K,NN,NO,M,NGL
 
 !     begin_execution
-  DO 9895 NX=NHW,NHE+1
-    DO 9890 NY=NVN,NVS+1
+  DO  NX=NHW,NHE+1
+    DO  NY=NVN,NVS+1
 !
 !     WATER,SNOW,SOLUTE RUNOFF
 !
-      DO 9835 NN=1,2
+      DO  NN=1,2
         DO N=1,2
           QR(N,NN,NY,NX)=0.0_r8
           HQR(N,NN,NY,NX)=0.0_r8
-          DO 9870 K=0,jcplx1
+          DO  K=0,jcplx1
             XOCQRS(K,N,NN,NY,NX)=0.0_r8
             XONQRS(K,N,NN,NY,NX)=0.0_r8
             XOPQRS(K,N,NN,NY,NX)=0.0_r8
             XOAQRS(K,N,NN,NY,NX)=0.0_r8
-9870      CONTINUE
+          ENDDO
           XCOQRS(N,NN,NY,NX)=0.0_r8
           XCHQRS(N,NN,NY,NX)=0.0_r8
           XOXQRS(N,NN,NY,NX)=0.0_r8
@@ -370,7 +350,8 @@ module Hour1Mod
           XP1QRW(N,NN,NY,NX)=0.0_r8
           XP4QRW(N,NN,NY,NX)=0.0_r8
         ENDDO
-9835  CONTINUE
+      ENDDO
+
       DO N=1,2
         QS(N,NY,NX)=0.0_r8
         QW(N,NY,NX)=0.0_r8
@@ -391,78 +372,78 @@ module Hour1Mod
 !
 !     GAS AND SOLUTE FLUXES
 !
-    DO N=1,3
-      DO  L=0,NL(NY,NX)+1
-        XCOFLS(N,L,NY,NX)=0.0_r8
-        XCHFLS(N,L,NY,NX)=0.0_r8
-        XOXFLS(N,L,NY,NX)=0.0_r8
-        XNGFLS(N,L,NY,NX)=0.0_r8
-        XN2FLS(N,L,NY,NX)=0.0_r8
-        XHGFLS(N,L,NY,NX)=0.0_r8
-        XN4FLW(N,L,NY,NX)=0.0_r8
-        XN3FLW(N,L,NY,NX)=0.0_r8
-        XNOFLW(N,L,NY,NX)=0.0_r8
-        XNXFLS(N,L,NY,NX)=0.0_r8
-        XH1PFS(N,L,NY,NX)=0.0_r8
-        XH2PFS(N,L,NY,NX)=0.0_r8
-        DO 9860 K=0,jcplx1
-          XOCFLS(K,N,L,NY,NX)=0.0_r8
-          XONFLS(K,N,L,NY,NX)=0.0_r8
-          XOPFLS(K,N,L,NY,NX)=0.0_r8
-          XOAFLS(K,N,L,NY,NX)=0.0_r8
-9860    CONTINUE
+      DO N=1,3
+        DO  L=0,NL(NY,NX)+1
+          XCOFLS(N,L,NY,NX)=0.0_r8
+          XCHFLS(N,L,NY,NX)=0.0_r8
+          XOXFLS(N,L,NY,NX)=0.0_r8
+          XNGFLS(N,L,NY,NX)=0.0_r8
+          XN2FLS(N,L,NY,NX)=0.0_r8
+          XHGFLS(N,L,NY,NX)=0.0_r8
+          XN4FLW(N,L,NY,NX)=0.0_r8
+          XN3FLW(N,L,NY,NX)=0.0_r8
+          XNOFLW(N,L,NY,NX)=0.0_r8
+          XNXFLS(N,L,NY,NX)=0.0_r8
+          XH1PFS(N,L,NY,NX)=0.0_r8
+          XH2PFS(N,L,NY,NX)=0.0_r8
+          DO  K=0,jcplx1
+            XOCFLS(K,N,L,NY,NX)=0.0_r8
+            XONFLS(K,N,L,NY,NX)=0.0_r8
+            XOPFLS(K,N,L,NY,NX)=0.0_r8
+            XOAFLS(K,N,L,NY,NX)=0.0_r8
+          ENDDO
+        ENDDO
       ENDDO
-    ENDDO
 !
 !     BAND AND MACROPORE FLUXES
 !
-    DO L=1,NL(NY,NX)+1
-      DO 9840 N=1,3
-        FLW(N,L,NY,NX)=0.0_r8
-        FLWX(N,L,NY,NX)=0.0_r8
-        FLWH(N,L,NY,NX)=0.0_r8
-        HFLW(N,L,NY,NX)=0.0_r8
-        XN4FLB(N,L,NY,NX)=0.0_r8
-        XN3FLB(N,L,NY,NX)=0.0_r8
-        XNOFLB(N,L,NY,NX)=0.0_r8
-        XNXFLB(N,L,NY,NX)=0.0_r8
-        XH1BFB(N,L,NY,NX)=0.0_r8
-        XH2BFB(N,L,NY,NX)=0.0_r8
-        XCOFHS(N,L,NY,NX)=0.0_r8
-        XCHFHS(N,L,NY,NX)=0.0_r8
-        XOXFHS(N,L,NY,NX)=0.0_r8
-        XNGFHS(N,L,NY,NX)=0.0_r8
-        XN2FHS(N,L,NY,NX)=0.0_r8
-        XHGFHS(N,L,NY,NX)=0.0_r8
-        XN4FHW(N,L,NY,NX)=0.0_r8
-        XN3FHW(N,L,NY,NX)=0.0_r8
-        XNOFHW(N,L,NY,NX)=0.0_r8
-        XNXFHS(N,L,NY,NX)=0.0_r8
-        XH1PHS(N,L,NY,NX)=0.0_r8
-        XH2PHS(N,L,NY,NX)=0.0_r8
-        XN4FHB(N,L,NY,NX)=0.0_r8
-        XN3FHB(N,L,NY,NX)=0.0_r8
-        XNOFHB(N,L,NY,NX)=0.0_r8
-        XNXFHB(N,L,NY,NX)=0.0_r8
-        XH1BHB(N,L,NY,NX)=0.0_r8
-        XH2BHB(N,L,NY,NX)=0.0_r8
-        XCOFLG(N,L,NY,NX)=0.0_r8
-        XCHFLG(N,L,NY,NX)=0.0_r8
-        XOXFLG(N,L,NY,NX)=0.0_r8
-        XNGFLG(N,L,NY,NX)=0.0_r8
-        XN2FLG(N,L,NY,NX)=0.0_r8
-        XN3FLG(N,L,NY,NX)=0.0_r8
-        XHGFLG(N,L,NY,NX)=0.0_r8
-        DO 9820 K=0,jcplx1
-          XOCFHS(K,N,L,NY,NX)=0.0_r8
-          XONFHS(K,N,L,NY,NX)=0.0_r8
-          XOPFHS(K,N,L,NY,NX)=0.0_r8
-          XOAFHS(K,N,L,NY,NX)=0.0_r8
-9820    CONTINUE
-9840  CONTINUE
+      DO L=1,NL(NY,NX)+1
+        DO N=1,3
+          FLW(N,L,NY,NX)=0.0_r8
+          FLWX(N,L,NY,NX)=0.0_r8
+          FLWH(N,L,NY,NX)=0.0_r8
+          HFLW(N,L,NY,NX)=0.0_r8
+          XN4FLB(N,L,NY,NX)=0.0_r8
+          XN3FLB(N,L,NY,NX)=0.0_r8
+          XNOFLB(N,L,NY,NX)=0.0_r8
+          XNXFLB(N,L,NY,NX)=0.0_r8
+          XH1BFB(N,L,NY,NX)=0.0_r8
+          XH2BFB(N,L,NY,NX)=0.0_r8
+          XCOFHS(N,L,NY,NX)=0.0_r8
+          XCHFHS(N,L,NY,NX)=0.0_r8
+          XOXFHS(N,L,NY,NX)=0.0_r8
+          XNGFHS(N,L,NY,NX)=0.0_r8
+          XN2FHS(N,L,NY,NX)=0.0_r8
+          XHGFHS(N,L,NY,NX)=0.0_r8
+          XN4FHW(N,L,NY,NX)=0.0_r8
+          XN3FHW(N,L,NY,NX)=0.0_r8
+          XNOFHW(N,L,NY,NX)=0.0_r8
+          XNXFHS(N,L,NY,NX)=0.0_r8
+          XH1PHS(N,L,NY,NX)=0.0_r8
+          XH2PHS(N,L,NY,NX)=0.0_r8
+          XN4FHB(N,L,NY,NX)=0.0_r8
+          XN3FHB(N,L,NY,NX)=0.0_r8
+          XNOFHB(N,L,NY,NX)=0.0_r8
+          XNXFHB(N,L,NY,NX)=0.0_r8
+          XH1BHB(N,L,NY,NX)=0.0_r8
+          XH2BHB(N,L,NY,NX)=0.0_r8
+          XCOFLG(N,L,NY,NX)=0.0_r8
+          XCHFLG(N,L,NY,NX)=0.0_r8
+          XOXFLG(N,L,NY,NX)=0.0_r8
+          XNGFLG(N,L,NY,NX)=0.0_r8
+          XN2FLG(N,L,NY,NX)=0.0_r8
+          XN3FLG(N,L,NY,NX)=0.0_r8
+          XHGFLG(N,L,NY,NX)=0.0_r8
+          DO  K=0,jcplx1
+            XOCFHS(K,N,L,NY,NX)=0.0_r8
+            XONFHS(K,N,L,NY,NX)=0.0_r8
+            XOPFHS(K,N,L,NY,NX)=0.0_r8
+            XOAFHS(K,N,L,NY,NX)=0.0_r8
+          ENDDO
+        ENDDO
+      ENDDO
     ENDDO
-9890  CONTINUE
-9895  CONTINUE
+  ENDDO
 
 !     IF EROSION FLAG SET
 !
@@ -522,17 +503,17 @@ module Hour1Mod
             DO K=0,jcplx
               DO  NO=1,NFGs
                 DO NGL=1,JG
-                  OMCER(3+(NGL-1)*3,NO,K,N,NN,NY,NX)=0.0_r8
-                  DO  M=1,2
-                    OMCER(M+(NGL-1)*3,NO,K,N,NN,NY,NX)=0.0_r8
-                    OMNER(M+(NGL-1)*3,NO,K,N,NN,NY,NX)=0.0_r8
-                    OMPER(M+(NGL-1)*3,NO,K,N,NN,NY,NX)=0.0_r8
+                  OMCER(nlbiomcp+(NGL-1)*nlbiomcp,NO,K,N,NN,NY,NX)=0.0_r8
+                  DO  M=1,nlbiomcp
+                    OMCER(M+(NGL-1)*nlbiomcp,NO,K,N,NN,NY,NX)=0.0_r8
+                    OMNER(M+(NGL-1)*nlbiomcp,NO,K,N,NN,NY,NX)=0.0_r8
+                    OMPER(M+(NGL-1)*nlbiomcp,NO,K,N,NN,NY,NX)=0.0_r8
                   enddo
                 enddo
               ENDDO
             ENDDO
             DO  K=0,jcplx1
-              DO  M=1,2
+              DO  M=1,ndbiomcp
                 ORCER(M,K,N,NN,NY,NX)=0.0_r8
                 ORNER(M,K,N,NN,NY,NX)=0.0_r8
                 ORPER(M,K,N,NN,NY,NX)=0.0_r8
@@ -564,10 +545,10 @@ module Hour1Mod
 !     begin_execution
 
 
-  DO 8895 NX=NHW,NHE+1
-    DO 8890 NY=NVN,NVS+1
+  DO  NX=NHW,NHE+1
+    DO  NY=NVN,NVS+1
       DO N=1,2
-        DO 9836 NN=1,2
+        DO  NN=1,2
           XQRAL(N,NN,NY,NX)=0.0_r8
           XQRFE(N,NN,NY,NX)=0.0_r8
           XQRHY(N,NN,NY,NX)=0.0_r8
@@ -609,7 +590,7 @@ module Hour1Mod
           XQRC1P(N,NN,NY,NX)=0.0_r8
           XQRC2P(N,NN,NY,NX)=0.0_r8
           XQRM1P(N,NN,NY,NX)=0.0_r8
-9836    CONTINUE
+        ENDDO
         XQSAL(N,NY,NX)=0.0_r8
         XQSFE(N,NY,NX)=0.0_r8
         XQSHY(N,NY,NX)=0.0_r8
@@ -654,7 +635,7 @@ module Hour1Mod
         XQSM1P(N,NY,NX)=0.0_r8
       ENDDO
 
-      DO 8885 L=1,NL(NY,NX)+1
+      DO  L=1,NL(NY,NX)+1
         DO N=1,3
           XALFLS(N,L,NY,NX)=0.0_r8
           XFEFLS(N,L,NY,NX)=0.0_r8
@@ -755,9 +736,9 @@ module Hour1Mod
           XC2BHB(N,L,NY,NX)=0.0_r8
           XM1BHB(N,L,NY,NX)=0.0_r8
         ENDDO
-8885  CONTINUE
-8890  CONTINUE
-8895  CONTINUE
+      ENDDO
+    ENDDO
+  ENDDO
   end subroutine ResetSaltModelArrays
 !------------------------------------------------------------------------------------------
 
@@ -769,9 +750,7 @@ module Hour1Mod
   real(r8) :: THETK(100)
   real(r8) :: CORGCM
   real(r8) :: PTDS
-  real(r8) :: THETF
   real(r8) :: SUM2,SUM1
-  real(r8) :: VISCWL
   real(r8) :: VORGC
   real(r8) :: XK,YK
   integer :: L,K,N,M
@@ -792,11 +771,6 @@ module Hour1Mod
     IF(BKDS(L,NY,NX).LE.ZERO)THEN
       VOLY(L,NY,NX)=VOLX(L,NY,NX)
     ENDIF
-    !     IF(NX.EQ.1)THEN
-    !     WRITE(*,443)'VOLT',I,J,NX,NY,L,VOLT(L,NY,NX)
-    !    2,VOLX(L,NY,NX),DLYR(3,L,NY,NX),AREA(3,L,NY,NX)
-    !443   FORMAT(A8,5I4,20E14.6)
-    !     ENDIF
     !
     !     BKVL=soil mass
     !     C*=concentration,ORGC=SOC,SAND=sand,SILT=silt,CLAY=clay
@@ -827,7 +801,7 @@ module Hour1Mod
         CCLAY(L,NY,NX)=0.0_r8
       ENDIF
       IF(BKDS(L,NY,NX).GT.ZERO)THEN
-        CORGCM=AMAX1(0.0,AMIN1(1.0,1.82E-06*CORGC(L,NY,NX)))
+        CORGCM=AZMAX1(AMIN1(1.0,1.82E-06*CORGC(L,NY,NX)))
         PTDS=1.30*CORGCM+2.66*(1.0-CORGCM)
         IF(L.EQ.NU(NY,NX))THEN
           POROS(L,NY,NX)=AMAX1(POROS(L,NY,NX),1.0-(BKDS(L,NY,NX)/PTDS))
@@ -845,214 +819,18 @@ module Hour1Mod
       VOLA(L,NY,NX)=POROS(L,NY,NX)*VOLY(L,NY,NX)
       VOLAH(L,NY,NX)=FHOL(L,NY,NX)*VOLT(L,NY,NX)
       IF(BKDS(L,NY,NX).GT.ZERO)THEN
-        VOLP(L,NY,NX)=AMAX1(0.0,VOLA(L,NY,NX)-VOLW(L,NY,NX) &
-          -VOLI(L,NY,NX))+AMAX1(0.0,VOLAH(L,NY,NX)-VOLWH(L,NY,NX) &
+        VOLP(L,NY,NX)=AZMAX1(VOLA(L,NY,NX)-VOLW(L,NY,NX) &
+          -VOLI(L,NY,NX))+AZMAX1(VOLAH(L,NY,NX)-VOLWH(L,NY,NX) &
           -VOLIH(L,NY,NX))
       ELSE
         VOLP(L,NY,NX)=0.0_r8
       ENDIF
       EHUM(L,NY,NX)=0.200+0.333*AMIN1(0.5,CCLAY(L,NY,NX))
 
-      EPOC(L,NY,NX)=1.0
-      IF(CORGC(L,NY,NX).GT.FORGC)THEN
-        SRP(L,NY,NX)=0.25
-      ELSEIF(CORGC(L,NY,NX).GT.0.5*FORGC)THEN
-        SRP(L,NY,NX)=0.33
-      ELSE
-        SRP(L,NY,NX)=1.00
-      ENDIF
-      PSL(L,NY,NX)=LOG(POROS(L,NY,NX))
-      IF((ISOIL(1,L,NY,NX).EQ.0.AND.ISOIL(2,L,NY,NX).EQ.0) &
-        .OR.is_restart_run)THEN
-        FCL(L,NY,NX)=LOG(FC(L,NY,NX))
-        WPL(L,NY,NX)=LOG(WP(L,NY,NX))
-        PSD(L,NY,NX)=PSL(L,NY,NX)-FCL(L,NY,NX)
-        FCD(L,NY,NX)=FCL(L,NY,NX)-WPL(L,NY,NX)
-      ELSE
-        !
-        !     DEFAULT SOIL HYDROLOGIC PPTYS (FIELD CAPACITY, WILTING POINT)
-        !     IF ACTUAL VALUES WERE NOT INPUT TO THE SOIL FILE
-        !
-        !     THW,THI=initial soil water,ice content from soil file
-        !
-        IF(.not.is_restart_run)THEN
-          IF(ISOIL(1,L,NY,NX).EQ.1.OR.ISOIL(2,L,NY,NX).EQ.1)THEN
-            IF(CORGC(L,NY,NX).LT.FORGW)THEN
-              FC(L,NY,NX)=0.2576-0.20*CSAND(L,NY,NX) &
-                +0.36*CCLAY(L,NY,NX)+0.60E-06*CORGC(L,NY,NX)
-            ELSE
-              IF(BKDS(L,NY,NX).LT.0.075)THEN
-                FC(L,NY,NX)=0.27
-              ELSEIF(BKDS(L,NY,NX).LT.0.195)THEN
-                FC(L,NY,NX)=0.62
-              ELSE
-                FC(L,NY,NX)=0.71
-              ENDIF
-            ENDIF
-            FC(L,NY,NX)=FC(L,NY,NX)/(1.0-FHOL(L,NY,NX))
-            FC(L,NY,NX)=AMIN1(0.75*POROS(L,NY,NX),FC(L,NY,NX))
-            !     WRITE(*,3332)'FC',IYRC,I,J,L,FC(L,NY,NX),CCLAY(L,NY,NX)
-            !    2,CORGC(L,NY,NX),CSAND(L,NY,NX)
-!3332  FORMAT(A8,4I6,20E12.4)
-            IF(CORGC(L,NY,NX).LT.FORGW)THEN
-              WP(L,NY,NX)=0.0260+0.50*CCLAY(L,NY,NX)+0.32E-06*CORGC(L,NY,NX)
-            ELSE
-              IF(BKDS(L,NY,NX).LT.0.075)THEN
-                WP(L,NY,NX)=0.04
-              ELSEIF(BKDS(L,NY,NX).LT.0.195)THEN
-                WP(L,NY,NX)=0.15
-              ELSE
-                WP(L,NY,NX)=0.22
-              ENDIF
-            ENDIF
-            WP(L,NY,NX)=WP(L,NY,NX)/(1.0-FHOL(L,NY,NX))
-            WP(L,NY,NX)=AMIN1(0.75*FC(L,NY,NX),WP(L,NY,NX))
-            !     WRITE(*,3332)'WP',IYRC,I,J,L,WP(L,NY,NX),CCLAY(L,NY,NX)
-            !    2,CORGC(L,NY,NX),FC(L,NY,NX)
-          ENDIF
-          FCL(L,NY,NX)=LOG(FC(L,NY,NX))
-          WPL(L,NY,NX)=LOG(WP(L,NY,NX))
-          PSD(L,NY,NX)=PSL(L,NY,NX)-FCL(L,NY,NX)
-          FCD(L,NY,NX)=FCL(L,NY,NX)-WPL(L,NY,NX)
-        ENDIF
-        IF(I.EQ.IBEGIN.AND.J.EQ.1.AND.IYRC.EQ.IDATA(9))THEN
-          IF(THW(L,NY,NX).GT.1.0.OR.DPTH(L,NY,NX).GE.DTBLZ(NY,NX))THEN
-            THETW(L,NY,NX)=POROS(L,NY,NX)
-          ELSEIF(test_aeqb(THW(L,NY,NX),1._r8))THEN
-            THETW(L,NY,NX)=FC(L,NY,NX)
-          ELSEIF(test_aeqb(THW(L,NY,NX),0._r8))THEN
-            THETW(L,NY,NX)=WP(L,NY,NX)
-          ELSEIF(THW(L,NY,NX).LT.0.0)THEN
-            THETW(L,NY,NX)=0.0_r8
-          ENDIF
-          IF(THI(L,NY,NX).GT.1.0.OR.DPTH(L,NY,NX).GE.DTBLZ(NY,NX))THEN
-            THETI(L,NY,NX)=AMAX1(0.0,AMIN1(POROS(L,NY,NX) &
-              ,POROS(L,NY,NX)-THW(L,NY,NX)))
-          ELSEIF(test_aeqb(THI(L,NY,NX),1._r8))THEN
-            THETI(L,NY,NX)=AMAX1(0.0,AMIN1(FC(L,NY,NX) &
-              ,POROS(L,NY,NX)-THW(L,NY,NX)))
-          ELSEIF(test_aeqb(THI(L,NY,NX),0._r8))THEN
-            THETI(L,NY,NX)=AMAX1(0.0,AMIN1(WP(L,NY,NX) &
-              ,POROS(L,NY,NX)-THW(L,NY,NX)))
-          ELSEIF(THI(L,NY,NX).LT.0.0)THEN
-            THETI(L,NY,NX)=0.0_r8
-          ENDIF
-          IF(.not.is_restart_run)THEN
-            VOLW(L,NY,NX)=THETW(L,NY,NX)*VOLX(L,NY,NX)
-            VOLWX(L,NY,NX)=VOLW(L,NY,NX)
-            VOLWH(L,NY,NX)=THETW(L,NY,NX)*VOLAH(L,NY,NX)
-            VOLI(L,NY,NX)=THETI(L,NY,NX)*VOLX(L,NY,NX)
-            VOLIH(L,NY,NX)=THETI(L,NY,NX)*VOLAH(L,NY,NX)
-            VHCP(L,NY,NX)=VHCM(L,NY,NX)+4.19*(VOLW(L,NY,NX) &
-              +VOLWH(L,NY,NX))+1.9274*(VOLI(L,NY,NX)+VOLIH(L,NY,NX))
-            THETWZ(L,NY,NX)=THETW(L,NY,NX)
-            THETIZ(L,NY,NX)=THETI(L,NY,NX)
-          ENDIF
-        ENDIF
-      ENDIF
-      VOLP(L,NY,NX)=AMAX1(0.0,VOLA(L,NY,NX)-VOLW(L,NY,NX) &
-        -VOLI(L,NY,NX))+AMAX1(0.0,VOLAH(L,NY,NX)-VOLWH(L,NY,NX) &
-        -VOLIH(L,NY,NX))
-      IF(VOLT(L,NY,NX).GT.ZEROS2(NY,NX))THEN
-        THETP(L,NY,NX)=VOLP(L,NY,NX)/VOLY(L,NY,NX)
-      ELSE
-        THETP(L,NY,NX)=0.0_r8
-      ENDIF
-      IF(BKDS(L,NY,NX).GT.ZERO)THEN
-        THETY(L,NY,NX)=EXP((PSIMX(NY,NX)-LOG(-PSIHY)) &
-          *FCD(L,NY,NX)/PSIMD(NY,NX)+FCL(L,NY,NX))
-      ELSE
-        THETY(L,NY,NX)=ZERO2
-      ENDIF
-      !
-      !     SATURATED HYDRAULIC CONDUCTIVITY FROM SWC AT SATURATION VS.
-      !     -0.033 MPA (MINERAL SOILS) IF NOT ENTERED IN SOIL FILE IN 'READS'
-      !
-      !     SCNV,SCNH=vertical,lateral saturated hydraulic conductivity
-!
-      IF(ISOIL(3,L,NY,NX).EQ.1)THEN
-        IF(CORGC(L,NY,NX).LT.FORGW)THEN
-          THETF=AMIN1(POROS(L,NY,NX),EXP((PSIMS(NY,NX)-LOG(0.033)) &
-            *(PSL(L,NY,NX)-FCL(L,NY,NX))/PSISD(NY,NX)+PSL(L,NY,NX)))
-          SCNV(L,NY,NX)=1.54*((POROS(L,NY,NX)-THETF)/THETF)**2
-        ELSE
-          SCNV(L,NY,NX)=0.10+75.0*1.0E-15**BKDS(L,NY,NX)
-          SCNV(L,NY,NX)=SCNV(L,NY,NX)*FMPR(L,NY,NX)
-        ENDIF
-        !     WRITE(*,3332)'SCNV',IYRC,I,J,L,SCNV(L,NY,NX),POROS(L,NY,NX)
-        !    2,THETF,FMPR(L,NY,NX),PSIMS(NY,NX),LOG(0.033)
-        !    3,PSL(L,NY,NX),FCL(L,NY,NX),PSISD(NY,NX)
-      ENDIF
-      IF(ISOIL(4,L,NY,NX).EQ.1)THEN
-        IF(CORGC(L,NY,NX).LT.FORGW)THEN
-          THETF=AMIN1(POROS(L,NY,NX),EXP((PSIMS(NY,NX)-LOG(0.033)) &
-            *(PSL(L,NY,NX)-FCL(L,NY,NX))/PSISD(NY,NX)+PSL(L,NY,NX)))
-          SCNH(L,NY,NX)=1.54*((POROS(L,NY,NX)-THETF)/THETF)**2
-        ELSE
-          SCNH(L,NY,NX)=0.10+75.0*1.0E-15**BKDS(L,NY,NX)
-          SCNH(L,NY,NX)=SCNH(L,NY,NX)*FMPR(L,NY,NX)
-        ENDIF
-        !     WRITE(*,3332)'SCNH',IYRC,I,J,L,SCNH(L,NY,NX),POROS(L,NY,NX)
-        !    2,THETF,FMPR(L,NY,NX)
-      ENDIF
+      EPOC(L,NY,NX)=1.0_r8
 
-      !
-      !     HYDRAULIC CONDUCTIVITY FUNCTION FROM KSAT AND SOIL WATER RELEASE CURVE
-      !
-      !     THETK,PSISK=micropore class water content,potential
-      !     HCND=lateral(1,2),vertical(3) micropore hydraulic conductivity
-      !
-      !     IF(BKVL(L,NY,NX).GT.ZEROS(NY,NX))THEN
-      SUM2=0.0_r8
-      DO 1320 K=1,100
-        XK=K-1
-        THETK(K)=POROS(L,NY,NX)-(XK/100.0*POROS(L,NY,NX))
-        IF(THETK(K).LT.FC(L,NY,NX))THEN
-          PSISK(K)=AMAX1(PSIHY,-EXP(PSIMX(NY,NX) &
-            +((FCL(L,NY,NX)-LOG(THETK(K))) &
-            /FCD(L,NY,NX)*PSIMD(NY,NX))))
-        ELSEIF(THETK(K).LT.POROS(L,NY,NX)-DTHETW)THEN
-          PSISK(K)=-EXP(PSIMS(NY,NX) &
-            +(((PSL(L,NY,NX)-LOG(THETK(K))) &
-            /PSD(L,NY,NX))**SRP(L,NY,NX)*PSISD(NY,NX)))
-        ELSE
-          PSISK(K)=PSISE(L,NY,NX)
-        ENDIF
-        SUM2=SUM2+(2*K-1)/(PSISK(K)**2)
-1320  CONTINUE
-      DO 1335 K=1,100
-      SUM1=0.0_r8
-      XK=K-1
-      YK=((100.0-XK)/100.0)**1.33
-      DO 1330 M=K,100
-        SUM1=SUM1+(2*M+1-2*K)/(PSISK(M)**2)
-1330  CONTINUE
-      DO 1340 N=1,3
-        IF(N.EQ.3)THEN
-          HCND(N,K,L,NY,NX)=SCNV(L,NY,NX)*YK*SUM1/SUM2
-          IF(K.GT.1.AND.PSISK(K).LT.PSISA(L,NY,NX).AND.PSISK(K-1).GE.PSISA(L,NY,NX))THEN
-            THETS(L,NY,NX)=THETK(K)
-          ENDIF
-        ELSE
-          HCND(N,K,L,NY,NX)=SCNH(L,NY,NX)*YK*SUM1/SUM2
-        ENDIF
-1340  CONTINUE
-1335  CONTINUE
-!     SOIL MACROPORE DIMENSIONS AND CONDUCTIVITY FROM MACROPORE FRACTION
-!     ENTERED IN 'READS'
-!
-!     PHOL,NHOL,HRAD=path length between, number,radius of macropores
-!     CNDH=macropore hydraulic conductivity
-!
-      HRAD(L,NY,NX)=0.5E-03
-      NHOL(L,NY,NX)=INT(VOLAH(L,NY,NX)/(PICON*HRAD(L,NY,NX)**2*VOLTI(L,NY,NX)))
-      IF(NHOL(L,NY,NX).GT.0.0)THEN
-        PHOL(L,NY,NX)=1.0/(SQRT(PICON*NHOL(L,NY,NX)))
-      ELSE
-        PHOL(L,NY,NX)=1.0
-      ENDIF
-      VISCWL=VISCW*EXP(0.533-0.0267*TCS(L,NY,NX))
-      CNDH(L,NY,NX)=3.6E+03*PICON*NHOL(L,NY,NX)*HRAD(L,NY,NX)**4/(8.0*VISCWL)
+      call SoilHydroProperty(L,NY,NX,I,J)
+
 !
 !     SOIL HEAT CAPACITY AND THERMAL CONDUCTIVITY OF SOLID PHASE
 !     FROM SOC AND TEXTURE
@@ -1148,47 +926,10 @@ module Hour1Mod
 !     IFLGS=disturbance flag
 !     BKDS,BKDSI=current,initial bulk density
 !
-!     WRITE(*,1116)'IFLGS',IYRC,I,J,IFLGS(NY,NX)
-!1116  FORMAT(A8,4I6)
-  IF(IFLGS(NY,NX).NE.0)THEN
-    IF(VOLT(0,NY,NX).GT.ZEROS2(NY,NX))THEN
-      BKDS(0,NY,NX)=BKVL(0,NY,NX)/VOLT(0,NY,NX)
-    ELSE
-      BKDS(0,NY,NX)=BKRS(1)
-    ENDIF
-    THETY(0,NY,NX)=EXP((PSIMX(NY,NX)-LOG(-PSIHY))*FCD(0,NY,NX)/PSIMD(NY,NX)+FCL(0,NY,NX))
-    SUM2=0.0_r8
-    DO 1220 K=1,100
-      XK=K-1
-      THETK(K)=POROS0(NY,NX)-(XK/100.0*POROS0(NY,NX))
-      IF(THETK(K).LT.FC(0,NY,NX))THEN
-        PSISK(K)=AMAX1(PSIHY,-EXP(PSIMX(NY,NX) &
-          +((FCL(0,NY,NX)-LOG(THETK(K))) &
-          /FCD(0,NY,NX)*PSIMD(NY,NX))))
-      ELSEIF(THETK(K).LT.POROS0(NY,NX))THEN
-        PSISK(K)=-EXP(PSIMS(NY,NX) &
-          +(((PSL(0,NY,NX)-LOG(THETK(K))) &
-          /PSD(0,NY,NX))**SRP(0,NY,NX)*PSISD(NY,NX)))
-      ELSE
-        PSISK(K)=PSISE(0,NY,NX)
-      ENDIF
-      SUM2=SUM2+(2*K-1)/(PSISK(K)**2)
-1220  CONTINUE
-    DO 1235 K=1,100
-      SUM1=0.0_r8
-      XK=K-1
-      YK=((100.0-XK)/100.0)**1.33
-      DO 1230 M=K,100
-        SUM1=SUM1+(2*M+1-2*K)/(PSISK(M)**2)
-1230  CONTINUE
-      HCND(3,K,0,NY,NX)=SCNV(0,NY,NX)*YK*SUM1/SUM2
-      HCND(1,K,0,NY,NX)=0.0_r8
-      HCND(2,K,0,NY,NX)=0.0_r8
-      IF(K.GT.1.AND.PSISK(K).LT.PSISA(0,NY,NX).AND.PSISK(K-1).GE.PSISA(0,NY,NX))THEN
-        THETS(0,NY,NX)=THETK(K)
-      ENDIF
 
-1235  CONTINUE
+  IF(IFLGS(NY,NX).NE.0)THEN
+
+    call LitterHydroproperty(NY,NX)
 !
 !     RESET SOIL PHYSICAL PROPERTIES (DENSITY, TEXTURE)
 !     AFTER DISTURBANCES (E.G. TILLAGE, EROSION)
@@ -1444,7 +1185,7 @@ module Hour1Mod
             THETW1=AMIN1(THETWM,EXP((PSIMS(NY,NX)-LOG(-PSIS1)) &
               *PSD(L,NY,NX)/PSISD(NY,NX)+PSL(L,NY,NX)))
             IF(THETWM.GT.THETW1)THEN
-              THETPX=AMIN1(1.0,AMAX1(0.0,(THETWM-THETW(L,NY,NX))/(THETWM-THETW1)))
+              THETPX=AMIN1(1.0,AZMAX1((THETWM-THETW(L,NY,NX))/(THETWM-THETW1)))
               DPTHT(NY,NX)=CDPTH(L,NY,NX)-DLYR(3,L,NY,NX)*(1.0-THETPX)
             ELSE
               DPTHT(NY,NX)=CDPTH(L,NY,NX)-DLYR(3,L,NY,NX)
@@ -1455,7 +1196,7 @@ module Hour1Mod
             THETW1=AMIN1(THETWM,EXP((PSIMS(NY,NX)-LOG(-PSIS1)) &
               *PSD(L-1,NY,NX)/PSISD(NY,NX)+PSL(L-1,NY,NX)))
             IF(THETWM.GT.THETW1)THEN
-              THETPX=AMIN1(1.0,AMAX1(0.0,(THETWM-THETW(L-1,NY,NX))/(THETWM-THETW1)))
+              THETPX=AMIN1(1.0,AZMAX1((THETWM-THETW(L-1,NY,NX))/(THETWM-THETW1)))
               DPTHT(NY,NX)=CDPTH(L-1,NY,NX)-DLYR(3,L-1,NY,NX)*(1.0-THETPX)
             ELSE
               DPTHT(NY,NX)=CDPTH(L-1,NY,NX)-DLYR(3,L-1,NY,NX)
@@ -1491,12 +1232,7 @@ module Hour1Mod
   !     DETE=soil detachability
   !     ZM=surface roughness used in runoff velocity calculation in watsub.f
   !
-  BKVLNU(NY,NX)=AMAX1(0.0_r8,BKVLNM(NY,NX)+1.82E-06_r8*ORGC(NU(NY,NX),NY,NX))
-  !     WRITE(*,2423)'BKVLH',I,J,NX,NY,BKVL(NU(N2,N1),N2,N1)
-  !    2,BKVLNM(N2,N1),BKVLNU(N2,N1),ORGR(NU(N2,N1),N2,N1)
-  !    3,ORGC(NU(N2,N1),N2,N1),SAND(NU(N2,N1),N2,N1)
-  !    3,SILT(NU(N2,N1),N2,N1),CLAY(NU(N2,N1),N2,N1)
-!2423  FORMAT(A8,4I4,20E12.4)
+  BKVLNU(NY,NX)=AZMAX1(BKVLNM(NY,NX)+1.82E-06_r8*ORGC(NU(NY,NX),NY,NX))
   BKVLNX=SAND(NU(NY,NX),NY,NX)+SILT(NU(NY,NX),NY,NX) &
     +CLAY(NU(NY,NX),NY,NX)+1.82E-06*ORGC(NU(NY,NX),NY,NX)
   IF(BKVLNX.GT.ZEROS(NY,NX))THEN
@@ -1527,15 +1263,6 @@ module Hour1Mod
     VISCWL=VISCW*EXP(0.533_r8-0.0267_r8*TCS(0,NY,NX))
     VLS(NY,NX)=3.6E+03_r8*9.8_r8*(PTDSNU(NY,NX)-1.0_r8) &
       *(1.0E-06_r8*D50)**2/(18.0_r8*VISCWL)
-!     WRITE(*,1118)'COHS',I,J,NX,NY,NU(NY,NX),COHS,DETE(NY,NX)
-!    2,ZM(NY,NX),VLS(NY,NX),D50,ZD50,PTDSNU(NY,NX)
-!    3,RTDNT(NU(NY,NX),NY,NX),VOLR(NY,NX)/AREA(3,0,NY,NX)
-!    3,ORGC(0,NY,NX)
-!    3,CCLAY(NU(NY,NX),NY,NX),CSILT(NU(NY,NX),NY,NX)
-!    4,CSAND(NU(NY,NX),NY,NX),CORGM,CORGC(NU(NY,NX),NY,NX)
-!    5,BKVL(NU(NY,NX),NY,NX),BKVLNX
-!    3,VISCWL,TCS(0,NY,NX)
-!1118  FORMAT(A8,5I4,20E12.4)
   ENDIF
   end subroutine SetSurfaceProperty4SedErosion
 !------------------------------------------------------------------------------------------
@@ -1578,7 +1305,7 @@ module Hour1Mod
   ENDDO
 
   DO 7900 K=0,jcplx1
-    DO 7920 M=1,2
+    DO 7920 M=1,ndbiomcp
       OC=OC+ORC(M,K,L,NY,NX)
 7920  CONTINUE
     OC=OC+OQC(K,L,NY,NX)+OQCH(K,L,NY,NX)+OHC(K,L,NY,NX) &
@@ -1590,114 +1317,6 @@ module Hour1Mod
   ORGCX(L,NY,NX)=OC
   ENDDO
   end subroutine UpdateTotalSOC
-!------------------------------------------------------------------------------------------
-
-  subroutine GetSoilHydraulicVars(NY,NX)
-  implicit none
-  integer, intent(in) :: NY,NX
-  REAL(R8) :: FCX,FCLX
-  real(r8) :: FCDX
-  real(r8) :: PSDX
-  real(r8) :: THETW1
-  real(r8) :: WPX,WPLX
-  integer :: K,L
-
-  ! begin_execution
-  DO L=NUI(NY,NX),NLI(NY,NX)
-  ! WATER POTENTIALS
-  !
-  ! FC,WP=water contents at field capacity,wilting point,saturation
-  ! PSISM,PSISE=matric,saturation water potential
-  ! SRP=parameter for deviation from linear log-log water retention
-  ! FC,WP=water contents at field capacity,wilting point from soil file
-  ! FCL,WPL=log FC,WP
-  ! FCD,PSD=FCL-WPL,log(POROS)-FCL
-  ! FCI,WPI=FC,WP of ice
-  ! THETIX=ice concentration
-!
-  IF(BKVL(L,NY,NX).GT.ZEROS(NY,NX) &
-    .AND.VOLX(L,NY,NX).GT.ZEROS(NY,NX))THEN
-    THETW1=AMAX1(0.0,AMIN1(POROS(L,NY,NX) &
-      ,VOLW(L,NY,NX)/VOLY(L,NY,NX)))
-    IF(THETW1.LT.FC(L,NY,NX))THEN
-      PSISM(L,NY,NX)=AMAX1(PSIHY,-EXP(PSIMX(NY,NX) &
-        +((FCL(L,NY,NX)-LOG(THETW1)) &
-        /FCD(L,NY,NX)*PSIMD(NY,NX))))
-    ELSEIF(THETW1.LT.POROS(L,NY,NX)-DTHETW)THEN
-      PSISM(L,NY,NX)=-EXP(PSIMS(NY,NX) &
-        +(((PSL(L,NY,NX)-LOG(THETW1)) &
-        /PSD(L,NY,NX))**SRP(L,NY,NX)*PSISD(NY,NX)))
-    ELSE
-      PSISM(L,NY,NX)=PSISE(L,NY,NX)
-    ENDIF
-  ELSEIF(VOLX(L,NY,NX).GT.ZEROS2(NY,NX).and.THETI(L,NY,NX)>ZEROS2(NY,NX))THEN
-    FCX=FCI*THETI(L,NY,NX)
-    WPX=WPI*THETI(L,NY,NX)
-    FCLX=LOG(FCX)
-    WPLX=LOG(WPX)
-    PSDX=PSL(L,NY,NX)-FCLX
-    FCDX=FCLX-WPLX
-    IF(THETW(L,NY,NX).LT.FCX)THEN
-      PSISM(L,NY,NX)=AMAX1(PSIHY,-EXP(PSIMX(NY,NX) &
-        +((FCLX-LOG(THETW(L,NY,NX))) &
-        /FCDX*PSIMD(NY,NX))))
-    ELSEIF(THETW(L,NY,NX).LT.POROS(L,NY,NX)-DTHETW)THEN
-      PSISM(L,NY,NX)=-EXP(PSIMS(NY,NX) &
-        +(((PSL(L,NY,NX)-LOG(THETW(L,NY,NX))) &
-        /PSDX)*PSISD(NY,NX)))
-    ELSE
-      PSISM(L,NY,NX)=PSISE(L,NY,NX)
-    ENDIF
-  ELSE
-    PSISM(L,NY,NX)=PSISE(L,NY,NX)
-  ENDIF
-!     WRITE(*,443)'PSISM',I,J,NX,NY,L,PSISM(L,NY,NX)
-!    2,THETW(L,NY,NX),THETI(L,NY,NX),FCX,WPX,POROS(L,NY,NX)
-!
-!     SOIL OSMOTIC, GRAVIMETRIC AND MATRIC WATER POTENTIALS
-!
-!     PSISM,PSISO,PSISH,PSIST=matric,osmotic,gravimetric,total water potential
-!
-  PSISO(L,NY,NX)=-8.3143E-06*TKS(L,NY,NX)*CION(L,NY,NX)
-  PSISH(L,NY,NX)=0.0098*(ALT(NY,NX)-DPTH(L,NY,NX))
-  PSIST(L,NY,NX)=AMIN1(0.0,PSISM(L,NY,NX)+PSISO(L,NY,NX)+PSISH(L,NY,NX))
-!     IF((I/30)*30.EQ.I.AND.J.EQ.15)THEN
-!     WRITE(*,1113)'PSISM1',I,J,NX,NY,L,PSISM(L,NY,NX)
-!    2,THETW(L,NY,NX),THETW1,VOLX(L,NY,NX)
-!    2,FC(L,NY,NX),WP(L,NY,NX),POROS(L,NY,NX),VOLP(L,NY,NX)
-!    3,VOLW(L,NY,NX),VOLI(L,NY,NX),VOLA(L,NY,NX),VOLT(L,NY,NX)
-!    4,CDPTH(L,NY,NX),DPTH(L,NY,NX),CDPTHZ(L,NY,NX),DPTHZ(L,NY,NX)
-!    5,DLYR(3,L,NY,NX),PSIST(L,NY,NX),PSISO(L,NY,NX)
-!    2,PSISH(L,NY,NX),TKS(L,NY,NX),CION(L,NY,NX)
-!1113  FORMAT(A8,5I4,50E12.4)
-!     ENDIF
-!
-!     SOIL RESISTANCE TO ROOT PENETRATION
-!
-!     RSCS=soil resistance to root penetration (MPa)
-!
-!     IF(BKDS(L,NY,NX).GT.ZERO)THEN
-!     CCLAYT=CCLAY(L,NY,NX)*1.0E+02
-!     CORGCT=CORGC(L,NY,NX)*1.0E-04
-!     CC=EXP(-3.6733-0.1447*CCLAYT+0.7653*CORGCT)
-!     DD=-0.4805-0.1239*CCLAYT+0.2080*CORGCT
-!     EE=3.8521+0.0963*CCLAYT
-!     RSCS(L,NY,NX)=CC*THETW(L,NY,NX)**DD*BKDS(L,NY,NX)**EE
-!     ELSE
-      RSCS(L,NY,NX)=0.0_r8
-!     ENDIF
-!     WRITE(*,2442)'RSCS',I,J,NX,NY,L,RSCS(L,NY,NX),THETW(L,NY,NX)
-!    2,BKDS(L,NY,NX),CCLAY(L,NY,NX),CORGC(L,NY,NX)
-!2442  FORMAT(A8,5I4,12E12.4)
-!
-!     SOIL HYDRAULIC CONDUCTIVITIES FROM AMBIENT SOIL WATER CONTENTS
-!
-!     CNDU=soil hydraulic conductivity for root uptake
-!
-  K=MAX(1,MIN(100,INT(100.0*(POROS(L,NY,NX)-THETW(L,NY,NX))/POROS(L,NY,NX))+1))
-  CNDU(L,NY,NX)=0.5*(HCND(1,K,L,NY,NX)+HCND(3,K,L,NY,NX))
-  ENDDO
-  end subroutine GetSoilHydraulicVars
 !------------------------------------------------------------------------------------------
 
   subroutine DiagActiveLayerDepth(NY,NX)
@@ -1785,12 +1404,12 @@ module Hour1Mod
   SNH3L(0,NY,NX)=gas_solubility(id_nh3g,TCS(0,NY,NX))
   SH2GL(0,NY,NX)=gas_solubility(id_h2g,TCS(0,NY,NX))
   IF(VOLW(0,NY,NX).GT.ZEROS2(NY,NX))THEN
-    CCO2S(0,NY,NX)=AMAX1(0.0,CO2S(0,NY,NX)/VOLW(0,NY,NX))
-    CCH4S(0,NY,NX)=AMAX1(0.0,CH4S(0,NY,NX)/VOLW(0,NY,NX))
-    COXYS(0,NY,NX)=AMAX1(0.0,OXYS(0,NY,NX)/VOLW(0,NY,NX))
-    CZ2GS(0,NY,NX)=AMAX1(0.0,Z2GS(0,NY,NX)/VOLW(0,NY,NX))
-    CZ2OS(0,NY,NX)=AMAX1(0.0,Z2OS(0,NY,NX)/VOLW(0,NY,NX))
-    CH2GS(0,NY,NX)=AMAX1(0.0,H2GS(0,NY,NX)/VOLW(0,NY,NX))
+    CCO2S(0,NY,NX)=AZMAX1(CO2S(0,NY,NX)/VOLW(0,NY,NX))
+    CCH4S(0,NY,NX)=AZMAX1(CH4S(0,NY,NX)/VOLW(0,NY,NX))
+    COXYS(0,NY,NX)=AZMAX1(OXYS(0,NY,NX)/VOLW(0,NY,NX))
+    CZ2GS(0,NY,NX)=AZMAX1(Z2GS(0,NY,NX)/VOLW(0,NY,NX))
+    CZ2OS(0,NY,NX)=AZMAX1(Z2OS(0,NY,NX)/VOLW(0,NY,NX))
+    CH2GS(0,NY,NX)=AZMAX1(H2GS(0,NY,NX)/VOLW(0,NY,NX))
   ELSE
     CCO2S(0,NY,NX)=0.0_r8
     CCH4S(0,NY,NX)=0.0_r8
@@ -1804,7 +1423,7 @@ module Hour1Mod
 !     *SGL= gaseous,aqueous diffusivity for gases,solutes listed in
 !     *SG PARAMETER statement above
 !
-  TFACL=(TKS(0,NY,NX)/298.15)**6
+  TFACL=TEFAQUDIF(TKS(0,NY,NX))
   TFND(0,NY,NX)=TFACL
   CQSGL(0,NY,NX)=CQSG*TFACL
   OLSGL(0,NY,NX)=OLSG*TFACL
@@ -1845,18 +1464,14 @@ module Hour1Mod
 !
 !     WGSGA,WGSGR,WGSGW=vapor diffusivity in air,litter,snowpack
 !
-  TFACA=(TKA(NY,NX)/298.15)**1.75
+  TFACA=TEFGASDIF(TKA(NY,NX))
   WGSGA(NY,NX)=WGSG*TFACA
-  if(TKS(0,NY,NX)<0._r8)then
-    write(*,*)'TKS(0,NY,NX)=',TKS(0,NY,NX)
-    call endrun(trim(mod_filename)//' at line',__LINE__)
-  endif
-  TFACR=(TKS(0,NY,NX)/298.15)**1.75
+  TFACR=TEFGASDIF(TKS(0,NY,NX))
   WGSGR(NY,NX)=WGSG*TFACR
-  DO 5060 L=1,JS
-    TFACW=(TKW(L,NY,NX)/298.15)**1.75
+  DO  L=1,JS
+    TFACW=TEFGASDIF(TKW(L,NY,NX))
     WGSGW(L,NY,NX)=WGSG*TFACW
-5060  CONTINUE
+  ENDDO
   end subroutine SetTracerPropertyInLiterAir
 !------------------------------------------------------------------------------------------
 
@@ -1877,29 +1492,23 @@ module Hour1Mod
   DO L=NUI(NY,NX),NLI(NY,NX)
   IF(VOLW(L,NY,NX).GT.ZEROS2(NY,NX))THEN
     IF(VLNH4(L,NY,NX).GT.ZERO)THEN
-      CNH4S(L,NY,NX)=AMAX1(0.0,ZNH4S(L,NY,NX) &
-        /(VOLW(L,NY,NX)*VLNH4(L,NY,NX)))
-      CNH3S(L,NY,NX)=AMAX1(0.0,ZNH3S(L,NY,NX) &
-        /(VOLW(L,NY,NX)*VLNH4(L,NY,NX)))
+      CNH4S(L,NY,NX)=AZMAX1(ZNH4S(L,NY,NX)/(VOLW(L,NY,NX)*VLNH4(L,NY,NX)))
+      CNH3S(L,NY,NX)=AZMAX1(ZNH3S(L,NY,NX)/(VOLW(L,NY,NX)*VLNH4(L,NY,NX)))
     ELSE
       CNH4S(L,NY,NX)=0.0_r8
       CNH3S(L,NY,NX)=0.0_r8
     ENDIF
     IF(VLNO3(L,NY,NX).GT.ZERO)THEN
-      CNO3S(L,NY,NX)=AMAX1(0.0,ZNO3S(L,NY,NX) &
-        /(VOLW(L,NY,NX)*VLNO3(L,NY,NX)))
-      CNO2S(L,NY,NX)=AMAX1(0.0,ZNO2S(L,NY,NX) &
-        /(VOLW(L,NY,NX)*VLNO3(L,NY,NX)))
+      CNO3S(L,NY,NX)=AZMAX1(ZNO3S(L,NY,NX)/(VOLW(L,NY,NX)*VLNO3(L,NY,NX)))
+      CNO2S(L,NY,NX)=AZMAX1(ZNO2S(L,NY,NX)/(VOLW(L,NY,NX)*VLNO3(L,NY,NX)))
     ELSE
       CNO3S(L,NY,NX)=0.0_r8
       CNO2S(L,NY,NX)=0.0_r8
     ENDIF
     IF(VLPO4(L,NY,NX).GT.ZERO)THEN
-      CH1P4(L,NY,NX)=AMAX1(0.0,H1PO4(L,NY,NX) &
-        /(VOLW(L,NY,NX)*VLPO4(L,NY,NX)))
-      CH2P4(L,NY,NX)=AMAX1(0.0,H2PO4(L,NY,NX) &
-        /(VOLW(L,NY,NX)*VLPO4(L,NY,NX)))
-      CPO4S(L,NY,NX)=AMAX1(0.0,((H0PO4(L,NY,NX)+H3PO4(L,NY,NX) &
+      CH1P4(L,NY,NX)=AZMAX1(H1PO4(L,NY,NX)/(VOLW(L,NY,NX)*VLPO4(L,NY,NX)))
+      CH2P4(L,NY,NX)=AZMAX1(H2PO4(L,NY,NX)/(VOLW(L,NY,NX)*VLPO4(L,NY,NX)))
+      CPO4S(L,NY,NX)=AZMAX1(((H0PO4(L,NY,NX)+H3PO4(L,NY,NX) &
         +ZFE1P(L,NY,NX)+ZFE2P(L,NY,NX)+ZCA0P(L,NY,NX) &
         +ZCA1P(L,NY,NX)+ZCA2P(L,NY,NX)+ZMG1P(L,NY,NX))*31.0 &
         +H1PO4(L,NY,NX)+H2PO4(L,NY,NX))/(VOLW(L,NY,NX)*VLPO4(L,NY,NX)))
@@ -1915,29 +1524,23 @@ module Hour1Mod
 !     VLNHB,VLNOB,VLPOB=fraction of soil volume in NH4,NO3,PO4 band
 !
     IF(VLNHB(L,NY,NX).GT.ZERO)THEN
-      CNH4B(L,NY,NX)=AMAX1(0.0,ZNH4B(L,NY,NX) &
-        /(VOLW(L,NY,NX)*VLNHB(L,NY,NX)))
-      CNH3B(L,NY,NX)=AMAX1(0.0,ZNH3B(L,NY,NX) &
-        /(VOLW(L,NY,NX)*VLNHB(L,NY,NX)))
+      CNH4B(L,NY,NX)=AZMAX1(ZNH4B(L,NY,NX)/(VOLW(L,NY,NX)*VLNHB(L,NY,NX)))
+      CNH3B(L,NY,NX)=AZMAX1(ZNH3B(L,NY,NX)/(VOLW(L,NY,NX)*VLNHB(L,NY,NX)))
     ELSE
       CNH4B(L,NY,NX)=0.0_r8
       CNH3B(L,NY,NX)=0.0_r8
     ENDIF
     IF(VLNOB(L,NY,NX).GT.ZERO)THEN
-      CNO3B(L,NY,NX)=AMAX1(0.0,ZNO3B(L,NY,NX) &
-        /(VOLW(L,NY,NX)*VLNOB(L,NY,NX)))
-      CNO2B(L,NY,NX)=AMAX1(0.0,ZNO2B(L,NY,NX) &
-        /(VOLW(L,NY,NX)*VLNOB(L,NY,NX)))
+      CNO3B(L,NY,NX)=AZMAX1(ZNO3B(L,NY,NX)/(VOLW(L,NY,NX)*VLNOB(L,NY,NX)))
+      CNO2B(L,NY,NX)=AZMAX1(ZNO2B(L,NY,NX)/(VOLW(L,NY,NX)*VLNOB(L,NY,NX)))
     ELSE
       CNO3B(L,NY,NX)=0.0_r8
       CNO2B(L,NY,NX)=0.0_r8
     ENDIF
     IF(VLPOB(L,NY,NX).GT.ZERO)THEN
-      CH1P4B(L,NY,NX)=AMAX1(0.0,H1POB(L,NY,NX) &
-        /(VOLW(L,NY,NX)*VLPOB(L,NY,NX)))
-      CH2P4B(L,NY,NX)=AMAX1(0.0,H2POB(L,NY,NX) &
-        /(VOLW(L,NY,NX)*VLPOB(L,NY,NX)))
-      CPO4B(L,NY,NX)=AMAX1(0.0,((H0POB(L,NY,NX)+H3POB(L,NY,NX) &
+      CH1P4B(L,NY,NX)=AZMAX1(H1POB(L,NY,NX)/(VOLW(L,NY,NX)*VLPOB(L,NY,NX)))
+      CH2P4B(L,NY,NX)=AZMAX1(H2POB(L,NY,NX)/(VOLW(L,NY,NX)*VLPOB(L,NY,NX)))
+      CPO4B(L,NY,NX)=AZMAX1(((H0POB(L,NY,NX)+H3POB(L,NY,NX) &
         +ZFE1PB(L,NY,NX)+ZFE2PB(L,NY,NX)+ZCA0PB(L,NY,NX) &
         +ZCA1PB(L,NY,NX)+ZCA2PB(L,NY,NX)+ZMG1PB(L,NY,NX))*31.0 &
         +H1POB(L,NY,NX)+H2POB(L,NY,NX))/(VOLW(L,NY,NX)*VLPOB(L,NY,NX)))
@@ -2023,12 +1626,8 @@ module Hour1Mod
 ! *SGL= gaseous,aqueous diffusivity for gases,solutes listed in
 ! *SG PARAMETER statement above
 !
-    if(TKS(L,NY,NX)<0._r8)THEN
-      WRITE(*,*)'TKS=',L,TKS(L,NY,NX)
-      CALL ENDRUN(TRIM(MOD_FILENAME)//' at line',__LINE__)
-    ENDIF
-    TFACG=(TKS(L,NY,NX)/298.15)**1.75
-    TFACL=(TKS(L,NY,NX)/298.15)**6
+    TFACG=TEFGASDIF(TKS(L,NY,NX))
+    TFACL=TEFAQUDIF(TKS(L,NY,NX))
     TFND(L,NY,NX)=TFACL
     CGSGL(L,NY,NX)=CGSG*TFACG
     CHSGL(L,NY,NX)=CHSG*TFACG
@@ -2091,23 +1690,14 @@ module Hour1Mod
         +ZMG1P(L,NY,NX)+H3POB(L,NY,NX)+ZCA1PB(L,NY,NX)+ZMG1PB(L,NY,NX)
       ZION1=ABS(3.0*(ZC3-ZA3)+2.0*(ZC2-ZA2)+ZC1-ZA1)
       IF(VOLW(L,NY,NX).GT.ZEROS2(NY,NX))THEN
-        CSTR(L,NY,NX)=AMAX1(0.0_r8,0.5E-03_r8*(9.0_r8*(ZC3+ZA3)+4.0_r8*(ZC2+ZA2) &
+        CSTR(L,NY,NX)=AZMAX1(0.5E-03_r8*(9.0_r8*(ZC3+ZA3)+4.0_r8*(ZC2+ZA2) &
           +ZC1+ZA1+ZION1)/VOLW(L,NY,NX))
-        CION(L,NY,NX)=AMAX1(0.0_r8,(ZC3+ZA3+ZC2+ZA2+ZC1+ZA1+ZN)/VOLW(L,NY,NX))
+        CION(L,NY,NX)=AZMAX1((ZC3+ZA3+ZC2+ZA2+ZC1+ZA1+ZN)/VOLW(L,NY,NX))
       ELSE
         CSTR(L,NY,NX)=0.0_r8
         CION(L,NY,NX)=0.0_r8
       ENDIF
     ENDIF
-! IF(L.EQ.1)THEN
-!     WRITE(*,1113)'CION',I,J,NX,NY,L,CION(L,NY,NX)
-!    2,CSTR(L,NY,NX),ZC3,ZA3,ZC2,ZA2,ZC1,ZA1,ZN,VOLW(L,NY,NX)
-!    3,ZAL(L,NY,NX),ZFE(L,NY,NX),ZNO3S(L,NY,NX),ZNO3B(L,NY,NX)
-!    4,ZOH(L,NY,NX),ZHCO3(L,NY,NX),ZCL(L,NY,NX),ZALOH4(L,NY,NX)
-!    5,ZFEOH4(L,NY,NX),ZNAC(L,NY,NX),ZNAS(L,NY,NX)
-!    6,ZKAS(L,NY,NX),H2PO4(L,NY,NX),H2POB(L,NY,NX)
-!    7,ZCA0P(L,NY,NX),ZCA0PB(L,NY,NX),ZCO3(L,NY,NX)
-! ENDIF
 !
 ! OSTWALD COEFFICIENTS FOR CO2, CH4, O2, N2, N2O, NH3 AND H2
 ! SOLUBILITY IN WATER
@@ -2131,21 +1721,6 @@ module Hour1Mod
       /(EXP(ANH3X*CSTR(L,NY,NX)))*FH2O
     SH2GL(L,NY,NX)=gas_solubility(id_h2g, TCS(L,NY,NX)) &
       /(EXP(AH2GX*CSTR(L,NY,NX)))*FH2O
-
-!    SCO2L(L,NY,NX)=SCO2X/(EXP(ACO2X*CSTR(L,NY,NX))) &
-!      *EXP(0.843_r8-0.0281_r8*TCS(L,NY,NX))*FH2O
-!    SCH4L(L,NY,NX)=SCH4X/(EXP(ACH4X*CSTR(L,NY,NX))) &
-!      *EXP(0.597_r8-0.0199_r8*TCS(L,NY,NX))*FH2O
-!    SOXYL(L,NY,NX)=SOXYX/(EXP(AOXYX*CSTR(L,NY,NX))) &
-!      *EXP(0.516_r8-0.0172_r8*TCS(L,NY,NX))*FH2O
-!    SN2GL(L,NY,NX)=SN2GX/(EXP(AN2GX*CSTR(L,NY,NX))) &
-!      *EXP(0.456_r8-0.0152_r8*TCS(L,NY,NX))*FH2O
-!    SN2OL(L,NY,NX)=SN2OX/(EXP(AN2OX*CSTR(L,NY,NX))) &
-!      *EXP(0.897_r8-0.0299_r8*TCS(L,NY,NX))*FH2O
-!    SNH3L(L,NY,NX)=SNH3X/(EXP(ANH3X*CSTR(L,NY,NX))) &
-!      *EXP(0.513_r8-0.0171_r8*TCS(L,NY,NX))*FH2O
-!    SH2GL(L,NY,NX)=SH2GX/(EXP(AH2GX*CSTR(L,NY,NX))) &
-!      *EXP(0.597_r8-0.0199_r8*TCS(L,NY,NX))*FH2O
   ENDDO
   end subroutine PrepVars4PlantMicrobeUptake
 !------------------------------------------------------------------------------------------
@@ -2178,18 +1753,18 @@ module Hour1Mod
 ! DLYR=litter thickness
 ! PSISM,PSISE=litter matric,saturation water potential
 !
-  TVOLG0=AMAX1(0.0,VOLW(0,NY,NX)+VOLI(0,NY,NX)-VOLWRX(NY,NX))
+  TVOLG0=AZMAX1(VOLW(0,NY,NX)+VOLI(0,NY,NX)-VOLWRX(NY,NX))
   VOLT(0,NY,NX)=TVOLG0+VOLR(NY,NX)
   IF(VOLT(0,NY,NX).GT.ZEROS2(NY,NX))THEN
     VOLX(0,NY,NX)=VOLT(0,NY,NX)
     BKVL(0,NY,NX)=1.82E-06_r8*ORGC(0,NY,NX)
-    VOLA(0,NY,NX)=AMAX1(0.0_r8,VOLR(NY,NX)-BKVL(0,NY,NX)/1.30_r8)
-    VOLP(0,NY,NX)=AMAX1(0.0_r8,VOLA(0,NY,NX)-VOLW(0,NY,NX)-VOLI(0,NY,NX))
+    VOLA(0,NY,NX)=AZMAX1(VOLR(NY,NX)-BKVL(0,NY,NX)/1.30_r8)
+    VOLP(0,NY,NX)=AZMAX1(VOLA(0,NY,NX)-VOLW(0,NY,NX)-VOLI(0,NY,NX))
     IF(VOLR(NY,NX).GT.ZEROS(NY,NX))THEN
       POROS(0,NY,NX)=VOLA(0,NY,NX)/VOLR(NY,NX)
-      THETW(0,NY,NX)=AMAX1(0.0_r8,AMIN1(1.0_r8,VOLW(0,NY,NX)/VOLR(NY,NX)))
-      THETI(0,NY,NX)=AMAX1(0.0_r8,AMIN1(1.0_r8,VOLI(0,NY,NX)/VOLR(NY,NX)))
-      THETP(0,NY,NX)=AMAX1(0.0_r8,AMIN1(1.0_r8,VOLP(0,NY,NX)/VOLR(NY,NX)))
+      THETW(0,NY,NX)=AZMAX1(AMIN1(1.0_r8,VOLW(0,NY,NX)/VOLR(NY,NX)))
+      THETI(0,NY,NX)=AZMAX1(AMIN1(1.0_r8,VOLI(0,NY,NX)/VOLR(NY,NX)))
+      THETP(0,NY,NX)=AZMAX1(AMIN1(1.0_r8,VOLP(0,NY,NX)/VOLR(NY,NX)))
     ELSE
       POROS(0,NY,NX)=1.0_r8
       THETW(0,NY,NX)=0.0_r8
@@ -2200,8 +1775,8 @@ module Hour1Mod
     IF(TVOLWI.GT.ZEROS(NY,NX))THEN
       VOLWRZ=VOLW(0,NY,NX)/TVOLWI*VOLWRX(NY,NX)
       VOLIRZ=VOLI(0,NY,NX)/TVOLWI*VOLWRX(NY,NX)
-      XVOLW0=AMAX1(0.0_r8,VOLW(0,NY,NX)-VOLWRZ)/AREA(3,NU(NY,NX),NY,NX)
-      XVOLI0=AMAX1(0.0_r8,VOLI(0,NY,NX)-VOLIRZ)/AREA(3,NU(NY,NX),NY,NX)
+      XVOLW0=AZMAX1(VOLW(0,NY,NX)-VOLWRZ)/AREA(3,NU(NY,NX),NY,NX)
+      XVOLI0=AZMAX1(VOLI(0,NY,NX)-VOLIRZ)/AREA(3,NU(NY,NX),NY,NX)
     ELSE
       XVOLW0=0.0_r8
       XVOLI0=0.0_r8
@@ -2214,28 +1789,26 @@ module Hour1Mod
         PSISM(0,NY,NX)=AMAX1(PSIHY,-EXP(PSIMX(NY,NX)+((FCL(0,NY,NX)-LOG(THETWR)) &
           /FCD(0,NY,NX)*PSIMD(NY,NX))))
       ELSEIF(THETWR.LT.POROS(0,NY,NX))THEN
-        PSISM(0,NY,NX)=-EXP(PSIMS(NY,NX) &
-          +(((PSL(0,NY,NX)-LOG(THETWR)) &
+        PSISM(0,NY,NX)=-EXP(PSIMS(NY,NX)+(((PSL(0,NY,NX)-LOG(THETWR)) &
           /PSD(0,NY,NX))**SRP(0,NY,NX)*PSISD(NY,NX)))
       ELSE
         PSISM(0,NY,NX)=PSISE(0,NY,NX)
       ENDIF
-      PSISO(0,NY,NX)=0.0
-      PSISH(0,NY,NX)=0.0098*(ALT(NY,NX)-CDPTH(NU(NY,NX)-1,NY,NX) &
-        +0.5*DLYR(3,0,NY,NX))
-      PSIST(0,NY,NX)=AMIN1(0.0,PSISM(0,NY,NX)+PSISO(0,NY,NX) &
-        +PSISH(0,NY,NX))
+      PSISO(0,NY,NX)=0.0_r8
+      PSISH(0,NY,NX)=0.0098_r8*(ALT(NY,NX)-CDPTH(NU(NY,NX)-1,NY,NX) &
+        +0.5_r8*DLYR(3,0,NY,NX))
+      PSIST(0,NY,NX)=AZMIN1(PSISM(0,NY,NX)+PSISO(0,NY,NX)+PSISH(0,NY,NX))
 !
 !     LITTER NH4,NH3,NO3,NO2,HPO4,H2PO4 CONCENTRATIONS
 !
 !     C*=litter solute concentrations
 !
-      CNH4S(0,NY,NX)=AMAX1(0.0,ZNH4S(0,NY,NX)/VOLW(0,NY,NX))
-      CNH3S(0,NY,NX)=AMAX1(0.0,ZNH3S(0,NY,NX)/VOLW(0,NY,NX))
-      CNO3S(0,NY,NX)=AMAX1(0.0,ZNO3S(0,NY,NX)/VOLW(0,NY,NX))
-      CNO2S(0,NY,NX)=AMAX1(0.0,ZNO2S(0,NY,NX)/VOLW(0,NY,NX))
-      CH1P4(0,NY,NX)=AMAX1(0.0,H1PO4(0,NY,NX)/VOLW(0,NY,NX))
-      CH2P4(0,NY,NX)=AMAX1(0.0,H2PO4(0,NY,NX)/VOLW(0,NY,NX))
+      CNH4S(0,NY,NX)=AZMAX1(ZNH4S(0,NY,NX)/VOLW(0,NY,NX))
+      CNH3S(0,NY,NX)=AZMAX1(ZNH3S(0,NY,NX)/VOLW(0,NY,NX))
+      CNO3S(0,NY,NX)=AZMAX1(ZNO3S(0,NY,NX)/VOLW(0,NY,NX))
+      CNO2S(0,NY,NX)=AZMAX1(ZNO2S(0,NY,NX)/VOLW(0,NY,NX))
+      CH1P4(0,NY,NX)=AZMAX1(H1PO4(0,NY,NX)/VOLW(0,NY,NX))
+      CH2P4(0,NY,NX)=AZMAX1(H2PO4(0,NY,NX)/VOLW(0,NY,NX))
     ELSE
       PSISM(0,NY,NX)=PSISM(NU(NY,NX),NY,NX)
       CNH4S(0,NY,NX)=0.0_r8
@@ -2246,29 +1819,29 @@ module Hour1Mod
       CH2P4(0,NY,NX)=0.0_r8
     ENDIF
   ELSE
-    VOLX(0,NY,NX)=0.0
-    BKVL(0,NY,NX)=0.0
-    VOLA(0,NY,NX)=0.0
-    VOLP(0,NY,NX)=0.0
+    VOLX(0,NY,NX)=0.0_r8
+    BKVL(0,NY,NX)=0.0_r8
+    VOLA(0,NY,NX)=0.0_r8
+    VOLP(0,NY,NX)=0.0_r8
     POROS(0,NY,NX)=1.0
-    DLYR(3,0,NY,NX)=0.0
-    THETW(0,NY,NX)=0.0
-    THETI(0,NY,NX)=0.0
+    DLYR(3,0,NY,NX)=0.0_r8
+    THETW(0,NY,NX)=0.0_r8
+    THETI(0,NY,NX)=0.0_r8
     THETP(0,NY,NX)=1.0
-    VOLWRX(NY,NX)=0.0
+    VOLWRX(NY,NX)=0.0_r8
     PSISM(0,NY,NX)=PSISM(NU(NY,NX),NY,NX)
-    CNH4S(0,NY,NX)=0.0
-    CNH3S(0,NY,NX)=0.0
-    CNO3S(0,NY,NX)=0.0
-    CNO2S(0,NY,NX)=0.0
-    CH1P4(0,NY,NX)=0.0
-    CH2P4(0,NY,NX)=0.0
-    CCO2S(0,NY,NX)=0.0
-    CCH4S(0,NY,NX)=0.0
-    COXYS(0,NY,NX)=0.0
-    CZ2GS(0,NY,NX)=0.0
-    CZ2OS(0,NY,NX)=0.0
-    CH2GS(0,NY,NX)=0.0
+    CNH4S(0,NY,NX)=0.0_r8
+    CNH3S(0,NY,NX)=0.0_r8
+    CNO3S(0,NY,NX)=0.0_r8
+    CNO2S(0,NY,NX)=0.0_r8
+    CH1P4(0,NY,NX)=0.0_r8
+    CH2P4(0,NY,NX)=0.0_r8
+    CCO2S(0,NY,NX)=0.0_r8
+    CCH4S(0,NY,NX)=0.0_r8
+    COXYS(0,NY,NX)=0.0_r8
+    CZ2GS(0,NY,NX)=0.0_r8
+    CZ2OS(0,NY,NX)=0.0_r8
+    CH2GS(0,NY,NX)=0.0_r8
   ENDIF
   end subroutine GetSurfResidualProperties
 
@@ -2331,8 +1904,8 @@ module Hour1Mod
         ZNHU0(L,NY,NX)=1.0
         ZNHUI(L,NY,NX)=1.0
       ELSE
-        ZNHU0(L,NY,NX)=0.0
-        ZNHUI(L,NY,NX)=0.0
+        ZNHU0(L,NY,NX)=0.0_r8
+        ZNHUI(L,NY,NX)=0.0_r8
       ENDIF
 9964  CONTINUE
   ENDIF
@@ -2342,8 +1915,8 @@ module Hour1Mod
         ZNFN0(L,NY,NX)=1.0
         ZNFNI(L,NY,NX)=1.0
       ELSE
-        ZNFN0(L,NY,NX)=0.0
-        ZNFNI(L,NY,NX)=0.0
+        ZNFN0(L,NY,NX)=0.0_r8
+        ZNFNI(L,NY,NX)=0.0_r8
       ENDIF
 9965  CONTINUE
   ENDIF
@@ -2509,9 +2082,9 @@ module Hour1Mod
       ELSE
         CORGCX=0.55E+06
       ENDIF
-      OSCX=0.0
-      OSNX=0.0
-      OSPX=0.0
+      OSCX=0.0_r8
+      OSNX=0.0_r8
+      OSPX=0.0_r8
 !
 !     BIOMASSES OF MICROBIAL POPULATIONS IN RESIDUE
 !
@@ -2522,9 +2095,9 @@ module Hour1Mod
       DO 2960 N=1,NFGs
         DO NGL=1,JG
           DO 2961 M=1,3
-            OMC1=AMAX1(0.0,AMIN1(OSCI*micpar%OMCI(M+(NGL-1)*3,K)*micpar%OMCF(N),OSCI-OSCX))
-            OMN1=AMAX1(0.0,AMIN1(OMC1*micpar%CNOMC(M,NGL,N,K),OSNI-OSNX))
-            OMP1=AMAX1(0.0,AMIN1(OMC1*micpar%CPOMC(M,NGL,N,K),OSPI-OSPX))
+            OMC1=AZMAX1(AMIN1(OSCI*micpar%OMCI(M+(NGL-1)*3,K)*micpar%OMCF(N),OSCI-OSCX))
+            OMN1=AZMAX1(AMIN1(OMC1*micpar%CNOMC(M,NGL,N,K),OSNI-OSNX))
+            OMP1=AZMAX1(AMIN1(OMC1*micpar%CPOMC(M,NGL,N,K),OSPI-OSPX))
             OMC(M,NGL,N,K,LFDPTH,NY,NX)=OMC(M,NGL,N,K,LFDPTH,NY,NX)+OMC1
             OMN(M,NGL,N,K,LFDPTH,NY,NX)=OMN(M,NGL,N,K,LFDPTH,NY,NX)+OMN1
             OMP(M,NGL,N,K,LFDPTH,NY,NX)=OMP(M,NGL,N,K,LFDPTH,NY,NX)+OMP1
@@ -2564,11 +2137,11 @@ module Hour1Mod
       OSCX=OSCX+OQC1
       OSNX=OSNX+OQN1
       OSPX=OSPX+OQP1
-      CNOFT=0.0
-      CPOFT=0.0
+      CNOFT=0.0_r8
+      CPOFT=0.0_r8
       IF(OSCI-OSCX.GT.ZEROS(NY,NX))THEN
-        RNT=0.0
-        RPT=0.0
+        RNT=0.0_r8
+        RPT=0.0_r8
         DO 965 M=1,jsken
           RNT=RNT+(OSCI-OSCX)*CFOSC(M,K,LFDPTH,NY,NX)*micpar%CNOFC(M,K)
           RPT=RPT+(OSCI-OSCX)*CFOSC(M,K,LFDPTH,NY,NX)*micpar%CPOFC(M,K)
@@ -2583,8 +2156,8 @@ module Hour1Mod
 970     CONTINUE
       ELSE
         DO 975 M=1,jsken
-          CNOF(M)=0.0
-          CPOF(M)=0.0
+          CNOF(M)=0.0_r8
+          CPOF(M)=0.0_r8
 975     CONTINUE
       ENDIF
       DO 2970 M=1,jsken
@@ -2592,12 +2165,12 @@ module Hour1Mod
         IF(CNOFT.GT.ZERO)THEN
           OSN1=CFOSC(M,K,LFDPTH,NY,NX)*CNOF(M)/CNOFT*(OSNI-OSNX)
         ELSE
-          OSN1=0.0
+          OSN1=0.0_r8
         ENDIF
         IF(CPOFT.GT.ZERO)THEN
           OSP1=CFOSC(M,K,LFDPTH,NY,NX)*CPOF(M)/CPOFT*(OSPI-OSPX)
         ELSE
-          OSP1=0.0
+          OSP1=0.0_r8
         ENDIF
         OSC(M,K,LFDPTH,NY,NX)=OSC(M,K,LFDPTH,NY,NX)+OSC1
         DO NGL=1,JG
@@ -2726,19 +2299,19 @@ module Hour1Mod
       DO 50 L=NUI(NY,NX),JZ
         IF(L.LT.LFDPTH)THEN
           DPNHB(L,NY,NX)=DLYR(3,L,NY,NX)
-          WDNHB(L,NY,NX)=0.0
+          WDNHB(L,NY,NX)=0.0_r8
         ELSEIF(L.EQ.LFDPTH)THEN
           DPNHB(L,NY,NX)=AMAX1(0.025,FDPTHF-CDPTH(L-1,NY,NX))
           WDNHB(L,NY,NX)=AMIN1(0.025,ROWN(NY,NX))
         ELSE
-          DPNHB(L,NY,NX)=0.0
-          WDNHB(L,NY,NX)=0.0
+          DPNHB(L,NY,NX)=0.0_r8
+          WDNHB(L,NY,NX)=0.0_r8
         ENDIF
         IF(DLYR(3,L,NY,NX).GT.ZERO2)THEN
           VLNHB(L,NY,NX)=AMIN1(0.999,WDNHB(L,NY,NX)/ROWN(NY,NX) &
             *DPNHB(L,NY,NX)/DLYR(3,L,NY,NX))
         ELSE
-          VLNHB(L,NY,NX)=0.0
+          VLNHB(L,NY,NX)=0.0_r8
         ENDIF
         VLNH4(L,NY,NX)=1.0-VLNHB(L,NY,NX)
         ZNH4T=ZNH4S(L,NY,NX)+ZNH4B(L,NY,NX)
@@ -2768,19 +2341,19 @@ module Hour1Mod
       DO 45 L=NUI(NY,NX),JZ
         IF(L.LT.LFDPTH)THEN
           DPNOB(L,NY,NX)=DLYR(3,L,NY,NX)
-          WDNOB(L,NY,NX)=0.0
+          WDNOB(L,NY,NX)=0.0_r8
         ELSEIF(L.EQ.LFDPTH)THEN
           DPNOB(L,NY,NX)=AMAX1(0.01,FDPTHF-CDPTH(L-1,NY,NX))
           WDNOB(L,NY,NX)=AMIN1(0.01,ROWO(NY,NX))
         ELSE
-          DPNOB(L,NY,NX)=0.0
-          WDNOB(L,NY,NX)=0.0
+          DPNOB(L,NY,NX)=0.0_r8
+          WDNOB(L,NY,NX)=0.0_r8
         ENDIF
         IF(DLYR(3,L,NY,NX).GT.ZERO2)THEN
           VLNOB(L,NY,NX)=AMIN1(0.999,WDNOB(L,NY,NX)/ROWO(NY,NX) &
             *DPNOB(L,NY,NX)/DLYR(3,L,NY,NX))
         ELSE
-          VLNOB(L,NY,NX)=0.0
+          VLNOB(L,NY,NX)=0.0_r8
         ENDIF
         VLNO3(L,NY,NX)=1.0-VLNOB(L,NY,NX)
         ZNO3T=ZNO3S(L,NY,NX)+ZNO3B(L,NY,NX)
@@ -2812,14 +2385,14 @@ module Hour1Mod
           DPPOB(L,NY,NX)=AMAX1(0.01,FDPTHF-CDPTH(L-1,NY,NX))
           WDPOB(L,NY,NX)=AMIN1(0.01,ROWP(NY,NX))
         ELSE
-          DPPOB(L,NY,NX)=0.0
-          WDPOB(L,NY,NX)=0.0
+          DPPOB(L,NY,NX)=0.0_r8
+          WDPOB(L,NY,NX)=0.0_r8
         ENDIF
         IF(DLYR(3,L,NY,NX).GT.ZERO2)THEN
           VLPOB(L,NY,NX)=AMIN1(0.999,WDPOB(L,NY,NX)/ROWP(NY,NX) &
           *DPPOB(L,NY,NX)/DLYR(3,L,NY,NX))
         ELSE
-          VLPOB(L,NY,NX)=0.0
+          VLPOB(L,NY,NX)=0.0_r8
         ENDIF
         VLPO4(L,NY,NX)=1.0-VLPOB(L,NY,NX)
         H0PO4T=H0PO4(L,NY,NX)+H0POB(L,NY,NX)
@@ -2972,14 +2545,14 @@ module Hour1Mod
 
   IF(VOLX(L,NY,NX).LE.ZEROS(NY,NX))THEN
     THETW(L,NY,NX)=POROS(L,NY,NX)
-    THETI(L,NY,NX)=0.0
-    THETP(L,NY,NX)=0.0
+    THETI(L,NY,NX)=0.0_r8
+    THETP(L,NY,NX)=0.0_r8
   ELSE
-    THETW(L,NY,NX)=AMAX1(0.0,AMIN1(POROS(L,NY,NX),VOLW(L,NY,NX)/VOLY(L,NY,NX)))
-    THETI(L,NY,NX)=AMAX1(0.0,AMIN1(POROS(L,NY,NX),VOLI(L,NY,NX)/VOLY(L,NY,NX)))
-    THETP(L,NY,NX)=AMAX1(0.0,VOLP(L,NY,NX)/VOLY(L,NY,NX))
+    THETW(L,NY,NX)=AZMAX1(AMIN1(POROS(L,NY,NX),VOLW(L,NY,NX)/VOLY(L,NY,NX)))
+    THETI(L,NY,NX)=AZMAX1(AMIN1(POROS(L,NY,NX),VOLI(L,NY,NX)/VOLY(L,NY,NX)))
+    THETP(L,NY,NX)=AZMAX1(VOLP(L,NY,NX)/VOLY(L,NY,NX))
   ENDIF
-  THETPZ(L,NY,NX)=AMAX1(0.0,POROS(L,NY,NX)-THETW(L,NY,NX)-THETI(L,NY,NX))
+  THETPZ(L,NY,NX)=AZMAX1(POROS(L,NY,NX)-THETW(L,NY,NX)-THETI(L,NY,NX))
 !     IF(L.EQ.7)THEN
 !     WRITE(*,1117)'BKDS',I,J,L
 !    3,BKDS(L,NY,NX),BKDSI(L,NY,NX),BKVL(L,NY,NX)
@@ -2999,36 +2572,36 @@ module Hour1Mod
 !     C*S=soil gas aqueous concentration
 !
   IF(THETP(L,NY,NX).GT.THETX)THEN
-    CCO2G(L,NY,NX)=AMAX1(0.0,CO2G(L,NY,NX)/VOLP(L,NY,NX))
-    CCH4G(L,NY,NX)=AMAX1(0.0,CH4G(L,NY,NX)/VOLP(L,NY,NX))
-    COXYG(L,NY,NX)=AMAX1(0.0,OXYG(L,NY,NX)/VOLP(L,NY,NX))
-    CZ2GG(L,NY,NX)=AMAX1(0.0,Z2GG(L,NY,NX)/VOLP(L,NY,NX))
-    CZ2OG(L,NY,NX)=AMAX1(0.0,Z2OG(L,NY,NX)/VOLP(L,NY,NX))
-    CNH3G(L,NY,NX)=AMAX1(0.0,ZNH3G(L,NY,NX)/VOLP(L,NY,NX))
-    CH2GG(L,NY,NX)=AMAX1(0.0,H2GG(L,NY,NX)/VOLP(L,NY,NX))
+    CCO2G(L,NY,NX)=AZMAX1(CO2G(L,NY,NX)/VOLP(L,NY,NX))
+    CCH4G(L,NY,NX)=AZMAX1(CH4G(L,NY,NX)/VOLP(L,NY,NX))
+    COXYG(L,NY,NX)=AZMAX1(OXYG(L,NY,NX)/VOLP(L,NY,NX))
+    CZ2GG(L,NY,NX)=AZMAX1(Z2GG(L,NY,NX)/VOLP(L,NY,NX))
+    CZ2OG(L,NY,NX)=AZMAX1(Z2OG(L,NY,NX)/VOLP(L,NY,NX))
+    CNH3G(L,NY,NX)=AZMAX1(ZNH3G(L,NY,NX)/VOLP(L,NY,NX))
+    CH2GG(L,NY,NX)=AZMAX1(H2GG(L,NY,NX)/VOLP(L,NY,NX))
   ELSE
-    CCO2G(L,NY,NX)=0.0
-    CCH4G(L,NY,NX)=0.0
-    COXYG(L,NY,NX)=0.0
-    CZ2GG(L,NY,NX)=0.0
-    CZ2OG(L,NY,NX)=0.0
-    CNH3G(L,NY,NX)=0.0
-    CH2GG(L,NY,NX)=0.0
+    CCO2G(L,NY,NX)=0.0_r8
+    CCH4G(L,NY,NX)=0.0_r8
+    COXYG(L,NY,NX)=0.0_r8
+    CZ2GG(L,NY,NX)=0.0_r8
+    CZ2OG(L,NY,NX)=0.0_r8
+    CNH3G(L,NY,NX)=0.0_r8
+    CH2GG(L,NY,NX)=0.0_r8
   ENDIF
   IF(VOLW(L,NY,NX).GT.ZEROS2(NY,NX))THEN
-    CCO2S(L,NY,NX)=AMAX1(0.0,CO2S(L,NY,NX)/VOLW(L,NY,NX))
-    CCH4S(L,NY,NX)=AMAX1(0.0,CH4S(L,NY,NX)/VOLW(L,NY,NX))
-    COXYS(L,NY,NX)=AMAX1(0.0,OXYS(L,NY,NX)/VOLW(L,NY,NX))
-    CZ2GS(L,NY,NX)=AMAX1(0.0,Z2GS(L,NY,NX)/VOLW(L,NY,NX))
-    CZ2OS(L,NY,NX)=AMAX1(0.0,Z2OS(L,NY,NX)/VOLW(L,NY,NX))
-    CH2GS(L,NY,NX)=AMAX1(0.0,H2GS(L,NY,NX)/VOLW(L,NY,NX))
+    CCO2S(L,NY,NX)=AZMAX1(CO2S(L,NY,NX)/VOLW(L,NY,NX))
+    CCH4S(L,NY,NX)=AZMAX1(CH4S(L,NY,NX)/VOLW(L,NY,NX))
+    COXYS(L,NY,NX)=AZMAX1(OXYS(L,NY,NX)/VOLW(L,NY,NX))
+    CZ2GS(L,NY,NX)=AZMAX1(Z2GS(L,NY,NX)/VOLW(L,NY,NX))
+    CZ2OS(L,NY,NX)=AZMAX1(Z2OS(L,NY,NX)/VOLW(L,NY,NX))
+    CH2GS(L,NY,NX)=AZMAX1(H2GS(L,NY,NX)/VOLW(L,NY,NX))
   ELSE
-    CCO2S(L,NY,NX)=0.0
-    CCH4S(L,NY,NX)=0.0
-    COXYS(L,NY,NX)=0.0
-    CZ2GS(L,NY,NX)=0.0
-    CZ2OS(L,NY,NX)=0.0
-    CH2GS(L,NY,NX)=0.0
+    CCO2S(L,NY,NX)=0.0_r8
+    CCH4S(L,NY,NX)=0.0_r8
+    COXYS(L,NY,NX)=0.0_r8
+    CZ2GS(L,NY,NX)=0.0_r8
+    CZ2OS(L,NY,NX)=0.0_r8
+    CH2GS(L,NY,NX)=0.0_r8
   ENDIF
 !
 !     CORGC=SOC concentration
@@ -3036,7 +2609,7 @@ module Hour1Mod
   IF(BKVL(L,NY,NX).GT.ZEROS(NY,NX))THEN
     CORGC(L,NY,NX)=AMIN1(0.55E+06,ORGC(L,NY,NX)/BKVL(L,NY,NX))
   ELSE
-    CORGC(L,NY,NX)=0.0
+    CORGC(L,NY,NX)=0.0_r8
   ENDIF
   ENDDO
   end subroutine GetChemicalConcsInSoil
@@ -3049,204 +2622,204 @@ module Hour1Mod
   integer :: K,L
 !     begin_execution
   DO L=NUI(NY,NX),NLI(NY,NX)
-  FINH(L,NY,NX)=0.0
-  TCO2S(L,NY,NX)=0.0
-  TCO2P(L,NY,NX)=0.0
-  TCOFLA(L,NY,NX)=0.0
-  TCHFLA(L,NY,NX)=0.0
-  TLCO2P(L,NY,NX)=0.0
-  TUPOXP(L,NY,NX)=0.0
-  TUPOXS(L,NY,NX)=0.0
-  TUPCHS(L,NY,NX)=0.0
-  TUPN2S(L,NY,NX)=0.0
-  TUPN3S(L,NY,NX)=0.0
-  TUPN3B(L,NY,NX)=0.0
-  TUPHGS(L,NY,NX)=0.0
-  TOXFLA(L,NY,NX)=0.0
-  TCHFLA(L,NY,NX)=0.0
-  TN2FLA(L,NY,NX)=0.0
-  TNHFLA(L,NY,NX)=0.0
-  THGFLA(L,NY,NX)=0.0
-  TLOXYP(L,NY,NX)=0.0
-  TLCH4P(L,NY,NX)=0.0
-  TLN2OP(L,NY,NX)=0.0
-  TLNH3P(L,NY,NX)=0.0
-  TLH2GP(L,NY,NX)=0.0
-  TUPNH4(L,NY,NX)=0.0
-  TUPNO3(L,NY,NX)=0.0
-  TUPH2P(L,NY,NX)=0.0
-  TUPH1P(L,NY,NX)=0.0
-  TUPNHB(L,NY,NX)=0.0
-  TUPNOB(L,NY,NX)=0.0
-  TUPH2B(L,NY,NX)=0.0
-  TUPH1B(L,NY,NX)=0.0
-  TUPNF(L,NY,NX)=0.0
-  TRN4B(L,NY,NX)=0.0
-  TRN3B(L,NY,NX)=0.0
-  TRNOB(L,NY,NX)=0.0
-  TRN2B(L,NY,NX)=0.0
-  TRH1B(L,NY,NX)=0.0
-  TRH2B(L,NY,NX)=0.0
-  TRAL(L,NY,NX)=0.0
-  TRFE(L,NY,NX)=0.0
-  TRHY(L,NY,NX)=0.0
-  TRCA(L,NY,NX)=0.0
-  TRMG(L,NY,NX)=0.0
-  TRNA(L,NY,NX)=0.0
-  TRKA(L,NY,NX)=0.0
-  TROH(L,NY,NX)=0.0
-  TRSO4(L,NY,NX)=0.0
-  TRCO3(L,NY,NX)=0.0
-  TRHCO(L,NY,NX)=0.0
-  TRCO2(L,NY,NX)=0.0
-  TBCO2(L,NY,NX)=0.0
-  TRAL1(L,NY,NX)=0.0
-  TRAL2(L,NY,NX)=0.0
-  TRAL3(L,NY,NX)=0.0
-  TRAL4(L,NY,NX)=0.0
-  TRALS(L,NY,NX)=0.0
-  TRFE1(L,NY,NX)=0.0
-  TRFE2(L,NY,NX)=0.0
-  TRFE3(L,NY,NX)=0.0
-  TRFE4(L,NY,NX)=0.0
-  TRFES(L,NY,NX)=0.0
-  TRCAO(L,NY,NX)=0.0
-  TRCAC(L,NY,NX)=0.0
-  TRCAH(L,NY,NX)=0.0
-  TRCAS(L,NY,NX)=0.0
-  TRMGO(L,NY,NX)=0.0
-  TRMGC(L,NY,NX)=0.0
-  TRMGH(L,NY,NX)=0.0
-  TRMGS(L,NY,NX)=0.0
-  TRNAC(L,NY,NX)=0.0
-  TRNAS(L,NY,NX)=0.0
-  TRKAS(L,NY,NX)=0.0
-  TRH0P(L,NY,NX)=0.0
-  TRH3P(L,NY,NX)=0.0
-  TRC0P(L,NY,NX)=0.0
-  TRF1P(L,NY,NX)=0.0
-  TRF2P(L,NY,NX)=0.0
-  TRC1P(L,NY,NX)=0.0
-  TRC2P(L,NY,NX)=0.0
-  TRM1P(L,NY,NX)=0.0
-  TRH0B(L,NY,NX)=0.0
-  TRH3B(L,NY,NX)=0.0
-  TRF1B(L,NY,NX)=0.0
-  TRF2B(L,NY,NX)=0.0
-  TRC0B(L,NY,NX)=0.0
-  TRC1B(L,NY,NX)=0.0
-  TRC2B(L,NY,NX)=0.0
-  TRM1B(L,NY,NX)=0.0
-  TRXNB(L,NY,NX)=0.0
-  TRXHY(L,NY,NX)=0.0
-  TRXAL(L,NY,NX)=0.0
-  TRXFE(L,NY,NX)=0.0
-  TRXCA(L,NY,NX)=0.0
-  TRXMG(L,NY,NX)=0.0
-  TRXNA(L,NY,NX)=0.0
-  TRXKA(L,NY,NX)=0.0
-  TRXHC(L,NY,NX)=0.0
-  TRXAL2(L,NY,NX)=0.0
-  TRXFE2(L,NY,NX)=0.0
-  TRBH0(L,NY,NX)=0.0
-  TRBH1(L,NY,NX)=0.0
-  TRBH2(L,NY,NX)=0.0
-  TRB1P(L,NY,NX)=0.0
-  TRB2P(L,NY,NX)=0.0
-  TRALOH(L,NY,NX)=0.0
-  TRFEOH(L,NY,NX)=0.0
-  TRCACO(L,NY,NX)=0.0
-  TRCASO(L,NY,NX)=0.0
-  TRALPB(L,NY,NX)=0.0
-  TRFEPB(L,NY,NX)=0.0
-  TRCPDB(L,NY,NX)=0.0
-  TRCPHB(L,NY,NX)=0.0
-  TRCPMB(L,NY,NX)=0.0
-  XCOFXS(L,NY,NX)=0.0
-  XCHFXS(L,NY,NX)=0.0
-  XOXFXS(L,NY,NX)=0.0
-  XNGFXS(L,NY,NX)=0.0
-  XN2FXS(L,NY,NX)=0.0
-  XHGFXS(L,NY,NX)=0.0
-  XN4FXW(L,NY,NX)=0.0
-  XN3FXW(L,NY,NX)=0.0
-  XNOFXW(L,NY,NX)=0.0
-  XNXFXS(L,NY,NX)=0.0
-  XH1PXS(L,NY,NX)=0.0
-  XH2PXS(L,NY,NX)=0.0
-  XN4FXB(L,NY,NX)=0.0
-  XN3FXB(L,NY,NX)=0.0
-  XNOFXB(L,NY,NX)=0.0
-  XNXFXB(L,NY,NX)=0.0
-  XH1BXB(L,NY,NX)=0.0
-  XH2BXB(L,NY,NX)=0.0
-  XALFXS(L,NY,NX)=0.0
-  XFEFXS(L,NY,NX)=0.0
-  XHYFXS(L,NY,NX)=0.0
-  XCAFXS(L,NY,NX)=0.0
-  XMGFXS(L,NY,NX)=0.0
-  XNAFXS(L,NY,NX)=0.0
-  XKAFXS(L,NY,NX)=0.0
-  XOHFXS(L,NY,NX)=0.0
-  XSOFXS(L,NY,NX)=0.0
-  XCLFXS(L,NY,NX)=0.0
-  XC3FXS(L,NY,NX)=0.0
-  XHCFXS(L,NY,NX)=0.0
-  XAL1XS(L,NY,NX)=0.0
-  XAL2XS(L,NY,NX)=0.0
-  XAL3XS(L,NY,NX)=0.0
-  XAL4XS(L,NY,NX)=0.0
-  XALSXS(L,NY,NX)=0.0
-  XFE1XS(L,NY,NX)=0.0
-  XFE2XS(L,NY,NX)=0.0
-  XFE3XS(L,NY,NX)=0.0
-  XFE4XS(L,NY,NX)=0.0
-  XFESXS(L,NY,NX)=0.0
-  XCAOXS(L,NY,NX)=0.0
-  XCACXS(L,NY,NX)=0.0
-  XCAHXS(L,NY,NX)=0.0
-  XCASXS(L,NY,NX)=0.0
-  XMGOXS(L,NY,NX)=0.0
-  XMGCXS(L,NY,NX)=0.0
-  XMGHXS(L,NY,NX)=0.0
-  XMGSXS(L,NY,NX)=0.0
-  XNACXS(L,NY,NX)=0.0
-  XNASXS(L,NY,NX)=0.0
-  XKASXS(L,NY,NX)=0.0
-  XH0PXS(L,NY,NX)=0.0
-  XH3PXS(L,NY,NX)=0.0
-  XF1PXS(L,NY,NX)=0.0
-  XF2PXS(L,NY,NX)=0.0
-  XC0PXS(L,NY,NX)=0.0
-  XC1PXS(L,NY,NX)=0.0
-  XC2PXS(L,NY,NX)=0.0
-  XM1PXS(L,NY,NX)=0.0
-  XH0BXB(L,NY,NX)=0.0
-  XH3BXB(L,NY,NX)=0.0
-  XF1BXB(L,NY,NX)=0.0
-  XF2BXB(L,NY,NX)=0.0
-  XC0BXB(L,NY,NX)=0.0
-  XC1BXB(L,NY,NX)=0.0
-  XC2BXB(L,NY,NX)=0.0
-  XM1BXB(L,NY,NX)=0.0
-  DO 9955 K=0,jcplx1
-    XOCFXS(K,L,NY,NX)=0.0
-    XONFXS(K,L,NY,NX)=0.0
-    XOPFXS(K,L,NY,NX)=0.0
-    XOAFXS(K,L,NY,NX)=0.0
-9955  CONTINUE
-  THAW(L,NY,NX)=0.0
-  THAWH(L,NY,NX)=0.0
-  HTHAW(L,NY,NX)=0.0
-  XCOBBL(L,NY,NX)=0.0
-  XCHBBL(L,NY,NX)=0.0
-  XOXBBL(L,NY,NX)=0.0
-  XNGBBL(L,NY,NX)=0.0
-  XN2BBL(L,NY,NX)=0.0
-  XN3BBL(L,NY,NX)=0.0
-  XNBBBL(L,NY,NX)=0.0
-  XHGBBL(L,NY,NX)=0.0
-  RTDNT(L,NY,NX)=0.0
+    FINH(L,NY,NX)=0.0_r8
+    TCO2S(L,NY,NX)=0.0_r8
+    TCO2P(L,NY,NX)=0.0_r8
+    TCOFLA(L,NY,NX)=0.0_r8
+    TCHFLA(L,NY,NX)=0.0_r8
+    TLCO2P(L,NY,NX)=0.0_r8
+    TUPOXP(L,NY,NX)=0.0_r8
+    TUPOXS(L,NY,NX)=0.0_r8
+    TUPCHS(L,NY,NX)=0.0_r8
+    TUPN2S(L,NY,NX)=0.0_r8
+    TUPN3S(L,NY,NX)=0.0_r8
+    TUPN3B(L,NY,NX)=0.0_r8
+    TUPHGS(L,NY,NX)=0.0_r8
+    TOXFLA(L,NY,NX)=0.0_r8
+    TCHFLA(L,NY,NX)=0.0_r8
+    TN2FLA(L,NY,NX)=0.0_r8
+    TNHFLA(L,NY,NX)=0.0_r8
+    THGFLA(L,NY,NX)=0.0_r8
+    TLOXYP(L,NY,NX)=0.0_r8
+    TLCH4P(L,NY,NX)=0.0_r8
+    TLN2OP(L,NY,NX)=0.0_r8
+    TLNH3P(L,NY,NX)=0.0_r8
+    TLH2GP(L,NY,NX)=0.0_r8
+    TUPNH4(L,NY,NX)=0.0_r8
+    TUPNO3(L,NY,NX)=0.0_r8
+    TUPH2P(L,NY,NX)=0.0_r8
+    TUPH1P(L,NY,NX)=0.0_r8
+    TUPNHB(L,NY,NX)=0.0_r8
+    TUPNOB(L,NY,NX)=0.0_r8
+    TUPH2B(L,NY,NX)=0.0_r8
+    TUPH1B(L,NY,NX)=0.0_r8
+    TUPNF(L,NY,NX)=0.0_r8
+    TRN4B(L,NY,NX)=0.0_r8
+    TRN3B(L,NY,NX)=0.0_r8
+    TRNOB(L,NY,NX)=0.0_r8
+    TRN2B(L,NY,NX)=0.0_r8
+    TRH1B(L,NY,NX)=0.0_r8
+    TRH2B(L,NY,NX)=0.0_r8
+    TRAL(L,NY,NX)=0.0_r8
+    TRFE(L,NY,NX)=0.0_r8
+    TRHY(L,NY,NX)=0.0_r8
+    TRCA(L,NY,NX)=0.0_r8
+    TRMG(L,NY,NX)=0.0_r8
+    TRNA(L,NY,NX)=0.0_r8
+    TRKA(L,NY,NX)=0.0_r8
+    TROH(L,NY,NX)=0.0_r8
+    TRSO4(L,NY,NX)=0.0_r8
+    TRCO3(L,NY,NX)=0.0_r8
+    TRHCO(L,NY,NX)=0.0_r8
+    TRCO2(L,NY,NX)=0.0_r8
+    TBCO2(L,NY,NX)=0.0_r8
+    TRAL1(L,NY,NX)=0.0_r8
+    TRAL2(L,NY,NX)=0.0_r8
+    TRAL3(L,NY,NX)=0.0_r8
+    TRAL4(L,NY,NX)=0.0_r8
+    TRALS(L,NY,NX)=0.0_r8
+    TRFE1(L,NY,NX)=0.0_r8
+    TRFE2(L,NY,NX)=0.0_r8
+    TRFE3(L,NY,NX)=0.0_r8
+    TRFE4(L,NY,NX)=0.0_r8
+    TRFES(L,NY,NX)=0.0_r8
+    TRCAO(L,NY,NX)=0.0_r8
+    TRCAC(L,NY,NX)=0.0_r8
+    TRCAH(L,NY,NX)=0.0_r8
+    TRCAS(L,NY,NX)=0.0_r8
+    TRMGO(L,NY,NX)=0.0_r8
+    TRMGC(L,NY,NX)=0.0_r8
+    TRMGH(L,NY,NX)=0.0_r8
+    TRMGS(L,NY,NX)=0.0_r8
+    TRNAC(L,NY,NX)=0.0_r8
+    TRNAS(L,NY,NX)=0.0_r8
+    TRKAS(L,NY,NX)=0.0_r8
+    TRH0P(L,NY,NX)=0.0_r8
+    TRH3P(L,NY,NX)=0.0_r8
+    TRC0P(L,NY,NX)=0.0_r8
+    TRF1P(L,NY,NX)=0.0_r8
+    TRF2P(L,NY,NX)=0.0_r8
+    TRC1P(L,NY,NX)=0.0_r8
+    TRC2P(L,NY,NX)=0.0_r8
+    TRM1P(L,NY,NX)=0.0_r8
+    TRH0B(L,NY,NX)=0.0_r8
+    TRH3B(L,NY,NX)=0.0_r8
+    TRF1B(L,NY,NX)=0.0_r8
+    TRF2B(L,NY,NX)=0.0_r8
+    TRC0B(L,NY,NX)=0.0_r8
+    TRC1B(L,NY,NX)=0.0_r8
+    TRC2B(L,NY,NX)=0.0_r8
+    TRM1B(L,NY,NX)=0.0_r8
+    TRXNB(L,NY,NX)=0.0_r8
+    TRXHY(L,NY,NX)=0.0_r8
+    TRXAL(L,NY,NX)=0.0_r8
+    TRXFE(L,NY,NX)=0.0_r8
+    TRXCA(L,NY,NX)=0.0_r8
+    TRXMG(L,NY,NX)=0.0_r8
+    TRXNA(L,NY,NX)=0.0_r8
+    TRXKA(L,NY,NX)=0.0_r8
+    TRXHC(L,NY,NX)=0.0_r8
+    TRXAL2(L,NY,NX)=0.0_r8
+    TRXFE2(L,NY,NX)=0.0_r8
+    TRBH0(L,NY,NX)=0.0_r8
+    TRBH1(L,NY,NX)=0.0_r8
+    TRBH2(L,NY,NX)=0.0_r8
+    TRB1P(L,NY,NX)=0.0_r8
+    TRB2P(L,NY,NX)=0.0_r8
+    TRALOH(L,NY,NX)=0.0_r8
+    TRFEOH(L,NY,NX)=0.0_r8
+    TRCACO(L,NY,NX)=0.0_r8
+    TRCASO(L,NY,NX)=0.0_r8
+    TRALPB(L,NY,NX)=0.0_r8
+    TRFEPB(L,NY,NX)=0.0_r8
+    TRCPDB(L,NY,NX)=0.0_r8
+    TRCPHB(L,NY,NX)=0.0_r8
+    TRCPMB(L,NY,NX)=0.0_r8
+    XCOFXS(L,NY,NX)=0.0_r8
+    XCHFXS(L,NY,NX)=0.0_r8
+    XOXFXS(L,NY,NX)=0.0_r8
+    XNGFXS(L,NY,NX)=0.0_r8
+    XN2FXS(L,NY,NX)=0.0_r8
+    XHGFXS(L,NY,NX)=0.0_r8
+    XN4FXW(L,NY,NX)=0.0_r8
+    XN3FXW(L,NY,NX)=0.0_r8
+    XNOFXW(L,NY,NX)=0.0_r8
+    XNXFXS(L,NY,NX)=0.0_r8
+    XH1PXS(L,NY,NX)=0.0_r8
+    XH2PXS(L,NY,NX)=0.0_r8
+    XN4FXB(L,NY,NX)=0.0_r8
+    XN3FXB(L,NY,NX)=0.0_r8
+    XNOFXB(L,NY,NX)=0.0_r8
+    XNXFXB(L,NY,NX)=0.0_r8
+    XH1BXB(L,NY,NX)=0.0_r8
+    XH2BXB(L,NY,NX)=0.0_r8
+    XALFXS(L,NY,NX)=0.0_r8
+    XFEFXS(L,NY,NX)=0.0_r8
+    XHYFXS(L,NY,NX)=0.0_r8
+    XCAFXS(L,NY,NX)=0.0_r8
+    XMGFXS(L,NY,NX)=0.0_r8
+    XNAFXS(L,NY,NX)=0.0_r8
+    XKAFXS(L,NY,NX)=0.0_r8
+    XOHFXS(L,NY,NX)=0.0_r8
+    XSOFXS(L,NY,NX)=0.0_r8
+    XCLFXS(L,NY,NX)=0.0_r8
+    XC3FXS(L,NY,NX)=0.0_r8
+    XHCFXS(L,NY,NX)=0.0_r8
+    XAL1XS(L,NY,NX)=0.0_r8
+    XAL2XS(L,NY,NX)=0.0_r8
+    XAL3XS(L,NY,NX)=0.0_r8
+    XAL4XS(L,NY,NX)=0.0_r8
+    XALSXS(L,NY,NX)=0.0_r8
+    XFE1XS(L,NY,NX)=0.0_r8
+    XFE2XS(L,NY,NX)=0.0_r8
+    XFE3XS(L,NY,NX)=0.0_r8
+    XFE4XS(L,NY,NX)=0.0_r8
+    XFESXS(L,NY,NX)=0.0_r8
+    XCAOXS(L,NY,NX)=0.0_r8
+    XCACXS(L,NY,NX)=0.0_r8
+    XCAHXS(L,NY,NX)=0.0_r8
+    XCASXS(L,NY,NX)=0.0_r8
+    XMGOXS(L,NY,NX)=0.0_r8
+    XMGCXS(L,NY,NX)=0.0_r8
+    XMGHXS(L,NY,NX)=0.0_r8
+    XMGSXS(L,NY,NX)=0.0_r8
+    XNACXS(L,NY,NX)=0.0_r8
+    XNASXS(L,NY,NX)=0.0_r8
+    XKASXS(L,NY,NX)=0.0_r8
+    XH0PXS(L,NY,NX)=0.0_r8
+    XH3PXS(L,NY,NX)=0.0_r8
+    XF1PXS(L,NY,NX)=0.0_r8
+    XF2PXS(L,NY,NX)=0.0_r8
+    XC0PXS(L,NY,NX)=0.0_r8
+    XC1PXS(L,NY,NX)=0.0_r8
+    XC2PXS(L,NY,NX)=0.0_r8
+    XM1PXS(L,NY,NX)=0.0_r8
+    XH0BXB(L,NY,NX)=0.0_r8
+    XH3BXB(L,NY,NX)=0.0_r8
+    XF1BXB(L,NY,NX)=0.0_r8
+    XF2BXB(L,NY,NX)=0.0_r8
+    XC0BXB(L,NY,NX)=0.0_r8
+    XC1BXB(L,NY,NX)=0.0_r8
+    XC2BXB(L,NY,NX)=0.0_r8
+    XM1BXB(L,NY,NX)=0.0_r8
+    DO  K=0,jcplx1
+      XOCFXS(K,L,NY,NX)=0.0_r8
+      XONFXS(K,L,NY,NX)=0.0_r8
+      XOPFXS(K,L,NY,NX)=0.0_r8
+      XOAFXS(K,L,NY,NX)=0.0_r8
+    ENDDO
+    THAW(L,NY,NX)=0.0_r8
+    THAWH(L,NY,NX)=0.0_r8
+    HTHAW(L,NY,NX)=0.0_r8
+    XCOBBL(L,NY,NX)=0.0_r8
+    XCHBBL(L,NY,NX)=0.0_r8
+    XOXBBL(L,NY,NX)=0.0_r8
+    XNGBBL(L,NY,NX)=0.0_r8
+    XN2BBL(L,NY,NX)=0.0_r8
+    XN3BBL(L,NY,NX)=0.0_r8
+    XNBBBL(L,NY,NX)=0.0_r8
+    XHGBBL(L,NY,NX)=0.0_r8
+    RTDNT(L,NY,NX)=0.0_r8
   ENDDO
   end subroutine ZeroHourlyArrays
 

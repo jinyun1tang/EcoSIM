@@ -5,6 +5,7 @@ module WatsubPars
   implicit none
   public
   save
+  character(len=*),private, parameter :: mod_filename = __FILE__
 !
 ! EMMS,EMMW,EMMR=emissivities of surface soil, snow and litter
 ! RACX,RARX=minimum boundary layer resistances of canopy,litter (h m-1)
@@ -27,40 +28,32 @@ module WatsubPars
 ! FENGYP=rate constant for restoring surface Ksat
 !
 
-  real(r8) :: EMMS
-  real(r8) :: EMMW
-  real(r8) :: EMMR
-  real(r8) :: RACX
-  real(r8) :: RARX
+  real(r8) :: EMMS    !soil emissivity
+  real(r8) :: EMMW    !snowpack emissivity
+  real(r8) :: EMMR    !surfce litter emissivity
+  real(r8) :: RACX    !total canopy boundary later resistance h/m
+  real(r8) :: RARX    !
   real(r8) :: RZ
-  real(r8) :: RAM
+  real(r8) :: RAM     !miminum boundary layer resistance h/m
   real(r8) :: DPTHSX
-  real(r8) :: Z1S
-  real(r8) :: Z2SW
-  real(r8) :: Z2SD
-  real(r8) :: Z3SX
-  real(r8) :: Z1R
-  real(r8) :: Z2RW
-  real(r8) :: Z2RD
-  real(r8) :: Z3R
-  real(r8) :: VISCW
-  real(r8) :: VISCA
-  real(r8) :: DIFFW
-  real(r8) :: DIFFA
-  real(r8) :: EXPNW
-  real(r8) :: EXPNA
-  real(r8) :: GRAV
+  real(r8) :: VISCW   !water viscosity
+  real(r8) :: VISCA   !air viscosity
+  real(r8) :: DIFFW   !parameter used to calculate Nusselt number for water
+  real(r8) :: DIFFA   !parameter used to calculate Nusselt number for air
+  real(r8) :: EXPNW   !parameter used to calculate Nusselt number for water
+  real(r8) :: EXPNA   !parameter used to calculate Nusselt number for air
+  real(r8) :: GRAV    !gravity of accleration, [m/s2]
   real(r8) :: RYLXW
   real(r8) :: RYLXA
   real(r8) :: PRNTW
   real(r8) :: PRNTA
   real(r8) :: DNUSW
   real(r8) :: DNUSA
-  real(r8) :: TRBW
-  real(r8) :: TRBA
-  real(r8) :: FVOLAH
-  real(r8) :: DTHETW
-  real(r8) :: HCNDRR
+  real(r8) :: TRBW    !threshold water-filled porosity for convective effects on heat transfer	m3 m-3
+  real(r8) :: TRBA    !threshold air-filled porosity for convective effects on heat transfer	m3 m-3
+  real(r8) :: FVOLAH  !accounts for clay shrinkage-swelling effect on macropore volume
+  real(r8) :: DTHETW  !parameter used to calculate Ksat 	m3 m-3
+  real(r8) :: HCNDRR  !surface litter hydraulic conductivity	m MPa-1 h-1
   real(r8) :: FENGYP
 
   contains
@@ -75,14 +68,6 @@ module WatsubPars
   RZ=0.0139_r8
   RAM=1.39E-03_r8   !this value differs from that in Hour1Mod.F90
   DPTHSX=0.075_r8
-  Z1S=0.010_r8
-  Z2SW=12.0_r8
-  Z2SD=12.0_r8
-  Z3SX=0.50_r8
-  Z1R=0.01_r8
-  Z2RW=12.0_r8
-  Z2RD=12.0_r8
-  Z3R=0.50_r8
   VISCW=1.0E-06_r8
   VISCA=2.0E-08_r8
   DIFFW=1.45E-07_r8

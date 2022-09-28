@@ -66,6 +66,8 @@ module ncdio_pio
     module procedure ncd_putvar_real_sp_all_2d
     module procedure ncd_putvar_int_3d
     module procedure ncd_putvar_real_sp_3d
+    module procedure ncd_putvar_real_sp_all_3d
+    module procedure ncd_putvar_real_sp_all_4d
   end interface ncd_putvar
 
   interface ncd_getvar
@@ -278,7 +280,7 @@ module ncdio_pio
 ! Check if variable is on netcdf file
 !
 ! USES
-  use netcdf
+
   use abortutils, only : endrun
 ! !ARGUMENTS:
   implicit none
@@ -359,7 +361,7 @@ module ncdio_pio
 ! !DESCRIPTION:
 ! Check return status from netcdf call
 !
-  use netcdf
+
   use abortutils, only : endrun
 ! !ARGUMENTS:
   implicit none
@@ -395,7 +397,7 @@ module ncdio_pio
 ! !DESCRIPTION:
 !  Define a netcdf variable
 !
-  use netcdf
+
   use abortutils, only : endrun
   use data_kind_mod, only : r8 => shr_kind_r8
 ! !ARGUMENTS:
@@ -512,7 +514,7 @@ module ncdio_pio
   !DESCRIPTION
   !put an integer scalar to file
 
-  use netcdf
+
 !**********************************************************************
   implicit none
   class(file_desc_t), intent(in) :: ncid
@@ -535,7 +537,7 @@ module ncdio_pio
   !
   !DESCRIPTION
   !put a real scalar to file
-  use netcdf
+
   use data_kind_mod, only : r8 => shr_kind_r8
 !**********************************************************************
   implicit none
@@ -558,7 +560,7 @@ module ncdio_pio
   !
   !DESCRIPTION
   !put a real scalar to file
-  use netcdf
+
   use data_kind_mod, only : r8 => shr_kind_r8
 !**********************************************************************
   implicit none
@@ -571,6 +573,7 @@ module ncdio_pio
   type(Var_desc_t)  :: vardesc
 
   call check_var(ncid, trim(varname), vardesc, readvar)
+
   call check_ret( nf90_put_var(ncid%fh, vardesc%varid, data),'ncd_putvar_real_sp_scalar')
 
   end subroutine ncd_putvar_real_sp_scalar
@@ -579,7 +582,7 @@ module ncdio_pio
   !
   ! DESCRIPTION
   ! put 1d integer array to file
-  use netcdf
+
 
 !**********************************************************************
   implicit none
@@ -601,7 +604,7 @@ module ncdio_pio
   !
   ! DESCRIPTIONS
   ! put 1d real array to file
-  use netcdf
+
   use data_kind_mod, only : r8 => shr_kind_r8
 !**********************************************************************
   implicit none
@@ -626,7 +629,7 @@ module ncdio_pio
     !
     ! DESCRIPTIONS
     ! put 1d real array to file
-    use netcdf
+
     use data_kind_mod, only : r8 => shr_kind_r8
   !**********************************************************************
     implicit none
@@ -649,7 +652,7 @@ module ncdio_pio
     !
     ! DESCRIPTIONS
     ! put 1d real array to file
-    use netcdf
+
     use data_kind_mod, only : r8 => shr_kind_r8
   !**********************************************************************
     implicit none
@@ -672,7 +675,7 @@ module ncdio_pio
   !
   ! DESCRIPTION
   ! put 2d integer array to file
-  use netcdf
+
 !**********************************************************************
   implicit none
   class(file_desc_t), intent(in) :: ncid
@@ -694,7 +697,7 @@ module ncdio_pio
   !
   ! DESCRIPTION
   ! put 2d real array to file
-  use netcdf
+
   use data_kind_mod, only : r8 => shr_kind_r8
 
 !**********************************************************************
@@ -721,7 +724,7 @@ module ncdio_pio
   ! DESCRIPTION
   ! put 3d integer to file
   !
-  use netcdf
+
 !**********************************************************************
   implicit none
   class(file_desc_t), intent(in) :: ncid
@@ -739,11 +742,48 @@ module ncdio_pio
 
   end subroutine ncd_putvar_int_3d
 !----------------------------------------------------------------------
+  subroutine ncd_putvar_real_sp_all_3d(ncid,varname,data)
+
+    use data_kind_mod, only : r8 => shr_kind_r8
+  !**********************************************************************
+    implicit none
+    class(file_desc_t), intent(in) :: ncid
+    real(r8),dimension(:,:,:), intent(in) :: data
+
+    character(len=*), intent(in) :: varname
+    integer :: varid
+    logical :: readvar
+    type(Var_desc_t)  :: vardesc
+
+    call check_var(ncid, trim(varname), vardesc, readvar)
+
+    call check_ret( nf90_put_var(ncid%fh, vardesc%varid, data),'ncd_putvar_real_sp_all_3d')
+  end subroutine ncd_putvar_real_sp_all_3d
+
+!----------------------------------------------------------------------
+  subroutine ncd_putvar_real_sp_all_4d(ncid,varname,data)
+
+    use data_kind_mod, only : r8 => shr_kind_r8
+  !**********************************************************************
+    implicit none
+    class(file_desc_t), intent(in) :: ncid
+    real(r8),dimension(:,:,:,:), intent(in) :: data
+
+    character(len=*), intent(in) :: varname
+    integer :: varid
+    logical :: readvar
+    type(Var_desc_t)  :: vardesc
+
+    call check_var(ncid, trim(varname), vardesc, readvar)
+
+    call check_ret( nf90_put_var(ncid%fh, vardesc%varid, data),'ncd_putvar_real_sp_all_4d')
+  end subroutine ncd_putvar_real_sp_all_4d
+!----------------------------------------------------------------------
   subroutine ncd_putvar_real_sp_3d(ncid, varname, rec, data)
   !
   ! DESCRIPTION
   ! put 3d real array to file
-  use netcdf
+
   use data_kind_mod, only : r8 => shr_kind_r8
 !**********************************************************************
   implicit none
@@ -767,7 +807,7 @@ module ncdio_pio
   !
   ! DESCRIPTION
   ! read a integer scalar
-  use netcdf
+
 !**********************************************************************
   implicit none
   class(file_desc_t), intent(in) :: ncid
@@ -791,7 +831,7 @@ module ncdio_pio
     !
     !DESCRIPTION
     ! read a real scalar
-    use netcdf
+
     use data_kind_mod, only : r8 => shr_kind_r8
   !**********************************************************************
     implicit none
@@ -815,7 +855,7 @@ module ncdio_pio
       !
       !DESCRIPTION
       ! read a real scalar
-      use netcdf
+
       use data_kind_mod, only : r8 => shr_kind_r8
     !**********************************************************************
       implicit none
@@ -834,11 +874,11 @@ module ncdio_pio
       end subroutine ncd_getvar_real_sp_all_2d
       !----------------------------------------------------------------------
 
-        subroutine ncd_getvar_real_sp_all_3d(ncid, varname, data)
+      subroutine ncd_getvar_real_sp_all_3d(ncid, varname, data)
         !
         !DESCRIPTION
         ! read a real scalar
-        use netcdf
+
         use data_kind_mod, only : r8 => shr_kind_r8
       !**********************************************************************
         implicit none
@@ -852,7 +892,7 @@ module ncdio_pio
 
         call check_var(ncid, trim(varname), vardesc, readvar)
 
-        call check_ret( nf90_get_var(ncid%fh, vardesc%varid, data),'ncd_getvar_real_sp_all_2d')
+        call check_ret( nf90_get_var(ncid%fh, vardesc%varid, data),'ncd_getvar_real_sp_all_3d')
 
         end subroutine ncd_getvar_real_sp_all_3d
         !----------------------------------------------------------------------
@@ -861,7 +901,7 @@ module ncdio_pio
           !
           !DESCRIPTION
           ! read a real scalar
-          use netcdf
+
           use data_kind_mod, only : r8 => shr_kind_r8
         !**********************************************************************
           implicit none
@@ -875,7 +915,7 @@ module ncdio_pio
 
           call check_var(ncid, trim(varname), vardesc, readvar)
 
-          call check_ret( nf90_get_var(ncid%fh, vardesc%varid, data),'ncd_getvar_real_sp_all_2d')
+          call check_ret( nf90_get_var(ncid%fh, vardesc%varid, data),'ncd_getvar_real_sp_all_4d')
 
           end subroutine ncd_getvar_real_sp_all_4d
 !----------------------------------------------------------------------
@@ -884,7 +924,7 @@ module ncdio_pio
   !
   !DESCRIPTION
   ! read a real scalar
-  use netcdf
+
   use data_kind_mod, only : r8 => shr_kind_r8
 !**********************************************************************
   implicit none
@@ -909,7 +949,7 @@ module ncdio_pio
   !
   !DESCRIPTION
   ! read a real scalar
-  use netcdf
+
   use data_kind_mod, only : r8 => shr_kind_r8
 !**********************************************************************
   implicit none
@@ -933,7 +973,7 @@ module ncdio_pio
   !DESCRIPTION
   !read 1d integer array
   !
-  use netcdf
+
 !**********************************************************************
   implicit none
   class(file_desc_t), intent(in) :: ncid
@@ -955,7 +995,7 @@ module ncdio_pio
   !
   ! DESCRIPTION
   ! read 1d real array
-  use netcdf
+
   use data_kind_mod, only : r8 => shr_kind_r8
 !**********************************************************************
   implicit none
@@ -982,7 +1022,7 @@ module ncdio_pio
   ! DESCRIPTION
   ! read 2d integer array
   !
-  use netcdf
+
 
 !**********************************************************************
   implicit none
@@ -1005,7 +1045,7 @@ module ncdio_pio
   !
   ! DESCRIPTION
   ! read 2d real array
-  use netcdf
+
   use data_kind_mod, only : r8 => shr_kind_r8
 !**********************************************************************
   implicit none
@@ -1029,7 +1069,7 @@ module ncdio_pio
   !
   ! DESCRIPTION
   ! read 3d integer array
-  use netcdf
+
 
 !**********************************************************************
   implicit none
@@ -1052,7 +1092,7 @@ module ncdio_pio
   !
   ! DESCRIPTION
   ! read 3d real array
-  use netcdf
+
   use data_kind_mod, only : r8 => shr_kind_r8
 !**********************************************************************
   implicit none
@@ -1079,7 +1119,7 @@ module ncdio_pio
 ! get dimension length
 !
 ! !ARGUMENTS:
-   use netcdf
+
    implicit none
    class(file_desc_t), intent(in) :: ncid
    character(len=*), intent(in) :: dimname
@@ -1108,7 +1148,7 @@ module ncdio_pio
    !
    ! DESCRIPTION
    ! get dimension length
-   use netcdf
+
    implicit none
    character(len=*), intent(in) :: fname
    character(len=*), intent(in) :: dim_name

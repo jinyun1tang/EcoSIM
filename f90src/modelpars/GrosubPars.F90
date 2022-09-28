@@ -5,7 +5,7 @@ module GrosubPars
   implicit none
   public
   save
-
+  character(len=*),private, parameter :: mod_filename = __FILE__
 ! PART1X,PART2X=modifiers to organ partitioning coefficients
 ! VMXC=rate constant for nonstructural C oxidation in respiration (h-1)
 ! FSNR=rate constant for litterfall at end of growing season (h-1)

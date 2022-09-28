@@ -8,12 +8,13 @@ module PlantMngmtDataType
   real(r8),allocatable ::  THIN(:,:,:,:)                      !thinning of plant population, [-]
   real(r8),allocatable ::  EHVST(:,:,:,:,:,:)                 !harvest efficiency, [-]
   real(r8),allocatable ::  HVST(:,:,:,:)                      !harvest cutting height (+ve) or fractional LAI removal (-ve), [m or -]
+  integer ,allocatable ::  IHVST(:,:,:,:)                      !type of harvest, [-]
+  integer ,allocatable ::  JHVST(:,:,:,:)                      !flag for stand replacing disturbance, [-]
+
   integer ,allocatable ::  IYR0(:,:,:)                         !year of planting, [-]
   integer ,allocatable ::  IYRH(:,:,:)                         !year of harvest, [-]
   integer ,allocatable ::  IDAY0(:,:,:)                        !day of planting, [-]
   integer ,allocatable ::  IDAYH(:,:,:)                        !day of harvest, [-]
-  integer ,allocatable ::  IHVST(:,:,:,:)                      !type of harvest, [-]
-  integer ,allocatable ::  JHVST(:,:,:,:)                      !flag for stand replacing disturbance, [-]
   integer ,allocatable ::  IDTH(:,:,:)                         !flag for species death, [-]
   integer ,allocatable ::  IYRX(:,:,:)                         !alternate year of planting, [-]
   integer ,allocatable ::  IDAYX(:,:,:)                        !alternate day of planting, [-]
@@ -44,12 +45,13 @@ module PlantMngmtDataType
   allocate(THIN(05,366,JY,JX)); THIN=0._r8
   allocate(EHVST(2,4,05,366,JY,JX));EHVST=0._r8
   allocate(HVST(05,366,JY,JX)); HVST=0._r8
+  allocate(IHVST(05,366,JY,JX));IHVST=0
+  allocate(JHVST(05,366,JY,JX));JHVST=0
+
   allocate(IYR0(JP,JY,JX));     IYR0=0
   allocate(IYRH(JP,JY,JX));     IYRH=0
   allocate(IDAY0(JP,JY,JX));    IDAY0=0
   allocate(IDAYH(JP,JY,JX));    IDAYH=0
-  allocate(IHVST(05,366,JY,JX));IHVST=0
-  allocate(JHVST(05,366,JY,JX));JHVST=0
   allocate(IDTH(JP,JY,JX));     IDTH=0
   allocate(IYRX(JP,JY,JX));     IYRX=0
   allocate(IDAYX(JP,JY,JX));    IDAYX=0
@@ -68,12 +70,13 @@ module PlantMngmtDataType
   if (allocated(THIN))     deallocate(THIN)
   if (allocated(EHVST))    deallocate(EHVST)
   if (allocated(HVST))     deallocate(HVST)
+  if (allocated(IHVST))    deallocate(IHVST)
+  if (allocated(JHVST))    deallocate(JHVST)
+
   if (allocated(IYR0))     deallocate(IYR0)
   if (allocated(IYRH))     deallocate(IYRH)
   if (allocated(IDAY0))    deallocate(IDAY0)
   if (allocated(IDAYH))    deallocate(IDAYH)
-  if (allocated(IHVST))    deallocate(IHVST)
-  if (allocated(JHVST))    deallocate(JHVST)
   if (allocated(IDTH))     deallocate(IDTH)
   if (allocated(IYRX))     deallocate(IYRX)
   if (allocated(IDAYX))    deallocate(IDAYX)

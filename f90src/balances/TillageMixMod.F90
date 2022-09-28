@@ -18,8 +18,9 @@ module TillageMixMod
   USE FlagDataType
   use EcoSIMCtrlDataType
   USE EcoSimSumDataType
+  use EcoSIMConfig , only : ndbiomcp => ndbiomcpc
   implicit none
-
+  character(len=*),private, parameter :: mod_filename = __FILE__
   public :: ApplyTillageMixing
   contains
 
@@ -100,7 +101,7 @@ module TillageMixMod
 !     EXTENT OF MIXING
 !
     IFLGS(NY,NX)=1
-    CORP=1.0-XCORP(NY,NX)
+    CORP=1.0_r8-XCORP(NY,NX)
     ENGYP(NY,NX)=0.0_r8
 !
 !     TEMPORARY ACCUMULATORS
@@ -281,7 +282,7 @@ module TillageMixMod
 !     ELSE
 !     XCORP0=1.0
 !     ENDIF
-    CORP0=1.0-XCORP0
+    CORP0=1.0_r8-XCORP0
     DC=0.0_r8
     DN=0.0_r8
     DP=0.0_r8
@@ -289,7 +290,7 @@ module TillageMixMod
     DO  K=0,jcplx1
       IF(K.NE.micpar%k_POM.AND.K.NE.micpar%k_humus)THEN
         DO  N=1,NFGs
-          DO  M=1,3
+          DO  M=1,nlbiomcp
             DO NGL=1,JG
               TOMGC(M,NGL,N,K)=OMC(M,NGL,N,K,0,NY,NX)*CORP0
               TOMGN(M,NGL,N,K)=OMN(M,NGL,N,K,0,NY,NX)*CORP0
@@ -307,7 +308,7 @@ module TillageMixMod
     ENDDO
 
     DO  N=1,NFGs
-      DO  M=1,3
+      DO  M=1,nlbiomcp
         DO NGL=1,JG
           TOMGCff(M,NGL,N)=OMCff(M,NGL,N,0,NY,NX)*CORP0
           TOMGNff(M,NGL,N)=OMNff(M,NGL,N,0,NY,NX)*CORP0
@@ -323,7 +324,7 @@ module TillageMixMod
     ENDDO
 
     DO K=0,2
-      DO M=1,2
+      DO M=1,ndbiomcp
         TORXC(M,K)=ORC(M,K,0,NY,NX)*CORP0
         TORXN(M,K)=ORN(M,K,0,NY,NX)*CORP0
         TORXP(M,K)=ORP(M,K,0,NY,NX)*CORP0
@@ -365,7 +366,7 @@ module TillageMixMod
         +OQA(K,0,NY,NX)+OQAH(K,0,NY,NX)+OHA(K,0,NY,NX)
       DN=DN+OQN(K,0,NY,NX)+OQNH(K,0,NY,NX)+OHN(K,0,NY,NX)
       DP=DP+OQP(K,0,NY,NX)+OQPH(K,0,NY,NX)+OHP(K,0,NY,NX)
-      DO  M=1,4
+      DO  M=1,jsken
         TOSGC(M,K)=OSC(M,K,0,NY,NX)*CORP0
         TOSGA(M,K)=OSA(M,K,0,NY,NX)*CORP0
         TOSGN(M,K)=OSN(M,K,0,NY,NX)*CORP0
@@ -605,7 +606,7 @@ module TillageMixMod
         TH2GS=TH2GS+TI*H2GS(L,NY,NX)
         DO  K=0,jcplx1
           DO  N=1,NFGs
-            DO  M=1,3
+            DO  M=1,nlbiomcp
               DO NGL=1,JG
                 TOMC(M,NGL,N,K)=TOMC(M,NGL,N,K)+TI*OMC(M,NGL,N,K,L,NY,NX)
                 TOMN(M,NGL,N,K)=TOMN(M,NGL,N,K)+TI*OMN(M,NGL,N,K,L,NY,NX)
@@ -616,7 +617,7 @@ module TillageMixMod
         ENDDO
 
         DO  N=1,NFGs
-          DO  M=1,3
+          DO  M=1,nlbiomcp
             DO NGL=1,JG
               TOMCff(M,NGL,N)=TOMCff(M,NGL,N)+TI*OMCff(M,NGL,N,L,NY,NX)
               TOMNff(M,NGL,N)=TOMNff(M,NGL,N)+TI*OMNff(M,NGL,N,L,NY,NX)
@@ -626,7 +627,7 @@ module TillageMixMod
         enddo
 
       DO K=0,jcplx1
-        DO  M=1,2
+        DO  M=1,ndbiomcp
           TORC(M,K)=TORC(M,K)+TI*ORC(M,K,L,NY,NX)
           TORN(M,K)=TORN(M,K)+TI*ORN(M,K,L,NY,NX)
           TORP(M,K)=TORP(M,K)+TI*ORP(M,K,L,NY,NX)
@@ -639,7 +640,7 @@ module TillageMixMod
         TOHN(K)=TOHN(K)+TI*OHN(K,L,NY,NX)
         TOHP(K)=TOHP(K)+TI*OHP(K,L,NY,NX)
         TOHA(K)=TOHA(K)+TI*OHA(K,L,NY,NX)
-        DO  M=1,4
+        DO  M=1,jsken
           TOSC(M,K)=TOSC(M,K)+TI*OSC(M,K,L,NY,NX)
           TOSA(M,K)=TOSA(M,K)+TI*OSA(M,K,L,NY,NX)
           TOSN(M,K)=TOSN(M,K)+TI*OSN(M,K,L,NY,NX)
@@ -662,37 +663,22 @@ module TillageMixMod
       TL=AMIN1(DLYR(3,L,NY,NX),DCORPZ-(CDPTHZ(L,NY,NX)-DLYR(3,L,NY,NX)))
       FI=TL/DCORPZ
       TI=TL/DLYR(3,L,NY,NX)
-      TX=1.0-TI
-      BKDSI(L,NY,NX)=TI*(BKDSI(L,NY,NX)+CORP*(TBKDX-BKDSI(L,NY,NX))) &
-        +TX*BKDSI(L,NY,NX)
-      FC(L,NY,NX)=TI*(FC(L,NY,NX)+CORP*(TFC-FC(L,NY,NX))) &
-        +TX*FC(L,NY,NX)
-      WP(L,NY,NX)=TI*(WP(L,NY,NX)+CORP*(TWP-WP(L,NY,NX))) &
-        +TX*WP(L,NY,NX)
-      SCNV(L,NY,NX)=TI*(SCNV(L,NY,NX)+CORP*(TSCNV-SCNV(L,NY,NX))) &
-        +TX*SCNV(L,NY,NX)
-      SCNH(L,NY,NX)=TI*(SCNH(L,NY,NX)+CORP*(TSCNH-SCNH(L,NY,NX))) &
-        +TX*SCNH(L,NY,NX)
-      SAND(L,NY,NX)=TI*SAND(L,NY,NX)+CORP*(FI*TSAND-TI*SAND(L,NY,NX)) &
-        +TX*SAND(L,NY,NX)
-      SILT(L,NY,NX)=TI*SILT(L,NY,NX)+CORP*(FI*TSILT-TI*SILT(L,NY,NX)) &
-        +TX*SILT(L,NY,NX)
-      CLAY(L,NY,NX)=TI*CLAY(L,NY,NX)+CORP*(FI*TCLAY-TI*CLAY(L,NY,NX)) &
-        +TX*CLAY(L,NY,NX)
-      XCEC(L,NY,NX)=TI*XCEC(L,NY,NX)+CORP*(FI*TXCEC-TI*XCEC(L,NY,NX)) &
-        +TX*XCEC(L,NY,NX)
-      XAEC(L,NY,NX)=TI*XAEC(L,NY,NX)+CORP*(FI*TXAEC-TI*XAEC(L,NY,NX)) &
-        +TX*XAEC(L,NY,NX)
-      GKC4(L,NY,NX)=TI*(GKC4(L,NY,NX)+CORP*(TGKC4-GKC4(L,NY,NX))) &
-        +TX*GKC4(L,NY,NX)
-      GKCA(L,NY,NX)=TI*(GKCA(L,NY,NX)+CORP*(TGKCA-GKCA(L,NY,NX))) &
-        +TX*GKCA(L,NY,NX)
-      GKCM(L,NY,NX)=TI*(GKCM(L,NY,NX)+CORP*(TGKCM-GKCM(L,NY,NX))) &
-        +TX*GKCM(L,NY,NX)
-      GKCN(L,NY,NX)=TI*(GKCN(L,NY,NX)+CORP*(TGKCN-GKCN(L,NY,NX))) &
-        +TX*GKCN(L,NY,NX)
-      GKCK(L,NY,NX)=TI*(GKCK(L,NY,NX)+CORP*(TGKCK-GKCK(L,NY,NX))) &
-        +TX*GKCK(L,NY,NX)
+      TX=1.0_r8-TI
+      BKDSI(L,NY,NX)=TI*(BKDSI(L,NY,NX)+CORP*(TBKDX-BKDSI(L,NY,NX)))+TX*BKDSI(L,NY,NX)
+      FC(L,NY,NX)=TI*(FC(L,NY,NX)+CORP*(TFC-FC(L,NY,NX)))+TX*FC(L,NY,NX)
+      WP(L,NY,NX)=TI*(WP(L,NY,NX)+CORP*(TWP-WP(L,NY,NX)))+TX*WP(L,NY,NX)
+      SCNV(L,NY,NX)=TI*(SCNV(L,NY,NX)+CORP*(TSCNV-SCNV(L,NY,NX)))+TX*SCNV(L,NY,NX)
+      SCNH(L,NY,NX)=TI*(SCNH(L,NY,NX)+CORP*(TSCNH-SCNH(L,NY,NX)))+TX*SCNH(L,NY,NX)
+      SAND(L,NY,NX)=TI*SAND(L,NY,NX)+CORP*(FI*TSAND-TI*SAND(L,NY,NX))+TX*SAND(L,NY,NX)
+      SILT(L,NY,NX)=TI*SILT(L,NY,NX)+CORP*(FI*TSILT-TI*SILT(L,NY,NX))+TX*SILT(L,NY,NX)
+      CLAY(L,NY,NX)=TI*CLAY(L,NY,NX)+CORP*(FI*TCLAY-TI*CLAY(L,NY,NX))+TX*CLAY(L,NY,NX)
+      XCEC(L,NY,NX)=TI*XCEC(L,NY,NX)+CORP*(FI*TXCEC-TI*XCEC(L,NY,NX))+TX*XCEC(L,NY,NX)
+      XAEC(L,NY,NX)=TI*XAEC(L,NY,NX)+CORP*(FI*TXAEC-TI*XAEC(L,NY,NX))+TX*XAEC(L,NY,NX)
+      GKC4(L,NY,NX)=TI*(GKC4(L,NY,NX)+CORP*(TGKC4-GKC4(L,NY,NX)))+TX*GKC4(L,NY,NX)
+      GKCA(L,NY,NX)=TI*(GKCA(L,NY,NX)+CORP*(TGKCA-GKCA(L,NY,NX)))+TX*GKCA(L,NY,NX)
+      GKCM(L,NY,NX)=TI*(GKCM(L,NY,NX)+CORP*(TGKCM-GKCM(L,NY,NX)))+TX*GKCM(L,NY,NX)
+      GKCN(L,NY,NX)=TI*(GKCN(L,NY,NX)+CORP*(TGKCN-GKCN(L,NY,NX)))+TX*GKCN(L,NY,NX)
+      GKCK(L,NY,NX)=TI*(GKCK(L,NY,NX)+CORP*(TGKCK-GKCK(L,NY,NX)))+TX*GKCK(L,NY,NX)
       ENGYM=VHCM(L,NY,NX)*TKS(L,NY,NX)
       ENGYV=(cpw*(VOLW(L,NY,NX)+VOLWH(L,NY,NX)) &
         +cpi*(VOLI(L,NY,NX)+VOLIH(L,NY,NX)))*TKS(L,NY,NX)
@@ -851,40 +837,25 @@ module TillageMixMod
         -TI*ZCA2PB(L,NY,NX))+TX*ZCA2PB(L,NY,NX)+CORP*ZCA2BH(L,NY,NX)
       ZMG1PB(L,NY,NX)=TI*ZMG1PB(L,NY,NX)+CORP*(FI*TMG1PB &
         -TI*ZMG1PB(L,NY,NX))+TX*ZMG1PB(L,NY,NX)+CORP*ZMG1BH(L,NY,NX)
-      XN4(L,NY,NX)=TI*XN4(L,NY,NX)+CORP*(FI*TXNH4-TI*XN4(L,NY,NX)) &
-        +TX*XN4(L,NY,NX)
-      XNB(L,NY,NX)=TI*XNB(L,NY,NX)+CORP*(FI*TXNHB-TI*XNB(L,NY,NX)) &
-        +TX*XNB(L,NY,NX)
-      XHY(L,NY,NX)=TI*XHY(L,NY,NX)+CORP*(FI*TXHY-TI*XHY(L,NY,NX)) &
-        +TX*XHY(L,NY,NX)
-      XAL(L,NY,NX)=TI*XAL(L,NY,NX)+CORP*(FI*TXAL-TI*XAL(L,NY,NX)) &
-        +TX*XAL(L,NY,NX)
-      XFE(L,NY,NX)=TI*XFE(L,NY,NX)+CORP*(FI*TXFE-TI*XFE(L,NY,NX)) &
-        +TX*XFE(L,NY,NX)
-      XCA(L,NY,NX)=TI*XCA(L,NY,NX)+CORP*(FI*TXCA-TI*XCA(L,NY,NX)) &
-        +TX*XCA(L,NY,NX)
-      XMG(L,NY,NX)=TI*XMG(L,NY,NX)+CORP*(FI*TXMG-TI*XMG(L,NY,NX)) &
-        +TX*XMG(L,NY,NX)
-      XNA(L,NY,NX)=TI*XNA(L,NY,NX)+CORP*(FI*TXNA-TI*XNA(L,NY,NX)) &
-        +TX*XNA(L,NY,NX)
-      XKA(L,NY,NX)=TI*XKA(L,NY,NX)+CORP*(FI*TXKA-TI*XKA(L,NY,NX)) &
-        +TX*XKA(L,NY,NX)
-      XHC(L,NY,NX)=TI*XHC(L,NY,NX)+CORP*(FI*TXHC-TI*XHC(L,NY,NX)) &
-        +TX*XHC(L,NY,NX)
+      XN4(L,NY,NX)=TI*XN4(L,NY,NX)+CORP*(FI*TXNH4-TI*XN4(L,NY,NX))+TX*XN4(L,NY,NX)
+      XNB(L,NY,NX)=TI*XNB(L,NY,NX)+CORP*(FI*TXNHB-TI*XNB(L,NY,NX))+TX*XNB(L,NY,NX)
+      XHY(L,NY,NX)=TI*XHY(L,NY,NX)+CORP*(FI*TXHY-TI*XHY(L,NY,NX)) +TX*XHY(L,NY,NX)
+      XAL(L,NY,NX)=TI*XAL(L,NY,NX)+CORP*(FI*TXAL-TI*XAL(L,NY,NX))+TX*XAL(L,NY,NX)
+      XFE(L,NY,NX)=TI*XFE(L,NY,NX)+CORP*(FI*TXFE-TI*XFE(L,NY,NX))+TX*XFE(L,NY,NX)
+      XCA(L,NY,NX)=TI*XCA(L,NY,NX)+CORP*(FI*TXCA-TI*XCA(L,NY,NX))+TX*XCA(L,NY,NX)
+      XMG(L,NY,NX)=TI*XMG(L,NY,NX)+CORP*(FI*TXMG-TI*XMG(L,NY,NX))+TX*XMG(L,NY,NX)
+      XNA(L,NY,NX)=TI*XNA(L,NY,NX)+CORP*(FI*TXNA-TI*XNA(L,NY,NX))+TX*XNA(L,NY,NX)
+      XKA(L,NY,NX)=TI*XKA(L,NY,NX)+CORP*(FI*TXKA-TI*XKA(L,NY,NX))+TX*XKA(L,NY,NX)
+      XHC(L,NY,NX)=TI*XHC(L,NY,NX)+CORP*(FI*TXHC-TI*XHC(L,NY,NX))+TX*XHC(L,NY,NX)
       XALO2(L,NY,NX)=TI*XALO2(L,NY,NX)+CORP*(FI*TXAL2-TI*XALO2(L,NY,NX)) &
         +TX*XALO2(L,NY,NX)
       XFEO2(L,NY,NX)=TI*XFEO2(L,NY,NX)+CORP*(FI*TXFE2-TI*XFEO2(L,NY,NX)) &
         +TX*XFEO2(L,NY,NX)
-      XOH0(L,NY,NX)=TI*XOH0(L,NY,NX)+CORP*(FI*TXOH0-TI*XOH0(L,NY,NX)) &
-        +TX*XOH0(L,NY,NX)
-      XOH1(L,NY,NX)=TI*XOH1(L,NY,NX)+CORP*(FI*TXOH1-TI*XOH1(L,NY,NX)) &
-        +TX*XOH1(L,NY,NX)
-      XOH2(L,NY,NX)=TI*XOH2(L,NY,NX)+CORP*(FI*TXOH2-TI*XOH2(L,NY,NX)) &
-        +TX*XOH2(L,NY,NX)
-      XH1P(L,NY,NX)=TI*XH1P(L,NY,NX)+CORP*(FI*TXH1P-TI*XH1P(L,NY,NX)) &
-        +TX*XH1P(L,NY,NX)
-      XH2P(L,NY,NX)=TI*XH2P(L,NY,NX)+CORP*(FI*TXH2P-TI*XH2P(L,NY,NX)) &
-        +TX*XH2P(L,NY,NX)
+      XOH0(L,NY,NX)=TI*XOH0(L,NY,NX)+CORP*(FI*TXOH0-TI*XOH0(L,NY,NX))+TX*XOH0(L,NY,NX)
+      XOH1(L,NY,NX)=TI*XOH1(L,NY,NX)+CORP*(FI*TXOH1-TI*XOH1(L,NY,NX))+TX*XOH1(L,NY,NX)
+      XOH2(L,NY,NX)=TI*XOH2(L,NY,NX)+CORP*(FI*TXOH2-TI*XOH2(L,NY,NX))+TX*XOH2(L,NY,NX)
+      XH1P(L,NY,NX)=TI*XH1P(L,NY,NX)+CORP*(FI*TXH1P-TI*XH1P(L,NY,NX))+TX*XH1P(L,NY,NX)
+      XH2P(L,NY,NX)=TI*XH2P(L,NY,NX)+CORP*(FI*TXH2P-TI*XH2P(L,NY,NX))+TX*XH2P(L,NY,NX)
       XOH0B(L,NY,NX)=TI*XOH0B(L,NY,NX)+CORP*(FI*TXOH0B &
         -TI*XOH0B(L,NY,NX))+TX*XOH0B(L,NY,NX)
       XOH1B(L,NY,NX)=TI*XOH1B(L,NY,NX)+CORP*(FI*TXOH1B &
@@ -1020,7 +991,7 @@ module TillageMixMod
 
       DO  K=0,jcplx1
         DO  N=1,NFGs
-          DO  M=1,3
+          DO  M=1,nlbiomcp
             DO NGL=1,JG
               OMC(M,NGL,N,K,L,NY,NX)=TI*OMC(M,NGL,N,K,L,NY,NX)+CORP*(FI*TOMC(M,NGL,N,K) &
                 -TI*OMC(M,NGL,N,K,L,NY,NX))+TX*OMC(M,NGL,N,K,L,NY,NX)
@@ -1033,7 +1004,7 @@ module TillageMixMod
         enddo
       ENDDO
       DO  N=1,NFGs
-        DO  M=1,3
+        DO  M=1,nlbiomcp
           DO NGL=1,JG
             OMCff(M,NGL,N,L,NY,NX)=TI*OMCff(M,NGL,N,L,NY,NX)+CORP*(FI*TOMCff(M,NGL,N) &
               -TI*OMCff(M,NGL,N,L,NY,NX))+TX*OMCff(M,NGL,N,L,NY,NX)
@@ -1046,7 +1017,7 @@ module TillageMixMod
       enddo
 
       DO  K=0,jcplx1
-        DO  M=1,2
+        DO  M=1,ndbiomcp
           ORC(M,K,L,NY,NX)=TI*ORC(M,K,L,NY,NX)+CORP*(FI*TORC(M,K) &
             -TI*ORC(M,K,L,NY,NX))+TX*ORC(M,K,L,NY,NX)
           ORN(M,K,L,NY,NX)=TI*ORN(M,K,L,NY,NX)+CORP*(FI*TORN(M,K) &
@@ -1074,7 +1045,7 @@ module TillageMixMod
           -TI*OHP(K,L,NY,NX))+TX*OHP(K,L,NY,NX)
         OHA(K,L,NY,NX)=TI*OHA(K,L,NY,NX)+CORP*(FI*TOHA(K) &
           -TI*OHA(K,L,NY,NX))+TX*OHA(K,L,NY,NX)
-        DO  M=1,4
+        DO  M=1,jsken
           OSC(M,K,L,NY,NX)=TI*OSC(M,K,L,NY,NX)+CORP*(FI*TOSC(M,K) &
             -TI*OSC(M,K,L,NY,NX))+TX*OSC(M,K,L,NY,NX)
           OSA(M,K,L,NY,NX)=TI*OSA(M,K,L,NY,NX)+CORP*(FI*TOSA(M,K) &
@@ -1092,7 +1063,7 @@ module TillageMixMod
       DO  K=0,jcplx1
         IF(K.NE.micpar%k_POM.AND.K.NE.micpar%k_humus)THEN
           DO  N=1,NFGs
-            DO M=1,3
+            DO M=1,nlbiomcp
               DO NGL=1,JG
                 OMC(M,NGL,N,K,L,NY,NX)=OMC(M,NGL,N,K,L,NY,NX)+FI*TOMGC(M,NGL,N,K)
                 OMN(M,NGL,N,K,L,NY,NX)=OMN(M,NGL,N,K,L,NY,NX)+FI*TOMGN(M,NGL,N,K)
@@ -1103,7 +1074,7 @@ module TillageMixMod
         ENDIF
       ENDDO
       DO  N=1,NFGs
-        DO M=1,3
+        DO M=1,nlbiomcp
           DO NGL=1,JG
             OMCff(M,NGL,N,L,NY,NX)=OMCff(M,NGL,N,L,NY,NX)+FI*TOMGCff(M,NGL,N)
             OMNff(M,NGL,N,L,NY,NX)=OMNff(M,NGL,N,L,NY,NX)+FI*TOMGNff(M,NGL,N)
@@ -1113,7 +1084,7 @@ module TillageMixMod
       ENDDO
 
       DO K=0,2
-        DO  M=1,2
+        DO  M=1,ndbiomcp
           ORC(M,K,L,NY,NX)=ORC(M,K,L,NY,NX)+FI*TORXC(M,K)
           ORN(M,K,L,NY,NX)=ORN(M,K,L,NY,NX)+FI*TORXN(M,K)
           ORP(M,K,L,NY,NX)=ORP(M,K,L,NY,NX)+FI*TORXP(M,K)
@@ -1130,7 +1101,7 @@ module TillageMixMod
         OHN(K,L,NY,NX)=OHN(K,L,NY,NX)+FI*TOHGN(K)
         OHP(K,L,NY,NX)=OHP(K,L,NY,NX)+FI*TOHGP(K)
         OHA(K,L,NY,NX)=OHA(K,L,NY,NX)+FI*TOHGA(K)
-        DO  M=1,4
+        DO  M=1,jsken
           OSC(M,K,L,NY,NX)=OSC(M,K,L,NY,NX)+FI*TOSGC(M,K)
           OSA(M,K,L,NY,NX)=OSA(M,K,L,NY,NX)+FI*TOSGA(M,K)
           OSN(M,K,L,NY,NX)=OSN(M,K,L,NY,NX)+FI*TOSGN(M,K)
@@ -1146,7 +1117,7 @@ module TillageMixMod
 
       DO  K=0,jcplx1
         DO  N=1,NFGs
-          DO  M=1,3
+          DO  M=1,nlbiomcp
             DO NGL=1,JG
               OC=OC+OMC(M,NGL,N,K,L,NY,NX)
               ON=ON+OMN(M,NGL,N,K,L,NY,NX)
@@ -1158,7 +1129,7 @@ module TillageMixMod
 
       DO  K=0,2
         DO  N=1,NFGs
-          DO  M=1,3
+          DO  M=1,nlbiomcp
             DO NGL=1,JG
               DC=DC+OMC(M,NGL,N,K,L,NY,NX)
               DN=DN+OMN(M,NGL,N,K,L,NY,NX)
@@ -1168,7 +1139,7 @@ module TillageMixMod
         enddo
       ENDDO
       DO  N=1,NFGs
-        DO  M=1,3
+        DO  M=1,nlbiomcp
           DO NGL=1,JG
             OC=OC+OMCff(M,NGL,N,L,NY,NX)
             ON=ON+OMNff(M,NGL,N,L,NY,NX)
@@ -1178,7 +1149,7 @@ module TillageMixMod
       enddo
 
       DO K=0,jcplx1
-        DO  M=1,2
+        DO  M=1,ndbiomcp
           OC=OC+ORC(M,K,L,NY,NX)
           ON=ON+ORN(M,K,L,NY,NX)
           OP=OP+ORP(M,K,L,NY,NX)
@@ -1199,7 +1170,7 @@ module TillageMixMod
           DN=DN+OQN(K,L,NY,NX)+OQNH(K,L,NY,NX)+OHN(K,L,NY,NX)
           DC=DC+OQC(K,L,NY,NX)+OQCH(K,L,NY,NX)+OHC(K,L,NY,NX)
         ENDIF
-        DO  M=1,4
+        DO  M=1,jsken
           OC=OC+OSC(M,K,L,NY,NX)
           ON=ON+OSN(M,K,L,NY,NX)
           OP=OP+OSP(M,K,L,NY,NX)

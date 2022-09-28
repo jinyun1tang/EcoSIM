@@ -19,10 +19,11 @@ module FertilizerDataType
   real(r8) :: DCORP(366,JY,JX)                  !soil mixing fraction with tillage, [-]
   real(r8) :: FERT(20,366,JY,JX)                !fertilizer application, [g m-2]
   real(r8) :: FDPTH(366,JY,JX)                  !depth of fertilizer application, [m]
+  real(r8) :: ROWI(366,JY,JX)                   !row spacing of fertilizer band, [m]
+
   real(r8) :: ROWN(JY,JX)                       !row spacing of NH4 fertilizer band, [m]
   real(r8) :: ROWO(JY,JX)                       !row spacing of NO3 fertilizer band, [m]
   real(r8) :: ROWP(JY,JX)                       !row spacing of PO4 fertilizer band, [m]
-  real(r8) :: ROWI(366,JY,JX)                   !row spacing of fertilizer band, [m]
 
   private :: InitAllocate
 

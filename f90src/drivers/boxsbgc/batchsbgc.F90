@@ -54,12 +54,15 @@ end program main
   use ecosim_Time_Mod     , only : ecosim_time_type
   use ecosim_log_mod      , only : errMsg => shr_log_errMsg
   use batchmod
+  use ForcTypeMod         , only : forc_type,ReadForc,UpdateForc
   use histMod
   use fileUtil
+  use EcoSIMSolverPar
   implicit none
   character(len=*), intent(in) :: namelist_buffer
 !
 ! local argument
+  type(forc_type)   :: forc
   type(micforctype) :: micfor
   type(micsttype) :: micstt
   type(micfluxtype) :: micflx
@@ -86,13 +89,38 @@ end program main
   character(len=32) :: model_name
   character(len=32) :: case_id
   character(len=32) :: prefix
+  character(len=128):: forc_file
   logical :: salton
-  namelist /driver_nml/model_name,case_id,hist_freq,salton
+  real(r8) :: CO2E                       !initial atmospheric CO2 concentration, [umol mol-1],ppmv
+  real(r8) :: OXYE                       !atmospheric O2 concentration, [umol mol-1],ppmv
+  real(r8) :: Z2OE                       !atmospheric N2O concentration, [umol mol-1],ppmv
+  real(r8) :: Z2GE                       !atmospheric N2 concentration, [umol mol-1],ppmv
+  real(r8) :: ZNH3E                      !atmospheric NH3 concentration, [umol mol-1],ppmv
+  real(r8) :: CH4E                       !atmospheric CH4 concentration, [umol mol-1],ppmv
+  real(r8) :: H2GE                       !atmospheric H2 concentration, [umol mol-1],ppmv
+  integer :: forctype                    ! 0: (transient), 1: T const, 2: water const, 3: T and water const
+  logical :: disvolonly                  !dissolution/volatilization only
+  namelist /driver_nml/model_name,case_id,hist_freq,salton,forc_file,&
+    CO2E,OXYE,Z2OE,Z2GE,ZNH3E,CH4E,H2GE,forctype,disvolonly
+
   character(len=*), parameter :: mod_filename=__FILE__
+
   hist_freq='day'
   model_name='boxsbgc'
   case_id='exp0'
   salton=.false.
+  forc_file='bbforc.nc'
+
+  disvolonly=.false.
+  OXYE=2.1E+05_r8
+  Z2GE=7.8E+05_r8
+  CO2E=370.0_r8
+  CH4E=1.8_r8
+  Z2OE= 0.3_r8
+  ZNH3E=0.005_r8
+  H2GE=1.e-3_r8
+  forctype=0
+
   if ( .true. )then
      ioerror_msg=''
      read(namelist_buffer, nml=driver_nml, iostat=nml_error, iomsg=ioerror_msg)
@@ -109,6 +137,10 @@ end program main
     write(stdout, *) '--------------------'
   endif
 
+! set up solver
+
+  NPH=1;NPT=15;NPG=NPT*NPH;XNPG=1.0_r8/NPG;XNPH=1._r8/NPH;XNPT=1.0_r8/NPT
+
   ncols=1
 !!============================================================
 ! customized model varlist creation
@@ -123,13 +155,25 @@ end program main
   allocate(ystates0l(1:nvars));       ystates0l(:) = 0._r8
   allocate(ystatesfl(1:nvars));       ystatesfl(:) = 0._r8
 
+
+  forc%OXYE =OXYE
+  forc%Z2GE =Z2GE
+  forc%CO2E =CO2E
+  forc%CH4E =CH4E
+  forc%Z2OE =Z2OE
+  forc%ZNH3E=ZNH3E
+  forc%H2GE =H2GE
+  forc%disvolonly=disvolonly
+
+  call ReadForc(forc,forc_file)
+
   call micfor%Init()
   call micstt%Init()
   call micflx%Init()
 
-
 ! customized model initialization
-  call initmodel(nvars, ystates0l, err_status)
+  call initmodel(nvars, ystates0l, forc, err_status)
+
 
   if(err_status%check_status())then
     call endrun(msg=err_status%print_msg())
@@ -148,27 +192,29 @@ end program main
 
   call hist%init(ncols,varl, varlnml, unitl, vartypes, freql, gname, dtime)
 
-!  call ReadForc(forc)
 
   DO
 
     call timer%update_time_stamp()
 
-  !  call BatchModelConfig(forc,micfor,micstt,micflx, ystatesf0l,err_status)
-
-!    if(err_status%check_status())then
-!      call endrun(msg=err_status%print_msg())
-!    endif
-
-!   computes the fluxes
-!    call SoilBGCOneLayer(I,J,micfor,micstt,micflx)
-
-!    call UpdateStateVars(micstt,micflx,nvars,ystatesfl)
+!   setup forcing, e.g., add litter/om/nutrients, set up temperature/moisture
 !
+    call UpdateForc(forc,forctype)
+
+    call BatchModelConfig(nvars,ystates0l,forc,micfor,micstt,micflx,err_status)
+
+    if(err_status%check_status())then
+      call endrun(msg=err_status%print_msg())
+    endif
+
+    call RunMicBGC(nvars, ystates0l, ystatesfl, forc,micfor,micstt,micflx, err_status)
+
     call timer%update_time_stamp()
 
     do jj = 1, nvars
       ystatesf(1,jj)=ystatesfl(jj)
+      ystates0l(jj) =ystatesfl(jj)
+      forc%ORGC=micfor%ORGC
     enddo
 
     call hist%hist_wrap(ystatesf, timer)
@@ -181,7 +227,7 @@ end program main
   enddo
   call timer%get_ymdhs(yymmddhhss)
 
-  call hist%histrst('aquachem.x', 'write', yymmddhhss)
+  call hist%histrst('boxsbgc.x', 'write', yymmddhhss)
 
   call micfor%destroy()
   call micflx%destroy()

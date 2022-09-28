@@ -7,7 +7,7 @@ module RootMod
   use NoduleBGCMod
 implicit none
   private
-
+  character(len=*),private, parameter :: mod_filename = __FILE__
   public :: RootBGCModel
   contains
 
@@ -1702,6 +1702,7 @@ implicit none
     WTRSBP     =>   plt_biom%WTRSBP   , &
     ZEROL      =>   plt_biom%ZEROL    , &
     ZEROP      =>   plt_biom%ZEROP    , &
+    IBTYP      =>   plt_pheno%IBTYP   , &
     IGTYP      =>   plt_pheno%IGTYP   , &
     IDTHB      =>   plt_pheno%IDTHB   , &
     ISTYP      =>   plt_pheno%ISTYP   , &
@@ -1872,9 +1873,9 @@ implicit none
           CNL=0._r8
           CPL=0._r8
         ENDIF
-        XFRCX=FXFR(IGTYP(NZ))*AMAX1(0.0_r8,CPOOLR(N,L,NZ))
-        XFRNX=FXFR(IGTYP(NZ))*AMAX1(0.0_r8,ZPOOLR(N,L,NZ))*(1.0+CNL)
-        XFRPX=FXFR(IGTYP(NZ))*AMAX1(0.0_r8,PPOOLR(N,L,NZ))*(1.0+CPL)
+        XFRCX=FXFR(IBTYP(NZ))*AMAX1(0.0_r8,CPOOLR(N,L,NZ))
+        XFRNX=FXFR(IBTYP(NZ))*AMAX1(0.0_r8,ZPOOLR(N,L,NZ))*(1.0+CNL)
+        XFRPX=FXFR(IBTYP(NZ))*AMAX1(0.0_r8,PPOOLR(N,L,NZ))*(1.0+CPL)
         XFRC=AMIN1(XFRCX,XFRNX/CNMN,XFRPX/CPMN)
         XFRN=AMIN1(XFRNX,XFRC*CNMX,XFRPX*CNMX/CPMN*0.5_r8)
         XFRP=AMIN1(XFRPX,XFRC*CPMX,XFRNX*CPMX/CNMN*0.5_r8)

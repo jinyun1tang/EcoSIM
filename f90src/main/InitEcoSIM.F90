@@ -2,6 +2,7 @@ module InitEcoSIM
 
   implicit none
   private
+  character(len=*),private, parameter :: mod_filename = __FILE__
   public ::   InitModules
 
   contains
@@ -32,8 +33,8 @@ module InitEcoSIM
   use PlantMngmtDataType  , only : InitPlantMngmtData
   use InitSOMBGCMod       , only : InitSOMBGC
   use GridConsts
-  use TrnsfrMod, only : InitTrnsfr
-
+  use TrnsfrMod           , only : InitTrnsfr
+  use EcoSIMConfig        , only : jcplx1 => jcplx1c
   implicit  none
   integer                 , intent(in) :: nmicbguilds   !number of microbial guilds per group
 

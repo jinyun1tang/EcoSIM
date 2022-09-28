@@ -5,18 +5,12 @@ SUBROUTINE soil(NA,ND,NT,NE,NAX,NTX,NEX,NHW,NHE,NVN,NVS)
 !
   use data_kind_mod, only : r8 => SHR_KIND_R8
   use DayMod       , only : day
-  use ErosionMod   , only : erosion
   use ExecMod      , only : exec
   use Hour1Mod     , only : hour1
-  use RedistMod    , only : redist
-  use GeochemAPI   , only : soluteModel
   use StarteMod    , only : starte
   use StartqMod    , only : startq
   use StartsMod    , only : starts
-  use TrnsfrMod    , only : trnsfr
-  use TrnsfrsMod   , only : trnsfrs
   use VisualMod    , only : visual
-  use WatsubMod    , only : watsub
   use WthrMod      , only : wthr
   use readiMod     , only : readi
   use readqmod     , only : readq
@@ -29,17 +23,18 @@ SUBROUTINE soil(NA,ND,NT,NE,NAX,NTX,NEX,NHW,NHE,NVN,NVS)
   use EcoSIMConfig
   use PlantAPI     , only : PlantModel
   use MicBGCAPI    , only : MicrobeModel, MicAPI_Init, MicAPI_cleanup
+  use ForcWriterMod, only : do_bgcforc_write,WriteBBGCForc
+  use EcoSIMAPI    , only : Run_EcoSIM_one_step
   implicit none
 
   integer, intent(in) :: NT,NE,NAX,NTX,NEX,NHW,NHE,NVN,NVS
   integer, intent(in) :: NA(1:NEX),ND(1:NEX)
 
   character(len=*), parameter :: mod_filename = __FILE__
-
+  real(r8) :: t1
   integer :: I,J
   integer, SAVE :: NF,NX,NTZ,NTZX,NFX
   DATA NF,NX,NTZ,NTZX,NFX/0,0,0,0,0/
-  real(r8) :: t1
 
 ! begin_execution
 !
@@ -136,105 +131,39 @@ SUBROUTINE soil(NA,ND,NT,NE,NAX,NTX,NEX,NHW,NHE,NVN,NVS)
 !
   if(lverb)WRITE(*,333)'DAY'
   CALL DAY(I,NHW,NHE,NVN,NVS)
+
   DO 9995 J=1,24
-!
-!   UPDATE HOURLY VARIABLES IN 'HOUR1'
-!
+
+
+    !
+    !   UPDATE HOURLY VARIABLES IN 'HOUR1'
+    !
     if(lverb)WRITE(*,333)'WTHR'
-!    if(I>=170)print*,I,J,TKS(0,NVN,NHW)
     call start_timer(t1)
     CALL WTHR(I,J,NHW,NHE,NVN,NVS)
     call end_timer('WTHR',t1)
 
-    if(lverb)WRITE(*,333)'HOUR1'
-!    if(I>=170)print*,TKS(0,NVN,NHW)
-    call start_timer(t1)
-    CALL HOUR1(I,J,NHW,NHE,NVN,NVS)
-    call end_timer('HOUR1',t1)
-!
-!   CALCULATE SOIL ENERGY BALANCE, WATER AND HEAT FLUXES IN 'WATSUB'
-!
-    if(lverb)WRITE(*,333)'WAT'
-!    if(I>=170)print*,TKS(0,NVN,NHW)
-    call start_timer(t1)
-    CALL WATSUB(I,J,NHW,NHE,NVN,NVS)
-    call end_timer('WAT',t1)
-!
-!   CALCULATE SOIL BIOLOGICAL TRANSFORMATIONS IN 'NITRO'
-!
-    if(lverb)WRITE(*,333)'NIT'
-!    if(I>=170)print*,TKS(0,NVN,NHW)
-    call start_timer(t1)
-    CALL MicrobeModel(I,J,NHW,NHE,NVN,NVS)
-    call end_timer('NIT',t1)
-!
-!   UPDATE PLANT biogeochemistry
-!
-    if(lverb)WRITE(*,333)'PlantModel'
-!    if(I>=170)print*,TKS(0,NVN,NHW)
-    call PlantModel(I,J,NHW,NHE,NVN,NVS)
-!
-!
-!   CALCULATE SOLUTE EQUILIBRIA IN 'SOLUTE'
-!
-    if(lverb)WRITE(*,333)'SOL'
-    call start_timer(t1)
-    CALL soluteModel(I,J,NHW,NHE,NVN,NVS)
-    call end_timer('SOL',t1)
-!
-!   CALCULATE GAS AND SOLUTE FLUXES IN 'TRNSFR'
-!
-    if(lverb)WRITE(*,333)'TRN'
-!    if(I>=170)print*,TKS(0,NVN,NHW)
-    call start_timer(t1)
-    CALL TRNSFR(I,J,NHW,NHE,NVN,NVS)
-    call end_timer('TRN',t1)
-!
-!   CALCULATE ADDITIONAL SOLUTE FLUXES IN 'TRNSFRS' IF SALT OPTION SELECTED
-!
-    if(lverb)WRITE(*,333)'TRNS'
-!    if(I>=170)print*,TKS(0,NVN,NHW)
-    call start_timer(t1)
-    CALL TRNSFRS(I,J,NHW,NHE,NVN,NVS)
-    call end_timer('TRNSFRS',t1)
-!
-!   CALCULATE SOIL SEDIMENT TRANSPORT IN 'EROSION'
-!
-    if(lverb)WRITE(*,333)'EROSION'
-!    if(I>=170)print*,TKS(0,NVN,NHW)
-    call start_timer(t1)
-    CALL EROSION(I,J,NHW,NHE,NVN,NVS)
-    call end_timer('EROSION',t1)
-!
-!   UPDATE ALL SOIL STATE VARIABLES FOR WATER, HEAT, GAS, SOLUTE
-!   AND SEDIMENT FLUXES IN 'REDIST'
-!
-    if(lverb)WRITE(*,333)'RED'
-!    if(I>=170)print*,TKS(0,NVN,NHW)
-    call start_timer(t1)
-    CALL REDIST(I,J,NHW,NHE,NVN,NVS)
-    call end_timer('RED',t1)
-!    if(I>=170)print*,'afred',TKS(0,NVN,NHW)
-!   WRITE(*,333)'END'
-!
-!   WRITE HOURLY SOIL AND PLANT OUTPUT IN 'OUTSH' AND 'OUTPH'
-!
-    IF((J/JOUT)*JOUT.EQ.J)THEN
-      if(lverb)WRITE(*,333)'OUTSH'
-      CALL OUTSH(I,J,NT,NE,NTX,NEX,NHW,NHE,NVN,NVS)
+    call Run_EcoSIM_one_step(I,J,NHW,NHE,NVN,NVS)
 
-      if(lverb)WRITE(*,333)'OUTPH'
-      CALL OUTPH(I,J,NT,NE,NTX,NEX,NHW,NHE,NVN,NVS)
+  !
+  !   WRITE HOURLY SOIL AND PLANT OUTPUT IN 'OUTSH' AND 'OUTPH'
+  !
+  IF((J/JOUT)*JOUT.EQ.J)THEN
+    if(lverb)WRITE(*,333)'OUTSH'
+    CALL OUTSH(I,J,NT,NE,NTX,NEX,NHW,NHE,NVN,NVS)
+
+    if(lverb)WRITE(*,333)'OUTPH'
+    CALL OUTPH(I,J,NT,NE,NTX,NEX,NHW,NHE,NVN,NVS)
+  ENDIF
+  !
+  !   WRITE OUTPUT FOR DYNAMIC VISUALIZATION
+  !
+  IF(DATA1(18).EQ.'YES')THEN
+    IF((J/JOUT)*JOUT.EQ.J)THEN
+      if(lverb)WRITE(*,333)'VIS'
+      CALL VISUAL(I,J,NHW,NHE,NVN,NVS)
     ENDIF
-!
-!   WRITE OUTPUT FOR DYNAMIC VISUALIZATION
-!
-    IF(DATA1(18).EQ.'YES')THEN
-      IF((J/JOUT)*JOUT.EQ.J)THEN
-        if(lverb)WRITE(*,333)'VIS'
-        CALL VISUAL(I,J,NHW,NHE,NVN,NVS)
-      ENDIF
-    ENDIF
+  ENDIF
     call end_timer_loop()
 
 9995  CONTINUE
@@ -277,6 +206,10 @@ SUBROUTINE soil(NA,ND,NT,NE,NAX,NTX,NEX,NHW,NHE,NVN,NVS)
     if(lverb)WRITE(*,333)'ROUTP'
     CALL ROUTP(NHW,NHE,NVN,NVS)
   ENDIF
+
+  if(do_bgcforc_write)then
+    call WriteBBGCForc(I,IYRR)
+  endif
   GO TO 9000
 9999  CONTINUE
 
