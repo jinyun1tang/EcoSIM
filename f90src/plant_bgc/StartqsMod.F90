@@ -48,6 +48,7 @@ module StartqsMod
 
       NZ2X=MIN(NZ2Q,NP)
       DO 9985 NZ=NZ1Q,NZ2X
+        print*,'startqs',IFLGC(NZ)
         IF(IFLGC(NZ).EQ.0)THEN
 
           call InitShootGrowth(NZ)
@@ -466,9 +467,9 @@ module StartqsMod
 !     SDVL,SDLG,SDAR=seed volume(m3),length(m),AREA3(NU)(m2)
 !     GRDM=seed C mass (g) from PFT file
 !
-  SDVL(NZ)=GRDM(NZ)*5.0E-06
-  SDLG(NZ)=2.0*(0.75*SDVL(NZ)/PICON)**0.33
-  SDAR(NZ)=4.0*PICON*(SDLG(NZ)/2.0)**2
+  SDVL(NZ)=GRDM(NZ)*5.0E-06_r8
+  SDLG(NZ)=2.0_r8*(0.75*SDVL(NZ)/PICON)**0.33_r8
+  SDAR(NZ)=4.0_r8*PICON*(SDLG(NZ)/2.0_r8)**2_r8
 !
 !     INITIALIZE ROOT(N=1),MYCORRHIZAL(N=2) DIMENSIONS, UPTAKE PARAMETERS
 !
@@ -484,10 +485,12 @@ module StartqsMod
 !     RSRR,RSRA=radial,axial root resistivity (m2 MPa-1 h-1)
 !
   SDPTH(NZ)=SDPTHI(NZ)
+  print*,'set seed',SDPTH(NZ),CDPTHZ(NU-1),CDPTHZ(NU),NU,NL
   DO 9795 L=NU,NL
     IF(SDPTH(NZ).GE.CDPTHZ(L-1).AND.SDPTH(NZ).LT.CDPTHZ(L))THEN
       NG(NZ)=L
       NIX(NZ)=L
+      print*,'set ninr startq'
       DO 9790 NR=1,JC1
         NINR(NR,NZ)=L
 9790  CONTINUE

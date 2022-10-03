@@ -32,7 +32,7 @@ module StartsMod
   use PlantMngmtDataType
   use EcoSimSumDataType
   use RootDataType
-  use EcosysBGCFluxType
+  use EcosimBGCFluxType
   use SoilPropertyDataType
   use IrrigationDataType
   use SedimentDataType
@@ -88,15 +88,15 @@ module StartsMod
 
   ALTZG=0.0_r8
   CDPTHG=0.0_r8
-  DO 9995 NX=NHW,NHE
-    DO 9990 NY=NVN,NVS
+  DO  NX=NHW,NHE
+    DO  NY=NVN,NVS
 
       !
       !     MINIMUM SURFACE ELEVATION IN LANDSCAPE
       !
       !     ALT=surface elevation relative to maximum
       !     ALTZG=minimum surface elevation in landscape
-      !
+      !CDPTH: depth to bottom of soil layer
       ALT(NY,NX)=ALT(NY,NX)-ALTY
       IF(NX.EQ.NHW.AND.NY.EQ.NVN)THEN
         ALTZG=ALT(NY,NX)
@@ -164,11 +164,11 @@ module StartsMod
       DPTHSK(NY,NX)=AMAX1(10.0_r8,CDPTH(NL(NY,NX),NY,NX)+1.0_r8)
       TCS(0,NY,NX)=ATCS(NY,NX)
       TKS(0,NY,NX)=ATKS(NY,NX)
-      TKSD(NY,NX)=ATKS(NY,NX)+2.052E-04*DPTHSK(NY,NX)/TCNDG
+      TKSD(NY,NX)=ATKS(NY,NX)+2.052E-04_r8*DPTHSK(NY,NX)/TCNDG
 !
 
-9990  CONTINUE
-9995  CONTINUE
+    ENDDO
+  ENDDO
 
 !
 !     INITIALIZE COMMUNITY CANOPY
@@ -214,20 +214,32 @@ module StartsMod
   ENDIF
 !
 !     INITIALIZE GRID CELL DIMENSIONS
-  DO 9895 NX=NHW,NHE
-    DO 9890 NY=NVN,NVS
+! altz: topographic altitude
+! ALT: grid altitude
+! DTBLI: external water table depth
+! DTBLG: slope of water table relative to surface slope
+! DTBLZ: external water table depth
+! DTBLDI: depth of artificial water table
+! DPTHT: internal water table depth
+!
+  DO  NX=NHW,NHE
+    DO  NY=NVN,NVS
       ALTZ(NY,NX)=ALTZG
       IF(BKDS(NU(NY,NX),NY,NX).GT.0.0_r8)THEN
-        DTBLZ(NY,NX)=DTBLI(NY,NX)-(ALTZ(NY,NX)-ALT(NY,NX)) &
-          *(1.0_r8-DTBLG(NY,NX))
-        DTBLD(NY,NX)=AZMAX1(DTBLDI(NY,NX)-(ALTZ(NY,NX)-ALT(NY,NX)) &
-          *(1.0_r8-DTBLG(NY,NX)))
+        DTBLZ(NY,NX)=DTBLI(NY,NX)-(ALTZ(NY,NX)-ALT(NY,NX))*(1.0_r8-DTBLG(NY,NX))
+        DTBLD(NY,NX)=AZMAX1(DTBLDI(NY,NX)-(ALTZ(NY,NX)-ALT(NY,NX))*(1.0_r8-DTBLG(NY,NX)))
       ELSE
         DTBLZ(NY,NX)=0.0_r8
         DTBLD(NY,NX)=0.0_r8
       ENDIF
       DPTHT(NY,NX)=DTBLZ(NY,NX)
-      DO 4400 L=1,NL(NY,NX)
+    ENDDO
+  ENDDO
+
+  DO  NX=NHW,NHE
+    DO  NY=NVN,NVS
+
+      DO L=1,NL(NY,NX)
         N1=NX
         N2=NY
         N3=L
@@ -260,17 +272,23 @@ module StartsMod
               N6=L+1
             ENDIF
           ENDIF
-          DIST(N,N6,N5,N4)=0.5*(DLYR(N,N3,N2,N1)+DLYR(N,N6,N5,N4))
+          DIST(N,N6,N5,N4)=0.5_r8*(DLYR(N,N3,N2,N1)+DLYR(N,N6,N5,N4))
           XDPTH(N,N6,N5,N4)=AREA(N,N3,N2,N1)/DIST(N,N6,N5,N4)
 !1.07 is a scaling parameter for dispersion calculation, reference?
-          DISP(N,N6,N5,N4)=0.20*DIST(N,N6,N5,N4)**1.07_r8
+          DISP(N,N6,N5,N4)=0.20_r8*DIST(N,N6,N5,N4)**1.07_r8
         ENDDO
+
         IF(L.EQ.NU(NY,NX))THEN
           DIST(3,N3,N2,N1)=0.5*DLYR(3,N3,N2,N1)
           XDPTH(3,N3,N2,N1)=AREA(3,N3,N2,N1)/DIST(3,N3,N2,N1)
           DISP(3,N3,N2,N1)=0.20*DIST(3,N3,N2,N1)**1.07_r8
         ENDIF
-4400  CONTINUE
+      ENDDO
+    ENDDO
+  ENDDO
+
+  DO  NX=NHW,NHE
+    DO  NY=NVN,NVS
 
       !
       !     ALLOCATE LITTER,SOC TO WOODY,NON-WOODY,MANURE,POC AND HUMUS
@@ -279,14 +297,13 @@ module StartsMod
       !
       !     SURFACE LITTER HEAT CAPACITY
       !
-      BKVLNM(NY,NX)=AMAX1(0.0,SAND(NU(NY,NX),NY,NX) &
+      BKVLNM(NY,NX)=AZMAX1(SAND(NU(NY,NX),NY,NX) &
         +SILT(NU(NY,NX),NY,NX)+CLAY(NU(NY,NX),NY,NX))
-      VHCP(0,NY,NX)=cpo*ORGC(0,NY,NX)+cpw*VOLW(0,NY,NX) &
-        +cpi*VOLI(0,NY,NX)
+      VHCP(0,NY,NX)=cpo*ORGC(0,NY,NX)+cpw*VOLW(0,NY,NX)+cpi*VOLI(0,NY,NX)
       VHCM(0,NY,NX)=0.0_r8
       VOLAI(0,NY,NX)=0.0_r8
-9890  CONTINUE
-9895  CONTINUE
+    ENDDO
+  ENDDO
   end subroutine InitSoilVars
 !------------------------------------------------------------------------------------------
   subroutine InitSoilProfile(NY,NX,CDPTHG)
@@ -324,12 +341,12 @@ module StartsMod
     !     ALLOCATE SOC TO POC(3) AND HUMUS(4)
     !
     !     CORGCX(3)=CORGRZ
-    !     CORGCX(4)=AMAX1(0.0,CORGCZ-CORGCX(3))
+    !     CORGCX(4)=AZMAX1(CORGCZ-CORGCX(3))
     !     CORGNX(3)=AMIN1(CNRH(3)*CORGCX(3),CORGNZ)
-    !     CORGNX(4)=AMAX1(0.0,CORGNZ-CORGNX(3))
+    !     CORGNX(4)=AZMAX1(CORGNZ-CORGNX(3))
     !     CORGPX(3)=AMIN1(CPRH(3)*CORGCX(3),CORGPZ)
-    !     CORGPX(4)=AMAX1(0.0,CORGPZ-CORGPX(3))
-    CORGL=AMAX1(0.0,CORGC(L,NY,NX)-CORGR(L,NY,NX))
+    !     CORGPX(4)=AZMAX1(CORGPZ-CORGPX(3))
+    CORGL=AZMAX1(CORGC(L,NY,NX)-CORGR(L,NY,NX))
     TORGL(L)=TORGC+CORGL*BKVL(L,NY,NX)/AREA(3,L,NY,NX)*0.5
     TORGC=TORGC+CORGL*BKVL(L,NY,NX)/AREA(3,L,NY,NX)
 1190  CONTINUE
@@ -425,11 +442,11 @@ module StartsMod
           THETW(L,NY,NX)=THW(L,NY,NX)
         ENDIF
         IF(THI(L,NY,NX).GT.1.0)THEN
-          THETI(L,NY,NX)=AMAX1(0.0,AMIN1(POROS(L,NY,NX),POROS(L,NY,NX)-THW(L,NY,NX)))
+          THETI(L,NY,NX)=AZMAX1(AMIN1(POROS(L,NY,NX),POROS(L,NY,NX)-THW(L,NY,NX)))
         ELSEIF(test_aeqb(THI(L,NY,NX),1.0_r8))THEN
-          THETI(L,NY,NX)=AMAX1(0.0,AMIN1(FC(L,NY,NX),POROS(L,NY,NX)-THW(L,NY,NX)))
+          THETI(L,NY,NX)=AZMAX1(AMIN1(FC(L,NY,NX),POROS(L,NY,NX)-THW(L,NY,NX)))
         ELSEIF(test_aeqb(THI(L,NY,NX),0.0_r8))THEN
-          THETI(L,NY,NX)=AMAX1(0.0,AMIN1(WP(L,NY,NX),POROS(L,NY,NX)-THW(L,NY,NX)))
+          THETI(L,NY,NX)=AZMAX1(AMIN1(WP(L,NY,NX),POROS(L,NY,NX)-THW(L,NY,NX)))
         ELSEIF(THI(L,NY,NX).LT.0.0)THEN
           THETI(L,NY,NX)=0.0_r8
         ELSE
@@ -440,17 +457,14 @@ module StartsMod
         VOLWH(L,NY,NX)=THETW(L,NY,NX)*VOLAH(L,NY,NX)
         VOLI(L,NY,NX)=THETI(L,NY,NX)*VOLX(L,NY,NX)
         VOLIH(L,NY,NX)=THETI(L,NY,NX)*VOLAH(L,NY,NX)
-        VOLP(L,NY,NX)=AMAX1(0.0,VOLA(L,NY,NX)-VOLW(L,NY,NX) &
-          -VOLI(L,NY,NX))+AMAX1(0.0,VOLAH(L,NY,NX)-VOLWH(L,NY,NX) &
+!       VOLP: total air-filled porosity, micropores + macropores
+        VOLP(L,NY,NX)=AZMAX1(VOLA(L,NY,NX)-VOLW(L,NY,NX) &
+          -VOLI(L,NY,NX))+AZMAX1(VOLAH(L,NY,NX)-VOLWH(L,NY,NX) &
           -VOLIH(L,NY,NX))
         VHCP(L,NY,NX)=VHCM(L,NY,NX)+cpw*(VOLW(L,NY,NX) &
           +VOLWH(L,NY,NX))+cpi*(VOLI(L,NY,NX)+VOLIH(L,NY,NX))
         THETWZ(L,NY,NX)=THETW(L,NY,NX)
         THETIZ(L,NY,NX)=THETI(L,NY,NX)
-          !     WRITE(*,2425)'VOLWS',NX,NY,L
-          !    2,VOLW(L,NY,NX),THETW(L,NY,NX),VOLI(L,NY,NX),THETI(L,NY,NX)
-          !    3,VOLX(L,NY,NX),POROS(L,NY,NX),TKS(L,NY,NX),VHCP(L,NY,NX)
-!2425  FORMAT(A8,3I4,20E12.4)
       ENDIF
     ENDIF
     TKS(L,NY,NX)=ATKS(NY,NX)
@@ -460,6 +474,7 @@ module StartsMod
     call InitSOMVars(L,NY,NX,FCX)
     !
 1200  CONTINUE
+    POROSI(0,NY,NX)=1._r8  !this is added for numerical fixing
     !
     !  INITIALIZE FERTILIZER ARRAYS
     call initFertArrays(NY,NX)
@@ -558,7 +573,7 @@ module StartsMod
       DLYRS(L,NY,NX)=AMIN1(DLYRSI,DPTHS(NY,NX))
     ELSE
       DLYRSI=CDPTHSI(L)-CDPTHSI(L-1)
-      DLYRS(L,NY,NX)=AMIN1(DLYRSI,AMAX1(0.0,DPTHS(NY,NX)-CDPTHSI(L-1)))
+      DLYRS(L,NY,NX)=AMIN1(DLYRSI,AZMAX1(DPTHS(NY,NX)-CDPTHSI(L-1)))
     ENDIF
     VOLSSL(L,NY,NX)=DLYRS(L,NY,NX)*DENS0(NY,NX)*DH(NY,NX)*DV(NY,NX)
     VOLWSL(L,NY,NX)=0.0_r8
@@ -651,7 +666,7 @@ module StartsMod
       GCOS(NY,NX)=SQRT(1.0-GSIN(NY,NX)**2)
       DO 240 N=1,JSA
         DGAZI=COS(GAZI(NY,NX)-YAZI(N))
-        OMEGAG(N,NY,NX)=AMAX1(0.0,AMIN1(1.0,GCOS(NY,NX)*YSIN(N)+GSIN(NY,NX)*YCOS(N)*DGAZI))
+        OMEGAG(N,NY,NX)=AZMAX1(AMIN1(1.0,GCOS(NY,NX)*YSIN(N)+GSIN(NY,NX)*YCOS(N)*DGAZI))
 240   CONTINUE
 !     compute ground surface elevation
       IF(NX.EQ.NHW)THEN
@@ -868,7 +883,7 @@ module StartsMod
   integer :: L
 
 !     begin_execution
-  DO 1195 L=0,NL(NY,NX)
+  DO  L=0,NL(NY,NX)
 !
 ! LAYER DEPTHS AND THEIR PHYSICAL PROPERTIES
 
@@ -885,54 +900,52 @@ module StartsMod
     DLYR(2,L,NY,NX)=DLYRI(2,L,NY,NX)
     AREA(3,L,NY,NX)=DLYR(1,L,NY,NX)*DLYR(2,L,NY,NX)
     IF(L.EQ.0)THEN
+! surface residue layer
       TAREA=TAREA+AREA(3,L,NY,NX)
-      CDPTHZ(L,NY,NX)=0.0
+      CDPTHZ(L,NY,NX)=0.0_r8
       ORGC(L,NY,NX)=(RSC(0,L,NY,NX)+RSC(1,L,NY,NX)+RSC(2,L,NY,NX))*AREA(3,L,NY,NX)
       ORGCX(L,NY,NX)=ORGC(L,NY,NX)
-      VOLR(NY,NX)=(RSC(0,L,NY,NX)*1.0E-06/BKRS(0) &
-        +RSC(1,L,NY,NX)*1.0E-06/BKRS(1)+RSC(2,L,NY,NX)*1.0E-06/BKRS(2)) &
+      VOLR(NY,NX)=(RSC(0,L,NY,NX)*1.0E-06_r8/BKRS(0) &
+        +RSC(1,L,NY,NX)*1.0E-06_r8/BKRS(1)+RSC(2,L,NY,NX)*1.0E-06_r8/BKRS(2)) &
         *AREA(3,L,NY,NX)
       VOLT(L,NY,NX)=VOLR(NY,NX)
       VOLX(L,NY,NX)=VOLT(L,NY,NX)
       VOLY(L,NY,NX)=VOLX(L,NY,NX)
       VOLTI(L,NY,NX)=VOLT(L,NY,NX)
-      BKVL(L,NY,NX)=1.82E-06*ORGC(L,NY,NX)
+      BKVL(L,NY,NX)=1.82E-06_r8*ORGC(L,NY,NX)  !mass of soil layer, Mg/d2
       DLYRI(3,L,NY,NX)=VOLX(L,NY,NX)/AREA(3,L,NY,NX)
       DLYR(3,L,NY,NX)=DLYRI(3,L,NY,NX)
     ELSE
+!     if it is a standing water, no macropore fraction
       IF(BKDSI(L,NY,NX).LE.ZERO)FHOL(L,NY,NX)=0.0
+!     thickness:=bottom depth-upper depth
       DLYRI(3,L,NY,NX)=(CDPTH(L,NY,NX)-CDPTH(L-1,NY,NX))
       call check_bool(DLYRI(3,L,NY,NX)<0._r8,'negative soil layer thickness',&
         __LINE__,mod_filename)
-!      if(abs(DLYRI(3,L,NY,NX))<1.e-10_r8)then
-!      print*,'L,NX,NY=',L,NX,NY
-!      print*,'DLYRI(3,L,NY,NX)=',DLYRI(3,L,NY,NX)
-!      call print_info('CDPTH(L,NY,NX)',(/padr('CDPTH(L)',12),
-!      2padr('CDPTH(L-1)',12)/),
-!      3(/CDPTH(L,NY,NX),CDPTH(L-1,NY,NX)/))
-!      endif
+      !FMPR: micropore fraction
       DLYR(3,L,NY,NX)=DLYRI(3,L,NY,NX)
-      DPTH(L,NY,NX)=0.5*(CDPTH(L,NY,NX)+CDPTH(L-1,NY,NX))
+!     DPTH: depth of layer middle
+      DPTH(L,NY,NX)=0.5_r8*(CDPTH(L,NY,NX)+CDPTH(L-1,NY,NX))
+!     CDPTHZ: soil thickness from surface to bottom of layer L, [m]
       CDPTHZ(L,NY,NX)=CDPTH(L,NY,NX)-CDPTH(NU(NY,NX),NY,NX)+DLYR(3,NU(NY,NX),NY,NX)
-      DPTHZ(L,NY,NX)=0.5*(CDPTHZ(L,NY,NX)+CDPTHZ(L-1,NY,NX))
+!     DPTHZ: depth to middle of soil layer from  surface of grid cell [m]
+      DPTHZ(L,NY,NX)=0.5_r8*(CDPTHZ(L,NY,NX)+CDPTHZ(L-1,NY,NX))
+!     VOLT: total volume
       VOLT(L,NY,NX)=amax1(AREA(3,L,NY,NX)*DLYR(3,L,NY,NX),1.e-8_r8)
-!      if(abs(DLYR(3,L,NY,NX))<1.e-10_r8)then
-!      print*,'L,NX,NY=',L,NX,NY
-!      print*,'VOLT(L,NY,NX)=',VOLT(L,NY,NX)
-!      call print_info('DLYR(3,L,NY,NX)==0.',(/padr('DLYR(3)',10)/),
-!     2(/DLYR(3,L,NY,NX)/))
-!      endif
+!     VOLX: total micropore volume
       VOLX(L,NY,NX)=VOLT(L,NY,NX)*FMPR(L,NY,NX)
       VOLY(L,NY,NX)=VOLX(L,NY,NX)
       VOLTI(L,NY,NX)=VOLT(L,NY,NX)
+!     bulk density evaluated as micropore volume
       BKVL(L,NY,NX)=BKDS(L,NY,NX)*VOLX(L,NY,NX)
-      RTDNT(L,NY,NX)=0.0
+      RTDNT(L,NY,NX)=0.0_r8
     ENDIF
     AREA(1,L,NY,NX)=DLYR(3,L,NY,NX)*DLYR(2,L,NY,NX)
     AREA(2,L,NY,NX)=DLYR(3,L,NY,NX)*DLYR(1,L,NY,NX)
-1195  CONTINUE
+  ENDDO
   CDPTH(0,NY,NX)=CDPTH(NU(NY,NX),NY,NX)-DLYR(3,NU(NY,NX),NY,NX)
   CDPTHI(NY,NX)=CDPTH(0,NY,NX)
   AREA(3,NL(NY,NX)+1:JZ,NY,NX)=DLYR(1,NL(NY,NX),NY,NX)*DLYR(2,NL(NY,NX),NY,NX)
+
   end subroutine InitLayerDepths
 end module StartsMod

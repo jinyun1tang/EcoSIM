@@ -967,8 +967,7 @@ implicit none
                 TFRCO2=0._r8
                 DO 5100 LL=NG(NZ),NINR(NR,NZ)
                   IF(LL.LT.NINR(NR,NZ))THEN
-                    FRCO2=AMIN1(1.0,RTLG1(N,LL,NR,NZ) &
-                      /(RTDP1(N,NR,NZ)-SDPTH(NZ)))
+                    FRCO2=AMIN1(1.0,RTLG1(N,LL,NR,NZ)/(RTDP1(N,NR,NZ)-SDPTH(NZ)))
                   ELSE
                     FRCO2=1.0_r8-TFRCO2
                   ENDIF
@@ -1911,10 +1910,10 @@ implicit none
       RECO=RECO+RCO2A(N,L,NZ)
       TRAU=TRAU+RCO2A(N,L,NZ)
 5450  CONTINUE
-    DO 5470 NR=1,NRT(NZ)
-      WTRTL(N,NINR(NR,NZ),NZ)=WTRTL(N,NINR(NR,NZ),NZ) &
-        +RTWT1(N,NR,NZ)
-5470  CONTINUE
+
+    DO  NR=1,NRT(NZ)
+      WTRTL(N,NINR(NR,NZ),NZ)=WTRTL(N,NINR(NR,NZ),NZ)+RTWT1(N,NR,NZ)
+    ENDDO
 5445  CONTINUE
 !
 !     TRANSFER NON-STRUCTURAL C,N,P BETWEEN ROOT AND SHOOT

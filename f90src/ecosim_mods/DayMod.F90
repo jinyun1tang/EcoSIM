@@ -19,7 +19,7 @@
   use RootDataType
   use PlantMngmtDataType
   use SOMDataType
-  use EcosysBGCFluxType
+  use EcosimBGCFluxType
   use EcoSIMHistMod
   use SoilPropertyDataType
   use IrrigationDataType

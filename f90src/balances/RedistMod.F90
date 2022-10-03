@@ -1,7 +1,7 @@
 module RedistMod
   use data_kind_mod, only : r8 => SHR_KIND_R8
   use abortutils, only : padr, print_info,endrun,destroy
-  use minimathmod, only : safe_adb
+  use minimathmod, only : safe_adb,AZMAX1
   use MicBGCPars, only : micpar
   use EcosimConst
   use FlagDataType
@@ -17,7 +17,7 @@ module RedistMod
   USE SoilHeatDataType
   USE EcoSIMCtrlDataType
   USE SoilBGCDataType
-  USE EcosysBGCFluxType
+  USE EcosimBGCFluxType
   use PlantDataRateType
   USE CanopyDataType
   USE ClimForcDataType
@@ -41,7 +41,7 @@ module RedistMod
 
   character(len=*), parameter :: mod_filename = __FILE__
 
-  real(r8) :: TXCO2(JY,JX),DORGE(JY,JX),THETCX(0:1)
+  real(r8) :: THETCX(0:1)
 
   DATA THETCX/8.0E-06_r8,8.0E-06_r8/
 
@@ -68,10 +68,9 @@ module RedistMod
   integer, intent(in) :: I, J
   integer, intent(in) :: NHW,NHE,NVN,NVS
 
-  integer :: NY,NX,L,LL,K,M,N,N1,N2,N3,N4,N5,N6,NN,NO
-  integer :: NZ,NUX,NR,L0,L1,LY,N4B,N5B
-  integer :: LG
+  integer :: NY,NX,L,LG
   real(r8) :: DORGC(JZ,JY,JX),DVOLI(JZ,JY,JX)
+  real(r8) :: TXCO2(JY,JX),DORGE(JY,JX)
   real(r8) :: UDVOLI,UDLYXF
   real(r8) :: VOLISO,VOLPT,VOLTT
   real(r8) :: TFLWT
@@ -112,7 +111,7 @@ module RedistMod
 !     OVERLAND FLOW
       call OverlandFlow(NY,NX)
 
-      call SoilErosion(NY,NX)
+      call SoilErosion(NY,NX,DORGE)
 !
       call ChemicalBySnowRedistribution(NY,NX)
 !
@@ -120,15 +119,14 @@ module RedistMod
 !
       call SumupSurfaceChemicalMass(NY,NX)
 !
-      call UpdateChemInSoilLayers(NY,NX,LG,VOLISO,DORGC,DVOLI)
+      call UpdateChemInSoilLayers(NY,NX,LG,VOLISO,DORGC,DVOLI,TXCO2,DORGE)
 !
 !     SNOWPACK LAYERING
       call SnowpackLayering(NY,NX)
 
-!     watch out 'L' in the following call
-      call RelayerSoilProfile(L,NY,NX,DORGC,DVOLI,UDVOLI,UDLYXF)
+      call RelayerSoilProfile(NY,NX,DORGC,DVOLI,UDVOLI,UDLYXF)
 
-      call UpdateOutputVars(I,J,NY,NX)
+      call UpdateOutputVars(I,J,NY,NX,TXCO2)
 !
 !     CHECK MATERIAL BALANCES
 !
@@ -146,12 +144,12 @@ module RedistMod
 
 !------------------------------------------------------------------------------------------
 
-  subroutine UpdateOutputVars(I,J,NY,NX)
+  subroutine UpdateOutputVars(I,J,NY,NX,TXCO2)
 
   use TillageMixMod
   implicit none
   integer, intent(in) :: I,J,NY,NX
-
+  real(r8), intent(in) :: TXCO2(JY,JX)
   real(r8) :: VOLXX,VOLTX
   integer  :: L
   TRN(NY,NX)=TRN(NY,NX)+HEATI(NY,NX)
@@ -184,10 +182,10 @@ module RedistMod
   !
   !     OUTPUT FOR SOIL WATER, ICE CONTENTS
   !
-  THETWZ(0,NY,NX)=AMAX1(0.0_r8,(VOLW(0,NY,NX)-VOLWRX(NY,NX))/AREA(3,0,NY,NX))
-  THETIZ(0,NY,NX)=AMAX1(0.0_r8,(VOLI(0,NY,NX)-VOLWRX(NY,NX))/AREA(3,0,NY,NX))
-  !THETWZ(0,NY,NX)=AMAX1(0.0_r8,AMIN1(1.0,VOLW(0,NY,NX)/VOLR(NY,NX)))
-  !THETIZ(0,NY,NX)=AMAX1(0.0_r8,AMIN1(1.0,VOLI(0,NY,NX)/VOLR(NY,NX)))
+  THETWZ(0,NY,NX)=AZMAX1((VOLW(0,NY,NX)-VOLWRX(NY,NX))/AREA(3,0,NY,NX))
+  THETIZ(0,NY,NX)=AZMAX1((VOLI(0,NY,NX)-VOLWRX(NY,NX))/AREA(3,0,NY,NX))
+  !THETWZ(0,NY,NX)=AZMAX1(AMIN1(1.0,VOLW(0,NY,NX)/VOLR(NY,NX)))
+  !THETIZ(0,NY,NX)=AZMAX1(AMIN1(1.0,VOLI(0,NY,NX)/VOLR(NY,NX)))
   DO 9945 L=NUI(NY,NX),NL(NY,NX)
     VOLXX=AREA(3,L,NY,NX)*DLYR(3,L,NY,NX)*FMPR(L,NY,NX)
     VOLTX=VOLXX+VOLAH(L,NY,NX)
@@ -272,8 +270,7 @@ module RedistMod
   IF(J.EQ.INT(ZNOON(NY,NX)).AND.ITILL(I,NY,NX).EQ.23)THEN
     DCORPW=DCORP(I,NY,NX)+CDPTH(NU(NY,NX)-1,NY,NX)
     DTBLI(NY,NX)=DCORPW
-    DTBLZ(NY,NX)=DTBLI(NY,NX)-(ALTZ(NY,NX)-ALT(NY,NX)) &
-      *(1.0-DTBLG(NY,NX))
+    DTBLZ(NY,NX)=DTBLI(NY,NX)-(ALTZ(NY,NX)-ALT(NY,NX))*(1.0_r8-DTBLG(NY,NX))
     DTBLX(NY,NX)=DTBLZ(NY,NX)+CDPTH(NU(NY,NX)-1,NY,NX)
   ENDIF
   IF(J.EQ.INT(ZNOON(NY,NX)).AND.ITILL(I,NY,NX).EQ.24)THEN
@@ -284,8 +281,7 @@ module RedistMod
       IDTBL(NY,NX)=4
     ENDIF
     DTBLDI(NY,NX)=DCORPW
-    DTBLD(NY,NX)=AMAX1(0.0_r8,DTBLDI(NY,NX)-(ALTZ(NY,NX)-ALT(NY,NX)) &
-      *(1.0_r8-DTBLG(NY,NX)))
+    DTBLD(NY,NX)=AZMAX1(DTBLDI(NY,NX)-(ALTZ(NY,NX)-ALT(NY,NX))*(1.0_r8-DTBLG(NY,NX)))
     DTBLY(NY,NX)=DTBLD(NY,NX)
   ENDIF
 !
@@ -710,15 +706,12 @@ module RedistMod
   end subroutine OverlandFlow
 !------------------------------------------------------------------------------------------
 
-  subroutine SoilErosion(NY,NX)
+  subroutine SoilErosion(NY,NX,DORGE)
   implicit none
   integer, intent(in) :: NY,NX
-
+  real(r8), intent(out) :: DORGE(JY,JX)
   integer :: K,NO,M,NGL
 
-  real(r8) :: TOMCERff(nlbiomcp,JG,NFGs,JY,JX)
-  real(r8) :: TOMNERff(nlbiomcp,JG,NFGs,JY,JX)
-  real(r8) :: TOMPERff(nlbiomcp,JG,NFGs,JY,JX)
   REAL(R8) :: DORGP
 
   ! begin_execution
@@ -1121,13 +1114,15 @@ module RedistMod
 !------------------------------------------------------------------------------------------
 
 
-  subroutine UpdateChemInSoilLayers(NY,NX,LG,VOLISO,DORGC,DVOLI)
+  subroutine UpdateChemInSoilLayers(NY,NX,LG,VOLISO,DORGC,DVOLI,TXCO2,DORGE)
   implicit none
   integer, intent(in) :: NY,NX,LG
   real(r8), intent(inout) :: VOLISO
   real(r8),intent(out) :: DORGC(JZ,JY,JX)
   REAL(R8),INTENT(OUT) :: DVOLI(JZ,JY,JX)
-  real(r8) :: DVOLW(JZ,JY,JX)
+  real(r8), intent(inout) :: TXCO2(JY,JX)
+  real(r8), intent(in) :: DORGE(JY,JX)
+  real(r8) :: DVOLW(JZ,JY,JX)   !change in water volume
   integer  :: L,K,M,N,LL,NGL
   real(r8) :: TKS00,TKSX
   real(r8) :: ENGY
@@ -1172,7 +1167,7 @@ module RedistMod
     DVOLW(L,NY,NX)=VOLW1(L,NY,NX)+VOLWH1(L,NY,NX)-VOLW(L,NY,NX)-VOLWH(L,NY,NX)
     DVOLI(L,NY,NX)=VOLI1(L,NY,NX)+VOLIH1(L,NY,NX)-VOLI(L,NY,NX)-VOLIH(L,NY,NX)
     IF(BKDS(L,NY,NX).GT.ZERO)THEN
-      VOLP(L,NY,NX)=AMAX1(0.0_r8,VOLA(L,NY,NX)-VOLW(L,NY,NX)-VOLI(L,NY,NX) &
+      VOLP(L,NY,NX)=AZMAX1(VOLA(L,NY,NX)-VOLW(L,NY,NX)-VOLI(L,NY,NX) &
         +VOLAH(L,NY,NX)-VOLWH(L,NY,NX)-VOLIH(L,NY,NX))
     ELSE
       VOLP(L,NY,NX)=0.0_r8
@@ -1182,8 +1177,7 @@ module RedistMod
 !     VOLT(L,NY,NX)=VOLA(L,NY,NX)
     ENDIF
     ENGY=VHCPX*TKSX
-    VHCP(L,NY,NX)=VHCM(L,NY,NX) &
-      +cpw*(VOLW(L,NY,NX)+VOLWH(L,NY,NX)) &
+    VHCP(L,NY,NX)=VHCM(L,NY,NX)+cpw*(VOLW(L,NY,NX)+VOLWH(L,NY,NX)) &
       +cpi*(VOLI(L,NY,NX)+VOLIH(L,NY,NX))
     TVHCP=TVHCP+VHCP(L,NY,NX)
     TVHCM=TVHCM+VHCM(L,NY,NX)
@@ -1531,7 +1525,7 @@ module RedistMod
     UPO4(NY,NX)=UPO4(NY,NX)+POX
     UPP4(NY,NX)=UPP4(NY,NX)+POP
     !
-    call SumOMStates(L,NY,NX,DORGC(L,NY,NX))
+    call SumOMStates(L,NY,NX,DORGC(L,NY,NX),DORGE(NY,NX))
 !
 !     TOTAL SALT IONS
 !
@@ -1751,19 +1745,19 @@ module RedistMod
 !     SOIL ELECTRICAL CONDUCTIVITY
 !
   IF(VOLW(L,NY,NX).GT.ZEROS2(NY,NX))THEN
-    ECHY=0.337_r8*AMAX1(0.0_r8,ZHY(L,NY,NX)/VOLW(L,NY,NX))
-    ECOH=0.192_r8*AMAX1(0.0_r8,ZOH(L,NY,NX)/VOLW(L,NY,NX))
-    ECAL=0.056_r8*AMAX1(0.0_r8,ZAL(L,NY,NX)*3.0_r8/VOLW(L,NY,NX))
-    ECFE=0.051_r8*AMAX1(0.0_r8,ZFE(L,NY,NX)*3.0_r8/VOLW(L,NY,NX))
-    ECCA=0.060_r8*AMAX1(0.0_r8,ZCA(L,NY,NX)*2.0_r8/VOLW(L,NY,NX))
-    ECMG=0.053_r8*AMAX1(0.0_r8,ZMG(L,NY,NX)*2.0_r8/VOLW(L,NY,NX))
-    ECNA=0.050_r8*AMAX1(0.0_r8,ZNA(L,NY,NX)/VOLW(L,NY,NX))
-    ECKA=0.070_r8*AMAX1(0.0_r8,ZKA(L,NY,NX)/VOLW(L,NY,NX))
-    ECCO=0.072_r8*AMAX1(0.0_r8,ZCO3(L,NY,NX)*2.0_r8/VOLW(L,NY,NX))
-    ECHC=0.044_r8*AMAX1(0.0_r8,ZHCO3(L,NY,NX)/VOLW(L,NY,NX))
-    ECSO=0.080_r8*AMAX1(0.0_r8,ZSO4(L,NY,NX)*2.0_r8/VOLW(L,NY,NX))
-    ECCL=0.076_r8*AMAX1(0.0_r8,ZCL(L,NY,NX)/VOLW(L,NY,NX))
-    ECNO=0.071_r8*AMAX1(0.0_r8,ZNO3S(L,NY,NX)/(VOLW(L,NY,NX)*natomw))
+    ECHY=0.337_r8*AZMAX1(ZHY(L,NY,NX)/VOLW(L,NY,NX))
+    ECOH=0.192_r8*AZMAX1(ZOH(L,NY,NX)/VOLW(L,NY,NX))
+    ECAL=0.056_r8*AZMAX1(ZAL(L,NY,NX)*3.0_r8/VOLW(L,NY,NX))
+    ECFE=0.051_r8*AZMAX1(ZFE(L,NY,NX)*3.0_r8/VOLW(L,NY,NX))
+    ECCA=0.060_r8*AZMAX1(ZCA(L,NY,NX)*2.0_r8/VOLW(L,NY,NX))
+    ECMG=0.053_r8*AZMAX1(ZMG(L,NY,NX)*2.0_r8/VOLW(L,NY,NX))
+    ECNA=0.050_r8*AZMAX1(ZNA(L,NY,NX)/VOLW(L,NY,NX))
+    ECKA=0.070_r8*AZMAX1(ZKA(L,NY,NX)/VOLW(L,NY,NX))
+    ECCO=0.072_r8*AZMAX1(ZCO3(L,NY,NX)*2.0_r8/VOLW(L,NY,NX))
+    ECHC=0.044_r8*AZMAX1(ZHCO3(L,NY,NX)/VOLW(L,NY,NX))
+    ECSO=0.080_r8*AZMAX1(ZSO4(L,NY,NX)*2.0_r8/VOLW(L,NY,NX))
+    ECCL=0.076_r8*AZMAX1(ZCL(L,NY,NX)/VOLW(L,NY,NX))
+    ECNO=0.071_r8*AZMAX1(ZNO3S(L,NY,NX)/(VOLW(L,NY,NX)*natomw))
     ECND(L,NY,NX)=ECHY+ECOH+ECAL+ECFE+ECCA+ECMG+ECNA+ECKA &
       +ECCO+ECHC+ECSO+ECCL+ECNO
 
@@ -1773,9 +1767,10 @@ module RedistMod
   end subroutine UpdateSaltIonInSoilLayers
 
 !------------------------------------------------------------------------------------------
-  subroutine SumOMStates(L,NY,NX,DORGCC)
+  subroutine SumOMStates(L,NY,NX,DORGCC,DORGEC)
   implicit none
   integer, intent(in) :: L,NY,NX
+  real(r8), intent(in):: DORGEC
   real(r8), intent(out):: DORGCC
   real(r8) :: DC,DN,DP,OC,ON,OP
 
@@ -1798,6 +1793,7 @@ module RedistMod
   OMCL(L,NY,NX)=0.0_r8
   OMNL(L,NY,NX)=0.0_r8
 
+! add living microbes
   DO K=0,jcplx1
     IF(K.LE.2)THEN  !K=0,1,2: woody litr, nonwoody litr, and manure
       DO N=1,NFGs
@@ -1831,7 +1827,7 @@ module RedistMod
       ENDDO
     ENDIF
   ENDDO
-
+! add autotrophs
   DO  N=1,NFGs
     DO  M=1,nlbiomcp
       DO NGL=1,JG
@@ -1848,6 +1844,7 @@ module RedistMod
   ENDDO
 
   DO K=0,jcplx1
+! litter + manure
     IF(K.LE.2)THEN
       DO M=1,ndbiomcp
         DC=DC+ORC(M,K,L,NY,NX)
@@ -1885,9 +1882,10 @@ module RedistMod
   ORGN(L,NY,NX)=DN+ON
   ORGR(L,NY,NX)=DC
   IF(IERSNG.EQ.2.OR.IERSNG.EQ.3)THEN
+! change in organic C
     DORGCC=ORGCX(L,NY,NX)-ORGC(L,NY,NX)
     IF(L.EQ.NU(NY,NX))THEN
-      DORGCC=DORGCC+DORGE(NY,NX)
+      DORGCC=DORGCC+DORGEC
     ENDIF
   ELSE
     DORGCC=0.0_r8

@@ -19,7 +19,7 @@ module Hist1Mod
   use SnowDataType
   use ChemTranspDataType
   use PlantMngmtDataType
-  use EcosysBGCFluxType
+  use EcosimBGCFluxType
   use SoilPropertyDataType
   use SoilBGCDataType
   use AqueChemDatatype

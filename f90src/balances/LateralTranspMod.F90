@@ -17,6 +17,7 @@ module LateralTranspMod
   USE SoilHeatDataType
   use EcoSimConst
   use EcoSIMConfig, only : jcplx => jcplxc,NFGs=>NFGsc
+  use EcoSIMConfig, only : nlbiomcp=>nlbiomcpc
 implicit none
   private
   character(len=*), parameter :: mod_filename = __FILE__
@@ -44,7 +45,7 @@ implicit none
   LG=0
   LX=0
 
-  DO 8575 L=NU(NY,NX),NL(NY,NX)
+  DO L=NU(NY,NX),NL(NY,NX)
     !
     !     IDENTIFY LAYERS FOR BUBBLE FLUX TRANSFER
     !
@@ -57,12 +58,12 @@ implicit none
     !     gas code:*CO2*=CO2,*OXY*=O2,*CH4*=CH4,*Z2G*=N2,*Z2O*=N2O
     !             :*ZN3*=NH3,*H2G*=H2
 !
-    VCO2G2=CO2G(L,NY,NX)/12.0
-    VCH4G2=CH4G(L,NY,NX)/12.0
+    VCO2G2=CO2G(L,NY,NX)/catomw
+    VCH4G2=CH4G(L,NY,NX)/catomw
     VOXYG2=OXYG(L,NY,NX)/32.0
     VZ2GG2=Z2GG(L,NY,NX)/28.0
     VZ2OG2=Z2OG(L,NY,NX)/28.0
-    VNH3G2=ZNH3G(L,NY,NX)/14.0
+    VNH3G2=ZNH3G(L,NY,NX)/natomw
     VH2GG2=H2GG(L,NY,NX)/2.0
     VTATM=AMAX1(0.0,1.2194E+04*VOLP(L,NY,NX)/TKS(L,NY,NX))
     VTGAS=VCO2G2+VCH4G2+VOXYG2+VZ2GG2+VZ2OG2+VNH3G2+VH2GG2
@@ -133,7 +134,7 @@ implicit none
     TTHAW(N3,N2,N1)=TTHAW(N3,N2,N1)+THAW(N3,N2,N1)
     TTHAWH(N3,N2,N1)=TTHAWH(N3,N2,N1)+THAWH(N3,N2,N1)
     THTHAW(N3,N2,N1)=THTHAW(N3,N2,N1)+HTHAW(N3,N2,N1)
-8575  CONTINUE
+  ENDDO
   end subroutine LateralTranspt
 
 !------------------------------------------------------------------------------------------
@@ -183,7 +184,7 @@ implicit none
   TNOQSS(NY,NX)=0.0_r8
   TP1QSS(NY,NX)=0.0_r8
   TPOQSS(NY,NX)=0.0_r8
-  DO 9955 L=1,JS
+  DO  L=1,JS
     TCOBLS(L,NY,NX)=0.0_r8
     TCHBLS(L,NY,NX)=0.0_r8
     TOXBLS(L,NY,NX)=0.0_r8
@@ -194,7 +195,7 @@ implicit none
     TNOBLW(L,NY,NX)=0.0_r8
     TH1PBS(L,NY,NX)=0.0_r8
     TH2PBS(L,NY,NX)=0.0_r8
-9955  CONTINUE
+  ENDDO
   IF(ISALTG.NE.0)THEN
     TQRAL(NY,NX)=0.0_r8
     TQRFE(NY,NX)=0.0_r8
@@ -281,7 +282,7 @@ implicit none
 !
 !     INITIALIZE NET SOLUTE AND GAS FLUXES FROM SNOWPACK DRIFT
 !
-    DO 9950 L=1,JS
+    DO  L=1,JS
       TALBLS(L,NY,NX)=0.0_r8
       TFEBLS(L,NY,NX)=0.0_r8
       THYBLS(L,NY,NX)=0.0_r8
@@ -323,100 +324,112 @@ implicit none
       TC1PBS(L,NY,NX)=0.0_r8
       TC2PBS(L,NY,NX)=0.0_r8
       TM1PBS(L,NY,NX)=0.0_r8
-9950  CONTINUE
-    ENDIF
+    ENDDO
+  ENDIF
 !
 !     INITIALIZE NET SEDIMENT FLUXES FROM EROSION
 !
-    IF(IERSNG.EQ.1.OR.IERSNG.EQ.3)THEN
-      TSEDER(NY,NX)=0.0_r8
-      TSANER(NY,NX)=0.0_r8
-      TSILER(NY,NX)=0.0_r8
-      TCLAER(NY,NX)=0.0_r8
-      TCECER(NY,NX)=0.0_r8
-      TAECER(NY,NX)=0.0_r8
-      TNH4ER(NY,NX)=0.0_r8
-      TNH3ER(NY,NX)=0.0_r8
-      TNHUER(NY,NX)=0.0_r8
-      TNO3ER(NY,NX)=0.0_r8
-      TNH4EB(NY,NX)=0.0_r8
-      TNH3EB(NY,NX)=0.0_r8
-      TNHUEB(NY,NX)=0.0_r8
-      TNO3EB(NY,NX)=0.0_r8
-      TN4ER(NY,NX)=0.0_r8
-      TNBER(NY,NX)=0.0_r8
-      THYER(NY,NX)=0.0_r8
-      TALER(NY,NX)=0.0_r8
-      TFEER(NY,NX)=0.0_r8
-      TCAER(NY,NX)=0.0_r8
-      TMGER(NY,NX)=0.0_r8
-      TNAER(NY,NX)=0.0_r8
-      TKAER(NY,NX)=0.0_r8
-      THCER(NY,NX)=0.0_r8
-      TAL2ER(NY,NX)=0.0_r8
-      TFE2ER(NY,NX)=0.0_r8
-      TOH0ER(NY,NX)=0.0_r8
-      TOH1ER(NY,NX)=0.0_r8
-      TOH2ER(NY,NX)=0.0_r8
-      TH1PER(NY,NX)=0.0_r8
-      TH2PER(NY,NX)=0.0_r8
-      TOH0EB(NY,NX)=0.0_r8
-      TOH1EB(NY,NX)=0.0_r8
-      TOH2EB(NY,NX)=0.0_r8
-      TH1PEB(NY,NX)=0.0_r8
-      TH2PEB(NY,NX)=0.0_r8
-      TALOER(NY,NX)=0.0_r8
-      TFEOER(NY,NX)=0.0_r8
-      TCACER(NY,NX)=0.0_r8
-      TCASER(NY,NX)=0.0_r8
-      TALPER(NY,NX)=0.0_r8
-      TFEPER(NY,NX)=0.0_r8
-      TCPDER(NY,NX)=0.0_r8
-      TCPHER(NY,NX)=0.0_r8
-      TCPMER(NY,NX)=0.0_r8
-      TALPEB(NY,NX)=0.0_r8
-      TFEPEB(NY,NX)=0.0_r8
-      TCPDEB(NY,NX)=0.0_r8
-      TCPHEB(NY,NX)=0.0_r8
-      TCPMEB(NY,NX)=0.0_r8
-      DO 9480 K=0,jcplx
-        DO  NO=1,NFGs
-          DO  M=1,3
-            DO NGL=1,JG
-              TOMCER(M,NGL,NO,K,NY,NX)=0.0_r8
-              TOMNER(M,NGL,NO,K,NY,NX)=0.0_r8
-              TOMPER(M,NGL,NO,K,NY,NX)=0.0_r8
-            enddo
-          ENDDO
+  IF(IERSNG.EQ.1.OR.IERSNG.EQ.3)THEN
+    TSEDER(NY,NX)=0.0_r8
+    TSANER(NY,NX)=0.0_r8
+    TSILER(NY,NX)=0.0_r8
+    TCLAER(NY,NX)=0.0_r8
+    TCECER(NY,NX)=0.0_r8
+    TAECER(NY,NX)=0.0_r8
+    TNH4ER(NY,NX)=0.0_r8
+    TNH3ER(NY,NX)=0.0_r8
+    TNHUER(NY,NX)=0.0_r8
+    TNO3ER(NY,NX)=0.0_r8
+    TNH4EB(NY,NX)=0.0_r8
+    TNH3EB(NY,NX)=0.0_r8
+    TNHUEB(NY,NX)=0.0_r8
+    TNO3EB(NY,NX)=0.0_r8
+    TN4ER(NY,NX)=0.0_r8
+    TNBER(NY,NX)=0.0_r8
+    THYER(NY,NX)=0.0_r8
+    TALER(NY,NX)=0.0_r8
+    TFEER(NY,NX)=0.0_r8
+    TCAER(NY,NX)=0.0_r8
+    TMGER(NY,NX)=0.0_r8
+    TNAER(NY,NX)=0.0_r8
+    TKAER(NY,NX)=0.0_r8
+    THCER(NY,NX)=0.0_r8
+    TAL2ER(NY,NX)=0.0_r8
+    TFE2ER(NY,NX)=0.0_r8
+    TOH0ER(NY,NX)=0.0_r8
+    TOH1ER(NY,NX)=0.0_r8
+    TOH2ER(NY,NX)=0.0_r8
+    TH1PER(NY,NX)=0.0_r8
+    TH2PER(NY,NX)=0.0_r8
+    TOH0EB(NY,NX)=0.0_r8
+    TOH1EB(NY,NX)=0.0_r8
+    TOH2EB(NY,NX)=0.0_r8
+    TH1PEB(NY,NX)=0.0_r8
+    TH2PEB(NY,NX)=0.0_r8
+    TALOER(NY,NX)=0.0_r8
+    TFEOER(NY,NX)=0.0_r8
+    TCACER(NY,NX)=0.0_r8
+    TCASER(NY,NX)=0.0_r8
+    TALPER(NY,NX)=0.0_r8
+    TFEPER(NY,NX)=0.0_r8
+    TCPDER(NY,NX)=0.0_r8
+    TCPHER(NY,NX)=0.0_r8
+    TCPMER(NY,NX)=0.0_r8
+    TALPEB(NY,NX)=0.0_r8
+    TFEPEB(NY,NX)=0.0_r8
+    TCPDEB(NY,NX)=0.0_r8
+    TCPHEB(NY,NX)=0.0_r8
+    TCPMEB(NY,NX)=0.0_r8
+
+    DO  K=0,jcplx1
+      DO  NO=1,NFGs
+        DO  M=1,nlbiomcp
+          DO NGL=1,JG
+            TOMCER(M,NGL,NO,K,NY,NX)=0.0_r8
+            TOMNER(M,NGL,NO,K,NY,NX)=0.0_r8
+            TOMPER(M,NGL,NO,K,NY,NX)=0.0_r8
+          enddo
+        ENDDO
+      enddo
+    ENDDO
+
+    DO  NO=1,NFGs
+      DO  M=1,nlbiomcp
+        DO NGL=1,JG
+          TOMCERff(M,NGL,NO,NY,NX)=0.0_r8
+          TOMNERff(M,NGL,NO,NY,NX)=0.0_r8
+          TOMPERff(M,NGL,NO,NY,NX)=0.0_r8
         enddo
-9480  CONTINUE
-      DO 9475 K=0,jcplx1
-        DO 9470 M=1,2
-          TORCER(M,K,NY,NX)=0.0_r8
-          TORNER(M,K,NY,NX)=0.0_r8
-          TORPER(M,K,NY,NX)=0.0_r8
-9470    CONTINUE
-        TOHCER(K,NY,NX)=0.0_r8
-        TOHNER(K,NY,NX)=0.0_r8
-        TOHPER(K,NY,NX)=0.0_r8
-        TOHAER(K,NY,NX)=0.0_r8
-        DO 9465 M=1,jsken
-          TOSCER(M,K,NY,NX)=0.0_r8
-          TOSAER(M,K,NY,NX)=0.0_r8
-          TOSNER(M,K,NY,NX)=0.0_r8
-          TOSPER(M,K,NY,NX)=0.0_r8
-9465    CONTINUE
-9475  CONTINUE
-    ENDIF
+      ENDDO
+    enddo
+
+    DO  K=0,jcplx1
+      DO  M=1,2
+        TORCER(M,K,NY,NX)=0.0_r8
+        TORNER(M,K,NY,NX)=0.0_r8
+        TORPER(M,K,NY,NX)=0.0_r8
+      ENDDO
+      TOHCER(K,NY,NX)=0.0_r8
+      TOHNER(K,NY,NX)=0.0_r8
+      TOHPER(K,NY,NX)=0.0_r8
+      TOHAER(K,NY,NX)=0.0_r8
+      DO  M=1,jsken
+        TOSCER(M,K,NY,NX)=0.0_r8
+        TOSAER(M,K,NY,NX)=0.0_r8
+        TOSNER(M,K,NY,NX)=0.0_r8
+        TOSPER(M,K,NY,NX)=0.0_r8
+      ENDDO
+    ENDDO
+  ENDIF
 !
 !     INITIALIZE NET SNOWPACK FLUXES WITHIN SNOWPACK
 !
-    DO 8475 L=1,JS
-      TFLWS(L,NY,NX)=0.0_r8
-      TFLWW(L,NY,NX)=0.0_r8
-      TFLWI(L,NY,NX)=0.0_r8
-      THFLWW(L,NY,NX)=0.0_r8
-8475  CONTINUE
+  DO  L=1,JS
+    TFLWS(L,NY,NX)=0.0_r8
+    TFLWW(L,NY,NX)=0.0_r8
+    TFLWI(L,NY,NX)=0.0_r8
+    THFLWW(L,NY,NX)=0.0_r8
+  ENDDO
   end subroutine ZeroFluxArrays
 !------------------------------------------------------------------------------------------
 
@@ -1413,7 +1426,7 @@ implicit none
       TCPDEB(N2,N1)=TCPDEB(N2,N1)+PCPDEB(N,NN,N2,N1)
       TCPHEB(N2,N1)=TCPHEB(N2,N1)+PCPHEB(N,NN,N2,N1)
       TCPMEB(N2,N1)=TCPMEB(N2,N1)+PCPMEB(N,NN,N2,N1)
-      DO 9380 K=0,jcplx
+      DO  K=0,jcplx1
       DO NO=1,NFGs
       DO M=1,nlbiomcp
       DO NGL=1,JG
@@ -1423,7 +1436,19 @@ implicit none
       enddo
       enddo
       enddo
-9380  CONTINUE
+      ENDDO
+
+      DO NO=1,NFGs
+      DO M=1,nlbiomcp
+      DO NGL=1,JG
+      TOMCERff(M,NGL,NO,N2,N1)=TOMCERff(M,NGL,NO,N2,N1)+OMCERff(M+(NGL-1)*nlbiomcp,NO,N,NN,N2,N1)
+      TOMNERff(M,NGL,NO,N2,N1)=TOMNERff(M,NGL,NO,N2,N1)+OMNERff(M+(NGL-1)*nlbiomcp,NO,N,NN,N2,N1)
+      TOMPERff(M,NGL,NO,N2,N1)=TOMPERff(M,NGL,NO,N2,N1)+OMPERff(M+(NGL-1)*nlbiomcp,NO,N,NN,N2,N1)
+      enddo
+      enddo
+      enddo
+
+
       DO 9375 K=0,jcplx1
       DO 9370 M=1,ndbiomcp
       TORCER(M,K,N2,N1)=TORCER(M,K,N2,N1)+ORCER(M,K,N,NN,N2,N1)
@@ -1492,17 +1517,31 @@ implicit none
       TCPDEB(N2,N1)=TCPDEB(N2,N1)-PCPDEB(N,NN,N5,N4)
       TCPHEB(N2,N1)=TCPHEB(N2,N1)-PCPHEB(N,NN,N5,N4)
       TCPMEB(N2,N1)=TCPMEB(N2,N1)-PCPMEB(N,NN,N5,N4)
-      DO 7380 K=0,jcplx
-      DO  NO=1,7
-      DO  M=1,3
+
+      DO  K=0,jcplx1
+      DO  NO=1,NFGs
+      DO  M=1,nlbiomcp
       DO NGL=1,JG
-      TOMCER(M,NGL,NO,K,N2,N1)=TOMCER(M,NGL,NO,K,N2,N1)-OMCER(M+(NGL-1)*3,NO,K,N,NN,N5,N4)
-      TOMNER(M,NGL,NO,K,N2,N1)=TOMNER(M,NGL,NO,K,N2,N1)-OMNER(M+(NGL-1)*3,NO,K,N,NN,N5,N4)
-      TOMPER(M,NGL,NO,K,N2,N1)=TOMPER(M,NGL,NO,K,N2,N1)-OMPER(M+(NGL-1)*3,NO,K,N,NN,N5,N4)
+      TOMCER(M,NGL,NO,K,N2,N1)=TOMCER(M,NGL,NO,K,N2,N1)-OMCER(M+(NGL-1)*nlbiomcp,NO,K,N,NN,N5,N4)
+      TOMNER(M,NGL,NO,K,N2,N1)=TOMNER(M,NGL,NO,K,N2,N1)-OMNER(M+(NGL-1)*nlbiomcp,NO,K,N,NN,N5,N4)
+      TOMPER(M,NGL,NO,K,N2,N1)=TOMPER(M,NGL,NO,K,N2,N1)-OMPER(M+(NGL-1)*nlbiomcp,NO,K,N,NN,N5,N4)
       enddo
       enddo
       enddo
-7380  CONTINUE
+    ENDDO
+
+
+      DO  NO=1,NFGs
+      DO  M=1,nlbiomcp
+      DO NGL=1,JG
+      TOMCERff(M,NGL,NO,N2,N1)=TOMCERff(M,NGL,NO,N2,N1)-OMCERff(M+(NGL-1)*nlbiomcp,NO,N,NN,N5,N4)
+      TOMNERff(M,NGL,NO,N2,N1)=TOMNERff(M,NGL,NO,N2,N1)-OMNERff(M+(NGL-1)*nlbiomcp,NO,N,NN,N5,N4)
+      TOMPERff(M,NGL,NO,N2,N1)=TOMPERff(M,NGL,NO,N2,N1)-OMPERff(M+(NGL-1)*nlbiomcp,NO,N,NN,N5,N4)
+      enddo
+      enddo
+      enddo
+
+
       DO 7375 K=0,jcplx1
       DO 7370 M=1,2
       TORCER(M,K,N2,N1)=TORCER(M,K,N2,N1)-ORCER(M,K,N,NN,N5,N4)
@@ -1574,7 +1613,8 @@ implicit none
       TCPDEB(N2,N1)=TCPDEB(N2,N1)-PCPDEB(N,NN,N5B,N4B)
       TCPHEB(N2,N1)=TCPHEB(N2,N1)-PCPHEB(N,NN,N5B,N4B)
       TCPMEB(N2,N1)=TCPMEB(N2,N1)-PCPMEB(N,NN,N5B,N4B)
-      DO 8380 K=0,jcplx
+
+      DO 8380 K=0,jcplx1
       DO  NO=1,7
       DO  M=1,3
       DO NGL=1,JG
@@ -1585,6 +1625,18 @@ implicit none
       enddo
       enddo
 8380  CONTINUE
+
+      DO  NO=1,7
+      DO  M=1,3
+      DO NGL=1,JG
+      TOMCERff(M,NGL,NO,N2,N1)=TOMCERff(M,NGL,NO,N2,N1)-OMCERff(M+(NGL-1)*nlbiomcp,NO,N,NN,N5B,N4B)
+      TOMNERff(M,NGL,NO,N2,N1)=TOMNERff(M,NGL,NO,N2,N1)-OMNERff(M+(NGL-1)*nlbiomcp,NO,N,NN,N5B,N4B)
+      TOMPERff(M,NGL,NO,N2,N1)=TOMPERff(M,NGL,NO,N2,N1)-OMPERff(M+(NGL-1)*nlbiomcp,NO,N,NN,N5B,N4B)
+      enddo
+      enddo
+      enddo
+
+
       DO 8375 K=0,jcplx1
       DO 8370 M=1,2
       TORCER(M,K,N2,N1)=TORCER(M,K,N2,N1)-ORCER(M,K,N,NN,N5B,N4B)

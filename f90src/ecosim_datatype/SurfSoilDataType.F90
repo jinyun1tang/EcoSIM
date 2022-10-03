@@ -6,27 +6,78 @@ module SurfSoilDataType
   public
   save
   character(len=*), private, parameter :: mod_filename = __FILE__
+  real(r8),allocatable ::  FSNW(:,:)                          !fraction of snow cover
+  real(r8),allocatable ::  FSNX(:,:)                          !fraction of snow-free cover
+  real(r8),allocatable ::  THRMG(:,:)                         !longwave radiation emitted from ground surface, [MJ d-2 t-1]
+  real(r8),allocatable ::  HEATI(:,:)                         !total net radiation at ground surface, [MJ d-2 t-1]
+  real(r8),allocatable ::  HEATE(:,:)                         !total latent heat flux at ground surface, [MJ d-2 t-1]
+  real(r8),allocatable ::  HEATS(:,:)                         !total sensible heat flux at ground surface, [MJ d-2 t-1]
+  real(r8),allocatable ::  HEATV(:,:)                         !total convective heat flux at ground surface, [MJ d-2 t-1]
+  real(r8),allocatable ::  HEATH(:,:)                         !total ground heat flux at ground surface, [MJ d-2 t-1]
+  real(r8),allocatable ::  TEVAPG(:,:)                        !total evaporation at ground surface, [m3 d-2 t-1]
+  real(r8),allocatable ::  BARE(:,:)                          !fraction of exposed soil surface, [-]
+  real(r8),allocatable ::  VOLWG(:,:)                         !surface water storage capacity, [m3 d-2]
+  real(r8),allocatable ::  VOLWD(:,:)                         !soil surface water retention capacity
+  real(r8),allocatable ::  VHCPNX(:,:)                        !minimum heat capacities
+  real(r8),allocatable ::  PARG(:,:,:)                        !soil surface boundary layer conductance, [m t-1]
+  real(r8),allocatable ::  FLQGQ(:,:)                         !precipitation flux into soil surface , [m3 d-2 h-1]
+  real(r8),allocatable ::  FLQGI(:,:)                         !irrifation flux into soil surface , [m3 d-2 h-1]
+  real(r8),allocatable ::  FLWNU(:,:)                         !lake surface water flux
+  real(r8),allocatable ::  FLWXNU(:,:)                        !lake surface water flux
+  real(r8),allocatable ::  FLWHNU(:,:)                        !lake surface water flux
+  real(r8),allocatable ::  HFLWNU(:,:)                        !lake surface heat flux
+!----------------------------------------------------------------------
 
-  real(r8) :: FSNW(JY,JX)                       !fraction of snow cover
-  real(r8) :: FSNX(JY,JX)                       !fraction of snow-free cover
-  real(r8) :: THRMG(JY,JX)                      !longwave radiation emitted from ground surface, [MJ d-2 t-1]
-  real(r8) :: HEATI(JY,JX)                      !total net radiation at ground surface, [MJ d-2 t-1]
-  real(r8) :: HEATE(JY,JX)                      !total latent heat flux at ground surface, [MJ d-2 t-1]
-  real(r8) :: HEATS(JY,JX)                      !total sensible heat flux at ground surface, [MJ d-2 t-1]
-  real(r8) :: HEATV(JY,JX)                      !total convective heat flux at ground surface, [MJ d-2 t-1]
-  real(r8) :: HEATH(JY,JX)                      !total ground heat flux at ground surface, [MJ d-2 t-1]
-  real(r8) :: TEVAPG(JY,JX)                     !total evaporation at ground surface, [m3 d-2 t-1]
-  real(r8) :: BARE(JY,JX)                       !fraction of exposed soil surface, [-]
-  real(r8) :: VOLWG(JY,JX)                      !surface water storage capacity, [m3 d-2]
-  real(r8) :: VOLWD(JY,JX)                      !soil surface water retention capacity
-  real(r8) :: VHCPNX(JY,JX)                     !minimum heat capacities
-  real(r8) :: PARG(60,JY,JX)                    !soil surface boundary layer conductance, [m t-1]
+contains
+  subroutine InitSurfSoilData
 
-  real(r8) :: FLQGQ(JY,JX)                      !precipitation flux into soil surface , [m3 d-2 h-1]
-  real(r8) :: FLQGI(JY,JX)                      !irrifation flux into soil surface , [m3 d-2 h-1]
-  real(r8) :: FLWNU(JY,JX)                      !lake surface water flux
-  real(r8) :: FLWXNU(JY,JX)                     !lake surface water flux
-  real(r8) :: FLWHNU(JY,JX)                     !lake surface water flux
-  real(r8) :: HFLWNU(JY,JX)                     !lake surface heat flux
+  implicit none
+  allocate(FSNW(JY,JX));        FSNW=0._r8
+  allocate(FSNX(JY,JX));        FSNX=0._r8
+  allocate(THRMG(JY,JX));       THRMG=0._r8
+  allocate(HEATI(JY,JX));       HEATI=0._r8
+  allocate(HEATE(JY,JX));       HEATE=0._r8
+  allocate(HEATS(JY,JX));       HEATS=0._r8
+  allocate(HEATV(JY,JX));       HEATV=0._r8
+  allocate(HEATH(JY,JX));       HEATH=0._r8
+  allocate(TEVAPG(JY,JX));      TEVAPG=0._r8
+  allocate(BARE(JY,JX));        BARE=0._r8
+  allocate(VOLWG(JY,JX));       VOLWG=0._r8
+  allocate(VOLWD(JY,JX));       VOLWD=0._r8
+  allocate(VHCPNX(JY,JX));      VHCPNX=0._r8
+  allocate(PARG(60,JY,JX));     PARG=0._r8
+  allocate(FLQGQ(JY,JX));       FLQGQ=0._r8
+  allocate(FLQGI(JY,JX));       FLQGI=0._r8
+  allocate(FLWNU(JY,JX));       FLWNU=0._r8
+  allocate(FLWXNU(JY,JX));      FLWXNU=0._r8
+  allocate(FLWHNU(JY,JX));      FLWHNU=0._r8
+  allocate(HFLWNU(JY,JX));      HFLWNU=0._r8
+  end subroutine InitSurfSoilData
+
+!----------------------------------------------------------------------
+  subroutine DestructSurfSoilData
+  use abortutils, only : destroy
+  implicit none
+  call destroy(FSNW)
+  call destroy(FSNX)
+  call destroy(THRMG)
+  call destroy(HEATI)
+  call destroy(HEATE)
+  call destroy(HEATS)
+  call destroy(HEATV)
+  call destroy(HEATH)
+  call destroy(TEVAPG)
+  call destroy(BARE)
+  call destroy(VOLWG)
+  call destroy(VOLWD)
+  call destroy(VHCPNX)
+  call destroy(PARG)
+  call destroy(FLQGQ)
+  call destroy(FLQGI)
+  call destroy(FLWNU)
+  call destroy(FLWXNU)
+  call destroy(FLWHNU)
+  call destroy(HFLWNU)
+  end subroutine DestructSurfSoilData
 
 end module SurfSoilDataType

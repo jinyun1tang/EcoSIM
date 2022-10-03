@@ -25,11 +25,34 @@ module ErosionMod
   character(len=*),private, parameter :: mod_filename = __FILE__
 
   real(r8), PARAMETER :: FSINK=0.01_r8
-  real(r8) ::  RERSED(2,2,JV,JH),TERSED(JY,JX),RDTSED(JY,JX) &
-      ,FVOLIM(JY,JX),FVOLWM(JY,JX),FERSNM(JY,JX),RERSED0(JY,JX)
+
+  real(r8), allocatable :: RERSED(:,:,:,:)
+  real(r8), allocatable :: TERSED(:,:)
+  real(r8), allocatable :: RDTSED(:,:)
+  real(r8), allocatable :: FVOLIM(:,:)
+  real(r8), allocatable :: FVOLWM(:,:)
+  real(r8), allocatable :: FERSNM(:,:)
+  real(r8), allocatable :: RERSED0(:,:)
 
   public :: erosion
+  public :: InitErosion
+  public :: DestructErosion
   contains
+
+  subroutine InitErosion()
+
+  implicit none
+
+  allocate(RERSED(2,2,JV,JH))
+  allocate(TERSED(JY,JX))
+  allocate(RDTSED(JY,JX))
+  allocate(FVOLIM(JY,JX))
+  allocate(FVOLWM(JY,JX))
+  allocate(FERSNM(JY,JX))
+  allocate(RERSED0(JY,JX))
+
+  end subroutine InitErosion
+!------------------------------------------------------------------------------------------
 
   SUBROUTINE erosion(I,J,NHW,NHE,NVN,NVS)
       !
@@ -619,7 +642,7 @@ module ErosionMod
 !
 !     ORGANIC MATTER
 !
-              DO  K=0,jcplx
+              DO  K=0,jcplx1
                 DO  NO=1,NFGs
                   DO NGL=1,JG
                     DO  M=1,nlbiomcp
@@ -630,6 +653,17 @@ module ErosionMod
                   ENDDO
                 enddo
               ENDDO
+
+              DO  NO=1,NFGs
+                DO NGL=1,JG
+                  DO  M=1,nlbiomcp
+                    OMCERff(M+(NGL-1)*nlbiomcp,NO,N,2,N5,N4)=0._r8
+                    OMNERff(M+(NGL-1)*nlbiomcp,NO,N,2,N5,N4)=0._r8
+                    OMPERff(M+(NGL-1)*nlbiomcp,NO,N,2,N5,N4)=0._r8
+                  enddo
+                ENDDO
+              enddo
+
               DO  K=0,jcplx1
                 DO  M=1,ndbiomcp
                   ORCER(M,K,N,2,N5,N4)=0._r8
@@ -839,7 +873,7 @@ module ErosionMod
 !
 !     ORGANIC MATTER
 !
-                DO  K=0,jcplx
+                DO  K=0,jcplx1
                   DO  NO=1,NFGs
                     DO NGL=1,JG
                       DO  M=1,nlbiomcp
@@ -850,6 +884,17 @@ module ErosionMod
                     ENDDO
                   enddo
                 ENDDO
+
+                DO  NO=1,NFGs
+                  DO NGL=1,JG
+                    DO  M=1,nlbiomcp
+                      OMCERff(M+(NGL-1)*nlbiomcp,NO,N,1,N5B,N4B)=0._r8
+                      OMNERff(M+(NGL-1)*nlbiomcp,NO,N,1,N5B,N4B)=0._r8
+                      OMPERff(M+(NGL-1)*nlbiomcp,NO,N,1,N5B,N4B)=0._r8
+                    enddo
+                  ENDDO
+                enddo
+
                 DO  K=0,jcplx1
                   DO  M=1,ndbiomcp
                     ORCER(M,K,N,1,N5B,N4B)=0._r8
@@ -1013,7 +1058,7 @@ module ErosionMod
 !
 !     ORGANIC MATTER
 !
-              DO  K=0,jcplx
+              DO  K=0,jcplx1
                 DO  NO=1,NFGs
                   DO NGL=1,JG
                     DO  M=1,nlbiomcp
@@ -1023,6 +1068,15 @@ module ErosionMod
                     enddo
                   ENDDO
                 enddo
+              enddo
+              DO  NO=1,NFGs
+                DO NGL=1,JG
+                  DO  M=1,nlbiomcp
+                    OMCERff(M+(NGL-1)*nlbiomcp,NO,N,NN,M5,M4)=0._r8
+                    OMNERff(M+(NGL-1)*nlbiomcp,NO,N,NN,M5,M4)=0._r8
+                    OMPERff(M+(NGL-1)*nlbiomcp,NO,N,NN,M5,M4)=0._r8
+                  enddo
+                ENDDO
               enddo
               DO  K=0,jcplx1
                 DO  M=1,ndbiomcp
@@ -1162,4 +1216,20 @@ module ErosionMod
   ENDDO
 
   end subroutine ExternalSedimentFluxes
+
+!------------------------------------------------------------------------------------------
+  subroutine DestructErosion()
+  use abortutils, only : destroy
+
+  implicit none
+
+  call destroy(RERSED)
+  call destroy(TERSED)
+  call destroy(RDTSED)
+  call destroy(FVOLIM)
+  call destroy(FVOLWM)
+  call destroy(FERSNM)
+  call destroy(RERSED0)
+
+  end subroutine DestructErosion
   end module ErosionMod

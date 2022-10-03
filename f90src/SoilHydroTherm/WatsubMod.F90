@@ -32,51 +32,13 @@ module WatsubMod
   use SoilPropertyDataType
   use IrrigationDataType
   use GridDataType
+  use WatsubDataMod
   implicit none
 
   private
 
   character(len=*), parameter :: mod_filename = __FILE__
 
-  real(r8) :: VOLWX1(JZ,JY,JX),VPQ(JY,JX),TKQ(JY,JX) &
-    ,XVOLT(JY,JX),XVOLW(JY,JX),XVOLI(JY,JX),FMAC(JZ,JY,JX) &
-    ,FGRD(JZ,JY,JX),VOLW1(0:JZ,JY,JX),VOLI1(0:JZ,JY,JX) &
-    ,VHCP1(0:JZ,JY,JX),VHCP1A(JZ,JY,JX),VHCP1B(JZ,JY,JX) &
-    ,TK1(0:JZ,JY,JX),TWFLXL(JZ,JY,JX),VOLW2(JZ,JY,JX) &
-    ,VOLP1(0:JZ,JY,JX),TWFLXH(JZ,JY,JX),PRECM(JY,JX) &
-    ,VOLS0(JS,JY,JX),VOLI0(JS,JY,JX),VOLW0(JS,JY,JX) &
-    ,VOLS1(JS,JY,JX),DLYRS0(JS,JY,JX),VOLP1Z(JZ,JY,JX) &
-    ,TK0(JS,JY,JX),AREAU(JZ,JY,JX),AREAUD(JZ,JY,JX),FLQ0S(JY,JX) &
-    ,FLQ0I(JY,JX),FLQ0W(JY,JX),FLQ1(JY,JX),FLH1(JY,JX) &
-    ,FLY1(JY,JX),HWFLQ0(JY,JX),HWFLQ1(JY,JX),HWFLY1(JY,JX) &
-    ,RAR(JY,JX),RAGS(JY,JX),BAREW(JY,JX),CVRDW(JY,JX) &
-    ,RARG(JY,JX),RAGR(JY,JX),RAGW(JY,JX),PAREW(JY,JX),PAREG(JY,JX) &
-    ,RAG(JY,JX),PARSW(JY,JX),PARSG(JY,JX),PARER(JY,JX),PARSR(JY,JX) &
-    ,QR1(2,2,JV,JH),HQR1(2,2,JV,JH),VOLPH1Z(JZ,JY,JX) &
-    ,QS1(2,JV,JH),QW1(2,JV,JH),QI1(2,JV,JH),HQS1(2,JV,JH) &
-    ,TQR1(JY,JX),THQR1(JY,JX),EVAPG(JY,JX),TTFLXL(JZ,JY,JX) &
-    ,EVAPW(JY,JX),EVAPS(JY,JX),EVAPR(JY,JX),FLWRL(JY,JX) &
-    ,HFLWRL(JY,JX),FINHL(JZ,JY,JX),FLWL(3,JD,JV,JH)
-  real(r8) :: FLWHL(3,JD,JV,JH),HFLWL(3,JD,JV,JH) &
-    ,TFLWL(JZ,JY,JX),TFLWHL(JZ,JY,JX),THFLWL(JZ,JY,JX) &
-    ,WFLXL(JZ,JY,JX),TFLXL(JZ,JY,JX),AVCNHL(3,JD,JV,JH) &
-    ,THRYW(JY,JX),THRMW(JY,JX),THRMS(JY,JX),THRMR(JY,JX) &
-    ,THRYG(JY,JX),THRYR(JY,JX),RADXW(JY,JX),RADXG(JY,JX) &
-    ,RADXR(JY,JX),FLWLX(3,JD,JV,JH),TFLWLX(JZ,JY,JX) &
-    ,FLU1(JZ,JY,JX),HWFLU1(JZ,JY,JX),PSISM1(0:JZ,JY,JX) &
-    ,ALTG(JY,JX),WFLXLH(JZ,JY,JX),DLYRR(JY,JX),WFLXR(JY,JX) &
-    ,TFLXR(JY,JX),HCNDR(JY,JX),CNDH1(JZ,JY,JX),VOLA1(0:JZ,JY,JX) &
-    ,THETWX(0:JZ,JY,JX),THETIX(0:JZ,JY,JX),THETPX(0:JZ,JY,JX) &
-    ,VOLAH1(JZ,JY,JX),VOLWH1(JZ,JY,JX),VOLPH1(JZ,JY,JX) &
-    ,VOLIH1(JZ,JY,JX),THETPY(0:JZ,JY,JX),FLWNX(JY,JX) &
-    ,FLWXNX(JY,JX),FLWHNX(JY,JX),HFLWNX(JY,JX),PSISA1(JZ,JY,JX)
-  real(r8) :: TQS1(JY,JX),TQW1(JY,JX),TQI1(JY,JX),THQS1(JY,JX) &
-    ,TFLWS(JS,JY,JX),TFLWW(JS,JY,JX),TFLWI(JS,JY,JX) &
-    ,THFLWW(JS,JY,JX),TFLX0(JS,JY,JX),WFLXS(JS,JY,JX) &
-    ,WFLXI(JS,JY,JX),FLW0W(JS,JY,JX),FLW0S(JS,JY,JX) &
-    ,FLW0I(JS,JY,JX),HFLW0W(JS,JY,JX) &
-    ,VOLS0M(JS,JY,JX),VOLW0M(JS,JY,JX) &
-    ,VOLI0M(JS,JY,JX),VHCPWMM(JS,JY,JX),TK0M(JS,JY,JX)
 
   real(r8) :: ALFZ,ALBW,ATCNVW,ATCNDW,ATCNVS,ATCNDS,ATCNVR,ATCNDR
   real(r8) :: ALBG,ALBL,AVCNDR,ALT1,ALT2,ALTB,ALTS1,ALTS2,AVCNDL
@@ -125,7 +87,6 @@ module WatsubMod
   real(r8) :: XNUSW2,XNUSA2,XN,Z3S
 
   integer :: ICHKL,IFLGH,IFLGU,IFLGUH,IFLGD,IFLGDH
-  integer :: N6X(JY,JX)
 
   REAL(r8) :: RI,THETWR,THETW1,THETA1,THETAL,THETWL &
     ,TKR1,TKS1,TKY,TKW1,TK11,TK12,TK0X,TKXR,TK1X,TKX1,TFND1
@@ -138,6 +99,8 @@ module WatsubMod
   implicit none
 
   call InitWatsubPars
+
+  call InitWatSubData
 
   end subroutine InitWatsub
 !------------------------------------------------------------------------------------------
@@ -164,9 +127,9 @@ module WatsubMod
 !
 ! DYNAMIC LOOP FOR FLUX CALCULATIONS
 !
-  DO 3320 M=1,NPH
-    DO 9895 NX=NHW,NHE
-      DO 9890 NY=NVN,NVS
+  DO  M=1,NPH
+    DO  NX=NHW,NHE
+      DO  NY=NVN,NVS
 !
         call PrepForIterationM(M,NY,NX)
 !
@@ -182,8 +145,8 @@ module WatsubMod
         call AccumWaterVaporHeatFluxes(M,NY,NX)
 
         call Subsurface3DFlow(M,NY,NX,NHE,NVS)
-9890  CONTINUE
-9895  CONTINUE
+      ENDDO
+    ENDDO
 !
 !      if(curday>=41)call print_info('BOUNDARY WATER AND HEAT FLUXES',__LINE__)
 !
@@ -191,17 +154,16 @@ module WatsubMod
 !     VOLP2,VOLPH2=air-filled porosity in micropores,macropores
       call WaterHeatExchThruBoundaryFlow(M,NHW,NHE,NVN,NVS)
 !
-      IF(M.NE.NPH)THEN
+    IF(M.NE.NPH)THEN
 !
-        call UpdateStateSolutionNotNPH(M,NHW,NHE,NVN,NVS)
-      ELSE
+      call UpdateStateSolutionNotNPH(M,NHW,NHE,NVN,NVS)
+    ELSE
 !
-        call UpdateFLuxAtNPH(NHW,NHE,NVN,NVS)
-      ENDIF
-3320  CONTINUE
-      RETURN
+      call UpdateFLuxAtNPH(NHW,NHE,NVN,NVS)
+    ENDIF
+  ENDDO
 
-      END subroutine watsub
+  END subroutine watsub
 !------------------------------------------------------------------------------------------
 
   subroutine LocalCopyStateVars(I,NY,NX)
@@ -1732,21 +1694,7 @@ module WatsubMod
 
       VP1=vapsat(TKS1)*EXP(18.0_r8*PSISV1/(8.3143_r8*TKS1))    !in soil
       EVAPR2=AMAX1(-AZMAX1(VOLWR2*XNPX),PARE*(VPQ(NY,NX)-VPR))
-!      if(EVAPR2/=EVAPR2.OR.abs(EVAPR2)>1.e20_r8)then
-!        write(*,*)'curday, curhour=',curday,curhour
-!        write(*,*)'NN=',NN,M
-!        write(*,*)'VOLWR2=',VOLWR2
-!        write(*,*)'XNPX=',XNPX
-!        write(*,*)'PARE=',PARE
-!        write(*,*)'VPQ(NY,NX)=',VPQ(NY,NX)
-!        write(*,*)'VPR=',VPR
-!        write(*,*)'NUM=',NUM(NY,NX)
-!        write(*,*)'TKA=',TKA(NY,NX)
-!        write(*,*)'TKR1=',TKR1,TKS1,TK1(NUM(NY,NX),NY,NX)
-!        write(*,*)'PSISM1=',PSISM1(0,NY,NX)
-!        write(*,*)'ORGC=',ORGC(0,NY,NX)
-!        call endrun(msg='NaN encounterd in '//mod_filename,line=__LINE__)
-!      endif
+
       EFLXR2=EVAPR2*VAP             !energy flux
       VFLXR2=EVAPR2*cpw*TKR1        !energy flux
       !
@@ -2736,8 +2684,8 @@ module WatsubMod
 !     begin_execution
 !     LOCATE INTERNAL BOUNDARIES BETWEEN ADJACENT GRID CELLS
 !
-  DO 4310 N=1,2
-    DO 4305 NN=1,2
+  DO  N=1,2
+    DO  NN=1,2
       IF(N.EQ.1)THEN
         IF(NX.EQ.NHE.AND.NN.EQ.1.OR.NX.EQ.NHW.AND.NN.EQ.2)THEN
           cycle
@@ -2876,8 +2824,8 @@ module WatsubMod
         QSM(M,N,N5,N4)=QS1(N,N5,N4)
 
       ENDIF
-4305  CONTINUE
-4310  CONTINUE
+    ENDDO
+  ENDDO
   end subroutine LateralHydroExchange
 !------------------------------------------------------------------------------------------
 

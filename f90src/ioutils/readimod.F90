@@ -5,7 +5,7 @@ module readiMod
   use data_kind_mod, only : r8 => SHR_KIND_R8
   use abortutils   , only : endrun
   use fileUtil     , only : open_safe, check_read
-  use minimathmod  , only : test_aeqb
+  use minimathmod  , only : test_aeqb, AZMAX1
   use SOMDataType
   use CanopyRadDataType
   use EcosimConst
@@ -28,14 +28,13 @@ module readiMod
   private
 
   character(len=*), parameter :: mod_filename = __FILE__
-  integer :: NM(JY,JX)
-  real(r8) :: DHI(JX),DVI(JY)
   real(r8) :: datav(40)
   CHARACTER(len=16) :: OUTW,OUTI,OUTT,OUTN,OUTF
   CHARACTER(len=4) :: CHARY
   CHARACTER(len=1) :: TTYPE,CTYPE,IVAR(20),VAR(50),TYP(50)
   character(len=*), parameter :: subname='readi.f'
   character(len=3), parameter :: model_status(0:1)=(/'off','on '/)
+
   integer :: ll
   real(r8) :: DAT(50),DATK(50)
   real(r8) :: ALATG,ATCAG,AZI,ASPX,CO2EIG,CH4EG,DTBLIG,DTBLDIG
@@ -62,6 +61,8 @@ module readiMod
   integer, intent(in) :: NA(1:NEX),ND(1:NEX)
   integer :: jj,NX,NY
   integer :: ierr
+  integer :: NM(JY,JX)
+  real(r8) :: DHI(JX),DVI(JY)
   character(len=200) :: tline
 !
 ! begin_execution
@@ -154,7 +155,7 @@ module readiMod
     write(*,'(40A)')('-',ll=1,40)
     write(*,*)'Koppen climate zone: IETYPG',IETYPG
     write(*,*)'flag for salt model: ISALTG',ISALTG,model_status(isaltg)
-    write(*,*)'flag for erosion model: IERSNG',IERSNG,model_status(iersng)
+    write(*,*)'flag for erosion model: IERSNG',IERSNG,erosion_model_status(iersng)
     write(*,*)'flag for lateral connections between grid cells (1),'// &
       ' no connections (3): NCNG',NCNG
     write(*,*)'depth of natural water table: DTBLIG',DTBLIG
@@ -268,8 +269,8 @@ module readiMod
 
   call OPEN_safe(9,PREFIX,DATA1(7),'OLD',mod_filename,__LINE__)
 
-  DO 9995 NX=NH1,NH2
-    DO 9990 NY=NV1,NV2
+  DO  NX=NH1,NH2
+    DO  NY=NV1,NV2
 !
 !     SURFACE SLOPES AND ASPECTS
 !
@@ -279,8 +280,9 @@ module readiMod
 !
 !     CONVERT ASPECT TO GEOMETRIC FORMAT
 !
-      ASP(NY,NX)=450.0-ASP(NY,NX)
-      IF(ASP(NY,NX).GE.360.0)ASP(NY,NX)=ASP(NY,NX)-360.0
+!     what does geometric format mean?
+      ASP(NY,NX)=450.0_r8-ASP(NY,NX)
+      IF(ASP(NY,NX).GE.360.0_r8)ASP(NY,NX)=ASP(NY,NX)-360.0_r8
 !
 !     SURFACE PROPERTIES
 !
@@ -317,14 +319,15 @@ module readiMod
       RSP(2,0,NY,NX) =datav(13)
       IXTYP(1,NY,NX) =int(datav(14))
       IXTYP(2,NY,NX) =int(datav(15))
-      NUI(NY,NX) = int(datav(16))
-      NJ(NY,NX)  =int(datav(17))
-      NL1=int(datav(18))
+      NUI(NY,NX) = int(datav(16))   !Initial surface layer, >=1,
+      NJ(NY,NX)  =int(datav(17))    !maximum root layer number
+      NL1=int(datav(18))            !extra layer below root zone
       NL2=int(datav(19))
       ISOILR(NY,NX)=int(datav(20))
       NU(NY,NX)=NUI(NY,NX)
       NK(NY,NX)=NJ(NY,NX)+1
       NM(NY,NX)=NJ(NY,NX)+NL1
+!  the extra soil layer below root zone cannot be greater than what is allowed
       NL2=min0(JZ-NM(NY,NX),NL2)
       NLI(NY,NX)=NM(NY,NX)+NL2
       NL(NY,NX)=NLI(NY,NX)
@@ -345,8 +348,8 @@ module readiMod
         write(*,*)'N in surface manure litter (g m-2)',RSN(2,0,NY,NX)
         write(*,*)'P in surface manure litter (g m-2)',RSP(2,0,NY,NX)
         write(*,*)'surface litter type:1=plant,2=manure',IXTYP(1,NY,NX),IXTYP(2,NY,NX)
-        write(*,*)'number of soil surface layer NUI',NUI(NY,NX)
-        write(*,*)'number of maximum rooting layer NJ',NJ(NY,NX)
+        write(*,*)'layer number of soil surface layer NUI',NUI(NY,NX)
+        write(*,*)'layer number of maximum rooting layer NJ',NJ(NY,NX)
         write(*,*)'number of additional layers below NJ with data in file',NL1
         write(*,*)'number of additional layers below NJ without data in file',NL2
         write(*,*)'number of layers involved in model calculation',NL(NY,NX)
@@ -781,7 +784,7 @@ module readiMod
 !
 !     ISOIL=flag for calculating FC(1),WP(2),SCNV(3),SCNH(4)
 !
-      DO 25 L=NU(NY,NX),NM(NY,NX)
+      DO  L=NU(NY,NX),NM(NY,NX)
         IF(FC(L,NY,NX).LT.0.0)THEN
           !computing field capacity
           ISOIL(1,L,NY,NX)=1
@@ -808,16 +811,18 @@ module readiMod
         ELSE
           ISOIL(4,L,NY,NX)=0
         ENDIF
-25    CONTINUE
+      ENDDO
 !
 !     FILL OUT SOIL BOUNDARY LAYERS ABOVE ROOTING ZONE (NOT USED)
+!     below is for soil repacking, whence NU>1
+!     root zone from NU to NM,
 !
       IF(NU(NY,NX).GT.1)THEN
-        DO 31 L=NU(NY,NX)-1,0,-1
-          IF(BKDSI(L+1,NY,NX).GT.0.025)THEN
-            CDPTH(L,NY,NX)=CDPTH(L+1,NY,NX)-0.01
+        DO  L=NU(NY,NX)-1,0,-1
+          IF(BKDSI(L+1,NY,NX).GT.0.025_r8)THEN
+            CDPTH(L,NY,NX)=CDPTH(L+1,NY,NX)-0.01_r8
           ELSE
-            CDPTH(L,NY,NX)=CDPTH(L+1,NY,NX)-0.02
+            CDPTH(L,NY,NX)=CDPTH(L+1,NY,NX)-0.02_r8
           ENDIF
           IF(L.GT.0)THEN
             BKDSI(L,NY,NX)=BKDSI(L+1,NY,NX)
@@ -868,23 +873,23 @@ module readiMod
             ISOIL(2,L,NY,NX)=ISOIL(2,L+1,NY,NX)
             ISOIL(3,L,NY,NX)=ISOIL(3,L+1,NY,NX)
             ISOIL(4,L,NY,NX)=ISOIL(4,L+1,NY,NX)
-            RSC(1,L,NY,NX)=0.0
-            RSN(1,L,NY,NX)=0.0
-            RSP(1,L,NY,NX)=0.0
-            RSC(0,L,NY,NX)=0.0
-            RSN(0,L,NY,NX)=0.0
-            RSP(0,L,NY,NX)=0.0
-            RSC(2,L,NY,NX)=0.0
-            RSN(2,L,NY,NX)=0.0
-            RSP(2,L,NY,NX)=0.0
+            RSC(1,L,NY,NX)=0.0_r8
+            RSN(1,L,NY,NX)=0.0_r8
+            RSP(1,L,NY,NX)=0.0_r8
+            RSC(0,L,NY,NX)=0.0_r8
+            RSN(0,L,NY,NX)=0.0_r8
+            RSP(0,L,NY,NX)=0.0_r8
+            RSC(2,L,NY,NX)=0.0_r8
+            RSN(2,L,NY,NX)=0.0_r8
+            RSP(2,L,NY,NX)=0.0_r8
           ENDIF
-31      CONTINUE
+        ENDDO
       ENDIF
 !
 !     ADD SOIL BOUNDARY LAYERS BELOW SOIL ZONE
-!
-      DO 32 L=NM(NY,NX)+1,JZ
-        CDPTH(L,NY,NX)=2.0_r8*CDPTH(L-1,NY,NX)-1.0*CDPTH(L-2,NY,NX)
+!     depth of layer (L-1) is at the middle between that of layer L-2 and L
+      DO L=NM(NY,NX)+1,JZ
+        CDPTH(L,NY,NX)=2.0_r8*CDPTH(L-1,NY,NX)-1.0_r8*CDPTH(L-2,NY,NX)
         BKDSI(L,NY,NX)=BKDSI(L-1,NY,NX)
         FC(L,NY,NX)=FC(L-1,NY,NX)
         WP(L,NY,NX)=WP(L-1,NY,NX)
@@ -899,57 +904,59 @@ module readiMod
         CEC(L,NY,NX)=CEC(L-1,NY,NX)
         AEC(L,NY,NX)=AEC(L-1,NY,NX)
 !     IF(IDTBL(NY,NX).EQ.0)THEN
-        CORGC(L,NY,NX)=0.25*CORGC(L-1,NY,NX)
-        CORGR(L,NY,NX)=0.25*CORGR(L-1,NY,NX)
-        CORGN(L,NY,NX)=0.25*CORGN(L-1,NY,NX)
-        CORGP(L,NY,NX)=0.25*CORGP(L-1,NY,NX)
+!       0.25_r8 is the geometric decreasing ratio (tunable)
+!  or different scheme can be used
+        CORGC(L,NY,NX)=0.25_r8*CORGC(L-1,NY,NX)
+        CORGR(L,NY,NX)=0.25_r8*CORGR(L-1,NY,NX)
+        CORGN(L,NY,NX)=0.25_r8*CORGN(L-1,NY,NX)
+        CORGP(L,NY,NX)=0.25_r8*CORGP(L-1,NY,NX)
 !     ELSE
 !       CORGC(L,NY,NX)=CORGC(L-1,NY,NX)
 !       CORGR(L,NY,NX)=CORGR(L-1,NY,NX)
 !       CORGN(L,NY,NX)=CORGN(L-1,NY,NX)
 !       CORGP(L,NY,NX)=CORGP(L-1,NY,NX)
 !     ENDIF
-      CNH4(L,NY,NX)=CNH4(L-1,NY,NX)
-      CNO3(L,NY,NX)=CNO3(L-1,NY,NX)
-      CPO4(L,NY,NX)=CPO4(L-1,NY,NX)
-      CAL(L,NY,NX)=CAL(L-1,NY,NX)
-      CFE(L,NY,NX)=CFE(L-1,NY,NX)
-      CCA(L,NY,NX)=CCA(L-1,NY,NX)
-      CMG(L,NY,NX)=CMG(L-1,NY,NX)
-      CNA(L,NY,NX)=CNA(L-1,NY,NX)
-      CKA(L,NY,NX)=CKA(L-1,NY,NX)
-      CSO4(L,NY,NX)=CSO4(L-1,NY,NX)
-      CCL(L,NY,NX)=CCL(L-1,NY,NX)
-      CALOH(L,NY,NX)=CALOH(L-1,NY,NX)
-      CFEOH(L,NY,NX)=CFEOH(L-1,NY,NX)
-      CCACO(L,NY,NX)=CCACO(L-1,NY,NX)
-      CCASO(L,NY,NX)=CCASO(L-1,NY,NX)
-      CALPO(L,NY,NX)=CALPO(L-1,NY,NX)
-      CFEPO(L,NY,NX)=CFEPO(L-1,NY,NX)
-      CCAPD(L,NY,NX)=CCAPD(L-1,NY,NX)
-      CCAPH(L,NY,NX)=CCAPH(L-1,NY,NX)
-      GKC4(L,NY,NX)=GKC4(L-1,NY,NX)
-      GKCH(L,NY,NX)=GKCH(L-1,NY,NX)
-      GKCA(L,NY,NX)=GKCA(L-1,NY,NX)
-      GKCM(L,NY,NX)=GKCM(L-1,NY,NX)
-      GKCN(L,NY,NX)=GKCN(L-1,NY,NX)
-      GKCK(L,NY,NX)=GKCK(L-1,NY,NX)
-      THW(L,NY,NX)=THW(L-1,NY,NX)
-      THI(L,NY,NX)=THI(L-1,NY,NX)
-      ISOIL(1,L,NY,NX)=ISOIL(1,L-1,NY,NX)
-      ISOIL(2,L,NY,NX)=ISOIL(2,L-1,NY,NX)
-      ISOIL(3,L,NY,NX)=ISOIL(3,L-1,NY,NX)
-      ISOIL(4,L,NY,NX)=ISOIL(4,L-1,NY,NX)
-      RSC(1,L,NY,NX)=0.0
-      RSN(1,L,NY,NX)=0.0
-      RSP(1,L,NY,NX)=0.0
-      RSC(0,L,NY,NX)=0.0
-      RSN(0,L,NY,NX)=0.0
-      RSP(0,L,NY,NX)=0.0
-      RSC(2,L,NY,NX)=0.0
-      RSN(2,L,NY,NX)=0.0
-      RSP(2,L,NY,NX)=0.0
-32  CONTINUE
+        CNH4(L,NY,NX)=CNH4(L-1,NY,NX)
+        CNO3(L,NY,NX)=CNO3(L-1,NY,NX)
+        CPO4(L,NY,NX)=CPO4(L-1,NY,NX)
+        CAL(L,NY,NX)=CAL(L-1,NY,NX)
+        CFE(L,NY,NX)=CFE(L-1,NY,NX)
+        CCA(L,NY,NX)=CCA(L-1,NY,NX)
+        CMG(L,NY,NX)=CMG(L-1,NY,NX)
+        CNA(L,NY,NX)=CNA(L-1,NY,NX)
+        CKA(L,NY,NX)=CKA(L-1,NY,NX)
+        CSO4(L,NY,NX)=CSO4(L-1,NY,NX)
+        CCL(L,NY,NX)=CCL(L-1,NY,NX)
+        CALOH(L,NY,NX)=CALOH(L-1,NY,NX)
+        CFEOH(L,NY,NX)=CFEOH(L-1,NY,NX)
+        CCACO(L,NY,NX)=CCACO(L-1,NY,NX)
+        CCASO(L,NY,NX)=CCASO(L-1,NY,NX)
+        CALPO(L,NY,NX)=CALPO(L-1,NY,NX)
+        CFEPO(L,NY,NX)=CFEPO(L-1,NY,NX)
+        CCAPD(L,NY,NX)=CCAPD(L-1,NY,NX)
+        CCAPH(L,NY,NX)=CCAPH(L-1,NY,NX)
+        GKC4(L,NY,NX)=GKC4(L-1,NY,NX)
+        GKCH(L,NY,NX)=GKCH(L-1,NY,NX)
+        GKCA(L,NY,NX)=GKCA(L-1,NY,NX)
+        GKCM(L,NY,NX)=GKCM(L-1,NY,NX)
+        GKCN(L,NY,NX)=GKCN(L-1,NY,NX)
+        GKCK(L,NY,NX)=GKCK(L-1,NY,NX)
+        THW(L,NY,NX)=THW(L-1,NY,NX)
+        THI(L,NY,NX)=THI(L-1,NY,NX)
+        ISOIL(1,L,NY,NX)=ISOIL(1,L-1,NY,NX)
+        ISOIL(2,L,NY,NX)=ISOIL(2,L-1,NY,NX)
+        ISOIL(3,L,NY,NX)=ISOIL(3,L-1,NY,NX)
+        ISOIL(4,L,NY,NX)=ISOIL(4,L-1,NY,NX)
+        RSC(1,L,NY,NX)=0.0_r8
+        RSN(1,L,NY,NX)=0.0_r8
+        RSP(1,L,NY,NX)=0.0_r8
+        RSC(0,L,NY,NX)=0.0_r8
+        RSN(0,L,NY,NX)=0.0_r8
+        RSP(0,L,NY,NX)=0.0_r8
+        RSC(2,L,NY,NX)=0.0_r8
+        RSN(2,L,NY,NX)=0.0_r8
+        RSP(2,L,NY,NX)=0.0_r8
+      ENDDO
 !
 !   CALCULATE DERIVED SOIL PROPERTIES FROM INPUT SOIL PROPERTIES
 !
@@ -959,89 +966,119 @@ module readiMod
 !   CORGC,CORGR=SOC,POC converted to g Mg-1
 !   CEC,AEC=cation,anion exchange capacity converted to mol Mg-1
 !   CNH4...=solute concentrations converted to mol Mg-1
-!
-    DO 28 L=1,NL(NY,NX)
-!     BKDSI(L,NY,NX)=BKDSI(L,NY,NX)/(1.0-FHOL(L,NY,NX))
-      BKDS(L,NY,NX)=BKDSI(L,NY,NX)
-      IF(test_aeqb(BKDS(L,NY,NX),0.0_r8))FHOL(L,NY,NX)=0.0
-      FMPR(L,NY,NX)=(1.0-ROCK(L,NY,NX))*(1.0-FHOL(L,NY,NX))
+!   BKDSI: initial bulk density
+
+      DO  L=1,NL(NY,NX)
+!   FHOL: micropore fraction
+!     BKDSI(L,NY,NX)=BKDSI(L,NY,NX)/(1.0_r8-FHOL(L,NY,NX))
+        BKDS(L,NY,NX)=BKDSI(L,NY,NX)
+        IF(test_aeqb(BKDS(L,NY,NX),0.0_r8))FHOL(L,NY,NX)=0.0
+!     fraction of soil has micropore
+        FMPR(L,NY,NX)=(1.0_r8-ROCK(L,NY,NX))*(1.0_r8-FHOL(L,NY,NX))
 !     FC(L,NY,NX)=FC(L,NY,NX)/(1.0-FHOL(L,NY,NX))
 !     WP(L,NY,NX)=WP(L,NY,NX)/(1.0-FHOL(L,NY,NX))
-      SCNV(L,NY,NX)=0.098*SCNV(L,NY,NX)*FMPR(L,NY,NX)
-      SCNH(L,NY,NX)=0.098*SCNH(L,NY,NX)*FMPR(L,NY,NX)
-      CCLAY(L,NY,NX)=AMAX1(0.0,1.0E+03-(CSAND(L,NY,NX) &
-        +CSILT(L,NY,NX)))
-      CORGC(L,NY,NX)=CORGC(L,NY,NX)*1.0E+03
-      CORGR(L,NY,NX)=CORGR(L,NY,NX)*1.0E+03
-      CORGCI(L,NY,NX)=CORGC(L,NY,NX)
-      FHOLI(L,NY,NX)=FHOL(L,NY,NX)
-      CSAND(L,NY,NX)=CSAND(L,NY,NX) &
-        *1.0E-03*AMAX1(0.0,(1.0-CORGC(L,NY,NX)/0.55E+06))
-      CSILT(L,NY,NX)=CSILT(L,NY,NX) &
-        *1.0E-03*AMAX1(0.0,(1.0-CORGC(L,NY,NX)/0.55E+06))
-      CCLAY(L,NY,NX)=CCLAY(L,NY,NX) &
-        *1.0E-03*AMAX1(0.0,(1.0-CORGC(L,NY,NX)/0.55E+06))
-      CEC(L,NY,NX)=CEC(L,NY,NX)*10.0
-      AEC(L,NY,NX)=AEC(L,NY,NX)*10.0
-      CNH4(L,NY,NX)=CNH4(L,NY,NX)/14.0
-      CNO3(L,NY,NX)=CNO3(L,NY,NX)/14.0
-      CPO4(L,NY,NX)=CPO4(L,NY,NX)/31.0
-      CAL(L,NY,NX)=CAL(L,NY,NX)/27.0
-      CFE(L,NY,NX)=CFE(L,NY,NX)/56.0
-      CCA(L,NY,NX)=CCA(L,NY,NX)/40.0
-      CMG(L,NY,NX)=CMG(L,NY,NX)/24.3
-      CNA(L,NY,NX)=CNA(L,NY,NX)/23.0
-      CKA(L,NY,NX)=CKA(L,NY,NX)/39.1
-      CSO4(L,NY,NX)=CSO4(L,NY,NX)/32.0
-      CCL(L,NY,NX)=CCL(L,NY,NX)/35.5
-      CALPO(L,NY,NX)=CALPO(L,NY,NX)/31.0
-      CFEPO(L,NY,NX)=CFEPO(L,NY,NX)/31.0
-      CCAPD(L,NY,NX)=CCAPD(L,NY,NX)/31.0
-      CCAPH(L,NY,NX)=CCAPH(L,NY,NX)/(31.0*3.0)
-      CALOH(L,NY,NX)=CALOH(L,NY,NX)/27.0
-      CFEOH(L,NY,NX)=CFEOH(L,NY,NX)/56.0
-      CCACO(L,NY,NX)=CCACO(L,NY,NX)/40.0
-      CCASO(L,NY,NX)=CCASO(L,NY,NX)/40.0
+!
+        SCNV(L,NY,NX)=0.098_r8*SCNV(L,NY,NX)*FMPR(L,NY,NX)
+        SCNH(L,NY,NX)=0.098_r8*SCNH(L,NY,NX)*FMPR(L,NY,NX)
+        CCLAY(L,NY,NX)=AZMAX1(1.0E+03_r8-(CSAND(L,NY,NX)+CSILT(L,NY,NX)))
+        CORGC(L,NY,NX)=CORGC(L,NY,NX)*1.0E+03_r8   !convert to g C
+        CORGR(L,NY,NX)=CORGR(L,NY,NX)*1.0E+03_r8   !convert to g C
+        CORGCI(L,NY,NX)=CORGC(L,NY,NX)
+        FHOLI(L,NY,NX)=FHOL(L,NY,NX)
+!
+        CSAND(L,NY,NX)=CSAND(L,NY,NX)*1.0E-03_r8*AZMAX1((1.0_r8-CORGC(L,NY,NX)/0.55E+06_r8))
+        CSILT(L,NY,NX)=CSILT(L,NY,NX)*1.0E-03_r8*AZMAX1((1.0_r8-CORGC(L,NY,NX)/0.55E+06_r8))
+        CCLAY(L,NY,NX)=CCLAY(L,NY,NX)*1.0E-03_r8*AZMAX1((1.0_r8-CORGC(L,NY,NX)/0.55E+06_r8))
+        CEC(L,NY,NX)=CEC(L,NY,NX)*10.0_r8
+        AEC(L,NY,NX)=AEC(L,NY,NX)*10.0_r8
+        CNH4(L,NY,NX)=CNH4(L,NY,NX)/14.0_r8
+        CNO3(L,NY,NX)=CNO3(L,NY,NX)/14.0_r8
+        CPO4(L,NY,NX)=CPO4(L,NY,NX)/31.0_r8
+        CAL(L,NY,NX)=CAL(L,NY,NX)/27.0_r8
+        CFE(L,NY,NX)=CFE(L,NY,NX)/56.0_r8
+        CCA(L,NY,NX)=CCA(L,NY,NX)/40.0_r8
+        CMG(L,NY,NX)=CMG(L,NY,NX)/24.3_r8
+        CNA(L,NY,NX)=CNA(L,NY,NX)/23.0_r8
+        CKA(L,NY,NX)=CKA(L,NY,NX)/39.1_r8
+        CSO4(L,NY,NX)=CSO4(L,NY,NX)/32.0_r8
+        CCL(L,NY,NX)=CCL(L,NY,NX)/35.5_r8
+        CALPO(L,NY,NX)=CALPO(L,NY,NX)/31.0_r8
+        CFEPO(L,NY,NX)=CFEPO(L,NY,NX)/31.0_r8
+        CCAPD(L,NY,NX)=CCAPD(L,NY,NX)/31.0_r8
+        CCAPH(L,NY,NX)=CCAPH(L,NY,NX)/(31.0_r8*3.0_r8)
+        CALOH(L,NY,NX)=CALOH(L,NY,NX)/27.0_r8
+        CFEOH(L,NY,NX)=CFEOH(L,NY,NX)/56.0_r8
+        CCACO(L,NY,NX)=CCACO(L,NY,NX)/40.0_r8
+        CCASO(L,NY,NX)=CCASO(L,NY,NX)/40.0_r8
 !
 !     ESTIMATE SON,SOP,CEC IF UNKNOWN
 !     BIOCHEMISTRY 130:117-131
 !
-      IF(CORGN(L,NY,NX).LT.0.0)THEN
-        CORGN(L,NY,NX)=AMIN1(0.125*CORGC(L,NY,NX) &
-          ,8.9E+02*(CORGC(L,NY,NX)/1.0E+04)**0.80)
-!       WRITE(*,1111)'CORGN',L,CORGN(L,NY,NX),CORGC(L,NY,NX)
-      ENDIF
-      IF(CORGP(L,NY,NX).LT.0.0)THEN
-        CORGP(L,NY,NX)=AMIN1(0.0125*CORGC(L,NY,NX) &
-          ,1.2E+02*(CORGC(L,NY,NX)/1.0E+04)**0.52)
-!       WRITE(*,1111)'CORGP',L,CORGP(L,NY,NX),CORGC(L,NY,NX)
-      ENDIF
-      IF(CEC(L,NY,NX).LT.0.0)THEN
-        CEC(L,NY,NX)=10.0*(200.0*2.0*CORGC(L,NY,NX)/1.0E+06 &
-          +80.0*CCLAY(L,NY,NX)+20.0*CSILT(L,NY,NX) &
-          +5.0*CSAND(L,NY,NX))
-      ENDIF
-28  CONTINUE
-    CORGC(0,NY,NX)=0.55E+06
-    FMPR(0,NY,NX)=1.0
-9990  CONTINUE
-9995  CONTINUE
+        IF(CORGN(L,NY,NX).LT.0.0_r8)THEN
+!  default ORGN parameterization
+          CORGN(L,NY,NX)=AMIN1(0.125_r8*CORGC(L,NY,NX) &
+            ,8.9E+02_r8*(CORGC(L,NY,NX)/1.0E+04_r8)**0.80_r8)
+        ENDIF
+        IF(CORGP(L,NY,NX).LT.0.0_r8)THEN
+          CORGP(L,NY,NX)=AMIN1(0.0125_r8*CORGC(L,NY,NX) &
+            ,1.2E+02_r8*(CORGC(L,NY,NX)/1.0E+04_r8)**0.52_r8)
+        ENDIF
+        IF(CEC(L,NY,NX).LT.0.0_r8)THEN
+          CEC(L,NY,NX)=10.0_r8*(200.0_r8*2.0_r8*CORGC(L,NY,NX)/1.0E+06_r8 &
+            +80.0_r8*CCLAY(L,NY,NX)+20.0_r8*CSILT(L,NY,NX) &
+            +5.0_r8*CSAND(L,NY,NX))
+        ENDIF
+      ENDDO
+      CORGC(0,NY,NX)=0.55E+06_r8
+      FMPR(0,NY,NX)=1.0_r8
+    ENDDO
+  ENDDO
     CLOSE(9)
     GO TO 50
 20  CONTINUE
     CLOSE(7)
-    DO 9975 NX=NHW,NHE
+    DO  NX=NHW,NHE
       NL(NVS+1,NX)=NL(NVS,NX)
 !     WRITE(*,2223)'NHE',NX,NHW,NHE,NVS,NL(NVS,NX)
-9975  CONTINUE
-    DO 9970 NY=NVN,NVS
+    ENDDO
+    DO  NY=NVN,NVS
       NL(NY,NHE+1)=NL(NY,NHE)
 !     WRITE(*,2223)'NVS',NY,NVN,NVS,NHE,NL(NY,NHE)
 !2223  FORMAT(A8,6I4)
-9970  CONTINUE
+    ENDDO
     NL(NVS+1,NHE+1)=NL(NVS,NHE)
     IOLD=0
     RETURN
-END SUBROUTINE readi
+  END SUBROUTINE readi
+
+
+!------------------------------------------------------------------------------------------
+
+  function erosion_model_status(flag)result(status)
+
+  implicit none
+  integer, intent(in) :: flag
+  character(len=40) :: status
+  !0 means allowing  freeze- thaw to change elevation
+  !1 means allowing freeze-thaw plus erosion to change elevation
+  !2 means allowing freeze-thaw plus SOC accumulation to change elevation
+  !3 means allowing freeze-thaw plus SOC accumulation, plus erosion to change elevation
+  !-1 means no change in elevation.
+  select case (flag)
+  case (-1)
+    status='no elv change'
+  case (0)
+    status='freeze-thaw elv change'
+  case (1)
+    status='freeze-thaw+erosion elv change'
+  case (2)
+    status='freeze-thaw+SOC accum elv change'
+  case (3)
+    status='freeze-thaw+SOC+erosion elv change'
+  case default
+    status=''
+    call endrun('wrong erosion model option in '//trim(mod_filename)//' at line',__LINE__)
+  end select
+  end function erosion_model_status
 
 end module readiMod

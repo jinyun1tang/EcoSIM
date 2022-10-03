@@ -8,11 +8,11 @@ module EcoSIMCtrlDataType
   public
   real(r8) :: ZERO
   real(r8) :: ZERO2
-  real(r8) :: ZEROS(JY,JX)
-  real(r8) :: ZEROP(JP,JY,JX)
-  real(r8) :: ZEROQ(JP,JY,JX)
-  real(r8) :: ZEROL(JP,JY,JX)
-  real(r8) :: ZEROS2(JY,JX)
+  real(r8), allocatable :: ZEROS(:,:)
+  real(r8), allocatable :: ZEROP(:,:,:)
+  real(r8), allocatable :: ZEROQ(:,:,:)
+  real(r8), allocatable :: ZEROL(:,:,:)
+  real(r8), allocatable :: ZEROS2(:,:)
 
   integer :: IGO             !flag for first scenario
   integer :: IDAYR           !day of recovery from earlier run
@@ -36,4 +36,32 @@ module EcoSIMCtrlDataType
 
   logical :: lverb           !logical switch for verbose output
   logical :: do_rgres        !logical switch for regression tests
+
+  contains
+
+  subroutine InitEcoSIMCtrlData
+
+  implicit none
+
+  allocate(ZEROS(JY,JX)); ZEROS(:,:) = 0._r8
+  allocate(ZEROP(JP,JY,JX)); ZEROP(:,:,:)=0._r8
+  allocate(ZEROQ(JP,JY,JX)); ZEROQ(:,:,:)=0._r8
+  allocate(ZEROL(JP,JY,JX)); ZEROL(:,:,:)=0._r8
+  allocate(ZEROS2(JY,JX));  ZEROS2(:,:)=0._r8
+
+  end subroutine InitEcoSIMCtrlData
+
+  subroutine DestructEcoSIMCtrlData
+  use abortutils, only : destroy
+
+  implicit none
+
+  call destroy(ZEROS)
+  call destroy(ZEROP)
+  call destroy(ZEROQ)
+  call destroy(ZEROL)
+  call destroy(ZEROS2)
+
+  end subroutine DestructEcoSIMCtrlData
+
 end module EcoSIMCtrlDataType

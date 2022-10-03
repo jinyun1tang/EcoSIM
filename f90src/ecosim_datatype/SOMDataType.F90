@@ -1,7 +1,7 @@
 module SOMDataType
   use data_kind_mod, only : r8 => SHR_KIND_R8
   use GridConsts
-  use EcoSIMConfig, only : jcplx1=> jcplx1c,jsken=>jskenc
+  use EcoSIMConfig, only : jcplx1=> jcplx1c,jsken=>jskenc, ndbiomcp=>ndbiomcpc
   implicit none
   public
   save
@@ -90,9 +90,9 @@ module SOMDataType
   allocate(OHN(0:jcplx1,0:JZ,JY,JX))
   allocate(OHP(0:jcplx1,0:JZ,JY,JX))
   allocate(OHA(0:jcplx1,0:JZ,JY,JX))
-  allocate(ORC(2,0:jcplx1,0:JZ,JY,JX))
-  allocate(ORN(2,0:jcplx1,0:JZ,JY,JX))
-  allocate(ORP(2,0:jcplx1,0:JZ,JY,JX))
+  allocate(ORC(ndbiomcp,0:jcplx1,0:JZ,JY,JX))
+  allocate(ORN(ndbiomcp,0:jcplx1,0:JZ,JY,JX))
+  allocate(ORP(ndbiomcp,0:jcplx1,0:JZ,JY,JX))
   allocate(OQC(0:jcplx1,0:JZ,JY,JX))
   allocate(OQN(0:jcplx1,0:JZ,JY,JX))
   allocate(OQP(0:jcplx1,0:JZ,JY,JX))

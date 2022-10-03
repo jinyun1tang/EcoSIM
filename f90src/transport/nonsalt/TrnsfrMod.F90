@@ -36,18 +36,26 @@ module TrnsfrMod
 
   real(r8) :: XN
 
-  real(r8) ::  CHY0(0:JZ,JY,JX),RHGFLZ(JZ,JY,JX)
-
-  real(r8) :: RCOFLZ(JZ,JY,JX),RCHFLZ(JZ,JY,JX)
-  real(r8) :: ROXFLZ(JZ,JY,JX),RNGFLZ(JZ,JY,JX)
-  real(r8) :: RN2FLZ(JZ,JY,JX),RN4FLZ(JZ,JY,JX),RN3FLZ(JZ,JY,JX)
-  real(r8) :: RNOFLZ(JZ,JY,JX),RH2PFZ(JZ,JY,JX),RN4FBZ(JZ,JY,JX)
-  real(r8) :: RN3FBZ(JZ,JY,JX),RNOFBZ(JZ,JY,JX),RH2BBZ(JZ,JY,JX)
-  real(r8) :: RH1PFZ(JZ,JY,JX),RH1BBZ(JZ,JY,JX)
+  real(r8), allocatable :: CHY0(:,:,:)
+  real(r8), allocatable :: RHGFLZ(:,:,:)
+  real(r8), allocatable :: RCOFLZ(:,:,:)
+  real(r8), allocatable :: RCHFLZ(:,:,:)
+  real(r8), allocatable :: ROXFLZ(:,:,:)
+  real(r8), allocatable :: RNGFLZ(:,:,:)
+  real(r8), allocatable :: RN2FLZ(:,:,:)
+  real(r8), allocatable :: RN4FLZ(:,:,:)
+  real(r8), allocatable :: RN3FLZ(:,:,:)
+  real(r8), allocatable :: RNOFLZ(:,:,:)
+  real(r8), allocatable :: RH2PFZ(:,:,:)
+  real(r8), allocatable :: RN4FBZ(:,:,:)
+  real(r8), allocatable :: RN3FBZ(:,:,:)
+  real(r8), allocatable :: RNOFBZ(:,:,:)
+  real(r8), allocatable :: RH2BBZ(:,:,:)
+  real(r8), allocatable :: RH1PFZ(:,:,:)
+  real(r8), allocatable :: RH1BBZ(:,:,:)
 
   real(r8), PARAMETER :: DPN4=5.7E-07
-  REAL(r8) :: CCO2SQ,CCH4SQ,COXYSQ,CZ2GSQ,CZ2OSQ,CNH3SQ &
-  ,CNH3BQ,CH2GSQ
+  REAL(r8) :: CCO2SQ,CCH4SQ,COXYSQ,CZ2GSQ,CZ2OSQ,CNH3SQ,CNH3BQ,CH2GSQ
 
   public :: trnsfr
   public :: InitTrnsfr,DestructTrnsfr
@@ -56,30 +64,25 @@ module TrnsfrMod
   subroutine InitTrnsfr()
   implicit none
 
-  allocate(RQROC0(0:jcplx1,JV,JH))
-  allocate(RQRON0(0:jcplx1,JV,JH))
-  allocate(RQROA0(0:jcplx1,JV,JH))
-  allocate(RQROP0(0:jcplx1,JV,JH))
-  allocate(OQC2(0:jcplx1,0:JZ,JY,JX))
-  allocate(OQN2(0:jcplx1,0:JZ,JY,JX))
-  allocate(OQP2(0:jcplx1,0:JZ,JY,JX))
-  allocate(OQA2(0:jcplx1,0:JZ,JY,JX))
-  allocate(ROCSK2(0:jcplx1,0:JZ,JY,JX))
-  allocate(RONSK2(0:jcplx1,0:JZ,JY,JX))
-  allocate(ROPSK2(0:jcplx1,0:JZ,JY,JX))
-  allocate(ROASK2(0:jcplx1,0:JZ,JY,JX))
-  allocate(ROCFLS(0:jcplx1,3,0:JD,JV,JH))
-  allocate(RONFLS(0:jcplx1,3,0:JD,JV,JH))
-  allocate(ROPFLS(0:jcplx1,3,0:JD,JV,JH))
-  allocate(ROAFLS(0:jcplx1,3,0:JD,JV,JH))
-  allocate(ROCFHS(0:jcplx1,3,JD,JV,JH))
-  allocate(RONFHS(0:jcplx1,3,JD,JV,JH))
-  allocate(ROPFHS(0:jcplx1,3,JD,JV,JH))
-  allocate(ROAFHS(0:jcplx1,3,JD,JV,JH))
-  allocate(TOCFLS(0:jcplx1,JZ,JY,JX))
-  allocate(TONFLS(0:jcplx1,JZ,JY,JX))
-  allocate(TOPFLS(0:jcplx1,JZ,JY,JX))
-  allocate(TOAFLS(0:jcplx1,JZ,JY,JX))
+  allocate(CHY0(0:JZ,JY,JX))
+  allocate(RHGFLZ(JZ,JY,JX))
+  allocate(RCOFLZ(JZ,JY,JX))
+  allocate(RCHFLZ(JZ,JY,JX))
+  allocate(ROXFLZ(JZ,JY,JX))
+  allocate(RNGFLZ(JZ,JY,JX))
+  allocate(RN2FLZ(JZ,JY,JX))
+  allocate(RN4FLZ(JZ,JY,JX))
+  allocate(RN3FLZ(JZ,JY,JX))
+  allocate(RNOFLZ(JZ,JY,JX))
+  allocate(RH2PFZ(JZ,JY,JX))
+  allocate(RN4FBZ(JZ,JY,JX))
+  allocate(RN3FBZ(JZ,JY,JX))
+  allocate(RNOFBZ(JZ,JY,JX))
+  allocate(RH2BBZ(JZ,JY,JX))
+  allocate(RH1PFZ(JZ,JY,JX))
+  allocate(RH1BBZ(JZ,JY,JX))
+
+  call InitTransfrData
 
   call InitInsTp
   end subroutine InitTrnsfr
@@ -87,32 +90,26 @@ module TrnsfrMod
   subroutine DestructTrnsfr
   implicit none
 
-  call destroy(OQC2)
-  call destroy(OQN2)
-  call destroy(OQP2)
-  call destroy(OQA2)
-  call destroy(ROCSK2)
-  call destroy(RONSK2)
-  call destroy(ROPSK2)
-  call destroy(ROASK2)
-  call destroy(ROCFLS)
-  call destroy(RONFLS)
-  call destroy(ROPFLS)
-  call destroy(ROAFLS)
-  call destroy(ROCFHS)
-  call destroy(RONFHS)
-  call destroy(ROPFHS)
-  call destroy(ROAFHS)
-  call destroy(TOCFLS)
-  call destroy(TONFLS)
-  call destroy(TOPFLS)
-  call destroy(TOAFLS)
 
-  call destroy(RQROC0)
-  call destroy(RQRON0)
-  call destroy(RQROA0)
-  call destroy(RQROP0)
+  call destroy(CHY0)
+  call destroy(RHGFLZ)
+  call destroy(RCOFLZ)
+  call destroy(RCHFLZ)
+  call destroy(ROXFLZ)
+  call destroy(RNGFLZ)
+  call destroy(RN2FLZ)
+  call destroy(RN4FLZ)
+  call destroy(RN3FLZ)
+  call destroy(RNOFLZ)
+  call destroy(RH2PFZ)
+  call destroy(RN4FBZ)
+  call destroy(RN3FBZ)
+  call destroy(RNOFBZ)
+  call destroy(RH2BBZ)
+  call destroy(RH1PFZ)
+  call destroy(RH1BBZ)
 
+  call DestructTransfrData
 
   call DestructInsTp
   end subroutine DestructTrnsfr
@@ -923,6 +920,7 @@ module TrnsfrMod
   implicit none
 
   integer, intent(in) ::  I,NY, NX
+
   real(r8) :: FLWU(JZ,JY,JX)
   integer :: L,K
 

@@ -5,14 +5,15 @@ implicit none
   save
   character(len=*), private, parameter :: mod_filename = __FILE__
 
-  integer, PARAMETER :: JX=6
-  integer, PARAMETER :: JY=4
-  integer, PARAMETER :: JZ=20
-  integer, PARAMETER :: JH=JX+1
-  integer, PARAMETER :: JV=JY+1
-  integer, PARAMETER :: JD=JZ+1
+  integer :: JX=6
+  integer :: JY=4
+  integer :: JZ=20
+  integer :: JH
+  integer :: JV
+  integer :: JD
+
   integer, PARAMETER :: JP=5
-  integer, PARAMETER :: JC=10
+  integer, PARAMETER :: JC=10   !# of canopy layers
   integer, PARAMETER :: JS=5
   integer, PARAMETER :: JLI=4   !# of sectors for the leaf zenith [0,pi/2]
   integer, PARAMETER :: JLA=4   !# of sectors for the leaf azimuth, [0,pi]

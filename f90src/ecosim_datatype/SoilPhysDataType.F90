@@ -6,33 +6,93 @@ implicit none
   save
   character(len=*), private, parameter :: mod_filename = __FILE__
 
-  real(r8) :: SLOPE(0:3,JY,JX)                 !slope	in three directions [o]
-  real(r8) :: FC(0:JZ,JY,JX)                   !water contents at field capacity
-  real(r8) :: WP(0:JZ,JY,JX)                   !water contents at wilting point
-  real(r8) :: SCNV(0:JZ,JY,JX)                 !soil vertical saturated hydraulic conductivity [mm h-1]
-  real(r8) :: SCNH(JZ,JY,JX)                   !soil horizontal saturated hydraulic conductivity, [mm h-1]
+  real(r8),allocatable ::  SLOPE(:,:,:)                       !slope	in three directions [o]
+  real(r8),allocatable ::  FC(:,:,:)                          !water contents at field capacity
+  real(r8),allocatable ::  WP(:,:,:)                          !water contents at wilting point
+  real(r8),allocatable ::  SCNV(:,:,:)                        !soil vertical saturated hydraulic conductivity [mm h-1]
+  real(r8),allocatable ::  SCNH(:,:,:)                        !soil horizontal saturated hydraulic conductivity, [mm h-1]
+  real(r8),allocatable ::  PSIFC(:,:)                         !water potentials at field capacity, [MPa]
+  real(r8),allocatable ::  PSIWP(:,:)                         !water potentials at wilting point [MPa]
+  real(r8),allocatable ::  THW(:,:,:)                         !initial soil water content
+  real(r8),allocatable ::  THI(:,:,:)                         !initial ice content
+  REAL(R8),allocatable ::  ALBX(:,:)                          !Surface albedo
+  real(r8),allocatable ::  PSL(:,:,:)                         !log soil porosity	-
+  real(r8),allocatable ::  FCL(:,:,:)                         !log water content at field capacity
+  real(r8),allocatable ::  WPL(:,:,:)                         !log water content at wilting point
+  real(r8),allocatable ::  PSD(:,:,:)                         !log soil porosity - log water content at field capacity
+  real(r8),allocatable ::  FCD(:,:,:)                         !log water content at field capacity
+  real(r8),allocatable ::  SRP(:,:,:)                         !shape parameter for water desorption
+  real(r8),allocatable ::  FSLOPE(:,:,:)                      !fraction of slope in 1 and 2
+  REAL(R8),allocatable ::  VOLAI(:,:,:)                       !initial total soil micropore porosity	m3 d-2
+  REAL(R8),allocatable ::  PSIMS(:,:)                         !log water potential at saturation	MPa
+  REAL(R8),allocatable ::  PSIMX(:,:)                         !log water potential at field capacity	-
+  REAL(R8),allocatable ::  PSIMN(:,:)                         !log water potential at wilting point
+  REAL(R8),allocatable ::  PSISD(:,:)                         !log water potential at field capacity 	-
+  REAL(R8),allocatable ::  PSIMD(:,:)                         !log water potential at saturation - log water potential at field capacity
+  real(r8),allocatable ::  VHCM(:,:,:)                        !soil solid heat capacity [MPa m-3 K-1]
+  real(r8),allocatable ::  DPTHA(:,:)                         !active layer depth, [n]
+!----------------------------------------------------------------------
 
-  real(r8) :: PSIFC(JY,JX)                     !water potentials at field capacity, [MPa]
-  real(r8) :: PSIWP(JY,JX)                     !water potentials at wilting point [MPa]
-  real(r8) :: THW(JZ,JY,JX)                    !initial soil water content
-  real(r8) :: THI(JZ,JY,JX)                    !initial ice content
-  REAL(R8) :: ALBX(JY,JX)                      !Surface albedo
-  real(r8) :: PSL(0:JZ,JY,JX)                  !log soil porosity	-
-  real(r8) :: FCL(0:JZ,JY,JX)                  !log water content at field capacity
-  real(r8) :: WPL(0:JZ,JY,JX)                  !log water content at wilting point
-  real(r8) :: PSD(0:JZ,JY,JX)                  !log soil porosity - log water content at field capacity
-  real(r8) :: FCD(0:JZ,JY,JX)                  !log water content at field capacity
+contains
+  subroutine InitSoilPhysData
 
-  real(r8) :: SRP(0:JZ,JY,JX)                  !shape parameter for water desorption
-  real(r8) :: FSLOPE(2,JY,JX)                  !fraction of slope in 1 and 2
-  REAL(R8) :: VOLAI(0:JZ,JY,JX)                !initial total soil micropore porosity	m3 d-2
-  REAL(R8) :: PSIMS(JY,JX)                     !log water potential at saturation	MPa
-  REAL(R8) :: PSIMX(JY,JX)                     !log water potential at field capacity	-
-  REAL(R8) :: PSIMN(JY,JX)                     !log water potential at wilting point
-  REAL(R8) :: PSISD(JY,JX)                     !log water potential at field capacity 	-
-  REAL(R8) :: PSIMD(JY,JX)                     !log water potential at saturation - log water potential at field capacity
-  real(r8) :: VHCM(0:JZ,JY,JX)                 !soil solid heat capacity [MPa m-3 K-1]
-  real(r8) :: DPTHA(JY,JX)                     !active layer depth, [n]
+  implicit none
+  allocate(SLOPE(0:3,JY,JX));   SLOPE=0._r8
+  allocate(FC(0:JZ,JY,JX));     FC=0._r8
+  allocate(WP(0:JZ,JY,JX));     WP=0._r8
+  allocate(SCNV(0:JZ,JY,JX));   SCNV=0._r8
+  allocate(SCNH(JZ,JY,JX));     SCNH=0._r8
+  allocate(PSIFC(JY,JX));       PSIFC=0._r8
+  allocate(PSIWP(JY,JX));       PSIWP=0._r8
+  allocate(THW(JZ,JY,JX));      THW=0._r8
+  allocate(THI(JZ,JY,JX));      THI=0._r8
+  allocate(ALBX(JY,JX));        ALBX=0._r8
+  allocate(PSL(0:JZ,JY,JX));    PSL=0._r8
+  allocate(FCL(0:JZ,JY,JX));    FCL=0._r8
+  allocate(WPL(0:JZ,JY,JX));    WPL=0._r8
+  allocate(PSD(0:JZ,JY,JX));    PSD=0._r8
+  allocate(FCD(0:JZ,JY,JX));    FCD=0._r8
+  allocate(SRP(0:JZ,JY,JX));    SRP=0._r8
+  allocate(FSLOPE(2,JY,JX));    FSLOPE=0._r8
+  allocate(VOLAI(0:JZ,JY,JX));  VOLAI=0._r8
+  allocate(PSIMS(JY,JX));       PSIMS=0._r8
+  allocate(PSIMX(JY,JX));       PSIMX=0._r8
+  allocate(PSIMN(JY,JX));       PSIMN=0._r8
+  allocate(PSISD(JY,JX));       PSISD=0._r8
+  allocate(PSIMD(JY,JX));       PSIMD=0._r8
+  allocate(VHCM(0:JZ,JY,JX));   VHCM=0._r8
+  allocate(DPTHA(JY,JX));       DPTHA=0._r8
+  end subroutine InitSoilPhysData
 
+!----------------------------------------------------------------------
+  subroutine DestructSoilPhysData
+  use abortutils, only : destroy
+  implicit none
+  call destroy(SLOPE)
+  call destroy(FC)
+  call destroy(WP)
+  call destroy(SCNV)
+  call destroy(SCNH)
+  call destroy(PSIFC)
+  call destroy(PSIWP)
+  call destroy(THW)
+  call destroy(THI)
+  call destroy(ALBX)
+  call destroy(PSL)
+  call destroy(FCL)
+  call destroy(WPL)
+  call destroy(PSD)
+  call destroy(FCD)
+  call destroy(SRP)
+  call destroy(FSLOPE)
+  call destroy(VOLAI)
+  call destroy(PSIMS)
+  call destroy(PSIMX)
+  call destroy(PSIMN)
+  call destroy(PSISD)
+  call destroy(PSIMD)
+  call destroy(VHCM)
+  call destroy(DPTHA)
+  end subroutine DestructSoilPhysData
 
 end module SoilPhysDataType

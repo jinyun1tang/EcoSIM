@@ -17,6 +17,7 @@ SUBROUTINE soil(NA,ND,NT,NE,NAX,NTX,NEX,NHW,NHE,NVN,NVS)
   use readsmod     , only : reads
   use Hist1Mod     , only : fouts,foutp,outpd,outph,outsd,outsh
   use timings      , only : init_timer, start_timer, end_timer,end_timer_loop
+  use InitEcoSIM   , only : InitModules2
   use GridConsts
   use EcoSIMCtrlDataType
   use EcoSIMHistMod
@@ -49,6 +50,8 @@ SUBROUTINE soil(NA,ND,NT,NE,NAX,NTX,NEX,NHW,NHE,NVN,NVS)
   IF(is_first_year)THEN
     if(lverb)WRITE(*,333)'READI'
     CALL READI(NA,ND,NT,NE,NTX,NEX,NF,NFX,NTZ,NTZX,NHW,NHE,NVN,NVS)
+
+    call InitModules2
   ENDIF
 
   if(lverb)WRITE(*,333)'READS'

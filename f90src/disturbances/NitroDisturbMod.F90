@@ -18,7 +18,7 @@ module NitroDisturbMod
   use EcosimConst
   use PlantMngmtDataType
   use EcoSimSumDataType
-  use EcosysBGCFluxType
+  use EcosimBGCFluxType
   use SoilBGCDataType
   use AqueChemDatatype
   use GridDataType

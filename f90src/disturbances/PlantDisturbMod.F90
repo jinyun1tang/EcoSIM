@@ -20,7 +20,7 @@ module PlantDisturbMod
   use CanopyDataType
   use EcoSimSumDataType
   use SoilBGCDataType
-  use EcosysBGCFluxType
+  use EcosimBGCFluxType
   use GridDataType
   implicit none
   private

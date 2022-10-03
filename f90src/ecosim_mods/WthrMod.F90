@@ -26,8 +26,6 @@ module WthrMod
 
   real(r8) :: AMP,CLD,DTA,DHR,DTS,EMM,RADX,RADZ,VPX,XJ
 
-  real(r8) :: PRECRI(JY,JX),PRECWI(JY,JX),PRECII(JY,JX) &
-    ,PRECUI(JY,JX),RADN(JY,JX),VPS(JY,JX)
   !
   !     CDIR,CDIF=fraction of solar SW,sky diffuse radiation in visible
   !     PDIR,PDIF=PAR:SW ratio (umol s-1/(MJ h-1))
@@ -50,6 +48,13 @@ module WthrMod
   integer, intent(in) :: I, J
   integer, intent(in) :: NHW,NHE,NVN,NVS
   integer :: ITYPE,NX,NY,N,NZ
+  real(r8) :: PRECRI(JY,JX)
+  real(r8) :: PRECWI(JY,JX)
+  real(r8) :: PRECII(JY,JX)
+  real(r8) :: PRECUI(JY,JX)
+  real(r8) :: RADN(JY,JX)
+  real(r8) :: VPS(JY,JX)
+
   !     execution begins here
 
   XJ=J
@@ -73,34 +78,35 @@ module WthrMod
   !
   IF(ITYPE.EQ.1)THEN
 !
-    call DailyWeather(I,J,NHW,NHE,NVN,NVS)
+    call DailyWeather(I,J,NHW,NHE,NVN,NVS,RADN,PRECRI,PRECWI,VPS)
     !     CALCULATE HOURLY TEMPERATURE, RADIATION, WINDSPEED, VAPOR PRESSURE
     !     AND PRECIPITATION FROM HOURLY WEATHER ARRAYS LOADED IN 'READS'
     !
   ELSE
-    call HourlyWeather(I,J,NHW,NHE,NVN,NVS)
+    call HourlyWeather(I,J,NHW,NHE,NVN,NVS,RADN,PRECRI,PRECWI,VPS)
   ENDIF
 !
-  call CalcRadiation(I,J,NHW,NHE,NVN,NVS)
+  call CalcRadiation(I,J,NHW,NHE,NVN,NVS,RADN,PRECUI,PRECII)
 !
 
   IF(ICLM.EQ.1.OR.ICLM.EQ.2)THEN
-    call ApplyClimateCorrection(I,J,NHW,NHE,NVN,NVS)
+    call ApplyClimateCorrection(I,J,NHW,NHE,NVN,NVS,PRECUI,&
+      PRECRI,PRECII,PRECWI,VPS)
   ENDIF
 !
 
-  call SummaryForOutput(NHW,NHE,NVN,NVS)
+  call SummaryForOutput(NHW,NHE,NVN,NVS,PRECUI,PRECRI,PRECII,PRECWI)
 
   END subroutine wthr
 !------------------------------------------------------------------------------------------
 
-  subroutine DailyWeather(I,J,NHW,NHE,NVN,NVS)
+  subroutine DailyWeather(I,J,NHW,NHE,NVN,NVS,RADN,PRECRI,PRECWI,VPS)
 !
 !     Description:
 !
   implicit none
   integer,  intent(in) :: I,J,NHW,NHE,NVN,NVS
-
+  real(r8), intent(out) :: RADN(JY,JX),PRECRI(JY,JX),PRECWI(JY,JX),VPS(JY,JX)
   integer :: NY,NX
   !     begin_execution
 
@@ -183,11 +189,13 @@ module WthrMod
   end subroutine DailyWeather
 !------------------------------------------------------------------------------------------
 
-  subroutine HourlyWeather(I,J,NHW,NHE,NVN,NVS)
+  subroutine HourlyWeather(I,J,NHW,NHE,NVN,NVS,RADN,PRECRI,PRECWI,VPS)
 !
 !     Description:
 !
   integer, intent(in) :: I,J,NHW,NHE,NVN,NVS
+  real(r8), intent(out) :: RADN(JY,JX),PRECRI(JY,JX),PRECWI(JY,JX)
+  real(r8), intent(out) :: VPS(JY,JX)
   integer :: NY,NX
   !     begin_execution
 
@@ -219,13 +227,14 @@ module WthrMod
   end subroutine HourlyWeather
 !------------------------------------------------------------------------------------------
 
-  subroutine CalcRadiation(I,J,NHW,NHE,NVN,NVS)
+  subroutine CalcRadiation(I,J,NHW,NHE,NVN,NVS,RADN,PRECUI,PRECII)
 !
   !     Description:
 !
   implicit none
   integer, intent(in) :: I,J,NHW,NHE,NVN,NVS
-
+  real(r8), intent(inout) :: RADN(JY,JX)
+  real(r8), intent(out) :: PRECUI(JY,JX),PRECII(JY,JX)
   integer :: NY,NX
   real(r8) :: AZI  !solar azimuth
   REAL(R8) :: DEC  !solar declination
@@ -345,7 +354,8 @@ module WthrMod
   end subroutine CalcRadiation
 !------------------------------------------------------------------------------------------
 
-  subroutine ApplyClimateCorrection(I,J,NHW,NHE,NVN,NVS)
+  subroutine ApplyClimateCorrection(I,J,NHW,NHE,NVN,NVS,PRECUI,&
+    PRECRI,PRECII,PRECWI,VPS)
   !
   !     DESCRIPTION:
   !     IMPLEMENT CLIMATE CHANGES READ IN 'READS' TO HOURLY TEMPERATURE,
@@ -353,7 +363,8 @@ module WthrMod
   !     AND CO2
   implicit none
   integer, intent(in) :: I,J,NHW,NHE,NVN,NVS
-
+  real(r8), intent(inout) :: PRECUI(JY,JX),PRECRI(JY,JX),PRECII(JY,JX)
+  real(r8), intent(inout) :: PRECWI(JY,JX),VPS(JY,JX)
   integer :: NY,NX,NZ,N
   !     begin_execution
   !
@@ -485,30 +496,31 @@ module WthrMod
   end subroutine ApplyClimateCorrection
 !------------------------------------------------------------------------------------------
 
-  subroutine SummaryForOutput(NHW,NHE,NVN,NVS)
+  subroutine SummaryForOutput(NHW,NHE,NVN,NVS,PRECUI,PRECRI,PRECII,PRECWI)
   !
   !     DESCRIPTION:
   !     DAILY WEATHER TOTALS, MAXIMA AND MINIMA FOR DAILY OUTPUT
   !     CHECK AGAINST INPUTS FROM WEATHER FILE
   implicit none
   integer, intent(in) :: NHW,NHE,NVN,NVS
-
+  real(r8), intent(in):: PRECUI(JY,JX),PRECRI(JY,JX)
+  real(r8), intent(in) :: PRECII(JY,JX),PRECWI(JY,JX)
   integer :: NY,NX
   !
   !     begin_execution
 
   DO NX=NHW,NHE
     DO  NY=NVN,NVS
-      IF(SSIN(NY,NX).GT.0.0)TRAD(NY,NX)=TRAD(NY,NX)+RADS(NY,NX) &
+      IF(SSIN(NY,NX).GT.0.0_r8)TRAD(NY,NX)=TRAD(NY,NX)+RADS(NY,NX) &
         *SSIN(NY,NX)+RADY(NY,NX)*TYSIN
       TAMX(NY,NX)=AMAX1(TAMX(NY,NX),TCA(NY,NX))
       TAMN(NY,NX)=AMIN1(TAMN(NY,NX),TCA(NY,NX))
       HUDX(NY,NX)=AMAX1(HUDX(NY,NX),VPK(NY,NX))
       HUDN(NY,NX)=AMIN1(HUDN(NY,NX),VPK(NY,NX))
       TWIND(NY,NX)=TWIND(NY,NX)+UA(NY,NX)
-      VPA(NY,NX)=VPK(NY,NX)*2.173E-03/TKA(NY,NX)
+      VPA(NY,NX)=VPK(NY,NX)*2.173E-03_r8/TKA(NY,NX)
       TRAI(NY,NX)=TRAI(NY,NX)+(PRECRI(NY,NX)+PRECWI(NY,NX) &
-        +PRECII(NY,NX)+PRECUI(NY,NX))*1000.0
+        +PRECII(NY,NX)+PRECUI(NY,NX))*1000.0_r8
 !
       !     WATER AND HEAT INPUTS TO GRID CELLS
       !

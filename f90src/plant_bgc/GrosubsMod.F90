@@ -391,10 +391,10 @@ module grosubsMod
 !     WTLFB,WTSHEB,WTLSB=leaf,petiole,leaf+petiole mass
 !     IDTHB=branch living flag: 0=alive,1=dead
 !
-    DO 105 NB=1,NBR(NZ)
+    DO  NB=1,NBR(NZ)
       call GrowOneBranch(I,J,NB,NZ,TFN6,ZCX,CNLFW,CPLFW,CNSHW,CPSHW,CNRTW,CPRTW,&
         TFN5,WFNG,WFNC,WFNS,WFNSG,PTRT,UPNFC,IFLGZ)
-105 CONTINUE
+    ENDDO
 !
     call RootBGCModel(I,J,NZ,IFLGZ,ICHK1,IDTHRN,NRX,PTRT,TFN6,CNRTW,CPRTW,XRTN1)
 

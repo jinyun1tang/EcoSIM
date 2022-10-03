@@ -4,6 +4,7 @@
 ! Description:
 ! read control namelist
   use abortutils, only : endrun
+  use GridConsts, only : JX,JY,JZ,JH,JV,JD
   use ForcWriterMod, only : bgc_forc_conf,do_bgcforc_write
   implicit none
       character(len=*), intent(in) :: nmlfile
@@ -24,15 +25,20 @@
       integer :: do_doy,do_year,do_layer
       character(len=64) :: bgc_fname
       namelist /ecosys/case_name, prefix, runfile, do_regression_test, &
-      num_of_simdays,lverbose,num_microbial_guilds
+      num_of_simdays,lverbose,num_microbial_guilds,JX,JY,JZ
 
       logical :: laddband
       namelist /bbgcforc/do_bgcforc_write,do_year,do_doy,laddband,do_layer,&
         bgc_fname
+
       !local variables
       character(len=256) :: ioerror_msg
       integer :: rc, fu
       integer :: nml_error
+
+      JX=2
+      JY=2
+      JZ=14
       num_of_simdays=-1
       do_year=-1
       do_doy=0
@@ -92,5 +98,9 @@
   LYRG=num_of_simdays
   lverb=lverbose
   nmicbguilds=num_microbial_guilds
+
+  JH=JX+1
+  JV=JY+1
+  JD=JZ+1
 
 end subroutine readnamelist

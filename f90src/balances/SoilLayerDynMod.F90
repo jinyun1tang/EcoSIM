@@ -27,29 +27,28 @@ implicit none
 
   character(len=*), parameter :: mod_filename = __FILE__
 
-  real(r8) :: CDPTHX(JZ,JY,JX),CDPTHY(0:JZ,JY,JX)
-  real(r8) :: DDLYRX(3),DDLYRY(JZ)
-  real(r8) :: DDLYR(0:JZ,6),DDLYX(0:JZ,6)
+  real(r8) :: DDLYRX(3)
   real(r8) :: XVOLWP,WDPOBDL,WDNOBD1,WDPOBD0,WDPOBD1
   real(r8) :: WDNHBDL,WDNHBD0,WDNHBD1,WDNOBDL,WDNOBD0
   real(r8), PARAMETER :: ZEROC=0.1E-03_r8
-  integer :: IFLGL(0:JZ,6)
+
   public :: RelayerSoilProfile
   contains
 
 
-  subroutine RelayerSoilProfile(L,NY,NX,DORGC,DVOLI,UDVOLI,UDLYXF)
+  subroutine RelayerSoilProfile(NY,NX,DORGC,DVOLI,UDVOLI,UDLYXF)
   !
   !Description:
   !relayer the soil profiles
   implicit none
-  integer, intent(inout):: L
   integer, intent(in) :: NY,NX
-  real(r8),intent(in) :: DORGC(JZ,JY,JX)
-  REAL(R8),INTENT(IN) :: DVOLI(JZ,JY,JX)
+  real(r8),intent(in) :: DORGC(JZ,JY,JX)  !change in organic matter, initial-final
+  REAL(R8),INTENT(IN) :: DVOLI(JZ,JY,JX)  !change in ice volume, initial-final
   real(r8),intent(inout):: UDVOLI,UDLYXF
 
-  integer :: NN,K,M,N,NR,NZ
+  real(r8) :: CDPTHY(0:JZ,JY,JX),CDPTHX(JZ,JY,JX)
+  integer :: IFLGL(0:JZ,6)  !flag for soil thickness change
+  integer :: NN,K,M,N,NR,NZ,L
   integer :: L0,L1,NUX,ICHKLX,ICHKL,NGL
   real(r8) :: FX,FY
   real(r8) :: FBO
@@ -60,13 +59,15 @@ implicit none
   !     SOIL SUBSIDENCE
   !
   IF(IERSNG.GE.0)THEN
+!  soil erosion flag is active
     IF(BKDS(NU(NY,NX),NY,NX).LE.ZERO)THEN
       ICHKLX=0
     ELSE
+      !it is a soil column
       ICHKLX=1
     ENDIF
 
-    call SoilSubsidence(ICHKLX,NY,NX,DORGC,DVOLI,UDLYXF,UDVOLI)
+    call SoilSubsidence(ICHKLX,NY,NX,DORGC,DVOLI,UDLYXF,UDVOLI,CDPTHX,CDPTHY,IFLGL)
 
     !
     !     RECALCULATE SOIL LAYER THICKNESS
@@ -75,7 +76,7 @@ implicit none
     DO 245 L=NU(NY,NX),NL(NY,NX)-1
       DO 230 NN=1,3
 
-        call getTSlyrthicks(NN,L,NY,NX,ICHKL,NUX)
+        call getTSlyrthicks(NN,L,NY,NX,ICHKL,NUX,CDPTHX,CDPTHY,IFLGL)
 
         !
         !     TRANSFER STATE VARIABLES BETWEEN LAYERS
@@ -83,16 +84,16 @@ implicit none
         !     IF(IFLGL(L,NN).EQ.1)THEN
         IF(ABS(DDLYRX(NN)).GT.ZERO)THEN
 !L0,L1: target and source layers
-          call getFLs(L,NN,NY,NX,NUX,FX,FO,L1,L0)
+          call getFLs(L,NN,NY,NX,NUX,FX,FO,L1,L0,IFLGL)
 
           IF(FX.GT.ZERO)THEN
             IFLGS(NY,NX)=1
-            FY=1.0-FX
+            FY=1.0_r8-FX
             IF(FY.LE.ZERO2)FY=0.0_r8
             IF(BKDS(L0,NY,NX).LE.ZERO)THEN
 !     TARGET POND LAYER
 !
-              call tgtPondLyr(L,L0,L1,NY,NX,NN,FX,FY)
+              call tgtPondLyr(L,L0,L1,NY,NX,NN,FX,FY,CDPTHY,IFLGL)
             ELSE
 !
         !     MOVE ALL MATTER WITH CHANGES IN LAYER DEPTHS
@@ -117,7 +118,7 @@ implicit none
                 call MoveMMPoreSolute(L0,L1,NY,NX,FHO)
               ENDIF
 !     SOIL ORGANIC MATTER
-              call MoveSOM(L0,L1,L,NY,NX,FO)
+              call MoveSOM(L0,L1,L,NY,NX,FO,IFLGL)
 
               IF(NN.EQ.1)THEN
                 IF(BKDS(L0,NY,NX).LE.ZERO.AND.BKDS(L1,NY,NX).LE.ZERO &
@@ -149,42 +150,62 @@ implicit none
 230   CONTINUE
 245   CONTINUE
   ENDIF
+
   end subroutine RelayerSoilProfile
 !------------------------------------------------------------------------------------------
-  subroutine SoilSubsidence(ICHKLX,NY,NX,DORGC,DVOLI,UDLYXF,UDVOLI)
-
+  subroutine SoilSubsidence(ICHKLX,NY,NX,DORGC,DVOLI,UDLYXF,UDVOLI,&
+    CDPTHX,CDPTHY,IFLGL)
+!
+! IFLGL: c1, ponding water, c4: freeze-thaw, c5: erosion, c6: som change
   implicit none
   integer, intent(in) :: ICHKLX,NY,NX
   REAL(R8),INTENT(IN) :: DVOLI(JZ,JY,JX)
   real(r8),intent(in) :: DORGC(JZ,JY,JX)
   real(r8), intent(inout) :: UDLYXF,UDVOLI
+  real(r8), intent(out) :: CDPTHX(JZ,JY,JX)
+  real(r8), intent(inout) :: CDPTHY(0:JZ,JY,JX)
+  integer, intent(inout) :: IFLGL(0:JZ,6)
+  real(r8) :: DDLYX(0:JZ,6)
+  real(r8) :: DDLYR(0:JZ,6)
   integer :: LX,LY,LL,NN,L
   real(r8) :: DDLYXC,DDLYXE
   real(r8) :: DDLYXF
   real(r8) :: DENSJ,DPTWI,DDLYXP
 
 ! begin_execution
-  DO 225 LX=NL(NY,NX),NU(NY,NX),-1
+! starting from bottom up
+  DO  LX=NL(NY,NX),NU(NY,NX),-1
+    !make a copy of the depth, bottom of the layer
     CDPTHX(LX,NY,NX)=CDPTH(LX,NY,NX)
     CDPTHY(LX,NY,NX)=CDPTH(LX,NY,NX)
     !
-    !     POND
+    !     POND, from water to soil
     !
+! compute the change
     IF(BKDS(LX,NY,NX).LE.ZERO)THEN
+      ! current layer is water
       IF(BKDS(LX+1,NY,NX).GT.ZERO.OR.ICHKLX.EQ.1)THEN
+        !next layer is soil,
         DDLYXP=DLYR(3,LX,NY,NX)-(VOLW(LX,NY,NX)+VOLI(LX,NY,NX))/AREA(3,LX,NY,NX)
         DDLYX(LX,1)=DDLYXP+DDLYX(LX+1,1)
         DDLYR(LX,1)=DDLYX(LX+1,1)
         IFLGL(LX,1)=2
       ELSE
+        !next layer is not soil
+        !DDLYXP: soil equivalent depth
+        !DLYRI: initial soil layer thickness, [m]
         DDLYXP=DLYRI(3,LX,NY,NX)-(VOLW(LX,NY,NX)+VOLI(LX,NY,NX))/AREA(3,LX,NY,NX)
+        !DPTWI: water+ice total thickness
         DPTWI=(VOLW(LX+1,NY,NX)+VOLI(LX+1,NY,NX))/AREA(3,LX,NY,NX)
+        !there is expansion in layer LX, or next layer has
         IF(DDLYXP.LT.-ZERO.OR.DPTWI.GT.ZERO)THEN
           DDLYX(LX,1)=DDLYXP+DDLYX(LX+1,1)
           DDLYR(LX,1)=AMIN1(DDLYX(LX+1,1),DPTWI)
           IF(DPTWI.GT.ZERO)THEN
+! already has solid thickness
             IFLGL(LX,1)=1
           ELSE
+! has no solid thickness
             IFLGL(LX,1)=2
           ENDIF
         ELSE
@@ -194,6 +215,7 @@ implicit none
           IFLGL(LX,1)=2
         ENDIF
       ENDIF
+      !surface layer or layer above is still soil
       IF(LX.EQ.NU(NY,NX).OR.BKDS(LX-1,NY,NX).GT.ZERO)THEN
         DDLYX(LX-1,1)=DDLYX(LX,1)
         DDLYR(LX-1,1)=DDLYX(LX,1)
@@ -214,19 +236,27 @@ implicit none
     ELSE
       !
       !     FREEZE-THAW
-      !
+      !DVOLI: change in ice volume, initial-final
+      !DENSI: mass density of ice, g/cm3
+      !DENSJ: volume added per unit addition of ice (with respect to ice)
+      !the change is put to layer thickness
+      !DDLYXF: added thickness change
+! 4: due to freeze-thaw
       IF(ABS(DVOLI(LX,NY,NX)).GT.ZEROS(NY,NX))THEN
         DENSJ=1._r8-DENSI
         DDLYXF=DVOLI(LX,NY,NX)*DENSJ/AREA(3,LX,NY,NX)
+        !bottom layer
         IF(LX.EQ.NL(NY,NX))THEN
           DDLYX(LX,4)=DDLYXF
           DDLYR(LX,4)=0.0_r8
           IFLGL(LX,4)=0
+        !layer not at the bottom
         ELSE
           DDLYX(LX,4)=DDLYXF+DDLYX(LX+1,4)
           DDLYR(LX,4)=DDLYX(LX+1,4)
           !    2+DLYRI(3,LX,NY,NX)-DLYR(3,LX,NY,NX)
           IFLGL(LX,4)=0
+          !top soil layer or water layer
           IF(LX.EQ.NU(NY,NX).OR.BKDS(LX-1,NY,NX).LE.ZERO)THEN
             DDLYX(LX-1,4)=DDLYX(LX,4)
             DDLYR(LX-1,4)=DDLYX(LX,4)
@@ -234,7 +264,9 @@ implicit none
             IFLGL(LX-1,4)=0
           ENDIF
         ENDIF
+! no change in ice volume
       ELSE
+
         DDLYXF=0.0_r8
         IF(LX.EQ.NL(NY,NX))THEN
           DDLYX(LX,4)=0.0_r8
@@ -251,7 +283,7 @@ implicit none
           ENDIF
         ENDIF
       ENDIF
-
+      !total change in ice volume
       TDVOLI=TDVOLI+DVOLI(LX,NY,NX)
       TDLYXF=TDLYXF+DDLYXF
       UDVOLI=UDVOLI+DVOLI(LX,NY,NX)
@@ -259,42 +291,49 @@ implicit none
       !
       !     EROSION
       !
-      IF((IERSNG.EQ.1.OR.IERSNG.EQ.3) &
-        .AND.ABS(TSEDER(NY,NX)).GT.ZEROS(NY,NX))THEN
+      IF((IERSNG.EQ.1.OR.IERSNG.EQ.3).AND.ABS(TSEDER(NY,NX)).GT.ZEROS(NY,NX))THEN
         IF(LX.EQ.NL(NY,NX))THEN
+!  5: due to sediment erosion
+!         total soil layer reduction due to erosion
           DDLYXE=-TSEDER(NY,NX)/(BKVLNU(NY,NX)/VOLX(NU(NY,NX),NY,NX))
+          DDLYX(LX,5)=DDLYXE
+          DDLYR(LX,5)=DDLYXE
+          IFLGL(LX,5)=1
         ELSE
-!check if this is the right assignment, jytang, 05/20/2022
-          DDLYXE=0._r8
+          DDLYX(LX,5)=0.0_r8
+          DDLYR(LX,5)=0.0_r8
+          IFLGL(LX,5)=0
         ENDIF
-        DDLYX(LX,5)=DDLYXE
-        DDLYR(LX,5)=DDLYXE
-        IFLGL(LX,5)=1
       ELSE
-        DDLYX(LX,5)=0.0_r8
-        DDLYR(LX,5)=0.0_r8
-        IFLGL(LX,5)=0
+          DDLYX(LX,5)=0.0_r8
+          DDLYR(LX,5)=0.0_r8
+          IFLGL(LX,5)=0
       ENDIF
+
       !
       !     SOC GAIN OR LOSS
-!
-      IF((IERSNG.EQ.2.OR.IERSNG.EQ.3) &
-        .AND.ABS(DORGC(LX,NY,NX)).GT.ZEROS(NY,NX))THEN
-        DDLYXC=1.82E-06*DORGC(LX,NY,NX) &
-          /((1.0-FHOL(LX,NY,NX))*BKDSI(LX,NY,NX))/AREA(3,LX,NY,NX)
+      ! FHOL: macropore fraction
+      ! DDLYXC: soil thickness added due to change in organic matter,
+      ! keeping macropore fraction
+      ! BKDSI: initial bulk density,
+      IF((IERSNG.EQ.2.OR.IERSNG.EQ.3).AND.ABS(DORGC(LX,NY,NX)).GT.ZEROS(NY,NX))THEN
+        DDLYXC=1.82E-06_r8*DORGC(LX,NY,NX) &
+          /((1.0_r8-FHOL(LX,NY,NX))*BKDSI(LX,NY,NX))/AREA(3,LX,NY,NX)
+! obtain diagnostics only for NX==1
         IF(NX.EQ.1)THEN
           TDORGC=TDORGC+DORGC(LX,NY,NX)
           TDYLXC=TDYLXC+DDLYXC
         ENDIF
+! bottom layer
         IF(LX.EQ.NL(NY,NX).OR.BKDS(LX+1,NY,NX).LE.ZERO)THEN
           DDLYX(LX,6)=DDLYXC
           DDLYR(LX,6)=0.0_r8
           IFLGL(LX,6)=1
         ELSE
           DDLYX(LX,6)=DDLYXC+DDLYX(LX+1,6)
-          DDLYR(LX,6)=DDLYX(LX+1,6) &
-            +DLYRI(3,LX,NY,NX)-DLYR(3,LX,NY,NX)
+          DDLYR(LX,6)=DDLYX(LX+1,6)+DLYRI(3,LX,NY,NX)-DLYR(3,LX,NY,NX)
           IFLGL(LX,6)=1
+! top layer
           IF(LX.EQ.NU(NY,NX).OR.BKDS(LX-1,NY,NX).LE.ZERO)THEN
             DDLYX(LX-1,6)=DDLYX(LX,6)
             DDLYR(LX-1,6)=DDLYX(LX,6)
@@ -303,6 +342,7 @@ implicit none
           ENDIF
         ENDIF
       ELSE
+! bottom layer
         IF(LX.EQ.NL(NY,NX))THEN
           DDLYX(LX,6)=0.0_r8
           DDLYR(LX,6)=0.0_r8
@@ -318,32 +358,34 @@ implicit none
       IFLGL(LX,1)=0
 
     ENDIF
+! apply the change
       !
       !     RESET SOIL LAYER DEPTHS
       !
-    DO 200 NN=1,6
+    DO  NN=1,6
       !     IF(ABS(DDLYX(LX,NN)).GT.ZERO)IFLGS(NY,NX)=1
+!     c2, and c3 are not implemented
       IF(NN.NE.2.AND.NN.NE.3)THEN
         !
         !     POND
         !
         IF(BKDS(LX,NY,NX).LE.ZERO)THEN
+! there are some changes
           IF(IFLGL(LX,NN).NE.0)THEN
             CDPTH(LX,NY,NX)=CDPTH(LX,NY,NX)+DDLYR(LX,NN)
             CDPTHY(LX,NY,NX)=CDPTHY(LX,NY,NX)+DDLYR(LX,NN)
+!           not top layer
             IF(LX.NE.NU(NY,NX).AND.IFLGL(LX,1).EQ.2)THEN
-              DO 201 LL=LX-1,0,-1
+              DO  LL=LX-1,0,-1
                 CDPTH(LL,NY,NX)=CDPTH(LL,NY,NX)+DDLYX(LX,NN)
                 CDPTHY(LL,NY,NX)=CDPTHY(LL,NY,NX)+DDLYX(LX,NN)
-201           CONTINUE
+              ENDDO
               DDLYX(LX,NN)=0.0_r8
             ENDIF
-
+!           top layer
             IF(LX.EQ.NU(NY,NX))THEN
-              CDPTH(LX-1,NY,NX)=CDPTH(LX,NY,NX) &
-                -(VOLW(LX,NY,NX)+VOLI(LX,NY,NX))/AREA(3,LX,NY,NX)
-              CDPTHY(LX-1,NY,NX)=CDPTHY(LX,NY,NX) &
-                -(VOLW(LX,NY,NX)+VOLI(LX,NY,NX))/AREA(3,LX,NY,NX)
+              CDPTH(LX-1,NY,NX)=CDPTH(LX,NY,NX)-(VOLW(LX,NY,NX)+VOLI(LX,NY,NX))/AREA(3,LX,NY,NX)
+              CDPTHY(LX-1,NY,NX)=CDPTHY(LX,NY,NX)-(VOLW(LX,NY,NX)+VOLI(LX,NY,NX))/AREA(3,LX,NY,NX)
             ENDIF
           ENDIF
             !
@@ -357,7 +399,7 @@ implicit none
           IF(NN.EQ.4)THEN
             CDPTH(LX,NY,NX)=CDPTH(LX,NY,NX)+DDLYR(LX,NN)
             !     CDPTHY(LX,NY,NX)=CDPTHY(LX,NY,NX)+DDLYR(LX,NN)
-
+! top layer
             IF(LX.EQ.NU(NY,NX))THEN
               CDPTH(LX-1,NY,NX)=CDPTH(LX-1,NY,NX)+DDLYR(LX-1,NN)
               !     CDPTHY(LX-1,NY,NX)=CDPTHY(LX-1,NY,NX)+DDLYR(LX-1,NN)
@@ -370,10 +412,10 @@ implicit none
           IF(NN.EQ.5.AND.IFLGL(LX,NN).EQ.1)THEN
             CDPTH(LX,NY,NX)=CDPTH(LX,NY,NX)+DDLYR(LX,NN)
             CDPTHY(LX,NY,NX)=CDPTHY(LX,NY,NX)+DDLYR(LX,NN)
+
             IF(LX.EQ.NU(NY,NX))THEN
               CDPTH(LX-1,NY,NX)=CDPTH(LX-1,NY,NX)+DDLYR(LX,NN)
               CDPTHY(LX-1,NY,NX)=CDPTHY(LX-1,NY,NX)+DDLYR(LX,NN)
-
             ENDIF
           ENDIF
           !
@@ -388,35 +430,35 @@ implicit none
               CDPTHY(LX-1,NY,NX)=CDPTHY(LX-1,NY,NX)+DDLYR(LX-1,NN)
 
               IF(BKDS(LX-1,NY,NX).LE.ZERO)THEN
-                DO 255 LY=LX-2,0,-1
+                DO  LY=LX-2,0,-1
                   IF(BKDS(LY+1,NY,NX).LE.ZERO)THEN
                     CDPTH(LY,NY,NX)=CDPTH(LY,NY,NX)+DDLYR(LX-1,NN)
                     CDPTHY(LY,NY,NX)=CDPTHY(LY,NY,NX)+DDLYR(LX-1,NN)
 
                   ENDIF
-255             CONTINUE
+                ENDDO
               ENDIF
             ENDIF
           ENDIF
         ENDIF
       ENDIF
-200 CONTINUE
+    ENDDO
     VOLY(LX,NY,NX)=VOLX(LX,NY,NX)
-225 CONTINUE
-    VOLY(0,NY,NX)=VOLW(0,NY,NX)+VOLI(0,NY,NX)
+  ENDDO
+  VOLY(0,NY,NX)=VOLW(0,NY,NX)+VOLI(0,NY,NX)
   end subroutine SoilSubsidence
 
 !------------------------------------------------------------------------------------------
 
 
-  subroutine getFLs(L,NN,NY,NX,NUX,FX,FO,L1,L0)
+  subroutine getFLs(L,NN,NY,NX,NUX,FX,FO,L1,L0,IFLGL)
 
   implicit none
   integer, intent(in) :: L,NN,NY,NX,NUX
   real(r8), intent(out) :: FX,FO
   integer, intent(out) :: L1   !source
   integer, intent(out) :: L0   !target
-
+  integer, intent(in) :: IFLGL(0:JZ,6)
   real(r8) :: DPTWI
 
 ! begin_execution
@@ -434,13 +476,13 @@ implicit none
 
     IF((BKDS(L,NY,NX).LE.ZERO.AND.IFLGL(L,1).EQ.2) &
         .OR.(DLYR(3,L0,NY,NX).LE.ZEROC.AND.IFLGL(L,6).EQ.1))THEN
-      FX=1.0
-      FO=1.0
+      FX=1.0_r8
+      FO=1.0_r8
     ELSE
       IF(BKDS(L0,NY,NX).LE.ZERO)THEN
         DPTWI=(VOLW(L0,NY,NX)+VOLI(L0,NY,NX))/AREA(3,L0,NY,NX)
         IF(DPTWI.GT.ZERO)THEN
-          FX=AMIN1(1.0,DDLYRX(NN)/DPTWI)
+          FX=AMIN1(1.0_r8,DDLYRX(NN)/DPTWI)
           FO=FX
         ELSE
           FX=0.0_r8
@@ -489,11 +531,15 @@ implicit none
   end subroutine getFLs
 !------------------------------------------------------------------------------------------
 
-  subroutine getTSlyrthicks(NN,L,NY,NX,ICHKL,NUX)
+  subroutine getTSlyrthicks(NN,L,NY,NX,ICHKL,NUX,CDPTHX,CDPTHY,IFLGL)
   implicit none
   integer, intent(in) :: NN,L,NY,NX
   integer, intent(inout) :: ICHKL
   integer, intent(out) :: NUX
+  real(r8), intent(in) :: CDPTHX(JZ,JY,JX)
+  real(r8), intent(inout) :: CDPTHY(0:JZ,JY,JX)
+  integer, intent(inout) :: IFLGL(0:JZ,6)
+  real(r8) :: DDLYRY(JZ)
   real(r8) :: DLYR0
   real(r8) :: DLYRXX
   integer :: LL
@@ -615,14 +661,15 @@ implicit none
   end subroutine getTSlyrthicks
 !------------------------------------------------------------------------------------------
 
-  subroutine tgtPondLyr(L,L0,L1,NY,NX,NN,FX,FY)
+  subroutine tgtPondLyr(L,L0,L1,NY,NX,NN,FX,FY,CDPTHY,IFLGL)
   implicit none
   integer, intent(in) :: L
   integer, intent(in) :: L0  !target
   integer, intent(in) :: L1  !source
   integer, intent(in) :: NY,NX,NN
   real(r8), intent(in) :: FX,FY
-
+  real(r8), intent(inout) :: CDPTHY(0:JZ,JY,JX)
+  integer, intent(in) ::  IFLGL(0:JZ,6)
   integer :: N,M,NZ,K,NGL,NR
   real(r8) :: ENGY0,ENGY1
 ! begin_execution
@@ -634,12 +681,7 @@ implicit none
     XCEC(L1,NY,NX)=XCEC(L1,NY,NX)+FX*XCEC(L0,NY,NX)
     XAEC(L1,NY,NX)=XAEC(L1,NY,NX)+FX*XAEC(L0,NY,NX)
   ENDIF
-          !     IF(BKDS(L1,NY,NX).LE.ZERO)THEN
-          !     VOLT(L1,NY,NX)=VOLT(L1,NY,NX)
-          !    2+FX*VOLT(L0,NY,NX)
-          !     VOLX(L1,NY,NX)=VOLX(L1,NY,NX)
-          !    2+FX*VOLX(L0,NY,NX)
-          !     ENDIF
+
   VOLW(L1,NY,NX)=VOLW(L1,NY,NX)+FX*VOLW(L0,NY,NX)
   VOLI(L1,NY,NX)=VOLI(L1,NY,NX)+FX*VOLI(L0,NY,NX)
   VOLP(L1,NY,NX)=VOLP(L1,NY,NX)+FX*VOLP(L0,NY,NX)
@@ -1165,12 +1207,13 @@ implicit none
 
 !------------------------------------------------------------------------------------------
 
-  subroutine MoveSOM(L0,L1,L,NY,NX,FO)
+  subroutine MoveSOM(L0,L1,L,NY,NX,FO,IFLGL)
 !
   implicit none
   integer, intent(in) :: L0,L1,L
   integer, intent(in) :: NY,NX
   real(r8),intent(in) :: FO
+  integer, intent(in) :: IFLGL(0:JZ,6)
 
   integer :: K,N,M,NGL,NR,NZ
   real(r8) :: FXO,FRO
@@ -2270,7 +2313,7 @@ implicit none
   real(r8) :: FXENGY,FXVOLI,FXVOLY,FXVOLWX,FXVHCM
   real(r8) :: ENGY0,ENGY1
 
-  IF(L0.EQ.L.OR.POROSI(L0,NY,NX).LE.ZERO)THEN
+  IF(L0.EQ.L.OR.(L0>0 .and. POROSI(L0,NY,NX).LE.ZERO))THEN
     FWO=FO
   ELSE
     FWO=AMIN1(0.5,FO*POROSI(L1,NY,NX)/POROSI(L0,NY,NX))

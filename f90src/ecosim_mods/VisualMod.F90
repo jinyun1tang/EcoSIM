@@ -13,7 +13,7 @@ module VisualMod
   use SnowDataType
   use PlantDataRateType
   use CanopyDataType
-  use EcosysBGCFluxType
+  use EcosimBGCFluxType
   use EcoSIMHistMod
   use SoilPropertyDataType
   use SoilBGCDataType
@@ -29,7 +29,7 @@ module VisualMod
 
   integer :: L,NX,NY,N
 
-  real(r8) :: OUT(100),SWC(JY,JX)
+  real(r8) :: OUT(100)
   real(r8), PARAMETER :: DEFAULT=-9999
 
   integer, SAVE :: IYR1,IYR2
@@ -43,7 +43,7 @@ module VisualMod
   implicit none
   integer, intent(in) :: I, J
   integer, intent(in) :: NHW,NHE,NVN,NVS
-
+  real(r8) :: SWC(JY,JX)
 ! begin_execution
   IF(ICHECK.EQ.0)THEN
     call OPEN_safe(16,PREFIX,'years','OLD',mod_filename,__LINE__)
