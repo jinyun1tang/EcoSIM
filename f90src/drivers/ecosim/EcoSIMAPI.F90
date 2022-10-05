@@ -115,7 +115,7 @@ contains
   integer, intent(in) :: NVS   !lower corner y index
   JX=(NHE-NHW)+2
   JY=(NVS-NVN)+2
-  JZ=20
+  JZ=14
   JH=JX+1
   JV=JY+1
   JD=JZ+1
