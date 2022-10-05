@@ -1,6 +1,7 @@
 set(SOIL_HT_SOURCES
   WatsubPars.F90
   SoilHydroParaMod.F90
+  WatsubDataMod.F90
   WatsubMod.F90
 )
 include_directories(${CMAKE_BINARY_DIR}/f90src/utils/)

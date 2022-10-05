@@ -3,11 +3,26 @@ module InitEcoSIM
   implicit none
   private
   character(len=*),private, parameter :: mod_filename = __FILE__
-  public ::   InitModules
-
+  public :: InitModules
+  public :: InitModules2
   contains
 
   subroutine InitModules(nmicbguilds)
+
+  use SnowDataType        , only : InitSnowData
+  use ErosionMod          , only : InitErosion
+  use FlagDataType        , only : InitFlagData
+  use SurfSoilDataType    , only : InitSurfSoilData
+  use SoilPhysDataType    , only : InitSoilPhysData
+  use SoilHeatDatatype    , only : InitSoilHeatData
+  use GridDataType        , only : InitGridData
+  use RootDataType        , only : InitRootData
+  use LandSurfDataType    , only : InitLandSurfData
+  use EcosimBGCFluxType   , only : InitEcosimBGCFluxData
+  use CanopyDataType      , only : InitCanopyData
+  use EcoSIMCtrlDataType  , only : InitEcoSIMCtrlData
+  use EcoSIMHistMod       , only : InitEcoSIMHistData
+  use ClimForcDataType    , only : InitClimForcData
   use NitrosMod            , only : InitNitro
   use RedistMod           , only : InitRedist
   use MicrobialDataType   , only : InitMicrobialData
@@ -33,13 +48,20 @@ module InitEcoSIM
   use PlantMngmtDataType  , only : InitPlantMngmtData
   use InitSOMBGCMod       , only : InitSOMBGC
   use GridConsts
-  use TrnsfrMod           , only : InitTrnsfr
   use EcoSIMConfig        , only : jcplx1 => jcplx1c
   implicit  none
   integer                 , intent(in) :: nmicbguilds   !number of microbial guilds per group
 
 ! begin_execution
   call InitSOMBGC(nmicbguilds)
+
+  call InitGridData
+
+  call InitLandSurfData
+
+  call InitEcoSIMCtrlData
+
+  call InitCanopyData
 
   call InitCanopyRad
 
@@ -73,6 +95,8 @@ module InitEcoSIM
 
   call InitPlantTraits
 
+  call InitFlagData
+
   call InitPlantDisturbance
 
   call InitHour1
@@ -87,6 +111,43 @@ module InitEcoSIM
 
   call InitRedist
 
-  call InitTrnsfr
+  call InitRootData
+
+  call InitClimForcData
+
+  call InitEcosimBGCFluxData
+
+  call InitSnowData
+
+  call InitEcoSIMHistData
+
+  call InitSoilHeatData
+
+  call InitSurfSoilData
+
+  call InitSoilPhysData
+
+  call InitErosion
+
   end subroutine InitModules
+
+!------------------------------------------------------------------------------------------
+
+  subroutine InitModules2
+
+  use FlagDataType , only : ISALTG
+  use TrnsfrsMod   , only : InitTrnsfrs
+  use TrnsfrMod    , only : InitTrnsfr
+
+  implicit none
+
+
+  if(ISALTG/=0)then
+    call InitTrnsfrs
+  else
+    call InitTrnsfr
+  endif
+
+
+  end subroutine InitModules2
 end module InitEcoSIM

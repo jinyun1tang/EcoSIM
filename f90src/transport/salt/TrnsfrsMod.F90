@@ -34,93 +34,716 @@ module TrnsfrsMod
 
   real(r8) :: RCHQF,RCHGFU,RCHGFT
   real(r8) :: XN
+  real(r8),allocatable ::  TQRAL(:,:)                         !
+  real(r8),allocatable ::  TQRFE(:,:)                         !
+  real(r8),allocatable ::  TQRHY(:,:)                         !
+  real(r8),allocatable ::  TQRCA(:,:)                         !
+  real(r8),allocatable ::  TQRMG(:,:)                         !
+  real(r8),allocatable ::  TQRNA(:,:)                         !
+  real(r8),allocatable ::  TQRKA(:,:)                         !
+  real(r8),allocatable ::  TQROH(:,:)                         !
+  real(r8),allocatable ::  TQRSO(:,:)                         !
+  real(r8),allocatable ::  TQRCL(:,:)                         !
+  real(r8),allocatable ::  TQRC3(:,:)                         !
+  real(r8),allocatable ::  TQRHC(:,:)                         !
+  real(r8),allocatable ::  TQRAL1(:,:)                        !
+  real(r8),allocatable ::  TQRAL2(:,:)                        !
+  real(r8),allocatable ::  TQRAL3(:,:)                        !
+  real(r8),allocatable ::  TQRAL4(:,:)                        !
+  real(r8),allocatable ::  TQRALS(:,:)                        !
+  real(r8),allocatable ::  TQRFE1(:,:)                        !
+  real(r8),allocatable ::  TQRFE2(:,:)                        !
+  real(r8),allocatable ::  TQRFE3(:,:)                        !
+  real(r8),allocatable ::  TQRFE4(:,:)                        !
+  real(r8),allocatable ::  TQRFES(:,:)                        !
+  real(r8),allocatable ::  TQRCAO(:,:)                        !
+  real(r8),allocatable ::  TQRCAC(:,:)                        !
+  real(r8),allocatable ::  TQRCAH(:,:)                        !
+  real(r8),allocatable ::  TQRCAS(:,:)                        !
+  real(r8),allocatable ::  TQRMGO(:,:)                        !
+  real(r8),allocatable ::  TQRMGC(:,:)                        !
+  real(r8),allocatable ::  TQRMGH(:,:)                        !
+  real(r8),allocatable ::  TQRMGS(:,:)                        !
+  real(r8),allocatable ::  TQRNAC(:,:)                        !
+  real(r8),allocatable ::  TQRNAS(:,:)                        !
+  real(r8),allocatable ::  TQRKAS(:,:)                        !
+  real(r8),allocatable ::  TQRH0P(:,:)                        !
+  real(r8),allocatable ::  TQRH3P(:,:)                        !
+  real(r8),allocatable ::  TQRF1P(:,:)                        !
+  real(r8),allocatable ::  TQRF2P(:,:)                        !
+  real(r8),allocatable ::  TQRC0P(:,:)                        !
+  real(r8),allocatable ::  TQRC1P(:,:)                        !
+  real(r8),allocatable ::  TQRC2P(:,:)                        !
+  real(r8),allocatable ::  TQRM1P(:,:)                        !
+  real(r8),allocatable ::  TQSAL(:,:)                         !
+  real(r8),allocatable ::  TQSFE(:,:)                         !
+  real(r8),allocatable ::  TQSHY(:,:)                         !
+  real(r8),allocatable ::  TQSCA(:,:)                         !
+  real(r8),allocatable ::  TQSMG(:,:)                         !
+  real(r8),allocatable ::  TQSNA(:,:)                         !
+  real(r8),allocatable ::  TQSKA(:,:)                         !
+  real(r8),allocatable ::  TQSOH(:,:)                         !
+  real(r8),allocatable ::  TQSSO(:,:)                         !
+  real(r8),allocatable ::  TQSCL(:,:)                         !
+  real(r8),allocatable ::  TQSC3(:,:)                         !
+  real(r8),allocatable ::  TQSHC(:,:)                         !
+  real(r8),allocatable ::  TQSAL1(:,:)                        !
+  real(r8),allocatable ::  TQSAL2(:,:)                        !
+  real(r8),allocatable ::  TQSAL3(:,:)                        !
+  real(r8),allocatable ::  TQSAL4(:,:)                        !
+  real(r8),allocatable ::  TQSALS(:,:)                        !
+  real(r8),allocatable ::  TQSFE1(:,:)                        !
+  real(r8),allocatable ::  TQSFE2(:,:)                        !
+  real(r8),allocatable ::  TQSFE3(:,:)                        !
+  real(r8),allocatable ::  TQSFE4(:,:)                        !
+  real(r8),allocatable ::  TQSFES(:,:)                        !
+  real(r8),allocatable ::  TQSCAO(:,:)                        !
+  real(r8),allocatable ::  TQSCAC(:,:)                        !
+  real(r8),allocatable ::  TQSCAH(:,:)                        !
+  real(r8),allocatable ::  TQSCAS(:,:)                        !
+  real(r8),allocatable ::  TQSMGO(:,:)                        !
+  real(r8),allocatable ::  TQSMGC(:,:)                        !
+  real(r8),allocatable ::  TQSMGH(:,:)                        !
+  real(r8),allocatable ::  TQSMGS(:,:)                        !
+  real(r8),allocatable ::  TQSNAC(:,:)                        !
+  real(r8),allocatable ::  TQSNAS(:,:)                        !
+  real(r8),allocatable ::  TQSKAS(:,:)                        !
+  real(r8),allocatable ::  TQSH0P(:,:)                        !
+  real(r8),allocatable ::  TQSH3P(:,:)                        !
+  real(r8),allocatable ::  TQSF1P(:,:)                        !
+  real(r8),allocatable ::  TQSF2P(:,:)                        !
+  real(r8),allocatable ::  TQSC0P(:,:)                        !
+  real(r8),allocatable ::  TQSC1P(:,:)                        !
+  real(r8),allocatable ::  TQSC2P(:,:)                        !
+  real(r8),allocatable ::  TQSM1P(:,:)                        !
+  real(r8),allocatable ::  TALFLS(:,:,:)                      !
+  real(r8),allocatable ::  TFEFLS(:,:,:)                      !
+  real(r8),allocatable ::  TCAFLS(:,:,:)                      !
+  real(r8),allocatable ::  THYFLS(:,:,:)                      !
+  real(r8),allocatable ::  TMGFLS(:,:,:)                      !
+  real(r8),allocatable ::  TNAFLS(:,:,:)                      !
+  real(r8),allocatable ::  TKAFLS(:,:,:)                      !
+  real(r8),allocatable ::  TOHFLS(:,:,:)                      !
+  real(r8),allocatable ::  TSOFLS(:,:,:)                      !
+  real(r8),allocatable ::  TCLFLS(:,:,:)                      !
+  real(r8),allocatable ::  TC3FLS(:,:,:)                      !
+  real(r8),allocatable ::  THCFLS(:,:,:)                      !
+  real(r8),allocatable ::  TAL1FS(:,:,:)                      !
+  real(r8),allocatable ::  TAL2FS(:,:,:)                      !
+  real(r8),allocatable ::  TAL3FS(:,:,:)                      !
+  real(r8),allocatable ::  TAL4FS(:,:,:)                      !
+  real(r8),allocatable ::  TALSFS(:,:,:)                      !
+  real(r8),allocatable ::  TFE1FS(:,:,:)                      !
+  real(r8),allocatable ::  TFE2FS(:,:,:)                      !
+  real(r8),allocatable ::  TFE3FS(:,:,:)                      !
+  real(r8),allocatable ::  TFE4FS(:,:,:)                      !
+  real(r8),allocatable ::  TFESFS(:,:,:)                      !
+  real(r8),allocatable ::  TCAOFS(:,:,:)                      !
+  real(r8),allocatable ::  TCACFS(:,:,:)                      !
+  real(r8),allocatable ::  TCAHFS(:,:,:)                      !
+  real(r8),allocatable ::  TCASFS(:,:,:)                      !
+  real(r8),allocatable ::  TMGOFS(:,:,:)                      !
+  real(r8),allocatable ::  TMGCFS(:,:,:)                      !
+  real(r8),allocatable ::  TMGHFS(:,:,:)                      !
+  real(r8),allocatable ::  TMGSFS(:,:,:)                      !
+  real(r8),allocatable ::  TNACFS(:,:,:)                      !
+  real(r8),allocatable ::  TNASFS(:,:,:)                      !
+  real(r8),allocatable ::  TKASFS(:,:,:)                      !
+  real(r8),allocatable ::  TH0PFS(:,:,:)                      !
+  real(r8),allocatable ::  TH3PFS(:,:,:)                      !
+  real(r8),allocatable ::  TF1PFS(:,:,:)                      !
+  real(r8),allocatable ::  TF2PFS(:,:,:)                      !
+  real(r8),allocatable ::  TC0PFS(:,:,:)                      !
+  real(r8),allocatable ::  TC1PFS(:,:,:)                      !
+  real(r8),allocatable ::  TC2PFS(:,:,:)                      !
+  real(r8),allocatable ::  TM1PFS(:,:,:)                      !
+  real(r8),allocatable ::  TH0BFB(:,:,:)                      !
+  real(r8),allocatable ::  TH3BFB(:,:,:)                      !
+  real(r8),allocatable ::  TF1BFB(:,:,:)                      !
+  real(r8),allocatable ::  TF2BFB(:,:,:)                      !
+  real(r8),allocatable ::  TC0BFB(:,:,:)                      !
+  real(r8),allocatable ::  TC1BFB(:,:,:)                      !
+  real(r8),allocatable ::  TC2BFB(:,:,:)                      !
+  real(r8),allocatable ::  TM1BFB(:,:,:)                      !
+  real(r8),allocatable ::  TALFHS(:,:,:)                      !
+  real(r8),allocatable ::  TFEFHS(:,:,:)                      !
+  real(r8),allocatable ::  THYFHS(:,:,:)                      !
+  real(r8),allocatable ::  TCAFHS(:,:,:)                      !
+  real(r8),allocatable ::  TMGFHS(:,:,:)                      !
+  real(r8),allocatable ::  TNAFHS(:,:,:)                      !
+  real(r8),allocatable ::  TKAFHS(:,:,:)                      !
+  real(r8),allocatable ::  TOHFHS(:,:,:)                      !
+  real(r8),allocatable ::  TSOFHS(:,:,:)                      !
+  real(r8),allocatable ::  TCLFHS(:,:,:)                      !
+  real(r8),allocatable ::  TC3FHS(:,:,:)                      !
+  real(r8),allocatable ::  THCFHS(:,:,:)                      !
+  real(r8),allocatable ::  TAL1HS(:,:,:)                      !
+  real(r8),allocatable ::  TAL2HS(:,:,:)                      !
+  real(r8),allocatable ::  TAL3HS(:,:,:)                      !
+  real(r8),allocatable ::  TAL4HS(:,:,:)                      !
+  real(r8),allocatable ::  TALSHS(:,:,:)                      !
+  real(r8),allocatable ::  TFE1HS(:,:,:)                      !
+  real(r8),allocatable ::  TFE2HS(:,:,:)                      !
+  real(r8),allocatable ::  TFE3HS(:,:,:)                      !
+  real(r8),allocatable ::  TFE4HS(:,:,:)                      !
+  real(r8),allocatable ::  TFESHS(:,:,:)                      !
+  real(r8),allocatable ::  TCAOHS(:,:,:)                      !
+  real(r8),allocatable ::  TCACHS(:,:,:)                      !
+  real(r8),allocatable ::  TCAHHS(:,:,:)                      !
+  real(r8),allocatable ::  TCASHS(:,:,:)                      !
+  real(r8),allocatable ::  TMGOHS(:,:,:)                      !
+  real(r8),allocatable ::  TMGCHS(:,:,:)                      !
+  real(r8),allocatable ::  TMGHHS(:,:,:)                      !
+  real(r8),allocatable ::  TMGSHS(:,:,:)                      !
+  real(r8),allocatable ::  TNACHS(:,:,:)                      !
+  real(r8),allocatable ::  TNASHS(:,:,:)                      !
+  real(r8),allocatable ::  TKASHS(:,:,:)                      !
+  real(r8),allocatable ::  TH0PHS(:,:,:)                      !
+  real(r8),allocatable ::  TH3PHS(:,:,:)                      !
+  real(r8),allocatable ::  TF1PHS(:,:,:)                      !
+  real(r8),allocatable ::  TF2PHS(:,:,:)                      !
+  real(r8),allocatable ::  TC0PHS(:,:,:)                      !
+  real(r8),allocatable ::  TC1PHS(:,:,:)                      !
+  real(r8),allocatable ::  TC2PHS(:,:,:)                      !
+  real(r8),allocatable ::  TM1PHS(:,:,:)                      !
+  real(r8),allocatable ::  TH0BHB(:,:,:)                      !
+  real(r8),allocatable ::  TH3BHB(:,:,:)                      !
+  real(r8),allocatable ::  TF1BHB(:,:,:)                      !
+  real(r8),allocatable ::  TF2BHB(:,:,:)                      !
+  real(r8),allocatable ::  TC0BHB(:,:,:)                      !
+  real(r8),allocatable ::  TC1BHB(:,:,:)                      !
+  real(r8),allocatable ::  TC2BHB(:,:,:)                      !
+  real(r8),allocatable ::  TM1BHB(:,:,:)                      !
+  real(r8),allocatable ::  RALFLZ(:,:,:)                      !
+  real(r8),allocatable ::  RFEFLZ(:,:,:)                      !
+  real(r8),allocatable ::  RHYFLZ(:,:,:)                      !
+  real(r8),allocatable ::  RCAFLZ(:,:,:)                      !
+  real(r8),allocatable ::  RMGFLZ(:,:,:)                      !
+  real(r8),allocatable ::  RNAFLZ(:,:,:)                      !
+  real(r8),allocatable ::  RKAFLZ(:,:,:)                      !
+  real(r8),allocatable ::  ROHFLZ(:,:,:)                      !
+  real(r8),allocatable ::  RSOFLZ(:,:,:)                      !
+  real(r8),allocatable ::  RCLFLZ(:,:,:)                      !
+  real(r8),allocatable ::  RC3FLZ(:,:,:)                      !
+  real(r8),allocatable ::  RHCFLZ(:,:,:)                      !
+  real(r8),allocatable ::  RAL1FZ(:,:,:)                      !
+  real(r8),allocatable ::  RAL2FZ(:,:,:)                      !
+  real(r8),allocatable ::  RAL3FZ(:,:,:)                      !
+  real(r8),allocatable ::  RAL4FZ(:,:,:)                      !
+  real(r8),allocatable ::  RALSFZ(:,:,:)                      !
+  real(r8),allocatable ::  RCAOFZ(:,:,:)                      !
+  real(r8),allocatable ::  RFE1FZ(:,:,:)                      !
+  real(r8),allocatable ::  RFE2FZ(:,:,:)                      !
+  real(r8),allocatable ::  RFE3FZ(:,:,:)                      !
+  real(r8),allocatable ::  RFE4FZ(:,:,:)                      !
+  real(r8),allocatable ::  RFESFZ(:,:,:)                      !
+  real(r8),allocatable ::  RCACFZ(:,:,:)                      !
+  real(r8),allocatable ::  RCAHFZ(:,:,:)                      !
+  real(r8),allocatable ::  RCASFZ(:,:,:)                      !
+  real(r8),allocatable ::  RMGOFZ(:,:,:)                      !
+  real(r8),allocatable ::  RMGCFZ(:,:,:)                      !
+  real(r8),allocatable ::  RMGHFZ(:,:,:)                      !
+  real(r8),allocatable ::  RMGSFZ(:,:,:)                      !
+  real(r8),allocatable ::  RNACFZ(:,:,:)                      !
+  real(r8),allocatable ::  RNASFZ(:,:,:)                      !
+  real(r8),allocatable ::  RKASFZ(:,:,:)                      !
+  real(r8),allocatable ::  RH0PFZ(:,:,:)                      !
+  real(r8),allocatable ::  RH3PFZ(:,:,:)                      !
+  real(r8),allocatable ::  RF1PFZ(:,:,:)                      !
+  real(r8),allocatable ::  RF2PFZ(:,:,:)                      !
+  real(r8),allocatable ::  RC0PFZ(:,:,:)                      !
+  real(r8),allocatable ::  RC1PFZ(:,:,:)                      !
+  real(r8),allocatable ::  RC2PFZ(:,:,:)                      !
+  real(r8),allocatable ::  RM1PFZ(:,:,:)                      !
+  real(r8),allocatable ::  RH0BBZ(:,:,:)                      !
+  real(r8),allocatable ::  RH3BBZ(:,:,:)                      !
+  real(r8),allocatable ::  RF1BBZ(:,:,:)                      !
+  real(r8),allocatable ::  RF2BBZ(:,:,:)                      !
+  real(r8),allocatable ::  RC0BBZ(:,:,:)                      !
+  real(r8),allocatable ::  RC1BBZ(:,:,:)                      !
+  real(r8),allocatable ::  RC2BBZ(:,:,:)                      !
+  real(r8),allocatable ::  RM1BBZ(:,:,:)                      !
+!----------------------------------------------------------------------
 
-
-  real(r8) :: TQRAL(JY,JX),TQRFE(JY,JX),TQRHY(JY,JX) &
-  ,TQRCA(JY,JX),TQRMG(JY,JX),TQRNA(JY,JX),TQRKA(JY,JX) &
-  ,TQROH(JY,JX),TQRSO(JY,JX),TQRCL(JY,JX),TQRC3(JY,JX) &
-  ,TQRHC(JY,JX),TQRAL1(JY,JX),TQRAL2(JY,JX),TQRAL3(JY,JX) &
-  ,TQRAL4(JY,JX),TQRALS(JY,JX),TQRFE1(JY,JX),TQRFE2(JY,JX) &
-  ,TQRFE3(JY,JX),TQRFE4(JY,JX),TQRFES(JY,JX),TQRCAO(JY,JX) &
-  ,TQRCAC(JY,JX),TQRCAH(JY,JX),TQRCAS(JY,JX),TQRMGO(JY,JX) &
-  ,TQRMGC(JY,JX),TQRMGH(JY,JX),TQRMGS(JY,JX),TQRNAC(JY,JX) &
-  ,TQRNAS(JY,JX),TQRKAS(JY,JX),TQRH0P(JY,JX) &
-  ,TQRH3P(JY,JX),TQRF1P(JY,JX),TQRF2P(JY,JX),TQRC0P(JY,JX) &
-  ,TQRC1P(JY,JX),TQRC2P(JY,JX),TQRM1P(JY,JX)
-  real(r8) :: TQSAL(JY,JX),TQSFE(JY,JX),TQSHY(JY,JX) &
-  ,TQSCA(JY,JX),TQSMG(JY,JX),TQSNA(JY,JX),TQSKA(JY,JX) &
-  ,TQSOH(JY,JX),TQSSO(JY,JX),TQSCL(JY,JX),TQSC3(JY,JX) &
-  ,TQSHC(JY,JX),TQSAL1(JY,JX),TQSAL2(JY,JX),TQSAL3(JY,JX) &
-  ,TQSAL4(JY,JX),TQSALS(JY,JX),TQSFE1(JY,JX),TQSFE2(JY,JX) &
-  ,TQSFE3(JY,JX),TQSFE4(JY,JX),TQSFES(JY,JX),TQSCAO(JY,JX) &
-  ,TQSCAC(JY,JX),TQSCAH(JY,JX),TQSCAS(JY,JX),TQSMGO(JY,JX) &
-  ,TQSMGC(JY,JX),TQSMGH(JY,JX),TQSMGS(JY,JX),TQSNAC(JY,JX) &
-  ,TQSNAS(JY,JX),TQSKAS(JY,JX),TQSH0P(JY,JX) &
-  ,TQSH3P(JY,JX),TQSF1P(JY,JX),TQSF2P(JY,JX),TQSC0P(JY,JX) &
-  ,TQSC1P(JY,JX),TQSC2P(JY,JX),TQSM1P(JY,JX)
-  real(r8) :: TALFLS(JZ,JY,JX),TFEFLS(JZ,JY,JX) &
-  ,TCAFLS(JZ,JY,JX),THYFLS(JZ,JY,JX),TMGFLS(JZ,JY,JX) &
-  ,TNAFLS(JZ,JY,JX),TKAFLS(JZ,JY,JX),TOHFLS(JZ,JY,JX) &
-  ,TSOFLS(JZ,JY,JX),TCLFLS(JZ,JY,JX),TC3FLS(JZ,JY,JX) &
-  ,THCFLS(JZ,JY,JX),TAL1FS(JZ,JY,JX),TAL2FS(JZ,JY,JX) &
-  ,TAL3FS(JZ,JY,JX),TAL4FS(JZ,JY,JX),TALSFS(JZ,JY,JX) &
-  ,TFE1FS(JZ,JY,JX),TFE2FS(JZ,JY,JX),TFE3FS(JZ,JY,JX) &
-  ,TFE4FS(JZ,JY,JX),TFESFS(JZ,JY,JX) &
-  ,TCAOFS(JZ,JY,JX),TCACFS(JZ,JY,JX),TCAHFS(JZ,JY,JX) &
-  ,TCASFS(JZ,JY,JX),TMGOFS(JZ,JY,JX),TMGCFS(JZ,JY,JX) &
-  ,TMGHFS(JZ,JY,JX),TMGSFS(JZ,JY,JX),TNACFS(JZ,JY,JX) &
-  ,TNASFS(JZ,JY,JX),TKASFS(JZ,JY,JX),TH0PFS(JZ,JY,JX) &
-  ,TH3PFS(JZ,JY,JX),TF1PFS(JZ,JY,JX) &
-  ,TF2PFS(JZ,JY,JX),TC0PFS(JZ,JY,JX),TC1PFS(JZ,JY,JX) &
-  ,TC2PFS(JZ,JY,JX),TM1PFS(JZ,JY,JX),TH0BFB(JZ,JY,JX) &
-  ,TH3BFB(JZ,JY,JX),TF1BFB(JZ,JY,JX) &
-  ,TF2BFB(JZ,JY,JX),TC0BFB(JZ,JY,JX),TC1BFB(JZ,JY,JX) &
-  ,TC2BFB(JZ,JY,JX),TM1BFB(JZ,JY,JX)
-  real(r8) :: TALFHS(JZ,JY,JX),TFEFHS(JZ,JY,JX) &
-  ,THYFHS(JZ,JY,JX),TCAFHS(JZ,JY,JX),TMGFHS(JZ,JY,JX) &
-  ,TNAFHS(JZ,JY,JX),TKAFHS(JZ,JY,JX),TOHFHS(JZ,JY,JX) &
-  ,TSOFHS(JZ,JY,JX),TCLFHS(JZ,JY,JX),TC3FHS(JZ,JY,JX) &
-  ,THCFHS(JZ,JY,JX),TAL1HS(JZ,JY,JX),TAL2HS(JZ,JY,JX) &
-  ,TAL3HS(JZ,JY,JX),TAL4HS(JZ,JY,JX),TALSHS(JZ,JY,JX) &
-  ,TFE1HS(JZ,JY,JX),TFE2HS(JZ,JY,JX),TFE3HS(JZ,JY,JX) &
-  ,TFE4HS(JZ,JY,JX),TFESHS(JZ,JY,JX) &
-  ,TCAOHS(JZ,JY,JX),TCACHS(JZ,JY,JX),TCAHHS(JZ,JY,JX) &
-  ,TCASHS(JZ,JY,JX),TMGOHS(JZ,JY,JX),TMGCHS(JZ,JY,JX) &
-  ,TMGHHS(JZ,JY,JX),TMGSHS(JZ,JY,JX),TNACHS(JZ,JY,JX) &
-  ,TNASHS(JZ,JY,JX),TKASHS(JZ,JY,JX),TH0PHS(JZ,JY,JX) &
-  ,TH3PHS(JZ,JY,JX),TF1PHS(JZ,JY,JX) &
-  ,TF2PHS(JZ,JY,JX),TC0PHS(JZ,JY,JX),TC1PHS(JZ,JY,JX) &
-  ,TC2PHS(JZ,JY,JX),TM1PHS(JZ,JY,JX),TH0BHB(JZ,JY,JX) &
-  ,TH3BHB(JZ,JY,JX),TF1BHB(JZ,JY,JX) &
-  ,TF2BHB(JZ,JY,JX),TC0BHB(JZ,JY,JX),TC1BHB(JZ,JY,JX) &
-  ,TC2BHB(JZ,JY,JX),TM1BHB(JZ,JY,JX)
-  real(r8) :: RALFLZ(JZ,JY,JX) &
-  ,RFEFLZ(JZ,JY,JX),RHYFLZ(JZ,JY,JX) &
-  ,RCAFLZ(JZ,JY,JX),RMGFLZ(JZ,JY,JX),RNAFLZ(JZ,JY,JX) &
-  ,RKAFLZ(JZ,JY,JX),ROHFLZ(JZ,JY,JX),RSOFLZ(JZ,JY,JX) &
-,RCLFLZ(JZ,JY,JX),RC3FLZ(JZ,JY,JX),RHCFLZ(JZ,JY,JX) &
-  ,RAL1FZ(JZ,JY,JX),RAL2FZ(JZ,JY,JX),RAL3FZ(JZ,JY,JX) &
-  ,RAL4FZ(JZ,JY,JX),RALSFZ(JZ,JY,JX),RCAOFZ(JZ,JY,JX) &
-  ,RFE1FZ(JZ,JY,JX),RFE2FZ(JZ,JY,JX),RFE3FZ(JZ,JY,JX) &
-  ,RFE4FZ(JZ,JY,JX),RFESFZ(JZ,JY,JX),RCACFZ(JZ,JY,JX) &
-  ,RCAHFZ(JZ,JY,JX),RCASFZ(JZ,JY,JX),RMGOFZ(JZ,JY,JX) &
-  ,RMGCFZ(JZ,JY,JX),RMGHFZ(JZ,JY,JX),RMGSFZ(JZ,JY,JX) &
-  ,RNACFZ(JZ,JY,JX),RNASFZ(JZ,JY,JX),RKASFZ(JZ,JY,JX)
-  real(r8) :: RH0PFZ(JZ,JY,JX),RH3PFZ(JZ,JY,JX) &
-  ,RF1PFZ(JZ,JY,JX),RF2PFZ(JZ,JY,JX),RC0PFZ(JZ,JY,JX) &
-  ,RC1PFZ(JZ,JY,JX),RC2PFZ(JZ,JY,JX),RM1PFZ(JZ,JY,JX) &
-  ,RH0BBZ(JZ,JY,JX),RH3BBZ(JZ,JY,JX) &
-  ,RF1BBZ(JZ,JY,JX),RF2BBZ(JZ,JY,JX),RC0BBZ(JZ,JY,JX) &
-  ,RC1BBZ(JZ,JY,JX),RC2BBZ(JZ,JY,JX),RM1BBZ(JZ,JY,JX)
-
-
-
-  real(r8) :: FLWU(JZ,JY,JX)
 
 
   public :: trnsfrs
+  public :: initTrnsfrs
+  public :: destructTrnsfrs
   contains
+!----------------------------------------------------------------------
+  subroutine DestructTrnsfrs
+  use abortutils, only : destroy
+  implicit none
 
+  call destroy(TQRAL)
+  call destroy(TQRFE)
+  call destroy(TQRHY)
+  call destroy(TQRCA)
+  call destroy(TQRMG)
+  call destroy(TQRNA)
+  call destroy(TQRKA)
+  call destroy(TQROH)
+  call destroy(TQRSO)
+  call destroy(TQRCL)
+  call destroy(TQRC3)
+  call destroy(TQRHC)
+  call destroy(TQRAL1)
+  call destroy(TQRAL2)
+  call destroy(TQRAL3)
+  call destroy(TQRAL4)
+  call destroy(TQRALS)
+  call destroy(TQRFE1)
+  call destroy(TQRFE2)
+  call destroy(TQRFE3)
+  call destroy(TQRFE4)
+  call destroy(TQRFES)
+  call destroy(TQRCAO)
+  call destroy(TQRCAC)
+  call destroy(TQRCAH)
+  call destroy(TQRCAS)
+  call destroy(TQRMGO)
+  call destroy(TQRMGC)
+  call destroy(TQRMGH)
+  call destroy(TQRMGS)
+  call destroy(TQRNAC)
+  call destroy(TQRNAS)
+  call destroy(TQRKAS)
+  call destroy(TQRH0P)
+  call destroy(TQRH3P)
+  call destroy(TQRF1P)
+  call destroy(TQRF2P)
+  call destroy(TQRC0P)
+  call destroy(TQRC1P)
+  call destroy(TQRC2P)
+  call destroy(TQRM1P)
+  call destroy(TQSAL)
+  call destroy(TQSFE)
+  call destroy(TQSHY)
+  call destroy(TQSCA)
+  call destroy(TQSMG)
+  call destroy(TQSNA)
+  call destroy(TQSKA)
+  call destroy(TQSOH)
+  call destroy(TQSSO)
+  call destroy(TQSCL)
+  call destroy(TQSC3)
+  call destroy(TQSHC)
+  call destroy(TQSAL1)
+  call destroy(TQSAL2)
+  call destroy(TQSAL3)
+  call destroy(TQSAL4)
+  call destroy(TQSALS)
+  call destroy(TQSFE1)
+  call destroy(TQSFE2)
+  call destroy(TQSFE3)
+  call destroy(TQSFE4)
+  call destroy(TQSFES)
+  call destroy(TQSCAO)
+  call destroy(TQSCAC)
+  call destroy(TQSCAH)
+  call destroy(TQSCAS)
+  call destroy(TQSMGO)
+  call destroy(TQSMGC)
+  call destroy(TQSMGH)
+  call destroy(TQSMGS)
+  call destroy(TQSNAC)
+  call destroy(TQSNAS)
+  call destroy(TQSKAS)
+  call destroy(TQSH0P)
+  call destroy(TQSH3P)
+  call destroy(TQSF1P)
+  call destroy(TQSF2P)
+  call destroy(TQSC0P)
+  call destroy(TQSC1P)
+  call destroy(TQSC2P)
+  call destroy(TQSM1P)
+  call destroy(TALFLS)
+  call destroy(TFEFLS)
+  call destroy(TCAFLS)
+  call destroy(THYFLS)
+  call destroy(TMGFLS)
+  call destroy(TNAFLS)
+  call destroy(TKAFLS)
+  call destroy(TOHFLS)
+  call destroy(TSOFLS)
+  call destroy(TCLFLS)
+  call destroy(TC3FLS)
+  call destroy(THCFLS)
+  call destroy(TAL1FS)
+  call destroy(TAL2FS)
+  call destroy(TAL3FS)
+  call destroy(TAL4FS)
+  call destroy(TALSFS)
+  call destroy(TFE1FS)
+  call destroy(TFE2FS)
+  call destroy(TFE3FS)
+  call destroy(TFE4FS)
+  call destroy(TFESFS)
+  call destroy(TCAOFS)
+  call destroy(TCACFS)
+  call destroy(TCAHFS)
+  call destroy(TCASFS)
+  call destroy(TMGOFS)
+  call destroy(TMGCFS)
+  call destroy(TMGHFS)
+  call destroy(TMGSFS)
+  call destroy(TNACFS)
+  call destroy(TNASFS)
+  call destroy(TKASFS)
+  call destroy(TH0PFS)
+  call destroy(TH3PFS)
+  call destroy(TF1PFS)
+  call destroy(TF2PFS)
+  call destroy(TC0PFS)
+  call destroy(TC1PFS)
+  call destroy(TC2PFS)
+  call destroy(TM1PFS)
+  call destroy(TH0BFB)
+  call destroy(TH3BFB)
+  call destroy(TF1BFB)
+  call destroy(TF2BFB)
+  call destroy(TC0BFB)
+  call destroy(TC1BFB)
+  call destroy(TC2BFB)
+  call destroy(TM1BFB)
+  call destroy(TALFHS)
+  call destroy(TFEFHS)
+  call destroy(THYFHS)
+  call destroy(TCAFHS)
+  call destroy(TMGFHS)
+  call destroy(TNAFHS)
+  call destroy(TKAFHS)
+  call destroy(TOHFHS)
+  call destroy(TSOFHS)
+  call destroy(TCLFHS)
+  call destroy(TC3FHS)
+  call destroy(THCFHS)
+  call destroy(TAL1HS)
+  call destroy(TAL2HS)
+  call destroy(TAL3HS)
+  call destroy(TAL4HS)
+  call destroy(TALSHS)
+  call destroy(TFE1HS)
+  call destroy(TFE2HS)
+  call destroy(TFE3HS)
+  call destroy(TFE4HS)
+  call destroy(TFESHS)
+  call destroy(TCAOHS)
+  call destroy(TCACHS)
+  call destroy(TCAHHS)
+  call destroy(TCASHS)
+  call destroy(TMGOHS)
+  call destroy(TMGCHS)
+  call destroy(TMGHHS)
+  call destroy(TMGSHS)
+  call destroy(TNACHS)
+  call destroy(TNASHS)
+  call destroy(TKASHS)
+  call destroy(TH0PHS)
+  call destroy(TH3PHS)
+  call destroy(TF1PHS)
+  call destroy(TF2PHS)
+  call destroy(TC0PHS)
+  call destroy(TC1PHS)
+  call destroy(TC2PHS)
+  call destroy(TM1PHS)
+  call destroy(TH0BHB)
+  call destroy(TH3BHB)
+  call destroy(TF1BHB)
+  call destroy(TF2BHB)
+  call destroy(TC0BHB)
+  call destroy(TC1BHB)
+  call destroy(TC2BHB)
+  call destroy(TM1BHB)
+  call destroy(RALFLZ)
+  call destroy(RFEFLZ)
+  call destroy(RHYFLZ)
+  call destroy(RCAFLZ)
+  call destroy(RMGFLZ)
+  call destroy(RNAFLZ)
+  call destroy(RKAFLZ)
+  call destroy(ROHFLZ)
+  call destroy(RSOFLZ)
+  call destroy(RCLFLZ)
+  call destroy(RC3FLZ)
+  call destroy(RHCFLZ)
+  call destroy(RAL1FZ)
+  call destroy(RAL2FZ)
+  call destroy(RAL3FZ)
+  call destroy(RAL4FZ)
+  call destroy(RALSFZ)
+  call destroy(RCAOFZ)
+  call destroy(RFE1FZ)
+  call destroy(RFE2FZ)
+  call destroy(RFE3FZ)
+  call destroy(RFE4FZ)
+  call destroy(RFESFZ)
+  call destroy(RCACFZ)
+  call destroy(RCAHFZ)
+  call destroy(RCASFZ)
+  call destroy(RMGOFZ)
+  call destroy(RMGCFZ)
+  call destroy(RMGHFZ)
+  call destroy(RMGSFZ)
+  call destroy(RNACFZ)
+  call destroy(RNASFZ)
+  call destroy(RKASFZ)
+  call destroy(RH0PFZ)
+  call destroy(RH3PFZ)
+  call destroy(RF1PFZ)
+  call destroy(RF2PFZ)
+  call destroy(RC0PFZ)
+  call destroy(RC1PFZ)
+  call destroy(RC2PFZ)
+  call destroy(RM1PFZ)
+  call destroy(RH0BBZ)
+  call destroy(RH3BBZ)
+  call destroy(RF1BBZ)
+  call destroy(RF2BBZ)
+  call destroy(RC0BBZ)
+  call destroy(RC1BBZ)
+  call destroy(RC2BBZ)
+  call destroy(RM1BBZ)
+
+  end subroutine DestructTrnsfrs
+
+!----------------------------------------------------------------------
+
+  subroutine initTrnsfrs()
+  implicit none
+
+  allocate(TQRAL(JY,JX));       TQRAL=0._r8
+  allocate(TQRFE(JY,JX));       TQRFE=0._r8
+  allocate(TQRHY(JY,JX));       TQRHY=0._r8
+  allocate(TQRCA(JY,JX));       TQRCA=0._r8
+  allocate(TQRMG(JY,JX));       TQRMG=0._r8
+  allocate(TQRNA(JY,JX));       TQRNA=0._r8
+  allocate(TQRKA(JY,JX));       TQRKA=0._r8
+  allocate(TQROH(JY,JX));       TQROH=0._r8
+  allocate(TQRSO(JY,JX));       TQRSO=0._r8
+  allocate(TQRCL(JY,JX));       TQRCL=0._r8
+  allocate(TQRC3(JY,JX));       TQRC3=0._r8
+  allocate(TQRHC(JY,JX));       TQRHC=0._r8
+  allocate(TQRAL1(JY,JX));      TQRAL1=0._r8
+  allocate(TQRAL2(JY,JX));      TQRAL2=0._r8
+  allocate(TQRAL3(JY,JX));      TQRAL3=0._r8
+  allocate(TQRAL4(JY,JX));      TQRAL4=0._r8
+  allocate(TQRALS(JY,JX));      TQRALS=0._r8
+  allocate(TQRFE1(JY,JX));      TQRFE1=0._r8
+  allocate(TQRFE2(JY,JX));      TQRFE2=0._r8
+  allocate(TQRFE3(JY,JX));      TQRFE3=0._r8
+  allocate(TQRFE4(JY,JX));      TQRFE4=0._r8
+  allocate(TQRFES(JY,JX));      TQRFES=0._r8
+  allocate(TQRCAO(JY,JX));      TQRCAO=0._r8
+  allocate(TQRCAC(JY,JX));      TQRCAC=0._r8
+  allocate(TQRCAH(JY,JX));      TQRCAH=0._r8
+  allocate(TQRCAS(JY,JX));      TQRCAS=0._r8
+  allocate(TQRMGO(JY,JX));      TQRMGO=0._r8
+  allocate(TQRMGC(JY,JX));      TQRMGC=0._r8
+  allocate(TQRMGH(JY,JX));      TQRMGH=0._r8
+  allocate(TQRMGS(JY,JX));      TQRMGS=0._r8
+  allocate(TQRNAC(JY,JX));      TQRNAC=0._r8
+  allocate(TQRNAS(JY,JX));      TQRNAS=0._r8
+  allocate(TQRKAS(JY,JX));      TQRKAS=0._r8
+  allocate(TQRH0P(JY,JX));      TQRH0P=0._r8
+  allocate(TQRH3P(JY,JX));      TQRH3P=0._r8
+  allocate(TQRF1P(JY,JX));      TQRF1P=0._r8
+  allocate(TQRF2P(JY,JX));      TQRF2P=0._r8
+  allocate(TQRC0P(JY,JX));      TQRC0P=0._r8
+  allocate(TQRC1P(JY,JX));      TQRC1P=0._r8
+  allocate(TQRC2P(JY,JX));      TQRC2P=0._r8
+  allocate(TQRM1P(JY,JX));      TQRM1P=0._r8
+  allocate(TQSAL(JY,JX));       TQSAL=0._r8
+  allocate(TQSFE(JY,JX));       TQSFE=0._r8
+  allocate(TQSHY(JY,JX));       TQSHY=0._r8
+  allocate(TQSCA(JY,JX));       TQSCA=0._r8
+  allocate(TQSMG(JY,JX));       TQSMG=0._r8
+  allocate(TQSNA(JY,JX));       TQSNA=0._r8
+  allocate(TQSKA(JY,JX));       TQSKA=0._r8
+  allocate(TQSOH(JY,JX));       TQSOH=0._r8
+  allocate(TQSSO(JY,JX));       TQSSO=0._r8
+  allocate(TQSCL(JY,JX));       TQSCL=0._r8
+  allocate(TQSC3(JY,JX));       TQSC3=0._r8
+  allocate(TQSHC(JY,JX));       TQSHC=0._r8
+  allocate(TQSAL1(JY,JX));      TQSAL1=0._r8
+  allocate(TQSAL2(JY,JX));      TQSAL2=0._r8
+  allocate(TQSAL3(JY,JX));      TQSAL3=0._r8
+  allocate(TQSAL4(JY,JX));      TQSAL4=0._r8
+  allocate(TQSALS(JY,JX));      TQSALS=0._r8
+  allocate(TQSFE1(JY,JX));      TQSFE1=0._r8
+  allocate(TQSFE2(JY,JX));      TQSFE2=0._r8
+  allocate(TQSFE3(JY,JX));      TQSFE3=0._r8
+  allocate(TQSFE4(JY,JX));      TQSFE4=0._r8
+  allocate(TQSFES(JY,JX));      TQSFES=0._r8
+  allocate(TQSCAO(JY,JX));      TQSCAO=0._r8
+  allocate(TQSCAC(JY,JX));      TQSCAC=0._r8
+  allocate(TQSCAH(JY,JX));      TQSCAH=0._r8
+  allocate(TQSCAS(JY,JX));      TQSCAS=0._r8
+  allocate(TQSMGO(JY,JX));      TQSMGO=0._r8
+  allocate(TQSMGC(JY,JX));      TQSMGC=0._r8
+  allocate(TQSMGH(JY,JX));      TQSMGH=0._r8
+  allocate(TQSMGS(JY,JX));      TQSMGS=0._r8
+  allocate(TQSNAC(JY,JX));      TQSNAC=0._r8
+  allocate(TQSNAS(JY,JX));      TQSNAS=0._r8
+  allocate(TQSKAS(JY,JX));      TQSKAS=0._r8
+  allocate(TQSH0P(JY,JX));      TQSH0P=0._r8
+  allocate(TQSH3P(JY,JX));      TQSH3P=0._r8
+  allocate(TQSF1P(JY,JX));      TQSF1P=0._r8
+  allocate(TQSF2P(JY,JX));      TQSF2P=0._r8
+  allocate(TQSC0P(JY,JX));      TQSC0P=0._r8
+  allocate(TQSC1P(JY,JX));      TQSC1P=0._r8
+  allocate(TQSC2P(JY,JX));      TQSC2P=0._r8
+  allocate(TQSM1P(JY,JX));      TQSM1P=0._r8
+  allocate(TALFLS(JZ,JY,JX));   TALFLS=0._r8
+  allocate(TFEFLS(JZ,JY,JX));   TFEFLS=0._r8
+  allocate(TCAFLS(JZ,JY,JX));   TCAFLS=0._r8
+  allocate(THYFLS(JZ,JY,JX));   THYFLS=0._r8
+  allocate(TMGFLS(JZ,JY,JX));   TMGFLS=0._r8
+  allocate(TNAFLS(JZ,JY,JX));   TNAFLS=0._r8
+  allocate(TKAFLS(JZ,JY,JX));   TKAFLS=0._r8
+  allocate(TOHFLS(JZ,JY,JX));   TOHFLS=0._r8
+  allocate(TSOFLS(JZ,JY,JX));   TSOFLS=0._r8
+  allocate(TCLFLS(JZ,JY,JX));   TCLFLS=0._r8
+  allocate(TC3FLS(JZ,JY,JX));   TC3FLS=0._r8
+  allocate(THCFLS(JZ,JY,JX));   THCFLS=0._r8
+  allocate(TAL1FS(JZ,JY,JX));   TAL1FS=0._r8
+  allocate(TAL2FS(JZ,JY,JX));   TAL2FS=0._r8
+  allocate(TAL3FS(JZ,JY,JX));   TAL3FS=0._r8
+  allocate(TAL4FS(JZ,JY,JX));   TAL4FS=0._r8
+  allocate(TALSFS(JZ,JY,JX));   TALSFS=0._r8
+  allocate(TFE1FS(JZ,JY,JX));   TFE1FS=0._r8
+  allocate(TFE2FS(JZ,JY,JX));   TFE2FS=0._r8
+  allocate(TFE3FS(JZ,JY,JX));   TFE3FS=0._r8
+  allocate(TFE4FS(JZ,JY,JX));   TFE4FS=0._r8
+  allocate(TFESFS(JZ,JY,JX));   TFESFS=0._r8
+  allocate(TCAOFS(JZ,JY,JX));   TCAOFS=0._r8
+  allocate(TCACFS(JZ,JY,JX));   TCACFS=0._r8
+  allocate(TCAHFS(JZ,JY,JX));   TCAHFS=0._r8
+  allocate(TCASFS(JZ,JY,JX));   TCASFS=0._r8
+  allocate(TMGOFS(JZ,JY,JX));   TMGOFS=0._r8
+  allocate(TMGCFS(JZ,JY,JX));   TMGCFS=0._r8
+  allocate(TMGHFS(JZ,JY,JX));   TMGHFS=0._r8
+  allocate(TMGSFS(JZ,JY,JX));   TMGSFS=0._r8
+  allocate(TNACFS(JZ,JY,JX));   TNACFS=0._r8
+  allocate(TNASFS(JZ,JY,JX));   TNASFS=0._r8
+  allocate(TKASFS(JZ,JY,JX));   TKASFS=0._r8
+  allocate(TH0PFS(JZ,JY,JX));   TH0PFS=0._r8
+  allocate(TH3PFS(JZ,JY,JX));   TH3PFS=0._r8
+  allocate(TF1PFS(JZ,JY,JX));   TF1PFS=0._r8
+  allocate(TF2PFS(JZ,JY,JX));   TF2PFS=0._r8
+  allocate(TC0PFS(JZ,JY,JX));   TC0PFS=0._r8
+  allocate(TC1PFS(JZ,JY,JX));   TC1PFS=0._r8
+  allocate(TC2PFS(JZ,JY,JX));   TC2PFS=0._r8
+  allocate(TM1PFS(JZ,JY,JX));   TM1PFS=0._r8
+  allocate(TH0BFB(JZ,JY,JX));   TH0BFB=0._r8
+  allocate(TH3BFB(JZ,JY,JX));   TH3BFB=0._r8
+  allocate(TF1BFB(JZ,JY,JX));   TF1BFB=0._r8
+  allocate(TF2BFB(JZ,JY,JX));   TF2BFB=0._r8
+  allocate(TC0BFB(JZ,JY,JX));   TC0BFB=0._r8
+  allocate(TC1BFB(JZ,JY,JX));   TC1BFB=0._r8
+  allocate(TC2BFB(JZ,JY,JX));   TC2BFB=0._r8
+  allocate(TM1BFB(JZ,JY,JX));   TM1BFB=0._r8
+  allocate(TALFHS(JZ,JY,JX));   TALFHS=0._r8
+  allocate(TFEFHS(JZ,JY,JX));   TFEFHS=0._r8
+  allocate(THYFHS(JZ,JY,JX));   THYFHS=0._r8
+  allocate(TCAFHS(JZ,JY,JX));   TCAFHS=0._r8
+  allocate(TMGFHS(JZ,JY,JX));   TMGFHS=0._r8
+  allocate(TNAFHS(JZ,JY,JX));   TNAFHS=0._r8
+  allocate(TKAFHS(JZ,JY,JX));   TKAFHS=0._r8
+  allocate(TOHFHS(JZ,JY,JX));   TOHFHS=0._r8
+  allocate(TSOFHS(JZ,JY,JX));   TSOFHS=0._r8
+  allocate(TCLFHS(JZ,JY,JX));   TCLFHS=0._r8
+  allocate(TC3FHS(JZ,JY,JX));   TC3FHS=0._r8
+  allocate(THCFHS(JZ,JY,JX));   THCFHS=0._r8
+  allocate(TAL1HS(JZ,JY,JX));   TAL1HS=0._r8
+  allocate(TAL2HS(JZ,JY,JX));   TAL2HS=0._r8
+  allocate(TAL3HS(JZ,JY,JX));   TAL3HS=0._r8
+  allocate(TAL4HS(JZ,JY,JX));   TAL4HS=0._r8
+  allocate(TALSHS(JZ,JY,JX));   TALSHS=0._r8
+  allocate(TFE1HS(JZ,JY,JX));   TFE1HS=0._r8
+  allocate(TFE2HS(JZ,JY,JX));   TFE2HS=0._r8
+  allocate(TFE3HS(JZ,JY,JX));   TFE3HS=0._r8
+  allocate(TFE4HS(JZ,JY,JX));   TFE4HS=0._r8
+  allocate(TFESHS(JZ,JY,JX));   TFESHS=0._r8
+  allocate(TCAOHS(JZ,JY,JX));   TCAOHS=0._r8
+  allocate(TCACHS(JZ,JY,JX));   TCACHS=0._r8
+  allocate(TCAHHS(JZ,JY,JX));   TCAHHS=0._r8
+  allocate(TCASHS(JZ,JY,JX));   TCASHS=0._r8
+  allocate(TMGOHS(JZ,JY,JX));   TMGOHS=0._r8
+  allocate(TMGCHS(JZ,JY,JX));   TMGCHS=0._r8
+  allocate(TMGHHS(JZ,JY,JX));   TMGHHS=0._r8
+  allocate(TMGSHS(JZ,JY,JX));   TMGSHS=0._r8
+  allocate(TNACHS(JZ,JY,JX));   TNACHS=0._r8
+  allocate(TNASHS(JZ,JY,JX));   TNASHS=0._r8
+  allocate(TKASHS(JZ,JY,JX));   TKASHS=0._r8
+  allocate(TH0PHS(JZ,JY,JX));   TH0PHS=0._r8
+  allocate(TH3PHS(JZ,JY,JX));   TH3PHS=0._r8
+  allocate(TF1PHS(JZ,JY,JX));   TF1PHS=0._r8
+  allocate(TF2PHS(JZ,JY,JX));   TF2PHS=0._r8
+  allocate(TC0PHS(JZ,JY,JX));   TC0PHS=0._r8
+  allocate(TC1PHS(JZ,JY,JX));   TC1PHS=0._r8
+  allocate(TC2PHS(JZ,JY,JX));   TC2PHS=0._r8
+  allocate(TM1PHS(JZ,JY,JX));   TM1PHS=0._r8
+  allocate(TH0BHB(JZ,JY,JX));   TH0BHB=0._r8
+  allocate(TH3BHB(JZ,JY,JX));   TH3BHB=0._r8
+  allocate(TF1BHB(JZ,JY,JX));   TF1BHB=0._r8
+  allocate(TF2BHB(JZ,JY,JX));   TF2BHB=0._r8
+  allocate(TC0BHB(JZ,JY,JX));   TC0BHB=0._r8
+  allocate(TC1BHB(JZ,JY,JX));   TC1BHB=0._r8
+  allocate(TC2BHB(JZ,JY,JX));   TC2BHB=0._r8
+  allocate(TM1BHB(JZ,JY,JX));   TM1BHB=0._r8
+  allocate(RALFLZ(JZ,JY,JX));   RALFLZ=0._r8
+  allocate(RFEFLZ(JZ,JY,JX));   RFEFLZ=0._r8
+  allocate(RHYFLZ(JZ,JY,JX));   RHYFLZ=0._r8
+  allocate(RCAFLZ(JZ,JY,JX));   RCAFLZ=0._r8
+  allocate(RMGFLZ(JZ,JY,JX));   RMGFLZ=0._r8
+  allocate(RNAFLZ(JZ,JY,JX));   RNAFLZ=0._r8
+  allocate(RKAFLZ(JZ,JY,JX));   RKAFLZ=0._r8
+  allocate(ROHFLZ(JZ,JY,JX));   ROHFLZ=0._r8
+  allocate(RSOFLZ(JZ,JY,JX));   RSOFLZ=0._r8
+  allocate(RCLFLZ(JZ,JY,JX));   RCLFLZ=0._r8
+  allocate(RC3FLZ(JZ,JY,JX));   RC3FLZ=0._r8
+  allocate(RHCFLZ(JZ,JY,JX));   RHCFLZ=0._r8
+  allocate(RAL1FZ(JZ,JY,JX));   RAL1FZ=0._r8
+  allocate(RAL2FZ(JZ,JY,JX));   RAL2FZ=0._r8
+  allocate(RAL3FZ(JZ,JY,JX));   RAL3FZ=0._r8
+  allocate(RAL4FZ(JZ,JY,JX));   RAL4FZ=0._r8
+  allocate(RALSFZ(JZ,JY,JX));   RALSFZ=0._r8
+  allocate(RCAOFZ(JZ,JY,JX));   RCAOFZ=0._r8
+  allocate(RFE1FZ(JZ,JY,JX));   RFE1FZ=0._r8
+  allocate(RFE2FZ(JZ,JY,JX));   RFE2FZ=0._r8
+  allocate(RFE3FZ(JZ,JY,JX));   RFE3FZ=0._r8
+  allocate(RFE4FZ(JZ,JY,JX));   RFE4FZ=0._r8
+  allocate(RFESFZ(JZ,JY,JX));   RFESFZ=0._r8
+  allocate(RCACFZ(JZ,JY,JX));   RCACFZ=0._r8
+  allocate(RCAHFZ(JZ,JY,JX));   RCAHFZ=0._r8
+  allocate(RCASFZ(JZ,JY,JX));   RCASFZ=0._r8
+  allocate(RMGOFZ(JZ,JY,JX));   RMGOFZ=0._r8
+  allocate(RMGCFZ(JZ,JY,JX));   RMGCFZ=0._r8
+  allocate(RMGHFZ(JZ,JY,JX));   RMGHFZ=0._r8
+  allocate(RMGSFZ(JZ,JY,JX));   RMGSFZ=0._r8
+  allocate(RNACFZ(JZ,JY,JX));   RNACFZ=0._r8
+  allocate(RNASFZ(JZ,JY,JX));   RNASFZ=0._r8
+  allocate(RKASFZ(JZ,JY,JX));   RKASFZ=0._r8
+  allocate(RH0PFZ(JZ,JY,JX));   RH0PFZ=0._r8
+  allocate(RH3PFZ(JZ,JY,JX));   RH3PFZ=0._r8
+  allocate(RF1PFZ(JZ,JY,JX));   RF1PFZ=0._r8
+  allocate(RF2PFZ(JZ,JY,JX));   RF2PFZ=0._r8
+  allocate(RC0PFZ(JZ,JY,JX));   RC0PFZ=0._r8
+  allocate(RC1PFZ(JZ,JY,JX));   RC1PFZ=0._r8
+  allocate(RC2PFZ(JZ,JY,JX));   RC2PFZ=0._r8
+  allocate(RM1PFZ(JZ,JY,JX));   RM1PFZ=0._r8
+  allocate(RH0BBZ(JZ,JY,JX));   RH0BBZ=0._r8
+  allocate(RH3BBZ(JZ,JY,JX));   RH3BBZ=0._r8
+  allocate(RF1BBZ(JZ,JY,JX));   RF1BBZ=0._r8
+  allocate(RF2BBZ(JZ,JY,JX));   RF2BBZ=0._r8
+  allocate(RC0BBZ(JZ,JY,JX));   RC0BBZ=0._r8
+  allocate(RC1BBZ(JZ,JY,JX));   RC1BBZ=0._r8
+  allocate(RC2BBZ(JZ,JY,JX));   RC2BBZ=0._r8
+  allocate(RM1BBZ(JZ,JY,JX));   RM1BBZ=0._r8
+  end subroutine InitTrnsfrs
+!----------------------------------------------------------------------
   SUBROUTINE trnsfrs(I,J,NHW,NHE,NVN,NVS)
 !
 !     Description:
@@ -139,15 +762,15 @@ module TrnsfrsMod
 !
 !     TIME STEPS FOR SOLUTE FLUX CALCULATIONS
 !
-    call SaltModelSoluteFlux(I,NHW,NHE,NVN,NVS)
+  call SaltModelSoluteFlux(I,NHW,NHE,NVN,NVS)
 !
 !     TIME STEP USED IN GAS AND SOLUTE FLUX CALCULATIONS
 !
-    DO 30 M=1,NPH
+  DO 30 M=1,NPH
 !
-      call InitFluxArrays(NHW,NHE,NVN,NVS)
+    call InitFluxArrays(NHW,NHE,NVN,NVS)
 
-      call SaltModelSoluteHydroFlux(I,M,NHW,NHE,NVN,NVS)
+    call SaltModelSoluteHydroFlux(I,M,NHW,NHE,NVN,NVS)
 !
 !     BOUNDARY SOLUTE AND GAS FLUXES
 !
@@ -876,6 +1499,9 @@ module TrnsfrsMod
   integer, intent(in) :: I,NY,NX
 
   integer :: L
+  real(r8) :: FLWU(JZ,JY,JX)
+
+
 !     begin_execution
 !
 !     XNPH=1/no. of cycles h-1 for water, heat and solute flux calculations

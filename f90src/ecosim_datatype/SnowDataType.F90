@@ -6,148 +6,438 @@ module SnowDataType
   save
   character(len=*), private, parameter :: mod_filename = __FILE__
 
-  REAL(R8) :: ALBS(JY,JX)                       !snowpack albedo
-  real(r8) :: DENS0(JY,JX)                      !snowpack density, [Mg m-3]
-  real(r8) :: VHCPWM(60,JS,JY,JX)               !volumetric heat capacity of snowpack
-  real(r8) :: FLQWM(60,JS,JY,JX)                !snowpack water flux
-  real(r8) :: TCW(JS,JY,JX)                     !snow temperature, [oC]
-  real(r8) :: TKW(JS,JY,JX)                     !snow temperature, [K]
-  real(r8) :: VHCPW(JS,JY,JX)                   !snowpack heat capacity, [MJ m-3 K-1]
-  real(r8) :: VOLSSL(JS,JY,JX)                  !snow water equivalent volume in snowpack layer
-  real(r8) :: VOLWSL(JS,JY,JX)                  !snow water volume in snowpack layer
-  real(r8) :: VOLISL(JS,JY,JX)                  !snow ice volume in snowpack layer
-  real(r8) :: VOLSL(JS,JY,JX)                   !snow volume in snowpack layer
-  real(r8) :: DENSS(JS,JY,JX)                   !snowpack density, [Mg m-3]
-  real(r8) :: DLYRS(JS,JY,JX)                   !snowpack layer depth
-  real(r8) :: XFLWW(JS,JY,JX)                   !hourly snow water transfer
-  real(r8) :: XFLWS(JS,JY,JX)                   !hourly snow transfer
-  real(r8) :: XFLWI(JS,JY,JX)                   !hourly snow ice transfer
-  real(r8) :: XHFLWW(JS,JY,JX)                  !hourly convective heat flux from water transfer
-  real(r8) :: XWFLXS(JS,JY,JX)                  !hourly convective heat flux from snow transfer
-  real(r8) :: XWFLXI(JS,JY,JX)                  !hourly convective heat flux from ice transfer
-  real(r8) :: CDPTHS(0:JS,JY,JX)                !cumulative depth to bottom of snowpack layer
-  real(r8) :: VOLSI(JS,JY,JX)                   !Initial snowpack volume, [m3 d-2]
-  real(r8) :: DPTHS(JY,JX)                      !snowpack depth, [m]
-  real(r8) :: VOLSS(JY,JX)                      !snow volume in snowpack (water equivalent), [m3 d-2]
-  real(r8) :: VOLWS(JY,JX)                      !water volume in snowpack, [m3 d-2]
-  real(r8) :: VOLIS(JY,JX)                      !ice volume in snowpack, [m3 d-2]
-  real(r8) :: VOLS(JY,JX)                       !snowpack volume, [m3 d-2]
-  real(r8) :: VHCPWX(JY,JX)                     !snowpack heat capacity from previous time step, [MJ d-2 K-1]
-  real(r8) :: FLSW(JS,JY,JX)                    !water from snowpack to soil micropores
-  real(r8) :: FLSWH(JS,JY,JX)                   !water from snowpack to soil macropores
-  real(r8) :: HFLSW(JS,JY,JX)                   !convective heat from snowpack to soil
-  real(r8) :: FLSWR(JS,JY,JX)                   !water flux from snowpack to litter
-  real(r8) :: HFLSWR(JS,JY,JX)                  !convective heat flux from snowpack to litter
-  real(r8) :: QS(2,JV,JH)                       !snowpack runoff snow, [m3 d-2 h-1]
-  real(r8) :: QW(2,JV,JH)                       !snowpack runoff water, [m3 d-2 h-1]
-  real(r8) :: QI(2,JV,JH)                       !snowpack runoff ice, [m3 d-2 h-1]
-  real(r8) :: HQS(2,JV,JH)                      !snowpack runoff heat, [MJ d-2 h-1]
-  real(r8) :: QSM(60,2,JV,JH)                   !runoff snow flux, [m3 d-2 t-1]
+  real(r8),allocatable ::  VHCPWM(:,:,:,:)                    !volumetric heat capacity of snowpack
+  real(r8),allocatable ::  FLQWM(:,:,:,:)                     !snowpack water flux
+  real(r8),allocatable ::  QSM(:,:,:,:)                       !runoff snow flux, [m3 d-2 t-1]
+  REAL(R8),allocatable ::  ALBS(:,:)                          !snowpack albedo
+  real(r8),allocatable ::  DENS0(:,:)                         !snowpack density, [Mg m-3]
+  real(r8),allocatable ::  TCW(:,:,:)                         !snow temperature, [oC]
+  real(r8),allocatable ::  TKW(:,:,:)                         !snow temperature, [K]
+  real(r8),allocatable ::  VHCPW(:,:,:)                       !snowpack heat capacity, [MJ m-3 K-1]
+  real(r8),allocatable ::  VOLSSL(:,:,:)                      !snow water equivalent volume in snowpack layer
+  real(r8),allocatable ::  VOLWSL(:,:,:)                      !snow water volume in snowpack layer
+  real(r8),allocatable ::  VOLISL(:,:,:)                      !snow ice volume in snowpack layer
+  real(r8),allocatable ::  VOLSL(:,:,:)                       !snow volume in snowpack layer
+  real(r8),allocatable ::  DENSS(:,:,:)                       !snowpack density, [Mg m-3]
+  real(r8),allocatable ::  DLYRS(:,:,:)                       !snowpack layer depth
+  real(r8),allocatable ::  XFLWW(:,:,:)                       !hourly snow water transfer
+  real(r8),allocatable ::  XFLWS(:,:,:)                       !hourly snow transfer
+  real(r8),allocatable ::  XFLWI(:,:,:)                       !hourly snow ice transfer
+  real(r8),allocatable ::  XHFLWW(:,:,:)                      !hourly convective heat flux from water transfer
+  real(r8),allocatable ::  XWFLXS(:,:,:)                      !hourly convective heat flux from snow transfer
+  real(r8),allocatable ::  XWFLXI(:,:,:)                      !hourly convective heat flux from ice transfer
+  real(r8),allocatable ::  CDPTHS(:,:,:)                      !cumulative depth to bottom of snowpack layer
+  real(r8),allocatable ::  VOLSI(:,:,:)                       !Initial snowpack volume, [m3 d-2]
+  real(r8),allocatable ::  DPTHS(:,:)                         !snowpack depth, [m]
+  real(r8),allocatable ::  VOLSS(:,:)                         !snow volume in snowpack (water equivalent), [m3 d-2]
+  real(r8),allocatable ::  VOLWS(:,:)                         !water volume in snowpack, [m3 d-2]
+  real(r8),allocatable ::  VOLIS(:,:)                         !ice volume in snowpack, [m3 d-2]
+  real(r8),allocatable ::  VOLS(:,:)                          !snowpack volume, [m3 d-2]
+  real(r8),allocatable ::  VHCPWX(:,:)                        !snowpack heat capacity from previous time step, [MJ d-2 K-1]
+  real(r8),allocatable ::  FLSW(:,:,:)                        !water from snowpack to soil micropores
+  real(r8),allocatable ::  FLSWH(:,:,:)                       !water from snowpack to soil macropores
+  real(r8),allocatable ::  HFLSW(:,:,:)                       !convective heat from snowpack to soil
+  real(r8),allocatable ::  FLSWR(:,:,:)                       !water flux from snowpack to litter
+  real(r8),allocatable ::  HFLSWR(:,:,:)                      !convective heat flux from snowpack to litter
+  real(r8),allocatable ::  QS(:,:,:)                          !snowpack runoff snow, [m3 d-2 h-1]
+  real(r8),allocatable ::  QW(:,:,:)                          !snowpack runoff water, [m3 d-2 h-1]
+  real(r8),allocatable ::  QI(:,:,:)                          !snowpack runoff ice, [m3 d-2 h-1]
+  real(r8),allocatable ::  HQS(:,:,:)                         !snowpack runoff heat, [MJ d-2 h-1]
+  real(r8),allocatable ::  XCOQSS(:,:,:)                      !snowpack runoff CO2 flux, [g d-2 h-1]
+  real(r8),allocatable ::  XCHQSS(:,:,:)                      !snowpack runoff CH4 flux, [g d-2 h-1]
+  real(r8),allocatable ::  XOXQSS(:,:,:)                      !snowpack runoff O2 flux, [g d-2 h-1]
+  real(r8),allocatable ::  XNGQSS(:,:,:)                      !snowpack runoff N2 flux, [g d-2 h-1]
+  real(r8),allocatable ::  XN2QSS(:,:,:)                      !snowpack runoff N2O flux, [g d-2 h-1]
+  real(r8),allocatable ::  XN4QSS(:,:,:)                      !snowpack runoff NH4 flux, [g d-2 h-1]
+  real(r8),allocatable ::  XN3QSS(:,:,:)                      !snowpack runoff NH3 flux, [g d-2 h-1]
+  real(r8),allocatable ::  XNOQSS(:,:,:)                      !snowpack runoff NO3 flux, [g d-2 h-1]
+  real(r8),allocatable ::  XP4QSS(:,:,:)                      !snowpack runoff PO4 flux, [g d-2 h-1]
+  real(r8),allocatable ::  XP1QSS(:,:,:)                      !snowpack runoff HPO4 flux, [g d-2 h-1]
+  real(r8),allocatable ::  CO2W(:,:,:)                        !snowpack CO2, [mol d-2]
+  real(r8),allocatable ::  CH4W(:,:,:)                        !snowpack CH4, [mol d-2]
+  real(r8),allocatable ::  OXYW(:,:,:)                        !snowpack O2, [mol d-2]
+  real(r8),allocatable ::  ZN2W(:,:,:)                        !snowpack N2O, [mol d-2]
+  real(r8),allocatable ::  ZNGW(:,:,:)                        !snowpack N2, [mol d-2]
+  real(r8),allocatable ::  ZN4W(:,:,:)                        !snowpack NH4, [mol d-2]
+  real(r8),allocatable ::  ZN3W(:,:,:)                        !snowpack NH3, [mol d-2]
+  real(r8),allocatable ::  ZNOW(:,:,:)                        !snowpack NO3, [mol d-2]
+  real(r8),allocatable ::  Z1PW(:,:,:)                        !snowpack HPO4,[mol d-2]
+  real(r8),allocatable ::  ZHPW(:,:,:)                        !snowpack H2PO4, [mol d-2]
+  real(r8),allocatable ::  ZALW(:,:,:)                        !snowpack Al, [mol d-2]
+  real(r8),allocatable ::  ZFEW(:,:,:)                        !snowpack Fe, [mol d-2]
+  real(r8),allocatable ::  ZHYW(:,:,:)                        !snowpack H, [mol d-2]
+  real(r8),allocatable ::  ZCAW(:,:,:)                        !snowpack Ca, [mol d-2]
+  real(r8),allocatable ::  ZMGW(:,:,:)                        !snowpack Mg, [mol d-2]
+  real(r8),allocatable ::  ZNAW(:,:,:)                        !snowpack Na, [mol d-2]
+  real(r8),allocatable ::  ZKAW(:,:,:)                        !snowpack K, [mol d-2]
+  real(r8),allocatable ::  ZOHW(:,:,:)                        !snowpack OH, [mol d-2]
+  real(r8),allocatable ::  ZSO4W(:,:,:)                       !snowpack SO4, [mol d-2]
+  real(r8),allocatable ::  ZCLW(:,:,:)                        !snowpack Cl, [mol d-2]
+  real(r8),allocatable ::  ZCO3W(:,:,:)                       !snowpack CO3, [mol d-2]
+  real(r8),allocatable ::  ZHCO3W(:,:,:)                      !snowpack HCO3, [mol d-2]
+  real(r8),allocatable ::  ZALH1W(:,:,:)                      !snowpack AlOH, [mol d-2]
+  real(r8),allocatable ::  ZALH2W(:,:,:)                      !snowpack AlOH2, [mol d-2]
+  real(r8),allocatable ::  ZALH3W(:,:,:)                      !snowpack AlOH3, [mol d-2]
+  real(r8),allocatable ::  ZALH4W(:,:,:)                      !snowpack AlOH4, [mol d-2]
+  real(r8),allocatable ::  ZALSW(:,:,:)                       !snowpack AlSO4, [mol d-2]
+  real(r8),allocatable ::  ZFEH1W(:,:,:)                      !snowpack FeOH, [mol d-2]
+  real(r8),allocatable ::  ZFEH2W(:,:,:)                      !snowpack FeOH2, [mol d-2]
+  real(r8),allocatable ::  ZFEH3W(:,:,:)                      !snowpack FeOH3, [mol d-2]
+  real(r8),allocatable ::  ZFEH4W(:,:,:)                      !snowpack F3OH4, [mol d-2]
+  real(r8),allocatable ::  ZFESW(:,:,:)                       !snowpack FeSO4, [mol d-2]
+  real(r8),allocatable ::  ZCAOW(:,:,:)                       !snowpack CaOH2, [mol d-2]
+  real(r8),allocatable ::  ZCACW(:,:,:)                       !snowpack CaCO3, [mol d-2]
+  real(r8),allocatable ::  ZCAHW(:,:,:)                       !snowpack CaHCO3, [mol d-2]
+  real(r8),allocatable ::  ZCASW(:,:,:)                       !snowpack CaSO4, [mol d-2]
+  real(r8),allocatable ::  ZMGOW(:,:,:)                       !snowpack MgOH2, [mol d-2]
+  real(r8),allocatable ::  ZMGCW(:,:,:)                       !snowpack MgCO3, [mol d-2]
+  real(r8),allocatable ::  ZMGHW(:,:,:)                       !snowpack MgHCO3, [mol d-2]
+  real(r8),allocatable ::  ZMGSW(:,:,:)                       !snowpack MgSO4, [mol d-2]
+  real(r8),allocatable ::  ZNACW(:,:,:)                       !snowpack NaCO3, [mol d-2]
+  real(r8),allocatable ::  ZNASW(:,:,:)                       !snowpack NaSO4, [mol d-2]
+  real(r8),allocatable ::  ZKASW(:,:,:)                       !snowpack KSO4, [mol d-2]
+  real(r8),allocatable ::  H0PO4W(:,:,:)                      !snowpack PO4, [mol d-2]
+  real(r8),allocatable ::  H3PO4W(:,:,:)                      !snowpack H3PO4, [mol d-2]
+  real(r8),allocatable ::  ZFE1PW(:,:,:)                      !snowpack FeHPO4, [mol d-2]
+  real(r8),allocatable ::  ZFE2PW(:,:,:)                      !snowpack FeH2PO4, [mol d-2]
+  real(r8),allocatable ::  ZCA0PW(:,:,:)                      !snowpack CaPO4, [mol d-2]
+  real(r8),allocatable ::  ZCA1PW(:,:,:)                      !snowpack CaHPO4, [mol d-2]
+  real(r8),allocatable ::  ZCA2PW(:,:,:)                      !snowpack CaH2PO4, [mol d-2]
+  real(r8),allocatable ::  ZMG1PW(:,:,:)                      !snowpack MgHPO4, [mol d-2]
+  real(r8),allocatable ::  XQSAL(:,:,:)                       !total Al in snow drift, [mol d-2 h-1]
+  real(r8),allocatable ::  XQSFE(:,:,:)                       !total Fe in snow drift, [mol d-2 h-1]
+  real(r8),allocatable ::  XQSHY(:,:,:)                       !total H in snow drift, [mol d-2 h-1]
+  real(r8),allocatable ::  XQSCA(:,:,:)                       !total Ca in snow drift, [mol d-2 h-1]
+  real(r8),allocatable ::  XQSMG(:,:,:)                       !total Mg in snow drift, [mol d-2 h-1]
+  real(r8),allocatable ::  XQSNA(:,:,:)                       !total Na in snow drift, [mol d-2 h-1]
+  real(r8),allocatable ::  XQSKA(:,:,:)                       !total K in snow drift, [mol d-2 h-1]
+  real(r8),allocatable ::  XQSOH(:,:,:)                       !total OH in snow drift, [mol d-2 h-1]
+  real(r8),allocatable ::  XQSSO(:,:,:)                       !total SO4 in snow drift, [mol d-2 h-1]
+  real(r8),allocatable ::  XQSCL(:,:,:)                       !total Cl in snow drift, [mol d-2 h-1]
+  real(r8),allocatable ::  XQSC3(:,:,:)                       !total CO3 in snow drift, [mol d-2 h-1]
+  real(r8),allocatable ::  XQSHC(:,:,:)                       !total HCO3 in snow drift, [mol d-2 h-1]
+  real(r8),allocatable ::  XQSAL1(:,:,:)                      !total AlOH in snow drift, [mol d-2 h-1]
+  real(r8),allocatable ::  XQSAL2(:,:,:)                      !total AlOH2 in snow drift, [mol d-2 h-1]
+  real(r8),allocatable ::  XQSAL3(:,:,:)                      !total AlOH3 in snow drift, [mol d-2 h-1]
+  real(r8),allocatable ::  XQSAL4(:,:,:)                      !total AlOH4 in snow drift, [mol d-2 h-1]
+  real(r8),allocatable ::  XQSALS(:,:,:)                      !total AlSO4 in snow drift, [mol d-2 h-1]
+  real(r8),allocatable ::  XQSFE1(:,:,:)                      !total FeOH in snow drift, [mol d-2 h-1]
+  real(r8),allocatable ::  XQSFE2(:,:,:)                      !total FeOH2 in snow drift, [mol d-2 h-1]
+  real(r8),allocatable ::  XQSFE3(:,:,:)                      !total FeOH3 in snow drift, [mol d-2 h-1]
+  real(r8),allocatable ::  XQSFE4(:,:,:)                      !total FeOH4 in snow drift, [mol d-2 h-1]
+  real(r8),allocatable ::  XQSFES(:,:,:)                      !total FeSO4 in snow drift, [mol d-2 h-1]
+  real(r8),allocatable ::  XQSCAO(:,:,:)                      !total CaOH in snow drift, [mol d-2 h-1]
+  real(r8),allocatable ::  XQSCAC(:,:,:)                      !total CaCO3 in snow drift, [mol d-2 h-1]
+  real(r8),allocatable ::  XQSCAH(:,:,:)                      !total CaHCO3 in snow drift, [mol d-2 h-1]
+  real(r8),allocatable ::  XQSCAS(:,:,:)                      !total CaSO4 in snow drift, [mol d-2 h-1]
+  real(r8),allocatable ::  XQSMGO(:,:,:)                      !total MgOH in snow drift, [mol d-2 h-1]
+  real(r8),allocatable ::  XQSMGC(:,:,:)                      !total MgCO3 in snow drift, [mol d-2 h-1]
+  real(r8),allocatable ::  XQSMGH(:,:,:)                      !total MgHCO3 in snow drift, [mol d-2 h-1]
+  real(r8),allocatable ::  XQSMGS(:,:,:)                      !total MgSO4 in snow drift, [mol d-2 h-1]
+  real(r8),allocatable ::  XQSNAC(:,:,:)                      !total NaCO3 in snow drift, [mol d-2 h-1]
+  real(r8),allocatable ::  XQSNAS(:,:,:)                      !total NaSO4 in snow drift, [mol d-2 h-1]
+  real(r8),allocatable ::  XQSKAS(:,:,:)                      !total KSO4 in snow drift, [mol d-2 h-1]
+  real(r8),allocatable ::  XQSH0P(:,:,:)                      !total PO4 in snow drif, [mol d-2 h-1]
+  real(r8),allocatable ::  XQSH1P(:,:,:)                      !total HPO4 in snow drift , [mol d-2 h-1]
+  real(r8),allocatable ::  XQSH3P(:,:,:)                      !total H3PO4 in snow drift , [mol d-2 h-1]
+  real(r8),allocatable ::  XQSF1P(:,:,:)                      !total FeHPO4 in snow drift , [mol d-2 h-1]
+  real(r8),allocatable ::  XQSF2P(:,:,:)                      !total FeH2PO4 in snow drift , [mol d-2 h-1]
+  real(r8),allocatable ::  XQSC0P(:,:,:)                      !total CaPO4 in snow drift , [mol d-2 h-1]
+  real(r8),allocatable ::  XQSC1P(:,:,:)                      !total CaHPO4 in snow drift, [mol d-2 h-1]
+  real(r8),allocatable ::  XQSC2P(:,:,:)                      !total CaH2PO4 in snow drift , [mol d-2 h-1]
+  real(r8),allocatable ::  XQSM1P(:,:,:)                      !total MgHPO4 in snow drift , [mol d-2 h-1]
+!----------------------------------------------------------------------
 
-  real(r8) :: XCOQSS(2,JV,JH)                   !snowpack runoff CO2 flux, [g d-2 h-1]
-  real(r8) :: XCHQSS(2,JV,JH)                   !snowpack runoff CH4 flux, [g d-2 h-1]
-  real(r8) :: XOXQSS(2,JV,JH)                   !snowpack runoff O2 flux, [g d-2 h-1]
-  real(r8) :: XNGQSS(2,JV,JH)                   !snowpack runoff N2 flux, [g d-2 h-1]
-  real(r8) :: XN2QSS(2,JV,JH)                   !snowpack runoff N2O flux, [g d-2 h-1]
-  real(r8) :: XN4QSS(2,JV,JH)                   !snowpack runoff NH4 flux, [g d-2 h-1]
-  real(r8) :: XN3QSS(2,JV,JH)                   !snowpack runoff NH3 flux, [g d-2 h-1]
-  real(r8) :: XNOQSS(2,JV,JH)                   !snowpack runoff NO3 flux, [g d-2 h-1]
-  real(r8) :: XP4QSS(2,JV,JH)                   !snowpack runoff PO4 flux, [g d-2 h-1]
-  real(r8) :: XP1QSS(2,JV,JH)                   !snowpack runoff HPO4 flux, [g d-2 h-1]
+contains
+  subroutine InitSnowData
 
-  real(r8) :: CO2W(JS,JY,JX)                    !snowpack CO2, [mol d-2]
-  real(r8) :: CH4W(JS,JY,JX)                    !snowpack CH4, [mol d-2]
-  real(r8) :: OXYW(JS,JY,JX)                    !snowpack O2, [mol d-2]
-  real(r8) :: ZN2W(JS,JY,JX)                    !snowpack N2O, [mol d-2]
-  real(r8) :: ZNGW(JS,JY,JX)                    !snowpack N2, [mol d-2]
-  real(r8) :: ZN4W(JS,JY,JX)                    !snowpack NH4, [mol d-2]
-  real(r8) :: ZN3W(JS,JY,JX)                    !snowpack NH3, [mol d-2]
-  real(r8) :: ZNOW(JS,JY,JX)                    !snowpack NO3, [mol d-2]
-  real(r8) :: Z1PW(JS,JY,JX)                    !snowpack HPO4,[mol d-2]
-  real(r8) :: ZHPW(JS,JY,JX)                    !snowpack H2PO4, [mol d-2]
-  real(r8) :: ZALW(JS,JY,JX)                    !snowpack Al, [mol d-2]
-  real(r8) :: ZFEW(JS,JY,JX)                    !snowpack Fe, [mol d-2]
-  real(r8) :: ZHYW(JS,JY,JX)                    !snowpack H, [mol d-2]
-  real(r8) :: ZCAW(JS,JY,JX)                    !snowpack Ca, [mol d-2]
-  real(r8) :: ZMGW(JS,JY,JX)                    !snowpack Mg, [mol d-2]
-  real(r8) :: ZNAW(JS,JY,JX)                    !snowpack Na, [mol d-2]
-  real(r8) :: ZKAW(JS,JY,JX)                    !snowpack K, [mol d-2]
-  real(r8) :: ZOHW(JS,JY,JX)                    !snowpack OH, [mol d-2]
-  real(r8) :: ZSO4W(JS,JY,JX)                   !snowpack SO4, [mol d-2]
-  real(r8) :: ZCLW(JS,JY,JX)                    !snowpack Cl, [mol d-2]
-  real(r8) :: ZCO3W(JS,JY,JX)                   !snowpack CO3, [mol d-2]
-  real(r8) :: ZHCO3W(JS,JY,JX)                  !snowpack HCO3, [mol d-2]
-  real(r8) :: ZALH1W(JS,JY,JX)                  !snowpack AlOH, [mol d-2]
-  real(r8) :: ZALH2W(JS,JY,JX)                  !snowpack AlOH2, [mol d-2]
-  real(r8) :: ZALH3W(JS,JY,JX)                  !snowpack AlOH3, [mol d-2]
-  real(r8) :: ZALH4W(JS,JY,JX)                  !snowpack AlOH4, [mol d-2]
-  real(r8) :: ZALSW(JS,JY,JX)                   !snowpack AlSO4, [mol d-2]
-  real(r8) :: ZFEH1W(JS,JY,JX)                  !snowpack FeOH, [mol d-2]
-  real(r8) :: ZFEH2W(JS,JY,JX)                  !snowpack FeOH2, [mol d-2]
-  real(r8) :: ZFEH3W(JS,JY,JX)                  !snowpack FeOH3, [mol d-2]
-  real(r8) :: ZFEH4W(JS,JY,JX)                  !snowpack F3OH4, [mol d-2]
-  real(r8) :: ZFESW(JS,JY,JX)                   !snowpack FeSO4, [mol d-2]
-  real(r8) :: ZCAOW(JS,JY,JX)                   !snowpack CaOH2, [mol d-2]
-  real(r8) :: ZCACW(JS,JY,JX)                   !snowpack CaCO3, [mol d-2]
-  real(r8) :: ZCAHW(JS,JY,JX)                   !snowpack CaHCO3, [mol d-2]
-  real(r8) :: ZCASW(JS,JY,JX)                   !snowpack CaSO4, [mol d-2]
-  real(r8) :: ZMGOW(JS,JY,JX)                   !snowpack MgOH2, [mol d-2]
-  real(r8) :: ZMGCW(JS,JY,JX)                   !snowpack MgCO3, [mol d-2]
-  real(r8) :: ZMGHW(JS,JY,JX)                   !snowpack MgHCO3, [mol d-2]
-  real(r8) :: ZMGSW(JS,JY,JX)                   !snowpack MgSO4, [mol d-2]
-  real(r8) :: ZNACW(JS,JY,JX)                   !snowpack NaCO3, [mol d-2]
-  real(r8) :: ZNASW(JS,JY,JX)                   !snowpack NaSO4, [mol d-2]
-  real(r8) :: ZKASW(JS,JY,JX)                   !snowpack KSO4, [mol d-2]
-  real(r8) :: H0PO4W(JS,JY,JX)                  !snowpack PO4, [mol d-2]
-  real(r8) :: H3PO4W(JS,JY,JX)                  !snowpack H3PO4, [mol d-2]
-  real(r8) :: ZFE1PW(JS,JY,JX)                  !snowpack FeHPO4, [mol d-2]
-  real(r8) :: ZFE2PW(JS,JY,JX)                  !snowpack FeH2PO4, [mol d-2]
-  real(r8) :: ZCA0PW(JS,JY,JX)                  !snowpack CaPO4, [mol d-2]
-  real(r8) :: ZCA1PW(JS,JY,JX)                  !snowpack CaHPO4, [mol d-2]
-  real(r8) :: ZCA2PW(JS,JY,JX)                  !snowpack CaH2PO4, [mol d-2]
-  real(r8) :: ZMG1PW(JS,JY,JX)                  !snowpack MgHPO4, [mol d-2]
+  implicit none
+  allocate(VHCPWM(60,JS,JY,JX));VHCPWM=0._r8
+  allocate(FLQWM(60,JS,JY,JX)); FLQWM=0._r8
+  allocate(QSM(60,2,JV,JH));    QSM=0._r8
+  allocate(ALBS(JY,JX));        ALBS=0._r8
+  allocate(DENS0(JY,JX));       DENS0=0._r8
+  allocate(TCW(JS,JY,JX));      TCW=0._r8
+  allocate(TKW(JS,JY,JX));      TKW=0._r8
+  allocate(VHCPW(JS,JY,JX));    VHCPW=0._r8
+  allocate(VOLSSL(JS,JY,JX));   VOLSSL=0._r8
+  allocate(VOLWSL(JS,JY,JX));   VOLWSL=0._r8
+  allocate(VOLISL(JS,JY,JX));   VOLISL=0._r8
+  allocate(VOLSL(JS,JY,JX));    VOLSL=0._r8
+  allocate(DENSS(JS,JY,JX));    DENSS=0._r8
+  allocate(DLYRS(JS,JY,JX));    DLYRS=0._r8
+  allocate(XFLWW(JS,JY,JX));    XFLWW=0._r8
+  allocate(XFLWS(JS,JY,JX));    XFLWS=0._r8
+  allocate(XFLWI(JS,JY,JX));    XFLWI=0._r8
+  allocate(XHFLWW(JS,JY,JX));   XHFLWW=0._r8
+  allocate(XWFLXS(JS,JY,JX));   XWFLXS=0._r8
+  allocate(XWFLXI(JS,JY,JX));   XWFLXI=0._r8
+  allocate(CDPTHS(0:JS,JY,JX)); CDPTHS=0._r8
+  allocate(VOLSI(JS,JY,JX));    VOLSI=0._r8
+  allocate(DPTHS(JY,JX));       DPTHS=0._r8
+  allocate(VOLSS(JY,JX));       VOLSS=0._r8
+  allocate(VOLWS(JY,JX));       VOLWS=0._r8
+  allocate(VOLIS(JY,JX));       VOLIS=0._r8
+  allocate(VOLS(JY,JX));        VOLS=0._r8
+  allocate(VHCPWX(JY,JX));      VHCPWX=0._r8
+  allocate(FLSW(JS,JY,JX));     FLSW=0._r8
+  allocate(FLSWH(JS,JY,JX));    FLSWH=0._r8
+  allocate(HFLSW(JS,JY,JX));    HFLSW=0._r8
+  allocate(FLSWR(JS,JY,JX));    FLSWR=0._r8
+  allocate(HFLSWR(JS,JY,JX));   HFLSWR=0._r8
+  allocate(QS(2,JV,JH));        QS=0._r8
+  allocate(QW(2,JV,JH));        QW=0._r8
+  allocate(QI(2,JV,JH));        QI=0._r8
+  allocate(HQS(2,JV,JH));       HQS=0._r8
+  allocate(XCOQSS(2,JV,JH));    XCOQSS=0._r8
+  allocate(XCHQSS(2,JV,JH));    XCHQSS=0._r8
+  allocate(XOXQSS(2,JV,JH));    XOXQSS=0._r8
+  allocate(XNGQSS(2,JV,JH));    XNGQSS=0._r8
+  allocate(XN2QSS(2,JV,JH));    XN2QSS=0._r8
+  allocate(XN4QSS(2,JV,JH));    XN4QSS=0._r8
+  allocate(XN3QSS(2,JV,JH));    XN3QSS=0._r8
+  allocate(XNOQSS(2,JV,JH));    XNOQSS=0._r8
+  allocate(XP4QSS(2,JV,JH));    XP4QSS=0._r8
+  allocate(XP1QSS(2,JV,JH));    XP1QSS=0._r8
+  allocate(CO2W(JS,JY,JX));     CO2W=0._r8
+  allocate(CH4W(JS,JY,JX));     CH4W=0._r8
+  allocate(OXYW(JS,JY,JX));     OXYW=0._r8
+  allocate(ZN2W(JS,JY,JX));     ZN2W=0._r8
+  allocate(ZNGW(JS,JY,JX));     ZNGW=0._r8
+  allocate(ZN4W(JS,JY,JX));     ZN4W=0._r8
+  allocate(ZN3W(JS,JY,JX));     ZN3W=0._r8
+  allocate(ZNOW(JS,JY,JX));     ZNOW=0._r8
+  allocate(Z1PW(JS,JY,JX));     Z1PW=0._r8
+  allocate(ZHPW(JS,JY,JX));     ZHPW=0._r8
+  allocate(ZALW(JS,JY,JX));     ZALW=0._r8
+  allocate(ZFEW(JS,JY,JX));     ZFEW=0._r8
+  allocate(ZHYW(JS,JY,JX));     ZHYW=0._r8
+  allocate(ZCAW(JS,JY,JX));     ZCAW=0._r8
+  allocate(ZMGW(JS,JY,JX));     ZMGW=0._r8
+  allocate(ZNAW(JS,JY,JX));     ZNAW=0._r8
+  allocate(ZKAW(JS,JY,JX));     ZKAW=0._r8
+  allocate(ZOHW(JS,JY,JX));     ZOHW=0._r8
+  allocate(ZSO4W(JS,JY,JX));    ZSO4W=0._r8
+  allocate(ZCLW(JS,JY,JX));     ZCLW=0._r8
+  allocate(ZCO3W(JS,JY,JX));    ZCO3W=0._r8
+  allocate(ZHCO3W(JS,JY,JX));   ZHCO3W=0._r8
+  allocate(ZALH1W(JS,JY,JX));   ZALH1W=0._r8
+  allocate(ZALH2W(JS,JY,JX));   ZALH2W=0._r8
+  allocate(ZALH3W(JS,JY,JX));   ZALH3W=0._r8
+  allocate(ZALH4W(JS,JY,JX));   ZALH4W=0._r8
+  allocate(ZALSW(JS,JY,JX));    ZALSW=0._r8
+  allocate(ZFEH1W(JS,JY,JX));   ZFEH1W=0._r8
+  allocate(ZFEH2W(JS,JY,JX));   ZFEH2W=0._r8
+  allocate(ZFEH3W(JS,JY,JX));   ZFEH3W=0._r8
+  allocate(ZFEH4W(JS,JY,JX));   ZFEH4W=0._r8
+  allocate(ZFESW(JS,JY,JX));    ZFESW=0._r8
+  allocate(ZCAOW(JS,JY,JX));    ZCAOW=0._r8
+  allocate(ZCACW(JS,JY,JX));    ZCACW=0._r8
+  allocate(ZCAHW(JS,JY,JX));    ZCAHW=0._r8
+  allocate(ZCASW(JS,JY,JX));    ZCASW=0._r8
+  allocate(ZMGOW(JS,JY,JX));    ZMGOW=0._r8
+  allocate(ZMGCW(JS,JY,JX));    ZMGCW=0._r8
+  allocate(ZMGHW(JS,JY,JX));    ZMGHW=0._r8
+  allocate(ZMGSW(JS,JY,JX));    ZMGSW=0._r8
+  allocate(ZNACW(JS,JY,JX));    ZNACW=0._r8
+  allocate(ZNASW(JS,JY,JX));    ZNASW=0._r8
+  allocate(ZKASW(JS,JY,JX));    ZKASW=0._r8
+  allocate(H0PO4W(JS,JY,JX));   H0PO4W=0._r8
+  allocate(H3PO4W(JS,JY,JX));   H3PO4W=0._r8
+  allocate(ZFE1PW(JS,JY,JX));   ZFE1PW=0._r8
+  allocate(ZFE2PW(JS,JY,JX));   ZFE2PW=0._r8
+  allocate(ZCA0PW(JS,JY,JX));   ZCA0PW=0._r8
+  allocate(ZCA1PW(JS,JY,JX));   ZCA1PW=0._r8
+  allocate(ZCA2PW(JS,JY,JX));   ZCA2PW=0._r8
+  allocate(ZMG1PW(JS,JY,JX));   ZMG1PW=0._r8
+  allocate(XQSAL(2,JV,JH));     XQSAL=0._r8
+  allocate(XQSFE(2,JV,JH));     XQSFE=0._r8
+  allocate(XQSHY(2,JV,JH));     XQSHY=0._r8
+  allocate(XQSCA(2,JV,JH));     XQSCA=0._r8
+  allocate(XQSMG(2,JV,JH));     XQSMG=0._r8
+  allocate(XQSNA(2,JV,JH));     XQSNA=0._r8
+  allocate(XQSKA(2,JV,JH));     XQSKA=0._r8
+  allocate(XQSOH(2,JV,JH));     XQSOH=0._r8
+  allocate(XQSSO(2,JV,JH));     XQSSO=0._r8
+  allocate(XQSCL(2,JV,JH));     XQSCL=0._r8
+  allocate(XQSC3(2,JV,JH));     XQSC3=0._r8
+  allocate(XQSHC(2,JV,JH));     XQSHC=0._r8
+  allocate(XQSAL1(2,JV,JH));    XQSAL1=0._r8
+  allocate(XQSAL2(2,JV,JH));    XQSAL2=0._r8
+  allocate(XQSAL3(2,JV,JH));    XQSAL3=0._r8
+  allocate(XQSAL4(2,JV,JH));    XQSAL4=0._r8
+  allocate(XQSALS(2,JV,JH));    XQSALS=0._r8
+  allocate(XQSFE1(2,JV,JH));    XQSFE1=0._r8
+  allocate(XQSFE2(2,JV,JH));    XQSFE2=0._r8
+  allocate(XQSFE3(2,JV,JH));    XQSFE3=0._r8
+  allocate(XQSFE4(2,JV,JH));    XQSFE4=0._r8
+  allocate(XQSFES(2,JV,JH));    XQSFES=0._r8
+  allocate(XQSCAO(2,JV,JH));    XQSCAO=0._r8
+  allocate(XQSCAC(2,JV,JH));    XQSCAC=0._r8
+  allocate(XQSCAH(2,JV,JH));    XQSCAH=0._r8
+  allocate(XQSCAS(2,JV,JH));    XQSCAS=0._r8
+  allocate(XQSMGO(2,JV,JH));    XQSMGO=0._r8
+  allocate(XQSMGC(2,JV,JH));    XQSMGC=0._r8
+  allocate(XQSMGH(2,JV,JH));    XQSMGH=0._r8
+  allocate(XQSMGS(2,JV,JH));    XQSMGS=0._r8
+  allocate(XQSNAC(2,JV,JH));    XQSNAC=0._r8
+  allocate(XQSNAS(2,JV,JH));    XQSNAS=0._r8
+  allocate(XQSKAS(2,JV,JH));    XQSKAS=0._r8
+  allocate(XQSH0P(2,JV,JH));    XQSH0P=0._r8
+  allocate(XQSH1P(2,JV,JH));    XQSH1P=0._r8
+  allocate(XQSH3P(2,JV,JH));    XQSH3P=0._r8
+  allocate(XQSF1P(2,JV,JH));    XQSF1P=0._r8
+  allocate(XQSF2P(2,JV,JH));    XQSF2P=0._r8
+  allocate(XQSC0P(2,JV,JH));    XQSC0P=0._r8
+  allocate(XQSC1P(2,JV,JH));    XQSC1P=0._r8
+  allocate(XQSC2P(2,JV,JH));    XQSC2P=0._r8
+  allocate(XQSM1P(2,JV,JH));    XQSM1P=0._r8
+  end subroutine InitSnowData
 
-  real(r8) :: XQSAL(2,JV,JH)                    !total Al in snow drift, [mol d-2 h-1]
-  real(r8) :: XQSFE(2,JV,JH)                    !total Fe in snow drift, [mol d-2 h-1]
-  real(r8) :: XQSHY(2,JV,JH)                    !total H in snow drift, [mol d-2 h-1]
-  real(r8) :: XQSCA(2,JV,JH)                    !total Ca in snow drift, [mol d-2 h-1]
-  real(r8) :: XQSMG(2,JV,JH)                    !total Mg in snow drift, [mol d-2 h-1]
-  real(r8) :: XQSNA(2,JV,JH)                    !total Na in snow drift, [mol d-2 h-1]
-  real(r8) :: XQSKA(2,JV,JH)                    !total K in snow drift, [mol d-2 h-1]
-  real(r8) :: XQSOH(2,JV,JH)                    !total OH in snow drift, [mol d-2 h-1]
-  real(r8) :: XQSSO(2,JV,JH)                    !total SO4 in snow drift, [mol d-2 h-1]
-  real(r8) :: XQSCL(2,JV,JH)                    !total Cl in snow drift, [mol d-2 h-1]
-  real(r8) :: XQSC3(2,JV,JH)                    !total CO3 in snow drift, [mol d-2 h-1]
-  real(r8) :: XQSHC(2,JV,JH)                    !total HCO3 in snow drift, [mol d-2 h-1]
-  real(r8) :: XQSAL1(2,JV,JH)                   !total AlOH in snow drift, [mol d-2 h-1]
-  real(r8) :: XQSAL2(2,JV,JH)                   !total AlOH2 in snow drift, [mol d-2 h-1]
-  real(r8) :: XQSAL3(2,JV,JH)                   !total AlOH3 in snow drift, [mol d-2 h-1]
-  real(r8) :: XQSAL4(2,JV,JH)                   !total AlOH4 in snow drift, [mol d-2 h-1]
-  real(r8) :: XQSALS(2,JV,JH)                   !total AlSO4 in snow drift, [mol d-2 h-1]
-  real(r8) :: XQSFE1(2,JV,JH)                   !total FeOH in snow drift, [mol d-2 h-1]
-  real(r8) :: XQSFE2(2,JV,JH)                   !total FeOH2 in snow drift, [mol d-2 h-1]
-  real(r8) :: XQSFE3(2,JV,JH)                   !total FeOH3 in snow drift, [mol d-2 h-1]
-  real(r8) :: XQSFE4(2,JV,JH)                   !total FeOH4 in snow drift, [mol d-2 h-1]
-  real(r8) :: XQSFES(2,JV,JH)                   !total FeSO4 in snow drift, [mol d-2 h-1]
-  real(r8) :: XQSCAO(2,JV,JH)                   !total CaOH in snow drift, [mol d-2 h-1]
-  real(r8) :: XQSCAC(2,JV,JH)                   !total CaCO3 in snow drift, [mol d-2 h-1]
-  real(r8) :: XQSCAH(2,JV,JH)                   !total CaHCO3 in snow drift, [mol d-2 h-1]
-  real(r8) :: XQSCAS(2,JV,JH)                   !total CaSO4 in snow drift, [mol d-2 h-1]
-  real(r8) :: XQSMGO(2,JV,JH)                   !total MgOH in snow drift, [mol d-2 h-1]
-  real(r8) :: XQSMGC(2,JV,JH)                   !total MgCO3 in snow drift, [mol d-2 h-1]
-  real(r8) :: XQSMGH(2,JV,JH)                   !total MgHCO3 in snow drift, [mol d-2 h-1]
-  real(r8) :: XQSMGS(2,JV,JH)                   !total MgSO4 in snow drift, [mol d-2 h-1]
-  real(r8) :: XQSNAC(2,JV,JH)                   !total NaCO3 in snow drift, [mol d-2 h-1]
-  real(r8) :: XQSNAS(2,JV,JH)                   !total NaSO4 in snow drift, [mol d-2 h-1]
-  real(r8) :: XQSKAS(2,JV,JH)                   !total KSO4 in snow drift, [mol d-2 h-1]
-  real(r8) :: XQSH0P(2,JV,JH)                   !total PO4 in snow drif, [mol d-2 h-1]
-  real(r8) :: XQSH1P(2,JV,JH)                   !total HPO4 in snow drift , [mol d-2 h-1]
-  real(r8) :: XQSH3P(2,JV,JH)                   !total H3PO4 in snow drift , [mol d-2 h-1]
-  real(r8) :: XQSF1P(2,JV,JH)                   !total FeHPO4 in snow drift , [mol d-2 h-1]
-  real(r8) :: XQSF2P(2,JV,JH)                   !total FeH2PO4 in snow drift , [mol d-2 h-1]
-  real(r8) :: XQSC0P(2,JV,JH)                   !total CaPO4 in snow drift , [mol d-2 h-1]
-  real(r8) :: XQSC1P(2,JV,JH)                   !total CaHPO4 in snow drift, [mol d-2 h-1]
-  real(r8) :: XQSC2P(2,JV,JH)                   !total CaH2PO4 in snow drift , [mol d-2 h-1]
-  real(r8) :: XQSM1P(2,JV,JH)                   !total MgHPO4 in snow drift , [mol d-2 h-1]
+!----------------------------------------------------------------------
+  subroutine DestructSnowData
+  use abortutils, only : destroy
+  implicit none
+  call destroy(VHCPWM)
+  call destroy(FLQWM)
+  call destroy(QSM)
+  call destroy(ALBS)
+  call destroy(DENS0)
+  call destroy(TCW)
+  call destroy(TKW)
+  call destroy(VHCPW)
+  call destroy(VOLSSL)
+  call destroy(VOLWSL)
+  call destroy(VOLISL)
+  call destroy(VOLSL)
+  call destroy(DENSS)
+  call destroy(DLYRS)
+  call destroy(XFLWW)
+  call destroy(XFLWS)
+  call destroy(XFLWI)
+  call destroy(XHFLWW)
+  call destroy(XWFLXS)
+  call destroy(XWFLXI)
+  call destroy(CDPTHS)
+  call destroy(VOLSI)
+  call destroy(DPTHS)
+  call destroy(VOLSS)
+  call destroy(VOLWS)
+  call destroy(VOLIS)
+  call destroy(VOLS)
+  call destroy(VHCPWX)
+  call destroy(FLSW)
+  call destroy(FLSWH)
+  call destroy(HFLSW)
+  call destroy(FLSWR)
+  call destroy(HFLSWR)
+  call destroy(QS)
+  call destroy(QW)
+  call destroy(QI)
+  call destroy(HQS)
+  call destroy(XCOQSS)
+  call destroy(XCHQSS)
+  call destroy(XOXQSS)
+  call destroy(XNGQSS)
+  call destroy(XN2QSS)
+  call destroy(XN4QSS)
+  call destroy(XN3QSS)
+  call destroy(XNOQSS)
+  call destroy(XP4QSS)
+  call destroy(XP1QSS)
+  call destroy(CO2W)
+  call destroy(CH4W)
+  call destroy(OXYW)
+  call destroy(ZN2W)
+  call destroy(ZNGW)
+  call destroy(ZN4W)
+  call destroy(ZN3W)
+  call destroy(ZNOW)
+  call destroy(Z1PW)
+  call destroy(ZHPW)
+  call destroy(ZALW)
+  call destroy(ZFEW)
+  call destroy(ZHYW)
+  call destroy(ZCAW)
+  call destroy(ZMGW)
+  call destroy(ZNAW)
+  call destroy(ZKAW)
+  call destroy(ZOHW)
+  call destroy(ZSO4W)
+  call destroy(ZCLW)
+  call destroy(ZCO3W)
+  call destroy(ZHCO3W)
+  call destroy(ZALH1W)
+  call destroy(ZALH2W)
+  call destroy(ZALH3W)
+  call destroy(ZALH4W)
+  call destroy(ZALSW)
+  call destroy(ZFEH1W)
+  call destroy(ZFEH2W)
+  call destroy(ZFEH3W)
+  call destroy(ZFEH4W)
+  call destroy(ZFESW)
+  call destroy(ZCAOW)
+  call destroy(ZCACW)
+  call destroy(ZCAHW)
+  call destroy(ZCASW)
+  call destroy(ZMGOW)
+  call destroy(ZMGCW)
+  call destroy(ZMGHW)
+  call destroy(ZMGSW)
+  call destroy(ZNACW)
+  call destroy(ZNASW)
+  call destroy(ZKASW)
+  call destroy(H0PO4W)
+  call destroy(H3PO4W)
+  call destroy(ZFE1PW)
+  call destroy(ZFE2PW)
+  call destroy(ZCA0PW)
+  call destroy(ZCA1PW)
+  call destroy(ZCA2PW)
+  call destroy(ZMG1PW)
+  call destroy(XQSAL)
+  call destroy(XQSFE)
+  call destroy(XQSHY)
+  call destroy(XQSCA)
+  call destroy(XQSMG)
+  call destroy(XQSNA)
+  call destroy(XQSKA)
+  call destroy(XQSOH)
+  call destroy(XQSSO)
+  call destroy(XQSCL)
+  call destroy(XQSC3)
+  call destroy(XQSHC)
+  call destroy(XQSAL1)
+  call destroy(XQSAL2)
+  call destroy(XQSAL3)
+  call destroy(XQSAL4)
+  call destroy(XQSALS)
+  call destroy(XQSFE1)
+  call destroy(XQSFE2)
+  call destroy(XQSFE3)
+  call destroy(XQSFE4)
+  call destroy(XQSFES)
+  call destroy(XQSCAO)
+  call destroy(XQSCAC)
+  call destroy(XQSCAH)
+  call destroy(XQSCAS)
+  call destroy(XQSMGO)
+  call destroy(XQSMGC)
+  call destroy(XQSMGH)
+  call destroy(XQSMGS)
+  call destroy(XQSNAC)
+  call destroy(XQSNAS)
+  call destroy(XQSKAS)
+  call destroy(XQSH0P)
+  call destroy(XQSH1P)
+  call destroy(XQSH3P)
+  call destroy(XQSF1P)
+  call destroy(XQSF2P)
+  call destroy(XQSC0P)
+  call destroy(XQSC1P)
+  call destroy(XQSC2P)
+  call destroy(XQSM1P)
+  end subroutine DestructSnowData
 
 end module SnowDataType

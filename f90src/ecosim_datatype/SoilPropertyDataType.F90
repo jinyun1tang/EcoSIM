@@ -52,7 +52,7 @@ contains
 
   implicit none
   allocate(CORGCI(JZ,JY,JX));    CORGCI=0._r8
-  allocate(POROSI(JZ,JY,JX));    POROSI=0._r8
+  allocate(POROSI(0:JZ,JY,JX));  POROSI=0._r8
   allocate(FHOLI(JZ,JY,JX));     FHOLI=0._r8
   allocate(CSAND(JZ,JY,JX));     CSAND=0._r8
   allocate(CSILT(JZ,JY,JX));     CSILT=0._r8

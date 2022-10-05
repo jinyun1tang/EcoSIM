@@ -1,6 +1,7 @@
 module MiniFuncMod
 
   use data_kind_mod     , only : r8 => SHR_KIND_R8
+  use EcosimConst
 implicit none
 
   character(len=*),private, parameter :: mod_filename = __FILE__
@@ -117,4 +118,29 @@ implicit none
   ans=0.333_r8*(12.5_r8-AMAX1(0.0_r8,AMIN1(25.0_r8,ATCS)))
 
   end function fOFFSET
+
+!------------------------------------------------------------------------------------------
+  function GetDayLength(ALAT,XI,DECLIN)result(DYL)
+! Description:
+! CALCULATE MAXIMUM DAYLENTH FOR PLANT PHENOLOGY
+  implicit none
+  real(r8), intent(in) :: ALAT,XI
+  real(r8), optional, intent(out) :: DECLIN
+  real(r8) :: DYL
+  real(r8) :: DECDAY,AZI,DEC,DECLIN1
+
+  DECDAY=XI+100._r8
+  DECLIN1=SIN((DECDAY*0.9863_r8)*1.7453E-02_r8)*(-23.47_r8)
+  AZI=SIN(ALAT*1.7453E-02_r8)*SIN(DECLIN1*1.7453E-02_r8)
+  DEC=COS(ALAT*1.7453E-02_r8)*COS(DECLIN1*1.7453E-02_r8)
+  IF(AZI/DEC.GE.1.0_r8-TWILGT)THEN
+    DYL=24.0_r8
+  ELSEIF(AZI/DEC.LE.-1.0_r8+TWILGT)THEN
+    DYL=0.0_r8
+  ELSE
+    DYL=12.0_r8*(1.0_r8+2.0_r8/PICON*ASIN(TWILGT+AZI/DEC))
+  ENDIF
+  if(present(DECLIN))DECLIN=DECLIN1
+  end function GetDayLength
+!------------------------------------------------------------------------------------------
 end module MiniFuncMod

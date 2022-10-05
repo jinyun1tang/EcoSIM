@@ -36,6 +36,11 @@ module abortutils
     module procedure destroy_6d_i
     module procedure destroy_7d_i
     module procedure destroy_1d_l
+    module procedure destroy_1d_char
+    module procedure destroy_2d_char
+    module procedure destroy_3d_char
+    module procedure destroy_4d_char
+
   end interface destroy
   public :: padl, padr
   public :: print_info
@@ -373,4 +378,40 @@ CONTAINS
   if(allocated(arr))deallocate(arr)
 
   end subroutine destroy_1d_L
+
+
+  !-----------------------------------------------------------------------
+  subroutine destroy_1d_char(arr)
+  implicit none
+  character(len=*), allocatable :: arr(:)
+
+  if(allocated(arr))deallocate(arr)
+
+  end subroutine destroy_1d_char
+
+  !-----------------------------------------------------------------------
+  subroutine destroy_2d_char(arr)
+  implicit none
+  character(len=*), allocatable :: arr(:,:)
+
+  if(allocated(arr))deallocate(arr)
+
+  end subroutine destroy_2d_char
+  !-----------------------------------------------------------------------
+  subroutine destroy_3d_char(arr)
+  implicit none
+  character(len=*), allocatable :: arr(:,:,:)
+
+  if(allocated(arr))deallocate(arr)
+
+  end subroutine destroy_3d_char
+
+  !-----------------------------------------------------------------------
+  subroutine destroy_4d_char(arr)
+  implicit none
+  character(len=*), allocatable :: arr(:,:,:,:)
+
+  if(allocated(arr))deallocate(arr)
+
+  end subroutine destroy_4d_char
 end module abortutils

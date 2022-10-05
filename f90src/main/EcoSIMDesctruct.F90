@@ -7,23 +7,42 @@ module EcoSIMDesctruct
   contains
 
   subroutine DestructEcoSIM
-  use AqueChemDatatype  , only : DestructAquaChem
-  use MicrobialDataType , only : DestructMicrobialData
+
+  use FlagDataType        , only : DestructFlagData,ISALTG
+  use WatsubDataMod       , only : DestructWatSubData
+  use TrnsfrsMod          , only : DestructTrnsfrs
+  use ErosionMod          , only : DestructErosion
+  use SoilHeatDatatype    , only : DestructSoilHeatData
+  use SoilPhysDataType    , only : DestructSoilPhysData
+  use SurfSoilDataType    , only : DestructSurfSoilData
+  use GridDataType        , only : DestructGridData
+  use RootDataType        , only : DestructRootData
+  use SnowDataType        , only : DestructSnowData
+  use PlantTraitDataType  , only : DestructPlantTraits
+  use LandSurfDataType    , only : DestructLandSurfData
+  use EcoSIMCtrlDataType  , only : DestructEcoSIMCtrlData
+  use EcosimBGCFluxType   , only : DestructEcosimBGCFluxData
+  use EcoSIMHistMod       , only : DestructEcoSIMHistData
+  use CanopyDataType      , only : DestructCanopyData
+  use ClimForcDataType    , only : DestructClimForcData
+  use AqueChemDatatype    , only : DestructAquaChem
+  use MicrobialDataType   , only : DestructMicrobialData
   use ChemTranspDataType  , only : DestructChemTranspData
-  use SOMDataType       , only : DestructSOMData
-  use FertilizerDataType, only : DestructFertilizerData
-  use CanopyRadDataType       , only : DestructCanopyRad
-  use SurfLitterDataType, only : DestructSurfLitter
+  use SOMDataType         , only : DestructSOMData
+  use FertilizerDataType  , only : DestructFertilizerData
+  use CanopyRadDataType   , only : DestructCanopyRad
+  use SurfLitterDataType  , only : DestructSurfLitter
   use SoilPropertyDataType, only : DestructSoilProperty
-  use PlantDataRateType, only : DestructPlantRates
-  use IrrigationDataType, only : DestructIrrigation
-  use SoilBGCDataType, only : DestructSoilBGCData
-  use SedimentDataType, only : DestructSedimentData
-  use SoilWaterDataType, only : DestructSoilWater
-  use PlantAPIData  , only : DestructPlantAPIData
-  use PlantMngmtDataType, only : DestructPlantMngmtData
-  use InitSOMBGCMOD, only : DestructSOMBGC
-  use TrnsfrMod, only : DestructTrnsfr
+  use PlantDataRateType   , only : DestructPlantRates
+  use IrrigationDataType  , only : DestructIrrigation
+  use SoilBGCDataType     , only : DestructSoilBGCData
+  use SedimentDataType    , only : DestructSedimentData
+  use SoilWaterDataType   , only : DestructSoilWater
+  use PlantAPIData        , only : DestructPlantAPIData
+  use PlantMngmtDataType  , only : DestructPlantMngmtData
+  use InitSOMBGCMOD       , only : DestructSOMBGC
+  use TrnsfrMod           , only : DestructTrnsfr
+
   implicit none
 
   call DestructMicrobialData
@@ -54,8 +73,40 @@ module EcoSIMDesctruct
 
   call DestructSOMBGC
 
-  call DestructTrnsfr
+  call DestructFlagData
 
+  if(ISALTG/=0)then
+    call DestructTrnsfrs
+  else
+    call DestructTrnsfr
+  endif
+  call DestructEcoSIMCtrlData
+
+  call DestructCanopyData
+
+  call DestructEcoSIMHistData
+
+  call DestructEcosimBGCFluxData
+
+  call DestructLandSurfData
+
+  call DestructGridData
+
+  call DestructPlantTraits
+
+  call DestructRootData
+
+  call DestructSnowData
+
+  call DestructSoilHeatData
+
+  call DestructSoilPhysData
+
+  call DestructSurfSoilData
+
+  call DestructErosion
+
+  call DestructWatSubData
   end subroutine DestructEcoSIM
 
 end module EcoSIMDesctruct

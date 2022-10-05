@@ -11,7 +11,7 @@ module MicBGCAPI
   USE PlantDataRateType
   USE SoilWaterDataType
   USE SurfLitterDataType
-  USE EcosysBGCFluxType
+  USE EcosimBGCFluxType
   USE EcoSIMCtrlDataType
   USE ClimForcDataType
   USE GridDataType

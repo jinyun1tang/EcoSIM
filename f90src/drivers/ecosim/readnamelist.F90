@@ -4,6 +4,7 @@
 ! Description:
 ! read control namelist
   use abortutils, only : endrun
+
   use ForcWriterMod, only : bgc_forc_conf,do_bgcforc_write
   implicit none
       character(len=*), intent(in) :: nmlfile
@@ -29,10 +30,12 @@
       logical :: laddband
       namelist /bbgcforc/do_bgcforc_write,do_year,do_doy,laddband,do_layer,&
         bgc_fname
+
       !local variables
       character(len=256) :: ioerror_msg
       integer :: rc, fu
       integer :: nml_error
+
       num_of_simdays=-1
       do_year=-1
       do_doy=0
@@ -92,5 +95,6 @@
   LYRG=num_of_simdays
   lverb=lverbose
   nmicbguilds=num_microbial_guilds
+
 
 end subroutine readnamelist

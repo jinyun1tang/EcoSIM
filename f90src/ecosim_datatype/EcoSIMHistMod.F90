@@ -7,16 +7,15 @@ module EcoSIMHistMod
   implicit none
   character(len=*), private, parameter :: mod_filename = __FILE__
 
-  public
   CHARACTER(len=16) :: DATAC(30,250,250)
-  CHARACTER(len=16) :: DATAP(JP,JY,JX)
-  CHARACTER(len=16) :: DATAM(JP,JY,JX)
+  CHARACTER(len=16), allocatable :: DATAP(:,:,:)
+  CHARACTER(len=16), allocatable :: DATAM(:,:,:)
+  CHARACTER(len=16), allocatable :: DATAZ(:,:,:)
+  CHARACTER(len=16), allocatable :: OUTFILS(:,:,:)
+  CHARACTER(len=16), allocatable :: OUTFILP(:,:,:,:)
   CHARACTER(len=16) :: DATAX(JP),DATAY(JP)
-  CHARACTER(len=16) :: DATAZ(JP,JY,JX)
   CHARACTER(len=16) :: OUTS(10)
   CHARACTER(len=16) :: OUTP(10)
-  CHARACTER(len=16) :: OUTFILS(10,JY,JX)
-  CHARACTER(len=16) :: OUTFILP(10,JP,JY,JX)
   CHARACTER(len=3) :: CHOICE(102,20)
   CHARACTER(len=8) :: CDATE
   CHARACTER(len=640):: PREFIX
@@ -24,6 +23,33 @@ module EcoSIMHistMod
   integer :: IDATA(60),NOUTS(10),NOUTP(10)
   CHARACTER(len=16) :: DATA1(30)               !for model io related setup
 
+  contains
 
+  subroutine InitEcoSIMHistData
+
+  implicit none
+
+  allocate(DATAP(JP,JY,JX))
+  allocate(DATAM(JP,JY,JX))
+  allocate(DATAZ(JP,JY,JX))
+  allocate(OUTFILS(10,JY,JX))
+  allocate(OUTFILP(10,JP,JY,JX))
+
+  end subroutine InitEcoSIMHistData
+
+
+  subroutine DestructEcoSIMHistData
+
+  use abortutils, only : destroy
+
+  implicit none
+
+  call destroy(DATAP)
+  call destroy(DATAM)
+  call destroy(DATAZ)
+  call destroy(OUTFILP)
+  call destroy(OUTFILS)
+
+  end subroutine DestructEcoSIMHistData
 
 end module EcoSIMHistMod

@@ -23,7 +23,7 @@ set(ECOSIM_DATATYPE_SOURCES
   CanopyDataType.F90
   RootDataType.F90
   EcoSimSumDataType.F90
-  EcosysBGCFluxType.F90
+  EcosimBGCFluxType.F90
   AqueChemDatatype.F90
   EcoSIMHistMod.F90
   SoilPropertyDataType.F90

@@ -28,7 +28,7 @@ module PlantAPI
   use PlantTraitDataType
   use CanopyRadDataType
   use FlagDataType
-  use EcosysBGCFluxType
+  use EcosimBGCFluxType
   use FertilizerDataType
   use SoilBGCDataType
   use PlantMngmtDataType

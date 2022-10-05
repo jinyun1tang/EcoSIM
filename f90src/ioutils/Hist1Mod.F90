@@ -19,7 +19,7 @@ module Hist1Mod
   use SnowDataType
   use ChemTranspDataType
   use PlantMngmtDataType
-  use EcosysBGCFluxType
+  use EcosimBGCFluxType
   use SoilPropertyDataType
   use SoilBGCDataType
   use AqueChemDatatype
@@ -2191,6 +2191,7 @@ module Hist1Mod
                   IF(K.EQ.5)HEAD(M)=HVOLO(NY,NX)*1000.0/TAREA
                   IF(K.EQ.6)HEAD(M)=AMAX1(1.0E-64,(VOLSS(NY,NX)+VOLIS(NY,NX) &
                     *DENSI+VOLWS(NY,NX))*1000.0/AREA(3,NU(NY,NX),NY,NX))
+
                   IF(K.EQ.7)HEAD(M)=THETWZ(1,NY,NX)
                   IF(K.EQ.8)HEAD(M)=THETWZ(2,NY,NX)
                   IF(K.EQ.9)HEAD(M)=THETWZ(3,NY,NX)
@@ -2211,6 +2212,7 @@ module Hist1Mod
                   IF(K.EQ.24)HEAD(M)=THETWZ(18,NY,NX)
                   IF(K.EQ.25)HEAD(M)=THETWZ(19,NY,NX)
                   IF(K.EQ.26)HEAD(M)=THETWZ(20,NY,NX)
+
                   IF(K.EQ.27)HEAD(M)=THETWZ(0,NY,NX)
                   IF(K.EQ.28)HEAD(M)=THETIZ(1,NY,NX)
                   IF(K.EQ.29)HEAD(M)=THETIZ(2,NY,NX)
@@ -2232,6 +2234,7 @@ module Hist1Mod
                   IF(K.EQ.45)HEAD(M)=THETIZ(18,NY,NX)
                   IF(K.EQ.46)HEAD(M)=THETIZ(19,NY,NX)
                   IF(K.EQ.47)HEAD(M)=THETIZ(20,NY,NX)
+
                   IF(K.EQ.48)HEAD(M)=THETIZ(0,NY,NX)
                   IF(K.EQ.49)HEAD(M)=-(DPTHA(NY,NX)-CDPTH(NU(NY,NX)-1,NY,NX))
                   IF(K.EQ.50)HEAD(M)=-(DPTHT(NY,NX)-CDPTH(NU(NY,NX)-1,NY,NX))
