@@ -92,4 +92,34 @@ contains
 
   end subroutine Run_EcoSIM_one_step
 
+
+!------------------------------------------------------------------------
+
+  subroutine SetMesh(NHW,NVN,NHE,NVS)
+
+  use GridConsts, only : JX,JY,JZ,JH,JV,JD
+!  set up the landscape rectangular mesh
+!  beginning(NHW,NVN)
+!  o--------------------------x
+!  |                          |
+!  |                          |
+!  |                          |
+!  |                          |
+!  x--------------------------o
+!                             end (NHE,NVS)
+
+  implicit none
+  integer, intent(in) :: NHW   !upper corner x index
+  integer, intent(in) :: NVN   !upper corner y index
+  integer, intent(in) :: NHE   !lower corner x index
+  integer, intent(in) :: NVS   !lower corner y index
+  JX=(NHE-NHW)+2
+  JY=(NVS-NVN)+2
+  JZ=20
+  JH=JX+1
+  JV=JY+1
+  JD=JZ+1
+  print*,'grid size'
+  print*,'JX=',JX,'JY=',JY
+  end subroutine SetMesh
 end module EcoSIMAPI

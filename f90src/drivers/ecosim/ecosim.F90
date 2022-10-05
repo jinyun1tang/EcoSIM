@@ -9,8 +9,8 @@ PROGRAM main
   use TestMod           , only : regression
   use InitEcoSIM        , only : InitModules
   use EcoSIMDesctruct   , only : DestructEcoSIM
+  use EcoSIMAPI         , only : SetMesh
   use EcoSIMCtrlDataType
-  use GridConsts
   use EcoSIMHistMod
   use EcosimConst
   implicit none
@@ -56,8 +56,6 @@ PROGRAM main
   call readnamelist(trim(nmlfile),runfile, case_name, prefix, &
     do_rgres,LYRG,lverb, nmicbguilds)
 
-  call  InitModules(nmicbguilds)
-
   write(*,*)'read runfile',trim(runfile)
   OPEN(5,FILE=runfile,STATUS='OLD')
 !
@@ -77,6 +75,11 @@ PROGRAM main
 ! NUMBER OF COLUMNS AND ROWS
 !
   READ(5,*)NHW,NVN,NHE,NVS
+
+  call SetMesh(NHW,NVN,NHE,NVS)
+
+  call  InitModules(nmicbguilds)
+
 !
 ! SITE FILE
 !

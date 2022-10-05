@@ -253,11 +253,12 @@ module WthrMod
 !     RADN=SW radiation at horizontal surface
 !
       IF(IETYP(NY,NX).GE.-1)THEN
-        AZI=SIN(ALAT(NY,NX)*1.7453E-02)*SIN(DECLIN*1.7453E-02)
-        DEC=COS(ALAT(NY,NX)*1.7453E-02)*COS(DECLIN*1.7453E-02)
+        AZI=SIN(ALAT(NY,NX)*1.7453E-02_r8)*SIN(DECLIN*1.7453E-02_r8)
+        DEC=COS(ALAT(NY,NX)*1.7453E-02_r8)*COS(DECLIN*1.7453E-02_r8)
 
         SSIN(NY,NX)=AZMAX1(AZI+DEC*COS(.2618_r8*(ZNOON(NY,NX)-(J-0.5_r8))))
         SSINN(NY,NX)=AZMAX1(AZI+DEC*COS(.2618_r8*(ZNOON(NY,NX)-(J+0.5_r8))))
+
         !     IF(SSIN(NY,NX).GT.0.0.AND.SSIN(NY,NX).LT.TWILGT)SSIN(NY,NX)=TWILGT
         IF(RADN(NY,NX).LE.0.0)SSIN(NY,NX)=0.0_r8
         IF(SSIN(NY,NX).LE.-TWILGT)RADN(NY,NX)=0.0_r8
@@ -284,22 +285,22 @@ module WthrMod
         !     VPK,TKA=vapor pressure,temperature
         !
         IF(RADX.GT.ZERO)THEN
-          CLD=AMIN1(1.0,AMAX1(0.2,2.33-3.33*RADN(NY,NX)/RADX))
+          CLD=AMIN1(1.0_r8,AMAX1(0.2_r8,2.33_r8-3.33_r8*RADN(NY,NX)/RADX))
         ELSE
-          CLD=0.2
+          CLD=0.2_r8
         ENDIF
-        EMM=0.625*AMAX1(1.0,(1.0E+03*VPK(NY,NX)/TKA(NY,NX))**0.131)
-        EMM=EMM*(1.0+0.242*CLD**0.583)
+        EMM=0.625_r8*AMAX1(1.0_r8,(1.0E+03_r8*VPK(NY,NX)/TKA(NY,NX))**0.131_r8)
+        EMM=EMM*(1.0_r8+0.242_r8*CLD**0.583_r8)
         !
         !     IF PHYTOTRON
         !
       ELSE
-        IF(RADN(NY,NX).LE.0.0)THEN
+        IF(RADN(NY,NX).LE.0.0_r8)THEN
           SSIN(NY,NX)=0.0_r8
         ELSE
-          SSIN(NY,NX)=1.0
+          SSIN(NY,NX)=1.0_r8
         ENDIF
-        SSINN(NY,NX)=1.0
+        SSINN(NY,NX)=1.0_r8
         CLD=0.0_r8
         EMM=0.96
       ENDIF
@@ -315,7 +316,7 @@ module WthrMod
         !     THSX(NY,NX)=THSX(NY,NX)+XRADH(J,I)
         THSX(NY,NX)=XRADH(J,I)
       ELSE
-        THSX(NY,NX)=EMM*(2.04E-10*TKA(NY,NX)**4)
+        THSX(NY,NX)=EMM*(2.04E-10_r8*TKA(NY,NX)**4._r8)
       ENDIF
 !
       !     INSERT CESM WEATHER HERE

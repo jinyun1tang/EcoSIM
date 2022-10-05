@@ -2,7 +2,8 @@
   module DayMod
   use data_kind_mod, only : r8 => SHR_KIND_R8
   use EcosimConst
-  use minimathmod, only : isLeap
+  use minimathmod  , only : isLeap
+  use MiniFuncMod  , only : GetDayLength
   use GridConsts
   use SoilPhysDataType
   use FlagDataType
@@ -92,8 +93,8 @@
   implicit none
   integer, intent(in) :: I, NHW, NHE, NVN, NVS
 
-  real(r8) :: AZI
-  REAL(R8) :: DEC
+!  real(r8) :: AZI
+!  REAL(R8) :: DEC
   DO 955 NX=NHW,NHE
     DO 950 NY=NVN,NVS
       TRAD(NY,NX)=0._r8
@@ -207,20 +208,22 @@
 !     DYLX,DLYN=daylength of previous,current day
 !     ALAT=latitude
 !
+      DYLX(NY,NX)=DYLN(NY,NX)
       XI=I
       IF(I.EQ.366)XI=365.5
       DECDAY=XI+100
-      DECLIN=SIN((DECDAY*0.9863)*1.7453E-02)*(-23.47)
-      AZI=SIN(ALAT(NY,NX)*1.7453E-02)*SIN(DECLIN*1.7453E-02)
-      DEC=COS(ALAT(NY,NX)*1.7453E-02)*COS(DECLIN*1.7453E-02)
-      DYLX(NY,NX)=DYLN(NY,NX)
-      IF(AZI/DEC.GE.1.0-TWILGT)THEN
-        DYLN(NY,NX)=24.0
-      ELSEIF(AZI/DEC.LE.-1.0+TWILGT)THEN
-        DYLN(NY,NX)=0._r8
-      ELSE
-        DYLN(NY,NX)=12.0*(1.0+2.0/PICON*ASIN(TWILGT+AZI/DEC))
-      ENDIF
+
+!      DECLIN=SIN((DECDAY*0.9863)*1.7453E-02)*(-23.47)
+!      AZI=SIN(ALAT(NY,NX)*1.7453E-02)*SIN(DECLIN*1.7453E-02)
+!      DEC=COS(ALAT(NY,NX)*1.7453E-02)*COS(DECLIN*1.7453E-02)
+!      IF(AZI/DEC.GE.1.0-TWILGT)THEN
+!        DYLN(NY,NX)=24.0
+!      ELSEIF(AZI/DEC.LE.-1.0+TWILGT)THEN
+!        DYLN(NY,NX)=0._r8
+!      ELSE
+!        DYLN(NY,NX)=12.0*(1.0+2.0/PICON*ASIN(TWILGT+AZI/DEC))
+!      ENDIF
+      DYLN(NY,NX)=GetDayLength(ALAT(NY,NX),XI,DECLIN)
 !
 !     TIME STEP OF WEARHER DATA
 !     ITYPE 1=daily,2=hourly

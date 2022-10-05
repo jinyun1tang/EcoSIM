@@ -4,6 +4,7 @@ module SaltChemEquilibriaMod
   use minimathmod, only : test_aeqb
   use SoluteChemDataType, only : chem_var_type, solute_flx_type
   use SoluteParMod
+  use EcosimConst
   use EcoSIMSolverPar
   implicit none
   private
@@ -549,13 +550,13 @@ module SaltChemEquilibriaMod
 !     CNO1,CNOB=NO3 concentrations in non-band,band
 !
   IF(VOLWNO.GT.ZEROS2)THEN
-    CNO1=AMAX1(0._r8,ZNO3S/(14.0*VOLWNO))
+    CNO1=AMAX1(0._r8,ZNO3S/(natomw*VOLWNO))
   ELSE
     CNO1=0._r8
   ENDIF
 
   IF(VOLWNZ.GT.ZEROS2)THEN
-    CNOB=AMAX1(0._r8,ZNO3B/(14.0*VOLWNZ))
+    CNOB=AMAX1(0._r8,ZNO3B/(natomw*VOLWNZ))
   ELSE
     CNOB=0._r8
   ENDIF
@@ -589,7 +590,7 @@ module SaltChemEquilibriaMod
     CCL1=AMAX1(0._r8,ZCL/VOLWM)
     CCO31=AMAX1(0._r8,ZCO3/VOLWM)
     CHCO31=AMAX1(0._r8,ZHCO3/VOLWM)
-    CCO21=AMAX1(0._r8,CO2S/(12.0*VOLWM))
+    CCO21=AMAX1(0._r8,CO2S/(catomw*VOLWM))
     CALO1=AMAX1(0._r8,ZALOH1/VOLWM)
     CALO2=AMAX1(0._r8,ZALOH2/VOLWM)
     CALO3=AMAX1(0._r8,ZALOH3/VOLWM)
@@ -652,7 +653,7 @@ module SaltChemEquilibriaMod
 !     VOLWPO,VOLWPB=water volume in PO4 non-band,band
 !
   IF(VOLWPO.GT.ZEROS2)THEN
-    VOLWPX=31.0_r8*VOLWPO
+    VOLWPX=patomw*VOLWPO
     CH0P1=AMAX1(0._r8,H0PO4/VOLWPO)
     CH3P1=AMAX1(0._r8,H3PO4/VOLWPO)
     CF1P1=AMAX1(0._r8,ZFE1P/VOLWPO)

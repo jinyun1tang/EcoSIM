@@ -6,6 +6,7 @@ module readiMod
   use abortutils   , only : endrun
   use fileUtil     , only : open_safe, check_read
   use minimathmod  , only : test_aeqb, AZMAX1
+  use MiniFuncMod  , only : GetDayLength
   use SOMDataType
   use CanopyRadDataType
   use EcosimConst
@@ -38,10 +39,10 @@ module readiMod
   integer :: ll
   real(r8) :: DAT(50),DATK(50)
   real(r8) :: ALATG,ATCAG,AZI,ASPX,CO2EIG,CH4EG,DTBLIG,DTBLDIG
-  real(r8) :: DTBLGG,DECDAY,DEC,DPTHSX,OXYEG,RCHQNG,RCHQEG
+  real(r8) :: DTBLGG,DEC,DPTHSX,OXYEG,RCHQNG,RCHQEG
   real(r8) :: RCHQSG,RCHQWG,RCHGNUG,RCHGEUG,RCHGSUG,RCHGWUG
   real(r8) :: RCHGNTG,RCHGETG,RCHGSTG,RCHGWTG,RCHGDG
-  real(r8) :: SL0,XI,Z2GEG,Z2OEG,ZNH3EG,SLX,SL1,SL2
+  real(r8) :: SL0,Z2GEG,Z2OEG,ZNH3EG,SLX,SL1,SL2
 
   integer :: IDTBLG,IETYPG,L,NCNG,NH1,NH2,NV1,NV2,NL1
   integer :: NL2
@@ -64,6 +65,7 @@ module readiMod
   integer :: NM(JY,JX)
   real(r8) :: DHI(JX),DVI(JY)
   character(len=200) :: tline
+  real(r8) :: XI
 !
 ! begin_execution
 !
@@ -157,7 +159,7 @@ module readiMod
     write(*,*)'flag for salt model: ISALTG',ISALTG,model_status(isaltg)
     write(*,*)'flag for erosion model: IERSNG',IERSNG,erosion_model_status(iersng)
     write(*,*)'flag for lateral connections between grid cells (1),'// &
-      ' no connections (3): NCNG',NCNG
+      ' no connections (3): NCNG',GridConectionModel(NCNG)
     write(*,*)'depth of natural water table: DTBLIG',DTBLIG
     write(*,*)'depth of artificial water table: DTBLDIG',DTBLDIG
     write(*,*)'slope of natural water table relative to landscape '// &
@@ -215,28 +217,19 @@ module readiMod
       DH(NY,NX)=DHI(NX)
       DV(NY,NX)=DVI(NY)
       CO2E(NY,NX)=CO2EI(NY,NX)
-      H2GE(NY,NX)=1.0E-03
+      H2GE(NY,NX)=1.0E-03_r8
 !
 !     CALCULATE MAXIMUM DAYLENTH FOR PLANT PHENOLOGY
 !
 !     DYLM=maximum daylength (h)
 !
-      IF(ALAT(NY,NX).GT.0.0)THEN
-        XI=173
+      IF(ALAT(NY,NX).GT.0.0_r8)THEN
+        XI=173._r8
       ELSE
-        XI=356
+        XI=356._r8
       ENDIF
-      DECDAY=XI+100
-      DECLIN=SIN((DECDAY*0.9863)*1.7453E-02)*(-23.47)
-      AZI=SIN(ALAT(NY,NX)*1.7453E-02)*SIN(DECLIN*1.7453E-02)
-      DEC=COS(ALAT(NY,NX)*1.7453E-02)*COS(DECLIN*1.7453E-02)
-      IF(AZI/DEC.GE.1.0-TWILGT)THEN
-        DYLM(NY,NX)=24.0
-      ELSEIF(AZI/DEC.LE.-1.0+TWILGT)THEN
-        DYLM(NY,NX)=0.0
-      ELSE
-        DYLM(NY,NX)=12.0*(1.0+2.0/PICON*ASIN(TWILGT+AZI/DEC))
-      ENDIF
+      DYLM(NY,NX)=GetDayLength(ALAT(NY,NX),XI)
+
 9890  CONTINUE
 9895  CONTINUE
 !
@@ -280,7 +273,7 @@ module readiMod
 !
 !     CONVERT ASPECT TO GEOMETRIC FORMAT
 !
-!     what does geometric format mean?
+!     what is geometric format mean?
       ASP(NY,NX)=450.0_r8-ASP(NY,NX)
       IF(ASP(NY,NX).GE.360.0_r8)ASP(NY,NX)=ASP(NY,NX)-360.0_r8
 !
@@ -295,12 +288,6 @@ module readiMod
 !     NL1,NL2=number of additional layers below NJ with,without data in file
 !     ISOILR=natural(0),reconstructed(1) soil profile
 !
-!      READ(tline,*,iostat=ierr)PSIFC(NY,NX),PSIWP(NY,NX),ALBS(NY,NX),PH(0,NY,NX)
-!     2,RSC(1,0,NY,NX),RSN(1,0,NY,NX),RSP(1,0,NY,NX)
-!     3,RSC(0,0,NY,NX),RSN(0,0,NY,NX),RSP(0,0,NY,NX)
-!     4,RSC(2,0,NY,NX),RSN(2,0,NY,NX),RSP(2,0,NY,NX)
-!     5,IXTYP(1,NY,NX),IXTYP(2,NY,NX)
-!     6,NUI(NY,NX),NJ(NY,NX),NL1,NL2,ISOILR(NY,NX)
       read(9,'(A)')tline
       READ(tline,*,iostat=ierr)(datav(jj),jj=1,20)
       call check_read(ierr,20,__LINE__,mod_filename)
@@ -1081,4 +1068,22 @@ module readiMod
   end select
   end function erosion_model_status
 
+!------------------------------------------------------------------------------------------
+
+  function GridConectionModel(NCNG)result(status)
+  implicit none
+  integer, intent(in) :: NCNG
+  character(len=40) :: status
+
+  select case(NCNG)
+  case (0)
+    status='No lateral connnection'
+  case (3)
+    status='3D lateral connection'
+  case default
+    status=''
+    call endrun('wrong option for NCNG in '//trim(mod_filename)//' at line',__LINE__)
+  end select
+
+  end function GridConectionModel
 end module readiMod
