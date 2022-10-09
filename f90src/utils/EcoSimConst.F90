@@ -40,4 +40,5 @@ module EcosimConst
   real(r8), parameter :: Patomw=31._r8         !P 31 molar mass [g/mol]
   integer :: ICOR(12)=(/1,-1,0,0,1,1,2,3,3,4,4,5/)
   real(r8), parameter :: TWILGT=0.06976_r8
+  real(r8), parameter :: MWC2Soil=1.82E-06_r8  !convert organic carbon (g C/d2) to soil mass (Mg/d2)
 end module EcosimConst

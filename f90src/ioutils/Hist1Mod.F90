@@ -69,7 +69,7 @@ module Hist1Mod
 !
 !     OPEN AND NAME OUTPUT FILES
 !
-  DO N=21,30
+  D1010: DO N=21,30
     IF(DATAC(N,NE,NEX).NE.'NO')THEN
       WRITE(CHARR,'(I4)')IYRC
       OUTP(N-20)=CHARO//CHARR//DATAC(N,NE,NEX)
@@ -112,6 +112,7 @@ module Hist1Mod
             IF(L.EQ.56)HEAD(M)='BLYR_RSC'
             IF(L.EQ.57)HEAD(M)='[CAN_CO2]'
             IF(L.EQ.58)HEAD(M)='LAI'
+            print*,M,HEAD(M)
           ENDIF
         ENDDO
         NOUTP(N-20)=M
@@ -142,6 +143,7 @@ module Hist1Mod
             IF(L.EQ.69)HEAD(M)='PSI_RT_13'
             IF(L.EQ.70)HEAD(M)='PSI_RT_14'
             IF(L.EQ.71)HEAD(M)='PSI_RT_15'
+            print*,M,HEAD(M)
           ENDIF
         ENDDO
         NOUTP(N-20)=M
@@ -186,6 +188,7 @@ module Hist1Mod
             IF(L.EQ.83)HEAD(M)='UP_NO3_13'
             IF(L.EQ.84)HEAD(M)='UP_NO3_14'
             IF(L.EQ.85)HEAD(M)='UP_NO3_15'
+            print*,M,HEAD(M)
           ENDIF
         ENDDO
         NOUTP(N-20)=M
@@ -212,6 +215,7 @@ module Hist1Mod
             IF(L.EQ.65)HEAD(M)='UP_PO4_13'
             IF(L.EQ.66)HEAD(M)='UP_PO4_14'
             IF(L.EQ.67)HEAD(M)='UP_PO4_15'
+            print*,M,HEAD(M)
           ENDIF
         ENDDO
         NOUTP(N-20)=M
@@ -227,6 +231,7 @@ module Hist1Mod
             IF(L.EQ.54)HEAD(M)='CAN_G'
             IF(L.EQ.55)HEAD(M)='CAN_TEMP'
             IF(L.EQ.56)HEAD(M)='TEMP_FN'
+            print*,M,HEAD(M)
           ENDIF
         ENDDO
         NOUTP(N-20)=M
@@ -278,6 +283,7 @@ module Hist1Mod
             IF(L.EQ.90)HEAD(M)='NPP'
             IF(L.EQ.91)HEAD(M)='CAN_HT'
             IF(L.EQ.92)HEAD(M)='POPN'
+            print*,M,HEAD(M)
           ENDIF
         ENDDO
         NOUTP(N-20)=M
@@ -290,6 +296,7 @@ module Hist1Mod
             IF(L.EQ.51)HEAD(M)='TRANSPN'
             IF(L.EQ.52)HEAD(M)='WTR_STRESS'
             IF(L.EQ.53)HEAD(M)='OXY_STRESS'
+            print*,M,HEAD(M)
           ENDIF
         ENDDO
         NOUTP(N-20)=M
@@ -322,6 +329,7 @@ module Hist1Mod
             IF(L.EQ.71)HEAD(M)='STG_DEAD_N'
             IF(L.EQ.72)HEAD(M)='FIRE_N'
             IF(L.EQ.73)HEAD(M)='SF_LIT_N'
+            print*,M,HEAD(M)
           ENDIF
         ENDDO
         NOUTP(N-20)=M
@@ -350,6 +358,7 @@ module Hist1Mod
             IF(L.EQ.67)HEAD(M)='STG_DEAD_P'
             IF(L.EQ.68)HEAD(M)='FIRE_P'
             IF(L.EQ.69)HEAD(M)='SF_LIT_P'
+            print*,M,HEAD(M)
           ENDIF
         ENDDO
         NOUTP(N-20)=M
@@ -368,6 +377,7 @@ module Hist1Mod
             IF(L.EQ.57)HEAD(M)='MIN_LWP'
             IF(L.EQ.58)HEAD(M)='O2_STRESS'
             IF(L.EQ.59)HEAD(M)='TEMP_STRESS'
+            print*,M,HEAD(M)
           ENDIF
         ENDDO
         NOUTP(N-20)=M
@@ -375,7 +385,7 @@ module Hist1Mod
       IF(N.LE.25)WRITE(LUN,'(A12,2A8,50A16)')CDOY,DATE,HOUR,(HEAD(K),K=1,M)
       IF(N.GE.26)WRITE(LUN,'(A12,A8,50A16)')CDOY,DATE,(HEAD(K),K=1,M)
     ENDIF
-  ENDDO
+  ENDDO D1010
   RETURN
   END SUBROUTINE foutp
 
@@ -422,6 +432,7 @@ module Hist1Mod
 !     OPEN AND NAME OUTPUT FILES
 !
   DO N=21,30
+    write(*,*)'N=',N,'output config file ',DATAC(N,NE,NEX)
     IF(DATAC(N,NE,NEX).NE.'NO')THEN
       call OPEN_safe(15,PREFIX,DATAC(N,NE,NEX),'OLD',mod_filename,__LINE__)
       WRITE(CHARR,'(I4)')IYRC
@@ -530,6 +541,7 @@ module Hist1Mod
             IF(L.EQ.48)HEAD(M)='O2_14'
             IF(L.EQ.49)HEAD(M)='O2_15'
             IF(L.EQ.50)HEAD(M)='O2_LIT'
+            print*,M,HEAD(M)
           ENDIF
         ENDDO
         NOUTS(N-20)=M
@@ -589,6 +601,7 @@ module Hist1Mod
             IF(L.EQ.48)HEAD(M)='SURF_ICE'
             IF(L.EQ.49)HEAD(M)='ACTV_LYR'
             IF(L.EQ.50)HEAD(M)='WTR_TBL'
+            print*,M,HEAD(M)
           ENDIF
         ENDDO
         NOUTS(N-20)=M
@@ -635,6 +648,7 @@ module Hist1Mod
             IF(L.EQ.35)HEAD(M)='NH3_15'
             IF(L.EQ.36)HEAD(M)='N2O_LIT'
             IF(L.EQ.37)HEAD(M)='NH3_LIT'
+            print*,M,HEAD(M)
           ENDIF
         ENDDO
         NOUTS(N-20)=M
@@ -646,6 +660,7 @@ module Hist1Mod
             M=M+1
             IF(L.EQ.1)HEAD(M)='SURF_P_FLUX'
             IF(L.EQ.2)HEAD(M)='SUBS_P_FLUX'
+            print*,M,HEAD(M)
           ENDIF
         ENDDO
         NOUTS(N-20)=M
@@ -690,6 +705,7 @@ module Hist1Mod
             IF(L.EQ.33)HEAD(M)='TEMP_20'
             IF(L.EQ.34)HEAD(M)='TEMP_LITTER'
             IF(L.EQ.35)HEAD(M)='TEMP_SNOW'
+            print*,M,HEAD(M)
           ENDIF
         ENDDO
         NOUTS(N-20)=M
@@ -741,6 +757,7 @@ module Hist1Mod
             IF(L.EQ.48)HEAD(M)='FIRE_CH4'
             IF(L.EQ.49)HEAD(M)='TTL_DIC'
             IF(L.EQ.50)HEAD(M)='STG_DEAD'
+            print*,M,HEAD(M)
           ENDIF
         ENDDO
         NOUTS(N-20)=M
@@ -800,6 +817,7 @@ module Hist1Mod
             IF(L.EQ.48)HEAD(M)='SURF_ELEV'
             IF(L.EQ.49)HEAD(M)='ACTV_LYR'
             IF(L.EQ.50)HEAD(M)='WTR_TBL'
+            print*,M,HEAD(M)
           ENDIF
         ENDDO
         NOUTS(N-20)=M
@@ -859,6 +877,7 @@ module Hist1Mod
             IF(L.EQ.48)HEAD(M)='NET_N_MIN'
             IF(L.EQ.49)HEAD(M)='FIRE_N'
             IF(L.EQ.50)HEAD(M)='N2_FLUX'
+            print*,M,HEAD(M)
           ENDIF
         ENDDO
         NOUTS(N-20)=M
@@ -914,6 +933,7 @@ module Hist1Mod
             IF(L.EQ.44)HEAD(M)='EXCH_P_RES'
             IF(L.EQ.47)HEAD(M)='ECO_HVST_P'
             IF(L.EQ.48)HEAD(M)='NET_P_MIN'
+            print*,M,HEAD(M)
           ENDIF
         ENDDO
         NOUTS(N-20)=M
@@ -973,6 +993,7 @@ module Hist1Mod
             IF(L.EQ.48)HEAD(M)='ECND_11'
             IF(L.EQ.49)HEAD(M)='ECND_12'
             IF(L.EQ.50)HEAD(M)='TTL_SALT_DISCHG'
+            print*,M,HEAD(M)
           ENDIF
         ENDDO
         NOUTS(N-20)=M
@@ -1015,7 +1036,7 @@ module Hist1Mod
         DO NY=NVN,NVS
           DO NZ=1,NP0(NY,NX)
             IF(IFLGC(NZ,NY,NX).EQ.1)THEN
-    !
+!
 !     WRITE DAILY CROP DATA TO OUTPUT FILES
 !
               M=0

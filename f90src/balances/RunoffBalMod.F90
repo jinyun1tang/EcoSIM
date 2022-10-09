@@ -30,8 +30,9 @@ implicit none
   real(r8) :: XN
   real(r8) :: CXR,ZXR,PXR
   real(r8) :: ZGR
+
   SG=0._r8
-  DO 9985 L=NU(NY,NX),NL(NY,NX)
+  D9985: DO L=NU(NY,NX),NL(NY,NX)
 !
 !     LOCATE EXTERNAL BOUNDARIES
 !
@@ -40,15 +41,15 @@ implicit none
 !
     N1=NX
     N2=NY
-    DO 9980 N=1,3
-      DO 9975 NN=1,2
+    D9980: DO N=NCN(NY,NX),3
+      D9975: DO NN=1,2
         IF(N.EQ.1)THEN
           IF(NN.EQ.1)THEN
             IF(NX.EQ.NHE)THEN
               N4=NX+1
               N5=NY
               N6=L
-              XN=-1.0
+              XN=-1.0_r8
             ELSE
               cycle
             ENDIF
@@ -57,7 +58,7 @@ implicit none
               N4=NX
               N5=NY
               N6=L
-              XN=1.0
+              XN=1.0_r8
             ELSE
               cycle
             ENDIF
@@ -68,7 +69,7 @@ implicit none
               N4=NX
               N5=NY+1
               N6=L
-              XN=-1.0
+              XN=-1.0_r8
             ELSE
               cycle
             ENDIF
@@ -77,7 +78,7 @@ implicit none
               N4=NX
               N5=NY
               N6=L
-              XN=1.0
+              XN=1.0_r8
             ELSE
               cycle
             ENDIF
@@ -88,7 +89,7 @@ implicit none
               N4=NX
               N5=NY
               N6=L+1
-              XN=-1.0
+              XN=-1.0_r8
             ELSE
               cycle
             ENDIF
@@ -100,12 +101,12 @@ implicit none
         call RunoffXBoundaryFluxes(L,N,NY,NX,N1,N2,N4,N5,NN,XN,CXR,ZXR,PXR,ZGR)
     !
         call SubsurfaceBoundaryFluxes(I,J,N,NY,NX,N1,N2,N3,N4,N5,N6,XN)
-9975  CONTINUE
+      ENDDO D9975
 !
     !     WATER, HEAT, SOLUTES IN SNOW DRIFT
       call WaterHeatSoluteBySnowDrift(N,N4,N5,L,NY,NX,CXR,ZXR,PXR,ZGR,XN)
-9980  CONTINUE
-9985  CONTINUE
+    ENDDO D9980
+  ENDDO D9985
   end subroutine RunoffBal
 
 !------------------------------------------------------------------------------------------

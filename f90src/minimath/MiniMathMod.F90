@@ -15,6 +15,17 @@ module minimathmod
   public :: isLeap
   public :: AZMAX1,AZMIN1
 
+  interface AZMAX1
+    module procedure AZMAX1_s
+    module procedure AZMAX1_d
+  end interface AZMAX1
+
+  interface AZMIN1
+    module procedure AZMIN1_s
+    module procedure AZMIN1_d
+  end interface AZMIN1
+
+  public :: addone
   real(r8), parameter :: tiny_val=1.e-20_r8
   contains
 
@@ -113,7 +124,7 @@ module minimathmod
   end function isLeap
 !------------------------------------------------------------------------------------------
 
-  function AZMAX1(val)result(ans)
+  function AZMAX1_s(val)result(ans)
   implicit none
   real(r8), intent(in) :: val
 
@@ -121,10 +132,22 @@ module minimathmod
 
   ans=AMAX1(0.0_r8,val)
 
-  end function AZMAX1
+  end function AZMAX1_s
 !------------------------------------------------------------------------------------------
 
-  function AZMIN1(val)result(ans)
+  function AZMAX1_d(val1,val2)result(ans)
+  implicit none
+  real(r8), intent(in) :: val1,val2
+
+  real(r8) :: ans
+
+  ans=AMAX1(0.0_r8,val1,val2)
+
+  end function AZMAX1_d
+
+!------------------------------------------------------------------------------------------
+
+  function AZMIN1_s(val)result(ans)
   implicit none
   real(r8), intent(in) :: val
 
@@ -132,6 +155,34 @@ module minimathmod
 
   ans=AMIN1(0.0_r8,val)
 
-  end function AZMIN1
+  end function AZMIN1_s
+
+
+!------------------------------------------------------------------------------------------
+
+  function AZMIN1_d(val1,val2)result(ans)
+  implicit none
+  real(r8), intent(in) :: val1,val2
+
+  real(r8) :: ans
+
+  ans=AMIN1(0.0_r8,val1,val2)
+
+  end function AZMIN1_d
+
+! ----------------------------------------------------------------------
+
+  function addone(itemp)result(ans)
+!
+!  DESCRIPTION
+! increase itemp by one
+  implicit none
+  integer, intent(inout) :: itemp
+
+  integer :: ans
+
+  itemp=itemp+1
+  ans=itemp
+  end function addone
 
 end module minimathmod

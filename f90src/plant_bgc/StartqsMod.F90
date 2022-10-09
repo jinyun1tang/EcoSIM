@@ -485,17 +485,15 @@ module StartqsMod
 !     RSRR,RSRA=radial,axial root resistivity (m2 MPa-1 h-1)
 !
   SDPTH(NZ)=SDPTHI(NZ)
-  print*,'set seed',SDPTH(NZ),CDPTHZ(NU-1),CDPTHZ(NU),NU,NL
-  DO 9795 L=NU,NL
+  D9795: DO L=NU,NL
     IF(SDPTH(NZ).GE.CDPTHZ(L-1).AND.SDPTH(NZ).LT.CDPTHZ(L))THEN
       NG(NZ)=L
       NIX(NZ)=L
-      print*,'set ninr startq'
-      DO 9790 NR=1,JC1
+      D9790: DO NR=1,JC1
         NINR(NR,NZ)=L
-9790  CONTINUE
+      ENDDO D9790
     ENDIF
-9795  CONTINUE
+  ENDDO D9795
   CNRTS(NZ)=CNRT(NZ)*DMRT(NZ)
   CPRTS(NZ)=CPRT(NZ)*DMRT(NZ)
   RRAD1M(2,NZ)=5.0E-06_r8

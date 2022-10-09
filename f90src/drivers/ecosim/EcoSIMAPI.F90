@@ -97,6 +97,7 @@ contains
 
   subroutine SetMesh(NHW,NVN,NHE,NVS)
 
+  use EcoSIMConfig, only : column_mode
   use GridConsts, only : JX,JY,JZ,JH,JV,JD
 !  set up the landscape rectangular mesh
 !  beginning(NHW,NVN)
@@ -113,11 +114,15 @@ contains
   integer, intent(in) :: NVN   !upper corner y index
   integer, intent(in) :: NHE   !lower corner x index
   integer, intent(in) :: NVS   !lower corner y index
-  JX=(NHE-NHW)+2
-  JY=(NVS-NVN)+2
+  integer :: nextra_grid
+
+  nextra_grid=1
+  if(column_mode)nextra_grid=0
+  JX=(NHE-NHW)+1+nextra_grid
+  JY=(NVS-NVN)+1+nextra_grid
   JZ=14
-  JH=JX+1
-  JV=JY+1
+  JH=JX+nextra_grid
+  JV=JY+nextra_grid  
   JD=JZ+1
   print*,'grid size'
   print*,'JX=',JX,'JY=',JY

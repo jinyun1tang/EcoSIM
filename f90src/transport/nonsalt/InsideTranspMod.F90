@@ -118,13 +118,13 @@ module InsideTranspMod
   end subroutine DestructInsTp
 !------------------------------------------------------------------------------------------
 
-  subroutine ModelTracerHydroFlux(M,MX, NHW, NHE, NVN, NVS)
+  subroutine ModelTracerHydroFlux(M,MX, NHW, NHE, NVN, NVS,FLQM)
   implicit none
 
   integer, intent(in) :: M,MX, NHW, NHE, NVN, NVS
+  real(r8), intent(inout) :: FLQM(3,JD,JV,JH)
   integer :: NY,NX
   real(r8) :: FLWRM1
-  real(r8) :: FLQM(3,JD,JV,JH)
 
   DO NX=NHW,NHE
     DO  NY=NVN,NVS
@@ -167,7 +167,7 @@ module InsideTranspMod
 !
 !     SOLUTE FLUXES BETWEEN ADJACENT GRID CELLS
 !
-      call TracerExchInBetweenCells(M,MX,NY,NX,NHE,NVS)
+      call TracerExchInBetweenCells(M,MX,NY,NX,NHE,NVS,FLQM)
 
     ENDDO
   ENDDO
@@ -374,7 +374,7 @@ module InsideTranspMod
 
 !------------------------------------------------------------------------------------------
 
-  subroutine TracerExchInBetweenCells(M,MX,NY,NX,NHE,NVS)
+  subroutine TracerExchInBetweenCells(M,MX,NY,NX,NHE,NVS,FLQM)
 !
 ! DESCRIPTION
 ! exchanges tracers within (gaseous vs aqueous phase) and between
@@ -382,7 +382,7 @@ module InsideTranspMod
   implicit none
 
   integer, intent(in) :: M,MX, NY, NX, NHE, NVS
-  real(r8) :: FLQM(3,JD,JV,JH)
+  real(r8), intent(inout) :: FLQM(3,JD,JV,JH)
   real(r8) :: VFLW
   real(r8) :: VOLH2A,VOLH2B
   real(r8) :: VOLWHS,VOLWT
@@ -395,17 +395,17 @@ module InsideTranspMod
 !     N6,N5,N4=L,NY,NX of destination grid cell
 !
   IFLGB=0
-  DO 125 L=1,NL(NY,NX)
+  D125: DO L=1,NL(NY,NX)
     N1=NX
     N2=NY
     N3=L
 !
 !     LOCATE INTERNAL BOUNDARIES BETWEEN ADJACENT GRID CELLS
 !
-    DO 120 N=NCN(N2,N1),3
+    D120: DO N=NCN(N2,N1),3
       IF(N.EQ.1)THEN
         IF(NX.EQ.NHE)THEN
-          GO TO 120
+          cycle
         ELSE
           N4=NX+1
           N5=NY
@@ -413,7 +413,7 @@ module InsideTranspMod
         ENDIF
       ELSEIF(N.EQ.2)THEN
         IF(NY.EQ.NVS)THEN
-          GO TO 120
+          cycle
         ELSE
           N4=NX
           N5=NY+1
@@ -421,7 +421,7 @@ module InsideTranspMod
         ENDIF
       ELSEIF(N.EQ.3)THEN
         IF(L.EQ.NL(NY,NX))THEN
-          GO TO 120
+          cycle
         ELSE
           N4=NX
           N5=NY
@@ -494,13 +494,13 @@ module InsideTranspMod
       ELSE
         call ZeroTransport2(N,N1,N2,N3,N4,N5,N6)
       ENDIF
-120 CONTINUE
+    ENDDO D120
 !
 !     CHECK FOR BUBBLING IF THE SUM OF ALL GASEOUS EQUIVALENT
 !     PARTIAL CONCENTRATIONS EXCEEDS ATMOSPHERIC PRESSURE
     call BubbleEfflux(M,N1,N2,N3,NY,NX,MX,IFLGB)
 
-125 CONTINUE
+  ENDDO D125
   end subroutine TracerExchInBetweenCells
 
 ! ----------------------------------------------------------------------

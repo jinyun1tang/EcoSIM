@@ -1,6 +1,6 @@
 module AquachemMod
   use data_kind_mod  , only : r8 => SHR_KIND_R8
-  use MiscUtilMod    , only : addone
+  use MiniMathMod    , only : addone
   use ModelStatusType, only : model_status_type
   use EcosimConst
   use ChemIDMod

@@ -37,7 +37,7 @@ module BoundaryTranspMod
 !
   DO  NX=NHW,NHE
     DO  NY=NVN,NVS
-      DO L=NU(NY,NX),NL(NY,NX)
+      D9585: DO L=NU(NY,NX),NL(NY,NX)
         N1=NX
         N2=NY
         N3=L
@@ -45,8 +45,8 @@ module BoundaryTranspMod
 !     LOCATE ALL EXTERNAL BOUNDARIES AND SET BOUNDARY CONDITIONS
 !     ENTERED IN 'READS'
 !
-        DO  N=1,3
-          DO  NN=1,2
+        D9580: DO  N=NCN(NY,NX),3
+          D9575: DO  NN=1,2
             IF(N.EQ.1)THEN
 !direction x
               N4=NX+1
@@ -158,7 +158,7 @@ module BoundaryTranspMod
 !     SOLUTE LOSS WITH SUBSURFACE MICROPORE WATER LOSS
 !
             ENDIF
-          ENDDO
+          ENDDO D9575
 !
 !     NET GAS AND SOLUTE FLUXES IN EACH GRID CELL
 !C
@@ -182,8 +182,8 @@ module BoundaryTranspMod
           IF(NCN(N2,N1).NE.3.OR.N.EQ.3)THEN
             call NetFluxMicroandMacropores(NY,NX,N,M,MX,N1,N2,N3,N4,N5,N6)
           ENDIF
-        ENDDO
-      ENDDO
+        ENDDO D9580
+      ENDDO D9585
     ENDDO
   ENDDO
   end subroutine BoundaryFlux

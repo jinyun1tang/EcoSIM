@@ -53,7 +53,7 @@ contains
   implicit none
   integer, intent(in) :: NY,NX,M
   integer, intent(in) :: NHE,NHW,NVS,NVN
-  real(r8),intent(out) :: FLQM(3,JD,JV,JH)
+  real(r8),intent(inout) :: FLQM(3,JD,JV,JH)
   real(r8) :: FLWRM1
 !     VOLWM,VOLWHM,VOLPM,FLPM=micropore,macropore water volume, air volume and change in air volume
 !     FLWM,FLWHM=water flux into soil micropore,macropore from watsub.f

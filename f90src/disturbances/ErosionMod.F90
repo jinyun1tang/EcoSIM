@@ -19,6 +19,7 @@ module ErosionMod
   use GridDataType
   use EcoSIMConfig, only : nlbiomcp => nlbiomcpc, ndbiomcp=> ndbiomcpc
   use EcoSIMConfig, only : jcplx1=> jcplx1c, NFGs => NFGsc,jcplx=>jcplxc
+  use EcoSIMConfig, only : column_mode
   implicit none
 
   private
@@ -79,7 +80,7 @@ module ErosionMod
 !
 !     EXTERNAL BOUNDARY SEDIMENT FLUXES
 !
-  call ExternalSedimentFluxes(NHW,NHE,NVN,NVS)
+  if(.not.column_mode)call ExternalSedimentFluxes(NHW,NHE,NVN,NVS)
 
   END subroutine erosion
 !---------------------------------------------------------------------------------------------------
@@ -279,7 +280,7 @@ module ErosionMod
           ENDIF
         ENDIF
 !
-        call XBoundSedTransp(M,NY,NX,NHW,NHE,NVN,NVS,N1,N2)
+        if(.not. column_mode)call XBoundSedTransp(M,NY,NX,NHW,NHE,NVN,NVS,N1,N2)
 
       ENDIF
     ENDDO
@@ -306,8 +307,8 @@ module ErosionMod
   integer :: M1,M2,M4,M5
   real(r8) :: RCHQF,FERM,XN
 
-  DO  N=1,2
-    DO  NN=1,2
+  D9580: DO  N=1,2
+    D9575: DO  NN=1,2
       IF(N.EQ.1)THEN
         N4=NX+1
         N5=NY
@@ -319,7 +320,7 @@ module ErosionMod
             M2=NY
             M4=NX+1
             M5=NY
-            XN=-1.0
+            XN=-1.0_r8
             RCHQF=RCHQE(M2,M1)
           ELSE
             cycle
@@ -330,7 +331,7 @@ module ErosionMod
             M2=NY
             M4=NX
             M5=NY
-            XN=1.0
+            XN=1.0_r8
             RCHQF=RCHQW(M5,M4)
           ELSE
             cycle
@@ -347,7 +348,7 @@ module ErosionMod
             M2=NY
             M4=NX
             M5=NY+1
-            XN=-1.0
+            XN=-1.0_r8
             RCHQF=RCHQS(M2,M1)
           ELSE
             cycle
@@ -358,7 +359,7 @@ module ErosionMod
             M2=NY
             M4=NX
             M5=NY
-            XN=1.0
+            XN=1.0_r8
             RCHQF=RCHQN(M5,M4)
           ELSE
             cycle
@@ -388,11 +389,11 @@ module ErosionMod
           ENDIF
         ENDIF
       ENDIF
-    ENDDO
+    ENDDO D9575
 !
 !     TOTAL SEDIMENT FLUXES
 !
-    DO  NN=1,2
+    D1202: DO  NN=1,2
       TERSED(N2,N1)=TERSED(N2,N1)+RERSED(N,NN,N2,N1)
       IF(IFLBM(M,N,NN,N5,N4).EQ.0)THEN
         TERSED(N2,N1)=TERSED(N2,N1)-RERSED(N,NN,N5,N4)
@@ -400,8 +401,8 @@ module ErosionMod
       IF(N4B.GT.0.AND.N5B.GT.0.AND.NN.EQ.1)THEN
         TERSED(N2,N1)=TERSED(N2,N1)-RERSED(N,NN,N5B,N4B)
       ENDIF
-    ENDDO
-  ENDDO
+    ENDDO D1202
+  ENDDO D9580
   end subroutine XBoundSedTransp
 !------------------------------------------------------------------------------------------
 
@@ -940,8 +941,8 @@ module ErosionMod
       IF((IERSNG.EQ.1.OR.IERSNG.EQ.3).AND.BKDS(NU(NY,NX),NY,NX).GT.ZERO)THEN
         N1=NX
         N2=NY
-        DO  N=1,2
-          DO  NN=1,2
+        D8980: DO  N=1,2
+          D8975: DO  NN=1,2
             IF(N.EQ.1)THEN
               N4=NX+1
               N5=NY
@@ -951,7 +952,7 @@ module ErosionMod
                   M2=NY
                   M4=NX+1
                   M5=NY
-                  XN=-1.0
+                  XN=-1.0_r8
                   RCHQF=RCHQE(M2,M1)
                 ELSE
                   cycle
@@ -962,7 +963,7 @@ module ErosionMod
                   M2=NY
                   M4=NX
                   M5=NY
-                  XN=1.0
+                  XN=1.0_r8
                   RCHQF=RCHQW(M5,M4)
                 ELSE
                   cycle
@@ -977,7 +978,7 @@ module ErosionMod
                   M2=NY
                   M4=NX
                   M5=NY+1
-                  XN=-1.0
+                  XN=-1.0_r8
                   RCHQF=RCHQS(M2,M1)
                 ELSE
                   cycle
@@ -988,7 +989,7 @@ module ErosionMod
                   M2=NY
                   M4=NX
                   M5=NY
-                  XN=1.0
+                  XN=1.0_r8
                   RCHQF=RCHQN(M5,M4)
                 ELSE
                   cycle
@@ -1209,8 +1210,8 @@ module ErosionMod
                 ENDDO
               ENDDO
             ENDIF
-          ENDDO
-        ENDDO
+          ENDDO D8975
+        ENDDO D8980
       ENDIF
     ENDDO
   ENDDO

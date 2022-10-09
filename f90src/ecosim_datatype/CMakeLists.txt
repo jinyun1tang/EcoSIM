@@ -32,6 +32,7 @@ set(ECOSIM_DATATYPE_SOURCES
 )
 
 include_directories(${CMAKE_BINARY_DIR}/f90src/utils/)
+include_directories(${CMAKE_BINARY_DIR}/f90src/modelconfig/)
 
 include(add_ecosim_library)
 add_ecosim_library(ecosim_datatype ${ECOSIM_DATATYPE_SOURCES})

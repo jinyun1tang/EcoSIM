@@ -6,6 +6,8 @@
 !     TO INITIALIZE LATER MODEL RUNS
 !
   use data_kind_mod, only : r8 => SHR_KIND_R8
+  use EcoSIMConfig, only : jcplx=> jcplxc, NFGs=> NFGsc,nlbiomcp=>nlbiomcpc
+  use EcoSIMConfig, only : ndbiomcp=>ndbiomcpc,jsken=>jskenc
   use MicrobialDataType
   use SOMDataType
   use ChemTranspDataType
@@ -346,8 +348,8 @@
         WRITE(21,91)I,IDATA(3),(PCACO(L,NY,NX),L=1,NLI(NY,NX))
         WRITE(21,91)I,IDATA(3),(PCASO(L,NY,NX),L=1,NLI(NY,NX))
       ENDIF
-      DO 9985 K=0,5
-        DO  N=1,7
+      D9985: DO K=0,jcplx1
+        DO  N=1,NFGs
           DO NGL=1,JG
             WRITE(22,91)I,IDATA(3),(ROXYS(NGL,N,K,L,NY,NX),L=0,NLI(NY,NX))
             WRITE(22,91)I,IDATA(3),(RVMX4(NGL,N,K,L,NY,NX),L=0,NLI(NY,NX))
@@ -363,35 +365,54 @@
             WRITE(22,91)I,IDATA(3),(RINHB(NGL,N,K,L,NY,NX),L=0,NLI(NY,NX))
             WRITE(22,91)I,IDATA(3),(RINOB(NGL,N,K,L,NY,NX),L=0,NLI(NY,NX))
             WRITE(22,91)I,IDATA(3),(RIPBO(NGL,N,K,L,NY,NX),L=0,NLI(NY,NX))
-            IF(K.LE.4)THEN
-              WRITE(22,91)I,IDATA(3),(ROQCS(NGL,N,K,L,NY,NX),L=0,NLI(NY,NX))
-              WRITE(22,91)I,IDATA(3),(ROQAS(NGL,N,K,L,NY,NX),L=0,NLI(NY,NX))
-            ENDIF
+            WRITE(22,91)I,IDATA(3),(ROQCS(NGL,N,K,L,NY,NX),L=0,NLI(NY,NX))
+            WRITE(22,91)I,IDATA(3),(ROQAS(NGL,N,K,L,NY,NX),L=0,NLI(NY,NX))
             WRITE(22,91)I,IDATA(3),RINHOR(NGL,N,K,NY,NX)
             WRITE(22,91)I,IDATA(3),RINOOR(NGL,N,K,NY,NX)
             WRITE(22,91)I,IDATA(3),RIPOOR(NGL,N,K,NY,NX)
-            if(K.ne.5)then
-            DO M=1,3
+            DO M=1,nlbiomcp
               WRITE(22,91)I,IDATA(3),(OMC(M,NGL,N,K,L,NY,NX),L=0,NLI(NY,NX))
               WRITE(22,91)I,IDATA(3),(OMN(M,NGL,N,K,L,NY,NX),L=0,NLI(NY,NX))
               WRITE(22,91)I,IDATA(3),(OMP(M,NGL,N,K,L,NY,NX),L=0,NLI(NY,NX))
             enddo
-            ELSE
-            DO M=1,3
-              WRITE(22,91)I,IDATA(3),(OMCff(M,NGL,N,L,NY,NX),L=0,NLI(NY,NX))
-              WRITE(22,91)I,IDATA(3),(OMNff(M,NGL,N,L,NY,NX),L=0,NLI(NY,NX))
-              WRITE(22,91)I,IDATA(3),(OMPff(M,NGL,N,L,NY,NX),L=0,NLI(NY,NX))
-            enddo
-            ENDIF
           enddo
         enddo
-9985  CONTINUE
-      DO 9980 K=0,4
-        DO 9975 M=1,2
+      ENDDO D9985
+
+      DO  N=1,NFGs
+        DO NGL=1,JG
+          WRITE(22,91)I,IDATA(3),(ROXYSff(NGL,N,L,NY,NX),L=0,NLI(NY,NX))
+          WRITE(22,91)I,IDATA(3),(RVMX4ff(NGL,N,L,NY,NX),L=0,NLI(NY,NX))
+          WRITE(22,91)I,IDATA(3),(RVMX3ff(NGL,N,L,NY,NX),L=0,NLI(NY,NX))
+          WRITE(22,91)I,IDATA(3),(RVMX2ff(NGL,N,L,NY,NX),L=0,NLI(NY,NX))
+          WRITE(22,91)I,IDATA(3),(RVMX1ff(NGL,N,L,NY,NX),L=0,NLI(NY,NX))
+          WRITE(22,91)I,IDATA(3),(RVMB4ff(NGL,N,L,NY,NX),L=0,NLI(NY,NX))
+          WRITE(22,91)I,IDATA(3),(RVMB3ff(NGL,N,L,NY,NX),L=0,NLI(NY,NX))
+          WRITE(22,91)I,IDATA(3),(RVMB2ff(NGL,N,L,NY,NX),L=0,NLI(NY,NX))
+          WRITE(22,91)I,IDATA(3),(RINHOff(NGL,N,L,NY,NX),L=0,NLI(NY,NX))
+          WRITE(22,91)I,IDATA(3),(RINOOff(NGL,N,L,NY,NX),L=0,NLI(NY,NX))
+          WRITE(22,91)I,IDATA(3),(RIPOOff(NGL,N,L,NY,NX),L=0,NLI(NY,NX))
+          WRITE(22,91)I,IDATA(3),(RINHBff(NGL,N,L,NY,NX),L=0,NLI(NY,NX))
+          WRITE(22,91)I,IDATA(3),(RINOBff(NGL,N,L,NY,NX),L=0,NLI(NY,NX))
+          WRITE(22,91)I,IDATA(3),(RIPBOff(NGL,N,L,NY,NX),L=0,NLI(NY,NX))
+          WRITE(22,91)I,IDATA(3),RINHORff(NGL,N,NY,NX)
+          WRITE(22,91)I,IDATA(3),RINOORff(NGL,N,NY,NX)
+          WRITE(22,91)I,IDATA(3),RIPOORff(NGL,N,NY,NX)
+          DO M=1,nlbiomcp
+            WRITE(22,91)I,IDATA(3),(OMCff(M,NGL,N,L,NY,NX),L=0,NLI(NY,NX))
+            WRITE(22,91)I,IDATA(3),(OMNff(M,NGL,N,L,NY,NX),L=0,NLI(NY,NX))
+            WRITE(22,91)I,IDATA(3),(OMPff(M,NGL,N,L,NY,NX),L=0,NLI(NY,NX))
+          enddo
+        enddo
+      enddo
+
+
+      D9980: DO K=0,jcplx1
+        D9975: DO M=1,ndbiomcp
           WRITE(22,91)I,IDATA(3),(ORC(M,K,L,NY,NX),L=0,NLI(NY,NX))
           WRITE(22,91)I,IDATA(3),(ORN(M,K,L,NY,NX),L=0,NLI(NY,NX))
           WRITE(22,91)I,IDATA(3),(ORP(M,K,L,NY,NX),L=0,NLI(NY,NX))
-9975    CONTINUE
+        ENDDO D9975
         WRITE(22,91)I,IDATA(3),(OQC(K,L,NY,NX),L=0,NLI(NY,NX))
         WRITE(22,91)I,IDATA(3),(OQN(K,L,NY,NX),L=0,NLI(NY,NX))
         WRITE(22,91)I,IDATA(3),(OQP(K,L,NY,NX),L=0,NLI(NY,NX))
@@ -404,13 +425,13 @@
         WRITE(22,91)I,IDATA(3),(OHN(K,L,NY,NX),L=0,NLI(NY,NX))
         WRITE(22,91)I,IDATA(3),(OHP(K,L,NY,NX),L=0,NLI(NY,NX))
         WRITE(22,91)I,IDATA(3),(OHA(K,L,NY,NX),L=0,NLI(NY,NX))
-        DO 9970 M=1,4
+        D9970: DO M=1,jsken
           WRITE(22,91)I,IDATA(3),(OSC(M,K,L,NY,NX),L=0,NLI(NY,NX))
           WRITE(22,91)I,IDATA(3),(OSA(M,K,L,NY,NX),L=0,NLI(NY,NX))
           WRITE(22,91)I,IDATA(3),(OSN(M,K,L,NY,NX),L=0,NLI(NY,NX))
           WRITE(22,91)I,IDATA(3),(OSP(M,K,L,NY,NX),L=0,NLI(NY,NX))
-9970    CONTINUE
-9980  CONTINUE
+        ENDDO D9970
+      ENDDO D9980
       WRITE(22,91)I,IDATA(3),(RVMXC(L,NY,NX),L=0,NLI(NY,NX))
       WRITE(22,91)I,IDATA(3),(ORGC(L,NY,NX),L=0,NLI(NY,NX))
       WRITE(22,91)I,IDATA(3),(ORGR(L,NY,NX),L=0,NLI(NY,NX))

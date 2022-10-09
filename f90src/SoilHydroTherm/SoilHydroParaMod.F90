@@ -188,7 +188,7 @@ contains
       PSD(L,NY,NX)=PSL(L,NY,NX)-FCL(L,NY,NX)
       FCD(L,NY,NX)=FCL(L,NY,NX)-WPL(L,NY,NX)
     ENDIF
-    !IBEGIN:   start date of model run
+!   IBEGIN:   start date of model run
     !IDATA(9): start year of model run
     IF(I.EQ.IBEGIN.AND.J.EQ.1.AND.IYRC.EQ.IDATA(9))THEN
       IF(THW(L,NY,NX).GT.1.0_r8.OR.DPTH(L,NY,NX).GE.DTBLZ(NY,NX))THEN
@@ -215,8 +215,8 @@ contains
         VOLWH(L,NY,NX)=THETW(L,NY,NX)*VOLAH(L,NY,NX)
         VOLI(L,NY,NX)=THETI(L,NY,NX)*VOLX(L,NY,NX)
         VOLIH(L,NY,NX)=THETI(L,NY,NX)*VOLAH(L,NY,NX)
-        VHCP(L,NY,NX)=VHCM(L,NY,NX)+4.19*(VOLW(L,NY,NX) &
-          +VOLWH(L,NY,NX))+1.9274*(VOLI(L,NY,NX)+VOLIH(L,NY,NX))
+        VHCP(L,NY,NX)=VHCM(L,NY,NX)+Cpw*(VOLW(L,NY,NX) &
+          +VOLWH(L,NY,NX))+Cpi*(VOLI(L,NY,NX)+VOLIH(L,NY,NX))
         THETWZ(L,NY,NX)=THETW(L,NY,NX)
         THETIZ(L,NY,NX)=THETI(L,NY,NX)
       ENDIF
@@ -331,7 +331,8 @@ contains
   integer  :: K,M
   real(r8) :: XK,YK
   real(r8) :: SUM1,SUM2
-  real(r8) :: THETK(100),PSISK(0:100)
+  integer, parameter :: n100=100
+  real(r8) :: THETK(n100),PSISK(0:n100)
 
   IF(VOLT(0,NY,NX).GT.ZEROS2(NY,NX))THEN
     BKDS(0,NY,NX)=BKVL(0,NY,NX)/VOLT(0,NY,NX)
@@ -340,9 +341,9 @@ contains
   ENDIF
   THETY(0,NY,NX)=EXP((PSIMX(NY,NX)-LOG(-PSIHY))*FCD(0,NY,NX)/PSIMD(NY,NX)+FCL(0,NY,NX))
   SUM2=0.0_r8
-  DO  K=1,100
+  D1220: DO  K=1,n100
     XK=K-1
-    THETK(K)=POROS0(NY,NX)-(XK/100.0*POROS0(NY,NX))
+    THETK(K)=POROS0(NY,NX)-(XK/n100*POROS0(NY,NX))
     IF(THETK(K).LT.FC(0,NY,NX))THEN
       PSISK(K)=AMAX1(PSIHY,-EXP(PSIMX(NY,NX)+((FCL(0,NY,NX)-LOG(THETK(K))) &
           /FCD(0,NY,NX)*PSIMD(NY,NX))))
@@ -353,21 +354,21 @@ contains
       PSISK(K)=PSISE(0,NY,NX)
     ENDIF
     SUM2=SUM2+(2*K-1)/(PSISK(K)**2)
-  ENDDO
+  ENDDO D1220
 
-  DO  K=1,100
+  D1235: DO  K=1,n100
     SUM1=0.0_r8
     XK=K-1
-    YK=((100.0_r8-XK)/100.0_r8)**1.33_r8
-    DO M=K,100
+    YK=((n100-XK)/n100)**1.33_r8
+    D1230: DO M=K,n100
         SUM1=SUM1+(2*M+1-2*K)/(PSISK(M)**2._r8)
-    ENDDO
+    ENDDO D1230
     HCND(3,K,0,NY,NX)=SCNV(0,NY,NX)*YK*SUM1/SUM2
     HCND(1,K,0,NY,NX)=0.0_r8
     HCND(2,K,0,NY,NX)=0.0_r8
     IF(K.GT.1.AND.PSISK(K).LT.PSISA(0,NY,NX).AND.PSISK(K-1).GE.PSISA(0,NY,NX))THEN
       THETS(0,NY,NX)=THETK(K)
     ENDIF
-  ENDDO
+  ENDDO D1235
   end subroutine LitterHydroproperty
 end module SoilHydroParaMod

@@ -125,12 +125,13 @@ module TrnsfrMod
   integer, intent(in) :: I, J
   integer, intent(in) :: NHW,NHE,NVN,NVS
   integer :: MX,MM,M
-
+  real(r8) :: FLQM(3,JD,JV,JH)
 !     execution begins here
 !
 !     TIME STEPS FOR SOLUTE AND GAS FLUX CALCULATIONS
 !
 
+  FLQM(:,:,:,:)=0._r8
   call InitFluxandStateVariables(I,NHW,NHE,NVN,NVS)
 
 !
@@ -142,7 +143,7 @@ module TrnsfrMod
   DO  MM=1,NPG
     M=MIN(NPH,INT((MM-1)*XNPT)+1)
 
-    call ModelTracerHydroFlux(M,MX,NHW, NHE, NVN, NVS)
+    call ModelTracerHydroFlux(M,MX,NHW, NHE, NVN, NVS,FLQM)
 !
 !     BOUNDARY SOLUTE AND GAS FLUXES
 !

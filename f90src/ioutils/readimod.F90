@@ -56,6 +56,7 @@ module readiMod
 ! Description:
 ! THIS SUBROUTINE READS ALL SOIL AND TOPOGRAPHIC INPUT FILES
 !
+  use EcoSIMConfig, only : column_mode
   implicit none
   integer, intent(in) :: NT,NE,NTX,NEX,NTZX,NHW,NHE,NVN,NVS
   integer, intent(out) :: NF, NFX, NTZ
@@ -123,6 +124,13 @@ module readiMod
   READ(tline,*,iostat=ierr)IETYPG,ISALTG,IERSNG,NCNG,DTBLIG,DTBLDIG,DTBLGG
   call check_read(ierr,7,__LINE__,mod_filename)
 
+
+  if(column_mode)then
+    if(NCNG/=3)then
+      call endrun('Because the column_mode in on, no lateral transport is allowed, in '// &
+        trim(mod_filename)//' at line',__LINE__)
+    endif
+  endif
   read(1,'(A)')tline
   READ(tline,*,iostat=ierr)RCHQNG,RCHQEG,RCHQSG,RCHQWG,RCHGNUG,RCHGEUG,RCHGSUG &
       ,RCHGWUG,RCHGNTG,RCHGETG,RCHGSTG,RCHGWTG,RCHGDG
@@ -145,8 +153,7 @@ module readiMod
     write(*,*)'Latitude (o): ALATG',ALATG
     write(*,*)'Altitude (m): ALTIG',ALTIG
     write(*,*)'Mean annual temperaure (oC): ATCAG',ATCAG
-    write(*,*)'water table flag, 0=none, 1=natural stationary, '// &
-      '2=natural mobile, 3=artificial stationary, 4=artificial mobile',IDTBLG
+    write(*,*)'water table flag ',IDTBLG, WaterTableStatus(IDTBLG)
     write(*,'(40A)')('-',ll=1,40)
     write(*,*)'atmospheric O2 (ppm): OXYEG',OXYEG
     write(*,*)'atmospheric N2 (ppm): Z2GEG',Z2GEG
@@ -273,7 +280,8 @@ module readiMod
 !
 !     CONVERT ASPECT TO GEOMETRIC FORMAT
 !
-!     what is geometric format mean?
+!     what is geometric format mean? 0 is north, 90 east, 180 south,
+!     geometric format 0/360 is east,
       ASP(NY,NX)=450.0_r8-ASP(NY,NX)
       IF(ASP(NY,NX).GE.360.0_r8)ASP(NY,NX)=ASP(NY,NX)-360.0_r8
 !
@@ -1020,22 +1028,21 @@ module readiMod
       FMPR(0,NY,NX)=1.0_r8
     ENDDO
   ENDDO
-    CLOSE(9)
-    GO TO 50
+  CLOSE(9)
+  GO TO 50
 20  CONTINUE
-    CLOSE(7)
+  CLOSE(7)
+  if(.not.column_mode)then
     DO  NX=NHW,NHE
       NL(NVS+1,NX)=NL(NVS,NX)
-!     WRITE(*,2223)'NHE',NX,NHW,NHE,NVS,NL(NVS,NX)
     ENDDO
     DO  NY=NVN,NVS
       NL(NY,NHE+1)=NL(NY,NHE)
-!     WRITE(*,2223)'NVS',NY,NVN,NVS,NHE,NL(NY,NHE)
-!2223  FORMAT(A8,6I4)
     ENDDO
     NL(NVS+1,NHE+1)=NL(NVS,NHE)
-    IOLD=0
-    RETURN
+  endif
+  IOLD=0
+  RETURN
   END SUBROUTINE readi
 
 
@@ -1078,6 +1085,10 @@ module readiMod
   select case(NCNG)
   case (0)
     status='No lateral connnection'
+  case (1)
+    status='Along the west-east direction'
+  case (2)
+    status='Along the north-south direction'
   case (3)
     status='3D lateral connection'
   case default
@@ -1086,4 +1097,29 @@ module readiMod
   end select
 
   end function GridConectionModel
+
+!------------------------------------------------------------------------------------------
+  function WaterTableStatus(IDTBLG)result(status)
+
+  implicit none
+  integer, intent(in) :: IDTBLG
+
+  character(len=64) :: status
+
+  select case(IDTBLG)
+
+  case (0)
+    status='no water table'
+  case (1)
+    status='Natural stationary water table'
+  case (2)
+    status='Natural mobile water table'
+  case (3)
+    status='Artificial stationary water table'
+  case (4)
+    status='Artificial mobile water table'
+  case default
+    call endrun('wrong option for IDTBLG in '//trim(mod_filename)//' at line',__LINE__)
+  end select
+  end function WaterTableStatus
 end module readiMod

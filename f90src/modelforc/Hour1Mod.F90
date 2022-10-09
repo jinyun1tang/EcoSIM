@@ -13,7 +13,6 @@ module Hour1Mod
   use FertilizerDataType
   use CanopyRadDataType
   use EcoSIMSolverPar
-  use Hour1Pars
   use ChemTracerParsMod
   use GridConsts
   use SoilPhysDataType
@@ -48,6 +47,14 @@ module Hour1Mod
 
   CHARACTER(LEN=*), PARAMETER :: MOD_FILENAME=__FILE__
 
+  real(r8) :: BKDSX  !     BKDSX=maximm soil bulk density
+  real(r8) :: THETPW !     THETPW=minimum air-filled porosity for saturation (m3 m-3)
+  real(r8) :: THETWP
+  real(r8) :: XVOLWC(0:3),THETRX(0:2)
+!
+!     XVOLWC=foliar water retention capacity (m3 m-2)
+!     THETRX=litter water retention capacity (m3 g C-1)
+
   public :: hour1
   public :: InitHour1
   contains
@@ -55,7 +62,15 @@ module Hour1Mod
   subroutine InitHour1
 
   implicit none
-  call initHour1Pars
+
+
+  BKDSX=1.89_r8
+
+  THETPW=0.01_r8
+  THETWP=1.0_r8-THETPW
+
+  XVOLWC=real((/5.0E-04,2.5E-04,2.5E-04,2.5E-04/),r8)
+  THETRX=real((/4.0E-06,8.0E-06,8.0E-06/),r8)
 
   end subroutine InitHour1
 !------------------------------------------------------------------------------------------
@@ -143,7 +158,7 @@ module Hour1Mod
 
       call SetSurfaceProperty4SedErosion(NY,NX)
 !
-!     RESET HOURLY ACCUMULATORS
+!     'RESET HOURLY ACCUMULATORS'
       call SetHourlyAccumulators(NY,NX)
 !
 !     RESET ARRAYS TO TRANSFER MATERIALS WITHIN SOILS
@@ -317,14 +332,18 @@ module Hour1Mod
 !------------------------------------------------------------------------------------------
 
   subroutine ResetFluxArrays(I,NHW,NHE,NVN,NVS)
+!
+  use EcoSIMConfig, only : column_mode
   implicit none
   integer, intent(in) :: I,NHW,NHE,NVN,NVS
 
   integer :: L,N,NX,NY,K,NN,NO,M,NGL
-
+  integer :: extragrid
 !     begin_execution
-  DO  NX=NHW,NHE+1
-    DO  NY=NVN,NVS+1
+  extragrid=1
+  if(column_mode)extragrid=0
+  DO  NX=NHW,NHE+extragrid
+    DO  NY=NVN,NVS+extragrid
 !
 !     WATER,SNOW,SOLUTE RUNOFF
 !
@@ -449,8 +468,8 @@ module Hour1Mod
 !     IF EROSION FLAG SET
 !
   IF(IERSNG.EQ.1.OR.IERSNG.EQ.3)THEN
-    DO NX=NHW,NHE+1
-      DO NY=NVN,NVS+1
+    DO NX=NHW,NHE+extragrid
+      DO NY=NVN,NVS+extragrid
         DO NN=1,2
           DO N=1,2
             XSEDER(N,NN,NY,NX)=0.0_r8
@@ -549,15 +568,19 @@ module Hour1Mod
 !------------------------------------------------------------------------------------------
 
   subroutine ResetSaltModelArrays(NHW,NHE,NVN,NVS)
+!
+  use EcoSIMConfig, only : column_mode
   implicit none
   integer, intent(in) :: NHW,NHE,NVN,NVS
 
   integer :: N,NX,NY,L,NN
+  integer :: extragrid
 !     begin_execution
 
-
-  DO  NX=NHW,NHE+1
-    DO  NY=NVN,NVS+1
+  extragrid=1
+  if(column_mode)extragrid=0
+  DO  NX=NHW,NHE+extragrid
+    DO  NY=NVN,NVS+extragrid
       DO N=1,2
         DO  NN=1,2
           XQRAL(N,NN,NY,NX)=0.0_r8
@@ -767,7 +790,7 @@ module Hour1Mod
   integer :: L,K,N,M
 
   !     begin_execution
-  DO 9975 L=NUI(NY,NX),NLI(NY,NX)
+  D9975: DO L=NUI(NY,NX),NLI(NY,NX)
     !
     !     AREA,DLYR=lateral(1,2), vertical(3) area,thickness of soil layer
     !     VOLT,VOLX,VOLY=layer volume including,excluding rock,macropores
@@ -814,15 +837,20 @@ module Hour1Mod
       CSILT(L,NY,NX)=0.0_r8
       CCLAY(L,NY,NX)=0.0_r8
     ENDIF
-    IF(BKDS(L,NY,NX).GT.ZERO)THEN
-      CORGCM=AZMAX1(AMIN1(1.0_r8,1.82E-06_r8*CORGC(L,NY,NX)))
+    IF(BKVL(L,NY,NX).GT.ZERO)THEN
+      CORGCM=AZMAX1(AMIN1(1.0_r8,MWC2Soil*CORGC(L,NY,NX)))
       PTDS=1.30_r8*CORGCM+2.66_r8*(1.0_r8-CORGCM)
-      !IF(L.EQ.NU(NY,NX))THEN
+      IF(L.EQ.NU(NY,NX))THEN
 !surface layer
         POROS(L,NY,NX)=AMAX1(POROS(L,NY,NX),1.0_r8-(BKDS(L,NY,NX)/PTDS))
-      !ELSE
-      !  POROS(L,NY,NX)=1.0_r8-(BKDS(L,NY,NX)/PTDS)
-      !ENDIF
+      ELSE
+!  avoid float exception
+        if(BKDS(L,NY,NX)>=PTDS)then
+          POROS(L,NY,NX)=1.0_r8
+        else
+          POROS(L,NY,NX)=1.0_r8-(BKDS(L,NY,NX)/PTDS)
+        endif
+      ENDIF
     ELSE
       PTDS=0.0_r8
       POROS(L,NY,NX)=1.0_r8
@@ -844,7 +872,6 @@ module Hour1Mod
 
     EPOC(L,NY,NX)=1.0_r8
     call SoilHydroProperty(L,NY,NX,I,J)
-
 !
 !     SOIL HEAT CAPACITY AND THERMAL CONDUCTIVITY OF SOLID PHASE
 !     FROM SOC AND TEXTURE
@@ -865,7 +892,7 @@ module Hour1Mod
       STC(L,NY,NX)=0.0_r8
       DTC(L,NY,NX)=0.0_r8
     ENDIF
-9975  CONTINUE
+  ENDDO D9975
   end subroutine SetSoilPropertyAftDisturbance
 !------------------------------------------------------------------------------------------
 
@@ -881,7 +908,7 @@ module Hour1Mod
 !     FCR=litter water content at -0.01 MPa
 !     THETY=litter hygroscopic water content
 !
-  CORGC(0,NY,NX)=0.55E+06
+  CORGC(0,NY,NX)=0.55E+06_r8
 !
 !     SOIL SURFACE WATER STORAGE CAPACITY
 !
@@ -945,12 +972,12 @@ module Hour1Mod
 
     call LitterHydroproperty(NY,NX)
 !
-!     RESET SOIL PHYSICAL PROPERTIES (DENSITY, TEXTURE)
+!   'RESET SOIL PHYSICAL PROPERTIES (DENSITY, TEXTURE)'
 !     AFTER DISTURBANCES (E.G. TILLAGE, EROSION)
 !
     call SetSoilPropertyAftDisturbance(I,J,NY,NX)
 !
-!   SURFACE RESIDUE PROPERTIES
+!   'SURFACE RESIDUE PROPERTIES'
     call ResetSurfResidualProperty(NY,NX)
 !
 !     IFLGS=reset disturbance flag
@@ -1246,11 +1273,11 @@ module Hour1Mod
   !     DETE=soil detachability
   !     ZM=surface roughness used in runoff velocity calculation in watsub.f
   !
-  BKVLNU(NY,NX)=AZMAX1(BKVLNM(NY,NX)+1.82E-06_r8*ORGC(NU(NY,NX),NY,NX))
+  BKVLNU(NY,NX)=AZMAX1(BKVLNM(NY,NX)+MWC2Soil*ORGC(NU(NY,NX),NY,NX))
   BKVLNX=SAND(NU(NY,NX),NY,NX)+SILT(NU(NY,NX),NY,NX) &
     +CLAY(NU(NY,NX),NY,NX)+1.82E-06*ORGC(NU(NY,NX),NY,NX)
   IF(BKVLNX.GT.ZEROS(NY,NX))THEN
-    CORGM=1.82E-06_r8*ORGC(NU(NY,NX),NY,NX)/BKVLNX
+    CORGM=MWC2Soil*ORGC(NU(NY,NX),NY,NX)/BKVLNX
     CORGC(NU(NY,NX),NY,NX)=0.55E+06_r8*CORGM
     CSAND(NU(NY,NX),NY,NX)=SAND(NU(NY,NX),NY,NX)/BKVLNX
     CSILT(NU(NY,NX),NY,NX)=SILT(NU(NY,NX),NY,NX)/BKVLNX
@@ -1777,7 +1804,7 @@ module Hour1Mod
   VOLT(0,NY,NX)=TVOLG0+VOLR(NY,NX)
   IF(VOLT(0,NY,NX).GT.ZEROS2(NY,NX))THEN
     VOLX(0,NY,NX)=VOLT(0,NY,NX)
-    BKVL(0,NY,NX)=1.82E-06_r8*ORGC(0,NY,NX)
+    BKVL(0,NY,NX)=MWC2Soil*ORGC(0,NY,NX)
     VOLA(0,NY,NX)=AZMAX1(VOLR(NY,NX)-BKVL(0,NY,NX)/1.30_r8)
     VOLP(0,NY,NX)=AZMAX1(VOLA(0,NY,NX)-VOLW(0,NY,NX)-VOLI(0,NY,NX))
     IF(VOLR(NY,NX).GT.ZEROS(NY,NX))THEN

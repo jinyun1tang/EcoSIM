@@ -19,6 +19,8 @@ set(IOUTILS_SOURCES
   histMod.F90
 	)
 include_directories(${CMAKE_BINARY_DIR}/f90src/utils/)
+include_directories(${CMAKE_BINARY_DIR}/f90src/minimath/)
+include_directories(${CMAKE_BINARY_DIR}/f90src/modelconfig/)
 include_directories(${CMAKE_BINARY_DIR}/f90src/ecosim_datatype/)
 include_directories(${CMAKE_BINARY_DIR}/f90src/plant_bgc/)
 include_directories(${CMAKE_BINARY_DIR}/f90src/ecosim_mods/)

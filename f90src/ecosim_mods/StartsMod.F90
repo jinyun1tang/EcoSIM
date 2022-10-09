@@ -912,7 +912,7 @@ module StartsMod
       VOLX(L,NY,NX)=VOLT(L,NY,NX)
       VOLY(L,NY,NX)=VOLX(L,NY,NX)
       VOLTI(L,NY,NX)=VOLT(L,NY,NX)
-      BKVL(L,NY,NX)=1.82E-06_r8*ORGC(L,NY,NX)  !mass of soil layer, Mg/d2
+      BKVL(L,NY,NX)=MWC2Soil*ORGC(L,NY,NX)  !mass of soil layer, Mg/d2
       DLYRI(3,L,NY,NX)=VOLX(L,NY,NX)/AREA(3,L,NY,NX)
       DLYR(3,L,NY,NX)=DLYRI(3,L,NY,NX)
     ELSE

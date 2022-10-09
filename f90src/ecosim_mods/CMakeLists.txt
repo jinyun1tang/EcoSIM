@@ -1,14 +1,12 @@
 set(ECOSIM_MOD_SOURCES
-	DayMod.F90
 	ExecMod.F90
-  Hour1Pars.F90
-	Hour1Mod.F90
 	StarteMod.F90
 	StartsMod.F90
 	VisualMod.F90
-	WthrMod.F90
 )
 include_directories(${CMAKE_BINARY_DIR}/f90src/utils/)
+include_directories(${CMAKE_BINARY_DIR}/f90src/minimath/)
+include_directories(${CMAKE_BINARY_DIR}/f90src/modelconfig/)
 include_directories(${CMAKE_BINARY_DIR}/f90src/modelpars/)
 include_directories(${CMAKE_BINARY_DIR}/f90src/ecosim_datatype/)
 include_directories(${CMAKE_BINARY_DIR}/f90src/ioutils/)

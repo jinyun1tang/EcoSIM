@@ -156,7 +156,7 @@ implicit none
   subroutine SoilSubsidence(ICHKLX,NY,NX,DORGC,DVOLI,UDLYXF,UDVOLI,&
     CDPTHX,CDPTHY,IFLGL)
 !
-! IFLGL: c1, ponding water, c4: freeze-thaw, c5: erosion, c6: som change
+! IFLGL: c1, ponding water, c2, pond disappear, c3, pond reappare, c4: freeze-thaw, c5: erosion, c6: som change
   implicit none
   integer, intent(in) :: ICHKLX,NY,NX
   REAL(R8),INTENT(IN) :: DVOLI(JZ,JY,JX)
@@ -317,7 +317,7 @@ implicit none
       ! keeping macropore fraction
       ! BKDSI: initial bulk density,
       IF((IERSNG.EQ.2.OR.IERSNG.EQ.3).AND.ABS(DORGC(LX,NY,NX)).GT.ZEROS(NY,NX))THEN
-        DDLYXC=1.82E-06_r8*DORGC(LX,NY,NX) &
+        DDLYXC=MWC2Soil*DORGC(LX,NY,NX) &
           /((1.0_r8-FHOL(LX,NY,NX))*BKDSI(LX,NY,NX))/AREA(3,LX,NY,NX)
 ! obtain diagnostics only for NX==1
         IF(NX.EQ.1)THEN
@@ -464,7 +464,7 @@ implicit none
 ! begin_execution
   IF(DDLYRX(NN).GT.ZERO)THEN
 !
-!     LAYERS MOVE DOWN (FX>0.)
+!     LAYERS MOVE DOWN (FX>0.), pond drys up
 !
     IF(IFLGL(L,2).EQ.0)THEN
       L1=L
@@ -500,7 +500,7 @@ implicit none
     ENDIF
   ELSE
 !
-!     LAYERS MOVE UP (FX<=0.)
+!     LAYERS MOVE UP (FX<=0.), pond builds up
 !
     IF(IFLGL(L,3).EQ.0)THEN
       L1=L+1

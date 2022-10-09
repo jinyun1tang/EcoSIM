@@ -4,6 +4,8 @@ implicit none
   character(len=*),private, parameter :: mod_filename = __FILE__
   logical :: is_restart_run=.false.
   logical :: is_first_year=.false.
+  logical :: transport_on=.true.
+  logical :: column_mode=.false.
   integer :: IFLGW                 !flag for raising Z0G with vegn
 
   integer, parameter :: ndbiomcpc = 2 !# of microbial residue components

@@ -4,7 +4,7 @@
 ! Description:
 ! read control namelist
   use abortutils, only : endrun
-
+  use EcoSIMConfig, only : transport_on,column_mode
   use ForcWriterMod, only : bgc_forc_conf,do_bgcforc_write
   implicit none
       character(len=*), intent(in) :: nmlfile
@@ -25,7 +25,7 @@
       integer :: do_doy,do_year,do_layer
       character(len=64) :: bgc_fname
       namelist /ecosys/case_name, prefix, runfile, do_regression_test, &
-      num_of_simdays,lverbose,num_microbial_guilds
+      num_of_simdays,lverbose,num_microbial_guilds,transport_on,column_mode
 
       logical :: laddband
       namelist /bbgcforc/do_bgcforc_write,do_year,do_doy,laddband,do_layer,&
