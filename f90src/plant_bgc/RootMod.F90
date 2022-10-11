@@ -1,6 +1,6 @@
 module RootMod
   use data_kind_mod, only : r8 => SHR_KIND_R8
-  use minimathmod  , only : test_aeqb,safe_adb,AZMAX1
+  use minimathmod  , only : test_aeqb,safe_adb,AZMAX1,AZMIN1
   use EcosimConst
   use GrosubPars
   use PlantAPIData
@@ -246,7 +246,7 @@ implicit none
             CPOOLX=AZMAX1(CPOOLR(N,L,NZ))
             WTRVCX=AZMAX1(WTRVC(NZ)*FWTRT)
             CPOOLD=(WTRVCX*WTRTLX-CPOOLX*WTRTTX)/WTRTTT
-            XFRC=AMIN1(0.0_r8,XFRY*CPOOLD)
+            XFRC=AZMIN1(XFRY*CPOOLD)
             CPOOLR(N,L,NZ)=CPOOLR(N,L,NZ)+XFRC
             WTRVC(NZ)=WTRVC(NZ)-XFRC
           ENDIF

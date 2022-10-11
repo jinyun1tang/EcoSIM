@@ -1,6 +1,7 @@
   module stomatesMod
   use data_kind_mod, only : r8 => SHR_KIND_R8
   use EcosimConst
+  use minimathmod, only : AZMAX1
   use PlantAPIData
   implicit none
 
@@ -79,7 +80,7 @@
 !     CNETX=net CO2 flux in canopy air from soil,plants, g d-2 h-1
 !
   CO2Q(NZ)=CO2E-8.33E+04_r8*CNETX*RACL/FMOL(NZ)
-  CO2Q(NZ)=AMIN1(CO2E+200.0_r8,AMAX1(0.0_r8,CO2E-200.0_r8,CO2Q(NZ)))
+  CO2Q(NZ)=AMIN1(CO2E+200.0_r8,AZMAX1(CO2E-200.0_r8,CO2Q(NZ)))
 !
 !     MESOPHYLL CO2 CONCENTRATION FROM CI:CA RATIO ENTERED IN 'READQ'
 !
@@ -290,7 +291,7 @@
   VCGRO(K,NB,NZ)=VCMX(NZ)*TFN1*VCDN
   VOGRO=VOMX(NZ)*TFN2*VCDN
   COMPL(K,NB,NZ)=0.5_r8*O2L(NZ)*VOGRO*XKCO2L(NZ)/(VCGRO(K,NB,NZ)*XKO2L)
-  VGRO(K,NB,NZ)=AMAX1(0.0_r8,VCGRO(K,NB,NZ)*(CO2L(NZ)-COMPL(K,NB,NZ)) &
+  VGRO(K,NB,NZ)=AZMAX1(VCGRO(K,NB,NZ)*(CO2L(NZ)-COMPL(K,NB,NZ)) &
     /(CO2L(NZ)+XKCO2O(NZ)))
 !
 !     C3 ELECTRON TRANSFER RATES
@@ -305,7 +306,7 @@
 !     ELEC3=e- requirement for CO2 fixn by rubisco
 !
   ETGRO(K,NB,NZ)=ETMX(NZ)*TFNE*ETDN
-  CBXN(K,NB,NZ)=AMAX1(0.0_r8,(CO2L(NZ)-COMPL(K,NB,NZ))/(ELEC3*CO2L(NZ) &
+  CBXN(K,NB,NZ)=AZMAX1((CO2L(NZ)-COMPL(K,NB,NZ))/(ELEC3*CO2L(NZ) &
     +10.5_r8*COMPL(K,NB,NZ)))
 !
 !     FOR EACH CANOPY LAYER
@@ -374,8 +375,8 @@
 !     FBS,FMP=leaf water content in bundle sheath, mesophyll
 !     FDBK4=N,P feedback inhibition on C4 CO2 fixation
 !
-  CC4M=AMAX1(0.0_r8,0.021E+09_r8*CPOOL4(K,NB,NZ)/(WGLF(K,NB,NZ)*FMP))
-  CCBS=AMAX1(0.0_r8,0.083E+09_r8*CO2B(K,NB,NZ)/(WGLF(K,NB,NZ)*FBS))
+  CC4M=AZMAX1(0.021E+09_r8*CPOOL4(K,NB,NZ)/(WGLF(K,NB,NZ)*FMP))
+  CCBS=AZMAX1(0.083E+09_r8*CO2B(K,NB,NZ)/(WGLF(K,NB,NZ)*FBS))
   FDBK4(K,NB,NZ)=1.0_r8/(1.0_r8+CC4M/C4KI)
   FDBK4(K,NB,NZ)=FDBK4(K,NB,NZ)*FDBKX(NB,NZ)
 !
@@ -401,7 +402,7 @@
 !     XKCO24=Km for VCMX4 from PFT file (uM)
 !
   VCGR4(K,NB,NZ)=VCMX4(NZ)*TFN1*VCDN4
-  VGRO4(K,NB,NZ)=AMAX1(0.0_r8,VCGR4(K,NB,NZ)*(CO2L(NZ)-COMP4)/(CO2L(NZ)+XKCO24(NZ)))
+  VGRO4(K,NB,NZ)=AZMAX1(VCGR4(K,NB,NZ)*(CO2L(NZ)-COMP4)/(CO2L(NZ)+XKCO24(NZ)))
 !
 !     C4 ELECTRON TRANSFER RATES
 !
@@ -415,7 +416,7 @@
 !     ELEC4=e- requirement for CO2 fixn by PEP carboxylase
 !
   ETGR4(K,NB,NZ)=ETMX(NZ)*TFNE*ETDN4
-  CBXN4(K,NB,NZ)=AMAX1(0.0_r8,(CO2L(NZ)-COMP4)/(ELEC4*CO2L(NZ)+10.5_r8*COMP4))
+  CBXN4(K,NB,NZ)=AZMAX1((CO2L(NZ)-COMP4)/(ELEC4*CO2L(NZ)+10.5_r8*COMP4))
 !
 !     FOR EACH CANOPY LAYER
 !
@@ -457,7 +458,7 @@
   VCGRO(K,NB,NZ)=VCMX(NZ)*TFN1*VCDN
   VOGRO=VOMX(NZ)*TFN2*VCDN
   COMPL(K,NB,NZ)=0.5_r8*O2L(NZ)*VOGRO*XKCO2L(NZ)/(VCGRO(K,NB,NZ)*XKO2L)
-  VGRO(K,NB,NZ)=AMAX1(0.0_r8,VCGRO(K,NB,NZ)*(CCBS-COMPL(K,NB,NZ))/(CCBS+XKCO2O(NZ)))
+  VGRO(K,NB,NZ)=AZMAX1(VCGRO(K,NB,NZ)*(CCBS-COMPL(K,NB,NZ))/(CCBS+XKCO2O(NZ)))
 !
 !     C3 ELECTRON TRANSFER RATES
 !
@@ -471,7 +472,7 @@
 !     ELEC3=e- requirement for CO2 fixn by rubisco
 !
   ETGRO(K,NB,NZ)=ETMX(NZ)*TFNE*ETDN
-  CBXN(K,NB,NZ)=AMAX1(0.0_r8,(CCBS-COMPL(K,NB,NZ))/(ELEC3*CCBS+10.5*COMPL(K,NB,NZ)))
+  CBXN(K,NB,NZ)=AZMAX1((CCBS-COMPL(K,NB,NZ))/(ELEC3*CCBS+10.5*COMPL(K,NB,NZ)))
   end associate
   end subroutine C4Photosynthesis
 !------------------------------------------------------------------------------------------
@@ -699,7 +700,7 @@
 !     ATRPZ=hours to full dehardening of conifers in spring
 !
   IF(IWTYP(NZ).NE.0.AND.IBTYP(NZ).GE.2)THEN
-    FDBK(NB,NZ)=FDBK(NB,NZ)*AMAX1(0.0_r8,AMIN1(1.0_r8 &
+    FDBK(NB,NZ)=FDBK(NB,NZ)*AZMAX1(AMIN1(1.0_r8 &
       ,ATRP(NB,NZ)/(0.9_r8*ATRPZ)))
   ENDIF
 !
@@ -710,7 +711,7 @@
 !     FLG4Y=number of hours with no grain fill to terminate annuals
 !
   IF(ISTYP(NZ).EQ.0.AND.FLG4(NB,NZ).GT.0.0)THEN
-    FDBKX(NB,NZ)=AMAX1(0.0_r8,1.0_r8-FLG4(NB,NZ)/FLG4Y(IWTYP(NZ)))
+    FDBKX(NB,NZ)=AZMAX1(1.0_r8-FLG4(NB,NZ)/FLG4Y(IWTYP(NZ)))
   ELSE
     FDBKX(NB,NZ)=1.0
   ENDIF

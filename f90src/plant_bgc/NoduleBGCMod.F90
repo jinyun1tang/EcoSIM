@@ -1,7 +1,7 @@
 module NoduleBGCMod
 
   use data_kind_mod, only : r8 => SHR_KIND_R8
-  use minimathmod, only : test_aeqb,safe_adb
+  use minimathmod, only : test_aeqb,safe_adb,AZMAX1
   use EcosimConst
   use PlantAPIData
   use GrosubPars
@@ -114,19 +114,19 @@ module NoduleBGCMod
 !     FCNPF=N,P constraint to bacterial activity
 !
     IF(WTNDB(NB,NZ).GT.ZEROP(NZ))THEN
-      CCPOLN=AMAX1(0.0,CPOLNB(NB,NZ)/WTNDB(NB,NZ))
-      CZPOLN=AMAX1(0.0,ZPOLNB(NB,NZ)/WTNDB(NB,NZ))
-      CPPOLN=AMAX1(0.0,PPOLNB(NB,NZ)/WTNDB(NB,NZ))
+      CCPOLN=AZMAX1(CPOLNB(NB,NZ)/WTNDB(NB,NZ))
+      CZPOLN=AZMAX1(ZPOLNB(NB,NZ)/WTNDB(NB,NZ))
+      CPPOLN=AZMAX1(PPOLNB(NB,NZ)/WTNDB(NB,NZ))
     ELSE
       CCPOLN=1.0_r8
       CZPOLN=1.0_r8
       CPPOLN=1.0_r8
     ENDIF
     IF(CCPOLN.GT.ZERO)THEN
-      CCC=AMAX1(0.0,AMIN1(1.0,safe_adb(CZPOLN,CZPOLN+CCPOLN*CNKI) &
+      CCC=AZMAX1(AMIN1(1.0,safe_adb(CZPOLN,CZPOLN+CCPOLN*CNKI) &
         ,safe_adb(CPPOLN,CPPOLN+CCPOLN*CPKI)))
-      CNC=AMAX1(0.0,AMIN1(1.0,safe_adb(CCPOLN,CCPOLN+CZPOLN/CNKI)))
-      CPC=AMAX1(0.0,AMIN1(1.0,safe_adb(CCPOLN,CCPOLN+CPPOLN/CPKI)))
+      CNC=AZMAX1(AMIN1(1.0,safe_adb(CCPOLN,CCPOLN+CZPOLN/CNKI)))
+      CPC=AZMAX1(AMIN1(1.0,safe_adb(CCPOLN,CCPOLN+CPPOLN/CPKI)))
     ELSE
       CCC=0._r8
       CNC=0._r8
@@ -152,7 +152,7 @@ module NoduleBGCMod
 !     FCNPF=N,P constraint to bacterial activity
 !     WFNG=growth function of canopy water potential
 !
-    RCNDL=AMAX1(0.0,AMIN1(CPOLNB(NB,NZ) &
+    RCNDL=AZMAX1(AMIN1(CPOLNB(NB,NZ) &
       ,VMXO*WTNDB(NB,NZ))*FCNPF*TFN3(NZ)*WFNG)
 !     CPOOLNX=CPOLNB(NB,NZ)
 !     VMXOX=VMXO*WTNDB(NB,NZ)*FCNPF*TFN3(NZ)*WFNG
@@ -165,7 +165,7 @@ module NoduleBGCMod
 !     TFN5=temperature function for canopy maintenance respiration
 !     WTNDBN=bacterial N mass
 !
-    RMNDL=AMAX1(0.0,RMPLT*TFN5*WTNDBN(NB,NZ))*SPNDLI
+    RMNDL=AZMAX1(RMPLT*TFN5*WTNDBN(NB,NZ))*SPNDLI
 !
 !     NODULE GROWTH RESPIRATION FROM TOTAL - MAINTENANCE
 !     IF > 0 DRIVES GROWTH, IF < 0 DRIVES REMOBILIZATION
@@ -175,8 +175,8 @@ module NoduleBGCMod
 !     RSNDL=excess maintenance respiration
 !
     RXNDL=RCNDL-RMNDL
-    RGNDL=AMAX1(0.0,RXNDL)
-    RSNDL=AMAX1(0.0,-RXNDL)
+    RGNDL=AZMAX1(RXNDL)
+    RSNDL=AZMAX1(-RXNDL)
 !
 !     NODULE N2 FIXATION FROM GROWTH RESPIRATION, FIXATION ENERGY
 !     REQUIREMENT AND NON-STRUCTURAL C:N:P PRODUCT INHIBITION,
@@ -190,7 +190,7 @@ module NoduleBGCMod
 !     RGN2F=respiration for N2 fixation
 !     RUPNFB,UPNFC=branch,total N2 fixation
 !
-    RGN2P=AMAX1(0.0,WTNDB(NB,NZ)*CNND(NZ)-WTNDBN(NB,NZ))/EN2F
+    RGN2P=AZMAX1(WTNDB(NB,NZ)*CNND(NZ)-WTNDBN(NB,NZ))/EN2F
     IF(RGNDL.GT.ZEROP(NZ))THEN
       RGN2F=RGNDL*RGN2P/(RGNDL+RGN2P)
     ELSE
@@ -251,9 +251,9 @@ module NoduleBGCMod
       -RGN2F+RCNDLC,(RGNDL-RGN2F)/(1.0_r8-DMND(NZ)))
     GRNDG=CGNDL*DMND(NZ)
     RGNDG=RGN2F+CGNDL*(1.0_r8-DMND(NZ))
-    ZADDN=AMAX1(0.0,AMIN1(ZPOLNB(NB,NZ) &
+    ZADDN=AZMAX1(AMIN1(ZPOLNB(NB,NZ) &
       ,GRNDG*CNND(NZ)))*CZPOLN/(CZPOLN+CZKM)
-    PADDN=AMAX1(0.0,AMIN1(PPOLNB(NB,NZ) &
+    PADDN=AZMAX1(AMIN1(PPOLNB(NB,NZ) &
       ,GRNDG*CPND(NZ)))*CPPOLN/(CPPOLN+CPKM)
 !
 !     NODULE SENESCENCE
@@ -498,20 +498,20 @@ module NoduleBGCMod
 !     FCNPF=N,P constraint to bacterial activity
 !
         IF(WTNDL(L,NZ).GT.ZEROP(NZ))THEN
-          CCPOLN=AMAX1(0.0,CPOOLN(L,NZ)/WTNDL(L,NZ))
-          CZPOLN=AMAX1(0.0,ZPOOLN(L,NZ)/WTNDL(L,NZ))
-          CPPOLN=AMAX1(0.0,PPOOLN(L,NZ)/WTNDL(L,NZ))
+          CCPOLN=AZMAX1(CPOOLN(L,NZ)/WTNDL(L,NZ))
+          CZPOLN=AZMAX1(ZPOOLN(L,NZ)/WTNDL(L,NZ))
+          CPPOLN=AZMAX1(PPOOLN(L,NZ)/WTNDL(L,NZ))
         ELSE
           CCPOLN=1.0_r8
           CZPOLN=1.0_r8
           CPPOLN=1.0_r8
         ENDIF
         IF(CCPOLN.GT.ZERO)THEN
-          CCC=AMAX1(0.0,AMIN1(1.0,safe_adb(CZPOLN,CZPOLN+CCPOLN*CNKI) &
+          CCC=AZMAX1(AMIN1(1.0,safe_adb(CZPOLN,CZPOLN+CCPOLN*CNKI) &
             ,safe_adb(CPPOLN,CPPOLN+CCPOLN*CPKI)))
 !          if(curday==73)write(*,*)CCPOLN,CCPOLN,CZPOLN,CNKI
-          CNC=AMAX1(0.0,AMIN1(1.0,safe_adb(CCPOLN,CCPOLN+CZPOLN/CNKI)))
-          CPC=AMAX1(0.0,AMIN1(1.0,safe_adb(CCPOLN,CCPOLN+CPPOLN/CPKI)))
+          CNC=AZMAX1(AMIN1(1.0,safe_adb(CCPOLN,CCPOLN+CZPOLN/CNKI)))
+          CPC=AZMAX1(AMIN1(1.0,safe_adb(CCPOLN,CCPOLN+CPPOLN/CPKI)))
         ELSE
           CCC=0._r8
           CNC=0._r8
@@ -537,7 +537,7 @@ module NoduleBGCMod
 !     FCNPF=N,P constraint to bacterial activity
 !     WFNGR=growth function of root water potential
 !
-        RCNDLM=AMAX1(0.0,AMIN1(CPOOLN(L,NZ) &
+        RCNDLM=AZMAX1(AMIN1(CPOOLN(L,NZ) &
           ,VMXO*WTNDL(L,NZ))*FCNPF*TFN4(L,NZ)*WFNGR(1,L))
         CPOOLNX=CPOOLN(L,NZ)
 !
@@ -556,7 +556,7 @@ module NoduleBGCMod
 !     TFN6=temperature function for root maintenance respiration
 !     WTNDLN=bacterial N mass
 !
-        RMNDL=AMAX1(0.0,RMPLT*TFN6(L)*WTNDLN(L,NZ))*SPNDLI
+        RMNDL=AZMAX1(RMPLT*TFN6(L)*WTNDLN(L,NZ))*SPNDLI
 !
 !     NODULE GROWTH RESPIRATION FROM TOTAL - MAINTENANCE
 !     IF > 0 DRIVES GROWTH, IF < 0 DRIVES REMOBILIZATION
@@ -567,10 +567,10 @@ module NoduleBGCMod
 !
         RXNDLM=RCNDLM-RMNDL
         RXNDL=RCNDL-RMNDL
-        RGNDLM=AMAX1(0.0,RXNDLM)
-        RGNDL=AMAX1(0.0,RXNDL)
-        RSNDLM=AMAX1(0.0,-RXNDLM)
-        RSNDL=AMAX1(0.0,-RXNDL)
+        RGNDLM=AZMAX1(RXNDLM)
+        RGNDL=AZMAX1(RXNDL)
+        RSNDLM=AZMAX1(-RXNDLM)
+        RSNDL=AZMAX1(-RXNDL)
 !
 !     NODULE N2 FIXATION FROM GROWTH RESPIRATION, FIXATION ENERGY
 !     REQUIREMENT AND NON-STRUCTURAL C:N:P PRODUCT INHIBITION,
@@ -584,7 +584,7 @@ module NoduleBGCMod
 !     RGN2F=respiration for N2 fixation
 !     RUPNF,UPNF=layer,total root N2 fixation
 !
-        RGN2P=AMAX1(0.0,WTNDL(L,NZ)*CNND(NZ)-WTNDLN(L,NZ))/EN2F
+        RGN2P=AZMAX1(WTNDL(L,NZ)*CNND(NZ)-WTNDLN(L,NZ))/EN2F
         IF(RGNDL.GT.ZEROP(NZ))THEN
           RGN2F=RGNDL*RGN2P/(RGNDL+RGN2P)
         ELSE
@@ -645,8 +645,8 @@ module NoduleBGCMod
           -RGN2F+RCNDLC,(RGNDL-RGN2F)/(1.0_r8-DMND(NZ)))
         GRNDG=CGNDL*DMND(NZ)
         RGNDG=RGN2F+CGNDL*(1.0_r8-DMND(NZ))
-        ZADDN=AMAX1(0.0,AMIN1(ZPOOLN(L,NZ),GRNDG*CNND(NZ)))*CZPOLN/(CZPOLN+CZKM)
-        PADDN=AMAX1(0.0,AMIN1(PPOOLN(L,NZ),GRNDG*CPND(NZ)))*CPPOLN/(CPPOLN+CPKM)
+        ZADDN=AZMAX1(AMIN1(ZPOOLN(L,NZ),GRNDG*CNND(NZ)))*CZPOLN/(CZPOLN+CZKM)
+        PADDN=AZMAX1(AMIN1(PPOOLN(L,NZ),GRNDG*CPND(NZ)))*CPPOLN/(CPPOLN+CPKM)
 !
 !     NODULE SENESCENCE
 !

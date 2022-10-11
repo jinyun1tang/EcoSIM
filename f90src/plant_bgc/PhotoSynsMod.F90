@@ -2,6 +2,7 @@ module PhotoSynsMod
   use data_kind_mod, only : r8 => SHR_KIND_R8
   use EcosimConst
   use GrosubPars
+  use minimathmod, only : AZMAX1
   use PlantAPIData
 implicit none
   private
@@ -140,7 +141,7 @@ implicit none
                 CO2X=CO2I(NZ)
                 DO 225 NN=1,100
                   CO2C=CO2X*SCO2(NZ)
-                  CO2Y=AMAX1(0.0,CO2C-COMPL(K,NB,NZ))
+                  CO2Y=AZMAX1(CO2C-COMPL(K,NB,NZ))
                   CBXNX=CO2Y/(ELEC3*CO2C+10.5*COMPL(K,NB,NZ))
                   VGROX=VCGRO(K,NB,NZ)*CO2Y/(CO2C+XKCO2O(NZ))
                   EGROX=ETLF*CBXNX
@@ -241,7 +242,7 @@ implicit none
                 CO2X=CO2I(NZ)
                 DO 235 NN=1,100
                   CO2C=CO2X*SCO2(NZ)
-                  CO2Y=AMAX1(0.0,CO2C-COMPL(K,NB,NZ))
+                  CO2Y=AZMAX1(CO2C-COMPL(K,NB,NZ))
                   CBXNX=CO2Y/(ELEC3*CO2C+10.5*COMPL(K,NB,NZ))
                   VGROX=VCGRO(K,NB,NZ)*CO2Y/(CO2C+XKCO2O(NZ))
                   EGROX=ETLF*CBXNX
@@ -417,7 +418,7 @@ implicit none
                 CO2X=CO2I(NZ)
                 DO 125 NN=1,100
                   CO2C=CO2X*SCO2(NZ)
-                  CO2Y=AMAX1(0.0,CO2C-COMP4)
+                  CO2Y=AZMAX1(CO2C-COMP4)
                   CBXNX=CO2Y/(ELEC4*CO2C+10.5*COMP4)
                   VGROX=VCGR4(K,NB,NZ)*CO2Y/(CO2C+XKCO24(NZ))
                   EGROX=ETLF4*CBXNX
@@ -544,7 +545,7 @@ implicit none
                 CO2X=CO2I(NZ)
                 DO 135 NN=1,100
                   CO2C=CO2X*SCO2(NZ)
-                  CO2Y=AMAX1(0.0,CO2C-COMP4)
+                  CO2Y=AZMAX1(CO2C-COMP4)
                   CBXNX=CO2Y/(ELEC4*CO2C+10.5*COMP4)
                   VGROX=VCGR4(K,NB,NZ)*CO2Y/(CO2C+XKCO24(NZ))
                   EGROX=ETLF4*CBXNX

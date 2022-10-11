@@ -49,7 +49,7 @@ subroutine RunModel(namelist_buffer)
   use ModelStatusType, only : model_status_type
   use data_kind_mod  , only : r8 => SHR_KIND_R8
   use PlantMod
-  use histMod
+  use bhistMod
   use fileUtil
   implicit none
   character(len=*), intent(in) :: namelist_buffer

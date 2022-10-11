@@ -1,7 +1,7 @@
 module UptakesMod
   use data_kind_mod, only : r8 => SHR_KIND_R8
   use StomatesMod   , only : stomates
-  use minimathmod  , only : safe_adb,vapsat,test_aneb
+  use minimathmod  , only : safe_adb,vapsat,test_aneb,AZMAX1,AZMIN1
   use EcosimConst
   use EcoSIMSolverPar
   use UptakePars
@@ -148,7 +148,7 @@ module UptakesMod
         ENDIF
 
         TKCX=TKC(NZ)
-        WVPLT=AMAX1(0.0,WTLS(NZ)+WVSTK(NZ))
+        WVPLT=AZMAX1(WTLS(NZ)+WVSTK(NZ))
         VHCPX=cpw*(WVPLT*VSTK+VOLWC(NZ)+VOLWP(NZ))
 !
 !     CONVERGENCE SOLUTION
@@ -298,7 +298,7 @@ module UptakesMod
     PSIST1(L)=PSIST(L)-0.0098_r8*ALT
     IF(BKDS(L).GT.ZERO)THEN
       VOLWU(L)=VOLWM(NPH,L)-THETY(L)*VOLY(L)
-      VOLPU(L)=AMAX1(0.0,VOLA(L)-VOLW(L)-VOLI(L))
+      VOLPU(L)=AZMAX1(VOLA(L)-VOLW(L)-VOLI(L))
     ELSE
       VOLWU(L)=VOLWM(NPH,L)
       VOLPU(L)=0.0_r8
@@ -307,7 +307,7 @@ module UptakesMod
     DO 9005 NZ=1,NP
       DO  N=1,MY(NZ)
 !     IF(IFLGC(NZ).EQ.1.AND.PP(NZ).GT.0.0)THEN
-      WTRTG(L)=WTRTG(L)+AMAX1(0.0,WTRTD(N,L,NZ))
+      WTRTG(L)=WTRTG(L)+AZMAX1(WTRTD(N,L,NZ))
 !     ENDIF
       enddo
 9005  CONTINUE
@@ -398,7 +398,7 @@ module UptakesMod
 700   CONTINUE
       ALFZ=2.0_r8*TFRADP
       IF(RAB.GT.ZERO.AND.ZT.GT.ZERO.AND.ALFZ.GT.ZERO)THEN
-        RACZ(NZ)=AMIN1(RACX,AMAX1(0.0,ZT*EXP(ALFZ) &
+        RACZ(NZ)=AMIN1(RACX,AZMAX1(ZT*EXP(ALFZ) &
           /(ALFZ/RAB)*(EXP(-ALFZ*ZC(NZ)/ZT) &
           -EXP(-ALFZ*(ZD+ZR)/ZT))))
       ELSE
@@ -487,9 +487,9 @@ module UptakesMod
           FRTDPX(L,NZ)=1.0_r8
         ELSE
           IF(DLYR3(L).GT.ZERO)THEN
-            RTDPX=AMAX1(0.0_r8,RTDPZ-CDPTHZ(L-1))
-            RTDPX=AMAX1(0.0_r8,AMIN1(DLYR3(L),RTDPX) &
-              -AMAX1(0.0,SDPTH(NZ)-CDPTHZ(L-1)-HTCTL(NZ)))
+            RTDPX=AZMAX1(RTDPZ-CDPTHZ(L-1))
+            RTDPX=AZMAX1(AMIN1(DLYR3(L),RTDPX) &
+              -AZMAX1(SDPTH(NZ)-CDPTHZ(L-1)-HTCTL(NZ)))
             FRTDPX(L,NZ)=RTDPX/DLYR3(L)
           ELSE
             FRTDPX(L,NZ)=0.0_r8
@@ -498,7 +498,7 @@ module UptakesMod
 
       ENDIF
       IF(WTRTG(L).GT.ZEROS)THEN
-        FPQ(N,L,NZ)=AMAX1(0.0,WTRTD(N,L,NZ))/WTRTG(L)
+        FPQ(N,L,NZ)=AZMAX1(WTRTD(N,L,NZ))/WTRTG(L)
       ELSE
         FPQ(N,L,NZ)=1.0
       ENDIF
@@ -589,9 +589,9 @@ module UptakesMod
       APSILT=ABS(PSILT(NZ))
       FDMP=0.16+0.10*APSILT/(0.05*APSILT+2.0)
       CCPOLT=CCPOLP(NZ)+CZPOLP(NZ)+CPPOLP(NZ)
-      OSWT=36.0+840.0*AMAX1(0.0,CCPOLT)
+      OSWT=36.0+840.0*AZMAX1(CCPOLT)
       PSILO(NZ)=FDMP/0.16*OSMO(NZ)-RGAS*TKC(NZ)*FDMP*CCPOLT/OSWT
-      PSILG(NZ)=AMAX1(0.0,PSILT(NZ)-PSILO(NZ))
+      PSILG(NZ)=AZMAX1(PSILT(NZ)-PSILO(NZ))
       WFNC=EXP(RCS(NZ)*PSILG(NZ))
       RC(NZ)=RSMN(NZ)+(RSMH(NZ)-RSMN(NZ))*WFNC
       RA(NZ)=RAZ(NZ)
@@ -603,10 +603,10 @@ module UptakesMod
           APSIRT=ABS(PSIRT(N,L,NZ))
           FDMR=0.16+0.10*APSIRT/(0.05*APSIRT+2.0)
           CCPOLT=CCPOLR(N,L,NZ)+CZPOLR(N,L,NZ)+CPPOLR(N,L,NZ)
-          OSWT=36.0+840.0*AMAX1(0.0,CCPOLT)
+          OSWT=36.0+840.0*AZMAX1(CCPOLT)
           PSIRO(N,L,NZ)=FDMR/0.16*OSMO(NZ) &
             -RGAS*TKS(L)*FDMR*CCPOLT/OSWT
-          PSIRG(N,L,NZ)=AMAX1(0.0,PSIRT(N,L,NZ)-PSIRO(N,L,NZ))
+          PSIRG(N,L,NZ)=AZMAX1(PSIRT(N,L,NZ)-PSIRO(N,L,NZ))
           UPWTR(N,L,NZ)=0.0_r8
       enddo
 4290  CONTINUE
@@ -690,7 +690,7 @@ module UptakesMod
     THRMGX  => plt_rad%THRMGX     &
   )
   CCPOLT=CCPOLP(NZ)+CZPOLP(NZ)+CPPOLP(NZ)
-  OSWT=36.0+840.0*AMAX1(0.0,CCPOLT)
+  OSWT=36.0+840.0*AZMAX1(CCPOLT)
   FTHRM=EMMC*2.04E-10*FRADP(NZ)*AREA3(NU)
   FDTHS=(THS+THRMGX)*FRADP(NZ)
 !     RAZ=canopy isothermal boundary later resistance
@@ -745,7 +745,7 @@ module UptakesMod
     APSILT=ABS(PSILT(NZ))
     FDMP=0.16+0.10*APSILT/(0.05*APSILT+2.0)
     PSILO(NZ)=FDMP/0.16*OSMO(NZ)-RGAS*TKC1*FDMP*CCPOLT/OSWT
-    PSILG(NZ)=AMAX1(0.0,PSILT(NZ)-PSILO(NZ))
+    PSILG(NZ)=AZMAX1(PSILT(NZ)-PSILO(NZ))
 !
 !     CANOPY STOMATAL RESISTANCE
 !
@@ -842,7 +842,7 @@ module UptakesMod
       DO N=1,MY(NZ)
         DO  L=NU,NI(NZ)
           IF(ILYR(N,L).EQ.1)THEN
-            UPWTR(N,L,NZ)=AMAX1(AMIN1(0.0,-VOLWU(L)*FPQ(N,L,NZ)) &
+            UPWTR(N,L,NZ)=AMAX1(AZMIN1(-VOLWU(L)*FPQ(N,L,NZ)) &
               ,AMIN1((PSILC-PSIST1(L))/RSRS(N,L),VOLPU(L)*FPQ(N,L,NZ)))
             IF(UPWTR(N,L,NZ).GT.0.0)THEN
               UPWTR(N,L,NZ)=0.1*UPWTR(N,L,NZ)
@@ -923,7 +923,7 @@ module UptakesMod
         EPX=EP(NZ)
         UPRTX=UPRT
         VOLWPX=VOLWPZ
-        PSILT(NZ)=AMIN1(0.0_r8,PSILT(NZ)+0.5_r8*DPSI)
+        PSILT(NZ)=AZMIN1(PSILT(NZ)+0.5_r8*DPSI)
         XC=0.50_r8
         cycle
 !
@@ -1162,9 +1162,9 @@ module UptakesMod
   APSILT=ABS(PSILT(NZ))
   FDMP=0.16_r8+0.10_r8*APSILT/(0.05_r8*APSILT+2.0_r8)
   CCPOLT=CCPOLP(NZ)+CZPOLP(NZ)+CPPOLP(NZ)
-  OSWT=36.0_r8+840.0_r8*AMAX1(0.0_r8,CCPOLT)
+  OSWT=36.0_r8+840.0_r8*AZMAX1(CCPOLT)
   PSILO(NZ)=FDMP/0.16_r8*OSMO(NZ)-RGAS*TKC(NZ)*FDMP*CCPOLT/OSWT
-  PSILG(NZ)=AMAX1(0.0_r8,PSILT(NZ)-PSILO(NZ))
+  PSILG(NZ)=AZMAX1(PSILT(NZ)-PSILO(NZ))
   WFNC=EXP(RCS(NZ)*PSILG(NZ))
   RC(NZ)=RSMN(NZ)+(RSMH(NZ)-RSMN(NZ))*WFNC
   RA(NZ)=RAZ(NZ)
@@ -1176,9 +1176,9 @@ module UptakesMod
       APSIRT=ABS(PSIRT(N,L,NZ))
       FDMR=0.16_r8+0.10_r8*APSIRT/(0.05*APSIRT+2.0_r8)
       CCPOLT=CCPOLR(N,L,NZ)+CZPOLR(N,L,NZ)+CPPOLR(N,L,NZ)
-      OSWT=36.0_r8+840.0_r8*AMAX1(0.0_r8,CCPOLT)
+      OSWT=36.0_r8+840.0_r8*AZMAX1(CCPOLT)
       PSIRO(N,L,NZ)=FDMR/0.16_r8*OSMO(NZ)-RGAS*TKS(L)*FDMR*CCPOLT/OSWT
-      PSIRG(N,L,NZ)=AMAX1(0.0_r8,PSIRT(N,L,NZ)-PSIRO(N,L,NZ))
+      PSIRG(N,L,NZ)=AZMAX1(PSIRT(N,L,NZ)-PSIRO(N,L,NZ))
       UPWTR(N,L,NZ)=0.0_r8
     enddo
   ENDDO
@@ -1255,24 +1255,24 @@ module UptakesMod
   DO 4505 N=1,MY(NZ)
     DO 4510 L=NU,NI(NZ)
       IF(ILYR(N,L).EQ.1)THEN
-        PSIRT(N,L,NZ)=AMIN1(0.0,(PSIST1(L)*RSRT(N,L) &
+        PSIRT(N,L,NZ)=AZMIN1((PSIST1(L)*RSRT(N,L) &
           +PSILT(NZ)*RSSX(N,L))/RSRS(N,L))
         APSIRT=ABS(PSIRT(N,L,NZ))
         FDMR=0.16+0.10*APSIRT/(0.05*APSIRT+2.0)
         CCPOLT=CCPOLR(N,L,NZ)+CZPOLR(N,L,NZ)+CPPOLR(N,L,NZ)
-        OSWT=36.0+840.0*AMAX1(0.0,CCPOLT)
+        OSWT=36.0+840.0*AZMAX1(CCPOLT)
         PSIRO(N,L,NZ)=FDMR/0.16*OSMO(NZ) &
           -RGAS*TKS(L)*FDMR*CCPOLT/OSWT
-        PSIRG(N,L,NZ)=AMAX1(0.0,PSIRT(N,L,NZ)-PSIRO(N,L,NZ))
+        PSIRG(N,L,NZ)=AZMAX1(PSIRT(N,L,NZ)-PSIRO(N,L,NZ))
       ELSE
         PSIRT(N,L,NZ)=PSIST1(L)
         APSIRT=ABS(PSIRT(N,L,NZ))
         FDMR=0.16+0.10*APSIRT/(0.05*APSIRT+2.0)
         CCPOLT=CCPOLR(N,L,NZ)+CZPOLR(N,L,NZ)+CPPOLR(N,L,NZ)
-        OSWT=36.0+840.0*AMAX1(0.0,CCPOLT)
+        OSWT=36.0+840.0*AZMAX1(CCPOLT)
         PSIRO(N,L,NZ)=FDMR/0.16*OSMO(NZ) &
           -RGAS*TKS(L)*FDMR*CCPOLT/OSWT
-        PSIRG(N,L,NZ)=AMAX1(0.0,PSIRT(N,L,NZ)-PSIRO(N,L,NZ))
+        PSIRG(N,L,NZ)=AZMAX1(PSIRT(N,L,NZ)-PSIRO(N,L,NZ))
       ENDIF
 4510  CONTINUE
 4505  CONTINUE
@@ -1351,7 +1351,7 @@ module UptakesMod
   IF(TCC(NZ).LT.CTC(NZ))THEN
     CHILL(NZ)=AMIN1(24.0,CHILL(NZ)+1.0)
   ELSE
-    CHILL(NZ)=AMAX1(0.0,CHILL(NZ)-1.0)
+    CHILL(NZ)=AZMAX1(CHILL(NZ)-1.0)
   ENDIF
   end associate
   end subroutine SetCanopyGrowthFuncs

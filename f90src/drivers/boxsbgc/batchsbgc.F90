@@ -55,7 +55,7 @@ end program main
   use ecosim_log_mod      , only : errMsg => shr_log_errMsg
   use batchmod
   use ForcTypeMod         , only : forc_type,ReadForc,UpdateForc
-  use histMod
+  use bhistMod
   use fileUtil
   use EcoSIMSolverPar
   implicit none

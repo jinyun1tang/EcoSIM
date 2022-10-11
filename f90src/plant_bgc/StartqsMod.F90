@@ -1,6 +1,7 @@
 module StartqsMod
   use data_kind_mod, only : r8 => SHR_KIND_R8
   use EcosimConst
+  use minimathmod, only : AZMAX1
   use EcoSIMConfig
   use PlantAPIData
   implicit none
@@ -940,7 +941,7 @@ module StartqsMod
   TFN3(NZ)=1.0
   PSILT(NZ)=-1.0E-03
   PSILO(NZ)=OSMO(NZ)+PSILT(NZ)
-  PSILG(NZ)=AMAX1(0.0,PSILT(NZ)-PSILO(NZ))
+  PSILG(NZ)=AZMAX1(PSILT(NZ)-PSILO(NZ))
   EP(NZ)=0._r8
   FRADP(NZ)=0._r8
   end associate
@@ -1000,7 +1001,7 @@ module StartqsMod
       plt_ew%UPWTR(N,L,NZ)=0._r8
       PSIRT(N,L,NZ)=-0.01
       PSIRO(N,L,NZ)=OSMO(NZ)+PSIRT(N,L,NZ)
-      PSIRG(N,L,NZ)=AMAX1(0.0_r8,PSIRT(N,L,NZ)-PSIRO(N,L,NZ))
+      PSIRG(N,L,NZ)=AZMAX1(PSIRT(N,L,NZ)-PSIRO(N,L,NZ))
       plt_biom%CPOOLR(N,L,NZ)=0._r8
       plt_biom%ZPOOLR(N,L,NZ)=0._r8
       plt_biom%PPOOLR(N,L,NZ)=0._r8

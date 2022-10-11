@@ -1,4 +1,4 @@
-module histMod
+module bhistMod
 
 #include "shr_assert.h"
   use data_kind_mod, only : r8 => shr_kind_r8, i4 => shr_kind_i4
@@ -464,4 +464,4 @@ contains
   call this%reset_counter(clockid)
   call ncd_pio_closefile(ncid)
   end subroutine hist_write
-end module histMod
+end module bhistMod

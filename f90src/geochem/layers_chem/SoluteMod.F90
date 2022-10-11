@@ -1,6 +1,6 @@
 module SoluteMod
   use data_kind_mod, only : r8 => SHR_KIND_R8
-  use minimathmod, only : test_aeqb,AZMAX1
+  use minimathmod, only : test_aeqb,AZMAX1,AZMIN1
   use SoluteParMod
   use SOMDataType
   use EcosimConst
@@ -533,7 +533,7 @@ module SoluteMod
         VLNHB(L,NY,NX)=0._r8
       ENDIF
       VLNH4(L,NY,NX)=1._r8-VLNHB(L,NY,NX)
-      FVLNH4=AMIN1(0.0_r8,(VLNH4(L,NY,NX)-XVLNH4)/XVLNH4)
+      FVLNH4=AZMIN1((VLNH4(L,NY,NX)-XVLNH4)/XVLNH4)
 !
 !     TRANSFER NH4, NH3 FROM NON-BAND TO BAND
 !     DURING BAND GROWTH
@@ -630,7 +630,7 @@ module SoluteMod
         VLPOB(L,NY,NX)=0._r8
       ENDIF
       VLPO4(L,NY,NX)=1._r8-VLPOB(L,NY,NX)
-      FVLPO4=AMIN1(0.0_r8,(VLPO4(L,NY,NX)-XVLPO4)/XVLPO4)
+      FVLPO4=AZMIN1((VLPO4(L,NY,NX)-XVLPO4)/XVLPO4)
 !
 !     TRANSFER HPO4,H2PO4 FROM NON-BAND TO BAND
 !     DURING BAND GROWTH DEPENDING ON SALT
@@ -845,7 +845,7 @@ module SoluteMod
         VLNOB(L,NY,NX)=0._r8
       ENDIF
       VLNO3(L,NY,NX)=1._r8-VLNOB(L,NY,NX)
-      FVLNO3=AMIN1(0.0_r8,(VLNO3(L,NY,NX)-XVLNO3)/XVLNO3)
+      FVLNO3=AZMIN1((VLNO3(L,NY,NX)-XVLNO3)/XVLNO3)
 !
 !     TRANSFER NO3 FROM NON-BAND TO BAND
 !     DURING BAND GROWTH

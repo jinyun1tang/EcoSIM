@@ -48,7 +48,7 @@ subroutine RunModel(namelist_buffer)
   use data_kind_mod  , only : r8 => SHR_KIND_R8
   use ecosim_log_mod   , only : errMsg => shr_log_errMsg
   use AquachemMod
-  use histMod
+  use bhistMod
   use fileUtil
   implicit none
   character(len=*), intent(in) :: namelist_buffer

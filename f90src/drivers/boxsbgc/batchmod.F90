@@ -181,10 +181,10 @@ contains
   if(micfor%litrm)then
 !   the following hasn't been turned on yet
 !
-    micstt%ZNH4TU=AMAX1(0.0,forc%ZNH4S)
-    micstt%ZNO3TU=AMAX1(0.0,forc%ZNO3S)
-    micstt%H1P4TU=AMAX1(0.0,forc%H1PO4)
-    micstt%H2P4TU=AMAX1(0.0,forc%H2PO4)
+    micstt%ZNH4TU=AZMAX1(forc%ZNH4S)
+    micstt%ZNO3TU=AZMAX1(forc%ZNO3S)
+    micstt%H1P4TU=AZMAX1(forc%H1PO4)
+    micstt%H2P4TU=AZMAX1(forc%H2PO4)
     micstt%CNH4BU=forc%CNH4B
     micstt%CNH4SU=forc%CNH4S
     micstt%CH2P4U=forc%CH2P4
@@ -666,7 +666,7 @@ contains
 
   subroutine getvarlist(nvars, varl, varlnml, unitl, vartypes)
 
-  use histMod, only : hist_var_str_len,hist_unit_str_len,hist_var_lon_str_len
+  use bhistMod, only : hist_var_str_len,hist_unit_str_len,hist_var_lon_str_len
   implicit none
   integer, intent(in) :: nvars
   character(len=hist_var_str_len), intent(out) :: varl(nvars)            !variable name

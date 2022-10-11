@@ -456,15 +456,9 @@ module Hist1Mod
       ENDDO
       DO M=1,2
         READ(15,*)DY
-        IDY1=INT(DY/1.0E+02)
-        IDY2=INT(DY/1.0E+00-IDY1*1.0E+02)
+        IDY1=INT(DY/1.0E+02)   !get day, the date is given as 0101 for Jan 1st, or 3112, Dec 31th
+        IDY2=INT(DY/1.0E+00-IDY1*1.0E+02) !get month
         IF(IDY2.GT.2)LPY=1
-!        IF(IDY2.EQ.1)GO TO 4525
-!        IDY=30*(IDY2-1)+ICOR(IDY2-1)+IDY1+LPY
-!        GO TO 4530
-!4525    IDY=IDY1
-!4530    IF(M.EQ.1)IDATA(N)=IDY
-
         IF(IDY2.EQ.1)THEN
           IDY=IDY1
         ELSE
@@ -473,6 +467,7 @@ module Hist1Mod
         IF(M.EQ.1)IDATA(N)=IDY
         IF(M.EQ.2)IDATA(N+20)=IDY
       ENDDO
+!read the variable options in the form of YES/NO
       M=0
       DO while(.True.)
         M=M+1

@@ -6,6 +6,7 @@ module HfuncsMod
   use data_kind_mod, only : r8 => SHR_KIND_R8
   use EcosimConst
   use PlantAPIData
+  use minimathmod, only : AZMAX1
   use StartqsMod, only : startqs
   implicit none
 
@@ -299,7 +300,7 @@ module HfuncsMod
                   IDTHB(NB,NZ)=0
                   VRNS(NB,NZ)=0.0
                   IF(ISTYP(NZ).EQ.0)THEN
-                    GROUP(NB,NZ)=AMAX1(0.0,GROUPI(NZ)-NBTB(NB,NZ))
+                    GROUP(NB,NZ)=AZMAX1(GROUPI(NZ)-NBTB(NB,NZ))
                   ELSE
                     GROUP(NB,NZ)=GROUPI(NZ)
                   ENDIF
@@ -432,9 +433,9 @@ module HfuncsMod
   DO 180 N=1,MY(NZ)
     DO 160 L=NU,NI(NZ)
       IF(WTRTL(N,L,NZ).GT.ZEROL(NZ))THEN
-        CCPOLR(N,L,NZ)=AMAX1(0.0,CPOOLR(N,L,NZ)/WTRTL(N,L,NZ))
-        CZPOLR(N,L,NZ)=AMAX1(0.0,ZPOOLR(N,L,NZ)/WTRTL(N,L,NZ))
-        CPPOLR(N,L,NZ)=AMAX1(0.0,PPOOLR(N,L,NZ)/WTRTL(N,L,NZ))
+        CCPOLR(N,L,NZ)=AZMAX1(CPOOLR(N,L,NZ)/WTRTL(N,L,NZ))
+        CZPOLR(N,L,NZ)=AZMAX1(ZPOOLR(N,L,NZ)/WTRTL(N,L,NZ))
+        CPPOLR(N,L,NZ)=AZMAX1(PPOOLR(N,L,NZ)/WTRTL(N,L,NZ))
 !       CCPOLR(N,L,NZ)=AMIN1(1.0,CCPOLR(N,L,NZ))
       ELSE
         CCPOLR(N,L,NZ)=1.0
@@ -451,10 +452,10 @@ module HfuncsMod
 ! CCPOLB,CZPOLB,CPPOLB=nonstructural C,N,P concn in branch(g g-1)
 !
   IF(WTLS(NZ).GT.ZEROL(NZ))THEN
-    CCPOLP(NZ)=AMAX1(0.0,AMIN1(1.0,CPOOLP(NZ)/WTLS(NZ)))
-    CCPLNP(NZ)=AMAX1(0.0,AMIN1(1.0,CPOLNP(NZ)/WTLS(NZ)))
-    CZPOLP(NZ)=AMAX1(0.0,AMIN1(1.0,ZPOOLP(NZ)/WTLS(NZ)))
-    CPPOLP(NZ)=AMAX1(0.0,AMIN1(1.0,PPOOLP(NZ)/WTLS(NZ)))
+    CCPOLP(NZ)=AZMAX1(AMIN1(1.0,CPOOLP(NZ)/WTLS(NZ)))
+    CCPLNP(NZ)=AZMAX1(AMIN1(1.0,CPOLNP(NZ)/WTLS(NZ)))
+    CZPOLP(NZ)=AZMAX1(AMIN1(1.0,ZPOOLP(NZ)/WTLS(NZ)))
+    CPPOLP(NZ)=AZMAX1(AMIN1(1.0,PPOOLP(NZ)/WTLS(NZ)))
   ELSE
     CCPOLP(NZ)=1.0
     CCPLNP(NZ)=1.0
@@ -463,9 +464,9 @@ module HfuncsMod
   ENDIF
   DO 190 NB=1,NBR(NZ)
     IF(WTLSB(NB,NZ).GT.ZEROP(NZ))THEN
-      CCPOLB(NB,NZ)=AMAX1(0.0,CPOOL(NB,NZ)/WTLSB(NB,NZ))
-      CZPOLB(NB,NZ)=AMAX1(0.0,ZPOOL(NB,NZ)/WTLSB(NB,NZ))
-      CPPOLB(NB,NZ)=AMAX1(0.0,PPOOL(NB,NZ)/WTLSB(NB,NZ))
+      CCPOLB(NB,NZ)=AZMAX1(CPOOL(NB,NZ)/WTLSB(NB,NZ))
+      CZPOLB(NB,NZ)=AZMAX1(ZPOOL(NB,NZ)/WTLSB(NB,NZ))
+      CPPOLB(NB,NZ)=AZMAX1(PPOOL(NB,NZ)/WTLSB(NB,NZ))
     ELSE
       CCPOLB(NB,NZ)=1.0
       CZPOLB(NB,NZ)=1.0
@@ -580,7 +581,7 @@ module HfuncsMod
         ENDIF
         IF(VRNS(NB,NZ).LT.VRNL(NB,NZ))THEN
           IF(TCG(NZ).LT.CTC(NZ))THEN
-            VRNS(NB,NZ)=AMAX1(0.0,VRNS(NB,NZ)-1.0)
+            VRNS(NB,NZ)=AZMAX1(VRNS(NB,NZ)-1.0)
           ENDIF
         ENDIF
         IF(VRNS(NB,NZ).GE.VRNL(NB,NZ) &
@@ -636,7 +637,7 @@ module HfuncsMod
         ENDIF
         IF(VRNS(NB,NZ).LT.VRNL(NB,NZ))THEN
           IF(PSILT(NZ).LT.PSILY(IGTYP(NZ)))THEN
-            VRNS(NB,NZ)=AMAX1(0.0,VRNS(NB,NZ)-12.0)
+            VRNS(NB,NZ)=AZMAX1(VRNS(NB,NZ)-12.0)
           ENDIF
         ENDIF
         IF(VRNS(NB,NZ).GE.VRNL(NB,NZ))THEN
@@ -702,7 +703,7 @@ module HfuncsMod
         IF(VRNS(NB,NZ).LT.VRNL(NB,NZ))THEN
           IF(TCG(NZ).LT.CTC(NZ) &
             .OR.PSILG(NZ).LT.PSILM)THEN
-            VRNS(NB,NZ)=AMAX1(0.0,VRNS(NB,NZ)-1.5)
+            VRNS(NB,NZ)=AZMAX1(VRNS(NB,NZ)-1.5)
           ENDIF
         ENDIF
         IF(VRNS(NB,NZ).GE.VRNL(NB,NZ))THEN
@@ -822,8 +823,8 @@ module HfuncsMod
     STK=710.0_r8*TKCO
     ACTV=1+EXP((197500_r8-STK)/RTK)+EXP((STK-218500._r8)/RTK)
     TFNP=EXP(24.269_r8-60000._r8/RTK)/ACTV
-    RNI=AMAX1(0.0_r8,XRNI(NZ)*TFNP)
-    RLA=AMAX1(0.0_r8,XRLA(NZ)*TFNP)
+    RNI=AZMAX1(XRNI(NZ)*TFNP)
+    RLA=AZMAX1(XRLA(NZ)*TFNP)
 !
 !   NODE INITIATION AND LEAF APPEARANCE RATES SLOWED BY LOW TURGOR
 !
@@ -917,7 +918,7 @@ module HfuncsMod
       IF(IPTYP(NZ).EQ.0)THEN
         PPD=0.0
       ELSE
-        PPD=AMAX1(0.0,XDL(NZ)-DYLN)
+        PPD=AZMAX1(XDL(NZ)-DYLN)
         IF(IPTYP(NZ).EQ.1.AND.DYLN.GE.DYLX)PPD=0.0
       ENDIF
 

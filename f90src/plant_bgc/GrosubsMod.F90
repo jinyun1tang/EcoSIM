@@ -2,7 +2,7 @@ module grosubsMod
 !!
 ! Description:
 ! module for plant biological transformations
-  use minimathmod, only : test_aeqb,safe_adb
+  use minimathmod, only : test_aeqb,safe_adb,AZMAX1
   use data_kind_mod, only : r8 => SHR_KIND_R8
   use EcosimConst
   use GrosubPars
@@ -587,7 +587,7 @@ module grosubsMod
 !     WFNG=growth function of canopy water potential
 !     WFNSG=expansion,extension function of canopy water potential
 !
-  WFNS=AMIN1(1.0,AMAX1(0.0_r8,PSILG(NZ)-PSILM))
+  WFNS=AMIN1(1.0,AZMAX1(PSILG(NZ)-PSILM))
   IF(IGTYP(NZ).EQ.0)THEN
     WFNC=1.0_r8
     WFNG=EXP(0.05*PSILT(NZ))

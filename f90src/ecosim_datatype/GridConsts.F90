@@ -11,7 +11,6 @@ implicit none
   integer :: JH
   integer :: JV
   integer :: JD
-
   integer, PARAMETER :: JP=5
   integer, PARAMETER :: JC=10   !# of canopy layers
   integer, PARAMETER :: JS=5
@@ -20,4 +19,10 @@ implicit none
   integer, PARAMETER :: JSA=4   !# of sectors for the sky azimuth  [0,2*pi]
   integer, parameter :: JNODS=25!# of nodes for plant canopy
   integer  :: JG
+  integer, pointer :: JGnio(:)   !guid indices for organic-microbial complex
+  integer, pointer :: JGnfo(:)   !guid indices for organic-microbial complex
+  integer, pointer :: JGniA(:)   !guid indices for autotrophic-microbial complex
+  integer, pointer :: JGnfA(:)   !guid indices for autotrophic-microbial complex
+  integer  :: NMICBSA             !total number of microbial guilds in the autotrophic complex
+  integer  :: NMICBSO             !total number of microbial guilds in one organic-microbial complex
 end module GridConsts

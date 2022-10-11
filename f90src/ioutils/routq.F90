@@ -31,7 +31,7 @@ SUBROUTINE routq(NT,NE,NTX,NEX,NHW,NHE,NVN,NVS)
 ! OPEN CHECKPOINT FILES FOR PLANT VARIABLES
 !
   IF(is_first_year)THEN
-    DO 9999 NX=NHW,NHE
+    D9999: DO NX=NHW,NHE
       DO  NY=NVN,NVS
         DO NZ=1,5
           IDAY0(NZ,NY,NX)=-1E+06
@@ -40,7 +40,7 @@ SUBROUTINE routq(NT,NE,NTX,NEX,NHW,NHE,NVN,NVS)
           IYRH(NZ,NY,NX)=1E+06
         enddo
       enddo
-9999  CONTINUE
+    ENDDO D9999
     IF(is_restart_run)THEN
       IDATE=IDATA(9)
     ELSE
@@ -69,45 +69,49 @@ SUBROUTINE routq(NT,NE,NTX,NEX,NHW,NHE,NVN,NVS)
     call OPEN_safe(14,PREFIX,DATAC(10,NE,NEX),'OLD',mod_filename,__LINE__)
 50  READ(14,*,END=1000)NH1,NV1,NH2,NV2,NS
 !   NN=NN+1
+!   maximum number of NS is JP, which currently is set to 5.
     NN=1
-    DO 4995 NX=NH1,NH2
-      DO 4990 NY=NV1,NV2
+    D4995: DO NX=NH1,NH2
+      D4990: DO NY=NV1,NV2
         NP0(NY,NX)=NS
-        DO 4985 NZ=1,NS
+        D4985: DO NZ=1,NS
           LSG(NZ,NY,NX)=NN
-4985    CONTINUE
-4990  CONTINUE
-4995  CONTINUE
+        ENDDO D4985
+      ENDDO D4990
+    ENDDO D4995
+
     IF(NS.GT.0)THEN
+!DATAX(NZ): pft file defines pft properties
+!DATAY(NZ): management file, seeding etc
       READ(14,*)(DATAX(NZ),DATAY(NZ),NZ=1,NS)
-      DO 4975 NX=NH1,NH2
-        DO 4970 NY=NV1,NV2
-          DO 4965 NZ=1,NS
+      D4975: DO NX=NH1,NH2
+        D4970: DO NY=NV1,NV2
+          D4965: DO NZ=1,NS
             IF(IETYP(NY,NX).GT.0)THEN
               WRITE(CLIMATE,'(I2)')IETYP(NY,NX)
 !the type of pft is specified by genra+Koppen climate zone
               DATAX(NZ)=DATAX(NZ)(1:4)//CLIMATE
             ENDIF
-4965      CONTINUE
-4970    CONTINUE
-4975  CONTINUE
-
+          ENDDO D4965
+        ENDDO D4970
+      ENDDO D4975
     ENDIF
     IF(.not. is_restart_run)THEN
-      DO 8995 NX=NH1,NH2
-        DO 8990 NY=NV1,NV2
+      D8995: DO NX=NH1,NH2
+        D8990: DO NY=NV1,NV2
           NP(NY,NX)=NS
           NPP(NY,NX)=0
-          DO 100 NZ=1,NP(NY,NX)
+!DATAP(NZ,NY,NX) and DATAM(NZ,NY,NX) are to be read in readqmod.F90
+          D100: DO NZ=1,NP(NY,NX)
             DATAP(NZ,NY,NX)=DATAX(NZ)
             DATAM(NZ,NY,NX)=DATAY(NZ)
-100       CONTINUE
-          DO 101 NZ=NP(NY,NX)+1,5
+          ENDDO D100
+          D101: DO NZ=NP(NY,NX)+1,5
             DATAP(NZ,NY,NX)='NO'
             DATAM(NZ,NY,NX)='NO'
-101       CONTINUE
-8990    CONTINUE
-8995  CONTINUE
+          ENDDO D101
+        ENDDO D8990
+      ENDDO D8995
     ELSE
 !
 !     READ PLANT SPECIES NAMES FROM EARLIER RUN IF NEEDED
@@ -115,14 +119,14 @@ SUBROUTINE routq(NT,NE,NTX,NEX,NHW,NHE,NVN,NVS)
       REWIND(30)
 8000  CONTINUE
 
-      DO 9995 NX=NHW,NHE
-        DO 9990 NY=NVN,NVS
+      D9995: DO NX=NHW,NHE
+        D9990: DO NY=NVN,NVS
           READ(30,90,END=1001)IDATE,IYR,NPP(NY,NX) &
             ,(DATAZ(NZ,NY,NX),IFLGC(NZ,NY,NX),NZ=1,NPP(NY,NX))
 90        FORMAT(2I4,1I3,5(A16,I4))
 
-9990    CONTINUE
-9995  CONTINUE
+        ENDDO D9990
+      ENDDO D9995
 
 
       IF(IDATE.LT.IDAYR.OR.IYR.LT.IYRR)THEN
@@ -131,40 +135,41 @@ SUBROUTINE routq(NT,NE,NTX,NEX,NHW,NHE,NVN,NVS)
 !
 !       MATCH PREVIOUS AND CURRENT PLANT SPECIES
 !
-        DO 7975 NX=NHW,NHE
-          DO 7970 NY=NVN,NVS
-            DO 7965 NZ=1,NS
+        D7975: DO NX=NHW,NHE
+          D7970: DO NY=NVN,NVS
+            D7965: DO NZ=1,NS
               DATAA(NZ,NY,NX)=DATAX(NZ)
               DATAB(NZ,NY,NX)=DATAY(NZ)
-7965        CONTINUE
-7970      CONTINUE
-7975    CONTINUE
-        DO 7995 NX=NH1,NH2
-          DO 7990 NY=NV1,NV2
+            ENDDO D7965
+          ENDDO D7970
+        ENDDO D7975
+
+        D7995: DO NX=NH1,NH2
+          D7990: DO NY=NV1,NV2
             NP(NY,NX)=MAX(NS,NPP(NY,NX))
-            DO 195 NN=1,NP(NY,NX)
+            D195: DO NN=1,NP(NY,NX)
               DATAP(NN,NY,NX)='NO'
               DATAM(NN,NY,NX)='NO'
-195         CONTINUE
+            ENDDO D195
             IF(NPP(NY,NX).GT.0)THEN
-              DO 200 NN=1,NPP(NY,NX)
-                DO 205 NZ=1,NS
+              D200: DO NN=1,NPP(NY,NX)
+                D205: DO NZ=1,NS
                   IF(DATAZ(NN,NY,NX).EQ.DATAX(NZ).AND.IFLGC(NN,NY,NX).EQ.1)THEN
                     DATAP(NN,NY,NX)=DATAX(NZ)
                     DATAM(NN,NY,NX)=DATAY(NZ)
                     DATAA(NZ,NY,NX)='NO'
                     DATAB(NZ,NY,NX)='NO'
                   ENDIF
-205             CONTINUE
-200           CONTINUE
+                ENDDO D205
+              ENDDO D200
 !
 !             ADD NEW PLANT SPECIES
 !
-              DO 250 NN=1,NP(NY,NX)
+              D250: DO NN=1,NP(NY,NX)
 !               WRITE(*,2223)'250',NX,NY,NZ,NN,NP(NY,NX),NS
 !                2,(DATAB(NZ,NY,NX),NZ=1,NS),DATAP(NN,NY,NX),DATAM(NN,NY,NX)
                 IF(DATAP(NN,NY,NX).EQ.'NO')THEN
-                  DO 255 NZ=1,NS
+                  D255: DO NZ=1,NS
 !                   WRITE(*,2223)'255',NX,NY,NZ,NN,NP(NY,NX),NS
 !                    2,DATAM(NN,NY,NX),DATAB(NZ,NY,NX)
 !2223                FORMAT(A8,6I4,10A16)
@@ -173,63 +178,61 @@ SUBROUTINE routq(NT,NE,NTX,NEX,NHW,NHE,NVN,NVS)
                       DATAM(NN,NY,NX)=DATAB(NZ,NY,NX)
                       DATAA(NZ,NY,NX)='NO'
                       DATAB(NZ,NY,NX)='NO'
-                      GO TO 250
+                      EXIT
                     ENDIF
-255               CONTINUE
+                  ENDDO D255
                 ENDIF
-250           CONTINUE
-              DO 201 NZ=NP(NY,NX)+1,5
+              ENDDO D250
+              D201: DO NZ=NP(NY,NX)+1,5
                 DATAP(NZ,NY,NX)='NO'
                 DATAM(NZ,NY,NX)='NO'
-201           CONTINUE
+              ENDDO D201
             ELSE
-              DO 265 NZ=1,NS
+              D265: DO NZ=1,NS
                 DATAP(NZ,NY,NX)=DATAX(NZ)
                 DATAM(NZ,NY,NX)=DATAY(NZ)
-265           CONTINUE
-              DO 270 NZ=NS+1,5
+              ENDDO D265
+              D270: DO NZ=NS+1,5
                 DATAP(NZ,NY,NX)='NO'
                 DATAM(NZ,NY,NX)='NO'
-270           CONTINUE
+              ENDDO D270
             ENDIF
 !
 !           SET NUMBER OF PLANT SPECIES
 !
             NN=5
-            DO 202 NZ=JP,1,-1
+            D202: DO NZ=JP,1,-1
               IF(DATAP(NZ,NY,NX).EQ.'NO')THEN
                 NN=NN-1
               ELSE
-                GO TO 203
+                EXIT
               ENDIF
-202         CONTINUE
-203         CONTINUE
+            ENDDO D202
             NP(NY,NX)=NN
             NP0(NY,NX)=NN
-
-7990      CONTINUE
-7995    CONTINUE
+          ENDDO D7990
+        ENDDO D7995
       ENDIF
     ENDIF
     GO TO 50
 1001 CONTINUE
-    DO 6995 NX=NHW,NHE
-      DO 6990 NY=NVN,NVS
+    D6995: DO NX=NHW,NHE
+      D6990: DO NY=NVN,NVS
         NP(NY,NX)=NS
-        DO 300 NZ=1,NP(NY,NX)
+        D300: DO NZ=1,NP(NY,NX)
           DATAP(NZ,NY,NX)=DATAX(NZ)
           DATAM(NZ,NY,NX)=DATAY(NZ)
-300     CONTINUE
-        DO 301 NZ=NP(NY,NX)+1,5
+        ENDDO D300
+        D301: DO NZ=NP(NY,NX)+1,5
           DATAP(NZ,NY,NX)='NO'
           DATAM(NZ,NY,NX)='NO'
-301     CONTINUE
-6990  CONTINUE
-6995  CONTINUE
+        ENDDO D301
+      ENDDO D6990
+    ENDDO D6995
     GO TO 50
 1000  CLOSE(14)
   ELSE
-    DO 5995 NX=NHW,NHE
+    D5995: DO NX=NHW,NHE
       DO  NY=NVN,NVS
         NP(NY,NX)=0
         DO NZ=1,NP0(NY,NX)
@@ -237,7 +240,7 @@ SUBROUTINE routq(NT,NE,NTX,NEX,NHW,NHE,NVN,NVS)
           DATAM(NZ,NY,NX)='NO'
         enddo
       enddo
-5995    CONTINUE
+    ENDDO D5995
   ENDIF
   RETURN
 END subroutine routq

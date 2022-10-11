@@ -3,6 +3,7 @@ module InitSOMBGCMOD
   use MicrobialDataType
   use SOMDataType
   use GridConsts
+  use minimathmod, only : AZMAX1
   use SoilPhysDataType
   use FlagDataType
   use EcoSIMCtrlDataType
@@ -36,6 +37,12 @@ module InitSOMBGCMOD
 
   call MicPar%Init(nmicbguilds)
 
+  JGnio  => micpar%JGnio
+  JGnfo  => micpar%JGnfo
+  JGniA  => micpar%JGniA
+  JGnfA  => micpar%JGnfA
+  NMICBSA= micpar%NMICBSA
+  NMICBSO= micpar%NMICBSO
 
   JG=micpar%jguilds
   allocate(CORGCX(0:jcplx1))
@@ -245,9 +252,9 @@ module InitSOMBGCMOD
     DO 8990 N=1,NFGs
       do NGL=1,JG
         DO 8991 M=1,3
-          OMC1=AMAX1(0.0,OSCM(K)*OMCI(M,K)*OMCF(N)*FOSCI)
-          OMN1=AMAX1(0.0,OMC1*CNOMC(M,NGL,N,K)*FOSNI)
-          OMP1=AMAX1(0.0,OMC1*CPOMC(M,NGL,N,K)*FOSPI)
+          OMC1=AZMAX1(OSCM(K)*OMCI(M,K)*OMCF(N)*FOSCI)
+          OMN1=AZMAX1(OMC1*CNOMC(M,NGL,N,K)*FOSNI)
+          OMP1=AZMAX1(OMC1*CPOMC(M,NGL,N,K)*FOSPI)
           OMC(M,NGL,N,K,L,NY,NX)=OMC1
           OMN(M,NGL,N,K,L,NY,NX)=OMN1
           OMP(M,NGL,N,K,L,NY,NX)=OMP1
@@ -272,9 +279,9 @@ module InitSOMBGCMOD
 !     ORCI=allocation of microbial residue to kinetic components
 !  X is an indicator of surface residual layer
     DO 8985 M=1,2
-      ORC(M,K,L,NY,NX)=X*AMAX1(0.0,OSCM(K)*ORCI(M,K)*FOSCI)
-      ORN(M,K,L,NY,NX)=AMAX1(0.0,ORC(M,K,L,NY,NX)*CNOMC(M,1,1,K)*FOSNI)
-      ORP(M,K,L,NY,NX)=AMAX1(0.0,ORC(M,K,L,NY,NX)*CPOMC(M,1,1,K)*FOSPI)
+      ORC(M,K,L,NY,NX)=X*AZMAX1(OSCM(K)*ORCI(M,K)*FOSCI)
+      ORN(M,K,L,NY,NX)=AZMAX1(ORC(M,K,L,NY,NX)*CNOMC(M,1,1,K)*FOSNI)
+      ORP(M,K,L,NY,NX)=AZMAX1(ORC(M,K,L,NY,NX)*CPOMC(M,1,1,K)*FOSPI)
       OSCX(KK)=OSCX(KK)+ORC(M,K,L,NY,NX)
       OSNX(KK)=OSNX(KK)+ORN(M,K,L,NY,NX)
       OSPX(KK)=OSPX(KK)+ORP(M,K,L,NY,NX)
@@ -285,9 +292,9 @@ module InitSOMBGCMOD
 !     OQC,OQN,OQP,OQA=DOC,DON,DOP,acetate in micropores (g)
 !     OQCH,OQNH,OQPH,OQAH=DOC,DON,DOP,acetate in macropores (g)
 !
-    OQC(K,L,NY,NX)=X*AMAX1(0.0,OSCM(K)*OQCK(K)*FOSCI)
-    OQN(K,L,NY,NX)=AMAX1(0.0,OQC(K,L,NY,NX)*CNOSCT(KK)*FOSNI)
-    OQP(K,L,NY,NX)=AMAX1(0.0,OQC(K,L,NY,NX)*CPOSCT(KK)*FOSPI)
+    OQC(K,L,NY,NX)=X*AZMAX1(OSCM(K)*OQCK(K)*FOSCI)
+    OQN(K,L,NY,NX)=AZMAX1(OQC(K,L,NY,NX)*CNOSCT(KK)*FOSNI)
+    OQP(K,L,NY,NX)=AZMAX1(OQC(K,L,NY,NX)*CPOSCT(KK)*FOSPI)
     OQA(K,L,NY,NX)=0.0_r8
     OQCH(K,L,NY,NX)=0.0_r8
     OQNH(K,L,NY,NX)=0.0_r8
@@ -301,9 +308,9 @@ module InitSOMBGCMOD
 !
 !     OHC,OHN,OHP,OHA=adsorbed C,N,P,acetate
 !
-    OHC(K,L,NY,NX)=X*AMAX1(0.0,OSCM(K)*OHCK(K)*FOSCI)
-    OHN(K,L,NY,NX)=AMAX1(0.0,OHC(K,L,NY,NX)*CNOSCT(KK)*FOSNI)
-    OHP(K,L,NY,NX)=AMAX1(0.0,OHC(K,L,NY,NX)*CPOSCT(KK)*FOSPI)
+    OHC(K,L,NY,NX)=X*AZMAX1(OSCM(K)*OHCK(K)*FOSCI)
+    OHN(K,L,NY,NX)=AZMAX1(OHC(K,L,NY,NX)*CNOSCT(KK)*FOSNI)
+    OHP(K,L,NY,NX)=AZMAX1(OHC(K,L,NY,NX)*CPOSCT(KK)*FOSPI)
     OHA(K,L,NY,NX)=0.0_r8
     OSCX(KK)=OSCX(KK)+OHC(K,L,NY,NX)+OHA(K,L,NY,NX)
     OSNX(KK)=OSNX(KK)+OHN(K,L,NY,NX)
@@ -314,15 +321,15 @@ module InitSOMBGCMOD
 !     OSC,OAA,OSN,OSP=SOC,colonized SOC,SON,SOP
 
     DO 8980 M=1,jsken
-      OSC(M,K,L,NY,NX)=AMAX1(0.0,CFOSC(M,K,L,NY,NX)*(OSCI(K)-OSCX(K)))
+      OSC(M,K,L,NY,NX)=AZMAX1(CFOSC(M,K,L,NY,NX)*(OSCI(K)-OSCX(K)))
       IF(CNOSCT(K).GT.ZERO)THEN
-        OSN(M,K,L,NY,NX)=AMAX1(0.0,CFOSC(M,K,L,NY,NX)*CNOSC(M,K,L,NY,NX) &
+        OSN(M,K,L,NY,NX)=AZMAX1(CFOSC(M,K,L,NY,NX)*CNOSC(M,K,L,NY,NX) &
           /CNOSCT(K)*(OSNI(K)-OSNX(K)))
       ELSE
         OSN(M,K,L,NY,NX)=0.0_r8
       ENDIF
       IF(CPOSCT(K).GT.ZERO)THEN
-        OSP(M,K,L,NY,NX)=AMAX1(0.0,CFOSC(M,K,L,NY,NX)*CPOSC(M,K,L,NY,NX) &
+        OSP(M,K,L,NY,NX)=AZMAX1(CFOSC(M,K,L,NY,NX)*CPOSC(M,K,L,NY,NX) &
           /CPOSCT(K)*(OSPI(K)-OSPX(K)))
       ELSE
         OSP(M,K,L,NY,NX)=0.0_r8
@@ -725,11 +732,11 @@ module InitSOMBGCMOD
       CORGPZ=CORGP(L,NY,NX)
       IF(CORGCZ.GT.ZERO)THEN
         CORGCX(3)=CORGRZ
-        CORGCX(4)=AMAX1(0.0,CORGCZ-CORGCX(3))
+        CORGCX(4)=AZMAX1(CORGCZ-CORGCX(3))
         CORGNX(3)=AMIN1(CNRH(3)*CORGCX(3),CORGNZ)
-        CORGNX(4)=AMAX1(0.0,CORGNZ-CORGNX(3))
+        CORGNX(4)=AZMAX1(CORGNZ-CORGNX(3))
         CORGPX(3)=AMIN1(CPRH(3)*CORGCX(3),CORGPZ)
-        CORGPX(4)=AMAX1(0.0,CORGPZ-CORGPX(3))
+        CORGPX(4)=AZMAX1(CORGPZ-CORGPX(3))
       ELSE
         CORGCX(3)=0.0_r8
         CORGCX(4)=0.0_r8

@@ -5,6 +5,7 @@ module StartqMod
   use FlagDataType
   use EcosimConst
   use EcoSIMCtrlDataType
+  use minimathmod, only : AZMAX1
   use PlantDataRateType
   use ClimForcDataType
   use PlantTraitDataType
@@ -727,7 +728,7 @@ module StartqMod
   TFN3(NZ,NY,NX)=1.0
   PSILT(NZ,NY,NX)=-1.0E-03
   PSILO(NZ,NY,NX)=OSMO(NZ,NY,NX)+PSILT(NZ,NY,NX)
-  PSILG(NZ,NY,NX)=AMAX1(0.0,PSILT(NZ,NY,NX)-PSILO(NZ,NY,NX))
+  PSILG(NZ,NY,NX)=AZMAX1(PSILT(NZ,NY,NX)-PSILO(NZ,NY,NX))
   EP(NZ,NY,NX)=0._r8
   FRADP(NZ,NY,NX)=0._r8
   end subroutine InitPlantHeatandWater
@@ -759,7 +760,7 @@ module StartqMod
       UPWTR(N,L,NZ,NY,NX)=0._r8
       PSIRT(N,L,NZ,NY,NX)=-0.01
       PSIRO(N,L,NZ,NY,NX)=OSMO(NZ,NY,NX)+PSIRT(N,L,NZ,NY,NX)
-      PSIRG(N,L,NZ,NY,NX)=AMAX1(0.0,PSIRT(N,L,NZ,NY,NX)-PSIRO(N,L,NZ,NY,NX))
+      PSIRG(N,L,NZ,NY,NX)=AZMAX1(PSIRT(N,L,NZ,NY,NX)-PSIRO(N,L,NZ,NY,NX))
       CPOOLR(N,L,NZ,NY,NX)=0._r8
       ZPOOLR(N,L,NZ,NY,NX)=0._r8
       PPOOLR(N,L,NZ,NY,NX)=0._r8

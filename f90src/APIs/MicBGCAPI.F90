@@ -7,6 +7,7 @@ module MicBGCAPI
   use MicFLuxTypeMod, only : micfluxtype
   use MicStateTraitTypeMod, only : micsttype
   use MicForcTypeMod, only : micforctype
+  use minimathmod, only : AZMAX1
   use SoilBGCDataType
   USE PlantDataRateType
   USE SoilWaterDataType
@@ -214,14 +215,14 @@ END subroutine MicrobeModel
   micfor%litrm=(L==0)
   micfor%Lsurf=(L==NU(NY,NX))
   if(micfor%litrm)then
-    micstt%ZNH4TU=AMAX1(0.0,ZNH4S(NU(NY,NX),NY,NX)) &
-      +AMAX1(0.0,ZNH4B(NU(NY,NX),NY,NX))
-    micstt%ZNO3TU=AMAX1(0.0,ZNO3S(NU(NY,NX),NY,NX)) &
-      +AMAX1(0.0,ZNO3B(NU(NY,NX),NY,NX))
-    micstt%H1P4TU=AMAX1(0.0,H1PO4(NU(NY,NX),NY,NX)) &
-      +AMAX1(0.0,H1POB(NU(NY,NX),NY,NX))
-    micstt%H2P4TU=AMAX1(0.0,H2PO4(NU(NY,NX),NY,NX)) &
-      +AMAX1(0.0,H2POB(NU(NY,NX),NY,NX))
+    micstt%ZNH4TU=AZMAX1(ZNH4S(NU(NY,NX),NY,NX)) &
+      +AZMAX1(ZNH4B(NU(NY,NX),NY,NX))
+    micstt%ZNO3TU=AZMAX1(ZNO3S(NU(NY,NX),NY,NX)) &
+      +AZMAX1(ZNO3B(NU(NY,NX),NY,NX))
+    micstt%H1P4TU=AZMAX1(H1PO4(NU(NY,NX),NY,NX)) &
+      +AZMAX1(H1POB(NU(NY,NX),NY,NX))
+    micstt%H2P4TU=AZMAX1(H2PO4(NU(NY,NX),NY,NX)) &
+      +AZMAX1(H2POB(NU(NY,NX),NY,NX))
     micstt%CNH4BU=CNH4B(NU(NY,NX),NY,NX)
     micstt%CNH4SU=CNH4S(NU(NY,NX),NY,NX)
     micstt%CH2P4U=CH2P4(NU(NY,NX),NY,NX)

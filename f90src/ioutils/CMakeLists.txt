@@ -16,7 +16,7 @@ set(IOUTILS_SOURCES
 	splitp.c
 	splits.c
   ncdio_pio.F90
-  histMod.F90
+  bhistMod.F90
 	)
 include_directories(${CMAKE_BINARY_DIR}/f90src/utils/)
 include_directories(${CMAKE_BINARY_DIR}/f90src/minimath/)

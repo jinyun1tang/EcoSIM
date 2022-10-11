@@ -5,7 +5,7 @@ module StartsMod
 
   use data_kind_mod, only : r8 => SHR_KIND_R8
   use abortutils, only : padr, print_info,check_bool
-  use minimathMod, only : test_aeqb, test_aneb, AZMAX1
+  use minimathMod, only : test_aeqb, test_aneb, AZMAX1,AZMIN1
   use EcosimConst
   use MicrobialDataType
   use EcoSIMSolverPar
@@ -590,7 +590,7 @@ module StartsMod
     VOLSI(L,NY,NX)=DLYRSI*DH(NY,NX)*DV(NY,NX)
     CDPTHS(L,NY,NX)=CDPTHS(L-1,NY,NX)+DLYRS(L,NY,NX)
     TKW(L,NY,NX)=AMIN1(Tref,ATKA(NY,NX))
-    TCW(L,NY,NX)=AMIN1(0.0,ATCA(NY,NX))
+    TCW(L,NY,NX)=AZMIN1(ATCA(NY,NX))
     VHCPW(L,NY,NX)=cps*VOLSSL(L,NY,NX)+cpw*VOLWSL(L,NY,NX)+cpi*VOLISL(L,NY,NX)
 9580  CONTINUE
   end subroutine InitSnowLayers

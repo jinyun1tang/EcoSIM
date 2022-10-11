@@ -34,33 +34,39 @@ implicit none
   integer :: ndbiomcp   !number of necrobiomass components
   integer :: nlbiomcp   !number of living biomass components
 
-  real(r8), allocatable :: OMCI(:,:)             !initializes microbial biomass
-  real(r8), allocatable :: OHCK(:)    !fractions of SOC in adsorbed C
-  real(r8), allocatable :: OMCK(:)    !fractions of SOC in biomass
-  real(r8), allocatable :: ORCK(:)    !fractions of SOC in litter
-  real(r8), allocatable :: OQCK(:)    !fractions of SOC in DOC
-  real(r8), allocatable :: ORCI(:,:)   !allocation of residue to kinetic components
-  real(r8), allocatable :: FL(:)       !allocation to microbial kinetic fractions
-  real(r8),allocatable :: CNOMC(:,:,:,:)        !maximum/minimum microbial N:C
-  real(r8),allocatable :: CPOMC(:,:,:,:)        !maximum/minimum microbial P:C
-  real(r8),allocatable :: CNOMCff(:,:,:)        !maximum/minimum microbial N:C
-  real(r8),allocatable :: CPOMCff(:,:,:)        !maximum/minimum microbial P:C
-  real(r8), allocatable :: DOSA(:)
-  real(r8), allocatable :: SPOSC(:,:)
-  real(r8),allocatable :: CNOFC(:,:)                         !fractions to allocate N to kinetic components
-  real(r8),allocatable :: CPOFC(:,:)                         !fractions to allocate P to kinetic components
-  real(r8),allocatable :: CNRH(:)                            !default N:C ratios in SOC complexes
-  real(r8),allocatable :: CPRH(:)                            !default P:C ratios in SOC complexes
-  real(r8),allocatable :: OMCF(:)                            !hetero microbial biomass composition in SOC
-  real(r8),allocatable :: OMCA(:)                            !autotrophic microbial biomass composition in SOC
-  logical, allocatable :: is_activef_micb(:)
-  logical, allocatable :: is_litter(:)
+  real(r8), pointer :: OMCI(:,:)             !initializes microbial biomass
+  real(r8), pointer :: OHCK(:)    !fractions of SOC in adsorbed C
+  real(r8), pointer :: OMCK(:)    !fractions of SOC in biomass
+  real(r8), pointer :: ORCK(:)    !fractions of SOC in litter
+  real(r8), pointer :: OQCK(:)    !fractions of SOC in DOC
+  real(r8), pointer :: ORCI(:,:)   !allocation of residue to kinetic components
+  real(r8), pointer :: FL(:)       !allocation to microbial kinetic fractions
+  real(r8), pointer :: CNOMC(:,:,:,:)        !maximum/minimum microbial N:C
+  real(r8), pointer :: CPOMC(:,:,:,:)        !maximum/minimum microbial P:C
+  real(r8), pointer :: CNOMCff(:,:,:)        !maximum/minimum microbial N:C
+  real(r8), pointer :: CPOMCff(:,:,:)        !maximum/minimum microbial P:C
+  real(r8), pointer :: DOSA(:)
+  real(r8), pointer :: SPOSC(:,:)
+  real(r8), pointer :: CNOFC(:,:)                         !fractions to allocate N to kinetic components
+  real(r8), pointer :: CPOFC(:,:)                         !fractions to allocate P to kinetic components
+  real(r8), pointer :: CNRH(:)                            !default N:C ratios in SOC complexes
+  real(r8), pointer :: CPRH(:)                            !default P:C ratios in SOC complexes
+  real(r8), pointer :: OMCF(:)                            !hetero microbial biomass composition in SOC
+  real(r8), pointer :: OMCA(:)                            !autotrophic microbial biomass composition in SOC
+  logical, pointer :: is_activef_micb(:)
+  logical, pointer :: is_litter(:)
   character(len=16) :: kiname(0:jskenc-1)
   character(len=16) :: cplxname(0:jcplx1c)
   character(len=16) :: hmicname(NFGsc)
   character(len=16) :: amicname(NFGsc)
   character(len=16) :: micresb(0:ndbiomcpc-1)      !residual biomass name
   character(len=16) :: micbiom(1:nlbiomcpc)        !microbial biomass pool name
+  integer, pointer :: JGnio(:)   !guid indices for organic-microbial complex
+  integer, pointer :: JGnfo(:)   !guid indices for organic-microbial complex
+  integer, pointer :: JGniA(:)   !guid indices for autotrophic-microbial complex
+  integer, pointer :: JGnfA(:)   !guid indices for autotrophic-microbial complex
+  integer :: NMICBSA             !total number of microbial guilds in the autotrophic complex
+  integer :: NMICBSO             !total number of microbial guilds in one organic-microbial complex
   contains
     procedure, public  :: Init
     procedure, public  :: SetPars
@@ -75,6 +81,8 @@ contains
   implicit none
   class(MicParType) :: this
   integer, intent(in) :: nmicbguilds
+  integer :: n, k
+
   !organic matter is grouped into five complexes, including woody(0),
   ! non-woody(1), manure(2), litter, POC(3) and humus(4) (g Mg-1)
 
@@ -86,7 +94,6 @@ contains
   this%jsken=jskenc        !# of kinetic components of the substrates
   this%jguilds=nmicbguilds
   this%NFGs=NFGsc
-
   !woody, non_woody litter and manure are defined as litter
   allocate(this%is_litter(0:this%jcplx1));this%is_litter(:)=.false.
   this%k_woody_litr=0;     this%is_litter(this%k_woody_litr)=.true.
@@ -144,6 +151,20 @@ contains
   this%is_activef_micb(this%nf_nitrite_oxi)=.True.
   this%is_activef_micb(this%nf_aero_methanot)=.True.
   this%is_activef_micb(this%nf_hydro_methang)=.True.
+
+  k=1
+  this%NMICBSA=0
+  this%NMICBSO=0
+  do n=1,NFGsc
+    this%JGnio(n)=k
+    this%JGniA(n)=k
+    k=k+nmicbguilds
+    this%JGnfo(n)=k-1
+    this%JGnfA(n)=k-1
+    this%NMICBSA=this%NMICBSA+this%JGnfA(n)-this%JGniA(n)+1
+    this%NMICBSO=this%NMICBSO+this%JGnfo(n)-this%JGnio(n)+1
+  enddo
+
   end subroutine Init
 !------------------------------------------------------------------------------------------
 
@@ -280,6 +301,12 @@ contains
   jcplx =this%jcplx
   jcplx1=this%jcplx1
   jsken =this%jsken
+  allocate(this%JGnio(NFGs))
+  allocate(this%JGnfo(NFGs))
+
+  allocate(this%JGniA(NFGsc))
+  allocate(this%JGnfA(NFGsc))
+
   allocate(this%DOSA(0:jcplx1))
   allocate(this%SPOSC(jsken,0:jcplx1))
   allocate(this%OHCK(0:jcplx1))

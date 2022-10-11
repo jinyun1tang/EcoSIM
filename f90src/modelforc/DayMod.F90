@@ -2,7 +2,7 @@
   module DayMod
   use data_kind_mod, only : r8 => SHR_KIND_R8
   use EcosimConst
-  use minimathmod  , only : isLeap
+  use minimathmod  , only : isLeap,AZMAX1
   use MiniFuncMod  , only : GetDayLength
   use GridConsts
   use SoilPhysDataType
@@ -336,9 +336,9 @@
 !     CORP=soil mixing fraction used in redist.f
 !
       IF(ITILL(I,NY,NX).LE.10)THEN
-        CORP=AMIN1(1.0,AMAX1(0.0,ITILL(I,NY,NX)/10.0))
+        CORP=AMIN1(1.0,AZMAX1(ITILL(I,NY,NX)/10.0))
       ELSEIF(ITILL(I,NY,NX).LE.20)THEN
-        CORP=AMIN1(1.0,AMAX1(0.0,(ITILL(I,NY,NX)-10.0)/10.0))
+        CORP=AMIN1(1.0,AZMAX1((ITILL(I,NY,NX)-10.0)/10.0))
       ENDIF
       XCORP(NY,NX)=1.0-CORP
 !     WRITE(*,2227)'TILL',I,ITILL(I,NY,NX),CORP,XCORP(NY,NX)
@@ -379,7 +379,7 @@
 165       CONTINUE
           IF((IFLGV(NY,NX).EQ.0.AND.TVW.LT.TWP+FIRRA(NY,NX)*(TFZ-TWP)) &
             .OR.(IFLGV(NY,NX).EQ.1.AND.PSILZ(1,NY,NX).LT.FIRRA(NY,NX)))THEN
-            RR=AMAX1(0.0,TFZ-TVW)
+            RR=AZMAX1(TFZ-TVW)
             IF(RR.GT.0.0)THEN
               DO 170 J=IIRRA(3,NY,NX),IIRRA(4,NY,NX)
                 RRIG(J,I,NY,NX)=RR/(IIRRA(4,NY,NX)-IIRRA(3,NY,NX)+1)

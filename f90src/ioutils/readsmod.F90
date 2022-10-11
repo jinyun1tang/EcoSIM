@@ -3,7 +3,7 @@ module readsmod
   use data_kind_mod, only : r8 => SHR_KIND_R8
   use abortutils , only : endrun
   use fileUtil   , only : open_safe
-  use minimathmod, only : isLeap
+  use minimathmod, only : isLeap,AZMAX1
   use GridConsts
   use FlagDataType
   use FertilizerDataType
@@ -702,19 +702,19 @@ module readsmod
 ! shortwave radiation
           IF(TYP(K).EQ.'W')THEN
 ! W m-2 to MJ m-2 per hour (3600 seconds per hour * 1.e-6)
-            SRADH(J,I)=AMAX1(0.0,(DAT(K)+DATK(K))/IH*0.0036_r8)
+            SRADH(J,I)=AZMAX1((DAT(K)+DATK(K))/IH*0.0036_r8)
           ELSEIF(TYP(K).EQ.'J')THEN
 ! 1.e4 J m-2
-            SRADH(J,I)=AMAX1(0.0,(DAT(K)+DATK(K))/IH*0.01_r8)
+            SRADH(J,I)=AZMAX1((DAT(K)+DATK(K))/IH*0.01_r8)
           ELSEIF(TYP(K).EQ.'K')THEN
 ! kJ m-2 per hour
-            SRADH(J,I)=AMAX1(0.0,(DAT(K)+DATK(K))/IH*0.001_r8)
+            SRADH(J,I)=AZMAX1((DAT(K)+DATK(K))/IH*0.001_r8)
           ELSEIF(TYP(K).EQ.'P')THEN
-            SRADH(J,I)=AMAX1(0.0,(DAT(K)+DATK(K))/IH*0.0036_r8*0.457_r8)
+            SRADH(J,I)=AZMAX1((DAT(K)+DATK(K))/IH*0.0036_r8*0.457_r8)
 !     ELSEIF(TYP(K).EQ.'M')THEN
-!     SRADH(J,I)=AMAX1(0.0,(DAT(K)+DATK(K))/IH*3.6*0.457)
+!     SRADH(J,I)=AZMAX1((DAT(K)+DATK(K))/IH*3.6*0.457)
           ELSE
-            SRADH(J,I)=AMAX1(0.0,(DAT(K)+DATK(K))/IH)
+            SRADH(J,I)=AZMAX1((DAT(K)+DATK(K))/IH)
           ENDIF
 !
 !     WIND SPEED
@@ -746,24 +746,24 @@ module readsmod
           ELSEIF(TYP(K).EQ.'H')THEN
 ! given as relative humidity, [0, 1]
             DWPTH(J,I)=0.61*EXP(5360.0*(3.661E-03-1.0/(TC2K+TMPH(J,I)))) &
-              *AMAX1(0.0,AMIN1(1.0,(DAT(K)+DATK(K))/IH))
+              *AZMAX1(AMIN1(1.0,(DAT(K)+DATK(K))/IH))
           ELSEIF(TYP(K).EQ.'R')THEN
 ! given as relative humidity [0, 100]
             DWPTH(J,I)=0.61*EXP(5360.0*(3.661E-03-1.0/(TC2K+TMPH(J,I)))) &
-              *AMAX1(0.0,AMIN1(100.0,(DAT(K)+DATK(K))/IH))*0.01
+              *AZMAX1(AMIN1(100.0,(DAT(K)+DATK(K))/IH))*0.01
           ELSEIF(TYP(K).EQ.'S')THEN
 ! what is the unit? mass mixing ratio? [0,100]
-            DWPTH(J,I)=AMAX1(0.0,(DAT(K)+DATK(K))/IH)*0.0289/18.0*101.325 &
+            DWPTH(J,I)=AZMAX1((DAT(K)+DATK(K))/IH)*0.0289/18.0*101.325 &
               *EXP(-ALTIG/7272.0)*288.15/(TC2K+TMPH(J,I))
           ELSEIF(TYP(K).EQ.'G')THEN
 ! what is the unit? mass mixing ratio? [0, 1] ALTIG is doing altitude correction,
-            DWPTH(J,I)=AMAX1(0.0,(DAT(K)+DATK(K))/IH)*28.9/18.0*101.325 &
+            DWPTH(J,I)=AZMAX1((DAT(K)+DATK(K))/IH)*28.9/18.0*101.325 &
               *EXP(-ALTIG/7272.0)*288.15/(TC2K+TMPH(J,I))
           ELSEIF(TYP(K).EQ.'M')THEN
 ! given as hPa
-            DWPTH(J,I)=AMAX1(0.0,(DAT(K)+DATK(K))/IH*0.1)
+            DWPTH(J,I)=AZMAX1((DAT(K)+DATK(K))/IH*0.1)
           ELSE
-            DWPTH(J,I)=AMAX1(0.0,(DAT(K)+DATK(K))/IH)
+            DWPTH(J,I)=AZMAX1((DAT(K)+DATK(K))/IH)
           ENDIF
 !
 !       PRECIPITATION, [m h-1]
@@ -771,24 +771,24 @@ module readsmod
       ELSEIF(VAR(K).EQ.'P')THEN
         IF(TYP(K).EQ.'M')THEN
 !   [mm m-2] (mm to m, 1.e-3)
-          RAINH(J,I)=AMAX1(0.0,DAT(K)+DATK(K))/1.0E+03
+          RAINH(J,I)=AZMAX1(DAT(K)+DATK(K))/1.0E+03
         ELSEIF(TYP(K).EQ.'C')THEN
 !   [cm m-2]
-          RAINH(J,I)=AMAX1(0.0,DAT(K)+DATK(K))/1.0E+02
+          RAINH(J,I)=AZMAX1(DAT(K)+DATK(K))/1.0E+02
         ELSEIF(TYP(K).EQ.'I')THEN
 !  [inch m-2] -> [m m-2]
-          RAINH(J,I)=AMAX1(0.0,DAT(K)+DATK(K))*0.0254
+          RAINH(J,I)=AZMAX1(DAT(K)+DATK(K))*0.0254
         ELSEIF(TYP(K).EQ.'S')THEN
 !  [second m-2]
           IF(TTYPE.EQ.'H')THEN
 ! given in hour
-            RAINH(J,I)=AMAX1(0.0,DAT(K)+DATK(K))*3.6
+            RAINH(J,I)=AZMAX1(DAT(K)+DATK(K))*3.6
           ELSE
 ! given in half hour
-            RAINH(J,I)=AMAX1(0.0,DAT(K)+DATK(K))*1.8
+            RAINH(J,I)=AZMAX1(DAT(K)+DATK(K))*1.8
           ENDIF
         ELSE
-          RAINH(J,I)=AMAX1(0.0,DAT(K)+DATK(K))
+          RAINH(J,I)=AZMAX1(DAT(K)+DATK(K))
         ENDIF
 !
 !       LONGWAVE RADIATION (OPTIONAL)
@@ -796,14 +796,14 @@ module readsmod
       ELSEIF(VAR(K).EQ.'L')THEN
         IF(TYP(K).EQ.'W')THEN
 ! watss m-2, into MJ per hour, *3600 seconds * 1.0-6 = 0.0036
-          XRADH(J,I)=AMAX1(0.0,(DAT(K)+DATK(K))/IH*0.0036)
+          XRADH(J,I)=AZMAX1((DAT(K)+DATK(K))/IH*0.0036)
         ELSEIF(TYP(K).EQ.'J')THEN
-          XRADH(J,I)=AMAX1(0.0,(DAT(K)+DATK(K))/IH*0.01)
+          XRADH(J,I)=AZMAX1((DAT(K)+DATK(K))/IH*0.01)
         ELSEIF(TYP(K).EQ.'K')THEN
 ! kJ m-2, into MJ per hour, * 0.001
-          XRADH(J,I)=AMAX1(0.0,(DAT(K)+DATK(K))/IH*0.001)
+          XRADH(J,I)=AZMAX1((DAT(K)+DATK(K))/IH*0.001)
         ELSE
-          XRADH(J,I)=AMAX1(0.0,(DAT(K)+DATK(K))/IH)
+          XRADH(J,I)=AZMAX1((DAT(K)+DATK(K))/IH)
         ENDIF
       ENDIF
       DATK(K)=0.0
@@ -910,11 +910,11 @@ module readsmod
 !
     ELSEIF(VAR(K).EQ.'R')THEN
       IF(TYP(K).EQ.'L')THEN
-        SRAD(I)=AMAX1(0.0,DAT(K)/23.87)
+        SRAD(I)=AZMAX1(DAT(K)/23.87)
       ELSEIF(TYP(K).EQ.'J')THEN
-        SRAD(I)=AMAX1(0.0,DAT(K)*0.01)
+        SRAD(I)=AZMAX1(DAT(K)*0.01)
       ELSE
-        SRAD(I)=AMAX1(0.0,DAT(K))
+        SRAD(I)=AZMAX1(DAT(K))
       ENDIF
 !
 !     WIND SPEED
@@ -943,42 +943,42 @@ module readsmod
         DWPT(1,I)=0.61*EXP(5360.0*(3.661E-03-1.0/(TC2K+DAT(K))))
         DWPT(2,I)=0.61*EXP(5360.0*(3.661E-03-1.0/(TC2K+DAT(K))))
       ELSEIF(TYP(K).EQ.'H')THEN
-        DAT(K)=AMAX1(0.0,AMIN1(1.0,DAT(K)))
+        DAT(K)=AZMAX1(AMIN1(1.0,DAT(K)))
         DWPT(1,I)=0.61*EXP(5360.0*(3.661E-03-1.0/(TC2K+(TMPN(I)+TMPX(I))/2)))*DAT(K)
         DWPT(2,I)=0.61*EXP(5360.0*(3.661E-03-1.0/(TC2K+TMPN(I))))
       ELSEIF(TYP(K).EQ.'R')THEN
-        DAT(K)=AMAX1(0.0,AMIN1(100.0,DAT(K)))
+        DAT(K)=AZMAX1(AMIN1(100.0,DAT(K)))
         DWPT(1,I)=0.61*EXP(5360.0*(3.661E-03-1.0/(TC2K+(TMPN(I)+TMPX(I))/2)))*DAT(K)*0.01
         DWPT(2,I)=0.61*EXP(5360.0*(3.661E-03-1.0/(TC2K+TMPN(I))))
       ELSEIF(TYP(K).EQ.'S')THEN
-        DWPT(1,I)=AMAX1(0.0,DAT(K))*0.0289/18.0*101.325 &
+        DWPT(1,I)=AZMAX1(DAT(K))*0.0289/18.0*101.325 &
           *EXP(-ALTIG/7272.0)*288.15/(TC2K+(TMPN(I)+TMPX(I))/2)
-        DWPT(2,I)=AMAX1(0.0,DAT(K))*0.0289/18.0*101.325 &
+        DWPT(2,I)=AZMAX1(DAT(K))*0.0289/18.0*101.325 &
           *EXP(-ALTIG/7272.0)*288.15/(TC2K+TMPN(I))
       ELSEIF(TYP(K).EQ.'G')THEN
-        DWPT(1,I)=AMAX1(0.0,DAT(K))*28.9/18.0*101.325 &
+        DWPT(1,I)=AZMAX1(DAT(K))*28.9/18.0*101.325 &
           *EXP(-ALTIG/7272.0)*288.15/(TC2K+(TMPN(I)+TMPX(I))/2)
-        DWPT(2,I)=AMAX1(0.0,DAT(K))*28.9/18.0*101.325 &
+        DWPT(2,I)=AZMAX1(DAT(K))*28.9/18.0*101.325 &
           *EXP(-ALTIG/7272.0)*288.15/(TC2K+TMPN(I))
       ELSEIF(TYP(K).EQ.'M')THEN
-        DWPT(1,I)=AMAX1(0.0,DAT(K)*0.1)
-        DWPT(2,I)=AMAX1(0.0,DAT(K)*0.1)
+        DWPT(1,I)=AZMAX1(DAT(K)*0.1)
+        DWPT(2,I)=AZMAX1(DAT(K)*0.1)
       ELSE
-        DWPT(1,I)=AMAX1(0.0,DAT(K))
-        DWPT(2,I)=AMAX1(0.0,DAT(K))
+        DWPT(1,I)=AZMAX1(DAT(K))
+        DWPT(2,I)=AZMAX1(DAT(K))
       ENDIF
 !
 !     PRECIPITATION
 !
     ELSEIF(VAR(K).EQ.'P')THEN
       IF(TYP(K).EQ.'M')THEN
-        RAIN(I)=AMAX1(0.0,DAT(K))/1.0E+03
+        RAIN(I)=AZMAX1(DAT(K))/1.0E+03
       ELSEIF(TYP(K).EQ.'C')THEN
-        RAIN(I)=AMAX1(0.0,DAT(K))/1.0E+02
+        RAIN(I)=AZMAX1(DAT(K))/1.0E+02
       ELSEIF(TYP(K).EQ.'I')THEN
-        RAIN(I)=AMAX1(0.0,DAT(K))*0.0254
+        RAIN(I)=AZMAX1(DAT(K))*0.0254
       ELSE
-        RAIN(I)=AMAX1(0.0,DAT(K))
+        RAIN(I)=AZMAX1(DAT(K))
       ENDIF
     ENDIF
 65  CONTINUE

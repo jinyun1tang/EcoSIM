@@ -5,6 +5,7 @@ module ForcTypeMod
   use EcoSIMSolverPar
   use ChemTracerParsMod
   use MiniFuncMod
+  use minimathmod, only : AZMAX1
 implicit none
 
   character(len=*),private, parameter :: mod_filename = __FILE__
@@ -471,7 +472,7 @@ implicit none
     scalar=forc%TFND*XNPD
     forc%DFGS=fDFGS(scalar,THETW,Z3S)
 
-    DFLG2=2.0_r8*AMAX1(0.0_r8,forc%THETPM)*POROQ &
+    DFLG2=2.0_r8*AZMAX1(forc%THETPM)*POROQ &
       *forc%THETPM/forc%POROS*forc%AREA3/forc%DLYR3
     TFACG=TEFGASDIF(forc%TKS)
     forc%CGSGL=CGSG*TFACG*DFLG2

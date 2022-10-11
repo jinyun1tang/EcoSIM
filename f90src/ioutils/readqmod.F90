@@ -44,9 +44,9 @@ module readqmod
 
 ! begin_execution
 
-  DO 9995 NX=NHW,NHE
-    DO 9990 NY=NVN,NVS
-      DO 9985 NZ=1,NP(NY,NX)
+  D9995: DO NX=NHW,NHE
+    D9990: DO NY=NVN,NVS
+      D9985: DO NZ=1,NP(NY,NX)
 !
 !       OPEN PFT(11), PFT MANAGEMENT(12) FILES FROM
 !       FILE NAMES IN DATA ARRAYS LOADED IN MAIN.F
@@ -61,11 +61,11 @@ module readqmod
 
         IFLGC(NZ,NY,NX)=0
         IDTH(NZ,NY,NX)=0
-9985  CONTINUE
-9990  CONTINUE
-9995  CONTINUE
-      RETURN
-END SUBROUTINE readq
+      ENDDO D9985
+    ENDDO D9990
+  ENDDO D9995
+  RETURN
+  END SUBROUTINE readq
 
 
 !------------------------------------------------------------------------------------------
@@ -84,7 +84,7 @@ END SUBROUTINE readq
   ENDIF
 
 !
-  DO 15 M=1,366
+  D15: DO M=1,366
     IHVST(NZ,M,NY,NX)=-1
     JHVST(NZ,M,NY,NX)=0
     HVST(NZ,M,NY,NX)=1.0E+06
@@ -97,7 +97,7 @@ END SUBROUTINE readq
     EHVST(2,2,NZ,M,NY,NX)=1.0
     EHVST(2,3,NZ,M,NY,NX)=1.0
     EHVST(2,4,NZ,M,NY,NX)=1.0
-15  CONTINUE
+  ENDDO D15
   if(lverb)then
     write(*,*)'read pft management file ',DATAM(NZ,NY,NX)
   endif

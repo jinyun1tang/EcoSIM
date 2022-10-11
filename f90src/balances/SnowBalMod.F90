@@ -1,6 +1,7 @@
 module SnowBalMod
   use data_kind_mod, only : r8 => SHR_KIND_R8
   use abortutils, only : endrun
+  use minimathmod, only : AZMAX1
   USE SnowDataType
   use GridConsts
   use GridDataType
@@ -236,7 +237,7 @@ implicit none
     .GT.ZEROS2(NY,NX))THEN
     VOLSL(L,NY,NX)=VOLSSL(L,NY,NX)/DENSS(L,NY,NX) &
       +VOLWSL(L,NY,NX)+VOLISL(L,NY,NX)
-    DLYRS(L,NY,NX)=AMAX1(0.0,VOLSL(L,NY,NX)) &
+    DLYRS(L,NY,NX)=AZMAX1(VOLSL(L,NY,NX)) &
       /AREA(3,NU(NY,NX),NY,NX)
     CDPTHS(L,NY,NX)=CDPTHS(L-1,NY,NX)+DLYRS(L,NY,NX)
     VHCPWZ(L,NY,NX)=VHCPW(L,NY,NX)
