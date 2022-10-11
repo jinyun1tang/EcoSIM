@@ -45,6 +45,10 @@ implicit none
   real(r8), pointer :: CPOMC(:,:,:,:)        !maximum/minimum microbial P:C
   real(r8), pointer :: CNOMCff(:,:,:)        !maximum/minimum microbial N:C
   real(r8), pointer :: CPOMCff(:,:,:)        !maximum/minimum microbial P:C
+  real(r8), pointer :: CNOMCa(:,:,:)         !average maximum/minimum microbial N:C
+  real(r8), pointer :: CPOMCa(:,:,:)         !average maximum/minimum microbial P:C
+  real(r8), pointer :: CNOMCffa(:,:)         !average maximum/minimum microbial N:C
+  real(r8), pointer :: CPOMCffa(:,:)         !average maximum/minimum microbial P:C
   real(r8), pointer :: DOSA(:)
   real(r8), pointer :: SPOSC(:,:)
   real(r8), pointer :: CNOFC(:,:)                         !fractions to allocate N to kinetic components
@@ -81,7 +85,6 @@ contains
   implicit none
   class(MicParType) :: this
   integer, intent(in) :: nmicbguilds
-  integer :: n, k
 
   !organic matter is grouped into five complexes, including woody(0),
   ! non-woody(1), manure(2), litter, POC(3) and humus(4) (g Mg-1)
@@ -152,18 +155,6 @@ contains
   this%is_activef_micb(this%nf_aero_methanot)=.True.
   this%is_activef_micb(this%nf_hydro_methang)=.True.
 
-  k=1
-  this%NMICBSA=0
-  this%NMICBSO=0
-  do n=1,NFGsc
-    this%JGnio(n)=k
-    this%JGniA(n)=k
-    k=k+nmicbguilds
-    this%JGnfo(n)=k-1
-    this%JGnfA(n)=k-1
-    this%NMICBSA=this%NMICBSA+this%JGnfA(n)-this%JGniA(n)+1
-    this%NMICBSO=this%NMICBSO+this%JGnfo(n)-this%JGnio(n)+1
-  enddo
 
   end subroutine Init
 !------------------------------------------------------------------------------------------
@@ -202,8 +193,10 @@ contains
   OMCK=real((/0.01,0.01,0.01,0.01,0.01/),r8)
   ORCK=real((/0.25,0.25,0.25,0.25,0.25/),r8)
   OQCK=real((/0.005,0.005,0.005,0.005,0.005/),r8)
+
   OMCI1=reshape(real((/0.010,0.050,0.005,0.050,0.050,0.005,0.050,0.050,0.005, &
      0.010,0.050,0.005,0.010,0.050,0.005/),r8),shape(OMCI1))
+
   ORCI=reshape(real((/0.01,0.05,0.01,0.05,0.01,0.05 &
      ,0.001,0.005,0.001,0.005/),r8),shape(ORCI))
 
@@ -217,22 +210,22 @@ contains
   OMCF=(/0.20_r8,0.20_r8,0.30_r8,0.20_r8,0.050_r8,0.025_r8,0.025_r8/)
   OMCA=(/0.06_r8,0.02_r8,0.01_r8,0.0_r8,0.01_r8,0.0_r8,0.0_r8/)
 
-  OMCI(1:3,:)=OMCI1/real(JG,r8)
+  OMCI(1:3,:)=OMCI1
 
-  if(this%jguilds.GT.1)then
-    COMCI=OMCI(1:nlbiomcpc,:)
-    DO K=0,jcplx1c
-      DO NGL=2,this%jguilds-1
-        DO M=1,nlbiomcpc
-          OMCI(M+(NGL-1)*nlbiomcpc,K)=OMCI(M,K)
-          COMCI(M,K)=COMCI(M,K)+OMCI(M,K)
-        enddo
-      enddo
-      DO M=1,nlbiomcpc
-        OMCI(M+(JG-1)*3,K)=OMCI1(M,K)-COMCI(M,K)
-      ENDDO
-    enddo
-  endif
+!  if(this%jguilds.GT.1)then
+!    COMCI=OMCI(1:nlbiomcpc,:)
+!    DO K=0,jcplx1c
+!      DO NGL=2,this%jguilds-1
+!        DO M=1,nlbiomcpc
+!          OMCI(M+(NGL-1)*nlbiomcpc,K)=OMCI(M,K)
+!          COMCI(M,K)=COMCI(M,K)+OMCI(M,K)
+!        enddo
+!      enddo
+!      DO M=1,nlbiomcpc
+!        OMCI(M+(JG-1)*3,K)=OMCI1(M,K)-COMCI(M,K)
+!      ENDDO
+!    enddo
+!  endif
 
 
 ! CNOFC,CPOFC=fractions to allocate N,P to kinetic components
@@ -246,7 +239,7 @@ contains
   CPOFC(1:jskenc,2)=real((/0.0020,0.0020,0.0020,0.0020/),r8)   !manure
   FL(1:2)=real((/0.55,0.45/),r8)
 
-  DO 95 K=0,this%jcplx1
+  D95: DO K=0,this%jcplx1
     DO  N=1,this%NFGs
       IF(N.EQ.this%n_aero_fungi)THEN
         DO NGL=1,JG
@@ -255,6 +248,11 @@ contains
           CPOMC(1,NGL,N,K)=0.015_r8
           CPOMC(2,NGL,N,K)=0.009_r8
         ENDDO
+        this%CNOMCa(1,N,K)=0.15_r8           !maximum
+        this%CNOMCa(2,N,K)=0.09_r8           !minimum
+        this%CPOMCa(1,N,K)=0.015_r8
+        this%CPOMCa(2,N,K)=0.009_r8
+
       ELSE
         do NGL=1,JG
           CNOMC(1,NGL,N,K)=0.225_r8
@@ -262,26 +260,38 @@ contains
           CPOMC(1,NGL,N,K)=0.0225_r8
           CPOMC(2,NGL,N,K)=0.0135_r8
         enddo
+        this%CNOMCa(1,N,K)=0.225_r8
+        this%CNOMCa(2,N,K)=0.135_r8
+        this%CPOMCa(1,N,K)=0.0225_r8
+        this%CPOMCa(2,N,K)=0.0135_r8
       ENDIF
       do NGL=1,JG
-        CNOMC(3,NGL,N,K)=FL(1)*CNOMC(1,NGL,N,K)+FL(2)*CNOMC(2,NGL,N,K)
-        CPOMC(3,NGL,N,K)=FL(1)*CPOMC(1,NGL,N,K)+FL(2)*CPOMC(2,NGL,N,K)
+        CNOMC(3,NGL,N,K)=DOT_PRODUCT(FL,CNOMC(1:2,NGL,N,K))
+        CPOMC(3,NGL,N,K)=DOT_PRODUCT(FL,CPOMC(1:2,NGL,N,K))
       enddo
-     enddo
-95  CONTINUE
+      this%CNOMCa(3,N,K)=DOT_PRODUCT(FL,this%CNOMCa(1:2,N,K))
+      this%CPOMCa(3,N,K)=DOT_PRODUCT(FL,this%CPOMCa(1:2,N,K))
+    enddo
+  ENDDO D95
 
-    DO  N=1,this%NFGs
-        do NGL=1,JG
-          CNOMCff(1,NGL,N)=0.225_r8
-          CNOMCff(2,NGL,N)=0.135_r8
-          CPOMCff(1,NGL,N)=0.0225_r8
-          CPOMCff(2,NGL,N)=0.0135_r8
-        enddo
-      do NGL=1,JG
-        CNOMCff(3,NGL,N)=FL(1)*CNOMCff(1,NGL,N)+FL(2)*CNOMCff(2,NGL,N)
-        CPOMCff(3,NGL,N)=FL(1)*CPOMCff(1,NGL,N)+FL(2)*CPOMCff(2,NGL,N)
-      enddo
-     enddo
+  DO  N=1,this%NFGs
+    do NGL=1,JG
+      CNOMCff(1,NGL,N)=0.225_r8
+      CNOMCff(2,NGL,N)=0.135_r8
+      CPOMCff(1,NGL,N)=0.0225_r8
+      CPOMCff(2,NGL,N)=0.0135_r8
+    enddo
+    this%CNOMCffa(1,N)=0.225_r8
+    this%CNOMCffa(2,N)=0.135_r8
+    this%CPOMCffa(1,N)=0.0225_r8
+    this%CPOMCffa(2,N)=0.0135_r8
+    do NGL=1,JG
+      CNOMCff(3,NGL,N)=DOT_PRODUCT(FL,CNOMCff(1:2,NGL,N))
+      CPOMCff(3,NGL,N)=DOT_PRODUCT(FL,CPOMCff(1:2,NGL,N))
+    enddo
+    this%CNOMCffa(3,N)=DOT_PRODUCT(FL,this%CNOMCffa(1:2,N))
+    this%CPOMCffa(3,N)=DOT_PRODUCT(FL,this%CPOMCffa(1:2,N))
+  enddo
 
   end associate
   end subroutine SetPars
@@ -295,6 +305,7 @@ contains
   integer :: NFGs
   integer :: jcplx1,jcplx
   integer :: jsken
+  integer :: n, k
 
   jguilds = this%jguilds
   NFGs  =this%NFGs
@@ -307,6 +318,20 @@ contains
   allocate(this%JGniA(NFGsc))
   allocate(this%JGnfA(NFGsc))
 
+  k=1
+  this%NMICBSA=0
+  this%NMICBSO=0
+  do n=1,NFGsc
+    this%JGnio(n)=k
+    this%JGniA(n)=k
+    k=k+jguilds
+    this%JGnfo(n)=k-1
+    this%JGnfA(n)=k-1
+    this%NMICBSA=this%NMICBSA+this%JGnfA(n)-this%JGniA(n)+1
+    this%NMICBSO=this%NMICBSO+this%JGnfo(n)-this%JGnio(n)+1
+  enddo
+
+
   allocate(this%DOSA(0:jcplx1))
   allocate(this%SPOSC(jsken,0:jcplx1))
   allocate(this%OHCK(0:jcplx1))
@@ -314,11 +339,16 @@ contains
   allocate(this%ORCK(0:jcplx1))
   allocate(this%OQCK(0:jcplx1))
   allocate(this%ORCI(ndbiomcpc,0:jcplx1))
-  allocate(this%OMCI(nlbiomcpc*jguilds,0:jcplx1))
+  allocate(this%OMCI(nlbiomcpc,0:jcplx1))
   allocate(this%CNOMC(nlbiomcpc,jguilds,NFGs,0:jcplx1))
   allocate(this%CPOMC(nlbiomcpc,jguilds,NFGs,0:jcplx1))
   allocate(this%CNOMCff(nlbiomcpc,jguilds,NFGs))
   allocate(this%CPOMCff(nlbiomcpc,jguilds,NFGs))
+  allocate(this%CNOMCa(nlbiomcpc,NFGs,0:jcplx1))
+  allocate(this%CPOMCa(nlbiomcpc,NFGs,0:jcplx1))
+  allocate(this%CNOMCffa(nlbiomcpc,NFGs))
+  allocate(this%CPOMCffa(nlbiomcpc,NFGs))
+
   allocate(this%CNOFC(jsken,0:2))
   allocate(this%CPOFC(jsken,0:2))
   allocate(this%CNRH(0:jcplx1))

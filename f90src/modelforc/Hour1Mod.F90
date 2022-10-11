@@ -1987,7 +1987,9 @@ module Hour1Mod
   real(r8) :: OQC1,OQN1,OQP1
   real(r8) :: OSC1,OSN1,OSP1
   REAL(R8) :: RNT,RPT
-  integer :: L,K,M,N,NN,NGL
+  integer  :: L,K,M,N,NN,NGL
+  real(r8) :: tglds
+  real(r8) :: OMC1g,OMN1g,OMP1g
 !     begin_execution
 !     LFDPTH=layer number
 !
@@ -2120,7 +2122,8 @@ module Hour1Mod
 !
 !     OFC,OFN,OFP=litter C,N,P application from fertilizer file
 !
-    DO 2965 K=1,2
+
+    D2965: DO K=1,2
       OSCI=OFC(K)*AREA(3,LFDPTH,NY,NX)
       OSNI=OFN(K)*AREA(3,LFDPTH,NY,NX)
       OSPI=OFP(K)*AREA(3,LFDPTH,NY,NX)
@@ -2139,37 +2142,48 @@ module Hour1Mod
 !     OMCI=microbial biomass content in litter
 !     OMCF,OMCA=hetero,autotrophic biomass composition in litter
 !
-      DO 2960 N=1,NFGs
-        DO NGL=1,JG
-          DO 2961 M=1,nlbiomcp
-            OMC1=AZMAX1(AMIN1(OSCI*micpar%OMCI(M+(NGL-1)*3,K)*micpar%OMCF(N),OSCI-OSCX))
-            OMN1=AZMAX1(AMIN1(OMC1*micpar%CNOMC(M,NGL,N,K),OSNI-OSNX))
-            OMP1=AZMAX1(AMIN1(OMC1*micpar%CPOMC(M,NGL,N,K),OSPI-OSPX))
-            OMC(M,NGL,N,K,LFDPTH,NY,NX)=OMC(M,NGL,N,K,LFDPTH,NY,NX)+OMC1
-            OMN(M,NGL,N,K,LFDPTH,NY,NX)=OMN(M,NGL,N,K,LFDPTH,NY,NX)+OMN1
-            OMP(M,NGL,N,K,LFDPTH,NY,NX)=OMP(M,NGL,N,K,LFDPTH,NY,NX)+OMP1
-            OSCX=OSCX+OMC1
-            OSNX=OSNX+OMN1
-            OSPX=OSPX+OMP1
-            DO 2962 NN=1,NFGs
-              OMC(M,NGL,NN,5,LFDPTH,NY,NX)=OMC(M,NGL,NN,5,LFDPTH,NY,NX)+OMC1*micpar%OMCA(NN)
-              OMN(M,NGL,NN,5,LFDPTH,NY,NX)=OMN(M,NGL,NN,5,LFDPTH,NY,NX)+OMN1*micpar%OMCA(NN)
-              OMP(M,NGL,NN,5,LFDPTH,NY,NX)=OMP(M,NGL,NN,5,LFDPTH,NY,NX)+OMP1*micpar%OMCA(NN)
-              OSCX=OSCX+OMC1*micpar%OMCA(NN)
-              OSNX=OSNX+OMN1*micpar%OMCA(NN)
-              OSPX=OSPX+OMP1*micpar%OMCA(NN)
-2962        CONTINUE
-2961      CONTINUE
-        ENDDO
-2960  CONTINUE
+      D2960: DO N=1,NFGs
+        tglds=JGnfo(N)-JGnfo(N)+1
+        D2961: DO M=1,nlbiomcp
+          OMC1=AZMAX1(AMIN1(OSCI*micpar%OMCI(M,K)*micpar%OMCF(N),OSCI-OSCX))
+          OMN1=AZMAX1(AMIN1(OMC1*micpar%CNOMCa(M,N,K),OSNI-OSNX))
+          OMP1=AZMAX1(AMIN1(OMC1*micpar%CPOMCa(M,N,K),OSPI-OSPX))
+!            DO NGL=JGnio(N),JGnfo(N)
+          DO NGL=1,JG
+            OMC1g=OMC1/tglds
+            OMN1g=OMN1/tglds
+            OMP1g=OMP1/tglds
+            OMC(M,NGL,N,K,LFDPTH,NY,NX)=OMC(M,NGL,N,K,LFDPTH,NY,NX)+OMC1g
+            OMN(M,NGL,N,K,LFDPTH,NY,NX)=OMN(M,NGL,N,K,LFDPTH,NY,NX)+OMN1g
+            OMP(M,NGL,N,K,LFDPTH,NY,NX)=OMP(M,NGL,N,K,LFDPTH,NY,NX)+OMP1g
+          ENDDO
+          OSCX=OSCX+OMC1
+          OSNX=OSNX+OMN1
+          OSPX=OSPX+OMP1
+          D2962: DO NN=1,NFGs
+            tglds=JGnfA(N)-JGnfA(N)+1
+            DO NGL=1,JG
+              OMC1g=OMC1/tglds
+              OMN1g=OMN1/tglds
+              OMP1g=OMP1/tglds
+              OMCff(M,NGL,NN,LFDPTH,NY,NX)=OMCff(M,NGL,NN,LFDPTH,NY,NX)+OMC1g*micpar%OMCA(NN)
+              OMNff(M,NGL,NN,LFDPTH,NY,NX)=OMNff(M,NGL,NN,LFDPTH,NY,NX)+OMN1g*micpar%OMCA(NN)
+              OMPff(M,NGL,NN,LFDPTH,NY,NX)=OMPff(M,NGL,NN,LFDPTH,NY,NX)+OMP1g*micpar%OMCA(NN)
+            ENDDO
+            OSCX=OSCX+OMC1*micpar%OMCA(NN)
+            OSNX=OSNX+OMN1*micpar%OMCA(NN)
+            OSPX=OSPX+OMP1*micpar%OMCA(NN)
+          ENDDO D2962
+        ENDDO D2961
+      ENDDO D2960
 !
 !     DOC, DON AND DOP IN RESIDUE
 !
 !     OQC,OQN,OQP=DOC,DON,DOP in litter
 !
-      OQC1=AMIN1(0.1*OSCX,OSCI-OSCX)
-      OQN1=AMIN1(0.1*OSNX,OSNI-OSNX)
-      OQP1=AMIN1(0.1*OSPX,OSPI-OSPX)
+      OQC1=AMIN1(0.1_r8*OSCX,OSCI-OSCX)
+      OQN1=AMIN1(0.1_r8*OSNX,OSNI-OSNX)
+      OQP1=AMIN1(0.1_r8*OSPX,OSPI-OSPX)
       OQC(K,LFDPTH,NY,NX)=OQC(K,LFDPTH,NY,NX)+OQC1
       OQN(K,LFDPTH,NY,NX)=OQN(K,LFDPTH,NY,NX)+OQN1
       OQP(K,LFDPTH,NY,NX)=OQP(K,LFDPTH,NY,NX)+OQP1
@@ -2189,25 +2203,25 @@ module Hour1Mod
       IF(OSCI-OSCX.GT.ZEROS(NY,NX))THEN
         RNT=0.0_r8
         RPT=0.0_r8
-        DO 965 M=1,jsken
+        D965: DO M=1,jsken
           RNT=RNT+(OSCI-OSCX)*CFOSC(M,K,LFDPTH,NY,NX)*micpar%CNOFC(M,K)
           RPT=RPT+(OSCI-OSCX)*CFOSC(M,K,LFDPTH,NY,NX)*micpar%CPOFC(M,K)
-965     CONTINUE
+        ENDDO D965
         FRNT=(OSNI-OSNX)/RNT
         FRPT=(OSPI-OSPX)/RPT
-        DO 970 M=1,jsken
+        D970: DO M=1,jsken
           CNOF(M)=micpar%CNOFC(M,K)*FRNT
           CPOF(M)=micpar%CPOFC(M,K)*FRPT
           CNOFT=CNOFT+CFOSC(M,K,LFDPTH,NY,NX)*CNOF(M)
           CPOFT=CPOFT+CFOSC(M,K,LFDPTH,NY,NX)*CPOF(M)
-970     CONTINUE
+        ENDDO D970
       ELSE
-        DO 975 M=1,jsken
+        D975: DO M=1,jsken
           CNOF(M)=0.0_r8
           CPOF(M)=0.0_r8
-975     CONTINUE
+        ENDDO D975
       ENDIF
-      DO 2970 M=1,jsken
+      D2970: DO M=1,jsken
         OSC1=CFOSC(M,K,LFDPTH,NY,NX)*(OSCI-OSCX)
         IF(CNOFT.GT.ZERO)THEN
           OSN1=CFOSC(M,K,LFDPTH,NY,NX)*CNOF(M)/CNOFT*(OSNI-OSNX)
@@ -2220,15 +2234,13 @@ module Hour1Mod
           OSP1=0.0_r8
         ENDIF
         OSC(M,K,LFDPTH,NY,NX)=OSC(M,K,LFDPTH,NY,NX)+OSC1
-        DO NGL=1,JG
-          OSA(M,K,LFDPTH,NY,NX)=OSA(M,K,LFDPTH,NY,NX)+OSC1*micpar%OMCI(1+(NGL-1)*3,K)
-        ENDDO
+        OSA(M,K,LFDPTH,NY,NX)=OSA(M,K,LFDPTH,NY,NX)+OSC1*micpar%OMCI(1,K)
         OSN(M,K,LFDPTH,NY,NX)=OSN(M,K,LFDPTH,NY,NX)+OSN1
         OSP(M,K,LFDPTH,NY,NX)=OSP(M,K,LFDPTH,NY,NX)+OSP1
         IF(LFDPTH.EQ.0)THEN
           VOLT(LFDPTH,NY,NX)=VOLT(LFDPTH,NY,NX)+OSC1*1.0E-06/BKRS(1)
         ENDIF
-2970  CONTINUE
+      ENDDO D2970
       TORGF=TORGF+OSCI
       TORGN=TORGN+OSNI
       TORGP=TORGP+OSPI
@@ -2238,7 +2250,7 @@ module Hour1Mod
       IF(IYTYP(2,I,NY,NX).LT.3)THEN
         TNBP(NY,NX)=TNBP(NY,NX)+OSCI
       ENDIF
-2965  CONTINUE
+    ENDDO D2965
   ENDIF
   end subroutine ApplyPlantAnimalResidue
 !------------------------------------------------------------------------------------------
