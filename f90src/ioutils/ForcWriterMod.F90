@@ -5,6 +5,7 @@ module ForcWriterMod
   USE MicrobialDataType
   use SoilBGCDataType
   use GridDataType
+  use GridConsts
   use AqueChemDatatype
   use SoilPropertyDataType
   use ClimForcDataType
@@ -51,8 +52,8 @@ implicit none
     call ncd_defdim(ncf,'jsken',jsken,recordDimID)
     call ncd_defdim(ncf,'ndbiomcp',2,recordDimID)
     call ncd_defdim(ncf,'nlbiomcp',3,recordDimID)
-    call ncd_defdim(ncf,'JG',JG,recordDimID)
-    call ncd_defdim(ncf,'NFGs',NFGs,recordDimID)
+    call ncd_defdim(ncf,'NMICBSO',NMICBSO,recordDimID)
+    call ncd_defdim(ncf,'NMICBSA',NMICBSA,recordDimID)
 
     call ncd_defvar(ncf, 'pH', ncd_float, long_name='soil pH',  &
             units='none', missing_value=spval, fill_value=spval)
@@ -187,30 +188,27 @@ implicit none
             dim2name='jcplx',long_name='microbial residue P in each complex',  &
             units='gP d-2', missing_value=spval, fill_value=spval)
     call ncd_defvar(ncf, 'OMC', ncd_float, dim1name='nlbiomcp',&
-            dim2name='JG',dim3name='NFGs',dim4name='jcplx',&
+            dim2name='NMICBSO',dim3name='jcplx',&
             long_name='microbial biomass C in each complex',  &
             units='gC d-2', missing_value=spval, fill_value=spval)
     call ncd_defvar(ncf, 'OMN', ncd_float, dim1name='nlbiomcp',&
-            dim2name='JG',dim3name='NFGs',dim4name='jcplx',&
+            dim2name='NMICBSO',dim3name='jcplx',&
             long_name='microbial biomass N in each complex',  &
             units='gN d-2', missing_value=spval, fill_value=spval)
     call ncd_defvar(ncf, 'OMP', ncd_float, dim1name='nlbiomcp',&
-            dim2name='JG',dim3name='NFGs',dim4name='jcplx',&
+            dim2name='NMICBSO',dim3name='jcplx',&
             long_name='microbial biomass P in each complex',  &
             units='gP d-2', missing_value=spval, fill_value=spval)
 
-    call ncd_defvar(ncf, 'OMCff', ncd_float, dim1name='nlbiomcp',&
-            dim2name='JG',dim3name='NFGs',&
+    call ncd_defvar(ncf, 'OMCff', ncd_float, dim1name='nlbiomcp',dim2name='NMICBSA',&
             long_name='microbial biomass C in autotrophic complex',  &
             units='gC d-2', missing_value=spval, fill_value=spval)
 
-    call ncd_defvar(ncf, 'OMNff', ncd_float, dim1name='nlbiomcp',&
-            dim2name='JG',dim3name='NFGs',&
+    call ncd_defvar(ncf, 'OMNff', ncd_float, dim1name='nlbiomcp',dim2name='NMICBSA',&
             long_name='microbial biomass N in autotrophic complex',  &
             units='gN d-2', missing_value=spval, fill_value=spval)
 
-    call ncd_defvar(ncf, 'OMPff', ncd_float, dim1name='nlbiomcp',&
-            dim2name='JG',dim3name='NFGs',&
+    call ncd_defvar(ncf, 'OMPff', ncd_float, dim1name='nlbiomcp',dim2name='NMICBSA',&
             long_name='microbial biomass P in autotrophic complex',  &
             units='gP d-2', missing_value=spval, fill_value=spval)
 
@@ -317,13 +315,13 @@ implicit none
     call ncd_putvar(ncf,'ORN',ORN(:,:,L,NY,NX))
     call ncd_putvar(ncf,'ORP',ORP(:,:,L,NY,NX))
 
-    call ncd_putvar(ncf,'OMC',OMC(:,:,:,:,L,NY,NX))
-    call ncd_putvar(ncf,'OMN',OMN(:,:,:,:,L,NY,NX))
-    call ncd_putvar(ncf,'OMP',OMP(:,:,:,:,L,NY,NX))
+    call ncd_putvar(ncf,'OMC',OMC(:,:,:,L,NY,NX))
+    call ncd_putvar(ncf,'OMN',OMN(:,:,:,L,NY,NX))
+    call ncd_putvar(ncf,'OMP',OMP(:,:,:,L,NY,NX))
 
-    call ncd_putvar(ncf,'OMCff',OMCff(:,:,:,L,NY,NX))
-    call ncd_putvar(ncf,'OMNff',OMNff(:,:,:,L,NY,NX))
-    call ncd_putvar(ncf,'OMPff',OMPff(:,:,:,L,NY,NX))
+    call ncd_putvar(ncf,'OMCff',OMCff(:,:,L,NY,NX))
+    call ncd_putvar(ncf,'OMNff',OMNff(:,:,L,NY,NX))
+    call ncd_putvar(ncf,'OMPff',OMPff(:,:,L,NY,NX))
 
     if(bgc_forc_conf%laddband)then
       call ncd_putvar(ncf,'ZNH4S',ZNH4S(L,NY,NX)+ZNH4B(L,NY,NX))

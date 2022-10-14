@@ -2,6 +2,7 @@ module ErosionBalMod
   use data_kind_mod, only : r8 => SHR_KIND_R8
   use SoilPropertyDataType
   use RootDataType
+  use MicBGCPars, only : micpar
   USE EcoSIMCtrlDataType
   use MicrobialDataType
   USE SOMDataType
@@ -42,13 +43,14 @@ implicit none
 ! VLS=hourly sinking rate from hour1.f
 ! FSINK=hourly rate for sediment sinking
 !
-  DO 9885 L=NL(NY,NX)-1,0,-1
+  D9885: DO L=NL(NY,NX)-1,0,-1
     IF(BKDS(L,NY,NX).LE.ZERO.AND.DLYR(3,L,NY,NX).GT.ZERO)THEN
       !sinking from water to sediment layer
-      DO 9880 LL=L+1,NL(NY,NX)
+      D9880: DO LL=L+1,NL(NY,NX)
         IF(DLYR(3,LL,NY,NX).GT.ZEROS(NY,NX))exit
-9880  CONTINUE
-      FSINK=AMIN1(1.0,VLS(NY,NX)/DLYR(3,L,NY,NX))
+      ENDDO D9880
+
+      FSINK=AMIN1(1.0_r8,VLS(NY,NX)/DLYR(3,L,NY,NX))
 !
 !     SOIL MINERALS
 !
@@ -185,57 +187,56 @@ implicit none
 !
 !     MICROBIAL C,N,P
 !
-      DO 1970 K=0,jcplx1
-        IF(K.NE.3.AND.K.NE.4)THEN
-!         OMC,OMN,OMP=microbial C,N,P
-!         ORC,ORN,ORP=microbial residue C,N,P
-!         OHC,OHN,OHP,OHA=adsorbed C,N,P,acetate
-!         OSC,OAA,OSN,OSP=SOC,colonized SOC,SON,SOP
-!
-          DO 1960 N=1,NFGs
-            DO M=1,nlbiomcp
-              DO NGL=1,JG
-                FOMC=FSINK*OMC(M,NGL,N,K,L,NY,NX)
-                FOMN=FSINK*OMN(M,NGL,N,K,L,NY,NX)
-                FOMP=FSINK*OMP(M,NGL,N,K,L,NY,NX)
-                OMC(M,NGL,N,K,LL,NY,NX)=OMC(M,NGL,N,K,LL,NY,NX)+FOMC
-                OMN(M,NGL,N,K,LL,NY,NX)=OMN(M,NGL,N,K,LL,NY,NX)+FOMN
-                OMP(M,NGL,N,K,LL,NY,NX)=OMP(M,NGL,N,K,LL,NY,NX)+FOMP
-                OMC(M,NGL,N,K,L,NY,NX)=OMC(M,NGL,N,K,L,NY,NX)-FOMC
-                OMN(M,NGL,N,K,L,NY,NX)=OMN(M,NGL,N,K,L,NY,NX)-FOMN
-                OMP(M,NGL,N,K,L,NY,NX)=OMP(M,NGL,N,K,L,NY,NX)-FOMP
-              enddo
-            enddo
-1960      CONTINUE
-        ENDIF
-1970  CONTINUE
+      D1970: DO K=0,micpar%k_litrsf
 
 !         OMC,OMN,OMP=microbial C,N,P
 !         ORC,ORN,ORP=microbial residue C,N,P
 !         OHC,OHN,OHP,OHA=adsorbed C,N,P,acetate
 !         OSC,OAA,OSN,OSP=SOC,colonized SOC,SON,SOP
 !
-          DO N=1,NFGs
+        D1960: DO N=1,NFGs
+          DO NGL=JGnio(N),JGnfo(N)
             DO M=1,nlbiomcp
-              DO NGL=1,JG
-                FOMC=FSINK*OMCff(M,NGL,N,L,NY,NX)
-                FOMN=FSINK*OMNff(M,NGL,N,L,NY,NX)
-                FOMP=FSINK*OMPff(M,NGL,N,L,NY,NX)
-                OMCff(M,NGL,N,LL,NY,NX)=OMCff(M,NGL,N,LL,NY,NX)+FOMC
-                OMNff(M,NGL,N,LL,NY,NX)=OMNff(M,NGL,N,LL,NY,NX)+FOMN
-                OMPff(M,NGL,N,LL,NY,NX)=OMPff(M,NGL,N,LL,NY,NX)+FOMP
-                OMCff(M,NGL,N,L,NY,NX)=OMCff(M,NGL,N,L,NY,NX)-FOMC
-                OMNff(M,NGL,N,L,NY,NX)=OMNff(M,NGL,N,L,NY,NX)-FOMN
-                OMPff(M,NGL,N,L,NY,NX)=OMPff(M,NGL,N,L,NY,NX)-FOMP
-              enddo
+              FOMC=FSINK*OMC(M,NGL,K,L,NY,NX)
+              FOMN=FSINK*OMN(M,NGL,K,L,NY,NX)
+              FOMP=FSINK*OMP(M,NGL,K,L,NY,NX)
+              OMC(M,NGL,K,LL,NY,NX)=OMC(M,NGL,K,LL,NY,NX)+FOMC
+              OMN(M,NGL,K,LL,NY,NX)=OMN(M,NGL,K,LL,NY,NX)+FOMN
+              OMP(M,NGL,K,LL,NY,NX)=OMP(M,NGL,K,LL,NY,NX)+FOMP
+              OMC(M,NGL,K,L,NY,NX)=OMC(M,NGL,K,L,NY,NX)-FOMC
+              OMN(M,NGL,K,L,NY,NX)=OMN(M,NGL,K,L,NY,NX)-FOMN
+              OMP(M,NGL,K,L,NY,NX)=OMP(M,NGL,K,L,NY,NX)-FOMP
             enddo
-          ENDDO
+          enddo
+        ENDDO D1960
+      ENDDO D1970
+
+!         OMC,OMN,OMP=microbial C,N,P
+!         ORC,ORN,ORP=microbial residue C,N,P
+!         OHC,OHN,OHP,OHA=adsorbed C,N,P,acetate
+!         OSC,OAA,OSN,OSP=SOC,colonized SOC,SON,SOP
+!
+      DO N=1,NFGs
+        DO NGL=JGniA(N),JGnfA(N)
+          DO M=1,nlbiomcp
+            FOMC=FSINK*OMCff(M,NGL,L,NY,NX)
+            FOMN=FSINK*OMNff(M,NGL,L,NY,NX)
+            FOMP=FSINK*OMPff(M,NGL,L,NY,NX)
+            OMCff(M,NGL,LL,NY,NX)=OMCff(M,NGL,LL,NY,NX)+FOMC
+            OMNff(M,NGL,LL,NY,NX)=OMNff(M,NGL,LL,NY,NX)+FOMN
+            OMPff(M,NGL,LL,NY,NX)=OMPff(M,NGL,LL,NY,NX)+FOMP
+            OMCff(M,NGL,L,NY,NX)=OMCff(M,NGL,L,NY,NX)-FOMC
+            OMNff(M,NGL,L,NY,NX)=OMNff(M,NGL,L,NY,NX)-FOMN
+            OMPff(M,NGL,L,NY,NX)=OMPff(M,NGL,L,NY,NX)-FOMP
+          enddo
+        enddo
+      ENDDO
 
 !
 !     MICROBIAL RESIDUE C,N,P
 !
-      DO 1900 K=0,2
-        DO 1940 M=1,ndbiomcp
+      D1900: DO K=0,micpar%k_litrsf
+        D1940: DO M=1,ndbiomcp
           FORC=FSINK*ORC(M,K,L,NY,NX)
           FORN=FSINK*ORN(M,K,L,NY,NX)
           FORP=FSINK*ORP(M,K,L,NY,NX)
@@ -245,7 +246,7 @@ implicit none
           ORC(M,K,L,NY,NX)=ORC(M,K,L,NY,NX)-FORC
           ORN(M,K,L,NY,NX)=ORN(M,K,L,NY,NX)-FORN
           ORP(M,K,L,NY,NX)=ORP(M,K,L,NY,NX)-FORP
-1940    CONTINUE
+        ENDDO D1940
 !
 !       ADSORBED C,N,P
 !
@@ -264,7 +265,7 @@ implicit none
 !
 !       SOC,N,P
 !
-        DO 1930 M=1,jsken
+        D1930: DO M=1,jsken
           FOSC=FSINK*OSC(M,K,L,NY,NX)
           FOSA=FSINK*OSA(M,K,L,NY,NX)
           FOSN=FSINK*OSN(M,K,L,NY,NX)
@@ -277,10 +278,10 @@ implicit none
           OSA(M,K,L,NY,NX)=OSA(M,K,L,NY,NX)-FOSA
           OSN(M,K,L,NY,NX)=OSN(M,K,L,NY,NX)-FOSN
           OSP(M,K,L,NY,NX)=OSP(M,K,L,NY,NX)-FOSP
-1930    CONTINUE
-1900  CONTINUE
+        ENDDO D1930
+      ENDDO D1900
     ENDIF
-9885  CONTINUE
+  ENDDO D9885
   end subroutine SinkChemicals
 
 end module ErosionBalMod

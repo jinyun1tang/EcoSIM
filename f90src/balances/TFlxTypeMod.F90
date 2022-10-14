@@ -378,14 +378,14 @@ implicit none
   real(r8),allocatable ::  VOLWH1(:,:,:)                      !
   real(r8),allocatable ::  VOLIH1(:,:,:)                      !
 
-  real(r8),allocatable :: TOMCER(:,:,:,:,:,:)
-  real(r8),allocatable :: TOMNER(:,:,:,:,:,:)
-  real(r8),allocatable :: TOMPER(:,:,:,:,:,:)
+  real(r8),allocatable :: TOMCER(:,:,:,:,:)
+  real(r8),allocatable :: TOMNER(:,:,:,:,:)
+  real(r8),allocatable :: TOMPER(:,:,:,:,:)
 
 
-  real(r8),allocatable :: TOMCERff(:,:,:,:,:)
-  real(r8),allocatable :: TOMNERff(:,:,:,:,:)
-  real(r8),allocatable :: TOMPERff(:,:,:,:,:)
+  real(r8),allocatable :: TOMCERff(:,:,:,:)
+  real(r8),allocatable :: TOMNERff(:,:,:,:)
+  real(r8),allocatable :: TOMPERff(:,:,:,:)
 
   real(r8),allocatable ::  TOCFLS(:,:,:,:)
   real(r8),allocatable ::  TONFLS(:,:,:,:)
@@ -790,13 +790,13 @@ implicit none
   allocate(VOLI1(JZ,JY,JX));    VOLI1=0._r8
   allocate(VOLWH1(JZ,JY,JX));   VOLWH1=0._r8
   allocate(VOLIH1(JZ,JY,JX));   VOLIH1=0._r8
-  allocate(TOMCER(nlbiomcp,JG,NFGs,0:jcplx1,JY,JX)); TOMCER=0._r8
-  allocate(TOMNER(nlbiomcp,JG,NFGs,0:jcplx1,JY,JX)); TOMNER=0._r8
-  allocate(TOMPER(nlbiomcp,JG,NFGs,0:jcplx1,JY,JX)); TOMPER=0._r8
+  allocate(TOMCER(nlbiomcp,NMICBSO,0:jcplx1,JY,JX)); TOMCER=0._r8
+  allocate(TOMNER(nlbiomcp,NMICBSO,0:jcplx1,JY,JX)); TOMNER=0._r8
+  allocate(TOMPER(nlbiomcp,NMICBSO,0:jcplx1,JY,JX)); TOMPER=0._r8
 
-  allocate(TOMCERff(nlbiomcp,JG,NFGs,JY,JX));TOMCERff=0._r8
-  allocate(TOMNERff(nlbiomcp,JG,NFGs,JY,JX));TOMNERff=0._r8
-  allocate(TOMPERff(nlbiomcp,JG,NFGs,JY,JX));TOMPERff=0._r8
+  allocate(TOMCERff(nlbiomcp,NMICBSA,JY,JX));TOMCERff=0._r8
+  allocate(TOMNERff(nlbiomcp,NMICBSA,JY,JX));TOMNERff=0._r8
+  allocate(TOMPERff(nlbiomcp,NMICBSA,JY,JX));TOMPERff=0._r8
 
   allocate(TOCFLS(0:jcplx1,JZ,JY,JX));TOCFLS=0._r8
   allocate(TONFLS(0:jcplx1,JZ,JY,JX));TONFLS=0._r8

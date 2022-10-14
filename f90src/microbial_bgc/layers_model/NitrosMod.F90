@@ -7,6 +7,7 @@ module nitrosMod
   use data_kind_mod, only : r8 => SHR_KIND_R8
   use abortutils  , only : endrun
   use minimathmod, only : safe_adb,AZMAX1
+  use MicBGCPars, only : micpar
   use MicrobialDataType
   use NitroPars
   use SOMDataType
@@ -70,23 +71,23 @@ module nitrosMod
       IF(L.EQ.0)THEN
         LL=NU(NY,NX)
         IF(ORGR(L,NY,NX).GT.ZEROS(NY,NX))THEN
-          FOSCXS=AMIN1(1.0,FOSCZ0/ORGR(L,NY,NX)*TOQCK(L,NY,NX))
+          FOSCXS=AMIN1(1.0_r8,FOSCZ0/ORGR(L,NY,NX)*TOQCK(L,NY,NX))
         ELSE
           FOSCXS=0.0_r8
         ENDIF
       ELSE
-        DO 1100 LN=L+1,NL(NY,NX)
+        D1100: DO LN=L+1,NL(NY,NX)
           IF(VOLX(LN,NY,NX).GT.ZEROS2(NY,NX))THEN
             LL=LN
             exit
           ENDIF
-1100    CONTINUE
+        ENDDO D1100
         ORGRL=AZMAX1(ORGR(L,NY,NX))
         ORGRLL=AZMAX1(ORGR(LL,NY,NX))
         OSCXD=(ORGRL*VOLT(LL,NY,NX)-ORGRLL*VOLT(L,NY,NX))/(VOLT(L,NY,NX)+VOLT(LL,NY,NX))
-        IF(OSCXD.GT.0.0.AND.ORGR(L,NY,NX).GT.ZEROS(NY,NX))THEN
+        IF(OSCXD.GT.0.0_r8.AND.ORGR(L,NY,NX).GT.ZEROS(NY,NX))THEN
           FOSCXD=OSCXD/ORGR(L,NY,NX)
-        ELSEIF(OSCXD.LT.0.0.AND.ORGR(LL,NY,NX).GT.ZEROS(NY,NX))THEN
+        ELSEIF(OSCXD.LT.0.0_r8.AND.ORGR(LL,NY,NX).GT.ZEROS(NY,NX))THEN
           FOSCXD=OSCXD/ORGR(LL,NY,NX)
         ELSE
           FOSCXD=0.0_r8
@@ -121,32 +122,35 @@ module nitrosMod
   integer :: K,M,N,NGL
 !     begin_execution
   IF(FOSCXS.GT.ZERO)THEN
-    DO 7971 K=1,2
-      DO 7961 N=1,7
-        DO NGL=1,JG
-          DO 7962 M=1,3
+    D7971: DO K=1,micpar%k_litrsf
+      if(.not.micpar%is_finelitter(K))cycle
+      D7961: DO N=1,NFGs
+        DO NGL=JGnio(N),JGnfo(N)
+          D7962: DO M=1,micpar%nlbiomcp
             IF(FOSCXS.GT.0.0)THEN
-              OMCXS=FOSCXS*AZMAX1(OMC(M,NGL,N,K,L,NY,NX))
-              OMNXS=FOSCXS*AZMAX1(OMN(M,NGL,N,K,L,NY,NX))
-              OMPXS=FOSCXS*AZMAX1(OMP(M,NGL,N,K,L,NY,NX))
+              OMCXS=FOSCXS*AZMAX1(OMC(M,NGL,K,L,NY,NX))
+              OMNXS=FOSCXS*AZMAX1(OMN(M,NGL,K,L,NY,NX))
+              OMPXS=FOSCXS*AZMAX1(OMP(M,NGL,K,L,NY,NX))
             ELSE
-              OMCXS=FOSCXS*AZMAX1(OMC(M,NGL,N,K,LL,NY,NX))
-              OMNXS=FOSCXS*AZMAX1(OMN(M,NGL,N,K,LL,NY,NX))
-              OMPXS=FOSCXS*AZMAX1(OMP(M,NGL,N,K,LL,NY,NX))
+              OMCXS=FOSCXS*AZMAX1(OMC(M,NGL,K,LL,NY,NX))
+              OMNXS=FOSCXS*AZMAX1(OMN(M,NGL,K,LL,NY,NX))
+              OMPXS=FOSCXS*AZMAX1(OMP(M,NGL,K,LL,NY,NX))
             ENDIF
-            OMC(M,NGL,N,K,L,NY,NX)=OMC(M,NGL,N,K,L,NY,NX)-OMCXS
-            OMN(M,NGL,N,K,L,NY,NX)=OMN(M,NGL,N,K,L,NY,NX)-OMNXS
-            OMP(M,NGL,N,K,L,NY,NX)=OMP(M,NGL,N,K,L,NY,NX)-OMPXS
-            OMC(M,NGL,N,K,LL,NY,NX)=OMC(M,NGL,N,K,LL,NY,NX)+OMCXS
-            OMN(M,NGL,N,K,LL,NY,NX)=OMN(M,NGL,N,K,LL,NY,NX)+OMNXS
-            OMP(M,NGL,N,K,LL,NY,NX)=OMP(M,NGL,N,K,LL,NY,NX)+OMPXS
-7962      CONTINUE
+            OMC(M,NGL,K,L,NY,NX)=OMC(M,NGL,K,L,NY,NX)-OMCXS
+            OMN(M,NGL,K,L,NY,NX)=OMN(M,NGL,K,L,NY,NX)-OMNXS
+            OMP(M,NGL,K,L,NY,NX)=OMP(M,NGL,K,L,NY,NX)-OMPXS
+            OMC(M,NGL,K,LL,NY,NX)=OMC(M,NGL,K,LL,NY,NX)+OMCXS
+            OMN(M,NGL,K,LL,NY,NX)=OMN(M,NGL,K,LL,NY,NX)+OMNXS
+            OMP(M,NGL,K,LL,NY,NX)=OMP(M,NGL,K,LL,NY,NX)+OMPXS
+          ENDDO D7962
         ENDDO
-7961  CONTINUE
-7971  CONTINUE
-    DO 7901 K=1,2
-      DO 7941 M=1,2
-        IF(FOSCXS.GT.0.0)THEN
+      ENDDO D7961
+    ENDDO D7971
+
+    D7901: DO K=1,micpar%k_litrsf
+      if(.not.micpar%is_finelitter(K))cycle
+      D7941: DO M=1,micpar%ndbiomcp
+        IF(FOSCXS.GT.0.0_r8)THEN
           ORCXS=FOSCXS*AZMAX1(ORC(M,K,L,NY,NX))
           ORNXS=FOSCXS*AZMAX1(ORN(M,K,L,NY,NX))
           ORPXS=FOSCXS*AZMAX1(ORP(M,K,L,NY,NX))
@@ -161,8 +165,8 @@ module nitrosMod
         ORC(M,K,LL,NY,NX)=ORC(M,K,LL,NY,NX)+ORCXS
         ORN(M,K,LL,NY,NX)=ORN(M,K,LL,NY,NX)+ORNXS
         ORP(M,K,LL,NY,NX)=ORP(M,K,LL,NY,NX)+ORPXS
-7941  CONTINUE
-      IF(FOSCXS.GT.0.0)THEN
+      ENDDO D7941
+      IF(FOSCXS.GT.0.0_r8)THEN
         OQCXS=FOSCXS*AZMAX1(OQC(K,L,NY,NX))
         OQCHXS=FOSCXS*AZMAX1(OQCH(K,L,NY,NX))
         OHCXS=FOSCXS*AZMAX1(OHC(K,L,NY,NX))
@@ -213,8 +217,8 @@ module nitrosMod
       OQP(K,LL,NY,NX)=OQP(K,LL,NY,NX)+OQPXS
       OQPH(K,LL,NY,NX)=OQPH(K,LL,NY,NX)+OQPHXS
       OHP(K,LL,NY,NX)=OHP(K,LL,NY,NX)+OHPXS
-      DO 7931 M=1,jsken
-        IF(FOSCXS.GT.0.0)THEN
+      D7931: DO M=1,jsken
+        IF(FOSCXS.GT.0.0_r8)THEN
           OSCXS=FOSCXS*AZMAX1(OSC(M,K,L,NY,NX))
           OSAXS=FOSCXS*AZMAX1(OSA(M,K,L,NY,NX))
           OSNXS=FOSCXS*AZMAX1(OSN(M,K,L,NY,NX))
@@ -233,8 +237,8 @@ module nitrosMod
         OSA(M,K,LL,NY,NX)=OSA(M,K,LL,NY,NX)+OSAXS
         OSN(M,K,LL,NY,NX)=OSN(M,K,LL,NY,NX)+OSNXS
         OSP(M,K,LL,NY,NX)=OSP(M,K,LL,NY,NX)+OSPXS
-7931  CONTINUE
-7901  CONTINUE
+      ENDDO D7931
+    ENDDO D7901
   ENDIF
   end subroutine ApplyVerticalMix
 

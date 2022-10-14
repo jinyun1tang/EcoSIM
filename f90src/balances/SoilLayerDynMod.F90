@@ -830,20 +830,20 @@ implicit none
     DO  K=0,jcplx1
       DO  N=1,NFGs
         DO  M=1,nlbiomcp
-          DO NGL=1,JG
-            OMC(M,NGL,N,K,L1,NY,NX)=OMC(M,NGL,N,K,L1,NY,NX)+FX*OMC(M,NGL,N,K,L0,NY,NX)
-            OMN(M,NGL,N,K,L1,NY,NX)=OMN(M,NGL,N,K,L1,NY,NX)+FX*OMN(M,NGL,N,K,L0,NY,NX)
-            OMP(M,NGL,N,K,L1,NY,NX)=OMP(M,NGL,N,K,L1,NY,NX)+FX*OMP(M,NGL,N,K,L0,NY,NX)
+          DO NGL=JGnio(N),JGnfo(N)
+            OMC(M,NGL,K,L1,NY,NX)=OMC(M,NGL,K,L1,NY,NX)+FX*OMC(M,NGL,K,L0,NY,NX)
+            OMN(M,NGL,K,L1,NY,NX)=OMN(M,NGL,K,L1,NY,NX)+FX*OMN(M,NGL,K,L0,NY,NX)
+            OMP(M,NGL,K,L1,NY,NX)=OMP(M,NGL,K,L1,NY,NX)+FX*OMP(M,NGL,K,L0,NY,NX)
           enddo
         enddo
       enddo
     ENDDO
     DO  N=1,NFGs
       DO  M=1,nlbiomcp
-        DO NGL=1,JG
-          OMCff(M,NGL,N,L1,NY,NX)=OMCff(M,NGL,N,L1,NY,NX)+FX*OMCff(M,NGL,N,L0,NY,NX)
-          OMNff(M,NGL,N,L1,NY,NX)=OMNff(M,NGL,N,L1,NY,NX)+FX*OMNff(M,NGL,N,L0,NY,NX)
-          OMPff(M,NGL,N,L1,NY,NX)=OMPff(M,NGL,N,L1,NY,NX)+FX*OMPff(M,NGL,N,L0,NY,NX)
+        DO NGL=JGniA(N),JGnfA(N)
+          OMCff(M,NGL,L1,NY,NX)=OMCff(M,NGL,L1,NY,NX)+FX*OMCff(M,NGL,L0,NY,NX)
+          OMNff(M,NGL,L1,NY,NX)=OMNff(M,NGL,L1,NY,NX)+FX*OMNff(M,NGL,L0,NY,NX)
+          OMPff(M,NGL,L1,NY,NX)=OMPff(M,NGL,L1,NY,NX)+FX*OMPff(M,NGL,L0,NY,NX)
         enddo
       enddo
     enddo
@@ -1095,10 +1095,10 @@ implicit none
     DO  K=0,jcplx1
        DO N=1,NFGs
         DO M=1,nlbiomcp
-          DO NGL=1,JG
-            OMC(M,NGL,N,K,L0,NY,NX)=FY*OMC(M,NGL,N,K,L0,NY,NX)
-            OMN(M,NGL,N,K,L0,NY,NX)=FY*OMN(M,NGL,N,K,L0,NY,NX)
-            OMP(M,NGL,N,K,L0,NY,NX)=FY*OMP(M,NGL,N,K,L0,NY,NX)
+          DO NGL=JGnio(N),JGnfo(N)
+            OMC(M,NGL,K,L0,NY,NX)=FY*OMC(M,NGL,K,L0,NY,NX)
+            OMN(M,NGL,K,L0,NY,NX)=FY*OMN(M,NGL,K,L0,NY,NX)
+            OMP(M,NGL,K,L0,NY,NX)=FY*OMP(M,NGL,K,L0,NY,NX)
           ENDDO
         enddo
       enddo
@@ -1106,10 +1106,10 @@ implicit none
 
     DO N=1,NFGs
       DO M=1,nlbiomcp
-        DO NGL=1,JG
-          OMCff(M,NGL,N,L0,NY,NX)=FY*OMCff(M,NGL,N,L0,NY,NX)
-          OMNff(M,NGL,N,L0,NY,NX)=FY*OMNff(M,NGL,N,L0,NY,NX)
-          OMPff(M,NGL,N,L0,NY,NX)=FY*OMPff(M,NGL,N,L0,NY,NX)
+        DO NGL=JGniA(N),JGnfA(N)
+          OMCff(M,NGL,L0,NY,NX)=FY*OMCff(M,NGL,L0,NY,NX)
+          OMNff(M,NGL,L0,NY,NX)=FY*OMNff(M,NGL,L0,NY,NX)
+          OMPff(M,NGL,L0,NY,NX)=FY*OMPff(M,NGL,L0,NY,NX)
         ENDDO
       enddo
     enddo
@@ -1243,16 +1243,16 @@ implicit none
     DO  K=0,jcplx1
       DO  N=1,NFGs
         DO  M=1,nlbiomcp
-          DO NGL=1,JG
-            FXOMC=FXO*OMC(M,NGL,N,K,L0,NY,NX)
-            OMC(M,NGL,N,K,L1,NY,NX)=OMC(M,NGL,N,K,L1,NY,NX)+FXOMC
-            OMC(M,NGL,N,K,L0,NY,NX)=OMC(M,NGL,N,K,L0,NY,NX)-FXOMC
-            FXOMN=FXO*OMN(M,NGL,N,K,L0,NY,NX)
-            OMN(M,NGL,N,K,L1,NY,NX)=OMN(M,NGL,N,K,L1,NY,NX)+FXOMN
-            OMN(M,NGL,N,K,L0,NY,NX)=OMN(M,NGL,N,K,L0,NY,NX)-FXOMN
-            FXOMP=FXO*OMP(M,NGL,N,K,L0,NY,NX)
-            OMP(M,NGL,N,K,L1,NY,NX)=OMP(M,NGL,N,K,L1,NY,NX)+FXOMP
-            OMP(M,NGL,N,K,L0,NY,NX)=OMP(M,NGL,N,K,L0,NY,NX)-FXOMP
+          DO NGL=JGnio(N),JGnfo(N)
+            FXOMC=FXO*OMC(M,NGL,K,L0,NY,NX)
+            OMC(M,NGL,K,L1,NY,NX)=OMC(M,NGL,K,L1,NY,NX)+FXOMC
+            OMC(M,NGL,K,L0,NY,NX)=OMC(M,NGL,K,L0,NY,NX)-FXOMC
+            FXOMN=FXO*OMN(M,NGL,K,L0,NY,NX)
+            OMN(M,NGL,K,L1,NY,NX)=OMN(M,NGL,K,L1,NY,NX)+FXOMN
+            OMN(M,NGL,K,L0,NY,NX)=OMN(M,NGL,K,L0,NY,NX)-FXOMN
+            FXOMP=FXO*OMP(M,NGL,K,L0,NY,NX)
+            OMP(M,NGL,K,L1,NY,NX)=OMP(M,NGL,K,L1,NY,NX)+FXOMP
+            OMP(M,NGL,K,L0,NY,NX)=OMP(M,NGL,K,L0,NY,NX)-FXOMP
           enddo
         enddo
       enddo
@@ -1260,16 +1260,16 @@ implicit none
 
     DO  N=1,NFGs
       DO  M=1,nlbiomcp
-        DO NGL=1,JG
-          FXOMC=FXO*OMCff(M,NGL,N,L0,NY,NX)
-          OMCff(M,NGL,N,L1,NY,NX)=OMCff(M,NGL,N,L1,NY,NX)+FXOMC
-          OMCff(M,NGL,N,L0,NY,NX)=OMCff(M,NGL,N,L0,NY,NX)-FXOMC
-          FXOMN=FXO*OMNff(M,NGL,N,L0,NY,NX)
-          OMNff(M,NGL,N,L1,NY,NX)=OMNff(M,NGL,N,L1,NY,NX)+FXOMN
-          OMNff(M,NGL,N,L0,NY,NX)=OMNff(M,NGL,N,L0,NY,NX)-FXOMN
-          FXOMP=FXO*OMPff(M,NGL,N,L0,NY,NX)
-          OMPff(M,NGL,N,L1,NY,NX)=OMPff(M,NGL,N,L1,NY,NX)+FXOMP
-          OMPff(M,NGL,N,L0,NY,NX)=OMPff(M,NGL,N,L0,NY,NX)-FXOMP
+        DO NGL=JGniA(N),JGnfA(N)
+          FXOMC=FXO*OMCff(M,NGL,L0,NY,NX)
+          OMCff(M,NGL,L1,NY,NX)=OMCff(M,NGL,L1,NY,NX)+FXOMC
+          OMCff(M,NGL,L0,NY,NX)=OMCff(M,NGL,L0,NY,NX)-FXOMC
+          FXOMN=FXO*OMNff(M,NGL,L0,NY,NX)
+          OMNff(M,NGL,L1,NY,NX)=OMNff(M,NGL,L1,NY,NX)+FXOMN
+          OMNff(M,NGL,L0,NY,NX)=OMNff(M,NGL,L0,NY,NX)-FXOMN
+          FXOMP=FXO*OMPff(M,NGL,L0,NY,NX)
+          OMPff(M,NGL,L1,NY,NX)=OMPff(M,NGL,L1,NY,NX)+FXOMP
+          OMPff(M,NGL,L0,NY,NX)=OMPff(M,NGL,L0,NY,NX)-FXOMP
         enddo
       enddo
     enddo

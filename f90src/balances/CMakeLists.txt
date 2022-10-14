@@ -11,6 +11,7 @@ set(BALANCES_MOD_SOURCES
 include_directories(${CMAKE_BINARY_DIR}/f90src/utils/)
 include_directories(${CMAKE_BINARY_DIR}/f90src/minimath/)
 include_directories(${CMAKE_BINARY_DIR}/f90src/modelconfig/)
+include_directories(${CMAKE_BINARY_DIR}/f90src/modelpars/)
 include_directories(${CMAKE_BINARY_DIR}/f90src/ecosim_datatype/)
 include_directories(${CMAKE_BINARY_DIR}/f90src/ioutils/)
 include_directories(${CMAKE_BINARY_DIR}/f90src/SoilHydroTherm/)

@@ -306,38 +306,48 @@ implicit none
           COE=0.0_r8
           ZOE=0.0_r8
           POE=0.0_r8
-          DO 3580 K=0,jcplx
+          D3580: DO K=0,jcplx1
             DO NO=1,NFGs
               DO M=1,nlbiomcp
-                DO NGL=1,JG
-                  COE=COE+XN*OMCER(M+(NGL-1)*nlbiomcp,NO,K,N,NN,N5,N4)
-                  ZOE=ZOE+XN*OMNER(M+(NGL-1)*nlbiomcp,NO,K,N,NN,N5,N4)
-                  POE=POE+XN*OMPER(M+(NGL-1)*nlbiomcp,NO,K,N,NN,N5,N4)
+                DO NGL=JGnio(NO),JGnfo(NO)
+                  COE=COE+XN*OMCER(M+(NGL-1)*nlbiomcp,K,N,NN,N5,N4)
+                  ZOE=ZOE+XN*OMNER(M+(NGL-1)*nlbiomcp,K,N,NN,N5,N4)
+                  POE=POE+XN*OMPER(M+(NGL-1)*nlbiomcp,K,N,NN,N5,N4)
                 enddo
               enddo
             enddo
-3580      CONTINUE
+          ENDDO D3580
+          DO NO=1,NFGs
+            DO M=1,nlbiomcp
+              DO NGL=JGniA(NO),JGnfA(NO)
+                COE=COE+XN*OMCERff(M+(NGL-1)*nlbiomcp,N,NN,N5,N4)
+                ZOE=ZOE+XN*OMNERff(M+(NGL-1)*nlbiomcp,N,NN,N5,N4)
+                POE=POE+XN*OMPERff(M+(NGL-1)*nlbiomcp,N,NN,N5,N4)
+              enddo
+            enddo
+          enddo
+
 !
     !     MICROBIAL RESIDUE C IN RUNOFF SEDIMENT
 !
-          DO 3575 K=0,jcplx1
-            DO 3570 M=1,ndbiomcp
+          D3575: DO K=0,jcplx1
+            D3570: DO M=1,ndbiomcp
               COE=COE+XN*ORCER(M,K,N,NN,N5,N4)
               ZOE=ZOE+XN*ORNER(M,K,N,NN,N5,N4)
               POE=POE+XN*ORPER(M,K,N,NN,N5,N4)
-3570        CONTINUE
+            ENDDO D3570
 !
         !   DOC, ADSORBED AND HUMUS C IN RUNOFF SEDIMENT
 !
             COE=COE+XN*(OHCER(K,N,NN,N5,N4)+OHAER(K,N,NN,N5,N4))
             ZOE=ZOE+XN*OHNER(K,N,NN,N5,N4)
             POE=POE+XN*OHPER(K,N,NN,N5,N4)
-            DO 3565 M=1,jsken
+            D3565: DO M=1,jsken
               COE=COE+XN*OSCER(M,K,N,NN,N5,N4)
               ZOE=ZOE+XN*OSNER(M,K,N,NN,N5,N4)
               POE=POE+XN*OSPER(M,K,N,NN,N5,N4)
-3565        CONTINUE
-3575      CONTINUE
+            ENDDO D3565
+          ENDDO D3575
           TCOU=TCOU-COE-CXE
           TZOU=TZOU-ZOE-ZXE-ZPE
           TPOU=TPOU-POE-PXE-PPE

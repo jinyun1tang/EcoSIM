@@ -11,5 +11,6 @@ do_regression_test=.true.
 num_of_simdays=180
 /
 &bbgcforc
-
+ DO_BGCFORC_WRITE=.true.
+ bgc_fname='dryland.bgc.forc.nc'
 /

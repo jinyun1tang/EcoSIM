@@ -67,24 +67,46 @@ implicit none
 !
 !     THIS SUBROUTINE CALCULATES ALL SOIL BIOLOGICAL TRANSFORMATIONS
 !
-implicit none
-integer, intent(in) :: I, J
-integer, intent(in) :: NHW,NHE,NVN,NVS
+  implicit none
+  integer, intent(in) :: I, J
+  integer, intent(in) :: NHW,NHE,NVN,NVS
 
-integer :: L,NX,NY
+  integer :: L,NX,NY
 
 !   begin_execution
-curI=I; curJ=J
-DO 9995 NX=NHW,NHE
-  DO 9990 NY=NVN,NVS
+  curI=I; curJ=J
+  D9995: DO NX=NHW,NHE
+    D9990: DO NY=NVN,NVS
 !
 !       VOLWZ=water volume used to calculate aqueous microbial
 !       concentrations that drive microbial density effects on
 !       decomposition
-    DO 998 L=0,NL(NY,NX)
-      IF(VOLX(L,NY,NX).GT.ZEROS2(NY,NX))THEN
-        IF(L.EQ.0.OR.L.GE.NU(NY,NX))THEN
-           call MicBGC1Layer(I,J,L,NY,NX)
+      D998: DO L=0,NL(NY,NX)
+        IF(VOLX(L,NY,NX).GT.ZEROS2(NY,NX))THEN
+          IF(L.EQ.0.OR.L.GE.NU(NY,NX))THEN
+             call MicBGC1Layer(I,J,L,NY,NX)
+          ELSE
+            RCO2O(L,NY,NX)=0.0_r8
+            RCH4O(L,NY,NX)=0.0_r8
+            RH2GO(L,NY,NX)=0.0_r8
+            RUPOXO(L,NY,NX)=0.0_r8
+            RN2G(L,NY,NX)=0.0_r8
+            RN2O(L,NY,NX)=0.0_r8
+            XNH4S(L,NY,NX)=0.0_r8
+            XNO3S(L,NY,NX)=0.0_r8
+            XNO2S(L,NY,NX)=0.0_r8
+            XH2PS(L,NY,NX)=0.0_r8
+            XH1PS(L,NY,NX)=0.0_r8
+            XNH4B(L,NY,NX)=0.0_r8
+            XNO3B(L,NY,NX)=0.0_r8
+            XNO2B(L,NY,NX)=0.0_r8
+            XH2BS(L,NY,NX)=0.0_r8
+            XH1BS(L,NY,NX)=0.0_r8
+            XN2GS(L,NY,NX)=0.0_r8
+          ENDIF
+  !     MIX LITTER C BETWEEN ADJACENT SOIL LAYERS L AND LL
+          call VerticalLitterMixLvsLL(I,J,L,NY,NX)
+
         ELSE
           RCO2O(L,NY,NX)=0.0_r8
           RCH4O(L,NY,NX)=0.0_r8
@@ -104,38 +126,15 @@ DO 9995 NX=NHW,NHE
           XH1BS(L,NY,NX)=0.0_r8
           XN2GS(L,NY,NX)=0.0_r8
         ENDIF
-!     MIX LITTER C BETWEEN ADJACENT SOIL LAYERS L AND LL
-        call VerticalLitterMixLvsLL(I,J,L,NY,NX)
-
-      ELSE
-        RCO2O(L,NY,NX)=0.0_r8
-        RCH4O(L,NY,NX)=0.0_r8
-        RH2GO(L,NY,NX)=0.0_r8
-        RUPOXO(L,NY,NX)=0.0_r8
-        RN2G(L,NY,NX)=0.0_r8
-        RN2O(L,NY,NX)=0.0_r8
-        XNH4S(L,NY,NX)=0.0_r8
-        XNO3S(L,NY,NX)=0.0_r8
-        XNO2S(L,NY,NX)=0.0_r8
-        XH2PS(L,NY,NX)=0.0_r8
-        XH1PS(L,NY,NX)=0.0_r8
-        XNH4B(L,NY,NX)=0.0_r8
-        XNO3B(L,NY,NX)=0.0_r8
-        XNO2B(L,NY,NX)=0.0_r8
-        XH2BS(L,NY,NX)=0.0_r8
-        XH1BS(L,NY,NX)=0.0_r8
-        XN2GS(L,NY,NX)=0.0_r8
-      ENDIF
-
-998   CONTINUE
+      ENDDO D998
 !
 !       SOC LOSS IF FIRE OR REMOVAL EVENT IS ENTERED IN DISTURBANCE FILE
 !
-    call SOMRemovalByDisturbance(I,J,NY,NX)
-9990  CONTINUE
-9995  CONTINUE
-RETURN
-END subroutine MicrobeModel
+      call SOMRemovalByDisturbance(I,J,NY,NX)
+    ENDDO D9990
+  ENDDO D9995
+  RETURN
+  END subroutine MicrobeModel
 
 !------------------------------------------------------------------------------------------
 
@@ -162,11 +161,17 @@ END subroutine MicrobeModel
   type(micsttype), intent(inout) :: micstt
   type(micfluxtype), intent(inout) :: micflx
 
-  integer :: NFGs, jcplx1, JG
-  integer :: kk
+  integer :: NFGs, jcplx1, JG, k_POM, k_humus
+  integer :: kk, ndbiomcp, nlbiomcp, NMICBSA, NMICBSO
   NFGs=micpar%NFGs
   jcplx1=micpar%jcplx1
   JG=micpar%jguilds
+  ndbiomcp = micpar%ndbiomcp
+  nlbiomcp = micpar%nlbiomcp
+  NMICBSA  = micpar%NMICBSA
+  NMICBSO  = micpar%NMICBSO
+  k_humus  = micpar%k_humus
+  k_POM    = micpar%k_POM
 
   micfor%ZERO  =ZERO
   micfor%CCH4E =CCH4E(NY,NX)
@@ -215,14 +220,10 @@ END subroutine MicrobeModel
   micfor%litrm=(L==0)
   micfor%Lsurf=(L==NU(NY,NX))
   if(micfor%litrm)then
-    micstt%ZNH4TU=AZMAX1(ZNH4S(NU(NY,NX),NY,NX)) &
-      +AZMAX1(ZNH4B(NU(NY,NX),NY,NX))
-    micstt%ZNO3TU=AZMAX1(ZNO3S(NU(NY,NX),NY,NX)) &
-      +AZMAX1(ZNO3B(NU(NY,NX),NY,NX))
-    micstt%H1P4TU=AZMAX1(H1PO4(NU(NY,NX),NY,NX)) &
-      +AZMAX1(H1POB(NU(NY,NX),NY,NX))
-    micstt%H2P4TU=AZMAX1(H2PO4(NU(NY,NX),NY,NX)) &
-      +AZMAX1(H2POB(NU(NY,NX),NY,NX))
+    micstt%ZNH4TU=AZMAX1(ZNH4S(NU(NY,NX),NY,NX))+AZMAX1(ZNH4B(NU(NY,NX),NY,NX))
+    micstt%ZNO3TU=AZMAX1(ZNO3S(NU(NY,NX),NY,NX))+AZMAX1(ZNO3B(NU(NY,NX),NY,NX))
+    micstt%H1P4TU=AZMAX1(H1PO4(NU(NY,NX),NY,NX))+AZMAX1(H1POB(NU(NY,NX),NY,NX))
+    micstt%H2P4TU=AZMAX1(H2PO4(NU(NY,NX),NY,NX))+AZMAX1(H2POB(NU(NY,NX),NY,NX))
     micstt%CNH4BU=CNH4B(NU(NY,NX),NY,NX)
     micstt%CNH4SU=CNH4S(NU(NY,NX),NY,NX)
     micstt%CH2P4U=CH2P4(NU(NY,NX),NY,NX)
@@ -231,15 +232,15 @@ END subroutine MicrobeModel
     micstt%CH1P4BU=CH1P4B(NU(NY,NX),NY,NX)
     micstt%CNO3SU=CNO3S(NU(NY,NX),NY,NX)
     micstt%CNO3BU=CNO3B(NU(NY,NX),NY,NX)
-    micstt%OSC13U=OSC(1,3,NU(NY,NX),NY,NX)
-    micstt%OSN13U=OSN(1,3,NU(NY,NX),NY,NX)
-    micstt%OSP13U=OSP(1,3,NU(NY,NX),NY,NX)
-    micstt%OSC14U=OSC(1,4,NU(NY,NX),NY,NX)
-    micstt%OSN14U=OSN(1,4,NU(NY,NX),NY,NX)
-    micstt%OSP14U=OSP(1,4,NU(NY,NX),NY,NX)
-    micstt%OSC24U=OSC(2,4,NU(NY,NX),NY,NX)
-    micstt%OSN24U=OSN(2,4,NU(NY,NX),NY,NX)
-    micstt%OSP24U=OSP(2,4,NU(NY,NX),NY,NX)
+    micstt%OSC13U=OSC(1,k_POM,NU(NY,NX),NY,NX)
+    micstt%OSN13U=OSN(1,k_POM,NU(NY,NX),NY,NX)
+    micstt%OSP13U=OSP(1,k_POM,NU(NY,NX),NY,NX)
+    micstt%OSC14U=OSC(1,k_humus,NU(NY,NX),NY,NX)
+    micstt%OSN14U=OSN(1,k_humus,NU(NY,NX),NY,NX)
+    micstt%OSP14U=OSP(1,k_humus,NU(NY,NX),NY,NX)
+    micstt%OSC24U=OSC(2,k_humus,NU(NY,NX),NY,NX)
+    micstt%OSN24U=OSN(2,k_humus,NU(NY,NX),NY,NX)
+    micstt%OSP24U=OSP(2,k_humus,NU(NY,NX),NY,NX)
     micfor%RNH4YU =RNH4Y(NU(NY,NX),NY,NX)
     micfor%RNO3YU =RNO3Y(NU(NY,NX),NY,NX)
     micfor%RPO4YU =RPO4Y(NU(NY,NX),NY,NX)
@@ -316,42 +317,42 @@ END subroutine MicrobeModel
   micstt%OSA(1:jsken,0:jcplx1)=OSA(1:jsken,0:jcplx1,L,NY,NX)
   micstt%OSN(1:jsken,0:jcplx1)=OSN(1:jsken,0:jcplx1,L,NY,NX)
   micstt%OSP(1:jsken,0:jcplx1)=OSP(1:jsken,0:jcplx1,L,NY,NX)
-  micstt%ORC(1:2,0:jcplx1)=ORC(1:2,0:jcplx1,L,NY,NX)
-  micstt%ORN(1:2,0:jcplx1)=ORN(1:2,0:jcplx1,L,NY,NX)
-  micstt%ORP(1:2,0:jcplx1)=ORP(1:2,0:jcplx1,L,NY,NX)
+  micstt%ORC(1:ndbiomcp,0:jcplx1)=ORC(1:ndbiomcp,0:jcplx1,L,NY,NX)
+  micstt%ORN(1:ndbiomcp,0:jcplx1)=ORN(1:ndbiomcp,0:jcplx1,L,NY,NX)
+  micstt%ORP(1:ndbiomcp,0:jcplx1)=ORP(1:ndbiomcp,0:jcplx1,L,NY,NX)
   micstt%CNOSC(1:jsken,0:jcplx1)=CNOSC(1:jsken,0:jcplx1,L,NY,NX)
   micstt%CPOSC(1:jsken,0:jcplx1)=CPOSC(1:jsken,0:jcplx1,L,NY,NX)
-  micstt%OMC(1:3,1:JG,1:NFGs,0:jcplx1)=OMC(1:3,1:JG,1:NFGs,0:jcplx1,L,NY,NX)
-  micstt%OMN(1:3,1:JG,1:NFGs,0:jcplx1)=OMN(1:3,1:JG,1:NFGs,0:jcplx1,L,NY,NX)
-  micstt%OMP(1:3,1:JG,1:NFGs,0:jcplx1)=OMP(1:3,1:JG,1:NFGs,0:jcplx1,L,NY,NX)
-  micstt%OMCff(1:3,1:JG,1:NFGs)=OMCff(1:3,1:JG,1:NFGs,L,NY,NX)
-  micstt%OMNff(1:3,1:JG,1:NFGs)=OMNff(1:3,1:JG,1:NFGs,L,NY,NX)
-  micstt%OMPff(1:3,1:JG,1:NFGs)=OMPff(1:3,1:JG,1:NFGs,L,NY,NX)
+  micstt%OMC(1:nlbiomcp,1:NMICBSO,0:jcplx1)=OMC(1:nlbiomcp,1:NMICBSO,0:jcplx1,L,NY,NX)
+  micstt%OMN(1:nlbiomcp,1:NMICBSO,0:jcplx1)=OMN(1:nlbiomcp,1:NMICBSO,0:jcplx1,L,NY,NX)
+  micstt%OMP(1:nlbiomcp,1:NMICBSO,0:jcplx1)=OMP(1:nlbiomcp,1:NMICBSO,0:jcplx1,L,NY,NX)
+  micstt%OMCff(1:nlbiomcp,1:NMICBSA)=OMCff(1:nlbiomcp,1:NMICBSA,L,NY,NX)
+  micstt%OMNff(1:nlbiomcp,1:NMICBSA)=OMNff(1:nlbiomcp,1:NMICBSA,L,NY,NX)
+  micstt%OMPff(1:nlbiomcp,1:NMICBSA)=OMPff(1:nlbiomcp,1:NMICBSA,L,NY,NX)
   if(.not.micfor%litrm)then
     micfor%AEC=AEC(L,NY,NX)
     micstt%OXYG=OXYG(L,NY,NX)
   endif
   micflx%RVMXC=RVMXC(L,NY,NX)
   micflx%RVMBC=RVMBC(L,NY,NX)
-  micflx%RINHOff(1:JG,1:NFGs)=RINHOff(1:JG,1:NFGs,L,NY,NX)
-  micflx%RINHBff(1:JG,1:NFGs)=RINHBff(1:JG,1:NFGs,L,NY,NX)
-  micflx%RINOOff(1:JG,1:NFGs)=RINOOff(1:JG,1:NFGs,L,NY,NX)
-  micflx%RINOBff(1:JG,1:NFGs)=RINOBff(1:JG,1:NFGs,L,NY,NX)
-  micflx%RIPOOff(1:JG,1:NFGs)=RIPOOff(1:JG,1:NFGs,L,NY,NX)
-  micflx%RIPBOff(1:JG,1:NFGs)=RIPBOff(1:JG,1:NFGs,L,NY,NX)
-  micflx%RIPO1ff(1:JG,1:NFGs)=RIPO1ff(1:JG,1:NFGs,L,NY,NX)
-  micflx%RIPB1ff(1:JG,1:NFGs)=RIPB1ff(1:JG,1:NFGs,L,NY,NX)
-  micflx%ROXYSff(1:JG,1:NFGs)=ROXYSff(1:JG,1:NFGs,L,NY,NX)
+  micflx%RINHOff(1:NMICBSA)=RINHOff(1:NMICBSA,L,NY,NX)
+  micflx%RINHBff(1:NMICBSA)=RINHBff(1:NMICBSA,L,NY,NX)
+  micflx%RINOOff(1:NMICBSA)=RINOOff(1:NMICBSA,L,NY,NX)
+  micflx%RINOBff(1:NMICBSA)=RINOBff(1:NMICBSA,L,NY,NX)
+  micflx%RIPOOff(1:NMICBSA)=RIPOOff(1:NMICBSA,L,NY,NX)
+  micflx%RIPBOff(1:NMICBSA)=RIPBOff(1:NMICBSA,L,NY,NX)
+  micflx%RIPO1ff(1:NMICBSA)=RIPO1ff(1:NMICBSA,L,NY,NX)
+  micflx%RIPB1ff(1:NMICBSA)=RIPB1ff(1:NMICBSA,L,NY,NX)
+  micflx%ROXYSff(1:NMICBSA)=ROXYSff(1:NMICBSA,L,NY,NX)
 
-  micflx%RINHO(1:JG,1:NFGs,0:JCPLX1)=RINHO(1:JG,1:NFGs,0:JCPLX1,L,NY,NX)
-  micflx%RINHB(1:JG,1:NFGs,0:JCPLX1)=RINHB(1:JG,1:NFGs,0:JCPLX1,L,NY,NX)
-  micflx%RINOO(1:JG,1:NFGs,0:JCPLX1)=RINOO(1:JG,1:NFGs,0:JCPLX1,L,NY,NX)
-  micflx%RINOB(1:JG,1:NFGs,0:JCPLX1)=RINOB(1:JG,1:NFGs,0:JCPLX1,L,NY,NX)
-  micflx%RIPOO(1:JG,1:NFGs,0:JCPLX1)=RIPOO(1:JG,1:NFGs,0:JCPLX1,L,NY,NX)
-  micflx%RIPBO(1:JG,1:NFGs,0:JCPLX1)=RIPBO(1:JG,1:NFGs,0:JCPLX1,L,NY,NX)
-  micflx%RIPO1(1:JG,1:NFGs,0:JCPLX1)=RIPO1(1:JG,1:NFGs,0:JCPLX1,L,NY,NX)
-  micflx%RIPB1(1:JG,1:NFGs,0:JCPLX1)=RIPB1(1:JG,1:NFGs,0:JCPLX1,L,NY,NX)
-  micflx%ROXYS(1:JG,1:NFGs,0:JCPLX1)=ROXYS(1:JG,1:NFGs,0:JCPLX1,L,NY,NX)
+  micflx%RINHO(1:NMICBSO,0:JCPLX1)=RINHO(1:NMICBSO,0:JCPLX1,L,NY,NX)
+  micflx%RINHB(1:NMICBSO,0:JCPLX1)=RINHB(1:NMICBSO,0:JCPLX1,L,NY,NX)
+  micflx%RINOO(1:NMICBSO,0:JCPLX1)=RINOO(1:NMICBSO,0:JCPLX1,L,NY,NX)
+  micflx%RINOB(1:NMICBSO,0:JCPLX1)=RINOB(1:NMICBSO,0:JCPLX1,L,NY,NX)
+  micflx%RIPOO(1:NMICBSO,0:JCPLX1)=RIPOO(1:NMICBSO,0:JCPLX1,L,NY,NX)
+  micflx%RIPBO(1:NMICBSO,0:JCPLX1)=RIPBO(1:NMICBSO,0:JCPLX1,L,NY,NX)
+  micflx%RIPO1(1:NMICBSO,0:JCPLX1)=RIPO1(1:NMICBSO,0:JCPLX1,L,NY,NX)
+  micflx%RIPB1(1:NMICBSO,0:JCPLX1)=RIPB1(1:NMICBSO,0:JCPLX1,L,NY,NX)
+  micflx%ROXYS(1:NMICBSO,0:JCPLX1)=ROXYS(1:NMICBSO,0:JCPLX1,L,NY,NX)
 
   end subroutine MicAPISend
 
@@ -364,8 +365,8 @@ END subroutine MicrobeModel
   logical, intent(in) :: litrM
   type(micsttype), intent(in) :: micstt
   type(micfluxtype), intent(in) :: micflx
-  integer :: NFGs, jcplx1,JG
-
+  integer :: NFGs, jcplx1,JG, NMICBSA
+  NMICBSA = micpar%NMICBSA
   NFGs=micpar%NFGs
   jcplx1=micpar%jcplx1
   JG=micpar%jguilds
@@ -395,29 +396,29 @@ END subroutine MicrobeModel
   XOQPS(0:jcplx1,L,NY,NX)=micflx%XOQPS(0:jcplx1)
   XOQAS(0:jcplx1,L,NY,NX)=micflx%XOQAS(0:jcplx1)
 
-  ROXYSff(1:JG,1:NFGs,L,NY,NX)=micflx%ROXYSff(1:JG,1:NFGs)
-  RVMX4ff(1:JG,1:NFGs,L,NY,NX)=micflx%RVMX4ff(1:JG,1:NFGs)
-  RVMB4ff(1:JG,1:NFGs,L,NY,NX)=micflx%RVMB4ff(1:JG,1:NFGs)
-  RVMX2ff(1:JG,1:NFGs,L,NY,NX)=micflx%RVMX2ff(1:JG,1:NFGs)
-  RVMB2ff(1:JG,1:NFGs,L,NY,NX)=micflx%RVMB2ff(1:JG,1:NFGs)
-  ROXYS(1:JG,1:NFGs,0:JCPLX1,L,NY,NX)=micflx%ROXYS(1:JG,1:NFGs,0:JCPLX1)
-  ROQCS(1:JG,1:NFGs,0:JCPLX1,L,NY,NX)=micflx%ROQCS(1:JG,1:NFGs,0:JCPLX1)
-  ROQAS(1:JG,1:NFGs,0:JCPLX1,L,NY,NX)=micflx%ROQAS(1:JG,1:NFGs,0:JCPLX1)
-  RVMX3(1:JG,1:NFGs,0:JCPLX1,L,NY,NX)=micflx%RVMX3(1:JG,1:NFGs,0:JCPLX1)
-  RVMB3(1:JG,1:NFGs,0:JCPLX1,L,NY,NX)=micflx%RVMB3(1:JG,1:NFGs,0:JCPLX1)
-  RVMX2(1:JG,1:NFGs,0:JCPLX1,L,NY,NX)=micflx%RVMX2(1:JG,1:NFGs,0:JCPLX1)
-  RVMB2(1:JG,1:NFGs,0:JCPLX1,L,NY,NX)=micflx%RVMB2(1:JG,1:NFGs,0:JCPLX1)
-  RVMX1(1:JG,1:NFGs,0:JCPLX1,L,NY,NX)=micflx%RVMX1(1:JG,1:NFGs,0:JCPLX1)
-  RVMX4(1:JG,1:NFGs,0:JCPLX1,L,NY,NX)=micflx%RVMX4(1:JG,1:NFGs,0:JCPLX1)
-  RVMB4(1:JG,1:NFGs,0:JCPLX1,L,NY,NX)=micflx%RVMB4(1:JG,1:NFGs,0:JCPLX1)
-  RINHO(1:JG,1:NFGs,0:JCPLX1,L,NY,NX)=micflx%RINHO(1:JG,1:NFGs,0:JCPLX1)
-  RINHB(1:JG,1:NFGs,0:JCPLX1,L,NY,NX)=micflx%RINHB(1:JG,1:NFGs,0:JCPLX1)
-  RINOO(1:JG,1:NFGs,0:JCPLX1,L,NY,NX)=micflx%RINOO(1:JG,1:NFGs,0:JCPLX1)
-  RINOB(1:JG,1:NFGs,0:JCPLX1,L,NY,NX)=micflx%RINOB(1:JG,1:NFGs,0:JCPLX1)
-  RIPOO(1:JG,1:NFGs,0:JCPLX1,L,NY,NX)=micflx%RIPOO(1:JG,1:NFGs,0:JCPLX1)
-  RIPBO(1:JG,1:NFGs,0:JCPLX1,L,NY,NX)=micflx%RIPBO(1:JG,1:NFGs,0:JCPLX1)
-  RIPO1(1:JG,1:NFGs,0:JCPLX1,L,NY,NX)=micflx%RIPO1(1:JG,1:NFGs,0:JCPLX1)
-  RIPB1(1:JG,1:NFGs,0:JCPLX1,L,NY,NX)=micflx%RIPB1(1:JG,1:NFGs,0:JCPLX1)
+  ROXYSff(1:NMICBSA,L,NY,NX)=micflx%ROXYSff(1:NMICBSA)
+  RVMX4ff(1:NMICBSA,L,NY,NX)=micflx%RVMX4ff(1:NMICBSA)
+  RVMB4ff(1:NMICBSA,L,NY,NX)=micflx%RVMB4ff(1:NMICBSA)
+  RVMX2ff(1:NMICBSA,L,NY,NX)=micflx%RVMX2ff(1:NMICBSA)
+  RVMB2ff(1:NMICBSA,L,NY,NX)=micflx%RVMB2ff(1:NMICBSA)
+  ROXYS(1:NMICBSO,0:JCPLX1,L,NY,NX)=micflx%ROXYS(1:NMICBSO,0:JCPLX1)
+  ROQCS(1:NMICBSO,0:JCPLX1,L,NY,NX)=micflx%ROQCS(1:NMICBSO,0:JCPLX1)
+  ROQAS(1:NMICBSO,0:JCPLX1,L,NY,NX)=micflx%ROQAS(1:NMICBSO,0:JCPLX1)
+  RVMX3(1:NMICBSO,0:JCPLX1,L,NY,NX)=micflx%RVMX3(1:NMICBSO,0:JCPLX1)
+  RVMB3(1:NMICBSO,0:JCPLX1,L,NY,NX)=micflx%RVMB3(1:NMICBSO,0:JCPLX1)
+  RVMX2(1:NMICBSO,0:JCPLX1,L,NY,NX)=micflx%RVMX2(1:NMICBSO,0:JCPLX1)
+  RVMB2(1:NMICBSO,0:JCPLX1,L,NY,NX)=micflx%RVMB2(1:NMICBSO,0:JCPLX1)
+  RVMX1(1:NMICBSO,0:JCPLX1,L,NY,NX)=micflx%RVMX1(1:NMICBSO,0:JCPLX1)
+  RVMX4(1:NMICBSO,0:JCPLX1,L,NY,NX)=micflx%RVMX4(1:NMICBSO,0:JCPLX1)
+  RVMB4(1:NMICBSO,0:JCPLX1,L,NY,NX)=micflx%RVMB4(1:NMICBSO,0:JCPLX1)
+  RINHO(1:NMICBSO,0:JCPLX1,L,NY,NX)=micflx%RINHO(1:NMICBSO,0:JCPLX1)
+  RINHB(1:NMICBSO,0:JCPLX1,L,NY,NX)=micflx%RINHB(1:NMICBSO,0:JCPLX1)
+  RINOO(1:NMICBSO,0:JCPLX1,L,NY,NX)=micflx%RINOO(1:NMICBSO,0:JCPLX1)
+  RINOB(1:NMICBSO,0:JCPLX1,L,NY,NX)=micflx%RINOB(1:NMICBSO,0:JCPLX1)
+  RIPOO(1:NMICBSO,0:JCPLX1,L,NY,NX)=micflx%RIPOO(1:NMICBSO,0:JCPLX1)
+  RIPBO(1:NMICBSO,0:JCPLX1,L,NY,NX)=micflx%RIPBO(1:NMICBSO,0:JCPLX1)
+  RIPO1(1:NMICBSO,0:JCPLX1,L,NY,NX)=micflx%RIPO1(1:NMICBSO,0:JCPLX1)
+  RIPB1(1:NMICBSO,0:JCPLX1,L,NY,NX)=micflx%RIPB1(1:NMICBSO,0:JCPLX1)
 
   OSC(1:jsken,0:jcplx1,L,NY,NX)=micstt%OSC(1:jsken,0:jcplx1)
   OSA(1:jsken,0:jcplx1,L,NY,NX)=micstt%OSA(1:jsken,0:jcplx1)
@@ -425,14 +426,14 @@ END subroutine MicrobeModel
   OSP(1:jsken,0:jcplx1,L,NY,NX)=micstt%OSP(1:jsken,0:jcplx1)
 
   if(litrm)then
-    RINHOR(1:JG,1:NFGs,0:JCPLX1,NY,NX)=micflx%RINHOR(1:JG,1:NFGs,0:JCPLX1)
-    RINOOR(1:JG,1:NFGs,0:JCPLX1,NY,NX)=micflx%RINOOR(1:JG,1:NFGs,0:JCPLX1)
-    RIPOOR(1:JG,1:NFGs,0:JCPLX1,NY,NX)=micflx%RIPOOR(1:JG,1:NFGs,0:JCPLX1)
-    RIPO1R(1:JG,1:NFGs,0:JCPLX1,NY,NX)=micflx%RIPO1R(1:JG,1:NFGs,0:JCPLX1)
-    RINHORff(1:JG,1:NFGs,NY,NX)=micflx%RINHORff(1:JG,1:NFGs)
-    RINOORff(1:JG,1:NFGs,NY,NX)=micflx%RINOORff(1:JG,1:NFGs)
-    RIPOORff(1:JG,1:NFGs,NY,NX)=micflx%RIPOORff(1:JG,1:NFGs)
-    RIPO1Rff(1:JG,1:NFGs,NY,NX)=micflx%RIPO1Rff(1:JG,1:NFGs)
+    RINHOR(1:NMICBSO,0:JCPLX1,NY,NX)=micflx%RINHOR(1:NMICBSO,0:JCPLX1)
+    RINOOR(1:NMICBSO,0:JCPLX1,NY,NX)=micflx%RINOOR(1:NMICBSO,0:JCPLX1)
+    RIPOOR(1:NMICBSO,0:JCPLX1,NY,NX)=micflx%RIPOOR(1:NMICBSO,0:JCPLX1)
+    RIPO1R(1:NMICBSO,0:JCPLX1,NY,NX)=micflx%RIPO1R(1:NMICBSO,0:JCPLX1)
+    RINHORff(1:NMICBSA,NY,NX)=micflx%RINHORff(1:NMICBSA)
+    RINOORff(1:NMICBSA,NY,NX)=micflx%RINOORff(1:NMICBSA)
+    RIPOORff(1:NMICBSA,NY,NX)=micflx%RIPOORff(1:NMICBSA)
+    RIPO1Rff(1:NMICBSA,NY,NX)=micflx%RIPO1Rff(1:NMICBSA)
     OSC(1,3,NU(NY,NX),NY,NX)=micstt%OSC13U
     OSC(1,4,NU(NY,NX),NY,NX)=micstt%OSC14U
     OSC(2,4,NU(NY,NX),NY,NX)=micstt%OSC24U
@@ -444,14 +445,14 @@ END subroutine MicrobeModel
     OSP(2,4,NU(NY,NX),NY,NX)=micstt%OSP24U
   endif
 
-  RINHOff(1:JG,1:NFGs,L,NY,NX)=micflx%RINHOff(1:JG,1:NFGs)
-  RINHBff(1:JG,1:NFGs,L,NY,NX)=micflx%RINHBff(1:JG,1:NFGs)
-  RINOOff(1:JG,1:NFGs,L,NY,NX)=micflx%RINOOff(1:JG,1:NFGs)
-  RINOBff(1:JG,1:NFGs,L,NY,NX)=micflx%RINOBff(1:JG,1:NFGs)
-  RIPOOff(1:JG,1:NFGs,L,NY,NX)=micflx%RIPOOff(1:JG,1:NFGs)
-  RIPBOff(1:JG,1:NFGs,L,NY,NX)=micflx%RIPBOff(1:JG,1:NFGs)
-  RIPO1ff(1:JG,1:NFGs,L,NY,NX)=micflx%RIPO1ff(1:JG,1:NFGs)
-  RIPB1ff(1:JG,1:NFGs,L,NY,NX)=micflx%RIPB1ff(1:JG,1:NFGs)
+  RINHOff(1:NMICBSA,L,NY,NX)=micflx%RINHOff(1:NMICBSA)
+  RINHBff(1:NMICBSA,L,NY,NX)=micflx%RINHBff(1:NMICBSA)
+  RINOOff(1:NMICBSA,L,NY,NX)=micflx%RINOOff(1:NMICBSA)
+  RINOBff(1:NMICBSA,L,NY,NX)=micflx%RINOBff(1:NMICBSA)
+  RIPOOff(1:NMICBSA,L,NY,NX)=micflx%RIPOOff(1:NMICBSA)
+  RIPBOff(1:NMICBSA,L,NY,NX)=micflx%RIPBOff(1:NMICBSA)
+  RIPO1ff(1:NMICBSA,L,NY,NX)=micflx%RIPO1ff(1:NMICBSA)
+  RIPB1ff(1:NMICBSA,L,NY,NX)=micflx%RIPB1ff(1:NMICBSA)
   ROXSK(1:NPH,L,NY,NX)=micflx%ROXSK(1:NPH)
 
   TFNQ(L,NY,NX)=micstt%TFNQ
@@ -468,15 +469,15 @@ END subroutine MicrobeModel
   OHP(0:jcplx1,L,NY,NX)=micstt%OHP(0:jcplx1)
   OHA(0:jcplx1,L,NY,NX)=micstt%OHA(0:jcplx1)
 
-  ORC(1:2,0:jcplx1,L,NY,NX)=micstt%ORC(1:2,0:jcplx1)
-  ORN(1:2,0:jcplx1,L,NY,NX)=micstt%ORN(1:2,0:jcplx1)
-  ORP(1:2,0:jcplx1,L,NY,NX)=micstt%ORP(1:2,0:jcplx1)
-  OMC(1:3,1:JG,1:NFGs,0:jcplx1,L,NY,NX)=micstt%OMC(1:3,1:JG,1:NFGs,0:jcplx1)
-  OMN(1:3,1:JG,1:NFGs,0:jcplx1,L,NY,NX)=micstt%OMN(1:3,1:JG,1:NFGs,0:jcplx1)
-  OMP(1:3,1:JG,1:NFGs,0:jcplx1,L,NY,NX)=micstt%OMP(1:3,1:JG,1:NFGs,0:jcplx1)
-  OMCff(1:3,1:JG,1:NFGs,L,NY,NX)=micstt%OMCff(1:3,1:JG,1:NFGs)
-  OMNff(1:3,1:JG,1:NFGs,L,NY,NX)=micstt%OMNff(1:3,1:JG,1:NFGs)
-  OMPff(1:3,1:JG,1:NFGs,L,NY,NX)=micstt%OMPff(1:3,1:JG,1:NFGs)
+  ORC(1:ndbiomcp,0:jcplx1,L,NY,NX)=micstt%ORC(1:ndbiomcp,0:jcplx1)
+  ORN(1:ndbiomcp,0:jcplx1,L,NY,NX)=micstt%ORN(1:ndbiomcp,0:jcplx1)
+  ORP(1:ndbiomcp,0:jcplx1,L,NY,NX)=micstt%ORP(1:ndbiomcp,0:jcplx1)
+  OMC(1:nlbiomcp,1:NMICBSO,0:JCPLX1,L,NY,NX)=micstt%OMC(1:nlbiomcp,1:NMICBSO,0:JCPLX1)
+  OMN(1:nlbiomcp,1:NMICBSO,0:JCPLX1,L,NY,NX)=micstt%OMN(1:nlbiomcp,1:NMICBSO,0:JCPLX1)
+  OMP(1:nlbiomcp,1:NMICBSO,0:JCPLX1,L,NY,NX)=micstt%OMP(1:nlbiomcp,1:NMICBSO,0:JCPLX1)
+  OMCff(1:nlbiomcp,1:NMICBSA,L,NY,NX)=micstt%OMCff(1:nlbiomcp,1:NMICBSA)
+  OMNff(1:nlbiomcp,1:NMICBSA,L,NY,NX)=micstt%OMNff(1:nlbiomcp,1:NMICBSA)
+  OMPff(1:nlbiomcp,1:NMICBSA,L,NY,NX)=micstt%OMPff(1:nlbiomcp,1:NMICBSA)
 
   end subroutine MicAPIRecv
 end module MicBGCAPI

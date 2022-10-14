@@ -1,7 +1,6 @@
 set(BOX_MODEL_SOURCES
   MicAutoCPLXMod.F90
   MicBGCMod.F90
-  MicBGCPars.F90
   MicFluxTypeMod.F90
   MicForcTypeMod.F90
   MicStateTraitTypeMod.F90

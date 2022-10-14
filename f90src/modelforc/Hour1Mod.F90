@@ -347,120 +347,111 @@ module Hour1Mod
 !
 !     WATER,SNOW,SOLUTE RUNOFF
 !
-      DO  NN=1,2
-        DO N=1,2
-          QR(N,NN,NY,NX)=0.0_r8
-          HQR(N,NN,NY,NX)=0.0_r8
-          DO  K=0,jcplx1
-            XOCQRS(K,N,NN,NY,NX)=0.0_r8
-            XONQRS(K,N,NN,NY,NX)=0.0_r8
-            XOPQRS(K,N,NN,NY,NX)=0.0_r8
-            XOAQRS(K,N,NN,NY,NX)=0.0_r8
-          ENDDO
-          XCOQRS(N,NN,NY,NX)=0.0_r8
-          XCHQRS(N,NN,NY,NX)=0.0_r8
-          XOXQRS(N,NN,NY,NX)=0.0_r8
-          XNGQRS(N,NN,NY,NX)=0.0_r8
-          XN2QRS(N,NN,NY,NX)=0.0_r8
-          XHGQRS(N,NN,NY,NX)=0.0_r8
-          XN4QRW(N,NN,NY,NX)=0.0_r8
-          XN3QRW(N,NN,NY,NX)=0.0_r8
-          XNOQRW(N,NN,NY,NX)=0.0_r8
-          XNXQRS(N,NN,NY,NX)=0.0_r8
-          XP1QRW(N,NN,NY,NX)=0.0_r8
-          XP4QRW(N,NN,NY,NX)=0.0_r8
-        ENDDO
-      ENDDO
 
-      DO N=1,2
-        QS(N,NY,NX)=0.0_r8
-        QW(N,NY,NX)=0.0_r8
-        QI(N,NY,NX)=0.0_r8
-        HQS(N,NY,NX)=0.0_r8
-        XCOQSS(N,NY,NX)=0.0_r8
-        XCHQSS(N,NY,NX)=0.0_r8
-        XOXQSS(N,NY,NX)=0.0_r8
-        XNGQSS(N,NY,NX)=0.0_r8
-        XN2QSS(N,NY,NX)=0.0_r8
-        XN4QSS(N,NY,NX)=0.0_r8
-        XN3QSS(N,NY,NX)=0.0_r8
-        XNOQSS(N,NY,NX)=0.0_r8
-        XP1QSS(N,NY,NX)=0.0_r8
-        XP4QSS(N,NY,NX)=0.0_r8
-      ENDDO  !9880
+      QR(1:2,1:2,NY,NX)=0.0_r8
+      HQR(1:2,1:2,NY,NX)=0.0_r8
+
+      XOCQRS(0:jcplx1,1:2,1:2,NY,NX)=0.0_r8
+      XONQRS(0:jcplx1,1:2,1:2,NY,NX)=0.0_r8
+      XOPQRS(0:jcplx1,1:2,1:2,NY,NX)=0.0_r8
+      XOAQRS(0:jcplx1,1:2,1:2,NY,NX)=0.0_r8
+
+      XCOQRS(1:2,1:2,NY,NX)=0.0_r8
+      XCHQRS(1:2,1:2,NY,NX)=0.0_r8
+      XOXQRS(1:2,1:2,NY,NX)=0.0_r8
+      XNGQRS(1:2,1:2,NY,NX)=0.0_r8
+      XN2QRS(1:2,1:2,NY,NX)=0.0_r8
+      XHGQRS(1:2,1:2,NY,NX)=0.0_r8
+      XN4QRW(1:2,1:2,NY,NX)=0.0_r8
+      XN3QRW(1:2,1:2,NY,NX)=0.0_r8
+      XNOQRW(1:2,1:2,NY,NX)=0.0_r8
+      XNXQRS(1:2,1:2,NY,NX)=0.0_r8
+      XP1QRW(1:2,1:2,NY,NX)=0.0_r8
+      XP4QRW(1:2,1:2,NY,NX)=0.0_r8
+
+      QS(1:2,NY,NX)=0.0_r8
+      QW(1:2,NY,NX)=0.0_r8
+      QI(1:2,NY,NX)=0.0_r8
+      HQS(1:2,NY,NX)=0.0_r8
+      XCOQSS(1:2,NY,NX)=0.0_r8
+      XCHQSS(1:2,NY,NX)=0.0_r8
+      XOXQSS(1:2,NY,NX)=0.0_r8
+      XNGQSS(1:2,NY,NX)=0.0_r8
+      XN2QSS(1:2,NY,NX)=0.0_r8
+      XN4QSS(1:2,NY,NX)=0.0_r8
+      XN3QSS(1:2,NY,NX)=0.0_r8
+      XNOQSS(1:2,NY,NX)=0.0_r8
+      XP1QSS(1:2,NY,NX)=0.0_r8
+      XP4QSS(1:2,NY,NX)=0.0_r8
+
 !
 !
 !     GAS AND SOLUTE FLUXES
 !
-      DO N=1,3
-        DO  L=0,NL(NY,NX)+1
-          XCOFLS(N,L,NY,NX)=0.0_r8
-          XCHFLS(N,L,NY,NX)=0.0_r8
-          XOXFLS(N,L,NY,NX)=0.0_r8
-          XNGFLS(N,L,NY,NX)=0.0_r8
-          XN2FLS(N,L,NY,NX)=0.0_r8
-          XHGFLS(N,L,NY,NX)=0.0_r8
-          XN4FLW(N,L,NY,NX)=0.0_r8
-          XN3FLW(N,L,NY,NX)=0.0_r8
-          XNOFLW(N,L,NY,NX)=0.0_r8
-          XNXFLS(N,L,NY,NX)=0.0_r8
-          XH1PFS(N,L,NY,NX)=0.0_r8
-          XH2PFS(N,L,NY,NX)=0.0_r8
-          DO  K=0,jcplx1
-            XOCFLS(K,N,L,NY,NX)=0.0_r8
-            XONFLS(K,N,L,NY,NX)=0.0_r8
-            XOPFLS(K,N,L,NY,NX)=0.0_r8
-            XOAFLS(K,N,L,NY,NX)=0.0_r8
-          ENDDO
-        ENDDO
+      DO  L=0,NL(NY,NX)+1
+        XCOFLS(1:3,L,NY,NX)=0.0_r8
+        XCHFLS(1:3,L,NY,NX)=0.0_r8
+        XOXFLS(1:3,L,NY,NX)=0.0_r8
+        XNGFLS(1:3,L,NY,NX)=0.0_r8
+        XN2FLS(1:3,L,NY,NX)=0.0_r8
+        XHGFLS(1:3,L,NY,NX)=0.0_r8
+        XN4FLW(1:3,L,NY,NX)=0.0_r8
+        XN3FLW(1:3,L,NY,NX)=0.0_r8
+        XNOFLW(1:3,L,NY,NX)=0.0_r8
+        XNXFLS(1:3,L,NY,NX)=0.0_r8
+        XH1PFS(1:3,L,NY,NX)=0.0_r8
+        XH2PFS(1:3,L,NY,NX)=0.0_r8
+
+        XOCFLS(0:jcplx1,1:3,L,NY,NX)=0.0_r8
+        XONFLS(0:jcplx1,1:3,L,NY,NX)=0.0_r8
+        XOPFLS(0:jcplx1,1:3,L,NY,NX)=0.0_r8
+        XOAFLS(0:jcplx1,1:3,L,NY,NX)=0.0_r8
       ENDDO
 !
 !     BAND AND MACROPORE FLUXES
 !
       DO L=1,NL(NY,NX)+1
-        DO N=1,3
-          FLW(N,L,NY,NX)=0.0_r8
-          FLWX(N,L,NY,NX)=0.0_r8
-          FLWH(N,L,NY,NX)=0.0_r8
-          HFLW(N,L,NY,NX)=0.0_r8
-          XN4FLB(N,L,NY,NX)=0.0_r8
-          XN3FLB(N,L,NY,NX)=0.0_r8
-          XNOFLB(N,L,NY,NX)=0.0_r8
-          XNXFLB(N,L,NY,NX)=0.0_r8
-          XH1BFB(N,L,NY,NX)=0.0_r8
-          XH2BFB(N,L,NY,NX)=0.0_r8
-          XCOFHS(N,L,NY,NX)=0.0_r8
-          XCHFHS(N,L,NY,NX)=0.0_r8
-          XOXFHS(N,L,NY,NX)=0.0_r8
-          XNGFHS(N,L,NY,NX)=0.0_r8
-          XN2FHS(N,L,NY,NX)=0.0_r8
-          XHGFHS(N,L,NY,NX)=0.0_r8
-          XN4FHW(N,L,NY,NX)=0.0_r8
-          XN3FHW(N,L,NY,NX)=0.0_r8
-          XNOFHW(N,L,NY,NX)=0.0_r8
-          XNXFHS(N,L,NY,NX)=0.0_r8
-          XH1PHS(N,L,NY,NX)=0.0_r8
-          XH2PHS(N,L,NY,NX)=0.0_r8
-          XN4FHB(N,L,NY,NX)=0.0_r8
-          XN3FHB(N,L,NY,NX)=0.0_r8
-          XNOFHB(N,L,NY,NX)=0.0_r8
-          XNXFHB(N,L,NY,NX)=0.0_r8
-          XH1BHB(N,L,NY,NX)=0.0_r8
-          XH2BHB(N,L,NY,NX)=0.0_r8
-          XCOFLG(N,L,NY,NX)=0.0_r8
-          XCHFLG(N,L,NY,NX)=0.0_r8
-          XOXFLG(N,L,NY,NX)=0.0_r8
-          XNGFLG(N,L,NY,NX)=0.0_r8
-          XN2FLG(N,L,NY,NX)=0.0_r8
-          XN3FLG(N,L,NY,NX)=0.0_r8
-          XHGFLG(N,L,NY,NX)=0.0_r8
-          DO  K=0,jcplx1
-            XOCFHS(K,N,L,NY,NX)=0.0_r8
-            XONFHS(K,N,L,NY,NX)=0.0_r8
-            XOPFHS(K,N,L,NY,NX)=0.0_r8
-            XOAFHS(K,N,L,NY,NX)=0.0_r8
-          ENDDO
-        ENDDO
+        FLW(1:3,L,NY,NX)=0.0_r8
+        FLWX(1:3,L,NY,NX)=0.0_r8
+        FLWH(1:3,L,NY,NX)=0.0_r8
+        HFLW(1:3,L,NY,NX)=0.0_r8
+        XN4FLB(1:3,L,NY,NX)=0.0_r8
+        XN3FLB(1:3,L,NY,NX)=0.0_r8
+        XNOFLB(1:3,L,NY,NX)=0.0_r8
+        XNXFLB(1:3,L,NY,NX)=0.0_r8
+        XH1BFB(1:3,L,NY,NX)=0.0_r8
+        XH2BFB(1:3,L,NY,NX)=0.0_r8
+        XCOFHS(1:3,L,NY,NX)=0.0_r8
+        XCHFHS(1:3,L,NY,NX)=0.0_r8
+        XOXFHS(1:3,L,NY,NX)=0.0_r8
+        XNGFHS(1:3,L,NY,NX)=0.0_r8
+        XN2FHS(1:3,L,NY,NX)=0.0_r8
+        XHGFHS(1:3,L,NY,NX)=0.0_r8
+        XN4FHW(1:3,L,NY,NX)=0.0_r8
+        XN3FHW(1:3,L,NY,NX)=0.0_r8
+        XNOFHW(1:3,L,NY,NX)=0.0_r8
+        XNXFHS(1:3,L,NY,NX)=0.0_r8
+        XH1PHS(1:3,L,NY,NX)=0.0_r8
+        XH2PHS(1:3,L,NY,NX)=0.0_r8
+        XN4FHB(1:3,L,NY,NX)=0.0_r8
+        XN3FHB(1:3,L,NY,NX)=0.0_r8
+        XNOFHB(1:3,L,NY,NX)=0.0_r8
+        XNXFHB(1:3,L,NY,NX)=0.0_r8
+        XH1BHB(1:3,L,NY,NX)=0.0_r8
+        XH2BHB(1:3,L,NY,NX)=0.0_r8
+        XCOFLG(1:3,L,NY,NX)=0.0_r8
+        XCHFLG(1:3,L,NY,NX)=0.0_r8
+        XOXFLG(1:3,L,NY,NX)=0.0_r8
+        XNGFLG(1:3,L,NY,NX)=0.0_r8
+        XN2FLG(1:3,L,NY,NX)=0.0_r8
+        XN3FLG(1:3,L,NY,NX)=0.0_r8
+        XHGFLG(1:3,L,NY,NX)=0.0_r8
+
+        XOCFHS(0:jcplx1,1:3,L,NY,NX)=0.0_r8
+        XONFHS(0:jcplx1,1:3,L,NY,NX)=0.0_r8
+        XOPFHS(0:jcplx1,1:3,L,NY,NX)=0.0_r8
+        XOAFHS(0:jcplx1,1:3,L,NY,NX)=0.0_r8
+
       ENDDO
     ENDDO
   ENDDO
@@ -470,96 +461,72 @@ module Hour1Mod
   IF(IERSNG.EQ.1.OR.IERSNG.EQ.3)THEN
     DO NX=NHW,NHE+extragrid
       DO NY=NVN,NVS+extragrid
-        DO NN=1,2
-          DO N=1,2
-            XSEDER(N,NN,NY,NX)=0.0_r8
-            XSANER(N,NN,NY,NX)=0.0_r8
-            XSILER(N,NN,NY,NX)=0.0_r8
-            XCLAER(N,NN,NY,NX)=0.0_r8
-            XCECER(N,NN,NY,NX)=0.0_r8
-            XAECER(N,NN,NY,NX)=0.0_r8
-            XNH4ER(N,NN,NY,NX)=0.0_r8
-            XNH3ER(N,NN,NY,NX)=0.0_r8
-            XNHUER(N,NN,NY,NX)=0.0_r8
-            XNO3ER(N,NN,NY,NX)=0.0_r8
-            XNH4EB(N,NN,NY,NX)=0.0_r8
-            XNH3EB(N,NN,NY,NX)=0.0_r8
-            XNHUEB(N,NN,NY,NX)=0.0_r8
-            XNO3EB(N,NN,NY,NX)=0.0_r8
-            XN4ER(N,NN,NY,NX)=0.0_r8
-            XNBER(N,NN,NY,NX)=0.0_r8
-            XHYER(N,NN,NY,NX)=0.0_r8
-            XALER(N,NN,NY,NX)=0.0_r8
-            XCAER(N,NN,NY,NX)=0.0_r8
-            XMGER(N,NN,NY,NX)=0.0_r8
-            XNAER(N,NN,NY,NX)=0.0_r8
-            XKAER(N,NN,NY,NX)=0.0_r8
-            XHCER(N,NN,NY,NX)=0.0_r8
-            XAL2ER(N,NN,NY,NX)=0.0_r8
-            XOH0ER(N,NN,NY,NX)=0.0_r8
-            XOH1ER(N,NN,NY,NX)=0.0_r8
-            XOH2ER(N,NN,NY,NX)=0.0_r8
-            XH1PER(N,NN,NY,NX)=0.0_r8
-            XH2PER(N,NN,NY,NX)=0.0_r8
-            XOH0EB(N,NN,NY,NX)=0.0_r8
-            XOH1EB(N,NN,NY,NX)=0.0_r8
-            XOH2EB(N,NN,NY,NX)=0.0_r8
-            XH1PEB(N,NN,NY,NX)=0.0_r8
-            XH2PEB(N,NN,NY,NX)=0.0_r8
-            PALOER(N,NN,NY,NX)=0.0_r8
-            PFEOER(N,NN,NY,NX)=0.0_r8
-            PCACER(N,NN,NY,NX)=0.0_r8
-            PCASER(N,NN,NY,NX)=0.0_r8
-            PALPER(N,NN,NY,NX)=0.0_r8
-            PFEPER(N,NN,NY,NX)=0.0_r8
-            PCPDER(N,NN,NY,NX)=0.0_r8
-            PCPHER(N,NN,NY,NX)=0.0_r8
-            PCPMER(N,NN,NY,NX)=0.0_r8
-            PALPEB(N,NN,NY,NX)=0.0_r8
-            PFEPEB(N,NN,NY,NX)=0.0_r8
-            PCPDEB(N,NN,NY,NX)=0.0_r8
-            PCPHEB(N,NN,NY,NX)=0.0_r8
-            PCPMEB(N,NN,NY,NX)=0.0_r8
-            DO K=0,jcplx1
-              DO  NO=1,NFGs
-                DO NGL=1,JG
-                  DO  M=1,nlbiomcp
-                    OMCER(M+(NGL-1)*nlbiomcp,NO,K,N,NN,NY,NX)=0.0_r8
-                    OMNER(M+(NGL-1)*nlbiomcp,NO,K,N,NN,NY,NX)=0.0_r8
-                    OMPER(M+(NGL-1)*nlbiomcp,NO,K,N,NN,NY,NX)=0.0_r8
-                  enddo
-                enddo
-              ENDDO
-            ENDDO
+        XSEDER(1:2,1:2,NY,NX)=0.0_r8
+        XSANER(1:2,1:2,NY,NX)=0.0_r8
+        XSILER(1:2,1:2,NY,NX)=0.0_r8
+        XCLAER(1:2,1:2,NY,NX)=0.0_r8
+        XCECER(1:2,1:2,NY,NX)=0.0_r8
+        XAECER(1:2,1:2,NY,NX)=0.0_r8
+        XNH4ER(1:2,1:2,NY,NX)=0.0_r8
+        XNH3ER(1:2,1:2,NY,NX)=0.0_r8
+        XNHUER(1:2,1:2,NY,NX)=0.0_r8
+        XNO3ER(1:2,1:2,NY,NX)=0.0_r8
+        XNH4EB(1:2,1:2,NY,NX)=0.0_r8
+        XNH3EB(1:2,1:2,NY,NX)=0.0_r8
+        XNHUEB(1:2,1:2,NY,NX)=0.0_r8
+        XNO3EB(1:2,1:2,NY,NX)=0.0_r8
+        XN4ER(1:2,1:2,NY,NX)=0.0_r8
+        XNBER(1:2,1:2,NY,NX)=0.0_r8
+        XHYER(1:2,1:2,NY,NX)=0.0_r8
+        XALER(1:2,1:2,NY,NX)=0.0_r8
+        XCAER(1:2,1:2,NY,NX)=0.0_r8
+        XMGER(1:2,1:2,NY,NX)=0.0_r8
+        XNAER(1:2,1:2,NY,NX)=0.0_r8
+        XKAER(1:2,1:2,NY,NX)=0.0_r8
+        XHCER(1:2,1:2,NY,NX)=0.0_r8
+        XAL2ER(1:2,1:2,NY,NX)=0.0_r8
+        XOH0ER(1:2,1:2,NY,NX)=0.0_r8
+        XOH1ER(1:2,1:2,NY,NX)=0.0_r8
+        XOH2ER(1:2,1:2,NY,NX)=0.0_r8
+        XH1PER(1:2,1:2,NY,NX)=0.0_r8
+        XH2PER(1:2,1:2,NY,NX)=0.0_r8
+        XOH0EB(1:2,1:2,NY,NX)=0.0_r8
+        XOH1EB(1:2,1:2,NY,NX)=0.0_r8
+        XOH2EB(1:2,1:2,NY,NX)=0.0_r8
+        XH1PEB(1:2,1:2,NY,NX)=0.0_r8
+        XH2PEB(1:2,1:2,NY,NX)=0.0_r8
+        PALOER(1:2,1:2,NY,NX)=0.0_r8
+        PFEOER(1:2,1:2,NY,NX)=0.0_r8
+        PCACER(1:2,1:2,NY,NX)=0.0_r8
+        PCASER(1:2,1:2,NY,NX)=0.0_r8
+        PALPER(1:2,1:2,NY,NX)=0.0_r8
+        PFEPER(1:2,1:2,NY,NX)=0.0_r8
+        PCPDER(1:2,1:2,NY,NX)=0.0_r8
+        PCPHER(1:2,1:2,NY,NX)=0.0_r8
+        PCPMER(1:2,1:2,NY,NX)=0.0_r8
+        PALPEB(1:2,1:2,NY,NX)=0.0_r8
+        PFEPEB(1:2,1:2,NY,NX)=0.0_r8
+        PCPDEB(1:2,1:2,NY,NX)=0.0_r8
+        PCPHEB(1:2,1:2,NY,NX)=0.0_r8
+        PCPMEB(1:2,1:2,NY,NX)=0.0_r8
+        OMCER(:,:,1:2,1:2,NY,NX)=0.0_r8
+        OMNER(:,:,1:2,1:2,NY,NX)=0.0_r8
+        OMPER(:,:,1:2,1:2,NY,NX)=0.0_r8
 
-            DO  NO=1,NFGs
-              DO NGL=1,JG
-                DO  M=1,nlbiomcp
-                  OMCERff(M+(NGL-1)*nlbiomcp,NO,N,NN,NY,NX)=0.0_r8
-                  OMNERff(M+(NGL-1)*nlbiomcp,NO,N,NN,NY,NX)=0.0_r8
-                  OMPERff(M+(NGL-1)*nlbiomcp,NO,N,NN,NY,NX)=0.0_r8
-                enddo
-              enddo
-            ENDDO
+        OMCERff(:,1:2,1:2,NY,NX)=0.0_r8
+        OMNERff(:,1:2,1:2,NY,NX)=0.0_r8
+        OMPERff(:,1:2,1:2,NY,NX)=0.0_r8
 
-            DO  K=0,jcplx1
-              DO  M=1,ndbiomcp
-                ORCER(M,K,N,NN,NY,NX)=0.0_r8
-                ORNER(M,K,N,NN,NY,NX)=0.0_r8
-                ORPER(M,K,N,NN,NY,NX)=0.0_r8
-              ENDDO
-              OHCER(K,N,NN,NY,NX)=0.0_r8
-              OHNER(K,N,NN,NY,NX)=0.0_r8
-              OHPER(K,N,NN,NY,NX)=0.0_r8
-              DO M=1,jsken
-                OSCER(M,K,N,NN,NY,NX)=0.0_r8
-                OSAER(M,K,N,NN,NY,NX)=0.0_r8
-                OSNER(M,K,N,NN,NY,NX)=0.0_r8
-                OSPER(M,K,N,NN,NY,NX)=0.0_r8
-              ENDDO
-            ENDDO
-          ENDDO
-        ENDDO
+        ORCER(:,:,1:2,1:2,NY,NX)=0.0_r8
+        ORNER(:,:,1:2,1:2,NY,NX)=0.0_r8
+        ORPER(:,:,1:2,1:2,NY,NX)=0.0_r8
+        OHCER(:,1:2,1:2,NY,NX)=0.0_r8
+        OHNER(:,1:2,1:2,NY,NX)=0.0_r8
+        OHPER(:,1:2,1:2,NY,NX)=0.0_r8
+        OSCER(:,:,1:2,1:2,NY,NX)=0.0_r8
+        OSAER(:,:,1:2,1:2,NY,NX)=0.0_r8
+        OSNER(:,:,1:2,1:2,NY,NX)=0.0_r8
+        OSPER(:,:,1:2,1:2,NY,NX)=0.0_r8
       ENDDO
     ENDDO
   ENDIF
@@ -581,195 +548,191 @@ module Hour1Mod
   if(column_mode)extragrid=0
   DO  NX=NHW,NHE+extragrid
     DO  NY=NVN,NVS+extragrid
-      DO N=1,2
-        DO  NN=1,2
-          XQRAL(N,NN,NY,NX)=0.0_r8
-          XQRFE(N,NN,NY,NX)=0.0_r8
-          XQRHY(N,NN,NY,NX)=0.0_r8
-          XQRCA(N,NN,NY,NX)=0.0_r8
-          XQRMG(N,NN,NY,NX)=0.0_r8
-          XQRNA(N,NN,NY,NX)=0.0_r8
-          XQRKA(N,NN,NY,NX)=0.0_r8
-          XQROH(N,NN,NY,NX)=0.0_r8
-          XQRSO(N,NN,NY,NX)=0.0_r8
-          XQRCL(N,NN,NY,NX)=0.0_r8
-          XQRC3(N,NN,NY,NX)=0.0_r8
-          XQRHC(N,NN,NY,NX)=0.0_r8
-          XQRAL1(N,NN,NY,NX)=0.0_r8
-          XQRAL2(N,NN,NY,NX)=0.0_r8
-          XQRAL3(N,NN,NY,NX)=0.0_r8
-          XQRAL4(N,NN,NY,NX)=0.0_r8
-          XQRALS(N,NN,NY,NX)=0.0_r8
-          XQRFE1(N,NN,NY,NX)=0.0_r8
-          XQRFE2(N,NN,NY,NX)=0.0_r8
-          XQRFE3(N,NN,NY,NX)=0.0_r8
-          XQRFE4(N,NN,NY,NX)=0.0_r8
-          XQRFES(N,NN,NY,NX)=0.0_r8
-          XQRCAO(N,NN,NY,NX)=0.0_r8
-          XQRCAC(N,NN,NY,NX)=0.0_r8
-          XQRCAH(N,NN,NY,NX)=0.0_r8
-          XQRCAS(N,NN,NY,NX)=0.0_r8
-          XQRMGO(N,NN,NY,NX)=0.0_r8
-          XQRMGC(N,NN,NY,NX)=0.0_r8
-          XQRMGH(N,NN,NY,NX)=0.0_r8
-          XQRMGS(N,NN,NY,NX)=0.0_r8
-          XQRNAC(N,NN,NY,NX)=0.0_r8
-          XQRNAS(N,NN,NY,NX)=0.0_r8
-          XQRKAS(N,NN,NY,NX)=0.0_r8
-          XQRH0P(N,NN,NY,NX)=0.0_r8
-          XQRH3P(N,NN,NY,NX)=0.0_r8
-          XQRF1P(N,NN,NY,NX)=0.0_r8
-          XQRF2P(N,NN,NY,NX)=0.0_r8
-          XQRC0P(N,NN,NY,NX)=0.0_r8
-          XQRC1P(N,NN,NY,NX)=0.0_r8
-          XQRC2P(N,NN,NY,NX)=0.0_r8
-          XQRM1P(N,NN,NY,NX)=0.0_r8
-        ENDDO
-        XQSAL(N,NY,NX)=0.0_r8
-        XQSFE(N,NY,NX)=0.0_r8
-        XQSHY(N,NY,NX)=0.0_r8
-        XQSCA(N,NY,NX)=0.0_r8
-        XQSMG(N,NY,NX)=0.0_r8
-        XQSNA(N,NY,NX)=0.0_r8
-        XQSKA(N,NY,NX)=0.0_r8
-        XQSOH(N,NY,NX)=0.0_r8
-        XQSSO(N,NY,NX)=0.0_r8
-        XQSCL(N,NY,NX)=0.0_r8
-        XQSC3(N,NY,NX)=0.0_r8
-        XQSHC(N,NY,NX)=0.0_r8
-        XQSAL1(N,NY,NX)=0.0_r8
-        XQSAL2(N,NY,NX)=0.0_r8
-        XQSAL3(N,NY,NX)=0.0_r8
-        XQSAL4(N,NY,NX)=0.0_r8
-        XQSALS(N,NY,NX)=0.0_r8
-        XQSFE1(N,NY,NX)=0.0_r8
-        XQSFE2(N,NY,NX)=0.0_r8
-        XQSFE3(N,NY,NX)=0.0_r8
-        XQSFE4(N,NY,NX)=0.0_r8
-        XQSFES(N,NY,NX)=0.0_r8
-        XQSCAO(N,NY,NX)=0.0_r8
-        XQSCAC(N,NY,NX)=0.0_r8
-        XQSCAH(N,NY,NX)=0.0_r8
-        XQSCAS(N,NY,NX)=0.0_r8
-        XQSMGO(N,NY,NX)=0.0_r8
-        XQSMGC(N,NY,NX)=0.0_r8
-        XQSMGH(N,NY,NX)=0.0_r8
-        XQSMGS(N,NY,NX)=0.0_r8
-        XQSNAC(N,NY,NX)=0.0_r8
-        XQSNAS(N,NY,NX)=0.0_r8
-        XQSKAS(N,NY,NX)=0.0_r8
-        XQSH0P(N,NY,NX)=0.0_r8
-        XQSH1P(N,NY,NX)=0.0_r8
-        XQSH3P(N,NY,NX)=0.0_r8
-        XQSF1P(N,NY,NX)=0.0_r8
-        XQSF2P(N,NY,NX)=0.0_r8
-        XQSC0P(N,NY,NX)=0.0_r8
-        XQSC1P(N,NY,NX)=0.0_r8
-        XQSC2P(N,NY,NX)=0.0_r8
-        XQSM1P(N,NY,NX)=0.0_r8
-      ENDDO
+
+      XQRAL(1:2,1:2,NY,NX)=0.0_r8
+      XQRFE(1:2,1:2,NY,NX)=0.0_r8
+      XQRHY(1:2,1:2,NY,NX)=0.0_r8
+      XQRCA(1:2,1:2,NY,NX)=0.0_r8
+      XQRMG(1:2,1:2,NY,NX)=0.0_r8
+      XQRNA(1:2,1:2,NY,NX)=0.0_r8
+      XQRKA(1:2,1:2,NY,NX)=0.0_r8
+      XQROH(1:2,1:2,NY,NX)=0.0_r8
+      XQRSO(1:2,1:2,NY,NX)=0.0_r8
+      XQRCL(1:2,1:2,NY,NX)=0.0_r8
+      XQRC3(1:2,1:2,NY,NX)=0.0_r8
+      XQRHC(1:2,1:2,NY,NX)=0.0_r8
+      XQRAL1(1:2,1:2,NY,NX)=0.0_r8
+      XQRAL2(1:2,1:2,NY,NX)=0.0_r8
+      XQRAL3(1:2,1:2,NY,NX)=0.0_r8
+      XQRAL4(1:2,1:2,NY,NX)=0.0_r8
+      XQRALS(1:2,1:2,NY,NX)=0.0_r8
+      XQRFE1(1:2,1:2,NY,NX)=0.0_r8
+      XQRFE2(1:2,1:2,NY,NX)=0.0_r8
+      XQRFE3(1:2,1:2,NY,NX)=0.0_r8
+      XQRFE4(1:2,1:2,NY,NX)=0.0_r8
+      XQRFES(1:2,1:2,NY,NX)=0.0_r8
+      XQRCAO(1:2,1:2,NY,NX)=0.0_r8
+      XQRCAC(1:2,1:2,NY,NX)=0.0_r8
+      XQRCAH(1:2,1:2,NY,NX)=0.0_r8
+      XQRCAS(1:2,1:2,NY,NX)=0.0_r8
+      XQRMGO(1:2,1:2,NY,NX)=0.0_r8
+      XQRMGC(1:2,1:2,NY,NX)=0.0_r8
+      XQRMGH(1:2,1:2,NY,NX)=0.0_r8
+      XQRMGS(1:2,1:2,NY,NX)=0.0_r8
+      XQRNAC(1:2,1:2,NY,NX)=0.0_r8
+      XQRNAS(1:2,1:2,NY,NX)=0.0_r8
+      XQRKAS(1:2,1:2,NY,NX)=0.0_r8
+      XQRH0P(1:2,1:2,NY,NX)=0.0_r8
+      XQRH3P(1:2,1:2,NY,NX)=0.0_r8
+      XQRF1P(1:2,1:2,NY,NX)=0.0_r8
+      XQRF2P(1:2,1:2,NY,NX)=0.0_r8
+      XQRC0P(1:2,1:2,NY,NX)=0.0_r8
+      XQRC1P(1:2,1:2,NY,NX)=0.0_r8
+      XQRC2P(1:2,1:2,NY,NX)=0.0_r8
+      XQRM1P(1:2,1:2,NY,NX)=0.0_r8
+
+      XQSAL(1:2,NY,NX)=0.0_r8
+      XQSFE(1:2,NY,NX)=0.0_r8
+      XQSHY(1:2,NY,NX)=0.0_r8
+      XQSCA(1:2,NY,NX)=0.0_r8
+      XQSMG(1:2,NY,NX)=0.0_r8
+      XQSNA(1:2,NY,NX)=0.0_r8
+      XQSKA(1:2,NY,NX)=0.0_r8
+      XQSOH(1:2,NY,NX)=0.0_r8
+      XQSSO(1:2,NY,NX)=0.0_r8
+      XQSCL(1:2,NY,NX)=0.0_r8
+      XQSC3(1:2,NY,NX)=0.0_r8
+      XQSHC(1:2,NY,NX)=0.0_r8
+      XQSAL1(1:2,NY,NX)=0.0_r8
+      XQSAL2(1:2,NY,NX)=0.0_r8
+      XQSAL3(1:2,NY,NX)=0.0_r8
+      XQSAL4(1:2,NY,NX)=0.0_r8
+      XQSALS(1:2,NY,NX)=0.0_r8
+      XQSFE1(1:2,NY,NX)=0.0_r8
+      XQSFE2(1:2,NY,NX)=0.0_r8
+      XQSFE3(1:2,NY,NX)=0.0_r8
+      XQSFE4(1:2,NY,NX)=0.0_r8
+      XQSFES(1:2,NY,NX)=0.0_r8
+      XQSCAO(1:2,NY,NX)=0.0_r8
+      XQSCAC(1:2,NY,NX)=0.0_r8
+      XQSCAH(1:2,NY,NX)=0.0_r8
+      XQSCAS(1:2,NY,NX)=0.0_r8
+      XQSMGO(1:2,NY,NX)=0.0_r8
+      XQSMGC(1:2,NY,NX)=0.0_r8
+      XQSMGH(1:2,NY,NX)=0.0_r8
+      XQSMGS(1:2,NY,NX)=0.0_r8
+      XQSNAC(1:2,NY,NX)=0.0_r8
+      XQSNAS(1:2,NY,NX)=0.0_r8
+      XQSKAS(1:2,NY,NX)=0.0_r8
+      XQSH0P(1:2,NY,NX)=0.0_r8
+      XQSH1P(1:2,NY,NX)=0.0_r8
+      XQSH3P(1:2,NY,NX)=0.0_r8
+      XQSF1P(1:2,NY,NX)=0.0_r8
+      XQSF2P(1:2,NY,NX)=0.0_r8
+      XQSC0P(1:2,NY,NX)=0.0_r8
+      XQSC1P(1:2,NY,NX)=0.0_r8
+      XQSC2P(1:2,NY,NX)=0.0_r8
+      XQSM1P(1:2,NY,NX)=0.0_r8
 
       DO  L=1,NL(NY,NX)+1
-        DO N=1,3
-          XALFLS(N,L,NY,NX)=0.0_r8
-          XFEFLS(N,L,NY,NX)=0.0_r8
-          XHYFLS(N,L,NY,NX)=0.0_r8
-          XCAFLS(N,L,NY,NX)=0.0_r8
-          XMGFLS(N,L,NY,NX)=0.0_r8
-          XNAFLS(N,L,NY,NX)=0.0_r8
-          XKAFLS(N,L,NY,NX)=0.0_r8
-          XOHFLS(N,L,NY,NX)=0.0_r8
-          XSOFLS(N,L,NY,NX)=0.0_r8
-          XCLFLS(N,L,NY,NX)=0.0_r8
-          XC3FLS(N,L,NY,NX)=0.0_r8
-          XHCFLS(N,L,NY,NX)=0.0_r8
-          XAL1FS(N,L,NY,NX)=0.0_r8
-          XAL2FS(N,L,NY,NX)=0.0_r8
-          XAL3FS(N,L,NY,NX)=0.0_r8
-          XAL4FS(N,L,NY,NX)=0.0_r8
-          XALSFS(N,L,NY,NX)=0.0_r8
-          XFE1FS(N,L,NY,NX)=0.0_r8
-          XFE2FS(N,L,NY,NX)=0.0_r8
-          XFE3FS(N,L,NY,NX)=0.0_r8
-          XFE4FS(N,L,NY,NX)=0.0_r8
-          XFESFS(N,L,NY,NX)=0.0_r8
-          XCAOFS(N,L,NY,NX)=0.0_r8
-          XCACFS(N,L,NY,NX)=0.0_r8
-          XCAHFS(N,L,NY,NX)=0.0_r8
-          XCASFS(N,L,NY,NX)=0.0_r8
-          XMGOFS(N,L,NY,NX)=0.0_r8
-          XMGCFS(N,L,NY,NX)=0.0_r8
-          XMGHFS(N,L,NY,NX)=0.0_r8
-          XMGSFS(N,L,NY,NX)=0.0_r8
-          XNACFS(N,L,NY,NX)=0.0_r8
-          XNASFS(N,L,NY,NX)=0.0_r8
-          XKASFS(N,L,NY,NX)=0.0_r8
-          XH0PFS(N,L,NY,NX)=0.0_r8
-          XH3PFS(N,L,NY,NX)=0.0_r8
-          XF1PFS(N,L,NY,NX)=0.0_r8
-          XF2PFS(N,L,NY,NX)=0.0_r8
-          XC0PFS(N,L,NY,NX)=0.0_r8
-          XC1PFS(N,L,NY,NX)=0.0_r8
-          XC2PFS(N,L,NY,NX)=0.0_r8
-          XM1PFS(N,L,NY,NX)=0.0_r8
-          XH0BFB(N,L,NY,NX)=0.0_r8
-          XH3BFB(N,L,NY,NX)=0.0_r8
-          XF1BFB(N,L,NY,NX)=0.0_r8
-          XF2BFB(N,L,NY,NX)=0.0_r8
-          XC0BFB(N,L,NY,NX)=0.0_r8
-          XC1BFB(N,L,NY,NX)=0.0_r8
-          XC2BFB(N,L,NY,NX)=0.0_r8
-          XM1BFB(N,L,NY,NX)=0.0_r8
-          XALFHS(N,L,NY,NX)=0.0_r8
-          XFEFHS(N,L,NY,NX)=0.0_r8
-          XHYFHS(N,L,NY,NX)=0.0_r8
-          XCAFHS(N,L,NY,NX)=0.0_r8
-          XMGFHS(N,L,NY,NX)=0.0_r8
-          XNAFHS(N,L,NY,NX)=0.0_r8
-          XKAFHS(N,L,NY,NX)=0.0_r8
-          XOHFHS(N,L,NY,NX)=0.0_r8
-          XSOFHS(N,L,NY,NX)=0.0_r8
-          XCLFHS(N,L,NY,NX)=0.0_r8
-          XC3FHS(N,L,NY,NX)=0.0_r8
-          XHCFHS(N,L,NY,NX)=0.0_r8
-          XAL1HS(N,L,NY,NX)=0.0_r8
-          XAL2HS(N,L,NY,NX)=0.0_r8
-          XAL3HS(N,L,NY,NX)=0.0_r8
-          XAL4HS(N,L,NY,NX)=0.0_r8
-          XALSHS(N,L,NY,NX)=0.0_r8
-          XFE1HS(N,L,NY,NX)=0.0_r8
-          XFE2HS(N,L,NY,NX)=0.0_r8
-          XFE3HS(N,L,NY,NX)=0.0_r8
-          XFE4HS(N,L,NY,NX)=0.0_r8
-          XFESHS(N,L,NY,NX)=0.0_r8
-          XCAOHS(N,L,NY,NX)=0.0_r8
-          XCACHS(N,L,NY,NX)=0.0_r8
-          XCAHHS(N,L,NY,NX)=0.0_r8
-          XCASHS(N,L,NY,NX)=0.0_r8
-          XMGOHS(N,L,NY,NX)=0.0_r8
-          XMGCHS(N,L,NY,NX)=0.0_r8
-          XMGHHS(N,L,NY,NX)=0.0_r8
-          XMGSHS(N,L,NY,NX)=0.0_r8
-          XNACHS(N,L,NY,NX)=0.0_r8
-          XNASHS(N,L,NY,NX)=0.0_r8
-          XKASHS(N,L,NY,NX)=0.0_r8
-          XH0PHS(N,L,NY,NX)=0.0_r8
-          XH3PHS(N,L,NY,NX)=0.0_r8
-          XF1PHS(N,L,NY,NX)=0.0_r8
-          XF2PHS(N,L,NY,NX)=0.0_r8
-          XC0PHS(N,L,NY,NX)=0.0_r8
-          XC1PHS(N,L,NY,NX)=0.0_r8
-          XC2PHS(N,L,NY,NX)=0.0_r8
-          XM1PHS(N,L,NY,NX)=0.0_r8
-          XH0BHB(N,L,NY,NX)=0.0_r8
-          XH3BHB(N,L,NY,NX)=0.0_r8
-          XF1BHB(N,L,NY,NX)=0.0_r8
-          XF2BHB(N,L,NY,NX)=0.0_r8
-          XC0BHB(N,L,NY,NX)=0.0_r8
-          XC1BHB(N,L,NY,NX)=0.0_r8
-          XC2BHB(N,L,NY,NX)=0.0_r8
-          XM1BHB(N,L,NY,NX)=0.0_r8
-        ENDDO
+        XALFLS(1:3,L,NY,NX)=0.0_r8
+        XFEFLS(1:3,L,NY,NX)=0.0_r8
+        XHYFLS(1:3,L,NY,NX)=0.0_r8
+        XCAFLS(1:3,L,NY,NX)=0.0_r8
+        XMGFLS(1:3,L,NY,NX)=0.0_r8
+        XNAFLS(1:3,L,NY,NX)=0.0_r8
+        XKAFLS(1:3,L,NY,NX)=0.0_r8
+        XOHFLS(1:3,L,NY,NX)=0.0_r8
+        XSOFLS(1:3,L,NY,NX)=0.0_r8
+        XCLFLS(1:3,L,NY,NX)=0.0_r8
+        XC3FLS(1:3,L,NY,NX)=0.0_r8
+        XHCFLS(1:3,L,NY,NX)=0.0_r8
+        XAL1FS(1:3,L,NY,NX)=0.0_r8
+        XAL2FS(1:3,L,NY,NX)=0.0_r8
+        XAL3FS(1:3,L,NY,NX)=0.0_r8
+        XAL4FS(1:3,L,NY,NX)=0.0_r8
+        XALSFS(1:3,L,NY,NX)=0.0_r8
+        XFE1FS(1:3,L,NY,NX)=0.0_r8
+        XFE2FS(1:3,L,NY,NX)=0.0_r8
+        XFE3FS(1:3,L,NY,NX)=0.0_r8
+        XFE4FS(1:3,L,NY,NX)=0.0_r8
+        XFESFS(1:3,L,NY,NX)=0.0_r8
+        XCAOFS(1:3,L,NY,NX)=0.0_r8
+        XCACFS(1:3,L,NY,NX)=0.0_r8
+        XCAHFS(1:3,L,NY,NX)=0.0_r8
+        XCASFS(1:3,L,NY,NX)=0.0_r8
+        XMGOFS(1:3,L,NY,NX)=0.0_r8
+        XMGCFS(1:3,L,NY,NX)=0.0_r8
+        XMGHFS(1:3,L,NY,NX)=0.0_r8
+        XMGSFS(1:3,L,NY,NX)=0.0_r8
+        XNACFS(1:3,L,NY,NX)=0.0_r8
+        XNASFS(1:3,L,NY,NX)=0.0_r8
+        XKASFS(1:3,L,NY,NX)=0.0_r8
+        XH0PFS(1:3,L,NY,NX)=0.0_r8
+        XH3PFS(1:3,L,NY,NX)=0.0_r8
+        XF1PFS(1:3,L,NY,NX)=0.0_r8
+        XF2PFS(1:3,L,NY,NX)=0.0_r8
+        XC0PFS(1:3,L,NY,NX)=0.0_r8
+        XC1PFS(1:3,L,NY,NX)=0.0_r8
+        XC2PFS(1:3,L,NY,NX)=0.0_r8
+        XM1PFS(1:3,L,NY,NX)=0.0_r8
+        XH0BFB(1:3,L,NY,NX)=0.0_r8
+        XH3BFB(1:3,L,NY,NX)=0.0_r8
+        XF1BFB(1:3,L,NY,NX)=0.0_r8
+        XF2BFB(1:3,L,NY,NX)=0.0_r8
+        XC0BFB(1:3,L,NY,NX)=0.0_r8
+        XC1BFB(1:3,L,NY,NX)=0.0_r8
+        XC2BFB(1:3,L,NY,NX)=0.0_r8
+        XM1BFB(1:3,L,NY,NX)=0.0_r8
+        XALFHS(1:3,L,NY,NX)=0.0_r8
+        XFEFHS(1:3,L,NY,NX)=0.0_r8
+        XHYFHS(1:3,L,NY,NX)=0.0_r8
+        XCAFHS(1:3,L,NY,NX)=0.0_r8
+        XMGFHS(1:3,L,NY,NX)=0.0_r8
+        XNAFHS(1:3,L,NY,NX)=0.0_r8
+        XKAFHS(1:3,L,NY,NX)=0.0_r8
+        XOHFHS(1:3,L,NY,NX)=0.0_r8
+        XSOFHS(1:3,L,NY,NX)=0.0_r8
+        XCLFHS(1:3,L,NY,NX)=0.0_r8
+        XC3FHS(1:3,L,NY,NX)=0.0_r8
+        XHCFHS(1:3,L,NY,NX)=0.0_r8
+        XAL1HS(1:3,L,NY,NX)=0.0_r8
+        XAL2HS(1:3,L,NY,NX)=0.0_r8
+        XAL3HS(1:3,L,NY,NX)=0.0_r8
+        XAL4HS(1:3,L,NY,NX)=0.0_r8
+        XALSHS(1:3,L,NY,NX)=0.0_r8
+        XFE1HS(1:3,L,NY,NX)=0.0_r8
+        XFE2HS(1:3,L,NY,NX)=0.0_r8
+        XFE3HS(1:3,L,NY,NX)=0.0_r8
+        XFE4HS(1:3,L,NY,NX)=0.0_r8
+        XFESHS(1:3,L,NY,NX)=0.0_r8
+        XCAOHS(1:3,L,NY,NX)=0.0_r8
+        XCACHS(1:3,L,NY,NX)=0.0_r8
+        XCAHHS(1:3,L,NY,NX)=0.0_r8
+        XCASHS(1:3,L,NY,NX)=0.0_r8
+        XMGOHS(1:3,L,NY,NX)=0.0_r8
+        XMGCHS(1:3,L,NY,NX)=0.0_r8
+        XMGHHS(1:3,L,NY,NX)=0.0_r8
+        XMGSHS(1:3,L,NY,NX)=0.0_r8
+        XNACHS(1:3,L,NY,NX)=0.0_r8
+        XNASHS(1:3,L,NY,NX)=0.0_r8
+        XKASHS(1:3,L,NY,NX)=0.0_r8
+        XH0PHS(1:3,L,NY,NX)=0.0_r8
+        XH3PHS(1:3,L,NY,NX)=0.0_r8
+        XF1PHS(1:3,L,NY,NX)=0.0_r8
+        XF2PHS(1:3,L,NY,NX)=0.0_r8
+        XC0PHS(1:3,L,NY,NX)=0.0_r8
+        XC1PHS(1:3,L,NY,NX)=0.0_r8
+        XC2PHS(1:3,L,NY,NX)=0.0_r8
+        XM1PHS(1:3,L,NY,NX)=0.0_r8
+        XH0BHB(1:3,L,NY,NX)=0.0_r8
+        XH3BHB(1:3,L,NY,NX)=0.0_r8
+        XF1BHB(1:3,L,NY,NX)=0.0_r8
+        XF2BHB(1:3,L,NY,NX)=0.0_r8
+        XC0BHB(1:3,L,NY,NX)=0.0_r8
+        XC1BHB(1:3,L,NY,NX)=0.0_r8
+        XC2BHB(1:3,L,NY,NX)=0.0_r8
+        XM1BHB(1:3,L,NY,NX)=0.0_r8
       ENDDO
     ENDDO
   ENDDO
@@ -1329,38 +1292,19 @@ module Hour1Mod
 
   DO L=0,NL(NY,NX)
 !  add heterotrophic complexs
-    DO  K=0,jcplx1
-      DO  N=1,NFGs
-        DO NGL=1,JG
-          DO  M=1,nlbiomcp
-            OC=OC+OMC(M,NGL,N,K,L,NY,NX)
-          enddo
-        ENDDO
-      ENDDO
-    ENDDO
+    OC=OC+sum(OMC(1:nlbiomcp,1:NMICBSO,0:jcplx1,L,NY,NX))
+
 !  add autotrophic complex
-    DO  N=1,NFGs
-      DO NGL=1,JG
-        DO  M=1,nlbiomcp
-          OC=OC+OMCff(M,NGL,N,L,NY,NX)
-        enddo
-      ENDDO
-    ENDDO
-    DO  K=0,jcplx1
-! add microbial residue
-
-      DO  M=1,ndbiomcp
-        OC=OC+ORC(M,K,L,NY,NX)
-      ENDDO
-! doc and acetate in mic/mac-ropores, and adsorbed
-      OC=OC+OQC(K,L,NY,NX)+OQCH(K,L,NY,NX)+OHC(K,L,NY,NX) &
-        +OQA(K,L,NY,NX)+OQAH(K,L,NY,NX)+OHA(K,L,NY,NX)
-
-!add om polymers
-      DO  M=1,jsken
-        OC=OC+OSC(M,K,L,NY,NX)
-      ENDDO
-    ENDDO
+    OC=OC+sum(OMCff(1:nlbiomcp,1:NMICBSA,L,NY,NX))
+!  add microbial residue
+    OC=OC+SUM(ORC(1:ndbiomcp,0:jcplx1,L,NY,NX))
+!  add dissolved/sorbed OM and acetate
+    OC=OC+SUM(OQC(0:jcplx1,L,NY,NX))+SUM(OQCH(0:jcplx1,L,NY,NX)) &
+         +SUM(OHC(0:jcplx1,L,NY,NX))+SUM(OQA(0:jcplx1,L,NY,NX)) &
+         +SUM(OQAH(0:jcplx1,L,NY,NX))+SUM(OHA(0:jcplx1,L,NY,NX))
+!  add OM complexes
+    OC=OC+SUM(OSC(1:jsken,0:jcplx1,L,NY,NX))
+!
     ORGCX(L,NY,NX)=OC
   ENDDO
   end subroutine UpdateTotalSOC
@@ -1390,16 +1334,16 @@ module Hour1Mod
     VOLIT=VOLI(L,NY,NX)+VOLIH(L,NY,NX)
     VOLAT=VOLA(L,NY,NX)+VOLAH(L,NY,NX)
     IF(VOLAT.GT.ZEROS2(NY,NX).AND.VOLIT.GT.0.01*VOLAT)THEN
-      DO 5700 LL=MIN(L+1,NL(NY,NX)),NL(NY,NX)
+      D5700: DO LL=MIN(L+1,NL(NY,NX)),NL(NY,NX)
         VOLITL=VOLI(LL,NY,NX)+VOLIH(LL,NY,NX)
         VOLWTL=VOLW(LL,NY,NX)+VOLWH(LL,NY,NX)
         VOLATL=VOLA(LL,NY,NX)+VOLAH(LL,NY,NX)
-        goto5701=(VOLATL.GT.ZEROS2(NY,NX).AND.VOLITL.LT.0.01*VOLATL)
+        goto5701=(VOLATL.GT.ZEROS2(NY,NX).AND.VOLITL.LT.0.01_r8*VOLATL)
         if(goto5701)exit
-5700  CONTINUE
+      ENDDO D5700
       if(.not. goto5701)then
         IF(VOLAT.GT.ZEROS2(NY,NX))THEN
-          DPTHA(NY,NX)=CDPTH(L,NY,NX)-DLYR(3,L,NY,NX)*AMIN1(1.0,VOLIT/VOLAT)
+          DPTHA(NY,NX)=CDPTH(L,NY,NX)-DLYR(3,L,NY,NX)*AMIN1(1.0_r8,VOLIT/VOLAT)
         ELSE
           DPTHA(NY,NX)=CDPTH(L,NY,NX)-DLYR(3,L,NY,NX)
         ENDIF
@@ -2148,27 +2092,26 @@ module Hour1Mod
           OMC1=AZMAX1(AMIN1(OSCI*micpar%OMCI(M,K)*micpar%OMCF(N),OSCI-OSCX))
           OMN1=AZMAX1(AMIN1(OMC1*micpar%CNOMCa(M,N,K),OSNI-OSNX))
           OMP1=AZMAX1(AMIN1(OMC1*micpar%CPOMCa(M,N,K),OSPI-OSPX))
-!            DO NGL=JGnio(N),JGnfo(N)
-          DO NGL=1,JG
+          DO NGL=JGnio(N),JGnfo(N)
             OMC1g=OMC1/tglds
             OMN1g=OMN1/tglds
             OMP1g=OMP1/tglds
-            OMC(M,NGL,N,K,LFDPTH,NY,NX)=OMC(M,NGL,N,K,LFDPTH,NY,NX)+OMC1g
-            OMN(M,NGL,N,K,LFDPTH,NY,NX)=OMN(M,NGL,N,K,LFDPTH,NY,NX)+OMN1g
-            OMP(M,NGL,N,K,LFDPTH,NY,NX)=OMP(M,NGL,N,K,LFDPTH,NY,NX)+OMP1g
+            OMC(M,NGL,K,LFDPTH,NY,NX)=OMC(M,NGL,K,LFDPTH,NY,NX)+OMC1g
+            OMN(M,NGL,K,LFDPTH,NY,NX)=OMN(M,NGL,K,LFDPTH,NY,NX)+OMN1g
+            OMP(M,NGL,K,LFDPTH,NY,NX)=OMP(M,NGL,K,LFDPTH,NY,NX)+OMP1g
           ENDDO
           OSCX=OSCX+OMC1
           OSNX=OSNX+OMN1
           OSPX=OSPX+OMP1
           D2962: DO NN=1,NFGs
-            tglds=JGnfA(N)-JGnfA(N)+1
-            DO NGL=1,JG
+            tglds=JGnfA(N)-JGniA(N)+1
+            DO NGL=JGniA(NN),JGnfA(NN)
               OMC1g=OMC1/tglds
               OMN1g=OMN1/tglds
               OMP1g=OMP1/tglds
-              OMCff(M,NGL,NN,LFDPTH,NY,NX)=OMCff(M,NGL,NN,LFDPTH,NY,NX)+OMC1g*micpar%OMCA(NN)
-              OMNff(M,NGL,NN,LFDPTH,NY,NX)=OMNff(M,NGL,NN,LFDPTH,NY,NX)+OMN1g*micpar%OMCA(NN)
-              OMPff(M,NGL,NN,LFDPTH,NY,NX)=OMPff(M,NGL,NN,LFDPTH,NY,NX)+OMP1g*micpar%OMCA(NN)
+              OMCff(M,NGL,LFDPTH,NY,NX)=OMCff(M,NGL,LFDPTH,NY,NX)+OMC1g*micpar%OMCA(NN)
+              OMNff(M,NGL,LFDPTH,NY,NX)=OMNff(M,NGL,LFDPTH,NY,NX)+OMN1g*micpar%OMCA(NN)
+              OMPff(M,NGL,LFDPTH,NY,NX)=OMPff(M,NGL,LFDPTH,NY,NX)+OMP1g*micpar%OMCA(NN)
             ENDDO
             OSCX=OSCX+OMC1*micpar%OMCA(NN)
             OSNX=OSNX+OMN1*micpar%OMCA(NN)

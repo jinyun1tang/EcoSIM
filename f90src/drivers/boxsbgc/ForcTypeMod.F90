@@ -79,12 +79,12 @@ implicit none
     real(r8), allocatable :: OQN(:)
     real(r8), allocatable :: OQP(:)
     real(r8), allocatable :: OQA(:)
-    real(r8), allocatable :: OMC(:,:,:,:)
-    real(r8), allocatable :: OMN(:,:,:,:)
-    real(r8), allocatable :: OMP(:,:,:,:)
-    real(r8), allocatable :: OMCff(:,:,:)
-    real(r8), allocatable :: OMNff(:,:,:)
-    real(r8), allocatable :: OMPff(:,:,:)
+    real(r8), allocatable :: OMC(:,:,:)
+    real(r8), allocatable :: OMN(:,:,:)
+    real(r8), allocatable :: OMP(:,:,:)
+    real(r8), allocatable :: OMCff(:,:)
+    real(r8), allocatable :: OMNff(:,:)
+    real(r8), allocatable :: OMPff(:,:)
 
 !    real(r8) :: COXQ        !surface irrigation  O2 concentration, [g m-3]
 !    real(r8) :: COXR        !precipitation  O2 concentration, [g m-3]
@@ -230,21 +230,22 @@ implicit none
   implicit none
   type(forc_type), intent(inout) :: forc
   character(len=*), intent(in) :: fname
-  integer :: jcplx1,JG,ndbiomcp,nlbiomcp
-  integer :: NFGs,jsken
+  integer :: jcplx1,ndbiomcp,nlbiomcp
+  integer :: NFGs,jsken,NMICBSO,NMICBSA
   type(file_desc_t) :: ncf
 
   call ncd_pio_openfile(ncf, fname, ncd_nowrite)
 
   jcplx1=get_dim_len(ncf,'jcplx')-1
   jsken =get_dim_len(ncf,'jsken')
-  JG    =get_dim_len(ncf,'JG')
+  NMICBSO=get_dim_len(ncf,'NMICBSO')
+  NMICBSA=get_dim_len(ncf,'NMICBSA')
   nlbiomcp=get_dim_len(ncf,'nlbiomcp')
   ndbiomcp=get_dim_len(ncf,'ndbiomcp')
   NFGs    =get_dim_len(ncf,'NFGs')
-  allocate(forc%OMC(nlbiomcp,JG,NFGs,0:jcplx1))
-  allocate(forc%OMN(nlbiomcp,JG,NFGs,0:jcplx1))
-  allocate(forc%OMP(nlbiomcp,JG,NFGs,0:jcplx1))
+  allocate(forc%OMC(nlbiomcp,NMICBSO,0:jcplx1))
+  allocate(forc%OMN(nlbiomcp,NMICBSO,0:jcplx1))
+  allocate(forc%OMP(nlbiomcp,NMICBSO,0:jcplx1))
   allocate(forc%OQC(0:jcplx1))
   allocate(forc%OQN(0:jcplx1))
   allocate(forc%OQP(0:jcplx1))
@@ -256,9 +257,9 @@ implicit none
   allocate(forc%ORC(ndbiomcp,0:jcplx1))
   allocate(forc%ORN(ndbiomcp,0:jcplx1))
   allocate(forc%ORP(ndbiomcp,0:jcplx1))
-  allocate(forc%OMCff(nlbiomcp,JG,NFGs))
-  allocate(forc%OMNff(nlbiomcp,JG,NFGs))
-  allocate(forc%OMPff(nlbiomcp,JG,NFGs))
+  allocate(forc%OMCff(nlbiomcp,NMICBSA))
+  allocate(forc%OMNff(nlbiomcp,NMICBSA))
+  allocate(forc%OMPff(nlbiomcp,NMICBSA))
   allocate(forc%OHC(0:jcplx1))
   allocate(forc%OHN(0:jcplx1))
   allocate(forc%OHP(0:jcplx1))

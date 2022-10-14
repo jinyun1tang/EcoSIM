@@ -9,6 +9,7 @@ module InitSOMBGCMOD
   use EcoSIMCtrlDataType
   use SoilWaterDataType
   use EcosimConst
+  use EcoSIMConfig, only : nlbiomcp => nlbiomcpc, ndbiomcp=> ndbiomcpc
   use SurfLitterDataType
   use SoilPropertyDataType
   use GridDataType
@@ -84,12 +85,12 @@ module InitSOMBGCMOD
   real(r8) :: OSCX(0:jcplx1)
   real(r8) :: OSNX(0:jcplx1)
   real(r8) :: OSPX(0:jcplx1)
-
+  real(r8) :: tglds
 ! begin_execution
 
   associate(                  &
-    CNOMC   => micpar%CNOMC  ,&
-    CPOMC   => micpar%CPOMC  ,&
+    CNOMCa  => micpar%CNOMCa ,&
+    CPOMCa  => micpar%CPOMCa ,&
     OHCK    => micpar%OHCK   ,&
     OMCK    => micpar%OMCK   ,&
     OQCK    => micpar%OQCK   ,&
@@ -103,52 +104,54 @@ module InitSOMBGCMOD
     OMCF    => micpar%OMCF   ,&
     OMCA    => micpar%OMCA    &
   )
-  DO 975 K=0,2
+
+  D975: DO K=0,micpar%k_litrsf
     CNOSCT(K)=0.0_r8
     CPOSCT(K)=0.0_r8
     IF(RSC(K,L,NY,NX).GT.ZEROS(NY,NX))THEN
       RNT=0.0_r8
       RPT=0.0_r8
-      DO 970 M=1,jsken
+      D970: DO M=1,jsken
         RNT=RNT+RSC(K,L,NY,NX)*CFOSC(M,K,L,NY,NX)*CNOFC(M,K)
         RPT=RPT+RSC(K,L,NY,NX)*CFOSC(M,K,L,NY,NX)*CPOFC(M,K)
-970   CONTINUE
+      ENDDO D970
       FRNT=RSN(K,L,NY,NX)/RNT
       FRPT=RSP(K,L,NY,NX)/RPT
-      DO 960 M=1,jsken
+      D960: DO M=1,jsken
         CNOSC(M,K,L,NY,NX)=CNOFC(M,K)*FRNT
         CPOSC(M,K,L,NY,NX)=CPOFC(M,K)*FRPT
         CNOSCT(K)=CNOSCT(K)+CFOSC(M,K,L,NY,NX)*CNOSC(M,K,L,NY,NX)
         CPOSCT(K)=CPOSCT(K)+CFOSC(M,K,L,NY,NX)*CPOSC(M,K,L,NY,NX)
-960   CONTINUE
+      ENDDO D960
     ELSE
-      DO 965 M=1,jsken
+      D965: DO M=1,jsken
         CNOSC(M,K,L,NY,NX)=CNRH(K)
         CPOSC(M,K,L,NY,NX)=CPRH(K)
-965   CONTINUE
+      ENDDO D965
       CNOSCT(K)=CNRH(K)
       CPOSCT(K)=CPRH(K)
     ENDIF
-975 CONTINUE
-  DO 990 K=3,jcplx1
+  ENDDO D975
+
+  D990: DO K=micpar%k_litrsf+1,jcplx1
     CNOSCT(K)=0.0_r8
     CPOSCT(K)=0.0_r8
     IF(CORGCX(K).GT.ZERO)THEN
-      DO 985 M=1,jsken
+      D985: DO M=1,jsken
         CNOSC(M,K,L,NY,NX)=CORGNX(K)/CORGCX(K)
         CPOSC(M,K,L,NY,NX)=CORGPX(K)/CORGCX(K)
         CNOSCT(K)=CNOSCT(K)+CFOSC(M,K,L,NY,NX)*CNOSC(M,K,L,NY,NX)
         CPOSCT(K)=CPOSCT(K)+CFOSC(M,K,L,NY,NX)*CPOSC(M,K,L,NY,NX)
-985   CONTINUE
+      ENDDO D985
     ELSE
-      DO 980 M=1,jsken
+      D980: DO M=1,jsken
         CNOSC(M,K,L,NY,NX)=CNRH(K)
         CPOSC(M,K,L,NY,NX)=CPRH(K)
-980   CONTINUE
+      ENDDO D980
       CNOSCT(K)=CNRH(K)
       CPOSCT(K)=CPRH(K)
     ENDIF
-990 CONTINUE
+  ENDDO D990
 !
 !     MICROBIAL BIOMASS,RESIDUE, DOC, ADSORBED
 !
@@ -160,11 +163,12 @@ module InitSOMBGCMOD
   TOSCI=0.0_r8
   TOSNI=0.0_r8
   TOSPI=0.0_r8
-  DO 995 K=0,jcplx1
+  D995: DO K=0,jcplx1
     IF(L.EQ.0)THEN
       KK=K
     ELSE
-      KK=4
+      !humus complex
+      KK=micpar%k_humus
     ENDIF
     IF(BKVL(L,NY,NX).GT.ZEROS(NY,NX))THEN
       OSCI(K)=CORGCX(K)*BKVL(L,NY,NX)
@@ -178,19 +182,20 @@ module InitSOMBGCMOD
     TOSCK(K)=OMCK(K)+ORCK(K)+OQCK(K)+OHCK(K)
     TOSNK(K)=ORCK(K)*CNRH(K)+OQCK(K)*CNOSCT(KK)+OHCK(K)*CNOSCT(KK)
     TOSPK(K)=ORCK(K)*CPRH(K)+OQCK(K)*CPOSCT(KK)+OHCK(K)*CPOSCT(KK)
-    do NGL=1,JG
-      TOSNK(K)=TOSNK(K)+OMCI(1,K)*CNOMC(1,NGL,1,K)+OMCI(2,K)*CNOMC(2,NGL,1,K)
-      TOSPK(K)=TOSPK(K)+OMCI(1,K)*CPOMC(1,NGL,1,K)+OMCI(2,K)*CPOMC(2,NGL,1,K)
-    enddo
+!   based on aerobic heterotrophs
+
+    TOSNK(K)=TOSNK(K)+OMCI(1,K)*CNOMCa(1,1,K)+OMCI(2,K)*CNOMCa(2,1,K)
+    TOSPK(K)=TOSPK(K)+OMCI(1,K)*CPOMCa(1,1,K)+OMCI(2,K)*CPOMCa(2,1,K)
+
     TOSCI=TOSCI+OSCI(K)*TOSCK(K)
     TOSNI=TOSNI+OSCI(K)*TOSNK(K)
     TOSPI=TOSPI+OSCI(K)*TOSPK(K)
     OSCX(K)=0.0_r8
     OSNX(K)=0.0_r8
     OSPX(K)=0.0_r8
-995 CONTINUE
+  ENDDO D995
 
-  DO 8995 K=0,jcplx1
+  D8995: DO K=0,jcplx1
     IF(L.EQ.0)THEN
       OSCM(K)=DCKR*CORGCX(K)*BKVL(L,NY,NX)
       X=0.0_r8
@@ -200,29 +205,24 @@ module InitSOMBGCMOD
       FOSPI=1.0
     ELSE
       IF(BKVL(L,NY,NX).GT.ZEROS(NY,NX))THEN
-        IF(K.LE.2)THEN
+        IF(K.LE.micpar%k_litrsf)THEN
           OSCM(K)=DCKR*CORGCX(K)*BKVL(L,NY,NX)
         ELSE
           OSCM(K)=FCX*CORGCX(K)*BKVL(L,NY,NX)*DCKM/(CORGCX(4)+DCKM)
         ENDIF
       ELSE
-        IF(K.LE.2)THEN
+        IF(K.LE.micpar%k_litrsf)THEN
           OSCM(K)=DCKR*CORGCX(K)*VOLT(L,NY,NX)
         ELSE
           OSCM(K)=FCX*CORGCX(K)*VOLT(L,NY,NX)*DCKM/(CORGCX(4)+DCKM)
         ENDIF
       ENDIF
-      !     IF(L.EQ.NU(NY,NX))THEN
-      !     WRITE(*,2424)'OSCM',NX,NY,L,K,OSCM(K),OSCI(K),CORGCX(K)
-      !    2,BKVL(L,NY,NX),CORGCX(K)*BKVL(L,NY,NX),FCX
-!2424  FORMAT(A8,4I4,12E12.4)
-      !     ENDIF
-      X=1.0
-      KK=4
+      X=1.0_r8
+      KK=micpar%k_humus
       IF(TOSCI.GT.ZEROS(NY,NX))THEN
-        FOSCI=AMIN1(1.0,OSCI(KK)/TOSCI)
-        FOSNI=AMIN1(1.0,OSCI(KK)*CNOSCT(KK)/TOSNI)
-        FOSPI=AMIN1(1.0,OSCI(KK)*CPOSCT(KK)/TOSPI)
+        FOSCI=AMIN1(1.0_r8,OSCI(KK)/TOSCI)
+        FOSNI=AMIN1(1.0_r8,OSCI(KK)*CNOSCT(KK)/TOSNI)
+        FOSPI=AMIN1(1.0_r8,OSCI(KK)*CPOSCT(KK)/TOSPI)
       ELSE
         FOSCI=0.0_r8
         FOSNI=0.0_r8
@@ -239,53 +239,51 @@ module InitSOMBGCMOD
 !     OSCX,OSNX,OSPX=remaining unallocated SOC,SON,SOP
 !  The reason that initialization of complex 5 microbes is repated for each
 ! complex is because complex 5 is shared by the other complexes
-    DO 7990 N=1,NFGs
-      DO NGL=1,JG
-        DO 7985 M=1,3
-          OMCff(M,NGL,N,L,NY,NX)=0.0_r8
-          OMNff(M,NGL,N,L,NY,NX)=0.0_r8
-          OMPff(M,NGL,N,L,NY,NX)=0.0_r8
-7985    CONTINUE
-      enddo
-7990  CONTINUE
+    OMCff(:,:,L,NY,NX)=0._r8
+    OMNff(:,:,L,NY,NX)=0._r8
+    OMPff(:,:,L,NY,NX)=0._r8
 
-    DO 8990 N=1,NFGs
-      do NGL=1,JG
-        DO 8991 M=1,3
-          OMC1=AZMAX1(OSCM(K)*OMCI(M,K)*OMCF(N)*FOSCI)
-          OMN1=AZMAX1(OMC1*CNOMC(M,NGL,N,K)*FOSNI)
-          OMP1=AZMAX1(OMC1*CPOMC(M,NGL,N,K)*FOSPI)
-          OMC(M,NGL,N,K,L,NY,NX)=OMC1
-          OMN(M,NGL,N,K,L,NY,NX)=OMN1
-          OMP(M,NGL,N,K,L,NY,NX)=OMP1
-          OSCX(KK)=OSCX(KK)+OMC1
-          OSNX(KK)=OSNX(KK)+OMN1
-          OSPX(KK)=OSPX(KK)+OMP1
-          DO 8992 NN=1,NFGs
-            OMCff(M,NGL,NN,L,NY,NX)=OMCff(M,NGL,NN,L,NY,NX)+OMC1*OMCA(NN)
-            OMNff(M,NGL,NN,L,NY,NX)=OMNff(M,NGL,NN,L,NY,NX)+OMN1*OMCA(NN)
-            OMPff(M,NGL,NN,L,NY,NX)=OMPff(M,NGL,NN,L,NY,NX)+OMP1*OMCA(NN)
-            OSCX(KK)=OSCX(KK)+OMC1*OMCA(NN)
-            OSNX(KK)=OSNX(KK)+OMN1*OMCA(NN)
-            OSPX(KK)=OSPX(KK)+OMP1*OMCA(NN)
-8992      CONTINUE
-8991    CONTINUE
-      enddo
-8990  CONTINUE
+    D8990: DO N=1,NFGs
+      tglds=JGnfo(N)-JGnio(N)+1._r8
+      D8991: DO M=1,nlbiomcp
+        OMC1=AZMAX1(OSCM(K)*OMCI(M,K)*OMCF(N)*FOSCI)
+        OMN1=AZMAX1(OMC1*CNOMCa(M,N,K)*FOSNI)
+        OMP1=AZMAX1(OMC1*CPOMCa(M,N,K)*FOSPI)
+        do NGL=JGnio(N),JGnfo(N)
+          OMC(M,NGL,K,L,NY,NX)=OMC1/tglds
+          OMN(M,NGL,K,L,NY,NX)=OMN1/tglds
+          OMP(M,NGL,K,L,NY,NX)=OMP1/tglds
+        ENDDO
+        OSCX(KK)=OSCX(KK)+OMC1
+        OSNX(KK)=OSNX(KK)+OMN1
+        OSPX(KK)=OSPX(KK)+OMP1
+        D8992: DO NN=1,NFGs
+          tglds=JGnfA(N)-JGniA(N)+1._r8
+          do NGL=JGniA(N),JGnfA(N)
+            OMCff(M,NGL,L,NY,NX)=OMCff(M,NGL,L,NY,NX)+OMC1*OMCA(NN)/tglds
+            OMNff(M,NGL,L,NY,NX)=OMNff(M,NGL,L,NY,NX)+OMN1*OMCA(NN)/tglds
+            OMPff(M,NGL,L,NY,NX)=OMPff(M,NGL,L,NY,NX)+OMP1*OMCA(NN)/tglds
+          ENDDO
+          OSCX(KK)=OSCX(KK)+OMC1*OMCA(NN)
+          OSNX(KK)=OSNX(KK)+OMN1*OMCA(NN)
+          OSPX(KK)=OSPX(KK)+OMP1*OMCA(NN)
+        ENDDO D8992
+      ENDDO D8991
+    ENDDO D8990
 !
 !     MICROBIAL RESIDUE C, N AND P
 !
 !     ORC,ORN,ORP=microbial residue C,N,P
 !     ORCI=allocation of microbial residue to kinetic components
 !  X is an indicator of surface residual layer
-    DO 8985 M=1,2
+    D8985: DO M=1,ndbiomcp
       ORC(M,K,L,NY,NX)=X*AZMAX1(OSCM(K)*ORCI(M,K)*FOSCI)
-      ORN(M,K,L,NY,NX)=AZMAX1(ORC(M,K,L,NY,NX)*CNOMC(M,1,1,K)*FOSNI)
-      ORP(M,K,L,NY,NX)=AZMAX1(ORC(M,K,L,NY,NX)*CPOMC(M,1,1,K)*FOSPI)
+      ORN(M,K,L,NY,NX)=AZMAX1(ORC(M,K,L,NY,NX)*CNOMCa(M,1,K)*FOSNI)
+      ORP(M,K,L,NY,NX)=AZMAX1(ORC(M,K,L,NY,NX)*CPOMCa(M,1,K)*FOSPI)
       OSCX(KK)=OSCX(KK)+ORC(M,K,L,NY,NX)
       OSNX(KK)=OSNX(KK)+ORN(M,K,L,NY,NX)
       OSPX(KK)=OSPX(KK)+ORP(M,K,L,NY,NX)
-8985  CONTINUE
+    ENDDO D8985
 !
 !     DOC, DON AND DOP
 !
@@ -320,7 +318,7 @@ module InitSOMBGCMOD
 !
 !     OSC,OAA,OSN,OSP=SOC,colonized SOC,SON,SOP
 
-    DO 8980 M=1,jsken
+    D8980: DO M=1,jsken
       OSC(M,K,L,NY,NX)=AZMAX1(CFOSC(M,K,L,NY,NX)*(OSCI(K)-OSCX(K)))
       IF(CNOSCT(K).GT.ZERO)THEN
         OSN(M,K,L,NY,NX)=AZMAX1(CFOSC(M,K,L,NY,NX)*CNOSC(M,K,L,NY,NX) &
@@ -334,15 +332,13 @@ module InitSOMBGCMOD
       ELSE
         OSP(M,K,L,NY,NX)=0.0_r8
       ENDIF
-      IF(K.EQ.0)THEN
-        do NGL=1,JG
-          OSA(M,K,L,NY,NX)=OSC(M,K,L,NY,NX)*OMCI(1+(NGL-1)*3,K)
-        ENDDO
+      IF(K.EQ.micpar%k_woody_litr)THEN
+        OSA(M,K,L,NY,NX)=OSC(M,K,L,NY,NX)*OMCI(1,K)
       ELSE
         OSA(M,K,L,NY,NX)=OSC(M,K,L,NY,NX)
       ENDIF
-8980  CONTINUE
-8995  CONTINUE
+    ENDDO D8980
+  ENDDO D8995
 !
 !     ADD ALL LITTER,POC,HUMUS COMPONENTS TO GET TOTAL SOC
 !
@@ -351,94 +347,93 @@ module InitSOMBGCMOD
   OP=0.0_r8
   RC=0.0_r8
   IF(L.EQ.0)THEN
-    DO 6975 K=0,jcplx1
-      RC0(K,NY,NX)=0.0_r8
-6975  CONTINUE
+    RC0(:,NY,NX)=0.0_r8
     RC0ff(NY,NX)=0._r8
   ENDIF
 
-  DO 6990 K=0,jcplx1
+  ROXYS(:,:,L,NY,NX)=0.0_r8
+  RVMX4(:,:,L,NY,NX)=0.0_r8
+  RVMX3(:,:,L,NY,NX)=0.0_r8
+  RVMX2(:,:,L,NY,NX)=0.0_r8
+  RVMX1(:,:,L,NY,NX)=0.0_r8
+  RINHO(:,:,L,NY,NX)=0.0_r8
+  RINHB(:,:,L,NY,NX)=0.0_r8
+  RINOO(:,:,L,NY,NX)=0.0_r8
+  RIPOO(:,:,L,NY,NX)=0.0_r8
+  RINOB(:,:,L,NY,NX)=0.0_r8
+  RIPBO(:,:,L,NY,NX)=0.0_r8
+  RIPO1(:,:,L,NY,NX)=0.0_r8
+  RIPB1(:,:,L,NY,NX)=0.0_r8
+  IF(L.EQ.0)THEN
+    RINHOR(:,:,NY,NX)=0.0_r8
+    RINOOR(:,:,NY,NX)=0.0_r8
+    RIPOOR(:,:,NY,NX)=0.0_r8
+  ENDIF
+
+  D6990: DO K=0,jcplx1
     DO  N=1,NFGs
-      do NGL=1,JG
-        ROXYS(NGL,N,K,L,NY,NX)=0.0_r8
-        RVMX4(NGL,N,K,L,NY,NX)=0.0_r8
-        RVMX3(NGL,N,K,L,NY,NX)=0.0_r8
-        RVMX2(NGL,N,K,L,NY,NX)=0.0_r8
-        RVMX1(NGL,N,K,L,NY,NX)=0.0_r8
-        RINHO(NGL,N,K,L,NY,NX)=0.0_r8
-        RINHB(NGL,N,K,L,NY,NX)=0.0_r8
-        RINOO(NGL,N,K,L,NY,NX)=0.0_r8
-        RIPOO(NGL,N,K,L,NY,NX)=0.0_r8
-        RINOB(NGL,N,K,L,NY,NX)=0.0_r8
-        RIPBO(NGL,N,K,L,NY,NX)=0.0_r8
-        RIPO1(NGL,N,K,L,NY,NX)=0.0_r8
-        RIPB1(NGL,N,K,L,NY,NX)=0.0_r8
-        IF(L.EQ.0)THEN
-          RINHOR(NGL,N,K,NY,NX)=0.0_r8
-          RINOOR(NGL,N,K,NY,NX)=0.0_r8
-          RIPOOR(NGL,N,K,NY,NX)=0.0_r8
-        ENDIF
-        DO  M=1,3
-          OC=OC+OMC(M,NGL,N,K,L,NY,NX)
-          ON=ON+OMN(M,NGL,N,K,L,NY,NX)
-          OP=OP+OMP(M,NGL,N,K,L,NY,NX)
-          IF(K.LE.2)THEN
-            RC=RC+OMC(M,NGL,N,K,L,NY,NX)
+      do NGL=JGnio(n),JGnfo(n)
+        DO  M=1,nlbiomcp
+          OC=OC+OMC(M,NGL,K,L,NY,NX)
+          ON=ON+OMN(M,NGL,K,L,NY,NX)
+          OP=OP+OMP(M,NGL,K,L,NY,NX)
+          IF(K.LE.micpar%k_litrsf)THEN
+            RC=RC+OMC(M,NGL,K,L,NY,NX)
           ENDIF
-          RC0(K,NY,NX)=RC0(K,NY,NX)+OMC(M,NGL,N,K,L,NY,NX)
+          RC0(K,NY,NX)=RC0(K,NY,NX)+OMC(M,NGL,K,L,NY,NX)
         ENDDO
       ENDDO
     enddo
-6990  CONTINUE
+  ENDDO D6990
 
+  ROXYSff(:,L,NY,NX)=0.0_r8
+  RVMX4ff(:,L,NY,NX)=0.0_r8
+  RVMX3ff(:,L,NY,NX)=0.0_r8
+  RVMB3ff(:,L,NY,NX)=0.0_r8
+  RVMX2ff(:,L,NY,NX)=0.0_r8
+  RVMX1ff(:,L,NY,NX)=0.0_r8
+  RINHOff(:,L,NY,NX)=0.0_r8
+  RINHBff(:,L,NY,NX)=0.0_r8
+  RINOOff(:,L,NY,NX)=0.0_r8
+  RINOBff(:,L,NY,NX)=0.0_r8
+  RIPOOff(:,L,NY,NX)=0.0_r8
+  RIPBOff(:,L,NY,NX)=0.0_r8
+  RIPO1ff(:,L,NY,NX)=0.0_r8
+  RIPB1ff(:,L,NY,NX)=0.0_r8
+  IF(L.EQ.0)THEN
+    RINHORff(:,NY,NX)=0.0_r8
+    RINOORff(:,NY,NX)=0.0_r8
+    RIPOORff(:,NY,NX)=0.0_r8
+  ENDIF
     DO  N=1,NFGs
-      do NGL=1,JG
-        ROXYSff(NGL,N,L,NY,NX)=0.0_r8
-        RVMX4ff(NGL,N,L,NY,NX)=0.0_r8
-        RVMX3ff(NGL,N,L,NY,NX)=0.0_r8
-        RVMB3ff(NGL,N,L,NY,NX)=0.0_r8
-        RVMX2ff(NGL,N,L,NY,NX)=0.0_r8
-        RVMX1ff(NGL,N,L,NY,NX)=0.0_r8
-        RINHOff(NGL,N,L,NY,NX)=0.0_r8
-        RINHBff(NGL,N,L,NY,NX)=0.0_r8
-        RINOOff(NGL,N,L,NY,NX)=0.0_r8
-        RINOBff(NGL,N,L,NY,NX)=0.0_r8
-        RIPOOff(NGL,N,L,NY,NX)=0.0_r8
-        RIPBOff(NGL,N,L,NY,NX)=0.0_r8
-        RIPO1ff(NGL,N,L,NY,NX)=0.0_r8
-        RIPB1ff(NGL,N,L,NY,NX)=0.0_r8
-        IF(L.EQ.0)THEN
-          RINHORff(NGL,N,NY,NX)=0.0_r8
-          RINOORff(NGL,N,NY,NX)=0.0_r8
-          RIPOORff(NGL,N,NY,NX)=0.0_r8
-        ENDIF
-        DO  M=1,3
-          OC=OC+OMCff(M,NGL,N,L,NY,NX)
-          ON=ON+OMNff(M,NGL,N,L,NY,NX)
-          OP=OP+OMPff(M,NGL,N,L,NY,NX)
-          RC0ff(NY,NX)=RC0(K,NY,NX)+OMCff(M,NGL,N,L,NY,NX)
+      do NGL=JGniA(n),JGnfA(n)
+        DO  M=1,nlbiomcp
+          OC=OC+OMCff(M,NGL,L,NY,NX)
+          ON=ON+OMNff(M,NGL,L,NY,NX)
+          OP=OP+OMPff(M,NGL,L,NY,NX)
+          RC0ff(NY,NX)=RC0(K,NY,NX)+OMCff(M,NGL,L,NY,NX)
         ENDDO
       ENDDO
     enddo
 
-  DO 6995 K=0,jcplx1
-    DO 6985 M=1,2
+  D6995: DO K=0,jcplx1
+    D6985: DO M=1,ndbiomcp
       OC=OC+ORC(M,K,L,NY,NX)
       ON=ON+ORN(M,K,L,NY,NX)
       OP=OP+ORP(M,K,L,NY,NX)
-      IF(K.LE.2)THEN
+      IF(K.LE.micpar%k_litrsf)THEN
         RC=RC+ORC(M,K,L,NY,NX)
       ENDIF
       IF(L.EQ.0)THEN
         RC0(K,NY,NX)=RC0(K,NY,NX)+ORC(M,K,L,NY,NX)
       ENDIF
-6985  CONTINUE
+    ENDDO D6985
     OC=OC+OQC(K,L,NY,NX)+OQCH(K,L,NY,NX)+OHC(K,L,NY,NX) &
       +OQA(K,L,NY,NX)+OQAH(K,L,NY,NX)+OHA(K,L,NY,NX)
     ON=ON+OQN(K,L,NY,NX)+OQNH(K,L,NY,NX)+OHN(K,L,NY,NX)
     OP=OP+OQP(K,L,NY,NX)+OQPH(K,L,NY,NX)+OHP(K,L,NY,NX)
     OC=OC+OQA(K,L,NY,NX)+OQAH(K,L,NY,NX)
-    IF(K.LE.2)THEN
+    IF(K.LE.micpar%k_litrsf)THEN
       RC=RC+OQC(K,L,NY,NX)+OQCH(K,L,NY,NX)+OHC(K,L,NY,NX) &
         +OQA(K,L,NY,NX)+OQAH(K,L,NY,NX)+OHA(K,L,NY,NX)
       RC=RC+OQA(K,L,NY,NX)+OQAH(K,L,NY,NX)
@@ -447,18 +442,18 @@ module InitSOMBGCMOD
       RC0(K,NY,NX)=RC0(K,NY,NX)+OQC(K,L,NY,NX)+OQCH(K,L,NY,NX) &
         +OHC(K,L,NY,NX)+OQA(K,L,NY,NX)+OQAH(K,L,NY,NX)+OHA(K,L,NY,NX)
     ENDIF
-    DO 6980 M=1,jsken
+    D6980: DO M=1,jsken
       OC=OC+OSC(M,K,L,NY,NX)
       ON=ON+OSN(M,K,L,NY,NX)
       OP=OP+OSP(M,K,L,NY,NX)
-      IF(K.LE.2)THEN
+      IF(K.LE.micpar%k_litrsf)THEN
         RC=RC+OSC(M,K,L,NY,NX)
       ENDIF
       IF(L.EQ.0)THEN
         RC0(K,NY,NX)=RC0(K,NY,NX)+OSC(M,K,L,NY,NX)
       ENDIF
-6980  CONTINUE
-6995  CONTINUE
+    ENDDO D6980
+  ENDDO D6995
   ORGC(L,NY,NX)=OC
   ORGCX(L,NY,NX)=ORGC(L,NY,NX)
   ORGR(L,NY,NX)=RC

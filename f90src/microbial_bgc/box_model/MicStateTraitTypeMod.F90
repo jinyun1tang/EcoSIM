@@ -79,12 +79,12 @@ implicit none
   real(r8),allocatable :: ORP(:,:)
   real(r8),allocatable :: CNOSC(:,:)
   real(r8),allocatable :: CPOSC(:,:)
-  real(r8),allocatable :: OMC(:,:,:,:)
-  real(r8),allocatable :: OMN(:,:,:,:)
-  real(r8),allocatable :: OMP(:,:,:,:)
-  real(r8),allocatable :: OMCff(:,:,:)
-  real(r8),allocatable :: OMNff(:,:,:)
-  real(r8),allocatable :: OMPff(:,:,:)
+  real(r8),allocatable :: OMC(:,:,:)
+  real(r8),allocatable :: OMN(:,:,:)
+  real(r8),allocatable :: OMP(:,:,:)
+  real(r8),allocatable :: OMCff(:,:)
+  real(r8),allocatable :: OMNff(:,:)
+  real(r8),allocatable :: OMPff(:,:)
   real(r8) :: OSC13U,OSC14U,OSC24U
   real(r8) :: OSN13U,OSN14U,OSN24U
   real(r8) :: OSP13U,OSP14U,OSP24U
@@ -99,11 +99,17 @@ implicit none
   implicit none
   class(micsttype) :: this
   integer :: jcplx1,jg,nfgs,jsken
+  integer :: ndbiomcp, nlbiomcp
+  integer :: NMICBSA, NMICBSO
 
   jcplx1=micpar%jcplx1
   JG=micpar%jguilds
   NFGs=micpar%NFGs
   jsken=micpar%jsken
+  ndbiomcp=micpar%ndbiomcp
+  nlbiomcp=micpar%nlbiomcp
+  NMICBSA=micpar%NMICBSA
+  NMICBSO=micpar%NMICBSO
 
   allocate(this%FOSRH(0:jcplx1))
   allocate(this%OQC(0:jcplx1))
@@ -118,17 +124,17 @@ implicit none
   allocate(this%OSC(jsken,0:jcplx1))
   allocate(this%OSN(jsken,0:jcplx1))
   allocate(this%OSP(jsken,0:jcplx1))
-  allocate(this%ORC(2,0:jcplx1))
-  allocate(this%ORN(2,0:jcplx1))
-  allocate(this%ORP(2,0:jcplx1))
+  allocate(this%ORC(ndbiomcp,0:jcplx1))
+  allocate(this%ORN(ndbiomcp,0:jcplx1))
+  allocate(this%ORP(ndbiomcp,0:jcplx1))
   allocate(this%CNOSC(jsken,0:jcplx1))
   allocate(this%CPOSC(jsken,0:jcplx1))
-  allocate(this%OMC(3,JG,NFGs,0:jcplx1))
-  allocate(this%OMN(3,JG,NFGs,0:jcplx1))
-  allocate(this%OMP(3,JG,NFGs,0:jcplx1))
-  allocate(this%OMCff(3,JG,NFGs))
-  allocate(this%OMNff(3,JG,NFGs))
-  allocate(this%OMPff(3,JG,NFGs))
+  allocate(this%OMC(nlbiomcp,NMICBSO,0:jcplx1))
+  allocate(this%OMN(nlbiomcp,NMICBSO,0:jcplx1))
+  allocate(this%OMP(nlbiomcp,NMICBSO,0:jcplx1))
+  allocate(this%OMCff(nlbiomcp,NMICBSA))
+  allocate(this%OMNff(nlbiomcp,NMICBSA))
+  allocate(this%OMPff(nlbiomcp,NMICBSA))
 
   end subroutine Init
 

@@ -41,10 +41,10 @@ implicit none
   real(r8), pointer :: OQCK(:)    !fractions of SOC in DOC
   real(r8), pointer :: ORCI(:,:)   !allocation of residue to kinetic components
   real(r8), pointer :: FL(:)       !allocation to microbial kinetic fractions
-  real(r8), pointer :: CNOMC(:,:,:,:)        !maximum/minimum microbial N:C
-  real(r8), pointer :: CPOMC(:,:,:,:)        !maximum/minimum microbial P:C
-  real(r8), pointer :: CNOMCff(:,:,:)        !maximum/minimum microbial N:C
-  real(r8), pointer :: CPOMCff(:,:,:)        !maximum/minimum microbial P:C
+  real(r8), pointer :: CNOMC(:,:,:)        !maximum/minimum microbial N:C
+  real(r8), pointer :: CPOMC(:,:,:)        !maximum/minimum microbial P:C
+  real(r8), pointer :: CNOMCff(:,:)        !maximum/minimum microbial N:C
+  real(r8), pointer :: CPOMCff(:,:)        !maximum/minimum microbial P:C
   real(r8), pointer :: CNOMCa(:,:,:)         !average maximum/minimum microbial N:C
   real(r8), pointer :: CPOMCa(:,:,:)         !average maximum/minimum microbial P:C
   real(r8), pointer :: CNOMCffa(:,:)         !average maximum/minimum microbial N:C
@@ -57,8 +57,12 @@ implicit none
   real(r8), pointer :: CPRH(:)                            !default P:C ratios in SOC complexes
   real(r8), pointer :: OMCF(:)                            !hetero microbial biomass composition in SOC
   real(r8), pointer :: OMCA(:)                            !autotrophic microbial biomass composition in SOC
-  logical, pointer :: is_activef_micb(:)
-  logical, pointer :: is_litter(:)
+  logical,  pointer :: is_activef_micb(:)
+  logical,  pointer :: is_aerobic_hetr(:)
+  logical,  pointer :: is_anerobic_hetr(:)
+  logical,  pointer :: is_litter(:)
+  logical, pointer :: is_finelitter(:)
+  logical, pointer :: is_CO2_autotroph(:)
   character(len=16) :: kiname(0:jskenc-1)
   character(len=16) :: cplxname(0:jcplx1c)
   character(len=16) :: hmicname(NFGsc)
@@ -71,6 +75,7 @@ implicit none
   integer, pointer :: JGnfA(:)   !guid indices for autotrophic-microbial complex
   integer :: NMICBSA             !total number of microbial guilds in the autotrophic complex
   integer :: NMICBSO             !total number of microbial guilds in one organic-microbial complex
+  integer :: k_litrsf
   contains
     procedure, public  :: Init
     procedure, public  :: SetPars
@@ -99,9 +104,15 @@ contains
   this%NFGs=NFGsc
   !woody, non_woody litter and manure are defined as litter
   allocate(this%is_litter(0:this%jcplx1));this%is_litter(:)=.false.
+  allocate(this%is_finelitter(0:this%jcplx1));this%is_finelitter(:)=.false.
+
   this%k_woody_litr=0;     this%is_litter(this%k_woody_litr)=.true.
   this%k_non_woody_litr=1; this%is_litter(this%k_non_woody_litr)=.true.
   this%k_manure=2;         this%is_litter(this%k_manure)=.true.
+  this%is_litter(this%k_non_woody_litr)=.true.
+  this%is_litter(this%k_manure)=.true.
+
+  this%k_litrsf=this%k_manure
   this%k_POM=3
   this%k_humus=4
   this%kiname(0)='protein'
@@ -144,6 +155,13 @@ contains
   this%n_aero_n2fixer=6
   this%n_anero_n2fixer=7
 
+  this%is_aerobic_hetr(this%n_aero_hetrophb)=.true.
+  this%is_aerobic_hetr(this%n_anero_faculb)=.true.
+  this%is_aerobic_hetr(this%n_aero_fungi)=.true.
+  this%is_aerobic_hetr(this%n_aero_n2fixer)=.true.
+
+  this%is_anerobic_hetr(this%n_anaero_ferm)=.true.
+  this%is_anerobic_hetr(this%n_anero_n2fixer)=.true.
 !the abstract complex
   this%nf_amonia_oxi=1
   this%nf_nitrite_oxi=2
@@ -154,6 +172,10 @@ contains
   this%is_activef_micb(this%nf_nitrite_oxi)=.True.
   this%is_activef_micb(this%nf_aero_methanot)=.True.
   this%is_activef_micb(this%nf_hydro_methang)=.True.
+
+  this%is_CO2_autotroph(this%nf_amonia_oxi)=.true.
+  this%is_CO2_autotroph(this%nf_nitrite_oxi)=.true.
+  this%is_CO2_autotroph(this%nf_hydro_methang)=.true.
 
 
   end subroutine Init
@@ -167,27 +189,27 @@ contains
   real(r8) :: COMCI(nlbiomcpc,0:this%jcplx1)
   real(r8) :: OMCI1(nlbiomcpc,0:this%jcplx1)  !allocation of biomass to kinetic components
   integer :: K,M,NGL,N
-  associate(               &
-    OHCK  => this%OHCK     , &
-    OMCK  => this%OMCK     , &
-    ORCK  => this%ORCK     , &
-    OQCK  => this%OQCK     , &
-    ORCI  => this%ORCI     , &
-    OMCI  => this%OMCI     , &
-    CNOFC  => this%CNOFC     , &
-    CPOFC  => this%CPOFC     , &
-    CNOMC  => this%CNOMC     , &
-    CPOMC  => this%CPOMC     , &
-    CNOMCff  => this%CNOMCff     , &
-    CPOMCff  => this%CPOMCff     , &
-    FL      => this%FL          , &
-    DOSA    => this%DOSA       , &
-    SPOSC   => this%SPOSC      , &
-    CNRH    => this%CNRH       , &
-    CPRH    => this%CPRH       , &
-    OMCF    => this%OMCF       , &
-    OMCA    => this%OMCA       , &
-    JG    => this%jguilds      &
+  associate(                    &
+    OHCK     => this%OHCK     , &
+    OMCK     => this%OMCK     , &
+    ORCK     => this%ORCK     , &
+    OQCK     => this%OQCK     , &
+    ORCI     => this%ORCI     , &
+    OMCI     => this%OMCI     , &
+    CNOFC    => this%CNOFC    , &
+    CPOFC    => this%CPOFC    , &
+    CNOMC    => this%CNOMC    , &
+    CPOMC    => this%CPOMC    , &
+    CNOMCff  => this%CNOMCff  , &
+    CPOMCff  => this%CPOMCff  , &
+    FL       => this%FL       , &
+    DOSA     => this%DOSA     , &
+    SPOSC    => this%SPOSC    , &
+    CNRH     => this%CNRH     , &
+    CPRH     => this%CPRH     , &
+    OMCF     => this%OMCF     , &
+    OMCA     => this%OMCA     , &
+    JG       => this%jguilds    &
   )
   OHCK=real((/0.05,0.05,0.05,0.05,0.05/),r8)
   OMCK=real((/0.01,0.01,0.01,0.01,0.01/),r8)
@@ -242,11 +264,12 @@ contains
   D95: DO K=0,this%jcplx1
     DO  N=1,this%NFGs
       IF(N.EQ.this%n_aero_fungi)THEN
-        DO NGL=1,JG
-          CNOMC(1,NGL,N,K)=0.15_r8           !maximum
-          CNOMC(2,NGL,N,K)=0.09_r8           !minimum
-          CPOMC(1,NGL,N,K)=0.015_r8
-          CPOMC(2,NGL,N,K)=0.009_r8
+
+        DO NGL=this%JGnio(n),this%JGnfo(n)
+          CNOMC(1,NGL,K)=0.15_r8           !maximum
+          CNOMC(2,NGL,K)=0.09_r8           !minimum
+          CPOMC(1,NGL,K)=0.015_r8
+          CPOMC(2,NGL,K)=0.009_r8
         ENDDO
         this%CNOMCa(1,N,K)=0.15_r8           !maximum
         this%CNOMCa(2,N,K)=0.09_r8           !minimum
@@ -254,20 +277,20 @@ contains
         this%CPOMCa(2,N,K)=0.009_r8
 
       ELSE
-        do NGL=1,JG
-          CNOMC(1,NGL,N,K)=0.225_r8
-          CNOMC(2,NGL,N,K)=0.135_r8
-          CPOMC(1,NGL,N,K)=0.0225_r8
-          CPOMC(2,NGL,N,K)=0.0135_r8
+        do NGL=this%JGnio(n),this%JGnfo(n)
+          CNOMC(1,NGL,K)=0.225_r8
+          CNOMC(2,NGL,K)=0.135_r8
+          CPOMC(1,NGL,K)=0.0225_r8
+          CPOMC(2,NGL,K)=0.0135_r8
         enddo
         this%CNOMCa(1,N,K)=0.225_r8
         this%CNOMCa(2,N,K)=0.135_r8
         this%CPOMCa(1,N,K)=0.0225_r8
         this%CPOMCa(2,N,K)=0.0135_r8
       ENDIF
-      do NGL=1,JG
-        CNOMC(3,NGL,N,K)=DOT_PRODUCT(FL,CNOMC(1:2,NGL,N,K))
-        CPOMC(3,NGL,N,K)=DOT_PRODUCT(FL,CPOMC(1:2,NGL,N,K))
+      do NGL=this%JGnio(n),this%JGnfo(n)
+        CNOMC(3,NGL,K)=DOT_PRODUCT(FL,CNOMC(1:2,NGL,K))
+        CPOMC(3,NGL,K)=DOT_PRODUCT(FL,CPOMC(1:2,NGL,K))
       enddo
       this%CNOMCa(3,N,K)=DOT_PRODUCT(FL,this%CNOMCa(1:2,N,K))
       this%CPOMCa(3,N,K)=DOT_PRODUCT(FL,this%CPOMCa(1:2,N,K))
@@ -275,19 +298,19 @@ contains
   ENDDO D95
 
   DO  N=1,this%NFGs
-    do NGL=1,JG
-      CNOMCff(1,NGL,N)=0.225_r8
-      CNOMCff(2,NGL,N)=0.135_r8
-      CPOMCff(1,NGL,N)=0.0225_r8
-      CPOMCff(2,NGL,N)=0.0135_r8
+    do NGL=this%JGniA(n),this%JGnfA(n)
+      CNOMCff(1,NGL)=0.225_r8
+      CNOMCff(2,NGL)=0.135_r8
+      CPOMCff(1,NGL)=0.0225_r8
+      CPOMCff(2,NGL)=0.0135_r8
     enddo
     this%CNOMCffa(1,N)=0.225_r8
     this%CNOMCffa(2,N)=0.135_r8
     this%CPOMCffa(1,N)=0.0225_r8
     this%CPOMCffa(2,N)=0.0135_r8
-    do NGL=1,JG
-      CNOMCff(3,NGL,N)=DOT_PRODUCT(FL,CNOMCff(1:2,NGL,N))
-      CPOMCff(3,NGL,N)=DOT_PRODUCT(FL,CPOMCff(1:2,NGL,N))
+    do NGL=this%JGniA(n),this%JGnfA(n)
+      CNOMCff(3,NGL)=DOT_PRODUCT(FL,CNOMCff(1:2,NGL))
+      CPOMCff(3,NGL)=DOT_PRODUCT(FL,CPOMCff(1:2,NGL))
     enddo
     this%CNOMCffa(3,N)=DOT_PRODUCT(FL,this%CNOMCffa(1:2,N))
     this%CPOMCffa(3,N)=DOT_PRODUCT(FL,this%CPOMCffa(1:2,N))
@@ -340,10 +363,10 @@ contains
   allocate(this%OQCK(0:jcplx1))
   allocate(this%ORCI(ndbiomcpc,0:jcplx1))
   allocate(this%OMCI(nlbiomcpc,0:jcplx1))
-  allocate(this%CNOMC(nlbiomcpc,jguilds,NFGs,0:jcplx1))
-  allocate(this%CPOMC(nlbiomcpc,jguilds,NFGs,0:jcplx1))
-  allocate(this%CNOMCff(nlbiomcpc,jguilds,NFGs))
-  allocate(this%CPOMCff(nlbiomcpc,jguilds,NFGs))
+  allocate(this%CNOMC(nlbiomcpc,this%NMICBSO,0:jcplx1))
+  allocate(this%CPOMC(nlbiomcpc,this%NMICBSO,0:jcplx1))
+  allocate(this%CNOMCff(nlbiomcpc,this%NMICBSA))
+  allocate(this%CPOMCff(nlbiomcpc,this%NMICBSA))
   allocate(this%CNOMCa(nlbiomcpc,NFGs,0:jcplx1))
   allocate(this%CPOMCa(nlbiomcpc,NFGs,0:jcplx1))
   allocate(this%CNOMCffa(nlbiomcpc,NFGs))
@@ -357,6 +380,9 @@ contains
   allocate(this%OMCA(NFGs))
   allocate(this%FL(2))
   allocate(this%is_activef_micb(NFGs)); this%is_activef_micb=.false.
+  allocate(this%is_CO2_autotroph(NFGs)); this%is_CO2_autotroph=.false.
+  allocate(this%is_aerobic_hetr(NFGs)); this%is_aerobic_hetr=.false.
+  allocate(this%is_anerobic_hetr(NFGs));this%is_anerobic_hetr=.false.
   end subroutine InitAllocate
 !------------------------------------------------------------------------------------------
 
@@ -387,6 +413,9 @@ contains
   call destroy(this%OMCF)
   call destroy(this%OMCA)
   call destroy(this%is_activef_micb)
+  call destroy(this%is_CO2_autotroph)
+  call destroy(this%is_aerobic_hetr)
+  call destroy(this%is_anerobic_hetr)
   end subroutine DestructMicBGCPar
 
 end module MicBGCPars
