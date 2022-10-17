@@ -1267,7 +1267,7 @@ module NutUptakeMod
   !      RA=canopy boundary layer resistance
   !     OSTR=O2 stress indicator
   !
-  DO 195 K=0,jcplx11
+  D195: DO K=0,jcplx11
     VOLWK=VOLWM(NPH,L)*FOSRH(K,L)
     IF(VOLWK.GT.ZEROS2.AND.RTVLW(N,L,NZ).GT.ZEROP(NZ))THEN
       VOLWT=VOLWK+RTVLW(N,L,NZ)
@@ -1292,7 +1292,7 @@ module NutUptakeMod
       RDFOMP(N,K,L,NZ)=0.0_r8
     ENDIF
 
-195   CONTINUE
+  ENDDO D195
   end associate
   end subroutine RootExudates
 !------------------------------------------------------------------------

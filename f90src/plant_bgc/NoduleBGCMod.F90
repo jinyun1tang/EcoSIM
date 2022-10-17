@@ -152,8 +152,7 @@ module NoduleBGCMod
 !     FCNPF=N,P constraint to bacterial activity
 !     WFNG=growth function of canopy water potential
 !
-    RCNDL=AZMAX1(AMIN1(CPOLNB(NB,NZ) &
-      ,VMXO*WTNDB(NB,NZ))*FCNPF*TFN3(NZ)*WFNG)
+    RCNDL=AZMAX1(AMIN1(CPOLNB(NB,NZ),VMXO*WTNDB(NB,NZ))*FCNPF*TFN3(NZ)*WFNG)
 !     CPOOLNX=CPOLNB(NB,NZ)
 !     VMXOX=VMXO*WTNDB(NB,NZ)*FCNPF*TFN3(NZ)*WFNG
 !

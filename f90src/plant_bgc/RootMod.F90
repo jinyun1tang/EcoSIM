@@ -2145,16 +2145,14 @@ implicit none
 !     RUPNH4,RUPNHB,RUPN03,RUPNOB=uptake from non-band,band of NH4,NO3
 !     RUPH2P,RUPH2B,RUPH1P,RUPH1B=uptake from non-band,band of H2PO4,HPO4
 !
-        DO 195 K=0,jcplx11
+        D195: DO K=0,jcplx11
           CPOOLR(N,L,NZ)=CPOOLR(N,L,NZ)+RDFOMC(N,K,L,NZ)
           ZPOOLR(N,L,NZ)=ZPOOLR(N,L,NZ)+RDFOMN(N,K,L,NZ)
           PPOOLR(N,L,NZ)=PPOOLR(N,L,NZ)+RDFOMP(N,K,L,NZ)
-195     CONTINUE
-        ZPOOLR(N,L,NZ)=ZPOOLR(N,L,NZ) &
-          +RUPNH4(N,L,NZ)+RUPNHB(N,L,NZ) &
+        ENDDO D195
+        ZPOOLR(N,L,NZ)=ZPOOLR(N,L,NZ)+RUPNH4(N,L,NZ)+RUPNHB(N,L,NZ) &
           +RUPNO3(N,L,NZ)+RUPNOB(N,L,NZ)
-        PPOOLR(N,L,NZ)=PPOOLR(N,L,NZ) &
-          +RUPH2P(N,L,NZ)+RUPH2B(N,L,NZ) &
+        PPOOLR(N,L,NZ)=PPOOLR(N,L,NZ)+RUPH2P(N,L,NZ)+RUPH2B(N,L,NZ) &
           +RUPH1P(N,L,NZ)+RUPH1B(N,L,NZ)
 !
 !     GROWTH OF EACH ROOT AXIS

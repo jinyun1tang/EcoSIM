@@ -163,7 +163,7 @@
         XHVSTP(NY,NX)=0._r8
         TRINH4(NY,NX)=0._r8
         TRIPO4(NY,NX)=0._r8
-        DO 960 NZ=1,NP0(NY,NX)
+        D960: DO NZ=1,NP0(NY,NX)
           RSETC(NZ,NY,NX)=RSETC(NZ,NY,NX)+CARBN(NZ,NY,NX)+TCUPTK(NZ,NY,NX) &
             -TCSNC(NZ,NY,NX)+TCO2T(NZ,NY,NX)-VCO2F(NZ,NY,NX)-VCH4F(NZ,NY,NX)
           RSETN(NZ,NY,NX)=RSETN(NZ,NY,NX)+TZUPTK(NZ,NY,NX)+TNH3C(NZ,NY,NX) &
@@ -197,7 +197,7 @@
           TCSNC(NZ,NY,NX)=0._r8
           TZSNC(NZ,NY,NX)=0._r8
           TPSNC(NZ,NY,NX)=0._r8
-960     CONTINUE
+        ENDDO D960
         IF(IERSNG.EQ.1.OR.IERSNG.EQ.3)THEN
           TSED(NY,NX)=0._r8
         ENDIF
