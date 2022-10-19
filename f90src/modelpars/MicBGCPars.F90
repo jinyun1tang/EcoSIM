@@ -6,7 +6,7 @@ module MicBGCPars
   use EcoSIMConfig
 implicit none
   private
-
+  save
   character(len=*), private, parameter :: mod_filename = __FILE__
 
   type, public :: MicParType
@@ -76,6 +76,7 @@ implicit none
   integer :: NMICBSA             !total number of microbial guilds in the autotrophic complex
   integer :: NMICBSO             !total number of microbial guilds in one organic-microbial complex
   integer :: k_litrsf
+  integer :: n_pltlitrk
   contains
     procedure, public  :: Init
     procedure, public  :: SetPars
@@ -108,6 +109,7 @@ contains
 
   this%k_woody_litr=0;     this%is_litter(this%k_woody_litr)=.true.
   this%k_non_woody_litr=1; this%is_litter(this%k_non_woody_litr)=.true.
+  this%n_pltlitrk=this%k_non_woody_litr
   this%k_manure=2;         this%is_litter(this%k_manure)=.true.
   this%is_litter(this%k_non_woody_litr)=.true.
   this%is_litter(this%k_manure)=.true.

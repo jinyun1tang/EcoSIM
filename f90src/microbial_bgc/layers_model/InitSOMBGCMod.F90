@@ -411,7 +411,7 @@ module InitSOMBGCMOD
           OC=OC+OMCff(M,NGL,L,NY,NX)
           ON=ON+OMNff(M,NGL,L,NY,NX)
           OP=OP+OMPff(M,NGL,L,NY,NX)
-          RC0ff(NY,NX)=RC0(K,NY,NX)+OMCff(M,NGL,L,NY,NX)
+          RC0ff(NY,NX)=RC0ff(NY,NX)+OMCff(M,NGL,L,NY,NX)
         ENDDO
       ENDDO
     enddo

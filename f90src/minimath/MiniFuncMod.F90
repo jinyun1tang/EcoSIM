@@ -18,9 +18,9 @@ implicit none
   is_top_layer_loc=.false.
   if(PRESENT(is_top_layer))is_top_layer_loc=is_top_layer
   if(is_top_layer_loc)then
-    ans=AMAX1(1.0E-06_r8,EXP(-13.650_r8-0.857_r8*LOG(-PSISM)))
+    ans=AMAX1(ppmc,EXP(-13.650_r8-0.857_r8*LOG(-PSISM)))
   else
-    ans=AMAX1(1.0E-06_r8,EXP(-13.833_r8-0.857_r8*LOG(-PSISM)))
+    ans=AMAX1(ppmc,EXP(-13.833_r8-0.857_r8*LOG(-PSISM)))
   endif
   end function FilmThickness
 !------------------------------------------------------------------------------------------

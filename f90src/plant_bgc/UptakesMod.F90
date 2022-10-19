@@ -134,7 +134,7 @@ module UptakesMod
 !     VHCPX=canopy heat capacity
 !     VOLWP,VOLWC=water volume in canopy,on canopy surfaces
 !
-        PSILT(NZ)=AMIN1(-1.0E-06,0.667*PSILT(NZ))
+        PSILT(NZ)=AMIN1(-ppmc,0.667*PSILT(NZ))
         EP(NZ)=0.0_r8
         EVAPC(NZ)=0.0_r8
         HFLWC1=FLWC(NZ)*cpw*TKA
@@ -476,20 +476,19 @@ module UptakesMod
 !     PATH=path length of water and nutrient uptake
 !     RTARR=root surface area/radius for uptake,diffusivity
 !
-  DO 2000 N=1,MY(NZ)
+  D2000: DO N=1,MY(NZ)
     DO  L=NU,NI(NZ)
       IF(N.EQ.1)THEN
         RTDPZ=0.0_r8
-        DO 2005 NR=1,NRT(NZ)
+        D2005: DO NR=1,NRT(NZ)
           RTDPZ=AMAX1(RTDPZ,RTDP1(1,NR,NZ))
-2005    CONTINUE
+        ENDDO D2005
         IF(L.EQ.NU)THEN
           FRTDPX(L,NZ)=1.0_r8
         ELSE
           IF(DLYR3(L).GT.ZERO)THEN
             RTDPX=AZMAX1(RTDPZ-CDPTHZ(L-1))
-            RTDPX=AZMAX1(AMIN1(DLYR3(L),RTDPX) &
-              -AZMAX1(SDPTH(NZ)-CDPTHZ(L-1)-HTCTL(NZ)))
+            RTDPX=AZMAX1(AMIN1(DLYR3(L),RTDPX)-AZMAX1(SDPTH(NZ)-CDPTHZ(L-1)-HTCTL(NZ)))
             FRTDPX(L,NZ)=RTDPX/DLYR3(L)
           ELSE
             FRTDPX(L,NZ)=0.0_r8
@@ -500,22 +499,21 @@ module UptakesMod
       IF(WTRTG(L).GT.ZEROS)THEN
         FPQ(N,L,NZ)=AZMAX1(WTRTD(N,L,NZ))/WTRTG(L)
       ELSE
-        FPQ(N,L,NZ)=1.0
+        FPQ(N,L,NZ)=1.0_r8
       ENDIF
       FPP(N,L,NZ)=FMN*FPQ(N,L,NZ)
       IF(RTDNP(N,L,NZ).GT.ZERO.AND.FRTDPX(L,NZ).GT.ZERO)THEN
         RRADL(N,L)=AMAX1(RRAD2X(N,NZ),SQRT((RTVLW(N,L,NZ) &
-          /(1.0-PORT(N,NZ)))/(PICON*PP(NZ)*RTLGP(N,L,NZ))))
-        PATH(N,L)=AMAX1(1.001*RRADL(N,L) &
-          ,1.0/(SQRT(PICON*(RTDNP(N,L,NZ)/FRTDPX(L,NZ))/FMPR(L))))
+          /(1.0_r8-PORT(N,NZ)))/(PICON*PP(NZ)*RTLGP(N,L,NZ))))
+        PATH(N,L)=AMAX1(1.001_r8*RRADL(N,L),1.0_r8/(SQRT(PICON*(RTDNP(N,L,NZ)/FRTDPX(L,NZ))/FMPR(L))))
         RTARR(N,L)=6.283*RTLGP(N,L,NZ)/FRTDPX(L,NZ)
       ELSE
         RRADL(N,L)=RRAD2M(N,NZ)
-        PATH(N,L)=1.001*RRADL(N,L)
-        RTARR(N,L)=6.283*RTLGP(N,L,NZ)
+        PATH(N,L)=1.001_r8*RRADL(N,L)
+        RTARR(N,L)=6.283_r8*RTLGP(N,L,NZ)
       ENDIF
     enddo
-2000  CONTINUE
+  ENDDO D2000
   end associate
   end subroutine UpdateRootProperty
 !------------------------------------------------------------------------
@@ -597,19 +595,18 @@ module UptakesMod
       RA(NZ)=RAZ(NZ)
       VHCPC(NZ)=cpw*(WTSHT(NZ)*10.0E-06)
       DTKC(NZ)=0.0_r8
-      DO 4290 N=1,MY(NZ)
+      D4290: DO N=1,MY(NZ)
         DO  L=NU,NI(NZ)
           PSIRT(N,L,NZ)=PSIST1(L)
           APSIRT=ABS(PSIRT(N,L,NZ))
-          FDMR=0.16+0.10*APSIRT/(0.05*APSIRT+2.0)
+          FDMR=0.16_r8+0.10_r8*APSIRT/(0.05_r8*APSIRT+2.0_r8)
           CCPOLT=CCPOLR(N,L,NZ)+CZPOLR(N,L,NZ)+CPPOLR(N,L,NZ)
-          OSWT=36.0+840.0*AZMAX1(CCPOLT)
-          PSIRO(N,L,NZ)=FDMR/0.16*OSMO(NZ) &
-            -RGAS*TKS(L)*FDMR*CCPOLT/OSWT
+          OSWT=36.0_r8+840.0_r8*AZMAX1(CCPOLT)
+          PSIRO(N,L,NZ)=FDMR/0.16_r8*OSMO(NZ)-RGAS*TKS(L)*FDMR*CCPOLT/OSWT
           PSIRG(N,L,NZ)=AZMAX1(PSIRT(N,L,NZ)-PSIRO(N,L,NZ))
           UPWTR(N,L,NZ)=0.0_r8
       enddo
-4290  CONTINUE
+      ENDDO D4290
     ENDIF
   ENDIF
   end associate
@@ -864,7 +861,7 @@ module UptakesMod
 !     RSSZ=change in canopy water potl vs change in canopy water cnt
 !     RSSU=change in canopy water potl vs change in transpiration
 
-      VOLWPZ=1.0E-06_r8*WVPLT/FDMP
+      VOLWPZ=ppmc*WVPLT/FDMP
       DIFFZ=VOLWPZ-VOLWP(NZ)
       DIFFU=EP(NZ)-UPRT
       IF(test_aneb(UPRT,0.0_r8))THEN

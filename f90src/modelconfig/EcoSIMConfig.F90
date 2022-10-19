@@ -6,6 +6,7 @@ implicit none
   logical :: is_first_year=.false.
   logical :: transport_on=.true.
   logical :: column_mode=.false.
+  logical :: do_instequil=.false.
   integer :: IFLGW                 !flag for raising Z0G with vegn
 
   integer, parameter :: ndbiomcpc = 2 !# of microbial residue components

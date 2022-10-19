@@ -118,7 +118,7 @@ module readqmod
 !     SDPTHI=seeding depth (m)
 !
       READ(12,*,END=540)DY,PPI(NZ,NY,NX),SDPTHI(NZ,NY,NX)
-      SDPTHI(NZ,NY,NX)=AMAX1(1.0E-06,SDPTHI(NZ,NY,NX))
+      SDPTHI(NZ,NY,NX)=AMAX1(ppmc,SDPTHI(NZ,NY,NX))
       if(lverb)then
         write(*,*)'planting date DDMMYYYY: DY',DY
         write(*,*)'initial planting density (m-2): PPI',PPI(NZ,NY,NX)
@@ -265,7 +265,7 @@ module readqmod
     enddo
 540 CLOSE(12)
   ELSE
-    SDPTHI(NZ,NY,NX)=1.0E-06
+    SDPTHI(NZ,NY,NX)=ppmc
   ENDIF
   IDAYY(NZ,NY,NX)=IDAYH(NZ,NY,NX)
   IYRY(NZ,NY,NX)=IYRH(NZ,NY,NX)

@@ -394,7 +394,7 @@ module StartsMod
     RCH4L(L,NY,NX)=0.0_r8
     IF(L.GT.0)THEN
       IF(BKDS(L,NY,NX).GT.ZERO)THEN
-        PTDS=1.0E-06_r8*(1.30*CORGCM+2.66_r8*(1.0E+06_r8-CORGCM))
+        PTDS=ppmc*(1.30*CORGCM+2.66_r8*(1.0E+06_r8-CORGCM))
         POROS(L,NY,NX)=1.0_r8-(BKDS(L,NY,NX)/PTDS)
       ELSE
         !for ponding water
@@ -418,7 +418,7 @@ module StartsMod
       SILT(L,NY,NX)=CSILT(L,NY,NX)*BKVL(L,NY,NX)
       CLAY(L,NY,NX)=CCLAY(L,NY,NX)*BKVL(L,NY,NX)
       IF(BKDS(L,NY,NX).GT.ZERO)THEN
-        VORGC=CORGCM*1.0E-06_r8*BKDS(L,NY,NX)/PTDS
+        VORGC=CORGCM*ppmc*BKDS(L,NY,NX)/PTDS
         VMINL=(CSILT(L,NY,NX)+CCLAY(L,NY,NX))*BKDS(L,NY,NX)/PTDS
         VSAND=CSAND(L,NY,NX)*BKDS(L,NY,NX)/PTDS
         VHCM(L,NY,NX)=((2.496*VORGC+2.385*VMINL+2.128*VSAND) &
@@ -905,8 +905,8 @@ module StartsMod
       CDPTHZ(L,NY,NX)=0.0_r8
       ORGC(L,NY,NX)=(RSC(0,L,NY,NX)+RSC(1,L,NY,NX)+RSC(2,L,NY,NX))*AREA(3,L,NY,NX)
       ORGCX(L,NY,NX)=ORGC(L,NY,NX)
-      VOLR(NY,NX)=(RSC(0,L,NY,NX)*1.0E-06_r8/BKRS(0) &
-        +RSC(1,L,NY,NX)*1.0E-06_r8/BKRS(1)+RSC(2,L,NY,NX)*1.0E-06_r8/BKRS(2)) &
+      VOLR(NY,NX)=(RSC(0,L,NY,NX)*ppmc/BKRS(0) &
+        +RSC(1,L,NY,NX)*ppmc/BKRS(1)+RSC(2,L,NY,NX)*ppmc/BKRS(2)) &
         *AREA(3,L,NY,NX)
       VOLT(L,NY,NX)=VOLR(NY,NX)
       VOLX(L,NY,NX)=VOLT(L,NY,NX)

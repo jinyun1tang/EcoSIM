@@ -2,6 +2,7 @@ module WatsubPars
 
 ! USES:
   use data_kind_mod, only : r8 => SHR_KIND_R8
+  use EcoSimConst, only : ppmc
   implicit none
   public
   save
@@ -68,7 +69,7 @@ module WatsubPars
   RZ=0.0139_r8
   RAM=1.39E-03_r8   !this value differs from that in Hour1Mod.F90
   DPTHSX=0.075_r8
-  VISCW=1.0E-06_r8
+  VISCW=ppmc
   VISCA=2.0E-08_r8
   DIFFW=1.45E-07_r8
   DIFFA=2.01E-05_r8
@@ -84,7 +85,7 @@ module WatsubPars
   TRBW=0.375_r8
   TRBA=0.000_r8
   FVOLAH=0.0_r8
-  DTHETW=1.0E-06_r8
+  DTHETW=ppmc
   HCNDRR=25.0_r8
   FENGYP=1.0E-03_r8
   end subroutine InitWatsubPars

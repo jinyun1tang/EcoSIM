@@ -1897,7 +1897,7 @@ module WatsubMod
     ATCNVR=0.0_r8
   ENDIF
   THETRR=AZMAX1(1.0_r8-THETPX(0,NY,NX)-THETWX(0,NY,NX)-THETIX(0,NY,NX))
-  DTKX=ABS(TK1(0,NY,NX)-TK1(NUM(NY,NX),NY,NX))*1.0E-06_r8
+  DTKX=ABS(TK1(0,NY,NX)-TK1(NUM(NY,NX),NY,NX))*ppmc
   DTHW0=AZMAX1(THETWX(0,NY,NX)-TRBW)**3
   DTHA0=AZMAX1(THETPX(0,NY,NX)-TRBA)**3
   DTHW1=AZMAX1(THETWX(NUM(NY,NX),NY,NX)-TRBW)**3
@@ -3310,7 +3310,7 @@ module WatsubMod
           !     WTHET*=multiplier for air concn in thermal conductivity
           !     ATCNDL=source-destination thermal conductance
       !
-          DTKX=ABS(TK1(N3,N2,N1)-TK1(N6,N5,N4))*1.0E-06
+          DTKX=ABS(TK1(N3,N2,N1)-TK1(N6,N5,N4))*ppmc
           IF(BKDS(N3,N2,N1).GT.ZERO.OR.THETWX(N3,N2,N1)+THETIX(N3,N2,N1).GT.ZERO)THEN
             DTHW1=AZMAX1(THETWX(N3,N2,N1)-TRBW)**3
             DTHA1=AZMAX1(THETPX(N3,N2,N1)-TRBA)**3

@@ -1463,8 +1463,6 @@ contains
       XN2FLG=XN2FLG+DFVN2G
       XN3FLG=XN3FLG+DFVN3G
       XHGFLG=XHGFLG+DFVHGG
-
-
     endif
 
     if(VOLWM > micfor%ZEROS2)then
@@ -1473,7 +1471,6 @@ contains
     !dissolution between atmosphere and soil
       VOLWMA=VOLWM*forc%VLNH4
       VOLWMB=VOLWM*forc%VLNHB
-
 
       CCO2S2=AZMAX1(CO2S2/VOLWM)
       CCH4S2=AZMAX1(CH4S2/VOLWM)

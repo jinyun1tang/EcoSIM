@@ -3,8 +3,8 @@
 !!
 ! Description:
 ! read control namelist
-  use abortutils, only : endrun
-  use EcoSIMConfig, only : transport_on,column_mode
+  use abortutils   , only : endrun
+  use EcoSIMConfig , only : transport_on,column_mode, do_instequil
   use ForcWriterMod, only : bgc_forc_conf,do_bgcforc_write
   implicit none
       character(len=*), intent(in) :: nmlfile
@@ -25,7 +25,8 @@
       integer :: do_doy,do_year,do_layer
       character(len=64) :: bgc_fname
       namelist /ecosys/case_name, prefix, runfile, do_regression_test, &
-      num_of_simdays,lverbose,num_microbial_guilds,transport_on,column_mode
+      num_of_simdays,lverbose,num_microbial_guilds,transport_on,column_mode,&
+      do_instequil
 
       logical :: laddband
       namelist /bbgcforc/do_bgcforc_write,do_year,do_doy,laddband,do_layer,&
@@ -46,6 +47,7 @@
       num_microbial_guilds=1
       do_bgcforc_write=.false.
       bgc_fname='bbforc.nc'
+      do_instequil=.false.
       inquire (file=nmlfile, iostat=rc)
       if (rc /= 0) then
         write (stdout, '(3a)') 'Error: input file ', trim(nmlfile), &

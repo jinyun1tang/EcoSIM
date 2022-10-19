@@ -6,7 +6,6 @@ SUBROUTINE soil(NA,ND,NT,NE,NAX,NTX,NEX,NHW,NHE,NVN,NVS)
   use data_kind_mod, only : r8 => SHR_KIND_R8
   use DayMod       , only : day
   use ExecMod      , only : exec
-  use Hour1Mod     , only : hour1
   use StarteMod    , only : starte
   use StartqMod    , only : startq
   use StartsMod    , only : starts

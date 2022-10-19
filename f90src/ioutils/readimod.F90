@@ -770,7 +770,7 @@ module readiMod
         write(*,*)(RSP(2,L,NY,NX),L=NU(NY,NX),NM(NY,NX))
         write(*,'(100A)')('=',ll=1,100)
       endif
-      RSC(1,0,NY,NX)=AMAX1(1.0E-06,RSC(1,0,NY,NX))
+      RSC(1,0,NY,NX)=AMAX1(ppmc,RSC(1,0,NY,NX))
       RSN(1,0,NY,NX)=AMAX1(0.04E-06,RSN(1,0,NY,NX))
       RSP(1,0,NY,NX)=AMAX1(0.004E-06,RSP(1,0,NY,NX))
       SCNV(0,NY,NX)=10.0*0.098

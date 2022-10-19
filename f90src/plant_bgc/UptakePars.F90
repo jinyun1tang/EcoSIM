@@ -1,6 +1,7 @@
 module UptakePars
 ! USES:
   use data_kind_mod, only : r8 => SHR_KIND_R8
+  use EcoSimConst
   implicit none
   public
   save
@@ -46,12 +47,12 @@ module UptakePars
   MXN=200
   DIFFX=1.0E-09_r8
   DIFFY=0.5E-02_r8
-  FMN=1.0E-06_r8
+  FMN=ppmc
   RACM=0.00139_r8
   RACX=0.0278_r8
   RZ=0.0139_r8
   DSTK=0.225_r8
-  VSTK=1.0E-06_r8/DSTK
+  VSTK=ppmc/DSTK
   SNH3X=2.852E+02_r8
   EMMC=0.97_r8
   EMODW=50.0_r8

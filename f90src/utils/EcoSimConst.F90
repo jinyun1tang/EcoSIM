@@ -41,4 +41,5 @@ module EcosimConst
   integer :: ICOR(12)=(/1,-1,0,0,1,1,2,3,3,4,4,5/)
   real(r8), parameter :: TWILGT=0.06976_r8
   real(r8), parameter :: MWC2Soil=1.82E-06_r8  !convert organic carbon (g C/d2) to soil mass (Mg/d2)
+  real(r8), parameter :: ppmc=1.0E-06_r8        !part per million
 end module EcosimConst

@@ -24,6 +24,7 @@ module StarteMod
   use InitSoluteMod
   use SoluteParMod
   use SoluteChemDataType, only : solutedtype
+  use MicBGCPars, only : micpar
   use ChemTracerParsMod
   implicit none
 
@@ -63,7 +64,7 @@ module StarteMod
           DO K=1,3
             BKVLX=0._r8
 !
-            IF(K.EQ.2.AND.L.EQ.1)THEN
+            IF(K.EQ.micpar%k_manure.AND.L.EQ.1)THEN
 !     INITIALIZE IRRIGATION WATER
               solutevar%CN4Z=CN4Q(I,NY,NX)
               solutevar%CNOZ=CNOQ(I,NY,NX)
@@ -80,7 +81,7 @@ module StarteMod
               solutevar%COH1=DPH2O/solutevar%CHY1
             ELSE
               IF(I.EQ.1)then
-                IF(K.EQ.1.AND.L.EQ.1)THEN
+                IF(K.EQ.micpar%k_non_woody_litr.AND.L.EQ.1)THEN
 !     INITIALIZE RAINFALL
                   solutevar%CHY1=10.0_r8**(-(PHR(NY,NX)-3.0_r8))
                   solutevar%COH1=DPH2O/solutevar%CHY1
@@ -95,7 +96,7 @@ module StarteMod
                   solutevar%CKAZ=CKAR(NY,NX)
                   solutevar%CSOZ=CSOR(NY,NX)
                   solutevar%CCLZ=CCLR(NY,NX)
-!               ELSEIF(K.EQ.3.AND.(.not.is_restart_run).AND.is_first_year)THEN
+!               ELSEIF(K.EQ.micpar%k_POM.AND.(.not.is_restart_run).AND.is_first_year)THEN
 !
 !     INITIALIZE SOIL WATER
 
@@ -180,7 +181,7 @@ module StarteMod
 !
 !     SOLUTE CONCENTRATIONS IN PRECIPITATION
 !
-  IF(K.EQ.1.AND.L.EQ.1.AND.I.EQ.1)THEN
+  IF(K.EQ.micpar%k_non_woody_litr.AND.L.EQ.1.AND.I.EQ.1)THEN
     CCOR(NY,NX)=solutevar%CCO21
     CCHR(NY,NX)=solutevar%CCH41
     COXR(NY,NX)=solutevar%COXY1
@@ -235,7 +236,7 @@ module StarteMod
 !
 !     SOLUTE CONCENTRATIONS IN IRRIGATION
 !
-  ELSEIF(K.EQ.2.AND.L.EQ.1)THEN
+  ELSEIF(K.EQ.micpar%k_manure.AND.L.EQ.1)THEN
     CCOQ(NY,NX)=solutevar%CCO21
     CCHQ(NY,NX)=solutevar%CCH41
     COXQ(NY,NX)=solutevar%COXY1
@@ -291,7 +292,7 @@ module StarteMod
 !     SOLUTE CONCENTRATIONS IN SOIL
 ! for the POM complex, on the first day in the first year
 ! U means surface irrigation
-  ELSEIF(K.EQ.3.AND.I.EQ.1.AND.(.not.is_restart_run).AND.is_first_year)THEN
+  ELSEIF(K.EQ.micpar%k_POM.AND.I.EQ.1.AND.(.not.is_restart_run).AND.is_first_year)THEN
     CCOU=solutevar%CCO21
     CCHU=solutevar%CCH41
     COXU=0._r8
@@ -607,7 +608,7 @@ module StarteMod
 !
 !     INITIAL STATE VARIABLES FOR MINERAL N AND P IN SNOWPACK
 !
-    DO 9985 L=1,JS
+    D9985: DO L=1,JS
       IF(VHCPW(L,NY,NX).GT.VHCPWX(NY,NX))THEN
         VOLWW=VOLWSL(L,NY,NX)+VOLSSL(L,NY,NX)+VOLISL(L,NY,NX)*DENSI
         CO2W(L,NY,NX)=VOLWW*CCOR(NY,NX)
@@ -615,11 +616,11 @@ module StarteMod
         OXYW(L,NY,NX)=VOLWW*COXR(NY,NX)
         ZNGW(L,NY,NX)=VOLWW*CNNR(NY,NX)
         ZN2W(L,NY,NX)=VOLWW*CN2R(NY,NX)
-        ZN4W(L,NY,NX)=VOLWW*CN4R(NY,NX)*14.0
-        ZN3W(L,NY,NX)=VOLWW*CN3R(NY,NX)*14.0
-        ZNOW(L,NY,NX)=VOLWW*CNOR(NY,NX)*14.0
-        Z1PW(L,NY,NX)=VOLWW*CH1PR(NY,NX)*31.0
-        ZHPW(L,NY,NX)=VOLWW*CPOR(NY,NX)*31.0
+        ZN4W(L,NY,NX)=VOLWW*CN4R(NY,NX)*natomw
+        ZN3W(L,NY,NX)=VOLWW*CN3R(NY,NX)*natomw
+        ZNOW(L,NY,NX)=VOLWW*CNOR(NY,NX)*natomw
+        Z1PW(L,NY,NX)=VOLWW*CH1PR(NY,NX)*patomw
+        ZHPW(L,NY,NX)=VOLWW*CPOR(NY,NX)*patomw
 !
 !     INITIAL STATE VARIABLES FOR CATIONS AND ANIONS IN SNOWPACK
 !
@@ -724,7 +725,7 @@ module StarteMod
           ZMG1PW(L,NY,NX)=0._r8
         ENDIF
       ENDIF
-9985  CONTINUE
+    ENDDO D9985
   ENDIF
   end subroutine InitialState
 

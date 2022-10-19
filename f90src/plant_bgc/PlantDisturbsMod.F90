@@ -1081,7 +1081,7 @@ module PlantDisturbsMod
         WVPLT=AZMAX1(WTLS(NZ)+WVSTK(NZ))
         APSILT=ABS(PSILT(NZ))
         FDM=0.16_r8+0.10_r8*APSILT/(0.05_r8*APSILT+2.0_r8)
-        VOLWP(NZ)=1.0E-06_r8*WVPLT/FDM
+        VOLWP(NZ)=ppmc*WVPLT/FDM
         VOLWOU=VOLWOU+VOLWPX-VOLWP(NZ)
         UVOLO=UVOLO+VOLWPX-VOLWP(NZ)
 !
@@ -2524,7 +2524,7 @@ module PlantDisturbsMod
         WVPLT=AZMAX1(WTLS(NZ)+WVSTK(NZ))
         APSILT=ABS(PSILT(NZ))
         FDM=0.16_r8+0.10_r8*APSILT/(0.05_r8*APSILT+2.0_r8)
-        VOLWP(NZ)=1.0E-06_r8*WVPLT/FDM
+        VOLWP(NZ)=ppmc*WVPLT/FDM
         VOLWOU=VOLWOU+VOLWPX-VOLWP(NZ)
         UVOLO=UVOLO+VOLWPX-VOLWP(NZ)
 !

@@ -2,6 +2,7 @@ module Hour1Mod
   use data_kind_mod, only : r8 => SHR_KIND_R8
   use minimathmod  , only : test_aeqb,AZMAX1,AZMIN1
   use abortutils   , only : endrun, print_info
+  use ATSUtilsMod
   use TracerPropMod
   use EcoSimConst
   use MiniFuncMod
@@ -39,7 +40,7 @@ module Hour1Mod
   use PlantDataRateType
   use GridDataType
   use EcoSIMConfig, only : jcplx1 => jcplx1c,jcplx=>jcplxc,nlbiomcp=>nlbiomcpc
-  use EcoSIMConfig, only : ndbiomcp=>ndbiomcpc,jsken=>jskenc,NFGs=>NFGsc
+  use EcoSIMConfig, only : ndbiomcp=>ndbiomcpc,jsken=>jskenc,NFGs=>NFGsc,do_instequil
   use MicBGCPars, only : micpar
   implicit none
 
@@ -128,10 +129,8 @@ module Hour1Mod
 !     VOLR=dry litter volume
 !     POROS0,FC,WP=litter porosity,field capacity,wilting point
 !
-      VOLWRX(NY,NX)=AZMAX1(THETRX(0)*RC0(0,NY,NX) &
-        +THETRX(1)*RC0(1,NY,NX)+THETRX(2)*RC0(2,NY,NX))
-      VOLR(NY,NX)=AZMAX1(RC0(0,NY,NX)*1.0E-06/BKRS(0) &
-        +RC0(1,NY,NX)*1.0E-06/BKRS(1)+RC0(2,NY,NX)*1.0E-06_r8/BKRS(2))
+      VOLWRX(NY,NX)=AZMAX1(THETRX(0)*RC0(0,NY,NX)+THETRX(1)*RC0(1,NY,NX)+THETRX(2)*RC0(2,NY,NX))
+      VOLR(NY,NX)=AZMAX1(RC0(0,NY,NX)*ppmc/BKRS(0)+RC0(1,NY,NX)*ppmc/BKRS(1)+RC0(2,NY,NX)*ppmc/BKRS(2))
       IF(VOLR(NY,NX).GT.ZEROS(NY,NX))THEN
         FVOLR=VOLWRX(NY,NX)/VOLR(NY,NX)
       ELSE
@@ -179,7 +178,9 @@ module Hour1Mod
 
       call GetSoluteConcentrations(NY,NX)
 
-      call PrepVars4PlantMicrobeUptake(NY,NX)
+      call Prep4PlantMicrobeUptake(NY,NX)
+
+      call CalGasSolubility(NY,NX)
 
       call GetSoilHydraulicVars(NY,NX)
 
@@ -192,6 +193,8 @@ module Hour1Mod
       call GetSurfResidualProperties(NY,NX,DPTH0)
 
       call SetTracerPropertyInLiterAir(NY,NX)
+
+      if(do_instequil)call ForceGasAquaEquil(NY,NX)
 !
 !      call CanopyConditionModel(I,J,NY,NX,DPTH0)
 
@@ -1173,14 +1176,14 @@ module Hour1Mod
       IF(THETPZ(L,NY,NX).LT.THETPW.OR.L.EQ.NL(NY,NX))THEN
         IFLGY=1
         IF(DPTH(L,NY,NX).LT.DTBLX(NY,NX))THEN
-          DO 5705 LL=MIN(L+1,NL(NY,NX)),NL(NY,NX)
+          D5705: DO LL=MIN(L+1,NL(NY,NX)),NL(NY,NX)
             IF(THETPZ(LL,NY,NX).GE.THETPW.AND.LL.NE.NL(NY,NX))THEN
               IFLGY=0
               exit
             ELSEIF(DPTH(LL,NY,NX).GE.DTBLX(NY,NX))THEN
               exit
             ENDIF
-5705      CONTINUE
+          ENDDO D5705
         ENDIF
         IF(IFLGY.EQ.1)THEN
           IF(THETPZ(L,NY,NX).GE.THETPW.AND.L.NE.NL(NY,NX))THEN
@@ -1195,7 +1198,7 @@ module Hour1Mod
               DPTHT(NY,NX)=CDPTH(L,NY,NX)-DLYR(3,L,NY,NX)
             ENDIF
           ELSEIF(L.GT.NU(NY,NX))THEN
-            PSIS1=PSISM(L,NY,NX)-0.0098*(DPTH(L,NY,NX)-DPTH(L-1,NY,NX))
+            PSIS1=PSISM(L,NY,NX)-0.0098_r8*(DPTH(L,NY,NX)-DPTH(L-1,NY,NX))
             THETWM=THETWP*POROS(L-1,NY,NX)
             THETW1=AMIN1(THETWM,EXP((PSIMS(NY,NX)-LOG(-PSIS1)) &
               *PSD(L-1,NY,NX)/PSISD(NY,NX)+PSL(L-1,NY,NX)))
@@ -1255,18 +1258,18 @@ module Hour1Mod
   IF(IERSNG.EQ.2.OR.IERSNG.EQ.3)THEN
     D50=1.0_r8*CCLAY(NU(NY,NX),NY,NX)+10.0_r8*CSILT(NU(NY,NX),NY,NX) &
       +100.0_r8*CSAND(NU(NY,NX),NY,NX)+100.0_r8*CORGM
-    ZD50=0.041*(1.0E-06_r8*D50)**0.167_r8
+    ZD50=0.041*(ppmc*D50)**0.167_r8
     ZM(NY,NX)=ZS(NY,NX)+ZD50+1.0_r8*VOLR(NY,NX)/AREA(3,0,NY,NX)
     CER(NY,NX)=((D50+5.0_r8)/0.32_r8)**(-0.6_r8)
     XER(NY,NX)=((D50+5.0_r8)/300.0_r8)**0.25_r8
-    DETS(NY,NX)=1.0E-06_r8*(1.0_r8+2.0_r8*(1.0_r8-CSILT(NU(NY,NX),NY,NX)-CORGM))
+    DETS(NY,NX)=ppmc*(1.0_r8+2.0_r8*(1.0_r8-CSILT(NU(NY,NX),NY,NX)-CORGM))
     COHS=2.0_r8+10.0_r8*(CCLAY(NU(NY,NX),NY,NX)+CORGM) &
       +5.0_r8*(1.0_r8-EXP(-2.0E-06_r8*RTDNT(NU(NY,NX),NY,NX)))
     DETE(NY,NX)=0.79_r8*EXP(-0.85_r8*AMAX1(1.0_r8,COHS))
     PTDSNU(NY,NX)=1.30_r8*CORGM+2.66_r8*(1.0_r8-CORGM)
     VISCWL=VISCW*EXP(0.533_r8-0.0267_r8*TCS(0,NY,NX))
     VLS(NY,NX)=3.6E+03_r8*9.8_r8*(PTDSNU(NY,NX)-1.0_r8) &
-      *(1.0E-06_r8*D50)**2/(18.0_r8*VISCWL)
+      *(ppmc*D50)**2/(18.0_r8*VISCWL)
   ENDIF
   end subroutine SetSurfaceProperty4SedErosion
 !------------------------------------------------------------------------------------------
@@ -1375,25 +1378,18 @@ module Hour1Mod
 !     S*L=gas solubility
 !     C*S=soil gas aqueous concentration
 !
-  CCO2G(0,NY,NX)=CO2E(NY,NX)*5.36E-04*TREF/TKS(0,NY,NX)
-  CCH4G(0,NY,NX)=CH4E(NY,NX)*5.36E-04*TREF/TKS(0,NY,NX)
-  COXYG(0,NY,NX)=OXYE(NY,NX)*1.43E-03*TREF/TKS(0,NY,NX)
-  CZ2GG(0,NY,NX)=Z2GE(NY,NX)*1.25E-03*TREF/TKS(0,NY,NX)
-  CZ2OG(0,NY,NX)=Z2OE(NY,NX)*1.25E-03*TREF/TKS(0,NY,NX)
-  CNH3G(0,NY,NX)=ZNH3E(NY,NX)*6.25E-04*TREF/TKS(0,NY,NX)
+  CCO2G(0,NY,NX)=CO2E(NY,NX)*5.36E-04_r8*TREF/TKS(0,NY,NX)
+  CCH4G(0,NY,NX)=CH4E(NY,NX)*5.36E-04_r8*TREF/TKS(0,NY,NX)
+  COXYG(0,NY,NX)=OXYE(NY,NX)*1.43E-03_r8*TREF/TKS(0,NY,NX)
+  CZ2GG(0,NY,NX)=Z2GE(NY,NX)*1.25E-03_r8*TREF/TKS(0,NY,NX)
+  CZ2OG(0,NY,NX)=Z2OE(NY,NX)*1.25E-03_r8*TREF/TKS(0,NY,NX)
+  CNH3G(0,NY,NX)=ZNH3E(NY,NX)*6.25E-04_r8*TREF/TKS(0,NY,NX)
   CH2GG(0,NY,NX)=H2GE(NY,NX)*8.92E-05*TREF/TKS(0,NY,NX)
   CNH4B(0,NY,NX)=0.0_r8
   CNH3B(0,NY,NX)=0.0_r8
   CNO3B(0,NY,NX)=0.0_r8
   CNO2B(0,NY,NX)=0.0_r8
   CH2P4B(0,NY,NX)=0.0_r8
-  SCO2L(0,NY,NX)=gas_solubility(id_co2g,TCS(0,NY,NX))
-  SCH4L(0,NY,NX)=gas_solubility(id_ch4g,TCS(0,NY,NX))
-  SOXYL(0,NY,NX)=gas_solubility(id_o2g,TCS(0,NY,NX))
-  SN2GL(0,NY,NX)=gas_solubility(id_n2g,TCS(0,NY,NX))
-  SN2OL(0,NY,NX)=gas_solubility(id_n2og,TCS(0,NY,NX))
-  SNH3L(0,NY,NX)=gas_solubility(id_nh3g,TCS(0,NY,NX))
-  SH2GL(0,NY,NX)=gas_solubility(id_h2g,TCS(0,NY,NX))
   IF(VOLW(0,NY,NX).GT.ZEROS2(NY,NX))THEN
     CCO2S(0,NY,NX)=AZMAX1(CO2S(0,NY,NX)/VOLW(0,NY,NX))
     CCH4S(0,NY,NX)=AZMAX1(CH4S(0,NY,NX)/VOLW(0,NY,NX))
@@ -1446,12 +1442,12 @@ module Hour1Mod
   RN2OX(0,NY,NX)=0.0_r8
   RP14X(0,NY,NX)=0.0_r8
   RPO4X(0,NY,NX)=0.0_r8
-  DO 5055 K=0,jcplx1
+  D5055: DO K=0,jcplx1
     ROQCY(K,0,NY,NX)=ROQCX(K,0,NY,NX)
     ROQAY(K,0,NY,NX)=ROQAX(K,0,NY,NX)
     ROQCX(K,0,NY,NX)=0.0_r8
     ROQAX(K,0,NY,NX)=0.0_r8
-5055  CONTINUE
+  ENDDO D5055
 !
 !     WGSGA,WGSGR,WGSGW=vapor diffusivity in air,litter,snowpack
 !
@@ -1459,10 +1455,10 @@ module Hour1Mod
   WGSGA(NY,NX)=WGSG*TFACA
   TFACR=TEFGASDIF(TKS(0,NY,NX))
   WGSGR(NY,NX)=WGSG*TFACR
-  DO  L=1,JS
+  D5060: DO  L=1,JS
     TFACW=TEFGASDIF(TKW(L,NY,NX))
     WGSGW(L,NY,NX)=WGSG*TFACW
-  ENDDO
+  ENDDO D5060
   end subroutine SetTracerPropertyInLiterAir
 !------------------------------------------------------------------------------------------
 
@@ -1481,86 +1477,86 @@ module Hour1Mod
 !     VLNH4,VLNO3,VLPO4=fraction of soil volume in NH4,NO3,PO4 non-band
 !
   DO L=NUI(NY,NX),NLI(NY,NX)
-  IF(VOLW(L,NY,NX).GT.ZEROS2(NY,NX))THEN
-    IF(VLNH4(L,NY,NX).GT.ZERO)THEN
-      CNH4S(L,NY,NX)=AZMAX1(ZNH4S(L,NY,NX)/(VOLW(L,NY,NX)*VLNH4(L,NY,NX)))
-      CNH3S(L,NY,NX)=AZMAX1(ZNH3S(L,NY,NX)/(VOLW(L,NY,NX)*VLNH4(L,NY,NX)))
-    ELSE
-      CNH4S(L,NY,NX)=0.0_r8
-      CNH3S(L,NY,NX)=0.0_r8
-    ENDIF
-    IF(VLNO3(L,NY,NX).GT.ZERO)THEN
-      CNO3S(L,NY,NX)=AZMAX1(ZNO3S(L,NY,NX)/(VOLW(L,NY,NX)*VLNO3(L,NY,NX)))
-      CNO2S(L,NY,NX)=AZMAX1(ZNO2S(L,NY,NX)/(VOLW(L,NY,NX)*VLNO3(L,NY,NX)))
-    ELSE
-      CNO3S(L,NY,NX)=0.0_r8
-      CNO2S(L,NY,NX)=0.0_r8
-    ENDIF
-    IF(VLPO4(L,NY,NX).GT.ZERO)THEN
-      CH1P4(L,NY,NX)=AZMAX1(H1PO4(L,NY,NX)/(VOLW(L,NY,NX)*VLPO4(L,NY,NX)))
-      CH2P4(L,NY,NX)=AZMAX1(H2PO4(L,NY,NX)/(VOLW(L,NY,NX)*VLPO4(L,NY,NX)))
-      CPO4S(L,NY,NX)=AZMAX1(((H0PO4(L,NY,NX)+H3PO4(L,NY,NX) &
-        +ZFE1P(L,NY,NX)+ZFE2P(L,NY,NX)+ZCA0P(L,NY,NX) &
-        +ZCA1P(L,NY,NX)+ZCA2P(L,NY,NX)+ZMG1P(L,NY,NX))*31.0 &
-        +H1PO4(L,NY,NX)+H2PO4(L,NY,NX))/(VOLW(L,NY,NX)*VLPO4(L,NY,NX)))
-    ELSE
-      CH1P4(L,NY,NX)=0.0_r8
-      CH2P4(L,NY,NX)=0.0_r8
-      CPO4S(L,NY,NX)=0.0_r8
-    ENDIF
+    IF(VOLW(L,NY,NX).GT.ZEROS2(NY,NX))THEN
+      IF(VLNH4(L,NY,NX).GT.ZERO)THEN
+        CNH4S(L,NY,NX)=AZMAX1(ZNH4S(L,NY,NX)/(VOLW(L,NY,NX)*VLNH4(L,NY,NX)))
+        CNH3S(L,NY,NX)=AZMAX1(ZNH3S(L,NY,NX)/(VOLW(L,NY,NX)*VLNH4(L,NY,NX)))
+      ELSE
+        CNH4S(L,NY,NX)=0.0_r8
+        CNH3S(L,NY,NX)=0.0_r8
+      ENDIF
+      IF(VLNO3(L,NY,NX).GT.ZERO)THEN
+        CNO3S(L,NY,NX)=AZMAX1(ZNO3S(L,NY,NX)/(VOLW(L,NY,NX)*VLNO3(L,NY,NX)))
+        CNO2S(L,NY,NX)=AZMAX1(ZNO2S(L,NY,NX)/(VOLW(L,NY,NX)*VLNO3(L,NY,NX)))
+      ELSE
+        CNO3S(L,NY,NX)=0.0_r8
+        CNO2S(L,NY,NX)=0.0_r8
+      ENDIF
+      IF(VLPO4(L,NY,NX).GT.ZERO)THEN
+        CH1P4(L,NY,NX)=AZMAX1(H1PO4(L,NY,NX)/(VOLW(L,NY,NX)*VLPO4(L,NY,NX)))
+        CH2P4(L,NY,NX)=AZMAX1(H2PO4(L,NY,NX)/(VOLW(L,NY,NX)*VLPO4(L,NY,NX)))
+        CPO4S(L,NY,NX)=AZMAX1(((H0PO4(L,NY,NX)+H3PO4(L,NY,NX) &
+          +ZFE1P(L,NY,NX)+ZFE2P(L,NY,NX)+ZCA0P(L,NY,NX) &
+          +ZCA1P(L,NY,NX)+ZCA2P(L,NY,NX)+ZMG1P(L,NY,NX))*patomw &
+          +H1PO4(L,NY,NX)+H2PO4(L,NY,NX))/(VOLW(L,NY,NX)*VLPO4(L,NY,NX)))
+      ELSE
+        CH1P4(L,NY,NX)=0.0_r8
+        CH2P4(L,NY,NX)=0.0_r8
+        CPO4S(L,NY,NX)=0.0_r8
+      ENDIF
 !
 !     C*B=solute concentration in band
 !     CH1PB,CH2PB=HPO4,H2PO4 concentration in band
 !     Z*B=P ion pair amounts in band (see solute.f)
 !     VLNHB,VLNOB,VLPOB=fraction of soil volume in NH4,NO3,PO4 band
 !
-    IF(VLNHB(L,NY,NX).GT.ZERO)THEN
-      CNH4B(L,NY,NX)=AZMAX1(ZNH4B(L,NY,NX)/(VOLW(L,NY,NX)*VLNHB(L,NY,NX)))
-      CNH3B(L,NY,NX)=AZMAX1(ZNH3B(L,NY,NX)/(VOLW(L,NY,NX)*VLNHB(L,NY,NX)))
+      IF(VLNHB(L,NY,NX).GT.ZERO)THEN
+        CNH4B(L,NY,NX)=AZMAX1(ZNH4B(L,NY,NX)/(VOLW(L,NY,NX)*VLNHB(L,NY,NX)))
+        CNH3B(L,NY,NX)=AZMAX1(ZNH3B(L,NY,NX)/(VOLW(L,NY,NX)*VLNHB(L,NY,NX)))
+      ELSE
+        CNH4B(L,NY,NX)=0.0_r8
+        CNH3B(L,NY,NX)=0.0_r8
+      ENDIF
+      IF(VLNOB(L,NY,NX).GT.ZERO)THEN
+        CNO3B(L,NY,NX)=AZMAX1(ZNO3B(L,NY,NX)/(VOLW(L,NY,NX)*VLNOB(L,NY,NX)))
+        CNO2B(L,NY,NX)=AZMAX1(ZNO2B(L,NY,NX)/(VOLW(L,NY,NX)*VLNOB(L,NY,NX)))
+      ELSE
+        CNO3B(L,NY,NX)=0.0_r8
+        CNO2B(L,NY,NX)=0.0_r8
+      ENDIF
+      IF(VLPOB(L,NY,NX).GT.ZERO)THEN
+        CH1P4B(L,NY,NX)=AZMAX1(H1POB(L,NY,NX)/(VOLW(L,NY,NX)*VLPOB(L,NY,NX)))
+        CH2P4B(L,NY,NX)=AZMAX1(H2POB(L,NY,NX)/(VOLW(L,NY,NX)*VLPOB(L,NY,NX)))
+        CPO4B(L,NY,NX)=AZMAX1(((H0POB(L,NY,NX)+H3POB(L,NY,NX) &
+          +ZFE1PB(L,NY,NX)+ZFE2PB(L,NY,NX)+ZCA0PB(L,NY,NX) &
+          +ZCA1PB(L,NY,NX)+ZCA2PB(L,NY,NX)+ZMG1PB(L,NY,NX))*patomw &
+          +H1POB(L,NY,NX)+H2POB(L,NY,NX))/(VOLW(L,NY,NX)*VLPOB(L,NY,NX)))
+      ELSE
+        CH1P4B(L,NY,NX)=0.0_r8
+        CH2P4B(L,NY,NX)=0.0_r8
+        CPO4B(L,NY,NX)=0.0_r8
+      ENDIF
     ELSE
+      CNH4S(L,NY,NX)=0.0_r8
+      CNH3S(L,NY,NX)=0.0_r8
+      CNO3S(L,NY,NX)=0.0_r8
+      CNO2S(L,NY,NX)=0.0_r8
+      CH1P4(L,NY,NX)=0.0_r8
+      CH2P4(L,NY,NX)=0.0_r8
+      CPO4S(L,NY,NX)=0.0_r8
       CNH4B(L,NY,NX)=0.0_r8
       CNH3B(L,NY,NX)=0.0_r8
-    ENDIF
-    IF(VLNOB(L,NY,NX).GT.ZERO)THEN
-      CNO3B(L,NY,NX)=AZMAX1(ZNO3B(L,NY,NX)/(VOLW(L,NY,NX)*VLNOB(L,NY,NX)))
-      CNO2B(L,NY,NX)=AZMAX1(ZNO2B(L,NY,NX)/(VOLW(L,NY,NX)*VLNOB(L,NY,NX)))
-    ELSE
       CNO3B(L,NY,NX)=0.0_r8
       CNO2B(L,NY,NX)=0.0_r8
-    ENDIF
-    IF(VLPOB(L,NY,NX).GT.ZERO)THEN
-      CH1P4B(L,NY,NX)=AZMAX1(H1POB(L,NY,NX)/(VOLW(L,NY,NX)*VLPOB(L,NY,NX)))
-      CH2P4B(L,NY,NX)=AZMAX1(H2POB(L,NY,NX)/(VOLW(L,NY,NX)*VLPOB(L,NY,NX)))
-      CPO4B(L,NY,NX)=AZMAX1(((H0POB(L,NY,NX)+H3POB(L,NY,NX) &
-        +ZFE1PB(L,NY,NX)+ZFE2PB(L,NY,NX)+ZCA0PB(L,NY,NX) &
-        +ZCA1PB(L,NY,NX)+ZCA2PB(L,NY,NX)+ZMG1PB(L,NY,NX))*31.0 &
-        +H1POB(L,NY,NX)+H2POB(L,NY,NX))/(VOLW(L,NY,NX)*VLPOB(L,NY,NX)))
-    ELSE
       CH1P4B(L,NY,NX)=0.0_r8
       CH2P4B(L,NY,NX)=0.0_r8
       CPO4B(L,NY,NX)=0.0_r8
     ENDIF
-  ELSE
-    CNH4S(L,NY,NX)=0.0_r8
-    CNH3S(L,NY,NX)=0.0_r8
-    CNO3S(L,NY,NX)=0.0_r8
-    CNO2S(L,NY,NX)=0.0_r8
-    CH1P4(L,NY,NX)=0.0_r8
-    CH2P4(L,NY,NX)=0.0_r8
-    CPO4S(L,NY,NX)=0.0_r8
-    CNH4B(L,NY,NX)=0.0_r8
-    CNH3B(L,NY,NX)=0.0_r8
-    CNO3B(L,NY,NX)=0.0_r8
-    CNO2B(L,NY,NX)=0.0_r8
-    CH1P4B(L,NY,NX)=0.0_r8
-    CH2P4B(L,NY,NX)=0.0_r8
-    CPO4B(L,NY,NX)=0.0_r8
-  ENDIF
   ENDDO
   end subroutine GetSoluteConcentrations
 !------------------------------------------------------------------------------------------
 
-  subroutine PrepVars4PlantMicrobeUptake(NY,NX)
+  subroutine Prep4PlantMicrobeUptake(NY,NX)
   implicit none
   integer, intent(in) :: NY,NX
   real(r8) :: TFACL,TFACG
@@ -1603,12 +1599,12 @@ module Hour1Mod
     RN2BX(L,NY,NX)=0.0_r8
     RP1BX(L,NY,NX)=0.0_r8
     RPOBX(L,NY,NX)=0.0_r8
-    DO 5050 K=0,jcplx1
+    D5050: DO K=0,jcplx1
       ROQCY(K,L,NY,NX)=ROQCX(K,L,NY,NX)
       ROQAY(K,L,NY,NX)=ROQAX(K,L,NY,NX)
       ROQCX(K,L,NY,NX)=0.0_r8
       ROQAX(K,L,NY,NX)=0.0_r8
-5050  CONTINUE
+    ENDDO D5050
 !
 ! DIFFUSIVITY
 !
@@ -1665,21 +1661,21 @@ module Hour1Mod
       ZC2=ZCA(L,NY,NX)+ZMG(L,NY,NX)+ZALOH1(L,NY,NX)+ZFEOH1(L,NY,NX) &
         +ZFE2P(L,NY,NX)+ZFE2PB(L,NY,NX)
       ZA2=ZSO4(L,NY,NX)+ZCO3(L,NY,NX)+H1PO4(L,NY,NX)+H1POB(L,NY,NX)
-      ZC1=(ZNH4S(L,NY,NX)+ZNH4B(L,NY,NX))/14.0+ZHY(L,NY,NX) &
+      ZC1=(ZNH4S(L,NY,NX)+ZNH4B(L,NY,NX))/natomw+ZHY(L,NY,NX) &
         +ZNA(L,NY,NX)+ZKA(L,NY,NX)+ZALOH2(L,NY,NX)+ZFEOH2(L,NY,NX) &
         +ZALS(L,NY,NX)+ZFES(L,NY,NX)+ZCAO(L,NY,NX)+ZCAH(L,NY,NX) &
         +ZMGO(L,NY,NX)+ZMGH(L,NY,NX)+ZFE1P(L,NY,NX)+ZFE1PB(L,NY,NX) &
         +ZCA2P(L,NY,NX)+ZCA2PB(L,NY,NX)
-      ZA1=(ZNO3S(L,NY,NX)+ZNO3B(L,NY,NX))/14.0+ZOH(L,NY,NX) &
+      ZA1=(ZNO3S(L,NY,NX)+ZNO3B(L,NY,NX))/natomw+ZOH(L,NY,NX) &
         +ZHCO3(L,NY,NX)+ZCL(L,NY,NX)+ZALOH4(L,NY,NX)+ZFEOH4(L,NY,NX) &
         +ZNAC(L,NY,NX)+ZNAS(L,NY,NX)+ZKAS(L,NY,NX)+(H2PO4(L,NY,NX) &
-        +H2POB(L,NY,NX))/31.0+ZCA0P(L,NY,NX)+ZCA0PB(L,NY,NX)
-      ZN=CO2S(L,NY,NX)/12.0+CH4S(L,NY,NX)/12.0+OXYS(L,NY,NX)/32.0 &
-        +(Z2GS(L,NY,NX)+Z2OS(L,NY,NX)+ZNH3S(L,NY,NX)+ZNH3B(L,NY,NX))/14.0 &
+        +H2POB(L,NY,NX))/patomw+ZCA0P(L,NY,NX)+ZCA0PB(L,NY,NX)
+      ZN=CO2S(L,NY,NX)/catomw+CH4S(L,NY,NX)/catomw+OXYS(L,NY,NX)/32.0 &
+        +(Z2GS(L,NY,NX)+Z2OS(L,NY,NX)+ZNH3S(L,NY,NX)+ZNH3B(L,NY,NX))/natomw &
         +ZALOH3(L,NY,NX)+ZFEOH3(L,NY,NX)+ZCAC(L,NY,NX)+ZCAS(L,NY,NX) &
         +ZMGC(L,NY,NX)+ZMGS(L,NY,NX)+H3PO4(L,NY,NX)+ZCA1P(L,NY,NX) &
         +ZMG1P(L,NY,NX)+H3POB(L,NY,NX)+ZCA1PB(L,NY,NX)+ZMG1PB(L,NY,NX)
-      ZION1=ABS(3.0*(ZC3-ZA3)+2.0*(ZC2-ZA2)+ZC1-ZA1)
+      ZION1=ABS(3.0_r8*(ZC3-ZA3)+2.0_r8*(ZC2-ZA2)+ZC1-ZA1)
       IF(VOLW(L,NY,NX).GT.ZEROS2(NY,NX))THEN
         CSTR(L,NY,NX)=AZMAX1(0.5E-03_r8*(9.0_r8*(ZC3+ZA3)+4.0_r8*(ZC2+ZA2) &
           +ZC1+ZA1+ZION1)/VOLW(L,NY,NX))
@@ -1693,27 +1689,9 @@ module Hour1Mod
 ! OSTWALD COEFFICIENTS FOR CO2, CH4, O2, N2, N2O, NH3 AND H2
 ! SOLUBILITY IN WATER
 !
-! S*L=solubility of gas in water
-! TCS=soil temperature (oC)
-! 5.56E+04_r8 := mole H2O / m3
-    FH2O=5.56E+04_r8/(5.56E+04_r8+CION(L,NY,NX))
 
-    SCO2L(L,NY,NX)=gas_solubility(id_co2g,TCS(L,NY,NX)) &
-      /(EXP(ACO2X*CSTR(L,NY,NX)))*FH2O
-    SCH4L(L,NY,NX)=gas_solubility(id_ch4g,TCS(L,NY,NX)) &
-      /(EXP(ACH4X*CSTR(L,NY,NX)))*FH2O
-    SOXYL(L,NY,NX)=gas_solubility(id_o2g, TCS(L,NY,NX)) &
-      /(EXP(AOXYX*CSTR(L,NY,NX)))*FH2O
-    SN2GL(L,NY,NX)=gas_solubility(id_n2g, TCS(L,NY,NX)) &
-      /(EXP(AN2GX*CSTR(L,NY,NX)))*FH2O
-    SN2OL(L,NY,NX)=gas_solubility(id_n2og,TCS(L,NY,NX)) &
-      /(EXP(AN2OX*CSTR(L,NY,NX)))*FH2O
-    SNH3L(L,NY,NX)=gas_solubility(id_nh3g,TCS(L,NY,NX)) &
-      /(EXP(ANH3X*CSTR(L,NY,NX)))*FH2O
-    SH2GL(L,NY,NX)=gas_solubility(id_h2g, TCS(L,NY,NX)) &
-      /(EXP(AH2GX*CSTR(L,NY,NX)))*FH2O
   ENDDO
-  end subroutine PrepVars4PlantMicrobeUptake
+  end subroutine Prep4PlantMicrobeUptake
 !------------------------------------------------------------------------------------------
 
   subroutine GetSurfResidualProperties(NY,NX,DPTH0)
@@ -1890,7 +1868,7 @@ module Hour1Mod
     ELSE
       IUTYP(NY,NX)=2
     ENDIF
-    DO 9964 L=0,NL(NY,NX)
+    D9964: DO L=0,NL(NY,NX)
       IF(L.EQ.LFDPTH)THEN
         ZNHU0(L,NY,NX)=1.0_r8
         ZNHUI(L,NY,NX)=1.0_r8
@@ -1898,10 +1876,10 @@ module Hour1Mod
         ZNHU0(L,NY,NX)=0.0_r8
         ZNHUI(L,NY,NX)=0.0_r8
       ENDIF
-9964  CONTINUE
+    ENDDO D9964
   ENDIF
   IF(IYTYP(0,I,NY,NX).EQ.3.OR.IYTYP(0,I,NY,NX).EQ.4)THEN
-    DO 9965 L=0,NL(NY,NX)
+    D9965: DO L=0,NL(NY,NX)
       IF(L.EQ.LFDPTH)THEN
         ZNFN0(L,NY,NX)=1.0_r8
         ZNFNI(L,NY,NX)=1.0_r8
@@ -1909,7 +1887,7 @@ module Hour1Mod
         ZNFN0(L,NY,NX)=0.0_r8
         ZNFNI(L,NY,NX)=0.0_r8
       ENDIF
-9965  CONTINUE
+    ENDDO D9965
   ENDIF
   end subroutine ApplyUreaNitrifierInhibitor
 !------------------------------------------------------------------------------------------
@@ -2181,7 +2159,7 @@ module Hour1Mod
         OSN(M,K,LFDPTH,NY,NX)=OSN(M,K,LFDPTH,NY,NX)+OSN1
         OSP(M,K,LFDPTH,NY,NX)=OSP(M,K,LFDPTH,NY,NX)+OSP1
         IF(LFDPTH.EQ.0)THEN
-          VOLT(LFDPTH,NY,NX)=VOLT(LFDPTH,NY,NX)+OSC1*1.0E-06/BKRS(1)
+          VOLT(LFDPTH,NY,NX)=VOLT(LFDPTH,NY,NX)+OSC1*ppmc/BKRS(1)
         ENDIF
       ENDDO D2970
       TORGF=TORGF+OSCI
@@ -2515,7 +2493,7 @@ module Hour1Mod
     TZIN=TZIN+natomw*(Z4AX+Z3AX+ZUAX+ZOAX+Z4BX+Z3BX+ZUBX+ZOBX)
     TPIN=TPIN+62.0*(PMAX+PMBX)+93.0*PHAX
     TIONIN=TIONIN+2.0*(CACX+CASX)
-    UFERTN(NY,NX)=UFERTN(NY,NX)+14.0*(Z4AX+Z4BX+Z3AX+Z3BX+ZUAX+ZUBX+ZOAX+ZOBX)
+    UFERTN(NY,NX)=UFERTN(NY,NX)+natomw*(Z4AX+Z4BX+Z3AX+Z3BX+ZUAX+ZUBX+ZOAX+ZOBX)
     UFERTP(NY,NX)=UFERTP(NY,NX)+62.0*(PMAX+PMBX)+93.0*PHAX
   ENDIF
   end subroutine ApplyMineralFertilizer
@@ -2804,4 +2782,33 @@ module Hour1Mod
   ENDDO
   end subroutine ZeroHourlyArrays
 
+!------------------------------------------------------------------------------------------
+
+  subroutine CalGasSolubility(NY,NX)
+  implicit none
+  integer, intent(in) :: NY,NX
+  integer  :: L
+  real(r8) :: FH2O
+  L=0
+  SCO2L(L,NY,NX)=gas_solubility(id_co2g,TCS(L,NY,NX))
+  SCH4L(L,NY,NX)=gas_solubility(id_ch4g,TCS(L,NY,NX))
+  SOXYL(L,NY,NX)=gas_solubility(id_o2g,TCS(L,NY,NX))
+  SN2GL(L,NY,NX)=gas_solubility(id_n2g,TCS(L,NY,NX))
+  SN2OL(L,NY,NX)=gas_solubility(id_n2og,TCS(L,NY,NX))
+  SNH3L(L,NY,NX)=gas_solubility(id_nh3g,TCS(L,NY,NX))
+  SH2GL(L,NY,NX)=gas_solubility(id_h2g,TCS(L,NY,NX))
+  DO  L=1,NL(NY,NX)+1
+! S*L=solubility of gas in water
+! TCS=soil temperature (oC)
+! 5.56E+04_r8 := mole H2O / m3
+    FH2O=5.56E+04_r8/(5.56E+04_r8+CION(L,NY,NX))
+    SCO2L(L,NY,NX)=gas_solubility(id_co2g,TCS(L,NY,NX))/(EXP(ACO2X*CSTR(L,NY,NX)))*FH2O
+    SCH4L(L,NY,NX)=gas_solubility(id_ch4g,TCS(L,NY,NX))/(EXP(ACH4X*CSTR(L,NY,NX)))*FH2O
+    SOXYL(L,NY,NX)=gas_solubility(id_o2g, TCS(L,NY,NX))/(EXP(AOXYX*CSTR(L,NY,NX)))*FH2O
+    SN2GL(L,NY,NX)=gas_solubility(id_n2g, TCS(L,NY,NX))/(EXP(AN2GX*CSTR(L,NY,NX)))*FH2O
+    SN2OL(L,NY,NX)=gas_solubility(id_n2og,TCS(L,NY,NX))/(EXP(AN2OX*CSTR(L,NY,NX)))*FH2O
+    SNH3L(L,NY,NX)=gas_solubility(id_nh3g,TCS(L,NY,NX))/(EXP(ANH3X*CSTR(L,NY,NX)))*FH2O
+    SH2GL(L,NY,NX)=gas_solubility(id_h2g, TCS(L,NY,NX))/(EXP(AH2GX*CSTR(L,NY,NX)))*FH2O
+  ENDDO
+  end subroutine CalGasSolubility
 end module Hour1Mod

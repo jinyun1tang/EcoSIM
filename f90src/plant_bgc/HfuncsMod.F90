@@ -116,7 +116,7 @@ module HfuncsMod
 !               IFLGP=flag for remobilization
 !
             KVSTGX=KVSTG(NB,NZ)
-            IF(VSTGX(NB,NZ).LE.1.0E-06)THEN
+            IF(VSTGX(NB,NZ).LE.ppmc)THEN
               KVSTG(NB,NZ)=INT(VSTG(NB,NZ))+1
             ELSE
               KVSTG(NB,NZ)=INT(AMIN1(VSTG(NB,NZ),VSTGX(NB,NZ)))+1
@@ -487,7 +487,7 @@ module HfuncsMod
     ARLSP=ARLFP(NZ)+ARSTP(NZ)
     IF((HTCTL(NZ).GT.SDPTH(NZ)) &
       .AND.(ARLSP.GT.ZEROL(NZ)) &
-      .AND.(RTDP1(1,1,NZ).GT.SDPTH(NZ)+1.0E-06))THEN
+      .AND.(RTDP1(1,1,NZ).GT.SDPTH(NZ)+ppmc))THEN
       IDAY(1,NB1(NZ),NZ)=I
       VHCPC(NZ)=cpw*(WTSHT(NZ)*10.0E-06+VOLWC(NZ))
     ENDIF

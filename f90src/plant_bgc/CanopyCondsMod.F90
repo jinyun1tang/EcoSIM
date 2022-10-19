@@ -170,7 +170,7 @@ module CanopyCondsMod
 2765  CONTINUE
     D2770: DO L=JC1,2,-1
       ZL(L-1)=ZL1(L-1)
-!     ZL(L-1)=AZMAX1(AMIN1(ZL(L)-1.0E-06_r8
+!     ZL(L-1)=AZMAX1(AMIN1(ZL(L)-ppmc
 !    2,ZL(L-1)))
     ENDDO D2770
   ENDIF

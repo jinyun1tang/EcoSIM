@@ -4,6 +4,7 @@ module StartqsMod
   use minimathmod, only : AZMAX1
   use EcoSIMConfig
   use PlantAPIData
+  use MicBGCPars, only : micpar
   implicit none
 
   private
@@ -48,8 +49,8 @@ module StartqsMod
 !
 
       NZ2X=MIN(NZ2Q,NP)
-      DO 9985 NZ=NZ1Q,NZ2X
-        print*,'startqs',IFLGC(NZ)
+      D9985: DO NZ=NZ1Q,NZ2X
+
         IF(IFLGC(NZ).EQ.0)THEN
 
           call InitShootGrowth(NZ)
@@ -73,11 +74,11 @@ module StartqsMod
         ZEROP(NZ)=ZERO*PP(NZ)
         ZEROQ(NZ)=ZERO*PP(NZ)/AREA3(NU)
         ZEROL(NZ)=ZERO*PP(NZ)*1.0E+06_r8
-9985  CONTINUE
+      ENDDO D9985
 !
 !     FILL OUT UNUSED ARRAYS
 !
-      DO 9986 NZ=NP+1,5
+      D9986: DO NZ=NP+1,5
         plt_bgcr%TCSN0(NZ)=0._r8
         plt_bgcr%TZSN0(NZ)=0._r8
         plt_bgcr%TPSN0(NZ)=0._r8
@@ -87,16 +88,16 @@ module StartqsMod
         plt_biom%WTSTG(NZ)=0._r8
         plt_biom%WTSTGN(NZ)=0._r8
         plt_biom%WTSTGP(NZ)=0._r8
-        DO 6401 L=1,NL
-          DO  K=0,1
+        D6401: DO L=1,NL
+          DO  K=0,micpar%n_pltlitrk
             DO  M=1,jsken
               plt_bgcr%CSNC(M,K,L,NZ)=0._r8
               plt_bgcr%ZSNC(M,K,L,NZ)=0._r8
               plt_bgcr%PSNC(M,K,L,NZ)=0._r8
             enddo
           enddo
-6401    CONTINUE
-9986  CONTINUE
+        ENDDO D6401
+      ENDDO D9986
   RETURN
   end associate
   END subroutine startqs
@@ -521,7 +522,7 @@ module StartqsMod
   DO 500 N=1,2
     PORTX(N,NZ)=PORT(N,NZ)**1.33_r8
     RRADP(N,NZ)=LOG(1.0_r8/SQRT(AMAX1(0.01_r8,PORT(N,NZ))))
-    DMVL(N,NZ)=1.0E-06_r8/(0.05_r8*(1.0-PORT(N,NZ)))
+    DMVL(N,NZ)=ppmc/(0.05_r8*(1.0-PORT(N,NZ)))
     RTLG1X(N,NZ)=DMVL(N,NZ)/(PICON*RRAD1M(N,NZ)**2)
     RTLG2X(N,NZ)=DMVL(N,NZ)/(PICON*RRAD2M(N,NZ)**2)
     RRAD1X(N,NZ)=RRAD1M(N,NZ)
@@ -1170,7 +1171,7 @@ module StartqsMod
   WTLSB(1,NZ)=WTLFB(1,NZ)+WTSHEB(1,NZ)
   WTLS(NZ)=WTLS(NZ)+WTLSB(1,NZ)
   FDM=AMIN1(1.0,0.16-0.045*PSILT(NZ))
-  VOLWP(NZ)=1.0E-06*WTLS(NZ)/FDM
+  VOLWP(NZ)=ppmc*WTLS(NZ)/FDM
   VOLWC(NZ)=0._r8
   ZPOOL(1,NZ)=CNGR(NZ)*CPOOL(1,NZ)
   PPOOL(1,NZ)=CPGR(NZ)*CPOOL(1,NZ)
