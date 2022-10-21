@@ -158,45 +158,35 @@
         TNPP(NY,NX)=0._r8
         TRAU(NY,NX)=0._r8
         TCAN(NY,NX)=0._r8
-        XHVSTC(NY,NX)=0._r8
-        XHVSTN(NY,NX)=0._r8
-        XHVSTP(NY,NX)=0._r8
+        XHVSTE(NY,NX,:)=0._r8
         TRINH4(NY,NX)=0._r8
         TRIPO4(NY,NX)=0._r8
         D960: DO NZ=1,NP0(NY,NX)
-          RSETC(NZ,NY,NX)=RSETC(NZ,NY,NX)+CARBN(NZ,NY,NX)+TCUPTK(NZ,NY,NX) &
-            -TCSNC(NZ,NY,NX)+TCO2T(NZ,NY,NX)-VCO2F(NZ,NY,NX)-VCH4F(NZ,NY,NX)
-          RSETN(NZ,NY,NX)=RSETN(NZ,NY,NX)+TZUPTK(NZ,NY,NX)+TNH3C(NZ,NY,NX) &
-            -TZSNC(NZ,NY,NX)-VNH3F(NZ,NY,NX)-VN2OF(NZ,NY,NX)+TZUPFX(NZ,NY,NX)
-          RSETP(NZ,NY,NX)=RSETP(NZ,NY,NX)+TPUPTK(NZ,NY,NX) &
-            -TPSNC(NZ,NY,NX)-VPO4F(NZ,NY,NX)
+          RSETC(NZ,NY,NX)=RSETC(NZ,NY,NX)+CARBN(NZ,NY,NX)+TEUPTK(NZ,NY,NX,ielmc) &
+            -TESNC(NZ,NY,NX,ielmc)+TCO2T(NZ,NY,NX)-VCO2F(NZ,NY,NX)-VCH4F(NZ,NY,NX)
+          RSETN(NZ,NY,NX)=RSETN(NZ,NY,NX)+TEUPTK(NZ,NY,NX,ielmn)+TNH3C(NZ,NY,NX) &
+            -TESNC(NZ,NY,NX,ielmn)-VNH3F(NZ,NY,NX)-VN2OF(NZ,NY,NX)+TZUPFX(NZ,NY,NX)
+          RSETP(NZ,NY,NX)=RSETP(NZ,NY,NX)+TEUPTK(NZ,NY,NX,ielmp) &
+            -TESNC(NZ,NY,NX,ielmp)-VPO4F(NZ,NY,NX)
           CARBN(NZ,NY,NX)=0._r8
-          TCUPTK(NZ,NY,NX)=0._r8
+          TEUPTK(NZ,NY,NX,:)=0._r8
           TCO2T(NZ,NY,NX)=0._r8
           TCO2A(NZ,NY,NX)=0._r8
           CTRAN(NZ,NY,NX)=0._r8
-          TZUPTK(NZ,NY,NX)=0._r8
           TZUPFX(NZ,NY,NX)=0._r8
           TNH3C(NZ,NY,NX)=0._r8
-          TPUPTK(NZ,NY,NX)=0._r8
           VCO2F(NZ,NY,NX)=0._r8
           VCH4F(NZ,NY,NX)=0._r8
           VOXYF(NZ,NY,NX)=0._r8
           VNH3F(NZ,NY,NX)=0._r8
           VN2OF(NZ,NY,NX)=0._r8
           VPO4F(NZ,NY,NX)=0._r8
-          THVSTC(NZ,NY,NX)=THVSTC(NZ,NY,NX)+HVSTC(NZ,NY,NX)
-          THVSTN(NZ,NY,NX)=THVSTN(NZ,NY,NX)+HVSTN(NZ,NY,NX)
-          THVSTP(NZ,NY,NX)=THVSTP(NZ,NY,NX)+HVSTP(NZ,NY,NX)
-          HVSTC(NZ,NY,NX)=0._r8
-          HVSTN(NZ,NY,NX)=0._r8
-          HVSTP(NZ,NY,NX)=0._r8
-          TCSN0(NZ,NY,NX)=0._r8
-          TZSN0(NZ,NY,NX)=0._r8
-          TPSN0(NZ,NY,NX)=0._r8
-          TCSNC(NZ,NY,NX)=0._r8
-          TZSNC(NZ,NY,NX)=0._r8
-          TPSNC(NZ,NY,NX)=0._r8
+          THVSTE(NZ,NY,NX,ielmc)=THVSTE(NZ,NY,NX,ielmc)+HVSTE(NZ,NY,NX,ielmc)
+          THVSTE(NZ,NY,NX,ielmn)=THVSTE(NZ,NY,NX,ielmn)+HVSTE(NZ,NY,NX,ielmn)
+          THVSTE(NZ,NY,NX,ielmp)=THVSTE(NZ,NY,NX,ielmp)+HVSTE(NZ,NY,NX,ielmp)
+          HVSTE(NZ,NY,NX,:)=0._r8
+          TESN0(NZ,NY,NX,:)=0._r8
+          TESNC(NZ,NY,NX,:)=0._r8
         ENDDO D960
         IF(IERSNG.EQ.1.OR.IERSNG.EQ.3)THEN
           TSED(NY,NX)=0._r8

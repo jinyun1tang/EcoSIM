@@ -1,5 +1,6 @@
 module EcoSimSumDataType
   use data_kind_mod, only : r8 => SHR_KIND_R8
+  use ElmIDMod
   implicit none
   public
   save
@@ -24,9 +25,7 @@ module EcoSimSumDataType
   real(r8) :: TLNH4    !total soil NH4 content	g d-2
   real(r8) :: TLNO3    !total soil NO3 content	g d-2
   real(r8) :: TLPO4    !total soil PO4 content	g d-2
-  real(r8) :: TBALC    !total plant C balance	g d-2
-  real(r8) :: TBALN    !total plant N balance	g d-2
-  real(r8) :: TBALP    !total plant P balance	g d-2
+  real(r8), pointer :: TBALE(:)    !total plant element balance	g d-2
   real(r8) :: CRAIN    !total precipitation	m3 d-2
   real(r8) :: HEATIN   !total surface heat flux	MJ d-2
   real(r8) :: OXYGIN   !total surface O2 flux	g d-2
@@ -51,4 +50,27 @@ module EcoSimSumDataType
   real(r8) :: TLCO2G   !total soil CO2	g d-2
   real(r8) :: TLN2G    !total soil N2	g d-2
 
+  private :: InitAllocate
+  contains
+
+
+  subroutine InitEcoSimSum
+  implicit none
+
+  call InitAllocate
+
+  end subroutine InitEcoSimSum
+
+  subroutine InitAllocate
+  implicit none
+
+  allocate(TBALE(npelms)); TBALE=0._r8
+  end subroutine InitAllocate
+
+!----------------------------------------------------------------------
+  subroutine DestructEcoSimSum
+  use abortutils, only : destroy
+  implicit none
+  call destroy(TBALE)
+  end subroutine DestructEcoSimSum
 end module EcoSimSumDataType

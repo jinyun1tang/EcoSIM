@@ -4,6 +4,7 @@ module EcosimBGCFluxType
 ! Ecosystm fluxes for C, N, and P budget
   use data_kind_mod, only : r8 => SHR_KIND_R8
   use GridConsts
+  use ElmIDMod
   implicit none
   public
   save
@@ -18,16 +19,12 @@ module EcosimBGCFluxType
   real(r8),allocatable ::  TRAU(:,:)                          !ecosystem autotrophic respiration, [g d-2 h-1]
   real(r8),allocatable ::  TNPP(:,:)                          !ecosystem NPP, [g d-2 h-1]
   real(r8),allocatable ::  THRE(:,:)                          !ecosystem heterotrophic respiration, [g d-2 h-1]
-  real(r8),allocatable ::  XHVSTC(:,:)                        !ecosystem harvest C, [g d-2]
-  real(r8),allocatable ::  XHVSTN(:,:)                        !ecosystem harvest N, [g d-2]
-  real(r8),allocatable ::  XHVSTP(:,:)                        !ecosystem harvest P, [g d-2]
+  real(r8),allocatable ::  XHVSTE(:,:,:)                      !ecosystem harvest , [g d-2]
   real(r8),allocatable ::  TRINH4(:,:)                        !total NH4 net mineraln (-ve) or immobiln (+ve)
   real(r8),allocatable ::  TRIPO4(:,:)                        !total H2PO4 net mineraln (-ve) or immobiln (+ve)
   real(r8),allocatable ::  GPP(:,:)                           !gross primary productivity, [g d-2 h-1]
   real(r8),allocatable ::  TCCAN(:,:)                         !total net CO2 fixation
-  real(r8),allocatable ::  ZCSNC(:,:)                         !total litterfall C, [g d-2 h-1]
-  real(r8),allocatable ::  ZZSNC(:,:)                         !total litterfall N, [g d-2 h-1]
-  real(r8),allocatable ::  ZPSNC(:,:)                         !total litterfall P, [g d-2 h-1]
+  real(r8),allocatable ::  ZESNC(:,:,:)                       !total litterfall element, [g d-2 h-1]
   real(r8),allocatable ::  RECO(:,:)                          !ecosystem respiration, [g d-2 h-1]
   real(r8),allocatable ::  TNBP(:,:)                          !total NBP, [g d-2]
   real(r8),allocatable ::  RP14X(:,:,:)                       !HPO4 demand in non-band by all microbial,root,myco populations
@@ -49,16 +46,12 @@ contains
   allocate(TRAU(JY,JX));        TRAU=0._r8
   allocate(TNPP(JY,JX));        TNPP=0._r8
   allocate(THRE(JY,JX));        THRE=0._r8
-  allocate(XHVSTC(JY,JX));      XHVSTC=0._r8
-  allocate(XHVSTN(JY,JX));      XHVSTN=0._r8
-  allocate(XHVSTP(JY,JX));      XHVSTP=0._r8
+  allocate(XHVSTE(JY,JX,npelms));      XHVSTE=0._r8
   allocate(TRINH4(JY,JX));      TRINH4=0._r8
   allocate(TRIPO4(JY,JX));      TRIPO4=0._r8
   allocate(GPP(JY,JX));         GPP=0._r8
   allocate(TCCAN(JY,JX));       TCCAN=0._r8
-  allocate(ZCSNC(JY,JX));       ZCSNC=0._r8
-  allocate(ZZSNC(JY,JX));       ZZSNC=0._r8
-  allocate(ZPSNC(JY,JX));       ZPSNC=0._r8
+  allocate(ZESNC(JY,JX,npelms));       ZESNC=0._r8
   allocate(RECO(JY,JX));        RECO=0._r8
   allocate(TNBP(JY,JX));        TNBP=0._r8
   allocate(RP14X(0:JZ,JY,JX));  RP14X=0._r8
@@ -79,16 +72,12 @@ contains
   call destroy(TRAU)
   call destroy(TNPP)
   call destroy(THRE)
-  call destroy(XHVSTC)
-  call destroy(XHVSTN)
-  call destroy(XHVSTP)
+  call destroy(XHVSTE)
   call destroy(TRINH4)
   call destroy(TRIPO4)
   call destroy(GPP)
   call destroy(TCCAN)
-  call destroy(ZCSNC)
-  call destroy(ZZSNC)
-  call destroy(ZPSNC)
+  call destroy(ZESNC)
   call destroy(RECO)
   call destroy(TNBP)
   call destroy(RP14X)

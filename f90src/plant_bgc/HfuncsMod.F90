@@ -234,8 +234,8 @@ module HfuncsMod
 
 ! begin_execution
   associate(                            &
-    CCPOLP  =>   plt_biom%CCPOLP  , &
-    WTRVC   =>   plt_biom%WTRVC   , &
+    CEPOLP  =>   plt_biom%CEPOLP  , &
+    WTRVE   =>   plt_biom%WTRVE   , &
     GROUP   =>   plt_pheno%GROUP  , &
     IDAY    =>   plt_pheno%IDAY   , &
     IFLGI   =>   plt_pheno%IFLGI  , &
@@ -286,8 +286,8 @@ module HfuncsMod
     IF(J.EQ.1.AND.PP(NZ).GT.0.0)THEN
       IF(PSIRG(1,NG(NZ),NZ).GT.PSILM)THEN
         IF(ISTYP(NZ).NE.0.OR.IDAY(2,NB1(NZ),NZ).EQ.0)THEN
-          IF((NBR(NZ).EQ.0.AND.WTRVC(NZ).GT.0.0) &
-            .OR.(CCPOLP(NZ).GT.PB(NZ).AND.PB(NZ).GT.0.0))THEN
+          IF((NBR(NZ).EQ.0.AND.WTRVE(NZ,ielmc).GT.0.0) &
+            .OR.(CEPOLP(NZ,ielmc).GT.PB(NZ).AND.PB(NZ).GT.0.0))THEN
             DO 120 NB=1,JC1
               IF(IDTHB(NB,NZ).EQ.1)THEN
                 IF(NB.EQ.NB1(NZ) &
@@ -320,8 +320,8 @@ module HfuncsMod
       IF(PSIRG(1,NG(NZ),NZ).GT.PSILM)THEN
         IF(NRT(NZ).EQ.0.OR.PSTG(NB1(NZ),NZ) &
           .GT.NRT(NZ)/FNOD(NZ)+XTLI(NZ))THEN
-          IF((NRT(NZ).EQ.0.AND.WTRVC(NZ).GT.0.0) &
-            .OR.(CCPOLP(NZ).GT.PR(NZ).AND.PR(NZ).GT.0.0))THEN
+          IF((NRT(NZ).EQ.0.AND.WTRVE(NZ,ielmc).GT.0.0) &
+            .OR.(CEPOLP(NZ,ielmc).GT.PR(NZ).AND.PR(NZ).GT.0.0))THEN
             NRT(NZ)=MIN(JC1,NRT(NZ)+1)
             IDTHR(NZ)=0
           ENDIF
@@ -342,23 +342,17 @@ module HfuncsMod
   associate(                           &
     WTLS   =>  plt_biom%WTLS     , &
     WTLSB  =>  plt_biom%WTLSB    , &
-    WTSHT  =>  plt_biom%WTSHT    , &
+    WTSHTE =>  plt_biom%WTSHTE   , &
     CCPLNP =>  plt_biom%CCPLNP   , &
     CCPOLB =>  plt_biom%CCPOLB   , &
     CZPOLB =>  plt_biom%CZPOLB   , &
     CPPOLB =>  plt_biom%CPPOLB   , &
-    CCPOLP =>  plt_biom%CCPOLP   , &
-    CZPOLP =>  plt_biom%CZPOLP   , &
-    CPPOLP =>  plt_biom%CPPOLP   , &
-    CPOOLP =>  plt_biom%CPOOLP   , &
-    ZPOOLP =>  plt_biom%ZPOOLP   , &
-    PPOOLP =>  plt_biom%PPOOLP   , &
+    CEPOLP =>  plt_biom%CEPOLP   , &
+    EPOOLP =>  plt_biom%EPOOLP   , &
     CPOLNB =>  plt_biom%CPOLNB   , &
     ZPOLNB =>  plt_biom%ZPOLNB   , &
     PPOLNB =>  plt_biom%PPOLNB   , &
-    CPOOLR =>  plt_biom%CPOOLR   , &
-    ZPOOLR =>  plt_biom%ZPOOLR   , &
-    PPOOLR =>  plt_biom%PPOOLR   , &
+    EPOOLR =>  plt_biom%EPOOLR   , &
     CPOOL  =>  plt_biom%CPOOL    , &
     ZPOOL  =>  plt_biom%ZPOOL    , &
     PPOOL  =>  plt_biom%PPOOL    , &
@@ -395,9 +389,7 @@ module HfuncsMod
   plt_bgcr%RN2OZ(NZ)=0.0_r8
   plt_bgcr%RNH3Z(NZ)=0.0_r8
   plt_bgcr%RH2GZ(NZ)=0.0_r8
-  CPOOLP(NZ)=0.0_r8
-  ZPOOLP(NZ)=0.0_r8
-  PPOOLP(NZ)=0.0_r8
+  EPOOLP(NZ,:)=0.0_r8
   NI(NZ)=NIX(NZ)
   NG(NZ)=MIN(NI(NZ),MAX(NG(NZ),NU))
   NB1(NZ)=1
@@ -409,11 +401,11 @@ module HfuncsMod
 ! CPOLN*,ZPOLN*,PPOLN*=non-structl C,N,P in branch,canopy nodules (g)
 ! NB1=main branch number
 !
-  DO 140 NB=1,NBR(NZ)
+  D140: DO NB=1,NBR(NZ)
     IF(IDTHB(NB,NZ).EQ.0)THEN
-      CPOOLP(NZ)=CPOOLP(NZ)+CPOOL(NB,NZ)
-      ZPOOLP(NZ)=ZPOOLP(NZ)+ZPOOL(NB,NZ)
-      PPOOLP(NZ)=PPOOLP(NZ)+PPOOL(NB,NZ)
+      EPOOLP(NZ,ielmc)=EPOOLP(NZ,ielmc)+CPOOL(NB,NZ)
+      EPOOLP(NZ,ielmn)=EPOOLP(NZ,ielmn)+ZPOOL(NB,NZ)
+      EPOOLP(NZ,ielmp)=EPOOLP(NZ,ielmp)+PPOOL(NB,NZ)
       CPOLNP(NZ)=CPOLNP(NZ)+CPOLNB(NB,NZ)
       ZPOLNP(NZ)=ZPOLNP(NZ)+ZPOLNB(NB,NZ)
       PPOLNP(NZ)=PPOLNP(NZ)+PPOLNB(NB,NZ)
@@ -422,7 +414,7 @@ module HfuncsMod
         NBTX=NBTB(NB,NZ)
       ENDIF
     ENDIF
-140   CONTINUE
+  ENDDO D140
 !
 ! NON-STRUCTURAL C, N, P CONCENTRATIONS IN ROOT
 !
@@ -433,10 +425,10 @@ module HfuncsMod
   DO 180 N=1,MY(NZ)
     DO 160 L=NU,NI(NZ)
       IF(WTRTL(N,L,NZ).GT.ZEROL(NZ))THEN
-        CCPOLR(N,L,NZ)=AZMAX1(CPOOLR(N,L,NZ)/WTRTL(N,L,NZ))
-        CZPOLR(N,L,NZ)=AZMAX1(ZPOOLR(N,L,NZ)/WTRTL(N,L,NZ))
-        CPPOLR(N,L,NZ)=AZMAX1(PPOOLR(N,L,NZ)/WTRTL(N,L,NZ))
-!       CCPOLR(N,L,NZ)=AMIN1(1.0,CCPOLR(N,L,NZ))
+        CCPOLR(N,L,NZ)=AZMAX1(EPOOLR(N,L,NZ,ielmc)/WTRTL(N,L,NZ))
+        CZPOLR(N,L,NZ)=AZMAX1(EPOOLR(N,L,NZ,ielmn)/WTRTL(N,L,NZ))
+        CPPOLR(N,L,NZ)=AZMAX1(EPOOLR(N,L,NZ,ielmp)/WTRTL(N,L,NZ))
+!       CCPOLR(N,L,NZ)=AMIN1(1.0_r8,CCPOLR(N,L,NZ))
       ELSE
         CCPOLR(N,L,NZ)=1.0
         CZPOLR(N,L,NZ)=1.0
@@ -452,17 +444,17 @@ module HfuncsMod
 ! CCPOLB,CZPOLB,CPPOLB=nonstructural C,N,P concn in branch(g g-1)
 !
   IF(WTLS(NZ).GT.ZEROL(NZ))THEN
-    CCPOLP(NZ)=AZMAX1(AMIN1(1.0,CPOOLP(NZ)/WTLS(NZ)))
-    CCPLNP(NZ)=AZMAX1(AMIN1(1.0,CPOLNP(NZ)/WTLS(NZ)))
-    CZPOLP(NZ)=AZMAX1(AMIN1(1.0,ZPOOLP(NZ)/WTLS(NZ)))
-    CPPOLP(NZ)=AZMAX1(AMIN1(1.0,PPOOLP(NZ)/WTLS(NZ)))
+    CEPOLP(NZ,ielmc)=AZMAX1(AMIN1(1.0_r8,EPOOLP(NZ,ielmc)/WTLS(NZ)))
+    CEPOLP(NZ,ielmn)=AZMAX1(AMIN1(1.0_r8,EPOOLP(NZ,ielmn)/WTLS(NZ)))
+    CEPOLP(NZ,ielmp)=AZMAX1(AMIN1(1.0_r8,EPOOLP(NZ,ielmp)/WTLS(NZ)))
+    CCPLNP(NZ)=AZMAX1(AMIN1(1.0_r8,CPOLNP(NZ)/WTLS(NZ)))
   ELSE
-    CCPOLP(NZ)=1.0
-    CCPLNP(NZ)=1.0
-    CZPOLP(NZ)=1.0
-    CPPOLP(NZ)=1.0
+    CEPOLP(NZ,ielmc)=1.0_r8
+    CEPOLP(NZ,ielmn)=1.0_r8
+    CEPOLP(NZ,ielmp)=1.0_r8
+    CCPLNP(NZ)=1.0_r8
   ENDIF
-  DO 190 NB=1,NBR(NZ)
+  D190: DO NB=1,NBR(NZ)
     IF(WTLSB(NB,NZ).GT.ZEROP(NZ))THEN
       CCPOLB(NB,NZ)=AZMAX1(CPOOL(NB,NZ)/WTLSB(NB,NZ))
       CZPOLB(NB,NZ)=AZMAX1(ZPOOL(NB,NZ)/WTLSB(NB,NZ))
@@ -472,7 +464,7 @@ module HfuncsMod
       CZPOLB(NB,NZ)=1.0
       CPPOLB(NB,NZ)=1.0
     ENDIF
-190 CONTINUE
+  ENDDO D190
 !
 ! EMERGENCE DATE FROM COTYLEDON HEIGHT, LEAF AREA, ROOT DEPTH
 !
@@ -489,7 +481,7 @@ module HfuncsMod
       .AND.(ARLSP.GT.ZEROL(NZ)) &
       .AND.(RTDP1(1,1,NZ).GT.SDPTH(NZ)+ppmc))THEN
       IDAY(1,NB1(NZ),NZ)=I
-      VHCPC(NZ)=cpw*(WTSHT(NZ)*10.0E-06+VOLWC(NZ))
+      VHCPC(NZ)=cpw*(WTSHTE(NZ,ielmc)*10.0E-06+VOLWC(NZ))
     ENDIF
   ENDIF
   end associate

@@ -5,6 +5,7 @@ module RootDataType
 ! data types of plant characteristics
   use data_kind_mod, only : r8 => SHR_KIND_R8
   use GridConsts
+  use ElmIDMod
   implicit none
   character(len=*), private, parameter :: mod_filename = __FILE__
   integer,allocatable ::  NRT(:,:,:)                          !root primary axis number, [-]
@@ -43,18 +44,14 @@ module RootDataType
   real(r8),allocatable ::  RRAD2M(:,:,:,:)                    !maximum radius of secondary roots, [m]
   real(r8),allocatable ::  RTFQ(:,:,:)                        !root brancing frequency, [m-1]
   real(r8),allocatable ::  PORTX(:,:,:,:)                     !power function of root porosity used to calculate root gaseous diffusivity, [-]
-  real(r8),allocatable ::  PPOOLR(:,:,:,:,:)                  !root layer nonstructural P, [g d-2]
   real(r8),allocatable ::  CPPOLR(:,:,:,:,:)                  !root layer nonstructural P concentration, [g g-1]
-  real(r8),allocatable ::  WTRTP(:,:,:)                       !root total P, [g d-2]
   real(r8),allocatable ::  WTRT1P(:,:,:,:,:,:)                !root layer P primary axes, [g d-2]
   real(r8),allocatable ::  WTRT2P(:,:,:,:,:,:)                !root layer P secondary axes, [g d-2]
   real(r8),allocatable ::  WTNDLP(:,:,:,:)                    !root layer nodule P, [g d-2]
   real(r8),allocatable ::  PPOOLN(:,:,:,:)                    !nodule layer nonstructural P, [g d-2]
   real(r8),allocatable ::  ZPOOLN(:,:,:,:)                    !root nodule nonstructural N, [g d-2]
   real(r8),allocatable ::  RTWT1P(:,:,:,:,:)                  !root P primary axes, [g d-2]
-  real(r8),allocatable ::  ZPOOLR(:,:,:,:,:)                  !root layer nonstructural N, [g d-2]
   real(r8),allocatable ::  CZPOLR(:,:,:,:,:)                  !root layer nonstructural N concentration, [g g-1]
-  real(r8),allocatable ::  WTRTN(:,:,:)                       !total root N , [g d-2]
   real(r8),allocatable ::  WTRT1N(:,:,:,:,:,:)                !root layer N primary axes, [g d-2]
   real(r8),allocatable ::  WTRT2N(:,:,:,:,:,:)                !root layer N secondary axes, [g d-2]
   real(r8),allocatable ::  WTNDLN(:,:,:,:)                    !root layer nodule N, [g d-2]
@@ -98,18 +95,16 @@ module RootDataType
   real(r8),allocatable ::  H2GA(:,:,:,:,:)                    !gaseous H2 content of roots, [g d-2]
   real(r8),allocatable ::  H2GP(:,:,:,:,:)                    !aqueous H2 content of roots, [g d-2]
   real(r8),allocatable ::  WTRTA(:,:,:)                       !root C per plant, [g p-1]
-  real(r8),allocatable ::  WTRT(:,:,:)                        !plant root C, [g d-2]
-  real(r8),allocatable ::  WTRTS(:,:,:)                       !plant root structural C, [g d-2]
-  real(r8),allocatable ::  WTRTSN(:,:,:)                      !plant root structural C, [g d-2]
-  real(r8),allocatable ::  WTRTSP(:,:,:)                      !plant root structural C, [g d-2]
+  real(r8),allocatable ::  WTRTE(:,:,:,:)                     !plant root element, [g d-2]
+  real(r8),allocatable ::  WTRTSE(:,:,:,:)                    !plant root structural element, [g d-2]
   real(r8),allocatable ::  WSRTL(:,:,:,:,:)                   !root layer protein C, [g d-2]
   real(r8),allocatable ::  WTRT1(:,:,:,:,:,:)                 !root layer C primary axes, [g d-2]
   real(r8),allocatable ::  WTRT2(:,:,:,:,:,:)                 !root layer C secondary axes, [g d-2]
   real(r8),allocatable ::  WTRTD(:,:,:,:,:)                   !root layer C, [g d-2]
   real(r8),allocatable ::  WTNDL(:,:,:,:)                     !root layer nodule mass, [g d-2]
-  real(r8),allocatable ::  WTND(:,:,:)                        !root total nodule mass, [g d-2]
+  real(r8),allocatable ::  WTNDE(:,:,:,:)                     !root total nodule mass, [g d-2]
   real(r8),allocatable ::  WTRTL(:,:,:,:,:)                   !root layer structural C, [g d-2]
-  real(r8),allocatable ::  CPOOLR(:,:,:,:,:)                  !root  layer nonstructural C, [g d-2]
+  real(r8),allocatable ::  EPOOLR(:,:,:,:,:,:)                !root  layer nonstructural element, [g d-2]
   real(r8),allocatable ::  CCPOLR(:,:,:,:,:)                  !root  layer nonstructural C concentration, [g g-1]
   real(r8),allocatable ::  RTWT1(:,:,:,:,:)                   !root C primary axes, [g d-2]
   real(r8),allocatable ::  CWSRTL(:,:,:,:,:)                  !root layer protein C concentration, [g g-1]
@@ -155,18 +150,14 @@ contains
   allocate(RRAD2M(2,JP,JY,JX)); RRAD2M=0._r8
   allocate(RTFQ(JP,JY,JX));     RTFQ=0._r8
   allocate(PORTX(2,JP,JY,JX));  PORTX=0._r8
-  allocate(PPOOLR(2,JZ,JP,JY,JX));PPOOLR=0._r8
   allocate(CPPOLR(2,JZ,JP,JY,JX));CPPOLR=0._r8
-  allocate(WTRTP(JP,JY,JX));    WTRTP=0._r8
   allocate(WTRT1P(2,JZ,JC,JP,JY,JX));WTRT1P=0._r8
   allocate(WTRT2P(2,JZ,JC,JP,JY,JX));WTRT2P=0._r8
   allocate(WTNDLP(JZ,JP,JY,JX));WTNDLP=0._r8
   allocate(PPOOLN(JZ,JP,JY,JX));PPOOLN=0._r8
   allocate(ZPOOLN(JZ,JP,JY,JX));ZPOOLN=0._r8
   allocate(RTWT1P(2,JC,JP,JY,JX));RTWT1P=0._r8
-  allocate(ZPOOLR(2,JZ,JP,JY,JX));ZPOOLR=0._r8
   allocate(CZPOLR(2,JZ,JP,JY,JX));CZPOLR=0._r8
-  allocate(WTRTN(JP,JY,JX));    WTRTN=0._r8
   allocate(WTRT1N(2,JZ,JC,JP,JY,JX));WTRT1N=0._r8
   allocate(WTRT2N(2,JZ,JC,JP,JY,JX));WTRT2N=0._r8
   allocate(WTNDLN(JZ,JP,JY,JX));WTNDLN=0._r8
@@ -210,18 +201,16 @@ contains
   allocate(H2GA(2,JZ,JP,JY,JX));H2GA=0._r8
   allocate(H2GP(2,JZ,JP,JY,JX));H2GP=0._r8
   allocate(WTRTA(JP,JY,JX));    WTRTA=0._r8
-  allocate(WTRT(JP,JY,JX));     WTRT=0._r8
-  allocate(WTRTS(JP,JY,JX));    WTRTS=0._r8
-  allocate(WTRTSN(JP,JY,JX));   WTRTSN=0._r8
-  allocate(WTRTSP(JP,JY,JX));   WTRTSP=0._r8
+  allocate(WTRTE(JP,JY,JX,npelms)); WTRTE=0._r8
+  allocate(WTRTSE(JP,JY,JX,npelms));   WTRTSE=0._r8
   allocate(WSRTL(2,JZ,JP,JY,JX));WSRTL=0._r8
   allocate(WTRT1(2,JZ,JC,JP,JY,JX));WTRT1=0._r8
   allocate(WTRT2(2,JZ,JC,JP,JY,JX));WTRT2=0._r8
   allocate(WTRTD(2,JZ,JP,JY,JX));WTRTD=0._r8
   allocate(WTNDL(JZ,JP,JY,JX)); WTNDL=0._r8
-  allocate(WTND(JP,JY,JX));     WTND=0._r8
+  allocate(WTNDE(JP,JY,JX,npelms));  WTNDE=0._r8
   allocate(WTRTL(2,JZ,JP,JY,JX));WTRTL=0._r8
-  allocate(CPOOLR(2,JZ,JP,JY,JX));CPOOLR=0._r8
+  allocate(EPOOLR(2,JZ,JP,JY,JX,npelms));EPOOLR=0._r8
   allocate(CCPOLR(2,JZ,JP,JY,JX));CCPOLR=0._r8
   allocate(RTWT1(2,JC,JP,JY,JX));RTWT1=0._r8
   allocate(CWSRTL(2,JZ,JP,JY,JX));CWSRTL=0._r8
@@ -267,18 +256,14 @@ contains
   call destroy(RRAD2M)
   call destroy(RTFQ)
   call destroy(PORTX)
-  call destroy(PPOOLR)
   call destroy(CPPOLR)
-  call destroy(WTRTP)
   call destroy(WTRT1P)
   call destroy(WTRT2P)
   call destroy(WTNDLP)
   call destroy(PPOOLN)
   call destroy(ZPOOLN)
   call destroy(RTWT1P)
-  call destroy(ZPOOLR)
   call destroy(CZPOLR)
-  call destroy(WTRTN)
   call destroy(WTRT1N)
   call destroy(WTRT2N)
   call destroy(WTNDLN)
@@ -322,18 +307,16 @@ contains
   call destroy(H2GA)
   call destroy(H2GP)
   call destroy(WTRTA)
-  call destroy(WTRT)
-  call destroy(WTRTS)
-  call destroy(WTRTSN)
-  call destroy(WTRTSP)
+  call destroy(WTRTE)
+  call destroy(WTRTSE)
   call destroy(WSRTL)
   call destroy(WTRT1)
   call destroy(WTRT2)
   call destroy(WTRTD)
   call destroy(WTNDL)
-  call destroy(WTND)
+  call destroy(WTNDE)
   call destroy(WTRTL)
-  call destroy(CPOOLR)
+  call destroy(EPOOLR)
   call destroy(CCPOLR)
   call destroy(RTWT1)
   call destroy(CWSRTL)

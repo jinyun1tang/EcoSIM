@@ -870,9 +870,7 @@ module StartsMod
   PPT(:,:)=0.0_r8
   DYLN(:,:)=12.0_r8
   ALBX(:,:)=ALBS(:,:)
-  XHVSTC(:,:)=0.0_r8
-  XHVSTN(:,:)=0.0_r8
-  XHVSTP(:,:)=0.0_r8
+  XHVSTE(:,:,:)=0.0_r8
   ENGYP(:,:)=0.0_r8
   end subroutine InitAccumulators
 !------------------------------------------------------------------------------------------

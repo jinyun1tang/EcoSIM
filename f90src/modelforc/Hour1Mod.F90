@@ -278,9 +278,7 @@ module Hour1Mod
   TLNO3=0.0_r8
   TLPO4=0.0_r8
   TION=0.0_r8
-  TBALC=0.0_r8
-  TBALN=0.0_r8
-  TBALP=0.0_r8
+  TBALE=0.0_r8
   end subroutine ResetLndscapeAccumlators
 !------------------------------------------------------------------------------------------
 
@@ -1023,9 +1021,7 @@ module Hour1Mod
   TN2OZ(NY,NX)=0.0_r8
   TNH3Z(NY,NX)=0.0_r8
   TH2GZ(NY,NX)=0.0_r8
-  ZCSNC(NY,NX)=0.0_r8
-  ZZSNC(NY,NX)=0.0_r8
-  ZPSNC(NY,NX)=0.0_r8
+  ZESNC(NY,NX,:)=0.0_r8
   WTSTGT(NY,NX)=0.0_r8
   PPT(NY,NX)=0.0_r8
 ! zero arrays in the snow layers

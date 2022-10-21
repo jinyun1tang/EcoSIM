@@ -2,16 +2,15 @@ module PlantDataRateType
 
   use data_kind_mod, only : r8 => SHR_KIND_R8
   use GridConsts
-  use EcoSIMConfig, only : jcplx1=> jcplx1c
+  use ElmIDMod
+  use EcoSIMConfig, only : jcplx1=> jcplx1c,jsken=>jskenc
   implicit none
   character(len=*), private, parameter :: mod_filename = __FILE__
 
   real(r8),allocatable ::  TCNET(:,:)                         !total canopy net CO2 exchange, [g d-2 h-1]
   real(r8),allocatable ::  RNH3C(:,:,:)                       !canopy NH3 flux, [g d-2 h-1]
   real(r8),allocatable ::  TNH3C(:,:,:)                       !total canopy NH3 flux, [g d-2 ]
-  real(r8),allocatable ::  TZSN0(:,:,:)                       !total surface litterfall N, [g d-2]
-  real(r8),allocatable ::  TPSN0(:,:,:)                       !total surface litterfall P, [g d-2]
-  real(r8),allocatable ::  TCSN0(:,:,:)                       !total surface litterfall C, [g d-2]
+  real(r8),allocatable ::  TESN0(:,:,:,:)                     !total surface litterfall element, [g d-2]
   real(r8),allocatable ::  RDFOMC(:,:,:,:,:,:)                !root uptake (+ve) - exudation (-ve) of DOC, [g d-2 h-1]
   real(r8),allocatable ::  RDFOMN(:,:,:,:,:,:)                !root uptake (+ve) - exudation (-ve) of DON, [g d-2 h-1]
   real(r8),allocatable ::  RDFOMP(:,:,:,:,:,:)                !root uptake (+ve) - exudation (-ve) of DOP, [g d-2 h-1]
@@ -36,29 +35,17 @@ module PlantDataRateType
   real(r8),allocatable ::  RCPSX(:,:,:,:)                     !P translocated from sheath during senescence, [g d-2 h-1]
   real(r8),allocatable ::  RCCSX(:,:,:,:)                     !C translocated from sheath during senescence, [g d-2 h-1]
   real(r8),allocatable ::  CARBN(:,:,:)                       !total gross CO2 fixation, [g d-2 ]
-  real(r8),allocatable ::  TCSNC(:,:,:)                       !total plant C litterfall , [g d-2 ]
-  real(r8),allocatable ::  TZSNC(:,:,:)                       !total plant N litterfall , [g d-2 ]
-  real(r8),allocatable ::  TPSNC(:,:,:)                       !total plant P litterfall , [g d-2 ]
+  real(r8),allocatable ::  TESNC(:,:,:,:)                     !total plant element litterfall , [g d-2 ]
   real(r8),allocatable ::  TZUPFX(:,:,:)                      !total plant N2 fixation, [g d-2 ]
   real(r8),allocatable ::  TCO2T(:,:,:)                       !total plant respiration, [g d-2 ]
-  real(r8),allocatable ::  BALC(:,:,:)                        !plant C balance, [g d-2]
-  real(r8),allocatable ::  BALN(:,:,:)                        !plant N balance, [g d-2]
-  real(r8),allocatable ::  BALP(:,:,:)                        !plant P balance, [g d-2]
-  real(r8),allocatable ::  HCSNC(:,:,:)                       !plant C litterfall, [g d-2 h-1]
-  real(r8),allocatable ::  HZSNC(:,:,:)                       !plant N litterfall, [g d-2 h-1]
-  real(r8),allocatable ::  HPSNC(:,:,:)                       !plant C litterfall, [g d-2 h-1]
-  real(r8),allocatable ::  PSNC(:,:,:,:,:,:)                  !litterfall P flux, [g d-2 h-1]
-  real(r8),allocatable ::  ZSNC(:,:,:,:,:,:)                  !litterfall N flux, [g d-2 h-1]
-  real(r8),allocatable ::  CSNC(:,:,:,:,:,:)                  !plant litterfall C, [g d-2 h-1]
+  real(r8),allocatable ::  BALE(:,:,:,:)                      !plant element balance, [g d-2]
+  real(r8),allocatable ::  HESNC(:,:,:,:)                     !plant element litterfall, [g d-2 h-1]
+  real(r8),allocatable ::  ESNC(:,:,:,:,:,:,:)                !plant litterfall element, [g d-2 h-1]
   real(r8),allocatable ::  ZNPP(:,:,:)                        !total net primary productivity, [g d-2]
   real(r8),allocatable ::  CTRAN(:,:,:)                       !total transpiration, [m d-2]
   real(r8),allocatable ::  TCO2A(:,:,:)                       !total autotrophic respiration, [g d-2 ]
-  real(r8),allocatable ::  HVSTC(:,:,:)                       !plant C harvest, [g d-2 ]
-  real(r8),allocatable ::  HVSTN(:,:,:)                       !plant N harvest, [g d-2 ]
-  real(r8),allocatable ::  HVSTP(:,:,:)                       !plant P harvest, [g d-2 ]
-  real(r8),allocatable ::  THVSTC(:,:,:)                      !total plant C harvest, [g d-2 ]
-  real(r8),allocatable ::  THVSTN(:,:,:)                      !total plant N harvest, [g d-2 ]
-  real(r8),allocatable ::  THVSTP(:,:,:)                      !total plant P harvest, [g d-2 ]
+  real(r8),allocatable ::  HVSTE(:,:,:,:)                     !plant element harvest, [g d-2 ]
+  real(r8),allocatable ::  THVSTE(:,:,:,:)                    !total plant harvest, [g d-2 ]
   real(r8),allocatable ::  VCO2F(:,:,:)                       !plant CO2 emission from fire, [g d-2 ]
   real(r8),allocatable ::  VCH4F(:,:,:)                       !plant CH4 emission from fire, [g d-2 ]
   real(r8),allocatable ::  VOXYF(:,:,:)                       !plant O2 uptake from fire, [g d-2 ]
@@ -125,12 +112,10 @@ module PlantDataRateType
   real(r8),allocatable ::  RHGFLA(:,:,:,:,:)                  !gaseous H2 flux through roots, [g d-2 h-1]
   real(r8),allocatable ::  RHGDFA(:,:,:,:,:)                  !dissolution (+ve) - volatilization (-ve) H2 flux in roots, [g d-2 h-1]
   real(r8),allocatable ::  RH2GZ(:,:,:)                       !gaseous H2 flux fron root disturbance, [g d-2 h-1]
-  real(r8),allocatable ::  TPUPTK(:,:,:)                      !total net root P uptake (+ve) - exudation (-ve), [g d-2 ]
   real(r8),allocatable ::  HCUPTK(:,:,:)                      !net root C uptake (+ve) - exudation (-ve), [g d-2 h-1]
   real(r8),allocatable ::  HZUPTK(:,:,:)                      !net root N uptake (+ve) - exudation (-ve), [g d-2 h-1]
   real(r8),allocatable ::  HPUPTK(:,:,:)                      !net root P uptake (+ve) - exudation (-ve), [g d-2 h-1]
-  real(r8),allocatable ::  TCUPTK(:,:,:)                      !total net root C uptake (+ve) - exudation (-ve), [g d-2 ]
-  real(r8),allocatable ::  TZUPTK(:,:,:)                      !total net root N uptake (+ve) - exudation (-ve), [g d-2 ]
+  real(r8),allocatable ::  TEUPTK(:,:,:,:)                    !total net root element uptake (+ve) - exudation (-ve), [g d-2 ]
   real(r8),allocatable ::  TUPWTR(:,:,:)                      !total root water uptake, [m3 d-2]
   real(r8),allocatable ::  TUPHT(:,:,:)                       !total root heat uptake, [MJ d-2]
   real(r8),allocatable ::  TCOFLA(:,:,:)                      !total internal root CO2 flux , [g d-2 h-1]
@@ -210,9 +195,7 @@ module PlantDataRateType
   allocate(TCNET(JY,JX));       TCNET=0._r8
   allocate(RNH3C(JP,JY,JX));    RNH3C=0._r8
   allocate(TNH3C(JP,JY,JX));    TNH3C=0._r8
-  allocate(TZSN0(JP,JY,JX));    TZSN0=0._r8
-  allocate(TPSN0(JP,JY,JX));    TPSN0=0._r8
-  allocate(TCSN0(JP,JY,JX));    TCSN0=0._r8
+  allocate(TESN0(JP,JY,JX,npelms));    TESN0=0._r8
   allocate(RDFOMC(2,0:jcplx1,JZ,JP,JY,JX));RDFOMC=0._r8
   allocate(RDFOMN(2,0:jcplx1,JZ,JP,JY,JX));RDFOMN=0._r8
   allocate(RDFOMP(2,0:jcplx1,JZ,JP,JY,JX));RDFOMP=0._r8
@@ -237,29 +220,17 @@ module PlantDataRateType
   allocate(RCPSX(JC,JP,JY,JX)); RCPSX=0._r8
   allocate(RCCSX(JC,JP,JY,JX)); RCCSX=0._r8
   allocate(CARBN(JP,JY,JX));    CARBN=0._r8
-  allocate(TCSNC(JP,JY,JX));    TCSNC=0._r8
-  allocate(TZSNC(JP,JY,JX));    TZSNC=0._r8
-  allocate(TPSNC(JP,JY,JX));    TPSNC=0._r8
+  allocate(TESNC(JP,JY,JX,npelms));    TESNC=0._r8
   allocate(TZUPFX(JP,JY,JX));   TZUPFX=0._r8
   allocate(TCO2T(JP,JY,JX));    TCO2T=0._r8
-  allocate(BALC(JP,JY,JX));     BALC=0._r8
-  allocate(BALN(JP,JY,JX));     BALN=0._r8
-  allocate(BALP(JP,JY,JX));     BALP=0._r8
-  allocate(HCSNC(JP,JY,JX));    HCSNC=0._r8
-  allocate(HZSNC(JP,JY,JX));    HZSNC=0._r8
-  allocate(HPSNC(JP,JY,JX));    HPSNC=0._r8
-  allocate(PSNC(4,0:1,0:JZ,JP,JY,JX));PSNC=0._r8
-  allocate(ZSNC(4,0:1,0:JZ,JP,JY,JX));ZSNC=0._r8
-  allocate(CSNC(4,0:1,0:JZ,JP,JY,JX));CSNC=0._r8
+  allocate(BALE(JP,JY,JX,npelms));     BALE=0._r8
+  allocate(HESNC(JP,JY,JX,npelms));    HESNC=0._r8
+  allocate(ESNC(jsken,0:1,0:JZ,JP,JY,JX,npelms));ESNC=0._r8
   allocate(ZNPP(JP,JY,JX));     ZNPP=0._r8
   allocate(CTRAN(JP,JY,JX));    CTRAN=0._r8
   allocate(TCO2A(JP,JY,JX));    TCO2A=0._r8
-  allocate(HVSTC(JP,JY,JX));    HVSTC=0._r8
-  allocate(HVSTN(JP,JY,JX));    HVSTN=0._r8
-  allocate(HVSTP(JP,JY,JX));    HVSTP=0._r8
-  allocate(THVSTC(JP,JY,JX));   THVSTC=0._r8
-  allocate(THVSTN(JP,JY,JX));   THVSTN=0._r8
-  allocate(THVSTP(JP,JY,JX));   THVSTP=0._r8
+  allocate(HVSTE(JP,JY,JX,npelms));    HVSTE=0._r8
+  allocate(THVSTE(JP,JY,JX,npelms));   THVSTE=0._r8
   allocate(VCO2F(JP,JY,JX));    VCO2F=0._r8
   allocate(VCH4F(JP,JY,JX));    VCH4F=0._r8
   allocate(VOXYF(JP,JY,JX));    VOXYF=0._r8
@@ -326,12 +297,10 @@ module PlantDataRateType
   allocate(RHGFLA(2,JZ,JP,JY,JX));RHGFLA=0._r8
   allocate(RHGDFA(2,JZ,JP,JY,JX));RHGDFA=0._r8
   allocate(RH2GZ(JP,JY,JX));    RH2GZ=0._r8
-  allocate(TPUPTK(JP,JY,JX));   TPUPTK=0._r8
   allocate(HCUPTK(JP,JY,JX));   HCUPTK=0._r8
   allocate(HZUPTK(JP,JY,JX));   HZUPTK=0._r8
   allocate(HPUPTK(JP,JY,JX));   HPUPTK=0._r8
-  allocate(TCUPTK(JP,JY,JX));   TCUPTK=0._r8
-  allocate(TZUPTK(JP,JY,JX));   TZUPTK=0._r8
+  allocate(TEUPTK(JP,JY,JX,1:npelms));   TEUPTK=0._r8
   allocate(TUPWTR(0:JZ,JY,JX)); TUPWTR=0._r8
   allocate(TUPHT(0:JZ,JY,JX));  TUPHT=0._r8
   allocate(TCOFLA(JZ,JY,JX));   TCOFLA=0._r8
@@ -402,9 +371,7 @@ module PlantDataRateType
   call destroy(TCNET)
   call destroy(RNH3C)
   call destroy(TNH3C)
-  call destroy(TZSN0)
-  call destroy(TPSN0)
-  call destroy(TCSN0)
+  call destroy(TESN0)
   call destroy(RDFOMC)
   call destroy(RDFOMN)
   call destroy(RDFOMP)
@@ -429,29 +396,17 @@ module PlantDataRateType
   call destroy(RCPSX)
   call destroy(RCCSX)
   call destroy(CARBN)
-  call destroy(TCSNC)
-  call destroy(TZSNC)
-  call destroy(TPSNC)
+  call destroy(TESNC)
   call destroy(TZUPFX)
   call destroy(TCO2T)
-  call destroy(BALC)
-  call destroy(BALN)
-  call destroy(BALP)
-  call destroy(HCSNC)
-  call destroy(HZSNC)
-  call destroy(HPSNC)
-  call destroy(PSNC)
-  call destroy(ZSNC)
-  call destroy(CSNC)
+  call destroy(BALE)
+  call destroy(HESNC)
+  call destroy(ESNC)
   call destroy(ZNPP)
   call destroy(CTRAN)
   call destroy(TCO2A)
-  call destroy(HVSTC)
-  call destroy(HVSTN)
-  call destroy(HVSTP)
-  call destroy(THVSTC)
-  call destroy(THVSTN)
-  call destroy(THVSTP)
+  call destroy(HVSTE)
+  call destroy(THVSTE)
   call destroy(VCO2F)
   call destroy(VCH4F)
   call destroy(VOXYF)
@@ -518,12 +473,10 @@ module PlantDataRateType
   call destroy(RHGFLA)
   call destroy(RHGDFA)
   call destroy(RH2GZ)
-  call destroy(TPUPTK)
   call destroy(HCUPTK)
   call destroy(HZUPTK)
   call destroy(HPUPTK)
-  call destroy(TCUPTK)
-  call destroy(TZUPTK)
+  call destroy(TEUPTK)
   call destroy(TUPWTR)
   call destroy(TUPHT)
   call destroy(TCOFLA)

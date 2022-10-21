@@ -2,6 +2,8 @@ module CanopyDataType
 
   use data_kind_mod, only : r8 => SHR_KIND_R8
   use GridConsts
+  use ElmIDMod
+  use EcoSIMConfig, only : jsken => jskenc
   implicit none
   public
   save
@@ -106,45 +108,24 @@ module CanopyDataType
   real(r8),allocatable ::  CFOPC(:,:,:,:,:)                   !litter kinetic fraction, [-]
   real(r8),allocatable ::  CFOPN(:,:,:,:,:)                   !litterfall kinetic N fraction, [-]
   real(r8),allocatable ::  CFOPP(:,:,:,:,:)                   !litter P kinetic fraction, [-]
-  real(r8),allocatable ::  WTSHT(:,:,:)                       !canopy shoot C, [g d-2]
-  real(r8),allocatable ::  WTLF(:,:,:)                        !canopy leaf C, [g d-2]
-  real(r8),allocatable ::  WTSHE(:,:,:)                       !canopy sheath C , [g d-2]
-  real(r8),allocatable ::  WTSTK(:,:,:)                       !canopy stalk C, [g d-2]
+  real(r8),allocatable ::  WTSHTE(:,:,:,:)                    !canopy shoot element, [g d-2]
+  real(r8),allocatable ::  WTLFE(:,:,:,:)                     !canopy leaf element, [g d-2]
+  real(r8),allocatable ::  WTSHEE(:,:,:,:)                    !canopy sheath element , [g d-2]
+  real(r8),allocatable ::  WTSTKE(:,:,:,:)                    !canopy stalk element, [g d-2]
   real(r8),allocatable ::  WVSTK(:,:,:)                       !canopy active stalk C, [g d-2]
-  real(r8),allocatable ::  WTRSV(:,:,:)                       !canopy reserve C, [g d-2]
-  real(r8),allocatable ::  WTHSK(:,:,:)                       !canopy husk C, [g d-2]
-  real(r8),allocatable ::  WTEAR(:,:,:)                       !canopy ear C, [g d-2]
-  real(r8),allocatable ::  WTGR(:,:,:)                        !canopy grain C, [g d-2]
+  real(r8),allocatable ::  WTRSVE(:,:,:,:)                    !canopy reserve element, [g d-2]
+  real(r8),allocatable ::  WTHSKE(:,:,:,:)                    !canopy husk C, [g d-2]
+  real(r8),allocatable ::  WTEARE(:,:,:,:)                    !canopy ear element, [g d-2]
+  real(r8),allocatable ::  WTGRE(:,:,:,:)                     !canopy grain element, [g d-2]
   real(r8),allocatable ::  WTLS(:,:,:)                        !canopy leaf + sheath C, [g d-2]
   real(r8),allocatable ::  ARLFV(:,:,:,:)                     !canopy layer leaf area, [m2 d-2]
   real(r8),allocatable ::  CNET(:,:,:)                        !canopy net CO2 exchange, [g d-2 h-1]
   real(r8),allocatable ::  WGLFV(:,:,:,:)                     !canopy layer leaf C, [g d-2]
-  real(r8),allocatable ::  CPOOLP(:,:,:)                      !canopy nonstructural C, [g d-2]
-  real(r8),allocatable ::  CCPOLP(:,:,:)                      !canopy nonstructural C concentration, [g d-2]
+  real(r8),allocatable ::  EPOOLP(:,:,:,:)                    !canopy nonstructural element, [g d-2]
+  real(r8),allocatable ::  CEPOLP(:,:,:,:)                    !canopy nonstructural element concentration, [g d-2]
   real(r8),allocatable ::  ARSTV(:,:,:,:)                     !canopy layer stem area, [m2 d-2]
   real(r8),allocatable ::  CPOLNP(:,:,:)                      !canopy nodule nonstructural C, [g d-2]
-  real(r8),allocatable ::  WTSHN(:,:,:)                       !canopy  N, [g d-2]
-  real(r8),allocatable ::  ZPOOLP(:,:,:)                      !canopy  nonstructural N, [g d-2]
-  real(r8),allocatable ::  WTLFN(:,:,:)                       !canopy leaf N, [g d-2]
-  real(r8),allocatable ::  WTSHEN(:,:,:)                      !canopy sheath N, [g d-2]
-  real(r8),allocatable ::  WTSTKN(:,:,:)                      !canopy stalk N, [g d-2]
-  real(r8),allocatable ::  WTRSVN(:,:,:)                      !canopy reserve N, [g d-2]
-  real(r8),allocatable ::  WTHSKN(:,:,:)                      !canopy husk N, [g d-2]
-  real(r8),allocatable ::  WTEARN(:,:,:)                      !canopy ear N, [g d-2]
-  real(r8),allocatable ::  WTGRNN(:,:,:)                      !canopy grain N, [g d-2]
-  real(r8),allocatable ::  CZPOLP(:,:,:)                      !canopy nonstructural N concentration, [g g-1]
   real(r8),allocatable ::  ZPOLNP(:,:,:)                      !canopy nonstructural P concentration, [g g-1]
-  real(r8),allocatable ::  CPPOLP(:,:,:)                      !canopy nonstructural P concentration, [g g-1]
-  real(r8),allocatable ::  WTNDN(:,:,:)                       !total canopy nodule N, [g d-2]
-  real(r8),allocatable ::  WTSHP(:,:,:)                       !canopy total P, [g d-2]
-  real(r8),allocatable ::  PPOOLP(:,:,:)                      !canopy nonstructural P, [g d-2]
-  real(r8),allocatable ::  WTLFP(:,:,:)                       !canopy leaf P, [g d-2]
-  real(r8),allocatable ::  WTSHEP(:,:,:)                      !canopy sheath P, [g d-2]
-  real(r8),allocatable ::  WTSTKP(:,:,:)                      !canopy stalk P, [g d-2]
-  real(r8),allocatable ::  WTRSVP(:,:,:)                      !canopy reserve P, [g d-2]
-  real(r8),allocatable ::  WTHSKP(:,:,:)                      !canopy husk P, [g d-2]
-  real(r8),allocatable ::  WTEARP(:,:,:)                      !canopy ear P, [g d-2]
-  real(r8),allocatable ::  WTGRNP(:,:,:)                      !canopy grain P, [g d-2]
   real(r8),allocatable ::  PPOLNP(:,:,:)                      !canopy nonstructural P concentration, [g g-1]
   real(r8),allocatable ::  WVSTKB(:,:,:,:)                    !branch active stalk C, [g d-2]
   real(r8),allocatable ::  CPOOL(:,:,:,:)                     !branch nonstructural C, [g d-2]
@@ -206,21 +187,14 @@ module CanopyDataType
   real(r8),allocatable ::  WGNODN(:,:,:,:,:)                  !internode N, [g d-2]
   real(r8),allocatable ::  CCPLNP(:,:,:)                      !nodule nonstructural C, [g d-2]
   real(r8),allocatable ::  GRWTB(:,:,:,:)                     !maximum grain C during grain fill, [g d-2]
-  real(r8),allocatable ::  WTSTDG(:,:,:,:)                    !standing dead C fraction, [g d-2]
-  real(r8),allocatable ::  WTSTG(:,:,:)                       !standing dead C, [g d-2]
-  real(r8),allocatable ::  WTSTDN(:,:,:,:)                    !standing dead N fraction, [g d-2]
-  real(r8),allocatable ::  WTSTGN(:,:,:)                      !standing dead N , [g d-2]
+  real(r8),allocatable ::  WTSTDE(:,:,:,:,:)                  !standing dead element fraction, [g d-2]
+  real(r8),allocatable ::  WTSTGE(:,:,:,:)                    !standing dead element, [g d-2]
   real(r8),allocatable ::  WGLFP(:,:,:,:,:)                   !leaf P, [g d-2]
   real(r8),allocatable ::  WGSHP(:,:,:,:,:)                   !sheath P, [g d-2]
   real(r8),allocatable ::  WGNODP(:,:,:,:,:)                  !nodule P, [g d-2]
   real(r8),allocatable ::  WGLFLP(:,:,:,:,:,:)                !leaf layer P, [g d-2]
-  real(r8),allocatable ::  WTSTDP(:,:,:,:)                    !standing dead P fraction, [g d-2]
-  real(r8),allocatable ::  WTSTGP(:,:,:)                      !standing dead P , [g d-2]
-  real(r8),allocatable ::  WTNDP(:,:,:)                       !total nodule P, [g d-2]
-  real(r8),allocatable ::  WTRVC(:,:,:)                       !plant stored nonstructural C, [g d-2]
+  real(r8),allocatable ::  WTRVE(:,:,:,:)                     !plant stored nonstructural element, [g d-2]
   real(r8),allocatable ::  WTRVX(:,:,:)                       !plant stored nonstructural C at planting, [g d-2]
-  real(r8),allocatable ::  WTRVN(:,:,:)                       !plant stored nonstructural N, [g d-2]
-  real(r8),allocatable ::  WTRVP(:,:,:)                       !plant stored nonstructural P, [g d-2]
   REAL(R8),allocatable ::  WTSHTA(:,:,:)                      !landscape average canopy shoot C, [g d-2]
   contains
 !----------------------------------------------------------------------
@@ -327,45 +301,24 @@ module CanopyDataType
   allocate(CFOPC(0:5,4,JP,JY,JX));CFOPC=0._r8
   allocate(CFOPN(0:5,4,JP,JY,JX));CFOPN=0._r8
   allocate(CFOPP(0:5,4,JP,JY,JX));CFOPP=0._r8
-  allocate(WTSHT(JP,JY,JX));    WTSHT=0._r8
-  allocate(WTLF(JP,JY,JX));     WTLF=0._r8
-  allocate(WTSHE(JP,JY,JX));    WTSHE=0._r8
-  allocate(WTSTK(JP,JY,JX));    WTSTK=0._r8
+  allocate(WTSHTE(JP,JY,JX,npelms)); WTSHTE=0._r8
+  allocate(WTLFE(JP,JY,JX,npelms));  WTLFE=0._r8
+  allocate(WTSHEE(JP,JY,JX,npelms)); WTSHEE=0._r8
+  allocate(WTSTKE(JP,JY,JX,npelms)); WTSTKE=0._r8
   allocate(WVSTK(JP,JY,JX));    WVSTK=0._r8
-  allocate(WTRSV(JP,JY,JX));    WTRSV=0._r8
-  allocate(WTHSK(JP,JY,JX));    WTHSK=0._r8
-  allocate(WTEAR(JP,JY,JX));    WTEAR=0._r8
-  allocate(WTGR(JP,JY,JX));     WTGR=0._r8
+  allocate(WTRSVE(JP,JY,JX,npelms));    WTRSVE=0._r8
+  allocate(WTHSKE(JP,JY,JX,npelms));    WTHSKE=0._r8
+  allocate(WTEARE(JP,JY,JX,npelms));    WTEARE=0._r8
+  allocate(WTGRE(JP,JY,JX,npelms));     WTGRE=0._r8
   allocate(WTLS(JP,JY,JX));     WTLS=0._r8
   allocate(ARLFV(JC,JP,JY,JX)); ARLFV=0._r8
   allocate(CNET(JP,JY,JX));     CNET=0._r8
   allocate(WGLFV(JC,JP,JY,JX)); WGLFV=0._r8
-  allocate(CPOOLP(JP,JY,JX));   CPOOLP=0._r8
-  allocate(CCPOLP(JP,JY,JX));   CCPOLP=0._r8
+  allocate(EPOOLP(JP,JY,JX,npelms));   EPOOLP=0._r8
+  allocate(CEPOLP(JP,JY,JX,npelms));   CEPOLP=0._r8
   allocate(ARSTV(JC,JP,JY,JX)); ARSTV=0._r8
   allocate(CPOLNP(JP,JY,JX));   CPOLNP=0._r8
-  allocate(WTSHN(JP,JY,JX));    WTSHN=0._r8
-  allocate(ZPOOLP(JP,JY,JX));   ZPOOLP=0._r8
-  allocate(WTLFN(JP,JY,JX));    WTLFN=0._r8
-  allocate(WTSHEN(JP,JY,JX));   WTSHEN=0._r8
-  allocate(WTSTKN(JP,JY,JX));   WTSTKN=0._r8
-  allocate(WTRSVN(JP,JY,JX));   WTRSVN=0._r8
-  allocate(WTHSKN(JP,JY,JX));   WTHSKN=0._r8
-  allocate(WTEARN(JP,JY,JX));   WTEARN=0._r8
-  allocate(WTGRNN(JP,JY,JX));   WTGRNN=0._r8
-  allocate(CZPOLP(JP,JY,JX));   CZPOLP=0._r8
   allocate(ZPOLNP(JP,JY,JX));   ZPOLNP=0._r8
-  allocate(CPPOLP(JP,JY,JX));   CPPOLP=0._r8
-  allocate(WTNDN(JP,JY,JX));    WTNDN=0._r8
-  allocate(WTSHP(JP,JY,JX));    WTSHP=0._r8
-  allocate(PPOOLP(JP,JY,JX));   PPOOLP=0._r8
-  allocate(WTLFP(JP,JY,JX));    WTLFP=0._r8
-  allocate(WTSHEP(JP,JY,JX));   WTSHEP=0._r8
-  allocate(WTSTKP(JP,JY,JX));   WTSTKP=0._r8
-  allocate(WTRSVP(JP,JY,JX));   WTRSVP=0._r8
-  allocate(WTHSKP(JP,JY,JX));   WTHSKP=0._r8
-  allocate(WTEARP(JP,JY,JX));   WTEARP=0._r8
-  allocate(WTGRNP(JP,JY,JX));   WTGRNP=0._r8
   allocate(PPOLNP(JP,JY,JX));   PPOLNP=0._r8
   allocate(WVSTKB(JC,JP,JY,JX));WVSTKB=0._r8
   allocate(CPOOL(JC,JP,JY,JX)); CPOOL=0._r8
@@ -427,21 +380,14 @@ module CanopyDataType
   allocate(WGNODN(0:JNODS,JC,JP,JY,JX));WGNODN=0._r8
   allocate(CCPLNP(JP,JY,JX));   CCPLNP=0._r8
   allocate(GRWTB(JC,JP,JY,JX)); GRWTB=0._r8
-  allocate(WTSTDG(4,JP,JY,JX)); WTSTDG=0._r8
-  allocate(WTSTG(JP,JY,JX));    WTSTG=0._r8
-  allocate(WTSTDN(4,JP,JY,JX)); WTSTDN=0._r8
-  allocate(WTSTGN(JP,JY,JX));   WTSTGN=0._r8
+  allocate(WTSTDE(jsken,JP,JY,JX,npelms)); WTSTDE=0._r8
+  allocate(WTSTGE(JP,JY,JX,npelms));    WTSTGE=0._r8
   allocate(WGLFP(0:JNODS,JC,JP,JY,JX));WGLFP=0._r8
   allocate(WGSHP(0:JNODS,JC,JP,JY,JX));WGSHP=0._r8
   allocate(WGNODP(0:JNODS,JC,JP,JY,JX));WGNODP=0._r8
   allocate(WGLFLP(JC,0:JNODS,JC,JP,JY,JX));WGLFLP=0._r8
-  allocate(WTSTDP(4,JP,JY,JX)); WTSTDP=0._r8
-  allocate(WTSTGP(JP,JY,JX));   WTSTGP=0._r8
-  allocate(WTNDP(JP,JY,JX));    WTNDP=0._r8
-  allocate(WTRVC(JP,JY,JX));    WTRVC=0._r8
+  allocate(WTRVE(JP,JY,JX,npelms));  WTRVE=0._r8
   allocate(WTRVX(JP,JY,JX));    WTRVX=0._r8
-  allocate(WTRVN(JP,JY,JX));    WTRVN=0._r8
-  allocate(WTRVP(JP,JY,JX));    WTRVP=0._r8
   allocate(WTSHTA(JP,JY,JX));   WTSHTA=0._r8
   end subroutine InitCanopyData
 
@@ -549,45 +495,24 @@ module CanopyDataType
   call destroy(CFOPC)
   call destroy(CFOPN)
   call destroy(CFOPP)
-  call destroy(WTSHT)
-  call destroy(WTLF)
-  call destroy(WTSHE)
-  call destroy(WTSTK)
+  call destroy(WTSHTE)
+  call destroy(WTLFE)
+  call destroy(WTSHEE)
+  call destroy(WTSTKE)
   call destroy(WVSTK)
-  call destroy(WTRSV)
-  call destroy(WTHSK)
-  call destroy(WTEAR)
-  call destroy(WTGR)
+  call destroy(WTRSVE)
+  call destroy(WTHSKE)
+  call destroy(WTEARE)
+  call destroy(WTGRE)
   call destroy(WTLS)
   call destroy(ARLFV)
   call destroy(CNET)
   call destroy(WGLFV)
-  call destroy(CPOOLP)
-  call destroy(CCPOLP)
+  call destroy(EPOOLP)
+  call destroy(CEPOLP)
   call destroy(ARSTV)
   call destroy(CPOLNP)
-  call destroy(WTSHN)
-  call destroy(ZPOOLP)
-  call destroy(WTLFN)
-  call destroy(WTSHEN)
-  call destroy(WTSTKN)
-  call destroy(WTRSVN)
-  call destroy(WTHSKN)
-  call destroy(WTEARN)
-  call destroy(WTGRNN)
-  call destroy(CZPOLP)
   call destroy(ZPOLNP)
-  call destroy(CPPOLP)
-  call destroy(WTNDN)
-  call destroy(WTSHP)
-  call destroy(PPOOLP)
-  call destroy(WTLFP)
-  call destroy(WTSHEP)
-  call destroy(WTSTKP)
-  call destroy(WTRSVP)
-  call destroy(WTHSKP)
-  call destroy(WTEARP)
-  call destroy(WTGRNP)
   call destroy(PPOLNP)
   call destroy(WVSTKB)
   call destroy(CPOOL)
@@ -649,21 +574,14 @@ module CanopyDataType
   call destroy(WGNODN)
   call destroy(CCPLNP)
   call destroy(GRWTB)
-  call destroy(WTSTDG)
-  call destroy(WTSTG)
-  call destroy(WTSTDN)
-  call destroy(WTSTGN)
+  call destroy(WTSTDE)
+  call destroy(WTSTGE)
   call destroy(WGLFP)
   call destroy(WGSHP)
   call destroy(WGNODP)
   call destroy(WGLFLP)
-  call destroy(WTSTDP)
-  call destroy(WTSTGP)
-  call destroy(WTNDP)
-  call destroy(WTRVC)
+  call destroy(WTRVE)
   call destroy(WTRVX)
-  call destroy(WTRVN)
-  call destroy(WTRVP)
   call destroy(WTSHTA)
   end subroutine DestructCanopyData
 

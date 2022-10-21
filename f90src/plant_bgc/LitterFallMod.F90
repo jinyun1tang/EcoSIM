@@ -24,8 +24,8 @@ implicit none
     IDAYH      =>   plt_distb%IDAYH    , &
     UVOLO      =>   plt_ew%UVOLO       , &
     VOLWP      =>   plt_ew%VOLWP       , &
-    WTRT       =>   plt_biom%WTRT      , &
-    WTRVC      =>   plt_biom%WTRVC     , &
+    WTRTE      =>   plt_biom%WTRTE     , &
+    WTRVE      =>   plt_biom%WTRVE     , &
     ISTYP      =>   plt_pheno%ISTYP    , &
     IDTHR      =>   plt_pheno%IDTHR    , &
     IDTHP      =>   plt_pheno%IDTHP    , &
@@ -97,7 +97,7 @@ implicit none
 !     PP=PFT population
 !     IDTHP,IDTHR=PFT shoot,root living flag: 0=alive,1=dead
 !
-      IF(WTRVC(NZ).LT.1.0E-04*WTRT(NZ) &
+      IF(WTRVE(NZ,ielmc).LT.1.0E-04*WTRTE(NZ,ielmc) &
         .AND.ISTYP(NZ).NE.0)IDTHR(NZ)=1
       IF(ISTYP(NZ).EQ.0)IDTHR(NZ)=1
       IF(JHVST(NZ).NE.0)IDTHR(NZ)=1
@@ -141,7 +141,6 @@ implicit none
     WTSTBN     =>   plt_biom%WTSTBN   , &
     WTRSBP     =>   plt_biom%WTRSBP   , &
     WTGRBN     =>   plt_biom%WTGRBN   , &
-    WTRVP      =>   plt_biom%WTRVP    , &
     WTGRBP     =>   plt_biom%WTGRBP   , &
     WTHSKB     =>   plt_biom%WTHSKB   , &
     WTSHEB     =>   plt_biom%WTSHEB   , &
@@ -152,24 +151,19 @@ implicit none
     CPOLNB     =>   plt_biom%CPOLNB   , &
     WTRSBN     =>   plt_biom%WTRSBN   , &
     WTLFBP     =>   plt_biom%WTLFBP   , &
-    WTRVN      =>   plt_biom%WTRVN    , &
     WTNDBP     =>   plt_biom%WTNDBP   , &
-    WTRVC      =>   plt_biom%WTRVC    , &
+    WTRVE      =>   plt_biom%WTRVE    , &
     WTGRB      =>   plt_biom%WTGRB    , &
     WTRT1      =>   plt_biom%WTRT1    , &
     WTRT1N     =>   plt_biom%WTRT1N   , &
     WTRT1P     =>   plt_biom%WTRT1P   , &
     WTLFB      =>   plt_biom%WTLFB    , &
-    CPOOLR     =>   plt_biom%CPOOLR   , &
-    ZPOOLR     =>   plt_biom%ZPOOLR   , &
-    PPOOLR     =>   plt_biom%PPOOLR   , &
-    WTSTDN     =>   plt_biom%WTSTDN   , &
-    WTSTDP     =>   plt_biom%WTSTDP   , &
+    EPOOLR     =>   plt_biom%EPOOLR   , &
     WTNDBN     =>   plt_biom%WTNDBN   , &
     WTSHBN     =>   plt_biom%WTSHBN   , &
     WTHSBP     =>   plt_biom%WTHSBP   , &
     WTHSBN     =>   plt_biom%WTHSBN   , &
-    WTSTDG     =>   plt_biom%WTSTDG   , &
+    WTSTDE     =>   plt_biom%WTSTDE   , &
     WTRT2      =>   plt_biom%WTRT2    , &
     WTRT2N     =>   plt_biom%WTRT2N   , &
     WTRT2P     =>   plt_biom%WTRT2P   , &
@@ -191,9 +185,7 @@ implicit none
     IGTYP      =>   plt_pheno%IGTYP   , &
     IBTYP      =>   plt_pheno%IBTYP   , &
     IDTHP      =>   plt_pheno%IDTHP   , &
-    CSNC       =>   plt_bgcr%CSNC     , &
-    ZSNC       =>   plt_bgcr%ZSNC     , &
-    PSNC       =>   plt_bgcr%PSNC     , &
+    ESNC       =>   plt_bgcr%ESNC     , &
     LYRC       =>   plt_site%LYRC     , &
     NJ         =>   plt_site%NJ       , &
     NU         =>   plt_site%NU       , &
@@ -231,57 +223,57 @@ implicit none
 !
   IF(IDTHP(NZ).EQ.1.AND.IDTHR(NZ).EQ.1)THEN
     IF(IFLGI(NZ).EQ.0)THEN
-      DO 6425 M=1,jsken
-        DO 8825 NB=1,NBR(NZ)
-          CSNC(M,1,0,NZ)=CSNC(M,1,0,NZ) &
+      D6425: DO M=1,jsken
+        D8825: DO NB=1,NBR(NZ)
+          ESNC(M,1,0,NZ,ielmc)=ESNC(M,1,0,NZ,ielmc) &
             +CFOPC(0,M,NZ)*(CPOOL(NB,NZ)+CPOLNB(NB,NZ) &
             +CPOOLK(NB,NZ)+WTRSVB(NB,NZ)) &
             +CFOPC(1,M,NZ)*(WTLFB(NB,NZ)*FWODB(1) &
             +WTNDB(NB,NZ)) &
             +CFOPC(2,M,NZ)*(WTSHEB(NB,NZ)*FWODB(1) &
             +WTHSKB(NB,NZ)+WTEARB(NB,NZ))
-          CSNC(M,0,0,NZ)=CSNC(M,0,0,NZ) &
+          ESNC(M,0,0,NZ,ielmc)=ESNC(M,0,0,NZ,ielmc) &
             +CFOPC(5,M,NZ)*(WTLFB(NB,NZ)*FWODB(0) &
             +WTSHEB(NB,NZ)*FWODB(0))
-          ZSNC(M,1,0,NZ)=ZSNC(M,1,0,NZ) &
+          ESNC(M,1,0,NZ,ielmn)=ESNC(M,1,0,NZ,ielmn) &
             +CFOPN(0,M,NZ)*(ZPOOL(NB,NZ)+ZPOLNB(NB,NZ) &
             +WTRSBN(NB,NZ)) &
             +CFOPN(1,M,NZ)*(WTLFBN(NB,NZ)*FWODLN(1) &
             +WTNDBN(NB,NZ)) &
             +CFOPN(2,M,NZ)*(WTSHBN(NB,NZ)*FWODSN(1) &
             +WTHSBN(NB,NZ)+WTEABN(NB,NZ))
-          ZSNC(M,0,0,NZ)=ZSNC(M,0,0,NZ) &
+          ESNC(M,0,0,NZ,ielmn)=ESNC(M,0,0,NZ,ielmn) &
             +CFOPN(5,M,NZ)*(WTLFBN(NB,NZ)*FWODLN(0) &
             +WTSHBN(NB,NZ)*FWODSN(0))
-          PSNC(M,1,0,NZ)=PSNC(M,1,0,NZ) &
+          ESNC(M,1,0,NZ,ielmp)=ESNC(M,1,0,NZ,ielmp) &
             +CFOPP(0,M,NZ)*(PPOOL(NB,NZ)+PPOLNB(NB,NZ) &
             +WTRSBP(NB,NZ)) &
             +CFOPP(1,M,NZ)*(WTLFBP(NB,NZ)*FWODLP(1) &
             +WTNDBP(NB,NZ)) &
             +CFOPP(2,M,NZ)*(WTSHBP(NB,NZ)*FWODSP(1) &
             +WTHSBP(NB,NZ)+WTEABP(NB,NZ))
-          PSNC(M,0,0,NZ)=PSNC(M,0,0,NZ) &
+          ESNC(M,0,0,NZ,ielmp)=ESNC(M,0,0,NZ,ielmp) &
             +CFOPP(5,M,NZ)*(WTLFBP(NB,NZ)*FWODLP(0) &
             +WTSHBP(NB,NZ)*FWODSP(0))
           IF(ISTYP(NZ).EQ.0.AND.IWTYP(NZ).NE.0)THEN
-            WTRVC(NZ)=WTRVC(NZ)+CFOPC(2,M,NZ)*WTGRB(NB,NZ)
-            WTRVN(NZ)=WTRVN(NZ)+CFOPN(2,M,NZ)*WTGRBN(NB,NZ)
-            WTRVP(NZ)=WTRVP(NZ)+CFOPP(2,M,NZ)*WTGRBP(NB,NZ)
+            WTRVE(NZ,ielmc)=WTRVE(NZ,ielmc)+CFOPC(2,M,NZ)*WTGRB(NB,NZ)
+            WTRVE(NZ,ielmn)=WTRVE(NZ,ielmn)+CFOPN(2,M,NZ)*WTGRBN(NB,NZ)
+            WTRVE(NZ,ielmp)=WTRVE(NZ,ielmp)+CFOPP(2,M,NZ)*WTGRBP(NB,NZ)
           ELSE
-            CSNC(M,1,0,NZ)=CSNC(M,1,0,NZ)+CFOPC(2,M,NZ)*WTGRB(NB,NZ)
-            ZSNC(M,1,0,NZ)=ZSNC(M,1,0,NZ)+CFOPN(2,M,NZ)*WTGRBN(NB,NZ)
-            PSNC(M,1,0,NZ)=PSNC(M,1,0,NZ)+CFOPP(2,M,NZ)*WTGRBP(NB,NZ)
+            ESNC(M,1,0,NZ,ielmc)=ESNC(M,1,0,NZ,ielmc)+CFOPC(2,M,NZ)*WTGRB(NB,NZ)
+            ESNC(M,1,0,NZ,ielmn)=ESNC(M,1,0,NZ,ielmn)+CFOPN(2,M,NZ)*WTGRBN(NB,NZ)
+            ESNC(M,1,0,NZ,ielmp)=ESNC(M,1,0,NZ,ielmp)+CFOPP(2,M,NZ)*WTGRBP(NB,NZ)
           ENDIF
           IF(IBTYP(NZ).EQ.0.OR.IGTYP(NZ).LE.1)THEN
-            CSNC(M,1,0,NZ)=CSNC(M,1,0,NZ)+CFOPC(3,M,NZ)*WTSTKB(NB,NZ)
-            ZSNC(M,1,0,NZ)=ZSNC(M,1,0,NZ)+CFOPN(3,M,NZ)*WTSTBN(NB,NZ)
-            PSNC(M,1,0,NZ)=PSNC(M,1,0,NZ)+CFOPP(3,M,NZ)*WTSTBP(NB,NZ)
+            ESNC(M,1,0,NZ,ielmc)=ESNC(M,1,0,NZ,ielmc)+CFOPC(3,M,NZ)*WTSTKB(NB,NZ)
+            ESNC(M,1,0,NZ,ielmn)=ESNC(M,1,0,NZ,ielmn)+CFOPN(3,M,NZ)*WTSTBN(NB,NZ)
+            ESNC(M,1,0,NZ,ielmp)=ESNC(M,1,0,NZ,ielmp)+CFOPP(3,M,NZ)*WTSTBP(NB,NZ)
           ELSE
-            WTSTDG(M,NZ)=WTSTDG(M,NZ)+CFOPC(5,M,NZ)*WTSTKB(NB,NZ)
-            WTSTDN(M,NZ)=WTSTDN(M,NZ)+CFOPN(5,M,NZ)*WTSTBN(NB,NZ)
-            WTSTDP(M,NZ)=WTSTDP(M,NZ)+CFOPP(5,M,NZ)*WTSTBP(NB,NZ)
+            WTSTDE(M,NZ,ielmc)=WTSTDE(M,NZ,ielmc)+CFOPC(5,M,NZ)*WTSTKB(NB,NZ)
+            WTSTDE(M,NZ,ielmn)=WTSTDE(M,NZ,ielmn)+CFOPN(5,M,NZ)*WTSTBN(NB,NZ)
+            WTSTDE(M,NZ,ielmp)=WTSTDE(M,NZ,ielmp)+CFOPP(5,M,NZ)*WTSTBP(NB,NZ)
           ENDIF
-8825    CONTINUE
+        ENDDO D8825
 !
 !     LITTERFALL AND STATE VARIABLES FOR SEASONAL STORAGE
 !     RESERVES FROM ROOT AND STORGE AT DEATH
@@ -294,40 +286,40 @@ implicit none
 !     FWOOD,FWOODN,FWOODP=C,N,P woody fraction in root:0=woody,1=non-woody
 !     WTRVC,WTRVN,WTRVP=storage C,N,P
 !
-        DO 6415 L=NU,NJ
+        D6415: DO L=NU,NJ
           DO N=1,MY(NZ)
-            CSNC(M,1,L,NZ)=CSNC(M,1,L,NZ)+CFOPC(0,M,NZ)*CPOOLR(N,L,NZ)
-            ZSNC(M,1,L,NZ)=ZSNC(M,1,L,NZ)+CFOPN(0,M,NZ)*ZPOOLR(N,L,NZ)
-            PSNC(M,1,L,NZ)=PSNC(M,1,L,NZ)+CFOPP(0,M,NZ)*PPOOLR(N,L,NZ)
+            ESNC(M,1,L,NZ,ielmc)=ESNC(M,1,L,NZ,ielmc)+CFOPC(0,M,NZ)*EPOOLR(N,L,NZ,ielmc)
+            ESNC(M,1,L,NZ,ielmn)=ESNC(M,1,L,NZ,ielmn)+CFOPN(0,M,NZ)*EPOOLR(N,L,NZ,ielmn)
+            ESNC(M,1,L,NZ,ielmp)=ESNC(M,1,L,NZ,ielmp)+CFOPP(0,M,NZ)*EPOOLR(N,L,NZ,ielmp)
             DO NR=1,NRT(NZ)
-              CSNC(M,0,L,NZ)=CSNC(M,0,L,NZ)+CFOPC(5,M,NZ) &
+              ESNC(M,0,L,NZ,ielmc)=ESNC(M,0,L,NZ,ielmc)+CFOPC(5,M,NZ) &
                 *(WTRT1(N,L,NR,NZ)+WTRT2(N,L,NR,NZ))*FWODR(0)
-              ZSNC(M,0,L,NZ)=ZSNC(M,0,L,NZ)+CFOPN(5,M,NZ) &
+              ESNC(M,0,L,NZ,ielmn)=ESNC(M,0,L,NZ,ielmn)+CFOPN(5,M,NZ) &
                 *(WTRT1N(N,L,NR,NZ)+WTRT2N(N,L,NR,NZ))*FWODRN(0)
-              PSNC(M,0,L,NZ)=PSNC(M,0,L,NZ)+CFOPP(5,M,NZ) &
+              ESNC(M,0,L,NZ,ielmp)=ESNC(M,0,L,NZ,ielmp)+CFOPP(5,M,NZ) &
                 *(WTRT1P(N,L,NR,NZ)+WTRT2P(N,L,NR,NZ))*FWODRP(0)
-              CSNC(M,1,L,NZ)=CSNC(M,1,L,NZ)+CFOPC(4,M,NZ) &
+              ESNC(M,1,L,NZ,ielmc)=ESNC(M,1,L,NZ,ielmc)+CFOPC(4,M,NZ) &
                 *(WTRT1(N,L,NR,NZ)+WTRT2(N,L,NR,NZ))*FWODR(1)
-              ZSNC(M,1,L,NZ)=ZSNC(M,1,L,NZ)+CFOPN(4,M,NZ) &
+              ESNC(M,1,L,NZ,ielmn)=ESNC(M,1,L,NZ,ielmn)+CFOPN(4,M,NZ) &
                 *(WTRT1N(N,L,NR,NZ)+WTRT2N(N,L,NR,NZ))*FWODRN(1)
-              PSNC(M,1,L,NZ)=PSNC(M,1,L,NZ)+CFOPP(4,M,NZ) &
+              ESNC(M,1,L,NZ,ielmp)=ESNC(M,1,L,NZ,ielmp)+CFOPP(4,M,NZ) &
                 *(WTRT1P(N,L,NR,NZ)+WTRT2P(N,L,NR,NZ))*FWODRP(1)
             ENDDO
           ENDDO
-6415    CONTINUE
-        CSNC(M,0,NG(NZ),NZ)=CSNC(M,0,NG(NZ),NZ) &
-          +CFOPC(0,M,NZ)*WTRVC(NZ)*FWOOD(0)
-        ZSNC(M,0,NG(NZ),NZ)=ZSNC(M,0,NG(NZ),NZ) &
-          +CFOPN(0,M,NZ)*WTRVN(NZ)*FWOODN(0)
-        PSNC(M,0,NG(NZ),NZ)=PSNC(M,0,NG(NZ),NZ) &
-          +CFOPP(0,M,NZ)*WTRVP(NZ)*FWOODP(0)
-        CSNC(M,1,NG(NZ),NZ)=CSNC(M,1,NG(NZ),NZ) &
-          +CFOPC(0,M,NZ)*WTRVC(NZ)*FWOOD(1)
-        ZSNC(M,1,NG(NZ),NZ)=ZSNC(M,1,NG(NZ),NZ) &
-          +CFOPN(0,M,NZ)*WTRVN(NZ)*FWOODN(1)
-        PSNC(M,1,NG(NZ),NZ)=PSNC(M,1,NG(NZ),NZ) &
-          +CFOPP(0,M,NZ)*WTRVP(NZ)*FWOODP(1)
-6425  CONTINUE
+        ENDDO D6415
+        ESNC(M,0,NG(NZ),NZ,ielmc)=ESNC(M,0,NG(NZ),NZ,ielmc) &
+          +CFOPC(0,M,NZ)*WTRVE(NZ,ielmc)*FWOOD(0)
+        ESNC(M,0,NG(NZ),NZ,ielmn)=ESNC(M,0,NG(NZ),NZ,ielmn) &
+          +CFOPN(0,M,NZ)*WTRVE(NZ,ielmn)*FWOODN(0)
+        ESNC(M,0,NG(NZ),NZ,ielmp)=ESNC(M,0,NG(NZ),NZ,ielmp) &
+          +CFOPP(0,M,NZ)*WTRVE(NZ,ielmp)*FWOODP(0)
+        ESNC(M,1,NG(NZ),NZ,ielmc)=ESNC(M,1,NG(NZ),NZ,ielmc) &
+          +CFOPC(0,M,NZ)*WTRVE(NZ,ielmc)*FWOOD(1)
+        ESNC(M,1,NG(NZ),NZ,ielmn)=ESNC(M,1,NG(NZ),NZ,ielmn) &
+          +CFOPN(0,M,NZ)*WTRVE(NZ,ielmn)*FWOODN(1)
+        ESNC(M,1,NG(NZ),NZ,ielmp)=ESNC(M,1,NG(NZ),NZ,ielmp) &
+          +CFOPP(0,M,NZ)*WTRVE(NZ,ielmp)*FWOODP(1)
+      ENDDO D6425
 !
       call ResetBranchRootStates(NZ,CPOOLK)
     ENDIF
@@ -368,9 +360,7 @@ implicit none
     WTRT1     =>   plt_biom%WTRT1     , &
     WTRT1N    =>   plt_biom%WTRT1N    , &
     WTRT1P    =>   plt_biom%WTRT1P    , &
-    CPOOLR    =>   plt_biom%CPOOLR    , &
-    ZPOOLR    =>   plt_biom%ZPOOLR    , &
-    PPOOLR    =>   plt_biom%PPOOLR    , &
+    EPOOLR    =>   plt_biom%EPOOLR    , &
     WTRTD     =>   plt_biom%WTRTD     , &
     ZPOOLN    =>   plt_biom%ZPOOLN    , &
     WTRTL     =>   plt_biom%WTRTL     , &
@@ -407,9 +397,7 @@ implicit none
     RCH4Z     =>   plt_bgcr%RCH4Z     , &
     ROXYZ     =>   plt_bgcr%ROXYZ     , &
     RCO2Z     =>   plt_bgcr%RCO2Z     , &
-    CSNC      =>   plt_bgcr%CSNC      , &
-    ZSNC      =>   plt_bgcr%ZSNC      , &
-    PSNC      =>   plt_bgcr%PSNC      , &
+    ESNC      =>   plt_bgcr%ESNC      , &
     RTDNP     =>   plt_morph%RTDNP    , &
     RTVLW     =>   plt_morph%RTVLW    , &
     RTARP     =>   plt_morph%RTARP    , &
@@ -449,25 +437,25 @@ implicit none
   IF(IDTHR(NZ).EQ.1)THEN
     DO 8900 N=1,MY(NZ)
       DO 8895 L=NU,NJ
-        DO 6410 M=1,jsken
-          CSNC(M,1,L,NZ)=CSNC(M,1,L,NZ)+CFOPC(0,M,NZ)*CPOOLR(N,L,NZ)
-          ZSNC(M,1,L,NZ)=ZSNC(M,1,L,NZ)+CFOPN(0,M,NZ)*ZPOOLR(N,L,NZ)
-          PSNC(M,1,L,NZ)=PSNC(M,1,L,NZ)+CFOPP(0,M,NZ)*PPOOLR(N,L,NZ)
+        D6410: DO M=1,jsken
+          ESNC(M,1,L,NZ,ielmc)=ESNC(M,1,L,NZ,ielmc)+CFOPC(0,M,NZ)*EPOOLR(N,L,NZ,ielmc)
+          ESNC(M,1,L,NZ,ielmn)=ESNC(M,1,L,NZ,ielmn)+CFOPN(0,M,NZ)*EPOOLR(N,L,NZ,ielmn)
+          ESNC(M,1,L,NZ,ielmp)=ESNC(M,1,L,NZ,ielmp)+CFOPP(0,M,NZ)*EPOOLR(N,L,NZ,ielmp)
           DO  NR=1,NRT(NZ)
-            CSNC(M,0,L,NZ)=CSNC(M,0,L,NZ)+CFOPC(5,M,NZ) &
+            ESNC(M,0,L,NZ,ielmc)=ESNC(M,0,L,NZ,ielmc)+CFOPC(5,M,NZ) &
               *(WTRT1(N,L,NR,NZ)+WTRT2(N,L,NR,NZ))*FWODR(0)
-            ZSNC(M,0,L,NZ)=ZSNC(M,0,L,NZ)+CFOPN(5,M,NZ) &
+            ESNC(M,0,L,NZ,ielmn)=ESNC(M,0,L,NZ,ielmn)+CFOPN(5,M,NZ) &
               *(WTRT1N(N,L,NR,NZ)+WTRT2N(N,L,NR,NZ))*FWODRN(0)
-            PSNC(M,0,L,NZ)=PSNC(M,0,L,NZ)+CFOPP(5,M,NZ) &
+            ESNC(M,0,L,NZ,ielmp)=ESNC(M,0,L,NZ,ielmp)+CFOPP(5,M,NZ) &
               *(WTRT1P(N,L,NR,NZ)+WTRT2P(N,L,NR,NZ))*FWODRP(0)
-            CSNC(M,1,L,NZ)=CSNC(M,1,L,NZ)+CFOPC(4,M,NZ) &
+            ESNC(M,1,L,NZ,ielmc)=ESNC(M,1,L,NZ,ielmc)+CFOPC(4,M,NZ) &
               *(WTRT1(N,L,NR,NZ)+WTRT2(N,L,NR,NZ))*FWODR(1)
-            ZSNC(M,1,L,NZ)=ZSNC(M,1,L,NZ)+CFOPN(4,M,NZ) &
+            ESNC(M,1,L,NZ,ielmn)=ESNC(M,1,L,NZ,ielmn)+CFOPN(4,M,NZ) &
               *(WTRT1N(N,L,NR,NZ)+WTRT2N(N,L,NR,NZ))*FWODRN(1)
-            PSNC(M,1,L,NZ)=PSNC(M,1,L,NZ)+CFOPP(4,M,NZ) &
+            ESNC(M,1,L,NZ,ielmp)=ESNC(M,1,L,NZ,ielmp)+CFOPP(4,M,NZ) &
               *(WTRT1P(N,L,NR,NZ)+WTRT2P(N,L,NR,NZ))*FWODRP(1)
           enddo
-6410    CONTINUE
+        ENDDO D6410
 !
 !     RELEASE GAS CONTENTS OF DEAD ROOTS
 !
@@ -506,7 +494,7 @@ implicit none
 !     RTARP=root surface area per plant
 !     RTLGA=average secondary root length
 !
-        DO 8870 NR=1,NRT(NZ)
+        D8870: DO NR=1,NRT(NZ)
           WTRT1(N,L,NR,NZ)=0._r8
           WTRT1N(N,L,NR,NZ)=0._r8
           WTRT1P(N,L,NR,NZ)=0._r8
@@ -519,10 +507,8 @@ implicit none
           RTLG1(N,L,NR,NZ)=0._r8
           RTLG2(N,L,NR,NZ)=0._r8
           RTN2(N,L,NR,NZ)=0._r8
-8870    CONTINUE
-        CPOOLR(N,L,NZ)=0._r8
-        ZPOOLR(N,L,NZ)=0._r8
-        PPOOLR(N,L,NZ)=0._r8
+        ENDDO D8870
+        EPOOLR(N,L,NZ,:)=0._r8
         WTRTL(N,L,NZ)=0._r8
         WTRTD(N,L,NZ)=0._r8
         WSRTL(N,L,NZ)=0._r8
@@ -546,14 +532,14 @@ implicit none
 !     CPOOLN,ZPOOLN,PPOOLN=nonstructural C,N,P in bacteria
 !
         IF(INTYP(NZ).NE.0.AND.N.EQ.1)THEN
-          DO 6420 M=1,jsken
-            CSNC(M,1,L,NZ)=CSNC(M,1,L,NZ)+CFOPC(4,M,NZ) &
+          D6420: DO M=1,jsken
+            ESNC(M,1,L,NZ,ielmc)=ESNC(M,1,L,NZ,ielmc)+CFOPC(4,M,NZ) &
               *WTNDL(L,NZ)+CFOPC(0,M,NZ)*CPOOLN(L,NZ)
-            ZSNC(M,1,L,NZ)=ZSNC(M,1,L,NZ)+CFOPN(4,M,NZ) &
+            ESNC(M,1,L,NZ,ielmn)=ESNC(M,1,L,NZ,ielmn)+CFOPN(4,M,NZ) &
               *WTNDLN(L,NZ)+CFOPN(0,M,NZ)*ZPOOLN(L,NZ)
-            PSNC(M,1,L,NZ)=PSNC(M,1,L,NZ)+CFOPP(4,M,NZ) &
+            ESNC(M,1,L,NZ,ielmp)=ESNC(M,1,L,NZ,ielmp)+CFOPP(4,M,NZ) &
               *WTNDLP(L,NZ)+CFOPP(0,M,NZ)*PPOOLN(L,NZ)
-6420      CONTINUE
+          ENDDO D6420
           WTNDL(L,NZ)=0._r8
           WTNDLN(L,NZ)=0._r8
           WTNDLP(L,NZ)=0._r8
@@ -625,18 +611,14 @@ implicit none
     WTSTBP    =>  plt_biom%WTSTBP     , &
     ZPOOL     =>  plt_biom%ZPOOL      , &
     CPOOL     =>  plt_biom%CPOOL      , &
-    WTRVP     =>  plt_biom%WTRVP      , &
     WTGRBP    =>  plt_biom%WTGRBP     , &
     WTGRB     =>  plt_biom%WTGRB      , &
     WTRSVB    =>  plt_biom%WTRSVB     , &
     WTRSBN    =>  plt_biom%WTRSBN     , &
     WTRSBP    =>  plt_biom%WTRSBP     , &
-    WTSTDG    =>  plt_biom%WTSTDG     , &
-    WTSTDN    =>  plt_biom%WTSTDN     , &
-    WTSTDP    =>  plt_biom%WTSTDP     , &
+    WTSTDE    =>  plt_biom%WTSTDE     , &
     WTGRBN    =>  plt_biom%WTGRBN     , &
-    WTRVC     =>  plt_biom%WTRVC      , &
-    WTRVN     =>  plt_biom%WTRVN      , &
+    WTRVE     =>  plt_biom%WTRVE      , &
     CFOPC     =>  plt_soilchem%CFOPC  , &
     CFOPN     =>  plt_soilchem%CFOPN  , &
     CFOPP     =>  plt_soilchem%CFOPP  , &
@@ -663,9 +645,7 @@ implicit none
     IGTYP     =>  plt_pheno%IGTYP     , &
     IWTYP     =>  plt_pheno%IWTYP     , &
     ISTYP     =>  plt_pheno%ISTYP     , &
-    CSNC      =>  plt_bgcr%CSNC       , &
-    ZSNC      =>  plt_bgcr%ZSNC       , &
-    PSNC      =>  plt_bgcr%PSNC       , &
+    ESNC      =>  plt_bgcr%ESNC       , &
     NBR       =>  plt_morph%NBR       , &
     PSTGI     =>  plt_morph%PSTGI     , &
     PSTG      =>  plt_morph%PSTG      , &
@@ -728,53 +708,53 @@ implicit none
 !     IBTYP=turnover:0=all abve-grd,1=all leaf+petiole,2=none,3=between 1,2
 !     IGTYP=growth type:0=bryophyte,1=graminoid,2=shrub,tree
 !
-      DO 6405 M=1,jsken
-        CSNC(M,1,0,NZ)=CSNC(M,1,0,NZ) &
+      D6405: DO M=1,jsken
+        ESNC(M,1,0,NZ,ielmc)=ESNC(M,1,0,NZ,ielmc) &
           +CFOPC(0,M,NZ)*CPOLNB(NB,NZ) &
           +CFOPC(1,M,NZ)*(WTLFB(NB,NZ)*FWODB(1) &
           +WTNDB(NB,NZ)) &
           +CFOPC(2,M,NZ)*(WTSHEB(NB,NZ)*FWODB(1) &
           +WTHSKB(NB,NZ)+WTEARB(NB,NZ))
-        CSNC(M,0,0,NZ)=CSNC(M,0,0,NZ) &
+        ESNC(M,0,0,NZ,ielmc)=ESNC(M,0,0,NZ,ielmc) &
           +CFOPC(5,M,NZ)*(WTLFB(NB,NZ)*FWODB(0) &
           +WTSHEB(NB,NZ)*FWODB(0))
-        ZSNC(M,1,0,NZ)=ZSNC(M,1,0,NZ) &
+        ESNC(M,1,0,NZ,ielmn)=ESNC(M,1,0,NZ,ielmn) &
           +CFOPN(0,M,NZ)*ZPOLNB(NB,NZ) &
           +CFOPN(1,M,NZ)*(WTLFBN(NB,NZ)*FWODLN(1) &
           +WTNDBN(NB,NZ)) &
           +CFOPN(2,M,NZ)*(WTSHBN(NB,NZ)*FWODSN(1) &
           +WTHSBN(NB,NZ)+WTEABN(NB,NZ))
-        ZSNC(M,0,0,NZ)=ZSNC(M,0,0,NZ) &
+        ESNC(M,0,0,NZ,ielmn)=ESNC(M,0,0,NZ,ielmn) &
           +CFOPN(5,M,NZ)*(WTLFBN(NB,NZ)*FWODLN(0) &
           +WTSHBN(NB,NZ)*FWODSN(0))
-        PSNC(M,1,0,NZ)=PSNC(M,1,0,NZ) &
+        ESNC(M,1,0,NZ,ielmp)=ESNC(M,1,0,NZ,ielmp) &
           +CFOPP(0,M,NZ)*PPOLNB(NB,NZ) &
           +CFOPP(1,M,NZ)*(WTLFBP(NB,NZ)*FWODLP(1) &
           +WTNDBP(NB,NZ)) &
           +CFOPP(2,M,NZ)*(WTSHBP(NB,NZ)*FWODSP(1) &
           +WTHSBP(NB,NZ)+WTEABP(NB,NZ))
-        PSNC(M,0,0,NZ)=PSNC(M,0,0,NZ) &
+        ESNC(M,0,0,NZ,ielmp)=ESNC(M,0,0,NZ,ielmp) &
           +CFOPP(5,M,NZ)*(WTLFBP(NB,NZ)*FWODLP(0) &
           +WTSHBP(NB,NZ)*FWODSP(0))
         IF(ISTYP(NZ).EQ.0.AND.IWTYP(NZ).NE.0)THEN
-          WTRVC(NZ)=WTRVC(NZ)+CFOPC(2,M,NZ)*WTGRB(NB,NZ)
-          WTRVN(NZ)=WTRVN(NZ)+CFOPN(2,M,NZ)*WTGRBN(NB,NZ)
-          WTRVP(NZ)=WTRVP(NZ)+CFOPP(2,M,NZ)*WTGRBP(NB,NZ)
+          WTRVE(NZ,ielmc)=WTRVE(NZ,ielmc)+CFOPC(2,M,NZ)*WTGRB(NB,NZ)
+          WTRVE(NZ,ielmn)=WTRVE(NZ,ielmn)+CFOPN(2,M,NZ)*WTGRBN(NB,NZ)
+          WTRVE(NZ,ielmp)=WTRVE(NZ,ielmp)+CFOPP(2,M,NZ)*WTGRBP(NB,NZ)
         ELSE
-          CSNC(M,1,0,NZ)=CSNC(M,1,0,NZ)+CFOPC(2,M,NZ)*WTGRB(NB,NZ)
-          ZSNC(M,1,0,NZ)=ZSNC(M,1,0,NZ)+CFOPN(2,M,NZ)*WTGRBN(NB,NZ)
-          PSNC(M,1,0,NZ)=PSNC(M,1,0,NZ)+CFOPP(2,M,NZ)*WTGRBP(NB,NZ)
+          ESNC(M,1,0,NZ,ielmc)=ESNC(M,1,0,NZ,ielmc)+CFOPC(2,M,NZ)*WTGRB(NB,NZ)
+          ESNC(M,1,0,NZ,ielmn)=ESNC(M,1,0,NZ,ielmn)+CFOPN(2,M,NZ)*WTGRBN(NB,NZ)
+          ESNC(M,1,0,NZ,ielmp)=ESNC(M,1,0,NZ,ielmp)+CFOPP(2,M,NZ)*WTGRBP(NB,NZ)
         ENDIF
         IF(IBTYP(NZ).EQ.0.OR.IGTYP(NZ).LE.1)THEN
-          CSNC(M,1,0,NZ)=CSNC(M,1,0,NZ)+CFOPC(3,M,NZ)*WTSTKB(NB,NZ)
-          ZSNC(M,1,0,NZ)=ZSNC(M,1,0,NZ)+CFOPN(3,M,NZ)*WTSTBN(NB,NZ)
-          PSNC(M,1,0,NZ)=PSNC(M,1,0,NZ)+CFOPP(3,M,NZ)*WTSTBP(NB,NZ)
+          ESNC(M,1,0,NZ,ielmc)=ESNC(M,1,0,NZ,ielmc)+CFOPC(3,M,NZ)*WTSTKB(NB,NZ)
+          ESNC(M,1,0,NZ,ielmn)=ESNC(M,1,0,NZ,ielmn)+CFOPN(3,M,NZ)*WTSTBN(NB,NZ)
+          ESNC(M,1,0,NZ,ielmp)=ESNC(M,1,0,NZ,ielmp)+CFOPP(3,M,NZ)*WTSTBP(NB,NZ)
         ELSE
-          WTSTDG(M,NZ)=WTSTDG(M,NZ)+CFOPC(5,M,NZ)*WTSTKB(NB,NZ)
-          WTSTDN(M,NZ)=WTSTDN(M,NZ)+CFOPN(5,M,NZ)*WTSTBN(NB,NZ)
-          WTSTDP(M,NZ)=WTSTDP(M,NZ)+CFOPP(5,M,NZ)*WTSTBP(NB,NZ)
+          WTSTDE(M,NZ,ielmc)=WTSTDE(M,NZ,ielmc)+CFOPC(5,M,NZ)*WTSTKB(NB,NZ)
+          WTSTDE(M,NZ,ielmn)=WTSTDE(M,NZ,ielmn)+CFOPN(5,M,NZ)*WTSTBN(NB,NZ)
+          WTSTDE(M,NZ,ielmp)=WTSTDE(M,NZ,ielmp)+CFOPP(5,M,NZ)*WTSTBP(NB,NZ)
         ENDIF
-6405  CONTINUE
+      ENDDO D6405
 !
 !     RECOVER NON-STRUCTURAL C,N,P FROM BRANCH TO
 !     SEASONAL STORAGE RESERVES
@@ -786,22 +766,22 @@ implicit none
 !     IHVST=harvest type:0=none,1=grain,2=all above-ground
 !                       ,3=pruning,4=grazing,5=fire,6=herbivory
 !
-      WTRVC(NZ)=WTRVC(NZ)+CPOOL(NB,NZ)+CPOOLK(NB,NZ)
-      WTRVN(NZ)=WTRVN(NZ)+ZPOOL(NB,NZ)
-      WTRVP(NZ)=WTRVP(NZ)+PPOOL(NB,NZ)
+      WTRVE(NZ,ielmc)=WTRVE(NZ,ielmc)+CPOOL(NB,NZ)+CPOOLK(NB,NZ)
+      WTRVE(NZ,ielmn)=WTRVE(NZ,ielmn)+ZPOOL(NB,NZ)
+      WTRVE(NZ,ielmp)=WTRVE(NZ,ielmp)+PPOOL(NB,NZ)
       IF(IHVST(NZ).NE.4.AND.IHVST(NZ).NE.6)THEN
-        DO 6406 M=1,jsken
-          CSNC(M,1,0,NZ)=CSNC(M,1,0,NZ) &
+        D6406: DO M=1,jsken
+          ESNC(M,1,0,NZ,ielmc)=ESNC(M,1,0,NZ,ielmc) &
             +CFOPC(0,M,NZ)*WTRSVB(NB,NZ)
-          ZSNC(M,1,0,NZ)=ZSNC(M,1,0,NZ) &
+          ESNC(M,1,0,NZ,ielmn)=ESNC(M,1,0,NZ,ielmn) &
             +CFOPN(0,M,NZ)*WTRSBN(NB,NZ)
-          PSNC(M,1,0,NZ)=PSNC(M,1,0,NZ) &
+          ESNC(M,1,0,NZ,ielmp)=ESNC(M,1,0,NZ,ielmp) &
             +CFOPP(0,M,NZ)*WTRSBP(NB,NZ)
-6406    CONTINUE
+        ENDDO D6406
       ELSE
-        WTRVC(NZ)=WTRVC(NZ)+WTRSVB(NB,NZ)
-        WTRVN(NZ)=WTRVN(NZ)+WTRSBN(NB,NZ)
-        WTRVP(NZ)=WTRVP(NZ)+WTRSBP(NB,NZ)
+        WTRVE(NZ,ielmc)=WTRVE(NZ,ielmc)+WTRSVB(NB,NZ)
+        WTRVE(NZ,ielmn)=WTRVE(NZ,ielmn)+WTRSBN(NB,NZ)
+        WTRVE(NZ,ielmp)=WTRVE(NZ,ielmp)+WTRSBP(NB,NZ)
       ENDIF
 !
       call ResetDeadRootStates(NB,NZ,CPOOLK)
@@ -835,9 +815,7 @@ implicit none
     WVSTKB => plt_biom%WVSTKB        , &
     WTRSBN => plt_biom%WTRSBN        , &
     WTHSBN => plt_biom%WTHSBN        , &
-    CPOOLR => plt_biom%CPOOLR        , &
-    ZPOOLR => plt_biom%ZPOOLR        , &
-    PPOOLR => plt_biom%PPOOLR        , &
+    EPOOLR => plt_biom%EPOOLR        , &
     WTEABN => plt_biom%WTEABN        , &
     WTGRBN => plt_biom%WTGRBN        , &
     WTSHTP => plt_biom%WTSHTP        , &
@@ -855,9 +833,7 @@ implicit none
     WTSTBN => plt_biom%WTSTBN        , &
     WTLSB  => plt_biom%WTLSB         , &
     WTSHBN => plt_biom%WTSHBN        , &
-    WTRVC  => plt_biom%WTRVC         , &
-    WTRVN  => plt_biom%WTRVN         , &
-    WTRVP  => plt_biom%WTRVP         , &
+    WTRVE  => plt_biom%WTRVE         , &
     WTLFBN => plt_biom%WTLFBN        , &
     WTSHTN => plt_biom%WTSHTN        , &
     WTRT1  => plt_biom%WTRT1         , &
@@ -930,11 +906,9 @@ implicit none
 !
 !     RESET ROOT STATE VARIABLES
 !
-  DO 6416 L=NU,NJ
+  D6416: DO L=NU,NJ
     DO  N=1,MY(NZ)
-      CPOOLR(N,L,NZ)=0._r8
-      ZPOOLR(N,L,NZ)=0._r8
-      PPOOLR(N,L,NZ)=0._r8
+      EPOOLR(N,L,NZ,:)=0._r8
       DO  NR=1,NRT(NZ)
         WTRT1(N,L,NR,NZ)=0._r8
         WTRT1N(N,L,NR,NZ)=0._r8
@@ -950,10 +924,10 @@ implicit none
         RTN2(N,L,NR,NZ)=0._r8
       enddo
     enddo
-6416  CONTINUE
-  WTRVC(NZ)=0._r8
-  WTRVN(NZ)=0._r8
-  WTRVP(NZ)=0._r8
+  ENDDO D6416
+  WTRVE(NZ,ielmc)=0._r8
+  WTRVE(NZ,ielmn)=0._r8
+  WTRVE(NZ,ielmp)=0._r8
   IDTH(NZ)=1
   end associate
   end subroutine ResetBranchRootStates

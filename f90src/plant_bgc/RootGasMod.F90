@@ -56,8 +56,8 @@ module RootGasMod
   real(r8) :: ZH3PA,ZH3PB,ZH3GA,ZH3GB,Z2OPX,ZH3PX
 
 !     begin_execution
-  associate(                           &
-    WTRTS  =>  plt_biom%WTRTS    , &
+  associate(                       &
+    WTRTSE =>  plt_biom%WTRTSE   , &
     ZEROP  =>  plt_biom%ZEROP    , &
     PP     =>  plt_site%PP       , &
     DPTHZ  =>  plt_site%DPTHZ    , &
@@ -275,7 +275,7 @@ module RootGasMod
 !     DPTHZ=depth of primary root from surface
 !     RTLGA=average secondary root length
 !
-    IF(WTRTS(NZ).GT.ZEROP(NZ).AND.FRTDPX(L,NZ).GT.ZERO)THEN
+    IF(WTRTSE(NZ,ielmc).GT.ZEROP(NZ).AND.FRTDPX(L,NZ).GT.ZERO)THEN
       RTCR1=AMAX1(PP(NZ),RTN1(N,L,NZ)) &
         *PICON*RRAD1(N,L,NZ)**2/DPTHZ(L)
       RTCR2=(RTNL(N,L,NZ)*PICON*RRAD2(N,L,NZ)**2 &

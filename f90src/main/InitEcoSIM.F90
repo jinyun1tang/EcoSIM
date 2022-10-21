@@ -8,7 +8,7 @@ module InitEcoSIM
   contains
 
   subroutine InitModules(nmicbguilds)
-
+  use EcoSimSumDataType   , only : InitEcoSimSum
   use SnowDataType        , only : InitSnowData
   use ErosionMod          , only : InitErosion
   use FlagDataType        , only : InitFlagData
@@ -53,6 +53,8 @@ module InitEcoSIM
   integer                 , intent(in) :: nmicbguilds   !number of microbial guilds per group
 
 ! begin_execution
+
+
   call InitSOMBGC(nmicbguilds)
 
   call InitGridData
@@ -129,6 +131,7 @@ module InitEcoSIM
 
   call InitErosion
 
+  call InitEcoSimSum
   end subroutine InitModules
 
 !------------------------------------------------------------------------------------------

@@ -56,7 +56,7 @@ module PlantDisturbMod
             D1990: DO NY1=NVN,NVS
               IF(LSG(NZ,NY1,NX1).EQ.LSG(NZ,NY,NX))THEN
                 IF(IFLGC(NZ,NY1,NX1).EQ.1)THEN
-                  WTSHTZ=WTSHTZ+WTSHT(NZ,NY1,NX1)
+                  WTSHTZ=WTSHTZ+WTSHTE(NZ,NY1,NX1,ielmc)
                   NN=NN+1
                 ENDIF
               ENDIF
@@ -65,7 +65,7 @@ module PlantDisturbMod
           IF(NN.GT.0)THEN
             WTSHTA(NZ,NY,NX)=WTSHTZ/NN
           ELSE
-            WTSHTA(NZ,NY,NX)=WTSHT(NZ,NY,NX)
+            WTSHTA(NZ,NY,NX)=WTSHTE(NZ,NY,NX,ielmc)
           ENDIF
         ENDIF
       ENDDO D2985

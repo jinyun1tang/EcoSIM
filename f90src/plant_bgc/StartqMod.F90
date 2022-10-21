@@ -3,6 +3,7 @@ module StartqMod
   use EcosimConst
   use GridConsts
   use FlagDataType
+  use EcoSIMConfig, only : jsken=>jskenc
   use EcosimConst
   use EcoSIMCtrlDataType
   use minimathmod, only : AZMAX1
@@ -78,26 +79,18 @@ module StartqMod
 !
 !     FILL OUT UNUSED ARRAYS
 !
-      DO 9986 NZ=NP(NY,NX)+1,JP
-        TCSN0(NZ,NY,NX)=0._r8
-        TZSN0(NZ,NY,NX)=0._r8
-        TPSN0(NZ,NY,NX)=0._r8
-        TCSNC(NZ,NY,NX)=0._r8
-        TZSNC(NZ,NY,NX)=0._r8
-        TPSNC(NZ,NY,NX)=0._r8
-        WTSTG(NZ,NY,NX)=0._r8
-        WTSTGN(NZ,NY,NX)=0._r8
-        WTSTGP(NZ,NY,NX)=0._r8
-        DO 6401 L=1,NL(NY,NX)
+      D9986: DO NZ=NP(NY,NX)+1,JP
+        TESN0(NZ,NY,NX,:)=0._r8
+        TESNC(NZ,NY,NX,:)=0._r8
+        WTSTGE(NZ,NY,NX,:)=0._r8
+        D6401: DO L=1,NL(NY,NX)
           DO  K=0,1
-            DO  M=1,4
-              CSNC(M,K,L,NZ,NY,NX)=0._r8
-              ZSNC(M,K,L,NZ,NY,NX)=0._r8
-              PSNC(M,K,L,NZ,NY,NX)=0._r8
+            DO  M=1,jsken
+              ESNC(M,K,L,NZ,NY,NX,:)=0._r8
             enddo
           enddo
-6401    CONTINUE
-9986  CONTINUE
+        ENDDO D6401
+      ENDDO D9986
 9990  CONTINUE
 9995  CONTINUE
   RETURN
@@ -592,57 +585,36 @@ module StartqMod
         CO2B(K,NB,NZ,NY,NX)=0._r8
         HCOB(K,NB,NZ,NY,NX)=0._r8
         CPOOL4(K,NB,NZ,NY,NX)=0._r8
-        DO 45 L=1,JC
+        D45: DO L=1,JC
           DO N=1,JLI
             SURF(N,L,K,NB,NZ,NY,NX)=0._r8
           enddo
-45      CONTINUE
+        ENDDO D45
       ENDIF
     enddo
 25  CONTINUE
-  DO 35 L=1,JC
+  D35: DO L=1,JC
     ARLFV(L,NZ,NY,NX)=0._r8
     WGLFV(L,NZ,NY,NX)=0._r8
     ARSTV(L,NZ,NY,NX)=0._r8
-35  CONTINUE
-  CPOOLP(NZ,NY,NX)=0._r8
-  ZPOOLP(NZ,NY,NX)=0._r8
-  PPOOLP(NZ,NY,NX)=0._r8
-  CCPOLP(NZ,NY,NX)=0._r8
+  ENDDO D35
+  EPOOLP(NZ,NY,NX,:)=0._r8
+  CEPOLP(NZ,NY,NX,:)=0._r8
   CCPLNP(NZ,NY,NX)=0._r8
-  CZPOLP(NZ,NY,NX)=0._r8
-  CPPOLP(NZ,NY,NX)=0._r8
-  WTSHT(NZ,NY,NX)=0._r8
-  WTLF(NZ,NY,NX)=0._r8
-  WTSHE(NZ,NY,NX)=0._r8
-  WTSTK(NZ,NY,NX)=0._r8
+  WTSHTE(NZ,NY,NX,:)=0._r8
+  WTLFE(NZ,NY,NX,:)=0._r8
+  WTSHEE(NZ,NY,NX,:)=0._r8
+  WTSTKE(NZ,NY,NX,:)=0._r8
   WVSTK(NZ,NY,NX)=0._r8
-  WTRSV(NZ,NY,NX)=0._r8
-  WTHSK(NZ,NY,NX)=0._r8
-  WTEAR(NZ,NY,NX)=0._r8
-  WTGR(NZ,NY,NX)=0._r8
-  WTRT(NZ,NY,NX)=0._r8
-  WTRTS(NZ,NY,NX)=0._r8
-  WTND(NZ,NY,NX)=0._r8
+  WTRSVE(NZ,NY,NX,:)=0._r8
+  WTHSKE(NZ,NY,NX,:)=0._r8
+  WTEARE(NZ,NY,NX,:)=0._r8
+  WTGRE(NZ,NY,NX,:)=0._r8
+  WTRTE(NZ,NY,NX,:)=0._r8
+  WTRTSE(NZ,NY,NX,:)=0._r8
+  WTNDE(NZ,NY,NX,:)=0._r8
   WTLS(NZ,NY,NX)=0._r8
-  WTSHN(NZ,NY,NX)=0._r8
-  WTLFN(NZ,NY,NX)=0._r8
-  WTSHEN(NZ,NY,NX)=0._r8
-  WTSTKN(NZ,NY,NX)=0._r8
-  WTRSVN(NZ,NY,NX)=0._r8
-  WTHSKN(NZ,NY,NX)=0._r8
-  WTEARN(NZ,NY,NX)=0._r8
-  WTGRNN(NZ,NY,NX)=0._r8
-  WTNDN(NZ,NY,NX)=0._r8
-  WTSHP(NZ,NY,NX)=0._r8
-  WTLFP(NZ,NY,NX)=0._r8
-  WTSHEP(NZ,NY,NX)=0._r8
-  WTSTKP(NZ,NY,NX)=0._r8
-  WTRSVP(NZ,NY,NX)=0._r8
-  WTHSKP(NZ,NY,NX)=0._r8
-  WTEARP(NZ,NY,NX)=0._r8
-  WTGRNP(NZ,NY,NX)=0._r8
-  WTNDP(NZ,NY,NX)=0._r8
+
   ARLFP(NZ,NY,NX)=0._r8
   WTRTA(NZ,NY,NX)=0._r8
   ARSTP(NZ,NY,NX)=0._r8
@@ -660,17 +632,11 @@ module StartqMod
 !
   IF(.not.is_restart_run.AND.is_first_year)THEN
     CARBN(NZ,NY,NX)=0._r8
-    TCSN0(NZ,NY,NX)=0._r8
-    TZSN0(NZ,NY,NX)=0._r8
-    TPSN0(NZ,NY,NX)=0._r8
+    TESN0(NZ,NY,NX,:)=0._r8
     TCO2T(NZ,NY,NX)=0._r8
     TCO2A(NZ,NY,NX)=0._r8
-    TCUPTK(NZ,NY,NX)=0._r8
-    TCSNC(NZ,NY,NX)=0._r8
-    TZUPTK(NZ,NY,NX)=0._r8
-    TZSNC(NZ,NY,NX)=0._r8
-    TPUPTK(NZ,NY,NX)=0._r8
-    TPSNC(NZ,NY,NX)=0._r8
+    TEUPTK(NZ,NY,NX,:)=0._r8
+    TESNC(NZ,NY,NX,:)=0._r8
     TZUPFX(NZ,NY,NX)=0._r8
     RNH3C(NZ,NY,NX)=0._r8
     TNH3C(NZ,NY,NX)=0._r8
@@ -680,28 +646,22 @@ module StartqMod
     VNH3F(NZ,NY,NX)=0._r8
     VN2OF(NZ,NY,NX)=0._r8
     VPO4F(NZ,NY,NX)=0._r8
-    THVSTC(NZ,NY,NX)=0._r8
-    THVSTN(NZ,NY,NX)=0._r8
-    THVSTP(NZ,NY,NX)=0._r8
-    HVSTC(NZ,NY,NX)=0._r8
-    HVSTN(NZ,NY,NX)=0._r8
-    HVSTP(NZ,NY,NX)=0._r8
+    THVSTE(NZ,NY,NX,:)=0._r8
+    HVSTE(NZ,NY,NX,:)=0._r8
     RSETC(NZ,NY,NX)=0._r8
     RSETN(NZ,NY,NX)=0._r8
     RSETP(NZ,NY,NX)=0._r8
     CTRAN(NZ,NY,NX)=0._r8
-    WTSTG(NZ,NY,NX)=0._r8
-    WTSTGN(NZ,NY,NX)=0._r8
-    WTSTGP(NZ,NY,NX)=0._r8
+    WTSTGE(NZ,NY,NX,:)=0._r8
     WTSTDX=WTSTDI(NZ,NY,NX)*AREA(3,NU(NY,NX),NY,NX)
-    DO 155 M=1,4
-      WTSTDG(M,NZ,NY,NX)=WTSTDX*CFOPC(5,M,NZ,NY,NX)
-      WTSTDN(M,NZ,NY,NX)=WTSTDX*CNSTK(NZ,NY,NX)*CFOPN(5,M,NZ,NY,NX)
-      WTSTDP(M,NZ,NY,NX)=WTSTDX*CPSTK(NZ,NY,NX)*CFOPP(5,M,NZ,NY,NX)
-      WTSTG(NZ,NY,NX)=WTSTG(NZ,NY,NX)+WTSTDG(M,NZ,NY,NX)
-      WTSTGN(NZ,NY,NX)=WTSTGN(NZ,NY,NX)+WTSTDN(M,NZ,NY,NX)
-      WTSTGP(NZ,NY,NX)=WTSTGP(NZ,NY,NX)+WTSTDP(M,NZ,NY,NX)
-155 CONTINUE
+    D155: DO M=1,jsken
+      WTSTDE(M,NZ,NY,NX,ielmc)=WTSTDX*CFOPC(5,M,NZ,NY,NX)
+      WTSTDE(M,NZ,NY,NX,ielmn)=WTSTDX*CNSTK(NZ,NY,NX)*CFOPN(5,M,NZ,NY,NX)
+      WTSTDE(M,NZ,NY,NX,ielmp)=WTSTDX*CPSTK(NZ,NY,NX)*CFOPP(5,M,NZ,NY,NX)
+      WTSTGE(NZ,NY,NX,ielmc)=WTSTGE(NZ,NY,NX,ielmc)+WTSTDE(M,NZ,NY,NX,ielmc)
+      WTSTGE(NZ,NY,NX,ielmn)=WTSTGE(NZ,NY,NX,ielmn)+WTSTDE(M,NZ,NY,NX,ielmn)
+      WTSTGE(NZ,NY,NX,ielmp)=WTSTGE(NZ,NY,NX,ielmp)+WTSTDE(M,NZ,NY,NX,ielmp)
+    ENDDO D155
   ENDIF
   end subroutine InitMassBalance
 !------------------------------------------------------------------------------------------
@@ -718,7 +678,7 @@ module StartqMod
 !     TCG,TKG=canopy temperature for phenology (oC,K)
 !     PSILT,PSILO,PSILG=canopy total,osmotic,turgor water potl(MPa)
 !
-  VHCPC(NZ,NY,NX)=cpw*WTSHT(NZ,NY,NX)*10.0E-06
+  VHCPC(NZ,NY,NX)=cpw*WTSHTE(NZ,NY,NX,ielmc)*10.0E-06
   ENGYX(NZ,NY,NX)=0._r8
   DTKC(NZ,NY,NX)=0._r8
   TCC(NZ,NY,NX)=ATCA(NY,NX)
@@ -761,9 +721,7 @@ module StartqMod
       PSIRT(N,L,NZ,NY,NX)=-0.01
       PSIRO(N,L,NZ,NY,NX)=OSMO(NZ,NY,NX)+PSIRT(N,L,NZ,NY,NX)
       PSIRG(N,L,NZ,NY,NX)=AZMAX1(PSIRT(N,L,NZ,NY,NX)-PSIRO(N,L,NZ,NY,NX))
-      CPOOLR(N,L,NZ,NY,NX)=0._r8
-      ZPOOLR(N,L,NZ,NY,NX)=0._r8
-      PPOOLR(N,L,NZ,NY,NX)=0._r8
+      EPOOLR(N,L,NZ,NY,NX,:)=0._r8
       CCPOLR(N,L,NZ,NY,NX)=0._r8
       CZPOLR(N,L,NZ,NY,NX)=0._r8
       CPPOLR(N,L,NZ,NY,NX)=0._r8
@@ -819,7 +777,7 @@ module StartqMod
       H2GA(N,L,NZ,NY,NX)=0._r8
       H2GP(N,L,NZ,NY,NX)=0._r8
       WFR(N,L,NZ,NY,NX)=1.0
-      DO 30 NR=1,10
+      D30: DO NR=1,10
         RTN2(N,L,NR,NZ,NY,NX)=0._r8
         RTLG1(N,L,NR,NZ,NY,NX)=0._r8
         WTRT1(N,L,NR,NZ,NY,NX)=0._r8
@@ -833,15 +791,13 @@ module StartqMod
         RTWT1(N,NR,NZ,NY,NX)=0._r8
         RTWT1N(N,NR,NZ,NY,NX)=0._r8
         RTWT1P(N,NR,NZ,NY,NX)=0._r8
-30    CONTINUE
+      ENDDO D30
       IF(N.EQ.1)THEN
-        DO 6400 K=0,1
-          DO  M=1,4
-            CSNC(M,K,L,NZ,NY,NX)=0._r8
-            ZSNC(M,K,L,NZ,NY,NX)=0._r8
-            PSNC(M,K,L,NZ,NY,NX)=0._r8
+        D6400: DO K=0,1
+          DO  M=1,jsken
+            ESNC(M,K,L,NZ,NY,NX,:)=0._r8
           enddo
-6400    CONTINUE
+        ENDDO D6400
         CPOOLN(L,NZ,NY,NX)=0._r8
         ZPOOLN(L,NZ,NY,NX)=0._r8
         PPOOLN(L,NZ,NY,NX)=0._r8
@@ -882,9 +838,9 @@ module StartqMod
 !     CPOOLR,ZPOOLR,PPOOLR=C,N,P in root,myco nonstructural pools (g)
 !
   WTRVX(NZ,NY,NX)=GRDM(NZ,NY,NX)*PP(NZ,NY,NX)
-  WTRVC(NZ,NY,NX)=WTRVX(NZ,NY,NX)
-  WTRVN(NZ,NY,NX)=CNGR(NZ,NY,NX)*WTRVC(NZ,NY,NX)
-  WTRVP(NZ,NY,NX)=CPGR(NZ,NY,NX)*WTRVC(NZ,NY,NX)
+  WTRVE(NZ,NY,NX,ielmc)=WTRVX(NZ,NY,NX)
+  WTRVE(NZ,NY,NX,ielmn)=CNGR(NZ,NY,NX)*WTRVE(NZ,NY,NX,ielmc)
+  WTRVE(NZ,NY,NX,ielmp)=CPGR(NZ,NY,NX)*WTRVE(NZ,NY,NX,ielmc)
   WTLFBN(1,NZ,NY,NX)=CNGR(NZ,NY,NX)*WTLFB(1,NZ,NY,NX)
   WTLFBP(1,NZ,NY,NX)=CPGR(NZ,NY,NX)*WTLFB(1,NZ,NY,NX)
   WTLSB(1,NZ,NY,NX)=WTLFB(1,NZ,NY,NX)+WTSHEB(1,NZ,NY,NX)
@@ -901,8 +857,8 @@ module StartqMod
   WTRTL(1,NG(NZ,NY,NX),NZ,NY,NX)=WTRT1(1,NG(NZ,NY,NX),1,NZ,NY,NX)
   WTRTD(1,NG(NZ,NY,NX),NZ,NY,NX)=WTRT1(1,NG(NZ,NY,NX),1,NZ,NY,NX)
   WSRTL(1,NG(NZ,NY,NX),NZ,NY,NX)=WTRTL(1,NG(NZ,NY,NX),NZ,NY,NX)*CWSRT(NZ,NY,NX)
-  ZPOOLR(1,NG(NZ,NY,NX),NZ,NY,NX)=CNGR(NZ,NY,NX)*CPOOLR(1,NG(NZ,NY,NX),NZ,NY,NX)
-  PPOOLR(1,NG(NZ,NY,NX),NZ,NY,NX)=CPGR(NZ,NY,NX)*CPOOLR(1,NG(NZ,NY,NX),NZ,NY,NX)
+  EPOOLR(1,NG(NZ,NY,NX),NZ,NY,NX,ielmn)=CNGR(NZ,NY,NX)*EPOOLR(1,NG(NZ,NY,NX),NZ,NY,NX,ielmc)
+  EPOOLR(1,NG(NZ,NY,NX),NZ,NY,NX,ielmp)=CPGR(NZ,NY,NX)*EPOOLR(1,NG(NZ,NY,NX),NZ,NY,NX,ielmc)
   end subroutine InitSeedMorphoBio
 
   end module StartqMod

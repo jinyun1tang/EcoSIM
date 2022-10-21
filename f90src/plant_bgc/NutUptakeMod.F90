@@ -1122,7 +1122,7 @@ module NutUptakeMod
     WSRTL   => plt_biom%WSRTL   , &
     CPPOLR  => plt_biom%CPPOLR  , &
     CZPOLR  => plt_biom%CZPOLR  , &
-    CPOOLR  => plt_biom%CPOOLR  , &
+    EPOOLR  => plt_biom%EPOOLR  , &
     CCPOLR  => plt_biom%CCPOLR  , &
     WTRTL   => plt_biom%WTRTL     &
   )
@@ -1150,8 +1150,7 @@ module NutUptakeMod
   !     CPOOLR=nonstructural C content
   !
   IF(RCO2N(N,L,NZ).GT.ZEROP(NZ))THEN
-    FCUP=AZMAX1(AMIN1(1.0,0.25*safe_adb(CPOOLR(N,L,NZ) &
-      ,RCO2N(N,L,NZ))))
+    FCUP=AZMAX1(AMIN1(1.0,0.25*safe_adb(EPOOLR(N,L,NZ,ielmc),RCO2N(N,L,NZ))))
   ELSE
     FCUP=0.0_r8
   ENDIF
@@ -1233,9 +1232,7 @@ module NutUptakeMod
   integer :: K
   !     begin_execution
   associate(                       &
-    CPOOLR=>  plt_biom%CPOOLR    , &
-    ZPOOLR=>  plt_biom%ZPOOLR    , &
-    PPOOLR=>  plt_biom%PPOOLR    , &
+    EPOOLR=>  plt_biom%EPOOLR    , &
     ZEROP =>  plt_biom%ZEROP     , &
     ZEROS =>  plt_site%ZEROS     , &
     ZEROS2=>  plt_site%ZEROS2    , &
@@ -1271,15 +1268,15 @@ module NutUptakeMod
     VOLWK=VOLWM(NPH,L)*FOSRH(K,L)
     IF(VOLWK.GT.ZEROS2.AND.RTVLW(N,L,NZ).GT.ZEROP(NZ))THEN
       VOLWT=VOLWK+RTVLW(N,L,NZ)
-      CPOOLX=AMIN1(1.25E+03*RTVLW(N,L,NZ),CPOOLR(N,L,NZ))
+      CPOOLX=AMIN1(1.25E+03*RTVLW(N,L,NZ),EPOOLR(N,L,NZ,ielmc))
       XFRC=(OQC(K,L)*RTVLW(N,L,NZ)-CPOOLX*VOLWK)/VOLWT
       RDFOMC(N,K,L,NZ)=FEXUC*XFRC
-      IF(OQC(K,L).GT.ZEROS.AND.CPOOLR(N,L,NZ).GT.ZEROP(NZ))THEN
-        CPOOLT=OQC(K,L)+CPOOLR(N,L,NZ)
-        ZPOOLX=0.1*ZPOOLR(N,L,NZ)
-        PPOOLX=0.1*PPOOLR(N,L,NZ)
-        XFRN=(OQN(K,L)*CPOOLR(N,L,NZ)-ZPOOLX*OQC(K,L))/CPOOLT
-        XFRP=(OQP(K,L)*CPOOLR(N,L,NZ)-PPOOLX*OQC(K,L))/CPOOLT
+      IF(OQC(K,L).GT.ZEROS.AND.EPOOLR(N,L,NZ,ielmc).GT.ZEROP(NZ))THEN
+        CPOOLT=OQC(K,L)+EPOOLR(N,L,NZ,ielmc)
+        ZPOOLX=0.1*EPOOLR(N,L,NZ,ielmn)
+        PPOOLX=0.1*EPOOLR(N,L,NZ,ielmp)
+        XFRN=(OQN(K,L)*EPOOLR(N,L,NZ,ielmc)-ZPOOLX*OQC(K,L))/CPOOLT
+        XFRP=(OQP(K,L)*EPOOLR(N,L,NZ,ielmc)-PPOOLX*OQC(K,L))/CPOOLT
         RDFOMN(N,K,L,NZ)=FEXUN*XFRN
         RDFOMP(N,K,L,NZ)=FEXUP*XFRP
       ELSE

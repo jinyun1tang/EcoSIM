@@ -71,12 +71,8 @@ module grosubsMod
     NP0      => plt_site%NP0      , &
     NJ       => plt_site%NJ       , &
     CNET     => plt_bgcr%CNET     , &
-    HCSNC    => plt_bgcr%HCSNC    , &
-    HZSNC    => plt_bgcr%HZSNC    , &
-    HPSNC    => plt_bgcr%HPSNC    , &
-    CSNC     => plt_bgcr%CSNC     , &
-    ZSNC     => plt_bgcr%ZSNC     , &
-    PSNC     => plt_bgcr%PSNC     , &
+    HESNC    => plt_bgcr%HESNC    , &
+    ESNC     => plt_bgcr%ESNC     , &
     ZC       => plt_morph%ZC        &
   )
 !     TOTAL AGB FOR GRAZING IN LANDSCAPE SECTION
@@ -85,23 +81,19 @@ module grosubsMod
 !     INITIALIZE SENESCENCE ARRAYS
 !
 
-      DO 9980 NZ=1,NP0
-        DO 1 L=0,NJ
+      D9980: DO NZ=1,NP0
+        D1: DO L=0,NJ
           DO K=0,1
             DO M=1,jsken
-              CSNC(M,K,L,NZ)=0._r8
-              ZSNC(M,K,L,NZ)=0._r8
-              PSNC(M,K,L,NZ)=0._r8
+              ESNC(M,K,L,NZ,1:npelms)=0._r8
             ENDDO
           ENDDO
-1       CONTINUE
-        HCSNC(NZ)=0._r8
-        HZSNC(NZ)=0._r8
-        HPSNC(NZ)=0._r8
+        ENDDO D1
+        HESNC(NZ,1:npelms)=0._r8
         CNET(NZ)=0._r8
         ZCX(NZ)=ZC(NZ)
         ZC(NZ)=0._r8
-9980  CONTINUE
+      ENDDO D9980
 !
 !     TRANSFORMATIONS IN LIVING PLANT POPULATIONS
 !
@@ -128,42 +120,26 @@ module grosubsMod
   implicit none
   integer, intent(in) :: I,J
 
-  integer :: L,K,NZ,M,NB
+  integer :: L,K,NZ,M,NB,NE
   real(r8) :: XFRC,XFRN,XFRP
 !     begin_execution
 
   associate(                           &
     IDAY0   => plt_distb%IDAY0   , &
     IYR0    => plt_distb%IYR0    , &
-    THVSTP  => plt_distb%THVSTP  , &
-    THVSTN  => plt_distb%THVSTN  , &
-    THVSTC  => plt_distb%THVSTC  , &
-    HVSTC   => plt_distb%HVSTC   , &
-    HVSTN   => plt_distb%HVSTN   , &
-    HVSTP   => plt_distb%HVSTP   , &
+    THVSTE  => plt_distb%THVSTE  , &
+    HVSTE   => plt_distb%HVSTE   , &
     VPO4F   => plt_distb%VPO4F   , &
     VN2OF   => plt_distb%VN2OF   , &
     VCH4F   => plt_distb%VCH4F   , &
     VCO2F   => plt_distb%VCO2F   , &
     VNH3F   => plt_distb%VNH3F   , &
-    WTSTDG  => plt_biom%WTSTDG   , &
-    WTSTDN  => plt_biom%WTSTDN   , &
-    WTSTDP  => plt_biom%WTSTDP   , &
-    WTSTGP  => plt_biom%WTSTGP   , &
-    WTSHP   => plt_biom%WTSHP    , &
-    WTSHN   => plt_biom%WTSHN    , &
-    WTRT    => plt_biom%WTRT     , &
-    WTSHT   => plt_biom%WTSHT    , &
-    WTND    => plt_biom%WTND     , &
-    WTRTN   => plt_biom%WTRTN    , &
-    WTNDN   => plt_biom%WTNDN    , &
-    WTNDP   => plt_biom%WTNDP    , &
-    WTRTP   => plt_biom%WTRTP    , &
-    WTRVN   => plt_biom%WTRVN    , &
-    WTRVC   => plt_biom%WTRVC    , &
-    WTRVP   => plt_biom%WTRVP    , &
-    WTSTGN  => plt_biom%WTSTGN   , &
-    WTSTG   => plt_biom%WTSTG    , &
+    WTSTDE  => plt_biom%WTSTDE   , &
+    WTRTE   => plt_biom%WTRTE    , &
+    WTSHTE  => plt_biom%WTSHTE  , &
+    WTNDE   => plt_biom%WTNDE    , &
+    WTRVE   => plt_biom%WTRVE    , &
+    WTSTGE  => plt_biom%WTSTGE   , &
     TFN3    => plt_pheno%TFN3    , &
     RSETC   => plt_pheno%RSETC   , &
     RSETN   => plt_pheno%RSETN   , &
@@ -175,41 +151,29 @@ module grosubsMod
     IBTYP   => plt_pheno%IBTYP   , &
     VRNL    => plt_pheno%VRNL    , &
     VRNS    => plt_pheno%VRNS    , &
-    BALC    => plt_site%BALC     , &
-    BALN    => plt_site%BALN     , &
-    BALP    => plt_site%BALP     , &
+    BALE    => plt_site%BALE     , &
     NP0     => plt_site%NP0      , &
     NJ      => plt_site%NJ       , &
     IYRC    => plt_site%IYRC     , &
-    CSNC    => plt_bgcr%CSNC     , &
-    ZSNC    => plt_bgcr%ZSNC     , &
-    PSNC    => plt_bgcr%PSNC     , &
+    ESNC    => plt_bgcr%ESNC     , &
     ZNPP    => plt_bgcr%ZNPP     , &
     TZUPFX  => plt_bgcr%TZUPFX   , &
-    HCSNC   => plt_bgcr%HCSNC    , &
-    HZSNC   => plt_bgcr%HZSNC    , &
-    HPSNC   => plt_bgcr%HPSNC    , &
+    HESNC   => plt_bgcr%HESNC    , &
     TNH3C   => plt_bgcr%TNH3C    , &
-    TZSNC   => plt_bgcr%TZSNC    , &
-    TPSNC   => plt_bgcr%TPSNC    , &
-    TCSNC   => plt_bgcr%TCSNC    , &
-    TPSN0   => plt_bgcr%TPSN0    , &
-    TZSN0   => plt_bgcr%TZSN0    , &
-    TCSN0   => plt_bgcr%TCSN0    , &
+    TESNC   => plt_bgcr%TESNC    , &
+    TESN0   => plt_bgcr%TESN0    , &
     TCO2T   => plt_bgcr%TCO2T    , &
     CARBN   => plt_bgcr%CARBN    , &
-    TCUPTK  => plt_rbgc%TCUPTK   , &
-    TZUPTK  => plt_rbgc%TZUPTK   , &
-    TPUPTK  => plt_rbgc%TPUPTK   , &
+    TEUPTK  => plt_rbgc%TEUPTK   , &
     CDPTHZ  => plt_site%CDPTHZ   , &
     SDPTHI  => plt_morph%SDPTHI  , &
     NBR     => plt_morph%NBR       &
   )
-  DO 9975 NZ=1,NP0
+  D9975: DO NZ=1,NP0
 !
 !     ACTIVATE DORMANT SEEDS
 !
-    DO 205 NB=1,NBR(NZ)
+    D205: DO NB=1,NBR(NZ)
       IF(IFLGI(NZ).EQ.1)THEN
         IF(IFLGE(NB,NZ).EQ.0 &
           .AND.VRNS(NB,NZ).GE.VRNL(NB,NZ))THEN
@@ -219,7 +183,7 @@ module grosubsMod
           IFLGI(NZ)=0
         ENDIF
       ENDIF
-205 CONTINUE
+    ENDDO D205
 !
 !     LITTERFALL FROM STANDING DEAD
 !
@@ -228,23 +192,23 @@ module grosubsMod
 !     WTSTG,WTSTDN,WTSTDP=standing dead C,N,P mass
 !     CSNC,ZSNC,PSNC=C,N,P litterfall
 !
-    DO 6235 M=1,jsken
-      XFRC=1.5814E-05*TFN3(NZ)*WTSTDG(M,NZ)
-      XFRN=1.5814E-05*TFN3(NZ)*WTSTDN(M,NZ)
-      XFRP=1.5814E-05*TFN3(NZ)*WTSTDP(M,NZ)
+    D6235: DO M=1,jsken
+      XFRC=1.5814E-05*TFN3(NZ)*WTSTDE(M,NZ,ielmc)
+      XFRN=1.5814E-05*TFN3(NZ)*WTSTDE(M,NZ,ielmn)
+      XFRP=1.5814E-05*TFN3(NZ)*WTSTDE(M,NZ,ielmp)
       IF(IBTYP(NZ).EQ.0.OR.IGTYP(NZ).LE.1)THEN
-        CSNC(M,1,0,NZ)=CSNC(M,1,0,NZ)+XFRC
-        ZSNC(M,1,0,NZ)=ZSNC(M,1,0,NZ)+XFRN
-        PSNC(M,1,0,NZ)=PSNC(M,1,0,NZ)+XFRP
+        ESNC(M,1,0,NZ,ielmc)=ESNC(M,1,0,NZ,ielmc)+XFRC
+        ESNC(M,1,0,NZ,ielmn)=ESNC(M,1,0,NZ,ielmn)+XFRN
+        ESNC(M,1,0,NZ,ielmp)=ESNC(M,1,0,NZ,ielmp)+XFRP
       ELSE
-        CSNC(M,0,0,NZ)=CSNC(M,0,0,NZ)+XFRC
-        ZSNC(M,0,0,NZ)=ZSNC(M,0,0,NZ)+XFRN
-        PSNC(M,0,0,NZ)=PSNC(M,0,0,NZ)+XFRP
+        ESNC(M,0,0,NZ,ielmc)=ESNC(M,0,0,NZ,ielmc)+XFRC
+        ESNC(M,0,0,NZ,ielmn)=ESNC(M,0,0,NZ,ielmn)+XFRN
+        ESNC(M,0,0,NZ,ielmp)=ESNC(M,0,0,NZ,ielmp)+XFRP
       ENDIF
-      WTSTDG(M,NZ)=WTSTDG(M,NZ)-XFRC
-      WTSTDN(M,NZ)=WTSTDN(M,NZ)-XFRN
-      WTSTDP(M,NZ)=WTSTDP(M,NZ)-XFRP
-6235  CONTINUE
+      WTSTDE(M,NZ,ielmc)=WTSTDE(M,NZ,ielmc)-XFRC
+      WTSTDE(M,NZ,ielmn)=WTSTDE(M,NZ,ielmn)-XFRN
+      WTSTDE(M,NZ,ielmp)=WTSTDE(M,NZ,ielmp)-XFRP
+    ENDDO D6235
 !
 !     ACCUMULATE TOTAL SURFACE, SUBSURFACE LITTERFALL
 !
@@ -252,32 +216,25 @@ module grosubsMod
 !     TCSNC,TZSNC,TPSNC=cumulative C,N,P litterfall
 !     HCSNC,HZSNC,HPSNC=hourly C,N,P litterfall
 !
-    DO 6430 M=1,jsken
-      DO K=0,1
-        TCSN0(NZ)=TCSN0(NZ)+CSNC(M,K,0,NZ)
-        TZSN0(NZ)=TZSN0(NZ)+ZSNC(M,K,0,NZ)
-        TPSN0(NZ)=TPSN0(NZ)+PSNC(M,K,0,NZ)
-        DO 8955 L=0,NJ
-          HCSNC(NZ)=HCSNC(NZ)+CSNC(M,K,L,NZ)
-          HZSNC(NZ)=HZSNC(NZ)+ZSNC(M,K,L,NZ)
-          HPSNC(NZ)=HPSNC(NZ)+PSNC(M,K,L,NZ)
-          TCSNC(NZ)=TCSNC(NZ)+CSNC(M,K,L,NZ)
-          TZSNC(NZ)=TZSNC(NZ)+ZSNC(M,K,L,NZ)
-          TPSNC(NZ)=TPSNC(NZ)+PSNC(M,K,L,NZ)
-8955    CONTINUE
-      enddo
-6430  CONTINUE
+    DO NE=1,npelms
+      D6430: DO M=1,jsken
+        DO K=0,1
+          TESN0(NZ,NE)=TESN0(NZ,ielmc)+ESNC(M,K,0,NZ,NE)
+          D8955: DO L=0,NJ
+            HESNC(NZ,NE)=HESNC(NZ,NE)+ESNC(M,K,L,NZ,NE)
+            TESNC(NZ,NE)=TESNC(NZ,NE)+ESNC(M,K,L,NZ,NE)
+          ENDDO D8955
+        enddo
+      ENDDO D6430
+    ENDDO
 !
 !     TOTAL STANDING DEAD
 !
 !     WTSTG,WTSTDN,WTSTDP=standing dead C,N,P mass
 !
-    WTSTG(NZ)=WTSTDG(1,NZ)+WTSTDG(2,NZ) &
-      +WTSTDG(3,NZ)+WTSTDG(4,NZ)
-    WTSTGN(NZ)=WTSTDN(1,NZ)+WTSTDN(2,NZ) &
-      +WTSTDN(3,NZ)+WTSTDN(4,NZ)
-    WTSTGP(NZ)=WTSTDP(1,NZ)+WTSTDP(2,NZ) &
-      +WTSTDP(3,NZ)+WTSTDP(4,NZ)
+    WTSTGE(NZ,ielmc)=sum(WTSTDE(1:4,NZ,ielmc))
+    WTSTGE(NZ,ielmn)=sum(WTSTDE(1:4,NZ,ielmn))
+    WTSTGE(NZ,ielmp)=sum(WTSTDE(1:4,NZ,ielmp))
 !
 !     PLANT C BALANCE = TOTAL C STATE VARIABLES + TOTAL
 !     AUTOTROPHIC RESPIRATION + TOTAL LITTERFALL - TOTAL EXUDATION
@@ -295,10 +252,10 @@ module grosubsMod
 !
     ZNPP(NZ)=CARBN(NZ)+TCO2T(NZ)
     IF(IFLGC(NZ).EQ.1)THEN
-      BALC(NZ)=WTSHT(NZ)+WTRT(NZ)+WTND(NZ) &
-        +WTRVC(NZ)-ZNPP(NZ)+TCSNC(NZ)-TCUPTK(NZ) &
-        -RSETC(NZ)+WTSTG(NZ)+THVSTC(NZ) &
-        +HVSTC(NZ)-VCO2F(NZ)-VCH4F(NZ)
+      BALE(NZ,ielmc)=WTSHTE(NZ,ielmc)+WTRTE(NZ,ielmc)+WTNDE(NZ,ielmc) &
+        +WTRVE(NZ,ielmc)-ZNPP(NZ)+TESNC(NZ,ielmc)-TEUPTK(NZ,ielmc) &
+        -RSETC(NZ)+WTSTGE(NZ,ielmc)+THVSTE(NZ,ielmc) &
+        +HVSTE(NZ,ielmc)-VCO2F(NZ)-VCH4F(NZ)
 !
 !     PLANT N BALANCE = TOTAL N STATE VARIABLES + TOTAL N LITTERFALL
 !     - TOTAL N UPTAKE FROM SOIL - TOTAL N ABSORPTION FROM ATMOSPHERE
@@ -314,9 +271,9 @@ module grosubsMod
 !     VNH3F,VN2OF=NH3,N2O emission from disturbance
 !     TZUPFX=cumulative PFT N2 fixation
 !
-      BALN(NZ)=WTSHN(NZ)+WTRTN(NZ)+WTNDN(NZ) &
-        +WTRVN(NZ)+TZSNC(NZ)-TZUPTK(NZ)-TNH3C(NZ) &
-        -RSETN(NZ)+WTSTGN(NZ)+HVSTN(NZ)+THVSTN(NZ) &
+      BALE(NZ,ielmn)=WTSHTE(NZ,ielmn)+WTRTE(NZ,ielmn)+WTNDE(NZ,ielmn) &
+        +WTRVE(NZ,ielmn)+TESNC(NZ,ielmn)-TEUPTK(NZ,ielmn)-TNH3C(NZ) &
+        -RSETN(NZ)+WTSTGE(NZ,ielmn)+HVSTE(NZ,ielmn)+THVSTE(NZ,ielmn) &
         -VNH3F(NZ)-VN2OF(NZ)-TZUPFX(NZ)
 !
 !     PLANT P BALANCE = TOTAL P STATE VARIABLES + TOTAL P LITTERFALL
@@ -331,12 +288,12 @@ module grosubsMod
 !     HVSTP=total PFT P removed from ecosystem in current year
 !     VPO4F=PO4 emission from disturbance
 !
-      BALP(NZ)=WTSHP(NZ)+WTRTP(NZ)+WTNDP(NZ) &
-        +WTRVP(NZ)+TPSNC(NZ)-TPUPTK(NZ) &
-        -RSETP(NZ)+WTSTDP(1,NZ)+WTSTGP(NZ) &
-        +HVSTP(NZ)+THVSTP(NZ)-VPO4F(NZ)
+      BALE(NZ,ielmp)=WTSHTE(NZ,ielmp)+WTRTE(NZ,ielmp)+WTNDE(NZ,ielmp) &
+        +WTRVE(NZ,ielmp)+TESNC(NZ,ielmp)-TEUPTK(NZ,ielmp) &
+        -RSETP(NZ)+WTSTDE(1,NZ,ielmp)+WTSTGE(NZ,ielmp) &
+        +HVSTE(NZ,ielmp)+THVSTE(NZ,ielmp)-VPO4F(NZ)
     ENDIF
-9975  CONTINUE
+  ENDDO D9975
   end associate
   end subroutine LiveDeadTransformation
 !------------------------------------------------------------------------------------------
@@ -441,8 +398,8 @@ module grosubsMod
     WVSTK  =>  plt_biom%WVSTK     , &
     WSRTL  =>  plt_biom%WSRTL     , &
     WTRTA  =>  plt_biom%WTRTA     , &
-    WTSTK  =>  plt_biom%WTSTK     , &
-    WTRT   =>  plt_biom%WTRT      , &
+    WTSTKE =>  plt_biom%WTSTKE    , &
+    WTRTE  =>  plt_biom%WTRTE     , &
     WGLFV  =>  plt_biom%WGLFV     , &
     IBTYP  =>  plt_pheno%IBTYP    , &
     IGTYP  =>  plt_pheno%IGTYP    , &
@@ -510,14 +467,14 @@ module grosubsMod
 !     FWOODN,FWOODP=N,P woody fraction in stalk:0=woody,1=non-woody
 !
   IF(IBTYP(NZ).EQ.0.OR.IGTYP(NZ).LE.1 &
-    .OR.WTSTK(NZ).LE.ZEROP(NZ))THEN
+    .OR.WTSTKE(NZ,ielmc).LE.ZEROP(NZ))THEN
     FWODB(1)=1.0_r8
     FWOOD(1)=1.0_r8
     FWODR(1)=1.0_r8
   ELSE
     FWODB(1)=1.0_r8
-    FWOOD(1)=SQRT(WVSTK(NZ)/WTSTK(NZ))
-    FWODR(1)=SQRT(FRTX*WVSTK(NZ)/WTSTK(NZ))
+    FWOOD(1)=SQRT(WVSTK(NZ)/WTSTKE(NZ,ielmc))
+    FWODR(1)=SQRT(FRTX*WVSTK(NZ)/WTSTKE(NZ,ielmc))
   ENDIF
   FWODB(0)=1.0_r8-FWODB(1)
   FWOOD(0)=1.0_r8-FWOOD(1)
@@ -574,7 +531,7 @@ module grosubsMod
 !     WTRT,PP=root mass,PFT population
 !     XRTN1=multiplier for number of primary root axes
 !
-  WTRTA(NZ)=AMAX1(0.999992087*WTRTA(NZ),WTRT(NZ)/PP(NZ))
+  WTRTA(NZ)=AMAX1(0.999992087*WTRTA(NZ),WTRTE(NZ,ielmc)/PP(NZ))
   XRTN1=AMAX1(1.0,WTRTA(NZ)**0.667)*PP(NZ)
 !
 !     WATER STRESS FUNCTIONS FOR EXPANSION AND GROWTH RESPIRATION
@@ -616,7 +573,7 @@ module grosubsMod
     WTSHTN     =>  plt_biom%WTSHTN     , &
     WTGRBN     =>  plt_biom%WTGRBN     , &
     WTGRBP     =>  plt_biom%WTGRBP     , &
-    CPOOLR     =>  plt_biom%CPOOLR     , &
+    EPOOLR     =>  plt_biom%EPOOLR     , &
     WTRTD      =>  plt_biom%WTRTD      , &
     WTSHTB     =>  plt_biom%WTSHTB     , &
     WTSHTP     =>  plt_biom%WTSHTP     , &
@@ -698,11 +655,11 @@ module grosubsMod
 !     UPNH4,UPNO3,UPH2P,UPH1P=PFT uptake of NH4,NO3,H2PO4,HPO4
 !     UPNF=PFT N2 fixation
 !
-  DO 345 N=1,MY(NZ)
+  D345: DO N=1,MY(NZ)
     DO  L=NU,NI(NZ)
-      WTRTD(N,L,NZ)=WTRTD(N,L,NZ)+CPOOLR(N,L,NZ)
+      WTRTD(N,L,NZ)=WTRTD(N,L,NZ)+EPOOLR(N,L,NZ,ielmc)
     enddo
-345   CONTINUE
+  ENDDO D345
   end associate
   end subroutine ComputeTotalBiom
 !------------------------------------------------------------------------------------------
@@ -717,25 +674,17 @@ module grosubsMod
     CPOOL    =>  plt_biom%CPOOL   , &
     ZPOOL    =>  plt_biom%ZPOOL   , &
     PPOOL    =>  plt_biom%PPOOL   , &
-    CPOOLR   =>  plt_biom%CPOOLR  , &
-    ZPOOLR   =>  plt_biom%ZPOOLR  , &
+    EPOOLR   =>  plt_biom%EPOOLR  , &
     ZPOLNP   =>  plt_biom%ZPOLNP  , &
     PPOLNB   =>  plt_biom%PPOLNB  , &
     CPOLNB   =>  plt_biom%CPOLNB  , &
-    ZPOOLP   =>  plt_biom%ZPOOLP  , &
     ZPOLNB   =>  plt_biom%ZPOLNB  , &
-    PPOOLR   =>  plt_biom%PPOOLR  , &
-    WTRTSN   =>  plt_biom%WTRTSN  , &
-    WTRTSP   =>  plt_biom%WTRTSP  , &
     WTNDBP   =>  plt_biom%WTNDBP  , &
-    WTNDP    =>  plt_biom%WTNDP   , &
-    WTND     =>  plt_biom%WTND    , &
-    WTRTS    =>  plt_biom%WTRTS   , &
-    WTRTN    =>  plt_biom%WTRTN   , &
-    WTRT     =>  plt_biom%WTRT    , &
+    WTNDE    =>  plt_biom%WTNDE   , &
+    WTRTSE   =>  plt_biom%WTRTSE  , &
+    WTRTE    =>  plt_biom%WTRTE   , &
     WTNDBN   =>  plt_biom%WTNDBN  , &
     WTNDB    =>  plt_biom%WTNDB   , &
-    WTNDN    =>  plt_biom%WTNDN   , &
     WTSHTB   =>  plt_biom%WTSHTB  , &
     WTSHTN   =>  plt_biom%WTSHTN  , &
     WTSHTP   =>  plt_biom%WTSHTP  , &
@@ -762,38 +711,20 @@ module grosubsMod
     WTLFB    =>  plt_biom%WTLFB   , &
     WVSTKB   =>  plt_biom%WVSTKB  , &
     WTSHEB   =>  plt_biom%WTSHEB  , &
-    WTSHT    =>  plt_biom%WTSHT   , &
-    WTSHN    =>  plt_biom%WTSHN   , &
-    WTSHP    =>  plt_biom%WTSHP   , &
-    WTLF     =>  plt_biom%WTLF    , &
-    WTSHE    =>  plt_biom%WTSHE   , &
-    WTSTK    =>  plt_biom%WTSTK   , &
-    WTRTP    =>  plt_biom%WTRTP   , &
+    WTSHTE   =>  plt_biom%WTSHTE  , &
+    WTLFE    =>  plt_biom%WTLFE   , &
+    WTSHEE   =>  plt_biom%WTSHEE  , &
+    WTSTKE   =>  plt_biom%WTSTKE  , &
     WVSTK    =>  plt_biom%WVSTK   , &
-    WTRSV    =>  plt_biom%WTRSV   , &
-    WTHSK    =>  plt_biom%WTHSK   , &
-    WTEAR    =>  plt_biom%WTEAR   , &
-    WTGR     =>  plt_biom%WTGR    , &
+    WTRSVE   =>  plt_biom%WTRSVE  , &
+    WTHSKE   =>  plt_biom%WTHSKE  , &
+    WTEARE   =>  plt_biom%WTEARE  , &
+    WTGRE    =>  plt_biom%WTGRE   , &
     WTLS     =>  plt_biom%WTLS    , &
-    WTLFN    =>  plt_biom%WTLFN   , &
-    WTSHEN   =>  plt_biom%WTSHEN  , &
-    WTSTKN   =>  plt_biom%WTSTKN  , &
-    PPOOLP   =>  plt_biom%PPOOLP  , &
     PPOLNP   =>  plt_biom%PPOLNP  , &
-    WTRSVN   =>  plt_biom%WTRSVN  , &
-    WTHSKN   =>  plt_biom%WTHSKN  , &
-    WTEARN   =>  plt_biom%WTEARN  , &
     WTNDL    =>  plt_biom%WTNDL   , &
     WTNDLN   =>  plt_biom%WTNDLN  , &
-    WTGRNN   =>  plt_biom%WTGRNN  , &
-    WTLFP    =>  plt_biom%WTLFP   , &
-    WTSHEP   =>  plt_biom%WTSHEP  , &
-    WTSTKP   =>  plt_biom%WTSTKP  , &
-    WTRSVP   =>  plt_biom%WTRSVP  , &
-    WTHSKP   =>  plt_biom%WTHSKP  , &
-    WTEARP   =>  plt_biom%WTEARP  , &
-    WTGRNP   =>  plt_biom%WTGRNP  , &
-    CPOOLP   =>  plt_biom%CPOOLP  , &
+    EPOOLP   =>  plt_biom%EPOOLP  , &
     CPOLNP   =>  plt_biom%CPOLNP  , &
     WTRT1    =>  plt_biom%WTRT1   , &
     WTRT1N   =>  plt_biom%WTRT1N  , &
@@ -806,9 +737,7 @@ module grosubsMod
     ZPOOLN   =>  plt_biom%ZPOOLN  , &
     PPOOLN   =>  plt_biom%PPOOLN  , &
     TZUPFX   =>  plt_bgcr%TZUPFX  , &
-    TPUPTK   =>  plt_rbgc%TPUPTK  , &
-    TZUPTK   =>  plt_rbgc%TZUPTK  , &
-    TCUPTK   =>  plt_rbgc%TCUPTK  , &
+    TEUPTK   =>  plt_rbgc%TEUPTK  , &
     UPH1P    =>  plt_rbgc%UPH1P   , &
     HCUPTK   =>  plt_rbgc%HCUPTK  , &
     HZUPTK   =>  plt_rbgc%HZUPTK  , &
@@ -852,35 +781,35 @@ module grosubsMod
 !     ARSTK=total branch stalk surface area in each layer
 !     GRNOB=seed set number
 !
-  CPOOLP(NZ)=sum(CPOOL(1:NBR(NZ),NZ))
-  ZPOOLP(NZ)=sum(ZPOOL(1:NBR(NZ),NZ))
-  PPOOLP(NZ)=sum(PPOOL(1:NBR(NZ),NZ))
-  WTSHT(NZ)=sum(WTSHTB(1:NBR(NZ),NZ))
-  WTSHN(NZ)=sum(WTSHTN(1:NBR(NZ),NZ))
-  WTSHP(NZ)=sum(WTSHTP(1:NBR(NZ),NZ))
-  WTLF(NZ)=sum(WTLFB(1:NBR(NZ),NZ))
-  WTSHE(NZ)=sum(WTSHEB(1:NBR(NZ),NZ))
-  WTSTK(NZ)=sum(WTSTKB(1:NBR(NZ),NZ))
+  EPOOLP(NZ,ielmc)=sum(CPOOL(1:NBR(NZ),NZ))
+  EPOOLP(NZ,ielmn)=sum(ZPOOL(1:NBR(NZ),NZ))
+  EPOOLP(NZ,ielmp)=sum(PPOOL(1:NBR(NZ),NZ))
+  WTSHTE(NZ,ielmc)=sum(WTSHTB(1:NBR(NZ),NZ))
+  WTSHTE(NZ,ielmn)=sum(WTSHTN(1:NBR(NZ),NZ))
+  WTSHTE(NZ,ielmp)=sum(WTSHTP(1:NBR(NZ),NZ))
+  WTLFE(NZ,ielmc)=sum(WTLFB(1:NBR(NZ),NZ))
+  WTSHEE(NZ,ielmc)=sum(WTSHEB(1:NBR(NZ),NZ))
+  WTSTKE(NZ,ielmc)=sum(WTSTKB(1:NBR(NZ),NZ))
   WVSTK(NZ)=sum(WVSTKB(1:NBR(NZ),NZ))
-  WTRSV(NZ)=sum(WTRSVB(1:NBR(NZ),NZ))
-  WTHSK(NZ)=sum(WTHSKB(1:NBR(NZ),NZ))
-  WTEAR(NZ)=sum(WTEARB(1:NBR(NZ),NZ))
-  WTGR(NZ)=sum(WTGRB(1:NBR(NZ),NZ))
+  WTRSVE(NZ,ielmc)=sum(WTRSVB(1:NBR(NZ),NZ))
+  WTHSKE(NZ,ielmc)=sum(WTHSKB(1:NBR(NZ),NZ))
+  WTEARE(NZ,ielmc)=sum(WTEARB(1:NBR(NZ),NZ))
+  WTGRE(NZ,ielmc)=sum(WTGRB(1:NBR(NZ),NZ))
   WTLS(NZ)=sum(WTLSB(1:NBR(NZ),NZ))
-  WTLFN(NZ)=sum(WTLFBN(1:NBR(NZ),NZ))
-  WTSHEN(NZ)=sum(WTSHBN(1:NBR(NZ),NZ))
-  WTSTKN(NZ)=sum(WTSTBN(1:NBR(NZ),NZ))
-  WTRSVN(NZ)=sum(WTRSBN(1:NBR(NZ),NZ))
-  WTHSKN(NZ)=sum(WTHSBN(1:NBR(NZ),NZ))
-  WTEARN(NZ)=sum(WTEABN(1:NBR(NZ),NZ))
-  WTGRNN(NZ)=sum(WTGRBN(1:NBR(NZ),NZ))
-  WTLFP(NZ)=sum(WTLFBP(1:NBR(NZ),NZ))
-  WTSHEP(NZ)=sum(WTSHBP(1:NBR(NZ),NZ))
-  WTSTKP(NZ)=sum(WTSTBP(1:NBR(NZ),NZ))
-  WTRSVP(NZ)=sum(WTRSBP(1:NBR(NZ),NZ))
-  WTHSKP(NZ)=sum(WTHSBP(1:NBR(NZ),NZ))
-  WTEARP(NZ)=sum(WTEABP(1:NBR(NZ),NZ))
-  WTGRNP(NZ)=sum(WTGRBP(1:NBR(NZ),NZ))
+  WTLFE(NZ,ielmn)=sum(WTLFBN(1:NBR(NZ),NZ))
+  WTSHEE(NZ,ielmn)=sum(WTSHBN(1:NBR(NZ),NZ))
+  WTSTKE(NZ,ielmn)=sum(WTSTBN(1:NBR(NZ),NZ))
+  WTRSVE(NZ,ielmn)=sum(WTRSBN(1:NBR(NZ),NZ))
+  WTHSKE(NZ,ielmn)=sum(WTHSBN(1:NBR(NZ),NZ))
+  WTEARE(NZ,ielmn)=sum(WTEABN(1:NBR(NZ),NZ))
+  WTGRE(NZ,ielmn)=sum(WTGRBN(1:NBR(NZ),NZ))
+  WTLFE(NZ,ielmp)=sum(WTLFBP(1:NBR(NZ),NZ))
+  WTSHEE(NZ,ielmp)=sum(WTSHBP(1:NBR(NZ),NZ))
+  WTSTKE(NZ,ielmp)=sum(WTSTBP(1:NBR(NZ),NZ))
+  WTRSVE(NZ,ielmp)=sum(WTRSBP(1:NBR(NZ),NZ))
+  WTHSKE(NZ,ielmp)=sum(WTHSBP(1:NBR(NZ),NZ))
+  WTEARE(NZ,ielmp)=sum(WTEABP(1:NBR(NZ),NZ))
+  WTGRE(NZ,ielmp)=sum(WTGRBP(1:NBR(NZ),NZ))
   GRNO(NZ)  =sum(GRNOB(1:NBR(NZ),NZ))
   ARLFP(NZ)=sum(ARLFB(1:NBR(NZ),NZ))
   ARSTP(NZ)=sum(ARSTK(1:JC1,1:NBR(NZ),NZ))
@@ -898,18 +827,18 @@ module grosubsMod
 !     WTRT2,WTRT2N,WTRT2P=secondary root C,N,P mass in soil layer
 !
 
-  WTRT(NZ)=sum(CPOOLR(1:MY(NZ),NU:NJ,NZ))
-  WTRTN(NZ)=sum(ZPOOLR(1:MY(NZ),NU:NJ,NZ))
-  WTRTP(NZ)=sum(PPOOLR(1:MY(NZ),NU:NJ,NZ))
-  WTRTS(NZ)=sum(WTRT1(1:MY(NZ),NU:NJ,1:NRT(NZ),NZ)) &
+  WTRTE(NZ,ielmc)=sum(EPOOLR(1:MY(NZ),NU:NJ,NZ,ielmc))
+  WTRTE(NZ,ielmn)=sum(EPOOLR(1:MY(NZ),NU:NJ,NZ,ielmn))
+  WTRTE(NZ,ielmp)=sum(EPOOLR(1:MY(NZ),NU:NJ,NZ,ielmp))
+  WTRTSE(NZ,ielmc)=sum(WTRT1(1:MY(NZ),NU:NJ,1:NRT(NZ),NZ)) &
     +sum(WTRT2(1:MY(NZ),NU:NJ,1:NRT(NZ),NZ))
-  WTRTSN(NZ)=sum(WTRT1N(1:MY(NZ),NU:NJ,1:NRT(NZ),NZ)) &
+  WTRTSE(NZ,ielmn)=sum(WTRT1N(1:MY(NZ),NU:NJ,1:NRT(NZ),NZ)) &
     +sum(WTRT2N(1:MY(NZ),NU:NJ,1:NRT(NZ),NZ))
-  WTRTSP(NZ)=sum(WTRT1P(1:MY(NZ),NU:NJ,1:NRT(NZ),NZ)) &
+  WTRTSE(NZ,ielmp)=sum(WTRT1P(1:MY(NZ),NU:NJ,1:NRT(NZ),NZ)) &
     +sum(WTRT2P(1:MY(NZ),NU:NJ,1:NRT(NZ),NZ))
-  WTRT(NZ)=WTRT(NZ)+WTRTS(NZ)
-  WTRTN(NZ)=WTRTN(NZ)+WTRTSN(NZ)
-  WTRTP(NZ)=WTRTP(NZ)+WTRTSP(NZ)
+  WTRTE(NZ,ielmc)=WTRTE(NZ,ielmc)+WTRTSE(NZ,ielmc)
+  WTRTE(NZ,ielmn)=WTRTE(NZ,ielmn)+WTRTSE(NZ,ielmn)
+  WTRTE(NZ,ielmp)=WTRTE(NZ,ielmp)+WTRTSE(NZ,ielmp)
 !
 !     ACCUMULATE NODULE STATE VATIABLES FROM NODULE LAYER VARIABLES
 !
@@ -924,18 +853,18 @@ module grosubsMod
         ZPOLNP(NZ)=ZPOLNP(NZ)+ZPOLNB(NB,NZ)
         PPOLNP(NZ)=PPOLNP(NZ)+PPOLNB(NB,NZ)
 7950  CONTINUE
-      WTND(NZ)=sum(WTNDB(1:NBR(NZ),NZ))+&
+      WTNDE(NZ,ielmc)=sum(WTNDB(1:NBR(NZ),NZ))+&
         sum(CPOLNB(1:NBR(NZ),NZ))
-      WTNDN(NZ)=sum(WTNDBN(1:NBR(NZ),NZ))+&
+      WTNDE(NZ,ielmn)=sum(WTNDBN(1:NBR(NZ),NZ))+&
         sum(ZPOLNB(1:NBR(NZ),NZ))
-      WTNDP(NZ)=sum(WTNDBP(1:NBR(NZ),NZ))+&
+      WTNDE(NZ,ielmp)=sum(WTNDBP(1:NBR(NZ),NZ))+&
         sum(PPOLNB(1:NBR(NZ),NZ))
     ELSEIF(INTYP(NZ).GE.1.AND.INTYP(NZ).LE.3)THEN
-      WTND(NZ)=sum(WTNDL(NU:NI(NZ),NZ))+&
+      WTNDE(NZ,ielmc)=sum(WTNDL(NU:NI(NZ),NZ))+&
         sum(CPOOLN(NU:NI(NZ),NZ))
-      WTNDN(NZ)=sum(WTNDLN(NU:NI(NZ),NZ))+&
+      WTNDE(NZ,ielmn)=sum(WTNDLN(NU:NI(NZ),NZ))+&
         sum(ZPOOLN(NU:NI(NZ),NZ))
-      WTNDP(NZ)=sum(WTNDLP(NU:NI(NZ),NZ))+&
+      WTNDE(NZ,ielmp)=sum(WTNDLP(NU:NI(NZ),NZ))+&
         sum(PPOOLN(NU:NI(NZ),NZ))
     ENDIF
   ENDIF
@@ -952,9 +881,9 @@ module grosubsMod
   HCUPTK(NZ)=UPOMC(NZ)
   HZUPTK(NZ)=UPOMN(NZ)+UPNH4(NZ)+UPNO3(NZ)+UPNF(NZ)
   HPUPTK(NZ)=UPOMP(NZ)+UPH2P(NZ)+UPH1P(NZ)
-  TCUPTK(NZ)=TCUPTK(NZ)+UPOMC(NZ)
-  TZUPTK(NZ)=TZUPTK(NZ)+UPOMN(NZ)+UPNH4(NZ)+UPNO3(NZ)
-  TPUPTK(NZ)=TPUPTK(NZ)+UPOMP(NZ)+UPH2P(NZ)+UPH1P(NZ)
+  TEUPTK(NZ,ielmc)=TEUPTK(NZ,ielmc)+UPOMC(NZ)
+  TEUPTK(NZ,ielmn)=TEUPTK(NZ,ielmn)+UPOMN(NZ)+UPNH4(NZ)+UPNO3(NZ)
+  TEUPTK(NZ,ielmp)=TEUPTK(NZ,ielmp)+UPOMP(NZ)+UPH2P(NZ)+UPH1P(NZ)
   TZUPFX(NZ)=TZUPFX(NZ)+UPNF(NZ)+UPNFC(NZ)
   end associate
   end subroutine AccumulateStates

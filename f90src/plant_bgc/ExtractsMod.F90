@@ -45,24 +45,18 @@ module ExtractsMod
 
   implicit none
   integer :: NZ,L,K,M
-
+  integer :: NE
   associate(                             &
    NP0      => plt_site%NP0        , &
    WGLFT    => plt_biom%WGLFT      , &
    WTSTGT   => plt_biom%WTSTGT     , &
-   WTSTG    => plt_biom%WTSTG      , &
-   HCSNC    => plt_bgcr%HCSNC      , &
-   HZSNC    => plt_bgcr%HZSNC      , &
-   HPSNC    => plt_bgcr%HPSNC      , &
-   ZCSNC    => plt_bgcr%ZCSNC      , &
-   ZZSNC    => plt_bgcr%ZZSNC      , &
-   ZPSNC    => plt_bgcr%ZPSNC      , &
+   WTSTGE   => plt_biom%WTSTGE     , &
+   HESNC    => plt_bgcr%HESNC      , &
+   ZESNC    => plt_bgcr%ZESNC      , &
    CSNT     => plt_bgcr%CSNT       , &
    ZSNT     => plt_bgcr%ZSNT       , &
    PSNT     => plt_bgcr%PSNT       , &
-   CSNC     => plt_bgcr%CSNC       , &
-   ZSNC     => plt_bgcr%ZSNC       , &
-   PSNC     => plt_bgcr%PSNC       , &
+   ESNC     => plt_bgcr%ESNC       , &
    NI       => plt_morph%NI        , &
    ARSTT    => plt_morph%ARSTT     , &
    ARLFT    =>  plt_morph%ARLFT    , &
@@ -80,16 +74,16 @@ module ExtractsMod
 !   CSNC,ZSNC,PSNC=cumulative PFT C,N,P litterfall from grosub.f
 !   CSNT,ZSNT,PSNT=cumulative total C,N,P litterfall
 !
-    ZCSNC=ZCSNC+HCSNC(NZ)
-    ZZSNC=ZZSNC+HZSNC(NZ)
-    ZPSNC=ZPSNC+HPSNC(NZ)
-    WTSTGT=WTSTGT+WTSTG(NZ)
+    DO NE=1,npelms
+      ZESNC(NE)=ZESNC(NE)+HESNC(NZ,NE)
+    ENDDO
+    WTSTGT=WTSTGT+WTSTGE(NZ,ielmc)
     DO  L=0,NI(NZ)
       DO K=0,1
         DO  M=1,jcplx11
-          CSNT(M,K,L)=CSNT(M,K,L)+CSNC(M,K,L,NZ)
-          ZSNT(M,K,L)=ZSNT(M,K,L)+ZSNC(M,K,L,NZ)
-          PSNT(M,K,L)=PSNT(M,K,L)+PSNC(M,K,L,NZ)
+          CSNT(M,K,L)=CSNT(M,K,L)+ESNC(M,K,L,NZ,ielmc)
+          ZSNT(M,K,L)=ZSNT(M,K,L)+ESNC(M,K,L,NZ,ielmn)
+          PSNT(M,K,L)=PSNT(M,K,L)+ESNC(M,K,L,NZ,ielmp)
         enddo
       ENDDO
     ENDDO
@@ -403,12 +397,8 @@ module ExtractsMod
   integer :: L, NB
   real(r8) :: ENGYC
   associate(                       &
-    TBALC => plt_site%TBALC  , &
-    TBALN => plt_site%TBALN  , &
-    TBALP => plt_site%TBALP  , &
-    BALC  => plt_site%BALC   , &
-    BALN  => plt_site%BALN   , &
-    BALP  => plt_site%BALP   , &
+    TBALE => plt_site%TBALE  , &
+    BALE  => plt_site%BALE   , &
     TNH3C => plt_bgcr%TNH3C  , &
     RNH3C => plt_bgcr%RNH3C  , &
     RCO2Z => plt_bgcr%RCO2Z  , &
@@ -418,9 +408,7 @@ module ExtractsMod
     RNH3Z => plt_bgcr%RNH3Z  , &
     RH2GZ => plt_bgcr%RH2GZ  , &
     TCCAN => plt_bgcr%TCCAN  , &
-    ZCSNC => plt_bgcr%ZCSNC  , &
-    ZZSNC => plt_bgcr%ZZSNC  , &
-    ZPSNC => plt_bgcr%ZPSNC  , &
+    ZESNC => plt_bgcr%ZESNC  , &
     RUPNF => plt_bgcr%RUPNF  , &
     CNET  => plt_bgcr%CNET   , &
     CTRAN => plt_ew%CTRAN    , &
@@ -516,12 +504,12 @@ module ExtractsMod
   THRMC=THRMC+THRM1(NZ)
   ARLFC=ARLFC+ARLFP(NZ)
   ARSTC=ARSTC+ARSTP(NZ)
-  ZCSNC=ZCSNC-HCUPTK(NZ)
-  ZZSNC=ZZSNC-HZUPTK(NZ)
-  ZPSNC=ZPSNC-HPUPTK(NZ)
-  TBALC=TBALC+BALC(NZ)
-  TBALN=TBALN+BALN(NZ)
-  TBALP=TBALP+BALP(NZ)
+  ZESNC(ielmc)=ZESNC(ielmc)-HCUPTK(NZ)
+  ZESNC(ielmn)=ZESNC(ielmn)-HZUPTK(NZ)
+  ZESNC(ielmp)=ZESNC(ielmp)-HPUPTK(NZ)
+  TBALE(ielmc)=TBALE(ielmc)+BALE(NZ,ielmc)
+  TBALE(ielmn)=TBALE(ielmn)+BALE(NZ,ielmn)
+  TBALE(ielmp)=TBALE(ielmp)+BALE(NZ,ielmp)
   TCO2Z=TCO2Z+RCO2Z(NZ)
   TOXYZ=TOXYZ+ROXYZ(NZ)
   TCH4Z=TCH4Z+RCH4Z(NZ)

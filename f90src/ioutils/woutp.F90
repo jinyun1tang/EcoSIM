@@ -8,6 +8,7 @@
 !
   use data_kind_mod, only : r8 => SHR_KIND_R8
   use GridConsts
+  use ElmIDMod
   use FlagDataType
   use PlantDataRateType
   use PlantTraitDataType
@@ -29,9 +30,9 @@
         ,(IFLGC(NZ,NY,NX),NZ=1,NP(NY,NX)) &
         ,(IDTH(NZ,NY,NX),NZ=1,NP(NY,NX))
       WRITE(26,97)I,IDATA(3),NP(NY,NX) &
-        ,((WTSTDG(M,NZ,NY,NX),M=1,4),NZ=1,NP(NY,NX)) &
-        ,((WTSTDN(M,NZ,NY,NX),M=1,4),NZ=1,NP(NY,NX)) &
-        ,((WTSTDP(M,NZ,NY,NX),M=1,4),NZ=1,NP(NY,NX))
+        ,((WTSTDE(M,NZ,NY,NX,ielmc),M=1,jsken),NZ=1,NP(NY,NX)) &
+        ,((WTSTDE(M,NZ,NY,NX,ielmn),M=1,jsken),NZ=1,NP(NY,NX)) &
+        ,((WTSTDE(M,NZ,NY,NX,ielmp),M=1,jsken),NZ=1,NP(NY,NX))
       IF(IFLGT(NY,NX).GT.0)THEN
         DO 9980 NZ=1,NP(NY,NX)
           IF(IFLGC(NZ,NY,NX).NE.0)THEN
@@ -40,17 +41,17 @@
               ,IDTHR(NZ,NY,NX),NBR(NZ,NY,NX),NBT(NZ,NY,NX),NB1(NZ,NY,NX) &
               ,IFLGI(NZ,NY,NX),NRT(NZ,NY,NX),NIX(NZ,NY,NX),MY(NZ,NY,NX) &
               ,(NINR(NR,NZ,NY,NX),NR=1,NRT(NZ,NY,NX))
-            WRITE(26,93)I,IDATA(3),NZ,TCUPTK(NZ,NY,NX),TCSNC(NZ,NY,NX) &
-              ,TZUPTK(NZ,NY,NX),TZSNC(NZ,NY,NX),TPUPTK(NZ,NY,NX),TPSNC(NZ,NY,NX) &
+            WRITE(26,93)I,IDATA(3),NZ,TEUPTK(NZ,NY,NX,ielmc),TESNC(NZ,NY,NX,ielmc) &
+              ,TEUPTK(NZ,NY,NX,ielmn),TESNC(NZ,NY,NX,ielmn),TEUPTK(NZ,NY,NX,ielmp),TESNC(NZ,NY,NX,ielmp) &
               ,TZUPFX(NZ,NY,NX),TCO2T(NZ,NY,NX),CTRAN(NZ,NY,NX),CARBN(NZ,NY,NX) &
               ,TCC(NZ,NY,NX),TKC(NZ,NY,NX),TCG(NZ,NY,NX),TKG(NZ,NY,NX) &
               ,TFN3(NZ,NY,NX),WVSTK(NZ,NY,NX),VOLWP(NZ,NY,NX) &
               ,PSILT(NZ,NY,NX),PSILO(NZ,NY,NX),PSILG(NZ,NY,NX),WTRTA(NZ,NY,NX) &
-              ,ARLFP(NZ,NY,NX),ARSTP(NZ,NY,NX),PP(NZ,NY,NX),HVSTC(NZ,NY,NX) &
-              ,HVSTN(NZ,NY,NX),HVSTP(NZ,NY,NX),THVSTC(NZ,NY,NX),THVSTN(NZ,NY,NX) &
-              ,THVSTP(NZ,NY,NX),TCO2A(NZ,NY,NX),RSETC(NZ,NY,NX),RSETN(NZ,NY,NX) &
-              ,RSETP(NZ,NY,NX),TNH3C(NZ,NY,NX),TCSN0(NZ,NY,NX),PPI(NZ,NY,NX) &
-              ,PPX(NZ,NY,NX),WTSTG(NZ,NY,NX),WTSTGN(NZ,NY,NX),WTSTGP(NZ,NY,NX) &
+              ,ARLFP(NZ,NY,NX),ARSTP(NZ,NY,NX),PP(NZ,NY,NX),HVSTE(NZ,NY,NX,ielmc) &
+              ,HVSTE(NZ,NY,NX,ielmn),HVSTE(NZ,NY,NX,ielmp),THVSTE(NZ,NY,NX,ielmc),THVSTE(NZ,NY,NX,ielmn) &
+              ,THVSTE(NZ,NY,NX,ielmp),TCO2A(NZ,NY,NX),RSETC(NZ,NY,NX),RSETN(NZ,NY,NX) &
+              ,RSETP(NZ,NY,NX),TNH3C(NZ,NY,NX),TESN0(NZ,NY,NX,ielmc),PPI(NZ,NY,NX) &
+              ,PPX(NZ,NY,NX),WTSTGE(NZ,NY,NX,ielmc),WTSTGE(NZ,NY,NX,ielmn),WTSTGE(NZ,NY,NX,ielmp) &
               ,ZC(NZ,NY,NX),VOLWC(NZ,NY,NX),CF(NZ,NY,NX),VCO2F(NZ,NY,NX) &
               ,VCH4F(NZ,NY,NX),VOXYF(NZ,NY,NX),VNH3F(NZ,NY,NX),VN2OF(NZ,NY,NX) &
               ,VPO4F(NZ,NY,NX)
@@ -84,14 +85,14 @@
             DO N=1,10
               WRITE(26,95)I,IDATA(3),NZ,(IDAY(N,NB,NZ,NY,NX),NB=1,NBR(NZ,NY,NX))
             ENDDO
-            WRITE(27,96)I,IDATA(3),NZ,CPOOLP(NZ,NY,NX),CPOLNP(NZ,NY,NX) &
-              ,VHCPC(NZ,NY,NX),DTKC(NZ,NY,NX),WTSHT(NZ,NY,NX) &
-              ,WTLS(NZ,NY,NX),WTRT(NZ,NY,NX),WTSHN(NZ,NY,NX),WTSHP(NZ,NY,NX) &
-              ,WTLF(NZ,NY,NX),WTSHE(NZ,NY,NX),WTSTK(NZ,NY,NX),WTRSV(NZ,NY,NX) &
-              ,WTHSK(NZ,NY,NX),WTEAR(NZ,NY,NX),WTGR(NZ,NY,NX),WTND(NZ,NY,NX) &
-              ,WTRVC(NZ,NY,NX),WTRVN(NZ,NY,NX),WTRVP(NZ,NY,NX),HTCTL(NZ,NY,NX) &
+            WRITE(27,96)I,IDATA(3),NZ,EPOOLP(NZ,NY,NX,ielmc),CPOLNP(NZ,NY,NX) &
+              ,VHCPC(NZ,NY,NX),DTKC(NZ,NY,NX),WTSHTE(NZ,NY,NX,ielmc) &
+              ,WTLS(NZ,NY,NX),WTRTE(NZ,NY,NX,ielmc),WTSHTE(NZ,NY,NX,ielmn),WTSHTE(NZ,NY,NX,ielmp) &
+              ,WTLFE(NZ,NY,NX,ielmc),WTSHEE(NZ,NY,NX,ielmc),WTSTKE(NZ,NY,NX,ielmc),WTRSVE(NZ,NY,NX,ielmc) &
+              ,WTHSKE(NZ,NY,NX,ielmc),WTEARE(NZ,NY,NX,ielmc),WTGRE(NZ,NY,NX,ielmc),WTNDE(NZ,NY,NX,ielmc) &
+              ,WTRVE(NZ,NY,NX,ielmc),WTRVE(NZ,NY,NX,ielmn),WTRVE(NZ,NY,NX,ielmp),HTCTL(NZ,NY,NX) &
               ,SDPTH(NZ,NY,NX),WSTR(NZ,NY,NX) &
-              ,CHILL(NZ,NY,NX),WTRTS(NZ,NY,NX),FRADP(NZ,NY,NX)
+              ,CHILL(NZ,NY,NX),WTRTSE(NZ,NY,NX,ielmc),FRADP(NZ,NY,NX)
             WRITE(27,92)I,IDATA(3),NZ,(CPOOL(NB,NZ,NY,NX),NB=1,NBR(NZ,NY,NX))
             WRITE(27,92)I,IDATA(3),NZ,(ZPOOL(NB,NZ,NY,NX),NB=1,NBR(NZ,NY,NX))
             WRITE(27,92)I,IDATA(3),NZ,(PPOOL(NB,NZ,NY,NX),NB=1,NBR(NZ,NY,NX))
@@ -226,9 +227,9 @@
               WRITE(29,94)I,IDATA(3),NZ,(RUPP2B(N,L,NZ,NY,NX),L=1,NJ(NY,NX))
               WRITE(29,94)I,IDATA(3),NZ,(RUPP1B(N,L,NZ,NY,NX),L=1,NJ(NY,NX))
               WRITE(29,94)I,IDATA(3),NZ,(WFR(N,L,NZ,NY,NX),L=1,NJ(NY,NX))
-              WRITE(29,94)I,IDATA(3),NZ,(CPOOLR(N,L,NZ,NY,NX),L=1,NJ(NY,NX))
-              WRITE(29,94)I,IDATA(3),NZ,(ZPOOLR(N,L,NZ,NY,NX),L=1,NJ(NY,NX))
-              WRITE(29,94)I,IDATA(3),NZ,(PPOOLR(N,L,NZ,NY,NX),L=1,NJ(NY,NX))
+              WRITE(29,94)I,IDATA(3),NZ,(EPOOLR(N,L,NZ,NY,NX,ielmc),L=1,NJ(NY,NX))
+              WRITE(29,94)I,IDATA(3),NZ,(EPOOLR(N,L,NZ,NY,NX,ielmn),L=1,NJ(NY,NX))
+              WRITE(29,94)I,IDATA(3),NZ,(EPOOLR(N,L,NZ,NY,NX,ielmp),L=1,NJ(NY,NX))
               WRITE(29,94)I,IDATA(3),NZ,(RTDP1(N,NR,NZ,NY,NX),NR=1,NRT(NZ,NY,NX))
               WRITE(29,94)I,IDATA(3),NZ,(RTWT1(N,NR,NZ,NY,NX),NR=1,NRT(NZ,NY,NX))
               WRITE(29,94)I,IDATA(3),NZ,(RTWT1N(N,NR,NZ,NY,NX),NR=1,NRT(NZ,NY,NX))
