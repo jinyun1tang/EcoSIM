@@ -193,9 +193,9 @@ module VisualMod
 !     IF(I.EQ.1)THEN
 !     TCSNY=0.0
 !     ENDIF
-!     DTCSN=TESN0(NZ,NY,NX,ielmc)-TCSNY
+!     DTCSN=TESN0(NZ,ielmc,NY,NX)-TCSNY
 !     TCSNX=TCSNX+DTCSN
-!     TCSNY=TESN0(NZ,NY,NX,ielmc)
+!     TCSNY=TESN0(NZ,ielmc,NY,NX)
 !     IF(I.EQ.IDAY0(NZ,NY,NX).OR.I.EQ.IDAYH(NZ,NY,NX))THEN
 !     ICHKA=0
 !     ICHKM=0
@@ -238,15 +238,15 @@ module VisualMod
           OUT(46)=-(DPTHT(NY,NX)-CDPTH(NU(NY,NX)-1,NY,NX))
           OUT(47)=DPTHS(NY,NX)
           OUT(48)=ARLFC(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-          OUT(49)=0.001*WTLFE(1,NY,NX,ielmc)/AREA(3,NU(NY,NX),NY,NX)
-          OUT(50)=0.001*WTLFE(3,NY,NX,ielmc)/AREA(3,NU(NY,NX),NY,NX)
-          OUT(51)=0.001*WTLFE(2,NY,NX,ielmc)/AREA(3,NU(NY,NX),NY,NX)
-          OUT(52)=0.001*WTSTKE(1,NY,NX,ielmc)/AREA(3,NU(NY,NX),NY,NX)
-          OUT(53)=0.001*WTSTKE(3,NY,NX,ielmc)/AREA(3,NU(NY,NX),NY,NX)
-          OUT(54)=0.001*WTSTKE(2,NY,NX,ielmc)/AREA(3,NU(NY,NX),NY,NX)
-          OUT(55)=0.001*WTRTE(1,NY,NX,ielmc)/AREA(3,NU(NY,NX),NY,NX)
-          OUT(56)=0.001*WTRTE(3,NY,NX,ielmc)/AREA(3,NU(NY,NX),NY,NX)
-          OUT(57)=0.001*WTRTE(2,NY,NX,ielmc)/AREA(3,NU(NY,NX),NY,NX)
+          OUT(49)=0.001*WTLFE(ielmc,1,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+          OUT(50)=0.001*WTLFE(ielmc,3,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+          OUT(51)=0.001*WTLFE(ielmc,2,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+          OUT(52)=0.001*WTSTKE(ielmc,1,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+          OUT(53)=0.001*WTSTKE(ielmc,3,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+          OUT(54)=0.001*WTSTKE(ielmc,2,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+          OUT(55)=0.001*WTRTE(ielmc,1,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+          OUT(56)=0.001*WTRTE(ielmc,3,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+          OUT(57)=0.001*WTRTE(ielmc,2,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
           L=0
           DO 62 N=58,68
             OUT(N)=0.001*ORGC(L,NY,NX)/AREA(3,NU(NY,NX),NY,NX)

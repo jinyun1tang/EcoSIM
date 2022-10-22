@@ -69,9 +69,7 @@ module NoduleBGCMod
     CPND     =>  plt_allom%CPND    , &
     WTLSB    =>  plt_biom%WTLSB    , &
     WTNDBP   =>  plt_biom%WTNDBP   , &
-    CPOOL    =>  plt_biom%CPOOL    , &
-    PPOOL    =>  plt_biom%PPOOL    , &
-    ZPOOL    =>  plt_biom%ZPOOL    , &
+    EPOOL    =>  plt_biom%EPOOL    , &
     CPOLNB   =>  plt_biom%CPOLNB   , &
     ZPOLNB   =>  plt_biom%ZPOLNB   , &
     PPOLNB   =>  plt_biom%PPOLNB   , &
@@ -311,9 +309,9 @@ module NoduleBGCMod
 !     RDNSNC,RDNSNC,RDNSNP=bacterial C,N,P senescence to litterfall
 !
     D6470: DO M=1,jsken
-      ESNC(M,1,0,NZ,ielmc)=ESNC(M,1,0,NZ,ielmc)+CFOPC(1,M,NZ)*(RDNDLC+RDNSNC)
-      ESNC(M,1,0,NZ,ielmn)=ESNC(M,1,0,NZ,ielmn)+CFOPN(1,M,NZ)*(RDNDLN+RDNSNN)
-      ESNC(M,1,0,NZ,ielmp)=ESNC(M,1,0,NZ,ielmp)+CFOPP(1,M,NZ)*(RDNDLP+RDNSNP)
+      ESNC(M,ielmc,1,0,NZ)=ESNC(M,ielmc,1,0,NZ)+CFOPC(1,M,NZ)*(RDNDLC+RDNSNC)
+      ESNC(M,ielmn,1,0,NZ)=ESNC(M,ielmn,1,0,NZ)+CFOPN(1,M,NZ)*(RDNDLN+RDNSNN)
+      ESNC(M,ielmp,1,0,NZ)=ESNC(M,ielmp,1,0,NZ)+CFOPP(1,M,NZ)*(RDNDLP+RDNSNP)
     ENDDO D6470
 !
 !     CONSUMPTION OF NON-STRUCTURAL C,N,P BY NODULE
@@ -357,7 +355,7 @@ module NoduleBGCMod
 !     XFRC,XFRN,XFRC=nonstructural C,N,P transfer
 !     CPOLNB,ZPOLNB,PPOLNB=nonstructural C,N,P in bacteria
 !
-    IF(CPOOL(NB,NZ).GT.ZEROP(NZ) &
+    IF(EPOOL(NB,ielmc,NZ).GT.ZEROP(NZ) &
       .AND.WTLSB(NB,NZ).GT.ZEROL(NZ))THEN
       CCNDLB=WTNDB(NB,NZ)/WTLSB(NB,NZ)
       WTLSB1=WTLSB(NB,NZ)
@@ -366,19 +364,19 @@ module NoduleBGCMod
       IF(WTLSBT.GT.ZEROP(NZ))THEN
         FXRNX=FXRN(INTYP(NZ))/(1.0+CCNDLB/CCNGB)
 !    2/(1.0+CCNDLB/(CCNGB*FXRN(INTYP(NZ))))
-        CPOOLD=(CPOOL(NB,NZ)*WTNDB1-CPOLNB(NB,NZ)*WTLSB1)/WTLSBT
+        CPOOLD=(EPOOL(NB,ielmc,NZ)*WTNDB1-CPOLNB(NB,NZ)*WTLSB1)/WTLSBT
         XFRC=FXRNX*CPOOLD
-        CPOOL(NB,NZ)=CPOOL(NB,NZ)-XFRC
+        EPOOL(NB,ielmc,NZ)=EPOOL(NB,ielmc,NZ)-XFRC
         CPOLNB(NB,NZ)=CPOLNB(NB,NZ)+XFRC
-        CPOOLT=CPOOL(NB,NZ)+CPOLNB(NB,NZ)
+        CPOOLT=EPOOL(NB,ielmc,NZ)+CPOLNB(NB,NZ)
         IF(CPOOLT.GT.ZEROP(NZ))THEN
-          ZPOOLD=(ZPOOL(NB,NZ)*CPOLNB(NB,NZ)-ZPOLNB(NB,NZ)*CPOOL(NB,NZ))/CPOOLT
+          ZPOOLD=(EPOOL(NB,ielmn,NZ)*CPOLNB(NB,NZ)-ZPOLNB(NB,NZ)*EPOOL(NB,ielmc,NZ))/CPOOLT
           XFRN=FXRNX*ZPOOLD
-          PPOOLD=(PPOOL(NB,NZ)*CPOLNB(NB,NZ) &
-            -PPOLNB(NB,NZ)*CPOOL(NB,NZ))/CPOOLT
+          PPOOLD=(EPOOL(NB,ielmp,NZ)*CPOLNB(NB,NZ) &
+            -PPOLNB(NB,NZ)*EPOOL(NB,ielmc,NZ))/CPOOLT
           XFRP=FXRNX*PPOOLD
-          ZPOOL(NB,NZ)=ZPOOL(NB,NZ)-XFRN
-          PPOOL(NB,NZ)=PPOOL(NB,NZ)-XFRP
+          EPOOL(NB,ielmn,NZ)=EPOOL(NB,ielmn,NZ)-XFRN
+          EPOOL(NB,ielmp,NZ)=EPOOL(NB,ielmp,NZ)-XFRP
           ZPOLNB(NB,NZ)=ZPOLNB(NB,NZ)+XFRN
           PPOLNB(NB,NZ)=PPOLNB(NB,NZ)+XFRP
         ENDIF
@@ -697,9 +695,9 @@ module NoduleBGCMod
 !     RDNSNC,RDNSNC,RDNSNP=bacterial C,N,P senescence to litterfall
 !
         D6370: DO M=1,jsken
-          ESNC(M,1,L,NZ,ielmc)=ESNC(M,1,L,NZ,ielmc)+CFOPC(4,M,NZ)*(RDNDLC+RDNSNC)
-          ESNC(M,1,L,NZ,ielmn)=ESNC(M,1,L,NZ,ielmn)+CFOPN(4,M,NZ)*(RDNDLN+RDNSNN)
-          ESNC(M,1,L,NZ,ielmp)=ESNC(M,1,L,NZ,ielmp)+CFOPP(4,M,NZ)*(RDNDLP+RDNSNP)
+          ESNC(M,ielmc,1,L,NZ)=ESNC(M,ielmc,1,L,NZ)+CFOPC(4,M,NZ)*(RDNDLC+RDNSNC)
+          ESNC(M,ielmn,1,L,NZ)=ESNC(M,ielmn,1,L,NZ)+CFOPN(4,M,NZ)*(RDNDLN+RDNSNN)
+          ESNC(M,ielmp,1,L,NZ)=ESNC(M,ielmp,1,L,NZ)+CFOPP(4,M,NZ)*(RDNDLP+RDNSNP)
         ENDDO D6370
 !
 !     CONSUMPTION OF NON-STRUCTURAL C,N,P BY NODULE
@@ -743,7 +741,7 @@ module NoduleBGCMod
 !     XFRC,XFRN,XFRC=nonstructural C,N,P transfer
 !     CPOOLN,ZPOOLN,PPOOLN=nonstructural C,N,P in bacteria
 !
-        IF(EPOOLR(1,L,NZ,ielmc).GT.ZEROP(NZ).AND.WTRTD(1,L,NZ).GT.ZEROL(NZ))THEN
+        IF(EPOOLR(ielmc,1,L,NZ).GT.ZEROP(NZ).AND.WTRTD(1,L,NZ).GT.ZEROL(NZ))THEN
           CCNDLR=WTNDL(L,NZ)/WTRTD(1,L,NZ)
           WTRTD1=WTRTD(1,L,NZ)
           WTNDL1=AMIN1(WTRTD(1,L,NZ),AMAX1(WTNDI*AREA3(NU),WTNDL(L,NZ)))
@@ -751,20 +749,20 @@ module NoduleBGCMod
           IF(WTRTDT.GT.ZEROP(NZ))THEN
             FXRNX=FXRN(INTYP(NZ))/(1.0_r8+CCNDLR/CCNGR)
 !    2/(1.0+CCNDLR/(CCNGR*FXRN(INTYP(NZ))))
-            CPOOLD=(EPOOLR(1,L,NZ,ielmc)*WTNDL1-CPOOLN(L,NZ)*WTRTD1)/WTRTDT
+            CPOOLD=(EPOOLR(ielmc,1,L,NZ)*WTNDL1-CPOOLN(L,NZ)*WTRTD1)/WTRTDT
             XFRC=FXRNX*CPOOLD
-            EPOOLR(1,L,NZ,ielmc)=EPOOLR(1,L,NZ,ielmc)-XFRC
+            EPOOLR(ielmc,1,L,NZ)=EPOOLR(ielmc,1,L,NZ)-XFRC
             CPOOLN(L,NZ)=CPOOLN(L,NZ)+XFRC
-            CPOOLT=EPOOLR(1,L,NZ,ielmc)+CPOOLN(L,NZ)
+            CPOOLT=EPOOLR(ielmc,1,L,NZ)+CPOOLN(L,NZ)
             IF(CPOOLT.GT.ZEROP(NZ))THEN
-              ZPOOLD=(EPOOLR(1,L,NZ,ielmn)*CPOOLN(L,NZ) &
-                -ZPOOLN(L,NZ)*EPOOLR(1,L,NZ,ielmc))/CPOOLT
+              ZPOOLD=(EPOOLR(ielmn,1,L,NZ)*CPOOLN(L,NZ) &
+                -ZPOOLN(L,NZ)*EPOOLR(ielmc,1,L,NZ))/CPOOLT
               XFRN=FXRNX*ZPOOLD
-              PPOOLD=(EPOOLR(1,L,NZ,ielmp)*CPOOLN(L,NZ) &
-                -PPOOLN(L,NZ)*EPOOLR(1,L,NZ,ielmc))/CPOOLT
+              PPOOLD=(EPOOLR(ielmp,1,L,NZ)*CPOOLN(L,NZ) &
+                -PPOOLN(L,NZ)*EPOOLR(ielmc,1,L,NZ))/CPOOLT
               XFRP=FXRNX*PPOOLD
-              EPOOLR(1,L,NZ,ielmn)=EPOOLR(1,L,NZ,ielmn)-XFRN
-              EPOOLR(1,L,NZ,ielmp)=EPOOLR(1,L,NZ,ielmp)-XFRP
+              EPOOLR(ielmn,1,L,NZ)=EPOOLR(ielmn,1,L,NZ)-XFRN
+              EPOOLR(ielmp,1,L,NZ)=EPOOLR(ielmp,1,L,NZ)-XFRP
               ZPOOLN(L,NZ)=ZPOOLN(L,NZ)+XFRN
               PPOOLN(L,NZ)=PPOOLN(L,NZ)+XFRP
             ENDIF

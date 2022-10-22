@@ -46,12 +46,12 @@ contains
   allocate(TRAU(JY,JX));        TRAU=0._r8
   allocate(TNPP(JY,JX));        TNPP=0._r8
   allocate(THRE(JY,JX));        THRE=0._r8
-  allocate(XHVSTE(JY,JX,npelms));      XHVSTE=0._r8
+  allocate(XHVSTE(npelms,JY,JX));      XHVSTE=0._r8
   allocate(TRINH4(JY,JX));      TRINH4=0._r8
   allocate(TRIPO4(JY,JX));      TRIPO4=0._r8
   allocate(GPP(JY,JX));         GPP=0._r8
   allocate(TCCAN(JY,JX));       TCCAN=0._r8
-  allocate(ZESNC(JY,JX,npelms));       ZESNC=0._r8
+  allocate(ZESNC(npelms,JY,JX));       ZESNC=0._r8
   allocate(RECO(JY,JX));        RECO=0._r8
   allocate(TNBP(JY,JX));        TNBP=0._r8
   allocate(RP14X(0:JZ,JY,JX));  RP14X=0._r8

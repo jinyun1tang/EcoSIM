@@ -46,7 +46,7 @@ module NutUptakeMod
   real(r8) :: ZPOOLB
   integer :: NB
 
-  associate(                            &
+  associate(                        &
     TCC     =>  plt_ew%TCC        , &
     NU      =>  plt_site%NU       , &
     AREA3   =>  plt_site%AREA3    , &
@@ -54,7 +54,7 @@ module NutUptakeMod
     RNH3B   =>  plt_rbgc%RNH3B    , &
     ZEROP   =>  plt_biom%ZEROP    , &
     WTLSB   =>  plt_biom%WTLSB    , &
-    ZPOOL   =>  plt_biom%ZPOOL    , &
+    EPOOL   =>  plt_biom%EPOOL    , &
     CCPOLB  =>  plt_biom%CCPOLB   , &
     CZPOLB  =>  plt_biom%CZPOLB   , &
     CPPOLB  =>  plt_biom%CPPOLB   , &
@@ -87,7 +87,7 @@ module NutUptakeMod
       .AND.ARLFB(NB,NZ).GT.ZEROP(NZ) &
       .AND.ARLFP(NZ).GT.ZEROP(NZ))THEN
       CNH3P=AZMAX1(FNH3P*CZPOLB(NB,NZ)/SNH3P)
-      ZPOOLB=AZMAX1(ZPOOL(NB,NZ))
+      ZPOOLB=AZMAX1(EPOOL(NB,ielmn,NZ))
       RNH3B(NB,NZ)=AMIN1(0.1_r8*ZPOOLB,AMAX1((CNH3E-CNH3P)/(RA(NZ)+RC(NZ)) &
         *FRADP(NZ)*AREA3(NU)*ARLFB(NB,NZ)/ARLFP(NZ),-0.1_r8*ZPOOLB))
       ELSE
@@ -1150,7 +1150,7 @@ module NutUptakeMod
   !     CPOOLR=nonstructural C content
   !
   IF(RCO2N(N,L,NZ).GT.ZEROP(NZ))THEN
-    FCUP=AZMAX1(AMIN1(1.0,0.25*safe_adb(EPOOLR(N,L,NZ,ielmc),RCO2N(N,L,NZ))))
+    FCUP=AZMAX1(AMIN1(1.0,0.25*safe_adb(EPOOLR(ielmc,N,L,NZ),RCO2N(N,L,NZ))))
   ELSE
     FCUP=0.0_r8
   ENDIF
@@ -1268,15 +1268,15 @@ module NutUptakeMod
     VOLWK=VOLWM(NPH,L)*FOSRH(K,L)
     IF(VOLWK.GT.ZEROS2.AND.RTVLW(N,L,NZ).GT.ZEROP(NZ))THEN
       VOLWT=VOLWK+RTVLW(N,L,NZ)
-      CPOOLX=AMIN1(1.25E+03*RTVLW(N,L,NZ),EPOOLR(N,L,NZ,ielmc))
+      CPOOLX=AMIN1(1.25E+03*RTVLW(N,L,NZ),EPOOLR(ielmc,N,L,NZ))
       XFRC=(OQC(K,L)*RTVLW(N,L,NZ)-CPOOLX*VOLWK)/VOLWT
       RDFOMC(N,K,L,NZ)=FEXUC*XFRC
-      IF(OQC(K,L).GT.ZEROS.AND.EPOOLR(N,L,NZ,ielmc).GT.ZEROP(NZ))THEN
-        CPOOLT=OQC(K,L)+EPOOLR(N,L,NZ,ielmc)
-        ZPOOLX=0.1*EPOOLR(N,L,NZ,ielmn)
-        PPOOLX=0.1*EPOOLR(N,L,NZ,ielmp)
-        XFRN=(OQN(K,L)*EPOOLR(N,L,NZ,ielmc)-ZPOOLX*OQC(K,L))/CPOOLT
-        XFRP=(OQP(K,L)*EPOOLR(N,L,NZ,ielmc)-PPOOLX*OQC(K,L))/CPOOLT
+      IF(OQC(K,L).GT.ZEROS.AND.EPOOLR(ielmc,N,L,NZ).GT.ZEROP(NZ))THEN
+        CPOOLT=OQC(K,L)+EPOOLR(ielmc,N,L,NZ)
+        ZPOOLX=0.1*EPOOLR(ielmn,N,L,NZ)
+        PPOOLX=0.1*EPOOLR(ielmp,N,L,NZ)
+        XFRN=(OQN(K,L)*EPOOLR(ielmc,N,L,NZ)-ZPOOLX*OQC(K,L))/CPOOLT
+        XFRP=(OQP(K,L)*EPOOLR(ielmc,N,L,NZ)-PPOOLX*OQC(K,L))/CPOOLT
         RDFOMN(N,K,L,NZ)=FEXUN*XFRN
         RDFOMP(N,K,L,NZ)=FEXUP*XFRP
       ELSE

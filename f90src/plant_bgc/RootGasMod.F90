@@ -275,7 +275,7 @@ module RootGasMod
 !     DPTHZ=depth of primary root from surface
 !     RTLGA=average secondary root length
 !
-    IF(WTRTSE(NZ,ielmc).GT.ZEROP(NZ).AND.FRTDPX(L,NZ).GT.ZERO)THEN
+    IF(WTRTSE(ielmc,NZ).GT.ZEROP(NZ).AND.FRTDPX(L,NZ).GT.ZERO)THEN
       RTCR1=AMAX1(PP(NZ),RTN1(N,L,NZ)) &
         *PICON*RRAD1(N,L,NZ)**2/DPTHZ(L)
       RTCR2=(RTNL(N,L,NZ)*PICON*RRAD2(N,L,NZ)**2 &

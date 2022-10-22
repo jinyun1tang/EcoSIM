@@ -905,9 +905,9 @@ implicit none
             RTLG2(N,L1,NR,NZ,NY,NX)=RTLG2(N,L1,NR,NZ,NY,NX)+FX*RTLG2(N,L0,NR,NZ,NY,NX)
             RTN2(N,L1,NR,NZ,NY,NX)=RTN2(N,L1,NR,NZ,NY,NX)+FX*RTN2(N,L0,NR,NZ,NY,NX)
           ENDDO
-          EPOOLR(N,L1,NZ,NY,NX,ielmc)=EPOOLR(N,L1,NZ,NY,NX,ielmc)+FX*EPOOLR(N,L0,NZ,NY,NX,ielmc)
-          EPOOLR(N,L1,NZ,NY,NX,ielmn)=EPOOLR(N,L1,NZ,NY,NX,ielmn)+FX*EPOOLR(N,L0,NZ,NY,NX,ielmn)
-          EPOOLR(N,L1,NZ,NY,NX,ielmp)=EPOOLR(N,L1,NZ,NY,NX,ielmp)+FX*EPOOLR(N,L0,NZ,NY,NX,ielmp)
+          EPOOLR(ielmc,N,L1,NZ,NY,NX)=EPOOLR(ielmc,N,L1,NZ,NY,NX)+FX*EPOOLR(ielmc,N,L0,NZ,NY,NX)
+          EPOOLR(ielmn,N,L1,NZ,NY,NX)=EPOOLR(ielmn,N,L1,NZ,NY,NX)+FX*EPOOLR(ielmn,N,L0,NZ,NY,NX)
+          EPOOLR(ielmp,N,L1,NZ,NY,NX)=EPOOLR(ielmp,N,L1,NZ,NY,NX)+FX*EPOOLR(ielmp,N,L0,NZ,NY,NX)
           WTRTL(N,L1,NZ,NY,NX)=WTRTL(N,L1,NZ,NY,NX)+FX*WTRTL(N,L0,NZ,NY,NX)
           WTRTD(N,L1,NZ,NY,NX)=WTRTD(N,L1,NZ,NY,NX)+FX*WTRTD(N,L0,NZ,NY,NX)
           WSRTL(N,L1,NZ,NY,NX)=WSRTL(N,L1,NZ,NY,NX)+FX*WSRTL(N,L0,NZ,NY,NX)
@@ -1171,9 +1171,9 @@ implicit none
             RTLG2(N,L0,NR,NZ,NY,NX)=FY*RTLG2(N,L0,NR,NZ,NY,NX)
             RTN2(N,L0,NR,NZ,NY,NX)=FY*RTN2(N,L0,NR,NZ,NY,NX)
           ENDDO
-          EPOOLR(N,L0,NZ,NY,NX,ielmc)=FY*EPOOLR(N,L0,NZ,NY,NX,ielmc)
-          EPOOLR(N,L0,NZ,NY,NX,ielmn)=FY*EPOOLR(N,L0,NZ,NY,NX,ielmn)
-          EPOOLR(N,L0,NZ,NY,NX,ielmp)=FY*EPOOLR(N,L0,NZ,NY,NX,ielmp)
+          EPOOLR(ielmc,N,L0,NZ,NY,NX)=FY*EPOOLR(ielmc,N,L0,NZ,NY,NX)
+          EPOOLR(ielmn,N,L0,NZ,NY,NX)=FY*EPOOLR(ielmn,N,L0,NZ,NY,NX)
+          EPOOLR(ielmp,N,L0,NZ,NY,NX)=FY*EPOOLR(ielmp,N,L0,NZ,NY,NX)
           WTRTL(N,L0,NZ,NY,NX)=FY*WTRTL(N,L0,NZ,NY,NX)
           WTRTD(N,L0,NZ,NY,NX)=FY*WTRTD(N,L0,NZ,NY,NX)
           WSRTL(N,L0,NZ,NY,NX)=FY*WSRTL(N,L0,NZ,NY,NX)
@@ -1417,15 +1417,15 @@ implicit none
             RTN2(N,L1,NR,NZ,NY,NX)=RTN2(N,L1,NR,NZ,NY,NX)+FXRTN2
             RTN2(N,L0,NR,NZ,NY,NX)=RTN2(N,L0,NR,NZ,NY,NX)-FXRTN2
           ENDDO
-          FXCPOOLR=FRO*EPOOLR(N,L0,NZ,NY,NX,ielmc)
-          EPOOLR(N,L1,NZ,NY,NX,ielmc)=EPOOLR(N,L1,NZ,NY,NX,ielmc)+FXCPOOLR
-          EPOOLR(N,L0,NZ,NY,NX,ielmc)=EPOOLR(N,L0,NZ,NY,NX,ielmc)-FXCPOOLR
-          FXZPOOLR=FRO*EPOOLR(N,L0,NZ,NY,NX,ielmn)
-          EPOOLR(N,L1,NZ,NY,NX,ielmn)=EPOOLR(N,L1,NZ,NY,NX,ielmn)+FXZPOOLR
-          EPOOLR(N,L0,NZ,NY,NX,ielmn)=EPOOLR(N,L0,NZ,NY,NX,ielmn)-FXZPOOLR
-          FXPPOOLR=FRO*EPOOLR(N,L0,NZ,NY,NX,ielmp)
-          EPOOLR(N,L1,NZ,NY,NX,ielmp)=EPOOLR(N,L1,NZ,NY,NX,ielmp)+FXPPOOLR
-          EPOOLR(N,L0,NZ,NY,NX,ielmp)=EPOOLR(N,L0,NZ,NY,NX,ielmp)-FXPPOOLR
+          FXCPOOLR=FRO*EPOOLR(ielmc,N,L0,NZ,NY,NX)
+          EPOOLR(ielmc,N,L1,NZ,NY,NX)=EPOOLR(ielmc,N,L1,NZ,NY,NX)+FXCPOOLR
+          EPOOLR(ielmc,N,L0,NZ,NY,NX)=EPOOLR(ielmc,N,L0,NZ,NY,NX)-FXCPOOLR
+          FXZPOOLR=FRO*EPOOLR(ielmn,N,L0,NZ,NY,NX)
+          EPOOLR(ielmn,N,L1,NZ,NY,NX)=EPOOLR(ielmn,N,L1,NZ,NY,NX)+FXZPOOLR
+          EPOOLR(ielmn,N,L0,NZ,NY,NX)=EPOOLR(ielmn,N,L0,NZ,NY,NX)-FXZPOOLR
+          FXPPOOLR=FRO*EPOOLR(ielmp,N,L0,NZ,NY,NX)
+          EPOOLR(ielmp,N,L1,NZ,NY,NX)=EPOOLR(ielmp,N,L1,NZ,NY,NX)+FXPPOOLR
+          EPOOLR(ielmp,N,L0,NZ,NY,NX)=EPOOLR(ielmp,N,L0,NZ,NY,NX)-FXPPOOLR
           FXWTRTL=FRO*WTRTL(N,L0,NZ,NY,NX)
           WTRTL(N,L1,NZ,NY,NX)=WTRTL(N,L1,NZ,NY,NX)+FXWTRTL
           WTRTL(N,L0,NZ,NY,NX)=WTRTL(N,L0,NZ,NY,NX)-FXWTRTL

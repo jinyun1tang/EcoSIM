@@ -79,14 +79,12 @@ module StartqsMod
 !     FILL OUT UNUSED ARRAYS
 !
       D9986: DO NZ=NP+1,JP1
-        plt_bgcr%TESN0(NZ,:)=0._r8
-        plt_bgcr%TESNC(NZ,:)=0._r8
-        plt_biom%WTSTGE(NZ,:)=0._r8
+        plt_bgcr%TESN0(1:npelms,NZ)=0._r8
+        plt_bgcr%TESNC(1:npelms,NZ)=0._r8
+        plt_biom%WTSTGE(1:npelms,NZ)=0._r8
         D6401: DO L=1,NL
           DO  K=0,micpar%n_pltlitrk
-            DO  M=1,jsken
-              plt_bgcr%ESNC(M,K,L,NZ,:)=0._r8
-            enddo
+            plt_bgcr%ESNC(1:jsken,1:npelms,K,L,NZ)=0._r8
           enddo
         ENDDO D6401
       ENDDO D9986
@@ -649,9 +647,7 @@ module StartqsMod
   WSTR(NZ)=0._r8
   CHILL(NZ)=0._r8
   DO 25 NB=1,10
-    plt_biom%CPOOL(NB,NZ)=0._r8
-    plt_biom%ZPOOL(NB,NZ)=0._r8
-    plt_biom%PPOOL(NB,NZ)=0._r8
+    plt_biom%EPOOL(NB,1:npelms,NZ)=0._r8
     plt_biom%CPOLNB(NB,NZ)=0._r8
     plt_biom%ZPOLNB(NB,NZ)=0._r8
     plt_biom%PPOLNB(NB,NZ)=0._r8
@@ -752,20 +748,20 @@ module StartqsMod
     plt_biom%WGLFV(L,NZ)=0._r8
     ARSTV(L,NZ)=0._r8
   ENDDO D35
-  plt_biom%EPOOLP(NZ,:)=0._r8
-  plt_biom%CEPOLP(NZ,:)=0._r8
+  plt_biom%EPOOLP(1:npelms,NZ)=0._r8
+  plt_biom%CEPOLP(1:npelms,NZ)=0._r8
   plt_biom%CCPLNP(NZ)=0._r8
-  plt_biom%WTSHTE(NZ,:)=0._r8
-  plt_biom%WTLFE(NZ,:)=0._r8
-  plt_biom%WTSHEE(NZ,:)=0._r8
-  plt_biom%WTSTKE(NZ,:)=0._r8
+  plt_biom%WTSHTE(1:npelms,NZ)=0._r8
+  plt_biom%WTLFE(1:npelms,NZ)=0._r8
+  plt_biom%WTSHEE(1:npelms,NZ)=0._r8
+  plt_biom%WTSTKE(1:npelms,NZ)=0._r8
   plt_biom%WVSTK(NZ)=0._r8
-  plt_biom%WTRSVE(NZ,:)=0._r8
-  plt_biom%WTHSKE(NZ,:)=0._r8
-  plt_biom%WTEARE(NZ,:)=0._r8
-  plt_biom%WTGRE(NZ,:)=0._r8
-  plt_biom%WTRTSE(NZ,:)=0._r8
-  plt_biom%WTNDE(NZ,:)=0._r8
+  plt_biom%WTRSVE(1:npelms,NZ)=0._r8
+  plt_biom%WTHSKE(1:npelms,NZ)=0._r8
+  plt_biom%WTEARE(1:npelms,NZ)=0._r8
+  plt_biom%WTGRE(1:npelms,NZ)=0._r8
+  plt_biom%WTRTSE(1:npelms,NZ)=0._r8
+  plt_biom%WTNDE(1:npelms,NZ)=0._r8
   plt_biom%WTLS(NZ)=0._r8
   ARLFP(NZ)=0._r8
   plt_biom%WTRTA(NZ)=0._r8
@@ -814,11 +810,11 @@ module StartqsMod
 !
   IF(.not.is_restart_run.AND.is_first_year)THEN
     CARBN(NZ)=0._r8
-    TESN0(NZ,:)=0._r8
+    TESN0(1:npelms,NZ)=0._r8
     TCO2T(NZ)=0._r8
     TCO2A(NZ)=0._r8
-    TEUPTK(NZ,:)=0._r8
-    TESNC(NZ,:)=0._r8
+    TEUPTK(1:npelms,NZ)=0._r8
+    TESNC(1:npelms,NZ)=0._r8
 
     TZUPFX(NZ)=0._r8
     RNH3C(NZ)=0._r8
@@ -829,21 +825,21 @@ module StartqsMod
     plt_distb%VNH3F(NZ)=0._r8
     plt_distb%VN2OF(NZ)=0._r8
     plt_distb%VPO4F(NZ)=0._r8
-    plt_distb%THVSTE(NZ,:)=0._r8
-    plt_distb%HVSTE(NZ,:)=0._r8
+    plt_distb%THVSTE(1:npelms,NZ)=0._r8
+    plt_distb%HVSTE(1:npelms,NZ)=0._r8
     RSETC(NZ)=0._r8
     RSETN(NZ)=0._r8
     RSETP(NZ)=0._r8
     CTRAN(NZ)=0._r8
-    WTSTGE(NZ,:)=0._r8
+    WTSTGE(1:npelms,NZ)=0._r8
     WTSTDX=WTSTDI(NZ)*AREA3(NU)
     D155: DO M=1,jsken
-      WTSTDE(M,NZ,ielmc)=WTSTDX*CFOPC(5,M,NZ)
-      WTSTDE(M,NZ,ielmn)=WTSTDX*CNSTK(NZ)*CFOPN(5,M,NZ)
-      WTSTDE(M,NZ,ielmp)=WTSTDX*CPSTK(NZ)*CFOPP(5,M,NZ)
-      WTSTGE(NZ,ielmc)=WTSTGE(NZ,ielmc)+WTSTDE(M,NZ,ielmc)
-      WTSTGE(NZ,ielmn)=WTSTGE(NZ,ielmn)+WTSTDE(M,NZ,ielmn)
-      WTSTGE(NZ,ielmp)=WTSTGE(NZ,ielmp)+WTSTDE(M,NZ,ielmp)
+      WTSTDE(M,ielmc,NZ)=WTSTDX*CFOPC(5,M,NZ)
+      WTSTDE(M,ielmn,NZ)=WTSTDX*CNSTK(NZ)*CFOPN(5,M,NZ)
+      WTSTDE(M,ielmp,NZ)=WTSTDX*CPSTK(NZ)*CFOPP(5,M,NZ)
+      WTSTGE(ielmc,NZ)=WTSTGE(ielmc,NZ)+WTSTDE(M,ielmc,NZ)
+      WTSTGE(ielmn,NZ)=WTSTGE(ielmn,NZ)+WTSTDE(M,ielmn,NZ)
+      WTSTGE(ielmp,NZ)=WTSTGE(ielmp,NZ)+WTSTDE(M,ielmp,NZ)
     ENDDO D155
   ENDIF
   end associate
@@ -880,7 +876,7 @@ module StartqsMod
 !     TCG,TKG=canopy temperature for phenology (oC,K)
 !     PSILT,PSILO,PSILG=canopy total,osmotic,turgor water potl(MPa)
 !
-  VHCPC(NZ)=cpw*WTSHTE(NZ,ielmc)*10.0E-06
+  VHCPC(NZ)=cpw*WTSHTE(ielmc,NZ)*10.0E-06
   ENGYX(NZ)=0._r8
   DTKC(NZ)=0._r8
   TCC(NZ)=ATCA
@@ -951,7 +947,7 @@ module StartqsMod
       PSIRT(N,L,NZ)=-0.01
       PSIRO(N,L,NZ)=OSMO(NZ)+PSIRT(N,L,NZ)
       PSIRG(N,L,NZ)=AZMAX1(PSIRT(N,L,NZ)-PSIRO(N,L,NZ))
-      plt_biom%EPOOLR(N,L,NZ,:)=0._r8
+      plt_biom%EPOOLR(:,N,L,NZ)=0._r8
       plt_biom%CCPOLR(N,L,NZ)=0._r8
       plt_biom%CZPOLR(N,L,NZ)=0._r8
       plt_biom%CPPOLR(N,L,NZ)=0._r8
@@ -1007,7 +1003,7 @@ module StartqsMod
       plt_rbgc%H2GA(N,L,NZ)=0._r8
       plt_rbgc%H2GP(N,L,NZ)=0._r8
       plt_rbgc%WFR(N,L,NZ)=1.0
-      DO 30 NR=1,JC1
+      D30: DO NR=1,JC1
         plt_morph%RTN2(N,L,NR,NZ)=0._r8
         plt_morph%RTLG1(N,L,NR,NZ)=0._r8
         plt_morph%RTLG2(N,L,NR,NZ)=0._r8
@@ -1021,12 +1017,10 @@ module StartqsMod
         plt_biom%RTWT1(N,NR,NZ)=0._r8
         plt_biom%RTWT1N(N,NR,NZ)=0._r8
         plt_biom%RTWT1P(N,NR,NZ)=0._r8
-30    CONTINUE
+      ENDDO D30
       IF(N.EQ.1)THEN
-        D6400: DO K=0,1
-          DO  M=1,jsken
-            plt_bgcr%ESNC(M,K,L,NZ,:)=0._r8
-          enddo
+        D6400: DO K=0,micpar%k_non_woody_litr
+          plt_bgcr%ESNC(:,:,K,L,NZ)=0._r8
         ENDDO D6400
         plt_biom%CPOOLN(L,NZ)=0._r8
         plt_biom%ZPOOLN(L,NZ)=0._r8
@@ -1077,9 +1071,7 @@ module StartqsMod
     WTRTL    =>   plt_biom%WTRTL   , &
     WSRTL    =>   plt_biom%WSRTL   , &
     EPOOLR   =>   plt_biom%EPOOLR  , &
-    CPOOL    =>   plt_biom%CPOOL   , &
-    ZPOOL    =>   plt_biom%ZPOOL   , &
-    PPOOL    =>   plt_biom%PPOOL   , &
+    EPOOL    =>   plt_biom%EPOOL   , &
     WTLFB    =>   plt_biom%WTLFB   , &
     WTLFBP   =>   plt_biom%WTLFBP  , &
     WTRVE    =>   plt_biom%WTRVE   , &
@@ -1103,9 +1095,9 @@ module StartqsMod
 !     CPOOLR,ZPOOLR,PPOOLR=C,N,P in root,myco nonstructural pools (g)
 !
   WTRVX(NZ)=GRDM(NZ)*PP(NZ)
-  WTRVE(NZ,ielmc)=WTRVX(NZ)
-  WTRVE(NZ,ielmn)=CNGR(NZ)*WTRVE(NZ,ielmc)
-  WTRVE(NZ,ielmp)=CPGR(NZ)*WTRVE(NZ,ielmc)
+  WTRVE(ielmc,NZ)=WTRVX(NZ)
+  WTRVE(ielmn,NZ)=CNGR(NZ)*WTRVE(ielmc,NZ)
+  WTRVE(ielmp,NZ)=CPGR(NZ)*WTRVE(ielmc,NZ)
   WTLFBN(1,NZ)=CNGR(NZ)*WTLFB(1,NZ)
   WTLFBP(1,NZ)=CPGR(NZ)*WTLFB(1,NZ)
   WTLSB(1,NZ)=WTLFB(1,NZ)+WTSHEB(1,NZ)
@@ -1113,8 +1105,8 @@ module StartqsMod
   FDM=AMIN1(1.0,0.16-0.045*PSILT(NZ))
   VOLWP(NZ)=ppmc*WTLS(NZ)/FDM
   VOLWC(NZ)=0._r8
-  ZPOOL(1,NZ)=CNGR(NZ)*CPOOL(1,NZ)
-  PPOOL(1,NZ)=CPGR(NZ)*CPOOL(1,NZ)
+  EPOOL(1,ielmn,NZ)=CNGR(NZ)*EPOOL(1,ielmc,NZ)
+  EPOOL(1,ielmp,NZ)=CPGR(NZ)*EPOOL(1,ielmc,NZ)
   WTRT1N(1,NG(NZ),1,NZ)=CNGR(NZ)*WTRT1(1,NG(NZ),1,NZ)
   WTRT1P(1,NG(NZ),1,NZ)=CPGR(NZ)*WTRT1(1,NG(NZ),1,NZ)
   RTWT1N(1,1,NZ)=CNGR(NZ)*RTWT1(1,1,NZ)
@@ -1122,8 +1114,8 @@ module StartqsMod
   WTRTL(1,NG(NZ),NZ)=WTRT1(1,NG(NZ),1,NZ)
   WTRTD(1,NG(NZ),NZ)=WTRT1(1,NG(NZ),1,NZ)
   WSRTL(1,NG(NZ),NZ)=WTRTL(1,NG(NZ),NZ)*CWSRT(NZ)
-  EPOOLR(1,NG(NZ),NZ,ielmn)=CNGR(NZ)*EPOOLR(1,NG(NZ),NZ,ielmc)
-  EPOOLR(1,NG(NZ),NZ,ielmp)=CPGR(NZ)*EPOOLR(1,NG(NZ),NZ,ielmc)
+  EPOOLR(ielmn,1,NG(NZ),NZ)=CNGR(NZ)*EPOOLR(ielmc,1,NG(NZ),NZ)
+  EPOOLR(ielmp,1,NG(NZ),NZ)=CPGR(NZ)*EPOOLR(ielmc,1,NG(NZ),NZ)
 
   end associate
   end subroutine InitSeedMorphoBio

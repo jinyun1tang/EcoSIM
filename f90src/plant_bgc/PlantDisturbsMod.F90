@@ -129,9 +129,9 @@ module PlantDisturbsMod
         ENDIF
       ENDIF
     ELSEIF(IHVST(NZ).EQ.4.OR.IHVST(NZ).EQ.6)THEN
-      IF(WTSTGE(NZ,ielmc).GT.ZEROP(NZ))THEN
+      IF(WTSTGE(ielmc,NZ).GT.ZEROP(NZ))THEN
         WHVSTD=HVST(NZ)*THIN(NZ)*0.45_r8/24.0_r8*AREA3(NU)*EHVST(1,4,NZ)
-        FHVST=AZMAX1(1._r8-WHVSTD/WTSTGE(NZ,ielmc))
+        FHVST=AZMAX1(1._r8-WHVSTD/WTSTGE(ielmc,NZ))
         FHVSH=FHVST
       ELSE
         FHVST=1.0_r8
@@ -142,15 +142,15 @@ module PlantDisturbsMod
       FHVSH=1.0_r8
     ENDIF
     D6475: DO M=1,jsken
-      WTHTH4=WTHTH4+(1._r8-FHVSH)*WTSTDE(M,NZ,ielmc)
-      WTHNH4=WTHNH4+(1._r8-FHVSH)*WTSTDE(M,NZ,ielmn)
-      WTHPH4=WTHPH4+(1._r8-FHVSH)*WTSTDE(M,NZ,ielmp)
-      WTHTX4=WTHTX4+(FHVSH-FHVST)*WTSTDE(M,NZ,ielmc)
-      WTHNX4=WTHNX4+(FHVSH-FHVST)*WTSTDE(M,NZ,ielmn)
-      WTHPX4=WTHPX4+(FHVSH-FHVST)*WTSTDE(M,NZ,ielmp)
-      WTSTDE(M,NZ,ielmc)=FHVST*WTSTDE(M,NZ,ielmc)
-      WTSTDE(M,NZ,ielmn)=FHVST*WTSTDE(M,NZ,ielmn)
-      WTSTDE(M,NZ,ielmp)=FHVST*WTSTDE(M,NZ,ielmp)
+      WTHTH4=WTHTH4+(1._r8-FHVSH)*WTSTDE(M,ielmc,NZ)
+      WTHNH4=WTHNH4+(1._r8-FHVSH)*WTSTDE(M,ielmn,NZ)
+      WTHPH4=WTHPH4+(1._r8-FHVSH)*WTSTDE(M,ielmp,NZ)
+      WTHTX4=WTHTX4+(FHVSH-FHVST)*WTSTDE(M,ielmc,NZ)
+      WTHNX4=WTHNX4+(FHVSH-FHVST)*WTSTDE(M,ielmn,NZ)
+      WTHPX4=WTHPX4+(FHVSH-FHVST)*WTSTDE(M,ielmp,NZ)
+      WTSTDE(M,ielmc,NZ)=FHVST*WTSTDE(M,ielmc,NZ)
+      WTSTDE(M,ielmn,NZ)=FHVST*WTSTDE(M,ielmn,NZ)
+      WTSTDE(M,ielmp,NZ)=FHVST*WTSTDE(M,ielmp,NZ)
     ENDDO D6475
 !
     call PlantDisturbance(I,J,NZ)
@@ -248,43 +248,43 @@ module PlantDisturbsMod
   IF(IHVST(NZ).NE.4.AND.IHVST(NZ).NE.6)THEN
     IF(IHVST(NZ).NE.5)THEN
       D6375: DO M=1,jsken
-        ESNC(M,1,0,NZ,ielmc)=ESNC(M,1,0,NZ,ielmc) &
+        ESNC(M,ielmc,1,0,NZ)=ESNC(M,ielmc,1,0,NZ) &
           +CFOPC(0,M,NZ)*(WTHTR0+WTHTX0) &
           +CFOPC(1,M,NZ)*(WTHTR1+WTHTX1) &
           +CFOPC(2,M,NZ)*(WTHTR2+WTHTX2)
-        ESNC(M,1,0,NZ,ielmn)=ESNC(M,1,0,NZ,ielmn) &
+        ESNC(M,ielmn,1,0,NZ)=ESNC(M,ielmn,1,0,NZ) &
           +CFOPN(0,M,NZ)*(WTHNR0+WTHNX0) &
           +CFOPN(1,M,NZ)*(WTHNR1+WTHNX1) &
           +CFOPN(2,M,NZ)*(WTHNR2+WTHNX2)
-        ESNC(M,1,0,NZ,ielmp)=ESNC(M,1,0,NZ,ielmp) &
+        ESNC(M,ielmp,1,0,NZ)=ESNC(M,ielmp,1,0,NZ) &
           +CFOPP(0,M,NZ)*(WTHPR0+WTHPX0) &
           +CFOPP(1,M,NZ)*(WTHPR1+WTHPX1) &
           +CFOPP(2,M,NZ)*(WTHPR2+WTHPX2)
         IF(IBTYP(NZ).EQ.0.OR.IGTYP(NZ).LE.1)THEN
-          ESNC(M,1,0,NZ,ielmc)=ESNC(M,1,0,NZ,ielmc) &
+          ESNC(M,ielmc,1,0,NZ)=ESNC(M,ielmc,1,0,NZ) &
             +CFOPC(3,M,NZ)*(WTHTR3+WTHTX3+WTHTR4+WTHTX4)
-          ESNC(M,1,0,NZ,ielmn)=ESNC(M,1,0,NZ,ielmn) &
+          ESNC(M,ielmn,1,0,NZ)=ESNC(M,ielmn,1,0,NZ) &
             +CFOPN(3,M,NZ)*(WTHNR3+WTHNX3+WTHNR4+WTHNX4)
-          ESNC(M,1,0,NZ,ielmp)=ESNC(M,1,0,NZ,ielmp) &
+          ESNC(M,ielmp,1,0,NZ)=ESNC(M,ielmp,1,0,NZ) &
             +CFOPP(3,M,NZ)*(WTHPR3+WTHPX3+WTHPR4+WTHPX4)
         ELSE
-          WTSTDE(M,NZ,ielmc)=WTSTDE(M,NZ,ielmc) &
+          WTSTDE(M,ielmc,NZ)=WTSTDE(M,ielmc,NZ) &
             +CFOPC(5,M,NZ)*(WTHTX3+WTHTX4)
-          WTSTDE(M,NZ,ielmn)=WTSTDE(M,NZ,ielmn) &
+          WTSTDE(M,ielmn,NZ)=WTSTDE(M,ielmn,NZ) &
             +CFOPN(5,M,NZ)*(WTHNX3+WTHNX4)
-          WTSTDE(M,NZ,ielmp)=WTSTDE(M,NZ,ielmp) &
+          WTSTDE(M,ielmp,NZ)=WTSTDE(M,ielmp,NZ) &
             +CFOPP(5,M,NZ)*(WTHPX3+WTHPX4)
-          ESNC(M,0,0,NZ,ielmc)=ESNC(M,0,0,NZ,ielmc) &
+          ESNC(M,ielmc,0,0,NZ)=ESNC(M,ielmc,0,0,NZ) &
             +CFOPC(5,M,NZ)*(WTHTR3+WTHTR4)*FWOOD(0)
-          ESNC(M,0,0,NZ,ielmn)=ESNC(M,0,0,NZ,ielmn) &
+          ESNC(M,ielmn,0,0,NZ)=ESNC(M,ielmn,0,0,NZ) &
             +CFOPN(5,M,NZ)*(WTHNR3+WTHNR4)*FWOODN(0)
-          ESNC(M,0,0,NZ,ielmp)=ESNC(M,0,0,NZ,ielmp) &
+          ESNC(M,ielmp,0,0,NZ)=ESNC(M,ielmp,0,0,NZ) &
             +CFOPP(5,M,NZ)*(WTHPR3+WTHPR4)*FWOODP(0)
-          ESNC(M,1,0,NZ,ielmc)=ESNC(M,1,0,NZ,ielmc) &
+          ESNC(M,ielmc,1,0,NZ)=ESNC(M,ielmc,1,0,NZ) &
             +CFOPC(5,M,NZ)*(WTHTR3+WTHTR4)*FWOOD(1)
-          ESNC(M,1,0,NZ,ielmn)=ESNC(M,1,0,NZ,ielmn) &
+          ESNC(M,ielmn,1,0,NZ)=ESNC(M,ielmn,1,0,NZ) &
             +CFOPN(5,M,NZ)*(WTHNR3+WTHNR4)*FWOODN(1)
-          ESNC(M,1,0,NZ,ielmp)=ESNC(M,1,0,NZ,ielmp) &
+          ESNC(M,ielmp,1,0,NZ)=ESNC(M,ielmp,1,0,NZ) &
             +CFOPP(5,M,NZ)*(WTHPR3+WTHPR4)*FWOODP(0)
         ENDIF
       ENDDO D6375
@@ -311,49 +311,49 @@ module PlantDisturbsMod
 !
     ELSE
       D6485: DO M=1,jsken
-        ESNC(M,1,0,NZ,ielmc)=ESNC(M,1,0,NZ,ielmc) &
+        ESNC(M,ielmc,1,0,NZ)=ESNC(M,ielmc,1,0,NZ) &
           +CFOPC(0,M,NZ)*(WTHTR0+WTHTX0) &
           +CFOPC(1,M,NZ)*(WTHTR1+WTHTX1) &
           +CFOPC(2,M,NZ)*(WTHTR2+WTHTX2)
-        ESNC(M,1,0,NZ,ielmn)=ESNC(M,1,0,NZ,ielmn) &
+        ESNC(M,ielmn,1,0,NZ)=ESNC(M,ielmn,1,0,NZ) &
           +CFOPN(0,M,NZ)*WTHNL0 &
           +CFOPN(1,M,NZ)*WTHNL1 &
           +CFOPN(2,M,NZ)*WTHNL2
-        ESNC(M,1,0,NZ,ielmp)=ESNC(M,1,0,NZ,ielmp) &
+        ESNC(M,ielmp,1,0,NZ)=ESNC(M,ielmp,1,0,NZ) &
           +CFOPP(0,M,NZ)*WTHPL0 &
           +CFOPP(1,M,NZ)*WTHPL1 &
           +CFOPP(2,M,NZ)*WTHPL2
-        ESNC(4,1,0,NZ,ielmc)=ESNC(4,1,0,NZ,ielmc) &
+        ESNC(4,ielmc,1,0,NZ)=ESNC(4,ielmc,1,0,NZ) &
           +CFOPN(0,M,NZ)*(WTHNR0+WTHNX0-WTHNL0) &
           +CFOPN(1,M,NZ)*(WTHNR1+WTHNX1-WTHNL1) &
           +CFOPN(2,M,NZ)*(WTHNR2+WTHNX2-WTHNL2)
-        ESNC(4,1,0,NZ,ielmp)=ESNC(4,1,0,NZ,ielmp) &
+        ESNC(4,ielmp,1,0,NZ)=ESNC(4,ielmp,1,0,NZ) &
           +CFOPP(0,M,NZ)*(WTHPR0+WTHPX0-WTHPL0) &
           +CFOPP(1,M,NZ)*(WTHPR1+WTHPX1-WTHPL1) &
           +CFOPP(2,M,NZ)*(WTHPR2+WTHPX2-WTHPL2)
         IF(IBTYP(NZ).EQ.0.OR.IGTYP(NZ).LE.1)THEN
-          ESNC(M,1,0,NZ,ielmc)=ESNC(M,1,0,NZ,ielmc)+CFOPC(3,M,NZ)*(WTHTR3+WTHTX3+WTHTR4+WTHTX4)
-          ESNC(M,1,0,NZ,ielmn)=ESNC(M,1,0,NZ,ielmn)+CFOPN(3,M,NZ)*(WTHNL3+WTHNL4)
-          ESNC(M,1,0,NZ,ielmp)=ESNC(M,1,0,NZ,ielmp)+CFOPP(3,M,NZ)*(WTHPL3+WTHPL4)
-          ESNC(4,1,0,NZ,ielmn)=ESNC(4,1,0,NZ,ielmn)+CFOPN(3,M,NZ)*(WTHNR3+WTHNX3-WTHNL3+WTHNR4+WTHNX4-WTHNL4)
-          ESNC(4,1,0,NZ,ielmp)=ESNC(4,1,0,NZ,ielmp)+CFOPP(3,M,NZ)*(WTHPR3+WTHPX3-WTHPL3+WTHPR4+WTHPX4-WTHPL4)
+          ESNC(M,ielmc,1,0,NZ)=ESNC(M,ielmc,1,0,NZ)+CFOPC(3,M,NZ)*(WTHTR3+WTHTX3+WTHTR4+WTHTX4)
+          ESNC(M,ielmn,1,0,NZ)=ESNC(M,ielmn,1,0,NZ)+CFOPN(3,M,NZ)*(WTHNL3+WTHNL4)
+          ESNC(M,ielmp,1,0,NZ)=ESNC(M,ielmp,1,0,NZ)+CFOPP(3,M,NZ)*(WTHPL3+WTHPL4)
+          ESNC(4,ielmn,1,0,NZ)=ESNC(4,ielmn,1,0,NZ)+CFOPN(3,M,NZ)*(WTHNR3+WTHNX3-WTHNL3+WTHNR4+WTHNX4-WTHNL4)
+          ESNC(4,ielmp,1,0,NZ)=ESNC(4,ielmp,1,0,NZ)+CFOPP(3,M,NZ)*(WTHPR3+WTHPX3-WTHPL3+WTHPR4+WTHPX4-WTHPL4)
         ELSE
-          WTSTDE(M,NZ,ielmc)=WTSTDE(M,NZ,ielmc)+CFOPC(5,M,NZ)*(WTHTR3+WTHTX3)
-          WTSTDE(M,NZ,ielmn)=WTSTDE(M,NZ,ielmn)+CFOPN(5,M,NZ)*WTHNL3
-          WTSTDE(M,NZ,ielmp)=WTSTDE(M,NZ,ielmp)+CFOPP(5,M,NZ)*WTHPL3
-          ESNC(M,0,0,NZ,ielmc)=ESNC(M,0,0,NZ,ielmc)*CFOPC(3,M,NZ)*(WTHTR4+WTHTX4)*FWOOD(0)
-          ESNC(M,0,0,NZ,ielmn)=ESNC(M,0,0,NZ,ielmn)+CFOPN(3,M,NZ)*WTHNL4*FWOODN(0)
-          ESNC(M,0,0,NZ,ielmp)=ESNC(M,0,0,NZ,ielmp)+CFOPP(3,M,NZ)*WTHPL4*FWOODP(0)
-          ESNC(4,0,0,NZ,ielmn)=ESNC(4,0,0,NZ,ielmn)+CFOPN(5,M,NZ)*(WTHNR3+WTHNX3-WTHNL3 &
+          WTSTDE(M,ielmc,NZ)=WTSTDE(M,ielmc,NZ)+CFOPC(5,M,NZ)*(WTHTR3+WTHTX3)
+          WTSTDE(M,ielmn,NZ)=WTSTDE(M,ielmn,NZ)+CFOPN(5,M,NZ)*WTHNL3
+          WTSTDE(M,ielmp,NZ)=WTSTDE(M,ielmp,NZ)+CFOPP(5,M,NZ)*WTHPL3
+          ESNC(M,ielmc,0,0,NZ)=ESNC(M,ielmc,0,0,NZ)*CFOPC(3,M,NZ)*(WTHTR4+WTHTX4)*FWOOD(0)
+          ESNC(M,ielmn,0,0,NZ)=ESNC(M,ielmn,0,0,NZ)+CFOPN(3,M,NZ)*WTHNL4*FWOODN(0)
+          ESNC(M,ielmp,0,0,NZ)=ESNC(M,ielmp,0,0,NZ)+CFOPP(3,M,NZ)*WTHPL4*FWOODP(0)
+          ESNC(4,ielmn,0,0,NZ)=ESNC(4,ielmn,0,0,NZ)+CFOPN(5,M,NZ)*(WTHNR3+WTHNX3-WTHNL3 &
             +WTHNR4+WTHNX4-WTHNL4)*FWOODN(0)
-          ESNC(4,0,0,NZ,ielmp)=ESNC(4,0,0,NZ,ielmp)+CFOPP(5,M,NZ)*(WTHPR3+WTHPX3-WTHPL3 &
+          ESNC(4,ielmp,0,0,NZ)=ESNC(4,ielmp,0,0,NZ)+CFOPP(5,M,NZ)*(WTHPR3+WTHPX3-WTHPL3 &
             +WTHPR4+WTHPX4-WTHPL4)*FWOODP(0)
-          ESNC(M,1,0,NZ,ielmc)=ESNC(M,1,0,NZ,ielmc)+CFOPC(3,M,NZ)*(WTHTR4+WTHTX4)*FWOOD(1)
-          ESNC(M,1,0,NZ,ielmn)=ESNC(M,1,0,NZ,ielmn)+CFOPN(3,M,NZ)*WTHNL4*FWOODN(1)
-          ESNC(M,1,0,NZ,ielmp)=ESNC(M,1,0,NZ,ielmp)+CFOPP(3,M,NZ)*WTHPL4*FWOODP(1)
-          ESNC(4,1,0,NZ,ielmn)=ESNC(4,1,0,NZ,ielmn)+CFOPN(5,M,NZ)*(WTHNR3+WTHNX3-WTHNL3 &
+          ESNC(M,ielmc,1,0,NZ)=ESNC(M,ielmc,1,0,NZ)+CFOPC(3,M,NZ)*(WTHTR4+WTHTX4)*FWOOD(1)
+          ESNC(M,ielmn,1,0,NZ)=ESNC(M,ielmn,1,0,NZ)+CFOPN(3,M,NZ)*WTHNL4*FWOODN(1)
+          ESNC(M,ielmp,1,0,NZ)=ESNC(M,ielmp,1,0,NZ)+CFOPP(3,M,NZ)*WTHPL4*FWOODP(1)
+          ESNC(4,ielmn,1,0,NZ)=ESNC(4,ielmn,1,0,NZ)+CFOPN(5,M,NZ)*(WTHNR3+WTHNX3-WTHNL3 &
             +WTHNR4+WTHNX4-WTHNL4)*FWOODN(1)
-          ESNC(4,1,0,NZ,ielmp)=ESNC(4,1,0,NZ,ielmp)+CFOPP(5,M,NZ)*(WTHPR3+WTHPX3-WTHPL3 &
+          ESNC(4,ielmp,1,0,NZ)=ESNC(4,ielmp,1,0,NZ)+CFOPP(5,M,NZ)*(WTHPR3+WTHPX3-WTHPL3 &
             +WTHPR4+WTHPX4-WTHPL4)*FWOODP(1)
         ENDIF
       ENDDO D6485
@@ -365,12 +365,12 @@ module PlantDisturbsMod
 !     TCSNC,TZSNC,TPSNC=cumulative C,N,P litterfall
 !     TCSN0,TZSN0,TPSN0=cumulative above-ground C,N,P litterfall
 !
-    TESNC(NZ,ielmc)=TESNC(NZ,ielmc)+WTHTRT+WTHTXT
-    TESNC(NZ,ielmn)=TESNC(NZ,ielmn)+WTHNRT+WTHNXT
-    TESNC(NZ,ielmp)=TESNC(NZ,ielmp)+WTHPRT+WTHPXT
-    TESN0(NZ,ielmc)=TESN0(NZ,ielmc)+WTHTRT+WTHTXT
-    TESN0(NZ,ielmn)=TESNC(NZ,ielmn)+WTHNRT+WTHNXT
-    TESN0(NZ,ielmp)=TESNC(NZ,ielmp)+WTHPRT+WTHPXT
+    TESNC(ielmc,NZ)=TESNC(ielmc,NZ)+WTHTRT+WTHTXT
+    TESNC(ielmn,NZ)=TESNC(ielmn,NZ)+WTHNRT+WTHNXT
+    TESNC(ielmp,NZ)=TESNC(ielmp,NZ)+WTHPRT+WTHPXT
+    TESN0(ielmc,NZ)=TESN0(ielmc,NZ)+WTHTRT+WTHTXT
+    TESN0(ielmn,NZ)=TESNC(ielmn,NZ)+WTHNRT+WTHNXT
+    TESN0(ielmp,NZ)=TESNC(ielmp,NZ)+WTHPRT+WTHPXT
   ENDIF
   end associate
   end subroutine LiterfallByDisturbance
@@ -426,17 +426,17 @@ module PlantDisturbsMod
   IF(IHVST(NZ).NE.4.AND.IHVST(NZ).NE.6)THEN
     IF(IHVST(NZ).NE.5)THEN
       IF(JHVST(NZ).NE.2)THEN
-        HVSTE(NZ,ielmc)=HVSTE(NZ,ielmc)+WTHTHT-WTHTRT
-        HVSTE(NZ,ielmn)=HVSTE(NZ,ielmn)+WTHNHT-WTHNRT
-        HVSTE(NZ,ielmp)=HVSTE(NZ,ielmp)+WTHPHT-WTHPRT
+        HVSTE(ielmc,NZ)=HVSTE(ielmc,NZ)+WTHTHT-WTHTRT
+        HVSTE(ielmn,NZ)=HVSTE(ielmn,NZ)+WTHNHT-WTHNRT
+        HVSTE(ielmp,NZ)=HVSTE(ielmp,NZ)+WTHPHT-WTHPRT
         TNBP=TNBP+WTHTRT-WTHTHT
         XHVSTE(ielmc)=XHVSTE(ielmc)+WTHTHT-WTHTRT
         XHVSTE(ielmn)=XHVSTE(ielmn)+WTHNHT-WTHNRT
         XHVSTE(ielmp)=XHVSTE(ielmp)+WTHPHT-WTHPRT
       ELSE
-        WTRVE(NZ,ielmc)=WTRVE(NZ,ielmc)+WTHTHT-WTHTRT
-        WTRVE(NZ,ielmn)=WTRVE(NZ,ielmn)+WTHNHT-WTHNRT
-        WTRVE(NZ,ielmp)=WTRVE(NZ,ielmp)+WTHPHT-WTHPRT
+        WTRVE(ielmc,NZ)=WTRVE(ielmc,NZ)+WTHTHT-WTHTRT
+        WTRVE(ielmn,NZ)=WTRVE(ielmn,NZ)+WTHNHT-WTHNRT
+        WTRVE(ielmp,NZ)=WTRVE(ielmp,NZ)+WTHPHT-WTHPRT
       ENDIF
 !
 !     C,N,P LOST AS GAS IF FIRE
@@ -467,9 +467,9 @@ module PlantDisturbsMod
 !     TRAU=total autotrophic respiration
 !
   ELSE
-    HVSTE(NZ,ielmc)=HVSTE(NZ,ielmc)+GY*(WTHTHT-WTHTRT)
-    HVSTE(NZ,ielmn)=HVSTE(NZ,ielmn)+WTHNHT-WTHNRT
-    HVSTE(NZ,ielmp)=HVSTE(NZ,ielmp)+WTHPHT-WTHPRT
+    HVSTE(ielmc,NZ)=HVSTE(ielmc,NZ)+GY*(WTHTHT-WTHTRT)
+    HVSTE(ielmn,NZ)=HVSTE(ielmn,NZ)+WTHNHT-WTHNRT
+    HVSTE(ielmp,NZ)=HVSTE(ielmp,NZ)+WTHPHT-WTHPRT
     TCO2T(NZ)=TCO2T(NZ)-GZ*(WTHTHT-WTHTRT)
     TCO2A(NZ)=TCO2A(NZ)-GZ*(WTHTHT-WTHTRT)
 !     TNBP=TNBP+GY*(WTHTRT-WTHTHT)
@@ -726,9 +726,7 @@ module PlantDisturbsMod
     WTGRB    =>  plt_biom%WTGRB      , &
     WTEARB   =>  plt_biom%WTEARB     , &
     CPOLNB   =>  plt_biom%CPOLNB     , &
-    PPOOL    =>  plt_biom%PPOOL      , &
-    ZPOOL    =>  plt_biom%ZPOOL      , &
-    CPOOL    =>  plt_biom%CPOOL      , &
+    EPOOL    =>  plt_biom%EPOOL      , &
     WTLFBN   =>  plt_biom%WTLFBN     , &
     WTSHTN   =>  plt_biom%WTSHTN     , &
     WTHSKB   =>  plt_biom%WTHSKB     , &
@@ -911,71 +909,71 @@ module PlantDisturbsMod
 !     IGTYP=growth type:0=bryophyte,1=graminoid,2=shrub,tree
 !
             D6380: DO M=1,jsken
-              ESNC(M,1,0,NZ,ielmc)=ESNC(M,1,0,NZ,ielmc)+(1._r8-XHVST) &
-                *(CFOPC(0,M,NZ)*(CPOOL(NB,NZ)+CPOLNB(NB,NZ) &
+              ESNC(M,ielmc,1,0,NZ)=ESNC(M,ielmc,1,0,NZ)+(1._r8-XHVST) &
+                *(CFOPC(0,M,NZ)*(EPOOL(NB,ielmc,NZ)+CPOLNB(NB,NZ) &
                 +CPOOLK(NB,NZ)+WTRSVB(NB,NZ)) &
                 +CFOPC(1,M,NZ)*(WTLFB(NB,NZ)*FWODB(1) &
                 +WTNDB(NB,NZ)) &
                 +CFOPC(2,M,NZ)*(WTSHEB(NB,NZ)*FWODB(1) &
                 +WTHSKB(NB,NZ)+WTEARB(NB,NZ)))
-              ESNC(M,0,0,NZ,ielmc)=ESNC(M,0,0,NZ,ielmc)+(1._r8-XHVST) &
+              ESNC(M,ielmc,0,0,NZ)=ESNC(M,ielmc,0,0,NZ)+(1._r8-XHVST) &
                 *CFOPC(5,M,NZ)*(WTLFB(NB,NZ)*FWODB(0) &
                 +WTSHEB(NB,NZ)*FWODB(0))
-              ESNC(M,1,0,NZ,ielmn)=ESNC(M,1,0,NZ,ielmn)+(1._r8-XHVST) &
-                *(CFOPN(0,M,NZ)*(ZPOOL(NB,NZ)+ZPOLNB(NB,NZ) &
+              ESNC(M,ielmn,1,0,NZ)=ESNC(M,ielmn,1,0,NZ)+(1._r8-XHVST) &
+                *(CFOPN(0,M,NZ)*(EPOOL(NB,ielmn,NZ)+ZPOLNB(NB,NZ) &
                 +WTRSBN(NB,NZ)) &
                 +CFOPN(1,M,NZ)*(WTLFBN(NB,NZ)*FWODLN(1) &
                 +WTNDBN(NB,NZ)) &
                 +CFOPN(2,M,NZ)*(WTSHBN(NB,NZ)*FWODSN(1) &
                 +WTHSBN(NB,NZ)+WTEABN(NB,NZ)))
-              ESNC(M,0,0,NZ,ielmn)=ESNC(M,0,0,NZ,ielmn)+(1._r8-XHVST) &
+              ESNC(M,ielmn,0,0,NZ)=ESNC(M,ielmn,0,0,NZ)+(1._r8-XHVST) &
                 *CFOPN(5,M,NZ)*(WTLFBN(NB,NZ)*FWODLN(0) &
                 +WTSHBN(NB,NZ)*FWODSN(0))
-              ESNC(M,1,0,NZ,ielmp)=ESNC(M,1,0,NZ,ielmp)+(1._r8-XHVST) &
-                *(CFOPP(0,M,NZ)*(PPOOL(NB,NZ)+PPOLNB(NB,NZ) &
+              ESNC(M,ielmp,1,0,NZ)=ESNC(M,ielmp,1,0,NZ)+(1._r8-XHVST) &
+                *(CFOPP(0,M,NZ)*(EPOOL(NB,ielmp,NZ)+PPOLNB(NB,NZ) &
                 +WTRSBP(NB,NZ)) &
                 +CFOPP(1,M,NZ)*(WTLFBP(NB,NZ)*FWODLP(1) &
                 +WTNDBP(NB,NZ)) &
                 +CFOPP(2,M,NZ)*(WTSHBP(NB,NZ)*FWODSP(1) &
                 +WTHSBP(NB,NZ)+WTEABP(NB,NZ)))
-              ESNC(M,0,0,NZ,ielmp)=ESNC(M,0,0,NZ,ielmp)+(1._r8-XHVST) &
+              ESNC(M,ielmp,0,0,NZ)=ESNC(M,ielmp,0,0,NZ)+(1._r8-XHVST) &
                 *CFOPP(5,M,NZ)*(WTLFBP(NB,NZ)*FWODLP(0) &
                 +WTSHBP(NB,NZ)*FWODSP(0))
               IF(ISTYP(NZ).EQ.0.AND.IWTYP(NZ).NE.0)THEN
-                WTRVE(NZ,ielmc)=WTRVE(NZ,ielmc)+(1._r8-XHVST) &
+                WTRVE(ielmc,NZ)=WTRVE(ielmc,NZ)+(1._r8-XHVST) &
                   *CFOPC(2,M,NZ)*WTGRB(NB,NZ)
-                WTRVE(NZ,ielmn)=WTRVE(NZ,ielmn)+(1._r8-XHVST) &
+                WTRVE(ielmn,NZ)=WTRVE(ielmn,NZ)+(1._r8-XHVST) &
                   *CFOPN(2,M,NZ)*WTGRBN(NB,NZ)
-                WTRVE(NZ,ielmp)=WTRVE(NZ,ielmp)+(1._r8-XHVST) &
+                WTRVE(ielmp,NZ)=WTRVE(ielmp,NZ)+(1._r8-XHVST) &
                   *CFOPP(2,M,NZ)*WTGRBP(NB,NZ)
               ELSE
-                ESNC(M,1,0,NZ,ielmc)=ESNC(M,1,0,NZ,ielmc)+(1._r8-XHVST) &
+                ESNC(M,ielmc,1,0,NZ)=ESNC(M,ielmc,1,0,NZ)+(1._r8-XHVST) &
                   *CFOPC(2,M,NZ)*WTGRB(NB,NZ)
-                ESNC(M,1,0,NZ,ielmn)=ESNC(M,1,0,NZ,ielmn)+(1._r8-XHVST) &
+                ESNC(M,ielmn,1,0,NZ)=ESNC(M,ielmn,1,0,NZ)+(1._r8-XHVST) &
                   *CFOPN(2,M,NZ)*WTGRBN(NB,NZ)
-                ESNC(M,1,0,NZ,ielmp)=ESNC(M,1,0,NZ,ielmp)+(1._r8-XHVST) &
+                ESNC(M,ielmp,1,0,NZ)=ESNC(M,ielmp,1,0,NZ)+(1._r8-XHVST) &
                   *CFOPP(2,M,NZ)*WTGRBP(NB,NZ)
               ENDIF
-              ESNC(M,0,0,NZ,ielmc)=ESNC(M,0,0,NZ,ielmc)+(1._r8-XHVST) &
+              ESNC(M,ielmc,0,0,NZ)=ESNC(M,ielmc,0,0,NZ)+(1._r8-XHVST) &
                 *CFOPC(5,M,NZ)*WTSTKB(NB,NZ)*FWOOD(0)
-              ESNC(M,0,0,NZ,ielmn)=ESNC(M,0,0,NZ,ielmn)+(1._r8-XHVST) &
+              ESNC(M,ielmn,0,0,NZ)=ESNC(M,ielmn,0,0,NZ)+(1._r8-XHVST) &
                 *CFOPN(5,M,NZ)*WTSTBN(NB,NZ)*FWOODN(0)
-              ESNC(M,0,0,NZ,ielmp)=ESNC(M,0,0,NZ,ielmp)+(1._r8-XHVST) &
+              ESNC(M,ielmp,0,0,NZ)=ESNC(M,ielmp,0,0,NZ)+(1._r8-XHVST) &
                 *CFOPP(5,M,NZ)*WTSTBP(NB,NZ)*FWOODP(0)
-              ESNC(M,1,0,NZ,ielmc)=ESNC(M,1,0,NZ,ielmc)+(1._r8-XHVST) &
+              ESNC(M,ielmc,1,0,NZ)=ESNC(M,ielmc,1,0,NZ)+(1._r8-XHVST) &
                 *CFOPC(3,M,NZ)*WTSTKB(NB,NZ)*FWOOD(1)
-              ESNC(M,1,0,NZ,ielmn)=ESNC(M,1,0,NZ,ielmn)+(1._r8-XHVST) &
+              ESNC(M,ielmn,1,0,NZ)=ESNC(M,ielmn,1,0,NZ)+(1._r8-XHVST) &
                 *CFOPN(3,M,NZ)*WTSTBN(NB,NZ)*FWOODN(1)
-              ESNC(M,1,0,NZ,ielmp)=ESNC(M,1,0,NZ,ielmp)+(1._r8-XHVST) &
+              ESNC(M,ielmp,1,0,NZ)=ESNC(M,ielmp,1,0,NZ)+(1._r8-XHVST) &
                 *CFOPP(3,M,NZ)*WTSTBP(NB,NZ)*FWOODP(1)
             ENDDO D6380
 !
 !     PLANT STATE VARIABLES REMAINING AFTER TILLAGE
 !
-            CPOOL(NB,NZ)=CPOOL(NB,NZ)*XHVST
+            EPOOL(NB,ielmc,NZ)=EPOOL(NB,ielmc,NZ)*XHVST
             CPOOLK(NB,NZ)=CPOOLK(NB,NZ)*XHVST
-            ZPOOL(NB,NZ)=ZPOOL(NB,NZ)*XHVST
-            PPOOL(NB,NZ)=PPOOL(NB,NZ)*XHVST
+            EPOOL(NB,ielmn,NZ)=EPOOL(NB,ielmn,NZ)*XHVST
+            EPOOL(NB,ielmp,NZ)=EPOOL(NB,ielmp,NZ)*XHVST
             CPOLNB(NB,NZ)=CPOLNB(NB,NZ)*XHVST
             ZPOLNB(NB,NZ)=ZPOLNB(NB,NZ)*XHVST
             PPOLNB(NB,NZ)=PPOLNB(NB,NZ)*XHVST
@@ -1091,29 +1089,29 @@ module PlantDisturbsMod
         DO 8985 N=1,MY(NZ)
           DO 8980 L=NU,NJ
             D6385: DO M=1,jsken
-              ESNC(M,1,L,NZ,ielmc)=ESNC(M,1,L,NZ,ielmc)+(1._r8-XHVST) &
-                *CFOPC(0,M,NZ)*EPOOLR(N,L,NZ,ielmc)
-              ESNC(M,1,L,NZ,ielmn)=ESNC(M,1,L,NZ,ielmn)+(1._r8-XHVST) &
-                *CFOPN(0,M,NZ)*EPOOLR(N,L,NZ,ielmn)
-              ESNC(M,1,L,NZ,ielmp)=ESNC(M,1,L,NZ,ielmp)+(1._r8-XHVST) &
-                *CFOPP(0,M,NZ)*EPOOLR(N,L,NZ,ielmp)
+              ESNC(M,ielmc,1,L,NZ)=ESNC(M,ielmc,1,L,NZ)+(1._r8-XHVST) &
+                *CFOPC(0,M,NZ)*EPOOLR(ielmc,N,L,NZ)
+              ESNC(M,ielmn,1,L,NZ)=ESNC(M,ielmn,1,L,NZ)+(1._r8-XHVST) &
+                *CFOPN(0,M,NZ)*EPOOLR(ielmn,N,L,NZ)
+              ESNC(M,ielmp,1,L,NZ)=ESNC(M,ielmp,1,L,NZ)+(1._r8-XHVST) &
+                *CFOPP(0,M,NZ)*EPOOLR(ielmp,N,L,NZ)
               DO NR=1,NRT(NZ)
-                ESNC(M,0,L,NZ,ielmc)=ESNC(M,0,L,NZ,ielmc)+(1._r8-XHVST) &
+                ESNC(M,ielmc,0,L,NZ)=ESNC(M,ielmc,0,L,NZ)+(1._r8-XHVST) &
                   *CFOPC(5,M,NZ)*(WTRT1(N,L,NR,NZ) &
                   +WTRT2(N,L,NR,NZ))*FWODR(0)
-                ESNC(M,0,L,NZ,ielmn)=ESNC(M,0,L,NZ,ielmn)+(1._r8-XHVST) &
+                ESNC(M,ielmn,0,L,NZ)=ESNC(M,ielmn,0,L,NZ)+(1._r8-XHVST) &
                   *CFOPN(5,M,NZ)*(WTRT1N(N,L,NR,NZ) &
                   +WTRT2N(N,L,NR,NZ))*FWODRN(0)
-                ESNC(M,0,L,NZ,ielmp)=ESNC(M,0,L,NZ,ielmp)+(1._r8-XHVST) &
+                ESNC(M,ielmp,0,L,NZ)=ESNC(M,ielmp,0,L,NZ)+(1._r8-XHVST) &
                   *CFOPP(5,M,NZ)*(WTRT1P(N,L,NR,NZ) &
                   +WTRT2P(N,L,NR,NZ))*FWODRP(0)
-                ESNC(M,1,L,NZ,ielmc)=ESNC(M,1,L,NZ,ielmc)+(1._r8-XHVST) &
+                ESNC(M,ielmc,1,L,NZ)=ESNC(M,ielmc,1,L,NZ)+(1._r8-XHVST) &
                   *CFOPC(4,M,NZ)*(WTRT1(N,L,NR,NZ) &
                   +WTRT2(N,L,NR,NZ))*FWODR(1)
-                ESNC(M,1,L,NZ,ielmn)=ESNC(M,1,L,NZ,ielmn)+(1._r8-XHVST) &
+                ESNC(M,ielmn,1,L,NZ)=ESNC(M,ielmn,1,L,NZ)+(1._r8-XHVST) &
                   *CFOPN(4,M,NZ)*(WTRT1N(N,L,NR,NZ) &
                   +WTRT2N(N,L,NR,NZ))*FWODRN(1)
-                ESNC(M,1,L,NZ,ielmp)=ESNC(M,1,L,NZ,ielmp)+(1._r8-XHVST) &
+                ESNC(M,ielmp,1,L,NZ)=ESNC(M,ielmp,1,L,NZ)+(1._r8-XHVST) &
                   *CFOPP(4,M,NZ)*(WTRT1P(N,L,NR,NZ) &
                   +WTRT2P(N,L,NR,NZ))*FWODRP(1)
               ENDDO
@@ -1180,9 +1178,9 @@ module PlantDisturbsMod
               RTLG2(N,L,NR,NZ)=RTLG2(N,L,NR,NZ)*XHVST
               RTN2(N,L,NR,NZ)=RTN2(N,L,NR,NZ)*XHVST
 8960        CONTINUE
-            EPOOLR(N,L,NZ,ielmc)=EPOOLR(N,L,NZ,ielmc)*XHVST
-            EPOOLR(N,L,NZ,ielmn)=EPOOLR(N,L,NZ,ielmn)*XHVST
-            EPOOLR(N,L,NZ,ielmp)=EPOOLR(N,L,NZ,ielmp)*XHVST
+            EPOOLR(ielmc,N,L,NZ)=EPOOLR(ielmc,N,L,NZ)*XHVST
+            EPOOLR(ielmn,N,L,NZ)=EPOOLR(ielmn,N,L,NZ)*XHVST
+            EPOOLR(ielmp,N,L,NZ)=EPOOLR(ielmp,N,L,NZ)*XHVST
             WTRTL(N,L,NZ)=WTRTL(N,L,NZ)*XHVST
             WTRTD(N,L,NZ)=WTRTD(N,L,NZ)*XHVST
             WSRTL(N,L,NZ)=WSRTL(N,L,NZ)*XHVST
@@ -1207,13 +1205,13 @@ module PlantDisturbsMod
 !
             IF(INTYP(NZ).NE.0.AND.N.EQ.1)THEN
               D6395: DO M=1,jsken
-                ESNC(M,1,L,NZ,ielmc)=ESNC(M,1,L,NZ,ielmc)+(1._r8-XHVST) &
+                ESNC(M,ielmc,1,L,NZ)=ESNC(M,ielmc,1,L,NZ)+(1._r8-XHVST) &
                   *(CFOPC(4,M,NZ)*WTNDL(L,NZ) &
                   +CFOPC(0,M,NZ)*CPOOLN(L,NZ))
-                ESNC(M,1,L,NZ,ielmn)=ESNC(M,1,L,NZ,ielmn)+(1._r8-XHVST) &
+                ESNC(M,ielmn,1,L,NZ)=ESNC(M,ielmn,1,L,NZ)+(1._r8-XHVST) &
                   *(CFOPN(4,M,NZ)*WTNDLN(L,NZ) &
                   +CFOPN(0,M,NZ)*ZPOOLN(L,NZ))
-                ESNC(M,1,L,NZ,ielmp)=ESNC(M,1,L,NZ,ielmp)+(1._r8-XHVST) &
+                ESNC(M,ielmp,1,L,NZ)=ESNC(M,ielmp,1,L,NZ)+(1._r8-XHVST) &
                   *(CFOPP(4,M,NZ)*WTNDLP(L,NZ) &
                   +CFOPP(0,M,NZ)*PPOOLN(L,NZ))
               ENDDO D6395
@@ -1237,22 +1235,22 @@ module PlantDisturbsMod
 !     WTRVC,WTRVN,WTRVP=storage C,N,P
 !
         D6400: DO M=1,jsken
-          ESNC(M,0,NG(NZ),NZ,ielmc)=ESNC(M,0,NG(NZ),NZ,ielmc) &
-            +((1._r8-XHVST)*CFOPC(0,M,NZ)*WTRVE(NZ,ielmc))*FWOOD(0)
-          ESNC(M,0,NG(NZ),NZ,ielmn)=ESNC(M,0,NG(NZ),NZ,ielmn) &
-            +((1._r8-XHVST)*CFOPN(0,M,NZ)*WTRVE(NZ,ielmn))*FWOODN(0)
-          ESNC(M,0,NG(NZ),NZ,ielmp)=ESNC(M,0,NG(NZ),NZ,ielmp) &
-            +((1._r8-XHVST)*CFOPP(0,M,NZ)*WTRVE(NZ,ielmp))*FWOODP(0)
-          ESNC(M,1,NG(NZ),NZ,ielmc)=ESNC(M,1,NG(NZ),NZ,ielmc) &
-            +((1._r8-XHVST)*CFOPC(0,M,NZ)*WTRVE(NZ,ielmc))*FWOOD(1)
-          ESNC(M,1,NG(NZ),NZ,ielmn)=ESNC(M,1,NG(NZ),NZ,ielmn) &
-            +((1._r8-XHVST)*CFOPN(0,M,NZ)*WTRVE(NZ,ielmn))*FWOODN(1)
-          ESNC(M,1,NG(NZ),NZ,ielmp)=ESNC(M,1,NG(NZ),NZ,ielmp) &
-            +((1._r8-XHVST)*CFOPP(0,M,NZ)*WTRVE(NZ,ielmp))*FWOODP(1)
+          ESNC(M,ielmc,0,NG(NZ),NZ)=ESNC(M,ielmc,0,NG(NZ),NZ) &
+            +((1._r8-XHVST)*CFOPC(0,M,NZ)*WTRVE(ielmc,NZ))*FWOOD(0)
+          ESNC(M,ielmn,0,NG(NZ),NZ)=ESNC(M,ielmn,0,NG(NZ),NZ) &
+            +((1._r8-XHVST)*CFOPN(0,M,NZ)*WTRVE(ielmn,NZ))*FWOODN(0)
+          ESNC(M,ielmp,0,NG(NZ),NZ)=ESNC(M,ielmp,0,NG(NZ),NZ) &
+            +((1._r8-XHVST)*CFOPP(0,M,NZ)*WTRVE(ielmp,NZ))*FWOODP(0)
+          ESNC(M,ielmc,1,NG(NZ),NZ)=ESNC(M,ielmc,1,NG(NZ),NZ) &
+            +((1._r8-XHVST)*CFOPC(0,M,NZ)*WTRVE(ielmc,NZ))*FWOOD(1)
+          ESNC(M,ielmn,1,NG(NZ),NZ)=ESNC(M,ielmn,1,NG(NZ),NZ) &
+            +((1._r8-XHVST)*CFOPN(0,M,NZ)*WTRVE(ielmn,NZ))*FWOODN(1)
+          ESNC(M,ielmp,1,NG(NZ),NZ)=ESNC(M,ielmp,1,NG(NZ),NZ) &
+            +((1._r8-XHVST)*CFOPP(0,M,NZ)*WTRVE(ielmp,NZ))*FWOODP(1)
         ENDDO D6400
-        WTRVE(NZ,ielmc)=WTRVE(NZ,ielmc)*XHVST
-        WTRVE(NZ,ielmn)=WTRVE(NZ,ielmn)*XHVST
-        WTRVE(NZ,ielmp)=WTRVE(NZ,ielmp)*XHVST
+        WTRVE(ielmc,NZ)=WTRVE(ielmc,NZ)*XHVST
+        WTRVE(ielmn,NZ)=WTRVE(ielmn,NZ)*XHVST
+        WTRVE(ielmp,NZ)=WTRVE(ielmp,NZ)*XHVST
       ENDIF
     ENDIF
   ENDIF
@@ -1384,9 +1382,7 @@ module PlantDisturbsMod
     WGLFLP   => plt_biom%WGLFLP    , &
     WGLFP    => plt_biom%WGLFP     , &
     WTSHEB   => plt_biom%WTSHEB    , &
-    CPOOL    => plt_biom%CPOOL     , &
-    ZPOOL    => plt_biom%ZPOOL     , &
-    PPOOL    => plt_biom%PPOOL     , &
+    EPOOL    => plt_biom%EPOOL     , &
     WGSHE    => plt_biom%WGSHE     , &
     WTLFBN   => plt_biom%WTLFBN    , &
     WGLFN    => plt_biom%WGLFN     , &
@@ -1599,14 +1595,14 @@ module PlantDisturbsMod
 !
       IF(WTSHTA(NZ).GT.ZEROP(NZ))THEN
         WHVSTT=HVST(NZ)*THIN(NZ)*0.45_r8/24.0_r8 &
-          *AREA3(NU)*WTSHTE(NZ,ielmc)/WTSHTA(NZ)
+          *AREA3(NU)*WTSHTE(ielmc,NZ)/WTSHTA(NZ)
       ELSE
         WHVSTT=0._r8
       ENDIF
       IF(IHVST(NZ).EQ.6)THEN
         WHVSTT=WHVSTT*TFN3(NZ)
       ENDIF
-      CCPOLX=CEPOLP(NZ,ielmc)/(1.0_r8+CEPOLP(NZ,ielmc))
+      CCPOLX=CEPOLP(ielmc,NZ)/(1.0_r8+CEPOLP(ielmc,NZ))
       CCPLNX=CCPLNP(NZ)/(1.0_r8+CCPLNP(NZ))
 !
 !     LEAF,BACTERIA GRAZED,REMOVED
@@ -1620,7 +1616,7 @@ module PlantDisturbsMod
 !     WHVXXX=grazing requirement unmet by leaf
 !
       WHVSLX=WHVSTT*EHVST(1,1,NZ)
-      WHVSLY=AMIN1(WTLFE(NZ,ielmc),WHVSLX)
+      WHVSLY=AMIN1(WTLFE(ielmc,NZ),WHVSLX)
       WHVSLF=WHVSLY*(1._r8-CCPOLX)
       WHVSCL=WHVSLY*CCPOLX
       WHVSNL=WHVSLY*CCPLNX
@@ -1634,24 +1630,24 @@ module PlantDisturbsMod
 !            petiole,husk,ear,grain,nonstructural C removed
 !     WHVXXX=grazing requirement unmet by non-foliar removal
 !
-      WTSHTT=WTSHEE(NZ,ielmc)+WTHSKE(NZ,ielmc)+WTEARE(NZ,ielmc)+WTGRE(NZ,ielmc)
+      WTSHTT=WTSHEE(ielmc,NZ)+WTHSKE(ielmc,NZ)+WTEARE(ielmc,NZ)+WTGRE(ielmc,NZ)
       IF(WTSHTT.GT.ZEROP(NZ))THEN
-        WHVSHX=WHVSSX*WTSHEE(NZ,ielmc)/WTSHTT+WHVXXX
-        WHVSHY=AMIN1(WTSHEE(NZ,ielmc),WHVSHX)
+        WHVSHX=WHVSSX*WTSHEE(ielmc,NZ)/WTSHTT+WHVXXX
+        WHVSHY=AMIN1(WTSHEE(ielmc,NZ),WHVSHX)
         WHVSHH=WHVSHY*(1._r8-CCPOLX)
         WHVSCS=WHVSHY*CCPOLX
         WHVSNS=WHVSHY*CCPLNX
         WHVXXX=AZMAX1(WHVSHX-WHVSHY)
-        WHVHSX=WHVSSX*WTHSKE(NZ,ielmc)/WTSHTT+WHVXXX
-        WHVHSY=AMIN1(WTHSKE(NZ,ielmc),WHVHSX)
+        WHVHSX=WHVSSX*WTHSKE(ielmc,NZ)/WTSHTT+WHVXXX
+        WHVHSY=AMIN1(WTHSKE(ielmc,NZ),WHVHSX)
         WHVHSH=WHVHSY
         WHVXXX=AZMAX1(WHVHSX-WHVHSY)
-        WHVEAX=WHVSSX*WTEARE(NZ,ielmc)/WTSHTT+WHVXXX
-        WHVEAY=AMIN1(WTEARE(NZ,ielmc),WHVEAX)
+        WHVEAX=WHVSSX*WTEARE(ielmc,NZ)/WTSHTT+WHVXXX
+        WHVEAY=AMIN1(WTEARE(ielmc,NZ),WHVEAX)
         WHVEAH=WHVEAY
         WHVXXX=AZMAX1(WHVEAX-WHVEAY)
-        WHVGRX=WHVSSX*WTGRE(NZ,ielmc)/WTSHTT+WHVXXX
-        WHVGRY=AMIN1(WTGRE(NZ,ielmc),WHVGRX)
+        WHVGRX=WHVSSX*WTGRE(ielmc,NZ)/WTSHTT+WHVXXX
+        WHVGRY=AMIN1(WTGRE(ielmc,NZ),WHVGRX)
         WHVGRH=WHVGRY
         WHVXXX=AZMAX1(WHVGRX-WHVGRY)
       ELSE
@@ -1673,14 +1669,14 @@ module PlantDisturbsMod
 !     WHVST*,WHVRV*=stalk,reserve C removed
 !     WHVXXX=grazing requirement unmet by stalk,reserve
 !
-      WTSTKT=WTSTKE(NZ,ielmc)+WTRSVE(NZ,ielmc)
+      WTSTKT=WTSTKE(ielmc,NZ)+WTRSVE(ielmc,NZ)
       IF(WTSTKT.GT.WHVSKX+WHVXXX)THEN
-        WHVSTX=WHVSKX*WTSTKE(NZ,ielmc)/WTSTKT+WHVXXX
-        WHVSTY=AMIN1(WTSTKE(NZ,ielmc),WHVSTX)
+        WHVSTX=WHVSKX*WTSTKE(ielmc,NZ)/WTSTKT+WHVXXX
+        WHVSTY=AMIN1(WTSTKE(ielmc,NZ),WHVSTX)
         WHVSTH=WHVSTY
         WHVXXX=AZMAX1(WHVSTX-WHVSTY)
-        WHVRVX=WHVSKX*WTRSVE(NZ,ielmc)/WTSTKT+WHVXXX
-        WHVRVY=AMIN1(WTRSVE(NZ,ielmc),WHVRVX)
+        WHVRVX=WHVSKX*WTRSVE(ielmc,NZ)/WTSTKT+WHVXXX
+        WHVRVY=AMIN1(WTRSVE(ielmc,NZ),WHVRVX)
         WHVRVH=WHVRVY
         WHVXXX=AZMAX1(WHVRVX-WHVRVY)
       ELSE
@@ -1696,28 +1692,28 @@ module PlantDisturbsMod
 !            petiole,husk,ear,grain,nonstructural C removed
 !
         IF(WHVXXX.GT.0.0)THEN
-          WHVSLY=AMIN1(WTLFE(NZ,ielmc)-WHVSLF-WHVSCL,WHVXXX)
+          WHVSLY=AMIN1(WTLFE(ielmc,NZ)-WHVSLF-WHVSCL,WHVXXX)
           WHVSLF=WHVSLF+WHVSLY*(1._r8-CCPOLX)
           WHVSCL=WHVSCL+WHVSLY*CCPOLX
           WHVSNL=WHVSNL+WHVSLY*CCPLNX
           WHVXXX=AZMAX1(WHVXXX-WHVSLY)
           IF(WTSHTT.GT.ZEROP(NZ))THEN
-            WHVSHX=WHVXXX*WTSHEE(NZ,ielmc)/WTSHTT
-            WHVSHY=AMIN1(WTSHEE(NZ,ielmc),WHVSHX)
+            WHVSHX=WHVXXX*WTSHEE(ielmc,NZ)/WTSHTT
+            WHVSHY=AMIN1(WTSHEE(ielmc,NZ),WHVSHX)
             WHVSHH=WHVSHH+WHVSHY*(1._r8-CCPOLX)
             WHVSCS=WHVSCS+WHVSHY*CCPOLX
             WHVSNS=WHVSNS+WHVSHY*CCPLNX
             WHVXXX=AZMAX1(WHVXXX-WHVSHY)
-            WHVHSX=WHVXXX*WTHSKE(NZ,ielmc)/WTSHTT
-            WHVHSY=AMIN1(WTHSKE(NZ,ielmc),WHVHSX)
+            WHVHSX=WHVXXX*WTHSKE(ielmc,NZ)/WTSHTT
+            WHVHSY=AMIN1(WTHSKE(ielmc,NZ),WHVHSX)
             WHVHSH=WHVHSH+WHVHSY
             WHVXXX=AZMAX1(WHVXXX-WHVHSY)
-            WHVEAX=WHVXXX*WTEARE(NZ,ielmc)/WTSHTT
-            WHVEAY=AMIN1(WTEARE(NZ,ielmc),WHVEAX)
+            WHVEAX=WHVXXX*WTEARE(ielmc,NZ)/WTSHTT
+            WHVEAY=AMIN1(WTEARE(ielmc,NZ),WHVEAX)
             WHVEAH=WHVEAH+WHVEAY
             WHVXXX=AZMAX1(WHVEAX-WHVEAY)
-            WHVGRX=WHVXXX*WTGRE(NZ,ielmc)/WTSHTT
-            WHVGRY=AMIN1(WTGRE(NZ,ielmc),WHVGRX)
+            WHVGRX=WHVXXX*WTGRE(ielmc,NZ)/WTSHTT
+            WHVGRY=AMIN1(WTGRE(ielmc,NZ),WHVGRX)
             WHVGRH=WHVGRH+WHVGRY
             WHVXXX=AZMAX1(WHVGRX-WHVGRY)
           ENDIF
@@ -1796,8 +1792,8 @@ module PlantDisturbsMod
 !
       DO 9855 NB=1,NBR(NZ)
         IF((IHVST(NZ).EQ.4.OR.IHVST(NZ).EQ.6) &
-          .AND.WTLFE(NZ,ielmc).GT.ZEROL(NZ))THEN
-          WHVSBL=WHVSLF*AZMAX1(WGLFBL(L,NB,NZ))/WTLFE(NZ,ielmc)
+          .AND.WTLFE(ielmc,NZ).GT.ZEROL(NZ))THEN
+          WHVSBL=WHVSLF*AZMAX1(WGLFBL(L,NB,NZ))/WTLFE(ielmc,NZ)
         ELSE
           WHVSBL=0._r8
         ENDIF
@@ -1960,8 +1956,8 @@ module PlantDisturbsMod
 !
       HTSTKX=0._r8
       IF((IHVST(NZ).EQ.4.OR.IHVST(NZ).EQ.6) &
-        .AND.WTSHEE(NZ,ielmc).GT.ZEROP(NZ))THEN
-        WHVSBS=WHVSHH*WTSHEB(NB,NZ)/WTSHEE(NZ,ielmc)
+        .AND.WTSHEE(ielmc,NZ).GT.ZEROP(NZ))THEN
+        WHVSBS=WHVSHH*WTSHEB(NB,NZ)/WTSHEE(ielmc,NZ)
       ELSE
         WHVSBS=0._r8
       ENDIF
@@ -2064,9 +2060,9 @@ module PlantDisturbsMod
 !     WTLS,WTLSB=total,branch PFT leaf+petiole C mass
 !     WHVSC*=nonstructural C removed
 !
-        CPOOLX=AZMAX1(CPOOL(NB,NZ))
-        ZPOOLX=AZMAX1(ZPOOL(NB,NZ))
-        PPOOLX=AZMAX1(PPOOL(NB,NZ))
+        CPOOLX=AZMAX1(EPOOL(NB,ielmc,NZ))
+        ZPOOLX=AZMAX1(EPOOL(NB,ielmn,NZ))
+        PPOOLX=AZMAX1(EPOOL(NB,ielmp,NZ))
         CPOLNX=AZMAX1(CPOLNB(NB,NZ))
         ZPOLNX=AZMAX1(ZPOLNB(NB,NZ))
         PPOLNX=AZMAX1(PPOLNB(NB,NZ))
@@ -2096,11 +2092,11 @@ module PlantDisturbsMod
         ELSE
           IF(WTLS(NZ).GT.ZEROL(NZ))THEN
             WTLSBX=AZMAX1(WTLSB(NB,NZ))
-            IF(CPOOL(NB,NZ).GT.ZEROP(NZ))THEN
+            IF(EPOOL(NB,ielmc,NZ).GT.ZEROP(NZ))THEN
               WHVSCX=AZMAX1(WHVSCP)*WTLSBX/WTLS(NZ)
               CPOOLG=AZMAX1(CPOOLX-WHVSCX)
-              ZPOOLG=AZMAX1(ZPOOLX-WHVSCX*ZPOOLX/CPOOL(NB,NZ))
-              PPOOLG=AZMAX1(PPOOLX-WHVSCX*PPOOLX/CPOOL(NB,NZ))
+              ZPOOLG=AZMAX1(ZPOOLX-WHVSCX*ZPOOLX/EPOOL(NB,ielmc,NZ))
+              PPOOLG=AZMAX1(PPOOLX-WHVSCX*PPOOLX/EPOOL(NB,ielmc,NZ))
             ELSE
               CPOOLG=0._r8
               ZPOOLG=0._r8
@@ -2152,9 +2148,9 @@ module PlantDisturbsMod
 !     CPOLNB,ZPOLNB,PPOLNB=nonstructural C,N,P in bacteria
 !     WTNDB,WTNDBN,WTNDBP=bacterial C,N,P mass
 !
-        CPOOL(NB,NZ)=CPOOLG
-        ZPOOL(NB,NZ)=ZPOOLG
-        PPOOL(NB,NZ)=PPOOLG
+        EPOOL(NB,ielmc,NZ)=CPOOLG
+        EPOOL(NB,ielmn,NZ)=ZPOOLG
+        EPOOL(NB,ielmp,NZ)=PPOOLG
         CPOLNB(NB,NZ)=CPOLNG
         ZPOLNB(NB,NZ)=ZPOLNG
         PPOLNB(NB,NZ)=PPOLNG
@@ -2225,8 +2221,8 @@ module PlantDisturbsMod
             FHVSH=1.0_r8
           ENDIF
         ELSE
-          IF(WTSTKE(NZ,ielmc).GT.ZEROL(NZ))THEN
-            FHVST=AZMAX1(AMIN1(1.0,1._r8-WHVSTH/WTSTKE(NZ,ielmc)))
+          IF(WTSTKE(ielmc,NZ).GT.ZEROL(NZ))THEN
+            FHVST=AZMAX1(AMIN1(1.0,1._r8-WHVSTH/WTSTKE(ielmc,NZ)))
             FHVSH=FHVST
           ELSE
             FHVST=1.0_r8
@@ -2290,8 +2286,8 @@ module PlantDisturbsMod
               FHVSTS=1.0_r8
             ENDIF
           ELSE
-            IF(WTSTKE(NZ,ielmc).GT.ZEROP(NZ))THEN
-              FHVSTS=AZMAX1(AMIN1(1.0,1._r8-WHVSTH/WTSTKE(NZ,ielmc)))
+            IF(WTSTKE(ielmc,NZ).GT.ZEROP(NZ))THEN
+              FHVSTS=AZMAX1(AMIN1(1.0,1._r8-WHVSTH/WTSTKE(ielmc,NZ)))
             ELSE
               FHVSTS=1.0_r8
             ENDIF
@@ -2324,8 +2320,8 @@ module PlantDisturbsMod
             FHVSH=0._r8
           ENDIF
         ELSE
-          IF(WTRSVE(NZ,ielmc).GT.ZEROP(NZ))THEN
-            FHVST=AZMAX1(AMIN1(1.0,1._r8-WHVRVH/WTRSVE(NZ,ielmc)))
+          IF(WTRSVE(ielmc,NZ).GT.ZEROP(NZ))THEN
+            FHVST=AZMAX1(AMIN1(1.0,1._r8-WHVRVH/WTRSVE(ielmc,NZ)))
             FHVSH=FHVST
           ELSE
             FHVST=0._r8
@@ -2386,22 +2382,22 @@ module PlantDisturbsMod
           FHVSHH=FHVSHG
           FHVSHE=FHVSHG
         ELSE
-          IF(WTHSKE(NZ,ielmc).GT.ZEROP(NZ))THEN
-            FHVSTH=AZMAX1(AMIN1(1.0,1._r8-WHVHSH/WTHSKE(NZ,ielmc)))
+          IF(WTHSKE(ielmc,NZ).GT.ZEROP(NZ))THEN
+            FHVSTH=AZMAX1(AMIN1(1.0,1._r8-WHVHSH/WTHSKE(ielmc,NZ)))
             FHVSHH=FHVSTH
           ELSE
             FHVSTH=1.0_r8
             FHVSHH=1.0_r8
           ENDIF
-          IF(WTEARE(NZ,ielmc).GT.ZEROP(NZ))THEN
-            FHVSTE=AZMAX1(AMIN1(1.0,1._r8-WHVEAH/WTEARE(NZ,ielmc)))
+          IF(WTEARE(ielmc,NZ).GT.ZEROP(NZ))THEN
+            FHVSTE=AZMAX1(AMIN1(1.0,1._r8-WHVEAH/WTEARE(ielmc,NZ)))
             FHVSHE=FHVSTE
           ELSE
             FHVSTE=1.0_r8
             FHVSHE=1.0_r8
           ENDIF
-          IF(WTGRE(NZ,ielmc).GT.ZEROP(NZ))THEN
-            FHVSTG=AZMAX1(AMIN1(1.0,1._r8-WHVGRH/WTGRE(NZ,ielmc)))
+          IF(WTGRE(ielmc,NZ).GT.ZEROP(NZ))THEN
+            FHVSTG=AZMAX1(AMIN1(1.0,1._r8-WHVGRH/WTGRE(ielmc,NZ)))
             FHVSHG=FHVSTG
           ELSE
             FHVSTG=1.0_r8
@@ -2481,15 +2477,15 @@ module PlantDisturbsMod
         WTSHTB(NB,NZ)=AZMAX1(WTLFB(NB,NZ) &
           +WTSHEB(NB,NZ)+WTSTKB(NB,NZ)+WTRSVB(NB,NZ) &
           +WTHSKB(NB,NZ)+WTEARB(NB,NZ)+WTGRB(NB,NZ) &
-          +CPOOL(NB,NZ)+CPOOLK(NB,NZ))
+          +EPOOL(NB,ielmc,NZ)+CPOOLK(NB,NZ))
         WTSHTN(NB,NZ)=AZMAX1(WTLFBN(NB,NZ) &
           +WTSHBN(NB,NZ)+WTSTBN(NB,NZ)+WTRSBN(NB,NZ) &
           +WTHSBN(NB,NZ)+WTEABN(NB,NZ)+WTGRBN(NB,NZ) &
-          +ZPOOL(NB,NZ))
+          +EPOOL(NB,ielmn,NZ))
         WTSHTP(NB,NZ)=AZMAX1(WTLFBP(NB,NZ) &
           +WTSHBP(NB,NZ)+WTSTBP(NB,NZ)+WTRSBP(NB,NZ) &
           +WTHSBP(NB,NZ)+WTEABP(NB,NZ)+WTGRBP(NB,NZ) &
-          +PPOOL(NB,NZ))
+          +EPOOL(NB,ielmp,NZ))
         VOLWPX=VOLWP(NZ)
         WVPLT=AZMAX1(WTLS(NZ)+WVSTK(NZ))
         APSILT=ABS(PSILT(NZ))
@@ -2574,12 +2570,12 @@ module PlantDisturbsMod
       IF(PP(NZ).LE.0.0)IDTHB(NB,NZ)=1
 9835  CONTINUE
       WTLS(NZ)=0._r8
-      WTSTKE(NZ,ielmc)=0._r8
+      WTSTKE(ielmc,NZ)=0._r8
       WVSTK(NZ)=0._r8
       ARSTP(NZ)=0._r8
       D9840: DO NB=1,NBR(NZ)
         WTLS(NZ)=WTLS(NZ)+WTLSB(NB,NZ)
-        WTSTKE(NZ,ielmc)=WTSTKE(NZ,ielmc)+WTSTKB(NB,NZ)
+        WTSTKE(ielmc,NZ)=WTSTKE(ielmc,NZ)+WTSTKB(NB,NZ)
         WVSTK(NZ)=WVSTK(NZ)+WVSTKB(NB,NZ)
         D9830: DO L=1,JC1
           ARSTP(NZ)=ARSTP(NZ)+ARSTK(L,NB,NZ)
@@ -2639,12 +2635,12 @@ module PlantDisturbsMod
               ENDIF
             ENDIF
             D3385: DO M=1,jsken
-              FHVST=(1._r8-XHVST)*CFOPC(0,M,NZ)*EPOOLR(N,L,NZ,ielmc)
-              FHVSN=(1._r8-XHVSN)*CFOPN(0,M,NZ)*EPOOLR(N,L,NZ,ielmn)
-              FHVSP=(1._r8-XHVSP)*CFOPP(0,M,NZ)*EPOOLR(N,L,NZ,ielmp)
-              ESNC(M,1,L,NZ,ielmc)=ESNC(M,1,L,NZ,ielmc)+(1._r8-FFIRE)*FHVST
-              ESNC(M,1,L,NZ,ielmn)=ESNC(M,1,L,NZ,ielmn)+(1._r8-FFIRN)*FHVSN
-              ESNC(M,1,L,NZ,ielmp)=ESNC(M,1,L,NZ,ielmp)+(1._r8-FFIRP)*FHVSP
+              FHVST=(1._r8-XHVST)*CFOPC(0,M,NZ)*EPOOLR(ielmc,N,L,NZ)
+              FHVSN=(1._r8-XHVSN)*CFOPN(0,M,NZ)*EPOOLR(ielmn,N,L,NZ)
+              FHVSP=(1._r8-XHVSP)*CFOPP(0,M,NZ)*EPOOLR(ielmp,N,L,NZ)
+              ESNC(M,ielmc,1,L,NZ)=ESNC(M,ielmc,1,L,NZ)+(1._r8-FFIRE)*FHVST
+              ESNC(M,ielmn,1,L,NZ)=ESNC(M,ielmn,1,L,NZ)+(1._r8-FFIRN)*FHVSN
+              ESNC(M,ielmp,1,L,NZ)=ESNC(M,ielmp,1,L,NZ)+(1._r8-FFIRP)*FHVSP
               VCO2F(NZ)=VCO2F(NZ)-(1._r8-FCH4F)*FFIRE*FHVST
               VCH4F(NZ)=VCH4F(NZ)-FCH4F*FFIRE*FHVST
               VOXYF(NZ)=VOXYF(NZ)-(1._r8-FCH4F)*FFIRE*FHVST*2.667
@@ -2660,9 +2656,9 @@ module PlantDisturbsMod
                   +WTRT2N(N,L,NR,NZ))*FWODRN(0)
                 FHVSP=(1._r8-XHVSP)*CFOPP(5,M,NZ)*(WTRT1P(N,L,NR,NZ) &
                   +WTRT2P(N,L,NR,NZ))*FWODRP(0)
-                ESNC(M,1,L,NZ,ielmc)=ESNC(M,1,L,NZ,ielmc)+(1._r8-FFIRE)*FHVST
-                ESNC(M,1,L,NZ,ielmn)=ESNC(M,1,L,NZ,ielmn)+(1._r8-FFIRN)*FHVSN
-                ESNC(M,1,L,NZ,ielmp)=ESNC(M,1,L,NZ,ielmp)+(1._r8-FFIRP)*FHVSP
+                ESNC(M,ielmc,1,L,NZ)=ESNC(M,ielmc,1,L,NZ)+(1._r8-FFIRE)*FHVST
+                ESNC(M,ielmn,1,L,NZ)=ESNC(M,ielmn,1,L,NZ)+(1._r8-FFIRN)*FHVSN
+                ESNC(M,ielmp,1,L,NZ)=ESNC(M,ielmp,1,L,NZ)+(1._r8-FFIRP)*FHVSP
                 VCO2F(NZ)=VCO2F(NZ)-(1._r8-FCH4F)*FFIRE*FHVST
                 VCH4F(NZ)=VCH4F(NZ)-FCH4F*FFIRE*FHVST
                 VOXYF(NZ)=VOXYF(NZ)-(1._r8-FCH4F)*FFIRE*FHVST*2.667
@@ -2677,9 +2673,9 @@ module PlantDisturbsMod
                   +WTRT2N(N,L,NR,NZ))*FWODRN(1)
                 FHVSP=(1._r8-XHVSP)*CFOPP(4,M,NZ)*(WTRT1P(N,L,NR,NZ) &
                   +WTRT2P(N,L,NR,NZ))*FWODRP(1)
-                ESNC(M,1,L,NZ,ielmc)=ESNC(M,1,L,NZ,ielmc)+(1._r8-FFIRE)*FHVST
-                ESNC(M,1,L,NZ,ielmn)=ESNC(M,1,L,NZ,ielmn)+(1._r8-FFIRN)*FHVSN
-                ESNC(M,1,L,NZ,ielmp)=ESNC(M,1,L,NZ,ielmp)+(1._r8-FFIRP)*FHVSP
+                ESNC(M,ielmc,1,L,NZ)=ESNC(M,ielmc,1,L,NZ)+(1._r8-FFIRE)*FHVST
+                ESNC(M,ielmn,1,L,NZ)=ESNC(M,ielmn,1,L,NZ)+(1._r8-FFIRN)*FHVSN
+                ESNC(M,ielmp,1,L,NZ)=ESNC(M,ielmp,1,L,NZ)+(1._r8-FFIRP)*FHVSP
                 VCO2F(NZ)=VCO2F(NZ)-(1._r8-FCH4F)*FFIRE*FHVST
                 VCH4F(NZ)=VCH4F(NZ)-FCH4F*FFIRE*FHVST
                 VOXYF(NZ)=VOXYF(NZ)-(1._r8-FCH4F)*FFIRE*FHVST*2.667_r8
@@ -2753,9 +2749,9 @@ module PlantDisturbsMod
               RTLG2(N,L,NR,NZ)=RTLG2(N,L,NR,NZ)*XHVST
               RTN2(N,L,NR,NZ)=RTN2(N,L,NR,NZ)*XHVST
 3960        CONTINUE
-            EPOOLR(N,L,NZ,ielmc)=EPOOLR(N,L,NZ,ielmc)*XHVST
-            EPOOLR(N,L,NZ,ielmn)=EPOOLR(N,L,NZ,ielmn)*XHVSN
-            EPOOLR(N,L,NZ,ielmp)=EPOOLR(N,L,NZ,ielmp)*XHVSP
+            EPOOLR(ielmc,N,L,NZ)=EPOOLR(ielmc,N,L,NZ)*XHVST
+            EPOOLR(ielmn,N,L,NZ)=EPOOLR(ielmn,N,L,NZ)*XHVSN
+            EPOOLR(ielmp,N,L,NZ)=EPOOLR(ielmp,N,L,NZ)*XHVSP
             WTRTL(N,L,NZ)=WTRTL(N,L,NZ)*XHVST
             WTRTD(N,L,NZ)=WTRTD(N,L,NZ)*XHVST
             WSRTL(N,L,NZ)=WSRTL(N,L,NZ)*XHVST
@@ -2780,13 +2776,13 @@ module PlantDisturbsMod
 !
             IF(INTYP(NZ).NE.0.AND.N.EQ.1)THEN
               D3395: DO M=1,jsken
-                ESNC(M,1,L,NZ,ielmc)=ESNC(M,1,L,NZ,ielmc)+(1._r8-XHVST) &
+                ESNC(M,ielmc,1,L,NZ)=ESNC(M,ielmc,1,L,NZ)+(1._r8-XHVST) &
                   *(CFOPC(4,M,NZ)*WTNDL(L,NZ) &
                   +CFOPC(0,M,NZ)*CPOOLN(L,NZ))
-                ESNC(M,1,L,NZ,ielmn)=ESNC(M,1,L,NZ,ielmn)+(1._r8-XHVSN) &
+                ESNC(M,ielmn,1,L,NZ)=ESNC(M,ielmn,1,L,NZ)+(1._r8-XHVSN) &
                   *(CFOPN(4,M,NZ)*WTNDLN(L,NZ) &
                   +CFOPN(0,M,NZ)*ZPOOLN(L,NZ))
-                ESNC(M,1,L,NZ,ielmp)=ESNC(M,1,L,NZ,ielmp)+(1._r8-XHVSP) &
+                ESNC(M,ielmp,1,L,NZ)=ESNC(M,ielmp,1,L,NZ)+(1._r8-XHVSP) &
                   *(CFOPP(4,M,NZ)*WTNDLP(L,NZ) &
                   +CFOPP(0,M,NZ)*PPOOLN(L,NZ))
               ENDDO D3395
@@ -2810,22 +2806,22 @@ module PlantDisturbsMod
 !
         IF(ISTYP(NZ).NE.0)THEN
           D3400: DO M=1,jsken
-            ESNC(M,0,NG(NZ),NZ,ielmc)=ESNC(M,0,NG(NZ),NZ,ielmc) &
-              +((1._r8-XHVST)*CFOPC(0,M,NZ)*WTRVE(NZ,ielmc))*FWOOD(0)
-            ESNC(M,0,NG(NZ),NZ,ielmn)=ESNC(M,0,NG(NZ),NZ,ielmn) &
-              +((1._r8-XHVSN)*CFOPN(0,M,NZ)*WTRVE(NZ,ielmn))*FWOODN(0)
-            ESNC(M,0,NG(NZ),NZ,ielmp)=ESNC(M,0,NG(NZ),NZ,ielmp) &
-              +((1._r8-XHVSP)*CFOPP(0,M,NZ)*WTRVE(NZ,ielmp))*FWOODP(0)
-            ESNC(M,1,NG(NZ),NZ,ielmc)=ESNC(M,1,NG(NZ),NZ,ielmc) &
-              +((1._r8-XHVST)*CFOPC(0,M,NZ)*WTRVE(NZ,ielmc))*FWOOD(1)
-            ESNC(M,1,NG(NZ),NZ,ielmn)=ESNC(M,1,NG(NZ),NZ,ielmn) &
-              +((1._r8-XHVSN)*CFOPN(0,M,NZ)*WTRVE(NZ,ielmn))*FWOODN(1)
-            ESNC(M,1,NG(NZ),NZ,ielmp)=ESNC(M,1,NG(NZ),NZ,ielmp) &
-              +((1._r8-XHVSP)*CFOPP(0,M,NZ)*WTRVE(NZ,ielmp))*FWOODP(1)
+            ESNC(M,ielmc,0,NG(NZ),NZ)=ESNC(M,ielmc,0,NG(NZ),NZ) &
+              +((1._r8-XHVST)*CFOPC(0,M,NZ)*WTRVE(ielmc,NZ))*FWOOD(0)
+            ESNC(M,ielmn,0,NG(NZ),NZ)=ESNC(M,ielmn,0,NG(NZ),NZ) &
+              +((1._r8-XHVSN)*CFOPN(0,M,NZ)*WTRVE(ielmn,NZ))*FWOODN(0)
+            ESNC(M,ielmp,0,NG(NZ),NZ)=ESNC(M,ielmp,0,NG(NZ),NZ) &
+              +((1._r8-XHVSP)*CFOPP(0,M,NZ)*WTRVE(ielmp,NZ))*FWOODP(0)
+            ESNC(M,ielmc,1,NG(NZ),NZ)=ESNC(M,ielmc,1,NG(NZ),NZ) &
+              +((1._r8-XHVST)*CFOPC(0,M,NZ)*WTRVE(ielmc,NZ))*FWOOD(1)
+            ESNC(M,ielmn,1,NG(NZ),NZ)=ESNC(M,ielmn,1,NG(NZ),NZ) &
+              +((1._r8-XHVSN)*CFOPN(0,M,NZ)*WTRVE(ielmn,NZ))*FWOODN(1)
+            ESNC(M,ielmp,1,NG(NZ),NZ)=ESNC(M,ielmp,1,NG(NZ),NZ) &
+              +((1._r8-XHVSP)*CFOPP(0,M,NZ)*WTRVE(ielmp,NZ))*FWOODP(1)
           ENDDO D3400
-          WTRVE(NZ,ielmc)=WTRVE(NZ,ielmc)*XHVST
-          WTRVE(NZ,ielmn)=WTRVE(NZ,ielmn)*XHVSN
-          WTRVE(NZ,ielmp)=WTRVE(NZ,ielmp)*XHVSP
+          WTRVE(ielmc,NZ)=WTRVE(ielmc,NZ)*XHVST
+          WTRVE(ielmn,NZ)=WTRVE(ielmn,NZ)*XHVSN
+          WTRVE(ielmp,NZ)=WTRVE(ielmp,NZ)*XHVSP
         ENDIF
     ENDIF
   ENDIF

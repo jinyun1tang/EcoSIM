@@ -128,7 +128,7 @@ module CanopyDataType
   real(r8),allocatable ::  ZPOLNP(:,:,:)                      !canopy nonstructural P concentration, [g g-1]
   real(r8),allocatable ::  PPOLNP(:,:,:)                      !canopy nonstructural P concentration, [g g-1]
   real(r8),allocatable ::  WVSTKB(:,:,:,:)                    !branch active stalk C, [g d-2]
-  real(r8),allocatable ::  CPOOL(:,:,:,:)                     !branch nonstructural C, [g d-2]
+  real(r8),allocatable ::  EPOOL(:,:,:,:,:)                   !branch nonstructural element, [g d-2]
   real(r8),allocatable ::  WTLSB(:,:,:,:)                     !branch leaf + sheath C, [g d-2]
   real(r8),allocatable ::  WTSHTB(:,:,:,:)                    !branch shoot C, [g d-2]
   real(r8),allocatable ::  WTLFB(:,:,:,:)                     !branch leaf C, [g d-2]
@@ -155,7 +155,6 @@ module CanopyDataType
   real(r8),allocatable ::  WTHSBN(:,:,:,:)                    !branch husk N, [g d-2]
   real(r8),allocatable ::  WTEABN(:,:,:,:)                    !branch ear N, [g d-2]
   real(r8),allocatable ::  WTGRBN(:,:,:,:)                    !branch grain N, [g d-2]
-  real(r8),allocatable ::  ZPOOL(:,:,:,:)                     !branch  nonstructural N, [g d-2]
   real(r8),allocatable ::  CZPOLB(:,:,:,:)                    !branch nonstructural N concentration, [g g-1]
   real(r8),allocatable ::  ZPOLNB(:,:,:,:)                    !branch nonstructural N concentration, [g g-1]
   real(r8),allocatable ::  PPOLNB(:,:,:,:)                    !branch nonstructural P concentration, [g g-1]
@@ -171,7 +170,6 @@ module CanopyDataType
   real(r8),allocatable ::  WTHSBP(:,:,:,:)                    !branch husk P, [g d-2]
   real(r8),allocatable ::  WTEABP(:,:,:,:)                    !branch ear P, [g d-2]
   real(r8),allocatable ::  WTGRBP(:,:,:,:)                    !branch grain P, [g d-2]
-  real(r8),allocatable ::  PPOOL(:,:,:,:)                     !branch nonstructural P, [g d-2]
   real(r8),allocatable ::  CPPOLB(:,:,:,:)                    !branch nonstructural P concentration, [g g-1]
   real(r8),allocatable ::  WTNDBP(:,:,:,:)                    !branch nodule P, [g d-2]
   real(r8),allocatable ::  WGLF(:,:,:,:,:)                    !leaf C, [g d-2]
@@ -301,27 +299,27 @@ module CanopyDataType
   allocate(CFOPC(0:5,4,JP,JY,JX));CFOPC=0._r8
   allocate(CFOPN(0:5,4,JP,JY,JX));CFOPN=0._r8
   allocate(CFOPP(0:5,4,JP,JY,JX));CFOPP=0._r8
-  allocate(WTSHTE(JP,JY,JX,npelms)); WTSHTE=0._r8
-  allocate(WTLFE(JP,JY,JX,npelms));  WTLFE=0._r8
-  allocate(WTSHEE(JP,JY,JX,npelms)); WTSHEE=0._r8
-  allocate(WTSTKE(JP,JY,JX,npelms)); WTSTKE=0._r8
+  allocate(WTSHTE(npelms,JP,JY,JX)); WTSHTE=0._r8
+  allocate(WTLFE(npelms,JP,JY,JX));  WTLFE=0._r8
+  allocate(WTSHEE(npelms,JP,JY,JX)); WTSHEE=0._r8
+  allocate(WTSTKE(npelms,JP,JY,JX)); WTSTKE=0._r8
   allocate(WVSTK(JP,JY,JX));    WVSTK=0._r8
-  allocate(WTRSVE(JP,JY,JX,npelms));    WTRSVE=0._r8
-  allocate(WTHSKE(JP,JY,JX,npelms));    WTHSKE=0._r8
-  allocate(WTEARE(JP,JY,JX,npelms));    WTEARE=0._r8
-  allocate(WTGRE(JP,JY,JX,npelms));     WTGRE=0._r8
+  allocate(WTRSVE(npelms,JP,JY,JX));    WTRSVE=0._r8
+  allocate(WTHSKE(npelms,JP,JY,JX));    WTHSKE=0._r8
+  allocate(WTEARE(npelms,JP,JY,JX));    WTEARE=0._r8
+  allocate(WTGRE(npelms,JP,JY,JX));     WTGRE=0._r8
   allocate(WTLS(JP,JY,JX));     WTLS=0._r8
   allocate(ARLFV(JC,JP,JY,JX)); ARLFV=0._r8
   allocate(CNET(JP,JY,JX));     CNET=0._r8
   allocate(WGLFV(JC,JP,JY,JX)); WGLFV=0._r8
-  allocate(EPOOLP(JP,JY,JX,npelms));   EPOOLP=0._r8
-  allocate(CEPOLP(JP,JY,JX,npelms));   CEPOLP=0._r8
+  allocate(EPOOLP(npelms,JP,JY,JX));   EPOOLP=0._r8
+  allocate(CEPOLP(npelms,JP,JY,JX));   CEPOLP=0._r8
   allocate(ARSTV(JC,JP,JY,JX)); ARSTV=0._r8
   allocate(CPOLNP(JP,JY,JX));   CPOLNP=0._r8
   allocate(ZPOLNP(JP,JY,JX));   ZPOLNP=0._r8
   allocate(PPOLNP(JP,JY,JX));   PPOLNP=0._r8
   allocate(WVSTKB(JC,JP,JY,JX));WVSTKB=0._r8
-  allocate(CPOOL(JC,JP,JY,JX)); CPOOL=0._r8
+  allocate(EPOOL(JC,npelms,JP,JY,JX)); EPOOL=0._r8
   allocate(WTLSB(JC,JP,JY,JX)); WTLSB=0._r8
   allocate(WTSHTB(JC,JP,JY,JX));WTSHTB=0._r8
   allocate(WTLFB(JC,JP,JY,JX)); WTLFB=0._r8
@@ -348,7 +346,6 @@ module CanopyDataType
   allocate(WTHSBN(JC,JP,JY,JX));WTHSBN=0._r8
   allocate(WTEABN(JC,JP,JY,JX));WTEABN=0._r8
   allocate(WTGRBN(JC,JP,JY,JX));WTGRBN=0._r8
-  allocate(ZPOOL(JC,JP,JY,JX)); ZPOOL=0._r8
   allocate(CZPOLB(JC,JP,JY,JX));CZPOLB=0._r8
   allocate(ZPOLNB(JC,JP,JY,JX));ZPOLNB=0._r8
   allocate(PPOLNB(JC,JP,JY,JX));PPOLNB=0._r8
@@ -364,7 +361,6 @@ module CanopyDataType
   allocate(WTHSBP(JC,JP,JY,JX));WTHSBP=0._r8
   allocate(WTEABP(JC,JP,JY,JX));WTEABP=0._r8
   allocate(WTGRBP(JC,JP,JY,JX));WTGRBP=0._r8
-  allocate(PPOOL(JC,JP,JY,JX)); PPOOL=0._r8
   allocate(CPPOLB(JC,JP,JY,JX));CPPOLB=0._r8
   allocate(WTNDBP(JC,JP,JY,JX));WTNDBP=0._r8
   allocate(WGLF(0:JNODS,JC,JP,JY,JX));WGLF=0._r8
@@ -380,13 +376,13 @@ module CanopyDataType
   allocate(WGNODN(0:JNODS,JC,JP,JY,JX));WGNODN=0._r8
   allocate(CCPLNP(JP,JY,JX));   CCPLNP=0._r8
   allocate(GRWTB(JC,JP,JY,JX)); GRWTB=0._r8
-  allocate(WTSTDE(jsken,JP,JY,JX,npelms)); WTSTDE=0._r8
-  allocate(WTSTGE(JP,JY,JX,npelms));    WTSTGE=0._r8
+  allocate(WTSTDE(jsken,npelms,JP,JY,JX)); WTSTDE=0._r8
+  allocate(WTSTGE(npelms,JP,JY,JX));    WTSTGE=0._r8
   allocate(WGLFP(0:JNODS,JC,JP,JY,JX));WGLFP=0._r8
   allocate(WGSHP(0:JNODS,JC,JP,JY,JX));WGSHP=0._r8
   allocate(WGNODP(0:JNODS,JC,JP,JY,JX));WGNODP=0._r8
   allocate(WGLFLP(JC,0:JNODS,JC,JP,JY,JX));WGLFLP=0._r8
-  allocate(WTRVE(JP,JY,JX,npelms));  WTRVE=0._r8
+  allocate(WTRVE(npelms,JP,JY,JX));  WTRVE=0._r8
   allocate(WTRVX(JP,JY,JX));    WTRVX=0._r8
   allocate(WTSHTA(JP,JY,JX));   WTSHTA=0._r8
   end subroutine InitCanopyData
@@ -515,7 +511,7 @@ module CanopyDataType
   call destroy(ZPOLNP)
   call destroy(PPOLNP)
   call destroy(WVSTKB)
-  call destroy(CPOOL)
+  call destroy(EPOOL)
   call destroy(WTLSB)
   call destroy(WTSHTB)
   call destroy(WTLFB)
@@ -542,7 +538,6 @@ module CanopyDataType
   call destroy(WTHSBN)
   call destroy(WTEABN)
   call destroy(WTGRBN)
-  call destroy(ZPOOL)
   call destroy(CZPOLB)
   call destroy(ZPOLNB)
   call destroy(PPOLNB)
@@ -558,7 +553,6 @@ module CanopyDataType
   call destroy(WTHSBP)
   call destroy(WTEABP)
   call destroy(WTGRBP)
-  call destroy(PPOOL)
   call destroy(CPPOLB)
   call destroy(WTNDBP)
   call destroy(WGLF)

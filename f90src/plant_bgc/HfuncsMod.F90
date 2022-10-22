@@ -286,8 +286,8 @@ module HfuncsMod
     IF(J.EQ.1.AND.PP(NZ).GT.0.0)THEN
       IF(PSIRG(1,NG(NZ),NZ).GT.PSILM)THEN
         IF(ISTYP(NZ).NE.0.OR.IDAY(2,NB1(NZ),NZ).EQ.0)THEN
-          IF((NBR(NZ).EQ.0.AND.WTRVE(NZ,ielmc).GT.0.0) &
-            .OR.(CEPOLP(NZ,ielmc).GT.PB(NZ).AND.PB(NZ).GT.0.0))THEN
+          IF((NBR(NZ).EQ.0.AND.WTRVE(ielmc,NZ).GT.0.0) &
+            .OR.(CEPOLP(ielmc,NZ).GT.PB(NZ).AND.PB(NZ).GT.0.0))THEN
             DO 120 NB=1,JC1
               IF(IDTHB(NB,NZ).EQ.1)THEN
                 IF(NB.EQ.NB1(NZ) &
@@ -320,8 +320,8 @@ module HfuncsMod
       IF(PSIRG(1,NG(NZ),NZ).GT.PSILM)THEN
         IF(NRT(NZ).EQ.0.OR.PSTG(NB1(NZ),NZ) &
           .GT.NRT(NZ)/FNOD(NZ)+XTLI(NZ))THEN
-          IF((NRT(NZ).EQ.0.AND.WTRVE(NZ,ielmc).GT.0.0) &
-            .OR.(CEPOLP(NZ,ielmc).GT.PR(NZ).AND.PR(NZ).GT.0.0))THEN
+          IF((NRT(NZ).EQ.0.AND.WTRVE(ielmc,NZ).GT.0.0) &
+            .OR.(CEPOLP(ielmc,NZ).GT.PR(NZ).AND.PR(NZ).GT.0.0))THEN
             NRT(NZ)=MIN(JC1,NRT(NZ)+1)
             IDTHR(NZ)=0
           ENDIF
@@ -353,9 +353,7 @@ module HfuncsMod
     ZPOLNB =>  plt_biom%ZPOLNB   , &
     PPOLNB =>  plt_biom%PPOLNB   , &
     EPOOLR =>  plt_biom%EPOOLR   , &
-    CPOOL  =>  plt_biom%CPOOL    , &
-    ZPOOL  =>  plt_biom%ZPOOL    , &
-    PPOOL  =>  plt_biom%PPOOL    , &
+    EPOOL  =>  plt_biom%EPOOL    , &
     CCPOLR =>  plt_biom%CCPOLR   , &
     CZPOLR =>  plt_biom%CZPOLR   , &
     CPPOLR =>  plt_biom%CPPOLR   , &
@@ -389,7 +387,7 @@ module HfuncsMod
   plt_bgcr%RN2OZ(NZ)=0.0_r8
   plt_bgcr%RNH3Z(NZ)=0.0_r8
   plt_bgcr%RH2GZ(NZ)=0.0_r8
-  EPOOLP(NZ,:)=0.0_r8
+  EPOOLP(1:npelms,NZ)=0.0_r8
   NI(NZ)=NIX(NZ)
   NG(NZ)=MIN(NI(NZ),MAX(NG(NZ),NU))
   NB1(NZ)=1
@@ -403,9 +401,9 @@ module HfuncsMod
 !
   D140: DO NB=1,NBR(NZ)
     IF(IDTHB(NB,NZ).EQ.0)THEN
-      EPOOLP(NZ,ielmc)=EPOOLP(NZ,ielmc)+CPOOL(NB,NZ)
-      EPOOLP(NZ,ielmn)=EPOOLP(NZ,ielmn)+ZPOOL(NB,NZ)
-      EPOOLP(NZ,ielmp)=EPOOLP(NZ,ielmp)+PPOOL(NB,NZ)
+      EPOOLP(ielmc,NZ)=EPOOLP(ielmc,NZ)+EPOOL(NB,ielmc,NZ)
+      EPOOLP(ielmn,NZ)=EPOOLP(ielmn,NZ)+EPOOL(NB,ielmn,NZ)
+      EPOOLP(ielmp,NZ)=EPOOLP(ielmp,NZ)+EPOOL(NB,ielmp,NZ)
       CPOLNP(NZ)=CPOLNP(NZ)+CPOLNB(NB,NZ)
       ZPOLNP(NZ)=ZPOLNP(NZ)+ZPOLNB(NB,NZ)
       PPOLNP(NZ)=PPOLNP(NZ)+PPOLNB(NB,NZ)
@@ -425,9 +423,9 @@ module HfuncsMod
   DO 180 N=1,MY(NZ)
     DO 160 L=NU,NI(NZ)
       IF(WTRTL(N,L,NZ).GT.ZEROL(NZ))THEN
-        CCPOLR(N,L,NZ)=AZMAX1(EPOOLR(N,L,NZ,ielmc)/WTRTL(N,L,NZ))
-        CZPOLR(N,L,NZ)=AZMAX1(EPOOLR(N,L,NZ,ielmn)/WTRTL(N,L,NZ))
-        CPPOLR(N,L,NZ)=AZMAX1(EPOOLR(N,L,NZ,ielmp)/WTRTL(N,L,NZ))
+        CCPOLR(N,L,NZ)=AZMAX1(EPOOLR(ielmc,N,L,NZ)/WTRTL(N,L,NZ))
+        CZPOLR(N,L,NZ)=AZMAX1(EPOOLR(ielmn,N,L,NZ)/WTRTL(N,L,NZ))
+        CPPOLR(N,L,NZ)=AZMAX1(EPOOLR(ielmp,N,L,NZ)/WTRTL(N,L,NZ))
 !       CCPOLR(N,L,NZ)=AMIN1(1.0_r8,CCPOLR(N,L,NZ))
       ELSE
         CCPOLR(N,L,NZ)=1.0
@@ -444,21 +442,21 @@ module HfuncsMod
 ! CCPOLB,CZPOLB,CPPOLB=nonstructural C,N,P concn in branch(g g-1)
 !
   IF(WTLS(NZ).GT.ZEROL(NZ))THEN
-    CEPOLP(NZ,ielmc)=AZMAX1(AMIN1(1.0_r8,EPOOLP(NZ,ielmc)/WTLS(NZ)))
-    CEPOLP(NZ,ielmn)=AZMAX1(AMIN1(1.0_r8,EPOOLP(NZ,ielmn)/WTLS(NZ)))
-    CEPOLP(NZ,ielmp)=AZMAX1(AMIN1(1.0_r8,EPOOLP(NZ,ielmp)/WTLS(NZ)))
+    CEPOLP(ielmc,NZ)=AZMAX1(AMIN1(1.0_r8,EPOOLP(ielmc,NZ)/WTLS(NZ)))
+    CEPOLP(ielmn,NZ)=AZMAX1(AMIN1(1.0_r8,EPOOLP(ielmn,NZ)/WTLS(NZ)))
+    CEPOLP(ielmp,NZ)=AZMAX1(AMIN1(1.0_r8,EPOOLP(ielmp,NZ)/WTLS(NZ)))
     CCPLNP(NZ)=AZMAX1(AMIN1(1.0_r8,CPOLNP(NZ)/WTLS(NZ)))
   ELSE
-    CEPOLP(NZ,ielmc)=1.0_r8
-    CEPOLP(NZ,ielmn)=1.0_r8
-    CEPOLP(NZ,ielmp)=1.0_r8
+    CEPOLP(ielmc,NZ)=1.0_r8
+    CEPOLP(ielmn,NZ)=1.0_r8
+    CEPOLP(ielmp,NZ)=1.0_r8
     CCPLNP(NZ)=1.0_r8
   ENDIF
   D190: DO NB=1,NBR(NZ)
     IF(WTLSB(NB,NZ).GT.ZEROP(NZ))THEN
-      CCPOLB(NB,NZ)=AZMAX1(CPOOL(NB,NZ)/WTLSB(NB,NZ))
-      CZPOLB(NB,NZ)=AZMAX1(ZPOOL(NB,NZ)/WTLSB(NB,NZ))
-      CPPOLB(NB,NZ)=AZMAX1(PPOOL(NB,NZ)/WTLSB(NB,NZ))
+      CCPOLB(NB,NZ)=AZMAX1(EPOOL(NB,ielmc,NZ)/WTLSB(NB,NZ))
+      CZPOLB(NB,NZ)=AZMAX1(EPOOL(NB,ielmn,NZ)/WTLSB(NB,NZ))
+      CPPOLB(NB,NZ)=AZMAX1(EPOOL(NB,ielmp,NZ)/WTLSB(NB,NZ))
     ELSE
       CCPOLB(NB,NZ)=1.0
       CZPOLB(NB,NZ)=1.0
@@ -481,7 +479,7 @@ module HfuncsMod
       .AND.(ARLSP.GT.ZEROL(NZ)) &
       .AND.(RTDP1(1,1,NZ).GT.SDPTH(NZ)+ppmc))THEN
       IDAY(1,NB1(NZ),NZ)=I
-      VHCPC(NZ)=cpw*(WTSHTE(NZ,ielmc)*10.0E-06+VOLWC(NZ))
+      VHCPC(NZ)=cpw*(WTSHTE(ielmc,NZ)*10.0E-06+VOLWC(NZ))
     ENDIF
   ENDIF
   end associate

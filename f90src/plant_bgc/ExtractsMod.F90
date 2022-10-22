@@ -75,15 +75,15 @@ module ExtractsMod
 !   CSNT,ZSNT,PSNT=cumulative total C,N,P litterfall
 !
     DO NE=1,npelms
-      ZESNC(NE)=ZESNC(NE)+HESNC(NZ,NE)
+      ZESNC(NE)=ZESNC(NE)+HESNC(NE,NZ)
     ENDDO
-    WTSTGT=WTSTGT+WTSTGE(NZ,ielmc)
+    WTSTGT=WTSTGT+WTSTGE(ielmc,NZ)
     DO  L=0,NI(NZ)
       DO K=0,1
         DO  M=1,jcplx11
-          CSNT(M,K,L)=CSNT(M,K,L)+ESNC(M,K,L,NZ,ielmc)
-          ZSNT(M,K,L)=ZSNT(M,K,L)+ESNC(M,K,L,NZ,ielmn)
-          PSNT(M,K,L)=PSNT(M,K,L)+ESNC(M,K,L,NZ,ielmp)
+          CSNT(M,K,L)=CSNT(M,K,L)+ESNC(M,ielmc,K,L,NZ)
+          ZSNT(M,K,L)=ZSNT(M,K,L)+ESNC(M,ielmn,K,L,NZ)
+          PSNT(M,K,L)=PSNT(M,K,L)+ESNC(M,ielmp,K,L,NZ)
         enddo
       ENDDO
     ENDDO
@@ -507,9 +507,9 @@ module ExtractsMod
   ZESNC(ielmc)=ZESNC(ielmc)-HCUPTK(NZ)
   ZESNC(ielmn)=ZESNC(ielmn)-HZUPTK(NZ)
   ZESNC(ielmp)=ZESNC(ielmp)-HPUPTK(NZ)
-  TBALE(ielmc)=TBALE(ielmc)+BALE(NZ,ielmc)
-  TBALE(ielmn)=TBALE(ielmn)+BALE(NZ,ielmn)
-  TBALE(ielmp)=TBALE(ielmp)+BALE(NZ,ielmp)
+  TBALE(ielmc)=TBALE(ielmc)+BALE(ielmc,NZ)
+  TBALE(ielmn)=TBALE(ielmn)+BALE(ielmn,NZ)
+  TBALE(ielmp)=TBALE(ielmp)+BALE(ielmp,NZ)
   TCO2Z=TCO2Z+RCO2Z(NZ)
   TOXYZ=TOXYZ+ROXYZ(NZ)
   TCH4Z=TCH4Z+RCH4Z(NZ)
