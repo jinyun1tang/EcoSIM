@@ -7,6 +7,7 @@ module grosubsMod
   use EcosimConst
   use GrosubPars
   use PlantAPIData
+  use MicBGCPars, only : micpar
   use PhotoSynsMod
   use RootMod, only : RootBGCModel
   use LitterFallMod
@@ -121,7 +122,7 @@ module grosubsMod
   integer, intent(in) :: I,J
 
   integer :: L,K,NZ,M,NB,NE
-  real(r8) :: XFRC,XFRN,XFRP
+  real(r8) :: XFRC,XFRN,XFRP,XFRE
 !     begin_execution
 
   associate(                           &
@@ -141,9 +142,7 @@ module grosubsMod
     WTRVE   => plt_biom%WTRVE    , &
     WTSTGE  => plt_biom%WTSTGE   , &
     TFN3    => plt_pheno%TFN3    , &
-    RSETC   => plt_pheno%RSETC   , &
-    RSETN   => plt_pheno%RSETN   , &
-    RSETP   => plt_pheno%RSETP   , &
+    RSETE   => plt_pheno%RSETE   , &
     IFLGC   => plt_pheno%IFLGC   , &
     IGTYP   => plt_pheno%IGTYP   , &
     IFLGI   => plt_pheno%IFLGI   , &
@@ -175,8 +174,7 @@ module grosubsMod
 !
     D205: DO NB=1,NBR(NZ)
       IF(IFLGI(NZ).EQ.1)THEN
-        IF(IFLGE(NB,NZ).EQ.0 &
-          .AND.VRNS(NB,NZ).GE.VRNL(NB,NZ))THEN
+        IF(IFLGE(NB,NZ).EQ.0.AND.VRNS(NB,NZ).GE.VRNL(NB,NZ))THEN
           IDAY0(NZ)=I
           IYR0(NZ)=IYRC
           SDPTHI(NZ)=0.005_r8+CDPTHZ(0)
@@ -192,23 +190,17 @@ module grosubsMod
 !     WTSTG,WTSTDN,WTSTDP=standing dead C,N,P mass
 !     CSNC,ZSNC,PSNC=C,N,P litterfall
 !
-    D6235: DO M=1,jsken
-      XFRC=1.5814E-05*TFN3(NZ)*WTSTDE(M,ielmc,NZ)
-      XFRN=1.5814E-05*TFN3(NZ)*WTSTDE(M,ielmn,NZ)
-      XFRP=1.5814E-05*TFN3(NZ)*WTSTDE(M,ielmp,NZ)
-      IF(IBTYP(NZ).EQ.0.OR.IGTYP(NZ).LE.1)THEN
-        ESNC(M,ielmc,1,0,NZ)=ESNC(M,ielmc,1,0,NZ)+XFRC
-        ESNC(M,ielmn,1,0,NZ)=ESNC(M,ielmn,1,0,NZ)+XFRN
-        ESNC(M,ielmp,1,0,NZ)=ESNC(M,ielmp,1,0,NZ)+XFRP
-      ELSE
-        ESNC(M,ielmc,0,0,NZ)=ESNC(M,ielmc,0,0,NZ)+XFRC
-        ESNC(M,ielmn,0,0,NZ)=ESNC(M,ielmn,0,0,NZ)+XFRN
-        ESNC(M,ielmp,0,0,NZ)=ESNC(M,ielmp,0,0,NZ)+XFRP
-      ENDIF
-      WTSTDE(M,ielmc,NZ)=WTSTDE(M,ielmc,NZ)-XFRC
-      WTSTDE(M,ielmn,NZ)=WTSTDE(M,ielmn,NZ)-XFRN
-      WTSTDE(M,ielmp,NZ)=WTSTDE(M,ielmp,NZ)-XFRP
-    ENDDO D6235
+    DO NE=1,npelms
+      D6235: DO M=1,jsken
+        XFRE=1.5814E-05_r8*TFN3(NZ)*WTSTDE(M,NE,NZ)
+        IF(IBTYP(NZ).EQ.0.OR.IGTYP(NZ).LE.1)THEN
+          ESNC(M,NE,1,0,NZ)=ESNC(M,NE,1,0,NZ)+XFRE
+        ELSE
+          ESNC(M,NE,0,0,NZ)=ESNC(M,NE,0,0,NZ)+XFRE
+        ENDIF
+        WTSTDE(M,NE,NZ)=WTSTDE(M,NE,NZ)-XFRE
+      ENDDO D6235
+    ENDDO
 !
 !     ACCUMULATE TOTAL SURFACE, SUBSURFACE LITTERFALL
 !
@@ -216,16 +208,16 @@ module grosubsMod
 !     TCSNC,TZSNC,TPSNC=cumulative C,N,P litterfall
 !     HCSNC,HZSNC,HPSNC=hourly C,N,P litterfall
 !
-    DO NE=1,npelms
-      D6430: DO M=1,jsken
-        DO K=0,1
+    DO K=0,micpar%n_pltlitrk
+      DO NE=1,npelms
+        D6430: DO M=1,jsken
           TESN0(NE,NZ)=TESN0(NE,NZ)+ESNC(M,NE,K,0,NZ)
           D8955: DO L=0,NJ
             HESNC(NE,NZ)=HESNC(NE,NZ)+ESNC(M,NE,K,L,NZ)
             TESNC(NE,NZ)=TESNC(NE,NZ)+ESNC(M,NE,K,L,NZ)
           ENDDO D8955
-        enddo
-      ENDDO D6430
+        ENDDO D6430
+      enddo
     ENDDO
 !
 !     TOTAL STANDING DEAD
@@ -254,7 +246,7 @@ module grosubsMod
     IF(IFLGC(NZ).EQ.1)THEN
       BALE(ielmc,NZ)=WTSHTE(ielmc,NZ)+WTRTE(ielmc,NZ)+WTNDE(ielmc,NZ) &
         +WTRVE(ielmc,NZ)-ZNPP(NZ)+TESNC(ielmc,NZ)-TEUPTK(ielmc,NZ) &
-        -RSETC(NZ)+WTSTGE(ielmc,NZ)+THVSTE(ielmc,NZ) &
+        -RSETE(ielmc,NZ)+WTSTGE(ielmc,NZ)+THVSTE(ielmc,NZ) &
         +HVSTE(ielmc,NZ)-VCO2F(NZ)-VCH4F(NZ)
 !
 !     PLANT N BALANCE = TOTAL N STATE VARIABLES + TOTAL N LITTERFALL
@@ -273,7 +265,7 @@ module grosubsMod
 !
       BALE(ielmn,NZ)=WTSHTE(ielmn,NZ)+WTRTE(ielmn,NZ)+WTNDE(ielmn,NZ) &
         +WTRVE(ielmn,NZ)+TESNC(ielmn,NZ)-TEUPTK(ielmn,NZ)-TNH3C(NZ) &
-        -RSETN(NZ)+WTSTGE(ielmn,NZ)+HVSTE(ielmn,NZ)+THVSTE(ielmn,NZ) &
+        -RSETE(ielmn,NZ)+WTSTGE(ielmn,NZ)+HVSTE(ielmn,NZ)+THVSTE(ielmn,NZ) &
         -VNH3F(NZ)-VN2OF(NZ)-TZUPFX(NZ)
 !
 !     PLANT P BALANCE = TOTAL P STATE VARIABLES + TOTAL P LITTERFALL
@@ -290,7 +282,7 @@ module grosubsMod
 !
       BALE(ielmp,NZ)=WTSHTE(ielmp,NZ)+WTRTE(ielmp,NZ)+WTNDE(ielmp,NZ) &
         +WTRVE(ielmp,NZ)+TESNC(ielmp,NZ)-TEUPTK(ielmp,NZ) &
-        -RSETP(NZ)+WTSTDE(1,ielmp,NZ)+WTSTGE(ielmp,NZ) &
+        -RSETE(ielmp,NZ)+WTSTDE(1,ielmp,NZ)+WTSTGE(ielmp,NZ) &
         +HVSTE(ielmp,NZ)+THVSTE(ielmp,NZ)-VPO4F(NZ)
     ENDIF
   ENDDO D9975

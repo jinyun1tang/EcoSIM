@@ -101,9 +101,7 @@ module CanopyDataType
   real(r8),allocatable ::  DTKC(:,:,:)                        !change in canopy temperature, [K]
   real(r8),allocatable ::  TKCZ(:,:,:)                        !canopy temperature, [K]
   real(r8),allocatable ::  CPOOL3(:,:,:,:,:)                  !minimum sink strength for nonstructural C transfer, [g d-2]
-  real(r8),allocatable ::  RSETC(:,:,:)                       !effect of canopy C status on seed set , []
-  real(r8),allocatable ::  RSETN(:,:,:)                       !effect of canopy N status on seed set , []
-  real(r8),allocatable ::  RSETP(:,:,:)                       !effect of canopy P status on seed set , []
+  real(r8),allocatable ::  RSETE(:,:,:,:)                     !effect of canopy element status on seed set , []
   real(r8),allocatable ::  WGLFT(:,:,:)                       !total leaf mass, [g d-2]
   real(r8),allocatable ::  CFOPC(:,:,:,:,:)                   !litter kinetic fraction, [-]
   real(r8),allocatable ::  CFOPN(:,:,:,:,:)                   !litterfall kinetic N fraction, [-]
@@ -286,9 +284,7 @@ module CanopyDataType
   allocate(DTKC(JP,JY,JX));     DTKC=0._r8
   allocate(TKCZ(JP,JY,JX));     TKCZ=0._r8
   allocate(CPOOL3(JNODS,JC,JP,JY,JX));CPOOL3=0._r8
-  allocate(RSETC(JP,JY,JX));    RSETC=0._r8
-  allocate(RSETN(JP,JY,JX));    RSETN=0._r8
-  allocate(RSETP(JP,JY,JX));    RSETP=0._r8
+  allocate(RSETE(npelms,JP,JY,JX));    RSETE=0._r8
   allocate(WGLFT(JC,JY,JX));    WGLFT=0._r8
   allocate(CFOPC(0:5,4,JP,JY,JX));CFOPC=0._r8
   allocate(CFOPN(0:5,4,JP,JY,JX));CFOPN=0._r8
@@ -472,9 +468,7 @@ module CanopyDataType
   call destroy(DTKC)
   call destroy(TKCZ)
   call destroy(CPOOL3)
-  call destroy(RSETC)
-  call destroy(RSETN)
-  call destroy(RSETP)
+  call destroy(RSETE)
   call destroy(WGLFT)
   call destroy(CFOPC)
   call destroy(CFOPN)

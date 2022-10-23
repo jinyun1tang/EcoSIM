@@ -41,17 +41,17 @@
               ,IDTHR(NZ,NY,NX),NBR(NZ,NY,NX),NBT(NZ,NY,NX),NB1(NZ,NY,NX) &
               ,IFLGI(NZ,NY,NX),NRT(NZ,NY,NX),NIX(NZ,NY,NX),MY(NZ,NY,NX) &
               ,(NINR(NR,NZ,NY,NX),NR=1,NRT(NZ,NY,NX))
-            WRITE(26,93)I,IDATA(3),NZ,TEUPTK(NZ,ielmc,NY,NX),TESNC(NZ,ielmc,NY,NX) &
-              ,TEUPTK(NZ,ielmn,NY,NX),TESNC(NZ,ielmn,NY,NX),TEUPTK(NZ,ielmp,NY,NX),TESNC(NZ,ielmp,NY,NX) &
+            WRITE(26,93)I,IDATA(3),NZ,TEUPTK(ielmc,NZ,NY,NX),TESNC(ielmc,NZ,NY,NX) &
+              ,TEUPTK(ielmn,NZ,NY,NX),TESNC(ielmn,NZ,NY,NX),TEUPTK(ielmp,NZ,NY,NX),TESNC(ielmp,NZ,NY,NX) &
               ,TZUPFX(NZ,NY,NX),TCO2T(NZ,NY,NX),CTRAN(NZ,NY,NX),CARBN(NZ,NY,NX) &
               ,TCC(NZ,NY,NX),TKC(NZ,NY,NX),TCG(NZ,NY,NX),TKG(NZ,NY,NX) &
               ,TFN3(NZ,NY,NX),WVSTK(NZ,NY,NX),VOLWP(NZ,NY,NX) &
               ,PSILT(NZ,NY,NX),PSILO(NZ,NY,NX),PSILG(NZ,NY,NX),WTRTA(NZ,NY,NX) &
-              ,ARLFP(NZ,NY,NX),ARSTP(NZ,NY,NX),PP(NZ,NY,NX),HVSTE(NZ,ielmc,NY,NX) &
-              ,HVSTE(NZ,ielmn,NY,NX),HVSTE(NZ,ielmp,NY,NX),THVSTE(NZ,ielmc,NY,NX),THVSTE(NZ,ielmn,NY,NX) &
-              ,THVSTE(NZ,ielmp,NY,NX),TCO2A(NZ,NY,NX),RSETC(NZ,NY,NX),RSETN(NZ,NY,NX) &
-              ,RSETP(NZ,NY,NX),TNH3C(NZ,NY,NX),TESN0(NZ,ielmc,NY,NX),PPI(NZ,NY,NX) &
-              ,PPX(NZ,NY,NX),WTSTGE(NZ,ielmc,NY,NX),WTSTGE(NZ,ielmn,NY,NX),WTSTGE(NZ,ielmp,NY,NX) &
+              ,ARLFP(NZ,NY,NX),ARSTP(NZ,NY,NX),PP(NZ,NY,NX),HVSTE(ielmc,NZ,NY,NX) &
+              ,HVSTE(ielmn,NZ,NY,NX),HVSTE(ielmp,NZ,NY,NX),THVSTE(ielmc,NZ,NY,NX),THVSTE(ielmn,NZ,NY,NX) &
+              ,THVSTE(ielmp,NZ,NY,NX),TCO2A(NZ,NY,NX),RSETE(ielmc,NZ,NY,NX),RSETE(ielmn,NZ,NY,NX) &
+              ,RSETE(ielmp,NZ,NY,NX),TNH3C(NZ,NY,NX),TESN0(ielmc,NZ,NY,NX),PPI(NZ,NY,NX) &
+              ,PPX(NZ,NY,NX),WTSTGE(ielmc,NZ,NY,NX),WTSTGE(ielmn,NZ,NY,NX),WTSTGE(ielmp,NZ,NY,NX) &
               ,ZC(NZ,NY,NX),VOLWC(NZ,NY,NX),CF(NZ,NY,NX),VCO2F(NZ,NY,NX) &
               ,VCH4F(NZ,NY,NX),VOXYF(NZ,NY,NX),VNH3F(NZ,NY,NX),VN2OF(NZ,NY,NX) &
               ,VPO4F(NZ,NY,NX)
@@ -85,14 +85,14 @@
             DO N=1,10
               WRITE(26,95)I,IDATA(3),NZ,(IDAY(N,NB,NZ,NY,NX),NB=1,NBR(NZ,NY,NX))
             ENDDO
-            WRITE(27,96)I,IDATA(3),NZ,EPOOLP(NZ,ielmc,NY,NX),EPOLNP(ielmc,NZ,NY,NX) &
-              ,VHCPC(NZ,NY,NX),DTKC(NZ,NY,NX),WTSHTE(NZ,ielmc,NY,NX) &
-              ,WTLS(NZ,NY,NX),WTRTE(NZ,ielmc,NY,NX),WTSHTE(NZ,ielmn,NY,NX),WTSHTE(NZ,ielmp,NY,NX) &
-              ,WTLFE(NZ,ielmc,NY,NX),WTSHEE(NZ,ielmc,NY,NX),WTSTKE(NZ,ielmc,NY,NX),WTRSVE(NZ,ielmc,NY,NX) &
-              ,WTHSKE(NZ,ielmc,NY,NX),WTEARE(NZ,ielmc,NY,NX),WTGRE(NZ,ielmc,NY,NX),WTNDE(NZ,ielmc,NY,NX) &
-              ,WTRVE(NZ,ielmc,NY,NX),WTRVE(NZ,ielmn,NY,NX),WTRVE(NZ,ielmp,NY,NX),HTCTL(NZ,NY,NX) &
+            WRITE(27,96)I,IDATA(3),NZ,EPOOLP(ielmc,NZ,NY,NX),EPOLNP(ielmc,NZ,NY,NX) &
+              ,VHCPC(NZ,NY,NX),DTKC(NZ,NY,NX),WTSHTE(ielmc,NZ,NY,NX) &
+              ,WTLS(NZ,NY,NX),WTRTE(ielmc,NZ,NY,NX),WTSHTE(ielmn,NZ,NY,NX),WTSHTE(ielmp,NZ,NY,NX) &
+              ,WTLFE(ielmc,NZ,NY,NX),WTSHEE(ielmc,NZ,NY,NX),WTSTKE(ielmc,NZ,NY,NX),WTRSVE(ielmc,NZ,NY,NX) &
+              ,WTHSKE(ielmc,NZ,NY,NX),WTEARE(ielmc,NZ,NY,NX),WTGRE(ielmc,NZ,NY,NX),WTNDE(ielmc,NZ,NY,NX) &
+              ,WTRVE(ielmc,NZ,NY,NX),WTRVE(ielmn,NZ,NY,NX),WTRVE(ielmp,NZ,NY,NX),HTCTL(NZ,NY,NX) &
               ,SDPTH(NZ,NY,NX),WSTR(NZ,NY,NX) &
-              ,CHILL(NZ,NY,NX),WTRTSE(NZ,ielmc,NY,NX),FRADP(NZ,NY,NX)
+              ,CHILL(NZ,NY,NX),WTRTSE(ielmc,NZ,NY,NX),FRADP(NZ,NY,NX)
             WRITE(27,92)I,IDATA(3),NZ,(EPOOL(NB,ielmc,NZ,NY,NX),NB=1,NBR(NZ,NY,NX))
             WRITE(27,92)I,IDATA(3),NZ,(EPOOL(NB,ielmn,NZ,NY,NX),NB=1,NBR(NZ,NY,NX))
             WRITE(27,92)I,IDATA(3),NZ,(EPOOL(NB,ielmp,NZ,NY,NX),NB=1,NBR(NZ,NY,NX))

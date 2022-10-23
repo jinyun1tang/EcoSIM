@@ -80,13 +80,13 @@ module StartqMod
 !     FILL OUT UNUSED ARRAYS
 !
       D9986: DO NZ=NP(NY,NX)+1,JP
-        TESN0(NZ,NY,NX,:)=0._r8
-        TESNC(NZ,NY,NX,:)=0._r8
-        WTSTGE(NZ,NY,NX,:)=0._r8
+        TESN0(1:npelms,NZ,NY,NX)=0._r8
+        TESNC(1:npelms,NZ,NY,NX)=0._r8
+        WTSTGE(1:npelms,NZ,NY,NX)=0._r8
         D6401: DO L=1,NL(NY,NX)
           DO  K=0,1
             DO  M=1,jsken
-              ESNC(M,K,L,NZ,NY,NX,:)=0._r8
+              ESNC(M,1:npelms,K,L,NZ,NY,NX)=0._r8
             enddo
           enddo
         ENDDO D6401
@@ -594,21 +594,21 @@ module StartqMod
     WGLFV(L,NZ,NY,NX)=0._r8
     ARSTV(L,NZ,NY,NX)=0._r8
   ENDDO D35
-  EPOOLP(NZ,NY,NX,:)=0._r8
-  CEPOLP(NZ,NY,NX,:)=0._r8
+  EPOOLP(1:npelms,NZ,NY,NX)=0._r8
+  CEPOLP(1:npelms,NZ,NY,NX)=0._r8
   CCPLNP(NZ,NY,NX)=0._r8
-  WTSHTE(NZ,NY,NX,:)=0._r8
-  WTLFE(NZ,NY,NX,:)=0._r8
-  WTSHEE(NZ,NY,NX,:)=0._r8
-  WTSTKE(NZ,NY,NX,:)=0._r8
+  WTSHTE(1:npelms,NZ,NY,NX)=0._r8
+  WTLFE(1:npelms,NZ,NY,NX)=0._r8
+  WTSHEE(1:npelms,NZ,NY,NX)=0._r8
+  WTSTKE(1:npelms,NZ,NY,NX)=0._r8
   WVSTK(NZ,NY,NX)=0._r8
-  WTRSVE(NZ,NY,NX,:)=0._r8
-  WTHSKE(NZ,NY,NX,:)=0._r8
-  WTEARE(NZ,NY,NX,:)=0._r8
-  WTGRE(NZ,NY,NX,:)=0._r8
-  WTRTE(NZ,NY,NX,:)=0._r8
-  WTRTSE(NZ,NY,NX,:)=0._r8
-  WTNDE(NZ,NY,NX,:)=0._r8
+  WTRSVE(1:npelms,NZ,NY,NX)=0._r8
+  WTHSKE(1:npelms,NZ,NY,NX)=0._r8
+  WTEARE(1:npelms,NZ,NY,NX)=0._r8
+  WTGRE(1:npelms,NZ,NY,NX)=0._r8
+  WTRTE(1:npelms,NZ,NY,NX)=0._r8
+  WTRTSE(1:npelms,NZ,NY,NX)=0._r8
+  WTNDE(1:npelms,NZ,NY,NX)=0._r8
   WTLS(NZ,NY,NX)=0._r8
 
   ARLFP(NZ,NY,NX)=0._r8
@@ -628,11 +628,11 @@ module StartqMod
 !
   IF(.not.is_restart_run.AND.is_first_year)THEN
     CARBN(NZ,NY,NX)=0._r8
-    TESN0(NZ,NY,NX,:)=0._r8
+    TESN0(1:npelms,NZ,NY,NX)=0._r8
     TCO2T(NZ,NY,NX)=0._r8
     TCO2A(NZ,NY,NX)=0._r8
-    TEUPTK(NZ,NY,NX,:)=0._r8
-    TESNC(NZ,NY,NX,:)=0._r8
+    TEUPTK(1:npelms,NZ,NY,NX)=0._r8
+    TESNC(1:npelms,NZ,NY,NX)=0._r8
     TZUPFX(NZ,NY,NX)=0._r8
     RNH3C(NZ,NY,NX)=0._r8
     TNH3C(NZ,NY,NX)=0._r8
@@ -642,21 +642,19 @@ module StartqMod
     VNH3F(NZ,NY,NX)=0._r8
     VN2OF(NZ,NY,NX)=0._r8
     VPO4F(NZ,NY,NX)=0._r8
-    THVSTE(NZ,NY,NX,:)=0._r8
-    HVSTE(NZ,NY,NX,:)=0._r8
-    RSETC(NZ,NY,NX)=0._r8
-    RSETN(NZ,NY,NX)=0._r8
-    RSETP(NZ,NY,NX)=0._r8
+    THVSTE(1:npelms,NZ,NY,NX)=0._r8
+    HVSTE(1:npelms,NZ,NY,NX)=0._r8
+    RSETE(1:npelms,NZ,NY,NX)=0._r8
     CTRAN(NZ,NY,NX)=0._r8
-    WTSTGE(NZ,NY,NX,:)=0._r8
+    WTSTGE(1:npelms,NZ,NY,NX)=0._r8
     WTSTDX=WTSTDI(NZ,NY,NX)*AREA(3,NU(NY,NX),NY,NX)
     D155: DO M=1,jsken
       WTSTDE(M,ielmc,NZ,NY,NX)=WTSTDX*CFOPC(5,M,NZ,NY,NX)
       WTSTDE(M,ielmn,NZ,NY,NX)=WTSTDX*CNSTK(NZ,NY,NX)*CFOPN(5,M,NZ,NY,NX)
       WTSTDE(M,ielmp,NZ,NY,NX)=WTSTDX*CPSTK(NZ,NY,NX)*CFOPP(5,M,NZ,NY,NX)
-      WTSTGE(NZ,ielmc,NY,NX)=WTSTGE(NZ,ielmc,NY,NX)+WTSTDE(M,ielmc,NZ,NY,NX)
-      WTSTGE(NZ,ielmn,NY,NX)=WTSTGE(NZ,ielmn,NY,NX)+WTSTDE(M,ielmn,NZ,NY,NX)
-      WTSTGE(NZ,ielmp,NY,NX)=WTSTGE(NZ,ielmp,NY,NX)+WTSTDE(M,ielmp,NZ,NY,NX)
+      WTSTGE(ielmc,NZ,NY,NX)=WTSTGE(ielmc,NZ,NY,NX)+WTSTDE(M,ielmc,NZ,NY,NX)
+      WTSTGE(ielmn,NZ,NY,NX)=WTSTGE(ielmn,NZ,NY,NX)+WTSTDE(M,ielmn,NZ,NY,NX)
+      WTSTGE(ielmp,NZ,NY,NX)=WTSTGE(ielmp,NZ,NY,NX)+WTSTDE(M,ielmp,NZ,NY,NX)
     ENDDO D155
   ENDIF
   end subroutine InitMassBalance
@@ -674,7 +672,7 @@ module StartqMod
 !     TCG,TKG=canopy temperature for phenology (oC,K)
 !     PSILT,PSILO,PSILG=canopy total,osmotic,turgor water potl(MPa)
 !
-  VHCPC(NZ,NY,NX)=cpw*WTSHTE(NZ,ielmc,NY,NX)*10.0E-06
+  VHCPC(NZ,NY,NX)=cpw*WTSHTE(ielmc,NZ,NY,NX)*10.0E-06
   ENGYX(NZ,NY,NX)=0._r8
   DTKC(NZ,NY,NX)=0._r8
   TCC(NZ,NY,NX)=ATCA(NY,NX)
@@ -834,9 +832,9 @@ module StartqMod
 !     CPOOLR,ZPOOLR,PPOOLR=C,N,P in root,myco nonstructural pools (g)
 !
   WTRVX(NZ,NY,NX)=GRDM(NZ,NY,NX)*PP(NZ,NY,NX)
-  WTRVE(NZ,ielmc,NY,NX)=WTRVX(NZ,NY,NX)
-  WTRVE(NZ,ielmn,NY,NX)=CNGR(NZ,NY,NX)*WTRVE(NZ,ielmc,NY,NX)
-  WTRVE(NZ,ielmp,NY,NX)=CPGR(NZ,NY,NX)*WTRVE(NZ,ielmc,NY,NX)
+  WTRVE(ielmc,NZ,NY,NX)=WTRVX(NZ,NY,NX)
+  WTRVE(ielmn,NZ,NY,NX)=CNGR(NZ,NY,NX)*WTRVE(ielmc,NZ,NY,NX)
+  WTRVE(ielmp,NZ,NY,NX)=CPGR(NZ,NY,NX)*WTRVE(ielmc,NZ,NY,NX)
   WTLFBN(1,NZ,NY,NX)=CNGR(NZ,NY,NX)*WTLFB(1,NZ,NY,NX)
   WTLFBP(1,NZ,NY,NX)=CPGR(NZ,NY,NX)*WTLFB(1,NZ,NY,NX)
   WTLSB(1,NZ,NY,NX)=WTLFB(1,NZ,NY,NX)+WTSHEB(1,NZ,NY,NX)

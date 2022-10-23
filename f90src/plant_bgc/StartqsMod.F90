@@ -799,9 +799,7 @@ module StartqsMod
     TZUPFX => plt_bgcr%TZUPFX    , &
     TESNC  => plt_bgcr%TESNC     , &
     ARSTP  => plt_morph%ARSTP    , &
-    RSETC  => plt_pheno%RSETC    , &
-    RSETN  => plt_pheno%RSETN    , &
-    RSETP  => plt_pheno%RSETP      &
+    RSETE  => plt_pheno%RSETE      &
 
   )
 !
@@ -826,9 +824,7 @@ module StartqsMod
     plt_distb%VPO4F(NZ)=0._r8
     plt_distb%THVSTE(1:npelms,NZ)=0._r8
     plt_distb%HVSTE(1:npelms,NZ)=0._r8
-    RSETC(NZ)=0._r8
-    RSETN(NZ)=0._r8
-    RSETP(NZ)=0._r8
+    RSETE(1:npelms,NZ)=0._r8
     CTRAN(NZ)=0._r8
     WTSTGE(1:npelms,NZ)=0._r8
     WTSTDX=WTSTDI(NZ)*AREA3(NU)

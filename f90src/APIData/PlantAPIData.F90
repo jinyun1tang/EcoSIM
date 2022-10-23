@@ -314,9 +314,7 @@ implicit none
   real(r8), pointer :: SSTX(:)    => null()     !sensitivity to HTC (seeds oC-1 above HTC)
   integer,  pointer :: IDTH(:)    => null()     !flag for species death
   integer,  pointer :: IFLGC(:)   => null()     !flag for living pft
-  real(r8), pointer :: RSETC(:)   => null()     !effect of canopy C status on seed set , []
-  real(r8), pointer :: RSETN(:)   => null()     !effect of canopy N status on seed set , []
-  real(r8), pointer :: RSETP(:)   => null()     !effect of canopy P status on seed set , []
+  real(r8), pointer :: RSETE(:,:) => null()     !effect of canopy element status on seed set , []
   real(r8), pointer :: XRNI(:)    => null()     !rate of node initiation, [h-1 at 25 oC]
   real(r8), pointer :: XRLA(:)    => null()     !rate of leaf initiation, [h-1 at 25 oC]
   real(r8), pointer :: XDL(:)     => null()     !critical daylength for phenological progress, [h]
@@ -2348,9 +2346,7 @@ implicit none
   allocate(this%ZTYP(JP1))
   allocate(this%IFLGC(JP1))
   allocate(this%IDTH(JP1))
-  allocate(this%RSETC(JP1))
-  allocate(this%RSETN(JP1))
-  allocate(this%RSETP(JP1))
+  allocate(this%RSETE(npelms,JP1))
   allocate(this%GROUP(JC1,JP1))
   allocate(this%IDTHP(JP1))
   allocate(this%ATRP(JC1,JP1))
@@ -2429,9 +2425,7 @@ implicit none
 !  if(allocated(ZTYP))deallocate(ZTYP)
 !  if(allocated(IFLGC))deallocate(IFLGC)
 !  if(allocated(IDTH))deallocate(IDTH)
-!  if(allocated(RSETC))deallocate(RSETC)
-!  if(allocated(RSETN))deallocate(RSETN)
-!  if(allocated(RSETP))deallocate(RSETP)
+!  if(allocated(RSETE))deallocate(RSETE)
 !  if(allocated(GROUP))deallocate(GROUP)
 !  if(allocated(IDTHP))deallocate(IDTHP)
 !  if(allocated(ATRP))deallocate(ATRP)

@@ -1044,26 +1044,26 @@ module Hist1Mod
                   DO K=51,100
                     IF(CHOICE(K,N-20).EQ.'YES')THEN
                       M=M+1
-                      IF(K.EQ.51)HEAD(M)=WTSHTE(NZ,ielmc,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-                      IF(K.EQ.52)HEAD(M)=WTLFE(NZ,ielmc,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-                      IF(K.EQ.53)HEAD(M)=WTSHEE(NZ,ielmc,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-                      IF(K.EQ.54)HEAD(M)=WTSTKE(NZ,ielmc,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-                      IF(K.EQ.55)HEAD(M)=WTRSVE(NZ,ielmc,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-                      IF(K.EQ.56)HEAD(M)=(WTHSKE(NZ,ielmc,NY,NX)+WTEARE(NZ,ielmc,NY,NX))/AREA(3,NU(NY,NX),NY,NX)
-                      IF(K.EQ.57)HEAD(M)=WTGRE(NZ,ielmc,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-                      IF(K.EQ.58)HEAD(M)=WTRTE(NZ,ielmc,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-                      IF(K.EQ.59)HEAD(M)=WTNDE(NZ,ielmc,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-                      IF(K.EQ.60)HEAD(M)=WTRVE(NZ,ielmc,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+                      IF(K.EQ.51)HEAD(M)=WTSHTE(ielmc,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+                      IF(K.EQ.52)HEAD(M)=WTLFE(ielmc,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+                      IF(K.EQ.53)HEAD(M)=WTSHEE(ielmc,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+                      IF(K.EQ.54)HEAD(M)=WTSTKE(ielmc,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+                      IF(K.EQ.55)HEAD(M)=WTRSVE(ielmc,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+                      IF(K.EQ.56)HEAD(M)=(WTHSKE(ielmc,NZ,NY,NX)+WTEARE(ielmc,NZ,NY,NX))/AREA(3,NU(NY,NX),NY,NX)
+                      IF(K.EQ.57)HEAD(M)=WTGRE(ielmc,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+                      IF(K.EQ.58)HEAD(M)=WTRTE(ielmc,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+                      IF(K.EQ.59)HEAD(M)=WTNDE(ielmc,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+                      IF(K.EQ.60)HEAD(M)=WTRVE(ielmc,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
                       IF(K.EQ.61)HEAD(M)=GRNO(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
                       IF(K.EQ.62)HEAD(M)=ARLFP(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
                       IF(K.EQ.63)HEAD(M)=CARBN(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-                      IF(K.EQ.64)HEAD(M)=TEUPTK(NZ,ielmc,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-                      IF(K.EQ.65)HEAD(M)=TESNC(NZ,ielmc,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-                      IF(K.EQ.66)HEAD(M)=TESN0(NZ,ielmc,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+                      IF(K.EQ.64)HEAD(M)=TEUPTK(ielmc,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+                      IF(K.EQ.65)HEAD(M)=TESNC(ielmc,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+                      IF(K.EQ.66)HEAD(M)=TESN0(ielmc,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
                       IF(K.EQ.67)HEAD(M)=TCO2T(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
                       IF(K.EQ.68)HEAD(M)=TCO2A(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-                      IF(K.EQ.69)HEAD(M)=CEPOLP(NZ,ielmc,NY,NX)
-                      IF(K.EQ.70)HEAD(M)=HVSTE(NZ,ielmc,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+                      IF(K.EQ.69)HEAD(M)=CEPOLP(ielmc,NZ,NY,NX)
+                      IF(K.EQ.70)HEAD(M)=HVSTE(ielmc,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
                       IF(K.EQ.71)HEAD(M)=RTDNP(1,1,NZ,NY,NX)*PP(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
                       IF(K.EQ.72)HEAD(M)=RTDNP(1,2,NZ,NY,NX)*PP(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
                       IF(K.EQ.73)HEAD(M)=RTDNP(1,3,NZ,NY,NX)*PP(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
@@ -1079,8 +1079,8 @@ module Hist1Mod
                       IF(K.EQ.83)HEAD(M)=RTDNP(1,13,NZ,NY,NX)*PP(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
                       IF(K.EQ.84)HEAD(M)=RTDNP(1,14,NZ,NY,NX)*PP(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
                       IF(K.EQ.85)HEAD(M)=RTDNP(1,15,NZ,NY,NX)*PP(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-                      IF(K.EQ.86)HEAD(M)=BALE(NZ,ielmc,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-                      IF(K.EQ.87)HEAD(M)=WTSTGE(NZ,ielmc,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+                      IF(K.EQ.86)HEAD(M)=BALE(ielmc,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+                      IF(K.EQ.87)HEAD(M)=WTSTGE(ielmc,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
                       IF(K.EQ.88)HEAD(M)=VCO2F(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
                       IF(K.EQ.89)HEAD(M)=VCH4F(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
                       IF(K.EQ.90)HEAD(M)=ZNPP(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
@@ -1115,41 +1115,41 @@ module Hist1Mod
                   DO K=51,100
                     IF(CHOICE(K,N-20).EQ.'YES')THEN
                       M=M+1
-                      IF(K.EQ.51)HEAD(M)=WTSHTE(NZ,ielmn,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-                      IF(K.EQ.52)HEAD(M)=WTLFE(NZ,ielmn,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-                      IF(K.EQ.53)HEAD(M)=WTSHEE(NZ,ielmn,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-                      IF(K.EQ.54)HEAD(M)=WTSTKE(NZ,ielmn,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-                      IF(K.EQ.55)HEAD(M)=WTRSVE(NZ,ielmn,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-                      IF(K.EQ.56)HEAD(M)=(WTHSKE(NZ,ielmn,NY,NX)+WTEARE(NZ,ielmn,NY,NX))/AREA(3,NU(NY,NX),NY,NX)
-                      IF(K.EQ.57)HEAD(M)=WTGRE(NZ,ielmn,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-                      IF(K.EQ.58)HEAD(M)=WTRTE(NZ,ielmn,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-                      IF(K.EQ.59)HEAD(M)=WTNDE(NZ,ielmn,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-                      IF(K.EQ.60)HEAD(M)=WTRVE(NZ,ielmn,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-                      IF(K.EQ.61)HEAD(M)=TEUPTK(NZ,ielmn,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-                      IF(K.EQ.62)HEAD(M)=TESNC(NZ,ielmn,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+                      IF(K.EQ.51)HEAD(M)=WTSHTE(ielmn,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+                      IF(K.EQ.52)HEAD(M)=WTLFE(ielmn,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+                      IF(K.EQ.53)HEAD(M)=WTSHEE(ielmn,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+                      IF(K.EQ.54)HEAD(M)=WTSTKE(ielmn,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+                      IF(K.EQ.55)HEAD(M)=WTRSVE(ielmn,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+                      IF(K.EQ.56)HEAD(M)=(WTHSKE(ielmn,NZ,NY,NX)+WTEARE(ielmn,NZ,NY,NX))/AREA(3,NU(NY,NX),NY,NX)
+                      IF(K.EQ.57)HEAD(M)=WTGRE(ielmn,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+                      IF(K.EQ.58)HEAD(M)=WTRTE(ielmn,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+                      IF(K.EQ.59)HEAD(M)=WTNDE(ielmn,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+                      IF(K.EQ.60)HEAD(M)=WTRVE(ielmn,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+                      IF(K.EQ.61)HEAD(M)=TEUPTK(ielmn,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+                      IF(K.EQ.62)HEAD(M)=TESNC(ielmn,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
                       IF(K.EQ.63)HEAD(M)=TZUPFX(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-                      IF(K.EQ.64)HEAD(M)=CEPOLP(NZ,ielmn,NY,NX)
+                      IF(K.EQ.64)HEAD(M)=CEPOLP(ielmn,NZ,NY,NX)
                       IF(K.EQ.65)THEN
-                        IF(WTLFE(NZ,ielmc,NY,NX).GT.ZEROP(NZ,NY,NX))THEN
-                          HEAD(M)=(WTLFE(NZ,ielmn,NY,NX)+EPOOLP(NZ,ielmn,NY,NX))/(WTLFE(NZ,ielmc,NY,NX)+EPOOLP(NZ,ielmc,NY,NX))
+                        IF(WTLFE(ielmc,NZ,NY,NX).GT.ZEROP(NZ,NY,NX))THEN
+                          HEAD(M)=(WTLFE(ielmn,NZ,NY,NX)+EPOOLP(ielmn,NZ,NY,NX))/(WTLFE(ielmc,NZ,NY,NX)+EPOOLP(ielmc,NZ,NY,NX))
                         ELSE
                           HEAD(M)=0.0
                         ENDIF
                       ENDIF
-                      IF(K.EQ.66)HEAD(M)=CEPOLP(NZ,ielmp,NY,NX)
+                      IF(K.EQ.66)HEAD(M)=CEPOLP(ielmp,NZ,NY,NX)
                       IF(K.EQ.67)THEN
-                        IF(WTLFE(NZ,ielmc,NY,NX).GT.ZEROP(NZ,NY,NX))THEN
-                          HEAD(M)=(WTLFE(NZ,ielmn,NY,NX)+EPOOLP(NZ,ielmp,NY,NX))/(WTLFE(NZ,ielmc,NY,NX)+EPOOLP(NZ,ielmc,NY,NX))
+                        IF(WTLFE(ielmc,NZ,NY,NX).GT.ZEROP(NZ,NY,NX))THEN
+                          HEAD(M)=(WTLFE(ielmn,NZ,NY,NX)+EPOOLP(ielmp,NZ,NY,NX))/(WTLFE(ielmc,NZ,NY,NX)+EPOOLP(ielmc,NZ,NY,NX))
                         ELSE
                           HEAD(M)=0.0
                         ENDIF
                       ENDIF
                       IF(K.EQ.68)HEAD(M)=TNH3C(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-                      IF(K.EQ.69)HEAD(M)=HVSTE(NZ,ielmn,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-                      IF(K.EQ.70)HEAD(M)=BALE(NZ,ielmn,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-                      IF(K.EQ.71)HEAD(M)=WTSTGE(NZ,ielmn,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+                      IF(K.EQ.69)HEAD(M)=HVSTE(ielmn,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+                      IF(K.EQ.70)HEAD(M)=BALE(ielmn,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+                      IF(K.EQ.71)HEAD(M)=WTSTGE(ielmn,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
                       IF(K.EQ.72)HEAD(M)=VNH3F(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-                      IF(K.EQ.73)HEAD(M)=TESN0(NZ,ielmn,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+                      IF(K.EQ.73)HEAD(M)=TESN0(ielmn,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
                     ENDIF
                   ENDDO
                   WRITE(LUN,'(A16,F8.3,4X,A8,50E16.7E3)')OUTFILP(N-20,NZ,NY,NX),DOY,CDATE,(HEAD(K),K=1,M)
@@ -1163,31 +1163,31 @@ module Hist1Mod
                   DO K=51,100
                     IF(CHOICE(K,N-20).EQ.'YES')THEN
                       M=M+1
-                      IF(K.EQ.51)HEAD(M)=WTSHTE(NZ,ielmp,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-                      IF(K.EQ.52)HEAD(M)=WTLFE(NZ,ielmp,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-                      IF(K.EQ.53)HEAD(M)=WTSHEE(NZ,ielmp,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-                      IF(K.EQ.54)HEAD(M)=WTSTKE(NZ,ielmp,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-                      IF(K.EQ.55)HEAD(M)=WTRSVE(NZ,ielmp,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-                      IF(K.EQ.56)HEAD(M)=(WTHSKE(NZ,ielmp,NY,NX)+WTEARE(NZ,ielmp,NY,NX))/AREA(3,NU(NY,NX),NY,NX)
-                      IF(K.EQ.57)HEAD(M)=WTGRE(NZ,ielmp,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-                      IF(K.EQ.58)HEAD(M)=WTRTE(NZ,ielmp,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-                      IF(K.EQ.59)HEAD(M)=WTNDE(NZ,ielmp,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-                      IF(K.EQ.60)HEAD(M)=WTRVE(NZ,ielmp,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-                      IF(K.EQ.61)HEAD(M)=TEUPTK(NZ,ielmp,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-                      IF(K.EQ.62)HEAD(M)=TESNC(NZ,ielmp,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-                      IF(K.EQ.63)HEAD(M)=CEPOLP(NZ,ielmp,NY,NX)
+                      IF(K.EQ.51)HEAD(M)=WTSHTE(ielmp,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+                      IF(K.EQ.52)HEAD(M)=WTLFE(ielmp,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+                      IF(K.EQ.53)HEAD(M)=WTSHEE(ielmp,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+                      IF(K.EQ.54)HEAD(M)=WTSTKE(ielmp,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+                      IF(K.EQ.55)HEAD(M)=WTRSVE(ielmp,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+                      IF(K.EQ.56)HEAD(M)=(WTHSKE(ielmp,NZ,NY,NX)+WTEARE(ielmp,NZ,NY,NX))/AREA(3,NU(NY,NX),NY,NX)
+                      IF(K.EQ.57)HEAD(M)=WTGRE(ielmp,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+                      IF(K.EQ.58)HEAD(M)=WTRTE(ielmp,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+                      IF(K.EQ.59)HEAD(M)=WTNDE(ielmp,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+                      IF(K.EQ.60)HEAD(M)=WTRVE(ielmp,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+                      IF(K.EQ.61)HEAD(M)=TEUPTK(ielmp,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+                      IF(K.EQ.62)HEAD(M)=TESNC(ielmp,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+                      IF(K.EQ.63)HEAD(M)=CEPOLP(ielmp,NZ,NY,NX)
                       IF(K.EQ.64)THEN
-                        IF(WTLFE(NZ,ielmc,NY,NX).GT.ZEROP(NZ,NY,NX))THEN
-                          HEAD(M)=(WTLFE(NZ,ielmp,NY,NX)+EPOOLP(NZ,ielmp,NY,NX))/(WTLFE(NZ,ielmc,NY,NX)+EPOOLP(NZ,ielmc,NY,NX))
+                        IF(WTLFE(ielmc,NZ,NY,NX).GT.ZEROP(NZ,NY,NX))THEN
+                          HEAD(M)=(WTLFE(ielmp,NZ,NY,NX)+EPOOLP(ielmp,NZ,NY,NX))/(WTLFE(ielmc,NZ,NY,NX)+EPOOLP(ielmc,NZ,NY,NX))
                         ELSE
                           HEAD(M)=0.0
                         ENDIF
                       ENDIF
-                      IF(K.EQ.65)HEAD(M)=HVSTE(NZ,ielmp,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-                      IF(K.EQ.66)HEAD(M)=BALE(NZ,ielmp,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-                      IF(K.EQ.67)HEAD(M)=WTSTGE(NZ,ielmp,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+                      IF(K.EQ.65)HEAD(M)=HVSTE(ielmp,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+                      IF(K.EQ.66)HEAD(M)=BALE(ielmp,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+                      IF(K.EQ.67)HEAD(M)=WTSTGE(ielmp,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
                       IF(K.EQ.68)HEAD(M)=VPO4F(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-                      IF(K.EQ.69)HEAD(M)=TESN0(NZ,ielmp,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+                      IF(K.EQ.69)HEAD(M)=TESN0(ielmp,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
                     ENDIF
                   ENDDO
                   WRITE(LUN,'(A16,F8.3,4X,A8,50E16.7E3)')OUTFILP(N-20,NZ,NY,NX),DOY,CDATE,(HEAD(K),K=1,M)
@@ -1230,15 +1230,15 @@ module Hist1Mod
                       IF(K.EQ.53)HEAD(M)=VSTG(NB1(NZ,NY,NX),NZ,NY,NX)
                       IF(K.EQ.54)HEAD(M)=FDBK(NB1(NZ,NY,NX),NZ,NY,NX)
                       IF(K.EQ.55)THEN
-                        IF(WTLFE(NZ,ielmc,NY,NX).GT.ZEROP(NZ,NY,NX))THEN
-                          HEAD(M)=(WTLFE(NZ,ielmn,NY,NX)+EPOOLP(NZ,ielmn,NY,NX))/(WTLFE(NZ,ielmc,NY,NX)+EPOOLP(NZ,ielmc,NY,NX))
+                        IF(WTLFE(ielmc,NZ,NY,NX).GT.ZEROP(NZ,NY,NX))THEN
+                          HEAD(M)=(WTLFE(ielmn,NZ,NY,NX)+EPOOLP(ielmn,NZ,NY,NX))/(WTLFE(ielmc,NZ,NY,NX)+EPOOLP(ielmc,NZ,NY,NX))
                         ELSE
                           HEAD(M)=0.0_r8
                         ENDIF
                       ENDIF
                       IF(K.EQ.56)THEN
-                        IF(WTLFE(NZ,ielmc,NY,NX).GT.ZEROP(NZ,NY,NX))THEN
-                          HEAD(M)=(WTLFE(NZ,ielmp,NY,NX)+EPOOLP(NZ,ielmp,NY,NX))/(WTLFE(NZ,ielmc,NY,NX)+EPOOLP(NZ,ielmc,NY,NX))
+                        IF(WTLFE(ielmc,NZ,NY,NX).GT.ZEROP(NZ,NY,NX))THEN
+                          HEAD(M)=(WTLFE(ielmp,NZ,NY,NX)+EPOOLP(ielmp,NZ,NY,NX))/(WTLFE(ielmc,NZ,NY,NX)+EPOOLP(ielmc,NZ,NY,NX))
                         ELSE
                           HEAD(M)=0.0_r8
                         ENDIF
@@ -1305,7 +1305,7 @@ module Hist1Mod
                       IF(K.EQ.51)HEAD(M)=CNET(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)*23.148
                       IF(K.EQ.52)HEAD(M)=CARBN(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
                       IF(K.EQ.53)HEAD(M)=TCO2A(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-                      IF(K.EQ.54)HEAD(M)=CEPOLP(NZ,ielmc,NY,NX)
+                      IF(K.EQ.54)HEAD(M)=CEPOLP(ielmc,NZ,NY,NX)
                       IF(K.EQ.55)HEAD(M)=RC(NZ,NY,NX)*1.56*3600.0
                       IF(K.EQ.56)HEAD(M)=RA(NZ,NY,NX)*1.34*3600.0
                       IF(K.EQ.57)HEAD(M)=CO2Q(NZ,NY,NX)
@@ -1360,7 +1360,7 @@ module Hist1Mod
                       IF(K.EQ.51)HEAD(M)=UPNH4(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
                       IF(K.EQ.52)HEAD(M)=UPNO3(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
                       IF(K.EQ.53)HEAD(M)=UPNF(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-                      IF(K.EQ.54)HEAD(M)=CEPOLP(NZ,ielmn,NY,NX)
+                      IF(K.EQ.54)HEAD(M)=CEPOLP(ielmn,NZ,NY,NX)
                       IF(K.EQ.55)HEAD(M)=RNH3C(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
                       IF(K.EQ.56)HEAD(M)=(RUPNH4(1,1,NZ,NY,NX)+RUPNH4(2,1,NZ,NY,NX) &
                         +RUPNHB(1,1,NZ,NY,NX)+RUPNHB(2,1,NZ,NY,NX))/AREA(3,1,NY,NX)
@@ -1437,7 +1437,7 @@ module Hist1Mod
                     IF(CHOICE(K,N-20).EQ.'YES')THEN
                       M=M+1
                       IF(K.EQ.51)HEAD(M)=UPH2P(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-                      IF(K.EQ.52)HEAD(M)=CEPOLP(NZ,ielmp,NY,NX)
+                      IF(K.EQ.52)HEAD(M)=CEPOLP(ielmp,NZ,NY,NX)
                       IF(K.EQ.53)HEAD(M)=(RUPH2P(1,1,NZ,NY,NX)+RUPH2P(2,1,NZ,NY,NX) &
                         +RUPH2B(1,1,NZ,NY,NX)+RUPH2B(2,1,NZ,NY,NX))/AREA(3,1,NY,NX)
                       IF(K.EQ.54)HEAD(M)=(RUPH2P(1,2,NZ,NY,NX)+RUPH2P(2,2,NZ,NY,NX) &

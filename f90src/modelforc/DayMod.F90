@@ -162,12 +162,12 @@
         TRINH4(NY,NX)=0._r8
         TRIPO4(NY,NX)=0._r8
         D960: DO NZ=1,NP0(NY,NX)
-          RSETC(NZ,NY,NX)=RSETC(NZ,NY,NX)+CARBN(NZ,NY,NX)+TEUPTK(NZ,ielmc,NY,NX) &
-            -TESNC(NZ,ielmc,NY,NX)+TCO2T(NZ,NY,NX)-VCO2F(NZ,NY,NX)-VCH4F(NZ,NY,NX)
-          RSETN(NZ,NY,NX)=RSETN(NZ,NY,NX)+TEUPTK(NZ,ielmn,NY,NX)+TNH3C(NZ,NY,NX) &
-            -TESNC(NZ,ielmn,NY,NX)-VNH3F(NZ,NY,NX)-VN2OF(NZ,NY,NX)+TZUPFX(NZ,NY,NX)
-          RSETP(NZ,NY,NX)=RSETP(NZ,NY,NX)+TEUPTK(NZ,ielmp,NY,NX) &
-            -TESNC(NZ,ielmp,NY,NX)-VPO4F(NZ,NY,NX)
+          RSETE(ielmc,NZ,NY,NX)=RSETE(ielmc,NZ,NY,NX)+CARBN(NZ,NY,NX)+TEUPTK(ielmc,NZ,NY,NX) &
+            -TESNC(ielmc,NZ,NY,NX)+TCO2T(NZ,NY,NX)-VCO2F(NZ,NY,NX)-VCH4F(NZ,NY,NX)
+          RSETE(ielmn,NZ,NY,NX)=RSETE(ielmn,NZ,NY,NX)+TEUPTK(ielmn,NZ,NY,NX)+TNH3C(NZ,NY,NX) &
+            -TESNC(ielmn,NZ,NY,NX)-VNH3F(NZ,NY,NX)-VN2OF(NZ,NY,NX)+TZUPFX(NZ,NY,NX)
+          RSETE(ielmp,NZ,NY,NX)=RSETE(ielmp,NZ,NY,NX)+TEUPTK(ielmp,NZ,NY,NX) &
+            -TESNC(ielmp,NZ,NY,NX)-VPO4F(NZ,NY,NX)
           CARBN(NZ,NY,NX)=0._r8
           TEUPTK(NZ,NY,NX,:)=0._r8
           TCO2T(NZ,NY,NX)=0._r8
@@ -181,9 +181,9 @@
           VNH3F(NZ,NY,NX)=0._r8
           VN2OF(NZ,NY,NX)=0._r8
           VPO4F(NZ,NY,NX)=0._r8
-          THVSTE(NZ,ielmc,NY,NX)=THVSTE(NZ,ielmc,NY,NX)+HVSTE(NZ,ielmc,NY,NX)
-          THVSTE(NZ,ielmn,NY,NX)=THVSTE(NZ,ielmn,NY,NX)+HVSTE(NZ,ielmn,NY,NX)
-          THVSTE(NZ,ielmp,NY,NX)=THVSTE(NZ,ielmp,NY,NX)+HVSTE(NZ,ielmp,NY,NX)
+          THVSTE(ielmc,NZ,NY,NX)=THVSTE(ielmc,NZ,NY,NX)+HVSTE(ielmc,NZ,NY,NX)
+          THVSTE(ielmn,NZ,NY,NX)=THVSTE(ielmn,NZ,NY,NX)+HVSTE(ielmn,NZ,NY,NX)
+          THVSTE(ielmp,NZ,NY,NX)=THVSTE(ielmp,NZ,NY,NX)+HVSTE(ielmp,NZ,NY,NX)
           HVSTE(NZ,NY,NX,:)=0._r8
           TESN0(NZ,NY,NX,:)=0._r8
           TESNC(NZ,NY,NX,:)=0._r8

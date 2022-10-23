@@ -65,7 +65,7 @@ module PlantDisturbMod
           IF(NN.GT.0)THEN
             WTSHTA(NZ,NY,NX)=WTSHTZ/NN
           ELSE
-            WTSHTA(NZ,NY,NX)=WTSHTE(NZ,ielmc,NY,NX)
+            WTSHTA(NZ,NY,NX)=WTSHTE(ielmc,NZ,NY,NX)
           ENDIF
         ENDIF
       ENDDO D2985

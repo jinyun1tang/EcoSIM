@@ -193,9 +193,9 @@ module VisualMod
 !     IF(I.EQ.1)THEN
 !     TCSNY=0.0
 !     ENDIF
-!     DTCSN=TESN0(NZ,ielmc,NY,NX)-TCSNY
+!     DTCSN=TESN0(ielmc,NZ,NY,NX)-TCSNY
 !     TCSNX=TCSNX+DTCSN
-!     TCSNY=TESN0(NZ,ielmc,NY,NX)
+!     TCSNY=TESN0(ielmc,NZ,NY,NX)
 !     IF(I.EQ.IDAY0(NZ,NY,NX).OR.I.EQ.IDAYH(NZ,NY,NX))THEN
 !     ICHKA=0
 !     ICHKM=0
