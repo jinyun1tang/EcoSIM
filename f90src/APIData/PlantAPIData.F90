@@ -527,10 +527,9 @@ implicit none
   real(r8), pointer :: RTWT1N(:,:,:)  => null()    !root N primary axes, [g d-2]
   real(r8), pointer :: RTWT1P(:,:,:)  => null()    !root P primary axes, [g d-2]
   real(r8), pointer :: WTSTDE(:,:,:)  => null()    !standing dead element fraction, [g d-2]
-  real(r8), pointer :: PPOLNP(:)      => null()    !canopy nonstructural P concentration, [gP gC-1]
   real(r8), pointer :: CEPOLP(:,:)    => null()    !canopy nonstructural element concentration, [g d-2]
   real(r8), pointer :: EPOOLP(:,:)    => null()    !canopy nonstructural element concentration, [g d-2]
-  real(r8), pointer :: CPOLNP(:)      => null()    !canopy nodule nonstructural P, [gP d-2]
+  real(r8), pointer :: EPOLNP(:,:)    => null()    !canopy nodule nonstructural element, [g d-2]
   real(r8), pointer :: CCPLNP(:)      => null()    !nodule nonstructural C, [gC d-2]
   real(r8), pointer :: WTRTL(:,:,:)   => null()    !root layer structural C, [g d-2]
   real(r8), pointer :: WTRTD(:,:,:)   => null()    !root layer C, [g d-2]
@@ -540,11 +539,7 @@ implicit none
   real(r8), pointer :: CCPOLR(:,:,:)  => null()    !root  layer nonstructural C concentration, [g g-1]
   real(r8), pointer :: CZPOLR(:,:,:)  => null()    !root layer nonstructural N concentration, [g g-1]
   real(r8), pointer :: CPPOLR(:,:,:)  => null()    !root layer nonstructural P concentration, [g g-1]
-  real(r8), pointer :: ZPOLNP(:)      => null()    !canopy nonstructural P concentration, [g g-1]
-  real(r8), pointer :: CCPOLB(:,:)    => null()    !branch nonstructural C concentration, [g d-2]
-  real(r8), pointer :: CZPOLB(:,:)    => null()    !branch nonstructural N concentration, [g g-1]
-  real(r8), pointer :: CPPOLB(:,:)    => null()    !branch nonstructural P concentration, [g g-1]
-  real(r8), pointer :: PPOLNB(:,:)    => null()    !branch nonstructural P concentration, [g g-1]
+  real(r8), pointer :: CEPOLB(:,:,:)    => null()    !branch nonstructural C concentration, [g d-2]
   real(r8), pointer :: WGNODE(:,:,:)  => null()    !internode C, [g d-2]
   real(r8), pointer :: WGNODN(:,:,:)  => null()    !internode N, [g d-2]
   real(r8), pointer :: WGNODP(:,:,:)  => null()    !nodule P, [g d-2]
@@ -559,7 +554,6 @@ implicit none
   real(r8), pointer :: WGLFL(:,:,:,:) => null()    !layer leaf C, [g d-2]
   real(r8), pointer :: WGLFLN(:,:,:,:)=> null()    !layer leaf N, [g d-2]
   real(r8), pointer :: WGLFLP(:,:,:,:)=> null()    !leaf layer P, [g d-2]
-  real(r8), pointer :: ZPOLNB(:,:)    => null()    !branch nonstructural N concentration, [g g-1]
   real(r8), pointer :: WGLFT(:)       => null()  !total leaf mass, [gC d-2]
   real(r8), pointer :: WTSTDI(:)      => null()  !initial standing dead C, [g C m-2]
   real(r8), pointer :: WTRTE(:,:)     => null()  !plant root element, [gC d-2]
@@ -572,7 +566,7 @@ implicit none
   real(r8), pointer :: WTSTGE(:,:)    => null()  !standing dead element, [g d-2]
   real(r8), pointer :: WTNDE(:,:)     => null()  !root total nodule mass, element [g d-2]
   real(r8), pointer :: EPOOL(:,:,:)   => null()  !branch nonstructural element, [g d-2]
-  real(r8), pointer :: CPOLNB(:,:)    => null()  !branch nodule nonstructural C, [g d-2]
+  real(r8), pointer :: EPOLNB(:,:,:)  => null()  !branch nodule nonstructural element, [g d-2]
   real(r8), pointer :: WTLSB(:,:)     => null()  !branch leaf + sheath C, [g d-2]
   real(r8), pointer :: WTRSVB(:,:)    => null()  !branch reserve C, [g d-2]
   real(r8), pointer :: WTLFB(:,:)     => null()   !branch leaf C, [g d-2]
@@ -1674,7 +1668,7 @@ implicit none
   allocate(this%WTRT1P(2,JZ1,JC1,JP1))
   allocate(this%CEPOLP(npelms,JP1))
   allocate(this%EPOOLP(npelms,JP1))
-  allocate(this%CPOLNP(JP1))
+  allocate(this%EPOLNP(npelms,JP1))
   allocate(this%CCPLNP(JP1))
   allocate(this%CWSRTL(2,JZ1,JP1))
   allocate(this%WSRTL(2,JZ1,JP1))
@@ -1685,7 +1679,6 @@ implicit none
   allocate(this%CZPOLR(2,JZ1,JP1))
   allocate(this%CPPOLR(2,JZ1,JP1))
   allocate(this%EPOOL(JC1,npelms,JP1))
-  allocate(this%ZPOLNP(JP1))
   allocate(this%WVSTK(JP1))
   allocate(this%WSLF(0:JNODS1,JC1,JP1))
   allocate(this%WSSHE(0:JNODS1,JC1,JP1))
@@ -1702,12 +1695,8 @@ implicit none
   allocate(this%WGLFLN(JC1,0:JNODS1,JC1,JP1))
   allocate(this%WGLFLP(JC1,0:JNODS1,JC1,JP1))
   allocate(this%WVSTKB(JC1,JP1))
-  allocate(this%ZPOLNB(JC1,JP1))
-  allocate(this%PPOLNB(JC1,JP1))
-  allocate(this%CPOLNB(JC1,JP1))
-  allocate(this%CCPOLB(JC1,JP1))
-  allocate(this%CZPOLB(JC1,JP1))
-  allocate(this%CPPOLB(JC1,JP1))
+  allocate(this%EPOLNB(JC1,npelms,JP1))
+  allocate(this%CEPOLB(JC1,npelms,JP1))
   allocate(this%WTRTSE(npelms,JP1))
   allocate(this%WGLFT(JC1))
   allocate(this%WTRTE(npelms,JP1))
@@ -1764,7 +1753,6 @@ implicit none
   allocate(this%WTSTXB(JC1,JP1))
   allocate(this%WTSTXN(JC1,JP1))
   allocate(this%WTSTXP(JC1,JP1))
-  allocate(this%PPOLNP(JP1))
   allocate(this%RTWT1(2,JC1,JP1))
   allocate(this%RTWT1N(2,JC1,JP1))
   allocate(this%RTWT1P(2,JC1,JP1))
@@ -1796,10 +1784,9 @@ implicit none
 !  if(allocated(WTRT1N))deallocate(WTRT1N)
 !  if(allocated(WTRT2P))deallocate(WTRT2P)
 !  if(allocated(WTRT1P))deallocate(WTRT1P)
-!  if(allocated(PPOLNP))deallocate(PPOLNP)
 !  if(allocated(CEPOLP))deallocate(CEPOLP)
 !  if(allocated(EPOOLP))deallocate(EPOOLP)
-!  if(allocated(CPOLNP))deallocate(CPOLNP)
+!  if(allocated(EPOLNP))deallocate(EPOLNP)
 !  if(allocated(CCPLNP))deallocate(CCPLNP)
 !  if(allocated(CWSRTL))deallocate(CWSRTL)
 !  if(allocated(WSRTL))deallocate(WSRTL)
@@ -1809,7 +1796,6 @@ implicit none
 !  if(allocated(CCPOLR))deallocate(CCPOLR)
 !  if(allocated(CZPOLR))deallocate(CZPOLR)
 !  if(allocated(CPPOLR))deallocate(CPPOLR)
-!  if(allocated(ZPOLNP))deallocate(ZPOLNP)
 !  if(allocated(WVSTK))deallocate(WVSTK)
 !  if(allocated(WGLF))deallocate(WGLF)
 !  if(allocated(WGLFN))deallocate(WGLFN)
@@ -1826,13 +1812,9 @@ implicit none
 !  if(allocated(WGSHN))deallocate(WGSHN)
 !  if(allocated(WGSHP))deallocate(WGSHP)
 !  if(allocated(WVSTKB))deallocate(WVSTKB)
-!  if(allocated(ZPOLNB))deallocate(ZPOLNB)
 !  if(allocated(PPOOL))deallocate(PPOOL)
-!  if(allocated(PPOLNB))deallocate(PPOLNB)
-!  if(allocated(CPOLNB))deallocate(CPOLNB)
-!  if(allocated(CCPOLB))deallocate(CCPOLB)
-!  if(allocated(CZPOLB))deallocate(CZPOLB)
-!  if(allocated(CPPOLB))deallocate(CPPOLB)
+!  if(allocated(EPOLNB))deallocate(EPOLNB)
+!  if(allocated(CEPOLB))deallocate(CEPOLB)
 !  if(allocated(WTRTSE))deallocate(WTRTSE)
 !  if(allocated(WGLFT))deallocate(WGLFT)
 !  if(allocated(EPOOL))deallocate(EPOOL)

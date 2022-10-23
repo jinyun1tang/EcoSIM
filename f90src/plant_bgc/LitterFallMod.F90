@@ -132,9 +132,7 @@ implicit none
     WTEABN     =>   plt_biom%WTEABN   , &
     WTEABP     =>   plt_biom%WTEABP   , &
     EPOOL      =>   plt_biom%EPOOL    , &
-    ZPOLNB     =>   plt_biom%ZPOLNB   , &
     WTSTBP     =>   plt_biom%WTSTBP   , &
-    PPOLNB     =>   plt_biom%PPOLNB   , &
     WTSTKB     =>   plt_biom%WTSTKB   , &
     WTSTBN     =>   plt_biom%WTSTBN   , &
     WTRSBP     =>   plt_biom%WTRSBP   , &
@@ -146,7 +144,7 @@ implicit none
     WTSHBP     =>   plt_biom%WTSHBP   , &
     WTRSVB     =>   plt_biom%WTRSVB   , &
     WTLFBN     =>   plt_biom%WTLFBN   , &
-    CPOLNB     =>   plt_biom%CPOLNB   , &
+    EPOLNB     =>   plt_biom%EPOLNB   , &
     WTRSBN     =>   plt_biom%WTRSBN   , &
     WTLFBP     =>   plt_biom%WTLFBP   , &
     WTNDBP     =>   plt_biom%WTNDBP   , &
@@ -224,7 +222,7 @@ implicit none
       D6425: DO M=1,jsken
         D8825: DO NB=1,NBR(NZ)
           ESNC(M,ielmc,1,0,NZ)=ESNC(M,ielmc,1,0,NZ) &
-            +CFOPC(0,M,NZ)*(EPOOL(NB,ielmc,NZ)+CPOLNB(NB,NZ) &
+            +CFOPC(0,M,NZ)*(EPOOL(NB,ielmc,NZ)+EPOLNB(NB,ielmc,NZ) &
             +CPOOLK(NB,NZ)+WTRSVB(NB,NZ)) &
             +CFOPC(1,M,NZ)*(WTLFB(NB,NZ)*FWODB(1) &
             +WTNDB(NB,NZ)) &
@@ -234,7 +232,7 @@ implicit none
             +CFOPC(5,M,NZ)*(WTLFB(NB,NZ)*FWODB(0) &
             +WTSHEB(NB,NZ)*FWODB(0))
           ESNC(M,ielmn,1,0,NZ)=ESNC(M,ielmn,1,0,NZ) &
-            +CFOPN(0,M,NZ)*(EPOOL(NB,ielmn,NZ)+ZPOLNB(NB,NZ) &
+            +CFOPN(0,M,NZ)*(EPOOL(NB,ielmn,NZ)+EPOLNB(NB,ielmn,NZ) &
             +WTRSBN(NB,NZ)) &
             +CFOPN(1,M,NZ)*(WTLFBN(NB,NZ)*FWODLN(1) &
             +WTNDBN(NB,NZ)) &
@@ -244,7 +242,7 @@ implicit none
             +CFOPN(5,M,NZ)*(WTLFBN(NB,NZ)*FWODLN(0) &
             +WTSHBN(NB,NZ)*FWODSN(0))
           ESNC(M,ielmp,1,0,NZ)=ESNC(M,ielmp,1,0,NZ) &
-            +CFOPP(0,M,NZ)*(EPOOL(NB,ielmp,NZ)+PPOLNB(NB,NZ) &
+            +CFOPP(0,M,NZ)*(EPOOL(NB,ielmp,NZ)+EPOLNB(NB,ielmp,NZ) &
             +WTRSBP(NB,NZ)) &
             +CFOPP(1,M,NZ)*(WTLFBP(NB,NZ)*FWODLP(1) &
             +WTNDBP(NB,NZ)) &
@@ -585,9 +583,7 @@ implicit none
     FWODLN    =>  plt_allom%FWODLN    , &
     FWODLP    =>  plt_allom%FWODLP    , &
     WTEABN    =>  plt_biom%WTEABN     , &
-    CPOLNB    =>  plt_biom%CPOLNB     , &
-    ZPOLNB    =>  plt_biom%ZPOLNB     , &
-    PPOLNB    =>  plt_biom%PPOLNB     , &
+    EPOLNB    =>  plt_biom%EPOLNB     , &
     WTSTKB    =>  plt_biom%WTSTKB     , &
     WTHSKB    =>  plt_biom%WTHSKB     , &
     WTSHEB    =>  plt_biom%WTHSKB     , &
@@ -706,7 +702,7 @@ implicit none
 !
       D6405: DO M=1,jsken
         ESNC(M,ielmc,1,0,NZ)=ESNC(M,ielmc,1,0,NZ) &
-          +CFOPC(0,M,NZ)*CPOLNB(NB,NZ) &
+          +CFOPC(0,M,NZ)*EPOLNB(NB,ielmc,NZ) &
           +CFOPC(1,M,NZ)*(WTLFB(NB,NZ)*FWODB(1) &
           +WTNDB(NB,NZ)) &
           +CFOPC(2,M,NZ)*(WTSHEB(NB,NZ)*FWODB(1) &
@@ -715,7 +711,7 @@ implicit none
           +CFOPC(5,M,NZ)*(WTLFB(NB,NZ)*FWODB(0) &
           +WTSHEB(NB,NZ)*FWODB(0))
         ESNC(M,ielmn,1,0,NZ)=ESNC(M,ielmn,1,0,NZ) &
-          +CFOPN(0,M,NZ)*ZPOLNB(NB,NZ) &
+          +CFOPN(0,M,NZ)*EPOLNB(NB,ielmn,NZ) &
           +CFOPN(1,M,NZ)*(WTLFBN(NB,NZ)*FWODLN(1) &
           +WTNDBN(NB,NZ)) &
           +CFOPN(2,M,NZ)*(WTSHBN(NB,NZ)*FWODSN(1) &
@@ -724,7 +720,7 @@ implicit none
           +CFOPN(5,M,NZ)*(WTLFBN(NB,NZ)*FWODLN(0) &
           +WTSHBN(NB,NZ)*FWODSN(0))
         ESNC(M,ielmp,1,0,NZ)=ESNC(M,ielmp,1,0,NZ) &
-          +CFOPP(0,M,NZ)*PPOLNB(NB,NZ) &
+          +CFOPP(0,M,NZ)*EPOLNB(NB,ielmp,NZ) &
           +CFOPP(1,M,NZ)*(WTLFBP(NB,NZ)*FWODLP(1) &
           +WTNDBP(NB,NZ)) &
           +CFOPP(2,M,NZ)*(WTSHBP(NB,NZ)*FWODSP(1) &
@@ -798,8 +794,7 @@ implicit none
 !     begin_execution
   associate(                           &
     EPOOL  => plt_biom%EPOOL         , &
-    CPOLNB => plt_biom%CPOLNB        , &
-    ZPOLNB => plt_biom%ZPOLNB        , &
+    EPOLNB => plt_biom%EPOLNB        , &
     WTSHTB => plt_biom%WTSHTB        , &
     WTLFB  => plt_biom%WTLFB         , &
     WTRSVB => plt_biom%WTRSVB        , &
@@ -843,7 +838,6 @@ implicit none
     RTWT1  => plt_biom%RTWT1         , &
     RTWT1N => plt_biom%RTWT1N        , &
     RTWT1P => plt_biom%RTWT1P        , &
-    PPOLNB => plt_biom%PPOLNB        , &
     NJ     => plt_site%NJ            , &
     NU     => plt_site%NU            , &
     IDTH   => plt_pheno%IDTH         , &
@@ -856,14 +850,14 @@ implicit none
   )
 !     RESET BRANCH STATE VARIABLES
 !
-  DO 8835 NB=1,NBR(NZ)
+  D8835: DO NB=1,NBR(NZ)
     EPOOL(NB,ielmc,NZ)=0._r8
     CPOOLK(NB,NZ)=0._r8
     EPOOL(NB,ielmn,NZ)=0._r8
     EPOOL(NB,ielmp,NZ)=0._r8
-    CPOLNB(NB,NZ)=0._r8
-    ZPOLNB(NB,NZ)=0._r8
-    PPOLNB(NB,NZ)=0._r8
+    EPOLNB(NB,ielmc,NZ)=0._r8
+    EPOLNB(NB,ielmn,NZ)=0._r8
+    EPOLNB(NB,ielmp,NZ)=0._r8
     WTSHTB(NB,NZ)=0._r8
     WTLFB(NB,NZ)=0._r8
     WTNDB(NB,NZ)=0._r8
@@ -896,7 +890,7 @@ implicit none
     WTSTXB(NB,NZ)=0._r8
     WTSTXN(NB,NZ)=0._r8
     WTSTXP(NB,NZ)=0._r8
-8835  CONTINUE
+  ENDDO D8835
 !
 !     RESET ROOT STATE VARIABLES
 !
@@ -937,8 +931,7 @@ implicit none
 !     begin_execution
   associate(                          &
     EPOOL    => plt_biom%EPOOL      , &
-    CPOLNB   => plt_biom%CPOLNB     , &
-    PPOLNB   => plt_biom%PPOLNB     , &
+    EPOLNB   => plt_biom%EPOLNB     , &
     WTSHTB   => plt_biom%WTSHTB     , &
     WTLFB    => plt_biom%WTLFB      , &
     WTNDB    => plt_biom%WTNDB      , &
@@ -986,7 +979,6 @@ implicit none
     WGLFL    => plt_biom%WGLFL      , &
     WGLFV    => plt_biom%WGLFV      , &
     WTSHEB   => plt_biom%WTSHEB     , &
-    ZPOLNB   => plt_biom%ZPOLNB     , &
     CPOOL3   => plt_photo%CPOOL3    , &
     CPOOL4   => plt_photo%CPOOL4    , &
     CO2B     => plt_photo%CO2B      , &
@@ -1035,9 +1027,9 @@ implicit none
   CPOOLK(NB,NZ)=0._r8
   EPOOL(NB,ielmn,NZ)=0._r8
   EPOOL(NB,ielmp,NZ)=0._r8
-  CPOLNB(NB,NZ)=0._r8
-  ZPOLNB(NB,NZ)=0._r8
-  PPOLNB(NB,NZ)=0._r8
+  EPOLNB(NB,ielmc,NZ)=0._r8
+  EPOLNB(NB,ielmn,NZ)=0._r8
+  EPOLNB(NB,ielmp,NZ)=0._r8
   WTSHTB(NB,NZ)=0._r8
   WTLFB(NB,NZ)=0._r8
   WTNDB(NB,NZ)=0._r8

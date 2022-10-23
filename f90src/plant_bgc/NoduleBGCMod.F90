@@ -70,9 +70,7 @@ module NoduleBGCMod
     WTLSB    =>  plt_biom%WTLSB    , &
     WTNDBP   =>  plt_biom%WTNDBP   , &
     EPOOL    =>  plt_biom%EPOOL    , &
-    CPOLNB   =>  plt_biom%CPOLNB   , &
-    ZPOLNB   =>  plt_biom%ZPOLNB   , &
-    PPOLNB   =>  plt_biom%PPOLNB   , &
+    EPOLNB   =>  plt_biom%EPOLNB   , &
     ZEROP    =>  plt_biom%ZEROP    , &
     ZEROL    =>  plt_biom%ZEROL    , &
     WTNDBN   =>  plt_biom%WTNDBN   , &
@@ -110,9 +108,9 @@ module NoduleBGCMod
 !     FCNPF=N,P constraint to bacterial activity
 !
     IF(WTNDB(NB,NZ).GT.ZEROP(NZ))THEN
-      CCPOLN=AZMAX1(CPOLNB(NB,NZ)/WTNDB(NB,NZ))
-      CZPOLN=AZMAX1(ZPOLNB(NB,NZ)/WTNDB(NB,NZ))
-      CPPOLN=AZMAX1(PPOLNB(NB,NZ)/WTNDB(NB,NZ))
+      CCPOLN=AZMAX1(EPOLNB(NB,ielmc,NZ)/WTNDB(NB,NZ))
+      CZPOLN=AZMAX1(EPOLNB(NB,ielmn,NZ)/WTNDB(NB,NZ))
+      CPPOLN=AZMAX1(EPOLNB(NB,ielmp,NZ)/WTNDB(NB,NZ))
     ELSE
       CCPOLN=1.0_r8
       CZPOLN=1.0_r8
@@ -148,8 +146,8 @@ module NoduleBGCMod
 !     FCNPF=N,P constraint to bacterial activity
 !     WFNG=growth function of canopy water potential
 !
-    RCNDL=AZMAX1(AMIN1(CPOLNB(NB,NZ),VMXO*WTNDB(NB,NZ))*FCNPF*TFN3(NZ)*WFNG)
-!     CPOOLNX=CPOLNB(NB,NZ)
+    RCNDL=AZMAX1(AMIN1(EPOLNB(NB,ielmc,NZ),VMXO*WTNDB(NB,NZ))*FCNPF*TFN3(NZ)*WFNG)
+!     CPOOLNX=EPOLNB(NB,ielmc,NZ)
 !     VMXOX=VMXO*WTNDB(NB,NZ)*FCNPF*TFN3(NZ)*WFNG
 !
 !     NODULE MAINTENANCE RESPIRATION FROM SOIL TEMPERATURE,
@@ -242,14 +240,12 @@ module NoduleBGCMod
 !     CCPOLN,CZPOLN,CPPOLN=nonstructural C,N,P concn in bacteria
 !     CZKM,CPKM=Km for nonstructural N,P uptake by bacteria
 !
-    CGNDL=AMIN1(CPOLNB(NB,NZ)-AMIN1(RMNDL,RCNDL) &
+    CGNDL=AMIN1(EPOLNB(NB,ielmc,NZ)-AMIN1(RMNDL,RCNDL) &
       -RGN2F+RCNDLC,(RGNDL-RGN2F)/(1.0_r8-DMND(NZ)))
     GRNDG=CGNDL*DMND(NZ)
     RGNDG=RGN2F+CGNDL*(1.0_r8-DMND(NZ))
-    ZADDN=AZMAX1(AMIN1(ZPOLNB(NB,NZ) &
-      ,GRNDG*CNND(NZ)))*CZPOLN/(CZPOLN+CZKM)
-    PADDN=AZMAX1(AMIN1(PPOLNB(NB,NZ) &
-      ,GRNDG*CPND(NZ)))*CPPOLN/(CPPOLN+CPKM)
+    ZADDN=AZMAX1(AMIN1(EPOLNB(NB,ielmn,NZ),GRNDG*CNND(NZ)))*CZPOLN/(CZPOLN+CZKM)
+    PADDN=AZMAX1(AMIN1(EPOLNB(NB,ielmp,NZ),GRNDG*CPND(NZ)))*CPPOLN/(CPPOLN+CPKM)
 !
 !     NODULE SENESCENCE
 !
@@ -326,9 +322,9 @@ module NoduleBGCMod
 !     ZADDN,PADDN=nonstructural N,P used in growth
 !     RUPNFB=branch N2 fixation
 !
-    CPOLNB(NB,NZ)=CPOLNB(NB,NZ)-AMIN1(RMNDL,RCNDL)-RGN2F-CGNDL+RCNDLC
-    ZPOLNB(NB,NZ)=ZPOLNB(NB,NZ)-ZADDN+RCNDLN+RCNSNN+RUPNFB
-    PPOLNB(NB,NZ)=PPOLNB(NB,NZ)-PADDN+RCNDLP+RCNSNP
+    EPOLNB(NB,ielmc,NZ)=EPOLNB(NB,ielmc,NZ)-AMIN1(RMNDL,RCNDL)-RGN2F-CGNDL+RCNDLC
+    EPOLNB(NB,ielmn,NZ)=EPOLNB(NB,ielmn,NZ)-ZADDN+RCNDLN+RCNSNN+RUPNFB
+    EPOLNB(NB,ielmp,NZ)=EPOLNB(NB,ielmp,NZ)-PADDN+RCNDLP+RCNSNP
 !
 !     UPDATE STATE VARIABLES FOR NODULE C, N, P
 !
@@ -355,8 +351,7 @@ module NoduleBGCMod
 !     XFRC,XFRN,XFRC=nonstructural C,N,P transfer
 !     CPOLNB,ZPOLNB,PPOLNB=nonstructural C,N,P in bacteria
 !
-    IF(EPOOL(NB,ielmc,NZ).GT.ZEROP(NZ) &
-      .AND.WTLSB(NB,NZ).GT.ZEROL(NZ))THEN
+    IF(EPOOL(NB,ielmc,NZ).GT.ZEROP(NZ).AND.WTLSB(NB,NZ).GT.ZEROL(NZ))THEN
       CCNDLB=WTNDB(NB,NZ)/WTLSB(NB,NZ)
       WTLSB1=WTLSB(NB,NZ)
       WTNDB1=AMIN1(WTLSB(NB,NZ),AMAX1(WTNDI*AREA3(NU),WTNDB(NB,NZ)))
@@ -364,21 +359,20 @@ module NoduleBGCMod
       IF(WTLSBT.GT.ZEROP(NZ))THEN
         FXRNX=FXRN(INTYP(NZ))/(1.0+CCNDLB/CCNGB)
 !    2/(1.0+CCNDLB/(CCNGB*FXRN(INTYP(NZ))))
-        CPOOLD=(EPOOL(NB,ielmc,NZ)*WTNDB1-CPOLNB(NB,NZ)*WTLSB1)/WTLSBT
+        CPOOLD=(EPOOL(NB,ielmc,NZ)*WTNDB1-EPOLNB(NB,ielmc,NZ)*WTLSB1)/WTLSBT
         XFRC=FXRNX*CPOOLD
         EPOOL(NB,ielmc,NZ)=EPOOL(NB,ielmc,NZ)-XFRC
-        CPOLNB(NB,NZ)=CPOLNB(NB,NZ)+XFRC
-        CPOOLT=EPOOL(NB,ielmc,NZ)+CPOLNB(NB,NZ)
+        EPOLNB(NB,ielmc,NZ)=EPOLNB(NB,ielmc,NZ)+XFRC
+        CPOOLT=EPOOL(NB,ielmc,NZ)+EPOLNB(NB,ielmc,NZ)
         IF(CPOOLT.GT.ZEROP(NZ))THEN
-          ZPOOLD=(EPOOL(NB,ielmn,NZ)*CPOLNB(NB,NZ)-ZPOLNB(NB,NZ)*EPOOL(NB,ielmc,NZ))/CPOOLT
+          ZPOOLD=(EPOOL(NB,ielmn,NZ)*EPOLNB(NB,ielmc,NZ)-EPOLNB(NB,ielmn,NZ)*EPOOL(NB,ielmc,NZ))/CPOOLT
           XFRN=FXRNX*ZPOOLD
-          PPOOLD=(EPOOL(NB,ielmp,NZ)*CPOLNB(NB,NZ) &
-            -PPOLNB(NB,NZ)*EPOOL(NB,ielmc,NZ))/CPOOLT
+          PPOOLD=(EPOOL(NB,ielmp,NZ)*EPOLNB(NB,ielmc,NZ)-EPOLNB(NB,ielmp,NZ)*EPOOL(NB,ielmc,NZ))/CPOOLT
           XFRP=FXRNX*PPOOLD
           EPOOL(NB,ielmn,NZ)=EPOOL(NB,ielmn,NZ)-XFRN
           EPOOL(NB,ielmp,NZ)=EPOOL(NB,ielmp,NZ)-XFRP
-          ZPOLNB(NB,NZ)=ZPOLNB(NB,NZ)+XFRN
-          PPOLNB(NB,NZ)=PPOLNB(NB,NZ)+XFRP
+          EPOLNB(NB,ielmn,NZ)=EPOLNB(NB,ielmn,NZ)+XFRN
+          EPOLNB(NB,ielmp,NZ)=EPOLNB(NB,ielmp,NZ)+XFRP
         ENDIF
       ENDIF
     ENDIF

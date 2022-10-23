@@ -240,7 +240,7 @@ implicit none
     ARSTP(NZ,NY,NX) =plt_morph%ARSTP(NZ)
     BALE(1:npelms,NZ,NY,NX)  =plt_site%BALE(1:npelms,NZ)
     EPOOLP(1:npelms,NZ,NY,NX)=plt_biom%EPOOLP(1:npelms,NZ)
-    CPOLNP(NZ,NY,NX)=plt_biom%CPOLNP(NZ)
+    EPOLNP(1:npelms,NZ,NY,NX)=plt_biom%EPOLNP(1:npelms,NZ)
     CEPOLP(1:npelms,NZ,NY,NX)=plt_biom%CEPOLP(1:npelms,NZ)
     CCPLNP(NZ,NY,NX)=plt_biom%CCPLNP(NZ)
     CNET(NZ,NY,NX)  =plt_bgcr%CNET(NZ)
@@ -296,7 +296,6 @@ implicit none
     O2I(NZ,NY,NX)   =plt_photo%O2I(NZ)
     OFFST(NZ,NY,NX) =plt_pheno%OFFST(NZ)
     OSTR(NZ,NY,NX)  =plt_pheno%OSTR(NZ)
-    PPOLNP(NZ,NY,NX)=plt_biom%PPOLNP(NZ)
     PPX(NZ,NY,NX)   =plt_site%PPX(NZ)
     PP(NZ,NY,NX)    =plt_site%PP(NZ)
     PPI(NZ,NY,NX)   =plt_site%PPI(NZ)
@@ -383,7 +382,6 @@ implicit none
     WTRTA(NZ,NY,NX)  =plt_biom%WTRTA(NZ)
     XKCO2L(NZ,NY,NX) =plt_photo%XKCO2L(NZ)
     XKCO2O(NZ,NY,NX) =plt_photo%XKCO2O(NZ)
-    ZPOLNP(NZ,NY,NX) =plt_biom%ZPOLNP(NZ)
     ZC(NZ,NY,NX)     =plt_morph%ZC(NZ)
     ZNPP(NZ,NY,NX)   =plt_bgcr%ZNPP(NZ)
     ZEROP(NZ,NY,NX)  =plt_biom%ZEROP(NZ)
@@ -424,6 +422,12 @@ implicit none
       ENDDO
     ENDDO
 
+
+    DO NE=1,npelms
+      DO NB=1,NBR(NZ,NY,NX)
+        EPOLNB(NB,NE,NZ,NY,NX)=plt_biom%EPOLNB(NB,NE,NZ)
+      ENDDO
+    ENDDO
     DO NB=1,NBR(NZ,NY,NX)
       DO L=1,JC
         ARSTK(L,NB,NZ,NY,NX)=plt_morph%ARSTK(L,NB,NZ)
@@ -431,10 +435,7 @@ implicit none
       ATRP(NB,NZ,NY,NX)  =plt_pheno%ATRP(NB,NZ)
       ARLFB(NB,NZ,NY,NX) =plt_morph%ARLFB(NB,NZ)
       ARLFZ(NB,NZ,NY,NX) =plt_morph%ARLFZ(NB,NZ)
-      CCPOLB(NB,NZ,NY,NX)=plt_biom%CCPOLB(NB,NZ)
-      CZPOLB(NB,NZ,NY,NX)=plt_biom%CZPOLB(NB,NZ)
-      CPPOLB(NB,NZ,NY,NX)=plt_biom%CPPOLB(NB,NZ)
-      CPOLNB(NB,NZ,NY,NX)=plt_biom%CPOLNB(NB,NZ)
+      CEPOLB(NB,1:npelms,NZ,NY,NX)=plt_biom%CEPOLB(NB,1:npelms,NZ)
       DGSTGI(NB,NZ,NY,NX)=plt_pheno%DGSTGI(NB,NZ)
       DGSTGF(NB,NZ,NY,NX)=plt_pheno%DGSTGF(NB,NZ)
       FLG4(NB,NZ,NY,NX)  =plt_pheno%FLG4(NB,NZ)
@@ -464,7 +465,6 @@ implicit none
       PSTG(NB,NZ,NY,NX)  =plt_morph%PSTG(NB,NZ)
       PSTGI(NB,NZ,NY,NX) =plt_morph%PSTGI(NB,NZ)
       PSTGF(NB,NZ,NY,NX) =plt_morph%PSTGF(NB,NZ)
-      PPOLNB(NB,NZ,NY,NX)=plt_biom%PPOLNB(NB,NZ)
       RCCLX(NB,NZ,NY,NX) =plt_pheno%RCCLX(NB,NZ)
       RCZLX(NB,NZ,NY,NX) =plt_pheno%RCZLX(NB,NZ)
       RCPLX(NB,NZ,NY,NX) =plt_pheno%RCPLX(NB,NZ)
@@ -518,7 +518,6 @@ implicit none
       WTGRB(NB,NZ,NY,NX) =plt_biom%WTGRB(NB,NZ)
       WTGRBN(NB,NZ,NY,NX)=plt_biom%WTGRBN(NB,NZ)
       WTGRBP(NB,NZ,NY,NX)=plt_biom%WTGRBP(NB,NZ)
-      ZPOLNB(NB,NZ,NY,NX)=plt_biom%ZPOLNB(NB,NZ)
 
       DO K=0,JNODS
         ARLF(K,NB,NZ,NY,NX)=plt_morph%ARLF1(K,NB,NZ)
@@ -1276,7 +1275,7 @@ implicit none
     plt_photo%CO2I(NZ) =CO2I(NZ,NY,NX)
     plt_biom%CEPOLP(1:npelms,NZ)=CEPOLP(1:npelms,NZ,NY,NX)
     plt_biom%EPOOLP(1:npelms,NZ)=EPOOLP(1:npelms,NZ,NY,NX)
-    plt_biom%CPOLNP(NZ)=CPOLNP(NZ,NY,NX)
+    plt_biom%EPOLNP(1:npelms,NZ)=EPOLNP(1:npelms,NZ,NY,NX)
     plt_biom%CCPLNP(NZ)=CCPLNP(NZ,NY,NX)
     plt_bgcr%CNET(NZ)=CNET(NZ,NY,NX)
     plt_bgcr%CARBN(NZ)=CARBN(NZ,NY,NX)
@@ -1310,7 +1309,6 @@ implicit none
     plt_site%PP(NZ)=PP(NZ,NY,NX)
     plt_ew%PSILT(NZ)=PSILT(NZ,NY,NX)
     plt_ew%PSILG(NZ)=PSILG(NZ,NY,NX)
-    plt_biom%PPOLNP(NZ)=PPOLNP(NZ,NY,NX)
     plt_photo%RCMX(NZ)=RCMX(NZ,NY,NX)
     plt_bgcr%RCO2Z(NZ)=RCO2Z(NZ,NY,NX)
     plt_bgcr%ROXYZ(NZ)=ROXYZ(NZ,NY,NX)
@@ -1366,7 +1364,6 @@ implicit none
     plt_biom%WTSTGE(1:npelms,NZ) =WTSTGE(1:npelms,NZ,NY,NX)
     plt_biom%WTNDE(1:npelms,NZ)  =WTNDE(1:npelms,NZ,NY,NX)
 
-    plt_biom%ZPOLNP(NZ)=ZPOLNP(NZ,NY,NX)
     plt_biom%ZEROL(NZ) =ZEROL(NZ,NY,NX)
     plt_biom%ZEROP(NZ) =ZEROP(NZ,NY,NX)
     plt_morph%ZC(NZ)   =ZC(NZ,NY,NX)
@@ -1385,18 +1382,18 @@ implicit none
     DO NE=1,npelms
       DO NB=1,NBR(NZ,NY,NX)
         plt_biom%EPOOL(NB,NE,NZ)=EPOOL(NB,NE,NZ,NY,NX)
+        plt_biom%EPOLNB(NB,NE,NZ)=EPOLNB(NB,NE,NZ,NY,NX)
       ENDDO
     ENDDO
+
     DO NB=1,NBR(NZ,NY,NX)
       plt_photo%FDBK(NB,NZ)=FDBK(NB,NZ,NY,NX)
       plt_photo%FDBKX(NB,NZ)=FDBKX(NB,NZ,NY,NX)
       plt_pheno%ATRP(NB,NZ)=ATRP(NB,NZ,NY,NX)
       plt_morph%ARLFZ(NB,NZ)=ARLFZ(NB,NZ,NY,NX)
       plt_morph%ARLFB(NB,NZ)=ARLFB(NB,NZ,NY,NX)
-      plt_biom%CPOLNB(NB,NZ)=CPOLNB(NB,NZ,NY,NX)
-      plt_biom%CCPOLB(NB,NZ)=CCPOLB(NB,NZ,NY,NX)
-      plt_biom%CZPOLB(NB,NZ)=CZPOLB(NB,NZ,NY,NX)
-      plt_biom%CPPOLB(NB,NZ)=CPPOLB(NB,NZ,NY,NX)
+
+      plt_biom%CEPOLB(NB,1:npelms,NZ)=CEPOLB(NB,1:npelms,NZ,NY,NX)
       plt_pheno%DGSTGI(NB,NZ)=DGSTGI(NB,NZ,NY,NX)
       plt_pheno%DGSTGF(NB,NZ)=DGSTGF(NB,NZ,NY,NX)
       plt_pheno%FLG4(NB,NZ)=FLG4(NB,NZ,NY,NX)
@@ -1422,7 +1419,6 @@ implicit none
       plt_morph%PSTG(NB,NZ)=PSTG(NB,NZ,NY,NX)
       plt_morph%PSTGI(NB,NZ)=PSTGI(NB,NZ,NY,NX)
       plt_morph%PSTGF(NB,NZ)=PSTGF(NB,NZ,NY,NX)
-      plt_biom%PPOLNB(NB,NZ)=PPOLNB(NB,NZ,NY,NX)
       plt_pheno%RCCLX(NB,NZ)=RCCLX(NB,NZ,NY,NX)
       plt_pheno%RCZLX(NB,NZ)=RCZLX(NB,NZ,NY,NX)
       plt_pheno%RCPLX(NB,NZ)=RCPLX(NB,NZ,NY,NX)
@@ -1476,7 +1472,6 @@ implicit none
       plt_biom%WTSTXN(NB,NZ)=WTSTXN(NB,NZ,NY,NX)
       plt_biom%WTSTXP(NB,NZ)=WTSTXP(NB,NZ,NY,NX)
       plt_biom%WVSTKB(NB,NZ)=WVSTKB(NB,NZ,NY,NX)
-      plt_biom%ZPOLNB(NB,NZ)=ZPOLNB(NB,NZ,NY,NX)
       DO M=1,10
         plt_pheno%IDAY(M,NB,NZ)=IDAY(M,NB,NZ,NY,NX)
       ENDDO

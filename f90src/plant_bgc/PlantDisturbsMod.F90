@@ -725,7 +725,7 @@ module PlantDisturbsMod
     WTGRBN   =>  plt_biom%WTGRBN     , &
     WTGRB    =>  plt_biom%WTGRB      , &
     WTEARB   =>  plt_biom%WTEARB     , &
-    CPOLNB   =>  plt_biom%CPOLNB     , &
+    EPOLNB   =>  plt_biom%EPOLNB     , &
     EPOOL    =>  plt_biom%EPOOL      , &
     WTLFBN   =>  plt_biom%WTLFBN     , &
     WTSHTN   =>  plt_biom%WTSHTN     , &
@@ -733,8 +733,6 @@ module PlantDisturbsMod
     WTRSVB   =>  plt_biom%WTRSVB     , &
     WTNDB    =>  plt_biom%WTNDB      , &
     WTSHTB   =>  plt_biom%WTSHTB     , &
-    PPOLNB   =>  plt_biom%PPOLNB     , &
-    ZPOLNB   =>  plt_biom%ZPOLNB     , &
     WTSTKB   =>  plt_biom%WTSTKB     , &
     WTEABN   =>  plt_biom%WTEABN     , &
     WTSHBN   =>  plt_biom%WTSHBN     , &
@@ -910,7 +908,7 @@ module PlantDisturbsMod
 !
             D6380: DO M=1,jsken
               ESNC(M,ielmc,1,0,NZ)=ESNC(M,ielmc,1,0,NZ)+(1._r8-XHVST) &
-                *(CFOPC(0,M,NZ)*(EPOOL(NB,ielmc,NZ)+CPOLNB(NB,NZ) &
+                *(CFOPC(0,M,NZ)*(EPOOL(NB,ielmc,NZ)+EPOLNB(NB,ielmc,NZ) &
                 +CPOOLK(NB,NZ)+WTRSVB(NB,NZ)) &
                 +CFOPC(1,M,NZ)*(WTLFB(NB,NZ)*FWODB(1) &
                 +WTNDB(NB,NZ)) &
@@ -920,7 +918,7 @@ module PlantDisturbsMod
                 *CFOPC(5,M,NZ)*(WTLFB(NB,NZ)*FWODB(0) &
                 +WTSHEB(NB,NZ)*FWODB(0))
               ESNC(M,ielmn,1,0,NZ)=ESNC(M,ielmn,1,0,NZ)+(1._r8-XHVST) &
-                *(CFOPN(0,M,NZ)*(EPOOL(NB,ielmn,NZ)+ZPOLNB(NB,NZ) &
+                *(CFOPN(0,M,NZ)*(EPOOL(NB,ielmn,NZ)+EPOLNB(NB,ielmn,NZ) &
                 +WTRSBN(NB,NZ)) &
                 +CFOPN(1,M,NZ)*(WTLFBN(NB,NZ)*FWODLN(1) &
                 +WTNDBN(NB,NZ)) &
@@ -930,7 +928,7 @@ module PlantDisturbsMod
                 *CFOPN(5,M,NZ)*(WTLFBN(NB,NZ)*FWODLN(0) &
                 +WTSHBN(NB,NZ)*FWODSN(0))
               ESNC(M,ielmp,1,0,NZ)=ESNC(M,ielmp,1,0,NZ)+(1._r8-XHVST) &
-                *(CFOPP(0,M,NZ)*(EPOOL(NB,ielmp,NZ)+PPOLNB(NB,NZ) &
+                *(CFOPP(0,M,NZ)*(EPOOL(NB,ielmp,NZ)+EPOLNB(NB,ielmp,NZ) &
                 +WTRSBP(NB,NZ)) &
                 +CFOPP(1,M,NZ)*(WTLFBP(NB,NZ)*FWODLP(1) &
                 +WTNDBP(NB,NZ)) &
@@ -974,9 +972,9 @@ module PlantDisturbsMod
             CPOOLK(NB,NZ)=CPOOLK(NB,NZ)*XHVST
             EPOOL(NB,ielmn,NZ)=EPOOL(NB,ielmn,NZ)*XHVST
             EPOOL(NB,ielmp,NZ)=EPOOL(NB,ielmp,NZ)*XHVST
-            CPOLNB(NB,NZ)=CPOLNB(NB,NZ)*XHVST
-            ZPOLNB(NB,NZ)=ZPOLNB(NB,NZ)*XHVST
-            PPOLNB(NB,NZ)=PPOLNB(NB,NZ)*XHVST
+            EPOLNB(NB,ielmc,NZ)=EPOLNB(NB,ielmc,NZ)*XHVST
+            EPOLNB(NB,ielmn,NZ)=EPOLNB(NB,ielmn,NZ)*XHVST
+            EPOLNB(NB,ielmp,NZ)=EPOLNB(NB,ielmp,NZ)*XHVST
             WTSHTB(NB,NZ)=WTSHTB(NB,NZ)*XHVST
             WTLFB(NB,NZ)=WTLFB(NB,NZ)*XHVST
             WTNDB(NB,NZ)=WTNDB(NB,NZ)*XHVST
@@ -1374,9 +1372,7 @@ module PlantDisturbsMod
     WGNODP   => plt_biom%WGNODP    , &
     WTRSVB   => plt_biom%WTRSVB    , &
     WTSTXB   => plt_biom%WTSTXB    , &
-    CPOLNB   => plt_biom%CPOLNB    , &
-    ZPOLNB   => plt_biom%ZPOLNB    , &
-    PPOLNB   => plt_biom%PPOLNB    , &
+    EPOLNB   => plt_biom%EPOLNB     , &
     WGLFL    => plt_biom%WGLFL     , &
     WGLFLN   => plt_biom%WGLFLN    , &
     WGLFLP   => plt_biom%WGLFLP    , &
@@ -2022,8 +2018,7 @@ module PlantDisturbsMod
             WGSHN(K,NB,NZ)=FHVSTK(K)*WGSHN(K,NB,NZ)
             WGSHP(K,NB,NZ)=FHVSTK(K)*WGSHP(K,NB,NZ)
             WSSHE(K,NB,NZ)=FHVSTK(K)*WSSHE(K,NB,NZ)
-            IF(IHVST(NZ).LE.2 &
-              .AND.HTSHE(K,NB,NZ).GT.0.0)THEN
+            IF(IHVST(NZ).LE.2.AND.HTSHE(K,NB,NZ).GT.0.0)THEN
               FHGT=AZMAX1(AMIN1(1.0,(HTNODE(K,NB,NZ) &
                 +HTSHE(K,NB,NZ)-HVST(NZ))/HTSHE(K,NB,NZ)))
               HTSHE(K,NB,NZ)=(1._r8-FHGT)*HTSHE(K,NB,NZ)
@@ -2063,9 +2058,9 @@ module PlantDisturbsMod
         CPOOLX=AZMAX1(EPOOL(NB,ielmc,NZ))
         ZPOOLX=AZMAX1(EPOOL(NB,ielmn,NZ))
         PPOOLX=AZMAX1(EPOOL(NB,ielmp,NZ))
-        CPOLNX=AZMAX1(CPOLNB(NB,NZ))
-        ZPOLNX=AZMAX1(ZPOLNB(NB,NZ))
-        PPOLNX=AZMAX1(PPOLNB(NB,NZ))
+        CPOLNX=AZMAX1(EPOLNB(NB,ielmc,NZ))
+        ZPOLNX=AZMAX1(EPOLNB(NB,ielmn,NZ))
+        PPOLNX=AZMAX1(EPOLNB(NB,ielmp,NZ))
         IF(IHVST(NZ).NE.4.AND.IHVST(NZ).NE.6)THEN
           IF(WGLFGY+WGSHGY.GT.ZEROP(NZ))THEN
             FHVST=AZMAX1(AMIN1(1.0,(WGLFGX+WGSHGX)/(WGLFGY+WGSHGY)))
@@ -2102,11 +2097,11 @@ module PlantDisturbsMod
               ZPOOLG=0._r8
               PPOOLG=0._r8
             ENDIF
-            IF(CPOLNB(NB,NZ).GT.ZEROP(NZ))THEN
+            IF(EPOLNB(NB,ielmc,NZ).GT.ZEROP(NZ))THEN
               WHVSNX=AZMAX1(WHVSNP)*WTLSBX/WTLS(NZ)
               CPOLNG=AZMAX1(CPOLNX-WHVSNX)
-              ZPOLNG=AZMAX1(ZPOLNX-WHVSNX*ZPOLNX/CPOLNB(NB,NZ))
-              PPOLNG=AZMAX1(PPOLNX-WHVSNX*PPOLNX/CPOLNB(NB,NZ))
+              ZPOLNG=AZMAX1(ZPOLNX-WHVSNX*ZPOLNX/EPOLNB(NB,ielmc,NZ))
+              PPOLNG=AZMAX1(PPOLNX-WHVSNX*PPOLNX/EPOLNB(NB,ielmc,NZ))
               WTNDG=WTNDB(NB,NZ)*(1._r8-WHVSNX/CPOLNX)
               WTNDNG=WTNDBN(NB,NZ)*(1._r8-WHVSNX/CPOLNX)
               WTNDPG=WTNDBP(NB,NZ)*(1._r8-WHVSNX/CPOLNX)
@@ -2151,9 +2146,9 @@ module PlantDisturbsMod
         EPOOL(NB,ielmc,NZ)=CPOOLG
         EPOOL(NB,ielmn,NZ)=ZPOOLG
         EPOOL(NB,ielmp,NZ)=PPOOLG
-        CPOLNB(NB,NZ)=CPOLNG
-        ZPOLNB(NB,NZ)=ZPOLNG
-        PPOLNB(NB,NZ)=PPOLNG
+        EPOLNB(NB,ielmc,NZ)=CPOLNG
+        EPOLNB(NB,ielmn,NZ)=ZPOLNG
+        EPOLNB(NB,ielmp,NZ)=PPOLNG
         WTNDB(NB,NZ)=WTNDG
         WTNDBN(NB,NZ)=WTNDNG
         WTNDBP(NB,NZ)=WTNDPG

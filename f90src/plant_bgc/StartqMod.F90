@@ -494,11 +494,9 @@ module StartqMod
 !
   WSTR(NZ,NY,NX)=0._r8
   CHILL(NZ,NY,NX)=0._r8
+  EPOOL(1:JC,1:npelms,NZ,NY,NX)=0._r8
+  EPOLNB(1:JC,1:npelms,NZ,NY,NX)=0._r8
   D25: DO NB=1,JC
-    EPOOL(NB,1:npelms,NZ,NY,NX)=0._r8
-    CPOLNB(NB,NZ,NY,NX)=0._r8
-    ZPOLNB(NB,NZ,NY,NX)=0._r8
-    PPOLNB(NB,NZ,NY,NX)=0._r8
     WTSHTB(NB,NZ,NY,NX)=0._r8
     WTLFB(NB,NZ,NY,NX)=0._r8
     WTNDB(NB,NZ,NY,NX)=0._r8

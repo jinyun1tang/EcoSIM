@@ -144,8 +144,7 @@ module PlantBranchMod
     WGLFP      =>  plt_biom%WGLFP     , &
     WGLF       =>  plt_biom%WGLF      , &
     WGSHE      =>  plt_biom%WGSHE     , &
-    CCPOLB     =>  plt_biom%CCPOLB    , &
-    CPPOLB     =>  plt_biom%CPPOLB    , &
+    CEPOLB     =>  plt_biom%CEPOLB    , &
     WGNODE     =>  plt_biom%WGNODE    , &
     WGNODP     =>  plt_biom%WGNODP    , &
     WGSHN      =>  plt_biom%WGSHN     , &
@@ -153,7 +152,6 @@ module PlantBranchMod
     WGSHP      =>  plt_biom%WGSHP     , &
     WTHSBP     =>  plt_biom%WTHSBP    , &
     WTEABP     =>  plt_biom%WTEABP    , &
-    CZPOLB     =>  plt_biom%CZPOLB    , &
     WGLFN      =>  plt_biom%WGLFN     , &
     ZEROP      =>  plt_biom%ZEROP     , &
     ZEROL      =>  plt_biom%ZEROL     , &
@@ -351,8 +349,8 @@ module PlantBranchMod
 !   CNKI,CPKI=nonstruct N,P inhibition constant on growth (g N,P g-1 C)
 !   ETOL=coefficient for etoliation effects on expansion,extension
 !
-    CCE=AMIN1(safe_adb(CZPOLB(NB,NZ),CZPOLB(NB,NZ)+CCPOLB(NB,NZ)*CNKI) &
-      ,safe_adb(CPPOLB(NB,NZ),CPPOLB(NB,NZ)+CCPOLB(NB,NZ)*CPKI))
+    CCE=AMIN1(safe_adb(CEPOLB(NB,ielmn,NZ),CEPOLB(NB,ielmn,NZ)+CEPOLB(NB,ielmc,NZ)*CNKI) &
+      ,safe_adb(CEPOLB(NB,ielmp,NZ),CEPOLB(NB,ielmp,NZ)+CEPOLB(NB,ielmc,NZ)*CPKI))
 
     ETOL=1.0_r8+CCE
 !
@@ -556,18 +554,18 @@ module PlantBranchMod
     !   IGTYP=growth type:0=bryophyte,1=graminoid,2=shrub,tree
 !
         IF(IDAY(1,NB,NZ).NE.0 &
-         .AND.CCPOLB(NB,NZ).GT.ZERO)THEN
+         .AND.CEPOLB(NB,ielmc,NZ).GT.ZERO)THEN
           CCC=AZMAX1(AMIN1(1.0 &
-            ,safe_adb(CZPOLB(NB,NZ),CZPOLB(NB,NZ) &
-            +CCPOLB(NB,NZ)*CNKI) &
-            ,safe_adb(CPPOLB(NB,NZ),CPPOLB(NB,NZ) &
-            +CCPOLB(NB,NZ)*CPKI)))
+            ,safe_adb(CEPOLB(NB,ielmn,NZ),CEPOLB(NB,ielmn,NZ) &
+            +CEPOLB(NB,ielmc,NZ)*CNKI) &
+            ,safe_adb(CEPOLB(NB,ielmp,NZ),CEPOLB(NB,ielmp,NZ) &
+            +CEPOLB(NB,ielmc,NZ)*CPKI)))
           CNC=AZMAX1(AMIN1(1.0 &
-            ,safe_adb(CCPOLB(NB,NZ),CCPOLB(NB,NZ) &
-            +CZPOLB(NB,NZ)/CNKI)))
+            ,safe_adb(CEPOLB(NB,ielmc,NZ),CEPOLB(NB,ielmc,NZ) &
+            +CEPOLB(NB,ielmn,NZ)/CNKI)))
           CPC=AZMAX1(AMIN1(1.0 &
-            ,safe_adb(CCPOLB(NB,NZ),CCPOLB(NB,NZ) &
-            +CPPOLB(NB,NZ)/CPKI)))
+            ,safe_adb(CEPOLB(NB,ielmc,NZ),CEPOLB(NB,ielmc,NZ) &
+            +CEPOLB(NB,ielmp,NZ)/CPKI)))
         ELSE
           CCC=0._r8
           CNC=0._r8
@@ -976,7 +974,6 @@ module PlantBranchMod
     WVSTKB  =>  plt_biom%WVSTKB     , &
     WTRSVB  =>  plt_biom%WTRSVB     , &
     WTSTBP  =>  plt_biom%WTSTBP     , &
-    CZPOLB  =>  plt_biom%CZPOLB     , &
     WTHSBP  =>  plt_biom%WTHSBP     , &
     WTEABP  =>  plt_biom%WTEABP     , &
     ZERO    =>  plt_site%ZERO       , &
@@ -2392,9 +2389,7 @@ module PlantBranchMod
 ! begin_execution
   associate(                              &
     TCC      =>  plt_ew%TCC         , &
-    CCPOLB   =>  plt_biom%CCPOLB    , &
-    CZPOLB   =>  plt_biom%CZPOLB    , &
-    CPPOLB   =>  plt_biom%CPPOLB    , &
+    CEPOLB   =>  plt_biom%CEPOLB    , &
     WTGRB    =>  plt_biom%WTGRB     , &
     WTRSVB   =>  plt_biom%WTRSVB    , &
     WTRSBN   =>  plt_biom%WTRSBN    , &
@@ -2459,9 +2454,9 @@ module PlantBranchMod
 !   DGSTGF=change in reproductive node number normalized for maturity group
 !
   IF(IDAY(6,NB,NZ).NE.0.AND.IDAY(9,NB,NZ).EQ.0)THEN
-    SET=AMIN1(CCPOLB(NB,NZ)/(CCPOLB(NB,NZ)+SETC) &
-      ,CZPOLB(NB,NZ)/(CZPOLB(NB,NZ)+SETN) &
-      ,CPPOLB(NB,NZ)/(CPPOLB(NB,NZ)+SETP))
+    SET=AMIN1(CEPOLB(NB,ielmc,NZ)/(CEPOLB(NB,ielmc,NZ)+SETC) &
+      ,CEPOLB(NB,ielmn,NZ)/(CEPOLB(NB,ielmn,NZ)+SETN) &
+      ,CEPOLB(NB,ielmp,NZ)/(CEPOLB(NB,ielmp,NZ)+SETP))
     IF(TCC(NZ).LT.CTC(NZ))THEN
       IF(IDAY(7,NB,NZ).EQ.0)THEN
         FGRNX=SSTX(NZ)*(CTC(NZ)-TCC(NZ))
@@ -3074,11 +3069,9 @@ module PlantBranchMod
     EPOOLR =>  plt_biom%EPOOLR  , &
     WTRVE  =>  plt_biom%WTRVE   , &
     WTRSBN =>  plt_biom%WTRSBN  , &
-    CCPOLB =>  plt_biom%CCPOLB  , &
-    CZPOLB =>  plt_biom%CZPOLB  , &
+    CEPOLB =>  plt_biom%CEPOLB  , &
     WTLSB  =>  plt_biom%WTLSB   , &
     ZEROP  =>  plt_biom%ZEROP   , &
-    CPPOLB =>  plt_biom%CPPOLB  , &
     WTRSVB =>  plt_biom%WTRSVB  , &
     WTRSBP =>  plt_biom%WTRSBP  , &
     WVSTKB =>  plt_biom%WVSTKB  , &
@@ -3350,9 +3343,9 @@ module PlantBranchMod
     WTRVE(ielmn,NZ)=WTRVE(ielmn,NZ)+XFRN
     WTRSBP(NB,NZ)=WTRSBP(NB,NZ)-XFRP
     WTRVE(ielmp,NZ)=WTRVE(ielmp,NZ)+XFRP
-    IF(CCPOLB(NB,NZ).GT.ZEROP(NZ))THEN
-      CNL=CCPOLB(NB,NZ)/(CCPOLB(NB,NZ)+CZPOLB(NB,NZ)/CNKI)
-      CPL=CCPOLB(NB,NZ)/(CCPOLB(NB,NZ)+CPPOLB(NB,NZ)/CPKI)
+    IF(CEPOLB(NB,ielmc,NZ).GT.ZEROP(NZ))THEN
+      CNL=CEPOLB(NB,ielmc,NZ)/(CEPOLB(NB,ielmc,NZ)+CEPOLB(NB,ielmn,NZ)/CNKI)
+      CPL=CEPOLB(NB,ielmc,NZ)/(CEPOLB(NB,ielmc,NZ)+CEPOLB(NB,ielmp,NZ)/CPKI)
     ELSE
       CNL=0._r8
       CPL=0._r8
@@ -3490,9 +3483,7 @@ module PlantBranchMod
     CARBN     =>  plt_bgcr%CARBN   , &
     TCO2A     =>  plt_bgcr%TCO2A   , &
     EPOOL     =>  plt_biom%EPOOL   , &
-    CPPOLB    =>  plt_biom%CPPOLB  , &
-    CZPOLB    =>  plt_biom%CZPOLB  , &
-    CCPOLB    =>  plt_biom%CCPOLB  , &
+    CEPOLB    =>  plt_biom%CEPOLB  , &
     ZERO      => plt_site%ZERO     , &
     IGTYP     =>  plt_pheno%IGTYP  , &
     TFN3      =>  plt_pheno%TFN3   , &
@@ -3505,10 +3496,10 @@ module PlantBranchMod
 ! CCPOLB,CZPOLB,CPPOLB=nonstructural C,N,P concn in branch(g g-1)
 ! CNKI,CPKI=nonstruct N,P inhibn constant on growth(g N,P g-1 C)
 !
-  IF(CCPOLB(NB,NZ).GT.ZERO)THEN
-    CNPG=AMIN1(CZPOLB(NB,NZ)/(CZPOLB(NB,NZ) &
-      +CCPOLB(NB,NZ)*CNKI),CPPOLB(NB,NZ)/(CPPOLB(NB,NZ) &
-      +CCPOLB(NB,NZ)*CPKI))
+  IF(CEPOLB(NB,ielmc,NZ).GT.ZERO)THEN
+    CNPG=AMIN1(CEPOLB(NB,ielmn,NZ)/(CEPOLB(NB,ielmn,NZ) &
+      +CEPOLB(NB,ielmc,NZ)*CNKI),CEPOLB(NB,ielmp,NZ)/(CEPOLB(NB,ielmp,NZ) &
+      +CEPOLB(NB,ielmc,NZ)*CPKI))
   ELSE
     CNPG=1.0_r8
   ENDIF
@@ -3647,9 +3638,7 @@ module PlantBranchMod
   real(r8) :: SNCRM
 ! begin_execution
   associate(                          &
-    CCPOLB    =>  plt_biom%CCPOLB   , &
-    CPPOLB    =>  plt_biom%CPPOLB   , &
-    CZPOLB    =>  plt_biom%CZPOLB   , &
+    CEPOLB    =>  plt_biom%CEPOLB   , &
     EPOOL     =>  plt_biom%EPOOL    , &
     IGTYP     =>  plt_pheno%IGTYP   , &
     TFN4      =>  plt_pheno%TFN4    , &
@@ -3670,9 +3659,9 @@ module PlantBranchMod
 ! CCPOLB,CZPOLB,CPPOLB=nonstructural C,N,P concn in branch
 ! CNKI,CPKI=nonstructural N,P inhibition constant on growth
 !
-  IF(CCPOLB(NB,NZ).GT.ZERO)THEN
-    CNPG=AMIN1(CZPOLB(NB,NZ)/(CZPOLB(NB,NZ)+CCPOLB(NB,NZ)*CNKI), &
-      CPPOLB(NB,NZ)/(CPPOLB(NB,NZ)+CCPOLB(NB,NZ)*CPKI))
+  IF(CEPOLB(NB,ielmc,NZ).GT.ZERO)THEN
+    CNPG=AMIN1(CEPOLB(NB,ielmn,NZ)/(CEPOLB(NB,ielmn,NZ)+CEPOLB(NB,ielmc,NZ)*CNKI), &
+      CEPOLB(NB,ielmp,NZ)/(CEPOLB(NB,ielmp,NZ)+CEPOLB(NB,ielmc,NZ)*CPKI))
   ELSE
     CNPG=1.0_r8
   ENDIF

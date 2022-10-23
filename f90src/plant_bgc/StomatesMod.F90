@@ -661,9 +661,7 @@
   real(r8), intent(in) :: TFN1,TFN2,TFNE,XKO2L
 !     begin_execution
   associate(                          &
-    CCPOLB =>  plt_biom%CCPOLB  , &
-    CZPOLB =>  plt_biom%CZPOLB  , &
-    CPPOLB =>  plt_biom%CPPOLB  , &
+    CEPOLB =>  plt_biom%CEPOLB  , &
     IWTYP  =>  plt_pheno%IWTYP  , &
     IBTYP  =>  plt_pheno%IBTYP  , &
     FLG4   =>  plt_pheno%FLG4   , &
@@ -681,9 +679,9 @@
 !     FDBK=N,P feedback inhibition on C3 CO2 fixation
 !     CNKI,CPKI=nonstructural N,P inhibition constant on rubisco
 !
-  IF(CCPOLB(NB,NZ).GT.ZERO)THEN
-    FDBK(NB,NZ)=AMIN1(CZPOLB(NB,NZ)/(CZPOLB(NB,NZ)+CCPOLB(NB,NZ)/CNKI) &
-      ,CPPOLB(NB,NZ)/(CPPOLB(NB,NZ)+CCPOLB(NB,NZ)/CPKI))
+  IF(CEPOLB(NB,ielmc,NZ).GT.ZERO)THEN
+    FDBK(NB,NZ)=AMIN1(CEPOLB(NB,ielmn,NZ)/(CEPOLB(NB,ielmn,NZ)+CEPOLB(NB,ielmc,NZ)/CNKI) &
+      ,CEPOLB(NB,ielmp,NZ)/(CEPOLB(NB,ielmp,NZ)+CEPOLB(NB,ielmc,NZ)/CPKI))
   ELSE
     FDBK(NB,NZ)=1.0
   ENDIF
@@ -740,7 +738,7 @@
   real(r8) :: TKCO
 !     begin_execution
   associate(                          &
-    CCPOLB =>  plt_biom%CCPOLB  , &
+    CEPOLB =>  plt_biom%CEPOLB  , &
     TKCZ   =>  plt_ew%TKCZ      , &
     OFFST  =>  plt_pheno%OFFST  , &
     XKO2   =>  plt_photo%XKO2   , &

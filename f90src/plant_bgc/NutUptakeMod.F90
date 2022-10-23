@@ -55,9 +55,7 @@ module NutUptakeMod
     ZEROP   =>  plt_biom%ZEROP    , &
     WTLSB   =>  plt_biom%WTLSB    , &
     EPOOL   =>  plt_biom%EPOOL    , &
-    CCPOLB  =>  plt_biom%CCPOLB   , &
-    CZPOLB  =>  plt_biom%CZPOLB   , &
-    CPPOLB  =>  plt_biom%CPPOLB   , &
+    CEPOLB  =>  plt_biom%CEPOLB   , &
     RC      =>  plt_photo%RC      , &
     RA      =>  plt_photo%RA      , &
     ARLFB   =>  plt_morph%ARLFB   , &
@@ -82,19 +80,18 @@ module NutUptakeMod
   !
   SNH3P=SNH3X*EXP(0.513_r8-0.0171_r8*TCC(NZ))
   FNH3P=1.0E-04_r8*FDMP
-  DO 105 NB=1,NBR(NZ)
-    IF(WTLSB(NB,NZ).GT.ZEROP(NZ) &
-      .AND.ARLFB(NB,NZ).GT.ZEROP(NZ) &
+  D105: DO NB=1,NBR(NZ)
+    IF(WTLSB(NB,NZ).GT.ZEROP(NZ).AND.ARLFB(NB,NZ).GT.ZEROP(NZ) &
       .AND.ARLFP(NZ).GT.ZEROP(NZ))THEN
-      CNH3P=AZMAX1(FNH3P*CZPOLB(NB,NZ)/SNH3P)
+      CNH3P=AZMAX1(FNH3P*CEPOLB(NB,ielmn,NZ)/SNH3P)
       ZPOOLB=AZMAX1(EPOOL(NB,ielmn,NZ))
       RNH3B(NB,NZ)=AMIN1(0.1_r8*ZPOOLB,AMAX1((CNH3E-CNH3P)/(RA(NZ)+RC(NZ)) &
         *FRADP(NZ)*AREA3(NU)*ARLFB(NB,NZ)/ARLFP(NZ),-0.1_r8*ZPOOLB))
-      ELSE
+    ELSE
       RNH3B(NB,NZ)=0.0_r8
-      ENDIF
+    ENDIF
 
-105   CONTINUE
+  ENDDO D105
   end associate
   end subroutine CanopyNH3Flux
 

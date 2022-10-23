@@ -337,21 +337,17 @@ module HfuncsMod
   implicit none
   integer, intent(in) :: I,J,NZ
 
-  integer :: NB,N,L
+  integer :: NB,N,L,NE
   real(r8):: ARLSP
   associate(                           &
     WTLS   =>  plt_biom%WTLS     , &
     WTLSB  =>  plt_biom%WTLSB    , &
     WTSHTE =>  plt_biom%WTSHTE   , &
     CCPLNP =>  plt_biom%CCPLNP   , &
-    CCPOLB =>  plt_biom%CCPOLB   , &
-    CZPOLB =>  plt_biom%CZPOLB   , &
-    CPPOLB =>  plt_biom%CPPOLB   , &
+    CEPOLB =>  plt_biom%CEPOLB   , &
     CEPOLP =>  plt_biom%CEPOLP   , &
     EPOOLP =>  plt_biom%EPOOLP   , &
-    CPOLNB =>  plt_biom%CPOLNB   , &
-    ZPOLNB =>  plt_biom%ZPOLNB   , &
-    PPOLNB =>  plt_biom%PPOLNB   , &
+    EPOLNB =>  plt_biom%EPOLNB   , &
     EPOOLR =>  plt_biom%EPOOLR   , &
     EPOOL  =>  plt_biom%EPOOL    , &
     CCPOLR =>  plt_biom%CCPOLR   , &
@@ -360,9 +356,7 @@ module HfuncsMod
     ZEROL  =>  plt_biom%ZEROL    , &
     ZEROP  =>  plt_biom%ZEROP    , &
     WTRTL  =>  plt_biom%WTRTL    , &
-    CPOLNP =>  plt_biom%CPOLNP   , &
-    ZPOLNP =>  plt_biom%ZPOLNP   , &
-    PPOLNP =>  plt_biom%PPOLNP   , &
+    EPOLNP =>  plt_biom%EPOLNP   , &
     VOLWC  =>  plt_ew%VOLWC      , &
     VHCPC  =>  plt_ew%VHCPC      , &
     NU     =>  plt_site%NU       , &
@@ -391,7 +385,7 @@ module HfuncsMod
   NI(NZ)=NIX(NZ)
   NG(NZ)=MIN(NI(NZ),MAX(NG(NZ),NU))
   NB1(NZ)=1
-  NBTX=1.0E+06
+  NBTX=1.0E+06_r8
 !
 ! TOTAL PLANT NON-STRUCTURAL C, N, P
 !
@@ -399,20 +393,23 @@ module HfuncsMod
 ! CPOLN*,ZPOLN*,PPOLN*=non-structl C,N,P in branch,canopy nodules (g)
 ! NB1=main branch number
 !
-  D140: DO NB=1,NBR(NZ)
+  DO NE=1,npelms
+    D140: DO NB=1,NBR(NZ)
+      IF(IDTHB(NB,NZ).EQ.0)THEN
+        EPOOLP(NE,NZ)=EPOOLP(NE,NZ)+EPOOL(NB,NE,NZ)
+        EPOLNP(NE,NZ)=EPOLNP(NE,NZ)+EPOLNB(NB,NE,NZ)
+      ENDIF
+    ENDDO D140
+  ENDDO
+
+  DO NB=1,NBR(NZ)
     IF(IDTHB(NB,NZ).EQ.0)THEN
-      EPOOLP(ielmc,NZ)=EPOOLP(ielmc,NZ)+EPOOL(NB,ielmc,NZ)
-      EPOOLP(ielmn,NZ)=EPOOLP(ielmn,NZ)+EPOOL(NB,ielmn,NZ)
-      EPOOLP(ielmp,NZ)=EPOOLP(ielmp,NZ)+EPOOL(NB,ielmp,NZ)
-      CPOLNP(NZ)=CPOLNP(NZ)+CPOLNB(NB,NZ)
-      ZPOLNP(NZ)=ZPOLNP(NZ)+ZPOLNB(NB,NZ)
-      PPOLNP(NZ)=PPOLNP(NZ)+PPOLNB(NB,NZ)
       IF(NBTB(NB,NZ).LT.NBTX)THEN
         NB1(NZ)=NB
         NBTX=NBTB(NB,NZ)
       ENDIF
     ENDIF
-  ENDDO D140
+  ENDDO
 !
 ! NON-STRUCTURAL C, N, P CONCENTRATIONS IN ROOT
 !
@@ -420,8 +417,8 @@ module HfuncsMod
 ! CPOOLR,ZPOOLR,PPOOLR=non-structl C,N,P in root(1),myco(2)(g)
 ! CCPOLR,CZPOLR,CPPOLR=non-structl C,N,P concn in root(1),myco(2)(g g-1)
 !
-  DO 180 N=1,MY(NZ)
-    DO 160 L=NU,NI(NZ)
+  D180: DO N=1,MY(NZ)
+    D160: DO L=NU,NI(NZ)
       IF(WTRTL(N,L,NZ).GT.ZEROL(NZ))THEN
         CCPOLR(N,L,NZ)=AZMAX1(EPOOLR(ielmc,N,L,NZ)/WTRTL(N,L,NZ))
         CZPOLR(N,L,NZ)=AZMAX1(EPOOLR(ielmn,N,L,NZ)/WTRTL(N,L,NZ))
@@ -432,8 +429,8 @@ module HfuncsMod
         CZPOLR(N,L,NZ)=1.0
         CPPOLR(N,L,NZ)=1.0
       ENDIF
-160 CONTINUE
-180 CONTINUE
+    ENDDO D160
+  ENDDO D180
 !
 ! NON-STRUCTURAL C, N, P CONCENTRATIONS IN SHOOT
 !
@@ -445,24 +442,22 @@ module HfuncsMod
     CEPOLP(ielmc,NZ)=AZMAX1(AMIN1(1.0_r8,EPOOLP(ielmc,NZ)/WTLS(NZ)))
     CEPOLP(ielmn,NZ)=AZMAX1(AMIN1(1.0_r8,EPOOLP(ielmn,NZ)/WTLS(NZ)))
     CEPOLP(ielmp,NZ)=AZMAX1(AMIN1(1.0_r8,EPOOLP(ielmp,NZ)/WTLS(NZ)))
-    CCPLNP(NZ)=AZMAX1(AMIN1(1.0_r8,CPOLNP(NZ)/WTLS(NZ)))
+    CCPLNP(NZ)=AZMAX1(AMIN1(1.0_r8,EPOLNP(ielmc,NZ)/WTLS(NZ)))
   ELSE
     CEPOLP(ielmc,NZ)=1.0_r8
     CEPOLP(ielmn,NZ)=1.0_r8
     CEPOLP(ielmp,NZ)=1.0_r8
     CCPLNP(NZ)=1.0_r8
   ENDIF
-  D190: DO NB=1,NBR(NZ)
-    IF(WTLSB(NB,NZ).GT.ZEROP(NZ))THEN
-      CCPOLB(NB,NZ)=AZMAX1(EPOOL(NB,ielmc,NZ)/WTLSB(NB,NZ))
-      CZPOLB(NB,NZ)=AZMAX1(EPOOL(NB,ielmn,NZ)/WTLSB(NB,NZ))
-      CPPOLB(NB,NZ)=AZMAX1(EPOOL(NB,ielmp,NZ)/WTLSB(NB,NZ))
-    ELSE
-      CCPOLB(NB,NZ)=1.0
-      CZPOLB(NB,NZ)=1.0
-      CPPOLB(NB,NZ)=1.0
-    ENDIF
-  ENDDO D190
+  DO NE=1,npelms
+    D190: DO NB=1,NBR(NZ)
+      IF(WTLSB(NB,NZ).GT.ZEROP(NZ))THEN
+        CEPOLB(NB,NE,NZ)=AZMAX1(EPOOL(NB,NE,NZ)/WTLSB(NB,NZ))
+      ELSE
+        CEPOLB(NB,NE,NZ)=1.0
+      ENDIF
+    ENDDO D190
+  ENDDO
 !
 ! EMERGENCE DATE FROM COTYLEDON HEIGHT, LEAF AREA, ROOT DEPTH
 !

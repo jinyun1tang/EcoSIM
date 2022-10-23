@@ -671,10 +671,7 @@ module grosubsMod
   associate(                            &
     EPOOL    =>  plt_biom%EPOOL   , &
     EPOOLR   =>  plt_biom%EPOOLR  , &
-    ZPOLNP   =>  plt_biom%ZPOLNP  , &
-    PPOLNB   =>  plt_biom%PPOLNB  , &
-    CPOLNB   =>  plt_biom%CPOLNB  , &
-    ZPOLNB   =>  plt_biom%ZPOLNB  , &
+    EPOLNB   =>  plt_biom%EPOLNB  , &
     WTNDBP   =>  plt_biom%WTNDBP  , &
     WTNDE    =>  plt_biom%WTNDE   , &
     WTRTSE   =>  plt_biom%WTRTSE  , &
@@ -717,11 +714,10 @@ module grosubsMod
     WTEARE   =>  plt_biom%WTEARE  , &
     WTGRE    =>  plt_biom%WTGRE   , &
     WTLS     =>  plt_biom%WTLS    , &
-    PPOLNP   =>  plt_biom%PPOLNP  , &
     WTNDL    =>  plt_biom%WTNDL   , &
     WTNDLN   =>  plt_biom%WTNDLN  , &
     EPOOLP   =>  plt_biom%EPOOLP  , &
-    CPOLNP   =>  plt_biom%CPOLNP  , &
+    EPOLNP   =>  plt_biom%EPOLNP  , &
     WTRT1    =>  plt_biom%WTRT1   , &
     WTRT1N   =>  plt_biom%WTRT1N  , &
     WTRT1P   =>  plt_biom%WTRT1P  , &
@@ -844,17 +840,17 @@ module grosubsMod
 !
   IF(INTYP(NZ).NE.0)THEN
     IF(INTYP(NZ).GE.4)THEN
-      DO 7950 NB=1,NBR(NZ)
-        CPOLNP(NZ)=CPOLNP(NZ)+CPOLNB(NB,NZ)
-        ZPOLNP(NZ)=ZPOLNP(NZ)+ZPOLNB(NB,NZ)
-        PPOLNP(NZ)=PPOLNP(NZ)+PPOLNB(NB,NZ)
-7950  CONTINUE
+      DO NE=1,npelms
+        D7950: DO NB=1,NBR(NZ)
+          EPOLNP(NE,NZ)=EPOLNP(NE,NZ)+EPOLNB(NB,NE,NZ)
+        ENDDO D7950
+      ENDDO
       WTNDE(ielmc,NZ)=sum(WTNDB(1:NBR(NZ),NZ))+&
-        sum(CPOLNB(1:NBR(NZ),NZ))
+        sum(EPOLNB(1:NBR(NZ),ielmc,NZ))
       WTNDE(ielmn,NZ)=sum(WTNDBN(1:NBR(NZ),NZ))+&
-        sum(ZPOLNB(1:NBR(NZ),NZ))
+        sum(EPOLNB(1:NBR(NZ),ielmn,NZ))
       WTNDE(ielmp,NZ)=sum(WTNDBP(1:NBR(NZ),NZ))+&
-        sum(PPOLNB(1:NBR(NZ),NZ))
+        sum(EPOLNB(1:NBR(NZ),ielmp,NZ))
     ELSEIF(INTYP(NZ).GE.1.AND.INTYP(NZ).LE.3)THEN
       WTNDE(ielmc,NZ)=sum(WTNDL(NU:NI(NZ),NZ))+&
         sum(CPOOLN(NU:NI(NZ),NZ))

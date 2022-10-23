@@ -646,11 +646,10 @@ module StartqsMod
 !
   WSTR(NZ)=0._r8
   CHILL(NZ)=0._r8
-  DO 25 NB=1,10
-    plt_biom%EPOOL(NB,1:npelms,NZ)=0._r8
-    plt_biom%CPOLNB(NB,NZ)=0._r8
-    plt_biom%ZPOLNB(NB,NZ)=0._r8
-    plt_biom%PPOLNB(NB,NZ)=0._r8
+    plt_biom%EPOOL(1:JC1,1:npelms,NZ)=0._r8
+    plt_biom%EPOLNB(1:JC1,1:npelms,NZ)=0._r8
+
+  D25: DO NB=1,JC1
     plt_biom%WTSHTB(NB,NZ)=0._r8
     plt_biom%WTLFB(NB,NZ)=0._r8
     plt_biom%WTNDB(NB,NZ)=0._r8
@@ -742,7 +741,7 @@ module StartqsMod
 45      CONTINUE
       ENDIF
     enddo
-25  CONTINUE
+  ENDDO D25
   D35: DO L=1,JC1
     ARLFV(L,NZ)=0._r8
     plt_biom%WGLFV(L,NZ)=0._r8
