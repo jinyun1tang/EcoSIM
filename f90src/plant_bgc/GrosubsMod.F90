@@ -558,22 +558,16 @@ module grosubsMod
 !     begin_execution
   associate(                                 &
     WTLFBE     =>  plt_biom%WTLFBE     , &
-    WTGRB      =>  plt_biom%WTGRB      , &
-    WTGRBN     =>  plt_biom%WTGRBN     , &
-    WTGRBP     =>  plt_biom%WTGRBP     , &
+    WTGRBE     =>  plt_biom%WTGRBE     , &
     EPOOLR     =>  plt_biom%EPOOLR     , &
     WTRTD      =>  plt_biom%WTRTD      , &
     WTSHTBE    =>  plt_biom%WTSHTBE    , &
     WTEARB     =>  plt_biom%WTEARB     , &
     WTSTKBE    =>  plt_biom%WTSTKBE    , &
-    WTRSBN     =>  plt_biom%WTRSBN     , &
     WTSHEBE    =>  plt_biom%WTSHEBE    , &
-    WTHSKB     =>  plt_biom%WTHSKB     , &
+    WTHSKBE    =>  plt_biom%WTHSKBE    , &
     WTEABN     =>  plt_biom%WTEABN     , &
-    WTHSBP     =>  plt_biom%WTHSBP     , &
-    WTRSVB     =>  plt_biom%WTRSVB     , &
-    WTHSBN     =>  plt_biom%WTHSBN     , &
-    WTRSBP     =>  plt_biom%WTRSBP     , &
+    WTRSVBE     =>  plt_biom%WTRSVBE     , &
     WTEABP     =>  plt_biom%WTEABP     , &
     EPOOL      =>  plt_biom%EPOOL      , &
     NU         =>  plt_site%NU         , &
@@ -595,7 +589,7 @@ module grosubsMod
 !     CPOLNB,ZPOLNB,PPOLNB=nonstructural C,N,P in bacteria
 !     CPOOLK=total C4 nonstructural C in branch
 !     WTSHTB,WTSHTN,WTSHTP=branch total C,N,P mass
-!     WTRSVB,WTRSBN,WTRSBP=stalk reserve C,N,P mass
+!     WTRSVBE,WTRSBN,WTRSBP=stalk reserve C,N,P mass
 !     WTLFB,WTLFBN,WTLFBP=branch leaf C,N,P mass
 !     FWODB=C woody fraction in other organs:0=woody,1=non-woody
 !     WTNDB,WTNDBN,WTNDBP=bacterial C,N,P mass
@@ -607,7 +601,7 @@ module grosubsMod
 !     IWTYP=phenology type:0=evergreen,1=cold decid,2=drought decid,3=1+2
 !     WTRVC,WTRVN,WTRVP=storage C,N,P
 !
-  DO 320 NB=1,NBR(NZ)
+  D320: DO NB=1,NBR(NZ)
     CPOOLK(NB,NZ)=0._r8
     D325: DO K=1,JNODS1
       CPOOLK(NB,NZ)=CPOOLK(NB,NZ) &
@@ -615,18 +609,18 @@ module grosubsMod
         +CO2B(K,NB,NZ)+HCOB(K,NB,NZ)
     ENDDO D325
     WTSHTBE(NB,ielmc,NZ)=WTLFBE(NB,ielmc,NZ) &
-      +WTSHEBE(NB,ielmc,NZ)+WTSTKBE(NB,ielmc,NZ)+WTRSVB(NB,NZ) &
-      +WTHSKB(NB,NZ)+WTEARB(NB,NZ)+WTGRB(NB,NZ) &
+      +WTSHEBE(NB,ielmc,NZ)+WTSTKBE(NB,ielmc,NZ)+WTRSVBE(NB,ielmc,NZ) &
+      +WTHSKBE(NB,ielmc,NZ)+WTEARB(NB,NZ)+WTGRBE(NB,ielmc,NZ) &
       +EPOOL(NB,ielmc,NZ)+CPOOLK(NB,NZ)
     WTSHTBE(NB,ielmn,NZ)=WTLFBE(NB,ielmn,NZ) &
-      +WTSHEBE(NB,ielmn,NZ)+WTSTKBE(NB,ielmn,NZ)+WTRSBN(NB,NZ) &
-      +WTHSBN(NB,NZ)+WTEABN(NB,NZ)+WTGRBN(NB,NZ) &
+      +WTSHEBE(NB,ielmn,NZ)+WTSTKBE(NB,ielmn,NZ)+WTRSVBE(NB,ielmn,NZ) &
+      +WTHSKBE(NB,ielmn,NZ)+WTEABN(NB,NZ)+WTGRBE(NB,ielmn,NZ) &
       +EPOOL(NB,ielmn,NZ)
     WTSHTBE(NB,ielmp,NZ)=WTLFBE(NB,ielmp,NZ) &
-      +WTSHEBE(NB,ielmp,NZ)+WTSTKBE(NB,ielmp,NZ)+WTRSBP(NB,NZ) &
-      +WTHSBP(NB,NZ)+WTEABP(NB,NZ)+WTGRBP(NB,NZ) &
+      +WTSHEBE(NB,ielmp,NZ)+WTSTKBE(NB,ielmp,NZ)+WTRSVBE(NB,ielmp,NZ) &
+      +WTHSKBE(NB,ielmp,NZ)+WTEABP(NB,NZ)+WTGRBE(NB,ielmp,NZ) &
       +EPOOL(NB,ielmp,NZ)
-320   CONTINUE
+  ENDDO D320
 !
 !     TOTAL C,N,P IN ROOTS AND MYCORRHIZAE IN EACH SOIL LAYER
 !
@@ -664,19 +658,13 @@ module grosubsMod
     WTNDB    =>  plt_biom%WTNDB   , &
     WTSHTBE  =>  plt_biom%WTSHTBE , &
     WTSTKBE  =>  plt_biom%WTSTKBE , &
-    WTHSKB   =>  plt_biom%WTHSKB  , &
-    WTRSVB   =>  plt_biom%WTRSVB  , &
+    WTHSKBE  =>  plt_biom%WTHSKBE , &
+    WTRSVBE   =>  plt_biom%WTRSVBE  , &
     WTEARB   =>  plt_biom%WTEARB  , &
     WTLSB    =>  plt_biom%WTLSB   , &
     WTEABN   =>  plt_biom%WTEABN  , &
-    WTGRBN   =>  plt_biom%WTGRBN  , &
-    WTHSBP   =>  plt_biom%WTHSBP  , &
     WTEABP   =>  plt_biom%WTEABP  , &
-    WTGRBP   =>  plt_biom%WTGRBP  , &
-    WTRSBP   =>  plt_biom%WTRSBP  , &
-    WTHSBN   =>  plt_biom%WTHSBN  , &
-    WTRSBN   =>  plt_biom%WTRSBN  , &
-    WTGRB    =>  plt_biom%WTGRB   , &
+    WTGRBE   =>  plt_biom%WTGRBE  , &
     WTLFBE   =>  plt_biom%WTLFBE  , &
     WVSTKB   =>  plt_biom%WVSTKB  , &
     WTSHEBE  =>  plt_biom%WTSHEBE , &
@@ -737,7 +725,7 @@ module grosubsMod
 !
 !     CPOOL,ZPOOL,PPOOL=non-structural C,N,P mass in branch
 !     WTSHTB,WTSHTN,WTSHTP=branch total C,N,P mass
-!     WTRSVB,WTRSBN,WTRSBP=stalk reserve C,N,P mass
+!     WTRSVBE,WTRSBN,WTRSBP=stalk reserve C,N,P mass
 !     WTLFB,WTLFBN,WTLFBP=branch leaf C,N,P mass
 !     WTNDB,WTNDBN,WTNDBP=bacterial C,N,P mass
 !     WTSHEB,WTSHBN,WTSHBP=branch petiole C,N,P mass
@@ -755,22 +743,18 @@ module grosubsMod
     WTSHEE(NE,NZ)=sum(WTSHEBE(1:NBR(NZ),NE,NZ))
     WTSTKE(NE,NZ)=sum(WTSTKBE(1:NBR(NZ),NE,NZ))
     WTLFE(NE,NZ)=sum(WTLFBE(1:NBR(NZ),NE,NZ))
+    WTRSVE(NE,NZ)=sum(WTRSVBE(1:NBR(NZ),NE,NZ))
+    WTHSKE(NE,NZ)=sum(WTHSKBE(1:NBR(NZ),NE,NZ))
+    WTGRE(NE,NZ)=sum(WTGRBE(1:NBR(NZ),NE,NZ))
   ENDDO
 
   WVSTK(NZ)=sum(WVSTKB(1:NBR(NZ),NZ))
-  WTRSVE(ielmc,NZ)=sum(WTRSVB(1:NBR(NZ),NZ))
-  WTHSKE(ielmc,NZ)=sum(WTHSKB(1:NBR(NZ),NZ))
+
   WTEARE(ielmc,NZ)=sum(WTEARB(1:NBR(NZ),NZ))
-  WTGRE(ielmc,NZ)=sum(WTGRB(1:NBR(NZ),NZ))
-  WTLS(NZ)=sum(WTLSB(1:NBR(NZ),NZ))
-  WTRSVE(ielmn,NZ)=sum(WTRSBN(1:NBR(NZ),NZ))
-  WTHSKE(ielmn,NZ)=sum(WTHSBN(1:NBR(NZ),NZ))
   WTEARE(ielmn,NZ)=sum(WTEABN(1:NBR(NZ),NZ))
-  WTGRE(ielmn,NZ)=sum(WTGRBN(1:NBR(NZ),NZ))
-  WTRSVE(ielmp,NZ)=sum(WTRSBP(1:NBR(NZ),NZ))
-  WTHSKE(ielmp,NZ)=sum(WTHSBP(1:NBR(NZ),NZ))
   WTEARE(ielmp,NZ)=sum(WTEABP(1:NBR(NZ),NZ))
-  WTGRE(ielmp,NZ)=sum(WTGRBP(1:NBR(NZ),NZ))
+
+  WTLS(NZ)=sum(WTLSB(1:NBR(NZ),NZ))
   GRNO(NZ)  =sum(GRNOB(1:NBR(NZ),NZ))
   ARLFP(NZ)=sum(ARLFB(1:NBR(NZ),NZ))
   ARSTP(NZ)=sum(ARSTK(1:JC1,1:NBR(NZ),NZ))

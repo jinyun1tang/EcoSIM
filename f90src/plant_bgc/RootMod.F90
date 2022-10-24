@@ -1676,12 +1676,10 @@ implicit none
     EPOOL      =>   plt_biom%EPOOL    , &
     WTRTD      =>   plt_biom%WTRTD    , &
     WVSTKB     =>   plt_biom%WVSTKB   , &
-    WTRSVB     =>   plt_biom%WTRSVB   , &
-    WTRSBN     =>   plt_biom%WTRSBN   , &
+    WTRSVBE    =>   plt_biom%WTRSVBE  , &
     WTRVE      =>   plt_biom%WTRVE    , &
     WTLS       =>   plt_biom%WTLS     , &
     WTRTE      =>   plt_biom%WTRTE    , &
-    WTRSBP     =>   plt_biom%WTRSBP   , &
     ZEROL      =>   plt_biom%ZEROL    , &
     ZEROP      =>   plt_biom%ZEROP    , &
     IBTYP      =>   plt_pheno%IBTYP   , &
@@ -1768,33 +1766,32 @@ implicit none
     WTRSVT=0._r8
     WTRSNT=0._r8
     WTRSPT=0._r8
-    DO 330 NB=1,NBR(NZ)
+    D330: DO NB=1,NBR(NZ)
       IF(IDTHB(NB,NZ).EQ.0)THEN
         IF(IDAY(7,NB,NZ).NE.0)THEN
           WTSTKT=WTSTKT+WVSTKB(NB,NZ)
-          WTRSVT=WTRSVT+WTRSVB(NB,NZ)
-          WTRSNT=WTRSNT+WTRSBN(NB,NZ)
-          WTRSPT=WTRSPT+WTRSBP(NB,NZ)
+          WTRSVT=WTRSVT+WTRSVBE(NB,ielmc,NZ)
+          WTRSNT=WTRSNT+WTRSVBE(NB,ielmn,NZ)
+          WTRSPT=WTRSPT+WTRSVBE(NB,ielmp,NZ)
         ENDIF
       ENDIF
-330 CONTINUE
-    IF(WTSTKT.GT.ZEROP(NZ) &
-      .AND.WTRSVT.GT.ZEROP(NZ))THEN
-      DO 335 NB=1,NBR(NZ)
+    ENDDO D330
+    IF(WTSTKT.GT.ZEROP(NZ).AND.WTRSVT.GT.ZEROP(NZ))THEN
+      D335: DO NB=1,NBR(NZ)
         IF(IDTHB(NB,NZ).EQ.0)THEN
           IF(IDAY(7,NB,NZ).NE.0)THEN
-            WTRSVD=WTRSVT*WVSTKB(NB,NZ)-WTRSVB(NB,NZ)*WTSTKT
-            XFRC=0.1*WTRSVD/WTSTKT
-            WTRSVB(NB,NZ)=WTRSVB(NB,NZ)+XFRC
-            WTRSND=WTRSNT*WTRSVB(NB,NZ)-WTRSBN(NB,NZ)*WTRSVT
-            XFRN=0.1*WTRSND/WTRSVT
-            WTRSBN(NB,NZ)=WTRSBN(NB,NZ)+XFRN
-            WTRSPD=WTRSPT*WTRSVB(NB,NZ)-WTRSBP(NB,NZ)*WTRSVT
-            XFRP=0.1*WTRSPD/WTRSVT
-            WTRSBP(NB,NZ)=WTRSBP(NB,NZ)+XFRP
+            WTRSVD=WTRSVT*WVSTKB(NB,NZ)-WTRSVBE(NB,ielmc,NZ)*WTSTKT
+            XFRC=0.1_r8*WTRSVD/WTSTKT
+            WTRSVBE(NB,ielmc,NZ)=WTRSVBE(NB,ielmc,NZ)+XFRC
+            WTRSND=WTRSNT*WTRSVBE(NB,ielmc,NZ)-WTRSVBE(NB,ielmn,NZ)*WTRSVT
+            XFRN=0.1_r8*WTRSND/WTRSVT
+            WTRSVBE(NB,ielmn,NZ)=WTRSVBE(NB,ielmn,NZ)+XFRN
+            WTRSPD=WTRSPT*WTRSVBE(NB,ielmc,NZ)-WTRSVBE(NB,ielmp,NZ)*WTRSVT
+            XFRP=0.1_r8*WTRSPD/WTRSVT
+            WTRSVBE(NB,ielmp,NZ)=WTRSVBE(NB,ielmp,NZ)+XFRP
           ENDIF
         ENDIF
-335   CONTINUE
+      ENDDO D335
     ENDIF
   ENDIF
 !
