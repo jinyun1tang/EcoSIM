@@ -701,7 +701,7 @@ module StartqMod
       PSIRT(N,L,NZ,NY,NX)=-0.01
       PSIRO(N,L,NZ,NY,NX)=OSMO(NZ,NY,NX)+PSIRT(N,L,NZ,NY,NX)
       PSIRG(N,L,NZ,NY,NX)=AZMAX1(PSIRT(N,L,NZ,NY,NX)-PSIRO(N,L,NZ,NY,NX))
-      EPOOLR(N,L,NZ,NY,NX,:)=0._r8
+      EPOOLR(1:npelms,N,L,NZ,NY,NX)=0._r8
       CCPOLR(N,L,NZ,NY,NX)=0._r8
       CZPOLR(N,L,NZ,NY,NX)=0._r8
       CPPOLR(N,L,NZ,NY,NX)=0._r8
