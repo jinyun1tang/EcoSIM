@@ -112,7 +112,7 @@ module CanopyDataType
   real(r8),allocatable ::  WTSTKE(:,:,:,:)                    !canopy stalk element, [g d-2]
   real(r8),allocatable ::  WVSTK(:,:,:)                       !canopy active stalk C, [g d-2]
   real(r8),allocatable ::  WTRSVE(:,:,:,:)                    !canopy reserve element, [g d-2]
-  real(r8),allocatable ::  WTHSKE(:,:,:,:)                    !canopy husk C, [g d-2]
+  real(r8),allocatable ::  WTHSKE(:,:,:,:)                    !canopy husk element, [g d-2]
   real(r8),allocatable ::  WTEARE(:,:,:,:)                    !canopy ear element, [g d-2]
   real(r8),allocatable ::  WTGRE(:,:,:,:)                     !canopy grain element, [g d-2]
   real(r8),allocatable ::  WTLS(:,:,:)                        !canopy leaf + sheath C, [g d-2]
@@ -126,9 +126,9 @@ module CanopyDataType
   real(r8),allocatable ::  WVSTKB(:,:,:,:)                    !branch active stalk C, [g d-2]
   real(r8),allocatable ::  EPOOL(:,:,:,:,:)                   !branch nonstructural element, [g d-2]
   real(r8),allocatable ::  WTLSB(:,:,:,:)                     !branch leaf + sheath C, [g d-2]
-  real(r8),allocatable ::  WTSHTB(:,:,:,:)                    !branch shoot C, [g d-2]
+  real(r8),allocatable ::  WTSHTBE(:,:,:,:,:)                 !branch shoot C, [g d-2]
   real(r8),allocatable ::  WTLFB(:,:,:,:)                     !branch leaf C, [g d-2]
-  real(r8),allocatable ::  WTSHEB(:,:,:,:)                    !branch sheath C , [g d-2]
+  real(r8),allocatable ::  WTSHEBE(:,:,:,:,:)                 !branch sheath element , [g d-2]
   real(r8),allocatable ::  WTSTKB(:,:,:,:)                    !branch stalk C, [g d-2]
   real(r8),allocatable ::  WTRSVB(:,:,:,:)                    !branch reserve C, [g d-2]
   real(r8),allocatable ::  WTHSKB(:,:,:,:)                    !branch husk C, [g d-2]
@@ -143,9 +143,7 @@ module CanopyDataType
   real(r8),allocatable ::  WGLFPX(:,:,:,:)                    !branch leaf structural P, [g d-2]
   real(r8),allocatable ::  WGSHPX(:,:,:,:)                    !branch sheath structural P, [g d-2]
   real(r8),allocatable ::  WTSTXP(:,:,:,:)                    !branch stalk structural P, [g d-2]
-  real(r8),allocatable ::  WTSHTN(:,:,:,:)                    !branch N, [g d-2]
   real(r8),allocatable ::  WTLFBN(:,:,:,:)                    !branch leaf N, [g d-2]
-  real(r8),allocatable ::  WTSHBN(:,:,:,:)                    !branch sheath N, [g d-2]
   real(r8),allocatable ::  WTSTBN(:,:,:,:)                    !branch stalk N, [g d-2]
   real(r8),allocatable ::  WTRSBN(:,:,:,:)                    !branch reserve N, [g d-2]
   real(r8),allocatable ::  WTHSBN(:,:,:,:)                    !branch husk N, [g d-2]
@@ -155,9 +153,7 @@ module CanopyDataType
   real(r8),allocatable ::  WGSHNX(:,:,:,:)                    !branch sheath structural N, [g d-2]
   real(r8),allocatable ::  WTSTXN(:,:,:,:)                    !branch stalk structural N, [g d-2]
   real(r8),allocatable ::  WGLFNX(:,:,:,:)                    !branch leaf structural N, [g d-2]
-  real(r8),allocatable ::  WTSHTP(:,:,:,:)                    !branch total P, [g d-2]
   real(r8),allocatable ::  WTLFBP(:,:,:,:)                    !branch leaf P, [g d-2]
-  real(r8),allocatable ::  WTSHBP(:,:,:,:)                    !branch sheath P, [g d-2]
   real(r8),allocatable ::  WTSTBP(:,:,:,:)                    !branch stalk P, [g d-2]
   real(r8),allocatable ::  WTRSBP(:,:,:,:)                    !branch reserve P, [g d-2]
   real(r8),allocatable ::  WTHSBP(:,:,:,:)                    !branch husk P, [g d-2]
@@ -309,9 +305,9 @@ module CanopyDataType
   allocate(WVSTKB(JC,JP,JY,JX));WVSTKB=0._r8
   allocate(EPOOL(JC,npelms,JP,JY,JX)); EPOOL=0._r8
   allocate(WTLSB(JC,JP,JY,JX)); WTLSB=0._r8
-  allocate(WTSHTB(JC,JP,JY,JX));WTSHTB=0._r8
+  allocate(WTSHTBE(JC,npelms,JP,JY,JX));WTSHTBE=0._r8
   allocate(WTLFB(JC,JP,JY,JX)); WTLFB=0._r8
-  allocate(WTSHEB(JC,JP,JY,JX));WTSHEB=0._r8
+  allocate(WTSHEBE(JC,npelms,JP,JY,JX));WTSHEBE=0._r8
   allocate(WTSTKB(JC,JP,JY,JX));WTSTKB=0._r8
   allocate(WTRSVB(JC,JP,JY,JX));WTRSVB=0._r8
   allocate(WTHSKB(JC,JP,JY,JX));WTHSKB=0._r8
@@ -326,9 +322,7 @@ module CanopyDataType
   allocate(WGLFPX(JC,JP,JY,JX));WGLFPX=0._r8
   allocate(WGSHPX(JC,JP,JY,JX));WGSHPX=0._r8
   allocate(WTSTXP(JC,JP,JY,JX));WTSTXP=0._r8
-  allocate(WTSHTN(JC,JP,JY,JX));WTSHTN=0._r8
   allocate(WTLFBN(JC,JP,JY,JX));WTLFBN=0._r8
-  allocate(WTSHBN(JC,JP,JY,JX));WTSHBN=0._r8
   allocate(WTSTBN(JC,JP,JY,JX));WTSTBN=0._r8
   allocate(WTRSBN(JC,JP,JY,JX));WTRSBN=0._r8
   allocate(WTHSBN(JC,JP,JY,JX));WTHSBN=0._r8
@@ -338,9 +332,7 @@ module CanopyDataType
   allocate(WGSHNX(JC,JP,JY,JX));WGSHNX=0._r8
   allocate(WTSTXN(JC,JP,JY,JX));WTSTXN=0._r8
   allocate(WGLFNX(JC,JP,JY,JX));WGLFNX=0._r8
-  allocate(WTSHTP(JC,JP,JY,JX));WTSHTP=0._r8
   allocate(WTLFBP(JC,JP,JY,JX));WTLFBP=0._r8
-  allocate(WTSHBP(JC,JP,JY,JX));WTSHBP=0._r8
   allocate(WTSTBP(JC,JP,JY,JX));WTSTBP=0._r8
   allocate(WTRSBP(JC,JP,JY,JX));WTRSBP=0._r8
   allocate(WTHSBP(JC,JP,JY,JX));WTHSBP=0._r8
@@ -493,9 +485,9 @@ module CanopyDataType
   call destroy(WVSTKB)
   call destroy(EPOOL)
   call destroy(WTLSB)
-  call destroy(WTSHTB)
+  call destroy(WTSHTBE)
   call destroy(WTLFB)
-  call destroy(WTSHEB)
+  call destroy(WTSHEBE)
   call destroy(WTSTKB)
   call destroy(WTRSVB)
   call destroy(WTHSKB)
@@ -510,9 +502,7 @@ module CanopyDataType
   call destroy(WGLFPX)
   call destroy(WGSHPX)
   call destroy(WTSTXP)
-  call destroy(WTSHTN)
   call destroy(WTLFBN)
-  call destroy(WTSHBN)
   call destroy(WTSTBN)
   call destroy(WTRSBN)
   call destroy(WTHSBN)
@@ -522,9 +512,7 @@ module CanopyDataType
   call destroy(WGSHNX)
   call destroy(WTSTXN)
   call destroy(WGLFNX)
-  call destroy(WTSHTP)
   call destroy(WTLFBP)
-  call destroy(WTSHBP)
   call destroy(WTSTBP)
   call destroy(WTRSBP)
   call destroy(WTHSBP)

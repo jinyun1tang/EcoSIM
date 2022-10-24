@@ -569,19 +569,17 @@ implicit none
   real(r8), pointer :: WTRSVB(:,:)    => null()  !branch reserve C, [g d-2]
   real(r8), pointer :: WTLFB(:,:)     => null()   !branch leaf C, [g d-2]
   real(r8), pointer :: WTNDB(:,:)     => null()   !branch nodule C, [g d-2]
-  real(r8), pointer :: WTSHEB(:,:)    => null()   !branch sheath C , [g d-2]
+  real(r8), pointer :: WTSHEBE(:,:,:) => null()   !branch sheath element , [g d-2]
   real(r8), pointer :: WTEARB(:,:)    => null()   !branch ear C, [g d-2]
   real(r8), pointer :: WTHSKB(:,:)    => null()   !branch husk C, [g d-2]
   real(r8), pointer :: WTRSBN(:,:)    => null()   !branch reserve N, [g d-2]
   real(r8), pointer :: WTLFBN(:,:)    => null()   !branch leaf N, [g d-2]
   real(r8), pointer :: WTNDBN(:,:)    => null()   !branch nodule N, [g d-2]
-  real(r8), pointer :: WTSHBN(:,:)    => null()   !branch sheath N, [g d-2]
   real(r8), pointer :: WTEABN(:,:)    => null()   !branch ear N, [g d-2]
   real(r8), pointer :: WTHSBN(:,:)    => null()   !branch husk N, [g d-2]
   real(r8), pointer :: WTRSBP(:,:)    => null()   !branch reserve P, [g d-2]
   real(r8), pointer :: WTLFBP(:,:)    => null()   !branch leaf P, [g d-2]
   real(r8), pointer :: WTNDBP(:,:)    => null()   !branch nodule P, [g d-2]
-  real(r8), pointer :: WTSHBP(:,:)    => null()   !branch sheath P, [g d-2]
   real(r8), pointer :: WTEABP(:,:)    => null()   !branch ear P, [g d-2]
   real(r8), pointer :: WTHSBP(:,:)    => null()   !branch husk P, [g d-2]
   real(r8), pointer :: WTGRB(:,:)     => null()   !branch grain C, [g d-2]
@@ -590,9 +588,7 @@ implicit none
   real(r8), pointer :: WTSTKB(:,:)    => null()   !branch stalk C, [g d-2]
   real(r8), pointer :: WTSTBN(:,:)    => null()   !branch stalk N, [g d-2]
   real(r8), pointer :: WTSTBP(:,:)    => null()   !branch stalk P, [g d-2]
-  real(r8), pointer :: WTSHTB(:,:)    => null()   !branch shoot C, [g d-2]
-  real(r8), pointer :: WTSHTN(:,:)    => null()   !branch N, [g d-2]
-  real(r8), pointer :: WTSHTP(:,:)    => null()   !branch total P, [g d-2]
+  real(r8), pointer :: WTSHTBE(:,:,:)    => null()   !branch shoot C, [g d-2]
   real(r8), pointer :: WGLFX(:,:)     => null()   !branch leaf structural C, [g d-2]
   real(r8), pointer :: WGLFNX(:,:)    => null()   !branch leaf structural N, [g d-2]
   real(r8), pointer :: WGLFPX(:,:)    => null()   !branch leaf structural P, [g d-2]
@@ -1724,19 +1720,17 @@ implicit none
   allocate(this%WTRSVB(JC1,JP1))
   allocate(this%WTLFB(JC1,JP1))
   allocate(this%WTNDB(JC1,JP1))
-  allocate(this%WTSHEB(JC1,JP1))
+  allocate(this%WTSHEBE(JC1,npelms,JP1))
   allocate(this%WTEARB(JC1,JP1))
   allocate(this%WTHSKB(JC1,JP1))
   allocate(this%WTRSBN(JC1,JP1))
   allocate(this%WTLFBN(JC1,JP1))
   allocate(this%WTNDBN(JC1,JP1))
-  allocate(this%WTSHBN(JC1,JP1))
   allocate(this%WTEABN(JC1,JP1))
   allocate(this%WTHSBN(JC1,JP1))
   allocate(this%WTRSBP(JC1,JP1))
   allocate(this%WTLFBP(JC1,JP1))
   allocate(this%WTNDBP(JC1,JP1))
-  allocate(this%WTSHBP(JC1,JP1))
   allocate(this%WTEABP(JC1,JP1))
   allocate(this%WTHSBP(JC1,JP1))
   allocate(this%WTGRB(JC1,JP1))
@@ -1745,9 +1739,7 @@ implicit none
   allocate(this%WTSTKB(JC1,JP1))
   allocate(this%WTSTBN(JC1,JP1))
   allocate(this%WTSTBP(JC1,JP1))
-  allocate(this%WTSHTB(JC1,JP1))
-  allocate(this%WTSHTN(JC1,JP1))
-  allocate(this%WTSHTP(JC1,JP1))
+  allocate(this%WTSHTBE(JC1,npelms,JP1))
   allocate(this%WTSTXB(JC1,JP1))
   allocate(this%WTSTXN(JC1,JP1))
   allocate(this%WTSTXP(JC1,JP1))
@@ -1836,19 +1828,17 @@ implicit none
 !  if(allocated(WTRSVB))deallocate(WTRSVB)
 !  if(allocated(WTLFB))deallocate(WTLFB)
 !  if(allocated(WTNDB))deallocate(WTNDB)
-!  if(allocated(WTSHEB))deallocate(WTSHEB)
+!  if(allocated(WTSHEBE))deallocate(WTSHEBE)
 !  if(allocated(WTEARB))deallocate(WTEARB)
 !  if(allocated(WTHSKB))deallocate(WTHSKB)
 !  if(allocated(WTRSBN))deallocate(WTRSBN)
 !  if(allocated(WTLFBN))deallocate(WTLFBN)
 !  if(allocated(WTNDBN))deallocate(WTNDBN)
-!  if(allocated(WTSHBN))deallocate(WTSHBN)
 !  if(allocated(WTEABN))deallocate(WTEABN)
 !  if(allocated(WTHSBN))deallocate(WTHSBN)
 !  if(allocated(WTRSBP))deallocate(WTRSBP)
 !  if(allocated(WTLFBP))deallocate(WTLFBP)
 !  if(allocated(WTNDBP))deallocate(WTNDBP)
-!  if(allocated(WTSHBP))deallocate(WTSHBP)
 !  if(allocated(WTEABP))deallocate(WTEABP)
 !  if(allocated(WTHSBP))deallocate(WTHSBP)
 !  if(allocated(WTGRB))deallocate(WTGRB)
@@ -1857,9 +1847,7 @@ implicit none
 !  if(allocated(WTSTKB))deallocate(WTSTKB)
 !  if(allocated(WTSTBN))deallocate(WTSTBN)
 !  if(allocated(WTSTBP))deallocate(WTSTBP)
-!  if(allocated(WTSHTB))deallocate(WTSHTB)
-!  if(allocated(WTSHTN))deallocate(WTSHTN)
-!  if(allocated(WTSHTP))deallocate(WTSHTP)
+!  if(allocated(WTSHTBE))deallocate(WTSHTBE)
 !  if(allocated(WTSTXB))deallocate(WTSTXB)
 !  if(allocated(WTSTXN))deallocate(WTSTXN)
 !  if(allocated(WTSTXP))deallocate(WTSTXP)
