@@ -606,7 +606,7 @@ module StartqsMod
   NBR(NZ)=0
   HTCTL(NZ)=0._r8
   ZC(NZ)=0._r8
-  DO 10 NB=1,10
+  D10: DO NB=1,JC1
     plt_pheno%IFLGA(NB,NZ)=0
     plt_pheno%IFLGE(NB,NZ)=0
     plt_pheno%IFLGF(NB,NZ)=0
@@ -640,7 +640,7 @@ module StartqsMod
     D15: DO M=1,10
       IDAY(M,NB,NZ)=0
     ENDDO D15
-10  CONTINUE
+  ENDDO D10
 !
 !     INITIALIZE PLANT MORPHOLOGY AND BIOMASS
 !
@@ -650,28 +650,22 @@ module StartqsMod
   plt_biom%EPOLNB(1:JC1,1:npelms,NZ)=0._r8
   plt_biom%WTSHEBE(1:JC1,1:npelms,NZ)=0._r8
   plt_biom%WTSHTBE(1:JC1,1:npelms,NZ)=0._r8
+  plt_biom%WTSTKBE(1:JC1,1:npelms,NZ)=0._r8
+  plt_biom%WTLFBE(1:JC1,1:npelms,NZ)=0._r8
   D25: DO NB=1,JC1
-
-    plt_biom%WTLFB(NB,NZ)=0._r8
     plt_biom%WTNDB(NB,NZ)=0._r8
-
-    plt_biom%WTSTKB(NB,NZ)=0._r8
     plt_biom%WVSTKB(NB,NZ)=0._r8
     plt_biom%WTRSVB(NB,NZ)=0._r8
     plt_biom%WTHSKB(NB,NZ)=0._r8
     plt_biom%WTEARB(NB,NZ)=0._r8
     plt_biom%WTGRB(NB,NZ)=0._r8
     plt_biom%WTLSB(NB,NZ)=0._r8
-    plt_biom%WTLFBN(NB,NZ)=0._r8
     plt_biom%WTNDBN(NB,NZ)=0._r8
-    plt_biom%WTSTBN(NB,NZ)=0._r8
     plt_biom%WTRSBN(NB,NZ)=0._r8
     plt_biom%WTHSBN(NB,NZ)=0._r8
     plt_biom%WTEABN(NB,NZ)=0._r8
     plt_biom%WTGRBN(NB,NZ)=0._r8
-    plt_biom%WTLFBP(NB,NZ)=0._r8
     plt_biom%WTNDBP(NB,NZ)=0._r8
-    plt_biom%WTSTBP(NB,NZ)=0._r8
     plt_biom%WTRSBP(NB,NZ)=0._r8
     plt_biom%WTHSBP(NB,NZ)=0._r8
     plt_biom%WTEABP(NB,NZ)=0._r8
@@ -1055,7 +1049,6 @@ module StartqsMod
     WTRT1    =>   plt_biom%WTRT1   , &
     WTRT1N   =>   plt_biom%WTRT1N  , &
     WTRT1P   =>   plt_biom%WTRT1P  , &
-    WTLFBN   =>   plt_biom%WTLFBN  , &
     WTLSB    =>   plt_biom%WTLSB   , &
     WTLS     =>   plt_biom%WTLS    , &
     WTRTD    =>   plt_biom%WTRTD   , &
@@ -1064,8 +1057,7 @@ module StartqsMod
     WSRTL    =>   plt_biom%WSRTL   , &
     EPOOLR   =>   plt_biom%EPOOLR  , &
     EPOOL    =>   plt_biom%EPOOL   , &
-    WTLFB    =>   plt_biom%WTLFB   , &
-    WTLFBP   =>   plt_biom%WTLFBP  , &
+    WTLFBE   =>   plt_biom%WTLFBE  , &
     WTRVE    =>   plt_biom%WTRVE   , &
     GRDM     =>   plt_morph%GRDM   , &
     RTDP1    =>   plt_morph%RTDP1  , &
@@ -1090,11 +1082,11 @@ module StartqsMod
   WTRVE(ielmc,NZ)=WTRVX(NZ)
   WTRVE(ielmn,NZ)=CNGR(NZ)*WTRVE(ielmc,NZ)
   WTRVE(ielmp,NZ)=CPGR(NZ)*WTRVE(ielmc,NZ)
-  WTLFBN(1,NZ)=CNGR(NZ)*WTLFB(1,NZ)
-  WTLFBP(1,NZ)=CPGR(NZ)*WTLFB(1,NZ)
-  WTLSB(1,NZ)=WTLFB(1,NZ)+WTSHEBE(1,ielmc,NZ)
+  WTLFBE(1,ielmn,NZ)=CNGR(NZ)*WTLFBE(1,ielmc,NZ)
+  WTLFBE(1,ielmp,NZ)=CPGR(NZ)*WTLFBE(1,ielmc,NZ)
+  WTLSB(1,NZ)=WTLFBE(1,ielmc,NZ)+WTSHEBE(1,ielmc,NZ)
   WTLS(NZ)=WTLS(NZ)+WTLSB(1,NZ)
-  FDM=AMIN1(1.0,0.16-0.045*PSILT(NZ))
+  FDM=AMIN1(1.0_r8,0.16_r8-0.045_r8*PSILT(NZ))
   VOLWP(NZ)=ppmc*WTLS(NZ)/FDM
   VOLWC(NZ)=0._r8
   EPOOL(1,ielmn,NZ)=CNGR(NZ)*EPOOL(1,ielmc,NZ)

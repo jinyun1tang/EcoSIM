@@ -127,9 +127,9 @@ module CanopyDataType
   real(r8),allocatable ::  EPOOL(:,:,:,:,:)                   !branch nonstructural element, [g d-2]
   real(r8),allocatable ::  WTLSB(:,:,:,:)                     !branch leaf + sheath C, [g d-2]
   real(r8),allocatable ::  WTSHTBE(:,:,:,:,:)                 !branch shoot C, [g d-2]
-  real(r8),allocatable ::  WTLFB(:,:,:,:)                     !branch leaf C, [g d-2]
+  real(r8),allocatable ::  WTLFBE(:,:,:,:,:)                  !branch leaf element, [g d-2]
   real(r8),allocatable ::  WTSHEBE(:,:,:,:,:)                 !branch sheath element , [g d-2]
-  real(r8),allocatable ::  WTSTKB(:,:,:,:)                    !branch stalk C, [g d-2]
+  real(r8),allocatable ::  WTSTKBE(:,:,:,:,:)                  !branch stalk element, [g d-2]
   real(r8),allocatable ::  WTRSVB(:,:,:,:)                    !branch reserve C, [g d-2]
   real(r8),allocatable ::  WTHSKB(:,:,:,:)                    !branch husk C, [g d-2]
   real(r8),allocatable ::  WTEARB(:,:,:,:)                    !branch ear C, [g d-2]
@@ -143,8 +143,6 @@ module CanopyDataType
   real(r8),allocatable ::  WGLFPX(:,:,:,:)                    !branch leaf structural P, [g d-2]
   real(r8),allocatable ::  WGSHPX(:,:,:,:)                    !branch sheath structural P, [g d-2]
   real(r8),allocatable ::  WTSTXP(:,:,:,:)                    !branch stalk structural P, [g d-2]
-  real(r8),allocatable ::  WTLFBN(:,:,:,:)                    !branch leaf N, [g d-2]
-  real(r8),allocatable ::  WTSTBN(:,:,:,:)                    !branch stalk N, [g d-2]
   real(r8),allocatable ::  WTRSBN(:,:,:,:)                    !branch reserve N, [g d-2]
   real(r8),allocatable ::  WTHSBN(:,:,:,:)                    !branch husk N, [g d-2]
   real(r8),allocatable ::  WTEABN(:,:,:,:)                    !branch ear N, [g d-2]
@@ -153,8 +151,6 @@ module CanopyDataType
   real(r8),allocatable ::  WGSHNX(:,:,:,:)                    !branch sheath structural N, [g d-2]
   real(r8),allocatable ::  WTSTXN(:,:,:,:)                    !branch stalk structural N, [g d-2]
   real(r8),allocatable ::  WGLFNX(:,:,:,:)                    !branch leaf structural N, [g d-2]
-  real(r8),allocatable ::  WTLFBP(:,:,:,:)                    !branch leaf P, [g d-2]
-  real(r8),allocatable ::  WTSTBP(:,:,:,:)                    !branch stalk P, [g d-2]
   real(r8),allocatable ::  WTRSBP(:,:,:,:)                    !branch reserve P, [g d-2]
   real(r8),allocatable ::  WTHSBP(:,:,:,:)                    !branch husk P, [g d-2]
   real(r8),allocatable ::  WTEABP(:,:,:,:)                    !branch ear P, [g d-2]
@@ -306,9 +302,9 @@ module CanopyDataType
   allocate(EPOOL(JC,npelms,JP,JY,JX)); EPOOL=0._r8
   allocate(WTLSB(JC,JP,JY,JX)); WTLSB=0._r8
   allocate(WTSHTBE(JC,npelms,JP,JY,JX));WTSHTBE=0._r8
-  allocate(WTLFB(JC,JP,JY,JX)); WTLFB=0._r8
+  allocate(WTLFBE(JC,npelms,JP,JY,JX)); WTLFBE=0._r8
   allocate(WTSHEBE(JC,npelms,JP,JY,JX));WTSHEBE=0._r8
-  allocate(WTSTKB(JC,JP,JY,JX));WTSTKB=0._r8
+  allocate(WTSTKBE(JC,npelms,JP,JY,JX));WTSTKBE=0._r8
   allocate(WTRSVB(JC,JP,JY,JX));WTRSVB=0._r8
   allocate(WTHSKB(JC,JP,JY,JX));WTHSKB=0._r8
   allocate(WTEARB(JC,JP,JY,JX));WTEARB=0._r8
@@ -322,8 +318,6 @@ module CanopyDataType
   allocate(WGLFPX(JC,JP,JY,JX));WGLFPX=0._r8
   allocate(WGSHPX(JC,JP,JY,JX));WGSHPX=0._r8
   allocate(WTSTXP(JC,JP,JY,JX));WTSTXP=0._r8
-  allocate(WTLFBN(JC,JP,JY,JX));WTLFBN=0._r8
-  allocate(WTSTBN(JC,JP,JY,JX));WTSTBN=0._r8
   allocate(WTRSBN(JC,JP,JY,JX));WTRSBN=0._r8
   allocate(WTHSBN(JC,JP,JY,JX));WTHSBN=0._r8
   allocate(WTEABN(JC,JP,JY,JX));WTEABN=0._r8
@@ -332,8 +326,6 @@ module CanopyDataType
   allocate(WGSHNX(JC,JP,JY,JX));WGSHNX=0._r8
   allocate(WTSTXN(JC,JP,JY,JX));WTSTXN=0._r8
   allocate(WGLFNX(JC,JP,JY,JX));WGLFNX=0._r8
-  allocate(WTLFBP(JC,JP,JY,JX));WTLFBP=0._r8
-  allocate(WTSTBP(JC,JP,JY,JX));WTSTBP=0._r8
   allocate(WTRSBP(JC,JP,JY,JX));WTRSBP=0._r8
   allocate(WTHSBP(JC,JP,JY,JX));WTHSBP=0._r8
   allocate(WTEABP(JC,JP,JY,JX));WTEABP=0._r8
@@ -486,9 +478,9 @@ module CanopyDataType
   call destroy(EPOOL)
   call destroy(WTLSB)
   call destroy(WTSHTBE)
-  call destroy(WTLFB)
+  call destroy(WTLFBE)
   call destroy(WTSHEBE)
-  call destroy(WTSTKB)
+  call destroy(WTSTKBE)
   call destroy(WTRSVB)
   call destroy(WTHSKB)
   call destroy(WTEARB)
@@ -502,8 +494,6 @@ module CanopyDataType
   call destroy(WGLFPX)
   call destroy(WGSHPX)
   call destroy(WTSTXP)
-  call destroy(WTLFBN)
-  call destroy(WTSTBN)
   call destroy(WTRSBN)
   call destroy(WTHSBN)
   call destroy(WTEABN)
@@ -512,8 +502,6 @@ module CanopyDataType
   call destroy(WGSHNX)
   call destroy(WTSTXN)
   call destroy(WGLFNX)
-  call destroy(WTLFBP)
-  call destroy(WTSTBP)
   call destroy(WTRSBP)
   call destroy(WTHSBP)
   call destroy(WTEABP)

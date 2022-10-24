@@ -557,9 +557,7 @@ module grosubsMod
   integer :: L,K,N,NB
 !     begin_execution
   associate(                                 &
-    WTLFB      =>  plt_biom%WTLFB      , &
-    WTLFBN     =>  plt_biom%WTLFBN     , &
-    WTLFBP     =>  plt_biom%WTLFBP     , &
+    WTLFBE     =>  plt_biom%WTLFBE     , &
     WTGRB      =>  plt_biom%WTGRB      , &
     WTGRBN     =>  plt_biom%WTGRBN     , &
     WTGRBP     =>  plt_biom%WTGRBP     , &
@@ -567,17 +565,15 @@ module grosubsMod
     WTRTD      =>  plt_biom%WTRTD      , &
     WTSHTBE    =>  plt_biom%WTSHTBE    , &
     WTEARB     =>  plt_biom%WTEARB     , &
-    WTSTKB     =>  plt_biom%WTSTKB     , &
+    WTSTKBE    =>  plt_biom%WTSTKBE    , &
     WTRSBN     =>  plt_biom%WTRSBN     , &
     WTSHEBE    =>  plt_biom%WTSHEBE    , &
-    WTSTBP     =>  plt_biom%WTSTBP     , &
     WTHSKB     =>  plt_biom%WTHSKB     , &
     WTEABN     =>  plt_biom%WTEABN     , &
     WTHSBP     =>  plt_biom%WTHSBP     , &
     WTRSVB     =>  plt_biom%WTRSVB     , &
     WTHSBN     =>  plt_biom%WTHSBN     , &
     WTRSBP     =>  plt_biom%WTRSBP     , &
-    WTSTBN     =>  plt_biom%WTSTBN , &
     WTEABP     =>  plt_biom%WTEABP     , &
     EPOOL      =>  plt_biom%EPOOL      , &
     NU         =>  plt_site%NU         , &
@@ -613,21 +609,21 @@ module grosubsMod
 !
   DO 320 NB=1,NBR(NZ)
     CPOOLK(NB,NZ)=0._r8
-    DO 325 K=1,JNODS1
+    D325: DO K=1,JNODS1
       CPOOLK(NB,NZ)=CPOOLK(NB,NZ) &
         +CPOOL3(K,NB,NZ)+CPOOL4(K,NB,NZ) &
         +CO2B(K,NB,NZ)+HCOB(K,NB,NZ)
-325   CONTINUE
-    WTSHTBE(NB,ielmc,NZ)=WTLFB(NB,NZ) &
-      +WTSHEBE(NB,ielmc,NZ)+WTSTKB(NB,NZ)+WTRSVB(NB,NZ) &
+    ENDDO D325
+    WTSHTBE(NB,ielmc,NZ)=WTLFBE(NB,ielmc,NZ) &
+      +WTSHEBE(NB,ielmc,NZ)+WTSTKBE(NB,ielmc,NZ)+WTRSVB(NB,NZ) &
       +WTHSKB(NB,NZ)+WTEARB(NB,NZ)+WTGRB(NB,NZ) &
       +EPOOL(NB,ielmc,NZ)+CPOOLK(NB,NZ)
-    WTSHTBE(NB,ielmn,NZ)=WTLFBN(NB,NZ) &
-      +WTSHEBE(NB,ielmn,NZ)+WTSTBN(NB,NZ)+WTRSBN(NB,NZ) &
+    WTSHTBE(NB,ielmn,NZ)=WTLFBE(NB,ielmn,NZ) &
+      +WTSHEBE(NB,ielmn,NZ)+WTSTKBE(NB,ielmn,NZ)+WTRSBN(NB,NZ) &
       +WTHSBN(NB,NZ)+WTEABN(NB,NZ)+WTGRBN(NB,NZ) &
       +EPOOL(NB,ielmn,NZ)
-    WTSHTBE(NB,ielmp,NZ)=WTLFBP(NB,NZ) &
-      +WTSHEBE(NB,ielmp,NZ)+WTSTBP(NB,NZ)+WTRSBP(NB,NZ) &
+    WTSHTBE(NB,ielmp,NZ)=WTLFBE(NB,ielmp,NZ) &
+      +WTSHEBE(NB,ielmp,NZ)+WTSTKBE(NB,ielmp,NZ)+WTRSBP(NB,NZ) &
       +WTHSBP(NB,NZ)+WTEABP(NB,NZ)+WTGRBP(NB,NZ) &
       +EPOOL(NB,ielmp,NZ)
 320   CONTINUE
@@ -667,24 +663,21 @@ module grosubsMod
     WTNDBN   =>  plt_biom%WTNDBN  , &
     WTNDB    =>  plt_biom%WTNDB   , &
     WTSHTBE  =>  plt_biom%WTSHTBE , &
-    WTSTKB   =>  plt_biom%WTSTKB  , &
+    WTSTKBE  =>  plt_biom%WTSTKBE , &
     WTHSKB   =>  plt_biom%WTHSKB  , &
     WTRSVB   =>  plt_biom%WTRSVB  , &
     WTEARB   =>  plt_biom%WTEARB  , &
     WTLSB    =>  plt_biom%WTLSB   , &
-    WTLFBN   =>  plt_biom%WTLFBN  , &
     WTEABN   =>  plt_biom%WTEABN  , &
     WTGRBN   =>  plt_biom%WTGRBN  , &
     WTHSBP   =>  plt_biom%WTHSBP  , &
     WTEABP   =>  plt_biom%WTEABP  , &
     WTGRBP   =>  plt_biom%WTGRBP  , &
-    WTSTBP   =>  plt_biom%WTSTBP  , &
     WTRSBP   =>  plt_biom%WTRSBP  , &
-    WTLFBP   =>  plt_biom%WTLFBP  , &
     WTHSBN   =>  plt_biom%WTHSBN  , &
     WTRSBN   =>  plt_biom%WTRSBN  , &
     WTGRB    =>  plt_biom%WTGRB   , &
-    WTLFB    =>  plt_biom%WTLFB   , &
+    WTLFBE   =>  plt_biom%WTLFBE  , &
     WVSTKB   =>  plt_biom%WVSTKB  , &
     WTSHEBE  =>  plt_biom%WTSHEBE , &
     WTSHTE   =>  plt_biom%WTSHTE  , &
@@ -707,7 +700,6 @@ module grosubsMod
     WTNDLP   =>  plt_biom%WTNDLP  , &
     WTRT2    =>  plt_biom%WTRT2   , &
     WTRT2N   =>  plt_biom%WTRT2N  , &
-    WTSTBN   =>  plt_biom%WTSTBN , &
     WTRT2P   =>  plt_biom%WTRT2P  , &
     CPOOLN   =>  plt_biom%CPOOLN  , &
     ZPOOLN   =>  plt_biom%ZPOOLN  , &
@@ -761,23 +753,20 @@ module grosubsMod
     EPOOLP(NE,NZ)=sum(EPOOL(1:NBR(NZ),NE,NZ))
     WTSHTE(NE,NZ)=sum(WTSHTBE(1:NBR(NZ),NE,NZ))
     WTSHEE(NE,NZ)=sum(WTSHEBE(1:NBR(NZ),NE,NZ))
+    WTSTKE(NE,NZ)=sum(WTSTKBE(1:NBR(NZ),NE,NZ))
+    WTLFE(NE,NZ)=sum(WTLFBE(1:NBR(NZ),NE,NZ))
   ENDDO
-  WTLFE(ielmc,NZ)=sum(WTLFB(1:NBR(NZ),NZ))
-  WTSTKE(ielmc,NZ)=sum(WTSTKB(1:NBR(NZ),NZ))
+
   WVSTK(NZ)=sum(WVSTKB(1:NBR(NZ),NZ))
   WTRSVE(ielmc,NZ)=sum(WTRSVB(1:NBR(NZ),NZ))
   WTHSKE(ielmc,NZ)=sum(WTHSKB(1:NBR(NZ),NZ))
   WTEARE(ielmc,NZ)=sum(WTEARB(1:NBR(NZ),NZ))
   WTGRE(ielmc,NZ)=sum(WTGRB(1:NBR(NZ),NZ))
   WTLS(NZ)=sum(WTLSB(1:NBR(NZ),NZ))
-  WTLFE(ielmn,NZ)=sum(WTLFBN(1:NBR(NZ),NZ))
-  WTSTKE(ielmn,NZ)=sum(WTSTBN(1:NBR(NZ),NZ))
   WTRSVE(ielmn,NZ)=sum(WTRSBN(1:NBR(NZ),NZ))
   WTHSKE(ielmn,NZ)=sum(WTHSBN(1:NBR(NZ),NZ))
   WTEARE(ielmn,NZ)=sum(WTEABN(1:NBR(NZ),NZ))
   WTGRE(ielmn,NZ)=sum(WTGRBN(1:NBR(NZ),NZ))
-  WTLFE(ielmp,NZ)=sum(WTLFBP(1:NBR(NZ),NZ))
-  WTSTKE(ielmp,NZ)=sum(WTSTBP(1:NBR(NZ),NZ))
   WTRSVE(ielmp,NZ)=sum(WTRSBP(1:NBR(NZ),NZ))
   WTHSKE(ielmp,NZ)=sum(WTHSBP(1:NBR(NZ),NZ))
   WTEARE(ielmp,NZ)=sum(WTEABP(1:NBR(NZ),NZ))

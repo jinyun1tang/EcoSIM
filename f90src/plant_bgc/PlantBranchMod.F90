@@ -110,13 +110,11 @@ module PlantBranchMod
     CFOPC      =>  plt_soilchem%CFOPC , &
     CFOPN      =>  plt_soilchem%CFOPN , &
     CFOPP      =>  plt_soilchem%CFOPP , &
-    WTLFBN     =>  plt_biom%WTLFBN    , &
     WTHSBN     =>  plt_biom%WTHSBN    , &
-    WTSTKB     =>  plt_biom%WTSTKB    , &
+    WTSTKBE    =>  plt_biom%WTSTKBE   , &
     WTRSVB     =>  plt_biom%WTRSVB    , &
     WTHSKB     =>  plt_biom%WTHSKB    , &
     WTEARB     =>  plt_biom%WTEARB    , &
-    WTSTBN     =>  plt_biom%WTSTBN    , &
     WTSTXB     =>  plt_biom%WTSTXB    , &
     WTSTXN     =>  plt_biom%WTSTXN    , &
     WTSTXP     =>  plt_biom%WTSTXP    , &
@@ -127,7 +125,6 @@ module PlantBranchMod
     WTEABN     =>  plt_biom%WTEABN    , &
     EPOOL      =>  plt_biom%EPOOL     , &
     WTRSBN     =>  plt_biom%WTRSBN    , &
-    WTLFBP     =>  plt_biom%WTLFBP    , &
     WTGRBN     =>  plt_biom%WTGRBN    , &
     WTLSB      =>  plt_biom%WTLSB     , &
     WGNODN     =>  plt_biom%WGNODN    , &
@@ -135,9 +132,8 @@ module PlantBranchMod
     WGLFPX     =>  plt_biom%WGLFPX    , &
     WGLFNX     =>  plt_biom%WGLFNX    , &
     WTSHEBE    =>  plt_biom%WTSHEBE   , &
-    WTLFB      =>  plt_biom%WTLFB     , &
+    WTLFBE     =>  plt_biom%WTLFBE    , &
     WSLF       =>  plt_biom%WSLF      , &
-    WTSTBP     =>  plt_biom%WTSTBP    , &
     WTRSBP     =>  plt_biom%WTRSBP    , &
     WGLFP      =>  plt_biom%WGLFP     , &
     WGLF       =>  plt_biom%WGLF      , &
@@ -196,7 +192,7 @@ module PlantBranchMod
     HTNODX     =>   plt_morph%HTNODX  , &
     NNOD       =>   plt_morph%NNOD      &
   )
-  WTLSB(NB,NZ)=AZMAX1(WTLFB(NB,NZ)+WTSHEBE(NB,ielmc,NZ))
+  WTLSB(NB,NZ)=AZMAX1(WTLFBE(NB,ielmc,NZ)+WTSHEBE(NB,ielmc,NZ))
 
   IF(IDTHB(NB,NZ).EQ.0)THEN
     call CalcPartitionCoeff(I,J,NB,NZ,PART,PTRT,IFLGY,IFLGZ)
@@ -260,7 +256,7 @@ module PlantBranchMod
 !   CNSTK,WVSTKB=stalk N:C,sapwood mass
 !   IDAY(10=date of physiological maturity
 !
-    WTSHXN=AZMAX1(WTLFBN(NB,NZ)+WTSHEBE(NB,ielmn,NZ) &
+    WTSHXN=AZMAX1(WTLFBE(NB,ielmn,NZ)+WTSHEBE(NB,ielmn,NZ) &
       +CNSTK(NZ)*WVSTKB(NB,NZ))
     IF(IDAY(10,NB,NZ).EQ.0)THEN
       WTSHXN=WTSHXN+AZMAX1(WTHSBN(NB,NZ) &
@@ -322,21 +318,21 @@ module PlantBranchMod
     GROHSP=GROHSK*CPHSK(NZ)
     GROEAP=GROEAR*CPEAR(NZ)
     GROGRP=GROGR*CPRSV(NZ)
-    WTLFB(NB,NZ)=WTLFB(NB,NZ)+GROLF
+    WTLFBE(NB,ielmc,NZ)=WTLFBE(NB,ielmc,NZ)+GROLF
     WTSHEBE(NB,ielmc,NZ)=WTSHEBE(NB,ielmc,NZ)+GROSHE
-    WTSTKB(NB,NZ)=WTSTKB(NB,NZ)+GROSTK
+    WTSTKBE(NB,ielmc,NZ)=WTSTKBE(NB,ielmc,NZ)+GROSTK
     WTRSVB(NB,NZ)=WTRSVB(NB,NZ)+GRORSV
     WTHSKB(NB,NZ)=WTHSKB(NB,NZ)+GROHSK
     WTEARB(NB,NZ)=WTEARB(NB,NZ)+GROEAR
-    WTLFBN(NB,NZ)=WTLFBN(NB,NZ)+GROLFN
+    WTLFBE(NB,ielmn,NZ)=WTLFBE(NB,ielmn,NZ)+GROLFN
     WTSHEBE(NB,ielmn,NZ)=WTSHEBE(NB,ielmn,NZ)+GROSHN
-    WTSTBN(NB,NZ)=WTSTBN(NB,NZ)+GROSTN
+    WTSTKBE(NB,ielmn,NZ)=WTSTKBE(NB,ielmn,NZ)+GROSTN
     WTRSBN(NB,NZ)=WTRSBN(NB,NZ)+GRORSN
     WTHSBN(NB,NZ)=WTHSBN(NB,NZ)+GROHSN
     WTEABN(NB,NZ)=WTEABN(NB,NZ)+GROEAN
-    WTLFBP(NB,NZ)=WTLFBP(NB,NZ)+GROLFP
+    WTLFBE(NB,ielmp,NZ)=WTLFBE(NB,ielmp,NZ)+GROLFP
     WTSHEBE(NB,ielmp,NZ)=WTSHEBE(NB,ielmp,NZ)+GROSHP
-    WTSTBP(NB,NZ)=WTSTBP(NB,NZ)+GROSTP
+    WTSTKBE(NB,ielmp,NZ)=WTSTKBE(NB,ielmp,NZ)+GROSTP
     WTRSBP(NB,NZ)=WTRSBP(NB,NZ)+GRORSP
     WTHSBP(NB,NZ)=WTHSBP(NB,NZ)+GROHSP
     WTEABP(NB,NZ)=WTEABP(NB,NZ)+GROEAP
@@ -511,7 +507,7 @@ module PlantBranchMod
     !     PP=PFT population
     !     GROH,GRO=stalk length,mass growth
 !
-          SNL=ETOL*SNL1(NZ)*(WTSTKB(NB,NZ)/PP(NZ))**SNL2
+          SNL=ETOL*SNL1(NZ)*(WTSTKBE(NB,ielmc,NZ)/PP(NZ))**SNL2
           GROH=GRO/PP(NZ)*SNL
           KX=MOD(MNNOD-1,JNODS1)
           IF(KX.EQ.0.AND.MNNOD-1.NE.0)KX=25
@@ -662,9 +658,9 @@ module PlantBranchMod
     !       RCCLX,RCZLX,RCPLX=remobilization of C,N,P from senescing leaf
 !
             ARLFB(NB,NZ)=ARLFB(NB,NZ)-FSNCL*ARLFZ(NB,NZ)
-            WTLFB(NB,NZ)=WTLFB(NB,NZ)-FSNCL*WGLFX(NB,NZ)
-            WTLFBN(NB,NZ)=WTLFBN(NB,NZ)-FSNCL*WGLFNX(NB,NZ)
-            WTLFBP(NB,NZ)=WTLFBP(NB,NZ)-FSNCL*WGLFPX(NB,NZ)
+            WTLFBE(NB,ielmc,NZ)=WTLFBE(NB,ielmc,NZ)-FSNCL*WGLFX(NB,NZ)
+            WTLFBE(NB,ielmn,NZ)=WTLFBE(NB,ielmn,NZ)-FSNCL*WGLFNX(NB,NZ)
+            WTLFBE(NB,ielmp,NZ)=WTLFBE(NB,ielmp,NZ)-FSNCL*WGLFPX(NB,NZ)
             ARLF1(K,NB,NZ)=ARLF1(K,NB,NZ)-FSNCL*ARLFZ(NB,NZ)
             WGLF(K,NB,NZ)=WGLF(K,NB,NZ)-FSNCL*WGLFX(NB,NZ)
             WGLFN(K,NB,NZ)=WGLFN(K,NB,NZ)-FSNCL*WGLFNX(NB,NZ)
@@ -908,10 +904,10 @@ module PlantBranchMod
           XFRN=AMAX1(XFRN1,10.0*XFRP1)
           XFRP=AMAX1(XFRP1,0.10*XFRN1)
           WGLFN(K,NB,NZ)=WGLFN(K,NB,NZ)-XFRN
-          WTLFBN(NB,NZ)=WTLFBN(NB,NZ)-XFRN
+          WTLFBE(NB,ielmn,NZ)=WTLFBE(NB,ielmn,NZ)-XFRN
           EPOOL(NB,ielmn,NZ)=EPOOL(NB,ielmn,NZ)+XFRN
           WGLFP(K,NB,NZ)=WGLFP(K,NB,NZ)-XFRP
-          WTLFBP(NB,NZ)=WTLFBP(NB,NZ)-XFRP
+          WTLFBE(NB,ielmp,NZ)=WTLFBE(NB,ielmp,NZ)-XFRP
           EPOOL(NB,ielmp,NZ)=EPOOL(NB,ielmp,NZ)+XFRP
           WSLF(K,NB,NZ)=AZMAX1(WSLF(K,NB,NZ) &
             -AMAX1(XFRN*CNWS(NZ),XFRP*CPWS(NZ)))
@@ -971,7 +967,6 @@ module PlantBranchMod
     PSILT   =>  plt_ew%PSILT        , &
     WVSTKB  =>  plt_biom%WVSTKB     , &
     WTRSVB  =>  plt_biom%WTRSVB     , &
-    WTSTBP  =>  plt_biom%WTSTBP     , &
     WTHSBP  =>  plt_biom%WTHSBP     , &
     WTEABP  =>  plt_biom%WTEABP     , &
     ZERO    =>  plt_site%ZERO       , &
@@ -1380,11 +1375,10 @@ module PlantBranchMod
 ! begin_execution
   associate(                                 &
     WTRSVB     =>  plt_biom%WTRSVB     , &
-    WTSTKB     =>  plt_biom%WTSTKB     , &
+    WTSTKBE    =>  plt_biom%WTSTKBE    , &
     WGNODE     =>  plt_biom%WGNODE     , &
     WGNODP     =>  plt_biom%WGNODP     , &
     WVSTKB     =>  plt_biom%WVSTKB     , &
-    WTSTBN     =>  plt_biom%WTSTBN     , &
     WGNODN     =>  plt_biom%WGNODN     , &
     WGSHE      =>  plt_biom%WGSHE      , &
     WGLF       =>  plt_biom%WGLF       , &
@@ -1392,17 +1386,14 @@ module PlantBranchMod
     WGSHN      =>  plt_biom%WGSHN      , &
     WGSHP      =>  plt_biom%WGSHP      , &
     WTRVE      =>  plt_biom%WTRVE      , &
-    WTLFB      =>  plt_biom%WTLFB      , &
-    WTLFBP     =>  plt_biom%WTLFBP     , &
+    WTLFBE     =>  plt_biom%WTLFBE     , &
     WTSHEBE    =>  plt_biom%WTSHEBE    , &
-    WTSTBP     =>  plt_biom%WTSTBP     , &
     WTRSBN     =>  plt_biom%WTRSBN     , &
     WTRSBP     =>  plt_biom%WTRSBP     , &
     WTSTXN     =>  plt_biom%WTSTXN     , &
     WTSTXP     =>  plt_biom%WTSTXP     , &
     WTSTXB     =>  plt_biom%WTSTXB     , &
     WSSHE      =>  plt_biom%WSSHE      , &
-    WTLFBN     =>  plt_biom%WTLFBN     , &
     WGLFN      =>  plt_biom%WGLFN      , &
     WGLFP      =>  plt_biom%WGLFP      , &
     ZEROP      =>  plt_biom%ZEROP      , &
@@ -1523,9 +1514,9 @@ module PlantBranchMod
 !     CNWS,CPWS=protein:N,protein:P ratios from startq.f
 !
         ARLFB(NB,NZ)=AZMAX1(ARLFB(NB,NZ)-FSNAL*ARLF1(K,NB,NZ))
-        WTLFB(NB,NZ)=AZMAX1(WTLFB(NB,NZ)-FSNCL*WGLF(K,NB,NZ))
-        WTLFBN(NB,NZ)=AZMAX1(WTLFBN(NB,NZ)-FSNCL*WGLFN(K,NB,NZ))
-        WTLFBP(NB,NZ)=AZMAX1(WTLFBP(NB,NZ)-FSNCL*WGLFP(K,NB,NZ))
+        WTLFBE(NB,ielmc,NZ)=AZMAX1(WTLFBE(NB,ielmc,NZ)-FSNCL*WGLF(K,NB,NZ))
+        WTLFBE(NB,ielmn,NZ)=AZMAX1(WTLFBE(NB,ielmn,NZ)-FSNCL*WGLFN(K,NB,NZ))
+        WTLFBE(NB,ielmp,NZ)=AZMAX1(WTLFBE(NB,ielmp,NZ)-FSNCL*WGLFP(K,NB,NZ))
         ARLF1(K,NB,NZ)=ARLF1(K,NB,NZ)-FSNAL*ARLF1(K,NB,NZ)
         WGLF(K,NB,NZ)=WGLF(K,NB,NZ)-FSNCL*WGLF(K,NB,NZ)
         WGLFN(K,NB,NZ)=WGLFN(K,NB,NZ)-FSNCL*WGLFN(K,NB,NZ)
@@ -1547,8 +1538,8 @@ module PlantBranchMod
         EPOOL(NB,ielmp,NZ)=EPOOL(NB,ielmp,NZ)+FSNCL*RCPL
         SNCLF=SNCLF-FSNCL*RCCL
         SNCT=SNCT-FSNCL*RCCL
-        IF(WTLFB(NB,NZ).LE.ZEROL(NZ))THEN
-          WTLFB(NB,NZ)=0._r8
+        IF(WTLFBE(NB,ielmc,NZ).LE.ZEROL(NZ))THEN
+          WTLFBE(NB,ielmc,NZ)=0._r8
           ARLFB(NB,NZ)=0._r8
         ENDIF
       !
@@ -1589,16 +1580,16 @@ module PlantBranchMod
           CPOOL4(K,NB,NZ)=0._r8
         ENDIF
         ARLFB(NB,NZ)=AZMAX1(ARLFB(NB,NZ)-ARLF1(K,NB,NZ))
-        WTLFB(NB,NZ)=AZMAX1(WTLFB(NB,NZ)-WGLF(K,NB,NZ))
-        WTLFBN(NB,NZ)=AZMAX1(WTLFBN(NB,NZ)-WGLFN(K,NB,NZ))
-        WTLFBP(NB,NZ)=AZMAX1(WTLFBP(NB,NZ)-WGLFP(K,NB,NZ))
+        WTLFBE(NB,ielmc,NZ)=AZMAX1(WTLFBE(NB,ielmc,NZ)-WGLF(K,NB,NZ))
+        WTLFBE(NB,ielmn,NZ)=AZMAX1(WTLFBE(NB,ielmn,NZ)-WGLFN(K,NB,NZ))
+        WTLFBE(NB,ielmp,NZ)=AZMAX1(WTLFBE(NB,ielmp,NZ)-WGLFP(K,NB,NZ))
         ARLF1(K,NB,NZ)=0._r8
         WGLF(K,NB,NZ)=0._r8
         WGLFN(K,NB,NZ)=0._r8
         WGLFP(K,NB,NZ)=0._r8
         WSLF(K,NB,NZ)=0._r8
-        IF(WTLFB(NB,NZ).LE.ZEROL(NZ))THEN
-          WTLFB(NB,NZ)=0._r8
+        IF(WTLFBE(NB,ielmc,NZ).LE.ZEROL(NZ))THEN
+          WTLFBE(NB,ielmc,NZ)=0._r8
           ARLFB(NB,NZ)=0._r8
         ENDIF
       ENDIF
@@ -1762,9 +1753,9 @@ module PlantBranchMod
     SNCZ=FXFS*SNCR
     SNCT=SNCR+SNCZ
     IF(ISTYP(NZ).NE.0.AND.SNCT.GT.ZEROP(NZ) &
-      .AND.WTSTKB(NB,NZ).GT.ZEROP(NZ))THEN
+      .AND.WTSTKBE(NB,ielmc,NZ).GT.ZEROP(NZ))THEN
       SNCF=SNCZ/SNCT
-      FRCC=WVSTKB(NB,NZ)/WTSTKB(NB,NZ)
+      FRCC=WVSTKB(NB,NZ)/WTSTKBE(NB,ielmc,NZ)
       RCSC=RCCC*FRCC
       RCSN=RCCN*FRCC
       RCSP=RCCP*FRCC
@@ -1825,9 +1816,9 @@ module PlantBranchMod
       !     HTNODE,HTNODX=living,senescing internode length
       !     WTSTKB,WTSTBN,WTSTBP,WGNODE,WGNODN,WGNODP=C,N,P mass in senescing internode
       !
-          WTSTKB(NB,NZ)=AZMAX1(WTSTKB(NB,NZ)-FSNCK*WGNODE(K,NB,NZ))
-          WTSTBN(NB,NZ)=AZMAX1(WTSTBN(NB,NZ)-FSNCK*WGNODN(K,NB,NZ))
-          WTSTBP(NB,NZ)=AZMAX1(WTSTBP(NB,NZ)-FSNCK*WGNODP(K,NB,NZ))
+          WTSTKBE(NB,ielmc,NZ)=AZMAX1(WTSTKBE(NB,ielmc,NZ)-FSNCK*WGNODE(K,NB,NZ))
+          WTSTKBE(NB,ielmn,NZ)=AZMAX1(WTSTKBE(NB,ielmn,NZ)-FSNCK*WGNODN(K,NB,NZ))
+          WTSTKBE(NB,ielmp,NZ)=AZMAX1(WTSTKBE(NB,ielmp,NZ)-FSNCK*WGNODP(K,NB,NZ))
           HTNODE(K,NB,NZ)=HTNODE(K,NB,NZ)-FSNCK*HTNODX(K,NB,NZ)
           WGNODE(K,NB,NZ)=WGNODE(K,NB,NZ)-FSNCK*WGNODE(K,NB,NZ)
           WGNODN(K,NB,NZ)=WGNODN(K,NB,NZ)-FSNCK*WGNODN(K,NB,NZ)
@@ -1873,9 +1864,9 @@ module PlantBranchMod
             ESNC(M,ielmp,1,0,NZ)=ESNC(M,ielmp,0,0,NZ)+CFOPP(3,M,NZ) &
               *WGNODP(K,NB,NZ)*FWOODP(1)
           ENDDO D7315
-          WTSTKB(NB,NZ)=AZMAX1(WTSTKB(NB,NZ)-WGNODE(K,NB,NZ))
-          WTSTBN(NB,NZ)=AZMAX1(WTSTBN(NB,NZ)-WGNODN(K,NB,NZ))
-          WTSTBP(NB,NZ)=AZMAX1(WTSTBP(NB,NZ)-WGNODP(K,NB,NZ))
+          WTSTKBE(NB,ielmc,NZ)=AZMAX1(WTSTKBE(NB,ielmc,NZ)-WGNODE(K,NB,NZ))
+          WTSTKBE(NB,ielmn,NZ)=AZMAX1(WTSTKBE(NB,ielmn,NZ)-WGNODN(K,NB,NZ))
+          WTSTKBE(NB,ielmp,NZ)=AZMAX1(WTSTKBE(NB,ielmp,NZ)-WGNODP(K,NB,NZ))
           HTNODE(K,NB,NZ)=HTNODE(K,NB,NZ)-HTNODX(K,NB,NZ)
           WGNODE(K,NB,NZ)=0._r8
           WGNODN(K,NB,NZ)=0._r8
@@ -1932,11 +1923,11 @@ module PlantBranchMod
     !     WTSTXB,WTSTXN,WTSTXP=residual C,N,P mass in senescing stalk
     !     HTNODE,HTNODX=living,senescing internode length
     !
-        WTSTKB(NB,NZ)=AZMAX1(WTSTKB(NB,NZ) &
+        WTSTKBE(NB,ielmc,NZ)=AZMAX1(WTSTKBE(NB,ielmc,NZ) &
           -FSNCR*WTSTXB(NB,NZ))
-        WTSTBN(NB,NZ)=AZMAX1(WTSTBN(NB,NZ) &
+        WTSTKBE(NB,ielmn,NZ)=AZMAX1(WTSTKBE(NB,ielmn,NZ) &
           -FSNCR*WTSTXN(NB,NZ))
-        WTSTBP(NB,NZ)=AZMAX1(WTSTBP(NB,NZ) &
+        WTSTKBE(NB,ielmp,NZ)=AZMAX1(WTSTKBE(NB,ielmp,NZ) &
           -FSNCR*WTSTXP(NB,NZ))
         WTSTXB(NB,NZ)=AZMAX1(WTSTXB(NB,NZ) &
           -FSNCR*WTSTXB(NB,NZ))
@@ -1992,9 +1983,9 @@ module PlantBranchMod
         ESNC(M,ielmp,1,0,NZ)=ESNC(M,ielmp,0,0,NZ)+CFOPP(3,M,NZ) &
           *WTSTXP(NB,NZ)*FWOODP(1)
       ENDDO D8315
-      WTSTKB(NB,NZ)=AZMAX1(WTSTKB(NB,NZ)-WTSTXB(NB,NZ))
-      WTSTBN(NB,NZ)=AZMAX1(WTSTBN(NB,NZ)-WTSTXN(NB,NZ))
-      WTSTBP(NB,NZ)=AZMAX1(WTSTBP(NB,NZ)-WTSTXP(NB,NZ))
+      WTSTKBE(NB,ielmc,NZ)=AZMAX1(WTSTKBE(NB,ielmc,NZ)-WTSTXB(NB,NZ))
+      WTSTKBE(NB,ielmn,NZ)=AZMAX1(WTSTKBE(NB,ielmn,NZ)-WTSTXN(NB,NZ))
+      WTSTKBE(NB,ielmp,NZ)=AZMAX1(WTSTKBE(NB,ielmp,NZ)-WTSTXP(NB,NZ))
       WTSTXB(NB,NZ)=0._r8
       WTSTXN(NB,NZ)=0._r8
       WTSTXP(NB,NZ)=0._r8
@@ -2048,7 +2039,7 @@ module PlantBranchMod
     WVSTKB   =>  plt_biom%WVSTKB  , &
     WGLFP    =>  plt_biom%WGLFP   , &
     WGLFN    =>  plt_biom%WGLFN   , &
-    WTSTKB   =>  plt_biom%WTSTKB  , &
+    WTSTKBE  =>  plt_biom%WTSTKBE , &
     WGLFLN   =>  plt_biom%WGLFLN  , &
     WSSHE    =>  plt_biom%WSSHE   , &
     FNOD     =>  plt_allom%FNOD   , &
@@ -2260,11 +2251,11 @@ module PlantBranchMod
           LL=1
         ENDIF
 545   CONTINUE
-      RSTK=SQRT(VSTK*(AZMAX1(WTSTKB(NB,NZ))/PP(NZ)) &
+      RSTK=SQRT(VSTK*(AZMAX1(WTSTKBE(NB,ielmc,NZ))/PP(NZ)) &
         /(PICON*HTNODE(K1,NB,NZ)))
       ARSTKB=PICON*HTNODE(K1,NB,NZ)*PP(NZ)*RSTK
       IF(ISTYP(NZ).EQ.0)THEN
-        WVSTKB(NB,NZ)=WTSTKB(NB,NZ)
+        WVSTKB(NB,NZ)=WTSTKBE(NB,ielmc,NZ)
       ELSE
         ZSTK=AMIN1(ZSTX,FSTK*RSTK)
         ASTV=PICON*(2.0_r8*RSTK*ZSTK-ZSTK**2)
@@ -2646,19 +2637,15 @@ module PlantBranchMod
     WTGRBN   =>  plt_biom%WTGRBN     , &
     WTGRBP   =>  plt_biom%WTGRBP     , &
     WGLF     =>  plt_biom%WGLF       , &
-    WTLFBP   =>  plt_biom%WTLFBP     , &
     WTRTD    =>  plt_biom%WTRTD      , &
-    WTSTBN   =>  plt_biom%WTSTBN     , &
     WTSTXB   =>  plt_biom%WTSTXB     , &
     WTSTXP   =>  plt_biom%WTSTXP     , &
-    WTSTBP   =>  plt_biom%WTSTBP     , &
     WTHSBN   =>  plt_biom%WTHSBN     , &
-    WTSTKB   =>  plt_biom%WTSTKB     , &
+    WTSTKBE  =>  plt_biom%WTSTKBE    , &
     WTEABP   =>  plt_biom%WTEABP     , &
     WTHSBP   =>  plt_biom%WTHSBP     , &
     EPOOLR   =>  plt_biom%EPOOLR     , &
     WTSHEBE  =>  plt_biom%WTSHEBE    , &
-    WTLFBN   =>  plt_biom%WTLFBN     , &
     WTEARB   =>  plt_biom%WTEARB     , &
     WSLF     =>  plt_biom%WSLF       , &
     WGLFP    =>  plt_biom%WGLFP      , &
@@ -2669,7 +2656,7 @@ module PlantBranchMod
     WGSHE    =>  plt_biom%WGSHE      , &
     WGSHN    =>  plt_biom%WGSHN      , &
     WGLFN    =>  plt_biom%WGLFN      , &
-    WTLFB    =>  plt_biom%WTLFB      , &
+    WTLFBE   =>  plt_biom%WTLFBE     , &
     WTRVE    =>  plt_biom%WTRVE      , &
     WTSTXN   =>  plt_biom%WTSTXN     , &
     WGNODE   =>  plt_biom%WGNODE     , &
@@ -2801,28 +2788,28 @@ module PlantBranchMod
             FLG4(NB,NZ)=0._r8
             D5330: DO M=1,jsken
               ESNC(M,ielmc,0,0,NZ)=ESNC(M,ielmc,0,0,NZ) &
-                +CFOPC(5,M,NZ)*WTLFB(NB,NZ)*FWODB(0) &
+                +CFOPC(5,M,NZ)*WTLFBE(NB,ielmc,NZ)*FWODB(0) &
                 +CFOPC(5,M,NZ)*WTSHEBE(NB,ielmc,NZ)*FWODB(0)
               ESNC(M,ielmn,0,0,NZ)=ESNC(M,ielmn,0,0,NZ) &
-                +CFOPN(5,M,NZ)*WTLFBN(NB,NZ)*FWODLN(0) &
+                +CFOPN(5,M,NZ)*WTLFBE(NB,ielmn,NZ)*FWODLN(0) &
                 +CFOPN(5,M,NZ)*WTSHEBE(NB,ielmn,NZ)*FWODSN(0)
               ESNC(M,ielmp,0,0,NZ)=ESNC(M,ielmp,0,0,NZ) &
-                +CFOPP(5,M,NZ)*WTLFBP(NB,NZ)*FWODLP(0) &
+                +CFOPP(5,M,NZ)*WTLFBE(NB,ielmp,NZ)*FWODLP(0) &
                 +CFOPP(5,M,NZ)*WTSHEBE(NB,ielmp,NZ)*FWODSP(0)
               ESNC(M,ielmc,1,0,NZ)=ESNC(M,ielmc,1,0,NZ) &
-                +CFOPC(1,M,NZ)*WTLFB(NB,NZ)*FWODB(1) &
+                +CFOPC(1,M,NZ)*WTLFBE(NB,ielmc,NZ)*FWODB(1) &
                 +CFOPC(2,M,NZ)*WTSHEBE(NB,ielmc,NZ)*FWODB(1)
               ESNC(M,ielmn,1,0,NZ)=ESNC(M,ielmn,1,0,NZ) &
-                +CFOPN(1,M,NZ)*WTLFBN(NB,NZ)*FWODLN(1) &
+                +CFOPN(1,M,NZ)*WTLFBE(NB,ielmn,NZ)*FWODLN(1) &
                 +CFOPN(2,M,NZ)*WTSHEBE(NB,ielmn,NZ)*FWODSN(1)
               ESNC(M,ielmp,1,0,NZ)=ESNC(M,ielmp,1,0,NZ) &
-                +CFOPP(1,M,NZ)*WTLFBP(NB,NZ)*FWODLP(1) &
+                +CFOPP(1,M,NZ)*WTLFBE(NB,ielmp,NZ)*FWODLP(1) &
                 +CFOPP(2,M,NZ)*WTSHEBE(NB,ielmp,NZ)*FWODSP(1)
             ENDDO D5330
             ARLFB(NB,NZ)=0._r8
-            WTLFB(NB,NZ)=0._r8
-            WTLFBN(NB,NZ)=0._r8
-            WTLFBP(NB,NZ)=0._r8
+            WTLFBE(NB,ielmc,NZ)=0._r8
+            WTLFBE(NB,ielmn,NZ)=0._r8
+            WTLFBE(NB,ielmp,NZ)=0._r8
             WTSHEBE(NB,ielmc,NZ)=0._r8
             WTSHEBE(NB,ielmn,NZ)=0._r8
             WTSHEBE(NB,ielmp,NZ)=0._r8
@@ -2867,13 +2854,13 @@ module PlantBranchMod
           GRWTB(NB,NZ)=0._r8
           IF(IBTYP(NZ).EQ.0.OR.IGTYP(NZ).LE.1)THEN
             D6345: DO M=1,jsken
-              ESNC(M,ielmc,1,0,NZ)=ESNC(M,ielmc,1,0,NZ)+CFOPC(3,M,NZ)*WTSTKB(NB,NZ)
-              ESNC(M,ielmn,1,0,NZ)=ESNC(M,ielmn,1,0,NZ)+CFOPN(3,M,NZ)*WTSTBN(NB,NZ)
-              ESNC(M,ielmp,1,0,NZ)=ESNC(M,ielmp,1,0,NZ)+CFOPP(3,M,NZ)*WTSTBP(NB,NZ)
+              ESNC(M,ielmc,1,0,NZ)=ESNC(M,ielmc,1,0,NZ)+CFOPC(3,M,NZ)*WTSTKBE(NB,ielmc,NZ)
+              ESNC(M,ielmn,1,0,NZ)=ESNC(M,ielmn,1,0,NZ)+CFOPN(3,M,NZ)*WTSTKBE(NB,ielmn,NZ)
+              ESNC(M,ielmp,1,0,NZ)=ESNC(M,ielmp,1,0,NZ)+CFOPP(3,M,NZ)*WTSTKBE(NB,ielmp,NZ)
             ENDDO D6345
-            WTSTKB(NB,NZ)=0._r8
-            WTSTBN(NB,NZ)=0._r8
-            WTSTBP(NB,NZ)=0._r8
+            WTSTKBE(NB,ielmc,NZ)=0._r8
+            WTSTKBE(NB,ielmn,NZ)=0._r8
+            WTSTKBE(NB,ielmp,NZ)=0._r8
             WTSTXB(NB,NZ)=0._r8
             WTSTXN(NB,NZ)=0._r8
             WTSTXP(NB,NZ)=0._r8
@@ -2948,13 +2935,13 @@ module PlantBranchMod
 !
     IF((IBTYP(NZ).EQ.0.OR.IGTYP(NZ).LE.1).AND.ISTYP(NZ).NE.0)THEN
       D6335: DO M=1,jsken
-        ESNC(M,ielmc,1,0,NZ)=ESNC(M,ielmc,1,0,NZ)+FSNR*CFOPC(3,M,NZ)*WTSTKB(NB,NZ)
-        ESNC(M,ielmn,1,0,NZ)=ESNC(M,ielmn,1,0,NZ)+FSNR*CFOPN(3,M,NZ)*WTSTBN(NB,NZ)
-        ESNC(M,ielmp,1,0,NZ)=ESNC(M,ielmp,1,0,NZ)+FSNR*CFOPP(3,M,NZ)*WTSTBP(NB,NZ)
+        ESNC(M,ielmc,1,0,NZ)=ESNC(M,ielmc,1,0,NZ)+FSNR*CFOPC(3,M,NZ)*WTSTKBE(NB,ielmc,NZ)
+        ESNC(M,ielmn,1,0,NZ)=ESNC(M,ielmn,1,0,NZ)+FSNR*CFOPN(3,M,NZ)*WTSTKBE(NB,ielmn,NZ)
+        ESNC(M,ielmp,1,0,NZ)=ESNC(M,ielmp,1,0,NZ)+FSNR*CFOPP(3,M,NZ)*WTSTKBE(NB,ielmp,NZ)
       ENDDO D6335
-      WTSTKB(NB,NZ)=(1.0_r8-FSNR)*WTSTKB(NB,NZ)
-      WTSTBN(NB,NZ)=(1.0_r8-FSNR)*WTSTBN(NB,NZ)
-      WTSTBP(NB,NZ)=(1.0_r8-FSNR)*WTSTBP(NB,NZ)
+      WTSTKBE(NB,ielmc,NZ)=(1.0_r8-FSNR)*WTSTKBE(NB,ielmc,NZ)
+      WTSTKBE(NB,ielmn,NZ)=(1.0_r8-FSNR)*WTSTKBE(NB,ielmn,NZ)
+      WTSTKBE(NB,ielmp,NZ)=(1.0_r8-FSNR)*WTSTKBE(NB,ielmp,NZ)
       WTSTXB(NB,NZ)=(1.0_r8-FSNR)*WTSTXB(NB,NZ)
       WTSTXN(NB,NZ)=(1.0_r8-FSNR)*WTSTXN(NB,NZ)
       WTSTXP(NB,NZ)=(1.0_r8-FSNR)*WTSTXP(NB,NZ)
