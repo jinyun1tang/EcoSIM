@@ -515,12 +515,8 @@ implicit none
   real(r8), pointer :: WTNDLP(:,:)    => null()    !root layer nodule P, [g d-2]
   real(r8), pointer :: ZPOOLN(:,:)    => null()    !root nodule nonstructural N, [g d-2]
   real(r8), pointer :: WGLFV(:,:)     => null()    !canopy layer leaf C, [g d-2]
-  real(r8), pointer :: WTRT2(:,:,:,:) => null()    !root layer C secondary axes, [g d-2]
-  real(r8), pointer :: WTRT1(:,:,:,:) => null()    !root layer C primary axes, [g d-2]
-  real(r8), pointer :: WTRT2N(:,:,:,:)=> null()    !root layer N secondary axes, [g d-2]
-  real(r8), pointer :: WTRT1N(:,:,:,:)=> null()    !root layer N primary axes, [g d-2]
-  real(r8), pointer :: WTRT2P(:,:,:,:)=> null()    !root layer P secondary axes, [g d-2]
-  real(r8), pointer :: WTRT1P(:,:,:,:)=> null()    !root layer P primary axes, [g d-2]
+  real(r8), pointer :: WTRT2E(:,:,:,:,:) => null()    !root layer element secondary axes, [g d-2]
+  real(r8), pointer :: WTRT1E(:,:,:,:,:) => null()    !root layer element primary axes, [g d-2]
   real(r8), pointer :: RTWT1(:,:,:)   => null()    !root C primary axes, [g d-2]
   real(r8), pointer :: RTWT1N(:,:,:)  => null()    !root N primary axes, [g d-2]
   real(r8), pointer :: RTWT1P(:,:,:)  => null()    !root P primary axes, [g d-2]
@@ -1642,12 +1638,8 @@ implicit none
   allocate(this%CPOOLN(JZ1,JP1))
   allocate(this%PPOOLN(JZ1,JP1))
   allocate(this%WTSTDE(jsken,npelms,JP1))
-  allocate(this%WTRT2(2,JZ1,JC1,JP1))
-  allocate(this%WTRT1(2,JZ1,JC1,JP1))
-  allocate(this%WTRT2N(2,JZ1,JC1,JP1))
-  allocate(this%WTRT1N(2,JZ1,JC1,JP1))
-  allocate(this%WTRT2P(2,JZ1,JC1,JP1))
-  allocate(this%WTRT1P(2,JZ1,JC1,JP1))
+  allocate(this%WTRT2E(npelms,2,JZ1,JC1,JP1))
+  allocate(this%WTRT1E(npelms,2,JZ1,JC1,JP1))
   allocate(this%CEPOLP(npelms,JP1))
   allocate(this%EPOOLP(npelms,JP1))
   allocate(this%EPOLNP(npelms,JP1))
@@ -1743,13 +1735,9 @@ implicit none
 !  if(allocated(RTWT1))deallocate(RTWT1)
 !  if(allocated(RTWT1N))deallocate(RTWT1N)
 !  if(allocated(RTWT1P))deallocate(RTWT1P)
-!  if(allocated(WTRT1))deallocate(WTRT1)
+!  if(allocated(WTRT1E))deallocate(WTRT1E)
 !  if(allocated(WTSTDE))deallocate(WTSTDE)
-!  if(allocated(WTRT2))deallocate(WTRT2)
-!  if(allocated(WTRT2N))deallocate(WTRT2N)
-!  if(allocated(WTRT1N))deallocate(WTRT1N)
-!  if(allocated(WTRT2P))deallocate(WTRT2P)
-!  if(allocated(WTRT1P))deallocate(WTRT1P)
+!  if(allocated(WTRT2E))deallocate(WTRT2E)
 !  if(allocated(CEPOLP))deallocate(CEPOLP)
 !  if(allocated(EPOOLP))deallocate(EPOOLP)
 !  if(allocated(EPOLNP))deallocate(EPOLNP)

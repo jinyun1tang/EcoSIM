@@ -678,13 +678,9 @@ module grosubsMod
     WTNDLN   =>  plt_biom%WTNDLN  , &
     EPOOLP   =>  plt_biom%EPOOLP  , &
     EPOLNP   =>  plt_biom%EPOLNP  , &
-    WTRT1    =>  plt_biom%WTRT1   , &
-    WTRT1N   =>  plt_biom%WTRT1N  , &
-    WTRT1P   =>  plt_biom%WTRT1P  , &
+    WTRT1E   =>  plt_biom%WTRT1E  , &
     WTNDLP   =>  plt_biom%WTNDLP  , &
-    WTRT2    =>  plt_biom%WTRT2   , &
-    WTRT2N   =>  plt_biom%WTRT2N  , &
-    WTRT2P   =>  plt_biom%WTRT2P  , &
+    WTRT2E   =>  plt_biom%WTRT2E  , &
     CPOOLN   =>  plt_biom%CPOOLN  , &
     ZPOOLN   =>  plt_biom%ZPOOLN  , &
     PPOOLN   =>  plt_biom%PPOOLN  , &
@@ -765,12 +761,12 @@ module grosubsMod
 !     WTRT2,WTRT2N,WTRT2P=secondary root C,N,P mass in soil layer
 !
 
-  WTRTSE(ielmc,NZ)=sum(WTRT1(1:MY(NZ),NU:NJ,1:NRT(NZ),NZ)) &
-    +sum(WTRT2(1:MY(NZ),NU:NJ,1:NRT(NZ),NZ))
-  WTRTSE(ielmn,NZ)=sum(WTRT1N(1:MY(NZ),NU:NJ,1:NRT(NZ),NZ)) &
-    +sum(WTRT2N(1:MY(NZ),NU:NJ,1:NRT(NZ),NZ))
-  WTRTSE(ielmp,NZ)=sum(WTRT1P(1:MY(NZ),NU:NJ,1:NRT(NZ),NZ)) &
-    +sum(WTRT2P(1:MY(NZ),NU:NJ,1:NRT(NZ),NZ))
+  WTRTSE(ielmc,NZ)=sum(WTRT1E(ielmc,1:MY(NZ),NU:NJ,1:NRT(NZ),NZ)) &
+    +sum(WTRT2E(ielmc,1:MY(NZ),NU:NJ,1:NRT(NZ),NZ))
+  WTRTSE(ielmn,NZ)=sum(WTRT1E(ielmn,1:MY(NZ),NU:NJ,1:NRT(NZ),NZ)) &
+    +sum(WTRT2E(ielmn,1:MY(NZ),NU:NJ,1:NRT(NZ),NZ))
+  WTRTSE(ielmp,NZ)=sum(WTRT1E(ielmp,1:MY(NZ),NU:NJ,1:NRT(NZ),NZ)) &
+    +sum(WTRT2E(ielmp,1:MY(NZ),NU:NJ,1:NRT(NZ),NZ))
   DO NE=1,npelms
     WTRTE(NE,NZ)=WTRTE(NE,NZ)+WTRTSE(NE,NZ)
   ENDDO

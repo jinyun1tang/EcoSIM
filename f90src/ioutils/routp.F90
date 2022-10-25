@@ -248,12 +248,12 @@
               DO 9965 NR=1,NRT(NZ,NY,NX)
                 READ(29,94)IDATE,IYR,NZ,(RTN2(N,L,NR,NZ,NY,NX),L=1,NJ(NY,NX))
                 READ(29,94)IDATE,IYR,NZ,(RTLG1(N,L,NR,NZ,NY,NX),L=1,NJ(NY,NX))
-                READ(29,94)IDATE,IYR,NZ,(WTRT1(N,L,NR,NZ,NY,NX),L=1,NJ(NY,NX))
-                READ(29,94)IDATE,IYR,NZ,(WTRT1N(N,L,NR,NZ,NY,NX),L=1,NJ(NY,NX))
-                READ(29,94)IDATE,IYR,NZ,(WTRT1P(N,L,NR,NZ,NY,NX),L=1,NJ(NY,NX))
-                READ(29,94)IDATE,IYR,NZ,(WTRT2(N,L,NR,NZ,NY,NX),L=1,NJ(NY,NX))
-                READ(29,94)IDATE,IYR,NZ,(WTRT2N(N,L,NR,NZ,NY,NX),L=1,NJ(NY,NX))
-                READ(29,94)IDATE,IYR,NZ,(WTRT2P(N,L,NR,NZ,NY,NX),L=1,NJ(NY,NX))
+                READ(29,94)IDATE,IYR,NZ,(WTRT1E(ielmc,N,L,NR,NZ,NY,NX),L=1,NJ(NY,NX))
+                READ(29,94)IDATE,IYR,NZ,(WTRT1E(ielmn,N,L,NR,NZ,NY,NX),L=1,NJ(NY,NX))
+                READ(29,94)IDATE,IYR,NZ,(WTRT1E(ielmp,N,L,NR,NZ,NY,NX),L=1,NJ(NY,NX))
+                READ(29,94)IDATE,IYR,NZ,(WTRT2E(ielmc,N,L,NR,NZ,NY,NX),L=1,NJ(NY,NX))
+                READ(29,94)IDATE,IYR,NZ,(WTRT2E(ielmn,N,L,NR,NZ,NY,NX),L=1,NJ(NY,NX))
+                READ(29,94)IDATE,IYR,NZ,(WTRT2E(ielmp,N,L,NR,NZ,NY,NX),L=1,NJ(NY,NX))
                 READ(29,94)IDATE,IYR,NZ,(RTLG2(N,L,NR,NZ,NY,NX),L=1,NJ(NY,NX))
 9965          CONTINUE
 9970        CONTINUE
@@ -394,20 +394,16 @@
 9620            CONTINUE
 9610          CONTINUE
               DO 9700 NR=NRT(NZ,NY,NX)+1,10
-                DO 9705 N=1,MY(NZ,NY,NX)
+                D9705: DO N=1,MY(NZ,NY,NX)
                   RTDP1(N,NR,NZ,NY,NX)=AMAX1(0.0,SDPTH(NZ,NY,NX) &
                     +CDPTH(NU(NY,NX),NY,NX)-DLYR(3,NU(NY,NX),NY,NX))
-                  DO 9710 L=1,JZ
-                    WTRT1(N,L,NR,NZ,NY,NX)=0.0
-                    WTRT1N(N,L,NR,NZ,NY,NX)=0.0
-                    WTRT1P(N,L,NR,NZ,NY,NX)=0.0
+                  D9710: DO L=1,JZ
+                    WTRT1E(1:npelms,N,L,NR,NZ,NY,NX)=0.0
                     RTLG1(N,L,NR,NZ,NY,NX)=0.0
-                    WTRT2(N,L,NR,NZ,NY,NX)=0.0
-                    WTRT2N(N,L,NR,NZ,NY,NX)=0.0
-                    WTRT2P(N,L,NR,NZ,NY,NX)=0.0
+                    WTRT2E(1:npelms,N,L,NR,NZ,NY,NX)=0.0
                     RTLG2(N,L,NR,NZ,NY,NX)=0.0
-9710              CONTINUE
-9705            CONTINUE
+                  ENDDO D9710
+                ENDDO D9705
 9700          CONTINUE
             ENDIF
 9880      CONTINUE

@@ -139,16 +139,12 @@ implicit none
     WTNDBP     =>   plt_biom%WTNDBP   , &
     WTRVE      =>   plt_biom%WTRVE    , &
     WTGRBE     =>   plt_biom%WTGRBE   , &
-    WTRT1      =>   plt_biom%WTRT1    , &
-    WTRT1N     =>   plt_biom%WTRT1N   , &
-    WTRT1P     =>   plt_biom%WTRT1P   , &
+    WTRT1E     =>   plt_biom%WTRT1E   , &
     WTLFBE     =>   plt_biom%WTLFBE   , &
     EPOOLR     =>   plt_biom%EPOOLR   , &
     WTNDBN     =>   plt_biom%WTNDBN   , &
     WTSTDE     =>   plt_biom%WTSTDE   , &
-    WTRT2      =>   plt_biom%WTRT2    , &
-    WTRT2N     =>   plt_biom%WTRT2N   , &
-    WTRT2P     =>   plt_biom%WTRT2P   , &
+    WTRT2E     =>   plt_biom%WTRT2E   , &
     FWODLN     =>   plt_allom%FWODLN  , &
     FWODLP     =>   plt_allom%FWODLP  , &
     FWODB      =>   plt_allom%FWODB   , &
@@ -275,17 +271,17 @@ implicit none
             ESNC(M,ielmp,1,L,NZ)=ESNC(M,ielmp,1,L,NZ)+CFOPP(0,M,NZ)*EPOOLR(ielmp,N,L,NZ)
             DO NR=1,NRT(NZ)
               ESNC(M,ielmc,0,L,NZ)=ESNC(M,ielmc,0,L,NZ)+CFOPC(5,M,NZ) &
-                *(WTRT1(N,L,NR,NZ)+WTRT2(N,L,NR,NZ))*FWODR(0)
+                *(WTRT1E(ielmc,N,L,NR,NZ)+WTRT2E(ielmc,N,L,NR,NZ))*FWODR(0)
               ESNC(M,ielmn,0,L,NZ)=ESNC(M,ielmn,0,L,NZ)+CFOPN(5,M,NZ) &
-                *(WTRT1N(N,L,NR,NZ)+WTRT2N(N,L,NR,NZ))*FWODRN(0)
+                *(WTRT1E(ielmn,N,L,NR,NZ)+WTRT2E(ielmn,N,L,NR,NZ))*FWODRN(0)
               ESNC(M,ielmp,0,L,NZ)=ESNC(M,ielmp,0,L,NZ)+CFOPP(5,M,NZ) &
-                *(WTRT1P(N,L,NR,NZ)+WTRT2P(N,L,NR,NZ))*FWODRP(0)
+                *(WTRT1E(ielmp,N,L,NR,NZ)+WTRT2E(ielmp,N,L,NR,NZ))*FWODRP(0)
               ESNC(M,ielmc,1,L,NZ)=ESNC(M,ielmc,1,L,NZ)+CFOPC(4,M,NZ) &
-                *(WTRT1(N,L,NR,NZ)+WTRT2(N,L,NR,NZ))*FWODR(1)
+                *(WTRT1E(ielmc,N,L,NR,NZ)+WTRT2E(ielmc,N,L,NR,NZ))*FWODR(1)
               ESNC(M,ielmn,1,L,NZ)=ESNC(M,ielmn,1,L,NZ)+CFOPN(4,M,NZ) &
-                *(WTRT1N(N,L,NR,NZ)+WTRT2N(N,L,NR,NZ))*FWODRN(1)
+                *(WTRT1E(ielmn,N,L,NR,NZ)+WTRT2E(ielmn,N,L,NR,NZ))*FWODRN(1)
               ESNC(M,ielmp,1,L,NZ)=ESNC(M,ielmp,1,L,NZ)+CFOPP(4,M,NZ) &
-                *(WTRT1P(N,L,NR,NZ)+WTRT2P(N,L,NR,NZ))*FWODRP(1)
+                *(WTRT1E(ielmp,N,L,NR,NZ)+WTRT2E(ielmp,N,L,NR,NZ))*FWODRP(1)
             ENDDO
           ENDDO
         ENDDO D6415
@@ -333,15 +329,11 @@ implicit none
   integer :: L,M,NR,N
 !     begin_execution
   associate(                                &
-    WTRT2     =>   plt_biom%WTRT2     , &
-    WTRT2N    =>   plt_biom%WTRT2N    , &
-    WTRT2P    =>   plt_biom%WTRT2P    , &
+    WTRT2E    =>   plt_biom%WTRT2E    , &
     RTWT1     =>   plt_biom%RTWT1     , &
     RTWT1N    =>   plt_biom%RTWT1N    , &
     RTWT1P    =>   plt_biom%RTWT1P    , &
-    WTRT1     =>   plt_biom%WTRT1     , &
-    WTRT1N    =>   plt_biom%WTRT1N    , &
-    WTRT1P    =>   plt_biom%WTRT1P    , &
+    WTRT1E    =>   plt_biom%WTRT1E    , &
     EPOOLR    =>   plt_biom%EPOOLR    , &
     WTRTD     =>   plt_biom%WTRTD     , &
     ZPOOLN    =>   plt_biom%ZPOOLN    , &
@@ -425,17 +417,17 @@ implicit none
           ESNC(M,ielmp,1,L,NZ)=ESNC(M,ielmp,1,L,NZ)+CFOPP(0,M,NZ)*EPOOLR(ielmp,N,L,NZ)
           DO  NR=1,NRT(NZ)
             ESNC(M,ielmc,0,L,NZ)=ESNC(M,ielmc,0,L,NZ)+CFOPC(5,M,NZ) &
-              *(WTRT1(N,L,NR,NZ)+WTRT2(N,L,NR,NZ))*FWODR(0)
+              *(WTRT1E(ielmc,N,L,NR,NZ)+WTRT2E(ielmc,N,L,NR,NZ))*FWODR(0)
             ESNC(M,ielmn,0,L,NZ)=ESNC(M,ielmn,0,L,NZ)+CFOPN(5,M,NZ) &
-              *(WTRT1N(N,L,NR,NZ)+WTRT2N(N,L,NR,NZ))*FWODRN(0)
+              *(WTRT1E(ielmn,N,L,NR,NZ)+WTRT2E(ielmn,N,L,NR,NZ))*FWODRN(0)
             ESNC(M,ielmp,0,L,NZ)=ESNC(M,ielmp,0,L,NZ)+CFOPP(5,M,NZ) &
-              *(WTRT1P(N,L,NR,NZ)+WTRT2P(N,L,NR,NZ))*FWODRP(0)
+              *(WTRT1E(ielmp,N,L,NR,NZ)+WTRT2E(ielmp,N,L,NR,NZ))*FWODRP(0)
             ESNC(M,ielmc,1,L,NZ)=ESNC(M,ielmc,1,L,NZ)+CFOPC(4,M,NZ) &
-              *(WTRT1(N,L,NR,NZ)+WTRT2(N,L,NR,NZ))*FWODR(1)
+              *(WTRT1E(ielmc,N,L,NR,NZ)+WTRT2E(ielmc,N,L,NR,NZ))*FWODR(1)
             ESNC(M,ielmn,1,L,NZ)=ESNC(M,ielmn,1,L,NZ)+CFOPN(4,M,NZ) &
-              *(WTRT1N(N,L,NR,NZ)+WTRT2N(N,L,NR,NZ))*FWODRN(1)
+              *(WTRT1E(ielmn,N,L,NR,NZ)+WTRT2E(ielmn,N,L,NR,NZ))*FWODRN(1)
             ESNC(M,ielmp,1,L,NZ)=ESNC(M,ielmp,1,L,NZ)+CFOPP(4,M,NZ) &
-              *(WTRT1P(N,L,NR,NZ)+WTRT2P(N,L,NR,NZ))*FWODRP(1)
+              *(WTRT1E(ielmp,N,L,NR,NZ)+WTRT2E(ielmp,N,L,NR,NZ))*FWODRP(1)
           enddo
         ENDDO D6410
 !
@@ -477,12 +469,12 @@ implicit none
 !     RTLGA=average secondary root length
 !
         D8870: DO NR=1,NRT(NZ)
-          WTRT1(N,L,NR,NZ)=0._r8
-          WTRT1N(N,L,NR,NZ)=0._r8
-          WTRT1P(N,L,NR,NZ)=0._r8
-          WTRT2(N,L,NR,NZ)=0._r8
-          WTRT2N(N,L,NR,NZ)=0._r8
-          WTRT2P(N,L,NR,NZ)=0._r8
+          WTRT1E(ielmc,N,L,NR,NZ)=0._r8
+          WTRT1E(ielmn,N,L,NR,NZ)=0._r8
+          WTRT1E(ielmp,N,L,NR,NZ)=0._r8
+          WTRT2E(ielmc,N,L,NR,NZ)=0._r8
+          WTRT2E(ielmn,N,L,NR,NZ)=0._r8
+          WTRT2E(ielmp,N,L,NR,NZ)=0._r8
           RTWT1(N,NR,NZ)=0._r8
           RTWT1N(N,NR,NZ)=0._r8
           RTWT1P(N,NR,NZ)=0._r8
@@ -782,13 +774,9 @@ implicit none
     WTSTXP => plt_biom%WTSTXP        , &
     WTLSB  => plt_biom%WTLSB         , &
     WTRVE  => plt_biom%WTRVE         , &
-    WTRT1  => plt_biom%WTRT1         , &
-    WTRT1N => plt_biom%WTRT1N        , &
-    WTRT1P => plt_biom%WTRT1P        , &
+    WTRT1E => plt_biom%WTRT1E        , &
     WTNDBN => plt_biom%WTNDBN        , &
-    WTRT2  => plt_biom%WTRT2         , &
-    WTRT2N => plt_biom%WTRT2N        , &
-    WTRT2P => plt_biom%WTRT2P        , &
+    WTRT2E => plt_biom%WTRT2E        , &
     WTNDB  => plt_biom%WTNDB         , &
     WTSTKBE=> plt_biom%WTSTKBE       , &
     RTWT1  => plt_biom%RTWT1         , &
@@ -845,12 +833,12 @@ implicit none
     DO  N=1,MY(NZ)
       EPOOLR(:,N,L,NZ)=0._r8
       DO  NR=1,NRT(NZ)
-        WTRT1(N,L,NR,NZ)=0._r8
-        WTRT1N(N,L,NR,NZ)=0._r8
-        WTRT1P(N,L,NR,NZ)=0._r8
-        WTRT2(N,L,NR,NZ)=0._r8
-        WTRT2N(N,L,NR,NZ)=0._r8
-        WTRT2P(N,L,NR,NZ)=0._r8
+        WTRT1E(ielmc,N,L,NR,NZ)=0._r8
+        WTRT1E(ielmn,N,L,NR,NZ)=0._r8
+        WTRT1E(ielmp,N,L,NR,NZ)=0._r8
+        WTRT2E(ielmc,N,L,NR,NZ)=0._r8
+        WTRT2E(ielmn,N,L,NR,NZ)=0._r8
+        WTRT2E(ielmp,N,L,NR,NZ)=0._r8
         RTWT1(N,NR,NZ)=0._r8
         RTWT1N(N,NR,NZ)=0._r8
         RTWT1P(N,NR,NZ)=0._r8

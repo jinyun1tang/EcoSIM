@@ -670,12 +670,8 @@ implicit none
       ENDDO
       DO L=1,JZ
         DO N=1,2
-          WTRT1(N,L,NR,NZ,NY,NX) =plt_biom%WTRT1(N,L,NR,NZ)
-          WTRT1N(N,L,NR,NZ,NY,NX)=plt_biom%WTRT1N(N,L,NR,NZ)
-          WTRT1P(N,L,NR,NZ,NY,NX)=plt_biom%WTRT1P(N,L,NR,NZ)
-          WTRT2(N,L,NR,NZ,NY,NX) =plt_biom%WTRT2(N,L,NR,NZ)
-          WTRT2N(N,L,NR,NZ,NY,NX)=plt_biom%WTRT2N(N,L,NR,NZ)
-          WTRT2P(N,L,NR,NZ,NY,NX)=plt_biom%WTRT2P(N,L,NR,NZ)
+          WTRT1E(1:npelms,N,L,NR,NZ,NY,NX) =plt_biom%WTRT1E(1:npelms,N,L,NR,NZ)
+          WTRT2E(1:npelms,N,L,NR,NZ,NY,NX) =plt_biom%WTRT2E(1:npelms,N,L,NR,NZ)
           RTLG1(N,L,NR,NZ,NY,NX) =plt_morph%RTLG1(N,L,NR,NZ)
           RTLG2(N,L,NR,NZ,NY,NX) =plt_morph%RTLG2(N,L,NR,NZ)
           RTN2(N,L,NR,NZ,NY,NX)  =plt_morph%RTN2(N,L,NR,NZ)
@@ -1622,12 +1618,8 @@ implicit none
           plt_morph%RTLG1(N,L,NR,NZ)=RTLG1(N,L,NR,NZ,NY,NX)
           plt_morph%RTLG2(N,L,NR,NZ)=RTLG2(N,L,NR,NZ,NY,NX)
           plt_morph%RTN2(N,L,NR,NZ) =RTN2(N,L,NR,NZ,NY,NX)
-          plt_biom%WTRT2(N,L,NR,NZ) =WTRT2(N,L,NR,NZ,NY,NX)
-          plt_biom%WTRT1(N,L,NR,NZ) =WTRT1(N,L,NR,NZ,NY,NX)
-          plt_biom%WTRT2N(N,L,NR,NZ)=WTRT2N(N,L,NR,NZ,NY,NX)
-          plt_biom%WTRT1N(N,L,NR,NZ)=WTRT1N(N,L,NR,NZ,NY,NX)
-          plt_biom%WTRT2P(N,L,NR,NZ)=WTRT2P(N,L,NR,NZ,NY,NX)
-          plt_biom%WTRT1P(N,L,NR,NZ)=WTRT1P(N,L,NR,NZ,NY,NX)
+          plt_biom%WTRT2E(1:npelms,N,L,NR,NZ) =WTRT2E(1:npelms,N,L,NR,NZ,NY,NX)
+          plt_biom%WTRT1E(1:npelms,N,L,NR,NZ) =WTRT1E(1:npelms,N,L,NR,NZ,NY,NX)
         enddo
       enddo
       DO N=1,MY(NZ,NY,NX)

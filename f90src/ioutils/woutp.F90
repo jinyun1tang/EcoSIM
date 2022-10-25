@@ -237,12 +237,12 @@
               DO 9965 NR=1,NRT(NZ,NY,NX)
                 WRITE(29,94)I,IDATA(3),NZ,(RTN2(N,L,NR,NZ,NY,NX),L=1,NJ(NY,NX))
                 WRITE(29,94)I,IDATA(3),NZ,(RTLG1(N,L,NR,NZ,NY,NX),L=1,NJ(NY,NX))
-                WRITE(29,94)I,IDATA(3),NZ,(WTRT1(N,L,NR,NZ,NY,NX),L=1,NJ(NY,NX))
-                WRITE(29,94)I,IDATA(3),NZ,(WTRT1N(N,L,NR,NZ,NY,NX),L=1,NJ(NY,NX))
-                WRITE(29,94)I,IDATA(3),NZ,(WTRT1P(N,L,NR,NZ,NY,NX),L=1,NJ(NY,NX))
-                WRITE(29,94)I,IDATA(3),NZ,(WTRT2(N,L,NR,NZ,NY,NX),L=1,NJ(NY,NX))
-                WRITE(29,94)I,IDATA(3),NZ,(WTRT2N(N,L,NR,NZ,NY,NX),L=1,NJ(NY,NX))
-                WRITE(29,94)I,IDATA(3),NZ,(WTRT2P(N,L,NR,NZ,NY,NX),L=1,NJ(NY,NX))
+                WRITE(29,94)I,IDATA(3),NZ,(WTRT1E(ielmc,N,L,NR,NZ,NY,NX),L=1,NJ(NY,NX))
+                WRITE(29,94)I,IDATA(3),NZ,(WTRT1E(ielmn,N,L,NR,NZ,NY,NX),L=1,NJ(NY,NX))
+                WRITE(29,94)I,IDATA(3),NZ,(WTRT1E(ielmp,N,L,NR,NZ,NY,NX),L=1,NJ(NY,NX))
+                WRITE(29,94)I,IDATA(3),NZ,(WTRT2E(ielmc,N,L,NR,NZ,NY,NX),L=1,NJ(NY,NX))
+                WRITE(29,94)I,IDATA(3),NZ,(WTRT2E(ielmn,N,L,NR,NZ,NY,NX),L=1,NJ(NY,NX))
+                WRITE(29,94)I,IDATA(3),NZ,(WTRT2E(ielmp,N,L,NR,NZ,NY,NX),L=1,NJ(NY,NX))
                 WRITE(29,94)I,IDATA(3),NZ,(RTLG2(N,L,NR,NZ,NY,NX),L=1,NJ(NY,NX))
 9965          CONTINUE
 9970        CONTINUE
