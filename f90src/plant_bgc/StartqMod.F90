@@ -504,12 +504,10 @@ module StartqMod
   WTHSKBE(1:JC,1:npelms,NZ,NY,NX)=0._r8
   WTGRBE(1:JC,1:npelms,NZ,NY,NX)=0._r8
   WTEARBE(1:JC,1:npelms,NZ,NY,NX)=0._r8
+  WTNDBE(1:JC,1:npelms,NZ,NY,NX)=0._r8
   D25: DO NB=1,JC
-    WTNDB(NB,NZ,NY,NX)=0._r8
     WVSTKB(NB,NZ,NY,NX)=0._r8
     WTLSB(NB,NZ,NY,NX)=0._r8
-    WTNDBN(NB,NZ,NY,NX)=0._r8
-    WTNDBP(NB,NZ,NY,NX)=0._r8
     GRNXB(NB,NZ,NY,NX)=0._r8
     GRNOB(NB,NZ,NY,NX)=0._r8
     GRWTB(NB,NZ,NY,NX)=0._r8

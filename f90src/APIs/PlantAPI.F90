@@ -433,6 +433,7 @@ implicit none
         WTRSVBE(NB,NE,NZ,NY,NX)=plt_biom%WTRSVBE(NB,NE,NZ)
         WTHSKBE(NB,NE,NZ,NY,NX)=plt_biom%WTHSKBE(NB,NE,NZ)
         WTGRBE(NB,NE,NZ,NY,NX) =plt_biom%WTGRBE(NB,NE,NZ)
+        WTNDBE(NB,NE,NZ,NY,NX) =plt_biom%WTNDBE(NB,NE,NZ)
       ENDDO
     ENDDO
     DO NB=1,NBR(NZ,NY,NX)
@@ -487,9 +488,6 @@ implicit none
       VRNF(NB,NZ,NY,NX)  =plt_pheno%VRNF(NB,NZ)
       VSTG(NB,NZ,NY,NX)  =plt_morph%VSTG(NB,NZ)
       VSTGX(NB,NZ,NY,NX) =plt_pheno%VSTGX(NB,NZ)
-      WTNDB(NB,NZ,NY,NX) =plt_biom%WTNDB(NB,NZ)
-      WTNDBN(NB,NZ,NY,NX)=plt_biom%WTNDBN(NB,NZ)
-      WTNDBP(NB,NZ,NY,NX)=plt_biom%WTNDBP(NB,NZ)
       WTLSB(NB,NZ,NY,NX) =plt_biom%WTLSB(NB,NZ)
 
       WGLFX(NB,NZ,NY,NX) =plt_biom%WGLFX(NB,NZ)
@@ -1370,6 +1368,7 @@ implicit none
         plt_biom%WTHSKBE(NB,NE,NZ)=WTHSKBE(NB,NE,NZ,NY,NX)
         plt_biom%WTGRBE(NB,NE,NZ)=WTGRBE(NB,NE,NZ,NY,NX)
         plt_biom%WTEARBE(NB,NE,NZ)=WTEARBE(NB,NE,NZ,NY,NX)
+        plt_biom%WTNDBE(NB,NE,NZ)=WTNDBE(NB,NE,NZ,NY,NX)
       ENDDO
     ENDDO
 
@@ -1421,9 +1420,6 @@ implicit none
       plt_pheno%VRNS(NB,NZ)=VRNS(NB,NZ,NY,NX)
       plt_pheno%VRNF(NB,NZ)=VRNF(NB,NZ,NY,NX)
       plt_biom%WTLSB(NB,NZ)=WTLSB(NB,NZ,NY,NX)
-      plt_biom%WTNDB(NB,NZ)=WTNDB(NB,NZ,NY,NX)
-      plt_biom%WTNDBN(NB,NZ)=WTNDBN(NB,NZ,NY,NX)
-      plt_biom%WTNDBP(NB,NZ)=WTNDBP(NB,NZ,NY,NX)
       plt_biom%WGLFX(NB,NZ) =WGLFX(NB,NZ,NY,NX)
       plt_biom%WGLFNX(NB,NZ)=WGLFNX(NB,NZ,NY,NX)
       plt_biom%WGLFPX(NB,NZ)=WGLFPX(NB,NZ,NY,NX)

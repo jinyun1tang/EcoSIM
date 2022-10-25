@@ -426,27 +426,27 @@ module grosubsMod
     ARSTV  =>  plt_morph%ARSTV    , &
     NRT    =>  plt_morph%NRT        &
   )
-  DO 2 L=1,JC1
+  D2: DO L=1,JC1
     ARLFV(L,NZ)=0._r8
     WGLFV(L,NZ)=0._r8
     ARSTV(L,NZ)=0._r8
-2 CONTINUE
-  DO 5 NR=1,NRT(NZ)
+  ENDDO D2
+  D5: DO NR=1,NRT(NZ)
     DO  N=1,MY(NZ)
       NRX(N,NR)=0
       ICHK1(N,NR)=0
     enddo
-5 CONTINUE
-  DO 9 N=1,MY(NZ)
-    DO 6 L=NU,NJ
+  ENDDO D5
+  D9: DO N=1,MY(NZ)
+    D6: DO L=NU,NJ
       WSRTL(N,L,NZ)=0._r8
       RTN1(N,L,NZ)=0._r8
       RTNL(N,L,NZ)=0._r8
       RCO2M(N,L,NZ)=0._r8
       RCO2N(N,L,NZ)=0._r8
       RCO2A(N,L,NZ)=0._r8
-6   CONTINUE
-9 CONTINUE
+    ENDDO D6
+  ENDDO D9
 !
 !     IBTYP=turnover:0=all abve-grd,1=all leaf+petiole,2=none,3=between 1,2
 !     WTSTK,WVSTK=stalk,sapwood mass
@@ -458,8 +458,7 @@ module grosubsMod
 !     FWODSN,FWODSP=N,P woody fraction in petiole:0=woody,1=non-woody
 !     FWOODN,FWOODP=N,P woody fraction in stalk:0=woody,1=non-woody
 !
-  IF(IBTYP(NZ).EQ.0.OR.IGTYP(NZ).LE.1 &
-    .OR.WTSTKE(ielmc,NZ).LE.ZEROP(NZ))THEN
+  IF(IBTYP(NZ).EQ.0.OR.IGTYP(NZ).LE.1.OR.WTSTKE(ielmc,NZ).LE.ZEROP(NZ))THEN
     FWODB(1)=1.0_r8
     FWOOD(1)=1.0_r8
     FWODR(1)=1.0_r8
@@ -648,12 +647,10 @@ module grosubsMod
     EPOOL    =>  plt_biom%EPOOL   , &
     EPOOLR   =>  plt_biom%EPOOLR  , &
     EPOLNB   =>  plt_biom%EPOLNB  , &
-    WTNDBP   =>  plt_biom%WTNDBP  , &
     WTNDE    =>  plt_biom%WTNDE   , &
     WTRTSE   =>  plt_biom%WTRTSE  , &
     WTRTE    =>  plt_biom%WTRTE   , &
-    WTNDBN   =>  plt_biom%WTNDBN  , &
-    WTNDB    =>  plt_biom%WTNDB   , &
+    WTNDBE   =>  plt_biom%WTNDBE  , &
     WTSHTBE  =>  plt_biom%WTSHTBE , &
     WTSTKBE  =>  plt_biom%WTSTKBE , &
     WTHSKBE  =>  plt_biom%WTHSKBE , &
@@ -739,7 +736,11 @@ module grosubsMod
     WTHSKE(NE,NZ)=sum(WTHSKBE(1:NBR(NZ),NE,NZ))
     WTGRE(NE,NZ)=sum(WTGRBE(1:NBR(NZ),NE,NZ))
     WTEARE(NE,NZ)=sum(WTEARBE(1:NBR(NZ),NE,NZ))
+!root state variables
     WTRTE(NE,NZ)=sum(EPOOLR(NE,1:MY(NZ),NU:NJ,NZ))
+    WTRTSE(NE,NZ)=sum(WTRT1E(NE,1:MY(NZ),NU:NJ,1:NRT(NZ),NZ)) &
+      +sum(WTRT2E(NE,1:MY(NZ),NU:NJ,1:NRT(NZ),NZ))
+    WTRTE(NE,NZ)=WTRTE(NE,NZ)+WTRTSE(NE,NZ)
   ENDDO
 
   WVSTK(NZ)=sum(WVSTKB(1:NBR(NZ),NZ))
@@ -753,23 +754,7 @@ module grosubsMod
       ARSTV(L,NZ)=ARSTV(L,NZ)+ARSTK(L,NB,NZ)
     ENDDO
   ENDDO
-!
-!     ACCUMULATE ROOT STATE VARIABLES FROM ROOT LAYER STATE VARIABLES
-!
-!     CPOOLR,ZPOOLR,PPOOLR=non-structural C,N,P mass in root
-!     WTRT1,WTRT1N,WTRT1P=primary root C,N,P mass in soil layer
-!     WTRT2,WTRT2N,WTRT2P=secondary root C,N,P mass in soil layer
-!
 
-  WTRTSE(ielmc,NZ)=sum(WTRT1E(ielmc,1:MY(NZ),NU:NJ,1:NRT(NZ),NZ)) &
-    +sum(WTRT2E(ielmc,1:MY(NZ),NU:NJ,1:NRT(NZ),NZ))
-  WTRTSE(ielmn,NZ)=sum(WTRT1E(ielmn,1:MY(NZ),NU:NJ,1:NRT(NZ),NZ)) &
-    +sum(WTRT2E(ielmn,1:MY(NZ),NU:NJ,1:NRT(NZ),NZ))
-  WTRTSE(ielmp,NZ)=sum(WTRT1E(ielmp,1:MY(NZ),NU:NJ,1:NRT(NZ),NZ)) &
-    +sum(WTRT2E(ielmp,1:MY(NZ),NU:NJ,1:NRT(NZ),NZ))
-  DO NE=1,npelms
-    WTRTE(NE,NZ)=WTRTE(NE,NZ)+WTRTSE(NE,NZ)
-  ENDDO
 !
 !     ACCUMULATE NODULE STATE VATIABLES FROM NODULE LAYER VARIABLES
 !
@@ -783,13 +768,8 @@ module grosubsMod
         D7950: DO NB=1,NBR(NZ)
           EPOLNP(NE,NZ)=EPOLNP(NE,NZ)+EPOLNB(NB,NE,NZ)
         ENDDO D7950
+        WTNDE(NE,NZ)=sum(WTNDBE(1:NBR(NZ),NE,NZ))+sum(EPOLNB(1:NBR(NZ),NE,NZ))
       ENDDO
-      WTNDE(ielmc,NZ)=sum(WTNDB(1:NBR(NZ),NZ))+&
-        sum(EPOLNB(1:NBR(NZ),ielmc,NZ))
-      WTNDE(ielmn,NZ)=sum(WTNDBN(1:NBR(NZ),NZ))+&
-        sum(EPOLNB(1:NBR(NZ),ielmn,NZ))
-      WTNDE(ielmp,NZ)=sum(WTNDBP(1:NBR(NZ),NZ))+&
-        sum(EPOLNB(1:NBR(NZ),ielmp,NZ))
     ELSEIF(INTYP(NZ).GE.1.AND.INTYP(NZ).LE.3)THEN
       WTNDE(ielmc,NZ)=sum(WTNDL(NU:NI(NZ),NZ))+&
         sum(CPOOLN(NU:NI(NZ),NZ))

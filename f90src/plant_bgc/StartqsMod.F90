@@ -656,12 +656,10 @@ module StartqsMod
   plt_biom%WTHSKBE(1:JC1,1:npelms,NZ)=0._r8
   plt_biom%WTGRBE(1:JC1,1:npelms,NZ)=0._r8
   plt_biom%WTEARBE(1:JC1,1:npelms,NZ)=0._r8
+  plt_biom%WTNDBE(1:JC1,1:npelms,NZ)=0._r8
   D25: DO NB=1,JC1
-    plt_biom%WTNDB(NB,NZ)=0._r8
     plt_biom%WVSTKB(NB,NZ)=0._r8
     plt_biom%WTLSB(NB,NZ)=0._r8
-    plt_biom%WTNDBN(NB,NZ)=0._r8
-    plt_biom%WTNDBP(NB,NZ)=0._r8
     GRNXB(NB,NZ)=0._r8
     GRNOB(NB,NZ)=0._r8
     plt_allom%GRWTB(NB,NZ)=0._r8
