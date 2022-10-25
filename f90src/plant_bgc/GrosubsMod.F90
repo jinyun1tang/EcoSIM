@@ -562,13 +562,11 @@ module grosubsMod
     EPOOLR     =>  plt_biom%EPOOLR     , &
     WTRTD      =>  plt_biom%WTRTD      , &
     WTSHTBE    =>  plt_biom%WTSHTBE    , &
-    WTEARB     =>  plt_biom%WTEARB     , &
+    WTEARBE    =>  plt_biom%WTEARBE    , &
     WTSTKBE    =>  plt_biom%WTSTKBE    , &
     WTSHEBE    =>  plt_biom%WTSHEBE    , &
     WTHSKBE    =>  plt_biom%WTHSKBE    , &
-    WTEABN     =>  plt_biom%WTEABN     , &
-    WTRSVBE     =>  plt_biom%WTRSVBE     , &
-    WTEABP     =>  plt_biom%WTEABP     , &
+    WTRSVBE    =>  plt_biom%WTRSVBE    , &
     EPOOL      =>  plt_biom%EPOOL      , &
     NU         =>  plt_site%NU         , &
     CPOOL3     =>  plt_photo%CPOOL3    , &
@@ -610,15 +608,15 @@ module grosubsMod
     ENDDO D325
     WTSHTBE(NB,ielmc,NZ)=WTLFBE(NB,ielmc,NZ) &
       +WTSHEBE(NB,ielmc,NZ)+WTSTKBE(NB,ielmc,NZ)+WTRSVBE(NB,ielmc,NZ) &
-      +WTHSKBE(NB,ielmc,NZ)+WTEARB(NB,NZ)+WTGRBE(NB,ielmc,NZ) &
+      +WTHSKBE(NB,ielmc,NZ)+WTEARBE(NB,ielmc,NZ)+WTGRBE(NB,ielmc,NZ) &
       +EPOOL(NB,ielmc,NZ)+CPOOLK(NB,NZ)
     WTSHTBE(NB,ielmn,NZ)=WTLFBE(NB,ielmn,NZ) &
       +WTSHEBE(NB,ielmn,NZ)+WTSTKBE(NB,ielmn,NZ)+WTRSVBE(NB,ielmn,NZ) &
-      +WTHSKBE(NB,ielmn,NZ)+WTEABN(NB,NZ)+WTGRBE(NB,ielmn,NZ) &
+      +WTHSKBE(NB,ielmn,NZ)+WTEARBE(NB,ielmn,NZ)+WTGRBE(NB,ielmn,NZ) &
       +EPOOL(NB,ielmn,NZ)
     WTSHTBE(NB,ielmp,NZ)=WTLFBE(NB,ielmp,NZ) &
       +WTSHEBE(NB,ielmp,NZ)+WTSTKBE(NB,ielmp,NZ)+WTRSVBE(NB,ielmp,NZ) &
-      +WTHSKBE(NB,ielmp,NZ)+WTEABP(NB,NZ)+WTGRBE(NB,ielmp,NZ) &
+      +WTHSKBE(NB,ielmp,NZ)+WTEARBE(NB,ielmp,NZ)+WTGRBE(NB,ielmp,NZ) &
       +EPOOL(NB,ielmp,NZ)
   ENDDO D320
 !
@@ -660,10 +658,8 @@ module grosubsMod
     WTSTKBE  =>  plt_biom%WTSTKBE , &
     WTHSKBE  =>  plt_biom%WTHSKBE , &
     WTRSVBE   =>  plt_biom%WTRSVBE  , &
-    WTEARB   =>  plt_biom%WTEARB  , &
+    WTEARBE  =>  plt_biom%WTEARBE , &
     WTLSB    =>  plt_biom%WTLSB   , &
-    WTEABN   =>  plt_biom%WTEABN  , &
-    WTEABP   =>  plt_biom%WTEABP  , &
     WTGRBE   =>  plt_biom%WTGRBE  , &
     WTLFBE   =>  plt_biom%WTLFBE  , &
     WVSTKB   =>  plt_biom%WVSTKB  , &
@@ -746,16 +742,13 @@ module grosubsMod
     WTRSVE(NE,NZ)=sum(WTRSVBE(1:NBR(NZ),NE,NZ))
     WTHSKE(NE,NZ)=sum(WTHSKBE(1:NBR(NZ),NE,NZ))
     WTGRE(NE,NZ)=sum(WTGRBE(1:NBR(NZ),NE,NZ))
+    WTEARE(NE,NZ)=sum(WTEARBE(1:NBR(NZ),NE,NZ))
+    WTRTE(NE,NZ)=sum(EPOOLR(NE,1:MY(NZ),NU:NJ,NZ))
   ENDDO
 
   WVSTK(NZ)=sum(WVSTKB(1:NBR(NZ),NZ))
-
-  WTEARE(ielmc,NZ)=sum(WTEARB(1:NBR(NZ),NZ))
-  WTEARE(ielmn,NZ)=sum(WTEABN(1:NBR(NZ),NZ))
-  WTEARE(ielmp,NZ)=sum(WTEABP(1:NBR(NZ),NZ))
-
-  WTLS(NZ)=sum(WTLSB(1:NBR(NZ),NZ))
-  GRNO(NZ)  =sum(GRNOB(1:NBR(NZ),NZ))
+  WTLS(NZ) =sum(WTLSB(1:NBR(NZ),NZ))
+  GRNO(NZ) =sum(GRNOB(1:NBR(NZ),NZ))
   ARLFP(NZ)=sum(ARLFB(1:NBR(NZ),NZ))
   ARSTP(NZ)=sum(ARSTK(1:JC1,1:NBR(NZ),NZ))
   ARSTV(1:JC1,1:NBR(NZ))=0._r8
@@ -772,18 +765,15 @@ module grosubsMod
 !     WTRT2,WTRT2N,WTRT2P=secondary root C,N,P mass in soil layer
 !
 
-  WTRTE(ielmc,NZ)=sum(EPOOLR(ielmc,1:MY(NZ),NU:NJ,NZ))
-  WTRTE(ielmn,NZ)=sum(EPOOLR(ielmn,1:MY(NZ),NU:NJ,NZ))
-  WTRTE(ielmp,NZ)=sum(EPOOLR(ielmp,1:MY(NZ),NU:NJ,NZ))
   WTRTSE(ielmc,NZ)=sum(WTRT1(1:MY(NZ),NU:NJ,1:NRT(NZ),NZ)) &
     +sum(WTRT2(1:MY(NZ),NU:NJ,1:NRT(NZ),NZ))
   WTRTSE(ielmn,NZ)=sum(WTRT1N(1:MY(NZ),NU:NJ,1:NRT(NZ),NZ)) &
     +sum(WTRT2N(1:MY(NZ),NU:NJ,1:NRT(NZ),NZ))
   WTRTSE(ielmp,NZ)=sum(WTRT1P(1:MY(NZ),NU:NJ,1:NRT(NZ),NZ)) &
     +sum(WTRT2P(1:MY(NZ),NU:NJ,1:NRT(NZ),NZ))
-  WTRTE(ielmc,NZ)=WTRTE(ielmc,NZ)+WTRTSE(ielmc,NZ)
-  WTRTE(ielmn,NZ)=WTRTE(ielmn,NZ)+WTRTSE(ielmn,NZ)
-  WTRTE(ielmp,NZ)=WTRTE(ielmp,NZ)+WTRTSE(ielmp,NZ)
+  DO NE=1,npelms
+    WTRTE(NE,NZ)=WTRTE(NE,NZ)+WTRTSE(NE,NZ)
+  ENDDO
 !
 !     ACCUMULATE NODULE STATE VATIABLES FROM NODULE LAYER VARIABLES
 !

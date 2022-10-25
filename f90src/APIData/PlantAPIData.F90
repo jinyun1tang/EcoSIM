@@ -570,12 +570,10 @@ implicit none
   real(r8), pointer :: WTLFBE(:,:,:)  => null()   !branch leaf element, [g d-2]
   real(r8), pointer :: WTNDB(:,:)     => null()   !branch nodule C, [g d-2]
   real(r8), pointer :: WTSHEBE(:,:,:) => null()   !branch sheath element , [g d-2]
-  real(r8), pointer :: WTEARB(:,:)    => null()   !branch ear C, [g d-2]
+  real(r8), pointer :: WTEARBE(:,:,:) => null()   !branch ear C, [g d-2]
   real(r8), pointer :: WTHSKBE(:,:,:) => null()   !branch husk element, [g d-2]
   real(r8), pointer :: WTNDBN(:,:)    => null()   !branch nodule N, [g d-2]
-  real(r8), pointer :: WTEABN(:,:)    => null()   !branch ear N, [g d-2]
   real(r8), pointer :: WTNDBP(:,:)    => null()   !branch nodule P, [g d-2]
-  real(r8), pointer :: WTEABP(:,:)    => null()   !branch ear P, [g d-2]
   real(r8), pointer :: WTGRBE(:,:,:)  => null()   !branch grain element, [g d-2]
   real(r8), pointer :: WTSTKBE(:,:,:) => null()   !branch stalk element, [g d-2]
   real(r8), pointer :: WTSHTBE(:,:,:)    => null()   !branch shoot C, [g d-2]
@@ -1711,12 +1709,10 @@ implicit none
   allocate(this%WTLFBE(JC1,npelms,JP1))
   allocate(this%WTNDB(JC1,JP1))
   allocate(this%WTSHEBE(JC1,npelms,JP1))
-  allocate(this%WTEARB(JC1,JP1))
+  allocate(this%WTEARBE(JC1,npelms,JP1))
   allocate(this%WTHSKBE(JC1,npelms,JP1))
   allocate(this%WTNDBN(JC1,JP1))
-  allocate(this%WTEABN(JC1,JP1))
   allocate(this%WTNDBP(JC1,JP1))
-  allocate(this%WTEABP(JC1,JP1))
   allocate(this%WTGRBE(JC1,npelms,JP1))
   allocate(this%WTSTKBE(JC1,npelms,JP1))
   allocate(this%WTSHTBE(JC1,npelms,JP1))
@@ -1809,12 +1805,10 @@ implicit none
 !  if(allocated(WTLFBE))deallocate(WTLFBE)
 !  if(allocated(WTNDB))deallocate(WTNDB)
 !  if(allocated(WTSHEBE))deallocate(WTSHEBE)
-!  if(allocated(WTEARB))deallocate(WTEARB)
+!  if(allocated(WTEARBE))deallocate(WTEARBE)
 !  if(allocated(WTHSKBE))deallocate(WTHSKBE)
 !  if(allocated(WTNDBN))deallocate(WTNDBN)
-!  if(allocated(WTEABN))deallocate(WTEABN)
 !  if(allocated(WTNDBP))deallocate(WTNDBP)
-!  if(allocated(WTEABP))deallocate(WTEABP)
 !  if(allocated(WTGRBE))deallocate(WTGRBE)
 !  if(allocated(WTSTKBE))deallocate(WTSTKBE)
 !  if(allocated(WTSHTBE))deallocate(WTSHTBE)

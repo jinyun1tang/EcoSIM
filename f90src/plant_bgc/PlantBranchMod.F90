@@ -113,7 +113,7 @@ module PlantBranchMod
     WTSTKBE    =>  plt_biom%WTSTKBE   , &
     WTRSVBE    =>  plt_biom%WTRSVBE   , &
     WTHSKBE    =>  plt_biom%WTHSKBE   , &
-    WTEARB     =>  plt_biom%WTEARB    , &
+    WTEARBE    =>  plt_biom%WTEARBE   , &
     WTSTXB     =>  plt_biom%WTSTXB    , &
     WTSTXN     =>  plt_biom%WTSTXN    , &
     WTSTXP     =>  plt_biom%WTSTXP    , &
@@ -121,7 +121,6 @@ module PlantBranchMod
     WGSHNX     =>  plt_biom%WGSHNX    , &
     WGSHPX     =>  plt_biom%WGSHPX    , &
     WVSTKB     =>  plt_biom%WVSTKB    , &
-    WTEABN     =>  plt_biom%WTEABN    , &
     EPOOL      =>  plt_biom%EPOOL     , &
     WTLSB      =>  plt_biom%WTLSB     , &
     WGNODN     =>  plt_biom%WGNODN    , &
@@ -140,7 +139,6 @@ module PlantBranchMod
     WGSHN      =>  plt_biom%WGSHN     , &
     WSSHE      =>  plt_biom%WSSHE     , &
     WGSHP      =>  plt_biom%WGSHP     , &
-    WTEABP     =>  plt_biom%WTEABP    , &
     WGLFN      =>  plt_biom%WGLFN     , &
     WTGRBE     =>  plt_biom%WTGRBE    , &
     ZEROP      =>  plt_biom%ZEROP     , &
@@ -256,7 +254,7 @@ module PlantBranchMod
       +CNSTK(NZ)*WVSTKB(NB,NZ))
     IF(IDAY(10,NB,NZ).EQ.0)THEN
       WTSHXN=WTSHXN+AZMAX1(WTHSKBE(NB,ielmn,NZ) &
-        +WTEABN(NB,NZ)+WTGRBE(NB,ielmn,NZ))
+        +WTEARBE(NB,ielmn,NZ)+WTGRBE(NB,ielmn,NZ))
     ENDIF
 !
 !   GROSS PRIMARY PRODUCTIVITY
@@ -319,19 +317,19 @@ module PlantBranchMod
     WTSTKBE(NB,ielmc,NZ)=WTSTKBE(NB,ielmc,NZ)+GROSTK
     WTRSVBE(NB,ielmc,NZ)=WTRSVBE(NB,ielmc,NZ)+GRORSV
     WTHSKBE(NB,ielmc,NZ)=WTHSKBE(NB,ielmc,NZ)+GROHSK
-    WTEARB(NB,NZ)=WTEARB(NB,NZ)+GROEAR
+    WTEARBE(NB,ielmc,NZ)=WTEARBE(NB,ielmc,NZ)+GROEAR
     WTLFBE(NB,ielmn,NZ)=WTLFBE(NB,ielmn,NZ)+GROLFN
     WTSHEBE(NB,ielmn,NZ)=WTSHEBE(NB,ielmn,NZ)+GROSHN
     WTSTKBE(NB,ielmn,NZ)=WTSTKBE(NB,ielmn,NZ)+GROSTN
     WTRSVBE(NB,ielmn,NZ)=WTRSVBE(NB,ielmn,NZ)+GRORSN
     WTHSKBE(NB,ielmn,NZ)=WTHSKBE(NB,ielmn,NZ)+GROHSN
-    WTEABN(NB,NZ)=WTEABN(NB,NZ)+GROEAN
+    WTEARBE(NB,ielmn,NZ)=WTEARBE(NB,ielmn,NZ)+GROEAN
     WTLFBE(NB,ielmp,NZ)=WTLFBE(NB,ielmp,NZ)+GROLFP
     WTSHEBE(NB,ielmp,NZ)=WTSHEBE(NB,ielmp,NZ)+GROSHP
     WTSTKBE(NB,ielmp,NZ)=WTSTKBE(NB,ielmp,NZ)+GROSTP
     WTRSVBE(NB,ielmp,NZ)=WTRSVBE(NB,ielmp,NZ)+GRORSP
     WTHSKBE(NB,ielmp,NZ)=WTHSKBE(NB,ielmp,NZ)+GROHSP
-    WTEABP(NB,NZ)=WTEABP(NB,NZ)+GROEAP
+    WTEARBE(NB,ielmp,NZ)=WTEARBE(NB,ielmp,NZ)+GROEAP
 !
 !   ETOLIATION
 !
@@ -963,7 +961,6 @@ module PlantBranchMod
     PSILT   =>  plt_ew%PSILT        , &
     WVSTKB  =>  plt_biom%WVSTKB     , &
     WTRSVBE =>  plt_biom%WTRSVBE    , &
-    WTEABP  =>  plt_biom%WTEABP     , &
     ZERO    =>  plt_site%ZERO       , &
     NU      =>  plt_site%NU         , &
     AREA3   =>  plt_site%AREA3      , &
@@ -2628,16 +2625,14 @@ module PlantBranchMod
     WTSTXB   =>  plt_biom%WTSTXB     , &
     WTSTXP   =>  plt_biom%WTSTXP     , &
     WTSTKBE  =>  plt_biom%WTSTKBE    , &
-    WTEABP   =>  plt_biom%WTEABP     , &
     EPOOLR   =>  plt_biom%EPOOLR     , &
     WTSHEBE  =>  plt_biom%WTSHEBE    , &
-    WTEARB   =>  plt_biom%WTEARB     , &
+    WTEARBE  =>  plt_biom%WTEARBE    , &
     WSLF     =>  plt_biom%WSLF       , &
     WGLFP    =>  plt_biom%WGLFP      , &
     WSSHE    =>  plt_biom%WSSHE      , &
     WGSHP    =>  plt_biom%WGSHP      , &
     WTHSKBE  =>  plt_biom%WTHSKBE    , &
-    WTEABN   =>  plt_biom%WTEABN     , &
     WGSHE    =>  plt_biom%WGSHE      , &
     WGSHN    =>  plt_biom%WGSHN      , &
     WGLFN    =>  plt_biom%WGLFN      , &
@@ -2819,20 +2814,20 @@ module PlantBranchMod
         IF((IFLGE(NB,NZ).EQ.0.AND.ISTYP(NZ).NE.0).AND.VRNS(NB,NZ).GE.VRNL(NB,NZ))THEN
           D6245: DO M=1,jsken
             ESNC(M,ielmc,1,0,NZ)=ESNC(M,ielmc,1,0,NZ)+CFOPC(2,M,NZ) &
-              *(WTHSKBE(NB,ielmc,NZ)+WTEARB(NB,NZ)+WTGRBE(NB,ielmc,NZ))
+              *(WTHSKBE(NB,ielmc,NZ)+WTEARBE(NB,ielmc,NZ)+WTGRBE(NB,ielmc,NZ))
             ESNC(M,ielmn,1,0,NZ)=ESNC(M,ielmn,1,0,NZ)+CFOPN(2,M,NZ) &
-              *(WTHSKBE(NB,ielmn,NZ)+WTEABN(NB,NZ)+WTGRBE(NB,ielmn,NZ))
+              *(WTHSKBE(NB,ielmn,NZ)+WTEARBE(NB,ielmn,NZ)+WTGRBE(NB,ielmn,NZ))
             ESNC(M,ielmp,1,0,NZ)=ESNC(M,ielmp,1,0,NZ)+CFOPP(2,M,NZ) &
-              *(WTHSKBE(NB,ielmp,NZ)+WTEABP(NB,NZ)+WTGRBE(NB,ielmp,NZ))
+              *(WTHSKBE(NB,ielmp,NZ)+WTEARBE(NB,ielmp,NZ)+WTGRBE(NB,ielmp,NZ))
           ENDDO D6245
           WTHSKBE(NB,ielmc,NZ)=0._r8
-          WTEARB(NB,NZ)=0._r8
+          WTEARBE(NB,ielmc,NZ)=0._r8
           WTGRBE(NB,ielmc,NZ)=0._r8
           WTHSKBE(NB,ielmn,NZ)=0._r8
-          WTEABN(NB,NZ)=0._r8
+          WTEARBE(NB,ielmn,NZ)=0._r8
           WTGRBE(NB,ielmn,NZ)=0._r8
           WTHSKBE(NB,ielmp,NZ)=0._r8
-          WTEABP(NB,NZ)=0._r8
+          WTEARBE(NB,ielmp,NZ)=0._r8
           WTGRBE(NB,ielmp,NZ)=0._r8
           GRNXB(NB,NZ)=0._r8
           GRNOB(NB,NZ)=0._r8
@@ -2888,11 +2883,11 @@ module PlantBranchMod
     ENDIF
     D6330: DO M=1,jsken
       ESNC(M,ielmc,1,0,NZ)=ESNC(M,ielmc,1,0,NZ)+FSNR*CFOPC(2,M,NZ) &
-        *(WTHSKBE(NB,ielmc,NZ)+WTEARB(NB,NZ))
+        *(WTHSKBE(NB,ielmc,NZ)+WTEARBE(NB,ielmc,NZ))
       ESNC(M,ielmn,1,0,NZ)=ESNC(M,ielmn,1,0,NZ)+FSNR*CFOPN(2,M,NZ) &
-        *(WTHSKBE(NB,ielmn,NZ)+WTEABN(NB,NZ))
+        *(WTHSKBE(NB,ielmn,NZ)+WTEARBE(NB,ielmn,NZ))
       ESNC(M,ielmp,1,0,NZ)=ESNC(M,ielmp,1,0,NZ)+FSNR*CFOPP(2,M,NZ) &
-        *(WTHSKBE(NB,ielmp,NZ)+WTEABP(NB,NZ))
+        *(WTHSKBE(NB,ielmp,NZ)+WTEARBE(NB,ielmp,NZ))
       IF(ISTYP(NZ).EQ.0.AND.IWTYP(NZ).NE.0)THEN
         WTRVE(ielmc,NZ)=WTRVE(ielmc,NZ)+FSNR*CFOPC(2,M,NZ)*WTGRBE(NB,ielmc,NZ)
         WTRVE(ielmn,NZ)=WTRVE(ielmn,NZ)+FSNR*CFOPN(2,M,NZ)*WTGRBE(NB,ielmn,NZ)
@@ -2904,13 +2899,13 @@ module PlantBranchMod
       ENDIF
     ENDDO D6330
     WTHSKBE(NB,ielmc,NZ)=(1.0_r8-FSNR)*WTHSKBE(NB,ielmc,NZ)
-    WTEARB(NB,NZ)=(1.0_r8-FSNR)*WTEARB(NB,NZ)
+    WTEARBE(NB,ielmc,NZ)=(1.0_r8-FSNR)*WTEARBE(NB,ielmc,NZ)
     WTGRBE(NB,ielmc,NZ)=(1.0_r8-FSNR)*WTGRBE(NB,ielmc,NZ)
     WTHSKBE(NB,ielmn,NZ)=(1.0_r8-FSNR)*WTHSKBE(NB,ielmn,NZ)
-    WTEABN(NB,NZ)=(1.0_r8-FSNR)*WTEABN(NB,NZ)
+    WTEARBE(NB,ielmn,NZ)=(1.0_r8-FSNR)*WTEARBE(NB,ielmn,NZ)
     WTGRBE(NB,ielmn,NZ)=(1.0_r8-FSNR)*WTGRBE(NB,ielmn,NZ)
     WTHSKBE(NB,ielmp,NZ)=(1.0_r8-FSNR)*WTHSKBE(NB,ielmp,NZ)
-    WTEABP(NB,NZ)=(1.0_r8-FSNR)*WTEABP(NB,NZ)
+    WTEARBE(NB,ielmp,NZ)=(1.0_r8-FSNR)*WTEARBE(NB,ielmp,NZ)
     WTGRBE(NB,ielmp,NZ)=(1.0_r8-FSNR)*WTGRBE(NB,ielmp,NZ)
     GRNXB(NB,NZ)=(1.0_r8-FSNR)*GRNXB(NB,NZ)
     GRNOB(NB,NZ)=(1.0_r8-FSNR)*GRNOB(NB,NZ)

@@ -128,9 +128,7 @@ implicit none
     JHVST      =>   plt_distb%JHVST   , &
     IYR0       =>   plt_distb%IYR0    , &
     IDAY0      =>   plt_distb%IDAY0   , &
-    WTEARB     =>   plt_biom%WTEARB   , &
-    WTEABN     =>   plt_biom%WTEABN   , &
-    WTEABP     =>   plt_biom%WTEABP   , &
+    WTEARBE    =>   plt_biom%WTEARBE  , &
     EPOOL      =>   plt_biom%EPOOL    , &
     WTSTKBE    =>   plt_biom%WTSTKBE  , &
     WTHSKBE    =>   plt_biom%WTHSKBE  , &
@@ -215,7 +213,7 @@ implicit none
             +CFOPC(1,M,NZ)*(WTLFBE(NB,ielmc,NZ)*FWODB(1) &
             +WTNDB(NB,NZ)) &
             +CFOPC(2,M,NZ)*(WTSHEBE(NB,ielmc,NZ)*FWODB(1) &
-            +WTHSKBE(NB,ielmc,NZ)+WTEARB(NB,NZ))
+            +WTHSKBE(NB,ielmc,NZ)+WTEARBE(NB,ielmc,NZ))
           ESNC(M,ielmc,0,0,NZ)=ESNC(M,ielmc,0,0,NZ) &
             +CFOPC(5,M,NZ)*(WTLFBE(NB,ielmc,NZ)*FWODB(0) &
             +WTSHEBE(NB,ielmc,NZ)*FWODB(0))
@@ -225,7 +223,7 @@ implicit none
             +CFOPN(1,M,NZ)*(WTLFBE(NB,ielmn,NZ)*FWODLN(1) &
             +WTNDBN(NB,NZ)) &
             +CFOPN(2,M,NZ)*(WTSHEBE(NB,ielmn,NZ)*FWODSN(1) &
-            +WTHSKBE(NB,ielmn,NZ)+WTEABN(NB,NZ))
+            +WTHSKBE(NB,ielmn,NZ)+WTEARBE(NB,ielmn,NZ))
           ESNC(M,ielmn,0,0,NZ)=ESNC(M,ielmn,0,0,NZ) &
             +CFOPN(5,M,NZ)*(WTLFBE(NB,ielmn,NZ)*FWODLN(0) &
             +WTSHEBE(NB,ielmn,NZ)*FWODSN(0))
@@ -235,7 +233,7 @@ implicit none
             +CFOPP(1,M,NZ)*(WTLFBE(NB,ielmp,NZ)*FWODLP(1) &
             +WTNDBP(NB,NZ)) &
             +CFOPP(2,M,NZ)*(WTSHEBE(NB,ielmp,NZ)*FWODSP(1) &
-            +WTHSKBE(NB,ielmp,NZ)+WTEABP(NB,NZ))
+            +WTHSKBE(NB,ielmp,NZ)+WTEARBE(NB,ielmp,NZ))
           ESNC(M,ielmp,0,0,NZ)=ESNC(M,ielmp,0,0,NZ) &
             +CFOPP(5,M,NZ)*(WTLFBE(NB,ielmp,NZ)*FWODLP(0) &
             +WTSHEBE(NB,ielmp,NZ)*FWODSP(0))
@@ -570,7 +568,6 @@ implicit none
     FWODSN    =>  plt_allom%FWODSN    , &
     FWODLN    =>  plt_allom%FWODLN    , &
     FWODLP    =>  plt_allom%FWODLP    , &
-    WTEABN    =>  plt_biom%WTEABN     , &
     EPOLNB    =>  plt_biom%EPOLNB     , &
     WTSTKBE   =>  plt_biom%WTSTKBE    , &
     WTHSKBE   =>  plt_biom%WTHSKBE    , &
@@ -580,8 +577,7 @@ implicit none
     ZEROP     =>  plt_biom%ZEROP      , &
     WTNDBN    =>  plt_biom%WTNDBN     , &
     WTNDBP    =>  plt_biom%WTNDBP     , &
-    WTEARB    =>  plt_biom%WTEARB     , &
-    WTEABP    =>  plt_biom%WTEABP     , &
+    WTEARBE   =>  plt_biom%WTEARBE    , &
     EPOOL     =>  plt_biom%EPOOL      , &
     WTGRBE    =>  plt_biom%WTGRBE     , &
     WTRSVBE   =>  plt_biom%WTRSVBE    , &
@@ -682,7 +678,7 @@ implicit none
           +CFOPC(1,M,NZ)*(WTLFBE(NB,ielmc,NZ)*FWODB(1) &
           +WTNDB(NB,NZ)) &
           +CFOPC(2,M,NZ)*(WTSHEBE(NB,ielmc,NZ)*FWODB(1) &
-          +WTHSKBE(NB,ielmc,NZ)+WTEARB(NB,NZ))
+          +WTHSKBE(NB,ielmc,NZ)+WTEARBE(NB,ielmc,NZ))
         ESNC(M,ielmc,0,0,NZ)=ESNC(M,ielmc,0,0,NZ) &
           +CFOPC(5,M,NZ)*(WTLFBE(NB,ielmc,NZ)*FWODB(0) &
           +WTSHEBE(NB,ielmc,NZ)*FWODB(0))
@@ -691,7 +687,7 @@ implicit none
           +CFOPN(1,M,NZ)*(WTLFBE(NB,ielmn,NZ)*FWODLN(1) &
           +WTNDBN(NB,NZ)) &
           +CFOPN(2,M,NZ)*(WTSHEBE(NB,ielmn,NZ)*FWODSN(1) &
-          +WTHSKBE(NB,ielmn,NZ)+WTEABN(NB,NZ))
+          +WTHSKBE(NB,ielmn,NZ)+WTEARBE(NB,ielmn,NZ))
         ESNC(M,ielmn,0,0,NZ)=ESNC(M,ielmn,0,0,NZ) &
           +CFOPN(5,M,NZ)*(WTLFBE(NB,ielmn,NZ)*FWODLN(0) &
           +WTSHEBE(NB,ielmn,NZ)*FWODSN(0))
@@ -700,7 +696,7 @@ implicit none
           +CFOPP(1,M,NZ)*(WTLFBE(NB,ielmp,NZ)*FWODLP(1) &
           +WTNDBP(NB,NZ)) &
           +CFOPP(2,M,NZ)*(WTSHEBE(NB,ielmp,NZ)*FWODSP(1) &
-          +WTHSKBE(NB,ielmp,NZ)+WTEABP(NB,NZ))
+          +WTHSKBE(NB,ielmp,NZ)+WTEARBE(NB,ielmp,NZ))
         ESNC(M,ielmp,0,0,NZ)=ESNC(M,ielmp,0,0,NZ) &
           +CFOPP(5,M,NZ)*(WTLFBE(NB,ielmp,NZ)*FWODLP(0) &
           +WTSHEBE(NB,ielmp,NZ)*FWODSP(0))
@@ -776,13 +772,11 @@ implicit none
     WTRSVBE=> plt_biom%WTRSVBE       , &
     WTSHEBE=> plt_biom%WTSHEBE       , &
     WTHSKBE=> plt_biom%WTHSKBE       , &
-    WTEARB => plt_biom%WTEARB        , &
+    WTEARBE=> plt_biom%WTEARBE       , &
     WTGRBE => plt_biom%WTGRBE        , &
     WVSTKB => plt_biom%WVSTKB        , &
     EPOOLR => plt_biom%EPOOLR        , &
-    WTEABN => plt_biom%WTEABN        , &
     WTNDBP => plt_biom%WTNDBP        , &
-    WTEABP => plt_biom%WTEABP        , &
     WTSTXB => plt_biom%WTSTXB        , &
     WTSTXN => plt_biom%WTSTXN        , &
     WTSTXP => plt_biom%WTSTXP        , &
@@ -829,16 +823,16 @@ implicit none
     WTNDB(NB,NZ)=0._r8
     WVSTKB(NB,NZ)=0._r8
     WTHSKBE(NB,ielmc,NZ)=0._r8
-    WTEARB(NB,NZ)=0._r8
+    WTEARBE(NB,ielmc,NZ)=0._r8
     WTGRBE(NB,ielmc,NZ)=0._r8
     WTLSB(NB,NZ)=0._r8
     WTNDBN(NB,NZ)=0._r8
     WTHSKBE(NB,ielmn,NZ)=0._r8
-    WTEABN(NB,NZ)=0._r8
+    WTEARBE(NB,ielmn,NZ)=0._r8
     WTGRBE(NB,ielmn,NZ)=0._r8
     WTNDBP(NB,NZ)=0._r8
     WTHSKBE(NB,ielmp,NZ)=0._r8
-    WTEABP(NB,NZ)=0._r8
+    WTEARBE(NB,ielmp,NZ)=0._r8
     WTGRBE(NB,ielmp,NZ)=0._r8
     WTSTXB(NB,NZ)=0._r8
     WTSTXN(NB,NZ)=0._r8
@@ -894,15 +888,13 @@ implicit none
     WTSTXN   => plt_biom%WTSTXN     , &
     WTSTXP   => plt_biom%WTSTXP     , &
     WTSTXB   => plt_biom%WTSTXB     , &
-    WTEABP   => plt_biom%WTEABP     , &
     WTNDBP   => plt_biom%WTNDBP     , &
     WTNDBN   => plt_biom%WTNDBN     , &
-    WTEABN   => plt_biom%WTEABN     , &
     WVSTKB   => plt_biom%WVSTKB     , &
     WTGRBE   => plt_biom%WTGRBE     , &
     WTLSB    => plt_biom%WTLSB      , &
     WTHSKBE  => plt_biom%WTHSKBE    , &
-    WTEARB   => plt_biom%WTEARB     , &
+    WTEARBE  => plt_biom%WTEARBE    , &
     WSSHE    => plt_biom%WSSHE      , &
     WGLFN    => plt_biom%WGLFN      , &
     WSLF     => plt_biom%WSLF       , &
@@ -977,7 +969,7 @@ implicit none
   WVSTKB(NB,NZ)=0._r8
   WTRSVBE(NB,ielmc,NZ)=0._r8
   WTHSKBE(NB,ielmc,NZ)=0._r8
-  WTEARB(NB,NZ)=0._r8
+  WTEARBE(NB,ielmc,NZ)=0._r8
   WTGRBE(NB,ielmc,NZ)=0._r8
   WTLSB(NB,NZ)=0._r8
   WTSHTBE(NB,ielmn,NZ)=0._r8
@@ -987,7 +979,7 @@ implicit none
   WTSTKBE(NB,ielmn,NZ)=0._r8
   WTRSVBE(NB,ielmn,NZ)=0._r8
   WTHSKBE(NB,ielmn,NZ)=0._r8
-  WTEABN(NB,NZ)=0._r8
+  WTEARBE(NB,ielmn,NZ)=0._r8
   WTGRBE(NB,ielmn,NZ)=0._r8
   WTSHTBE(NB,ielmp,NZ)=0._r8
   WTLFBE(NB,ielmp,NZ)=0._r8
@@ -996,7 +988,7 @@ implicit none
   WTSTKBE(NB,ielmp,NZ)=0._r8
   WTRSVBE(NB,ielmp,NZ)=0._r8
   WTHSKBE(NB,ielmp,NZ)=0._r8
-  WTEABP(NB,NZ)=0._r8
+  WTEARBE(NB,ielmp,NZ)=0._r8
   WTGRBE(NB,ielmp,NZ)=0._r8
   GRNXB(NB,NZ)=0._r8
   GRNOB(NB,NZ)=0._r8
