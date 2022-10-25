@@ -103,9 +103,7 @@ module CanopyDataType
   real(r8),allocatable ::  CPOOL3(:,:,:,:,:)                  !minimum sink strength for nonstructural C transfer, [g d-2]
   real(r8),allocatable ::  RSETE(:,:,:,:)                     !effect of canopy element status on seed set , []
   real(r8),allocatable ::  WGLFT(:,:,:)                       !total leaf mass, [g d-2]
-  real(r8),allocatable ::  CFOPC(:,:,:,:,:)                   !litter kinetic fraction, [-]
-  real(r8),allocatable ::  CFOPN(:,:,:,:,:)                   !litterfall kinetic N fraction, [-]
-  real(r8),allocatable ::  CFOPP(:,:,:,:,:)                   !litter P kinetic fraction, [-]
+  real(r8),allocatable ::  CFOPE(:,:,:,:,:,:)                 !litter kinetic fraction, [-]
   real(r8),allocatable ::  WTSHTE(:,:,:,:)                    !canopy shoot element, [g d-2]
   real(r8),allocatable ::  WTLFE(:,:,:,:)                     !canopy leaf element, [g d-2]
   real(r8),allocatable ::  WTSHEE(:,:,:,:)                    !canopy sheath element , [g d-2]
@@ -260,9 +258,7 @@ module CanopyDataType
   allocate(CPOOL3(JNODS,JC,JP,JY,JX));CPOOL3=0._r8
   allocate(RSETE(npelms,JP,JY,JX));    RSETE=0._r8
   allocate(WGLFT(JC,JY,JX));    WGLFT=0._r8
-  allocate(CFOPC(0:5,4,JP,JY,JX));CFOPC=0._r8
-  allocate(CFOPN(0:5,4,JP,JY,JX));CFOPN=0._r8
-  allocate(CFOPP(0:5,4,JP,JY,JX));CFOPP=0._r8
+  allocate(CFOPE(0:5,jsken,npelms,JP,JY,JX));CFOPE=0._r8
   allocate(WTSHTE(npelms,JP,JY,JX)); WTSHTE=0._r8
   allocate(WTLFE(npelms,JP,JY,JX));  WTLFE=0._r8
   allocate(WTSHEE(npelms,JP,JY,JX)); WTSHEE=0._r8
@@ -418,9 +414,7 @@ module CanopyDataType
   call destroy(CPOOL3)
   call destroy(RSETE)
   call destroy(WGLFT)
-  call destroy(CFOPC)
-  call destroy(CFOPN)
-  call destroy(CFOPP)
+  call destroy(CFOPE)
   call destroy(WTSHTE)
   call destroy(WTLFE)
   call destroy(WTSHEE)

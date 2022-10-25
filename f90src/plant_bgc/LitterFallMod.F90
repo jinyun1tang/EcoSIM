@@ -166,9 +166,7 @@ implicit none
     NJ         =>   plt_site%NJ       , &
     NU         =>   plt_site%NU       , &
     IDATA      =>   plt_site%IDATA    , &
-    CFOPP      =>   plt_soilchem%CFOPP, &
-    CFOPN      =>   plt_soilchem%CFOPN, &
-    CFOPC      =>   plt_soilchem%CFOPC, &
+    CFOPE      =>   plt_soilchem%CFOPE, &
     MY         =>   plt_morph%MY      , &
     NG         =>   plt_morph%NG      , &
     NBR        =>   plt_morph%NBR     , &
@@ -202,52 +200,52 @@ implicit none
       D6425: DO M=1,jsken
         D8825: DO NB=1,NBR(NZ)
           ESNC(M,ielmc,1,0,NZ)=ESNC(M,ielmc,1,0,NZ) &
-            +CFOPC(0,M,NZ)*(EPOOL(NB,ielmc,NZ)+EPOLNB(NB,ielmc,NZ) &
+            +CFOPE(0,M,ielmc,NZ)*(EPOOL(NB,ielmc,NZ)+EPOLNB(NB,ielmc,NZ) &
             +CPOOLK(NB,NZ)+WTRSVBE(NB,ielmc,NZ)) &
-            +CFOPC(1,M,NZ)*(WTLFBE(NB,ielmc,NZ)*FWODB(1) &
+            +CFOPE(1,M,ielmc,NZ)*(WTLFBE(NB,ielmc,NZ)*FWODB(1) &
             +WTNDBE(NB,ielmc,NZ)) &
-            +CFOPC(2,M,NZ)*(WTSHEBE(NB,ielmc,NZ)*FWODB(1) &
+            +CFOPE(2,M,ielmc,NZ)*(WTSHEBE(NB,ielmc,NZ)*FWODB(1) &
             +WTHSKBE(NB,ielmc,NZ)+WTEARBE(NB,ielmc,NZ))
           ESNC(M,ielmc,0,0,NZ)=ESNC(M,ielmc,0,0,NZ) &
-            +CFOPC(5,M,NZ)*(WTLFBE(NB,ielmc,NZ)*FWODB(0) &
+            +CFOPE(5,M,ielmc,NZ)*(WTLFBE(NB,ielmc,NZ)*FWODB(0) &
             +WTSHEBE(NB,ielmc,NZ)*FWODB(0))
           ESNC(M,ielmn,1,0,NZ)=ESNC(M,ielmn,1,0,NZ) &
-            +CFOPN(0,M,NZ)*(EPOOL(NB,ielmn,NZ)+EPOLNB(NB,ielmn,NZ) &
+            +CFOPE(0,M,ielmn,NZ)*(EPOOL(NB,ielmn,NZ)+EPOLNB(NB,ielmn,NZ) &
             +WTRSVBE(NB,ielmn,NZ)) &
-            +CFOPN(1,M,NZ)*(WTLFBE(NB,ielmn,NZ)*FWODLN(1) &
+            +CFOPE(1,M,ielmn,NZ)*(WTLFBE(NB,ielmn,NZ)*FWODLN(1) &
             +WTNDBE(NB,ielmn,NZ)) &
-            +CFOPN(2,M,NZ)*(WTSHEBE(NB,ielmn,NZ)*FWODSN(1) &
+            +CFOPE(2,M,ielmn,NZ)*(WTSHEBE(NB,ielmn,NZ)*FWODSN(1) &
             +WTHSKBE(NB,ielmn,NZ)+WTEARBE(NB,ielmn,NZ))
           ESNC(M,ielmn,0,0,NZ)=ESNC(M,ielmn,0,0,NZ) &
-            +CFOPN(5,M,NZ)*(WTLFBE(NB,ielmn,NZ)*FWODLN(0) &
+            +CFOPE(5,M,ielmn,NZ)*(WTLFBE(NB,ielmn,NZ)*FWODLN(0) &
             +WTSHEBE(NB,ielmn,NZ)*FWODSN(0))
           ESNC(M,ielmp,1,0,NZ)=ESNC(M,ielmp,1,0,NZ) &
-            +CFOPP(0,M,NZ)*(EPOOL(NB,ielmp,NZ)+EPOLNB(NB,ielmp,NZ) &
+            +CFOPE(0,M,ielmp,NZ)*(EPOOL(NB,ielmp,NZ)+EPOLNB(NB,ielmp,NZ) &
             +WTRSVBE(NB,ielmp,NZ)) &
-            +CFOPP(1,M,NZ)*(WTLFBE(NB,ielmp,NZ)*FWODLP(1) &
+            +CFOPE(1,M,ielmp,NZ)*(WTLFBE(NB,ielmp,NZ)*FWODLP(1) &
             +WTNDBE(NB,ielmp,NZ)) &
-            +CFOPP(2,M,NZ)*(WTSHEBE(NB,ielmp,NZ)*FWODSP(1) &
+            +CFOPE(2,M,ielmp,NZ)*(WTSHEBE(NB,ielmp,NZ)*FWODSP(1) &
             +WTHSKBE(NB,ielmp,NZ)+WTEARBE(NB,ielmp,NZ))
           ESNC(M,ielmp,0,0,NZ)=ESNC(M,ielmp,0,0,NZ) &
-            +CFOPP(5,M,NZ)*(WTLFBE(NB,ielmp,NZ)*FWODLP(0) &
+            +CFOPE(5,M,ielmp,NZ)*(WTLFBE(NB,ielmp,NZ)*FWODLP(0) &
             +WTSHEBE(NB,ielmp,NZ)*FWODSP(0))
           IF(ISTYP(NZ).EQ.0.AND.IWTYP(NZ).NE.0)THEN
-            WTRVE(ielmc,NZ)=WTRVE(ielmc,NZ)+CFOPC(2,M,NZ)*WTGRBE(NB,ielmc,NZ)
-            WTRVE(ielmn,NZ)=WTRVE(ielmn,NZ)+CFOPN(2,M,NZ)*WTGRBE(NB,ielmn,NZ)
-            WTRVE(ielmp,NZ)=WTRVE(ielmp,NZ)+CFOPP(2,M,NZ)*WTGRBE(NB,ielmp,NZ)
+            WTRVE(ielmc,NZ)=WTRVE(ielmc,NZ)+CFOPE(2,M,ielmc,NZ)*WTGRBE(NB,ielmc,NZ)
+            WTRVE(ielmn,NZ)=WTRVE(ielmn,NZ)+CFOPE(2,M,ielmn,NZ)*WTGRBE(NB,ielmn,NZ)
+            WTRVE(ielmp,NZ)=WTRVE(ielmp,NZ)+CFOPE(2,M,ielmp,NZ)*WTGRBE(NB,ielmp,NZ)
           ELSE
-            ESNC(M,ielmc,1,0,NZ)=ESNC(M,ielmc,1,0,NZ)+CFOPC(2,M,NZ)*WTGRBE(NB,ielmc,NZ)
-            ESNC(M,ielmn,1,0,NZ)=ESNC(M,ielmn,1,0,NZ)+CFOPN(2,M,NZ)*WTGRBE(NB,ielmn,NZ)
-            ESNC(M,ielmp,1,0,NZ)=ESNC(M,ielmp,1,0,NZ)+CFOPP(2,M,NZ)*WTGRBE(NB,ielmp,NZ)
+            ESNC(M,ielmc,1,0,NZ)=ESNC(M,ielmc,1,0,NZ)+CFOPE(2,M,ielmc,NZ)*WTGRBE(NB,ielmc,NZ)
+            ESNC(M,ielmn,1,0,NZ)=ESNC(M,ielmn,1,0,NZ)+CFOPE(2,M,ielmn,NZ)*WTGRBE(NB,ielmn,NZ)
+            ESNC(M,ielmp,1,0,NZ)=ESNC(M,ielmp,1,0,NZ)+CFOPE(2,M,ielmp,NZ)*WTGRBE(NB,ielmp,NZ)
           ENDIF
           IF(IBTYP(NZ).EQ.0.OR.IGTYP(NZ).LE.1)THEN
-            ESNC(M,ielmc,1,0,NZ)=ESNC(M,ielmc,1,0,NZ)+CFOPC(3,M,NZ)*WTSTKBE(NB,ielmc,NZ)
-            ESNC(M,ielmn,1,0,NZ)=ESNC(M,ielmn,1,0,NZ)+CFOPN(3,M,NZ)*WTSTKBE(NB,ielmn,NZ)
-            ESNC(M,ielmp,1,0,NZ)=ESNC(M,ielmp,1,0,NZ)+CFOPP(3,M,NZ)*WTSTKBE(NB,ielmp,NZ)
+            ESNC(M,ielmc,1,0,NZ)=ESNC(M,ielmc,1,0,NZ)+CFOPE(3,M,ielmc,NZ)*WTSTKBE(NB,ielmc,NZ)
+            ESNC(M,ielmn,1,0,NZ)=ESNC(M,ielmn,1,0,NZ)+CFOPE(3,M,ielmn,NZ)*WTSTKBE(NB,ielmn,NZ)
+            ESNC(M,ielmp,1,0,NZ)=ESNC(M,ielmp,1,0,NZ)+CFOPE(3,M,ielmp,NZ)*WTSTKBE(NB,ielmp,NZ)
           ELSE
-            WTSTDE(M,ielmc,NZ)=WTSTDE(M,ielmc,NZ)+CFOPC(5,M,NZ)*WTSTKBE(NB,ielmc,NZ)
-            WTSTDE(M,ielmn,NZ)=WTSTDE(M,ielmn,NZ)+CFOPN(5,M,NZ)*WTSTKBE(NB,ielmn,NZ)
-            WTSTDE(M,ielmp,NZ)=WTSTDE(M,ielmp,NZ)+CFOPP(5,M,NZ)*WTSTKBE(NB,ielmp,NZ)
+            WTSTDE(M,ielmc,NZ)=WTSTDE(M,ielmc,NZ)+CFOPE(5,M,ielmc,NZ)*WTSTKBE(NB,ielmc,NZ)
+            WTSTDE(M,ielmn,NZ)=WTSTDE(M,ielmn,NZ)+CFOPE(5,M,ielmn,NZ)*WTSTKBE(NB,ielmn,NZ)
+            WTSTDE(M,ielmp,NZ)=WTSTDE(M,ielmp,NZ)+CFOPE(5,M,ielmp,NZ)*WTSTKBE(NB,ielmp,NZ)
           ENDIF
         ENDDO D8825
 !
@@ -264,37 +262,37 @@ implicit none
 !
         D6415: DO L=NU,NJ
           DO N=1,MY(NZ)
-            ESNC(M,ielmc,1,L,NZ)=ESNC(M,ielmc,1,L,NZ)+CFOPC(0,M,NZ)*EPOOLR(ielmc,N,L,NZ)
-            ESNC(M,ielmn,1,L,NZ)=ESNC(M,ielmn,1,L,NZ)+CFOPN(0,M,NZ)*EPOOLR(ielmn,N,L,NZ)
-            ESNC(M,ielmp,1,L,NZ)=ESNC(M,ielmp,1,L,NZ)+CFOPP(0,M,NZ)*EPOOLR(ielmp,N,L,NZ)
+            ESNC(M,ielmc,1,L,NZ)=ESNC(M,ielmc,1,L,NZ)+CFOPE(0,M,ielmc,NZ)*EPOOLR(ielmc,N,L,NZ)
+            ESNC(M,ielmn,1,L,NZ)=ESNC(M,ielmn,1,L,NZ)+CFOPE(0,M,ielmn,NZ)*EPOOLR(ielmn,N,L,NZ)
+            ESNC(M,ielmp,1,L,NZ)=ESNC(M,ielmp,1,L,NZ)+CFOPE(0,M,ielmp,NZ)*EPOOLR(ielmp,N,L,NZ)
             DO NR=1,NRT(NZ)
-              ESNC(M,ielmc,0,L,NZ)=ESNC(M,ielmc,0,L,NZ)+CFOPC(5,M,NZ) &
+              ESNC(M,ielmc,0,L,NZ)=ESNC(M,ielmc,0,L,NZ)+CFOPE(5,M,ielmc,NZ) &
                 *(WTRT1E(ielmc,N,L,NR,NZ)+WTRT2E(ielmc,N,L,NR,NZ))*FWODR(0)
-              ESNC(M,ielmn,0,L,NZ)=ESNC(M,ielmn,0,L,NZ)+CFOPN(5,M,NZ) &
+              ESNC(M,ielmn,0,L,NZ)=ESNC(M,ielmn,0,L,NZ)+CFOPE(5,M,ielmn,NZ) &
                 *(WTRT1E(ielmn,N,L,NR,NZ)+WTRT2E(ielmn,N,L,NR,NZ))*FWODRN(0)
-              ESNC(M,ielmp,0,L,NZ)=ESNC(M,ielmp,0,L,NZ)+CFOPP(5,M,NZ) &
+              ESNC(M,ielmp,0,L,NZ)=ESNC(M,ielmp,0,L,NZ)+CFOPE(5,M,ielmp,NZ) &
                 *(WTRT1E(ielmp,N,L,NR,NZ)+WTRT2E(ielmp,N,L,NR,NZ))*FWODRP(0)
-              ESNC(M,ielmc,1,L,NZ)=ESNC(M,ielmc,1,L,NZ)+CFOPC(4,M,NZ) &
+              ESNC(M,ielmc,1,L,NZ)=ESNC(M,ielmc,1,L,NZ)+CFOPE(4,M,ielmc,NZ) &
                 *(WTRT1E(ielmc,N,L,NR,NZ)+WTRT2E(ielmc,N,L,NR,NZ))*FWODR(1)
-              ESNC(M,ielmn,1,L,NZ)=ESNC(M,ielmn,1,L,NZ)+CFOPN(4,M,NZ) &
+              ESNC(M,ielmn,1,L,NZ)=ESNC(M,ielmn,1,L,NZ)+CFOPE(4,M,ielmn,NZ) &
                 *(WTRT1E(ielmn,N,L,NR,NZ)+WTRT2E(ielmn,N,L,NR,NZ))*FWODRN(1)
-              ESNC(M,ielmp,1,L,NZ)=ESNC(M,ielmp,1,L,NZ)+CFOPP(4,M,NZ) &
+              ESNC(M,ielmp,1,L,NZ)=ESNC(M,ielmp,1,L,NZ)+CFOPE(4,M,ielmp,NZ) &
                 *(WTRT1E(ielmp,N,L,NR,NZ)+WTRT2E(ielmp,N,L,NR,NZ))*FWODRP(1)
             ENDDO
           ENDDO
         ENDDO D6415
         ESNC(M,ielmc,0,NG(NZ),NZ)=ESNC(M,ielmc,0,NG(NZ),NZ) &
-          +CFOPC(0,M,NZ)*WTRVE(ielmc,NZ)*FWOOD(0)
+          +CFOPE(0,M,ielmc,NZ)*WTRVE(ielmc,NZ)*FWOOD(0)
         ESNC(M,ielmn,0,NG(NZ),NZ)=ESNC(M,ielmn,0,NG(NZ),NZ) &
-          +CFOPN(0,M,NZ)*WTRVE(ielmn,NZ)*FWOODN(0)
+          +CFOPE(0,M,ielmn,NZ)*WTRVE(ielmn,NZ)*FWOODN(0)
         ESNC(M,ielmp,0,NG(NZ),NZ)=ESNC(M,ielmp,0,NG(NZ),NZ) &
-          +CFOPP(0,M,NZ)*WTRVE(ielmp,NZ)*FWOODP(0)
+          +CFOPE(0,M,ielmp,NZ)*WTRVE(ielmp,NZ)*FWOODP(0)
         ESNC(M,ielmc,1,NG(NZ),NZ)=ESNC(M,ielmc,1,NG(NZ),NZ) &
-          +CFOPC(0,M,NZ)*WTRVE(ielmc,NZ)*FWOOD(1)
+          +CFOPE(0,M,ielmc,NZ)*WTRVE(ielmc,NZ)*FWOOD(1)
         ESNC(M,ielmn,1,NG(NZ),NZ)=ESNC(M,ielmn,1,NG(NZ),NZ) &
-          +CFOPN(0,M,NZ)*WTRVE(ielmn,NZ)*FWOODN(1)
+          +CFOPE(0,M,ielmn,NZ)*WTRVE(ielmn,NZ)*FWOODN(1)
         ESNC(M,ielmp,1,NG(NZ),NZ)=ESNC(M,ielmp,1,NG(NZ),NZ) &
-          +CFOPP(0,M,NZ)*WTRVE(ielmp,NZ)*FWOODP(1)
+          +CFOPE(0,M,ielmp,NZ)*WTRVE(ielmp,NZ)*FWOODP(1)
       ENDDO D6425
 !
       call ResetBranchRootStates(NZ,CPOOLK)
@@ -342,9 +340,7 @@ implicit none
     FWODRN    =>   plt_allom%FWODRN   , &
     FWODRP    =>   plt_allom%FWODRP   , &
     IDTHR     =>   plt_pheno%IDTHR    , &
-    CFOPC     =>   plt_soilchem%CFOPC , &
-    CFOPN     =>   plt_soilchem%CFOPN , &
-    CFOPP     =>   plt_soilchem%CFOPP , &
+    CFOPE     =>   plt_soilchem%CFOPE , &
     CO2P      =>   plt_rbgc%CO2P  , &
     OXYP      =>   plt_rbgc%OXYP  , &
     CO2A      =>   plt_rbgc%CO2A  , &
@@ -406,21 +402,21 @@ implicit none
     DO 8900 N=1,MY(NZ)
       DO 8895 L=NU,NJ
         D6410: DO M=1,jsken
-          ESNC(M,ielmc,1,L,NZ)=ESNC(M,ielmc,1,L,NZ)+CFOPC(0,M,NZ)*EPOOLR(ielmc,N,L,NZ)
-          ESNC(M,ielmn,1,L,NZ)=ESNC(M,ielmn,1,L,NZ)+CFOPN(0,M,NZ)*EPOOLR(ielmn,N,L,NZ)
-          ESNC(M,ielmp,1,L,NZ)=ESNC(M,ielmp,1,L,NZ)+CFOPP(0,M,NZ)*EPOOLR(ielmp,N,L,NZ)
+          ESNC(M,ielmc,1,L,NZ)=ESNC(M,ielmc,1,L,NZ)+CFOPE(0,M,ielmc,NZ)*EPOOLR(ielmc,N,L,NZ)
+          ESNC(M,ielmn,1,L,NZ)=ESNC(M,ielmn,1,L,NZ)+CFOPE(0,M,ielmn,NZ)*EPOOLR(ielmn,N,L,NZ)
+          ESNC(M,ielmp,1,L,NZ)=ESNC(M,ielmp,1,L,NZ)+CFOPE(0,M,ielmp,NZ)*EPOOLR(ielmp,N,L,NZ)
           DO  NR=1,NRT(NZ)
-            ESNC(M,ielmc,0,L,NZ)=ESNC(M,ielmc,0,L,NZ)+CFOPC(5,M,NZ) &
+            ESNC(M,ielmc,0,L,NZ)=ESNC(M,ielmc,0,L,NZ)+CFOPE(5,M,ielmc,NZ) &
               *(WTRT1E(ielmc,N,L,NR,NZ)+WTRT2E(ielmc,N,L,NR,NZ))*FWODR(0)
-            ESNC(M,ielmn,0,L,NZ)=ESNC(M,ielmn,0,L,NZ)+CFOPN(5,M,NZ) &
+            ESNC(M,ielmn,0,L,NZ)=ESNC(M,ielmn,0,L,NZ)+CFOPE(5,M,ielmn,NZ) &
               *(WTRT1E(ielmn,N,L,NR,NZ)+WTRT2E(ielmn,N,L,NR,NZ))*FWODRN(0)
-            ESNC(M,ielmp,0,L,NZ)=ESNC(M,ielmp,0,L,NZ)+CFOPP(5,M,NZ) &
+            ESNC(M,ielmp,0,L,NZ)=ESNC(M,ielmp,0,L,NZ)+CFOPE(5,M,ielmp,NZ) &
               *(WTRT1E(ielmp,N,L,NR,NZ)+WTRT2E(ielmp,N,L,NR,NZ))*FWODRP(0)
-            ESNC(M,ielmc,1,L,NZ)=ESNC(M,ielmc,1,L,NZ)+CFOPC(4,M,NZ) &
+            ESNC(M,ielmc,1,L,NZ)=ESNC(M,ielmc,1,L,NZ)+CFOPE(4,M,ielmc,NZ) &
               *(WTRT1E(ielmc,N,L,NR,NZ)+WTRT2E(ielmc,N,L,NR,NZ))*FWODR(1)
-            ESNC(M,ielmn,1,L,NZ)=ESNC(M,ielmn,1,L,NZ)+CFOPN(4,M,NZ) &
+            ESNC(M,ielmn,1,L,NZ)=ESNC(M,ielmn,1,L,NZ)+CFOPE(4,M,ielmn,NZ) &
               *(WTRT1E(ielmn,N,L,NR,NZ)+WTRT2E(ielmn,N,L,NR,NZ))*FWODRN(1)
-            ESNC(M,ielmp,1,L,NZ)=ESNC(M,ielmp,1,L,NZ)+CFOPP(4,M,NZ) &
+            ESNC(M,ielmp,1,L,NZ)=ESNC(M,ielmp,1,L,NZ)+CFOPE(4,M,ielmp,NZ) &
               *(WTRT1E(ielmp,N,L,NR,NZ)+WTRT2E(ielmp,N,L,NR,NZ))*FWODRP(1)
           enddo
         ENDDO D6410
@@ -501,12 +497,12 @@ implicit none
 !
         IF(INTYP(NZ).NE.0.AND.N.EQ.1)THEN
           D6420: DO M=1,jsken
-            ESNC(M,ielmc,1,L,NZ)=ESNC(M,ielmc,1,L,NZ)+CFOPC(4,M,NZ) &
-              *WTNDLE(L,ielmc,NZ)+CFOPC(0,M,NZ)*EPOOLN(L,ielmc,NZ)
-            ESNC(M,ielmn,1,L,NZ)=ESNC(M,ielmn,1,L,NZ)+CFOPN(4,M,NZ) &
-              *WTNDLE(L,ielmn,NZ)+CFOPN(0,M,NZ)*EPOOLN(L,ielmn,NZ)
-            ESNC(M,ielmp,1,L,NZ)=ESNC(M,ielmp,1,L,NZ)+CFOPP(4,M,NZ) &
-              *WTNDLE(L,ielmp,NZ)+CFOPP(0,M,NZ)*EPOOLN(L,ielmp,NZ)
+            ESNC(M,ielmc,1,L,NZ)=ESNC(M,ielmc,1,L,NZ)+CFOPE(4,M,ielmc,NZ) &
+              *WTNDLE(L,ielmc,NZ)+CFOPE(0,M,ielmc,NZ)*EPOOLN(L,ielmc,NZ)
+            ESNC(M,ielmn,1,L,NZ)=ESNC(M,ielmn,1,L,NZ)+CFOPE(4,M,ielmn,NZ) &
+              *WTNDLE(L,ielmn,NZ)+CFOPE(0,M,ielmn,NZ)*EPOOLN(L,ielmn,NZ)
+            ESNC(M,ielmp,1,L,NZ)=ESNC(M,ielmp,1,L,NZ)+CFOPE(4,M,ielmp,NZ) &
+              *WTNDLE(L,ielmp,NZ)+CFOPE(0,M,ielmp,NZ)*EPOOLN(L,ielmp,NZ)
           ENDDO D6420
           WTNDLE(L,ielmc,NZ)=0._r8
           WTNDLE(L,ielmn,NZ)=0._r8
@@ -567,9 +563,7 @@ implicit none
     WTRSVBE   =>  plt_biom%WTRSVBE    , &
     WTSTDE    =>  plt_biom%WTSTDE     , &
     WTRVE     =>  plt_biom%WTRVE      , &
-    CFOPC     =>  plt_soilchem%CFOPC  , &
-    CFOPN     =>  plt_soilchem%CFOPN  , &
-    CFOPP     =>  plt_soilchem%CFOPP  , &
+    CFOPE     =>  plt_soilchem%CFOPE  , &
     IDTHB     =>  plt_pheno%IDTHB     , &
     GROUP     =>  plt_pheno%GROUP     , &
     VSTGX     =>  plt_pheno%VSTGX     , &
@@ -658,49 +652,49 @@ implicit none
 !
       D6405: DO M=1,jsken
         ESNC(M,ielmc,1,0,NZ)=ESNC(M,ielmc,1,0,NZ) &
-          +CFOPC(0,M,NZ)*EPOLNB(NB,ielmc,NZ) &
-          +CFOPC(1,M,NZ)*(WTLFBE(NB,ielmc,NZ)*FWODB(1) &
+          +CFOPE(0,M,ielmc,NZ)*EPOLNB(NB,ielmc,NZ) &
+          +CFOPE(1,M,ielmc,NZ)*(WTLFBE(NB,ielmc,NZ)*FWODB(1) &
           +WTNDBE(NB,ielmc,NZ)) &
-          +CFOPC(2,M,NZ)*(WTSHEBE(NB,ielmc,NZ)*FWODB(1) &
+          +CFOPE(2,M,ielmc,NZ)*(WTSHEBE(NB,ielmc,NZ)*FWODB(1) &
           +WTHSKBE(NB,ielmc,NZ)+WTEARBE(NB,ielmc,NZ))
         ESNC(M,ielmc,0,0,NZ)=ESNC(M,ielmc,0,0,NZ) &
-          +CFOPC(5,M,NZ)*(WTLFBE(NB,ielmc,NZ)*FWODB(0) &
+          +CFOPE(5,M,ielmc,NZ)*(WTLFBE(NB,ielmc,NZ)*FWODB(0) &
           +WTSHEBE(NB,ielmc,NZ)*FWODB(0))
         ESNC(M,ielmn,1,0,NZ)=ESNC(M,ielmn,1,0,NZ) &
-          +CFOPN(0,M,NZ)*EPOLNB(NB,ielmn,NZ) &
-          +CFOPN(1,M,NZ)*(WTLFBE(NB,ielmn,NZ)*FWODLN(1) &
+          +CFOPE(0,M,ielmn,NZ)*EPOLNB(NB,ielmn,NZ) &
+          +CFOPE(1,M,ielmn,NZ)*(WTLFBE(NB,ielmn,NZ)*FWODLN(1) &
           +WTNDBE(NB,ielmn,NZ)) &
-          +CFOPN(2,M,NZ)*(WTSHEBE(NB,ielmn,NZ)*FWODSN(1) &
+          +CFOPE(2,M,ielmn,NZ)*(WTSHEBE(NB,ielmn,NZ)*FWODSN(1) &
           +WTHSKBE(NB,ielmn,NZ)+WTEARBE(NB,ielmn,NZ))
         ESNC(M,ielmn,0,0,NZ)=ESNC(M,ielmn,0,0,NZ) &
-          +CFOPN(5,M,NZ)*(WTLFBE(NB,ielmn,NZ)*FWODLN(0) &
+          +CFOPE(5,M,ielmn,NZ)*(WTLFBE(NB,ielmn,NZ)*FWODLN(0) &
           +WTSHEBE(NB,ielmn,NZ)*FWODSN(0))
         ESNC(M,ielmp,1,0,NZ)=ESNC(M,ielmp,1,0,NZ) &
-          +CFOPP(0,M,NZ)*EPOLNB(NB,ielmp,NZ) &
-          +CFOPP(1,M,NZ)*(WTLFBE(NB,ielmp,NZ)*FWODLP(1) &
+          +CFOPE(0,M,ielmp,NZ)*EPOLNB(NB,ielmp,NZ) &
+          +CFOPE(1,M,ielmp,NZ)*(WTLFBE(NB,ielmp,NZ)*FWODLP(1) &
           +WTNDBE(NB,ielmp,NZ)) &
-          +CFOPP(2,M,NZ)*(WTSHEBE(NB,ielmp,NZ)*FWODSP(1) &
+          +CFOPE(2,M,ielmp,NZ)*(WTSHEBE(NB,ielmp,NZ)*FWODSP(1) &
           +WTHSKBE(NB,ielmp,NZ)+WTEARBE(NB,ielmp,NZ))
         ESNC(M,ielmp,0,0,NZ)=ESNC(M,ielmp,0,0,NZ) &
-          +CFOPP(5,M,NZ)*(WTLFBE(NB,ielmp,NZ)*FWODLP(0) &
+          +CFOPE(5,M,ielmp,NZ)*(WTLFBE(NB,ielmp,NZ)*FWODLP(0) &
           +WTSHEBE(NB,ielmp,NZ)*FWODSP(0))
         IF(ISTYP(NZ).EQ.0.AND.IWTYP(NZ).NE.0)THEN
-          WTRVE(ielmc,NZ)=WTRVE(ielmc,NZ)+CFOPC(2,M,NZ)*WTGRBE(NB,ielmc,NZ)
-          WTRVE(ielmn,NZ)=WTRVE(ielmn,NZ)+CFOPN(2,M,NZ)*WTGRBE(NB,ielmn,NZ)
-          WTRVE(ielmp,NZ)=WTRVE(ielmp,NZ)+CFOPP(2,M,NZ)*WTGRBE(NB,ielmp,NZ)
+          WTRVE(ielmc,NZ)=WTRVE(ielmc,NZ)+CFOPE(2,M,ielmc,NZ)*WTGRBE(NB,ielmc,NZ)
+          WTRVE(ielmn,NZ)=WTRVE(ielmn,NZ)+CFOPE(2,M,ielmn,NZ)*WTGRBE(NB,ielmn,NZ)
+          WTRVE(ielmp,NZ)=WTRVE(ielmp,NZ)+CFOPE(2,M,ielmp,NZ)*WTGRBE(NB,ielmp,NZ)
         ELSE
-          ESNC(M,ielmc,1,0,NZ)=ESNC(M,ielmc,1,0,NZ)+CFOPC(2,M,NZ)*WTGRBE(NB,ielmc,NZ)
-          ESNC(M,ielmn,1,0,NZ)=ESNC(M,ielmn,1,0,NZ)+CFOPN(2,M,NZ)*WTGRBE(NB,ielmn,NZ)
-          ESNC(M,ielmp,1,0,NZ)=ESNC(M,ielmp,1,0,NZ)+CFOPP(2,M,NZ)*WTGRBE(NB,ielmp,NZ)
+          ESNC(M,ielmc,1,0,NZ)=ESNC(M,ielmc,1,0,NZ)+CFOPE(2,M,ielmc,NZ)*WTGRBE(NB,ielmc,NZ)
+          ESNC(M,ielmn,1,0,NZ)=ESNC(M,ielmn,1,0,NZ)+CFOPE(2,M,ielmn,NZ)*WTGRBE(NB,ielmn,NZ)
+          ESNC(M,ielmp,1,0,NZ)=ESNC(M,ielmp,1,0,NZ)+CFOPE(2,M,ielmp,NZ)*WTGRBE(NB,ielmp,NZ)
         ENDIF
         IF(IBTYP(NZ).EQ.0.OR.IGTYP(NZ).LE.1)THEN
-          ESNC(M,ielmc,1,0,NZ)=ESNC(M,ielmc,1,0,NZ)+CFOPC(3,M,NZ)*WTSTKBE(NB,ielmc,NZ)
-          ESNC(M,ielmn,1,0,NZ)=ESNC(M,ielmn,1,0,NZ)+CFOPN(3,M,NZ)*WTSTKBE(NB,ielmn,NZ)
-          ESNC(M,ielmp,1,0,NZ)=ESNC(M,ielmp,1,0,NZ)+CFOPP(3,M,NZ)*WTSTKBE(NB,ielmp,NZ)
+          ESNC(M,ielmc,1,0,NZ)=ESNC(M,ielmc,1,0,NZ)+CFOPE(3,M,ielmc,NZ)*WTSTKBE(NB,ielmc,NZ)
+          ESNC(M,ielmn,1,0,NZ)=ESNC(M,ielmn,1,0,NZ)+CFOPE(3,M,ielmn,NZ)*WTSTKBE(NB,ielmn,NZ)
+          ESNC(M,ielmp,1,0,NZ)=ESNC(M,ielmp,1,0,NZ)+CFOPE(3,M,ielmp,NZ)*WTSTKBE(NB,ielmp,NZ)
         ELSE
-          WTSTDE(M,ielmc,NZ)=WTSTDE(M,ielmc,NZ)+CFOPC(5,M,NZ)*WTSTKBE(NB,ielmc,NZ)
-          WTSTDE(M,ielmn,NZ)=WTSTDE(M,ielmn,NZ)+CFOPN(5,M,NZ)*WTSTKBE(NB,ielmn,NZ)
-          WTSTDE(M,ielmp,NZ)=WTSTDE(M,ielmp,NZ)+CFOPP(5,M,NZ)*WTSTKBE(NB,ielmp,NZ)
+          WTSTDE(M,ielmc,NZ)=WTSTDE(M,ielmc,NZ)+CFOPE(5,M,ielmc,NZ)*WTSTKBE(NB,ielmc,NZ)
+          WTSTDE(M,ielmn,NZ)=WTSTDE(M,ielmn,NZ)+CFOPE(5,M,ielmn,NZ)*WTSTKBE(NB,ielmn,NZ)
+          WTSTDE(M,ielmp,NZ)=WTSTDE(M,ielmp,NZ)+CFOPE(5,M,ielmp,NZ)*WTSTKBE(NB,ielmp,NZ)
         ENDIF
       ENDDO D6405
 !
@@ -720,11 +714,11 @@ implicit none
       IF(IHVST(NZ).NE.4.AND.IHVST(NZ).NE.6)THEN
         D6406: DO M=1,jsken
           ESNC(M,ielmc,1,0,NZ)=ESNC(M,ielmc,1,0,NZ) &
-            +CFOPC(0,M,NZ)*WTRSVBE(NB,ielmc,NZ)
+            +CFOPE(0,M,ielmc,NZ)*WTRSVBE(NB,ielmc,NZ)
           ESNC(M,ielmn,1,0,NZ)=ESNC(M,ielmn,1,0,NZ) &
-            +CFOPN(0,M,NZ)*WTRSVBE(NB,ielmn,NZ)
+            +CFOPE(0,M,ielmn,NZ)*WTRSVBE(NB,ielmn,NZ)
           ESNC(M,ielmp,1,0,NZ)=ESNC(M,ielmp,1,0,NZ) &
-            +CFOPP(0,M,NZ)*WTRSVBE(NB,ielmp,NZ)
+            +CFOPE(0,M,ielmp,NZ)*WTRSVBE(NB,ielmp,NZ)
         ENDDO D6406
       ELSE
         WTRVE(ielmc,NZ)=WTRVE(ielmc,NZ)+WTRSVBE(NB,ielmc,NZ)

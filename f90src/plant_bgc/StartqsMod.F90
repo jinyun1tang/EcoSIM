@@ -158,9 +158,7 @@ module StartqsMod
     IBTYP  =>  plt_pheno%IBTYP     , &
     IGTYP  =>  plt_pheno%IGTYP     , &
     GROUPI =>  plt_pheno%GROUPI    , &
-    CFOPC  =>  plt_soilchem%CFOPC  , &
-    CFOPN  =>  plt_soilchem%CFOPN  , &
-    CFOPP  =>  plt_soilchem%CFOPP  , &
+    CFOPE  =>  plt_soilchem%CFOPE  , &
     FNOD   =>  plt_allom%FNOD      , &
     INTYP  =>  plt_morph%INTYP     , &
     NNOD   =>  plt_morph%NNOD        &
@@ -174,70 +172,70 @@ module StartqsMod
 !
 !     NONSTRUCTURAL
 !
-  CFOPC(0,1,NZ)=0.0_r8
-  CFOPC(0,2,NZ)=0.67_r8
-  CFOPC(0,3,NZ)=0.33_r8
-  CFOPC(0,4,NZ)=0.0_r8
+  CFOPE(0,1,ielmc,NZ)=0.0_r8
+  CFOPE(0,2,ielmc,NZ)=0.67_r8
+  CFOPE(0,3,ielmc,NZ)=0.33_r8
+  CFOPE(0,4,ielmc,NZ)=0.0_r8
 !
 !     NON-VASCULAR (E.G. MOSSES)
 !
   IF(IGTYP(NZ).EQ.0)THEN
-    CFOPC(1,1,NZ)=0.07_r8
-    CFOPC(1,2,NZ)=0.25_r8
-    CFOPC(1,3,NZ)=0.30_r8
-    CFOPC(1,4,NZ)=0.38_r8
-    CFOPC(2,1,NZ)=0.07_r8
-    CFOPC(2,2,NZ)=0.25_r8
-    CFOPC(2,3,NZ)=0.30_r8
-    CFOPC(2,4,NZ)=0.38_r8
+    CFOPE(1,1,ielmc,NZ)=0.07_r8
+    CFOPE(1,2,ielmc,NZ)=0.25_r8
+    CFOPE(1,3,ielmc,NZ)=0.30_r8
+    CFOPE(1,4,ielmc,NZ)=0.38_r8
+    CFOPE(2,1,ielmc,NZ)=0.07_r8
+    CFOPE(2,2,ielmc,NZ)=0.25_r8
+    CFOPE(2,3,ielmc,NZ)=0.30_r8
+    CFOPE(2,4,ielmc,NZ)=0.38_r8
 !
 !     LEGUMES
 !
   ELSEIF(INTYP(NZ).NE.0)THEN
-    CFOPC(1,1,NZ)=0.16_r8
-    CFOPC(1,2,NZ)=0.38_r8
-    CFOPC(1,3,NZ)=0.34_r8
-    CFOPC(1,4,NZ)=0.12_r8
-    CFOPC(2,1,NZ)=0.07_r8
-    CFOPC(2,2,NZ)=0.41_r8
-    CFOPC(2,3,NZ)=0.37_r8
-    CFOPC(2,4,NZ)=0.15_r8
+    CFOPE(1,1,ielmc,NZ)=0.16_r8
+    CFOPE(1,2,ielmc,NZ)=0.38_r8
+    CFOPE(1,3,ielmc,NZ)=0.34_r8
+    CFOPE(1,4,ielmc,NZ)=0.12_r8
+    CFOPE(2,1,ielmc,NZ)=0.07_r8
+    CFOPE(2,2,ielmc,NZ)=0.41_r8
+    CFOPE(2,3,ielmc,NZ)=0.37_r8
+    CFOPE(2,4,ielmc,NZ)=0.15_r8
 !
 !     ANNUALS, GRASSES, SHRUBS
 !
   ELSEIF(IBTYP(NZ).EQ.0.OR.IGTYP(NZ).LE.1)THEN
-    CFOPC(1,1,NZ)=0.08_r8
-    CFOPC(1,2,NZ)=0.41_r8
-    CFOPC(1,3,NZ)=0.36_r8
-    CFOPC(1,4,NZ)=0.15_r8
-    CFOPC(2,1,NZ)=0.07_r8
-    CFOPC(2,2,NZ)=0.41_r8
-    CFOPC(2,3,NZ)=0.36_r8
-    CFOPC(2,4,NZ)=0.16_r8
+    CFOPE(1,1,ielmc,NZ)=0.08_r8
+    CFOPE(1,2,ielmc,NZ)=0.41_r8
+    CFOPE(1,3,ielmc,NZ)=0.36_r8
+    CFOPE(1,4,ielmc,NZ)=0.15_r8
+    CFOPE(2,1,ielmc,NZ)=0.07_r8
+    CFOPE(2,2,ielmc,NZ)=0.41_r8
+    CFOPE(2,3,ielmc,NZ)=0.36_r8
+    CFOPE(2,4,ielmc,NZ)=0.16_r8
 !
 !     DECIDUOUS TREES
 !
   ELSEIF(IBTYP(NZ).EQ.1.OR.IBTYP(NZ).EQ.3)THEN
-    CFOPC(1,1,NZ)=0.07_r8
-    CFOPC(1,2,NZ)=0.34_r8
-    CFOPC(1,3,NZ)=0.36_r8
-    CFOPC(1,4,NZ)=0.23_r8
-    CFOPC(2,1,NZ)=0.0_r8
-    CFOPC(2,2,NZ)=0.045_r8
-    CFOPC(2,3,NZ)=0.660_r8
-    CFOPC(2,4,NZ)=0.295_r8
+    CFOPE(1,1,ielmc,NZ)=0.07_r8
+    CFOPE(1,2,ielmc,NZ)=0.34_r8
+    CFOPE(1,3,ielmc,NZ)=0.36_r8
+    CFOPE(1,4,ielmc,NZ)=0.23_r8
+    CFOPE(2,1,ielmc,NZ)=0.0_r8
+    CFOPE(2,2,ielmc,NZ)=0.045_r8
+    CFOPE(2,3,ielmc,NZ)=0.660_r8
+    CFOPE(2,4,ielmc,NZ)=0.295_r8
 !
 !     CONIFEROUS TREES
 !
   ELSE
-    CFOPC(1,1,NZ)=0.07_r8
-    CFOPC(1,2,NZ)=0.25_r8
-    CFOPC(1,3,NZ)=0.38_r8
-    CFOPC(1,4,NZ)=0.30_r8
-    CFOPC(2,1,NZ)=0.0_r8
-    CFOPC(2,2,NZ)=0.045_r8
-    CFOPC(2,3,NZ)=0.660_r8
-    CFOPC(2,4,NZ)=0.295_r8
+    CFOPE(1,1,ielmc,NZ)=0.07_r8
+    CFOPE(1,2,ielmc,NZ)=0.25_r8
+    CFOPE(1,3,ielmc,NZ)=0.38_r8
+    CFOPE(1,4,ielmc,NZ)=0.30_r8
+    CFOPE(2,1,ielmc,NZ)=0.0_r8
+    CFOPE(2,2,ielmc,NZ)=0.045_r8
+    CFOPE(2,3,ielmc,NZ)=0.660_r8
+    CFOPE(2,4,ielmc,NZ)=0.295_r8
   ENDIF
 !
 !     FRACTIONS OF WOODY LITTER ALLOCATED TO
@@ -246,26 +244,26 @@ module StartqsMod
 !     NON-VASCULAR
 !
   IF(IGTYP(NZ).EQ.0)THEN
-    CFOPC(3,1,NZ)=0.07_r8
-    CFOPC(3,2,NZ)=0.25_r8
-    CFOPC(3,3,NZ)=0.30_r8
-    CFOPC(3,4,NZ)=0.38_r8
+    CFOPE(3,1,ielmc,NZ)=0.07_r8
+    CFOPE(3,2,ielmc,NZ)=0.25_r8
+    CFOPE(3,3,ielmc,NZ)=0.30_r8
+    CFOPE(3,4,ielmc,NZ)=0.38_r8
 !
 !     ANNUALS, GRASSES, SHRUBS
 !
   ELSEIF(IBTYP(NZ).EQ.0.OR.IGTYP(NZ).LE.1)THEN
-    CFOPC(3,1,NZ)=0.03_r8
-    CFOPC(3,2,NZ)=0.25_r8
-    CFOPC(3,3,NZ)=0.57_r8
-    CFOPC(3,4,NZ)=0.15_r8
+    CFOPE(3,1,ielmc,NZ)=0.03_r8
+    CFOPE(3,2,ielmc,NZ)=0.25_r8
+    CFOPE(3,3,ielmc,NZ)=0.57_r8
+    CFOPE(3,4,ielmc,NZ)=0.15_r8
 !
 !     DECIDUOUS AND CONIFEROUS TREES
 !
   ELSE
-    CFOPC(3,1,NZ)=0.0_r8
-    CFOPC(3,2,NZ)=0.045_r8
-    CFOPC(3,3,NZ)=0.660_r8
-    CFOPC(3,4,NZ)=0.295_r8
+    CFOPE(3,1,ielmc,NZ)=0.0_r8
+    CFOPE(3,2,ielmc,NZ)=0.045_r8
+    CFOPE(3,3,ielmc,NZ)=0.660_r8
+    CFOPE(3,4,ielmc,NZ)=0.295_r8
   ENDIF
 !
 !     FRACTIONS OF FINE ROOT LITTER ALLOCATED TO
@@ -274,42 +272,42 @@ module StartqsMod
 !     NON-VASCULAR
 !
   IF(IGTYP(NZ).EQ.0)THEN
-    CFOPC(4,1,NZ)=0.07_r8
-    CFOPC(4,2,NZ)=0.25_r8
-    CFOPC(4,3,NZ)=0.30_r8
-    CFOPC(4,4,NZ)=0.38_r8
+    CFOPE(4,1,ielmc,NZ)=0.07_r8
+    CFOPE(4,2,ielmc,NZ)=0.25_r8
+    CFOPE(4,3,ielmc,NZ)=0.30_r8
+    CFOPE(4,4,ielmc,NZ)=0.38_r8
 !
 !     ANNUALS, GRASSES, SHRUBS
 !
   ELSEIF(IBTYP(NZ).EQ.0.OR.IGTYP(NZ).LE.1)THEN
-    CFOPC(4,1,NZ)=0.057_r8
-    CFOPC(4,2,NZ)=0.263_r8
-    CFOPC(4,3,NZ)=0.542_r8
-    CFOPC(4,4,NZ)=0.138_r8
+    CFOPE(4,1,ielmc,NZ)=0.057_r8
+    CFOPE(4,2,ielmc,NZ)=0.263_r8
+    CFOPE(4,3,ielmc,NZ)=0.542_r8
+    CFOPE(4,4,ielmc,NZ)=0.138_r8
 !
 !     DECIDUOUS TREES
 !
   ELSEIF(IBTYP(NZ).EQ.1.OR.IBTYP(NZ).EQ.3)THEN
-    CFOPC(4,1,NZ)=0.059_r8
-    CFOPC(4,2,NZ)=0.308_r8
-    CFOPC(4,3,NZ)=0.464_r8
-    CFOPC(4,4,NZ)=0.169_r8
+    CFOPE(4,1,ielmc,NZ)=0.059_r8
+    CFOPE(4,2,ielmc,NZ)=0.308_r8
+    CFOPE(4,3,ielmc,NZ)=0.464_r8
+    CFOPE(4,4,ielmc,NZ)=0.169_r8
 !
 !     CONIFEROUS TREES
 !
   ELSE
-    CFOPC(4,1,NZ)=0.059_r8
-    CFOPC(4,2,NZ)=0.308_r8
-    CFOPC(4,3,NZ)=0.464_r8
-    CFOPC(4,4,NZ)=0.169_r8
+    CFOPE(4,1,ielmc,NZ)=0.059_r8
+    CFOPE(4,2,ielmc,NZ)=0.308_r8
+    CFOPE(4,3,ielmc,NZ)=0.464_r8
+    CFOPE(4,4,ielmc,NZ)=0.169_r8
   ENDIF
 !
 !     COARSE WOODY LITTER FROM BOLES AND ROOTS
 !
-  CFOPC(5,1,NZ)=0.00_r8
-  CFOPC(5,2,NZ)=0.045_r8
-  CFOPC(5,3,NZ)=0.660_r8
-  CFOPC(5,4,NZ)=0.295_r8
+  CFOPE(5,1,ielmc,NZ)=0.00_r8
+  CFOPE(5,2,ielmc,NZ)=0.045_r8
+  CFOPE(5,3,ielmc,NZ)=0.660_r8
+  CFOPE(5,4,ielmc,NZ)=0.295_r8
 !
 !     INITIALIZE C-N AND C-P RATIOS IN PLANT LITTER
 !
@@ -324,18 +322,18 @@ module StartqsMod
   CPOPC(2)=0.0010_r8
   CPOPC(3)=0.0010_r8
   CPOPC(4)=0.0020_r8
-  DO 110 N=0,5
+  D110: DO N=0,5
     CNOPCT=0.0_r8
     CPOPCT=0.0_r8
-    DO 100 M=1,4
-      CNOPCT=CNOPCT+CFOPC(N,M,NZ)*CNOPC(M)
-      CPOPCT=CPOPCT+CFOPC(N,M,NZ)*CPOPC(M)
-100 CONTINUE
-    DO 105 M=1,4
-      CFOPN(N,M,NZ)=CFOPC(N,M,NZ)*CNOPC(M)/CNOPCT
-      CFOPP(N,M,NZ)=CFOPC(N,M,NZ)*CPOPC(M)/CPOPCT
-105 CONTINUE
-110 CONTINUE
+    D100: DO M=1,jsken
+      CNOPCT=CNOPCT+CFOPE(N,M,ielmc,NZ)*CNOPC(M)
+      CPOPCT=CPOPCT+CFOPE(N,M,ielmc,NZ)*CPOPC(M)
+    ENDDO D100
+    D105: DO M=1,jsken
+      CFOPE(N,M,ielmn,NZ)=CFOPE(N,M,ielmc,NZ)*CNOPC(M)/CNOPCT
+      CFOPE(N,M,ielmp,NZ)=CFOPE(N,M,ielmc,NZ)*CPOPC(M)/CPOPCT
+    ENDDO D105
+  ENDDO D110
 !
 !     CONCURRENT NODE GROWTH
 !
@@ -742,15 +740,13 @@ module StartqsMod
 
   implicit none
   integer, intent(in) :: NZ
-  integer :: M
+  integer :: M,NE
   real(r8) :: WTSTDX
 
   associate(                           &
     NU     => plt_site%NU        , &
     AREA3  => plt_site%AREA3     , &
-    CFOPC  => plt_soilchem%CFOPC , &
-    CFOPN  => plt_soilchem%CFOPN , &
-    CFOPP  => plt_soilchem%CFOPP , &
+    CFOPE  => plt_soilchem%CFOPE , &
     CTRAN  => plt_ew%CTRAN       , &
     WTSTDE => plt_biom%WTSTDE    , &
     WTSTGE => plt_biom%WTSTGE    , &
@@ -798,13 +794,13 @@ module StartqsMod
     WTSTGE(1:npelms,NZ)=0._r8
     WTSTDX=WTSTDI(NZ)*AREA3(NU)
     D155: DO M=1,jsken
-      WTSTDE(M,ielmc,NZ)=WTSTDX*CFOPC(5,M,NZ)
-      WTSTDE(M,ielmn,NZ)=WTSTDX*CNSTK(NZ)*CFOPN(5,M,NZ)
-      WTSTDE(M,ielmp,NZ)=WTSTDX*CPSTK(NZ)*CFOPP(5,M,NZ)
-      WTSTGE(ielmc,NZ)=WTSTGE(ielmc,NZ)+WTSTDE(M,ielmc,NZ)
-      WTSTGE(ielmn,NZ)=WTSTGE(ielmn,NZ)+WTSTDE(M,ielmn,NZ)
-      WTSTGE(ielmp,NZ)=WTSTGE(ielmp,NZ)+WTSTDE(M,ielmp,NZ)
+      WTSTDE(M,ielmc,NZ)=WTSTDX*CFOPE(5,M,ielmc,NZ)
+      WTSTDE(M,ielmn,NZ)=WTSTDX*CNSTK(NZ)*CFOPE(5,M,ielmn,NZ)
+      WTSTDE(M,ielmp,NZ)=WTSTDX*CPSTK(NZ)*CFOPE(5,M,ielmp,NZ)
     ENDDO D155
+    DO NE=1,npelms
+      WTSTGE(NE,NZ)=WTSTGE(NE,NZ)+sum(WTSTDE(1:jsken,NE,NZ))
+    ENDDO
   ENDIF
   end associate
   end subroutine InitMassBalance

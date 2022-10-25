@@ -53,9 +53,7 @@ module NoduleBGCMod
     NU       =>  plt_site%NU       , &
     ZERO     =>  plt_site%ZERO     , &
     AREA3    =>  plt_site%AREA3    , &
-    CFOPC    =>  plt_soilchem%CFOPC, &
-    CFOPN    =>  plt_soilchem%CFOPN, &
-    CFOPP    =>  plt_soilchem%CFOPP, &
+    CFOPE    =>  plt_soilchem%CFOPE, &
     INTYP    =>  plt_morph%INTYP   , &
     TFN3     =>  plt_pheno%TFN3    , &
     TCO2T    =>  plt_bgcr%TCO2T    , &
@@ -300,9 +298,9 @@ module NoduleBGCMod
 !     RDNSNC,RDNSNC,RDNSNP=bacterial C,N,P senescence to litterfall
 !
     D6470: DO M=1,jsken
-      ESNC(M,ielmc,1,0,NZ)=ESNC(M,ielmc,1,0,NZ)+CFOPC(1,M,NZ)*(RDNDLC+RDNSNC)
-      ESNC(M,ielmn,1,0,NZ)=ESNC(M,ielmn,1,0,NZ)+CFOPN(1,M,NZ)*(RDNDLN+RDNSNN)
-      ESNC(M,ielmp,1,0,NZ)=ESNC(M,ielmp,1,0,NZ)+CFOPP(1,M,NZ)*(RDNDLP+RDNSNP)
+      ESNC(M,ielmc,1,0,NZ)=ESNC(M,ielmc,1,0,NZ)+CFOPE(1,M,ielmc,NZ)*(RDNDLC+RDNSNC)
+      ESNC(M,ielmn,1,0,NZ)=ESNC(M,ielmn,1,0,NZ)+CFOPE(1,M,ielmn,NZ)*(RDNDLN+RDNSNN)
+      ESNC(M,ielmp,1,0,NZ)=ESNC(M,ielmp,1,0,NZ)+CFOPE(1,M,ielmp,NZ)*(RDNDLP+RDNSNP)
     ENDDO D6470
 !
 !     CONSUMPTION OF NON-STRUCTURAL C,N,P BY NODULE
@@ -438,9 +436,7 @@ module NoduleBGCMod
     EPOOLN   =>   plt_biom%EPOOLN    , &
     ZEROL    =>   plt_biom%ZEROL     , &
     EPOOLR   =>   plt_biom%EPOOLR    , &
-    CFOPC    =>   plt_soilchem%CFOPC , &
-    CFOPN    =>   plt_soilchem%CFOPN , &
-    CFOPP    =>   plt_soilchem%CFOPP , &
+    CFOPE    =>   plt_soilchem%CFOPE , &
     INTYP    =>   plt_morph%INTYP    , &
     NIX      =>   plt_morph%NIX        &
   )
@@ -680,9 +676,9 @@ module NoduleBGCMod
 !     RDNSNC,RDNSNC,RDNSNP=bacterial C,N,P senescence to litterfall
 !
         D6370: DO M=1,jsken
-          ESNC(M,ielmc,1,L,NZ)=ESNC(M,ielmc,1,L,NZ)+CFOPC(4,M,NZ)*(RDNDLC+RDNSNC)
-          ESNC(M,ielmn,1,L,NZ)=ESNC(M,ielmn,1,L,NZ)+CFOPN(4,M,NZ)*(RDNDLN+RDNSNN)
-          ESNC(M,ielmp,1,L,NZ)=ESNC(M,ielmp,1,L,NZ)+CFOPP(4,M,NZ)*(RDNDLP+RDNSNP)
+          ESNC(M,ielmc,1,L,NZ)=ESNC(M,ielmc,1,L,NZ)+CFOPE(4,M,ielmc,NZ)*(RDNDLC+RDNSNC)
+          ESNC(M,ielmn,1,L,NZ)=ESNC(M,ielmn,1,L,NZ)+CFOPE(4,M,ielmn,NZ)*(RDNDLN+RDNSNN)
+          ESNC(M,ielmp,1,L,NZ)=ESNC(M,ielmp,1,L,NZ)+CFOPE(4,M,ielmp,NZ)*(RDNDLP+RDNSNP)
         ENDDO D6370
 !
 !     CONSUMPTION OF NON-STRUCTURAL C,N,P BY NODULE

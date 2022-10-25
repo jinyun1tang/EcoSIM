@@ -672,13 +672,13 @@ implicit none
       ENDDO
     ENDDO
 
-    DO M=1,jsken
-      DO N=0,5
-        CFOPC(N,M,NZ,NY,NX)=plt_soilchem%CFOPC(N,M,NZ)
-        CFOPN(N,M,NZ,NY,NX)=plt_soilchem%CFOPN(N,M,NZ)
-        CFOPP(N,M,NZ,NY,NX)=plt_soilchem%CFOPP(N,M,NZ)
+    DO NE=1,npelms
+      DO M=1,jsken
+        DO N=0,JP
+          CFOPE(N,M,NE,NZ,NY,NX)=plt_soilchem%CFOPE(N,M,NE,NZ)
+        enddo
       enddo
-    enddo
+    ENDDO
     RRAD1M(2,NZ,NY,NX)=plt_morph%RRAD1M(2,NZ)
     RRAD2M(2,NZ,NY,NX)=plt_morph%RRAD2M(2,NZ)
     PORT(2,NZ,NY,NX)  =plt_morph%PORT(2,NZ)
@@ -1606,13 +1606,13 @@ implicit none
         enddo
       enddo
     ENDDO
-    DO M=1,jsken
-      DO N=0,5
-        plt_soilchem%CFOPC(N,M,NZ)=CFOPC(N,M,NZ,NY,NX)
-        plt_soilchem%CFOPN(N,M,NZ)=CFOPN(N,M,NZ,NY,NX)
-        plt_soilchem%CFOPP(N,M,NZ)=CFOPP(N,M,NZ,NY,NX)
+    DO NE=1,npelms
+      DO M=1,jsken
+        DO N=0,JP
+          plt_soilchem%CFOPE(N,M,NE,NZ)=CFOPE(N,M,NE,NZ,NY,NX)
+        enddo
       enddo
-    enddo
+    ENDDO
   ENDDO
 
   DO L=1,NL(NY,NX)

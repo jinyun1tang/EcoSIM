@@ -424,9 +424,7 @@ implicit none
     TFN4    =>  plt_pheno%TFN4      , &
     IDAY    =>  plt_pheno%IDAY      , &
     BKDS    =>  plt_soilchem%BKDS   , &
-    CFOPC   =>  plt_soilchem%CFOPC  , &
-    CFOPN   =>  plt_soilchem%CFOPN  , &
-    CFOPP   =>  plt_soilchem%CFOPP  , &
+    CFOPE   =>  plt_soilchem%CFOPE  , &
     RSCS    =>  plt_soilchem%RSCS   , &
     DLYR3   =>  plt_site%DLYR3      , &
     ZERO    =>  plt_site%ZERO       , &
@@ -662,17 +660,17 @@ implicit none
 !     FWOOD,FWOODN,FWOODP=C,N,P woody fraction in root:0=woody,1=non-woody
 !
       D6350: DO M=1,jsken
-        ESNC(M,ielmc,0,L,NZ)=ESNC(M,ielmc,0,L,NZ)+CFOPC(5,M,NZ) &
+        ESNC(M,ielmc,0,L,NZ)=ESNC(M,ielmc,0,L,NZ)+CFOPE(5,M,ielmc,NZ) &
           *FSNC2*(WTRT2E(ielmc,N,L,NR,NZ)-RCCR)*FWODR(0)
-        ESNC(M,ielmn,0,L,NZ)=ESNC(M,ielmn,0,L,NZ)+CFOPN(5,M,NZ) &
+        ESNC(M,ielmn,0,L,NZ)=ESNC(M,ielmn,0,L,NZ)+CFOPE(5,M,ielmn,NZ) &
           *FSNC2*(WTRT2E(ielmn,N,L,NR,NZ)-RCZR)*FWODRN(0)
-        ESNC(M,ielmp,0,L,NZ)=ESNC(M,ielmp,0,L,NZ)+CFOPP(5,M,NZ) &
+        ESNC(M,ielmp,0,L,NZ)=ESNC(M,ielmp,0,L,NZ)+CFOPE(5,M,ielmp,NZ) &
           *FSNC2*(WTRT2E(ielmp,N,L,NR,NZ)-RCPR)*FWODRP(0)
-        ESNC(M,ielmc,1,L,NZ)=ESNC(M,ielmc,1,L,NZ)+CFOPC(4,M,NZ) &
+        ESNC(M,ielmc,1,L,NZ)=ESNC(M,ielmc,1,L,NZ)+CFOPE(4,M,ielmc,NZ) &
           *FSNC2*(WTRT2E(ielmc,N,L,NR,NZ)-RCCR)*FWODR(1)
-        ESNC(M,ielmn,1,L,NZ)=ESNC(M,ielmn,1,L,NZ)+CFOPN(4,M,NZ) &
+        ESNC(M,ielmn,1,L,NZ)=ESNC(M,ielmn,1,L,NZ)+CFOPE(4,M,ielmn,NZ) &
           *FSNC2*(WTRT2E(ielmn,N,L,NR,NZ)-RCZR)*FWODRN(1)
-        ESNC(M,ielmp,1,L,NZ)=ESNC(M,ielmp,1,L,NZ)+CFOPP(4,M,NZ) &
+        ESNC(M,ielmp,1,L,NZ)=ESNC(M,ielmp,1,L,NZ)+CFOPE(4,M,ielmp,NZ) &
           *FSNC2*(WTRT2E(ielmp,N,L,NR,NZ)-RCPR)*FWODRP(1)
       ENDDO D6350
 !
@@ -1052,23 +1050,23 @@ implicit none
                       FSNCP=1.0_r8
                     ENDIF
                     D6450: DO M=1,jsken
-                      ESNC(M,ielmc,0,LL,NZ)=ESNC(M,ielmc,0,LL,NZ)+CFOPC(5,M,NZ) &
+                      ESNC(M,ielmc,0,LL,NZ)=ESNC(M,ielmc,0,LL,NZ)+CFOPE(5,M,ielmc,NZ) &
                         *FSNCM*AZMAX1(WTRT2E(ielmc,2,LL,NR,NZ))*FWODR(0)
-                      ESNC(M,ielmn,0,LL,NZ)=ESNC(M,ielmn,0,LL,NZ)+CFOPN(5,M,NZ) &
+                      ESNC(M,ielmn,0,LL,NZ)=ESNC(M,ielmn,0,LL,NZ)+CFOPE(5,M,ielmn,NZ) &
                         *FSNCM*AZMAX1(WTRT2E(ielmn,2,LL,NR,NZ))*FWODRN(0)
-                      ESNC(M,ielmp,0,LL,NZ)=ESNC(M,ielmp,0,LL,NZ)+CFOPP(5,M,NZ) &
+                      ESNC(M,ielmp,0,LL,NZ)=ESNC(M,ielmp,0,LL,NZ)+CFOPE(5,M,ielmp,NZ) &
                         *FSNCM*AZMAX1(WTRT2E(ielmp,2,LL,NR,NZ))*FWODRP(0)
-                      ESNC(M,ielmc,1,LL,NZ)=ESNC(M,ielmc,1,LL,NZ)+CFOPC(4,M,NZ) &
+                      ESNC(M,ielmc,1,LL,NZ)=ESNC(M,ielmc,1,LL,NZ)+CFOPE(4,M,ielmc,NZ) &
                         *FSNCM*AZMAX1(WTRT2E(ielmc,2,LL,NR,NZ))*FWODR(1)
-                      ESNC(M,ielmn,1,LL,NZ)=ESNC(M,ielmn,1,LL,NZ)+CFOPN(4,M,NZ) &
+                      ESNC(M,ielmn,1,LL,NZ)=ESNC(M,ielmn,1,LL,NZ)+CFOPE(4,M,ielmn,NZ) &
                         *FSNCM*AZMAX1(WTRT2E(ielmn,2,LL,NR,NZ))*FWODRN(1)
-                      ESNC(M,ielmp,1,LL,NZ)=ESNC(M,ielmp,1,LL,NZ)+CFOPP(4,M,NZ) &
+                      ESNC(M,ielmp,1,LL,NZ)=ESNC(M,ielmp,1,LL,NZ)+CFOPE(4,M,ielmp,NZ) &
                         *FSNCM*AZMAX1(WTRT2E(ielmp,2,LL,NR,NZ))*FWODRP(1)
-                      ESNC(M,ielmc,1,LL,NZ)=ESNC(M,ielmc,1,LL,NZ)+CFOPC(0,M,NZ) &
+                      ESNC(M,ielmc,1,LL,NZ)=ESNC(M,ielmc,1,LL,NZ)+CFOPE(0,M,ielmc,NZ) &
                         *FSNCP*AZMAX1(EPOOLR(ielmc,2,LL,NZ))
-                      ESNC(M,ielmn,1,LL,NZ)=ESNC(M,ielmn,1,LL,NZ)+CFOPN(0,M,NZ) &
+                      ESNC(M,ielmn,1,LL,NZ)=ESNC(M,ielmn,1,LL,NZ)+CFOPE(0,M,ielmn,NZ) &
                         *FSNCP*AZMAX1(EPOOLR(ielmn,2,LL,NZ))
-                      ESNC(M,ielmp,1,LL,NZ)=ESNC(M,ielmp,1,LL,NZ)+CFOPP(0,M,NZ) &
+                      ESNC(M,ielmp,1,LL,NZ)=ESNC(M,ielmp,1,LL,NZ)+CFOPE(0,M,ielmp,NZ) &
                         *FSNCP*AZMAX1(EPOOLR(ielmp,2,LL,NZ))
                     ENDDO D6450
                     RTLG2(2,LL,NR,NZ)=AZMAX1(RTLG2(2,LL,NR,NZ))*(1.0_r8-FSNCM)
@@ -1152,9 +1150,7 @@ implicit none
     FWODR   =>  plt_allom%FWODR     , &
     FWODRN  =>  plt_allom%FWODRN    , &
     FWODRP  =>  plt_allom%FWODRP    , &
-    CFOPC   =>  plt_soilchem%CFOPC  , &
-    CFOPN   =>  plt_soilchem%CFOPN  , &
-    CFOPP   =>  plt_soilchem%CFOPP  , &
+    CFOPE   =>  plt_soilchem%CFOPE  , &
     WFR     =>  plt_rbgc%WFR        , &
     ESNC    =>  plt_bgcr%ESNC       , &
     IDAY    =>  plt_pheno%IDAY      , &
@@ -1250,17 +1246,17 @@ implicit none
 !     FWOOD,FWOODN,FWOODP=C,N,P woody fraction in root:0=woody,1=non-woody
 !
   D6355: DO M=1,jsken
-    ESNC(M,ielmc,0,L,NZ)=ESNC(M,ielmc,0,L,NZ)+CFOPC(5,M,NZ) &
+    ESNC(M,ielmc,0,L,NZ)=ESNC(M,ielmc,0,L,NZ)+CFOPE(5,M,ielmc,NZ) &
       *FSNC1*(RTWT1(N,NR,NZ)-RCCR)*FWODR(0)
-    ESNC(M,ielmn,0,L,NZ)=ESNC(M,ielmn,0,L,NZ)+CFOPN(5,M,NZ) &
+    ESNC(M,ielmn,0,L,NZ)=ESNC(M,ielmn,0,L,NZ)+CFOPE(5,M,ielmn,NZ) &
       *FSNC1*(RTWT1N(N,NR,NZ)-RCZR)*FWODRN(0)
-    ESNC(M,ielmp,0,L,NZ)=ESNC(M,ielmp,0,L,NZ)+CFOPP(5,M,NZ) &
+    ESNC(M,ielmp,0,L,NZ)=ESNC(M,ielmp,0,L,NZ)+CFOPE(5,M,ielmp,NZ) &
       *FSNC1*(RTWT1P(N,NR,NZ)-RCPR)*FWODRP(0)
-    ESNC(M,ielmc,1,L,NZ)=ESNC(M,ielmc,1,L,NZ)+CFOPC(4,M,NZ) &
+    ESNC(M,ielmc,1,L,NZ)=ESNC(M,ielmc,1,L,NZ)+CFOPE(4,M,ielmc,NZ) &
       *FSNC1*(RTWT1(N,NR,NZ)-RCCR)*FWODR(1)
-    ESNC(M,ielmn,1,L,NZ)=ESNC(M,ielmn,1,L,NZ)+CFOPN(4,M,NZ) &
+    ESNC(M,ielmn,1,L,NZ)=ESNC(M,ielmn,1,L,NZ)+CFOPE(4,M,ielmn,NZ) &
       *FSNC1*(RTWT1N(N,NR,NZ)-RCZR)*FWODRN(1)
-    ESNC(M,ielmp,1,L,NZ)=ESNC(M,ielmp,1,L,NZ)+CFOPP(4,M,NZ) &
+    ESNC(M,ielmp,1,L,NZ)=ESNC(M,ielmp,1,L,NZ)+CFOPE(4,M,ielmp,NZ) &
       *FSNC1*(RTWT1P(N,NR,NZ)-RCPR)*FWODRP(1)
   ENDDO D6355
   end associate

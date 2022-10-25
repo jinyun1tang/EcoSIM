@@ -360,9 +360,7 @@ implicit none
 
   type, public :: plant_soilchem_type
   real(r8), pointer :: FOSRH(:,:)  => null()  !fraction of total organic C in complex, [-]
-  real(r8), pointer :: CFOPC(:,:,:)=> null()  !litter kinetic fraction, [-]
-  real(r8), pointer :: CFOPN(:,:,:)=> null()  !litterfall kinetic N fraction, [-]
-  real(r8), pointer :: CFOPP(:,:,:)=> null()  !litter P kinetic fraction, [-]
+  real(r8), pointer :: CFOPE(:,:,:,:)=> null() !litter kinetic fraction, [-]
   real(r8), pointer :: TFND(:)     => null()  !temperature effect on diffusivity
   real(r8), pointer :: THETPM(:,:) => null()  !soil air-filled porosity, [m3 m-3]
   real(r8), pointer :: DFGS(:,:)   => null()  !coefficient for dissolution - volatilization, []
@@ -1764,9 +1762,7 @@ implicit none
   class(plant_soilchem_type) :: this
 
   allocate(this%FOSRH(0:jcplx11,0:JZ1))
-  allocate(this%CFOPC(0:Jlitgrp,jsken,JP1))
-  allocate(this%CFOPN(0:Jlitgrp,jsken,JP1))
-  allocate(this%CFOPP(0:Jlitgrp,jsken,JP1))
+  allocate(this%CFOPE(0:Jlitgrp,jsken,npelms,JP1))
   allocate(this%TFND(0:JZ1))
   allocate(this%THETPM(60,0:JZ1))
   allocate(this%DFGS(60,0:JZ1))
@@ -1854,9 +1850,7 @@ implicit none
 
 !  if(allocated(FOSRH))deallocate(FOSRH)
 
-!  if(allocated(CFOPC))deallocate(CFOPC)
-!  if(allocated(CFOPN))deallocate(CFOPN)
-!  if(allocated(CFOPP))deallocate(CFOPP)
+!  if(allocated(CFOPE))deallocate(CFOPE)
 !  if(allocated(TFND))deallocate(TFND)
 !  if(allocated(THETPM))deallocate(THETPM)
 !  if(allocated(DFGS))deallocate(DFGS)
