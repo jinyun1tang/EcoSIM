@@ -527,16 +527,14 @@ module StartqMod
     WTSTXB(NB,NZ,NY,NX)=0._r8
     WTSTXN(NB,NZ,NY,NX)=0._r8
     WTSTXP(NB,NZ,NY,NX)=0._r8
-    WGSHEX(NB,NZ,NY,NX)=0._r8
-    WGSHNX(NB,NZ,NY,NX)=0._r8
-    WGSHPX(NB,NZ,NY,NX)=0._r8
+    WGSHEXE(NB,1:npelms,NZ,NY,NX)=0._r8
     HTSHEX(NB,NZ,NY,NX)=0._r8
-    DO 5 L=1,JC
+    D5: DO L=1,JC
       ARSTK(L,NB,NZ,NY,NX)=0._r8
       DO N=1,JLI
         SURFB(N,L,NB,NZ,NY,NX)=0._r8
       enddo
-5   CONTINUE
+    ENDDO D5
     DO K=0,JNODS
       ARLF(K,NB,NZ,NY,NX)=0._r8
       HTNODE(K,NB,NZ,NY,NX)=0._r8
@@ -546,10 +544,8 @@ module StartqMod
       WSLF(K,NB,NZ,NY,NX)=0._r8
       WGLFN(K,NB,NZ,NY,NX)=0._r8
       WGLFP(K,NB,NZ,NY,NX)=0._r8
-      WGSHE(K,NB,NZ,NY,NX)=0._r8
+      WGSHE(K,NB,1:npelms,NZ,NY,NX)=0._r8
       WSSHE(K,NB,NZ,NY,NX)=0._r8
-      WGSHN(K,NB,NZ,NY,NX)=0._r8
-      WGSHP(K,NB,NZ,NY,NX)=0._r8
       WGNODE(K,NB,NZ,NY,NX)=0._r8
       WGNODN(K,NB,NZ,NY,NX)=0._r8
       WGNODP(K,NB,NZ,NY,NX)=0._r8

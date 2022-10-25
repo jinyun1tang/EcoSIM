@@ -537,9 +537,7 @@ implicit none
   real(r8), pointer :: WGLFN(:,:,:)   => null()    !leaf N, [g d-2]
   real(r8), pointer :: WGLFP(:,:,:)   => null()    !leaf P, [g d-2]
   real(r8), pointer :: WSLF(:,:,:)    => null()    !layer leaf protein C, [g d-2]
-  real(r8), pointer :: WGSHE(:,:,:)   => null()    !sheath C , [g d-2]
-  real(r8), pointer :: WGSHN(:,:,:)   => null()    !sheath N, [g d-2]
-  real(r8), pointer :: WGSHP(:,:,:)   => null()    !sheath P, [g d-2]
+  real(r8), pointer :: WGSHE(:,:,:,:)   => null()  !sheath element , [g d-2]
   real(r8), pointer :: WSSHE(:,:,:)   => null()    !layer sheath protein C, [g d-2]
   real(r8), pointer :: WGLFL(:,:,:,:) => null()    !layer leaf C, [g d-2]
   real(r8), pointer :: WGLFLN(:,:,:,:)=> null()    !layer leaf N, [g d-2]
@@ -570,9 +568,7 @@ implicit none
   real(r8), pointer :: WGLFX(:,:)     => null()   !branch leaf structural C, [g d-2]
   real(r8), pointer :: WGLFNX(:,:)    => null()   !branch leaf structural N, [g d-2]
   real(r8), pointer :: WGLFPX(:,:)    => null()   !branch leaf structural P, [g d-2]
-  real(r8), pointer :: WGSHEX(:,:)    => null()   !branch sheath structural C, [g d-2]
-  real(r8), pointer :: WGSHNX(:,:)    => null()   !branch sheath structural N, [g d-2]
-  real(r8), pointer :: WGSHPX(:,:)    => null()   !branch sheath structural P, [g d-2]
+  real(r8), pointer :: WGSHEXE(:,:,:) => null()   !branch sheath structural element, [g d-2]
   real(r8), pointer :: WTSTXB(:,:)    => null()   !branch stalk structural C, [g d-2]
   real(r8), pointer :: WTSTXN(:,:)    => null()   !branch stalk structural N, [g d-2]
   real(r8), pointer :: WTSTXP(:,:)    => null()   !branch stalk structural P, [g d-2]
@@ -1640,9 +1636,7 @@ implicit none
   allocate(this%WGLF(0:JNODS1,JC1,JP1))
   allocate(this%WGLFN(0:JNODS1,JC1,JP1))
   allocate(this%WGLFP(0:JNODS1,JC1,JP1))
-  allocate(this%WGSHE(0:JNODS1,JC1,JP1))
-  allocate(this%WGSHN(0:JNODS1,JC1,JP1))
-  allocate(this%WGSHP(0:JNODS1,JC1,JP1))
+  allocate(this%WGSHE(0:JNODS1,JC1,npelms,JP1))
   allocate(this%WGLFL(JC1,0:JNODS1,JC1,JP1))
   allocate(this%WGLFLN(JC1,0:JNODS1,JC1,JP1))
   allocate(this%WGLFLP(JC1,0:JNODS1,JC1,JP1))
@@ -1667,9 +1661,7 @@ implicit none
   allocate(this%WGLFX(JC1,JP1))
   allocate(this%WGLFNX(JC1,JP1))
   allocate(this%WGLFPX(JC1,JP1))
-  allocate(this%WGSHEX(JC1,JP1))
-  allocate(this%WGSHNX(JC1,JP1))
-  allocate(this%WGSHPX(JC1,JP1))
+  allocate(this%WGSHEXE(JC1,npelms,JP1))
   allocate(this%WTSHTE(npelms,JP1))
   allocate(this%WTSHTA(JP1))
   allocate(this%WTLFE(npelms,JP1))
@@ -1735,8 +1727,6 @@ implicit none
 !  if(allocated(WGNODN))deallocate(WGNODN)
 !  if(allocated(WGNODP))deallocate(WGNODP)
 !  if(allocated(WGSHE))deallocate(WGSHE)
-!  if(allocated(WGSHN))deallocate(WGSHN)
-!  if(allocated(WGSHP))deallocate(WGSHP)
 !  if(allocated(WVSTKB))deallocate(WVSTKB)
 !  if(allocated(PPOOL))deallocate(PPOOL)
 !  if(allocated(EPOLNB))deallocate(EPOLNB)
@@ -1757,9 +1747,7 @@ implicit none
 !  if(allocated(WGLFX))deallocate(WGLFX)
 !  if(allocated(WGLFNX))deallocate(WGLFNX)
 !  if(allocated(WGLFPX))deallocate(WGLFPX)
-!  if(allocated(WGSHEX))deallocate(WGSHEX)
-!  if(allocated(WGSHNX))deallocate(WGSHNX)
-!  if(allocated(WGSHPX))deallocate(WGSHPX)
+!  if(allocated(WGSHEXE))deallocate(WGSHEXE)
 !  if(allocated(WTLSB))deallocate(WTLSB)
 !  if(allocated(WTRSVBE))deallocate(WTRSVBE)
 !  if(allocated(WTLFBE))deallocate(WTLFBE)

@@ -150,9 +150,9 @@
             READ(27,92)IDATE,IYR,NZ,(RCZLX(NB,NZ,NY,NX),NB=1,NBR(NZ,NY,NX))
             READ(27,92)IDATE,IYR,NZ,(RCPLX(NB,NZ,NY,NX),NB=1,NBR(NZ,NY,NX))
             READ(27,92)IDATE,IYR,NZ,(RCCLX(NB,NZ,NY,NX),NB=1,NBR(NZ,NY,NX))
-            READ(27,92)IDATE,IYR,NZ,(WGSHEX(NB,NZ,NY,NX),NB=1,NBR(NZ,NY,NX))
-            READ(27,92)IDATE,IYR,NZ,(WGSHNX(NB,NZ,NY,NX),NB=1,NBR(NZ,NY,NX))
-            READ(27,92)IDATE,IYR,NZ,(WGSHPX(NB,NZ,NY,NX),NB=1,NBR(NZ,NY,NX))
+            READ(27,92)IDATE,IYR,NZ,(WGSHEXE(NB,ielmc,NZ,NY,NX),NB=1,NBR(NZ,NY,NX))
+            READ(27,92)IDATE,IYR,NZ,(WGSHEXE(NB,ielmn,NZ,NY,NX),NB=1,NBR(NZ,NY,NX))
+            READ(27,92)IDATE,IYR,NZ,(WGSHEXE(NB,ielmp,NZ,NY,NX),NB=1,NBR(NZ,NY,NX))
             READ(27,92)IDATE,IYR,NZ,(HTSHEX(NB,NZ,NY,NX),NB=1,NBR(NZ,NY,NX))
             READ(27,92)IDATE,IYR,NZ,(RCZSX(NB,NZ,NY,NX),NB=1,NBR(NZ,NY,NX))
             READ(27,92)IDATE,IYR,NZ,(RCPSX(NB,NZ,NY,NX),NB=1,NBR(NZ,NY,NX))
@@ -171,16 +171,16 @@
               READ(28,93)IDATE,IYR,NZ,(WGLF(K,NB,NZ,NY,NX),K=0,JNODS)
               READ(28,93)IDATE,IYR,NZ,(WSLF(K,NB,NZ,NY,NX),K=0,JNODS)
               READ(28,93)IDATE,IYR,NZ,(HTSHE(K,NB,NZ,NY,NX),K=0,JNODS)
-              READ(28,93)IDATE,IYR,NZ,(WGSHE(K,NB,NZ,NY,NX),K=0,JNODS)
+              READ(28,93)IDATE,IYR,NZ,(WGSHE(K,NB,ielmc,NZ,NY,NX),K=0,JNODS)
               READ(28,93)IDATE,IYR,NZ,(WSSHE(K,NB,NZ,NY,NX),K=0,JNODS)
               READ(28,93)IDATE,IYR,NZ,(HTNODE(K,NB,NZ,NY,NX),K=0,JNODS)
               READ(28,93)IDATE,IYR,NZ,(HTNODX(K,NB,NZ,NY,NX),K=0,JNODS)
               READ(28,93)IDATE,IYR,NZ,(WGNODE(K,NB,NZ,NY,NX),K=0,JNODS)
               READ(28,93)IDATE,IYR,NZ,(WGLFN(K,NB,NZ,NY,NX),K=0,JNODS)
-              READ(28,93)IDATE,IYR,NZ,(WGSHN(K,NB,NZ,NY,NX),K=0,JNODS)
+              READ(28,93)IDATE,IYR,NZ,(WGSHE(K,NB,ielmn,NZ,NY,NX),K=0,JNODS)
               READ(28,93)IDATE,IYR,NZ,(WGNODN(K,NB,NZ,NY,NX),K=0,JNODS)
               READ(28,93)IDATE,IYR,NZ,(WGLFP(K,NB,NZ,NY,NX),K=0,JNODS)
-              READ(28,93)IDATE,IYR,NZ,(WGSHP(K,NB,NZ,NY,NX),K=0,JNODS)
+              READ(28,93)IDATE,IYR,NZ,(WGSHE(K,NB,ielmp,NZ,NY,NX),K=0,JNODS)
               READ(28,93)IDATE,IYR,NZ,(WGNODP(K,NB,NZ,NY,NX),K=0,JNODS)
               DO 9950 K=0,JNODS
                 READ(28,94)IDATE,IYR,NZ,(ARLFL(L,K,NB,NZ,NY,NX),L=1,JC)
@@ -346,16 +346,14 @@
                 WTSTXB(NB,NZ,NY,NX)=0.0
                 WTSTXN(NB,NZ,NY,NX)=0.0
                 WTSTXP(NB,NZ,NY,NX)=0.0
-                WGSHEX(NB,NZ,NY,NX)=0.0
-                WGSHNX(NB,NZ,NY,NX)=0.0
-                WGSHPX(NB,NZ,NY,NX)=0.0
+                WGSHEXE(NB,1:npelms,NZ,NY,NX)=0.0
                 HTSHEX(NB,NZ,NY,NX)=0.0
-                DO 5 L=1,JZ
+                D5: DO L=1,JZ
                   ARSTK(L,NB,NZ,NY,NX)=0.0
                   DO N=1,JLI
                     SURFB(N,L,NB,NZ,NY,NX)=0.0
                   ENDDO
-5               CONTINUE
+                ENDDO D5
 9600          CONTINUE
               DO 9610 NB=NBR(NZ,NY,NX)+1,10
                 DO 9620 K=0,JNODS
@@ -367,19 +365,17 @@
                   WSLF(K,NB,NZ,NY,NX)=0.0
                   WGLFN(K,NB,NZ,NY,NX)=0.0
                   WGLFP(K,NB,NZ,NY,NX)=0.0
-                  WGSHE(K,NB,NZ,NY,NX)=0.0
+                  WGSHE(K,NB,1:npelms,NZ,NY,NX)=0.0
                   WSSHE(K,NB,NZ,NY,NX)=0.0
-                  WGSHN(K,NB,NZ,NY,NX)=0.0
-                  WGSHP(K,NB,NZ,NY,NX)=0.0
                   WGNODE(K,NB,NZ,NY,NX)=0.0
                   WGNODN(K,NB,NZ,NY,NX)=0.0
                   WGNODP(K,NB,NZ,NY,NX)=0.0
-                  DO 55 L=1,JZ
+                  D55: DO L=1,JZ
                     ARLFL(L,K,NB,NZ,NY,NX)=0.0
                     WGLFL(L,K,NB,NZ,NY,NX)=0.0
                     WGLFLN(L,K,NB,NZ,NY,NX)=0.0
                     WGLFLP(L,K,NB,NZ,NY,NX)=0.0
-55                CONTINUE
+                  ENDDO D55
                   IF(K.NE.0)THEN
                     CPOOL3(K,NB,NZ,NY,NX)=0.0
                     CO2B(K,NB,NZ,NY,NX)=0.0

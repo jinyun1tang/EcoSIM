@@ -879,8 +879,6 @@ implicit none
     WGNODE   => plt_biom%WGNODE     , &
     WGNODN   => plt_biom%WGNODN     , &
     WGNODP   => plt_biom%WGNODP     , &
-    WGSHP    => plt_biom%WGSHP      , &
-    WGSHN    => plt_biom%WGSHN      , &
     WGSHE    => plt_biom%WGSHE      , &
     WGLFLN   => plt_biom%WGLFLN     , &
     WGLFL    => plt_biom%WGLFL      , &
@@ -988,10 +986,10 @@ implicit none
     WSLF(K,NB,NZ)=0._r8
     WGLFN(K,NB,NZ)=0._r8
     WGLFP(K,NB,NZ)=0._r8
-    WGSHE(K,NB,NZ)=0._r8
+    WGSHE(K,NB,ielmc,NZ)=0._r8
     WSSHE(K,NB,NZ)=0._r8
-    WGSHN(K,NB,NZ)=0._r8
-    WGSHP(K,NB,NZ)=0._r8
+    WGSHE(K,NB,ielmn,NZ)=0._r8
+    WGSHE(K,NB,ielmp,NZ)=0._r8
     WGNODE(K,NB,NZ)=0._r8
     WGNODN(K,NB,NZ)=0._r8
     WGNODP(K,NB,NZ)=0._r8

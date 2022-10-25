@@ -427,6 +427,7 @@ implicit none
         WTHSKBE(NB,NE,NZ,NY,NX)=plt_biom%WTHSKBE(NB,NE,NZ)
         WTGRBE(NB,NE,NZ,NY,NX) =plt_biom%WTGRBE(NB,NE,NZ)
         WTNDBE(NB,NE,NZ,NY,NX) =plt_biom%WTNDBE(NB,NE,NZ)
+        WGSHEXE(NB,NE,NZ,NY,NX)=plt_biom%WGSHEXE(NB,NE,NZ)
       ENDDO
     ENDDO
     DO NB=1,NBR(NZ,NY,NX)
@@ -486,9 +487,6 @@ implicit none
       WGLFX(NB,NZ,NY,NX) =plt_biom%WGLFX(NB,NZ)
       WGLFNX(NB,NZ,NY,NX)=plt_biom%WGLFNX(NB,NZ)
       WGLFPX(NB,NZ,NY,NX)=plt_biom%WGLFPX(NB,NZ)
-      WGSHEX(NB,NZ,NY,NX)=plt_biom%WGSHEX(NB,NZ)
-      WGSHNX(NB,NZ,NY,NX)=plt_biom%WGSHNX(NB,NZ)
-      WGSHPX(NB,NZ,NY,NX)=plt_biom%WGSHPX(NB,NZ)
       WTSTXB(NB,NZ,NY,NX)=plt_biom%WTSTXB(NB,NZ)
       WTSTXN(NB,NZ,NY,NX)=plt_biom%WTSTXN(NB,NZ)
       WTSTXP(NB,NZ,NY,NX)=plt_biom%WTSTXP(NB,NZ)
@@ -506,9 +504,7 @@ implicit none
         WGLFN(K,NB,NZ,NY,NX) =plt_biom%WGLFN(K,NB,NZ)
         WGLFP(K,NB,NZ,NY,NX) =plt_biom%WGLFP(K,NB,NZ)
         WSLF(K,NB,NZ,NY,NX)  =plt_biom%WSLF(K,NB,NZ)
-        WGSHE(K,NB,NZ,NY,NX) =plt_biom%WGSHE(K,NB,NZ)
-        WGSHN(K,NB,NZ,NY,NX) =plt_biom%WGSHN(K,NB,NZ)
-        WGSHP(K,NB,NZ,NY,NX) =plt_biom%WGSHP(K,NB,NZ)
+        WGSHE(K,NB,1:npelms,NZ,NY,NX) =plt_biom%WGSHE(K,NB,1:npelms,NZ)
         WSSHE(K,NB,NZ,NY,NX) =plt_biom%WSSHE(K,NB,NZ)
       ENDDO
       DO  L=1,JC
@@ -1363,6 +1359,7 @@ implicit none
         plt_biom%WTGRBE(NB,NE,NZ)=WTGRBE(NB,NE,NZ,NY,NX)
         plt_biom%WTEARBE(NB,NE,NZ)=WTEARBE(NB,NE,NZ,NY,NX)
         plt_biom%WTNDBE(NB,NE,NZ)=WTNDBE(NB,NE,NZ,NY,NX)
+        plt_biom%WGSHEXE(NB,NE,NZ)=WGSHEXE(NB,NE,NZ,NY,NX)
       ENDDO
     ENDDO
 
@@ -1417,9 +1414,6 @@ implicit none
       plt_biom%WGLFX(NB,NZ) =WGLFX(NB,NZ,NY,NX)
       plt_biom%WGLFNX(NB,NZ)=WGLFNX(NB,NZ,NY,NX)
       plt_biom%WGLFPX(NB,NZ)=WGLFPX(NB,NZ,NY,NX)
-      plt_biom%WGSHEX(NB,NZ)=WGSHEX(NB,NZ,NY,NX)
-      plt_biom%WGSHNX(NB,NZ)=WGSHNX(NB,NZ,NY,NX)
-      plt_biom%WGSHPX(NB,NZ)=WGSHPX(NB,NZ,NY,NX)
       plt_biom%WTSTXB(NB,NZ)=WTSTXB(NB,NZ,NY,NX)
       plt_biom%WTSTXN(NB,NZ)=WTSTXN(NB,NZ,NY,NX)
       plt_biom%WTSTXP(NB,NZ)=WTSTXP(NB,NZ,NY,NX)
@@ -1461,9 +1455,7 @@ implicit none
         plt_biom%WGLFN(K,NB,NZ)  =WGLFN(K,NB,NZ,NY,NX)
         plt_biom%WGLFP(K,NB,NZ)  =WGLFP(K,NB,NZ,NY,NX)
         plt_biom%WSLF(K,NB,NZ)   =WSLF(K,NB,NZ,NY,NX)
-        plt_biom%WGSHE(K,NB,NZ)  =WGSHE(K,NB,NZ,NY,NX)
-        plt_biom%WGSHN(K,NB,NZ)  =WGSHN(K,NB,NZ,NY,NX)
-        plt_biom%WGSHP(K,NB,NZ)  =WGSHP(K,NB,NZ,NY,NX)
+        plt_biom%WGSHE(K,NB,1:npelms,NZ)  =WGSHE(K,NB,1:npelms,NZ,NY,NX)
         plt_biom%WSSHE(K,NB,NZ)  =WSSHE(K,NB,NZ,NY,NX)
       ENDDO
 

@@ -732,7 +732,6 @@ module PlantDisturbsMod
     WTSTKBE  =>  plt_biom%WTSTKBE    , &
     WGLFLN   =>  plt_biom%WGLFLN     , &
     WGLFL    =>  plt_biom%WGLFL      , &
-    WGSHP    =>  plt_biom%WGSHP      , &
     WTSHEBE  =>  plt_biom%WTSHEBE    , &
     WGLF     =>  plt_biom%WGLF       , &
     WTSTXN   =>  plt_biom%WTSTXN     , &
@@ -745,7 +744,6 @@ module PlantDisturbsMod
     WGSHE    =>  plt_biom%WGSHE      , &
     WTRT1E   =>  plt_biom%WTRT1E     , &
     WSLF     =>  plt_biom%WSLF       , &
-    WGSHN    =>  plt_biom%WGSHN      , &
     WGNODE   =>  plt_biom%WGNODE     , &
     WGLFN    =>  plt_biom%WGLFN      , &
     WGNODN   =>  plt_biom%WGNODN     , &
@@ -1000,16 +998,16 @@ module PlantDisturbsMod
               WGLF(K,NB,NZ)=WGLF(K,NB,NZ)*XHVST
               WSLF(K,NB,NZ)=WSLF(K,NB,NZ)*XHVST
 !     HTSHE(K,NB,NZ)=HTSHE(K,NB,NZ)*XHVST
-              WGSHE(K,NB,NZ)=WGSHE(K,NB,NZ)*XHVST
+              WGSHE(K,NB,ielmc,NZ)=WGSHE(K,NB,ielmc,NZ)*XHVST
               WSSHE(K,NB,NZ)=WSSHE(K,NB,NZ)*XHVST
 !     HTNODE(K,NB,NZ)=HTNODE(K,NB,NZ)*XHVST
 !     HTNODX(K,NB,NZ)=HTNODX(K,NB,NZ)*XHVST
               WGNODE(K,NB,NZ)=WGNODE(K,NB,NZ)*XHVST
               WGLFN(K,NB,NZ)=WGLFN(K,NB,NZ)*XHVST
-              WGSHN(K,NB,NZ)=WGSHN(K,NB,NZ)*XHVST
+              WGSHE(K,NB,ielmn,NZ)=WGSHE(K,NB,ielmn,NZ)*XHVST
               WGNODN(K,NB,NZ)=WGNODN(K,NB,NZ)*XHVST
               WGLFP(K,NB,NZ)=WGLFP(K,NB,NZ)*XHVST
-              WGSHP(K,NB,NZ)=WGSHP(K,NB,NZ)*XHVST
+              WGSHE(K,NB,ielmp,NZ)=WGSHE(K,NB,ielmp,NZ)*XHVST
               WGNODP(K,NB,NZ)=WGNODP(K,NB,NZ)*XHVST
               DO 8965 L=1,JC1
                 ARLFL(L,K,NB,NZ)=ARLFL(L,K,NB,NZ)*XHVST
@@ -1347,8 +1345,6 @@ module PlantDisturbsMod
     WGLF     => plt_biom%WGLF      , &
     WTLFBE   => plt_biom%WTLFBE    , &
     WSSHE    => plt_biom%WSSHE     , &
-    WGSHN    => plt_biom%WGSHN     , &
-    WGSHP    => plt_biom%WGSHP     , &
     WTSTKE   => plt_biom%WTSTKE    , &
     CEPOLP   => plt_biom%CEPOLP    , &
     CCPLNP   => plt_biom%CCPLNP    , &
@@ -1926,27 +1922,27 @@ module PlantDisturbsMod
 !
           IF((IHVST(NZ).NE.4.AND.IHVST(NZ).NE.6).OR.WHVSBS.GT.0.0)THEN
             IF(IHVST(NZ).EQ.4.OR.IHVST(NZ).EQ.6)THEN
-              IF(WGSHE(K,NB,NZ).GT.WHVSBS)THEN
-                FHVSTK(K)=AZMAX1(AMIN1(1.0_r8,(WGSHE(K,NB,NZ)-WHVSBS)/WGSHE(K,NB,NZ)))
+              IF(WGSHE(K,NB,ielmc,NZ).GT.WHVSBS)THEN
+                FHVSTK(K)=AZMAX1(AMIN1(1.0_r8,(WGSHE(K,NB,ielmc,NZ)-WHVSBS)/WGSHE(K,NB,ielmc,NZ)))
                 FHVSHK(K)=FHVSTK(K)
               ELSE
                 FHVSTK(K)=0._r8
                 FHVSHK(K)=0._r8
               ENDIF
             ENDIF
-            WHVSBS=WHVSBS-(1._r8-FHVSTK(K))*WGSHE(K,NB,NZ)
-            WTHTH2=WTHTH2+(1._r8-FHVSHK(K))*WGSHE(K,NB,NZ)*FWODB(1)
-            WTHNH2=WTHNH2+(1._r8-FHVSHK(K))*WGSHN(K,NB,NZ)*FWODSN(1)
-            WTHPH2=WTHPH2+(1._r8-FHVSHK(K))*WGSHP(K,NB,NZ)*FWODSP(1)
-            WTHTX2=WTHTX2+(FHVSHK(K)-FHVSTK(K))*WGSHE(K,NB,NZ)*FWODB(1)
-            WTHNX2=WTHNX2+(FHVSHK(K)-FHVSTK(K))*WGSHN(K,NB,NZ)*FWODSN(1)
-            WTHPX2=WTHPX2+(FHVSHK(K)-FHVSTK(K))*WGSHP(K,NB,NZ)*FWODSP(1)
-            WTHTH3=WTHTH3+(1._r8-FHVSHK(K))*WGSHE(K,NB,NZ)*FWODB(0)
-            WTHNH3=WTHNH3+(1._r8-FHVSHK(K))*WGSHN(K,NB,NZ)*FWODSN(0)
-            WTHPH3=WTHPH3+(1._r8-FHVSHK(K))*WGSHP(K,NB,NZ)*FWODSP(0)
-            WTHTX3=WTHTX3+(FHVSHK(K)-FHVSTK(K))*WGSHE(K,NB,NZ)*FWODB(0)
-            WTHNX3=WTHNX3+(FHVSHK(K)-FHVSTK(K))*WGSHN(K,NB,NZ)*FWODSN(0)
-            WTHPX3=WTHPX3+(FHVSHK(K)-FHVSTK(K))*WGSHP(K,NB,NZ)*FWODSP(0)
+            WHVSBS=WHVSBS-(1._r8-FHVSTK(K))*WGSHE(K,NB,ielmc,NZ)
+            WTHTH2=WTHTH2+(1._r8-FHVSHK(K))*WGSHE(K,NB,ielmc,NZ)*FWODB(1)
+            WTHNH2=WTHNH2+(1._r8-FHVSHK(K))*WGSHE(K,NB,ielmn,NZ)*FWODSN(1)
+            WTHPH2=WTHPH2+(1._r8-FHVSHK(K))*WGSHE(K,NB,ielmp,NZ)*FWODSP(1)
+            WTHTX2=WTHTX2+(FHVSHK(K)-FHVSTK(K))*WGSHE(K,NB,ielmc,NZ)*FWODB(1)
+            WTHNX2=WTHNX2+(FHVSHK(K)-FHVSTK(K))*WGSHE(K,NB,ielmn,NZ)*FWODSN(1)
+            WTHPX2=WTHPX2+(FHVSHK(K)-FHVSTK(K))*WGSHE(K,NB,ielmp,NZ)*FWODSP(1)
+            WTHTH3=WTHTH3+(1._r8-FHVSHK(K))*WGSHE(K,NB,ielmc,NZ)*FWODB(0)
+            WTHNH3=WTHNH3+(1._r8-FHVSHK(K))*WGSHE(K,NB,ielmn,NZ)*FWODSN(0)
+            WTHPH3=WTHPH3+(1._r8-FHVSHK(K))*WGSHE(K,NB,ielmp,NZ)*FWODSP(0)
+            WTHTX3=WTHTX3+(FHVSHK(K)-FHVSTK(K))*WGSHE(K,NB,ielmc,NZ)*FWODB(0)
+            WTHNX3=WTHNX3+(FHVSHK(K)-FHVSTK(K))*WGSHE(K,NB,ielmn,NZ)*FWODSN(0)
+            WTHPX3=WTHPX3+(FHVSHK(K)-FHVSTK(K))*WGSHE(K,NB,ielmp,NZ)*FWODSP(0)
 !
 !     ACCUMULATE REMAINING SHEATH OR PETIOLE C,N,P AND LENGTH
 !
@@ -1955,17 +1951,17 @@ module PlantDisturbsMod
 !     HTSHE=node petiole height
 !     WSSHE=petiole protein mass
 !
-            WGSHGY=WGSHGY+WGSHE(K,NB,NZ)
+            WGSHGY=WGSHGY+WGSHE(K,NB,ielmc,NZ)
             WTSHEBE(NB,ielmc,NZ)=WTSHEBE(NB,ielmc,NZ) &
-              -(1._r8-FHVSTK(K))*WGSHE(K,NB,NZ)
+              -(1._r8-FHVSTK(K))*WGSHE(K,NB,ielmc,NZ)
             WTSHEBE(NB,ielmn,NZ)=WTSHEBE(NB,ielmn,NZ) &
-              -(1._r8-FHVSTK(K))*WGSHN(K,NB,NZ)
+              -(1._r8-FHVSTK(K))*WGSHE(K,NB,ielmn,NZ)
             WTSHEBE(NB,ielmp,NZ)=WTSHEBE(NB,ielmp,NZ) &
-              -(1._r8-FHVSTK(K))*WGSHP(K,NB,NZ)
-            WGSHE(K,NB,NZ)=FHVSTK(K)*WGSHE(K,NB,NZ)
+              -(1._r8-FHVSTK(K))*WGSHE(K,NB,ielmp,NZ)
+            WGSHE(K,NB,ielmc,NZ)=FHVSTK(K)*WGSHE(K,NB,ielmc,NZ)
             WSSHE(K,NB,NZ)=FHVSTK(K)*WSSHE(K,NB,NZ)
-            WGSHN(K,NB,NZ)=FHVSTK(K)*WGSHN(K,NB,NZ)
-            WGSHP(K,NB,NZ)=FHVSTK(K)*WGSHP(K,NB,NZ)
+            WGSHE(K,NB,ielmn,NZ)=FHVSTK(K)*WGSHE(K,NB,ielmn,NZ)
+            WGSHE(K,NB,ielmp,NZ)=FHVSTK(K)*WGSHE(K,NB,ielmp,NZ)
             WSSHE(K,NB,NZ)=FHVSTK(K)*WSSHE(K,NB,NZ)
             IF(IHVST(NZ).LE.2.AND.HTSHE(K,NB,NZ).GT.0.0)THEN
               FHGT=AZMAX1(AMIN1(1.0_r8,(HTNODE(K,NB,NZ) &
@@ -1974,7 +1970,7 @@ module PlantDisturbsMod
             ELSE
               HTSHE(K,NB,NZ)=FHVSTK(K)*HTSHE(K,NB,NZ)
             ENDIF
-            WGSHGX=WGSHGX+WGSHE(K,NB,NZ)
+            WGSHGX=WGSHGX+WGSHE(K,NB,ielmc,NZ)
 !     IF(IHVST(NZ).NE.4.AND.IHVST(NZ).NE.6)THEN
 !     IF(HTNODE(K,NB,NZ).GT.HVST(NZ)
 !    2.OR.IHVST(NZ).EQ.3)THEN

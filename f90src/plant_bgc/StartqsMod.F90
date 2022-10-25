@@ -678,9 +678,7 @@ module StartqsMod
     plt_biom%WTSTXB(NB,NZ)=0._r8
     plt_biom%WTSTXN(NB,NZ)=0._r8
     plt_biom%WTSTXP(NB,NZ)=0._r8
-    plt_biom%WGSHEX(NB,NZ)=0._r8
-    plt_biom%WGSHNX(NB,NZ)=0._r8
-    plt_biom%WGSHPX(NB,NZ)=0._r8
+    plt_biom%WGSHEXE(NB,1:npelms,NZ)=0._r8
     HTSHEX(NB,NZ)=0._r8
     D5: DO L=1,JC1
       ARSTK(L,NB,NZ)=0._r8
@@ -697,10 +695,8 @@ module StartqsMod
       plt_biom%WSLF(K,NB,NZ)=0._r8
       plt_biom%WGLFN(K,NB,NZ)=0._r8
       plt_biom%WGLFP(K,NB,NZ)=0._r8
-      plt_biom%WGSHE(K,NB,NZ)=0._r8
+      plt_biom%WGSHE(K,NB,1:npelms,NZ)=0._r8
       plt_biom%WSSHE(K,NB,NZ)=0._r8
-      plt_biom%WGSHN(K,NB,NZ)=0._r8
-      plt_biom%WGSHP(K,NB,NZ)=0._r8
       plt_biom%WGNODE(K,NB,NZ)=0._r8
       plt_biom%WGNODN(K,NB,NZ)=0._r8
       plt_biom%WGNODP(K,NB,NZ)=0._r8
@@ -715,11 +711,11 @@ module StartqsMod
         CO2B(K,NB,NZ)=0._r8
         HCOB(K,NB,NZ)=0._r8
         CPOOL4(K,NB,NZ)=0._r8
-        DO 45 L=1,JC1
+        D45: DO L=1,JC1
           DO N=1,JLI1
             SURF(N,L,K,NB,NZ)=0._r8
           enddo
-45      CONTINUE
+        ENDDO D45
       ENDIF
     enddo
   ENDDO D25
