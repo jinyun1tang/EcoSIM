@@ -82,33 +82,33 @@ module grosubsMod
 !     INITIALIZE SENESCENCE ARRAYS
 !
 
-      D9980: DO NZ=1,NP0
-        D1: DO L=0,NJ
-          DO K=0,1
-            DO M=1,jsken
-              ESNC(M,1:npelms,K,L,NZ)=0._r8
-            ENDDO
-          ENDDO
-        ENDDO D1
-        HESNC(1:npelms,NZ)=0._r8
-        CNET(NZ)=0._r8
-        ZCX(NZ)=ZC(NZ)
-        ZC(NZ)=0._r8
-      ENDDO D9980
+  D9980: DO NZ=1,NP0
+    D1: DO L=0,NJ
+      DO K=0,micpar%n_pltlitrk
+        DO M=1,jsken
+          ESNC(M,1:npelms,K,L,NZ)=0._r8
+        ENDDO
+      ENDDO
+    ENDDO D1
+    HESNC(1:npelms,NZ)=0._r8
+    CNET(NZ)=0._r8
+    ZCX(NZ)=ZC(NZ)
+    ZC(NZ)=0._r8
+  ENDDO D9980
 !
 !     TRANSFORMATIONS IN LIVING PLANT POPULATIONS
 !
-      DO 9985 NZ=1,NP
+  D9985: DO NZ=1,NP
 
 ! IFLGC= flag for living pft
-        IF(IFLGC(NZ).EQ.1)THEN
-          call GrowPlant(I,J,NZ,ZCX,CPOOLK)
-        ENDIF
+    IF(IFLGC(NZ).EQ.1)THEN
+      call GrowPlant(I,J,NZ,ZCX,CPOOLK)
+    ENDIF
 
 !     HARVEST STANDING DEAD
 
-        call RemoveBiomassByDisturbance(I,J,NZ,CPOOLK)
-9985  CONTINUE
+    call RemoveBiomassByDisturbance(I,J,NZ,CPOOLK)
+  ENDDO D9985
 !
 ! TRANSFORMATIONS IN LIVING OR DEAD PLANT POPULATIONS
   call LiveDeadTransformation(I,J)
@@ -314,9 +314,7 @@ module grosubsMod
     UPNH4  => plt_rbgc%UPNH4        , &
     UPH1P  => plt_rbgc%UPH1P        , &
     UPNO3  => plt_rbgc%UPNO3        , &
-    HPUPTK => plt_rbgc%HPUPTK       , &
-    HZUPTK => plt_rbgc%HZUPTK       , &
-    HCUPTK => plt_rbgc%HCUPTK       , &
+    HEUPTK => plt_rbgc%HEUPTK       , &
     UPOME  => plt_rbgc%UPOME        , &
     SDAR   => plt_morph%SDAR        , &
     SDVL   => plt_morph%SDVL        , &
@@ -344,9 +342,9 @@ module grosubsMod
 !
     call ComputeTotalBiom(NZ,CPOOLK)
   ELSE
-    HCUPTK(NZ)=UPOME(ielmc,NZ)
-    HZUPTK(NZ)=UPOME(ielmn,NZ)+UPNH4(NZ)+UPNO3(NZ)+UPNF(NZ)
-    HPUPTK(NZ)=UPOME(ielmp,NZ)+UPH2P(NZ)+UPH1P(NZ)
+    HEUPTK(1:npelms,NZ)=UPOME(1:npelms,NZ)
+    HEUPTK(ielmn,NZ)=HEUPTK(ielmn,NZ)+UPNH4(NZ)+UPNO3(NZ)+UPNF(NZ)
+    HEUPTK(ielmp,NZ)=HEUPTK(ielmp,NZ)+UPH2P(NZ)+UPH1P(NZ)
   ENDIF
 !
   call RemoveBiomByManagement(I,J,NZ,CPOOLK)
@@ -674,9 +672,7 @@ module grosubsMod
     TZUPFX   =>  plt_bgcr%TZUPFX  , &
     TEUPTK   =>  plt_rbgc%TEUPTK  , &
     UPH1P    =>  plt_rbgc%UPH1P   , &
-    HCUPTK   =>  plt_rbgc%HCUPTK  , &
-    HZUPTK   =>  plt_rbgc%HZUPTK  , &
-    HPUPTK   =>  plt_rbgc%HPUPTK  , &
+    HEUPTK   =>  plt_rbgc%HEUPTK  , &
     UPNF     =>  plt_rbgc%UPNF    , &
     UPH2P    =>  plt_rbgc%UPH2P   , &
     UPNO3    =>  plt_rbgc%UPNO3   , &
@@ -774,12 +770,13 @@ module grosubsMod
 !     TCUPTK,TZUPTK,TPUPTK=cumulative PFT root-soil C,N,P exchange
 !     TZUPFX=cumulative PFT N2 fixation
 !
-  HCUPTK(NZ)=UPOME(ielmc,NZ)
-  HZUPTK(NZ)=UPOME(ielmn,NZ)+UPNH4(NZ)+UPNO3(NZ)+UPNF(NZ)
-  HPUPTK(NZ)=UPOME(ielmp,NZ)+UPH2P(NZ)+UPH1P(NZ)
-  TEUPTK(ielmc,NZ)=TEUPTK(ielmc,NZ)+UPOME(ielmc,NZ)
-  TEUPTK(ielmn,NZ)=TEUPTK(ielmn,NZ)+UPOME(ielmn,NZ)+UPNH4(NZ)+UPNO3(NZ)
-  TEUPTK(ielmp,NZ)=TEUPTK(ielmp,NZ)+UPOME(ielmp,NZ)+UPH2P(NZ)+UPH1P(NZ)
+  HEUPTK(1:npelms,NZ)=UPOME(1:npelms,NZ)
+  HEUPTK(ielmn,NZ)=HEUPTK(ielmn,NZ)+UPNH4(NZ)+UPNO3(NZ)+UPNF(NZ)
+  HEUPTK(ielmp,NZ)=HEUPTK(ielmp,NZ)+UPH2P(NZ)+UPH1P(NZ)
+
+  TEUPTK(1:npelms,NZ)=TEUPTK(1:npelms,NZ)+UPOME(1:npelms,NZ)
+  TEUPTK(ielmn,NZ)=TEUPTK(ielmn,NZ)+UPNH4(NZ)+UPNO3(NZ)
+  TEUPTK(ielmp,NZ)=TEUPTK(ielmp,NZ)+UPH2P(NZ)+UPH1P(NZ)
   TZUPFX(NZ)=TZUPFX(NZ)+UPNF(NZ)+UPNFC(NZ)
   end associate
   end subroutine AccumulateStates

@@ -6,6 +6,7 @@ module PlantAPI
   use HfuncsMod    , only : hfuncs
   use EcoSIMSolverPar
   use UptakesMod    , only : uptakes
+  use MicBGCPars    , only : micpar
   use PlantDisturbMod, only : PrepLandscapeGrazing
   use timings      , only : start_timer, end_timer
   use EcoSIMHistMod
@@ -118,12 +119,12 @@ implicit none
   TSHC(NY,NX)=plt_ew%TSHC
   TRAU(NY,NX)=plt_bgcr%TRAU
   ZESNC(1:npelms,NY,NX) =plt_bgcr%ZESNC(1:npelms)
+  XHVSTE(1:npelms,NY,NX)=plt_distb%XHVSTE(1:npelms)
   TVOLWC(NY,NX)=plt_ew%TVOLWC
   TSH(NY,NX)   =plt_ew%TSH
   WTSTGT(NY,NX)=plt_biom%WTSTGT
   UVOLO(NY,NX) =plt_ew%UVOLO
   ARSTC(NY,NX) =plt_morph%ARSTC
-  XHVSTE(1:npelms,NY,NX)=plt_distb%XHVSTE(1:npelms)
   ARLFC(NY,NX) =plt_morph%ARLFC
   TRN(NY,NX)   =plt_rad%TRN
   TLE(NY,NX)   =plt_ew%TLE
@@ -235,13 +236,33 @@ implicit none
     ENDDO
   ENDDO
   DO NZ=1,NP0(NY,NX)
-    WTRTE(1:npelms,NZ,NY,NX)  =plt_biom%WTRTE(1:npelms,NZ)
-    ARLFP(NZ,NY,NX) =plt_morph%ARLFP(NZ)
-    ARSTP(NZ,NY,NX) =plt_morph%ARSTP(NZ)
+    WTRTE(1:npelms,NZ,NY,NX) =plt_biom%WTRTE(1:npelms,NZ)
     BALE(1:npelms,NZ,NY,NX)  =plt_site%BALE(1:npelms,NZ)
     EPOOLP(1:npelms,NZ,NY,NX)=plt_biom%EPOOLP(1:npelms,NZ)
     EPOLNP(1:npelms,NZ,NY,NX)=plt_biom%EPOLNP(1:npelms,NZ)
     CEPOLP(1:npelms,NZ,NY,NX)=plt_biom%CEPOLP(1:npelms,NZ)
+    HESNC(1:npelms,NZ,NY,NX) =plt_bgcr%HESNC(1:npelms,NZ)
+    HVSTE(1:npelms,NZ,NY,NX) =plt_distb%HVSTE(1:npelms,NZ)
+    RSETE(1:npelms,NZ,NY,NX) =plt_pheno%RSETE(1:npelms,NZ)
+    TESN0(1:npelms,NZ,NY,NX) =plt_bgcr%TESN0(1:npelms,NZ)
+    TESNC(1:npelms,NZ,NY,NX) =plt_bgcr%TESNC(1:npelms,NZ)
+    THVSTE(1:npelms,NZ,NY,NX) =plt_distb%THVSTE(1:npelms,NZ)
+    TEUPTK(1:npelms,NZ,NY,NX) =plt_rbgc%TEUPTK(1:npelms,NZ)
+    UPOME(1:npelms,NZ,NY,NX)  =plt_rbgc%UPOME(1:npelms,NZ)
+    WTSTGE(1:npelms,NZ,NY,NX)  =plt_biom%WTSTGE(1:npelms,NZ)
+    WTRVE(1:npelms,NZ,NY,NX)  =plt_biom%WTRVE(1:npelms,NZ)
+    WTSHTE(1:npelms,NZ,NY,NX)  =plt_biom%WTSHTE(1:npelms,NZ)
+    WTLFE(1:npelms,NZ,NY,NX)   =plt_biom%WTLFE(1:npelms,NZ)
+    WTSHEE(1:npelms,NZ,NY,NX)  =plt_biom%WTSHEE(1:npelms,NZ)
+    WTSTKE(1:npelms,NZ,NY,NX)  =plt_biom%WTSTKE(1:npelms,NZ)
+    WTRSVE(1:npelms,NZ,NY,NX)  =plt_biom%WTRSVE(1:npelms,NZ)
+    WTHSKE(1:npelms,NZ,NY,NX)  =plt_biom%WTHSKE(1:npelms,NZ)
+    WTEARE(1:npelms,NZ,NY,NX)  =plt_biom%WTEARE(1:npelms,NZ)
+    WTGRE(1:npelms,NZ,NY,NX)   =plt_biom%WTGRE(1:npelms,NZ)
+    WTRTSE(1:npelms,NZ,NY,NX)  =plt_biom%WTRTSE(1:npelms,NZ)
+    WTNDE(1:npelms,NZ,NY,NX)   =plt_biom%WTNDE(1:npelms,NZ)
+    ARLFP(NZ,NY,NX) =plt_morph%ARLFP(NZ)
+    ARSTP(NZ,NY,NX) =plt_morph%ARSTP(NZ)
     CCPLNP(NZ,NY,NX)=plt_biom%CCPLNP(NZ)
     CNET(NZ,NY,NX)  =plt_bgcr%CNET(NZ)
     CO2Q(NZ,NY,NX)  =plt_photo%CO2Q(NZ)
@@ -266,12 +287,8 @@ implicit none
     FRADP(NZ,NY,NX) =plt_rad%FRADP(NZ)
     FNOD(NZ,NY,NX)  =plt_allom%FNOD(NZ)
     GRNO(NZ,NY,NX)  =plt_morph%GRNO(NZ)
-    HESNC(1:npelms,NZ,NY,NX) =plt_bgcr%HESNC(1:npelms,NZ)
-    HCUPTK(NZ,NY,NX)=plt_rbgc%HCUPTK(NZ)
-    HZUPTK(NZ,NY,NX)=plt_rbgc%HZUPTK(NZ)
-    HPUPTK(NZ,NY,NX)=plt_rbgc%HPUPTK(NZ)
+    HEUPTK(1:npelms,NZ,NY,NX)=plt_rbgc%HEUPTK(1:npelms,NZ)
     HTCTL(NZ,NY,NX) =plt_morph%HTCTL(NZ)
-    HVSTE(1:npelms,NZ,NY,NX) =plt_distb%HVSTE(1:npelms,NZ)
     HTC(NZ,NY,NX)   =plt_pheno%HTC(NZ)
     HFLXC(NZ,NY,NX) =plt_ew%HFLXC(NZ)
     HTSTZ(NZ,NY,NX) =plt_morph%HTSTZ(NZ)
@@ -313,7 +330,6 @@ implicit none
     RSMH(NZ,NY,NX)  =plt_photo%RSMH(NZ)
     RCMX(NZ,NY,NX)  =plt_photo%RCMX(NZ)
     RNH3C(NZ,NY,NX) =plt_bgcr%RNH3C(NZ)
-    RSETE(1:npelms,NZ,NY,NX) =plt_pheno%RSETE(1:npelms,NZ)
     RAD1(NZ,NY,NX)  =plt_rad%RAD1(NZ)
     RAZ(NZ,NY,NX)   =plt_ew%RAZ(NZ)
     RC(NZ,NY,NX)    =plt_photo%RC(NZ)
@@ -329,13 +345,9 @@ implicit none
     SFLXC(NZ,NY,NX) =plt_ew%SFLXC(NZ)
     TCO2T(NZ,NY,NX) =plt_bgcr%TCO2T(NZ)
     TCO2A(NZ,NY,NX) =plt_bgcr%TCO2A(NZ)
-    TESN0(1:npelms,NZ,NY,NX) =plt_bgcr%TESN0(1:npelms,NZ)
-    TESNC(1:npelms,NZ,NY,NX) =plt_bgcr%TESNC(1:npelms,NZ)
     TCZ(NZ,NY,NX)   =plt_pheno%TCZ(NZ)
     TCX(NZ,NY,NX)   =plt_pheno%TCX(NZ)
     TNH3C(NZ,NY,NX)  =plt_bgcr%TNH3C(NZ)
-    THVSTE(1:npelms,NZ,NY,NX) =plt_distb%THVSTE(1:npelms,NZ)
-    TEUPTK(1:npelms,NZ,NY,NX) =plt_rbgc%TEUPTK(1:npelms,NZ)
     TZUPFX(NZ,NY,NX) =plt_bgcr%TZUPFX(NZ)
     TKC(NZ,NY,NX)    =plt_ew%TKC(NZ)
     TCC(NZ,NY,NX)    =plt_ew%TCC(NZ)
@@ -345,7 +357,6 @@ implicit none
     TCG(NZ,NY,NX)    =plt_pheno%TCG(NZ)
     TFN3(NZ,NY,NX)   =plt_pheno%TFN3(NZ)
     UPNF(NZ,NY,NX)   =plt_rbgc%UPNF(NZ)
-    UPOME(1:npelms,NZ,NY,NX)  =plt_rbgc%UPOME(1:npelms,NZ)
     UPNH4(NZ,NY,NX)  =plt_rbgc%UPNH4(NZ)
     UPNO3(NZ,NY,NX)  =plt_rbgc%UPNO3(NZ)
     UPH2P(NZ,NY,NX)  =plt_rbgc%UPH2P(NZ)
@@ -362,18 +373,6 @@ implicit none
     WSTR(NZ,NY,NX)   =plt_pheno%WSTR(NZ)
     WTRVX(NZ,NY,NX)  =plt_biom%WTRVX(NZ)
     WVSTK(NZ,NY,NX)  =plt_biom%WVSTK(NZ)
-    WTSTGE(1:npelms,NZ,NY,NX)  =plt_biom%WTSTGE(1:npelms,NZ)
-    WTRVE(1:npelms,NZ,NY,NX)  =plt_biom%WTRVE(1:npelms,NZ)
-    WTSHTE(1:npelms,NZ,NY,NX)  =plt_biom%WTSHTE(1:npelms,NZ)
-    WTLFE(1:npelms,NZ,NY,NX)   =plt_biom%WTLFE(1:npelms,NZ)
-    WTSHEE(1:npelms,NZ,NY,NX)  =plt_biom%WTSHEE(1:npelms,NZ)
-    WTSTKE(1:npelms,NZ,NY,NX)  =plt_biom%WTSTKE(1:npelms,NZ)
-    WTRSVE(1:npelms,NZ,NY,NX)  =plt_biom%WTRSVE(1:npelms,NZ)
-    WTHSKE(1:npelms,NZ,NY,NX)  =plt_biom%WTHSKE(1:npelms,NZ)
-    WTEARE(1:npelms,NZ,NY,NX)  =plt_biom%WTEARE(1:npelms,NZ)
-    WTGRE(1:npelms,NZ,NY,NX)   =plt_biom%WTGRE(1:npelms,NZ)
-    WTRTSE(1:npelms,NZ,NY,NX)  =plt_biom%WTRTSE(1:npelms,NZ)
-    WTNDE(1:npelms,NZ,NY,NX)   =plt_biom%WTNDE(1:npelms,NZ)
     WTLS(NZ,NY,NX)   =plt_biom%WTLS(NZ)
     WTRTA(NZ,NY,NX)  =plt_biom%WTRTA(NZ)
     XKCO2L(NZ,NY,NX) =plt_photo%XKCO2L(NZ)
@@ -401,7 +400,7 @@ implicit none
     ENDDO
 
     DO L=0,JZ
-      DO K=0,1
+      DO K=0,micpar%n_pltlitrk
         DO M=1,jsken
           ESNC(M,1:npelms,K,L,NZ,NY,NX)=plt_bgcr%ESNC(M,1:npelms,K,L,NZ)
         ENDDO
@@ -557,10 +556,10 @@ implicit none
 
     DO  L=1,JZ
       DO N=1,2
+        EPOOLR(1:npelms,N,L,NZ,NY,NX)=plt_biom%EPOOLR(1:npelms,N,L,NZ)
         CCPOLR(N,L,NZ,NY,NX)=plt_biom%CCPOLR(N,L,NZ)
         CZPOLR(N,L,NZ,NY,NX)=plt_biom%CZPOLR(N,L,NZ)
         CPPOLR(N,L,NZ,NY,NX)=plt_biom%CPPOLR(N,L,NZ)
-        EPOOLR(1:npelms,N,L,NZ,NY,NX)=plt_biom%EPOOLR(1:npelms,N,L,NZ)
         CWSRTL(N,L,NZ,NY,NX)=plt_biom%CWSRTL(N,L,NZ)
         CO2A(N,L,NZ,NY,NX)  =plt_rbgc%CO2A(N,L,NZ)
         CH4A(N,L,NZ,NY,NX)  =plt_rbgc%CH4A(N,L,NZ)
@@ -1168,13 +1167,38 @@ implicit none
 
 
   DO NZ=1,NP0(NY,NX)
+    plt_biom%WTRTE(1:npelms,NZ)=WTRTE(1:npelms,NZ,NY,NX)
+    plt_biom%WTLFE(1:npelms,NZ)  =WTLFE(1:npelms,NZ,NY,NX)
+    plt_biom%WTEARE(1:npelms,NZ) =WTEARE(1:npelms,NZ,NY,NX)
+    plt_biom%WTRTSE(1:npelms,NZ) =WTRTSE(1:npelms,NZ,NY,NX)
+    plt_biom%WTHSKE(1:npelms,NZ) =WTHSKE(1:npelms,NZ,NY,NX)
+    plt_biom%WTRSVE(1:npelms,NZ) =WTRSVE(1:npelms,NZ,NY,NX)
+    plt_biom%WTSTKE(1:npelms,NZ) =WTSTKE(1:npelms,NZ,NY,NX)
+    plt_biom%WTSHEE(1:npelms,NZ) =WTSHEE(1:npelms,NZ,NY,NX)
+    plt_biom%WTGRE(1:npelms,NZ)=WTGRE(1:npelms,NZ,NY,NX)
+    plt_site%BALE(1:npelms,NZ)  =BALE(1:npelms,NZ,NY,NX)
+    plt_biom%CEPOLP(1:npelms,NZ)=CEPOLP(1:npelms,NZ,NY,NX)
+    plt_biom%EPOOLP(1:npelms,NZ)=EPOOLP(1:npelms,NZ,NY,NX)
+    plt_biom%EPOLNP(1:npelms,NZ)=EPOLNP(1:npelms,NZ,NY,NX)
+    plt_bgcr%HESNC(1:npelms,NZ) =HESNC(1:npelms,NZ,NY,NX)
+    plt_distb%HVSTE(1:npelms,NZ)=HVSTE(1:npelms,NZ,NY,NX)
+    plt_pheno%RSETE(1:npelms,NZ)=RSETE(1:npelms,NZ,NY,NX)
+    plt_bgcr%TESN0(1:npelms,NZ)  =TESN0(1:npelms,NZ,NY,NX)
+    plt_bgcr%TESNC(1:npelms,NZ)  =TESNC(1:npelms,NZ,NY,NX)
+    plt_rbgc%TEUPTK(1:npelms,NZ) =TEUPTK(1:npelms,NZ,NY,NX)
+    plt_distb%THVSTE(1:npelms,NZ)=THVSTE(1:npelms,NZ,NY,NX)
+    plt_rbgc%UPOME(1:npelms,NZ)=UPOME(1:npelms,NZ,NY,NX)
+    plt_biom%WTRVE(1:npelms,NZ) =WTRVE(1:npelms,NZ,NY,NX)
+    plt_biom%WTSHTE(1:npelms,NZ) =WTSHTE(1:npelms,NZ,NY,NX)
+    plt_biom%WTSTGE(1:npelms,NZ) =WTSTGE(1:npelms,NZ,NY,NX)
+    plt_biom%WTNDE(1:npelms,NZ)  =WTNDE(1:npelms,NZ,NY,NX)
+
     plt_ew%TKCZ(NZ)=TKCZ(NZ,NY,NX)
     plt_photo%SO2(NZ)=SO2(NZ,NY,NX)
     plt_ew%PSILZ(NZ)=PSILZ(NZ,NY,NX)
     plt_ew%HFLXC(NZ)=HFLXC(NZ,NY,NX)
     plt_photo%CO2Q(NZ)=CO2Q(NZ,NY,NX)
     plt_photo%O2L(NZ)=O2L(NZ,NY,NX)
-    plt_biom%WTRTE(1:npelms,NZ)=WTRTE(1:npelms,NZ,NY,NX)
 
     plt_photo%CO2L(NZ)=CO2L(NZ,NY,NX)
     plt_distb%EHVST(1:2,1:4,NZ)=EHVST(1:2,1:4,NZ,I,NY,NX)
@@ -1195,20 +1219,13 @@ implicit none
     plt_ew%DTKC(NZ)   =DTKC(NZ,NY,NX)
     plt_pheno%ZTYP(NZ)=ZTYP(NZ,NY,NX)
     plt_pheno%HTC(NZ) =HTC(NZ,NY,NX)
-
-    plt_biom%WTLFE(1:npelms,NZ)  =WTLFE(1:npelms,NZ,NY,NX)
     plt_ew%EP(NZ)      =EP(NZ,NY,NX)
-    plt_biom%WTEARE(1:npelms,NZ) =WTEARE(1:npelms,NZ,NY,NX)
-    plt_biom%WTRTSE(1:npelms,NZ) =WTRTSE(1:npelms,NZ,NY,NX)
-    plt_biom%WTHSKE(1:npelms,NZ) =WTHSKE(1:npelms,NZ,NY,NX)
-    plt_biom%WTRSVE(1:npelms,NZ) =WTRSVE(1:npelms,NZ,NY,NX)
+
     plt_biom%WVSTK(NZ) =WVSTK(NZ,NY,NX)
-    plt_biom%WTSTKE(1:npelms,NZ) =WTSTKE(1:npelms,NZ,NY,NX)
-    plt_biom%WTSHEE(1:npelms,NZ) =WTSHEE(1:npelms,NZ,NY,NX)
+
     plt_photo%CHILL(NZ)=CHILL(NZ,NY,NX)
     plt_ew%PSILO(NZ)=PSILO(NZ,NY,NX)
 
-    plt_biom%WTGRE(1:npelms,NZ)=WTGRE(1:npelms,NZ,NY,NX)
     plt_ew%TCC(NZ)=TCC(NZ,NY,NX)
     plt_allom%CWSRT(NZ)=CWSRT(NZ,NY,NX)
     plt_photo%RSMH(NZ)=RSMH(NZ,NY,NX)
@@ -1242,12 +1259,10 @@ implicit none
     plt_distb%THIN(NZ) =THIN(NZ,I,NY,NX)
     plt_morph%ARSTP(NZ)=ARSTP(NZ,NY,NX)
     plt_morph%ARLFP(NZ)=ARLFP(NZ,NY,NX)
-    plt_site%BALE(1:npelms,NZ)  =BALE(1:npelms,NZ,NY,NX)
+
     plt_photo%O2I(NZ)  =O2I(NZ,NY,NX)
     plt_photo%CO2I(NZ) =CO2I(NZ,NY,NX)
-    plt_biom%CEPOLP(1:npelms,NZ)=CEPOLP(1:npelms,NZ,NY,NX)
-    plt_biom%EPOOLP(1:npelms,NZ)=EPOOLP(1:npelms,NZ,NY,NX)
-    plt_biom%EPOLNP(1:npelms,NZ)=EPOLNP(1:npelms,NZ,NY,NX)
+
     plt_biom%CCPLNP(NZ)=CCPLNP(NZ,NY,NX)
     plt_bgcr%CNET(NZ)=CNET(NZ,NY,NX)
     plt_bgcr%CARBN(NZ)=CARBN(NZ,NY,NX)
@@ -1260,11 +1275,7 @@ implicit none
     plt_allom%FNOD(NZ)=FNOD(NZ,NY,NX)
 
     plt_morph%HTCTL(NZ)=HTCTL(NZ,NY,NX)
-    plt_bgcr%HESNC(1:npelms,NZ) =HESNC(1:npelms,NZ,NY,NX)
-    plt_distb%HVSTE(1:npelms,NZ)=HVSTE(1:npelms,NZ,NY,NX)
-    plt_rbgc%HCUPTK(NZ)=HCUPTK(NZ,NY,NX)
-    plt_rbgc%HZUPTK(NZ)=HZUPTK(NZ,NY,NX)
-    plt_rbgc%HPUPTK(NZ)=HPUPTK(NZ,NY,NX)
+    plt_rbgc%HEUPTK(1:npelms,NZ)=HEUPTK(1:npelms,NZ,NY,NX)
     plt_morph%HTSTZ(NZ)=HTSTZ(NZ,NY,NX)
     plt_morph%NI(NZ)   =NI(NZ,NY,NX)
     plt_photo%RA(NZ)   =RA(NZ,NY,NX)
@@ -1288,7 +1299,6 @@ implicit none
     plt_bgcr%RN2OZ(NZ)=RN2OZ(NZ,NY,NX)
     plt_bgcr%RNH3Z(NZ)=RNH3Z(NZ,NY,NX)
     plt_bgcr%RH2GZ(NZ)=RH2GZ(NZ,NY,NX)
-    plt_pheno%RSETE(1:npelms,NZ)=RSETE(1:npelms,NZ,NY,NX)
     plt_ew%RAZ(NZ)=RAZ(NZ,NY,NX)
     plt_photo%SCO2(NZ)=SCO2(NZ,NY,NX)
     plt_morph%SDPTH(NZ)=SDPTH(NZ,NY,NX)
@@ -1301,16 +1311,12 @@ implicit none
     plt_pheno%TCX(NZ)    =TCX(NZ,NY,NX)
     plt_pheno%TKG(NZ)      =TKG(NZ,NY,NX)
     plt_pheno%TFN3(NZ)  =TFN3(NZ,NY,NX)
-    plt_bgcr%TESN0(1:npelms,NZ)  =TESN0(1:npelms,NZ,NY,NX)
-    plt_bgcr%TESNC(1:npelms,NZ)  =TESNC(1:npelms,NZ,NY,NX)
+
     plt_bgcr%TCO2T(NZ)  =TCO2T(NZ,NY,NX)
     plt_photo%XKCO2L(NZ)=XKCO2L(NZ,NY,NX)
     plt_photo%XKCO2O(NZ)=XKCO2O(NZ,NY,NX)
-    plt_rbgc%TEUPTK(1:npelms,NZ) =TEUPTK(1:npelms,NZ,NY,NX)
-    plt_distb%THVSTE(1:npelms,NZ)=THVSTE(1:npelms,NZ,NY,NX)
     plt_bgcr%TNH3C(NZ)  =TNH3C(NZ,NY,NX)
     plt_bgcr%TZUPFX(NZ) =TZUPFX(NZ,NY,NX)
-    plt_rbgc%UPOME(1:npelms,NZ)=UPOME(1:npelms,NZ,NY,NX)
     plt_rbgc%UPNF(NZ)=UPNF(NZ,NY,NX)
     plt_rbgc%UPNO3(NZ)=UPNO3(NZ,NY,NX)
     plt_rbgc%UPNH4(NZ)=UPNH4(NZ,NY,NX)
@@ -1326,11 +1332,7 @@ implicit none
     plt_ew%VOLWP(NZ) =VOLWP(NZ,NY,NX)
     plt_pheno%WSTR(NZ) =WSTR(NZ,NY,NX)
     plt_biom%WTRVX(NZ) =WTRVX(NZ,NY,NX)
-    plt_biom%WTRVE(1:npelms,NZ) =WTRVE(1:npelms,NZ,NY,NX)
     plt_biom%WTLS(NZ)  =WTLS(NZ,NY,NX)
-    plt_biom%WTSHTE(1:npelms,NZ) =WTSHTE(1:npelms,NZ,NY,NX)
-    plt_biom%WTSTGE(1:npelms,NZ) =WTSTGE(1:npelms,NZ,NY,NX)
-    plt_biom%WTNDE(1:npelms,NZ)  =WTNDE(1:npelms,NZ,NY,NX)
 
     plt_biom%ZEROL(NZ) =ZEROL(NZ,NY,NX)
     plt_biom%ZEROP(NZ) =ZEROP(NZ,NY,NX)
@@ -1622,7 +1624,7 @@ implicit none
       ENDDO
     ENDDO
     DO L=0,NJ(NY,NX)
-      DO K=0,1
+      DO K=0,micpar%n_pltlitrk
         DO M=1,jsken
           plt_bgcr%ESNC(M,1:npelms,K,L,NZ)=ESNC(M,1:npelms,K,L,NZ,NY,NX)
         enddo

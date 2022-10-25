@@ -4,6 +4,7 @@ module StartqMod
   use GridConsts
   use FlagDataType
   use EcoSIMConfig, only : jsken=>jskenc
+  use MicBGCPars, only : micpar
   use EcosimConst
   use EcoSIMCtrlDataType
   use minimathmod, only : AZMAX1
@@ -84,7 +85,7 @@ module StartqMod
         TESNC(1:npelms,NZ,NY,NX)=0._r8
         WTSTGE(1:npelms,NZ,NY,NX)=0._r8
         D6401: DO L=1,NL(NY,NX)
-          DO  K=0,1
+          DO  K=0,micpar%n_pltlitrk
             DO  M=1,jsken
               ESNC(M,1:npelms,K,L,NZ,NY,NX)=0._r8
             enddo
@@ -552,12 +553,12 @@ module StartqMod
       WGNODE(K,NB,NZ,NY,NX)=0._r8
       WGNODN(K,NB,NZ,NY,NX)=0._r8
       WGNODP(K,NB,NZ,NY,NX)=0._r8
-      DO 55 L=1,JC
+      D55: DO L=1,JC
         ARLFL(L,K,NB,NZ,NY,NX)=0._r8
         WGLFL(L,K,NB,NZ,NY,NX)=0._r8
         WGLFLN(L,K,NB,NZ,NY,NX)=0._r8
         WGLFLP(L,K,NB,NZ,NY,NX)=0._r8
-55    CONTINUE
+      ENDDO D55
       IF(K.NE.0)THEN
         CPOOL3(K,NB,NZ,NY,NX)=0._r8
         CO2B(K,NB,NZ,NY,NX)=0._r8
@@ -769,7 +770,7 @@ module StartqMod
         RTWT1P(N,NR,NZ,NY,NX)=0._r8
       ENDDO D30
       IF(N.EQ.1)THEN
-        D6400: DO K=0,1
+        D6400: DO K=0,micpar%n_pltlitrk
           DO  M=1,jsken
             ESNC(M,K,L,NZ,NY,NX,:)=0._r8
           enddo

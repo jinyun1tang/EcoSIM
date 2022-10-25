@@ -371,9 +371,9 @@ module MicBGCMod
     TOHC=TOHC+OHC(K)+OHA(K)
   enddo
 
-  DO 860 K=0,KL
+  D860: DO K=0,KL
     OSRH(K)=OSAT(K)+ORCT(K)+OHC(K)+OHA(K)
-860 CONTINUE
+  ENDDO D860
   TSRH=TOSA+TORC+TOHC
 !
 !     C:N AND C:P RATIOS OF TOTAL BIOMASS
@@ -456,7 +456,6 @@ module MicBGCMod
       ENDDO
     ENDIF
   ENDDO
-
 
   D690: DO K=0,KL
     TOMK(K)=0.0_r8
@@ -645,7 +644,6 @@ module MicBGCMod
         DO M=1,2
           TOMCNK(M)=TOMCNK(M)+OMCff(M,NGL)
         ENDDO
-
 
         WFNG=EXP(0.2_r8*PSISM)
         OXKX=OXKA
@@ -1277,7 +1275,12 @@ module MicBGCMod
     TOPX  => ncplxs%TOPX,    &
     VOLWZ =>  nmicdiag%VOLWZ,&
     TFNX  =>  nmicdiag%TFNX ,&
-    SPOSC => micpar%SPOSC   ,&
+    iprotein  => micpar%iprotein, &
+    icarbhyro => micpar%icarbhyro, &
+    icellulos => micpar%icellulos, &
+    ilignin   => micpar%ilignin, &
+    SPOSC => micpar%SPOSC   , &
+    k_POM => micpar%k_POM   , &
     CNRH  => micpar%CNRH    ,&
     CPRH  => micpar%CPRH    ,&
     COQC  => ncplxs%COQC  ,&
@@ -1317,25 +1320,25 @@ module MicBGCMod
   IF(TOMK(K).GT.ZEROS)THEN
     CNOMX=TONK(K)/TONX(K)
     CPOMX=TOPK(K)/TOPX(K)
-    FCNK(K)=AMIN1(1.0,AMAX1(0.50,CNOMX))
-    FCPK(K)=AMIN1(1.0,AMAX1(0.50,CPOMX))
+    FCNK(K)=AMIN1(1.0_r8,AMAX1(0.50_r8,CNOMX))
+    FCPK(K)=AMIN1(1.0_r8,AMAX1(0.50_r8,CPOMX))
   ELSE
-    FCNK(K)=1.0
-    FCPK(K)=1.0
+    FCNK(K)=1.0_r8
+    FCPK(K)=1.0_r8
   ENDIF
 !
 !     AQUEOUS CONCENTRATION OF BIOMASS TO CACULATE INHIBITION
 !     CONSTANT FOR DECOMPOSITION
 !
   IF(VOLWZ.GT.ZEROS2)THEN
-    COQCK=AMIN1(0.1E+06,ROQCK(K)/VOLWZ)
+    COQCK=AMIN1(0.1E+06_r8,ROQCK(K)/VOLWZ)
   ELSE
-    COQCK=0.1E+06
+    COQCK=0.1E+06_r8
   ENDIF
   IF(litrm)THEN
-    DCKD=DCKM0*(1.0+COQCK/DCKI)
+    DCKD=DCKM0*(1.0_r8+COQCK/DCKI)
   ELSE
-    DCKD=DCKML*(1.0+COQCK/DCKI)
+    DCKD=DCKML*(1.0_r8+COQCK/DCKI)
   ENDIF
   IF(OSRH(K).GT.ZEROS)THEN
     IF(BKVL.GT.ZEROS)THEN
@@ -1344,7 +1347,7 @@ module MicBGCMod
       COSC=OSRH(K)/VOLY
     ENDIF
     DFNS=COSC/(COSC+DCKD)
-    OQCI=1.0/(1.0+COQC(K)/OQKI)
+    OQCI=1.0_r8/(1.0_r8+COQC(K)/OQKI)
 !
 !     C, N, P DECOMPOSITION RATE OF SOLID SUBSTRATES 'RDOS*' FROM
 !     RATE CONSTANT, TOTAL ACTIVE BIOMASS, DENSITY FACTOR,
@@ -1361,11 +1364,11 @@ module MicBGCMod
 !     OSRH=total SOC
 !     FCNK,FCPK=N,P limitation to microbial activity in each K
 !
-    DO 785 M=1,jsken
+    D785: DO M=1,jsken
       IF(OSC(M,K).GT.ZEROS)THEN
         CNS(M,K)=AZMAX1(OSN(M,K)/OSC(M,K))
         CPS(M,K)=AZMAX1(OSP(M,K)/OSC(M,K))
-        RDOSC(M,K)=AZMAX1(AMIN1(0.5*OSA(M,K) &
+        RDOSC(M,K)=AZMAX1(AMIN1(0.5_r8*OSA(M,K) &
           ,SPOSC(M,K)*ROQCK(K)*DFNS*OQCI*TFNX*OSA(M,K)/OSRH(K)))
         RDOSN(M,K)=AZMAX1(AMIN1(OSN(M,K),CNS(M,K)*RDOSC(M,K)))/FCNK(K)
         RDOSP(M,K)=AZMAX1(AMIN1(OSP(M,K),CPS(M,K)*RDOSC(M,K)))/FCPK(K)
@@ -1377,7 +1380,7 @@ module MicBGCMod
         RDOSN(M,K)=0.0_r8
         RDOSP(M,K)=0.0_r8
       ENDIF
-785 CONTINUE
+    ENDDO D785
 !
 !     HUMIFICATION OF DECOMPOSED RESIDUE LIGNIN WITH PROTEIN,
 !     CH2O AND CELLULOSE 'RHOS*' WITH REMAINDER 'RCOS*' TO DOC,DON,DOP
@@ -1388,35 +1391,38 @@ module MicBGCMod
 !     EPOC=fraction of RDOSC allocated to POC from hour1.f
 !     RCOSC,RCOSN,RCOSP=transfer of decomposition C,N,P to DOC,DON,DOP
 !
-    IF(K.LE.2)THEN
-      RHOSC(4,K)=AZMAX1(AMIN1(RDOSN(4,K)/CNRH(3) &
-        ,RDOSP(4,K)/CPRH(3),EPOC*RDOSC(4,K)))
-      RHOSCM=0.10*RHOSC(4,K)
-      RHOSC(1,K)=AZMAX1(AMIN1(RDOSC(1,K),RDOSN(1,K)/CNRH(3) &
-        ,RDOSP(1,K)/CPRH(3),RHOSCM))
-      RHOSC(2,K)=AZMAX1(AMIN1(RDOSC(2,K),RDOSN(2,K)/CNRH(3) &
-        ,RDOSP(2,K)/CPRH(3),RHOSCM))
-      RHOSC(3,K)=AZMAX1(AMIN1(RDOSC(3,K),RDOSN(3,K)/CNRH(3) &
-        ,RDOSP(3,K)/CPRH(3),RHOSCM-RHOSC(2,K)))
-      DO 805 M=1,jsken
-        RHOSN(M,K)=AMIN1(RDOSN(M,K),RHOSC(M,K)*CNRH(3))
-        RHOSP(M,K)=AMIN1(RDOSP(M,K),RHOSC(M,K)*CPRH(3))
+    IF(K.LE.micpar%k_litrsf)THEN
+      RHOSC(ilignin,K)=AZMAX1(AMIN1(RDOSN(ilignin,K)/CNRH(k_POM) &
+        ,RDOSP(ilignin,K)/CPRH(k_POM),EPOC*RDOSC(ilignin,K)))
+      RHOSCM=0.10_r8*RHOSC(ilignin,K)
+      RHOSC(iprotein,K)=AZMAX1(AMIN1(RDOSC(iprotein,K) &
+        ,RDOSN(iprotein,K)/CNRH(k_POM) &
+        ,RDOSP(iprotein,K)/CPRH(k_POM),RHOSCM))
+      RHOSC(icarbhyro,K)=AZMAX1(AMIN1(RDOSC(icarbhyro,K) &
+        ,RDOSN(icarbhyro,K)/CNRH(k_POM) &
+        ,RDOSP(icarbhyro,K)/CPRH(k_POM),RHOSCM))
+      RHOSC(icellulos,K)=AZMAX1(AMIN1(RDOSC(icellulos,K) &
+        ,RDOSN(icellulos,K)/CNRH(k_POM) &
+        ,RDOSP(icellulos,K)/CPRH(k_POM),RHOSCM-RHOSC(icarbhyro,K)))
+      D805: DO M=1,jsken
+        RHOSN(M,K)=AMIN1(RDOSN(M,K),RHOSC(M,K)*CNRH(k_POM))
+        RHOSP(M,K)=AMIN1(RDOSP(M,K),RHOSC(M,K)*CPRH(k_POM))
         RCOSC(M,K)=RDOSC(M,K)-RHOSC(M,K)
         RCOSN(M,K)=RDOSN(M,K)-RHOSN(M,K)
         RCOSP(M,K)=RDOSP(M,K)-RHOSP(M,K)
-805   CONTINUE
+      ENDDO D805
     ELSE
-      DO 810 M=1,jsken
+      D810: DO M=1,jsken
         RHOSC(M,K)=0.0_r8
         RHOSN(M,K)=0.0_r8
         RHOSP(M,K)=0.0_r8
         RCOSC(M,K)=RDOSC(M,K)
         RCOSN(M,K)=RDOSN(M,K)
         RCOSP(M,K)=RDOSP(M,K)
-810   CONTINUE
+      ENDDO D810
     ENDIF
   ELSE
-    DO 780 M=1,jsken
+    D780: DO M=1,jsken
       RDOSC(M,K)=0.0_r8
       RDOSN(M,K)=0.0_r8
       RDOSP(M,K)=0.0_r8
@@ -1426,7 +1432,7 @@ module MicBGCMod
       RCOSC(M,K)=0.0_r8
       RCOSN(M,K)=0.0_r8
       RCOSP(M,K)=0.0_r8
-780 CONTINUE
+    ENDDO D780
   ENDIF
 !
 !     C, N, P DECOMPOSITION RATE OF BIORESIDUE 'RDOR*' FROM
@@ -1445,7 +1451,7 @@ module MicBGCMod
 !     FCNK,FCPK=N,P limitation to microbial activity in each K
 !
   IF(OSRH(K).GT.ZEROS)THEN
-    DO 775 M=1,2
+    D775: DO M=1,ndbiomcp
       IF(ORC(M,K).GT.ZEROS)THEN
         CNR=AZMAX1(ORN(M,K)/ORC(M,K))
         CPR=AZMAX1(ORP(M,K)/ORC(M,K))
@@ -1459,13 +1465,13 @@ module MicBGCMod
         RDORN(M,K)=0.0_r8
         RDORP(M,K)=0.0_r8
       ENDIF
-775 CONTINUE
+    ENDDO D775
   ELSE
-    DO 776 M=1,2
+    D776: DO M=1,ndbiomcp
       RDORC(M,K)=0.0_r8
       RDORN(M,K)=0.0_r8
       RDORP(M,K)=0.0_r8
-776 CONTINUE
+    ENDDO D776
   ENDIF
 !
 !     C, N, P DECOMPOSITION RATE OF SORBED SUBSTRATES 'RDOH*' FROM
@@ -2463,7 +2469,7 @@ module MicBGCMod
   )
   GOMX=RGAS*1.E-3_r8*TKS*LOG((AMAX1(ZERO,COQA(K))/OAKI))
   GOMM=GOMX/24.0
-  ECHZ=AMAX1(EO2X,AMIN1(1.0,1.0/(1.0+AZMAX1((GC4X+GOMM))/EOMH)))
+  ECHZ=AMAX1(EO2X,AMIN1(1.0_r8,1.0/(1.0+AZMAX1((GC4X+GOMM))/EOMH)))
 !
 !     RESPIRATION RATES BY ACETOTROPHIC METHANOGENS 'RGOMP' FROM
 !     SPECIFIC OXIDATION RATE, ACTIVE BIOMASS, DOC CONCENTRATION,
@@ -2496,7 +2502,7 @@ module MicBGCMod
   ROQCS(NGL,K)=0.0_r8
   ROQAS(NGL,K)=RGOGZ
   ROQCD(NGL,K)=0.0_r8
-  naqfdiag%TCH4H=naqfdiag%TCH4H+0.5*RGOMP
+  naqfdiag%TCH4H=naqfdiag%TCH4H+0.5_r8*RGOMP
   end associate
   end subroutine AcetoMethanogenCatabolism
 !------------------------------------------------------------------------------------------
@@ -2659,9 +2665,9 @@ module MicBGCMod
   GOAF=GOAX/72.0
   GHAX=GH2F+GOAF
   IF(N.EQ.n_anaero_ferm)THEN
-    ECHZ=AMAX1(EO2X,AMIN1(1.0,1.0/(1.0+AZMAX1((GCHX-GHAX))/EOMF)))
+    ECHZ=AMAX1(EO2X,AMIN1(1.0_r8,1.0/(1.0+AZMAX1((GCHX-GHAX))/EOMF)))
   ELSE
-    ECHZ=AMAX1(ENFX,AMIN1(1.0,1.0/(1.0+AZMAX1((GCHX-GHAX))/EOMN)))
+    ECHZ=AMAX1(ENFX,AMIN1(1.0_r8,1.0/(1.0+AZMAX1((GCHX-GHAX))/EOMN)))
   ENDIF
 !
 !     RESPIRATION RATES BY HETEROTROPHIC ANAEROBES 'RGOMP' FROM
@@ -3745,19 +3751,19 @@ module MicBGCMod
     TCGOAC  => ncplxf%TCGOAC, &
     TCGOMN  => ncplxf%TCGOMN, &
     TCGOMP  => ncplxf%TCGOMP, &
-    CNQ  => ncplxs%CNQ,       &
-    CPQ  => ncplxs%CPQ,       &
-    CNOMC  => micpar%CNOMC,     &
-    CPOMC  => micpar%CPOMC,    &
-    FL       => micpar%FL    ,     &
-    EHUM     => micstt%EHUM,  &
-    OMC  => micstt%OMC , &
-    OMN  => micstt%OMN , &
-    OMP  => micstt%OMP, &
-    OQN   => micstt%OQN , &
-    OQP  => micstt%OQP , &
-    ZEROS  => micfor%ZEROS , &
-    ZERO   => micfor%ZERO  &
+    CNQ     => ncplxs%CNQ   , &
+    CPQ     => ncplxs%CPQ   , &
+    CNOMC   => micpar%CNOMC , &
+    CPOMC   => micpar%CPOMC , &
+    FL      => micpar%FL    , &
+    EHUM    => micstt%EHUM  , &
+    OMC     => micstt%OMC   , &
+    OMN     => micstt%OMN   , &
+    OMP     => micstt%OMP   , &
+    OQN     => micstt%OQN   , &
+    OQP     => micstt%OQP   , &
+    ZEROS   => micfor%ZEROS , &
+    ZERO    => micfor%ZERO    &
   )
 
 !     DOC, DON, DOP AND ACETATE UPTAKE DRIVEN BY GROWTH RESPIRATION
@@ -3809,10 +3815,8 @@ module MicBGCMod
       ,OMP(3,NGL,K)/(OMP(3,NGL,K)+OMC(3,NGL,K)*CPOMC(3,NGL,K))))
     CXC=OMC(3,NGL,K)/OMC(1,NGL,K)
     C3C=1.0_r8/(1.0_r8+CXC/CKC)
-    CNC=AZMAX1(AMIN1(1.0_r8 &
-      ,OMC(3,NGL,K)/(OMC(3,NGL,K)+OMN(3,NGL,K)/CNOMC(3,NGL,K))))
-    CPC=AZMAX1(AMIN1(1.0_r8 &
-      ,OMC(3,NGL,K)/(OMC(3,NGL,K)+OMP(3,NGL,K)/CPOMC(3,NGL,K))))
+    CNC=AZMAX1(AMIN1(1.0_r8,OMC(3,NGL,K)/(OMC(3,NGL,K)+OMN(3,NGL,K)/CNOMC(3,NGL,K))))
+    CPC=AZMAX1(AMIN1(1.0_r8,OMC(3,NGL,K)/(OMC(3,NGL,K)+OMP(3,NGL,K)/CPOMC(3,NGL,K))))
     RCCC=RCCZ+AMAX1(CCC,C3C)*RCCY
     RCCN=CNC*RCCX
     RCCP=CPC*RCCQ

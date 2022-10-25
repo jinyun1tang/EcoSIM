@@ -786,9 +786,7 @@ implicit none
   real(r8), pointer :: RDFOMC(:,:,:,:)  => null()  !root uptake (+ve) - exudation (-ve) of DOC, [gC d-2 h-1]
   real(r8), pointer :: RDFOMN(:,:,:,:)  => null()  !root uptake (+ve) - exudation (-ve) of DON, [gN d-2 h-1]
   real(r8), pointer :: RDFOMP(:,:,:,:)  => null()  !root uptake (+ve) - exudation (-ve) of DOP, [gP d-2 h-1]
-  real(r8), pointer :: HCUPTK(:)        => null()  !net root C uptake (+ve) - exudation (-ve), [gC d-2 h-1]
-  real(r8), pointer :: HZUPTK(:)        => null()  !net root N uptake (+ve) - exudation (-ve), [gN d-2 h-1]
-  real(r8), pointer :: HPUPTK(:)        => null()  !net root P uptake (+ve) - exudation (-ve), [gP d-2 h-1]
+  real(r8), pointer :: HEUPTK(:,:)      => null()  !net root element uptake (+ve) - exudation (-ve), [gC d-2 h-1]
   real(r8), pointer :: ROXSK(:,:)       => null()  !total O2 sink, [g d-2 t-1]
   real(r8), pointer :: ZEROQ(:)         => null()  !threshold zero for uptake calculation
   real(r8), pointer :: UPMNPO(:,:)      => null()  !minimum PO4 concentration for root NH4 uptake, [g m-3]
@@ -923,9 +921,7 @@ implicit none
   allocate(this%RDFOMC(2,0:jcplx11,0:JZ1,JP1))
   allocate(this%RDFOMN(2,0:jcplx11,0:JZ1,JP1))
   allocate(this%RDFOMP(2,0:jcplx11,0:JZ1,JP1))
-  allocate(this%HCUPTK(JP1))
-  allocate(this%HZUPTK(JP1))
-  allocate(this%HPUPTK(JP1))
+  allocate(this%HEUPTK(npelms,JP1))
   allocate(this%TEUPTK(npelms,JP1))
   allocate(this%UPOME(npelms,JP1))
   allocate(this%UPNF(JP1))
@@ -1043,9 +1039,7 @@ implicit none
 !  if(allocated(RDFOMC))deallocate(RDFOMC)
 !  if(allocated(RDFOMN))deallocate(RDFOMN)
 !  if(allocated(RDFOMP))deallocate(RDFOMP)
-!  if(allocated(HCUPTK))deallocate(HCUPTK)
-!  if(allocated(HZUPTK))deallocate(HZUPTK)
-!  if(allocated(HPUPTK))deallocate(HPUPTK)
+!  if(allocated(HEUPTK))deallocate(HEUPTK)
 !  if(allocated(TEUPTK))deallocate(TEUPTK)
 !  if(allocated(UPOME))deallocate(UPOME)
 !  if(allocated(UPNF))deallocate(UPNF)

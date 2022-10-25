@@ -77,6 +77,10 @@ implicit none
   integer :: NMICBSO             !total number of microbial guilds in one organic-microbial complex
   integer :: k_litrsf
   integer :: n_pltlitrk
+  integer :: iprotein
+  integer :: icarbhyro
+  integer :: icellulos
+  integer :: ilignin
   contains
     procedure, public  :: Init
     procedure, public  :: SetPars
@@ -113,6 +117,11 @@ contains
   this%k_manure=2;         this%is_litter(this%k_manure)=.true.
   this%is_litter(this%k_non_woody_litr)=.true.
   this%is_litter(this%k_manure)=.true.
+
+  this%iprotein =1
+  this%icarbhyro=2
+  this%icellulos=3
+  this%ilignin  =4
 
   this%k_litrsf=this%k_manure
   this%k_POM=3

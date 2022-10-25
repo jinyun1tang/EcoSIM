@@ -1213,14 +1213,14 @@ module RedistMod
     !
     !     RESIDUE FROM PLANT LITTERFALL
 !
-    DO 8565 K=0,1
-      DO  M=1,4
+    D8565: DO K=0,micpar%n_pltlitrk
+      DO  M=1,jsken
         OSC(M,K,L,NY,NX)=OSC(M,K,L,NY,NX)+CSNT(M,K,L,NY,NX)
         OSA(M,K,L,NY,NX)=OSA(M,K,L,NY,NX)+CSNT(M,K,L,NY,NX)*micpar%OMCI(1,K)
         OSN(M,K,L,NY,NX)=OSN(M,K,L,NY,NX)+ZSNT(M,K,L,NY,NX)
         OSP(M,K,L,NY,NX)=OSP(M,K,L,NY,NX)+PSNT(M,K,L,NY,NX)
       enddo
-8565  CONTINUE
+    ENDDO D8565
 !
     !     DOC, DON, DOP FROM AQUEOUS TRANSPORT
 !

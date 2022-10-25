@@ -110,9 +110,7 @@ module PlantDataRateType
   real(r8),allocatable ::  RHGFLA(:,:,:,:,:)                  !gaseous H2 flux through roots, [g d-2 h-1]
   real(r8),allocatable ::  RHGDFA(:,:,:,:,:)                  !dissolution (+ve) - volatilization (-ve) H2 flux in roots, [g d-2 h-1]
   real(r8),allocatable ::  RH2GZ(:,:,:)                       !gaseous H2 flux fron root disturbance, [g d-2 h-1]
-  real(r8),allocatable ::  HCUPTK(:,:,:)                      !net root C uptake (+ve) - exudation (-ve), [g d-2 h-1]
-  real(r8),allocatable ::  HZUPTK(:,:,:)                      !net root N uptake (+ve) - exudation (-ve), [g d-2 h-1]
-  real(r8),allocatable ::  HPUPTK(:,:,:)                      !net root P uptake (+ve) - exudation (-ve), [g d-2 h-1]
+  real(r8),allocatable ::  HEUPTK(:,:,:,:)                    !net root element uptake (+ve) - exudation (-ve), [g d-2 h-1]
   real(r8),allocatable ::  TEUPTK(:,:,:,:)                    !total net root element uptake (+ve) - exudation (-ve), [g d-2 ]
   real(r8),allocatable ::  TUPWTR(:,:,:)                      !total root water uptake, [m3 d-2]
   real(r8),allocatable ::  TUPHT(:,:,:)                       !total root heat uptake, [MJ d-2]
@@ -293,9 +291,7 @@ module PlantDataRateType
   allocate(RHGFLA(2,JZ,JP,JY,JX));RHGFLA=0._r8
   allocate(RHGDFA(2,JZ,JP,JY,JX));RHGDFA=0._r8
   allocate(RH2GZ(JP,JY,JX));    RH2GZ=0._r8
-  allocate(HCUPTK(JP,JY,JX));   HCUPTK=0._r8
-  allocate(HZUPTK(JP,JY,JX));   HZUPTK=0._r8
-  allocate(HPUPTK(JP,JY,JX));   HPUPTK=0._r8
+  allocate(HEUPTK(npelms,JP,JY,JX));   HEUPTK=0._r8
   allocate(TEUPTK(npelms,JP,JY,JX));   TEUPTK=0._r8
   allocate(TUPWTR(0:JZ,JY,JX)); TUPWTR=0._r8
   allocate(TUPHT(0:JZ,JY,JX));  TUPHT=0._r8
@@ -467,9 +463,7 @@ module PlantDataRateType
   call destroy(RHGFLA)
   call destroy(RHGDFA)
   call destroy(RH2GZ)
-  call destroy(HCUPTK)
-  call destroy(HZUPTK)
-  call destroy(HPUPTK)
+  call destroy(HEUPTK)
   call destroy(TEUPTK)
   call destroy(TUPWTR)
   call destroy(TUPHT)

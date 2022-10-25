@@ -8,6 +8,7 @@ module ExtractsMod
   use EcosimConst
   use GrosubPars
   use PlantAPIData
+  use MicBGCPars, only : micpar
   implicit none
 
   private
@@ -79,7 +80,7 @@ module ExtractsMod
     ENDDO
     WTSTGT=WTSTGT+WTSTGE(ielmc,NZ)
     DO  L=0,NI(NZ)
-      DO K=0,1
+      DO K=0,micpar%n_pltlitrk
         DO  M=1,jcplx11
           CSNT(M,K,L)=CSNT(M,K,L)+ESNC(M,ielmc,K,L,NZ)
           ZSNT(M,K,L)=ZSNT(M,K,L)+ESNC(M,ielmn,K,L,NZ)
@@ -394,7 +395,7 @@ module ExtractsMod
 
   implicit none
   integer, intent(in) :: NZ
-  integer :: L, NB
+  integer :: L, NB,NE
   real(r8) :: ENGYC
   associate(                       &
     TBALE => plt_site%TBALE  , &
@@ -414,9 +415,7 @@ module ExtractsMod
     CTRAN => plt_ew%CTRAN    , &
     TH2GZ => plt_bgcr%TH2GZ  , &
     RNH3B => plt_rbgc%RNH3B  , &
-    HCUPTK=> plt_rbgc%HCUPTK , &
-    HZUPTK=> plt_rbgc%HZUPTK , &
-    HPUPTK=> plt_rbgc%HPUPTK , &
+    HEUPTK=> plt_rbgc%HEUPTK , &
     TUPNF => plt_rbgc%TUPNF  , &
     TOXYZ => plt_rbgc%TOXYZ  , &
     TCH4Z => plt_rbgc%TCH4Z  , &
@@ -504,12 +503,10 @@ module ExtractsMod
   THRMC=THRMC+THRM1(NZ)
   ARLFC=ARLFC+ARLFP(NZ)
   ARSTC=ARSTC+ARSTP(NZ)
-  ZESNC(ielmc)=ZESNC(ielmc)-HCUPTK(NZ)
-  ZESNC(ielmn)=ZESNC(ielmn)-HZUPTK(NZ)
-  ZESNC(ielmp)=ZESNC(ielmp)-HPUPTK(NZ)
-  TBALE(ielmc)=TBALE(ielmc)+BALE(ielmc,NZ)
-  TBALE(ielmn)=TBALE(ielmn)+BALE(ielmn,NZ)
-  TBALE(ielmp)=TBALE(ielmp)+BALE(ielmp,NZ)
+  DO NE=1,npelms
+    ZESNC(NE)=ZESNC(NE)-HEUPTK(NE,NZ)
+    TBALE(NE)=TBALE(NE)+BALE(NE,NZ)
+  ENDDO
   TCO2Z=TCO2Z+RCO2Z(NZ)
   TOXYZ=TOXYZ+ROXYZ(NZ)
   TCH4Z=TCH4Z+RCH4Z(NZ)
