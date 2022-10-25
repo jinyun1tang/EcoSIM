@@ -122,9 +122,7 @@ module PlantBranchMod
     EPOOL      =>  plt_biom%EPOOL     , &
     WTLSB      =>  plt_biom%WTLSB     , &
     WGNODN     =>  plt_biom%WGNODN    , &
-    WGLFX      =>  plt_biom%WGLFX     , &
-    WGLFPX     =>  plt_biom%WGLFPX    , &
-    WGLFNX     =>  plt_biom%WGLFNX    , &
+    WGLFEX     =>  plt_biom%WGLFEX    , &
     WTSHEBE    =>  plt_biom%WTSHEBE   , &
     WTLFBE     =>  plt_biom%WTLFBE    , &
     WSLF       =>  plt_biom%WSLF      , &
@@ -141,18 +139,14 @@ module PlantBranchMod
     IDTHB      =>  plt_pheno%IDTHB    , &
     KVSTGN     =>  plt_pheno%KVSTGN   , &
     XRLA       =>  plt_pheno%XRLA     , &
-    RCCLX      =>  plt_pheno%RCCLX    , &
-    RCZLX      =>  plt_pheno%RCZLX    , &
-    RCPLX      =>  plt_pheno%RCPLX    , &
+    RCELX      =>  plt_pheno%RCELX    , &
     KVSTG      =>  plt_pheno%KVSTG    , &
     IGTYP      =>  plt_pheno%IGTYP    , &
     TFN3       =>  plt_pheno%TFN3     , &
     IFLGP      =>  plt_pheno%IFLGP    , &
     FLGZ       =>  plt_pheno%FLGZ     , &
     IDAY       =>  plt_pheno%IDAY     , &
-    RCCSX      =>  plt_pheno%RCCSX    , &
-    RCZSX      =>  plt_pheno%RCZSX    , &
-    RCPSX      =>  plt_pheno%RCPSX    , &
+    RCESX      =>  plt_pheno%RCESX    , &
     IBTYP      =>  plt_pheno%IBTYP    , &
     IFLGG      =>  plt_pheno%IFLGG    , &
     ISTYP      =>  plt_pheno%ISTYP    , &
@@ -583,18 +577,18 @@ module PlantBranchMod
         !   RCCLX,RCZLX,RCPLX=remobilization of C,N,P from senescing leaf
 !
             IF(IFLGP(NB,NZ).EQ.1)THEN
-              WGLFX(NB,NZ)=AZMAX1(WGLFE(K,NB,ielmc,NZ))
-              WGLFNX(NB,NZ)=AZMAX1(WGLFE(K,NB,ielmn,NZ))
-              WGLFPX(NB,NZ)=AZMAX1(WGLFE(K,NB,ielmp,NZ))
+              WGLFEX(NB,ielmc,NZ)=AZMAX1(WGLFE(K,NB,ielmc,NZ))
+              WGLFEX(NB,ielmn,NZ)=AZMAX1(WGLFE(K,NB,ielmn,NZ))
+              WGLFEX(NB,ielmp,NZ)=AZMAX1(WGLFE(K,NB,ielmp,NZ))
               ARLFZ(NB,NZ)=AZMAX1(ARLF1(K,NB,NZ))
-              IF(WGLFX(NB,NZ).GT.ZEROP(NZ))THEN
-                RCCLX(NB,NZ)=RCCC*WGLFX(NB,NZ)
-                RCZLX(NB,NZ)=WGLFNX(NB,NZ)*(RCCN+(1.0_r8-RCCN)*RCCC)
-                RCPLX(NB,NZ)=WGLFPX(NB,NZ)*(RCCP+(1.0_r8-RCCP)*RCCC)
+              IF(WGLFEX(NB,ielmc,NZ).GT.ZEROP(NZ))THEN
+                RCELX(NB,ielmc,NZ)=RCCC*WGLFEX(NB,ielmc,NZ)
+                RCELX(NB,ielmn,NZ)=WGLFEX(NB,ielmn,NZ)*(RCCN+(1.0_r8-RCCN)*RCCC)
+                RCELX(NB,ielmp,NZ)=WGLFEX(NB,ielmp,NZ)*(RCCP+(1.0_r8-RCCP)*RCCC)
               ELSE
-                RCCLX(NB,NZ)=0._r8
-                RCZLX(NB,NZ)=0._r8
-                RCPLX(NB,NZ)=0._r8
+                RCELX(NB,ielmc,NZ)=0._r8
+                RCELX(NB,ielmn,NZ)=0._r8
+                RCELX(NB,ielmp,NZ)=0._r8
               ENDIF
             ENDIF
 !
@@ -602,9 +596,9 @@ module PlantBranchMod
     !
     !       FSNC,FSNCL=fraction of lowest leaf to be remobilized
     !
-            IF(FSNC*WGLFX(NB,NZ).GT.WGLFE(K,NB,ielmc,NZ) &
-              .AND.WGLFX(NB,NZ).GT.ZEROP(NZ))THEN
-              FSNCL=AZMAX1(WGLFE(K,NB,ielmc,NZ)/WGLFX(NB,NZ))
+            IF(FSNC*WGLFEX(NB,ielmc,NZ).GT.WGLFE(K,NB,ielmc,NZ) &
+              .AND.WGLFEX(NB,ielmc,NZ).GT.ZEROP(NZ))THEN
+              FSNCL=AZMAX1(WGLFE(K,NB,ielmc,NZ)/WGLFEX(NB,ielmc,NZ))
             ELSE
               FSNCL=FSNC
             ENDIF
@@ -622,17 +616,17 @@ module PlantBranchMod
 !
             D6300: DO M=1,jsken
               ESNC(M,ielmc,0,0,NZ)=ESNC(M,ielmc,0,0,NZ)+CFOPC(5,M,NZ) &
-                *FSNCL*(WGLFX(NB,NZ)-RCCLX(NB,NZ))*FWODB(0)
+                *FSNCL*(WGLFEX(NB,ielmc,NZ)-RCELX(NB,ielmc,NZ))*FWODB(0)
               ESNC(M,ielmn,0,0,NZ)=ESNC(M,ielmn,0,0,NZ)+CFOPN(5,M,NZ) &
-                *FSNCL*(WGLFNX(NB,NZ)-RCZLX(NB,NZ))*FWODLN(0)
+                *FSNCL*(WGLFEX(NB,ielmn,NZ)-RCELX(NB,ielmn,NZ))*FWODLN(0)
               ESNC(M,ielmp,0,0,NZ)=ESNC(M,ielmp,0,0,NZ)+CFOPP(5,M,NZ) &
-                *FSNCL*(WGLFPX(NB,NZ)-RCPLX(NB,NZ))*FWODLP(0)
+                *FSNCL*(WGLFEX(NB,ielmp,NZ)-RCELX(NB,ielmp,NZ))*FWODLP(0)
               ESNC(M,ielmc,1,0,NZ)=ESNC(M,ielmc,1,0,NZ)+CFOPC(1,M,NZ) &
-                *FSNCL*(WGLFX(NB,NZ)-RCCLX(NB,NZ))*FWODB(1)
+                *FSNCL*(WGLFEX(NB,ielmc,NZ)-RCELX(NB,ielmc,NZ))*FWODB(1)
               ESNC(M,ielmn,1,0,NZ)=ESNC(M,ielmn,1,0,NZ)+CFOPN(1,M,NZ) &
-                *FSNCL*(WGLFNX(NB,NZ)-RCZLX(NB,NZ))*FWODLN(1)
+                *FSNCL*(WGLFEX(NB,ielmn,NZ)-RCELX(NB,ielmn,NZ))*FWODLN(1)
               ESNC(M,ielmp,1,0,NZ)=ESNC(M,ielmp,1,0,NZ)+CFOPP(1,M,NZ) &
-                *FSNCL*(WGLFPX(NB,NZ)-RCPLX(NB,NZ))*FWODLP(1)
+                *FSNCL*(WGLFEX(NB,ielmp,NZ)-RCELX(NB,ielmp,NZ))*FWODLP(1)
             ENDDO D6300
 !
     !       UPDATE STATE VARIABLES FOR REMOBILIZATION AND LITTERFALL
@@ -646,19 +640,19 @@ module PlantBranchMod
     !       RCCLX,RCZLX,RCPLX=remobilization of C,N,P from senescing leaf
 !
             ARLFB(NB,NZ)=ARLFB(NB,NZ)-FSNCL*ARLFZ(NB,NZ)
-            WTLFBE(NB,ielmc,NZ)=WTLFBE(NB,ielmc,NZ)-FSNCL*WGLFX(NB,NZ)
-            WTLFBE(NB,ielmn,NZ)=WTLFBE(NB,ielmn,NZ)-FSNCL*WGLFNX(NB,NZ)
-            WTLFBE(NB,ielmp,NZ)=WTLFBE(NB,ielmp,NZ)-FSNCL*WGLFPX(NB,NZ)
+            WTLFBE(NB,ielmc,NZ)=WTLFBE(NB,ielmc,NZ)-FSNCL*WGLFEX(NB,ielmc,NZ)
+            WTLFBE(NB,ielmn,NZ)=WTLFBE(NB,ielmn,NZ)-FSNCL*WGLFEX(NB,ielmn,NZ)
+            WTLFBE(NB,ielmp,NZ)=WTLFBE(NB,ielmp,NZ)-FSNCL*WGLFEX(NB,ielmp,NZ)
             ARLF1(K,NB,NZ)=ARLF1(K,NB,NZ)-FSNCL*ARLFZ(NB,NZ)
-            WGLFE(K,NB,ielmc,NZ)=WGLFE(K,NB,ielmc,NZ)-FSNCL*WGLFX(NB,NZ)
-            WGLFE(K,NB,ielmn,NZ)=WGLFE(K,NB,ielmn,NZ)-FSNCL*WGLFNX(NB,NZ)
-            WGLFE(K,NB,ielmp,NZ)=WGLFE(K,NB,ielmp,NZ)-FSNCL*WGLFPX(NB,NZ)
+            WGLFE(K,NB,ielmc,NZ)=WGLFE(K,NB,ielmc,NZ)-FSNCL*WGLFEX(NB,ielmc,NZ)
+            WGLFE(K,NB,ielmn,NZ)=WGLFE(K,NB,ielmn,NZ)-FSNCL*WGLFEX(NB,ielmn,NZ)
+            WGLFE(K,NB,ielmp,NZ)=WGLFE(K,NB,ielmp,NZ)-FSNCL*WGLFEX(NB,ielmp,NZ)
             WSLF(K,NB,NZ)=AZMAX1(WSLF(K,NB,NZ) &
-              -FSNCL*AMAX1(WGLFNX(NB,NZ)*CNWS(NZ) &
-              ,WGLFPX(NB,NZ)*CPWS(NZ)))
-            EPOOL(NB,ielmc,NZ)=EPOOL(NB,ielmc,NZ)+FSNCL*RCCLX(NB,NZ)
-            EPOOL(NB,ielmn,NZ)=EPOOL(NB,ielmn,NZ)+FSNCL*RCZLX(NB,NZ)
-            EPOOL(NB,ielmp,NZ)=EPOOL(NB,ielmp,NZ)+FSNCL*RCPLX(NB,NZ)
+              -FSNCL*AMAX1(WGLFEX(NB,ielmn,NZ)*CNWS(NZ) &
+              ,WGLFEX(NB,ielmp,NZ)*CPWS(NZ)))
+            EPOOL(NB,ielmc,NZ)=EPOOL(NB,ielmc,NZ)+FSNCL*RCELX(NB,ielmc,NZ)
+            EPOOL(NB,ielmn,NZ)=EPOOL(NB,ielmn,NZ)+FSNCL*RCELX(NB,ielmn,NZ)
+            EPOOL(NB,ielmp,NZ)=EPOOL(NB,ielmp,NZ)+FSNCL*RCELX(NB,ielmp,NZ)
 !
     !       REMOBILIZATION OF SHEATHS OR PETIOLE C,N,P ALSO DEPENDS ON
     !       STRUCTURAL C:N:P
@@ -674,15 +668,15 @@ module PlantBranchMod
               WGSHEXE(NB,ielmp,NZ)=AZMAX1(WGSHE(K,NB,ielmp,NZ))
               HTSHEX(NB,NZ)=AZMAX1(HTSHE(K,NB,NZ))
               IF(WGSHEXE(NB,ielmc,NZ).GT.ZEROP(NZ))THEN
-                RCCSX(NB,NZ)=RCCC*WGSHEXE(NB,ielmc,NZ)
-                RCZSX(NB,NZ)=WGSHEXE(NB,ielmn,NZ) &
-                  *(RCCN+(1.0_r8-RCCN)*RCCSX(NB,NZ)/WGSHEXE(NB,ielmc,NZ))
-                RCPSX(NB,NZ)=WGSHEXE(NB,ielmp,NZ) &
-                  *(RCCP+(1.0_r8-RCCP)*RCCSX(NB,NZ)/WGSHEXE(NB,ielmc,NZ))
+                RCESX(NB,ielmc,NZ)=RCCC*WGSHEXE(NB,ielmc,NZ)
+                RCESX(NB,ielmn,NZ)=WGSHEXE(NB,ielmn,NZ) &
+                  *(RCCN+(1.0_r8-RCCN)*RCESX(NB,ielmc,NZ)/WGSHEXE(NB,ielmc,NZ))
+                RCESX(NB,ielmp,NZ)=WGSHEXE(NB,ielmp,NZ) &
+                  *(RCCP+(1.0_r8-RCCP)*RCESX(NB,ielmc,NZ)/WGSHEXE(NB,ielmc,NZ))
               ELSE
-                RCCSX(NB,NZ)=0._r8
-                RCZSX(NB,NZ)=0._r8
-                RCPSX(NB,NZ)=0._r8
+                RCESX(NB,ielmc,NZ)=0._r8
+                RCESX(NB,ielmn,NZ)=0._r8
+                RCESX(NB,ielmp,NZ)=0._r8
               ENDIF
               WTSTXB(NB,NZ)=WTSTXB(NB,NZ)+WGNODE(K,NB,NZ)
               WTSTXN(NB,NZ)=WTSTXN(NB,NZ)+WGNODN(K,NB,NZ)
@@ -717,17 +711,17 @@ module PlantBranchMod
 !
             D6305: DO M=1,jsken
               ESNC(M,ielmc,0,0,NZ)=ESNC(M,ielmc,0,0,NZ)+CFOPC(5,M,NZ) &
-                *FSNCS*(WGSHEXE(NB,ielmc,NZ)-RCCSX(NB,NZ))*FWODB(0)
+                *FSNCS*(WGSHEXE(NB,ielmc,NZ)-RCESX(NB,ielmc,NZ))*FWODB(0)
               ESNC(M,ielmn,0,0,NZ)=ESNC(M,ielmn,0,0,NZ)+CFOPN(5,M,NZ) &
-                *FSNCS*(WGSHEXE(NB,ielmn,NZ)-RCZSX(NB,NZ))*FWODSN(0)
+                *FSNCS*(WGSHEXE(NB,ielmn,NZ)-RCESX(NB,ielmn,NZ))*FWODSN(0)
               ESNC(M,ielmp,0,0,NZ)=ESNC(M,ielmp,0,0,NZ)+CFOPP(5,M,NZ) &
-                *FSNCS*(WGSHEXE(NB,ielmp,NZ)-RCPSX(NB,NZ))*FWODSP(0)
+                *FSNCS*(WGSHEXE(NB,ielmp,NZ)-RCESX(NB,ielmp,NZ))*FWODSP(0)
               ESNC(M,ielmc,1,0,NZ)=ESNC(M,ielmc,1,0,NZ)+CFOPC(2,M,NZ) &
-                *FSNCS*(WGSHEXE(NB,ielmc,NZ)-RCCSX(NB,NZ))*FWODB(1)
+                *FSNCS*(WGSHEXE(NB,ielmc,NZ)-RCESX(NB,ielmc,NZ))*FWODB(1)
               ESNC(M,ielmn,1,0,NZ)=ESNC(M,ielmn,1,0,NZ)+CFOPN(2,M,NZ) &
-                *FSNCS*(WGSHEXE(NB,ielmn,NZ)-RCZSX(NB,NZ))*FWODSN(1)
+                *FSNCS*(WGSHEXE(NB,ielmn,NZ)-RCESX(NB,ielmn,NZ))*FWODSN(1)
               ESNC(M,ielmp,1,0,NZ)=ESNC(M,ielmp,1,0,NZ)+CFOPP(2,M,NZ) &
-                *FSNCS*(WGSHEXE(NB,ielmp,NZ)-RCPSX(NB,NZ))*FWODSP(1)
+                *FSNCS*(WGSHEXE(NB,ielmp,NZ)-RCESX(NB,ielmp,NZ))*FWODSP(1)
             ENDDO D6305
 !
     !       UPDATE STATE VARIABLES FOR REMOBILIZATION AND LITTERFALL
@@ -750,9 +744,9 @@ module PlantBranchMod
             WSSHE(K,NB,NZ)=AZMAX1(WSSHE(K,NB,NZ) &
               -FSNCS*AMAX1(WGSHEXE(NB,ielmn,NZ)*CNWS(NZ) &
               ,WGSHEXE(NB,ielmp,NZ)*CPWS(NZ)))
-            EPOOL(NB,ielmc,NZ)=EPOOL(NB,ielmc,NZ)+FSNCS*RCCSX(NB,NZ)
-            EPOOL(NB,ielmn,NZ)=EPOOL(NB,ielmn,NZ)+FSNCS*RCZSX(NB,NZ)
-            EPOOL(NB,ielmp,NZ)=EPOOL(NB,ielmp,NZ)+FSNCS*RCPSX(NB,NZ)
+            EPOOL(NB,ielmc,NZ)=EPOOL(NB,ielmc,NZ)+FSNCS*RCESX(NB,ielmc,NZ)
+            EPOOL(NB,ielmn,NZ)=EPOOL(NB,ielmn,NZ)+FSNCS*RCESX(NB,ielmn,NZ)
+            EPOOL(NB,ielmp,NZ)=EPOOL(NB,ielmp,NZ)+FSNCS*RCESX(NB,ielmp,NZ)
           ENDIF
         ENDIF
 !

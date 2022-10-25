@@ -139,11 +139,9 @@ module CanopyDataType
   real(r8),allocatable ::  WTNDBE(:,:,:,:,:)                  !branch nodule element, [g d-2]
   real(r8),allocatable ::  WGSHEXE(:,:,:,:,:)                  !branch sheath structural element, [g d-2]
   real(r8),allocatable ::  WTSTXB(:,:,:,:)                    !branch stalk structural C, [g d-2]
-  real(r8),allocatable ::  WGLFX(:,:,:,:)                     !branch leaf structural C, [g d-2]
-  real(r8),allocatable ::  WGLFPX(:,:,:,:)                    !branch leaf structural P, [g d-2]
+  real(r8),allocatable ::  WGLFEX(:,:,:,:,:)                     !branch leaf structural element, [g d-2]
   real(r8),allocatable ::  WTSTXP(:,:,:,:)                    !branch stalk structural P, [g d-2]
   real(r8),allocatable ::  WTSTXN(:,:,:,:)                    !branch stalk structural N, [g d-2]
-  real(r8),allocatable ::  WGLFNX(:,:,:,:)                    !branch leaf structural N, [g d-2]
   real(r8),allocatable ::  WGLFE(:,:,:,:,:,:)                    !leaf element, [g d-2]
   real(r8),allocatable ::  WGSHE(:,:,:,:,:,:)                 !sheath element , [g d-2]
   real(r8),allocatable ::  WGNODE(:,:,:,:,:)                  !internode C, [g d-2]
@@ -298,11 +296,9 @@ module CanopyDataType
   allocate(WTNDBE(JC,npelms,JP,JY,JX)); WTNDBE=0._r8
   allocate(WGSHEXE(JC,npelms,JP,JY,JX));WGSHEXE=0._r8
   allocate(WTSTXB(JC,JP,JY,JX));WTSTXB=0._r8
-  allocate(WGLFX(JC,JP,JY,JX)); WGLFX=0._r8
-  allocate(WGLFPX(JC,JP,JY,JX));WGLFPX=0._r8
+  allocate(WGLFEX(JC,npelms,JP,JY,JX)); WGLFEX=0._r8
   allocate(WTSTXP(JC,JP,JY,JX));WTSTXP=0._r8
   allocate(WTSTXN(JC,JP,JY,JX));WTSTXN=0._r8
-  allocate(WGLFNX(JC,JP,JY,JX));WGLFNX=0._r8
   allocate(WGLFE(0:JNODS,JC,npelms,JP,JY,JX));WGLFE=0._r8
   allocate(WGSHE(0:JNODS,JC,npelms,JP,JY,JX));WGSHE=0._r8
   allocate(WGNODE(0:JNODS,JC,JP,JY,JX));WGNODE=0._r8
@@ -458,11 +454,9 @@ module CanopyDataType
   call destroy(WTNDBE)
   call destroy(WGSHEXE)
   call destroy(WTSTXB)
-  call destroy(WGLFX)
-  call destroy(WGLFPX)
+  call destroy(WGLFEX)
   call destroy(WTSTXP)
   call destroy(WTSTXN)
-  call destroy(WGLFNX)
   call destroy(WGLFE)
   call destroy(WGSHE)
   call destroy(WGNODE)

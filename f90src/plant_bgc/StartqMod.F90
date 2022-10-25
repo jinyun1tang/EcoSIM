@@ -489,7 +489,7 @@ module StartqMod
     D15: DO M=1,10
       IDAY(M,NB,NZ,NY,NX)=0
     ENDDO D15
-  ENDDO D10 
+  ENDDO D10
 !
 !     INITIALIZE PLANT MORPHOLOGY AND BIOMASS
 !
@@ -514,16 +514,10 @@ module StartqMod
     GRWTB(NB,NZ,NY,NX)=0._r8
     ARLFB(NB,NZ,NY,NX)=0._r8
     RNH3B(NB,NZ,NY,NX)=0._r8
-    RCZLX(NB,NZ,NY,NX)=0._r8
-    RCPLX(NB,NZ,NY,NX)=0._r8
-    RCCLX(NB,NZ,NY,NX)=0._r8
-    WGLFX(NB,NZ,NY,NX)=0._r8
-    WGLFNX(NB,NZ,NY,NX)=0._r8
-    WGLFPX(NB,NZ,NY,NX)=0._r8
+    RCELX(NB,1:npelms,NZ,NY,NX)=0._r8
+    WGLFEX(NB,1:npelms,NZ,NY,NX)=0._r8
     ARLFZ(NB,NZ,NY,NX)=0._r8
-    RCZSX(NB,NZ,NY,NX)=0._r8
-    RCPSX(NB,NZ,NY,NX)=0._r8
-    RCCSX(NB,NZ,NY,NX)=0._r8
+    RCESX(NB,1:npelms,NZ,NY,NX)=0._r8
     WTSTXB(NB,NZ,NY,NX)=0._r8
     WTSTXN(NB,NZ,NY,NX)=0._r8
     WTSTXP(NB,NZ,NY,NX)=0._r8

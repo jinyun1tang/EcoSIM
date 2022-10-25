@@ -295,12 +295,8 @@ implicit none
   real(r8), pointer :: OSTR(:)     => null()     !plant O2 stress indicator, []
   real(r8), pointer :: PB(:)       => null()     !branch nonstructural C content required for new branch, [gC gC-1]
   real(r8), pointer :: PR(:)       => null()     !threshold root nonstructural C content for initiating new root axis, [gC gC-1]
-  real(r8), pointer :: RCCLX(:,:) => null()     !C translocated from leaf during senescence, [g d-2 h-1]
-  real(r8), pointer :: RCZLX(:,:) => null()     !N translocated from leaf during senescence, [g d-2 h-1]
-  real(r8), pointer :: RCPLX(:,:) => null()     !P translocated from leaf during senescence, [g d-2 h-1]
-  real(r8), pointer :: RCCSX(:,:) => null()     !C translocated from sheath during senescence, [g d-2 h-1]
-  real(r8), pointer :: RCZSX(:,:) => null()     !N translocated from sheath during senescence, [g d-2 h-1]
-  real(r8), pointer :: RCPSX(:,:) => null()     !P translocated from sheath during senescence, [g d-2 h-1]
+  real(r8), pointer :: RCELX(:,:,:) => null()    !element translocated from leaf during senescence, [g d-2 h-1]
+  real(r8), pointer :: RCESX(:,:,:) => null()    !element translocated from sheath during senescence, [g d-2 h-1]
   real(r8), pointer :: TCZ(:)     => null()     !threshold temperature for spring leafout/dehardening, [oC]
   real(r8), pointer :: TCG(:)     => null()     !canopy growth temperature, [oC]
   real(r8), pointer :: TCX(:)     => null()     !threshold temperature for autumn leafoff/hardening, [oC]
@@ -563,9 +559,7 @@ implicit none
   real(r8), pointer :: WTGRBE(:,:,:)  => null()   !branch grain element, [g d-2]
   real(r8), pointer :: WTSTKBE(:,:,:) => null()   !branch stalk element, [g d-2]
   real(r8), pointer :: WTSHTBE(:,:,:)    => null()   !branch shoot C, [g d-2]
-  real(r8), pointer :: WGLFX(:,:)     => null()   !branch leaf structural C, [g d-2]
-  real(r8), pointer :: WGLFNX(:,:)    => null()   !branch leaf structural N, [g d-2]
-  real(r8), pointer :: WGLFPX(:,:)    => null()   !branch leaf structural P, [g d-2]
+  real(r8), pointer :: WGLFEX(:,:,:)    => null()   !branch leaf structural element, [g d-2]
   real(r8), pointer :: WGSHEXE(:,:,:) => null()   !branch sheath structural element, [g d-2]
   real(r8), pointer :: WTSTXB(:,:)    => null()   !branch stalk structural C, [g d-2]
   real(r8), pointer :: WTSTXN(:,:)    => null()   !branch stalk structural N, [g d-2]
@@ -1654,9 +1648,7 @@ implicit none
   allocate(this%WTHSKE(npelms,JP1))
   allocate(this%WTEARE(npelms,JP1))
   allocate(this%WTNDE(npelms,JP1))
-  allocate(this%WGLFX(JC1,JP1))
-  allocate(this%WGLFNX(JC1,JP1))
-  allocate(this%WGLFPX(JC1,JP1))
+  allocate(this%WGLFEX(JC1,npelms,JP1))
   allocate(this%WGSHEXE(JC1,npelms,JP1))
   allocate(this%WTSHTE(npelms,JP1))
   allocate(this%WTSHTA(JP1))
@@ -1738,9 +1730,7 @@ implicit none
 !  if(allocated(WTLFN))deallocate(WTLFN)
 !  if(allocated(WTEAR))deallocate(WTEAR)
 !  if(allocated(WTHSKE))deallocate(WTHSKE)
-!  if(allocated(WGLFX))deallocate(WGLFX)
-!  if(allocated(WGLFNX))deallocate(WGLFNX)
-!  if(allocated(WGLFPX))deallocate(WGLFPX)
+!  if(allocated(WGLFEX))deallocate(WGLFEX)
 !  if(allocated(WGSHEXE))deallocate(WGSHEXE)
 !  if(allocated(WTLSB))deallocate(WTLSB)
 !  if(allocated(WTRSVBE))deallocate(WTRSVBE)
@@ -2222,12 +2212,8 @@ implicit none
   allocate(this%TKG(JP1))
   allocate(this%TCX(JP1))
   allocate(this%WSTR(JP1))
-  allocate(this%RCCLX(JC1,JP1))
-  allocate(this%RCZLX(JC1,JP1))
-  allocate(this%RCPLX(JC1,JP1))
-  allocate(this%RCCSX(JC1,JP1))
-  allocate(this%RCZSX(JC1,JP1))
-  allocate(this%RCPSX(JC1,JP1))
+  allocate(this%RCELX(JC1,npelms,JP1))
+  allocate(this%RCESX(JC1,npelms,JP1))
 
   allocate(this%TFN4(JZ1,JP1))
   allocate(this%GFILL(JP1))
@@ -2301,12 +2287,8 @@ implicit none
 !  if(allocated(TKG))deallocate(TKG)
 !  if(allocated(TCX))deallocate(TCX)
 !  if(allocated(WSTR))deallocate(WSTR)
-!  if(allocated(RCCLX))deallocate(RCCLX)
-!  if(allocated(RCZLX))deallocate(RCZLX)
-!  if(allocated(RCPLX))deallocate(RCPLX)
-!  if(allocated(RCCSX))deallocate(RCCSX)
-!  if(allocated(RCZSX))deallocate(RCZSX)
-!  if(allocated(RCPSX))deallocate(RCPSX)
+!  if(allocated(RCELX))deallocate(RCELX)
+!  if(allocated(RCESX))deallocate(RCESX)
 !  if(allocated(TFN4))deallocate(TFN4)
 !  if(allocated(GFILL))deallocate(GFILL)
 !  if(allocated(RTARP))deallocate(RTARP)

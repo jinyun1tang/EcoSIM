@@ -28,12 +28,10 @@ module PlantDataRateType
   real(r8),allocatable ::  RUPP2B(:,:,:,:,:)                  !root uptake of H2PO4 band
   real(r8),allocatable ::  RUPP1P(:,:,:,:,:)                  !HPO4 demand in non-band by each root population
   real(r8),allocatable ::  RUPP1B(:,:,:,:,:)                  !HPO4 demand in band by each root population
-  real(r8),allocatable ::  RCZLX(:,:,:,:)                     !N translocated from leaf during senescence, [g d-2 h-1]
-  real(r8),allocatable ::  RCPLX(:,:,:,:)                     !P translocated from leaf during senescence, [g d-2 h-1]
-  real(r8),allocatable ::  RCCLX(:,:,:,:)                     !C translocated from leaf during senescence, [g d-2 h-1]
+  real(r8),allocatable ::  RCELX(:,:,:,:,:)                   !element translocated from leaf during senescence, [g d-2 h-1]
   real(r8),allocatable ::  RCZSX(:,:,:,:)                     !N translocated from sheath during senescence, [g d-2 h-1]
   real(r8),allocatable ::  RCPSX(:,:,:,:)                     !P translocated from sheath during senescence, [g d-2 h-1]
-  real(r8),allocatable ::  RCCSX(:,:,:,:)                     !C translocated from sheath during senescence, [g d-2 h-1]
+  real(r8),allocatable ::  RCESX(:,:,:,:,:)                   !element translocated from sheath during senescence, [g d-2 h-1]
   real(r8),allocatable ::  CARBN(:,:,:)                       !total gross CO2 fixation, [g d-2 ]
   real(r8),allocatable ::  TESNC(:,:,:,:)                     !total plant element litterfall , [g d-2 ]
   real(r8),allocatable ::  TZUPFX(:,:,:)                      !total plant N2 fixation, [g d-2 ]
@@ -209,12 +207,8 @@ module PlantDataRateType
   allocate(RUPP2B(2,JZ,JP,JY,JX));RUPP2B=0._r8
   allocate(RUPP1P(2,JZ,JP,JY,JX));RUPP1P=0._r8
   allocate(RUPP1B(2,JZ,JP,JY,JX));RUPP1B=0._r8
-  allocate(RCZLX(JC,JP,JY,JX)); RCZLX=0._r8
-  allocate(RCPLX(JC,JP,JY,JX)); RCPLX=0._r8
-  allocate(RCCLX(JC,JP,JY,JX)); RCCLX=0._r8
-  allocate(RCZSX(JC,JP,JY,JX)); RCZSX=0._r8
-  allocate(RCPSX(JC,JP,JY,JX)); RCPSX=0._r8
-  allocate(RCCSX(JC,JP,JY,JX)); RCCSX=0._r8
+  allocate(RCELX(JC,npelms,JP,JY,JX)); RCELX=0._r8
+  allocate(RCESX(JC,npelms,JP,JY,JX)); RCESX=0._r8
   allocate(CARBN(JP,JY,JX));    CARBN=0._r8
   allocate(TESNC(npelms,JP,JY,JX));    TESNC=0._r8
   allocate(TZUPFX(JP,JY,JX));   TZUPFX=0._r8
@@ -381,12 +375,8 @@ module PlantDataRateType
   call destroy(RUPP2B)
   call destroy(RUPP1P)
   call destroy(RUPP1B)
-  call destroy(RCZLX)
-  call destroy(RCPLX)
-  call destroy(RCCLX)
-  call destroy(RCZSX)
-  call destroy(RCPSX)
-  call destroy(RCCSX)
+  call destroy(RCELX)
+  call destroy(RCESX)
   call destroy(CARBN)
   call destroy(TESNC)
   call destroy(TZUPFX)
