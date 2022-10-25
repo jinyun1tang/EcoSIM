@@ -733,19 +733,17 @@ module PlantDisturbsMod
     WGLFLN   =>  plt_biom%WGLFLN     , &
     WGLFL    =>  plt_biom%WGLFL      , &
     WTSHEBE  =>  plt_biom%WTSHEBE    , &
-    WGLF     =>  plt_biom%WGLF       , &
+    WGLFE    =>  plt_biom%WGLFE      , &
     WTSTXN   =>  plt_biom%WTSTXN     , &
     WTLSB    =>  plt_biom%WTLSB      , &
     WTSTXB   =>  plt_biom%WTSTXB     , &
     WVSTKB   =>  plt_biom%WVSTKB     , &
     WTSTXP   =>  plt_biom%WTSTXP     , &
-    WGLFP    =>  plt_biom%WGLFP      , &
     WSSHE    =>  plt_biom%WSSHE      , &
     WGSHE    =>  plt_biom%WGSHE      , &
     WTRT1E   =>  plt_biom%WTRT1E     , &
     WSLF     =>  plt_biom%WSLF       , &
     WGNODE   =>  plt_biom%WGNODE     , &
-    WGLFN    =>  plt_biom%WGLFN      , &
     WGNODN   =>  plt_biom%WGNODN     , &
     WGNODP   =>  plt_biom%WGNODP     , &
     WVSTK    =>  plt_biom%WVSTK      , &
@@ -995,7 +993,7 @@ module PlantDisturbsMod
                 HCOB(K,NB,NZ)=HCOB(K,NB,NZ)*XHVST
               ENDIF
               ARLF1(K,NB,NZ)=ARLF1(K,NB,NZ)*XHVST
-              WGLF(K,NB,NZ)=WGLF(K,NB,NZ)*XHVST
+              WGLFE(K,NB,ielmc,NZ)=WGLFE(K,NB,ielmc,NZ)*XHVST
               WSLF(K,NB,NZ)=WSLF(K,NB,NZ)*XHVST
 !     HTSHE(K,NB,NZ)=HTSHE(K,NB,NZ)*XHVST
               WGSHE(K,NB,ielmc,NZ)=WGSHE(K,NB,ielmc,NZ)*XHVST
@@ -1003,10 +1001,10 @@ module PlantDisturbsMod
 !     HTNODE(K,NB,NZ)=HTNODE(K,NB,NZ)*XHVST
 !     HTNODX(K,NB,NZ)=HTNODX(K,NB,NZ)*XHVST
               WGNODE(K,NB,NZ)=WGNODE(K,NB,NZ)*XHVST
-              WGLFN(K,NB,NZ)=WGLFN(K,NB,NZ)*XHVST
+              WGLFE(K,NB,ielmn,NZ)=WGLFE(K,NB,ielmn,NZ)*XHVST
               WGSHE(K,NB,ielmn,NZ)=WGSHE(K,NB,ielmn,NZ)*XHVST
               WGNODN(K,NB,NZ)=WGNODN(K,NB,NZ)*XHVST
-              WGLFP(K,NB,NZ)=WGLFP(K,NB,NZ)*XHVST
+              WGLFE(K,NB,ielmp,NZ)=WGLFE(K,NB,ielmp,NZ)*XHVST
               WGSHE(K,NB,ielmp,NZ)=WGSHE(K,NB,ielmp,NZ)*XHVST
               WGNODP(K,NB,NZ)=WGNODP(K,NB,NZ)*XHVST
               DO 8965 L=1,JC1
@@ -1336,13 +1334,11 @@ module PlantDisturbsMod
     WGLFL    => plt_biom%WGLFL     , &
     WGLFLN   => plt_biom%WGLFLN    , &
     WGLFLP   => plt_biom%WGLFLP    , &
-    WGLFP    => plt_biom%WGLFP     , &
     WTSHEBE  => plt_biom%WTSHEBE   , &
     EPOOL    => plt_biom%EPOOL     , &
     WGSHE    => plt_biom%WGSHE     , &
-    WGLFN    => plt_biom%WGLFN     , &
     WSLF     => plt_biom%WSLF      , &
-    WGLF     => plt_biom%WGLF      , &
+    WGLFE    => plt_biom%WGLFE     , &
     WTLFBE   => plt_biom%WTLFBE    , &
     WSSHE    => plt_biom%WSSHE     , &
     WTSTKE   => plt_biom%WTSTKE    , &
@@ -1840,9 +1836,9 @@ module PlantDisturbsMod
 !          IHVST=4 or 6:specific herbivory rate (g DM g-1 LM d-1)
 !
           IF(IHVST(NZ).NE.4.AND.IHVST(NZ).NE.6)THEN
-            IF(WGLF(K,NB,NZ).GT.ZEROP(NZ).AND.EHVST(1,1,NZ).GT.0.0)THEN
+            IF(WGLFE(K,NB,ielmc,NZ).GT.ZEROP(NZ).AND.EHVST(1,1,NZ).GT.0.0)THEN
               FHVSTK(K)=AZMAX1(AMIN1(1.0_r8,(1._r8-(1._r8-AZMAX1(WGLFG) &
-                /WGLF(K,NB,NZ))*EHVST(1,2,NZ)/EHVST(1,1,NZ))))
+                /WGLFE(K,NB,ielmc,NZ))*EHVST(1,2,NZ)/EHVST(1,1,NZ))))
               FHVSHK(K)=FHVSTK(K)
           ELSE
             IF(test_aeqb(THIN(NZ),0._r8))THEN
@@ -1869,10 +1865,10 @@ module PlantDisturbsMod
 !     ARLFB,ARLF=branch,node leaf area
 !     WSLF=leaf protein mass
 !
-        WGLFGY=WGLFGY+WGLF(K,NB,NZ)
-        WTLFBE(NB,ielmc,NZ)=WTLFBE(NB,ielmc,NZ)-WGLF(K,NB,NZ)+WGLFG
-        WTLFBE(NB,ielmn,NZ)=WTLFBE(NB,ielmn,NZ)-WGLFN(K,NB,NZ)+WGLFNG
-        WTLFBE(NB,ielmp,NZ)=WTLFBE(NB,ielmp,NZ)-WGLFP(K,NB,NZ)+WGLFPG
+        WGLFGY=WGLFGY+WGLFE(K,NB,ielmc,NZ)
+        WTLFBE(NB,ielmc,NZ)=WTLFBE(NB,ielmc,NZ)-WGLFE(K,NB,ielmc,NZ)+WGLFG
+        WTLFBE(NB,ielmn,NZ)=WTLFBE(NB,ielmn,NZ)-WGLFE(K,NB,ielmn,NZ)+WGLFNG
+        WTLFBE(NB,ielmp,NZ)=WTLFBE(NB,ielmp,NZ)-WGLFE(K,NB,ielmp,NZ)+WGLFPG
         ARLFB(NB,NZ)=ARLFB(NB,NZ)-ARLF1(K,NB,NZ)+ARLFG
         IF(ARLF1(K,NB,NZ).GT.ZEROP(NZ))THEN
           WSLF(K,NB,NZ)=WSLF(K,NB,NZ)*ARLFG/ARLF1(K,NB,NZ)
@@ -1880,10 +1876,10 @@ module PlantDisturbsMod
           WSLF(K,NB,NZ)=0._r8
         ENDIF
         ARLF1(K,NB,NZ)=ARLFG
-        WGLF(K,NB,NZ)=WGLFG
-        WGLFN(K,NB,NZ)=WGLFNG
-        WGLFP(K,NB,NZ)=WGLFPG
-        WGLFGX=WGLFGX+WGLF(K,NB,NZ)
+        WGLFE(K,NB,ielmc,NZ)=WGLFG
+        WGLFE(K,NB,ielmn,NZ)=WGLFNG
+        WGLFE(K,NB,ielmp,NZ)=WGLFPG
+        WGLFGX=WGLFGX+WGLFE(K,NB,ielmc,NZ)
       ENDDO D9825
 !
 !     CUT SHEATHS OR PETIOLES AND STALKS HARVESTED NODES AND LAYERS

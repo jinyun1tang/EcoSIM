@@ -691,10 +691,8 @@ module StartqsMod
       HTNODE(K,NB,NZ)=0._r8
       plt_morph%HTNODX(K,NB,NZ)=0._r8
       plt_morph%HTSHE(K,NB,NZ)=0._r8
-      plt_biom%WGLF(K,NB,NZ)=0._r8
+      plt_biom%WGLFE(K,NB,1:npelms,NZ)=0._r8
       plt_biom%WSLF(K,NB,NZ)=0._r8
-      plt_biom%WGLFN(K,NB,NZ)=0._r8
-      plt_biom%WGLFP(K,NB,NZ)=0._r8
       plt_biom%WGSHE(K,NB,1:npelms,NZ)=0._r8
       plt_biom%WSSHE(K,NB,NZ)=0._r8
       plt_biom%WGNODE(K,NB,NZ)=0._r8

@@ -168,7 +168,7 @@
               READ(28,93)IDATE,IYR,NZ,(CO2B(K,NB,NZ,NY,NX),K=1,JNODS)
               READ(28,93)IDATE,IYR,NZ,(HCOB(K,NB,NZ,NY,NX),K=1,JNODS)
               READ(28,93)IDATE,IYR,NZ,(ARLF(K,NB,NZ,NY,NX),K=0,JNODS)
-              READ(28,93)IDATE,IYR,NZ,(WGLF(K,NB,NZ,NY,NX),K=0,JNODS)
+              READ(28,93)IDATE,IYR,NZ,(WGLFE(K,NB,ielmc,NZ,NY,NX),K=0,JNODS)
               READ(28,93)IDATE,IYR,NZ,(WSLF(K,NB,NZ,NY,NX),K=0,JNODS)
               READ(28,93)IDATE,IYR,NZ,(HTSHE(K,NB,NZ,NY,NX),K=0,JNODS)
               READ(28,93)IDATE,IYR,NZ,(WGSHE(K,NB,ielmc,NZ,NY,NX),K=0,JNODS)
@@ -176,23 +176,23 @@
               READ(28,93)IDATE,IYR,NZ,(HTNODE(K,NB,NZ,NY,NX),K=0,JNODS)
               READ(28,93)IDATE,IYR,NZ,(HTNODX(K,NB,NZ,NY,NX),K=0,JNODS)
               READ(28,93)IDATE,IYR,NZ,(WGNODE(K,NB,NZ,NY,NX),K=0,JNODS)
-              READ(28,93)IDATE,IYR,NZ,(WGLFN(K,NB,NZ,NY,NX),K=0,JNODS)
+              READ(28,93)IDATE,IYR,NZ,(WGLFE(K,NB,ielmn,NZ,NY,NX),K=0,JNODS)
               READ(28,93)IDATE,IYR,NZ,(WGSHE(K,NB,ielmn,NZ,NY,NX),K=0,JNODS)
               READ(28,93)IDATE,IYR,NZ,(WGNODN(K,NB,NZ,NY,NX),K=0,JNODS)
-              READ(28,93)IDATE,IYR,NZ,(WGLFP(K,NB,NZ,NY,NX),K=0,JNODS)
+              READ(28,93)IDATE,IYR,NZ,(WGLFE(K,NB,ielmp,NZ,NY,NX),K=0,JNODS)
               READ(28,93)IDATE,IYR,NZ,(WGSHE(K,NB,ielmp,NZ,NY,NX),K=0,JNODS)
               READ(28,93)IDATE,IYR,NZ,(WGNODP(K,NB,NZ,NY,NX),K=0,JNODS)
-              DO 9950 K=0,JNODS
+              D9950: DO K=0,JNODS
                 READ(28,94)IDATE,IYR,NZ,(ARLFL(L,K,NB,NZ,NY,NX),L=1,JC)
                 READ(28,94)IDATE,IYR,NZ,(WGLFL(L,K,NB,NZ,NY,NX),L=1,JC)
                 READ(28,94)IDATE,IYR,NZ,(WGLFLN(L,K,NB,NZ,NY,NX),L=1,JC)
                 READ(28,94)IDATE,IYR,NZ,(WGLFLP(L,K,NB,NZ,NY,NX),L=1,JC)
                 IF(K.NE.0)THEN
-                  DO 9940 N=1,4
+                  D9940: DO N=1,4
                     READ(28,94)IDATE,IYR,NZ,(SURF(N,L,K,NB,NZ,NY,NX),L=1,JC)
-9940              CONTINUE
+                  ENDDO D9940
                 ENDIF
-9950          CONTINUE
+              ENDDO D9950
               READ(28,94)IDATE,IYR,NZ,(ARSTK(L,NB,NZ,NY,NX),L=1,JC)
               DO L=1,JC
                 READ(28,92)IDATE,IYR,NZ,(SURFB(N,L,NB,NZ,NY,NX),N=1,JLI)
@@ -361,10 +361,8 @@
                   HTNODE(K,NB,NZ,NY,NX)=0.0
                   HTNODX(K,NB,NZ,NY,NX)=0.0
                   HTSHE(K,NB,NZ,NY,NX)=0.0
-                  WGLF(K,NB,NZ,NY,NX)=0.0
+                  WGLFE(K,NB,1:npelms,NZ,NY,NX)=0.0
                   WSLF(K,NB,NZ,NY,NX)=0.0
-                  WGLFN(K,NB,NZ,NY,NX)=0.0
-                  WGLFP(K,NB,NZ,NY,NX)=0.0
                   WGSHE(K,NB,1:npelms,NZ,NY,NX)=0.0
                   WSSHE(K,NB,NZ,NY,NX)=0.0
                   WGNODE(K,NB,NZ,NY,NX)=0.0
@@ -381,11 +379,11 @@
                     CO2B(K,NB,NZ,NY,NX)=0.0
                     HCOB(K,NB,NZ,NY,NX)=0.0
                     CPOOL4(K,NB,NZ,NY,NX)=0.0
-                    DO 45 L=1,JC
+                    D45: DO L=1,JC
                       DO N=1,4
                         SURF(N,L,K,NB,NZ,NY,NX)=0.0
                       ENDDO
-45                  CONTINUE
+                    ENDDO D45
                   ENDIF
 9620            CONTINUE
 9610          CONTINUE

@@ -335,8 +335,8 @@
   real(r8) :: VCDN4,VCDN
   real(r8) :: VOGRO
 !     begin_execution
-  associate(                          &
-    WGLF    =>  plt_biom%WGLF   , &
+  associate(                      &
+    WGLFE   =>  plt_biom%WGLFE  , &
     ZEROP   =>  plt_biom%ZEROP  , &
     ARLFL   =>  plt_morph%ARLFL , &
     FDBKX   =>  plt_photo%FDBKX , &
@@ -375,8 +375,8 @@
 !     FBS,FMP=leaf water content in bundle sheath, mesophyll
 !     FDBK4=N,P feedback inhibition on C4 CO2 fixation
 !
-  CC4M=AZMAX1(0.021E+09_r8*CPOOL4(K,NB,NZ)/(WGLF(K,NB,NZ)*FMP))
-  CCBS=AZMAX1(0.083E+09_r8*CO2B(K,NB,NZ)/(WGLF(K,NB,NZ)*FBS))
+  CC4M=AZMAX1(0.021E+09_r8*CPOOL4(K,NB,NZ)/(WGLFE(K,NB,ielmc,NZ)*FMP))
+  CCBS=AZMAX1(0.083E+09_r8*CO2B(K,NB,NZ)/(WGLFE(K,NB,ielmc,NZ)*FBS))
   FDBK4(K,NB,NZ)=1.0_r8/(1.0_r8+CC4M/C4KI)
   FDBK4(K,NB,NZ)=FDBK4(K,NB,NZ)*FDBKX(NB,NZ)
 !
@@ -621,13 +621,13 @@
     VCGR4    => plt_photo%VCGR4   , &
     VCGRO    => plt_photo%VCGRO   , &
     ZERO     => plt_site%ZERO     , &
-    WGLF     => plt_biom%WGLF     , &
+    WGLFE    => plt_biom%WGLFE    , &
     ZEROP    => plt_biom%ZEROP    , &
     WSLF     => plt_biom%WSLF     , &
     ARLF1    => plt_morph%ARLF1     &
   )
   DO K=1,JNODS1
-    IF(ARLF1(K,NB,NZ).GT.ZEROP(NZ).AND.WGLF(K,NB,NZ).GT.ZEROP(NZ))THEN
+    IF(ARLF1(K,NB,NZ).GT.ZEROP(NZ).AND.WGLFE(K,NB,ielmc,NZ).GT.ZEROP(NZ))THEN
       WSDN=WSLF(K,NB,NZ)/ARLF1(K,NB,NZ)
     ELSE
       WSDN=0.0

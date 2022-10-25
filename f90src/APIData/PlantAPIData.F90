@@ -533,9 +533,7 @@ implicit none
   real(r8), pointer :: WGNODE(:,:,:)  => null()    !internode C, [g d-2]
   real(r8), pointer :: WGNODN(:,:,:)  => null()    !internode N, [g d-2]
   real(r8), pointer :: WGNODP(:,:,:)  => null()    !nodule P, [g d-2]
-  real(r8), pointer :: WGLF(:,:,:)    => null()    !leaf C, [g d-2]
-  real(r8), pointer :: WGLFN(:,:,:)   => null()    !leaf N, [g d-2]
-  real(r8), pointer :: WGLFP(:,:,:)   => null()    !leaf P, [g d-2]
+  real(r8), pointer :: WGLFE(:,:,:,:)    => null()    !leaf element, [g d-2]
   real(r8), pointer :: WSLF(:,:,:)    => null()    !layer leaf protein C, [g d-2]
   real(r8), pointer :: WGSHE(:,:,:,:)   => null()  !sheath element , [g d-2]
   real(r8), pointer :: WSSHE(:,:,:)   => null()    !layer sheath protein C, [g d-2]
@@ -1633,9 +1631,7 @@ implicit none
   allocate(this%WGNODE(0:JNODS1,JC1,JP1))
   allocate(this%WGNODN(0:JNODS1,JC1,JP1))
   allocate(this%WGNODP(0:JNODS1,JC1,JP1))
-  allocate(this%WGLF(0:JNODS1,JC1,JP1))
-  allocate(this%WGLFN(0:JNODS1,JC1,JP1))
-  allocate(this%WGLFP(0:JNODS1,JC1,JP1))
+  allocate(this%WGLFE(0:JNODS1,JC1,npelms,JP1))
   allocate(this%WGSHE(0:JNODS1,JC1,npelms,JP1))
   allocate(this%WGLFL(JC1,0:JNODS1,JC1,JP1))
   allocate(this%WGLFLN(JC1,0:JNODS1,JC1,JP1))
@@ -1715,9 +1711,7 @@ implicit none
 !  if(allocated(CZPOLR))deallocate(CZPOLR)
 !  if(allocated(CPPOLR))deallocate(CPPOLR)
 !  if(allocated(WVSTK))deallocate(WVSTK)
-!  if(allocated(WGLF))deallocate(WGLF)
-!  if(allocated(WGLFN))deallocate(WGLFN)
-!  if(allocated(WGLFP))deallocate(WGLFP)
+!  if(allocated(WGLFE))deallocate(WGLFE)
 !  if(allocated(WSLF))deallocate(WSLF)
 !  if(allocated(WSSHE))deallocate(WSSHE)
 !  if(allocated(WGLFL))deallocate(WGLFL)

@@ -861,7 +861,7 @@ implicit none
     WTLFBE   => plt_biom%WTLFBE     , &
     WTNDBE   => plt_biom%WTNDBE     , &
     WTSTKBE  => plt_biom%WTSTKBE    , &
-    WGLF     => plt_biom%WGLF       , &
+    WGLFE    => plt_biom%WGLFE      , &
     WTRSVBE  => plt_biom%WTRSVBE    , &
     WTSTXN   => plt_biom%WTSTXN     , &
     WTSTXP   => plt_biom%WTSTXP     , &
@@ -872,9 +872,7 @@ implicit none
     WTHSKBE  => plt_biom%WTHSKBE    , &
     WTEARBE  => plt_biom%WTEARBE    , &
     WSSHE    => plt_biom%WSSHE      , &
-    WGLFN    => plt_biom%WGLFN      , &
     WSLF     => plt_biom%WSLF       , &
-    WGLFP    => plt_biom%WGLFP      , &
     WGLFLP   => plt_biom%WGLFLP     , &
     WGNODE   => plt_biom%WGNODE     , &
     WGNODN   => plt_biom%WGNODN     , &
@@ -971,7 +969,7 @@ implicit none
   WTSTXB(NB,NZ)=0._r8
   WTSTXN(NB,NZ)=0._r8
   WTSTXP(NB,NZ)=0._r8
-  DO 8855 K=0,JNODS1
+  D8855: DO K=0,JNODS1
     IF(K.NE.0)THEN
       CPOOL3(K,NB,NZ)=0._r8
       CPOOL4(K,NB,NZ)=0._r8
@@ -982,10 +980,10 @@ implicit none
     HTNODE(K,NB,NZ)=0._r8
     HTNODX(K,NB,NZ)=0._r8
     HTSHE(K,NB,NZ)=0._r8
-    WGLF(K,NB,NZ)=0._r8
+    WGLFE(K,NB,ielmc,NZ)=0._r8
     WSLF(K,NB,NZ)=0._r8
-    WGLFN(K,NB,NZ)=0._r8
-    WGLFP(K,NB,NZ)=0._r8
+    WGLFE(K,NB,ielmn,NZ)=0._r8
+    WGLFE(K,NB,ielmp,NZ)=0._r8
     WGSHE(K,NB,ielmc,NZ)=0._r8
     WSSHE(K,NB,NZ)=0._r8
     WGSHE(K,NB,ielmn,NZ)=0._r8
@@ -993,7 +991,7 @@ implicit none
     WGNODE(K,NB,NZ)=0._r8
     WGNODN(K,NB,NZ)=0._r8
     WGNODP(K,NB,NZ)=0._r8
-    DO 8865 L=1,JC1
+    D8865: DO L=1,JC1
       ARLFV(L,NZ)=ARLFV(L,NZ)-ARLFL(L,K,NB,NZ)
       WGLFV(L,NZ)=WGLFV(L,NZ)-WGLFL(L,K,NB,NZ)
       ARLFL(L,K,NB,NZ)=0._r8
@@ -1001,18 +999,18 @@ implicit none
       WGLFLN(L,K,NB,NZ)=0._r8
       WGLFLP(L,K,NB,NZ)=0._r8
       IF(K.NE.0)THEN
-        DO 8860 N=1,JLI1
+        D8860: DO N=1,JLI1
           SURF(N,L,K,NB,NZ)=0._r8
-8860    CONTINUE
+        ENDDO D8860
       ENDIF
-8865  CONTINUE
-8855  CONTINUE
-  DO 8875 L=1,JC1
+    ENDDO D8865
+  ENDDO D8855
+  D8875: DO L=1,JC1
     ARSTK(L,NB,NZ)=0._r8
     DO  N=1,JLI1
       SURFB(N,L,NB,NZ)=0._r8
     enddo
-8875  CONTINUE
+  ENDDO D8875
   end associate
   end subroutine ResetDeadRootStates
 

@@ -455,7 +455,7 @@ module StartqMod
   NBR(NZ,NY,NX)=0
   HTCTL(NZ,NY,NX)=0._r8
   ZC(NZ,NY,NX)=0._r8
-  DO 10 NB=1,10
+  D10: DO NB=1,10
     IFLGA(NB,NZ,NY,NX)=0
     IFLGE(NB,NZ,NY,NX)=0
     IFLGF(NB,NZ,NY,NX)=0
@@ -489,7 +489,7 @@ module StartqMod
     D15: DO M=1,10
       IDAY(M,NB,NZ,NY,NX)=0
     ENDDO D15
-10  CONTINUE
+  ENDDO D10 
 !
 !     INITIALIZE PLANT MORPHOLOGY AND BIOMASS
 !
@@ -540,10 +540,8 @@ module StartqMod
       HTNODE(K,NB,NZ,NY,NX)=0._r8
       HTNODX(K,NB,NZ,NY,NX)=0._r8
       HTSHE(K,NB,NZ,NY,NX)=0._r8
-      WGLF(K,NB,NZ,NY,NX)=0._r8
+      WGLFE(K,NB,1:npelms,NZ,NY,NX)=0._r8
       WSLF(K,NB,NZ,NY,NX)=0._r8
-      WGLFN(K,NB,NZ,NY,NX)=0._r8
-      WGLFP(K,NB,NZ,NY,NX)=0._r8
       WGSHE(K,NB,1:npelms,NZ,NY,NX)=0._r8
       WSSHE(K,NB,NZ,NY,NX)=0._r8
       WGNODE(K,NB,NZ,NY,NX)=0._r8
