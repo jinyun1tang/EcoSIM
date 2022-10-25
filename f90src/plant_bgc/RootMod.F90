@@ -1437,13 +1437,9 @@ implicit none
     EPOOLR   =>  plt_biom%EPOOLR   , &
     WSRTL    =>  plt_biom%WSRTL    , &
     WTRTD    =>  plt_biom%WTRTD    , &
-    WTNDLN   =>  plt_biom%WTNDLN   , &
-    WTNDLP   =>  plt_biom%WTNDLP   , &
-    WTNDL    =>  plt_biom%WTNDL    , &
+    WTNDLE   =>  plt_biom%WTNDLE   , &
     ZEROP    =>  plt_biom%ZEROP    , &
-    CPOOLN   =>  plt_biom%CPOOLN   , &
-    ZPOOLN   =>  plt_biom%ZPOOLN   , &
-    PPOOLN   =>  plt_biom%PPOOLN   , &
+    EPOOLN   =>  plt_biom%EPOOLN   , &
     RH2GZ    =>  plt_bgcr%RH2GZ    , &
     RN2OZ    =>  plt_bgcr%RN2OZ    , &
     RNH3Z    =>  plt_bgcr%RNH3Z    , &
@@ -1590,24 +1586,24 @@ implicit none
 !     CPOOLN,ZPOOLN,PPOOLN=nonstructural C,N,P in root bacteria
 !
       IF(INTYP(NZ).GE.1.AND.INTYP(NZ).LE.3)THEN
-        XFRC=FRTN*WTNDL(LL,NZ)
-        XFRN=FRTN*WTNDLN(LL,NZ)
-        XFRP=FRTN*WTNDLP(LL,NZ)
-        WTNDL(LL,NZ)=WTNDL(LL,NZ)-XFRC
-        WTNDLN(LL,NZ)=WTNDLN(LL,NZ)-XFRN
-        WTNDLP(LL,NZ)=WTNDLP(LL,NZ)-XFRP
-        WTNDL(LL-1,NZ)=WTNDL(LL-1,NZ)+XFRC
-        WTNDLN(LL-1,NZ)=WTNDLN(LL-1,NZ)+XFRN
-        WTNDLP(LL-1,NZ)=WTNDLP(LL-1,NZ)+XFRP
-        XFRC=FRTN*CPOOLN(LL,NZ)
-        XFRN=FRTN*ZPOOLN(LL,NZ)
-        XFRP=FRTN*PPOOLN(LL,NZ)
-        CPOOLN(LL,NZ)=CPOOLN(LL,NZ)-XFRC
-        ZPOOLN(LL,NZ)=ZPOOLN(LL,NZ)-XFRN
-        PPOOLN(LL,NZ)=PPOOLN(LL,NZ)-XFRP
-        CPOOLN(LL-1,NZ)=CPOOLN(LL-1,NZ)+XFRC
-        ZPOOLN(LL-1,NZ)=ZPOOLN(LL-1,NZ)+XFRN
-        PPOOLN(LL-1,NZ)=PPOOLN(LL-1,NZ)+XFRP
+        XFRC=FRTN*WTNDLE(LL,ielmc,NZ)
+        XFRN=FRTN*WTNDLE(LL,ielmn,NZ)
+        XFRP=FRTN*WTNDLE(LL,ielmp,NZ)
+        WTNDLE(LL,ielmc,NZ)=WTNDLE(LL,ielmc,NZ)-XFRC
+        WTNDLE(LL,ielmn,NZ)=WTNDLE(LL,ielmn,NZ)-XFRN
+        WTNDLE(LL,ielmp,NZ)=WTNDLE(LL,ielmp,NZ)-XFRP
+        WTNDLE(LL-1,ielmc,NZ)=WTNDLE(LL-1,ielmc,NZ)+XFRC
+        WTNDLE(LL-1,ielmn,NZ)=WTNDLE(LL-1,ielmn,NZ)+XFRN
+        WTNDLE(LL-1,ielmp,NZ)=WTNDLE(LL-1,ielmp,NZ)+XFRP
+        XFRC=FRTN*EPOOLN(LL,ielmc,NZ)
+        XFRN=FRTN*EPOOLN(LL,ielmn,NZ)
+        XFRP=FRTN*EPOOLN(LL,ielmp,NZ)
+        EPOOLN(LL,ielmc,NZ)=EPOOLN(LL,ielmc,NZ)-XFRC
+        EPOOLN(LL,ielmn,NZ)=EPOOLN(LL,ielmn,NZ)-XFRN
+        EPOOLN(LL,ielmp,NZ)=EPOOLN(LL,ielmp,NZ)-XFRP
+        EPOOLN(LL-1,ielmc,NZ)=EPOOLN(LL-1,ielmc,NZ)+XFRC
+        EPOOLN(LL-1,ielmn,NZ)=EPOOLN(LL-1,ielmn,NZ)+XFRN
+        EPOOLN(LL-1,ielmp,NZ)=EPOOLN(LL-1,ielmp,NZ)+XFRP
       ENDIF
       NINR(NR,NZ)=MAX(NG(NZ),LL-1)
     ELSE

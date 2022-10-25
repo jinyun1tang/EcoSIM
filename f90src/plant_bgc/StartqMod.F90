@@ -691,8 +691,8 @@ module StartqMod
   UPH2P(NZ,NY,NX)=0._r8
   UPH1P(NZ,NY,NX)=0._r8
   UPNF(NZ,NY,NX)=0._r8
-  DO 40 N=1,2
-    DO 20 L=1,NL(NY,NX)
+  D40: DO N=1,2
+    D20: DO L=1,NL(NY,NX)
       UPWTR(N,L,NZ,NY,NX)=0._r8
       PSIRT(N,L,NZ,NY,NX)=-0.01
       PSIRO(N,L,NZ,NY,NX)=OSMO(NZ,NY,NX)+PSIRT(N,L,NZ,NY,NX)
@@ -774,16 +774,12 @@ module StartqMod
             ESNC(M,K,L,NZ,NY,NX,:)=0._r8
           enddo
         ENDDO D6400
-        CPOOLN(L,NZ,NY,NX)=0._r8
-        ZPOOLN(L,NZ,NY,NX)=0._r8
-        PPOOLN(L,NZ,NY,NX)=0._r8
-        WTNDL(L,NZ,NY,NX)=0._r8
-        WTNDLN(L,NZ,NY,NX)=0._r8
-        WTNDLP(L,NZ,NY,NX)=0._r8
+        EPOOLN(L,1:npelms,NZ,NY,NX)=0._r8
+        WTNDLE(L,1:npelms,NZ,NY,NX)=0._r8
         RUPNF(L,NZ,NY,NX)=0._r8
       ENDIF
-20  CONTINUE
-40  CONTINUE
+    ENDDO D20
+  ENDDO D40
 
   RUPNH4(1:2,NL(NY,NX)+1:JZ,NZ,NY,NX)=0._r8
   RUPNHB(1:2,NL(NY,NX)+1:JZ,NZ,NY,NX)=0._r8

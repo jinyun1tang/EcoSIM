@@ -917,8 +917,8 @@ module StartqsMod
   plt_rbgc%UPH2P(NZ)=0._r8
   plt_rbgc%UPH1P(NZ)=0._r8
   plt_rbgc%UPNF(NZ)=0._r8
-  DO 40 N=1,2
-    DO 20 L=1,NL
+  D40: DO N=1,2
+    D20: DO L=1,NL
       plt_ew%UPWTR(N,L,NZ)=0._r8
       PSIRT(N,L,NZ)=-0.01
       PSIRO(N,L,NZ)=OSMO(NZ)+PSIRT(N,L,NZ)
@@ -996,18 +996,14 @@ module StartqsMod
       ENDDO D30
       IF(N.EQ.1)THEN
         D6400: DO K=0,micpar%k_non_woody_litr
-          plt_bgcr%ESNC(:,:,K,L,NZ)=0._r8
+          plt_bgcr%ESNC(1:jsken,1:npelms,K,L,NZ)=0._r8
         ENDDO D6400
-        plt_biom%CPOOLN(L,NZ)=0._r8
-        plt_biom%ZPOOLN(L,NZ)=0._r8
-        plt_biom%PPOOLN(L,NZ)=0._r8
-        plt_biom%WTNDL(L,NZ)=0._r8
-        plt_biom%WTNDLN(L,NZ)=0._r8
-        plt_biom%WTNDLP(L,NZ)=0._r8
+        plt_biom%EPOOLN(L,1:npelms,NZ)=0._r8
+        plt_biom%WTNDLE(L,1:npelms,NZ)=0._r8
         RUPNF(L,NZ)=0._r8
       ENDIF
-20  CONTINUE
-40  CONTINUE
+    ENDDO D20
+  ENDDO D40
 
   plt_rbgc%RUPNH4(1:2,NL+1:JZ1,NZ)=0._r8
   plt_rbgc%RUPNHB(1:2,NL+1:JZ1,NZ)=0._r8

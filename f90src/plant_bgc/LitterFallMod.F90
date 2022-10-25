@@ -334,14 +334,10 @@ implicit none
     WTRT1E    =>   plt_biom%WTRT1E    , &
     EPOOLR    =>   plt_biom%EPOOLR    , &
     WTRTD     =>   plt_biom%WTRTD     , &
-    ZPOOLN    =>   plt_biom%ZPOOLN    , &
     WTRTL     =>   plt_biom%WTRTL     , &
     WSRTL     =>   plt_biom%WSRTL     , &
-    CPOOLN    =>   plt_biom%CPOOLN    , &
-    WTNDL     =>   plt_biom%WTNDL     , &
-    WTNDLN    =>   plt_biom%WTNDLN    , &
-    WTNDLP    =>   plt_biom%WTNDLP    , &
-    PPOOLN    =>   plt_biom%PPOOLN    , &
+    EPOOLN    =>   plt_biom%EPOOLN    , &
+    WTNDLE    =>   plt_biom%WTNDLE    , &
     FWODR     =>   plt_allom%FWODR    , &
     FWODRN    =>   plt_allom%FWODRN   , &
     FWODRP    =>   plt_allom%FWODRP   , &
@@ -506,18 +502,18 @@ implicit none
         IF(INTYP(NZ).NE.0.AND.N.EQ.1)THEN
           D6420: DO M=1,jsken
             ESNC(M,ielmc,1,L,NZ)=ESNC(M,ielmc,1,L,NZ)+CFOPC(4,M,NZ) &
-              *WTNDL(L,NZ)+CFOPC(0,M,NZ)*CPOOLN(L,NZ)
+              *WTNDLE(L,ielmc,NZ)+CFOPC(0,M,NZ)*EPOOLN(L,ielmc,NZ)
             ESNC(M,ielmn,1,L,NZ)=ESNC(M,ielmn,1,L,NZ)+CFOPN(4,M,NZ) &
-              *WTNDLN(L,NZ)+CFOPN(0,M,NZ)*ZPOOLN(L,NZ)
+              *WTNDLE(L,ielmn,NZ)+CFOPN(0,M,NZ)*EPOOLN(L,ielmn,NZ)
             ESNC(M,ielmp,1,L,NZ)=ESNC(M,ielmp,1,L,NZ)+CFOPP(4,M,NZ) &
-              *WTNDLP(L,NZ)+CFOPP(0,M,NZ)*PPOOLN(L,NZ)
+              *WTNDLE(L,ielmp,NZ)+CFOPP(0,M,NZ)*EPOOLN(L,ielmp,NZ)
           ENDDO D6420
-          WTNDL(L,NZ)=0._r8
-          WTNDLN(L,NZ)=0._r8
-          WTNDLP(L,NZ)=0._r8
-          CPOOLN(L,NZ)=0._r8
-          ZPOOLN(L,NZ)=0._r8
-          PPOOLN(L,NZ)=0._r8
+          WTNDLE(L,ielmc,NZ)=0._r8
+          WTNDLE(L,ielmn,NZ)=0._r8
+          WTNDLE(L,ielmp,NZ)=0._r8
+          EPOOLN(L,ielmc,NZ)=0._r8
+          EPOOLN(L,ielmn,NZ)=0._r8
+          EPOOLN(L,ielmp,NZ)=0._r8
         ENDIF
 8895  CONTINUE
 8900  CONTINUE

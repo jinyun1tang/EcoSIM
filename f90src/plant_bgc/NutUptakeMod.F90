@@ -1306,9 +1306,7 @@ module NutUptakeMod
     RDFOMC   =>  plt_rbgc%RDFOMC    , &
     RDFOMN   =>  plt_rbgc%RDFOMN    , &
     RDFOMP   =>  plt_rbgc%RDFOMP    , &
-    UPOMC    =>  plt_rbgc%UPOMC     , &
-    UPOMN    =>  plt_rbgc%UPOMN     , &
-    UPOMP    =>  plt_rbgc%UPOMP     , &
+    UPOME    =>  plt_rbgc%UPOME     , &
     UPH1P    =>  plt_rbgc%UPH1P     , &
     UPH2P    =>  plt_rbgc%UPH2P     , &
     UPNH4    =>  plt_rbgc%UPNH4     , &
@@ -1333,9 +1331,9 @@ module NutUptakeMod
   !     UPNH4,UPNO3,UPH2P,UPH1P=PFT uptake of NH4,NO3,H2PO4,HPO4
   !
   DO 295 K=0,jcplx11
-    UPOMC(NZ)=UPOMC(NZ)+RDFOMC(N,K,L,NZ)
-    UPOMN(NZ)=UPOMN(NZ)+RDFOMN(N,K,L,NZ)
-    UPOMP(NZ)=UPOMP(NZ)+RDFOMP(N,K,L,NZ)
+    UPOME(ielmc,NZ)=UPOME(ielmc,NZ)+RDFOMC(N,K,L,NZ)
+    UPOME(ielmn,NZ)=UPOME(ielmn,NZ)+RDFOMN(N,K,L,NZ)
+    UPOME(ielmp,NZ)=UPOME(ielmp,NZ)+RDFOMP(N,K,L,NZ)
     XOQCS(K,L)=XOQCS(K,L)-RDFOMC(N,K,L,NZ)
     XOQNS(K,L)=XOQNS(K,L)-RDFOMN(N,K,L,NZ)
     XOQPS(K,L)=XOQPS(K,L)-RDFOMP(N,K,L,NZ)

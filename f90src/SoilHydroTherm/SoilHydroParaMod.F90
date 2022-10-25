@@ -88,7 +88,7 @@ contains
 !
 !     PSISM,PSISO,PSISH,PSIST=matric,osmotic,gravimetric,total water potential
 !
-  PSISO(L,NY,NX)=-8.3143E-06_r8*TKS(L,NY,NX)*CION(L,NY,NX)
+  PSISO(L,NY,NX)=-RGAS*1.E-6_r8*TKS(L,NY,NX)*CION(L,NY,NX)
   PSISH(L,NY,NX)=0.0098_r8*(ALT(NY,NX)-DPTH(L,NY,NX))
   PSIST(L,NY,NX)=AZMIN1(PSISM(L,NY,NX)+PSISO(L,NY,NX)+PSISH(L,NY,NX))
 

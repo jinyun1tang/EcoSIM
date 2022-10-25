@@ -73,9 +73,7 @@ module PlantDataRateType
   real(r8),allocatable ::  RUPOXP(:,:,:,:,:)                  !aqueous O2 flux from roots to root water , [g d-2 h-1]
   real(r8),allocatable ::  RCO2M(:,:,:,:,:)                   !root respiration unconstrained by O2, [g d-2 h-1]
   real(r8),allocatable ::  RCO2A(:,:,:,:,:)                   !root respiration constrained by O2, [g d-2 h-1]
-  real(r8),allocatable ::  UPOMC(:,:,:)                       !total root uptake (+ve) - exudation (-ve) of DOC, [g d-2 h-1]
-  real(r8),allocatable ::  UPOMN(:,:,:)                       !total root uptake (+ve) - exudation (-ve) of DON, [g d-2 h-1]
-  real(r8),allocatable ::  UPOMP(:,:,:)                       !total root uptake (+ve) - exudation (-ve) of DOP, [g d-2 h-1]
+  real(r8),allocatable ::  UPOME(:,:,:,:)                     !total root uptake (+ve) - exudation (-ve) of dissovled element, [g d-2 h-1]
   real(r8),allocatable ::  UPNH4(:,:,:)                       !total root uptake of NH4, [g d-2 h-1]
   real(r8),allocatable ::  UPNO3(:,:,:)                       !total root uptake of NO3, [g d-2 h-1]
   real(r8),allocatable ::  UPH2P(:,:,:)                       !total root uptake of PO4, [g d-2 h-1]
@@ -258,9 +256,7 @@ module PlantDataRateType
   allocate(RUPOXP(2,JZ,JP,JY,JX));RUPOXP=0._r8
   allocate(RCO2M(2,JZ,JP,JY,JX));RCO2M=0._r8
   allocate(RCO2A(2,JZ,JP,JY,JX));RCO2A=0._r8
-  allocate(UPOMC(JP,JY,JX));    UPOMC=0._r8
-  allocate(UPOMN(JP,JY,JX));    UPOMN=0._r8
-  allocate(UPOMP(JP,JY,JX));    UPOMP=0._r8
+  allocate(UPOME(1:npelms,JP,JY,JX));    UPOME=0._r8
   allocate(UPNH4(JP,JY,JX));    UPNH4=0._r8
   allocate(UPNO3(JP,JY,JX));    UPNO3=0._r8
   allocate(UPH2P(JP,JY,JX));    UPH2P=0._r8
@@ -434,9 +430,7 @@ module PlantDataRateType
   call destroy(RUPOXP)
   call destroy(RCO2M)
   call destroy(RCO2A)
-  call destroy(UPOMC)
-  call destroy(UPOMN)
-  call destroy(UPOMP)
+  call destroy(UPOME)
   call destroy(UPNH4)
   call destroy(UPNO3)
   call destroy(UPH2P)

@@ -244,10 +244,12 @@ module grosubsMod
 !
     ZNPP(NZ)=CARBN(NZ)+TCO2T(NZ)
     IF(IFLGC(NZ).EQ.1)THEN
-      BALE(ielmc,NZ)=WTSHTE(ielmc,NZ)+WTRTE(ielmc,NZ)+WTNDE(ielmc,NZ) &
-        +WTRVE(ielmc,NZ)-ZNPP(NZ)+TESNC(ielmc,NZ)-TEUPTK(ielmc,NZ) &
-        -RSETE(ielmc,NZ)+WTSTGE(ielmc,NZ)+THVSTE(ielmc,NZ) &
-        +HVSTE(ielmc,NZ)-VCO2F(NZ)-VCH4F(NZ)
+      DO NE=1,npelms
+        BALE(NE,NZ)=WTSHTE(NE,NZ)+WTRTE(NE,NZ)+WTNDE(NE,NZ) &
+          +WTRVE(NE,NZ)+TESNC(NE,NZ)-TEUPTK(NE,NZ) &
+          -RSETE(NE,NZ)+WTSTGE(NE,NZ)+HVSTE(NE,NZ)+THVSTE(NE,NZ)
+      ENDDO
+      BALE(ielmc,NZ)=BALE(ielmc,NZ)-ZNPP(NZ)-VCO2F(NZ)-VCH4F(NZ)
 !
 !     PLANT N BALANCE = TOTAL N STATE VARIABLES + TOTAL N LITTERFALL
 !     - TOTAL N UPTAKE FROM SOIL - TOTAL N ABSORPTION FROM ATMOSPHERE
@@ -263,10 +265,7 @@ module grosubsMod
 !     VNH3F,VN2OF=NH3,N2O emission from disturbance
 !     TZUPFX=cumulative PFT N2 fixation
 !
-      BALE(ielmn,NZ)=WTSHTE(ielmn,NZ)+WTRTE(ielmn,NZ)+WTNDE(ielmn,NZ) &
-        +WTRVE(ielmn,NZ)+TESNC(ielmn,NZ)-TEUPTK(ielmn,NZ)-TNH3C(NZ) &
-        -RSETE(ielmn,NZ)+WTSTGE(ielmn,NZ)+HVSTE(ielmn,NZ)+THVSTE(ielmn,NZ) &
-        -VNH3F(NZ)-VN2OF(NZ)-TZUPFX(NZ)
+      BALE(ielmn,NZ)=BALE(ielmn,NZ)-TNH3C(NZ)-VNH3F(NZ)-VN2OF(NZ)-TZUPFX(NZ)
 !
 !     PLANT P BALANCE = TOTAL P STATE VARIABLES + TOTAL P LITTERFALL
 !     - TOTAL P UPTAKE FROM SOIL
@@ -280,10 +279,7 @@ module grosubsMod
 !     HVSTP=total PFT P removed from ecosystem in current year
 !     VPO4F=PO4 emission from disturbance
 !
-      BALE(ielmp,NZ)=WTSHTE(ielmp,NZ)+WTRTE(ielmp,NZ)+WTNDE(ielmp,NZ) &
-        +WTRVE(ielmp,NZ)+TESNC(ielmp,NZ)-TEUPTK(ielmp,NZ) &
-        -RSETE(ielmp,NZ)+WTSTDE(1,ielmp,NZ)+WTSTGE(ielmp,NZ) &
-        +HVSTE(ielmp,NZ)+THVSTE(ielmp,NZ)-VPO4F(NZ)
+      BALE(ielmp,NZ)=BALE(ielmp,NZ)-VPO4F(NZ)
     ENDIF
   ENDDO D9975
   end associate
@@ -321,9 +317,7 @@ module grosubsMod
     HPUPTK => plt_rbgc%HPUPTK       , &
     HZUPTK => plt_rbgc%HZUPTK       , &
     HCUPTK => plt_rbgc%HCUPTK       , &
-    UPOMC  => plt_rbgc%UPOMC        , &
-    UPOMN  => plt_rbgc%UPOMN        , &
-    UPOMP  => plt_rbgc%UPOMP        , &
+    UPOME  => plt_rbgc%UPOME        , &
     SDAR   => plt_morph%SDAR        , &
     SDVL   => plt_morph%SDVL        , &
     NBR    => plt_morph%NBR         , &
@@ -350,9 +344,9 @@ module grosubsMod
 !
     call ComputeTotalBiom(NZ,CPOOLK)
   ELSE
-    HCUPTK(NZ)=UPOMC(NZ)
-    HZUPTK(NZ)=UPOMN(NZ)+UPNH4(NZ)+UPNO3(NZ)+UPNF(NZ)
-    HPUPTK(NZ)=UPOMP(NZ)+UPH2P(NZ)+UPH1P(NZ)
+    HCUPTK(NZ)=UPOME(ielmc,NZ)
+    HZUPTK(NZ)=UPOME(ielmn,NZ)+UPNH4(NZ)+UPNO3(NZ)+UPNF(NZ)
+    HPUPTK(NZ)=UPOME(ielmp,NZ)+UPH2P(NZ)+UPH1P(NZ)
   ENDIF
 !
   call RemoveBiomByManagement(I,J,NZ,CPOOLK)
@@ -504,17 +498,17 @@ module grosubsMod
 !     62500,195000,232500=energy of activn,high,low temp inactivn(KJ mol-1)
 !
   TKCM=TKC(NZ)+OFFST(NZ)
-  RTK=8.3143*TKCM
-  STK=710.0*TKCM
-  ACTVM=1+EXP((195000-STK)/RTK)+EXP((STK-232500)/RTK)
-  TFN5=EXP(25.214-62500/RTK)/ACTVM
-  DO 7 L=NU,NJ
+  RTK=RGAS*TKCM
+  STK=710.0_r8*TKCM
+  ACTVM=1._r8+EXP((195000._r8-STK)/RTK)+EXP((STK-232500._r8)/RTK)
+  TFN5=EXP(25.214_r8-62500._r8/RTK)/ACTVM
+  D7: DO L=NU,NJ
     TKSM=TKS(L)+OFFST(NZ)
-    RTK=8.3143*TKSM
-    STK=710.0*TKSM
-    ACTVM=1+EXP((195000-STK)/RTK)+EXP((STK-232500)/RTK)
-    TFN6(L)=EXP(25.214-62500/RTK)/ACTVM
-7 CONTINUE
+    RTK=RGAS*TKSM
+    STK=710.0_r8*TKSM
+    ACTVM=1+EXP((195000._r8-STK)/RTK)+EXP((STK-232500._r8)/RTK)
+    TFN6(L)=EXP(25.214_r8-62500._r8/RTK)/ACTVM
+  ENDDO D7
 !
 !     PRIMARY ROOT NUMBER
 !
@@ -522,8 +516,8 @@ module grosubsMod
 !     WTRT,PP=root mass,PFT population
 !     XRTN1=multiplier for number of primary root axes
 !
-  WTRTA(NZ)=AMAX1(0.999992087*WTRTA(NZ),WTRTE(ielmc,NZ)/PP(NZ))
-  XRTN1=AMAX1(1.0,WTRTA(NZ)**0.667)*PP(NZ)
+  WTRTA(NZ)=AMAX1(0.999992087_r8*WTRTA(NZ),WTRTE(ielmc,NZ)/PP(NZ))
+  XRTN1=AMAX1(1.0_r8,WTRTA(NZ)**0.667_r8)*PP(NZ)
 !
 !     WATER STRESS FUNCTIONS FOR EXPANSION AND GROWTH RESPIRATION
 !     FROM CANOPY TURGOR
@@ -535,15 +529,15 @@ module grosubsMod
 !     WFNG=growth function of canopy water potential
 !     WFNSG=expansion,extension function of canopy water potential
 !
-  WFNS=AMIN1(1.0,AZMAX1(PSILG(NZ)-PSILM))
+  WFNS=AMIN1(1.0_r8,AZMAX1(PSILG(NZ)-PSILM))
   IF(IGTYP(NZ).EQ.0)THEN
     WFNC=1.0_r8
-    WFNG=EXP(0.05*PSILT(NZ))
-    WFNSG=WFNS**0.10
+    WFNG=EXP(0.05_r8*PSILT(NZ))
+    WFNSG=WFNS**0.10_r8
   ELSE
     WFNC=EXP(RCS(NZ)*PSILG(NZ))
-    WFNG=EXP(0.10*PSILT(NZ))
-    WFNSG=WFNS**0.25
+    WFNG=EXP(0.10_r8*PSILT(NZ))
+    WFNSG=WFNS**0.25_r8
   ENDIF
   end associate
   end subroutine StagePlantForGrowth
@@ -671,16 +665,12 @@ module grosubsMod
     WTEARE   =>  plt_biom%WTEARE  , &
     WTGRE    =>  plt_biom%WTGRE   , &
     WTLS     =>  plt_biom%WTLS    , &
-    WTNDL    =>  plt_biom%WTNDL   , &
-    WTNDLN   =>  plt_biom%WTNDLN  , &
+    WTNDLE   =>  plt_biom%WTNDLE  , &
     EPOOLP   =>  plt_biom%EPOOLP  , &
     EPOLNP   =>  plt_biom%EPOLNP  , &
     WTRT1E   =>  plt_biom%WTRT1E  , &
-    WTNDLP   =>  plt_biom%WTNDLP  , &
     WTRT2E   =>  plt_biom%WTRT2E  , &
-    CPOOLN   =>  plt_biom%CPOOLN  , &
-    ZPOOLN   =>  plt_biom%ZPOOLN  , &
-    PPOOLN   =>  plt_biom%PPOOLN  , &
+    EPOOLN   =>  plt_biom%EPOOLN  , &
     TZUPFX   =>  plt_bgcr%TZUPFX  , &
     TEUPTK   =>  plt_rbgc%TEUPTK  , &
     UPH1P    =>  plt_rbgc%UPH1P   , &
@@ -691,9 +681,7 @@ module grosubsMod
     UPH2P    =>  plt_rbgc%UPH2P   , &
     UPNO3    =>  plt_rbgc%UPNO3   , &
     UPNH4    =>  plt_rbgc%UPNH4   , &
-    UPOMC    =>  plt_rbgc%UPOMC   , &
-    UPOMN    =>  plt_rbgc%UPOMN   , &
-    UPOMP    =>  plt_rbgc%UPOMP   , &
+    UPOME    =>  plt_rbgc%UPOME   , &
     NJ       =>  plt_site%NJ      , &
     NU       =>  plt_site%NU      , &
     NBR      =>  plt_morph%NBR    , &
@@ -771,12 +759,9 @@ module grosubsMod
         WTNDE(NE,NZ)=sum(WTNDBE(1:NBR(NZ),NE,NZ))+sum(EPOLNB(1:NBR(NZ),NE,NZ))
       ENDDO
     ELSEIF(INTYP(NZ).GE.1.AND.INTYP(NZ).LE.3)THEN
-      WTNDE(ielmc,NZ)=sum(WTNDL(NU:NI(NZ),NZ))+&
-        sum(CPOOLN(NU:NI(NZ),NZ))
-      WTNDE(ielmn,NZ)=sum(WTNDLN(NU:NI(NZ),NZ))+&
-        sum(ZPOOLN(NU:NI(NZ),NZ))
-      WTNDE(ielmp,NZ)=sum(WTNDLP(NU:NI(NZ),NZ))+&
-        sum(PPOOLN(NU:NI(NZ),NZ))
+      DO NE=1,npelms
+        WTNDE(NE,NZ)=sum(WTNDLE(NU:NI(NZ),NE,NZ))+sum(EPOOLN(NU:NI(NZ),NE,NZ))
+      ENDDO
     ENDIF
   ENDIF
 !
@@ -789,12 +774,12 @@ module grosubsMod
 !     TCUPTK,TZUPTK,TPUPTK=cumulative PFT root-soil C,N,P exchange
 !     TZUPFX=cumulative PFT N2 fixation
 !
-  HCUPTK(NZ)=UPOMC(NZ)
-  HZUPTK(NZ)=UPOMN(NZ)+UPNH4(NZ)+UPNO3(NZ)+UPNF(NZ)
-  HPUPTK(NZ)=UPOMP(NZ)+UPH2P(NZ)+UPH1P(NZ)
-  TEUPTK(ielmc,NZ)=TEUPTK(ielmc,NZ)+UPOMC(NZ)
-  TEUPTK(ielmn,NZ)=TEUPTK(ielmn,NZ)+UPOMN(NZ)+UPNH4(NZ)+UPNO3(NZ)
-  TEUPTK(ielmp,NZ)=TEUPTK(ielmp,NZ)+UPOMP(NZ)+UPH2P(NZ)+UPH1P(NZ)
+  HCUPTK(NZ)=UPOME(ielmc,NZ)
+  HZUPTK(NZ)=UPOME(ielmn,NZ)+UPNH4(NZ)+UPNO3(NZ)+UPNF(NZ)
+  HPUPTK(NZ)=UPOME(ielmp,NZ)+UPH2P(NZ)+UPH1P(NZ)
+  TEUPTK(ielmc,NZ)=TEUPTK(ielmc,NZ)+UPOME(ielmc,NZ)
+  TEUPTK(ielmn,NZ)=TEUPTK(ielmn,NZ)+UPOME(ielmn,NZ)+UPNH4(NZ)+UPNO3(NZ)
+  TEUPTK(ielmp,NZ)=TEUPTK(ielmp,NZ)+UPOME(ielmp,NZ)+UPH2P(NZ)+UPH1P(NZ)
   TZUPFX(NZ)=TZUPFX(NZ)+UPNF(NZ)+UPNFC(NZ)
   end associate
   end subroutine AccumulateStates

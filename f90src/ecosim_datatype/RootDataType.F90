@@ -45,14 +45,10 @@ module RootDataType
   real(r8),allocatable ::  RTFQ(:,:,:)                        !root brancing frequency, [m-1]
   real(r8),allocatable ::  PORTX(:,:,:,:)                     !power function of root porosity used to calculate root gaseous diffusivity, [-]
   real(r8),allocatable ::  CPPOLR(:,:,:,:,:)                  !root layer nonstructural P concentration, [g g-1]
-  real(r8),allocatable ::  WTNDLP(:,:,:,:)                    !root layer nodule P, [g d-2]
-  real(r8),allocatable ::  PPOOLN(:,:,:,:)                    !nodule layer nonstructural P, [g d-2]
-  real(r8),allocatable ::  ZPOOLN(:,:,:,:)                    !root nodule nonstructural N, [g d-2]
   real(r8),allocatable ::  RTWT1P(:,:,:,:,:)                  !root P primary axes, [g d-2]
   real(r8),allocatable ::  CZPOLR(:,:,:,:,:)                  !root layer nonstructural N concentration, [g g-1]
-  real(r8),allocatable ::  WTNDLN(:,:,:,:)                    !root layer nodule N, [g d-2]
   real(r8),allocatable ::  RTWT1N(:,:,:,:,:)                  !root N primary axes, [g d-2]
-  real(r8),allocatable ::  CPOOLN(:,:,:,:)                    !root  layer nonstructural N, [g d-2]
+  real(r8),allocatable ::  EPOOLN(:,:,:,:,:)                  !root  layer nonstructural element, [g d-2]
   real(r8),allocatable ::  RTLGP(:,:,:,:,:)                   !root layer length per plant, [m p-1]
   real(r8),allocatable ::  RTLG1(:,:,:,:,:,:)                 !root layer length primary axes, [m d-2]
   real(r8),allocatable ::  RTLG2(:,:,:,:,:,:)                 !root layer length secondary axes, [m d-2]
@@ -97,7 +93,7 @@ module RootDataType
   real(r8),allocatable ::  WTRT1E(:,:,:,:,:,:,:)              !root layer element primary axes, [g d-2]
   real(r8),allocatable ::  WTRT2E(:,:,:,:,:,:,:)              !root layer element secondary axes, [g d-2]
   real(r8),allocatable ::  WTRTD(:,:,:,:,:)                   !root layer C, [g d-2]
-  real(r8),allocatable ::  WTNDL(:,:,:,:)                     !root layer nodule mass, [g d-2]
+  real(r8),allocatable ::  WTNDLE(:,:,:,:,:)                  !root layer nodule element, [g d-2]
   real(r8),allocatable ::  WTNDE(:,:,:,:)                     !root total nodule mass, [g d-2]
   real(r8),allocatable ::  WTRTL(:,:,:,:,:)                   !root layer structural C, [g d-2]
   real(r8),allocatable ::  EPOOLR(:,:,:,:,:,:)                !root  layer nonstructural element, [g d-2]
@@ -147,14 +143,10 @@ contains
   allocate(RTFQ(JP,JY,JX));     RTFQ=0._r8
   allocate(PORTX(2,JP,JY,JX));  PORTX=0._r8
   allocate(CPPOLR(2,JZ,JP,JY,JX));CPPOLR=0._r8
-  allocate(WTNDLP(JZ,JP,JY,JX));WTNDLP=0._r8
-  allocate(PPOOLN(JZ,JP,JY,JX));PPOOLN=0._r8
-  allocate(ZPOOLN(JZ,JP,JY,JX));ZPOOLN=0._r8
   allocate(RTWT1P(2,JC,JP,JY,JX));RTWT1P=0._r8
   allocate(CZPOLR(2,JZ,JP,JY,JX));CZPOLR=0._r8
-  allocate(WTNDLN(JZ,JP,JY,JX));WTNDLN=0._r8
   allocate(RTWT1N(2,JC,JP,JY,JX));RTWT1N=0._r8
-  allocate(CPOOLN(JZ,JP,JY,JX));CPOOLN=0._r8
+  allocate(EPOOLN(JZ,npelms,JP,JY,JX));EPOOLN=0._r8
   allocate(RTLGP(2,JZ,JP,JY,JX));RTLGP=0._r8
   allocate(RTLG1(2,JZ,JC,JP,JY,JX));RTLG1=0._r8
   allocate(RTLG2(2,JZ,JC,JP,JY,JX));RTLG2=0._r8
@@ -199,7 +191,7 @@ contains
   allocate(WTRT1E(npelms,2,JZ,JC,JP,JY,JX));WTRT1E=0._r8
   allocate(WTRT2E(npelms,2,JZ,JC,JP,JY,JX));WTRT2E=0._r8
   allocate(WTRTD(2,JZ,JP,JY,JX));WTRTD=0._r8
-  allocate(WTNDL(JZ,JP,JY,JX)); WTNDL=0._r8
+  allocate(WTNDLE(JZ,npelms,JP,JY,JX)); WTNDLE=0._r8
   allocate(WTNDE(npelms,JP,JY,JX));  WTNDE=0._r8
   allocate(WTRTL(2,JZ,JP,JY,JX));WTRTL=0._r8
   allocate(EPOOLR(npelms,2,JZ,JP,JY,JX));EPOOLR=0._r8
@@ -249,14 +241,10 @@ contains
   call destroy(RTFQ)
   call destroy(PORTX)
   call destroy(CPPOLR)
-  call destroy(WTNDLP)
-  call destroy(PPOOLN)
-  call destroy(ZPOOLN)
   call destroy(RTWT1P)
   call destroy(CZPOLR)
-  call destroy(WTNDLN)
   call destroy(RTWT1N)
-  call destroy(CPOOLN)
+  call destroy(EPOOLN)
   call destroy(RTLGP)
   call destroy(RTLG1)
   call destroy(RTLG2)
@@ -301,7 +289,7 @@ contains
   call destroy(WTRT1E)
   call destroy(WTRT2E)
   call destroy(WTRTD)
-  call destroy(WTNDL)
+  call destroy(WTNDLE)
   call destroy(WTNDE)
   call destroy(WTRTL)
   call destroy(EPOOLR)

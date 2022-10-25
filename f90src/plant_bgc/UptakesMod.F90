@@ -248,9 +248,7 @@ module UptakesMod
     THRM1(NZ)=0.0_r8
     plt_ew%EP(NZ)=0.0_r8
     plt_ew%EVAPC(NZ)=0.0_r8
-    plt_rbgc%UPOMC(NZ)=0.0_r8
-    plt_rbgc%UPOMN(NZ)=0.0_r8
-    plt_rbgc%UPOMP(NZ)=0.0_r8
+    plt_rbgc%UPOME(1:npelms,NZ)=0.0_r8
     plt_rbgc%UPNH4(NZ)=0.0_r8
     plt_rbgc%UPNO3(NZ)=0.0_r8
     plt_rbgc%UPH2P(NZ)=0.0_r8

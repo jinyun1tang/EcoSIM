@@ -757,12 +757,8 @@ module PlantDisturbsMod
     WTRVE    =>  plt_biom%WTRVE      , &
     WTLS     =>  plt_biom%WTLS       , &
     WTRT2E   =>  plt_biom%WTRT2E     , &
-    CPOOLN   =>  plt_biom%CPOOLN     , &
-    ZPOOLN   =>  plt_biom%ZPOOLN     , &
-    PPOOLN   =>  plt_biom%PPOOLN     , &
-    WTNDL    =>  plt_biom%WTNDL      , &
-    WTNDLN   =>  plt_biom%WTNDLN     , &
-    WTNDLP   =>  plt_biom%WTNDLP     , &
+    EPOOLN   =>  plt_biom%EPOOLN     , &
+    WTNDLE   =>  plt_biom%WTNDLE     , &
     GRWTB    =>  plt_allom%GRWTB     , &
     FWOODP   =>  plt_allom%FWOODP    , &
     FWOODN   =>  plt_allom%FWOODN    , &
@@ -1184,21 +1180,21 @@ module PlantDisturbsMod
             IF(INTYP(NZ).NE.0.AND.N.EQ.1)THEN
               D6395: DO M=1,jsken
                 ESNC(M,ielmc,1,L,NZ)=ESNC(M,ielmc,1,L,NZ)+(1._r8-XHVST) &
-                  *(CFOPC(4,M,NZ)*WTNDL(L,NZ) &
-                  +CFOPC(0,M,NZ)*CPOOLN(L,NZ))
+                  *(CFOPC(4,M,NZ)*WTNDLE(L,ielmc,NZ) &
+                  +CFOPC(0,M,NZ)*EPOOLN(L,ielmc,NZ))
                 ESNC(M,ielmn,1,L,NZ)=ESNC(M,ielmn,1,L,NZ)+(1._r8-XHVST) &
-                  *(CFOPN(4,M,NZ)*WTNDLN(L,NZ) &
-                  +CFOPN(0,M,NZ)*ZPOOLN(L,NZ))
+                  *(CFOPN(4,M,NZ)*WTNDLE(L,ielmn,NZ) &
+                  +CFOPN(0,M,NZ)*EPOOLN(L,ielmn,NZ))
                 ESNC(M,ielmp,1,L,NZ)=ESNC(M,ielmp,1,L,NZ)+(1._r8-XHVST) &
-                  *(CFOPP(4,M,NZ)*WTNDLP(L,NZ) &
-                  +CFOPP(0,M,NZ)*PPOOLN(L,NZ))
+                  *(CFOPP(4,M,NZ)*WTNDLE(L,ielmp,NZ) &
+                  +CFOPP(0,M,NZ)*EPOOLN(L,ielmp,NZ))
               ENDDO D6395
-              WTNDL(L,NZ)=WTNDL(L,NZ)*XHVST
-              WTNDLN(L,NZ)=WTNDLN(L,NZ)*XHVST
-              WTNDLP(L,NZ)=WTNDLP(L,NZ)*XHVST
-              CPOOLN(L,NZ)=CPOOLN(L,NZ)*XHVST
-              ZPOOLN(L,NZ)=ZPOOLN(L,NZ)*XHVST
-              PPOOLN(L,NZ)=PPOOLN(L,NZ)*XHVST
+              WTNDLE(L,ielmc,NZ)=WTNDLE(L,ielmc,NZ)*XHVST
+              WTNDLE(L,ielmn,NZ)=WTNDLE(L,ielmn,NZ)*XHVST
+              WTNDLE(L,ielmp,NZ)=WTNDLE(L,ielmp,NZ)*XHVST
+              EPOOLN(L,ielmc,NZ)=EPOOLN(L,ielmc,NZ)*XHVST
+              EPOOLN(L,ielmn,NZ)=EPOOLN(L,ielmn,NZ)*XHVST
+              EPOOLN(L,ielmp,NZ)=EPOOLN(L,ielmp,NZ)*XHVST
             ENDIF
 8980      CONTINUE
 8985    CONTINUE
@@ -1368,12 +1364,8 @@ module PlantDisturbsMod
     RTWT1N   => plt_biom%RTWT1N    , &
     RTWT1P   => plt_biom%RTWT1P    , &
     WTRT2E   => plt_biom%WTRT2E    , &
-    WTNDLN   => plt_biom%WTNDLN    , &
-    WTNDLP   => plt_biom%WTNDLP    , &
-    WTNDL    => plt_biom%WTNDL     , &
-    CPOOLN   => plt_biom%CPOOLN    , &
-    ZPOOLN   => plt_biom%ZPOOLN    , &
-    PPOOLN   => plt_biom%PPOOLN    , &
+    WTNDLE   => plt_biom%WTNDLE    , &
+    EPOOLN   => plt_biom%EPOOLN    , &
     ZEROP    => plt_biom%ZEROP     , &
     ZEROL    => plt_biom%ZEROL     , &
     WGLFV    => plt_biom%WGLFV     , &
@@ -1501,7 +1493,7 @@ module PlantDisturbsMod
         PPX(NZ)=PPX(NZ)*(1._r8-THIN(NZ))
         PP(NZ)=PP(NZ)*(1._r8-THIN(NZ))
       ELSE
-!     PPI(NZ)=AMAX1(1.0,0.5*(PPI(NZ)+GRNO(NZ)/AREA3(NU)))
+!     PPI(NZ)=AMAX1(1.0_r8,0.5*(PPI(NZ)+GRNO(NZ)/AREA3(NU)))
         PPX(NZ)=PPI(NZ)
         PP(NZ)=PPX(NZ)*AREA3(NU)
       ENDIF
@@ -1710,7 +1702,7 @@ module PlantDisturbsMod
       IF(IHVST(NZ).NE.4.AND.IHVST(NZ).NE.6)THEN
         IF(IHVST(NZ).NE.3)THEN
           IF(ZL(L).GT.ZL(L-1))THEN
-            FHGT=AZMAX1(AMIN1(1.0,1._r8-((ZL(L)) &
+            FHGT=AZMAX1(AMIN1(1.0_r8,1._r8-((ZL(L)) &
               -HVST(NZ))/(ZL(L)-ZL(L-1))))
           ELSE
             FHGT=1.0_r8
@@ -1755,7 +1747,7 @@ module PlantDisturbsMod
           IF((IHVST(NZ).NE.4.AND.IHVST(NZ).NE.6).OR.WHVSBL.GT.0.0)THEN
             IF(IHVST(NZ).EQ.4.OR.IHVST(NZ).EQ.6)THEN
               IF(WGLFL(L,K,NB,NZ).GT.WHVSBL)THEN
-                FHVST=AZMAX1(AMIN1(1.0,(WGLFL(L,K,NB,NZ)-WHVSBL)/WGLFL(L,K,NB,NZ)))
+                FHVST=AZMAX1(AMIN1(1.0_r8,(WGLFL(L,K,NB,NZ)-WHVSBL)/WGLFL(L,K,NB,NZ)))
                 FHVSH=FHVST
               ELSE
                 FHVST=1.0_r8
@@ -1820,7 +1812,7 @@ module PlantDisturbsMod
         WGSHGX=0._r8
         WGLFGY=0._r8
         WGSHGY=0._r8
-        DO 9825 K=0,JNODS1
+        D9825: DO K=0,JNODS1
           ARLFG=0._r8
           WGLFG=0._r8
           WGLFNG=0._r8
@@ -1831,14 +1823,14 @@ module PlantDisturbsMod
 !     WGLFL,WGLFLN,WGLFLP=leaf node C,N,P in canopy layer
 !     ARLFL,ARLFV=leaf node,total area in canopy layer
 !
-          DO 9815 L=1,JC1
+          D9815: DO L=1,JC1
             ARLFG=ARLFG+ARLFL(L,K,NB,NZ)
             WGLFG=WGLFG+WGLFL(L,K,NB,NZ)
             WGLFNG=WGLFNG+WGLFLN(L,K,NB,NZ)
             WGLFPG=WGLFPG+WGLFLP(L,K,NB,NZ)
             ARLFV(L,NZ)=ARLFV(L,NZ)+ARLFL(L,K,NB,NZ)
             WGLFV(L,NZ)=WGLFV(L,NZ)+WGLFL(L,K,NB,NZ)
-9815      CONTINUE
+          ENDDO D9815
 !
 !     CUT STALK AT HARVESTED NODES AND LAYERS
 !
@@ -1852,9 +1844,8 @@ module PlantDisturbsMod
 !          IHVST=4 or 6:specific herbivory rate (g DM g-1 LM d-1)
 !
           IF(IHVST(NZ).NE.4.AND.IHVST(NZ).NE.6)THEN
-            IF(WGLF(K,NB,NZ).GT.ZEROP(NZ) &
-              .AND.EHVST(1,1,NZ).GT.0.0)THEN
-              FHVSTK(K)=AZMAX1(AMIN1(1.0,(1._r8-(1._r8-AZMAX1(WGLFG) &
+            IF(WGLF(K,NB,NZ).GT.ZEROP(NZ).AND.EHVST(1,1,NZ).GT.0.0)THEN
+              FHVSTK(K)=AZMAX1(AMIN1(1.0_r8,(1._r8-(1._r8-AZMAX1(WGLFG) &
                 /WGLF(K,NB,NZ))*EHVST(1,2,NZ)/EHVST(1,1,NZ))))
               FHVSHK(K)=FHVSTK(K)
           ELSE
@@ -1897,7 +1888,7 @@ module PlantDisturbsMod
         WGLFN(K,NB,NZ)=WGLFNG
         WGLFP(K,NB,NZ)=WGLFPG
         WGLFGX=WGLFGX+WGLF(K,NB,NZ)
-9825  CONTINUE
+      ENDDO D9825
 !
 !     CUT SHEATHS OR PETIOLES AND STALKS HARVESTED NODES AND LAYERS
 !
@@ -1936,7 +1927,7 @@ module PlantDisturbsMod
           IF((IHVST(NZ).NE.4.AND.IHVST(NZ).NE.6).OR.WHVSBS.GT.0.0)THEN
             IF(IHVST(NZ).EQ.4.OR.IHVST(NZ).EQ.6)THEN
               IF(WGSHE(K,NB,NZ).GT.WHVSBS)THEN
-                FHVSTK(K)=AZMAX1(AMIN1(1.0,(WGSHE(K,NB,NZ)-WHVSBS)/WGSHE(K,NB,NZ)))
+                FHVSTK(K)=AZMAX1(AMIN1(1.0_r8,(WGSHE(K,NB,NZ)-WHVSBS)/WGSHE(K,NB,NZ)))
                 FHVSHK(K)=FHVSTK(K)
               ELSE
                 FHVSTK(K)=0._r8
@@ -1977,7 +1968,7 @@ module PlantDisturbsMod
             WGSHP(K,NB,NZ)=FHVSTK(K)*WGSHP(K,NB,NZ)
             WSSHE(K,NB,NZ)=FHVSTK(K)*WSSHE(K,NB,NZ)
             IF(IHVST(NZ).LE.2.AND.HTSHE(K,NB,NZ).GT.0.0)THEN
-              FHGT=AZMAX1(AMIN1(1.0,(HTNODE(K,NB,NZ) &
+              FHGT=AZMAX1(AMIN1(1.0_r8,(HTNODE(K,NB,NZ) &
                 +HTSHE(K,NB,NZ)-HVST(NZ))/HTSHE(K,NB,NZ)))
               HTSHE(K,NB,NZ)=(1._r8-FHGT)*HTSHE(K,NB,NZ)
             ELSE
@@ -2021,7 +2012,7 @@ module PlantDisturbsMod
         PPOLNX=AZMAX1(EPOLNB(NB,ielmp,NZ))
         IF(IHVST(NZ).NE.4.AND.IHVST(NZ).NE.6)THEN
           IF(WGLFGY+WGSHGY.GT.ZEROP(NZ))THEN
-            FHVST=AZMAX1(AMIN1(1.0,(WGLFGX+WGSHGX)/(WGLFGY+WGSHGY)))
+            FHVST=AZMAX1(AMIN1(1.0_r8,(WGLFGX+WGSHGX)/(WGLFGY+WGSHGY)))
             CPOOLG=CPOOLX*FHVST
             ZPOOLG=ZPOOLX*FHVST
             PPOOLG=PPOOLX*FHVST
@@ -2154,7 +2145,7 @@ module PlantDisturbsMod
         IF(IHVST(NZ).NE.4.AND.IHVST(NZ).NE.6)THEN
           IF(HTSTKX.GT.ZERO)THEN
             IF(IHVST(NZ).NE.3)THEN
-              FHGT=AZMAX1(AMIN1(1.0,HVST(NZ)/HTSTKX))
+              FHGT=AZMAX1(AMIN1(1.0_r8,HVST(NZ)/HTSTKX))
             ELSE
               FHGT=0._r8
             ENDIF
@@ -2175,7 +2166,7 @@ module PlantDisturbsMod
           ENDIF
         ELSE
           IF(WTSTKE(ielmc,NZ).GT.ZEROL(NZ))THEN
-            FHVST=AZMAX1(AMIN1(1.0,1._r8-WHVSTH/WTSTKE(ielmc,NZ)))
+            FHVST=AZMAX1(AMIN1(1.0_r8,1._r8-WHVSTH/WTSTKE(ielmc,NZ)))
             FHVSH=FHVST
           ELSE
             FHVST=1.0_r8
@@ -2225,7 +2216,7 @@ module PlantDisturbsMod
           IF(IHVST(NZ).NE.4.AND.IHVST(NZ).NE.6)THEN
             IF(HTNODX(K,NB,NZ).GT.ZERO)THEN
               IF(IHVST(NZ).NE.3)THEN
-                FHGTK=AZMAX1(AMIN1(1.0,(HTNODE(K,NB,NZ) &
+                FHGTK=AZMAX1(AMIN1(1.0_r8,(HTNODE(K,NB,NZ) &
                   -HVST(NZ))/HTNODX(K,NB,NZ)))
               ELSE
                 FHGTK=0._r8
@@ -2240,7 +2231,7 @@ module PlantDisturbsMod
             ENDIF
           ELSE
             IF(WTSTKE(ielmc,NZ).GT.ZEROP(NZ))THEN
-              FHVSTS=AZMAX1(AMIN1(1.0,1._r8-WHVSTH/WTSTKE(ielmc,NZ)))
+              FHVSTS=AZMAX1(AMIN1(1.0_r8,1._r8-WHVSTH/WTSTKE(ielmc,NZ)))
             ELSE
               FHVSTS=1.0_r8
             ENDIF
@@ -2274,7 +2265,7 @@ module PlantDisturbsMod
           ENDIF
         ELSE
           IF(WTRSVE(ielmc,NZ).GT.ZEROP(NZ))THEN
-            FHVST=AZMAX1(AMIN1(1.0,1._r8-WHVRVH/WTRSVE(ielmc,NZ)))
+            FHVST=AZMAX1(AMIN1(1.0_r8,1._r8-WHVRVH/WTRSVE(ielmc,NZ)))
             FHVSH=FHVST
           ELSE
             FHVST=0._r8
@@ -2336,21 +2327,21 @@ module PlantDisturbsMod
           FHVSHE=FHVSHG
         ELSE
           IF(WTHSKE(ielmc,NZ).GT.ZEROP(NZ))THEN
-            FHVSTH=AZMAX1(AMIN1(1.0,1._r8-WHVHSH/WTHSKE(ielmc,NZ)))
+            FHVSTH=AZMAX1(AMIN1(1.0_r8,1._r8-WHVHSH/WTHSKE(ielmc,NZ)))
             FHVSHH=FHVSTH
           ELSE
             FHVSTH=1.0_r8
             FHVSHH=1.0_r8
           ENDIF
           IF(WTEARE(ielmc,NZ).GT.ZEROP(NZ))THEN
-            FHVSTE=AZMAX1(AMIN1(1.0,1._r8-WHVEAH/WTEARE(ielmc,NZ)))
+            FHVSTE=AZMAX1(AMIN1(1.0_r8,1._r8-WHVEAH/WTEARE(ielmc,NZ)))
             FHVSHE=FHVSTE
           ELSE
             FHVSTE=1.0_r8
             FHVSHE=1.0_r8
           ENDIF
           IF(WTGRE(ielmc,NZ).GT.ZEROP(NZ))THEN
-            FHVSTG=AZMAX1(AMIN1(1.0,1._r8-WHVGRH/WTGRE(ielmc,NZ)))
+            FHVSTG=AZMAX1(AMIN1(1.0_r8,1._r8-WHVGRH/WTGRE(ielmc,NZ)))
             FHVSHG=FHVSTG
           ELSE
             FHVSTG=1.0_r8
@@ -2579,7 +2570,7 @@ module PlantDisturbsMod
                 FFIRP=0._r8
               ELSE
                 XHVST=1.0_r8-DCORP*EHVST(1,3,NZ) &
-                  *AMIN1(1.0,(CORGC(L)-FORGC)/(0.55E+06-FORGC))
+                  *AMIN1(1.0_r8,(CORGC(L)-FORGC)/(0.55E+06-FORGC))
                 XHVSN=XHVST
                 XHVSP=XHVST
                 FFIRE=EHVST(2,3,NZ)
@@ -2730,21 +2721,21 @@ module PlantDisturbsMod
             IF(INTYP(NZ).NE.0.AND.N.EQ.1)THEN
               D3395: DO M=1,jsken
                 ESNC(M,ielmc,1,L,NZ)=ESNC(M,ielmc,1,L,NZ)+(1._r8-XHVST) &
-                  *(CFOPC(4,M,NZ)*WTNDL(L,NZ) &
-                  +CFOPC(0,M,NZ)*CPOOLN(L,NZ))
+                  *(CFOPC(4,M,NZ)*WTNDLE(L,ielmc,NZ) &
+                  +CFOPC(0,M,NZ)*EPOOLN(L,ielmc,NZ))
                 ESNC(M,ielmn,1,L,NZ)=ESNC(M,ielmn,1,L,NZ)+(1._r8-XHVSN) &
-                  *(CFOPN(4,M,NZ)*WTNDLN(L,NZ) &
-                  +CFOPN(0,M,NZ)*ZPOOLN(L,NZ))
+                  *(CFOPN(4,M,NZ)*WTNDLE(L,ielmn,NZ) &
+                  +CFOPN(0,M,NZ)*EPOOLN(L,ielmn,NZ))
                 ESNC(M,ielmp,1,L,NZ)=ESNC(M,ielmp,1,L,NZ)+(1._r8-XHVSP) &
-                  *(CFOPP(4,M,NZ)*WTNDLP(L,NZ) &
-                  +CFOPP(0,M,NZ)*PPOOLN(L,NZ))
+                  *(CFOPP(4,M,NZ)*WTNDLE(L,ielmp,NZ) &
+                  +CFOPP(0,M,NZ)*EPOOLN(L,ielmp,NZ))
               ENDDO D3395
-              WTNDL(L,NZ)=WTNDL(L,NZ)*XHVST
-              WTNDLN(L,NZ)=WTNDLN(L,NZ)*XHVSN
-              WTNDLP(L,NZ)=WTNDLP(L,NZ)*XHVSP
-              CPOOLN(L,NZ)=CPOOLN(L,NZ)*XHVST
-              ZPOOLN(L,NZ)=ZPOOLN(L,NZ)*XHVSN
-              PPOOLN(L,NZ)=PPOOLN(L,NZ)*XHVSP
+              WTNDLE(L,ielmc,NZ)=WTNDLE(L,ielmc,NZ)*XHVST
+              WTNDLE(L,ielmn,NZ)=WTNDLE(L,ielmn,NZ)*XHVSN
+              WTNDLE(L,ielmp,NZ)=WTNDLE(L,ielmp,NZ)*XHVSP
+              EPOOLN(L,ielmc,NZ)=EPOOLN(L,ielmc,NZ)*XHVST
+              EPOOLN(L,ielmn,NZ)=EPOOLN(L,ielmn,NZ)*XHVSN
+              EPOOLN(L,ielmp,NZ)=EPOOLN(L,ielmp,NZ)*XHVSP
             ENDIF
 3980      CONTINUE
 3985    CONTINUE

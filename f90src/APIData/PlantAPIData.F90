@@ -508,12 +508,8 @@ implicit none
   real(r8) :: WTSTGT                               !total standing dead C, [g d-2]
   real(r8), pointer :: ZEROL(:)       => null()    !threshold zero for leaf calculation
   real(r8), pointer :: ZEROP(:)       => null()    !threshold zero for p calculation
-  real(r8), pointer :: CPOOLN(:,:)    => null()    !root  layer nonstructural N, [g d-2]
-  real(r8), pointer :: PPOOLN(:,:)    => null()    !nodule layer nonstructural P, [g d-2]
-  real(r8), pointer :: WTNDLN(:,:)    => null()    !root layer nodule N, [g d-2]
-  real(r8), pointer :: WTNDL(:,:)     => null()    !root layer nodule mass, [g d-2]
-  real(r8), pointer :: WTNDLP(:,:)    => null()    !root layer nodule P, [g d-2]
-  real(r8), pointer :: ZPOOLN(:,:)    => null()    !root nodule nonstructural N, [g d-2]
+  real(r8), pointer :: EPOOLN(:,:,:)  => null()    !root  layer nonstructural element, [g d-2]
+  real(r8), pointer :: WTNDLE(:,:,:)  => null()    !root layer nodule element, [g d-2]
   real(r8), pointer :: WGLFV(:,:)     => null()    !canopy layer leaf C, [g d-2]
   real(r8), pointer :: WTRT2E(:,:,:,:,:) => null()    !root layer element secondary axes, [g d-2]
   real(r8), pointer :: WTRT1E(:,:,:,:,:) => null()    !root layer element primary axes, [g d-2]
@@ -781,9 +777,7 @@ implicit none
   real(r8) :: TN2OZ     !total root N2O content, [g d-2]
   real(r8) :: TOXYZ     !total root O2 content, [g d-2]
   real(r8) :: TNH3Z     !total root NH3 content, [g d-2]
-  real(r8), pointer :: UPOMC(:)         => null()  !total root uptake (+ve) - exudation (-ve) of DOC, [g d-2 h-1]
-  real(r8), pointer :: UPOMN(:)         => null()  !total root uptake (+ve) - exudation (-ve) of DON, [g d-2 h-1]
-  real(r8), pointer :: UPOMP(:)         => null()  !total root uptake (+ve) - exudation (-ve) of DOP, [g d-2 h-1]
+  real(r8), pointer :: UPOME(:,:)       => null()  !total root uptake (+ve) - exudation (-ve) of dissolved element, [g d-2 h-1]
   real(r8), pointer :: UPNF(:)          => null()  !total root N2 fixation, [g d-2 h-1]
   real(r8), pointer :: UPNO3(:)         => null()  !total root uptake of NO3, [g d-2 h-1]
   real(r8), pointer :: UPNH4(:)         => null()  !total root uptake of NH4, [g d-2 h-1]
@@ -933,14 +927,12 @@ implicit none
   allocate(this%HZUPTK(JP1))
   allocate(this%HPUPTK(JP1))
   allocate(this%TEUPTK(npelms,JP1))
-  allocate(this%UPOMC(JP1))
+  allocate(this%UPOME(npelms,JP1))
   allocate(this%UPNF(JP1))
   allocate(this%UPNO3(JP1))
   allocate(this%UPNH4(JP1))
-  allocate(this%UPOMN(JP1))
   allocate(this%UPH1P(JP1))
   allocate(this%UPH2P(JP1))
-  allocate(this%UPOMP(JP1))
 
   allocate(this%ZEROQ(JP1))
   allocate(this%RCO2M(2,JZ1,JP1))
@@ -1055,14 +1047,12 @@ implicit none
 !  if(allocated(HZUPTK))deallocate(HZUPTK)
 !  if(allocated(HPUPTK))deallocate(HPUPTK)
 !  if(allocated(TEUPTK))deallocate(TEUPTK)
-!  if(allocated(UPOMC))deallocate(UPOMC)
+!  if(allocated(UPOME))deallocate(UPOME)
 !  if(allocated(UPNF))deallocate(UPNF)
 !  if(allocated(UPNO3))deallocate(UPNO3)
 !  if(allocated(UPNH4))deallocate(UPNH4)
-!  if(allocated(UPOMN))deallocate(UPOMN)
 !  if(allocated(UPH1P))deallocate(UPH1P)
 !  if(allocated(UPH2P))deallocate(UPH2P)
-!  if(allocated(UPOMP))deallocate(UPOMP)
 !  if(allocated(RNH3B))deallocate(RNH3B)
 !  if(allocated(ZEROQ))deallocate(ZEROQ)
 !  if(allocated(RCO2M))deallocate(RCO2M)
@@ -1628,13 +1618,9 @@ implicit none
   allocate(this%ZEROL(JP1))
   allocate(this%ZEROP(JP1))
 
-  allocate(this%WTNDLN(JZ1,JP1))
-  allocate(this%WTNDL(JZ1,JP1))
-  allocate(this%WTNDLP(JZ1,JP1))
-  allocate(this%ZPOOLN(JZ1,JP1))
+  allocate(this%WTNDLE(JZ1,npelms,JP1))
   allocate(this%WGLFV(JC1,JP1))
-  allocate(this%CPOOLN(JZ1,JP1))
-  allocate(this%PPOOLN(JZ1,JP1))
+  allocate(this%EPOOLN(JZ1,npelms,JP1))
   allocate(this%WTSTDE(jsken,npelms,JP1))
   allocate(this%WTRT2E(npelms,2,JZ1,JC1,JP1))
   allocate(this%WTRT1E(npelms,2,JZ1,JC1,JP1))
@@ -1721,12 +1707,8 @@ implicit none
 
 !  if(allocated(ZEROL))deallocate(ZEROL)
 !  if(allocated(ZEROP))deallocate(ZEROP)
-!  if(allocated(CPOOLN))deallocate(CPOOLN)
-!  if(allocated(PPOOLN))deallocate(PPOOLN)
-!  if(allocated(WTNDLN))deallocate(WTNDLN)
-!  if(allocated(WTNDL))deallocate(WTNDL)
-!  if(allocated(WTNDLP))deallocate(WTNDLP)
-!  if(allocated(ZPOOLN))deallocate(ZPOOLN)
+!  if(allocated(EPOOLN))deallocate(EPOOLN)
+!  if(allocated(WTNDLE))deallocate(WTNDLE)
 !  if(allocated(WGLFV))deallocate(WGLFV)
 !  if(allocated(RTWT1))deallocate(RTWT1)
 !  if(allocated(RTWT1N))deallocate(RTWT1N)

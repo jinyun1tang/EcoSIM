@@ -1275,7 +1275,7 @@ module MicAutoCPLXMod
 !     and energy yield of hydrogenotrophic
 !     methanogenesis GH2X at ambient H2 concentration CH2GS
 
-  GH2X=8.3143E-03_r8*TKS*LOG((AMAX1(1.0E-03_r8,CH2GS)/H2KI)**4)
+  GH2X=RGAS*1.E-3_r8*TKS*LOG((AMAX1(1.0E-03_r8,CH2GS)/H2KI)**4)
   GH2H=GH2X/12.08_r8
   ECHZ=AMAX1(EO2X,AMIN1(1.0_r8,1.0_r8/(1.0_r8+AZMAX1((GCOX+GH2H))/EOMH)))
   VMXA=TFNGff(NGL)*FCNPff(NGL)*XCO2*OMAff(NGL)*VMXC

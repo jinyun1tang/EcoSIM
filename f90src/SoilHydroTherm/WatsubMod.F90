@@ -750,8 +750,8 @@ module WatsubMod
     ! HFLVRSX=convective heat flux from snow-litter vapor flux
     !
     !VPR=2.173E-03_r8/TKXR*0.61_r8*EXP(5360.0_r8*(3.661E-03_r8-1.0_r8/TKXR)) &
-    !  *EXP(18.0_r8*PSISM1(0,NY,NX)/(8.3143_r8*TKXR))    !in residue vapor pressure
-    VPR=vapsat(TKXR)*EXP(18.0_r8*PSISM1(0,NY,NX)/(8.3143_r8*TKXR))
+    !  *EXP(18.0_r8*PSISM1(0,NY,NX)/(RGAS*TKXR))    !in residue vapor pressure
+    VPR=vapsat(TKXR)*EXP(18.0_r8*PSISM1(0,NY,NX)/(RGAS*TKXR))
     if(abs(VPR)>1.e20_r8)then
       write(*,*)'TKXR=',TKXR,TK1(0,NY,NX),TK1(NUM(NY,NX),NY,NX)
       write(*,*)'PSISM1(0,NY,NX)=',PSISM1(0,NY,NX)
@@ -810,8 +810,8 @@ module WatsubMod
     IF(VOLPM(M,0,NY,NX).GT.ZEROS(NY,NX) &
       .AND.VOLPM(M,NUM(NY,NX),NY,NX).GT.ZEROS(NY,NX))THEN
       !VP1=2.173E-03/TK1X*0.61*EXP(5360.0*(3.661E-03-1.0/TK1X)) &
-      !  *EXP(18.0*PSISV1/(8.3143*TK1X))
-      VP1=vapsat(TK1X)*EXP(18.0*PSISV1/(8.3143*TK1X))
+      !  *EXP(18.0*PSISV1/(RGAS*TK1X))
+      VP1=vapsat(TK1X)*EXP(18.0*PSISV1/(RGAS*TK1X))
       FLVC=ATCNVS*(VPR-VP1)*AREA(3,NUM(NY,NX),NY,NX)*FSNW(NY,NX)*CVRD(NY,NX)*XNPQ
       if(abs(FLVC)>1.e20_r8)then
         write(*,*)'ATCNVS=',ATCNVS,VPR,VP1
@@ -1142,7 +1142,7 @@ module WatsubMod
               *THETPM(M,NUM(NY,NX),NY,NX)/POROS(NUM(NY,NX),NY,NX)
             !VP2=2.173E-03_r8/TK1(NUM(NY,NX),NY,NX) &
             !  *0.61_r8*EXP(5360.0_r8*(3.661E-03_r8-1.0_r8/TK1(NUM(NY,NX),NY,NX))) &
-            VP2=vapsat(TK1(NUM(NY,NX),NY,NX))*EXP(18.0_r8*PSISV1/(8.3143_r8*TK1(NUM(NY,NX),NY,NX)))
+            VP2=vapsat(TK1(NUM(NY,NX),NY,NX))*EXP(18.0_r8*PSISV1/(RGAS*TK1(NUM(NY,NX),NY,NX)))
             ATCNVS=2.0_r8*CNV1*CNV2 &
               /(CNV1*DLYR(3,NUM(NY,NX),NY,NX)+CNV2*DLYRS0(L,NY,NX))
             FLVC=ATCNVS*(VP1-VP2)*AREA(3,NUM(NY,NX),NY,NX) &
@@ -1677,14 +1677,14 @@ module WatsubMod
 !     VAP=latent heat of evaporation
 !     VFLXR2=convective heat of evaporation flux
 !
-      VPR=vapsat(TKR1)*EXP(18.0_r8*PSISM1(0,NY,NX)/(8.3143_r8*TKR1))   !in litter
+      VPR=vapsat(TKR1)*EXP(18.0_r8*PSISM1(0,NY,NX)/(RGAS*TKR1))   !in litter
       if(abs(VPR)>1.e20_r8)then
         write(*,*)'TKR1=',TKR1,TK1(0,NY,NX),TK1(NUM(NY,NX),NY,NX)
         write(*,*)'PSISM1(0,NY,NX)=',PSISM1(0,NY,NX)
         call endrun(trim(mod_filename)//'at line',__LINE__)
       endif
 
-      VP1=vapsat(TKS1)*EXP(18.0_r8*PSISV1/(8.3143_r8*TKS1))    !in soil
+      VP1=vapsat(TKS1)*EXP(18.0_r8*PSISV1/(RGAS*TKS1))    !in soil
       EVAPR2=AMAX1(-AZMAX1(VOLWR2*XNPX),PARE*(VPQ(NY,NX)-VPR))
 
       EFLXR2=EVAPR2*VAP             !energy flux
@@ -2097,7 +2097,7 @@ module WatsubMod
   TKX1=TK1(NUM(NY,NX),NY,NX)
   !VP1=2.173E-03/TKX1 &
   !    *0.61*EXP(5360.0*(3.661E-03-1.0/TKX1)) &
-  VP1=vapsat(TKX1)*EXP(18.0*PSISV1/(8.3143*TKX1))
+  VP1=vapsat(TKX1)*EXP(18.0*PSISV1/(RGAS*TKX1))
   EVAPG(NY,NX)=AMAX1(PARE*(VPQ(NY,NX)-VP1) &
       ,-AZMAX1(VOLW2(NUM(NY,NX),NY,NX)*XNPX))
   EFLXG=EVAPG(NY,NX)*VAP
@@ -3263,10 +3263,10 @@ module WatsubMod
             TK12=TK1(N6,N5,N4)
             !VP1=2.173E-03/TK11 &
             !*0.61*EXP(5360.0*(3.661E-03-1.0/TK11)) &
-            VP1=vapsat(TK11)*EXP(18.0*PSISV1/(8.3143*TK11))
+            VP1=vapsat(TK11)*EXP(18.0*PSISV1/(RGAS*TK11))
             !VPL=2.173E-03/TK12 &
             !*0.61*EXP(5360.0*(3.661E-03-1.0/TK12)) &
-            VPL=vapsat(TK12)*EXP(18.0*PSISVL/(8.3143*TK12))
+            VPL=vapsat(TK12)*EXP(18.0*PSISVL/(RGAS*TK12))
             CNV1=WGSGL(N3,N2,N1)*THETPM(M,N3,N2,N1)*POROQ &
               *THETPM(M,N3,N2,N1)/POROS(N3,N2,N1)
             CNVL=WGSGL(N6,N5,N4)*THETPM(M,N6,N5,N4)*POROQ &
