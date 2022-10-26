@@ -82,6 +82,12 @@ module PlantBranchMod
   real(r8) :: XFRC,XFRN,XFRP
 ! begin_execution
   associate(                            &
+    instruct =>  pltpar%instruct  , &
+    ifoliar  =>  pltpar%ifoliar   , &
+    istalk   =>  pltpar%istalk    , &
+    iroot    =>  pltpar%iroot     , &
+    infoliar =>  pltpar%infoliar  , &
+    icwood   =>  pltpar%icwood    , &
     DMLF       =>  plt_allom%DMLF     , &
     DMSHE      =>  plt_allom%DMSHE    , &
     DMEAR      =>  plt_allom%DMEAR    , &
@@ -499,7 +505,7 @@ module PlantBranchMod
     !     HTNODX,HTNODE=stalk height,stalk internode length
     !     ANGBR=sine of stalk angle from horizontal from PFT file
 !
-          DO 510 KK=MNNOD,MXNOD
+          D510: DO KK=MNNOD,MXNOD
             K1=MOD(KK,JNODS1)
             IF(K1.EQ.0.AND.KK.NE.0)K1=25
             K2=MOD(KK-1,JNODS1)
@@ -513,8 +519,7 @@ module PlantBranchMod
             ELSE
               HTNODE(K1,NB,NZ)=HTNODX(K1,NB,NZ)
             ENDIF
-
-510       CONTINUE
+          ENDDO D510
         ENDIF
 !
     !   RECOVERY OF REMOBILIZABLE N,P DURING REMOBILIZATION DEPENDS
@@ -613,17 +618,17 @@ module PlantBranchMod
     !       FWODLN,FWODLP=N,P woody fraction in leaf:0=woody,1=non-woody
 !
             D6300: DO M=1,jsken
-              ESNC(M,ielmc,0,0,NZ)=ESNC(M,ielmc,0,0,NZ)+CFOPE(5,M,ielmc,NZ) &
+              ESNC(M,ielmc,0,0,NZ)=ESNC(M,ielmc,0,0,NZ)+CFOPE(icwood,M,ielmc,NZ) &
                 *FSNCL*(WGLFEX(NB,ielmc,NZ)-RCELX(NB,ielmc,NZ))*FWODB(0)
-              ESNC(M,ielmn,0,0,NZ)=ESNC(M,ielmn,0,0,NZ)+CFOPE(5,M,ielmn,NZ) &
+              ESNC(M,ielmn,0,0,NZ)=ESNC(M,ielmn,0,0,NZ)+CFOPE(icwood,M,ielmn,NZ) &
                 *FSNCL*(WGLFEX(NB,ielmn,NZ)-RCELX(NB,ielmn,NZ))*FWODLN(0)
-              ESNC(M,ielmp,0,0,NZ)=ESNC(M,ielmp,0,0,NZ)+CFOPE(5,M,ielmp,NZ) &
+              ESNC(M,ielmp,0,0,NZ)=ESNC(M,ielmp,0,0,NZ)+CFOPE(icwood,M,ielmp,NZ) &
                 *FSNCL*(WGLFEX(NB,ielmp,NZ)-RCELX(NB,ielmp,NZ))*FWODLP(0)
-              ESNC(M,ielmc,1,0,NZ)=ESNC(M,ielmc,1,0,NZ)+CFOPE(1,M,ielmc,NZ) &
+              ESNC(M,ielmc,1,0,NZ)=ESNC(M,ielmc,1,0,NZ)+CFOPE(ifoliar,M,ielmc,NZ) &
                 *FSNCL*(WGLFEX(NB,ielmc,NZ)-RCELX(NB,ielmc,NZ))*FWODB(1)
-              ESNC(M,ielmn,1,0,NZ)=ESNC(M,ielmn,1,0,NZ)+CFOPE(1,M,ielmn,NZ) &
+              ESNC(M,ielmn,1,0,NZ)=ESNC(M,ielmn,1,0,NZ)+CFOPE(ifoliar,M,ielmn,NZ) &
                 *FSNCL*(WGLFEX(NB,ielmn,NZ)-RCELX(NB,ielmn,NZ))*FWODLN(1)
-              ESNC(M,ielmp,1,0,NZ)=ESNC(M,ielmp,1,0,NZ)+CFOPE(1,M,ielmp,NZ) &
+              ESNC(M,ielmp,1,0,NZ)=ESNC(M,ielmp,1,0,NZ)+CFOPE(ifoliar,M,ielmp,NZ) &
                 *FSNCL*(WGLFEX(NB,ielmp,NZ)-RCELX(NB,ielmp,NZ))*FWODLP(1)
             ENDDO D6300
 !
@@ -708,17 +713,17 @@ module PlantBranchMod
     !       FWODSN,FWODSP=N,P woody fraction in petiole:0=woody,1=non-woody
 !
             D6305: DO M=1,jsken
-              ESNC(M,ielmc,0,0,NZ)=ESNC(M,ielmc,0,0,NZ)+CFOPE(5,M,ielmc,NZ) &
+              ESNC(M,ielmc,0,0,NZ)=ESNC(M,ielmc,0,0,NZ)+CFOPE(icwood,M,ielmc,NZ) &
                 *FSNCS*(WGSHEXE(NB,ielmc,NZ)-RCESX(NB,ielmc,NZ))*FWODB(0)
-              ESNC(M,ielmn,0,0,NZ)=ESNC(M,ielmn,0,0,NZ)+CFOPE(5,M,ielmn,NZ) &
+              ESNC(M,ielmn,0,0,NZ)=ESNC(M,ielmn,0,0,NZ)+CFOPE(icwood,M,ielmn,NZ) &
                 *FSNCS*(WGSHEXE(NB,ielmn,NZ)-RCESX(NB,ielmn,NZ))*FWODSN(0)
-              ESNC(M,ielmp,0,0,NZ)=ESNC(M,ielmp,0,0,NZ)+CFOPE(5,M,ielmp,NZ) &
+              ESNC(M,ielmp,0,0,NZ)=ESNC(M,ielmp,0,0,NZ)+CFOPE(icwood,M,ielmp,NZ) &
                 *FSNCS*(WGSHEXE(NB,ielmp,NZ)-RCESX(NB,ielmp,NZ))*FWODSP(0)
-              ESNC(M,ielmc,1,0,NZ)=ESNC(M,ielmc,1,0,NZ)+CFOPE(2,M,ielmc,NZ) &
+              ESNC(M,ielmc,1,0,NZ)=ESNC(M,ielmc,1,0,NZ)+CFOPE(infoliar,M,ielmc,NZ) &
                 *FSNCS*(WGSHEXE(NB,ielmc,NZ)-RCESX(NB,ielmc,NZ))*FWODB(1)
-              ESNC(M,ielmn,1,0,NZ)=ESNC(M,ielmn,1,0,NZ)+CFOPE(2,M,ielmn,NZ) &
+              ESNC(M,ielmn,1,0,NZ)=ESNC(M,ielmn,1,0,NZ)+CFOPE(infoliar,M,ielmn,NZ) &
                 *FSNCS*(WGSHEXE(NB,ielmn,NZ)-RCESX(NB,ielmn,NZ))*FWODSN(1)
-              ESNC(M,ielmp,1,0,NZ)=ESNC(M,ielmp,1,0,NZ)+CFOPE(2,M,ielmp,NZ) &
+              ESNC(M,ielmp,1,0,NZ)=ESNC(M,ielmp,1,0,NZ)+CFOPE(infoliar,M,ielmp,NZ) &
                 *FSNCS*(WGSHEXE(NB,ielmp,NZ)-RCESX(NB,ielmp,NZ))*FWODSP(1)
             ENDDO D6305
 !
@@ -1351,7 +1356,13 @@ module PlantBranchMod
   real(r8) :: SNCLF
   real(r8) :: SNCSH
 ! begin_execution
-  associate(                                 &
+  associate(                             &
+    instruct =>  pltpar%instruct  , &
+    ifoliar  =>  pltpar%ifoliar   , &
+    istalk   =>  pltpar%istalk    , &
+    iroot    =>  pltpar%iroot     , &
+    infoliar =>  pltpar%infoliar  , &
+    icwood   =>  pltpar%icwood    , &
     WTRSVBE    =>  plt_biom%WTRSVBE    , &
     WTSTKBE    =>  plt_biom%WTSTKBE    , &
     WGNODE     =>  plt_biom%WGNODE     , &
@@ -1453,17 +1464,17 @@ module PlantBranchMod
         !     CPOOL3,CPOOL4=C4 nonstructural C mass in bundle sheath,mesophyll
         !
         D6310: DO M=1,jsken
-          ESNC(M,ielmc,0,0,NZ)=ESNC(M,ielmc,0,0,NZ)+CFOPE(5,M,ielmc,NZ) &
+          ESNC(M,ielmc,0,0,NZ)=ESNC(M,ielmc,0,0,NZ)+CFOPE(icwood,M,ielmc,NZ) &
             *FSNCL*(WGLFE(K,NB,ielmc,NZ)-RCEL(ielmc))*FWODB(0)
-          ESNC(M,ielmc,0,0,NZ)=ESNC(M,ielmn,0,0,NZ)+CFOPE(5,M,ielmn,NZ) &
+          ESNC(M,ielmc,0,0,NZ)=ESNC(M,ielmn,0,0,NZ)+CFOPE(icwood,M,ielmn,NZ) &
             *FSNCL*(WGLFE(K,NB,ielmn,NZ)-RCEL(ielmn))*FWODLN(0)
-          ESNC(M,ielmp,0,0,NZ)=ESNC(M,ielmp,0,0,NZ)+CFOPE(5,M,ielmp,NZ) &
+          ESNC(M,ielmp,0,0,NZ)=ESNC(M,ielmp,0,0,NZ)+CFOPE(icwood,M,ielmp,NZ) &
             *FSNCL*(WGLFE(K,NB,ielmp,NZ)-RCEL(ielmp))*FWODLP(0)
-          ESNC(M,ielmc,1,0,NZ)=ESNC(M,ielmc,1,0,NZ)+CFOPE(1,M,ielmc,NZ) &
+          ESNC(M,ielmc,1,0,NZ)=ESNC(M,ielmc,1,0,NZ)+CFOPE(ifoliar,M,ielmc,NZ) &
             *FSNCL*(WGLFE(K,NB,ielmc,NZ)-RCEL(ielmc))*FWODB(1)
-          ESNC(M,ielmn,1,0,NZ)=ESNC(M,ielmn,1,0,NZ)+CFOPE(1,M,ielmn,NZ) &
+          ESNC(M,ielmn,1,0,NZ)=ESNC(M,ielmn,1,0,NZ)+CFOPE(ifoliar,M,ielmn,NZ) &
             *FSNCL*(WGLFE(K,NB,ielmn,NZ)-RCEL(ielmn))*FWODLN(1)
-          ESNC(M,ielmp,1,0,NZ)=ESNC(M,ielmp,1,0,NZ)+CFOPE(1,M,ielmp,NZ) &
+          ESNC(M,ielmp,1,0,NZ)=ESNC(M,ielmp,1,0,NZ)+CFOPE(ifoliar,M,ielmp,NZ) &
             *FSNCL*(WGLFE(K,NB,ielmp,NZ)-RCEL(ielmp))*FWODLP(1)
         ENDDO D6310
         IF(K.NE.0)THEN
@@ -1531,17 +1542,17 @@ module PlantBranchMod
         !
       ELSE
         D6315: DO M=1,jsken
-          ESNC(M,ielmc,0,0,NZ)=ESNC(M,ielmc,0,0,NZ)+CFOPE(5,M,ielmc,NZ) &
+          ESNC(M,ielmc,0,0,NZ)=ESNC(M,ielmc,0,0,NZ)+CFOPE(icwood,M,ielmc,NZ) &
             *WGLFE(K,NB,ielmc,NZ)*FWODB(0)
-          ESNC(M,ielmn,0,0,NZ)=ESNC(M,ielmn,0,0,NZ)+CFOPE(5,M,ielmn,NZ) &
+          ESNC(M,ielmn,0,0,NZ)=ESNC(M,ielmn,0,0,NZ)+CFOPE(icwood,M,ielmn,NZ) &
             *WGLFE(K,NB,ielmn,NZ)*FWODLN(0)
-          ESNC(M,ielmp,0,0,NZ)=ESNC(M,ielmp,0,0,NZ)+CFOPE(5,M,ielmp,NZ) &
+          ESNC(M,ielmp,0,0,NZ)=ESNC(M,ielmp,0,0,NZ)+CFOPE(icwood,M,ielmp,NZ) &
             *WGLFE(K,NB,ielmp,NZ)*FWODLP(0)
-          ESNC(M,ielmc,1,0,NZ)=ESNC(M,ielmc,1,0,NZ)+CFOPE(1,M,ielmc,NZ) &
+          ESNC(M,ielmc,1,0,NZ)=ESNC(M,ielmc,1,0,NZ)+CFOPE(ifoliar,M,ielmc,NZ) &
             *WGLFE(K,NB,ielmc,NZ)*FWODB(1)
-          ESNC(M,ielmn,1,0,NZ)=ESNC(M,ielmn,1,0,NZ)+CFOPE(1,M,ielmn,NZ) &
+          ESNC(M,ielmn,1,0,NZ)=ESNC(M,ielmn,1,0,NZ)+CFOPE(ifoliar,M,ielmn,NZ) &
             *WGLFE(K,NB,ielmn,NZ)*FWODLN(1)
-          ESNC(M,ielmp,1,0,NZ)=ESNC(M,ielmp,1,0,NZ)+CFOPE(1,M,ielmp,NZ) &
+          ESNC(M,ielmp,1,0,NZ)=ESNC(M,ielmp,1,0,NZ)+CFOPE(ifoliar,M,ielmp,NZ) &
             *WGLFE(K,NB,ielmp,NZ)*FWODLP(1)
         ENDDO D6315
         IF(K.NE.0)THEN
@@ -1602,17 +1613,17 @@ module PlantBranchMod
       !     FWODSN,FWODSP=N,P woody fraction in petiole:0=woody,1=non-woody
       !
         D6320: DO M=1,jsken
-          ESNC(M,ielmc,0,0,NZ)=ESNC(M,ielmc,0,0,NZ)+CFOPE(5,M,ielmc,NZ) &
+          ESNC(M,ielmc,0,0,NZ)=ESNC(M,ielmc,0,0,NZ)+CFOPE(icwood,M,ielmc,NZ) &
             *FSNCS*(WGSHE(K,NB,ielmc,NZ)-RCCS)*FWODB(0)
-          ESNC(M,ielmn,0,0,NZ)=ESNC(M,ielmn,0,0,NZ)+CFOPE(5,M,ielmn,NZ) &
+          ESNC(M,ielmn,0,0,NZ)=ESNC(M,ielmn,0,0,NZ)+CFOPE(icwood,M,ielmn,NZ) &
             *FSNCS*(WGSHE(K,NB,ielmn,NZ)-RCZS)*FWODSN(0)
-          ESNC(M,ielmp,0,0,NZ)=ESNC(M,ielmp,0,0,NZ)+CFOPE(5,M,ielmp,NZ) &
+          ESNC(M,ielmp,0,0,NZ)=ESNC(M,ielmp,0,0,NZ)+CFOPE(icwood,M,ielmp,NZ) &
             *FSNCS*(WGSHE(K,NB,ielmp,NZ)-RCPS)*FWODSP(0)
-          ESNC(M,ielmc,1,0,NZ)=ESNC(M,ielmc,1,0,NZ)+CFOPE(2,M,ielmc,NZ) &
+          ESNC(M,ielmc,1,0,NZ)=ESNC(M,ielmc,1,0,NZ)+CFOPE(infoliar,M,ielmc,NZ) &
             *FSNCS*(WGSHE(K,NB,ielmc,NZ)-RCCS)*FWODB(1)
-          ESNC(M,ielmn,1,0,NZ)=ESNC(M,ielmn,1,0,NZ)+CFOPE(2,M,ielmn,NZ) &
+          ESNC(M,ielmn,1,0,NZ)=ESNC(M,ielmn,1,0,NZ)+CFOPE(infoliar,M,ielmn,NZ) &
             *FSNCS*(WGSHE(K,NB,ielmn,NZ)-RCZS)*FWODSN(1)
-          ESNC(M,ielmp,1,0,NZ)=ESNC(M,ielmp,1,0,NZ)+CFOPE(2,M,ielmp,NZ) &
+          ESNC(M,ielmp,1,0,NZ)=ESNC(M,ielmp,1,0,NZ)+CFOPE(infoliar,M,ielmp,NZ) &
             *FSNCS*(WGSHE(K,NB,ielmp,NZ)-RCPS)*FWODSP(1)
         ENDDO D6320
 !
@@ -1669,17 +1680,17 @@ module PlantBranchMod
       !
       ELSE
         D6325: DO M=1,jsken
-          ESNC(M,ielmc,0,0,NZ)=ESNC(M,ielmc,0,0,NZ)+CFOPE(5,M,ielmc,NZ) &
+          ESNC(M,ielmc,0,0,NZ)=ESNC(M,ielmc,0,0,NZ)+CFOPE(icwood,M,ielmc,NZ) &
             *WGSHE(K,NB,ielmc,NZ)*FWODB(0)
-          ESNC(M,ielmn,0,0,NZ)=ESNC(M,ielmn,0,0,NZ)+CFOPE(5,M,ielmn,NZ) &
+          ESNC(M,ielmn,0,0,NZ)=ESNC(M,ielmn,0,0,NZ)+CFOPE(icwood,M,ielmn,NZ) &
             *WGSHE(K,NB,ielmn,NZ)*FWODSN(0)
-          ESNC(M,ielmp,0,0,NZ)=ESNC(M,ielmp,0,0,NZ)+CFOPE(5,M,ielmp,NZ) &
+          ESNC(M,ielmp,0,0,NZ)=ESNC(M,ielmp,0,0,NZ)+CFOPE(icwood,M,ielmp,NZ) &
             *WGSHE(K,NB,ielmp,NZ)*FWODSP(0)
-          ESNC(M,ielmp,0,0,NZ)=ESNC(M,ielmp,0,0,NZ)+CFOPE(2,M,ielmc,NZ) &
+          ESNC(M,ielmp,0,0,NZ)=ESNC(M,ielmp,0,0,NZ)+CFOPE(infoliar,M,ielmc,NZ) &
             *WGSHE(K,NB,ielmc,NZ)*FWODB(1)
-          ESNC(M,ielmn,1,0,NZ)=ESNC(M,ielmn,1,0,NZ)+CFOPE(2,M,ielmn,NZ) &
+          ESNC(M,ielmn,1,0,NZ)=ESNC(M,ielmn,1,0,NZ)+CFOPE(infoliar,M,ielmn,NZ) &
             *WGSHE(K,NB,ielmn,NZ)*FWODSN(1)
-          ESNC(M,ielmp,1,0,NZ)=ESNC(M,ielmp,1,0,NZ)+CFOPE(2,M,ielmp,NZ) &
+          ESNC(M,ielmp,1,0,NZ)=ESNC(M,ielmp,1,0,NZ)+CFOPE(infoliar,M,ielmp,NZ) &
             *WGSHE(K,NB,ielmp,NZ)*FWODSP(1)
         ENDDO D6325
         WTSHEBE(NB,ielmc,NZ)=AZMAX1(WTSHEBE(NB,ielmc,NZ)-WGSHE(K,NB,ielmc,NZ))
@@ -1766,17 +1777,17 @@ module PlantBranchMod
       !     WGNODE,WGNODN,WGNODP=senescing internode C,N,P mass
 !
           D7310: DO M=1,jsken
-            ESNC(M,ielmc,0,0,NZ)=ESNC(M,ielmc,0,0,NZ)+CFOPE(3,M,ielmc,NZ) &
+            ESNC(M,ielmc,0,0,NZ)=ESNC(M,ielmc,0,0,NZ)+CFOPE(istalk,M,ielmc,NZ) &
               *FSNCK*(WGNODE(K,NB,NZ)-RCCK)*FWOOD(0)
-            ESNC(M,ielmn,0,0,NZ)=ESNC(M,ielmn,0,0,NZ)+CFOPE(3,M,ielmn,NZ) &
+            ESNC(M,ielmn,0,0,NZ)=ESNC(M,ielmn,0,0,NZ)+CFOPE(istalk,M,ielmn,NZ) &
               *FSNCK*(WGNODN(K,NB,NZ)-RCZK)*FWOODN(0)
-            ESNC(M,ielmp,0,0,NZ)=ESNC(M,ielmp,0,0,NZ)+CFOPE(3,M,ielmp,NZ) &
+            ESNC(M,ielmp,0,0,NZ)=ESNC(M,ielmp,0,0,NZ)+CFOPE(istalk,M,ielmp,NZ) &
               *FSNCK*(WGNODP(K,NB,NZ)-RCPK)*FWOODP(0)
-            ESNC(M,ielmc,1,0,NZ)=ESNC(M,ielmc,0,0,NZ)+CFOPE(3,M,ielmc,NZ) &
+            ESNC(M,ielmc,1,0,NZ)=ESNC(M,ielmc,0,0,NZ)+CFOPE(istalk,M,ielmc,NZ) &
               *FSNCK*(WGNODE(K,NB,NZ)-RCCK)*FWOOD(1)
-            ESNC(M,ielmn,1,0,NZ)=ESNC(M,ielmn,0,0,NZ)+CFOPE(3,M,ielmn,NZ) &
+            ESNC(M,ielmn,1,0,NZ)=ESNC(M,ielmn,0,0,NZ)+CFOPE(istalk,M,ielmn,NZ) &
               *FSNCK*(WGNODN(K,NB,NZ)-RCZK)*FWOODN(1)
-            ESNC(M,ielmp,1,0,NZ)=ESNC(M,ielmp,0,0,NZ)+CFOPE(3,M,ielmp,NZ) &
+            ESNC(M,ielmp,1,0,NZ)=ESNC(M,ielmp,0,0,NZ)+CFOPE(istalk,M,ielmp,NZ) &
               *FSNCK*(WGNODP(K,NB,NZ)-RCPK)*FWOODP(1)
           ENDDO D7310
 !
@@ -1821,17 +1832,17 @@ module PlantBranchMod
     !
         ELSE
           D7315: DO M=1,jsken
-            ESNC(M,ielmc,0,0,NZ)=ESNC(M,ielmc,0,0,NZ)+CFOPE(3,M,ielmc,NZ) &
+            ESNC(M,ielmc,0,0,NZ)=ESNC(M,ielmc,0,0,NZ)+CFOPE(istalk,M,ielmc,NZ) &
               *WGNODE(K,NB,NZ)*FWOOD(0)
-            ESNC(M,ielmn,0,0,NZ)=ESNC(M,ielmn,0,0,NZ)+CFOPE(3,M,ielmn,NZ) &
+            ESNC(M,ielmn,0,0,NZ)=ESNC(M,ielmn,0,0,NZ)+CFOPE(istalk,M,ielmn,NZ) &
               *WGNODN(K,NB,NZ)*FWOODN(0)
-            ESNC(M,ielmp,0,0,NZ)=ESNC(M,ielmp,0,0,NZ)+CFOPE(3,M,ielmp,NZ) &
+            ESNC(M,ielmp,0,0,NZ)=ESNC(M,ielmp,0,0,NZ)+CFOPE(istalk,M,ielmp,NZ) &
               *WGNODP(K,NB,NZ)*FWOODP(0)
-            ESNC(M,ielmc,1,0,NZ)=ESNC(M,ielmc,0,0,NZ)+CFOPE(3,M,ielmc,NZ) &
+            ESNC(M,ielmc,1,0,NZ)=ESNC(M,ielmc,0,0,NZ)+CFOPE(istalk,M,ielmc,NZ) &
               *WGNODE(K,NB,NZ)*FWOOD(1)
-            ESNC(M,ielmn,1,0,NZ)=ESNC(M,ielmn,0,0,NZ)+CFOPE(3,M,ielmn,NZ) &
+            ESNC(M,ielmn,1,0,NZ)=ESNC(M,ielmn,0,0,NZ)+CFOPE(istalk,M,ielmn,NZ) &
               *WGNODN(K,NB,NZ)*FWOODN(1)
-            ESNC(M,ielmp,1,0,NZ)=ESNC(M,ielmp,0,0,NZ)+CFOPE(3,M,ielmp,NZ) &
+            ESNC(M,ielmp,1,0,NZ)=ESNC(M,ielmp,0,0,NZ)+CFOPE(istalk,M,ielmp,NZ) &
               *WGNODP(K,NB,NZ)*FWOODP(1)
           ENDDO D7315
           WTSTKBE(NB,ielmc,NZ)=AZMAX1(WTSTKBE(NB,ielmc,NZ)-WGNODE(K,NB,NZ))
@@ -1872,17 +1883,17 @@ module PlantBranchMod
     !     TO FRACTIONS SET IN 'STARTQ'
     !
         D8310: DO M=1,jsken
-          ESNC(M,ielmc,0,0,NZ)=ESNC(M,ielmc,0,0,NZ)+CFOPE(3,M,ielmc,NZ) &
+          ESNC(M,ielmc,0,0,NZ)=ESNC(M,ielmc,0,0,NZ)+CFOPE(istalk,M,ielmc,NZ) &
             *FSNCR*(WTSTXB(NB,NZ)-RCCK)*FWOOD(0)
-          ESNC(M,ielmn,0,0,NZ)=ESNC(M,ielmn,0,0,NZ)+CFOPE(3,M,ielmn,NZ) &
+          ESNC(M,ielmn,0,0,NZ)=ESNC(M,ielmn,0,0,NZ)+CFOPE(istalk,M,ielmn,NZ) &
             *FSNCR*(WTSTXN(NB,NZ)-RCZK)*FWOODN(0)
-          ESNC(M,ielmp,0,0,NZ)=ESNC(M,ielmp,0,0,NZ)+CFOPE(3,M,ielmp,NZ) &
+          ESNC(M,ielmp,0,0,NZ)=ESNC(M,ielmp,0,0,NZ)+CFOPE(istalk,M,ielmp,NZ) &
             *FSNCR*(WTSTXP(NB,NZ)-RCPK)*FWOODP(0)
-          ESNC(M,ielmc,1,0,NZ)=ESNC(M,ielmc,0,0,NZ)+CFOPE(3,M,ielmc,NZ) &
+          ESNC(M,ielmc,1,0,NZ)=ESNC(M,ielmc,0,0,NZ)+CFOPE(istalk,M,ielmc,NZ) &
             *FSNCR*(WTSTXB(NB,NZ)-RCCK)*FWOOD(1)
-          ESNC(M,ielmn,1,0,NZ)=ESNC(M,ielmn,0,0,NZ)+CFOPE(3,M,ielmn,NZ) &
+          ESNC(M,ielmn,1,0,NZ)=ESNC(M,ielmn,0,0,NZ)+CFOPE(istalk,M,ielmn,NZ) &
             *FSNCR*(WTSTXN(NB,NZ)-RCZK)*FWOODN(1)
-          ESNC(M,ielmp,1,0,NZ)=ESNC(M,ielmp,0,0,NZ)+CFOPE(3,M,ielmp,NZ) &
+          ESNC(M,ielmp,1,0,NZ)=ESNC(M,ielmp,0,0,NZ)+CFOPE(istalk,M,ielmp,NZ) &
             *FSNCR*(WTSTXP(NB,NZ)-RCPK)*FWOODP(1)
         ENDDO D8310
     !
@@ -1940,17 +1951,17 @@ module PlantBranchMod
   !
     ELSE
       D8315: DO M=1,jsken
-        ESNC(M,ielmc,0,0,NZ)=ESNC(M,ielmc,0,0,NZ)+CFOPE(3,M,ielmc,NZ) &
+        ESNC(M,ielmc,0,0,NZ)=ESNC(M,ielmc,0,0,NZ)+CFOPE(istalk,M,ielmc,NZ) &
           *WTSTXB(NB,NZ)*FWOOD(0)
-        ESNC(M,ielmn,0,0,NZ)=ESNC(M,ielmn,0,0,NZ)+CFOPE(3,M,ielmn,NZ) &
+        ESNC(M,ielmn,0,0,NZ)=ESNC(M,ielmn,0,0,NZ)+CFOPE(istalk,M,ielmn,NZ) &
           *WTSTXN(NB,NZ)*FWOODN(0)
-        ESNC(M,ielmp,0,0,NZ)=ESNC(M,ielmp,0,0,NZ)+CFOPE(3,M,ielmp,NZ) &
+        ESNC(M,ielmp,0,0,NZ)=ESNC(M,ielmp,0,0,NZ)+CFOPE(istalk,M,ielmp,NZ) &
           *WTSTXP(NB,NZ)*FWOODP(0)
-        ESNC(M,ielmc,1,0,NZ)=ESNC(M,ielmc,0,0,NZ)+CFOPE(3,M,ielmc,NZ) &
+        ESNC(M,ielmc,1,0,NZ)=ESNC(M,ielmc,0,0,NZ)+CFOPE(istalk,M,ielmc,NZ) &
           *WTSTXB(NB,NZ)*FWOOD(1)
-        ESNC(M,ielmn,1,0,NZ)=ESNC(M,ielmn,0,0,NZ)+CFOPE(3,M,ielmn,NZ) &
+        ESNC(M,ielmn,1,0,NZ)=ESNC(M,ielmn,0,0,NZ)+CFOPE(istalk,M,ielmn,NZ) &
           *WTSTXN(NB,NZ)*FWOODN(1)
-        ESNC(M,ielmp,1,0,NZ)=ESNC(M,ielmp,0,0,NZ)+CFOPE(3,M,ielmp,NZ) &
+        ESNC(M,ielmp,1,0,NZ)=ESNC(M,ielmp,0,0,NZ)+CFOPE(istalk,M,ielmp,NZ) &
           *WTSTXP(NB,NZ)*FWOODP(1)
       ENDDO D8315
       WTSTKBE(NB,ielmc,NZ)=AZMAX1(WTSTKBE(NB,ielmc,NZ)-WTSTXB(NB,NZ))
@@ -2587,6 +2598,12 @@ module PlantBranchMod
   integer :: K,M
 ! begin_execution
   associate(                           &
+    instruct =>  pltpar%instruct  , &
+    ifoliar  =>  pltpar%ifoliar   , &
+    istalk   =>  pltpar%istalk    , &
+    iroot    =>  pltpar%iroot     , &
+    infoliar =>  pltpar%infoliar  , &
+    icwood   =>  pltpar%icwood    , &
     EHVST    =>  plt_distb%EHVST     , &
     IYRH     =>  plt_distb%IYRH      , &
     THIN     =>  plt_distb%THIN      , &
@@ -2738,23 +2755,23 @@ module PlantBranchMod
             FLG4(NB,NZ)=0._r8
             D5330: DO M=1,jsken
               ESNC(M,ielmc,0,0,NZ)=ESNC(M,ielmc,0,0,NZ) &
-                +CFOPE(5,M,ielmc,NZ)*WTLFBE(NB,ielmc,NZ)*FWODB(0) &
-                +CFOPE(5,M,ielmc,NZ)*WTSHEBE(NB,ielmc,NZ)*FWODB(0)
+                +CFOPE(icwood,M,ielmc,NZ)*WTLFBE(NB,ielmc,NZ)*FWODB(0) &
+                +CFOPE(icwood,M,ielmc,NZ)*WTSHEBE(NB,ielmc,NZ)*FWODB(0)
               ESNC(M,ielmn,0,0,NZ)=ESNC(M,ielmn,0,0,NZ) &
-                +CFOPE(5,M,ielmn,NZ)*WTLFBE(NB,ielmn,NZ)*FWODLN(0) &
-                +CFOPE(5,M,ielmn,NZ)*WTSHEBE(NB,ielmn,NZ)*FWODSN(0)
+                +CFOPE(icwood,M,ielmn,NZ)*WTLFBE(NB,ielmn,NZ)*FWODLN(0) &
+                +CFOPE(icwood,M,ielmn,NZ)*WTSHEBE(NB,ielmn,NZ)*FWODSN(0)
               ESNC(M,ielmp,0,0,NZ)=ESNC(M,ielmp,0,0,NZ) &
-                +CFOPE(5,M,ielmp,NZ)*WTLFBE(NB,ielmp,NZ)*FWODLP(0) &
-                +CFOPE(5,M,ielmp,NZ)*WTSHEBE(NB,ielmp,NZ)*FWODSP(0)
+                +CFOPE(icwood,M,ielmp,NZ)*WTLFBE(NB,ielmp,NZ)*FWODLP(0) &
+                +CFOPE(icwood,M,ielmp,NZ)*WTSHEBE(NB,ielmp,NZ)*FWODSP(0)
               ESNC(M,ielmc,1,0,NZ)=ESNC(M,ielmc,1,0,NZ) &
-                +CFOPE(1,M,ielmc,NZ)*WTLFBE(NB,ielmc,NZ)*FWODB(1) &
-                +CFOPE(2,M,ielmc,NZ)*WTSHEBE(NB,ielmc,NZ)*FWODB(1)
+                +CFOPE(ifoliar,M,ielmc,NZ)*WTLFBE(NB,ielmc,NZ)*FWODB(1) &
+                +CFOPE(infoliar,M,ielmc,NZ)*WTSHEBE(NB,ielmc,NZ)*FWODB(1)
               ESNC(M,ielmn,1,0,NZ)=ESNC(M,ielmn,1,0,NZ) &
-                +CFOPE(1,M,ielmn,NZ)*WTLFBE(NB,ielmn,NZ)*FWODLN(1) &
-                +CFOPE(2,M,ielmn,NZ)*WTSHEBE(NB,ielmn,NZ)*FWODSN(1)
+                +CFOPE(ifoliar,M,ielmn,NZ)*WTLFBE(NB,ielmn,NZ)*FWODLN(1) &
+                +CFOPE(infoliar,M,ielmn,NZ)*WTSHEBE(NB,ielmn,NZ)*FWODSN(1)
               ESNC(M,ielmp,1,0,NZ)=ESNC(M,ielmp,1,0,NZ) &
-                +CFOPE(1,M,ielmp,NZ)*WTLFBE(NB,ielmp,NZ)*FWODLP(1) &
-                +CFOPE(2,M,ielmp,NZ)*WTSHEBE(NB,ielmp,NZ)*FWODSP(1)
+                +CFOPE(ifoliar,M,ielmp,NZ)*WTLFBE(NB,ielmp,NZ)*FWODLP(1) &
+                +CFOPE(infoliar,M,ielmp,NZ)*WTSHEBE(NB,ielmp,NZ)*FWODSP(1)
             ENDDO D5330
             ARLFB(NB,NZ)=0._r8
             WTLFBE(NB,1:npelms,NZ)=0._r8
@@ -2777,11 +2794,11 @@ module PlantBranchMod
     !
         IF((IFLGE(NB,NZ).EQ.0.AND.ISTYP(NZ).NE.0).AND.VRNS(NB,NZ).GE.VRNL(NB,NZ))THEN
           D6245: DO M=1,jsken
-            ESNC(M,ielmc,1,0,NZ)=ESNC(M,ielmc,1,0,NZ)+CFOPE(2,M,ielmc,NZ) &
+            ESNC(M,ielmc,1,0,NZ)=ESNC(M,ielmc,1,0,NZ)+CFOPE(infoliar,M,ielmc,NZ) &
               *(WTHSKBE(NB,ielmc,NZ)+WTEARBE(NB,ielmc,NZ)+WTGRBE(NB,ielmc,NZ))
-            ESNC(M,ielmn,1,0,NZ)=ESNC(M,ielmn,1,0,NZ)+CFOPE(2,M,ielmn,NZ) &
+            ESNC(M,ielmn,1,0,NZ)=ESNC(M,ielmn,1,0,NZ)+CFOPE(infoliar,M,ielmn,NZ) &
               *(WTHSKBE(NB,ielmn,NZ)+WTEARBE(NB,ielmn,NZ)+WTGRBE(NB,ielmn,NZ))
-            ESNC(M,ielmp,1,0,NZ)=ESNC(M,ielmp,1,0,NZ)+CFOPE(2,M,ielmp,NZ) &
+            ESNC(M,ielmp,1,0,NZ)=ESNC(M,ielmp,1,0,NZ)+CFOPE(infoliar,M,ielmp,NZ) &
               *(WTHSKBE(NB,ielmp,NZ)+WTEARBE(NB,ielmp,NZ)+WTGRBE(NB,ielmp,NZ))
           ENDDO D6245
           WTHSKBE(NB,ielmc,NZ)=0._r8
@@ -2798,9 +2815,9 @@ module PlantBranchMod
           GRWTB(NB,NZ)=0._r8
           IF(IBTYP(NZ).EQ.0.OR.IGTYP(NZ).LE.1)THEN
             D6345: DO M=1,jsken
-              ESNC(M,ielmc,1,0,NZ)=ESNC(M,ielmc,1,0,NZ)+CFOPE(3,M,ielmc,NZ)*WTSTKBE(NB,ielmc,NZ)
-              ESNC(M,ielmn,1,0,NZ)=ESNC(M,ielmn,1,0,NZ)+CFOPE(3,M,ielmn,NZ)*WTSTKBE(NB,ielmn,NZ)
-              ESNC(M,ielmp,1,0,NZ)=ESNC(M,ielmp,1,0,NZ)+CFOPE(3,M,ielmp,NZ)*WTSTKBE(NB,ielmp,NZ)
+              ESNC(M,ielmc,1,0,NZ)=ESNC(M,ielmc,1,0,NZ)+CFOPE(istalk,M,ielmc,NZ)*WTSTKBE(NB,ielmc,NZ)
+              ESNC(M,ielmn,1,0,NZ)=ESNC(M,ielmn,1,0,NZ)+CFOPE(istalk,M,ielmn,NZ)*WTSTKBE(NB,ielmn,NZ)
+              ESNC(M,ielmp,1,0,NZ)=ESNC(M,ielmp,1,0,NZ)+CFOPE(istalk,M,ielmp,NZ)*WTSTKBE(NB,ielmp,NZ)
             ENDDO D6345
             WTSTKBE(NB,ielmc,NZ)=0._r8
             WTSTKBE(NB,ielmn,NZ)=0._r8
@@ -2846,20 +2863,20 @@ module PlantBranchMod
       IFLGQ(NB,NZ)=0
     ENDIF
     D6330: DO M=1,jsken
-      ESNC(M,ielmc,1,0,NZ)=ESNC(M,ielmc,1,0,NZ)+FSNR*CFOPE(2,M,ielmc,NZ) &
+      ESNC(M,ielmc,1,0,NZ)=ESNC(M,ielmc,1,0,NZ)+FSNR*CFOPE(infoliar,M,ielmc,NZ) &
         *(WTHSKBE(NB,ielmc,NZ)+WTEARBE(NB,ielmc,NZ))
-      ESNC(M,ielmn,1,0,NZ)=ESNC(M,ielmn,1,0,NZ)+FSNR*CFOPE(2,M,ielmn,NZ) &
+      ESNC(M,ielmn,1,0,NZ)=ESNC(M,ielmn,1,0,NZ)+FSNR*CFOPE(infoliar,M,ielmn,NZ) &
         *(WTHSKBE(NB,ielmn,NZ)+WTEARBE(NB,ielmn,NZ))
-      ESNC(M,ielmp,1,0,NZ)=ESNC(M,ielmp,1,0,NZ)+FSNR*CFOPE(2,M,ielmp,NZ) &
+      ESNC(M,ielmp,1,0,NZ)=ESNC(M,ielmp,1,0,NZ)+FSNR*CFOPE(infoliar,M,ielmp,NZ) &
         *(WTHSKBE(NB,ielmp,NZ)+WTEARBE(NB,ielmp,NZ))
       IF(ISTYP(NZ).EQ.0.AND.IWTYP(NZ).NE.0)THEN
-        WTRVE(ielmc,NZ)=WTRVE(ielmc,NZ)+FSNR*CFOPE(2,M,ielmc,NZ)*WTGRBE(NB,ielmc,NZ)
-        WTRVE(ielmn,NZ)=WTRVE(ielmn,NZ)+FSNR*CFOPE(2,M,ielmn,NZ)*WTGRBE(NB,ielmn,NZ)
-        WTRVE(ielmp,NZ)=WTRVE(ielmp,NZ)+FSNR*CFOPE(2,M,ielmp,NZ)*WTGRBE(NB,ielmp,NZ)
+        WTRVE(ielmc,NZ)=WTRVE(ielmc,NZ)+FSNR*CFOPE(infoliar,M,ielmc,NZ)*WTGRBE(NB,ielmc,NZ)
+        WTRVE(ielmn,NZ)=WTRVE(ielmn,NZ)+FSNR*CFOPE(infoliar,M,ielmn,NZ)*WTGRBE(NB,ielmn,NZ)
+        WTRVE(ielmp,NZ)=WTRVE(ielmp,NZ)+FSNR*CFOPE(infoliar,M,ielmp,NZ)*WTGRBE(NB,ielmp,NZ)
       ELSE
-        ESNC(M,ielmc,1,0,NZ)=ESNC(M,ielmc,1,0,NZ)+FSNR*CFOPE(2,M,ielmc,NZ)*WTGRBE(NB,ielmc,NZ)
-        ESNC(M,ielmn,1,0,NZ)=ESNC(M,ielmn,1,0,NZ)+FSNR*CFOPE(2,M,ielmn,NZ)*WTGRBE(NB,ielmn,NZ)
-        ESNC(M,ielmp,1,0,NZ)=ESNC(M,ielmp,1,0,NZ)+FSNR*CFOPE(2,M,ielmp,NZ)*WTGRBE(NB,ielmp,NZ)
+        ESNC(M,ielmc,1,0,NZ)=ESNC(M,ielmc,1,0,NZ)+FSNR*CFOPE(infoliar,M,ielmc,NZ)*WTGRBE(NB,ielmc,NZ)
+        ESNC(M,ielmn,1,0,NZ)=ESNC(M,ielmn,1,0,NZ)+FSNR*CFOPE(infoliar,M,ielmn,NZ)*WTGRBE(NB,ielmn,NZ)
+        ESNC(M,ielmp,1,0,NZ)=ESNC(M,ielmp,1,0,NZ)+FSNR*CFOPE(infoliar,M,ielmp,NZ)*WTGRBE(NB,ielmp,NZ)
       ENDIF
     ENDDO D6330
     WTHSKBE(NB,ielmc,NZ)=(1.0_r8-FSNR)*WTHSKBE(NB,ielmc,NZ)
@@ -2879,9 +2896,9 @@ module PlantBranchMod
 !
     IF((IBTYP(NZ).EQ.0.OR.IGTYP(NZ).LE.1).AND.ISTYP(NZ).NE.0)THEN
       D6335: DO M=1,jsken
-        ESNC(M,ielmc,1,0,NZ)=ESNC(M,ielmc,1,0,NZ)+FSNR*CFOPE(3,M,ielmc,NZ)*WTSTKBE(NB,ielmc,NZ)
-        ESNC(M,ielmn,1,0,NZ)=ESNC(M,ielmn,1,0,NZ)+FSNR*CFOPE(3,M,ielmn,NZ)*WTSTKBE(NB,ielmn,NZ)
-        ESNC(M,ielmp,1,0,NZ)=ESNC(M,ielmp,1,0,NZ)+FSNR*CFOPE(3,M,ielmp,NZ)*WTSTKBE(NB,ielmp,NZ)
+        ESNC(M,ielmc,1,0,NZ)=ESNC(M,ielmc,1,0,NZ)+FSNR*CFOPE(istalk,M,ielmc,NZ)*WTSTKBE(NB,ielmc,NZ)
+        ESNC(M,ielmn,1,0,NZ)=ESNC(M,ielmn,1,0,NZ)+FSNR*CFOPE(istalk,M,ielmn,NZ)*WTSTKBE(NB,ielmn,NZ)
+        ESNC(M,ielmp,1,0,NZ)=ESNC(M,ielmp,1,0,NZ)+FSNR*CFOPE(istalk,M,ielmp,NZ)*WTSTKBE(NB,ielmp,NZ)
       ENDDO D6335
       WTSTKBE(NB,ielmc,NZ)=(1.0_r8-FSNR)*WTSTKBE(NB,ielmc,NZ)
       WTSTKBE(NB,ielmn,NZ)=(1.0_r8-FSNR)*WTSTKBE(NB,ielmn,NZ)

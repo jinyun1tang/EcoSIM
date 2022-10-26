@@ -107,7 +107,7 @@ contains
 
   implicit none
   allocate(NRT(JP,JY,JX));      NRT=0
-  allocate(NINR(JC,JP,JY,JX));  NINR=1  !set to one to avoid numerical failure
+  allocate(NINR(JRS,JP,JY,JX));  NINR=1  !set to one to avoid numerical failure
   allocate(IDTHR(JP,JY,JX));    IDTHR=0
   allocate(NIX(JP,JY,JX));      NIX=0
   allocate(NI(JP,JY,JX));       NI=0

@@ -313,7 +313,7 @@ contains
   allocate(FLG4(JC,JP,JY,JX));  FLG4=0._r8
   allocate(ATRP(JC,JP,JY,JX));  ATRP=0._r8
   allocate(FLGZ(JC,JP,JY,JX));  FLGZ=0._r8
-  allocate(IDAY(10,JC,JP,JY,JX));IDAY=0
+  allocate(IDAY(jpstgs,JC,JP,JY,JX));IDAY=0
   allocate(CTC(JP,JY,JX));      CTC=0._r8
   allocate(HTC(JP,JY,JX));      HTC=0._r8
   allocate(SSTX(JP,JY,JX));     SSTX=0._r8

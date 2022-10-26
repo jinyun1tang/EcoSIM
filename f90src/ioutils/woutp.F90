@@ -82,7 +82,7 @@
             WRITE(26,95)I,IDATA(3),NZ,(KLEAF(NB,NZ,NY,NX),NB=1,NBR(NZ,NY,NX))
             WRITE(26,95)I,IDATA(3),NZ,(KVSTG(NB,NZ,NY,NX),NB=1,NBR(NZ,NY,NX))
             WRITE(26,95)I,IDATA(3),NZ,(KVSTGN(NB,NZ,NY,NX),NB=1,NBR(NZ,NY,NX))
-            DO N=1,10
+            DO N=1,jpstgs
               WRITE(26,95)I,IDATA(3),NZ,(IDAY(N,NB,NZ,NY,NX),NB=1,NBR(NZ,NY,NX))
             ENDDO
             WRITE(27,96)I,IDATA(3),NZ,EPOOLP(ielmc,NZ,NY,NX),EPOLNP(ielmc,NZ,NY,NX) &

@@ -7,6 +7,7 @@ module PlantAPI
   use EcoSIMSolverPar
   use UptakesMod    , only : uptakes
   use MicBGCPars    , only : micpar
+  use GrosubPars    , only : pltpar
   use PlantDisturbMod, only : PrepLandscapeGrazing
   use timings      , only : start_timer, end_timer
   use EcoSIMHistMod
@@ -512,7 +513,7 @@ implicit none
           WGLFLP(L,K,NB,NZ,NY,NX)=plt_biom%WGLFLP(L,K,NB,NZ)
         ENDDO
       ENDDO
-      DO M=1,10
+      DO M=1,pltpar%jpstgs
         IDAY(M,NB,NZ,NY,NX)=plt_pheno%IDAY(M,NB,NZ)
       ENDDO
       DO K=1,JNODS
@@ -1404,7 +1405,7 @@ implicit none
       plt_biom%WTSTXN(NB,NZ)=WTSTXN(NB,NZ,NY,NX)
       plt_biom%WTSTXP(NB,NZ)=WTSTXP(NB,NZ,NY,NX)
       plt_biom%WVSTKB(NB,NZ)=WVSTKB(NB,NZ,NY,NX)
-      DO M=1,10
+      DO M=1,pltpar%jpstgs
         plt_pheno%IDAY(M,NB,NZ)=IDAY(M,NB,NZ,NY,NX)
       ENDDO
       DO K=1,JNODS

@@ -57,6 +57,8 @@ module InitEcoSIM
 
   call InitSOMBGC(nmicbguilds)
 
+  call InitGrosub(jpstgs,JRS)
+
   call InitGridData
 
   call InitLandSurfData
@@ -102,8 +104,6 @@ module InitEcoSIM
   call InitPlantDisturbance
 
   call InitHour1
-
-  call InitGrosub
 
   call InitUptake
 

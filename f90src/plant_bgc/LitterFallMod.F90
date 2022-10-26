@@ -625,9 +625,9 @@ implicit none
       IFLGR(NB,NZ)=0
       IFLGQ(NB,NZ)=0
       NBTB(NB,NZ)=0
-      DO 8850 M=1,10
+      D8850: DO M=1,pltpar%jpstgs
         IDAY(M,NB,NZ)=0
-8850  CONTINUE
+      ENDDO D8850
 !
 !     LITTERFALL FROM DEAD BRANCHES
 !

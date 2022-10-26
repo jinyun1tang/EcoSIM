@@ -5,6 +5,7 @@ module StartqsMod
   use EcoSIMConfig
   use PlantAPIData
   use MicBGCPars, only : micpar
+  use GrosubPars, only : pltpar
   implicit none
 
   private
@@ -153,7 +154,13 @@ module StartqsMod
   real(r8) :: CNOPC(4),CPOPC(4)
   REAL(R8) :: CNOPCT,CPOPCT
 
-  associate(                             &
+  associate(                         &
+    instruct => pltpar%instruct, &
+    ifoliar  => pltpar%ifoliar , &
+    infoliar => pltpar%infoliar, &
+    istalk   => pltpar%istalk  , &
+    iroot    => pltpar%iroot   , &
+    icwood   => pltpar%icwood  , &
     XRLA   =>  plt_pheno%XRLA      , &
     IBTYP  =>  plt_pheno%IBTYP     , &
     IGTYP  =>  plt_pheno%IGTYP     , &
@@ -172,70 +179,70 @@ module StartqsMod
 !
 !     NONSTRUCTURAL
 !
-  CFOPE(0,1,ielmc,NZ)=0.0_r8
-  CFOPE(0,2,ielmc,NZ)=0.67_r8
-  CFOPE(0,3,ielmc,NZ)=0.33_r8
-  CFOPE(0,4,ielmc,NZ)=0.0_r8
+  CFOPE(instruct,1,ielmc,NZ)=0.0_r8
+  CFOPE(instruct,2,ielmc,NZ)=0.67_r8
+  CFOPE(instruct,3,ielmc,NZ)=0.33_r8
+  CFOPE(instruct,4,ielmc,NZ)=0.0_r8
 !
 !     NON-VASCULAR (E.G. MOSSES)
 !
   IF(IGTYP(NZ).EQ.0)THEN
-    CFOPE(1,1,ielmc,NZ)=0.07_r8
-    CFOPE(1,2,ielmc,NZ)=0.25_r8
-    CFOPE(1,3,ielmc,NZ)=0.30_r8
-    CFOPE(1,4,ielmc,NZ)=0.38_r8
-    CFOPE(2,1,ielmc,NZ)=0.07_r8
-    CFOPE(2,2,ielmc,NZ)=0.25_r8
-    CFOPE(2,3,ielmc,NZ)=0.30_r8
-    CFOPE(2,4,ielmc,NZ)=0.38_r8
+    CFOPE(ifoliar,1,ielmc,NZ)=0.07_r8
+    CFOPE(ifoliar,2,ielmc,NZ)=0.25_r8
+    CFOPE(ifoliar,3,ielmc,NZ)=0.30_r8
+    CFOPE(ifoliar,4,ielmc,NZ)=0.38_r8
+    CFOPE(infoliar,1,ielmc,NZ)=0.07_r8
+    CFOPE(infoliar,2,ielmc,NZ)=0.25_r8
+    CFOPE(infoliar,3,ielmc,NZ)=0.30_r8
+    CFOPE(infoliar,4,ielmc,NZ)=0.38_r8
 !
 !     LEGUMES
 !
   ELSEIF(INTYP(NZ).NE.0)THEN
-    CFOPE(1,1,ielmc,NZ)=0.16_r8
-    CFOPE(1,2,ielmc,NZ)=0.38_r8
-    CFOPE(1,3,ielmc,NZ)=0.34_r8
-    CFOPE(1,4,ielmc,NZ)=0.12_r8
-    CFOPE(2,1,ielmc,NZ)=0.07_r8
-    CFOPE(2,2,ielmc,NZ)=0.41_r8
-    CFOPE(2,3,ielmc,NZ)=0.37_r8
-    CFOPE(2,4,ielmc,NZ)=0.15_r8
+    CFOPE(ifoliar,1,ielmc,NZ)=0.16_r8
+    CFOPE(ifoliar,2,ielmc,NZ)=0.38_r8
+    CFOPE(ifoliar,3,ielmc,NZ)=0.34_r8
+    CFOPE(ifoliar,4,ielmc,NZ)=0.12_r8
+    CFOPE(infoliar,1,ielmc,NZ)=0.07_r8
+    CFOPE(infoliar,2,ielmc,NZ)=0.41_r8
+    CFOPE(infoliar,3,ielmc,NZ)=0.37_r8
+    CFOPE(infoliar,4,ielmc,NZ)=0.15_r8
 !
 !     ANNUALS, GRASSES, SHRUBS
 !
   ELSEIF(IBTYP(NZ).EQ.0.OR.IGTYP(NZ).LE.1)THEN
-    CFOPE(1,1,ielmc,NZ)=0.08_r8
-    CFOPE(1,2,ielmc,NZ)=0.41_r8
-    CFOPE(1,3,ielmc,NZ)=0.36_r8
-    CFOPE(1,4,ielmc,NZ)=0.15_r8
-    CFOPE(2,1,ielmc,NZ)=0.07_r8
-    CFOPE(2,2,ielmc,NZ)=0.41_r8
-    CFOPE(2,3,ielmc,NZ)=0.36_r8
-    CFOPE(2,4,ielmc,NZ)=0.16_r8
+    CFOPE(ifoliar,1,ielmc,NZ)=0.08_r8
+    CFOPE(ifoliar,2,ielmc,NZ)=0.41_r8
+    CFOPE(ifoliar,3,ielmc,NZ)=0.36_r8
+    CFOPE(ifoliar,4,ielmc,NZ)=0.15_r8
+    CFOPE(infoliar,1,ielmc,NZ)=0.07_r8
+    CFOPE(infoliar,2,ielmc,NZ)=0.41_r8
+    CFOPE(infoliar,3,ielmc,NZ)=0.36_r8
+    CFOPE(infoliar,4,ielmc,NZ)=0.16_r8
 !
 !     DECIDUOUS TREES
 !
   ELSEIF(IBTYP(NZ).EQ.1.OR.IBTYP(NZ).EQ.3)THEN
-    CFOPE(1,1,ielmc,NZ)=0.07_r8
-    CFOPE(1,2,ielmc,NZ)=0.34_r8
-    CFOPE(1,3,ielmc,NZ)=0.36_r8
-    CFOPE(1,4,ielmc,NZ)=0.23_r8
-    CFOPE(2,1,ielmc,NZ)=0.0_r8
-    CFOPE(2,2,ielmc,NZ)=0.045_r8
-    CFOPE(2,3,ielmc,NZ)=0.660_r8
-    CFOPE(2,4,ielmc,NZ)=0.295_r8
+    CFOPE(ifoliar,1,ielmc,NZ)=0.07_r8
+    CFOPE(ifoliar,2,ielmc,NZ)=0.34_r8
+    CFOPE(ifoliar,3,ielmc,NZ)=0.36_r8
+    CFOPE(ifoliar,4,ielmc,NZ)=0.23_r8
+    CFOPE(infoliar,1,ielmc,NZ)=0.0_r8
+    CFOPE(infoliar,2,ielmc,NZ)=0.045_r8
+    CFOPE(infoliar,3,ielmc,NZ)=0.660_r8
+    CFOPE(infoliar,4,ielmc,NZ)=0.295_r8
 !
 !     CONIFEROUS TREES
 !
   ELSE
-    CFOPE(1,1,ielmc,NZ)=0.07_r8
-    CFOPE(1,2,ielmc,NZ)=0.25_r8
-    CFOPE(1,3,ielmc,NZ)=0.38_r8
-    CFOPE(1,4,ielmc,NZ)=0.30_r8
-    CFOPE(2,1,ielmc,NZ)=0.0_r8
-    CFOPE(2,2,ielmc,NZ)=0.045_r8
-    CFOPE(2,3,ielmc,NZ)=0.660_r8
-    CFOPE(2,4,ielmc,NZ)=0.295_r8
+    CFOPE(ifoliar,1,ielmc,NZ)=0.07_r8
+    CFOPE(ifoliar,2,ielmc,NZ)=0.25_r8
+    CFOPE(ifoliar,3,ielmc,NZ)=0.38_r8
+    CFOPE(ifoliar,4,ielmc,NZ)=0.30_r8
+    CFOPE(infoliar,1,ielmc,NZ)=0.0_r8
+    CFOPE(infoliar,2,ielmc,NZ)=0.045_r8
+    CFOPE(infoliar,3,ielmc,NZ)=0.660_r8
+    CFOPE(infoliar,4,ielmc,NZ)=0.295_r8
   ENDIF
 !
 !     FRACTIONS OF WOODY LITTER ALLOCATED TO
@@ -244,26 +251,26 @@ module StartqsMod
 !     NON-VASCULAR
 !
   IF(IGTYP(NZ).EQ.0)THEN
-    CFOPE(3,1,ielmc,NZ)=0.07_r8
-    CFOPE(3,2,ielmc,NZ)=0.25_r8
-    CFOPE(3,3,ielmc,NZ)=0.30_r8
-    CFOPE(3,4,ielmc,NZ)=0.38_r8
+    CFOPE(istalk,1,ielmc,NZ)=0.07_r8
+    CFOPE(istalk,2,ielmc,NZ)=0.25_r8
+    CFOPE(istalk,3,ielmc,NZ)=0.30_r8
+    CFOPE(istalk,4,ielmc,NZ)=0.38_r8
 !
 !     ANNUALS, GRASSES, SHRUBS
 !
   ELSEIF(IBTYP(NZ).EQ.0.OR.IGTYP(NZ).LE.1)THEN
-    CFOPE(3,1,ielmc,NZ)=0.03_r8
-    CFOPE(3,2,ielmc,NZ)=0.25_r8
-    CFOPE(3,3,ielmc,NZ)=0.57_r8
-    CFOPE(3,4,ielmc,NZ)=0.15_r8
+    CFOPE(istalk,1,ielmc,NZ)=0.03_r8
+    CFOPE(istalk,2,ielmc,NZ)=0.25_r8
+    CFOPE(istalk,3,ielmc,NZ)=0.57_r8
+    CFOPE(istalk,4,ielmc,NZ)=0.15_r8
 !
 !     DECIDUOUS AND CONIFEROUS TREES
 !
   ELSE
-    CFOPE(3,1,ielmc,NZ)=0.0_r8
-    CFOPE(3,2,ielmc,NZ)=0.045_r8
-    CFOPE(3,3,ielmc,NZ)=0.660_r8
-    CFOPE(3,4,ielmc,NZ)=0.295_r8
+    CFOPE(istalk,1,ielmc,NZ)=0.0_r8
+    CFOPE(istalk,2,ielmc,NZ)=0.045_r8
+    CFOPE(istalk,3,ielmc,NZ)=0.660_r8
+    CFOPE(istalk,4,ielmc,NZ)=0.295_r8
   ENDIF
 !
 !     FRACTIONS OF FINE ROOT LITTER ALLOCATED TO
@@ -272,42 +279,42 @@ module StartqsMod
 !     NON-VASCULAR
 !
   IF(IGTYP(NZ).EQ.0)THEN
-    CFOPE(4,1,ielmc,NZ)=0.07_r8
-    CFOPE(4,2,ielmc,NZ)=0.25_r8
-    CFOPE(4,3,ielmc,NZ)=0.30_r8
-    CFOPE(4,4,ielmc,NZ)=0.38_r8
+    CFOPE(iroot,1,ielmc,NZ)=0.07_r8
+    CFOPE(iroot,2,ielmc,NZ)=0.25_r8
+    CFOPE(iroot,3,ielmc,NZ)=0.30_r8
+    CFOPE(iroot,4,ielmc,NZ)=0.38_r8
 !
 !     ANNUALS, GRASSES, SHRUBS
 !
   ELSEIF(IBTYP(NZ).EQ.0.OR.IGTYP(NZ).LE.1)THEN
-    CFOPE(4,1,ielmc,NZ)=0.057_r8
-    CFOPE(4,2,ielmc,NZ)=0.263_r8
-    CFOPE(4,3,ielmc,NZ)=0.542_r8
-    CFOPE(4,4,ielmc,NZ)=0.138_r8
+    CFOPE(iroot,1,ielmc,NZ)=0.057_r8
+    CFOPE(iroot,2,ielmc,NZ)=0.263_r8
+    CFOPE(iroot,3,ielmc,NZ)=0.542_r8
+    CFOPE(iroot,4,ielmc,NZ)=0.138_r8
 !
 !     DECIDUOUS TREES
 !
   ELSEIF(IBTYP(NZ).EQ.1.OR.IBTYP(NZ).EQ.3)THEN
-    CFOPE(4,1,ielmc,NZ)=0.059_r8
-    CFOPE(4,2,ielmc,NZ)=0.308_r8
-    CFOPE(4,3,ielmc,NZ)=0.464_r8
-    CFOPE(4,4,ielmc,NZ)=0.169_r8
+    CFOPE(iroot,1,ielmc,NZ)=0.059_r8
+    CFOPE(iroot,2,ielmc,NZ)=0.308_r8
+    CFOPE(iroot,3,ielmc,NZ)=0.464_r8
+    CFOPE(iroot,4,ielmc,NZ)=0.169_r8
 !
 !     CONIFEROUS TREES
 !
   ELSE
-    CFOPE(4,1,ielmc,NZ)=0.059_r8
-    CFOPE(4,2,ielmc,NZ)=0.308_r8
-    CFOPE(4,3,ielmc,NZ)=0.464_r8
-    CFOPE(4,4,ielmc,NZ)=0.169_r8
+    CFOPE(iroot,1,ielmc,NZ)=0.059_r8
+    CFOPE(iroot,2,ielmc,NZ)=0.308_r8
+    CFOPE(iroot,3,ielmc,NZ)=0.464_r8
+    CFOPE(iroot,4,ielmc,NZ)=0.169_r8
   ENDIF
 !
 !     COARSE WOODY LITTER FROM BOLES AND ROOTS
 !
-  CFOPE(5,1,ielmc,NZ)=0.00_r8
-  CFOPE(5,2,ielmc,NZ)=0.045_r8
-  CFOPE(5,3,ielmc,NZ)=0.660_r8
-  CFOPE(5,4,ielmc,NZ)=0.295_r8
+  CFOPE(icwood,1,ielmc,NZ)=0.00_r8
+  CFOPE(icwood,2,ielmc,NZ)=0.045_r8
+  CFOPE(icwood,3,ielmc,NZ)=0.660_r8
+  CFOPE(icwood,4,ielmc,NZ)=0.295_r8
 !
 !     INITIALIZE C-N AND C-P RATIOS IN PLANT LITTER
 !
@@ -635,7 +642,7 @@ module StartqsMod
     FLGZ(NB,NZ)=0
     NBTB(NB,NZ)=0
     plt_pheno%IDTHB(NB,NZ)=1
-    D15: DO M=1,10
+    D15: DO M=1,pltpar%jpstgs
       IDAY(M,NB,NZ)=0
     ENDDO D15
   ENDDO D10
@@ -764,6 +771,7 @@ module StartqsMod
     TZUPFX => plt_bgcr%TZUPFX    , &
     TESNC  => plt_bgcr%TESNC     , &
     ARSTP  => plt_morph%ARSTP    , &
+    icwood => pltpar%icwood      , &
     RSETE  => plt_pheno%RSETE      &
 
   )
@@ -794,9 +802,9 @@ module StartqsMod
     WTSTGE(1:npelms,NZ)=0._r8
     WTSTDX=WTSTDI(NZ)*AREA3(NU)
     D155: DO M=1,jsken
-      WTSTDE(M,ielmc,NZ)=WTSTDX*CFOPE(5,M,ielmc,NZ)
-      WTSTDE(M,ielmn,NZ)=WTSTDX*CNSTK(NZ)*CFOPE(5,M,ielmn,NZ)
-      WTSTDE(M,ielmp,NZ)=WTSTDX*CPSTK(NZ)*CFOPE(5,M,ielmp,NZ)
+      WTSTDE(M,ielmc,NZ)=WTSTDX*CFOPE(icwood,M,ielmc,NZ)
+      WTSTDE(M,ielmn,NZ)=WTSTDX*CNSTK(NZ)*CFOPE(icwood,M,ielmn,NZ)
+      WTSTDE(M,ielmp,NZ)=WTSTDX*CPSTK(NZ)*CFOPE(icwood,M,ielmp,NZ)
     ENDDO D155
     DO NE=1,npelms
       WTSTGE(NE,NZ)=WTSTGE(NE,NZ)+sum(WTSTDE(1:jsken,NE,NZ))

@@ -147,9 +147,33 @@ module GrosubPars
   real(r8) :: GVMX(0:1)
   real(r8) :: RTSK(0:3)
 
+  type, public :: plant_bgc_par_type
+   !nonstructural(0,*),
+   !     foliar(1,*),non-foliar(2,*),stalk(3,*),root(4,*), coarse woody (5,*)
+  integer :: instruct
+  integer :: ifoliar
+  integer :: infoliar
+  integer :: istalk
+  integer :: iroot
+  integer :: icwood
+  integer :: jpstgs    !number of growth stages
+  integer :: JRS       !maximum number of root layers
+  end type plant_bgc_par_type
+
+  type(plant_bgc_par_type), public :: pltpar
   contains
+
   subroutine InitVegPars
   implicit none
+
+  pltpar%instruct=0
+  pltpar%ifoliar=1
+  pltpar%infoliar=2
+  pltpar%istalk=3
+  pltpar%iroot=4
+  pltpar%icwood=5
+  pltpar%jpstgs=10
+  pltpar%JRS=10
 
   PART1X=0.05_r8
   PART2X=0.02_r8

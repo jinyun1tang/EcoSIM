@@ -43,11 +43,13 @@ module grosubsMod
   public :: InitGrosub
   contains
 
-  subroutine InitGrosub
+  subroutine InitGrosub(jpstgs,JRS)
 
   implicit none
-
+  integer, intent(out) :: jpstgs,JRS
   call InitVegPars
+  jpstgs = pltpar%jpstgs
+  jrs = pltpar%JRS
 
 
   end subroutine InitGrosub

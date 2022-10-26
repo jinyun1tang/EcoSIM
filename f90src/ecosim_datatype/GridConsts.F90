@@ -11,6 +11,8 @@ implicit none
   integer :: JH
   integer :: JV
   integer :: JD
+  integer :: jpstgs  !number of plant growth states
+  integer :: JRS     !maximum number of root layers
   integer, PARAMETER :: JP=5
   integer, PARAMETER :: JC=10   !# of canopy layers
   integer, PARAMETER :: JS=5
