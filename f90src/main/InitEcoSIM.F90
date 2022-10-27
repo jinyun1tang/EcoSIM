@@ -30,14 +30,14 @@ module InitEcoSIM
   use ChemTranspDataType  , only : InitChemTranspData
   use FertilizerDataType  , only : InitFertilizerData
   use CanopyRadDataType   , only : InitCanopyRad
-  use GrosubsMod           , only : InitGrosub
+  use GrosubsMod          , only : InitGrosub
   use WatsubMod           , only : initWatsub
   use AqueChemDatatype    , only : initaquachem
   use PlantDataRateType   , only : InitPlantRates
   use PlantDisturbsMod     , only : InitPlantDisturbance
   use PlantTraitDataType   , only : InitPlantTraits
   use UptakesMod           , only : InitUptake
-  use Hour1Mod            , only : InitHour1
+  use Hour1Mod             , only : InitHour1
   use SoilPropertyDataType, only : InitSoilProperty
   use SurfLitterDataType  , only : InitSurfLitter
   use IrrigationDataType  , only : InitIrrigation
@@ -54,8 +54,9 @@ module InitEcoSIM
 
 ! begin_execution
 
-
   call InitSOMBGC(nmicbguilds)
+
+  call InitPlantMorphSize()
 
   call InitGrosub(jpstgs,JRS)
 
@@ -85,7 +86,7 @@ module InitEcoSIM
 
   call InitIrrigation
 
-  call InitPlantAPIData(JZ,JC,JP,JSA,jcplx1,JLI,JLA,JNODS)
+  call InitPlantAPIData()
 
   call InitMicrobialData
 
@@ -153,4 +154,26 @@ module InitEcoSIM
 
 
   end subroutine InitModules2
+
+!------------------------------------------------------------------------------------------
+  subroutine InitPlantMorphSize()
+  use GrosubPars, only : pltpar
+  use MicBGCPars, only : micpar
+  use GridConsts
+  implicit none
+
+  pltpar%JZ1    = JZ
+  pltpar%JC1    = JC
+  pltpar%JP1    = JP
+  pltpar%JLA1   = JLA
+  pltpar%JSA1   = JSA
+  pltpar%JLI1   = JLI
+  pltpar%JNODS1 = JNODS
+  !the following variable should be consistent with the soil bgc model
+  pltpar%jcplx11= micpar%jcplx1
+  pltpar%jsken  = micpar%jsken
+  pltpar%Jlitgrp= 5     !number of liter groups
+  pltpar%JBR    = 10    !number of branches
+
+  end subroutine InitPlantMorphSize
 end module InitEcoSIM

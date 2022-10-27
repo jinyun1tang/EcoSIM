@@ -19,7 +19,6 @@ module InitSOMBGCMOD
 
   private
 
-
   real(r8), allocatable :: CORGCX(:)  !C concentations from OM complexes
   real(r8), allocatable :: CORGNX(:)  !N concentations from OM complexes
   real(r8), allocatable :: CORGPX(:)  !P concentations from OM complexes
@@ -45,7 +44,6 @@ module InitSOMBGCMOD
   NMICBSA= micpar%NMICBSA
   NMICBSO= micpar%NMICBSO
 
-  JG=micpar%jguilds
   allocate(CORGCX(0:jcplx1))
   allocate(CORGNX(0:jcplx1))
   allocate(CORGPX(0:jcplx1))

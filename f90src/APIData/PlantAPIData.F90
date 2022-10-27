@@ -1,23 +1,27 @@
 module PlantAPIData
   use data_kind_mod, only : r8 => SHR_KIND_R8
   use ElmIDMod
+  use GrosubPars, only : pltpar
 implicit none
   save
   character(len=*),private, parameter :: mod_filename = __FILE__
   public
 
-! grid configuration
-  integer  :: JP1         !number of plants
-  integer  :: JSA1        !number of sectors for the sky azimuth  [0,2*pi]
-  integer  :: jcplx11     !number of organo-microbial complexes
-  integer  :: JLA1        !number of sectors for the leaf azimuth, [0,pi]
-  integer  :: JC1         !number of canopy layers
-  integer  :: JZ1         !number of soil layers
-  integer  :: JLI1        !number of sectors for the leaf zenith [0,pi/2]
-  integer  :: JNODS1      !number of canopy nodes
-  integer  :: jsken       !number of kinetic components in litter,  PROTEIN(*,1),CH2O(*,2),CELLULOSE(*,3),LIGNIN(*,4) IN SOIL LITTER
-  integer  :: Jlitgrp     !number of litter groups nonstructural(0,*),
+  integer, pointer :: jpstgs       !number of growth stages
+  integer, pointer :: JRS          !maximum number of root layers
+  integer, pointer :: JBR         !maximum number of plant branches
+  integer, pointer :: JP1         !number of plants
+  integer, pointer :: JSA1        !number of sectors for the sky azimuth  [0,2*pi]
+  integer, pointer :: jcplx11     !number of organo-microbial complexes
+  integer, pointer :: JLA1        !number of sectors for the leaf azimuth, [0,pi]
+  integer, pointer :: JC1         !number of canopy layers
+  integer, pointer :: JZ1         !number of soil layers
+  integer, pointer :: JLI1        !number of sectors for the leaf zenith [0,pi/2]
+  integer, pointer :: JNODS1      !number of canopy nodes
+  integer, pointer :: jsken       !number of kinetic components in litter,  PROTEIN(*,1),CH2O(*,2),CELLULOSE(*,3),LIGNIN(*,4) IN SOIL LITTER
+  integer, pointer :: Jlitgrp     !number of litter groups nonstructural(0,*),
                           !     foliar(1,*),non-foliar(2,*),stalk(3,*),root(4,*), coarse woody (5,*)
+
 !begin_data
 
   type, public :: plant_siteinfo_type
@@ -1929,22 +1933,23 @@ implicit none
 !----------------------------------------------------------------------
 
 
-  subroutine InitPlantAPIData(JZ,JC,JP,JSA,jcplx1,JLI,JLA,JNODS)
+  subroutine InitPlantAPIData()
 
   implicit none
-  integer, intent(in) :: JZ,JC,JP,JSA,JCplx1,JLI,JNODS,JLA
 
-  JZ1=JZ
-  JC1=JC
-  JP1=JP
-  JLA1=JLA
-  JSA1=JSA
-  JLI1   =JLI
-  JNODS1 =JNODS
+  JZ1    => pltpar%JZ1
+  JC1    => pltpar%JC1
+  JP1    => pltpar%JP1
+  JLA1   => pltpar%JLA1
+  JSA1   => pltpar%JSA1
+  JLI1   => pltpar%JLI1
+  JNODS1 => pltpar%JNODS1
   !the following variable should be consistent with the soil bgc model
-  jcplx11=jcplx1
-  jsken  =4
-  Jlitgrp=5
+  jcplx11=> pltpar%jcplx11
+  jsken  => pltpar%jsken
+  Jlitgrp=> pltpar%Jlitgrp
+  JBR    => pltpar%JBR
+
 
   call plt_site%Init()
 

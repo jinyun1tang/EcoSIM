@@ -11,6 +11,7 @@ implicit none
   integer :: JH
   integer :: JV
   integer :: JD
+  integer :: JBR     !number of plant branches
   integer :: jpstgs  !number of plant growth states
   integer :: JRS     !maximum number of root layers
   integer, PARAMETER :: JP=5
@@ -20,7 +21,6 @@ implicit none
   integer, PARAMETER :: JLA=4   !# of sectors for the leaf azimuth, [0,pi]
   integer, PARAMETER :: JSA=4   !# of sectors for the sky azimuth  [0,2*pi]
   integer, parameter :: JNODS=25!# of nodes for plant canopy
-  integer  :: JG
   integer, pointer :: JGnio(:)   !guid indices for organic-microbial complex
   integer, pointer :: JGnfo(:)   !guid indices for organic-microbial complex
   integer, pointer :: JGniA(:)   !guid indices for autotrophic-microbial complex

@@ -9,6 +9,7 @@ module PlantDisturbsMod
   use GrosubPars
   implicit none
   private
+  save
   character(len=*),private, parameter :: mod_filename = __FILE__
 ! end_include_section
 
