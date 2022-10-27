@@ -162,7 +162,7 @@
             READ(27,92)IDATE,IYR,NZ,(WTSTXP(NB,NZ,NY,NX),NB=1,NBR(NZ,NY,NX))
             READ(27,94)IDATE,IYR,NZ,(ARLFV(L,NZ,NY,NX),L=1,JC)
             READ(27,94)IDATE,IYR,NZ,(ARSTV(L,NZ,NY,NX),L=1,JC)
-            DO 9945 NB=1,NBR(NQ,NY,NX)
+            D9945: DO NB=1,NBR(NQ,NY,NX)
               READ(28,93)IDATE,IYR,NZ,(CPOOL4(K,NB,NZ,NY,NX),K=1,JNODS)
               READ(28,93)IDATE,IYR,NZ,(CPOOL3(K,NB,NZ,NY,NX),K=1,JNODS)
               READ(28,93)IDATE,IYR,NZ,(CO2B(K,NB,NZ,NY,NX),K=1,JNODS)
@@ -184,9 +184,9 @@
               READ(28,93)IDATE,IYR,NZ,(WGNODP(K,NB,NZ,NY,NX),K=0,JNODS)
               D9950: DO K=0,JNODS
                 READ(28,94)IDATE,IYR,NZ,(ARLFL(L,K,NB,NZ,NY,NX),L=1,JC)
-                READ(28,94)IDATE,IYR,NZ,(WGLFL(L,K,NB,NZ,NY,NX),L=1,JC)
-                READ(28,94)IDATE,IYR,NZ,(WGLFLN(L,K,NB,NZ,NY,NX),L=1,JC)
-                READ(28,94)IDATE,IYR,NZ,(WGLFLP(L,K,NB,NZ,NY,NX),L=1,JC)
+                READ(28,94)IDATE,IYR,NZ,(WGLFLE(L,K,NB,ielmc,NZ,NY,NX),L=1,JC)
+                READ(28,94)IDATE,IYR,NZ,(WGLFLE(L,K,NB,ielmn,NZ,NY,NX),L=1,JC)
+                READ(28,94)IDATE,IYR,NZ,(WGLFLE(L,K,NB,ielmp,NZ,NY,NX),L=1,JC)
                 IF(K.NE.0)THEN
                   D9940: DO N=1,4
                     READ(28,94)IDATE,IYR,NZ,(SURF(N,L,K,NB,NZ,NY,NX),L=1,JC)
@@ -197,7 +197,7 @@
               DO L=1,JC
                 READ(28,92)IDATE,IYR,NZ,(SURFB(N,L,NB,NZ,NY,NX),N=1,JLI)
               ENDDO
-9945        CONTINUE
+            ENDDO D9945
             DO 9970 N=1,MY(NQ,NY,NX)
               READ(29,94)IDATE,IYR,NZ,(PSIRT(N,L,NZ,NY,NX),L=1,NJ(NY,NX))
               READ(29,94)IDATE,IYR,NZ,(PSIRO(N,L,NZ,NY,NX),L=1,NJ(NY,NX))
@@ -350,7 +350,7 @@
                 ENDDO D5
 9600          CONTINUE
               DO 9610 NB=NBR(NZ,NY,NX)+1,10
-                DO 9620 K=0,JNODS
+                D9620: DO K=0,JNODS
                   ARLF(K,NB,NZ,NY,NX)=0.0
                   HTNODE(K,NB,NZ,NY,NX)=0.0
                   HTNODX(K,NB,NZ,NY,NX)=0.0
@@ -364,9 +364,7 @@
                   WGNODP(K,NB,NZ,NY,NX)=0.0
                   D55: DO L=1,JZ
                     ARLFL(L,K,NB,NZ,NY,NX)=0.0
-                    WGLFL(L,K,NB,NZ,NY,NX)=0.0
-                    WGLFLN(L,K,NB,NZ,NY,NX)=0.0
-                    WGLFLP(L,K,NB,NZ,NY,NX)=0.0
+                    WGLFLE(L,K,NB,1:npelms,NZ,NY,NX)=0.0
                   ENDDO D55
                   IF(K.NE.0)THEN
                     CPOOL3(K,NB,NZ,NY,NX)=0.0
@@ -379,7 +377,7 @@
                       ENDDO
                     ENDDO D45
                   ENDIF
-9620            CONTINUE
+                ENDDO D9620
 9610          CONTINUE
               DO 9700 NR=NRT(NZ,NY,NX)+1,10
                 D9705: DO N=1,MY(NZ,NY,NX)

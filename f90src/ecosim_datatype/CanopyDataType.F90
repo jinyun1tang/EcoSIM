@@ -143,9 +143,8 @@ module CanopyDataType
   real(r8),allocatable ::  WGLFE(:,:,:,:,:,:)                    !leaf element, [g d-2]
   real(r8),allocatable ::  WGSHE(:,:,:,:,:,:)                 !sheath element , [g d-2]
   real(r8),allocatable ::  WGNODE(:,:,:,:,:)                  !internode C, [g d-2]
-  real(r8),allocatable ::  WGLFL(:,:,:,:,:,:)                 !layer leaf C, [g d-2]
+  real(r8),allocatable ::  WGLFLE(:,:,:,:,:,:,:)                 !layer leaf element, [g d-2]
   real(r8),allocatable ::  ARLFL(:,:,:,:,:,:)                 !layer leaf area, [m2 d-2]
-  real(r8),allocatable ::  WGLFLN(:,:,:,:,:,:)                !layer leaf N, [g d-2]
   real(r8),allocatable ::  WSLF(:,:,:,:,:)                    !layer leaf protein C, [g d-2]
   real(r8),allocatable ::  WSSHE(:,:,:,:,:)                   !layer sheath protein C, [g d-2]
   real(r8),allocatable ::  WGNODN(:,:,:,:,:)                  !internode N, [g d-2]
@@ -154,7 +153,6 @@ module CanopyDataType
   real(r8),allocatable ::  WTSTDE(:,:,:,:,:)                  !standing dead element fraction, [g d-2]
   real(r8),allocatable ::  WTSTGE(:,:,:,:)                    !standing dead element, [g d-2]
   real(r8),allocatable ::  WGNODP(:,:,:,:,:)                  !nodule P, [g d-2]
-  real(r8),allocatable ::  WGLFLP(:,:,:,:,:,:)                !leaf layer P, [g d-2]
   real(r8),allocatable ::  WTRVE(:,:,:,:)                     !plant stored nonstructural element, [g d-2]
   real(r8),allocatable ::  WTRVX(:,:,:)                       !plant stored nonstructural C at planting, [g d-2]
   REAL(R8),allocatable ::  WTSHTA(:,:,:)                      !landscape average canopy shoot C, [g d-2]
@@ -298,9 +296,8 @@ module CanopyDataType
   allocate(WGLFE(0:JNODS,JC,npelms,JP,JY,JX));WGLFE=0._r8
   allocate(WGSHE(0:JNODS,JC,npelms,JP,JY,JX));WGSHE=0._r8
   allocate(WGNODE(0:JNODS,JC,JP,JY,JX));WGNODE=0._r8
-  allocate(WGLFL(JC,0:JNODS,JC,JP,JY,JX));WGLFL=0._r8
+  allocate(WGLFLE(JC,0:JNODS,JC,npelms,JP,JY,JX));WGLFLE=0._r8
   allocate(ARLFL(JC,0:JNODS,JC,JP,JY,JX));ARLFL=0._r8
-  allocate(WGLFLN(JC,0:JNODS,JC,JP,JY,JX));WGLFLN=0._r8
   allocate(WSLF(0:JNODS,JC,JP,JY,JX));WSLF=0._r8
   allocate(WSSHE(0:JNODS,JC,JP,JY,JX));WSSHE=0._r8
   allocate(WGNODN(0:JNODS,JC,JP,JY,JX));WGNODN=0._r8
@@ -309,7 +306,6 @@ module CanopyDataType
   allocate(WTSTDE(jsken,npelms,JP,JY,JX)); WTSTDE=0._r8
   allocate(WTSTGE(npelms,JP,JY,JX));    WTSTGE=0._r8
   allocate(WGNODP(0:JNODS,JC,JP,JY,JX));WGNODP=0._r8
-  allocate(WGLFLP(JC,0:JNODS,JC,JP,JY,JX));WGLFLP=0._r8
   allocate(WTRVE(npelms,JP,JY,JX));  WTRVE=0._r8
   allocate(WTRVX(JP,JY,JX));    WTRVX=0._r8
   allocate(WTSHTA(JP,JY,JX));   WTSHTA=0._r8
@@ -454,9 +450,8 @@ module CanopyDataType
   call destroy(WGLFE)
   call destroy(WGSHE)
   call destroy(WGNODE)
-  call destroy(WGLFL)
+  call destroy(WGLFLE)
   call destroy(ARLFL)
-  call destroy(WGLFLN)
   call destroy(WSLF)
   call destroy(WSSHE)
   call destroy(WGNODN)
@@ -465,7 +460,6 @@ module CanopyDataType
   call destroy(WTSTDE)
   call destroy(WTSTGE)
   call destroy(WGNODP)
-  call destroy(WGLFLP)
   call destroy(WTRVE)
   call destroy(WTRVX)
   call destroy(WTSHTA)

@@ -508,9 +508,7 @@ implicit none
       DO K=0,JNODS
         DO  L=1,JC
           ARLFL(L,K,NB,NZ,NY,NX) =plt_morph%ARLFL(L,K,NB,NZ)
-          WGLFL(L,K,NB,NZ,NY,NX) =plt_biom%WGLFL(L,K,NB,NZ)
-          WGLFLN(L,K,NB,NZ,NY,NX)=plt_biom%WGLFLN(L,K,NB,NZ)
-          WGLFLP(L,K,NB,NZ,NY,NX)=plt_biom%WGLFLP(L,K,NB,NZ)
+          WGLFLE(L,K,NB,1:npelms,NZ,NY,NX) =plt_biom%WGLFLE(L,K,NB,1:npelms,NZ)
         ENDDO
       ENDDO
       DO M=1,pltpar%jpstgs
@@ -1447,9 +1445,7 @@ implicit none
       DO K=0,JNODS
         DO  L=1,JC
           plt_morph%ARLFL(L,K,NB,NZ)=ARLFL(L,K,NB,NZ,NY,NX)
-          plt_biom%WGLFL(L,K,NB,NZ) =WGLFL(L,K,NB,NZ,NY,NX)
-          plt_biom%WGLFLN(L,K,NB,NZ)=WGLFLN(L,K,NB,NZ,NY,NX)
-          plt_biom%WGLFLP(L,K,NB,NZ)=WGLFLP(L,K,NB,NZ,NY,NX)
+          plt_biom%WGLFLE(L,K,NB,1:npelms,NZ) =WGLFLE(L,K,NB,1:npelms,NZ,NY,NX)
         ENDDO
       ENDDO
       DO  L=1,JC

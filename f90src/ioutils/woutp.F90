@@ -171,17 +171,17 @@
               WRITE(28,93)I,IDATA(3),NZ,(WGLFE(K,NB,ielmp,NZ,NY,NX),K=0,JNODS)
               WRITE(28,93)I,IDATA(3),NZ,(WGSHE(K,NB,ielmp,NZ,NY,NX),K=0,JNODS)
               WRITE(28,93)I,IDATA(3),NZ,(WGNODP(K,NB,NZ,NY,NX),K=0,JNODS)
-              DO 9950 K=0,JNODS
+              D9950: DO K=0,JNODS
                 WRITE(28,94)I,IDATA(3),NZ,(ARLFL(L,K,NB,NZ,NY,NX),L=1,JC)
-                WRITE(28,94)I,IDATA(3),NZ,(WGLFL(L,K,NB,NZ,NY,NX),L=1,JC)
-                WRITE(28,94)I,IDATA(3),NZ,(WGLFLN(L,K,NB,NZ,NY,NX),L=1,JC)
-                WRITE(28,94)I,IDATA(3),NZ,(WGLFLP(L,K,NB,NZ,NY,NX),L=1,JC)
+                WRITE(28,94)I,IDATA(3),NZ,(WGLFLE(L,K,NB,ielmc,NZ,NY,NX),L=1,JC)
+                WRITE(28,94)I,IDATA(3),NZ,(WGLFLE(L,K,NB,ielmn,NZ,NY,NX),L=1,JC)
+                WRITE(28,94)I,IDATA(3),NZ,(WGLFLE(L,K,NB,ielmp,NZ,NY,NX),L=1,JC)
                 IF(K.NE.0)THEN
-                  DO 9940 N=1,JLI
+                  D9940: DO N=1,JLI
                     WRITE(28,94)I,IDATA(3),NZ,(SURF(N,L,K,NB,NZ,NY,NX),L=1,JC)
-9940              CONTINUE
+                  ENDDO D9940
                 ENDIF
-9950          CONTINUE
+              ENDDO D9950
               WRITE(28,94)I,IDATA(3),NZ,(ARSTK(L,NB,NZ,NY,NX),L=1,JC)
               DO  L=1,JC
                 WRITE(28,92)I,IDATA(3),NZ,(SURFB(N,L,NB,NZ,NY,NX),N=1,JLI)

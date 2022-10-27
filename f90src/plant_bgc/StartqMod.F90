@@ -554,9 +554,7 @@ module StartqMod
       WGNODP(K,NB,NZ,NY,NX)=0._r8
       D55: DO L=1,JC
         ARLFL(L,K,NB,NZ,NY,NX)=0._r8
-        WGLFL(L,K,NB,NZ,NY,NX)=0._r8
-        WGLFLN(L,K,NB,NZ,NY,NX)=0._r8
-        WGLFLP(L,K,NB,NZ,NY,NX)=0._r8
+        WGLFLE(L,K,NB,1:npelms,NZ,NY,NX)=0._r8
       ENDDO D55
       IF(K.NE.0)THEN
         CPOOL3(K,NB,NZ,NY,NX)=0._r8

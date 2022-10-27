@@ -721,7 +721,6 @@ module PlantDisturbsMod
     WSRTL    =>  plt_biom%WSRTL      , &
     WTRTD    =>  plt_biom%WTRTD      , &
     WTRTL    =>  plt_biom%WTRTL      , &
-    WGLFLP   =>  plt_biom%WGLFLP     , &
     WTLFBE   =>  plt_biom%WTLFBE     , &
     WTGRBE   =>  plt_biom%WTGRBE     , &
     WTEARBE  =>  plt_biom%WTEARBE    , &
@@ -732,8 +731,7 @@ module PlantDisturbsMod
     WTNDBE   =>  plt_biom%WTNDBE     , &
     WTSHTBE  =>  plt_biom%WTSHTBE    , &
     WTSTKBE  =>  plt_biom%WTSTKBE    , &
-    WGLFLN   =>  plt_biom%WGLFLN     , &
-    WGLFL    =>  plt_biom%WGLFL      , &
+    WGLFLE   =>  plt_biom%WGLFLE     , &
     WTSHEBE  =>  plt_biom%WTSHEBE    , &
     WGLFE    =>  plt_biom%WGLFE      , &
     WTSTXN   =>  plt_biom%WTSTXN     , &
@@ -858,7 +856,7 @@ module PlantDisturbsMod
 !     IDTHB=branch living flag: 0=alive,1=dead
 !     PP=PFT population
 !
-        DO 8975 NB=1,NBR(NZ)
+        D8975: DO NB=1,NBR(NZ)
           IF(IDTHB(NB,NZ).EQ.0)THEN
             IF(PP(NZ).LE.0.0)IDTHB(NB,NZ)=1
 !
@@ -993,7 +991,7 @@ module PlantDisturbsMod
             WTSTXN(NB,NZ)=WTSTXN(NB,NZ)*XHVST
             WTSTXP(NB,NZ)=WTSTXP(NB,NZ)*XHVST
             WVSTK(NZ)=WVSTK(NZ)+WVSTKB(NB,NZ)
-            DO 8970 K=0,JNODS1
+            D8970: DO K=0,JNODS1
               IF(K.NE.0)THEN
                 CPOOL3(K,NB,NZ)=CPOOL3(K,NB,NZ)*XHVST
                 CPOOL4(K,NB,NZ)=CPOOL4(K,NB,NZ)*XHVST
@@ -1017,13 +1015,13 @@ module PlantDisturbsMod
               WGNODP(K,NB,NZ)=WGNODP(K,NB,NZ)*XHVST
               D8965: DO L=1,JC1
                 ARLFL(L,K,NB,NZ)=ARLFL(L,K,NB,NZ)*XHVST
-                WGLFL(L,K,NB,NZ)=WGLFL(L,K,NB,NZ)*XHVST
-                WGLFLN(L,K,NB,NZ)=WGLFLN(L,K,NB,NZ)*XHVST
-                WGLFLP(L,K,NB,NZ)=WGLFLP(L,K,NB,NZ)*XHVST
+                WGLFLE(L,K,NB,ielmc,NZ)=WGLFLE(L,K,NB,ielmc,NZ)*XHVST
+                WGLFLE(L,K,NB,ielmn,NZ)=WGLFLE(L,K,NB,ielmn,NZ)*XHVST
+                WGLFLE(L,K,NB,ielmp,NZ)=WGLFLE(L,K,NB,ielmp,NZ)*XHVST
               ENDDO D8965
-8970        CONTINUE
+            ENDDO D8970
           ENDIF
-8975    CONTINUE
+        ENDDO D8975
 !
 !     PSILT=canopy water potential
 !     VOLWP=water volume in canopy
@@ -1339,9 +1337,7 @@ module PlantDisturbsMod
     WTRSVBE  => plt_biom%WTRSVBE   , &
     WTSTXB   => plt_biom%WTSTXB    , &
     EPOLNB   => plt_biom%EPOLNB     , &
-    WGLFL    => plt_biom%WGLFL     , &
-    WGLFLN   => plt_biom%WGLFLN    , &
-    WGLFLP   => plt_biom%WGLFLP    , &
+    WGLFLE   => plt_biom%WGLFLE    , &
     WTSHEBE  => plt_biom%WTSHEBE   , &
     EPOOL    => plt_biom%EPOOL     , &
     WGSHE    => plt_biom%WGSHE     , &
@@ -1684,7 +1680,7 @@ module PlantDisturbsMod
       DO 9870 NB=1,NBR(NZ)
         DO  L=1,JC1
           DO  K=0,JNODS1
-            WGLFBL(L,NB,NZ)=WGLFBL(L,NB,NZ)+WGLFL(L,K,NB,NZ)
+            WGLFBL(L,NB,NZ)=WGLFBL(L,NB,NZ)+WGLFLE(L,K,NB,ielmc,NZ)
           enddo
         enddo
 9870  CONTINUE
@@ -1750,8 +1746,8 @@ module PlantDisturbsMod
         DO 9845 K=JNODS1,0,-1
           IF((IHVST(NZ).NE.4.AND.IHVST(NZ).NE.6).OR.WHVSBL.GT.0.0)THEN
             IF(IHVST(NZ).EQ.4.OR.IHVST(NZ).EQ.6)THEN
-              IF(WGLFL(L,K,NB,NZ).GT.WHVSBL)THEN
-                FHVST=AZMAX1(AMIN1(1.0_r8,(WGLFL(L,K,NB,NZ)-WHVSBL)/WGLFL(L,K,NB,NZ)))
+              IF(WGLFLE(L,K,NB,ielmc,NZ).GT.WHVSBL)THEN
+                FHVST=AZMAX1(AMIN1(1.0_r8,(WGLFLE(L,K,NB,ielmc,NZ)-WHVSBL)/WGLFLE(L,K,NB,ielmc,NZ)))
                 FHVSH=FHVST
               ELSE
                 FHVST=1.0_r8
@@ -1771,25 +1767,25 @@ module PlantDisturbsMod
 !     FWODB=C woody fraction in other organs:0=woody,1=non-woody
 !     FWODLN,FWODLP=N,P woody fraction in leaf:0=woody,1=non-woody
 !
-            WHVSBL=WHVSBL-(1._r8-FHVST)*WGLFL(L,K,NB,NZ)
-            WTHTH1=WTHTH1+(1._r8-FHVSH)*WGLFL(L,K,NB,NZ)*FWODB(1)
-            WTHNH1=WTHNH1+(1._r8-FHVSH)*WGLFLN(L,K,NB,NZ)*FWODLN(1)
-            WTHPH1=WTHPH1+(1._r8-FHVSH)*WGLFLP(L,K,NB,NZ)*FWODLP(1)
-            WTHTX1=WTHTX1+(FHVSH-FHVST)*WGLFL(L,K,NB,NZ)*FWODB(1)
-            WTHNX1=WTHNX1+(FHVSH-FHVST)*WGLFLN(L,K,NB,NZ)*FWODLN(1)
-            WTHPX1=WTHPX1+(FHVSH-FHVST)*WGLFLP(L,K,NB,NZ)*FWODLP(1)
-            WTHTH3=WTHTH3+(1._r8-FHVSH)*WGLFL(L,K,NB,NZ)*FWODB(0)
-            WTHNH3=WTHNH3+(1._r8-FHVSH)*WGLFLN(L,K,NB,NZ)*FWODLN(0)
-            WTHPH3=WTHPH3+(1._r8-FHVSH)*WGLFLP(L,K,NB,NZ)*FWODLP(0)
-            WTHTX3=WTHTX3+(FHVSH-FHVST)*WGLFL(L,K,NB,NZ)*FWODB(0)
-            WTHNX3=WTHNX3+(FHVSH-FHVST)*WGLFLN(L,K,NB,NZ)*FWODLN(0)
-            WTHPX3=WTHPX3+(FHVSH-FHVST)*WGLFLP(L,K,NB,NZ)*FWODLP(0)
+            WHVSBL=WHVSBL-(1._r8-FHVST)*WGLFLE(L,K,NB,ielmc,NZ)
+            WTHTH1=WTHTH1+(1._r8-FHVSH)*WGLFLE(L,K,NB,ielmc,NZ)*FWODB(1)
+            WTHNH1=WTHNH1+(1._r8-FHVSH)*WGLFLE(L,K,NB,ielmn,NZ)*FWODLN(1)
+            WTHPH1=WTHPH1+(1._r8-FHVSH)*WGLFLE(L,K,NB,ielmp,NZ)*FWODLP(1)
+            WTHTX1=WTHTX1+(FHVSH-FHVST)*WGLFLE(L,K,NB,ielmc,NZ)*FWODB(1)
+            WTHNX1=WTHNX1+(FHVSH-FHVST)*WGLFLE(L,K,NB,ielmn,NZ)*FWODLN(1)
+            WTHPX1=WTHPX1+(FHVSH-FHVST)*WGLFLE(L,K,NB,ielmp,NZ)*FWODLP(1)
+            WTHTH3=WTHTH3+(1._r8-FHVSH)*WGLFLE(L,K,NB,ielmc,NZ)*FWODB(0)
+            WTHNH3=WTHNH3+(1._r8-FHVSH)*WGLFLE(L,K,NB,ielmn,NZ)*FWODLN(0)
+            WTHPH3=WTHPH3+(1._r8-FHVSH)*WGLFLE(L,K,NB,ielmp,NZ)*FWODLP(0)
+            WTHTX3=WTHTX3+(FHVSH-FHVST)*WGLFLE(L,K,NB,ielmc,NZ)*FWODB(0)
+            WTHNX3=WTHNX3+(FHVSH-FHVST)*WGLFLE(L,K,NB,ielmn,NZ)*FWODLN(0)
+            WTHPX3=WTHPX3+(FHVSH-FHVST)*WGLFLE(L,K,NB,ielmp,NZ)*FWODLP(0)
 !
 !     REMAINING LEAF C,N,P AND AREA
 !
-            WGLFL(L,K,NB,NZ)=FHVST*WGLFL(L,K,NB,NZ)
-            WGLFLN(L,K,NB,NZ)=FHVST*WGLFLN(L,K,NB,NZ)
-            WGLFLP(L,K,NB,NZ)=FHVST*WGLFLP(L,K,NB,NZ)
+            WGLFLE(L,K,NB,ielmc,NZ)=FHVST*WGLFLE(L,K,NB,ielmc,NZ)
+            WGLFLE(L,K,NB,ielmn,NZ)=FHVST*WGLFLE(L,K,NB,ielmn,NZ)
+            WGLFLE(L,K,NB,ielmp,NZ)=FHVST*WGLFLE(L,K,NB,ielmp,NZ)
             ARLFL(L,K,NB,NZ)=FHVST*ARLFL(L,K,NB,NZ)
             IF(K.EQ.1)THEN
               ARSTK(L,NB,NZ)=FHVST*ARSTK(L,NB,NZ)
@@ -1829,11 +1825,11 @@ module PlantDisturbsMod
 !
           D9815: DO L=1,JC1
             ARLFG=ARLFG+ARLFL(L,K,NB,NZ)
-            WGLFG=WGLFG+WGLFL(L,K,NB,NZ)
-            WGLFNG=WGLFNG+WGLFLN(L,K,NB,NZ)
-            WGLFPG=WGLFPG+WGLFLP(L,K,NB,NZ)
+            WGLFG=WGLFG+WGLFLE(L,K,NB,ielmc,NZ)
+            WGLFNG=WGLFNG+WGLFLE(L,K,NB,ielmn,NZ)
+            WGLFPG=WGLFPG+WGLFLE(L,K,NB,ielmp,NZ)
             ARLFV(L,NZ)=ARLFV(L,NZ)+ARLFL(L,K,NB,NZ)
-            WGLFV(L,NZ)=WGLFV(L,NZ)+WGLFL(L,K,NB,NZ)
+            WGLFV(L,NZ)=WGLFV(L,NZ)+WGLFLE(L,K,NB,ielmc,NZ)
           ENDDO D9815
 !
 !     CUT STALK AT HARVESTED NODES AND LAYERS

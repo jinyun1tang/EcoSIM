@@ -867,13 +867,11 @@ implicit none
     WTEARBE  => plt_biom%WTEARBE    , &
     WSSHE    => plt_biom%WSSHE      , &
     WSLF     => plt_biom%WSLF       , &
-    WGLFLP   => plt_biom%WGLFLP     , &
     WGNODE   => plt_biom%WGNODE     , &
     WGNODN   => plt_biom%WGNODN     , &
     WGNODP   => plt_biom%WGNODP     , &
     WGSHE    => plt_biom%WGSHE      , &
-    WGLFLN   => plt_biom%WGLFLN     , &
-    WGLFL    => plt_biom%WGLFL      , &
+    WGLFLE   => plt_biom%WGLFLE     , &
     WGLFV    => plt_biom%WGLFV      , &
     WTSHEBE  => plt_biom%WTSHEBE    , &
     CPOOL3   => plt_photo%CPOOL3    , &
@@ -987,11 +985,9 @@ implicit none
     WGNODP(K,NB,NZ)=0._r8
     D8865: DO L=1,JC1
       ARLFV(L,NZ)=ARLFV(L,NZ)-ARLFL(L,K,NB,NZ)
-      WGLFV(L,NZ)=WGLFV(L,NZ)-WGLFL(L,K,NB,NZ)
+      WGLFV(L,NZ)=WGLFV(L,NZ)-WGLFLE(L,K,NB,ielmc,NZ)
       ARLFL(L,K,NB,NZ)=0._r8
-      WGLFL(L,K,NB,NZ)=0._r8
-      WGLFLN(L,K,NB,NZ)=0._r8
-      WGLFLP(L,K,NB,NZ)=0._r8
+      WGLFLE(L,K,NB,1:npelms,NZ)=0._r8
       IF(K.NE.0)THEN
         D8860: DO N=1,JLI1
           SURF(N,L,K,NB,NZ)=0._r8

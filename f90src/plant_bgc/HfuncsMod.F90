@@ -439,14 +439,12 @@ module HfuncsMod
 ! CCPOLB,CZPOLB,CPPOLB=nonstructural C,N,P concn in branch(g g-1)
 !
   IF(WTLS(NZ).GT.ZEROL(NZ))THEN
-    CEPOLP(ielmc,NZ)=AZMAX1(AMIN1(1.0_r8,EPOOLP(ielmc,NZ)/WTLS(NZ)))
-    CEPOLP(ielmn,NZ)=AZMAX1(AMIN1(1.0_r8,EPOOLP(ielmn,NZ)/WTLS(NZ)))
-    CEPOLP(ielmp,NZ)=AZMAX1(AMIN1(1.0_r8,EPOOLP(ielmp,NZ)/WTLS(NZ)))
+    DO NE=1,npelms
+      CEPOLP(NE,NZ)=AZMAX1(AMIN1(1.0_r8,EPOOLP(NE,NZ)/WTLS(NZ)))
+    ENDDO
     CCPLNP(NZ)=AZMAX1(AMIN1(1.0_r8,EPOLNP(ielmc,NZ)/WTLS(NZ)))
   ELSE
-    CEPOLP(ielmc,NZ)=1.0_r8
-    CEPOLP(ielmn,NZ)=1.0_r8
-    CEPOLP(ielmp,NZ)=1.0_r8
+    CEPOLP(1:npelms,NZ)=1.0_r8
     CCPLNP(NZ)=1.0_r8
   ENDIF
   DO NE=1,npelms
@@ -470,8 +468,7 @@ module HfuncsMod
 !
   IF(IDAY(1,NB1(NZ),NZ).EQ.0)THEN
     ARLSP=ARLFP(NZ)+ARSTP(NZ)
-    IF((HTCTL(NZ).GT.SDPTH(NZ)) &
-      .AND.(ARLSP.GT.ZEROL(NZ)) &
+    IF((HTCTL(NZ).GT.SDPTH(NZ)).AND.(ARLSP.GT.ZEROL(NZ)) &
       .AND.(RTDP1(1,1,NZ).GT.SDPTH(NZ)+ppmc))THEN
       IDAY(1,NB1(NZ),NZ)=I
       VHCPC(NZ)=cpw*(WTSHTE(ielmc,NZ)*10.0E-06+VOLWC(NZ))

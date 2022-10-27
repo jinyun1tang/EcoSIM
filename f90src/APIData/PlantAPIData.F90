@@ -531,9 +531,7 @@ implicit none
   real(r8), pointer :: WSLF(:,:,:)    => null()    !layer leaf protein C, [g d-2]
   real(r8), pointer :: WGSHE(:,:,:,:)   => null()  !sheath element , [g d-2]
   real(r8), pointer :: WSSHE(:,:,:)   => null()    !layer sheath protein C, [g d-2]
-  real(r8), pointer :: WGLFL(:,:,:,:) => null()    !layer leaf C, [g d-2]
-  real(r8), pointer :: WGLFLN(:,:,:,:)=> null()    !layer leaf N, [g d-2]
-  real(r8), pointer :: WGLFLP(:,:,:,:)=> null()    !leaf layer P, [g d-2]
+  real(r8), pointer :: WGLFLE(:,:,:,:,:) => null()    !layer leaf element, [g d-2]
   real(r8), pointer :: WGLFT(:)       => null()  !total leaf mass, [gC d-2]
   real(r8), pointer :: WTSTDI(:)      => null()  !initial standing dead C, [g C m-2]
   real(r8), pointer :: WTRTE(:,:)     => null()  !plant root element, [gC d-2]
@@ -1625,9 +1623,7 @@ implicit none
   allocate(this%WGNODP(0:JNODS1,JC1,JP1))
   allocate(this%WGLFE(0:JNODS1,JC1,npelms,JP1))
   allocate(this%WGSHE(0:JNODS1,JC1,npelms,JP1))
-  allocate(this%WGLFL(JC1,0:JNODS1,JC1,JP1))
-  allocate(this%WGLFLN(JC1,0:JNODS1,JC1,JP1))
-  allocate(this%WGLFLP(JC1,0:JNODS1,JC1,JP1))
+  allocate(this%WGLFLE(JC1,0:JNODS1,JC1,npelms,JP1))
   allocate(this%WVSTKB(JC1,JP1))
   allocate(this%EPOLNB(JC1,npelms,JP1))
   allocate(this%CEPOLB(JC1,npelms,JP1))
@@ -1704,9 +1700,7 @@ implicit none
 !  if(allocated(WGLFE))deallocate(WGLFE)
 !  if(allocated(WSLF))deallocate(WSLF)
 !  if(allocated(WSSHE))deallocate(WSSHE)
-!  if(allocated(WGLFL))deallocate(WGLFL)
-!  if(allocated(WGLFLN))deallocate(WGLFLN)
-!  if(allocated(WGLFLP))deallocate(WGLFLP)
+!  if(allocated(WGLFLE))deallocate(WGLFLE)
 !  if(allocated(WGNODE))deallocate(WGNODE)
 !  if(allocated(WGNODN))deallocate(WGNODN)
 !  if(allocated(WGNODP))deallocate(WGNODP)

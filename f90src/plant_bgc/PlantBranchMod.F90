@@ -2013,13 +2013,11 @@ module PlantBranchMod
   real(r8) :: TLGLF
 ! begin_execution
   associate(                            &
-    WGLFL    =>  plt_biom%WGLFL   , &
+    WGLFLE   =>  plt_biom%WGLFLE  , &
     WGLFE    =>  plt_biom%WGLFE   , &
     WGLFV    =>  plt_biom%WGLFV   , &
-    WGLFLP   =>  plt_biom%WGLFLP  , &
     WVSTKB   =>  plt_biom%WVSTKB  , &
     WTSTKBE  =>  plt_biom%WTSTKBE , &
-    WGLFLN   =>  plt_biom%WGLFLN  , &
     WSSHE    =>  plt_biom%WSSHE   , &
     FNOD     =>  plt_allom%FNOD   , &
     IGTYP    =>  plt_pheno%IGTYP  , &
@@ -2065,9 +2063,7 @@ module PlantBranchMod
     D540: DO K=0,JNODS1
       DO  L=1,JC1
         ARLFL(L,K,NB,NZ)=0._r8
-        WGLFL(L,K,NB,NZ)=0._r8
-        WGLFLN(L,K,NB,NZ)=0._r8
-        WGLFLP(L,K,NB,NZ)=0._r8
+        WGLFLE(L,K,NB,1:npelms,NZ)=0._r8
       enddo
     ENDDO D540
     D535: DO L=1,JC1
@@ -2175,9 +2171,9 @@ module PlantBranchMod
     !     HTNODE=internode length
     !
           ARLFL(L,K,NB,NZ)=ARLFL(L,K,NB,NZ)+YARLF
-          WGLFL(L,K,NB,NZ)=WGLFL(L,K,NB,NZ)+YWGLF
-          WGLFLN(L,K,NB,NZ)=WGLFLN(L,K,NB,NZ)+YWGLFN
-          WGLFLP(L,K,NB,NZ)=WGLFLP(L,K,NB,NZ)+YWGLFP
+          WGLFLE(L,K,NB,ielmc,NZ)=WGLFLE(L,K,NB,ielmn,NZ)+YWGLF
+          WGLFLE(L,K,NB,ielmn,NZ)=WGLFLE(L,K,NB,ielmn,NZ)+YWGLFN
+          WGLFLE(L,K,NB,ielmp,NZ)=WGLFLE(L,K,NB,ielmp,NZ)+YWGLFP
           ARLFV(L,NZ)=ARLFV(L,NZ)+YARLF
           WGLFV(L,NZ)=WGLFV(L,NZ)+YWGLF
         ENDDO D570

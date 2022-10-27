@@ -662,6 +662,10 @@ module StartqsMod
   plt_biom%WTGRBE(1:JC1,1:npelms,NZ)=0._r8
   plt_biom%WTEARBE(1:JC1,1:npelms,NZ)=0._r8
   plt_biom%WTNDBE(1:JC1,1:npelms,NZ)=0._r8
+  plt_pheno%RCELX(1:JC1,1:npelms,NZ)=0._r8
+  plt_biom%WGLFEX(1:JC1,1:npelms,NZ)=0._r8
+  plt_pheno%RCESX(1:JC1,1:npelms,NZ)=0._r8
+  plt_biom%WGSHEXE(1:JC1,1:npelms,NZ)=0._r8
   D25: DO NB=1,JC1
     plt_biom%WVSTKB(NB,NZ)=0._r8
     plt_biom%WTLSB(NB,NZ)=0._r8
@@ -670,14 +674,10 @@ module StartqsMod
     plt_allom%GRWTB(NB,NZ)=0._r8
     ARLFB(NB,NZ)=0._r8
     plt_rbgc%RNH3B(NB,NZ)=0._r8
-    plt_pheno%RCELX(NB,1:npelms,NZ)=0._r8
-    plt_biom%WGLFEX(NB,1:npelms,NZ)=0._r8
     ARLFZ(NB,NZ)=0._r8
-    plt_pheno%RCESX(NB,1:npelms,NZ)=0._r8
     plt_biom%WTSTXB(NB,NZ)=0._r8
     plt_biom%WTSTXN(NB,NZ)=0._r8
     plt_biom%WTSTXP(NB,NZ)=0._r8
-    plt_biom%WGSHEXE(NB,1:npelms,NZ)=0._r8
     HTSHEX(NB,NZ)=0._r8
     D5: DO L=1,JC1
       ARSTK(L,NB,NZ)=0._r8
@@ -699,9 +699,7 @@ module StartqsMod
       plt_biom%WGNODP(K,NB,NZ)=0._r8
       D55: DO L=1,JC1
         ARLFL(L,K,NB,NZ)=0._r8
-        plt_biom%WGLFL(L,K,NB,NZ)=0._r8
-        plt_biom%WGLFLN(L,K,NB,NZ)=0._r8
-        plt_biom%WGLFLP(L,K,NB,NZ)=0._r8
+        plt_biom%WGLFLE(L,K,NB,1:npelms,NZ)=0._r8
       ENDDO D55
       IF(K.NE.0)THEN
         CPOOL3(K,NB,NZ)=0._r8
