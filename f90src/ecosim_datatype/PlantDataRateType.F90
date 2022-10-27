@@ -207,8 +207,8 @@ module PlantDataRateType
   allocate(RUPP2B(2,JZ,JP,JY,JX));RUPP2B=0._r8
   allocate(RUPP1P(2,JZ,JP,JY,JX));RUPP1P=0._r8
   allocate(RUPP1B(2,JZ,JP,JY,JX));RUPP1B=0._r8
-  allocate(RCELX(JC,npelms,JP,JY,JX)); RCELX=0._r8
-  allocate(RCESX(JC,npelms,JP,JY,JX)); RCESX=0._r8
+  allocate(RCELX(JBR,npelms,JP,JY,JX)); RCELX=0._r8
+  allocate(RCESX(JBR,npelms,JP,JY,JX)); RCESX=0._r8
   allocate(CARBN(JP,JY,JX));    CARBN=0._r8
   allocate(TESNC(npelms,JP,JY,JX));    TESNC=0._r8
   allocate(TZUPFX(JP,JY,JX));   TZUPFX=0._r8
@@ -280,7 +280,7 @@ module PlantDataRateType
   allocate(RUNNBP(2,JZ,JP,JY,JX));RUNNBP=0._r8
   allocate(RUNNXP(2,JZ,JP,JY,JX));RUNNXP=0._r8
   allocate(RNH3Z(JP,JY,JX));    RNH3Z=0._r8
-  allocate(RNH3B(JC,JP,JY,JX)); RNH3B=0._r8
+  allocate(RNH3B(JBR,JP,JY,JX)); RNH3B=0._r8
   allocate(WFR(2,JZ,JP,JY,JX)); WFR=0._r8
   allocate(RHGFLA(2,JZ,JP,JY,JX));RHGFLA=0._r8
   allocate(RHGDFA(2,JZ,JP,JY,JX));RHGDFA=0._r8

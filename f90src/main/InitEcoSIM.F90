@@ -174,6 +174,8 @@ module InitEcoSIM
   pltpar%jsken  = micpar%jsken
   pltpar%Jlitgrp= 5     !number of liter groups
   pltpar%JBR    = 10    !number of branches
-
+  JBR=pltpar%JBR
+  Jlitgrp=pltpar%Jlitgrp
+  JRS=pltpar%JRS
   end subroutine InitPlantMorphSize
 end module InitEcoSIM

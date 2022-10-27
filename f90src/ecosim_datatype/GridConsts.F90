@@ -14,6 +14,7 @@ implicit none
   integer :: JBR     !number of plant branches
   integer :: jpstgs  !number of plant growth states
   integer :: JRS     !maximum number of root layers
+  integer :: Jlitgrp !number of liter groups
   integer, PARAMETER :: JP=5
   integer, PARAMETER :: JC=10   !# of canopy layers
   integer, PARAMETER :: JS=5

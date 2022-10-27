@@ -57,11 +57,11 @@ module CanopyRadDataType
   allocate(OMEGX(JSA,JLI,JLA))
   allocate(IALBY(JSA,JLI,JLA))
   allocate(CLASS(JLI,JP,JY,JX))
-  allocate(SURF(JLI,JC,JNODS,JC,JP,JY,JX))
-  allocate(SURFX(JLI,JC,JNODS,JC,JP,JY,JX))
+  allocate(SURF(JLI,JC,JNODS,JBR,JP,JY,JX))
+  allocate(SURFX(JLI,JC,JNODS,JBR,JP,JY,JX))
   allocate(PAR(JLI,JSA,JC,JP,JY,JX))
   allocate(PARDIF(JLI,JSA,JC,JP,JY,JX))
-  allocate(SURFB(JLI,JC,JC,JP,JY,JX))
+  allocate(SURFB(JLI,JC,JBR,JP,JY,JX))
 
   end subroutine InitAllocate
 !------------------------------------------------------------------------------------------

@@ -773,7 +773,7 @@ module StartqMod
       IF(N.EQ.1)THEN
         D6400: DO K=0,micpar%n_pltlitrk
           DO  M=1,jsken
-            ESNC(M,K,L,NZ,NY,NX,:)=0._r8
+            ESNC(M,1:npelms,K,L,NZ,NY,NX)=0._r8
           enddo
         ENDDO D6400
         EPOOLN(L,1:npelms,NZ,NY,NX)=0._r8
