@@ -652,7 +652,7 @@ module PlantBranchMod
     !       IFLGP=flag for remobilization
     !       WGSHE,WGSHN,WGSHP=node petiole C,N,P mass
     !       HTSHEX=petiole length
-    !       RCCSX,RCZSX,RCPSX=remobilization of C,N,P from senescing petiole
+    !       RCES(ielmc)X,RCES(ielmn)X,RCES(ielmp)X=remobilization of C,N,P from senescing petiole
 !
             IF(IFLGP(NB,NZ).EQ.1)THEN
               DO NE=1,npelms
@@ -692,7 +692,7 @@ module PlantBranchMod
     !       CSNC,ZSNC,PSNC=C,N,P litterfall from senescence
     !       CFOPC,CFOPN,CFOPC=fraction of litterfall C,N,P allocated to litter components
     !       FSNCS=fraction of lowest petiole to be remobilized
-    !       RCCSX,RCZSX,RCPSX=remobilization of C,N,P from senescing petiole
+    !       RCES(ielmc)X,RCES(ielmn)X,RCES(ielmp)X=remobilization of C,N,P from senescing petiole
     !       WGSHX,WGSHNX,WGSHPX=senescing petiole C,N,P mass
     !       FWODB=C woody fraction in other organs:0=woody,1=non-woody
     !       FWODSN,FWODSP=N,P woody fraction in petiole:0=woody,1=non-woody
@@ -715,7 +715,7 @@ module PlantBranchMod
     !       WSSHE=petiole protein mass
     !       CNWS,CPWS=protein:N,protein:P ratios from startq.f
     !       CPOOL,ZPOOL,PPOOL=non-structural C,N,P mass
-    !       RCCSX,RCZSX,RCPSX=remobilization of C,N,P from senescing petiole
+    !       RCES(ielmc)X,RCES(ielmn)X,RCES(ielmp)X=remobilization of C,N,P from senescing petiole
 !
             DO NE=1,npelms
               WTSHEBE(NB,NE,NZ)=WTSHEBE(NB,NE,NZ)-FSNCS*WGSHEXE(NB,NE,NZ)
@@ -1062,12 +1062,12 @@ module PlantBranchMod
 !
   IF(IDAY(2,NB,NZ).NE.0)THEN
     IF(WTRSVBE(NB,ielmc,NZ).LT.XFRX*WVSTKB(NB,NZ))THEN
-      DO 1020 N=1,7
+      D1020: DO N=1,JPRT
         IF(N.NE.4)THEN
           PART(4)=PART(4)+0.10*PART(N)
           PART(N)=PART(N)-0.10*PART(N)
         ENDIF
-1020  CONTINUE
+      ENDDO D1020
 !
 !     REDIRECT FROM STALK RESERVES TO STALK IF RESERVES BECOME TOO LARGE
 !
@@ -1316,14 +1316,15 @@ module PlantBranchMod
   real(r8), intent(in)   :: XKSNC,SNCX
   REAL(R8), INTENT(IN) :: RCCC,RCCN,RCCP
   real(r8), intent(inout):: SNCF
-  integer :: N,M,K,KK,MXNOD,MNNOD
+  integer :: N,M,K,KK,MXNOD,MNNOD,NE
   real(r8) :: FSNCL,FSNCS
   real(r8) :: FNCLF,FSNAL,FSNAS,FRCC
   real(r8) :: FSNCK
   real(r8) :: FSNCR
   real(r8) :: HTNODZ
   real(r8) :: RCEL(1:npelms)
-  real(r8) :: RCCS,RCZS,RCPS
+  real(r8) :: RCES(1:npelms)
+
   real(r8) :: RCSC,RCSN,RCSP
   real(r8) :: RCCK,RCZK,RCPK
   real(r8) :: SNCR
@@ -1437,6 +1438,7 @@ module PlantBranchMod
             *FSNCL*(WGLFE(K,NB,ielmn,NZ)-RCEL(ielmn))*FWODLN(0)
           ESNC(M,ielmp,0,0,NZ)=ESNC(M,ielmp,0,0,NZ)+CFOPE(icwood,M,ielmp,NZ) &
             *FSNCL*(WGLFE(K,NB,ielmp,NZ)-RCEL(ielmp))*FWODLP(0)
+
           ESNC(M,ielmc,1,0,NZ)=ESNC(M,ielmc,1,0,NZ)+CFOPE(ifoliar,M,ielmc,NZ) &
             *FSNCL*(WGLFE(K,NB,ielmc,NZ)-RCEL(ielmc))*FWODBE(ielmc,1)
           ESNC(M,ielmn,1,0,NZ)=ESNC(M,ielmn,1,0,NZ)+CFOPE(ifoliar,M,ielmn,NZ) &
@@ -1515,6 +1517,7 @@ module PlantBranchMod
             *WGLFE(K,NB,ielmn,NZ)*FWODLN(0)
           ESNC(M,ielmp,0,0,NZ)=ESNC(M,ielmp,0,0,NZ)+CFOPE(icwood,M,ielmp,NZ) &
             *WGLFE(K,NB,ielmp,NZ)*FWODLP(0)
+
           ESNC(M,ielmc,1,0,NZ)=ESNC(M,ielmc,1,0,NZ)+CFOPE(ifoliar,M,ielmc,NZ) &
             *WGLFE(K,NB,ielmc,NZ)*FWODBE(ielmc,1)
           ESNC(M,ielmn,1,0,NZ)=ESNC(M,ielmn,1,0,NZ)+CFOPE(ifoliar,M,ielmn,NZ) &
@@ -1528,13 +1531,11 @@ module PlantBranchMod
           CPOOL4(K,NB,NZ)=0._r8
         ENDIF
         ARLFB(NB,NZ)=AZMAX1(ARLFB(NB,NZ)-ARLF1(K,NB,NZ))
-        WTLFBE(NB,ielmc,NZ)=AZMAX1(WTLFBE(NB,ielmc,NZ)-WGLFE(K,NB,ielmc,NZ))
-        WTLFBE(NB,ielmn,NZ)=AZMAX1(WTLFBE(NB,ielmn,NZ)-WGLFE(K,NB,ielmn,NZ))
-        WTLFBE(NB,ielmp,NZ)=AZMAX1(WTLFBE(NB,ielmp,NZ)-WGLFE(K,NB,ielmp,NZ))
+        DO NE=1,npelms
+          WTLFBE(NB,NE,NZ)=AZMAX1(WTLFBE(NB,NE,NZ)-WGLFE(K,NB,NE,NZ))
+          WGLFE(K,NB,NE,NZ)=0._r8
+        ENDDO
         ARLF1(K,NB,NZ)=0._r8
-        WGLFE(K,NB,ielmc,NZ)=0._r8
-        WGLFE(K,NB,ielmn,NZ)=0._r8
-        WGLFE(K,NB,ielmp,NZ)=0._r8
         WSLF(K,NB,NZ)=0._r8
         IF(WTLFBE(NB,ielmc,NZ).LE.ZEROL(NZ))THEN
           WTLFBE(NB,ielmc,NZ)=0._r8
@@ -1547,21 +1548,21 @@ module PlantBranchMod
     !     NON-STRUCTURAL C:N:P
     !
     !     WGSHE,WGSHN,WGSHP=node petiole C,N,P mass
-    !     RCCS,RCZS,RCPS=remobilization of C,N,P from senescing petiole
+    !     RCES(ielmc),RCES(ielmn),RCES(ielmp)=remobilization of C,N,P from senescing petiole
     !     RCCC,RCCN,RCCP=remobilization coefficient for C,N,P
     !
       IF(WGSHE(K,NB,ielmc,NZ).GT.ZEROP(NZ))THEN
-        RCCS=RCCC*WGSHE(K,NB,ielmc,NZ)
-        RCZS=WGSHE(K,NB,ielmn,NZ)*(RCCN+(1.0_r8-RCCN)*RCCC)
-        RCPS=WGSHE(K,NB,ielmp,NZ)*(RCCP+(1.0_r8-RCCP)*RCCC)
+        RCES(ielmc)=RCCC*WGSHE(K,NB,ielmc,NZ)
+        RCES(ielmn)=WGSHE(K,NB,ielmn,NZ)*(RCCN+(1.0_r8-RCCN)*RCCC)
+        RCES(ielmp)=WGSHE(K,NB,ielmp,NZ)*(RCCP+(1.0_r8-RCCP)*RCCC)
 !
       !     FRACTION OF REMOBILIZATION THAT CAN BE MET FROM CURRENT SHEATH
       !     OR PETIOLE
       !
       !     FSNCS,FSNAS=fraction of current petiole C,length to be remobilized
       !
-        IF(RCCS.GT.ZEROP(NZ))THEN
-          FSNCS=AZMAX1(AMIN1(1.0,SNCSH/RCCS))
+        IF(RCES(ielmc).GT.ZEROP(NZ))THEN
+          FSNCS=AZMAX1(AMIN1(1.0,SNCSH/RCES(ielmc)))
         ELSE
           FSNCS=1.0_r8
         ENDIF
@@ -1575,24 +1576,27 @@ module PlantBranchMod
       !     foliar(1,*),non-foliar(2,*),stalk(3,*),root(4,*), coarse woody (5,*)
       !     FSNCS=fraction of current petiole to be remobilized
       !     WGSHE,WGSHN,WGSHP=node petiole C,N,P mass
-      !     RCCS,RCZS,RCPS=remobilization of C,N,P from senescing petiole
+      !     RCES(ielmc),RCES(ielmn),RCES(ielmp)=remobilization of C,N,P from senescing petiole
       !     FWODB=C woody fraction in other organs:0=woody,1=non-woody
       !     FWODSN,FWODSP=N,P woody fraction in petiole:0=woody,1=non-woody
       !
-        D6320: DO M=1,jsken
-          ESNC(M,ielmc,0,0,NZ)=ESNC(M,ielmc,0,0,NZ)+CFOPE(icwood,M,ielmc,NZ) &
-            *FSNCS*(WGSHE(K,NB,ielmc,NZ)-RCCS)*FWODBE(ielmc,0)
-          ESNC(M,ielmn,0,0,NZ)=ESNC(M,ielmn,0,0,NZ)+CFOPE(icwood,M,ielmn,NZ) &
-            *FSNCS*(WGSHE(K,NB,ielmn,NZ)-RCZS)*FWODBE(ielmn,0)
-          ESNC(M,ielmp,0,0,NZ)=ESNC(M,ielmp,0,0,NZ)+CFOPE(icwood,M,ielmp,NZ) &
-            *FSNCS*(WGSHE(K,NB,ielmp,NZ)-RCPS)*FWODBE(ielmp,0)
-          ESNC(M,ielmc,1,0,NZ)=ESNC(M,ielmc,1,0,NZ)+CFOPE(infoliar,M,ielmc,NZ) &
-            *FSNCS*(WGSHE(K,NB,ielmc,NZ)-RCCS)*FWODBE(ielmc,1)
-          ESNC(M,ielmn,1,0,NZ)=ESNC(M,ielmn,1,0,NZ)+CFOPE(infoliar,M,ielmn,NZ) &
-            *FSNCS*(WGSHE(K,NB,ielmn,NZ)-RCZS)*FWODBE(ielmn,1)
-          ESNC(M,ielmp,1,0,NZ)=ESNC(M,ielmp,1,0,NZ)+CFOPE(infoliar,M,ielmp,NZ) &
-            *FSNCS*(WGSHE(K,NB,ielmp,NZ)-RCPS)*FWODBE(ielmp,1)
-        ENDDO D6320
+        DO NE=1,npelms
+          D6320: DO M=1,jsken
+            ESNC(M,ielmc,0,0,NZ)=ESNC(M,ielmc,0,0,NZ)+CFOPE(icwood,M,ielmc,NZ) &
+              *FSNCS*(WGSHE(K,NB,ielmc,NZ)-RCES(ielmc))*FWODBE(ielmc,0)
+            ESNC(M,ielmn,0,0,NZ)=ESNC(M,ielmn,0,0,NZ)+CFOPE(icwood,M,ielmn,NZ) &
+              *FSNCS*(WGSHE(K,NB,ielmn,NZ)-RCES(ielmn))*FWODBE(ielmn,0)
+            ESNC(M,ielmp,0,0,NZ)=ESNC(M,ielmp,0,0,NZ)+CFOPE(icwood,M,ielmp,NZ) &
+              *FSNCS*(WGSHE(K,NB,ielmp,NZ)-RCES(ielmp))*FWODBE(ielmp,0)
+
+            ESNC(M,ielmc,1,0,NZ)=ESNC(M,ielmc,1,0,NZ)+CFOPE(infoliar,M,ielmc,NZ) &
+              *FSNCS*(WGSHE(K,NB,ielmc,NZ)-RCES(ielmc))*FWODBE(ielmc,1)
+            ESNC(M,ielmn,1,0,NZ)=ESNC(M,ielmn,1,0,NZ)+CFOPE(infoliar,M,ielmn,NZ) &
+              *FSNCS*(WGSHE(K,NB,ielmn,NZ)-RCES(ielmn))*FWODBE(ielmn,1)
+            ESNC(M,ielmp,1,0,NZ)=ESNC(M,ielmp,1,0,NZ)+CFOPE(infoliar,M,ielmp,NZ) &
+              *FSNCS*(WGSHE(K,NB,ielmp,NZ)-RCES(ielmp))*FWODBE(ielmp,1)
+          ENDDO D6320
+        ENDDO
 !
       !     UPDATE STATE VARIABLES FOR REMOBILIZATION AND LITTERFALL
       !
@@ -1618,14 +1622,14 @@ module PlantBranchMod
   !
   !     CPOOL,ZPOOL,PPOOL=non-structural C,N,P mass
   !     FSNCS=fraction of current petiole C to be remobilized
-  !     RCCS,RCZS,RCPS=remobilization of C,N,P from senescing petiole
+  !     RCES(ielmc),RCES(ielmn),RCES(ielmp)=remobilization of C,N,P from senescing petiole
   !     SNCSH,SNCT=remaining senescence respiration carried to next node
   !
-        EPOOL(NB,ielmc,NZ)=EPOOL(NB,ielmc,NZ)+FSNCS*RCCS*SNCF
-        EPOOL(NB,ielmn,NZ)=EPOOL(NB,ielmn,NZ)+FSNCS*RCZS
-        EPOOL(NB,ielmp,NZ)=EPOOL(NB,ielmp,NZ)+FSNCS*RCPS
-        SNCSH=SNCSH-FSNCS*RCCS
-        SNCT=SNCT-FSNCS*RCCS
+        EPOOL(NB,ielmc,NZ)=EPOOL(NB,ielmc,NZ)+FSNCS*RCES(ielmc)*SNCF
+        EPOOL(NB,ielmn,NZ)=EPOOL(NB,ielmn,NZ)+FSNCS*RCES(ielmn)
+        EPOOL(NB,ielmp,NZ)=EPOOL(NB,ielmp,NZ)+FSNCS*RCES(ielmp)
+        SNCSH=SNCSH-FSNCS*RCES(ielmc)
+        SNCT=SNCT-FSNCS*RCES(ielmc)
         IF(WTSHEBE(NB,ielmc,NZ).LE.ZEROL(NZ))THEN
           WTSHEBE(NB,ielmc,NZ)=0._r8
         ENDIF
@@ -1646,20 +1650,14 @@ module PlantBranchMod
       !     WGSHE,WGSHN,WGSHP,WSSHE=node petiole C,N,P,protein mass
       !
       ELSE
-        D6325: DO M=1,jsken
-          ESNC(M,ielmc,0,0,NZ)=ESNC(M,ielmc,0,0,NZ)+CFOPE(icwood,M,ielmc,NZ) &
-            *WGSHE(K,NB,ielmc,NZ)*FWODBE(ielmc,0)
-          ESNC(M,ielmn,0,0,NZ)=ESNC(M,ielmn,0,0,NZ)+CFOPE(icwood,M,ielmn,NZ) &
-            *WGSHE(K,NB,ielmn,NZ)*FWODBE(ielmn,0)
-          ESNC(M,ielmp,0,0,NZ)=ESNC(M,ielmp,0,0,NZ)+CFOPE(icwood,M,ielmp,NZ) &
-            *WGSHE(K,NB,ielmp,NZ)*FWODBE(ielmp,0)
-          ESNC(M,ielmp,0,0,NZ)=ESNC(M,ielmp,0,0,NZ)+CFOPE(infoliar,M,ielmc,NZ) &
-            *WGSHE(K,NB,ielmc,NZ)*FWODBE(ielmc,1)
-          ESNC(M,ielmn,1,0,NZ)=ESNC(M,ielmn,1,0,NZ)+CFOPE(infoliar,M,ielmn,NZ) &
-            *WGSHE(K,NB,ielmn,NZ)*FWODBE(ielmn,1)
-          ESNC(M,ielmp,1,0,NZ)=ESNC(M,ielmp,1,0,NZ)+CFOPE(infoliar,M,ielmp,NZ) &
-            *WGSHE(K,NB,ielmp,NZ)*FWODBE(ielmp,1)
-        ENDDO D6325
+        DO NE=1,npelms
+          D6325: DO M=1,jsken
+            ESNC(M,NE,0,0,NZ)=ESNC(M,NE,0,0,NZ)+CFOPE(icwood,M,NE,NZ) &
+              *WGSHE(K,NB,NE,NZ)*FWODBE(NE,0)
+            ESNC(M,NE,1,0,NZ)=ESNC(M,NE,1,0,NZ)+CFOPE(infoliar,M,NE,NZ) &
+              *WGSHE(K,NB,NE,NZ)*FWODBE(NE,1)
+          ENDDO D6325
+        ENDDO
         WTSHEBE(NB,ielmc,NZ)=AZMAX1(WTSHEBE(NB,ielmc,NZ)-WGSHE(K,NB,ielmc,NZ))
         WTSHEBE(NB,ielmn,NZ)=AZMAX1(WTSHEBE(NB,ielmn,NZ)-WGSHE(K,NB,ielmn,NZ))
         WTSHEBE(NB,ielmp,NZ)=AZMAX1(WTSHEBE(NB,ielmp,NZ)-WGSHE(K,NB,ielmp,NZ))
