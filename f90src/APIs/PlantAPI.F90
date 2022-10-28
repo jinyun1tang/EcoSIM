@@ -152,8 +152,7 @@ implicit none
   FWOODE(1:npelms,0:1) =plt_allom%FWOODE(1:npelms,0:1)
   FWODRE(1:npelms,0:1) =plt_allom%FWODRE(1:npelms,0:1)
   FWODBE(1:npelms,0:1) =plt_allom%FWODBE(1:npelms,0:1)
-  FWODLP(:)=plt_allom%FWODLP(:)
-  FWODLN(:)=plt_allom%FWODLN(:)
+  FWODLE(1:npelms,0:1)=plt_allom%FWODLE(1:npelms,0:1)
   VOLWOU   =plt_site%VOLWOU
   DO L=1,JC
     WGLFT(L,NY,NX)=plt_biom%WGLFT(L)
@@ -1064,8 +1063,7 @@ implicit none
   plt_allom%FWOODE(1:npelms,0:1)=FWOODE(1:npelms,0:1)
   plt_allom%FWODRE(1:npelms,0:1)=FWODRE(1:npelms,0:1)
   plt_allom%FWODBE(1:npelms,0:1)=FWODBE(1:npelms,0:1)
-  plt_allom%FWODLP(:)=FWODLP(:)
-  plt_allom%FWODLN(:)=FWODLN(:)
+  plt_allom%FWODLE(1:npelms,0:1)=FWODLE(1:npelms,0:1)
 
   DO L=0,NL(NY,NX)
     DO K=0,jcplx1

@@ -14,8 +14,7 @@ module PlantTraitDataType
 !allocation parameter
   real(r8) :: FVRN(0:5)              !allocation parameter
   REAL(R8), pointer :: FWODBE(:,:)             !woody element allocation
-  real(r8) :: FWODLN(0:1)            !allocation
-  real(r8) :: FWODLP(0:1)
+  real(r8), pointer :: FWODLE(:,:)             !element allocation for leaf
   real(r8),pointer :: FWODRE(:,:)
   real(r8),pointer :: FWOODE(:,:)             !woody C allocation
   real(r8),pointer ::  ARSTK(:,:,:,:,:)                   !stem layer area, [m2 d-2]
@@ -170,6 +169,7 @@ contains
   implicit none
 
   FVRN =real((/0.75,0.5,0.5,0.5,0.5,0.5/),r8)
+  allocate(FWODLE(npelms,0:1));  FWODLE=0._r8
   allocate(FWODBE(npelms,0:1));  FWODBE=0._r8
   allocate(FWODRE(npelms,0:1));  FWODRE=0._r8         !
   allocate(FWOODE(npelms,0:1));  FWOODE=0._r8         !woody element allocation

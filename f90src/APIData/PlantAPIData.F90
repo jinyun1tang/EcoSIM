@@ -475,9 +475,8 @@ implicit none
   real(r8), pointer :: CPRSV(:)    => null()  !reserve P:C ratio, [gP gC-1]
   real(r8), pointer :: CPGR(:)     => null()  !grain P:C ratio, [gP gP-1]
   real(r8), pointer :: CNSTK(:)    => null()  !stalk N:C ratio, [gN gC-1]
-  real(r8), pointer :: FWODBE(:,:) => null()  !woody C allocation
-  real(r8), pointer :: FWODLN(:)   => null()  !leaf N allocation
-  real(r8), pointer :: FWODLP(:)   => null()  !leaf P allocation
+  real(r8), pointer :: FWODBE(:,:) => null()  !woody element allocation
+  real(r8), pointer :: FWODLE(:,:) => null()  !leaf element allocation
   real(r8), pointer :: FWODRE(:,:) => null()  !C woody fraction in root
   real(r8), pointer :: FWOODE(:,:) => null()  !woody element allocation
   real(r8), pointer :: FVRN(:)     => null()  !allocation parameter
@@ -1504,8 +1503,7 @@ implicit none
   allocate(this%CPHSK(JP1))
   allocate(this%FVRN(0:5))
   allocate(this%FWOODE(npelms,0:1))
-  allocate(this%FWODLP(0:1))
-  allocate(this%FWODLN(0:1))
+  allocate(this%FWODLE(npelms,0:1))
   allocate(this%FWODRE(npelms,0:1))
   allocate(this%FWODBE(npelms,0:1))
 
@@ -1556,8 +1554,7 @@ implicit none
 !  if(allocated(DMEAR))deallocate(DMEAR)
 !  if(allocated(DMHSK))deallocate(DMHSK)
 !  if(allocated(FVRN))deallocate(FVRN)
-!  if(allocated(FWODLP))deallocate(FWODLP)
-!  if(allocated(FWODLN))deallocate(FWODLN)
+!  if(allocated(FWODLE))deallocate(FWODLE)
 !  if(allocated(FWOODE))deallocate(FWOODE)
 !  if(allocated(FWODRE))deallocate(FWODRE)
 !  if(allocated(FWODBE))deallocate(FWODBE)
