@@ -348,7 +348,7 @@ module StartqsMod
 !     NNOD=number of concurrently growing nodes
 !
   IF(IBTYP(NZ).EQ.0.OR.IGTYP(NZ).LE.1)THEN
-    FNOD(NZ)=1.0
+    FNOD(NZ)=1.0_r8
     IF(GROUPI(NZ).LE.10)THEN
       NNOD(NZ)=3
     ELSEIF(GROUPI(NZ).LE.15)THEN
@@ -357,7 +357,7 @@ module StartqsMod
       NNOD(NZ)=5
     ENDIF
   ELSE
-    FNOD(NZ)=AMAX1(1.0,0.04/XRLA(NZ))
+    FNOD(NZ)=AMAX1(1.0_r8,0.04_r8/XRLA(NZ))
     NNOD(NZ)=24
   ENDIF
   end associate
@@ -514,19 +514,19 @@ module StartqsMod
 !     RTLG1X,RTLG2X=specific primary,secondary root length (m g-1)
 !     RTAR1X,RTAR2X=specific primary,secondary root area (m2 g-1)
 !
-  DO 500 N=1,2
+  D500: DO N=1,2
     PORTX(N,NZ)=PORT(N,NZ)**1.33_r8
     RRADP(N,NZ)=LOG(1.0_r8/SQRT(AMAX1(0.01_r8,PORT(N,NZ))))
-    DMVL(N,NZ)=ppmc/(0.05_r8*(1.0-PORT(N,NZ)))
-    RTLG1X(N,NZ)=DMVL(N,NZ)/(PICON*RRAD1M(N,NZ)**2)
-    RTLG2X(N,NZ)=DMVL(N,NZ)/(PICON*RRAD2M(N,NZ)**2)
+    DMVL(N,NZ)=ppmc/(0.05_r8*(1.0_r8-PORT(N,NZ)))
+    RTLG1X(N,NZ)=DMVL(N,NZ)/(PICON*RRAD1M(N,NZ)**2._r8)
+    RTLG2X(N,NZ)=DMVL(N,NZ)/(PICON*RRAD2M(N,NZ)**2._r8)
     RRAD1X(N,NZ)=RRAD1M(N,NZ)
 !    2*SQRT(0.25*(1.0-PORT(N,NZ)))
     RRAD2X(N,NZ)=RRAD2M(N,NZ)
 !    2*SQRT(0.25*(1.0-PORT(N,NZ)))
     RTAR1X(N,NZ)=PICON*RRAD1X(N,NZ)**2
     RTAR2X(N,NZ)=PICON*RRAD2X(N,NZ)**2
-500 CONTINUE
+  ENDDO D500
   end associate
   end subroutine InitDimensionsandUptake
 !------------------------------------------------------------------------------------------
@@ -611,7 +611,7 @@ module StartqsMod
   NBR(NZ)=0
   HTCTL(NZ)=0._r8
   ZC(NZ)=0._r8
-  D10: DO NB=1,JC1
+  D10: DO NB=1,JBR
     plt_pheno%IFLGA(NB,NZ)=0
     plt_pheno%IFLGE(NB,NZ)=0
     plt_pheno%IFLGF(NB,NZ)=0
@@ -651,22 +651,24 @@ module StartqsMod
 !
   WSTR(NZ)=0._r8
   CHILL(NZ)=0._r8
-  plt_biom%EPOOL(1:JC1,1:npelms,NZ)=0._r8
-  plt_biom%EPOLNB(1:JC1,1:npelms,NZ)=0._r8
-  plt_biom%WTSHEBE(1:JC1,1:npelms,NZ)=0._r8
-  plt_biom%WTSHTBE(1:JC1,1:npelms,NZ)=0._r8
-  plt_biom%WTSTKBE(1:JC1,1:npelms,NZ)=0._r8
-  plt_biom%WTLFBE(1:JC1,1:npelms,NZ)=0._r8
-  plt_biom%WTRSVBE(1:JC1,1:npelms,NZ)=0._r8
-  plt_biom%WTHSKBE(1:JC1,1:npelms,NZ)=0._r8
-  plt_biom%WTGRBE(1:JC1,1:npelms,NZ)=0._r8
-  plt_biom%WTEARBE(1:JC1,1:npelms,NZ)=0._r8
-  plt_biom%WTNDBE(1:JC1,1:npelms,NZ)=0._r8
-  plt_pheno%RCELX(1:JC1,1:npelms,NZ)=0._r8
-  plt_biom%WGLFEX(1:JC1,1:npelms,NZ)=0._r8
-  plt_pheno%RCESX(1:JC1,1:npelms,NZ)=0._r8
-  plt_biom%WGSHEXE(1:JC1,1:npelms,NZ)=0._r8
-  D25: DO NB=1,JC1
+  plt_biom%EPOOL(1:JBR,1:npelms,NZ)=0._r8
+  plt_biom%EPOLNB(1:JBR,1:npelms,NZ)=0._r8
+  plt_biom%WTSHEBE(1:JBR,1:npelms,NZ)=0._r8
+  plt_biom%WTSHTBE(1:JBR,1:npelms,NZ)=0._r8
+  plt_biom%WTSTKBE(1:JBR,1:npelms,NZ)=0._r8
+  plt_biom%WTLFBE(1:JBR,1:npelms,NZ)=0._r8
+  plt_biom%WTRSVBE(1:JBR,1:npelms,NZ)=0._r8
+  plt_biom%WTHSKBE(1:JBR,1:npelms,NZ)=0._r8
+  plt_biom%WTGRBE(1:JBR,1:npelms,NZ)=0._r8
+  plt_biom%WTEARBE(1:JBR,1:npelms,NZ)=0._r8
+  plt_biom%WTNDBE(1:JBR,1:npelms,NZ)=0._r8
+  plt_pheno%RCELX(1:JBR,1:npelms,NZ)=0._r8
+  plt_biom%WGLFEX(1:JBR,1:npelms,NZ)=0._r8
+  plt_pheno%RCESX(1:JBR,1:npelms,NZ)=0._r8
+  plt_biom%WGSHEXE(1:JBR,1:npelms,NZ)=0._r8
+  plt_biom%WTSTXBE(1:JBR,1:npelms,NZ)=0._r8
+
+  D25: DO NB=1,JBR
     plt_biom%WVSTKB(NB,NZ)=0._r8
     plt_biom%WTLSB(NB,NZ)=0._r8
     GRNXB(NB,NZ)=0._r8
@@ -675,9 +677,6 @@ module StartqsMod
     ARLFB(NB,NZ)=0._r8
     plt_rbgc%RNH3B(NB,NZ)=0._r8
     ARLFZ(NB,NZ)=0._r8
-    plt_biom%WTSTXB(NB,NZ)=0._r8
-    plt_biom%WTSTXN(NB,NZ)=0._r8
-    plt_biom%WTSTXP(NB,NZ)=0._r8
     HTSHEX(NB,NZ)=0._r8
     D5: DO L=1,JC1
       ARSTK(L,NB,NZ)=0._r8
@@ -694,9 +693,7 @@ module StartqsMod
       plt_biom%WSLF(K,NB,NZ)=0._r8
       plt_biom%WGSHE(K,NB,1:npelms,NZ)=0._r8
       plt_biom%WSSHE(K,NB,NZ)=0._r8
-      plt_biom%WGNODE(K,NB,NZ)=0._r8
-      plt_biom%WGNODN(K,NB,NZ)=0._r8
-      plt_biom%WGNODP(K,NB,NZ)=0._r8
+      plt_biom%WGNODE(K,NB,1:npelms,NZ)=0._r8
       D55: DO L=1,JC1
         ARLFL(L,K,NB,NZ)=0._r8
         plt_biom%WGLFLE(L,K,NB,1:npelms,NZ)=0._r8
@@ -969,20 +966,14 @@ module StartqsMod
       plt_rbgc%H2GA(N,L,NZ)=0._r8
       plt_rbgc%H2GP(N,L,NZ)=0._r8
       plt_rbgc%WFR(N,L,NZ)=1.0
-      D30: DO NR=1,JC1
+      D30: DO NR=1,JRS
         plt_morph%RTN2(N,L,NR,NZ)=0._r8
         plt_morph%RTLG1(N,L,NR,NZ)=0._r8
         plt_morph%RTLG2(N,L,NR,NZ)=0._r8
         plt_morph%RTDP1(N,NR,NZ)=SDPTH(NZ)
-        plt_biom%WTRT1E(ielmc,N,L,NR,NZ)=0._r8
-        plt_biom%WTRT1E(ielmn,N,L,NR,NZ)=0._r8
-        plt_biom%WTRT1E(ielmp,N,L,NR,NZ)=0._r8
-        plt_biom%WTRT2E(ielmc,N,L,NR,NZ)=0._r8
-        plt_biom%WTRT2E(ielmn,N,L,NR,NZ)=0._r8
-        plt_biom%WTRT2E(ielmp,N,L,NR,NZ)=0._r8
-        plt_biom%RTWT1(N,NR,NZ)=0._r8
-        plt_biom%RTWT1N(N,NR,NZ)=0._r8
-        plt_biom%RTWT1P(N,NR,NZ)=0._r8
+        plt_biom%WTRT1E(1:npelms,N,L,NR,NZ)=0._r8
+        plt_biom%WTRT2E(1:npelms,N,L,NR,NZ)=0._r8
+        plt_biom%RTWT1E(N,NR,1:npelms,NZ)=0._r8
       ENDDO D30
       IF(N.EQ.1)THEN
         D6400: DO K=0,micpar%k_non_woody_litr
@@ -1018,9 +1009,7 @@ module StartqsMod
     CWSRT    =>   plt_allom%CWSRT  , &
     CNGR     =>   plt_allom%CNGR   , &
     CPGR     =>   plt_allom%CPGR   , &
-    RTWT1    =>   plt_biom%RTWT1   , &
-    RTWT1N   =>   plt_biom%RTWT1N  , &
-    RTWT1P   =>   plt_biom%RTWT1P  , &
+    RTWT1E   =>   plt_biom%RTWT1E  , &
     WTRVX    =>   plt_biom%WTRVX   , &
     WTRT1E   =>   plt_biom%WTRT1E  , &
     WTLSB    =>   plt_biom%WTLSB   , &
@@ -1067,8 +1056,8 @@ module StartqsMod
   EPOOL(1,ielmp,NZ)=CPGR(NZ)*EPOOL(1,ielmc,NZ)
   WTRT1E(ielmn,1,NG(NZ),1,NZ)=CNGR(NZ)*WTRT1E(ielmc,1,NG(NZ),1,NZ)
   WTRT1E(ielmp,1,NG(NZ),1,NZ)=CPGR(NZ)*WTRT1E(ielmc,1,NG(NZ),1,NZ)
-  RTWT1N(1,1,NZ)=CNGR(NZ)*RTWT1(1,1,NZ)
-  RTWT1P(1,1,NZ)=CPGR(NZ)*RTWT1(1,1,NZ)
+  RTWT1E(1,1,ielmn,NZ)=CNGR(NZ)*RTWT1E(1,1,ielmc,NZ)
+  RTWT1E(1,1,ielmp,NZ)=CPGR(NZ)*RTWT1E(1,1,ielmc,NZ)
   WTRTL(1,NG(NZ),NZ)=WTRT1E(ielmc,1,NG(NZ),1,NZ)
   WTRTD(1,NG(NZ),NZ)=WTRT1E(ielmc,1,NG(NZ),1,NZ)
   WSRTL(1,NG(NZ),NZ)=WTRTL(1,NG(NZ),NZ)*CWSRT(NZ)

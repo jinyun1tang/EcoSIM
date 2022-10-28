@@ -466,7 +466,7 @@ module StartqMod
   NBR(NZ,NY,NX)=0
   HTCTL(NZ,NY,NX)=0._r8
   ZC(NZ,NY,NX)=0._r8
-  D10: DO NB=1,JC
+  D10: DO NB=1,JBR
     IFLGA(NB,NZ,NY,NX)=0
     IFLGE(NB,NZ,NY,NX)=0
     IFLGF(NB,NZ,NY,NX)=0
@@ -517,7 +517,7 @@ module StartqMod
   WTGRBE(1:JC,1:npelms,NZ,NY,NX)=0._r8
   WTEARBE(1:JC,1:npelms,NZ,NY,NX)=0._r8
   WTNDBE(1:JC,1:npelms,NZ,NY,NX)=0._r8
-  D25: DO NB=1,JC
+  D25: DO NB=1,JBR
     WVSTKB(NB,NZ,NY,NX)=0._r8
     WTLSB(NB,NZ,NY,NX)=0._r8
     GRNXB(NB,NZ,NY,NX)=0._r8
@@ -529,9 +529,7 @@ module StartqMod
     WGLFEX(NB,1:npelms,NZ,NY,NX)=0._r8
     ARLFZ(NB,NZ,NY,NX)=0._r8
     RCESX(NB,1:npelms,NZ,NY,NX)=0._r8
-    WTSTXB(NB,NZ,NY,NX)=0._r8
-    WTSTXN(NB,NZ,NY,NX)=0._r8
-    WTSTXP(NB,NZ,NY,NX)=0._r8
+    WTSTXBE(NB,1:npelms,NZ,NY,NX)=0._r8
     WGSHEXE(NB,1:npelms,NZ,NY,NX)=0._r8
     HTSHEX(NB,NZ,NY,NX)=0._r8
     D5: DO L=1,JC
@@ -549,9 +547,7 @@ module StartqMod
       WSLF(K,NB,NZ,NY,NX)=0._r8
       WGSHE(K,NB,1:npelms,NZ,NY,NX)=0._r8
       WSSHE(K,NB,NZ,NY,NX)=0._r8
-      WGNODE(K,NB,NZ,NY,NX)=0._r8
-      WGNODN(K,NB,NZ,NY,NX)=0._r8
-      WGNODP(K,NB,NZ,NY,NX)=0._r8
+      WGNODE(K,NB,1:npelms,NZ,NY,NX)=0._r8
       D55: DO L=1,JC
         ARLFL(L,K,NB,NZ,NY,NX)=0._r8
         WGLFLE(L,K,NB,1:npelms,NZ,NY,NX)=0._r8
@@ -735,7 +731,7 @@ module StartqMod
       RUPP2B(N,L,NZ,NY,NX)=0._r8
       RUPP1B(N,L,NZ,NY,NX)=0._r8
       CCO2A=CCO2EI(NY,NX)
-      CCO2P=0.030*EXP(-2.621-0.0317*ATCA(NY,NX))*CO2EI(NY,NX)
+      CCO2P=0.030_r8*EXP(-2.621_r8-0.0317_r8*ATCA(NY,NX))*CO2EI(NY,NX)
       CO2A(N,L,NZ,NY,NX)=CCO2A*RTVLP(N,L,NZ,NY,NX)
       CO2P(N,L,NZ,NY,NX)=CCO2P*RTVLW(N,L,NZ,NY,NX)
       RCOFLA(N,L,NZ,NY,NX)=0._r8
@@ -743,7 +739,7 @@ module StartqMod
       RCO2S(N,L,NZ,NY,NX)=0._r8
       RCO2P(N,L,NZ,NY,NX)=0._r8
       COXYA=COXYE(NY,NX)
-      COXYP=0.032*EXP(-6.175-0.0211*ATCA(NY,NX))*OXYE(NY,NX)
+      COXYP=0.032_r8*EXP(-6.175_r8-0.0211_r8*ATCA(NY,NX))*OXYE(NY,NX)
       OXYA(N,L,NZ,NY,NX)=COXYA*RTVLP(N,L,NZ,NY,NX)
       OXYP(N,L,NZ,NY,NX)=COXYP*RTVLW(N,L,NZ,NY,NX)
       CH4A(N,L,NZ,NY,NX)=0._r8
@@ -755,20 +751,14 @@ module StartqMod
       H2GA(N,L,NZ,NY,NX)=0._r8
       H2GP(N,L,NZ,NY,NX)=0._r8
       WFR(N,L,NZ,NY,NX)=1.0
-      D30: DO NR=1,JC
+      D30: DO NR=1,JRS
         RTN2(N,L,NR,NZ,NY,NX)=0._r8
         RTLG1(N,L,NR,NZ,NY,NX)=0._r8
-        WTRT1E(ielmc,N,L,NR,NZ,NY,NX)=0._r8
-        WTRT1E(ielmn,N,L,NR,NZ,NY,NX)=0._r8
-        WTRT1E(ielmp,N,L,NR,NZ,NY,NX)=0._r8
+        WTRT1E(1:npelms,N,L,NR,NZ,NY,NX)=0._r8
         RTLG2(N,L,NR,NZ,NY,NX)=0._r8
-        WTRT2E(ielmc,N,L,NR,NZ,NY,NX)=0._r8
-        WTRT2E(ielmn,N,L,NR,NZ,NY,NX)=0._r8
-        WTRT2E(ielmp,N,L,NR,NZ,NY,NX)=0._r8
+        WTRT2E(1:npelms,N,L,NR,NZ,NY,NX)=0._r8
         RTDP1(N,NR,NZ,NY,NX)=SDPTH(NZ,NY,NX)
-        RTWT1(N,NR,NZ,NY,NX)=0._r8
-        RTWT1N(N,NR,NZ,NY,NX)=0._r8
-        RTWT1P(N,NR,NZ,NY,NX)=0._r8
+        RTWT1E(N,NR,1:npelms,NZ,NY,NX)=0._r8
       ENDDO D30
       IF(N.EQ.1)THEN
         D6400: DO K=0,micpar%n_pltlitrk
@@ -826,8 +816,8 @@ module StartqMod
   EPOOL(1,ielmp,NZ,NY,NX)=CPGR(NZ,NY,NX)*EPOOL(1,ielmc,NZ,NY,NX)
   WTRT1E(ielmn,1,NG(NZ,NY,NX),1,NZ,NY,NX)=CNGR(NZ,NY,NX)*WTRT1E(ielmc,1,NG(NZ,NY,NX),1,NZ,NY,NX)
   WTRT1E(ielmp,1,NG(NZ,NY,NX),1,NZ,NY,NX)=CPGR(NZ,NY,NX)*WTRT1E(ielmc,1,NG(NZ,NY,NX),1,NZ,NY,NX)
-  RTWT1N(1,1,NZ,NY,NX)=CNGR(NZ,NY,NX)*RTWT1(1,1,NZ,NY,NX)
-  RTWT1P(1,1,NZ,NY,NX)=CPGR(NZ,NY,NX)*RTWT1(1,1,NZ,NY,NX)
+  RTWT1E(1,1,ielmn,NZ,NY,NX)=CNGR(NZ,NY,NX)*RTWT1E(1,1,ielmc,NZ,NY,NX)
+  RTWT1E(1,1,ielmp,NZ,NY,NX)=CPGR(NZ,NY,NX)*RTWT1E(1,1,ielmc,NZ,NY,NX)
   WTRTL(1,NG(NZ,NY,NX),NZ,NY,NX)=WTRT1E(ielmc,1,NG(NZ,NY,NX),1,NZ,NY,NX)
   WTRTD(1,NG(NZ,NY,NX),NZ,NY,NX)=WTRT1E(ielmc,1,NG(NZ,NY,NX),1,NZ,NY,NX)
   WSRTL(1,NG(NZ,NY,NX),NZ,NY,NX)=WTRTL(1,NG(NZ,NY,NX),NZ,NY,NX)*CWSRT(NZ,NY,NX)

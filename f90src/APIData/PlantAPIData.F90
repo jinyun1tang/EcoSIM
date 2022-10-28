@@ -511,9 +511,7 @@ implicit none
   real(r8), pointer :: WGLFV(:,:)     => null()    !canopy layer leaf C, [g d-2]
   real(r8), pointer :: WTRT2E(:,:,:,:,:) => null()    !root layer element secondary axes, [g d-2]
   real(r8), pointer :: WTRT1E(:,:,:,:,:) => null()    !root layer element primary axes, [g d-2]
-  real(r8), pointer :: RTWT1(:,:,:)   => null()    !root C primary axes, [g d-2]
-  real(r8), pointer :: RTWT1N(:,:,:)  => null()    !root N primary axes, [g d-2]
-  real(r8), pointer :: RTWT1P(:,:,:)  => null()    !root P primary axes, [g d-2]
+  real(r8), pointer :: RTWT1E(:,:,:,:)   => null()    !root C primary axes, [g d-2]
   real(r8), pointer :: WTSTDE(:,:,:)  => null()    !standing dead element fraction, [g d-2]
   real(r8), pointer :: CEPOLP(:,:)    => null()    !canopy nonstructural element concentration, [g d-2]
   real(r8), pointer :: EPOOLP(:,:)    => null()    !canopy nonstructural element concentration, [g d-2]
@@ -528,9 +526,7 @@ implicit none
   real(r8), pointer :: CZPOLR(:,:,:)  => null()    !root layer nonstructural N concentration, [g g-1]
   real(r8), pointer :: CPPOLR(:,:,:)  => null()    !root layer nonstructural P concentration, [g g-1]
   real(r8), pointer :: CEPOLB(:,:,:)    => null()    !branch nonstructural C concentration, [g d-2]
-  real(r8), pointer :: WGNODE(:,:,:)  => null()    !internode C, [g d-2]
-  real(r8), pointer :: WGNODN(:,:,:)  => null()    !internode N, [g d-2]
-  real(r8), pointer :: WGNODP(:,:,:)  => null()    !nodule P, [g d-2]
+  real(r8), pointer :: WGNODE(:,:,:,:)  => null()    !internode C, [g d-2]
   real(r8), pointer :: WGLFE(:,:,:,:)    => null()    !leaf element, [g d-2]
   real(r8), pointer :: WSLF(:,:,:)    => null()    !layer leaf protein C, [g d-2]
   real(r8), pointer :: WGSHE(:,:,:,:)   => null()  !sheath element , [g d-2]
@@ -558,12 +554,10 @@ implicit none
   real(r8), pointer :: WTHSKBE(:,:,:) => null()   !branch husk element, [g d-2]
   real(r8), pointer :: WTGRBE(:,:,:)  => null()   !branch grain element, [g d-2]
   real(r8), pointer :: WTSTKBE(:,:,:) => null()   !branch stalk element, [g d-2]
-  real(r8), pointer :: WTSHTBE(:,:,:)    => null()   !branch shoot C, [g d-2]
-  real(r8), pointer :: WGLFEX(:,:,:)    => null()   !branch leaf structural element, [g d-2]
+  real(r8), pointer :: WTSHTBE(:,:,:) => null()   !branch shoot C, [g d-2]
+  real(r8), pointer :: WGLFEX(:,:,:)  => null()   !branch leaf structural element, [g d-2]
   real(r8), pointer :: WGSHEXE(:,:,:) => null()   !branch sheath structural element, [g d-2]
-  real(r8), pointer :: WTSTXB(:,:)    => null()   !branch stalk structural C, [g d-2]
-  real(r8), pointer :: WTSTXN(:,:)    => null()   !branch stalk structural N, [g d-2]
-  real(r8), pointer :: WTSTXP(:,:)    => null()   !branch stalk structural P, [g d-2]
+  real(r8), pointer :: WTSTXBE(:,:,:) => null()   !branch stalk structural element, [g d-2]
   real(r8), pointer :: WVSTKB(:,:)    => null()   !branch active stalk C, [g d-2]
   real(r8), pointer :: WTSTKE(:,:)    => null()   !canopy stalk element, [g d-2]
   real(r8), pointer :: WVSTK(:)       => null()   !canopy active stalk C, [g d-2
@@ -1622,9 +1616,7 @@ implicit none
   allocate(this%WVSTK(JP1))
   allocate(this%WSLF(0:JNODS1,JBR,JP1))
   allocate(this%WSSHE(0:JNODS1,JBR,JP1))
-  allocate(this%WGNODE(0:JNODS1,JBR,JP1))
-  allocate(this%WGNODN(0:JNODS1,JBR,JP1))
-  allocate(this%WGNODP(0:JNODS1,JBR,JP1))
+  allocate(this%WGNODE(0:JNODS1,JBR,npelms,JP1))
   allocate(this%WGLFE(0:JNODS1,JBR,npelms,JP1))
   allocate(this%WGSHE(0:JNODS1,JBR,npelms,JP1))
   allocate(this%WGLFLE(JC1,0:JNODS1,JBR,npelms,JP1))
@@ -1662,12 +1654,8 @@ implicit none
   allocate(this%WTGRBE(JBR,npelms,JP1))
   allocate(this%WTSTKBE(JBR,npelms,JP1))
   allocate(this%WTSHTBE(JBR,npelms,JP1))
-  allocate(this%WTSTXB(JBR,JP1))
-  allocate(this%WTSTXN(JBR,JP1))
-  allocate(this%WTSTXP(JBR,JP1))
-  allocate(this%RTWT1(2,JC1,JP1))
-  allocate(this%RTWT1N(2,JC1,JP1))
-  allocate(this%RTWT1P(2,JC1,JP1))
+  allocate(this%WTSTXBE(JBR,npelms,JP1))
+  allocate(this%RTWT1E(2,JRS,npelms,JP1))
 
   end subroutine plt_biom_init
 !----------------------------------------------------------------------
@@ -1682,9 +1670,7 @@ implicit none
 !  if(allocated(EPOOLN))deallocate(EPOOLN)
 !  if(allocated(WTNDLE))deallocate(WTNDLE)
 !  if(allocated(WGLFV))deallocate(WGLFV)
-!  if(allocated(RTWT1))deallocate(RTWT1)
-!  if(allocated(RTWT1N))deallocate(RTWT1N)
-!  if(allocated(RTWT1P))deallocate(RTWT1P)
+!  call destroy(RTWT1E)
 !  if(allocated(WTRT1E))deallocate(WTRT1E)
 !  if(allocated(WTSTDE))deallocate(WTSTDE)
 !  if(allocated(WTRT2E))deallocate(WTRT2E)
@@ -1706,8 +1692,6 @@ implicit none
 !  if(allocated(WSSHE))deallocate(WSSHE)
 !  if(allocated(WGLFLE))deallocate(WGLFLE)
 !  if(allocated(WGNODE))deallocate(WGNODE)
-!  if(allocated(WGNODN))deallocate(WGNODN)
-!  if(allocated(WGNODP))deallocate(WGNODP)
 !  if(allocated(WGSHE))deallocate(WGSHE)
 !  if(allocated(WVSTKB))deallocate(WVSTKB)
 !  if(allocated(PPOOL))deallocate(PPOOL)
@@ -1738,9 +1722,7 @@ implicit none
 !  if(allocated(WTGRBE))deallocate(WTGRBE)
 !  if(allocated(WTSTKBE))deallocate(WTSTKBE)
 !  if(allocated(WTSHTBE))deallocate(WTSHTBE)
-!  if(allocated(WTSTXB))deallocate(WTSTXB)
-!  if(allocated(WTSTXN))deallocate(WTSTXN)
-!  if(allocated(WTSTXP))deallocate(WTSTXP)
+!  if(allocated(WTSTXBE))deallocate(WTSTXBE)
 !  if(allocated(WTSTDI))deallocate(WTSTDI)
 !  if(allocated(WTRVX))deallocate(WTRVX)
 !  if(allocated(WTLS))deallocate(WTLS)
@@ -1949,6 +1931,7 @@ implicit none
   jsken  => pltpar%jsken
   Jlitgrp=> pltpar%Jlitgrp
   JBR    => pltpar%JBR
+  JRS    => pltpar%JRS
   jpstgs => pltpar%jpstgs
 
   call plt_site%Init()

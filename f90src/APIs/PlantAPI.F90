@@ -262,6 +262,7 @@ implicit none
     WTGRE(1:npelms,NZ,NY,NX)   =plt_biom%WTGRE(1:npelms,NZ)
     WTRTSE(1:npelms,NZ,NY,NX)  =plt_biom%WTRTSE(1:npelms,NZ)
     WTNDE(1:npelms,NZ,NY,NX)   =plt_biom%WTNDE(1:npelms,NZ)
+    HEUPTK(1:npelms,NZ,NY,NX)=plt_rbgc%HEUPTK(1:npelms,NZ)
     ARLFP(NZ,NY,NX) =plt_morph%ARLFP(NZ)
     ARSTP(NZ,NY,NX) =plt_morph%ARSTP(NZ)
     CCPLNP(NZ,NY,NX)=plt_biom%CCPLNP(NZ)
@@ -288,7 +289,6 @@ implicit none
     FRADP(NZ,NY,NX) =plt_rad%FRADP(NZ)
     FNOD(NZ,NY,NX)  =plt_allom%FNOD(NZ)
     GRNO(NZ,NY,NX)  =plt_morph%GRNO(NZ)
-    HEUPTK(1:npelms,NZ,NY,NX)=plt_rbgc%HEUPTK(1:npelms,NZ)
     HTCTL(NZ,NY,NX) =plt_morph%HTCTL(NZ)
     HTC(NZ,NY,NX)   =plt_pheno%HTC(NZ)
     HFLXC(NZ,NY,NX) =plt_ew%HFLXC(NZ)
@@ -482,9 +482,7 @@ implicit none
       WTLSB(NB,NZ,NY,NX) =plt_biom%WTLSB(NB,NZ)
 
       WGLFEX(NB,1:npelms,NZ,NY,NX) =plt_biom%WGLFEX(NB,1:npelms,NZ)
-      WTSTXB(NB,NZ,NY,NX)=plt_biom%WTSTXB(NB,NZ)
-      WTSTXN(NB,NZ,NY,NX)=plt_biom%WTSTXN(NB,NZ)
-      WTSTXP(NB,NZ,NY,NX)=plt_biom%WTSTXP(NB,NZ)
+      WTSTXBE(NB,1:npelms,NZ,NY,NX)=plt_biom%WTSTXBE(NB,1:npelms,NZ)
       WVSTKB(NB,NZ,NY,NX)=plt_biom%WVSTKB(NB,NZ)
 
       DO K=0,JNODS
@@ -492,9 +490,7 @@ implicit none
         HTNODX(K,NB,NZ,NY,NX)=plt_morph%HTNODX(K,NB,NZ)
         HTNODE(K,NB,NZ,NY,NX)=plt_morph%HTNODE(K,NB,NZ)
         HTSHE(K,NB,NZ,NY,NX) =plt_morph%HTSHE(K,NB,NZ)
-        WGNODE(K,NB,NZ,NY,NX)=plt_biom%WGNODE(K,NB,NZ)
-        WGNODN(K,NB,NZ,NY,NX)=plt_biom%WGNODN(K,NB,NZ)
-        WGNODP(K,NB,NZ,NY,NX)=plt_biom%WGNODP(K,NB,NZ)
+        WGNODE(K,NB,1:npelms,NZ,NY,NX)=plt_biom%WGNODE(K,NB,1:npelms,NZ)
         WGLFE(K,NB,1:npelms,NZ,NY,NX)  =plt_biom%WGLFE(K,NB,1:npelms,NZ)
         WSLF(K,NB,NZ,NY,NX)  =plt_biom%WSLF(K,NB,NZ)
         WGSHE(K,NB,1:npelms,NZ,NY,NX) =plt_biom%WGSHE(K,NB,1:npelms,NZ)
@@ -641,9 +637,7 @@ implicit none
     DO NR=1,NRT(NZ,NY,NX)
       NINR(NR,NZ,NY,NX)=plt_morph%NINR(NR,NZ)
       DO N=1,2
-        RTWT1(N,NR,NZ,NY,NX) =plt_biom%RTWT1(N,NR,NZ)
-        RTWT1N(N,NR,NZ,NY,NX)=plt_biom%RTWT1N(N,NR,NZ)
-        RTWT1P(N,NR,NZ,NY,NX)=plt_biom%RTWT1P(N,NR,NZ)
+        RTWT1E(N,NR,1:npelms,NZ,NY,NX) =plt_biom%RTWT1E(N,NR,1:npelms,NZ)
         RTDP1(N,NR,NZ,NY,NX) =plt_morph%RTDP1(N,NR,NZ)
       ENDDO
       DO L=1,JZ
@@ -1399,9 +1393,7 @@ implicit none
       plt_pheno%VRNF(NB,NZ)=VRNF(NB,NZ,NY,NX)
       plt_biom%WTLSB(NB,NZ)=WTLSB(NB,NZ,NY,NX)
       plt_biom%WGLFEX(NB,1:npelms,NZ) =WGLFEX(NB,1:npelms,NZ,NY,NX)
-      plt_biom%WTSTXB(NB,NZ)=WTSTXB(NB,NZ,NY,NX)
-      plt_biom%WTSTXN(NB,NZ)=WTSTXN(NB,NZ,NY,NX)
-      plt_biom%WTSTXP(NB,NZ)=WTSTXP(NB,NZ,NY,NX)
+      plt_biom%WTSTXBE(NB,1:npelms,NZ)=WTSTXBE(NB,1:npelms,NZ,NY,NX)
       plt_biom%WVSTKB(NB,NZ)=WVSTKB(NB,NZ,NY,NX)
       DO M=1,pltpar%jpstgs
         plt_pheno%IDAY(M,NB,NZ)=IDAY(M,NB,NZ,NY,NX)
@@ -1433,9 +1425,7 @@ implicit none
         plt_morph%HTNODX(K,NB,NZ)=HTNODX(K,NB,NZ,NY,NX)
         plt_morph%HTSHE(K,NB,NZ) =HTSHE(K,NB,NZ,NY,NX)
         plt_morph%HTNODE(K,NB,NZ)=HTNODE(K,NB,NZ,NY,NX)
-        plt_biom%WGNODE(K,NB,NZ) =WGNODE(K,NB,NZ,NY,NX)
-        plt_biom%WGNODN(K,NB,NZ) =WGNODN(K,NB,NZ,NY,NX)
-        plt_biom%WGNODP(K,NB,NZ) =WGNODP(K,NB,NZ,NY,NX)
+        plt_biom%WGNODE(K,NB,1:npelms,NZ) =WGNODE(K,NB,1:npelms,NZ,NY,NX)
         plt_biom%WGLFE(K,NB,1:npelms,NZ)   =WGLFE(K,NB,1:npelms,NZ,NY,NX)
         plt_biom%WSLF(K,NB,NZ)   =WSLF(K,NB,NZ,NY,NX)
         plt_biom%WGSHE(K,NB,1:npelms,NZ)  =WGSHE(K,NB,1:npelms,NZ,NY,NX)
@@ -1586,9 +1576,7 @@ implicit none
       enddo
       DO N=1,MY(NZ,NY,NX)
         plt_morph%RTDP1(N,NR,NZ)=RTDP1(N,NR,NZ,NY,NX)
-        plt_biom%RTWT1(N,NR,NZ)=RTWT1(N,NR,NZ,NY,NX)
-        plt_biom%RTWT1N(N,NR,NZ)=RTWT1N(N,NR,NZ,NY,NX)
-        plt_biom%RTWT1P(N,NR,NZ)=RTWT1P(N,NR,NZ,NY,NX)
+        plt_biom%RTWT1E(N,NR,1:npelms,NZ)=RTWT1E(N,NR,1:npelms,NZ,NY,NX)
       enddo
     enddo
     DO NE=1,npelms

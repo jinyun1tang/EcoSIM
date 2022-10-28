@@ -136,23 +136,19 @@ module CanopyDataType
   real(r8),allocatable ::  EPOLNB(:,:,:,:,:)                  !branch nodule nonstructural C, [g d-2]
   real(r8),allocatable ::  WTNDBE(:,:,:,:,:)                  !branch nodule element, [g d-2]
   real(r8),allocatable ::  WGSHEXE(:,:,:,:,:)                  !branch sheath structural element, [g d-2]
-  real(r8),allocatable ::  WTSTXB(:,:,:,:)                    !branch stalk structural C, [g d-2]
+  real(r8),allocatable ::  WTSTXBE(:,:,:,:,:)                    !branch stalk structural C, [g d-2]
   real(r8),allocatable ::  WGLFEX(:,:,:,:,:)                     !branch leaf structural element, [g d-2]
-  real(r8),allocatable ::  WTSTXP(:,:,:,:)                    !branch stalk structural P, [g d-2]
-  real(r8),allocatable ::  WTSTXN(:,:,:,:)                    !branch stalk structural N, [g d-2]
   real(r8),allocatable ::  WGLFE(:,:,:,:,:,:)                    !leaf element, [g d-2]
   real(r8),allocatable ::  WGSHE(:,:,:,:,:,:)                 !sheath element , [g d-2]
-  real(r8),allocatable ::  WGNODE(:,:,:,:,:)                  !internode C, [g d-2]
+  real(r8),allocatable ::  WGNODE(:,:,:,:,:,:)                  !internode element, [g d-2]
   real(r8),allocatable ::  WGLFLE(:,:,:,:,:,:,:)                 !layer leaf element, [g d-2]
   real(r8),allocatable ::  ARLFL(:,:,:,:,:,:)                 !layer leaf area, [m2 d-2]
   real(r8),allocatable ::  WSLF(:,:,:,:,:)                    !layer leaf protein C, [g d-2]
   real(r8),allocatable ::  WSSHE(:,:,:,:,:)                   !layer sheath protein C, [g d-2]
-  real(r8),allocatable ::  WGNODN(:,:,:,:,:)                  !internode N, [g d-2]
   real(r8),allocatable ::  CCPLNP(:,:,:)                      !nodule nonstructural C, [g d-2]
   real(r8),allocatable ::  GRWTB(:,:,:,:)                     !maximum grain C during grain fill, [g d-2]
   real(r8),allocatable ::  WTSTDE(:,:,:,:,:)                  !standing dead element fraction, [g d-2]
   real(r8),allocatable ::  WTSTGE(:,:,:,:)                    !standing dead element, [g d-2]
-  real(r8),allocatable ::  WGNODP(:,:,:,:,:)                  !nodule P, [g d-2]
   real(r8),allocatable ::  WTRVE(:,:,:,:)                     !plant stored nonstructural element, [g d-2]
   real(r8),allocatable ::  WTRVX(:,:,:)                       !plant stored nonstructural C at planting, [g d-2]
   REAL(R8),allocatable ::  WTSHTA(:,:,:)                      !landscape average canopy shoot C, [g d-2]
@@ -289,23 +285,19 @@ module CanopyDataType
   allocate(EPOLNB(JBR,npelms,JP,JY,JX));EPOLNB=0._r8
   allocate(WTNDBE(JBR,npelms,JP,JY,JX)); WTNDBE=0._r8
   allocate(WGSHEXE(JBR,npelms,JP,JY,JX));WGSHEXE=0._r8
-  allocate(WTSTXB(JBR,JP,JY,JX));WTSTXB=0._r8
+  allocate(WTSTXBE(JBR,npelms,JP,JY,JX));WTSTXBE=0._r8
   allocate(WGLFEX(JBR,npelms,JP,JY,JX)); WGLFEX=0._r8
-  allocate(WTSTXP(JBR,JP,JY,JX));WTSTXP=0._r8
-  allocate(WTSTXN(JBR,JP,JY,JX));WTSTXN=0._r8
   allocate(WGLFE(0:JNODS,JBR,npelms,JP,JY,JX));WGLFE=0._r8
   allocate(WGSHE(0:JNODS,JBR,npelms,JP,JY,JX));WGSHE=0._r8
-  allocate(WGNODE(0:JNODS,JBR,JP,JY,JX));WGNODE=0._r8
+  allocate(WGNODE(0:JNODS,JBR,npelms,JP,JY,JX));WGNODE=0._r8
   allocate(WGLFLE(JC,0:JNODS,JBR,npelms,JP,JY,JX));WGLFLE=0._r8
   allocate(ARLFL(JC,0:JNODS,JBR,JP,JY,JX));ARLFL=0._r8
   allocate(WSLF(0:JNODS,JBR,JP,JY,JX));WSLF=0._r8
   allocate(WSSHE(0:JNODS,JBR,JP,JY,JX));WSSHE=0._r8
-  allocate(WGNODN(0:JNODS,JBR,JP,JY,JX));WGNODN=0._r8
   allocate(CCPLNP(JP,JY,JX));   CCPLNP=0._r8
   allocate(GRWTB(JBR,JP,JY,JX)); GRWTB=0._r8
   allocate(WTSTDE(jsken,npelms,JP,JY,JX)); WTSTDE=0._r8
   allocate(WTSTGE(npelms,JP,JY,JX));    WTSTGE=0._r8
-  allocate(WGNODP(0:JNODS,JBR,JP,JY,JX));WGNODP=0._r8
   allocate(WTRVE(npelms,JP,JY,JX));  WTRVE=0._r8
   allocate(WTRVX(JP,JY,JX));    WTRVX=0._r8
   allocate(WTSHTA(JP,JY,JX));   WTSHTA=0._r8
@@ -443,10 +435,8 @@ module CanopyDataType
   call destroy(EPOLNB)
   call destroy(WTNDBE)
   call destroy(WGSHEXE)
-  call destroy(WTSTXB)
+  call destroy(WTSTXBE)
   call destroy(WGLFEX)
-  call destroy(WTSTXP)
-  call destroy(WTSTXN)
   call destroy(WGLFE)
   call destroy(WGSHE)
   call destroy(WGNODE)
@@ -454,12 +444,10 @@ module CanopyDataType
   call destroy(ARLFL)
   call destroy(WSLF)
   call destroy(WSSHE)
-  call destroy(WGNODN)
   call destroy(CCPLNP)
   call destroy(GRWTB)
   call destroy(WTSTDE)
   call destroy(WTSTGE)
-  call destroy(WGNODP)
   call destroy(WTRVE)
   call destroy(WTRVX)
   call destroy(WTSHTA)

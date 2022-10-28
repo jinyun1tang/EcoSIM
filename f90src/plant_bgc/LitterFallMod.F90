@@ -326,9 +326,7 @@ implicit none
 !     begin_execution
   associate(                                &
     WTRT2E    =>   plt_biom%WTRT2E    , &
-    RTWT1     =>   plt_biom%RTWT1     , &
-    RTWT1N    =>   plt_biom%RTWT1N    , &
-    RTWT1P    =>   plt_biom%RTWT1P    , &
+    RTWT1E    =>   plt_biom%RTWT1E    , &
     WTRT1E    =>   plt_biom%WTRT1E    , &
     EPOOLR    =>   plt_biom%EPOOLR    , &
     WTRTD     =>   plt_biom%WTRTD     , &
@@ -465,9 +463,7 @@ implicit none
           WTRT2E(ielmc,N,L,NR,NZ)=0._r8
           WTRT2E(ielmn,N,L,NR,NZ)=0._r8
           WTRT2E(ielmp,N,L,NR,NZ)=0._r8
-          RTWT1(N,NR,NZ)=0._r8
-          RTWT1N(N,NR,NZ)=0._r8
-          RTWT1P(N,NR,NZ)=0._r8
+          RTWT1E(N,NR,1:npelms,NZ)=0._r8
           RTLG1(N,L,NR,NZ)=0._r8
           RTLG2(N,L,NR,NZ)=0._r8
           RTN2(N,L,NR,NZ)=0._r8
@@ -520,15 +516,13 @@ implicit none
 !     RTDP1=primary root depth from soil surface
 !     RTWT1,RTWT1N,RTWT1P=primary root C,N,P mass
 !
-    DO 8795 NR=1,NRT(NZ)
+    D8795: DO NR=1,NRT(NZ)
       NINR(NR,NZ)=NG(NZ)
-      DO 8790 N=1,MY(NZ)
+      D8790: DO N=1,MY(NZ)
         RTDP1(N,NR,NZ)=SDPTH(NZ)
-        RTWT1(N,NR,NZ)=0._r8
-        RTWT1N(N,NR,NZ)=0._r8
-        RTWT1P(N,NR,NZ)=0._r8
-8790  CONTINUE
-8795  CONTINUE
+        RTWT1E(N,NR,1:npelms,NZ)=0._r8
+      ENDDO D8790
+    ENDDO D8795
     NIX(NZ)=NG(NZ)
     NRT(NZ)=0
   ENDIF
@@ -754,18 +748,14 @@ implicit none
     WTGRBE => plt_biom%WTGRBE        , &
     WVSTKB => plt_biom%WVSTKB        , &
     EPOOLR => plt_biom%EPOOLR        , &
-    WTSTXB => plt_biom%WTSTXB        , &
-    WTSTXN => plt_biom%WTSTXN        , &
-    WTSTXP => plt_biom%WTSTXP        , &
+    WTSTXBE=> plt_biom%WTSTXBE       , &
     WTLSB  => plt_biom%WTLSB         , &
     WTRVE  => plt_biom%WTRVE         , &
     WTRT1E => plt_biom%WTRT1E        , &
     WTRT2E => plt_biom%WTRT2E        , &
     WTNDBE => plt_biom%WTNDBE        , &
     WTSTKBE=> plt_biom%WTSTKBE       , &
-    RTWT1  => plt_biom%RTWT1         , &
-    RTWT1N => plt_biom%RTWT1N        , &
-    RTWT1P => plt_biom%RTWT1P        , &
+    RTWT1E => plt_biom%RTWT1E        , &
     NJ     => plt_site%NJ            , &
     NU     => plt_site%NU            , &
     IDTH   => plt_pheno%IDTH         , &
@@ -806,9 +796,9 @@ implicit none
     WTHSKBE(NB,ielmp,NZ)=0._r8
     WTEARBE(NB,ielmp,NZ)=0._r8
     WTGRBE(NB,ielmp,NZ)=0._r8
-    WTSTXB(NB,NZ)=0._r8
-    WTSTXN(NB,NZ)=0._r8
-    WTSTXP(NB,NZ)=0._r8
+    WTSTXBE(NB,ielmc,NZ)=0._r8
+    WTSTXBE(NB,ielmn,NZ)=0._r8
+    WTSTXBE(NB,ielmp,NZ)=0._r8
   ENDDO D8835
 !
 !     RESET ROOT STATE VARIABLES
@@ -823,9 +813,7 @@ implicit none
         WTRT2E(ielmc,N,L,NR,NZ)=0._r8
         WTRT2E(ielmn,N,L,NR,NZ)=0._r8
         WTRT2E(ielmp,N,L,NR,NZ)=0._r8
-        RTWT1(N,NR,NZ)=0._r8
-        RTWT1N(N,NR,NZ)=0._r8
-        RTWT1P(N,NR,NZ)=0._r8
+        RTWT1E(N,NR,1:npelms,NZ)=0._r8
         RTLG1(N,L,NR,NZ)=0._r8
         RTLG2(N,L,NR,NZ)=0._r8
         RTN2(N,L,NR,NZ)=0._r8
@@ -857,9 +845,7 @@ implicit none
     WTSTKBE  => plt_biom%WTSTKBE    , &
     WGLFE    => plt_biom%WGLFE      , &
     WTRSVBE  => plt_biom%WTRSVBE    , &
-    WTSTXN   => plt_biom%WTSTXN     , &
-    WTSTXP   => plt_biom%WTSTXP     , &
-    WTSTXB   => plt_biom%WTSTXB     , &
+    WTSTXBE  => plt_biom%WTSTXBE    , &
     WVSTKB   => plt_biom%WVSTKB     , &
     WTGRBE   => plt_biom%WTGRBE     , &
     WTLSB    => plt_biom%WTLSB      , &
@@ -868,8 +854,6 @@ implicit none
     WSSHE    => plt_biom%WSSHE      , &
     WSLF     => plt_biom%WSLF       , &
     WGNODE   => plt_biom%WGNODE     , &
-    WGNODN   => plt_biom%WGNODN     , &
-    WGNODP   => plt_biom%WGNODP     , &
     WGSHE    => plt_biom%WGSHE      , &
     WGLFLE   => plt_biom%WGLFLE     , &
     WGLFV    => plt_biom%WGLFV      , &
@@ -958,9 +942,9 @@ implicit none
   GRNOB(NB,NZ)=0._r8
   GRWTB(NB,NZ)=0._r8
   ARLFB(NB,NZ)=0._r8
-  WTSTXB(NB,NZ)=0._r8
-  WTSTXN(NB,NZ)=0._r8
-  WTSTXP(NB,NZ)=0._r8
+  WTSTXBE(NB,ielmc,NZ)=0._r8
+  WTSTXBE(NB,ielmn,NZ)=0._r8
+  WTSTXBE(NB,ielmp,NZ)=0._r8
   D8855: DO K=0,JNODS1
     IF(K.NE.0)THEN
       CPOOL3(K,NB,NZ)=0._r8
@@ -980,9 +964,9 @@ implicit none
     WSSHE(K,NB,NZ)=0._r8
     WGSHE(K,NB,ielmn,NZ)=0._r8
     WGSHE(K,NB,ielmp,NZ)=0._r8
-    WGNODE(K,NB,NZ)=0._r8
-    WGNODN(K,NB,NZ)=0._r8
-    WGNODP(K,NB,NZ)=0._r8
+    WGNODE(K,NB,ielmc,NZ)=0._r8
+    WGNODE(K,NB,ielmn,NZ)=0._r8
+    WGNODE(K,NB,ielmp,NZ)=0._r8
     D8865: DO L=1,JC1
       ARLFV(L,NZ)=ARLFV(L,NZ)-ARLFL(L,K,NB,NZ)
       WGLFV(L,NZ)=WGLFV(L,NZ)-WGLFLE(L,K,NB,ielmc,NZ)

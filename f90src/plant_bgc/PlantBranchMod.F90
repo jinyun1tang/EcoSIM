@@ -118,14 +118,11 @@ module PlantBranchMod
     WTRSVBE    =>  plt_biom%WTRSVBE   , &
     WTHSKBE    =>  plt_biom%WTHSKBE   , &
     WTEARBE    =>  plt_biom%WTEARBE   , &
-    WTSTXB     =>  plt_biom%WTSTXB    , &
-    WTSTXN     =>  plt_biom%WTSTXN    , &
-    WTSTXP     =>  plt_biom%WTSTXP    , &
+    WTSTXBE    =>  plt_biom%WTSTXBE   , &
     WGSHEXE    =>  plt_biom%WGSHEXE   , &
     WVSTKB     =>  plt_biom%WVSTKB    , &
     EPOOL      =>  plt_biom%EPOOL     , &
     WTLSB      =>  plt_biom%WTLSB     , &
-    WGNODN     =>  plt_biom%WGNODN    , &
     WGLFEX     =>  plt_biom%WGLFEX    , &
     WTSHEBE    =>  plt_biom%WTSHEBE   , &
     WTLFBE     =>  plt_biom%WTLFBE    , &
@@ -134,7 +131,6 @@ module PlantBranchMod
     WGSHE      =>  plt_biom%WGSHE     , &
     CEPOLB     =>  plt_biom%CEPOLB    , &
     WGNODE     =>  plt_biom%WGNODE    , &
-    WGNODP     =>  plt_biom%WGNODP    , &
     WSSHE      =>  plt_biom%WSSHE     , &
     WTGRBE     =>  plt_biom%WTGRBE    , &
     ZEROP      =>  plt_biom%ZEROP     , &
@@ -510,9 +506,9 @@ module PlantBranchMod
             IF(K1.EQ.0.AND.KK.NE.0)K1=25
             K2=MOD(KK-1,JNODS1)
             IF(K2.EQ.0.AND.KK-1.NE.0)K2=25
-            WGNODE(K1,NB,NZ)=WGNODE(K1,NB,NZ)+GRO
-            WGNODN(K1,NB,NZ)=WGNODN(K1,NB,NZ)+GRON
-            WGNODP(K1,NB,NZ)=WGNODP(K1,NB,NZ)+GROP
+            WGNODE(K1,NB,ielmc,NZ)=WGNODE(K1,NB,ielmc,NZ)+GRO
+            WGNODE(K1,NB,ielmn,NZ)=WGNODE(K1,NB,ielmn,NZ)+GRON
+            WGNODE(K1,NB,ielmp,NZ)=WGNODE(K1,NB,ielmp,NZ)+GROP
             HTNODX(K1,NB,NZ)=HTNODX(K1,NB,NZ)+GROH*ANGBR(NZ)
             IF(K1.NE.0)THEN
               HTNODE(K1,NB,NZ)=HTNODX(K1,NB,NZ)+HTNODE(K2,NB,NZ)
@@ -681,12 +677,12 @@ module PlantBranchMod
                 RCESX(NB,ielmn,NZ)=0._r8
                 RCESX(NB,ielmp,NZ)=0._r8
               ENDIF
-              WTSTXB(NB,NZ)=WTSTXB(NB,NZ)+WGNODE(K,NB,NZ)
-              WTSTXN(NB,NZ)=WTSTXN(NB,NZ)+WGNODN(K,NB,NZ)
-              WTSTXP(NB,NZ)=WTSTXP(NB,NZ)+WGNODP(K,NB,NZ)
-              WGNODE(K,NB,NZ)=0._r8
-              WGNODN(K,NB,NZ)=0._r8
-              WGNODP(K,NB,NZ)=0._r8
+              WTSTXBE(NB,ielmc,NZ)=WTSTXBE(NB,ielmc,NZ)+WGNODE(K,NB,ielmc,NZ)
+              WTSTXBE(NB,ielmn,NZ)=WTSTXBE(NB,ielmn,NZ)+WGNODE(K,NB,ielmn,NZ)
+              WTSTXBE(NB,ielmp,NZ)=WTSTXBE(NB,ielmp,NZ)+WGNODE(K,NB,ielmp,NZ)
+              WGNODE(K,NB,ielmc,NZ)=0._r8
+              WGNODE(K,NB,ielmn,NZ)=0._r8
+              WGNODE(K,NB,ielmp,NZ)=0._r8
               HTNODX(K,NB,NZ)=0._r8
             ENDIF
 !
@@ -1366,18 +1362,14 @@ module PlantBranchMod
     WTRSVBE    =>  plt_biom%WTRSVBE    , &
     WTSTKBE    =>  plt_biom%WTSTKBE    , &
     WGNODE     =>  plt_biom%WGNODE     , &
-    WGNODP     =>  plt_biom%WGNODP     , &
     WVSTKB     =>  plt_biom%WVSTKB     , &
-    WGNODN     =>  plt_biom%WGNODN     , &
     WGSHE      =>  plt_biom%WGSHE      , &
     WGLFE      =>  plt_biom%WGLFE      , &
     WSLF       =>  plt_biom%WSLF       , &
     WTRVE      =>  plt_biom%WTRVE      , &
     WTLFBE     =>  plt_biom%WTLFBE     , &
     WTSHEBE    =>  plt_biom%WTSHEBE    , &
-    WTSTXN     =>  plt_biom%WTSTXN     , &
-    WTSTXP     =>  plt_biom%WTSTXP     , &
-    WTSTXB     =>  plt_biom%WTSTXB     , &
+    WTSTXBE    =>  plt_biom%WTSTXBE    , &
     WSSHE      =>  plt_biom%WSSHE      , &
     ZEROP      =>  plt_biom%ZEROP      , &
     ZEROL      =>  plt_biom%ZEROL      , &
@@ -1752,10 +1744,10 @@ module PlantBranchMod
     !     RCCK,RCZK,RCPK=remobilization of C,N,P from senescing internode
     !     WGNODE,WGNODN,WGNODP=node stalk C,N,P mass
     !
-        IF(WGNODE(K,NB,NZ).GT.ZEROP(NZ))THEN
-          RCCK=RCSC*WGNODE(K,NB,NZ)
-          RCZK=WGNODN(K,NB,NZ)*(RCSN+(1.0_r8-RCSN)*RCSC)
-          RCPK=WGNODP(K,NB,NZ)*(RCSP+(1.0_r8-RCSP)*RCSC)
+        IF(WGNODE(K,NB,ielmc,NZ).GT.ZEROP(NZ))THEN
+          RCCK=RCSC*WGNODE(K,NB,ielmc,NZ)
+          RCZK=WGNODE(K,NB,ielmn,NZ)*(RCSN+(1.0_r8-RCSN)*RCSC)
+          RCPK=WGNODE(K,NB,ielmp,NZ)*(RCSP+(1.0_r8-RCSP)*RCSC)
     !
       !     FRACTION OF CURRENT NODE TO BE REMOBILIZED
       !
@@ -1778,17 +1770,17 @@ module PlantBranchMod
 !
           D7310: DO M=1,jsken
             ESNC(M,ielmc,0,0,NZ)=ESNC(M,ielmc,0,0,NZ)+CFOPE(istalk,M,ielmc,NZ) &
-              *FSNCK*(WGNODE(K,NB,NZ)-RCCK)*FWOOD(0)
+              *FSNCK*(WGNODE(K,NB,ielmc,NZ)-RCCK)*FWOOD(0)
             ESNC(M,ielmn,0,0,NZ)=ESNC(M,ielmn,0,0,NZ)+CFOPE(istalk,M,ielmn,NZ) &
-              *FSNCK*(WGNODN(K,NB,NZ)-RCZK)*FWOODN(0)
+              *FSNCK*(WGNODE(K,NB,ielmn,NZ)-RCZK)*FWOODN(0)
             ESNC(M,ielmp,0,0,NZ)=ESNC(M,ielmp,0,0,NZ)+CFOPE(istalk,M,ielmp,NZ) &
-              *FSNCK*(WGNODP(K,NB,NZ)-RCPK)*FWOODP(0)
+              *FSNCK*(WGNODE(K,NB,ielmp,NZ)-RCPK)*FWOODP(0)
             ESNC(M,ielmc,1,0,NZ)=ESNC(M,ielmc,0,0,NZ)+CFOPE(istalk,M,ielmc,NZ) &
-              *FSNCK*(WGNODE(K,NB,NZ)-RCCK)*FWOOD(1)
+              *FSNCK*(WGNODE(K,NB,ielmc,NZ)-RCCK)*FWOOD(1)
             ESNC(M,ielmn,1,0,NZ)=ESNC(M,ielmn,0,0,NZ)+CFOPE(istalk,M,ielmn,NZ) &
-              *FSNCK*(WGNODN(K,NB,NZ)-RCZK)*FWOODN(1)
+              *FSNCK*(WGNODE(K,NB,ielmn,NZ)-RCZK)*FWOODN(1)
             ESNC(M,ielmp,1,0,NZ)=ESNC(M,ielmp,0,0,NZ)+CFOPE(istalk,M,ielmp,NZ) &
-              *FSNCK*(WGNODP(K,NB,NZ)-RCPK)*FWOODP(1)
+              *FSNCK*(WGNODE(K,NB,ielmp,NZ)-RCPK)*FWOODP(1)
           ENDDO D7310
 !
       !     UPDATE STATE VARIABLES FOR REMOBILIZATION AND LITTERFALL
@@ -1797,13 +1789,13 @@ module PlantBranchMod
       !     HTNODE,HTNODX=living,senescing internode length
       !     WTSTKB,WTSTBN,WTSTBP,WGNODE,WGNODN,WGNODP=C,N,P mass in senescing internode
       !
-          WTSTKBE(NB,ielmc,NZ)=AZMAX1(WTSTKBE(NB,ielmc,NZ)-FSNCK*WGNODE(K,NB,NZ))
-          WTSTKBE(NB,ielmn,NZ)=AZMAX1(WTSTKBE(NB,ielmn,NZ)-FSNCK*WGNODN(K,NB,NZ))
-          WTSTKBE(NB,ielmp,NZ)=AZMAX1(WTSTKBE(NB,ielmp,NZ)-FSNCK*WGNODP(K,NB,NZ))
+          WTSTKBE(NB,ielmc,NZ)=AZMAX1(WTSTKBE(NB,ielmc,NZ)-FSNCK*WGNODE(K,NB,ielmc,NZ))
+          WTSTKBE(NB,ielmn,NZ)=AZMAX1(WTSTKBE(NB,ielmn,NZ)-FSNCK*WGNODE(K,NB,ielmn,NZ))
+          WTSTKBE(NB,ielmp,NZ)=AZMAX1(WTSTKBE(NB,ielmp,NZ)-FSNCK*WGNODE(K,NB,ielmp,NZ))
           HTNODE(K,NB,NZ)=HTNODE(K,NB,NZ)-FSNCK*HTNODX(K,NB,NZ)
-          WGNODE(K,NB,NZ)=WGNODE(K,NB,NZ)-FSNCK*WGNODE(K,NB,NZ)
-          WGNODN(K,NB,NZ)=WGNODN(K,NB,NZ)-FSNCK*WGNODN(K,NB,NZ)
-          WGNODP(K,NB,NZ)=WGNODP(K,NB,NZ)-FSNCK*WGNODP(K,NB,NZ)
+          WGNODE(K,NB,ielmc,NZ)=WGNODE(K,NB,ielmc,NZ)-FSNCK*WGNODE(K,NB,ielmc,NZ)
+          WGNODE(K,NB,ielmn,NZ)=WGNODE(K,NB,ielmn,NZ)-FSNCK*WGNODE(K,NB,ielmn,NZ)
+          WGNODE(K,NB,ielmp,NZ)=WGNODE(K,NB,ielmp,NZ)-FSNCK*WGNODE(K,NB,ielmp,NZ)
           HTNODX(K,NB,NZ)=HTNODX(K,NB,NZ)-FSNCK*HTNODX(K,NB,NZ)
 !
       !     FRACTION OF C REMOBILIZED FOR GROWTH RESPIRATION < 0 IS
@@ -1833,25 +1825,25 @@ module PlantBranchMod
         ELSE
           D7315: DO M=1,jsken
             ESNC(M,ielmc,0,0,NZ)=ESNC(M,ielmc,0,0,NZ)+CFOPE(istalk,M,ielmc,NZ) &
-              *WGNODE(K,NB,NZ)*FWOOD(0)
+              *WGNODE(K,NB,ielmc,NZ)*FWOOD(0)
             ESNC(M,ielmn,0,0,NZ)=ESNC(M,ielmn,0,0,NZ)+CFOPE(istalk,M,ielmn,NZ) &
-              *WGNODN(K,NB,NZ)*FWOODN(0)
+              *WGNODE(K,NB,ielmn,NZ)*FWOODN(0)
             ESNC(M,ielmp,0,0,NZ)=ESNC(M,ielmp,0,0,NZ)+CFOPE(istalk,M,ielmp,NZ) &
-              *WGNODP(K,NB,NZ)*FWOODP(0)
+              *WGNODE(K,NB,ielmp,NZ)*FWOODP(0)
             ESNC(M,ielmc,1,0,NZ)=ESNC(M,ielmc,0,0,NZ)+CFOPE(istalk,M,ielmc,NZ) &
-              *WGNODE(K,NB,NZ)*FWOOD(1)
+              *WGNODE(K,NB,ielmc,NZ)*FWOOD(1)
             ESNC(M,ielmn,1,0,NZ)=ESNC(M,ielmn,0,0,NZ)+CFOPE(istalk,M,ielmn,NZ) &
-              *WGNODN(K,NB,NZ)*FWOODN(1)
+              *WGNODE(K,NB,ielmn,NZ)*FWOODN(1)
             ESNC(M,ielmp,1,0,NZ)=ESNC(M,ielmp,0,0,NZ)+CFOPE(istalk,M,ielmp,NZ) &
-              *WGNODP(K,NB,NZ)*FWOODP(1)
+              *WGNODE(K,NB,ielmp,NZ)*FWOODP(1)
           ENDDO D7315
-          WTSTKBE(NB,ielmc,NZ)=AZMAX1(WTSTKBE(NB,ielmc,NZ)-WGNODE(K,NB,NZ))
-          WTSTKBE(NB,ielmn,NZ)=AZMAX1(WTSTKBE(NB,ielmn,NZ)-WGNODN(K,NB,NZ))
-          WTSTKBE(NB,ielmp,NZ)=AZMAX1(WTSTKBE(NB,ielmp,NZ)-WGNODP(K,NB,NZ))
+          WTSTKBE(NB,ielmc,NZ)=AZMAX1(WTSTKBE(NB,ielmc,NZ)-WGNODE(K,NB,ielmc,NZ))
+          WTSTKBE(NB,ielmn,NZ)=AZMAX1(WTSTKBE(NB,ielmn,NZ)-WGNODE(K,NB,ielmn,NZ))
+          WTSTKBE(NB,ielmp,NZ)=AZMAX1(WTSTKBE(NB,ielmp,NZ)-WGNODE(K,NB,ielmp,NZ))
           HTNODE(K,NB,NZ)=HTNODE(K,NB,NZ)-HTNODX(K,NB,NZ)
-          WGNODE(K,NB,NZ)=0._r8
-          WGNODN(K,NB,NZ)=0._r8
-          WGNODP(K,NB,NZ)=0._r8
+          WGNODE(K,NB,ielmc,NZ)=0._r8
+          WGNODE(K,NB,ielmn,NZ)=0._r8
+          WGNODE(K,NB,ielmp,NZ)=0._r8
           HTNODX(K,NB,NZ)=0._r8
         ENDIF
       ENDDO D1650
@@ -1861,10 +1853,10 @@ module PlantBranchMod
     !   RCCK,RCZK,RCPK=remobilization of C,N,P from senescing internode
     !   WTSTXB,WTSTXN,WTSTXP=residual C,N,P mass in senescing stalk
     !
-      IF(WTSTXB(NB,NZ).GT.ZEROP(NZ))THEN
-        RCCK=RCSC*WTSTXB(NB,NZ)
-        RCZK=WTSTXN(NB,NZ)*(RCSN+(1.0_r8-RCSN)*RCSC)
-        RCPK=WTSTXP(NB,NZ)*(RCSP+(1.0_r8-RCSP)*RCSC)
+      IF(WTSTXBE(NB,ielmc,NZ).GT.ZEROP(NZ))THEN
+        RCCK=RCSC*WTSTXBE(NB,ielmc,NZ)
+        RCZK=WTSTXBE(NB,ielmn,NZ)*(RCSN+(1.0_r8-RCSN)*RCSC)
+        RCPK=WTSTXBE(NB,ielmp,NZ)*(RCSP+(1.0_r8-RCSP)*RCSC)
     !
     !     FRACTION OF RESIDUAL STALK TO BE REMOBILIZED
     !
@@ -1884,17 +1876,17 @@ module PlantBranchMod
     !
         D8310: DO M=1,jsken
           ESNC(M,ielmc,0,0,NZ)=ESNC(M,ielmc,0,0,NZ)+CFOPE(istalk,M,ielmc,NZ) &
-            *FSNCR*(WTSTXB(NB,NZ)-RCCK)*FWOOD(0)
+            *FSNCR*(WTSTXBE(NB,ielmc,NZ)-RCCK)*FWOOD(0)
           ESNC(M,ielmn,0,0,NZ)=ESNC(M,ielmn,0,0,NZ)+CFOPE(istalk,M,ielmn,NZ) &
-            *FSNCR*(WTSTXN(NB,NZ)-RCZK)*FWOODN(0)
+            *FSNCR*(WTSTXBE(NB,ielmn,NZ)-RCZK)*FWOODN(0)
           ESNC(M,ielmp,0,0,NZ)=ESNC(M,ielmp,0,0,NZ)+CFOPE(istalk,M,ielmp,NZ) &
-            *FSNCR*(WTSTXP(NB,NZ)-RCPK)*FWOODP(0)
+            *FSNCR*(WTSTXBE(NB,ielmp,NZ)-RCPK)*FWOODP(0)
           ESNC(M,ielmc,1,0,NZ)=ESNC(M,ielmc,0,0,NZ)+CFOPE(istalk,M,ielmc,NZ) &
-            *FSNCR*(WTSTXB(NB,NZ)-RCCK)*FWOOD(1)
+            *FSNCR*(WTSTXBE(NB,ielmc,NZ)-RCCK)*FWOOD(1)
           ESNC(M,ielmn,1,0,NZ)=ESNC(M,ielmn,0,0,NZ)+CFOPE(istalk,M,ielmn,NZ) &
-            *FSNCR*(WTSTXN(NB,NZ)-RCZK)*FWOODN(1)
+            *FSNCR*(WTSTXBE(NB,ielmn,NZ)-RCZK)*FWOODN(1)
           ESNC(M,ielmp,1,0,NZ)=ESNC(M,ielmp,0,0,NZ)+CFOPE(istalk,M,ielmp,NZ) &
-            *FSNCR*(WTSTXP(NB,NZ)-RCPK)*FWOODP(1)
+            *FSNCR*(WTSTXBE(NB,ielmp,NZ)-RCPK)*FWOODP(1)
         ENDDO D8310
     !
     !     UPDATE STATE VARIABLES FOR REMOBILIZATION AND LITTERFALL
@@ -1905,17 +1897,17 @@ module PlantBranchMod
     !     HTNODE,HTNODX=living,senescing internode length
     !
         WTSTKBE(NB,ielmc,NZ)=AZMAX1(WTSTKBE(NB,ielmc,NZ) &
-          -FSNCR*WTSTXB(NB,NZ))
+          -FSNCR*WTSTXBE(NB,ielmc,NZ))
         WTSTKBE(NB,ielmn,NZ)=AZMAX1(WTSTKBE(NB,ielmn,NZ) &
-          -FSNCR*WTSTXN(NB,NZ))
+          -FSNCR*WTSTXBE(NB,ielmn,NZ))
         WTSTKBE(NB,ielmp,NZ)=AZMAX1(WTSTKBE(NB,ielmp,NZ) &
-          -FSNCR*WTSTXP(NB,NZ))
-        WTSTXB(NB,NZ)=AZMAX1(WTSTXB(NB,NZ) &
-          -FSNCR*WTSTXB(NB,NZ))
-        WTSTXN(NB,NZ)=AZMAX1(WTSTXN(NB,NZ) &
-          -FSNCR*WTSTXN(NB,NZ))
-        WTSTXP(NB,NZ)=AZMAX1(WTSTXP(NB,NZ) &
-          -FSNCR*WTSTXP(NB,NZ))
+          -FSNCR*WTSTXBE(NB,ielmp,NZ))
+        WTSTXBE(NB,ielmc,NZ)=AZMAX1(WTSTXBE(NB,ielmc,NZ) &
+          -FSNCR*WTSTXBE(NB,ielmc,NZ))
+        WTSTXBE(NB,ielmn,NZ)=AZMAX1(WTSTXBE(NB,ielmn,NZ) &
+          -FSNCR*WTSTXBE(NB,ielmn,NZ))
+        WTSTXBE(NB,ielmp,NZ)=AZMAX1(WTSTXBE(NB,ielmp,NZ) &
+          -FSNCR*WTSTXBE(NB,ielmp,NZ))
         HTNODZ=0._r8
         DO 8320 K=0,JNODS1
           HTNODZ=AMAX1(HTNODZ,HTNODE(K,NB,NZ))
@@ -1952,24 +1944,24 @@ module PlantBranchMod
     ELSE
       D8315: DO M=1,jsken
         ESNC(M,ielmc,0,0,NZ)=ESNC(M,ielmc,0,0,NZ)+CFOPE(istalk,M,ielmc,NZ) &
-          *WTSTXB(NB,NZ)*FWOOD(0)
+          *WTSTXBE(NB,ielmc,NZ)*FWOOD(0)
         ESNC(M,ielmn,0,0,NZ)=ESNC(M,ielmn,0,0,NZ)+CFOPE(istalk,M,ielmn,NZ) &
-          *WTSTXN(NB,NZ)*FWOODN(0)
+          *WTSTXBE(NB,ielmn,NZ)*FWOODN(0)
         ESNC(M,ielmp,0,0,NZ)=ESNC(M,ielmp,0,0,NZ)+CFOPE(istalk,M,ielmp,NZ) &
-          *WTSTXP(NB,NZ)*FWOODP(0)
+          *WTSTXBE(NB,ielmp,NZ)*FWOODP(0)
         ESNC(M,ielmc,1,0,NZ)=ESNC(M,ielmc,0,0,NZ)+CFOPE(istalk,M,ielmc,NZ) &
-          *WTSTXB(NB,NZ)*FWOOD(1)
+          *WTSTXBE(NB,ielmc,NZ)*FWOOD(1)
         ESNC(M,ielmn,1,0,NZ)=ESNC(M,ielmn,0,0,NZ)+CFOPE(istalk,M,ielmn,NZ) &
-          *WTSTXN(NB,NZ)*FWOODN(1)
+          *WTSTXBE(NB,ielmn,NZ)*FWOODN(1)
         ESNC(M,ielmp,1,0,NZ)=ESNC(M,ielmp,0,0,NZ)+CFOPE(istalk,M,ielmp,NZ) &
-          *WTSTXP(NB,NZ)*FWOODP(1)
+          *WTSTXBE(NB,ielmp,NZ)*FWOODP(1)
       ENDDO D8315
-      WTSTKBE(NB,ielmc,NZ)=AZMAX1(WTSTKBE(NB,ielmc,NZ)-WTSTXB(NB,NZ))
-      WTSTKBE(NB,ielmn,NZ)=AZMAX1(WTSTKBE(NB,ielmn,NZ)-WTSTXN(NB,NZ))
-      WTSTKBE(NB,ielmp,NZ)=AZMAX1(WTSTKBE(NB,ielmp,NZ)-WTSTXP(NB,NZ))
-      WTSTXB(NB,NZ)=0._r8
-      WTSTXN(NB,NZ)=0._r8
-      WTSTXP(NB,NZ)=0._r8
+      WTSTKBE(NB,ielmc,NZ)=AZMAX1(WTSTKBE(NB,ielmc,NZ)-WTSTXBE(NB,ielmc,NZ))
+      WTSTKBE(NB,ielmn,NZ)=AZMAX1(WTSTKBE(NB,ielmn,NZ)-WTSTXBE(NB,ielmn,NZ))
+      WTSTKBE(NB,ielmp,NZ)=AZMAX1(WTSTKBE(NB,ielmp,NZ)-WTSTXBE(NB,ielmp,NZ))
+      WTSTXBE(NB,ielmc,NZ)=0._r8
+      WTSTXBE(NB,ielmn,NZ)=0._r8
+      WTSTXBE(NB,ielmp,NZ)=0._r8
     ENDIF
 !
 !     REMOBILIZATION OF STORAGE C,N,P
@@ -2612,8 +2604,7 @@ module PlantBranchMod
     WTGRBE   =>  plt_biom%WTGRBE     , &
     WGLFE    =>  plt_biom%WGLFE      , &
     WTRTD    =>  plt_biom%WTRTD      , &
-    WTSTXB   =>  plt_biom%WTSTXB     , &
-    WTSTXP   =>  plt_biom%WTSTXP     , &
+    WTSTXBE  =>  plt_biom%WTSTXBE    , &
     WTSTKBE  =>  plt_biom%WTSTKBE    , &
     EPOOLR   =>  plt_biom%EPOOLR     , &
     WTSHEBE  =>  plt_biom%WTSHEBE    , &
@@ -2624,10 +2615,7 @@ module PlantBranchMod
     WGSHE    =>  plt_biom%WGSHE      , &
     WTLFBE   =>  plt_biom%WTLFBE     , &
     WTRVE    =>  plt_biom%WTRVE      , &
-    WTSTXN   =>  plt_biom%WTSTXN     , &
     WGNODE   =>  plt_biom%WGNODE     , &
-    WGNODN   =>  plt_biom%WGNODN     , &
-    WGNODP   =>  plt_biom%WGNODP     , &
     FWODLP   =>  plt_allom%FWODLP    , &
     FWODLN   =>  plt_allom%FWODLN    , &
     FWODSN   =>  plt_allom%FWODSN    , &
@@ -2818,15 +2806,15 @@ module PlantBranchMod
             WTSTKBE(NB,ielmc,NZ)=0._r8
             WTSTKBE(NB,ielmn,NZ)=0._r8
             WTSTKBE(NB,ielmp,NZ)=0._r8
-            WTSTXB(NB,NZ)=0._r8
-            WTSTXN(NB,NZ)=0._r8
-            WTSTXP(NB,NZ)=0._r8
+            WTSTXBE(NB,ielmc,NZ)=0._r8
+            WTSTXBE(NB,ielmn,NZ)=0._r8
+            WTSTXBE(NB,ielmp,NZ)=0._r8
             D6340: DO K=0,JNODS1
               HTNODE(K,NB,NZ)=0._r8
               HTNODX(K,NB,NZ)=0._r8
-              WGNODE(K,NB,NZ)=0._r8
-              WGNODN(K,NB,NZ)=0._r8
-              WGNODP(K,NB,NZ)=0._r8
+              WGNODE(K,NB,ielmc,NZ)=0._r8
+              WGNODE(K,NB,ielmn,NZ)=0._r8
+              WGNODE(K,NB,ielmp,NZ)=0._r8
             ENDDO D6340
           ENDIF
         ENDIF
@@ -2834,8 +2822,7 @@ module PlantBranchMod
 !
   !   SPRING OR FALL FLAG RESET
   !
-      IF(IFLGE(NB,NZ).EQ.0 &
-        .AND.VRNS(NB,NZ).GE.VRNL(NB,NZ))THEN
+      IF(IFLGE(NB,NZ).EQ.0.AND.VRNS(NB,NZ).GE.VRNL(NB,NZ))THEN
         IFLGE(NB,NZ)=1
         IFLGF(NB,NZ)=0
         IFLGR(NB,NZ)=0
@@ -2899,15 +2886,15 @@ module PlantBranchMod
       WTSTKBE(NB,ielmc,NZ)=(1.0_r8-FSNR)*WTSTKBE(NB,ielmc,NZ)
       WTSTKBE(NB,ielmn,NZ)=(1.0_r8-FSNR)*WTSTKBE(NB,ielmn,NZ)
       WTSTKBE(NB,ielmp,NZ)=(1.0_r8-FSNR)*WTSTKBE(NB,ielmp,NZ)
-      WTSTXB(NB,NZ)=(1.0_r8-FSNR)*WTSTXB(NB,NZ)
-      WTSTXN(NB,NZ)=(1.0_r8-FSNR)*WTSTXN(NB,NZ)
-      WTSTXP(NB,NZ)=(1.0_r8-FSNR)*WTSTXP(NB,NZ)
+      WTSTXBE(NB,ielmc,NZ)=(1.0_r8-FSNR)*WTSTXBE(NB,ielmc,NZ)
+      WTSTXBE(NB,ielmn,NZ)=(1.0_r8-FSNR)*WTSTXBE(NB,ielmn,NZ)
+      WTSTXBE(NB,ielmp,NZ)=(1.0_r8-FSNR)*WTSTXBE(NB,ielmp,NZ)
       D2010: DO K=0,JNODS1
     !     HTNODE(K,NB,NZ)=(1.0_r8-FSNR)*HTNODE(K,NB,NZ)
         HTNODX(K,NB,NZ)=(1.0_r8-FSNR)*HTNODX(K,NB,NZ)
-        WGNODE(K,NB,NZ)=(1.0_r8-FSNR)*WGNODE(K,NB,NZ)
-        WGNODN(K,NB,NZ)=(1.0_r8-FSNR)*WGNODN(K,NB,NZ)
-        WGNODP(K,NB,NZ)=(1.0_r8-FSNR)*WGNODP(K,NB,NZ)
+        WGNODE(K,NB,ielmc,NZ)=(1.0_r8-FSNR)*WGNODE(K,NB,ielmc,NZ)
+        WGNODE(K,NB,ielmn,NZ)=(1.0_r8-FSNR)*WGNODE(K,NB,ielmn,NZ)
+        WGNODE(K,NB,ielmp,NZ)=(1.0_r8-FSNR)*WGNODE(K,NB,ielmp,NZ)
       ENDDO D2010
     ENDIF
 !

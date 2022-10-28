@@ -157,9 +157,9 @@
             READ(27,92)IDATE,IYR,NZ,(RCESX(NB,ielmn,NZ,NY,NX),NB=1,NBR(NZ,NY,NX))
             READ(27,92)IDATE,IYR,NZ,(RCESX(NB,ielmp,NZ,NY,NX),NB=1,NBR(NZ,NY,NX))
             READ(27,92)IDATE,IYR,NZ,(RCESX(NB,ielmc,NZ,NY,NX),NB=1,NBR(NZ,NY,NX))
-            READ(27,92)IDATE,IYR,NZ,(WTSTXB(NB,NZ,NY,NX),NB=1,NBR(NZ,NY,NX))
-            READ(27,92)IDATE,IYR,NZ,(WTSTXN(NB,NZ,NY,NX),NB=1,NBR(NZ,NY,NX))
-            READ(27,92)IDATE,IYR,NZ,(WTSTXP(NB,NZ,NY,NX),NB=1,NBR(NZ,NY,NX))
+            READ(27,92)IDATE,IYR,NZ,(WTSTXBE(NB,ielmc,NZ,NY,NX),NB=1,NBR(NZ,NY,NX))
+            READ(27,92)IDATE,IYR,NZ,(WTSTXBE(NB,ielmn,NZ,NY,NX),NB=1,NBR(NZ,NY,NX))
+            READ(27,92)IDATE,IYR,NZ,(WTSTXBE(NB,ielmp,NZ,NY,NX),NB=1,NBR(NZ,NY,NX))
             READ(27,94)IDATE,IYR,NZ,(ARLFV(L,NZ,NY,NX),L=1,JC)
             READ(27,94)IDATE,IYR,NZ,(ARSTV(L,NZ,NY,NX),L=1,JC)
             D9945: DO NB=1,NBR(NQ,NY,NX)
@@ -175,13 +175,13 @@
               READ(28,93)IDATE,IYR,NZ,(WSSHE(K,NB,NZ,NY,NX),K=0,JNODS)
               READ(28,93)IDATE,IYR,NZ,(HTNODE(K,NB,NZ,NY,NX),K=0,JNODS)
               READ(28,93)IDATE,IYR,NZ,(HTNODX(K,NB,NZ,NY,NX),K=0,JNODS)
-              READ(28,93)IDATE,IYR,NZ,(WGNODE(K,NB,NZ,NY,NX),K=0,JNODS)
+              READ(28,93)IDATE,IYR,NZ,(WGNODE(K,NB,ielmc,NZ,NY,NX),K=0,JNODS)
               READ(28,93)IDATE,IYR,NZ,(WGLFE(K,NB,ielmn,NZ,NY,NX),K=0,JNODS)
               READ(28,93)IDATE,IYR,NZ,(WGSHE(K,NB,ielmn,NZ,NY,NX),K=0,JNODS)
-              READ(28,93)IDATE,IYR,NZ,(WGNODN(K,NB,NZ,NY,NX),K=0,JNODS)
+              READ(28,93)IDATE,IYR,NZ,(WGNODE(K,NB,ielmn,NZ,NY,NX),K=0,JNODS)
               READ(28,93)IDATE,IYR,NZ,(WGLFE(K,NB,ielmp,NZ,NY,NX),K=0,JNODS)
               READ(28,93)IDATE,IYR,NZ,(WGSHE(K,NB,ielmp,NZ,NY,NX),K=0,JNODS)
-              READ(28,93)IDATE,IYR,NZ,(WGNODP(K,NB,NZ,NY,NX),K=0,JNODS)
+              READ(28,93)IDATE,IYR,NZ,(WGNODE(K,NB,ielmp,NZ,NY,NX),K=0,JNODS)
               D9950: DO K=0,JNODS
                 READ(28,94)IDATE,IYR,NZ,(ARLFL(L,K,NB,NZ,NY,NX),L=1,JC)
                 READ(28,94)IDATE,IYR,NZ,(WGLFLE(L,K,NB,ielmc,NZ,NY,NX),L=1,JC)
@@ -242,10 +242,10 @@
               READ(29,94)IDATE,IYR,NZ,(EPOOLR(ielmn,N,L,NZ,NY,NX),L=1,NJ(NY,NX))
               READ(29,94)IDATE,IYR,NZ,(EPOOLR(ielmp,N,L,NZ,NY,NX),L=1,NJ(NY,NX))
               READ(29,94)IDATE,IYR,NZ,(RTDP1(N,NR,NZ,NY,NX),NR=1,NRT(NZ,NY,NX))
-              READ(29,94)IDATE,IYR,NZ,(RTWT1(N,NR,NZ,NY,NX),NR=1,NRT(NZ,NY,NX))
-              READ(29,94)IDATE,IYR,NZ,(RTWT1N(N,NR,NZ,NY,NX),NR=1,NRT(NZ,NY,NX))
-              READ(29,94)IDATE,IYR,NZ,(RTWT1P(N,NR,NZ,NY,NX),NR=1,NRT(NZ,NY,NX))
-              DO 9965 NR=1,NRT(NZ,NY,NX)
+              READ(29,94)IDATE,IYR,NZ,(RTWT1E(N,NR,ielmc,NZ,NY,NX),NR=1,NRT(NZ,NY,NX))
+              READ(29,94)IDATE,IYR,NZ,(RTWT1E(N,NR,ielmn,NZ,NY,NX),NR=1,NRT(NZ,NY,NX))
+              READ(29,94)IDATE,IYR,NZ,(RTWT1E(N,NR,ielmp,NZ,NY,NX),NR=1,NRT(NZ,NY,NX))
+              D9965: DO NR=1,NRT(NZ,NY,NX)
                 READ(29,94)IDATE,IYR,NZ,(RTN2(N,L,NR,NZ,NY,NX),L=1,NJ(NY,NX))
                 READ(29,94)IDATE,IYR,NZ,(RTLG1(N,L,NR,NZ,NY,NX),L=1,NJ(NY,NX))
                 READ(29,94)IDATE,IYR,NZ,(WTRT1E(ielmc,N,L,NR,NZ,NY,NX),L=1,NJ(NY,NX))
@@ -255,7 +255,7 @@
                 READ(29,94)IDATE,IYR,NZ,(WTRT2E(ielmn,N,L,NR,NZ,NY,NX),L=1,NJ(NY,NX))
                 READ(29,94)IDATE,IYR,NZ,(WTRT2E(ielmp,N,L,NR,NZ,NY,NX),L=1,NJ(NY,NX))
                 READ(29,94)IDATE,IYR,NZ,(RTLG2(N,L,NR,NZ,NY,NX),L=1,NJ(NY,NX))
-9965          CONTINUE
+              ENDDO D9965
 9970        CONTINUE
             READ(29,94)IDATE,IYR,NZ,(EPOOLN(L,ielmc,NZ,NY,NX),L=1,NJ(NY,NX))
             READ(29,94)IDATE,IYR,NZ,(EPOOLN(L,ielmn,NZ,NY,NX),L=1,NJ(NY,NX))
@@ -282,9 +282,9 @@
           IYRH(NZ,NY,NX)=IYRH2(NZ,NY,NX)
         ENDIF
         IF(IFLGT(NY,NX).GT.0)THEN
-          DO 9880 NZ=1,NP(NY,NX)
+          D9880: DO NZ=1,NP(NY,NX)
             IF(IFLGC(NZ,NY,NX).EQ.1)THEN
-              DO 9600 NB=NBR(NZ,NY,NX)+1,10
+              D9600: DO NB=NBR(NZ,NY,NX)+1,10
                 IFLGA(NB,NZ,NY,NX)=0
                 IFLGE(NB,NZ,NY,NX)=1
                 IFLGF(NB,NZ,NY,NX)=0
@@ -337,9 +337,7 @@
                 WGLFEX(NB,1:npelms,NZ,NY,NX)=0.0
                 ARLFZ(NB,NZ,NY,NX)=0.0
                 RCESX(NB,1:npelms,NZ,NY,NX)=0.0
-                WTSTXB(NB,NZ,NY,NX)=0.0
-                WTSTXN(NB,NZ,NY,NX)=0.0
-                WTSTXP(NB,NZ,NY,NX)=0.0
+                WTSTXBE(NB,1:npelms,NZ,NY,NX)=0.0
                 WGSHEXE(NB,1:npelms,NZ,NY,NX)=0.0
                 HTSHEX(NB,NZ,NY,NX)=0.0
                 D5: DO L=1,JZ
@@ -348,8 +346,8 @@
                     SURFB(N,L,NB,NZ,NY,NX)=0.0
                   ENDDO
                 ENDDO D5
-9600          CONTINUE
-              DO 9610 NB=NBR(NZ,NY,NX)+1,10
+              ENDDO D9600
+              D9610: DO NB=NBR(NZ,NY,NX)+1,JBR
                 D9620: DO K=0,JNODS
                   ARLF(K,NB,NZ,NY,NX)=0.0
                   HTNODE(K,NB,NZ,NY,NX)=0.0
@@ -359,9 +357,7 @@
                   WSLF(K,NB,NZ,NY,NX)=0.0
                   WGSHE(K,NB,1:npelms,NZ,NY,NX)=0.0
                   WSSHE(K,NB,NZ,NY,NX)=0.0
-                  WGNODE(K,NB,NZ,NY,NX)=0.0
-                  WGNODN(K,NB,NZ,NY,NX)=0.0
-                  WGNODP(K,NB,NZ,NY,NX)=0.0
+                  WGNODE(K,NB,1:npelms,NZ,NY,NX)=0.0
                   D55: DO L=1,JZ
                     ARLFL(L,K,NB,NZ,NY,NX)=0.0
                     WGLFLE(L,K,NB,1:npelms,NZ,NY,NX)=0.0
@@ -378,8 +374,8 @@
                     ENDDO D45
                   ENDIF
                 ENDDO D9620
-9610          CONTINUE
-              DO 9700 NR=NRT(NZ,NY,NX)+1,10
+              ENDDO D9610
+              D9700: DO NR=NRT(NZ,NY,NX)+1,10
                 D9705: DO N=1,MY(NZ,NY,NX)
                   RTDP1(N,NR,NZ,NY,NX)=AMAX1(0.0,SDPTH(NZ,NY,NX) &
                     +CDPTH(NU(NY,NX),NY,NX)-DLYR(3,NU(NY,NX),NY,NX))
@@ -390,9 +386,9 @@
                     RTLG2(N,L,NR,NZ,NY,NX)=0.0
                   ENDDO D9710
                 ENDDO D9705
-9700          CONTINUE
+              ENDDO D9700
             ENDIF
-9880      CONTINUE
+          ENDDO D9880
         ENDIF
 9885  CONTINUE
 9890  CONTINUE
