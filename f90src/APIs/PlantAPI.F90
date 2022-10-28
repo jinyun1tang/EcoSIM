@@ -150,12 +150,8 @@ implicit none
   FERT(3,I1,NY,NX) =plt_distb%FERT(3)
   IYTYP(2,I1,NY,NX)=plt_distb%IYTYP
   FWOODE(1:npelms,0:1) =plt_allom%FWOODE(1:npelms,0:1)
-  FWODR(:) =plt_allom%FWODR(:)
-  FWODRN(:)=plt_allom%FWODRN(:)
-  FWODRP(:)=plt_allom%FWODRP(:)
-  FWODSN(:)=plt_allom%FWODSN(:)
-  FWODSP(:)=plt_allom%FWODSP(:)
-  FWODB(:) =plt_allom%FWODB(:)
+  FWODRE(1:npelms,0:1) =plt_allom%FWODRE(1:npelms,0:1)
+  FWODBE(1:npelms,0:1) =plt_allom%FWODBE(1:npelms,0:1)
   FWODLP(:)=plt_allom%FWODLP(:)
   FWODLN(:)=plt_allom%FWODLN(:)
   VOLWOU   =plt_site%VOLWOU
@@ -1066,12 +1062,8 @@ implicit none
   ENDDO
 
   plt_allom%FWOODE(1:npelms,0:1)=FWOODE(1:npelms,0:1)
-  plt_allom%FWODR(:)=FWODR(:)
-  plt_allom%FWODRN(:)=FWODRN(:)
-  plt_allom%FWODSN(:)=FWODSN(:)
-  plt_allom%FWODRP(:)=FWODRP(:)
-  plt_allom%FWODSP(:)=FWODSP(:)
-  plt_allom%FWODB(:)=FWODB(:)
+  plt_allom%FWODRE(1:npelms,0:1)=FWODRE(1:npelms,0:1)
+  plt_allom%FWODBE(1:npelms,0:1)=FWODBE(1:npelms,0:1)
   plt_allom%FWODLP(:)=FWODLP(:)
   plt_allom%FWODLN(:)=FWODLN(:)
 

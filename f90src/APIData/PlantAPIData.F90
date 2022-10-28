@@ -21,6 +21,7 @@ implicit none
   integer, pointer :: jsken       !number of kinetic components in litter,  PROTEIN(*,1),CH2O(*,2),CELLULOSE(*,3),LIGNIN(*,4) IN SOIL LITTER
   integer, pointer :: Jlitgrp     !number of litter groups nonstructural(0,*),
                           !     foliar(1,*),non-foliar(2,*),stalk(3,*),root(4,*), coarse woody (5,*)
+  integer, pointer :: JPRT        !number of organs involved in partition
 
 !begin_data
 
@@ -474,15 +475,11 @@ implicit none
   real(r8), pointer :: CPRSV(:)    => null()  !reserve P:C ratio, [gP gC-1]
   real(r8), pointer :: CPGR(:)     => null()  !grain P:C ratio, [gP gP-1]
   real(r8), pointer :: CNSTK(:)    => null()  !stalk N:C ratio, [gN gC-1]
-  real(r8), pointer :: FWODB(:)    => null()  !woody C allocation
+  real(r8), pointer :: FWODBE(:,:) => null()  !woody C allocation
   real(r8), pointer :: FWODLN(:)   => null()  !leaf N allocation
   real(r8), pointer :: FWODLP(:)   => null()  !leaf P allocation
-  real(r8), pointer :: FWODSP(:)   => null()  !P woody fraction in petiole
-  real(r8), pointer :: FWODSN(:)   => null()  !N woody fraction in petiole
-  real(r8), pointer :: FWODRN(:)   => null()  !N woody fraction in root
-  real(r8), pointer :: FWODRP(:)   => null()  !P woody fraction in root
-  real(r8), pointer :: FWODR(:)    => null()  !C woody fraction in root
-  real(r8), pointer :: FWOODE(:,:)  => null()  !woody element allocation
+  real(r8), pointer :: FWODRE(:,:) => null()  !C woody fraction in root
+  real(r8), pointer :: FWOODE(:,:) => null()  !woody element allocation
   real(r8), pointer :: FVRN(:)     => null()  !allocation parameter
   real(r8), pointer :: DMLF(:)     => null()  !leaf growth yield, [g g-1]
   real(r8), pointer :: CNGR(:)     => null()  !grain N:C ratio, [g g-1]
@@ -1509,12 +1506,8 @@ implicit none
   allocate(this%FWOODE(npelms,0:1))
   allocate(this%FWODLP(0:1))
   allocate(this%FWODLN(0:1))
-  allocate(this%FWODR(0:1))
-  allocate(this%FWODSP(0:1))
-  allocate(this%FWODB(0:1))
-  allocate(this%FWODSN(0:1))
-  allocate(this%FWODRN(0:1))
-  allocate(this%FWODRP(0:1))
+  allocate(this%FWODRE(npelms,0:1))
+  allocate(this%FWODBE(npelms,0:1))
 
   allocate(this%DMSHE(JP1))
   allocate(this%DMHSK(JP1))
@@ -1566,12 +1559,8 @@ implicit none
 !  if(allocated(FWODLP))deallocate(FWODLP)
 !  if(allocated(FWODLN))deallocate(FWODLN)
 !  if(allocated(FWOODE))deallocate(FWOODE)
-!  if(allocated(FWODR))deallocate(FWODR)
-!  if(allocated(FWODRN))deallocate(FWODRN)
-!  if(allocated(FWODSN))deallocate(FWODSN)
-!  if(allocated(FWODSP))deallocate(FWODSP)
-!  if(allocated(FWODB))deallocate(FWODB)
-!  if(allocated(FWODRP))deallocate(FWODRP)
+!  if(allocated(FWODRE))deallocate(FWODRE)
+!  if(allocated(FWODBE))deallocate(FWODBE)
 !  if(allocated(CPEAR))deallocate(CPEAR)
 !  if(allocated(CPHSK))deallocate(CPHSK)
 !  if(allocated(CNHSK))deallocate(CNHSK)
@@ -1926,6 +1915,7 @@ implicit none
   Jlitgrp=> pltpar%Jlitgrp
   JBR    => pltpar%JBR
   JRS    => pltpar%JRS
+  JPRT   => pltpar%JPRT
   jpstgs => pltpar%jpstgs
 
   call plt_site%Init()

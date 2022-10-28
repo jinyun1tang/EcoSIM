@@ -170,6 +170,7 @@ module GrosubPars
   integer  :: jsken       !number of kinetic components in litter,  PROTEIN(*,1),CH2O(*,2),CELLULOSE(*,3),LIGNIN(*,4) IN SOIL LITTER
   integer  :: Jlitgrp     !number of litter groups nonstructural(0,*),
                           !     foliar(1,*),non-foliar(2,*),stalk(3,*),root(4,*), coarse woody (5,*)
+  integer  :: JPRT
   end type plant_bgc_par_type
 
   type(plant_bgc_par_type), target, public :: pltpar
@@ -186,6 +187,7 @@ module GrosubPars
   pltpar%icwood=5
   pltpar%jpstgs=10
   pltpar%JRS=10
+  pltpar%JPRT=7
 
   PART1X=0.05_r8
   PART2X=0.02_r8

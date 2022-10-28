@@ -395,15 +395,11 @@ module grosubsMod
     CNRT   =>  plt_allom%CNRT     , &
     CPRT   =>  plt_allom%CPRT     , &
     FVRN   =>  plt_allom%FVRN     , &
-    FWODRN =>  plt_allom%FWODRN   , &
     FWODLN =>  plt_allom%FWODLN   , &
     FWODLP =>  plt_allom%FWODLP   , &
-    FWODSP =>  plt_allom%FWODSP   , &
-    FWODRP =>  plt_allom%FWODRP   , &
-    FWODSN =>  plt_allom%FWODSN   , &
-    FWODB  =>  plt_allom%FWODB    , &
+    FWODBE =>  plt_allom%FWODBE   , &
     FWOODE =>  plt_allom%FWOODE   , &
-    FWODR  =>  plt_allom%FWODR    , &
+    FWODRE =>  plt_allom%FWODRE   , &
     CNLF   =>  plt_allom%CNLF     , &
     CPLF   =>  plt_allom%CPLF     , &
     CNSHE  =>  plt_allom%CNSHE    , &
@@ -451,39 +447,39 @@ module grosubsMod
 !     FWOODN,FWOODP=N,P woody fraction in stalk:0=woody,1=non-woody
 !
   IF(IBTYP(NZ).EQ.0.OR.IGTYP(NZ).LE.1.OR.WTSTKE(ielmc,NZ).LE.ZEROP(NZ))THEN
-    FWODB(1)=1.0_r8
+    FWODBE(ielmc,1)=1.0_r8
     FWOODE(ielmc,1)=1.0_r8
-    FWODR(1)=1.0_r8
+    FWODRE(ielmc,1)=1.0_r8
   ELSE
-    FWODB(1)=1.0_r8
+    FWODBE(ielmc,1)=1.0_r8
     FWOODE(ielmc,1)=SQRT(WVSTK(NZ)/WTSTKE(ielmc,NZ))
-    FWODR(1)=SQRT(FRTX*WVSTK(NZ)/WTSTKE(ielmc,NZ))
+    FWODRE(ielmc,1)=SQRT(FRTX*WVSTK(NZ)/WTSTKE(ielmc,NZ))
   ENDIF
-  FWODB(0)=1.0_r8-FWODB(1)
+  FWODBE(ielmc,0)=1.0_r8-FWODBE(ielmc,1)
   FWOODE(ielmc,0)=1.0_r8-FWOODE(ielmc,1)
-  FWODR(0)=1.0_r8-FWODR(1)
-  CNLFW=FWODB(0)*CNSTK(NZ)+FWODB(1)*CNLF(NZ)
-  CPLFW=FWODB(0)*CPSTK(NZ)+FWODB(1)*CPLF(NZ)
-  CNSHW=FWODB(0)*CNSTK(NZ)+FWODB(1)*CNSHE(NZ)
-  CPSHW=FWODB(0)*CPSTK(NZ)+FWODB(1)*CPSHE(NZ)
-  CNRTW=FWODR(0)*CNSTK(NZ)+FWODR(1)*CNRT(NZ)
-  CPRTW=FWODR(0)*CPSTK(NZ)+FWODR(1)*CPRT(NZ)
-  FWODLN(0)=FWODB(0)*CNSTK(NZ)/CNLFW
-  FWODLP(0)=FWODB(0)*CPSTK(NZ)/CPLFW
-  FWODSN(0)=FWODB(0)*CNSTK(NZ)/CNSHW
-  FWODSP(0)=FWODB(0)*CPSTK(NZ)/CPSHW
+  FWODRE(ielmc,0)=1.0_r8-FWODRE(ielmc,1)
+  CNLFW=FWODBE(ielmc,0)*CNSTK(NZ)+FWODBE(ielmc,1)*CNLF(NZ)
+  CPLFW=FWODBE(ielmc,0)*CPSTK(NZ)+FWODBE(ielmc,1)*CPLF(NZ)
+  CNSHW=FWODBE(ielmc,0)*CNSTK(NZ)+FWODBE(ielmc,1)*CNSHE(NZ)
+  CPSHW=FWODBE(ielmc,0)*CPSTK(NZ)+FWODBE(ielmc,1)*CPSHE(NZ)
+  CNRTW=FWODRE(ielmc,0)*CNSTK(NZ)+FWODRE(ielmc,1)*CNRT(NZ)
+  CPRTW=FWODRE(ielmc,0)*CPSTK(NZ)+FWODRE(ielmc,1)*CPRT(NZ)
+  FWODLN(0)=FWODBE(ielmc,0)*CNSTK(NZ)/CNLFW
+  FWODLP(0)=FWODBE(ielmc,0)*CPSTK(NZ)/CPLFW
+  FWODBE(ielmn,0)=FWODBE(ielmc,0)*CNSTK(NZ)/CNSHW
+  FWODBE(ielmp,0)=FWODBE(ielmc,0)*CPSTK(NZ)/CPSHW
   FWOODE(ielmn,0)=FWOODE(ielmc,0)*CNSTK(NZ)/CNRTW
   FWOODE(ielmp,0)=FWOODE(ielmc,0)*CPSTK(NZ)/CPRTW
-  FWODRN(0)=FWODR(0)*CNRT(NZ)/CNRTW
-  FWODRP(0)=FWODR(0)*CPRT(NZ)/CPRTW
+  FWODRE(ielmn,0)=FWODRE(ielmc,0)*CNRT(NZ)/CNRTW
+  FWODRE(ielmp,0)=FWODRE(ielmc,0)*CPRT(NZ)/CPRTW
   FWODLN(1)=1.0_r8-FWODLN(0)
   FWODLP(1)=1.0_r8-FWODLP(0)
-  FWODSN(1)=1.0_r8-FWODSN(0)
-  FWODSP(1)=1.0_r8-FWODSP(0)
+  FWODBE(ielmn,1)=1.0_r8-FWODBE(ielmn,0)
+  FWODBE(ielmp,1)=1.0_r8-FWODBE(ielmp,0)
   FWOODE(ielmn,1)=1.0_r8-FWOODE(ielmn,0)
   FWOODE(ielmp,1)=1.0_r8-FWOODE(ielmp,0)
-  FWODRN(1)=1.0_r8-FWODRN(0)
-  FWODRP(1)=1.0_r8-FWODRP(0)
+  FWODRE(ielmn,1)=1.0_r8-FWODRE(ielmn,0)
+  FWODRE(ielmp,1)=1.0_r8-FWODRE(ielmp,0)
 !
 !     SHOOT AND ROOT TEMPERATURE FUNCTIONS FOR MAINTENANCE
 !     RESPIRATION FROM TEMPERATURES WITH OFFSETS FOR THERMAL ADAPTATION

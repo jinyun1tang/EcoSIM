@@ -122,7 +122,7 @@ implicit none
     WTRTE    =>   plt_biom%WTRTE      , &
     ZEROP    =>   plt_biom%ZEROP      , &
     WTRVE    =>   plt_biom%WTRVE      , &
-    FWODR    =>   plt_allom%FWODR     , &
+    FWODRE   =>   plt_allom%FWODRE    , &
     DMRT     =>   plt_allom%DMRT      , &
     IGTYP    =>   plt_pheno%IGTYP     , &
     PSIRT    =>   plt_ew%PSIRT        , &
@@ -273,8 +273,8 @@ implicit none
 !     CO2P,OXYP,CH4P,Z2OP,ZH3P,H2GP=root aqueous CO2,O2,CH4,N2O,NH3,H2
 !
         IF(N.EQ.1)THEN
-          RTLGZ=RTLGZ*FWODR(1)
-          RTLGL=RTLGL*FWODR(1)
+          RTLGZ=RTLGZ*FWODRE(ielmc,1)
+          RTLGL=RTLGL*FWODRE(ielmc,1)
         ENDIF
         RTLGX=RTLGZ*PP(NZ)
         RTLGT=RTLGL+RTLGX
@@ -411,9 +411,7 @@ implicit none
     ESNC    =>  plt_bgcr%ESNC       , &
     CNWS    =>  plt_allom%CNWS      , &
     CPWS    =>  plt_allom%CPWS      , &
-    FWODR   =>  plt_allom%FWODR     , &
-    FWODRN  =>  plt_allom%FWODRN    , &
-    FWODRP  =>  plt_allom%FWODRP    , &
+    FWODRE  =>  plt_allom%FWODRE    , &
     CNRTS   =>  plt_allom%CNRTS     , &
     CPRTS   =>  plt_allom%CPRTS     , &
     DMRT    =>  plt_allom%DMRT      , &
@@ -659,17 +657,17 @@ implicit none
 !
       D6350: DO M=1,jsken
         ESNC(M,ielmc,0,L,NZ)=ESNC(M,ielmc,0,L,NZ)+CFOPE(5,M,ielmc,NZ) &
-          *FSNC2*(WTRT2E(ielmc,N,L,NR,NZ)-RCCR)*FWODR(0)
+          *FSNC2*(WTRT2E(ielmc,N,L,NR,NZ)-RCCR)*FWODRE(ielmc,0)
         ESNC(M,ielmn,0,L,NZ)=ESNC(M,ielmn,0,L,NZ)+CFOPE(5,M,ielmn,NZ) &
-          *FSNC2*(WTRT2E(ielmn,N,L,NR,NZ)-RCZR)*FWODRN(0)
+          *FSNC2*(WTRT2E(ielmn,N,L,NR,NZ)-RCZR)*FWODRE(ielmn,0)
         ESNC(M,ielmp,0,L,NZ)=ESNC(M,ielmp,0,L,NZ)+CFOPE(5,M,ielmp,NZ) &
-          *FSNC2*(WTRT2E(ielmp,N,L,NR,NZ)-RCPR)*FWODRP(0)
+          *FSNC2*(WTRT2E(ielmp,N,L,NR,NZ)-RCPR)*FWODRE(ielmp,0)
         ESNC(M,ielmc,1,L,NZ)=ESNC(M,ielmc,1,L,NZ)+CFOPE(4,M,ielmc,NZ) &
-          *FSNC2*(WTRT2E(ielmc,N,L,NR,NZ)-RCCR)*FWODR(1)
+          *FSNC2*(WTRT2E(ielmc,N,L,NR,NZ)-RCCR)*FWODRE(ielmc,1)
         ESNC(M,ielmn,1,L,NZ)=ESNC(M,ielmn,1,L,NZ)+CFOPE(4,M,ielmn,NZ) &
-          *FSNC2*(WTRT2E(ielmn,N,L,NR,NZ)-RCZR)*FWODRN(1)
+          *FSNC2*(WTRT2E(ielmn,N,L,NR,NZ)-RCZR)*FWODRE(ielmn,1)
         ESNC(M,ielmp,1,L,NZ)=ESNC(M,ielmp,1,L,NZ)+CFOPE(4,M,ielmp,NZ) &
-          *FSNC2*(WTRT2E(ielmp,N,L,NR,NZ)-RCPR)*FWODRP(1)
+          *FSNC2*(WTRT2E(ielmp,N,L,NR,NZ)-RCPR)*FWODRE(ielmp,1)
       ENDDO D6350
 !
 !     CONSUMPTION OF NON-STRUCTURAL C,N,P BY SECONDARY ROOT
@@ -719,7 +717,7 @@ implicit none
 !     WTRT2,WTRT2N,WTRT2P=secondary root C,N,P mass
 !     ZADD2,PADD2=nonstructural N,P ltd by O2 used in growth
 !
-      GRTLGL=GRTWTG*RTLG2X(N,NZ)*WFNR*FWODR(1) &
+      GRTLGL=GRTWTG*RTLG2X(N,NZ)*WFNR*FWODRE(ielmc,1) &
         -FSNC2*RTLG2(N,L,NR,NZ)
       GRTWTL=GRTWTG-FSNC2*WTRT2E(ielmc,N,L,NR,NZ)
       GRTWTN=ZADD2-FSNC2*WTRT2E(ielmn,N,L,NR,NZ)
@@ -1049,17 +1047,17 @@ implicit none
                     ENDIF
                     D6450: DO M=1,jsken
                       ESNC(M,ielmc,0,LL,NZ)=ESNC(M,ielmc,0,LL,NZ)+CFOPE(5,M,ielmc,NZ) &
-                        *FSNCM*AZMAX1(WTRT2E(ielmc,2,LL,NR,NZ))*FWODR(0)
+                        *FSNCM*AZMAX1(WTRT2E(ielmc,2,LL,NR,NZ))*FWODRE(ielmc,0)
                       ESNC(M,ielmn,0,LL,NZ)=ESNC(M,ielmn,0,LL,NZ)+CFOPE(5,M,ielmn,NZ) &
-                        *FSNCM*AZMAX1(WTRT2E(ielmn,2,LL,NR,NZ))*FWODRN(0)
+                        *FSNCM*AZMAX1(WTRT2E(ielmn,2,LL,NR,NZ))*FWODRE(ielmn,0)
                       ESNC(M,ielmp,0,LL,NZ)=ESNC(M,ielmp,0,LL,NZ)+CFOPE(5,M,ielmp,NZ) &
-                        *FSNCM*AZMAX1(WTRT2E(ielmp,2,LL,NR,NZ))*FWODRP(0)
+                        *FSNCM*AZMAX1(WTRT2E(ielmp,2,LL,NR,NZ))*FWODRE(ielmp,0)
                       ESNC(M,ielmc,1,LL,NZ)=ESNC(M,ielmc,1,LL,NZ)+CFOPE(4,M,ielmc,NZ) &
-                        *FSNCM*AZMAX1(WTRT2E(ielmc,2,LL,NR,NZ))*FWODR(1)
+                        *FSNCM*AZMAX1(WTRT2E(ielmc,2,LL,NR,NZ))*FWODRE(ielmc,1)
                       ESNC(M,ielmn,1,LL,NZ)=ESNC(M,ielmn,1,LL,NZ)+CFOPE(4,M,ielmn,NZ) &
-                        *FSNCM*AZMAX1(WTRT2E(ielmn,2,LL,NR,NZ))*FWODRN(1)
+                        *FSNCM*AZMAX1(WTRT2E(ielmn,2,LL,NR,NZ))*FWODRE(ielmn,1)
                       ESNC(M,ielmp,1,LL,NZ)=ESNC(M,ielmp,1,LL,NZ)+CFOPE(4,M,ielmp,NZ) &
-                        *FSNCM*AZMAX1(WTRT2E(ielmp,2,LL,NR,NZ))*FWODRP(1)
+                        *FSNCM*AZMAX1(WTRT2E(ielmp,2,LL,NR,NZ))*FWODRE(ielmp,1)
                       ESNC(M,ielmc,1,LL,NZ)=ESNC(M,ielmc,1,LL,NZ)+CFOPE(0,M,ielmc,NZ) &
                         *FSNCP*AZMAX1(EPOOLR(ielmc,2,LL,NZ))
                       ESNC(M,ielmn,1,LL,NZ)=ESNC(M,ielmn,1,LL,NZ)+CFOPE(0,M,ielmn,NZ) &
@@ -1143,9 +1141,7 @@ implicit none
     CPPOLR  =>  plt_biom%CPPOLR     , &
     ZEROP   =>  plt_biom%ZEROP      , &
     ZERO    =>  plt_site%ZERO       , &
-    FWODR   =>  plt_allom%FWODR     , &
-    FWODRN  =>  plt_allom%FWODRN    , &
-    FWODRP  =>  plt_allom%FWODRP    , &
+    FWODRE  =>  plt_allom%FWODRE    , &
     CFOPE   =>  plt_soilchem%CFOPE  , &
     WFR     =>  plt_rbgc%WFR        , &
     ESNC    =>  plt_bgcr%ESNC       , &
@@ -1243,17 +1239,17 @@ implicit none
 !
   D6355: DO M=1,jsken
     ESNC(M,ielmc,0,L,NZ)=ESNC(M,ielmc,0,L,NZ)+CFOPE(5,M,ielmc,NZ) &
-      *FSNC1*(RTWT1E(N,NR,ielmc,NZ)-RCCR)*FWODR(0)
+      *FSNC1*(RTWT1E(N,NR,ielmc,NZ)-RCCR)*FWODRE(ielmc,0)
     ESNC(M,ielmn,0,L,NZ)=ESNC(M,ielmn,0,L,NZ)+CFOPE(5,M,ielmn,NZ) &
-      *FSNC1*(RTWT1E(N,NR,ielmn,NZ)-RCZR)*FWODRN(0)
+      *FSNC1*(RTWT1E(N,NR,ielmn,NZ)-RCZR)*FWODRE(ielmn,0)
     ESNC(M,ielmp,0,L,NZ)=ESNC(M,ielmp,0,L,NZ)+CFOPE(5,M,ielmp,NZ) &
-      *FSNC1*(RTWT1E(N,NR,ielmp,NZ)-RCPR)*FWODRP(0)
+      *FSNC1*(RTWT1E(N,NR,ielmp,NZ)-RCPR)*FWODRE(ielmp,0)
     ESNC(M,ielmc,1,L,NZ)=ESNC(M,ielmc,1,L,NZ)+CFOPE(4,M,ielmc,NZ) &
-      *FSNC1*(RTWT1E(N,NR,ielmc,NZ)-RCCR)*FWODR(1)
+      *FSNC1*(RTWT1E(N,NR,ielmc,NZ)-RCCR)*FWODRE(ielmc,1)
     ESNC(M,ielmn,1,L,NZ)=ESNC(M,ielmn,1,L,NZ)+CFOPE(4,M,ielmn,NZ) &
-      *FSNC1*(RTWT1E(N,NR,ielmn,NZ)-RCZR)*FWODRN(1)
+      *FSNC1*(RTWT1E(N,NR,ielmn,NZ)-RCZR)*FWODRE(ielmn,1)
     ESNC(M,ielmp,1,L,NZ)=ESNC(M,ielmp,1,L,NZ)+CFOPE(4,M,ielmp,NZ) &
-      *FSNC1*(RTWT1E(N,NR,ielmp,NZ)-RCPR)*FWODRP(1)
+      *FSNC1*(RTWT1E(N,NR,ielmp,NZ)-RCPR)*FWODRE(ielmp,1)
   ENDDO D6355
   end associate
   end subroutine PrimRootRemobilization
@@ -1277,8 +1273,7 @@ implicit none
     ZEROP     =>  plt_biom%ZEROP       , &
     CNWS      =>  plt_allom%CNWS       , &
     CPWS      =>  plt_allom%CPWS       , &
-    FWODR     =>  plt_allom%FWODR      , &
-    FWODRP    =>  plt_allom%FWODRP     , &
+    FWODRE    =>  plt_allom%FWODRE     , &
     CDPTHZ    =>  plt_site%CDPTHZ      , &
     DLYR3     =>  plt_site%DLYR3       , &
     NJ        =>  plt_site%NJ          , &
@@ -1313,11 +1308,11 @@ implicit none
 !
   IF(GRTWTL.LT.0.0.AND.RTWT1E(N,NR,ielmc,NZ) &
     .GT.ZEROP(NZ))THEN
-    GRTLGL=GRTWTG*RTLG1X(N,NZ)/PP(NZ)*WFNR*FWODR(1) &
+    GRTLGL=GRTWTG*RTLG1X(N,NZ)/PP(NZ)*WFNR*FWODRE(ielmc,1) &
       +GRTWTL*(RTDP1(N,NR,NZ)-SDPTH(NZ)) &
       /RTWT1E(N,NR,ielmc,NZ)
   ELSE
-    GRTLGL=GRTWTG*RTLG1X(N,NZ)/PP(NZ)*WFNR*FWODR(1)
+    GRTLGL=GRTWTG*RTLG1X(N,NZ)/PP(NZ)*WFNR*FWODRE(ielmc,1)
   ENDIF
   IF(L.LT.NJ)THEN
     GRTLGL=AMIN1(DLYR3(L1),GRTLGL)
@@ -1640,8 +1635,8 @@ implicit none
   real(r8) :: XFRC,XFRN,XFRP
 !     begin_execution
   associate(                                &
-    FWODB      =>   plt_allom%FWODB   , &
-    FWODR      =>   plt_allom%FWODR   , &
+    FWODBE     =>   plt_allom%FWODBE  , &
+    FWODRE     =>   plt_allom%FWODRE  , &
     CCPOLR     =>   plt_biom%CCPOLR   , &
     CZPOLR     =>   plt_biom%CZPOLR   , &
     RTWT1E     =>   plt_biom%RTWT1E   , &
@@ -1941,8 +1936,8 @@ implicit none
         PTSHTR=PTSHT(NZ)
       ENDIF
       D415: DO L=NU,NI(NZ)
-        WTLSBX=WTLSB(NB,NZ)*FWODB(1)*FWTR(L)*FWTC
-        WTRTLX=WTRTL(1,L,NZ)*FWODR(1)*FWTB(NB)*FWTS
+        WTLSBX=WTLSB(NB,NZ)*FWODBE(ielmc,1)*FWTR(L)*FWTC
+        WTRTLX=WTRTL(1,L,NZ)*FWODRE(ielmc,1)*FWTB(NB)*FWTS
         WTLSBB=AZMAX1(WTLSBX,FSNK*WTRTLX)
         WTRTLR=AZMAX1(WTRTLX,FSNK*WTLSBX)
         WTPLTT=WTLSBB+WTRTLR
