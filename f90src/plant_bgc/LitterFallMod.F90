@@ -148,12 +148,10 @@ implicit none
     FWODB      =>   plt_allom%FWODB   , &
     FWODSP     =>   plt_allom%FWODSP  , &
     FWODSN     =>   plt_allom%FWODSN  , &
-    FWOOD      =>   plt_allom%FWOOD   , &
+    FWOODE     =>   plt_allom%FWOODE  , &
     FWODR      =>   plt_allom%FWODR   , &
     FWODRN     =>   plt_allom%FWODRN  , &
     FWODRP     =>   plt_allom%FWODRP  , &
-    FWOODN     =>   plt_allom%FWOODN  , &
-    FWOODP     =>   plt_allom%FWOODP  , &
     IFLGI      =>   plt_pheno%IFLGI   , &
     ISTYP      =>   plt_pheno%ISTYP   , &
     IWTYP      =>   plt_pheno%IWTYP   , &
@@ -282,17 +280,17 @@ implicit none
           ENDDO
         ENDDO D6415
         ESNC(M,ielmc,0,NG(NZ),NZ)=ESNC(M,ielmc,0,NG(NZ),NZ) &
-          +CFOPE(0,M,ielmc,NZ)*WTRVE(ielmc,NZ)*FWOOD(0)
+          +CFOPE(0,M,ielmc,NZ)*WTRVE(ielmc,NZ)*FWOODE(ielmc,0)
         ESNC(M,ielmn,0,NG(NZ),NZ)=ESNC(M,ielmn,0,NG(NZ),NZ) &
-          +CFOPE(0,M,ielmn,NZ)*WTRVE(ielmn,NZ)*FWOODN(0)
+          +CFOPE(0,M,ielmn,NZ)*WTRVE(ielmn,NZ)*FWOODE(ielmn,0)
         ESNC(M,ielmp,0,NG(NZ),NZ)=ESNC(M,ielmp,0,NG(NZ),NZ) &
-          +CFOPE(0,M,ielmp,NZ)*WTRVE(ielmp,NZ)*FWOODP(0)
+          +CFOPE(0,M,ielmp,NZ)*WTRVE(ielmp,NZ)*FWOODE(ielmp,0)
         ESNC(M,ielmc,1,NG(NZ),NZ)=ESNC(M,ielmc,1,NG(NZ),NZ) &
-          +CFOPE(0,M,ielmc,NZ)*WTRVE(ielmc,NZ)*FWOOD(1)
+          +CFOPE(0,M,ielmc,NZ)*WTRVE(ielmc,NZ)*FWOODE(ielmc,1)
         ESNC(M,ielmn,1,NG(NZ),NZ)=ESNC(M,ielmn,1,NG(NZ),NZ) &
-          +CFOPE(0,M,ielmn,NZ)*WTRVE(ielmn,NZ)*FWOODN(1)
+          +CFOPE(0,M,ielmn,NZ)*WTRVE(ielmn,NZ)*FWOODE(ielmn,1)
         ESNC(M,ielmp,1,NG(NZ),NZ)=ESNC(M,ielmp,1,NG(NZ),NZ) &
-          +CFOPE(0,M,ielmp,NZ)*WTRVE(ielmp,NZ)*FWOODP(1)
+          +CFOPE(0,M,ielmp,NZ)*WTRVE(ielmp,NZ)*FWOODE(ielmp,1)
       ENDDO D6425
 !
       call ResetBranchRootStates(NZ,CPOOLK)

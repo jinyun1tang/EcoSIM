@@ -398,13 +398,11 @@ module grosubsMod
     FWODRN =>  plt_allom%FWODRN   , &
     FWODLN =>  plt_allom%FWODLN   , &
     FWODLP =>  plt_allom%FWODLP   , &
-    FWOODN =>  plt_allom%FWOODN   , &
     FWODSP =>  plt_allom%FWODSP   , &
     FWODRP =>  plt_allom%FWODRP   , &
-    FWOODP =>  plt_allom%FWOODP   , &
     FWODSN =>  plt_allom%FWODSN   , &
     FWODB  =>  plt_allom%FWODB    , &
-    FWOOD  =>  plt_allom%FWOOD    , &
+    FWOODE =>  plt_allom%FWOODE   , &
     FWODR  =>  plt_allom%FWODR    , &
     CNLF   =>  plt_allom%CNLF     , &
     CPLF   =>  plt_allom%CPLF     , &
@@ -454,15 +452,15 @@ module grosubsMod
 !
   IF(IBTYP(NZ).EQ.0.OR.IGTYP(NZ).LE.1.OR.WTSTKE(ielmc,NZ).LE.ZEROP(NZ))THEN
     FWODB(1)=1.0_r8
-    FWOOD(1)=1.0_r8
+    FWOODE(ielmc,1)=1.0_r8
     FWODR(1)=1.0_r8
   ELSE
     FWODB(1)=1.0_r8
-    FWOOD(1)=SQRT(WVSTK(NZ)/WTSTKE(ielmc,NZ))
+    FWOODE(ielmc,1)=SQRT(WVSTK(NZ)/WTSTKE(ielmc,NZ))
     FWODR(1)=SQRT(FRTX*WVSTK(NZ)/WTSTKE(ielmc,NZ))
   ENDIF
   FWODB(0)=1.0_r8-FWODB(1)
-  FWOOD(0)=1.0_r8-FWOOD(1)
+  FWOODE(ielmc,0)=1.0_r8-FWOODE(ielmc,1)
   FWODR(0)=1.0_r8-FWODR(1)
   CNLFW=FWODB(0)*CNSTK(NZ)+FWODB(1)*CNLF(NZ)
   CPLFW=FWODB(0)*CPSTK(NZ)+FWODB(1)*CPLF(NZ)
@@ -474,16 +472,16 @@ module grosubsMod
   FWODLP(0)=FWODB(0)*CPSTK(NZ)/CPLFW
   FWODSN(0)=FWODB(0)*CNSTK(NZ)/CNSHW
   FWODSP(0)=FWODB(0)*CPSTK(NZ)/CPSHW
-  FWOODN(0)=FWOOD(0)*CNSTK(NZ)/CNRTW
-  FWOODP(0)=FWOOD(0)*CPSTK(NZ)/CPRTW
+  FWOODE(ielmn,0)=FWOODE(ielmc,0)*CNSTK(NZ)/CNRTW
+  FWOODE(ielmp,0)=FWOODE(ielmc,0)*CPSTK(NZ)/CPRTW
   FWODRN(0)=FWODR(0)*CNRT(NZ)/CNRTW
   FWODRP(0)=FWODR(0)*CPRT(NZ)/CPRTW
   FWODLN(1)=1.0_r8-FWODLN(0)
   FWODLP(1)=1.0_r8-FWODLP(0)
   FWODSN(1)=1.0_r8-FWODSN(0)
   FWODSP(1)=1.0_r8-FWODSP(0)
-  FWOODN(1)=1.0_r8-FWOODN(0)
-  FWOODP(1)=1.0_r8-FWOODP(0)
+  FWOODE(ielmn,1)=1.0_r8-FWOODE(ielmn,0)
+  FWOODE(ielmp,1)=1.0_r8-FWOODE(ielmp,0)
   FWODRN(1)=1.0_r8-FWODRN(0)
   FWODRP(1)=1.0_r8-FWODRP(0)
 !

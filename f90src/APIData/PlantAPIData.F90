@@ -482,10 +482,8 @@ implicit none
   real(r8), pointer :: FWODRN(:)   => null()  !N woody fraction in root
   real(r8), pointer :: FWODRP(:)   => null()  !P woody fraction in root
   real(r8), pointer :: FWODR(:)    => null()  !C woody fraction in root
-  real(r8), pointer :: FWOOD(:)    => null()  !woody C allocation
+  real(r8), pointer :: FWOODE(:,:)  => null()  !woody element allocation
   real(r8), pointer :: FVRN(:)     => null()  !allocation parameter
-  real(r8), pointer :: FWOODN(:)   => null()  !woody N allocation
-  real(r8), pointer :: FWOODP(:)   => null()  !woody P allocation
   real(r8), pointer :: DMLF(:)     => null()  !leaf growth yield, [g g-1]
   real(r8), pointer :: CNGR(:)     => null()  !grain N:C ratio, [g g-1]
   real(r8), pointer :: CPLF(:)     => null()  !maximum leaf P:C ratio, [g g-1]
@@ -1508,7 +1506,7 @@ implicit none
   allocate(this%CNRSV(JP1))
   allocate(this%CPHSK(JP1))
   allocate(this%FVRN(0:5))
-  allocate(this%FWOOD(0:1))
+  allocate(this%FWOODE(npelms,0:1))
   allocate(this%FWODLP(0:1))
   allocate(this%FWODLN(0:1))
   allocate(this%FWODR(0:1))
@@ -1517,8 +1515,6 @@ implicit none
   allocate(this%FWODSN(0:1))
   allocate(this%FWODRN(0:1))
   allocate(this%FWODRP(0:1))
-  allocate(this%FWOODN(0:1))
-  allocate(this%FWOODP(0:1))
 
   allocate(this%DMSHE(JP1))
   allocate(this%DMHSK(JP1))
@@ -1569,9 +1565,7 @@ implicit none
 !  if(allocated(FVRN))deallocate(FVRN)
 !  if(allocated(FWODLP))deallocate(FWODLP)
 !  if(allocated(FWODLN))deallocate(FWODLN)
-!  if(allocated(FWOOD))deallocate(FWOOD)
-!  if(allocated(FWOODP))deallocate(FWOODP)
-!  if(allocated(FWOODN))deallocate(FWOODN)
+!  if(allocated(FWOODE))deallocate(FWOODE)
 !  if(allocated(FWODR))deallocate(FWODR)
 !  if(allocated(FWODRN))deallocate(FWODRN)
 !  if(allocated(FWODSN))deallocate(FWODSN)

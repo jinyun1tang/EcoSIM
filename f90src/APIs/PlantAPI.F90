@@ -149,9 +149,7 @@ implicit none
   FERT(17:19,I1,NY,NX)=plt_distb%FERT(17:19)
   FERT(3,I1,NY,NX) =plt_distb%FERT(3)
   IYTYP(2,I1,NY,NX)=plt_distb%IYTYP
-  FWOOD(:) =plt_allom%FWOOD(:)
-  FWOODN(:)=plt_allom%FWOODN(:)
-  FWOODP(:)=plt_allom%FWOODP(:)
+  FWOODE(1:npelms,0:1) =plt_allom%FWOODE(1:npelms,0:1)
   FWODR(:) =plt_allom%FWODR(:)
   FWODRN(:)=plt_allom%FWODRN(:)
   FWODRP(:)=plt_allom%FWODRP(:)
@@ -1067,9 +1065,7 @@ implicit none
     plt_morph%ARLFT(L)=ARLFT(L,NY,NX)
   ENDDO
 
-  plt_allom%FWOOD(:)=FWOOD(:)
-  plt_allom%FWOODN(:)=FWOODN(:)
-  plt_allom%FWOODP(:)=FWOODP(:)
+  plt_allom%FWOODE(1:npelms,0:1)=FWOODE(1:npelms,0:1)
   plt_allom%FWODR(:)=FWODR(:)
   plt_allom%FWODRN(:)=FWODRN(:)
   plt_allom%FWODSN(:)=FWODSN(:)

@@ -1377,15 +1377,13 @@ module PlantBranchMod
     PP         =>   plt_site%PP        , &
     CPOOL3     =>  plt_photo%CPOOL3    , &
     CPOOL4     =>  plt_photo%CPOOL4    , &
-    FWOOD      =>  plt_allom%FWOOD     , &
-    FWOODN     =>  plt_allom%FWOODN    , &
+    FWOODE     =>  plt_allom%FWOODE    , &
     FWODSN     =>  plt_allom%FWODSN    , &
     FWODSP     =>  plt_allom%FWODSP    , &
     FWODB      =>  plt_allom%FWODB     , &
     FWODLN     =>  plt_allom%FWODLN    , &
     FWODLP     =>  plt_allom%FWODLP    , &
     FWODRN     =>  plt_allom%FWODRN    , &
-    FWOODP     =>  plt_allom%FWOODP    , &
     CNWS       =>  plt_allom%CNWS      , &
     CPWS       =>  plt_allom%CPWS      , &
     ESNC       =>  plt_bgcr%ESNC       , &
@@ -1770,17 +1768,17 @@ module PlantBranchMod
 !
           D7310: DO M=1,jsken
             ESNC(M,ielmc,0,0,NZ)=ESNC(M,ielmc,0,0,NZ)+CFOPE(istalk,M,ielmc,NZ) &
-              *FSNCK*(WGNODE(K,NB,ielmc,NZ)-RCCK)*FWOOD(0)
+              *FSNCK*(WGNODE(K,NB,ielmc,NZ)-RCCK)*FWOODE(ielmc,0)
             ESNC(M,ielmn,0,0,NZ)=ESNC(M,ielmn,0,0,NZ)+CFOPE(istalk,M,ielmn,NZ) &
-              *FSNCK*(WGNODE(K,NB,ielmn,NZ)-RCZK)*FWOODN(0)
+              *FSNCK*(WGNODE(K,NB,ielmn,NZ)-RCZK)*FWOODE(ielmn,0)
             ESNC(M,ielmp,0,0,NZ)=ESNC(M,ielmp,0,0,NZ)+CFOPE(istalk,M,ielmp,NZ) &
-              *FSNCK*(WGNODE(K,NB,ielmp,NZ)-RCPK)*FWOODP(0)
+              *FSNCK*(WGNODE(K,NB,ielmp,NZ)-RCPK)*FWOODE(ielmp,0)
             ESNC(M,ielmc,1,0,NZ)=ESNC(M,ielmc,0,0,NZ)+CFOPE(istalk,M,ielmc,NZ) &
-              *FSNCK*(WGNODE(K,NB,ielmc,NZ)-RCCK)*FWOOD(1)
+              *FSNCK*(WGNODE(K,NB,ielmc,NZ)-RCCK)*FWOODE(ielmc,1)
             ESNC(M,ielmn,1,0,NZ)=ESNC(M,ielmn,0,0,NZ)+CFOPE(istalk,M,ielmn,NZ) &
-              *FSNCK*(WGNODE(K,NB,ielmn,NZ)-RCZK)*FWOODN(1)
+              *FSNCK*(WGNODE(K,NB,ielmn,NZ)-RCZK)*FWOODE(ielmn,1)
             ESNC(M,ielmp,1,0,NZ)=ESNC(M,ielmp,0,0,NZ)+CFOPE(istalk,M,ielmp,NZ) &
-              *FSNCK*(WGNODE(K,NB,ielmp,NZ)-RCPK)*FWOODP(1)
+              *FSNCK*(WGNODE(K,NB,ielmp,NZ)-RCPK)*FWOODE(ielmp,1)
           ENDDO D7310
 !
       !     UPDATE STATE VARIABLES FOR REMOBILIZATION AND LITTERFALL
@@ -1825,17 +1823,17 @@ module PlantBranchMod
         ELSE
           D7315: DO M=1,jsken
             ESNC(M,ielmc,0,0,NZ)=ESNC(M,ielmc,0,0,NZ)+CFOPE(istalk,M,ielmc,NZ) &
-              *WGNODE(K,NB,ielmc,NZ)*FWOOD(0)
+              *WGNODE(K,NB,ielmc,NZ)*FWOODE(ielmc,0)
             ESNC(M,ielmn,0,0,NZ)=ESNC(M,ielmn,0,0,NZ)+CFOPE(istalk,M,ielmn,NZ) &
-              *WGNODE(K,NB,ielmn,NZ)*FWOODN(0)
+              *WGNODE(K,NB,ielmn,NZ)*FWOODE(ielmn,0)
             ESNC(M,ielmp,0,0,NZ)=ESNC(M,ielmp,0,0,NZ)+CFOPE(istalk,M,ielmp,NZ) &
-              *WGNODE(K,NB,ielmp,NZ)*FWOODP(0)
+              *WGNODE(K,NB,ielmp,NZ)*FWOODE(ielmp,0)
             ESNC(M,ielmc,1,0,NZ)=ESNC(M,ielmc,0,0,NZ)+CFOPE(istalk,M,ielmc,NZ) &
-              *WGNODE(K,NB,ielmc,NZ)*FWOOD(1)
+              *WGNODE(K,NB,ielmc,NZ)*FWOODE(ielmc,1)
             ESNC(M,ielmn,1,0,NZ)=ESNC(M,ielmn,0,0,NZ)+CFOPE(istalk,M,ielmn,NZ) &
-              *WGNODE(K,NB,ielmn,NZ)*FWOODN(1)
+              *WGNODE(K,NB,ielmn,NZ)*FWOODE(ielmn,1)
             ESNC(M,ielmp,1,0,NZ)=ESNC(M,ielmp,0,0,NZ)+CFOPE(istalk,M,ielmp,NZ) &
-              *WGNODE(K,NB,ielmp,NZ)*FWOODP(1)
+              *WGNODE(K,NB,ielmp,NZ)*FWOODE(ielmp,1)
           ENDDO D7315
           WTSTKBE(NB,ielmc,NZ)=AZMAX1(WTSTKBE(NB,ielmc,NZ)-WGNODE(K,NB,ielmc,NZ))
           WTSTKBE(NB,ielmn,NZ)=AZMAX1(WTSTKBE(NB,ielmn,NZ)-WGNODE(K,NB,ielmn,NZ))
@@ -1876,17 +1874,17 @@ module PlantBranchMod
     !
         D8310: DO M=1,jsken
           ESNC(M,ielmc,0,0,NZ)=ESNC(M,ielmc,0,0,NZ)+CFOPE(istalk,M,ielmc,NZ) &
-            *FSNCR*(WTSTXBE(NB,ielmc,NZ)-RCCK)*FWOOD(0)
+            *FSNCR*(WTSTXBE(NB,ielmc,NZ)-RCCK)*FWOODE(ielmc,0)
           ESNC(M,ielmn,0,0,NZ)=ESNC(M,ielmn,0,0,NZ)+CFOPE(istalk,M,ielmn,NZ) &
-            *FSNCR*(WTSTXBE(NB,ielmn,NZ)-RCZK)*FWOODN(0)
+            *FSNCR*(WTSTXBE(NB,ielmn,NZ)-RCZK)*FWOODE(ielmn,0)
           ESNC(M,ielmp,0,0,NZ)=ESNC(M,ielmp,0,0,NZ)+CFOPE(istalk,M,ielmp,NZ) &
-            *FSNCR*(WTSTXBE(NB,ielmp,NZ)-RCPK)*FWOODP(0)
+            *FSNCR*(WTSTXBE(NB,ielmp,NZ)-RCPK)*FWOODE(ielmp,0)
           ESNC(M,ielmc,1,0,NZ)=ESNC(M,ielmc,0,0,NZ)+CFOPE(istalk,M,ielmc,NZ) &
-            *FSNCR*(WTSTXBE(NB,ielmc,NZ)-RCCK)*FWOOD(1)
+            *FSNCR*(WTSTXBE(NB,ielmc,NZ)-RCCK)*FWOODE(ielmc,1)
           ESNC(M,ielmn,1,0,NZ)=ESNC(M,ielmn,0,0,NZ)+CFOPE(istalk,M,ielmn,NZ) &
-            *FSNCR*(WTSTXBE(NB,ielmn,NZ)-RCZK)*FWOODN(1)
+            *FSNCR*(WTSTXBE(NB,ielmn,NZ)-RCZK)*FWOODE(ielmn,1)
           ESNC(M,ielmp,1,0,NZ)=ESNC(M,ielmp,0,0,NZ)+CFOPE(istalk,M,ielmp,NZ) &
-            *FSNCR*(WTSTXBE(NB,ielmp,NZ)-RCPK)*FWOODP(1)
+            *FSNCR*(WTSTXBE(NB,ielmp,NZ)-RCPK)*FWOODE(ielmp,1)
         ENDDO D8310
     !
     !     UPDATE STATE VARIABLES FOR REMOBILIZATION AND LITTERFALL
@@ -1944,17 +1942,17 @@ module PlantBranchMod
     ELSE
       D8315: DO M=1,jsken
         ESNC(M,ielmc,0,0,NZ)=ESNC(M,ielmc,0,0,NZ)+CFOPE(istalk,M,ielmc,NZ) &
-          *WTSTXBE(NB,ielmc,NZ)*FWOOD(0)
+          *WTSTXBE(NB,ielmc,NZ)*FWOODE(ielmc,0)
         ESNC(M,ielmn,0,0,NZ)=ESNC(M,ielmn,0,0,NZ)+CFOPE(istalk,M,ielmn,NZ) &
-          *WTSTXBE(NB,ielmn,NZ)*FWOODN(0)
+          *WTSTXBE(NB,ielmn,NZ)*FWOODE(ielmn,0)
         ESNC(M,ielmp,0,0,NZ)=ESNC(M,ielmp,0,0,NZ)+CFOPE(istalk,M,ielmp,NZ) &
-          *WTSTXBE(NB,ielmp,NZ)*FWOODP(0)
+          *WTSTXBE(NB,ielmp,NZ)*FWOODE(ielmp,0)
         ESNC(M,ielmc,1,0,NZ)=ESNC(M,ielmc,0,0,NZ)+CFOPE(istalk,M,ielmc,NZ) &
-          *WTSTXBE(NB,ielmc,NZ)*FWOOD(1)
+          *WTSTXBE(NB,ielmc,NZ)*FWOODE(ielmc,1)
         ESNC(M,ielmn,1,0,NZ)=ESNC(M,ielmn,0,0,NZ)+CFOPE(istalk,M,ielmn,NZ) &
-          *WTSTXBE(NB,ielmn,NZ)*FWOODN(1)
+          *WTSTXBE(NB,ielmn,NZ)*FWOODE(ielmn,1)
         ESNC(M,ielmp,1,0,NZ)=ESNC(M,ielmp,0,0,NZ)+CFOPE(istalk,M,ielmp,NZ) &
-          *WTSTXBE(NB,ielmp,NZ)*FWOODP(1)
+          *WTSTXBE(NB,ielmp,NZ)*FWOODE(ielmp,1)
       ENDDO D8315
       WTSTKBE(NB,ielmc,NZ)=AZMAX1(WTSTKBE(NB,ielmc,NZ)-WTSTXBE(NB,ielmc,NZ))
       WTSTKBE(NB,ielmn,NZ)=AZMAX1(WTSTKBE(NB,ielmn,NZ)-WTSTXBE(NB,ielmn,NZ))
