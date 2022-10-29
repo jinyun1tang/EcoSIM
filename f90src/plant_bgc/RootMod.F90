@@ -1113,7 +1113,7 @@ implicit none
   integer, intent(in) :: N,L,NZ,NR
   real(r8), intent(in) :: RCO2X,RCO2XM
   real(r8), intent(out) :: FSNC1
-  integer :: M
+  integer :: M,NE
   real(r8) :: CCC,CNC,CPC
   real(r8) :: RCER(npelms)
   real(r8) :: RCCC,RCCN,RCCP
@@ -1201,9 +1201,7 @@ implicit none
       FSNC1=1.0_r8
     ENDIF
   ELSE
-    RCER(ielmc)=0._r8
-    RCER(ielmn)=0._r8
-    RCER(ielmp)=0._r8
+    RCER(1:npelms)=0._r8
     FSNC1=0._r8
   ENDIF
 !
@@ -1217,21 +1215,15 @@ implicit none
 !     RCER(ielmc),RCER(ielmn),RCER(ielmp)=remobilization of C,N,P from senescing root
 !     FWOOD,FWOODN,FWOODP=C,N,P woody fraction in root:0=woody,1=non-woody
 !
-  D6355: DO M=1,jsken
-    ESNC(M,ielmc,0,L,NZ)=ESNC(M,ielmc,0,L,NZ)+CFOPE(icwood,M,ielmc,NZ) &
-      *FSNC1*(RTWT1E(N,NR,ielmc,NZ)-RCER(ielmc))*FWODRE(ielmc,0)
-    ESNC(M,ielmn,0,L,NZ)=ESNC(M,ielmn,0,L,NZ)+CFOPE(icwood,M,ielmn,NZ) &
-      *FSNC1*(RTWT1E(N,NR,ielmn,NZ)-RCER(ielmn))*FWODRE(ielmn,0)
-    ESNC(M,ielmp,0,L,NZ)=ESNC(M,ielmp,0,L,NZ)+CFOPE(icwood,M,ielmp,NZ) &
-      *FSNC1*(RTWT1E(N,NR,ielmp,NZ)-RCER(ielmp))*FWODRE(ielmp,0)
+  DO NE=1,npelms
+    D6355: DO M=1,jsken
+      ESNC(M,NE,0,L,NZ)=ESNC(M,NE,0,L,NZ)+CFOPE(icwood,M,NE,NZ) &
+        *FSNC1*(RTWT1E(N,NR,NE,NZ)-RCER(NE))*FWODRE(NE,0)
 
-    ESNC(M,ielmc,1,L,NZ)=ESNC(M,ielmc,1,L,NZ)+CFOPE(iroot,M,ielmc,NZ) &
-      *FSNC1*(RTWT1E(N,NR,ielmc,NZ)-RCER(ielmc))*FWODRE(ielmc,1)
-    ESNC(M,ielmn,1,L,NZ)=ESNC(M,ielmn,1,L,NZ)+CFOPE(iroot,M,ielmn,NZ) &
-      *FSNC1*(RTWT1E(N,NR,ielmn,NZ)-RCER(ielmn))*FWODRE(ielmn,1)
-    ESNC(M,ielmp,1,L,NZ)=ESNC(M,ielmp,1,L,NZ)+CFOPE(iroot,M,ielmp,NZ) &
-      *FSNC1*(RTWT1E(N,NR,ielmp,NZ)-RCER(ielmp))*FWODRE(ielmp,1)
-  ENDDO D6355
+      ESNC(M,NE,1,L,NZ)=ESNC(M,NE,1,L,NZ)+CFOPE(iroot,M,NE,NZ) &
+        *FSNC1*(RTWT1E(N,NR,NE,NZ)-RCER(NE))*FWODRE(NE,1)
+    ENDDO D6355
+  ENDDO
   end associate
   end subroutine PrimRootRemobilization
 
@@ -1243,7 +1235,8 @@ implicit none
   real(r8), intent(inout) :: RTLGZ,WTRTZ
   real(r8), intent(out):: GRTLGL
   real(r8) :: FGROL,FGROZ
-  REAL(R8) :: XFRC,XFRN,XFRP
+  integer :: NE
+  REAL(R8) :: XFRE(npelms)
 ! begin_execution
   associate(                             &
     WTRT1E    =>  plt_biom%WTRT1E      , &
@@ -1287,11 +1280,9 @@ implicit none
 !     RTWT1,RTWT1N,RTWT1P=primary root C,N,P mass
 !     DLYR=soil layer thickness
 !
-  IF(GRTWTLE(ielmc).LT.0.0.AND.RTWT1E(N,NR,ielmc,NZ) &
-    .GT.ZEROP(NZ))THEN
+  IF(GRTWTLE(ielmc).LT.0.0.AND.RTWT1E(N,NR,ielmc,NZ).GT.ZEROP(NZ))THEN
     GRTLGL=GRTWTG*RTLG1X(N,NZ)/PP(NZ)*WFNR*FWODRE(ielmc,1) &
-      +GRTWTLE(ielmc)*(RTDP1(N,NR,NZ)-SDPTH(NZ)) &
-      /RTWT1E(N,NR,ielmc,NZ)
+      +GRTWTLE(ielmc)*(RTDP1(N,NR,NZ)-SDPTH(NZ))/RTWT1E(N,NR,ielmc,NZ)
   ELSE
     GRTLGL=GRTWTG*RTLG1X(N,NZ)/PP(NZ)*WFNR*FWODRE(ielmc,1)
   ENDIF
@@ -1307,9 +1298,8 @@ implicit none
 !     FGROL,FGROZ=fraction of GRTLGL in current,next lower soil layer
 !
   IF(GRTLGL.GT.ZEROP(NZ).AND.L.LT.NJ)THEN
-    FGROL=AZMAX1(AMIN1(1.0,(CDPTHZ(L) &
-      -RTDP1(N,NR,NZ))/GRTLGL))
-    IF(FGROL.LT.1.0)FGROL=0._r8
+    FGROL=AZMAX1(AMIN1(1.0_r8,(CDPTHZ(L)-RTDP1(N,NR,NZ))/GRTLGL))
+    IF(FGROL.LT.1.0_r8)FGROL=0._r8
     FGROZ=AZMAX1(1.0_r8-FGROL)
   ELSE
     FGROL=1.0_r8
@@ -1328,15 +1318,14 @@ implicit none
 !     CNWS,CPWS=protein:N,protein:P ratios from startq.f
 !     RTLG1=primary root length
 !
-  RTWT1E(N,NR,ielmc,NZ)=RTWT1E(N,NR,ielmc,NZ)+GRTWTLE(ielmc)
-  RTWT1E(N,NR,ielmn,NZ)=RTWT1E(N,NR,ielmn,NZ)+GRTWTLE(ielmn)
-  RTWT1E(N,NR,ielmp,NZ)=RTWT1E(N,NR,ielmp,NZ)+GRTWTLE(ielmp)
   RTDP1(N,NR,NZ)=RTDP1(N,NR,NZ)+GRTLGL
-  WTRT1E(ielmc,N,L,NR,NZ)=WTRT1E(ielmc,N,L,NR,NZ)+GRTWTLE(ielmc)*FGROL
-  WTRT1E(ielmn,N,L,NR,NZ)=WTRT1E(ielmn,N,L,NR,NZ)+GRTWTLE(ielmn)*FGROL
-  WTRT1E(ielmp,N,L,NR,NZ)=WTRT1E(ielmp,N,L,NR,NZ)+GRTWTLE(ielmp)*FGROL
-  WSRTL(N,L,NZ)=WSRTL(N,L,NZ) &
-    +AMIN1(CNWS(NZ)*WTRT1E(ielmn,N,L,NR,NZ) &
+
+  DO NE=1,npelms
+    RTWT1E(N,NR,NE,NZ)=RTWT1E(N,NR,NE,NZ)+GRTWTLE(NE)
+
+    WTRT1E(NE,N,L,NR,NZ)=WTRT1E(NE,N,L,NR,NZ)+GRTWTLE(NE)*FGROL
+  ENDDO
+  WSRTL(N,L,NZ)=WSRTL(N,L,NZ)+AMIN1(CNWS(NZ)*WTRT1E(ielmn,N,L,NR,NZ) &
     ,CPWS(NZ)*WTRT1E(ielmp,N,L,NR,NZ))
   RTLG1(N,L,NR,NZ)=RTLG1(N,L,NR,NZ)+GRTLGL*FGROL
 !
@@ -1358,9 +1347,9 @@ implicit none
 !     NINR=deepest root layer
 !
   IF(FGROZ.GT.0.0)THEN
-    WTRT1E(ielmc,N,L1,NR,NZ)=WTRT1E(ielmc,N,L1,NR,NZ)+GRTWTLE(ielmc)*FGROZ
-    WTRT1E(ielmn,N,L1,NR,NZ)=WTRT1E(ielmn,N,L1,NR,NZ)+GRTWTLE(ielmn)*FGROZ
-    WTRT1E(ielmp,N,L1,NR,NZ)=WTRT1E(ielmp,N,L1,NR,NZ)+GRTWTLE(ielmp)*FGROZ
+    DO NE=1,npelms
+      WTRT1E(NE,N,L1,NR,NZ)=WTRT1E(NE,N,L1,NR,NZ)+GRTWTLE(NE)*FGROZ
+    ENDDO
     WSRTL(N,L1,NZ)=WSRTL(N,L1,NZ)+AMIN1(CNWS(NZ)*WTRT1E(ielmn,N,L1,NR,NZ) &
       ,CPWS(NZ)*WTRT1E(ielmp,N,L1,NR,NZ))
     WTRTD(N,L1,NZ)=WTRTD(N,L1,NZ)+WTRT1E(ielmc,N,L1,NR,NZ)
@@ -1368,15 +1357,12 @@ implicit none
     RRAD1(N,L1,NZ)=RRAD1(N,L,NZ)
     RTLGZ=RTLGZ+RTLG1(N,L1,NR,NZ)
     WTRTZ=WTRTZ+WTRT1E(ielmc,N,L1,NR,NZ)
-    XFRC=FRTN*EPOOLR(ielmc,N,L,NZ)
-    XFRN=FRTN*EPOOLR(ielmn,N,L,NZ)
-    XFRP=FRTN*EPOOLR(ielmp,N,L,NZ)
-    EPOOLR(ielmc,N,L,NZ)=EPOOLR(ielmc,N,L,NZ)-XFRC
-    EPOOLR(ielmn,N,L,NZ)=EPOOLR(ielmn,N,L,NZ)-XFRN
-    EPOOLR(ielmp,N,L,NZ)=EPOOLR(ielmp,N,L,NZ)-XFRP
-    EPOOLR(ielmc,N,L1,NZ)=EPOOLR(ielmc,N,L1,NZ)+XFRC
-    EPOOLR(ielmn,N,L1,NZ)=EPOOLR(ielmn,N,L1,NZ)+XFRN
-    EPOOLR(ielmp,N,L1,NZ)=EPOOLR(ielmp,N,L1,NZ)+XFRP
+
+    DO NE=1,npelms
+      XFRE(NE)=FRTN*EPOOLR(NE,N,L,NZ)
+      EPOOLR(NE,N,L,NZ)=EPOOLR(NE,N,L,NZ)-XFRE(NE)
+      EPOOLR(NE,N,L1,NZ)=EPOOLR(NE,N,L1,NZ)+XFRE(NE)
+    ENDDO
     PSIRT(N,L1,NZ)=PSIRT(N,L,NZ)
     PSIRO(N,L1,NZ)=PSIRO(N,L,NZ)
     PSIRG(N,L1,NZ)=PSIRG(N,L,NZ)
@@ -1392,9 +1378,9 @@ implicit none
   real(r8), intent(in):: RTDP1X
   real(r8), INTENT(IN) :: RLNT(2,JZ1)
   real(r8),intent(in) :: RTSK1(2,JZ1,10),RTSK2(2,JZ1,10),XRTN1
-  integer :: LL,NN
+  integer :: LL,NN,NE
   real(r8) :: XFRD,XFRW,FRTN
-  real(r8) :: XFRC,XFRN,XFRP
+  real(r8) :: XFRE(npelms)
 
 ! begin_execution
   associate(                             &
@@ -1457,43 +1443,36 @@ implicit none
 !     WTRTD=root C mass
 !     CPOOLR,ZPOOLR,PPOOLR=non-structural C,N,P mass in root
 
-  DO 5115 LL=L,NG(NZ)+1,-1
-    IF(VOLX(LL-1).GT.ZEROS2 &
-      .AND.(RTDP1X.LT.CDPTHZ(LL-1) &
-      .OR.RTDP1X.LT.SDPTH(NZ)))THEN
+  D5115: DO LL=L,NG(NZ)+1,-1
+    IF(VOLX(LL-1).GT.ZEROS2.AND.(RTDP1X.LT.CDPTHZ(LL-1).OR.RTDP1X.LT.SDPTH(NZ)))THEN
       IF(RLNT(N,LL).GT.ZEROP(NZ))THEN
         FRTN=(RTSK1(N,LL,NR)+RTSK2(N,LL,NR))/RLNT(N,LL)
       ELSE
         FRTN=1.0_r8
       ENDIF
-      DO 5110 NN=1,MY(NZ)
-        WTRT1E(ielmc,NN,LL-1,NR,NZ)=WTRT1E(ielmc,NN,LL-1,NR,NZ)+WTRT1E(ielmc,NN,LL,NR,NZ)
-        WTRT1E(ielmn,NN,LL-1,NR,NZ)=WTRT1E(ielmn,NN,LL-1,NR,NZ)+WTRT1E(ielmn,NN,LL,NR,NZ)
-        WTRT1E(ielmp,NN,LL-1,NR,NZ)=WTRT1E(ielmp,NN,LL-1,NR,NZ)+WTRT1E(ielmp,NN,LL,NR,NZ)
-        WTRT2E(ielmc,NN,LL-1,NR,NZ)=WTRT2E(ielmc,NN,LL-1,NR,NZ)+WTRT2E(ielmc,NN,LL,NR,NZ)
-        WTRT2E(ielmn,NN,LL-1,NR,NZ)=WTRT2E(ielmn,NN,LL-1,NR,NZ)+WTRT2E(ielmn,NN,LL,NR,NZ)
-        WTRT2E(ielmp,NN,LL-1,NR,NZ)=WTRT2E(ielmp,NN,LL-1,NR,NZ)+WTRT2E(ielmp,NN,LL,NR,NZ)
+      D5110: DO NN=1,MY(NZ)
         RTLG1(NN,LL-1,NR,NZ)=RTLG1(NN,LL-1,NR,NZ)+RTLG1(NN,LL,NR,NZ)
-        WTRT1E(ielmc,NN,LL,NR,NZ)=0._r8
-        WTRT1E(ielmn,NN,LL,NR,NZ)=0._r8
-        WTRT1E(ielmp,NN,LL,NR,NZ)=0._r8
-        WTRT2E(ielmc,NN,LL,NR,NZ)=0._r8
-        WTRT2E(ielmn,NN,LL,NR,NZ)=0._r8
-        WTRT2E(ielmp,NN,LL,NR,NZ)=0._r8
         RTLG1(NN,LL,NR,NZ)=0._r8
-        XFRC=FRTN*EPOOLR(ielmc,NN,LL,NZ)
-        XFRN=FRTN*EPOOLR(ielmn,NN,LL,NZ)
-        XFRP=FRTN*EPOOLR(ielmp,NN,LL,NZ)
+        DO NE=1,npelms
+          WTRT1E(NE,NN,LL-1,NR,NZ)=WTRT1E(NE,NN,LL-1,NR,NZ)+WTRT1E(NE,NN,LL,NR,NZ)
+
+          WTRT2E(NE,NN,LL-1,NR,NZ)=WTRT2E(NE,NN,LL-1,NR,NZ)+WTRT2E(NE,NN,LL,NR,NZ)
+
+          WTRT1E(NE,NN,LL,NR,NZ)=0._r8
+
+          WTRT2E(NE,NN,LL,NR,NZ)=0._r8
+
+          XFRE(NE)=FRTN*EPOOLR(NE,NN,LL,NZ)
+
+          EPOOLR(NE,NN,LL,NZ)=EPOOLR(NE,NN,LL,NZ)-XFRE(NE)
+
+          EPOOLR(NE,NN,LL-1,NZ)=EPOOLR(NE,NN,LL-1,NZ)+XFRE(NE)
+        ENDDO
         XFRW=FRTN*WSRTL(NN,L,NZ)
         XFRD=FRTN*WTRTD(NN,LL,NZ)
-        EPOOLR(ielmc,NN,LL,NZ)=EPOOLR(ielmc,NN,LL,NZ)-XFRC
-        EPOOLR(ielmn,NN,LL,NZ)=EPOOLR(ielmn,NN,LL,NZ)-XFRN
-        EPOOLR(ielmp,NN,LL,NZ)=EPOOLR(ielmp,NN,LL,NZ)-XFRP
+
         WSRTL(NN,LL,NZ)=WSRTL(NN,LL,NZ)-XFRW
         WTRTD(NN,LL,NZ)=WTRTD(NN,LL,NZ)-XFRD
-        EPOOLR(ielmc,NN,LL-1,NZ)=EPOOLR(ielmc,NN,LL-1,NZ)+XFRC
-        EPOOLR(ielmn,NN,LL-1,NZ)=EPOOLR(ielmn,NN,LL-1,NZ)+XFRN
-        EPOOLR(ielmp,NN,LL-1,NZ)=EPOOLR(ielmp,NN,LL-1,NZ)+XFRP
         WSRTL(NN,LL-1,NZ)=WSRTL(NN,LL-1,NZ)+XFRW
         WTRTD(NN,LL-1,NZ)=WTRTD(NN,LL-1,NZ)+XFRD
 !
@@ -1523,7 +1502,7 @@ implicit none
         ZH3P(NN,LL,NZ)=(1.0_r8-FRTN)*ZH3P(NN,LL,NZ)
         H2GP(NN,LL,NZ)=(1.0_r8-FRTN)*H2GP(NN,LL,NZ)
 
-5110  CONTINUE
+      ENDDO D5110
 !
 !     RESET ROOT NUMBER AND PRIMARY ROOT LENGTH
 !
@@ -1552,30 +1531,21 @@ implicit none
 !     CPOOLN,ZPOOLN,PPOOLN=nonstructural C,N,P in root bacteria
 !
       IF(INTYP(NZ).GE.1.AND.INTYP(NZ).LE.3)THEN
-        XFRC=FRTN*WTNDLE(LL,ielmc,NZ)
-        XFRN=FRTN*WTNDLE(LL,ielmn,NZ)
-        XFRP=FRTN*WTNDLE(LL,ielmp,NZ)
-        WTNDLE(LL,ielmc,NZ)=WTNDLE(LL,ielmc,NZ)-XFRC
-        WTNDLE(LL,ielmn,NZ)=WTNDLE(LL,ielmn,NZ)-XFRN
-        WTNDLE(LL,ielmp,NZ)=WTNDLE(LL,ielmp,NZ)-XFRP
-        WTNDLE(LL-1,ielmc,NZ)=WTNDLE(LL-1,ielmc,NZ)+XFRC
-        WTNDLE(LL-1,ielmn,NZ)=WTNDLE(LL-1,ielmn,NZ)+XFRN
-        WTNDLE(LL-1,ielmp,NZ)=WTNDLE(LL-1,ielmp,NZ)+XFRP
-        XFRC=FRTN*EPOOLN(LL,ielmc,NZ)
-        XFRN=FRTN*EPOOLN(LL,ielmn,NZ)
-        XFRP=FRTN*EPOOLN(LL,ielmp,NZ)
-        EPOOLN(LL,ielmc,NZ)=EPOOLN(LL,ielmc,NZ)-XFRC
-        EPOOLN(LL,ielmn,NZ)=EPOOLN(LL,ielmn,NZ)-XFRN
-        EPOOLN(LL,ielmp,NZ)=EPOOLN(LL,ielmp,NZ)-XFRP
-        EPOOLN(LL-1,ielmc,NZ)=EPOOLN(LL-1,ielmc,NZ)+XFRC
-        EPOOLN(LL-1,ielmn,NZ)=EPOOLN(LL-1,ielmn,NZ)+XFRN
-        EPOOLN(LL-1,ielmp,NZ)=EPOOLN(LL-1,ielmp,NZ)+XFRP
+        DO NE=1,npelms
+          XFRE(NE)=FRTN*WTNDLE(LL,NE,NZ)
+          WTNDLE(LL,NE,NZ)=WTNDLE(LL,NE,NZ)-XFRE(NE)
+          WTNDLE(LL-1,NE,NZ)=WTNDLE(LL-1,NE,NZ)+XFRE(NE)
+
+          XFRE(NE)=FRTN*EPOOLN(LL,NE,NZ)
+          EPOOLN(LL,NE,NZ)=EPOOLN(LL,NE,NZ)-XFRE(NE)
+          EPOOLN(LL-1,NE,NZ)=EPOOLN(LL-1,NE,NZ)+XFRE(NE)
+        ENDDO
       ENDIF
       NINR(NR,NZ)=MAX(NG(NZ),LL-1)
     ELSE
       EXIT
     ENDIF
-5115  CONTINUE
+  ENDDO D5115
   end associate
   end subroutine WithdrawPrimRoot
 !------------------------------------------------------------------------------------------
@@ -1673,7 +1643,7 @@ implicit none
     CPOOLT=0._r8
     ZPOOLT=0._r8
     PPOOLT=0._r8
-    DO 300 NB=1,NBR(NZ)
+    D300: DO NB=1,NBR(NZ)
       IF(IDTHB(NB,NZ).EQ.0)THEN
         IF(ATRP(NB,NZ).GT.ATRPX(ISTYP(NZ)))THEN
           WTLSBZ(NB)=AZMAX1(WTLSB(NB,NZ))
@@ -1686,7 +1656,7 @@ implicit none
           PPOOLT=PPOOLT+PPOOLZ(NB)
         ENDIF
       ENDIF
-300 CONTINUE
+    ENDDO D300
     DO 305 NB=1,NBR(NZ)
       IF(IDTHB(NB,NZ).EQ.0)THEN
         IF(ATRP(NB,NZ).GT.ATRPX(ISTYP(NZ)))THEN
