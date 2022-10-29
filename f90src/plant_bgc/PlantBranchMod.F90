@@ -52,14 +52,12 @@ module PlantBranchMod
   real(r8) :: FSNC
   real(r8) :: FSNCL
   real(r8) :: FSNCS
-  real(r8) :: GROGR
+  real(r8) :: GROGRE(npelms)
   real(r8) :: GROLFE(npelms)
   real(r8) :: GRORSVE(npelms),GROHSKE(npelms)
   real(r8) :: GROEARE(npelms)
   real(r8) :: GROSHT,GROSHE(npelms)
   real(r8) :: GROSTKE(npelms)
-  real(r8) :: GROGRN
-  real(r8) :: GROGRP
   real(r8) :: GNOD
   REAL(R8) :: GROE(npelms)
   REAL(R8) :: GSLA,GROA
@@ -280,7 +278,7 @@ module PlantBranchMod
     GRORSVE(ielmc)=PART(4)*CGROS*DMRSV(NZ)
     GROHSKE(ielmc)=PART(5)*CGROS*DMHSK(NZ)
     GROEARE(ielmc)=PART(6)*CGROS*DMEAR(NZ)
-    GROGR=PART(7)*CGROS*DMGR(NZ)
+    GROGRE(ielmc)=PART(7)*CGROS*DMGR(NZ)
     GROSHT=CGROS*DMSHT
     GROLFE(ielmn)=GROLFE(ielmc)*CNLFB*(ZPLFM+ZPLFD*CNPG)
     GROSHE(ielmn)=GROSHE(ielmc)*CNSHB
@@ -288,14 +286,14 @@ module PlantBranchMod
     GRORSVE(ielmn)=GRORSVE(ielmc)*CNRSV(NZ)
     GROHSKE(ielmn)=GROHSKE(ielmc)*CNHSK(NZ)
     GROEARE(ielmn)=GROEARE(ielmc)*CNEAR(NZ)
-    GROGRN=GROGR*CNRSV(NZ)
+    GROGRE(ielmn)=GROGRE(ielmc)*CNRSV(NZ)
     GROLFE(ielmp)=GROLFE(ielmc)*CPLFB*(ZPLFM+ZPLFD*CNPG)
     GROSHE(ielmp)=GROSHE(ielmc)*CPSHB
     GROSTKE(ielmp)=GROSTKE(ielmc)*CPSTK(NZ)
     GRORSVE(ielmp)=GRORSVE(ielmc)*CPRSV(NZ)
     GROHSKE(ielmp)=GROHSKE(ielmc)*CPHSK(NZ)
     GROEARE(ielmp)=GROEARE(ielmc)*CPEAR(NZ)
-    GROGRP=GROGR*CPRSV(NZ)
+    GROGRE(ielmp)=GROGRE(ielmc)*CPRSV(NZ)
 
     DO NE=1,npelms
       WTLFBE(NB,NE,NZ)=WTLFBE(NB,NE,NZ)+GROLFE(NE)
@@ -874,7 +872,7 @@ module PlantBranchMod
       call LeafClassAllocation(NB,NZ)
     ENDIF
 
-    call GrainFilling(I,NB,NZ,GROGR,GROSTKE(ielmc),GROGRN,GROGRP)
+    call GrainFilling(I,NB,NZ,GROGRE,GROSTKE(ielmc))
 !
     call PhenologyReset(I,NB,NZ)
 !
@@ -1876,12 +1874,12 @@ module PlantBranchMod
   implicit none
   integer, intent(in) :: NB,NZ
   real(r8), intent(in) :: ZCX(JP1)
-  integer  :: LL,LU,L,K,k1,k2,KK
+  integer  :: LL,LU,L,K,k1,k2,KK,NE
   integer  :: KVSTGX,KVSTG1,LHTLFU,LHTLFL
   integer  :: LHTBRU,LHTBRL,N
   real(r8) :: ZSTK
-  real(r8) :: YWGLFN,YWGLFP
-  real(r8) :: YARLF,YWGLF,YLGLF,XLGLF
+  real(r8) :: YWGLFE(npelms)
+  real(r8) :: YARLF,YLGLF,XLGLF
   real(r8) :: ARSTKB,ASTV
   real(r8) :: FRACL
   real(r8) :: HTBR
@@ -2038,9 +2036,9 @@ module PlantBranchMod
             FRACL=CLASS(N,NZ)
           ENDIF
           YARLF=FRACL*ARLF1(K,NB,NZ)
-          YWGLF=FRACL*WGLFE(K,NB,ielmc,NZ)
-          YWGLFN=FRACL*WGLFE(K,NB,ielmn,NZ)
-          YWGLFP=FRACL*WGLFE(K,NB,ielmp,NZ)
+          DO NE=1,npelms
+            YWGLFE(NE)=FRACL*WGLFE(K,NB,NE,NZ)
+          ENDDO
 !
     !     ACCUMULATE LAYER LEAF AREAS, C, N AND P CONTENTS
     !
@@ -2050,11 +2048,11 @@ module PlantBranchMod
     !     HTNODE=internode length
     !
           ARLFL(L,K,NB,NZ)=ARLFL(L,K,NB,NZ)+YARLF
-          WGLFLE(L,K,NB,ielmc,NZ)=WGLFLE(L,K,NB,ielmc,NZ)+YWGLF
-          WGLFLE(L,K,NB,ielmn,NZ)=WGLFLE(L,K,NB,ielmn,NZ)+YWGLFN
-          WGLFLE(L,K,NB,ielmp,NZ)=WGLFLE(L,K,NB,ielmp,NZ)+YWGLFP
+          DO NE=1,npelms
+            WGLFLE(L,K,NB,NE,NZ)=WGLFLE(L,K,NB,NE,NZ)+YWGLFE(NE)
+          ENDDO
           ARLFV(L,NZ)=ARLFV(L,NZ)+YARLF
-          WGLFV(L,NZ)=WGLFV(L,NZ)+YWGLF
+          WGLFV(L,NZ)=WGLFV(L,NZ)+YWGLFE(ielmc)
         ENDDO D570
         TLGLF=TLGLF+YLGLF
         ZC(NZ)=AMAX1(ZC(NZ),HTLFU)
@@ -2213,17 +2211,18 @@ module PlantBranchMod
 
 !------------------------------------------------------------------------------------------
 
-  subroutine GrainFilling(I,NB,NZ,GROGR,GROSTKC,GROGRN,GROGRP)
+  subroutine GrainFilling(I,NB,NZ,GROGRE,GROSTKC)
   implicit none
   integer, intent(in) :: I,NB,NZ
-  real(r8), intent(in) :: GROGR,GROSTKC,GROGRN,GROGRP
+  real(r8), intent(in) :: GROGRE(npelms),GROSTKC
   real(r8) :: ZPGRP,ZPGRN,ZNPGP,ZNPGN
-  real(r8) :: XLOCM,XLOCC,XLOCN,XLOCP
+  real(r8) :: XLOCM,XLOCE(npelms)
   real(r8) :: FGRNX
   real(r8) :: GRMXB
   real(r8) :: GROLM
   real(r8) :: GROLC
   real(r8) :: SET
+  integer :: NE
 ! begin_execution
   associate(                              &
     TCC      =>  plt_ew%TCC         , &
@@ -2362,7 +2361,7 @@ module PlantBranchMod
 !     ZPGRM=min N:C,P:C in grain relative to max values from PFT file
 !     CNGR,CPGR=maximum N:C,P:C ratios in grain from PFT file
 !     GROLM,GROLC=maximum,actual grain fill rate
-!     XLOCM,XLOCC=maximum,actual C translocation rate from reserve to grain
+!     XLOCM,XLOCE(ielmc)=maximum,actual C translocation rate from reserve to grain
 !
     IF(WTGRBE(NB,ielmn,NZ).LT.ZPGRM*CNGR(NZ) &
       *WTGRBE(NB,ielmc,NZ).OR.WTGRBE(NB,ielmp,NZ).LT.ZPGRM &
@@ -2372,7 +2371,7 @@ module PlantBranchMod
       GROLC=GROLM
     ENDIF
     XLOCM=AMIN1(GROLM,WTRSVBE(NB,ielmc,NZ))
-    XLOCC=AMIN1(GROLC,WTRSVBE(NB,ielmc,NZ))
+    XLOCE(ielmc)=AMIN1(GROLC,WTRSVBE(NB,ielmc,NZ))
 !
 !     GRAIN N OR P FILL RATE MAY BE LIMITED BY C:N OR C:P RATIOS
 !     OF STALK RESERVES
@@ -2383,9 +2382,9 @@ module PlantBranchMod
 !     ZPGRM=min N:C,P:C in grain relative to max values from PFT file
 !     ZPGRD=1.0_r8-ZPGRM
 !     ZPGRN,ZPGRP=N:C,P:C ratios during grain fill
-!     XLOCM,XLOCC=maximum,actual C translocation rate from reserve to grain
+!     XLOCM,XLOCE(ielmc)=maximum,actual C translocation rate from reserve to grain
 !     CNGR,CPGR=maximum N:C,P:C ratios in grain from PFT file
-!     XLOCN,XLOCP=N,P translocation rate from reserve to grain
+!     XLOCE(ielmn),XLOCE(ielmp)=N,P translocation rate from reserve to grain
 !
     IF(WTRSVBE(NB,ielmc,NZ).GT.ZEROP(NZ))THEN
       ZNPGN=WTRSVBE(NB,ielmn,NZ)/(WTRSVBE(NB,ielmn,NZ) &
@@ -2394,47 +2393,43 @@ module PlantBranchMod
         +SETP*WTRSVBE(NB,ielmc,NZ))
       ZPGRN=ZPGRM+ZPGRD*AZMAX1(AMIN1(1.0_r8,ZNPGN))
       ZPGRP=ZPGRM+ZPGRD*AZMAX1(AMIN1(1.0_r8,ZNPGP))
-      XLOCN=AMIN1(XLOCM*CNGR(NZ) &
+      XLOCE(ielmn)=AMIN1(XLOCM*CNGR(NZ) &
         ,AZMAX1(WTRSVBE(NB,ielmn,NZ)*ZPGRN) &
-        ,(WTGRBE(NB,ielmc,NZ)+XLOCC)*CNGR(NZ)-WTGRBE(NB,ielmn,NZ))
-      XLOCP=AMIN1(XLOCM*CPGR(NZ) &
+        ,(WTGRBE(NB,ielmc,NZ)+XLOCE(ielmc))*CNGR(NZ)-WTGRBE(NB,ielmn,NZ))
+      XLOCE(ielmp)=AMIN1(XLOCM*CPGR(NZ) &
         ,AZMAX1(WTRSVBE(NB,ielmp,NZ)*ZPGRP) &
-        ,(WTGRBE(NB,ielmc,NZ)+XLOCC)*CPGR(NZ)-WTGRBE(NB,ielmp,NZ))
+        ,(WTGRBE(NB,ielmc,NZ)+XLOCE(ielmc))*CPGR(NZ)-WTGRBE(NB,ielmp,NZ))
     ELSE
-      XLOCN=0._r8
-      XLOCP=0._r8
+      XLOCE(ielmn)=0._r8
+      XLOCE(ielmp)=0._r8
     ENDIF
 !
 !     TRANSLOCATE C,N,P FROM STALK RESERVES TO GRAIN
 !
 !     WTRSVB,WTRSBN,WTRSBP=stalk reserve C,N,P mass
 !     GROGR=grain growth rate
-!     XLOCC,XLOCN,XLOCP=C,N,P translocation rate from reserve to grain
+!     XLOCE(ielmc),XLOCE(ielmn),XLOCE(ielmp)=C,N,P translocation rate from reserve to grain
 !
-    WTRSVBE(NB,ielmc,NZ)=WTRSVBE(NB,ielmc,NZ)+GROGR-XLOCC
-    WTRSVBE(NB,ielmn,NZ)=WTRSVBE(NB,ielmn,NZ)+GROGRN-XLOCN
-    WTRSVBE(NB,ielmp,NZ)=WTRSVBE(NB,ielmp,NZ)+GROGRP-XLOCP
-    WTGRBE(NB,ielmc,NZ)=WTGRBE(NB,ielmc,NZ)+XLOCC
-    WTGRBE(NB,ielmn,NZ)=WTGRBE(NB,ielmn,NZ)+XLOCN
-    WTGRBE(NB,ielmp,NZ)=WTGRBE(NB,ielmp,NZ)+XLOCP
+    DO NE=1,npelms
+      WTRSVBE(NB,NE,NZ)=WTRSVBE(NB,NE,NZ)+GROGRE(NE)-XLOCE(NE)
+      WTGRBE(NB,NE,NZ)=WTGRBE(NB,NE,NZ)+XLOCE(NE)
+    ENDDO
   ELSE
-    XLOCC=0._r8
-    XLOCN=0._r8
-    XLOCP=0._r8
+    XLOCE(1:npelms)=0._r8
   ENDIF
 !
 !   SET DATE OF PHYSIOLOGICAL MATURITY WHEN GRAIN FILL
 !   HAS STOPPED FOR SET PERIOD OF TIME
 !
 !   IDAY(8,=end date setting for final seed number
-!   XLOCC=C translocation rate from reserve to grain
+!   XLOCE(ielmc)=C translocation rate from reserve to grain
 !   PP=PFT population
 !   FLG4=number of hours with no grain fill
 !   FLG4X=number of hours with no grain filling until physl maturity
 !   IDAY(10,=date of physiological maturity
 !
   IF(IDAY(8,NB,NZ).NE.0)THEN
-    IF(XLOCC.LE.1.0E-09*PP(NZ))THEN
+    IF(XLOCE(ielmc).LE.1.0E-09*PP(NZ))THEN
       FLG4(NB,NZ)=FLG4(NB,NZ)+1.0
     ELSE
       FLG4(NB,NZ)=0._r8
@@ -2992,14 +2987,13 @@ module PlantBranchMod
     ! FRSV=rate constant for remobiln of storage C,N,P during leafout
     ! FXRT=root partitioning of storage C during leafout
     !
-      EPOOLM(ielmc)=0._r8
-      EPOOLM(ielmn)=0._r8
-      EPOOLM(ielmp)=0._r8
-      D3: DO L=NU,NI(NZ)
-        EPOOLM(ielmc)=EPOOLM(ielmc)+AZMAX1(EPOOLR(ielmc,1,L,NZ))
-        EPOOLM(ielmn)=EPOOLM(ielmn)+AZMAX1(EPOOLR(ielmn,1,L,NZ))
-        EPOOLM(ielmp)=EPOOLM(ielmp)+AZMAX1(EPOOLR(ielmp,1,L,NZ))
-      ENDDO D3
+
+      DO NE=1,npelms
+        EPOOLM(NE)=0._r8
+        D3: DO L=NU,NI(NZ)
+          EPOOLM(NE)=EPOOLM(NE)+AZMAX1(EPOOLR(NE,1,L,NZ))
+        ENDDO D3
+      ENDDO
       IF(WTRVE(ielmc,NZ).GT.ZEROP(NZ))THEN
         IF(ISTYP(NZ).NE.0)THEN
           CPOOLT=AMAX1(ZEROP(NZ),WTRVE(ielmc,NZ)+EPOOLM(ielmc))
@@ -3052,12 +3046,11 @@ module PlantBranchMod
   ! CPOOL,ZPOOL,PPOOL=non-structural C,N,P mass
   ! XFRE(ielmc),XFRE(ielmn),XFRE(ielmc)=nonstructural C,N,P transfer
   !
-    IF(NB.NE.NB1(NZ).AND.ATRP(NB,NZ) &
-      .LE.ATRPX(ISTYP(NZ)))THEN
+    IF(NB.NE.NB1(NZ).AND.ATRP(NB,NZ).LE.ATRPX(ISTYP(NZ)))THEN
       ATRP(NB,NZ)=ATRP(NB,NZ)+TFN3(NZ)*WFNG
       DO NE=1,npelms
-        XFRE(NE)=AZMAX1(0.05*TFN3(NZ) &
-          *(0.5*(EPOOL(NB1(NZ),NE,NZ)+EPOOL(NB,NE,NZ))-EPOOL(NB,NE,NZ)))
+        XFRE(NE)=AZMAX1(0.05_r8*TFN3(NZ) &
+          *(0.5_r8*(EPOOL(NB1(NZ),NE,NZ)+EPOOL(NB,NE,NZ))-EPOOL(NB,NE,NZ)))
         EPOOL(NB,NE,NZ)=EPOOL(NB,NE,NZ)+XFRE(NE)
         EPOOL(NB1(NZ),NE,NZ)=EPOOL(NB1(NZ),NE,NZ)-XFRE(NE)
       ENDDO
@@ -3088,8 +3081,7 @@ module PlantBranchMod
 ! CPOOL,ZPOOL,PPOOL=non-structural C,N,P mass
 !
   IF(IFLGZ.EQ.1.AND.ISTYP(NZ).NE.0)THEN
-    IF(WVSTKB(NB,NZ).GT.ZEROP(NZ) &
-      .AND.WTRSVBE(NB,ielmc,NZ).GT.ZEROP(NZ))THEN
+    IF(WVSTKB(NB,NZ).GT.ZEROP(NZ).AND.WTRSVBE(NB,ielmc,NZ).GT.ZEROP(NZ))THEN
       CWTRSV=AZMAX1(WTRSVBE(NB,ielmc,NZ)/WVSTKB(NB,NZ))
       CWTRSN=AZMAX1(WTRSVBE(NB,ielmn,NZ)/WVSTKB(NB,NZ))
       CWTRSP=AZMAX1(WTRSVBE(NB,ielmp,NZ)/WVSTKB(NB,NZ))
@@ -3165,10 +3157,10 @@ module PlantBranchMod
         -WTRSVBE(NB,ielmp,NZ)*EPOOL(NB,ielmc,NZ))/CPOOLT
       XFRE(ielmn)=FXFZ(ISTYP(NZ))*ZPOOLD
       XFRE(ielmp)=FXFZ(ISTYP(NZ))*PPOOLD
-      EPOOL(NB,ielmn,NZ)=EPOOL(NB,ielmn,NZ)-XFRE(ielmn)
-      WTRSVBE(NB,ielmn,NZ)=WTRSVBE(NB,ielmn,NZ)+XFRE(ielmn)
-      EPOOL(NB,ielmp,NZ)=EPOOL(NB,ielmp,NZ)-XFRE(ielmp)
-      WTRSVBE(NB,ielmp,NZ)=WTRSVBE(NB,ielmp,NZ)+XFRE(ielmp)
+      DO NE=2,npelms
+        EPOOL(NB,NE,NZ)=EPOOL(NB,NE,NZ)-XFRE(NE)
+        WTRSVBE(NB,NE,NZ)=WTRSVBE(NB,NE,NZ)+XFRE(NE)
+      ENDDO
     ENDIF
 
     IF(ISTYP(NZ).EQ.0.AND.IDAY(8,NB,NZ).NE.0)THEN
@@ -3187,11 +3179,10 @@ module PlantBranchMod
               PPOOLD=(EPOOLR(ielmp,1,L,NZ)*WTRSVBE(NB,ielmc,NZ)-WTRSVBE(NB,ielmp,NZ)*EPOOLR(ielmc,1,L,NZ))/CPOOLT
               XFRE(ielmn)=AZMAX1(FXFZ(ISTYP(NZ))*ZPOOLD)
               XFRE(ielmp)=AZMAX1(FXFZ(ISTYP(NZ))*PPOOLD)
-              EPOOLR(ielmn,1,L,NZ)=EPOOLR(ielmn,1,L,NZ)-XFRE(ielmn)
-              WTRSVBE(NB,ielmn,NZ)=WTRSVBE(NB,ielmn,NZ)+XFRE(ielmn)
-              EPOOLR(ielmp,1,L,NZ)=EPOOLR(ielmp,1,L,NZ)-XFRE(ielmp)
-              WTRSVBE(NB,ielmp,NZ)=WTRSVBE(NB,ielmp,NZ)+XFRE(ielmp)
-
+              DO NE=2,npelms
+                EPOOLR(NE,1,L,NZ)=EPOOLR(NE,1,L,NZ)-XFRE(NE)
+                WTRSVBE(NB,NE,NZ)=WTRSVBE(NB,NE,NZ)+XFRE(NE)
+              ENDDO
             ENDIF
           ENDIF
         ENDIF
@@ -3208,8 +3199,7 @@ module PlantBranchMod
 !   XFRX=maximum storage C content for remobiln from stalk,root reserves
 !   XFRE(ielmc)=C transfer
 !
-  IF(WVSTKB(NB,NZ).GT.ZEROP(NZ) &
-    .AND.WVSTK(NZ).GT.ZEROP(NZ) &
+  IF(WVSTKB(NB,NZ).GT.ZEROP(NZ).AND.WVSTK(NZ).GT.ZEROP(NZ) &
     .AND.WTRTE(ielmc,NZ).GT.ZEROP(NZ) &
     .AND.WTRSVBE(NB,ielmc,NZ).LE.XFRX*WVSTKB(NB,NZ))THEN
     FWTBR=WVSTKB(NB,NZ)/WVSTK(NZ)
