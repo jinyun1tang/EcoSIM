@@ -7,4 +7,6 @@ implicit none
   integer, parameter :: ielmn=2    !nitrogen element
   integer, parameter :: ielmp=3    !phosphorus element
   integer, parameter :: npelms=3   !totally three elements
+  integer, parameter :: ic4_photo=4
+  integer, parameter :: ic3_photo=3
 end module ElmIDMod

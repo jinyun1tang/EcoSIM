@@ -242,7 +242,7 @@ module readqmod
         if(mod(nn,2)==0)then
           IDYE=IDY
 
-          DO 580 IDYG=IDYS+1,IDYE-1
+          D580: DO IDYG=IDYS+1,IDYE-1
             IHVST(NZ,IDYG,NY,NX)=ICUT
             JHVST(NZ,IDYG,NY,NX)=JCUT
             HVST(NZ,IDYG,NY,NX)=HCUT
@@ -255,7 +255,7 @@ module readqmod
             EHVST(2,2,NZ,IDYG,NY,NX)=ECUT22
             EHVST(2,3,NZ,IDYG,NY,NX)=ECUT23
             EHVST(2,4,NZ,IDYG,NY,NX)=ECUT24
-580       CONTINUE
+          ENDDO D580
         endif
 !570     IDYS=IDY
         IDYS=IDY
@@ -671,4 +671,25 @@ module readqmod
 ! WRITE(*,1111)'CRITICAL DAYLENGTH',IGO,NZ,XDL(NZ,NY,NX)
 !1111    FORMAT(A20,2I8,E12.4)
   end subroutine ReadPlantProperties
+
+
+
+  subroutine pft_display()
+  implicit none
+!   ICTYP=photosynthesis type:3=C3,4=C4
+!   IGTYP=root profile:0=shallow (eg bryophytes),1=intermediate(eg herbs),2=deep (eg trees)
+!   ISTYP=growth habit:0=annual,1=perennial
+!   IDTYP=growth habit:0=determinate,1=indetermimate
+!   INTYP=N2 fixation:1,2,3=rapid to slow root symbiosis (e.g.legumes),
+!   4,5,6=rapid to slow canopy symbiosis (e.g. cyanobacteria)
+!   IWTYP=phenology type:0=evergreen,1=cold deciduous,2=drought deciduous,3=1+2
+!   IPTYP=photoperiod type:0=day neutral,1=short day,2=long day
+!   IBTYP=turnover:if IGTYP=0 or 1:all above-ground:0,1=rapid(deciduous),2=very slow(evergreen),3=slow(semi-deciduous)
+!                   :if IGTYP=2:trees:1=rapid(deciduous),2=very slow(coniferous),3=slow(semi-deciduous)
+!   IRTYP=storage organ:0=above ground,1=below ground
+!   MY=mycorrhizal:1=no,2=yes
+!   ZTYPI=thermal adaptation zone:1=arctic,boreal,2=cool temperate,
+!   3=warm temperate,4=subtropical,5=tropical
+
+  end subroutine pft_display
 end module readqmod

@@ -416,7 +416,7 @@ implicit none
 !               GSL=leaf stomatal conductance (mol m-2 s-1)
 !
                 CO2X=CO2I(NZ)
-                DO 125 NN=1,100
+                D125: DO NN=1,100
                   CO2C=CO2X*SCO2(NZ)
                   CO2Y=AZMAX1(CO2C-COMP4)
                   CBXNX=CO2Y/(ELEC4*CO2C+10.5*COMP4)
@@ -433,7 +433,7 @@ implicit none
                     VL=0._r8
                     exit
                   ENDIF
-125             CONTINUE
+                ENDDO D125
 !
 !               ACCUMULATE C4 FIXATION PRODUCT IN MESOPHYLL
 !
@@ -646,7 +646,7 @@ implicit none
 !
 !         FOR EACH NODE
 !
-        DO 100 K=1,JNODS1
+        D100: DO K=1,JNODS1
           CH2O3(K)=0._r8
           CH2O4(K)=0._r8
           IF(ARLF1(K,NB,NZ).GT.ZEROP(NZ))THEN
@@ -657,18 +657,18 @@ implicit none
 !             ICTYP=photosynthesis type:3=C3,4=C4 from PFT file
 !             VCGR4=PEP carboxylation rate unlimited by CO2
 !
-            IF(ICTYP(NZ).EQ.4.AND.VCGR4(K,NB,NZ).GT.0.0)THEN
+            IF(ICTYP(NZ).EQ.ic4_photo.AND.VCGR4(K,NB,NZ).GT.0.0_r8)THEN
 !
               CALL ComputeGPP_C4(K,NB,NZ,WFNG,WFNC,CH2O3,CH2O4,CO2F,CH2O)
 !
 !               C3 PHOTOSYNTHESIS
 !
-            ELSEIF(ICTYP(NZ).NE.4.AND.VCGRO(K,NB,NZ).GT.0.0)THEN
+            ELSEIF(ICTYP(NZ).NE.ic4_photo.AND.VCGRO(K,NB,NZ).GT.0.0_r8)THEN
               call ComputeGPP_C3(K,NB,NZ,WFNG,WFNC,CH2O3,CO2F,CH2O)
 
             ENDIF
           ENDIF
-100     CONTINUE
+        ENDDO D100
 !
 !         CO2F,CH2O=total CO2 fixation,CH2O production
 !
@@ -677,38 +677,39 @@ implicit none
 !
 !         CONVERT UMOL M-2 S-1 TO G C M-2 H-1
 !
-        DO 150 K=1,JNODS1
+        D150: DO K=1,JNODS1
           CH2O3(K)=CH2O3(K)*0.0432
           CH2O4(K)=CH2O4(K)*0.0432
-150     CONTINUE
+        ENDDO D150
       ELSE
         CO2F=0._r8
         CH2O=0._r8
-        IF(ICTYP(NZ).EQ.4)THEN
-          DO 155 K=1,JNODS1
+        IF(ICTYP(NZ).EQ.ic4_photo)THEN
+          D155: DO K=1,JNODS1
             CH2O3(K)=0._r8
             CH2O4(K)=0._r8
-155       CONTINUE
+          ENDDO D155
         ENDIF
       ENDIF
     ELSE
       CO2F=0._r8
       CH2O=0._r8
-      IF(ICTYP(NZ).EQ.4)THEN
-        DO 160 K=1,JNODS1
+      !C4
+      IF(ICTYP(NZ).EQ.ic4_photo)THEN
+        D160: DO K=1,JNODS1
           CH2O3(K)=0._r8
           CH2O4(K)=0._r8
-160     CONTINUE
+        ENDDO D160
       ENDIF
     ENDIF
   ELSE
     CO2F=0._r8
     CH2O=0._r8
-    IF(ICTYP(NZ).EQ.4)THEN
-      DO 165 K=1,JNODS1
+    IF(ICTYP(NZ).EQ.ic4_photo)THEN
+      D165: DO K=1,JNODS1
         CH2O3(K)=0._r8
         CH2O4(K)=0._r8
-165   CONTINUE
+      ENDDO D165
     ENDIF
   ENDIF
   end associate

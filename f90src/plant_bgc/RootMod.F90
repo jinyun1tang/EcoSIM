@@ -291,9 +291,9 @@ implicit none
           RTVLP(N,L,NZ)=PORT(N,NZ)*RTVL
           RTVLW(N,L,NZ)=(1.0_r8-PORT(N,NZ))*RTVL
           RRAD1(N,L,NZ)=AMAX1(RRAD1X(N,NZ) &
-            ,(1.0+PSIRT(N,L,NZ)/EMODR)*RRAD1M(N,NZ))
+            ,(1.0_r8+PSIRT(N,L,NZ)/EMODR)*RRAD1M(N,NZ))
           RRAD2(N,L,NZ)=AMAX1(RRAD2X(N,NZ) &
-            ,(1.0+PSIRT(N,L,NZ)/EMODR)*RRAD2M(N,NZ))
+            ,(1.0_r8+PSIRT(N,L,NZ)/EMODR)*RRAD2M(N,NZ))
           RTAR=6.283*RRAD1(N,L,NZ)*RTLGX &
             +6.283*RRAD2(N,L,NZ)*RTLGL
           IF(RTNL(N,L,NZ).GT.ZEROP(NZ))THEN
@@ -636,7 +636,7 @@ implicit none
         RCER(ielmn)=WTRT2E(ielmn,N,L,NR,NZ)*(RCCN+(1.0_r8-RCCN)*RCER(ielmc)/WTRT2E(ielmc,N,L,NR,NZ))
         RCER(ielmp)=WTRT2E(ielmp,N,L,NR,NZ)*(RCCP+(1.0_r8-RCCP)*RCER(ielmc)/WTRT2E(ielmc,N,L,NR,NZ))
         IF(RCER(ielmc).GT.ZEROP(NZ))THEN
-          FSNC2=AZMAX1(AMIN1(1.0,SNCR/RCER(ielmc)))
+          FSNC2=AZMAX1(AMIN1(1.0_r8,SNCR/RCER(ielmc)))
         ELSE
           FSNC2=1.0_r8
         ENDIF
@@ -786,7 +786,7 @@ implicit none
 !     WFNRG=respiration function of root water potential
 !
               RSCS1=RSCS(L)*RRAD1(N,L,NZ)/1.0E-03
-              WFNR=AMIN1(1.0,AZMAX1(PSIRG(N,L,NZ)-PSILM-RSCS1))
+              WFNR=AMIN1(1.0_r8,AZMAX1(PSIRG(N,L,NZ)-PSILM-RSCS1))
               IF(IGTYP(NZ).EQ.0)THEN
                 WFNRG=WFNR**0.10
               ELSE
@@ -950,7 +950,7 @@ implicit none
                 TFRCO2=0._r8
                 DO 5100 LL=NG(NZ),NINR(NR,NZ)
                   IF(LL.LT.NINR(NR,NZ))THEN
-                    FRCO2=AMIN1(1.0,RTLG1(N,LL,NR,NZ)/(RTDP1(N,NR,NZ)-SDPTH(NZ)))
+                    FRCO2=AMIN1(1.0_r8,RTLG1(N,LL,NR,NZ)/(RTDP1(N,NR,NZ)-SDPTH(NZ)))
                   ELSE
                     FRCO2=1.0_r8-TFRCO2
                   ENDIF
@@ -1031,12 +1031,12 @@ implicit none
 !
                   IF(GRTWTM.LT.0.0)THEN
                     IF(WTRT2E(ielmc,1,LL,NR,NZ).GT.ZEROP(NZ))THEN
-                      FSNCM=AMIN1(1.0,ABS(GRTWTM)/WTRT2E(ielmc,1,LL,NR,NZ))
+                      FSNCM=AMIN1(1.0_r8,ABS(GRTWTM)/WTRT2E(ielmc,1,LL,NR,NZ))
                     ELSE
                       FSNCM=1.0_r8
                     ENDIF
                     IF(WTRTL(1,LL,NZ).GT.ZEROP(NZ))THEN
-                      FSNCP=AMIN1(1.0,ABS(GRTWTM)/WTRTL(1,LL,NZ))
+                      FSNCP=AMIN1(1.0_r8,ABS(GRTWTM)/WTRTL(1,LL,NZ))
                     ELSE
                       FSNCP=1.0_r8
                     ENDIF
@@ -1196,7 +1196,7 @@ implicit none
     RCER(ielmn)=RTWT1E(N,NR,ielmn,NZ)*(RCCN+(1.0_r8-RCCN)*RCER(ielmc)/RTWT1E(N,NR,ielmc,NZ))
     RCER(ielmp)=RTWT1E(N,NR,ielmp,NZ)*(RCCP+(1.0_r8-RCCP)*RCER(ielmc)/RTWT1E(N,NR,ielmc,NZ))
     IF(RCER(ielmc).GT.ZEROP(NZ))THEN
-      FSNC1=AZMAX1(AMIN1(1.0,SNCR/RCER(ielmc)))
+      FSNC1=AZMAX1(AMIN1(1.0_r8,SNCR/RCER(ielmc)))
     ELSE
       FSNC1=1.0_r8
     ENDIF
@@ -1557,7 +1557,7 @@ implicit none
   real(r8), INTENT(IN) :: RLNT(2,JZ1)
   real(r8),intent(in) :: RTSK1(2,JZ1,10),RTSK2(2,JZ1,10)
   real(r8),intent(in) :: RTNT(2)
-  integer :: L,NB,N,NR
+  integer :: L,NB,N,NR,NE
   real(r8) :: ZPOOLS,ZPOOLT
   real(r8) :: ZPOOLB
   real(r8) :: ZPOOLD
@@ -1583,7 +1583,7 @@ implicit none
   real(r8) :: WTRSVD,WTRSND,WTRSPD
   real(r8) :: WTRTD2,WTLSBX,WTLSBB
   real(r8) :: WTRTLR
-  real(r8) :: XFRC,XFRN,XFRP
+  real(r8) :: XFRE(npelms)
 !     begin_execution
   associate(                                &
     FWODBE     =>   plt_allom%FWODBE  , &
@@ -1657,24 +1657,23 @@ implicit none
         ENDIF
       ENDIF
     ENDDO D300
-    DO 305 NB=1,NBR(NZ)
+    D305: DO NB=1,NBR(NZ)
       IF(IDTHB(NB,NZ).EQ.0)THEN
         IF(ATRP(NB,NZ).GT.ATRPX(ISTYP(NZ)))THEN
-          IF(WTPLTT.GT.ZEROP(NZ) &
-            .AND.CPOOLT.GT.ZEROP(NZ))THEN
+          IF(WTPLTT.GT.ZEROP(NZ).AND.CPOOLT.GT.ZEROP(NZ))THEN
             CPOOLD=CPOOLT*WTLSBZ(NB)-CPOOLZ(NB)*WTPLTT
             ZPOOLD=ZPOOLT*CPOOLZ(NB)-ZPOOLZ(NB)*CPOOLT
             PPOOLD=PPOOLT*CPOOLZ(NB)-PPOOLZ(NB)*CPOOLT
-            XFRC=0.01*CPOOLD/WTPLTT
-            XFRN=0.01*ZPOOLD/CPOOLT
-            XFRP=0.01*PPOOLD/CPOOLT
-            EPOOL(NB,ielmc,NZ)=EPOOL(NB,ielmc,NZ)+XFRC
-            EPOOL(NB,ielmn,NZ)=EPOOL(NB,ielmn,NZ)+XFRN
-            EPOOL(NB,ielmp,NZ)=EPOOL(NB,ielmp,NZ)+XFRP
+            XFRE(ielmc)=0.01_r8*CPOOLD/WTPLTT
+            XFRE(ielmn)=0.01_r8*ZPOOLD/CPOOLT
+            XFRE(ielmp)=0.01_r8*PPOOLD/CPOOLT
+            DO NE=1,npelms
+              EPOOL(NB,NE,NZ)=EPOOL(NB,NE,NZ)+XFRE(NE)
+            ENDDO
           ENDIF
         ENDIF
       ENDIF
-305 CONTINUE
+    ENDDO D305
   ENDIF
 !
 !     TRANSFER NON-STRUCTURAL C,N,P AMONG BRANCH STALK RESERVES
@@ -1705,14 +1704,14 @@ implicit none
         IF(IDTHB(NB,NZ).EQ.0)THEN
           IF(IDAY(7,NB,NZ).NE.0)THEN
             WTRSVD=WTRSVT*WVSTKB(NB,NZ)-WTRSVBE(NB,ielmc,NZ)*WTSTKT
-            XFRC=0.1_r8*WTRSVD/WTSTKT
-            WTRSVBE(NB,ielmc,NZ)=WTRSVBE(NB,ielmc,NZ)+XFRC
+            XFRE(ielmc)=0.1_r8*WTRSVD/WTSTKT
+            WTRSVBE(NB,ielmc,NZ)=WTRSVBE(NB,ielmc,NZ)+XFRE(ielmc)
             WTRSND=WTRSNT*WTRSVBE(NB,ielmc,NZ)-WTRSVBE(NB,ielmn,NZ)*WTRSVT
-            XFRN=0.1_r8*WTRSND/WTRSVT
-            WTRSVBE(NB,ielmn,NZ)=WTRSVBE(NB,ielmn,NZ)+XFRN
+            XFRE(ielmn)=0.1_r8*WTRSND/WTRSVT
+            WTRSVBE(NB,ielmn,NZ)=WTRSVBE(NB,ielmn,NZ)+XFRE(ielmn)
             WTRSPD=WTRSPT*WTRSVBE(NB,ielmc,NZ)-WTRSVBE(NB,ielmp,NZ)*WTRSVT
-            XFRP=0.1_r8*WTRSPD/WTRSVT
-            WTRSVBE(NB,ielmp,NZ)=WTRSVBE(NB,ielmp,NZ)+XFRP
+            XFRE(ielmp)=0.1_r8*WTRSPD/WTRSVT
+            WTRSVBE(NB,ielmp,NZ)=WTRSVBE(NB,ielmp,NZ)+XFRE(ielmp)
           ENDIF
         ENDIF
       ENDDO D335
@@ -1731,29 +1730,28 @@ implicit none
 !
   IF(MY(NZ).EQ.2)THEN
     D425: DO L=NU,NIX(NZ)
-      IF(EPOOLR(ielmc,1,L,NZ).GT.ZEROP(NZ) &
-        .AND.WTRTD(1,L,NZ).GT.ZEROL(NZ))THEN
+      IF(EPOOLR(ielmc,1,L,NZ).GT.ZEROP(NZ).AND.WTRTD(1,L,NZ).GT.ZEROL(NZ))THEN
         WTRTD1=WTRTD(1,L,NZ)
         WTRTD2=AMIN1(WTRTD(1,L,NZ),AMAX1(FSNK &
           *WTRTD(1,L,NZ),WTRTD(2,L,NZ)))
         WTPLTT=WTRTD1+WTRTD2
         IF(WTPLTT.GT.ZEROP(NZ))THEN
           CPOOLD=(EPOOLR(ielmc,1,L,NZ)*WTRTD2-EPOOLR(ielmc,2,L,NZ)*WTRTD1)/WTPLTT
-          XFRC=FMYC*CPOOLD
-          EPOOLR(ielmc,1,L,NZ)=EPOOLR(ielmc,1,L,NZ)-XFRC
-          EPOOLR(ielmc,2,L,NZ)=EPOOLR(ielmc,2,L,NZ)+XFRC
+          XFRE(ielmc)=FMYC*CPOOLD
+          EPOOLR(ielmc,1,L,NZ)=EPOOLR(ielmc,1,L,NZ)-XFRE(ielmc)
+          EPOOLR(ielmc,2,L,NZ)=EPOOLR(ielmc,2,L,NZ)+XFRE(ielmc)
           CPOOLT=EPOOLR(ielmc,1,L,NZ)+EPOOLR(ielmc,2,L,NZ)
           IF(CPOOLT.GT.ZEROP(NZ))THEN
             ZPOOLD=(EPOOLR(ielmn,1,L,NZ)*EPOOLR(ielmc,2,L,NZ) &
               -EPOOLR(ielmn,2,L,NZ)*EPOOLR(ielmc,1,L,NZ))/CPOOLT
-            XFRN=FMYC*ZPOOLD
+            XFRE(ielmn)=FMYC*ZPOOLD
             PPOOLD=(EPOOLR(ielmp,1,L,NZ)*EPOOLR(ielmc,2,L,NZ) &
               -EPOOLR(ielmp,2,L,NZ)*EPOOLR(ielmc,1,L,NZ))/CPOOLT
-            XFRP=FMYC*PPOOLD
-            EPOOLR(ielmn,1,L,NZ)=EPOOLR(ielmn,1,L,NZ)-XFRN
-            EPOOLR(ielmn,2,L,NZ)=EPOOLR(ielmn,2,L,NZ)+XFRN
-            EPOOLR(ielmp,1,L,NZ)=EPOOLR(ielmp,1,L,NZ)-XFRP
-            EPOOLR(ielmp,2,L,NZ)=EPOOLR(ielmp,2,L,NZ)+XFRP
+            XFRE(ielmp)=FMYC*PPOOLD
+            DO NE=2,npelms
+              EPOOLR(NE,1,L,NZ)=EPOOLR(NE,1,L,NZ)-XFRE(NE)
+              EPOOLR(NE,2,L,NZ)=EPOOLR(NE,2,L,NZ)+XFRE(NE)
+            ENDDO
           ENDIF
         ENDIF
       ENDIF
@@ -1774,17 +1772,16 @@ implicit none
           CPL=0._r8
         ENDIF
         XFRCX=FXFR(IBTYP(NZ))*AZMAX1(EPOOLR(ielmc,N,L,NZ))
-        XFRNX=FXFR(IBTYP(NZ))*AZMAX1(EPOOLR(ielmn,N,L,NZ))*(1.0+CNL)
-        XFRPX=FXFR(IBTYP(NZ))*AZMAX1(EPOOLR(ielmp,N,L,NZ))*(1.0+CPL)
-        XFRC=AMIN1(XFRCX,XFRNX/CNMN,XFRPX/CPMN)
-        XFRN=AMIN1(XFRNX,XFRC*CNMX,XFRPX*CNMX/CPMN*0.5_r8)
-        XFRP=AMIN1(XFRPX,XFRC*CPMX,XFRNX*CPMX/CNMN*0.5_r8)
-        EPOOLR(ielmc,N,L,NZ)=EPOOLR(ielmc,N,L,NZ)-XFRC
-        WTRVE(ielmc,NZ)=WTRVE(ielmc,NZ)+XFRC
-        EPOOLR(ielmn,N,L,NZ)=EPOOLR(ielmn,N,L,NZ)-XFRN
-        WTRVE(ielmn,NZ)=WTRVE(ielmn,NZ)+XFRN
-        EPOOLR(ielmp,N,L,NZ)=EPOOLR(ielmp,N,L,NZ)-XFRP
-        WTRVE(ielmp,NZ)=WTRVE(ielmp,NZ)+XFRP
+        XFRNX=FXFR(IBTYP(NZ))*AZMAX1(EPOOLR(ielmn,N,L,NZ))*(1.0_r8+CNL)
+        XFRPX=FXFR(IBTYP(NZ))*AZMAX1(EPOOLR(ielmp,N,L,NZ))*(1.0_r8+CPL)
+        XFRE(ielmc)=AMIN1(XFRCX,XFRNX/CNMN,XFRPX/CPMN)
+        XFRE(ielmn)=AMIN1(XFRNX,XFRE(ielmc)*CNMX,XFRPX*CNMX/CPMN*0.5_r8)
+        XFRE(ielmp)=AMIN1(XFRPX,XFRE(ielmc)*CPMX,XFRNX*CPMX/CNMN*0.5_r8)
+        DO NE=1,npelms
+          EPOOLR(NE,N,L,NZ)=EPOOLR(NE,N,L,NZ)-XFRE(NE)
+          WTRVE(NE,NZ)=WTRVE(NE,NZ)+XFRE(NE)
+        ENDDO
+
       ENDDO D5550
     ENDDO D5545
   ENDIF
@@ -1828,12 +1825,12 @@ implicit none
 !
 !     IF(ISTYP(NZ).EQ.1)THEN
   IF(WTLS(NZ).GT.ZEROP(NZ))THEN
-    FWTC=AMIN1(1.0,0.667*WTRTE(ielmc,NZ)/WTLS(NZ))
+    FWTC=AMIN1(1.0_r8,0.667_r8*WTRTE(ielmc,NZ)/WTLS(NZ))
   ELSE
     FWTC=1.0_r8
   ENDIF
   IF(WTRTE(ielmc,NZ).GT.ZEROP(NZ))THEN
-    FWTS=AMIN1(1.0,WTLS(NZ)/(0.667*WTRTE(ielmc,NZ)))
+    FWTS=AMIN1(1.0_r8,WTLS(NZ)/(0.667_r8*WTRTE(ielmc,NZ)))
   ELSE
     FWTS=1.0_r8
   ENDIF
@@ -1896,27 +1893,25 @@ implicit none
           CPOOLB=AZMAX1(EPOOL(NB,ielmc,NZ)*FWTR(L))
           CPOOLS=AZMAX1(EPOOLR(ielmc,1,L,NZ)*FWTB(NB))
           CPOOLD=(CPOOLB*WTRTLR-CPOOLS*WTLSBB)/WTPLTT
-          XFRC=PTSHTR*CPOOLD
-          EPOOL(NB,ielmc,NZ)=EPOOL(NB,ielmc,NZ)-XFRC
-          EPOOLR(ielmc,1,L,NZ)=EPOOLR(ielmc,1,L,NZ)+XFRC
+          XFRE(ielmc)=PTSHTR*CPOOLD
           CPOOLT=CPOOLS+CPOOLB
           IF(CPOOLT.GT.ZEROP(NZ))THEN
             ZPOOLB=AZMAX1(EPOOL(NB,ielmn,NZ)*FWTR(L))
             ZPOOLS=AZMAX1(EPOOLR(ielmn,1,L,NZ)*FWTB(NB))
             ZPOOLD=(ZPOOLB*CPOOLS-ZPOOLS*CPOOLB)/CPOOLT
-            XFRN=PTSHTR*ZPOOLD
+            XFRE(ielmn)=PTSHTR*ZPOOLD
             PPOOLB=AZMAX1(EPOOL(NB,ielmp,NZ)*FWTR(L))
             PPOOLS=AZMAX1(EPOOLR(ielmp,1,L,NZ)*FWTB(NB))
             PPOOLD=(PPOOLB*CPOOLS-PPOOLS*CPOOLB)/CPOOLT
-            XFRP=PTSHTR*PPOOLD
+            XFRE(ielmp)=PTSHTR*PPOOLD
           ELSE
-            XFRN=0._r8
-            XFRP=0._r8
+            XFRE(ielmn)=0._r8
+            XFRE(ielmp)=0._r8
           ENDIF
-          EPOOL(NB,ielmn,NZ)=EPOOL(NB,ielmn,NZ)-XFRN
-          EPOOLR(ielmn,1,L,NZ)=EPOOLR(ielmn,1,L,NZ)+XFRN
-          EPOOL(NB,ielmp,NZ)=EPOOL(NB,ielmp,NZ)-XFRP
-          EPOOLR(ielmp,1,L,NZ)=EPOOLR(ielmp,1,L,NZ)+XFRP
+          DO NE=1,npelms
+            EPOOL(NB,NE,NZ)=EPOOL(NB,NE,NZ)-XFRE(NE)
+            EPOOLR(NE,1,L,NZ)=EPOOLR(NE,1,L,NZ)+XFRE(NE)
+          ENDDO
 
         ENDIF
       ENDDO D415
@@ -1999,8 +1994,8 @@ implicit none
   RTSK1=0._r8
   RTSK2=0._r8
   RTNT=0._r8
-  DO 4995 N=1,MY(NZ)
-    DO 4990 L=NU,NI(NZ)
+  D4995: DO N=1,MY(NZ)
+    D4990: DO L=NU,NI(NZ)
 !
 !     RESPIRATION FROM NUTRIENT UPTAKE CALCULATED IN 'UPTAKE':
 !     ACTUAL, O2-UNLIMITED AND C-UNLIMITED
@@ -2016,13 +2011,13 @@ implicit none
 !     RUCH2P,RUCH2B,RUCH1P,RUCH1B=uptake from non-band,band of H2PO4,HPO4 unlimited by nonstructural C
 !
       IF(VOLX(L).GT.ZEROS2)THEN
-        CUPRL=0.86*(RUPNH4(N,L,NZ)+RUPNHB(N,L,NZ) &
+        CUPRL=0.86_r8*(RUPNH4(N,L,NZ)+RUPNHB(N,L,NZ) &
           +RUPNO3(N,L,NZ)+RUPNOB(N,L,NZ)+RUPH2P(N,L,NZ) &
           +RUPH2B(N,L,NZ)+RUPH1P(N,L,NZ)+RUPH1B(N,L,NZ))
-        CUPRO=0.86*(RUONH4(N,L,NZ)+RUONHB(N,L,NZ) &
+        CUPRO=0.86_r8*(RUONH4(N,L,NZ)+RUONHB(N,L,NZ) &
           +RUONO3(N,L,NZ)+RUONOB(N,L,NZ)+RUOH2P(N,L,NZ) &
           +RUOH2B(N,L,NZ)+RUOH1P(N,L,NZ)+RUOH1B(N,L,NZ))
-        CUPRC=0.86*(RUCNH4(N,L,NZ)+RUCNHB(N,L,NZ) &
+        CUPRC=0.86_r8*(RUCNH4(N,L,NZ)+RUCNHB(N,L,NZ) &
           +RUCNO3(N,L,NZ)+RUCNOB(N,L,NZ)+RUCH2P(N,L,NZ) &
           +RUCH2B(N,L,NZ)+RUCH1P(N,L,NZ)+RUCH1B(N,L,NZ))
 !
@@ -2059,7 +2054,7 @@ implicit none
 !
 !     GROWTH OF EACH ROOT AXIS
 !
-        DO 4985 NR=1,NRT(NZ)
+        D4985: DO NR=1,NRT(NZ)
 !
 !     PRIMARY ROOT SINK STRENGTH FROM ROOT RADIUS AND ROOT DEPTH
 !
@@ -2077,7 +2072,7 @@ implicit none
             IF(RTDP1(N,NR,NZ).GT.CDPTHZ(L-1))THEN
               IF(RTDP1(N,NR,NZ).LE.CDPTHZ(L))THEN
                 RTDPP=RTDP1(N,NR,NZ)+HTSTZ(NZ)
-                RTSK1(N,L,NR)=RTSK(IGTYP(NZ))*XRTN1*RRAD1(N,L,NZ)**2/RTDPP
+                RTSK1(N,L,NR)=RTSK(IGTYP(NZ))*XRTN1*RRAD1(N,L,NZ)**2._r8/RTDPP
                 RTNT(N)=RTNT(N)+RTSK1(N,L,NR)
                 RLNT(N,L)=RLNT(N,L)+RTSK1(N,L,NR)
               ENDIF
@@ -2108,8 +2103,8 @@ implicit none
               -AZMAX1(SDPTH(NZ)-CDPTHZ(L-1)-HTCTL(NZ)))
             RTDPS=AMAX1(SDPTH(NZ),CDPTHZ(L-1))+0.5*RTDPL(NR,L)+HTSTZ(NZ)
             IF(RTDPS.GT.ZERO)THEN
-              RTSKP=XRTN1*RRAD1(N,L,NZ)**2/RTDPS
-              RTSKS=safe_adb(RTN2(N,L,NR,NZ)*RRAD2(N,L,NZ)**2,RTLGA(N,L,NZ))
+              RTSKP=XRTN1*RRAD1(N,L,NZ)**2._r8/RTDPS
+              RTSKS=safe_adb(RTN2(N,L,NR,NZ)*RRAD2(N,L,NZ)**2._r8,RTLGA(N,L,NZ))
               IF(RTSKP+RTSKS.GT.ZEROP(NZ))THEN
                 RTSK2(N,L,NR)=RTSKP*RTSKS/(RTSKP+RTSKS)
               ELSE
@@ -2119,14 +2114,14 @@ implicit none
               RTSK2(N,L,NR)=0._r8
             ENDIF
           ELSE
-            RTSK2(N,L,NR)=safe_adb(RTN2(N,L,NR,NZ)*RRAD2(N,L,NZ)**2,RTLGA(N,L,NZ))
+            RTSK2(N,L,NR)=safe_adb(RTN2(N,L,NR,NZ)*RRAD2(N,L,NZ)**2._r8,RTLGA(N,L,NZ))
           ENDIF
           RTNT(N)=RTNT(N)+RTSK2(N,L,NR)
           RLNT(N,L)=RLNT(N,L)+RTSK2(N,L,NR)
-4985    CONTINUE
+        ENDDO D4985
       ENDIF
-4990  CONTINUE
-4995  CONTINUE
+    ENDDO D4990
+  ENDDO D4995
   end associate
   end subroutine SummarizeRootSink
 

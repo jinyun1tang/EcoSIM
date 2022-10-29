@@ -204,6 +204,7 @@ module PlantBranchMod
       CPLFB=CPRTW
       CPSHB=CPRTW
     ENDIF
+!part 1(leaf), (2) sheath, (3) stalk, (4) reserve, (5) husk, (6) ear, (7) grain
     DMSHT=PART(1)*DMLFB+PART(2)*DMSHB+PART(3)*DMSTK(NZ) &
       +PART(4)*DMRSV(NZ)+PART(5)*DMHSK(NZ) &
       +PART(6)*DMEAR(NZ)+PART(7)*DMGR(NZ)

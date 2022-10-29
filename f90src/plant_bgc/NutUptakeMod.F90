@@ -129,8 +129,8 @@ module NutUptakeMod
 
   call ZeroUptake(NZ)
 
-  DO 955 N=1,MY(NZ)
-    DO 950 L=NU,NI(NZ)
+  D955: DO N=1,MY(NZ)
+    D950: DO L=NU,NI(NZ)
       IF(VOLX(L).GT.ZEROS2.AND.RTDNP(N,L,NZ).GT.ZERO &
         .AND.RTVLW(N,L,NZ).GT.ZEROP(NZ).AND.THETW(L).GT.ZERO)THEN
         TFOXYX=0.0_r8
@@ -182,8 +182,8 @@ module NutUptakeMod
 
       call SumupNutrientUptake(N,L,NZ)
 
-950 CONTINUE
-955 CONTINUE
+    ENDDO D950
+  ENDDO D955
   end associate
   end subroutine RootMycoO2NutrientUptake
 !------------------------------------------------------------------------
@@ -762,7 +762,7 @@ module NutUptakeMod
     !     FCUP,FPUP=limitn to active uptake respiration from CCPOLR,CPPOLR
     !     WFR=constraint by O2 consumption on all biological processes
     !
-    UPMXP=0.1*UPMXPO(N,NZ)*RTARP(N,L,NZ) &
+    UPMXP=0.1_r8*UPMXPO(N,NZ)*RTARP(N,L,NZ) &
       *FWSRT*TFN4(L,NZ)*VLPO4(L)*AMIN1(FCUP,FPUP)
     UPMX=UPMXP*WFR(N,L,NZ)
     !
@@ -822,7 +822,7 @@ module NutUptakeMod
     !     FCUP,FPUP=limitn to active uptake respiration from CCPOLR,CPPOLR
     !     WFR=constraint by O2 consumption on all biological processes
     !
-    UPMXP=0.1*UPMXPO(N,NZ)*RTARP(N,L,NZ) &
+    UPMXP=0.1_r8*UPMXPO(N,NZ)*RTARP(N,L,NZ) &
       *FWSRT*TFN4(L,NZ)*VLPOB(L)*AMIN1(FCUP,FPUP)
     UPMX=UPMXP*WFR(N,L,NZ)
     !
@@ -1265,13 +1265,13 @@ module NutUptakeMod
     VOLWK=VOLWM(NPH,L)*FOSRH(K,L)
     IF(VOLWK.GT.ZEROS2.AND.RTVLW(N,L,NZ).GT.ZEROP(NZ))THEN
       VOLWT=VOLWK+RTVLW(N,L,NZ)
-      CPOOLX=AMIN1(1.25E+03*RTVLW(N,L,NZ),EPOOLR(ielmc,N,L,NZ))
+      CPOOLX=AMIN1(1.25E+03_r8*RTVLW(N,L,NZ),EPOOLR(ielmc,N,L,NZ))
       XFRC=(OQC(K,L)*RTVLW(N,L,NZ)-CPOOLX*VOLWK)/VOLWT
       RDFOMC(N,K,L,NZ)=FEXUC*XFRC
       IF(OQC(K,L).GT.ZEROS.AND.EPOOLR(ielmc,N,L,NZ).GT.ZEROP(NZ))THEN
         CPOOLT=OQC(K,L)+EPOOLR(ielmc,N,L,NZ)
-        ZPOOLX=0.1*EPOOLR(ielmn,N,L,NZ)
-        PPOOLX=0.1*EPOOLR(ielmp,N,L,NZ)
+        ZPOOLX=0.1_r8*EPOOLR(ielmn,N,L,NZ)
+        PPOOLX=0.1_r8*EPOOLR(ielmp,N,L,NZ)
         XFRN=(OQN(K,L)*EPOOLR(ielmc,N,L,NZ)-ZPOOLX*OQC(K,L))/CPOOLT
         XFRP=(OQP(K,L)*EPOOLR(ielmc,N,L,NZ)-PPOOLX*OQC(K,L))/CPOOLT
         RDFOMN(N,K,L,NZ)=FEXUN*XFRN
@@ -1330,14 +1330,14 @@ module NutUptakeMod
   !     RUPH2P,RUPH2B,RUPH1P,RUPH1B=uptake from non-band,band of H2PO4,HPO4
   !     UPNH4,UPNO3,UPH2P,UPH1P=PFT uptake of NH4,NO3,H2PO4,HPO4
   !
-  DO 295 K=0,jcplx11
+  D295: DO K=0,jcplx11
     UPOME(ielmc,NZ)=UPOME(ielmc,NZ)+RDFOMC(N,K,L,NZ)
     UPOME(ielmn,NZ)=UPOME(ielmn,NZ)+RDFOMN(N,K,L,NZ)
     UPOME(ielmp,NZ)=UPOME(ielmp,NZ)+RDFOMP(N,K,L,NZ)
     XOQCS(K,L)=XOQCS(K,L)-RDFOMC(N,K,L,NZ)
     XOQNS(K,L)=XOQNS(K,L)-RDFOMN(N,K,L,NZ)
     XOQPS(K,L)=XOQPS(K,L)-RDFOMP(N,K,L,NZ)
-295   CONTINUE
+  ENDDO D295
   UPNH4(NZ)=UPNH4(NZ)+RUPNH4(N,L,NZ)+RUPNHB(N,L,NZ)
   UPNO3(NZ)=UPNO3(NZ)+RUPNO3(N,L,NZ)+RUPNOB(N,L,NZ)
   UPH2P(NZ)=UPH2P(NZ)+RUPH2P(N,L,NZ)+RUPH2B(N,L,NZ)

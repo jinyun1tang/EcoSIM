@@ -97,8 +97,7 @@ implicit none
 !     PP=PFT population
 !     IDTHP,IDTHR=PFT shoot,root living flag: 0=alive,1=dead
 !
-      IF(WTRVE(ielmc,NZ).LT.1.0E-04_r8*WTRTE(ielmc,NZ) &
-        .AND.ISTYP(NZ).NE.0)IDTHR(NZ)=1
+      IF(WTRVE(ielmc,NZ).LT.1.0E-04_r8*WTRTE(ielmc,NZ).AND.ISTYP(NZ).NE.0)IDTHR(NZ)=1
       IF(ISTYP(NZ).EQ.0)IDTHR(NZ)=1
       IF(JHVST(NZ).NE.0)IDTHR(NZ)=1
       IF(PP(NZ).LE.0.0)IDTHR(NZ)=1
