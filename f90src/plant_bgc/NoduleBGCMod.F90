@@ -62,6 +62,7 @@ module NoduleBGCMod
     TRAU     =>  plt_bgcr%TRAU     , &
     CNET     =>  plt_bgcr%CNET     , &
     ESNC     =>  plt_bgcr%ESNC     , &
+    ifoliar  =>  pltpar%ifoliar    , &
     DMND     =>  plt_allom%DMND    , &
     CNND     =>  plt_allom%CNND    , &
     CPND     =>  plt_allom%CPND    , &
@@ -120,7 +121,7 @@ module NoduleBGCMod
       CPC=0._r8
     ENDIF
     IF(WTNDBE(NB,ielmc,NZ).GT.ZEROP(NZ))THEN
-      FCNPF=AMIN1(1.0 &
+      FCNPF=AMIN1(1.0_r8 &
         ,SQRT(WTNDBE(NB,ielmn,NZ)/(WTNDBE(NB,ielmc,NZ)*CNND(NZ))) &
         ,SQRT(WTNDBE(NB,ielmp,NZ)/(WTNDBE(NB,ielmc,NZ)*CPND(NZ))))
     ELSE
@@ -298,9 +299,9 @@ module NoduleBGCMod
 !     RDNSNC,RDNSNC,RDNSNP=bacterial C,N,P senescence to litterfall
 !
     D6470: DO M=1,jsken
-      ESNC(M,ielmc,1,0,NZ)=ESNC(M,ielmc,1,0,NZ)+CFOPE(1,M,ielmc,NZ)*(RDNDLC+RDNSNC)
-      ESNC(M,ielmn,1,0,NZ)=ESNC(M,ielmn,1,0,NZ)+CFOPE(1,M,ielmn,NZ)*(RDNDLN+RDNSNN)
-      ESNC(M,ielmp,1,0,NZ)=ESNC(M,ielmp,1,0,NZ)+CFOPE(1,M,ielmp,NZ)*(RDNDLP+RDNSNP)
+      ESNC(M,ielmc,1,0,NZ)=ESNC(M,ielmc,1,0,NZ)+CFOPE(ifoliar,M,ielmc,NZ)*(RDNDLC+RDNSNC)
+      ESNC(M,ielmn,1,0,NZ)=ESNC(M,ielmn,1,0,NZ)+CFOPE(ifoliar,M,ielmn,NZ)*(RDNDLN+RDNSNN)
+      ESNC(M,ielmp,1,0,NZ)=ESNC(M,ielmp,1,0,NZ)+CFOPE(ifoliar,M,ielmp,NZ)*(RDNDLP+RDNSNP)
     ENDDO D6470
 !
 !     CONSUMPTION OF NON-STRUCTURAL C,N,P BY NODULE

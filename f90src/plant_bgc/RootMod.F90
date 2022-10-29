@@ -236,8 +236,7 @@ implicit none
 !     CPOOLR=non-structural C mass in root
 !
         IF(L.LE.NIX(NZ))THEN
-          IF(WTRTL(N,L,NZ).GT.ZEROP(NZ) &
-            .AND.WTRTE(ielmc,NZ).GT.ZEROP(NZ) &
+          IF(WTRTL(N,L,NZ).GT.ZEROP(NZ).AND.WTRTE(ielmc,NZ).GT.ZEROP(NZ) &
             .AND.WTRVE(ielmc,NZ).LT.XFRX*WTRTE(ielmc,NZ))THEN
             FWTRT=WTRTL(N,L,NZ)/WTRTE(ielmc,NZ)
             WTRTLX=WTRTL(N,L,NZ)
@@ -372,7 +371,7 @@ implicit none
   real(r8) :: GRTWGM
   real(r8) :: GRTLGL
   real(r8) :: GRTWTG
-  real(r8) :: GRTWTP,GRTWTN,GRTWTL
+  real(r8) :: GRTWTLE(npelms)
   real(r8) :: GRTWTM
   real(r8) :: PPOOLB
   real(r8) :: PADD2,PADD1
@@ -383,13 +382,13 @@ implicit none
   real(r8) :: RCO2GM
   real(r8) :: RCO2TM
   real(r8) :: RMNCR,RCO2RM,RCO2R
-  real(r8) :: RCCR,RCZR,RCPR
+  real(r8) :: RCER(npelms)
   real(r8) :: RTN2X,RTN2Y
   real(r8) :: RTDP1X,RSCS1
   REAL(R8) :: SNCR,SNCRM
   real(r8) :: TFRCO2
   real(r8) :: RCCC,RCCN,RCCP
-  integer :: NR,M,LL,LX
+  integer :: NR,M,LL,LX,NE
 
 !begin_execution
   associate(                          &
@@ -415,6 +414,9 @@ implicit none
     CNRTS   =>  plt_allom%CNRTS     , &
     CPRTS   =>  plt_allom%CPRTS     , &
     DMRT    =>  plt_allom%DMRT      , &
+    icwood  =>  pltpar%icwood       , &
+    iroot   =>  pltpar%iroot        , &
+    instruct=>  pltpar%instruct     , &
     IGTYP   =>  plt_pheno%IGTYP     , &
     IWTYP   =>  plt_pheno%IWTYP     , &
     TFN4    =>  plt_pheno%TFN4      , &
@@ -448,7 +450,7 @@ implicit none
   RTLGZ=0._r8
   WTRTX=0._r8
   WTRTZ=0._r8
-  DO 5050 NR=1,NRT(NZ)
+  D5050: DO NR=1,NRT(NZ)
 !
 !     SECONDARY ROOT EXTENSION
 !
@@ -607,7 +609,7 @@ implicit none
 !     SNCRM,SNCR=excess maintenance respiration unltd,ltd by O2
 !     WTRT2,WTRT2N,WTRT2P=secondary root C,N,P mass
 !     WFR=constraint by O2 consumption on all root processes
-!     RCCR,RCZR,RCPR=remobilization of C,N,P from senescing root
+!     RCER(ielmc),RCER(ielmn),RCER(ielmp)=remobilization of C,N,P from senescing root
 !     RCCC,RCCN,RCCP=remobilization coefficient for C,N,P
 !     FSNC2=fraction of secondary root C to be remobilized
 !
@@ -630,18 +632,16 @@ implicit none
         SNCR=0._r8
       ENDIF
       IF(SNCR.GT.0.0.AND.WTRT2E(ielmc,N,L,NR,NZ).GT.ZEROP(NZ))THEN
-        RCCR=RCCC*WTRT2E(ielmc,N,L,NR,NZ)
-        RCZR=WTRT2E(ielmn,N,L,NR,NZ)*(RCCN+(1.0_r8-RCCN)*RCCR/WTRT2E(ielmc,N,L,NR,NZ))
-        RCPR=WTRT2E(ielmp,N,L,NR,NZ)*(RCCP+(1.0_r8-RCCP)*RCCR/WTRT2E(ielmc,N,L,NR,NZ))
-        IF(RCCR.GT.ZEROP(NZ))THEN
-          FSNC2=AZMAX1(AMIN1(1.0,SNCR/RCCR))
+        RCER(ielmc)=RCCC*WTRT2E(ielmc,N,L,NR,NZ)
+        RCER(ielmn)=WTRT2E(ielmn,N,L,NR,NZ)*(RCCN+(1.0_r8-RCCN)*RCER(ielmc)/WTRT2E(ielmc,N,L,NR,NZ))
+        RCER(ielmp)=WTRT2E(ielmp,N,L,NR,NZ)*(RCCP+(1.0_r8-RCCP)*RCER(ielmc)/WTRT2E(ielmc,N,L,NR,NZ))
+        IF(RCER(ielmc).GT.ZEROP(NZ))THEN
+          FSNC2=AZMAX1(AMIN1(1.0,SNCR/RCER(ielmc)))
         ELSE
           FSNC2=1.0_r8
         ENDIF
       ELSE
-        RCCR=0._r8
-        RCZR=0._r8
-        RCPR=0._r8
+        RCER(1:npelms)=0._r8
         FSNC2=0._r8
       ENDIF
 !
@@ -652,23 +652,18 @@ implicit none
 !     foliar(1,*),non-foliar(2,*),stalk(3,*),root(4,*), coarse woody (5,*)
 !     FSNC2=fraction of secondary root C to be remobilized
 !     WTRT2,WTRT2N,WTRT2P=secondary root C,N,P mass
-!     RCCR,RCZR,RCPR=remobilization of C,N,P from senescing root
+!     RCER(ielmc),RCER(ielmn),RCER(ielmp)=remobilization of C,N,P from senescing root
 !     FWOOD,FWOODN,FWOODP=C,N,P woody fraction in root:0=woody,1=non-woody
 !
-      D6350: DO M=1,jsken
-        ESNC(M,ielmc,0,L,NZ)=ESNC(M,ielmc,0,L,NZ)+CFOPE(5,M,ielmc,NZ) &
-          *FSNC2*(WTRT2E(ielmc,N,L,NR,NZ)-RCCR)*FWODRE(ielmc,0)
-        ESNC(M,ielmn,0,L,NZ)=ESNC(M,ielmn,0,L,NZ)+CFOPE(5,M,ielmn,NZ) &
-          *FSNC2*(WTRT2E(ielmn,N,L,NR,NZ)-RCZR)*FWODRE(ielmn,0)
-        ESNC(M,ielmp,0,L,NZ)=ESNC(M,ielmp,0,L,NZ)+CFOPE(5,M,ielmp,NZ) &
-          *FSNC2*(WTRT2E(ielmp,N,L,NR,NZ)-RCPR)*FWODRE(ielmp,0)
-        ESNC(M,ielmc,1,L,NZ)=ESNC(M,ielmc,1,L,NZ)+CFOPE(4,M,ielmc,NZ) &
-          *FSNC2*(WTRT2E(ielmc,N,L,NR,NZ)-RCCR)*FWODRE(ielmc,1)
-        ESNC(M,ielmn,1,L,NZ)=ESNC(M,ielmn,1,L,NZ)+CFOPE(4,M,ielmn,NZ) &
-          *FSNC2*(WTRT2E(ielmn,N,L,NR,NZ)-RCZR)*FWODRE(ielmn,1)
-        ESNC(M,ielmp,1,L,NZ)=ESNC(M,ielmp,1,L,NZ)+CFOPE(4,M,ielmp,NZ) &
-          *FSNC2*(WTRT2E(ielmp,N,L,NR,NZ)-RCPR)*FWODRE(ielmp,1)
-      ENDDO D6350
+      DO NE=1,npelms
+        D6350: DO M=1,jsken
+          ESNC(M,NE,0,L,NZ)=ESNC(M,NE,0,L,NZ)+CFOPE(icwood,M,NE,NZ) &
+            *FSNC2*(WTRT2E(NE,N,L,NR,NZ)-RCER(NE))*FWODRE(NE,0)
+
+          ESNC(M,NE,1,L,NZ)=ESNC(M,NE,1,L,NZ)+CFOPE(iroot,M,NE,NZ) &
+            *FSNC2*(WTRT2E(NE,N,L,NR,NZ)-RCER(NE))*FWODRE(NE,1)
+        ENDDO D6350
+      ENDDO
 !
 !     CONSUMPTION OF NON-STRUCTURAL C,N,P BY SECONDARY ROOT
 !
@@ -679,13 +674,13 @@ implicit none
 !     CNRDA=respiration for N assimilation unltd,ltd by O2
 !     SNCR=excess maintenance respiration ltd by O2
 !     FSNC2=fraction of secondary root C to be remobilized
-!     RCCR,RCZR,RCPR=remobilization of C,N,P from senescing root
+!     RCER(ielmc),RCER(ielmn),RCER(ielmp)=remobilization of C,N,P from senescing root
 !     ZADD2,PADD2=nonstructural N,P ltd by O2 used in growth
 !
       EPOOLR(ielmc,N,L,NZ)=EPOOLR(ielmc,N,L,NZ)-AMIN1(RMNCR,RCO2R) &
-        -CGROR-CNRDA-SNCR+FSNC2*RCCR
-      EPOOLR(ielmn,N,L,NZ)=EPOOLR(ielmn,N,L,NZ)-ZADD2+FSNC2*RCZR
-      EPOOLR(ielmp,N,L,NZ)=EPOOLR(ielmp,N,L,NZ)-PADD2+FSNC2*RCPR
+        -CGROR-CNRDA-SNCR+FSNC2*RCER(ielmc)
+      EPOOLR(ielmn,N,L,NZ)=EPOOLR(ielmn,N,L,NZ)-ZADD2+FSNC2*RCER(ielmn)
+      EPOOLR(ielmp,N,L,NZ)=EPOOLR(ielmp,N,L,NZ)-PADD2+FSNC2*RCER(ielmp)
 !
 !     TOTAL SECONDARY ROOT RESPIRATION
 !
@@ -713,15 +708,15 @@ implicit none
 !     FWOOD=C,N,P woody fraction in root:0=woody,1=non-woody
 !     FSNC2=fraction of secondary root C to be remobilized
 !     RTLG2=secondary root length
-!     GRTWTL,GRTWTN,GRTWTP=net root C,N,P growth
+!     GRTWTLE(ielmc),GRTWTLE(ielmn),GRTWTLE(ielmp)=net root C,N,P growth
 !     WTRT2,WTRT2N,WTRT2P=secondary root C,N,P mass
 !     ZADD2,PADD2=nonstructural N,P ltd by O2 used in growth
 !
       GRTLGL=GRTWTG*RTLG2X(N,NZ)*WFNR*FWODRE(ielmc,1) &
         -FSNC2*RTLG2(N,L,NR,NZ)
-      GRTWTL=GRTWTG-FSNC2*WTRT2E(ielmc,N,L,NR,NZ)
-      GRTWTN=ZADD2-FSNC2*WTRT2E(ielmn,N,L,NR,NZ)
-      GRTWTP=PADD2-FSNC2*WTRT2E(ielmp,N,L,NR,NZ)
+      GRTWTLE(ielmc)=GRTWTG-FSNC2*WTRT2E(ielmc,N,L,NR,NZ)
+      GRTWTLE(ielmn)=ZADD2-FSNC2*WTRT2E(ielmn,N,L,NR,NZ)
+      GRTWTLE(ielmp)=PADD2-FSNC2*WTRT2E(ielmp,N,L,NR,NZ)
 !
 !     UPDATE STATE VARIABLES FOR SECONDARY ROOT LENGTH, C, N, P
 !     AND AXIS NUMBER
@@ -729,16 +724,16 @@ implicit none
 !     RTLG2=secondary root length
 !     GRTLGL=secondary root length extension
 !     WTRT2,WTRT2N,WTRT2P=secondary root C,N,P mass
-!     GRTWTL,GRTWTN,GRTWTP=net root C,N,P growth
+!     GRTWTLE(ielmc),GRTWTLE(ielmn),GRTWTLE(ielmp)=net root C,N,P growth
 !     WSRTL=total root protein C mass
 !     CNWS,CPWS=protein:N,protein:P ratios from startq.f
 !     RTFQ=root branching frequency from PFT file
 !     RTN2,RTNL=number of secondary root axes
 !
       RTLG2(N,L,NR,NZ)=RTLG2(N,L,NR,NZ)+GRTLGL
-      WTRT2E(ielmc,N,L,NR,NZ)=WTRT2E(ielmc,N,L,NR,NZ)+GRTWTL
-      WTRT2E(ielmn,N,L,NR,NZ)=WTRT2E(ielmn,N,L,NR,NZ)+GRTWTN
-      WTRT2E(ielmp,N,L,NR,NZ)=WTRT2E(ielmp,N,L,NR,NZ)+GRTWTP
+      DO NE=1,npelms
+        WTRT2E(NE,N,L,NR,NZ)=WTRT2E(NE,N,L,NR,NZ)+GRTWTLE(NE)
+      ENDDO
       WSRTL(N,L,NZ)=WSRTL(N,L,NZ) &
         +AMIN1(CNWS(NZ)*WTRT2E(ielmn,N,L,NR,NZ) &
         ,CPWS(NZ)*WTRT2E(ielmp,N,L,NR,NZ))
@@ -918,12 +913,12 @@ implicit none
 !     CNRDA=respiration for N assimilation unltd,ltd by O2
 !     SNCR=excess maintenance respiration ltd by O2
 !     FSNC1=fraction of primary root C to be remobilized
-!     RCCR,RCZR,RCPR=remobilization of C,N,P from senescing root
+!     RCER(ielmc),RCER(ielmn),RCER(ielmp)=remobilization of C,N,P from senescing root
 !     ZADD1,PADD1=nonstructural N,P ltd by O2 used in growth
 !
-              EPOOLR(ielmc,N,L,NZ)=EPOOLR(ielmc,N,L,NZ)-AMIN1(RMNCR,RCO2R)-CGROR-CNRDA-SNCR+FSNC1*RCCR
-              EPOOLR(ielmn,N,L,NZ)=EPOOLR(ielmn,N,L,NZ)-ZADD1+FSNC1*RCZR
-              EPOOLR(ielmp,N,L,NZ)=EPOOLR(ielmp,N,L,NZ)-PADD1+FSNC1*RCPR
+              EPOOLR(ielmc,N,L,NZ)=EPOOLR(ielmc,N,L,NZ)-AMIN1(RMNCR,RCO2R)-CGROR-CNRDA-SNCR+FSNC1*RCER(ielmc)
+              EPOOLR(ielmn,N,L,NZ)=EPOOLR(ielmn,N,L,NZ)-ZADD1+FSNC1*RCER(ielmn)
+              EPOOLR(ielmp,N,L,NZ)=EPOOLR(ielmp,N,L,NZ)-PADD1+FSNC1*RCER(ielmp)
 !
 !     TOTAL PRIMARY ROOT RESPIRATION
 !
@@ -975,47 +970,47 @@ implicit none
 !     HAVE DISAPPEARED
 !
 !     GRTWTG=primary root C growth ltd by O2
-!     GRTWTL,GRTWTN,GRTWTP=net primary root C,N,P growth
+!     GRTWTLE(ielmc),GRTWTLE(ielmn),GRTWTLE(ielmp)=net primary root C,N,P growth
 !     FSNC1=fraction of primary root C to be remobilized
 !     RTWT1,RTWT1N,RTWT1P=primary root C,N,P mass
 !     ZADD1,PADD1=nonstructural N,P ltd by O2 used in growth
 !     WTRT2,WTRT2N,WTRT2P=secondary root C,N,P mass
 !     RTLG2=secondary root length
 !
-              GRTWTL=GRTWTG-FSNC1*RTWT1E(N,NR,ielmc,NZ)
-              GRTWTN=ZADD1-FSNC1*RTWT1E(N,NR,ielmn,NZ)
-              GRTWTP=PADD1-FSNC1*RTWT1E(N,NR,ielmp,NZ)
-              IF(GRTWTL.LT.0.0)THEN
+              GRTWTLE(ielmc)=GRTWTG-FSNC1*RTWT1E(N,NR,ielmc,NZ)
+              GRTWTLE(ielmn)=ZADD1-FSNC1*RTWT1E(N,NR,ielmn,NZ)
+              GRTWTLE(ielmp)=PADD1-FSNC1*RTWT1E(N,NR,ielmp,NZ)
+              IF(GRTWTLE(ielmc).LT.0.0)THEN
                 LX=MAX(1,L-1)
-                DO 5105 LL=L,LX,-1
-                  GRTWTM=GRTWTL
-                  IF(GRTWTL.LT.0.0)THEN
-                    IF(GRTWTL.GT.-WTRT2E(ielmc,N,LL,NR,NZ))THEN
-                      RTLG2(N,LL,NR,NZ)=RTLG2(N,LL,NR,NZ)+GRTWTL &
+                D5105: DO LL=L,LX,-1
+                  GRTWTM=GRTWTLE(ielmc)
+                  IF(GRTWTLE(ielmc).LT.0.0)THEN
+                    IF(GRTWTLE(ielmc).GT.-WTRT2E(ielmc,N,LL,NR,NZ))THEN
+                      RTLG2(N,LL,NR,NZ)=RTLG2(N,LL,NR,NZ)+GRTWTLE(ielmc) &
                         *RTLG2(N,LL,NR,NZ)/WTRT2E(ielmc,N,LL,NR,NZ)
-                      WTRT2E(ielmc,N,LL,NR,NZ)=WTRT2E(ielmc,N,LL,NR,NZ)+GRTWTL
-                      GRTWTL=0._r8
+                      WTRT2E(ielmc,N,LL,NR,NZ)=WTRT2E(ielmc,N,LL,NR,NZ)+GRTWTLE(ielmc)
+                      GRTWTLE(ielmc)=0._r8
                     ELSE
-                      GRTWTL=GRTWTL+WTRT2E(ielmc,N,LL,NR,NZ)
+                      GRTWTLE(ielmc)=GRTWTLE(ielmc)+WTRT2E(ielmc,N,LL,NR,NZ)
                       RTLG2(N,LL,NR,NZ)=0._r8
                       WTRT2E(ielmc,N,LL,NR,NZ)=0._r8
                     ENDIF
                   ENDIF
-                  IF(GRTWTN.LT.0.0)THEN
-                    IF(GRTWTN.GT.-WTRT2E(ielmn,N,LL,NR,NZ))THEN
-                      WTRT2E(ielmn,N,LL,NR,NZ)=WTRT2E(ielmn,N,LL,NR,NZ)+GRTWTN
-                      GRTWTN=0._r8
+                  IF(GRTWTLE(ielmn).LT.0.0)THEN
+                    IF(GRTWTLE(ielmn).GT.-WTRT2E(ielmn,N,LL,NR,NZ))THEN
+                      WTRT2E(ielmn,N,LL,NR,NZ)=WTRT2E(ielmn,N,LL,NR,NZ)+GRTWTLE(ielmn)
+                      GRTWTLE(ielmn)=0._r8
                     ELSE
-                      GRTWTN=GRTWTN+WTRT2E(ielmn,N,LL,NR,NZ)
+                      GRTWTLE(ielmn)=GRTWTLE(ielmn)+WTRT2E(ielmn,N,LL,NR,NZ)
                       WTRT2E(ielmn,N,LL,NR,NZ)=0._r8
                     ENDIF
                   ENDIF
-                  IF(GRTWTP.LT.0.0)THEN
-                    IF(GRTWTP.GT.-WTRT2E(ielmp,N,LL,NR,NZ))THEN
-                      WTRT2E(ielmp,N,LL,NR,NZ)=WTRT2E(ielmp,N,LL,NR,NZ)+GRTWTP
-                      GRTWTP=0._r8
+                  IF(GRTWTLE(ielmp).LT.0.0)THEN
+                    IF(GRTWTLE(ielmp).GT.-WTRT2E(ielmp,N,LL,NR,NZ))THEN
+                      WTRT2E(ielmp,N,LL,NR,NZ)=WTRT2E(ielmp,N,LL,NR,NZ)+GRTWTLE(ielmp)
+                      GRTWTLE(ielmp)=0._r8
                     ELSE
-                      GRTWTP=GRTWTP+WTRT2E(ielmp,N,LL,NR,NZ)
+                      GRTWTLE(ielmp)=GRTWTLE(ielmp)+WTRT2E(ielmp,N,LL,NR,NZ)
                       WTRT2E(ielmp,N,LL,NR,NZ)=0._r8
                     ENDIF
                   ENDIF
@@ -1045,38 +1040,28 @@ implicit none
                     ELSE
                       FSNCP=1.0_r8
                     ENDIF
-                    D6450: DO M=1,jsken
-                      ESNC(M,ielmc,0,LL,NZ)=ESNC(M,ielmc,0,LL,NZ)+CFOPE(5,M,ielmc,NZ) &
-                        *FSNCM*AZMAX1(WTRT2E(ielmc,2,LL,NR,NZ))*FWODRE(ielmc,0)
-                      ESNC(M,ielmn,0,LL,NZ)=ESNC(M,ielmn,0,LL,NZ)+CFOPE(5,M,ielmn,NZ) &
-                        *FSNCM*AZMAX1(WTRT2E(ielmn,2,LL,NR,NZ))*FWODRE(ielmn,0)
-                      ESNC(M,ielmp,0,LL,NZ)=ESNC(M,ielmp,0,LL,NZ)+CFOPE(5,M,ielmp,NZ) &
-                        *FSNCM*AZMAX1(WTRT2E(ielmp,2,LL,NR,NZ))*FWODRE(ielmp,0)
-                      ESNC(M,ielmc,1,LL,NZ)=ESNC(M,ielmc,1,LL,NZ)+CFOPE(4,M,ielmc,NZ) &
-                        *FSNCM*AZMAX1(WTRT2E(ielmc,2,LL,NR,NZ))*FWODRE(ielmc,1)
-                      ESNC(M,ielmn,1,LL,NZ)=ESNC(M,ielmn,1,LL,NZ)+CFOPE(4,M,ielmn,NZ) &
-                        *FSNCM*AZMAX1(WTRT2E(ielmn,2,LL,NR,NZ))*FWODRE(ielmn,1)
-                      ESNC(M,ielmp,1,LL,NZ)=ESNC(M,ielmp,1,LL,NZ)+CFOPE(4,M,ielmp,NZ) &
-                        *FSNCM*AZMAX1(WTRT2E(ielmp,2,LL,NR,NZ))*FWODRE(ielmp,1)
-                      ESNC(M,ielmc,1,LL,NZ)=ESNC(M,ielmc,1,LL,NZ)+CFOPE(0,M,ielmc,NZ) &
-                        *FSNCP*AZMAX1(EPOOLR(ielmc,2,LL,NZ))
-                      ESNC(M,ielmn,1,LL,NZ)=ESNC(M,ielmn,1,LL,NZ)+CFOPE(0,M,ielmn,NZ) &
-                        *FSNCP*AZMAX1(EPOOLR(ielmn,2,LL,NZ))
-                      ESNC(M,ielmp,1,LL,NZ)=ESNC(M,ielmp,1,LL,NZ)+CFOPE(0,M,ielmp,NZ) &
-                        *FSNCP*AZMAX1(EPOOLR(ielmp,2,LL,NZ))
-                    ENDDO D6450
+                    DO NE=1,npelms
+                      D6450: DO M=1,jsken
+                        ESNC(M,NE,0,LL,NZ)=ESNC(M,NE,0,LL,NZ)+CFOPE(icwood,M,NE,NZ) &
+                          *FSNCM*AZMAX1(WTRT2E(NE,2,LL,NR,NZ))*FWODRE(NE,0)
+
+                        ESNC(M,NE,1,LL,NZ)=ESNC(M,NE,1,LL,NZ)+CFOPE(iroot,M,NE,NZ) &
+                          *FSNCM*AZMAX1(WTRT2E(NE,2,LL,NR,NZ))*FWODRE(NE,1)
+
+                        ESNC(M,NE,1,LL,NZ)=ESNC(M,NE,1,LL,NZ)+CFOPE(instruct,M,NE,NZ) &
+                          *FSNCP*AZMAX1(EPOOLR(NE,2,LL,NZ))
+                      ENDDO D6450
+                      WTRT2E(NE,2,LL,NR,NZ)=AZMAX1(WTRT2E(NE,2,LL,NR,NZ))*(1.0_r8-FSNCM)
+
+                      EPOOLR(NE,2,LL,NZ)=AZMAX1(EPOOLR(NE,2,LL,NZ))*(1.0_r8-FSNCP)
+
+                    ENDDO
                     RTLG2(2,LL,NR,NZ)=AZMAX1(RTLG2(2,LL,NR,NZ))*(1.0_r8-FSNCM)
-                    WTRT2E(ielmc,2,LL,NR,NZ)=AZMAX1(WTRT2E(ielmc,2,LL,NR,NZ))*(1.0_r8-FSNCM)
-                    WTRT2E(ielmn,2,LL,NR,NZ)=AZMAX1(WTRT2E(ielmn,2,LL,NR,NZ))*(1.0_r8-FSNCM)
-                    WTRT2E(ielmp,2,LL,NR,NZ)=AZMAX1(WTRT2E(ielmp,2,LL,NR,NZ))*(1.0_r8-FSNCM)
-                    EPOOLR(ielmc,2,LL,NZ)=AZMAX1(EPOOLR(ielmc,2,LL,NZ))*(1.0_r8-FSNCP)
-                    EPOOLR(ielmn,2,LL,NZ)=AZMAX1(EPOOLR(ielmn,2,LL,NZ))*(1.0_r8-FSNCP)
-                    EPOOLR(ielmp,2,LL,NZ)=AZMAX1(EPOOLR(ielmp,2,LL,NZ))*(1.0_r8-FSNCP)
                   ENDIF
-5105            CONTINUE
+                ENDDO D5105
               ENDIF
 !
-              call PrimRootExtension(L,L1,N,NR,NZ,WFNR,FRTN,GRTWTG,GRTWTL,GRTWTN,GRTWTP,&
+              call PrimRootExtension(L,L1,N,NR,NZ,WFNR,FRTN,GRTWTG,GRTWTLE,&
                 GRTLGL,RTLGZ,WTRTZ)
             ENDIF
 !
@@ -1116,7 +1101,7 @@ implicit none
 !     ENDIF
       ENDIF
       NIX(NZ)=MAX(NIX(NZ),NINR(NR,NZ))
-5050  CONTINUE
+  ENDDO D5050
   end associate
   end subroutine GrowRootAxes
 
@@ -1130,7 +1115,7 @@ implicit none
   real(r8), intent(out) :: FSNC1
   integer :: M
   real(r8) :: CCC,CNC,CPC
-  real(r8) :: RCCR,RCZR,RCPR
+  real(r8) :: RCER(npelms)
   real(r8) :: RCCC,RCCN,RCCP
   real(r8) :: SNCR,SNCRM
 ! begin_execution
@@ -1141,6 +1126,8 @@ implicit none
     CPPOLR  =>  plt_biom%CPPOLR     , &
     ZEROP   =>  plt_biom%ZEROP      , &
     ZERO    =>  plt_site%ZERO       , &
+    icwood  =>  pltpar%icwood       , &
+    iroot   =>  pltpar%iroot        , &
     FWODRE  =>  plt_allom%FWODRE    , &
     CFOPE   =>  plt_soilchem%CFOPE  , &
     WFR     =>  plt_rbgc%WFR        , &
@@ -1162,17 +1149,10 @@ implicit none
 !
   IF(IDAY(1,NB1(NZ),NZ).NE.0 &
     .AND.CCPOLR(N,L,NZ).GT.ZERO)THEN
-    CCC=AZMAX1(AMIN1(1.0 &
-      ,safe_adb(CZPOLR(N,L,NZ),CZPOLR(N,L,NZ) &
-      +CCPOLR(N,L,NZ)*CNKI) &
-      ,safe_adb(CPPOLR(N,L,NZ),CPPOLR(N,L,NZ) &
-      +CCPOLR(N,L,NZ)*CPKI)))
-    CNC=AZMAX1(AMIN1(1.0 &
-      ,safe_adb(CCPOLR(N,L,NZ),CCPOLR(N,L,NZ) &
-      +CZPOLR(N,L,NZ)/CNKI)))
-    CPC=AZMAX1(AMIN1(1.0 &
-      ,safe_adb(CCPOLR(N,L,NZ),CCPOLR(N,L,NZ) &
-      +CPPOLR(N,L,NZ)/CPKI)))
+    CCC=AZMAX1(AMIN1(1.0_r8,safe_adb(CZPOLR(N,L,NZ),CZPOLR(N,L,NZ)+CCPOLR(N,L,NZ)*CNKI) &
+      ,safe_adb(CPPOLR(N,L,NZ),CPPOLR(N,L,NZ)+CCPOLR(N,L,NZ)*CPKI)))
+    CNC=AZMAX1(AMIN1(1.0_r8,safe_adb(CCPOLR(N,L,NZ),CCPOLR(N,L,NZ)+CZPOLR(N,L,NZ)/CNKI)))
+    CPC=AZMAX1(AMIN1(1.0_r8,safe_adb(CCPOLR(N,L,NZ),CCPOLR(N,L,NZ)+CPPOLR(N,L,NZ)/CPKI)))
   ELSE
     CCC=0._r8
     CNC=0._r8
@@ -1189,11 +1169,11 @@ implicit none
 !     SNCRM,SNCR=excess maintenance respiration unltd,ltd by O2
 !     RTWT1,RTWT1N,RTWT1P=primary root C,N,P mass
 !     WFR=constraint by O2 consumption on all root processes
-!     RCCR,RCZR,RCPR=remobilization of C,N,P from senescing root
+!     RCER(ielmc),RCER(ielmn),RCER(ielmp)=remobilization of C,N,P from senescing root
 !     RCCC,RCCN,RCCP=remobilization coefficient for C,N,P
 !     FSNC1=fraction of primary root C to be remobilized
 !
-  IF(-RCO2XM.GT.0.0)THEN
+  IF(-RCO2XM.GT.0.0_r8)THEN
     IF(-RCO2XM.LT.RTWT1E(N,NR,ielmc,NZ)*RCCC)THEN
       SNCRM=-RCO2XM
     ELSE
@@ -1202,7 +1182,7 @@ implicit none
   ELSE
     SNCRM=0._r8
   ENDIF
-  IF(-RCO2X.GT.0.0)THEN
+  IF(-RCO2X.GT.0.0_r8)THEN
     IF(-RCO2X.LT.RTWT1E(N,NR,ielmc,NZ)*RCCC)THEN
       SNCR=-RCO2X
     ELSE
@@ -1211,19 +1191,19 @@ implicit none
   ELSE
     SNCR=0._r8
   ENDIF
-  IF(SNCR.GT.0.0.AND.RTWT1E(N,NR,ielmc,NZ).GT.ZEROP(NZ))THEN
-    RCCR=RCCC*RTWT1E(N,NR,ielmc,NZ)
-    RCZR=RTWT1E(N,NR,ielmn,NZ)*(RCCN+(1.0_r8-RCCN)*RCCR/RTWT1E(N,NR,ielmc,NZ))
-    RCPR=RTWT1E(N,NR,ielmp,NZ)*(RCCP+(1.0_r8-RCCP)*RCCR/RTWT1E(N,NR,ielmc,NZ))
-    IF(RCCR.GT.ZEROP(NZ))THEN
-      FSNC1=AZMAX1(AMIN1(1.0,SNCR/RCCR))
+  IF(SNCR.GT.0.0_r8.AND.RTWT1E(N,NR,ielmc,NZ).GT.ZEROP(NZ))THEN
+    RCER(ielmc)=RCCC*RTWT1E(N,NR,ielmc,NZ)
+    RCER(ielmn)=RTWT1E(N,NR,ielmn,NZ)*(RCCN+(1.0_r8-RCCN)*RCER(ielmc)/RTWT1E(N,NR,ielmc,NZ))
+    RCER(ielmp)=RTWT1E(N,NR,ielmp,NZ)*(RCCP+(1.0_r8-RCCP)*RCER(ielmc)/RTWT1E(N,NR,ielmc,NZ))
+    IF(RCER(ielmc).GT.ZEROP(NZ))THEN
+      FSNC1=AZMAX1(AMIN1(1.0,SNCR/RCER(ielmc)))
     ELSE
       FSNC1=1.0_r8
     ENDIF
   ELSE
-    RCCR=0._r8
-    RCZR=0._r8
-    RCPR=0._r8
+    RCER(ielmc)=0._r8
+    RCER(ielmn)=0._r8
+    RCER(ielmp)=0._r8
     FSNC1=0._r8
   ENDIF
 !
@@ -1234,31 +1214,32 @@ implicit none
 !     foliar(1,*),non-foliar(2,*),stalk(3,*),root(4,*), coarse woody (5,*)
 !     FSNC1=fraction of primary root C to be remobilized
 !     RTWT1,RTWT1N,RTWT1P=primary root C,N,P mass
-!     RCCR,RCZR,RCPR=remobilization of C,N,P from senescing root
+!     RCER(ielmc),RCER(ielmn),RCER(ielmp)=remobilization of C,N,P from senescing root
 !     FWOOD,FWOODN,FWOODP=C,N,P woody fraction in root:0=woody,1=non-woody
 !
   D6355: DO M=1,jsken
-    ESNC(M,ielmc,0,L,NZ)=ESNC(M,ielmc,0,L,NZ)+CFOPE(5,M,ielmc,NZ) &
-      *FSNC1*(RTWT1E(N,NR,ielmc,NZ)-RCCR)*FWODRE(ielmc,0)
-    ESNC(M,ielmn,0,L,NZ)=ESNC(M,ielmn,0,L,NZ)+CFOPE(5,M,ielmn,NZ) &
-      *FSNC1*(RTWT1E(N,NR,ielmn,NZ)-RCZR)*FWODRE(ielmn,0)
-    ESNC(M,ielmp,0,L,NZ)=ESNC(M,ielmp,0,L,NZ)+CFOPE(5,M,ielmp,NZ) &
-      *FSNC1*(RTWT1E(N,NR,ielmp,NZ)-RCPR)*FWODRE(ielmp,0)
-    ESNC(M,ielmc,1,L,NZ)=ESNC(M,ielmc,1,L,NZ)+CFOPE(4,M,ielmc,NZ) &
-      *FSNC1*(RTWT1E(N,NR,ielmc,NZ)-RCCR)*FWODRE(ielmc,1)
-    ESNC(M,ielmn,1,L,NZ)=ESNC(M,ielmn,1,L,NZ)+CFOPE(4,M,ielmn,NZ) &
-      *FSNC1*(RTWT1E(N,NR,ielmn,NZ)-RCZR)*FWODRE(ielmn,1)
-    ESNC(M,ielmp,1,L,NZ)=ESNC(M,ielmp,1,L,NZ)+CFOPE(4,M,ielmp,NZ) &
-      *FSNC1*(RTWT1E(N,NR,ielmp,NZ)-RCPR)*FWODRE(ielmp,1)
+    ESNC(M,ielmc,0,L,NZ)=ESNC(M,ielmc,0,L,NZ)+CFOPE(icwood,M,ielmc,NZ) &
+      *FSNC1*(RTWT1E(N,NR,ielmc,NZ)-RCER(ielmc))*FWODRE(ielmc,0)
+    ESNC(M,ielmn,0,L,NZ)=ESNC(M,ielmn,0,L,NZ)+CFOPE(icwood,M,ielmn,NZ) &
+      *FSNC1*(RTWT1E(N,NR,ielmn,NZ)-RCER(ielmn))*FWODRE(ielmn,0)
+    ESNC(M,ielmp,0,L,NZ)=ESNC(M,ielmp,0,L,NZ)+CFOPE(icwood,M,ielmp,NZ) &
+      *FSNC1*(RTWT1E(N,NR,ielmp,NZ)-RCER(ielmp))*FWODRE(ielmp,0)
+
+    ESNC(M,ielmc,1,L,NZ)=ESNC(M,ielmc,1,L,NZ)+CFOPE(iroot,M,ielmc,NZ) &
+      *FSNC1*(RTWT1E(N,NR,ielmc,NZ)-RCER(ielmc))*FWODRE(ielmc,1)
+    ESNC(M,ielmn,1,L,NZ)=ESNC(M,ielmn,1,L,NZ)+CFOPE(iroot,M,ielmn,NZ) &
+      *FSNC1*(RTWT1E(N,NR,ielmn,NZ)-RCER(ielmn))*FWODRE(ielmn,1)
+    ESNC(M,ielmp,1,L,NZ)=ESNC(M,ielmp,1,L,NZ)+CFOPE(iroot,M,ielmp,NZ) &
+      *FSNC1*(RTWT1E(N,NR,ielmp,NZ)-RCER(ielmp))*FWODRE(ielmp,1)
   ENDDO D6355
   end associate
   end subroutine PrimRootRemobilization
 
 !------------------------------------------------------------------------------------------
-  subroutine PrimRootExtension(L,L1,N,NR,NZ,WFNR,FRTN,GRTWTG,GRTWTL,GRTWTN,GRTWTP,GRTLGL,RTLGZ,WTRTZ)
+  subroutine PrimRootExtension(L,L1,N,NR,NZ,WFNR,FRTN,GRTWTG,GRTWTLE,GRTLGL,RTLGZ,WTRTZ)
   implicit none
   integer, intent(in) :: L,L1,N,NR,NZ
-  real(r8), intent(in):: WFNR,FRTN,GRTWTG,GRTWTL,GRTWTN,GRTWTP
+  real(r8), intent(in):: WFNR,FRTN,GRTWTG,GRTWTLE(npelms)
   real(r8), intent(inout) :: RTLGZ,WTRTZ
   real(r8), intent(out):: GRTLGL
   real(r8) :: FGROL,FGROZ
@@ -1297,19 +1278,19 @@ implicit none
 !     PP=PFT population
 !     WFNR=water function for root extension
 !     FWOOD=C,N,P woody fraction in root:0=woody,1=non-woody
-!     GRTWTL,GRTWTN,GRTWTP=net primary root C,N,P growth
+!     GRTWTLE(ielmc),GRTWTLE(ielmn),GRTWTLE(ielmp)=net primary root C,N,P growth
 !     RTDP1=primary root depth from soil surface
 !     SDPTH=seeding depth
 !     FSNC1=fraction of primary root C to be remobilized
 !     RTLG1=primary root length
-!     GRTWTL,GRTWTN,GRTWTP=net root C,N,P growth
+!     GRTWTLE(ielmc),GRTWTLE(ielmn),GRTWTLE(ielmp)=net root C,N,P growth
 !     RTWT1,RTWT1N,RTWT1P=primary root C,N,P mass
 !     DLYR=soil layer thickness
 !
-  IF(GRTWTL.LT.0.0.AND.RTWT1E(N,NR,ielmc,NZ) &
+  IF(GRTWTLE(ielmc).LT.0.0.AND.RTWT1E(N,NR,ielmc,NZ) &
     .GT.ZEROP(NZ))THEN
     GRTLGL=GRTWTG*RTLG1X(N,NZ)/PP(NZ)*WFNR*FWODRE(ielmc,1) &
-      +GRTWTL*(RTDP1(N,NR,NZ)-SDPTH(NZ)) &
+      +GRTWTLE(ielmc)*(RTDP1(N,NR,NZ)-SDPTH(NZ)) &
       /RTWT1E(N,NR,ielmc,NZ)
   ELSE
     GRTLGL=GRTWTG*RTLG1X(N,NZ)/PP(NZ)*WFNR*FWODRE(ielmc,1)
@@ -1339,7 +1320,7 @@ implicit none
 !     AND AXIS NUMBER
 !
 !     RTWT1,RTWT1N,RTWT1P=primary root C,N,P mass
-!     GRTWTL,GRTWTN,GRTWTP=net root C,N,P growth
+!     GRTWTLE(ielmc),GRTWTLE(ielmn),GRTWTLE(ielmp)=net root C,N,P growth
 !     GRTLGL=primary root length extension
 !     WTRT1,WTRT1N,WTRT1P=primary root C,N,P mass in soil layer
 !     FGROL,FGROZ=fraction of GRTLGL in current,next lower soil layer
@@ -1347,13 +1328,13 @@ implicit none
 !     CNWS,CPWS=protein:N,protein:P ratios from startq.f
 !     RTLG1=primary root length
 !
-  RTWT1E(N,NR,ielmc,NZ)=RTWT1E(N,NR,ielmc,NZ)+GRTWTL
-  RTWT1E(N,NR,ielmn,NZ)=RTWT1E(N,NR,ielmn,NZ)+GRTWTN
-  RTWT1E(N,NR,ielmp,NZ)=RTWT1E(N,NR,ielmp,NZ)+GRTWTP
+  RTWT1E(N,NR,ielmc,NZ)=RTWT1E(N,NR,ielmc,NZ)+GRTWTLE(ielmc)
+  RTWT1E(N,NR,ielmn,NZ)=RTWT1E(N,NR,ielmn,NZ)+GRTWTLE(ielmn)
+  RTWT1E(N,NR,ielmp,NZ)=RTWT1E(N,NR,ielmp,NZ)+GRTWTLE(ielmp)
   RTDP1(N,NR,NZ)=RTDP1(N,NR,NZ)+GRTLGL
-  WTRT1E(ielmc,N,L,NR,NZ)=WTRT1E(ielmc,N,L,NR,NZ)+GRTWTL*FGROL
-  WTRT1E(ielmn,N,L,NR,NZ)=WTRT1E(ielmn,N,L,NR,NZ)+GRTWTN*FGROL
-  WTRT1E(ielmp,N,L,NR,NZ)=WTRT1E(ielmp,N,L,NR,NZ)+GRTWTP*FGROL
+  WTRT1E(ielmc,N,L,NR,NZ)=WTRT1E(ielmc,N,L,NR,NZ)+GRTWTLE(ielmc)*FGROL
+  WTRT1E(ielmn,N,L,NR,NZ)=WTRT1E(ielmn,N,L,NR,NZ)+GRTWTLE(ielmn)*FGROL
+  WTRT1E(ielmp,N,L,NR,NZ)=WTRT1E(ielmp,N,L,NR,NZ)+GRTWTLE(ielmp)*FGROL
   WSRTL(N,L,NZ)=WSRTL(N,L,NZ) &
     +AMIN1(CNWS(NZ)*WTRT1E(ielmn,N,L,NR,NZ) &
     ,CPWS(NZ)*WTRT1E(ielmp,N,L,NR,NZ))
@@ -1365,7 +1346,7 @@ implicit none
 !
 !     FGROZ=fraction of GRTLGL in next lower soil layer
 !     WTRT1,WTRT1N,WTRT1P=primary root C,N,P mass in soil layer
-!     GRTWTL,GRTWTN,GRTWTP=net root C,N,P growth
+!     GRTWTLE(ielmc),GRTWTLE(ielmn),GRTWTLE(ielmp)=net root C,N,P growth
 !     WSRTL=total root protein C mass
 !     CNWS,CPWS=protein:N,protein:P ratios from startq.f
 !     WTRTD=root C mass
@@ -1377,9 +1358,9 @@ implicit none
 !     NINR=deepest root layer
 !
   IF(FGROZ.GT.0.0)THEN
-    WTRT1E(ielmc,N,L1,NR,NZ)=WTRT1E(ielmc,N,L1,NR,NZ)+GRTWTL*FGROZ
-    WTRT1E(ielmn,N,L1,NR,NZ)=WTRT1E(ielmn,N,L1,NR,NZ)+GRTWTN*FGROZ
-    WTRT1E(ielmp,N,L1,NR,NZ)=WTRT1E(ielmp,N,L1,NR,NZ)+GRTWTP*FGROZ
+    WTRT1E(ielmc,N,L1,NR,NZ)=WTRT1E(ielmc,N,L1,NR,NZ)+GRTWTLE(ielmc)*FGROZ
+    WTRT1E(ielmn,N,L1,NR,NZ)=WTRT1E(ielmn,N,L1,NR,NZ)+GRTWTLE(ielmn)*FGROZ
+    WTRT1E(ielmp,N,L1,NR,NZ)=WTRT1E(ielmp,N,L1,NR,NZ)+GRTWTLE(ielmp)*FGROZ
     WSRTL(N,L1,NZ)=WSRTL(N,L1,NZ)+AMIN1(CNWS(NZ)*WTRT1E(ielmn,N,L1,NR,NZ) &
       ,CPWS(NZ)*WTRT1E(ielmp,N,L1,NR,NZ))
     WTRTD(N,L1,NZ)=WTRTD(N,L1,NZ)+WTRT1E(ielmc,N,L1,NR,NZ)

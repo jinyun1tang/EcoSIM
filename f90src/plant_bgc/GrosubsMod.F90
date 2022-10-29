@@ -541,7 +541,7 @@ module grosubsMod
 
   integer, intent(in) :: NZ
   real(r8), intent(out) :: CPOOLK(JC1,JP1)
-  integer :: L,K,N,NB
+  integer :: L,K,N,NB,NE
 !     begin_execution
   associate(                                 &
     WTLFBE     =>  plt_biom%WTLFBE     , &
@@ -586,6 +586,15 @@ module grosubsMod
 !     IWTYP=phenology type:0=evergreen,1=cold decid,2=drought decid,3=1+2
 !     WTRVC,WTRVN,WTRVP=storage C,N,P
 !
+  DO NE=1,npelms
+    DO NB=1,NBR(NZ)
+      WTSHTBE(NB,NE,NZ)=WTLFBE(NB,NE,NZ) &
+        +WTSHEBE(NB,NE,NZ)+WTSTKBE(NB,NE,NZ)+WTRSVBE(NB,NE,NZ) &
+        +WTHSKBE(NB,NE,NZ)+WTEARBE(NB,NE,NZ)+WTGRBE(NB,NE,NZ) &
+        +EPOOL(NB,NE,NZ)
+    ENDDO
+  ENDDO
+
   D320: DO NB=1,NBR(NZ)
     CPOOLK(NB,NZ)=0._r8
     D325: DO K=1,JNODS1
@@ -593,19 +602,9 @@ module grosubsMod
         +CPOOL3(K,NB,NZ)+CPOOL4(K,NB,NZ) &
         +CO2B(K,NB,NZ)+HCOB(K,NB,NZ)
     ENDDO D325
-    WTSHTBE(NB,ielmc,NZ)=WTLFBE(NB,ielmc,NZ) &
-      +WTSHEBE(NB,ielmc,NZ)+WTSTKBE(NB,ielmc,NZ)+WTRSVBE(NB,ielmc,NZ) &
-      +WTHSKBE(NB,ielmc,NZ)+WTEARBE(NB,ielmc,NZ)+WTGRBE(NB,ielmc,NZ) &
-      +EPOOL(NB,ielmc,NZ)+CPOOLK(NB,NZ)
-    WTSHTBE(NB,ielmn,NZ)=WTLFBE(NB,ielmn,NZ) &
-      +WTSHEBE(NB,ielmn,NZ)+WTSTKBE(NB,ielmn,NZ)+WTRSVBE(NB,ielmn,NZ) &
-      +WTHSKBE(NB,ielmn,NZ)+WTEARBE(NB,ielmn,NZ)+WTGRBE(NB,ielmn,NZ) &
-      +EPOOL(NB,ielmn,NZ)
-    WTSHTBE(NB,ielmp,NZ)=WTLFBE(NB,ielmp,NZ) &
-      +WTSHEBE(NB,ielmp,NZ)+WTSTKBE(NB,ielmp,NZ)+WTRSVBE(NB,ielmp,NZ) &
-      +WTHSKBE(NB,ielmp,NZ)+WTEARBE(NB,ielmp,NZ)+WTGRBE(NB,ielmp,NZ) &
-      +EPOOL(NB,ielmp,NZ)
+    WTSHTBE(NB,ielmc,NZ)=WTSHTBE(NB,NE,NZ)+CPOOLK(NB,NZ)
   ENDDO D320
+
 !
 !     TOTAL C,N,P IN ROOTS AND MYCORRHIZAE IN EACH SOIL LAYER
 !
