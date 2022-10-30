@@ -323,27 +323,7 @@ module readqmod
     call check_read(ierr,11,__LINE__,mod_filename)
 
     if(lverb)then
-      write(*,*)'PLANT FUNCTIONAL TYPE'
-      write(*,*)'photosynthesis type, 3=C3, 4=C4: ICTYP ', ICTYP(NZ,NY,NX)
-      write(*,*)'root profile, 0=shallow (eg bryophytes),'// &
-        ' 1=intermediate(eg herbs),2=deep (eg trees) : IGTYP ', IGTYP(NZ,NY,NX)
-      write(*,*)'ISTYP=growth habit, 0=annual,1=perennial: ISTYP', ISTYP(NZ,NY,NX)
-      write(*,*)'growth habit, 0=determinate,1=indetermimate: IDTYP ', IDTYP(NZ,NY,NX)
-      write(*,*)'N2 fixation, 1,2,3=rapid to slow root symbiosis '// &
-        '(e.g.legumes), 4,5,6=rapid to slow canopy symbiosis (e.g.'// &
-        'cyanobacteria): INTYP ',INTYP(NZ,NY,NX)
-      write(*,*)'phenology type, 0=evergreen,1=cold deciduous,'// &
-        '2=drought deciduous,3=1+2: IWTYP',IWTYP(NZ,NY,NX)
-      write(*,*)'photoperiod type, 0=day neutral,1=short day'// &
-        ',2=long day: IPTYP ',IPTYP(NZ,NY,NX)
-      write(*,*)'plant biom turnover, if IGTYP=0 or 1:all '// &
-        'above-ground:0,1=rapid(deciduous),2=very slow(evergreen)'// &
-        ',3=slow(semi-deciduous): IBTYP',IBTYP(NZ,NY,NX)
-      write(*,*)'storage organ:0=above ground,1=below '// &
-        'ground: IRTYP',IRTYP(NZ,NY,NX)
-      write(*,*)'mycorrhizal, 1=no,2=yes: MY',MY(NZ,NY,NX)
-      write(*,*)'thermal adaptation zone:1=arctic,boreal,'// &
-        '2=cool temperate: ZTYPI',ZTYPI(NZ,NY,NX)
+      call pft_display(NZ,NY,NX)
     endif
 !
 !   PHOTOSYNTHETIC PROPERTIES
@@ -365,22 +345,7 @@ module readqmod
     call check_read(ierr,12,__LINE__,mod_filename)
 
     if(lverb)then
-      write(*,*)'PHOTOSYNTHETIC PROPERTIES'
-      write(*,*)'specific rubisco carboxylase (umol C g-1 s-1): VCMX',VCMX(NZ,NY,NX)
-      write(*,*)'specific rubisco oxygenase (umol O g-1 s-1): VOMX',VOMX(NZ,NY,NX)
-      write(*,*)'specific PEP carboxylase activity (umol g-1 s-1): '// &
-        ' VCMX4',VCMX4(NZ,NY,NX)
-      write(*,*)'Km for VCMX (uM): XKCO2',XKCO2(NZ,NY,NX)
-      write(*,*)'Km for VOMX (uM): XKO2',XKO2(NZ,NY,NX)
-      write(*,*)'KM for VCMX4 (uM): XKCO24',XKCO24(NZ,NY,NX)
-      write(*,*)'fraction of leaf protein in rubisco: RUBP',RUBP(NZ,NY,NX)
-      write(*,*)'fraction of leaf protein in PEP carboxylase: PEPC',PEPC(NZ,NY,NX)
-      write(*,*)'specific chlorophyll activity (umol e- g-1 s-1): ETMX',ETMX(NZ,NY,NX)
-      write(*,*)'fraction of leaf protein in mesophyll(C3),' &
-        //' bundle sheath(C4) chlorophyll: CHL',CHL(NZ,NY,NX)
-      write(*,*)'fraction of leaf protein in mesophyll chlorophyll(C4)',CHL4(NZ,NY,NX)
-      write(*,*)'intercellular:atmospheric CO2 concentration '// &
-        'ratio:FCO2 ',FCO2(NZ,NY,NX)
+      call photosyns_trait_disp(NZ,NY,NX)
     endif
 !
 !   OPTICAL PROPERTIES
@@ -421,16 +386,7 @@ module readqmod
     call check_read(ierr,4,__LINE__,mod_filename)
 
     if(lverb)then
-      write(*,*)'PHENOLOGICAL PROPERTIES'
-      write(*,*)'rate of node initiation at 25oC (h-1): XRNI',XRNI(NZ,NY,NX)
-      write(*,*)'rate of leaf appearance at 25oC (h-1): XRLA',XRLA(NZ,NY,NX)
-      write(*,*)'chilling temperature for CO2 fixation, '// &
-        'seed loss (oC): CTC',CTC(NZ,NY,NX)
-      write(*,*)'hour requirement for spring leafout: VRNLI',VRNLI
-      write(*,*)'hour requirement for autumn leafoff: VRNXI',VRNXI
-      write(*,*)'leaf length:width ratio: WDLF',WDLF(NZ,NY,NX)
-      write(*,*)'nonstructural C concentration needed for branching'// &
-        ':PB',PB(NZ,NY,NX)
+      call Phenology_trait_disp(NZ,NY,NX,VRNLI,VRNXI)
     endif
 !
 !   MORPHOLOGICAL PROPERTIES
@@ -461,24 +417,7 @@ module readqmod
     call check_read(ierr,6,__LINE__,mod_filename)
 
     if(lverb)then
-      write(*,*)'MORPHOLOGICAL PROPERTIES'
-      write(*,*)'growth in leaf area vs mass: SLA1 ',SLA1(NZ,NY,NX)
-      write(*,*)'growth in petiole length vs mass: SSL1 ',SSL1(NZ,NY,NX)
-      write(*,*)'growth in internode length vs mass: SNL1',SNL1(NZ,NY,NX)
-      write(*,*)'fraction of leaf area in 0-22.5,45,67.5,90o '// &
-        'inclination classes: CLASS',(CLASS(N,NZ,NY,NX),N=1,JLI)
-      write(*,*)'initial clumping factor: CFI',CFI(NZ,NY,NX)
-      write(*,*)'stem angle from horizontal: ANGBR',ANGBR(NZ,NY,NX)
-      write(*,*)'petiole angle from horizontal: ANGSH',ANGSH(NZ,NY,NX)
-      write(*,*)'maximum potential seed mumber from '// &
-        'pre-anthesis stalk growth: STMX',STMX(NZ,NY,NX)
-      write(*,*)'maximum seed number per STMX: SDMX',SDMX(NZ,NY,NX)
-      write(*,*)'maximum seed size per SDMX (g): GRMX',GRMX(NZ,NY,NX)
-      write(*,*)'seed size at planting (g): GRDM',GRDM(NZ,NY,NX)
-      write(*,*)'grain filling rate at 25 oC (g seed-1 h-1): GFILL' &
-        ,GFILL(NZ,NY,NX)
-      write(*,*)'mass of dead standing biomass at planting: WTSTDI' &
-        ,WTSTDI(NZ,NY,NX)
+      call morphology_trait_disp(NZ,NY,NX)
     endif
 !
 !   ROOT CHARACTERISTICS
@@ -496,17 +435,7 @@ module readqmod
     call check_read(ierr,8,__LINE__,mod_filename)
 
     if(lverb)then
-      write(*,*)'ROOT CHARACTERISTICS'
-      write(*,*)'radius of primary roots: RRAD1M',RRAD1M(1,NZ,NY,NX)
-      write(*,*)'radius of secondary roots: RRAD2M',RRAD2M(1,NZ,NY,NX)
-      write(*,*)'primary/fine root porosity: PORT',PORT(1,NZ,NY,NX)
-      write(*,*)'nonstructural C concentration needed for root'// &
-        ' branching: PR',PR(NZ,NY,NX)
-      write(*,*)'radial root resistivity for water uptake (m2 MPa-1 h-1): RSRR',RSRR(1,NZ,NY,NX)
-      write(*,*)'axial root resistivity for water uptake (m2 MPa-1 h-1): RSRA',RSRA(1,NZ,NY,NX)
-      write(*,*)'rate constant for equilibrating shoot-root '// &
-        'nonstructural C concn: PTSHT',PTSHT(NZ,NY,NX)
-      write(*,*)'root branching frequency (m-1): RTFQ',RTFQ(NZ,NY,NX)
+      call Root_trait_disp(NZ,NY,NX)
     endif
 !
 !   ROOT UPTAKE PARAMETERS
@@ -528,16 +457,7 @@ module readqmod
     call check_read(ierr,3,__LINE__,mod_filename)
 
     if(lverb)then
-      write(*,*)'ROOT UPTAKE PARAMETERS'
-      write(*,*)'NH4 max uptake (g m-2 h-1): UPMXZH',UPMXZH(1,NZ,NY,NX)
-      write(*,*)'NH4 uptake Km (uM): UPKMZH',UPKMZH(1,NZ,NY,NX)
-      write(*,*)'NH4 uptake min concn (uM): UPMNZH',UPMNZH(1,NZ,NY,NX)
-      write(*,*)'NO3 max uptake (g m-2 h-1): UPMXZO',UPMXZO(1,NZ,NY,NX)
-      write(*,*)'NO3 uptake Km (uM): UPKMZO',UPKMZO(1,NZ,NY,NX)
-      write(*,*)'NO3 uptake min concn (uM): UPMNZO',UPMNZO(1,NZ,NY,NX)
-      write(*,*)'H2PO4 max uptake (g m-2 h-1): UPMXPO',UPMXPO(1,NZ,NY,NX)
-      write(*,*)'H2PO4 uptake Km (uM): UPKMPO',UPKMPO(1,NZ,NY,NX)
-      write(*,*)'H2PO4 uptake min conc (uM): UPMNPO',UPMNPO(1,NZ,NY,NX)
+      call Root_nutrient_trait_disp(NZ,NY,NX)
     endif
 !
 !   WATER RELATIONS
@@ -648,13 +568,13 @@ module readqmod
     ANGSH(NZ,NY,NX)=SIN(ANGSH(NZ,NY,NX)/57.29578)
     GROUPI(NZ,NY,NX)=GROUPX(NZ,NY,NX)
     IF(IBTYP(NZ,NY,NX).NE.0)THEN
-      XRNI(NZ,NY,NX)=XRNI(NZ,NY,NX)/25.0
-      XRLA(NZ,NY,NX)=XRLA(NZ,NY,NX)/25.0
-      GROUPI(NZ,NY,NX)=GROUPI(NZ,NY,NX)/25.0
-      XTLI(NZ,NY,NX)=XTLI(NZ,NY,NX)/25.0
+      XRNI(NZ,NY,NX)=XRNI(NZ,NY,NX)/25.0_r8
+      XRLA(NZ,NY,NX)=XRLA(NZ,NY,NX)/25.0_r8
+      GROUPI(NZ,NY,NX)=GROUPI(NZ,NY,NX)/25.0_r8
+      XTLI(NZ,NY,NX)=XTLI(NZ,NY,NX)/25.0_r8
     ENDIF
     GROUPI(NZ,NY,NX)=GROUPI(NZ,NY,NX)-XTLI(NZ,NY,NX)
-    IF(XDL(NZ,NY,NX).LT.0.0)THEN
+    IF(XDL(NZ,NY,NX).LT.0.0_r8)THEN
       XDL(NZ,NY,NX)=DYLM(NY,NX)
     ENDIF
     D5: DO NB=1,JC
@@ -671,11 +591,11 @@ module readqmod
 ! WRITE(*,1111)'CRITICAL DAYLENGTH',IGO,NZ,XDL(NZ,NY,NX)
 !1111    FORMAT(A20,2I8,E12.4)
   end subroutine ReadPlantProperties
-
-
-
-  subroutine pft_display()
+!------------------------------------------------------------------------------------------
+  subroutine pft_display(NZ,NY,NX)
+  use abortutils , only : endrun
   implicit none
+  integer, intent(in) :: NZ,NY,NX
 !   ICTYP=photosynthesis type:3=C3,4=C4
 !   IGTYP=root profile:0=shallow (eg bryophytes),1=intermediate(eg herbs),2=deep (eg trees)
 !   ISTYP=growth habit:0=annual,1=perennial
@@ -691,5 +611,240 @@ module readqmod
 !   ZTYPI=thermal adaptation zone:1=arctic,boreal,2=cool temperate,
 !   3=warm temperate,4=subtropical,5=tropical
 
+  write(*,*)'PLANT FUNCTIONAL TYPE for (NZ,NY,NX)=',NZ,NY,NX
+  select CASE (ICTYP(NZ,NY,NX))
+  case (3)
+    write(*,*)'C3 photosynthesis'
+  case (4)
+    write(*,*)'C4 photosynthesis'
+  case default
+    write(*,*)'photosynthesis type not defined'
+  end select
+
+  select case(IGTYP(NZ,NY,NX))
+  case (0)
+    write(*,*)'shallow root profile, like bryophytes'
+  case (1)
+    write(8,*)'intermediate root profile, like herbs'
+  case (2)
+    write(*,*)'deep root profile, like trees'
+  case default
+    write(*,*)'root profile not defined'
+  end select
+
+  select case (ISTYP(NZ,NY,NX))
+  case (0)
+    write(*,*)'Annual plant'
+  case (1)
+    write(*,*)'perennial plant'
+  case default
+    write(*,*)'growth habit not defined'
+  end select
+
+  select case (IDTYP(NZ,NY,NX))
+  case (0)
+    write(*,*)'determinate growth habit'
+  case (1)
+    write(*,*)'indetermimate growth habit'
+  case default
+    write(*,*)'growth habit not defined'
+  end select
+
+  select case (INTYP(NZ,NY,NX))
+! 1,2, 3, e.g. legumes
+  case (1)
+    write(*,*)'Rapid root N2 fixation symbiosis'
+  case (2)
+    write(*,*)'Intermediate root N2 fixation symbiosis'
+  case (3)
+    write(*,*)'Slow root N2 fixation symbiosis'
+!4,5,6, e.g. cyanobacteria
+  case (4)
+    write(*,*)'Rapid canopy N2 fixation symbiosis'
+  case (5)
+    write(*,*)'Intermediate canopy N2 fixation symbiosis'
+  case (6)
+    write(*,*)'Slow canopy N2 fixation symbiosis'
+  case default
+    write(*,*)'No N2 fixation symbiosis defined'
+  end select
+
+  select case(IWTYP(NZ,NY,NX))
+  case (0)
+    write(*,*)'phenology type: evergreen'
+  case (1)
+    write(*,*)'phenology type: cold deciduous'
+  case (2)
+    write(*,*)'phenology type: drought deciduous'
+  case (3)
+    write(*,*)'phenology type: cold+drought deciduous'
+  case default
+    write(*,*)'phenology type not defined'
+  end select
+
+  select case(IPTYP(NZ,NY,NX))
+  case (0)
+    write(*,*)'day neutral photoperiod'
+  case (1)
+    write(*,*)'short day photoperiod'
+  case (2)
+    write(*,*)'long day photoperiod'
+  case default
+    write(*,*)'photoperiod not defined'
+  end select
+
+  select case(IBTYP(NZ,NY,NX))
+  case (0, 1)
+    write(*,*)'plant biome turnover rapid (deciduous)'
+  case (2)
+    write(*,*)'Plant biome turnover very slow (needleleaf evergreen)'
+  case (3)
+    write(*,*)'Plant biome turnover slow broadleaf evergreen'
+  case (4)
+    write(*,*)'Plant biome turnover semi-deciduous'
+  case (5)
+    write(*,*)'Plant biome turnover semi-evergreen'
+  case default
+    write(*,*)'Plant biome turnover not defined'
+  end select
+
+  select case(IRTYP(NZ,NY,NX))
+  case (0)
+    write(*,*)'Above ground storage organ'
+  case (1)
+    write(*,*)'Belowground storage organ'
+  case default
+    write(*,*)'Storage organ not defined'
+  end select
+
+  select case(MY(NZ,NY,NX))
+  case (1)
+    write(*,*)'No mycorrhizal'
+  case (2)
+    write(*,*)'Mycorrhizal'
+  case default
+    write(*,*)'Wrong option for mycorrhizae'
+  end select
+
+  select case(INT(ZTYPI(NZ,NY,NX)))
+  case (1)
+    write(*,*)'thermal adaptation zone: arctic, boreal'
+  case (2)
+    write(*,*)'thermal adaptation zone: cool temperate'
+  case (3)
+    write(*,*)'thermal adaptation zone: warm temperate'
+  case (4)
+    write(*,*)'thermal adaptation zone: subtropical'
+  case (5)
+    write(*,*)'thermal adaptation zone: tropical'
+  case default
+    write(*,*)'Not thermal adaptation zone defined'
+  end select
+
   end subroutine pft_display
+
+!------------------------------------------------------------------------------------------
+  subroutine photosyns_trait_disp(NZ,NY,NX)
+  implicit none
+  integer, intent(in) :: NZ,NY,NX
+
+  write(*,*)'PHOTOSYNTHETIC PROPERTIES'
+  write(*,*)'Specific rubisco carboxylase (umol C g-1 s-1): ',VCMX(NZ,NY,NX)
+  write(*,*)'Specific rubisco oxygenase (umol O g-1 s-1): ',VOMX(NZ,NY,NX)
+  write(*,*)'Specific PEP carboxylase activity (umol g-1 s-1): '&
+    ,VCMX4(NZ,NY,NX)
+  write(*,*)'Km for VCMX (uM): ',XKCO2(NZ,NY,NX)
+  write(*,*)'Km for VOMX (uM): ',XKO2(NZ,NY,NX)
+  write(*,*)'KM for VCMX4 (uM): ',XKCO24(NZ,NY,NX)
+  write(*,*)'Fraction of leaf protein in rubisco: ',RUBP(NZ,NY,NX)
+  write(*,*)'Fraction of leaf protein in PEP carboxylase: ',PEPC(NZ,NY,NX)
+  write(*,*)'Specific chlorophyll activity (umol e- g-1 s-1): ',ETMX(NZ,NY,NX)
+  if(ICTYP(NZ,NY,NX).eq.ic3_photo)then
+    write(*,*)'Fraction of leaf protein as chlorophyll in mesophyll (C3) ',CHL(NZ,NY,NX)
+  elseif(ICTYP(NZ,NY,NX).eq.ic4_photo)then
+    write(*,*)'Fraction of leaf protein as chlorophyll in bundle sheath(C4)',CHL(NZ,NY,NX)
+    write(*,*)'fraction of leaf protein in mesophyll chlorophyll(C4)',CHL4(NZ,NY,NX)
+  endif
+  write(*,*)'intercellular:atmospheric CO2 concentration ratio:',FCO2(NZ,NY,NX)
+  end subroutine photosyns_trait_disp
+
+!------------------------------------------------------------------------------------------
+
+  subroutine Phenology_trait_disp(NZ,NY,NX,VRNLI,VRNXI)
+
+  implicit none
+  integer, intent(in) :: NZ,NY,NX
+  real(r8), intent(in) :: VRNLI,VRNXI
+  write(*,*)'PHENOLOGICAL PROPERTIES'
+  write(*,*)'rate of node initiation at 25oC (h-1): XRNI',XRNI(NZ,NY,NX)
+  write(*,*)'rate of leaf appearance at 25oC (h-1): XRLA',XRLA(NZ,NY,NX)
+  write(*,*)'chilling temperature for CO2 fixation, '// &
+    'seed loss (oC): CTC',CTC(NZ,NY,NX)
+  write(*,*)'hour requirement for spring leafout: VRNLI',VRNLI
+  write(*,*)'hour requirement for autumn leafoff: VRNXI',VRNXI
+  write(*,*)'leaf length:width ratio: WDLF',WDLF(NZ,NY,NX)
+  write(*,*)'nonstructural C concentration needed for branching'// &
+    ':PB',PB(NZ,NY,NX)
+  end subroutine Phenology_trait_disp
+!------------------------------------------------------------------------------------------
+  subroutine morphology_trait_disp(NZ,NY,NX)
+  implicit none
+  integer, intent(in) :: NZ,NY,NX
+  integer :: N
+
+  write(*,*)'MORPHOLOGICAL PROPERTIES'
+  write(*,*)'growth in leaf area vs mass: SLA1 ',SLA1(NZ,NY,NX)
+  write(*,*)'growth in petiole length vs mass: SSL1 ',SSL1(NZ,NY,NX)
+  write(*,*)'growth in internode length vs mass: SNL1',SNL1(NZ,NY,NX)
+  write(*,*)'fraction of leaf area in 0-22.5,45,67.5,90o '// &
+    'inclination classes: CLASS',(CLASS(N,NZ,NY,NX),N=1,JLI)
+  write(*,*)'initial clumping factor: CFI',CFI(NZ,NY,NX)
+  write(*,*)'stem angle from horizontal: ANGBR',ANGBR(NZ,NY,NX)
+  write(*,*)'petiole angle from horizontal: ANGSH',ANGSH(NZ,NY,NX)
+  write(*,*)'maximum potential seed mumber from '// &
+    'pre-anthesis stalk growth: STMX',STMX(NZ,NY,NX)
+  write(*,*)'maximum seed number per STMX: SDMX',SDMX(NZ,NY,NX)
+  write(*,*)'maximum seed size per SDMX (g): GRMX',GRMX(NZ,NY,NX)
+  write(*,*)'seed size at planting (g): GRDM',GRDM(NZ,NY,NX)
+  write(*,*)'grain filling rate at 25 oC (g seed-1 h-1): GFILL' &
+    ,GFILL(NZ,NY,NX)
+  write(*,*)'mass of dead standing biomass at planting: WTSTDI' &
+    ,WTSTDI(NZ,NY,NX)
+  end subroutine morphology_trait_disp
+
+!------------------------------------------------------------------------------------------
+  subroutine Root_trait_disp(NZ,NY,NX)
+  implicit none
+  integer, intent(in) :: NZ,NY,NX
+
+  write(*,*)'ROOT CHARACTERISTICS'
+  write(*,*)'radius of primary roots: RRAD1M',RRAD1M(1,NZ,NY,NX)
+  write(*,*)'radius of secondary roots: RRAD2M',RRAD2M(1,NZ,NY,NX)
+  write(*,*)'primary/fine root porosity: PORT',PORT(1,NZ,NY,NX)
+  write(*,*)'nonstructural C concentration needed for root'// &
+    ' branching: PR',PR(NZ,NY,NX)
+  write(*,*)'radial root resistivity for water uptake (m2 MPa-1 h-1): RSRR',RSRR(1,NZ,NY,NX)
+  write(*,*)'axial root resistivity for water uptake (m2 MPa-1 h-1): RSRA',RSRA(1,NZ,NY,NX)
+  write(*,*)'rate constant for equilibrating shoot-root '// &
+    'nonstructural C concn: PTSHT',PTSHT(NZ,NY,NX)
+  write(*,*)'root branching frequency (m-1): RTFQ',RTFQ(NZ,NY,NX)
+  end subroutine Root_trait_disp
+
+!------------------------------------------------------------------------------------------
+  subroutine Root_nutrient_trait_disp(NZ,NY,NX)
+  implicit none
+  integer, intent(in) :: NZ,NY,NX
+
+  write(*,*)'ROOT UPTAKE PARAMETERS'
+  write(*,*)'NH4 max uptake (g m-2 h-1): UPMXZH',UPMXZH(1,NZ,NY,NX)
+  write(*,*)'NH4 uptake Km (uM): UPKMZH',UPKMZH(1,NZ,NY,NX)
+  write(*,*)'NH4 uptake min concn (uM): UPMNZH',UPMNZH(1,NZ,NY,NX)
+  write(*,*)'NO3 max uptake (g m-2 h-1): UPMXZO',UPMXZO(1,NZ,NY,NX)
+  write(*,*)'NO3 uptake Km (uM): UPKMZO',UPKMZO(1,NZ,NY,NX)
+  write(*,*)'NO3 uptake min concn (uM): UPMNZO',UPMNZO(1,NZ,NY,NX)
+  write(*,*)'H2PO4 max uptake (g m-2 h-1): UPMXPO',UPMXPO(1,NZ,NY,NX)
+  write(*,*)'H2PO4 uptake Km (uM): UPKMPO',UPKMPO(1,NZ,NY,NX)
+  write(*,*)'H2PO4 uptake min conc (uM): UPMNPO',UPMNPO(1,NZ,NY,NX)
+  end subroutine Root_nutrient_trait_disp
+
 end module readqmod

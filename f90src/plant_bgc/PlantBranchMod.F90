@@ -281,6 +281,7 @@ module PlantBranchMod
     GROEARE(ielmc)=PART(6)*CGROS*DMEAR(NZ)
     GROGRE(ielmc)=PART(7)*CGROS*DMGR(NZ)
     GROSHT=CGROS*DMSHT
+
     GROLFE(ielmn)=GROLFE(ielmc)*CNLFB*(ZPLFM+ZPLFD*CNPG)
     GROSHE(ielmn)=GROSHE(ielmc)*CNSHB
     GROSTKE(ielmn)=GROSTKE(ielmc)*CNSTK(NZ)
@@ -288,6 +289,7 @@ module PlantBranchMod
     GROHSKE(ielmn)=GROHSKE(ielmc)*CNHSK(NZ)
     GROEARE(ielmn)=GROEARE(ielmc)*CNEAR(NZ)
     GROGRE(ielmn)=GROGRE(ielmc)*CNRSV(NZ)
+
     GROLFE(ielmp)=GROLFE(ielmc)*CPLFB*(ZPLFM+ZPLFD*CNPG)
     GROSHE(ielmp)=GROSHE(ielmc)*CPSHB
     GROSTKE(ielmp)=GROSTKE(ielmc)*CPSTK(NZ)
@@ -457,7 +459,7 @@ module PlantBranchMod
         MXNOD=KVSTG(NB,NZ)
         MNNOD=MAX(MIN(NN,MAX(NN,MXNOD-NNOD(NZ))),KVSTG(NB,NZ)-23)
         MXNOD=MAX(MXNOD,MNNOD)
-        IF(GROSTKE(ielmc).GT.0.0)THEN
+        IF(GROSTKE(ielmc).GT.0.0_r8)THEN
           GNOD=MXNOD-MNNOD+1
           ALLOCN=1.0_r8/GNOD
           DO NE=1,npelms
@@ -515,15 +517,15 @@ module PlantBranchMod
     !   IGTYP=growth type:0=bryophyte,1=graminoid,2=shrub,tree
 !
         IF(IDAY(1,NB,NZ).NE.0.AND.CEPOLB(NB,ielmc,NZ).GT.ZERO)THEN
-          CCC=AZMAX1(AMIN1(1.0 &
+          CCC=AZMAX1(AMIN1(1.0_r8 &
             ,safe_adb(CEPOLB(NB,ielmn,NZ),CEPOLB(NB,ielmn,NZ) &
             +CEPOLB(NB,ielmc,NZ)*CNKI) &
             ,safe_adb(CEPOLB(NB,ielmp,NZ),CEPOLB(NB,ielmp,NZ) &
             +CEPOLB(NB,ielmc,NZ)*CPKI)))
-          CNC=AZMAX1(AMIN1(1.0 &
+          CNC=AZMAX1(AMIN1(1.0_r8 &
             ,safe_adb(CEPOLB(NB,ielmc,NZ),CEPOLB(NB,ielmc,NZ) &
             +CEPOLB(NB,ielmn,NZ)/CNKI)))
-          CPC=AZMAX1(AMIN1(1.0 &
+          CPC=AZMAX1(AMIN1(1.0_r8 &
             ,safe_adb(CEPOLB(NB,ielmc,NZ),CEPOLB(NB,ielmc,NZ) &
             +CEPOLB(NB,ielmp,NZ)/CPKI)))
         ELSE

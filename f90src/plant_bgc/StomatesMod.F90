@@ -630,14 +630,14 @@
     IF(ARLF1(K,NB,NZ).GT.ZEROP(NZ).AND.WGLFE(K,NB,ielmc,NZ).GT.ZEROP(NZ))THEN
       WSDN=WSLF(K,NB,NZ)/ARLF1(K,NB,NZ)
     ELSE
-      WSDN=0.0
+      WSDN=0.0_r8
     ENDIF
 
     IF(WSDN.GT.ZERO)THEN
 !
 !     ICTYP=photosynthesis type:3=C3,4=C4 from PFT file
 !
-      IF(ICTYP(NZ).EQ.4)THEN
+      IF(ICTYP(NZ).EQ.ic4_photo)THEN
 !     C4 PHOTOSYNTHESIS
         call C4Photosynthesis(K,NB,NZ,CH2O,TFN1,TFN2,TFNE,XKO2L,WSDN)
       ELSE
@@ -646,8 +646,8 @@
       ENDIF
 !
     ELSE
-      VCGR4(K,NB,NZ)=0.0
-      VCGRO(K,NB,NZ)=0.0
+      VCGR4(K,NB,NZ)=0.0_r8
+      VCGRO(K,NB,NZ)=0.0_r8
     ENDIF
   ENDDO
   end associate
@@ -683,7 +683,7 @@
     FDBK(NB,NZ)=AMIN1(CEPOLB(NB,ielmn,NZ)/(CEPOLB(NB,ielmn,NZ)+CEPOLB(NB,ielmc,NZ)/CNKI) &
       ,CEPOLB(NB,ielmp,NZ)/(CEPOLB(NB,ielmp,NZ)+CEPOLB(NB,ielmc,NZ)/CPKI))
   ELSE
-    FDBK(NB,NZ)=1.0
+    FDBK(NB,NZ)=1.0_r8
   ENDIF
 !
 !     CHILLING
@@ -696,7 +696,7 @@
 !
 !     ATRP=hours above threshold temperature for dehardening since leafout
 !     ATRPZ=hours to full dehardening of conifers in spring
-!
+! deciduous
   IF(IWTYP(NZ).NE.0.AND.IBTYP(NZ).GE.2)THEN
     FDBK(NB,NZ)=FDBK(NB,NZ)*AZMAX1(AMIN1(1.0_r8 &
       ,ATRP(NB,NZ)/(0.9_r8*ATRPZ)))
@@ -708,10 +708,10 @@
 !     FLG4=number of hours with no grain fill after start of grain fill
 !     FLG4Y=number of hours with no grain fill to terminate annuals
 !
-  IF(ISTYP(NZ).EQ.0.AND.FLG4(NB,NZ).GT.0.0)THEN
+  IF(ISTYP(NZ).EQ.0.AND.FLG4(NB,NZ).GT.0.0_r8)THEN
     FDBKX(NB,NZ)=AZMAX1(1.0_r8-FLG4(NB,NZ)/FLG4Y(IWTYP(NZ)))
   ELSE
-    FDBKX(NB,NZ)=1.0
+    FDBKX(NB,NZ)=1.0_r8
   ENDIF
   FDBK(NB,NZ)=FDBK(NB,NZ)*FDBKX(NB,NZ)
 !

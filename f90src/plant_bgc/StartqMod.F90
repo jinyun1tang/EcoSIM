@@ -112,28 +112,34 @@ module StartqMod
   PPX(NZ,NY,NX)=PPI(NZ,NY,NX)
   CF(NZ,NY,NX)=CFI(NZ,NY,NX)
 
-  RSMH(NZ,NY,NX)=RSMX(NZ,NY,NX)/3600.0
-  RCMX(NZ,NY,NX)=RSMX(NZ,NY,NX)*1.56
-  CNWS(NZ,NY,NX)=2.5
-  CPWS(NZ,NY,NX)=25.0
+  RSMH(NZ,NY,NX)=RSMX(NZ,NY,NX)/3600.0_r8
+  RCMX(NZ,NY,NX)=RSMX(NZ,NY,NX)*1.56_r8
+  CNWS(NZ,NY,NX)=2.5_r8
+  CPWS(NZ,NY,NX)=25.0_r8
   CWSRT(NZ,NY,NX)=AMIN1(CNRT(NZ,NY,NX)*CNWS(NZ,NY,NX),CPRT(NZ,NY,NX)*CPWS(NZ,NY,NX))
-  IF(ICTYP(NZ,NY,NX).EQ.3)THEN
-    O2I(NZ,NY,NX)=2.10E+05
+  IF(ICTYP(NZ,NY,NX).EQ.ic3_photo)THEN
+    O2I(NZ,NY,NX)=2.10E+05_r8
   ELSE
-    O2I(NZ,NY,NX)=3.96E+05
+    O2I(NZ,NY,NX)=3.96E+05_r8
   ENDIF
   end subroutine InitShootGrowth
 !------------------------------------------------------------------------------------------
 
   subroutine PlantLitterFractions(NZ,NY,NX)
 
+  use MicBGCPars, only : micpar
   implicit none
   integer, intent(in) :: NZ,NY,NX
   integer :: N,M
   real(r8) :: CNOPC(4),CPOPC(4)
   REAL(R8) :: CNOPCT,CPOPCT
 
-  associate(                     &
+  associate(                       &
+    iprotein  => micpar%iprotein  ,&
+    icarbhyro => micpar%icarbhyro ,&
+    icellulos => micpar%icellulos ,&
+    ilignin  =>  micpar%ilignin   , &
+    Jlitgrp  => pltpar%Jlitgrp , &
     instruct => pltpar%instruct, &
     ifoliar  => pltpar%ifoliar , &
     infoliar => pltpar%infoliar, &
@@ -150,70 +156,75 @@ module StartqMod
 !
 !     NONSTRUCTURAL
 !
-  CFOPE(instruct,1,ielmc,NZ,NY,NX)=0.0_r8
-  CFOPE(instruct,2,ielmc,NZ,NY,NX)=0.67_r8
-  CFOPE(instruct,3,ielmc,NZ,NY,NX)=0.33_r8
-  CFOPE(instruct,4,ielmc,NZ,NY,NX)=0.0_r8
+  CFOPE(instruct,iprotein,ielmc,NZ,NY,NX)=0.0_r8
+  CFOPE(instruct,icarbhyro,ielmc,NZ,NY,NX)=0.67_r8
+  CFOPE(instruct,icellulos,ielmc,NZ,NY,NX)=0.33_r8
+  CFOPE(instruct,ilignin,ielmc,NZ,NY,NX)=0.0_r8
 !
 !     NON-VASCULAR (E.G. MOSSES)
 !
   IF(IGTYP(NZ,NY,NX).EQ.0)THEN
-    CFOPE(ifoliar,1,ielmc,NZ,NY,NX)=0.07_r8
-    CFOPE(ifoliar,2,ielmc,NZ,NY,NX)=0.25_r8
-    CFOPE(ifoliar,3,ielmc,NZ,NY,NX)=0.30_r8
-    CFOPE(ifoliar,4,ielmc,NZ,NY,NX)=0.38_r8
-    CFOPE(infoliar,1,ielmc,NZ,NY,NX)=0.07_r8
-    CFOPE(infoliar,2,ielmc,NZ,NY,NX)=0.25_r8
-    CFOPE(infoliar,3,ielmc,NZ,NY,NX)=0.30_r8
-    CFOPE(infoliar,4,ielmc,NZ,NY,NX)=0.38_r8
+    CFOPE(ifoliar,iprotein,ielmc,NZ,NY,NX)=0.07_r8
+    CFOPE(ifoliar,icarbhyro,ielmc,NZ,NY,NX)=0.25_r8
+    CFOPE(ifoliar,icellulos,ielmc,NZ,NY,NX)=0.30_r8
+    CFOPE(ifoliar,ilignin,ielmc,NZ,NY,NX)=0.38_r8
+
+    CFOPE(infoliar,iprotein,ielmc,NZ,NY,NX)=0.07_r8
+    CFOPE(infoliar,icarbhyro,ielmc,NZ,NY,NX)=0.25_r8
+    CFOPE(infoliar,icellulos,ielmc,NZ,NY,NX)=0.30_r8
+    CFOPE(infoliar,ilignin,ielmc,NZ,NY,NX)=0.38_r8
 !
 !     LEGUMES
 !
   ELSEIF(INTYP(NZ,NY,NX).NE.0)THEN
-    CFOPE(ifoliar,1,ielmc,NZ,NY,NX)=0.16_r8
-    CFOPE(ifoliar,2,ielmc,NZ,NY,NX)=0.38_r8
-    CFOPE(ifoliar,3,ielmc,NZ,NY,NX)=0.34_r8
-    CFOPE(ifoliar,4,ielmc,NZ,NY,NX)=0.12_r8
-    CFOPE(infoliar,1,ielmc,NZ,NY,NX)=0.07_r8
-    CFOPE(infoliar,2,ielmc,NZ,NY,NX)=0.41_r8
-    CFOPE(infoliar,3,ielmc,NZ,NY,NX)=0.37_r8
-    CFOPE(infoliar,4,ielmc,NZ,NY,NX)=0.15_r8
+    CFOPE(ifoliar,iprotein,ielmc,NZ,NY,NX)=0.16_r8
+    CFOPE(ifoliar,icarbhyro,ielmc,NZ,NY,NX)=0.38_r8
+    CFOPE(ifoliar,icellulos,ielmc,NZ,NY,NX)=0.34_r8
+    CFOPE(ifoliar,ilignin,ielmc,NZ,NY,NX)=0.12_r8
+
+    CFOPE(infoliar,iprotein,ielmc,NZ,NY,NX)=0.07_r8
+    CFOPE(infoliar,icarbhyro,ielmc,NZ,NY,NX)=0.41_r8
+    CFOPE(infoliar,icellulos,ielmc,NZ,NY,NX)=0.37_r8
+    CFOPE(infoliar,ilignin,ielmc,NZ,NY,NX)=0.15_r8
 !
 !     ANNUALS, GRASSES, SHRUBS
 !
   ELSEIF(IBTYP(NZ,NY,NX).EQ.0.OR.IGTYP(NZ,NY,NX).LE.1)THEN
-    CFOPE(ifoliar,1,ielmc,NZ,NY,NX)=0.08_r8
-    CFOPE(ifoliar,2,ielmc,NZ,NY,NX)=0.41_r8
-    CFOPE(ifoliar,3,ielmc,NZ,NY,NX)=0.36_r8
-    CFOPE(ifoliar,4,ielmc,NZ,NY,NX)=0.15_r8
-    CFOPE(infoliar,1,ielmc,NZ,NY,NX)=0.07_r8
-    CFOPE(infoliar,2,ielmc,NZ,NY,NX)=0.41_r8
-    CFOPE(infoliar,3,ielmc,NZ,NY,NX)=0.36_r8
-    CFOPE(infoliar,4,ielmc,NZ,NY,NX)=0.16_r8
+    CFOPE(ifoliar,iprotein,ielmc,NZ,NY,NX)=0.08_r8
+    CFOPE(ifoliar,icarbhyro,ielmc,NZ,NY,NX)=0.41_r8
+    CFOPE(ifoliar,icellulos,ielmc,NZ,NY,NX)=0.36_r8
+    CFOPE(ifoliar,ilignin,ielmc,NZ,NY,NX)=0.15_r8
+
+    CFOPE(infoliar,iprotein,ielmc,NZ,NY,NX)=0.07_r8
+    CFOPE(infoliar,icarbhyro,ielmc,NZ,NY,NX)=0.41_r8
+    CFOPE(infoliar,icellulos,ielmc,NZ,NY,NX)=0.36_r8
+    CFOPE(infoliar,ilignin,ielmc,NZ,NY,NX)=0.16_r8
 !
 !     DECIDUOUS TREES
 !
-  ELSEIF(IBTYP(NZ,NY,NX).EQ.1.OR.IBTYP(NZ,NY,NX).EQ.3)THEN
-    CFOPE(ifoliar,1,ielmc,NZ,NY,NX)=0.07_r8
-    CFOPE(ifoliar,2,ielmc,NZ,NY,NX)=0.34_r8
-    CFOPE(ifoliar,3,ielmc,NZ,NY,NX)=0.36_r8
-    CFOPE(ifoliar,4,ielmc,NZ,NY,NX)=0.23_r8
-    CFOPE(infoliar,1,ielmc,NZ,NY,NX)=0.0_r8
-    CFOPE(infoliar,2,ielmc,NZ,NY,NX)=0.045_r8
-    CFOPE(infoliar,3,ielmc,NZ,NY,NX)=0.660_r8
-    CFOPE(infoliar,4,ielmc,NZ,NY,NX)=0.295_r8
+  ELSEIF(IBTYP(NZ,NY,NX).EQ.1.OR.IBTYP(NZ,NY,NX).GE.3)THEN
+    CFOPE(ifoliar,iprotein,ielmc,NZ,NY,NX)=0.07_r8
+    CFOPE(ifoliar,icarbhyro,ielmc,NZ,NY,NX)=0.34_r8
+    CFOPE(ifoliar,icellulos,ielmc,NZ,NY,NX)=0.36_r8
+    CFOPE(ifoliar,ilignin,ielmc,NZ,NY,NX)=0.23_r8
+
+    CFOPE(infoliar,iprotein,ielmc,NZ,NY,NX)=0.0_r8
+    CFOPE(infoliar,icarbhyro,ielmc,NZ,NY,NX)=0.045_r8
+    CFOPE(infoliar,icellulos,ielmc,NZ,NY,NX)=0.660_r8
+    CFOPE(infoliar,ilignin,ielmc,NZ,NY,NX)=0.295_r8
 !
 !     CONIFEROUS TREES
 !
   ELSE
-    CFOPE(ifoliar,1,ielmc,NZ,NY,NX)=0.07_r8
-    CFOPE(ifoliar,2,ielmc,NZ,NY,NX)=0.25_r8
-    CFOPE(ifoliar,3,ielmc,NZ,NY,NX)=0.38_r8
-    CFOPE(ifoliar,4,ielmc,NZ,NY,NX)=0.30_r8
-    CFOPE(infoliar,1,ielmc,NZ,NY,NX)=0.0_r8
-    CFOPE(infoliar,2,ielmc,NZ,NY,NX)=0.045_r8
-    CFOPE(infoliar,3,ielmc,NZ,NY,NX)=0.660_r8
-    CFOPE(infoliar,4,ielmc,NZ,NY,NX)=0.295_r8
+    CFOPE(ifoliar,iprotein,ielmc,NZ,NY,NX)=0.07_r8
+    CFOPE(ifoliar,icarbhyro,ielmc,NZ,NY,NX)=0.25_r8
+    CFOPE(ifoliar,icellulos,ielmc,NZ,NY,NX)=0.38_r8
+    CFOPE(ifoliar,ilignin,ielmc,NZ,NY,NX)=0.30_r8
+
+    CFOPE(infoliar,iprotein,ielmc,NZ,NY,NX)=0.0_r8
+    CFOPE(infoliar,icarbhyro,ielmc,NZ,NY,NX)=0.045_r8
+    CFOPE(infoliar,icellulos,ielmc,NZ,NY,NX)=0.660_r8
+    CFOPE(infoliar,ilignin,ielmc,NZ,NY,NX)=0.295_r8
   ENDIF
 !
 !     FRACTIONS OF WOODY LITTER ALLOCATED TO
@@ -222,26 +233,26 @@ module StartqMod
 !     NON-VASCULAR
 !
   IF(IGTYP(NZ,NY,NX).EQ.0)THEN
-    CFOPE(istalk,1,ielmc,NZ,NY,NX)=0.07_r8
-    CFOPE(istalk,2,ielmc,NZ,NY,NX)=0.25_r8
-    CFOPE(istalk,3,ielmc,NZ,NY,NX)=0.30_r8
-    CFOPE(istalk,4,ielmc,NZ,NY,NX)=0.38_r8
+    CFOPE(istalk,iprotein,ielmc,NZ,NY,NX)=0.07_r8
+    CFOPE(istalk,icarbhyro,ielmc,NZ,NY,NX)=0.25_r8
+    CFOPE(istalk,icellulos,ielmc,NZ,NY,NX)=0.30_r8
+    CFOPE(istalk,ilignin,ielmc,NZ,NY,NX)=0.38_r8
 !
 !     ANNUALS, GRASSES, SHRUBS
 !
   ELSEIF(IBTYP(NZ,NY,NX).EQ.0.OR.IGTYP(NZ,NY,NX).LE.1)THEN
-    CFOPE(istalk,1,ielmc,NZ,NY,NX)=0.03_r8
-    CFOPE(istalk,2,ielmc,NZ,NY,NX)=0.25_r8
-    CFOPE(istalk,3,ielmc,NZ,NY,NX)=0.57_r8
-    CFOPE(istalk,4,ielmc,NZ,NY,NX)=0.15_r8
+    CFOPE(istalk,iprotein,ielmc,NZ,NY,NX)=0.03_r8
+    CFOPE(istalk,icarbhyro,ielmc,NZ,NY,NX)=0.25_r8
+    CFOPE(istalk,icellulos,ielmc,NZ,NY,NX)=0.57_r8
+    CFOPE(istalk,ilignin,ielmc,NZ,NY,NX)=0.15_r8
 !
 !     DECIDUOUS AND CONIFEROUS TREES
 !
   ELSE
-    CFOPE(istalk,1,ielmc,NZ,NY,NX)=0.0_r8
-    CFOPE(istalk,2,ielmc,NZ,NY,NX)=0.045_r8
-    CFOPE(istalk,3,ielmc,NZ,NY,NX)=0.660_r8
-    CFOPE(istalk,4,ielmc,NZ,NY,NX)=0.295_r8
+    CFOPE(istalk,iprotein,ielmc,NZ,NY,NX)=0.0_r8
+    CFOPE(istalk,icarbhyro,ielmc,NZ,NY,NX)=0.045_r8
+    CFOPE(istalk,icellulos,ielmc,NZ,NY,NX)=0.660_r8
+    CFOPE(istalk,ilignin,ielmc,NZ,NY,NX)=0.295_r8
   ENDIF
 !
 !     FRACTIONS OF FINE ROOT LITTER ALLOCATED TO
@@ -250,57 +261,59 @@ module StartqMod
 !     NON-VASCULAR
 !
   IF(IGTYP(NZ,NY,NX).EQ.0)THEN
-    CFOPE(iroot,1,ielmc,NZ,NY,NX)=0.07_r8
-    CFOPE(iroot,2,ielmc,NZ,NY,NX)=0.25_r8
-    CFOPE(iroot,3,ielmc,NZ,NY,NX)=0.30_r8
-    CFOPE(iroot,4,ielmc,NZ,NY,NX)=0.38_r8
+    CFOPE(iroot,iprotein,ielmc,NZ,NY,NX)=0.07_r8
+    CFOPE(iroot,icarbhyro,ielmc,NZ,NY,NX)=0.25_r8
+    CFOPE(iroot,icellulos,ielmc,NZ,NY,NX)=0.30_r8
+    CFOPE(iroot,ilignin,ielmc,NZ,NY,NX)=0.38_r8
 !
 !     ANNUALS, GRASSES, SHRUBS
 !
   ELSEIF(IBTYP(NZ,NY,NX).EQ.0.OR.IGTYP(NZ,NY,NX).LE.1)THEN
-    CFOPE(iroot,1,ielmc,NZ,NY,NX)=0.057_r8
-    CFOPE(iroot,2,ielmc,NZ,NY,NX)=0.263_r8
-    CFOPE(iroot,3,ielmc,NZ,NY,NX)=0.542_r8
-    CFOPE(iroot,4,ielmc,NZ,NY,NX)=0.138_r8
+    CFOPE(iroot,iprotein,ielmc,NZ,NY,NX)=0.057_r8
+    CFOPE(iroot,icarbhyro,ielmc,NZ,NY,NX)=0.263_r8
+    CFOPE(iroot,icellulos,ielmc,NZ,NY,NX)=0.542_r8
+    CFOPE(iroot,ilignin,ielmc,NZ,NY,NX)=0.138_r8
 !
 !     DECIDUOUS TREES
 !
-  ELSEIF(IBTYP(NZ,NY,NX).EQ.1.OR.IBTYP(NZ,NY,NX).EQ.3)THEN
-    CFOPE(iroot,1,ielmc,NZ,NY,NX)=0.059_r8
-    CFOPE(iroot,2,ielmc,NZ,NY,NX)=0.308_r8
-    CFOPE(iroot,3,ielmc,NZ,NY,NX)=0.464_r8
-    CFOPE(iroot,4,ielmc,NZ,NY,NX)=0.169_r8
+  ELSEIF(IBTYP(NZ,NY,NX).EQ.1.OR.IBTYP(NZ,NY,NX).GE.3)THEN
+    CFOPE(iroot,iprotein,ielmc,NZ,NY,NX)=0.059_r8
+    CFOPE(iroot,icarbhyro,ielmc,NZ,NY,NX)=0.308_r8
+    CFOPE(iroot,icellulos,ielmc,NZ,NY,NX)=0.464_r8
+    CFOPE(iroot,ilignin,ielmc,NZ,NY,NX)=0.169_r8
 !
 !     CONIFEROUS TREES
 !
   ELSE
-    CFOPE(iroot,1,ielmc,NZ,NY,NX)=0.059_r8
-    CFOPE(iroot,2,ielmc,NZ,NY,NX)=0.308_r8
-    CFOPE(iroot,3,ielmc,NZ,NY,NX)=0.464_r8
-    CFOPE(iroot,4,ielmc,NZ,NY,NX)=0.169_r8
+    CFOPE(iroot,iprotein,ielmc,NZ,NY,NX)=0.059_r8
+    CFOPE(iroot,icarbhyro,ielmc,NZ,NY,NX)=0.308_r8
+    CFOPE(iroot,icellulos,ielmc,NZ,NY,NX)=0.464_r8
+    CFOPE(iroot,ilignin,ielmc,NZ,NY,NX)=0.169_r8
   ENDIF
 !
 !     COARSE WOODY LITTER FROM BOLES AND ROOTS
 !
-  CFOPE(icwood,1,ielmc,NZ,NY,NX)=0.00_r8
-  CFOPE(icwood,2,ielmc,NZ,NY,NX)=0.045_r8
-  CFOPE(icwood,3,ielmc,NZ,NY,NX)=0.660_r8
-  CFOPE(icwood,4,ielmc,NZ,NY,NX)=0.295_r8
+  CFOPE(icwood,iprotein,ielmc,NZ,NY,NX)=0.00_r8
+  CFOPE(icwood,icarbhyro,ielmc,NZ,NY,NX)=0.045_r8
+  CFOPE(icwood,icellulos,ielmc,NZ,NY,NX)=0.660_r8
+  CFOPE(icwood,ilignin,ielmc,NZ,NY,NX)=0.295_r8
 !
 !     INITIALIZE C-N AND C-P RATIOS IN PLANT LITTER
 !
 !     CNOPC,CPOPC=fractions to allocate N,P to kinetic components
 !     CFOPN,CFOPP=distribution of litter N,P to kinetic components
 !
-  CNOPC(1)=0.020_r8
-  CNOPC(2)=0.010_r8
-  CNOPC(3)=0.010_r8
-  CNOPC(4)=0.020_r8
-  CPOPC(1)=0.0020_r8
-  CPOPC(2)=0.0010_r8
-  CPOPC(3)=0.0010_r8
-  CPOPC(4)=0.0020_r8
-  D110: DO N=0,5
+  CNOPC(iprotein)=0.020_r8
+  CNOPC(icarbhyro)=0.010_r8
+  CNOPC(icellulos)=0.010_r8
+  CNOPC(ilignin)=0.020_r8
+
+  CPOPC(iprotein)=0.0020_r8
+  CPOPC(icarbhyro)=0.0010_r8
+  CPOPC(icellulos)=0.0010_r8
+  CPOPC(ilignin)=0.0020_r8
+
+  D110: DO N=0,Jlitgrp
     CNOPCT=0.0_r8
     CPOPCT=0.0_r8
     D100: DO M=1,jsken
@@ -319,7 +332,9 @@ module StartqMod
 !     NNOD=number of concurrently growing nodes
 !
   IF(IBTYP(NZ,NY,NX).EQ.0.OR.IGTYP(NZ,NY,NX).LE.1)THEN
-    FNOD(NZ,NY,NX)=1.0
+! deciduous or shallow root
+    FNOD(NZ,NY,NX)=1.0_r8
+!
     IF(GROUPI(NZ,NY,NX).LE.10)THEN
       NNOD(NZ,NY,NX)=3
     ELSEIF(GROUPI(NZ,NY,NX).LE.15)THEN
@@ -328,7 +343,7 @@ module StartqMod
       NNOD(NZ,NY,NX)=5
     ENDIF
   ELSE
-    FNOD(NZ,NY,NX)=AMAX1(1.0,0.04/XRLA(NZ,NY,NX))
+    FNOD(NZ,NY,NX)=AMAX1(1.0_r8,0.04_r8/XRLA(NZ,NY,NX))
     NNOD(NZ,NY,NX)=24
   ENDIF
   end associate

@@ -84,7 +84,7 @@ module NoduleBGCMod
 !     AREA=grid cell area
 !     CNND,CPND=bacterial N:C,P:C ratio from PFT file
 !
-    IF(WTNDBE(NB,ielmc,NZ).LE.0.0)THEN
+    IF(WTNDBE(NB,ielmc,NZ).LE.0.0_r8)THEN
       WTNDBE(NB,ielmc,NZ)=WTNDBE(NB,ielmc,NZ)+WTNDI*AREA3(NU)
       WTNDBE(NB,ielmn,NZ)=WTNDBE(NB,ielmn,NZ)+WTNDI*AREA3(NU)*CNND(NZ)
       WTNDBE(NB,ielmp,NZ)=WTNDBE(NB,ielmp,NZ)+WTNDI*AREA3(NU)*CPND(NZ)
