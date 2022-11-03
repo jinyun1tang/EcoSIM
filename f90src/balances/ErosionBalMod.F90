@@ -2,7 +2,7 @@ module ErosionBalMod
   use data_kind_mod, only : r8 => SHR_KIND_R8
   use SoilPropertyDataType
   use RootDataType
-  use MicBGCPars, only : micpar
+  use EcoSiMParDataMod, only : micpar
   USE EcoSIMCtrlDataType
   use MicrobialDataType
   USE SOMDataType
@@ -187,7 +187,7 @@ implicit none
 !
 !     MICROBIAL C,N,P
 !
-      D1970: DO K=0,micpar%k_litrsf
+      D1970: DO K=1,micpar%n_litrsfk
 
 !         OMC,OMN,OMP=microbial C,N,P
 !         ORC,ORN,ORP=microbial residue C,N,P
@@ -235,7 +235,7 @@ implicit none
 !
 !     MICROBIAL RESIDUE C,N,P
 !
-      D1900: DO K=0,micpar%k_litrsf
+      D1900: DO K=1,micpar%n_litrsfk
         D1940: DO M=1,ndbiomcp
           FORC=FSINK*ORC(M,K,L,NY,NX)
           FORN=FSINK*ORN(M,K,L,NY,NX)

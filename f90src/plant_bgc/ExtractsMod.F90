@@ -8,7 +8,6 @@ module ExtractsMod
   use EcosimConst
   use GrosubPars
   use PlantAPIData
-  use MicBGCPars, only : micpar
   implicit none
 
   private
@@ -54,9 +53,7 @@ module ExtractsMod
    WTSTGE   => plt_biom%WTSTGE     , &
    HESNC    => plt_bgcr%HESNC      , &
    ZESNC    => plt_bgcr%ZESNC      , &
-   CSNT     => plt_bgcr%CSNT       , &
-   ZSNT     => plt_bgcr%ZSNT       , &
-   PSNT     => plt_bgcr%PSNT       , &
+   ESNT     => plt_bgcr%ESNT       , &
    ESNC     => plt_bgcr%ESNC       , &
    NI       => plt_morph%NI        , &
    ARSTT    => plt_morph%ARSTT     , &
@@ -72,20 +69,20 @@ module ExtractsMod
 !   HCSNC,HZSNC,HPSNC=hourly PFT C,N,P litterfall from grosub.f
 !   WTSTGT=total standing dead C,N,P mass
 !   WTSTG=PFT standing dead C,N,P mass
-!   CSNC,ZSNC,PSNC=cumulative PFT C,N,P litterfall from grosub.f
-!   CSNT,ZSNT,PSNT=cumulative total C,N,P litterfall
+!   ESNC,=cumulative PFT C,N,P litterfall from grosub.f
+!   ESNT,=cumulative total C,N,P litterfall
 !
     DO NE=1,npelms
       ZESNC(NE)=ZESNC(NE)+HESNC(NE,NZ)
     ENDDO
     WTSTGT=WTSTGT+WTSTGE(ielmc,NZ)
     DO  L=0,NI(NZ)
-      DO K=0,micpar%n_pltlitrk
-        DO  M=1,jcplx11
-          CSNT(M,K,L)=CSNT(M,K,L)+ESNC(M,ielmc,K,L,NZ)
-          ZSNT(M,K,L)=ZSNT(M,K,L)+ESNC(M,ielmn,K,L,NZ)
-          PSNT(M,K,L)=PSNT(M,K,L)+ESNC(M,ielmp,K,L,NZ)
-        enddo
+      DO K=1,pltpar%n_pltlitrk
+        DO NE=1,npelms
+          DO  M=1,pltpar%jsken
+            ESNT(M,NE,K,L)=ESNT(M,NE,K,L)+ESNC(M,NE,K,L,NZ)
+          enddo
+        ENDDO
       ENDDO
     ENDDO
   ENDDO
@@ -341,7 +338,7 @@ module ExtractsMod
 !     TDFOMC,TDFOMN,TDFOMP=total nonstructl C,N,P exchange
 !     RDFOMC,RDFOMN,RDFOMP=PFT nonstructl C,N,P exchange
 !
-      DO K=0,jcplx11
+      DO K=1,jcplx
         TDFOMC(K,L)=TDFOMC(K,L)-RDFOMC(N,K,L,NZ)
         TDFOMN(K,L)=TDFOMN(K,L)-RDFOMN(N,K,L,NZ)
         TDFOMP(K,L)=TDFOMP(K,L)-RDFOMP(N,K,L,NZ)

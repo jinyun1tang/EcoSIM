@@ -5,7 +5,7 @@ module NitroDisturbMod
   use abortutils  , only : endrun
   use minimathmod, only : safe_adb
   use MicrobialDataType
-  use MicBGCPars, only : micpar
+  use EcoSiMParDataMod, only : micpar
   use NitroPars
   use SOMDataType
   use ChemTranspDataType
@@ -47,7 +47,7 @@ module NitroDisturbMod
   real(r8) :: HFLXD
   real(r8) :: OC,ON,OP,OCH,ONH,OPH,ONX
   REAL(R8) :: OPX,OCA,OAH
-  real(r8) :: ONL(4,0:jcplx1),OPL(4,0:jcplx1)
+  real(r8) :: ONL(4,1:jcplx),OPL(4,1:jcplx)
   real(r8) :: DCORPC1
 !     begin_execution
 
@@ -94,10 +94,10 @@ module NitroDisturbMod
         DC=0.0_r8
         DN=0.0_r8
         DP=0.0_r8
-        ONL(1:4,0:jcplx1)=0._r8
-        OPL(1:4,0:jcplx1)=0._r8
+        ONL(1:4,1:jcplx)=0._r8
+        OPL(1:4,1:jcplx)=0._r8
 
-        D2970: DO K=0,jcplx1
+        D2970: DO K=1,jcplx
           IF(L.NE.0.OR.(micpar%is_litter(K)))THEN
 !
 !     REMOVE MICROBIAL BIOMASS
@@ -164,7 +164,7 @@ module NitroDisturbMod
 !
 !     REMOVE MICROBIAL RESIDUE
 !
-        D2900: DO K=0,jcplx1
+        D2900: DO K=1,jcplx
           IF(L.NE.0.OR.(micpar%is_litter(K)))THEN
             D2940: DO M=1,ndbiomcp
               OCH=DCORPC*ORC(M,K,L,NY,NX)
@@ -287,7 +287,7 @@ module NitroDisturbMod
 !
 !     ADD UNBURNED N,P TO ORG N, ORG P
 !
-        D2905: DO K=0,jcplx1
+        D2905: DO K=1,jcplx
           DO  M=1,jsken
             OSN(M,K,L,NY,NX)=OSN(M,K,L,NY,NX)+ONL(M,K)
             OSP(M,K,L,NY,NX)=OSP(M,K,L,NY,NX)+OPL(M,K)

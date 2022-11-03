@@ -16,7 +16,7 @@ module LateralTranspMod
   use FlagDataType
   USE SoilHeatDataType
   use EcoSimConst
-  use MicBGCPars, only : micpar
+  use EcoSiMParDataMod, only : micpar
   use minimathmod , only : AZMAX1
   use EcoSIMConfig, only : jcplx => jcplxc,NFGs=>NFGsc
   use EcoSIMConfig, only : nlbiomcp=>nlbiomcpc
@@ -158,12 +158,12 @@ implicit none
 !
 !     INITIALIZE NET SOLUTE AND GAS FLUXES FOR RUNOFF
 !
-  DO 9960 K=0,2
+  D9960: DO K=1,micpar%n_litrsfk
     TOCQRS(K,NY,NX)=0.0_r8
     TONQRS(K,NY,NX)=0.0_r8
     TOPQRS(K,NY,NX)=0.0_r8
     TOAQRS(K,NY,NX)=0.0_r8
-9960  CONTINUE
+  ENDDO D9960
   TCOQRS(NY,NX)=0.0_r8
   TCHQRS(NY,NX)=0.0_r8
   TOXQRS(NY,NX)=0.0_r8
@@ -383,25 +383,25 @@ implicit none
     TCPHEB(NY,NX)=0.0_r8
     TCPMEB(NY,NX)=0.0_r8
 
-    TOMCER(1:nlbiomcp,1:NMICBSO,0:jcplx1,NY,NX)=0.0_r8
-    TOMNER(1:nlbiomcp,1:NMICBSO,0:jcplx1,NY,NX)=0.0_r8
-    TOMPER(1:nlbiomcp,1:NMICBSO,0:jcplx1,NY,NX)=0.0_r8
+    TOMCER(1:nlbiomcp,1:NMICBSO,1:jcplx,NY,NX)=0.0_r8
+    TOMNER(1:nlbiomcp,1:NMICBSO,1:jcplx,NY,NX)=0.0_r8
+    TOMPER(1:nlbiomcp,1:NMICBSO,1:jcplx,NY,NX)=0.0_r8
 
     TOMCERff(1:nlbiomcp,1:NMICBSA,NY,NX)=0.0_r8
     TOMNERff(1:nlbiomcp,1:NMICBSA,NY,NX)=0.0_r8
     TOMPERff(1:nlbiomcp,1:NMICBSA,NY,NX)=0.0_r8
 
-    TORCER(1:2,0:jcplx1,NY,NX)=0.0_r8
-    TORNER(1:2,0:jcplx1,NY,NX)=0.0_r8
-    TORPER(1:2,0:jcplx1,NY,NX)=0.0_r8
-    TOHCER(0:jcplx1,NY,NX)=0.0_r8
-    TOHNER(0:jcplx1,NY,NX)=0.0_r8
-    TOHPER(0:jcplx1,NY,NX)=0.0_r8
-    TOHAER(0:jcplx1,NY,NX)=0.0_r8
-    TOSCER(1:jsken,0:jcplx1,NY,NX)=0.0_r8
-    TOSAER(1:jsken,0:jcplx1,NY,NX)=0.0_r8
-    TOSNER(1:jsken,0:jcplx1,NY,NX)=0.0_r8
-    TOSPER(1:jsken,0:jcplx1,NY,NX)=0.0_r8
+    TORCER(1:ndbiomcp,1:jcplx,NY,NX)=0.0_r8
+    TORNER(1:ndbiomcp,1:jcplx,NY,NX)=0.0_r8
+    TORPER(1:ndbiomcp,1:jcplx,NY,NX)=0.0_r8
+    TOHCER(1:jcplx,NY,NX)=0.0_r8
+    TOHNER(1:jcplx,NY,NX)=0.0_r8
+    TOHPER(1:jcplx,NY,NX)=0.0_r8
+    TOHAER(1:jcplx,NY,NX)=0.0_r8
+    TOSCER(1:jsken,1:jcplx,NY,NX)=0.0_r8
+    TOSAER(1:jsken,1:jcplx,NY,NX)=0.0_r8
+    TOSNER(1:jsken,1:jcplx,NY,NX)=0.0_r8
+    TOSPER(1:jsken,1:jcplx,NY,NX)=0.0_r8
   ENDIF
 !
 !     INITIALIZE NET SNOWPACK FLUXES WITHIN SNOWPACK
@@ -435,7 +435,7 @@ implicit none
 !
 !     INITIALIZE GAS AND SOLUTE NET FLUX ACCUMULATORS WITHIN SOIL
 !
-    DO 8595 K=0,jcplx1
+    DO 8595 K=1,jcplx
       TOCFLS(K,L,NY,NX)=0.0_r8
       TONFLS(K,L,NY,NX)=0.0_r8
       TOPFLS(K,L,NY,NX)=0.0_r8
@@ -610,7 +610,7 @@ implicit none
   D1202: DO NN=1,2
     TQR(N2,N1)=TQR(N2,N1)+QR(N,NN,N2,N1)
     THQR(N2,N1)=THQR(N2,N1)+HQR(N,NN,N2,N1)
-    D8590: DO K=0,micpar%k_litrsf
+    D8590: DO K=1,micpar%n_litrsfk
       TOCQRS(K,N2,N1)=TOCQRS(K,N2,N1)+XOCQRS(K,N,NN,N2,N1)
       TONQRS(K,N2,N1)=TONQRS(K,N2,N1)+XONQRS(K,N,NN,N2,N1)
       TOPQRS(K,N2,N1)=TOPQRS(K,N2,N1)+XOPQRS(K,N,NN,N2,N1)
@@ -631,7 +631,7 @@ implicit none
     IF(IFLBH(N,NN,N5,N4).EQ.0)THEN
       TQR(N2,N1)=TQR(N2,N1)-QR(N,NN,N5,N4)
       THQR(N2,N1)=THQR(N2,N1)-HQR(N,NN,N5,N4)
-      D8591: DO K=0,2
+      D8591: DO K=1,micpar%n_litrsfk
         TOCQRS(K,N2,N1)=TOCQRS(K,N2,N1)-XOCQRS(K,N,NN,N5,N4)
         TONQRS(K,N2,N1)=TONQRS(K,N2,N1)-XONQRS(K,N,NN,N5,N4)
         TOPQRS(K,N2,N1)=TOPQRS(K,N2,N1)-XOPQRS(K,N,NN,N5,N4)
@@ -656,12 +656,12 @@ implicit none
     IF(N4B.GT.0.AND.N5B.GT.0.AND.NN.EQ.1)THEN
       TQR(N2,N1)=TQR(N2,N1)-QR(N,NN,N5B,N4B)
       THQR(N2,N1)=THQR(N2,N1)-HQR(N,NN,N5B,N4B)
-      DO 8592 K=0,2
+      D8592: DO K=1,micpar%n_litrsfk
         TOCQRS(K,N2,N1)=TOCQRS(K,N2,N1)-XOCQRS(K,N,NN,N5B,N4B)
         TONQRS(K,N2,N1)=TONQRS(K,N2,N1)-XONQRS(K,N,NN,N5B,N4B)
         TOPQRS(K,N2,N1)=TOPQRS(K,N2,N1)-XOPQRS(K,N,NN,N5B,N4B)
         TOAQRS(K,N2,N1)=TOAQRS(K,N2,N1)-XOAQRS(K,N,NN,N5B,N4B)
-8592  CONTINUE
+      ENDDO D8592
       TCOQRS(N2,N1)=TCOQRS(N2,N1)-XCOQRS(N,NN,N5B,N4B)
       TCHQRS(N2,N1)=TCHQRS(N2,N1)-XCHQRS(N,NN,N5B,N4B)
       TOXQRS(N2,N1)=TOXQRS(N2,N1)-XOXQRS(N,NN,N5B,N4B)
@@ -1408,7 +1408,7 @@ implicit none
         TCPDEB(N2,N1)=TCPDEB(N2,N1)+PCPDEB(N,NN,N2,N1)
         TCPHEB(N2,N1)=TCPHEB(N2,N1)+PCPHEB(N,NN,N2,N1)
         TCPMEB(N2,N1)=TCPMEB(N2,N1)+PCPMEB(N,NN,N2,N1)
-        DO  K=0,jcplx1
+        DO  K=1,jcplx
           DO NO=1,NFGs
             DO NGL=JGnio(NO),JGnfo(NO)
               DO M=1,nlbiomcp
@@ -1431,7 +1431,7 @@ implicit none
         enddo
 
 
-        D9375: DO K=0,jcplx1
+        D9375: DO K=1,jcplx
           D9370: DO M=1,ndbiomcp
             TORCER(M,K,N2,N1)=TORCER(M,K,N2,N1)+ORCER(M,K,N,NN,N2,N1)
             TORNER(M,K,N2,N1)=TORNER(M,K,N2,N1)+ORNER(M,K,N,NN,N2,N1)
@@ -1500,7 +1500,7 @@ implicit none
         TCPHEB(N2,N1)=TCPHEB(N2,N1)-PCPHEB(N,NN,N5,N4)
         TCPMEB(N2,N1)=TCPMEB(N2,N1)-PCPMEB(N,NN,N5,N4)
 
-        DO  K=0,jcplx1
+        DO  K=1,jcplx
           DO  NO=1,NFGs
             DO NGL=JGnio(NO),JGnfo(NO)
               DO  M=1,nlbiomcp
@@ -1524,7 +1524,7 @@ implicit none
         enddo
 
 
-        D7375: DO K=0,jcplx1
+        D7375: DO K=1,jcplx
           D7370: DO M=1,ndbiomcp
             TORCER(M,K,N2,N1)=TORCER(M,K,N2,N1)-ORCER(M,K,N,NN,N5,N4)
             TORNER(M,K,N2,N1)=TORNER(M,K,N2,N1)-ORNER(M,K,N,NN,N5,N4)
@@ -1596,7 +1596,7 @@ implicit none
           TCPHEB(N2,N1)=TCPHEB(N2,N1)-PCPHEB(N,NN,N5B,N4B)
           TCPMEB(N2,N1)=TCPMEB(N2,N1)-PCPMEB(N,NN,N5B,N4B)
 
-          D8380: DO K=0,jcplx1
+          D8380: DO K=1,jcplx
             DO  NO=1,NFGs
               DO NGL=JGnio(NO),JGnfo(NO)
                 DO  M=1,nlbiomcp
@@ -1619,7 +1619,7 @@ implicit none
           enddo
 
 
-          D8375: DO K=0,jcplx1
+          D8375: DO K=1,jcplx
             D8370: DO M=1,ndbiomcp
               TORCER(M,K,N2,N1)=TORCER(M,K,N2,N1)-ORCER(M,K,N,NN,N5B,N4B)
               TORNER(M,K,N2,N1)=TORNER(M,K,N2,N1)-ORNER(M,K,N,NN,N5B,N4B)
@@ -1705,7 +1705,7 @@ implicit none
       !             :NH4=NH4,NH3=NH3,NO3=NO3,NO2=NO2,P14=HPO4,PO4=H2PO4 in non-band
       !             :N4B=NH4,N3B=NH3,NOB=NO3,N2B=NO2,P1B=HPO4,POB=H2PO4 in band
       !
-      DO 8585 K=0,jcplx1
+      DO 8585 K=1,jcplx
         TOCFLS(K,N3,N2,N1)=TOCFLS(K,N3,N2,N1)+XOCFLS(K,N,N3,N2,N1)-XOCFLS(K,N,N6,N5,N4)
         TONFLS(K,N3,N2,N1)=TONFLS(K,N3,N2,N1)+XONFLS(K,N,N3,N2,N1)-XONFLS(K,N,N6,N5,N4)
         TOPFLS(K,N3,N2,N1)=TOPFLS(K,N3,N2,N1)+XOPFLS(K,N,N3,N2,N1)-XOPFLS(K,N,N6,N5,N4)
@@ -1889,7 +1889,7 @@ implicit none
       TTHAW(N3,N2,N1)=0.0_r8
       TTHAWH(N3,N2,N1)=0.0_r8
       THTHAW(N3,N2,N1)=0.0_r8
-      DO 8596 K=0,jcplx1
+      DO 8596 K=1,jcplx
         TOCFLS(K,N3,N2,N1)=0.0_r8
         TONFLS(K,N3,N2,N1)=0.0_r8
         TOPFLS(K,N3,N2,N1)=0.0_r8

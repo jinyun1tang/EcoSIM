@@ -4,7 +4,6 @@ module StartqMod
   use GridConsts
   use FlagDataType
   use EcoSIMConfig, only : jsken=>jskenc
-  use MicBGCPars, only : micpar
   use EcosimConst
   use EcoSIMCtrlDataType
   use minimathmod, only : AZMAX1
@@ -19,6 +18,7 @@ module StartqMod
   use GridDataType
   use EcoSIMConfig
   use GrosubPars
+  use EcoSiMParDataMod, only : pltpar
   implicit none
 
   private
@@ -86,7 +86,7 @@ module StartqMod
         TESNC(1:npelms,NZ,NY,NX)=0._r8
         WTSTGE(1:npelms,NZ,NY,NX)=0._r8
         D6401: DO L=1,NL(NY,NX)
-          DO  K=0,micpar%n_pltlitrk
+          DO  K=1,pltpar%n_pltlitrk
             DO  M=1,jsken
               ESNC(M,1:npelms,K,L,NZ,NY,NX)=0._r8
             enddo
@@ -127,7 +127,6 @@ module StartqMod
 
   subroutine PlantLitterFractions(NZ,NY,NX)
 
-  use MicBGCPars, only : micpar
   implicit none
   integer, intent(in) :: NZ,NY,NX
   integer :: N,M
@@ -135,10 +134,10 @@ module StartqMod
   REAL(R8) :: CNOPCT,CPOPCT
 
   associate(                       &
-    iprotein  => micpar%iprotein  ,&
-    icarbhyro => micpar%icarbhyro ,&
-    icellulos => micpar%icellulos ,&
-    ilignin  =>  micpar%ilignin   , &
+    iprotein  => pltpar%iprotein  ,&
+    icarbhyro => pltpar%icarbhyro ,&
+    icellulos => pltpar%icellulos ,&
+    ilignin  =>  pltpar%ilignin   , &
     Jlitgrp  => pltpar%Jlitgrp , &
     instruct => pltpar%instruct, &
     ifoliar  => pltpar%ifoliar , &
@@ -776,7 +775,7 @@ module StartqMod
         RTWT1E(N,NR,1:npelms,NZ,NY,NX)=0._r8
       ENDDO D30
       IF(N.EQ.1)THEN
-        D6400: DO K=0,micpar%n_pltlitrk
+        D6400: DO K=1,pltpar%n_pltlitrk
           DO  M=1,jsken
             ESNC(M,1:npelms,K,L,NZ,NY,NX)=0._r8
           enddo

@@ -1,6 +1,6 @@
 module TillageMixMod
   use data_kind_mod, only : r8 => SHR_KIND_R8
-  use MicBGCPars, only : micpar
+  use EcoSiMParDataMod, only : micpar
   use EcosimConst
   use SOMDataType
   USE GridDataType
@@ -32,44 +32,44 @@ module TillageMixMod
 
   integer :: K,N,M,L,LL,NGL
 
-  REAL(R8) :: TOSGC(jsken,0:micpar%k_litrsf),TOSGA(jsken,0:micpar%k_litrsf)
-  real(r8) :: TOSGN(jsken,0:micpar%k_litrsf),TOSGP(jsken,0:micpar%k_litrsf)
-  real(r8) :: TORXC(ndbiomcp,0:micpar%k_litrsf)
-  real(r8) :: TORXN(ndbiomcp,0:micpar%k_litrsf),TORXP(ndbiomcp,0:micpar%k_litrsf)
-  real(r8) :: TOQGC(0:micpar%k_litrsf),TOQGN(0:micpar%k_litrsf)
-  real(r8) :: TOQGP(0:micpar%k_litrsf),TOQHC(0:micpar%k_litrsf)
-  real(r8) :: TOQHN(0:micpar%k_litrsf),TOQHP(0:micpar%k_litrsf)
-  real(r8) :: TOHGC(0:micpar%k_litrsf),TOHGN(0:micpar%k_litrsf)
-  real(r8) :: TOHGP(0:micpar%k_litrsf),TOHGA(0:micpar%k_litrsf)
-  real(r8) :: TOQGA(0:micpar%k_litrsf),TOQHA(0:micpar%k_litrsf)
+  REAL(R8) :: TOSGC(jsken,0:micpar%n_litrsfk),TOSGA(jsken,0:micpar%n_litrsfk)
+  real(r8) :: TOSGN(jsken,0:micpar%n_litrsfk),TOSGP(jsken,0:micpar%n_litrsfk)
+  real(r8) :: TORXC(ndbiomcp,0:micpar%n_litrsfk)
+  real(r8) :: TORXN(ndbiomcp,0:micpar%n_litrsfk),TORXP(ndbiomcp,0:micpar%n_litrsfk)
+  real(r8) :: TOQGC(0:micpar%n_litrsfk),TOQGN(0:micpar%n_litrsfk)
+  real(r8) :: TOQGP(0:micpar%n_litrsfk),TOQHC(0:micpar%n_litrsfk)
+  real(r8) :: TOQHN(0:micpar%n_litrsfk),TOQHP(0:micpar%n_litrsfk)
+  real(r8) :: TOHGC(0:micpar%n_litrsfk),TOHGN(0:micpar%n_litrsfk)
+  real(r8) :: TOHGP(0:micpar%n_litrsfk),TOHGA(0:micpar%n_litrsfk)
+  real(r8) :: TOQGA(0:micpar%n_litrsfk),TOQHA(0:micpar%n_litrsfk)
 
   real(r8) :: TOMGCff(nlbiomcp,NMICBSA)
   real(r8) :: TOMGNff(nlbiomcp,NMICBSA)
   real(r8) :: TOMGPff(nlbiomcp,NMICBSA)
-  real(r8) :: TOMGC(nlbiomcp,NMICBSO,0:jcplx1)
-  real(r8) :: TOMGN(nlbiomcp,NMICBSO,0:jcplx1)
-  real(r8) :: TOMGP(nlbiomcp,NMICBSO,0:jcplx1)
-  REAL(R8) :: TOMC(nlbiomcp,NMICBSO,0:jcplx1)
-  REAL(R8) :: TOMN(nlbiomcp,NMICBSO,0:jcplx1)
-  REAL(R8) :: TOMP(nlbiomcp,NMICBSO,0:jcplx1)
+  real(r8) :: TOMGC(nlbiomcp,NMICBSO,1:jcplx)
+  real(r8) :: TOMGN(nlbiomcp,NMICBSO,1:jcplx)
+  real(r8) :: TOMGP(nlbiomcp,NMICBSO,1:jcplx)
+  REAL(R8) :: TOMC(nlbiomcp,NMICBSO,1:jcplx)
+  REAL(R8) :: TOMN(nlbiomcp,NMICBSO,1:jcplx)
+  REAL(R8) :: TOMP(nlbiomcp,NMICBSO,1:jcplx)
   REAL(R8) :: TOMCff(nlbiomcp,NMICBSA)
   REAL(R8) :: TOMNff(nlbiomcp,NMICBSA)
   REAL(R8) :: TOMPff(nlbiomcp,NMICBSA)
-  real(r8) :: TORC(ndbiomcp,0:jcplx1)
-  real(r8) :: TORN(ndbiomcp,0:jcplx1)
-  real(r8) :: TORP(ndbiomcp,0:jcplx1)
-  real(r8) :: TOQC(0:jcplx1)
-  real(r8) :: TOQN(0:jcplx1)
-  real(r8) :: TOQP(0:jcplx1)
-  real(r8) :: TOQA(0:jcplx1)
-  real(r8) :: TOHC(0:jcplx1)
-  real(r8) :: TOHN(0:jcplx1)
-  real(r8) :: TOHP(0:jcplx1)
-  real(r8) :: TOHA(0:jcplx1)
-  real(r8) :: TOSC(jsken,0:jcplx1)
-  real(r8) :: TOSA(jsken,0:jcplx1)
-  real(r8) :: TOSN(jsken,0:jcplx1)
-  real(r8) :: TOSP(jsken,0:jcplx1)
+  real(r8) :: TORC(ndbiomcp,1:jcplx)
+  real(r8) :: TORN(ndbiomcp,1:jcplx)
+  real(r8) :: TORP(ndbiomcp,1:jcplx)
+  real(r8) :: TOQC(1:jcplx)
+  real(r8) :: TOQN(1:jcplx)
+  real(r8) :: TOQP(1:jcplx)
+  real(r8) :: TOQA(1:jcplx)
+  real(r8) :: TOHC(1:jcplx)
+  real(r8) :: TOHN(1:jcplx)
+  real(r8) :: TOHP(1:jcplx)
+  real(r8) :: TOHA(1:jcplx)
+  real(r8) :: TOSC(jsken,1:jcplx)
+  real(r8) :: TOSA(jsken,1:jcplx)
+  real(r8) :: TOSN(jsken,1:jcplx)
+  real(r8) :: TOSP(jsken,1:jcplx)
   real(r8) :: CORP,CORP0,XCORP0,DCORPZ
   real(r8) :: TBKDX,TFC,TWP,TSCNV,TSCNH,TSAND
   REAL(R8) :: ZNHUX0,ZNHUXI,ZNFNX0
@@ -292,7 +292,7 @@ module TillageMixMod
     DN=0.0_r8
     DP=0.0_r8
 
-    DO  K=0,micpar%k_litrsf
+    DO  K=1,micpar%n_litrsfk
       DO  N=1,NFGs
         DO NGL=JGnio(N),JGnfo(N)
           DO  M=1,nlbiomcp
@@ -326,7 +326,7 @@ module TillageMixMod
       enddo
     ENDDO
 
-    DO K=0,micpar%k_litrsf
+    DO K=1,micpar%n_litrsfk
       DO M=1,ndbiomcp
         TORXC(M,K)=ORC(M,K,0,NY,NX)*CORP0
         TORXN(M,K)=ORN(M,K,0,NY,NX)*CORP0
@@ -605,7 +605,7 @@ module TillageMixMod
         TZNH3G=TZNH3G+TI*ZNH3G(L,NY,NX)
         TH2GG=TH2GG+TI*H2GG(L,NY,NX)
         TH2GS=TH2GS+TI*H2GS(L,NY,NX)
-        DO  K=0,jcplx1
+        DO  K=1,jcplx
           DO  N=1,NFGs
             DO NGL=JGnio(N),JGnfo(N)
               DO  M=1,nlbiomcp
@@ -627,7 +627,7 @@ module TillageMixMod
           enddo
         enddo
 
-      DO K=0,jcplx1
+      DO K=1,jcplx
         DO  M=1,ndbiomcp
           TORC(M,K)=TORC(M,K)+TI*ORC(M,K,L,NY,NX)
           TORN(M,K)=TORN(M,K)+TI*ORN(M,K,L,NY,NX)
@@ -979,7 +979,7 @@ module TillageMixMod
         Z2OSH(L,NY,NX)=XCORP(NY,NX)*Z2OSH(L,NY,NX)
         H2GSH(L,NY,NX)=XCORP(NY,NX)*H2GSH(L,NY,NX)
 
-        DO  K=0,jcplx1
+        DO  K=1,jcplx
           DO  N=1,NFGs
             DO NGL=JGnio(N),JGnfo(N)
               DO  M=1,nlbiomcp
@@ -1006,7 +1006,7 @@ module TillageMixMod
           enddo
         enddo
 
-        DO  K=0,jcplx1
+        DO  K=1,jcplx
           DO  M=1,ndbiomcp
             ORC(M,K,L,NY,NX)=TI*ORC(M,K,L,NY,NX)+CORP*(FI*TORC(M,K) &
               -TI*ORC(M,K,L,NY,NX))+TX*ORC(M,K,L,NY,NX)
@@ -1050,7 +1050,7 @@ module TillageMixMod
 !     ADD STATE VARIABLES IN SURFACE RESIDUE INCORPORATED
 !     WITHIN TILLAGE MIXING ZONE
 !
-        DO  K=0,micpar%k_litrsf
+        DO  K=1,micpar%n_litrsfk
           DO  N=1,NFGs
             DO NGL=JGnio(N),JGnfo(N)
               DO M=1,nlbiomcp
@@ -1072,7 +1072,7 @@ module TillageMixMod
           enddo
         ENDDO
 
-        DO K=0,micpar%k_litrsf
+        DO K=1,micpar%n_litrsfk
           DO  M=1,ndbiomcp
             ORC(M,K,L,NY,NX)=ORC(M,K,L,NY,NX)+FI*TORXC(M,K)
             ORN(M,K,L,NY,NX)=ORN(M,K,L,NY,NX)+FI*TORXN(M,K)
@@ -1104,7 +1104,7 @@ module TillageMixMod
         DN=0.0_r8
         DP=0.0_r8
 
-        DO  K=0,jcplx1
+        DO  K=1,jcplx
           DO  N=1,NFGs
             DO NGL=JGnio(N),JGnfo(N)
               DO  M=1,nlbiomcp
@@ -1116,7 +1116,7 @@ module TillageMixMod
           enddo
         ENDDO
 
-        DO  K=0,micpar%k_litrsf
+        DO  K=1,micpar%n_litrsfk
           DO  N=1,NFGs
             DO NGL=JGnio(N),JGnfo(N)
               DO  M=1,nlbiomcp
@@ -1137,7 +1137,7 @@ module TillageMixMod
           enddo
         enddo
 
-        DO K=0,jcplx1
+        DO K=1,jcplx
           DO  M=1,ndbiomcp
             OC=OC+ORC(M,K,L,NY,NX)
             ON=ON+ORN(M,K,L,NY,NX)

@@ -827,7 +827,7 @@ implicit none
   Z2OS(L1,NY,NX)=Z2OS(L1,NY,NX)+FX*Z2OS(L0,NY,NX)
   H2GS(L1,NY,NX)=H2GS(L1,NY,NX)+FX*H2GS(L0,NY,NX)
   IF(IFLGL(L,3).EQ.0)THEN
-    DO  K=0,jcplx1
+    DO  K=1,jcplx
       DO  N=1,NFGs
         DO  M=1,nlbiomcp
           DO NGL=JGnio(N),JGnfo(N)
@@ -848,7 +848,7 @@ implicit none
       enddo
     enddo
 
-    DO K=0,jcplx1
+    DO K=1,jcplx
       DO  M=1,ndbiomcp
         ORC(M,K,L1,NY,NX)=ORC(M,K,L1,NY,NX)+FX*ORC(M,K,L0,NY,NX)
         ORN(M,K,L1,NY,NX)=ORN(M,K,L1,NY,NX)+FX*ORN(M,K,L0,NY,NX)
@@ -1092,7 +1092,7 @@ implicit none
   Z2OS(L0,NY,NX)=FY*Z2OS(L0,NY,NX)
   H2GS(L0,NY,NX)=FY*H2GS(L0,NY,NX)
   IF(IFLGL(L,3).EQ.0)THEN
-    DO  K=0,jcplx1
+    DO  K=1,jcplx
        DO N=1,NFGs
         DO M=1,nlbiomcp
           DO NGL=JGnio(N),JGnfo(N)
@@ -1114,7 +1114,7 @@ implicit none
       enddo
     enddo
 
-    DO K=0,jcplx1
+    DO K=1,jcplx
       DO  M=1,ndbiomcp
         ORC(M,K,L0,NY,NX)=FY*ORC(M,K,L0,NY,NX)
         ORN(M,K,L0,NY,NX)=FY*ORN(M,K,L0,NY,NX)
@@ -1240,7 +1240,7 @@ implicit none
         /CORGCI(L0,NY,NX)))
     ENDIF
 
-    DO  K=0,jcplx1
+    DO  K=1,jcplx
       DO  N=1,NFGs
         DO  M=1,nlbiomcp
           DO NGL=JGnio(N),JGnfo(N)
@@ -1274,7 +1274,7 @@ implicit none
       enddo
     enddo
 
-    DO  K=0,jcplx1
+    DO  K=1,jcplx
       DO  M=1,ndbiomcp
         FXORC=FXO*ORC(M,K,L0,NY,NX)
         ORC(M,K,L1,NY,NX)=ORC(M,K,L1,NY,NX)+FXORC

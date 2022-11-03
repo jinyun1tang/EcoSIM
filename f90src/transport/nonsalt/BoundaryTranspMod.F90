@@ -197,7 +197,7 @@ module BoundaryTranspMod
   integer :: K
 
   IF(IRCHG(NN,N,N2,N1).EQ.0.OR.test_aeqb(RCHQF,0.0_r8).OR.QRM(M,N2,N1).LE.ZEROS(N2,N1))THEN
-    DO  K=0,jcplx1
+    DO  K=1,jcplx
       RQROC(K,N,NN,M5,M4)=0.0_r8
       RQRON(K,N,NN,M5,M4)=0.0_r8
       RQROP(K,N,NN,M5,M4)=0.0_r8
@@ -223,7 +223,7 @@ module BoundaryTranspMod
     IF((NN.EQ.1.AND.QRMN(M,N,NN,M5,M4).GT.ZEROS(N2,N1)) &
       .OR.(NN.EQ.2.AND.QRMN(M,N,NN,M5,M4).LT.ZEROS(N2,N1)))THEN
       FQRM=QRMN(M,N,NN,M5,M4)/QRM(M,N2,N1)
-      DO  K=0,jcplx1
+      DO  K=1,jcplx
         RQROC(K,N,NN,M5,M4)=RQROC0(K,N2,N1)*FQRM
         RQRON(K,N,NN,M5,M4)=RQRON0(K,N2,N1)*FQRM
         RQROP(K,N,NN,M5,M4)=RQROP0(K,N2,N1)*FQRM
@@ -247,7 +247,7 @@ module BoundaryTranspMod
 !     X*QRS=hourly solute in runoff
 !     RQR*=solute in runoff
 !
-      DO  K=0,jcplx1
+      DO  K=1,jcplx
         XOCQRS(K,N,NN,M5,M4)=XOCQRS(K,N,NN,M5,M4)+RQROC(K,N,NN,M5,M4)
         XONQRS(K,N,NN,M5,M4)=XONQRS(K,N,NN,M5,M4)+RQRON(K,N,NN,M5,M4)
         XOPQRS(K,N,NN,M5,M4)=XOPQRS(K,N,NN,M5,M4)+RQROP(K,N,NN,M5,M4)
@@ -271,7 +271,7 @@ module BoundaryTranspMod
 !
     ELSEIF((NN.EQ.2.AND.QRMN(M,N,NN,M5,M4).GT.ZEROS(N2,N1)) &
       .OR.(NN.EQ.1.AND.QRMN(M,N,NN,M5,M4).LT.ZEROS(N2,N1)))THEN
-      DO  K=0,jcplx1
+      DO  K=1,jcplx
         RQROC(K,N,NN,M5,M4)=0.0_r8
         RQRON(K,N,NN,M5,M4)=0.0_r8
         RQROP(K,N,NN,M5,M4)=0.0_r8
@@ -295,7 +295,7 @@ module BoundaryTranspMod
       XNGQRS(N,NN,M5,M4)=XNGQRS(N,NN,M5,M4)+RQRNGS(N,NN,M5,M4)
       XN2QRS(N,NN,M5,M4)=XN2QRS(N,NN,M5,M4)+RQRN2S(N,NN,M5,M4)
     ELSE
-      DO  K=0,jcplx1
+      DO  K=1,jcplx
         RQROC(K,N,NN,M5,M4)=0.0_r8
         RQRON(K,N,NN,M5,M4)=0.0_r8
         RQROP(K,N,NN,M5,M4)=0.0_r8
@@ -347,7 +347,7 @@ module BoundaryTranspMod
     ELSE
       VFLW=0.0_r8
     ENDIF
-    DO  K=0,jcplx1
+    DO  K=1,jcplx
       ROCFLS(K,N,M6,M5,M4)=VFLW*AZMAX1(OQC2(K,M3,M2,M1))
       RONFLS(K,N,M6,M5,M4)=VFLW*AZMAX1(OQN2(K,M3,M2,M1))
       ROPFLS(K,N,M6,M5,M4)=VFLW*AZMAX1(OQP2(K,M3,M2,M1))
@@ -374,7 +374,7 @@ module BoundaryTranspMod
 !     SOLUTE GAIN WITH SUBSURFACE MICROPORE WATER GAIN
 !
   ELSE
-    DO  K=0,jcplx1
+    DO  K=1,jcplx
       ROCFLS(K,N,M6,M5,M4)=0.0_r8
       RONFLS(K,N,M6,M5,M4)=0.0_r8
       ROPFLS(K,N,M6,M5,M4)=0.0_r8
@@ -417,7 +417,7 @@ module BoundaryTranspMod
     ELSE
       VFLW=0.0_r8
     ENDIF
-    DO  K=0,jcplx1
+    DO  K=1,jcplx
       ROCFHS(K,N,M6,M5,M4)=VFLW*AZMAX1(OQCH2(K,M3,M2,M1))
       RONFHS(K,N,M6,M5,M4)=VFLW*AZMAX1(OQNH2(K,M3,M2,M1))
       ROPFHS(K,N,M6,M5,M4)=VFLW*AZMAX1(OQPH2(K,M3,M2,M1))
@@ -445,7 +445,7 @@ module BoundaryTranspMod
 !     NO SOLUTE GAIN IN SUBSURFACE MACROPORES
 !
   ELSE
-    DO  K=0,jcplx1
+    DO  K=1,jcplx
       ROCFHS(K,N,M6,M5,M4)=0.0_r8
       RONFHS(K,N,M6,M5,M4)=0.0_r8
       ROPFHS(K,N,M6,M5,M4)=0.0_r8
@@ -478,7 +478,7 @@ module BoundaryTranspMod
 !     R*FLS,R*FLW,R*FLB=solute flux in non-band,band micropores
 !     R*FHS,R*FHW,R*FHB=solute flux in non-band,band macropores
 !
-  DO  K=0,jcplx1
+  DO  K=1,jcplx
     XOCFLS(K,N,M6,M5,M4)=XOCFLS(K,N,M6,M5,M4)+ROCFLS(K,N,M6,M5,M4)
     XONFLS(K,N,M6,M5,M4)=XONFLS(K,N,M6,M5,M4)+RONFLS(K,N,M6,M5,M4)
     XOPFLS(K,N,M6,M5,M4)=XOPFLS(K,N,M6,M5,M4)+ROPFLS(K,N,M6,M5,M4)
@@ -610,7 +610,7 @@ module BoundaryTranspMod
       RHGFLG(N,M6,M5,M4)=0.0_r8
     ENDIF
   ELSE
-      DO  K=0,jcplx1
+      DO  K=1,jcplx
         ROCFHS(K,N,M6,M5,M4)=0.0_r8
         RONFHS(K,N,M6,M5,M4)=0.0_r8
         ROPFHS(K,N,M6,M5,M4)=0.0_r8
@@ -652,7 +652,7 @@ module BoundaryTranspMod
   integer :: NN,K
 
   DO NN=1,2
-    DO  K=0,jcplx1
+    DO  K=1,jcplx
       TQROC(K,N2,N1)=TQROC(K,N2,N1)+RQROC(K,N,NN,N2,N1)
       TQRON(K,N2,N1)=TQRON(K,N2,N1)+RQRON(K,N,NN,N2,N1)
       TQROP(K,N2,N1)=TQROP(K,N2,N1)+RQROP(K,N,NN,N2,N1)
@@ -671,7 +671,7 @@ module BoundaryTranspMod
     TQRH1P(N2,N1)=TQRH1P(N2,N1)+RQRH1P(N,NN,N2,N1)
     TQRH2P(N2,N1)=TQRH2P(N2,N1)+RQRH2P(N,NN,N2,N1)
     IF(IFLBM(M,N,NN,N5,N4).EQ.0)THEN
-      DO  K=0,jcplx1
+      DO  K=1,jcplx
         TQROC(K,N2,N1)=TQROC(K,N2,N1)-RQROC(K,N,NN,N5,N4)
         TQRON(K,N2,N1)=TQRON(K,N2,N1)-RQRON(K,N,NN,N5,N4)
         TQROP(K,N2,N1)=TQROP(K,N2,N1)-RQROP(K,N,NN,N5,N4)
@@ -691,7 +691,7 @@ module BoundaryTranspMod
       TQRH2P(N2,N1)=TQRH2P(N2,N1)-RQRH2P(N,NN,N5,N4)
     ENDIF
     IF(N4B.GT.0.AND.N5B.GT.0.AND.NN.EQ.1)THEN
-      DO  K=0,jcplx1
+      DO  K=1,jcplx
         TQROC(K,N2,N1)=TQROC(K,N2,N1)-RQROC(K,N,NN,N5B,N4B)
         TQRON(K,N2,N1)=TQRON(K,N2,N1)-RQRON(K,N,NN,N5B,N4B)
         TQROP(K,N2,N1)=TQROP(K,N2,N1)-RQROP(K,N,NN,N5B,N4B)
@@ -844,7 +844,7 @@ module BoundaryTranspMod
 
   IF(M.NE.MX)THEN
     IF(VOLX(N3,N2,N1).GT.ZEROS2(N2,N1))THEN
-      DO  K=0,jcplx1
+      DO  K=1,jcplx
         TOCFLS(K,N3,N2,N1)=TOCFLS(K,N3,N2,N1)+ROCFLS(K,N,N3,N2,N1)-ROCFLS(K,N,N6,N5,N4)
         TONFLS(K,N3,N2,N1)=TONFLS(K,N3,N2,N1)+RONFLS(K,N,N3,N2,N1)-RONFLS(K,N,N6,N5,N4)
         TOPFLS(K,N3,N2,N1)=TOPFLS(K,N3,N2,N1)+ROPFLS(K,N,N3,N2,N1)-ROPFLS(K,N,N6,N5,N4)
@@ -891,7 +891,7 @@ module BoundaryTranspMod
       TH1BHB(N3,N2,N1)=TH1BHB(N3,N2,N1)+RH1BHB(N,N3,N2,N1)-RH1BHB(N,N6,N5,N4)
       TH2BHB(N3,N2,N1)=TH2BHB(N3,N2,N1)+RH2BHB(N,N3,N2,N1)-RH2BHB(N,N6,N5,N4)
     ELSE
-      DO  K=0,jcplx1
+      DO  K=1,jcplx
         TOCFLS(K,N3,N2,N1)=0.0_r8
         TONFLS(K,N3,N2,N1)=0.0_r8
         TOPFLS(K,N3,N2,N1)=0.0_r8

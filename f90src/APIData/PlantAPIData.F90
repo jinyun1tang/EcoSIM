@@ -1,7 +1,7 @@
 module PlantAPIData
   use data_kind_mod, only : r8 => SHR_KIND_R8
   use ElmIDMod
-  use GrosubPars, only : pltpar
+  use EcoSiMParDataMod, only : pltpar
 implicit none
   save
   character(len=*),private, parameter :: mod_filename = __FILE__
@@ -12,7 +12,7 @@ implicit none
   integer, pointer :: JBR         !maximum number of plant branches
   integer, pointer :: JP1         !number of plants
   integer, pointer :: JSA1        !number of sectors for the sky azimuth  [0,2*pi]
-  integer, pointer :: jcplx11     !number of organo-microbial complexes
+  integer, pointer :: jcplx       !number of organo-microbial complexes
   integer, pointer :: JLA1        !number of sectors for the leaf azimuth, [0,pi]
   integer, pointer :: JC1         !number of canopy layers
   integer, pointer :: JZ1         !number of soil layers
@@ -22,7 +22,7 @@ implicit none
   integer, pointer :: Jlitgrp     !number of litter groups nonstructural(0,*),
                           !     foliar(1,*),non-foliar(2,*),stalk(3,*),root(4,*), coarse woody (5,*)
   integer, pointer :: JPRT        !number of organs involved in partition
-
+  integer, pointer :: n_pltlitrk
 !begin_data
 
   type, public :: plant_siteinfo_type
@@ -720,9 +720,7 @@ implicit none
   real(r8), pointer :: TUPNH4(:)     => null()   !total root-soil NH4 flux non-band, [gN d-2 h-1]
   real(r8), pointer :: TUPNHB(:)     => null()   !total root-soil NH4 flux band, [gN d-2 h-1]
   real(r8), pointer :: TUPNOB(:)     => null()   !total root-soil NO3 flux band, [gN d-2 h-1]
-  real(r8), pointer :: CSNT(:,:,:)   => null()   !total litterfall C, [gC d-2 h-1]
-  real(r8), pointer :: ZSNT(:,:,:)   => null()   !total litterfall N, [gN d-2 h-1]
-  real(r8), pointer :: PSNT(:,:,:)   => null()   !total litterfall P, [gP d-2 h-1]
+  real(r8), pointer :: ESNT(:,:,:,:)   => null() !total litterfall element, [g d-2 h-1]
   real(r8), pointer :: XOQCS(:,:)    => null()  !net microbial DOC flux, [gC d-2 h-1]
   real(r8), pointer :: XOQNS(:,:)    => null()  !net microbial DON flux, [gN d-2 h-1]
   real(r8), pointer :: XOQPS(:,:)    => null()  !net microbial DOP flux, [gP d-2 h-1]
@@ -894,9 +892,9 @@ implicit none
   allocate(this%OXYA(2,JZ1,JP1))
   allocate(this%TUPNF(JZ1))
   allocate(this%ROXSK(60,0:JZ1))
-  allocate(this%RDFOMC(2,0:jcplx11,0:JZ1,JP1))
-  allocate(this%RDFOMN(2,0:jcplx11,0:JZ1,JP1))
-  allocate(this%RDFOMP(2,0:jcplx11,0:JZ1,JP1))
+  allocate(this%RDFOMC(2,1:jcplx,0:JZ1,JP1))
+  allocate(this%RDFOMN(2,1:jcplx,0:JZ1,JP1))
+  allocate(this%RDFOMP(2,1:jcplx,0:JZ1,JP1))
   allocate(this%HEUPTK(npelms,JP1))
   allocate(this%TEUPTK(npelms,JP1))
   allocate(this%UPOME(npelms,JP1))
@@ -1214,13 +1212,11 @@ implicit none
   allocate(this%RN2OZ(JP1))
   allocate(this%RNH3Z(JP1))
   allocate(this%RH2GZ(JP1))
-  allocate(this%CSNT(jcplx11,0:1,0:JZ1))
-  allocate(this%ZSNT(jcplx11,0:1,0:JZ1))
-  allocate(this%PSNT(jcplx11,0:1,0:JZ1))
+  allocate(this%ESNT(jsken,npelms,n_pltlitrk,0:JZ1))
   allocate(this%CARBN(JP1))
-  allocate(this%XOQCS(0:jcplx11,0:JZ1))
-  allocate(this%XOQNS(0:jcplx11,0:JZ1))
-  allocate(this%XOQPS(0:jcplx11,0:JZ1))
+  allocate(this%XOQCS(1:jcplx,0:JZ1))
+  allocate(this%XOQNS(1:jcplx,0:JZ1))
+  allocate(this%XOQPS(1:jcplx,0:JZ1))
   allocate(this%CNET(JP1))
   allocate(this%RCO2Z(JP1))
   allocate(this%ROXYZ(JP1))
@@ -1232,9 +1228,9 @@ implicit none
   allocate(this%ZESNC(npelms))
   allocate(this%ZNPP(JP1))
   allocate(this%RNH3C(JP1))
-  allocate(this%TDFOMC(0:jcplx11,JZ1))
-  allocate(this%TDFOMN(0:jcplx11,JZ1))
-  allocate(this%TDFOMP(0:jcplx11,JZ1))
+  allocate(this%TDFOMC(1:jcplx,JZ1))
+  allocate(this%TDFOMN(1:jcplx,JZ1))
+  allocate(this%TDFOMP(1:jcplx,JZ1))
   allocate(this%RUPNF(JZ1,JP1))
   allocate(this%TCO2A(JP1))
   allocate(this%RP1BX(0:JZ1))
@@ -1249,7 +1245,7 @@ implicit none
 
   allocate(this%HESNC(npelms,JP1))
   allocate(this%TESNC(npelms,JP1))
-  allocate(this%ESNC(jsken,npelms,0:1,0:JZ1,JP1))
+  allocate(this%ESNC(jsken,npelms,1:n_pltlitrk,0:JZ1,JP1))
 
 
   end subroutine plt_bgcrate_init
@@ -1295,9 +1291,7 @@ implicit none
 !  if(allocated(RN2OZ))deallocate(RN2OZ)
 !  if(allocated(RNH3Z))deallocate(RNH3Z)
 !  if(allocated(RH2GZ))deallocate(RH2GZ)
-!  if(allocated(CSNT))deallocate(CSNT)
-!  if(allocated(ZSNT))deallocate(ZSNT)
-!  if(allocated(PSNT))deallocate(PSNT)
+!  if(allocated(ESNT))deallocate(ESNT)
 !  if(allocated(CARBN))deallocate(CARBN)
 !  if(allocated(XOQCS))deallocate(XOQCS)
 !  if(allocated(XOQNS))deallocate(XOQNS)
@@ -1502,10 +1496,10 @@ implicit none
   allocate(this%CNRSV(JP1))
   allocate(this%CPHSK(JP1))
   allocate(this%FVRN(0:5))
-  allocate(this%FWOODE(npelms,0:1))
-  allocate(this%FWODLE(npelms,0:1))
-  allocate(this%FWODRE(npelms,0:1))
-  allocate(this%FWODBE(npelms,0:1))
+  allocate(this%FWOODE(npelms,n_pltlitrk))
+  allocate(this%FWODLE(npelms,n_pltlitrk))
+  allocate(this%FWODRE(npelms,n_pltlitrk))
+  allocate(this%FWODBE(npelms,n_pltlitrk))
 
   allocate(this%DMSHE(JP1))
   allocate(this%DMHSK(JP1))
@@ -1721,7 +1715,7 @@ implicit none
 
   class(plant_soilchem_type) :: this
 
-  allocate(this%FOSRH(0:jcplx11,0:JZ1))
+  allocate(this%FOSRH(1:jcplx,0:JZ1))
   allocate(this%CFOPE(0:Jlitgrp,jsken,npelms,JP1))
   allocate(this%TFND(0:JZ1))
   allocate(this%THETPM(60,0:JZ1))
@@ -1737,9 +1731,9 @@ implicit none
   allocate(this%VLNH4(0:JZ1))
   allocate(this%VLNHB(0:JZ1))
   allocate(this%ZOSGL(0:JZ1))
-  allocate(this%OQC(0:jcplx11,0:JZ1))
-  allocate(this%OQN(0:jcplx11,0:JZ1))
-  allocate(this%OQP(0:jcplx11,0:JZ1))
+  allocate(this%OQC(1:jcplx,0:JZ1))
+  allocate(this%OQN(1:jcplx,0:JZ1))
+  allocate(this%OQP(1:jcplx,0:JZ1))
   allocate(this%ZNO3S(0:JZ1))
   allocate(this%ZNO3B(0:JZ1))
   allocate(this%ZNSGL(0:JZ1))
@@ -1907,12 +1901,13 @@ implicit none
   JLI1   => pltpar%JLI1
   JNODS1 => pltpar%JNODS1
   !the following variable should be consistent with the soil bgc model
-  jcplx11=> pltpar%jcplx11
+  jcplx => pltpar%jcplx
   jsken  => pltpar%jsken
   Jlitgrp=> pltpar%Jlitgrp
   JBR    => pltpar%JBR
   JRS    => pltpar%JRS
   JPRT   => pltpar%JPRT
+  n_pltlitrk => pltpar%n_pltlitrk
   jpstgs => pltpar%jpstgs
 
   call plt_site%Init()

@@ -11,12 +11,11 @@ implicit none
 
   type, public :: MicParType
   integer :: jcplx   !# of microbe-substrate complexes
-  integer :: jcplx1  !jcplx - 1
   integer :: jsken   !# of kinetic components of the substrates
   integer :: jguilds !# of guilds
   integer :: NFGs    !# of functional groups
   integer :: k_woody_litr
-  integer :: k_non_woody_litr
+  integer :: k_fine_litr
   integer :: k_manure
   integer :: k_POM
   integer :: k_humus
@@ -64,7 +63,7 @@ implicit none
   logical, pointer :: is_finelitter(:)
   logical, pointer :: is_CO2_autotroph(:)
   character(len=16) :: kiname(0:jskenc-1)
-  character(len=16) :: cplxname(0:jcplx1c)
+  character(len=16) :: cplxname(1:jcplxc)
   character(len=16) :: hmicname(NFGsc)
   character(len=16) :: amicname(NFGsc)
   character(len=16) :: micresb(0:ndbiomcpc-1)      !residual biomass name
@@ -75,7 +74,7 @@ implicit none
   integer, pointer :: JGnfA(:)   !guid indices for autotrophic-microbial complex
   integer :: NMICBSA             !total number of microbial guilds in the autotrophic complex
   integer :: NMICBSO             !total number of microbial guilds in one organic-microbial complex
-  integer :: k_litrsf
+  integer :: n_litrsfk
   integer :: n_pltlitrk
   integer :: iprotein
   integer :: icarbhyro
@@ -88,7 +87,7 @@ implicit none
     procedure, public  :: destroy      =>DestructMicBGCPar
   end type MicParType
 
-  type(MicParType), public :: micpar
+
 contains
 
   subroutine Init(this,nmicbguilds)
@@ -96,26 +95,25 @@ contains
   class(MicParType) :: this
   integer, intent(in) :: nmicbguilds
 
-  !organic matter is grouped into five complexes, including woody(0),
-  ! non-woody(1), manure(2), litter, POC(3) and humus(4) (g Mg-1)
+  !organic matter is grouped into five complexes, including woody(1),
+  ! non-woody(2), manure(3), litter, POC(4) and humus(5) (g Mg-1)
 
   this%ndbiomcp=ndbiomcpc  !number of necrobiomass components
   this%nlbiomcp=nlbiomcpc  !number of living biomass components
 
   this%jcplx=jcplxc         !# of microbe-substrate complexes
-  this%jcplx1=this%jcplx-1
   this%jsken=jskenc        !# of kinetic components of the substrates
   this%jguilds=nmicbguilds
   this%NFGs=NFGsc
   !woody, non_woody litter and manure are defined as litter
-  allocate(this%is_litter(0:this%jcplx1));this%is_litter(:)=.false.
-  allocate(this%is_finelitter(0:this%jcplx1));this%is_finelitter(:)=.false.
+  allocate(this%is_litter(1:this%jcplx));this%is_litter(:)=.false.
+  allocate(this%is_finelitter(1:this%jcplx));this%is_finelitter(:)=.false.
 
-  this%k_woody_litr=0;     this%is_litter(this%k_woody_litr)=.true.
-  this%k_non_woody_litr=1; this%is_litter(this%k_non_woody_litr)=.true.
-  this%n_pltlitrk=this%k_non_woody_litr
-  this%k_manure=2;         this%is_litter(this%k_manure)=.true.
-  this%is_litter(this%k_non_woody_litr)=.true.
+  this%k_woody_litr=1;     this%is_litter(this%k_woody_litr)=.true.
+  this%k_fine_litr=this%k_woody_litr+1; this%is_litter(this%k_fine_litr)=.true.
+  this%n_pltlitrk=this%k_fine_litr
+  this%k_manure=this%k_fine_litr+1;   this%is_litter(this%k_manure)=.true.
+  this%is_litter(this%k_fine_litr)=.true.
   this%is_litter(this%k_manure)=.true.
 
   this%iprotein =1
@@ -123,18 +121,18 @@ contains
   this%icellulos=3
   this%ilignin  =4
 
-  this%k_litrsf=this%k_manure
-  this%k_POM=3
-  this%k_humus=4
+  this%n_litrsfk=this%k_manure
+  this%k_POM=this%k_manure+1
+  this%k_humus=this%k_POM+1
   this%kiname(0)='protein'
   this%kiname(1)='carbhydro'
   this%kiname(2)='cellulose'
   this%kiname(3)='lignin'
-  this%cplxname(0)='woodylitr'
-  this%cplxname(1)='nwoodylit'
-  this%cplxname(2)='manure'
-  this%cplxname(3)='pom'
-  this%cplxname(4)='humus'
+  this%cplxname(1)='woodylitr'
+  this%cplxname(2)='nwoodylit'
+  this%cplxname(3)='manure'
+  this%cplxname(4)='pom'
+  this%cplxname(5)='humus'
   this%hmicname(1)='aerohetrob'
   this%hmicname(2)='anerofaclb'
   this%hmicname(3)='aerofungi'
@@ -197,8 +195,8 @@ contains
   implicit none
   class(MicParType) :: this
 
-  real(r8) :: COMCI(nlbiomcpc,0:this%jcplx1)
-  real(r8) :: OMCI1(nlbiomcpc,0:this%jcplx1)  !allocation of biomass to kinetic components
+  real(r8) :: COMCI(nlbiomcpc,1:this%jcplx)
+  real(r8) :: OMCI1(nlbiomcpc,1:this%jcplx)  !allocation of biomass to kinetic components
   integer :: K,M,NGL,N
   associate(                    &
     OHCK     => this%OHCK     , &
@@ -247,7 +245,7 @@ contains
 
 !  if(this%jguilds.GT.1)then
 !    COMCI=OMCI(1:nlbiomcpc,:)
-!    DO K=0,jcplx1c
+!    DO K=1,jcplxc
 !      DO NGL=2,this%jguilds-1
 !        DO M=1,nlbiomcpc
 !          OMCI(M+(NGL-1)*nlbiomcpc,K)=OMCI(M,K)
@@ -264,15 +262,15 @@ contains
 ! CNOFC,CPOFC=fractions to allocate N,P to kinetic components
 ! CNOMC,CPOMC=maximum N:C and P:C ratios in microbial biomass
 
-  CNOFC(1:jskenc,0)=real((/0.0050,0.0050,0.0050,0.0200/),r8)  !woody
-  CPOFC(1:jskenc,0)=real((/0.0005,0.0005,0.0005,0.0020/),r8)  !woody
-  CNOFC(1:jskenc,1)=real((/0.0200,0.0200,0.0200,0.0200/),r8)  !non-woody
-  CPOFC(1:jskenc,1)=real((/0.0020,0.0020,0.0020,0.0020/),r8)  !non-woody
-  CNOFC(1:jskenc,2)=real((/0.0200,0.0200,0.0200,0.0200/),r8)   !manure
-  CPOFC(1:jskenc,2)=real((/0.0020,0.0020,0.0020,0.0020/),r8)   !manure
+  CNOFC(1:jskenc,this%k_woody_litr)=real((/0.0050,0.0050,0.0050,0.0200/),r8)  !woody
+  CPOFC(1:jskenc,this%k_woody_litr)=real((/0.0005,0.0005,0.0005,0.0020/),r8)  !woody
+  CNOFC(1:jskenc,this%k_fine_litr)=real((/0.0200,0.0200,0.0200,0.0200/),r8)  !non-woody
+  CPOFC(1:jskenc,this%k_fine_litr)=real((/0.0020,0.0020,0.0020,0.0020/),r8)  !non-woody
+  CNOFC(1:jskenc,this%k_manure)=real((/0.0200,0.0200,0.0200,0.0200/),r8)   !manure
+  CPOFC(1:jskenc,this%k_manure)=real((/0.0020,0.0020,0.0020,0.0020/),r8)   !manure
   FL(1:2)=real((/0.55,0.45/),r8)
 
-  D95: DO K=0,this%jcplx1
+  D95: DO K=1,this%jcplx
     DO  N=1,this%NFGs
       IF(N.EQ.this%n_aero_fungi)THEN
 
@@ -337,14 +335,13 @@ contains
 
   integer :: jguilds
   integer :: NFGs
-  integer :: jcplx1,jcplx
+  integer :: jcplx
   integer :: jsken
   integer :: n, k
 
   jguilds = this%jguilds
   NFGs  =this%NFGs
   jcplx =this%jcplx
-  jcplx1=this%jcplx1
   jsken =this%jsken
   allocate(this%JGnio(NFGs))
   allocate(this%JGnfo(NFGs))
@@ -366,27 +363,27 @@ contains
   enddo
 
 
-  allocate(this%DOSA(0:jcplx1))
-  allocate(this%SPOSC(jsken,0:jcplx1))
-  allocate(this%OHCK(0:jcplx1))
-  allocate(this%OMCK(0:jcplx1))
-  allocate(this%ORCK(0:jcplx1))
-  allocate(this%OQCK(0:jcplx1))
-  allocate(this%ORCI(ndbiomcpc,0:jcplx1))
-  allocate(this%OMCI(nlbiomcpc,0:jcplx1))
-  allocate(this%CNOMC(nlbiomcpc,this%NMICBSO,0:jcplx1))
-  allocate(this%CPOMC(nlbiomcpc,this%NMICBSO,0:jcplx1))
+  allocate(this%DOSA(1:jcplx))
+  allocate(this%SPOSC(jsken,1:jcplx))
+  allocate(this%OHCK(1:jcplx))
+  allocate(this%OMCK(1:jcplx))
+  allocate(this%ORCK(1:jcplx))
+  allocate(this%OQCK(1:jcplx))
+  allocate(this%ORCI(ndbiomcpc,1:jcplx))
+  allocate(this%OMCI(nlbiomcpc,1:jcplx))
+  allocate(this%CNOMC(nlbiomcpc,this%NMICBSO,1:jcplx))
+  allocate(this%CPOMC(nlbiomcpc,this%NMICBSO,1:jcplx))
   allocate(this%CNOMCff(nlbiomcpc,this%NMICBSA))
   allocate(this%CPOMCff(nlbiomcpc,this%NMICBSA))
-  allocate(this%CNOMCa(nlbiomcpc,NFGs,0:jcplx1))
-  allocate(this%CPOMCa(nlbiomcpc,NFGs,0:jcplx1))
+  allocate(this%CNOMCa(nlbiomcpc,NFGs,1:jcplx))
+  allocate(this%CPOMCa(nlbiomcpc,NFGs,1:jcplx))
   allocate(this%CNOMCffa(nlbiomcpc,NFGs))
   allocate(this%CPOMCffa(nlbiomcpc,NFGs))
 
-  allocate(this%CNOFC(jsken,0:2))
-  allocate(this%CPOFC(jsken,0:2))
-  allocate(this%CNRH(0:jcplx1))
-  allocate(this%CPRH(0:jcplx1))
+  allocate(this%CNOFC(jsken,1:this%n_litrsfk))
+  allocate(this%CPOFC(jsken,1:this%n_litrsfk))
+  allocate(this%CNRH(1:jcplx))
+  allocate(this%CPRH(1:jcplx))
   allocate(this%OMCF(NFGs))
   allocate(this%OMCA(NFGs))
   allocate(this%FL(2))

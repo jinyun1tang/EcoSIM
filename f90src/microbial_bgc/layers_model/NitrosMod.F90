@@ -7,7 +7,7 @@ module nitrosMod
   use data_kind_mod, only : r8 => SHR_KIND_R8
   use abortutils  , only : endrun
   use minimathmod, only : safe_adb,AZMAX1
-  use MicBGCPars, only : micpar
+  use EcoSiMParDataMod, only : micpar
   use MicrobialDataType
   use NitroPars
   use SOMDataType
@@ -122,7 +122,7 @@ module nitrosMod
   integer :: K,M,N,NGL
 !     begin_execution
   IF(FOSCXS.GT.ZERO)THEN
-    D7971: DO K=1,micpar%k_litrsf
+    D7971: DO K=1,micpar%n_litrsfk
       if(.not.micpar%is_finelitter(K))cycle
       D7961: DO N=1,NFGs
         DO NGL=JGnio(N),JGnfo(N)
@@ -147,7 +147,7 @@ module nitrosMod
       ENDDO D7961
     ENDDO D7971
 
-    D7901: DO K=1,micpar%k_litrsf
+    D7901: DO K=1,micpar%n_litrsfk
       if(.not.micpar%is_finelitter(K))cycle
       D7941: DO M=1,micpar%ndbiomcp
         IF(FOSCXS.GT.0.0_r8)THEN

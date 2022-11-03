@@ -3,7 +3,7 @@ module TFlxTypeMod
   use GridDataType
   use data_kind_mod, only : r8 => SHR_KIND_R8
   use abortutils, only : destroy
-  use EcoSIMConfig, only : jcplx1 => jcplx1c,jsken=>jskenc,NFGs=>NFGsc
+  use EcoSIMConfig, only : jcplx => jcplxc,jsken=>jskenc,NFGs=>NFGsc
   use EcoSIMConfig, only : nlbiomcp=>nlbiomcpc,ndbiomcp=>ndbiomcpc
 implicit none
 
@@ -790,37 +790,37 @@ implicit none
   allocate(VOLI1(JZ,JY,JX));    VOLI1=0._r8
   allocate(VOLWH1(JZ,JY,JX));   VOLWH1=0._r8
   allocate(VOLIH1(JZ,JY,JX));   VOLIH1=0._r8
-  allocate(TOMCER(nlbiomcp,NMICBSO,0:jcplx1,JY,JX)); TOMCER=0._r8
-  allocate(TOMNER(nlbiomcp,NMICBSO,0:jcplx1,JY,JX)); TOMNER=0._r8
-  allocate(TOMPER(nlbiomcp,NMICBSO,0:jcplx1,JY,JX)); TOMPER=0._r8
+  allocate(TOMCER(nlbiomcp,NMICBSO,1:jcplx,JY,JX)); TOMCER=0._r8
+  allocate(TOMNER(nlbiomcp,NMICBSO,1:jcplx,JY,JX)); TOMNER=0._r8
+  allocate(TOMPER(nlbiomcp,NMICBSO,1:jcplx,JY,JX)); TOMPER=0._r8
 
   allocate(TOMCERff(nlbiomcp,NMICBSA,JY,JX));TOMCERff=0._r8
   allocate(TOMNERff(nlbiomcp,NMICBSA,JY,JX));TOMNERff=0._r8
   allocate(TOMPERff(nlbiomcp,NMICBSA,JY,JX));TOMPERff=0._r8
 
-  allocate(TOCFLS(0:jcplx1,JZ,JY,JX));TOCFLS=0._r8
-  allocate(TONFLS(0:jcplx1,JZ,JY,JX));TONFLS=0._r8
-  allocate(TOPFLS(0:jcplx1,JZ,JY,JX));TOPFLS=0._r8
-  allocate(TOAFLS(0:jcplx1,JZ,JY,JX));TOAFLS=0._r8
-  allocate(TOCFHS(0:jcplx1,JZ,JY,JX));TOCFHS=0._r8
-  allocate(TONFHS(0:jcplx1,JZ,JY,JX));TONFHS=0._r8
-  allocate(TOPFHS(0:jcplx1,JZ,JY,JX));TOPFHS=0._r8
-  allocate(TOAFHS(0:jcplx1,JZ,JY,JX));TOAFHS=0._r8
-  allocate(TOCQRS(0:jcplx1,JY,JX));TOCQRS=0._r8
-  allocate(TONQRS(0:jcplx1,JY,JX));TONQRS=0._r8
-  allocate(TOPQRS(0:jcplx1,JY,JX));TOPQRS=0._r8
-  allocate(TOAQRS(0:jcplx1,JY,JX));TOAQRS=0._r8
-  allocate(TORCER(ndbiomcp,0:jcplx1,JY,JX));TORCER=0._r8
-  allocate(TORNER(ndbiomcp,0:jcplx1,JY,JX));TORNER=0._r8
-  allocate(TORPER(ndbiomcp,0:jcplx1,JY,JX));TORPER=0._r8
-  allocate(TOHCER(0:jcplx1,JY,JX));TOHCER=0._r8
-  allocate(TOHNER(0:jcplx1,JY,JX));TOHNER=0._r8
-  allocate(TOHPER(0:jcplx1,JY,JX));TOHPER=0._r8
-  allocate(TOHAER(0:jcplx1,JY,JX));TOHAER=0._r8
-  allocate(TOSCER(jsken,0:jcplx1,JY,JX));TOSCER=0._r8
-  allocate(TOSAER(jsken,0:jcplx1,JY,JX));TOSAER=0._r8
-  allocate(TOSNER(jsken,0:jcplx1,JY,JX));TOSNER=0._r8
-  allocate(TOSPER(jsken,0:jcplx1,JY,JX));TOSPER=0._r8
+  allocate(TOCFLS(1:jcplx,JZ,JY,JX));TOCFLS=0._r8
+  allocate(TONFLS(1:jcplx,JZ,JY,JX));TONFLS=0._r8
+  allocate(TOPFLS(1:jcplx,JZ,JY,JX));TOPFLS=0._r8
+  allocate(TOAFLS(1:jcplx,JZ,JY,JX));TOAFLS=0._r8
+  allocate(TOCFHS(1:jcplx,JZ,JY,JX));TOCFHS=0._r8
+  allocate(TONFHS(1:jcplx,JZ,JY,JX));TONFHS=0._r8
+  allocate(TOPFHS(1:jcplx,JZ,JY,JX));TOPFHS=0._r8
+  allocate(TOAFHS(1:jcplx,JZ,JY,JX));TOAFHS=0._r8
+  allocate(TOCQRS(1:jcplx,JY,JX));TOCQRS=0._r8
+  allocate(TONQRS(1:jcplx,JY,JX));TONQRS=0._r8
+  allocate(TOPQRS(1:jcplx,JY,JX));TOPQRS=0._r8
+  allocate(TOAQRS(1:jcplx,JY,JX));TOAQRS=0._r8
+  allocate(TORCER(ndbiomcp,1:jcplx,JY,JX));TORCER=0._r8
+  allocate(TORNER(ndbiomcp,1:jcplx,JY,JX));TORNER=0._r8
+  allocate(TORPER(ndbiomcp,1:jcplx,JY,JX));TORPER=0._r8
+  allocate(TOHCER(1:jcplx,JY,JX));TOHCER=0._r8
+  allocate(TOHNER(1:jcplx,JY,JX));TOHNER=0._r8
+  allocate(TOHPER(1:jcplx,JY,JX));TOHPER=0._r8
+  allocate(TOHAER(1:jcplx,JY,JX));TOHAER=0._r8
+  allocate(TOSCER(jsken,1:jcplx,JY,JX));TOSCER=0._r8
+  allocate(TOSAER(jsken,1:jcplx,JY,JX));TOSAER=0._r8
+  allocate(TOSNER(jsken,1:jcplx,JY,JX));TOSNER=0._r8
+  allocate(TOSPER(jsken,1:jcplx,JY,JX));TOSPER=0._r8
   end subroutine InitTflxType
 
 

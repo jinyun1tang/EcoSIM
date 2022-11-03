@@ -1,7 +1,7 @@
 module AqueChemDatatype
   use data_kind_mod, only : r8 => SHR_KIND_R8
   use GridConsts
-  use EcoSIMConfig, only : jcplx1=> jcplx1c
+  use EcoSIMConfig, only : jcplx=> jcplxc
   implicit none
   public
   save
@@ -764,10 +764,10 @@ module AqueChemDatatype
   allocate(XC1BHB(3,JD,JV,JH)); XC1BHB=0._r8
   allocate(XC2BHB(3,JD,JV,JH)); XC2BHB=0._r8
   allocate(XM1BHB(3,JD,JV,JH)); XM1BHB=0._r8
-  allocate(XOCFXS(0:jcplx1,JZ,JY,JX));XOCFXS=0._r8
-  allocate(XONFXS(0:jcplx1,JZ,JY,JX));XONFXS=0._r8
-  allocate(XOPFXS(0:jcplx1,JZ,JY,JX));XOPFXS=0._r8
-  allocate(XOAFXS(0:jcplx1,JZ,JY,JX));XOAFXS=0._r8
+  allocate(XOCFXS(1:jcplx,JZ,JY,JX));XOCFXS=0._r8
+  allocate(XONFXS(1:jcplx,JZ,JY,JX));XONFXS=0._r8
+  allocate(XOPFXS(1:jcplx,JZ,JY,JX));XOPFXS=0._r8
+  allocate(XOAFXS(1:jcplx,JZ,JY,JX));XOAFXS=0._r8
   allocate(XCOFXS(JZ,JY,JX));   XCOFXS=0._r8
   allocate(XCHFXS(JZ,JY,JX));   XCHFXS=0._r8
   allocate(XOXFXS(JZ,JY,JX));   XOXFXS=0._r8

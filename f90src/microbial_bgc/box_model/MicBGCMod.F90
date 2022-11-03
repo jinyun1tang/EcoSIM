@@ -15,8 +15,7 @@ module MicBGCMod
   use MicFLuxTypeMod, only : micfluxtype
   use MicStateTraitTypeMod, only : micsttype
   use MicForcTypeMod, only : micforctype
-  use MicBGCPars, only : micpar
-
+  use EcoSiMParDataMod, only : micpar
   implicit none
 
   private
@@ -24,7 +23,7 @@ module MicBGCMod
   save
   character(len=*), parameter :: mod_filename = __FILE__
 
-  integer :: jcplx,jcplx1,NFGs,JG,jsken,ndbiomcp,nlbiomcp
+  integer :: jcplx,NFGs,jsken,ndbiomcp,nlbiomcp
   integer, pointer :: JGniA(:)
   integer, pointer :: JGnfA(:)
   integer, pointer :: JGnio(:)
@@ -43,9 +42,7 @@ module MicBGCMod
   implicit none
 
   jcplx =micpar%jcplx
-  jcplx1=micpar%jcplx1
   NFGs  =micpar%NFGs
-  JG    =micpar%jguilds
   jsken =micpar%jsken
   ndbiomcp = micpar%ndbiomcp
   nlbiomcp = micpar%nlbiomcp
@@ -77,8 +74,8 @@ module MicBGCMod
   type(NitroOMcplxStateType) :: ncplxs
 
 ! begin_execution
-  call nmicf%Init(JG,jcplx,NFGs)
-  call nmics%Init(JG,jcplx,NFGs)
+  call nmicf%Init(jcplx,NFGs)
+  call nmics%Init(jcplx,NFGs)
   call ncplxf%Init()
   call ncplxs%Init()
   call naqfdiag%ZeroOut()
@@ -98,7 +95,7 @@ module MicBGCMod
 !
 !     ROQCK=total respiration of DOC+DOA used to represent microbial activity
 !
-  DO  K=0,KL
+  DO  K=1,KL
     DO  N=1,NFGs
       DO NGL=JGnio(N),JGnfo(N)
         ncplxf%ROQCK(K)=ncplxf%ROQCK(K)+nmicf%ROQCD(NGL,K)
@@ -116,7 +113,7 @@ module MicBGCMod
         !     OQC,OQN,OQP,OQA=DOC,DON,DOP,acetate in micropores
         !     OMC,OMN,OMP=microbial C,N,P
         !
-  DO K=0,KL
+  DO K=1,KL
 !
           !write(*,*)'DECOMPOSITION OF ORGANIC SUBSTRATES'
 !
@@ -276,7 +273,7 @@ module MicBGCMod
 !     WITH OFFSET FOR THERMAL ADAPTATION
   IF(litrm)THEN
     ! surface litter layer
-    KL=2
+    KL=micpar%n_litrsfk
     IF(VOLWRX.GT.ZEROS2)THEN
       THETR=VOLW0/VOLR
       THETZ=AZMAX1(THETR-THETY)
@@ -286,7 +283,7 @@ module MicBGCMod
     ENDIF
   ELSE
 !     non-surface layer
-    KL=4
+    KL=micpar%jcplx
     THETZ=AZMAX1((AMIN1(AMAX1(0.5_r8*POROS,FC),THETW)-THETY))
     VOLWZ=THETZ*VOLY
   ENDIF
@@ -343,7 +340,7 @@ module MicBGCMod
 !
 !     TOTAL SOLID SUBSTRATE
 !
-  DO  K=0,KL
+  DO  K=1,KL
     OSCT(K)=0.0_r8
     OSAT(K)=0.0_r8
 
@@ -357,7 +354,7 @@ module MicBGCMod
 !
 !     TOTAL BIORESIDUE
 !
-  DO  K=0,KL
+  DO  K=1,KL
     ORCT(K)=0.0_r8
     DO  M=1,ndbiomcp
       ORCT(K)=ORCT(K)+ORC(M,K)
@@ -371,7 +368,7 @@ module MicBGCMod
     TOHC=TOHC+OHC(K)+OHA(K)
   enddo
 
-  D860: DO K=0,KL
+  D860: DO K=1,KL
     OSRH(K)=OSAT(K)+ORCT(K)+OHC(K)+OHA(K)
   ENDDO D860
   TSRH=TOSA+TORC+TOHC
@@ -382,7 +379,7 @@ module MicBGCMod
 !
   TOMA=0.0_r8
   TOMN=0.0_r8
-  D890: DO K=0,jcplx1
+  D890: DO K=1,jcplx
     IF(.not.litrm.OR.(K.NE.k_POM.AND.K.NE.k_humus))THEN
 ! the omb complexes
       D895: DO N=1,NFGs
@@ -457,7 +454,7 @@ module MicBGCMod
     ENDIF
   ENDDO
 
-  D690: DO K=0,KL
+  D690: DO K=1,KL
     TOMK(K)=0.0_r8
     TONK(K)=0.0_r8
     TOPK(K)=0.0_r8
@@ -474,7 +471,7 @@ module MicBGCMod
     ENDDO D685
   ENDDO D690
 
-  K=jcplx
+  K=jcplx+1
   DO N=1,NFGs
     DO NGL=JGniA(N),JGnfA(N)
       TOMK(K)=TOMK(K)+OMAff(NGL)
@@ -488,7 +485,7 @@ module MicBGCMod
 !
 !     FOSRH=fraction of total SOC in each substrate complex K
 !
-  D790: DO K=0,KL
+  D790: DO K=1,KL
     IF(TSRH.GT.ZEROS)THEN
       FOSRH(K)=OSRH(K)/TSRH
     ELSE
@@ -602,7 +599,7 @@ module MicBGCMod
   TCGOMN(:)=0.0_r8
   TCGOMP(:)=0.0_r8
 
-  D760: DO K=0,jcplx1
+  D760: DO K=1,jcplx
     IF(.not.litrm.OR.(K.NE.k_POM.AND.K.NE.k_humus))THEN
       DO  N=1,NFGs
         TOMCNK(:)=0.0_r8
@@ -1024,7 +1021,7 @@ module MicBGCMod
 !     ROQCK,OQC,OQN,OQP=respiration,DOC,DON,DOP
 !     XOQCK,XOQCZ,XOQNZ,XOQPZ,XOQAZ=total XFRK,XFRC,XFRN,XFRP,XFRA for all K
 !
-  D795: DO K=0,KL
+  D795: DO K=1,KL
     IF(K.LE.KL-1)THEN
       D800: DO KK=K+1,KL
         OSRT=OSRH(K)+OSRH(KK)
@@ -1105,7 +1102,7 @@ module MicBGCMod
 !     OMC,OMN,OMP=microbial C,N,P
 !
   TOQCK=0.0_r8
-  D840: DO K=0,KL
+  D840: DO K=1,KL
     ROQCK(K)=ROQCK(K)+XOQCK(K)
     TOQCK=TOQCK+ROQCK(K)
     OQC(K)=OQC(K)+XOQCZ(K)
@@ -1243,8 +1240,8 @@ module MicBGCMod
   real(r8) :: DFNS
   real(r8) :: OQCI
   real(r8) :: RHOSCM
-  real(r8) :: FCNK(0:jcplx1),FCPK(0:jcplx1)
-  real(r8) :: CNS(4,0:jcplx1),CPS(4,0:jcplx1)
+  real(r8) :: FCNK(1:jcplx),FCPK(1:jcplx)
+  real(r8) :: CNS(4,1:jcplx),CPS(4,1:jcplx)
 
 !     begin_execution
   associate(                 &
@@ -1391,7 +1388,7 @@ module MicBGCMod
 !     EPOC=fraction of RDOSC allocated to POC from hour1.f
 !     RCOSC,RCOSN,RCOSP=transfer of decomposition C,N,P to DOC,DON,DOP
 !
-    IF(K.LE.micpar%k_litrsf)THEN
+    IF(K.LE.micpar%n_litrsfk)THEN
       RHOSC(ilignin,K)=AZMAX1(AMIN1(RDOSN(ilignin,K)/CNRH(k_POM) &
         ,RDOSP(ilignin,K)/CPRH(k_POM),EPOC*RDOSC(ilignin,K)))
       RHOSCM=0.10_r8*RHOSC(ilignin,K)
@@ -1582,6 +1579,7 @@ module MicBGCMod
     OSC      => micstt%OSC   , &
     OSN      => micstt%OSN   , &
     OSP      => micstt%OSP   , &
+    iprotein  => micpar%iprotein , &
 !    OSA      => micstt%OSA   , &
     OSC13U      => micstt%OSC13U   , &
     OSN13U      => micstt%OSN13U   , &
@@ -1610,7 +1608,7 @@ module MicBGCMod
 !     RCOMC,RCOMN,RCOMP=transfer of microbial C,N,P litterfall to residue
 !     RCMMC,RCMMN,RCMMC=transfer of senesence litterfall C,N,P to residue
 !
-  D1690: DO K=0,KL
+  D1690: DO K=1,KL
     IF(TORC.GT.ZEROS)THEN
       FORC(K)=ORCT(K)/TORC
     ELSE
@@ -1635,7 +1633,7 @@ module MicBGCMod
 !   VARIABLES IN SUBSTRATE-MICROBE COMPLEXES
 !
 
-  D590: DO K=0,KL
+  D590: DO K=1,KL
     D580: DO M=1,jsken
 !
 !     SUBSTRATE DECOMPOSITION PRODUCTS
@@ -1659,10 +1657,10 @@ module MicBGCMod
 !
       IF(.not.litrm)THEN
 ! add to POM carbonhydrate
-        OSC(1,k_POM)=OSC(1,k_POM)+RHOSC(M,K)
+        OSC(iprotein,k_POM)=OSC(iprotein,k_POM)+RHOSC(M,K)
  !      OSA(1,k_POM)=OSA(1,k_POM)+RHOSC(M,K)
-        OSN(1,k_POM)=OSN(1,k_POM)+RHOSN(M,K)
-        OSP(1,k_POM)=OSP(1,k_POM)+RHOSP(M,K)
+        OSN(iprotein,k_POM)=OSN(iprotein,k_POM)+RHOSN(M,K)
+        OSP(iprotein,k_POM)=OSP(iprotein,k_POM)+RHOSP(M,K)
       ELSE
         OSC13U=OSC13U+RHOSC(M,K)
  !      OSA13U=OSA13U+RHOSC(M,K)
@@ -1807,6 +1805,8 @@ module MicBGCMod
     OSP24U=> micstt%OSP24U, &
     CFOMC => micfor%CFOMC, &
     CFOMCU => micfor%CFOMCU, &
+    icarbhyro => micpar%icarbhyro, &
+    iprotein  => micpar%iprotein , &
     Litrm => micfor%litrm  &
   )
 !
@@ -1818,7 +1818,7 @@ module MicBGCMod
 
   call MicrobialAnabolicUpdateff(micfor,micstt,nmicf)
 
-  D550: DO K=0,jcplx1
+  D550: DO K=1,jcplx
     IF(.not.litrm.OR.(K.NE.k_POM.AND.K.NE.k_humus))THEN
       DO  N=1,NFGs
         DO NGL=JGnio(N),JGnfo(N)
@@ -1838,13 +1838,13 @@ module MicBGCMod
 !
             IF(.not.litrm)THEN
 !add as protein
-              OSC(1,k_humus)=OSC(1,k_humus)+CFOMC(1)*(RHOMC(M,NGL,K)+RHMMC(M,NGL,K))
-              OSN(1,k_humus)=OSN(1,k_humus)+CFOMC(1)*(RHOMN(M,NGL,K)+RHMMN(M,NGL,K))
-              OSP(1,k_humus)=OSP(1,k_humus)+CFOMC(1)*(RHOMP(M,NGL,K)+RHMMP(M,NGL,K))
+              OSC(iprotein,k_humus)=OSC(iprotein,k_humus)+CFOMC(1)*(RHOMC(M,NGL,K)+RHMMC(M,NGL,K))
+              OSN(iprotein,k_humus)=OSN(iprotein,k_humus)+CFOMC(1)*(RHOMN(M,NGL,K)+RHMMN(M,NGL,K))
+              OSP(iprotein,k_humus)=OSP(iprotein,k_humus)+CFOMC(1)*(RHOMP(M,NGL,K)+RHMMP(M,NGL,K))
 !add as carbon hydro
-              OSC(2,k_humus)=OSC(2,k_humus)+CFOMC(2)*(RHOMC(M,NGL,K)+RHMMC(M,NGL,K))
-              OSN(2,k_humus)=OSN(2,k_humus)+CFOMC(2)*(RHOMN(M,NGL,K)+RHMMN(M,NGL,K))
-              OSP(2,k_humus)=OSP(2,k_humus)+CFOMC(2)*(RHOMP(M,NGL,K)+RHMMP(M,NGL,K))
+              OSC(icarbhyro,k_humus)=OSC(icarbhyro,k_humus)+CFOMC(2)*(RHOMC(M,NGL,K)+RHMMC(M,NGL,K))
+              OSN(icarbhyro,k_humus)=OSN(icarbhyro,k_humus)+CFOMC(2)*(RHOMN(M,NGL,K)+RHMMN(M,NGL,K))
+              OSP(icarbhyro,k_humus)=OSP(icarbhyro,k_humus)+CFOMC(2)*(RHOMP(M,NGL,K)+RHMMP(M,NGL,K))
             ELSE
               OSC14U=OSC14U+CFOMCU(1)*(RHOMC(M,NGL,K)+RHMMC(M,NGL,K))
               OSN14U=OSN14U+CFOMCU(1)*(RHOMN(M,NGL,K)+RHMMN(M,NGL,K))
@@ -1923,7 +1923,7 @@ module MicBGCMod
 !     DOSA=rate constant for litter colonization
 !     ROQCK=total respiration of DOC+DOA used to represent microbial activity
 !
-  D475: DO K=0,KL
+  D475: DO K=1,KL
     OSCT(K)=0.0_r8
     OSAT(K)=0.0_r8
     DO  M=1,jsken
@@ -1931,7 +1931,7 @@ module MicBGCMod
       OSAT(K)=OSAT(K)+OSA(M,K)
     enddo
   ENDDO D475
-  D480: DO K=0,KL
+  D480: DO K=1,KL
     IF(OSCT(K).GT.ZEROS)THEN
       DOSAK=DOSA(K)*AZMAX1(ROQCK(K))
       D485: DO M=1,jsken
@@ -2070,7 +2070,7 @@ module MicBGCMod
     XOQPS =>micflx%XOQPS     , &
     XOQAS =>micflx%XOQAS       &
   )
-  D650: DO K=0,jcplx1
+  D650: DO K=1,jcplx
     IF(.not.litrm.OR.(K.NE.k_POM.AND.K.NE.k_humus))THEN
       DO N=1,NFGs
         DO NGL=JGnio(N),JGnfo(N)
@@ -2180,7 +2180,7 @@ module MicBGCMod
 !
 !     XOQCS,XOQNZ,XOQPS,XOQAS=net change in DOC,DON,DOP,acetate
 !
-  D655: DO K=0,jcplx1
+  D655: DO K=1,jcplx
     D660: DO M=1,jsken
       XOQCS(K)=XOQCS(K)+RCOSC(M,K)
       XOQNS(K)=XOQNS(K)+RCOSN(M,K)

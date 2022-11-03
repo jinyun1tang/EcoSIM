@@ -8,6 +8,7 @@ module InitEcoSIM
   contains
 
   subroutine InitModules(nmicbguilds)
+  use EcoSiMParDataMod    , only : micpar,pltpar
   use EcoSimSumDataType   , only : InitEcoSimSum
   use SnowDataType        , only : InitSnowData
   use ErosionMod          , only : InitErosion
@@ -74,11 +75,11 @@ module InitEcoSIM
 
   call InitPlantMngmtData
 
-  call InitPlantRates
+  call InitPlantRates(micpar%n_pltlitrk)
 
   call InitSoilProperty
 
-  call InitSurfLitter
+  call InitSurfLitter(micpar%n_litrsfk)
 
   call InitSedimentData
 
@@ -92,19 +93,19 @@ module InitEcoSIM
 
   call InitChemTranspData
 
-  call InitSoilBGCData
+  call InitSoilBGCData(pltpar%n_pltlitrk)
 
-  call InitSOMData
+  call InitSOMData(micpar%n_litrsfk)
 
   call InitFertilizerData
 
-  call InitPlantTraits
+  call InitPlantTraits(pltpar%n_pltlitrk)
 
   call InitFlagData
 
   call InitPlantDisturbance
 
-  call InitHour1
+  call InitHour1(micpar%n_litrsfk)
 
   call InitUptake
 
@@ -157,8 +158,7 @@ module InitEcoSIM
 
 !------------------------------------------------------------------------------------------
   subroutine InitPlantMorphSize()
-  use GrosubPars, only : pltpar
-  use MicBGCPars, only : micpar
+  use EcoSiMParDataMod, only : pltpar,micpar
   use GridConsts
   implicit none
 
@@ -169,13 +169,22 @@ module InitEcoSIM
   pltpar%JSA1   = JSA
   pltpar%JLI1   = JLI
   pltpar%JNODS1 = JNODS
+  pltpar%iprotein =micpar%iprotein
+  pltpar%icarbhyro=micpar%icarbhyro
+  pltpar%icellulos=micpar%icellulos
+  pltpar%ilignin  =micpar%ilignin
+  pltpar%k_woody_litr=micpar%k_woody_litr
+  pltpar%k_fine_litr=micpar%k_fine_litr
   !the following variable should be consistent with the soil bgc model
-  pltpar%jcplx11= micpar%jcplx1
+  pltpar%jcplx= micpar%jcplx
+  pltpar%n_pltlitrk=micpar%n_pltlitrk
   pltpar%jsken  = micpar%jsken
   pltpar%Jlitgrp= 5     !number of liter groups
   pltpar%JBR    = 10    !number of branches
   JBR=pltpar%JBR
   Jlitgrp=pltpar%Jlitgrp
   JRS=pltpar%JRS
+
+
   end subroutine InitPlantMorphSize
 end module InitEcoSIM

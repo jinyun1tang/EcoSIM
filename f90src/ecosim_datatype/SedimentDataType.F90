@@ -1,7 +1,7 @@
 module SedimentDataType
   use data_kind_mod, only : r8 => SHR_KIND_R8
   use GridConsts
-  use EcoSIMConfig, only : jcplx1=> jcplx1c,ndbiomcp=>ndbiomcpc,jsken=>jskenc
+  use EcoSIMConfig, only : jcplx => jcplxc,ndbiomcp=>ndbiomcpc,jsken=>jskenc
 implicit none
 
   save
@@ -151,17 +151,17 @@ implicit none
   allocate(XFE2ER(2,2,JV,JH));  XFE2ER=0._r8
   allocate(XSEDER(2,2,JV,JH));  XSEDER=0._r8
   allocate(XFEER(2,2,JV,JH));   XFEER=0._r8
-  allocate(ORCER(ndbiomcp,0:jcplx1,2,2,JV,JH));ORCER=0._r8
-  allocate(ORNER(ndbiomcp,0:jcplx1,2,2,JV,JH));ORNER=0._r8
-  allocate(ORPER(ndbiomcp,0:jcplx1,2,2,JV,JH));ORPER=0._r8
-  allocate(OHCER(0:jcplx1,2,2,JV,JH));OHCER=0._r8
-  allocate(OHNER(0:jcplx1,2,2,JV,JH));OHNER=0._r8
-  allocate(OHPER(0:jcplx1,2,2,JV,JH));OHPER=0._r8
-  allocate(OHAER(0:jcplx1,2,2,JV,JH));OHAER=0._r8
-  allocate(OSCER(jsken,0:jcplx1,2,2,JV,JH));OSCER=0._r8
-  allocate(OSAER(jsken,0:jcplx1,2,2,JV,JH));OSAER=0._r8
-  allocate(OSNER(jsken,0:jcplx1,2,2,JV,JH));OSNER=0._r8
-  allocate(OSPER(jsken,0:jcplx1,2,2,JV,JH));OSPER=0._r8
+  allocate(ORCER(ndbiomcp,1:jcplx,2,2,JV,JH));ORCER=0._r8
+  allocate(ORNER(ndbiomcp,1:jcplx,2,2,JV,JH));ORNER=0._r8
+  allocate(ORPER(ndbiomcp,1:jcplx,2,2,JV,JH));ORPER=0._r8
+  allocate(OHCER(1:jcplx,2,2,JV,JH));OHCER=0._r8
+  allocate(OHNER(1:jcplx,2,2,JV,JH));OHNER=0._r8
+  allocate(OHPER(1:jcplx,2,2,JV,JH));OHPER=0._r8
+  allocate(OHAER(1:jcplx,2,2,JV,JH));OHAER=0._r8
+  allocate(OSCER(jsken,1:jcplx,2,2,JV,JH));OSCER=0._r8
+  allocate(OSAER(jsken,1:jcplx,2,2,JV,JH));OSAER=0._r8
+  allocate(OSNER(jsken,1:jcplx,2,2,JV,JH));OSNER=0._r8
+  allocate(OSPER(jsken,1:jcplx,2,2,JV,JH));OSPER=0._r8
   end subroutine InitAllocate
 
 !----------------------------------------------------------------------

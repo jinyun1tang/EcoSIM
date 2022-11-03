@@ -1,7 +1,7 @@
 module MicForcTypeMod
 
   use data_kind_mod, only : r8 => SHR_KIND_R8
-  use MicBGCPars, only : micpar
+  use EcoSiMParDataMod, only : micpar
   use EcoSIMSolverPar, only : NPH
   use abortutils, only : destroy
   implicit none
@@ -92,12 +92,12 @@ module MicForcTypeMod
 
   implicit none
   class(micforctype) :: this
-  integer :: jcplx1
-  jcplx1=micpar%jcplx1
+  integer :: jcplx
+  jcplx=micpar%jcplx
   allocate(this%CFOMC(1:micpar%ndbiomcp))
   allocate(this%CFOMCU(1:micpar%ndbiomcp))
-  allocate(this%ROQCY(0:jcplx1))
-  allocate(this%ROQAY(0:jcplx1))
+  allocate(this%ROQCY(1:jcplx))
+  allocate(this%ROQAY(1:jcplx))
   allocate(this%VOLWM(NPH))
   allocate(this%THETPM(NPH))
   allocate(this%FILM(NPH))

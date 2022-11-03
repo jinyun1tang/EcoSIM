@@ -49,10 +49,11 @@ module NoduleBGCMod
   real(r8) :: XFRC,XFRN,XFRP
   REAL(R8) :: RCCC,RCCN,RCCP
 !     begin_execution
-  associate(                             &
+  associate(                         &
     NU       =>  plt_site%NU       , &
     ZERO     =>  plt_site%ZERO     , &
     AREA3    =>  plt_site%AREA3    , &
+    k_fine_litr=> pltpar%k_fine_litr,&
     CFOPE    =>  plt_soilchem%CFOPE, &
     INTYP    =>  plt_morph%INTYP   , &
     TFN3     =>  plt_pheno%TFN3    , &
@@ -299,9 +300,9 @@ module NoduleBGCMod
 !     RDNSNC,RDNSNC,RDNSNP=bacterial C,N,P senescence to litterfall
 !
     D6470: DO M=1,jsken
-      ESNC(M,ielmc,1,0,NZ)=ESNC(M,ielmc,1,0,NZ)+CFOPE(ifoliar,M,ielmc,NZ)*(RDNDLC+RDNSNC)
-      ESNC(M,ielmn,1,0,NZ)=ESNC(M,ielmn,1,0,NZ)+CFOPE(ifoliar,M,ielmn,NZ)*(RDNDLN+RDNSNN)
-      ESNC(M,ielmp,1,0,NZ)=ESNC(M,ielmp,1,0,NZ)+CFOPE(ifoliar,M,ielmp,NZ)*(RDNDLP+RDNSNP)
+      ESNC(M,ielmc,k_fine_litr,0,NZ)=ESNC(M,ielmc,k_fine_litr,0,NZ)+CFOPE(ifoliar,M,ielmc,NZ)*(RDNDLC+RDNSNC)
+      ESNC(M,ielmn,k_fine_litr,0,NZ)=ESNC(M,ielmn,k_fine_litr,0,NZ)+CFOPE(ifoliar,M,ielmn,NZ)*(RDNDLN+RDNSNN)
+      ESNC(M,ielmp,k_fine_litr,0,NZ)=ESNC(M,ielmp,k_fine_litr,0,NZ)+CFOPE(ifoliar,M,ielmp,NZ)*(RDNDLP+RDNSNP)
     ENDDO D6470
 !
 !     CONSUMPTION OF NON-STRUCTURAL C,N,P BY NODULE
@@ -416,7 +417,7 @@ module NoduleBGCMod
   real(r8) :: XFRC,XFRN,XFRP
   real(r8) :: RCCC,RCCN,RCCP
 !     begin_execution
-  associate(                               &
+  associate(                           &
     NU       =>   plt_site%NU        , &
     AREA3    =>   plt_site%AREA3     , &
     ZERO     =>   plt_site%ZERO      , &
@@ -424,6 +425,8 @@ module NoduleBGCMod
     DMND     =>   plt_allom%DMND     , &
     CNND     =>   plt_allom%CNND     , &
     CPND     =>   plt_allom%CPND     , &
+    k_fine_litr=> pltpar%k_fine_litr , &
+    iroot    =>   pltpar%iroot       , &
     RCO2M    =>   plt_rbgc%RCO2M     , &
     RCO2N    =>   plt_rbgc%RCO2N     , &
     WFR      =>   plt_rbgc%WFR       , &
@@ -677,9 +680,9 @@ module NoduleBGCMod
 !     RDNSNC,RDNSNC,RDNSNP=bacterial C,N,P senescence to litterfall
 !
         D6370: DO M=1,jsken
-          ESNC(M,ielmc,1,L,NZ)=ESNC(M,ielmc,1,L,NZ)+CFOPE(4,M,ielmc,NZ)*(RDNDLC+RDNSNC)
-          ESNC(M,ielmn,1,L,NZ)=ESNC(M,ielmn,1,L,NZ)+CFOPE(4,M,ielmn,NZ)*(RDNDLN+RDNSNN)
-          ESNC(M,ielmp,1,L,NZ)=ESNC(M,ielmp,1,L,NZ)+CFOPE(4,M,ielmp,NZ)*(RDNDLP+RDNSNP)
+          ESNC(M,ielmc,k_fine_litr,L,NZ)=ESNC(M,ielmc,k_fine_litr,L,NZ)+CFOPE(iroot,M,ielmc,NZ)*(RDNDLC+RDNSNC)
+          ESNC(M,ielmn,k_fine_litr,L,NZ)=ESNC(M,ielmn,k_fine_litr,L,NZ)+CFOPE(iroot,M,ielmn,NZ)*(RDNDLN+RDNSNN)
+          ESNC(M,ielmp,k_fine_litr,L,NZ)=ESNC(M,ielmp,k_fine_litr,L,NZ)+CFOPE(iroot,M,ielmp,NZ)*(RDNDLP+RDNSNP)
         ENDDO D6370
 !
 !     CONSUMPTION OF NON-STRUCTURAL C,N,P BY NODULE

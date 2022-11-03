@@ -57,6 +57,7 @@ module readiMod
 ! THIS SUBROUTINE READS ALL SOIL AND TOPOGRAPHIC INPUT FILES
 !
   use EcoSIMConfig, only : column_mode
+  use EcoSiMParDataMod, only : micpar
   implicit none
   integer, intent(in) :: NT,NE,NTX,NEX,NTZX,NHW,NHE,NVN,NVS
   integer, intent(out) :: NF, NFX, NTZ
@@ -69,6 +70,11 @@ module readiMod
   real(r8) :: XI
 !
 ! begin_execution
+  associate(                            &
+  k_woody_litr => micpar%k_woody_litr , &
+  k_fine_litr  => micpar%k_fine_litr  , &
+  k_manure     => micpar%k_manure       &
+  )
 !
 ! OPEN OUTPUT LOGFILES,AND SITE,TOPOGRAPHY FILES FROM
 ! FILE NAMES IN DATA ARRAYS LOADED IN 'MAIN'
@@ -303,15 +309,15 @@ module readiMod
       PSIWP(NY,NX)=datav(2)
       ALBS(NY,NX) =datav(3)
       PH(0,NY,NX) =datav(4)
-      RSC(1,0,NY,NX) =datav(5)
-      RSN(1,0,NY,NX) =datav(6)
-      RSP(1,0,NY,NX) =datav(7)
-      RSC(0,0,NY,NX) =datav(8)
-      RSN(0,0,NY,NX) =datav(9)
-      RSP(0,0,NY,NX) =datav(10)
-      RSC(2,0,NY,NX) =datav(11)
-      RSN(2,0,NY,NX) =datav(12)
-      RSP(2,0,NY,NX) =datav(13)
+      RSC(k_fine_litr,0,NY,NX) =datav(5)
+      RSN(k_fine_litr,0,NY,NX) =datav(6)
+      RSP(k_fine_litr,0,NY,NX) =datav(7)
+      RSC(k_woody_litr,0,NY,NX) =datav(8)
+      RSN(k_woody_litr,0,NY,NX) =datav(9)
+      RSP(k_woody_litr,0,NY,NX) =datav(10)
+      RSC(k_manure,0,NY,NX) =datav(11)
+      RSN(k_manure,0,NY,NX) =datav(12)
+      RSP(k_manure,0,NY,NX) =datav(13)
       IXTYP(1,NY,NX) =int(datav(14))
       IXTYP(2,NY,NX) =int(datav(15))
       NUI(NY,NX) = int(datav(16))   !Initial surface layer, >=1,
@@ -333,15 +339,15 @@ module readiMod
         write(*,*)'Water potential at wilting point (MPa)',PSIWP(NY,NX)
         write(*,*)'Wet soil albedo',ALBS(NY,NX)
         write(*,*)'Litter pH',PH(0,NY,NX)
-        write(*,*)'C in surface fine litter (g m-2)',RSC(1,0,NY,NX)
-        write(*,*)'N in surface fine litter (g m-2)',RSN(1,0,NY,NX)
-        write(*,*)'P in surface fine litter (g m-2)',RSP(1,0,NY,NX)
-        write(*,*)'C in surface woody litter (g m-2)',RSC(0,0,NY,NX)
-        write(*,*)'N in surface woody litter (g m-2)',RSN(0,0,NY,NX)
-        write(*,*)'P in surface woody litter (g m-2)',RSP(0,0,NY,NX)
-        write(*,*)'C in surface manure litter (g m-2)',RSC(2,0,NY,NX)
-        write(*,*)'N in surface manure litter (g m-2)',RSN(2,0,NY,NX)
-        write(*,*)'P in surface manure litter (g m-2)',RSP(2,0,NY,NX)
+        write(*,*)'C in surface fine litter (g m-2)',RSC(k_fine_litr,0,NY,NX)
+        write(*,*)'N in surface fine litter (g m-2)',RSN(k_fine_litr,0,NY,NX)
+        write(*,*)'P in surface fine litter (g m-2)',RSP(k_fine_litr,0,NY,NX)
+        write(*,*)'C in surface woody litter (g m-2)',RSC(k_woody_litr,0,NY,NX)
+        write(*,*)'N in surface woody litter (g m-2)',RSN(k_woody_litr,0,NY,NX)
+        write(*,*)'P in surface woody litter (g m-2)',RSP(k_woody_litr,0,NY,NX)
+        write(*,*)'C in surface manure litter (g m-2)',RSC(k_manure,0,NY,NX)
+        write(*,*)'N in surface manure litter (g m-2)',RSN(k_manure,0,NY,NX)
+        write(*,*)'P in surface manure litter (g m-2)',RSP(k_manure,0,NY,NX)
         write(*,*)'surface litter type:1=plant,2=manure',IXTYP(1,NY,NX),IXTYP(2,NY,NX)
         write(*,*)'layer number of soil surface layer NUI',NUI(NY,NX)
         write(*,*)'layer number of maximum rooting layer NJ',NJ(NY,NX)
@@ -711,68 +717,68 @@ module readiMod
 !     RSC,RSC,RSP=C,N,P in fine(1),woody(0),manure(2) litter (g m-2)
 !
       read(9,'(A)')tline
-      READ(tline,*,iostat=ierr)(RSC(1,L,NY,NX),L=NU(NY,NX),NM(NY,NX))
+      READ(tline,*,iostat=ierr)(RSC(k_fine_litr,L,NY,NX),L=NU(NY,NX),NM(NY,NX))
       call check_read(ierr,1-NU(NY,NX)+NM(NY,NX),__LINE__,mod_filename)
 
       read(9,'(A)')tline
-      READ(tline,*,iostat=ierr)(RSN(1,L,NY,NX),L=NU(NY,NX),NM(NY,NX))
+      READ(tline,*,iostat=ierr)(RSN(k_fine_litr,L,NY,NX),L=NU(NY,NX),NM(NY,NX))
       call check_read(ierr,1-NU(NY,NX)+NM(NY,NX),__LINE__,mod_filename)
 
       read(9,'(A)')tline
-      READ(tline,*,iostat=ierr)(RSP(1,L,NY,NX),L=NU(NY,NX),NM(NY,NX))
+      READ(tline,*,iostat=ierr)(RSP(k_fine_litr,L,NY,NX),L=NU(NY,NX),NM(NY,NX))
       call check_read(ierr,1-NU(NY,NX)+NM(NY,NX),__LINE__,mod_filename)
 
       read(9,'(A)')tline
-      READ(tline,*,iostat=ierr)(RSC(0,L,NY,NX),L=NU(NY,NX),NM(NY,NX))
+      READ(tline,*,iostat=ierr)(RSC(k_woody_litr,L,NY,NX),L=NU(NY,NX),NM(NY,NX))
       call check_read(ierr,1-NU(NY,NX)+NM(NY,NX),__LINE__,mod_filename)
 
       read(9,'(A)')tline
-      READ(tline,*,iostat=ierr)(RSN(0,L,NY,NX),L=NU(NY,NX),NM(NY,NX))
+      READ(tline,*,iostat=ierr)(RSN(k_woody_litr,L,NY,NX),L=NU(NY,NX),NM(NY,NX))
       call check_read(ierr,1-NU(NY,NX)+NM(NY,NX),__LINE__,mod_filename)
 
       read(9,'(A)')tline
-      READ(tline,*,iostat=ierr)(RSP(0,L,NY,NX),L=NU(NY,NX),NM(NY,NX))
+      READ(tline,*,iostat=ierr)(RSP(k_woody_litr,L,NY,NX),L=NU(NY,NX),NM(NY,NX))
       call check_read(ierr,1-NU(NY,NX)+NM(NY,NX),__LINE__,mod_filename)
 
       read(9,'(A)')tline
-      READ(tline,*,iostat=ierr)(RSC(2,L,NY,NX),L=NU(NY,NX),NM(NY,NX))
+      READ(tline,*,iostat=ierr)(RSC(k_manure,L,NY,NX),L=NU(NY,NX),NM(NY,NX))
       call check_read(ierr,1-NU(NY,NX)+NM(NY,NX),__LINE__,mod_filename)
 
       read(9,'(A)')tline
-      READ(tline,*,iostat=ierr)(RSN(2,L,NY,NX),L=NU(NY,NX),NM(NY,NX))
+      READ(tline,*,iostat=ierr)(RSN(k_manure,L,NY,NX),L=NU(NY,NX),NM(NY,NX))
       call check_read(ierr,1-NU(NY,NX)+NM(NY,NX),__LINE__,mod_filename)
 
       read(9,'(A)')tline
-      READ(tline,*,iostat=ierr)(RSP(2,L,NY,NX),L=NU(NY,NX),NM(NY,NX))
+      READ(tline,*,iostat=ierr)(RSP(k_manure,L,NY,NX),L=NU(NY,NX),NM(NY,NX))
       call check_read(ierr,1-NU(NY,NX)+NM(NY,NX),__LINE__,mod_filename)
 
       REWIND(9)
       if(lverb)then
         write(*,*)''
         write(*,*)'NY,NX=',NY,NX
-        write(*,*)'Initial fine litter C (gC m-2): RSC(1)'
-        write(*,*)(RSC(1,L,NY,NX),L=NU(NY,NX),NM(NY,NX))
-        write(*,*)'Initial fine litter N (gN m-2): RSN(1)'
-        write(*,*)(RSN(1,L,NY,NX),L=NU(NY,NX),NM(NY,NX))
-        write(*,*)'Initial fine litter P (gP m-2): RSP(1)'
-        write(*,*)(RSP(1,L,NY,NX),L=NU(NY,NX),NM(NY,NX))
-        write(*,*)'Initial woody liter C (gC m-2): RSC(0)'
-        write(*,*)(RSC(0,L,NY,NX),L=NU(NY,NX),NM(NY,NX))
-        write(*,*)'Initial woody litter N (gN m-2): RSN(0)'
-        write(*,*)(RSN(0,L,NY,NX),L=NU(NY,NX),NM(NY,NX))
-        write(*,*)'Initial woody litter P (gP m-2): RSP(0)'
-        write(*,*)(RSP(0,L,NY,NX),L=NU(NY,NX),NM(NY,NX))
-        write(*,*)'Initial manure liter C (gC m-2): RSC(2)'
-        write(*,*)(RSC(2,L,NY,NX),L=NU(NY,NX),NM(NY,NX))
-        write(*,*)'Initial manure litter N (gN m-2): RSN(2)'
-        write(*,*)(RSN(2,L,NY,NX),L=NU(NY,NX),NM(NY,NX))
-        write(*,*)'Initial manure litter P (gP m-2): RSP(2)'
-        write(*,*)(RSP(2,L,NY,NX),L=NU(NY,NX),NM(NY,NX))
+        write(*,*)'Initial fine litter C (gC m-2): RSC(k_fine_litr)'
+        write(*,*)(RSC(k_fine_litr,L,NY,NX),L=NU(NY,NX),NM(NY,NX))
+        write(*,*)'Initial fine litter N (gN m-2): RSN(k_fine_litr)'
+        write(*,*)(RSN(k_fine_litr,L,NY,NX),L=NU(NY,NX),NM(NY,NX))
+        write(*,*)'Initial fine litter P (gP m-2): RSP(k_fine_litr)'
+        write(*,*)(RSP(k_fine_litr,L,NY,NX),L=NU(NY,NX),NM(NY,NX))
+        write(*,*)'Initial woody liter C (gC m-2): RSC(k_woody_litr)'
+        write(*,*)(RSC(k_woody_litr,L,NY,NX),L=NU(NY,NX),NM(NY,NX))
+        write(*,*)'Initial woody litter N (gN m-2): RSN(k_woody_litr)'
+        write(*,*)(RSN(k_woody_litr,L,NY,NX),L=NU(NY,NX),NM(NY,NX))
+        write(*,*)'Initial woody litter P (gP m-2): RSP(k_woody_litr)'
+        write(*,*)(RSP(k_woody_litr,L,NY,NX),L=NU(NY,NX),NM(NY,NX))
+        write(*,*)'Initial manure liter C (gC m-2): RSC(k_manure)'
+        write(*,*)(RSC(k_manure,L,NY,NX),L=NU(NY,NX),NM(NY,NX))
+        write(*,*)'Initial manure litter N (gN m-2): RSN(k_manure)'
+        write(*,*)(RSN(k_manure,L,NY,NX),L=NU(NY,NX),NM(NY,NX))
+        write(*,*)'Initial manure litter P (gP m-2): RSP(k_manure)'
+        write(*,*)(RSP(k_manure,L,NY,NX),L=NU(NY,NX),NM(NY,NX))
         write(*,'(100A)')('=',ll=1,100)
       endif
-      RSC(1,0,NY,NX)=AMAX1(ppmc,RSC(1,0,NY,NX))
-      RSN(1,0,NY,NX)=AMAX1(0.04E-06,RSN(1,0,NY,NX))
-      RSP(1,0,NY,NX)=AMAX1(0.004E-06,RSP(1,0,NY,NX))
+      RSC(k_fine_litr,0,NY,NX)=AMAX1(ppmc,RSC(k_fine_litr,0,NY,NX))
+      RSN(k_fine_litr,0,NY,NX)=AMAX1(0.04E-06,RSN(k_fine_litr,0,NY,NX))
+      RSP(k_fine_litr,0,NY,NX)=AMAX1(0.004E-06,RSP(k_fine_litr,0,NY,NX))
       SCNV(0,NY,NX)=10.0*0.098
 !
 !     SET FLAGS FOR ESTIMATING FC,WP,SCNV,SCNH IF UNKNOWN
@@ -868,15 +874,15 @@ module readiMod
             ISOIL(2,L,NY,NX)=ISOIL(2,L+1,NY,NX)
             ISOIL(3,L,NY,NX)=ISOIL(3,L+1,NY,NX)
             ISOIL(4,L,NY,NX)=ISOIL(4,L+1,NY,NX)
-            RSC(1,L,NY,NX)=0.0_r8
-            RSN(1,L,NY,NX)=0.0_r8
-            RSP(1,L,NY,NX)=0.0_r8
-            RSC(0,L,NY,NX)=0.0_r8
-            RSN(0,L,NY,NX)=0.0_r8
-            RSP(0,L,NY,NX)=0.0_r8
-            RSC(2,L,NY,NX)=0.0_r8
-            RSN(2,L,NY,NX)=0.0_r8
-            RSP(2,L,NY,NX)=0.0_r8
+            RSC(k_fine_litr,L,NY,NX)=0.0_r8
+            RSN(k_fine_litr,L,NY,NX)=0.0_r8
+            RSP(k_fine_litr,L,NY,NX)=0.0_r8
+            RSC(k_woody_litr,L,NY,NX)=0.0_r8
+            RSN(k_woody_litr,L,NY,NX)=0.0_r8
+            RSP(k_woody_litr,L,NY,NX)=0.0_r8
+            RSC(k_manure,L,NY,NX)=0.0_r8
+            RSN(k_manure,L,NY,NX)=0.0_r8
+            RSP(k_manure,L,NY,NX)=0.0_r8
           ENDIF
         ENDDO
       ENDIF
@@ -942,15 +948,15 @@ module readiMod
         ISOIL(2,L,NY,NX)=ISOIL(2,L-1,NY,NX)
         ISOIL(3,L,NY,NX)=ISOIL(3,L-1,NY,NX)
         ISOIL(4,L,NY,NX)=ISOIL(4,L-1,NY,NX)
-        RSC(1,L,NY,NX)=0.0_r8
-        RSN(1,L,NY,NX)=0.0_r8
-        RSP(1,L,NY,NX)=0.0_r8
-        RSC(0,L,NY,NX)=0.0_r8
-        RSN(0,L,NY,NX)=0.0_r8
-        RSP(0,L,NY,NX)=0.0_r8
-        RSC(2,L,NY,NX)=0.0_r8
-        RSN(2,L,NY,NX)=0.0_r8
-        RSP(2,L,NY,NX)=0.0_r8
+        RSC(k_fine_litr,L,NY,NX)=0.0_r8
+        RSN(k_fine_litr,L,NY,NX)=0.0_r8
+        RSP(k_fine_litr,L,NY,NX)=0.0_r8
+        RSC(k_woody_litr,L,NY,NX)=0.0_r8
+        RSN(k_woody_litr,L,NY,NX)=0.0_r8
+        RSP(k_woody_litr,L,NY,NX)=0.0_r8
+        RSC(k_manure,L,NY,NX)=0.0_r8
+        RSN(k_manure,L,NY,NX)=0.0_r8
+        RSP(k_manure,L,NY,NX)=0.0_r8
       ENDDO
 !
 !   CALCULATE DERIVED SOIL PROPERTIES FROM INPUT SOIL PROPERTIES
@@ -986,9 +992,9 @@ module readiMod
         CCLAY(L,NY,NX)=CCLAY(L,NY,NX)*1.0E-03_r8*AZMAX1((1.0_r8-CORGC(L,NY,NX)/0.55E+06_r8))
         CEC(L,NY,NX)=CEC(L,NY,NX)*10.0_r8
         AEC(L,NY,NX)=AEC(L,NY,NX)*10.0_r8
-        CNH4(L,NY,NX)=CNH4(L,NY,NX)/14.0_r8
-        CNO3(L,NY,NX)=CNO3(L,NY,NX)/14.0_r8
-        CPO4(L,NY,NX)=CPO4(L,NY,NX)/31.0_r8
+        CNH4(L,NY,NX)=CNH4(L,NY,NX)/natomw
+        CNO3(L,NY,NX)=CNO3(L,NY,NX)/natomw
+        CPO4(L,NY,NX)=CPO4(L,NY,NX)/patomw
         CAL(L,NY,NX)=CAL(L,NY,NX)/27.0_r8
         CFE(L,NY,NX)=CFE(L,NY,NX)/56.0_r8
         CCA(L,NY,NX)=CCA(L,NY,NX)/40.0_r8
@@ -1042,7 +1048,8 @@ module readiMod
     NL(NVS+1,NHE+1)=NL(NVS,NHE)
   endif
   IOLD=0
-  RETURN
+
+  end associate
   END SUBROUTINE readi
 
 

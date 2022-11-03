@@ -6,8 +6,7 @@ module PlantAPI
   use HfuncsMod    , only : hfuncs
   use EcoSIMSolverPar
   use UptakesMod    , only : uptakes
-  use MicBGCPars    , only : micpar
-  use GrosubPars    , only : pltpar
+  use EcoSiMParDataMod, only : micpar, pltpar
   use PlantDisturbMod, only : PrepLandscapeGrazing
   use timings      , only : start_timer, end_timer
   use EcoSIMHistMod
@@ -103,8 +102,11 @@ implicit none
 !------------------------------------------------------------------------------------------
 
   subroutine PlantAPIRecv(I,J,NY,NX)
+  !
+  !DESCRIPTION
+  !
+  use EcoSIMConfig, only : jsken=>jskenc,jcplx => jcplxc
   use PlantAPIData, only : plt_rad
-  use EcoSIMConfig, only : jsken=>jskenc
   implicit none
   integer, intent(in) :: I,J,NY,NX
 
@@ -149,10 +151,10 @@ implicit none
   FERT(17:19,I1,NY,NX)=plt_distb%FERT(17:19)
   FERT(3,I1,NY,NX) =plt_distb%FERT(3)
   IYTYP(2,I1,NY,NX)=plt_distb%IYTYP
-  FWOODE(1:npelms,0:1) =plt_allom%FWOODE(1:npelms,0:1)
-  FWODRE(1:npelms,0:1) =plt_allom%FWODRE(1:npelms,0:1)
-  FWODBE(1:npelms,0:1) =plt_allom%FWODBE(1:npelms,0:1)
-  FWODLE(1:npelms,0:1)=plt_allom%FWODLE(1:npelms,0:1)
+  FWOODE(1:npelms,1:n_pltlitrk) =plt_allom%FWOODE(1:npelms,1:n_pltlitrk)
+  FWODRE(1:npelms,1:n_pltlitrk) =plt_allom%FWODRE(1:npelms,1:n_pltlitrk)
+  FWODBE(1:npelms,1:n_pltlitrk) =plt_allom%FWODBE(1:npelms,1:n_pltlitrk)
+  FWODLE(1:npelms,1:n_pltlitrk)=plt_allom%FWODLE(1:npelms,1:n_pltlitrk)
   VOLWOU   =plt_site%VOLWOU
   DO L=1,JC
     WGLFT(L,NY,NX)=plt_biom%WGLFT(L)
@@ -160,7 +162,7 @@ implicit none
     ARLFT(L,NY,NX)=plt_morph%ARLFT(L)
   ENDDO
   DO L=NU(NY,NX),NL(NY,NX)
-    DO K=0,jcplx1
+    DO K=1,jcplx
       XOQCS(K,L,NY,NX)=plt_bgcr%XOQCS(K,L)
       XOQNS(K,L,NY,NX)=plt_bgcr%XOQNS(K,L)
       XOQPS(K,L,NY,NX)=plt_bgcr%XOQPS(K,L)
@@ -182,11 +184,11 @@ implicit none
     ROXYX(L,NY,NX) =plt_bgcr%ROXYX(L)
     TUPHT(L,NY,NX) =plt_ew%TUPHT(L)
     TUPWTR(L,NY,NX)=plt_ew%TUPWTR(L)
-    DO  N=0,1
-      DO  K=1,jcplx1
-        CSNT(K,N,L,NY,NX)=plt_bgcr%CSNT(K,N,L)
-        ZSNT(K,N,L,NY,NX)=plt_bgcr%ZSNT(K,N,L)
-        PSNT(K,N,L,NY,NX)=plt_bgcr%PSNT(K,N,L)
+    DO  K=1,micpar%n_pltlitrk
+      DO NE=1,npelms
+        DO  M=1,jsken
+          ESNT(M,NE,K,L,NY,NX)=plt_bgcr%ESNT(M,NE,K,L)
+        ENDDO
       ENDDO
     ENDDO
   ENDDO
@@ -223,7 +225,7 @@ implicit none
     TUPNOB(L,NY,NX)=plt_bgcr%TUPNOB(L)
     TUPH1P(L,NY,NX)=plt_bgcr%TUPH1P(L)
     TUPH2P(L,NY,NX)=plt_bgcr%TUPH2P(L)
-    DO  K=0,jcplx1
+    DO  K=1,jcplx
       TDFOMP(K,L,NY,NX)=plt_bgcr%TDFOMP(K,L)
       TDFOMN(K,L,NY,NX)=plt_bgcr%TDFOMN(K,L)
       TDFOMC(K,L,NY,NX)=plt_bgcr%TDFOMC(K,L)
@@ -394,7 +396,7 @@ implicit none
     ENDDO
 
     DO L=0,JZ
-      DO K=0,micpar%n_pltlitrk
+      DO K=1,micpar%n_pltlitrk
         DO M=1,jsken
           ESNC(M,1:npelms,K,L,NZ,NY,NX)=plt_bgcr%ESNC(M,1:npelms,K,L,NZ)
         ENDDO
@@ -649,7 +651,7 @@ implicit none
 
     DO L=NU(NY,NX),NI(NZ,NY,NX)
 
-      DO K=0,jcplx1
+      DO K=1,jcplx
         DO N=1,2
           RDFOMC(N,K,L,NZ,NY,NX)=plt_rbgc%RDFOMC(N,K,L,NZ)
           RDFOMN(N,K,L,NZ,NY,NX)=plt_rbgc%RDFOMN(N,K,L,NZ)
@@ -698,8 +700,11 @@ implicit none
 !------------------------------------------------------------------------------------------
 
   subroutine PlantAPISend(I,J,NY,NX)
+  !
+  !DESCRIPTION
+  !Send data to plant model
   use PlantAPIData, only : plt_rad
-  use EcoSIMConfig, only : jsken=>jskenc
+  use EcoSIMConfig, only : jsken=>jskenc,jcplx => jcplxc
   implicit none
   integer, intent(in) :: I,J,NY,NX
   integer :: K,L,M,N,NB,NZ,NR,I1,NE
@@ -866,7 +871,7 @@ implicit none
     plt_soilchem%ZNH3B(L) =ZNH3B(L,NY,NX)
     plt_soilchem%ZVSGL(L) =ZVSGL(L,NY,NX)
     plt_site%DLYR3(L)     =DLYR(3,L,NY,NX)
-    DO K=0,jcplx1
+    DO K=1,jcplx
       plt_soilchem%FOSRH(K,L)=FOSRH(K,L,NY,NX)
       plt_soilchem%OQC(K,L)=OQC(K,L,NY,NX)
       plt_soilchem%OQN(K,L)=OQN(K,L,NY,NX)
@@ -1060,13 +1065,13 @@ implicit none
     plt_morph%ARLFT(L)=ARLFT(L,NY,NX)
   ENDDO
 
-  plt_allom%FWOODE(1:npelms,0:1)=FWOODE(1:npelms,0:1)
-  plt_allom%FWODRE(1:npelms,0:1)=FWODRE(1:npelms,0:1)
-  plt_allom%FWODBE(1:npelms,0:1)=FWODBE(1:npelms,0:1)
-  plt_allom%FWODLE(1:npelms,0:1)=FWODLE(1:npelms,0:1)
+  plt_allom%FWOODE(1:npelms,1:n_pltlitrk)=FWOODE(1:npelms,1:n_pltlitrk)
+  plt_allom%FWODRE(1:npelms,1:n_pltlitrk)=FWODRE(1:npelms,1:n_pltlitrk)
+  plt_allom%FWODBE(1:npelms,1:n_pltlitrk)=FWODBE(1:npelms,1:n_pltlitrk)
+  plt_allom%FWODLE(1:npelms,1:n_pltlitrk)=FWODLE(1:npelms,1:n_pltlitrk)
 
   DO L=0,NL(NY,NX)
-    DO K=0,jcplx1
+    DO K=1,jcplx
       plt_bgcr%XOQCS(K,L)=XOQCS(K,L,NY,NX)
       plt_bgcr%XOQNS(K,L)=XOQNS(K,L,NY,NX)
       plt_bgcr%XOQPS(K,L)=XOQPS(K,L,NY,NX)
@@ -1085,11 +1090,11 @@ implicit none
     plt_bgcr%ROXYX(L)=ROXYX(L,NY,NX)
     plt_ew%TUPHT(L)  =TUPHT(L,NY,NX)
     plt_ew%TUPWTR(L) =TUPWTR(L,NY,NX)
-    DO  N=0,1
-      DO  K=1,jcplx1
-        plt_bgcr%CSNT(K,N,L)=CSNT(K,N,L,NY,NX)
-        plt_bgcr%ZSNT(K,N,L)=ZSNT(K,N,L,NY,NX)
-        plt_bgcr%PSNT(K,N,L)=PSNT(K,N,L,NY,NX)
+    DO  K=1,micpar%n_pltlitrk
+      DO NE=1,npelms
+        DO  M=1,jsken
+          plt_bgcr%ESNT(M,NE,K,L)=ESNT(M,NE,K,L,NY,NX)
+        ENDDO
       ENDDO
     ENDDO
   ENDDO
@@ -1125,7 +1130,7 @@ implicit none
     plt_bgcr%TUPNOB(L)=TUPNOB(L,NY,NX)
     plt_bgcr%TUPH1P(L)=TUPH1P(L,NY,NX)
     plt_bgcr%TUPH2P(L)=TUPH2P(L,NY,NX)
-    DO  K=0,jcplx1
+    DO  K=1,jcplx
       plt_bgcr%TDFOMP(K,L)=TDFOMP(K,L,NY,NX)
       plt_bgcr%TDFOMN(K,L)=TDFOMN(K,L,NY,NX)
       plt_bgcr%TDFOMC(K,L)=TDFOMC(K,L,NY,NX)
@@ -1308,7 +1313,7 @@ implicit none
 
 
     DO L=1,NL(NY,NX)
-      DO K=0,jcplx1
+      DO K=1,jcplx
         DO N=1,2
           plt_rbgc%RDFOMC(N,K,L,NZ)=RDFOMC(N,K,L,NZ,NY,NX)
           plt_rbgc%RDFOMN(N,K,L,NZ)=RDFOMN(N,K,L,NZ,NY,NX)
@@ -1571,7 +1576,7 @@ implicit none
       ENDDO
     ENDDO
     DO L=0,NJ(NY,NX)
-      DO K=0,micpar%n_pltlitrk
+      DO K=1,micpar%n_pltlitrk
         DO M=1,jsken
           plt_bgcr%ESNC(M,1:npelms,K,L,NZ)=ESNC(M,1:npelms,K,L,NZ,NY,NX)
         enddo

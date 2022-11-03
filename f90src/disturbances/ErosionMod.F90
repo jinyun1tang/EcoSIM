@@ -536,7 +536,7 @@ module ErosionMod
 !
 !     ORGANIC MATTER
 !
-              DO  K=0,jcplx1
+              DO  K=1,jcplx
                 DO NO=1,NFGs
                   DO NGL=JGnio(NO),JGnfo(NO)
                     DO M=1,nlbiomcp
@@ -558,7 +558,7 @@ module ErosionMod
                 ENDDO
               ENDDO
 
-              DO  K=0,jcplx1
+              DO  K=1,jcplx
                 DO  M=1,ndbiomcp
                   ORCER(M,K,N,2,N5,N4)=FSEDER*ORC(M,K,NU(N2,N1),N2,N1)
                   ORNER(M,K,N,2,N5,N4)=FSEDER*ORN(M,K,NU(N2,N1),N2,N1)
@@ -637,7 +637,7 @@ module ErosionMod
 !
 !     ORGANIC MATTER
 !
-              DO  K=0,jcplx1
+              DO  K=1,jcplx
                 DO  NO=1,NFGs
                   DO NGL=JGnio(NO),JGnfo(NO)
                     DO  M=1,nlbiomcp
@@ -659,7 +659,7 @@ module ErosionMod
                 ENDDO
               enddo
 
-              DO  K=0,jcplx1
+              DO  K=1,jcplx
                 DO  M=1,ndbiomcp
                   ORCER(M,K,N,2,N5,N4)=0._r8
                   ORNER(M,K,N,2,N5,N4)=0._r8
@@ -762,7 +762,7 @@ module ErosionMod
 !
 !     ORGANIC MATTER
 !
-                DO  K=0,jcplx1
+                DO  K=1,jcplx
                   DO  NO=1,NFGs
                     DO NGL=JGnio(NO),JGnfo(NO)
                       DO  M=1,nlbiomcp
@@ -783,7 +783,7 @@ module ErosionMod
                   enddo
                 ENDDO
 
-                DO  K=0,jcplx1
+                DO  K=1,jcplx
                   DO  M=1,ndbiomcp
                     ORCER(M,K,N,1,N5B,N4B)=FSEDER*ORC(M,K,NU(N2,N1),N2,N1)
                     ORNER(M,K,N,1,N5B,N4B)=FSEDER*ORN(M,K,NU(N2,N1),N2,N1)
@@ -862,7 +862,7 @@ module ErosionMod
 !
 !     ORGANIC MATTER
 !
-                DO  K=0,jcplx1
+                DO  K=1,jcplx
                   DO  NO=1,NFGs
                     DO NGL=JGnio(NO),JGnfo(NO)
                       DO  M=1,nlbiomcp
@@ -884,7 +884,7 @@ module ErosionMod
                   ENDDO
                 enddo
 
-                DO  K=0,jcplx1
+                DO  K=1,jcplx
                   DO  M=1,ndbiomcp
                     ORCER(M,K,N,1,N5B,N4B)=0._r8
                     ORNER(M,K,N,1,N5B,N4B)=0._r8
@@ -1047,7 +1047,7 @@ module ErosionMod
 !
 !     ORGANIC MATTER
 !
-              DO  K=0,jcplx1
+              DO  K=1,jcplx
                 DO  NO=1,NFGs
                   DO NGL=JGnio(NO),JGnfo(NO)
                     DO  M=1,nlbiomcp
@@ -1067,7 +1067,7 @@ module ErosionMod
                   enddo
                 ENDDO
               enddo
-              DO  K=0,jcplx1
+              DO  K=1,jcplx
                 DO  M=1,ndbiomcp
                   ORCER(M,K,N,NN,M5,M4)=0._r8
                   ORNER(M,K,N,NN,M5,M4)=0._r8
@@ -1153,7 +1153,7 @@ module ErosionMod
 !
 !     ORGANIC MATTER
 !
-              DO  K=0,jcplx1
+              DO  K=1,jcplx
                 DO NO=1,NFGs
                   DO NGL=JGnio(NO),JGnfo(NO)
                     DO M=1,nlbiomcp
@@ -1174,7 +1174,7 @@ module ErosionMod
                 ENDDO
               ENDDO
 
-              DO  K=0,jcplx1
+              DO  K=1,jcplx
                 DO  M=1,ndbiomcp
                   ORCER(M,K,N,NN,M5,M4)=FSEDER*ORC(M,K,NU(N2,N1),N2,N1)
                   ORNER(M,K,N,NN,M5,M4)=FSEDER*ORN(M,K,NU(N2,N1),N2,N1)

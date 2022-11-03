@@ -13,6 +13,8 @@ PROGRAM main
   use EcoSIMCtrlDataType
   use EcoSIMHistMod
   use EcosimConst
+  USE fileUtil          , ONLY : iulog
+  use EcoSIMConfig      , only : case_name
   implicit none
 
   character(len=*), parameter :: mod_filename = __FILE__
@@ -22,7 +24,6 @@ PROGRAM main
 
   CHARACTER(len=640):: BUF
   character(len=80):: runfile
-  character(len=36):: case_name
   character(len=36):: nmlfile
   logical :: is_dos
   integer :: nmicbguilds
@@ -31,13 +32,13 @@ PROGRAM main
 
   is_dos=.false.
 
-  write(*,*)'obtain working directory'
+  write(iulog,*)'obtain working directory'
   CALL GETCWD(BUF)
 !
 ! IDENTIFY OPERATING SYSTEM: DOS OR UNIX
 
   IF((.NOT.(BUF(1:1).EQ.'/'.OR.BUF(1:1).EQ.'~')).AND.BUF(2:2).EQ.':')THEN
-    write(*,*)'Running ecosim on dos system'
+    write(iulog,*)'Running ecosim on dos system'
     is_dos=.true.
 !   CALL GETARG(1,BUF)
 !   OPEN(5,FILE=BUF,STATUS='OLD')
@@ -46,17 +47,17 @@ PROGRAM main
     PREFIX='.\\'  ! location where input files are put
 !   make output directory
   ELSE
-    write(*,*)'Running ecosim on unix system'
+    write(iulog,*)'Running ecosim on unix system'
 !   make output directory
   ENDIF
 !
   CALL GETARG(1,nmlfile)
 
-  write(*,*)'read namelist'
+  write(iulog,*)'read namelist'
   call readnamelist(trim(nmlfile),runfile, case_name, prefix, &
     do_rgres,LYRG,lverb, nmicbguilds)
 
-  write(*,*)'read runfile',trim(runfile)
+  write(iulog,*)'read runfile',trim(runfile)
   OPEN(5,FILE=runfile,STATUS='OLD')
 !
 ! READ INPUT FILES
@@ -69,7 +70,7 @@ PROGRAM main
     outdir=trim(buf)//'/'//trim(case_name)//'_outputs/'
   endif
   call system('mkdir -p '//trim(outdir))
-  write(*,*)'input files at:',trim(prefix)
+  write(iulog,*)'input files at:',trim(prefix)
   IGO=0
 !
 ! NUMBER OF COLUMNS AND ROWS
@@ -97,14 +98,14 @@ PROGRAM main
 !   NUMBER OF SCENES IN THE NEXT SCENARIO OF THE MODEL RUN
 !   AND THE NUMBER OF TIMES THIS SCENARIO IS TO BE EXECUTED
 !
-  DO 105 NEX=1,NAX
+  D105: DO NEX=1,NAX
     READ(5,*)NAY,NDY
     NA(NEX)=NAY
     ND(NEX)=NDY
 !
 !   FOR EACH SCENE IN THIS SCENARIO:
 !
-    DO 110 NE=1,NA(NEX)
+    D110: DO NE=1,NA(NEX)
 !
 !     WEATHER FILE
 !
@@ -124,11 +125,11 @@ PROGRAM main
 !
 !     OUTPUT DATA CONTROL
 !
-      DO 115 N=21,30
+      D115: DO N=21,30
         READ(5,10)DATAC(N,NE,NEX)
-115   CONTINUE
-110   CONTINUE
-105   CONTINUE
+      ENDDO D115   
+    ENDDO D110
+  ENDDO D105
 !
 !  RUN THIS SCRIPT
 !

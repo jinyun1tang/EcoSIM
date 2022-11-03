@@ -161,7 +161,7 @@ contains
     ELSE
       VFLW=VFLWX
     ENDIF
-    DO  K=0,jcplx1
+    DO  K=1,jcplx
       RFLOC(K)=VFLW*AZMAX1(OQC2(K,0,NY,NX))
       RFLON(K)=VFLW*AZMAX1(OQN2(K,0,NY,NX))
       RFLOP(K)=VFLW*AZMAX1(OQP2(K,0,NY,NX))
@@ -207,7 +207,7 @@ contains
     ELSE
       VFLW=-VFLWX
     ENDIF
-    DO K=0,jcplx1
+    DO K=1,jcplx
       RFLOC(K)=VFLW*AZMAX1(OQC2(K,NU(NY,NX),NY,NX))
       RFLON(K)=VFLW*AZMAX1(OQN2(K,NU(NY,NX),NY,NX))
       RFLOP(K)=VFLW*AZMAX1(OQP2(K,NU(NY,NX),NY,NX))
@@ -325,7 +325,7 @@ contains
 !             :*ZN3*=NH3,*H2G*=H2
 !     C*1,C*2=solute concentration in litter,soil surface
 !
-    DO  K=0,jcplx1
+    DO  K=1,jcplx
       DFVOC(K)=DIFOC*(COQC1(K)-COQC2(K))
       DFVON(K)=DIFON*(COQN1(K)-COQN2(K))
       DFVOP(K)=DIFOP*(COQP1(K)-COQP2(K))
@@ -350,7 +350,7 @@ contains
     DFVP1B=DIFPO*(CP14S1-CP14B2)*VLPOB(NU(NY,NX),NY,NX)
     DFVPOB=DIFPO*(CPO4S1-CPO4B2)*VLPOB(NU(NY,NX),NY,NX)
   ELSE
-    DO  K=0,jcplx1
+    DO  K=1,jcplx
       DFVOC(K)=0.0_r8
       DFVON(K)=0.0_r8
       DFVOP(K)=0.0_r8
@@ -381,6 +381,7 @@ contains
 !------------------------------------------------------------------------------------------
 
   subroutine TotalPoreFluxAdjacentCell(NY,NX)
+  use EcoSiMParDataMod, only : micpar
   implicit none
 
   integer, intent(in) :: NY, NX
@@ -396,7 +397,7 @@ contains
 !     RFL*=convective flux between surface litter and soil surface
 !     DFV*=diffusive solute flux between litter and soil surface
 !
-  DO K=0,2
+  DO K=1,micpar%n_litrsfk
     ROCFLS(K,3,0,NY,NX)=ROCFL0(K,NY,NX)-RFLOC(K)-DFVOC(K)
     RONFLS(K,3,0,NY,NX)=RONFL0(K,NY,NX)-RFLON(K)-DFVON(K)
     ROPFLS(K,3,0,NY,NX)=ROPFL0(K,NY,NX)-RFLOP(K)-DFVOP(K)
@@ -442,7 +443,7 @@ contains
 !     X*FLS=hourly convective + diffusive solute flux
 !     X*FLW,X*FLB= hourly convective + diffusive solute flux in non-band,band
 !
-  DO K=0,2
+  DO K=1,micpar%n_litrsfk
     XOCFLS(K,3,0,NY,NX)=XOCFLS(K,3,0,NY,NX)-RFLOC(K)-DFVOC(K)
     XONFLS(K,3,0,NY,NX)=XONFLS(K,3,0,NY,NX)-RFLON(K)-DFVON(K)
     XOPFLS(K,3,0,NY,NX)=XOPFLS(K,3,0,NY,NX)-RFLOP(K)-DFVOP(K)
@@ -514,7 +515,7 @@ contains
     ELSE
       VFLW=VFLWX
     ENDIF
-    DO  K=0,jcplx1
+    DO  K=1,jcplx
       RFLOC(K)=VFLW*AZMAX1(OQCH2(K,NU(NY,NX),NY,NX))
       RFLON(K)=VFLW*AZMAX1(OQNH2(K,NU(NY,NX),NY,NX))
       RFLOP(K)=VFLW*AZMAX1(OQPH2(K,NU(NY,NX),NY,NX))
@@ -547,7 +548,7 @@ contains
     ELSE
       VFLW=-VFLWX
     ENDIF
-    DO  K=0,jcplx1
+    DO  K=1,jcplx
       RFLOC(K)=VFLW*AZMAX1(OQC2(K,NU(NY,NX),NY,NX))
       RFLON(K)=VFLW*AZMAX1(OQN2(K,NU(NY,NX),NY,NX))
       RFLOP(K)=VFLW*AZMAX1(OQP2(K,NU(NY,NX),NY,NX))
@@ -575,7 +576,7 @@ contains
 !     NO MACROPORE TO MICROPORE TRANSFER
 !
   ELSE
-    DO  K=0,jcplx1
+    DO  K=1,jcplx
       RFLOC(K)=0.0_r8
       RFLON(K)=0.0_r8
       RFLOP(K)=0.0_r8
@@ -619,7 +620,7 @@ contains
   IF(VOLWHM(M,NU(NY,NX),NY,NX).GT.ZEROS2(NY,NX))THEN
     VOLWHS=AMIN1(XFRS*VOLT(NU(NY,NX),NY,NX),VOLWHM(M,NU(NY,NX),NY,NX))
     VOLWT=VOLWM(M,NU(NY,NX),NY,NX)+VOLWHS
-    DO  K=0,jcplx1
+    DO  K=1,jcplx
       DFVOC(K)=XNPH*(AZMAX1(OQCH2(K,NU(NY,NX),NY,NX))*VOLWM(M,NU(NY,NX),NY,NX) &
         -AZMAX1(OQC2(K,NU(NY,NX),NY,NX))*VOLWHS)/VOLWT
       DFVON(K)=XNPH*(AZMAX1(OQNH2(K,NU(NY,NX),NY,NX))*VOLWM(M,NU(NY,NX),NY,NX) &
@@ -678,7 +679,7 @@ contains
       *VOLWM(M,NU(NY,NX),NY,NX)-AZMAX1(H2POB2(NU(NY,NX),NY,NX))*VOLWHS)/VOLWT &
       *VLPOB(NU(NY,NX),NY,NX)
   ELSE
-    DO  K=0,jcplx1
+    DO  K=1,jcplx
       DFVOC(K)=0.0_r8
       DFVON(K)=0.0_r8
       DFVOP(K)=0.0_r8
@@ -714,7 +715,7 @@ contains
 !             :NH4=NH4,NH3=NH3,NO3=NO3,NO2=NO2,P14=HPO4,PO4=H2PO4 in non-band
 !             :N4B=NH4,N3B=NH3,NOB=NO3,N2B=NO2,P1B=HPO4,POB=H2PO4 in band
 !
-  DO  K=0,jcplx1
+  DO  K=1,jcplx
     ROCFXS(K,NU(NY,NX),NY,NX)=RFLOC(K)+DFVOC(K)
     RONFXS(K,NU(NY,NX),NY,NX)=RFLON(K)+DFVON(K)
     ROPFXS(K,NU(NY,NX),NY,NX)=RFLOP(K)+DFVOP(K)
@@ -748,7 +749,7 @@ contains
 !             :NH4=NH4,NH3=NH3,NO3=NO3,NO2=NO2,P14=HPO4,PO4=H2PO4 in non-band
 !             :N4B=NH4,N3B=NH3,NOB=NO3,N2B=NO2,P1B=HPO4,POB=H2PO4 in band
 !
-  DO  K=0,jcplx1
+  DO  K=1,jcplx
     XOCFXS(K,NU(NY,NX),NY,NX)=XOCFXS(K,NU(NY,NX),NY,NX)+ROCFXS(K,NU(NY,NX),NY,NX)
     XONFXS(K,NU(NY,NX),NY,NX)=XONFXS(K,NU(NY,NX),NY,NX)+RONFXS(K,NU(NY,NX),NY,NX)
     XOPFXS(K,NU(NY,NX),NY,NX)=XOPFXS(K,NU(NY,NX),NY,NX)+ROPFXS(K,NU(NY,NX),NY,NX)
@@ -802,7 +803,7 @@ contains
     ELSE
       VFLW=VFLWX
     ENDIF
-    DO  K=0,jcplx1
+    DO  K=1,jcplx
       RQROC0(K,N2,N1)=VFLW*AZMAX1(OQC2(K,0,N2,N1))
       RQRON0(K,N2,N1)=VFLW*AZMAX1(OQN2(K,0,N2,N1))
       RQROP0(K,N2,N1)=VFLW*AZMAX1(OQP2(K,0,N2,N1))
@@ -821,7 +822,7 @@ contains
     RQRH1P0(N2,N1)=VFLW*AZMAX1(H1PO42(0,N2,N1))
     RQRH2P0(N2,N1)=VFLW*AZMAX1(H2PO42(0,N2,N1))
   ELSE
-    DO K=0,jcplx1
+    DO K=1,jcplx
       RQROC0(K,N2,N1)=0.0_r8
       RQRON0(K,N2,N1)=0.0_r8
       RQROP0(K,N2,N1)=0.0_r8
@@ -879,7 +880,7 @@ contains
       IF(QRM(M,N2,N1).GT.ZEROS(N2,N1))THEN
         IF(NN.EQ.1)THEN
           FQRM=QRMN(M,N,2,N5,N4)/QRM(M,N2,N1)
-          DO  K=0,jcplx1
+          DO  K=1,jcplx
             RQROC(K,N,2,N5,N4)=RQROC0(K,N2,N1)*FQRM
             RQRON(K,N,2,N5,N4)=RQRON0(K,N2,N1)*FQRM
             RQROP(K,N,2,N5,N4)=RQROP0(K,N2,N1)*FQRM
@@ -903,7 +904,7 @@ contains
 !     XQR*=hourly solute in runoff
 !     RQR*=solute in runoff
 !
-          DO  K=0,jcplx1
+          DO  K=1,jcplx
             XOCQRS(K,N,2,N5,N4)=XOCQRS(K,N,2,N5,N4)+RQROC(K,N,2,N5,N4)
             XONQRS(K,N,2,N5,N4)=XONQRS(K,N,2,N5,N4)+RQRON(K,N,2,N5,N4)
             XOPQRS(K,N,2,N5,N4)=XOPQRS(K,N,2,N5,N4)+RQROP(K,N,2,N5,N4)
@@ -922,7 +923,7 @@ contains
           XP1QRW(N,2,N5,N4)=XP1QRW(N,2,N5,N4)+RQRH1P(N,2,N5,N4)
           XP4QRW(N,2,N5,N4)=XP4QRW(N,2,N5,N4)+RQRH2P(N,2,N5,N4)
         ELSE
-          DO K=0,jcplx1
+          DO K=1,jcplx
             RQROC(K,N,2,N5,N4)=0.0_r8
             RQRON(K,N,2,N5,N4)=0.0_r8
             RQROP(K,N,2,N5,N4)=0.0_r8
@@ -947,7 +948,7 @@ contains
         IF(NN.EQ.2)THEN
           IF(N4B.GT.0.AND.N5B.GT.0)THEN
             FQRM=QRMN(M,N,1,N5B,N4B)/QRM(M,N2,N1)
-            DO  K=0,jcplx1
+            DO  K=1,jcplx
               RQROC(K,N,1,N5B,N4B)=RQROC0(K,N2,N1)*FQRM
               RQRON(K,N,1,N5B,N4B)=RQRON0(K,N2,N1)*FQRM
               RQROP(K,N,1,N5B,N4B)=RQROP0(K,N2,N1)*FQRM
@@ -965,7 +966,7 @@ contains
             RQRNO2(N,1,N5B,N4B)=RQRNO20(N2,N1)*FQRM
             RQRH1P(N,1,N5B,N4B)=RQRH1P0(N2,N1)*FQRM
             RQRH2P(N,1,N5B,N4B)=RQRH2P0(N2,N1)*FQRM
-            DO K=0,jcplx1
+            DO K=1,jcplx
               XOCQRS(K,N,1,N5B,N4B)=XOCQRS(K,N,1,N5B,N4B)+RQROC(K,N,1,N5B,N4B)
               XONQRS(K,N,1,N5B,N4B)=XONQRS(K,N,1,N5B,N4B)+RQRON(K,N,1,N5B,N4B)
               XOPQRS(K,N,1,N5B,N4B)=XOPQRS(K,N,1,N5B,N4B)+RQROP(K,N,1,N5B,N4B)
@@ -984,7 +985,7 @@ contains
             XP1QRW(N,1,N5B,N4B)=XP1QRW(N,1,N5B,N4B)+RQRH1P(N,1,N5B,N4B)
             XP4QRW(N,1,N5B,N4B)=XP4QRW(N,1,N5B,N4B)+RQRH2P(N,1,N5B,N4B)
           ELSE
-            DO  K=0,jcplx1
+            DO  K=1,jcplx
               RQROC(K,N,1,N5B,N4B)=0.0_r8
               RQRON(K,N,1,N5B,N4B)=0.0_r8
               RQROP(K,N,1,N5B,N4B)=0.0_r8
@@ -1005,7 +1006,7 @@ contains
           ENDIF
         ENDIF
       ELSE
-        DO K=0,jcplx1
+        DO K=1,jcplx
           RQROC(K,N,2,N5,N4)=0.0_r8
           RQRON(K,N,2,N5,N4)=0.0_r8
           RQROP(K,N,2,N5,N4)=0.0_r8
@@ -1024,7 +1025,7 @@ contains
         RQRH1P(N,2,N5,N4)=0.0_r8
         RQRH2P(N,2,N5,N4)=0.0_r8
         IF(N4B.GT.0.AND.N5B.GT.0)THEN
-          DO  K=0,jcplx1
+          DO  K=1,jcplx
             RQROC(K,N,1,N5B,N4B)=0.0_r8
             RQRON(K,N,1,N5B,N4B)=0.0_r8
             RQROP(K,N,1,N5B,N4B)=0.0_r8
@@ -1335,7 +1336,7 @@ contains
     DFGSN2=ZNSGL2(0,NY,NX)*TORT0
     DFGSN3=ZVSGL2(0,NY,NX)*TORT0
     DFGSHL=HLSGL2(0,NY,NX)*TORT0
-    DO  K=0,jcplx1
+    DO  K=1,jcplx
       COQC1(K)=AZMAX1(OQC2(K,0,NY,NX)/VOLWM(M,0,NY,NX))
       COQN1(K)=AZMAX1(OQN2(K,0,NY,NX)/VOLWM(M,0,NY,NX))
       COQP1(K)=AZMAX1(OQP2(K,0,NY,NX)/VOLWM(M,0,NY,NX))
@@ -1466,7 +1467,7 @@ contains
     DFGSN2=ZNSGL2(NU(NY,NX),NY,NX)*TORT1
     DFGSN3=ZVSGL2(NU(NY,NX),NY,NX)*TORT1
     DFGSHL=HLSGL2(NU(NY,NX),NY,NX)*TORT1
-    DO  K=0,jcplx1
+    DO  K=1,jcplx
       COQC2(K)=AZMAX1(OQC2(K,NU(NY,NX),NY,NX)/VOLWM(M,NU(NY,NX),NY,NX))
       COQN2(K)=AZMAX1(OQN2(K,NU(NY,NX),NY,NX)/VOLWM(M,NU(NY,NX),NY,NX))
       COQP2(K)=AZMAX1(OQP2(K,NU(NY,NX),NY,NX)/VOLWM(M,NU(NY,NX),NY,NX))

@@ -4,9 +4,9 @@ module batchmod
   use minimathMod    , only : addone
   use data_kind_mod  , only : r8 => SHR_KIND_R8
   use ModelStatusType, only : model_status_type
-  use MicBGCPars     , only : micpar
-  use MicForcTypeMod , only : micforctype
-  use MicFLuxTypeMod , only : micfluxtype
+  use EcoSiMParDataMod  , only : micpar
+  use MicForcTypeMod    , only : micforctype
+  use MicFLuxTypeMod    , only : micfluxtype
   use MicStateTraitTypeMod, only : micsttype
   use fileUtil
   use minimathmod    , only : AZMAX1,AZMIN1
@@ -62,31 +62,30 @@ contains
     NMICBSO  => micpar%NMICBSO  , &
     NMICBSA  => micpar%NMICBSA  , &
     jcplx    => micpar%jcplx    , &
-    jcplx1   => micpar%jcplx1   , &
     JG       => micpar%jguilds    &
   )
 
-  ystates0l(cid_oqc_b:cid_oqc_e)=forc%OQC(0:jcplx1)
-  ystates0l(cid_oqn_b:cid_oqn_e)=forc%OQN(0:jcplx1)
-  ystates0l(cid_oqp_b:cid_oqp_e)=forc%OQP(0:jcplx1)
-  ystates0l(cid_oqa_b:cid_oqa_e)=forc%OQA(0:jcplx1)
-  ystates0l(cid_ohc_b:cid_ohc_e)=forc%OHC(0:jcplx1)
-  ystates0l(cid_ohn_b:cid_ohn_e)=forc%OHN(0:jcplx1)
-  ystates0l(cid_ohp_b:cid_ohp_e)=forc%OHP(0:jcplx1)
-  ystates0l(cid_oha_b:cid_oha_e)=forc%OHA(0:jcplx1)
-  ystates0l(cid_osc_b:cid_osc_e)=reshape(forc%OSC(1:jsken,0:jcplx1),(/jsken*jcplx/))
-  ystates0l(cid_osa_b:cid_osa_e)=reshape(forc%OSA(1:jsken,0:jcplx1),(/jsken*jcplx/))
-  ystates0l(cid_osn_b:cid_osn_e)=reshape(forc%OSN(1:jsken,0:jcplx1),(/jsken*jcplx/))
-  ystates0l(cid_osp_b:cid_osp_e)=reshape(forc%OSP(1:jsken,0:jcplx1),(/jsken*jcplx/))
-  ystates0l(cid_orc_b:cid_orc_e)=reshape(forc%ORC(1:ndbiomcp,0:jcplx1),(/ndbiomcp*jcplx/))
-  ystates0l(cid_orn_b:cid_orn_e)=reshape(forc%ORN(1:ndbiomcp,0:jcplx1),(/ndbiomcp*jcplx/))
-  ystates0l(cid_orp_b:cid_orp_e)=reshape(forc%ORP(1:ndbiomcp,0:jcplx1),(/ndbiomcp*jcplx/))
+  ystates0l(cid_oqc_b:cid_oqc_e)=forc%OQC(1:jcplx)
+  ystates0l(cid_oqn_b:cid_oqn_e)=forc%OQN(1:jcplx)
+  ystates0l(cid_oqp_b:cid_oqp_e)=forc%OQP(1:jcplx)
+  ystates0l(cid_oqa_b:cid_oqa_e)=forc%OQA(1:jcplx)
+  ystates0l(cid_ohc_b:cid_ohc_e)=forc%OHC(1:jcplx)
+  ystates0l(cid_ohn_b:cid_ohn_e)=forc%OHN(1:jcplx)
+  ystates0l(cid_ohp_b:cid_ohp_e)=forc%OHP(1:jcplx)
+  ystates0l(cid_oha_b:cid_oha_e)=forc%OHA(1:jcplx)
+  ystates0l(cid_osc_b:cid_osc_e)=reshape(forc%OSC(1:jsken,1:jcplx),(/jsken*jcplx/))
+  ystates0l(cid_osa_b:cid_osa_e)=reshape(forc%OSA(1:jsken,1:jcplx),(/jsken*jcplx/))
+  ystates0l(cid_osn_b:cid_osn_e)=reshape(forc%OSN(1:jsken,1:jcplx),(/jsken*jcplx/))
+  ystates0l(cid_osp_b:cid_osp_e)=reshape(forc%OSP(1:jsken,1:jcplx),(/jsken*jcplx/))
+  ystates0l(cid_orc_b:cid_orc_e)=reshape(forc%ORC(1:ndbiomcp,1:jcplx),(/ndbiomcp*jcplx/))
+  ystates0l(cid_orn_b:cid_orn_e)=reshape(forc%ORN(1:ndbiomcp,1:jcplx),(/ndbiomcp*jcplx/))
+  ystates0l(cid_orp_b:cid_orp_e)=reshape(forc%ORP(1:ndbiomcp,1:jcplx),(/ndbiomcp*jcplx/))
 
-  ystates0l(cid_omc_b:cid_omc_e)=reshape(forc%OMC(1:nlbiomcp,1:NMICBSO,0:jcplx1),&
+  ystates0l(cid_omc_b:cid_omc_e)=reshape(forc%OMC(1:nlbiomcp,1:NMICBSO,1:jcplx),&
     (/nlbiomcp*NMICBSO*jcplx/))
-  ystates0l(cid_omn_b:cid_omn_e)=reshape(forc%OMN(1:nlbiomcp,1:NMICBSO,0:jcplx1),&
+  ystates0l(cid_omn_b:cid_omn_e)=reshape(forc%OMN(1:nlbiomcp,1:NMICBSO,1:jcplx),&
     (/nlbiomcp*NMICBSO*jcplx/))
-  ystates0l(cid_omp_b:cid_omp_e)=reshape(forc%OMP(1:nlbiomcp,1:NMICBSO,0:jcplx1),&
+  ystates0l(cid_omp_b:cid_omp_e)=reshape(forc%OMP(1:nlbiomcp,1:NMICBSO,1:jcplx),&
     (/nlbiomcp*NMICBSO*jcplx/))
   ystates0l(cid_omcff_b:cid_omcff_e)=reshape(forc%OMCff(1:nlbiomcp,1:NMICBSA),&
     (/nlbiomcp*NMICBSA/))
@@ -106,7 +105,6 @@ contains
 ! configure the batch mode of the soil bgc
   use MicStateTraitTypeMod, only : micsttype
   use MicForcTypeMod      , only : micforctype
-  use MicBGCPars          , only : micpar
   implicit none
   integer, intent(in) :: nvars
   real(r8), intent(in) :: ystates0l(nvars)
@@ -127,12 +125,15 @@ contains
     ndbiomcp => micpar%ndbiomcp , &
     NMICBSO  => micpar%NMICBSO  , &
     NMICBSA  => micpar%NMICBSA  , &
+    k_humus  => micpar%k_humus  , &
+    k_POM    => micpar%k_POM    , &
+    icarbhyro=> micpar%icarbhyro, &
+    iprotein => micpar%iprotein , &
     jsken    => micpar%jsken    , &
     NFGs     => micpar%NFGs     , &
-    jcplx1   => micpar%jcplx1   , &
+    jcplx    => micpar%jcplx    , &
     JG       => micpar%jguilds    &
   )
-  jcplx=jcplx1+1
   micfor%ZERO  =ZERO
   micfor%ZEROS2=ZEROS2
   micfor%ZEROS =ZERO
@@ -175,8 +176,8 @@ contains
   micfor%RN3BY =ystates0l(fid_RN3BY)
   micfor%RPOBY =ystates0l(fid_RPOBY)
   micfor%RP1BY =ystates0l(fid_RP1BY)
-  micfor%ROQCY(0:jcplx1)=ystates0l(fid_ROQCY_b:fid_ROQCY_e)
-  micfor%ROQAY(0:jcplx1)=ystates0l(fid_ROQAY_b:fid_ROQAY_e)
+  micfor%ROQCY(1:jcplx)=ystates0l(fid_ROQCY_b:fid_ROQCY_e)
+  micfor%ROQAY(1:jcplx)=ystates0l(fid_ROQAY_b:fid_ROQAY_e)
   micfor%RCH4L = 0._r8
   micfor%ROXYL = 0._r8
   micfor%CFOMC =forc%CFOMC(1:ndbiomcp)
@@ -197,15 +198,15 @@ contains
     micstt%CH1P4BU=forc%CH1P4B
     micstt%CNO3SU=forc%CNO3S
     micstt%CNO3BU=forc%CNO3B
-    micstt%OSC13U=forc%OSC(1,3)
-    micstt%OSN13U=forc%OSN(1,3)
-    micstt%OSP13U=forc%OSP(1,3)
-    micstt%OSC14U=forc%OSC(1,4)
-    micstt%OSN14U=forc%OSN(1,4)
-    micstt%OSP14U=forc%OSP(1,4)
-    micstt%OSC24U=forc%OSC(2,4)
-    micstt%OSN24U=forc%OSN(2,4)
-    micstt%OSP24U=forc%OSP(2,4)
+    micstt%OSC13U=forc%OSC(iprotein,k_POM)
+    micstt%OSN13U=forc%OSN(iprotein,k_POM)
+    micstt%OSP13U=forc%OSP(iprotein,k_POM)
+    micstt%OSC14U=forc%OSC(iprotein,k_humus)
+    micstt%OSN14U=forc%OSN(iprotein,k_humus)
+    micstt%OSP14U=forc%OSP(iprotein,k_humus)
+    micstt%OSC24U=forc%OSC(icarbhyro,k_humus)
+    micstt%OSN24U=forc%OSN(icarbhyro,k_humus)
+    micstt%OSP24U=forc%OSP(icarbhyro,k_humus)
     micfor%RNH4YU=ystates0l(fid_RNH4Y)
     micfor%RNO3YU=ystates0l(fid_RNO3Y)
     micfor%RPO4YU=ystates0l(fid_RPO4Y)
@@ -271,30 +272,30 @@ contains
   micstt%ZNFN0=forc%ZNFN0
   micstt%ZNFNI=forc%ZNFNI
 
-  micstt%OQC(0:jcplx1)=ystates0l(cid_oqc_b:cid_oqc_e)
-  micstt%OQN(0:jcplx1)=ystates0l(cid_oqn_b:cid_oqn_e)
-  micstt%OQP(0:jcplx1)=ystates0l(cid_oqp_b:cid_oqp_e)
-  micstt%OQA(0:jcplx1)=ystates0l(cid_oqa_b:cid_oqa_e)
-  micstt%OHC(0:jcplx1)=ystates0l(cid_ohc_b:cid_ohc_e)
-  micstt%OHN(0:jcplx1)=ystates0l(cid_ohn_b:cid_ohn_e)
-  micstt%OHP(0:jcplx1)=ystates0l(cid_ohp_b:cid_ohp_e)
-  micstt%OHA(0:jcplx1)=ystates0l(cid_oha_b:cid_oha_e)
+  micstt%OQC(1:jcplx)=ystates0l(cid_oqc_b:cid_oqc_e)
+  micstt%OQN(1:jcplx)=ystates0l(cid_oqn_b:cid_oqn_e)
+  micstt%OQP(1:jcplx)=ystates0l(cid_oqp_b:cid_oqp_e)
+  micstt%OQA(1:jcplx)=ystates0l(cid_oqa_b:cid_oqa_e)
+  micstt%OHC(1:jcplx)=ystates0l(cid_ohc_b:cid_ohc_e)
+  micstt%OHN(1:jcplx)=ystates0l(cid_ohn_b:cid_ohn_e)
+  micstt%OHP(1:jcplx)=ystates0l(cid_ohp_b:cid_ohp_e)
+  micstt%OHA(1:jcplx)=ystates0l(cid_oha_b:cid_oha_e)
 
-  micstt%OSC(1:jsken,0:jcplx1)=reshape(ystates0l(cid_osc_b:cid_osc_e),(/jsken,jcplx/))
-  micstt%OSA(1:jsken,0:jcplx1)=reshape(ystates0l(cid_osa_b:cid_osa_e),(/jsken,jcplx/))
-  micstt%OSN(1:jsken,0:jcplx1)=reshape(ystates0l(cid_osn_b:cid_osn_e),(/jsken,jcplx/))
-  micstt%OSP(1:jsken,0:jcplx1)=reshape(ystates0l(cid_osp_b:cid_osp_e),(/jsken,jcplx/))
-  micstt%ORC(1:ndbiomcp,0:jcplx1)=reshape(ystates0l(cid_orc_b:cid_orc_e),(/ndbiomcp,jcplx/))
-  micstt%ORN(1:ndbiomcp,0:jcplx1)=reshape(ystates0l(cid_orn_b:cid_orn_e),(/ndbiomcp,jcplx/))
-  micstt%ORP(1:ndbiomcp,0:jcplx1)=reshape(ystates0l(cid_orp_b:cid_orp_e),(/ndbiomcp,jcplx/))
-  micstt%CNOSC(1:jsken,0:jcplx1)=forc%CNOSC(1:jsken,0:jcplx1)
-  micstt%CPOSC(1:jsken,0:jcplx1)=forc%CPOSC(1:jsken,0:jcplx1)
+  micstt%OSC(1:jsken,1:jcplx)=reshape(ystates0l(cid_osc_b:cid_osc_e),(/jsken,jcplx/))
+  micstt%OSA(1:jsken,1:jcplx)=reshape(ystates0l(cid_osa_b:cid_osa_e),(/jsken,jcplx/))
+  micstt%OSN(1:jsken,1:jcplx)=reshape(ystates0l(cid_osn_b:cid_osn_e),(/jsken,jcplx/))
+  micstt%OSP(1:jsken,1:jcplx)=reshape(ystates0l(cid_osp_b:cid_osp_e),(/jsken,jcplx/))
+  micstt%ORC(1:ndbiomcp,1:jcplx)=reshape(ystates0l(cid_orc_b:cid_orc_e),(/ndbiomcp,jcplx/))
+  micstt%ORN(1:ndbiomcp,1:jcplx)=reshape(ystates0l(cid_orn_b:cid_orn_e),(/ndbiomcp,jcplx/))
+  micstt%ORP(1:ndbiomcp,1:jcplx)=reshape(ystates0l(cid_orp_b:cid_orp_e),(/ndbiomcp,jcplx/))
+  micstt%CNOSC(1:jsken,1:jcplx)=forc%CNOSC(1:jsken,1:jcplx)
+  micstt%CPOSC(1:jsken,1:jcplx)=forc%CPOSC(1:jsken,1:jcplx)
 
-  micstt%OMC(1:nlbiomcp,1:NMICBSO,0:jcplx1)=reshape(ystates0l(cid_omc_b:cid_omc_e),&
+  micstt%OMC(1:nlbiomcp,1:NMICBSO,1:jcplx)=reshape(ystates0l(cid_omc_b:cid_omc_e),&
     (/nlbiomcp,NMICBSO,jcplx/))
-  micstt%OMN(1:nlbiomcp,1:NMICBSO,0:jcplx1)=reshape(ystates0l(cid_omn_b:cid_omn_e),&
+  micstt%OMN(1:nlbiomcp,1:NMICBSO,1:jcplx)=reshape(ystates0l(cid_omn_b:cid_omn_e),&
     (/nlbiomcp,NMICBSO,jcplx/))
-  micstt%OMP(1:nlbiomcp,1:NMICBSO,0:jcplx1)=reshape(ystates0l(cid_omp_b:cid_omp_e),&
+  micstt%OMP(1:nlbiomcp,1:NMICBSO,1:jcplx)=reshape(ystates0l(cid_omp_b:cid_omp_e),&
     (/nlbiomcp,NMICBSO,jcplx/))
   micstt%OMCff(1:nlbiomcp,1:NMICBSA)=reshape(ystates0l(cid_omcff_b:cid_omcff_e),&
     (/nlbiomcp,NMICBSA/))
@@ -303,15 +304,15 @@ contains
   micstt%OMPff(1:nlbiomcp,1:NMICBSA)=reshape(ystates0l(cid_ompff_b:cid_ompff_e),&
     (/nlbiomcp,NMICBSA/))
 
-  micflx%RINHO(1:NMICBSO,0:JCPLX1)=reshape(ystates0l(fid_RINHO_b:fid_RINHO_e),(/NMICBSO,JCPLX/))
-  micflx%RINHB(1:NMICBSO,0:JCPLX1)=reshape(ystates0l(fid_RINHB_b:fid_RINHB_e),(/NMICBSO,JCPLX/))
-  micflx%RINOO(1:NMICBSO,0:JCPLX1)=reshape(ystates0l(fid_RINOO_b:fid_RINOO_e),(/NMICBSO,JCPLX/))
-  micflx%RINOB(1:NMICBSO,0:JCPLX1)=reshape(ystates0l(fid_RINOB_b:fid_RINOB_e),(/NMICBSO,JCPLX/))
-  micflx%RIPOO(1:NMICBSO,0:JCPLX1)=reshape(ystates0l(fid_RIPOO_b:fid_RIPOO_e),(/NMICBSO,JCPLX/))
-  micflx%RIPBO(1:NMICBSO,0:JCPLX1)=reshape(ystates0l(fid_RIPBO_b:fid_RIPBO_e),(/NMICBSO,JCPLX/))
-  micflx%RIPO1(1:NMICBSO,0:JCPLX1)=reshape(ystates0l(fid_RIPO1_b:fid_RIPO1_e),(/NMICBSO,JCPLX/))
-  micflx%RIPB1(1:NMICBSO,0:JCPLX1)=reshape(ystates0l(fid_RIPB1_b:fid_RIPB1_e),(/NMICBSO,JCPLX/))
-  micflx%ROXYS(1:NMICBSO,0:JCPLX1)=reshape(ystates0l(fid_ROXYS_b:fid_ROXYS_e),(/NMICBSO,JCPLX/))
+  micflx%RINHO(1:NMICBSO,1:jcplx)=reshape(ystates0l(fid_RINHO_b:fid_RINHO_e),(/NMICBSO,JCPLX/))
+  micflx%RINHB(1:NMICBSO,1:jcplx)=reshape(ystates0l(fid_RINHB_b:fid_RINHB_e),(/NMICBSO,JCPLX/))
+  micflx%RINOO(1:NMICBSO,1:jcplx)=reshape(ystates0l(fid_RINOO_b:fid_RINOO_e),(/NMICBSO,JCPLX/))
+  micflx%RINOB(1:NMICBSO,1:jcplx)=reshape(ystates0l(fid_RINOB_b:fid_RINOB_e),(/NMICBSO,JCPLX/))
+  micflx%RIPOO(1:NMICBSO,1:jcplx)=reshape(ystates0l(fid_RIPOO_b:fid_RIPOO_e),(/NMICBSO,JCPLX/))
+  micflx%RIPBO(1:NMICBSO,1:jcplx)=reshape(ystates0l(fid_RIPBO_b:fid_RIPBO_e),(/NMICBSO,JCPLX/))
+  micflx%RIPO1(1:NMICBSO,1:jcplx)=reshape(ystates0l(fid_RIPO1_b:fid_RIPO1_e),(/NMICBSO,JCPLX/))
+  micflx%RIPB1(1:NMICBSO,1:jcplx)=reshape(ystates0l(fid_RIPB1_b:fid_RIPB1_e),(/NMICBSO,JCPLX/))
+  micflx%ROXYS(1:NMICBSO,1:jcplx)=reshape(ystates0l(fid_ROXYS_b:fid_ROXYS_e),(/NMICBSO,JCPLX/))
   end associate
   end subroutine BatchModelConfig
 
@@ -330,7 +331,6 @@ contains
 
   associate(                        &
     jcplx    => micpar%jcplx      , &
-    jcplx1   => micpar%jcplx1     , &
     jsken    => micpar%jsken      , &
     NFGs     => micpar%NFGs       , &
     NMICBSA  => micpar%NMICBSA    , &
@@ -402,27 +402,27 @@ contains
   fid_TRCPMB= addone(itemp)
   fid_TRAL  = addone(itemp)
 
-  cid_oqc_b=addone(itemp);cid_oqc_e=cid_oqc_b+jcplx1;itemp=cid_oqc_e
-  cid_oqn_b=addone(itemp);cid_oqn_e=cid_oqn_b+jcplx1;itemp=cid_oqn_e
-  cid_oqp_b=addone(itemp);cid_oqp_e=cid_oqp_b+jcplx1;itemp=cid_oqp_e
-  cid_oqa_b=addone(itemp);cid_oqa_e=cid_oqa_b+jcplx1;itemp=cid_oqa_e
-  cid_ohc_b=addone(itemp);cid_ohc_e=cid_ohc_b+jcplx1;itemp=cid_ohc_e
-  cid_ohn_b=addone(itemp);cid_ohn_e=cid_ohn_b+jcplx1;itemp=cid_ohn_e
-  cid_ohp_b=addone(itemp);cid_ohp_e=cid_ohp_b+jcplx1;itemp=cid_ohp_e
-  cid_oha_b=addone(itemp);cid_oha_e=cid_oha_b+jcplx1;itemp=cid_oha_e
-  cid_osc_b=addone(itemp);cid_osc_e=cid_osc_b+jsken*jcplx-1;itemp=cid_osc_e
-  cid_osa_b=addone(itemp);cid_osa_e=cid_osa_b+jsken*jcplx-1;itemp=cid_osa_e
-  cid_osn_b=addone(itemp);cid_osn_e=cid_osn_b+jsken*jcplx-1;itemp=cid_osn_e
-  cid_osp_b=addone(itemp);cid_osp_e=cid_osp_b+jsken*jcplx-1;itemp=cid_osp_e
-  cid_orc_b=addone(itemp);cid_orc_e=cid_orc_b+ndbiomcp*jcplx-1;itemp=cid_orc_e
-  cid_orn_b=addone(itemp);cid_orn_e=cid_orn_b+ndbiomcp*jcplx-1;itemp=cid_orn_e
-  cid_orp_b=addone(itemp);cid_orp_e=cid_orp_b+ndbiomcp*jcplx-1;itemp=cid_orp_e
-  cid_omc_b=addone(itemp);cid_omc_e=cid_omc_b+nlbiomcp*NMICBSO*jcplx-1;itemp=cid_omc_e
-  cid_omn_b=addone(itemp);cid_omn_e=cid_omn_b+nlbiomcp*NMICBSO*jcplx-1;itemp=cid_omn_e
-  cid_omp_b=addone(itemp);cid_omp_e=cid_omp_b+nlbiomcp*NMICBSO*jcplx-1;itemp=cid_omp_e
-  cid_omcff_b=addone(itemp);cid_omcff_e=cid_omcff_b+nlbiomcp*NMICBSA-1;itemp=cid_omcff_e
-  cid_omnff_b=addone(itemp);cid_omnff_e=cid_omnff_b+nlbiomcp*NMICBSA-1;itemp=cid_omnff_e
-  cid_ompff_b=addone(itemp);cid_ompff_e=cid_ompff_b+nlbiomcp*NMICBSA-1;itemp=cid_ompff_e
+  cid_oqc_b=addone(itemp);cid_oqc_e=cid_oqc_b+jcplx;itemp=cid_oqc_e
+  cid_oqn_b=addone(itemp);cid_oqn_e=cid_oqn_b+jcplx;itemp=cid_oqn_e
+  cid_oqp_b=addone(itemp);cid_oqp_e=cid_oqp_b+jcplx;itemp=cid_oqp_e
+  cid_oqa_b=addone(itemp);cid_oqa_e=cid_oqa_b+jcplx;itemp=cid_oqa_e
+  cid_ohc_b=addone(itemp);cid_ohc_e=cid_ohc_b+jcplx;itemp=cid_ohc_e
+  cid_ohn_b=addone(itemp);cid_ohn_e=cid_ohn_b+jcplx;itemp=cid_ohn_e
+  cid_ohp_b=addone(itemp);cid_ohp_e=cid_ohp_b+jcplx;itemp=cid_ohp_e
+  cid_oha_b=addone(itemp);cid_oha_e=cid_oha_b+jcplx;itemp=cid_oha_e
+  cid_osc_b=addone(itemp);cid_osc_e=cid_osc_b+jsken*jcplx;itemp=cid_osc_e
+  cid_osa_b=addone(itemp);cid_osa_e=cid_osa_b+jsken*jcplx;itemp=cid_osa_e
+  cid_osn_b=addone(itemp);cid_osn_e=cid_osn_b+jsken*jcplx;itemp=cid_osn_e
+  cid_osp_b=addone(itemp);cid_osp_e=cid_osp_b+jsken*jcplx;itemp=cid_osp_e
+  cid_orc_b=addone(itemp);cid_orc_e=cid_orc_b+ndbiomcp*jcplx;itemp=cid_orc_e
+  cid_orn_b=addone(itemp);cid_orn_e=cid_orn_b+ndbiomcp*jcplx;itemp=cid_orn_e
+  cid_orp_b=addone(itemp);cid_orp_e=cid_orp_b+ndbiomcp*jcplx;itemp=cid_orp_e
+  cid_omc_b=addone(itemp);cid_omc_e=cid_omc_b+nlbiomcp*NMICBSO*jcplx;itemp=cid_omc_e
+  cid_omn_b=addone(itemp);cid_omn_e=cid_omn_b+nlbiomcp*NMICBSO*jcplx;itemp=cid_omn_e
+  cid_omp_b=addone(itemp);cid_omp_e=cid_omp_b+nlbiomcp*NMICBSO*jcplx;itemp=cid_omp_e
+  cid_omcff_b=addone(itemp);cid_omcff_e=cid_omcff_b+nlbiomcp*NMICBSA;itemp=cid_omcff_e
+  cid_omnff_b=addone(itemp);cid_omnff_e=cid_omnff_b+nlbiomcp*NMICBSA;itemp=cid_omnff_e
+  cid_ompff_b=addone(itemp);cid_ompff_e=cid_ompff_b+nlbiomcp*NMICBSA;itemp=cid_ompff_e
 
   fid_ROXYY=addone(itemp)
   fid_ROXYF=addone(itemp)
@@ -437,17 +437,17 @@ contains
   fid_RN2BY=addone(itemp)
   fid_RPOBY=addone(itemp)
   fid_RP1BY=addone(itemp)
-  fid_ROQCY_b=addone(itemp);fid_ROQCY_e=fid_ROQCY_b+jcplx1;itemp=fid_ROQCY_e
-  fid_ROQAY_b=addone(itemp);fid_ROQAY_e=fid_ROQAY_b+jcplx1;itemp=fid_ROQAY_e
-  fid_RINHO_b=addone(itemp);fid_RINHO_e=fid_RINHO_b+NMICBSO*jcplx-1;itemp=fid_RINHO_e
-  fid_RINHB_b=addone(itemp);fid_RINHB_e=fid_RINHB_b+NMICBSO*jcplx-1;itemp=fid_RINHB_e
-  fid_RINOO_b=addone(itemp);fid_RINOO_e=fid_RINOO_b+NMICBSO*jcplx-1;itemp=fid_RINOO_e
-  fid_RINOB_b=addone(itemp);fid_RINOB_e=fid_RINOB_b+NMICBSO*jcplx-1;itemp=fid_RINOB_e
-  fid_RIPOO_b=addone(itemp);fid_RIPOO_e=fid_RIPOO_b+NMICBSO*jcplx-1;itemp=fid_RIPOO_e
-  fid_RIPBO_b=addone(itemp);fid_RIPBO_e=fid_RIPBO_b+NMICBSO*jcplx-1;itemp=fid_RIPBO_e
-  fid_RIPO1_b=addone(itemp);fid_RIPO1_e=fid_RIPO1_b+NMICBSO*jcplx-1;itemp=fid_RIPO1_e
-  fid_RIPB1_b=addone(itemp);fid_RIPB1_e=fid_RIPB1_b+NMICBSO*jcplx-1;itemp=fid_RIPB1_e
-  fid_ROXYS_b=addone(itemp);fid_ROXYS_e=fid_ROXYS_b+NMICBSO*jcplx-1;itemp=fid_ROXYS_e
+  fid_ROQCY_b=addone(itemp);fid_ROQCY_e=fid_ROQCY_b+jcplx;itemp=fid_ROQCY_e
+  fid_ROQAY_b=addone(itemp);fid_ROQAY_e=fid_ROQAY_b+jcplx;itemp=fid_ROQAY_e
+  fid_RINHO_b=addone(itemp);fid_RINHO_e=fid_RINHO_b+NMICBSO*jcplx;itemp=fid_RINHO_e
+  fid_RINHB_b=addone(itemp);fid_RINHB_e=fid_RINHB_b+NMICBSO*jcplx;itemp=fid_RINHB_e
+  fid_RINOO_b=addone(itemp);fid_RINOO_e=fid_RINOO_b+NMICBSO*jcplx;itemp=fid_RINOO_e
+  fid_RINOB_b=addone(itemp);fid_RINOB_e=fid_RINOB_b+NMICBSO*jcplx;itemp=fid_RINOB_e
+  fid_RIPOO_b=addone(itemp);fid_RIPOO_e=fid_RIPOO_b+NMICBSO*jcplx;itemp=fid_RIPOO_e
+  fid_RIPBO_b=addone(itemp);fid_RIPBO_e=fid_RIPBO_b+NMICBSO*jcplx;itemp=fid_RIPBO_e
+  fid_RIPO1_b=addone(itemp);fid_RIPO1_e=fid_RIPO1_b+NMICBSO*jcplx;itemp=fid_RIPO1_e
+  fid_RIPB1_b=addone(itemp);fid_RIPB1_e=fid_RIPB1_b+NMICBSO*jcplx;itemp=fid_RIPB1_e
+  fid_ROXYS_b=addone(itemp);fid_ROXYS_e=fid_ROXYS_b+NMICBSO*jcplx;itemp=fid_ROXYS_e
 
   fid_XCODFS=addone(itemp)
   fid_XCHDFS=addone(itemp)
@@ -528,11 +528,13 @@ contains
 
   integer :: K,N,NGL,M
   associate(                         &
-    jcplx1    => micpar%jcplx1     , &
     jcplx     => micpar%jcplx      , &
-    JG        => micpar%jguilds    , &
     NFGs      => micpar%NFGs       , &
     jsken     => micpar%jsken      , &
+    k_humus   => micpar%k_humus    , &
+    k_POM     => micpar%k_POM      , &
+    iprotein  => micpar%iprotein   , &
+    icarbhyro => micpar%icarbhyro  , &
     nlbiomcp  => micpar%nlbiomcp   , &
     ndbiomcp  => micpar%ndbiomcp   , &
     is_litter => micpar%is_litter  , &
@@ -595,26 +597,26 @@ contains
   ystatesfl(cid_CCH4G)=ystatesfl(cid_CH4G)/micfor%VOLP
 
 ! the following variables are updated in the microbial model
-  ystatesfl(cid_oqc_b:cid_oqc_e)=micstt%OQC(0:jcplx1)
-  ystatesfl(cid_oqn_b:cid_oqn_e)=micstt%OQN(0:jcplx1)
-  ystatesfl(cid_oqp_b:cid_oqp_e)=micstt%OQP(0:jcplx1)
-  ystatesfl(cid_oqa_b:cid_oqa_e)=micstt%OQA(0:jcplx1)
-  ystatesfl(cid_ohc_b:cid_ohc_e)=micstt%OHC(0:jcplx1)
-  ystatesfl(cid_ohn_b:cid_ohn_e)=micstt%OHN(0:jcplx1)
-  ystatesfl(cid_ohp_b:cid_ohp_e)=micstt%OHP(0:jcplx1)
-  ystatesfl(cid_oha_b:cid_oha_e)=micstt%OHA(0:jcplx1)
-  ystatesfl(cid_osc_b:cid_osc_e)=reshape(micstt%OSC(1:jsken,0:jcplx1),(/jsken*jcplx/))
-  ystatesfl(cid_osa_b:cid_osa_e)=reshape(micstt%OSA(1:jsken,0:jcplx1),(/jsken*jcplx/))
-  ystatesfl(cid_osn_b:cid_osn_e)=reshape(micstt%OSN(1:jsken,0:jcplx1),(/jsken*jcplx/))
-  ystatesfl(cid_osp_b:cid_osp_e)=reshape(micstt%OSP(1:jsken,0:jcplx1),(/jsken*jcplx/))
-  ystatesfl(cid_orc_b:cid_orc_e)=reshape(micstt%ORC(1:ndbiomcp,0:jcplx1),(/ndbiomcp*jcplx/))
-  ystatesfl(cid_orn_b:cid_orn_e)=reshape(micstt%ORN(1:ndbiomcp,0:jcplx1),(/ndbiomcp*jcplx/))
-  ystatesfl(cid_orp_b:cid_orp_e)=reshape(micstt%ORP(1:ndbiomcp,0:jcplx1),(/ndbiomcp*jcplx/))
-  ystatesfl(cid_omc_b:cid_omc_e)=reshape(micstt%OMC(1:nlbiomcp,1:NMICBSO,0:jcplx1),&
+  ystatesfl(cid_oqc_b:cid_oqc_e)=micstt%OQC(1:jcplx)
+  ystatesfl(cid_oqn_b:cid_oqn_e)=micstt%OQN(1:jcplx)
+  ystatesfl(cid_oqp_b:cid_oqp_e)=micstt%OQP(1:jcplx)
+  ystatesfl(cid_oqa_b:cid_oqa_e)=micstt%OQA(1:jcplx)
+  ystatesfl(cid_ohc_b:cid_ohc_e)=micstt%OHC(1:jcplx)
+  ystatesfl(cid_ohn_b:cid_ohn_e)=micstt%OHN(1:jcplx)
+  ystatesfl(cid_ohp_b:cid_ohp_e)=micstt%OHP(1:jcplx)
+  ystatesfl(cid_oha_b:cid_oha_e)=micstt%OHA(1:jcplx)
+  ystatesfl(cid_osc_b:cid_osc_e)=reshape(micstt%OSC(1:jsken,1:jcplx),(/jsken*jcplx/))
+  ystatesfl(cid_osa_b:cid_osa_e)=reshape(micstt%OSA(1:jsken,1:jcplx),(/jsken*jcplx/))
+  ystatesfl(cid_osn_b:cid_osn_e)=reshape(micstt%OSN(1:jsken,1:jcplx),(/jsken*jcplx/))
+  ystatesfl(cid_osp_b:cid_osp_e)=reshape(micstt%OSP(1:jsken,1:jcplx),(/jsken*jcplx/))
+  ystatesfl(cid_orc_b:cid_orc_e)=reshape(micstt%ORC(1:ndbiomcp,1:jcplx),(/ndbiomcp*jcplx/))
+  ystatesfl(cid_orn_b:cid_orn_e)=reshape(micstt%ORN(1:ndbiomcp,1:jcplx),(/ndbiomcp*jcplx/))
+  ystatesfl(cid_orp_b:cid_orp_e)=reshape(micstt%ORP(1:ndbiomcp,1:jcplx),(/ndbiomcp*jcplx/))
+  ystatesfl(cid_omc_b:cid_omc_e)=reshape(micstt%OMC(1:nlbiomcp,1:NMICBSO,1:jcplx),&
     (/nlbiomcp*NMICBSO*jcplx/))
-  ystatesfl(cid_omn_b:cid_omn_e)=reshape(micstt%OMN(1:nlbiomcp,1:NMICBSO,0:jcplx1),&
+  ystatesfl(cid_omn_b:cid_omn_e)=reshape(micstt%OMN(1:nlbiomcp,1:NMICBSO,1:jcplx),&
     (/nlbiomcp*NMICBSO*jcplx/))
-  ystatesfl(cid_omp_b:cid_omp_e)=reshape(micstt%OMP(1:nlbiomcp,1:NMICBSO,0:jcplx1),&
+  ystatesfl(cid_omp_b:cid_omp_e)=reshape(micstt%OMP(1:nlbiomcp,1:NMICBSO,1:jcplx),&
     (/nlbiomcp*NMICBSO*jcplx/))
   ystatesfl(cid_omcff_b:cid_omcff_e)=reshape(micstt%OMCff(1:nlbiomcp,1:NMICBSA),&
     (/nlbiomcp*NMICBSA/))
@@ -624,7 +626,7 @@ contains
     (/nlbiomcp*NMICBSA/))
 
 ! summarize diagnostic fluxes
-  DO K=0,jcplx1
+  DO K=1,jcplx
     IF(.not.micfor%litrm.or.(micpar%is_litter(K)))THEN
       DO N=1,NFGs
         DO NGL=micpar%JGnio(N),micpar%JGnfo(N)
@@ -685,7 +687,7 @@ contains
   integer :: jj,ll,k,m,n,ngl
 
   associate(                        &
-    jcplx1    => micpar%jcplx1    , &
+    jcplx     => micpar%jcplx    , &
     JG        => micpar%jguilds   , &
     jsken     => micpar%jsken     , &
     NFGs      => micpar%NFGs      , &
@@ -819,49 +821,49 @@ contains
 
   do jj=cid_oqc_b,cid_oqc_e
     write(varl(jj),'(A,I1)')'OQC',jj-cid_oqc_b
-    varlnml(jj)='micropore dissolved organic C mass in complex '//trim(micpar%cplxname(jj-cid_oqc_b))
+    varlnml(jj)='micropore dissolved organic C mass in complex '//trim(micpar%cplxname(jj-cid_oqc_b+1))
     unitl(jj)='gC d-2'
     vartypes(jj)=var_state_type
   enddo
   do jj=cid_oqn_b,cid_oqn_e
     write(varl(jj),'(A,I1)')'OQN',jj-cid_oqn_b
-    varlnml(jj)='micropore dissolved N mass in complex '//trim(micpar%cplxname(jj-cid_oqn_b))
+    varlnml(jj)='micropore dissolved N mass in complex '//trim(micpar%cplxname(jj-cid_oqn_b+1))
     unitl(jj)='gN d-2'
     vartypes(jj)=var_state_type
   enddo
   do jj=cid_oqp_b,cid_oqp_e
     write(varl(jj),'(A,I1)')'OQP',jj-cid_oqn_b
-    varlnml(jj)='micropore dissolved N mass in complex '//trim(micpar%cplxname(jj-cid_oqp_b))
+    varlnml(jj)='micropore dissolved N mass in complex '//trim(micpar%cplxname(jj-cid_oqp_b+1))
     unitl(jj)='gP d-2'
     vartypes(jj)=var_state_type
   enddo
   do jj=cid_oqa_b,cid_oqa_e
     write(varl(jj),'(A,I1)')'OQA',jj-cid_oqa_b
-    varlnml(jj)='micropore dissolved acetate mass in complex '//trim(micpar%cplxname(jj-cid_oqa_b))
+    varlnml(jj)='micropore dissolved acetate mass in complex '//trim(micpar%cplxname(jj-cid_oqa_b+1))
     unitl(jj)='gC d-2'
     vartypes(jj)=var_state_type
   enddo
   do jj=cid_ohc_b,cid_ohc_e
     write(varl(jj),'(A,I1)')'OHC',jj-cid_ohc_b
-    varlnml(jj)='adsorbed soil C mass in complex'//trim(micpar%cplxname(jj-cid_ohc_b))
+    varlnml(jj)='adsorbed soil C mass in complex'//trim(micpar%cplxname(jj-cid_ohc_b+1))
     unitl(jj)='gC d-2'
     vartypes(jj)=var_state_type
   enddo
   do jj=cid_ohn_b,cid_ohn_e
     write(varl(jj),'(A,I1)')'OHN',jj-cid_ohn_b
-    varlnml(jj)='adsorbed soil N mass in complex'//trim(micpar%cplxname(jj-cid_ohn_b))
+    varlnml(jj)='adsorbed soil N mass in complex'//trim(micpar%cplxname(jj-cid_ohn_b+1))
     unitl(jj)='gN d-2'
     vartypes(jj)=var_state_type
   enddo
   do jj=cid_ohp_b,cid_ohp_e
     write(varl(jj),'(A,I1)')'OHP',jj-cid_ohp_b
-    varlnml(jj)='adsorbed soil P mass in complex'//trim(micpar%cplxname(jj-cid_ohp_b))
+    varlnml(jj)='adsorbed soil P mass in complex'//trim(micpar%cplxname(jj-cid_ohp_b+1))
     unitl(jj)='gP d-2'
     vartypes(jj)=var_state_type
   enddo
   do jj=cid_oha_b,cid_oha_e
     write(varl(jj),'(A,I1)')'OHA',jj-cid_oha_b
-    varlnml(jj)='adsorbed soil acetate mass in complex'//trim(micpar%cplxname(jj-cid_oha_b))
+    varlnml(jj)='adsorbed soil acetate mass in complex'//trim(micpar%cplxname(jj-cid_oha_b+1))
     unitl(jj)='gC d-2'
     vartypes(jj)=var_state_type
   enddo
@@ -870,7 +872,7 @@ contains
     icplx=floor((iknen+1-1.e-3_r8)/jsken)
     iknen=mod(iknen,jsken)
     write(varl(jj),'(A,I1,I1)')'OSC',iknen+1,icplx
-    varlnml(jj)='humus soil C as '//trim(micpar%kiname(iknen))//' in complex '//trim(micpar%cplxname(icplx))
+    varlnml(jj)='humus soil C as '//trim(micpar%kiname(iknen))//' in complex '//trim(micpar%cplxname(icplx+1))
     unitl(jj)='gC d-2'
     vartypes(jj)=var_state_type
   enddo
@@ -935,7 +937,7 @@ contains
   enddo
 
   jj=0
-  DO k=0,jcplx1
+  DO k=1,jcplx
   DO N=1,NFGs
   DO NGL=micpar%JGnio(N),micpar%JGnfo(N)
   DO M=1,nlbiomcp
@@ -1112,20 +1114,20 @@ contains
   do jj =fid_ROQCY_b,fid_ROQCY_e
     write(varl(jj),'(A,I2.2)')'ROQCY',jj-fid_ROQCY_b
     varlnml(jj)='total root + microbial DOC uptake in complex ' &
-      //micpar%cplxname(jj-fid_ROQCY_b)
+      //micpar%cplxname(jj-fid_ROQCY_b+1)
     vartypes(jj)=var_flux_type
     unitl(jj)='gC d-2 h-1'
   enddo
   do jj =fid_ROQAY_b,fid_ROQAY_e
     write(varl(jj),'(A,I2.2)')'ROQAY',jj-fid_ROQAY_b
     varlnml(jj)='total root + microbial acetate uptake in complex ' &
-      //micpar%cplxname(jj-fid_ROQAY_b)
+      //micpar%cplxname(jj-fid_ROQAY_b+1)
     vartypes(jj)=var_flux_type
     unitl(jj)='gC d-2 h-1'
   enddo
 
   ll=0
-  DO k=0,jcplx1
+  DO k=1,jcplx
   DO N=1,NFGs
   DO NGL=micpar%JGniA(N),micpar%JGnfA(N)
     jj=fid_RINHO_b+ll
@@ -1139,7 +1141,7 @@ contains
   enddo
 
   ll=0
-  DO k=0,jcplx1
+  DO k=1,jcplx
   DO N=1,NFGs
   DO NGL=micpar%JGnio(N),micpar%JGnfo(N)
     jj=fid_RINHB_b+ll
@@ -1154,7 +1156,7 @@ contains
   enddo
 
   ll=0
-  DO k=0,jcplx1
+  DO k=1,jcplx
   DO N=1,NFGs
   DO NGL=micpar%JGnio(N),micpar%JGnfo(N)
     jj=fid_RINOO_b+ll
@@ -1168,7 +1170,7 @@ contains
   enddo
 
   ll=0
-  DO k=0,jcplx1
+  DO k=1,jcplx
   DO N=1,NFGs
   DO NGL=micpar%JGnio(N),micpar%JGnfo(N)
     jj=fid_RINOB_b+ll
@@ -1183,7 +1185,7 @@ contains
   enddo
 
   ll=0
-  DO k=0,jcplx1
+  DO k=1,jcplx
   DO N=1,NFGs
   DO NGL=micpar%JGnio(N),micpar%JGnfo(N)
     jj=fid_RIPOO_b+ll
@@ -1197,7 +1199,7 @@ contains
   enddo
 
   ll=0
-  DO k=0,jcplx1
+  DO k=1,jcplx
   DO N=1,NFGs
   DO NGL=micpar%JGnio(N),micpar%JGnfo(N)
     jj=fid_RIPBO_b+ll
@@ -1211,7 +1213,7 @@ contains
   enddo
 
   ll=0
-  DO k=0,jcplx1
+  DO k=1,jcplx
   DO N=1,NFGs
   DO NGL=micpar%JGnio(N),micpar%JGnfo(N)
     jj=fid_RIPO1_b+ll
@@ -1225,7 +1227,7 @@ contains
   enddo
 
   ll=0
-  DO k=0,jcplx1
+  DO k=1,jcplx
   DO N=1,NFGs
   DO NGL=micpar%JGnio(N),micpar%JGnfo(N)
     jj=fid_RIPB1_b+ll
@@ -1239,7 +1241,7 @@ contains
   enddo
 
   ll=0
-  DO k=0,jcplx1
+  DO k=1,jcplx
   DO N=1,NFGs
   DO NGL=micpar%JGnio(N),micpar%JGnfo(N)
     jj=fid_ROXYS_b+ll
@@ -1697,7 +1699,7 @@ contains
   ON=0.0_r8
   OP=0.0_r8
 
-  DO K=0,micpar%jcplx1
+  DO K=1,micpar%jcplx
     IF(micpar%is_litter(K))THEN
       DO N=1,micpar%NFGs
         DO NGL=micpar%JGnio(N),micpar%JGnfo(N)
@@ -1731,7 +1733,7 @@ contains
     enddo
   ENDDO
 ! microbial residue
-  DO K=0,micpar%jcplx1
+  DO K=1,micpar%jcplx
     IF(micpar%is_litter(K))THEN
       DO M=1,micpar%ndbiomcp
         DC=DC+micstt%ORC(M,K)

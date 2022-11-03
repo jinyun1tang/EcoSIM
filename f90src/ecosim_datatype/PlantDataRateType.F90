@@ -3,7 +3,7 @@ module PlantDataRateType
   use data_kind_mod, only : r8 => SHR_KIND_R8
   use GridConsts
   use ElmIDMod
-  use EcoSIMConfig, only : jcplx1=> jcplx1c,jsken=>jskenc
+  use EcoSIMConfig, only : jcplx => jcplxc,jsken=>jskenc
   implicit none
   character(len=*), private, parameter :: mod_filename = __FILE__
 
@@ -175,24 +175,27 @@ module PlantDataRateType
   contains
 
 !----------------------------------------------------------------------
-  subroutine InitPlantRates
+  subroutine InitPlantRates(n_pltlitrk)
   implicit none
+  integer, intent(in) :: n_pltlitrk
 
-  call InitAllocate
+  call InitAllocate(n_pltlitrk)
 
   end subroutine InitPlantRates
 !----------------------------------------------------------------------
 
-  subroutine InitAllocate
+  subroutine InitAllocate(n_pltlitrk)
 
   implicit none
+  integer, intent(in) :: n_pltlitrk
+
   allocate(TCNET(JY,JX));       TCNET=0._r8
   allocate(RNH3C(JP,JY,JX));    RNH3C=0._r8
   allocate(TNH3C(JP,JY,JX));    TNH3C=0._r8
   allocate(TESN0(npelms,JP,JY,JX));    TESN0=0._r8
-  allocate(RDFOMC(2,0:jcplx1,JZ,JP,JY,JX));RDFOMC=0._r8
-  allocate(RDFOMN(2,0:jcplx1,JZ,JP,JY,JX));RDFOMN=0._r8
-  allocate(RDFOMP(2,0:jcplx1,JZ,JP,JY,JX));RDFOMP=0._r8
+  allocate(RDFOMC(2,1:jcplx,JZ,JP,JY,JX));RDFOMC=0._r8
+  allocate(RDFOMN(2,1:jcplx,JZ,JP,JY,JX));RDFOMN=0._r8
+  allocate(RDFOMP(2,1:jcplx,JZ,JP,JY,JX));RDFOMP=0._r8
   allocate(RUPNH4(2,JZ,JP,JY,JX));RUPNH4=0._r8
   allocate(RUPNHB(2,JZ,JP,JY,JX));RUPNHB=0._r8
   allocate(RUPNO3(2,JZ,JP,JY,JX));RUPNO3=0._r8
@@ -215,7 +218,7 @@ module PlantDataRateType
   allocate(TCO2T(JP,JY,JX));    TCO2T=0._r8
   allocate(BALE(npelms,JP,JY,JX));     BALE=0._r8
   allocate(HESNC(npelms,JP,JY,JX));    HESNC=0._r8
-  allocate(ESNC(jsken,npelms,0:1,0:JZ,JP,JY,JX));ESNC=0._r8
+  allocate(ESNC(jsken,npelms,1:n_pltlitrk,0:JZ,JP,JY,JX));ESNC=0._r8
   allocate(ZNPP(JP,JY,JX));     ZNPP=0._r8
   allocate(CTRAN(JP,JY,JX));    CTRAN=0._r8
   allocate(TCO2A(JP,JY,JX));    TCO2A=0._r8
@@ -312,9 +315,9 @@ module PlantDataRateType
   allocate(TUPNOB(JZ,JY,JX));   TUPNOB=0._r8
   allocate(TUPH2B(JZ,JY,JX));   TUPH2B=0._r8
   allocate(TUPNF(JZ,JY,JX));    TUPNF=0._r8
-  allocate(TDFOMC(0:jcplx1,JZ,JY,JX));TDFOMC=0._r8
-  allocate(TDFOMN(0:jcplx1,JZ,JY,JX));TDFOMN=0._r8
-  allocate(TDFOMP(0:jcplx1,JZ,JY,JX));TDFOMP=0._r8
+  allocate(TDFOMC(1:jcplx,JZ,JY,JX));TDFOMC=0._r8
+  allocate(TDFOMN(1:jcplx,JZ,JY,JX));TDFOMN=0._r8
+  allocate(TDFOMP(1:jcplx,JZ,JY,JX));TDFOMP=0._r8
   allocate(TCO2P(JZ,JY,JX));    TCO2P=0._r8
   allocate(TUPOXP(JZ,JY,JX));   TUPOXP=0._r8
   allocate(RTDNT(JZ,JY,JX));    RTDNT=0._r8
@@ -340,10 +343,10 @@ module PlantDataRateType
   allocate(RN2BY(0:JZ,JY,JX));  RN2BY=0._r8
   allocate(RPOBX(0:JZ,JY,JX));  RPOBX=0._r8
   allocate(RPOBY(0:JZ,JY,JX));  RPOBY=0._r8
-  allocate(ROQCX(0:jcplx1,0:JZ,JY,JX));ROQCX=0._r8
-  allocate(ROQCY(0:jcplx1,0:JZ,JY,JX));ROQCY=0._r8
-  allocate(ROQAX(0:jcplx1,0:JZ,JY,JX));ROQAX=0._r8
-  allocate(ROQAY(0:jcplx1,0:JZ,JY,JX));ROQAY=0._r8
+  allocate(ROQCX(1:jcplx,0:JZ,JY,JX));ROQCX=0._r8
+  allocate(ROQCY(1:jcplx,0:JZ,JY,JX));ROQCY=0._r8
+  allocate(ROQAX(1:jcplx,0:JZ,JY,JX));ROQAX=0._r8
+  allocate(ROQAY(1:jcplx,0:JZ,JY,JX));ROQAY=0._r8
   allocate(TH2GZ(JY,JX));       TH2GZ=0._r8
   allocate(TUPHGS(JZ,JY,JX));   TUPHGS=0._r8
   allocate(THGFLA(JZ,JY,JX));   THGFLA=0._r8

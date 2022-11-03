@@ -1,5 +1,4 @@
 set(ECOSIM_DATATYPE_SOURCES
-  GridConsts.F90
   GridDataType.F90
   MicrobialDataType.F90
   SOMDataType.F90

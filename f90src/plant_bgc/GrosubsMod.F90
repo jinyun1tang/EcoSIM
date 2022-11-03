@@ -5,9 +5,9 @@ module grosubsMod
   use minimathmod, only : test_aeqb,safe_adb,AZMAX1
   use data_kind_mod, only : r8 => SHR_KIND_R8
   use EcosimConst
+  use EcoSiMParDataMod, only : pltpar
   use GrosubPars
   use PlantAPIData
-  use MicBGCPars, only : micpar
   use PhotoSynsMod
   use RootMod, only : RootBGCModel
   use LitterFallMod
@@ -47,7 +47,8 @@ module grosubsMod
 
   implicit none
   integer, intent(out) :: jpstgs,JRS
-  call InitVegPars
+
+  call InitVegPars(pltpar)
   jpstgs = pltpar%jpstgs
   jrs = pltpar%JRS
 
@@ -86,7 +87,7 @@ module grosubsMod
 
   D9980: DO NZ=1,NP0
     D1: DO L=0,NJ
-      DO K=0,micpar%n_pltlitrk
+      DO K=1,pltpar%n_pltlitrk
         DO M=1,jsken
           ESNC(M,1:npelms,K,L,NZ)=0._r8
         ENDDO
@@ -127,7 +128,9 @@ module grosubsMod
   real(r8) :: XFRC,XFRN,XFRP,XFRE
 !     begin_execution
 
-  associate(                           &
+  associate(                       &
+    k_fine_litr=> pltpar%k_fine_litr ,&
+    k_woody_litr=> pltpar%k_woody_litr,&
     IDAY0   => plt_distb%IDAY0   , &
     IYR0    => plt_distb%IYR0    , &
     THVSTE  => plt_distb%THVSTE  , &
@@ -196,9 +199,9 @@ module grosubsMod
       D6235: DO M=1,jsken
         XFRE=1.5814E-05_r8*TFN3(NZ)*WTSTDE(M,NE,NZ)
         IF(IBTYP(NZ).EQ.0.OR.IGTYP(NZ).LE.1)THEN
-          ESNC(M,NE,1,0,NZ)=ESNC(M,NE,1,0,NZ)+XFRE
+          ESNC(M,NE,k_fine_litr,0,NZ)=ESNC(M,NE,k_fine_litr,0,NZ)+XFRE
         ELSE
-          ESNC(M,NE,0,0,NZ)=ESNC(M,NE,0,0,NZ)+XFRE
+          ESNC(M,NE,k_woody_litr,0,NZ)=ESNC(M,NE,k_woody_litr,0,NZ)+XFRE
         ENDIF
         WTSTDE(M,NE,NZ)=WTSTDE(M,NE,NZ)-XFRE
       ENDDO D6235
@@ -210,7 +213,7 @@ module grosubsMod
 !     TCSNC,TZSNC,TPSNC=cumulative C,N,P litterfall
 !     HCSNC,HZSNC,HPSNC=hourly C,N,P litterfall
 !
-    DO K=0,micpar%n_pltlitrk
+    DO K=1,pltpar%n_pltlitrk
       DO NE=1,npelms
         D6430: DO M=1,jsken
           TESN0(NE,NZ)=TESN0(NE,NZ)+ESNC(M,NE,K,0,NZ)
@@ -405,6 +408,8 @@ module grosubsMod
     CPSHE  =>  plt_allom%CPSHE    , &
     CNSTK  =>  plt_allom%CNSTK    , &
     CPSTK  =>  plt_allom%CPSTK    , &
+    k_fine_litr=> pltpar%k_fine_litr,&
+    k_woody_litr=> pltpar%k_woody_litr,&
     RCS    =>  plt_photo%RCS      , &
     RTN1   =>  plt_morph%RTN1     , &
     RTNL   =>  plt_morph%RTNL     , &
@@ -446,40 +451,40 @@ module grosubsMod
 !     FWOODN,FWOODP=N,P woody fraction in stalk:0=woody,1=non-woody
 !
   IF(IBTYP(NZ).EQ.0.OR.IGTYP(NZ).LE.1.OR.WTSTKE(ielmc,NZ).LE.ZEROP(NZ))THEN
-    FWODBE(ielmc,1)=1.0_r8
-    FWOODE(ielmc,1)=1.0_r8
-    FWODRE(ielmc,1)=1.0_r8
+    FWODBE(ielmc,k_fine_litr)=1.0_r8
+    FWOODE(ielmc,k_fine_litr)=1.0_r8
+    FWODRE(ielmc,k_fine_litr)=1.0_r8
   ELSE
-    FWODBE(ielmc,1)=1.0_r8
-    FWOODE(ielmc,1)=SQRT(WVSTK(NZ)/WTSTKE(ielmc,NZ))
-    FWODRE(ielmc,1)=SQRT(FRTX*WVSTK(NZ)/WTSTKE(ielmc,NZ))
+    FWODBE(ielmc,k_fine_litr)=1.0_r8
+    FWOODE(ielmc,k_fine_litr)=SQRT(WVSTK(NZ)/WTSTKE(ielmc,NZ))
+    FWODRE(ielmc,k_fine_litr)=SQRT(FRTX*WVSTK(NZ)/WTSTKE(ielmc,NZ))
   ENDIF
-  FWODBE(ielmc,0)=1.0_r8-FWODBE(ielmc,1)
-  FWOODE(ielmc,0)=1.0_r8-FWOODE(ielmc,1)
-  FWODRE(ielmc,0)=1.0_r8-FWODRE(ielmc,1)
-  CNLFW=FWODBE(ielmc,0)*CNSTK(NZ)+FWODBE(ielmc,1)*CNLF(NZ)
-  CPLFW=FWODBE(ielmc,0)*CPSTK(NZ)+FWODBE(ielmc,1)*CPLF(NZ)
-  CNSHW=FWODBE(ielmc,0)*CNSTK(NZ)+FWODBE(ielmc,1)*CNSHE(NZ)
-  CPSHW=FWODBE(ielmc,0)*CPSTK(NZ)+FWODBE(ielmc,1)*CPSHE(NZ)
-  CNRTW=FWODRE(ielmc,0)*CNSTK(NZ)+FWODRE(ielmc,1)*CNRT(NZ)
-  CPRTW=FWODRE(ielmc,0)*CPSTK(NZ)+FWODRE(ielmc,1)*CPRT(NZ)
-  FWODLE(ielmc,0:1)=FWODBE(ielmc,0:1)
-  FWODLE(ielmn,0)=FWODBE(ielmc,0)*CNSTK(NZ)/CNLFW
-  FWODLE(ielmp,0)=FWODBE(ielmc,0)*CPSTK(NZ)/CPLFW
-  FWODBE(ielmn,0)=FWODBE(ielmc,0)*CNSTK(NZ)/CNSHW
-  FWODBE(ielmp,0)=FWODBE(ielmc,0)*CPSTK(NZ)/CPSHW
-  FWOODE(ielmn,0)=FWOODE(ielmc,0)*CNSTK(NZ)/CNRTW
-  FWOODE(ielmp,0)=FWOODE(ielmc,0)*CPSTK(NZ)/CPRTW
-  FWODRE(ielmn,0)=FWODRE(ielmc,0)*CNRT(NZ)/CNRTW
-  FWODRE(ielmp,0)=FWODRE(ielmc,0)*CPRT(NZ)/CPRTW
-  FWODLE(ielmn,1)=1.0_r8-FWODLE(ielmn,0)
-  FWODLE(ielmp,1)=1.0_r8-FWODLE(ielmp,0)
-  FWODBE(ielmn,1)=1.0_r8-FWODBE(ielmn,0)
-  FWODBE(ielmp,1)=1.0_r8-FWODBE(ielmp,0)
-  FWOODE(ielmn,1)=1.0_r8-FWOODE(ielmn,0)
-  FWOODE(ielmp,1)=1.0_r8-FWOODE(ielmp,0)
-  FWODRE(ielmn,1)=1.0_r8-FWODRE(ielmn,0)
-  FWODRE(ielmp,1)=1.0_r8-FWODRE(ielmp,0)
+  FWODBE(ielmc,k_woody_litr)=1.0_r8-FWODBE(ielmc,k_fine_litr)
+  FWOODE(ielmc,k_woody_litr)=1.0_r8-FWOODE(ielmc,k_fine_litr)
+  FWODRE(ielmc,k_woody_litr)=1.0_r8-FWODRE(ielmc,k_fine_litr)
+  CNLFW=FWODBE(ielmc,k_woody_litr)*CNSTK(NZ)+FWODBE(ielmc,k_fine_litr)*CNLF(NZ)
+  CPLFW=FWODBE(ielmc,k_woody_litr)*CPSTK(NZ)+FWODBE(ielmc,k_fine_litr)*CPLF(NZ)
+  CNSHW=FWODBE(ielmc,k_woody_litr)*CNSTK(NZ)+FWODBE(ielmc,k_fine_litr)*CNSHE(NZ)
+  CPSHW=FWODBE(ielmc,k_woody_litr)*CPSTK(NZ)+FWODBE(ielmc,k_fine_litr)*CPSHE(NZ)
+  CNRTW=FWODRE(ielmc,k_woody_litr)*CNSTK(NZ)+FWODRE(ielmc,k_fine_litr)*CNRT(NZ)
+  CPRTW=FWODRE(ielmc,k_woody_litr)*CPSTK(NZ)+FWODRE(ielmc,k_fine_litr)*CPRT(NZ)
+  FWODLE(ielmc,1:n_pltlitrk)=FWODBE(ielmc,1:n_pltlitrk)
+  FWODLE(ielmn,k_woody_litr)=FWODBE(ielmc,k_woody_litr)*CNSTK(NZ)/CNLFW
+  FWODLE(ielmp,k_woody_litr)=FWODBE(ielmc,k_woody_litr)*CPSTK(NZ)/CPLFW
+  FWODBE(ielmn,k_woody_litr)=FWODBE(ielmc,k_woody_litr)*CNSTK(NZ)/CNSHW
+  FWODBE(ielmp,k_woody_litr)=FWODBE(ielmc,k_woody_litr)*CPSTK(NZ)/CPSHW
+  FWOODE(ielmn,k_woody_litr)=FWOODE(ielmc,k_woody_litr)*CNSTK(NZ)/CNRTW
+  FWOODE(ielmp,k_woody_litr)=FWOODE(ielmc,k_woody_litr)*CPSTK(NZ)/CPRTW
+  FWODRE(ielmn,k_woody_litr)=FWODRE(ielmc,k_woody_litr)*CNRT(NZ)/CNRTW
+  FWODRE(ielmp,k_woody_litr)=FWODRE(ielmc,k_woody_litr)*CPRT(NZ)/CPRTW
+  FWODLE(ielmn,k_fine_litr)=1.0_r8-FWODLE(ielmn,k_woody_litr)
+  FWODLE(ielmp,k_fine_litr)=1.0_r8-FWODLE(ielmp,k_woody_litr)
+  FWODBE(ielmn,k_fine_litr)=1.0_r8-FWODBE(ielmn,k_woody_litr)
+  FWODBE(ielmp,k_fine_litr)=1.0_r8-FWODBE(ielmp,k_woody_litr)
+  FWOODE(ielmn,k_fine_litr)=1.0_r8-FWOODE(ielmn,k_woody_litr)
+  FWOODE(ielmp,k_fine_litr)=1.0_r8-FWOODE(ielmp,k_woody_litr)
+  FWODRE(ielmn,k_fine_litr)=1.0_r8-FWODRE(ielmn,k_woody_litr)
+  FWODRE(ielmp,k_fine_litr)=1.0_r8-FWODRE(ielmp,k_woody_litr)
 !
 !     SHOOT AND ROOT TEMPERATURE FUNCTIONS FOR MAINTENANCE
 !     RESPIRATION FROM TEMPERATURES WITH OFFSETS FOR THERMAL ADAPTATION
@@ -598,11 +603,10 @@ module grosubsMod
   D320: DO NB=1,NBR(NZ)
     CPOOLK(NB,NZ)=0._r8
     D325: DO K=1,JNODS1
-      CPOOLK(NB,NZ)=CPOOLK(NB,NZ) &
-        +CPOOL3(K,NB,NZ)+CPOOL4(K,NB,NZ) &
+      CPOOLK(NB,NZ)=CPOOLK(NB,NZ)+CPOOL3(K,NB,NZ)+CPOOL4(K,NB,NZ) &
         +CO2B(K,NB,NZ)+HCOB(K,NB,NZ)
     ENDDO D325
-    WTSHTBE(NB,ielmc,NZ)=WTSHTBE(NB,NE,NZ)+CPOOLK(NB,NZ)
+    WTSHTBE(NB,ielmc,NZ)=WTSHTBE(NB,ielmc,NZ)+CPOOLK(NB,NZ)
   ENDDO D320
 
 !

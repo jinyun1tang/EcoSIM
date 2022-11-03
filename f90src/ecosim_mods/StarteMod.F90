@@ -24,7 +24,7 @@ module StarteMod
   use InitSoluteMod
   use SoluteParMod
   use SoluteChemDataType, only : solutedtype
-  use MicBGCPars, only : micpar
+  use EcoSiMParDataMod, only : micpar
   use ChemTracerParsMod
   implicit none
 
@@ -61,7 +61,7 @@ module StarteMod
 
       DO I=1,366
         DO  L=NU(NY,NX),NL(NY,NX)
-          DO K=1,3
+          DO K=micpar%k_fine_litr,micpar%k_POM
             BKVLX=0._r8
 !
             IF(K.EQ.micpar%k_manure.AND.L.EQ.1)THEN
@@ -81,7 +81,7 @@ module StarteMod
               solutevar%COH1=DPH2O/solutevar%CHY1
             ELSE
               IF(I.EQ.1)then
-                IF(K.EQ.micpar%k_non_woody_litr.AND.L.EQ.1)THEN
+                IF(K.EQ.micpar%k_fine_litr.AND.L.EQ.1)THEN
 !     INITIALIZE RAINFALL
                   solutevar%CHY1=10.0_r8**(-(PHR(NY,NX)-3.0_r8))
                   solutevar%COH1=DPH2O/solutevar%CHY1
@@ -181,7 +181,7 @@ module StarteMod
 !
 !     SOLUTE CONCENTRATIONS IN PRECIPITATION
 !
-  IF(K.EQ.micpar%k_non_woody_litr.AND.L.EQ.1.AND.I.EQ.1)THEN
+  IF(K.EQ.micpar%k_fine_litr.AND.L.EQ.1.AND.I.EQ.1)THEN
     CCOR(NY,NX)=solutevar%CCO21
     CCHR(NY,NX)=solutevar%CCH41
     COXR(NY,NX)=solutevar%COXY1

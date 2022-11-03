@@ -45,38 +45,38 @@ module InsideTranspMod
 !------------------------------------------------------------------------------------------
   subroutine InitInsTp()
   implicit none
-  allocate(RFLOC(0:jcplx1))
-  allocate(RFLON(0:jcplx1))
-  allocate(RFLOP(0:jcplx1))
-  allocate(RFLOA(0:jcplx1))
-  allocate(RFHOC(0:jcplx1))
-  allocate(RFHON(0:jcplx1))
-  allocate(RFHOP(0:jcplx1))
-  allocate(RFHOA(0:jcplx1))
-  allocate(COQC1(0:jcplx1))
-  allocate(COQC2(0:jcplx1))
-  allocate(COQN1(0:jcplx1))
-  allocate(COQN2(0:jcplx1))
-  allocate(COQP1(0:jcplx1))
-  allocate(COQP2(0:jcplx1))
-  allocate(COQA1(0:jcplx1))
-  allocate(COQA2(0:jcplx1))
-  allocate(COQCH1(0:jcplx1))
-  allocate(COQCH2(0:jcplx1))
-  allocate(COQNH1(0:jcplx1))
-  allocate(COQNH2(0:jcplx1))
-  allocate(COQPH1(0:jcplx1))
-  allocate(COQPH2(0:jcplx1))
-  allocate(COQAH1(0:jcplx1))
-  allocate(COQAH2(0:jcplx1))
-  allocate(DFVOC(0:jcplx1))
-  allocate(DFVON(0:jcplx1))
-  allocate(DFVOP(0:jcplx1))
-  allocate(DFVOA(0:jcplx1))
-  allocate(DFHOC(0:jcplx1))
-  allocate(DFHON(0:jcplx1))
-  allocate(DFHOP(0:jcplx1))
-  allocate(DFHOA(0:jcplx1))
+  allocate(RFLOC(1:jcplx))
+  allocate(RFLON(1:jcplx))
+  allocate(RFLOP(1:jcplx))
+  allocate(RFLOA(1:jcplx))
+  allocate(RFHOC(1:jcplx))
+  allocate(RFHON(1:jcplx))
+  allocate(RFHOP(1:jcplx))
+  allocate(RFHOA(1:jcplx))
+  allocate(COQC1(1:jcplx))
+  allocate(COQC2(1:jcplx))
+  allocate(COQN1(1:jcplx))
+  allocate(COQN2(1:jcplx))
+  allocate(COQP1(1:jcplx))
+  allocate(COQP2(1:jcplx))
+  allocate(COQA1(1:jcplx))
+  allocate(COQA2(1:jcplx))
+  allocate(COQCH1(1:jcplx))
+  allocate(COQCH2(1:jcplx))
+  allocate(COQNH1(1:jcplx))
+  allocate(COQNH2(1:jcplx))
+  allocate(COQPH1(1:jcplx))
+  allocate(COQPH2(1:jcplx))
+  allocate(COQAH1(1:jcplx))
+  allocate(COQAH2(1:jcplx))
+  allocate(DFVOC(1:jcplx))
+  allocate(DFVON(1:jcplx))
+  allocate(DFVOP(1:jcplx))
+  allocate(DFVOA(1:jcplx))
+  allocate(DFHOC(1:jcplx))
+  allocate(DFHON(1:jcplx))
+  allocate(DFHOP(1:jcplx))
+  allocate(DFHOA(1:jcplx))
 
   end subroutine InitInsTp
 !------------------------------------------------------------------------------------------
@@ -206,7 +206,7 @@ module InsideTranspMod
 !     ZN3G=gaseous NH3
 !
 
-    DO  K=0,jcplx1
+    DO  K=1,jcplx
       TQROC(K,NY,NX)=0.0_r8
       TQRON(K,NY,NX)=0.0_r8
       TQROP(K,NY,NX)=0.0_r8
@@ -275,7 +275,7 @@ module InsideTranspMod
 !
   DO L=NU(NY,NX),NL(NY,NX)
     IF(M.NE.MX)THEN
-      DO  K=0,jcplx1
+      DO  K=1,jcplx
         TOCFLS(K,L,NY,NX)=0.0_r8
         TONFLS(K,L,NY,NX)=0.0_r8
         TOPFLS(K,L,NY,NX)=0.0_r8
@@ -537,7 +537,7 @@ module InsideTranspMod
     ELSE
       VFLW=VFLWX
     ENDIF
-    DO  K=0,jcplx1
+    DO  K=1,jcplx
       RFLOC(K)=VFLW*AZMAX1(OQC2(K,N3,N2,N1))
       RFLON(K)=VFLW*AZMAX1(OQN2(K,N3,N2,N1))
       RFLOP(K)=VFLW*AZMAX1(OQP2(K,N3,N2,N1))
@@ -573,7 +573,7 @@ module InsideTranspMod
     ELSE
       VFLW=-VFLWX
     ENDIF
-    DO 9815 K=0,jcplx1
+    DO 9815 K=1,jcplx
       RFLOC(K)=VFLW*AZMAX1(OQC2(K,N6,N5,N4))
       RFLON(K)=VFLW*AZMAX1(OQN2(K,N6,N5,N4))
       RFLOP(K)=VFLW*AZMAX1(OQP2(K,N6,N5,N4))
@@ -676,7 +676,7 @@ module InsideTranspMod
 !             :N4B=NH4,N3B=NH3,NOB=NO3,N2B=NO2,P1B=HPO4,POB=H2PO4 in band
 !     *S2,*B2=soil solute content in non-band,band
 !
-    DO 9810 K=0,jcplx1
+    DO 9810 K=1,jcplx
       COQC1(K)=AZMAX1(OQC2(K,N3,N2,N1)/VOLWM(M,N3,N2,N1))
       COQN1(K)=AZMAX1(OQN2(K,N3,N2,N1)/VOLWM(M,N3,N2,N1))
       COQP1(K)=AZMAX1(OQP2(K,N3,N2,N1)/VOLWM(M,N3,N2,N1))
@@ -822,7 +822,7 @@ module InsideTranspMod
 !     DIFFUSIVE FLUXES BETWEEN CURRENT AND ADJACENT GRID CELL
 !     MICROPORES
 !
-    DO 9805 K=0,jcplx1
+    DO 9805 K=1,jcplx
       DFVOC(K)=DIFOC*(COQC1(K)-COQC2(K))
       DFVON(K)=DIFON*(COQN1(K)-COQN2(K))
       DFVOP(K)=DIFOP*(COQP1(K)-COQP2(K))
@@ -847,7 +847,7 @@ module InsideTranspMod
     DFVP1B=DIFPO*(CP14B1-CP14B2)*AMIN1(VLPOB(N3,N2,N1),VLPOB(N6,N5,N4))
     DFVPOB=DIFPO*(CPO4B1-CPO4B2)*AMIN1(VLPOB(N3,N2,N1),VLPOB(N6,N5,N4))
   ELSE
-    DO 9905 K=0,jcplx1
+    DO 9905 K=1,jcplx
       DFVOC(K)=0.0_r8
       DFVON(K)=0.0_r8
       DFVOP(K)=0.0_r8
@@ -936,7 +936,7 @@ module InsideTranspMod
 !     ACCOUNT FOR MACROPORE-MICROPORE EXCHANGE
 !
     IF(N.EQ.3.AND.VOLAH(N6,N5,N4).GT.VOLWHM(M,N6,N5,N4))THEN
-      DO 9800 K=0,jcplx1
+      DO 9800 K=1,jcplx
         RFHOC(K)=VFLW*AZMAX1((OQCH2(K,N3,N2,N1)-AZMIN1(ROCFXS(K,NU(N2,N1),N2,N1))))
         RFHON(K)=VFLW*AZMAX1((OQNH2(K,N3,N2,N1)-AZMIN1(RONFXS(K,NU(N2,N1),N2,N1))))
         RFHOP(K)=VFLW*AZMAX1((OQPH2(K,N3,N2,N1)-AZMIN1(ROPFXS(K,NU(N2,N1),N2,N1))))
@@ -964,7 +964,7 @@ module InsideTranspMod
 !     OTHERWISE
 !
     ELSE
-      DO 9850 K=0,jcplx1
+      DO 9850 K=1,jcplx
         RFHOC(K)=VFLW*AZMAX1(OQCH2(K,N3,N2,N1))
         RFHON(K)=VFLW*AZMAX1(OQNH2(K,N3,N2,N1))
         RFHOP(K)=VFLW*AZMAX1(OQPH2(K,N3,N2,N1))
@@ -1001,7 +1001,7 @@ module InsideTranspMod
     ELSE
       VFLW=-VFLWX
     ENDIF
-    DO 9665 K=0,jcplx1
+    DO 9665 K=1,jcplx
       RFHOC(K)=VFLW*AZMAX1(OQCH2(K,N6,N5,N4))
       RFHON(K)=VFLW*AZMAX1(OQNH2(K,N6,N5,N4))
       RFHOP(K)=VFLW*AZMAX1(OQPH2(K,N6,N5,N4))
@@ -1029,7 +1029,7 @@ module InsideTranspMod
 !
 !     NO MACROPORE FLUX
 !
-    DO 9795 K=0,jcplx1
+    DO 9795 K=1,jcplx
       RFHOC(K)=0.0_r8
       RFHON(K)=0.0_r8
       RFHOP(K)=0.0_r8
@@ -1134,7 +1134,7 @@ module InsideTranspMod
     VOLHPB=VOLWHM(M,N6,N5,N4)*VLPOB(N6,N5,N4)
 
 
-    DO 9790 K=0,jcplx1
+    DO 9790 K=1,jcplx
       COQCH1(K)=AZMAX1(OQCH2(K,N3,N2,N1)/VOLWHM(M,N3,N2,N1))
       COQNH1(K)=AZMAX1(OQNH2(K,N3,N2,N1)/VOLWHM(M,N3,N2,N1))
       COQPH1(K)=AZMAX1(OQPH2(K,N3,N2,N1)/VOLWHM(M,N3,N2,N1))
@@ -1286,7 +1286,7 @@ module InsideTranspMod
 !     DIFFUSIVE FLUXES BETWEEN CURRENT AND ADJACENT GRID CELL
 !     MACROPORES
 !
-    DO 9785 K=0,jcplx1
+    DO 9785 K=1,jcplx
       DFHOC(K)=DIFOC*(COQCH1(K)-COQCH2(K))
       DFHON(K)=DIFON*(COQNH1(K)-COQNH2(K))
       DFHOP(K)=DIFOP*(COQPH1(K)-COQPH2(K))
@@ -1312,7 +1312,7 @@ module InsideTranspMod
     DFHP1B=DIFPO*(CP14BH1-CP14BH2)*AMIN1(VLPOB(N3,N2,N1),VLPOB(N6,N5,N4))
     DFHPOB=DIFPO*(CPO4BH1-CPO4BH2)*AMIN1(VLPOB(N3,N2,N1),VLPOB(N6,N5,N4))
   ELSE
-    DO 9780 K=0,jcplx1
+    DO 9780 K=1,jcplx
       DFHOC(K)=0.0_r8
       DFHON(K)=0.0_r8
       DFHOP(K)=0.0_r8
@@ -1400,7 +1400,7 @@ module InsideTranspMod
 !     RFH*=convective flux through macropores
 !     DFH*=diffusive solute flux through macropores
 !
-  DO 9765 K=0,jcplx1
+  DO 9765 K=1,jcplx
     ROCFLS(K,N,N6,N5,N4)=RFLOC(K)+DFVOC(K)
     RONFLS(K,N,N6,N5,N4)=RFLON(K)+DFVON(K)
     ROPFLS(K,N,N6,N5,N4)=RFLOP(K)+DFVOP(K)
@@ -1423,7 +1423,7 @@ module InsideTranspMod
 !     R*FHS=convective + diffusive solute flux through macropores
 !     R*FHW,X*FHB=convective + diffusive solute flux through macropores in non-band,band
 !
-  DO 9755 K=0,jcplx1
+  DO 9755 K=1,jcplx
     XOCFLS(K,N,N6,N5,N4)=XOCFLS(K,N,N6,N5,N4)+ROCFLS(K,N,N6,N5,N4)
     XONFLS(K,N,N6,N5,N4)=XONFLS(K,N,N6,N5,N4)+RONFLS(K,N,N6,N5,N4)
     XOPFLS(K,N,N6,N5,N4)=XOPFLS(K,N,N6,N5,N4)+ROPFLS(K,N,N6,N5,N4)
@@ -1503,7 +1503,7 @@ module InsideTranspMod
 !     X*FXS,X*FXB= hourly convective + diffusive solute flux between macro- and micropore in non-band,band
 !     R*FXS,R*FXB=convective + diffusive solute flux between macro- and micropore in non-band,band
 !
-  DO 9945 K=0,jcplx1
+  DO 9945 K=1,jcplx
     XOCFXS(K,N6,N5,N4)=XOCFXS(K,N6,N5,N4)+ROCFXS(K,N6,N5,N4)
     XONFXS(K,N6,N5,N4)=XONFXS(K,N6,N5,N4)+RONFXS(K,N6,N5,N4)
     XOPFXS(K,N6,N5,N4)=XOPFXS(K,N6,N5,N4)+ROPFXS(K,N6,N5,N4)
@@ -1562,7 +1562,7 @@ module InsideTranspMod
     ELSE
       VFLW=VFLWX
     ENDIF
-    DO 9970 K=0,jcplx1
+    DO 9970 K=1,jcplx
       RFLOC(K)=VFLW*AZMAX1(OQCH2(K,N6,N5,N4))
       RFLON(K)=VFLW*AZMAX1(OQNH2(K,N6,N5,N4))
       RFLOP(K)=VFLW*AZMAX1(OQPH2(K,N6,N5,N4))
@@ -1595,7 +1595,7 @@ module InsideTranspMod
     ELSE
       VFLW=-VFLWX
     ENDIF
-    DO 9965 K=0,jcplx1
+    DO 9965 K=1,jcplx
       RFLOC(K)=VFLW*AZMAX1(OQC2(K,N6,N5,N4))
       RFLON(K)=VFLW*AZMAX1(OQN2(K,N6,N5,N4))
       RFLOP(K)=VFLW*AZMAX1(OQP2(K,N6,N5,N4))
@@ -1623,7 +1623,7 @@ module InsideTranspMod
 !     NO MACROPORE TO MICROPORE TRANSFER
 !
   ELSE
-    DO 9960 K=0,jcplx1
+    DO 9960 K=1,jcplx
       RFLOC(K)=0.0_r8
       RFLON(K)=0.0_r8
       RFLOP(K)=0.0_r8
@@ -1678,7 +1678,7 @@ module InsideTranspMod
 !     DFV*=diffusive solute flux between macro- and micropore
 !
 
-  DO  K=0,jcplx1
+  DO  K=1,jcplx
     ROCFXS(K,N6,N5,N4)=RFLOC(K)
     RONFXS(K,N6,N5,N4)=RFLON(K)
     ROPFXS(K,N6,N5,N4)=RFLOP(K)
@@ -1712,7 +1712,7 @@ module InsideTranspMod
   IF(VOLWHM(M,N6,N5,N4).GT.ZEROS2(N5,N4))THEN
     VOLWHS=AMIN1(XFRS*VOLT(N6,N5,N4),VOLWHM(M,N6,N5,N4))
     VOLWT=VOLWM(M,N6,N5,N4)+VOLWHS
-    DO 9955 K=0,jcplx1
+    DO 9955 K=1,jcplx
       DFVOC(K)=XNPH*(AZMAX1(OQCH2(K,N6,N5,N4))*VOLWM(M,N6,N5,N4) &
         -AZMAX1(OQC2(K,N6,N5,N4))*VOLWHS)/VOLWT
       DFVON(K)=XNPH*(AZMAX1(OQNH2(K,N6,N5,N4))*VOLWM(M,N6,N5,N4) &
@@ -1771,7 +1771,7 @@ module InsideTranspMod
       -AZMAX1(H2POB2(N6,N5,N4))*VOLWHS)/VOLWT &
       *VLPOB(N6,N5,N4)
   ELSE
-    DO 9975 K=0,jcplx1
+    DO 9975 K=1,jcplx
       DFVOC(K)=0.0_r8
       DFVON(K)=0.0_r8
       DFVOP(K)=0.0_r8
@@ -1826,7 +1826,7 @@ module InsideTranspMod
 !     DFV*=diffusive solute flux between macro- and micropore
 !
 
-  DO  K=0,jcplx1
+  DO  K=1,jcplx
     ROCFXS(K,N6,N5,N4)=ROCFXS(K,N6,N5,N4)+DFVOC(K)
     RONFXS(K,N6,N5,N4)=RONFXS(K,N6,N5,N4)+DFVON(K)
     ROPFXS(K,N6,N5,N4)=ROPFXS(K,N6,N5,N4)+DFVOP(K)
@@ -2277,7 +2277,7 @@ module InsideTranspMod
   DZ2OG(N,N6,N5,N4)=0.0_r8
   DNH3G(N,N6,N5,N4)=0.0_r8
   DH2GG(N,N6,N5,N4)=0.0_r8
-  DO 9750 K=0,jcplx1
+  DO 9750 K=1,jcplx
     ROCFLS(K,N,N6,N5,N4)=0.0_r8
     RONFLS(K,N,N6,N5,N4)=0.0_r8
     ROPFLS(K,N,N6,N5,N4)=0.0_r8
@@ -2346,7 +2346,7 @@ module InsideTranspMod
   DZ2OG(N,N3,N2,N1)=0.0_r8
   DNH3G(N,N3,N2,N1)=0.0_r8
   DH2GG(N,N3,N2,N1)=0.0_r8
-  DO 9751 K=0,jcplx1
+  DO 9751 K=1,jcplx
     ROCFLS(K,N,N3,N2,N1)=0.0_r8
     RONFLS(K,N,N3,N2,N1)=0.0_r8
     ROPFLS(K,N,N3,N2,N1)=0.0_r8

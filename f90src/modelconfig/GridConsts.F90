@@ -28,4 +28,18 @@ implicit none
   integer, pointer :: JGnfA(:)   !guid indices for autotrophic-microbial complex
   integer  :: NMICBSA             !total number of microbial guilds in the autotrophic complex
   integer  :: NMICBSO             !total number of microbial guilds in one organic-microbial complex
+
+  type, public :: bounds_type
+   integer :: NHW
+   integer :: NVN
+   integer :: NHE
+   integer :: NVS
+   integer :: ncols
+   integer :: npfts
+   integer, pointer :: icol(:,:)    => null()   !column id
+   integer, pointer :: ipft(:,:,:)  => null()   !pft id
+  end type bounds_type
+
+  type(bounds_type) :: bounds
+
 end module GridConsts

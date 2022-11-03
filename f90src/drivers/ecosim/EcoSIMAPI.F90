@@ -98,7 +98,8 @@ contains
   subroutine SetMesh(NHW,NVN,NHE,NVS)
 
   use EcoSIMConfig, only : column_mode
-  use GridConsts, only : JX,JY,JZ,JH,JV,JD
+  USE fileUtil, ONLY : iulog
+  use GridConsts, only : JX,JY,JZ,JH,JV,JD,bounds,JP
 !  set up the landscape rectangular mesh
 !  beginning(NHW,NVN)
 !  o--------------------------x
@@ -115,6 +116,28 @@ contains
   integer, intent(in) :: NHE   !lower corner x index
   integer, intent(in) :: NVS   !lower corner y index
   integer :: nextra_grid
+  INTEGER :: NZ,NY,NX,ic,ip
+
+  bounds%NHW =NHW
+  bounds%NVN =NVN
+  bounds%NHE =NHE
+  bounds%NVS =NVS
+  bounds%ncols=((NHE-NHW)+1)*((NVS-NVN)+1)
+  bounds%npfts=bounds%ncols*JP
+  allocate(bounds%icol((NVS-NVN)+1,(NHE-NHW)+1))
+  allocate(bounds%ipft(JP,(NVS-NVN)+1,(NHE-NHW)+1))
+
+  ic=0;ip=0
+  DO  NX=NHW,NHE
+    DO  NY=NVN,NVS
+      ic=ic+1
+      bounds%icol(NY,NX)=ic
+      DO NZ=1,JP
+        ip=ip+1
+        bounds%ipft(NZ,NY,NX)=ip
+      ENDDO
+    ENDDO
+  ENDDO
 
   nextra_grid=1
   if(column_mode)nextra_grid=0
@@ -122,9 +145,9 @@ contains
   JY=(NVS-NVN)+1+nextra_grid
   JZ=14
   JH=JX+nextra_grid
-  JV=JY+nextra_grid  
+  JV=JY+nextra_grid
   JD=JZ+1
-  print*,'grid size'
-  print*,'JX=',JX,'JY=',JY
+  write(iulog,*)'grid size'
+  write(iulog,*)'JX=',JX,'JY=',JY,'JZ=',JZ
   end subroutine SetMesh
 end module EcoSIMAPI

@@ -214,9 +214,9 @@ module NutUptakeMod
   plt_rbgc%RUPN3S(1:NN,L1:L2,NZ)=0.0_r8
   plt_rbgc%RCO2P(1:NN,L1:L2,NZ)=0.0_r8
   plt_rbgc%RUPOXP(1:NN,L1:L2,NZ)=0.0_r8
-  plt_rbgc%RDFOMC(1:NN,0:jcplx11,L1:L2,NZ)=0.0_r8
-  plt_rbgc%RDFOMN(1:NN,0:jcplx11,L1:L2,NZ)=0.0_r8
-  plt_rbgc%RDFOMP(1:NN,0:jcplx11,L1:L2,NZ)=0.0_r8
+  plt_rbgc%RDFOMC(1:NN,1:jcplx,L1:L2,NZ)=0.0_r8
+  plt_rbgc%RDFOMN(1:NN,1:jcplx,L1:L2,NZ)=0.0_r8
+  plt_rbgc%RDFOMP(1:NN,1:jcplx,L1:L2,NZ)=0.0_r8
   plt_rbgc%WFR(1:NN,L1:L2,NZ)=1.0
   plt_rbgc%RUNNHP(1:NN,L1:L2,NZ)=0.0_r8
   plt_rbgc%RUPNH4(1:NN,L1:L2,NZ)=0.0_r8
@@ -1261,7 +1261,7 @@ module NutUptakeMod
   !      RA=canopy boundary layer resistance
   !     OSTR=O2 stress indicator
   !
-  D195: DO K=0,jcplx11
+  D195: DO K=1,jcplx
     VOLWK=VOLWM(NPH,L)*FOSRH(K,L)
     IF(VOLWK.GT.ZEROS2.AND.RTVLW(N,L,NZ).GT.ZEROP(NZ))THEN
       VOLWT=VOLWK+RTVLW(N,L,NZ)
@@ -1330,7 +1330,7 @@ module NutUptakeMod
   !     RUPH2P,RUPH2B,RUPH1P,RUPH1B=uptake from non-band,band of H2PO4,HPO4
   !     UPNH4,UPNO3,UPH2P,UPH1P=PFT uptake of NH4,NO3,H2PO4,HPO4
   !
-  D295: DO K=0,jcplx11
+  D295: DO K=1,jcplx
     UPOME(ielmc,NZ)=UPOME(ielmc,NZ)+RDFOMC(N,K,L,NZ)
     UPOME(ielmn,NZ)=UPOME(ielmn,NZ)+RDFOMN(N,K,L,NZ)
     UPOME(ielmp,NZ)=UPOME(ielmp,NZ)+RDFOMP(N,K,L,NZ)

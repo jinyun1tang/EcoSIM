@@ -1,7 +1,7 @@
 module IrrigationDataType
   use data_kind_mod, only : r8 => SHR_KIND_R8
   use GridConsts
-  use EcoSIMConfig, only : jcplx1=> jcplx1c
+  use EcoSIMConfig, only : jcplx => jcplxc
   implicit none
   public
   save
@@ -277,9 +277,9 @@ module IrrigationDataType
   allocate(COXQ(JY,JX));        COXQ=0._r8
   allocate(CNNQ(JY,JX));        CNNQ=0._r8
   allocate(CN2Q(JY,JX));        CN2Q=0._r8
-  allocate(COCU(0:jcplx1,JZ,JY,JX)); COCU=0._r8
-  allocate(CONU(0:jcplx1,JZ,JY,JX)); CONU=0._r8
-  allocate(COAU(0:jcplx1,JZ,JY,JX)); COAU=0._r8
+  allocate(COCU(1:jcplx,JZ,JY,JX)); COCU=0._r8
+  allocate(CONU(1:jcplx,JZ,JY,JX)); CONU=0._r8
+  allocate(COAU(1:jcplx,JZ,JY,JX)); COAU=0._r8
   allocate(CN4U(JZ,JY,JX));     CN4U=0._r8
   allocate(CN3U(JZ,JY,JX));     CN3U=0._r8
   allocate(CNOU(JZ,JY,JX));     CNOU=0._r8
@@ -327,7 +327,7 @@ module IrrigationDataType
   allocate(CC1PU(JZ,JY,JX));    CC1PU=0._r8
   allocate(CC2PU(JZ,JY,JX));    CC2PU=0._r8
   allocate(CM1PU(JZ,JY,JX));    CM1PU=0._r8
-  allocate(COPU(0:jcplx1,JZ,JY,JX)); COPU=0._r8
+  allocate(COPU(1:jcplx,JZ,JY,JX)); COPU=0._r8
   allocate(FLU(JZ,JY,JX));      FLU=0._r8
   allocate(HWFLU(JZ,JY,JX));    HWFLU=0._r8
   allocate(RCOFLU(JZ,JY,JX));   RCOFLU=0._r8

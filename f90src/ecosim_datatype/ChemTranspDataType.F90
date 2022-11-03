@@ -2,7 +2,7 @@ module ChemTranspDataType
 
   use data_kind_mod, only : r8 => SHR_KIND_R8
   use GridConsts
-  use EcoSIMConfig, only : jcplx1=> jcplx1c
+  use EcoSIMConfig, only : jcplx => jcplxc
   implicit none
 
   save
@@ -250,10 +250,10 @@ module ChemTranspDataType
   allocate(XNXQRS(2,2,JV,JH));  XNXQRS=0._r8
   allocate(XP4QRW(2,2,JV,JH));  XP4QRW=0._r8
   allocate(XP1QRW(2,2,JV,JH));  XP1QRW=0._r8
-  allocate(XOCQRS(0:jcplx1,2,2,JV,JH));XOCQRS=0._r8
-  allocate(XONQRS(0:jcplx1,2,2,JV,JH));XONQRS=0._r8
-  allocate(XOPQRS(0:jcplx1,2,2,JV,JH));XOPQRS=0._r8
-  allocate(XOAQRS(0:jcplx1,2,2,JV,JH));XOAQRS=0._r8
+  allocate(XOCQRS(1:jcplx,2,2,JV,JH));XOCQRS=0._r8
+  allocate(XONQRS(1:jcplx,2,2,JV,JH));XONQRS=0._r8
+  allocate(XOPQRS(1:jcplx,2,2,JV,JH));XOPQRS=0._r8
+  allocate(XOAQRS(1:jcplx,2,2,JV,JH));XOAQRS=0._r8
 
   end subroutine InitAllocate
 !------------------------------------------------------------------------------------------

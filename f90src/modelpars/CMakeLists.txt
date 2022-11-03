@@ -3,6 +3,7 @@ set(MODELPARS_SOURCES
   GrosubPars.F90
   TracerPropMod.F90
   MicBGCPars.F90
+  EcoSiMParDataMod.F90
   ChemTracerParsMod.F90
 )
 include_directories(${CMAKE_BINARY_DIR}/f90src/utils/)

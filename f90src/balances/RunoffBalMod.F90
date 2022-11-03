@@ -169,7 +169,7 @@ implicit none
       COR=0.0_r8
       ZOR=0.0_r8
       POR=0.0_r8
-      DO 2575 K=0,jcplx1
+      DO 2575 K=1,jcplx
         COR=COR+XN*(XOCQRS(K,N,NN,N5,N4)+XOAQRS(K,N,NN,N5,N4))
         ZOR=ZOR+XN*XONQRS(K,N,NN,N5,N4)
         POR=POR+XN*XOPQRS(K,N,NN,N5,N4)
@@ -306,7 +306,7 @@ implicit none
           COE=0.0_r8
           ZOE=0.0_r8
           POE=0.0_r8
-          D3580: DO K=0,jcplx1
+          D3580: DO K=1,jcplx
             DO NO=1,NFGs
               DO M=1,nlbiomcp
                 DO NGL=JGnio(NO),JGnfo(NO)
@@ -330,7 +330,7 @@ implicit none
 !
     !     MICROBIAL RESIDUE C IN RUNOFF SEDIMENT
 !
-          D3575: DO K=0,jcplx1
+          D3575: DO K=1,jcplx
             D3570: DO M=1,ndbiomcp
               COE=COE+XN*ORCER(M,K,N,NN,N5,N4)
               ZOE=ZOE+XN*ORNER(M,K,N,NN,N5,N4)
@@ -476,7 +476,7 @@ implicit none
       COD=0.0_r8
       ZOD=0.0_r8
       POD=0.0_r8
-      DO 450 K=0,jcplx1
+      DO 450 K=1,jcplx
         COD=COD+XN*(XOCFLS(K,N,N6,N5,N4)+XOAFLS(K,N,N6,N5,N4) &
           +XOCFHS(K,N,N6,N5,N4)+XOAFHS(K,N,N6,N5,N4))
         ZOD=ZOD+XN*(XONFLS(K,N,N6,N5,N4)+XONFHS(K,N,N6,N5,N4))

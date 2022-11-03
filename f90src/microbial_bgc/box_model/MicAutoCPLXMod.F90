@@ -6,7 +6,7 @@ module MicAutoCPLXMod
   use MicFluxTypeMod, only: micfluxtype
   use MicStateTraitTypeMod, only : micsttype
   use NitroDiagTypes
-  use MicBGCPars, only : micpar
+  use EcoSiMParDataMod, only : micpar
   use EcoSIMSolverPar
   use EcoSimConst
   use NitroPars
@@ -1945,26 +1945,27 @@ module MicAutoCPLXMod
     RIP1Bff   => nmicf%RIP1Bff,  &
     RIP14Rff  => nmicf%RIP14Rff,  &
     RINH4ff   => nmicf%RINH4ff,  &
-    litrm => micfor%litrm,&
-    CFOMC => micfor%CFOMC, &
-    CFOMCU => micfor%CFOMCU, &
-    OSC  => micstt%OSC, &
-    OSN  => micstt%OSN, &
-    OSP  => micstt%OSP, &
-    OMCff => micstt%OMCff, &
-    OMNff => micstt%OMNff, &
-    OMPff => micstt%OMPff, &
-    OSC14U => micstt%OSC14U, &
-    OSN14U=> micstt%OSN14U, &
-    OSP14U=> micstt%OSP14U, &
-    OSC24U=> micstt%OSC24U, &
-    OSN24U=> micstt%OSN24U, &
-    OSP24U=> micstt%OSP24U, &
-    JGniA => micpar%JGniA, &
-    JGnfA => micpar%JGnfA, &
-    NFGs=> micpar%NFGs, &
-    JG=> micpar%jguilds, &
-    k_POM=> micpar%k_POM, &
+    litrm     => micfor%litrm  , &
+    CFOMC     => micfor%CFOMC  , &
+    CFOMCU    => micfor%CFOMCU , &
+    OSC       => micstt%OSC    , &
+    OSN       => micstt%OSN    , &
+    OSP       => micstt%OSP    , &
+    OMCff     => micstt%OMCff  , &
+    OMNff     => micstt%OMNff  , &
+    OMPff     => micstt%OMPff  , &
+    OSC14U    => micstt%OSC14U , &
+    OSN14U    => micstt%OSN14U , &
+    OSP14U    => micstt%OSP14U , &
+    OSC24U    => micstt%OSC24U , &
+    OSN24U    => micstt%OSN24U , &
+    OSP24U    => micstt%OSP24U , &
+    JGniA     => micpar%JGniA  , &
+    JGnfA     => micpar%JGnfA  , &
+    NFGs      => micpar%NFGs   , &
+    icarbhyro => micpar%icarbhyro, &
+    iprotein  => micpar%iprotein , &
+    k_POM     => micpar%k_POM  , &
     is_activef_micb => micpar%is_activef_micb  &
   )
   DO  N=1,NFGs
@@ -1982,12 +1983,12 @@ module MicAutoCPLXMod
 !     RHMMC,RHMMN,RHMMC=transfer of senesence litterfall C,N,P to humus
 !
           IF(.not.litrm)THEN
-            OSC(1,k_POM)=OSC(1,k_POM)+CFOMC(1)*(RHOMCff(M,NGL)+RHMMCff(M,NGL))
-            OSN(1,k_POM)=OSN(1,k_POM)+CFOMC(1)*(RHOMNff(M,NGL)+RHMMNff(M,NGL))
-            OSP(1,k_POM)=OSP(1,k_POM)+CFOMC(1)*(RHOMPff(M,NGL)+RHMMPff(M,NGL))
-            OSC(2,k_POM)=OSC(2,k_POM)+CFOMC(2)*(RHOMCff(M,NGL)+RHMMCff(M,NGL))
-            OSN(2,k_POM)=OSN(2,k_POM)+CFOMC(2)*(RHOMNff(M,NGL)+RHMMNff(M,NGL))
-            OSP(2,k_POM)=OSP(2,k_POM)+CFOMC(2)*(RHOMPff(M,NGL)+RHMMPff(M,NGL))
+            OSC(iprotein,k_POM)=OSC(iprotein,k_POM)+CFOMC(1)*(RHOMCff(M,NGL)+RHMMCff(M,NGL))
+            OSN(iprotein,k_POM)=OSN(iprotein,k_POM)+CFOMC(1)*(RHOMNff(M,NGL)+RHMMNff(M,NGL))
+            OSP(iprotein,k_POM)=OSP(iprotein,k_POM)+CFOMC(1)*(RHOMPff(M,NGL)+RHMMPff(M,NGL))
+            OSC(icarbhyro,k_POM)=OSC(icarbhyro,k_POM)+CFOMC(2)*(RHOMCff(M,NGL)+RHMMCff(M,NGL))
+            OSN(icarbhyro,k_POM)=OSN(icarbhyro,k_POM)+CFOMC(2)*(RHOMNff(M,NGL)+RHMMNff(M,NGL))
+            OSP(icarbhyro,k_POM)=OSP(icarbhyro,k_POM)+CFOMC(2)*(RHOMPff(M,NGL)+RHMMPff(M,NGL))
           ELSE
             OSC14U=OSC14U+CFOMCU(1)*(RHOMCff(M,NGL)+RHMMCff(M,NGL))
             OSN14U=OSN14U+CFOMCU(1)*(RHOMNff(M,NGL)+RHMMNff(M,NGL))

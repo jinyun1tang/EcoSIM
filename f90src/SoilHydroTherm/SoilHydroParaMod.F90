@@ -16,6 +16,7 @@ module SoilHydroParaMod
   use EcoSIMConfig
   use WatsubPars
   use SurfLitterDataType
+  use EcoSiMParDataMod   , only : micpar
   use minimathmod  , only : test_aeqb,AZMAX1,AZMIN1
 implicit none
   private
@@ -337,7 +338,7 @@ contains
   IF(VOLT(0,NY,NX).GT.ZEROS2(NY,NX))THEN
     BKDS(0,NY,NX)=BKVL(0,NY,NX)/VOLT(0,NY,NX)
   ELSE
-    BKDS(0,NY,NX)=BKRS(1)
+    BKDS(0,NY,NX)=BKRS(micpar%k_fine_litr)
   ENDIF
   THETY(0,NY,NX)=EXP((PSIMX(NY,NX)-LOG(-PSIHY))*FCD(0,NY,NX)/PSIMD(NY,NX)+FCL(0,NY,NX))
   SUM2=0.0_r8

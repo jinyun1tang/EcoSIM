@@ -161,7 +161,7 @@ module GrosubPars
   integer  :: JP1         !number of plants
   integer  :: JBR         !maximum number of branches
   integer  :: JSA1        !number of sectors for the sky azimuth  [0,2*pi]
-  integer  :: jcplx11     !number of organo-microbial complexes
+  integer  :: jcplx       !number of organo-microbial complexes
   integer  :: JLA1        !number of sectors for the leaf azimuth, [0,pi]
   integer  :: JC1         !number of canopy layers
   integer  :: JZ1         !number of soil layers
@@ -171,13 +171,22 @@ module GrosubPars
   integer  :: Jlitgrp     !number of litter groups nonstructural(0,*),
                           !     foliar(1,*),non-foliar(2,*),stalk(3,*),root(4,*), coarse woody (5,*)
   integer  :: JPRT
+  integer  :: n_pltlitrk  !number of plant litter microbial-om complexes
+  integer :: iprotein
+  integer :: icarbhyro
+  integer :: icellulos
+  integer :: ilignin
+  integer :: k_woody_litr
+  integer :: k_fine_litr
+
   end type plant_bgc_par_type
 
-  type(plant_bgc_par_type), target, public :: pltpar
+
   contains
 
-  subroutine InitVegPars
+  subroutine InitVegPars(pltpar)
   implicit none
+  type(plant_bgc_par_type)  :: pltpar
 
   pltpar%instruct=0
   pltpar%ifoliar=1

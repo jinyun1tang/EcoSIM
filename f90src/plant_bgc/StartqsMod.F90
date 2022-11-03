@@ -4,8 +4,7 @@ module StartqsMod
   use minimathmod, only : AZMAX1
   use EcoSIMConfig
   use PlantAPIData
-  use MicBGCPars, only : micpar
-  use GrosubPars, only : pltpar
+  use EcoSiMParDataMod, only : pltpar
   implicit none
 
   private
@@ -84,7 +83,7 @@ module StartqsMod
         plt_bgcr%TESNC(1:npelms,NZ)=0._r8
         plt_biom%WTSTGE(1:npelms,NZ)=0._r8
         D6401: DO L=1,NL
-          DO  K=0,micpar%n_pltlitrk
+          DO  K=1,pltpar%n_pltlitrk
             plt_bgcr%ESNC(1:jsken,1:npelms,K,L,NZ)=0._r8
           enddo
         ENDDO D6401
@@ -147,7 +146,6 @@ module StartqsMod
 !------------------------------------------------------------------------------------------
 
   subroutine PlantLitterFraction(NZ)
-  use MicBGCPars, only : micpar
   implicit none
   integer, intent(in) :: NZ
   integer :: N,M
@@ -161,10 +159,10 @@ module StartqsMod
     istalk   => pltpar%istalk  , &
     iroot    => pltpar%iroot   , &
     icwood   => pltpar%icwood  , &
-    iprotein  => micpar%iprotein  ,&
-    icarbhyro => micpar%icarbhyro ,&
-    icellulos => micpar%icellulos ,&
-    ilignin  =>  micpar%ilignin   , &
+    iprotein  => pltpar%iprotein  ,&
+    icarbhyro => pltpar%icarbhyro ,&
+    icellulos => pltpar%icellulos ,&
+    ilignin  =>  pltpar%ilignin   , &
     Jlitgrp  => pltpar%Jlitgrp , &
     XRLA   =>  plt_pheno%XRLA      , &
     IBTYP  =>  plt_pheno%IBTYP     , &
@@ -988,7 +986,7 @@ module StartqsMod
         plt_biom%RTWT1E(N,NR,1:npelms,NZ)=0._r8
       ENDDO D30
       IF(N.EQ.1)THEN
-        D6400: DO K=0,micpar%k_non_woody_litr
+        D6400: DO K=1,pltpar%n_pltlitrk
           plt_bgcr%ESNC(1:jsken,1:npelms,K,L,NZ)=0._r8
         ENDDO D6400
         plt_biom%EPOOLN(L,1:npelms,NZ)=0._r8

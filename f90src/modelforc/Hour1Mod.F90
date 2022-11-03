@@ -41,7 +41,7 @@ module Hour1Mod
   use GridDataType
   use EcoSIMConfig, only : jcplx1 => jcplx1c,jcplx=>jcplxc,nlbiomcp=>nlbiomcpc
   use EcoSIMConfig, only : ndbiomcp=>ndbiomcpc,jsken=>jskenc,NFGs=>NFGsc,do_instequil
-  use MicBGCPars, only : micpar
+  use EcoSiMParDataMod, only : micpar,pltpar
   implicit none
 
   private
@@ -51,7 +51,8 @@ module Hour1Mod
   real(r8) :: BKDSX  !     BKDSX=maximm soil bulk density
   real(r8) :: THETPW !     THETPW=minimum air-filled porosity for saturation (m3 m-3)
   real(r8) :: THETWP
-  real(r8) :: XVOLWC(0:3),THETRX(0:2)
+  real(r8) :: XVOLWC(0:3)
+  real(r8), pointer :: THETRX(:)
 !
 !     XVOLWC=foliar water retention capacity (m3 m-2)
 !     THETRX=litter water retention capacity (m3 g C-1)
@@ -60,11 +61,12 @@ module Hour1Mod
   public :: InitHour1
   contains
 
-  subroutine InitHour1
+  subroutine InitHour1(n_litrsfk)
 
   implicit none
+  integer, intent(in) :: n_litrsfk
 
-
+  allocate(THETRX(1:n_litrsfk))
   BKDSX=1.89_r8
 
   THETPW=0.01_r8
@@ -90,8 +92,9 @@ module Hour1Mod
   real(r8) :: DPTH0(JY,JX)
   real(r8) :: FVOLR
   real(r8) :: VOLWCX
+  real(r8) :: VOLWRX0,VOLR0
   real(r8) :: XJ
-  integer :: NZ,NR
+  integer :: NZ,NR,K
 !     execution begins here
 
   XJ=J
@@ -129,12 +132,20 @@ module Hour1Mod
 !     VOLR=dry litter volume
 !     POROS0,FC,WP=litter porosity,field capacity,wilting point
 !
-      VOLWRX(NY,NX)=AZMAX1(THETRX(0)*RC0(0,NY,NX)+THETRX(1)*RC0(1,NY,NX)+THETRX(2)*RC0(2,NY,NX))
-      VOLR(NY,NX)=AZMAX1(RC0(0,NY,NX)*ppmc/BKRS(0)+RC0(1,NY,NX)*ppmc/BKRS(1)+RC0(2,NY,NX)*ppmc/BKRS(2))
+      VOLWRX0=0._r8
+      VOLR0=0._r8
+      DO K=1,micpar%n_litrsfk
+        VOLWRX0=VOLWRX0+THETRX(K)*RC0(K,NY,NX)
+        VOLR0=VOLR0+RC0(K,NY,NX)/BKRS(K)
+      ENDDO
+
+      VOLWRX(NY,NX)=AZMAX1(VOLWRX0)
+      VOLR(NY,NX)=AZMAX1(VOLR0*ppmc)
+
       IF(VOLR(NY,NX).GT.ZEROS(NY,NX))THEN
         FVOLR=VOLWRX(NY,NX)/VOLR(NY,NX)
       ELSE
-        FVOLR=THETRX(1)/BKRS(1)
+        FVOLR=THETRX(micpar%k_fine_litr)/BKRS(micpar%k_fine_litr)
       ENDIF
       POROS0(NY,NX)=FVOLR
       FC(0,NY,NX)=0.500_r8*FVOLR
@@ -352,10 +363,10 @@ module Hour1Mod
       QR(1:2,1:2,NY,NX)=0.0_r8
       HQR(1:2,1:2,NY,NX)=0.0_r8
 
-      XOCQRS(0:jcplx1,1:2,1:2,NY,NX)=0.0_r8
-      XONQRS(0:jcplx1,1:2,1:2,NY,NX)=0.0_r8
-      XOPQRS(0:jcplx1,1:2,1:2,NY,NX)=0.0_r8
-      XOAQRS(0:jcplx1,1:2,1:2,NY,NX)=0.0_r8
+      XOCQRS(1:jcplx,1:2,1:2,NY,NX)=0.0_r8
+      XONQRS(1:jcplx,1:2,1:2,NY,NX)=0.0_r8
+      XOPQRS(1:jcplx,1:2,1:2,NY,NX)=0.0_r8
+      XOAQRS(1:jcplx,1:2,1:2,NY,NX)=0.0_r8
 
       XCOQRS(1:2,1:2,NY,NX)=0.0_r8
       XCHQRS(1:2,1:2,NY,NX)=0.0_r8
@@ -403,10 +414,10 @@ module Hour1Mod
         XH1PFS(1:3,L,NY,NX)=0.0_r8
         XH2PFS(1:3,L,NY,NX)=0.0_r8
 
-        XOCFLS(0:jcplx1,1:3,L,NY,NX)=0.0_r8
-        XONFLS(0:jcplx1,1:3,L,NY,NX)=0.0_r8
-        XOPFLS(0:jcplx1,1:3,L,NY,NX)=0.0_r8
-        XOAFLS(0:jcplx1,1:3,L,NY,NX)=0.0_r8
+        XOCFLS(1:jcplx,1:3,L,NY,NX)=0.0_r8
+        XONFLS(1:jcplx,1:3,L,NY,NX)=0.0_r8
+        XOPFLS(1:jcplx,1:3,L,NY,NX)=0.0_r8
+        XOAFLS(1:jcplx,1:3,L,NY,NX)=0.0_r8
       ENDDO
 !
 !     BAND AND MACROPORE FLUXES
@@ -448,10 +459,10 @@ module Hour1Mod
         XN3FLG(1:3,L,NY,NX)=0.0_r8
         XHGFLG(1:3,L,NY,NX)=0.0_r8
 
-        XOCFHS(0:jcplx1,1:3,L,NY,NX)=0.0_r8
-        XONFHS(0:jcplx1,1:3,L,NY,NX)=0.0_r8
-        XOPFHS(0:jcplx1,1:3,L,NY,NX)=0.0_r8
-        XOAFHS(0:jcplx1,1:3,L,NY,NX)=0.0_r8
+        XOCFHS(1:jcplx,1:3,L,NY,NX)=0.0_r8
+        XONFHS(1:jcplx,1:3,L,NY,NX)=0.0_r8
+        XOPFHS(1:jcplx,1:3,L,NY,NX)=0.0_r8
+        XOAFHS(1:jcplx,1:3,L,NY,NX)=0.0_r8
 
       ENDDO
     ENDDO
@@ -1099,14 +1110,12 @@ module Hour1Mod
 
 !     begin_execution
 
-  CSNT(1:jsken,0:1,0:NL(NY,NX),NY,NX)=0.0_r8
-  ZSNT(1:jsken,0:1,0:NL(NY,NX),NY,NX)=0.0_r8
-  PSNT(1:jsken,0:1,0:NL(NY,NX),NY,NX)=0.0_r8
+  ESNT(1:jsken,1:npelms,1:pltpar%n_pltlitrk,0:NL(NY,NX),NY,NX)=0.0_r8
 
-  XOQCS(0:jcplx1,0:NL(NY,NX),NY,NX)=0.0_r8
-  XOQNS(0:jcplx1,0:NL(NY,NX),NY,NX)=0.0_r8
-  XOQPS(0:jcplx1,0:NL(NY,NX),NY,NX)=0.0_r8
-  XOQAS(0:jcplx1,0:NL(NY,NX),NY,NX)=0.0_r8
+  XOQCS(1:jcplx,0:NL(NY,NX),NY,NX)=0.0_r8
+  XOQNS(1:jcplx,0:NL(NY,NX),NY,NX)=0.0_r8
+  XOQPS(1:jcplx,0:NL(NY,NX),NY,NX)=0.0_r8
+  XOQAS(1:jcplx,0:NL(NY,NX),NY,NX)=0.0_r8
 
   XZHYS(0:NL(NY,NX),NY,NX)=0.0_r8
   TRN4S(0:NL(NY,NX),NY,NX)=0.0_r8
@@ -1138,9 +1147,9 @@ module Hour1Mod
   XNBDFG(0:NL(NY,NX),NY,NX)=0.0_r8
   XHGDFG(0:NL(NY,NX),NY,NX)=0.0_r8
 
-  TDFOMC(0:jcplx1,NU(NY,NX):NL(NY,NX),NY,NX)=0.0_r8
-  TDFOMN(0:jcplx1,NU(NY,NX):NL(NY,NX),NY,NX)=0.0_r8
-  TDFOMP(0:jcplx1,NU(NY,NX):NL(NY,NX),NY,NX)=0.0_r8
+  TDFOMC(1:jcplx,NU(NY,NX):NL(NY,NX),NY,NX)=0.0_r8
+  TDFOMN(1:jcplx,NU(NY,NX):NL(NY,NX),NY,NX)=0.0_r8
+  TDFOMP(1:jcplx,NU(NY,NX):NL(NY,NX),NY,NX)=0.0_r8
   ROXSK(1:NPH,NU(NY,NX):NL(NY,NX),NY,NX)=0.0_r8
   end subroutine SetArrays4PlantSoilTransfer
 !------------------------------------------------------------------------------------------
@@ -1291,18 +1300,18 @@ module Hour1Mod
 
   DO L=0,NL(NY,NX)
 !  add heterotrophic complexs
-    OC=OC+sum(OMC(1:nlbiomcp,1:NMICBSO,0:jcplx1,L,NY,NX))
+    OC=OC+sum(OMC(1:nlbiomcp,1:NMICBSO,1:jcplx,L,NY,NX))
 
 !  add autotrophic complex
     OC=OC+sum(OMCff(1:nlbiomcp,1:NMICBSA,L,NY,NX))
 !  add microbial residue
-    OC=OC+SUM(ORC(1:ndbiomcp,0:jcplx1,L,NY,NX))
+    OC=OC+SUM(ORC(1:ndbiomcp,1:jcplx,L,NY,NX))
 !  add dissolved/sorbed OM and acetate
-    OC=OC+SUM(OQC(0:jcplx1,L,NY,NX))+SUM(OQCH(0:jcplx1,L,NY,NX)) &
-         +SUM(OHC(0:jcplx1,L,NY,NX))+SUM(OQA(0:jcplx1,L,NY,NX)) &
-         +SUM(OQAH(0:jcplx1,L,NY,NX))+SUM(OHA(0:jcplx1,L,NY,NX))
+    OC=OC+SUM(OQC(1:jcplx,L,NY,NX))+SUM(OQCH(1:jcplx,L,NY,NX)) &
+         +SUM(OHC(1:jcplx,L,NY,NX))+SUM(OQA(1:jcplx,L,NY,NX)) &
+         +SUM(OQAH(1:jcplx,L,NY,NX))+SUM(OHA(1:jcplx,L,NY,NX))
 !  add OM complexes
-    OC=OC+SUM(OSC(1:jsken,0:jcplx1,L,NY,NX))
+    OC=OC+SUM(OSC(1:jsken,1:jcplx,L,NY,NX))
 !
     ORGCX(L,NY,NX)=OC
   ENDDO
@@ -1438,7 +1447,7 @@ module Hour1Mod
   RN2OX(0,NY,NX)=0.0_r8
   RP14X(0,NY,NX)=0.0_r8
   RPO4X(0,NY,NX)=0.0_r8
-  D5055: DO K=0,jcplx1
+  D5055: DO K=1,jcplx
     ROQCY(K,0,NY,NX)=ROQCX(K,0,NY,NX)
     ROQAY(K,0,NY,NX)=ROQAX(K,0,NY,NX)
     ROQCX(K,0,NY,NX)=0.0_r8
@@ -1595,7 +1604,7 @@ module Hour1Mod
     RN2BX(L,NY,NX)=0.0_r8
     RP1BX(L,NY,NX)=0.0_r8
     RPOBX(L,NY,NX)=0.0_r8
-    D5050: DO K=0,jcplx1
+    D5050: DO K=1,jcplx
       ROQCY(K,L,NY,NX)=ROQCX(K,L,NY,NX)
       ROQAY(K,L,NY,NX)=ROQAX(K,L,NY,NX)
       ROQCX(K,L,NY,NX)=0.0_r8
@@ -1862,6 +1871,7 @@ module Hour1Mod
     ELSEIF(IYTYP(0,I,NY,NX).EQ.1.OR.IYTYP(0,I,NY,NX).EQ.3)THEN
       IUTYP(NY,NX)=1
     ELSE
+      !urea hydrolysis is on
       IUTYP(NY,NX)=2
     ENDIF
     D9964: DO L=0,NL(NY,NX)
@@ -1909,6 +1919,14 @@ module Hour1Mod
   real(r8) :: tglds
   real(r8) :: OMC1g,OMN1g,OMP1g
 !     begin_execution
+  associate(                           &
+    k_fine_litr => micpar%k_fine_litr, &
+    k_manure    => micpar%k_manure   , &
+    ilignin     => micpar%ilignin    , &
+    icellulos   => micpar%icellulos  , &
+    icarbhyro   => micpar%icarbhyro  , &
+    iprotein    => micpar%iprotein     &
+  )
 !     LFDPTH=layer number
 !
   IF(OFC(1)+OFC(2).GT.0.0_r8)THEN
@@ -1933,71 +1951,71 @@ module Hour1Mod
 !     MAIZE
 !
     IF(IYTYP(1,I,NY,NX).EQ.1)THEN
-      CFOSC(1,1,LFDPTH,NY,NX)=0.080_r8
-      CFOSC(2,1,LFDPTH,NY,NX)=0.245_r8
-      CFOSC(3,1,LFDPTH,NY,NX)=0.613_r8
-      CFOSC(4,1,LFDPTH,NY,NX)=0.062_r8
+      CFOSC(iprotein,k_fine_litr,LFDPTH,NY,NX)=0.080_r8
+      CFOSC(icarbhyro,k_fine_litr,LFDPTH,NY,NX)=0.245_r8
+      CFOSC(icellulos,k_fine_litr,LFDPTH,NY,NX)=0.613_r8
+      CFOSC(ilignin,k_fine_litr,LFDPTH,NY,NX)=0.062_r8
 !
 !     WHEAT
 !
     ELSEIF(IYTYP(1,I,NY,NX).EQ.2)THEN
-      CFOSC(1,1,LFDPTH,NY,NX)=0.125_r8
-      CFOSC(2,1,LFDPTH,NY,NX)=0.171_r8
-      CFOSC(3,1,LFDPTH,NY,NX)=0.560_r8
-      CFOSC(4,1,LFDPTH,NY,NX)=0.144_r8
+      CFOSC(iprotein,k_fine_litr,LFDPTH,NY,NX)=0.125_r8
+      CFOSC(icarbhyro,k_fine_litr,LFDPTH,NY,NX)=0.171_r8
+      CFOSC(icellulos,k_fine_litr,LFDPTH,NY,NX)=0.560_r8
+      CFOSC(ilignin,k_fine_litr,LFDPTH,NY,NX)=0.144_r8
 !
 !     SOYBEAN
 !
     ELSEIF(IYTYP(1,I,NY,NX).EQ.3)THEN
-      CFOSC(1,1,LFDPTH,NY,NX)=0.138_r8
-      CFOSC(2,1,LFDPTH,NY,NX)=0.426_r8
-      CFOSC(3,1,LFDPTH,NY,NX)=0.316_r8
-      CFOSC(4,1,LFDPTH,NY,NX)=0.120_r8
+      CFOSC(iprotein,k_fine_litr,LFDPTH,NY,NX)=0.138_r8
+      CFOSC(icarbhyro,k_fine_litr,LFDPTH,NY,NX)=0.426_r8
+      CFOSC(icellulos,k_fine_litr,LFDPTH,NY,NX)=0.316_r8
+      CFOSC(ilignin,k_fine_litr,LFDPTH,NY,NX)=0.120_r8
 !
 !     OLD STRAW
 !
     ELSEIF(IYTYP(1,I,NY,NX).EQ.4)THEN
-      CFOSC(1,1,LFDPTH,NY,NX)=0.075_r8
-      CFOSC(2,1,LFDPTH,NY,NX)=0.125_r8
-      CFOSC(3,1,LFDPTH,NY,NX)=0.550_r8
-      CFOSC(4,1,LFDPTH,NY,NX)=0.250_r8
+      CFOSC(iprotein,k_fine_litr,LFDPTH,NY,NX)=0.075_r8
+      CFOSC(icarbhyro,k_fine_litr,LFDPTH,NY,NX)=0.125_r8
+      CFOSC(icellulos,k_fine_litr,LFDPTH,NY,NX)=0.550_r8
+      CFOSC(ilignin,k_fine_litr,LFDPTH,NY,NX)=0.250_r8
 !
 !     STRAW
 !
     ELSEIF(IYTYP(1,I,NY,NX).EQ.5)THEN
-      CFOSC(1,1,LFDPTH,NY,NX)=0.036_r8
-      CFOSC(2,1,LFDPTH,NY,NX)=0.044_r8
-      CFOSC(3,1,LFDPTH,NY,NX)=0.767_r8
-      CFOSC(4,1,LFDPTH,NY,NX)=0.153_r8
+      CFOSC(iprotein,k_fine_litr,LFDPTH,NY,NX)=0.036_r8
+      CFOSC(icarbhyro,k_fine_litr,LFDPTH,NY,NX)=0.044_r8
+      CFOSC(icellulos,k_fine_litr,LFDPTH,NY,NX)=0.767_r8
+      CFOSC(ilignin,k_fine_litr,LFDPTH,NY,NX)=0.153_r8
 !
 !     COMPOST
 !
     ELSEIF(IYTYP(1,I,NY,NX).EQ.6)THEN
-      CFOSC(1,1,LFDPTH,NY,NX)=0.143_r8
-      CFOSC(2,1,LFDPTH,NY,NX)=0.015_r8
-      CFOSC(3,1,LFDPTH,NY,NX)=0.640_r8
-      CFOSC(4,1,LFDPTH,NY,NX)=0.202_r8
+      CFOSC(iprotein,k_fine_litr,LFDPTH,NY,NX)=0.143_r8
+      CFOSC(icarbhyro,k_fine_litr,LFDPTH,NY,NX)=0.015_r8
+      CFOSC(icellulos,k_fine_litr,LFDPTH,NY,NX)=0.640_r8
+      CFOSC(ilignin,k_fine_litr,LFDPTH,NY,NX)=0.202_r8
 !
 !     GREEN MANURE
 !
     ELSEIF(IYTYP(1,I,NY,NX).EQ.7)THEN
-      CFOSC(1,1,LFDPTH,NY,NX)=0.202_r8
-      CFOSC(2,1,LFDPTH,NY,NX)=0.013_r8
-      CFOSC(3,1,LFDPTH,NY,NX)=0.560_r8
-      CFOSC(4,1,LFDPTH,NY,NX)=0.225_r8
+      CFOSC(iprotein,k_fine_litr,LFDPTH,NY,NX)=0.202_r8
+      CFOSC(icarbhyro,k_fine_litr,LFDPTH,NY,NX)=0.013_r8
+      CFOSC(icellulos,k_fine_litr,LFDPTH,NY,NX)=0.560_r8
+      CFOSC(ilignin,k_fine_litr,LFDPTH,NY,NX)=0.225_r8
 !
 !     SIMPLE SUBSTRATE
 !
     ELSEIF(IYTYP(1,I,NY,NX).EQ.10)THEN
-      CFOSC(1,1,LFDPTH,NY,NX)=0.000_r8
-      CFOSC(2,1,LFDPTH,NY,NX)=1.000_r8
-      CFOSC(3,1,LFDPTH,NY,NX)=0.000_r8
-      CFOSC(4,1,LFDPTH,NY,NX)=0.000_r8
+      CFOSC(iprotein,k_fine_litr,LFDPTH,NY,NX)=0.000_r8
+      CFOSC(icarbhyro,k_fine_litr,LFDPTH,NY,NX)=1.000_r8
+      CFOSC(icellulos,k_fine_litr,LFDPTH,NY,NX)=0.000_r8
+      CFOSC(ilignin,k_fine_litr,LFDPTH,NY,NX)=0.000_r8
     ELSE
-      CFOSC(1,1,LFDPTH,NY,NX)=0.075_r8
-      CFOSC(2,1,LFDPTH,NY,NX)=0.125_r8
-      CFOSC(3,1,LFDPTH,NY,NX)=0.550_r8
-      CFOSC(4,1,LFDPTH,NY,NX)=0.250_r8
+      CFOSC(iprotein,k_fine_litr,LFDPTH,NY,NX)=0.075_r8
+      CFOSC(icarbhyro,k_fine_litr,LFDPTH,NY,NX)=0.125_r8
+      CFOSC(icellulos,k_fine_litr,LFDPTH,NY,NX)=0.550_r8
+      CFOSC(ilignin,k_fine_litr,LFDPTH,NY,NX)=0.250_r8
     ENDIF
 !
 !     ALLOCATION OF ANIMAL MANURE APPLICATION TO
@@ -2006,34 +2024,34 @@ module Hour1Mod
 !     RUMINANT
 !
     IF(IYTYP(2,I,NY,NX).EQ.1)THEN
-      CFOSC(1,2,LFDPTH,NY,NX)=0.036_r8
-      CFOSC(2,2,LFDPTH,NY,NX)=0.044_r8
-      CFOSC(3,2,LFDPTH,NY,NX)=0.630_r8
-      CFOSC(4,2,LFDPTH,NY,NX)=0.290_r8
+      CFOSC(iprotein,k_manure,LFDPTH,NY,NX)=0.036_r8
+      CFOSC(icarbhyro,k_manure,LFDPTH,NY,NX)=0.044_r8
+      CFOSC(icellulos,k_manure,LFDPTH,NY,NX)=0.630_r8
+      CFOSC(ilignin,k_manure,LFDPTH,NY,NX)=0.290_r8
 !
 !     NON-RUMINANT
 !
     ELSEIF(IYTYP(2,I,NY,NX).EQ.2)THEN
-      CFOSC(1,2,LFDPTH,NY,NX)=0.138_r8
-      CFOSC(2,2,LFDPTH,NY,NX)=0.401_r8
-      CFOSC(3,2,LFDPTH,NY,NX)=0.316_r8
-      CFOSC(4,2,LFDPTH,NY,NX)=0.145_r8
+      CFOSC(iprotein,k_manure,LFDPTH,NY,NX)=0.138_r8
+      CFOSC(icarbhyro,k_manure,LFDPTH,NY,NX)=0.401_r8
+      CFOSC(icellulos,k_manure,LFDPTH,NY,NX)=0.316_r8
+      CFOSC(ilignin,k_manure,LFDPTH,NY,NX)=0.145_r8
 !
 !     GRAZING
 !
     ELSEIF(IYTYP(2,I,NY,NX).EQ.3)THEN
-      CFOSC(1,2,LFDPTH,NY,NX)=0.036_r8
-      CFOSC(2,2,LFDPTH,NY,NX)=0.044_r8
-      CFOSC(3,2,LFDPTH,NY,NX)=0.630_r8
-      CFOSC(4,2,LFDPTH,NY,NX)=0.290_r8
+      CFOSC(iprotein,k_manure,LFDPTH,NY,NX)=0.036_r8
+      CFOSC(icarbhyro,k_manure,LFDPTH,NY,NX)=0.044_r8
+      CFOSC(icellulos,k_manure,LFDPTH,NY,NX)=0.630_r8
+      CFOSC(ilignin,k_manure,LFDPTH,NY,NX)=0.290_r8
 !
 !     OTHER
 !
     ELSE
-      CFOSC(1,2,LFDPTH,NY,NX)=0.138_r8
-      CFOSC(2,2,LFDPTH,NY,NX)=0.401_r8
-      CFOSC(3,2,LFDPTH,NY,NX)=0.316_r8
-      CFOSC(4,2,LFDPTH,NY,NX)=0.145_r8
+      CFOSC(iprotein,k_manure,LFDPTH,NY,NX)=0.138_r8
+      CFOSC(icarbhyro,k_manure,LFDPTH,NY,NX)=0.401_r8
+      CFOSC(icellulos,k_manure,LFDPTH,NY,NX)=0.316_r8
+      CFOSC(ilignin,k_manure,LFDPTH,NY,NX)=0.145_r8
     ENDIF
 !
 !     DISTRIBUTE RESIDUE APPLICATION AMONG COMPONENTS OF RESIDUE COMPLEX
@@ -2155,7 +2173,7 @@ module Hour1Mod
         OSN(M,K,LFDPTH,NY,NX)=OSN(M,K,LFDPTH,NY,NX)+OSN1
         OSP(M,K,LFDPTH,NY,NX)=OSP(M,K,LFDPTH,NY,NX)+OSP1
         IF(LFDPTH.EQ.0)THEN
-          VOLT(LFDPTH,NY,NX)=VOLT(LFDPTH,NY,NX)+OSC1*ppmc/BKRS(1)
+          VOLT(LFDPTH,NY,NX)=VOLT(LFDPTH,NY,NX)+OSC1*ppmc/BKRS(micpar%k_fine_litr)
         ENDIF
       ENDDO D2970
       TORGF=TORGF+OSCI
@@ -2169,6 +2187,7 @@ module Hour1Mod
       ENDIF
     ENDDO D2965
   ENDIF
+  end associate
   end subroutine ApplyPlantAnimalResidue
 !------------------------------------------------------------------------------------------
 
@@ -2245,21 +2264,21 @@ module Hour1Mod
 !     LFDPTH=layer number
 !     CVRDF=fraction of fertilizer applied to surface litter
 !
-  IF(Z4A+Z3A+ZUA+ZOA+Z4B+Z3B+ZUB+ZOB+PMA+PMB+PHA+CAC+CAS.GT.0.0)THEN
+  IF(Z4A+Z3A+ZUA+ZOA+Z4B+Z3B+ZUB+ZOB+PMA+PMB+PHA+CAC+CAS.GT.0.0_r8)THEN
     FDPTHF=FDPTH(I,NY,NX)+CDPTH(NU(NY,NX)-1,NY,NX)
-    IF(FDPTHF.LE.0.0.AND.test_aeqb(Z4B+Z3B+ZUB+ZOB+PMB,0._r8))THEN
+    IF(FDPTHF.LE.0.0_r8.AND.test_aeqb(Z4B+Z3B+ZUB+ZOB+PMB,0._r8))THEN
       LFDPTH=0
-      CVRDF=1.0-EXP(-0.8E-02*(ORGC(0,NY,NX)/AREA(3,0,NY,NX)))
+      CVRDF=1.0_r8-EXP(-0.8E-02_r8*(ORGC(0,NY,NX)/AREA(3,0,NY,NX)))
     ELSE
-      DO 65 L=NUI(NY,NX),JZ
+      D65: DO L=NUI(NY,NX),JZ
         IF(CDPTH(L,NY,NX).GE.FDPTHF)THEN
           LFDPTH=L
-          CVRDF=1.0
+          CVRDF=1.0_r8
           exit
         ENDIF
-65    CONTINUE
+      ENDDO D65
     ENDIF
-    BAREF=1.0-CVRDF
+    BAREF=1.0_r8-CVRDF
 !
 !     RESET WIDTH AND DEPTH OF NH4 FERTILIZER BAND IF NEW BAND
 !     AND ADD REMAINS OF ANY EXISTING FERTILIZER BAND TO NEW BAND
@@ -2268,28 +2287,28 @@ module Hour1Mod
 !     DPNHB,WDNHB=depth,width of NH4 band
 !     VLNHB,VLNH4=soil volume in NH4 band,non-band
 !
-    IF((Z4B+Z3B+ZUB.GT.0.0).OR.((ZNH4B(LFDPTH,NY,NX).GT.0.0 &
-      .OR.ZNH3B(LFDPTH,NY,NX).GT.0.0).AND.IFNHB(NY,NX).EQ.0))THEN
+    IF((Z4B+Z3B+ZUB.GT.0.0_r8).OR.((ZNH4B(LFDPTH,NY,NX).GT.0.0_r8 &
+      .OR.ZNH3B(LFDPTH,NY,NX).GT.0.0_r8).AND.IFNHB(NY,NX).EQ.0))THEN
       IFNHB(NY,NX)=1
       ROWN(NY,NX)=ROWI(I,NY,NX)
-      DO 50 L=NUI(NY,NX),JZ
+      D50: DO L=NUI(NY,NX),JZ
         IF(L.LT.LFDPTH)THEN
           DPNHB(L,NY,NX)=DLYR(3,L,NY,NX)
           WDNHB(L,NY,NX)=0.0_r8
         ELSEIF(L.EQ.LFDPTH)THEN
-          DPNHB(L,NY,NX)=AMAX1(0.025,FDPTHF-CDPTH(L-1,NY,NX))
-          WDNHB(L,NY,NX)=AMIN1(0.025,ROWN(NY,NX))
+          DPNHB(L,NY,NX)=AMAX1(0.025_r8,FDPTHF-CDPTH(L-1,NY,NX))
+          WDNHB(L,NY,NX)=AMIN1(0.025_r8,ROWN(NY,NX))
         ELSE
           DPNHB(L,NY,NX)=0.0_r8
           WDNHB(L,NY,NX)=0.0_r8
         ENDIF
         IF(DLYR(3,L,NY,NX).GT.ZERO2)THEN
-          VLNHB(L,NY,NX)=AMIN1(0.999,WDNHB(L,NY,NX)/ROWN(NY,NX) &
+          VLNHB(L,NY,NX)=AMIN1(0.999_r8,WDNHB(L,NY,NX)/ROWN(NY,NX) &
             *DPNHB(L,NY,NX)/DLYR(3,L,NY,NX))
         ELSE
           VLNHB(L,NY,NX)=0.0_r8
         ENDIF
-        VLNH4(L,NY,NX)=1.0-VLNHB(L,NY,NX)
+        VLNH4(L,NY,NX)=1.0_r8-VLNHB(L,NY,NX)
         ZNH4T=ZNH4S(L,NY,NX)+ZNH4B(L,NY,NX)
         ZNH3T=ZNH3S(L,NY,NX)+ZNH3B(L,NY,NX)
         XN4T=XN4(L,NY,NX)+XNB(L,NY,NX)
@@ -2299,7 +2318,7 @@ module Hour1Mod
         ZNH3B(L,NY,NX)=ZNH3T*VLNHB(L,NY,NX)
         XN4(L,NY,NX)=XN4T*VLNH4(L,NY,NX)
         XNB(L,NY,NX)=XN4T*VLNHB(L,NY,NX)
-50    CONTINUE
+      ENDDO D50
       DPNH4(NY,NX)=DPNHB(LFDPTH,NY,NX)+CDPTH(LFDPTH-1,NY,NX)
     ENDIF
 !
@@ -2310,35 +2329,35 @@ module Hour1Mod
 !     DPNOB,WDNOB=depth,width of NO3 band
 !     VLNOB,VLNO3=soil volume in NO3 band,non-band
 !
-    IF((Z4B+Z3B+ZUB+ZOB.GT.0.0).OR.((ZNO3B(LFDPTH,NY,NX).GT.0.0 &
-      .OR.ZNO2B(LFDPTH,NY,NX).GT.0.0).AND.IFNOB(NY,NX).EQ.0))THEN
+    IF((Z4B+Z3B+ZUB+ZOB.GT.0.0_r8).OR.((ZNO3B(LFDPTH,NY,NX).GT.0.0_r8 &
+      .OR.ZNO2B(LFDPTH,NY,NX).GT.0.0_r8).AND.IFNOB(NY,NX).EQ.0))THEN
       IFNOB(NY,NX)=1
       ROWO(NY,NX)=ROWI(I,NY,NX)
-      DO 45 L=NUI(NY,NX),JZ
+      D45: DO L=NUI(NY,NX),JZ
         IF(L.LT.LFDPTH)THEN
           DPNOB(L,NY,NX)=DLYR(3,L,NY,NX)
           WDNOB(L,NY,NX)=0.0_r8
         ELSEIF(L.EQ.LFDPTH)THEN
-          DPNOB(L,NY,NX)=AMAX1(0.01,FDPTHF-CDPTH(L-1,NY,NX))
-          WDNOB(L,NY,NX)=AMIN1(0.01,ROWO(NY,NX))
+          DPNOB(L,NY,NX)=AMAX1(0.01_r8,FDPTHF-CDPTH(L-1,NY,NX))
+          WDNOB(L,NY,NX)=AMIN1(0.01_r8,ROWO(NY,NX))
         ELSE
           DPNOB(L,NY,NX)=0.0_r8
           WDNOB(L,NY,NX)=0.0_r8
         ENDIF
         IF(DLYR(3,L,NY,NX).GT.ZERO2)THEN
-          VLNOB(L,NY,NX)=AMIN1(0.999,WDNOB(L,NY,NX)/ROWO(NY,NX) &
+          VLNOB(L,NY,NX)=AMIN1(0.999_r8,WDNOB(L,NY,NX)/ROWO(NY,NX) &
             *DPNOB(L,NY,NX)/DLYR(3,L,NY,NX))
         ELSE
           VLNOB(L,NY,NX)=0.0_r8
         ENDIF
-        VLNO3(L,NY,NX)=1.0-VLNOB(L,NY,NX)
+        VLNO3(L,NY,NX)=1.0_r8-VLNOB(L,NY,NX)
         ZNO3T=ZNO3S(L,NY,NX)+ZNO3B(L,NY,NX)
         ZNO2T=ZNO2S(L,NY,NX)+ZNO2B(L,NY,NX)
         ZNO3S(L,NY,NX)=ZNO3T*VLNO3(L,NY,NX)
         ZNO2S(L,NY,NX)=ZNO2T*VLNO3(L,NY,NX)
         ZNO3B(L,NY,NX)=ZNO3T*VLNOB(L,NY,NX)
         ZNO2B(L,NY,NX)=ZNO2T*VLNOB(L,NY,NX)
-45    CONTINUE
+      ENDDO D45
       DPNO3(NY,NX)=DPNOB(LFDPTH,NY,NX)+CDPTH(LFDPTH-1,NY,NX)
     ENDIF
 !
@@ -2452,11 +2471,11 @@ module Hour1Mod
     Z3BX=Z3B*AREA(3,LFDPTH,NY,NX)/natomw
     ZUBX=ZUB*AREA(3,LFDPTH,NY,NX)/natomw
     ZOBX=ZOB*AREA(3,LFDPTH,NY,NX)/natomw
-    PMAX=PMA*AREA(3,LFDPTH,NY,NX)/62.0
-    PMBX=PMB*AREA(3,LFDPTH,NY,NX)/62.0
-    PHAX=PHA*AREA(3,LFDPTH,NY,NX)/93.0
-    CACX=CAC*AREA(3,LFDPTH,NY,NX)/40.0
-    CASX=CAS*AREA(3,LFDPTH,NY,NX)/40.0
+    PMAX=PMA*AREA(3,LFDPTH,NY,NX)/(2.0_r8*patomw)
+    PMBX=PMB*AREA(3,LFDPTH,NY,NX)/(2.0_r8*patomw)
+    PHAX=PHA*AREA(3,LFDPTH,NY,NX)/(3.0_r8*patomw)
+    CACX=CAC*AREA(3,LFDPTH,NY,NX)/40.0_r8
+    CASX=CAS*AREA(3,LFDPTH,NY,NX)/40.0_r8
     ZNH4FA(LFDPTH,NY,NX)=ZNH4FA(LFDPTH,NY,NX)+Z4AX*CVRDF
     ZNHUFA(LFDPTH,NY,NX)=ZNHUFA(LFDPTH,NY,NX)+ZUAX*CVRDF
     ZNO3FA(LFDPTH,NY,NX)=ZNO3FA(LFDPTH,NY,NX)+ZOAX*CVRDF
@@ -2757,7 +2776,7 @@ module Hour1Mod
     XC1BXB(L,NY,NX)=0.0_r8
     XC2BXB(L,NY,NX)=0.0_r8
     XM1BXB(L,NY,NX)=0.0_r8
-    DO  K=0,jcplx1
+    DO  K=1,jcplx
       XOCFXS(K,L,NY,NX)=0.0_r8
       XONFXS(K,L,NY,NX)=0.0_r8
       XOPFXS(K,L,NY,NX)=0.0_r8

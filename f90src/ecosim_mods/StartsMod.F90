@@ -364,7 +364,7 @@ module StartsMod
     HCX=0.0_r8
   ENDIF
 
-  DO 1200 L=0,NL(NY,NX)
+  D1200: DO L=0,NL(NY,NX)
     !
     if(L==0)then
       TORGLL=0.0_r8
@@ -473,11 +473,11 @@ module StartsMod
     !     INITIALIZE SOM VARIABLES
     call InitSOMVars(L,NY,NX,FCX)
     !
-1200  CONTINUE
-    POROSI(0,NY,NX)=1._r8  !this is added for numerical fixing
-    !
-    !  INITIALIZE FERTILIZER ARRAYS
-    call initFertArrays(NY,NX)
+  ENDDO D1200
+  POROSI(0,NY,NX)=1._r8  !this is added for numerical fixing
+  !
+  !  INITIALIZE FERTILIZER ARRAYS
+  call initFertArrays(NY,NX)
 
   end subroutine InitSoilProfile
 !------------------------------------------------------------------------------------------
@@ -530,10 +530,10 @@ module StartsMod
   DPNOB(1:L2,NY,NX)=0.0_r8
   WDPOB(1:L2,NY,NX)=0.0_r8
   DPPOB(1:L2,NY,NX)=0.0_r8
-  COCU(0:jcplx1,1:L2,NY,NX)=0.0_r8
-  CONU(0:jcplx1,1:L2,NY,NX)=0.0_r8
-  COPU(0:jcplx1,1:L2,NY,NX)=0.0_r8
-  COAU(0:jcplx1,1:L2,NY,NX)=0.0_r8
+  COCU(1:jcplx,1:L2,NY,NX)=0.0_r8
+  CONU(1:jcplx,1:L2,NY,NX)=0.0_r8
+  COPU(1:jcplx,1:L2,NY,NX)=0.0_r8
+  COAU(1:jcplx,1:L2,NY,NX)=0.0_r8
 
   end subroutine initFertArrays
 !------------------------------------------------------------------------------------------
@@ -875,11 +875,17 @@ module StartsMod
   end subroutine InitAccumulators
 !------------------------------------------------------------------------------------------
   subroutine InitLayerDepths(NY,NX)
-
+  use EcoSiMParDataMod, only : micpar
   implicit none
   integer, intent(in) :: NY, NX
-  integer :: L
-
+  integer :: L,K
+  real(r8) :: VOLR0
+  associate(                              &
+    n_litrsfk    => micpar%n_litrsfk    , &
+    k_woody_litr => micpar%k_woody_litr , &
+    k_fine_litr  => micpar%k_fine_litr  , &
+    k_manure     => micpar%k_manure       &
+  )
 !     begin_execution
   DO  L=0,NL(NY,NX)
 !
@@ -901,11 +907,13 @@ module StartsMod
 ! surface residue layer
       TAREA=TAREA+AREA(3,L,NY,NX)
       CDPTHZ(L,NY,NX)=0.0_r8
-      ORGC(L,NY,NX)=(RSC(0,L,NY,NX)+RSC(1,L,NY,NX)+RSC(2,L,NY,NX))*AREA(3,L,NY,NX)
+      ORGC(L,NY,NX)=SUM(RSC(1:n_litrsfk,L,NY,NX))*AREA(3,L,NY,NX)
       ORGCX(L,NY,NX)=ORGC(L,NY,NX)
-      VOLR(NY,NX)=(RSC(0,L,NY,NX)*ppmc/BKRS(0) &
-        +RSC(1,L,NY,NX)*ppmc/BKRS(1)+RSC(2,L,NY,NX)*ppmc/BKRS(2)) &
-        *AREA(3,L,NY,NX)
+      VOLR0=0._r8
+      DO K=1,n_litrsfk
+        VOLR0=VOLR0+RSC(K,L,NY,NX)/BKRS(K)
+      ENDDO
+      VOLR(NY,NX)=VOLR0*ppmc*AREA(3,L,NY,NX)
       VOLT(L,NY,NX)=VOLR(NY,NX)
       VOLX(L,NY,NX)=VOLT(L,NY,NX)
       VOLY(L,NY,NX)=VOLX(L,NY,NX)
@@ -945,5 +953,6 @@ module StartsMod
   CDPTHI(NY,NX)=CDPTH(0,NY,NX)
   AREA(3,NL(NY,NX)+1:JZ,NY,NX)=DLYR(1,NL(NY,NX),NY,NX)*DLYR(2,NL(NY,NX),NY,NX)
 
+  end associate
   end subroutine InitLayerDepths
 end module StartsMod

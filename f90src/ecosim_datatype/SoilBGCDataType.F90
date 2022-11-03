@@ -4,7 +4,8 @@ module SoilBGCDataType
 ! USES:
   use data_kind_mod, only : r8 => SHR_KIND_R8
   use GridConsts
-  use EcoSIMConfig, only : jcplx1=> jcplx1c
+  use ElmIDMod    , only : npelms
+  use EcoSIMConfig, only : jcplx => jcplxc,jsken => jskenc
 implicit none
   character(len=*), private, parameter :: mod_filename = __FILE__
 
@@ -154,9 +155,7 @@ implicit none
   real(r8),allocatable ::  TOQCK(:,:,:)                       !total respiration of DOC+DOA in soil layer
   real(r8),allocatable ::  VOLQ(:,:,:)                        !soil water volume occupied by microial biomass, [m3 m-3]
   real(r8),allocatable ::  TFNQ(:,:,:)                        !constraints of temperature and water potential on microbial activity, []
-  real(r8),allocatable ::  CSNT(:,:,:,:,:)                    !total litterfall C, [g d-2 h-1]
-  real(r8),allocatable ::  ZSNT(:,:,:,:,:)                    !total litterfall N, [g d-2 h-1]
-  real(r8),allocatable ::  PSNT(:,:,:,:,:)                    !total litterfall P, [g d-2 h-1]
+  real(r8),allocatable ::  ESNT(:,:,:,:,:,:)                    !total litterfall C, [g d-2 h-1]
   real(r8),allocatable ::  VLNH4(:,:,:)                       !NH4 non-band volume fracrion, []
   real(r8),allocatable ::  VLNHB(:,:,:)                       !NH4 band volume fracrion, []
   real(r8),allocatable ::  VLNO3(:,:,:)                       !NO3 non-band volume fracrion, []
@@ -248,17 +247,20 @@ implicit none
   private :: InitAllocate
   contains
 
-  subroutine InitSoilBGCData
+  subroutine InitSoilBGCData(n_pltlitrk)
 
   implicit none
+  integer, intent(in) :: n_pltlitrk
 
-  call InitAllocate
+  call InitAllocate(n_pltlitrk)
   end subroutine InitSoilBGCData
 
 !------------------------------------------------------------------------------------------
 
-  subroutine InitAllocate
+  subroutine InitAllocate(n_pltlitrk)
   implicit none
+  integer, intent(in) :: n_pltlitrk
+
   allocate(CNH4(JZ,JY,JX));     CNH4=0._r8
   allocate(CNO3(JZ,JY,JX));     CNO3=0._r8
   allocate(CPO4(JZ,JY,JX));     CPO4=0._r8
@@ -397,16 +399,14 @@ implicit none
   allocate(XH2PS(0:JZ,JY,JX));  XH2PS=0._r8
   allocate(XNH4S(0:JZ,JY,JX));  XNH4S=0._r8
   allocate(XNO3S(0:JZ,JY,JX));  XNO3S=0._r8
-  allocate(XOQCS(0:jcplx1,0:JZ,JY,JX));XOQCS=0._r8
-  allocate(XOQNS(0:jcplx1,0:JZ,JY,JX));XOQNS=0._r8
-  allocate(XOQPS(0:jcplx1,0:JZ,JY,JX));XOQPS=0._r8
-  allocate(XOQAS(0:jcplx1,0:JZ,JY,JX));XOQAS=0._r8
+  allocate(XOQCS(1:jcplx,0:JZ,JY,JX));XOQCS=0._r8
+  allocate(XOQNS(1:jcplx,0:JZ,JY,JX));XOQNS=0._r8
+  allocate(XOQPS(1:jcplx,0:JZ,JY,JX));XOQPS=0._r8
+  allocate(XOQAS(1:jcplx,0:JZ,JY,JX));XOQAS=0._r8
   allocate(TOQCK(0:JZ,JY,JX));  TOQCK=0._r8
   allocate(VOLQ(0:JZ,JY,JX));   VOLQ=0._r8
   allocate(TFNQ(0:JZ,JY,JX));   TFNQ=0._r8
-  allocate(CSNT(4,0:1,0:JZ,JY,JX));CSNT=0._r8
-  allocate(ZSNT(4,0:1,0:JZ,JY,JX));ZSNT=0._r8
-  allocate(PSNT(4,0:1,0:JZ,JY,JX));PSNT=0._r8
+  allocate(ESNT(jsken,npelms,1:n_pltlitrk,0:JZ,JY,JX));ESNT=0._r8
   allocate(VLNH4(0:JZ,JY,JX));  VLNH4=0._r8
   allocate(VLNHB(0:JZ,JY,JX));  VLNHB=0._r8
   allocate(VLNO3(0:JZ,JY,JX));  VLNO3=0._r8
@@ -459,12 +459,12 @@ implicit none
   allocate(XNOFLB(3,JD,JV,JH)); XNOFLB=0._r8
   allocate(XH2BFB(3,JD,JV,JH)); XH2BFB=0._r8
   allocate(XNXFLB(3,JD,JV,JH)); XNXFLB=0._r8
-  allocate(XOCFLS(0:jcplx1,3,0:JD,JV,JH));XOCFLS=0._r8
-  allocate(XONFLS(0:jcplx1,3,0:JD,JV,JH));XONFLS=0._r8
+  allocate(XOCFLS(1:jcplx,3,0:JD,JV,JH));XOCFLS=0._r8
+  allocate(XONFLS(1:jcplx,3,0:JD,JV,JH));XONFLS=0._r8
   allocate(XCHFLG(3,0:JD,JV,JH));XCHFLG=0._r8
-  allocate(XOAFLS(0:jcplx1,3,0:JD,JV,JH));XOAFLS=0._r8
+  allocate(XOAFLS(1:jcplx,3,0:JD,JV,JH));XOAFLS=0._r8
   allocate(XCOFLG(3,JD,JV,JH)); XCOFLG=0._r8
-  allocate(XOPFLS(0:jcplx1,3,0:JD,JV,JH));XOPFLS=0._r8
+  allocate(XOPFLS(1:jcplx,3,0:JD,JV,JH));XOPFLS=0._r8
   allocate(XOXFLG(3,JD,JV,JH)); XOXFLG=0._r8
   allocate(XNGFLG(3,JD,JV,JH)); XNGFLG=0._r8
   allocate(XHGFLG(3,JD,JV,JH)); XHGFLG=0._r8
@@ -488,10 +488,10 @@ implicit none
   allocate(XNOFHB(3,JD,JV,JH)); XNOFHB=0._r8
   allocate(XNXFHB(3,0:JD,JV,JH));XNXFHB=0._r8
   allocate(XH2BHB(3,JD,JV,JH)); XH2BHB=0._r8
-  allocate(XOCFHS(0:jcplx1,3,JD,JV,JH));XOCFHS=0._r8
-  allocate(XONFHS(0:jcplx1,3,JD,JV,JH));XONFHS=0._r8
-  allocate(XOPFHS(0:jcplx1,3,JD,JV,JH));XOPFHS=0._r8
-  allocate(XOAFHS(0:jcplx1,3,JD,JV,JH));XOAFHS=0._r8
+  allocate(XOCFHS(1:jcplx,3,JD,JV,JH));XOCFHS=0._r8
+  allocate(XONFHS(1:jcplx,3,JD,JV,JH));XONFHS=0._r8
+  allocate(XOPFHS(1:jcplx,3,JD,JV,JH));XOPFHS=0._r8
+  allocate(XOAFHS(1:jcplx,3,JD,JV,JH));XOAFHS=0._r8
   allocate(XH1PHS(3,JD,JV,JH)); XH1PHS=0._r8
   allocate(XH1BHB(3,JD,JV,JH)); XH1BHB=0._r8
 
@@ -649,9 +649,7 @@ implicit none
   call destroy(TOQCK)
   call destroy(VOLQ)
   call destroy(TFNQ)
-  call destroy(CSNT)
-  call destroy(ZSNT)
-  call destroy(PSNT)
+  call destroy(ESNT)
   call destroy(VLNH4)
   call destroy(VLNHB)
   call destroy(VLNO3)

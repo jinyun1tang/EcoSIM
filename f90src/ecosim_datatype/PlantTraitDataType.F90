@@ -164,15 +164,16 @@ module PlantTraitDataType
 !----------------------------------------------------------------------
 
 contains
-  subroutine InitPlantTraits
+  subroutine InitPlantTraits(n_pltlitrk)
 
   implicit none
+  integer, intent(in) :: n_pltlitrk
 
   FVRN =real((/0.75,0.5,0.5,0.5,0.5,0.5/),r8)
-  allocate(FWODLE(npelms,0:1));  FWODLE=0._r8
-  allocate(FWODBE(npelms,0:1));  FWODBE=0._r8
-  allocate(FWODRE(npelms,0:1));  FWODRE=0._r8         !
-  allocate(FWOODE(npelms,0:1));  FWOODE=0._r8         !woody element allocation
+  allocate(FWODLE(npelms,1:n_pltlitrk));  FWODLE=0._r8
+  allocate(FWODBE(npelms,1:n_pltlitrk));  FWODBE=0._r8
+  allocate(FWODRE(npelms,1:n_pltlitrk));  FWODRE=0._r8         !
+  allocate(FWOODE(npelms,1:n_pltlitrk));  FWOODE=0._r8         !woody element allocation
   allocate(ARSTK(JC,JBR,JP,JY,JX));ARSTK=0._r8
   allocate(ARLFP(JP,JY,JX));    ARLFP=0._r8
   allocate(ARLFS(JP,JY,JX));    ARLFS=0._r8

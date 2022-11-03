@@ -2,7 +2,7 @@ module RedistMod
   use data_kind_mod, only : r8 => SHR_KIND_R8
   use abortutils, only : padr, print_info,endrun,destroy
   use minimathmod, only : safe_adb,AZMAX1
-  use MicBGCPars, only : micpar
+  use EcoSiMParDataMod, only : micpar
   use EcosimConst
   use FlagDataType
   use GridDataType
@@ -41,9 +41,9 @@ module RedistMod
 
   character(len=*), parameter :: mod_filename = __FILE__
 
-  real(r8) :: THETCX(0:1)
+  real(r8), pointer :: THETCX(:)
 
-  DATA THETCX/8.0E-06_r8,8.0E-06_r8/
+
 
   integer :: curday, curhour
   public :: redist, InitRedist
@@ -51,6 +51,10 @@ module RedistMod
 
   subroutine InitRedist
   implicit none
+
+  allocate(THETCX(micpar%n_pltlitrk))
+
+  THETCX=(/8.0E-06_r8,8.0E-06_r8/)
 
   call InitTflxType()
 
@@ -556,12 +560,12 @@ module RedistMod
   !
   ! GAS EXCHANGE FROM SURFACE VOLATILIZATION-DISSOLUTION
   !
-  DO 9680 K=0,2
+  D9680: DO K=1,micpar%n_litrsfk
     OQC(K,0,NY,NX)=OQC(K,0,NY,NX)+XOCFLS(K,3,0,NY,NX)
     OQN(K,0,NY,NX)=OQN(K,0,NY,NX)+XONFLS(K,3,0,NY,NX)
     OQP(K,0,NY,NX)=OQP(K,0,NY,NX)+XOPFLS(K,3,0,NY,NX)
     OQA(K,0,NY,NX)=OQA(K,0,NY,NX)+XOAFLS(K,3,0,NY,NX)
-9680  CONTINUE
+  ENDDO D9680
   CO2S(0,NY,NX)=CO2S(0,NY,NX)+XCODFR(NY,NX)+XCOFLS(3,0,NY,NX) &
     +XCODFG(0,NY,NX)-RCO2O(0,NY,NX)
   CH4S(0,NY,NX)=CH4S(0,NY,NX)+XCHDFR(NY,NX)+XCHFLS(3,0,NY,NX) &
@@ -637,13 +641,13 @@ module RedistMod
     !
     !     DOC, DON, DOP
     !
-    DO 8570 K=0,2
+    D8570: DO K=1,micpar%n_litrsfk
       OQC(K,0,NY,NX)=OQC(K,0,NY,NX)+TOCQRS(K,NY,NX)
       OQN(K,0,NY,NX)=OQN(K,0,NY,NX)+TONQRS(K,NY,NX)
       OQP(K,0,NY,NX)=OQP(K,0,NY,NX)+TOPQRS(K,NY,NX)
       OQA(K,0,NY,NX)=OQA(K,0,NY,NX)+TOAQRS(K,NY,NX)
 
-8570  CONTINUE
+    ENDDO D8570
 !
     !    SOLUTES
 !
@@ -785,7 +789,7 @@ module RedistMod
     !   ORGANIC CONSTITUENTS
 !
     DORGP=0.0_r8
-    D9280: DO K=0,jcplx1
+    D9280: DO K=1,jcplx
       DO  NO=1,NFGs
         DO NGL=JGnio(NO),JGnfo(NO)
           DO  M=1,nlbiomcp
@@ -811,7 +815,7 @@ module RedistMod
       enddo
     enddo
 
-    D9275: DO K=0,jcplx1
+    D9275: DO K=1,jcplx
       D9270: DO M=1,ndbiomcp
         ORC(M,K,NU(NY,NX),NY,NX)=ORC(M,K,NU(NY,NX),NY,NX)+TORCER(M,K,NY,NX)
         ORN(M,K,NU(NY,NX),NY,NX)=ORN(M,K,NU(NY,NX),NY,NX)+TORNER(M,K,NY,NX)
@@ -912,17 +916,17 @@ module RedistMod
   real(r8) :: POS,POX,POP
   real(r8) :: SSS,ZG,Z4S,WS,Z4X
   real(r8) :: Z4F,ZOS,ZOF
-  integer :: k_litrsf
+  integer :: n_litrsfk
 !     begin_execution
 !     TOTAL C,N,P, SALTS IN SURFACE RESIDUE
 !
 
-  k_litrsf   = micpar%k_litrsf
+  n_litrsfk   = micpar%n_litrsfk
 
   DC=0.0_r8
   DN=0.0_r8
   DP=0.0_r8
-  DO K=0,jcplx1
+  DO K=1,jcplx
     RC0(K,NY,NX)=0.0_r8
   ENDDO
   RC0ff(NY,NX)=0.0_r8
@@ -930,7 +934,7 @@ module RedistMod
   OMCL(0,NY,NX)=0.0_r8
   OMNL(0,NY,NX)=0.0_r8
 
-  DO K=0,k_litrsf
+  DO K=1,n_litrsfk
     !
     ! TOTAL heterotrophic MICROBIAL C,N,P
     !
@@ -962,10 +966,10 @@ module RedistMod
   !
   !     TOTAL MICROBIAL RESIDUE C,N,P
   !
-  DC=DC+SUM(ORC(1:ndbiomcp,0:k_litrsf,0,NY,NX))
-  DN=DN+SUM(ORN(1:ndbiomcp,0:k_litrsf,0,NY,NX))
-  DP=DP+SUM(ORP(1:ndbiomcp,0:k_litrsf,0,NY,NX))
-  DO K=0,k_litrsf
+  DC=DC+SUM(ORC(1:ndbiomcp,1:n_litrsfk,0,NY,NX))
+  DN=DN+SUM(ORN(1:ndbiomcp,1:n_litrsfk,0,NY,NX))
+  DP=DP+SUM(ORP(1:ndbiomcp,1:n_litrsfk,0,NY,NX))
+  DO K=1,n_litrsfk
     RC0(K,NY,NX)=RC0(K,NY,NX)+SUM(ORC(1:ndbiomcp,K,0,NY,NX))
     RC0(K,NY,NX)=RC0(K,NY,NX)+OQC(K,0,NY,NX)+OQCH(K,0,NY,NX) &
       +OHC(K,0,NY,NX)+OQA(K,0,NY,NX)+OQAH(K,0,NY,NX)+OHA(K,0,NY,NX)
@@ -975,21 +979,21 @@ module RedistMod
 !
     !     TOTAL DOC, DON, DOP
 !
-  DC=DC+SUM(OQC(0:k_litrsf,0,NY,NX))+SUM(OQCH(0:k_litrsf,0,NY,NX)) &
-       +SUM(OHC(0:k_litrsf,0,NY,NX))+SUM(OQA(0:k_litrsf,0,NY,NX)) &
-       +SUM(OQAH(0:k_litrsf,0,NY,NX))+SUM(OHA(0:k_litrsf,0,NY,NX))
+  DC=DC+SUM(OQC(1:n_litrsfk,0,NY,NX))+SUM(OQCH(1:n_litrsfk,0,NY,NX)) &
+       +SUM(OHC(1:n_litrsfk,0,NY,NX))+SUM(OQA(1:n_litrsfk,0,NY,NX)) &
+       +SUM(OQAH(1:n_litrsfk,0,NY,NX))+SUM(OHA(1:n_litrsfk,0,NY,NX))
 
-  DN=DN+SUM(OQN(0:k_litrsf,0,NY,NX))+SUM(OQNH(0:k_litrsf,0,NY,NX)) &
-       +SUM(OHN(0:k_litrsf,0,NY,NX))
-  DP=DP+SUM(OQP(0:k_litrsf,0,NY,NX))+SUM(OQPH(0:k_litrsf,0,NY,NX)) &
-       +SUM(OHP(0:k_litrsf,0,NY,NX))
+  DN=DN+SUM(OQN(1:n_litrsfk,0,NY,NX))+SUM(OQNH(1:n_litrsfk,0,NY,NX)) &
+       +SUM(OHN(1:n_litrsfk,0,NY,NX))
+  DP=DP+SUM(OQP(1:n_litrsfk,0,NY,NX))+SUM(OQPH(1:n_litrsfk,0,NY,NX)) &
+       +SUM(OHP(1:n_litrsfk,0,NY,NX))
 
 !
     !     TOTAL PLANT RESIDUE C,N,P
 !
-  DC=DC+SUM(OSC(1:jsken,0:k_litrsf,0,NY,NX))
-  DN=DN+SUM(OSN(1:jsken,0:k_litrsf,0,NY,NX))
-  DP=DP+SUM(OSP(1:jsken,0:k_litrsf,0,NY,NX))
+  DC=DC+SUM(OSC(1:jsken,1:n_litrsfk,0,NY,NX))
+  DN=DN+SUM(OSN(1:jsken,1:n_litrsfk,0,NY,NX))
+  DP=DP+SUM(OSP(1:jsken,1:n_litrsfk,0,NY,NX))
 
   ORGC(0,NY,NX)=DC
   ORGN(0,NY,NX)=DN
@@ -1213,18 +1217,18 @@ module RedistMod
     !
     !     RESIDUE FROM PLANT LITTERFALL
 !
-    D8565: DO K=0,micpar%n_pltlitrk
+    D8565: DO K=1,micpar%n_pltlitrk
       DO  M=1,jsken
-        OSC(M,K,L,NY,NX)=OSC(M,K,L,NY,NX)+CSNT(M,K,L,NY,NX)
-        OSA(M,K,L,NY,NX)=OSA(M,K,L,NY,NX)+CSNT(M,K,L,NY,NX)*micpar%OMCI(1,K)
-        OSN(M,K,L,NY,NX)=OSN(M,K,L,NY,NX)+ZSNT(M,K,L,NY,NX)
-        OSP(M,K,L,NY,NX)=OSP(M,K,L,NY,NX)+PSNT(M,K,L,NY,NX)
+        OSC(M,K,L,NY,NX)=OSC(M,K,L,NY,NX)+ESNT(M,ielmc,K,L,NY,NX)
+        OSA(M,K,L,NY,NX)=OSA(M,K,L,NY,NX)+ESNT(M,ielmc,K,L,NY,NX)*micpar%OMCI(1,K)
+        OSN(M,K,L,NY,NX)=OSN(M,K,L,NY,NX)+ESNT(M,ielmn,K,L,NY,NX)
+        OSP(M,K,L,NY,NX)=OSP(M,K,L,NY,NX)+ESNT(M,ielmp,K,L,NY,NX)
       enddo
     ENDDO D8565
 !
     !     DOC, DON, DOP FROM AQUEOUS TRANSPORT
 !
-    DO 8560 K=0,jcplx1
+    D8560: DO K=1,jcplx
       OQC(K,L,NY,NX)=OQC(K,L,NY,NX)+TOCFLS(K,L,NY,NX)+XOCFXS(K,L,NY,NX)
       OQN(K,L,NY,NX)=OQN(K,L,NY,NX)+TONFLS(K,L,NY,NX)+XONFXS(K,L,NY,NX)
       OQP(K,L,NY,NX)=OQP(K,L,NY,NX)+TOPFLS(K,L,NY,NX)+XOPFXS(K,L,NY,NX)
@@ -1234,15 +1238,15 @@ module RedistMod
       OQPH(K,L,NY,NX)=OQPH(K,L,NY,NX)+TOPFHS(K,L,NY,NX)-XOPFXS(K,L,NY,NX)
       OQAH(K,L,NY,NX)=OQAH(K,L,NY,NX)+TOAFHS(K,L,NY,NX)-XOAFXS(K,L,NY,NX)
 
-8560  CONTINUE
+    ENDDO D8560
     !
     !     DOC, DON, DOP FROM PLANT EXUDATION
     !
-    DO 195 K=0,jcplx1
+    D195: DO K=1,jcplx
       OQC(K,L,NY,NX)=OQC(K,L,NY,NX)+TDFOMC(K,L,NY,NX)
       OQN(K,L,NY,NX)=OQN(K,L,NY,NX)+TDFOMN(K,L,NY,NX)
       OQP(K,L,NY,NX)=OQP(K,L,NY,NX)+TDFOMP(K,L,NY,NX)
-195   CONTINUE
+    ENDDO D195
     !
     !     SOIL SOLUTES FROM AQUEOUS TRANSPORT, MICROBIAL AND ROOT
     !     EXCHANGE, EQUILIBRIUM REACTIONS, GAS EXCHANGE,
@@ -1441,16 +1445,15 @@ module RedistMod
     !
     !     GRID CELL BOUNDARY FLUXES FROM EQUILIBRIUM REACTIONS
 !
-    SNM=(2.0*(XNH4S(L,NY,NX)+XNH4B(L,NY,NX)-TUPNH4(L,NY,NX) &
+    SNM=(2.0_r8*(XNH4S(L,NY,NX)+XNH4B(L,NY,NX)-TUPNH4(L,NY,NX) &
       -TUPNHB(L,NY,NX)-XN2GS(L,NY,NX))-TUPN3S(L,NY,NX)-TUPN3B(L,NY,NX) &
       +XNO3S(L,NY,NX)+XNO3B(L,NY,NX)-TUPNO3(L,NY,NX)-TUPNOB(L,NY,NX) &
       +XNO2S(L,NY,NX)+XNO2B(L,NY,NX))/natomw
-    SPM=(2.0*(XH1PS(L,NY,NX)+XH1BS(L,NY,NX)-TUPH1P(L,NY,NX) &
+    SPM=(2.0_r8*(XH1PS(L,NY,NX)+XH1BS(L,NY,NX)-TUPH1P(L,NY,NX) &
       -TUPH1B(L,NY,NX))+3.0*(XH2PS(L,NY,NX)+XH2BS(L,NY,NX) &
       -TUPH2P(L,NY,NX)-TUPH2B(L,NY,NX)))/patomw
-    SSB=TRH2O(L,NY,NX)+TBCO2(L,NY,NX)+XZHYS(L,NY,NX) &
-      +TBION(L,NY,NX)
-      TIONOU=TIONOU-SSB
+    SSB=TRH2O(L,NY,NX)+TBCO2(L,NY,NX)+XZHYS(L,NY,NX)+TBION(L,NY,NX)
+    TIONOU=TIONOU-SSB
     !     UIONOU(NY,NX)=UIONOU(NY,NX)-SSB
     !     WRITE(20,3339)'SSB',I,J,L,SSB,TRH2O(L,NY,NX)
     !    2,TBCO2(L,NY,NX),XZHYS(L,NY,NX),TBION(L,NY,NX)
@@ -1767,7 +1770,7 @@ module RedistMod
   real(r8) :: DC,DN,DP,OC,ON,OP
 
   integer :: K,N,M,NGL
-  integer :: k_litrsf
+  integer :: n_litrsfk
     !     TOTAL SOC,SON,SOP
     !
     !     OMC=microbial biomass, ORC=microbial residue
@@ -1777,7 +1780,7 @@ module RedistMod
     !     OSC=SOC(K=0:woody litter, K=1:non-woody litter,
     !     K=2:manure, K=3:POC, K=4:humus)
 !
-  k_litrsf  = micpar%k_litrsf
+  n_litrsfk  = micpar%n_litrsfk
 
   DC=0.0_r8
   DN=0.0_r8
@@ -1789,7 +1792,7 @@ module RedistMod
   OMNL(L,NY,NX)=0.0_r8
 
 ! add living microbes
-  DO K=0,jcplx1
+  DO K=1,jcplx
     IF(micpar%is_litter(K))THEN  !K=0,1,2: woody litr, nonwoody litr, and manure
       DC=DC+SUM(OMC(1:nlbiomcp,1:NMICBSO,K,L,NY,NX))
       DN=DN+SUM(OMN(1:nlbiomcp,1:NMICBSO,K,L,NY,NX))
@@ -1825,7 +1828,7 @@ module RedistMod
   OMCL(L,NY,NX)=OMCL(L,NY,NX)+SUM(OMCff(1:nlbiomcp,1:NMICBSA,L,NY,NX))
   OMNL(L,NY,NX)=OMNL(L,NY,NX)+SUM(OMNff(1:nlbiomcp,1:NMICBSA,L,NY,NX))
 
-  DO K=0,jcplx1
+  DO K=1,jcplx
 ! litter + manure
     IF(micpar%is_litter(K))THEN
 
@@ -1906,14 +1909,14 @@ module RedistMod
 !     FLWR,HFLWR=water,heat flux into litter
 !     HEATIN=cumulative net surface heat transfer
 !
-  DO   K=0,micpar%k_manure-1
+  DO   K=1,micpar%n_pltlitrk
     DO  M=1,jsken
-      OSC(M,K,0,NY,NX)=OSC(M,K,0,NY,NX)+CSNT(M,K,0,NY,NX)
-      OSA(M,K,0,NY,NX)=OSA(M,K,0,NY,NX)+CSNT(M,K,0,NY,NX)*micpar%OMCI(1,K)
-      OSN(M,K,0,NY,NX)=OSN(M,K,0,NY,NX)+ZSNT(M,K,0,NY,NX)
-      OSP(M,K,0,NY,NX)=OSP(M,K,0,NY,NX)+PSNT(M,K,0,NY,NX)
-      ORGC(0,NY,NX)=ORGC(0,NY,NX)+CSNT(M,K,0,NY,NX)
-      RAINR=CSNT(M,K,0,NY,NX)*THETCX(K)
+      OSC(M,K,0,NY,NX)=OSC(M,K,0,NY,NX)+ESNT(M,ielmc,K,0,NY,NX)
+      OSA(M,K,0,NY,NX)=OSA(M,K,0,NY,NX)+ESNT(M,ielmc,K,0,NY,NX)*micpar%OMCI(1,K)
+      OSN(M,K,0,NY,NX)=OSN(M,K,0,NY,NX)+ESNT(M,ielmn,K,0,NY,NX)
+      OSP(M,K,0,NY,NX)=OSP(M,K,0,NY,NX)+ESNT(M,ielmp,K,0,NY,NX)
+      ORGC(0,NY,NX)=ORGC(0,NY,NX)+ESNT(M,ielmc,K,0,NY,NX)
+      RAINR=ESNT(M,ielmc,K,0,NY,NX)*THETCX(K)
       HRAINR=RAINR*cpw*TKA(NY,NX)
       FLWR(NY,NX)=FLWR(NY,NX)+RAINR
       HFLWR(NY,NX)=HFLWR(NY,NX)+HRAINR
@@ -1961,7 +1964,7 @@ module RedistMod
   !     RNO2X=total demand for NO2 reduction
   !     RVMXC=demand for NO2 reduction
 !
-  DO K=0,jcplx1
+  DO K=1,jcplx
     IF(micpar%is_litter(K))THEN
       DO  N=1,NFGs
         DO NGL=JGnio(N),JGnfo(N)
@@ -2017,25 +2020,25 @@ module RedistMod
 
   integer :: K,N,NGL
 
-  ROXYX(L,NY,NX)=ROXYX(L,NY,NX)+SUM(ROXYS(1:NMICBSO,0:jcplx1,L,NY,NX))
-  RNH4X(L,NY,NX)=RNH4X(L,NY,NX)+SUM(RVMX4(1:NMICBSO,0:jcplx1,L,NY,NX)) &
-    +SUM(RINHO(1:NMICBSO,0:jcplx1,L,NY,NX))
-  RNO3X(L,NY,NX)=RNO3X(L,NY,NX)+SUM(RVMX3(1:NMICBSO,0:jcplx1,L,NY,NX)) &
-    +SUM(RINOO(1:NMICBSO,0:jcplx1,L,NY,NX))
-  RNO2X(L,NY,NX)=RNO2X(L,NY,NX)+SUM(RVMX2(1:NMICBSO,0:jcplx1,L,NY,NX))
-  RN2OX(L,NY,NX)=RN2OX(L,NY,NX)+SUM(RVMX1(1:NMICBSO,0:jcplx1,L,NY,NX))
-  RPO4X(L,NY,NX)=RPO4X(L,NY,NX)+SUM(RIPOO(1:NMICBSO,0:jcplx1,L,NY,NX))
-  RP14X(L,NY,NX)=RP14X(L,NY,NX)+SUM(RIPO1(1:NMICBSO,0:jcplx1,L,NY,NX))
-  RNHBX(L,NY,NX)=RNHBX(L,NY,NX)+SUM(RVMB4(1:NMICBSO,0:jcplx1,L,NY,NX)) &
-    +SUM(RINHB(1:NMICBSO,0:jcplx1,L,NY,NX))
-  RN3BX(L,NY,NX)=RN3BX(L,NY,NX)+SUM(RVMB3(1:NMICBSO,0:jcplx1,L,NY,NX)) &
-    +SUM(RINOB(1:NMICBSO,0:jcplx1,L,NY,NX))
-  RN2BX(L,NY,NX)=RN2BX(L,NY,NX)+SUM(RVMB2(1:NMICBSO,0:jcplx1,L,NY,NX))
-  RPOBX(L,NY,NX)=RPOBX(L,NY,NX)+SUM(RIPBO(1:NMICBSO,0:jcplx1,L,NY,NX))
-  RP1BX(L,NY,NX)=RP1BX(L,NY,NX)+SUM(RIPB1(1:NMICBSO,0:jcplx1,L,NY,NX))
-  DO K=0,jcplx1
-    ROQCX(K,L,NY,NX)=ROQCX(K,L,NY,NX)+SUM(ROQCS(1:NMICBSO,0:jcplx1,L,NY,NX))
-    ROQAX(K,L,NY,NX)=ROQAX(K,L,NY,NX)+SUM(ROQAS(1:NMICBSO,0:jcplx1,L,NY,NX))
+  ROXYX(L,NY,NX)=ROXYX(L,NY,NX)+SUM(ROXYS(1:NMICBSO,1:jcplx,L,NY,NX))
+  RNH4X(L,NY,NX)=RNH4X(L,NY,NX)+SUM(RVMX4(1:NMICBSO,1:jcplx,L,NY,NX)) &
+    +SUM(RINHO(1:NMICBSO,1:jcplx,L,NY,NX))
+  RNO3X(L,NY,NX)=RNO3X(L,NY,NX)+SUM(RVMX3(1:NMICBSO,1:jcplx,L,NY,NX)) &
+    +SUM(RINOO(1:NMICBSO,1:jcplx,L,NY,NX))
+  RNO2X(L,NY,NX)=RNO2X(L,NY,NX)+SUM(RVMX2(1:NMICBSO,1:jcplx,L,NY,NX))
+  RN2OX(L,NY,NX)=RN2OX(L,NY,NX)+SUM(RVMX1(1:NMICBSO,1:jcplx,L,NY,NX))
+  RPO4X(L,NY,NX)=RPO4X(L,NY,NX)+SUM(RIPOO(1:NMICBSO,1:jcplx,L,NY,NX))
+  RP14X(L,NY,NX)=RP14X(L,NY,NX)+SUM(RIPO1(1:NMICBSO,1:jcplx,L,NY,NX))
+  RNHBX(L,NY,NX)=RNHBX(L,NY,NX)+SUM(RVMB4(1:NMICBSO,1:jcplx,L,NY,NX)) &
+    +SUM(RINHB(1:NMICBSO,1:jcplx,L,NY,NX))
+  RN3BX(L,NY,NX)=RN3BX(L,NY,NX)+SUM(RVMB3(1:NMICBSO,1:jcplx,L,NY,NX)) &
+    +SUM(RINOB(1:NMICBSO,1:jcplx,L,NY,NX))
+  RN2BX(L,NY,NX)=RN2BX(L,NY,NX)+SUM(RVMB2(1:NMICBSO,1:jcplx,L,NY,NX))
+  RPOBX(L,NY,NX)=RPOBX(L,NY,NX)+SUM(RIPBO(1:NMICBSO,1:jcplx,L,NY,NX))
+  RP1BX(L,NY,NX)=RP1BX(L,NY,NX)+SUM(RIPB1(1:NMICBSO,1:jcplx,L,NY,NX))
+  DO K=1,jcplx
+    ROQCX(K,L,NY,NX)=ROQCX(K,L,NY,NX)+SUM(ROQCS(1:NMICBSO,1:jcplx,L,NY,NX))
+    ROQAX(K,L,NY,NX)=ROQAX(K,L,NY,NX)+SUM(ROQAS(1:NMICBSO,1:jcplx,L,NY,NX))
   ENDDO
   ROXYX(L,NY,NX)=ROXYX(L,NY,NX)+SUM(ROXYSff(1:NMICBSO,L,NY,NX))
   RNH4X(L,NY,NX)=RNH4X(L,NY,NX)+SUM(RVMX4ff(1:NMICBSO,L,NY,NX)) &

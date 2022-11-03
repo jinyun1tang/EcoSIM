@@ -1,7 +1,7 @@
 module TransfrDataMod
   use data_kind_mod, only : r8 => SHR_KIND_R8
   use GridConsts
-  use EcoSIMConfig, only : jcplx1 => jcplx1c
+  use EcoSIMConfig, only : jcplx => jcplxc
 implicit none
   CHARACTER(LEN=*), Private,PARAMETER :: MOD_FILENAME=__FILE__
   real(r8), parameter :: XFRS=0.05_r8
@@ -449,33 +449,34 @@ implicit none
 
 contains
   subroutine InitTransfrData
-
+  use EcoSiMParDataMod, only : micpar
   implicit none
-
-  allocate(RQROC0(0:jcplx1,JV,JH));       RQROC0=0._r8
-  allocate(RQRON0(0:jcplx1,JV,JH));       RQRON0=0._r8
-  allocate(RQROA0(0:jcplx1,JV,JH));       RQROA0=0._r8
-  allocate(RQROP0(0:jcplx1,JV,JH));       RQROP0=0._r8
-  allocate(OQC2(0:jcplx1,0:JZ,JY,JX));    OQC2=0._r8
-  allocate(OQN2(0:jcplx1,0:JZ,JY,JX));    OQN2=0._r8
-  allocate(OQP2(0:jcplx1,0:JZ,JY,JX));    OQP2=0._r8
-  allocate(OQA2(0:jcplx1,0:JZ,JY,JX));    OQA2=0._r8
-  allocate(ROCSK2(0:jcplx1,0:JZ,JY,JX));  ROCSK2=0._r8
-  allocate(RONSK2(0:jcplx1,0:JZ,JY,JX));  RONSK2=0._r8
-  allocate(ROPSK2(0:jcplx1,0:JZ,JY,JX));  ROPSK2=0._r8
-  allocate(ROASK2(0:jcplx1,0:JZ,JY,JX));  ROASK2=0._r8
-  allocate(ROCFLS(0:jcplx1,3,0:JD,JV,JH));ROCFLS=0._r8
-  allocate(RONFLS(0:jcplx1,3,0:JD,JV,JH));RONFLS=0._r8
-  allocate(ROPFLS(0:jcplx1,3,0:JD,JV,JH));ROPFLS=0._r8
-  allocate(ROAFLS(0:jcplx1,3,0:JD,JV,JH));ROAFLS=0._r8
-  allocate(ROCFHS(0:jcplx1,3,JD,JV,JH));  ROCFHS=0._r8
-  allocate(RONFHS(0:jcplx1,3,JD,JV,JH));  RONFHS=0._r8
-  allocate(ROPFHS(0:jcplx1,3,JD,JV,JH));  ROPFHS=0._r8
-  allocate(ROAFHS(0:jcplx1,3,JD,JV,JH));  ROAFHS=0._r8
-  allocate(TOCFLS(0:jcplx1,JZ,JY,JX));    TOCFLS=0._r8
-  allocate(TONFLS(0:jcplx1,JZ,JY,JX));    TONFLS=0._r8
-  allocate(TOPFLS(0:jcplx1,JZ,JY,JX));    TOPFLS=0._r8
-  allocate(TOAFLS(0:jcplx1,JZ,JY,JX));    TOAFLS=0._r8
+  integer :: n_litrsfk
+  n_litrsfk=micpar%n_litrsfk
+  allocate(RQROC0(1:jcplx,JV,JH));       RQROC0=0._r8
+  allocate(RQRON0(1:jcplx,JV,JH));       RQRON0=0._r8
+  allocate(RQROA0(1:jcplx,JV,JH));       RQROA0=0._r8
+  allocate(RQROP0(1:jcplx,JV,JH));       RQROP0=0._r8
+  allocate(OQC2(1:jcplx,0:JZ,JY,JX));    OQC2=0._r8
+  allocate(OQN2(1:jcplx,0:JZ,JY,JX));    OQN2=0._r8
+  allocate(OQP2(1:jcplx,0:JZ,JY,JX));    OQP2=0._r8
+  allocate(OQA2(1:jcplx,0:JZ,JY,JX));    OQA2=0._r8
+  allocate(ROCSK2(1:jcplx,0:JZ,JY,JX));  ROCSK2=0._r8
+  allocate(RONSK2(1:jcplx,0:JZ,JY,JX));  RONSK2=0._r8
+  allocate(ROPSK2(1:jcplx,0:JZ,JY,JX));  ROPSK2=0._r8
+  allocate(ROASK2(1:jcplx,0:JZ,JY,JX));  ROASK2=0._r8
+  allocate(ROCFLS(1:jcplx,3,0:JD,JV,JH));ROCFLS=0._r8
+  allocate(RONFLS(1:jcplx,3,0:JD,JV,JH));RONFLS=0._r8
+  allocate(ROPFLS(1:jcplx,3,0:JD,JV,JH));ROPFLS=0._r8
+  allocate(ROAFLS(1:jcplx,3,0:JD,JV,JH));ROAFLS=0._r8
+  allocate(ROCFHS(1:jcplx,3,JD,JV,JH));  ROCFHS=0._r8
+  allocate(RONFHS(1:jcplx,3,JD,JV,JH));  RONFHS=0._r8
+  allocate(ROPFHS(1:jcplx,3,JD,JV,JH));  ROPFHS=0._r8
+  allocate(ROAFHS(1:jcplx,3,JD,JV,JH));  ROAFHS=0._r8
+  allocate(TOCFLS(1:jcplx,JZ,JY,JX));    TOCFLS=0._r8
+  allocate(TONFLS(1:jcplx,JZ,JY,JX));    TONFLS=0._r8
+  allocate(TOPFLS(1:jcplx,JZ,JY,JX));    TOPFLS=0._r8
+  allocate(TOAFLS(1:jcplx,JZ,JY,JX));    TOAFLS=0._r8
 
   allocate(RCOBLS(JS,JY,JX));   RCOBLS=0._r8
   allocate(RCHBLS(JS,JY,JX));   RCHBLS=0._r8
@@ -487,14 +488,14 @@ contains
   allocate(RNOBLW(JS,JY,JX));   RNOBLW=0._r8
   allocate(RH1PBS(JS,JY,JX));   RH1PBS=0._r8
   allocate(RH2PBS(JS,JY,JX));   RH2PBS=0._r8
-  allocate(ROCFL0(0:2,JY,JX));  ROCFL0=0._r8
-  allocate(RONFL0(0:2,JY,JX));  RONFL0=0._r8
-  allocate(ROPFL0(0:2,JY,JX));  ROPFL0=0._r8
-  allocate(ROAFL0(0:2,JY,JX));  ROAFL0=0._r8
-  allocate(ROCFL1(0:2,JY,JX));  ROCFL1=0._r8
-  allocate(RONFL1(0:2,JY,JX));  RONFL1=0._r8
-  allocate(ROPFL1(0:2,JY,JX));  ROPFL1=0._r8
-  allocate(ROAFL1(0:2,JY,JX));  ROAFL1=0._r8
+  allocate(ROCFL0(1:n_litrsfk,JY,JX));  ROCFL0=0._r8
+  allocate(RONFL0(1:n_litrsfk,JY,JX));  RONFL0=0._r8
+  allocate(ROPFL0(1:n_litrsfk,JY,JX));  ROPFL0=0._r8
+  allocate(ROAFL0(1:n_litrsfk,JY,JX));  ROAFL0=0._r8
+  allocate(ROCFL1(1:n_litrsfk,JY,JX));  ROCFL1=0._r8
+  allocate(RONFL1(1:n_litrsfk,JY,JX));  RONFL1=0._r8
+  allocate(ROPFL1(1:n_litrsfk,JY,JX));  ROPFL1=0._r8
+  allocate(ROAFL1(1:n_litrsfk,JY,JX));  ROAFL1=0._r8
   allocate(RCOFL0(JY,JX));      RCOFL0=0._r8
   allocate(RCHFL0(JY,JX));      RCHFL0=0._r8
   allocate(ROXFL0(JY,JX));      ROXFL0=0._r8
@@ -525,10 +526,10 @@ contains
   allocate(RH1PF0(JY,JX));      RH1PF0=0._r8
   allocate(RH1PF1(JY,JX));      RH1PF1=0._r8
   allocate(RH1BF2(JY,JX));      RH1BF2=0._r8
-  allocate(ROCFXS(0:jcplx1,JZ,JY,JX));ROCFXS=0._r8
-  allocate(RONFXS(0:jcplx1,JZ,JY,JX));RONFXS=0._r8
-  allocate(ROPFXS(0:jcplx1,JZ,JY,JX));ROPFXS=0._r8
-  allocate(ROAFXS(0:jcplx1,JZ,JY,JX));ROAFXS=0._r8
+  allocate(ROCFXS(1:jcplx,JZ,JY,JX));ROCFXS=0._r8
+  allocate(RONFXS(1:jcplx,JZ,JY,JX));RONFXS=0._r8
+  allocate(ROPFXS(1:jcplx,JZ,JY,JX));ROPFXS=0._r8
+  allocate(ROAFXS(1:jcplx,JZ,JY,JX));ROAFXS=0._r8
   allocate(RCOFXS(JZ,JY,JX));   RCOFXS=0._r8
   allocate(RCHFXS(JZ,JY,JX));   RCHFXS=0._r8
   allocate(ROXFXS(JZ,JY,JX));   ROXFXS=0._r8
@@ -562,10 +563,10 @@ contains
   allocate(RN2DFG(0:JZ,JY,JX)); RN2DFG=0._r8
   allocate(RN3DFG(0:JZ,JY,JX)); RN3DFG=0._r8
   allocate(RNBDFG(0:JZ,JY,JX)); RNBDFG=0._r8
-  allocate(TQROC(0:jcplx1,JY,JX));   TQROC=0._r8
-  allocate(TQRON(0:jcplx1,JY,JX));   TQRON=0._r8
-  allocate(TQROP(0:jcplx1,JY,JX));   TQROP=0._r8
-  allocate(TQROA(0:jcplx1,JY,JX));   TQROA=0._r8
+  allocate(TQROC(1:jcplx,JY,JX));   TQROC=0._r8
+  allocate(TQRON(1:jcplx,JY,JX));   TQRON=0._r8
+  allocate(TQROP(1:jcplx,JY,JX));   TQROP=0._r8
+  allocate(TQROA(1:jcplx,JY,JX));   TQROA=0._r8
   allocate(TQRCHS(JY,JX));      TQRCHS=0._r8
   allocate(TQROXS(JY,JX));      TQROXS=0._r8
   allocate(TQRNGS(JY,JX));      TQRNGS=0._r8
@@ -683,13 +684,13 @@ contains
   allocate(RQRNO20(JV,JH));     RQRNO20=0._r8
   allocate(RQRH2P0(JV,JH));     RQRH2P0=0._r8
   allocate(RQRH1P0(JV,JH));     RQRH1P0=0._r8
-  allocate(OQNH2(0:jcplx1,JZ,JY,JX));OQNH2=0._r8
-  allocate(OQPH2(0:jcplx1,JZ,JY,JX));OQPH2=0._r8
-  allocate(OQAH2(0:jcplx1,JZ,JY,JX));OQAH2=0._r8
-  allocate(TOCFHS(0:jcplx1,JZ,JY,JX));TOCFHS=0._r8
-  allocate(TONFHS(0:jcplx1,JZ,JY,JX));TONFHS=0._r8
-  allocate(TOPFHS(0:jcplx1,JZ,JY,JX));TOPFHS=0._r8
-  allocate(TOAFHS(0:jcplx1,JZ,JY,JX));TOAFHS=0._r8
+  allocate(OQNH2(1:jcplx,JZ,JY,JX));OQNH2=0._r8
+  allocate(OQPH2(1:jcplx,JZ,JY,JX));OQPH2=0._r8
+  allocate(OQAH2(1:jcplx,JZ,JY,JX));OQAH2=0._r8
+  allocate(TOCFHS(1:jcplx,JZ,JY,JX));TOCFHS=0._r8
+  allocate(TONFHS(1:jcplx,JZ,JY,JX));TONFHS=0._r8
+  allocate(TOPFHS(1:jcplx,JZ,JY,JX));TOPFHS=0._r8
+  allocate(TOAFHS(1:jcplx,JZ,JY,JX));TOAFHS=0._r8
   allocate(TCOFHS(JZ,JY,JX));   TCOFHS=0._r8
   allocate(TCHFHS(JZ,JY,JX));   TCHFHS=0._r8
   allocate(TOXFHS(JZ,JY,JX));   TOXFHS=0._r8
@@ -738,8 +739,8 @@ contains
   allocate(TNOBLW(JS,JY,JX));   TNOBLW=0._r8
   allocate(TH1PBS(JS,JY,JX));   TH1PBS=0._r8
   allocate(TH2PBS(JS,JY,JX));   TH2PBS=0._r8
-  allocate(RQROP(0:jcplx1,2,2,JV,JH));RQROP=0._r8
-  allocate(RQROA(0:jcplx1,2,2,JV,JH));RQROA=0._r8
+  allocate(RQROP(1:jcplx,2,2,JV,JH));RQROP=0._r8
+  allocate(RQROA(1:jcplx,2,2,JV,JH));RQROA=0._r8
   allocate(RQRCOS(2,2,JV,JH));  RQRCOS=0._r8
   allocate(RQRCHS(2,2,JV,JH));  RQRCHS=0._r8
   allocate(RQROXS(2,2,JV,JH));  RQROXS=0._r8
@@ -763,8 +764,8 @@ contains
   allocate(RN3DFR(JY,JX));      RN3DFR=0._r8
   allocate(RHGDFR(JY,JX));      RHGDFR=0._r8
   allocate(R1BSK2(JZ,JY,JX));   R1BSK2=0._r8
-  allocate(RQROC(0:jcplx1,2,2,JV,JH));RQROC=0._r8
-  allocate(RQRON(0:jcplx1,2,2,JV,JH));RQRON=0._r8
+  allocate(RQROC(1:jcplx,2,2,JV,JH));RQROC=0._r8
+  allocate(RQRON(1:jcplx,2,2,JV,JH));RQRON=0._r8
   allocate(ZNH4S2(0:JZ,JY,JX)); ZNH4S2=0._r8
   allocate(ZNH4B2(0:JZ,JY,JX)); ZNH4B2=0._r8
   allocate(ZNH3S2(0:JZ,JY,JX)); ZNH3S2=0._r8
@@ -794,7 +795,7 @@ contains
   allocate(H2P4H2(JZ,JY,JX));   H2P4H2=0._r8
   allocate(H2PBH2(JZ,JY,JX));   H2PBH2=0._r8
   allocate(ZNO2H2(JZ,JY,JX));   ZNO2H2=0._r8
-  allocate(OQCH2(0:jcplx1,JZ,JY,JX));OQCH2=0._r8
+  allocate(OQCH2(1:jcplx,JZ,JY,JX));OQCH2=0._r8
   allocate(CH4G2(JZ,JY,JX));    CH4G2=0._r8
   allocate(CH4S2(0:JZ,JY,JX));  CH4S2=0._r8
   allocate(OXYG2(JZ,JY,JX));    OXYG2=0._r8

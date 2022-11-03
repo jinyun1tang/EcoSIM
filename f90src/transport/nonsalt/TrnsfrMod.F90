@@ -378,7 +378,7 @@ module TrnsfrMod
 !             :NH4=NH4,NH3=NH3,NO3=NO3,NO2=NO2,P14=HPO4,PO4=H2PO4 in non-band
 !             :N4B=NH4,N3B=NH3,NOB=NO3,N2B=NO2,P1B=HPO4,POB=H2PO4 in band
 !
-  DO  K=0,jcplx1
+  DO  K=1,jcplx
     OQC2(K,0,NY,NX)=OQC2(K,0,NY,NX)+ROCFLS(K,3,0,NY,NX)
     OQN2(K,0,NY,NX)=OQN2(K,0,NY,NX)+RONFLS(K,3,0,NY,NX)
     OQP2(K,0,NY,NX)=OQP2(K,0,NY,NX)+ROPFLS(K,3,0,NY,NX)
@@ -404,7 +404,7 @@ module TrnsfrMod
   ZNH3S2(NU(NY,NX),NY,NX)=ZNH3S2(NU(NY,NX),NY,NX)+RN3DFS(NY,NX)
   ZNH3B2(NU(NY,NX),NY,NX)=ZNH3B2(NU(NY,NX),NY,NX)+RNBDFS(NY,NX)
   H2GS2(NU(NY,NX),NY,NX)=H2GS2(NU(NY,NX),NY,NX)+RHGDFS(NY,NX)
-  DO 9680 K=0,jcplx1
+  DO 9680 K=1,jcplx
     OQC2(K,0,NY,NX)=OQC2(K,0,NY,NX)+TQROC(K,NY,NX)
     OQN2(K,0,NY,NX)=OQN2(K,0,NY,NX)+TQRON(K,NY,NX)
     OQP2(K,0,NY,NX)=OQP2(K,0,NY,NX)+TQROP(K,NY,NX)
@@ -466,7 +466,7 @@ module TrnsfrMod
           +RN3FBZ(L,NY,NX)+RNBBBL(L,NY,NX)
         H2GS2(L,NY,NX)=H2GS2(L,NY,NX)+THGFLS(L,NY,NX)+RHGFXS(L,NY,NX) &
           +RHGFLZ(L,NY,NX)+RHGBBL(L,NY,NX)
-        DO  K=0,jcplx1
+        DO  K=1,jcplx
           OQC2(K,L,NY,NX)=OQC2(K,L,NY,NX)+TOCFLS(K,L,NY,NX)+ROCFXS(K,L,NY,NX)
           OQN2(K,L,NY,NX)=OQN2(K,L,NY,NX)+TONFLS(K,L,NY,NX)+RONFXS(K,L,NY,NX)
           OQP2(K,L,NY,NX)=OQP2(K,L,NY,NX)+TOPFLS(K,L,NY,NX)+ROPFXS(K,L,NY,NX)
@@ -553,7 +553,7 @@ module TrnsfrMod
   RN2SK2(0,NY,NX)=RN2O(0,NY,NX)*XNPG
   RNHSK2(0,NY,NX)=0.0_r8
   RHGSK2(0,NY,NX)=RH2GO(0,NY,NX)*XNPG
-  DO  K=0,jcplx1
+  DO  K=1,jcplx
     ROCSK2(K,0,NY,NX)=-XOQCS(K,0,NY,NX)*XNPH
     RONSK2(K,0,NY,NX)=-XOQNS(K,0,NY,NX)*XNPH
     ROPSK2(K,0,NY,NX)=-XOQPS(K,0,NY,NX)*XNPH
@@ -581,7 +581,7 @@ module TrnsfrMod
   Z2GS2(0,NY,NX)=Z2GS(0,NY,NX)
   Z2OS2(0,NY,NX)=Z2OS(0,NY,NX)
   H2GS2(0,NY,NX)=H2GS(0,NY,NX)
-  DO 9979 K=0,jcplx1
+  DO 9979 K=1,jcplx
     OQC2(K,0,NY,NX)=OQC(K,0,NY,NX)-XOQCS(K,0,NY,NX)
     OQN2(K,0,NY,NX)=OQN(K,0,NY,NX)-XOQNS(K,0,NY,NX)
     OQP2(K,0,NY,NX)=OQP(K,0,NY,NX)-XOQPS(K,0,NY,NX)
@@ -602,7 +602,7 @@ module TrnsfrMod
   integer, intent(in) :: NY, NX
   integer :: K
 
-  DO 8855 K=0,jcplx1
+  DO 8855 K=1,jcplx
     IF(K.LE.2)THEN
       XOCFLS(K,3,0,NY,NX)=0.0
       XONFLS(K,3,0,NY,NX)=0.0
@@ -815,12 +815,13 @@ module TrnsfrMod
 !------------------------------------------------------------------------------------------
 
   subroutine SubHourlyFluxesFromSiteFile(NY,NX)
+  use EcoSiMParDataMod, only : micpar
   implicit none
 
   integer, intent(in) :: NY, NX
   INTEGER :: K,L
 
-  DO  K=0,2
+  DO  K=1,micpar%n_litrsfk
     ROCFL0(K,NY,NX)=XOCFLS(K,3,0,NY,NX)*XNPH
     RONFL0(K,NY,NX)=XONFLS(K,3,0,NY,NX)*XNPH
     ROPFL0(K,NY,NX)=XOPFLS(K,3,0,NY,NX)*XNPH
@@ -934,7 +935,7 @@ module TrnsfrMod
     RN2SK2(L,NY,NX)=(RN2O(L,NY,NX)+TUPN2S(L,NY,NX))*XNPG
     RNHSK2(L,NY,NX)=-TRN3G(L,NY,NX)*XNPG
     RHGSK2(L,NY,NX)=(RH2GO(L,NY,NX)+TUPHGS(L,NY,NX))*XNPG
-    DO  K=0,jcplx1
+    DO  K=1,jcplx
       ROCSK2(K,L,NY,NX)=-XOQCS(K,L,NY,NX)*XNPH
       RONSK2(K,L,NY,NX)=-XOQNS(K,L,NY,NX)*XNPH
       ROPSK2(K,L,NY,NX)=-XOQPS(K,L,NY,NX)*XNPH
@@ -1063,7 +1064,7 @@ module TrnsfrMod
     Z2GS2(L,NY,NX)=Z2GS(L,NY,NX)
     Z2OS2(L,NY,NX)=Z2OS(L,NY,NX)
     H2GS2(L,NY,NX)=H2GS(L,NY,NX)
-    DO  K=0,jcplx1
+    DO  K=1,jcplx
       OQC2(K,L,NY,NX)=OQC(K,L,NY,NX)-XOQCS(K,L,NY,NX)
       OQN2(K,L,NY,NX)=OQN(K,L,NY,NX)-XOQNS(K,L,NY,NX)
       OQP2(K,L,NY,NX)=OQP(K,L,NY,NX)-XOQPS(K,L,NY,NX)

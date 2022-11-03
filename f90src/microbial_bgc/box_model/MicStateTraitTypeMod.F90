@@ -1,7 +1,7 @@
 module MicStateTraitTypeMod
 
   use data_kind_mod, only : r8 => SHR_KIND_R8
-  use MicBGCPars, only : micpar
+  use EcoSiMParDataMod, only : micpar
   use abortutils, only : destroy
 implicit none
   private
@@ -98,12 +98,11 @@ implicit none
   subroutine Init(this)
   implicit none
   class(micsttype) :: this
-  integer :: jcplx1,jg,nfgs,jsken
+  integer :: jcplx,nfgs,jsken
   integer :: ndbiomcp, nlbiomcp
   integer :: NMICBSA, NMICBSO
 
-  jcplx1=micpar%jcplx1
-  JG=micpar%jguilds
+  jcplx=micpar%jcplx
   NFGs=micpar%NFGs
   jsken=micpar%jsken
   ndbiomcp=micpar%ndbiomcp
@@ -111,27 +110,27 @@ implicit none
   NMICBSA=micpar%NMICBSA
   NMICBSO=micpar%NMICBSO
 
-  allocate(this%FOSRH(0:jcplx1))
-  allocate(this%OQC(0:jcplx1))
-  allocate(this%OQN(0:jcplx1))
-  allocate(this%OQP(0:jcplx1))
-  allocate(this%OQA(0:jcplx1))
-  allocate(this%OHC(0:jcplx1))
-  allocate(this%OHN(0:jcplx1))
-  allocate(this%OHP(0:jcplx1))
-  allocate(this%OHA(0:jcplx1))
-  allocate(this%OSA(jsken,0:jcplx1))
-  allocate(this%OSC(jsken,0:jcplx1))
-  allocate(this%OSN(jsken,0:jcplx1))
-  allocate(this%OSP(jsken,0:jcplx1))
-  allocate(this%ORC(ndbiomcp,0:jcplx1))
-  allocate(this%ORN(ndbiomcp,0:jcplx1))
-  allocate(this%ORP(ndbiomcp,0:jcplx1))
-  allocate(this%CNOSC(jsken,0:jcplx1))
-  allocate(this%CPOSC(jsken,0:jcplx1))
-  allocate(this%OMC(nlbiomcp,NMICBSO,0:jcplx1))
-  allocate(this%OMN(nlbiomcp,NMICBSO,0:jcplx1))
-  allocate(this%OMP(nlbiomcp,NMICBSO,0:jcplx1))
+  allocate(this%FOSRH(1:jcplx))
+  allocate(this%OQC(1:jcplx))
+  allocate(this%OQN(1:jcplx))
+  allocate(this%OQP(1:jcplx))
+  allocate(this%OQA(1:jcplx))
+  allocate(this%OHC(1:jcplx))
+  allocate(this%OHN(1:jcplx))
+  allocate(this%OHP(1:jcplx))
+  allocate(this%OHA(1:jcplx))
+  allocate(this%OSA(jsken,1:jcplx))
+  allocate(this%OSC(jsken,1:jcplx))
+  allocate(this%OSN(jsken,1:jcplx))
+  allocate(this%OSP(jsken,1:jcplx))
+  allocate(this%ORC(ndbiomcp,1:jcplx))
+  allocate(this%ORN(ndbiomcp,1:jcplx))
+  allocate(this%ORP(ndbiomcp,1:jcplx))
+  allocate(this%CNOSC(jsken,1:jcplx))
+  allocate(this%CPOSC(jsken,1:jcplx))
+  allocate(this%OMC(nlbiomcp,NMICBSO,1:jcplx))
+  allocate(this%OMN(nlbiomcp,NMICBSO,1:jcplx))
+  allocate(this%OMP(nlbiomcp,NMICBSO,1:jcplx))
   allocate(this%OMCff(nlbiomcp,NMICBSA))
   allocate(this%OMNff(nlbiomcp,NMICBSA))
   allocate(this%OMPff(nlbiomcp,NMICBSA))

@@ -137,22 +137,23 @@ implicit none
     ROXYZ    =>   plt_bgcr%ROXYZ      , &
     RCO2Z    =>   plt_bgcr%RCO2Z      , &
     RNH3Z    =>   plt_bgcr%RNH3Z      , &
-    CO2A     =>   plt_rbgc%CO2A   , &
+    CO2A     =>   plt_rbgc%CO2A       , &
     RSCS     =>   plt_soilchem%RSCS   , &
     VOLX     =>   plt_soilchem%VOLX   , &
-    H2GP     =>   plt_rbgc%H2GP   , &
-    OXYA     =>   plt_rbgc%OXYA   , &
-    CH4P     =>   plt_rbgc%CH4P   , &
-    H2GA     =>   plt_rbgc%H2GA   , &
-    CO2P     =>   plt_rbgc%CO2P   , &
-    OXYP     =>   plt_rbgc%OXYP   , &
-    CH4A     =>   plt_rbgc%CH4A   , &
+    H2GP     =>   plt_rbgc%H2GP       , &
+    OXYA     =>   plt_rbgc%OXYA       , &
+    CH4P     =>   plt_rbgc%CH4P       , &
+    H2GA     =>   plt_rbgc%H2GA       , &
+    CO2P     =>   plt_rbgc%CO2P       , &
+    OXYP     =>   plt_rbgc%OXYP       , &
+    CH4A     =>   plt_rbgc%CH4A       , &
     NU       =>   plt_site%NU         , &
     ZERO     =>   plt_site%ZERO       , &
     PP       =>   plt_site%PP         , &
     ZEROS2   =>   plt_site%ZEROS2     , &
     DLYR3    =>   plt_site%DLYR3      , &
     NL       =>   plt_site%NL         , &
+    k_fine_litr=> pltpar%k_fine_litr  , &
     RTVLP    =>   plt_morph%RTVLP     , &
     RTDNP    =>   plt_morph%RTDNP     , &
     RTARP    =>   plt_morph%RTARP     , &
@@ -272,8 +273,8 @@ implicit none
 !     CO2P,OXYP,CH4P,Z2OP,ZH3P,H2GP=root aqueous CO2,O2,CH4,N2O,NH3,H2
 !
         IF(N.EQ.1)THEN
-          RTLGZ=RTLGZ*FWODRE(ielmc,1)
-          RTLGL=RTLGL*FWODRE(ielmc,1)
+          RTLGZ=RTLGZ*FWODRE(ielmc,k_fine_litr)
+          RTLGL=RTLGL*FWODRE(ielmc,k_fine_litr)
         ENDIF
         RTLGX=RTLGZ*PP(NZ)
         RTLGT=RTLGL+RTLGX
@@ -414,6 +415,8 @@ implicit none
     CNRTS   =>  plt_allom%CNRTS     , &
     CPRTS   =>  plt_allom%CPRTS     , &
     DMRT    =>  plt_allom%DMRT      , &
+    k_woody_litr=> pltpar%k_woody_litr,&
+    k_fine_litr=> pltpar%k_fine_litr, &
     icwood  =>  pltpar%icwood       , &
     iroot   =>  pltpar%iroot        , &
     instruct=>  pltpar%instruct     , &
@@ -657,11 +660,11 @@ implicit none
 !
       DO NE=1,npelms
         D6350: DO M=1,jsken
-          ESNC(M,NE,0,L,NZ)=ESNC(M,NE,0,L,NZ)+CFOPE(icwood,M,NE,NZ) &
-            *FSNC2*(WTRT2E(NE,N,L,NR,NZ)-RCER(NE))*FWODRE(NE,0)
+          ESNC(M,NE,k_woody_litr,L,NZ)=ESNC(M,NE,k_woody_litr,L,NZ)+CFOPE(icwood,M,NE,NZ) &
+            *FSNC2*(WTRT2E(NE,N,L,NR,NZ)-RCER(NE))*FWODRE(NE,k_woody_litr)
 
-          ESNC(M,NE,1,L,NZ)=ESNC(M,NE,1,L,NZ)+CFOPE(iroot,M,NE,NZ) &
-            *FSNC2*(WTRT2E(NE,N,L,NR,NZ)-RCER(NE))*FWODRE(NE,1)
+          ESNC(M,NE,k_fine_litr,L,NZ)=ESNC(M,NE,k_fine_litr,L,NZ)+CFOPE(iroot,M,NE,NZ) &
+            *FSNC2*(WTRT2E(NE,N,L,NR,NZ)-RCER(NE))*FWODRE(NE,k_fine_litr)
         ENDDO D6350
       ENDDO
 !
@@ -712,7 +715,7 @@ implicit none
 !     WTRT2,WTRT2N,WTRT2P=secondary root C,N,P mass
 !     ZADD2,PADD2=nonstructural N,P ltd by O2 used in growth
 !
-      GRTLGL=GRTWTG*RTLG2X(N,NZ)*WFNR*FWODRE(ielmc,1) &
+      GRTLGL=GRTWTG*RTLG2X(N,NZ)*WFNR*FWODRE(ielmc,k_fine_litr) &
         -FSNC2*RTLG2(N,L,NR,NZ)
       GRTWTLE(ielmc)=GRTWTG-FSNC2*WTRT2E(ielmc,N,L,NR,NZ)
       GRTWTLE(ielmn)=ZADD2-FSNC2*WTRT2E(ielmn,N,L,NR,NZ)
@@ -948,7 +951,7 @@ implicit none
 !
               IF(RTDP1(N,NR,NZ).GT.CDPTHZ(NG(NZ)))THEN
                 TFRCO2=0._r8
-                DO 5100 LL=NG(NZ),NINR(NR,NZ)
+                D5100: DO LL=NG(NZ),NINR(NR,NZ)
                   IF(LL.LT.NINR(NR,NZ))THEN
                     FRCO2=AMIN1(1.0_r8,RTLG1(N,LL,NR,NZ)/(RTDP1(N,NR,NZ)-SDPTH(NZ)))
                   ELSE
@@ -958,7 +961,7 @@ implicit none
                   RCO2M(N,LL,NZ)=RCO2M(N,LL,NZ)+RCO2TM*FRCO2
                   RCO2N(N,LL,NZ)=RCO2N(N,LL,NZ)+RCO2T*FRCO2
                   RCO2A(N,LL,NZ)=RCO2A(N,LL,NZ)-RCO2T*FRCO2
-5100            CONTINUE
+                ENDDO D5100
               ELSE
                 RCO2M(N,L,NZ)=RCO2M(N,L,NZ)+RCO2TM
                 RCO2N(N,L,NZ)=RCO2N(N,L,NZ)+RCO2T
@@ -1042,13 +1045,13 @@ implicit none
                     ENDIF
                     DO NE=1,npelms
                       D6450: DO M=1,jsken
-                        ESNC(M,NE,0,LL,NZ)=ESNC(M,NE,0,LL,NZ)+CFOPE(icwood,M,NE,NZ) &
-                          *FSNCM*AZMAX1(WTRT2E(NE,2,LL,NR,NZ))*FWODRE(NE,0)
+                        ESNC(M,NE,k_woody_litr,LL,NZ)=ESNC(M,NE,k_woody_litr,LL,NZ)+CFOPE(icwood,M,NE,NZ) &
+                          *FSNCM*AZMAX1(WTRT2E(NE,2,LL,NR,NZ))*FWODRE(NE,k_woody_litr)
 
-                        ESNC(M,NE,1,LL,NZ)=ESNC(M,NE,1,LL,NZ)+CFOPE(iroot,M,NE,NZ) &
-                          *FSNCM*AZMAX1(WTRT2E(NE,2,LL,NR,NZ))*FWODRE(NE,1)
+                        ESNC(M,NE,k_fine_litr,LL,NZ)=ESNC(M,NE,k_fine_litr,LL,NZ)+CFOPE(iroot,M,NE,NZ) &
+                          *FSNCM*AZMAX1(WTRT2E(NE,2,LL,NR,NZ))*FWODRE(NE,k_fine_litr)
 
-                        ESNC(M,NE,1,LL,NZ)=ESNC(M,NE,1,LL,NZ)+CFOPE(instruct,M,NE,NZ) &
+                        ESNC(M,NE,k_fine_litr,LL,NZ)=ESNC(M,NE,k_fine_litr,LL,NZ)+CFOPE(instruct,M,NE,NZ) &
                           *FSNCP*AZMAX1(EPOOLR(NE,2,LL,NZ))
                       ENDDO D6450
                       WTRT2E(NE,2,LL,NR,NZ)=AZMAX1(WTRT2E(NE,2,LL,NR,NZ))*(1.0_r8-FSNCM)
@@ -1127,6 +1130,8 @@ implicit none
     ZEROP   =>  plt_biom%ZEROP      , &
     ZERO    =>  plt_site%ZERO       , &
     icwood  =>  pltpar%icwood       , &
+    k_woody_litr=> pltpar%k_woody_litr,&
+    k_fine_litr=> pltpar%k_fine_litr, &
     iroot   =>  pltpar%iroot        , &
     FWODRE  =>  plt_allom%FWODRE    , &
     CFOPE   =>  plt_soilchem%CFOPE  , &
@@ -1217,11 +1222,11 @@ implicit none
 !
   DO NE=1,npelms
     D6355: DO M=1,jsken
-      ESNC(M,NE,0,L,NZ)=ESNC(M,NE,0,L,NZ)+CFOPE(icwood,M,NE,NZ) &
-        *FSNC1*(RTWT1E(N,NR,NE,NZ)-RCER(NE))*FWODRE(NE,0)
+      ESNC(M,NE,k_woody_litr,L,NZ)=ESNC(M,NE,k_woody_litr,L,NZ)+CFOPE(icwood,M,NE,NZ) &
+        *FSNC1*(RTWT1E(N,NR,NE,NZ)-RCER(NE))*FWODRE(NE,k_woody_litr)
 
-      ESNC(M,NE,1,L,NZ)=ESNC(M,NE,1,L,NZ)+CFOPE(iroot,M,NE,NZ) &
-        *FSNC1*(RTWT1E(N,NR,NE,NZ)-RCER(NE))*FWODRE(NE,1)
+      ESNC(M,NE,k_fine_litr,L,NZ)=ESNC(M,NE,k_fine_litr,L,NZ)+CFOPE(iroot,M,NE,NZ) &
+        *FSNC1*(RTWT1E(N,NR,NE,NZ)-RCER(NE))*FWODRE(NE,k_fine_litr)
     ENDDO D6355
   ENDDO
   end associate
@@ -1255,6 +1260,8 @@ implicit none
     PSIRG     =>  plt_ew%PSIRG         , &
     PSIRO     =>  plt_ew%PSIRO         , &
     PSIRT     =>  plt_ew%PSIRT         , &
+    k_woody_litr=> pltpar%k_woody_litr , &
+    k_fine_litr=> pltpar%k_fine_litr   , &
     RTLG1X    =>  plt_morph%RTLG1X     , &
     RRAD1     =>  plt_morph%RRAD1      , &
     RTLG1     =>  plt_morph%RTLG1      , &
@@ -1281,10 +1288,10 @@ implicit none
 !     DLYR=soil layer thickness
 !
   IF(GRTWTLE(ielmc).LT.0.0.AND.RTWT1E(N,NR,ielmc,NZ).GT.ZEROP(NZ))THEN
-    GRTLGL=GRTWTG*RTLG1X(N,NZ)/PP(NZ)*WFNR*FWODRE(ielmc,1) &
+    GRTLGL=GRTWTG*RTLG1X(N,NZ)/PP(NZ)*WFNR*FWODRE(ielmc,k_fine_litr) &
       +GRTWTLE(ielmc)*(RTDP1(N,NR,NZ)-SDPTH(NZ))/RTWT1E(N,NR,ielmc,NZ)
   ELSE
-    GRTLGL=GRTWTG*RTLG1X(N,NZ)/PP(NZ)*WFNR*FWODRE(ielmc,1)
+    GRTLGL=GRTWTG*RTLG1X(N,NZ)/PP(NZ)*WFNR*FWODRE(ielmc,k_fine_litr)
   ENDIF
   IF(L.LT.NJ)THEN
     GRTLGL=AMIN1(DLYR3(L1),GRTLGL)
@@ -1619,6 +1626,8 @@ implicit none
     TRAU       =>   plt_bgcr%TRAU     , &
     NU         =>   plt_site%NU       , &
     ZERO       =>   plt_site%ZERO     , &
+    k_woody_litr=> pltpar%k_woody_litr,&
+    k_fine_litr=> pltpar%k_fine_litr, &
     NIX        =>   plt_morph%NIX     , &
     NINR       =>   plt_morph%NINR    , &
     RRAD2      =>   plt_morph%RRAD2   , &
@@ -1884,8 +1893,8 @@ implicit none
         PTSHTR=PTSHT(NZ)
       ENDIF
       D415: DO L=NU,NI(NZ)
-        WTLSBX=WTLSB(NB,NZ)*FWODBE(ielmc,1)*FWTR(L)*FWTC
-        WTRTLX=WTRTL(1,L,NZ)*FWODRE(ielmc,1)*FWTB(NB)*FWTS
+        WTLSBX=WTLSB(NB,NZ)*FWODBE(ielmc,k_fine_litr)*FWTR(L)*FWTC
+        WTRTLX=WTRTL(1,L,NZ)*FWODRE(ielmc,k_fine_litr)*FWTB(NB)*FWTS
         WTLSBB=AZMAX1(WTLSBX,FSNK*WTRTLX)
         WTRTLR=AZMAX1(WTRTLX,FSNK*WTLSBX)
         WTPLTT=WTLSBB+WTRTLR
@@ -2042,7 +2051,7 @@ implicit none
 !     RUPNH4,RUPNHB,RUPN03,RUPNOB=uptake from non-band,band of NH4,NO3
 !     RUPH2P,RUPH2B,RUPH1P,RUPH1B=uptake from non-band,band of H2PO4,HPO4
 !
-        D195: DO K=0,jcplx11
+        D195: DO K=1,jcplx
           EPOOLR(ielmc,N,L,NZ)=EPOOLR(ielmc,N,L,NZ)+RDFOMC(N,K,L,NZ)
           EPOOLR(ielmn,N,L,NZ)=EPOOLR(ielmn,N,L,NZ)+RDFOMN(N,K,L,NZ)
           EPOOLR(ielmp,N,L,NZ)=EPOOLR(ielmp,N,L,NZ)+RDFOMP(N,K,L,NZ)

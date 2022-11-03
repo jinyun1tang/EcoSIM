@@ -1,7 +1,7 @@
 module MicFluxTypeMod
 
   use data_kind_mod, only : r8 => SHR_KIND_R8
-  use MicBGCPars, only : micpar
+  use EcoSiMParDataMod, only : micpar
   use EcoSIMSolverPar, only : NPH
   use abortutils, only : destroy
 implicit none
@@ -88,41 +88,41 @@ implicit none
 
   implicit none
   class(micfluxtype) :: this
-  integer :: jcplx1,JG,NFGs
+  integer :: jcplx,JG,NFGs
   integer :: NMICBSO, NMICBSA
 
-  jcplx1=micpar%jcplx1
+  jcplx=micpar%jcplx
   JG=micpar%jguilds
   NFGs=micpar%NFGs
   NMICBSO=micpar%NMICBSO
   NMICBSA=micpar%NMICBSA
   allocate(this%ROXSK(NPH));this%ROXSK = 0._r8
-  allocate(this%XOQCS(0:JCPLX1));this%XOQCS=0._r8
-  allocate(this%XOQNS(0:JCPLX1));this%XOQNS=0._r8
-  allocate(this%XOQPS(0:JCPLX1));this%XOQPS=0._r8
-  allocate(this%XOQAS(0:JCPLX1));this%XOQAS=0._r8
-  allocate(this%ROXYS(NMICBSO,0:JCPLX1));this%ROXYS=0._r8
-  allocate(this%ROQCS(NMICBSO,0:JCPLX1));this%ROQCS=0._r8
-  allocate(this%ROQAS(NMICBSO,0:JCPLX1));this%ROQAS=0._r8
-  allocate(this%RVMX3(NMICBSO,0:JCPLX1));this%RVMX3=0._r8
-  allocate(this%RVMB3(NMICBSO,0:JCPLX1));this%RVMB3=0._r8
-  allocate(this%RVMX2(NMICBSO,0:JCPLX1));this%RVMX2=0._r8
-  allocate(this%RVMB2(NMICBSO,0:JCPLX1));this%RVMB2=0._r8
-  allocate(this%RVMX1(NMICBSO,0:JCPLX1));this%RVMX1=0._r8
-  allocate(this%RVMX4(NMICBSO,0:JCPLX1));this%RVMX4=0._r8
-  allocate(this%RVMB4(NMICBSO,0:JCPLX1));this%RVMB4=0._r8
-  allocate(this%RINHO(NMICBSO,0:JCPLX1));this%RINHO=0._r8
-  allocate(this%RINHB(NMICBSO,0:JCPLX1));this%RINHB=0._r8
-  allocate(this%RINOO(NMICBSO,0:JCPLX1));this%RINOO=0._r8
-  allocate(this%RINOB(NMICBSO,0:JCPLX1));this%RINOB=0._r8
-  allocate(this%RIPOO(NMICBSO,0:JCPLX1));this%RIPOO=0._r8
-  allocate(this%RIPBO(NMICBSO,0:JCPLX1));this%RIPBO=0._r8
-  allocate(this%RIPO1(NMICBSO,0:JCPLX1));this%RIPO1=0._r8
-  allocate(this%RIPB1(NMICBSO,0:JCPLX1));this%RIPB1=0._r8
-  allocate(this%RINHOR(NMICBSO,0:JCPLX1));this%RINHOR=0._r8
-  allocate(this%RINOOR(NMICBSO,0:JCPLX1));this%RINOOR=0._r8
-  allocate(this%RIPOOR(NMICBSO,0:JCPLX1));this%RIPOOR=0._r8
-  allocate(this%RIPO1R(NMICBSO,0:JCPLX1));this%RIPO1R=0._r8
+  allocate(this%XOQCS(1:jcplx));this%XOQCS=0._r8
+  allocate(this%XOQNS(1:jcplx));this%XOQNS=0._r8
+  allocate(this%XOQPS(1:jcplx));this%XOQPS=0._r8
+  allocate(this%XOQAS(1:jcplx));this%XOQAS=0._r8
+  allocate(this%ROXYS(NMICBSO,1:jcplx));this%ROXYS=0._r8
+  allocate(this%ROQCS(NMICBSO,1:jcplx));this%ROQCS=0._r8
+  allocate(this%ROQAS(NMICBSO,1:jcplx));this%ROQAS=0._r8
+  allocate(this%RVMX3(NMICBSO,1:jcplx));this%RVMX3=0._r8
+  allocate(this%RVMB3(NMICBSO,1:jcplx));this%RVMB3=0._r8
+  allocate(this%RVMX2(NMICBSO,1:jcplx));this%RVMX2=0._r8
+  allocate(this%RVMB2(NMICBSO,1:jcplx));this%RVMB2=0._r8
+  allocate(this%RVMX1(NMICBSO,1:jcplx));this%RVMX1=0._r8
+  allocate(this%RVMX4(NMICBSO,1:jcplx));this%RVMX4=0._r8
+  allocate(this%RVMB4(NMICBSO,1:jcplx));this%RVMB4=0._r8
+  allocate(this%RINHO(NMICBSO,1:jcplx));this%RINHO=0._r8
+  allocate(this%RINHB(NMICBSO,1:jcplx));this%RINHB=0._r8
+  allocate(this%RINOO(NMICBSO,1:jcplx));this%RINOO=0._r8
+  allocate(this%RINOB(NMICBSO,1:jcplx));this%RINOB=0._r8
+  allocate(this%RIPOO(NMICBSO,1:jcplx));this%RIPOO=0._r8
+  allocate(this%RIPBO(NMICBSO,1:jcplx));this%RIPBO=0._r8
+  allocate(this%RIPO1(NMICBSO,1:jcplx));this%RIPO1=0._r8
+  allocate(this%RIPB1(NMICBSO,1:jcplx));this%RIPB1=0._r8
+  allocate(this%RINHOR(NMICBSO,1:jcplx));this%RINHOR=0._r8
+  allocate(this%RINOOR(NMICBSO,1:jcplx));this%RINOOR=0._r8
+  allocate(this%RIPOOR(NMICBSO,1:jcplx));this%RIPOOR=0._r8
+  allocate(this%RIPO1R(NMICBSO,1:jcplx));this%RIPO1R=0._r8
   allocate(this%ROXYSff(NMICBSA));this%ROXYSff=0._r8
   allocate(this%RINHOff(NMICBSA));this%RINHOff=0._r8
   allocate(this%RINHBff(NMICBSA));this%RINHBff=0._r8
@@ -147,7 +147,7 @@ implicit none
 
   implicit none
   class(micfluxtype) :: this
-  integer :: jcplx1,JG,NFGs
+  integer :: jcplx,JG,NFGs
 
   this%ROXSK = 0._r8
   this%XOQCS=0._r8
