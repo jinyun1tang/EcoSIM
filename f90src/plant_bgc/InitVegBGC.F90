@@ -53,7 +53,7 @@ module InitVegBGC
         ELSE
           OMEGZ=-ACOS(OMEGY)
         ENDIF
-        IF(OMEGZ.GT.-PICON2)THEN
+        IF(OMEGZ.GT.-PICON2h)THEN
           ZAGL=YAGL+2.0*OMEGZ
         ELSE
           ZAGL=YAGL-2.0*(PICON+OMEGZ)

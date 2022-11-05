@@ -504,11 +504,11 @@ module UptakesMod
         RRADL(N,L)=AMAX1(RRAD2X(N,NZ),SQRT((RTVLW(N,L,NZ) &
           /(1.0_r8-PORT(N,NZ)))/(PICON*PP(NZ)*RTLGP(N,L,NZ))))
         PATH(N,L)=AMAX1(1.001_r8*RRADL(N,L),1.0_r8/(SQRT(PICON*(RTDNP(N,L,NZ)/FRTDPX(L,NZ))/FMPR(L))))
-        RTARR(N,L)=6.283*RTLGP(N,L,NZ)/FRTDPX(L,NZ)
+        RTARR(N,L)=PICON2s*RTLGP(N,L,NZ)/FRTDPX(L,NZ)
       ELSE
         RRADL(N,L)=RRAD2M(N,NZ)
         PATH(N,L)=1.001_r8*RRADL(N,L)
-        RTARR(N,L)=6.283_r8*RTLGP(N,L,NZ)
+        RTARR(N,L)=PICON2s*RTLGP(N,L,NZ)
       ENDIF
     enddo
   ENDDO D2000
@@ -1004,7 +1004,7 @@ module UptakesMod
         .AND.VOLWM(NPH,L).GT.ZEROS2 &
         .AND.RTDNP(N,L,NZ).GT.ZERO &
         .AND.CNDU(L).GT.ZERO &
-        .AND.RTN1(1,L,NZ).GT.ZEROP(NZ) &
+        .AND.RTN1(ifineroot,L,NZ).GT.ZEROP(NZ) &
         .AND.RTNL(N,L,NZ).GT.ZEROP(NZ) &
         .AND.THETW(L).GT.ZERO)THEN
         ILYR(N,L)=1
@@ -1029,7 +1029,7 @@ module UptakesMod
         !     RSRR=radial resistivity from PFT file
         !     VOLA,VOLWM=soil micropore,water volume
         !
-        RTAR2=6.283*RRAD2(N,L,NZ)*RTLGP(N,L,NZ)*PP(NZ)
+        RTAR2=PICON2s*RRAD2(N,L,NZ)*RTLGP(N,L,NZ)*PP(NZ)
         RSRG(N,L)=RSRR(N,NZ)/RTAR2*VOLA(L)/VOLWM(NPH,L)
 !
         !     ROOT AXIAL RESISTANCE FROM RADII AND LENGTHS OF PRIMARY AND
@@ -1044,10 +1044,10 @@ module UptakesMod
         !     RTLGA=average secondary root length
         !     RTN1,RTNL=number of primary,secondary axes
 !
-        FRAD1=(RRAD1(N,L,NZ)/RRAD2M(N,NZ))**4
-        RSR1(N,L)=RSRA(N,NZ)*DPTHZ(L)/(FRAD1*RTN1(1,L,NZ)) &
-          +RSRA(1,NZ)*HTSTZ(NZ)/(FRADW*RTN1(1,L,NZ))
-        FRAD2=(RRAD2(N,L,NZ)/RRAD2M(N,NZ))**4
+        FRAD1=(RRAD1(N,L,NZ)/RRAD2M(N,NZ))**4._r8
+        RSR1(N,L)=RSRA(N,NZ)*DPTHZ(L)/(FRAD1*RTN1(ifineroot,L,NZ)) &
+          +RSRA(ifineroot,NZ)*HTSTZ(NZ)/(FRADW*RTN1(ifineroot,L,NZ))
+        FRAD2=(RRAD2(N,L,NZ)/RRAD2M(N,NZ))**4._r8
         RSR2(N,L)=RSRA(N,NZ)*RTLGA(N,L,NZ)/(FRAD2*RTNL(N,L,NZ))
       ELSE
         ILYR(N,L)=0

@@ -23,6 +23,7 @@ implicit none
                           !     foliar(1,*),non-foliar(2,*),stalk(3,*),root(4,*), coarse woody (5,*)
   integer, pointer :: JPRT        !number of organs involved in partition
   integer, pointer :: n_pltlitrk
+  integer, pointer :: jroots
 !begin_data
 
   type, public :: plant_siteinfo_type
@@ -757,9 +758,7 @@ implicit none
   real(r8), pointer :: UPNH4(:)         => null()  !total root uptake of NH4, [g d-2 h-1]
   real(r8), pointer :: UPH1P(:)         => null()  !total root uptake of HPO4, [g d-2 h-1]
   real(r8), pointer :: UPH2P(:)         => null()  !total root uptake of PO4, [g d-2 h-1]
-  real(r8), pointer :: RDFOMC(:,:,:,:)  => null()  !root uptake (+ve) - exudation (-ve) of DOC, [gC d-2 h-1]
-  real(r8), pointer :: RDFOMN(:,:,:,:)  => null()  !root uptake (+ve) - exudation (-ve) of DON, [gN d-2 h-1]
-  real(r8), pointer :: RDFOMP(:,:,:,:)  => null()  !root uptake (+ve) - exudation (-ve) of DOP, [gP d-2 h-1]
+  real(r8), pointer :: RDFOME(:,:,:,:,:)  => null()  !root uptake (+ve) - exudation (-ve) of DOE, [g d-2 h-1]
   real(r8), pointer :: HEUPTK(:,:)      => null()  !net root element uptake (+ve) - exudation (-ve), [gC d-2 h-1]
   real(r8), pointer :: ROXSK(:,:)       => null()  !total O2 sink, [g d-2 t-1]
   real(r8), pointer :: ZEROQ(:)         => null()  !threshold zero for uptake calculation
@@ -892,9 +891,7 @@ implicit none
   allocate(this%OXYA(2,JZ1,JP1))
   allocate(this%TUPNF(JZ1))
   allocate(this%ROXSK(60,0:JZ1))
-  allocate(this%RDFOMC(2,1:jcplx,0:JZ1,JP1))
-  allocate(this%RDFOMN(2,1:jcplx,0:JZ1,JP1))
-  allocate(this%RDFOMP(2,1:jcplx,0:JZ1,JP1))
+  allocate(this%RDFOME(npelms,2,1:jcplx,0:JZ1,JP1))
   allocate(this%HEUPTK(npelms,JP1))
   allocate(this%TEUPTK(npelms,JP1))
   allocate(this%UPOME(npelms,JP1))
@@ -1010,9 +1007,7 @@ implicit none
 !  if(allocated(OXYA))deallocate(OXYA)
 !  if(allocated(TUPNF))deallocate(TUPNF)
 !  if(allocated(ROXSK))deallocate(ROXSK)
-!  if(allocated(RDFOMC))deallocate(RDFOMC)
-!  if(allocated(RDFOMN))deallocate(RDFOMN)
-!  if(allocated(RDFOMP))deallocate(RDFOMP)
+!  if(allocated(RDFOME))deallocate(RDFOME)
 !  if(allocated(HEUPTK))deallocate(HEUPTK)
 !  if(allocated(TEUPTK))deallocate(TEUPTK)
 !  if(allocated(UPOME))deallocate(UPOME)
@@ -1572,17 +1567,17 @@ implicit none
   allocate(this%WGLFV(JC1,JP1))
   allocate(this%EPOOLN(JZ1,npelms,JP1))
   allocate(this%WTSTDE(jsken,npelms,JP1))
-  allocate(this%WTRT2E(npelms,2,JZ1,JC1,JP1))
-  allocate(this%WTRT1E(npelms,2,JZ1,JC1,JP1))
+  allocate(this%WTRT2E(npelms,jroots,JZ1,JC1,JP1))
+  allocate(this%WTRT1E(npelms,jroots,JZ1,JC1,JP1))
   allocate(this%CEPOLP(npelms,JP1))
   allocate(this%EPOOLP(npelms,JP1))
   allocate(this%EPOLNP(npelms,JP1))
   allocate(this%CCPLNP(JP1))
   allocate(this%CWSRTL(2,JZ1,JP1))
   allocate(this%WSRTL(2,JZ1,JP1))
-  allocate(this%WTRTL(2,JZ1,JP1))
-  allocate(this%WTRTD(2,JZ1,JP1))
-  allocate(this%EPOOLR(npelms,2,JZ1,JP1))
+  allocate(this%WTRTL(jroots,JZ1,JP1))
+  allocate(this%WTRTD(jroots,JZ1,JP1))
+  allocate(this%EPOOLR(npelms,jroots,JZ1,JP1))
   allocate(this%CCPOLR(2,JZ1,JP1))
   allocate(this%CZPOLR(2,JZ1,JP1))
   allocate(this%CPPOLR(2,JZ1,JP1))
@@ -1909,6 +1904,7 @@ implicit none
   JPRT   => pltpar%JPRT
   n_pltlitrk => pltpar%n_pltlitrk
   jpstgs => pltpar%jpstgs
+  jroots => pltpar%jroots
 
   call plt_site%Init()
 
@@ -2322,7 +2318,7 @@ implicit none
   allocate(this%RRAD2X(2,JP1))
   allocate(this%RRADP(2,JP1))
   allocate(this%RRAD1(2,JZ1,JP1))
-  allocate(this%RRAD2(2,JZ1,JP1))
+  allocate(this%RRAD2(jroots,JZ1,JP1))
   allocate(this%RRAD1M(2,JP1))
   allocate(this%RRAD2M(2,JP1))
 
@@ -2393,8 +2389,8 @@ implicit none
   allocate(this%PORT(2,JP1))
   allocate(this%RTAR2X(2,JP1))
   allocate(this%RTAR1X(2,JP1))
-  allocate(this%RSRR(2,JP1))
-  allocate(this%RSRA(2,JP1))
+  allocate(this%RSRR(jroots,JP1))
+  allocate(this%RSRA(jroots,JP1))
   allocate(this%IRTYP(JP1))
   end subroutine plt_morph_init
 

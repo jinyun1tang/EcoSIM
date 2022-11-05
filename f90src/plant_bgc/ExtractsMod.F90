@@ -182,11 +182,9 @@ module ExtractsMod
     TCOFLA=> plt_rbgc%TCOFLA , &
     TOXFLA=> plt_rbgc%TOXFLA , &
     ROXYP => plt_rbgc%ROXYP  , &
-    RDFOMC=> plt_rbgc%RDFOMC , &
+    RDFOME=> plt_rbgc%RDFOME , &
     RUNNHP=> plt_rbgc%RUNNHP , &
-    RDFOMN=> plt_rbgc%RDFOMN , &
     RUNNOP=> plt_rbgc%RUNNOP , &
-    RDFOMP=> plt_rbgc%RDFOMP , &
     RUPP2P=> plt_rbgc%RUPP2P , &
     RUNNBP=> plt_rbgc%RUNNBP , &
     RUPP1P=> plt_rbgc%RUPP1P , &
@@ -339,9 +337,9 @@ module ExtractsMod
 !     RDFOMC,RDFOMN,RDFOMP=PFT nonstructl C,N,P exchange
 !
       DO K=1,jcplx
-        TDFOMC(K,L)=TDFOMC(K,L)-RDFOMC(N,K,L,NZ)
-        TDFOMN(K,L)=TDFOMN(K,L)-RDFOMN(N,K,L,NZ)
-        TDFOMP(K,L)=TDFOMP(K,L)-RDFOMP(N,K,L,NZ)
+        TDFOMC(K,L)=TDFOMC(K,L)-RDFOME(ielmc,N,K,L,NZ)
+        TDFOMN(K,L)=TDFOMN(K,L)-RDFOME(ielmn,N,K,L,NZ)
+        TDFOMP(K,L)=TDFOMP(K,L)-RDFOME(ielmp,N,K,L,NZ)
       ENDDO
 !
 !     TOTAL ROOT O2, NH4, NO3, PO4 UPTAKE CONTRIBUTES TO

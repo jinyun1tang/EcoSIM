@@ -671,7 +671,7 @@ implicit none
   real(r8), intent(in) :: FX,FY
   real(r8), intent(inout) :: CDPTHY(0:JZ,JY,JX)
   integer, intent(in) ::  IFLGL(0:JZ,6)
-  integer :: N,M,NZ,K,NGL,NR
+  integer :: N,M,NZ,K,NGL,NR,NE
   real(r8) :: ENGY0,ENGY1
 ! begin_execution
 
@@ -879,8 +879,8 @@ implicit none
 !
   IF(L0.NE.0)THEN
     DO  NZ=1,NP(NY,NX)
-      IF(WTRTL(1,L0,NZ,NY,NX).GT.ZEROP(NZ,NY,NX) &
-        .AND.WTRTL(1,L1,NZ,NY,NX).GT.ZEROP(NZ,NY,NX))THEN
+      IF(WTRTL(ifineroot,L0,NZ,NY,NX).GT.ZEROP(NZ,NY,NX) &
+        .AND.WTRTL(ifineroot,L1,NZ,NY,NX).GT.ZEROP(NZ,NY,NX))THEN
         DO N=1,MY(NZ,NY,NX)
           CO2A(N,L1,NZ,NY,NX)=CO2A(N,L1,NZ,NY,NX)+FX*CO2A(N,L0,NZ,NY,NX)
           OXYA(N,L1,NZ,NY,NX)=OXYA(N,L1,NZ,NY,NX)+FX*OXYA(N,L0,NZ,NY,NX)
@@ -895,19 +895,17 @@ implicit none
           ZH3P(N,L1,NZ,NY,NX)=ZH3P(N,L1,NZ,NY,NX)+FX*ZH3P(N,L0,NZ,NY,NX)
           H2GP(N,L1,NZ,NY,NX)=H2GP(N,L1,NZ,NY,NX)+FX*H2GP(N,L0,NZ,NY,NX)
           DO  NR=1,NRT(NZ,NY,NX)
-            WTRT1E(ielmc,N,L1,NR,NZ,NY,NX)=WTRT1E(ielmc,N,L1,NR,NZ,NY,NX)+FX*WTRT1E(ielmc,N,L0,NR,NZ,NY,NX)
-            WTRT1E(ielmn,N,L1,NR,NZ,NY,NX)=WTRT1E(ielmn,N,L1,NR,NZ,NY,NX)+FX*WTRT1E(ielmn,N,L0,NR,NZ,NY,NX)
-            WTRT1E(ielmp,N,L1,NR,NZ,NY,NX)=WTRT1E(ielmp,N,L1,NR,NZ,NY,NX)+FX*WTRT1E(ielmp,N,L0,NR,NZ,NY,NX)
-            WTRT2E(ielmc,N,L1,NR,NZ,NY,NX)=WTRT2E(ielmc,N,L1,NR,NZ,NY,NX)+FX*WTRT2E(ielmc,N,L0,NR,NZ,NY,NX)
-            WTRT2E(ielmn,N,L1,NR,NZ,NY,NX)=WTRT2E(ielmn,N,L1,NR,NZ,NY,NX)+FX*WTRT2E(ielmn,N,L0,NR,NZ,NY,NX)
-            WTRT2E(ielmp,N,L1,NR,NZ,NY,NX)=WTRT2E(ielmp,N,L1,NR,NZ,NY,NX)+FX*WTRT2E(ielmp,N,L0,NR,NZ,NY,NX)
+            DO NE=1,npelms
+              WTRT1E(NE,N,L1,NR,NZ,NY,NX)=WTRT1E(NE,N,L1,NR,NZ,NY,NX)+FX*WTRT1E(NE,N,L0,NR,NZ,NY,NX)
+              WTRT2E(NE,N,L1,NR,NZ,NY,NX)=WTRT2E(NE,N,L1,NR,NZ,NY,NX)+FX*WTRT2E(NE,N,L0,NR,NZ,NY,NX)
+            ENDDO
             RTLG1(N,L1,NR,NZ,NY,NX)=RTLG1(N,L1,NR,NZ,NY,NX)+FX*RTLG1(N,L0,NR,NZ,NY,NX)
             RTLG2(N,L1,NR,NZ,NY,NX)=RTLG2(N,L1,NR,NZ,NY,NX)+FX*RTLG2(N,L0,NR,NZ,NY,NX)
             RTN2(N,L1,NR,NZ,NY,NX)=RTN2(N,L1,NR,NZ,NY,NX)+FX*RTN2(N,L0,NR,NZ,NY,NX)
           ENDDO
-          EPOOLR(ielmc,N,L1,NZ,NY,NX)=EPOOLR(ielmc,N,L1,NZ,NY,NX)+FX*EPOOLR(ielmc,N,L0,NZ,NY,NX)
-          EPOOLR(ielmn,N,L1,NZ,NY,NX)=EPOOLR(ielmn,N,L1,NZ,NY,NX)+FX*EPOOLR(ielmn,N,L0,NZ,NY,NX)
-          EPOOLR(ielmp,N,L1,NZ,NY,NX)=EPOOLR(ielmp,N,L1,NZ,NY,NX)+FX*EPOOLR(ielmp,N,L0,NZ,NY,NX)
+          DO NE=1,npelms
+            EPOOLR(NE,N,L1,NZ,NY,NX)=EPOOLR(NE,N,L1,NZ,NY,NX)+FX*EPOOLR(NE,N,L0,NZ,NY,NX)
+          ENDDO
           WTRTL(N,L1,NZ,NY,NX)=WTRTL(N,L1,NZ,NY,NX)+FX*WTRTL(N,L0,NZ,NY,NX)
           WTRTD(N,L1,NZ,NY,NX)=WTRTD(N,L1,NZ,NY,NX)+FX*WTRTD(N,L0,NZ,NY,NX)
           WSRTL(N,L1,NZ,NY,NX)=WSRTL(N,L1,NZ,NY,NX)+FX*WSRTL(N,L0,NZ,NY,NX)
@@ -922,12 +920,11 @@ implicit none
           RTARP(N,L1,NZ,NY,NX)=RTARP(N,L1,NZ,NY,NX)+FX*RTARP(N,L0,NZ,NY,NX)
           RTLGA(N,L1,NZ,NY,NX)=RTLGA(N,L1,NZ,NY,NX)+FX*RTLGA(N,L0,NZ,NY,NX)
         ENDDO
-        WTNDLE(L1,ielmc,NZ,NY,NX)=WTNDLE(L1,ielmc,NZ,NY,NX)+FX*WTNDLE(L0,ielmc,NZ,NY,NX)
-        WTNDLE(L1,ielmn,NZ,NY,NX)=WTNDLE(L1,ielmn,NZ,NY,NX)+FX*WTNDLE(L0,ielmn,NZ,NY,NX)
-        WTNDLE(L1,ielmp,NZ,NY,NX)=WTNDLE(L1,ielmp,NZ,NY,NX)+FX*WTNDLE(L0,ielmp,NZ,NY,NX)
-        EPOOLN(L1,ielmc,NZ,NY,NX)=EPOOLN(L1,ielmc,NZ,NY,NX)+FX*EPOOLN(L0,ielmc,NZ,NY,NX)
-        EPOOLN(L1,ielmn,NZ,NY,NX)=EPOOLN(L1,ielmn,NZ,NY,NX)+FX*EPOOLN(L0,ielmn,NZ,NY,NX)
-        EPOOLN(L1,ielmp,NZ,NY,NX)=EPOOLN(L1,ielmp,NZ,NY,NX)+FX*EPOOLN(L0,ielmp,NZ,NY,NX)
+        DO NE=1,npelms
+          WTNDLE(L1,NE,NZ,NY,NX)=WTNDLE(L1,NE,NZ,NY,NX)+FX*WTNDLE(L0,NE,NZ,NY,NX)
+
+          EPOOLN(L1,NE,NZ,NY,NX)=EPOOLN(L1,NE,NZ,NY,NX)+FX*EPOOLN(L0,NE,NZ,NY,NX)
+        ENDDO
       ENDIF
     ENDDO
   ENDIF
@@ -1145,8 +1142,8 @@ implicit none
           !
   IF(L0.NE.0)THEN
     DO  NZ=1,NP(NY,NX)
-      IF(WTRTL(1,L0,NZ,NY,NX).GT.ZEROP(NZ,NY,NX) &
-        .AND.WTRTL(1,L1,NZ,NY,NX).GT.ZEROP(NZ,NY,NX))THEN
+      IF(WTRTL(ifineroot,L0,NZ,NY,NX).GT.ZEROP(NZ,NY,NX) &
+        .AND.WTRTL(ifineroot,L1,NZ,NY,NX).GT.ZEROP(NZ,NY,NX))THEN
         DO  N=1,MY(NZ,NY,NX)
           CO2A(N,L0,NZ,NY,NX)=FY*CO2A(N,L0,NZ,NY,NX)
           OXYA(N,L0,NZ,NY,NX)=FY*OXYA(N,L0,NZ,NY,NX)
@@ -1161,19 +1158,17 @@ implicit none
           ZH3P(N,L0,NZ,NY,NX)=FY*ZH3P(N,L0,NZ,NY,NX)
           H2GP(N,L0,NZ,NY,NX)=FY*H2GP(N,L0,NZ,NY,NX)
           DO NR=1,NRT(NZ,NY,NX)
-            WTRT1E(ielmc,N,L0,NR,NZ,NY,NX)=FY*WTRT1E(ielmc,N,L0,NR,NZ,NY,NX)
-            WTRT1E(ielmn,N,L0,NR,NZ,NY,NX)=FY*WTRT1E(ielmn,N,L0,NR,NZ,NY,NX)
-            WTRT1E(ielmp,N,L0,NR,NZ,NY,NX)=FY*WTRT1E(ielmp,N,L0,NR,NZ,NY,NX)
-            WTRT2E(ielmc,N,L0,NR,NZ,NY,NX)=FY*WTRT2E(ielmc,N,L0,NR,NZ,NY,NX)
-            WTRT2E(ielmn,N,L0,NR,NZ,NY,NX)=FY*WTRT2E(ielmn,N,L0,NR,NZ,NY,NX)
-            WTRT2E(ielmp,N,L0,NR,NZ,NY,NX)=FY*WTRT2E(ielmp,N,L0,NR,NZ,NY,NX)
+            DO NE=1,npelms
+              WTRT1E(NE,N,L0,NR,NZ,NY,NX)=FY*WTRT1E(NE,N,L0,NR,NZ,NY,NX)
+              WTRT2E(NE,N,L0,NR,NZ,NY,NX)=FY*WTRT2E(NE,N,L0,NR,NZ,NY,NX)
+            ENDDO
             RTLG1(N,L0,NR,NZ,NY,NX)=FY*RTLG1(N,L0,NR,NZ,NY,NX)
             RTLG2(N,L0,NR,NZ,NY,NX)=FY*RTLG2(N,L0,NR,NZ,NY,NX)
             RTN2(N,L0,NR,NZ,NY,NX)=FY*RTN2(N,L0,NR,NZ,NY,NX)
           ENDDO
-          EPOOLR(ielmc,N,L0,NZ,NY,NX)=FY*EPOOLR(ielmc,N,L0,NZ,NY,NX)
-          EPOOLR(ielmn,N,L0,NZ,NY,NX)=FY*EPOOLR(ielmn,N,L0,NZ,NY,NX)
-          EPOOLR(ielmp,N,L0,NZ,NY,NX)=FY*EPOOLR(ielmp,N,L0,NZ,NY,NX)
+          DO NE=1,npelms
+            EPOOLR(NE,N,L0,NZ,NY,NX)=FY*EPOOLR(NE,N,L0,NZ,NY,NX)
+          ENDDO
           WTRTL(N,L0,NZ,NY,NX)=FY*WTRTL(N,L0,NZ,NY,NX)
           WTRTD(N,L0,NZ,NY,NX)=FY*WTRTD(N,L0,NZ,NY,NX)
           WSRTL(N,L0,NZ,NY,NX)=FY*WSRTL(N,L0,NZ,NY,NX)
@@ -1188,12 +1183,11 @@ implicit none
           RTARP(N,L0,NZ,NY,NX)=FY*RTARP(N,L0,NZ,NY,NX)
           RTLGA(N,L0,NZ,NY,NX)=FY*RTLGA(N,L0,NZ,NY,NX)
         ENDDO
-        WTNDLE(L0,ielmc,NZ,NY,NX)=FY*WTNDLE(L0,ielmc,NZ,NY,NX)
-        WTNDLE(L0,ielmn,NZ,NY,NX)=FY*WTNDLE(L0,ielmn,NZ,NY,NX)
-        WTNDLE(L0,ielmp,NZ,NY,NX)=FY*WTNDLE(L0,ielmp,NZ,NY,NX)
-        EPOOLN(L0,ielmc,NZ,NY,NX)=FY*EPOOLN(L0,ielmc,NZ,NY,NX)
-        EPOOLN(L0,ielmn,NZ,NY,NX)=FY*EPOOLN(L0,ielmn,NZ,NY,NX)
-        EPOOLN(L0,ielmp,NZ,NY,NX)=FY*EPOOLN(L0,ielmp,NZ,NY,NX)
+        DO NE=1,npelms
+          WTNDLE(L0,NE,NZ,NY,NX)=FY*WTNDLE(L0,NE,NZ,NY,NX)
+
+          EPOOLN(L0,NE,NZ,NY,NX)=FY*EPOOLN(L0,NE,NZ,NY,NX)
+        ENDDO
       ENDIF
     ENDDO
   ENDIF
@@ -1216,12 +1210,12 @@ implicit none
   real(r8),intent(in) :: FO
   integer, intent(in) :: IFLGL(0:JZ,6)
 
-  integer :: K,N,M,NGL,NR,NZ
+  integer :: K,N,M,NGL,NR,NZ,NE
   real(r8) :: FXO,FRO
-  real(r8) :: FXRTLG2,FXRTN2,FXCPOOLR,FXZPOOLR,FXPPOOLR,FXWTRTL
-  real(r8) :: FXWTNDL,FXWTNDLN,FXWTNDLP,FXCPOOLN,FXZPOOLN,FXPPOOLN
-  real(r8) :: FXCO2P,FXOXYP,FXCH4P,FXZ2OP,FXZH3P,FXH2GP,FXWTRT1
-  real(r8) :: FXWTR1N,FXWTR1P,FXWTRT2,FXWTR2N,FXWTR2P,FXRTLG1
+  real(r8) :: FXRTLG2,FXRTN2,FXEPOOLR,FXWTRTL
+  real(r8) :: FXWTNDLE,FXEPOOLN
+  real(r8) :: FXCO2P,FXOXYP,FXCH4P,FXZ2OP,FXZH3P,FXH2GP,FXWTRT1E
+  real(r8) :: FXWTRT2E,FXRTLG1
   real(r8) :: FXWTRTD,FXWSRTL,FXRTN1,FXRTNL,FXRTLGP,FXRTDNP
   real(r8) :: FXRTVLP,FXRTVLW,FXRRAD1,FXRRAD2,FXRTARP,FXRTLGA
   real(r8) :: FXCO2A,FXOXYA,FXCH4A,FXZ2OA,FXZH3A,FXH2GA
@@ -1344,8 +1338,8 @@ implicit none
 !
     return
     DO NZ=1,NP(NY,NX)
-      IF(WTRTL(1,L0,NZ,NY,NX).GT.ZEROP(NZ,NY,NX) &
-        .AND.WTRTL(1,L1,NZ,NY,NX).GT.ZEROP(NZ,NY,NX))THEN
+      IF(WTRTL(ifineroot,L0,NZ,NY,NX).GT.ZEROP(NZ,NY,NX) &
+        .AND.WTRTL(ifineroot,L1,NZ,NY,NX).GT.ZEROP(NZ,NY,NX))THEN
         IF(L0.EQ.L.OR.DPTHZ(L1,NY,NX).LE.ZERO)THEN
           FRO=FO
         ELSE
@@ -1389,24 +1383,15 @@ implicit none
           H2GP(N,L1,NZ,NY,NX)=H2GP(N,L1,NZ,NY,NX)+FXH2GP
           H2GP(N,L0,NZ,NY,NX)=H2GP(N,L0,NZ,NY,NX)-FXH2GP
           DO  NR=1,NRT(NZ,NY,NX)
-            FXWTRT1=FRO*WTRT1E(ielmc,N,L0,NR,NZ,NY,NX)
-            WTRT1E(ielmc,N,L1,NR,NZ,NY,NX)=WTRT1E(ielmc,N,L1,NR,NZ,NY,NX)+FXWTRT1
-            WTRT1E(ielmc,N,L0,NR,NZ,NY,NX)=WTRT1E(ielmc,N,L0,NR,NZ,NY,NX)-FXWTRT1
-            FXWTR1N=FRO*WTRT1E(ielmn,N,L0,NR,NZ,NY,NX)
-            WTRT1E(ielmn,N,L1,NR,NZ,NY,NX)=WTRT1E(ielmn,N,L1,NR,NZ,NY,NX)+FXWTR1N
-            WTRT1E(ielmn,N,L0,NR,NZ,NY,NX)=WTRT1E(ielmn,N,L0,NR,NZ,NY,NX)-FXWTR1N
-            FXWTR1P=FRO*WTRT1E(ielmp,N,L0,NR,NZ,NY,NX)
-            WTRT1E(ielmp,N,L1,NR,NZ,NY,NX)=WTRT1E(ielmp,N,L1,NR,NZ,NY,NX)+FXWTR1P
-            WTRT1E(ielmp,N,L0,NR,NZ,NY,NX)=WTRT1E(ielmp,N,L0,NR,NZ,NY,NX)-FXWTR1P
-            FXWTRT2=FRO*WTRT2E(ielmc,N,L0,NR,NZ,NY,NX)
-            WTRT2E(ielmc,N,L1,NR,NZ,NY,NX)=WTRT2E(ielmc,N,L1,NR,NZ,NY,NX)+FXWTRT2
-            WTRT2E(ielmc,N,L0,NR,NZ,NY,NX)=WTRT2E(ielmc,N,L0,NR,NZ,NY,NX)-FXWTRT2
-            FXWTR2N=FRO*WTRT2E(ielmn,N,L0,NR,NZ,NY,NX)
-            WTRT2E(ielmn,N,L1,NR,NZ,NY,NX)=WTRT2E(ielmn,N,L1,NR,NZ,NY,NX)+FXWTR2N
-            WTRT2E(ielmn,N,L0,NR,NZ,NY,NX)=WTRT2E(ielmn,N,L0,NR,NZ,NY,NX)-FXWTR2N
-            FXWTR2P=FRO*WTRT2E(ielmp,N,L0,NR,NZ,NY,NX)
-            WTRT2E(ielmp,N,L1,NR,NZ,NY,NX)=WTRT2E(ielmp,N,L1,NR,NZ,NY,NX)+FXWTR2P
-            WTRT2E(ielmp,N,L0,NR,NZ,NY,NX)=WTRT2E(ielmp,N,L0,NR,NZ,NY,NX)-FXWTR2P
+            DO NE=1,npelms
+              FXWTRT1E=FRO*WTRT1E(NE,N,L0,NR,NZ,NY,NX)
+              WTRT1E(NE,N,L1,NR,NZ,NY,NX)=WTRT1E(NE,N,L1,NR,NZ,NY,NX)+FXWTRT1E
+              WTRT1E(NE,N,L0,NR,NZ,NY,NX)=WTRT1E(NE,N,L0,NR,NZ,NY,NX)-FXWTRT1E
+
+              FXWTRT2E=FRO*WTRT2E(NE,N,L0,NR,NZ,NY,NX)
+              WTRT2E(NE,N,L1,NR,NZ,NY,NX)=WTRT2E(NE,N,L1,NR,NZ,NY,NX)+FXWTRT2E
+              WTRT2E(NE,N,L0,NR,NZ,NY,NX)=WTRT2E(NE,N,L0,NR,NZ,NY,NX)-FXWTRT2E
+            ENDDO
             FXRTLG1=FRO*RTLG1(N,L0,NR,NZ,NY,NX)
             RTLG1(N,L1,NR,NZ,NY,NX)=RTLG1(N,L1,NR,NZ,NY,NX)+FXRTLG1
             RTLG1(N,L0,NR,NZ,NY,NX)=RTLG1(N,L0,NR,NZ,NY,NX)-FXRTLG1
@@ -1417,15 +1402,12 @@ implicit none
             RTN2(N,L1,NR,NZ,NY,NX)=RTN2(N,L1,NR,NZ,NY,NX)+FXRTN2
             RTN2(N,L0,NR,NZ,NY,NX)=RTN2(N,L0,NR,NZ,NY,NX)-FXRTN2
           ENDDO
-          FXCPOOLR=FRO*EPOOLR(ielmc,N,L0,NZ,NY,NX)
-          EPOOLR(ielmc,N,L1,NZ,NY,NX)=EPOOLR(ielmc,N,L1,NZ,NY,NX)+FXCPOOLR
-          EPOOLR(ielmc,N,L0,NZ,NY,NX)=EPOOLR(ielmc,N,L0,NZ,NY,NX)-FXCPOOLR
-          FXZPOOLR=FRO*EPOOLR(ielmn,N,L0,NZ,NY,NX)
-          EPOOLR(ielmn,N,L1,NZ,NY,NX)=EPOOLR(ielmn,N,L1,NZ,NY,NX)+FXZPOOLR
-          EPOOLR(ielmn,N,L0,NZ,NY,NX)=EPOOLR(ielmn,N,L0,NZ,NY,NX)-FXZPOOLR
-          FXPPOOLR=FRO*EPOOLR(ielmp,N,L0,NZ,NY,NX)
-          EPOOLR(ielmp,N,L1,NZ,NY,NX)=EPOOLR(ielmp,N,L1,NZ,NY,NX)+FXPPOOLR
-          EPOOLR(ielmp,N,L0,NZ,NY,NX)=EPOOLR(ielmp,N,L0,NZ,NY,NX)-FXPPOOLR
+          DO NE=1,npelms
+            FXEPOOLR=FRO*EPOOLR(NE,N,L0,NZ,NY,NX)
+            EPOOLR(NE,N,L1,NZ,NY,NX)=EPOOLR(NE,N,L1,NZ,NY,NX)+FXEPOOLR
+            EPOOLR(NE,N,L0,NZ,NY,NX)=EPOOLR(NE,N,L0,NZ,NY,NX)-FXEPOOLR
+          ENDDO
+
           FXWTRTL=FRO*WTRTL(N,L0,NZ,NY,NX)
           WTRTL(N,L1,NZ,NY,NX)=WTRTL(N,L1,NZ,NY,NX)+FXWTRTL
           WTRTL(N,L0,NZ,NY,NX)=WTRTL(N,L0,NZ,NY,NX)-FXWTRTL
@@ -1469,24 +1451,16 @@ implicit none
 !
 !     ROOT NODULES
 !
-        FXWTNDL=FRO*WTNDLE(L0,ielmc,NZ,NY,NX)
-        WTNDLE(L1,ielmc,NZ,NY,NX)=WTNDLE(L1,ielmc,NZ,NY,NX)+FXWTNDL
-        WTNDLE(L0,ielmc,NZ,NY,NX)=WTNDLE(L0,ielmc,NZ,NY,NX)-FXWTNDL
-        FXWTNDLN=FRO*WTNDLE(L0,ielmn,NZ,NY,NX)
-        WTNDLE(L1,ielmn,NZ,NY,NX)=WTNDLE(L1,ielmn,NZ,NY,NX)+FXWTNDLN
-        WTNDLE(L0,ielmn,NZ,NY,NX)=WTNDLE(L0,ielmn,NZ,NY,NX)-FXWTNDLN
-        FXWTNDLP=FRO*WTNDLE(L0,ielmp,NZ,NY,NX)
-        WTNDLE(L1,ielmp,NZ,NY,NX)=WTNDLE(L1,ielmp,NZ,NY,NX)+FXWTNDLP
-        WTNDLE(L0,ielmp,NZ,NY,NX)=WTNDLE(L0,ielmp,NZ,NY,NX)-FXWTNDLP
-        FXCPOOLN=FRO*EPOOLN(L0,ielmc,NZ,NY,NX)
-        EPOOLN(L1,ielmc,NZ,NY,NX)=EPOOLN(L1,ielmc,NZ,NY,NX)+FXCPOOLN
-        EPOOLN(L0,ielmc,NZ,NY,NX)=EPOOLN(L0,ielmc,NZ,NY,NX)-FXCPOOLN
-        FXZPOOLN=FRO*EPOOLN(L0,ielmn,NZ,NY,NX)
-        EPOOLN(L1,ielmn,NZ,NY,NX)=EPOOLN(L1,ielmn,NZ,NY,NX)+FXZPOOLN
-        EPOOLN(L0,ielmn,NZ,NY,NX)=EPOOLN(L0,ielmn,NZ,NY,NX)-FXZPOOLN
-        FXPPOOLN=FRO*EPOOLN(L0,ielmp,NZ,NY,NX)
-        EPOOLN(L1,ielmp,NZ,NY,NX)=EPOOLN(L1,ielmp,NZ,NY,NX)+FXPPOOLN
-        EPOOLN(L0,ielmp,NZ,NY,NX)=EPOOLN(L0,ielmp,NZ,NY,NX)-FXPPOOLN
+        DO NE=1,npelms
+          FXWTNDLE=FRO*WTNDLE(L0,NE,NZ,NY,NX)
+          WTNDLE(L1,NE,NZ,NY,NX)=WTNDLE(L1,NE,NZ,NY,NX)+FXWTNDLE
+          WTNDLE(L0,NE,NZ,NY,NX)=WTNDLE(L0,NE,NZ,NY,NX)-FXWTNDLE
+
+          FXEPOOLN=FRO*EPOOLN(L0,NE,NZ,NY,NX)
+          EPOOLN(L1,NE,NZ,NY,NX)=EPOOLN(L1,NE,NZ,NY,NX)+FXEPOOLN
+          EPOOLN(L0,NE,NZ,NY,NX)=EPOOLN(L0,NE,NZ,NY,NX)-FXEPOOLN
+
+        ENDDO
       ENDIF
     ENDDO
   ENDIF

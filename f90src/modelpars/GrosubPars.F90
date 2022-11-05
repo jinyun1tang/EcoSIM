@@ -178,7 +178,7 @@ module GrosubPars
   integer :: ilignin
   integer :: k_woody_litr
   integer :: k_fine_litr
-
+  integer :: jroots
   end type plant_bgc_par_type
 
 
@@ -197,6 +197,7 @@ module GrosubPars
   pltpar%jpstgs=10
   pltpar%JRS=10
   pltpar%JPRT=7
+  pltpar%jroots=2
 
   PART1X=0.05_r8
   PART2X=0.02_r8

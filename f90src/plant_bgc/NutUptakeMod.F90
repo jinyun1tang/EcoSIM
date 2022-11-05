@@ -214,9 +214,7 @@ module NutUptakeMod
   plt_rbgc%RUPN3S(1:NN,L1:L2,NZ)=0.0_r8
   plt_rbgc%RCO2P(1:NN,L1:L2,NZ)=0.0_r8
   plt_rbgc%RUPOXP(1:NN,L1:L2,NZ)=0.0_r8
-  plt_rbgc%RDFOMC(1:NN,1:jcplx,L1:L2,NZ)=0.0_r8
-  plt_rbgc%RDFOMN(1:NN,1:jcplx,L1:L2,NZ)=0.0_r8
-  plt_rbgc%RDFOMP(1:NN,1:jcplx,L1:L2,NZ)=0.0_r8
+  plt_rbgc%RDFOME(1:npelms,1:NN,1:jcplx,L1:L2,NZ)=0.0_r8
   plt_rbgc%WFR(1:NN,L1:L2,NZ)=1.0
   plt_rbgc%RUNNHP(1:NN,L1:L2,NZ)=0.0_r8
   plt_rbgc%RUPNH4(1:NN,L1:L2,NZ)=0.0_r8
@@ -1235,9 +1233,7 @@ module NutUptakeMod
     ZEROS2=>  plt_site%ZEROS2    , &
     VOLWM =>  plt_site%VOLWM     , &
     RTVLW =>  plt_morph%RTVLW    , &
-    RDFOMC=>  plt_rbgc%RDFOMC    , &
-    RDFOMN=>  plt_rbgc%RDFOMN    , &
-    RDFOMP=>  plt_rbgc%RDFOMP    , &
+    RDFOME=>  plt_rbgc%RDFOME    , &
     FOSRH =>  plt_soilchem%FOSRH , &
     OQN   =>  plt_soilchem%OQN   , &
     OQP   =>  plt_soilchem%OQP   , &
@@ -1267,23 +1263,21 @@ module NutUptakeMod
       VOLWT=VOLWK+RTVLW(N,L,NZ)
       CPOOLX=AMIN1(1.25E+03_r8*RTVLW(N,L,NZ),EPOOLR(ielmc,N,L,NZ))
       XFRC=(OQC(K,L)*RTVLW(N,L,NZ)-CPOOLX*VOLWK)/VOLWT
-      RDFOMC(N,K,L,NZ)=FEXUC*XFRC
+      RDFOME(ielmc,N,K,L,NZ)=FEXUC*XFRC
       IF(OQC(K,L).GT.ZEROS.AND.EPOOLR(ielmc,N,L,NZ).GT.ZEROP(NZ))THEN
         CPOOLT=OQC(K,L)+EPOOLR(ielmc,N,L,NZ)
         ZPOOLX=0.1_r8*EPOOLR(ielmn,N,L,NZ)
         PPOOLX=0.1_r8*EPOOLR(ielmp,N,L,NZ)
         XFRN=(OQN(K,L)*EPOOLR(ielmc,N,L,NZ)-ZPOOLX*OQC(K,L))/CPOOLT
         XFRP=(OQP(K,L)*EPOOLR(ielmc,N,L,NZ)-PPOOLX*OQC(K,L))/CPOOLT
-        RDFOMN(N,K,L,NZ)=FEXUN*XFRN
-        RDFOMP(N,K,L,NZ)=FEXUP*XFRP
+        RDFOME(ielmn,N,K,L,NZ)=FEXUN*XFRN
+        RDFOME(ielmp,N,K,L,NZ)=FEXUP*XFRP
       ELSE
-        RDFOMN(N,K,L,NZ)=0.0_r8
-        RDFOMP(N,K,L,NZ)=0.0_r8
+        RDFOME(ielmn,N,K,L,NZ)=0.0_r8
+        RDFOME(ielmp,N,K,L,NZ)=0.0_r8
       ENDIF
     ELSE
-      RDFOMC(N,K,L,NZ)=0.0_r8
-      RDFOMN(N,K,L,NZ)=0.0_r8
-      RDFOMP(N,K,L,NZ)=0.0_r8
+      RDFOME(1:npelms,N,K,L,NZ)=0.0_r8
     ENDIF
 
   ENDDO D195
@@ -1303,9 +1297,7 @@ module NutUptakeMod
     XOQCS    =>  plt_bgcr%XOQCS     , &
     XOQNS    =>  plt_bgcr%XOQNS     , &
     XOQPS    =>  plt_bgcr%XOQPS     , &
-    RDFOMC   =>  plt_rbgc%RDFOMC    , &
-    RDFOMN   =>  plt_rbgc%RDFOMN    , &
-    RDFOMP   =>  plt_rbgc%RDFOMP    , &
+    RDFOME   =>  plt_rbgc%RDFOME    , &
     UPOME    =>  plt_rbgc%UPOME     , &
     UPH1P    =>  plt_rbgc%UPH1P     , &
     UPH2P    =>  plt_rbgc%UPH2P     , &
@@ -1331,12 +1323,12 @@ module NutUptakeMod
   !     UPNH4,UPNO3,UPH2P,UPH1P=PFT uptake of NH4,NO3,H2PO4,HPO4
   !
   D295: DO K=1,jcplx
-    UPOME(ielmc,NZ)=UPOME(ielmc,NZ)+RDFOMC(N,K,L,NZ)
-    UPOME(ielmn,NZ)=UPOME(ielmn,NZ)+RDFOMN(N,K,L,NZ)
-    UPOME(ielmp,NZ)=UPOME(ielmp,NZ)+RDFOMP(N,K,L,NZ)
-    XOQCS(K,L)=XOQCS(K,L)-RDFOMC(N,K,L,NZ)
-    XOQNS(K,L)=XOQNS(K,L)-RDFOMN(N,K,L,NZ)
-    XOQPS(K,L)=XOQPS(K,L)-RDFOMP(N,K,L,NZ)
+    UPOME(ielmc,NZ)=UPOME(ielmc,NZ)+RDFOME(ielmc,N,K,L,NZ)
+    UPOME(ielmn,NZ)=UPOME(ielmn,NZ)+RDFOME(ielmn,N,K,L,NZ)
+    UPOME(ielmp,NZ)=UPOME(ielmp,NZ)+RDFOME(ielmp,N,K,L,NZ)
+    XOQCS(K,L)=XOQCS(K,L)-RDFOME(ielmc,N,K,L,NZ)
+    XOQNS(K,L)=XOQNS(K,L)-RDFOME(ielmn,N,K,L,NZ)
+    XOQPS(K,L)=XOQPS(K,L)-RDFOME(ielmp,N,K,L,NZ)
   ENDDO D295
   UPNH4(NZ)=UPNH4(NZ)+RUPNH4(N,L,NZ)+RUPNHB(N,L,NZ)
   UPNO3(NZ)=UPNO3(NZ)+RUPNO3(N,L,NZ)+RUPNOB(N,L,NZ)

@@ -115,7 +115,7 @@ module InitEcoSIM
 
   call InitRedist
 
-  call InitRootData
+  call InitRootData(pltpar%jroots)
 
   call InitClimForcData
 

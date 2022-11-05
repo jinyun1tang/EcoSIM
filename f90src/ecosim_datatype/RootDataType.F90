@@ -101,9 +101,11 @@ module RootDataType
 !----------------------------------------------------------------------
 
 contains
-  subroutine InitRootData
+  subroutine InitRootData(jroots)
 
   implicit none
+  integer, intent(in) :: jroots
+
   allocate(NRT(JP,JY,JX));      NRT=0
   allocate(NINR(JRS,JP,JY,JX));  NINR=1  !set to one to avoid numerical failure
   allocate(IDTHR(JP,JY,JX));    IDTHR=0
@@ -121,8 +123,8 @@ contains
   allocate(CNRT(JP,JY,JX));     CNRT=0._r8
   allocate(CPRT(JP,JY,JX));     CPRT=0._r8
   allocate(PORT(2,JP,JY,JX));   PORT=0._r8
-  allocate(RSRR(2,JP,JY,JX));   RSRR=0._r8
-  allocate(RSRA(2,JP,JY,JX));   RSRA=0._r8
+  allocate(RSRR(jroots,JP,JY,JX));   RSRR=0._r8
+  allocate(RSRA(jroots,JP,JY,JX));   RSRA=0._r8
   allocate(PTSHT(JP,JY,JX));    PTSHT=0._r8
   allocate(UPMXZH(2,JP,JY,JX)); UPMXZH=0._r8
   allocate(UPKMZH(2,JP,JY,JX)); UPKMZH=0._r8
@@ -145,7 +147,7 @@ contains
   allocate(EPOOLN(JZ,npelms,JP,JY,JX));EPOOLN=0._r8
   allocate(RTLGP(2,JZ,JP,JY,JX));RTLGP=0._r8
   allocate(RTLG1(2,JZ,JC,JP,JY,JX));RTLG1=0._r8
-  allocate(RTLG2(2,JZ,JC,JP,JY,JX));RTLG2=0._r8
+  allocate(RTLG2(jroots,JZ,JC,JP,JY,JX));RTLG2=0._r8
   allocate(RTDNP(2,JZ,JP,JY,JX));RTDNP=0._r8
   allocate(RTN1(2,JZ,JP,JY,JX));RTN1=0._r8
   allocate(RTNL(2,JZ,JP,JY,JX));RTNL=0._r8
@@ -156,7 +158,7 @@ contains
   allocate(RRAD1(2,JZ,JP,JY,JX));RRAD1=0._r8
   allocate(RTVLP(2,JZ,JP,JY,JX));RTVLP=0._r8
   allocate(RTDP1(2,JC,JP,JY,JX));RTDP1=0._r8
-  allocate(RRAD2(2,JZ,JP,JY,JX));RRAD2=0._r8
+  allocate(RRAD2(jroots,JZ,JP,JY,JX));RRAD2=0._r8
   allocate(RTLG1X(2,JP,JY,JX)); RTLG1X=0._r8
   allocate(RTLG2X(2,JP,JY,JX)); RTLG2X=0._r8
   allocate(UPWTR(2,JZ,JP,JY,JX));UPWTR=0._r8
@@ -184,13 +186,13 @@ contains
   allocate(WTRTE(npelms,JP,JY,JX)); WTRTE=0._r8
   allocate(WTRTSE(npelms,JP,JY,JX));   WTRTSE=0._r8
   allocate(WSRTL(2,JZ,JP,JY,JX));WSRTL=0._r8
-  allocate(WTRT1E(npelms,2,JZ,JC,JP,JY,JX));WTRT1E=0._r8
-  allocate(WTRT2E(npelms,2,JZ,JC,JP,JY,JX));WTRT2E=0._r8
-  allocate(WTRTD(2,JZ,JP,JY,JX));WTRTD=0._r8
+  allocate(WTRT1E(npelms,jroots,JZ,JC,JP,JY,JX));WTRT1E=0._r8
+  allocate(WTRT2E(npelms,jroots,JZ,JC,JP,JY,JX));WTRT2E=0._r8
+  allocate(WTRTD(jroots,JZ,JP,JY,JX));WTRTD=0._r8
   allocate(WTNDLE(JZ,npelms,JP,JY,JX)); WTNDLE=0._r8
   allocate(WTNDE(npelms,JP,JY,JX));  WTNDE=0._r8
-  allocate(WTRTL(2,JZ,JP,JY,JX));WTRTL=0._r8
-  allocate(EPOOLR(npelms,2,JZ,JP,JY,JX));EPOOLR=0._r8
+  allocate(WTRTL(jroots,JZ,JP,JY,JX));WTRTL=0._r8
+  allocate(EPOOLR(npelms,jroots,JZ,JP,JY,JX));EPOOLR=0._r8
   allocate(CCPOLR(2,JZ,JP,JY,JX));CCPOLR=0._r8
   allocate(RTWT1E(2,JRS,npelms,JP,JY,JX));RTWT1E=0._r8
   allocate(CWSRTL(2,JZ,JP,JY,JX));CWSRTL=0._r8

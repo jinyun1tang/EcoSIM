@@ -11,9 +11,7 @@ module PlantDataRateType
   real(r8),allocatable ::  RNH3C(:,:,:)                       !canopy NH3 flux, [g d-2 h-1]
   real(r8),allocatable ::  TNH3C(:,:,:)                       !total canopy NH3 flux, [g d-2 ]
   real(r8),allocatable ::  TESN0(:,:,:,:)                     !total surface litterfall element, [g d-2]
-  real(r8),allocatable ::  RDFOMC(:,:,:,:,:,:)                !root uptake (+ve) - exudation (-ve) of DOC, [g d-2 h-1]
-  real(r8),allocatable ::  RDFOMN(:,:,:,:,:,:)                !root uptake (+ve) - exudation (-ve) of DON, [g d-2 h-1]
-  real(r8),allocatable ::  RDFOMP(:,:,:,:,:,:)                !root uptake (+ve) - exudation (-ve) of DOP, [g d-2 h-1]
+  real(r8),allocatable ::  RDFOME(:,:,:,:,:,:,:)                !root uptake (+ve) - exudation (-ve) of DOC, [g d-2 h-1]
   real(r8),allocatable ::  RUPNH4(:,:,:,:,:)                  !root uptake of NH4 non-band, [g d-2 h-1]
   real(r8),allocatable ::  RUPNHB(:,:,:,:,:)                  !root uptake of NH4 band, [g d-2 h-1]
   real(r8),allocatable ::  RUPNO3(:,:,:,:,:)                  !root uptake of NO3 non-band, [g d-2 h-1]
@@ -193,9 +191,7 @@ module PlantDataRateType
   allocate(RNH3C(JP,JY,JX));    RNH3C=0._r8
   allocate(TNH3C(JP,JY,JX));    TNH3C=0._r8
   allocate(TESN0(npelms,JP,JY,JX));    TESN0=0._r8
-  allocate(RDFOMC(2,1:jcplx,JZ,JP,JY,JX));RDFOMC=0._r8
-  allocate(RDFOMN(2,1:jcplx,JZ,JP,JY,JX));RDFOMN=0._r8
-  allocate(RDFOMP(2,1:jcplx,JZ,JP,JY,JX));RDFOMP=0._r8
+  allocate(RDFOME(npelms,2,1:jcplx,JZ,JP,JY,JX));RDFOME=0._r8
   allocate(RUPNH4(2,JZ,JP,JY,JX));RUPNH4=0._r8
   allocate(RUPNHB(2,JZ,JP,JY,JX));RUPNHB=0._r8
   allocate(RUPNO3(2,JZ,JP,JY,JX));RUPNO3=0._r8
@@ -361,9 +357,7 @@ module PlantDataRateType
   call destroy(RNH3C)
   call destroy(TNH3C)
   call destroy(TESN0)
-  call destroy(RDFOMC)
-  call destroy(RDFOMN)
-  call destroy(RDFOMP)
+  call destroy(RDFOME)
   call destroy(RUPNH4)
   call destroy(RUPNHB)
   call destroy(RUPNO3)

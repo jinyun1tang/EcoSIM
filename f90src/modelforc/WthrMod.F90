@@ -135,13 +135,13 @@ module WthrMod
       !
       IF(J.LT.(ZNOON(NY,NX)-DYLN(NY,NX)/2))THEN
         TCA(NY,NX)=TAVG1+AMP1*SIN(((J+ZNOON(NY,NX)-3.0)*PICON &
-          /(ZNOON(NY,NX)+9.0-DYLN(NY,NX)/2.0))+PICON2)
+          /(ZNOON(NY,NX)+9.0-DYLN(NY,NX)/2.0))+PICON2h)
       ELSEIF(J.GT.ZNOON(NY,NX)+3)THEN
         TCA(NY,NX)=TAVG3+AMP3*SIN(((J-ZNOON(NY,NX)-3.0)*PICON &
-          /(ZNOON(NY,NX)+9.0-DYLN(NY,NX)/2.0))+PICON2)
+          /(ZNOON(NY,NX)+9.0-DYLN(NY,NX)/2.0))+PICON2h)
       ELSE
         TCA(NY,NX)=TAVG2+AMP2*SIN(((J-(ZNOON(NY,NX) &
-          -DYLN(NY,NX)/2.0))*PICON/(3.0+DYLN(NY,NX)/2.0))-PICON2)
+          -DYLN(NY,NX)/2.0))*PICON/(3.0+DYLN(NY,NX)/2.0))-PICON2h)
       ENDIF
       TKA(NY,NX)=TCA(NY,NX)+TC2K
       !
@@ -151,13 +151,13 @@ module WthrMod
       !
       IF(J.LT.(ZNOON(NY,NX)-DYLN(NY,NX)/2))THEN
         VPK(NY,NX)=VAVG1+VMP1*SIN(((J+ZNOON(NY,NX)-3.0)*PICON &
-          /(ZNOON(NY,NX)+9.0-DYLN(NY,NX)/2.0))+PICON2)
+          /(ZNOON(NY,NX)+9.0-DYLN(NY,NX)/2.0))+PICON2h)
       ELSEIF(J.GT.ZNOON(NY,NX)+3)THEN
         VPK(NY,NX)=VAVG3+VMP3*SIN(((J-ZNOON(NY,NX)-3.0)*PICON &
-          /(ZNOON(NY,NX)+9.0-DYLN(NY,NX)/2.0))+PICON2)
+          /(ZNOON(NY,NX)+9.0-DYLN(NY,NX)/2.0))+PICON2h)
       ELSE
         VPK(NY,NX)=VAVG2+VMP2*SIN(((J-(ZNOON(NY,NX) &
-          -DYLN(NY,NX)/2.0))*PICON /(3.0+DYLN(NY,NX)/2.0))-PICON2)
+          -DYLN(NY,NX)/2.0))*PICON /(3.0+DYLN(NY,NX)/2.0))-PICON2h)
       ENDIF
       !VPS(NY,NX)=0.61*EXP(5360.0*(3.661E-03-1.0/TKA(NY,NX))) &
       VPS(NY,NX)=vapsat0(tka(ny,nx))*EXP(-ALTI(NY,NX)/7272.0)
@@ -424,7 +424,7 @@ module WthrMod
       IF(test_aneb(TDTPX(NY,NX,N),0.0_r8).OR.test_aneb(TDTPN(NY,NX,N),0.0_r8))THEN
         DTA=0.5_r8*(TDTPX(NY,NX,N)+TDTPN(NY,NX,N))
         AMP=0.5_r8*(TDTPX(NY,NX,N)-TDTPN(NY,NX,N))
-        DHR=SIN(0.2618_r8*(J-(ZNOON(NY,NX)+3.0_r8))+PICON2)
+        DHR=SIN(0.2618_r8*(J-(ZNOON(NY,NX)+3.0_r8))+PICON2h)
         TCA(NY,NX)=TCA(NY,NX)+DTA+AMP*DHR
         TKA(NY,NX)=TCA(NY,NX)+TC2K
 !

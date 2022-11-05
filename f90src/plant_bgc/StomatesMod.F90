@@ -708,7 +708,7 @@
 !     FLG4=number of hours with no grain fill after start of grain fill
 !     FLG4Y=number of hours with no grain fill to terminate annuals
 !
-  IF(ISTYP(NZ).EQ.0.AND.FLG4(NB,NZ).GT.0.0_r8)THEN
+  IF(ISTYP(NZ).EQ.iplt_annual.AND.FLG4(NB,NZ).GT.0.0_r8)THEN
     FDBKX(NB,NZ)=AZMAX1(1.0_r8-FLG4(NB,NZ)/FLG4Y(IWTYP(NZ)))
   ELSE
     FDBKX(NB,NZ)=1.0_r8
@@ -721,7 +721,7 @@
 !     ARLF,WGLF,WSLF=leaf area,C mass,protein mass
 !     WSDN=leaf protein surficial density
 !
-  IF(IDTHB(NB,NZ).EQ.0)THEN
+  IF(IDTHB(NB,NZ).EQ.ialive)THEN
     call LivingBranch(NB,NZ,CH2O,TFN1,TFN2,TFNE,XKO2L)
   ENDIF
   end associate

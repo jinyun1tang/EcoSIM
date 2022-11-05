@@ -3626,7 +3626,7 @@ module WatsubMod
                 ALT2=ALTG(N2,N1)+DPTHW2-XN*SLOPE(N,N2,N1)*DLYR(N,NUM(N2,N1),N2,N1)
                 IF(ALT1.GT.ALT2 &
                   .AND.CDPTH(NU(N2,N1)-1,N2,N1)-DPTHW1.LT.DTBLX(N2,N1))THEN
-                  QR1(N,NN,M5,M4)=-XN*QRM(M,N2,N1)*FSLOPE(N,N2,N1)*RCHQF
+                  QR1(N,NN,M5,M4)=-XN*QRM(M,N2,N1)*RCHQF
                   HQR1(N,NN,M5,M4)=cpw*TK1(0,N2,N1)*QR1(N,NN,M5,M4)
                   QR(N,NN,M5,M4)=QR(N,NN,M5,M4)+QR1(N,NN,M5,M4)
                   HQR(N,NN,M5,M4)=HQR(N,NN,M5,M4)+HQR1(N,NN,M5,M4)
@@ -3639,7 +3639,7 @@ module WatsubMod
                   *AREA(3,NUM(N2,N1),N2,N1))
                 QRM(M,N2,N1)=VX*XNPX
                 QRV(M,N2,N1)=0.0_r8
-                QR1(N,NN,M5,M4)=-XN*QRM(M,N2,N1)*FSLOPE(N,N2,N1)*RCHQF
+                QR1(N,NN,M5,M4)=-XN*QRM(M,N2,N1)*RCHQF
                 HQR1(N,NN,M5,M4)=cpw*TK1(0,N2,N1)*QR1(N,NN,M5,M4)
                 QR(N,NN,M5,M4)=QR(N,NN,M5,M4)+QR1(N,NN,M5,M4)
                 HQR(N,NN,M5,M4)=HQR(N,NN,M5,M4)+HQR1(N,NN,M5,M4)
@@ -4057,7 +4057,7 @@ module WatsubMod
 !     VOLWH1X,VOLPH1X=current macropore water,air volume
 !
       IF(VOLWH1(N3,N2,N1).GT.ZEROS2(N2,N1))THEN
-        FINHX=6.283*HCND(2,1,N3,N2,N1)*AREA(3,N3,N2,N1) &
+        FINHX=PICON2s*HCND(2,1,N3,N2,N1)*AREA(3,N3,N2,N1) &
           *(PSISE(N3,N2,N1)-PSISA1(N3,N2,N1)) &
           /LOG(PHOL(N3,N2,N1)/HRAD(N3,N2,N1))*XNPH
         VOLW1X=VOLW1(N3,N2,N1)+TFLWL(N3,N2,N1)+FLU1(N3,N2,N1)

@@ -67,7 +67,7 @@ implicit none
 !     IFLGQ=current hours after physl maturity until start of litterfall
 !
   IF(J.EQ.INT(ZNOON).AND.IDAY(1,NB1(NZ),NZ).NE.0 &
-    .AND.(ISTYP(NZ).NE.0.OR.(I.GE.IDAYH(NZ) &
+    .AND.(ISTYP(NZ).NE.iplt_annual.OR.(I.GE.IDAYH(NZ) &
     .AND.IYRC.GE.IYRH(NZ))))THEN
     IDTHY=0
 !
@@ -76,7 +76,7 @@ implicit none
     call LiterfallFromDeadBranches(I,J,NZ,IDTHY,CPOOLK)
 
     IF(IDTHY.EQ.NBR(NZ))THEN
-      IDTHP(NZ)=1
+      IDTHP(NZ)=idead
       NBT(NZ)=0
       WSTR(NZ)=0._r8
       IF(IFLGI(NZ).EQ.1)THEN
@@ -97,11 +97,12 @@ implicit none
 !     PP=PFT population
 !     IDTHP,IDTHR=PFT shoot,root living flag: 0=alive,1=dead
 !
-      IF(WTRVE(ielmc,NZ).LT.1.0E-04_r8*WTRTE(ielmc,NZ).AND.ISTYP(NZ).NE.0)IDTHR(NZ)=1
-      IF(ISTYP(NZ).EQ.0)IDTHR(NZ)=1
-      IF(JHVST(NZ).NE.0)IDTHR(NZ)=1
-      IF(PP(NZ).LE.0.0)IDTHR(NZ)=1
-      IF(IDTHR(NZ).EQ.1)IDTHP(NZ)=1
+      IF(WTRVE(ielmc,NZ).LT.1.0E-04_r8*WTRTE(ielmc,NZ)&
+        .AND.ISTYP(NZ).NE.iplt_annual)IDTHR(NZ)=idead
+      IF(ISTYP(NZ).EQ.iplt_annual)IDTHR(NZ)=idead
+      IF(JHVST(NZ).NE.ihv_noaction)IDTHR(NZ)=idead
+      IF(PP(NZ).LE.0.0)IDTHR(NZ)=idead
+      IF(IDTHR(NZ).EQ.idead)IDTHP(NZ)=idead
     ENDIF
 !
 !     DEAD ROOTS
@@ -216,7 +217,7 @@ implicit none
               +CFOPE(infoliar,M,NE,NZ)*(WTSHEBE(NB,NE,NZ)*FWODBE(NE,k_fine_litr) &
               +WTHSKBE(NB,NE,NZ)+WTEARBE(NB,NE,NZ))
 
-            IF(ISTYP(NZ).EQ.0.AND.IWTYP(NZ).NE.0)THEN
+            IF(ISTYP(NZ).EQ.iplt_annual.AND.IWTYP(NZ).NE.0)THEN
               WTRVE(NE,NZ)=WTRVE(NE,NZ)+CFOPE(infoliar,M,NE,NZ)*WTGRBE(NB,NE,NZ)
             ELSE
               ESNC(M,NE,k_fine_litr,0,NZ)=ESNC(M,NE,k_fine_litr,0,NZ)+CFOPE(infoliar,M,NE,NZ)*WTGRBE(NB,NE,NZ)
@@ -271,7 +272,7 @@ implicit none
 !     LYRC=number of days in current year
 !     IDAY0,IYR0=day,year of planting
 !
-    IF(ISTYP(NZ).NE.0.AND.JHVST(NZ).EQ.0)THEN
+    IF(ISTYP(NZ).NE.iplt_annual.AND.JHVST(NZ).EQ.ihv_noaction)THEN
       IF(I.LT.LYRC)THEN
         IDAY0(NZ)=I+1
         IYR0(NZ)=IDATA(3)
@@ -551,7 +552,7 @@ implicit none
     FDBKX     =>  plt_photo%FDBKX       &
   )
   D8845: DO NB=1,NBR(NZ)
-    IF(IDTHB(NB,NZ).EQ.1)THEN
+    IF(IDTHB(NB,NZ).EQ.idead)THEN
       GROUP(NB,NZ)=GROUPI(NZ)
       PSTG(NB,NZ)=XTLI(NZ)
       PSTGI(NB,NZ)=PSTG(NB,NZ)
@@ -614,7 +615,7 @@ implicit none
             +CFOPE(icwood,M,NE,NZ)*(WTLFBE(NB,NE,NZ)*FWODBE(NE,k_woody_litr) &
             +WTSHEBE(NB,NE,NZ)*FWODBE(NE,k_woody_litr))
 
-          IF(ISTYP(NZ).EQ.0.AND.IWTYP(NZ).NE.0)THEN
+          IF(ISTYP(NZ).EQ.iplt_annual.AND.IWTYP(NZ).NE.0)THEN
             WTRVE(NE,NZ)=WTRVE(NE,NZ)+CFOPE(infoliar,M,NE,NZ)*WTGRBE(NB,NE,NZ)
           ELSE
             ESNC(M,NE,k_fine_litr,0,NZ)=ESNC(M,NE,k_fine_litr,0,NZ)+CFOPE(infoliar,M,NE,NZ)*WTGRBE(NB,NE,NZ)

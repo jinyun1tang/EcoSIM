@@ -16,7 +16,8 @@ module EcosimConst
   real(r8), parameter :: VHCPNMin=4.190E-03_r8 !minimum heat capacities for solving
                                                !soil water and heat fluxes, [MJ/K]
   real(r8), parameter :: PICON=3.14159265358979323846_r8
-  real(r8), parameter :: PICON2=PICON*0.5_r8
+  real(r8), parameter :: PICON2h=PICON*0.5_r8
+  real(r8), parameter :: PICON2s=PICON*2._r8
   real(r8), PARAMETER :: PSIPS=-0.5E-03_r8
   real(r8), parameter :: RDN=57.29577951_r8
   real(r8), parameter :: VAP=2465.0_r8         !latent heat of vaporization of water, kJ/kg

@@ -136,7 +136,7 @@ module StartqsMod
   CNWS(NZ)=2.5_r8
   CPWS(NZ)=25.0_r8
   CWSRT(NZ)=AMIN1(CNRT(NZ)*CNWS(NZ),CPRT(NZ)*CPWS(NZ))
-  IF(ICTYP(NZ).EQ.3)THEN
+  IF(ICTYP(NZ).EQ.ic3_photo)THEN
     O2I(NZ)=2.10E+05_r8
   ELSE
     O2I(NZ)=3.96E+05_r8
@@ -405,7 +405,7 @@ module StartqsMod
   OFFST(NZ)=2.667_r8*(2.5_r8-ZTYP(NZ))
   TCZ(NZ)=TCZD-OFFST(NZ)
   TCX(NZ)=AMIN1(15.0_r8,TCXD-OFFST(NZ))
-  IF(ICTYP(NZ).EQ.3)THEN
+  IF(ICTYP(NZ).EQ.ic3_photo)THEN
     IF(DATAP(NZ)(1:4).EQ.'soyb')THEN
       HTC(NZ)=30.0_r8+3.0_r8*ZTYP(NZ)
       SSTX(NZ)=0.002_r8
@@ -651,7 +651,7 @@ module StartqsMod
     FLG4(NB,NZ)=0
     FLGZ(NB,NZ)=0
     NBTB(NB,NZ)=0
-    plt_pheno%IDTHB(NB,NZ)=1
+    plt_pheno%IDTHB(NB,NZ)=idead
     D15: DO M=1,pltpar%jpstgs
       IDAY(M,NB,NZ)=0
     ENDDO D15
@@ -1064,13 +1064,13 @@ module StartqsMod
   VOLWC(NZ)=0._r8
   EPOOL(1,ielmn,NZ)=CNGR(NZ)*EPOOL(1,ielmc,NZ)
   EPOOL(1,ielmp,NZ)=CPGR(NZ)*EPOOL(1,ielmc,NZ)
-  WTRT1E(ielmn,1,NG(NZ),1,NZ)=CNGR(NZ)*WTRT1E(ielmc,1,NG(NZ),1,NZ)
-  WTRT1E(ielmp,1,NG(NZ),1,NZ)=CPGR(NZ)*WTRT1E(ielmc,1,NG(NZ),1,NZ)
+  WTRT1E(ielmn,ifineroot,NG(NZ),1,NZ)=CNGR(NZ)*WTRT1E(ielmc,ifineroot,NG(NZ),1,NZ)
+  WTRT1E(ielmp,ifineroot,NG(NZ),1,NZ)=CPGR(NZ)*WTRT1E(ielmc,ifineroot,NG(NZ),1,NZ)
   RTWT1E(1,1,ielmn,NZ)=CNGR(NZ)*RTWT1E(1,1,ielmc,NZ)
   RTWT1E(1,1,ielmp,NZ)=CPGR(NZ)*RTWT1E(1,1,ielmc,NZ)
-  WTRTL(1,NG(NZ),NZ)=WTRT1E(ielmc,1,NG(NZ),1,NZ)
-  WTRTD(1,NG(NZ),NZ)=WTRT1E(ielmc,1,NG(NZ),1,NZ)
-  WSRTL(1,NG(NZ),NZ)=WTRTL(1,NG(NZ),NZ)*CWSRT(NZ)
+  WTRTL(ifineroot,NG(NZ),NZ)=WTRT1E(ielmc,ifineroot,NG(NZ),1,NZ)
+  WTRTD(ifineroot,NG(NZ),NZ)=WTRT1E(ielmc,ifineroot,NG(NZ),1,NZ)
+  WSRTL(1,NG(NZ),NZ)=WTRTL(ifineroot,NG(NZ),NZ)*CWSRT(NZ)
   EPOOLR(ielmn,1,NG(NZ),NZ)=CNGR(NZ)*EPOOLR(ielmc,1,NG(NZ),NZ)
   EPOOLR(ielmp,1,NG(NZ),NZ)=CPGR(NZ)*EPOOLR(ielmc,1,NG(NZ),NZ)
 

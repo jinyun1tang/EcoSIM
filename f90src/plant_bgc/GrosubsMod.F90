@@ -178,12 +178,12 @@ module grosubsMod
 !     ACTIVATE DORMANT SEEDS
 !
     D205: DO NB=1,NBR(NZ)
-      IF(IFLGI(NZ).EQ.1)THEN
+      IF(IFLGI(NZ).EQ.itrue)THEN
         IF(IFLGE(NB,NZ).EQ.0.AND.VRNS(NB,NZ).GE.VRNL(NB,NZ))THEN
           IDAY0(NZ)=I
           IYR0(NZ)=IYRC
           SDPTHI(NZ)=0.005_r8+CDPTHZ(0)
-          IFLGI(NZ)=0
+          IFLGI(NZ)=ifalse
         ENDIF
       ENDIF
     ENDDO D205
@@ -326,7 +326,7 @@ module grosubsMod
     NBR    => plt_morph%NBR         , &
     NRT    => plt_morph%NRT           &
   )
-  IF(IDTHP(NZ).EQ.0.OR.IDTHR(NZ).EQ.0)THEN
+  IF(IDTHP(NZ).EQ.0.OR.IDTHR(NZ).EQ.ialive)THEN
     UPNFC(NZ)=0._r8
     IFLGZ = 0
     call StagePlantForGrowth(I,J,NZ,ICHK1,NRX,TFN6,CNLFW,CPLFW,&

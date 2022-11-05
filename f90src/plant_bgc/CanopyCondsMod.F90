@@ -74,11 +74,10 @@ module CanopyCondsMod
 !     ZZ=reference height for wind speed
 !
   ARLSC=ARLFC+ARSTC
-  IF(ARLSC.GT.ZEROS.AND.ZT.GE.DPTHS-ZERO &
-    .AND.ZT.GE.DPTH0-ZERO)THEN
+  IF(ARLSC.GT.ZEROS.AND.ZT.GE.DPTHS-ZERO.AND.ZT.GE.DPTH0-ZERO)THEN
     ARLSG=ARLSC/AREA3(NU)
-    ZX=EXP(-0.5*ARLSG)
-    ZY=1.0-ZX
+    ZX=EXP(-0.5_r8*ARLSG)
+    ZY=1.0_r8-ZX
     ZD=ZT*AZMAX1(1.0_r8-2.0_r8/ARLSG*ZY)
     ZE=ZT*AMAX1(0.05_r8,ZX*ZY)
   ELSE
@@ -103,8 +102,8 @@ module CanopyCondsMod
 !     UA=wind speed
 !     RIB=canopy isothermal Richardson number
 !
-    RAB=AMAX1(RAM,(LOG((ZZ-ZD)/ZR))**2/(0.168*UA))
-    RIB=1.27E+08*(ZZ-ZR)/(UA**2*TKA)
+    RAB=AMAX1(RAM,(LOG((ZZ-ZD)/ZR))**2._r8/(0.168_r8*UA))
+    RIB=1.27E+08_r8*(ZZ-ZR)/(UA**2*TKA)
   ELSE
     RAB=RAM
     RIB=0.0_r8
@@ -402,7 +401,7 @@ module CanopyCondsMod
           ELSE
             BETZ=-ACOS(BETY)
           ENDIF
-          IF(BETZ.GT.-PICON2)THEN
+          IF(BETZ.GT.-PICON2h)THEN
             ZAGL=SAGL+2.0*BETZ
           ELSE
             ZAGL=SAGL-2.0*(PICON+BETZ)

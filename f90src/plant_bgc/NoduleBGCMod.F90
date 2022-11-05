@@ -452,7 +452,7 @@ module NoduleBGCMod
 !
   IF(INTYP(NZ).GE.1.AND.INTYP(NZ).LE.3)THEN
     DO 5400 L=NU,NIX(NZ)
-      IF(WTRTD(1,L,NZ).GT.ZEROL(NZ))THEN
+      IF(WTRTD(ifineroot,L,NZ).GT.ZEROL(NZ))THEN
 !
 !     INITIAL INFECTION
 !
@@ -726,25 +726,25 @@ module NoduleBGCMod
 !     XFRC,XFRN,XFRC=nonstructural C,N,P transfer
 !     CPOOLN,ZPOOLN,PPOOLN=nonstructural C,N,P in bacteria
 !
-        IF(EPOOLR(ielmc,1,L,NZ).GT.ZEROP(NZ).AND.WTRTD(1,L,NZ).GT.ZEROL(NZ))THEN
-          CCNDLR=WTNDLE(L,ielmc,NZ)/WTRTD(1,L,NZ)
-          WTRTD1=WTRTD(1,L,NZ)
-          WTNDL1=AMIN1(WTRTD(1,L,NZ),AMAX1(WTNDI*AREA3(NU),WTNDLE(L,ielmc,NZ)))
+        IF(EPOOLR(ielmc,ifineroot,L,NZ).GT.ZEROP(NZ).AND.WTRTD(ifineroot,L,NZ).GT.ZEROL(NZ))THEN
+          CCNDLR=WTNDLE(L,ielmc,NZ)/WTRTD(ifineroot,L,NZ)
+          WTRTD1=WTRTD(ifineroot,L,NZ)
+          WTNDL1=AMIN1(WTRTD(ifineroot,L,NZ),AMAX1(WTNDI*AREA3(NU),WTNDLE(L,ielmc,NZ)))
           WTRTDT=WTRTD1+WTNDL1
           IF(WTRTDT.GT.ZEROP(NZ))THEN
             FXRNX=FXRN(INTYP(NZ))/(1.0_r8+CCNDLR/CCNGR)
 !    2/(1.0+CCNDLR/(CCNGR*FXRN(INTYP(NZ))))
-            CPOOLD=(EPOOLR(ielmc,1,L,NZ)*WTNDL1-EPOOLN(L,ielmc,NZ)*WTRTD1)/WTRTDT
+            CPOOLD=(EPOOLR(ielmc,ifineroot,L,NZ)*WTNDL1-EPOOLN(L,ielmc,NZ)*WTRTD1)/WTRTDT
             XFRC=FXRNX*CPOOLD
-            EPOOLR(ielmc,1,L,NZ)=EPOOLR(ielmc,1,L,NZ)-XFRC
+            EPOOLR(ielmc,ifineroot,L,NZ)=EPOOLR(ielmc,ifineroot,L,NZ)-XFRC
             EPOOLN(L,ielmc,NZ)=EPOOLN(L,ielmc,NZ)+XFRC
-            CPOOLT=EPOOLR(ielmc,1,L,NZ)+EPOOLN(L,ielmc,NZ)
+            CPOOLT=EPOOLR(ielmc,ifineroot,L,NZ)+EPOOLN(L,ielmc,NZ)
             IF(CPOOLT.GT.ZEROP(NZ))THEN
               ZPOOLD=(EPOOLR(ielmn,1,L,NZ)*EPOOLN(L,ielmc,NZ) &
-                -EPOOLN(L,ielmn,NZ)*EPOOLR(ielmc,1,L,NZ))/CPOOLT
+                -EPOOLN(L,ielmn,NZ)*EPOOLR(ielmc,ifineroot,L,NZ))/CPOOLT
               XFRN=FXRNX*ZPOOLD
               PPOOLD=(EPOOLR(ielmp,1,L,NZ)*EPOOLN(L,ielmc,NZ) &
-                -EPOOLN(L,ielmp,NZ)*EPOOLR(ielmc,1,L,NZ))/CPOOLT
+                -EPOOLN(L,ielmp,NZ)*EPOOLR(ielmc,ifineroot,L,NZ))/CPOOLT
               XFRP=FXRNX*PPOOLD
               EPOOLR(ielmn,1,L,NZ)=EPOOLR(ielmn,1,L,NZ)-XFRN
               EPOOLR(ielmp,1,L,NZ)=EPOOLR(ielmp,1,L,NZ)-XFRP

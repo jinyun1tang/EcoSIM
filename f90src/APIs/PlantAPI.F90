@@ -533,7 +533,7 @@ implicit none
     ENDDO
 
     DO  L=1,JZ
-      DO N=1,2
+      DO N=1,pltpar%jroots
         EPOOLR(1:npelms,N,L,NZ,NY,NX)=plt_biom%EPOOLR(1:npelms,N,L,NZ)
         CCPOLR(N,L,NZ,NY,NX)=plt_biom%CCPOLR(N,L,NZ)
         CZPOLR(N,L,NZ,NY,NX)=plt_biom%CZPOLR(N,L,NZ)
@@ -653,9 +653,9 @@ implicit none
 
       DO K=1,jcplx
         DO N=1,2
-          RDFOMC(N,K,L,NZ,NY,NX)=plt_rbgc%RDFOMC(N,K,L,NZ)
-          RDFOMN(N,K,L,NZ,NY,NX)=plt_rbgc%RDFOMN(N,K,L,NZ)
-          RDFOMP(N,K,L,NZ,NY,NX)=plt_rbgc%RDFOMP(N,K,L,NZ)
+          DO NE=1,npelms
+            RDFOME(NE,N,K,L,NZ,NY,NX)=plt_rbgc%RDFOME(NE,N,K,L,NZ)
+          ENDDO
         ENDDO
       ENDDO
     ENDDO
@@ -1315,9 +1315,9 @@ implicit none
     DO L=1,NL(NY,NX)
       DO K=1,jcplx
         DO N=1,2
-          plt_rbgc%RDFOMC(N,K,L,NZ)=RDFOMC(N,K,L,NZ,NY,NX)
-          plt_rbgc%RDFOMN(N,K,L,NZ)=RDFOMN(N,K,L,NZ,NY,NX)
-          plt_rbgc%RDFOMP(N,K,L,NZ)=RDFOMP(N,K,L,NZ,NY,NX)
+          DO NE=1,npelms
+            plt_rbgc%RDFOME(NE,N,K,L,NZ)=RDFOME(NE,N,K,L,NZ,NY,NX)
+          ENDDO
         ENDDO
       ENDDO
     ENDDO
