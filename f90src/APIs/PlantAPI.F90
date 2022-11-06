@@ -11,6 +11,7 @@ module PlantAPI
   use timings      , only : start_timer, end_timer
   use EcoSIMHistMod
   use SnowDataType
+  use TracerIDMod
   use SoilPhysDataType, only : ALBX
   use SurfLitterDataType
   use LandSurfDataType
@@ -720,14 +721,14 @@ implicit none
   plt_site%ALT=ALT(NY,NX)
   plt_site%CCO2EI=CCO2EI(NY,NX)
   plt_site%CO2EI=CO2EI(NY,NX)
-  plt_site%COXYE=COXYE(NY,NX)
+  plt_site%COXYE=AtmGgms(idg_O2,NY,NX)
   plt_bgcr%CNETX=CNETX(NY,NX)
   plt_site%CO2E=CO2E(NY,NX)
-  plt_site%CCO2E=CCO2E(NY,NX)
-  plt_site%CCH4E=CCH4E(NY,NX)
-  plt_site%CZ2OE=CZ2OE(NY,NX)
-  plt_site%CH2GE=CH2GE(NY,NX)
-  plt_site%CNH3E=CNH3E(NY,NX)
+  plt_site%CCO2E=AtmGgms(idg_CO2,NY,NX)
+  plt_site%CCH4E=AtmGgms(idg_CH4,NY,NX)
+  plt_site%CZ2OE=AtmGgms(idg_N2O,NY,NX)
+  plt_site%CH2GE=AtmGgms(idg_H2,NY,NX)
+  plt_site%CNH3E=AtmGgms(idg_NH3,NY,NX)
   plt_site%DYLX=DYLX(NY,NX)
   plt_site%DYLN=DYLN(NY,NX)
   plt_ew%DPTHS=DPTHS(NY,NX)
@@ -840,12 +841,12 @@ implicit none
     plt_bgcr%ROXYL(L)     =ROXYL(L,NY,NX)
     plt_bgcr%ROXYY(L)     =ROXYY(L,NY,NX)
     plt_ew%TKS(L)         =TKS(L,NY,NX)
-    plt_soilchem%SCO2L(L) =SCO2L(L,NY,NX)
-    plt_soilchem%SOXYL(L) =SOXYL(L,NY,NX)
-    plt_soilchem%SCH4L(L) =SCH4L(L,NY,NX)
-    plt_soilchem%SN2OL(L) =SN2OL(L,NY,NX)
-    plt_soilchem%SNH3L(L) =SNH3L(L,NY,NX)
-    plt_soilchem%SH2GL(L) =SH2GL(L,NY,NX)
+    plt_soilchem%GSolbility(idg_CO2,L) =GSolbility(idg_CO2,L,NY,NX)
+    plt_soilchem%GSolbility(idg_O2,L) =GSolbility(idg_O2,L,NY,NX)
+    plt_soilchem%GSolbility(idg_CH4,L) =GSolbility(idg_CH4,L,NY,NX)
+    plt_soilchem%GSolbility(idg_N2O,L) =GSolbility(idg_N2O,L,NY,NX)
+    plt_soilchem%GSolbility(idg_NH3,L) =GSolbility(idg_NH3,L,NY,NX)
+    plt_soilchem%GSolbility(idg_H2,L) =GSolbility(idg_H2,L,NY,NX)
     plt_soilchem%THETW(L) =THETW(L,NY,NX)
     plt_soilchem%THETY(L) =THETY(L,NY,NX)
     plt_soilchem%TFND(L)  =TFND(L,NY,NX)

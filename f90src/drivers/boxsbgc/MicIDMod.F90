@@ -3,8 +3,8 @@ use ChemIDMod
 implicit none
   save
   character(len=*),private, parameter :: mod_filename = __FILE__
-  integer :: cid_CO2G      !gaseous tracer CO2
-  integer :: cid_CH4G      !gaseous tracer CH4
+  integer :: cidg_CO2      !gaseous tracer CO2
+  integer :: cidg_CH4      !gaseous tracer CH4
   integer :: cid_OXYG      !gaseous tracer O2
   integer :: cid_Z2GG      !gaseous tracer N2
   integer :: cid_Z2OG      !gaseous tracer N2O

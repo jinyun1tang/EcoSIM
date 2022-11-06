@@ -4,6 +4,7 @@ module Hour1Mod
   use abortutils   , only : endrun, print_info
   use ATSUtilsMod
   use TracerPropMod
+  use TracerIDMod
   use EcoSimConst
   use MiniFuncMod
   use SoilHydroParaMod
@@ -310,32 +311,35 @@ module Hour1Mod
 ! CSTRR: surface irrigation ion strength, [g m-3]
   DO NX=NHW,NHE
     DO NY=NVN,NVS
-      CCO2E(NY,NX)=CO2E(NY,NX)*5.36E-04_r8*TREF/TKA(NY,NX)  !gC/m3
-      CCH4E(NY,NX)=CH4E(NY,NX)*5.36E-04_r8*TREF/TKA(NY,NX)  !gC/m3
-      COXYE(NY,NX)=OXYE(NY,NX)*1.43E-03_r8*TREF/TKA(NY,NX)  !gO/m3
-      CZ2GE(NY,NX)=Z2GE(NY,NX)*1.25E-03_r8*TREF/TKA(NY,NX)  !gN/m3
-      CZ2OE(NY,NX)=Z2OE(NY,NX)*1.25E-03_r8*TREF/TKA(NY,NX)  !gN/m3
-      CNH3E(NY,NX)=ZNH3E(NY,NX)*6.25E-04_r8*TREF/TKA(NY,NX) !gN/m3
-      CH2GE(NY,NX)=H2GE(NY,NX)*8.92E-05_r8*TREF/TKA(NY,NX)  !gH/m3
-      CCOR(NY,NX)=CCO2E(NY,NX)*gas_solubility(id_co2g,TCA(NY,NX)) &
+
+      AtmGgms(idg_CO2,NY,NX)=CO2E(NY,NX)*5.36E-04_r8*TREF/TKA(NY,NX)  !gC/m3
+      AtmGgms(idg_CH4,NY,NX)=CH4E(NY,NX)*5.36E-04_r8*TREF/TKA(NY,NX)  !gC/m3
+      AtmGgms(idg_O2 ,NY,NX)=OXYE(NY,NX)*1.43E-03_r8*TREF/TKA(NY,NX)  !gO/m3
+      AtmGgms(idg_N2 ,NY,NX)=Z2GE(NY,NX)*1.25E-03_r8*TREF/TKA(NY,NX)  !gN/m3
+      AtmGgms(idg_N2O,NY,NX)=Z2OE(NY,NX)*1.25E-03_r8*TREF/TKA(NY,NX)  !gN/m3
+      AtmGgms(idg_NH3,NY,NX)=ZNH3E(NY,NX)*6.25E-04_r8*TREF/TKA(NY,NX) !gN/m3
+      AtmGgms(idg_H2 ,NY,NX)=H2GE(NY,NX)*8.92E-05_r8*TREF/TKA(NY,NX)  !gH/m3
+
+      CCOR(NY,NX)=AtmGgms(idg_CO2,NY,NX)*gas_solubility(idg_CO2,TCA(NY,NX)) &
          /(EXP(ACO2X*CSTRR(NY,NX)))
-      CCHR(NY,NX)=CCH4E(NY,NX)*gas_solubility(id_ch4g,TCA(NY,NX)) &
+      CCHR(NY,NX)=AtmGgms(idg_CH4,NY,NX)*gas_solubility(idg_CH4,TCA(NY,NX)) &
         /(EXP(ACH4X*CSTRR(NY,NX)))
-      COXR(NY,NX)=COXYE(NY,NX)*gas_solubility(id_o2g, TCA(NY,NX)) &
+      COXR(NY,NX)=AtmGgms(idg_O2,NY,NX)*gas_solubility(idg_O2, TCA(NY,NX)) &
         /(EXP(AOXYX*CSTRR(NY,NX)))
-      CNNR(NY,NX)=CZ2GE(NY,NX)*gas_solubility(id_n2g, TCA(NY,NX)) &
+      CNNR(NY,NX)=AtmGgms(idg_N2,NY,NX)*gas_solubility(idg_N2, TCA(NY,NX)) &
         /(EXP(AN2GX*CSTRR(NY,NX)))
-      CN2R(NY,NX)=CZ2OE(NY,NX)*gas_solubility(id_n2og, TCA(NY,NX)) &
+      CN2R(NY,NX)=AtmGgms(idg_N2O,NY,NX)*gas_solubility(idg_N2O, TCA(NY,NX)) &
         /(EXP(AN2OX*CSTRR(NY,NX)))
-      CCOQ(NY,NX)=CCO2E(NY,NX)*gas_solubility(id_co2g, TCA(NY,NX)) &
+
+      CCOQ(NY,NX)=AtmGgms(idg_CO2,NY,NX)*gas_solubility(idg_CO2, TCA(NY,NX)) &
         /(EXP(ACO2X*CSTRQ(I,NY,NX)))
-      CCHQ(NY,NX)=CCH4E(NY,NX)*gas_solubility(id_ch4g, TCA(NY,NX)) &
+      CCHQ(NY,NX)=AtmGgms(idg_CH4,NY,NX)*gas_solubility(idg_CH4, TCA(NY,NX)) &
         /(EXP(ACH4X*CSTRQ(I,NY,NX)))
-      COXQ(NY,NX)=COXYE(NY,NX)*gas_solubility(id_o2g, TCA(NY,NX)) &
+      COXQ(NY,NX)=AtmGgms(idg_O2,NY,NX)*gas_solubility(idg_O2, TCA(NY,NX)) &
         /(EXP(AOXYX*CSTRQ(I,NY,NX)))
-      CNNQ(NY,NX)=CZ2GE(NY,NX)*gas_solubility(id_n2g, TCA(NY,NX)) &
+      CNNQ(NY,NX)=AtmGgms(idg_N2,NY,NX)*gas_solubility(idg_N2, TCA(NY,NX)) &
         /(EXP(AN2GX*CSTRQ(I,NY,NX)))
-      CN2Q(NY,NX)=CZ2OE(NY,NX)*gas_solubility(id_n2og, TCA(NY,NX)) &
+      CN2Q(NY,NX)=AtmGgms(idg_N2O,NY,NX)*gas_solubility(idg_N2O, TCA(NY,NX)) &
         /(EXP(AN2OX*CSTRQ(I,NY,NX)))
 
     ENDDO
@@ -2805,25 +2809,25 @@ module Hour1Mod
   integer  :: L
   real(r8) :: FH2O
   L=0
-  SCO2L(L,NY,NX)=gas_solubility(id_co2g,TCS(L,NY,NX))
-  SCH4L(L,NY,NX)=gas_solubility(id_ch4g,TCS(L,NY,NX))
-  SOXYL(L,NY,NX)=gas_solubility(id_o2g,TCS(L,NY,NX))
-  SN2GL(L,NY,NX)=gas_solubility(id_n2g,TCS(L,NY,NX))
-  SN2OL(L,NY,NX)=gas_solubility(id_n2og,TCS(L,NY,NX))
-  SNH3L(L,NY,NX)=gas_solubility(id_nh3g,TCS(L,NY,NX))
-  SH2GL(L,NY,NX)=gas_solubility(id_h2g,TCS(L,NY,NX))
+  GSolbility(idg_CO2,L,NY,NX)=gas_solubility(idg_CO2,TCS(L,NY,NX))
+  GSolbility(idg_CH4,L,NY,NX)=gas_solubility(idg_CH4,TCS(L,NY,NX))
+  GSolbility(idg_O2,L,NY,NX)=gas_solubility(idg_O2,TCS(L,NY,NX))
+  GSolbility(idg_N2,L,NY,NX)=gas_solubility(idg_N2,TCS(L,NY,NX))
+  GSolbility(idg_N2O,L,NY,NX)=gas_solubility(idg_N2O,TCS(L,NY,NX))
+  GSolbility(idg_NH3,L,NY,NX)=gas_solubility(idg_NH3,TCS(L,NY,NX))
+  GSolbility(idg_H2,L,NY,NX)=gas_solubility(idg_H2,TCS(L,NY,NX))
   DO  L=1,NL(NY,NX)+1
 ! S*L=solubility of gas in water
 ! TCS=soil temperature (oC)
 ! 5.56E+04_r8 := mole H2O / m3
     FH2O=5.56E+04_r8/(5.56E+04_r8+CION(L,NY,NX))
-    SCO2L(L,NY,NX)=gas_solubility(id_co2g,TCS(L,NY,NX))/(EXP(ACO2X*CSTR(L,NY,NX)))*FH2O
-    SCH4L(L,NY,NX)=gas_solubility(id_ch4g,TCS(L,NY,NX))/(EXP(ACH4X*CSTR(L,NY,NX)))*FH2O
-    SOXYL(L,NY,NX)=gas_solubility(id_o2g, TCS(L,NY,NX))/(EXP(AOXYX*CSTR(L,NY,NX)))*FH2O
-    SN2GL(L,NY,NX)=gas_solubility(id_n2g, TCS(L,NY,NX))/(EXP(AN2GX*CSTR(L,NY,NX)))*FH2O
-    SN2OL(L,NY,NX)=gas_solubility(id_n2og,TCS(L,NY,NX))/(EXP(AN2OX*CSTR(L,NY,NX)))*FH2O
-    SNH3L(L,NY,NX)=gas_solubility(id_nh3g,TCS(L,NY,NX))/(EXP(ANH3X*CSTR(L,NY,NX)))*FH2O
-    SH2GL(L,NY,NX)=gas_solubility(id_h2g, TCS(L,NY,NX))/(EXP(AH2GX*CSTR(L,NY,NX)))*FH2O
+    GSolbility(idg_CO2,L,NY,NX)=gas_solubility(idg_CO2,TCS(L,NY,NX))/(EXP(ACO2X*CSTR(L,NY,NX)))*FH2O
+    GSolbility(idg_CH4,L,NY,NX)=gas_solubility(idg_CH4,TCS(L,NY,NX))/(EXP(ACH4X*CSTR(L,NY,NX)))*FH2O
+    GSolbility(idg_O2,L,NY,NX)=gas_solubility(idg_O2, TCS(L,NY,NX))/(EXP(AOXYX*CSTR(L,NY,NX)))*FH2O
+    GSolbility(idg_N2,L,NY,NX)=gas_solubility(idg_N2, TCS(L,NY,NX))/(EXP(AN2GX*CSTR(L,NY,NX)))*FH2O
+    GSolbility(idg_N2O,L,NY,NX)=gas_solubility(idg_N2O,TCS(L,NY,NX))/(EXP(AN2OX*CSTR(L,NY,NX)))*FH2O
+    GSolbility(idg_NH3,L,NY,NX)=gas_solubility(idg_NH3,TCS(L,NY,NX))/(EXP(ANH3X*CSTR(L,NY,NX)))*FH2O
+    GSolbility(idg_H2,L,NY,NX)=gas_solubility(idg_H2, TCS(L,NY,NX))/(EXP(AH2GX*CSTR(L,NY,NX)))*FH2O
   ENDDO
   end subroutine CalGasSolubility
 end module Hour1Mod

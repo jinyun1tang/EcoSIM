@@ -118,6 +118,7 @@ module AqueChemDatatype
   real(r8),allocatable ::  CION(:,:,:)                        !solution ion concentratiom, [mol m-3]
   real(r8),allocatable ::  XCEC(:,:,:)                        !cation exchange capacity, [mol d-2]
   real(r8),allocatable ::  XAEC(:,:,:)                        !anion exchange capacity, [mol d-2]
+
   real(r8),allocatable ::  ZALH(:,:,:)                        !aqueous Al content macropore, [mol d-2]
   real(r8),allocatable ::  ZFEH(:,:,:)                        !aqueous Fe content macropore, [mol d-2]
   real(r8),allocatable ::  ZHYH(:,:,:)                        !aqueous H content macropore, [mol d-2]
@@ -168,6 +169,7 @@ module AqueChemDatatype
   real(r8),allocatable ::  ZCA1BH(:,:,:)                      !soil aqueous CaHPO4 content band macropore, [mol d-2]
   real(r8),allocatable ::  ZCA2BH(:,:,:)                      !soil aqueous CaH2PO4 content band macropore, [mol d-2]
   real(r8),allocatable ::  ZMG1BH(:,:,:)                      !soil aqueous MgHPO4 content band macropore, [mol d-2]
+
   real(r8),allocatable ::  XALFLS(:,:,:,:)                    !total Al in micropore water flux, [mol d-2 h-1]
   real(r8),allocatable ::  XFEFLS(:,:,:,:)                    !total Fe in micropore water flux, [mol d-2 h-1]
   real(r8),allocatable ::  XHYFLS(:,:,:,:)                    !total H in micropore water flux, [mol d-2 h-1]

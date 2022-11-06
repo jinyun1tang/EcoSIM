@@ -1,6 +1,8 @@
 set(ECOSIM_CONFG_SOURCES
   EcoSIMSolverPar.F90
   EcoSIMConfig.F90
+  EcoSIMCtrlMod.F90
+  TracerIDMod.F90
   GridConsts.F90
   ElmIDMod.F90
 )

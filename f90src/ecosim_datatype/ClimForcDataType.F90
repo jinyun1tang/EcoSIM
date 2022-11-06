@@ -45,137 +45,134 @@ implicit none
   real(r8) :: DCN4R(12)                         !change factor for NH4 in precipitation, [-]
   real(r8) :: DCNOR(12)                         !change factor for NO3 in precipitation, [-]
 
-  real(r8),allocatable ::  WDPTHD(:,:,:)                      !
-  real(r8),allocatable ::  TDTPX(:,:,:)                       !accumulated change  for maximum temperature, [-]
-  real(r8),allocatable ::  TDTPN(:,:,:)                       !accumulated change  for minimum temperature, [-]
-  real(r8),allocatable ::  TDRAD(:,:,:)                       !accumulated change  for radiation, [-]
-  real(r8),allocatable ::  TDHUM(:,:,:)                       !accumulated change  for humidity, [-]
-  real(r8),allocatable ::  TDPRC(:,:,:)                       !accumulated change  for precipitation, [-]
-  real(r8),allocatable ::  TDWND(:,:,:)                       !accumulated change  for wind speed, [-]
-  real(r8),allocatable ::  TDCO2(:,:,:)                       !accumulated change  for atmospheric CO2 concentration, [-]
-  real(r8),allocatable ::  TDCN4(:,:,:)                       !accumulated change  for NH4 in precipitation, [-]
-  real(r8),allocatable ::  TDCNO(:,:,:)                       !accumulated change  for NO3 in precipitation, [-]
-  real(r8),allocatable ::  TCA(:,:)                           !air temperature, [oC]
-  real(r8),allocatable ::  TKA(:,:)                           !air temperature, [K]
-  real(r8),allocatable ::  UA(:,:)                            !wind speed, [m h-1]
-  real(r8),allocatable ::  VPA(:,:)                           !vapor concentration, [m3 m-3]
-  real(r8),allocatable ::  VPK(:,:)                           !vapor pressure, [kPa]
-  real(r8),allocatable ::  DYLN(:,:)                          !daylength, [h]
-  real(r8),allocatable ::  DYLX(:,:)                          !daylength of previous day, [h]
-  real(r8),allocatable ::  DYLM(:,:)                          !maximum daylength, [h]
-  real(r8),allocatable ::  OMEGAG(:,:,:)                      !sine of solar beam on leaf surface, [-]
-  real(r8),allocatable ::  THS(:,:)                           !sky longwave radiation , [MJ d-2 h-1]
-  real(r8),allocatable ::  TRAD(:,:)                          !total daily solar radiation, [MJ d-1]
-  real(r8),allocatable ::  TAMX(:,:)                          !daily maximum air temperature , [oC]
-  real(r8),allocatable ::  TAMN(:,:)                          !daily minimum air temperature , [oC]
-  real(r8),allocatable ::  HUDX(:,:)                          !daily maximum vapor pressure , [kPa]
-  real(r8),allocatable ::  HUDN(:,:)                          !daily minimum vapor pressure , [kPa]
-  real(r8),allocatable ::  TWIND(:,:)                         !total daily wind travel, [m d-1]
-  real(r8),allocatable ::  TRAI(:,:)                          !total daily precipitation, [m d-1]
-  real(r8),allocatable ::  THSX(:,:)                          !sky longwave radiation , [MJ m-2 h-1]
-  real(r8),allocatable ::  OFFSET(:,:)                        !offset for calculating temperature in Arrhenius curves, [oC]
-  real(r8),allocatable ::  PRECD(:,:)                         !precipitation at ground surface used to calculate soil erosion, [m h-1]
-  real(r8),allocatable ::  PRECB(:,:)                         !precipitation at ground surface used to calculate soil erosion, [m h-1]
-  real(r8),allocatable ::  CO2EI(:,:)                         !initial atmospheric CO2 concentration, [umol mol-1]
-  real(r8),allocatable ::  CCO2EI(:,:)                        !initial atmospheric CO2 concentration, [g m-3]
-  real(r8),allocatable ::  OXYE(:,:)                          !atmospheric O2 concentration, [umol mol-1]
-  real(r8),allocatable ::  COXYE(:,:)                         !atmospheric O2 concentration, [g m-3]
-  real(r8),allocatable ::  Z2OE(:,:)                          !atmospheric N2O concentration, [umol mol-1]
-  real(r8),allocatable ::  CZ2OE(:,:)                         !atmospheric N2O concentration, [g m-3]
-  real(r8),allocatable ::  Z2GE(:,:)                          !atmospheric N2 concentration, [umol mol-1]
-  real(r8),allocatable ::  CZ2GE(:,:)                         !atmospheric N2 concentration, [g m-3]
-  real(r8),allocatable ::  ZNH3E(:,:)                         !atmospheric NH3 concentration, [umol mol-1]
-  real(r8),allocatable ::  CNH3E(:,:)                         !atmospheric NH3 concentration, [g m-3]
-  real(r8),allocatable ::  CH4E(:,:)                          !atmospheric CH4 concentration, [umol mol-1]
-  real(r8),allocatable ::  CCH4E(:,:)                         !atmospheric CH4 concentration, [g m-3]
-  real(r8),allocatable ::  H2GE(:,:)                          !atmospheric H2 concentration, [umol mol-1]
-  real(r8),allocatable ::  CH2GE(:,:)                         !atmospheric H2 concentration, [g m-3]
-  real(r8),allocatable ::  ZNOON(:,:)                         !time of solar noon, [h]
-  real(r8),allocatable ::  CO2E(:,:)                          !atmospheric CO2 concentration, [umol mol-1]
-  real(r8),allocatable ::  CCO2E(:,:)                         !atmospheric CO2 concentration, [g m-3]
-  real(r8),allocatable ::  RADS(:,:)                          !direct shortwave radiation, [W m-2]
-  real(r8),allocatable ::  RADY(:,:)                          !diffuse shortwave radiation, [W m-2]
-  real(r8),allocatable ::  RAPS(:,:)                          !direct PAR, [umol m-2 s-1]
-  real(r8),allocatable ::  RAPY(:,:)                          !diffuse PAR, [umol m-2 s-1]
-  real(r8),allocatable ::  SSIN(:,:)                          !sine of solar angle, [-]
-  real(r8),allocatable ::  SSINN(:,:)                         !sine of solar angle next hour, [-]
-  real(r8),allocatable ::  TLEX(:,:)                          !total latent heat flux x boundary layer resistance, [MJ m-1]
-  real(r8),allocatable ::  TSHX(:,:)                          !total sensible heat flux x boundary layer resistance, [MJ m-1]
-  real(r8),allocatable ::  TLEC(:,:)                          !total latent heat flux x boundary layer resistance, [MJ m-1]
-  real(r8),allocatable ::  TSHC(:,:)                          !total sensible heat flux x boundary layer resistance, [MJ m-1]
-  real(r8),allocatable ::  DPTHSK(:,:)                        !depth of soil heat sink/source, [m]
-  real(r8),allocatable ::  TKSD(:,:)                          !temperature of soil heat sink/source, [oC]
-  real(r8),allocatable ::  ATCAI(:,:)                         !initial mean annual air temperature, [oC]
-  real(r8),allocatable ::  RAD(:,:)                           !shortwave radiation in solar beam, [MJ m-2 h-1]
-  real(r8),allocatable ::  RAP(:,:)                           !PAR radiation in solar beam, [umol m-2 s-1]
-  real(r8),allocatable ::  ATCA(:,:)                          !mean annual air temperature, [oC]
-  real(r8),allocatable ::  ATCS(:,:)                          !mean annual soil temperature, [oC]
-  real(r8),allocatable ::  ATKA(:,:)                          !mean annual air temperature, [K]
-  real(r8),allocatable ::  ATKS(:,:)                          !mean annual soil temperature, [K]
-  real(r8),allocatable ::  PRECR(:,:)                         !rainfall, [m3 d-2 h-1]
-  real(r8),allocatable ::  PRECW(:,:)                         !snowfall, [m3 d-2 h-1]
-  real(r8),allocatable ::  PRECQ(:,:)                         !rainfall + snowfall, [m3 d-2 h-1]
-  real(r8),allocatable ::  PRECA(:,:)                         !rainfall + irrigation, [m3 d-2 h-1]
-  real(r8),allocatable ::  ENGYP(:,:)                         !cumulative rainfall energy impact on soil surface
-  real(r8),allocatable ::  PHR(:,:)                           !precipitation pH, [-]
-  real(r8),allocatable ::  CN4RI(:,:)                         !precipitation initial NH4 concentration, [g m-3]
-  real(r8),allocatable ::  CNORI(:,:)                         !precipitation initial NO3 concentration, [g m-3]
-  real(r8),allocatable ::  CN4R(:,:)                          !precipitation  NH4 concentration, [g m-3]
-  real(r8),allocatable ::  CN3R(:,:)                          !precipitation  NH3 concentration, [g m-3]
-  real(r8),allocatable ::  CNOR(:,:)                          !precipitation  NO3 concentration, [g m-3]
-  real(r8),allocatable ::  CPOR(:,:)                          !precipitation  H2PO4 concentration, [g m-3]
-  real(r8),allocatable ::  CALR(:,:)                          !precipitation  Al concentration, [g m-3]
-  real(r8),allocatable ::  CFER(:,:)                          !precipitation  Fe concentration, [g m-3]
-  real(r8),allocatable ::  CHYR(:,:)                          !precipitation  H concentration, [g m-3]
-  real(r8),allocatable ::  CCAR(:,:)                          !precipitation  Ca concentration, [g m-3]
-  real(r8),allocatable ::  CMGR(:,:)                          !precipitation  Mg concentration, [g m-3]
-  real(r8),allocatable ::  CNAR(:,:)                          !precipitation  Na concentration, [g m-3]
-  real(r8),allocatable ::  CKAR(:,:)                          !precipitation  K concentration, [g m-3]
-  real(r8),allocatable ::  COHR(:,:)                          !precipitation  OH concentration, [g m-3]
-  real(r8),allocatable ::  CSOR(:,:)                          !precipitation  SO4 concentration, [g m-3]
-  real(r8),allocatable ::  CCLR(:,:)                          !precipitation  Cl concentration, [g m-3]
-  real(r8),allocatable ::  CC3R(:,:)                          !precipitation  CO3 concentration, [g m-3]
-  real(r8),allocatable ::  CHCR(:,:)                          !precipitation  HCO3 concentration, [g m-3]
-  real(r8),allocatable ::  CCHR(:,:)                          !precipitation  CH4 concentration, [g m-3]
-  real(r8),allocatable ::  CAL1R(:,:)                         !precipitation  AlOH concentration, [g m-3]
-  real(r8),allocatable ::  CAL2R(:,:)                         !precipitation  AlOH2 concentration, [g m-3]
-  real(r8),allocatable ::  CAL3R(:,:)                         !precipitation  AlOH3 concentration, [g m-3]
-  real(r8),allocatable ::  CAL4R(:,:)                         !precipitation  AlOH4 concentration, [g m-3]
-  real(r8),allocatable ::  CALSR(:,:)                         !precipitation  AlSO4 concentration, [g m-3]
-  real(r8),allocatable ::  CFE1R(:,:)                         !precipitation  FeOH concentration, [g m-3]
-  real(r8),allocatable ::  CFE2R(:,:)                         !precipitation  FeOH2 concentration, [g m-3]
-  real(r8),allocatable ::  CFE3R(:,:)                         !precipitation  FeOH3 concentration, [g m-3]
-  real(r8),allocatable ::  CFE4R(:,:)                         !precipitation  FeOH4 concentration, [g m-3]
-  real(r8),allocatable ::  CFESR(:,:)                         !precipitation  FeSO4 concentration, [g m-3]
-  real(r8),allocatable ::  CCAOR(:,:)                         !precipitation  CaOH concentration, [g m-3]
-  real(r8),allocatable ::  CCACR(:,:)                         !precipitation  CaCO3 concentration, [g m-3]
-  real(r8),allocatable ::  CCAHR(:,:)                         !precipitation  CaHCO3 concentration, [g m-3]
-  real(r8),allocatable ::  CCASR(:,:)                         !precipitation  CaSO4 concentration, [g m-3]
-  real(r8),allocatable ::  CMGOR(:,:)                         !precipitation  MgOH concentration, [g m-3]
-  real(r8),allocatable ::  CMGCR(:,:)                         !precipitation  MgCO3 concentration, [g m-3]
-  real(r8),allocatable ::  CMGHR(:,:)                         !precipitation  MgHCO3 concentration, [g m-3]
-  real(r8),allocatable ::  CMGSR(:,:)                         !precipitation  MgSO4 concentration, [g m-3]
-  real(r8),allocatable ::  CNACR(:,:)                         !precipitation  NaCO3 concentration, [g m-3]
-  real(r8),allocatable ::  CNASR(:,:)                         !precipitation  NaSO4 concentration, [g m-3]
-  real(r8),allocatable ::  CKASR(:,:)                         !precipitation  K concentration, [g m-3]
-  real(r8),allocatable ::  CH0PR(:,:)                         !precipitation  PO4 concentration, [g m-3]
-  real(r8),allocatable ::  CH1PR(:,:)                         !precipitation  HPO4 concentration, [g m-3]
-  real(r8),allocatable ::  CH3PR(:,:)                         !precipitation  H3PO4 concentration, [g m-3]
-  real(r8),allocatable ::  CF1PR(:,:)                         !precipitation  FeHPO4 concentration, [g m-3]
-  real(r8),allocatable ::  CF2PR(:,:)                         !precipitation  FeH2PO4 concentration, [g m-3]
-  real(r8),allocatable ::  CC0PR(:,:)                         !precipitation  CaPO4 concentration, [g m-3]
-  real(r8),allocatable ::  CC1PR(:,:)                         !precipitation  CaHPO4 concentration, [g m-3]
-  real(r8),allocatable ::  CC2PR(:,:)                         !precipitation  CaH2PO4 concentration, [g m-3]
-  real(r8),allocatable ::  CM1PR(:,:)                         !precipitation  MgHPO4 concentration, [g m-3]
-  real(r8),allocatable ::  CCOR(:,:)                          !precipitation  CO2 concentration, [g m-3]
-  real(r8),allocatable ::  COXR(:,:)                          !precipitation  O2 concentration, [g m-3]
-  real(r8),allocatable ::  CNNR(:,:)                          !precipitation  N2 concentration, [g m-3]
-  real(r8),allocatable ::  CN2R(:,:)                          !precipitation  N2O concentration, [g m-3]
+  real(r8),pointer ::  WDPTHD(:,:,:)                      !
+  real(r8),pointer ::  TDTPX(:,:,:)                       !accumulated change  for maximum temperature, [-]
+  real(r8),pointer ::  TDTPN(:,:,:)                       !accumulated change  for minimum temperature, [-]
+  real(r8),pointer ::  TDRAD(:,:,:)                       !accumulated change  for radiation, [-]
+  real(r8),pointer ::  TDHUM(:,:,:)                       !accumulated change  for humidity, [-]
+  real(r8),pointer ::  TDPRC(:,:,:)                       !accumulated change  for precipitation, [-]
+  real(r8),pointer ::  TDWND(:,:,:)                       !accumulated change  for wind speed, [-]
+  real(r8),pointer ::  TDCO2(:,:,:)                       !accumulated change  for atmospheric CO2 concentration, [-]
+  real(r8),pointer ::  TDCN4(:,:,:)                       !accumulated change  for NH4 in precipitation, [-]
+  real(r8),pointer ::  TDCNO(:,:,:)                       !accumulated change  for NO3 in precipitation, [-]
+  real(r8),pointer ::  TCA(:,:)                           !air temperature, [oC]
+  real(r8),pointer ::  TKA(:,:)                           !air temperature, [K]
+  real(r8),pointer ::  UA(:,:)                            !wind speed, [m h-1]
+  real(r8),pointer ::  VPA(:,:)                           !vapor concentration, [m3 m-3]
+  real(r8),pointer ::  VPK(:,:)                           !vapor pressure, [kPa]
+  real(r8),pointer ::  DYLN(:,:)                          !daylength, [h]
+  real(r8),pointer ::  DYLX(:,:)                          !daylength of previous day, [h]
+  real(r8),pointer ::  DYLM(:,:)                          !maximum daylength, [h]
+  real(r8),pointer ::  OMEGAG(:,:,:)                      !sine of solar beam on leaf surface, [-]
+  real(r8),pointer ::  THS(:,:)                           !sky longwave radiation , [MJ d-2 h-1]
+  real(r8),pointer ::  TRAD(:,:)                          !total daily solar radiation, [MJ d-1]
+  real(r8),pointer ::  TAMX(:,:)                          !daily maximum air temperature , [oC]
+  real(r8),pointer ::  TAMN(:,:)                          !daily minimum air temperature , [oC]
+  real(r8),pointer ::  HUDX(:,:)                          !daily maximum vapor pressure , [kPa]
+  real(r8),pointer ::  HUDN(:,:)                          !daily minimum vapor pressure , [kPa]
+  real(r8),pointer ::  TWIND(:,:)                         !total daily wind travel, [m d-1]
+  real(r8),pointer ::  TRAI(:,:)                          !total daily precipitation, [m d-1]
+  real(r8),pointer ::  THSX(:,:)                          !sky longwave radiation , [MJ m-2 h-1]
+  real(r8),pointer ::  OFFSET(:,:)                        !offset for calculating temperature in Arrhenius curves, [oC]
+  real(r8),pointer ::  PRECD(:,:)                         !precipitation at ground surface used to calculate soil erosion, [m h-1]
+  real(r8),pointer ::  PRECB(:,:)                         !precipitation at ground surface used to calculate soil erosion, [m h-1]
+  real(r8),pointer ::  CO2EI(:,:)                         !initial atmospheric CO2 concentration, [umol mol-1]
+  real(r8),pointer ::  CCO2EI(:,:)                        !initial atmospheric CO2 concentration, [g m-3]
+
+  real(r8),pointer ::  AtmGgms(:,:,:)                     !atmospheric gas concentration in g m-3
+  real(r8),pointer ::  AtmGmms(:,:,:)                     !atmospheric gas concentration in umol mol-1
+  real(r8),pointer ::  OXYE(:,:)                          !atmospheric O2 concentration, [umol mol-1]
+  real(r8),pointer ::  Z2OE(:,:)                          !atmospheric N2O concentration, [umol mol-1]
+  real(r8),pointer ::  Z2GE(:,:)                          !atmospheric N2 concentration, [umol mol-1]
+  real(r8),pointer ::  ZNH3E(:,:)                         !atmospheric NH3 concentration, [umol mol-1]
+  real(r8),pointer ::  CH4E(:,:)                          !atmospheric CH4 concentration, [umol mol-1]
+  real(r8),pointer ::  H2GE(:,:)                          !atmospheric H2 concentration, [umol mol-1]
+  real(r8),pointer ::  CO2E(:,:)                          !atmospheric CO2 concentration, [umol mol-1]
+
+  real(r8),pointer ::  ZNOON(:,:)                         !time of solar noon, [h]
+  real(r8),pointer ::  RADS(:,:)                          !direct shortwave radiation, [W m-2]
+  real(r8),pointer ::  RADY(:,:)                          !diffuse shortwave radiation, [W m-2]
+  real(r8),pointer ::  RAPS(:,:)                          !direct PAR, [umol m-2 s-1]
+  real(r8),pointer ::  RAPY(:,:)                          !diffuse PAR, [umol m-2 s-1]
+  real(r8),pointer ::  SSIN(:,:)                          !sine of solar angle, [-]
+  real(r8),pointer ::  SSINN(:,:)                         !sine of solar angle next hour, [-]
+  real(r8),pointer ::  TLEX(:,:)                          !total latent heat flux x boundary layer resistance, [MJ m-1]
+  real(r8),pointer ::  TSHX(:,:)                          !total sensible heat flux x boundary layer resistance, [MJ m-1]
+  real(r8),pointer ::  TLEC(:,:)                          !total latent heat flux x boundary layer resistance, [MJ m-1]
+  real(r8),pointer ::  TSHC(:,:)                          !total sensible heat flux x boundary layer resistance, [MJ m-1]
+  real(r8),pointer ::  DPTHSK(:,:)                        !depth of soil heat sink/source, [m]
+  real(r8),pointer ::  TKSD(:,:)                          !temperature of soil heat sink/source, [oC]
+  real(r8),pointer ::  ATCAI(:,:)                         !initial mean annual air temperature, [oC]
+  real(r8),pointer ::  RAD(:,:)                           !shortwave radiation in solar beam, [MJ m-2 h-1]
+  real(r8),pointer ::  RAP(:,:)                           !PAR radiation in solar beam, [umol m-2 s-1]
+  real(r8),pointer ::  ATCA(:,:)                          !mean annual air temperature, [oC]
+  real(r8),pointer ::  ATCS(:,:)                          !mean annual soil temperature, [oC]
+  real(r8),pointer ::  ATKA(:,:)                          !mean annual air temperature, [K]
+  real(r8),pointer ::  ATKS(:,:)                          !mean annual soil temperature, [K]
+  real(r8),pointer ::  PRECR(:,:)                         !rainfall, [m3 d-2 h-1]
+  real(r8),pointer ::  PRECW(:,:)                         !snowfall, [m3 d-2 h-1]
+  real(r8),pointer ::  PRECQ(:,:)                         !rainfall + snowfall, [m3 d-2 h-1]
+  real(r8),pointer ::  PRECA(:,:)                         !rainfall + irrigation, [m3 d-2 h-1]
+  real(r8),pointer ::  ENGYP(:,:)                         !cumulative rainfall energy impact on soil surface
+  real(r8),pointer ::  PHR(:,:)                           !precipitation pH, [-]
+  real(r8),pointer ::  CN4RI(:,:)                         !precipitation initial NH4 concentration, [g m-3]
+  real(r8),pointer ::  CNORI(:,:)                         !precipitation initial NO3 concentration, [g m-3]
+  real(r8),pointer ::  CN4R(:,:)                          !precipitation  NH4 concentration, [g m-3]
+  real(r8),pointer ::  CN3R(:,:)                          !precipitation  NH3 concentration, [g m-3]
+  real(r8),pointer ::  CNOR(:,:)                          !precipitation  NO3 concentration, [g m-3]
+  real(r8),pointer ::  CPOR(:,:)                          !precipitation  H2PO4 concentration, [g m-3]
+  real(r8),pointer ::  CALR(:,:)                          !precipitation  Al concentration, [g m-3]
+  real(r8),pointer ::  CFER(:,:)                          !precipitation  Fe concentration, [g m-3]
+  real(r8),pointer ::  CHYR(:,:)                          !precipitation  H concentration, [g m-3]
+  real(r8),pointer ::  CCAR(:,:)                          !precipitation  Ca concentration, [g m-3]
+  real(r8),pointer ::  CMGR(:,:)                          !precipitation  Mg concentration, [g m-3]
+  real(r8),pointer ::  CNAR(:,:)                          !precipitation  Na concentration, [g m-3]
+  real(r8),pointer ::  CKAR(:,:)                          !precipitation  K concentration, [g m-3]
+  real(r8),pointer ::  COHR(:,:)                          !precipitation  OH concentration, [g m-3]
+  real(r8),pointer ::  CSOR(:,:)                          !precipitation  SO4 concentration, [g m-3]
+  real(r8),pointer ::  CCLR(:,:)                          !precipitation  Cl concentration, [g m-3]
+  real(r8),pointer ::  CC3R(:,:)                          !precipitation  CO3 concentration, [g m-3]
+  real(r8),pointer ::  CHCR(:,:)                          !precipitation  HCO3 concentration, [g m-3]
+  real(r8),pointer ::  CCHR(:,:)                          !precipitation  CH4 concentration, [g m-3]
+  real(r8),pointer ::  CAL1R(:,:)                         !precipitation  AlOH concentration, [g m-3]
+  real(r8),pointer ::  CAL2R(:,:)                         !precipitation  AlOH2 concentration, [g m-3]
+  real(r8),pointer ::  CAL3R(:,:)                         !precipitation  AlOH3 concentration, [g m-3]
+  real(r8),pointer ::  CAL4R(:,:)                         !precipitation  AlOH4 concentration, [g m-3]
+  real(r8),pointer ::  CALSR(:,:)                         !precipitation  AlSO4 concentration, [g m-3]
+  real(r8),pointer ::  CFE1R(:,:)                         !precipitation  FeOH concentration, [g m-3]
+  real(r8),pointer ::  CFE2R(:,:)                         !precipitation  FeOH2 concentration, [g m-3]
+  real(r8),pointer ::  CFE3R(:,:)                         !precipitation  FeOH3 concentration, [g m-3]
+  real(r8),pointer ::  CFE4R(:,:)                         !precipitation  FeOH4 concentration, [g m-3]
+  real(r8),pointer ::  CFESR(:,:)                         !precipitation  FeSO4 concentration, [g m-3]
+  real(r8),pointer ::  CCAOR(:,:)                         !precipitation  CaOH concentration, [g m-3]
+  real(r8),pointer ::  CCACR(:,:)                         !precipitation  CaCO3 concentration, [g m-3]
+  real(r8),pointer ::  CCAHR(:,:)                         !precipitation  CaHCO3 concentration, [g m-3]
+  real(r8),pointer ::  CCASR(:,:)                         !precipitation  CaSO4 concentration, [g m-3]
+  real(r8),pointer ::  CMGOR(:,:)                         !precipitation  MgOH concentration, [g m-3]
+  real(r8),pointer ::  CMGCR(:,:)                         !precipitation  MgCO3 concentration, [g m-3]
+  real(r8),pointer ::  CMGHR(:,:)                         !precipitation  MgHCO3 concentration, [g m-3]
+  real(r8),pointer ::  CMGSR(:,:)                         !precipitation  MgSO4 concentration, [g m-3]
+  real(r8),pointer ::  CNACR(:,:)                         !precipitation  NaCO3 concentration, [g m-3]
+  real(r8),pointer ::  CNASR(:,:)                         !precipitation  NaSO4 concentration, [g m-3]
+  real(r8),pointer ::  CKASR(:,:)                         !precipitation  K concentration, [g m-3]
+  real(r8),pointer ::  CH0PR(:,:)                         !precipitation  PO4 concentration, [g m-3]
+  real(r8),pointer ::  CH1PR(:,:)                         !precipitation  HPO4 concentration, [g m-3]
+  real(r8),pointer ::  CH3PR(:,:)                         !precipitation  H3PO4 concentration, [g m-3]
+  real(r8),pointer ::  CF1PR(:,:)                         !precipitation  FeHPO4 concentration, [g m-3]
+  real(r8),pointer ::  CF2PR(:,:)                         !precipitation  FeH2PO4 concentration, [g m-3]
+  real(r8),pointer ::  CC0PR(:,:)                         !precipitation  CaPO4 concentration, [g m-3]
+  real(r8),pointer ::  CC1PR(:,:)                         !precipitation  CaHPO4 concentration, [g m-3]
+  real(r8),pointer ::  CC2PR(:,:)                         !precipitation  CaH2PO4 concentration, [g m-3]
+  real(r8),pointer ::  CM1PR(:,:)                         !precipitation  MgHPO4 concentration, [g m-3]
+  real(r8),pointer ::  CCOR(:,:)                          !precipitation  CO2 concentration, [g m-3]
+  real(r8),pointer ::  COXR(:,:)                          !precipitation  O2 concentration, [g m-3]
+  real(r8),pointer ::  CNNR(:,:)                          !precipitation  N2 concentration, [g m-3]
+  real(r8),pointer ::  CN2R(:,:)                          !precipitation  N2O concentration, [g m-3]
   contains
 !----------------------------------------------------------------------
 
   subroutine InitClimForcData
-
+  use TracerIDMod
   implicit none
   allocate(WDPTHD(366,JY,JX));  WDPTHD=0._r8
   allocate(TDTPX(JY,JX,12));    TDTPX=0._r8
@@ -210,21 +207,19 @@ implicit none
   allocate(PRECB(JY,JX));       PRECB=0._r8
   allocate(CO2EI(JY,JX));       CO2EI=0._r8
   allocate(CCO2EI(JY,JX));      CCO2EI=0._r8
+
+  allocate(AtmGgms(idg_beg:idg_end,JY,JX)); AtmGgms=0._r8
+  allocate(AtmGmms(idg_beg:idg_end,JY,JX)); AtmGmms=0._r8
+
   allocate(OXYE(JY,JX));        OXYE=0._r8
-  allocate(COXYE(JY,JX));       COXYE=0._r8
   allocate(Z2OE(JY,JX));        Z2OE=0._r8
-  allocate(CZ2OE(JY,JX));       CZ2OE=0._r8
   allocate(Z2GE(JY,JX));        Z2GE=0._r8
-  allocate(CZ2GE(JY,JX));       CZ2GE=0._r8
   allocate(ZNH3E(JY,JX));       ZNH3E=0._r8
-  allocate(CNH3E(JY,JX));       CNH3E=0._r8
   allocate(CH4E(JY,JX));        CH4E=0._r8
-  allocate(CCH4E(JY,JX));       CCH4E=0._r8
   allocate(H2GE(JY,JX));        H2GE=0._r8
-  allocate(CH2GE(JY,JX));       CH2GE=0._r8
-  allocate(ZNOON(JY,JX));       ZNOON=0._r8
   allocate(CO2E(JY,JX));        CO2E=0._r8
-  allocate(CCO2E(JY,JX));       CCO2E=0._r8
+
+  allocate(ZNOON(JY,JX));       ZNOON=0._r8
   allocate(RADS(JY,JX));        RADS=0._r8
   allocate(RADY(JY,JX));        RADY=0._r8
   allocate(RAPS(JY,JX));        RAPS=0._r8
@@ -342,21 +337,19 @@ implicit none
   call destroy(PRECB)
   call destroy(CO2EI)
   call destroy(CCO2EI)
+
+  call destroy(AtmGgms)
+  call destroy(AtmGmms)
+
   call destroy(OXYE)
-  call destroy(COXYE)
   call destroy(Z2OE)
-  call destroy(CZ2OE)
   call destroy(Z2GE)
-  call destroy(CZ2GE)
   call destroy(ZNH3E)
-  call destroy(CNH3E)
   call destroy(CH4E)
-  call destroy(CCH4E)
   call destroy(H2GE)
-  call destroy(CH2GE)
+
   call destroy(ZNOON)
   call destroy(CO2E)
-  call destroy(CCO2E)
   call destroy(RADS)
   call destroy(RADY)
   call destroy(RAPS)

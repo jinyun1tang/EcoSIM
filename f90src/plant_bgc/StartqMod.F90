@@ -5,6 +5,7 @@ module StartqMod
   use FlagDataType
   use EcoSIMConfig, only : jsken=>jskenc
   use EcosimConst
+  use TracerIDMod
   use EcoSIMCtrlDataType
   use minimathmod, only : AZMAX1
   use PlantDataRateType
@@ -752,7 +753,7 @@ module StartqMod
       RCODFA(N,L,NZ,NY,NX)=0._r8
       RCO2S(N,L,NZ,NY,NX)=0._r8
       RCO2P(N,L,NZ,NY,NX)=0._r8
-      COXYA=COXYE(NY,NX)
+      COXYA=AtmGgms(idg_O2,NY,NX)
       COXYP=0.032_r8*EXP(-6.175_r8-0.0211_r8*ATCA(NY,NX))*OXYE(NY,NX)
       OXYA(N,L,NZ,NY,NX)=COXYA*RTVLP(N,L,NZ,NY,NX)
       OXYP(N,L,NZ,NY,NX)=COXYP*RTVLW(N,L,NZ,NY,NX)

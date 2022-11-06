@@ -5,6 +5,7 @@ module InitSoluteMod
   use ChemTracerParsMod
   use SoluteParMod
   use TracerPropMod
+  use TracerIDMod
   use EcoSiMParDataMod, only : micpar
   implicit none
 
@@ -354,7 +355,7 @@ module InitSoluteMod
 !     INITIALIZE GASES
 !
 
-  CCO2X=CCO2M*gas_solubility(id_co2g,ATCA)/(EXP(ACO2X*CSTRZ))*FH2O
+  CCO2X=CCO2M*gas_solubility(idg_CO2,ATCA)/(EXP(ACO2X*CSTRZ))*FH2O
 !  CCO2X=CCO2M*SCO2X/(EXP(ACO2X*CSTRZ))*EXP(0.843-0.0281*ATCA)*FH2O
   CCO2Y=LOG(CCO2X)
   CCO2Z=ABS(CCO2Y)
@@ -367,10 +368,10 @@ module InitSoluteMod
     IF(R.LT.1.0E-03)exit
     CCO21=CCO21/SQRT(1.0_r8+R)
   ENDDO
-  CCH41=CCH4M*gas_solubility(id_ch4g,ATCA)/(EXP(ACH4X*CSTR1))*FH2O
-  COXY1=COXYM*gas_solubility(id_o2g,ATCA)/(EXP(AOXYX*CSTR1))*FH2O
-  CZ2G1=CZ2GM*gas_solubility(id_n2g,ATCA)/(EXP(AN2GX*CSTR1))*FH2O
-  CZ2O1=CZ2OM*gas_solubility(id_n2og,ATCA)/(EXP(AN2OX*CSTR1))*FH2O
+  CCH41=CCH4M*gas_solubility(idg_CH4,ATCA)/(EXP(ACH4X*CSTR1))*FH2O
+  COXY1=COXYM*gas_solubility(idg_O2,ATCA)/(EXP(AOXYX*CSTR1))*FH2O
+  CZ2G1=CZ2GM*gas_solubility(idg_N2,ATCA)/(EXP(AN2GX*CSTR1))*FH2O
+  CZ2O1=CZ2OM*gas_solubility(idg_N2O,ATCA)/(EXP(AN2OX*CSTR1))*FH2O
 !  CCH41=CCH4M*SCH4X/(EXP(ACH4X*CSTR1))*EXP(0.597-0.0199*ATCA)*FH2O
 !  COXY1=COXYM*SOXYX/(EXP(AOXYX*CSTR1))*EXP(0.516-0.0172*ATCA)*FH2O
 !  CZ2G1=CZ2GM*SN2GX/(EXP(AN2GX*CSTR1))*EXP(0.456-0.0152*ATCA)*FH2O

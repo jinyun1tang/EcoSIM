@@ -74,8 +74,8 @@ implicit none
     !     RECALCULATE SOIL LAYER THICKNESS
     !
     ICHKL=0
-    DO 245 L=NU(NY,NX),NL(NY,NX)-1
-      DO 230 NN=1,3
+    D245: DO L=NU(NY,NX),NL(NY,NX)-1
+      D230: DO NN=1,3
 
         call getTSlyrthicks(NN,L,NY,NX,ICHKL,NUX,CDPTHX,CDPTHY,IFLGL)
 
@@ -116,7 +116,7 @@ implicit none
 
                 call MoveDisolvGas(L0,L1,NY,NX,FX,FWO)
 
-                call MoveMMPoreSolute(L0,L1,NY,NX,FHO)
+                call MoveMacPoreSolute(L0,L1,NY,NX,FHO)
               ENDIF
 !     SOIL ORGANIC MATTER
               call MoveSOM(L0,L1,L,NY,NX,FO,IFLGL)
@@ -148,8 +148,8 @@ implicit none
             ENDIF
           ENDIF
         ENDIF
-230   CONTINUE
-245   CONTINUE
+      ENDDO D230
+    ENDDO D245
   ENDIF
 
   end subroutine RelayerSoilProfile
@@ -696,6 +696,7 @@ implicit none
   VHCP(L1,NY,NX)=VHCM(L1,NY,NX) &
     +cpw*(VOLW(L1,NY,NX)+VOLWH(L1,NY,NX)) &
     +cpi*(VOLI(L1,NY,NX)+VOLIH(L1,NY,NX))
+
   IF(VHCP(L1,NY,NX).GT.ZEROS(NY,NX))THEN
     TKS(L1,NY,NX)=ENGY1/VHCP(L1,NY,NX)
   ELSE
@@ -720,6 +721,7 @@ implicit none
   ZNO2B(L1,NY,NX)=ZNO2B(L1,NY,NX)+FX*ZNO2B(L0,NY,NX)
   H1PO4(L1,NY,NX)=H1PO4(L1,NY,NX)+FX*H1PO4(L0,NY,NX)
   H2PO4(L1,NY,NX)=H2PO4(L1,NY,NX)+FX*H2PO4(L0,NY,NX)
+
   IF(ISALTG.NE.0)THEN
     ZAL(L1,NY,NX)=ZAL(L1,NY,NX)+FX*ZAL(L0,NY,NX)
     ZFE(L1,NY,NX)=ZFE(L1,NY,NX)+FX*ZFE(L0,NY,NX)
@@ -766,6 +768,7 @@ implicit none
   IF(L0.NE.0)THEN
     H1POB(L1,NY,NX)=H1POB(L1,NY,NX)+FX*H1POB(L0,NY,NX)
     H2POB(L1,NY,NX)=H2POB(L1,NY,NX)+FX*H2POB(L0,NY,NX)
+
     IF(ISALTG.NE.0)THEN
       H0POB(L1,NY,NX)=H0POB(L1,NY,NX)+FX*H0POB(L0,NY,NX)
       H3POB(L1,NY,NX)=H3POB(L1,NY,NX)+FX*H3POB(L0,NY,NX)
@@ -1467,7 +1470,7 @@ implicit none
   end subroutine MoveSOM
 !------------------------------------------------------------------------------------------
 
-  subroutine MoveMMPoreSolute(L0,L1,NY,NX,FHO)
+  subroutine MoveMacPoreSolute(L0,L1,NY,NX,FHO)
 
   implicit none
   integer, intent(in) :: L0,L1,NY,NX
@@ -1697,7 +1700,7 @@ implicit none
     Z2OSH(L1,NY,NX)=Z2OSH(L1,NY,NX)+FXZ2OSH
     Z2OSH(L0,NY,NX)=Z2OSH(L0,NY,NX)-FXZ2OSH
   ENDIF
-  end subroutine MoveMMPoreSolute
+  end subroutine MoveMacPoreSolute
 
 !------------------------------------------------------------------------------------------
 

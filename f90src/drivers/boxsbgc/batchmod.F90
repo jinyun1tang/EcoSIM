@@ -473,8 +473,8 @@ contains
   fid_XN3FLG=addone(itemp)
   fid_XHGFLG=addone(itemp)
 
-  cid_CO2G=addone(itemp)
-  cid_CH4G=addone(itemp)
+  cidg_CO2=addone(itemp)
+  cidg_CH4=addone(itemp)
   cid_OXYG=addone(itemp)
   cid_Z2GG=addone(itemp)
   cid_Z2OG=addone(itemp)
@@ -575,8 +575,8 @@ contains
   ystatesfl(cid_ZNH3B)=ystatesfl(cid_ZNH3B)+ystatesfl(fid_XNBDFS)+ystatesfl(fid_XNBDFG)
   ystatesfl(cid_H2GS)=ystatesfl(cid_H2GS)+ystatesfl(fid_XHGDFS)+ystatesfl(fid_XHGDFG)
 
-  ystatesfl(cid_CO2G)=ystates0l(cid_CO2G)-ystatesfl(fid_XCODFG)+ystatesfl(fid_XHGDFG)
-  ystatesfl(cid_CH4G)=ystates0l(cid_CH4G)-ystatesfl(fid_XCHDFG)+ystatesfl(fid_XCHFLG)
+  ystatesfl(cidg_CO2)=ystates0l(cidg_CO2)-ystatesfl(fid_XCODFG)+ystatesfl(fid_XHGDFG)
+  ystatesfl(cidg_CH4)=ystates0l(cidg_CH4)-ystatesfl(fid_XCHDFG)+ystatesfl(fid_XCHFLG)
   ystatesfl(cid_OXYG)=ystates0l(cid_OXYG)-ystatesfl(fid_XOXDFG)+ystatesfl(fid_XOXFLG)
   ystatesfl(cid_Z2GG)=ystates0l(cid_Z2GG)-ystatesfl(fid_XNGDFG)+ystatesfl(fid_XNGFLG)
   ystatesfl(cid_Z2OG)=ystates0l(cid_Z2OG)-ystatesfl(fid_XN2DFG)+ystatesfl(fid_XN2FLG)
@@ -594,7 +594,7 @@ contains
   ystatesfl(cid_CZ2GS)=ystatesfl(cid_Z2GS)/micfor%VOLW
   ystatesfl(cid_CZ2GG)=ystatesfl(cid_Z2GG)/micfor%VOLP
   ystatesfl(cid_COXYG)=ystatesfl(cid_OXYG)/micfor%VOLP
-  ystatesfl(cid_CCH4G)=ystatesfl(cid_CH4G)/micfor%VOLP
+  ystatesfl(cid_CCH4G)=ystatesfl(cidg_CH4)/micfor%VOLP
 
 ! the following variables are updated in the microbial model
   ystatesfl(cid_oqc_b:cid_oqc_e)=micstt%OQC(1:jcplx)
@@ -798,11 +798,11 @@ contains
   varl(cid_ZNFNI)='ZNFNI';varlnml(cid_ZNFNI)='current nitrification inhibition activity'
   unitl(cid_ZNFNI)='none';vartypes(cid_ZNFNI)=var_state_type
 
-  varl(cid_CO2G)='CO2G';varlnml(cid_CO2G)='gaseous CO2 mass'
-  unitl(cid_CO2G)='gC d-2';vartypes(cid_CO2G)=var_state_type
+  varl(cidg_CO2)='CO2G';varlnml(cidg_CO2)='gaseous CO2 mass'
+  unitl(cidg_CO2)='gC d-2';vartypes(cidg_CO2)=var_state_type
 
-  varl(cid_CH4G)='CH4G';varlnml(cid_CH4G)='gaseous CH4 mass'
-  unitl(cid_CH4G)='gC d-2';vartypes(cid_CH4G)=var_state_type
+  varl(cidg_CH4)='CH4G';varlnml(cidg_CH4)='gaseous CH4 mass'
+  unitl(cidg_CH4)='gC d-2';vartypes(cidg_CH4)=var_state_type
 
   varl(cid_OXYG)='OXYG';varlnml(cid_OXYG)='gaseous oxygen mass'
   unitl(cid_OXYG)='gO d-2';vartypes(cid_OXYG)=var_state_type
@@ -1407,8 +1407,8 @@ contains
   if(VOLPM>ZEROS2)then
       !gaseous flux between atmosphere and soil
 
-    CO2G2=AZMAX1(ystates0l(cid_CO2G))
-    CH4G2=AZMAX1(ystates0l(cid_CH4G))
+    CO2G2=AZMAX1(ystates0l(cidg_CO2))
+    CH4G2=AZMAX1(ystates0l(cidg_CH4))
     OXYG2=AZMAX1(ystates0l(cid_OXYG))
     Z2GG2=AZMAX1(ystates0l(cid_Z2GG))
     Z2OG2=AZMAX1(ystates0l(cid_Z2OG))

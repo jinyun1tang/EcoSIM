@@ -1,7 +1,9 @@
 module PlantAPIData
   use data_kind_mod, only : r8 => SHR_KIND_R8
   use ElmIDMod
+  use abortutils, only : destroy
   use EcoSiMParDataMod, only : pltpar
+  use TracerIDMod
 implicit none
   save
   character(len=*),private, parameter :: mod_filename = __FILE__
@@ -414,12 +416,8 @@ implicit none
   real(r8), pointer :: OXYS(:)     => null()  !aqueous O2  micropore	[g d-2]
   real(r8), pointer :: OLSGL(:)    => null()  !aqueous CO2 diffusivity	[m2 h-1]
   real(r8), pointer :: POSGL(:)    => null()  !aqueous PO4 diffusivity, [m2 h-1]
-  real(r8), pointer :: SCO2L(:)    => null()  !solubility of CO2, [m3 m-3]
-  real(r8), pointer :: SOXYL(:)    => null()  !solubility of O2, [m3 m-3]
-  real(r8), pointer :: SCH4L(:)    => null()  !solubility of CH4, [m3 m-3]
-  real(r8), pointer :: SN2OL(:)    => null()  !solubility of N2O, [m3 m-3]
-  real(r8), pointer :: SNH3L(:)    => null()  !solubility of NH3, [m3 m-3]
-  real(r8), pointer :: SH2GL(:)    => null()  !solubility of H2, [m3 m-3]
+  real(r8), pointer :: GSolbility(:,:)=> null() !gas solubility, [m3 m-3]
+
   real(r8), pointer :: THETW(:)    => null()  !volumetric water content [m3 m-3]
   real(r8), pointer :: THETY(:)    => null()  !air-dry water content, [m3 m-3]
   real(r8), pointer :: VOLX(:)     => null()  !volume of soil layer	m3 d-2
@@ -1775,12 +1773,9 @@ implicit none
   allocate(this%VOLX(0:JZ1))
   allocate(this%THETW(0:JZ1))
   allocate(this%THETY(0:JZ1))
-  allocate(this%SCO2L(0:JZ1))
-  allocate(this%SOXYL(0:JZ1))
-  allocate(this%SCH4L(0:JZ1))
-  allocate(this%SN2OL(0:JZ1))
-  allocate(this%SNH3L(0:JZ1))
-  allocate(this%SH2GL(0:JZ1))
+
+  allocate(this%GSolbility(idg_beg:idg_end,0:JZ1))
+
   allocate(this%CGSGL(JZ1))
   allocate(this%CHSGL(JZ1))
   allocate(this%HGSGL(JZ1))
@@ -1812,11 +1807,8 @@ implicit none
 !  if(allocated(HGSGL))deallocate(HGSGL)
 !  if(allocated(OGSGL))deallocate(OGSGL)
 !  if(allocated(RSCS))deallocate(RSCS)
-!  if(allocated(SCO2L))deallocate(SCO2L)
-!  if(allocated(SCH4L))deallocate(SCH4L)
-!  if(allocated(SN2OL))deallocate(SN2OL)
-!  if(allocated(SNH3L))deallocate(SNH3L)
-!  if(allocated(SH2GL))deallocate(SH2GL)
+
+   call destroy(this%GSolbility)
 !  if(allocated(THETW))deallocate(THETW)
 !  if(allocated(THETY))deallocate(THETY)
 !  if(allocated(VOLX))deallocate(VOLX)

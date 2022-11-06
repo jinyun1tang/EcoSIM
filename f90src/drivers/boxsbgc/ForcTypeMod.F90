@@ -3,6 +3,7 @@ module ForcTypeMod
   use EcoSimConst
   use TracerPropMod
   use EcoSIMSolverPar
+  use TracerIDMod
   use ChemTracerParsMod
   use MiniFuncMod
   use minimathmod, only : AZMAX1
@@ -438,13 +439,13 @@ implicit none
   if(first .or. forctype ==0 .or. forctype==2)then
 
     TCS=TKS-TC2K
-    forc%SCH4L=gas_solubility(id_ch4g,TCS)
-    forc%SOXYL=gas_solubility(id_o2g, TCS)
-    forc%SCO2L=gas_solubility(id_co2g, TCS)     !solubility of CO2, [m3 m-3]
-    forc%SN2GL=gas_solubility(id_n2g, TCS)      !solubility of N2, [m3 m-3]
-    forc%SN2OL=gas_solubility(id_n2og, TCS)     !solubility of N2O, [m3 m-3]
-    forc%SNH3L=gas_solubility(id_nh3g, TCS)     !solubility of NH3, [m3 m-3]
-    forc%SH2GL=gas_solubility(id_h2g, TCS)       !solubility of H2, [m3 m-3]
+    forc%SCH4L=gas_solubility(idg_CH4,TCS)
+    forc%SOXYL=gas_solubility(idg_O2, TCS)
+    forc%SCO2L=gas_solubility(idg_CO2, TCS)     !solubility of CO2, [m3 m-3]
+    forc%SN2GL=gas_solubility(idg_N2, TCS)      !solubility of N2, [m3 m-3]
+    forc%SN2OL=gas_solubility(idg_N2O, TCS)     !solubility of N2O, [m3 m-3]
+    forc%SNH3L=gas_solubility(idg_NH3, TCS)     !solubility of NH3, [m3 m-3]
+    forc%SH2GL=gas_solubility(idg_H2, TCS)       !solubility of H2, [m3 m-3]
 
 
     forc%CCO2E=forc%CO2E*5.36E-04_r8*Tref/TKS    ![gC/m3]

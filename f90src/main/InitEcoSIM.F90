@@ -49,7 +49,9 @@ module InitEcoSIM
   use PlantMngmtDataType  , only : InitPlantMngmtData
   use InitSOMBGCMod       , only : InitSOMBGC
   use GridConsts
+  use EcoSIMCtrlMod
   use EcoSIMConfig        , only : jcplx1 => jcplx1c
+  use TracerIDMod         , only : InitTracerIDs
   implicit  none
   integer                 , intent(in) :: nmicbguilds   !number of microbial guilds per group
 
@@ -62,6 +64,8 @@ module InitEcoSIM
   call InitGrosub(jpstgs,JRS)
 
   call InitGridData
+
+  call InitTracerIDs(salt_model)
 
   call InitLandSurfData
 

@@ -6,6 +6,7 @@ module RootGasMod
   use EcoSIMSolverPar
   use UptakePars
   use PlantAPIData
+  use TracerIDMod
   implicit none
 
   private
@@ -119,7 +120,6 @@ module RootGasMod
     CO2G   =>  plt_soilchem%CO2G , &
     CO2S   =>  plt_soilchem%CO2S , &
     ZNH3S  =>  plt_soilchem%ZNH3S, &
-    SN2OL  =>  plt_soilchem%SN2OL, &
     H2GS   =>  plt_soilchem%H2GS , &
     CZ2OS  =>  plt_soilchem%CZ2OS, &
     CNH3G  =>  plt_soilchem%CNH3G, &
@@ -128,25 +128,21 @@ module RootGasMod
     CZ2OG  =>  plt_soilchem%CZ2OG, &
     VLNH4  =>  plt_soilchem%VLNH4, &
     HGSGL  =>  plt_soilchem%HGSGL, &
-    SCH4L  =>  plt_soilchem%SCH4L, &
     CCH4G  =>  plt_soilchem%CCH4G, &
     CLSGL  =>  plt_soilchem%CLSGL, &
     THETY  =>  plt_soilchem%THETY, &
     OLSGL  =>  plt_soilchem%OLSGL, &
-    SOXYL  =>  plt_soilchem%SOXYL, &
-    SNH3L  =>  plt_soilchem%SNH3L, &
-    SH2GL  =>  plt_soilchem%SH2GL, &
     VOLY   =>  plt_soilchem%VOLY , &
     ZNSGL  =>  plt_soilchem%ZNSGL, &
     Z2SGL  =>  plt_soilchem%Z2SGL, &
     ZHSGL  =>  plt_soilchem%ZHSGL, &
     ZVSGL  =>  plt_soilchem%ZVSGL, &
-    SCO2L  =>  plt_soilchem%SCO2L, &
     HLSGL  =>  plt_soilchem%HLSGL, &
     CQSGL  =>  plt_soilchem%CQSGL, &
     VLNHB  =>  plt_soilchem%VLNHB, &
     ZNH3B  =>  plt_soilchem%ZNH3B, &
     CGSGL  =>  plt_soilchem%CGSGL, &
+    GSolbility=> plt_soilchem%GSolbility,&
     CNH3B  =>  plt_soilchem%CNH3B, &
     CHSGL  =>  plt_soilchem%CHSGL, &
     OGSGL  =>  plt_soilchem%OGSGL, &
@@ -309,12 +305,14 @@ module RootGasMod
       .AND.RTLGP(N,L,NZ).GT.ZEROP(NZ))THEN
       RTARRX=RTARR(N,L)/RRADP(N,NZ)
       DIFOP=OLSGLP*RTARRX
-      VOLWCA=RTVLW(N,L,NZ)*SCO2L(L)
-      VOLWOA=RTVLW(N,L,NZ)*SOXYL(L)
-      VOLWC4=RTVLW(N,L,NZ)*SCH4L(L)
-      VOLWZA=RTVLW(N,L,NZ)*SN2OL(L)
-      VOLWNA=RTVLW(N,L,NZ)*SNH3L(L)
-      VOLWH2=RTVLW(N,L,NZ)*SH2GL(L)
+
+      VOLWCA=RTVLW(N,L,NZ)*GSolbility(idg_CO2,L)
+      VOLWOA=RTVLW(N,L,NZ)*GSolbility(idg_O2,L)
+      VOLWC4=RTVLW(N,L,NZ)*GSolbility(idg_CH4,L)
+      VOLWZA=RTVLW(N,L,NZ)*GSolbility(idg_N2O,L)
+      VOLWNA=RTVLW(N,L,NZ)*GSolbility(idg_NH3,L)
+      VOLWH2=RTVLW(N,L,NZ)*GSolbility(idg_H2,L)
+
       DFCOA=CGSGL1*RTCRA
       DFOXA=OGSGL1*RTCRA
       DFCHA=CHSGL1*RTCRA
@@ -387,13 +385,13 @@ module RootGasMod
         Z2OG1=CZ2OG(L)*VOLPMM
         ZH3G1=CNH3G(L)*VOLPMM
         H2GG1=CH2GG(L)*VOLPMM
-        VOLWCO=VOLWMM*SCO2L(L)
-        VOLWOX=VOLWMM*SOXYL(L)
-        VOLWCH=VOLWMM*SCH4L(L)
-        VOLWN2=VOLWMM*SN2OL(L)
-        VOLWNH=VOLWMM*SNH3L(L)*VLNH4(L)
-        VOLWNB=VOLWMM*SNH3L(L)*VLNHB(L)
-        VOLWHG=VOLWMM*SH2GL(L)
+        VOLWCO=VOLWMM*GSolbility(idg_CO2,L)
+        VOLWOX=VOLWMM*GSolbility(idg_O2,L)
+        VOLWCH=VOLWMM*GSolbility(idg_CH4,L)
+        VOLWN2=VOLWMM*GSolbility(idg_N2O,L)
+        VOLWNH=VOLWMM*GSolbility(idg_NH3,L)*VLNH4(L)
+        VOLWNB=VOLWMM*GSolbility(idg_NH3,L)*VLNHB(L)
+        VOLWHG=VOLWMM*GSolbility(idg_H2,L)
         VOLPNH=VOLPMM*VLNH4(L)
         VOLPNB=VOLPMM*VLNHB(L)
 !
@@ -413,7 +411,7 @@ module RootGasMod
         DO 90 MX=1,NPT
           OXYS1=OXYS1+ROXYLX
           CCO2S1=AZMAX1(CO2S1/VOLWMM)
-          COXYS1=AMIN1(COXYE*SOXYL(L),AZMAX1(OXYS1/VOLWMO))
+          COXYS1=AMIN1(COXYE*GSolbility(idg_O2,L),AZMAX1(OXYS1/VOLWMO))
           CCH4S1=AZMAX1(CH4S1/VOLWMM)
           CN2OS1=AZMAX1(Z2OS1/VOLWMM)
           CNH3S1=AZMAX1(ZH3S1/VOLWMM)
@@ -435,7 +433,7 @@ module RootGasMod
             CH2GA1=0.0_r8
           ENDIF
           CCO2P1=AZMAX1(CO2P1/RTVLW(N,L,NZ))
-          COXYP1=AMIN1(COXYE*SOXYL(L),AZMAX1(OXYP1/RTVLW(N,L,NZ)))
+          COXYP1=AMIN1(COXYE*GSolbility(idg_O2,L),AZMAX1(OXYP1/RTVLW(N,L,NZ)))
           CCH4P1=AZMAX1(CH4P1/RTVLW(N,L,NZ))
           CN2OP1=AZMAX1(Z2OP1/RTVLW(N,L,NZ))
           CNH3P1=AZMAX1(ZH3P1/RTVLW(N,L,NZ))

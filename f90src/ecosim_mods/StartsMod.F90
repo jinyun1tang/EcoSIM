@@ -7,6 +7,7 @@ module StartsMod
   use abortutils, only : padr, print_info,check_bool
   use minimathMod, only : test_aeqb, test_aneb, AZMAX1,AZMIN1
   use EcosimConst
+  use TracerIDMod
   use MicrobialDataType
   use EcoSIMSolverPar
   use SOMDataType
@@ -113,13 +114,13 @@ module StartsMod
 !     ATKA=mean annual air temperature (K)
 !
       CCO2EI(NY,NX)=CO2EI(NY,NX)*5.36E-04_r8*Tref/ATKA(NY,NX)
-      CCO2E(NY,NX)=CO2E(NY,NX)*5.36E-04_r8*Tref/ATKA(NY,NX)
-      CCH4E(NY,NX)=CH4E(NY,NX)*5.36E-04_r8*Tref/ATKA(NY,NX)
-      COXYE(NY,NX)=OXYE(NY,NX)*1.43E-03_r8*Tref/ATKA(NY,NX)
-      CZ2GE(NY,NX)=Z2GE(NY,NX)*1.25E-03_r8*Tref/ATKA(NY,NX)
-      CZ2OE(NY,NX)=Z2OE(NY,NX)*1.25E-03_r8*Tref/ATKA(NY,NX)
-      CNH3E(NY,NX)=ZNH3E(NY,NX)*6.25E-04_r8*Tref/ATKA(NY,NX)
-      CH2GE(NY,NX)=H2GE(NY,NX)*8.92E-05_r8*Tref/ATKA(NY,NX)
+      AtmGgms(idg_CO2,NY,NX)=CO2E(NY,NX)*5.36E-04_r8*Tref/ATKA(NY,NX)
+      AtmGgms(idg_CH4,NY,NX)=CH4E(NY,NX)*5.36E-04_r8*Tref/ATKA(NY,NX)
+      AtmGgms(idg_O2,NY,NX)=OXYE(NY,NX)*1.43E-03_r8*Tref/ATKA(NY,NX)
+      AtmGgms(idg_N2,NY,NX)=Z2GE(NY,NX)*1.25E-03_r8*Tref/ATKA(NY,NX)
+      AtmGgms(idg_N2O,NY,NX)=Z2OE(NY,NX)*1.25E-03_r8*Tref/ATKA(NY,NX)
+      AtmGgms(idg_NH3,NY,NX)=ZNH3E(NY,NX)*6.25E-04_r8*Tref/ATKA(NY,NX)
+      AtmGgms(idg_H2,NY,NX)=H2GE(NY,NX)*8.92E-05_r8*Tref/ATKA(NY,NX)
 !
 !     MICROBIAL THERMAL ADAPTATION
 !

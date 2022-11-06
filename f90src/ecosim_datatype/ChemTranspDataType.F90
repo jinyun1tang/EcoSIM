@@ -3,125 +3,122 @@ module ChemTranspDataType
   use data_kind_mod, only : r8 => SHR_KIND_R8
   use GridConsts
   use EcoSIMConfig, only : jcplx => jcplxc
+  use TracerIDMod
   implicit none
 
   save
   character(len=*), private, parameter :: mod_filename = __FILE__
-  real(r8),allocatable ::  TFND(:,:,:)                        !temperature effect on diffusivity
-  real(r8),allocatable ::  DISP(:,:,:,:)                      !aqueous dispersivity
-  real(r8),allocatable ::  CGSGL(:,:,:)                       !gaseous CO2 diffusivity	[m2 h-1]
-  real(r8),allocatable ::  CLSGL(:,:,:)                       !aqueous CO2 diffusivity	[m2 h-1]
-  real(r8),allocatable ::  OGSGL(:,:,:)                       !gaseous O2 diffusivity	m2 h-1
-  real(r8),allocatable ::  OLSGL(:,:,:)                       !aqueous CO2 diffusivity	m2 h-1
-  real(r8),allocatable ::  ZGSGL(:,:,:)                       !gaseous N2 diffusivity	m2 h-1
-  real(r8),allocatable ::  CHSGL(:,:,:)                       !gaseous CH4 diffusivity	m2 h-1
-  real(r8),allocatable ::  CQSGL(:,:,:)                       !aqueous CH4 diffusivity	m2 h-1
-  real(r8),allocatable ::  ZLSGL(:,:,:)                       !aqueous N2 diffusivity, [m2 h-1]
-  real(r8),allocatable ::  ZHSGL(:,:,:)                       !aqueous NH4 diffusivity, [m2 h-1]
-  real(r8),allocatable ::  ZNSGL(:,:,:)                       !aqueous NH3 diffusivity, [m2 h-1]
-  real(r8),allocatable ::  ZOSGL(:,:,:)                       !aqueous NO3 diffusivity, [m2 h-1]
-  real(r8),allocatable ::  POSGL(:,:,:)                       !aqueous PO4 diffusivity, [m2 h-1]
-  real(r8),allocatable ::  OCSGL(:,:,:)                       !aqueous DOC diffusivity, [m2 h-1]
-  real(r8),allocatable ::  ONSGL(:,:,:)                       !aqueous DON diffusivity, [m2 h-1]
-  real(r8),allocatable ::  OPSGL(:,:,:)                       !aqueous DOP diffusivity, [m2 h-1]
-  real(r8),allocatable ::  OASGL(:,:,:)                       !aqueous acetate diffusivity, [m2 h-1]
-  real(r8),allocatable ::  Z2SGL(:,:,:)                       !gaseous N2O diffusivity, [m2 h-1]
-  real(r8),allocatable ::  ZVSGL(:,:,:)                       !aqueous N2O diffusivity, [m2 h-1]
-  real(r8),allocatable ::  WGSGL(:,:,:)                       !water vapor diffusivity, [m2 h-1]
-  real(r8),allocatable ::  WGSGW(:,:,:)                       !water vapor diffusivity, [m2 h-1]
-  real(r8),allocatable ::  WGSGR(:,:)                         !water vapor diffusivity, [m2 h-1]
-  real(r8),allocatable ::  WGSGA(:,:)                         !water vapor diffusivity, [m2 h-1]
-  real(r8),allocatable ::  SCO2L(:,:,:)                       !solubility of CO2, [m3 m-3]
-  real(r8),allocatable ::  SOXYL(:,:,:)                       !solubility of O2, [m3 m-3]
-  real(r8),allocatable ::  SCH4L(:,:,:)                       !solubility of CH4, [m3 m-3]
-  real(r8),allocatable ::  SN2OL(:,:,:)                       !solubility of N2O, [m3 m-3]
-  real(r8),allocatable ::  SN2GL(:,:,:)                       !solubility of N2, [m3 m-3]
-  real(r8),allocatable ::  SNH3L(:,:,:)                       !solubility of NH3, [m3 m-3]
-  real(r8),allocatable ::  SH2GL(:,:,:)                       !solubility of H2, [m3 m-3]
-  real(r8),allocatable ::  HGSGL(:,:,:)                       !gaseous H2 diffusivity, [m2 h-1]
-  real(r8),allocatable ::  HLSGL(:,:,:)                       !aqueous H2 diffusivity, [m2 h-1]
-  real(r8),allocatable ::  XCODFG(:,:,:)                      !soil CO2 dissolution (+ve) - volatilization (-ve) , [g d-2 h-1]
-  real(r8),allocatable ::  XCHDFG(:,:,:)                      !soil CH4 dissolution (+ve) - volatilization (-ve) , [g d-2 h-1]
-  real(r8),allocatable ::  XOXDFG(:,:,:)                      !soil O2 dissolution (+ve) - volatilization (-ve) , [g d-2 h-1]
-  real(r8),allocatable ::  XNGDFG(:,:,:)                      !soil N2 dissolution (+ve) - volatilization (-ve) , [g d-2 h-1]
-  real(r8),allocatable ::  XN2DFG(:,:,:)                      !soil N2O dissolution (+ve) - volatilization (-ve) , [g d-2 h-1]
-  real(r8),allocatable ::  XN3DFG(:,:,:)                      !soil NH3 dissolution (+ve) - volatilization (-ve) non-band, [g d-2 h-1]
-  real(r8),allocatable ::  XNBDFG(:,:,:)                      !soil NH3 dissolution (+ve) - volatilization (-ve) band, [g d-2 h-1]
-  real(r8),allocatable ::  XHGDFG(:,:,:)                      !soil H2 dissolution (+ve) - volatilization (-ve) , [g d-2 h-1]
-  real(r8),allocatable ::  RCO2F(:,:,:)                       !net gaseous CO2 flux, [g d-2 h-1]
-  real(r8),allocatable ::  RCH4L(:,:,:)                       !net aqueous CH4 flux, [g d-2 h-1]
-  real(r8),allocatable ::  ROXYF(:,:,:)                       !net gaseous O2 flux, [g d-2 h-1]
-  real(r8),allocatable ::  ROXYL(:,:,:)                       !net aqueous O2 flux, [g d-2 h-1]
-  real(r8),allocatable ::  RCH4F(:,:,:)                       !net gaseous CH4 flux, [g d-2 h-1]
-  real(r8),allocatable ::  ALSGL(:,:,:)                       !aqueous Al diffusivity, [m2 h-1]
-  real(r8),allocatable ::  FESGL(:,:,:)                       !aqueous Fe diffusivity, [m2 h-1]
-  real(r8),allocatable ::  HYSGL(:,:,:)                       !aqueous H diffusivity, [m2 h-1]
-  real(r8),allocatable ::  CASGL(:,:,:)                       !aqueous Ca diffusivity, [m2 h-1]
-  real(r8),allocatable ::  GMSGL(:,:,:)                       !aqueous Mg diffusivity, [m2 h-1]
-  real(r8),allocatable ::  ANSGL(:,:,:)                       !aqueous Na diffusivity, [m2 h-1]
-  real(r8),allocatable ::  AKSGL(:,:,:)                       !aqueous K diffusivity, [m2 h-1]
-  real(r8),allocatable ::  OHSGL(:,:,:)                       !aqueous OH diffusivity, [m2 h-1]
-  real(r8),allocatable ::  C3SGL(:,:,:)                       !aqueous CO3 diffusivity, [m2 h-1]
-  real(r8),allocatable ::  HCSGL(:,:,:)                       !aqueous HCO3 diffusivity, [m2 h-1]
-  real(r8),allocatable ::  SOSGL(:,:,:)                       !aqueous SO4 diffusivity, [m2 h-1]
-  real(r8),allocatable ::  CLSXL(:,:,:)                       !aqueous Cl diffusivity, [m2 h-1]
-  real(r8),allocatable ::  XQRAL(:,:,:,:)                     !total Al in runoff, [mol d-2 h-1]
-  real(r8),allocatable ::  XQRFE(:,:,:,:)                     !total Fe in runoff, [mol d-2 h-1]
-  real(r8),allocatable ::  XQRHY(:,:,:,:)                     !total H in runoff, [mol d-2 h-1]
-  real(r8),allocatable ::  XQRCA(:,:,:,:)                     !total Ca in runoff, [mol d-2 h-1]
-  real(r8),allocatable ::  XQRMG(:,:,:,:)                     !total Mg in runoff, [mol d-2 h-1]
-  real(r8),allocatable ::  XQRNA(:,:,:,:)                     !total Na in runoff, [mol d-2 h-1]
-  real(r8),allocatable ::  XQRKA(:,:,:,:)                     !total K in runoff, [mol d-2 h-1]
-  real(r8),allocatable ::  XQROH(:,:,:,:)                     !total OH in runoff, [mol d-2 h-1]
-  real(r8),allocatable ::  XQRSO(:,:,:,:)                     !total SO4 in runoff, [mol d-2 h-1]
-  real(r8),allocatable ::  XQRCL(:,:,:,:)                     !total Cl in runoff, [mol d-2 h-1]
-  real(r8),allocatable ::  XQRC3(:,:,:,:)                     !total CO3 in runoff, [mol d-2 h-1]
-  real(r8),allocatable ::  XQRHC(:,:,:,:)                     !total HCO3 in runoff, [mol d-2 h-1]
-  real(r8),allocatable ::  XQRAL1(:,:,:,:)                    !total AlOH in runoff, [mol d-2 h-1]
-  real(r8),allocatable ::  XQRAL2(:,:,:,:)                    !total AlOH2 in runoff, [mol d-2 h-1]
-  real(r8),allocatable ::  XQRAL3(:,:,:,:)                    !total AlOH3 in runoff, [mol d-2 h-1]
-  real(r8),allocatable ::  XQRAL4(:,:,:,:)                    !total AlOH4 in runoff, [mol d-2 h-1]
-  real(r8),allocatable ::  XQRALS(:,:,:,:)                    !total AlSO4 in runoff, [mol d-2 h-1]
-  real(r8),allocatable ::  XQRFE1(:,:,:,:)                    !total FeOH in runoff, [mol d-2 h-1]
-  real(r8),allocatable ::  XQRFE2(:,:,:,:)                    !total FeOH2 in runoff, [mol d-2 h-1]
-  real(r8),allocatable ::  XQRFE3(:,:,:,:)                    !total FeOH3 in runoff, [mol d-2 h-1]
-  real(r8),allocatable ::  XQRFE4(:,:,:,:)                    !total FeOH4 in runoff, [mol d-2 h-1]
-  real(r8),allocatable ::  XQRFES(:,:,:,:)                    !total FeSO4 in runoff, [mol d-2 h-1]
-  real(r8),allocatable ::  XQRCAO(:,:,:,:)                    !total CaOH in runoff, [mol d-2 h-1]
-  real(r8),allocatable ::  XQRCAC(:,:,:,:)                    !total CaCO3 in runoff, [mol d-2 h-1]
-  real(r8),allocatable ::  XQRCAH(:,:,:,:)                    !total CaHCO3 in runoff, [mol d-2 h-1]
-  real(r8),allocatable ::  XQRCAS(:,:,:,:)                    !total CaSO4 in runoff, [mol d-2 h-1]
-  real(r8),allocatable ::  XQRMGO(:,:,:,:)                    !total MgOH in runoff, [mol d-2 h-1]
-  real(r8),allocatable ::  XQRMGC(:,:,:,:)                    !total MgCO3 in runoff, [mol d-2 h-1]
-  real(r8),allocatable ::  XQRMGH(:,:,:,:)                    !total MgHCO3 in runoff, [mol d-2 h-1]
-  real(r8),allocatable ::  XQRMGS(:,:,:,:)                    !total MgSO4 in runoff, [mol d-2 h-1]
-  real(r8),allocatable ::  XQRNAC(:,:,:,:)                    !total NaCO3 in runoff, [mol d-2 h-1]
-  real(r8),allocatable ::  XQRNAS(:,:,:,:)                    !total NaSO4 in runoff, [mol d-2 h-1]
-  real(r8),allocatable ::  XQRKAS(:,:,:,:)                    !total KSO4 in runoff, [mol d-2 h-1]
-  real(r8),allocatable ::  XQRH0P(:,:,:,:)                    !total PO4 in runoff non-band, [mol d-2 h-1]
-  real(r8),allocatable ::  XQRH3P(:,:,:,:)                    !total H3PO4 in runoff non-band, [mol d-2 h-1]
-  real(r8),allocatable ::  XQRF1P(:,:,:,:)                    !total FeHPO4 in runoff non-band, [mol d-2 h-1]
-  real(r8),allocatable ::  XQRF2P(:,:,:,:)                    !total FeH2PO4 in runoff non-band, [mol d-2 h-1]
-  real(r8),allocatable ::  XQRC0P(:,:,:,:)                    !total CaPO4 in runoff non-band, [mol d-2 h-1]
-  real(r8),allocatable ::  XQRC1P(:,:,:,:)                    !total CaHPO4 in runoff non-band, [mol d-2 h-1]
-  real(r8),allocatable ::  XQRC2P(:,:,:,:)                    !total CaH2PO4 in runoff non-band, [mol d-2 h-1]
-  real(r8),allocatable ::  XQRM1P(:,:,:,:)                    !total MgHPO4 in runoff non-band, [mol d-2 h-1]
-  real(r8),allocatable ::  XCOQRS(:,:,:,:)                    !surface runoff CO2 flux, [g d-2 h-1]
-  real(r8),allocatable ::  XCHQRS(:,:,:,:)                    !surface brunoff CH4 flux, [g d-2 h-1]
-  real(r8),allocatable ::  XOXQRS(:,:,:,:)                    !surface runoff O2 flux, [g d-2 h-1]
-  real(r8),allocatable ::  XNGQRS(:,:,:,:)                    !surface runoff N2 flux, [g d-2 h-1]
-  real(r8),allocatable ::  XN2QRS(:,:,:,:)                    !surface runoff N2O flux, [g d-2 h-1]
-  real(r8),allocatable ::  XHGQRS(:,:,:,:)                    !surface runoff H2 flux, [g d-2 h-1]
-  real(r8),allocatable ::  XN4QRW(:,:,:,:)                    !surface runoff NH4 flux non-band, [g d-2 h-1]
-  real(r8),allocatable ::  XN3QRW(:,:,:,:)                    !surface runoff NH3 flux non-band, [g d-2 h-1]
-  real(r8),allocatable ::  XNOQRW(:,:,:,:)                    !surface runoff NO3 flux non-band, [g d-2 h-1]
-  real(r8),allocatable ::  XNXQRS(:,:,:,:)                    !surface runoff NO2 flux, [g d-2 h-1]
-  real(r8),allocatable ::  XP4QRW(:,:,:,:)                    !surface runoff PO4 flux, [g d-2 h-1]
-  real(r8),allocatable ::  XP1QRW(:,:,:,:)                    !surface runoff HPO4 flux, [g d-2 h-1]
-  real(r8),allocatable ::  XOCQRS(:,:,:,:,:)                  !surface runoff DOC flux, [g d-2 h-1]
-  real(r8),allocatable ::  XONQRS(:,:,:,:,:)                  !surface runoff DON flux, [g d-2 h-1]
-  real(r8),allocatable ::  XOPQRS(:,:,:,:,:)                  !surface runoff DOP flux, [g d-2 h-1]
-  real(r8),allocatable ::  XOAQRS(:,:,:,:,:)                  !surface runoff acetate flux, [g d-2 h-1]
+  real(r8),pointer ::  TFND(:,:,:)                        !temperature effect on diffusivity
+  real(r8),pointer ::  DISP(:,:,:,:)                      !aqueous dispersivity
+  real(r8),pointer ::  CGSGL(:,:,:)                       !gaseous CO2 diffusivity	[m2 h-1]
+  real(r8),pointer ::  CLSGL(:,:,:)                       !aqueous CO2 diffusivity	[m2 h-1]
+  real(r8),pointer ::  OGSGL(:,:,:)                       !gaseous O2 diffusivity	m2 h-1
+  real(r8),pointer ::  OLSGL(:,:,:)                       !aqueous CO2 diffusivity	m2 h-1
+  real(r8),pointer ::  ZGSGL(:,:,:)                       !gaseous N2 diffusivity	m2 h-1
+  real(r8),pointer ::  CHSGL(:,:,:)                       !gaseous CH4 diffusivity	m2 h-1
+  real(r8),pointer ::  CQSGL(:,:,:)                       !aqueous CH4 diffusivity	m2 h-1
+  real(r8),pointer ::  ZLSGL(:,:,:)                       !aqueous N2 diffusivity, [m2 h-1]
+  real(r8),pointer ::  ZHSGL(:,:,:)                       !aqueous NH4 diffusivity, [m2 h-1]
+  real(r8),pointer ::  ZNSGL(:,:,:)                       !aqueous NH3 diffusivity, [m2 h-1]
+  real(r8),pointer ::  ZOSGL(:,:,:)                       !aqueous NO3 diffusivity, [m2 h-1]
+  real(r8),pointer ::  POSGL(:,:,:)                       !aqueous PO4 diffusivity, [m2 h-1]
+  real(r8),pointer ::  OCSGL(:,:,:)                       !aqueous DOC diffusivity, [m2 h-1]
+  real(r8),pointer ::  ONSGL(:,:,:)                       !aqueous DON diffusivity, [m2 h-1]
+  real(r8),pointer ::  OPSGL(:,:,:)                       !aqueous DOP diffusivity, [m2 h-1]
+  real(r8),pointer ::  OASGL(:,:,:)                       !aqueous acetate diffusivity, [m2 h-1]
+  real(r8),pointer ::  Z2SGL(:,:,:)                       !gaseous N2O diffusivity, [m2 h-1]
+  real(r8),pointer ::  ZVSGL(:,:,:)                       !aqueous N2O diffusivity, [m2 h-1]
+  real(r8),pointer ::  WGSGL(:,:,:)                       !water vapor diffusivity, [m2 h-1]
+  real(r8),pointer ::  WGSGW(:,:,:)                       !water vapor diffusivity, [m2 h-1]
+  real(r8),pointer ::  WGSGR(:,:)                         !water vapor diffusivity, [m2 h-1]
+  real(r8),pointer ::  WGSGA(:,:)                         !water vapor diffusivity, [m2 h-1]
+
+  real(r8),pointer ::  GSolbility(:,:,:,:)                !solubility of gases
+
+  real(r8),pointer ::  HGSGL(:,:,:)                       !gaseous H2 diffusivity, [m2 h-1]
+  real(r8),pointer ::  HLSGL(:,:,:)                       !aqueous H2 diffusivity, [m2 h-1]
+  real(r8),pointer ::  XCODFG(:,:,:)                      !soil CO2 dissolution (+ve) - volatilization (-ve) , [g d-2 h-1]
+  real(r8),pointer ::  XCHDFG(:,:,:)                      !soil CH4 dissolution (+ve) - volatilization (-ve) , [g d-2 h-1]
+  real(r8),pointer ::  XOXDFG(:,:,:)                      !soil O2 dissolution (+ve) - volatilization (-ve) , [g d-2 h-1]
+  real(r8),pointer ::  XNGDFG(:,:,:)                      !soil N2 dissolution (+ve) - volatilization (-ve) , [g d-2 h-1]
+  real(r8),pointer ::  XN2DFG(:,:,:)                      !soil N2O dissolution (+ve) - volatilization (-ve) , [g d-2 h-1]
+  real(r8),pointer ::  XN3DFG(:,:,:)                      !soil NH3 dissolution (+ve) - volatilization (-ve) non-band, [g d-2 h-1]
+  real(r8),pointer ::  XNBDFG(:,:,:)                      !soil NH3 dissolution (+ve) - volatilization (-ve) band, [g d-2 h-1]
+  real(r8),pointer ::  XHGDFG(:,:,:)                      !soil H2 dissolution (+ve) - volatilization (-ve) , [g d-2 h-1]
+  real(r8),pointer ::  RCO2F(:,:,:)                       !net gaseous CO2 flux, [g d-2 h-1]
+  real(r8),pointer ::  RCH4L(:,:,:)                       !net aqueous CH4 flux, [g d-2 h-1]
+  real(r8),pointer ::  ROXYF(:,:,:)                       !net gaseous O2 flux, [g d-2 h-1]
+  real(r8),pointer ::  ROXYL(:,:,:)                       !net aqueous O2 flux, [g d-2 h-1]
+  real(r8),pointer ::  RCH4F(:,:,:)                       !net gaseous CH4 flux, [g d-2 h-1]
+  real(r8),pointer ::  ALSGL(:,:,:)                       !aqueous Al diffusivity, [m2 h-1]
+  real(r8),pointer ::  FESGL(:,:,:)                       !aqueous Fe diffusivity, [m2 h-1]
+  real(r8),pointer ::  HYSGL(:,:,:)                       !aqueous H diffusivity, [m2 h-1]
+  real(r8),pointer ::  CASGL(:,:,:)                       !aqueous Ca diffusivity, [m2 h-1]
+  real(r8),pointer ::  GMSGL(:,:,:)                       !aqueous Mg diffusivity, [m2 h-1]
+  real(r8),pointer ::  ANSGL(:,:,:)                       !aqueous Na diffusivity, [m2 h-1]
+  real(r8),pointer ::  AKSGL(:,:,:)                       !aqueous K diffusivity, [m2 h-1]
+  real(r8),pointer ::  OHSGL(:,:,:)                       !aqueous OH diffusivity, [m2 h-1]
+  real(r8),pointer ::  C3SGL(:,:,:)                       !aqueous CO3 diffusivity, [m2 h-1]
+  real(r8),pointer ::  HCSGL(:,:,:)                       !aqueous HCO3 diffusivity, [m2 h-1]
+  real(r8),pointer ::  SOSGL(:,:,:)                       !aqueous SO4 diffusivity, [m2 h-1]
+  real(r8),pointer ::  CLSXL(:,:,:)                       !aqueous Cl diffusivity, [m2 h-1]
+  real(r8),pointer ::  XQRAL(:,:,:,:)                     !total Al in runoff, [mol d-2 h-1]
+  real(r8),pointer ::  XQRFE(:,:,:,:)                     !total Fe in runoff, [mol d-2 h-1]
+  real(r8),pointer ::  XQRHY(:,:,:,:)                     !total H in runoff, [mol d-2 h-1]
+  real(r8),pointer ::  XQRCA(:,:,:,:)                     !total Ca in runoff, [mol d-2 h-1]
+  real(r8),pointer ::  XQRMG(:,:,:,:)                     !total Mg in runoff, [mol d-2 h-1]
+  real(r8),pointer ::  XQRNA(:,:,:,:)                     !total Na in runoff, [mol d-2 h-1]
+  real(r8),pointer ::  XQRKA(:,:,:,:)                     !total K in runoff, [mol d-2 h-1]
+  real(r8),pointer ::  XQROH(:,:,:,:)                     !total OH in runoff, [mol d-2 h-1]
+  real(r8),pointer ::  XQRSO(:,:,:,:)                     !total SO4 in runoff, [mol d-2 h-1]
+  real(r8),pointer ::  XQRCL(:,:,:,:)                     !total Cl in runoff, [mol d-2 h-1]
+  real(r8),pointer ::  XQRC3(:,:,:,:)                     !total CO3 in runoff, [mol d-2 h-1]
+  real(r8),pointer ::  XQRHC(:,:,:,:)                     !total HCO3 in runoff, [mol d-2 h-1]
+  real(r8),pointer ::  XQRAL1(:,:,:,:)                    !total AlOH in runoff, [mol d-2 h-1]
+  real(r8),pointer ::  XQRAL2(:,:,:,:)                    !total AlOH2 in runoff, [mol d-2 h-1]
+  real(r8),pointer ::  XQRAL3(:,:,:,:)                    !total AlOH3 in runoff, [mol d-2 h-1]
+  real(r8),pointer ::  XQRAL4(:,:,:,:)                    !total AlOH4 in runoff, [mol d-2 h-1]
+  real(r8),pointer ::  XQRALS(:,:,:,:)                    !total AlSO4 in runoff, [mol d-2 h-1]
+  real(r8),pointer ::  XQRFE1(:,:,:,:)                    !total FeOH in runoff, [mol d-2 h-1]
+  real(r8),pointer ::  XQRFE2(:,:,:,:)                    !total FeOH2 in runoff, [mol d-2 h-1]
+  real(r8),pointer ::  XQRFE3(:,:,:,:)                    !total FeOH3 in runoff, [mol d-2 h-1]
+  real(r8),pointer ::  XQRFE4(:,:,:,:)                    !total FeOH4 in runoff, [mol d-2 h-1]
+  real(r8),pointer ::  XQRFES(:,:,:,:)                    !total FeSO4 in runoff, [mol d-2 h-1]
+  real(r8),pointer ::  XQRCAO(:,:,:,:)                    !total CaOH in runoff, [mol d-2 h-1]
+  real(r8),pointer ::  XQRCAC(:,:,:,:)                    !total CaCO3 in runoff, [mol d-2 h-1]
+  real(r8),pointer ::  XQRCAH(:,:,:,:)                    !total CaHCO3 in runoff, [mol d-2 h-1]
+  real(r8),pointer ::  XQRCAS(:,:,:,:)                    !total CaSO4 in runoff, [mol d-2 h-1]
+  real(r8),pointer ::  XQRMGO(:,:,:,:)                    !total MgOH in runoff, [mol d-2 h-1]
+  real(r8),pointer ::  XQRMGC(:,:,:,:)                    !total MgCO3 in runoff, [mol d-2 h-1]
+  real(r8),pointer ::  XQRMGH(:,:,:,:)                    !total MgHCO3 in runoff, [mol d-2 h-1]
+  real(r8),pointer ::  XQRMGS(:,:,:,:)                    !total MgSO4 in runoff, [mol d-2 h-1]
+  real(r8),pointer ::  XQRNAC(:,:,:,:)                    !total NaCO3 in runoff, [mol d-2 h-1]
+  real(r8),pointer ::  XQRNAS(:,:,:,:)                    !total NaSO4 in runoff, [mol d-2 h-1]
+  real(r8),pointer ::  XQRKAS(:,:,:,:)                    !total KSO4 in runoff, [mol d-2 h-1]
+  real(r8),pointer ::  XQRH0P(:,:,:,:)                    !total PO4 in runoff non-band, [mol d-2 h-1]
+  real(r8),pointer ::  XQRH3P(:,:,:,:)                    !total H3PO4 in runoff non-band, [mol d-2 h-1]
+  real(r8),pointer ::  XQRF1P(:,:,:,:)                    !total FeHPO4 in runoff non-band, [mol d-2 h-1]
+  real(r8),pointer ::  XQRF2P(:,:,:,:)                    !total FeH2PO4 in runoff non-band, [mol d-2 h-1]
+  real(r8),pointer ::  XQRC0P(:,:,:,:)                    !total CaPO4 in runoff non-band, [mol d-2 h-1]
+  real(r8),pointer ::  XQRC1P(:,:,:,:)                    !total CaHPO4 in runoff non-band, [mol d-2 h-1]
+  real(r8),pointer ::  XQRC2P(:,:,:,:)                    !total CaH2PO4 in runoff non-band, [mol d-2 h-1]
+  real(r8),pointer ::  XQRM1P(:,:,:,:)                    !total MgHPO4 in runoff non-band, [mol d-2 h-1]
+  real(r8),pointer ::  XCOQRS(:,:,:,:)                    !surface runoff CO2 flux, [g d-2 h-1]
+  real(r8),pointer ::  XCHQRS(:,:,:,:)                    !surface brunoff CH4 flux, [g d-2 h-1]
+  real(r8),pointer ::  XOXQRS(:,:,:,:)                    !surface runoff O2 flux, [g d-2 h-1]
+  real(r8),pointer ::  XNGQRS(:,:,:,:)                    !surface runoff N2 flux, [g d-2 h-1]
+  real(r8),pointer ::  XN2QRS(:,:,:,:)                    !surface runoff N2O flux, [g d-2 h-1]
+  real(r8),pointer ::  XHGQRS(:,:,:,:)                    !surface runoff H2 flux, [g d-2 h-1]
+  real(r8),pointer ::  XN4QRW(:,:,:,:)                    !surface runoff NH4 flux non-band, [g d-2 h-1]
+  real(r8),pointer ::  XN3QRW(:,:,:,:)                    !surface runoff NH3 flux non-band, [g d-2 h-1]
+  real(r8),pointer ::  XNOQRW(:,:,:,:)                    !surface runoff NO3 flux non-band, [g d-2 h-1]
+  real(r8),pointer ::  XNXQRS(:,:,:,:)                    !surface runoff NO2 flux, [g d-2 h-1]
+  real(r8),pointer ::  XP4QRW(:,:,:,:)                    !surface runoff PO4 flux, [g d-2 h-1]
+  real(r8),pointer ::  XP1QRW(:,:,:,:)                    !surface runoff HPO4 flux, [g d-2 h-1]
+  real(r8),pointer ::  XOCQRS(:,:,:,:,:)                  !surface runoff DOC flux, [g d-2 h-1]
+  real(r8),pointer ::  XONQRS(:,:,:,:,:)                  !surface runoff DON flux, [g d-2 h-1]
+  real(r8),pointer ::  XOPQRS(:,:,:,:,:)                  !surface runoff DOP flux, [g d-2 h-1]
+  real(r8),pointer ::  XOAQRS(:,:,:,:,:)                  !surface runoff acetate flux, [g d-2 h-1]
 
   private :: InitAllocate
 
@@ -163,13 +160,9 @@ module ChemTranspDataType
   allocate(WGSGW(JS,JY,JX));    WGSGW=0._r8
   allocate(WGSGR(JY,JX));       WGSGR=0._r8
   allocate(WGSGA(JY,JX));       WGSGA=0._r8
-  allocate(SCO2L(0:JZ,JY,JX));  SCO2L=0._r8
-  allocate(SOXYL(0:JZ,JY,JX));  SOXYL=0._r8
-  allocate(SCH4L(0:JZ,JY,JX));  SCH4L=0._r8
-  allocate(SN2OL(0:JZ,JY,JX));  SN2OL=0._r8
-  allocate(SN2GL(0:JZ,JY,JX));  SN2GL=0._r8
-  allocate(SNH3L(0:JZ,JY,JX));  SNH3L=0._r8
-  allocate(SH2GL(0:JZ,JY,JX));  SH2GL=0._r8
+
+  allocate(GSolbility(idg_beg:idg_end,0:JZ,JY,JX)); GSolbility=0._r8
+
   allocate(HGSGL(JZ,JY,JX));    HGSGL=0._r8
   allocate(HLSGL(0:JZ,JY,JX));  HLSGL=0._r8
   allocate(XCODFG(0:JZ,JY,JX)); XCODFG=0._r8
@@ -287,13 +280,9 @@ module ChemTranspDataType
   call destroy(WGSGW)
   call destroy(WGSGR)
   call destroy(WGSGA)
-  call destroy(SCO2L)
-  call destroy(SOXYL)
-  call destroy(SCH4L)
-  call destroy(SN2OL)
-  call destroy(SN2GL)
-  call destroy(SNH3L)
-  call destroy(SH2GL)
+
+  call destroy(GSolbility)
+
   call destroy(HGSGL)
   call destroy(HLSGL)
   call destroy(XCODFG)

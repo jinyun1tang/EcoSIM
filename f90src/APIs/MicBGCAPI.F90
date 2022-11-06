@@ -8,6 +8,7 @@ module MicBGCAPI
   use MicStateTraitTypeMod, only : micsttype
   use MicForcTypeMod, only : micforctype
   use minimathmod, only : AZMAX1
+  use TracerIDMod
   use SoilBGCDataType
   USE PlantDataRateType
   USE SoilWaterDataType
@@ -174,8 +175,8 @@ implicit none
   k_POM    = micpar%k_POM
 
   micfor%ZERO  =ZERO
-  micfor%CCH4E =CCH4E(NY,NX)
-  micfor%COXYE =COXYE(NY,NX)
+  micfor%CCH4E =AtmGgms(idg_CH4,NY,NX)
+  micfor%COXYE =AtmGgms(idg_O2,NY,NX)
   micfor%COXQ  =COXQ(NY,NX)
   micfor%COXR  =COXR(NY,NX)
   micfor%FLQRI =FLQRI(NY,NX)
@@ -293,14 +294,14 @@ implicit none
   micstt%Z2OS=Z2OS(L,NY,NX)
   micstt%COXYS=COXYS(L,NY,NX)
   micstt%OXYS=OXYS(L,NY,NX)
-  micstt%SOXYL=SOXYL(L,NY,NX)
+  micstt%SOXYL=GSolbility(idg_O2,L,NY,NX)
   micstt%COXYG=COXYG(L,NY,NX)
   micstt%CZ2GS=CZ2GS(L,NY,NX)
   micstt%CH2GS=CH2GS(L,NY,NX)
   micstt%H2GS=H2GS(L,NY,NX)
   micstt%CCH4G=CCH4G(L,NY,NX)
   micstt%CH4S=CH4S(L,NY,NX)
-  micstt%SCH4L=SCH4L(L,NY,NX)
+  micstt%SCH4L=GSolbility(idg_CH4,L,NY,NX)
   micstt%ZNFN0=ZNFN0(L,NY,NX)
   micstt%ZNFNI=ZNFNI(L,NY,NX)
   micstt%FOSRH(1:jcplx)=FOSRH(1:jcplx,L,NY,NX)

@@ -3,6 +3,7 @@ module StarteMod
   use minimathmod, only : test_aeqb
   use SOMDataType
   use TracerPropMod
+  use TracerIDMod
   use ChemTranspDataType
   use GridConsts
   use FlagDataType
@@ -52,10 +53,10 @@ module StarteMod
   DO   NX=NHW,NHE
     DO  NY=NVN,NVS
       solutevar%CCO2M=CCO2EI(NY,NX)/12.0_r8
-      solutevar%CCH4M=CCH4E(NY,NX)/12.0_r8
-      solutevar%COXYM=COXYE(NY,NX)/32.0_r8
-      solutevar%CZ2GM=CZ2GE(NY,NX)/14.0_r8
-      solutevar%CZ2OM=CZ2OE(NY,NX)/14.0_r8
+      solutevar%CCH4M=AtmGgms(idg_CH4,NY,NX)/12.0_r8
+      solutevar%COXYM=AtmGgms(idg_O2,NY,NX)/32.0_r8
+      solutevar%CZ2GM=AtmGgms(idg_N2,NY,NX)/14.0_r8
+      solutevar%CZ2OM=AtmGgms(idg_N2O,NY,NX)/14.0_r8
       solutevar%ATCA  = ATCA(NY,NX)
       solutevar%ZEROS = ZEROS(NY,NX)
 
@@ -348,27 +349,27 @@ module StarteMod
 !     INITIAL STATE VARIABLES FOR GAS IN SOIL
 !
     CO2G(L,NY,NX)=CCO2EI(NY,NX)*VOLP(L,NY,NX)
-    CH4G(L,NY,NX)=CCH4E(NY,NX)*VOLP(L,NY,NX)
-    OXYG(L,NY,NX)=COXYE(NY,NX)*VOLP(L,NY,NX)
-    Z2GG(L,NY,NX)=CZ2GE(NY,NX)*VOLP(L,NY,NX)
-    Z2OG(L,NY,NX)=CZ2OE(NY,NX)*VOLP(L,NY,NX)
-    ZNH3G(L,NY,NX)=CNH3E(NY,NX)*VOLP(L,NY,NX)
-    H2GG(L,NY,NX)=CH2GE(NY,NX)*VOLP(L,NY,NX)
+    CH4G(L,NY,NX)=AtmGgms(idg_CH4,NY,NX)*VOLP(L,NY,NX)
+    OXYG(L,NY,NX)=AtmGgms(idg_O2,NY,NX)*VOLP(L,NY,NX)
+    Z2GG(L,NY,NX)=AtmGgms(idg_N2,NY,NX)*VOLP(L,NY,NX)
+    Z2OG(L,NY,NX)=AtmGgms(idg_N2O,NY,NX)*VOLP(L,NY,NX)
+    ZNH3G(L,NY,NX)=AtmGgms(idg_NH3,NY,NX)*VOLP(L,NY,NX)
+    H2GG(L,NY,NX)=AtmGgms(idg_H2,NY,NX)*VOLP(L,NY,NX)
     IF(CDPTH(L-1,NY,NX).LT.DTBLZ(NY,NX))THEN
-      OXYS(L,NY,NX)=COXYE(NY,NX)*gas_solubility(id_o2g, ATCA(NY,NX)) &
+      OXYS(L,NY,NX)=AtmGgms(idg_O2,NY,NX)*gas_solubility(idg_O2, ATCA(NY,NX)) &
         /(EXP(AOXYX*solutevar%CSTR1))*solutevar%FH2O*VOLW(L,NY,NX)
     ELSE
       OXYS(L,NY,NX)=0._r8
     ENDIF
-    CO2S(L,NY,NX)=CCO2EI(NY,NX)*gas_solubility(id_co2g, ATCA(NY,NX)) &
+    CO2S(L,NY,NX)=CCO2EI(NY,NX)*gas_solubility(idg_CO2, ATCA(NY,NX)) &
       /(EXP(ACO2X*solutevar%CSTR1))*solutevar%FH2O*VOLW(L,NY,NX)
-    CH4S(L,NY,NX)=CCH4E(NY,NX)*gas_solubility(id_ch4g, ATCA(NY,NX)) &
+    CH4S(L,NY,NX)=AtmGgms(idg_CH4,NY,NX)*gas_solubility(idg_CH4, ATCA(NY,NX)) &
       /(EXP(ACH4X*solutevar%CSTR1))*solutevar%FH2O*VOLW(L,NY,NX)
-    Z2GS(L,NY,NX)=CZ2GE(NY,NX)*gas_solubility(id_n2g, ATCA(NY,NX)) &
+    Z2GS(L,NY,NX)=AtmGgms(idg_N2,NY,NX)*gas_solubility(idg_N2, ATCA(NY,NX)) &
       /(EXP(AN2GX*solutevar%CSTR1))*solutevar%FH2O*VOLW(L,NY,NX)
-    Z2OS(L,NY,NX)=CZ2OE(NY,NX)*gas_solubility(id_n2og, ATCA(NY,NX)) &
+    Z2OS(L,NY,NX)=AtmGgms(idg_N2O,NY,NX)*gas_solubility(idg_N2O, ATCA(NY,NX)) &
       /(EXP(AN2OX*solutevar%CSTR1))*solutevar%FH2O*VOLW(L,NY,NX)
-    H2GS(L,NY,NX)=CH2GE(NY,NX)*gas_solubility(id_h2g, ATCA(NY,NX)) &
+    H2GS(L,NY,NX)=AtmGgms(idg_H2,NY,NX)*gas_solubility(idg_H2, ATCA(NY,NX)) &
       /(EXP(AH2GX*solutevar%CSTR1))*solutevar%FH2O*VOLW(L,NY,NX)
 !
 !     INITIAL STATE VARIABLES FOR MINERAL N AND P IN SOIL

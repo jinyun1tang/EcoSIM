@@ -23,6 +23,7 @@ implicit none
   real(r8),allocatable ::  Z2GS(:,:,:)                       !aqueous N2 micropore, [g d-2]
   real(r8),allocatable ::  Z2OG(:,:,:)                       !gaseous N2O, [g d-2]
   real(r8),allocatable ::  Z2OS(:,:,:)                       !aqueous N2O micropore, [g d-2]
+
   real(r8),allocatable ::  ZNH4SH(:,:,:)                     !NH4 non-band macropore, [g d-2]
   real(r8),allocatable ::  ZNH3SH(:,:,:)                     !NH3 non-band macropore, [g d-2]
   real(r8),allocatable ::  ZNO3SH(:,:,:)                     !NO3 non-band macropore, [g d-2]
@@ -35,10 +36,12 @@ implicit none
   real(r8),allocatable ::  Z2GSH(:,:,:)                      !aqueous N2 macropore, [g d-2]
   real(r8),allocatable ::  Z2OSH(:,:,:)                      !aqueous N2O macropore, [g d-2]
   real(r8),allocatable ::  ZNO2BH(:,:,:)                     !NO2 band macropore, [g d-2]
+
   real(r8),allocatable ::  ZNO2B(:,:,:)                      !NO2  band micropore, [g d-2]
   real(r8),allocatable ::  ZNH4S(:,:,:)                      !NH4 non-band micropore, [g d-2]
   real(r8),allocatable ::  ZNH3S(:,:,:)                      !NH3 non-band micropore, [g d-2]
   real(r8),allocatable ::  ZNO3S(:,:,:)                      !NO3 non-band micropore, [g d-2]
+
   real(r8),allocatable ::  ZNFNI(:,:,:)                      !current nitrification inhibition activity
   real(r8),allocatable ::  ZNFN0(:,:,:)                      !initial nitrification inhibition activity
   real(r8),allocatable ::  ZNHUI(:,:,:)                      !current inhibition activity

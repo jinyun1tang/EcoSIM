@@ -44,13 +44,13 @@ implicit none
 
   DO L =0,NL(NY,NX)
 
-    call PhasePartition(VOLP(L,NY,NX),VOLW(L,NY,NX),SCO2L(L,NY,NX),CCO2S(L,NY,NX),CCO2G(L,NY,NX))
-    call PhasePartition(VOLP(L,NY,NX),VOLW(L,NY,NX),SCH4L(L,NY,NX),CCH4S(L,NY,NX),CCH4G(L,NY,NX))
-    call PhasePartition(VOLP(L,NY,NX),VOLW(L,NY,NX),SOXYL(L,NY,NX),COXYS(L,NY,NX),COXYG(L,NY,NX))
-    call PhasePartition(VOLP(L,NY,NX),VOLW(L,NY,NX),SN2GL(L,NY,NX),CZ2GS(L,NY,NX),CZ2GG(L,NY,NX))
-    call PhasePartition(VOLP(L,NY,NX),VOLW(L,NY,NX),SN2OL(L,NY,NX),CZ2OS(L,NY,NX),CZ2OG(L,NY,NX))
-    call PhasePartition(VOLP(L,NY,NX),VOLW(L,NY,NX),SNH3L(L,NY,NX),CNH3S(L,NY,NX),CNH3G(L,NY,NX))
-    call PhasePartition(VOLP(L,NY,NX),VOLW(L,NY,NX),SH2GL(L,NY,NX),CH2GS(L,NY,NX),CH2GG(L,NY,NX))
+    call PhasePartition(VOLP(L,NY,NX),VOLW(L,NY,NX),GSolbility(idg_CO2,L,NY,NX),CCO2S(L,NY,NX),CCO2G(L,NY,NX))
+    call PhasePartition(VOLP(L,NY,NX),VOLW(L,NY,NX),GSolbility(idg_CH4,L,NY,NX),CCH4S(L,NY,NX),CCH4G(L,NY,NX))
+    call PhasePartition(VOLP(L,NY,NX),VOLW(L,NY,NX),GSolbility(idg_O2,L,NY,NX),COXYS(L,NY,NX),COXYG(L,NY,NX))
+    call PhasePartition(VOLP(L,NY,NX),VOLW(L,NY,NX),GSolbility(idg_N2,L,NY,NX),CZ2GS(L,NY,NX),CZ2GG(L,NY,NX))
+    call PhasePartition(VOLP(L,NY,NX),VOLW(L,NY,NX),GSolbility(idg_N2O,L,NY,NX),CZ2OS(L,NY,NX),CZ2OG(L,NY,NX))
+    call PhasePartition(VOLP(L,NY,NX),VOLW(L,NY,NX),GSolbility(idg_NH3,L,NY,NX),CNH3S(L,NY,NX),CNH3G(L,NY,NX))
+    call PhasePartition(VOLP(L,NY,NX),VOLW(L,NY,NX),GSolbility(idg_H2,L,NY,NX),CH2GS(L,NY,NX),CH2GG(L,NY,NX))
 
   ENDDO
 

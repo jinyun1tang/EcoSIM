@@ -4,6 +4,7 @@ module StartqsMod
   use minimathmod, only : AZMAX1
   use EcoSIMConfig
   use PlantAPIData
+  use TracerIDMod
   use EcoSiMParDataMod, only : pltpar
   implicit none
 
