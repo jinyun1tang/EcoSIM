@@ -373,7 +373,6 @@ implicit none
   real(r8), pointer :: THETPM(:,:) => null()  !soil air-filled porosity, [m3 m-3]
   real(r8), pointer :: DFGS(:,:)   => null()  !coefficient for dissolution - volatilization, []
   real(r8), pointer :: RSCS(:)     => null()  !soil hydraulic resistance, [MPa h m-2]
-  real(r8), pointer :: ZHSGL(:)    => null()  !aqueous NH4 diffusivity, [m2 h-1]
   real(r8), pointer :: BKDS(:)     => null()  !soil bulk density, [Mg m-3]
   real(r8), pointer :: CH2P4(:)    => null()  !aqueous PO4 concentration non-band	[gP m-3]
   real(r8), pointer :: CH1P4B(:)   => null()  !aqueous H1PO4 concentration band [gP m-3]
@@ -383,7 +382,7 @@ implicit none
   real(r8), pointer :: CNO3B(:)    => null()  !NO3 concentration band micropore	[gN m-3]
   real(r8), pointer :: CNH4S(:)    => null()  !NH4 concentration non-band micropore	[gN m-3]
   real(r8), pointer :: CNH4B(:)    => null()  !NH4 concentration band micropore	[gN m-3]
-  real(r8), pointer :: CO2G(:)     => null()  !gaseous CO2	[g d-2]
+
   real(r8), pointer :: CO2S(:)     => null()  !aqueous CO2  micropore	[gC d-2]
   real(r8), pointer :: CH4S(:)     => null()  !aqueous CH4  micropore	[gC d-2]
   real(r8), pointer :: CCH4S(:)    => null()  !aqueous CH4 concentration micropore	[gC m-3]
@@ -401,18 +400,17 @@ implicit none
   real(r8), pointer :: CORGC(:)    => null()  !soil organic C content [gC kg soil-1]
   real(r8), pointer :: CPO4S(:)    => null()  !PO4 concentration non-band micropore	[g m-3]
   real(r8), pointer :: CNDU(:)     => null()  !soil micropore hydraulic conductivity for root water uptake [m MPa-1 h-1]
-  real(r8), pointer :: CGSGL(:)    => null()  !gaseous CO2 diffusivity	[m2 h-1]
-  real(r8), pointer :: CHSGL(:)    => null()  !gaseous CH4 diffusivity	[m2 h-1]
-  real(r8), pointer :: HGSGL(:)    => null()  !gaseous H2 diffusivity  [m2 h-1]
-  real(r8), pointer :: OGSGL(:)    => null()  !gaseous O2 diffusivity	[m2 h-1]
-  real(r8), pointer :: Z2SGL(:)    => null()  !gaseous N2O diffusivity, [m2 h-1]
+
+  real(r8), pointer :: GasDifc(:,:)=> null()  !gaseous diffusivity [m2 h-1]
+
   real(r8), pointer :: ZOSGL(:)    => null()  !aqueous NO3 diffusivity, [m2 h-1]
   real(r8), pointer :: H1PO4(:)    => null()  !soil aqueous HPO4 content micropore non-band, [gP d-2]
   real(r8), pointer :: H2PO4(:)    => null()  !PO4 non-band micropore, [gP d-2]
   real(r8), pointer :: H1POB(:)    => null()  !soil aqueous HPO4 content micropore band, [gP d-2]
   real(r8), pointer :: H2POB(:)    => null()  !PO4 band micropore, [gP d-2]
   real(r8), pointer :: H2GS(:)     => null()  !aqueous H2 	[g d-2]
-  real(r8), pointer :: OXYG(:)     => null()  !gaseous O2 	[g d-2]
+  real(r8), pointer :: trc_gasml(:,:)=> null()!gas layer mass [g d-2]
+
   real(r8), pointer :: OXYS(:)     => null()  !aqueous O2  micropore	[g d-2]
   real(r8), pointer :: OLSGL(:)    => null()  !aqueous CO2 diffusivity	[m2 h-1]
   real(r8), pointer :: POSGL(:)    => null()  !aqueous PO4 diffusivity, [m2 h-1]
@@ -1741,7 +1739,8 @@ implicit none
   allocate(this%H2POB(0:JZ1))
   allocate(this%H2GS(0:JZ1))
   allocate(this%HLSGL(0:JZ1))
-  allocate(this%OXYG(0:JZ1))
+  allocate(this%trc_gasml(idg_beg:idg_end,0:JZ1))
+
   allocate(this%OXYS(0:JZ1))
   allocate(this%OLSGL(0:JZ1))
   allocate(this%POSGL(0:JZ1))
@@ -1750,8 +1749,7 @@ implicit none
   allocate(this%CNH3G(0:JZ1))
   allocate(this%CH2GG(0:JZ1))
   allocate(this%CORGC(0:JZ1))
-  allocate(this%Z2SGL(JZ1))
-  allocate(this%ZHSGL(JZ1))
+
   allocate(this%CH2P4(0:JZ1))
   allocate(this%CH1P4B(0:JZ1))
   allocate(this%CH2P4B(0:JZ1))
@@ -1760,7 +1758,7 @@ implicit none
   allocate(this%CNO3B(0:JZ1))
   allocate(this%CNH4S(0:JZ1))
   allocate(this%CNH4B(0:JZ1))
-  allocate(this%CO2G(0:JZ1))
+
   allocate(this%CO2S(0:JZ1))
   allocate(this%CH4S(0:JZ1))
   allocate(this%CCH4S(0:JZ1))
@@ -1775,11 +1773,8 @@ implicit none
   allocate(this%THETY(0:JZ1))
 
   allocate(this%GSolbility(idg_beg:idg_end,0:JZ1))
+  allocate(this%GasDifc(idg_beg:idg_end,0:JZ1))
 
-  allocate(this%CGSGL(JZ1))
-  allocate(this%CHSGL(JZ1))
-  allocate(this%HGSGL(JZ1))
-  allocate(this%OGSGL(JZ1))
   allocate(this%RSCS(JZ1))
   allocate(this%BKDS(0:JZ1))
   allocate(this%CNDU(JZ1))
@@ -1823,7 +1818,7 @@ implicit none
 !  if(allocated(H2POB))deallocate(H2POB)
 !  if(allocated(H2GS))deallocate(H2GS)
 !  if(allocated(HLSGL))deallocate(HLSGL)
-!  if(allocated(OXYG))deallocate(OXYG)
+
 !  if(allocated(OXYS))deallocate(OXYS)
 !  if(allocated(OLSGL))deallocate(OLSGL)
 !  if(allocated(POSGL))deallocate(POSGL)

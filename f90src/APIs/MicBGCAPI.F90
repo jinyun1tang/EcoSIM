@@ -331,7 +331,7 @@ implicit none
   micstt%OMPff(1:nlbiomcp,1:NMICBSA)=OMPff(1:nlbiomcp,1:NMICBSA,L,NY,NX)
   if(.not.micfor%litrm)then
     micfor%AEC=AEC(L,NY,NX)
-    micstt%OXYG=OXYG(L,NY,NX)
+    micstt%OXYG=trc_gasml(idg_O2,L,NY,NX)
   endif
   micflx%RVMXC=RVMXC(L,NY,NX)
   micflx%RVMBC=RVMBC(L,NY,NX)

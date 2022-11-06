@@ -592,18 +592,18 @@ module TillageMixMod
         TPCPDB=TPCPDB+TI*PCPDB(L,NY,NX)
         TPCPHB=TPCPHB+TI*PCPHB(L,NY,NX)
         TPCPMB=TPCPMB+TI*PCPMB(L,NY,NX)
-        TCO2G=TCO2G+TI*CO2G(L,NY,NX)
-        TCH4G=TCH4G+TI*CH4G(L,NY,NX)
+        TCO2G=TCO2G+TI*trc_gasml(idg_CO2,L,NY,NX)
+        TCH4G=TCH4G+TI*trc_gasml(idg_CH4,L,NY,NX)
         TCOZS=TCOZS+TI*CO2S(L,NY,NX)
         TCHFS=TCHFS+TI*CH4S(L,NY,NX)
-        TOXYG=TOXYG+TI*OXYG(L,NY,NX)
+        TOXYG=TOXYG+TI*trc_gasml(idg_O2,L,NY,NX)
         TOXYS=TOXYS+TI*OXYS(L,NY,NX)
-        TZ2GG=TZ2GG+TI*Z2GG(L,NY,NX)
+        TZ2GG=TZ2GG+TI*trc_gasml(idg_N2,L,NY,NX)
         TZ2GS=TZ2GS+TI*Z2GS(L,NY,NX)
-        TZ2OG=TZ2OG+TI*Z2OG(L,NY,NX)
+        TZ2OG=TZ2OG+TI*trc_gasml(idg_N2O,L,NY,NX)
         TZ2OS=TZ2OS+TI*Z2OS(L,NY,NX)
-        TZNH3G=TZNH3G+TI*ZNH3G(L,NY,NX)
-        TH2GG=TH2GG+TI*H2GG(L,NY,NX)
+        TZNH3G=TZNH3G+TI*trc_gasml(idg_NH3,L,NY,NX)
+        TH2GG=TH2GG+TI*trc_gasml(idg_H2,L,NY,NX)
         TH2GS=TH2GS+TI*H2GS(L,NY,NX)
         DO  K=1,jcplx
           DO  N=1,NFGs
@@ -884,30 +884,30 @@ module TillageMixMod
           -TI*PCPHB(L,NY,NX))+TX*PCPHB(L,NY,NX)
         PCPMB(L,NY,NX)=TI*PCPMB(L,NY,NX)+CORP*(FI*TPCPMB &
           -TI*PCPMB(L,NY,NX))+TX*PCPMB(L,NY,NX)
-        CO2G(L,NY,NX)=TI*CO2G(L,NY,NX)+CORP*(FI*TCO2G-TI*CO2G(L,NY,NX)) &
-          +TX*CO2G(L,NY,NX)
-        CH4G(L,NY,NX)=TI*CH4G(L,NY,NX)+CORP*(FI*TCH4G-TI*CH4G(L,NY,NX)) &
-            +TX*CH4G(L,NY,NX)
+        trc_gasml(idg_CO2,L,NY,NX)=TI*trc_gasml(idg_CO2,L,NY,NX)+CORP*(FI*TCO2G-TI*trc_gasml(idg_CO2,L,NY,NX)) &
+          +TX*trc_gasml(idg_CO2,L,NY,NX)
+        trc_gasml(idg_CH4,L,NY,NX)=TI*trc_gasml(idg_CH4,L,NY,NX)+CORP*(FI*TCH4G-TI*trc_gasml(idg_CH4,L,NY,NX)) &
+            +TX*trc_gasml(idg_CH4,L,NY,NX)
         CO2S(L,NY,NX)=TI*CO2S(L,NY,NX)+CORP*(FI*TCOZS-TI*CO2S(L,NY,NX)) &
           +TX*CO2S(L,NY,NX)+CORP*CO2SH(L,NY,NX)
         CH4S(L,NY,NX)=TI*CH4S(L,NY,NX)+CORP*(FI*TCHFS-TI*CH4S(L,NY,NX)) &
           +TX*CH4S(L,NY,NX)+CORP*CH4SH(L,NY,NX)
-        OXYG(L,NY,NX)=TI*OXYG(L,NY,NX)+CORP*(FI*TOXYG-TI*OXYG(L,NY,NX)) &
-          +TX*OXYG(L,NY,NX)
+        trc_gasml(idg_O2,L,NY,NX)=TI*trc_gasml(idg_O2,L,NY,NX)+CORP*(FI*TOXYG-TI*trc_gasml(idg_O2,L,NY,NX)) &
+          +TX*trc_gasml(idg_O2,L,NY,NX)
         OXYS(L,NY,NX)=TI*OXYS(L,NY,NX)+CORP*(FI*TOXYS-TI*OXYS(L,NY,NX)) &
           +TX*OXYS(L,NY,NX)+CORP*OXYSH(L,NY,NX)
-        Z2GG(L,NY,NX)=TI*Z2GG(L,NY,NX)+CORP*(FI*TZ2GG-TI*Z2GG(L,NY,NX)) &
-          +TX*Z2GG(L,NY,NX)
+        trc_gasml(idg_N2,L,NY,NX)=TI*trc_gasml(idg_N2,L,NY,NX)+CORP*(FI*TZ2GG-TI*trc_gasml(idg_N2,L,NY,NX)) &
+          +TX*trc_gasml(idg_N2,L,NY,NX)
         Z2GS(L,NY,NX)=TI*Z2GS(L,NY,NX)+CORP*(FI*TZ2GS-TI*Z2GS(L,NY,NX)) &
           +TX*Z2GS(L,NY,NX)+CORP*Z2GSH(L,NY,NX)
-        Z2OG(L,NY,NX)=TI*Z2OG(L,NY,NX)+CORP*(FI*TZ2OG-TI*Z2OG(L,NY,NX)) &
-          +TX*Z2OG(L,NY,NX)
+        trc_gasml(idg_N2O,L,NY,NX)=TI*trc_gasml(idg_N2O,L,NY,NX)+CORP*(FI*TZ2OG-TI*trc_gasml(idg_N2O,L,NY,NX)) &
+          +TX*trc_gasml(idg_N2O,L,NY,NX)
         Z2OS(L,NY,NX)=TI*Z2OS(L,NY,NX)+CORP*(FI*TZ2OS-TI*Z2OS(L,NY,NX)) &
           +TX*Z2OS(L,NY,NX)+CORP*Z2OSH(L,NY,NX)
-        ZNH3G(L,NY,NX)=TI*ZNH3G(L,NY,NX)+CORP*(FI*TZNH3G &
-          -TI*ZNH3G(L,NY,NX))+TX*ZNH3G(L,NY,NX)
-        H2GG(L,NY,NX)=TI*H2GG(L,NY,NX)+CORP*(FI*TH2GG-TI*H2GG(L,NY,NX)) &
-          +TX*H2GG(L,NY,NX)
+        trc_gasml(idg_NH3,L,NY,NX)=TI*trc_gasml(idg_NH3,L,NY,NX)+CORP*(FI*TZNH3G &
+          -TI*trc_gasml(idg_NH3,L,NY,NX))+TX*trc_gasml(idg_NH3,L,NY,NX)
+        trc_gasml(idg_H2,L,NY,NX)=TI*trc_gasml(idg_H2,L,NY,NX)+CORP*(FI*TH2GG-TI*trc_gasml(idg_H2,L,NY,NX)) &
+          +TX*trc_gasml(idg_H2,L,NY,NX)
         H2GS(L,NY,NX)=TI*H2GS(L,NY,NX)+CORP*(FI*TH2GS-TI*H2GS(L,NY,NX)) &
           +TX*H2GS(L,NY,NX)+CORP*H2GSH(L,NY,NX)
         ZNH4SH(L,NY,NX)=XCORP(NY,NX)*ZNH4SH(L,NY,NX)

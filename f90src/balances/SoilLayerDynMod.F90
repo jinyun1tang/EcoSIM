@@ -815,13 +815,13 @@ implicit none
     PCPDB(L1,NY,NX)=PCPDB(L1,NY,NX)+FX*PCPDB(L0,NY,NX)
     PCPHB(L1,NY,NX)=PCPHB(L1,NY,NX)+FX*PCPHB(L0,NY,NX)
     PCPMB(L1,NY,NX)=PCPMB(L1,NY,NX)+FX*PCPMB(L0,NY,NX)
-    CO2G(L1,NY,NX)=CO2G(L1,NY,NX)+FX*CO2G(L0,NY,NX)
-    CH4G(L1,NY,NX)=CH4G(L1,NY,NX)+FX*CH4G(L0,NY,NX)
-    OXYG(L1,NY,NX)=OXYG(L1,NY,NX)+FX*OXYG(L0,NY,NX)
-    Z2GG(L1,NY,NX)=Z2GG(L1,NY,NX)+FX*Z2GG(L0,NY,NX)
-    Z2OG(L1,NY,NX)=Z2OG(L1,NY,NX)+FX*Z2OG(L0,NY,NX)
-    ZNH3G(L1,NY,NX)=ZNH3G(L1,NY,NX)+FX*ZNH3G(L0,NY,NX)
-    H2GG(L1,NY,NX)=H2GG(L1,NY,NX)+FX*H2GG(L0,NY,NX)
+    trc_gasml(idg_CO2,L1,NY,NX)=trc_gasml(idg_CO2,L1,NY,NX)+FX*trc_gasml(idg_CO2,L0,NY,NX)
+    trc_gasml(idg_CH4,L1,NY,NX)=trc_gasml(idg_CH4,L1,NY,NX)+FX*trc_gasml(idg_CH4,L0,NY,NX)
+    trc_gasml(idg_O2,L1,NY,NX)=trc_gasml(idg_O2,L1,NY,NX)+FX*trc_gasml(idg_O2,L0,NY,NX)
+    trc_gasml(idg_N2,L1,NY,NX)=trc_gasml(idg_N2,L1,NY,NX)+FX*trc_gasml(idg_N2,L0,NY,NX)
+    trc_gasml(idg_N2O,L1,NY,NX)=trc_gasml(idg_N2O,L1,NY,NX)+FX*trc_gasml(idg_N2O,L0,NY,NX)
+    trc_gasml(idg_NH3,L1,NY,NX)=trc_gasml(idg_NH3,L1,NY,NX)+FX*trc_gasml(idg_NH3,L0,NY,NX)
+    trc_gasml(idg_H2,L1,NY,NX)=trc_gasml(idg_H2,L1,NY,NX)+FX*trc_gasml(idg_H2,L0,NY,NX)
   ENDIF
   CO2S(L1,NY,NX)=CO2S(L1,NY,NX)+FX*CO2S(L0,NY,NX)
   CH4S(L1,NY,NX)=CH4S(L1,NY,NX)+FX*CH4S(L0,NY,NX)
@@ -1077,13 +1077,13 @@ implicit none
     PCPDB(L0,NY,NX)=FY*PCPDB(L0,NY,NX)
     PCPHB(L0,NY,NX)=FY*PCPHB(L0,NY,NX)
     PCPMB(L0,NY,NX)=FY*PCPMB(L0,NY,NX)
-    CO2G(L0,NY,NX)=FY*CO2G(L0,NY,NX)
-    CH4G(L0,NY,NX)=FY*CH4G(L0,NY,NX)
-    OXYG(L0,NY,NX)=FY*OXYG(L0,NY,NX)
-    Z2GG(L0,NY,NX)=FY*Z2GG(L0,NY,NX)
-    Z2OG(L0,NY,NX)=FY*Z2OG(L0,NY,NX)
-    ZNH3G(L0,NY,NX)=FY*ZNH3G(L0,NY,NX)
-    H2GG(L0,NY,NX)=FY*H2GG(L0,NY,NX)
+    trc_gasml(idg_CO2,L0,NY,NX)=FY*trc_gasml(idg_CO2,L0,NY,NX)
+    trc_gasml(idg_CH4,L0,NY,NX)=FY*trc_gasml(idg_CH4,L0,NY,NX)
+    trc_gasml(idg_O2,L0,NY,NX)=FY*trc_gasml(idg_O2,L0,NY,NX)
+    trc_gasml(idg_N2,L0,NY,NX)=FY*trc_gasml(idg_N2,L0,NY,NX)
+    trc_gasml(idg_N2O,L0,NY,NX)=FY*trc_gasml(idg_N2O,L0,NY,NX)
+    trc_gasml(idg_NH3,L0,NY,NX)=FY*trc_gasml(idg_NH3,L0,NY,NX)
+    trc_gasml(idg_H2,L0,NY,NX)=FY*trc_gasml(idg_H2,L0,NY,NX)
   ENDIF
   CO2S(L0,NY,NX)=FY*CO2S(L0,NY,NX)
   CH4S(L0,NY,NX)=FY*CH4S(L0,NY,NX)
@@ -1901,27 +1901,27 @@ implicit none
 !
 !     SOIL GASEOUS GASES
 !
-  FXCO2G=FWO*CO2G(L0,NY,NX)
-  CO2G(L1,NY,NX)=CO2G(L1,NY,NX)+FXCO2G
-  CO2G(L0,NY,NX)=CO2G(L0,NY,NX)-FXCO2G
-  FXCH4G=FWO*CH4G(L0,NY,NX)
-  CH4G(L1,NY,NX)=CH4G(L1,NY,NX)+FXCH4G
-  CH4G(L0,NY,NX)=CH4G(L0,NY,NX)-FXCH4G
-  FXOXYG=FWO*OXYG(L0,NY,NX)
-  OXYG(L1,NY,NX)=OXYG(L1,NY,NX)+FXOXYG
-  OXYG(L0,NY,NX)=OXYG(L0,NY,NX)-FXOXYG
-  FXZ2GG=FWO*Z2GG(L0,NY,NX)
-  Z2GG(L1,NY,NX)=Z2GG(L1,NY,NX)+FXZ2GG
-  Z2GG(L0,NY,NX)=Z2GG(L0,NY,NX)-FXZ2GG
-  FXZ2OG=FWO*Z2OG(L0,NY,NX)
-  Z2OG(L1,NY,NX)=Z2OG(L1,NY,NX)+FXZ2OG
-  Z2OG(L0,NY,NX)=Z2OG(L0,NY,NX)-FXZ2OG
-  FXZNH3G=FWO*ZNH3G(L0,NY,NX)
-  ZNH3G(L1,NY,NX)=ZNH3G(L1,NY,NX)+FXZNH3G
-  ZNH3G(L0,NY,NX)=ZNH3G(L0,NY,NX)-FXZNH3G
-  FXH2GG=FWO*H2GG(L0,NY,NX)
-  H2GG(L1,NY,NX)=H2GG(L1,NY,NX)+FXH2GG
-  H2GG(L0,NY,NX)=H2GG(L0,NY,NX)-FXH2GG
+  FXCO2G=FWO*trc_gasml(idg_CO2,L0,NY,NX)
+  trc_gasml(idg_CO2,L1,NY,NX)=trc_gasml(idg_CO2,L1,NY,NX)+FXCO2G
+  trc_gasml(idg_CO2,L0,NY,NX)=trc_gasml(idg_CO2,L0,NY,NX)-FXCO2G
+  FXCH4G=FWO*trc_gasml(idg_CH4,L0,NY,NX)
+  trc_gasml(idg_CH4,L1,NY,NX)=trc_gasml(idg_CH4,L1,NY,NX)+FXCH4G
+  trc_gasml(idg_CH4,L0,NY,NX)=trc_gasml(idg_CH4,L0,NY,NX)-FXCH4G
+  FXOXYG=FWO*trc_gasml(idg_O2,L0,NY,NX)
+  trc_gasml(idg_O2,L1,NY,NX)=trc_gasml(idg_O2,L1,NY,NX)+FXOXYG
+  trc_gasml(idg_O2,L0,NY,NX)=trc_gasml(idg_O2,L0,NY,NX)-FXOXYG
+  FXZ2GG=FWO*trc_gasml(idg_N2,L0,NY,NX)
+  trc_gasml(idg_N2,L1,NY,NX)=trc_gasml(idg_N2,L1,NY,NX)+FXZ2GG
+  trc_gasml(idg_N2,L0,NY,NX)=trc_gasml(idg_N2,L0,NY,NX)-FXZ2GG
+  FXZ2OG=FWO*trc_gasml(idg_N2O,L0,NY,NX)
+  trc_gasml(idg_N2O,L1,NY,NX)=trc_gasml(idg_N2O,L1,NY,NX)+FXZ2OG
+  trc_gasml(idg_N2O,L0,NY,NX)=trc_gasml(idg_N2O,L0,NY,NX)-FXZ2OG
+  FXZNH3G=FWO*trc_gasml(idg_NH3,L0,NY,NX)
+  trc_gasml(idg_NH3,L1,NY,NX)=trc_gasml(idg_NH3,L1,NY,NX)+FXZNH3G
+  trc_gasml(idg_NH3,L0,NY,NX)=trc_gasml(idg_NH3,L0,NY,NX)-FXZNH3G
+  FXH2GG=FWO*trc_gasml(idg_H2,L0,NY,NX)
+  trc_gasml(idg_H2,L1,NY,NX)=trc_gasml(idg_H2,L1,NY,NX)+FXH2GG
+  trc_gasml(idg_H2,L0,NY,NX)=trc_gasml(idg_H2,L0,NY,NX)-FXH2GG
 
   FXCO2S=FWO*CO2S(L0,NY,NX)
   CO2S(L1,NY,NX)=CO2S(L1,NY,NX)+FXCO2S

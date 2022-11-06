@@ -117,7 +117,6 @@ module RootGasMod
     H2GA   =>  plt_rbgc%H2GA     , &
     H2GP   =>  plt_rbgc%H2GP     , &
     TFND   =>  plt_soilchem%TFND , &
-    CO2G   =>  plt_soilchem%CO2G , &
     CO2S   =>  plt_soilchem%CO2S , &
     ZNH3S  =>  plt_soilchem%ZNH3S, &
     H2GS   =>  plt_soilchem%H2GS , &
@@ -127,29 +126,26 @@ module RootGasMod
     CH2GS  =>  plt_soilchem%CH2GS, &
     CZ2OG  =>  plt_soilchem%CZ2OG, &
     VLNH4  =>  plt_soilchem%VLNH4, &
-    HGSGL  =>  plt_soilchem%HGSGL, &
+    GasDifc=>  plt_soilchem%GasDifc,&
     CCH4G  =>  plt_soilchem%CCH4G, &
     CLSGL  =>  plt_soilchem%CLSGL, &
     THETY  =>  plt_soilchem%THETY, &
     OLSGL  =>  plt_soilchem%OLSGL, &
     VOLY   =>  plt_soilchem%VOLY , &
     ZNSGL  =>  plt_soilchem%ZNSGL, &
-    Z2SGL  =>  plt_soilchem%Z2SGL, &
-    ZHSGL  =>  plt_soilchem%ZHSGL, &
+
     ZVSGL  =>  plt_soilchem%ZVSGL, &
     HLSGL  =>  plt_soilchem%HLSGL, &
     CQSGL  =>  plt_soilchem%CQSGL, &
     VLNHB  =>  plt_soilchem%VLNHB, &
     ZNH3B  =>  plt_soilchem%ZNH3B, &
-    CGSGL  =>  plt_soilchem%CGSGL, &
+
     GSolbility=> plt_soilchem%GSolbility,&
     CNH3B  =>  plt_soilchem%CNH3B, &
-    CHSGL  =>  plt_soilchem%CHSGL, &
-    OGSGL  =>  plt_soilchem%OGSGL, &
     Z2OS   =>  plt_soilchem%Z2OS , &
     CNH3S  =>  plt_soilchem%CNH3S, &
     THETPM =>  plt_soilchem%THETPM,&
-    OXYG   =>  plt_soilchem%OXYG , &
+    trc_gasml=> plt_soilchem%trc_gasml,&
     DFGS   =>  plt_soilchem%DFGS , &
     CCH4S  =>  plt_soilchem%CCH4S, &
     OXYS   =>  plt_soilchem%OXYS , &
@@ -194,11 +190,11 @@ module RootGasMod
 !
     CO2A1=AMAX1(ZEROP(NZ),CO2A(N,L,NZ))
     CO2P1=AMAX1(ZEROP(NZ),CO2P(N,L,NZ))
-    CO2G1=AMAX1(ZEROP(NZ),CO2G(L)*FPQ(N,L,NZ))
+    CO2G1=AMAX1(ZEROP(NZ),trc_gasml(idg_CO2,L)*FPQ(N,L,NZ))
     CO2S1=AMAX1(ZEROP(NZ),CO2S(L)*FPQ(N,L,NZ))
     OXYA1=AMAX1(ZEROP(NZ),OXYA(N,L,NZ))
     OXYP1=AMAX1(ZEROP(NZ),OXYP(N,L,NZ))
-    OXYG1=AMAX1(ZEROP(NZ),OXYG(L)*FOXYX)
+    OXYG1=AMAX1(ZEROP(NZ),trc_gasml(idg_O2,L)*FOXYX)
     OXYS1=OXYS(L)*FOXYX
     CH4A1=CH4A(N,L,NZ)
     CH4P1=CH4P(N,L,NZ)
@@ -236,12 +232,13 @@ module RootGasMod
 !     CG=CO2g,OG=O2g,CH=CH4g,Z2=N2Og,ZH=NH3g,HG=H2g
 !     CL=CO2s,OL=O2s,CQ=CH4s,ZV=N2Os,ZN=NH3s,HL=H2s
 !
-    CGSGL1=CGSGL(L)*XNPG*PORTX(N,NZ)
-    OGSGL1=OGSGL(L)*XNPG*PORTX(N,NZ)
-    CHSGL1=CHSGL(L)*XNPG*PORTX(N,NZ)
-    Z2SGL1=Z2SGL(L)*XNPG*PORTX(N,NZ)
-    ZHSGL1=ZHSGL(L)*XNPG*PORTX(N,NZ)
-    HGSGL1=HGSGL(L)*XNPG*PORTX(N,NZ)
+    CGSGL1=GasDifc(idg_CO2,L)*XNPG*PORTX(N,NZ)
+    OGSGL1=GasDifc(idg_O2,L)*XNPG*PORTX(N,NZ)
+    CHSGL1=GasDifc(idg_CH4,L)*XNPG*PORTX(N,NZ)
+    Z2SGL1=GasDifc(idg_N2O,L)*XNPG*PORTX(N,NZ)
+    ZHSGL1=GasDifc(idg_NH3,L)*XNPG*PORTX(N,NZ)
+    HGSGL1=GasDifc(idg_H2,L)*XNPG*PORTX(N,NZ)
+
     CLSGL1=CLSGL(L)*XNPG*FOXYX
     OLSGL1=OLSGL(L)*XNPG*FOXYX
     CQSGL1=CQSGL(L)*XNPG*FOXYX

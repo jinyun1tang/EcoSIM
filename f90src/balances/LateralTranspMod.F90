@@ -60,13 +60,13 @@ implicit none
     !     gas code:*CO2*=CO2,*OXY*=O2,*CH4*=CH4,*Z2G*=N2,*Z2O*=N2O
     !             :*ZN3*=NH3,*H2G*=H2
 !
-    VCO2G2=CO2G(L,NY,NX)/catomw
-    VCH4G2=CH4G(L,NY,NX)/catomw
-    VOXYG2=OXYG(L,NY,NX)/32.0_r8
-    VZ2GG2=Z2GG(L,NY,NX)/28.0_r8
-    VZ2OG2=Z2OG(L,NY,NX)/28.0_r8
-    VNH3G2=ZNH3G(L,NY,NX)/natomw
-    VH2GG2=H2GG(L,NY,NX)/2.0_r8
+    VCO2G2=trc_gasml(idg_CO2,L,NY,NX)/catomw
+    VCH4G2=trc_gasml(idg_CH4,L,NY,NX)/catomw
+    VOXYG2=trc_gasml(idg_O2,L,NY,NX)/32.0_r8
+    VZ2GG2=trc_gasml(idg_N2,L,NY,NX)/28.0_r8
+    VZ2OG2=trc_gasml(idg_N2O,L,NY,NX)/28.0_r8
+    VNH3G2=trc_gasml(idg_NH3,L,NY,NX)/natomw
+    VH2GG2=trc_gasml(idg_H2,L,NY,NX)/2.0_r8
     VTATM=AZMAX1(1.2194E+04*VOLP(L,NY,NX)/TKS(L,NY,NX))
     VTGAS=VCO2G2+VCH4G2+VOXYG2+VZ2GG2+VZ2OG2+VNH3G2+VH2GG2
     IF(THETP(L,NY,NX).LT.THETX.OR.VTGAS.GT.VTATM)LX=1

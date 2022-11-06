@@ -10,6 +10,9 @@ module ChemTranspDataType
   character(len=*), private, parameter :: mod_filename = __FILE__
   real(r8),pointer ::  TFND(:,:,:)                        !temperature effect on diffusivity
   real(r8),pointer ::  DISP(:,:,:,:)                      !aqueous dispersivity
+
+  real(r8),pointer ::  GasDifc(:,:,:,:)                   !gaseous diffusivity [m2 h-1]
+
   real(r8),pointer ::  CGSGL(:,:,:)                       !gaseous CO2 diffusivity	[m2 h-1]
   real(r8),pointer ::  CLSGL(:,:,:)                       !aqueous CO2 diffusivity	[m2 h-1]
   real(r8),pointer ::  OGSGL(:,:,:)                       !gaseous O2 diffusivity	m2 h-1
@@ -138,6 +141,9 @@ module ChemTranspDataType
   implicit none
   allocate(TFND(0:JZ,JY,JX));   TFND=0._r8
   allocate(DISP(3,JD,JV,JH));   DISP=0._r8
+
+  allocate(GasDifc(idg_beg:idg_end,JZ,JY,JX));GasDifc=0._r8
+
   allocate(CGSGL(JZ,JY,JX));    CGSGL=0._r8
   allocate(CLSGL(0:JZ,JY,JX));  CLSGL=0._r8
   allocate(OGSGL(JZ,JY,JX));    OGSGL=0._r8

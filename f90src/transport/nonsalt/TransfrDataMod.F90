@@ -1,32 +1,33 @@
 module TransfrDataMod
   use data_kind_mod, only : r8 => SHR_KIND_R8
   use GridConsts
+  use TracerIDMod
   use EcoSIMConfig, only : jcplx => jcplxc
 implicit none
   CHARACTER(LEN=*), Private,PARAMETER :: MOD_FILENAME=__FILE__
   real(r8), parameter :: XFRS=0.05_r8
   real(r8), Parameter :: VFLWX=0.5
 
-  real(r8),allocatable :: RFLOC(:)
-  real(r8),allocatable :: RFLON(:)
-  real(r8),allocatable :: RFLOP(:)
-  real(r8),allocatable :: RFLOA(:)
-  real(r8),allocatable :: DFVOC(:)
-  real(r8),allocatable :: DFVON(:)
-  real(r8),allocatable :: DFVOP(:)
-  real(r8),allocatable :: DFVOA(:)
-  real(r8),allocatable :: DFHOC(:)
-  real(r8),allocatable :: DFHON(:)
-  real(r8),allocatable :: DFHOP(:)
-  real(r8),allocatable :: DFHOA(:)
-  real(r8),allocatable :: COQC1(:)
-  real(r8),allocatable :: COQC2(:)
-  real(r8),allocatable :: COQN1(:)
-  real(r8),allocatable :: COQN2(:)
-  real(r8),allocatable :: COQP1(:)
-  real(r8),allocatable :: COQP2(:)
-  real(r8),allocatable :: COQA1(:)
-  real(r8),allocatable :: COQA2(:)
+  real(r8), pointer :: RFLOC(:)
+  real(r8), pointer :: RFLON(:)
+  real(r8), pointer :: RFLOP(:)
+  real(r8), pointer :: RFLOA(:)
+  real(r8), pointer :: DFVOC(:)
+  real(r8), pointer :: DFVON(:)
+  real(r8), pointer :: DFVOP(:)
+  real(r8), pointer :: DFVOA(:)
+  real(r8), pointer :: DFHOC(:)
+  real(r8), pointer :: DFHON(:)
+  real(r8), pointer :: DFHOP(:)
+  real(r8), pointer :: DFHOA(:)
+  real(r8), pointer :: COQC1(:)
+  real(r8), pointer :: COQC2(:)
+  real(r8), pointer :: COQN1(:)
+  real(r8), pointer :: COQN2(:)
+  real(r8), pointer :: COQP1(:)
+  real(r8), pointer :: COQP2(:)
+  real(r8), pointer :: COQA1(:)
+  real(r8), pointer :: COQA2(:)
   real(r8), allocatable :: OQC2(:,:,:,:)
   real(r8), allocatable :: OQN2(:,:,:,:)
   real(r8), allocatable :: OQP2(:,:,:,:)
@@ -53,398 +54,384 @@ implicit none
   real(r8), allocatable :: RQROA0(:,:,:)
   real(r8), allocatable :: RQROP0(:,:,:)
 
-  real(r8),allocatable ::  RCOBLS(:,:,:)                      !
-  real(r8),allocatable ::  RCHBLS(:,:,:)                      !
-  real(r8),allocatable ::  ROXBLS(:,:,:)                      !
-  real(r8),allocatable ::  RNGBLS(:,:,:)                      !
-  real(r8),allocatable ::  RN2BLS(:,:,:)                      !
-  real(r8),allocatable ::  RN4BLW(:,:,:)                      !
-  real(r8),allocatable ::  RN3BLW(:,:,:)                      !
-  real(r8),allocatable ::  RNOBLW(:,:,:)                      !
-  real(r8),allocatable ::  RH1PBS(:,:,:)                      !
-  real(r8),allocatable ::  RH2PBS(:,:,:)                      !
-  real(r8),allocatable ::  ROCFL0(:,:,:)                      !
-  real(r8),allocatable ::  RONFL0(:,:,:)                      !
-  real(r8),allocatable ::  ROPFL0(:,:,:)                      !
-  real(r8),allocatable ::  ROAFL0(:,:,:)                      !
-  real(r8),allocatable ::  ROCFL1(:,:,:)                      !
-  real(r8),allocatable ::  RONFL1(:,:,:)                      !
-  real(r8),allocatable ::  ROPFL1(:,:,:)                      !
-  real(r8),allocatable ::  ROAFL1(:,:,:)                      !
-  real(r8),allocatable ::  RCOFL0(:,:)                        !
-  real(r8),allocatable ::  RCHFL0(:,:)                        !
-  real(r8),allocatable ::  ROXFL0(:,:)                        !
-  real(r8),allocatable ::  RNGFL0(:,:)                        !
-  real(r8),allocatable ::  RN2FL0(:,:)                        !
-  real(r8),allocatable ::  RHGFL0(:,:)                        !
-  real(r8),allocatable ::  RN4FL0(:,:)                        !
-  real(r8),allocatable ::  RN3FL0(:,:)                        !
-  real(r8),allocatable ::  RNOFL0(:,:)                        !
-  real(r8),allocatable ::  RNXFL0(:,:)                        !
-  real(r8),allocatable ::  RH2PF0(:,:)                        !
-  real(r8),allocatable ::  RCOFL1(:,:)                        !
-  real(r8),allocatable ::  RCHFL1(:,:)                        !
-  real(r8),allocatable ::  ROXFL1(:,:)                        !
-  real(r8),allocatable ::  RNGFL1(:,:)                        !
-  real(r8),allocatable ::  RN2FL1(:,:)                        !
-  real(r8),allocatable ::  RHGFL1(:,:)                        !
-  real(r8),allocatable ::  RN4FL1(:,:)                        !
-  real(r8),allocatable ::  RN3FL1(:,:)                        !
-  real(r8),allocatable ::  RNOFL1(:,:)                        !
-  real(r8),allocatable ::  RNXFL1(:,:)                        !
-  real(r8),allocatable ::  RH2PF1(:,:)                        !
-  real(r8),allocatable ::  RN4FL2(:,:)                        !
-  real(r8),allocatable ::  RN3FL2(:,:)                        !
-  real(r8),allocatable ::  RNOFL2(:,:)                        !
-  real(r8),allocatable ::  RNXFL2(:,:)                        !
-  real(r8),allocatable ::  RH2BF2(:,:)                        !
-  real(r8),allocatable ::  RH1PF0(:,:)                        !
-  real(r8),allocatable ::  RH1PF1(:,:)                        !
-  real(r8),allocatable ::  RH1BF2(:,:)                        !
-  real(r8),allocatable ::  ROCFXS(:,:,:,:)                    !
-  real(r8),allocatable ::  RONFXS(:,:,:,:)                    !
-  real(r8),allocatable ::  ROPFXS(:,:,:,:)                    !
-  real(r8),allocatable ::  ROAFXS(:,:,:,:)                    !
-  real(r8),allocatable ::  RCOFXS(:,:,:)                      !
-  real(r8),allocatable ::  RCHFXS(:,:,:)                      !
-  real(r8),allocatable ::  ROXFXS(:,:,:)                      !
-  real(r8),allocatable ::  RNGFXS(:,:,:)                      !
-  real(r8),allocatable ::  RN2FXS(:,:,:)                      !
-  real(r8),allocatable ::  RN4FXW(:,:,:)                      !
-  real(r8),allocatable ::  RN3FXW(:,:,:)                      !
-  real(r8),allocatable ::  RNOFXW(:,:,:)                      !
-  real(r8),allocatable ::  RH2PXS(:,:,:)                      !
-  real(r8),allocatable ::  RN4FXB(:,:,:)                      !
-  real(r8),allocatable ::  RN3FXB(:,:,:)                      !
-  real(r8),allocatable ::  RNOFXB(:,:,:)                      !
-  real(r8),allocatable ::  RH2BXB(:,:,:)                      !
-  real(r8),allocatable ::  RNXFXS(:,:,:)                      !
-  real(r8),allocatable ::  RNXFXB(:,:,:)                      !
-  real(r8),allocatable ::  RH1PXS(:,:,:)                      !
-  real(r8),allocatable ::  RH1BXB(:,:,:)                      !
-  real(r8),allocatable ::  CLSGL2(:,:,:)                      !
-  real(r8),allocatable ::  CQSGL2(:,:,:)                      !
-  real(r8),allocatable ::  POSGL2(:,:,:)                      !
-  real(r8),allocatable ::  OLSGL2(:,:,:)                      !
-  real(r8),allocatable ::  ZNSGL2(:,:,:)                      !
-  real(r8),allocatable ::  ZLSGL2(:,:,:)                      !
-  real(r8),allocatable ::  ZVSGL2(:,:,:)                      !
-  real(r8),allocatable ::  HLSGL2(:,:,:)                      !
-  real(r8),allocatable ::  ZOSGL2(:,:,:)                      !
-  real(r8),allocatable ::  RCODFG(:,:,:)                      !CO2 volatilization/dissolution within soil layer	g d-2 t-1
-  real(r8),allocatable ::  RCHDFG(:,:,:)                      !CH4 volatilization/dissolution within soil layer	g d-2 t-1
-  real(r8),allocatable ::  ROXDFG(:,:,:)                      !O2 volatilization/dissolution within soil layer	g d-2 t-1
-  real(r8),allocatable ::  RNGDFG(:,:,:)                      !N2 volatilization/dissolution within soil layer	g d-2 t-1
-  real(r8),allocatable ::  RN2DFG(:,:,:)                      !N2O volatilization/dissolution within soil layer	g d-2 t-1
-  real(r8),allocatable ::  RN3DFG(:,:,:)                      !NH3 volatilization/dissolution within soil layer non-band	g d-2 t-1
-  real(r8),allocatable ::  RNBDFG(:,:,:)                      !NH3 volatilization/dissolution within soil layer band	g d-2 t-1
-  real(r8),allocatable ::  TQROC(:,:,:)                       !
-  real(r8),allocatable ::  TQRON(:,:,:)                       !
-  real(r8),allocatable ::  TQROP(:,:,:)                       !
-  real(r8),allocatable ::  TQROA(:,:,:)                       !
-  real(r8),allocatable ::  TQRCHS(:,:)                        !
-  real(r8),allocatable ::  TQROXS(:,:)                        !
-  real(r8),allocatable ::  TQRNGS(:,:)                        !
-  real(r8),allocatable ::  TQRN2S(:,:)                        !
-  real(r8),allocatable ::  TQRNH4(:,:)                        !
-  real(r8),allocatable ::  TQRNH3(:,:)                        !
-  real(r8),allocatable ::  TQRNO3(:,:)                        !
-  real(r8),allocatable ::  TQRH2P(:,:)                        !
-  real(r8),allocatable ::  TQRNO2(:,:)                        !
-  real(r8),allocatable ::  TQRHGS(:,:)                        !
-  real(r8),allocatable ::  TQSCOS(:,:)                        !
-  real(r8),allocatable ::  TQRCOS(:,:)                        !
-  real(r8),allocatable ::  TQSCHS(:,:)                        !
-  real(r8),allocatable ::  TQSOXS(:,:)                        !
-  real(r8),allocatable ::  TQSNGS(:,:)                        !
-  real(r8),allocatable ::  TQSN2S(:,:)                        !
-  real(r8),allocatable ::  TQSNH4(:,:)                        !
-  real(r8),allocatable ::  TQSNH3(:,:)                        !
-  real(r8),allocatable ::  TQSNO3(:,:)                        !
-  real(r8),allocatable ::  TQSH1P(:,:)                        !
-  real(r8),allocatable ::  TQSH2P(:,:)                        !
-  real(r8),allocatable ::  TCOFLS(:,:,:)                      !
-  real(r8),allocatable ::  TCHFLS(:,:,:)                      !
-  real(r8),allocatable ::  TOXFLS(:,:,:)                      !
-  real(r8),allocatable ::  TNGFLS(:,:,:)                      !
-  real(r8),allocatable ::  TN2FLS(:,:,:)                      !
-  real(r8),allocatable ::  TN4FLW(:,:,:)                      !
-  real(r8),allocatable ::  TN3FLW(:,:,:)                      !
-  real(r8),allocatable ::  TNOFLW(:,:,:)                      !
-  real(r8),allocatable ::  TH2PFS(:,:,:)                      !
-  real(r8),allocatable ::  TN4FLB(:,:,:)                      !
-  real(r8),allocatable ::  TN3FLB(:,:,:)                      !
-  real(r8),allocatable ::  TNOFLB(:,:,:)                      !
-  real(r8),allocatable ::  TH2BFB(:,:,:)                      !
-  real(r8),allocatable ::  TNXFLS(:,:,:)                      !
-  real(r8),allocatable ::  TCOFLG(:,:,:)                      !
-  real(r8),allocatable ::  TCHFLG(:,:,:)                      !
-  real(r8),allocatable ::  TOXFLG(:,:,:)                      !
-  real(r8),allocatable ::  TNGFLG(:,:,:)                      !
-  real(r8),allocatable ::  TN2FLG(:,:,:)                      !
-  real(r8),allocatable ::  TQRH1P(:,:)                        !
-  real(r8),allocatable ::  TH1PFS(:,:,:)                      !
-  real(r8),allocatable ::  TH1BFB(:,:,:)                      !
-  real(r8),allocatable ::  DCO2G(:,:,:,:)                     !
-  real(r8),allocatable ::  DCH4G(:,:,:,:)                     !
-  real(r8),allocatable ::  DOXYG(:,:,:,:)                     !
-  real(r8),allocatable ::  DZ2GG(:,:,:,:)                     !
-  real(r8),allocatable ::  DZ2OG(:,:,:,:)                     !
-  real(r8),allocatable ::  DNH3G(:,:,:,:)                     !
-  real(r8),allocatable ::  VOLWCO(:,:,:)                      !
-  real(r8),allocatable ::  VOLWCH(:,:,:)                      !
-  real(r8),allocatable ::  VOLWOX(:,:,:)                      !
-  real(r8),allocatable ::  VOLWNG(:,:,:)                      !
-  real(r8),allocatable ::  VOLWN2(:,:,:)                      !
-  real(r8),allocatable ::  VOLWN3(:,:,:)                      !
-  real(r8),allocatable ::  VOLWNB(:,:,:)                      !
-  real(r8),allocatable ::  VOLWHG(:,:,:)                      !
-  real(r8),allocatable ::  HGSGL2(:,:,:)                      !
-  real(r8),allocatable ::  DH2GG(:,:,:,:)                     !
-  real(r8),allocatable ::  RHGFXS(:,:,:)                      !
-  real(r8),allocatable ::  THGFHS(:,:,:)                      !
-  real(r8),allocatable ::  THGFLG(:,:,:)                      !
-  real(r8),allocatable ::  FLVM(:,:,:)                        !
-  real(r8),allocatable ::  THETH2(:,:,:)                      !
-  real(r8),allocatable ::  THETHL(:,:,:)                      !
-  real(r8),allocatable ::  VOLPMA(:,:,:)                      !
-  real(r8),allocatable ::  VOLPMB(:,:,:)                      !
-  real(r8),allocatable ::  VOLWMA(:,:,:)                      !
-  real(r8),allocatable ::  VOLWMB(:,:,:)                      !
-  real(r8),allocatable ::  VOLWXA(:,:,:)                      !
-  real(r8),allocatable ::  VOLWXB(:,:,:)                      !
-  real(r8),allocatable ::  PARGCO(:,:)                        !
-  real(r8),allocatable ::  PARGCH(:,:)                        !
-  real(r8),allocatable ::  PARGOX(:,:)                        !
-  real(r8),allocatable ::  PARGNG(:,:)                        !
-  real(r8),allocatable ::  PARGN2(:,:)                        !
-  real(r8),allocatable ::  PARGN3(:,:)                        !
-  real(r8),allocatable ::  PARGH2(:,:)                        !
-  real(r8),allocatable ::  RCOSK2(:,:,:)                      !
-  real(r8),allocatable ::  ROXSK2(:,:,:)                      !
-  real(r8),allocatable ::  RCHSK2(:,:,:)                      !
-  real(r8),allocatable ::  RNGSK2(:,:,:)                      !
-  real(r8),allocatable ::  RN2SK2(:,:,:)                      !
-  real(r8),allocatable ::  RN4SK2(:,:,:)                      !
-  real(r8),allocatable ::  RN3SK2(:,:,:)                      !
-  real(r8),allocatable ::  RNOSK2(:,:,:)                      !
-  real(r8),allocatable ::  RHPSK2(:,:,:)                      !
-  real(r8),allocatable ::  R4BSK2(:,:,:)                      !
-  real(r8),allocatable ::  R3BSK2(:,:,:)                      !
-  real(r8),allocatable ::  RNBSK2(:,:,:)                      !
-  real(r8),allocatable ::  RHBSK2(:,:,:)                      !
-  real(r8),allocatable ::  RNXSK2(:,:,:)                      !
-  real(r8),allocatable ::  RNZSK2(:,:,:)                      !
-  real(r8),allocatable ::  RHGSK2(:,:,:)                      !
-  real(r8),allocatable ::  RNHSK2(:,:,:)                      !
-  real(r8),allocatable ::  R1PSK2(:,:,:)                      !
-  real(r8),allocatable ::  TN3FLG(:,:,:)                      !
-  real(r8),allocatable ::  RCOBBL(:,:,:)                      !
-  real(r8),allocatable ::  RCHBBL(:,:,:)                      !
-  real(r8),allocatable ::  ROXBBL(:,:,:)                      !
-  real(r8),allocatable ::  RNGBBL(:,:,:)                      !
-  real(r8),allocatable ::  RN2BBL(:,:,:)                      !
-  real(r8),allocatable ::  RN3BBL(:,:,:)                      !
-  real(r8),allocatable ::  RNBBBL(:,:,:)                      !
-  real(r8),allocatable ::  RHGBBL(:,:,:)                      !
-  real(r8),allocatable ::  RQRCOS0(:,:)                       !
-  real(r8),allocatable ::  RQRCHS0(:,:)                       !
-  real(r8),allocatable ::  RQROXS0(:,:)                       !
-  real(r8),allocatable ::  RQRNGS0(:,:)                       !
-  real(r8),allocatable ::  RQRN2S0(:,:)                       !
-  real(r8),allocatable ::  RQRHGS0(:,:)                       !
-  real(r8),allocatable ::  RQRNH40(:,:)                       !
-  real(r8),allocatable ::  RQRNH30(:,:)                       !
-  real(r8),allocatable ::  RQRNO30(:,:)                       !
-  real(r8),allocatable ::  RQRNO20(:,:)                       !
-  real(r8),allocatable ::  RQRH2P0(:,:)                       !
-  real(r8),allocatable ::  RQRH1P0(:,:)                       !
-  real(r8),allocatable ::  OQNH2(:,:,:,:)                     !
-  real(r8),allocatable ::  OQPH2(:,:,:,:)                     !
-  real(r8),allocatable ::  OQAH2(:,:,:,:)                     !
-  real(r8),allocatable ::  TOCFHS(:,:,:,:)                    !
-  real(r8),allocatable ::  TONFHS(:,:,:,:)                    !
-  real(r8),allocatable ::  TOPFHS(:,:,:,:)                    !
-  real(r8),allocatable ::  TOAFHS(:,:,:,:)                    !
-  real(r8),allocatable ::  TCOFHS(:,:,:)                      !
-  real(r8),allocatable ::  TCHFHS(:,:,:)                      !
-  real(r8),allocatable ::  TOXFHS(:,:,:)                      !
-  real(r8),allocatable ::  TNGFHS(:,:,:)                      !
-  real(r8),allocatable ::  TN2FHS(:,:,:)                      !
-  real(r8),allocatable ::  TN4FHW(:,:,:)                      !
-  real(r8),allocatable ::  TN3FHW(:,:,:)                      !
-  real(r8),allocatable ::  TNOFHW(:,:,:)                      !
-  real(r8),allocatable ::  TH2PHS(:,:,:)                      !
-  real(r8),allocatable ::  TN4FHB(:,:,:)                      !
-  real(r8),allocatable ::  TN3FHB(:,:,:)                      !
-  real(r8),allocatable ::  TNOFHB(:,:,:)                      !
-  real(r8),allocatable ::  TH2BHB(:,:,:)                      !
-  real(r8),allocatable ::  TNXFHS(:,:,:)                      !
-  real(r8),allocatable ::  ZNO2B2(:,:,:)                      !
-  real(r8),allocatable ::  ZN2BH2(:,:,:)                      !
-  real(r8),allocatable ::  TNXFLB(:,:,:)                      !
-  real(r8),allocatable ::  TNXFHB(:,:,:)                      !
-  real(r8),allocatable ::  H1P4H2(:,:,:)                      !
-  real(r8),allocatable ::  H1PBH2(:,:,:)                      !
-  real(r8),allocatable ::  TH1PHS(:,:,:)                      !
-  real(r8),allocatable ::  TH1BHB(:,:,:)                      !
-  REAL(R8),allocatable ::  H1PO42(:,:,:)                      !
-  real(r8),allocatable ::  H1POB2(:,:,:)                      !
-  real(r8),allocatable ::  OCSGL2(:,:,:)                      !
-  real(r8),allocatable ::  ONSGL2(:,:,:)                      !
-  real(r8),allocatable ::  OPSGL2(:,:,:)                      !
-  real(r8),allocatable ::  OASGL2(:,:,:)                      !
-  real(r8),allocatable ::  CO2W2(:,:,:)                       !
-  real(r8),allocatable ::  CH4W2(:,:,:)                       !
-  real(r8),allocatable ::  OXYW2(:,:,:)                       !
-  real(r8),allocatable ::  ZNGW2(:,:,:)                       !
-  real(r8),allocatable ::  ZN2W2(:,:,:)                       !
-  real(r8),allocatable ::  ZN4W2(:,:,:)                       !
-  real(r8),allocatable ::  ZN3W2(:,:,:)                       !
-  real(r8),allocatable ::  ZNOW2(:,:,:)                       !
-  real(r8),allocatable ::  ZHPW2(:,:,:)                       !
-  real(r8),allocatable ::  Z1PW2(:,:,:)                       !
-  real(r8),allocatable ::  TCOBLS(:,:,:)                      !
-  real(r8),allocatable ::  TCHBLS(:,:,:)                      !
-  real(r8),allocatable ::  TOXBLS(:,:,:)                      !
-  real(r8),allocatable ::  TNGBLS(:,:,:)                      !
-  real(r8),allocatable ::  TN2BLS(:,:,:)                      !
-  real(r8),allocatable ::  TN4BLW(:,:,:)                      !
-  real(r8),allocatable ::  TN3BLW(:,:,:)                      !
-  real(r8),allocatable ::  TNOBLW(:,:,:)                      !
-  real(r8),allocatable ::  TH1PBS(:,:,:)                      !
-  real(r8),allocatable ::  TH2PBS(:,:,:)                      !
-  real(r8),allocatable ::  RQROP(:,:,:,:,:)                   !
-  real(r8),allocatable ::  RQROA(:,:,:,:,:)                   !
-  real(r8),allocatable ::  RQRCOS(:,:,:,:)                    !
-  real(r8),allocatable ::  RQRCHS(:,:,:,:)                    !
-  real(r8),allocatable ::  RQROXS(:,:,:,:)                    !
-  real(r8),allocatable ::  RQRNGS(:,:,:,:)                    !
-  real(r8),allocatable ::  RQRN2S(:,:,:,:)                    !
-  real(r8),allocatable ::  RQRHGS(:,:,:,:)                    !
-  real(r8),allocatable ::  RQRNH4(:,:,:,:)                    !
-  real(r8),allocatable ::  RCODFS(:,:)                        !
-  real(r8),allocatable ::  RCHDFS(:,:)                        !
-  real(r8),allocatable ::  ROXDFS(:,:)                        !
-  real(r8),allocatable ::  RNGDFS(:,:)                        !
-  real(r8),allocatable ::  RN2DFS(:,:)                        !
-  real(r8),allocatable ::  RN3DFS(:,:)                        !
-  real(r8),allocatable ::  RNBDFS(:,:)                        !
-  real(r8),allocatable ::  RHGDFS(:,:)                        !
-  real(r8),allocatable ::  RCODFR(:,:)                        !
-  real(r8),allocatable ::  RCHDFR(:,:)                        !
-  real(r8),allocatable ::  ROXDFR(:,:)                        !
-  real(r8),allocatable ::  RNGDFR(:,:)                        !
-  real(r8),allocatable ::  RN2DFR(:,:)                        !
-  real(r8),allocatable ::  RN3DFR(:,:)                        !
-  real(r8),allocatable ::  RHGDFR(:,:)                        !
-  real(r8),allocatable ::  R1BSK2(:,:,:)                      !
-  real(r8),allocatable ::  RQROC(:,:,:,:,:)                   !
-  real(r8),allocatable ::  RQRON(:,:,:,:,:)                   !
-  real(r8),allocatable ::  ZNH4S2(:,:,:)                      !
-  real(r8),allocatable ::  ZNH4B2(:,:,:)                      !
-  real(r8),allocatable ::  ZNH3S2(:,:,:)                      !
-  real(r8),allocatable ::  ZNH3B2(:,:,:)                      !
-  real(r8),allocatable ::  ZNO3S2(:,:,:)                      !
-  real(r8),allocatable ::  ZNO3B2(:,:,:)                      !
-  real(r8),allocatable ::  H2PO42(:,:,:)                      !
-  real(r8),allocatable ::  H2POB2(:,:,:)                      !
-  real(r8),allocatable ::  ZNO2S2(:,:,:)                      !
-  real(r8),allocatable ::  CGSGL2(:,:,:)                      !
-  real(r8),allocatable ::  CHSGL2(:,:,:)                      !
-  real(r8),allocatable ::  OGSGL2(:,:,:)                      !
-  real(r8),allocatable ::  ZGSGL2(:,:,:)                      !
-  real(r8),allocatable ::  Z2SGL2(:,:,:)                      !
-  real(r8),allocatable ::  ZHSGL2(:,:,:)                      !
-  real(r8),allocatable ::  CO2SH2(:,:,:)                      !
-  real(r8),allocatable ::  CH4SH2(:,:,:)                      !
-  real(r8),allocatable ::  OXYSH2(:,:,:)                      !
-  real(r8),allocatable ::  Z2GSH2(:,:,:)                      !
-  real(r8),allocatable ::  Z2OSH2(:,:,:)                      !
-  real(r8),allocatable ::  ZNH4H2(:,:,:)                      !
-  real(r8),allocatable ::  ZN4BH2(:,:,:)                      !
-  real(r8),allocatable ::  ZNH3H2(:,:,:)                      !
-  real(r8),allocatable ::  ZN3BH2(:,:,:)                      !
-  real(r8),allocatable ::  ZNO3H2(:,:,:)                      !
-  real(r8),allocatable ::  ZNOBH2(:,:,:)                      !
-  real(r8),allocatable ::  H2P4H2(:,:,:)                      !
-  real(r8),allocatable ::  H2PBH2(:,:,:)                      !
-  real(r8),allocatable ::  ZNO2H2(:,:,:)                      !
-  real(r8),allocatable ::  OQCH2(:,:,:,:)                     !
-  real(r8),allocatable ::  CH4G2(:,:,:)                       !
-  real(r8),allocatable ::  CH4S2(:,:,:)                       !
-  real(r8),allocatable ::  OXYG2(:,:,:)                       !
-  real(r8),allocatable ::  OXYS2(:,:,:)                       !
-  real(r8),allocatable ::  Z2GG2(:,:,:)                       !
-  real(r8),allocatable ::  Z2GS2(:,:,:)                       !
-  real(r8),allocatable ::  Z2OG2(:,:,:)                       !
-  real(r8),allocatable ::  Z2OS2(:,:,:)                       !
-  real(r8),allocatable ::  ZN3G2(:,:,:)                       !
-  real(r8),allocatable ::  CO2G2(:,:,:)                       !
-  real(r8),allocatable ::  CO2S2(:,:,:)                       !
-  real(r8),allocatable ::  H2GG2(:,:,:)                       !
-  real(r8),allocatable ::  H2GS2(:,:,:)                       !
-  real(r8),allocatable ::  H2GSH2(:,:,:)                      !
-  real(r8),allocatable ::  RQSH2P(:,:,:)                      !
-  real(r8),allocatable ::  RQSH1P(:,:,:)                      !
-  real(r8),allocatable ::  RQSCOS(:,:,:)                      !
-  real(r8),allocatable ::  RQSCHS(:,:,:)                      !
-  real(r8),allocatable ::  RQSOXS(:,:,:)                      !
-  real(r8),allocatable ::  RQRH2P(:,:,:,:)                    !
-  real(r8),allocatable ::  RQRH1P(:,:,:,:)                    !
-  real(r8),allocatable ::  RHGFLG(:,:,:,:)                    !
-  real(r8),allocatable ::  THGFLS(:,:,:)                      !
-  real(r8),allocatable ::  ROXFLG(:,:,:,:)                    !
-  real(r8),allocatable ::  RN3FLG(:,:,:,:)                    !
-  real(r8),allocatable ::  RCOFLG(:,:,:,:)                    !
-  real(r8),allocatable ::  RNXFHS(:,:,:,:)                    !
-  real(r8),allocatable ::  RNXFHB(:,:,:,:)                    !
-  real(r8),allocatable ::  RH1PFS(:,:,:,:)                    !
-  real(r8),allocatable ::  RH1BFB(:,:,:,:)                    !
-  real(r8),allocatable ::  RH1PHS(:,:,:,:)                    !
-  real(r8),allocatable ::  RH1BHB(:,:,:,:)                    !
-  real(r8),allocatable ::  RCHFLG(:,:,:,:)                    !
-  real(r8),allocatable ::  RNGFLG(:,:,:,:)                    !
-  real(r8),allocatable ::  RN2FLG(:,:,:,:)                    !
-  real(r8),allocatable ::  RN3FHB(:,:,:,:)                    !
-  real(r8),allocatable ::  RNOFHB(:,:,:,:)                    !
-  real(r8),allocatable ::  RH2BHB(:,:,:,:)                    !
-  real(r8),allocatable ::  RNOFHW(:,:,:,:)                    !
-  real(r8),allocatable ::  RH2PHS(:,:,:,:)                    !
-  real(r8),allocatable ::  RN4FHB(:,:,:,:)                    !
-  real(r8),allocatable ::  RN2FHS(:,:,:,:)                    !
-  real(r8),allocatable ::  RN4FHW(:,:,:,:)                    !
-  real(r8),allocatable ::  RN3FHW(:,:,:,:)                    !
-  real(r8),allocatable ::  RHGDFG(:,:,:)                      !
-  real(r8),allocatable ::  RHGFHS(:,:,:,:)                    !
-  real(r8),allocatable ::  RCHFHS(:,:,:,:)                    !
-  real(r8),allocatable ::  ROXFHS(:,:,:,:)                    !
-  real(r8),allocatable ::  RNGFHS(:,:,:,:)                    !
-  real(r8),allocatable ::  RQRNH3(:,:,:,:)                    !
-  real(r8),allocatable ::  RQRNO3(:,:,:,:)                    !
-  real(r8),allocatable ::  RQRNO2(:,:,:,:)                    !
-  real(r8),allocatable ::  RQSNGS(:,:,:)                      !
-  real(r8),allocatable ::  RQSN2S(:,:,:)                      !
-  real(r8),allocatable ::  RQSNH4(:,:,:)                      !
-  real(r8),allocatable ::  RQSNH3(:,:,:)                      !
-  real(r8),allocatable ::  RQSNO3(:,:,:)                      !
-  real(r8),allocatable ::  RCOFLS(:,:,:,:)                    !
-  real(r8),allocatable ::  RCHFLS(:,:,:,:)                    !
-  real(r8),allocatable ::  ROXFLS(:,:,:,:)                    !
-  real(r8),allocatable ::  RNGFLS(:,:,:,:)                    !
-  real(r8),allocatable ::  RN2FLS(:,:,:,:)                    !
-  real(r8),allocatable ::  RHGFLS(:,:,:,:)                    !
-  real(r8),allocatable ::  RN4FLW(:,:,:,:)                    !
-  real(r8),allocatable ::  RN3FLW(:,:,:,:)                    !
-  real(r8),allocatable ::  RNOFLW(:,:,:,:)                    !
-  real(r8),allocatable ::  RNXFLS(:,:,:,:)                    !
-  real(r8),allocatable ::  RH2PFS(:,:,:,:)                    !
-  real(r8),allocatable ::  RN4FLB(:,:,:,:)                    !
-  real(r8),allocatable ::  RN3FLB(:,:,:,:)                    !
-  real(r8),allocatable ::  RNOFLB(:,:,:,:)                    !
-  real(r8),allocatable ::  RNXFLB(:,:,:,:)                    !
-  real(r8),allocatable ::  RH2BFB(:,:,:,:)                    !
-  real(r8),allocatable ::  RCOFHS(:,:,:,:)                    !
+  real(r8), pointer ::  RCOBLS(:,:,:)                      !
+  real(r8), pointer ::  RCHBLS(:,:,:)                      !
+  real(r8), pointer ::  ROXBLS(:,:,:)                      !
+  real(r8), pointer ::  RNGBLS(:,:,:)                      !
+  real(r8), pointer ::  RN2BLS(:,:,:)                      !
+  real(r8), pointer ::  RN4BLW(:,:,:)                      !
+  real(r8), pointer ::  RN3BLW(:,:,:)                      !
+  real(r8), pointer ::  RNOBLW(:,:,:)                      !
+  real(r8), pointer ::  RH1PBS(:,:,:)                      !
+  real(r8), pointer ::  RH2PBS(:,:,:)                      !
+  real(r8), pointer ::  ROCFL0(:,:,:)                      !
+  real(r8), pointer ::  RONFL0(:,:,:)                      !
+  real(r8), pointer ::  ROPFL0(:,:,:)                      !
+  real(r8), pointer ::  ROAFL0(:,:,:)                      !
+  real(r8), pointer ::  ROCFL1(:,:,:)                      !
+  real(r8), pointer ::  RONFL1(:,:,:)                      !
+  real(r8), pointer ::  ROPFL1(:,:,:)                      !
+  real(r8), pointer ::  ROAFL1(:,:,:)                      !
+  real(r8), pointer ::  RCOFL0(:,:)                        !
+  real(r8), pointer ::  RCHFL0(:,:)                        !
+  real(r8), pointer ::  ROXFL0(:,:)                        !
+  real(r8), pointer ::  RNGFL0(:,:)                        !
+  real(r8), pointer ::  RN2FL0(:,:)                        !
+  real(r8), pointer ::  RHGFL0(:,:)                        !
+  real(r8), pointer ::  RN4FL0(:,:)                        !
+  real(r8), pointer ::  RN3FL0(:,:)                        !
+  real(r8), pointer ::  RNOFL0(:,:)                        !
+  real(r8), pointer ::  RNXFL0(:,:)                        !
+  real(r8), pointer ::  RH2PF0(:,:)                        !
+  real(r8), pointer ::  RCOFL1(:,:)                        !
+  real(r8), pointer ::  RCHFL1(:,:)                        !
+  real(r8), pointer ::  ROXFL1(:,:)                        !
+  real(r8), pointer ::  RNGFL1(:,:)                        !
+  real(r8), pointer ::  RN2FL1(:,:)                        !
+  real(r8), pointer ::  RHGFL1(:,:)                        !
+  real(r8), pointer ::  RN4FL1(:,:)                        !
+  real(r8), pointer ::  RN3FL1(:,:)                        !
+  real(r8), pointer ::  RNOFL1(:,:)                        !
+  real(r8), pointer ::  RNXFL1(:,:)                        !
+  real(r8), pointer ::  RH2PF1(:,:)                        !
+  real(r8), pointer ::  RN4FL2(:,:)                        !
+  real(r8), pointer ::  RN3FL2(:,:)                        !
+  real(r8), pointer ::  RNOFL2(:,:)                        !
+  real(r8), pointer ::  RNXFL2(:,:)                        !
+  real(r8), pointer ::  RH2BF2(:,:)                        !
+  real(r8), pointer ::  RH1PF0(:,:)                        !
+  real(r8), pointer ::  RH1PF1(:,:)                        !
+  real(r8), pointer ::  RH1BF2(:,:)                        !
+  real(r8), pointer ::  ROCFXS(:,:,:,:)                    !
+  real(r8), pointer ::  RONFXS(:,:,:,:)                    !
+  real(r8), pointer ::  ROPFXS(:,:,:,:)                    !
+  real(r8), pointer ::  ROAFXS(:,:,:,:)                    !
+  real(r8), pointer ::  RCOFXS(:,:,:)                      !
+  real(r8), pointer ::  RCHFXS(:,:,:)                      !
+  real(r8), pointer ::  ROXFXS(:,:,:)                      !
+  real(r8), pointer ::  RNGFXS(:,:,:)                      !
+  real(r8), pointer ::  RN2FXS(:,:,:)                      !
+  real(r8), pointer ::  RN4FXW(:,:,:)                      !
+  real(r8), pointer ::  RN3FXW(:,:,:)                      !
+  real(r8), pointer ::  RNOFXW(:,:,:)                      !
+  real(r8), pointer ::  RH2PXS(:,:,:)                      !
+  real(r8), pointer ::  RN4FXB(:,:,:)                      !
+  real(r8), pointer ::  RN3FXB(:,:,:)                      !
+  real(r8), pointer ::  RNOFXB(:,:,:)                      !
+  real(r8), pointer ::  RH2BXB(:,:,:)                      !
+  real(r8), pointer ::  RNXFXS(:,:,:)                      !
+  real(r8), pointer ::  RNXFXB(:,:,:)                      !
+  real(r8), pointer ::  RH1PXS(:,:,:)                      !
+  real(r8), pointer ::  RH1BXB(:,:,:)                      !
+  real(r8), pointer ::  CLSGL2(:,:,:)                      !
+  real(r8), pointer ::  CQSGL2(:,:,:)                      !
+  real(r8), pointer ::  POSGL2(:,:,:)                      !
+  real(r8), pointer ::  OLSGL2(:,:,:)                      !
+  real(r8), pointer ::  ZNSGL2(:,:,:)                      !
+  real(r8), pointer ::  ZLSGL2(:,:,:)                      !
+  real(r8), pointer ::  ZVSGL2(:,:,:)                      !
+  real(r8), pointer ::  HLSGL2(:,:,:)                      !
+  real(r8), pointer ::  ZOSGL2(:,:,:)                      !
+
+  real(r8), pointer ::  RNBDFG(:,:,:)                      !NH3 volatilization/dissolution within soil layer band	g d-2 t-1
+  real(r8), pointer ::  TQROC(:,:,:)                       !
+  real(r8), pointer ::  TQRON(:,:,:)                       !
+  real(r8), pointer ::  TQROP(:,:,:)                       !
+  real(r8), pointer ::  TQROA(:,:,:)                       !
+  real(r8), pointer ::  TQRCHS(:,:)                        !
+  real(r8), pointer ::  TQROXS(:,:)                        !
+  real(r8), pointer ::  TQRNGS(:,:)                        !
+  real(r8), pointer ::  TQRN2S(:,:)                        !
+  real(r8), pointer ::  TQRNH4(:,:)                        !
+  real(r8), pointer ::  TQRNH3(:,:)                        !
+  real(r8), pointer ::  TQRNO3(:,:)                        !
+  real(r8), pointer ::  TQRH2P(:,:)                        !
+  real(r8), pointer ::  TQRNO2(:,:)                        !
+  real(r8), pointer ::  TQRHGS(:,:)                        !
+  real(r8), pointer ::  TQSCOS(:,:)                        !
+  real(r8), pointer ::  TQRCOS(:,:)                        !
+  real(r8), pointer ::  TQSCHS(:,:)                        !
+  real(r8), pointer ::  TQSOXS(:,:)                        !
+  real(r8), pointer ::  TQSNGS(:,:)                        !
+  real(r8), pointer ::  TQSN2S(:,:)                        !
+  real(r8), pointer ::  TQSNH4(:,:)                        !
+  real(r8), pointer ::  TQSNH3(:,:)                        !
+  real(r8), pointer ::  TQSNO3(:,:)                        !
+  real(r8), pointer ::  TQSH1P(:,:)                        !
+  real(r8), pointer ::  TQSH2P(:,:)                        !
+  real(r8), pointer ::  TCOFLS(:,:,:)                      !
+  real(r8), pointer ::  TCHFLS(:,:,:)                      !
+  real(r8), pointer ::  TOXFLS(:,:,:)                      !
+  real(r8), pointer ::  TNGFLS(:,:,:)                      !
+  real(r8), pointer ::  TN2FLS(:,:,:)                      !
+  real(r8), pointer ::  TN4FLW(:,:,:)                      !
+  real(r8), pointer ::  TN3FLW(:,:,:)                      !
+  real(r8), pointer ::  TNOFLW(:,:,:)                      !
+  real(r8), pointer ::  TH2PFS(:,:,:)                      !
+  real(r8), pointer ::  TN4FLB(:,:,:)                      !
+  real(r8), pointer ::  TN3FLB(:,:,:)                      !
+  real(r8), pointer ::  TNOFLB(:,:,:)                      !
+  real(r8), pointer ::  TH2BFB(:,:,:)                      !
+  real(r8), pointer ::  TNXFLS(:,:,:)                      !
+  real(r8), pointer ::  TCOFLG(:,:,:)                      !
+  real(r8), pointer ::  TCHFLG(:,:,:)                      !
+  real(r8), pointer ::  TOXFLG(:,:,:)                      !
+  real(r8), pointer ::  TNGFLG(:,:,:)                      !
+  real(r8), pointer ::  TN2FLG(:,:,:)                      !
+  real(r8), pointer ::  TQRH1P(:,:)                        !
+  real(r8), pointer ::  TH1PFS(:,:,:)                      !
+  real(r8), pointer ::  TH1BFB(:,:,:)                      !
+
+  real(r8), pointer ::  DifuscG(:,:,:,:,:)
+  real(r8), pointer ::  DCO2G(:,:,:,:)                     !
+  real(r8), pointer ::  DCH4G(:,:,:,:)                     !
+  real(r8), pointer ::  DOXYG(:,:,:,:)                     !
+  real(r8), pointer ::  DZ2GG(:,:,:,:)                     !
+  real(r8), pointer ::  DZ2OG(:,:,:,:)                     !
+  real(r8), pointer ::  DNH3G(:,:,:,:)                     !
+  real(r8), pointer ::  VOLWCO(:,:,:)                      !
+  real(r8), pointer ::  VOLWCH(:,:,:)                      !
+  real(r8), pointer ::  VOLWOX(:,:,:)                      !
+  real(r8), pointer ::  VOLWNG(:,:,:)                      !
+  real(r8), pointer ::  VOLWN2(:,:,:)                      !
+  real(r8), pointer ::  VOLWN3(:,:,:)                      !
+  real(r8), pointer ::  VOLWNB(:,:,:)                      !
+  real(r8), pointer ::  VOLWHG(:,:,:)                      !
+  real(r8), pointer ::  HGSGL2(:,:,:)                      !
+  real(r8), pointer ::  DH2GG(:,:,:,:)                     !
+  real(r8), pointer ::  RHGFXS(:,:,:)                      !
+  real(r8), pointer ::  THGFHS(:,:,:)                      !
+  real(r8), pointer ::  THGFLG(:,:,:)                      !
+  real(r8), pointer ::  FLVM(:,:,:)                        !
+  real(r8), pointer ::  THETH2(:,:,:)                      !
+  real(r8), pointer ::  THETHL(:,:,:)                      !
+  real(r8), pointer ::  VOLPMA(:,:,:)                      !
+  real(r8), pointer ::  VOLPMB(:,:,:)                      !
+  real(r8), pointer ::  VOLWMA(:,:,:)                      !
+  real(r8), pointer ::  VOLWMB(:,:,:)                      !
+  real(r8), pointer ::  VOLWXA(:,:,:)                      !
+  real(r8), pointer ::  VOLWXB(:,:,:)                      !
+  real(r8), pointer ::  PARGCO(:,:)                        !
+  real(r8), pointer ::  PARGCH(:,:)                        !
+  real(r8), pointer ::  PARGOX(:,:)                        !
+  real(r8), pointer ::  PARGNG(:,:)                        !
+  real(r8), pointer ::  PARGN2(:,:)                        !
+  real(r8), pointer ::  PARGN3(:,:)                        !
+  real(r8), pointer ::  PARGH2(:,:)                        !
+  real(r8), pointer ::  RCOSK2(:,:,:)                      !
+  real(r8), pointer ::  ROXSK2(:,:,:)                      !
+  real(r8), pointer ::  RCHSK2(:,:,:)                      !
+  real(r8), pointer ::  RNGSK2(:,:,:)                      !
+  real(r8), pointer ::  RN2SK2(:,:,:)                      !
+  real(r8), pointer ::  RN4SK2(:,:,:)                      !
+  real(r8), pointer ::  RN3SK2(:,:,:)                      !
+  real(r8), pointer ::  RNOSK2(:,:,:)                      !
+  real(r8), pointer ::  RHPSK2(:,:,:)                      !
+  real(r8), pointer ::  R4BSK2(:,:,:)                      !
+  real(r8), pointer ::  R3BSK2(:,:,:)                      !
+  real(r8), pointer ::  RNBSK2(:,:,:)                      !
+  real(r8), pointer ::  RHBSK2(:,:,:)                      !
+  real(r8), pointer ::  RNXSK2(:,:,:)                      !
+  real(r8), pointer ::  RNZSK2(:,:,:)                      !
+  real(r8), pointer ::  RHGSK2(:,:,:)                      !
+  real(r8), pointer ::  RNHSK2(:,:,:)                      !
+  real(r8), pointer ::  R1PSK2(:,:,:)                      !
+  real(r8), pointer ::  TN3FLG(:,:,:)                      !
+  real(r8), pointer ::  RCOBBL(:,:,:)                      !
+  real(r8), pointer ::  RCHBBL(:,:,:)                      !
+  real(r8), pointer ::  ROXBBL(:,:,:)                      !
+  real(r8), pointer ::  RNGBBL(:,:,:)                      !
+  real(r8), pointer ::  RN2BBL(:,:,:)                      !
+  real(r8), pointer ::  RN3BBL(:,:,:)                      !
+  real(r8), pointer ::  RNBBBL(:,:,:)                      !
+  real(r8), pointer ::  RHGBBL(:,:,:)                      !
+  real(r8), pointer ::  RQRCOS0(:,:)                       !
+  real(r8), pointer ::  RQRCHS0(:,:)                       !
+  real(r8), pointer ::  RQROXS0(:,:)                       !
+  real(r8), pointer ::  RQRNGS0(:,:)                       !
+  real(r8), pointer ::  RQRN2S0(:,:)                       !
+  real(r8), pointer ::  RQRHGS0(:,:)                       !
+  real(r8), pointer ::  RQRNH40(:,:)                       !
+  real(r8), pointer ::  RQRNH30(:,:)                       !
+  real(r8), pointer ::  RQRNO30(:,:)                       !
+  real(r8), pointer ::  RQRNO20(:,:)                       !
+  real(r8), pointer ::  RQRH2P0(:,:)                       !
+  real(r8), pointer ::  RQRH1P0(:,:)                       !
+  real(r8), pointer ::  OQNH2(:,:,:,:)                     !
+  real(r8), pointer ::  OQPH2(:,:,:,:)                     !
+  real(r8), pointer ::  OQAH2(:,:,:,:)                     !
+  real(r8), pointer ::  TOCFHS(:,:,:,:)                    !
+  real(r8), pointer ::  TONFHS(:,:,:,:)                    !
+  real(r8), pointer ::  TOPFHS(:,:,:,:)                    !
+  real(r8), pointer ::  TOAFHS(:,:,:,:)                    !
+  real(r8), pointer ::  TCOFHS(:,:,:)                      !
+  real(r8), pointer ::  TCHFHS(:,:,:)                      !
+  real(r8), pointer ::  TOXFHS(:,:,:)                      !
+  real(r8), pointer ::  TNGFHS(:,:,:)                      !
+  real(r8), pointer ::  TN2FHS(:,:,:)                      !
+  real(r8), pointer ::  TN4FHW(:,:,:)                      !
+  real(r8), pointer ::  TN3FHW(:,:,:)                      !
+  real(r8), pointer ::  TNOFHW(:,:,:)                      !
+  real(r8), pointer ::  TH2PHS(:,:,:)                      !
+  real(r8), pointer ::  TN4FHB(:,:,:)                      !
+  real(r8), pointer ::  TN3FHB(:,:,:)                      !
+  real(r8), pointer ::  TNOFHB(:,:,:)                      !
+  real(r8), pointer ::  TH2BHB(:,:,:)                      !
+  real(r8), pointer ::  TNXFHS(:,:,:)                      !
+  real(r8), pointer ::  ZNO2B2(:,:,:)                      !
+  real(r8), pointer ::  ZN2BH2(:,:,:)                      !
+  real(r8), pointer ::  TNXFLB(:,:,:)                      !
+  real(r8), pointer ::  TNXFHB(:,:,:)                      !
+  real(r8), pointer ::  H1P4H2(:,:,:)                      !
+  real(r8), pointer ::  H1PBH2(:,:,:)                      !
+  real(r8), pointer ::  TH1PHS(:,:,:)                      !
+  real(r8), pointer ::  TH1BHB(:,:,:)                      !
+  REAL(R8), pointer ::  H1PO42(:,:,:)                      !
+  real(r8), pointer ::  H1POB2(:,:,:)                      !
+  real(r8), pointer ::  OCSGL2(:,:,:)                      !
+  real(r8), pointer ::  ONSGL2(:,:,:)                      !
+  real(r8), pointer ::  OPSGL2(:,:,:)                      !
+  real(r8), pointer ::  OASGL2(:,:,:)                      !
+  real(r8), pointer ::  CO2W2(:,:,:)                       !
+  real(r8), pointer ::  CH4W2(:,:,:)                       !
+  real(r8), pointer ::  OXYW2(:,:,:)                       !
+  real(r8), pointer ::  ZNGW2(:,:,:)                       !
+  real(r8), pointer ::  ZN2W2(:,:,:)                       !
+  real(r8), pointer ::  ZN4W2(:,:,:)                       !
+  real(r8), pointer ::  ZN3W2(:,:,:)                       !
+  real(r8), pointer ::  ZNOW2(:,:,:)                       !
+  real(r8), pointer ::  ZHPW2(:,:,:)                       !
+  real(r8), pointer ::  Z1PW2(:,:,:)                       !
+  real(r8), pointer ::  TCOBLS(:,:,:)                      !
+  real(r8), pointer ::  TCHBLS(:,:,:)                      !
+  real(r8), pointer ::  TOXBLS(:,:,:)                      !
+  real(r8), pointer ::  TNGBLS(:,:,:)                      !
+  real(r8), pointer ::  TN2BLS(:,:,:)                      !
+  real(r8), pointer ::  TN4BLW(:,:,:)                      !
+  real(r8), pointer ::  TN3BLW(:,:,:)                      !
+  real(r8), pointer ::  TNOBLW(:,:,:)                      !
+  real(r8), pointer ::  TH1PBS(:,:,:)                      !
+  real(r8), pointer ::  TH2PBS(:,:,:)                      !
+  real(r8), pointer ::  RQROP(:,:,:,:,:)                   !
+  real(r8), pointer ::  RQROA(:,:,:,:,:)                   !
+  real(r8), pointer ::  RQRCOS(:,:,:,:)                    !
+  real(r8), pointer ::  RQRCHS(:,:,:,:)                    !
+  real(r8), pointer ::  RQROXS(:,:,:,:)                    !
+  real(r8), pointer ::  RQRNGS(:,:,:,:)                    !
+  real(r8), pointer ::  RQRN2S(:,:,:,:)                    !
+  real(r8), pointer ::  RQRHGS(:,:,:,:)                    !
+  real(r8), pointer ::  RQRNH4(:,:,:,:)                    !
+  real(r8), pointer ::  RCODFS(:,:)                        !
+  real(r8), pointer ::  RCHDFS(:,:)                        !
+  real(r8), pointer ::  ROXDFS(:,:)                        !
+  real(r8), pointer ::  RNGDFS(:,:)                        !
+  real(r8), pointer ::  RN2DFS(:,:)                        !
+  real(r8), pointer ::  RN3DFS(:,:)                        !
+  real(r8), pointer ::  RNBDFS(:,:)                        !
+  real(r8), pointer ::  RHGDFS(:,:)                        !
+  real(r8), pointer ::  RCODFR(:,:)                        !
+  real(r8), pointer ::  RCHDFR(:,:)                        !
+  real(r8), pointer ::  ROXDFR(:,:)                        !
+  real(r8), pointer ::  RNGDFR(:,:)                        !
+  real(r8), pointer ::  RN2DFR(:,:)                        !
+  real(r8), pointer ::  RN3DFR(:,:)                        !
+  real(r8), pointer ::  RHGDFR(:,:)                        !
+  real(r8), pointer ::  R1BSK2(:,:,:)                      !
+  real(r8), pointer ::  RQROC(:,:,:,:,:)                   !
+  real(r8), pointer ::  RQRON(:,:,:,:,:)                   !
+
+  real(r8), pointer ::  CGSGL2(:,:,:)                      !
+  real(r8), pointer ::  CHSGL2(:,:,:)                      !
+  real(r8), pointer ::  OGSGL2(:,:,:)                      !
+  real(r8), pointer ::  ZGSGL2(:,:,:)                      !
+  real(r8), pointer ::  Z2SGL2(:,:,:)                      !
+  real(r8), pointer ::  ZHSGL2(:,:,:)                      !
+  real(r8), pointer ::  CO2SH2(:,:,:)                      !
+  real(r8), pointer ::  CH4SH2(:,:,:)                      !
+  real(r8), pointer ::  OXYSH2(:,:,:)                      !
+  real(r8), pointer ::  Z2GSH2(:,:,:)                      !
+  real(r8), pointer ::  Z2OSH2(:,:,:)                      !
+  real(r8), pointer ::  ZNH4H2(:,:,:)                      !
+  real(r8), pointer ::  ZN4BH2(:,:,:)                      !
+  real(r8), pointer ::  ZNH3H2(:,:,:)                      !
+  real(r8), pointer ::  ZN3BH2(:,:,:)                      !
+  real(r8), pointer ::  ZNO3H2(:,:,:)                      !
+  real(r8), pointer ::  ZNOBH2(:,:,:)                      !
+  real(r8), pointer ::  H2P4H2(:,:,:)                      !
+  real(r8), pointer ::  H2PBH2(:,:,:)                      !
+  real(r8), pointer ::  ZNO2H2(:,:,:)                      !
+  real(r8), pointer ::  OQCH2(:,:,:,:)                     !
+  real(r8), pointer ::  CH4S2(:,:,:)                       !
+  real(r8), pointer ::  OXYS2(:,:,:)                       !
+  real(r8), pointer ::  Z2GS2(:,:,:)                       !
+  real(r8), pointer ::  Z2OS2(:,:,:)                       !
+
+  real(r8), pointer :: trc_gasml2(:,:,:,:)
+  real(r8), pointer :: trc_solml2(:,:,:,:)
+
+  real(r8), pointer ::  H2GS2(:,:,:)                       !
+  real(r8), pointer ::  H2GSH2(:,:,:)                      !
+  real(r8), pointer ::  RQSH2P(:,:,:)                      !
+  real(r8), pointer ::  RQSH1P(:,:,:)                      !
+  real(r8), pointer ::  RQSCOS(:,:,:)                      !
+  real(r8), pointer ::  RQSCHS(:,:,:)                      !
+  real(r8), pointer ::  RQSOXS(:,:,:)                      !
+  real(r8), pointer ::  RQRH2P(:,:,:,:)                    !
+  real(r8), pointer ::  RQRH1P(:,:,:,:)                    !
+  real(r8), pointer ::  RHGFLG(:,:,:,:)                    !
+  real(r8), pointer ::  THGFLS(:,:,:)                      !
+  real(r8), pointer ::  ROXFLG(:,:,:,:)                    !
+  real(r8), pointer ::  RN3FLG(:,:,:,:)                    !
+  real(r8), pointer ::  RCOFLG(:,:,:,:)                    !
+  real(r8), pointer ::  RNXFHS(:,:,:,:)                    !
+  real(r8), pointer ::  RNXFHB(:,:,:,:)                    !
+  real(r8), pointer ::  RH1PFS(:,:,:,:)                    !
+  real(r8), pointer ::  RH1BFB(:,:,:,:)                    !
+  real(r8), pointer ::  RH1PHS(:,:,:,:)                    !
+  real(r8), pointer ::  RH1BHB(:,:,:,:)                    !
+  real(r8), pointer ::  RCHFLG(:,:,:,:)                    !
+  real(r8), pointer ::  RNGFLG(:,:,:,:)                    !
+  real(r8), pointer ::  RN2FLG(:,:,:,:)                    !
+  real(r8), pointer ::  RN3FHB(:,:,:,:)                    !
+  real(r8), pointer ::  RNOFHB(:,:,:,:)                    !
+  real(r8), pointer ::  RH2BHB(:,:,:,:)                    !
+  real(r8), pointer ::  RNOFHW(:,:,:,:)                    !
+  real(r8), pointer ::  RH2PHS(:,:,:,:)                    !
+  real(r8), pointer ::  RN4FHB(:,:,:,:)                    !
+  real(r8), pointer ::  RN2FHS(:,:,:,:)                    !
+  real(r8), pointer ::  RN4FHW(:,:,:,:)                    !
+  real(r8), pointer ::  RN3FHW(:,:,:,:)
+                  !
+  real(r8), pointer ::  RGasDSFlx(:,:,:,:)   !gas dissolution-volatilization
+  real(r8), pointer ::  RHGFHS(:,:,:,:)                    !
+  real(r8), pointer ::  RCHFHS(:,:,:,:)                    !
+  real(r8), pointer ::  ROXFHS(:,:,:,:)                    !
+  real(r8), pointer ::  RNGFHS(:,:,:,:)                    !
+  real(r8), pointer ::  RQRNH3(:,:,:,:)                    !
+  real(r8), pointer ::  RQRNO3(:,:,:,:)                    !
+  real(r8), pointer ::  RQRNO2(:,:,:,:)                    !
+  real(r8), pointer ::  RQSNGS(:,:,:)                      !
+  real(r8), pointer ::  RQSN2S(:,:,:)                      !
+  real(r8), pointer ::  RQSNH4(:,:,:)                      !
+  real(r8), pointer ::  RQSNH3(:,:,:)                      !
+  real(r8), pointer ::  RQSNO3(:,:,:)                      !
+  real(r8), pointer ::  RCOFLS(:,:,:,:)                    !
+  real(r8), pointer ::  RCHFLS(:,:,:,:)                    !
+  real(r8), pointer ::  ROXFLS(:,:,:,:)                    !
+  real(r8), pointer ::  RNGFLS(:,:,:,:)                    !
+  real(r8), pointer ::  RN2FLS(:,:,:,:)                    !
+  real(r8), pointer ::  RHGFLS(:,:,:,:)                    !
+  real(r8), pointer ::  RN4FLW(:,:,:,:)                    !
+  real(r8), pointer ::  RN3FLW(:,:,:,:)                    !
+  real(r8), pointer ::  RNOFLW(:,:,:,:)                    !
+  real(r8), pointer ::  RNXFLS(:,:,:,:)                    !
+  real(r8), pointer ::  RH2PFS(:,:,:,:)                    !
+  real(r8), pointer ::  RN4FLB(:,:,:,:)                    !
+  real(r8), pointer ::  RN3FLB(:,:,:,:)                    !
+  real(r8), pointer ::  RNOFLB(:,:,:,:)                    !
+  real(r8), pointer ::  RNXFLB(:,:,:,:)                    !
+  real(r8), pointer ::  RH2BFB(:,:,:,:)                    !
+  real(r8), pointer ::  RCOFHS(:,:,:,:)                    !
 !----------------------------------------------------------------------
 
 contains
@@ -556,13 +543,8 @@ contains
   allocate(ZVSGL2(0:JZ,JY,JX)); ZVSGL2=0._r8
   allocate(HLSGL2(0:JZ,JY,JX)); HLSGL2=0._r8
   allocate(ZOSGL2(0:JZ,JY,JX)); ZOSGL2=0._r8
-  allocate(RCODFG(0:JZ,JY,JX)); RCODFG=0._r8
-  allocate(RCHDFG(0:JZ,JY,JX)); RCHDFG=0._r8
-  allocate(ROXDFG(0:JZ,JY,JX)); ROXDFG=0._r8
-  allocate(RNGDFG(0:JZ,JY,JX)); RNGDFG=0._r8
-  allocate(RN2DFG(0:JZ,JY,JX)); RN2DFG=0._r8
-  allocate(RN3DFG(0:JZ,JY,JX)); RN3DFG=0._r8
   allocate(RNBDFG(0:JZ,JY,JX)); RNBDFG=0._r8
+
   allocate(TQROC(1:jcplx,JY,JX));   TQROC=0._r8
   allocate(TQRON(1:jcplx,JY,JX));   TQRON=0._r8
   allocate(TQROP(1:jcplx,JY,JX));   TQROP=0._r8
@@ -610,6 +592,8 @@ contains
   allocate(TQRH1P(JY,JX));      TQRH1P=0._r8
   allocate(TH1PFS(JZ,JY,JX));   TH1PFS=0._r8
   allocate(TH1BFB(JZ,JY,JX));   TH1BFB=0._r8
+
+  allocate(DifuscG(idg_beg:idg_end,3,JZ,JY,JX)); DifuscG=0._r8
   allocate(DCO2G(3,JZ,JY,JX));  DCO2G=0._r8
   allocate(DCH4G(3,JZ,JY,JX));  DCH4G=0._r8
   allocate(DOXYG(3,JZ,JY,JX));  DOXYG=0._r8
@@ -766,15 +750,7 @@ contains
   allocate(R1BSK2(JZ,JY,JX));   R1BSK2=0._r8
   allocate(RQROC(1:jcplx,2,2,JV,JH));RQROC=0._r8
   allocate(RQRON(1:jcplx,2,2,JV,JH));RQRON=0._r8
-  allocate(ZNH4S2(0:JZ,JY,JX)); ZNH4S2=0._r8
-  allocate(ZNH4B2(0:JZ,JY,JX)); ZNH4B2=0._r8
-  allocate(ZNH3S2(0:JZ,JY,JX)); ZNH3S2=0._r8
-  allocate(ZNH3B2(0:JZ,JY,JX)); ZNH3B2=0._r8
-  allocate(ZNO3S2(0:JZ,JY,JX)); ZNO3S2=0._r8
-  allocate(ZNO3B2(0:JZ,JY,JX)); ZNO3B2=0._r8
-  allocate(H2PO42(0:JZ,JY,JX)); H2PO42=0._r8
-  allocate(H2POB2(0:JZ,JY,JX)); H2POB2=0._r8
-  allocate(ZNO2S2(0:JZ,JY,JX)); ZNO2S2=0._r8
+
   allocate(CGSGL2(JZ,JY,JX));   CGSGL2=0._r8
   allocate(CHSGL2(JZ,JY,JX));   CHSGL2=0._r8
   allocate(OGSGL2(JZ,JY,JX));   OGSGL2=0._r8
@@ -796,18 +772,18 @@ contains
   allocate(H2PBH2(JZ,JY,JX));   H2PBH2=0._r8
   allocate(ZNO2H2(JZ,JY,JX));   ZNO2H2=0._r8
   allocate(OQCH2(1:jcplx,JZ,JY,JX));OQCH2=0._r8
-  allocate(CH4G2(JZ,JY,JX));    CH4G2=0._r8
   allocate(CH4S2(0:JZ,JY,JX));  CH4S2=0._r8
-  allocate(OXYG2(JZ,JY,JX));    OXYG2=0._r8
+
+  allocate(trc_gasml2(idg_beg:idg_end,0:JZ,JY,JX)); trc_gasml2(:,:,:,:)=0._r8
+  allocate(trc_solml2(ids_beg:ids_end,0:JZ,JY,JX)); trc_solml2(:,:,:,:)=0._r8
   allocate(OXYS2(0:JZ,JY,JX));  OXYS2=0._r8
-  allocate(Z2GG2(JZ,JY,JX));    Z2GG2=0._r8
+
   allocate(Z2GS2(0:JZ,JY,JX));  Z2GS2=0._r8
-  allocate(Z2OG2(JZ,JY,JX));    Z2OG2=0._r8
+
   allocate(Z2OS2(0:JZ,JY,JX));  Z2OS2=0._r8
-  allocate(ZN3G2(0:JZ,JY,JX));  ZN3G2=0._r8
-  allocate(CO2G2(JZ,JY,JX));    CO2G2=0._r8
-  allocate(CO2S2(0:JZ,JY,JX));  CO2S2=0._r8
-  allocate(H2GG2(JZ,JY,JX));    H2GG2=0._r8
+
+
+
   allocate(H2GS2(0:JZ,JY,JX));  H2GS2=0._r8
   allocate(H2GSH2(JZ,JY,JX));   H2GSH2=0._r8
   allocate(RQSH2P(2,JV,JH));    RQSH2P=0._r8
@@ -840,7 +816,8 @@ contains
   allocate(RN2FHS(3,JD,JV,JH)); RN2FHS=0._r8
   allocate(RN4FHW(3,JD,JV,JH)); RN4FHW=0._r8
   allocate(RN3FHW(3,JD,JV,JH)); RN3FHW=0._r8
-  allocate(RHGDFG(0:JZ,JY,JX)); RHGDFG=0._r8
+
+  allocate(RGasDSFlx(idg_beg:idg_end,0:JZ,JY,JX)); RGasDSFlx=0._r8
   allocate(RHGFHS(3,JD,JV,JH)); RHGFHS=0._r8
   allocate(RCHFHS(3,JD,JV,JH)); RCHFHS=0._r8
   allocate(ROXFHS(3,JD,JV,JH)); ROXFHS=0._r8
@@ -980,12 +957,7 @@ contains
   call destroy(ZVSGL2)
   call destroy(HLSGL2)
   call destroy(ZOSGL2)
-  call destroy(RCODFG)
-  call destroy(RCHDFG)
-  call destroy(ROXDFG)
-  call destroy(RNGDFG)
-  call destroy(RN2DFG)
-  call destroy(RN3DFG)
+
   call destroy(RNBDFG)
   call destroy(TQROC)
   call destroy(TQRON)
@@ -1190,15 +1162,7 @@ contains
   call destroy(R1BSK2)
   call destroy(RQROC)
   call destroy(RQRON)
-  call destroy(ZNH4S2)
-  call destroy(ZNH4B2)
-  call destroy(ZNH3S2)
-  call destroy(ZNH3B2)
-  call destroy(ZNO3S2)
-  call destroy(ZNO3B2)
-  call destroy(H2PO42)
-  call destroy(H2POB2)
-  call destroy(ZNO2S2)
+
   call destroy(CGSGL2)
   call destroy(CHSGL2)
   call destroy(OGSGL2)
@@ -1220,19 +1184,10 @@ contains
   call destroy(H2PBH2)
   call destroy(ZNO2H2)
   call destroy(OQCH2)
-  call destroy(CH4G2)
-  call destroy(CH4S2)
-  call destroy(OXYG2)
-  call destroy(OXYS2)
-  call destroy(Z2GG2)
-  call destroy(Z2GS2)
-  call destroy(Z2OG2)
-  call destroy(Z2OS2)
-  call destroy(ZN3G2)
-  call destroy(CO2G2)
-  call destroy(CO2S2)
-  call destroy(H2GG2)
-  call destroy(H2GS2)
+
+  call destroy(trc_gasml2)
+  call destroy(trc_solml2)
+
   call destroy(H2GSH2)
   call destroy(RQSH2P)
   call destroy(RQSH1P)
@@ -1264,7 +1219,9 @@ contains
   call destroy(RN2FHS)
   call destroy(RN4FHW)
   call destroy(RN3FHW)
-  call destroy(RHGDFG)
+
+  call destroy(RGasDSFlx)
+
   call destroy(RHGFHS)
   call destroy(RCHFHS)
   call destroy(ROXFHS)

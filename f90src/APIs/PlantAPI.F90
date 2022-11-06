@@ -776,19 +776,19 @@ implicit none
 
   DO L=1,NL(NY,NX)
     plt_soilchem%CNDU(L)=CNDU(L,NY,NX)
-    plt_soilchem%CGSGL(L)=CGSGL(L,NY,NX)
-    plt_soilchem%CHSGL(L)=CHSGL(L,NY,NX)
-    plt_soilchem%HGSGL(L)=HGSGL(L,NY,NX)
-    plt_soilchem%OGSGL(L)=OGSGL(L,NY,NX)
+    plt_soilchem%GasDifc(idg_CO2,L)=GasDifc(idg_CO2,L,NY,NX)
+    plt_soilchem%GasDifc(idg_CH4,L)=GasDifc(idg_CH4,L,NY,NX)
+    plt_soilchem%GasDifc(idg_H2,L) =GasDifc(idg_H2,L,NY,NX)
+    plt_soilchem%GasDifc(idg_O2,L) =GasDifc(idg_O2,L,NY,NX)
+    plt_soilchem%GasDifc(idg_N2O,L)=GasDifc(idg_N2O,L,NY,NX)
+    plt_soilchem%GasDifc(idg_NH3,L)=GasDifc(idg_NH3,L,NY,NX)
     plt_soilchem%RSCS(L)=RSCS(L,NY,NX)
-    plt_soilchem%Z2SGL(L)=Z2SGL(L,NY,NX)
-    plt_soilchem%ZHSGL(L)=ZHSGL(L,NY,NX)
     plt_site%DPTHZ(L)=DPTHZ(L,NY,NX)
   ENDDO
   plt_allom%FVRN(:) = FVRN(:)
   DO L=1,NL(NY,NX)
-    plt_soilchem%CO2G(L)=CO2G(L,NY,NX)
-    plt_soilchem%OXYG(L)=OXYG(L,NY,NX)
+    plt_soilchem%trc_gasml(idg_CO2,L)=trc_gasml(idg_CO2,L,NY,NX)
+    plt_soilchem%trc_gasml(idg_O2,L)=trc_gasml(idg_O2,L,NY,NX)
   ENDDO
 
   DO L=0,NL(NY,NX)

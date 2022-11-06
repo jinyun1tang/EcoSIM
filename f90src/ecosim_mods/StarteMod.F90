@@ -348,13 +348,13 @@ module StarteMod
 !
 !     INITIAL STATE VARIABLES FOR GAS IN SOIL
 !
-    CO2G(L,NY,NX)=CCO2EI(NY,NX)*VOLP(L,NY,NX)
-    CH4G(L,NY,NX)=AtmGgms(idg_CH4,NY,NX)*VOLP(L,NY,NX)
-    OXYG(L,NY,NX)=AtmGgms(idg_O2,NY,NX)*VOLP(L,NY,NX)
-    Z2GG(L,NY,NX)=AtmGgms(idg_N2,NY,NX)*VOLP(L,NY,NX)
-    Z2OG(L,NY,NX)=AtmGgms(idg_N2O,NY,NX)*VOLP(L,NY,NX)
-    ZNH3G(L,NY,NX)=AtmGgms(idg_NH3,NY,NX)*VOLP(L,NY,NX)
-    H2GG(L,NY,NX)=AtmGgms(idg_H2,NY,NX)*VOLP(L,NY,NX)
+    trc_gasml(idg_CO2,L,NY,NX)=CCO2EI(NY,NX)*VOLP(L,NY,NX)
+    trc_gasml(idg_CH4,L,NY,NX)=AtmGgms(idg_CH4,NY,NX)*VOLP(L,NY,NX)
+    trc_gasml(idg_O2,L,NY,NX)=AtmGgms(idg_O2,NY,NX)*VOLP(L,NY,NX)
+    trc_gasml(idg_N2,L,NY,NX)=AtmGgms(idg_N2,NY,NX)*VOLP(L,NY,NX)
+    trc_gasml(idg_N2O,L,NY,NX)=AtmGgms(idg_N2O,NY,NX)*VOLP(L,NY,NX)
+    trc_gasml(idg_NH3,L,NY,NX)=AtmGgms(idg_NH3,NY,NX)*VOLP(L,NY,NX)
+    trc_gasml(idg_H2,L,NY,NX)=AtmGgms(idg_H2,NY,NX)*VOLP(L,NY,NX)
     IF(CDPTH(L-1,NY,NX).LT.DTBLZ(NY,NX))THEN
       OXYS(L,NY,NX)=AtmGgms(idg_O2,NY,NX)*gas_solubility(idg_O2, ATCA(NY,NX)) &
         /(EXP(AOXYX*solutevar%CSTR1))*solutevar%FH2O*VOLW(L,NY,NX)

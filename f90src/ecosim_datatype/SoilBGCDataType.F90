@@ -5,247 +5,247 @@ module SoilBGCDataType
   use data_kind_mod, only : r8 => SHR_KIND_R8
   use GridConsts
   use ElmIDMod    , only : npelms
+  use TracerIDMod
   use EcoSIMConfig, only : jcplx => jcplxc,jsken => jskenc
 implicit none
   character(len=*), private, parameter :: mod_filename = __FILE__
 
-  real(r8),allocatable ::  CNH4(:,:,:)                       !soil NH4 content, [mg kg-1]
-  real(r8),allocatable ::  CNO3(:,:,:)                       !soil NO3 content, [mg kg-1]
-  real(r8),allocatable ::  CPO4(:,:,:)                       !soil PO4 content, [mg kg-1]
-  real(r8),allocatable ::  H2PO4(:,:,:)                      !PO4 non-band micropore, [g d-2]
-  real(r8),allocatable ::  ZNH4B(:,:,:)                      !NH4 band micropore, [g d-2]
-  real(r8),allocatable ::  ZNH3B(:,:,:)                      !NH3 band micropore, [g d-2]
-  real(r8),allocatable ::  ZNO3B(:,:,:)                      !NO3 band micropore, [g d-2]
-  real(r8),allocatable ::  H2POB(:,:,:)                      !PO4 band micropore, [g d-2]
-  real(r8),allocatable ::  ZNO2S(:,:,:)                      !NO2  non-band micropore, [g d-2]
-  real(r8),allocatable ::  ZNH3G(:,:,:)                      !gaseous NH3, [g d-2]
-  real(r8),allocatable ::  Z2GG(:,:,:)                       !gaseous N2, [g d-2]
-  real(r8),allocatable ::  Z2GS(:,:,:)                       !aqueous N2 micropore, [g d-2]
-  real(r8),allocatable ::  Z2OG(:,:,:)                       !gaseous N2O, [g d-2]
-  real(r8),allocatable ::  Z2OS(:,:,:)                       !aqueous N2O micropore, [g d-2]
+  real(r8),pointer ::  CNH4(:,:,:)                       !soil NH4 content, [mg kg-1]
+  real(r8),pointer ::  CNO3(:,:,:)                       !soil NO3 content, [mg kg-1]
+  real(r8),pointer ::  CPO4(:,:,:)                       !soil PO4 content, [mg kg-1]
+  real(r8),pointer ::  H2PO4(:,:,:)                      !PO4 non-band micropore, [g d-2]
+  real(r8),pointer ::  ZNH4B(:,:,:)                      !NH4 band micropore, [g d-2]
+  real(r8),pointer ::  ZNH3B(:,:,:)                      !NH3 band micropore, [g d-2]
+  real(r8),pointer ::  ZNO3B(:,:,:)                      !NO3 band micropore, [g d-2]
+  real(r8),pointer ::  H2POB(:,:,:)                      !PO4 band micropore, [g d-2]
+  real(r8),pointer ::  ZNO2S(:,:,:)                      !NO2  non-band micropore, [g d-2]
 
-  real(r8),allocatable ::  ZNH4SH(:,:,:)                     !NH4 non-band macropore, [g d-2]
-  real(r8),allocatable ::  ZNH3SH(:,:,:)                     !NH3 non-band macropore, [g d-2]
-  real(r8),allocatable ::  ZNO3SH(:,:,:)                     !NO3 non-band macropore, [g d-2]
-  real(r8),allocatable ::  H2PO4H(:,:,:)                     !PO4 non-band macropore, [g d-2]
-  real(r8),allocatable ::  ZNH4BH(:,:,:)                     !NH4 band macropore, [g d-2]
-  real(r8),allocatable ::  ZNH3BH(:,:,:)                     !NH3 band macropore, [g d-2]
-  real(r8),allocatable ::  ZNO3BH(:,:,:)                     !NO3 band macropore, [g d-2]
-  real(r8),allocatable ::  H2POBH(:,:,:)                     !PO4 band macropore, [g d-2]
-  real(r8),allocatable ::  ZNO2SH(:,:,:)                     !NO2  non-band macropore, [g d-2]
-  real(r8),allocatable ::  Z2GSH(:,:,:)                      !aqueous N2 macropore, [g d-2]
-  real(r8),allocatable ::  Z2OSH(:,:,:)                      !aqueous N2O macropore, [g d-2]
-  real(r8),allocatable ::  ZNO2BH(:,:,:)                     !NO2 band macropore, [g d-2]
+  real(r8),pointer ::  Z2GS(:,:,:)                       !aqueous N2 micropore, [g d-2]
+  real(r8),pointer ::  Z2OS(:,:,:)                       !aqueous N2O micropore, [g d-2]
 
-  real(r8),allocatable ::  ZNO2B(:,:,:)                      !NO2  band micropore, [g d-2]
-  real(r8),allocatable ::  ZNH4S(:,:,:)                      !NH4 non-band micropore, [g d-2]
-  real(r8),allocatable ::  ZNH3S(:,:,:)                      !NH3 non-band micropore, [g d-2]
-  real(r8),allocatable ::  ZNO3S(:,:,:)                      !NO3 non-band micropore, [g d-2]
+  real(r8),pointer ::  ZNH4SH(:,:,:)                     !NH4 non-band macropore, [g d-2]
+  real(r8),pointer ::  ZNH3SH(:,:,:)                     !NH3 non-band macropore, [g d-2]
+  real(r8),pointer ::  ZNO3SH(:,:,:)                     !NO3 non-band macropore, [g d-2]
+  real(r8),pointer ::  H2PO4H(:,:,:)                     !PO4 non-band macropore, [g d-2]
+  real(r8),pointer ::  ZNH4BH(:,:,:)                     !NH4 band macropore, [g d-2]
+  real(r8),pointer ::  ZNH3BH(:,:,:)                     !NH3 band macropore, [g d-2]
+  real(r8),pointer ::  ZNO3BH(:,:,:)                     !NO3 band macropore, [g d-2]
+  real(r8),pointer ::  H2POBH(:,:,:)                     !PO4 band macropore, [g d-2]
+  real(r8),pointer ::  ZNO2SH(:,:,:)                     !NO2  non-band macropore, [g d-2]
+  real(r8),pointer ::  Z2GSH(:,:,:)                      !aqueous N2 macropore, [g d-2]
+  real(r8),pointer ::  Z2OSH(:,:,:)                      !aqueous N2O macropore, [g d-2]
+  real(r8),pointer ::  ZNO2BH(:,:,:)                     !NO2 band macropore, [g d-2]
 
-  real(r8),allocatable ::  ZNFNI(:,:,:)                      !current nitrification inhibition activity
-  real(r8),allocatable ::  ZNFN0(:,:,:)                      !initial nitrification inhibition activity
-  real(r8),allocatable ::  ZNHUI(:,:,:)                      !current inhibition activity
-  real(r8),allocatable ::  ZNHU0(:,:,:)                      !urea hydrolysis inhibition activity
-  real(r8),allocatable :: CZ2GS(:,:,:)          !aqueous N2 concentration micropore	[g m-3]
-  real(r8),allocatable :: CNH4S(:,:,:)          !NH4 concentration non-band micropore	[g m-3]
-  real(r8),allocatable :: CNH3S(:,:,:)          !NH3 concentration non-band micropore	[g m-3]
-  real(r8),allocatable :: CNO3S(:,:,:)          !NO3 concentration non-band micropore	[g m-3]
-  real(r8),allocatable :: CPO4S(:,:,:)          !PO4 concentration non-band micropore	[g m-3]
-  real(r8),allocatable :: CNH4B(:,:,:)          !NH4 concentration band micropore	[g m-3]
-  real(r8),allocatable :: CNH3B(:,:,:)          !NH3 concentration band micropore	[g m-3]
-  real(r8),allocatable :: CNO3B(:,:,:)          !NO3 concentration band micropore	[g m-3]
-  real(r8),allocatable :: CPO4B(:,:,:)          !PO4 concentration band micropore	[g m-3]
-  real(r8),allocatable :: CNO2S(:,:,:)          !NO2 concentration non-band micropore	[g m-3]
-  real(r8),allocatable :: CNH3G(:,:,:)          !gaseous NH3 concentration	[g m-3]
-  real(r8),allocatable :: CZ2GG(:,:,:)          !gaseous N2 concentration	[g m-3]
-  real(r8),allocatable :: CZ2OG(:,:,:)          !gaseous N2O concentration	[g m-3]
-  real(r8),allocatable :: CZ2OS(:,:,:)          !aqueous N2O concentration micropore	[g m-3]
-  real(r8),allocatable :: COXYG(:,:,:)          !gaseous O2 concentration	[g m-3]
-  real(r8),allocatable :: CCH4G(:,:,:)          !gaseous CH4 concentration	[g m-3]
-  real(r8),allocatable :: COXYS(:,:,:)          !aqueous O2 concentration micropore	[g m-3]
-  real(r8),allocatable :: CCO2G(:,:,:)          !gaseous CO2 concentration	[g m-3]
-  real(r8),allocatable :: CCO2S(:,:,:)          !aqueous CO2 concentration micropore	[g m-3]
-  real(r8),allocatable :: CCH4S(:,:,:)          !aqueous CH4 concentration micropore	[g m-3]
-  real(r8),allocatable :: CH1P4(:,:,:)          !aqueous H1PO4 concentration non-band [g m-3]
-  real(r8),allocatable :: CH1P4B(:,:,:)         !aqueous H1PO4 concentration band [g m-3]
-  real(r8),allocatable :: CNO2B(:,:,:)          !aqueous HNO2 concentration band [g m-3]
-  real(r8),allocatable :: CH2GS(:,:,:)          !aqueous H2 concentration	[g m-3]
-  real(r8),allocatable :: CH2P4(:,:,:)          !aqueous PO4 concentration non-band	[g m-3]
-  real(r8),allocatable :: CH2P4B(:,:,:)         !aqueous PO4 concentration band	[g m-3]
-  real(r8),allocatable :: CH2GG(:,:,:)          !gaseous H2 concentration	[g m-3]
-  real(r8),allocatable :: OXYS(:,:,:)           !aqueous O2  micropore	[g d-2]
-  real(r8),allocatable :: OXYSH(:,:,:)          !aqueous O2 macropore	g [d-2]
-  real(r8),allocatable :: OXYG(:,:,:)           !gaseous O2 	[g d-2]
-  real(r8),allocatable :: CO2G(:,:,:)           !gaseous CO2	[g d-2]
-  real(r8),allocatable :: CO2S(:,:,:)           !aqueous CO2  micropore	[g d-2]
-  real(r8),allocatable :: CO2SH(:,:,:)          !aqueous CO2  macropore	[g d-2]
-  real(r8),allocatable :: CH4G(:,:,:)           !gaseous CH4	[g d-2]
-  real(r8),allocatable :: CH4S(:,:,:)           !aqueous CO2  micropore	[g d-2]
-  real(r8),allocatable :: CH4SH(:,:,:)          !aqueous CO2  macropore	[g d-2]
-  real(r8),allocatable :: H2GS(:,:,:)           !aqueous H2 	[g d-2]
-  real(r8),allocatable :: H2GSH(:,:,:)          !aqueous H2 macropore	[g d-2]
-  real(r8),allocatable :: H2GG(:,:,:)           !gaseous H2	[g d-2]
-  real(r8),allocatable :: PH(:,:,:)             !soil pH
-  real(r8),allocatable :: CEC(:,:,:)            !soil cation exchange capacity	[cmol kg-1]
-  real(r8),allocatable :: AEC(:,:,:)            !soil anion exchange capacity	[cmol kg-1]
+  real(r8),pointer ::  ZNO2B(:,:,:)                      !NO2  band micropore, [g d-2]
+  real(r8),pointer ::  ZNH4S(:,:,:)                      !NH4 non-band micropore, [g d-2]
+  real(r8),pointer ::  ZNH3S(:,:,:)                      !NH3 non-band micropore, [g d-2]
+  real(r8),pointer ::  ZNO3S(:,:,:)                      !NO3 non-band micropore, [g d-2]
 
-  real(r8),allocatable ::  H1PO4(:,:,:)                       !soil aqueous HPO4 content micropore non-band, [mol d-2]
-  real(r8),allocatable ::  H1POB(:,:,:)                       !soil aqueous HPO4 content micropore band, [mol d-2]
-  real(r8),allocatable ::  H1PO4H(:,:,:)                      !soil aqueous HPO4 content non-band macropore, [mol d-2]
-  real(r8),allocatable ::  H1POBH(:,:,:)                      !soil aqueous HPO4 content band macropore, [mol d-2]
-  real(r8),allocatable ::  ROXSK(:,:,:,:)                     !total O2 sink, [g d-2 t-1]
-  real(r8),allocatable ::  HCO2G(:,:)                         !soil CO2 flux, [g d-2 h-1]
-  real(r8),allocatable ::  HCH4G(:,:)                         !soil CH4 flux, [g d-2 h-1]
-  real(r8),allocatable ::  HOXYG(:,:)                         !soil O2 flux, [g d-2 h-1]
-  real(r8),allocatable ::  HN2OG(:,:)                         !soil N2O flux, [g d-2 h-1]
-  real(r8),allocatable ::  HNH3G(:,:)                         !soil NH3 flux, [g d-2 h-1]
-  real(r8),allocatable ::  UORGF(:,:)                         !total C amendment, [g d-2]
-  real(r8),allocatable ::  UFERTN(:,:)                        !total fertilizer N amendment, [g d-2]
-  real(r8),allocatable ::  UFERTP(:,:)                        !total fertilizer P amendment, [g d-2]
-  real(r8),allocatable ::  UDOCQ(:,:)                         !total surface DOC flux, [g d-2]
-  real(r8),allocatable ::  UDOCD(:,:)                         !total subsurface DOC flux, [g d-2]
-  real(r8),allocatable ::  UXCSN(:,:)                         !total litterfall C, [g d-2]
-  real(r8),allocatable ::  UXZSN(:,:)                         !total litterfall N, [g d-2]
-  real(r8),allocatable ::  UXPSN(:,:)                         !total litterfall P, [g d-2]
-  real(r8),allocatable ::  UDONQ(:,:)                         !total surface DON flux, [g d-2]
-  real(r8),allocatable ::  UDOND(:,:)                         !total subsurface DON flux, [g d-2]
-  real(r8),allocatable ::  UDOPQ(:,:)                         !total surface DOP flux, [g d-2]
-  real(r8),allocatable ::  UDOPD(:,:)                         !total subsurface DOP flux, [g d-2]
-  real(r8),allocatable ::  UPP4(:,:)                          !total soil precipited P, [g d-2]
-  real(r8),allocatable ::  UN2GS(:,:)                         !total N2 fixation, [g d-2]
-  real(r8),allocatable ::  UH2GG(:,:)                         !total H2 flux, []
-  real(r8),allocatable ::  HN2GG(:,:)                         !soil N2 flux, [g d-2 h-1]
-  real(r8),allocatable ::  UN2GG(:,:)                         !total soil N2 flux, [g d-2]
-  real(r8),allocatable ::  UCO2G(:,:)                         !total soil CO2 flux, [g d-2]
-  real(r8),allocatable ::  UCH4G(:,:)                         !total soil CH4 flux, [g d-2]
-  real(r8),allocatable ::  UOXYG(:,:)                         !total soil O2 flux, [g d-2]
-  real(r8),allocatable ::  UNH3G(:,:)                         !total soil NH3 flux, [g d-2]
-  real(r8),allocatable ::  UN2OG(:,:)                         !total soil N2O flux, [g d-2]
-  real(r8),allocatable ::  UCOP(:,:)                          !total soil autotrophic respiration, [g d-2]
-  real(r8),allocatable ::  USEDOU(:,:)                        !total sediment subsurface flux, [Mg d-2]
-  real(r8),allocatable ::  UDICQ(:,:)                         !total surface DIC flux, [g d-2]
-  real(r8),allocatable ::  UDICD(:,:)                         !total subsurface DIC flux, [g d-2]
-  real(r8),allocatable ::  UDINQ(:,:)                         !total surface DIN flux, [g d-2]
-  real(r8),allocatable ::  UDIND(:,:)                         !total subsurface DIN flux, [g d-2]
-  real(r8),allocatable ::  UDIPQ(:,:)                         !total surface DIP flux, [g d-2]
-  real(r8),allocatable ::  UDIPD(:,:)                         !total subsurface DIP flux, [g d-2]
-  real(r8),allocatable ::  WTSTGT(:,:)                        !total standing dead C, [g d-2]
-  real(r8),allocatable ::  ZDRAIN(:,:)                        !total N drainage below root zone, [g d-2]
-  real(r8),allocatable ::  PDRAIN(:,:)                        !total P drainage below root zone, [g d-2]
-  real(r8),allocatable ::  UION(:,:)                          !total soil ion content, [mol d-2]
-  real(r8),allocatable ::  UIONOU(:,:)                        !total subsurface ion flux, [mol d-2]
-  real(r8),allocatable ::  XNO2S(:,:,:)                       !total NO2 exchange, [g d-2 h-1]
-  real(r8),allocatable ::  RUPOXO(:,:,:)                      !microbial O2 uptake, [g d-2 h-1]
-  real(r8),allocatable ::  RCO2O(:,:,:)                       !microbial net CO2 exchange, [g d-2 h-1]
-  real(r8),allocatable ::  RCH4O(:,:,:)                       !microbial net CH4 exchange, [g d-2 h-1]
-  real(r8),allocatable ::  RH2GO(:,:,:)                       !microbial net H2 exchange, [g d-2 h-1]
-  real(r8),allocatable ::  RN2G(:,:,:)                        !microbial net N2 exchange, [g d-2 h-1]
-  real(r8),allocatable ::  RN2O(:,:,:)                        !microbial net N2O exchange, [g d-2 h-1]
-  real(r8),allocatable ::  XNO2B(:,:,:)                       !net microbial NO2 exchange band, [g d-2 h-1]
-  real(r8),allocatable ::  XNH4B(:,:,:)                       !net microbial NH4 exchange band, [g d-2 h-1]
-  real(r8),allocatable ::  XNO3B(:,:,:)                       !net microbial NO3 exchange band, [g d-2 h-1]
-  real(r8),allocatable ::  XH2BS(:,:,:)                       !net microbial PO4 exchange band, [g d-2 h-1]
-  real(r8),allocatable ::  XH1BS(:,:,:)                       !net microbial HPO4 exchange band, [g d-2 h-1]
-  real(r8),allocatable ::  XN2GS(:,:,:)                       !net microbial N2 exchange, [g d-2 h-1]
-  real(r8),allocatable ::  XH1PS(:,:,:)                       !net microibal HPO4 exchange non-band, [g d-2 h-1]
-  real(r8),allocatable ::  XH2PS(:,:,:)                       !net microbial PO4 exchange nonband, [g d-2 h-1]
-  real(r8),allocatable ::  XNH4S(:,:,:)                       !net microbial NH4 exchange non-band, [g d-2 h-1]
-  real(r8),allocatable ::  XNO3S(:,:,:)                       !net microbial NO3 exchange non-band, [g d-2 h-1]
-  real(r8),allocatable ::  XOQCS(:,:,:,:)                     !net microbial DOC flux, [g d-2 h-1]
-  real(r8),allocatable ::  XOQNS(:,:,:,:)                     !net microbial DON flux, [g d-2 h-1]
-  real(r8),allocatable ::  XOQPS(:,:,:,:)                     !net microbial DOP flux, [g d-2 h-1]
-  real(r8),allocatable ::  XOQAS(:,:,:,:)                     !net microbial acetate flux, [g d-2 h-1]
-  real(r8),allocatable ::  TOQCK(:,:,:)                       !total respiration of DOC+DOA in soil layer
-  real(r8),allocatable ::  VOLQ(:,:,:)                        !soil water volume occupied by microial biomass, [m3 m-3]
-  real(r8),allocatable ::  TFNQ(:,:,:)                        !constraints of temperature and water potential on microbial activity, []
-  real(r8),allocatable ::  ESNT(:,:,:,:,:,:)                    !total litterfall C, [g d-2 h-1]
-  real(r8),allocatable ::  VLNH4(:,:,:)                       !NH4 non-band volume fracrion, []
-  real(r8),allocatable ::  VLNHB(:,:,:)                       !NH4 band volume fracrion, []
-  real(r8),allocatable ::  VLNO3(:,:,:)                       !NO3 non-band volume fracrion, []
-  real(r8),allocatable ::  VLNOB(:,:,:)                       !NO3 band volume fracrion, []
-  real(r8),allocatable ::  VLPO4(:,:,:)                       !PO4 non-band volume fracrion, []
-  real(r8),allocatable ::  VLPOB(:,:,:)                       !PO4 band volume fracrion, []
-  real(r8),allocatable ::  WDNHB(:,:,:)                       !width of NH4 band, [m]
-  real(r8),allocatable ::  DPNHB(:,:,:)                       !depth of NH4 band, [m]
-  real(r8),allocatable ::  WDNOB(:,:,:)                       !width of NO3 band, [m]
-  real(r8),allocatable ::  DPNOB(:,:,:)                       !depth of NO4 band, [m]
-  real(r8),allocatable ::  WDPOB(:,:,:)                       !width of PO4 band, [m]
-  real(r8),allocatable ::  DPPOB(:,:,:)                       !depth of PO4 band, [m]
-  real(r8),allocatable ::  DPNH4(:,:)                         !total depth of NH4 band, [m]
-  real(r8),allocatable ::  DPNO3(:,:)                         !total depth of NO3 band, [m]
-  real(r8),allocatable ::  DPPO4(:,:)                         !total depth of PO4 band, [m]
-  real(r8),allocatable ::  RVMXC(:,:,:)                       !total chemodenitrification N2O uptake non-band unconstrained by N2O, [g d-2 h-1]
-  real(r8),allocatable ::  RVMBC(:,:,:)                       !total chemodenitrification N2O uptake band unconstrained by N2O, [g d-2 h-1]
-  real(r8),allocatable ::  XCODFR(:,:)                        !soil surface CO2 dissolution (+ve) - volatilization (-ve), [g d-2 h-1]
-  real(r8),allocatable ::  XCHDFR(:,:)                        !soil surface CH4 dissolution (+ve) - volatilization (-ve), [g d-2 h-1]
-  real(r8),allocatable ::  XOXDFR(:,:)                        !soil surface O2 dissolution (+ve) - volatilization (-ve), [g d-2 h-1]
-  real(r8),allocatable ::  XNGDFR(:,:)                        !soil surface N2 dissolution (+ve) - volatilization (-ve), [g d-2 h-1]
-  real(r8),allocatable ::  XN2DFR(:,:)                        !soil surface N2O dissolution (+ve) - volatilization (-ve), [g d-2 h-1]
-  real(r8),allocatable ::  XN3DFR(:,:)                        !soil surface NH3 dissolution (+ve) - volatilization (-ve), [g d-2 h-1]
-  real(r8),allocatable ::  XHGDFR(:,:)                        !soil surface H2 dissolution (+ve) - volatilization (-ve), [g d-2 h-1]
-  real(r8),allocatable ::  XCOBBL(:,:,:)                      !CO2 bubbling, [g d-2 h-1]
-  real(r8),allocatable ::  XCHBBL(:,:,:)                      !CH4 bubbling, [g d-2 h-1]
-  real(r8),allocatable ::  XOXBBL(:,:,:)                      !O2 bubbling, [g d-2 h-1]
-  real(r8),allocatable ::  XNGBBL(:,:,:)                      !N2 bubbling, [g d-2 h-1]
-  real(r8),allocatable ::  XN2BBL(:,:,:)                      !N2O bubbling, [g d-2 h-1]
-  real(r8),allocatable ::  XN3BBL(:,:,:)                      !NH3 bubbling non-band, [g d-2 h-1]
-  real(r8),allocatable ::  XNBBBL(:,:,:)                      !NH3 bubbling band, [g d-2 h-1]
-  real(r8),allocatable ::  XHGBBL(:,:,:)                      !H2 bubbling, [g d-2 h-1]
-  real(r8),allocatable ::  XZHYS(:,:,:)                       !total H+ production
-  real(r8),allocatable ::  FLW(:,:,:,:)                       !water flux micropore, [m3 d-2 h-1]
-  real(r8),allocatable ::  FLWH(:,:,:,:)                      !water flux macropore, [m3 d-2 h-1]
-  real(r8),allocatable ::  HFLW(:,:,:,:)                      !convective heat flux micropore, [MJ d-2 h-1]
-  real(r8),allocatable ::  XCOFLS(:,:,:,:)                    !aqueous CO2 flux micropore, [g d-2 h-1]
-  real(r8),allocatable ::  XCHFLS(:,:,:,:)                    !aqueous CH4 flux micropore, [g d-2 h-1]
-  real(r8),allocatable ::  XOXFLS(:,:,:,:)                    !aqueous O2 flux micropore, [g d-2 h-1]
-  real(r8),allocatable ::  XNGFLS(:,:,:,:)                    !aqueous N2 flux micropore, [g d-2 h-1]
-  real(r8),allocatable ::  XN2FLS(:,:,:,:)                    !aqueous N2O flux micropore, [g d-2 h-1]
-  real(r8),allocatable ::  XHGFLS(:,:,:,:)                    !aqueous H2 flux micropore, [g d-2 h-1]
-  real(r8),allocatable ::  XN4FLW(:,:,:,:)                    !aqueous NH4 flux non-band micropore, [g d-2 h-1]
-  real(r8),allocatable ::  XN3FLW(:,:,:,:)                    !aqueous NH3 flux non-band micropore, [g d-2 h-1]
-  real(r8),allocatable ::  XNOFLW(:,:,:,:)                    !aqueous NO3 flux non-band micropore, [g d-2 h-1]
-  real(r8),allocatable ::  XH2PFS(:,:,:,:)                    !aqueous PO4 flux non-band micropore, [g d-2 h-1]
-  real(r8),allocatable ::  XNXFLS(:,:,:,:)                    !aqueous NO2 flux non-band micropore, [g d-2 h-1]
-  real(r8),allocatable ::  XN4FLB(:,:,:,:)                    !aqueous NH4 flux band micropore, [g d-2 h-1]
-  real(r8),allocatable ::  XN3FLB(:,:,:,:)                    !aqueous NH3 flux band micropore, [g d-2 h-1]
-  real(r8),allocatable ::  XNOFLB(:,:,:,:)                    !aqueous NO3 flux band micropore, [g d-2 h-1]
-  real(r8),allocatable ::  XH2BFB(:,:,:,:)                    !aqueous PO4 flux band micropore, [g d-2 h-1]
-  real(r8),allocatable ::  XNXFLB(:,:,:,:)                    !aqueous NO2 flux band micropore, [g d-2 h-1]
-  real(r8),allocatable ::  XOCFLS(:,:,:,:,:)                  !DOC flux micropore, [g d-2 h-1]
-  real(r8),allocatable ::  XONFLS(:,:,:,:,:)                  !DON flux micropore, [g d-2 h-1]
-  real(r8),allocatable ::  XCHFLG(:,:,:,:)                    !gaseous CH4 flux, [g d-2 h-1]
-  real(r8),allocatable ::  XOAFLS(:,:,:,:,:)                  !aqueous acetate flux, [g d-2 h-1]
-  real(r8),allocatable ::  XCOFLG(:,:,:,:)                    !gaseous CO2 flux, [g d-2 h-1]
-  real(r8),allocatable ::  XOPFLS(:,:,:,:,:)                  !DOP flux micropore, [g d-2 h-1]
-  real(r8),allocatable ::  XOXFLG(:,:,:,:)                    !gaseous O24 flux, [g d-2 h-1]
-  real(r8),allocatable ::  XNGFLG(:,:,:,:)                    !gaseous N2 flux, [g d-2 h-1]
-  real(r8),allocatable ::  XHGFLG(:,:,:,:)                    !gaseous H2 flux, [g d-2 h-1]
-  real(r8),allocatable ::  XN2FLG(:,:,:,:)                    !gaseous N2O flux, [g d-2 h-1]
-  real(r8),allocatable ::  XN3FLG(:,:,:,:)                    !gaseous NH3 flux, [g d-2 h-1]
-  real(r8),allocatable ::  XH1PFS(:,:,:,:)                    !total HPO4 in micropore water flux non-band, [mol d-2 h-1]
-  real(r8),allocatable ::  XH1BFB(:,:,:,:)                    !total HPO4 in micropore water flux band, [mol d-2 h-1]
-  real(r8),allocatable ::  XCOFHS(:,:,:,:)                    !aqueous CO2 flux macropore, [g d-2 h-1]
-  real(r8),allocatable ::  XCHFHS(:,:,:,:)                    !aqueous CH4 flux macropore, [g d-2 h-1]
-  real(r8),allocatable ::  XOXFHS(:,:,:,:)                    !aqueous O2 flux macropore, [g d-2 h-1]
-  real(r8),allocatable ::  XNGFHS(:,:,:,:)                    !aqueous N2 flux macropore, [g d-2 h-1]
-  real(r8),allocatable ::  XN2FHS(:,:,:,:)                    !aqueous N2O flux macropore, [g d-2 h-1]
-  real(r8),allocatable ::  XHGFHS(:,:,:,:)                    !aqueous H2 flux macropore, [g d-2 h-1]
-  real(r8),allocatable ::  XN4FHW(:,:,:,:)                    !aqueous NH4 flux non-band macropore, [g d-2 h-1]
-  real(r8),allocatable ::  XN3FHW(:,:,:,:)                    !aqueous NH3 flux non-band macropore, [g d-2 h-1]
-  real(r8),allocatable ::  XNOFHW(:,:,:,:)                    !aqueous NO3 flux non-band macropore, [g d-2 h-1]
-  real(r8),allocatable ::  XH2PHS(:,:,:,:)                    !aqueous PO4 flux non-band macropore, [g d-2 h-1]
-  real(r8),allocatable ::  XNXFHS(:,:,:,:)                    !aqueous NO2 flux non-band macropore, [g d-2 h-1]
-  real(r8),allocatable ::  XN4FHB(:,:,:,:)                    !aqueous NH4 flux band macropore, [g d-2 h-1]
-  real(r8),allocatable ::  XN3FHB(:,:,:,:)                    !aqueous NH3 flux band macropore, [g d-2 h-1]
-  real(r8),allocatable ::  XNOFHB(:,:,:,:)                    !aqueous NO3 flux band macropore, [g d-2 h-1]
-  real(r8),allocatable ::  XNXFHB(:,:,:,:)                    !aqueous PO4 flux band macropore, [g d-2 h-1]
-  real(r8),allocatable ::  XH2BHB(:,:,:,:)                    !aqueous NO2 flux band macropore, [g d-2 h-1]
-  real(r8),allocatable ::  XOCFHS(:,:,:,:,:)                  !DOC flux macropore, [g d-2 h-1]
-  real(r8),allocatable ::  XONFHS(:,:,:,:,:)                  !DON flux macropore, [g d-2 h-1]
-  real(r8),allocatable ::  XOPFHS(:,:,:,:,:)                  !DOP flux macropore, [g d-2 h-1]
-  real(r8),allocatable ::  XOAFHS(:,:,:,:,:)                  !acetate flux macropore, [g d-2 h-1]
-  real(r8),allocatable ::  XH1PHS(:,:,:,:)                    !total HPO4 in macropore water flux non-band, [mol d-2 h-1]
-  real(r8),allocatable ::  XH1BHB(:,:,:,:)                    !total HPO4 in macropore water flux band, [mol d-2 h-1]
+  real(r8),pointer ::  ZNFNI(:,:,:)                      !current nitrification inhibition activity
+  real(r8),pointer ::  ZNFN0(:,:,:)                      !initial nitrification inhibition activity
+  real(r8),pointer ::  ZNHUI(:,:,:)                      !current inhibition activity
+  real(r8),pointer ::  ZNHU0(:,:,:)                      !urea hydrolysis inhibition activity
+  real(r8),pointer :: CZ2GS(:,:,:)          !aqueous N2 concentration micropore	[g m-3]
+  real(r8),pointer :: CNH4S(:,:,:)          !NH4 concentration non-band micropore	[g m-3]
+  real(r8),pointer :: CNH3S(:,:,:)          !NH3 concentration non-band micropore	[g m-3]
+  real(r8),pointer :: CNO3S(:,:,:)          !NO3 concentration non-band micropore	[g m-3]
+  real(r8),pointer :: CPO4S(:,:,:)          !PO4 concentration non-band micropore	[g m-3]
+  real(r8),pointer :: CNH4B(:,:,:)          !NH4 concentration band micropore	[g m-3]
+  real(r8),pointer :: CNH3B(:,:,:)          !NH3 concentration band micropore	[g m-3]
+  real(r8),pointer :: CNO3B(:,:,:)          !NO3 concentration band micropore	[g m-3]
+  real(r8),pointer :: CPO4B(:,:,:)          !PO4 concentration band micropore	[g m-3]
+  real(r8),pointer :: CNO2S(:,:,:)          !NO2 concentration non-band micropore	[g m-3]
+  real(r8),pointer :: CNH3G(:,:,:)          !gaseous NH3 concentration	[g m-3]
+  real(r8),pointer :: CZ2GG(:,:,:)          !gaseous N2 concentration	[g m-3]
+  real(r8),pointer :: CZ2OG(:,:,:)          !gaseous N2O concentration	[g m-3]
+  real(r8),pointer :: CZ2OS(:,:,:)          !aqueous N2O concentration micropore	[g m-3]
+  real(r8),pointer :: COXYG(:,:,:)          !gaseous O2 concentration	[g m-3]
+  real(r8),pointer :: CCH4G(:,:,:)          !gaseous CH4 concentration	[g m-3]
+  real(r8),pointer :: COXYS(:,:,:)          !aqueous O2 concentration micropore	[g m-3]
+  real(r8),pointer :: CCO2G(:,:,:)          !gaseous CO2 concentration	[g m-3]
+  real(r8),pointer :: CCO2S(:,:,:)          !aqueous CO2 concentration micropore	[g m-3]
+  real(r8),pointer :: CCH4S(:,:,:)          !aqueous CH4 concentration micropore	[g m-3]
+  real(r8),pointer :: CH1P4(:,:,:)          !aqueous H1PO4 concentration non-band [g m-3]
+  real(r8),pointer :: CH1P4B(:,:,:)         !aqueous H1PO4 concentration band [g m-3]
+  real(r8),pointer :: CNO2B(:,:,:)          !aqueous HNO2 concentration band [g m-3]
+  real(r8),pointer :: CH2GS(:,:,:)          !aqueous H2 concentration	[g m-3]
+  real(r8),pointer :: CH2P4(:,:,:)          !aqueous PO4 concentration non-band	[g m-3]
+  real(r8),pointer :: CH2P4B(:,:,:)         !aqueous PO4 concentration band	[g m-3]
+  real(r8),pointer :: CH2GG(:,:,:)          !gaseous H2 concentration	[g m-3]
+  real(r8),pointer :: OXYS(:,:,:)           !aqueous O2  micropore	[g d-2]
+  real(r8),pointer :: OXYSH(:,:,:)          !aqueous O2 macropore	g [d-2]
+
+  real(r8),pointer :: trc_gasml(:,:,:,:)     !layer mass of gases [g d-2]
+
+  real(r8),pointer :: CO2S(:,:,:)           !aqueous CO2  micropore	[g d-2]
+  real(r8),pointer :: CO2SH(:,:,:)          !aqueous CO2  macropore	[g d-2]
+
+  real(r8),pointer :: CH4S(:,:,:)           !aqueous CO2  micropore	[g d-2]
+  real(r8),pointer :: CH4SH(:,:,:)          !aqueous CO2  macropore	[g d-2]
+  real(r8),pointer :: H2GS(:,:,:)           !aqueous H2 	[g d-2]
+  real(r8),pointer :: H2GSH(:,:,:)          !aqueous H2 macropore	[g d-2]
+
+  real(r8),pointer :: PH(:,:,:)             !soil pH
+  real(r8),pointer :: CEC(:,:,:)            !soil cation exchange capacity	[cmol kg-1]
+  real(r8),pointer :: AEC(:,:,:)            !soil anion exchange capacity	[cmol kg-1]
+
+  real(r8),pointer ::  H1PO4(:,:,:)                       !soil aqueous HPO4 content micropore non-band, [mol d-2]
+  real(r8),pointer ::  H1POB(:,:,:)                       !soil aqueous HPO4 content micropore band, [mol d-2]
+  real(r8),pointer ::  H1PO4H(:,:,:)                      !soil aqueous HPO4 content non-band macropore, [mol d-2]
+  real(r8),pointer ::  H1POBH(:,:,:)                      !soil aqueous HPO4 content band macropore, [mol d-2]
+  real(r8),pointer ::  ROXSK(:,:,:,:)                     !total O2 sink, [g d-2 t-1]
+  real(r8),pointer ::  HCO2G(:,:)                         !soil CO2 flux, [g d-2 h-1]
+  real(r8),pointer ::  HCH4G(:,:)                         !soil CH4 flux, [g d-2 h-1]
+  real(r8),pointer ::  HOXYG(:,:)                         !soil O2 flux, [g d-2 h-1]
+  real(r8),pointer ::  HN2OG(:,:)                         !soil N2O flux, [g d-2 h-1]
+  real(r8),pointer ::  HNH3G(:,:)                         !soil NH3 flux, [g d-2 h-1]
+  real(r8),pointer ::  UORGF(:,:)                         !total C amendment, [g d-2]
+  real(r8),pointer ::  UFERTN(:,:)                        !total fertilizer N amendment, [g d-2]
+  real(r8),pointer ::  UFERTP(:,:)                        !total fertilizer P amendment, [g d-2]
+  real(r8),pointer ::  UDOCQ(:,:)                         !total surface DOC flux, [g d-2]
+  real(r8),pointer ::  UDOCD(:,:)                         !total subsurface DOC flux, [g d-2]
+  real(r8),pointer ::  UXCSN(:,:)                         !total litterfall C, [g d-2]
+  real(r8),pointer ::  UXZSN(:,:)                         !total litterfall N, [g d-2]
+  real(r8),pointer ::  UXPSN(:,:)                         !total litterfall P, [g d-2]
+  real(r8),pointer ::  UDONQ(:,:)                         !total surface DON flux, [g d-2]
+  real(r8),pointer ::  UDOND(:,:)                         !total subsurface DON flux, [g d-2]
+  real(r8),pointer ::  UDOPQ(:,:)                         !total surface DOP flux, [g d-2]
+  real(r8),pointer ::  UDOPD(:,:)                         !total subsurface DOP flux, [g d-2]
+  real(r8),pointer ::  UPP4(:,:)                          !total soil precipited P, [g d-2]
+  real(r8),pointer ::  UN2GS(:,:)                         !total N2 fixation, [g d-2]
+  real(r8),pointer ::  UH2GG(:,:)                         !total H2 flux, []
+  real(r8),pointer ::  HN2GG(:,:)                         !soil N2 flux, [g d-2 h-1]
+  real(r8),pointer ::  UN2GG(:,:)                         !total soil N2 flux, [g d-2]
+  real(r8),pointer ::  UCO2G(:,:)                         !total soil CO2 flux, [g d-2]
+  real(r8),pointer ::  UCH4G(:,:)                         !total soil CH4 flux, [g d-2]
+  real(r8),pointer ::  UOXYG(:,:)                         !total soil O2 flux, [g d-2]
+  real(r8),pointer ::  UNH3G(:,:)                         !total soil NH3 flux, [g d-2]
+  real(r8),pointer ::  UN2OG(:,:)                         !total soil N2O flux, [g d-2]
+  real(r8),pointer ::  UCOP(:,:)                          !total soil autotrophic respiration, [g d-2]
+  real(r8),pointer ::  USEDOU(:,:)                        !total sediment subsurface flux, [Mg d-2]
+  real(r8),pointer ::  UDICQ(:,:)                         !total surface DIC flux, [g d-2]
+  real(r8),pointer ::  UDICD(:,:)                         !total subsurface DIC flux, [g d-2]
+  real(r8),pointer ::  UDINQ(:,:)                         !total surface DIN flux, [g d-2]
+  real(r8),pointer ::  UDIND(:,:)                         !total subsurface DIN flux, [g d-2]
+  real(r8),pointer ::  UDIPQ(:,:)                         !total surface DIP flux, [g d-2]
+  real(r8),pointer ::  UDIPD(:,:)                         !total subsurface DIP flux, [g d-2]
+  real(r8),pointer ::  WTSTGT(:,:)                        !total standing dead C, [g d-2]
+  real(r8),pointer ::  ZDRAIN(:,:)                        !total N drainage below root zone, [g d-2]
+  real(r8),pointer ::  PDRAIN(:,:)                        !total P drainage below root zone, [g d-2]
+  real(r8),pointer ::  UION(:,:)                          !total soil ion content, [mol d-2]
+  real(r8),pointer ::  UIONOU(:,:)                        !total subsurface ion flux, [mol d-2]
+  real(r8),pointer ::  XNO2S(:,:,:)                       !total NO2 exchange, [g d-2 h-1]
+  real(r8),pointer ::  RUPOXO(:,:,:)                      !microbial O2 uptake, [g d-2 h-1]
+  real(r8),pointer ::  RCO2O(:,:,:)                       !microbial net CO2 exchange, [g d-2 h-1]
+  real(r8),pointer ::  RCH4O(:,:,:)                       !microbial net CH4 exchange, [g d-2 h-1]
+  real(r8),pointer ::  RH2GO(:,:,:)                       !microbial net H2 exchange, [g d-2 h-1]
+  real(r8),pointer ::  RN2G(:,:,:)                        !microbial net N2 exchange, [g d-2 h-1]
+  real(r8),pointer ::  RN2O(:,:,:)                        !microbial net N2O exchange, [g d-2 h-1]
+  real(r8),pointer ::  XNO2B(:,:,:)                       !net microbial NO2 exchange band, [g d-2 h-1]
+  real(r8),pointer ::  XNH4B(:,:,:)                       !net microbial NH4 exchange band, [g d-2 h-1]
+  real(r8),pointer ::  XNO3B(:,:,:)                       !net microbial NO3 exchange band, [g d-2 h-1]
+  real(r8),pointer ::  XH2BS(:,:,:)                       !net microbial PO4 exchange band, [g d-2 h-1]
+  real(r8),pointer ::  XH1BS(:,:,:)                       !net microbial HPO4 exchange band, [g d-2 h-1]
+  real(r8),pointer ::  XN2GS(:,:,:)                       !net microbial N2 exchange, [g d-2 h-1]
+  real(r8),pointer ::  XH1PS(:,:,:)                       !net microibal HPO4 exchange non-band, [g d-2 h-1]
+  real(r8),pointer ::  XH2PS(:,:,:)                       !net microbial PO4 exchange nonband, [g d-2 h-1]
+  real(r8),pointer ::  XNH4S(:,:,:)                       !net microbial NH4 exchange non-band, [g d-2 h-1]
+  real(r8),pointer ::  XNO3S(:,:,:)                       !net microbial NO3 exchange non-band, [g d-2 h-1]
+  real(r8),pointer ::  XOQCS(:,:,:,:)                     !net microbial DOC flux, [g d-2 h-1]
+  real(r8),pointer ::  XOQNS(:,:,:,:)                     !net microbial DON flux, [g d-2 h-1]
+  real(r8),pointer ::  XOQPS(:,:,:,:)                     !net microbial DOP flux, [g d-2 h-1]
+  real(r8),pointer ::  XOQAS(:,:,:,:)                     !net microbial acetate flux, [g d-2 h-1]
+  real(r8),pointer ::  TOQCK(:,:,:)                       !total respiration of DOC+DOA in soil layer
+  real(r8),pointer ::  VOLQ(:,:,:)                        !soil water volume occupied by microial biomass, [m3 m-3]
+  real(r8),pointer ::  TFNQ(:,:,:)                        !constraints of temperature and water potential on microbial activity, []
+  real(r8),pointer ::  ESNT(:,:,:,:,:,:)                    !total litterfall C, [g d-2 h-1]
+  real(r8),pointer ::  VLNH4(:,:,:)                       !NH4 non-band volume fracrion, []
+  real(r8),pointer ::  VLNHB(:,:,:)                       !NH4 band volume fracrion, []
+  real(r8),pointer ::  VLNO3(:,:,:)                       !NO3 non-band volume fracrion, []
+  real(r8),pointer ::  VLNOB(:,:,:)                       !NO3 band volume fracrion, []
+  real(r8),pointer ::  VLPO4(:,:,:)                       !PO4 non-band volume fracrion, []
+  real(r8),pointer ::  VLPOB(:,:,:)                       !PO4 band volume fracrion, []
+  real(r8),pointer ::  WDNHB(:,:,:)                       !width of NH4 band, [m]
+  real(r8),pointer ::  DPNHB(:,:,:)                       !depth of NH4 band, [m]
+  real(r8),pointer ::  WDNOB(:,:,:)                       !width of NO3 band, [m]
+  real(r8),pointer ::  DPNOB(:,:,:)                       !depth of NO4 band, [m]
+  real(r8),pointer ::  WDPOB(:,:,:)                       !width of PO4 band, [m]
+  real(r8),pointer ::  DPPOB(:,:,:)                       !depth of PO4 band, [m]
+  real(r8),pointer ::  DPNH4(:,:)                         !total depth of NH4 band, [m]
+  real(r8),pointer ::  DPNO3(:,:)                         !total depth of NO3 band, [m]
+  real(r8),pointer ::  DPPO4(:,:)                         !total depth of PO4 band, [m]
+  real(r8),pointer ::  RVMXC(:,:,:)                       !total chemodenitrification N2O uptake non-band unconstrained by N2O, [g d-2 h-1]
+  real(r8),pointer ::  RVMBC(:,:,:)                       !total chemodenitrification N2O uptake band unconstrained by N2O, [g d-2 h-1]
+  real(r8),pointer ::  XCODFR(:,:)                        !soil surface CO2 dissolution (+ve) - volatilization (-ve), [g d-2 h-1]
+  real(r8),pointer ::  XCHDFR(:,:)                        !soil surface CH4 dissolution (+ve) - volatilization (-ve), [g d-2 h-1]
+  real(r8),pointer ::  XOXDFR(:,:)                        !soil surface O2 dissolution (+ve) - volatilization (-ve), [g d-2 h-1]
+  real(r8),pointer ::  XNGDFR(:,:)                        !soil surface N2 dissolution (+ve) - volatilization (-ve), [g d-2 h-1]
+  real(r8),pointer ::  XN2DFR(:,:)                        !soil surface N2O dissolution (+ve) - volatilization (-ve), [g d-2 h-1]
+  real(r8),pointer ::  XN3DFR(:,:)                        !soil surface NH3 dissolution (+ve) - volatilization (-ve), [g d-2 h-1]
+  real(r8),pointer ::  XHGDFR(:,:)                        !soil surface H2 dissolution (+ve) - volatilization (-ve), [g d-2 h-1]
+  real(r8),pointer ::  XCOBBL(:,:,:)                      !CO2 bubbling, [g d-2 h-1]
+  real(r8),pointer ::  XCHBBL(:,:,:)                      !CH4 bubbling, [g d-2 h-1]
+  real(r8),pointer ::  XOXBBL(:,:,:)                      !O2 bubbling, [g d-2 h-1]
+  real(r8),pointer ::  XNGBBL(:,:,:)                      !N2 bubbling, [g d-2 h-1]
+  real(r8),pointer ::  XN2BBL(:,:,:)                      !N2O bubbling, [g d-2 h-1]
+  real(r8),pointer ::  XN3BBL(:,:,:)                      !NH3 bubbling non-band, [g d-2 h-1]
+  real(r8),pointer ::  XNBBBL(:,:,:)                      !NH3 bubbling band, [g d-2 h-1]
+  real(r8),pointer ::  XHGBBL(:,:,:)                      !H2 bubbling, [g d-2 h-1]
+  real(r8),pointer ::  XZHYS(:,:,:)                       !total H+ production
+  real(r8),pointer ::  FLW(:,:,:,:)                       !water flux micropore, [m3 d-2 h-1]
+  real(r8),pointer ::  FLWH(:,:,:,:)                      !water flux macropore, [m3 d-2 h-1]
+  real(r8),pointer ::  HFLW(:,:,:,:)                      !convective heat flux micropore, [MJ d-2 h-1]
+  real(r8),pointer ::  XCOFLS(:,:,:,:)                    !aqueous CO2 flux micropore, [g d-2 h-1]
+  real(r8),pointer ::  XCHFLS(:,:,:,:)                    !aqueous CH4 flux micropore, [g d-2 h-1]
+  real(r8),pointer ::  XOXFLS(:,:,:,:)                    !aqueous O2 flux micropore, [g d-2 h-1]
+  real(r8),pointer ::  XNGFLS(:,:,:,:)                    !aqueous N2 flux micropore, [g d-2 h-1]
+  real(r8),pointer ::  XN2FLS(:,:,:,:)                    !aqueous N2O flux micropore, [g d-2 h-1]
+  real(r8),pointer ::  XHGFLS(:,:,:,:)                    !aqueous H2 flux micropore, [g d-2 h-1]
+  real(r8),pointer ::  XN4FLW(:,:,:,:)                    !aqueous NH4 flux non-band micropore, [g d-2 h-1]
+  real(r8),pointer ::  XN3FLW(:,:,:,:)                    !aqueous NH3 flux non-band micropore, [g d-2 h-1]
+  real(r8),pointer ::  XNOFLW(:,:,:,:)                    !aqueous NO3 flux non-band micropore, [g d-2 h-1]
+  real(r8),pointer ::  XH2PFS(:,:,:,:)                    !aqueous PO4 flux non-band micropore, [g d-2 h-1]
+  real(r8),pointer ::  XNXFLS(:,:,:,:)                    !aqueous NO2 flux non-band micropore, [g d-2 h-1]
+  real(r8),pointer ::  XN4FLB(:,:,:,:)                    !aqueous NH4 flux band micropore, [g d-2 h-1]
+  real(r8),pointer ::  XN3FLB(:,:,:,:)                    !aqueous NH3 flux band micropore, [g d-2 h-1]
+  real(r8),pointer ::  XNOFLB(:,:,:,:)                    !aqueous NO3 flux band micropore, [g d-2 h-1]
+  real(r8),pointer ::  XH2BFB(:,:,:,:)                    !aqueous PO4 flux band micropore, [g d-2 h-1]
+  real(r8),pointer ::  XNXFLB(:,:,:,:)                    !aqueous NO2 flux band micropore, [g d-2 h-1]
+  real(r8),pointer ::  XOCFLS(:,:,:,:,:)                  !DOC flux micropore, [g d-2 h-1]
+  real(r8),pointer ::  XONFLS(:,:,:,:,:)                  !DON flux micropore, [g d-2 h-1]
+  real(r8),pointer ::  XCHFLG(:,:,:,:)                    !gaseous CH4 flux, [g d-2 h-1]
+  real(r8),pointer ::  XOAFLS(:,:,:,:,:)                  !aqueous acetate flux, [g d-2 h-1]
+  real(r8),pointer ::  XCOFLG(:,:,:,:)                    !gaseous CO2 flux, [g d-2 h-1]
+  real(r8),pointer ::  XOPFLS(:,:,:,:,:)                  !DOP flux micropore, [g d-2 h-1]
+  real(r8),pointer ::  XOXFLG(:,:,:,:)                    !gaseous O24 flux, [g d-2 h-1]
+  real(r8),pointer ::  XNGFLG(:,:,:,:)                    !gaseous N2 flux, [g d-2 h-1]
+  real(r8),pointer ::  XHGFLG(:,:,:,:)                    !gaseous H2 flux, [g d-2 h-1]
+  real(r8),pointer ::  XN2FLG(:,:,:,:)                    !gaseous N2O flux, [g d-2 h-1]
+  real(r8),pointer ::  XN3FLG(:,:,:,:)                    !gaseous NH3 flux, [g d-2 h-1]
+  real(r8),pointer ::  XH1PFS(:,:,:,:)                    !total HPO4 in micropore water flux non-band, [mol d-2 h-1]
+  real(r8),pointer ::  XH1BFB(:,:,:,:)                    !total HPO4 in micropore water flux band, [mol d-2 h-1]
+  real(r8),pointer ::  XCOFHS(:,:,:,:)                    !aqueous CO2 flux macropore, [g d-2 h-1]
+  real(r8),pointer ::  XCHFHS(:,:,:,:)                    !aqueous CH4 flux macropore, [g d-2 h-1]
+  real(r8),pointer ::  XOXFHS(:,:,:,:)                    !aqueous O2 flux macropore, [g d-2 h-1]
+  real(r8),pointer ::  XNGFHS(:,:,:,:)                    !aqueous N2 flux macropore, [g d-2 h-1]
+  real(r8),pointer ::  XN2FHS(:,:,:,:)                    !aqueous N2O flux macropore, [g d-2 h-1]
+  real(r8),pointer ::  XHGFHS(:,:,:,:)                    !aqueous H2 flux macropore, [g d-2 h-1]
+  real(r8),pointer ::  XN4FHW(:,:,:,:)                    !aqueous NH4 flux non-band macropore, [g d-2 h-1]
+  real(r8),pointer ::  XN3FHW(:,:,:,:)                    !aqueous NH3 flux non-band macropore, [g d-2 h-1]
+  real(r8),pointer ::  XNOFHW(:,:,:,:)                    !aqueous NO3 flux non-band macropore, [g d-2 h-1]
+  real(r8),pointer ::  XH2PHS(:,:,:,:)                    !aqueous PO4 flux non-band macropore, [g d-2 h-1]
+  real(r8),pointer ::  XNXFHS(:,:,:,:)                    !aqueous NO2 flux non-band macropore, [g d-2 h-1]
+  real(r8),pointer ::  XN4FHB(:,:,:,:)                    !aqueous NH4 flux band macropore, [g d-2 h-1]
+  real(r8),pointer ::  XN3FHB(:,:,:,:)                    !aqueous NH3 flux band macropore, [g d-2 h-1]
+  real(r8),pointer ::  XNOFHB(:,:,:,:)                    !aqueous NO3 flux band macropore, [g d-2 h-1]
+  real(r8),pointer ::  XNXFHB(:,:,:,:)                    !aqueous PO4 flux band macropore, [g d-2 h-1]
+  real(r8),pointer ::  XH2BHB(:,:,:,:)                    !aqueous NO2 flux band macropore, [g d-2 h-1]
+  real(r8),pointer ::  XOCFHS(:,:,:,:,:)                  !DOC flux macropore, [g d-2 h-1]
+  real(r8),pointer ::  XONFHS(:,:,:,:,:)                  !DON flux macropore, [g d-2 h-1]
+  real(r8),pointer ::  XOPFHS(:,:,:,:,:)                  !DOP flux macropore, [g d-2 h-1]
+  real(r8),pointer ::  XOAFHS(:,:,:,:,:)                  !acetate flux macropore, [g d-2 h-1]
+  real(r8),pointer ::  XH1PHS(:,:,:,:)                    !total HPO4 in macropore water flux non-band, [mol d-2 h-1]
+  real(r8),pointer ::  XH1BHB(:,:,:,:)                    !total HPO4 in macropore water flux band, [mol d-2 h-1]
 
   private :: InitAllocate
   contains
@@ -273,10 +273,10 @@ implicit none
   allocate(ZNO3B(0:JZ,JY,JX));  ZNO3B=0._r8
   allocate(H2POB(0:JZ,JY,JX));  H2POB=0._r8
   allocate(ZNO2S(0:JZ,JY,JX));  ZNO2S=0._r8
-  allocate(ZNH3G(JZ,JY,JX));    ZNH3G=0._r8
-  allocate(Z2GG(JZ,JY,JX));     Z2GG=0._r8
+
+  allocate(trc_gasml(idg_beg:idg_end,JZ,JY,JX)); trc_gasml=0._r8
+
   allocate(Z2GS(0:JZ,JY,JX));   Z2GS=0._r8
-  allocate(Z2OG(JZ,JY,JX));     Z2OG=0._r8
   allocate(Z2OS(0:JZ,JY,JX));   Z2OS=0._r8
   allocate(ZNH4SH(JZ,JY,JX));   ZNH4SH=0._r8
   allocate(ZNH3SH(JZ,JY,JX));   ZNH3SH=0._r8
@@ -312,13 +312,12 @@ implicit none
   allocate(CZ2GG(0:JZ,JY,JX));CZ2GG(0:JZ,JY,JX)=0._r8
   allocate(CZ2OG(0:JZ,JY,JX));CZ2OG(0:JZ,JY,JX)=0._r8
   allocate(CZ2OS(0:JZ,JY,JX));CZ2OS(0:JZ,JY,JX)=0._r8
-  allocate(OXYG(JZ,JY,JX));OXYG(JZ,JY,JX)=0._r8
+
   allocate(OXYS(0:JZ,JY,JX));OXYS(0:JZ,JY,JX)=0._r8
   allocate(OXYSH(JZ,JY,JX));OXYSH(JZ,JY,JX)=0._r8
-  allocate(CO2G(JZ,JY,JX));CO2G(JZ,JY,JX)=0._r8
   allocate(CO2S(0:JZ,JY,JX));CO2S(0:JZ,JY,JX)=0._r8
   allocate(CO2SH(JZ,JY,JX));CO2SH(JZ,JY,JX)=0._r8
-  allocate(CH4G(JZ,JY,JX));CH4G(JZ,JY,JX)=0._r8
+
   allocate(CH4S(0:JZ,JY,JX));CH4S(0:JZ,JY,JX)=0._r8
   allocate(CH4SH(JZ,JY,JX));CH4SH(JZ,JY,JX)=0._r8
   allocate(COXYG(0:JZ,JY,JX));COXYG(0:JZ,JY,JX)=0._r8
@@ -335,7 +334,7 @@ implicit none
   allocate(CH2P4(0:JZ,JY,JX));CH2P4(0:JZ,JY,JX)=0._r8
   allocate(CH2P4B(0:JZ,JY,JX));CH2P4B(0:JZ,JY,JX)=0._r8
   allocate(H2GSH(JZ,JY,JX));H2GSH(JZ,JY,JX)=0._r8
-  allocate(H2GG(JZ,JY,JX));H2GG(JZ,JY,JX)=0._r8
+
   allocate(CH2GG(0:JZ,JY,JX));CH2GG(0:JZ,JY,JX)=0._r8
   allocate(PH(0:JZ,JY,JX));PH(0:JZ,JY,JX)=0._r8
   allocate(CEC(JZ,JY,JX));CEC(JZ,JY,JX)=0._r8
@@ -515,10 +514,9 @@ implicit none
   call destroy(ZNO3B)
   call destroy(H2POB)
   call destroy(ZNO2S)
-  call destroy(ZNH3G)
-  call destroy(Z2GG)
+  call destroy(trc_gasml)
+
   call destroy(Z2GS)
-  call destroy(Z2OG)
   call destroy(Z2OS)
   call destroy(ZNH4SH)
   call destroy(ZNH3SH)
@@ -554,13 +552,12 @@ implicit none
   call destroy(CZ2GG)
   call destroy(CZ2OG)
   call destroy(CZ2OS)
-  call destroy(OXYG)
   call destroy(OXYS)
   call destroy(OXYSH)
-  call destroy(CO2G)
+
   call destroy(CO2S)
   call destroy(CO2SH)
-  call destroy(CH4G)
+
   call destroy(CH4S)
   call destroy(CH4SH)
   call destroy(COXYG)
@@ -577,7 +574,7 @@ implicit none
   call destroy(CH2P4)
   call destroy(CH2P4B)
   call destroy(H2GSH)
-  call destroy(H2GG)
+
   call destroy(CH2GG)
   call destroy(PH)
   call destroy(CEC)

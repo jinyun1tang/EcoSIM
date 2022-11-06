@@ -8,6 +8,7 @@ set(ECOSIM_CONFG_SOURCES
 )
 
 include_directories(${CMAKE_BINARY_DIR}/f90src/utils/)
+include_directories(${CMAKE_BINARY_DIR}/f90src/minimath/)
 include(add_ecosim_library)
 add_ecosim_library(modelconfig ${ECOSIM_CONFG_SOURCES})
 
