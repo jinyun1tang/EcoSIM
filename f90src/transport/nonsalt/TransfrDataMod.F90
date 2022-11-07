@@ -368,7 +368,7 @@ implicit none
 
   real(r8), pointer :: trc_gasml2(:,:,:,:)
   real(r8), pointer :: trc_solml2(:,:,:,:)
-
+  real(r8), pointer :: trc_soHml2(:,:,:,:)
   real(r8), pointer ::  H2GS2(:,:,:)                       !
   real(r8), pointer ::  H2GSH2(:,:,:)                      !
   real(r8), pointer ::  RQSH2P(:,:,:)                      !
@@ -432,6 +432,10 @@ implicit none
   real(r8), pointer ::  RNXFLB(:,:,:,:)                    !
   real(r8), pointer ::  RH2BFB(:,:,:,:)                    !
   real(r8), pointer ::  RCOFHS(:,:,:,:)                    !
+
+  real(r8), pointer :: RPoreSoHFlx(:,:,:,:,:)
+  real(r8), pointer :: RPoreSolFlx(:,:,:,:,:)
+
 !----------------------------------------------------------------------
 
 contains
@@ -776,6 +780,7 @@ contains
 
   allocate(trc_gasml2(idg_beg:idg_end,0:JZ,JY,JX)); trc_gasml2(:,:,:,:)=0._r8
   allocate(trc_solml2(ids_beg:ids_end,0:JZ,JY,JX)); trc_solml2(:,:,:,:)=0._r8
+  allocate(trc_soHml2(ids_beg:ids_end,0:JZ,JY,JX)); trc_soHml2(:,:,:,:)=0._r8
   allocate(OXYS2(0:JZ,JY,JX));  OXYS2=0._r8
 
   allocate(Z2GS2(0:JZ,JY,JX));  Z2GS2=0._r8
@@ -847,6 +852,9 @@ contains
   allocate(RNXFLB(3,0:JD,JV,JH));RNXFLB=0._r8
   allocate(RH2BFB(3,0:JD,JV,JH));RH2BFB=0._r8
   allocate(RCOFHS(3,JD,JV,JH)); RCOFHS=0._r8
+  allocate(RPoreSoHFlx(ids_beg:ids_end,3,JD,JV,JH));RPoreSoHFlx=0._r8
+  allocate(RPoreSolFlx(ids_beg:ids_end,3,JD,JV,JH));RPoreSolFlx=0._r8
+
   end subroutine InitTransfrData
 
 !----------------------------------------------------------------------
@@ -1187,6 +1195,7 @@ contains
 
   call destroy(trc_gasml2)
   call destroy(trc_solml2)
+  call destroy(trc_soHml2)
 
   call destroy(H2GSH2)
   call destroy(RQSH2P)
@@ -1251,6 +1260,8 @@ contains
   call destroy(RNXFLB)
   call destroy(RH2BFB)
   call destroy(RCOFHS)
+  call destroy(RPoreSoHFlx)
+  call destroy(RPoreSolFlx)
   end subroutine DestructTransfrData
 
 
