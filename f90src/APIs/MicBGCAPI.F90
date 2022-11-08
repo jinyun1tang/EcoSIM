@@ -203,7 +203,7 @@ implicit none
   micfor%VLPO4 =VLPO4(L,NY,NX)
   micfor%VLPOB =VLPOB(L,NY,NX)
   micfor%PSISM =PSISM(L,NY,NX)
-  micfor%OLSGL =OLSGL(L,NY,NX)
+  micfor%OLSGL =SolDifc(idg_O2,L,NY,NX)
   micfor%ORGC  =ORGC(L,NY,NX)
   micfor%RNO2Y =RNO2Y(L,NY,NX)
   micfor%RN2OY =RN2OY(L,NY,NX)

@@ -391,9 +391,6 @@ implicit none
   real(r8), pointer :: CNH3S(:)    => null()  !NH3 concentration non-band micropore	[gN m-3]
   real(r8), pointer :: CNH3B(:)    => null()  !NH3 concentration band micropore	[gN m-3]
   real(r8), pointer :: CH2GS(:)    => null()  !aqueous H2 concentration	[g m-3]
-  real(r8), pointer :: HLSGL(:)    => null()  !aqueous H2 diffusivity, [m2 h-1]
-  real(r8), pointer :: CLSGL(:)    => null()  !aqueous CO2 diffusivity	[m2 h-1]
-  real(r8), pointer :: CQSGL(:)    => null()  !aqueous CH4 diffusivity	[m2 h-1]
   real(r8), pointer :: CZ2OG(:)    => null()  !gaseous N2O concentration	[gN m-3]
   real(r8), pointer :: CNH3G(:)    => null()  !gaseous NH3 concentration	[gN m-3]
   real(r8), pointer :: CH2GG(:)    => null()  !gaseous H2 concentration	[g m-3]
@@ -402,8 +399,8 @@ implicit none
   real(r8), pointer :: CNDU(:)     => null()  !soil micropore hydraulic conductivity for root water uptake [m MPa-1 h-1]
 
   real(r8), pointer :: GasDifc(:,:)=> null()  !gaseous diffusivity [m2 h-1]
+  real(r8), pointer :: SolDifc(:,:)=> null()  !aqueous diffusivity [m2 h-1]
 
-  real(r8), pointer :: ZOSGL(:)    => null()  !aqueous NO3 diffusivity, [m2 h-1]
   real(r8), pointer :: H1PO4(:)    => null()  !soil aqueous HPO4 content micropore non-band, [gP d-2]
   real(r8), pointer :: H2PO4(:)    => null()  !PO4 non-band micropore, [gP d-2]
   real(r8), pointer :: H1POB(:)    => null()  !soil aqueous HPO4 content micropore band, [gP d-2]
@@ -412,8 +409,6 @@ implicit none
   real(r8), pointer :: trc_gasml(:,:)=> null()!gas layer mass [g d-2]
 
   real(r8), pointer :: OXYS(:)     => null()  !aqueous O2  micropore	[g d-2]
-  real(r8), pointer :: OLSGL(:)    => null()  !aqueous CO2 diffusivity	[m2 h-1]
-  real(r8), pointer :: POSGL(:)    => null()  !aqueous PO4 diffusivity, [m2 h-1]
   real(r8), pointer :: GSolbility(:,:)=> null() !gas solubility, [m3 m-3]
 
   real(r8), pointer :: THETW(:)    => null()  !volumetric water content [m3 m-3]
@@ -431,8 +426,6 @@ implicit none
   real(r8), pointer :: VOLA(:)     => null()  !total volume in micropores [m3 d-2]
   real(r8), pointer :: ZNO3S(:)    => null()  !NO3 non-band micropore, [gN d-2]
   real(r8), pointer :: ZNO3B(:)    => null()  !NO3 band micropore, [Ng d-2]
-  real(r8), pointer :: ZNSGL(:)    => null()  !aqueous NH3 diffusivity, [m2 h-1]
-  real(r8), pointer :: ZVSGL(:)    => null()  !aqueous N2O diffusivity, [m2 h-1]
   real(r8), pointer :: ZNH4S(:)    => null()  !NH4 non-band micropore, [gN d-2]
   real(r8), pointer :: ZNH4B(:)    => null()  !NH4 band micropore, [gN d-2]
   real(r8), pointer :: Z2OS(:)     => null()  !aqueous N2O micropore, [gN d-2]
@@ -1721,13 +1714,11 @@ implicit none
   allocate(this%VLNOB(0:JZ1))
   allocate(this%VLNH4(0:JZ1))
   allocate(this%VLNHB(0:JZ1))
-  allocate(this%ZOSGL(0:JZ1))
   allocate(this%OQC(1:jcplx,0:JZ1))
   allocate(this%OQN(1:jcplx,0:JZ1))
   allocate(this%OQP(1:jcplx,0:JZ1))
   allocate(this%ZNO3S(0:JZ1))
   allocate(this%ZNO3B(0:JZ1))
-  allocate(this%ZNSGL(0:JZ1))
   allocate(this%ZNH4S(0:JZ1))
   allocate(this%ZNH4B(0:JZ1))
   allocate(this%Z2OS(0:JZ1))
@@ -1738,12 +1729,10 @@ implicit none
   allocate(this%H1POB(0:JZ1))
   allocate(this%H2POB(0:JZ1))
   allocate(this%H2GS(0:JZ1))
-  allocate(this%HLSGL(0:JZ1))
+
   allocate(this%trc_gasml(idg_beg:idg_end,0:JZ1))
 
   allocate(this%OXYS(0:JZ1))
-  allocate(this%OLSGL(0:JZ1))
-  allocate(this%POSGL(0:JZ1))
   allocate(this%CCH4G(0:JZ1))
   allocate(this%CZ2OG(0:JZ1))
   allocate(this%CNH3G(0:JZ1))
@@ -1766,20 +1755,18 @@ implicit none
   allocate(this%CNH3S(0:JZ1))
   allocate(this%CNH3B(0:JZ1))
   allocate(this%CH2GS(0:JZ1))
-  allocate(this%CLSGL(0:JZ1))
-  allocate(this%CQSGL(0:JZ1))
+
   allocate(this%VOLX(0:JZ1))
   allocate(this%THETW(0:JZ1))
   allocate(this%THETY(0:JZ1))
 
   allocate(this%GSolbility(idg_beg:idg_end,0:JZ1))
   allocate(this%GasDifc(idg_beg:idg_end,0:JZ1))
-
+  allocate(this%SolDifc(ids_beg:ids_end,0:JZ1))
   allocate(this%RSCS(JZ1))
   allocate(this%BKDS(0:JZ1))
   allocate(this%CNDU(JZ1))
   allocate(this%CPO4S(JZ1))
-  allocate(this%ZVSGL(0:JZ1))
   end subroutine plt_soilchem_init
 !----------------------------------------------------------------------
 

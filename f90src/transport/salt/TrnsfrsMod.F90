@@ -1679,7 +1679,7 @@ module TrnsfrsMod
 !     *SGL*=solute diffusivity from hour1.f
 !     solute code:PO=PO4,AL=Al,FE=Fe,HY=H,CA=Ca,GM=Mg,AN=Na,AK=KOH=OH
 !                :SO=SO4,CL=Cl,C3=CO3,HC=HCO3
-    POSGL2(L,NY,NX)=POSGL(L,NY,NX)*XNPH
+    POSGL2(L,NY,NX)=SolDifc(ids_H1PO4,L,NY,NX)*XNPH
     ALSGL2(L,NY,NX)=ALSGL(L,NY,NX)*XNPH
     FESGL2(L,NY,NX)=FESGL(L,NY,NX)*XNPH
     HYSGL2(L,NY,NX)=HYSGL(L,NY,NX)*XNPH

@@ -368,7 +368,7 @@ module BoundaryTranspMod
     RPoreSolFlx(ids_H2PO4,N,M6,M5,M4)=VFLW*AZMAX1(trc_solml2(ids_H2PO4,M3,M2,M1))*VLPO4(M3,M2,M1)
 
     RPoreSolFlx(ids_NH4B,N,M6,M5,M4)=VFLW*AZMAX1(trc_solml2(ids_NH4B,M3,M2,M1))*VLNHB(M3,M2,M1)
-    RPoreSolFlx(ids_NH3B,N,M6,M5,M4)=VFLW*AZMAX1(trc_solml2(ids_NH3B,M3,M2,M1))*VLNHB(M3,M2,M1)
+    RPoreSolFlx(idg_NH3B,N,M6,M5,M4)=VFLW*AZMAX1(trc_solml2(idg_NH3B,M3,M2,M1))*VLNHB(M3,M2,M1)
     RPoreSolFlx(ids_NO3B,N,M6,M5,M4)=VFLW*AZMAX1(trc_solml2(ids_NO3B,M3,M2,M1))*VLNOB(M3,M2,M1)
     RPoreSolFlx(ids_NO2B,N,M6,M5,M4)=VFLW*AZMAX1(trc_solml2(ids_NO2B,M3,M2,M1))*VLNOB(M3,M2,M1)
     RPoreSolFlx(ids_H2PO4B,N,M6,M5,M4)=VFLW*AZMAX1(trc_solml2(ids_H2PO4B,M3,M2,M1))*VLPOB(M3,M2,M1)
@@ -395,7 +395,7 @@ module BoundaryTranspMod
     RPoreSolFlx(ids_H1PO4,N,M6,M5,M4)=FLWM(M,N,M6,M5,M4)*CH1PU(M3,M2,M1)*VLPO4(M3,M2,M1)
     RPoreSolFlx(ids_H2PO4,N,M6,M5,M4)=FLWM(M,N,M6,M5,M4)*CH2PU(M3,M2,M1)*VLPO4(M3,M2,M1)
     RPoreSolFlx(ids_NH4B,N,M6,M5,M4)=FLWM(M,N,M6,M5,M4)*CN4U(M3,M2,M1)*VLNHB(M3,M2,M1)
-    RPoreSolFlx(ids_NH3B,N,M6,M5,M4)=FLWM(M,N,M6,M5,M4)*CN3U(M3,M2,M1)*VLNHB(M3,M2,M1)
+    RPoreSolFlx(idg_NH3B,N,M6,M5,M4)=FLWM(M,N,M6,M5,M4)*CN3U(M3,M2,M1)*VLNHB(M3,M2,M1)
     RPoreSolFlx(ids_NO3B,N,M6,M5,M4)=FLWM(M,N,M6,M5,M4)*CNOU(M3,M2,M1)*VLNOB(M3,M2,M1)
     RPoreSolFlx(ids_NO2B,N,M6,M5,M4)=0.0_r8
     RPoreSolFlx(ids_H1PO4B,N,M6,M5,M4)=FLWM(M,N,M6,M5,M4)*CH1PU(M3,M2,M1)*VLPOB(M3,M2,M1)
@@ -439,7 +439,7 @@ module BoundaryTranspMod
     RPoreSoHFlx(ids_H1PO4,N,M6,M5,M4)=VFLW*AZMAX1(trc_soHml2(ids_H1PO4,M3,M2,M1))*VLPO4(M3,M2,M1)
     RPoreSoHFlx(ids_H2PO4,N,M6,M5,M4)=VFLW*AZMAX1(trc_soHml2(ids_H2PO4,M3,M2,M1))*VLPO4(M3,M2,M1)
     RPoreSoHFlx(ids_NH4B,N,M6,M5,M4)=VFLW*AZMAX1(trc_soHml2(ids_NH4B,M3,M2,M1))*VLNHB(M3,M2,M1)
-    RPoreSoHFlx(ids_NH3B,N,M6,M5,M4)=VFLW*AZMAX1(trc_soHml2(ids_NH3B,M3,M2,M1))*VLNHB(M3,M2,M1)
+    RPoreSoHFlx(idg_NH3B,N,M6,M5,M4)=VFLW*AZMAX1(trc_soHml2(idg_NH3B,M3,M2,M1))*VLNHB(M3,M2,M1)
     RPoreSoHFlx(ids_NO3B,N,M6,M5,M4)=VFLW*AZMAX1(trc_soHml2(ids_NO3B,M3,M2,M1))*VLNOB(M3,M2,M1)
     RPoreSoHFlx(ids_NO2B,N,M6,M5,M4)=VFLW*AZMAX1(trc_soHml2(ids_NO2B,M3,M2,M1))*VLNOB(M3,M2,M1)
     RPoreSoHFlx(ids_H1PO4B,N,M6,M5,M4)=VFLW*AZMAX1(trc_soHml2(ids_H1PO4B,M3,M2,M1))*VLPOB(M3,M2,M1)
@@ -454,24 +454,7 @@ module BoundaryTranspMod
       ROPFHS(K,N,M6,M5,M4)=0.0_r8
       ROAFHS(K,N,M6,M5,M4)=0.0_r8
     enddo
-    RPoreSoHFlx(idg_CO2,N,M6,M5,M4)=0.0_r8
-    RPoreSoHFlx(idg_CH4,N,M6,M5,M4)=0.0_r8
-    RPoreSoHFlx(idg_O2,N,M6,M5,M4)=0.0_r8
-    RPoreSoHFlx(idg_N2,N,M6,M5,M4)=0.0_r8
-    RPoreSoHFlx(idg_N2O,N,M6,M5,M4)=0.0_r8
-    RPoreSoHFlx(ids_NH4,N,M6,M5,M4)=0.0_r8
-    RPoreSoHFlx(idg_H2,N,M6,M5,M4)=0.0_r8
-    RPoreSoHFlx(idg_NH3,N,M6,M5,M4)=0.0_r8
-    RPoreSoHFlx(ids_NO3,N,M6,M5,M4)=0.0_r8
-    RPoreSoHFlx(ids_NO2,N,M6,M5,M4)=0.0_r8
-    RPoreSoHFlx(ids_H1PO4,N,M6,M5,M4)=0.0_r8
-    RPoreSoHFlx(ids_H2PO4,N,M6,M5,M4)=0.0_r8
-    RPoreSoHFlx(ids_NH4B,N,M6,M5,M4)=0.0_r8
-    RPoreSoHFlx(ids_NH3B,N,M6,M5,M4)=0.0_r8
-    RPoreSoHFlx(ids_NO3B,N,M6,M5,M4)=0.0_r8
-    RPoreSoHFlx(ids_NO2B,N,M6,M5,M4)=0.0_r8
-    RPoreSoHFlx(ids_H1PO4B,N,M6,M5,M4)=0.0_r8
-    RPoreSoHFlx(ids_H2PO4B,N,M6,M5,M4)=0.0_r8
+    RPoreSoHFlx(ids_beg:ids_end,N,M6,M5,M4)=0.0_r8
   ENDIF
 !
 !     ACCUMULATE HOURLY FLUXES FOR USE IN REDIST.F
@@ -504,7 +487,7 @@ module BoundaryTranspMod
   XH1PFS(N,M6,M5,M4)=XH1PFS(N,M6,M5,M4)+RPoreSolFlx(ids_H1PO4,N,M6,M5,M4)
   XH2PFS(N,M6,M5,M4)=XH2PFS(N,M6,M5,M4)+RPoreSolFlx(ids_H2PO4,N,M6,M5,M4)
   XN4FLB(N,M6,M5,M4)=XN4FLB(N,M6,M5,M4)+RPoreSolFlx(ids_NH4B,N,M6,M5,M4)
-  XN3FLB(N,M6,M5,M4)=XN3FLB(N,M6,M5,M4)+RPoreSolFlx(ids_NH3B,N,M6,M5,M4)
+  XN3FLB(N,M6,M5,M4)=XN3FLB(N,M6,M5,M4)+RPoreSolFlx(idg_NH3B,N,M6,M5,M4)
   XNOFLB(N,M6,M5,M4)=XNOFLB(N,M6,M5,M4)+RPoreSolFlx(ids_NO3B,N,M6,M5,M4)
   XNXFLB(N,M6,M5,M4)=XNXFLB(N,M6,M5,M4)+RPoreSolFlx(ids_NO2B,N,M6,M5,M4)
   XH1BFB(N,M6,M5,M4)=XH1BFB(N,M6,M5,M4)+RPoreSolFlx(ids_H1PO4B,N,M6,M5,M4)
@@ -523,7 +506,7 @@ module BoundaryTranspMod
   XH1PHS(N,M6,M5,M4)=XH1PHS(N,M6,M5,M4)+RPoreSoHFlx(ids_H1PO4,N,M6,M5,M4)
   XH2PHS(N,M6,M5,M4)=XH2PHS(N,M6,M5,M4)+RPoreSoHFlx(ids_H2PO4,N,M6,M5,M4)
   XN4FHB(N,M6,M5,M4)=XN4FHB(N,M6,M5,M4)+RPoreSoHFlx(ids_NH4B,N,M6,M5,M4)
-  XN3FHB(N,M6,M5,M4)=XN3FHB(N,M6,M5,M4)+RPoreSoHFlx(ids_NH3B,N,M6,M5,M4)
+  XN3FHB(N,M6,M5,M4)=XN3FHB(N,M6,M5,M4)+RPoreSoHFlx(idg_NH3B,N,M6,M5,M4)
   XNOFHB(N,M6,M5,M4)=XNOFHB(N,M6,M5,M4)+RPoreSoHFlx(ids_NO3B,N,M6,M5,M4)
   XNXFHB(N,M6,M5,M4)=XNXFHB(N,M6,M5,M4)+RPoreSoHFlx(ids_NO2B,N,M6,M5,M4)
   XH1BHB(N,M6,M5,M4)=XH1BHB(N,M6,M5,M4)+RPoreSoHFlx(ids_H1PO4B,N,M6,M5,M4)
@@ -634,7 +617,7 @@ module BoundaryTranspMod
       RPoreSoHFlx(ids_H1PO4,N,M6,M5,M4)=0.0_r8
       RPoreSoHFlx(ids_H2PO4,N,M6,M5,M4)=0.0_r8
       RPoreSoHFlx(ids_NH4B,N,M6,M5,M4)=0.0_r8
-      RPoreSoHFlx(ids_NH3B,N,M6,M5,M4)=0.0_r8
+      RPoreSoHFlx(idg_NH3B,N,M6,M5,M4)=0.0_r8
       RPoreSoHFlx(ids_NO3B,N,M6,M5,M4)=0.0_r8
       RPoreSoHFlx(ids_NO2B,N,M6,M5,M4)=0.0_r8
       RPoreSoHFlx(ids_H1PO4B,N,M6,M5,M4)=0.0_r8
@@ -813,8 +796,8 @@ module BoundaryTranspMod
 !    3-RPoreSoHFlx(ids_NH4,3,NUM(N2,N1),N2,N1)-RPoreSoHFlx(ids_NH4B,3,NUM(N2,N1),N2,N1)
         TN3BLW(LS,N2,N1)=TN3BLW(LS,N2,N1)+RN3BLW(LS,N2,N1) &
           -RPoreSolFlx(idg_NH3,3,0,N2,N1)-RPoreSolFlx(idg_NH3,3,NUM(N2,N1),N2,N1) &
-          -RPoreSolFlx(ids_NH3B,3,NUM(N2,N1),N2,N1)
-!    3-RPoreSoHFlx(idg_NH3,3,NUM(N2,N1),N2,N1)-RPoreSoHFlx(ids_NH3B,3,NUM(N2,N1),N2,N1)
+          -RPoreSolFlx(idg_NH3B,3,NUM(N2,N1),N2,N1)
+!    3-RPoreSoHFlx(idg_NH3,3,NUM(N2,N1),N2,N1)-RPoreSoHFlx(idg_NH3B,3,NUM(N2,N1),N2,N1)
         TNOBLW(LS,N2,N1)=TNOBLW(LS,N2,N1)+RNOBLW(LS,N2,N1) &
           -RPoreSolFlx(ids_NO3,3,0,N2,N1)-RPoreSolFlx(ids_NO3,3,NUM(N2,N1),N2,N1) &
           -RPoreSolFlx(ids_NO3B,3,NUM(N2,N1),N2,N1)
@@ -872,7 +855,7 @@ module BoundaryTranspMod
       TH1PFS(N3,N2,N1)=TH1PFS(N3,N2,N1)+RPoreSolFlx(ids_H1PO4,N,N3,N2,N1)-RPoreSolFlx(ids_H1PO4,N,N6,N5,N4)
       TH2PFS(N3,N2,N1)=TH2PFS(N3,N2,N1)+RPoreSolFlx(ids_H2PO4,N,N3,N2,N1)-RPoreSolFlx(ids_H2PO4,N,N6,N5,N4)
       TN4FLB(N3,N2,N1)=TN4FLB(N3,N2,N1)+RPoreSolFlx(ids_NH4B,N,N3,N2,N1)-RPoreSolFlx(ids_NH4B,N,N6,N5,N4)
-      TN3FLB(N3,N2,N1)=TN3FLB(N3,N2,N1)+RPoreSolFlx(ids_NH3B,N,N3,N2,N1)-RPoreSolFlx(ids_NH3B,N,N6,N5,N4)
+      TN3FLB(N3,N2,N1)=TN3FLB(N3,N2,N1)+RPoreSolFlx(idg_NH3B,N,N3,N2,N1)-RPoreSolFlx(idg_NH3B,N,N6,N5,N4)
       TNOFLB(N3,N2,N1)=TNOFLB(N3,N2,N1)+RPoreSolFlx(ids_NO3B,N,N3,N2,N1)-RPoreSolFlx(ids_NO3B,N,N6,N5,N4)
       TNXFLB(N3,N2,N1)=TNXFLB(N3,N2,N1)+RPoreSolFlx(ids_NO2B,N,N3,N2,N1)-RPoreSolFlx(ids_NO2B,N,N6,N5,N4)
       TH1BFB(N3,N2,N1)=TH1BFB(N3,N2,N1)+RPoreSolFlx(ids_H1PO4B,N,N3,N2,N1)-RPoreSolFlx(ids_H1PO4B,N,N6,N5,N4)
@@ -890,7 +873,7 @@ module BoundaryTranspMod
       TH1PHS(N3,N2,N1)=TH1PHS(N3,N2,N1)+RPoreSoHFlx(ids_H1PO4,N,N3,N2,N1)-RPoreSoHFlx(ids_H1PO4,N,N6,N5,N4)
       TH2PHS(N3,N2,N1)=TH2PHS(N3,N2,N1)+RPoreSoHFlx(ids_H2PO4,N,N3,N2,N1)-RPoreSoHFlx(ids_H2PO4,N,N6,N5,N4)
       TN4FHB(N3,N2,N1)=TN4FHB(N3,N2,N1)+RPoreSoHFlx(ids_NH4B,N,N3,N2,N1)-RPoreSoHFlx(ids_NH4B,N,N6,N5,N4)
-      TN3FHB(N3,N2,N1)=TN3FHB(N3,N2,N1)+RPoreSoHFlx(ids_NH3B,N,N3,N2,N1)-RPoreSoHFlx(ids_NH3B,N,N6,N5,N4)
+      TN3FHB(N3,N2,N1)=TN3FHB(N3,N2,N1)+RPoreSoHFlx(idg_NH3B,N,N3,N2,N1)-RPoreSoHFlx(idg_NH3B,N,N6,N5,N4)
       TNOFHB(N3,N2,N1)=TNOFHB(N3,N2,N1)+RPoreSoHFlx(ids_NO3B,N,N3,N2,N1)-RPoreSoHFlx(ids_NO3B,N,N6,N5,N4)
       TNXFHB(N3,N2,N1)=TNXFHB(N3,N2,N1)+RPoreSoHFlx(ids_NO2B,N,N3,N2,N1)-RPoreSoHFlx(ids_NO2B,N,N6,N5,N4)
       TH1BHB(N3,N2,N1)=TH1BHB(N3,N2,N1)+RPoreSoHFlx(ids_H1PO4B,N,N3,N2,N1)-RPoreSoHFlx(ids_H1PO4B,N,N6,N5,N4)

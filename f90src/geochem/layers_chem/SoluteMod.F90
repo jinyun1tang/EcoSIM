@@ -807,7 +807,7 @@ module SoluteMod
 !     ZOSGL=NO3 diffusivity
 !     TORT=tortuosity
 !
-      DWNO3=0.5*SQRT(ZOSGL(L,NY,NX))*TORT(NPH,L,NY,NX)
+      DWNO3=0.5*SQRT(SolDifc(ids_NO3,L,NY,NX))*TORT(NPH,L,NY,NX)
       WDNOB(L,NY,NX)=AMIN1(ROWO(NY,NX),WDNOB(L,NY,NX)+DWNO3)
 !
 !     NO3 BAND DEPTH

@@ -128,15 +128,11 @@ module RootGasMod
     VLNH4  =>  plt_soilchem%VLNH4, &
     GasDifc=>  plt_soilchem%GasDifc,&
     CCH4G  =>  plt_soilchem%CCH4G, &
-    CLSGL  =>  plt_soilchem%CLSGL, &
-    THETY  =>  plt_soilchem%THETY, &
-    OLSGL  =>  plt_soilchem%OLSGL, &
-    VOLY   =>  plt_soilchem%VOLY , &
-    ZNSGL  =>  plt_soilchem%ZNSGL, &
+    SolDifc  =>  plt_soilchem%SolDifc, &
 
-    ZVSGL  =>  plt_soilchem%ZVSGL, &
-    HLSGL  =>  plt_soilchem%HLSGL, &
-    CQSGL  =>  plt_soilchem%CQSGL, &
+    THETY  =>  plt_soilchem%THETY, &
+    VOLY   =>  plt_soilchem%VOLY , &
+
     VLNHB  =>  plt_soilchem%VLNHB, &
     ZNH3B  =>  plt_soilchem%ZNH3B, &
 
@@ -239,13 +235,13 @@ module RootGasMod
     ZHSGL1=GasDifc(idg_NH3,L)*XNPG*PORTX(N,NZ)
     HGSGL1=GasDifc(idg_H2,L)*XNPG*PORTX(N,NZ)
 
-    CLSGL1=CLSGL(L)*XNPG*FOXYX
-    OLSGL1=OLSGL(L)*XNPG*FOXYX
-    CQSGL1=CQSGL(L)*XNPG*FOXYX
-    ZVSGL1=ZVSGL(L)*XNPG*FOXYX
-    ZNSGL1=ZNSGL(L)*XNPG*FOXYX
-    HLSGL1=HLSGL(L)*XNPG*FOXYX
-    OLSGLP=OLSGL(L)*XNPG
+    CLSGL1=SolDifc(idg_CO2,L)*XNPG*FOXYX
+    OLSGL1=SolDifc(idg_O2,L)*XNPG*FOXYX
+    CQSGL1=SolDifc(idg_CH4,L)*XNPG*FOXYX
+    ZVSGL1=SolDifc(idg_N2O,L)*XNPG*FOXYX
+    ZNSGL1=SolDifc(idg_NH3,L)*XNPG*FOXYX
+    HLSGL1=SolDifc(idg_H2,L)*XNPG*FOXYX
+    OLSGLP=SolDifc(idg_O2,L)*XNPG
     ROXDFQ=0.0_r8
     RCHDFQ=0.0_r8
     RN2DFQ=0.0_r8

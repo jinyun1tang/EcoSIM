@@ -275,11 +275,11 @@ module NutUptakeMod
     RUPP1P  =>   plt_rbgc%RUPP1P     , &
     RUPP2P  =>   plt_rbgc%RUPP2P     , &
     RUPP2B  =>   plt_rbgc%RUPP2B     , &
+    SolDifc =>   plt_soilchem%SolDifc, &
     RP1BY   =>   plt_bgcr%RP1BY      , &
     RPOBY   =>   plt_bgcr%RPOBY      , &
     RP14Y   =>   plt_bgcr%RP14Y      , &
-    RPO4Y   =>   plt_bgcr%RPO4Y      , &
-    POSGL   =>   plt_soilchem%POSGL    &
+    RPO4Y   =>   plt_bgcr%RPO4Y        &
   )
   TFPO4X=0.0_r8
   TFPOBX=0.0_r8
@@ -325,7 +325,7 @@ module NutUptakeMod
     !     RRADL=root radius
     !     DIFFL=PO4 diffusion per plant
     !
-    POSGX=POSGL(L)*TORT(NPH,L)
+    POSGX=SolDifc(ids_H1PO4,L)*TORT(NPH,L)
     PATHL=AMIN1(PATH(N,L),RRADL(N,L)+SQRT(2.0*POSGX))
     DIFFL=POSGX*safe_adb(RTARR(N,L),LOG(PATHL/RRADL(N,L)))
 
@@ -372,10 +372,10 @@ module NutUptakeMod
     RUONOB  =>  plt_rbgc%RUONOB     , &
     RUPNOB  =>  plt_rbgc%RUPNOB     , &
     RUONO3  =>  plt_rbgc%RUONO3     , &
+    SolDifc =>  plt_soilchem%SolDifc, &
     VLNOB   =>  plt_soilchem%VLNOB  , &
     CNO3B   =>  plt_soilchem%CNO3B  , &
     ZNO3S   =>  plt_soilchem%ZNO3S  , &
-    ZOSGL   =>  plt_soilchem%ZOSGL  , &
     CNO3S   =>  plt_soilchem%CNO3S  , &
     VOLW    =>  plt_soilchem%VOLW   , &
     VLNO3   =>  plt_soilchem%VLNO3  , &
@@ -391,7 +391,7 @@ module NutUptakeMod
 ! PATH=path length of water and nutrient uptake
 ! DIFFL=NO3 diffusion per plant
 !
-  ZOSGX=ZOSGL(L)*TORT(NPH,L)
+  ZOSGX=SolDifc(ids_NO3,L)*TORT(NPH,L)
   PATHL=AMIN1(PATH(N,L),RRADL(N,L)+SQRT(2.0*ZOSGX))
   DIFFL=ZOSGX*safe_adb(RTARR(N,L),LOG(PATHL/RRADL(N,L)))
   !
@@ -552,7 +552,7 @@ module NutUptakeMod
     RUNNBP  =>  plt_rbgc%RUNNBP     , &
     RUPNH4  =>  plt_rbgc%RUPNH4     , &
     RTARP   =>  plt_morph%RTARP     , &
-    ZNSGL   =>  plt_soilchem%ZNSGL  , &
+    SolDifc =>  plt_soilchem%SolDifc, &
     VOLW    =>  plt_soilchem%VOLW   , &
     VLNHB   =>  plt_soilchem%VLNHB  , &
     ZNH4B   =>  plt_soilchem%ZNH4B  , &
@@ -567,7 +567,7 @@ module NutUptakeMod
 ! RRADL=root radius
 ! DIFFL=NH4 diffusion per plant
 !
-  ZNSGX=ZNSGL(L)*TORT(NPH,L)
+  ZNSGX=SolDifc(idg_NH3,L)*TORT(NPH,L)
   PATHL=AMIN1(PATH(N,L),RRADL(N,L)+SQRT(2.0*ZNSGX))
   DIFFL=ZNSGX*safe_adb(RTARR(N,L),LOG(PATHL/RRADL(N,L)))
 !

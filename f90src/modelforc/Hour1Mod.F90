@@ -319,6 +319,7 @@ module Hour1Mod
       AtmGgms(idg_N2O,NY,NX)=Z2OE(NY,NX)*1.25E-03_r8*TREF/TKA(NY,NX)  !gN/m3
       AtmGgms(idg_NH3,NY,NX)=ZNH3E(NY,NX)*6.25E-04_r8*TREF/TKA(NY,NX) !gN/m3
       AtmGgms(idg_H2 ,NY,NX)=H2GE(NY,NX)*8.92E-05_r8*TREF/TKA(NY,NX)  !gH/m3
+      AtmGgms(idg_NH3B,NY,NX)=ZNH3E(NY,NX)*6.25E-04_r8*TREF/TKA(NY,NX) !gN/m3
 
       CCOR(NY,NX)=AtmGgms(idg_CO2,NY,NX)*gas_solubility(idg_CO2,TCA(NY,NX)) &
          /(EXP(ACO2X*CSTRR(NY,NX)))
@@ -1421,14 +1422,25 @@ module Hour1Mod
 !
   TFACL=TEFAQUDIF(TKS(0,NY,NX))
   TFND(0,NY,NX)=TFACL
-  CQSGL(0,NY,NX)=CQSG*TFACL
-  OLSGL(0,NY,NX)=OLSG*TFACL
-  ZLSGL(0,NY,NX)=ZLSG*TFACL
-  ZNSGL(0,NY,NX)=ZNSG*TFACL
-  HLSGL(0,NY,NX)=HLSG*TFACL
-  ZVSGL(0,NY,NX)=ZVSG*TFACL
-  ZOSGL(0,NY,NX)=ZOSG*TFACL
-  POSGL(0,NY,NX)=POSG*TFACL
+  SolDifc(idg_CH4,0,NY,NX)=CQSG*TFACL
+  SolDifc(idg_O2,0,NY,NX)=OLSG*TFACL
+  SolDifc(idg_N2,0,NY,NX)=ZLSG*TFACL
+  SolDifc(idg_NH3,0,NY,NX)=ZNSG*TFACL
+  SolDifc(idg_H2,0,NY,NX)=HLSG*TFACL
+  SolDifc(idg_N2O,0,NY,NX)=ZVSG*TFACL
+  SolDifc(ids_NO3,0,NY,NX)=ZOSG*TFACL
+  SolDifc(ids_H1PO4,0,NY,NX)=POSG*TFACL
+
+  SolDifc(ids_NH4,0,NY,NX)   =SolDifc(idg_NH3,0,NY,NX)
+  SolDifc(ids_NH4B,0,NY,NX)  =SolDifc(ids_NH4,0,NY,NX)
+  SolDifc(idg_NH3B,0,NY,NX)  =SolDifc(idg_NH3,0,NY,NX)
+  SolDifc(ids_NO3B,0,NY,NX)  =SolDifc(ids_NO3,0,NY,NX)
+  SolDifc(ids_NO2,0,NY,NX)   =SolDifc(ids_NO3,0,NY,NX)
+  SolDifc(ids_NO2B,0,NY,NX)  =SolDifc(ids_NO2,0,NY,NX)
+  SolDifc(ids_H2PO4,0,NY,NX) =SolDifc(ids_H1PO4,0,NY,NX)
+  SolDifc(ids_H1PO4B,0,NY,NX)=SolDifc(ids_H1PO4,0,NY,NX)
+  SolDifc(ids_H2PO4B,0,NY,NX)=SolDifc(ids_H2PO4,0,NY,NX)
+
   OCSGL(0,NY,NX)=OCSG*TFACL
   ONSGL(0,NY,NX)=ONSG*TFACL
   OPSGL(0,NY,NX)=OPSG*TFACL
@@ -1633,16 +1645,28 @@ module Hour1Mod
     GasDifc(idg_N2O,L,NY,NX)=Z2SG*TFACG
     GasDifc(idg_NH3,L,NY,NX)=ZHSG*TFACG
     GasDifc(idg_H2,L,NY,NX)=HGSG*TFACG
+    GasDifc(idg_NH3B,L,NY,NX)=ZHSG*TFACG
 
-    CLSGL(L,NY,NX)=CLSG*TFACL
-    CQSGL(L,NY,NX)=CQSG*TFACL
-    OLSGL(L,NY,NX)=OLSG*TFACL
-    ZLSGL(L,NY,NX)=ZLSG*TFACL
-    ZNSGL(L,NY,NX)=ZNSG*TFACL
-    HLSGL(L,NY,NX)=HLSG*TFACL
-    ZVSGL(L,NY,NX)=ZVSG*TFACL
-    ZOSGL(L,NY,NX)=ZOSG*TFACL
-    POSGL(L,NY,NX)=POSG*TFACL
+    SolDifc(idg_CO2,L,NY,NX)=CLSG*TFACL
+    SolDifc(idg_CH4,L,NY,NX)=CQSG*TFACL
+    SolDifc(idg_O2,L,NY,NX)=OLSG*TFACL
+    SolDifc(idg_N2,L,NY,NX)=ZLSG*TFACL
+    SolDifc(idg_NH3,L,NY,NX)=ZNSG*TFACL
+    SolDifc(idg_H2,L,NY,NX)=HLSG*TFACL
+    SolDifc(idg_N2O,L,NY,NX)=ZVSG*TFACL
+    SolDifc(idg_NH3B,L,NY,NX)=SolDifc(idg_NH3,L,NY,NX)
+    SolDifc(ids_NO3,L,NY,NX)=ZOSG*TFACL
+    SolDifc(ids_H1PO4,L,NY,NX)=POSG*TFACL
+
+    SolDifc(ids_NH4,L,NY,NX)   =SolDifc(idg_NH3,L,NY,NX)
+    SolDifc(ids_NH4B,L,NY,NX)  =SolDifc(ids_NH4,L,NY,NX)
+    SolDifc(ids_NO3B,L,NY,NX)  =SolDifc(ids_NO3,L,NY,NX)
+    SolDifc(ids_NO2,L,NY,NX)   =SolDifc(ids_NO3,L,NY,NX)
+    SolDifc(ids_NO2B,L,NY,NX)  =SolDifc(ids_NO2,L,NY,NX)
+    SolDifc(ids_H2PO4,L,NY,NX) =SolDifc(ids_H1PO4,L,NY,NX)
+    SolDifc(ids_H1PO4B,L,NY,NX)=SolDifc(ids_H1PO4,L,NY,NX)
+    SolDifc(ids_H2PO4B,L,NY,NX)=SolDifc(ids_H2PO4,L,NY,NX)
+
     OCSGL(L,NY,NX)=OCSG*TFACL
     ONSGL(L,NY,NX)=ONSG*TFACL
     OPSGL(L,NY,NX)=OPSG*TFACL

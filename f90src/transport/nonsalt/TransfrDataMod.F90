@@ -182,6 +182,8 @@ implicit none
   real(r8), pointer ::  TH1PFS(:,:,:)                      !
   real(r8), pointer ::  TH1BFB(:,:,:)                      !
 
+  real(r8), pointer ::  GasDifcc(:,:,:,:)
+  real(r8), pointer ::  SolDifcc(:,:,:,:)
   real(r8), pointer ::  DifuscG(:,:,:,:,:)
   real(r8), pointer ::  DCO2G(:,:,:,:)                     !
   real(r8), pointer ::  DCH4G(:,:,:,:)                     !
@@ -346,11 +348,7 @@ implicit none
   real(r8), pointer ::  ZGSGL2(:,:,:)                      !
   real(r8), pointer ::  Z2SGL2(:,:,:)                      !
   real(r8), pointer ::  ZHSGL2(:,:,:)                      !
-  real(r8), pointer ::  CO2SH2(:,:,:)                      !
-  real(r8), pointer ::  CH4SH2(:,:,:)                      !
-  real(r8), pointer ::  OXYSH2(:,:,:)                      !
-  real(r8), pointer ::  Z2GSH2(:,:,:)                      !
-  real(r8), pointer ::  Z2OSH2(:,:,:)                      !
+
   real(r8), pointer ::  ZNH4H2(:,:,:)                      !
   real(r8), pointer ::  ZN4BH2(:,:,:)                      !
   real(r8), pointer ::  ZNH3H2(:,:,:)                      !
@@ -361,16 +359,11 @@ implicit none
   real(r8), pointer ::  H2PBH2(:,:,:)                      !
   real(r8), pointer ::  ZNO2H2(:,:,:)                      !
   real(r8), pointer ::  OQCH2(:,:,:,:)                     !
-  real(r8), pointer ::  CH4S2(:,:,:)                       !
-  real(r8), pointer ::  OXYS2(:,:,:)                       !
-  real(r8), pointer ::  Z2GS2(:,:,:)                       !
-  real(r8), pointer ::  Z2OS2(:,:,:)                       !
 
   real(r8), pointer :: trc_gasml2(:,:,:,:)
   real(r8), pointer :: trc_solml2(:,:,:,:)
   real(r8), pointer :: trc_soHml2(:,:,:,:)
-  real(r8), pointer ::  H2GS2(:,:,:)                       !
-  real(r8), pointer ::  H2GSH2(:,:,:)                      !
+
   real(r8), pointer ::  RQSH2P(:,:,:)                      !
   real(r8), pointer ::  RQSH1P(:,:,:)                      !
   real(r8), pointer ::  RQSCOS(:,:,:)                      !
@@ -402,6 +395,7 @@ implicit none
   real(r8), pointer ::  RN4FHW(:,:,:,:)                    !
   real(r8), pointer ::  RN3FHW(:,:,:,:)
                   !
+  real(r8), pointer ::  RGasSSVol(:,:,:)       !soil surface gas volatization
   real(r8), pointer ::  RGasDSFlx(:,:,:,:)   !gas dissolution-volatilization
   real(r8), pointer ::  RHGFHS(:,:,:,:)                    !
   real(r8), pointer ::  RCHFHS(:,:,:,:)                    !
@@ -433,9 +427,9 @@ implicit none
   real(r8), pointer ::  RH2BFB(:,:,:,:)                    !
   real(r8), pointer ::  RCOFHS(:,:,:,:)                    !
 
-  real(r8), pointer :: RPoreSoHFlx(:,:,:,:,:)
-  real(r8), pointer :: RPoreSolFlx(:,:,:,:,:)
-
+  real(r8), pointer :: RPoreSoHFlx(:,:,:,:,:)        !macropore flux
+  real(r8), pointer :: RPoreSolFlx(:,:,:,:,:)        !micropore flux
+  real(r8), pointer :: RporeSoXFlx(:,:,:,:)        !Mac-mic pore exchange flux
 !----------------------------------------------------------------------
 
 contains
@@ -597,6 +591,8 @@ contains
   allocate(TH1PFS(JZ,JY,JX));   TH1PFS=0._r8
   allocate(TH1BFB(JZ,JY,JX));   TH1BFB=0._r8
 
+  allocate(GasDifcc(idg_beg:idg_end,JZ,JY,JX))
+  allocate(SolDifcc(ids_beg:ids_end,JZ,JY,JX))
   allocate(DifuscG(idg_beg:idg_end,3,JZ,JY,JX)); DifuscG=0._r8
   allocate(DCO2G(3,JZ,JY,JX));  DCO2G=0._r8
   allocate(DCH4G(3,JZ,JY,JX));  DCH4G=0._r8
@@ -761,11 +757,6 @@ contains
   allocate(ZGSGL2(JZ,JY,JX));   ZGSGL2=0._r8
   allocate(Z2SGL2(JZ,JY,JX));   Z2SGL2=0._r8
   allocate(ZHSGL2(JZ,JY,JX));   ZHSGL2=0._r8
-  allocate(CO2SH2(JZ,JY,JX));   CO2SH2=0._r8
-  allocate(CH4SH2(JZ,JY,JX));   CH4SH2=0._r8
-  allocate(OXYSH2(JZ,JY,JX));   OXYSH2=0._r8
-  allocate(Z2GSH2(JZ,JY,JX));   Z2GSH2=0._r8
-  allocate(Z2OSH2(JZ,JY,JX));   Z2OSH2=0._r8
   allocate(ZNH4H2(JZ,JY,JX));   ZNH4H2=0._r8
   allocate(ZN4BH2(JZ,JY,JX));   ZN4BH2=0._r8
   allocate(ZNH3H2(JZ,JY,JX));   ZNH3H2=0._r8
@@ -776,21 +767,13 @@ contains
   allocate(H2PBH2(JZ,JY,JX));   H2PBH2=0._r8
   allocate(ZNO2H2(JZ,JY,JX));   ZNO2H2=0._r8
   allocate(OQCH2(1:jcplx,JZ,JY,JX));OQCH2=0._r8
-  allocate(CH4S2(0:JZ,JY,JX));  CH4S2=0._r8
 
   allocate(trc_gasml2(idg_beg:idg_end,0:JZ,JY,JX)); trc_gasml2(:,:,:,:)=0._r8
   allocate(trc_solml2(ids_beg:ids_end,0:JZ,JY,JX)); trc_solml2(:,:,:,:)=0._r8
   allocate(trc_soHml2(ids_beg:ids_end,0:JZ,JY,JX)); trc_soHml2(:,:,:,:)=0._r8
-  allocate(OXYS2(0:JZ,JY,JX));  OXYS2=0._r8
-
-  allocate(Z2GS2(0:JZ,JY,JX));  Z2GS2=0._r8
-
-  allocate(Z2OS2(0:JZ,JY,JX));  Z2OS2=0._r8
 
 
 
-  allocate(H2GS2(0:JZ,JY,JX));  H2GS2=0._r8
-  allocate(H2GSH2(JZ,JY,JX));   H2GSH2=0._r8
   allocate(RQSH2P(2,JV,JH));    RQSH2P=0._r8
   allocate(RQSH1P(2,JV,JH));    RQSH1P=0._r8
   allocate(RQSCOS(2,JV,JH));    RQSCOS=0._r8
@@ -823,6 +806,7 @@ contains
   allocate(RN3FHW(3,JD,JV,JH)); RN3FHW=0._r8
 
   allocate(RGasDSFlx(idg_beg:idg_end,0:JZ,JY,JX)); RGasDSFlx=0._r8
+  allocate(RGasSSVol(idg_beg:idg_end,JY,JX)); RGasSSVol=0._r8
   allocate(RHGFHS(3,JD,JV,JH)); RHGFHS=0._r8
   allocate(RCHFHS(3,JD,JV,JH)); RCHFHS=0._r8
   allocate(ROXFHS(3,JD,JV,JH)); ROXFHS=0._r8
@@ -852,9 +836,10 @@ contains
   allocate(RNXFLB(3,0:JD,JV,JH));RNXFLB=0._r8
   allocate(RH2BFB(3,0:JD,JV,JH));RH2BFB=0._r8
   allocate(RCOFHS(3,JD,JV,JH)); RCOFHS=0._r8
+
   allocate(RPoreSoHFlx(ids_beg:ids_end,3,JD,JV,JH));RPoreSoHFlx=0._r8
   allocate(RPoreSolFlx(ids_beg:ids_end,3,JD,JV,JH));RPoreSolFlx=0._r8
-
+  allocate(RporeSoXFlx(ids_beg:ids_end,JZ,JY,JX));RporeSoXFlx=0._r8
   end subroutine InitTransfrData
 
 !----------------------------------------------------------------------
@@ -935,6 +920,7 @@ contains
   call destroy(RH1PF0)
   call destroy(RH1PF1)
   call destroy(RH1BF2)
+
   call destroy(ROCFXS)
   call destroy(RONFXS)
   call destroy(ROPFXS)
@@ -956,6 +942,7 @@ contains
   call destroy(RNXFXB)
   call destroy(RH1PXS)
   call destroy(RH1BXB)
+
   call destroy(CLSGL2)
   call destroy(CQSGL2)
   call destroy(POSGL2)
@@ -1177,11 +1164,7 @@ contains
   call destroy(ZGSGL2)
   call destroy(Z2SGL2)
   call destroy(ZHSGL2)
-  call destroy(CO2SH2)
-  call destroy(CH4SH2)
-  call destroy(OXYSH2)
-  call destroy(Z2GSH2)
-  call destroy(Z2OSH2)
+
   call destroy(ZNH4H2)
   call destroy(ZN4BH2)
   call destroy(ZNH3H2)
@@ -1197,7 +1180,6 @@ contains
   call destroy(trc_solml2)
   call destroy(trc_soHml2)
 
-  call destroy(H2GSH2)
   call destroy(RQSH2P)
   call destroy(RQSH1P)
   call destroy(RQSCOS)
@@ -1262,6 +1244,7 @@ contains
   call destroy(RCOFHS)
   call destroy(RPoreSoHFlx)
   call destroy(RPoreSolFlx)
+  call destroy(RporeSoXFlx)
   end subroutine DestructTransfrData
 
 
