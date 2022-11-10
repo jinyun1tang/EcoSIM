@@ -1675,77 +1675,77 @@ module Hist1Mod
                   IF(K.EQ.14)HEAD(M)=TONT(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
                   IF(K.EQ.15)THEN
                     IF(BKVL(1,NY,NX).GT.ZEROS(NY,NX))THEN
-                      HEAD(M)=(ZNH4S(1,NY,NX)+ZNH4B(1,NY,NX)+14.0*(XN4(1,NY,NX)+XNB(1,NY,NX)))/BKVL(1,NY,NX)
+                      HEAD(M)=(trc_solml(ids_NH4,1,NY,NX)+ZNH4B(1,NY,NX)+14.0*(XN4(1,NY,NX)+XNB(1,NY,NX)))/BKVL(1,NY,NX)
                     ENDIF
                   ENDIF
                   IF(K.EQ.16)THEN
                     IF(BKVL(2,NY,NX).GT.ZEROS(NY,NX))THEN
-                      HEAD(M)=(ZNH4S(2,NY,NX)+ZNH4B(2,NY,NX)+14.0*(XN4(2,NY,NX)+XNB(2,NY,NX)))/BKVL(2,NY,NX)
+                      HEAD(M)=(trc_solml(ids_NH4,2,NY,NX)+ZNH4B(2,NY,NX)+14.0*(XN4(2,NY,NX)+XNB(2,NY,NX)))/BKVL(2,NY,NX)
                     ENDIF
                   ENDIF
                   IF(K.EQ.17)THEN
                     IF(BKVL(3,NY,NX).GT.ZEROS(NY,NX))THEN
-                      HEAD(M)=(ZNH4S(3,NY,NX)+ZNH4B(3,NY,NX)+14.0*(XN4(3,NY,NX)+XNB(3,NY,NX)))/BKVL(3,NY,NX)
+                      HEAD(M)=(trc_solml(ids_NH4,3,NY,NX)+ZNH4B(3,NY,NX)+14.0*(XN4(3,NY,NX)+XNB(3,NY,NX)))/BKVL(3,NY,NX)
                     ENDIF
                   ENDIF
                   IF(K.EQ.18)THEN
                     IF(BKVL(4,NY,NX).GT.ZEROS(NY,NX))THEN
-                      HEAD(M)=(ZNH4S(4,NY,NX)+ZNH4B(4,NY,NX)+14.0*(XN4(4,NY,NX)+XNB(4,NY,NX)))/BKVL(4,NY,NX)
+                      HEAD(M)=(trc_solml(ids_NH4,4,NY,NX)+ZNH4B(4,NY,NX)+14.0*(XN4(4,NY,NX)+XNB(4,NY,NX)))/BKVL(4,NY,NX)
                     ENDIF
                   ENDIF
                   IF(K.EQ.19)THEN
                     IF(BKVL(5,NY,NX).GT.ZEROS(NY,NX))THEN
-                      HEAD(M)=(ZNH4S(5,NY,NX)+ZNH4B(5,NY,NX)+14.0*(XN4(5,NY,NX)+XNB(5,NY,NX)))/BKVL(5,NY,NX)
+                      HEAD(M)=(trc_solml(ids_NH4,5,NY,NX)+ZNH4B(5,NY,NX)+14.0*(XN4(5,NY,NX)+XNB(5,NY,NX)))/BKVL(5,NY,NX)
                     ENDIF
                   ENDIF
                   IF(K.EQ.20)THEN
                     IF(BKVL(6,NY,NX).GT.ZEROS(NY,NX))THEN
-                      HEAD(M)=(ZNH4S(6,NY,NX)+ZNH4B(6,NY,NX)+14.0*(XN4(6,NY,NX)+XNB(6,NY,NX)))/BKVL(6,NY,NX)
+                      HEAD(M)=(trc_solml(ids_NH4,6,NY,NX)+ZNH4B(6,NY,NX)+14.0*(XN4(6,NY,NX)+XNB(6,NY,NX)))/BKVL(6,NY,NX)
                     ENDIF
                   ENDIF
                   IF(K.EQ.21)THEN
                     IF(BKVL(7,NY,NX).GT.ZEROS(NY,NX))THEN
-                      HEAD(M)=(ZNH4S(7,NY,NX)+ZNH4B(7,NY,NX)+14.0*(XN4(7,NY,NX)+XNB(7,NY,NX)))/BKVL(7,NY,NX)
+                      HEAD(M)=(trc_solml(ids_NH4,7,NY,NX)+ZNH4B(7,NY,NX)+14.0*(XN4(7,NY,NX)+XNB(7,NY,NX)))/BKVL(7,NY,NX)
                     ENDIF
                   ENDIF
                   IF(K.EQ.22)THEN
                     IF(BKVL(8,NY,NX).GT.ZEROS(NY,NX))THEN
-                      HEAD(M)=(ZNH4S(8,NY,NX)+ZNH4B(8,NY,NX)+14.0*(XN4(8,NY,NX)+XNB(8,NY,NX)))/BKVL(8,NY,NX)
+                      HEAD(M)=(trc_solml(ids_NH4,8,NY,NX)+ZNH4B(8,NY,NX)+14.0*(XN4(8,NY,NX)+XNB(8,NY,NX)))/BKVL(8,NY,NX)
                     ENDIF
                   ENDIF
                   IF(K.EQ.23)THEN
                     IF(BKVL(9,NY,NX).GT.ZEROS(NY,NX))THEN
-                      HEAD(M)=(ZNH4S(9,NY,NX)+ZNH4B(9,NY,NX)+14.0*(XN4(9,NY,NX)+XNB(9,NY,NX)))/BKVL(9,NY,NX)
+                      HEAD(M)=(trc_solml(ids_NH4,9,NY,NX)+ZNH4B(9,NY,NX)+14.0*(XN4(9,NY,NX)+XNB(9,NY,NX)))/BKVL(9,NY,NX)
                     ENDIF
                   ENDIF
                   IF(K.EQ.24.AND.JZ>=10)THEN
                     IF(BKVL(10,NY,NX).GT.ZEROS(NY,NX))THEN
-                      HEAD(M)=(ZNH4S(10,NY,NX)+ZNH4B(10,NY,NX)+14.0*(XN4(10,NY,NX)+XNB(10,NY,NX)))/BKVL(10,NY,NX)
+                      HEAD(M)=(trc_solml(ids_NH4,10,NY,NX)+ZNH4B(10,NY,NX)+14.0*(XN4(10,NY,NX)+XNB(10,NY,NX)))/BKVL(10,NY,NX)
                     ENDIF
                   ENDIF
                   IF(K.EQ.25.AND.JZ>=11)THEN
                     IF(BKVL(11,NY,NX).GT.ZEROS(NY,NX))THEN
-                      HEAD(M)=(ZNH4S(11,NY,NX)+ZNH4B(11,NY,NX)+14.0*(XN4(11,NY,NX)+XNB(11,NY,NX)))/BKVL(11,NY,NX)
+                      HEAD(M)=(trc_solml(ids_NH4,11,NY,NX)+ZNH4B(11,NY,NX)+14.0*(XN4(11,NY,NX)+XNB(11,NY,NX)))/BKVL(11,NY,NX)
                     ENDIF
                   ENDIF
                   IF(K.EQ.26.AND.JZ>=12)THEN
                     IF(BKVL(12,NY,NX).GT.ZEROS(NY,NX))THEN
-                      HEAD(M)=(ZNH4S(12,NY,NX)+ZNH4B(12,NY,NX)+14.0*(XN4(12,NY,NX)+XNB(12,NY,NX)))/BKVL(12,NY,NX)
+                      HEAD(M)=(trc_solml(ids_NH4,12,NY,NX)+ZNH4B(12,NY,NX)+14.0*(XN4(12,NY,NX)+XNB(12,NY,NX)))/BKVL(12,NY,NX)
                     ENDIF
                   ENDIF
                   IF(K.EQ.27.AND.JZ>=13)THEN
                     IF(BKVL(13,NY,NX).GT.ZEROS(NY,NX))THEN
-                      HEAD(M)=(ZNH4S(13,NY,NX)+ZNH4B(13,NY,NX)+14.0*(XN4(13,NY,NX)+XNB(13,NY,NX)))/BKVL(13,NY,NX)
+                      HEAD(M)=(trc_solml(ids_NH4,13,NY,NX)+ZNH4B(13,NY,NX)+14.0*(XN4(13,NY,NX)+XNB(13,NY,NX)))/BKVL(13,NY,NX)
                     ENDIF
                   ENDIF
                   IF(K.EQ.28.AND.JZ>=14)THEN
                     IF(BKVL(14,NY,NX).GT.ZEROS(NY,NX))THEN
-                      HEAD(M)=(ZNH4S(14,NY,NX)+ZNH4B(14,NY,NX)+14.0*(XN4(14,NY,NX)+XNB(14,NY,NX)))/BKVL(14,NY,NX)
+                      HEAD(M)=(trc_solml(ids_NH4,14,NY,NX)+ZNH4B(14,NY,NX)+14.0*(XN4(14,NY,NX)+XNB(14,NY,NX)))/BKVL(14,NY,NX)
                     ENDIF
                   ENDIF
                   IF(K.EQ.29.AND.JZ>=15)THEN
                     IF(BKVL(15,NY,NX).GT.ZEROS(NY,NX))THEN
-                      HEAD(M)=(ZNH4S(15,NY,NX)+ZNH4B(15,NY,NX)+14.0*(XN4(15,NY,NX)+XNB(15,NY,NX)))/BKVL(15,NY,NX)
+                      HEAD(M)=(trc_solml(ids_NH4,15,NY,NX)+ZNH4B(15,NY,NX)+14.0*(XN4(15,NY,NX)+XNB(15,NY,NX)))/BKVL(15,NY,NX)
                     ENDIF
                   ENDIF
 
@@ -1826,7 +1826,7 @@ module Hist1Mod
                   ENDIF
                   IF(K.EQ.45)THEN
                     IF(BKVL(0,NY,NX).GT.ZEROS(NY,NX))THEN
-                      HEAD(M)=(ZNH4S(0,NY,NX)+14.0*XN4(0,NY,NX))/BKVL(0,NY,NX)
+                      HEAD(M)=(trc_solml(ids_NH4,0,NY,NX)+14.0*XN4(0,NY,NX))/BKVL(0,NY,NX)
                     ENDIF
                   ENDIF
                   IF(K.EQ.46)THEN
@@ -1865,77 +1865,77 @@ module Hist1Mod
                   IF(K.EQ.12)HEAD(M)=UPO4F(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
                   IF(K.EQ.13)THEN
                     IF(BKVL(1,NY,NX).GT.ZEROS(NY,NX))THEN
-                      HEAD(M)=(H1PO4(1,NY,NX)+H1POB(1,NY,NX)+H2PO4(1,NY,NX)+H2POB(1,NY,NX))/VOLW(1,NY,NX)
+                      HEAD(M)=(H1PO4(1,NY,NX)+H1POB(1,NY,NX)+H2PO4(1,NY,NX)+trc_solml(ids_H2PO4B,1,NY,NX))/VOLW(1,NY,NX)
                     ENDIF
                   ENDIF
                   IF(K.EQ.14)THEN
                     IF(BKVL(2,NY,NX).GT.ZEROS(NY,NX))THEN
-                      HEAD(M)=(H1PO4(2,NY,NX)+H2POB(1,NY,NX)+H2PO4(2,NY,NX)+H2POB(2,NY,NX))/VOLW(2,NY,NX)
+                      HEAD(M)=(H1PO4(2,NY,NX)+trc_solml(ids_H2PO4B,1,NY,NX)+H2PO4(2,NY,NX)+trc_solml(ids_H2PO4B,2,NY,NX))/VOLW(2,NY,NX)
                     ENDIF
                   ENDIF
                   IF(K.EQ.15)THEN
                     IF(BKVL(3,NY,NX).GT.ZEROS(NY,NX))THEN
-                      HEAD(M)=(H1PO4(3,NY,NX)+H1POB(3,NY,NX)+H2PO4(3,NY,NX)+H2POB(3,NY,NX))/VOLW(3,NY,NX)
+                      HEAD(M)=(H1PO4(3,NY,NX)+H1POB(3,NY,NX)+H2PO4(3,NY,NX)+trc_solml(ids_H2PO4B,3,NY,NX))/VOLW(3,NY,NX)
                     ENDIF
                   ENDIF
                   IF(K.EQ.16)THEN
                     IF(BKVL(4,NY,NX).GT.ZEROS(NY,NX))THEN
-                      HEAD(M)=(H1PO4(4,NY,NX)+H1POB(4,NY,NX)+H2PO4(4,NY,NX)+H2POB(4,NY,NX))/VOLW(4,NY,NX)
+                      HEAD(M)=(H1PO4(4,NY,NX)+H1POB(4,NY,NX)+H2PO4(4,NY,NX)+trc_solml(ids_H2PO4B,4,NY,NX))/VOLW(4,NY,NX)
                     ENDIF
                   ENDIF
                   IF(K.EQ.17)THEN
                     IF(BKVL(5,NY,NX).GT.ZEROS(NY,NX))THEN
-                      HEAD(M)=(H1PO4(5,NY,NX)+H1POB(5,NY,NX)+H2PO4(5,NY,NX)+H2POB(5,NY,NX))/VOLW(5,NY,NX)
+                      HEAD(M)=(H1PO4(5,NY,NX)+H1POB(5,NY,NX)+H2PO4(5,NY,NX)+trc_solml(ids_H2PO4B,5,NY,NX))/VOLW(5,NY,NX)
                     ENDIF
                   ENDIF
                   IF(K.EQ.18)THEN
                     IF(BKVL(6,NY,NX).GT.ZEROS(NY,NX))THEN
-                      HEAD(M)=(H1PO4(6,NY,NX)+H1POB(6,NY,NX)+H2PO4(6,NY,NX)+H2POB(6,NY,NX))/VOLW(6,NY,NX)
+                      HEAD(M)=(H1PO4(6,NY,NX)+H1POB(6,NY,NX)+H2PO4(6,NY,NX)+trc_solml(ids_H2PO4B,6,NY,NX))/VOLW(6,NY,NX)
                     ENDIF
                   ENDIF
                   IF(K.EQ.19)THEN
                     IF(BKVL(7,NY,NX).GT.ZEROS(NY,NX))THEN
-                      HEAD(M)=(H1PO4(7,NY,NX)+H1POB(7,NY,NX)+H2PO4(7,NY,NX)+H2POB(7,NY,NX))/VOLW(7,NY,NX)
+                      HEAD(M)=(H1PO4(7,NY,NX)+H1POB(7,NY,NX)+H2PO4(7,NY,NX)+trc_solml(ids_H2PO4B,7,NY,NX))/VOLW(7,NY,NX)
                     ENDIF
                   ENDIF
                   IF(K.EQ.20)THEN
                     IF(BKVL(8,NY,NX).GT.ZEROS(NY,NX))THEN
-                      HEAD(M)=(H1PO4(8,NY,NX)+H1POB(8,NY,NX)+H2PO4(8,NY,NX)+H2POB(8,NY,NX))/VOLW(8,NY,NX)
+                      HEAD(M)=(H1PO4(8,NY,NX)+H1POB(8,NY,NX)+H2PO4(8,NY,NX)+trc_solml(ids_H2PO4B,8,NY,NX))/VOLW(8,NY,NX)
                     ENDIF
                   ENDIF
                   IF(K.EQ.21)THEN
                     IF(BKVL(9,NY,NX).GT.ZEROS(NY,NX))THEN
-                      HEAD(M)=(H1PO4(9,NY,NX)+H1POB(9,NY,NX)+H2PO4(9,NY,NX)+H2POB(9,NY,NX))/VOLW(9,NY,NX)
+                      HEAD(M)=(H1PO4(9,NY,NX)+H1POB(9,NY,NX)+H2PO4(9,NY,NX)+trc_solml(ids_H2PO4B,9,NY,NX))/VOLW(9,NY,NX)
                     ENDIF
                   ENDIF
                   IF(K.EQ.22.AND.JZ>=10)THEN
                     IF(BKVL(10,NY,NX).GT.ZEROS(NY,NX))THEN
-                      HEAD(M)=(H1PO4(10,NY,NX)+H1POB(10,NY,NX)+H2PO4(10,NY,NX)+H2POB(10,NY,NX))/VOLW(10,NY,NX)
+                      HEAD(M)=(H1PO4(10,NY,NX)+H1POB(10,NY,NX)+H2PO4(10,NY,NX)+trc_solml(ids_H2PO4B,10,NY,NX))/VOLW(10,NY,NX)
                     ENDIF
                   ENDIF
                   IF(K.EQ.23.AND.JZ>=11)THEN
                     IF(BKVL(11,NY,NX).GT.ZEROS(NY,NX))THEN
-                      HEAD(M)=(H1PO4(11,NY,NX)+H1POB(11,NY,NX)+H2PO4(11,NY,NX)+H2POB(11,NY,NX))/VOLW(11,NY,NX)
+                      HEAD(M)=(H1PO4(11,NY,NX)+H1POB(11,NY,NX)+H2PO4(11,NY,NX)+trc_solml(ids_H2PO4B,11,NY,NX))/VOLW(11,NY,NX)
                     ENDIF
                   ENDIF
                   IF(K.EQ.24.AND.JZ>=12)THEN
                     IF(BKVL(12,NY,NX).GT.ZEROS(NY,NX))THEN
-                      HEAD(M)=(H1PO4(12,NY,NX)+H1POB(1,NY,NX)+H2PO4(12,NY,NX)+H2POB(12,NY,NX))/VOLW(12,NY,NX)
+                      HEAD(M)=(H1PO4(12,NY,NX)+H1POB(1,NY,NX)+H2PO4(12,NY,NX)+trc_solml(ids_H2PO4B,12,NY,NX))/VOLW(12,NY,NX)
                     ENDIF
                   ENDIF
                   IF(K.EQ.25.AND.JZ>=13)THEN
                     IF(BKVL(13,NY,NX).GT.ZEROS(NY,NX))THEN
-                      HEAD(M)=(H1PO4(13,NY,NX)+H1POB(13,NY,NX)+H2PO4(13,NY,NX)+H2POB(13,NY,NX))/VOLW(13,NY,NX)
+                      HEAD(M)=(H1PO4(13,NY,NX)+H1POB(13,NY,NX)+H2PO4(13,NY,NX)+trc_solml(ids_H2PO4B,13,NY,NX))/VOLW(13,NY,NX)
                     ENDIF
                   ENDIF
                   IF(K.EQ.26.AND.JZ>=14)THEN
                     IF(BKVL(14,NY,NX).GT.ZEROS(NY,NX))THEN
-                      HEAD(M)=(H1PO4(14,NY,NX)+H1POB(14,NY,NX)+H2PO4(14,NY,NX)+H2POB(14,NY,NX))/VOLW(14,NY,NX)
+                      HEAD(M)=(H1PO4(14,NY,NX)+H1POB(14,NY,NX)+H2PO4(14,NY,NX)+trc_solml(ids_H2PO4B,14,NY,NX))/VOLW(14,NY,NX)
                     ENDIF
                   ENDIF
                   IF(K.EQ.27.AND.JZ>=15)THEN
                     IF(BKVL(15,NY,NX).GT.ZEROS(NY,NX))THEN
-                      HEAD(M)=(H1PO4(15,NY,NX)+H1POB(15,NY,NX)+H2PO4(15,NY,NX)+H2POB(15,NY,NX))/VOLW(15,NY,NX)
+                      HEAD(M)=(H1PO4(15,NY,NX)+H1POB(15,NY,NX)+H2PO4(15,NY,NX)+trc_solml(ids_H2PO4B,15,NY,NX))/VOLW(15,NY,NX)
                     ENDIF
                   ENDIF
                   IF(K.EQ.28)THEN
@@ -2145,54 +2145,54 @@ module Hist1Mod
                   IF(K.EQ.2)HEAD(M)=TCNET(NY,NX)/AREA(3,NU(NY,NX),NY,NX)*23.14815
                   IF(K.EQ.3)HEAD(M)=HCH4G(NY,NX)/AREA(3,NU(NY,NX),NY,NX)*23.14815
                   IF(K.EQ.4)HEAD(M)=HOXYG(NY,NX)/AREA(3,NU(NY,NX),NY,NX)*8.68056
-                  IF(K.EQ.5)HEAD(M)=CCO2S(1,NY,NX)
-                  IF(K.EQ.6)HEAD(M)=CCO2S(2,NY,NX)
-                  IF(K.EQ.7)HEAD(M)=CCO2S(3,NY,NX)
-                  IF(K.EQ.8)HEAD(M)=CCO2S(4,NY,NX)
-                  IF(K.EQ.9)HEAD(M)=CCO2S(5,NY,NX)
-                  IF(K.EQ.10)HEAD(M)=CCO2S(6,NY,NX)
-                  IF(K.EQ.11)HEAD(M)=CCO2S(7,NY,NX)
-                  IF(K.EQ.12)HEAD(M)=CCO2S(8,NY,NX)
-                  IF(K.EQ.13)HEAD(M)=CCO2S(9,NY,NX)
-                  IF(K.EQ.14.AND.JZ>=10)HEAD(M)=CCO2S(10,NY,NX)
-                  IF(K.EQ.15.AND.JZ>=11)HEAD(M)=CCO2S(11,NY,NX)
-                  IF(K.EQ.16.AND.JZ>=12)HEAD(M)=CCO2S(12,NY,NX)
-                  IF(K.EQ.17.AND.JZ>=13)HEAD(M)=CCO2S(13,NY,NX)
-                  IF(K.EQ.18.AND.JZ>=14)HEAD(M)=CCO2S(14,NY,NX)
+                  IF(K.EQ.5)HEAD(M)=trc_solcl(idg_CO2,1,NY,NX)
+                  IF(K.EQ.6)HEAD(M)=trc_solcl(idg_CO2,2,NY,NX)
+                  IF(K.EQ.7)HEAD(M)=trc_solcl(idg_CO2,3,NY,NX)
+                  IF(K.EQ.8)HEAD(M)=trc_solcl(idg_CO2,4,NY,NX)
+                  IF(K.EQ.9)HEAD(M)=trc_solcl(idg_CO2,5,NY,NX)
+                  IF(K.EQ.10)HEAD(M)=trc_solcl(idg_CO2,6,NY,NX)
+                  IF(K.EQ.11)HEAD(M)=trc_solcl(idg_CO2,7,NY,NX)
+                  IF(K.EQ.12)HEAD(M)=trc_solcl(idg_CO2,8,NY,NX)
+                  IF(K.EQ.13)HEAD(M)=trc_solcl(idg_CO2,9,NY,NX)
+                  IF(K.EQ.14.AND.JZ>=10)HEAD(M)=trc_solcl(idg_CO2,10,NY,NX)
+                  IF(K.EQ.15.AND.JZ>=11)HEAD(M)=trc_solcl(idg_CO2,11,NY,NX)
+                  IF(K.EQ.16.AND.JZ>=12)HEAD(M)=trc_solcl(idg_CO2,12,NY,NX)
+                  IF(K.EQ.17.AND.JZ>=13)HEAD(M)=trc_solcl(idg_CO2,13,NY,NX)
+                  IF(K.EQ.18.AND.JZ>=14)HEAD(M)=trc_solcl(idg_CO2,14,NY,NX)
 
-                  IF(K.EQ.19)HEAD(M)=CCO2S(0,NY,NX)
-                  IF(K.EQ.20)HEAD(M)=CCH4S(1,NY,NX)
-                  IF(K.EQ.21)HEAD(M)=CCH4S(2,NY,NX)
-                  IF(K.EQ.22)HEAD(M)=CCH4S(3,NY,NX)
-                  IF(K.EQ.23)HEAD(M)=CCH4S(4,NY,NX)
-                  IF(K.EQ.24)HEAD(M)=CCH4S(5,NY,NX)
-                  IF(K.EQ.25)HEAD(M)=CCH4S(6,NY,NX)
-                  IF(K.EQ.26)HEAD(M)=CCH4S(7,NY,NX)
-                  IF(K.EQ.27)HEAD(M)=CCH4S(8,NY,NX)
-                  IF(K.EQ.28)HEAD(M)=CCH4S(9,NY,NX)
-                  IF(K.EQ.29.AND.JZ>=10)HEAD(M)=CCH4S(10,NY,NX)
-                  IF(K.EQ.30.AND.JZ>=11)HEAD(M)=CCH4S(11,NY,NX)
-                  IF(K.EQ.31.AND.JZ>=12)HEAD(M)=CCH4S(12,NY,NX)
-                  IF(K.EQ.32.AND.JZ>=13)HEAD(M)=CCH4S(13,NY,NX)
-                  IF(K.EQ.33.AND.JZ>=14)HEAD(M)=CCH4S(14,NY,NX)
-                  IF(K.EQ.34.AND.JZ>=15)HEAD(M)=CCH4S(15,NY,NX)
+                  IF(K.EQ.19)HEAD(M)=trc_solcl(idg_CO2,0,NY,NX)
+                  IF(K.EQ.20)HEAD(M)=trc_solcl(idg_CH4,1,NY,NX)
+                  IF(K.EQ.21)HEAD(M)=trc_solcl(idg_CH4,2,NY,NX)
+                  IF(K.EQ.22)HEAD(M)=trc_solcl(idg_CH4,3,NY,NX)
+                  IF(K.EQ.23)HEAD(M)=trc_solcl(idg_CH4,4,NY,NX)
+                  IF(K.EQ.24)HEAD(M)=trc_solcl(idg_CH4,5,NY,NX)
+                  IF(K.EQ.25)HEAD(M)=trc_solcl(idg_CH4,6,NY,NX)
+                  IF(K.EQ.26)HEAD(M)=trc_solcl(idg_CH4,7,NY,NX)
+                  IF(K.EQ.27)HEAD(M)=trc_solcl(idg_CH4,8,NY,NX)
+                  IF(K.EQ.28)HEAD(M)=trc_solcl(idg_CH4,9,NY,NX)
+                  IF(K.EQ.29.AND.JZ>=10)HEAD(M)=trc_solcl(idg_CH4,10,NY,NX)
+                  IF(K.EQ.30.AND.JZ>=11)HEAD(M)=trc_solcl(idg_CH4,11,NY,NX)
+                  IF(K.EQ.31.AND.JZ>=12)HEAD(M)=trc_solcl(idg_CH4,12,NY,NX)
+                  IF(K.EQ.32.AND.JZ>=13)HEAD(M)=trc_solcl(idg_CH4,13,NY,NX)
+                  IF(K.EQ.33.AND.JZ>=14)HEAD(M)=trc_solcl(idg_CH4,14,NY,NX)
+                  IF(K.EQ.34.AND.JZ>=15)HEAD(M)=trc_solcl(idg_CH4,15,NY,NX)
 
-                  IF(K.EQ.35)HEAD(M)=COXYS(1,NY,NX)
-                  IF(K.EQ.36)HEAD(M)=COXYS(2,NY,NX)
-                  IF(K.EQ.37)HEAD(M)=COXYS(3,NY,NX)
-                  IF(K.EQ.38)HEAD(M)=COXYS(4,NY,NX)
-                  IF(K.EQ.39)HEAD(M)=COXYS(5,NY,NX)
-                  IF(K.EQ.40)HEAD(M)=COXYS(6,NY,NX)
-                  IF(K.EQ.41)HEAD(M)=COXYS(7,NY,NX)
-                  IF(K.EQ.42)HEAD(M)=COXYS(8,NY,NX)
-                  IF(K.EQ.43)HEAD(M)=COXYS(9,NY,NX)
-                  IF(K.EQ.44.AND.JZ>=10)HEAD(M)=COXYS(10,NY,NX)
-                  IF(K.EQ.45.AND.JZ>=11)HEAD(M)=COXYS(11,NY,NX)
-                  IF(K.EQ.46.AND.JZ>=12)HEAD(M)=COXYS(12,NY,NX)
-                  IF(K.EQ.47.AND.JZ>=13)HEAD(M)=COXYS(13,NY,NX)
-                  IF(K.EQ.48.AND.JZ>=14)HEAD(M)=COXYS(14,NY,NX)
-                  IF(K.EQ.49.AND.JZ>=15)HEAD(M)=COXYS(15,NY,NX)
-                  IF(K.EQ.50)HEAD(M)=COXYS(0,NY,NX)
+                  IF(K.EQ.35)HEAD(M)=trc_solcl(idg_O2,1,NY,NX)
+                  IF(K.EQ.36)HEAD(M)=trc_solcl(idg_O2,2,NY,NX)
+                  IF(K.EQ.37)HEAD(M)=trc_solcl(idg_O2,3,NY,NX)
+                  IF(K.EQ.38)HEAD(M)=trc_solcl(idg_O2,4,NY,NX)
+                  IF(K.EQ.39)HEAD(M)=trc_solcl(idg_O2,5,NY,NX)
+                  IF(K.EQ.40)HEAD(M)=trc_solcl(idg_O2,6,NY,NX)
+                  IF(K.EQ.41)HEAD(M)=trc_solcl(idg_O2,7,NY,NX)
+                  IF(K.EQ.42)HEAD(M)=trc_solcl(idg_O2,8,NY,NX)
+                  IF(K.EQ.43)HEAD(M)=trc_solcl(idg_O2,9,NY,NX)
+                  IF(K.EQ.44.AND.JZ>=10)HEAD(M)=trc_solcl(idg_O2,10,NY,NX)
+                  IF(K.EQ.45.AND.JZ>=11)HEAD(M)=trc_solcl(idg_O2,11,NY,NX)
+                  IF(K.EQ.46.AND.JZ>=12)HEAD(M)=trc_solcl(idg_O2,12,NY,NX)
+                  IF(K.EQ.47.AND.JZ>=13)HEAD(M)=trc_solcl(idg_O2,13,NY,NX)
+                  IF(K.EQ.48.AND.JZ>=14)HEAD(M)=trc_solcl(idg_O2,14,NY,NX)
+                  IF(K.EQ.49.AND.JZ>=15)HEAD(M)=trc_solcl(idg_O2,15,NY,NX)
+                  IF(K.EQ.50)HEAD(M)=trc_solcl(idg_O2,0,NY,NX)
                 ENDIF
               ENDDO
               WRITE(LUN,'(A16,F8.3,4X,A8,I8,50E16.7E3)')OUTFILS(N-20,NY,NX),DOY,CDATE,J,(HEAD(K),K=1,M)
@@ -2278,39 +2278,39 @@ module Hist1Mod
                   IF(K.EQ.3)HEAD(M)=HNH3G(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
                   IF(K.EQ.4)HEAD(M)=UDINQ(NY,NX)/TAREA
                   IF(K.EQ.5)HEAD(M)=UDIND(NY,NX)/TAREA
-                  IF(K.EQ.6)HEAD(M)=CZ2OS(1,NY,NX)
-                  IF(K.EQ.7)HEAD(M)=CZ2OS(2,NY,NX)
-                  IF(K.EQ.8)HEAD(M)=CZ2OS(3,NY,NX)
-                  IF(K.EQ.9)HEAD(M)=CZ2OS(4,NY,NX)
-                  IF(K.EQ.10)HEAD(M)=CZ2OS(5,NY,NX)
-                  IF(K.EQ.11)HEAD(M)=CZ2OS(6,NY,NX)
-                  IF(K.EQ.12)HEAD(M)=CZ2OS(7,NY,NX)
-                  IF(K.EQ.13)HEAD(M)=CZ2OS(8,NY,NX)
-                  IF(K.EQ.14)HEAD(M)=CZ2OS(9,NY,NX)
-                  IF(K.EQ.15.AND.JZ>=10)HEAD(M)=CZ2OS(10,NY,NX)
-                  IF(K.EQ.16.AND.JZ>=11)HEAD(M)=CZ2OS(11,NY,NX)
-                  IF(K.EQ.17.AND.JZ>=12)HEAD(M)=CZ2OS(12,NY,NX)
-                  IF(K.EQ.18.AND.JZ>=13)HEAD(M)=CZ2OS(13,NY,NX)
-                  IF(K.EQ.19.AND.JZ>=14)HEAD(M)=CZ2OS(14,NY,NX)
-                  IF(K.EQ.20.AND.JZ>=15)HEAD(M)=CZ2OS(15,NY,NX)
+                  IF(K.EQ.6)HEAD(M)=trc_solcl(idg_N2O,1,NY,NX)
+                  IF(K.EQ.7)HEAD(M)=trc_solcl(idg_N2O,2,NY,NX)
+                  IF(K.EQ.8)HEAD(M)=trc_solcl(idg_N2O,3,NY,NX)
+                  IF(K.EQ.9)HEAD(M)=trc_solcl(idg_N2O,4,NY,NX)
+                  IF(K.EQ.10)HEAD(M)=trc_solcl(idg_N2O,5,NY,NX)
+                  IF(K.EQ.11)HEAD(M)=trc_solcl(idg_N2O,6,NY,NX)
+                  IF(K.EQ.12)HEAD(M)=trc_solcl(idg_N2O,7,NY,NX)
+                  IF(K.EQ.13)HEAD(M)=trc_solcl(idg_N2O,8,NY,NX)
+                  IF(K.EQ.14)HEAD(M)=trc_solcl(idg_N2O,9,NY,NX)
+                  IF(K.EQ.15.AND.JZ>=10)HEAD(M)=trc_solcl(idg_N2O,10,NY,NX)
+                  IF(K.EQ.16.AND.JZ>=11)HEAD(M)=trc_solcl(idg_N2O,11,NY,NX)
+                  IF(K.EQ.17.AND.JZ>=12)HEAD(M)=trc_solcl(idg_N2O,12,NY,NX)
+                  IF(K.EQ.18.AND.JZ>=13)HEAD(M)=trc_solcl(idg_N2O,13,NY,NX)
+                  IF(K.EQ.19.AND.JZ>=14)HEAD(M)=trc_solcl(idg_N2O,14,NY,NX)
+                  IF(K.EQ.20.AND.JZ>=15)HEAD(M)=trc_solcl(idg_N2O,15,NY,NX)
 
-                  IF(K.EQ.21)HEAD(M)=CNH3S(1,NY,NX)
-                  IF(K.EQ.22)HEAD(M)=CNH3S(2,NY,NX)
-                  IF(K.EQ.23)HEAD(M)=CNH3S(3,NY,NX)
-                  IF(K.EQ.24)HEAD(M)=CNH3S(4,NY,NX)
-                  IF(K.EQ.25)HEAD(M)=CNH3S(5,NY,NX)
-                  IF(K.EQ.26)HEAD(M)=CNH3S(6,NY,NX)
-                  IF(K.EQ.27)HEAD(M)=CNH3S(7,NY,NX)
-                  IF(K.EQ.28)HEAD(M)=CNH3S(8,NY,NX)
-                  IF(K.EQ.29)HEAD(M)=CNH3S(9,NY,NX)
-                  IF(K.EQ.30.AND.JZ>=10)HEAD(M)=CNH3S(10,NY,NX)
-                  IF(K.EQ.31.AND.JZ>=11)HEAD(M)=CNH3S(11,NY,NX)
-                  IF(K.EQ.32.AND.JZ>=12)HEAD(M)=CNH3S(12,NY,NX)
-                  IF(K.EQ.33.AND.JZ>=13)HEAD(M)=CNH3S(13,NY,NX)
-                  IF(K.EQ.34.AND.JZ>=14)HEAD(M)=CNH3S(14,NY,NX)
-                  IF(K.EQ.35.AND.JZ>=15)HEAD(M)=CNH3S(15,NY,NX)
-                  IF(K.EQ.36)HEAD(M)=CZ2OS(0,NY,NX)
-                  IF(K.EQ.37)HEAD(M)=CNH3S(0,NY,NX)
+                  IF(K.EQ.21)HEAD(M)=trc_solcl(idg_NH3,1,NY,NX)
+                  IF(K.EQ.22)HEAD(M)=trc_solcl(idg_NH3,2,NY,NX)
+                  IF(K.EQ.23)HEAD(M)=trc_solcl(idg_NH3,3,NY,NX)
+                  IF(K.EQ.24)HEAD(M)=trc_solcl(idg_NH3,4,NY,NX)
+                  IF(K.EQ.25)HEAD(M)=trc_solcl(idg_NH3,5,NY,NX)
+                  IF(K.EQ.26)HEAD(M)=trc_solcl(idg_NH3,6,NY,NX)
+                  IF(K.EQ.27)HEAD(M)=trc_solcl(idg_NH3,7,NY,NX)
+                  IF(K.EQ.28)HEAD(M)=trc_solcl(idg_NH3,8,NY,NX)
+                  IF(K.EQ.29)HEAD(M)=trc_solcl(idg_NH3,9,NY,NX)
+                  IF(K.EQ.30.AND.JZ>=10)HEAD(M)=trc_solcl(idg_NH3,10,NY,NX)
+                  IF(K.EQ.31.AND.JZ>=11)HEAD(M)=trc_solcl(idg_NH3,11,NY,NX)
+                  IF(K.EQ.32.AND.JZ>=12)HEAD(M)=trc_solcl(idg_NH3,12,NY,NX)
+                  IF(K.EQ.33.AND.JZ>=13)HEAD(M)=trc_solcl(idg_NH3,13,NY,NX)
+                  IF(K.EQ.34.AND.JZ>=14)HEAD(M)=trc_solcl(idg_NH3,14,NY,NX)
+                  IF(K.EQ.35.AND.JZ>=15)HEAD(M)=trc_solcl(idg_NH3,15,NY,NX)
+                  IF(K.EQ.36)HEAD(M)=trc_solcl(idg_N2O,0,NY,NX)
+                  IF(K.EQ.37)HEAD(M)=trc_solcl(idg_NH3,0,NY,NX)
                 ENDIF
               ENDDO
               WRITE(LUN,'(A16,F8.3,4X,A8,I8,50E16.7E3)')OUTFILS(N-20,NY,NX),DOY,CDATE,J,(HEAD(K),K=1,M)

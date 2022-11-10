@@ -374,28 +374,16 @@ implicit none
   real(r8), pointer :: DFGS(:,:)   => null()  !coefficient for dissolution - volatilization, []
   real(r8), pointer :: RSCS(:)     => null()  !soil hydraulic resistance, [MPa h m-2]
   real(r8), pointer :: BKDS(:)     => null()  !soil bulk density, [Mg m-3]
-  real(r8), pointer :: CH2P4(:)    => null()  !aqueous PO4 concentration non-band	[gP m-3]
-  real(r8), pointer :: CH1P4B(:)   => null()  !aqueous H1PO4 concentration band [gP m-3]
-  real(r8), pointer :: CH2P4B(:)   => null()  !aqueous PO4 concentration band	[gP m-3]
-  real(r8), pointer :: CNO3S(:)    => null()  !NO3 concentration non-band micropore	[gN m-3]
-  real(r8), pointer :: CH1P4(:)    => null()  !aqueous H1PO4 concentration non-band [gP m-3]
-  real(r8), pointer :: CNO3B(:)    => null()  !NO3 concentration band micropore	[gN m-3]
-  real(r8), pointer :: CNH4S(:)    => null()  !NH4 concentration non-band micropore	[gN m-3]
-  real(r8), pointer :: CNH4B(:)    => null()  !NH4 concentration band micropore	[gN m-3]
-
+  real(r8), pointer :: trc_solcl(:,:) => null() !aqueous tracer concentration [g m-3]
   real(r8), pointer :: CO2S(:)     => null()  !aqueous CO2  micropore	[gC d-2]
   real(r8), pointer :: CH4S(:)     => null()  !aqueous CH4  micropore	[gC d-2]
-  real(r8), pointer :: CCH4S(:)    => null()  !aqueous CH4 concentration micropore	[gC m-3]
-  real(r8), pointer :: CZ2OS(:)    => null()  !aqueous N2O concentration micropore	[gN m-3]
   real(r8), pointer :: CCH4G(:)    => null()  !gaseous CH4 concentration	[gC m-3]
-  real(r8), pointer :: CNH3S(:)    => null()  !NH3 concentration non-band micropore	[gN m-3]
-  real(r8), pointer :: CNH3B(:)    => null()  !NH3 concentration band micropore	[gN m-3]
-  real(r8), pointer :: CH2GS(:)    => null()  !aqueous H2 concentration	[g m-3]
+
   real(r8), pointer :: CZ2OG(:)    => null()  !gaseous N2O concentration	[gN m-3]
   real(r8), pointer :: CNH3G(:)    => null()  !gaseous NH3 concentration	[gN m-3]
   real(r8), pointer :: CH2GG(:)    => null()  !gaseous H2 concentration	[g m-3]
   real(r8), pointer :: CORGC(:)    => null()  !soil organic C content [gC kg soil-1]
-  real(r8), pointer :: CPO4S(:)    => null()  !PO4 concentration non-band micropore	[g m-3]
+
   real(r8), pointer :: CNDU(:)     => null()  !soil micropore hydraulic conductivity for root water uptake [m MPa-1 h-1]
 
   real(r8), pointer :: GasDifc(:,:)=> null()  !gaseous diffusivity [m2 h-1]
@@ -404,7 +392,7 @@ implicit none
   real(r8), pointer :: H1PO4(:)    => null()  !soil aqueous HPO4 content micropore non-band, [gP d-2]
   real(r8), pointer :: H2PO4(:)    => null()  !PO4 non-band micropore, [gP d-2]
   real(r8), pointer :: H1POB(:)    => null()  !soil aqueous HPO4 content micropore band, [gP d-2]
-  real(r8), pointer :: H2POB(:)    => null()  !PO4 band micropore, [gP d-2]
+
   real(r8), pointer :: H2GS(:)     => null()  !aqueous H2 	[g d-2]
   real(r8), pointer :: trc_gasml(:,:)=> null()!gas layer mass [g d-2]
 
@@ -434,7 +422,7 @@ implicit none
   real(r8), pointer :: OQC(:,:)    => null()  !dissolved organic C micropore	[gC d-2]
   real(r8), pointer :: OQN(:,:)    => null()  !dissolved organic N micropore	[gN d-2]
   real(r8), pointer :: OQP(:,:)    => null()  !dissolved organic P micropore	[gP d-2]
-
+  real(r8), pointer :: trc_solml(:,:)=> null() !aqueous tracer [g d-2]
   contains
     procedure, public :: Init => plt_soilchem_init
     procedure, public :: Destroy => plt_soilchem_destroy
@@ -1720,6 +1708,7 @@ implicit none
   allocate(this%ZNO3S(0:JZ1))
   allocate(this%ZNO3B(0:JZ1))
   allocate(this%ZNH4S(0:JZ1))
+  allocate(this%trc_solml(ids_beg:ids_end,0:JZ1))
   allocate(this%ZNH4B(0:JZ1))
   allocate(this%Z2OS(0:JZ1))
   allocate(this%ZNH3S(0:JZ1))
@@ -1727,7 +1716,6 @@ implicit none
   allocate(this%H1PO4(0:JZ1))
   allocate(this%H2PO4(0:JZ1))
   allocate(this%H1POB(0:JZ1))
-  allocate(this%H2POB(0:JZ1))
   allocate(this%H2GS(0:JZ1))
 
   allocate(this%trc_gasml(idg_beg:idg_end,0:JZ1))
@@ -1739,22 +1727,10 @@ implicit none
   allocate(this%CH2GG(0:JZ1))
   allocate(this%CORGC(0:JZ1))
 
-  allocate(this%CH2P4(0:JZ1))
-  allocate(this%CH1P4B(0:JZ1))
-  allocate(this%CH2P4B(0:JZ1))
-  allocate(this%CNO3S(0:JZ1))
-  allocate(this%CH1P4(0:JZ1))
-  allocate(this%CNO3B(0:JZ1))
-  allocate(this%CNH4S(0:JZ1))
-  allocate(this%CNH4B(0:JZ1))
+  allocate(this%trc_solcl(ids_beg:ids_end,0:jZ1))
 
   allocate(this%CO2S(0:JZ1))
   allocate(this%CH4S(0:JZ1))
-  allocate(this%CCH4S(0:JZ1))
-  allocate(this%CZ2OS(0:JZ1))
-  allocate(this%CNH3S(0:JZ1))
-  allocate(this%CNH3B(0:JZ1))
-  allocate(this%CH2GS(0:JZ1))
 
   allocate(this%VOLX(0:JZ1))
   allocate(this%THETW(0:JZ1))
@@ -1766,7 +1742,7 @@ implicit none
   allocate(this%RSCS(JZ1))
   allocate(this%BKDS(0:JZ1))
   allocate(this%CNDU(JZ1))
-  allocate(this%CPO4S(JZ1))
+
   end subroutine plt_soilchem_init
 !----------------------------------------------------------------------
 
@@ -1782,7 +1758,7 @@ implicit none
 !  if(allocated(DFGS))deallocate(DFGS)
 !  if(allocated(ZVSGL))deallocate(ZVSGL)
 !  if(allocated(SOXYL))deallocate(SOXYL)
-!  if(allocated(CPO4S))deallocate(CPO4S)
+
 !  if(allocated(CNDU))deallocate(CNDU)
 !  if(allocated(CGSGL))deallocate(CGSGL)
 !  if(allocated(CHSGL))deallocate(CHSGL)
@@ -1802,7 +1778,6 @@ implicit none
 !  if(allocated(H1PO4))deallocate(H1PO4)
 !  if(allocated(H2PO4))deallocate(H2PO4)
 !  if(allocated(H1POB))deallocate(H1POB)
-!  if(allocated(H2POB))deallocate(H2POB)
 !  if(allocated(H2GS))deallocate(H2GS)
 !  if(allocated(HLSGL))deallocate(HLSGL)
 
@@ -1835,22 +1810,9 @@ implicit none
 !  if(allocated(Z2SGL))deallocate(Z2SGL)
 !  if(allocated(ZHSGL))deallocate(ZHSGL)
 !  if(allocated(BKDS))deallocate(BKDS)
-!  if(allocated(CH2P4))deallocate(CH2P4)
-!  if(allocated(CH1P4B))deallocate(CH1P4B)
-!  if(allocated(CH2P4B))deallocate(CH2P4B)
-!  if(allocated(CNO3S))deallocate(CNO3S)
-!  if(allocated(CH1P4))deallocate(CH1P4)
-!  if(allocated(CNO3B))deallocate(CNO3B)
-!  if(allocated(CNH4S))deallocate(CNH4S)
-!  if(allocated(CNH4B))deallocate(CNH4B)
 !  if(allocated(CO2G))deallocate(CO2G)
 !  if(allocated(CO2S))deallocate(CO2S)
 !  if(allocated(CH4S))deallocate(CH4S)
-!  if(allocated(CCH4S))deallocate(CCH4S)
-!  if(allocated(CZ2OS))deallocate(CZ2OS)
-!  if(allocated(CNH3S))deallocate(CNH3S)
-!  if(allocated(CNH3B))deallocate(CNH3B)
-!  if(allocated(CH2GS))deallocate(CH2GS)
 !  if(allocated(CLSGL))deallocate(CLSGL)
 !  if(allocated(CQSGL))deallocate(CQSGL)
 

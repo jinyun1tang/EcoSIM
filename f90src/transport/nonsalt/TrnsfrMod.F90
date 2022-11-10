@@ -554,13 +554,13 @@ module TrnsfrMod
     OQP2(K,0,NY,NX)=OQP(K,0,NY,NX)-XOQPS(K,0,NY,NX)
     OQA2(K,0,NY,NX)=OQA(K,0,NY,NX)-XOQAS(K,0,NY,NX)
   ENDDO D9979
-  trc_solml2(ids_NH4,0,NY,NX)=ZNH4S(0,NY,NX)
+  trc_solml2(ids_NH4,0,NY,NX)=trc_solml(ids_NH4,0,NY,NX)
   trc_solml2(idg_NH3,0,NY,NX)=ZNH3S(0,NY,NX)
   trc_solml2(ids_NO3,0,NY,NX)=ZNO3S(0,NY,NX)
   trc_solml2(ids_NO2,0,NY,NX)=ZNO2S(0,NY,NX)
   trc_solml2(ids_H1PO4,0,NY,NX)=H1PO4(0,NY,NX)
   trc_solml2(ids_H2PO4,0,NY,NX)=H2PO4(0,NY,NX)
-  CHY0(0,NY,NX)=10.0**(-(PH(0,NY,NX)-3.0))
+  CHY0(0,NY,NX)=10.0_r8**(-(PH(0,NY,NX)-3.0_r8))
   end subroutine StateVarforGasandSolute
 !------------------------------------------------------------------------------------------
 
@@ -1029,7 +1029,7 @@ module TrnsfrMod
       OQPH2(K,L,NY,NX)=OQPH(K,L,NY,NX)
       OQAH2(K,L,NY,NX)=OQAH(K,L,NY,NX)
     enddo
-    trc_solml2(ids_NH4,L,NY,NX)=ZNH4S(L,NY,NX)
+    trc_solml2(ids_NH4,L,NY,NX)=trc_solml(ids_NH4,L,NY,NX)
     trc_solml2(idg_NH3,L,NY,NX)=ZNH3S(L,NY,NX)
     trc_solml2(ids_NO3,L,NY,NX)=ZNO3S(L,NY,NX)
     trc_solml2(ids_NO2,L,NY,NX)=ZNO2S(L,NY,NX)
@@ -1040,7 +1040,7 @@ module TrnsfrMod
     trc_solml2(ids_NO3B,L,NY,NX)=ZNO3B(L,NY,NX)
     trc_solml2(ids_NO2B,L,NY,NX)=ZNO2B(L,NY,NX)
     trc_solml2(ids_H1PO4B,L,NY,NX)=H1POB(L,NY,NX)
-    trc_solml2(ids_H2PO4B,L,NY,NX)=H2POB(L,NY,NX)
+    trc_solml2(ids_H2PO4B,L,NY,NX)=trc_solml(ids_H2PO4B,L,NY,NX)
 
     trc_soHml2(idg_CO2,L,NY,NX)=CO2SH(L,NY,NX)
     trc_soHml2(idg_CH4,L,NY,NX)=CH4SH(L,NY,NX)

@@ -52,7 +52,7 @@ subroutine regressiontest(nmfile,case_name, NX, NY)
 
     category = 'state'
     name = 'aqueous soil O2 (g m^3)'
-    datv=COXYS(1:12,NY,NX)
+    datv=trc_solcl(idg_O2,1:12,NY,NX)
     call regression%writedata(category,name,datv)
 
     category = 'state'

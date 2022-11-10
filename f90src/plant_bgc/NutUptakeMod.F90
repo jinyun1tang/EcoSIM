@@ -374,9 +374,8 @@ module NutUptakeMod
     RUONO3  =>  plt_rbgc%RUONO3     , &
     SolDifc =>  plt_soilchem%SolDifc, &
     VLNOB   =>  plt_soilchem%VLNOB  , &
-    CNO3B   =>  plt_soilchem%CNO3B  , &
     ZNO3S   =>  plt_soilchem%ZNO3S  , &
-    CNO3S   =>  plt_soilchem%CNO3S  , &
+    trc_solcl  =>  plt_soilchem%trc_solcl , &
     VOLW    =>  plt_soilchem%VOLW   , &
     VLNO3   =>  plt_soilchem%VLNO3  , &
     ZNO3B   =>  plt_soilchem%ZNO3B    &
@@ -404,9 +403,8 @@ module NutUptakeMod
   !     RMFNO3=soil-root convective NO3 flux per plant in non-band
   !     DIFNO3=soil-root NO3 diffusion per plant in non-band
   !
-  IF(VLNO3(L).GT.ZERO.AND.CNO3S(L) &
-    .GT.UPMNZO(N,NZ))THEN
-    RMFNO3=UPWTRP*CNO3S(L)*VLNO3(L)
+  IF(VLNO3(L).GT.ZERO.AND.trc_solcl(ids_NO3,L).GT.UPMNZO(N,NZ))THEN
+    RMFNO3=UPWTRP*trc_solcl(ids_NO3,L)*VLNO3(L)
     DIFNO3=DIFFL*VLNO3(L)
     !
     !     NO3 UPTAKE DEMAND FROM ROOT UPTAKE PARAMETERS ENTERED IN 'READQ'
@@ -438,7 +436,7 @@ module NutUptakeMod
     !     RUONO3=NO3 uptake in non-band unlimited by O2
     !     RUCNO3=NO3 uptake in non-band unlimited by nonstructural C
 !
-    X=(DIFNO3+RMFNO3)*CNO3S(L)
+    X=(DIFNO3+RMFNO3)*trc_solcl(ids_NO3,L)
     Y=DIFNO3*UPMNZO(N,NZ)
     B=-UPMX-DIFNO3*UPKMZO(N,NZ)-X+Y
     C=(X-Y)*UPMX
@@ -464,9 +462,8 @@ module NutUptakeMod
   !     DIFNOB=soil-root NO3 diffusion per plant in band
   !
 
-  IF(VLNOB(L).GT.ZERO.AND.CNO3B(L) &
-    .GT.UPMNZO(N,NZ))THEN
-    RMFNOB=UPWTRP*CNO3B(L)*VLNOB(L)
+  IF(VLNOB(L).GT.ZERO.AND.trc_solcl(ids_NO3B,L).GT.UPMNZO(N,NZ))THEN
+    RMFNOB=UPWTRP*trc_solcl(ids_NO3B,L)*VLNOB(L)
     DIFNOB=DIFFL*VLNOB(L)
     !
     !     NO3 UPTAKE DEMAND FROM ROOT UPTAKE PARAMETERS ENTERED IN 'READQ'
@@ -498,7 +495,7 @@ module NutUptakeMod
     !     RUONOB=NO3 uptake in band unlimited by O2
     !     RUCNOB=NO3 uptake in band unlimited by nonstructural C
     !
-    X=(DIFNOB+RMFNOB)*CNO3B(L)
+    X=(DIFNOB+RMFNOB)*trc_solcl(ids_NO3B,L)
     Y=DIFNOB*UPMNZO(N,NZ)
     B=-UPMX-DIFNOB*UPKMZO(N,NZ)-X+Y
     C=(X-Y)*UPMX
@@ -556,10 +553,9 @@ module NutUptakeMod
     VOLW    =>  plt_soilchem%VOLW   , &
     VLNHB   =>  plt_soilchem%VLNHB  , &
     ZNH4B   =>  plt_soilchem%ZNH4B  , &
-    CNH4B   =>  plt_soilchem%CNH4B  , &
     VLNH4   =>  plt_soilchem%VLNH4  , &
-    ZNH4S   =>  plt_soilchem%ZNH4S  , &
-    CNH4S   =>  plt_soilchem%CNH4S    &
+    trc_solml  =>  plt_soilchem%trc_solml , &
+    trc_solcl   =>  plt_soilchem%trc_solcl    &
   )
 ! ZNSGL=NH4 diffusivity
 ! TORT=soil tortuosity
@@ -580,8 +576,8 @@ module NutUptakeMod
 ! RMFNH4=soil-root convective NH4 flux per plant in non-band
 ! DIFNH4=soil-root NH4 diffusion per plant in non-band
 !
-  IF(VLNH4(L).GT.ZERO.AND.CNH4S(L).GT.UPMNZH(N,NZ))THEN
-    RMFNH4=UPWTRP*CNH4S(L)*VLNH4(L)
+  IF(VLNH4(L).GT.ZERO.AND.trc_solcl(ids_NH4,L).GT.UPMNZH(N,NZ))THEN
+    RMFNH4=UPWTRP*trc_solcl(ids_NH4,L)*VLNH4(L)
     DIFNH4=DIFFL*VLNH4(L)
 !
 !   NH4 UPTAKE DEMAND FROM ROOT UPTAKE PARAMETERS ENTERED IN 'READQ'
@@ -613,7 +609,7 @@ module NutUptakeMod
 !   RUONH4=NH4 uptake in non-band unlimited by O2
 !   RUCNH4=NH4 uptake in non-band unlimited by nonstructural C
 !
-    X=(DIFNH4+RMFNH4)*CNH4S(L)
+    X=(DIFNH4+RMFNH4)*trc_solcl(ids_NH4,L)
     Y=DIFNH4*UPMNZH(N,NZ)
     B=-UPMX-DIFNH4*UPKMZH(N,NZ)-X+Y
     C=(X-Y)*UPMX
@@ -622,7 +618,7 @@ module NutUptakeMod
     CP=(X-Y)*UPMXP
     RTKNHP=(-BP-SQRT(BP*BP-4.0*CP))/2.0
     ZNH4M=UPMNZH(N,NZ)*VOLW(L)*VLNH4(L)
-    ZNH4X=AZMAX1(FNH4X*(ZNH4S(L)-ZNH4M))
+    ZNH4X=AZMAX1(FNH4X*(trc_solml(ids_NH4,L)-ZNH4M))
     RUNNHP(N,L,NZ)=AZMAX1(RTKNH4*PP(NZ))
     RUPNH4(N,L,NZ)=AMIN1(ZNH4X,RUNNHP(N,L,NZ))
     RUONH4(N,L,NZ)=AMIN1(ZNH4X,AZMAX1(RTKNHP*PP(NZ)))
@@ -639,9 +635,8 @@ module NutUptakeMod
 ! DIFNHB=soil-root NH4 diffusion per plant in band
 !
 
-  IF(VLNHB(L).GT.ZERO.AND.CNH4B(L) &
-    .GT.UPMNZH(N,NZ))THEN
-    RMFNHB=UPWTRP*CNH4B(L)*VLNHB(L)
+  IF(VLNHB(L).GT.ZERO.AND.trc_solcl(ids_NH4B,L).GT.UPMNZH(N,NZ))THEN
+    RMFNHB=UPWTRP*trc_solcl(ids_NH4B,L)*VLNHB(L)
     DIFNHB=DIFFL*VLNHB(L)
 !
 !   NH4 UPTAKE DEMAND FROM ROOT UPTAKE PARAMETERS ENTERED IN 'READQ'
@@ -673,7 +668,7 @@ module NutUptakeMod
 !   RUONHB=NH4 uptake in band unlimited by O2
 !   RUCNHB=NH4 uptake in band unlimited by nonstructural C
 !
-    X=(DIFNHB+RMFNHB)*CNH4B(L)
+    X=(DIFNHB+RMFNHB)*trc_solcl(ids_NH4B,L)
     Y=DIFNHB*UPMNZH(N,NZ)
     B=-UPMX-DIFNHB*UPKMZH(N,NZ)-X+Y
     C=(X-Y)*UPMX
@@ -729,10 +724,9 @@ module NutUptakeMod
     RTARP   => plt_morph%RTARP     , &
     VOLW    => plt_soilchem%VOLW   , &
     VLPO4   => plt_soilchem%VLPO4  , &
-    CH1P4   => plt_soilchem%CH1P4  , &
+    trc_solcl   => plt_soilchem%trc_solcl  , &
     H1PO4   => plt_soilchem%H1PO4  , &
     VLPOB   => plt_soilchem%VLPOB  , &
-    CH1P4B  => plt_soilchem%CH1P4B , &
     H1POB   => plt_soilchem%H1POB    &
   )
   !
@@ -745,9 +739,8 @@ module NutUptakeMod
   !     RMFH1P=soil-root convective HPO4 flux per plant in non-band
   !     DIFH1P=soil-root HPO4 diffusion per plant in non-band
 !
-    IF(VLPO4(L).GT.ZERO.AND.CH1P4(L) &
-      .GT.UPMNPO(N,NZ))THEN
-      RMFH1P=UPWTRP*CH1P4(L)*VLPO4(L)
+    IF(VLPO4(L).GT.ZERO.AND.trc_solcl(ids_H1PO4,L).GT.UPMNPO(N,NZ))THEN
+      RMFH1P=UPWTRP*trc_solcl(ids_H1PO4,L)*VLPO4(L)
       DIFH1P=DIFFL*VLPO4(L)
     !
     !     HPO4 UPTAKE DEMAND FROM ROOT UPTAKE PARAMETERS ENTERED IN 'READQ'
@@ -779,7 +772,7 @@ module NutUptakeMod
     !     RUOH1P=HPO4 uptake in non-band unlimited by O2
     !     RUCH1P=HPO4 uptake in non-band unlimited by nonstructural C
 !
-    X=(DIFH1P+RMFH1P)*CH1P4(L)
+    X=(DIFH1P+RMFH1P)*trc_solcl(ids_H1PO4,L)
     Y=DIFH1P*UPMNPO(N,NZ)
     B=-UPMX-DIFH1P*UPKMPO(N,NZ)-X+Y
     C=(X-Y)*UPMX
@@ -805,9 +798,8 @@ module NutUptakeMod
   !     RMFH1B=soil-root convective HPO4 flux per plant in band
   !     DIFH1B=soil-root HPO4 diffusion per plant in band
   !
-  IF(VLPOB(L).GT.ZERO.AND.CH1P4B(L) &
-    .GT.UPMNPO(N,NZ))THEN
-    RMFH2B=UPWTRP*CH1P4B(L)*VLPOB(L)
+  IF(VLPOB(L).GT.ZERO.AND.trc_solcl(ids_H1PO4B,L).GT.UPMNPO(N,NZ))THEN
+    RMFH2B=UPWTRP*trc_solcl(ids_H1PO4B,L)*VLPOB(L)
     DIFH1B=DIFFL*VLPOB(L)
     !
     !     HPO4 UPTAKE DEMAND FROM ROOT UPTAKE PARAMETERS ENTERED IN 'READQ'
@@ -839,7 +831,7 @@ module NutUptakeMod
     !     RUOH1B=HPO4 uptake in band unlimited by O2
     !     RUCH1B=HPO4 uptake in band unlimited by nonstructural C
 !
-    X=(DIFH1B+RMFH2B)*CH1P4B(L)
+    X=(DIFH1B+RMFH2B)*trc_solcl(ids_H1PO4B,L)
     Y=DIFH1B*UPMNPO(N,NZ)
     B=-UPMX-DIFH1B*UPKMPO(N,NZ)-X+Y
     C=(X-Y)*UPMX
@@ -890,12 +882,11 @@ module NutUptakeMod
     RUPP2P  => plt_rbgc%RUPP2P     , &
     TFN4    => plt_pheno%TFN4      , &
     RTARP   => plt_morph%RTARP     , &
-    H2POB   => plt_soilchem%H2POB  , &
+    trc_solml   => plt_soilchem%trc_solml  , &
     VOLW    => plt_soilchem%VOLW   , &
     H2PO4   => plt_soilchem%H2PO4  , &
-    CH2P4   => plt_soilchem%CH2P4  , &
+    trc_solcl   => plt_soilchem%trc_solcl  , &
     VLPO4   => plt_soilchem%VLPO4  , &
-    CH2P4B  => plt_soilchem%CH2P4B , &
     VLPOB   => plt_soilchem%VLPOB    &
   )
   !     H2PO4 UPTAKE IN NON-BAND SOIL ZONE
@@ -907,9 +898,9 @@ module NutUptakeMod
   !     RMFH2P=soil-root convective H2PO4 flux per plant in non-band
   !     DIFH2P=soil-root H2PO4 diffusion per plant in non-band
 !
-    IF(VLPO4(L).GT.ZERO.AND.CH2P4(L) &
+    IF(VLPO4(L).GT.ZERO.AND.trc_solcl(ids_H2PO4,L) &
       .GT.UPMNPO(N,NZ))THEN
-      RMFH2P=UPWTRP*CH2P4(L)*VLPO4(L)
+      RMFH2P=UPWTRP*trc_solcl(ids_H2PO4,L)*VLPO4(L)
       DIFH2P=DIFFL*VLPO4(L)
       !
       !     H2PO4 UPTAKE DEMAND FROM ROOT UPTAKE PARAMETERS ENTERED IN 'READQ'
@@ -941,7 +932,7 @@ module NutUptakeMod
       !     RUOH2P=H2PO4 uptake in non-band unlimited by O2
       !     RUCH2P=H2PO4 uptake in non-band unlimited by nonstructural C
 !
-      X=(DIFH2P+RMFH2P)*CH2P4(L)
+      X=(DIFH2P+RMFH2P)*trc_solcl(ids_H2PO4,L)
       Y=DIFH2P*UPMNPO(N,NZ)
       B=-UPMX-DIFH2P*UPKMPO(N,NZ)-X+Y
       C=(X-Y)*UPMX
@@ -967,9 +958,8 @@ module NutUptakeMod
     !     DIFH2B=soil-root H2PO4 diffusion per plant in band
     !
 
-  IF(VLPOB(L).GT.ZERO.AND.CH2P4B(L) &
-    .GT.UPMNPO(N,NZ))THEN
-    RMFH2B=UPWTRP*CH2P4B(L)*VLPOB(L)
+  IF(VLPOB(L).GT.ZERO.AND.trc_solcl(ids_H2PO4B,L).GT.UPMNPO(N,NZ))THEN
+    RMFH2B=UPWTRP*trc_solcl(ids_H2PO4B,L)*VLPOB(L)
     DIFH2B=DIFFL*VLPOB(L)
     !
     !     H2PO4 UPTAKE DEMAND FROM ROOT UPTAKE PARAMETERS ENTERED IN 'READQ'
@@ -1001,7 +991,7 @@ module NutUptakeMod
     !     RUOH2B=H2PO4 uptake in band unlimited by O2
     !     RUCH2B=H2PO4 uptake in band unlimited by nonstructural C
 !
-    X=(DIFH2B+RMFH2B)*CH2P4B(L)
+    X=(DIFH2B+RMFH2B)*trc_solcl(ids_H2PO4B,L)
     Y=DIFH2B*UPMNPO(N,NZ)
     B=-UPMX-DIFH2B*UPKMPO(N,NZ)-X+Y
     C=(X-Y)*UPMX
@@ -1010,7 +1000,7 @@ module NutUptakeMod
     CP=(X-Y)*UPMXP
     RTKHPB=(-BP-SQRT(BP*BP-4.0*CP))/2.0
     H2PXM=UPMNPO(N,NZ)*VOLW(L)*VLPOB(L)
-    H2PXB=AZMAX1(FPOBX*(H2POB(L)-H2PXM))
+    H2PXB=AZMAX1(FPOBX*(trc_solml(ids_H2PO4B,L)-H2PXM))
     RUPP2B(N,L,NZ)=AZMAX1(RTKH2B*PP(NZ))
     RUPH2B(N,L,NZ)=AMIN1(H2PXB,RUPP2B(N,L,NZ))
     RUOH2B(N,L,NZ)=AMIN1(H2PXB,AZMAX1(RTKHPB*PP(NZ)))

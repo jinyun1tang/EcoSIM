@@ -17,7 +17,6 @@ implicit none
   real(r8),pointer ::  ZNH4B(:,:,:)                      !NH4 band micropore, [g d-2]
   real(r8),pointer ::  ZNH3B(:,:,:)                      !NH3 band micropore, [g d-2]
   real(r8),pointer ::  ZNO3B(:,:,:)                      !NO3 band micropore, [g d-2]
-  real(r8),pointer ::  H2POB(:,:,:)                      !PO4 band micropore, [g d-2]
   real(r8),pointer ::  ZNO2S(:,:,:)                      !NO2  non-band micropore, [g d-2]
 
   real(r8),pointer ::  Z2GS(:,:,:)                       !aqueous N2 micropore, [g d-2]
@@ -35,7 +34,9 @@ implicit none
   real(r8),pointer ::  Z2GSH(:,:,:)                      !aqueous N2 macropore, [g d-2]
   real(r8),pointer ::  Z2OSH(:,:,:)                      !aqueous N2O macropore, [g d-2]
   real(r8),pointer ::  ZNO2BH(:,:,:)                     !NO2 band macropore, [g d-2]
-
+  real(r8),pointer :: CPO4B(:,:,:)          !PO4 concentration band micropore	[g m-3]
+  real(r8),pointer :: trc_solml(:,:,:,:)                 !solute mass in micropore [g d-2]
+  real(r8),pointer :: trc_solcl(:,:,:,:)                 !solute concentration in micropre [d m-3]
   real(r8),pointer ::  ZNO2B(:,:,:)                      !NO2  band micropore, [g d-2]
   real(r8),pointer ::  ZNH4S(:,:,:)                      !NH4 non-band micropore, [g d-2]
   real(r8),pointer ::  ZNH3S(:,:,:)                      !NH3 non-band micropore, [g d-2]
@@ -45,32 +46,19 @@ implicit none
   real(r8),pointer ::  ZNFN0(:,:,:)                      !initial nitrification inhibition activity
   real(r8),pointer ::  ZNHUI(:,:,:)                      !current inhibition activity
   real(r8),pointer ::  ZNHU0(:,:,:)                      !urea hydrolysis inhibition activity
-  real(r8),pointer :: CZ2GS(:,:,:)          !aqueous N2 concentration micropore	[g m-3]
-  real(r8),pointer :: CNH4S(:,:,:)          !NH4 concentration non-band micropore	[g m-3]
-  real(r8),pointer :: CNH3S(:,:,:)          !NH3 concentration non-band micropore	[g m-3]
-  real(r8),pointer :: CNO3S(:,:,:)          !NO3 concentration non-band micropore	[g m-3]
-  real(r8),pointer :: CPO4S(:,:,:)          !PO4 concentration non-band micropore	[g m-3]
-  real(r8),pointer :: CNH4B(:,:,:)          !NH4 concentration band micropore	[g m-3]
-  real(r8),pointer :: CNH3B(:,:,:)          !NH3 concentration band micropore	[g m-3]
-  real(r8),pointer :: CNO3B(:,:,:)          !NO3 concentration band micropore	[g m-3]
-  real(r8),pointer :: CPO4B(:,:,:)          !PO4 concentration band micropore	[g m-3]
-  real(r8),pointer :: CNO2S(:,:,:)          !NO2 concentration non-band micropore	[g m-3]
+
   real(r8),pointer :: CNH3G(:,:,:)          !gaseous NH3 concentration	[g m-3]
   real(r8),pointer :: CZ2GG(:,:,:)          !gaseous N2 concentration	[g m-3]
   real(r8),pointer :: CZ2OG(:,:,:)          !gaseous N2O concentration	[g m-3]
-  real(r8),pointer :: CZ2OS(:,:,:)          !aqueous N2O concentration micropore	[g m-3]
+
   real(r8),pointer :: COXYG(:,:,:)          !gaseous O2 concentration	[g m-3]
   real(r8),pointer :: CCH4G(:,:,:)          !gaseous CH4 concentration	[g m-3]
-  real(r8),pointer :: COXYS(:,:,:)          !aqueous O2 concentration micropore	[g m-3]
+
   real(r8),pointer :: CCO2G(:,:,:)          !gaseous CO2 concentration	[g m-3]
-  real(r8),pointer :: CCO2S(:,:,:)          !aqueous CO2 concentration micropore	[g m-3]
-  real(r8),pointer :: CCH4S(:,:,:)          !aqueous CH4 concentration micropore	[g m-3]
+
   real(r8),pointer :: CH1P4(:,:,:)          !aqueous H1PO4 concentration non-band [g m-3]
-  real(r8),pointer :: CH1P4B(:,:,:)         !aqueous H1PO4 concentration band [g m-3]
-  real(r8),pointer :: CNO2B(:,:,:)          !aqueous HNO2 concentration band [g m-3]
-  real(r8),pointer :: CH2GS(:,:,:)          !aqueous H2 concentration	[g m-3]
-  real(r8),pointer :: CH2P4(:,:,:)          !aqueous PO4 concentration non-band	[g m-3]
-  real(r8),pointer :: CH2P4B(:,:,:)         !aqueous PO4 concentration band	[g m-3]
+
+
   real(r8),pointer :: CH2GG(:,:,:)          !gaseous H2 concentration	[g m-3]
   real(r8),pointer :: OXYS(:,:,:)           !aqueous O2  micropore	[g d-2]
   real(r8),pointer :: OXYSH(:,:,:)          !aqueous O2 macropore	g [d-2]
@@ -84,7 +72,7 @@ implicit none
   real(r8),pointer :: CH4SH(:,:,:)          !aqueous CO2  macropore	[g d-2]
   real(r8),pointer :: H2GS(:,:,:)           !aqueous H2 	[g d-2]
   real(r8),pointer :: H2GSH(:,:,:)          !aqueous H2 macropore	[g d-2]
-
+  real(r8),pointer :: CPO4S(:,:,:)          !PO4 concentration non-band micropore	[g m-3]
   real(r8),pointer :: PH(:,:,:)             !soil pH
   real(r8),pointer :: CEC(:,:,:)            !soil cation exchange capacity	[cmol kg-1]
   real(r8),pointer :: AEC(:,:,:)            !soil anion exchange capacity	[cmol kg-1]
@@ -267,7 +255,6 @@ implicit none
   allocate(ZNH4B(0:JZ,JY,JX));  ZNH4B=0._r8
   allocate(ZNH3B(0:JZ,JY,JX));  ZNH3B=0._r8
   allocate(ZNO3B(0:JZ,JY,JX));  ZNO3B=0._r8
-  allocate(H2POB(0:JZ,JY,JX));  H2POB=0._r8
   allocate(ZNO2S(0:JZ,JY,JX));  ZNO2S=0._r8
 
   allocate(trc_gasml(idg_beg:idg_end,JZ,JY,JX)); trc_gasml=0._r8
@@ -287,6 +274,8 @@ implicit none
   allocate(Z2OSH(JZ,JY,JX));    Z2OSH=0._r8
   allocate(ZNO2BH(JZ,JY,JX));   ZNO2BH=0._r8
   allocate(ZNO2B(0:JZ,JY,JX));  ZNO2B=0._r8
+  allocate(trc_solml(ids_beg:ids_end,0:JZ,JY,JX)); trc_solml=0._r8
+  allocate(trc_solcl(ids_beg:ids_end,0:JZ,JY,JX)); trc_solcl=0._r8
   allocate(ZNH4S(0:JZ,JY,JX));  ZNH4S=0._r8
   allocate(ZNH3S(0:JZ,JY,JX));  ZNH3S=0._r8
   allocate(ZNO3S(0:JZ,JY,JX));  ZNO3S=0._r8
@@ -294,20 +283,10 @@ implicit none
   allocate(ZNFN0(0:JZ,JY,JX));  ZNFN0=0._r8
   allocate(ZNHUI(0:JZ,JY,JX));  ZNHUI=0._r8
   allocate(ZNHU0(0:JZ,JY,JX));  ZNHU0=0._r8
-  allocate(CZ2GS(0:JZ,JY,JX));CZ2GS(0:JZ,JY,JX)=0._r8
-  allocate(CNH4S(0:JZ,JY,JX));CNH4S(0:JZ,JY,JX)=0._r8
-  allocate(CNH3S(0:JZ,JY,JX));CNH3S(0:JZ,JY,JX)=0._r8
-  allocate(CNO3S(0:JZ,JY,JX));CNO3S(0:JZ,JY,JX)=0._r8
-  allocate(CPO4S(JZ,JY,JX));CPO4S(JZ,JY,JX)=0._r8
-  allocate(CNH4B(0:JZ,JY,JX));CNH4B(0:JZ,JY,JX)=0._r8
-  allocate(CNH3B(0:JZ,JY,JX));CNH3B(0:JZ,JY,JX)=0._r8
-  allocate(CNO3B(0:JZ,JY,JX));CNO3B(0:JZ,JY,JX)=0._r8
   allocate(CPO4B(0:JZ,JY,JX));CPO4B(0:JZ,JY,JX)=0._r8
-  allocate(CNO2S(0:JZ,JY,JX));CNO2S(0:JZ,JY,JX)=0._r8
   allocate(CNH3G(0:JZ,JY,JX));CNH3G(0:JZ,JY,JX)=0._r8
   allocate(CZ2GG(0:JZ,JY,JX));CZ2GG(0:JZ,JY,JX)=0._r8
   allocate(CZ2OG(0:JZ,JY,JX));CZ2OG(0:JZ,JY,JX)=0._r8
-  allocate(CZ2OS(0:JZ,JY,JX));CZ2OS(0:JZ,JY,JX)=0._r8
 
   allocate(OXYS(0:JZ,JY,JX));OXYS(0:JZ,JY,JX)=0._r8
   allocate(OXYSH(JZ,JY,JX));OXYSH(JZ,JY,JX)=0._r8
@@ -318,17 +297,12 @@ implicit none
   allocate(CH4SH(JZ,JY,JX));CH4SH(JZ,JY,JX)=0._r8
   allocate(COXYG(0:JZ,JY,JX));COXYG(0:JZ,JY,JX)=0._r8
   allocate(CCH4G(0:JZ,JY,JX));CCH4G(0:JZ,JY,JX)=0._r8
-  allocate(COXYS(0:JZ,JY,JX));COXYS(0:JZ,JY,JX)=0._r8
+
   allocate(CCO2G(0:JZ,JY,JX));CCO2G(0:JZ,JY,JX)=0._r8
-  allocate(CCO2S(0:JZ,JY,JX));CCO2S(0:JZ,JY,JX)=0._r8
-  allocate(CCH4S(0:JZ,JY,JX));CCH4S(0:JZ,JY,JX)=0._r8
+
   allocate(CH1P4(0:JZ,JY,JX));CH1P4(0:JZ,JY,JX)=0._r8
-  allocate(CH1P4B(0:JZ,JY,JX));CH1P4B(0:JZ,JY,JX)=0._r8
-  allocate(CNO2B(0:JZ,JY,JX));CNO2B(0:JZ,JY,JX)=0._r8
+
   allocate(H2GS(0:JZ,JY,JX));H2GS(0:JZ,JY,JX)=0._r8
-  allocate(CH2GS(0:JZ,JY,JX));CH2GS(0:JZ,JY,JX)=0._r8
-  allocate(CH2P4(0:JZ,JY,JX));CH2P4(0:JZ,JY,JX)=0._r8
-  allocate(CH2P4B(0:JZ,JY,JX));CH2P4B(0:JZ,JY,JX)=0._r8
   allocate(H2GSH(JZ,JY,JX));H2GSH(JZ,JY,JX)=0._r8
 
   allocate(CH2GG(0:JZ,JY,JX));CH2GG(0:JZ,JY,JX)=0._r8
@@ -462,7 +436,7 @@ implicit none
   allocate(XOAFLS(1:jcplx,3,0:JD,JV,JH));XOAFLS=0._r8
   allocate(R3GasADTFlx(idg_beg:idg_end,3,JD,JV,JH));R3GasADTFlx=0._r8
   allocate(XOPFLS(1:jcplx,3,0:JD,JV,JH));XOPFLS=0._r8
-
+  allocate(CPO4S(JZ,JY,JX));CPO4S(JZ,JY,JX)=0._r8
   allocate(XH1PFS(3,0:JD,JV,JH));XH1PFS=0._r8
   allocate(XH1BFB(3,0:JD,JV,JH));XH1BFB=0._r8
   allocate(XCOFHS(3,JD,JV,JH)); XCOFHS=0._r8
@@ -503,10 +477,9 @@ implicit none
   call destroy(ZNH4B)
   call destroy(ZNH3B)
   call destroy(ZNO3B)
-  call destroy(H2POB)
   call destroy(ZNO2S)
   call destroy(trc_gasml)
-
+  call destroy(CPO4B)
   call destroy(Z2GS)
   call destroy(Z2OS)
   call destroy(ZNH4SH)
@@ -522,6 +495,7 @@ implicit none
   call destroy(Z2OSH)
   call destroy(ZNO2BH)
   call destroy(ZNO2B)
+  call destroy(trc_solml)
   call destroy(ZNH4S)
   call destroy(ZNH3S)
   call destroy(ZNO3S)
@@ -529,20 +503,10 @@ implicit none
   call destroy(ZNFN0)
   call destroy(ZNHUI)
   call destroy(ZNHU0)
-  call destroy(CZ2GS)
-  call destroy(CNH4S)
-  call destroy(CNH3S)
-  call destroy(CNO3S)
-  call destroy(CPO4S)
-  call destroy(CNH4B)
-  call destroy(CNH3B)
-  call destroy(CNO3B)
-  call destroy(CPO4B)
-  call destroy(CNO2S)
   call destroy(CNH3G)
   call destroy(CZ2GG)
   call destroy(CZ2OG)
-  call destroy(CZ2OS)
+
   call destroy(OXYS)
   call destroy(OXYSH)
 
@@ -553,24 +517,19 @@ implicit none
   call destroy(CH4SH)
   call destroy(COXYG)
   call destroy(CCH4G)
-  call destroy(COXYS)
+
   call destroy(CCO2G)
-  call destroy(CCO2S)
-  call destroy(CCH4S)
+
   call destroy(CH1P4)
-  call destroy(CH1P4B)
-  call destroy(CNO2B)
+
   call destroy(H2GS)
-  call destroy(CH2GS)
-  call destroy(CH2P4)
-  call destroy(CH2P4B)
   call destroy(H2GSH)
 
   call destroy(CH2GG)
   call destroy(PH)
   call destroy(CEC)
   call destroy(AEC)
-
+  call destroy(CPO4S)
   call destroy(H1PO4)
   call destroy(H1POB)
   call destroy(H1PO4H)

@@ -324,13 +324,13 @@ implicit none
     call ncd_putvar(ncf,'OMPff',OMPff(:,:,L,NY,NX))
 
     if(bgc_forc_conf%laddband)then
-      call ncd_putvar(ncf,'ZNH4S',ZNH4S(L,NY,NX)+ZNH4B(L,NY,NX))
+      call ncd_putvar(ncf,'ZNH4S',trc_solml(ids_NH4,L,NY,NX)+ZNH4B(L,NY,NX))
       call ncd_putvar(ncf,'ZNO3S',ZNO3S(L,NY,NX)+ZNO3B(L,NY,NX))
       call ncd_putvar(ncf,'ZNO2S',ZNO2S(L,NY,NX)+ZNO2B(L,NY,NX))
-      call ncd_putvar(ncf,'H2PO4',H2PO4(L,NY,NX)+H2POB(L,NY,NX))
+      call ncd_putvar(ncf,'H2PO4',H2PO4(L,NY,NX)+trc_solml(ids_H2PO4B,L,NY,NX))
       call ncd_putvar(ncf,'H1PO4',H1PO4(L,NY,NX)+H1POB(L,NY,NX))
     else
-      call ncd_putvar(ncf,'ZNH4S',ZNH4S(L,NY,NX))
+      call ncd_putvar(ncf,'ZNH4S',trc_solml(ids_NH4,L,NY,NX))
       call ncd_putvar(ncf,'ZNO3S',ZNO3S(L,NY,NX))
       call ncd_putvar(ncf,'ZNO2S',ZNO2S(L,NY,NX))
       call ncd_putvar(ncf,'H2PO4',H2PO4(L,NY,NX))

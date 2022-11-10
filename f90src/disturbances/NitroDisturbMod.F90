@@ -299,11 +299,11 @@ module NitroDisturbMod
 !     REMOVE FERTILIZER IN RESIDUE
 !
         IF(ITILL(I,NY,NX).EQ.21)THEN
-          ON=ON+DCORPC*(ZNH4S(L,NY,NX)+ZNH3S(L,NY,NX) &
+          ON=ON+DCORPC*(trc_solml(ids_NH4,L,NY,NX)+ZNH3S(L,NY,NX) &
             +ZNO3S(L,NY,NX)+ZNO2S(L,NY,NX))
           OP=OP+DCORPC*(H1PO4(L,NY,NX)+H2PO4(L,NY,NX))
           DCORPC1=1.0_r8-DCORPC
-          ZNH4S(L,NY,NX)=DCORPC1*ZNH4S(L,NY,NX)
+          trc_solml(ids_NH4,L,NY,NX)=DCORPC1*trc_solml(ids_NH4,L,NY,NX)
           ZNH3S(L,NY,NX)=DCORPC1*ZNH3S(L,NY,NX)
           ZNO3S(L,NY,NX)=DCORPC1*ZNO3S(L,NY,NX)
           ZNO2S(L,NY,NX)=DCORPC1*ZNO2S(L,NY,NX)
