@@ -157,7 +157,7 @@ module GrosubPars
   integer :: iroot
   integer :: icwood
   integer :: jpstgs       !number of growth stages
-  integer :: JRS          !maximum number of root layers
+  integer :: JRS          !maximum number of root axes
   integer  :: JP1         !number of plants
   integer  :: JBR         !maximum number of branches
   integer  :: JSA1        !number of sectors for the sky azimuth  [0,2*pi]
@@ -170,7 +170,7 @@ module GrosubPars
   integer  :: jsken       !number of kinetic components in litter,  PROTEIN(*,1),CH2O(*,2),CELLULOSE(*,3),LIGNIN(*,4) IN SOIL LITTER
   integer  :: Jlitgrp     !number of litter groups nonstructural(0,*),
                           !     foliar(1,*),non-foliar(2,*),stalk(3,*),root(4,*), coarse woody (5,*)
-  integer  :: JPRT
+  integer  :: JPRT        !number of plant organs
   integer  :: n_pltlitrk  !number of plant litter microbial-om complexes
   integer :: iprotein
   integer :: icarbhyro

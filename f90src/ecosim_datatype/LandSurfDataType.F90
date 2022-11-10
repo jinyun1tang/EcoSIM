@@ -2,6 +2,7 @@ module LandSurfDataType
 
   use data_kind_mod, only : r8 => SHR_KIND_R8
   use GridConsts
+  use TracerIDMod, only : idg_beg,idg_end
   implicit none
   public
   save
@@ -23,6 +24,7 @@ module LandSurfDataType
   real(r8),allocatable ::  ALTZ(:,:)                          !altitude, [m]
   real(r8),allocatable ::  SL(:,:)                            !slope, [o]
   real(r8),allocatable ::  ASP(:,:)                           !aspect , [o]
+  real(r8),pointer :: GasSfAtmFlx(:,:,:)   ! surface-atmosphere gas exchange flux , [g d-2 h-1]
   real(r8),allocatable ::  XCODFS(:,:)                        !surface - atmosphere CO2 dissolution (+ve) - volatilization (-ve) , [g d-2 h-1]
   real(r8),allocatable ::  XCHDFS(:,:)                        !surface - atmosphere CH4 dissolution (+ve) - volatilization (-ve) , [g d-2 h-1]
   real(r8),allocatable ::  XOXDFS(:,:)                        !surface - atmosphere O2 dissolution (+ve) - volatilization (-ve) , [g d-2 h-1]
@@ -60,6 +62,8 @@ contains
   allocate(XN3DFS(JY,JX));      XN3DFS=0._r8
   allocate(XNBDFS(JY,JX));      XNBDFS=0._r8
   allocate(XHGDFS(JY,JX));      XHGDFS=0._r8
+
+  allocate(GasSfAtmFlx(idg_beg:idg_end,JY,JX)); GasSfAtmFlx=0._r8
   end subroutine InitLandSurfData
 
 !----------------------------------------------------------------------

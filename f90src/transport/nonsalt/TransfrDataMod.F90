@@ -54,6 +54,8 @@ implicit none
   real(r8), allocatable :: RQROA0(:,:,:)
   real(r8), allocatable :: RQROP0(:,:,:)
 
+  real(r8), pointer :: RBGCSinkG(:,:,:,:)   !BGC sink for gaseous tracers
+  real(r8), pointer :: RBGCSinkS(:,:,:,:)   !BGC sink for solute tracers
   real(r8), pointer ::  RCOBLS(:,:,:)                      !
   real(r8), pointer ::  RCHBLS(:,:,:)                      !
   real(r8), pointer ::  ROXBLS(:,:,:)                      !
@@ -159,6 +161,9 @@ implicit none
   real(r8), pointer ::  TQSNO3(:,:)                        !
   real(r8), pointer ::  TQSH1P(:,:)                        !
   real(r8), pointer ::  TQSH2P(:,:)                        !
+
+  real(r8), pointer ::  R3PorTSolFlx(:,:,:,:) !total 3D micropore flux
+  real(r8), pointer ::  R3PorTSoHFlx(:,:,:,:) !total 3D macropore flux
   real(r8), pointer ::  TCOFLS(:,:,:)                      !
   real(r8), pointer ::  TCHFLS(:,:,:)                      !
   real(r8), pointer ::  TOXFLS(:,:,:)                      !
@@ -220,6 +225,7 @@ implicit none
   real(r8), pointer ::  PARGN2(:,:)                        !
   real(r8), pointer ::  PARGN3(:,:)                        !
   real(r8), pointer ::  PARGH2(:,:)                        !
+
   real(r8), pointer ::  RCOSK2(:,:,:)                      !
   real(r8), pointer ::  ROXSK2(:,:,:)                      !
   real(r8), pointer ::  RCHSK2(:,:,:)                      !
@@ -238,6 +244,7 @@ implicit none
   real(r8), pointer ::  RHGSK2(:,:,:)                      !
   real(r8), pointer ::  RNHSK2(:,:,:)                      !
   real(r8), pointer ::  R1PSK2(:,:,:)                      !
+
   real(r8), pointer ::  TN3FLG(:,:,:)                      !
   real(r8), pointer ::  RCOBBL(:,:,:)                      !
   real(r8), pointer ::  RCHBBL(:,:,:)                      !
@@ -371,20 +378,14 @@ implicit none
   real(r8), pointer ::  RQSOXS(:,:,:)                      !
   real(r8), pointer ::  RQRH2P(:,:,:,:)                    !
   real(r8), pointer ::  RQRH1P(:,:,:,:)                    !
-  real(r8), pointer ::  RHGFLG(:,:,:,:)                    !
+
   real(r8), pointer ::  THGFLS(:,:,:)                      !
-  real(r8), pointer ::  ROXFLG(:,:,:,:)                    !
-  real(r8), pointer ::  RN3FLG(:,:,:,:)                    !
-  real(r8), pointer ::  RCOFLG(:,:,:,:)                    !
   real(r8), pointer ::  RNXFHS(:,:,:,:)                    !
   real(r8), pointer ::  RNXFHB(:,:,:,:)                    !
   real(r8), pointer ::  RH1PFS(:,:,:,:)                    !
   real(r8), pointer ::  RH1BFB(:,:,:,:)                    !
   real(r8), pointer ::  RH1PHS(:,:,:,:)                    !
   real(r8), pointer ::  RH1BHB(:,:,:,:)                    !
-  real(r8), pointer ::  RCHFLG(:,:,:,:)                    !
-  real(r8), pointer ::  RNGFLG(:,:,:,:)                    !
-  real(r8), pointer ::  RN2FLG(:,:,:,:)                    !
   real(r8), pointer ::  RN3FHB(:,:,:,:)                    !
   real(r8), pointer ::  RNOFHB(:,:,:,:)                    !
   real(r8), pointer ::  RH2BHB(:,:,:,:)                    !
@@ -395,8 +396,11 @@ implicit none
   real(r8), pointer ::  RN4FHW(:,:,:,:)                    !
   real(r8), pointer ::  RN3FHW(:,:,:,:)
                   !
-  real(r8), pointer ::  RGasSSVol(:,:,:)       !soil surface gas volatization
+  real(r8), pointer ::  RGasSSVol(:,:,:)     !soil surface gas volatization
   real(r8), pointer ::  RGasDSFlx(:,:,:,:)   !gas dissolution-volatilization
+  real(r8), pointer ::  R3GasADFlx(:,:,:,:,:) !3D gas flux advection + diffusion
+  real(r8), pointer ::  RTGasADFlx(:,:,:,:)  !total 3D gas flux advection + diffusion
+
   real(r8), pointer ::  RHGFHS(:,:,:,:)                    !
   real(r8), pointer ::  RCHFHS(:,:,:,:)                    !
   real(r8), pointer ::  ROXFHS(:,:,:,:)                    !
@@ -427,8 +431,8 @@ implicit none
   real(r8), pointer ::  RH2BFB(:,:,:,:)                    !
   real(r8), pointer ::  RCOFHS(:,:,:,:)                    !
 
-  real(r8), pointer :: RPoreSoHFlx(:,:,:,:,:)        !macropore flux
-  real(r8), pointer :: RPoreSolFlx(:,:,:,:,:)        !micropore flux
+  real(r8), pointer :: R3PoreSoHFlx(:,:,:,:,:)        !3D macropore flux
+  real(r8), pointer :: R3PoreSolFlx(:,:,:,:,:)        !3D micropore flux
   real(r8), pointer :: RporeSoXFlx(:,:,:,:)        !Mac-mic pore exchange flux
 !----------------------------------------------------------------------
 
@@ -629,6 +633,10 @@ contains
   allocate(PARGN2(JY,JX));      PARGN2=0._r8
   allocate(PARGN3(JY,JX));      PARGN3=0._r8
   allocate(PARGH2(JY,JX));      PARGH2=0._r8
+
+  allocate(RBGCSinkG(idg_beg:idg_end,0:JZ,JY,JX));RBGCSinkG=0._r8
+  allocate(RBGCSinkS(ids_nuts_beg:ids_nuts_end,0:JZ,JY,JX));RBGCSinkS=0._r8
+
   allocate(RCOSK2(0:JZ,JY,JX)); RCOSK2=0._r8
   allocate(ROXSK2(0:JZ,JY,JX)); ROXSK2=0._r8
   allocate(RCHSK2(0:JZ,JY,JX)); RCHSK2=0._r8
@@ -647,6 +655,7 @@ contains
   allocate(RHGSK2(0:JZ,JY,JX)); RHGSK2=0._r8
   allocate(RNHSK2(0:JZ,JY,JX)); RNHSK2=0._r8
   allocate(R1PSK2(0:JZ,JY,JX)); R1PSK2=0._r8
+
   allocate(TN3FLG(JZ,JY,JX));   TN3FLG=0._r8
   allocate(RCOBBL(JZ,JY,JX));   RCOBBL=0._r8
   allocate(RCHBBL(JZ,JY,JX));   RCHBBL=0._r8
@@ -781,20 +790,18 @@ contains
   allocate(RQSOXS(2,JV,JH));    RQSOXS=0._r8
   allocate(RQRH2P(2,2,JV,JH));  RQRH2P=0._r8
   allocate(RQRH1P(2,2,JV,JH));  RQRH1P=0._r8
-  allocate(RHGFLG(3,JD,JV,JH)); RHGFLG=0._r8
+
   allocate(THGFLS(JZ,JY,JX));   THGFLS=0._r8
-  allocate(ROXFLG(3,JD,JV,JH)); ROXFLG=0._r8
-  allocate(RN3FLG(3,JD,JV,JH)); RN3FLG=0._r8
-  allocate(RCOFLG(3,JD,JV,JH)); RCOFLG=0._r8
+
+  allocate(R3GasADFlx(idg_beg:idg_end,3,JD,JV,JH));R3GasADFlx=0._r8
+  allocate(RTGasADFlx(idg_beg:idg_end,JZ,JY,JH));RTGasADFlx=0._r8
+
   allocate(RNXFHS(3,JD,JV,JH)); RNXFHS=0._r8
   allocate(RNXFHB(3,JD,JV,JH)); RNXFHB=0._r8
   allocate(RH1PFS(3,0:JD,JV,JH));RH1PFS=0._r8
   allocate(RH1BFB(3,0:JD,JV,JH));RH1BFB=0._r8
   allocate(RH1PHS(3,JD,JV,JH)); RH1PHS=0._r8
   allocate(RH1BHB(3,JD,JV,JH)); RH1BHB=0._r8
-  allocate(RCHFLG(3,JD,JV,JH)); RCHFLG=0._r8
-  allocate(RNGFLG(3,JD,JV,JH)); RNGFLG=0._r8
-  allocate(RN2FLG(3,JD,JV,JH)); RN2FLG=0._r8
   allocate(RN3FHB(3,JD,JV,JH)); RN3FHB=0._r8
   allocate(RNOFHB(3,JD,JV,JH)); RNOFHB=0._r8
   allocate(RH2BHB(3,JD,JV,JH)); RH2BHB=0._r8
@@ -837,9 +844,11 @@ contains
   allocate(RH2BFB(3,0:JD,JV,JH));RH2BFB=0._r8
   allocate(RCOFHS(3,JD,JV,JH)); RCOFHS=0._r8
 
-  allocate(RPoreSoHFlx(ids_beg:ids_end,3,JD,JV,JH));RPoreSoHFlx=0._r8
-  allocate(RPoreSolFlx(ids_beg:ids_end,3,JD,JV,JH));RPoreSolFlx=0._r8
+  allocate(R3PoreSoHFlx(ids_beg:ids_end,3,JD,JV,JH));R3PoreSoHFlx=0._r8
+  allocate(R3PoreSolFlx(ids_beg:ids_end,3,JD,JV,JH));R3PoreSolFlx=0._r8
   allocate(RporeSoXFlx(ids_beg:ids_end,JZ,JY,JX));RporeSoXFlx=0._r8
+  allocate(R3PorTSolFlx(ids_beg:ids_end,JZ,JY,JX));R3PorTSolFlx=0._r8
+  allocate(R3PorTSoHFlx(ids_beg:ids_end,JZ,JY,JX));R3PorTSoHFlx=0._r8
   end subroutine InitTransfrData
 
 !----------------------------------------------------------------------
@@ -1187,20 +1196,14 @@ contains
   call destroy(RQSOXS)
   call destroy(RQRH2P)
   call destroy(RQRH1P)
-  call destroy(RHGFLG)
+
   call destroy(THGFLS)
-  call destroy(ROXFLG)
-  call destroy(RN3FLG)
-  call destroy(RCOFLG)
   call destroy(RNXFHS)
   call destroy(RNXFHB)
   call destroy(RH1PFS)
   call destroy(RH1BFB)
   call destroy(RH1PHS)
   call destroy(RH1BHB)
-  call destroy(RCHFLG)
-  call destroy(RNGFLG)
-  call destroy(RN2FLG)
   call destroy(RN3FHB)
   call destroy(RNOFHB)
   call destroy(RH2BHB)
@@ -1242,8 +1245,8 @@ contains
   call destroy(RNXFLB)
   call destroy(RH2BFB)
   call destroy(RCOFHS)
-  call destroy(RPoreSoHFlx)
-  call destroy(RPoreSolFlx)
+  call destroy(R3PoreSoHFlx)
+  call destroy(R3PoreSolFlx)
   call destroy(RporeSoXFlx)
   end subroutine DestructTransfrData
 

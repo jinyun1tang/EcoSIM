@@ -213,15 +213,11 @@ implicit none
   real(r8),pointer ::  XNXFLB(:,:,:,:)                    !aqueous NO2 flux band micropore, [g d-2 h-1]
   real(r8),pointer ::  XOCFLS(:,:,:,:,:)                  !DOC flux micropore, [g d-2 h-1]
   real(r8),pointer ::  XONFLS(:,:,:,:,:)                  !DON flux micropore, [g d-2 h-1]
-  real(r8),pointer ::  XCHFLG(:,:,:,:)                    !gaseous CH4 flux, [g d-2 h-1]
+
   real(r8),pointer ::  XOAFLS(:,:,:,:,:)                  !aqueous acetate flux, [g d-2 h-1]
-  real(r8),pointer ::  XCOFLG(:,:,:,:)                    !gaseous CO2 flux, [g d-2 h-1]
+
+  real(r8),pointer ::  R3GasADTFlx(:,:,:,:,:)             !3D gaseous fluxes, [g d-2 h-1]
   real(r8),pointer ::  XOPFLS(:,:,:,:,:)                  !DOP flux micropore, [g d-2 h-1]
-  real(r8),pointer ::  XOXFLG(:,:,:,:)                    !gaseous O24 flux, [g d-2 h-1]
-  real(r8),pointer ::  XNGFLG(:,:,:,:)                    !gaseous N2 flux, [g d-2 h-1]
-  real(r8),pointer ::  XHGFLG(:,:,:,:)                    !gaseous H2 flux, [g d-2 h-1]
-  real(r8),pointer ::  XN2FLG(:,:,:,:)                    !gaseous N2O flux, [g d-2 h-1]
-  real(r8),pointer ::  XN3FLG(:,:,:,:)                    !gaseous NH3 flux, [g d-2 h-1]
   real(r8),pointer ::  XH1PFS(:,:,:,:)                    !total HPO4 in micropore water flux non-band, [mol d-2 h-1]
   real(r8),pointer ::  XH1BFB(:,:,:,:)                    !total HPO4 in micropore water flux band, [mol d-2 h-1]
   real(r8),pointer ::  XCOFHS(:,:,:,:)                    !aqueous CO2 flux macropore, [g d-2 h-1]
@@ -463,15 +459,10 @@ implicit none
   allocate(XNXFLB(3,JD,JV,JH)); XNXFLB=0._r8
   allocate(XOCFLS(1:jcplx,3,0:JD,JV,JH));XOCFLS=0._r8
   allocate(XONFLS(1:jcplx,3,0:JD,JV,JH));XONFLS=0._r8
-  allocate(XCHFLG(3,0:JD,JV,JH));XCHFLG=0._r8
   allocate(XOAFLS(1:jcplx,3,0:JD,JV,JH));XOAFLS=0._r8
-  allocate(XCOFLG(3,JD,JV,JH)); XCOFLG=0._r8
+  allocate(R3GasADTFlx(idg_beg:idg_end,3,JD,JV,JH));R3GasADTFlx=0._r8
   allocate(XOPFLS(1:jcplx,3,0:JD,JV,JH));XOPFLS=0._r8
-  allocate(XOXFLG(3,JD,JV,JH)); XOXFLG=0._r8
-  allocate(XNGFLG(3,JD,JV,JH)); XNGFLG=0._r8
-  allocate(XHGFLG(3,JD,JV,JH)); XHGFLG=0._r8
-  allocate(XN2FLG(3,JD,JV,JH)); XN2FLG=0._r8
-  allocate(XN3FLG(3,JD,JV,JH)); XN3FLG=0._r8
+
   allocate(XH1PFS(3,0:JD,JV,JH));XH1PFS=0._r8
   allocate(XH1BFB(3,0:JD,JV,JH));XH1BFB=0._r8
   allocate(XCOFHS(3,JD,JV,JH)); XCOFHS=0._r8
@@ -704,15 +695,9 @@ implicit none
   call destroy(XNXFLB)
   call destroy(XOCFLS)
   call destroy(XONFLS)
-  call destroy(XCHFLG)
+
   call destroy(XOAFLS)
-  call destroy(XCOFLG)
   call destroy(XOPFLS)
-  call destroy(XOXFLG)
-  call destroy(XNGFLG)
-  call destroy(XHGFLG)
-  call destroy(XN2FLG)
-  call destroy(XN3FLG)
   call destroy(XH1PFS)
   call destroy(XH1BFB)
   call destroy(XCOFHS)

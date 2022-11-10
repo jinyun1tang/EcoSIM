@@ -358,7 +358,7 @@ module TrnsfrMod
   implicit none
   integer, intent(in) :: NY,NX
 
-  integer :: K,NTG
+  integer :: K,NTG,NTS
 !     STATE VARIABLES FOR SOLUTES IN SURFACE RESIDUE AND IN
 !     MICROPORES AND MACROPORES IN SOIL SURFACE LAYER FROM OVERLAND
 !     FLOW AND SURFACE VOLATILIZATION-DISSOLUTION
@@ -380,19 +380,18 @@ module TrnsfrMod
     OQP2(K,0,NY,NX)=OQP2(K,0,NY,NX)+ROPFLS(K,3,0,NY,NX)
     OQA2(K,0,NY,NX)=OQA2(K,0,NY,NX)+ROAFLS(K,3,0,NY,NX)
   ENDDO
-  trc_solml2(idg_CO2,0,NY,NX)=trc_solml2(idg_CO2,0,NY,NX)+RCODFR(NY,NX)+RPoreSolFlx(idg_CO2,3,0,NY,NX)
-  trc_solml2(idg_CH4,0,NY,NX)=trc_solml2(idg_CH4,0,NY,NX)+RCHDFR(NY,NX)+RPoreSolFlx(idg_CH4,3,0,NY,NX)
-  trc_solml2(idg_O2,0,NY,NX)=trc_solml2(idg_O2,0,NY,NX)+ROXDFR(NY,NX)+RPoreSolFlx(idg_O2,3,0,NY,NX)
-  trc_solml2(idg_N2,0,NY,NX)=trc_solml2(idg_N2,0,NY,NX)+RNGDFR(NY,NX)+RPoreSolFlx(idg_N2,3,0,NY,NX)
-  trc_solml2(idg_N2O,0,NY,NX)=trc_solml2(idg_N2O,0,NY,NX)+RN2DFR(NY,NX)+RPoreSolFlx(idg_N2O,3,0,NY,NX)
-  trc_solml2(idg_H2,0,NY,NX)=trc_solml2(idg_H2,0,NY,NX)+RHGDFR(NY,NX)+RPoreSolFlx(idg_H2,3,0,NY,NX)
-  trc_solml2(ids_NH4,0,NY,NX)=trc_solml2(ids_NH4,0,NY,NX)+RPoreSolFlx(ids_NH4,3,0,NY,NX)
-  trc_solml2(idg_NH3,0,NY,NX)=trc_solml2(idg_NH3,0,NY,NX)+RN3DFR(NY,NX)+RPoreSolFlx(idg_NH3,3,0,NY,NX)
+  trc_solml2(idg_CO2,0,NY,NX)=trc_solml2(idg_CO2,0,NY,NX)+RCODFR(NY,NX)
+  trc_solml2(idg_CH4,0,NY,NX)=trc_solml2(idg_CH4,0,NY,NX)+RCHDFR(NY,NX)
+  trc_solml2(idg_O2,0,NY,NX)=trc_solml2(idg_O2,0,NY,NX)+ROXDFR(NY,NX)
+  trc_solml2(idg_N2,0,NY,NX)=trc_solml2(idg_N2,0,NY,NX)+RNGDFR(NY,NX)
+  trc_solml2(idg_N2O,0,NY,NX)=trc_solml2(idg_N2O,0,NY,NX)+RN2DFR(NY,NX)
+  trc_solml2(idg_H2,0,NY,NX)=trc_solml2(idg_H2,0,NY,NX)+RHGDFR(NY,NX)
+  trc_solml2(idg_NH3,0,NY,NX)=trc_solml2(idg_NH3,0,NY,NX)+RN3DFR(NY,NX)
 
-  trc_solml2(ids_NO3,0,NY,NX)=trc_solml2(ids_NO3,0,NY,NX)+RPoreSolFlx(ids_NO3,3,0,NY,NX)
-  trc_solml2(ids_NO2,0,NY,NX)=trc_solml2(ids_NO2,0,NY,NX)+RPoreSolFlx(ids_NO2,3,0,NY,NX)
-  trc_solml2(ids_H1PO4,0,NY,NX)=trc_solml2(ids_H1PO4,0,NY,NX)+RPoreSolFlx(ids_H1PO4,3,0,NY,NX)
-  trc_solml2(ids_H2PO4,0,NY,NX)=trc_solml2(ids_H2PO4,0,NY,NX)+RPoreSolFlx(ids_H2PO4,3,0,NY,NX)
+! band does not exist in litter layer
+  DO NTS=ids_beg,ids_end
+    trc_solml2(NTS,0,NY,NX)=trc_solml2(NTS,0,NY,NX)+R3PoreSolFlx(NTS,3,0,NY,NX)
+  ENDDO
 
   DO NTG=idg_beg,idg_end
     trc_solml2(NTG,NU(NY,NX),NY,NX)=trc_solml2(NTG,NU(NY,NX),NY,NX)+RGasSSVol(NTG,NY,NX)
@@ -403,6 +402,7 @@ module TrnsfrMod
     OQP2(K,0,NY,NX)=OQP2(K,0,NY,NX)+TQROP(K,NY,NX)
     OQA2(K,0,NY,NX)=OQA2(K,0,NY,NX)+TQROA(K,NY,NX)
   ENDDO D9680
+
   trc_solml2(idg_CO2,0,NY,NX)=trc_solml2(idg_CO2,0,NY,NX)+TQRCOS(NY,NX)
   trc_solml2(idg_CH4,0,NY,NX)=trc_solml2(idg_CH4,0,NY,NX)+TQRCHS(NY,NX)
   trc_solml2(idg_O2,0,NY,NX)=trc_solml2(idg_O2,0,NY,NX)+TQROXS(NY,NX)
@@ -423,7 +423,8 @@ module TrnsfrMod
   implicit none
   integer, intent(in) :: M,NY,NX,MX
 
-  integer :: L,K,NTG
+  integer :: L,K,NTG,NTS
+
 !     STATE VARIABLES FOR SOLUTES IN MICROPORES AND
 !     MACROPORES IN SOIL LAYERS FROM SUBSURFACE FLOW, MICROBIAL
 !     AND ROOT EXCHANGE IN 'NITRO' AND 'UPTAKE', AND EQUILIBRIUM
@@ -443,22 +444,24 @@ module TrnsfrMod
   D9685: DO L=NU(NY,NX),NL(NY,NX)
     IF(M.NE.MX)THEN
       IF(VOLX(L,NY,NX).GT.ZEROS2(NY,NX))THEN
-        trc_solml2(idg_CO2,L,NY,NX)=trc_solml2(idg_CO2,L,NY,NX)+TCOFLS(L,NY,NX)+RporeSoXFlx(idg_CO2,L,NY,NX) &
-          +RCOFLZ(L,NY,NX)+RCOBBL(L,NY,NX)
-        trc_solml2(idg_CH4,L,NY,NX)=trc_solml2(idg_CH4,L,NY,NX)+TCHFLS(L,NY,NX)+RporeSoXFlx(idg_CH4,L,NY,NX) &
-          +RCHFLZ(L,NY,NX)+RCHBBL(L,NY,NX)
-        trc_solml2(idg_O2,L,NY,NX)=trc_solml2(idg_O2,L,NY,NX)+TOXFLS(L,NY,NX)+RporeSoXFlx(idg_O2,L,NY,NX) &
-          +ROXFLZ(L,NY,NX)+ROXBBL(L,NY,NX)
-        trc_solml2(idg_N2,L,NY,NX)=trc_solml2(idg_N2,L,NY,NX)+TNGFLS(L,NY,NX)+RporeSoXFlx(idg_N2,L,NY,NX) &
-          +RNGFLZ(L,NY,NX)+RNGBBL(L,NY,NX)
-        trc_solml2(idg_N2O,L,NY,NX)=trc_solml2(idg_N2O,L,NY,NX)+TN2FLS(L,NY,NX)+RporeSoXFlx(idg_N2O,L,NY,NX) &
-          +RN2FLZ(L,NY,NX)+RN2BBL(L,NY,NX)
-        trc_solml2(idg_NH3,L,NY,NX)=trc_solml2(idg_NH3,L,NY,NX)+TN3FLW(L,NY,NX)+RporeSoXFlx(idg_NH3,L,NY,NX) &
-          +RN3FLZ(L,NY,NX)+RN3BBL(L,NY,NX)
-        trc_solml2(idg_NH3B,L,NY,NX)=trc_solml2(idg_NH3B,L,NY,NX)+TN3FLB(L,NY,NX)+RporeSoXFlx(idg_NH3B,L,NY,NX) &
-          +RN3FBZ(L,NY,NX)+RNBBBL(L,NY,NX)
-        trc_solml2(idg_H2,L,NY,NX)=trc_solml2(idg_H2,L,NY,NX)+THGFLS(L,NY,NX)+RporeSoXFlx(idg_H2,L,NY,NX) &
-          +RHGFLZ(L,NY,NX)+RHGBBL(L,NY,NX)
+
+        trc_solml2(idg_CO2,L,NY,NX)=trc_solml2(idg_CO2,L,NY,NX)+RCOFLZ(L,NY,NX)+RCOBBL(L,NY,NX)
+        trc_solml2(idg_CH4,L,NY,NX)=trc_solml2(idg_CH4,L,NY,NX)+RCHFLZ(L,NY,NX)+RCHBBL(L,NY,NX)
+        trc_solml2(idg_O2,L,NY,NX)=trc_solml2(idg_O2,L,NY,NX)+ROXFLZ(L,NY,NX)+ROXBBL(L,NY,NX)
+        trc_solml2(idg_N2,L,NY,NX)=trc_solml2(idg_N2,L,NY,NX)+RNGFLZ(L,NY,NX)+RNGBBL(L,NY,NX)
+        trc_solml2(idg_N2O,L,NY,NX)=trc_solml2(idg_N2O,L,NY,NX)+RN2FLZ(L,NY,NX)+RN2BBL(L,NY,NX)
+        trc_solml2(idg_NH3,L,NY,NX)=trc_solml2(idg_NH3,L,NY,NX)+RN3FLZ(L,NY,NX)+RN3BBL(L,NY,NX)
+        trc_solml2(idg_NH3B,L,NY,NX)=trc_solml2(idg_NH3B,L,NY,NX)+RN3FBZ(L,NY,NX)+RNBBBL(L,NY,NX)
+        trc_solml2(idg_H2,L,NY,NX)=trc_solml2(idg_H2,L,NY,NX)+RHGFLZ(L,NY,NX)+RHGBBL(L,NY,NX)
+
+        trc_solml2(ids_NH4,L,NY,NX)=trc_solml2(ids_NH4,L,NY,NX)+RN4FLZ(L,NY,NX)
+        trc_solml2(ids_NO3,L,NY,NX)=trc_solml2(ids_NO3,L,NY,NX)+RNOFLZ(L,NY,NX)
+        trc_solml2(ids_H1PO4,L,NY,NX)=trc_solml2(ids_H1PO4,L,NY,NX)+RH1PFZ(L,NY,NX)
+        trc_solml2(ids_H2PO4,L,NY,NX)=trc_solml2(ids_H2PO4,L,NY,NX)+RH2PFZ(L,NY,NX)
+        trc_solml2(ids_NH4B,L,NY,NX)=trc_solml2(ids_NH4B,L,NY,NX)+RN4FBZ(L,NY,NX)
+        trc_solml2(ids_NO3B,L,NY,NX)=trc_solml2(ids_NO3B,L,NY,NX)+RNOFBZ(L,NY,NX)
+        trc_solml2(ids_H1PO4B,L,NY,NX)=trc_solml2(ids_H1PO4B,L,NY,NX)+RH1BBZ(L,NY,NX)
+        trc_solml2(ids_H2PO4B,L,NY,NX)=trc_solml2(ids_H2PO4B,L,NY,NX)+RH2BBZ(L,NY,NX)
 
         DO  K=1,jcplx
           OQC2(K,L,NY,NX)=OQC2(K,L,NY,NX)+TOCFLS(K,L,NY,NX)+ROCFXS(K,L,NY,NX)
@@ -470,34 +473,11 @@ module TrnsfrMod
           OQPH2(K,L,NY,NX)=OQPH2(K,L,NY,NX)+TOPFHS(K,L,NY,NX)-ROPFXS(K,L,NY,NX)
           OQAH2(K,L,NY,NX)=OQAH2(K,L,NY,NX)+TOAFHS(K,L,NY,NX)-ROAFXS(K,L,NY,NX)
         ENDDO
-        trc_solml2(ids_NH4,L,NY,NX)=trc_solml2(ids_NH4,L,NY,NX)+TN4FLW(L,NY,NX)+RporeSoXFlx(ids_NH4,L,NY,NX)+RN4FLZ(L,NY,NX)
-        trc_solml2(ids_NO3,L,NY,NX)=trc_solml2(ids_NO3,L,NY,NX)+TNOFLW(L,NY,NX)+RporeSoXFlx(ids_NO3,L,NY,NX)+RNOFLZ(L,NY,NX)
-        trc_solml2(ids_NO2,L,NY,NX)=trc_solml2(ids_NO2,L,NY,NX)+TNXFLS(L,NY,NX)+RporeSoXFlx(ids_NO2,L,NY,NX)
-        trc_solml2(ids_H1PO4,L,NY,NX)=trc_solml2(ids_H1PO4,L,NY,NX)+TH1PFS(L,NY,NX)+RporeSoXFlx(ids_H1PO4,L,NY,NX)+RH1PFZ(L,NY,NX)
-        trc_solml2(ids_H2PO4,L,NY,NX)=trc_solml2(ids_H2PO4,L,NY,NX)+TH2PFS(L,NY,NX)+RporeSoXFlx(ids_H2PO4,L,NY,NX)+RH2PFZ(L,NY,NX)
-        trc_solml2(ids_NH4B,L,NY,NX)=trc_solml2(ids_NH4B,L,NY,NX)+TN4FLB(L,NY,NX)+RporeSoXFlx(ids_NH4B,L,NY,NX)+RN4FBZ(L,NY,NX)
-        trc_solml2(ids_NO3B,L,NY,NX)=trc_solml2(ids_NO3B,L,NY,NX)+TNOFLB(L,NY,NX)+RporeSoXFlx(ids_NO3B,L,NY,NX)+RNOFBZ(L,NY,NX)
-        trc_solml2(ids_NO2B,L,NY,NX)=trc_solml2(ids_NO2B,L,NY,NX)+TNXFLB(L,NY,NX)+RporeSoXFlx(ids_NO2B,L,NY,NX)
-        trc_solml2(ids_H1PO4B,L,NY,NX)=trc_solml2(ids_H1PO4B,L,NY,NX)+TH1BFB(L,NY,NX)+RporeSoXFlx(ids_H1PO4B,L,NY,NX)+RH1BBZ(L,NY,NX)
-        trc_solml2(ids_H2PO4B,L,NY,NX)=trc_solml2(ids_H2PO4B,L,NY,NX)+TH2BFB(L,NY,NX)+RporeSoXFlx(ids_H2PO4B,L,NY,NX)+RH2BBZ(L,NY,NX)
-        trc_soHml2(idg_CO2,L,NY,NX)=trc_soHml2(idg_CO2,L,NY,NX)+TCOFHS(L,NY,NX)-RporeSoXFlx(idg_CO2,L,NY,NX)
-        trc_soHml2(idg_CH4,L,NY,NX)=trc_soHml2(idg_CH4,L,NY,NX)+TCHFHS(L,NY,NX)-RporeSoXFlx(idg_CH4,L,NY,NX)
-        trc_soHml2(idg_O2,L,NY,NX)=trc_soHml2(idg_O2,L,NY,NX)+TOXFHS(L,NY,NX)-RporeSoXFlx(idg_O2,L,NY,NX)
-        trc_soHml2(idg_N2,L,NY,NX)=trc_soHml2(idg_N2,L,NY,NX)+TNGFHS(L,NY,NX)-RporeSoXFlx(idg_N2,L,NY,NX)
-        trc_soHml2(idg_N2O,L,NY,NX)=trc_soHml2(idg_N2O,L,NY,NX)+TN2FHS(L,NY,NX)-RporeSoXFlx(idg_N2O,L,NY,NX)
-        trc_soHml2(idg_H2,L,NY,NX)=trc_soHml2(idg_H2,L,NY,NX)+THGFHS(L,NY,NX)-RporeSoXFlx(idg_H2,L,NY,NX)
-        trc_soHml2(ids_NH4,L,NY,NX)=trc_soHml2(ids_NH4,L,NY,NX)+TN4FHW(L,NY,NX)-RporeSoXFlx(ids_NH4,L,NY,NX)
-        trc_soHml2(idg_NH3,L,NY,NX)=trc_soHml2(idg_NH3,L,NY,NX)+TN3FHW(L,NY,NX)-RporeSoXFlx(idg_NH3,L,NY,NX)
-        trc_soHml2(ids_NO3,L,NY,NX)=trc_soHml2(ids_NO3,L,NY,NX)+TNOFHW(L,NY,NX)-RporeSoXFlx(ids_NO3,L,NY,NX)
-        trc_soHml2(ids_NO2,L,NY,NX)=trc_soHml2(ids_NO2,L,NY,NX)+TNXFHS(L,NY,NX)-RporeSoXFlx(ids_NO2,L,NY,NX)
-        trc_soHml2(ids_H1PO4,L,NY,NX)=trc_soHml2(ids_H1PO4,L,NY,NX)+TH1PHS(L,NY,NX)-RporeSoXFlx(ids_H1PO4,L,NY,NX)
-        trc_soHml2(ids_H2PO4,L,NY,NX)=trc_soHml2(ids_H2PO4,L,NY,NX)+TH2PHS(L,NY,NX)-RporeSoXFlx(ids_H2PO4,L,NY,NX)
-        trc_soHml2(ids_NH4B,L,NY,NX)=trc_soHml2(ids_NH4B,L,NY,NX)+TN4FHB(L,NY,NX)-RporeSoXFlx(ids_NH4B,L,NY,NX)
-        trc_soHml2(idg_NH3B,L,NY,NX)=trc_soHml2(idg_NH3B,L,NY,NX)+TN3FHB(L,NY,NX)-RporeSoXFlx(idg_NH3B,L,NY,NX)
-        trc_soHml2(ids_NO3B,L,NY,NX)=trc_soHml2(ids_NO3B,L,NY,NX)+TNOFHB(L,NY,NX)-RporeSoXFlx(ids_NO3B,L,NY,NX)
-        trc_soHml2(ids_NO2B,L,NY,NX)=trc_soHml2(ids_NO2B,L,NY,NX)+TNXFHB(L,NY,NX)-RporeSoXFlx(ids_NO2B,L,NY,NX)
-        trc_soHml2(ids_H1PO4B,L,NY,NX)=trc_soHml2(ids_H1PO4B,L,NY,NX)+TH1BHB(L,NY,NX)-RporeSoXFlx(ids_H1PO4B,L,NY,NX)
-        trc_soHml2(ids_H2PO4B,L,NY,NX)=trc_soHml2(ids_H2PO4B,L,NY,NX)+TH2BHB(L,NY,NX)-RporeSoXFlx(ids_H2PO4B,L,NY,NX)
+        DO NTS=ids_beg,ids_end
+          trc_solml2(NTS,L,NY,NX)=trc_solml2(NTS,L,NY,NX)+R3PorTSolFlx(NTS,L,NY,NX)+RporeSoXFlx(NTS,L,NY,NX)
+          trc_soHml2(NTS,L,NY,NX)=trc_soHml2(NTS,L,NY,NX)+R3PorTSoHFlx(NTS,L,NY,NX)-RporeSoXFlx(NTS,L,NY,NX)
+        ENDDO
+
       ENDIF
     ENDIF
 !
@@ -515,13 +495,10 @@ module TrnsfrMod
         trc_solml2(NTG,L,NY,NX)=trc_solml2(NTG,L,NY,NX)+RGasDSFlx(NTG,L,NY,NX)
       ENDDO
 
-      trc_gasml2(idg_CO2,L,NY,NX)=trc_gasml2(idg_CO2,L,NY,NX)+TCOFLG(L,NY,NX)-RGasDSFlx(idg_CO2,L,NY,NX)
-      trc_gasml2(idg_CH4,L,NY,NX)=trc_gasml2(idg_CH4,L,NY,NX)+TCHFLG(L,NY,NX)-RGasDSFlx(idg_CH4,L,NY,NX)
-      trc_gasml2(idg_O2,L,NY,NX) =trc_gasml2(idg_O2,L,NY,NX)+TOXFLG(L,NY,NX)-RGasDSFlx(idg_O2,L,NY,NX)
-      trc_gasml2(idg_N2,L,NY,NX) =trc_gasml2(idg_N2,L,NY,NX)+TNGFLG(L,NY,NX)-RGasDSFlx(idg_N2,L,NY,NX)
-      trc_gasml2(idg_N2O,L,NY,NX)=trc_gasml2(idg_N2O,L,NY,NX)+TN2FLG(L,NY,NX)-RGasDSFlx(idg_N2O,L,NY,NX)
-      trc_gasml2(idg_NH3,L,NY,NX)=trc_gasml2(idg_NH3,L,NY,NX)+TN3FLG(L,NY,NX)-RGasDSFlx(idg_NH3,L,NY,NX)-RGasDSFlx(idg_NH3B,L,NY,NX)
-      trc_gasml2(idg_H2,L,NY,NX)=trc_gasml2(idg_H2,L,NY,NX)+THGFLG(L,NY,NX)-RGasDSFlx(idg_H2,L,NY,NX)
+      DO NTG=idg_beg,idg_end-1
+        trc_gasml2(NTG,L,NY,NX)=trc_gasml2(NTG,L,NY,NX)+RTGasADFlx(NTG,L,NY,NX)-RGasDSFlx(NTG,L,NY,NX)
+      ENDDO
+      trc_gasml2(idg_NH3,L,NY,NX)=trc_gasml2(idg_NH3,L,NY,NX)-RGasDSFlx(idg_NH3B,L,NY,NX)
     ENDIF
 
   ENDDO D9685
@@ -537,24 +514,24 @@ module TrnsfrMod
 
   integer :: K
 
-  RCOSK2(0,NY,NX)=RCO2O(0,NY,NX)*XNPG
-  RCHSK2(0,NY,NX)=RCH4O(0,NY,NX)*XNPG
-  RNGSK2(0,NY,NX)=(RN2G(0,NY,NX)+XN2GS(0,NY,NX))*XNPG
-  RN2SK2(0,NY,NX)=RN2O(0,NY,NX)*XNPG
-  RNHSK2(0,NY,NX)=0.0_r8
-  RHGSK2(0,NY,NX)=RH2GO(0,NY,NX)*XNPG
+  RBGCSinkG(idg_CO2,0,NY,NX)=RCO2O(0,NY,NX)*XNPG
+  RBGCSinkG(idg_CH4,0,NY,NX)=RCH4O(0,NY,NX)*XNPG
+  RBGCSinkG(idg_N2,0,NY,NX)=(RN2G(0,NY,NX)+XN2GS(0,NY,NX))*XNPG
+  RBGCSinkG(idg_N2O,0,NY,NX)=RN2O(0,NY,NX)*XNPG
+  RBGCSinkG(idg_NH3,0,NY,NX)=0.0_r8
+  RBGCSinkG(idg_H2,0,NY,NX)=RH2GO(0,NY,NX)*XNPG
   DO  K=1,jcplx
     ROCSK2(K,0,NY,NX)=-XOQCS(K,0,NY,NX)*XNPH
     RONSK2(K,0,NY,NX)=-XOQNS(K,0,NY,NX)*XNPH
     ROPSK2(K,0,NY,NX)=-XOQPS(K,0,NY,NX)*XNPH
     ROASK2(K,0,NY,NX)=-XOQAS(K,0,NY,NX)*XNPH
   ENDDO
-  RN4SK2(0,NY,NX)=(-XNH4S(0,NY,NX)-TRN4S(0,NY,NX))*XNPH
-  RN3SK2(0,NY,NX)=-TRN3S(0,NY,NX)*XNPH
-  RNOSK2(0,NY,NX)=(-XNO3S(0,NY,NX)-TRNO3(0,NY,NX))*XNPH
-  RNXSK2(0,NY,NX)=(-XNO2S(0,NY,NX)-TRNO2(0,NY,NX))*XNPH
-  RHPSK2(0,NY,NX)=(-XH2PS(0,NY,NX)-TRH2P(0,NY,NX))*XNPH
-  R1PSK2(0,NY,NX)=(-XH1PS(0,NY,NX)-TRH1P(0,NY,NX))*XNPH
+  RBGCSinkS(ids_NH4,0,NY,NX)=(-XNH4S(0,NY,NX)-TRN4S(0,NY,NX))*XNPH
+  RBGCSinkS(idg_NH3,0,NY,NX)=-TRN3S(0,NY,NX)*XNPH
+  RBGCSinkS(ids_NO3,0,NY,NX)=(-XNO3S(0,NY,NX)-TRNO3(0,NY,NX))*XNPH
+  RBGCSinkS(ids_NO2,0,NY,NX)=(-XNO2S(0,NY,NX)-TRNO2(0,NY,NX))*XNPH
+  RBGCSinkS(ids_H2PO4,0,NY,NX)=(-XH2PS(0,NY,NX)-TRH2P(0,NY,NX))*XNPH
+  RBGCSinkS(ids_H1PO4,0,NY,NX)=(-XH1PS(0,NY,NX)-TRH1P(0,NY,NX))*XNPH
   end subroutine SurfaceSinksandSources
 !------------------------------------------------------------------------------------------
 
@@ -914,30 +891,30 @@ module TrnsfrMod
   DO L=NU(NY,NX),NL(NY,NX)
     CHY0(L,NY,NX)=10.0_r8**(-(PH(L,NY,NX)-3.0_r8))
     FLWU(L,NY,NX)=TUPWTR(L,NY,NX)*XNPH
-    RCOSK2(L,NY,NX)=(RCO2O(L,NY,NX)+TCO2S(L,NY,NX)-TRCO2(L,NY,NX))*XNPG
-    RCHSK2(L,NY,NX)=(RCH4O(L,NY,NX)+TUPCHS(L,NY,NX))*XNPG
-    RNGSK2(L,NY,NX)=(RN2G(L,NY,NX)+XN2GS(L,NY,NX)+TUPNF(L,NY,NX))*XNPG
-    RN2SK2(L,NY,NX)=(RN2O(L,NY,NX)+TUPN2S(L,NY,NX))*XNPG
-    RNHSK2(L,NY,NX)=-TRN3G(L,NY,NX)*XNPG
-    RHGSK2(L,NY,NX)=(RH2GO(L,NY,NX)+TUPHGS(L,NY,NX))*XNPG
+    RBGCSinkG(idg_CO2,L,NY,NX)=(RCO2O(L,NY,NX)+TCO2S(L,NY,NX)-TRCO2(L,NY,NX))*XNPG
+    RBGCSinkG(idg_CH4,L,NY,NX)=(RCH4O(L,NY,NX)+TUPCHS(L,NY,NX))*XNPG
+    RBGCSinkG(idg_N2,L,NY,NX)=(RN2G(L,NY,NX)+XN2GS(L,NY,NX)+TUPNF(L,NY,NX))*XNPG
+    RBGCSinkG(idg_N2O,L,NY,NX)=(RN2O(L,NY,NX)+TUPN2S(L,NY,NX))*XNPG
+    RBGCSinkG(idg_NH3,L,NY,NX)=-TRN3G(L,NY,NX)*XNPG
+    RBGCSinkG(idg_H2,L,NY,NX)=(RH2GO(L,NY,NX)+TUPHGS(L,NY,NX))*XNPG
     DO  K=1,jcplx
       ROCSK2(K,L,NY,NX)=-XOQCS(K,L,NY,NX)*XNPH
       RONSK2(K,L,NY,NX)=-XOQNS(K,L,NY,NX)*XNPH
       ROPSK2(K,L,NY,NX)=-XOQPS(K,L,NY,NX)*XNPH
       ROASK2(K,L,NY,NX)=-XOQAS(K,L,NY,NX)*XNPH
     ENDDO
-    RN4SK2(L,NY,NX)=(-XNH4S(L,NY,NX)-TRN4S(L,NY,NX)+TUPNH4(L,NY,NX))*XNPH
-    RN3SK2(L,NY,NX)=(-TRN3S(L,NY,NX)+TUPN3S(L,NY,NX))*XNPH
-    RNOSK2(L,NY,NX)=(-XNO3S(L,NY,NX)-TRNO3(L,NY,NX)+TUPNO3(L,NY,NX))*XNPH
-    RNXSK2(L,NY,NX)=(-XNO2S(L,NY,NX)-TRNO2(L,NY,NX))*XNPH
-    RHPSK2(L,NY,NX)=(-XH2PS(L,NY,NX)-TRH2P(L,NY,NX)+TUPH2P(L,NY,NX))*XNPH
-    R1PSK2(L,NY,NX)=(-XH1PS(L,NY,NX)-TRH1P(L,NY,NX)+TUPH1P(L,NY,NX))*XNPH
-    R4BSK2(L,NY,NX)=(-XNH4B(L,NY,NX)-TRN4B(L,NY,NX)+TUPNHB(L,NY,NX))*XNPH
-    R3BSK2(L,NY,NX)=(-TRN3B(L,NY,NX)+TUPN3B(L,NY,NX))*XNPH
-    RNBSK2(L,NY,NX)=(-XNO3B(L,NY,NX)-TRNOB(L,NY,NX)+TUPNOB(L,NY,NX))*XNPH
-    RNZSK2(L,NY,NX)=(-XNO2B(L,NY,NX)-TRN2B(L,NY,NX))*XNPH
-    RHBSK2(L,NY,NX)=(-XH2BS(L,NY,NX)-TRH2B(L,NY,NX)+TUPH2B(L,NY,NX))*XNPH
-    R1BSK2(L,NY,NX)=(-XH1BS(L,NY,NX)-TRH1B(L,NY,NX)+TUPH1B(L,NY,NX))*XNPH
+    RBGCSinkS(ids_NH4,L,NY,NX)=(-XNH4S(L,NY,NX)-TRN4S(L,NY,NX)+TUPNH4(L,NY,NX))*XNPH
+    RBGCSinkS(idg_NH3,L,NY,NX)=(-TRN3S(L,NY,NX)+TUPN3S(L,NY,NX))*XNPH
+    RBGCSinkS(ids_NO3,L,NY,NX)=(-XNO3S(L,NY,NX)-TRNO3(L,NY,NX)+TUPNO3(L,NY,NX))*XNPH
+    RBGCSinkS(ids_NO2,L,NY,NX)=(-XNO2S(L,NY,NX)-TRNO2(L,NY,NX))*XNPH
+    RBGCSinkS(ids_H2PO4,L,NY,NX)=(-XH2PS(L,NY,NX)-TRH2P(L,NY,NX)+TUPH2P(L,NY,NX))*XNPH
+    RBGCSinkS(ids_H1PO4,L,NY,NX)=(-XH1PS(L,NY,NX)-TRH1P(L,NY,NX)+TUPH1P(L,NY,NX))*XNPH
+    RBGCSinkS(ids_NH4B,L,NY,NX)=(-XNH4B(L,NY,NX)-TRN4B(L,NY,NX)+TUPNHB(L,NY,NX))*XNPH
+    RBGCSinkS(idg_NH3B,L,NY,NX)=(-TRN3B(L,NY,NX)+TUPN3B(L,NY,NX))*XNPH
+    RBGCSinkS(ids_NO3B,L,NY,NX)=(-XNO3B(L,NY,NX)-TRNOB(L,NY,NX)+TUPNOB(L,NY,NX))*XNPH
+    RBGCSinkS(ids_NO2B,L,NY,NX)=(-XNO2B(L,NY,NX)-TRN2B(L,NY,NX))*XNPH
+    RBGCSinkS(ids_H2PO4B,L,NY,NX)=(-XH2BS(L,NY,NX)-TRH2B(L,NY,NX)+TUPH2B(L,NY,NX))*XNPH
+    RBGCSinkS(ids_H1PO4B,L,NY,NX)=(-XH1BS(L,NY,NX)-TRH1B(L,NY,NX)+TUPH1B(L,NY,NX))*XNPH
 !
 !     SOLUTE FLUXES FROM SUBSURFACE IRRIGATION
 !

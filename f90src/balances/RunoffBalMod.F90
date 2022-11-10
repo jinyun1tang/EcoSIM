@@ -476,24 +476,24 @@ implicit none
       COD=0.0_r8
       ZOD=0.0_r8
       POD=0.0_r8
-      DO 450 K=1,jcplx
+      D450: DO K=1,jcplx
         COD=COD+XN*(XOCFLS(K,N,N6,N5,N4)+XOAFLS(K,N,N6,N5,N4) &
           +XOCFHS(K,N,N6,N5,N4)+XOAFHS(K,N,N6,N5,N4))
         ZOD=ZOD+XN*(XONFLS(K,N,N6,N5,N4)+XONFHS(K,N,N6,N5,N4))
         POD=POD+XN*(XOPFLS(K,N,N6,N5,N4)+XOPFHS(K,N,N6,N5,N4))
-450   CONTINUE
+      ENDDO D450
       CXD=XN*(XCOFLS(N,N6,N5,N4)+XCOFHS(N,N6,N5,N4) &
-        +XCOFLG(N,N6,N5,N4)+XCHFLS(N,N6,N5,N4) &
-        +XCHFHS(N,N6,N5,N4)+XCHFLG(N,N6,N5,N4))
+        +R3GasADTFlx(idg_CO2,N,N6,N5,N4)+XCHFLS(N,N6,N5,N4) &
+        +XCHFHS(N,N6,N5,N4)+R3GasADTFlx(idg_CH4,N,N6,N5,N4))
       ZXD=XN*(XN4FLW(N,N6,N5,N4)+XN3FLW(N,N6,N5,N4)+XNOFLW(N,N6,N5,N4) &
         +XN4FLB(N,N6,N5,N4)+XN3FLB(N,N6,N5,N4)+XNOFLB(N,N6,N5,N4) &
         +XNXFLS(N,N6,N5,N4)+XNXFLB(N,N6,N5,N4) &
         +XN4FHW(N,N6,N5,N4)+XN3FHW(N,N6,N5,N4)+XNOFHW(N,N6,N5,N4) &
         +XN4FHB(N,N6,N5,N4)+XN3FHB(N,N6,N5,N4)+XNOFHB(N,N6,N5,N4) &
         +XNXFHS(N,N6,N5,N4)+XNXFHB(N,N6,N5,N4))
-      ZGD=XN*(XNGFLS(N,N6,N5,N4)+XNGFLG(N,N6,N5,N4)+XNGFHS(N,N6,N5,N4) &
-        +XN2FLS(N,N6,N5,N4)+XN2FLG(N,N6,N5,N4)+XN2FHS(N,N6,N5,N4) &
-        +XN3FLG(N,N6,N5,N4))
+      ZGD=XN*(XNGFLS(N,N6,N5,N4)+R3GasADTFlx(idg_N2,N,N6,N5,N4)+XNGFHS(N,N6,N5,N4) &
+        +XN2FLS(N,N6,N5,N4)+R3GasADTFlx(idg_N2O,N,N6,N5,N4)+XN2FHS(N,N6,N5,N4) &
+        +R3GasADTFlx(idg_NH3,N,N6,N5,N4))
       PXD=XN*(XH2PFS(N,N6,N5,N4)+XH2BFB(N,N6,N5,N4) &
         +XH2PHS(N,N6,N5,N4)+XH2BHB(N,N6,N5,N4)+XH1PFS(N,N6,N5,N4) &
         +XH1BFB(N,N6,N5,N4)+XH1PHS(N,N6,N5,N4)+XH1BHB(N,N6,N5,N4))
@@ -513,9 +513,9 @@ implicit none
 !     X*FLG=convective+diffusive gas flux from trnsfr.f
 !     OXYGOU,H2GOU=cumulative O2,H2 loss through lateral and lower boundaries
 !
-      OOD=XN*(XOXFLS(N,N6,N5,N4)+XOXFHS(N,N6,N5,N4)+XOXFLG(N,N6,N5,N4))
+      OOD=XN*(XOXFLS(N,N6,N5,N4)+XOXFHS(N,N6,N5,N4)+R3GasADTFlx(idg_O2,N,N6,N5,N4))
       OXYGOU=OXYGOU-OOD
-      HOD=XN*(XHGFLS(N,N6,N5,N4)+XHGFHS(N,N6,N5,N4)+XHGFLG(N,N6,N5,N4))
+      HOD=XN*(XHGFLS(N,N6,N5,N4)+XHGFHS(N,N6,N5,N4)+R3GasADTFlx(idg_H2,N,N6,N5,N4))
       H2GOU=H2GOU-HOD
 !
 !     SUBSURFACE BOUNDARY FLUXES OF SOLUTES
@@ -616,7 +616,7 @@ implicit none
           ECNDX=0.0_r8
         ENDIF
       ENDIF
-      SG=SG+XHGFLS(N,N6,N5,N4)+XHGFLG(N,N6,N5,N4)
+      SG=SG+XHGFLS(N,N6,N5,N4)+R3GasADTFlx(idg_H2,N,N6,N5,N4)
     ENDIF
   ENDIF
   end subroutine SubsurfaceBoundaryFluxes

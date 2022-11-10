@@ -456,14 +456,8 @@ module Hour1Mod
         XNXFHB(1:3,L,NY,NX)=0.0_r8
         XH1BHB(1:3,L,NY,NX)=0.0_r8
         XH2BHB(1:3,L,NY,NX)=0.0_r8
-        XCOFLG(1:3,L,NY,NX)=0.0_r8
-        XCHFLG(1:3,L,NY,NX)=0.0_r8
-        XOXFLG(1:3,L,NY,NX)=0.0_r8
-        XNGFLG(1:3,L,NY,NX)=0.0_r8
-        XN2FLG(1:3,L,NY,NX)=0.0_r8
-        XN3FLG(1:3,L,NY,NX)=0.0_r8
-        XHGFLG(1:3,L,NY,NX)=0.0_r8
 
+        R3GasADTFlx(idg_beg:idg_end,1:3,L,NY,NX)=0._r8
         XOCFHS(1:jcplx,1:3,L,NY,NX)=0.0_r8
         XONFHS(1:jcplx,1:3,L,NY,NX)=0.0_r8
         XOPFHS(1:jcplx,1:3,L,NY,NX)=0.0_r8
@@ -1008,14 +1002,9 @@ module Hour1Mod
   HEATV(NY,NX)=0.0_r8
   HEATH(NY,NX)=0.0_r8
   TEVAPG(NY,NX)=0.0_r8
-  XCODFS(NY,NX)=0.0_r8
-  XCHDFS(NY,NX)=0.0_r8
-  XOXDFS(NY,NX)=0.0_r8
-  XNGDFS(NY,NX)=0.0_r8
-  XN2DFS(NY,NX)=0.0_r8
-  XN3DFS(NY,NX)=0.0_r8
-  XNBDFS(NY,NX)=0.0_r8
-  XHGDFS(NY,NX)=0.0_r8
+
+
+  GasSfAtmFlx(idg_beg:idg_end,NY,NX)=0._r8
   XCODFR(NY,NX)=0.0_r8
   XCHDFR(NY,NX)=0.0_r8
   XOXDFR(NY,NX)=0.0_r8
@@ -1143,14 +1132,8 @@ module Hour1Mod
   TRCAPM(0:NL(NY,NX),NY,NX)=0.0_r8
   TUPWTR(0:NL(NY,NX),NY,NX)=0.0_r8
   TUPHT(0:NL(NY,NX),NY,NX)=0.0_r8
-  XCODFG(0:NL(NY,NX),NY,NX)=0.0_r8
-  XCHDFG(0:NL(NY,NX),NY,NX)=0.0_r8
-  XOXDFG(0:NL(NY,NX),NY,NX)=0.0_r8
-  XNGDFG(0:NL(NY,NX),NY,NX)=0.0_r8
-  XN2DFG(0:NL(NY,NX),NY,NX)=0.0_r8
-  XN3DFG(0:NL(NY,NX),NY,NX)=0.0_r8
-  XNBDFG(0:NL(NY,NX),NY,NX)=0.0_r8
-  XHGDFG(0:NL(NY,NX),NY,NX)=0.0_r8
+
+  GasDisFlx(idg_beg:idg_end,0:NL(NY,NX),NY,NX)=0.0_r8
 
   TDFOMC(1:jcplx,NU(NY,NX):NL(NY,NX),NY,NX)=0.0_r8
   TDFOMN(1:jcplx,NU(NY,NX):NL(NY,NX),NY,NX)=0.0_r8
