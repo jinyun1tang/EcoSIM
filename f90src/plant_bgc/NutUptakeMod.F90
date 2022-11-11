@@ -373,12 +373,11 @@ module NutUptakeMod
     RUPNOB  =>  plt_rbgc%RUPNOB     , &
     RUONO3  =>  plt_rbgc%RUONO3     , &
     SolDifc =>  plt_soilchem%SolDifc, &
+    trc_solml   => plt_soilchem%trc_solml  , &
     VLNOB   =>  plt_soilchem%VLNOB  , &
-    ZNO3S   =>  plt_soilchem%ZNO3S  , &
     trc_solcl  =>  plt_soilchem%trc_solcl , &
     VOLW    =>  plt_soilchem%VOLW   , &
-    VLNO3   =>  plt_soilchem%VLNO3  , &
-    ZNO3B   =>  plt_soilchem%ZNO3B    &
+    VLNO3   =>  plt_soilchem%VLNO3    &
   )
 !
 ! PARAMETERS FOR RADIAL MASS FLOW AND DIFFUSION OF NO3
@@ -445,7 +444,7 @@ module NutUptakeMod
     CP=(X-Y)*UPMXP
     RTKNOP=(-BP-SQRT(BP*BP-4.0*CP))/2.0
     ZNO3M=UPMNZO(N,NZ)*VOLW(L)*VLNO3(L)
-    ZNO3X=AZMAX1(FNO3X*(ZNO3S(L)-ZNO3M))
+    ZNO3X=AZMAX1(FNO3X*(trc_solml(ids_NO3,L)-ZNO3M))
     RUNNOP(N,L,NZ)=AZMAX1(RTKNO3*PP(NZ))
     RUPNO3(N,L,NZ)=AMIN1(ZNO3X,RUNNOP(N,L,NZ))
     RUONO3(N,L,NZ)=AMIN1(ZNO3X,AZMAX1(RTKNOP*PP(NZ)))
@@ -504,7 +503,7 @@ module NutUptakeMod
     CP=(X-Y)*UPMXP
     RTKNPB=(-BP-SQRT(BP*BP-4.0*CP))/2.0
     ZNOBM=UPMNZO(N,NZ)*VOLW(L)*VLNOB(L)
-    ZNOBX=AZMAX1(FNOBX*(ZNO3B(L)-ZNOBM))
+    ZNOBX=AZMAX1(FNOBX*(trc_solml(ids_NO3B,L)-ZNOBM))
     RUNNXP(N,L,NZ)=AZMAX1(RTKNOB*PP(NZ))
     RUPNOB(N,L,NZ)=AMIN1(ZNOBX,RUNNXP(N,L,NZ))
     RUONOB(N,L,NZ)=AMIN1(ZNOBX,AZMAX1(RTKNPB*PP(NZ)))
@@ -552,7 +551,6 @@ module NutUptakeMod
     SolDifc =>  plt_soilchem%SolDifc, &
     VOLW    =>  plt_soilchem%VOLW   , &
     VLNHB   =>  plt_soilchem%VLNHB  , &
-    ZNH4B   =>  plt_soilchem%ZNH4B  , &
     VLNH4   =>  plt_soilchem%VLNH4  , &
     trc_solml  =>  plt_soilchem%trc_solml , &
     trc_solcl   =>  plt_soilchem%trc_solcl    &
@@ -677,7 +675,7 @@ module NutUptakeMod
     CP=(X-Y)*UPMXP
     RTKNBP=(-BP-SQRT(BP*BP-4.0*CP))/2.0
     ZNHBM=UPMNZH(N,NZ)*VOLW(L)*VLNHB(L)
-    ZNHBX=AZMAX1(FNHBX*(ZNH4B(L)-ZNHBM))
+    ZNHBX=AZMAX1(FNHBX*(trc_solml(ids_NH4B,L)-ZNHBM))
     RUNNBP(N,L,NZ)=AZMAX1(RTKNHB*PP(NZ))
     RUPNHB(N,L,NZ)=AMIN1(ZNHBX,RUNNBP(N,L,NZ))
     RUONHB(N,L,NZ)=AMIN1(ZNHBX,AZMAX1(RTKNBP*PP(NZ)))
@@ -725,9 +723,8 @@ module NutUptakeMod
     VOLW    => plt_soilchem%VOLW   , &
     VLPO4   => plt_soilchem%VLPO4  , &
     trc_solcl   => plt_soilchem%trc_solcl  , &
-    H1PO4   => plt_soilchem%H1PO4  , &
-    VLPOB   => plt_soilchem%VLPOB  , &
-    H1POB   => plt_soilchem%H1POB    &
+    trc_solml   => plt_soilchem%trc_solml  , &
+    VLPOB   => plt_soilchem%VLPOB    &
   )
   !
   !     HPO4 UPTAKE IN NON-BAND SOIL ZONE
@@ -781,7 +778,7 @@ module NutUptakeMod
     CP=(X-Y)*UPMXP
     RTKHP1=(-BP-SQRT(BP*BP-4.0*CP))/2.0
     H1POM=UPMNPO(N,NZ)*VOLW(L)*VLPO4(L)
-    H1POX=AZMAX1(FP14X*(H1PO4(L)-H1POM))
+    H1POX=AZMAX1(FP14X*(trc_solml(ids_H1PO4,L)-H1POM))
     RUPP1P(N,L,NZ)=AZMAX1(RTKH1P*PP(NZ))
     RUPH1P(N,L,NZ)=AMIN1(H1POX,RUPP1P(N,L,NZ))
     RUOH1P(N,L,NZ)=AMIN1(H1POX,AZMAX1(RTKHP1*PP(NZ)))
@@ -840,7 +837,7 @@ module NutUptakeMod
     CP=(X-Y)*UPMXP
     RTKHB1=(-BP-SQRT(BP*BP-4.0*CP))/2.0
     H1PXM=UPMNPO(N,NZ)*VOLW(L)*VLPOB(L)
-    H1PXB=AZMAX1(FP1BX*(H1POB(L)-H1PXM))
+    H1PXB=AZMAX1(FP1BX*(trc_solml(ids_H1PO4B,L)-H1PXM))
     RUPP1B(N,L,NZ)=AZMAX1(RTKH1B*PP(NZ))
     RUPH1B(N,L,NZ)=AMIN1(H1PXB,RUPP1B(N,L,NZ))
     RUOH1B(N,L,NZ)=AMIN1(H1PXB,AZMAX1(RTKHB1*PP(NZ)))
@@ -884,7 +881,6 @@ module NutUptakeMod
     RTARP   => plt_morph%RTARP     , &
     trc_solml   => plt_soilchem%trc_solml  , &
     VOLW    => plt_soilchem%VOLW   , &
-    H2PO4   => plt_soilchem%H2PO4  , &
     trc_solcl   => plt_soilchem%trc_solcl  , &
     VLPO4   => plt_soilchem%VLPO4  , &
     VLPOB   => plt_soilchem%VLPOB    &
@@ -941,7 +937,7 @@ module NutUptakeMod
       CP=(X-Y)*UPMXP
       RTKHPP=(-BP-SQRT(BP*BP-4.0*CP))/2.0
       H2POM=UPMNPO(N,NZ)*VOLW(L)*VLPO4(L)
-      H2POX=AZMAX1(FPO4X*(H2PO4(L)-H2POM))
+      H2POX=AZMAX1(FPO4X*(trc_solml(ids_H2PO4,L)-H2POM))
       RUPP2P(N,L,NZ)=AZMAX1(RTKH2P*PP(NZ))
       RUPH2P(N,L,NZ)=AMIN1(H2POX,RUPP2P(N,L,NZ))
       RUOH2P(N,L,NZ)=AMIN1(H2POX,AZMAX1(RTKHPP*PP(NZ)))

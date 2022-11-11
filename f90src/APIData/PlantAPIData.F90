@@ -375,8 +375,7 @@ implicit none
   real(r8), pointer :: RSCS(:)     => null()  !soil hydraulic resistance, [MPa h m-2]
   real(r8), pointer :: BKDS(:)     => null()  !soil bulk density, [Mg m-3]
   real(r8), pointer :: trc_solcl(:,:) => null() !aqueous tracer concentration [g m-3]
-  real(r8), pointer :: CO2S(:)     => null()  !aqueous CO2  micropore	[gC d-2]
-  real(r8), pointer :: CH4S(:)     => null()  !aqueous CH4  micropore	[gC d-2]
+
   real(r8), pointer :: CCH4G(:)    => null()  !gaseous CH4 concentration	[gC m-3]
 
   real(r8), pointer :: CZ2OG(:)    => null()  !gaseous N2O concentration	[gN m-3]
@@ -389,14 +388,8 @@ implicit none
   real(r8), pointer :: GasDifc(:,:)=> null()  !gaseous diffusivity [m2 h-1]
   real(r8), pointer :: SolDifc(:,:)=> null()  !aqueous diffusivity [m2 h-1]
 
-  real(r8), pointer :: H1PO4(:)    => null()  !soil aqueous HPO4 content micropore non-band, [gP d-2]
-  real(r8), pointer :: H2PO4(:)    => null()  !PO4 non-band micropore, [gP d-2]
-  real(r8), pointer :: H1POB(:)    => null()  !soil aqueous HPO4 content micropore band, [gP d-2]
-
-  real(r8), pointer :: H2GS(:)     => null()  !aqueous H2 	[g d-2]
   real(r8), pointer :: trc_gasml(:,:)=> null()!gas layer mass [g d-2]
 
-  real(r8), pointer :: OXYS(:)     => null()  !aqueous O2  micropore	[g d-2]
   real(r8), pointer :: GSolbility(:,:)=> null() !gas solubility, [m3 m-3]
 
   real(r8), pointer :: THETW(:)    => null()  !volumetric water content [m3 m-3]
@@ -412,13 +405,7 @@ implicit none
   real(r8), pointer :: VOLI(:)     => null()  !soil micropore ice content   [m3 d-2]
   real(r8), pointer :: VOLW(:)     => null()  !soil micropore water content [m3 d-2]
   real(r8), pointer :: VOLA(:)     => null()  !total volume in micropores [m3 d-2]
-  real(r8), pointer :: ZNO3S(:)    => null()  !NO3 non-band micropore, [gN d-2]
-  real(r8), pointer :: ZNO3B(:)    => null()  !NO3 band micropore, [Ng d-2]
-  real(r8), pointer :: ZNH4S(:)    => null()  !NH4 non-band micropore, [gN d-2]
-  real(r8), pointer :: ZNH4B(:)    => null()  !NH4 band micropore, [gN d-2]
-  real(r8), pointer :: Z2OS(:)     => null()  !aqueous N2O micropore, [gN d-2]
-  real(r8), pointer :: ZNH3S(:)    => null()  !NH3 non-band micropore, [gN d-2]
-  real(r8), pointer :: ZNH3B(:)    => null()  !NH3 band micropore, [g d-2]
+
   real(r8), pointer :: OQC(:,:)    => null()  !dissolved organic C micropore	[gC d-2]
   real(r8), pointer :: OQN(:,:)    => null()  !dissolved organic N micropore	[gN d-2]
   real(r8), pointer :: OQP(:,:)    => null()  !dissolved organic P micropore	[gP d-2]
@@ -1705,22 +1692,11 @@ implicit none
   allocate(this%OQC(1:jcplx,0:JZ1))
   allocate(this%OQN(1:jcplx,0:JZ1))
   allocate(this%OQP(1:jcplx,0:JZ1))
-  allocate(this%ZNO3S(0:JZ1))
-  allocate(this%ZNO3B(0:JZ1))
-  allocate(this%ZNH4S(0:JZ1))
+
   allocate(this%trc_solml(ids_beg:ids_end,0:JZ1))
-  allocate(this%ZNH4B(0:JZ1))
-  allocate(this%Z2OS(0:JZ1))
-  allocate(this%ZNH3S(0:JZ1))
-  allocate(this%ZNH3B(0:JZ1))
-  allocate(this%H1PO4(0:JZ1))
-  allocate(this%H2PO4(0:JZ1))
-  allocate(this%H1POB(0:JZ1))
-  allocate(this%H2GS(0:JZ1))
 
   allocate(this%trc_gasml(idg_beg:idg_end,0:JZ1))
 
-  allocate(this%OXYS(0:JZ1))
   allocate(this%CCH4G(0:JZ1))
   allocate(this%CZ2OG(0:JZ1))
   allocate(this%CNH3G(0:JZ1))
@@ -1728,9 +1704,6 @@ implicit none
   allocate(this%CORGC(0:JZ1))
 
   allocate(this%trc_solcl(ids_beg:ids_end,0:jZ1))
-
-  allocate(this%CO2S(0:JZ1))
-  allocate(this%CH4S(0:JZ1))
 
   allocate(this%VOLX(0:JZ1))
   allocate(this%THETW(0:JZ1))
@@ -1775,13 +1748,9 @@ implicit none
 !  if(allocated(CNH3G))deallocate(CNH3G)
 !  if(allocated(CH2GG))deallocate(CH2GG)
 !  if(allocated(CORGC))deallocate(CORGC)
-!  if(allocated(H1PO4))deallocate(H1PO4)
 !  if(allocated(H2PO4))deallocate(H2PO4)
-!  if(allocated(H1POB))deallocate(H1POB)
-!  if(allocated(H2GS))deallocate(H2GS)
 !  if(allocated(HLSGL))deallocate(HLSGL)
 
-!  if(allocated(OXYS))deallocate(OXYS)
 !  if(allocated(OLSGL))deallocate(OLSGL)
 !  if(allocated(POSGL))deallocate(POSGL)
 !  if(allocated(VLPOB))deallocate(VLPOB)
@@ -1799,20 +1768,13 @@ implicit none
 !  if(allocated(OQC))deallocate(OQC)
 !  if(allocated(OQN))deallocate(OQN)
 !  if(allocated(OQP))deallocate(OQP)
-!  if(allocated(ZNO3S))deallocate(ZNO3S)
-!  if(allocated(ZNO3B))deallocate(ZNO3B)
+
 !  if(allocated(ZNSGL))deallocate(ZNSGL)
-!  if(allocated(ZNH4S))deallocate(ZNH4S)
-!  if(allocated(ZNH4B))deallocate(ZNH4B)
-!  if(allocated(Z2OS))deallocate(Z2OS)
-!  if(allocated(ZNH3S))deallocate(ZNH3S)
-!  if(allocated(ZNH3B))deallocate(ZNH3B)
+
 !  if(allocated(Z2SGL))deallocate(Z2SGL)
 !  if(allocated(ZHSGL))deallocate(ZHSGL)
 !  if(allocated(BKDS))deallocate(BKDS)
 !  if(allocated(CO2G))deallocate(CO2G)
-!  if(allocated(CO2S))deallocate(CO2S)
-!  if(allocated(CH4S))deallocate(CH4S)
 !  if(allocated(CLSGL))deallocate(CLSGL)
 !  if(allocated(CQSGL))deallocate(CQSGL)
 

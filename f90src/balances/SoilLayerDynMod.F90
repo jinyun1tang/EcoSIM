@@ -712,15 +712,15 @@ implicit none
   ZNHUFB(L1,NY,NX)=ZNHUFB(L1,NY,NX)+FX*ZNHUFB(L0,NY,NX)
   ZNO3FB(L1,NY,NX)=ZNO3FB(L1,NY,NX)+FX*ZNO3FB(L0,NY,NX)
   trc_solml(ids_NH4,L1,NY,NX)=trc_solml(ids_NH4,L1,NY,NX)+FX*trc_solml(ids_NH4,L0,NY,NX)
-  ZNH4B(L1,NY,NX)=ZNH4B(L1,NY,NX)+FX*ZNH4B(L0,NY,NX)
-  ZNH3S(L1,NY,NX)=ZNH3S(L1,NY,NX)+FX*ZNH3S(L0,NY,NX)
-  ZNH3B(L1,NY,NX)=ZNH3B(L1,NY,NX)+FX*ZNH3B(L0,NY,NX)
-  ZNO3S(L1,NY,NX)=ZNO3S(L1,NY,NX)+FX*ZNO3S(L0,NY,NX)
-  ZNO3B(L1,NY,NX)=ZNO3B(L1,NY,NX)+FX*ZNO3B(L0,NY,NX)
-  ZNO2S(L1,NY,NX)=ZNO2S(L1,NY,NX)+FX*ZNO2S(L0,NY,NX)
-  ZNO2B(L1,NY,NX)=ZNO2B(L1,NY,NX)+FX*ZNO2B(L0,NY,NX)
-  H1PO4(L1,NY,NX)=H1PO4(L1,NY,NX)+FX*H1PO4(L0,NY,NX)
-  H2PO4(L1,NY,NX)=H2PO4(L1,NY,NX)+FX*H2PO4(L0,NY,NX)
+  trc_solml(ids_NH4B,L1,NY,NX)=trc_solml(ids_NH4B,L1,NY,NX)+FX*trc_solml(ids_NH4B,L0,NY,NX)
+  trc_solml(idg_NH3,L1,NY,NX)=trc_solml(idg_NH3,L1,NY,NX)+FX*trc_solml(idg_NH3,L0,NY,NX)
+  trc_solml(idg_NH3B,L1,NY,NX)=trc_solml(idg_NH3B,L1,NY,NX)+FX*trc_solml(idg_NH3B,L0,NY,NX)
+  trc_solml(ids_NO3,L1,NY,NX)=trc_solml(ids_NO3,L1,NY,NX)+FX*trc_solml(ids_NO3,L0,NY,NX)
+  trc_solml(ids_NO3B,L1,NY,NX)=trc_solml(ids_NO3B,L1,NY,NX)+FX*trc_solml(ids_NO3B,L0,NY,NX)
+  trc_solml(ids_NO2,L1,NY,NX)=trc_solml(ids_NO2,L1,NY,NX)+FX*trc_solml(ids_NO2,L0,NY,NX)
+  trc_solml(ids_NO2B,L1,NY,NX)=trc_solml(ids_NO2B,L1,NY,NX)+FX*trc_solml(ids_NO2B,L0,NY,NX)
+  trc_solml(ids_H1PO4,L1,NY,NX)=trc_solml(ids_H1PO4,L1,NY,NX)+FX*trc_solml(ids_H1PO4,L0,NY,NX)
+  trc_solml(ids_H2PO4,L1,NY,NX)=trc_solml(ids_H2PO4,L1,NY,NX)+FX*trc_solml(ids_H2PO4,L0,NY,NX)
 
   IF(ISALTG.NE.0)THEN
     ZAL(L1,NY,NX)=ZAL(L1,NY,NX)+FX*ZAL(L0,NY,NX)
@@ -766,7 +766,7 @@ implicit none
     ZMG1P(L1,NY,NX)=ZMG1P(L1,NY,NX)+FX*ZMG1P(L0,NY,NX)
   ENDIF
   IF(L0.NE.0)THEN
-    H1POB(L1,NY,NX)=H1POB(L1,NY,NX)+FX*H1POB(L0,NY,NX)
+    trc_solml(ids_H1PO4B,L1,NY,NX)=trc_solml(ids_H1PO4B,L1,NY,NX)+FX*trc_solml(ids_H1PO4B,L0,NY,NX)
     trc_solml(ids_H2PO4B,L1,NY,NX)=trc_solml(ids_H2PO4B,L1,NY,NX)+FX*trc_solml(ids_H2PO4B,L0,NY,NX)
 
     IF(ISALTG.NE.0)THEN
@@ -823,12 +823,12 @@ implicit none
     trc_gasml(idg_NH3,L1,NY,NX)=trc_gasml(idg_NH3,L1,NY,NX)+FX*trc_gasml(idg_NH3,L0,NY,NX)
     trc_gasml(idg_H2,L1,NY,NX)=trc_gasml(idg_H2,L1,NY,NX)+FX*trc_gasml(idg_H2,L0,NY,NX)
   ENDIF
-  CO2S(L1,NY,NX)=CO2S(L1,NY,NX)+FX*CO2S(L0,NY,NX)
-  CH4S(L1,NY,NX)=CH4S(L1,NY,NX)+FX*CH4S(L0,NY,NX)
-  OXYS(L1,NY,NX)=OXYS(L1,NY,NX)+FX*OXYS(L0,NY,NX)
-  Z2GS(L1,NY,NX)=Z2GS(L1,NY,NX)+FX*Z2GS(L0,NY,NX)
-  Z2OS(L1,NY,NX)=Z2OS(L1,NY,NX)+FX*Z2OS(L0,NY,NX)
-  H2GS(L1,NY,NX)=H2GS(L1,NY,NX)+FX*H2GS(L0,NY,NX)
+  trc_solml(idg_CO2,L1,NY,NX)=trc_solml(idg_CO2,L1,NY,NX)+FX*trc_solml(idg_CO2,L0,NY,NX)
+  trc_solml(idg_CH4,L1,NY,NX)=trc_solml(idg_CH4,L1,NY,NX)+FX*trc_solml(idg_CH4,L0,NY,NX)
+  trc_solml(idg_O2,L1,NY,NX)=trc_solml(idg_O2,L1,NY,NX)+FX*trc_solml(idg_O2,L0,NY,NX)
+  trc_solml(idg_N2,L1,NY,NX)=trc_solml(idg_N2,L1,NY,NX)+FX*trc_solml(idg_N2,L0,NY,NX)
+  trc_solml(idg_N2O,L1,NY,NX)=trc_solml(idg_N2O,L1,NY,NX)+FX*trc_solml(idg_N2O,L0,NY,NX)
+  trc_solml(idg_H2,L1,NY,NX)=trc_solml(idg_H2,L1,NY,NX)+FX*trc_solml(idg_H2,L0,NY,NX)
   IF(IFLGL(L,3).EQ.0)THEN
     DO  K=1,jcplx
       DO  N=1,NFGs
@@ -976,15 +976,15 @@ implicit none
   ZNHUFB(L0,NY,NX)=FY*ZNHUFB(L0,NY,NX)
   ZNO3FB(L0,NY,NX)=FY*ZNO3FB(L0,NY,NX)
   trc_solml(ids_NH4,L0,NY,NX)=FY*trc_solml(ids_NH4,L0,NY,NX)
-  ZNH4B(L0,NY,NX)=FY*ZNH4B(L0,NY,NX)
-  ZNH3S(L0,NY,NX)=FY*ZNH3S(L0,NY,NX)
-  ZNH3B(L0,NY,NX)=FY*ZNH3B(L0,NY,NX)
-  ZNO3S(L0,NY,NX)=FY*ZNO3S(L0,NY,NX)
-  ZNO3B(L0,NY,NX)=FY*ZNO3B(L0,NY,NX)
-  ZNO2S(L0,NY,NX)=FY*ZNO2S(L0,NY,NX)
-  ZNO2B(L0,NY,NX)=FY*ZNO2B(L0,NY,NX)
-  H1PO4(L0,NY,NX)=FY*H1PO4(L0,NY,NX)
-  H2PO4(L0,NY,NX)=FY*H2PO4(L0,NY,NX)
+  trc_solml(ids_NH4B,L0,NY,NX)=FY*trc_solml(ids_NH4B,L0,NY,NX)
+  trc_solml(idg_NH3,L0,NY,NX)=FY*trc_solml(idg_NH3,L0,NY,NX)
+  trc_solml(idg_NH3B,L0,NY,NX)=FY*trc_solml(idg_NH3B,L0,NY,NX)
+  trc_solml(ids_NO3,L0,NY,NX)=FY*trc_solml(ids_NO3,L0,NY,NX)
+  trc_solml(ids_NO3B,L0,NY,NX)=FY*trc_solml(ids_NO3B,L0,NY,NX)
+  trc_solml(ids_NO2,L0,NY,NX)=FY*trc_solml(ids_NO2,L0,NY,NX)
+  trc_solml(ids_NO2B,L0,NY,NX)=FY*trc_solml(ids_NO2B,L0,NY,NX)
+  trc_solml(ids_H1PO4,L0,NY,NX)=FY*trc_solml(ids_H1PO4,L0,NY,NX)
+  trc_solml(ids_H2PO4,L0,NY,NX)=FY*trc_solml(ids_H2PO4,L0,NY,NX)
   IF(ISALTG.NE.0)THEN
     ZAL(L0,NY,NX)=FY*ZAL(L0,NY,NX)
     ZFE(L0,NY,NX)=FY*ZFE(L0,NY,NX)
@@ -1029,7 +1029,7 @@ implicit none
     ZMG1P(L0,NY,NX)=FY*ZMG1P(L0,NY,NX)
   ENDIF
   IF(L0.NE.0)THEN
-    H1POB(L0,NY,NX)=FY*H1POB(L0,NY,NX)
+    trc_solml(ids_H1PO4B,L0,NY,NX)=FY*trc_solml(ids_H1PO4B,L0,NY,NX)
     trc_solml(ids_H2PO4B,L0,NY,NX)=FY*trc_solml(ids_H2PO4B,L0,NY,NX)
     IF(ISALTG.NE.0)THEN
       H0POB(L0,NY,NX)=FY*H0POB(L0,NY,NX)
@@ -1085,12 +1085,12 @@ implicit none
     trc_gasml(idg_NH3,L0,NY,NX)=FY*trc_gasml(idg_NH3,L0,NY,NX)
     trc_gasml(idg_H2,L0,NY,NX)=FY*trc_gasml(idg_H2,L0,NY,NX)
   ENDIF
-  CO2S(L0,NY,NX)=FY*CO2S(L0,NY,NX)
-  CH4S(L0,NY,NX)=FY*CH4S(L0,NY,NX)
-  OXYS(L0,NY,NX)=FY*OXYS(L0,NY,NX)
-  Z2GS(L0,NY,NX)=FY*Z2GS(L0,NY,NX)
-  Z2OS(L0,NY,NX)=FY*Z2OS(L0,NY,NX)
-  H2GS(L0,NY,NX)=FY*H2GS(L0,NY,NX)
+  trc_solml(idg_CO2,L0,NY,NX)=FY*trc_solml(idg_CO2,L0,NY,NX)
+  trc_solml(idg_CH4,L0,NY,NX)=FY*trc_solml(idg_CH4,L0,NY,NX)
+  trc_solml(idg_O2,L0,NY,NX)=FY*trc_solml(idg_O2,L0,NY,NX)
+  trc_solml(idg_N2,L0,NY,NX)=FY*trc_solml(idg_N2,L0,NY,NX)
+  trc_solml(idg_N2O,L0,NY,NX)=FY*trc_solml(idg_N2O,L0,NY,NX)
+  trc_solml(idg_H2,L0,NY,NX)=FY*trc_solml(idg_H2,L0,NY,NX)
   IF(IFLGL(L,3).EQ.0)THEN
     DO  K=1,jcplx
        DO N=1,NFGs
@@ -1719,9 +1719,9 @@ implicit none
   real(r8) :: FXPCPHB,FXPCPMB
   real(r8) :: FXH1POB,FXH2POB
 
-  FXH1POB=FWO*H1POB(L0,NY,NX)
-  H1POB(L1,NY,NX)=H1POB(L1,NY,NX)+FXH1POB
-  H1POB(L0,NY,NX)=H1POB(L0,NY,NX)-FXH1POB
+  FXH1POB=FWO*trc_solml(ids_H1PO4B,L0,NY,NX)
+  trc_solml(ids_H1PO4B,L1,NY,NX)=trc_solml(ids_H1PO4B,L1,NY,NX)+FXH1POB
+  trc_solml(ids_H1PO4B,L0,NY,NX)=trc_solml(ids_H1PO4B,L0,NY,NX)-FXH1POB
   FXH2POB=FWO*trc_solml(ids_H2PO4B,L0,NY,NX)
   trc_solml(ids_H2PO4B,L1,NY,NX)=trc_solml(ids_H2PO4B,L1,NY,NX)+FXH2POB
   trc_solml(ids_H2PO4B,L0,NY,NX)=trc_solml(ids_H2PO4B,L0,NY,NX)-FXH2POB
@@ -1923,24 +1923,24 @@ implicit none
   trc_gasml(idg_H2,L1,NY,NX)=trc_gasml(idg_H2,L1,NY,NX)+FXH2GG
   trc_gasml(idg_H2,L0,NY,NX)=trc_gasml(idg_H2,L0,NY,NX)-FXH2GG
 
-  FXCO2S=FWO*CO2S(L0,NY,NX)
-  CO2S(L1,NY,NX)=CO2S(L1,NY,NX)+FXCO2S
-  CO2S(L0,NY,NX)=CO2S(L0,NY,NX)-FXCO2S
-  FXCH4S=FWO*CH4S(L0,NY,NX)
-  CH4S(L1,NY,NX)=CH4S(L1,NY,NX)+FXCH4S
-  CH4S(L0,NY,NX)=CH4S(L0,NY,NX)-FXCH4S
-  FXOXYS=FWO*OXYS(L0,NY,NX)
-  OXYS(L1,NY,NX)=OXYS(L1,NY,NX)+FXOXYS
-  OXYS(L0,NY,NX)=OXYS(L0,NY,NX)-FXOXYS
-  FXZ2GS=FWO*Z2GS(L0,NY,NX)
-  Z2GS(L1,NY,NX)=Z2GS(L1,NY,NX)+FXZ2GS
-  Z2GS(L0,NY,NX)=Z2GS(L0,NY,NX)-FXZ2GS
-  FXZ2OS=FWO*Z2OS(L0,NY,NX)
-  Z2OS(L1,NY,NX)=Z2OS(L1,NY,NX)+FXZ2OS
-  Z2OS(L0,NY,NX)=Z2OS(L0,NY,NX)-FXZ2OS
-  FXH2GS=FWO*H2GS(L0,NY,NX)
-  H2GS(L1,NY,NX)=H2GS(L1,NY,NX)+FXH2GS
-  H2GS(L0,NY,NX)=H2GS(L0,NY,NX)-FXH2GS
+  FXCO2S=FWO*trc_solml(idg_CO2,L0,NY,NX)
+  trc_solml(idg_CO2,L1,NY,NX)=trc_solml(idg_CO2,L1,NY,NX)+FXCO2S
+  trc_solml(idg_CO2,L0,NY,NX)=trc_solml(idg_CO2,L0,NY,NX)-FXCO2S
+  FXCH4S=FWO*trc_solml(idg_CH4,L0,NY,NX)
+  trc_solml(idg_CH4,L1,NY,NX)=trc_solml(idg_CH4,L1,NY,NX)+FXCH4S
+  trc_solml(idg_CH4,L0,NY,NX)=trc_solml(idg_CH4,L0,NY,NX)-FXCH4S
+  FXOXYS=FWO*trc_solml(idg_O2,L0,NY,NX)
+  trc_solml(idg_O2,L1,NY,NX)=trc_solml(idg_O2,L1,NY,NX)+FXOXYS
+  trc_solml(idg_O2,L0,NY,NX)=trc_solml(idg_O2,L0,NY,NX)-FXOXYS
+  FXZ2GS=FWO*trc_solml(idg_N2,L0,NY,NX)
+  trc_solml(idg_N2,L1,NY,NX)=trc_solml(idg_N2,L1,NY,NX)+FXZ2GS
+  trc_solml(idg_N2,L0,NY,NX)=trc_solml(idg_N2,L0,NY,NX)-FXZ2GS
+  FXZ2OS=FWO*trc_solml(idg_N2O,L0,NY,NX)
+  trc_solml(idg_N2O,L1,NY,NX)=trc_solml(idg_N2O,L1,NY,NX)+FXZ2OS
+  trc_solml(idg_N2O,L0,NY,NX)=trc_solml(idg_N2O,L0,NY,NX)-FXZ2OS
+  FXH2GS=FWO*trc_solml(idg_H2,L0,NY,NX)
+  trc_solml(idg_H2,L1,NY,NX)=trc_solml(idg_H2,L1,NY,NX)+FXH2GS
+  trc_solml(idg_H2,L0,NY,NX)=trc_solml(idg_H2,L0,NY,NX)-FXH2GS
   end Subroutine MoveDisolvGas
 
 !------------------------------------------------------------------------------------------
@@ -1994,33 +1994,33 @@ implicit none
   FXZNH4S=FWO*trc_solml(ids_NH4,L0,NY,NX)
   trc_solml(ids_NH4,L1,NY,NX)=trc_solml(ids_NH4,L1,NY,NX)+FXZNH4S
   trc_solml(ids_NH4,L0,NY,NX)=trc_solml(ids_NH4,L0,NY,NX)-FXZNH4S
-  FXZNH4B=FWO*ZNH4B(L0,NY,NX)
-  ZNH4B(L1,NY,NX)=ZNH4B(L1,NY,NX)+FXZNH4B
-  ZNH4B(L0,NY,NX)=ZNH4B(L0,NY,NX)-FXZNH4B
-  FXZNH3S=FWO*ZNH3S(L0,NY,NX)
-  ZNH3S(L1,NY,NX)=ZNH3S(L1,NY,NX)+FXZNH3S
-  ZNH3S(L0,NY,NX)=ZNH3S(L0,NY,NX)-FXZNH3S
-  FXZNH3B=FWO*ZNH3B(L0,NY,NX)
-  ZNH3B(L1,NY,NX)=ZNH3B(L1,NY,NX)+FXZNH3B
-  ZNH3B(L0,NY,NX)=ZNH3B(L0,NY,NX)-FXZNH3B
-  FXZNO3S=FWO*ZNO3S(L0,NY,NX)
-  ZNO3S(L1,NY,NX)=ZNO3S(L1,NY,NX)+FXZNO3S
-  ZNO3S(L0,NY,NX)=ZNO3S(L0,NY,NX)-FXZNO3S
-  FXZNO3B=FWO*ZNO3B(L0,NY,NX)
-  ZNO3B(L1,NY,NX)=ZNO3B(L1,NY,NX)+FXZNO3B
-  ZNO3B(L0,NY,NX)=ZNO3B(L0,NY,NX)-FXZNO3B
-  FXZNO2S=FWO*ZNO2S(L0,NY,NX)
-  ZNO2S(L1,NY,NX)=ZNO2S(L1,NY,NX)+FXZNO2S
-  ZNO2S(L0,NY,NX)=ZNO2S(L0,NY,NX)-FXZNO2S
-  FXZNO2B=FWO*ZNO2B(L0,NY,NX)
-  ZNO2B(L1,NY,NX)=ZNO2B(L1,NY,NX)+FXZNO2B
-  ZNO2B(L0,NY,NX)=ZNO2B(L0,NY,NX)-FXZNO2B
-  FXH1PO4=FWO*H1PO4(L0,NY,NX)
-  H1PO4(L1,NY,NX)=H1PO4(L1,NY,NX)+FXH1PO4
-  H1PO4(L0,NY,NX)=H1PO4(L0,NY,NX)-FXH1PO4
-  FXH2PO4=FWO*H2PO4(L0,NY,NX)
-  H2PO4(L1,NY,NX)=H2PO4(L1,NY,NX)+FXH2PO4
-  H2PO4(L0,NY,NX)=H2PO4(L0,NY,NX)-FXH2PO4
+  FXZNH4B=FWO*trc_solml(ids_NH4B,L0,NY,NX)
+  trc_solml(ids_NH4B,L1,NY,NX)=trc_solml(ids_NH4B,L1,NY,NX)+FXZNH4B
+  trc_solml(ids_NH4B,L0,NY,NX)=trc_solml(ids_NH4B,L0,NY,NX)-FXZNH4B
+  FXZNH3S=FWO*trc_solml(idg_NH3,L0,NY,NX)
+  trc_solml(idg_NH3,L1,NY,NX)=trc_solml(idg_NH3,L1,NY,NX)+FXZNH3S
+  trc_solml(idg_NH3,L0,NY,NX)=trc_solml(idg_NH3,L0,NY,NX)-FXZNH3S
+  FXZNH3B=FWO*trc_solml(idg_NH3B,L0,NY,NX)
+  trc_solml(idg_NH3B,L1,NY,NX)=trc_solml(idg_NH3B,L1,NY,NX)+FXZNH3B
+  trc_solml(idg_NH3B,L0,NY,NX)=trc_solml(idg_NH3B,L0,NY,NX)-FXZNH3B
+  FXZNO3S=FWO*trc_solml(ids_NO3,L0,NY,NX)
+  trc_solml(ids_NO3,L1,NY,NX)=trc_solml(ids_NO3,L1,NY,NX)+FXZNO3S
+  trc_solml(ids_NO3,L0,NY,NX)=trc_solml(ids_NO3,L0,NY,NX)-FXZNO3S
+  FXZNO3B=FWO*trc_solml(ids_NO3B,L0,NY,NX)
+  trc_solml(ids_NO3B,L1,NY,NX)=trc_solml(ids_NO3B,L1,NY,NX)+FXZNO3B
+  trc_solml(ids_NO3B,L0,NY,NX)=trc_solml(ids_NO3B,L0,NY,NX)-FXZNO3B
+  FXZNO2S=FWO*trc_solml(ids_NO2,L0,NY,NX)
+  trc_solml(ids_NO2,L1,NY,NX)=trc_solml(ids_NO2,L1,NY,NX)+FXZNO2S
+  trc_solml(ids_NO2,L0,NY,NX)=trc_solml(ids_NO2,L0,NY,NX)-FXZNO2S
+  FXZNO2B=FWO*trc_solml(ids_NO2B,L0,NY,NX)
+  trc_solml(ids_NO2B,L1,NY,NX)=trc_solml(ids_NO2B,L1,NY,NX)+FXZNO2B
+  trc_solml(ids_NO2B,L0,NY,NX)=trc_solml(ids_NO2B,L0,NY,NX)-FXZNO2B
+  FXH1PO4=FWO*trc_solml(ids_H1PO4,L0,NY,NX)
+  trc_solml(ids_H1PO4,L1,NY,NX)=trc_solml(ids_H1PO4,L1,NY,NX)+FXH1PO4
+  trc_solml(ids_H1PO4,L0,NY,NX)=trc_solml(ids_H1PO4,L0,NY,NX)-FXH1PO4
+  FXH2PO4=FWO*trc_solml(ids_H2PO4,L0,NY,NX)
+  trc_solml(ids_H2PO4,L1,NY,NX)=trc_solml(ids_H2PO4,L1,NY,NX)+FXH2PO4
+  trc_solml(ids_H2PO4,L0,NY,NX)=trc_solml(ids_H2PO4,L0,NY,NX)-FXH2PO4
 !
 !     SOIL SALT SOLUTES
 !

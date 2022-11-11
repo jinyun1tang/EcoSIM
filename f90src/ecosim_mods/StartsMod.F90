@@ -851,7 +851,7 @@ module StartsMod
   DPNH4(:,:)=0.0_r8
   DPNO3(:,:)=0.0_r8
   DPPO4(:,:)=0.0_r8
-  OXYS(0,:,:)=0.0_r8
+  trc_solml(idg_O2,0,:,:)=0.0_r8
   FRADG(:,:)=1.0_r8
   THRMG(:,:)=0.0_r8
   THRMC(:,:)=0.0_r8

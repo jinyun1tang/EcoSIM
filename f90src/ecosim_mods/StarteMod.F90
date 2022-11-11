@@ -356,36 +356,36 @@ module StarteMod
     trc_gasml(idg_NH3,L,NY,NX)=AtmGgms(idg_NH3,NY,NX)*VOLP(L,NY,NX)
     trc_gasml(idg_H2,L,NY,NX)=AtmGgms(idg_H2,NY,NX)*VOLP(L,NY,NX)
     IF(CDPTH(L-1,NY,NX).LT.DTBLZ(NY,NX))THEN
-      OXYS(L,NY,NX)=AtmGgms(idg_O2,NY,NX)*gas_solubility(idg_O2, ATCA(NY,NX)) &
+      trc_solml(idg_O2,L,NY,NX)=AtmGgms(idg_O2,NY,NX)*gas_solubility(idg_O2, ATCA(NY,NX)) &
         /(EXP(AOXYX*solutevar%CSTR1))*solutevar%FH2O*VOLW(L,NY,NX)
     ELSE
-      OXYS(L,NY,NX)=0._r8
+      trc_solml(idg_O2,L,NY,NX)=0._r8
     ENDIF
-    CO2S(L,NY,NX)=CCO2EI(NY,NX)*gas_solubility(idg_CO2, ATCA(NY,NX)) &
+    trc_solml(idg_CO2,L,NY,NX)=CCO2EI(NY,NX)*gas_solubility(idg_CO2, ATCA(NY,NX)) &
       /(EXP(ACO2X*solutevar%CSTR1))*solutevar%FH2O*VOLW(L,NY,NX)
-    CH4S(L,NY,NX)=AtmGgms(idg_CH4,NY,NX)*gas_solubility(idg_CH4, ATCA(NY,NX)) &
+    trc_solml(idg_CH4,L,NY,NX)=AtmGgms(idg_CH4,NY,NX)*gas_solubility(idg_CH4, ATCA(NY,NX)) &
       /(EXP(ACH4X*solutevar%CSTR1))*solutevar%FH2O*VOLW(L,NY,NX)
-    Z2GS(L,NY,NX)=AtmGgms(idg_N2,NY,NX)*gas_solubility(idg_N2, ATCA(NY,NX)) &
+    trc_solml(idg_N2,L,NY,NX)=AtmGgms(idg_N2,NY,NX)*gas_solubility(idg_N2, ATCA(NY,NX)) &
       /(EXP(AN2GX*solutevar%CSTR1))*solutevar%FH2O*VOLW(L,NY,NX)
-    Z2OS(L,NY,NX)=AtmGgms(idg_N2O,NY,NX)*gas_solubility(idg_N2O, ATCA(NY,NX)) &
+    trc_solml(idg_N2O,L,NY,NX)=AtmGgms(idg_N2O,NY,NX)*gas_solubility(idg_N2O, ATCA(NY,NX)) &
       /(EXP(AN2OX*solutevar%CSTR1))*solutevar%FH2O*VOLW(L,NY,NX)
-    H2GS(L,NY,NX)=AtmGgms(idg_H2,NY,NX)*gas_solubility(idg_H2, ATCA(NY,NX)) &
+    trc_solml(idg_H2,L,NY,NX)=AtmGgms(idg_H2,NY,NX)*gas_solubility(idg_H2, ATCA(NY,NX)) &
       /(EXP(AH2GX*solutevar%CSTR1))*solutevar%FH2O*VOLW(L,NY,NX)
 !
 !     INITIAL STATE VARIABLES FOR MINERAL N AND P IN SOIL
 !
     trc_solml(ids_NH4,L,NY,NX)=CN4U(L,NY,NX)*VOLW(L,NY,NX)*VLNH4(L,NY,NX)*14.0
-    ZNH4B(L,NY,NX)=CN4U(L,NY,NX)*VOLW(L,NY,NX)*VLNHB(L,NY,NX)*14.0
-    ZNH3S(L,NY,NX)=CN3U(L,NY,NX)*VOLW(L,NY,NX)*VLNH4(L,NY,NX)*14.0
-    ZNH3B(L,NY,NX)=CN3U(L,NY,NX)*VOLW(L,NY,NX)*VLNHB(L,NY,NX)*14.0
-    ZNO3S(L,NY,NX)=CNOU(L,NY,NX)*VOLW(L,NY,NX)*VLNO3(L,NY,NX)*14.0
-    ZNO3B(L,NY,NX)=CNOU(L,NY,NX)*VOLW(L,NY,NX)*VLNOB(L,NY,NX)*14.0
-    H2PO4(L,NY,NX)=CH2PU(L,NY,NX)*VOLW(L,NY,NX)*VLPO4(L,NY,NX)*31.0
+    trc_solml(ids_NH4B,L,NY,NX)=CN4U(L,NY,NX)*VOLW(L,NY,NX)*VLNHB(L,NY,NX)*14.0
+    trc_solml(idg_NH3,L,NY,NX)=CN3U(L,NY,NX)*VOLW(L,NY,NX)*VLNH4(L,NY,NX)*14.0
+    trc_solml(idg_NH3B,L,NY,NX)=CN3U(L,NY,NX)*VOLW(L,NY,NX)*VLNHB(L,NY,NX)*14.0
+    trc_solml(ids_NO3,L,NY,NX)=CNOU(L,NY,NX)*VOLW(L,NY,NX)*VLNO3(L,NY,NX)*14.0
+    trc_solml(ids_NO3B,L,NY,NX)=CNOU(L,NY,NX)*VOLW(L,NY,NX)*VLNOB(L,NY,NX)*14.0
+    trc_solml(ids_H2PO4,L,NY,NX)=CH2PU(L,NY,NX)*VOLW(L,NY,NX)*VLPO4(L,NY,NX)*31.0
     trc_solml(ids_H2PO4B,L,NY,NX)=CH2PU(L,NY,NX)*VOLW(L,NY,NX)*VLPOB(L,NY,NX)*31.0
-    H1PO4(L,NY,NX)=CH1PU(L,NY,NX)*VOLW(L,NY,NX)*VLPO4(L,NY,NX)*31.0
-    H1POB(L,NY,NX)=CH1PU(L,NY,NX)*VOLW(L,NY,NX)*VLPOB(L,NY,NX)*31.0
-    ZNO2S(L,NY,NX)=0._r8
-    ZNO2B(L,NY,NX)=0._r8
+    trc_solml(ids_H1PO4,L,NY,NX)=CH1PU(L,NY,NX)*VOLW(L,NY,NX)*VLPO4(L,NY,NX)*31.0
+    trc_solml(ids_H1PO4B,L,NY,NX)=CH1PU(L,NY,NX)*VOLW(L,NY,NX)*VLPOB(L,NY,NX)*31.0
+    trc_solml(ids_NO2,L,NY,NX)=0._r8
+    trc_solml(ids_NO2B,L,NY,NX)=0._r8
 !
 !     INITIAL STATE VARIABLES FOR CATIONS, ANIONS AND ION PAIRS IN SOIL
 !
@@ -572,17 +572,17 @@ module StarteMod
 !
   IF(.not.is_restart_run.AND.is_first_year)THEN
     trc_solml(ids_NH4,0,NY,NX)=0._r8
-    ZNH3S(0,NY,NX)=0._r8
-    ZNO3S(0,NY,NX)=0._r8
-    ZNO2S(0,NY,NX)=0._r8
-    H2PO4(0,NY,NX)=0._r8
-    H1PO4(0,NY,NX)=0._r8
-    ZNH4B(0,NY,NX)=0._r8
-    ZNH3B(0,NY,NX)=0._r8
-    ZNO3B(0,NY,NX)=0._r8
-    ZNO2B(0,NY,NX)=0._r8
+    trc_solml(idg_NH3,0,NY,NX)=0._r8
+    trc_solml(ids_NO3,0,NY,NX)=0._r8
+    trc_solml(ids_NO2,0,NY,NX)=0._r8
+    trc_solml(ids_H2PO4,0,NY,NX)=0._r8
+    trc_solml(ids_H1PO4,0,NY,NX)=0._r8
+    trc_solml(ids_NH4B,0,NY,NX)=0._r8
+    trc_solml(idg_NH3B,0,NY,NX)=0._r8
+    trc_solml(ids_NO3B,0,NY,NX)=0._r8
+    trc_solml(ids_NO2B,0,NY,NX)=0._r8
     trc_solml(ids_H2PO4B,0,NY,NX)=0._r8
-    H1POB(0,NY,NX)=0._r8
+    trc_solml(ids_H1PO4B,0,NY,NX)=0._r8
     XN4(0,NY,NX)=0._r8
     XNB(0,NY,NX)=0._r8
     XOH0(0,NY,NX)=0._r8

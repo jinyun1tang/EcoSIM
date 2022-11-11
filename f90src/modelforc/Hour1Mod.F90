@@ -1384,12 +1384,12 @@ module Hour1Mod
   trc_solcl(ids_NO2B,0,NY,NX)=0.0_r8
   trc_solcl(ids_H2PO4B,0,NY,NX)=0.0_r8
   IF(VOLW(0,NY,NX).GT.ZEROS2(NY,NX))THEN
-    trc_solcl(idg_CO2,0,NY,NX)=AZMAX1(CO2S(0,NY,NX)/VOLW(0,NY,NX))
-    trc_solcl(idg_CH4,0,NY,NX)=AZMAX1(CH4S(0,NY,NX)/VOLW(0,NY,NX))
-    trc_solcl(idg_O2,0,NY,NX)=AZMAX1(OXYS(0,NY,NX)/VOLW(0,NY,NX))
-    trc_solcl(idg_N2,0,NY,NX)=AZMAX1(Z2GS(0,NY,NX)/VOLW(0,NY,NX))
-    trc_solcl(idg_N2O,0,NY,NX)=AZMAX1(Z2OS(0,NY,NX)/VOLW(0,NY,NX))
-    trc_solcl(idg_H2,0,NY,NX)=AZMAX1(H2GS(0,NY,NX)/VOLW(0,NY,NX))
+    trc_solcl(idg_CO2,0,NY,NX)=AZMAX1(trc_solml(idg_CO2,0,NY,NX)/VOLW(0,NY,NX))
+    trc_solcl(idg_CH4,0,NY,NX)=AZMAX1(trc_solml(idg_CH4,0,NY,NX)/VOLW(0,NY,NX))
+    trc_solcl(idg_O2,0,NY,NX)=AZMAX1(trc_solml(idg_O2,0,NY,NX)/VOLW(0,NY,NX))
+    trc_solcl(idg_N2,0,NY,NX)=AZMAX1(trc_solml(idg_N2,0,NY,NX)/VOLW(0,NY,NX))
+    trc_solcl(idg_N2O,0,NY,NX)=AZMAX1(trc_solml(idg_N2O,0,NY,NX)/VOLW(0,NY,NX))
+    trc_solcl(idg_H2,0,NY,NX)=AZMAX1(trc_solml(idg_H2,0,NY,NX)/VOLW(0,NY,NX))
   ELSE
     trc_solcl(idg_CO2,0,NY,NX)=0.0_r8
     trc_solcl(idg_CH4,0,NY,NX)=0.0_r8
@@ -1484,26 +1484,26 @@ module Hour1Mod
     IF(VOLW(L,NY,NX).GT.ZEROS2(NY,NX))THEN
       IF(VLNH4(L,NY,NX).GT.ZERO)THEN
         trc_solcl(ids_NH4,L,NY,NX)=AZMAX1(trc_solml(ids_NH4,L,NY,NX)/(VOLW(L,NY,NX)*VLNH4(L,NY,NX)))
-        trc_solcl(idg_NH3,L,NY,NX)=AZMAX1(ZNH3S(L,NY,NX)/(VOLW(L,NY,NX)*VLNH4(L,NY,NX)))
+        trc_solcl(idg_NH3,L,NY,NX)=AZMAX1(trc_solml(idg_NH3,L,NY,NX)/(VOLW(L,NY,NX)*VLNH4(L,NY,NX)))
       ELSE
         trc_solcl(ids_NH4,L,NY,NX)=0.0_r8
         trc_solcl(idg_NH3,L,NY,NX)=0.0_r8
       ENDIF
       IF(VLNO3(L,NY,NX).GT.ZERO)THEN
-        trc_solcl(ids_NO3,L,NY,NX)=AZMAX1(ZNO3S(L,NY,NX)/(VOLW(L,NY,NX)*VLNO3(L,NY,NX)))
-        trc_solcl(ids_NO2,L,NY,NX)=AZMAX1(ZNO2S(L,NY,NX)/(VOLW(L,NY,NX)*VLNO3(L,NY,NX)))
+        trc_solcl(ids_NO3,L,NY,NX)=AZMAX1(trc_solml(ids_NO3,L,NY,NX)/(VOLW(L,NY,NX)*VLNO3(L,NY,NX)))
+        trc_solcl(ids_NO2,L,NY,NX)=AZMAX1(trc_solml(ids_NO2,L,NY,NX)/(VOLW(L,NY,NX)*VLNO3(L,NY,NX)))
       ELSE
         trc_solcl(ids_NO3,L,NY,NX)=0.0_r8
         trc_solcl(ids_NO2,L,NY,NX)=0.0_r8
       ENDIF
       IF(VLPO4(L,NY,NX).GT.ZERO)THEN
-        trc_solcl(ids_H1PO4,L,NY,NX)=AZMAX1(H1PO4(L,NY,NX)/(VOLW(L,NY,NX)*VLPO4(L,NY,NX)))
-        trc_solcl(ids_H2PO4,L,NY,NX)=AZMAX1(H2PO4(L,NY,NX)/(VOLW(L,NY,NX)*VLPO4(L,NY,NX)))
+        trc_solcl(ids_H1PO4,L,NY,NX)=AZMAX1(trc_solml(ids_H1PO4,L,NY,NX)/(VOLW(L,NY,NX)*VLPO4(L,NY,NX)))
+        trc_solcl(ids_H2PO4,L,NY,NX)=AZMAX1(trc_solml(ids_H2PO4,L,NY,NX)/(VOLW(L,NY,NX)*VLPO4(L,NY,NX)))
 
         CPO4S(L,NY,NX)=AZMAX1(((H0PO4(L,NY,NX)+H3PO4(L,NY,NX) &
           +ZFE1P(L,NY,NX)+ZFE2P(L,NY,NX)+ZCA0P(L,NY,NX) &
           +ZCA1P(L,NY,NX)+ZCA2P(L,NY,NX)+ZMG1P(L,NY,NX))*patomw &
-          +H1PO4(L,NY,NX)+H2PO4(L,NY,NX))/(VOLW(L,NY,NX)*VLPO4(L,NY,NX)))
+          +trc_solml(ids_H1PO4,L,NY,NX)+trc_solml(ids_H2PO4,L,NY,NX))/(VOLW(L,NY,NX)*VLPO4(L,NY,NX)))
       ELSE
         trc_solcl(ids_H1PO4,L,NY,NX)=0.0_r8
         trc_solcl(ids_H2PO4,L,NY,NX)=0.0_r8
@@ -1516,26 +1516,26 @@ module Hour1Mod
 !     VLNHB,VLNOB,VLPOB=fraction of soil volume in NH4,NO3,PO4 band
 !
       IF(VLNHB(L,NY,NX).GT.ZERO)THEN
-        trc_solcl(ids_NH4B,L,NY,NX)=AZMAX1(ZNH4B(L,NY,NX)/(VOLW(L,NY,NX)*VLNHB(L,NY,NX)))
-        trc_solcl(idg_NH3B,L,NY,NX)=AZMAX1(ZNH3B(L,NY,NX)/(VOLW(L,NY,NX)*VLNHB(L,NY,NX)))
+        trc_solcl(ids_NH4B,L,NY,NX)=AZMAX1(trc_solml(ids_NH4B,L,NY,NX)/(VOLW(L,NY,NX)*VLNHB(L,NY,NX)))
+        trc_solcl(idg_NH3B,L,NY,NX)=AZMAX1(trc_solml(idg_NH3B,L,NY,NX)/(VOLW(L,NY,NX)*VLNHB(L,NY,NX)))
       ELSE
         trc_solcl(ids_NH4B,L,NY,NX)=0.0_r8
         trc_solcl(idg_NH3B,L,NY,NX)=0.0_r8
       ENDIF
       IF(VLNOB(L,NY,NX).GT.ZERO)THEN
-        trc_solcl(ids_NO3B,L,NY,NX)=AZMAX1(ZNO3B(L,NY,NX)/(VOLW(L,NY,NX)*VLNOB(L,NY,NX)))
-        trc_solcl(ids_NO2B,L,NY,NX)=AZMAX1(ZNO2B(L,NY,NX)/(VOLW(L,NY,NX)*VLNOB(L,NY,NX)))
+        trc_solcl(ids_NO3B,L,NY,NX)=AZMAX1(trc_solml(ids_NO3B,L,NY,NX)/(VOLW(L,NY,NX)*VLNOB(L,NY,NX)))
+        trc_solcl(ids_NO2B,L,NY,NX)=AZMAX1(trc_solml(ids_NO2B,L,NY,NX)/(VOLW(L,NY,NX)*VLNOB(L,NY,NX)))
       ELSE
         trc_solcl(ids_NO3B,L,NY,NX)=0.0_r8
         trc_solcl(ids_NO2B,L,NY,NX)=0.0_r8
       ENDIF
       IF(VLPOB(L,NY,NX).GT.ZERO)THEN
-        trc_solcl(ids_H1PO4B,L,NY,NX)=AZMAX1(H1POB(L,NY,NX)/(VOLW(L,NY,NX)*VLPOB(L,NY,NX)))
+        trc_solcl(ids_H1PO4B,L,NY,NX)=AZMAX1(trc_solml(ids_H1PO4B,L,NY,NX)/(VOLW(L,NY,NX)*VLPOB(L,NY,NX)))
         trc_solcl(ids_H2PO4B,L,NY,NX)=AZMAX1(trc_solml(ids_H2PO4B,L,NY,NX)/(VOLW(L,NY,NX)*VLPOB(L,NY,NX)))
         CPO4B(L,NY,NX)=AZMAX1(((H0POB(L,NY,NX)+H3POB(L,NY,NX) &
           +ZFE1PB(L,NY,NX)+ZFE2PB(L,NY,NX)+ZCA0PB(L,NY,NX) &
           +ZCA1PB(L,NY,NX)+ZCA2PB(L,NY,NX)+ZMG1PB(L,NY,NX))*patomw &
-          +H1POB(L,NY,NX)+trc_solml(ids_H2PO4B,L,NY,NX))/(VOLW(L,NY,NX)*VLPOB(L,NY,NX)))
+          +trc_solml(ids_H1PO4B,L,NY,NX)+trc_solml(ids_H2PO4B,L,NY,NX))/(VOLW(L,NY,NX)*VLPOB(L,NY,NX)))
       ELSE
         trc_solcl(ids_H1PO4B,L,NY,NX)=0.0_r8
         trc_solcl(ids_H2PO4B,L,NY,NX)=0.0_r8
@@ -1679,18 +1679,18 @@ module Hour1Mod
       ZA3=H0PO4(L,NY,NX)+H0POB(L,NY,NX)
       ZC2=ZCA(L,NY,NX)+ZMG(L,NY,NX)+ZALOH1(L,NY,NX)+ZFEOH1(L,NY,NX) &
         +ZFE2P(L,NY,NX)+ZFE2PB(L,NY,NX)
-      ZA2=ZSO4(L,NY,NX)+ZCO3(L,NY,NX)+H1PO4(L,NY,NX)+H1POB(L,NY,NX)
-      ZC1=(trc_solml(ids_NH4,L,NY,NX)+ZNH4B(L,NY,NX))/natomw+ZHY(L,NY,NX) &
+      ZA2=ZSO4(L,NY,NX)+ZCO3(L,NY,NX)+trc_solml(ids_H1PO4,L,NY,NX)+trc_solml(ids_H1PO4B,L,NY,NX)
+      ZC1=(trc_solml(ids_NH4,L,NY,NX)+trc_solml(ids_NH4B,L,NY,NX))/natomw+ZHY(L,NY,NX) &
         +ZNA(L,NY,NX)+ZKA(L,NY,NX)+ZALOH2(L,NY,NX)+ZFEOH2(L,NY,NX) &
         +ZALS(L,NY,NX)+ZFES(L,NY,NX)+ZCAO(L,NY,NX)+ZCAH(L,NY,NX) &
         +ZMGO(L,NY,NX)+ZMGH(L,NY,NX)+ZFE1P(L,NY,NX)+ZFE1PB(L,NY,NX) &
         +ZCA2P(L,NY,NX)+ZCA2PB(L,NY,NX)
-      ZA1=(ZNO3S(L,NY,NX)+ZNO3B(L,NY,NX))/natomw+ZOH(L,NY,NX) &
+      ZA1=(trc_solml(ids_NO3,L,NY,NX)+trc_solml(ids_NO3B,L,NY,NX))/natomw+ZOH(L,NY,NX) &
         +ZHCO3(L,NY,NX)+ZCL(L,NY,NX)+ZALOH4(L,NY,NX)+ZFEOH4(L,NY,NX) &
-        +ZNAC(L,NY,NX)+ZNAS(L,NY,NX)+ZKAS(L,NY,NX)+(H2PO4(L,NY,NX) &
+        +ZNAC(L,NY,NX)+ZNAS(L,NY,NX)+ZKAS(L,NY,NX)+(trc_solml(ids_H2PO4,L,NY,NX) &
         +trc_solml(ids_H2PO4B,L,NY,NX))/patomw+ZCA0P(L,NY,NX)+ZCA0PB(L,NY,NX)
-      ZN=CO2S(L,NY,NX)/catomw+CH4S(L,NY,NX)/catomw+OXYS(L,NY,NX)/32.0 &
-        +(Z2GS(L,NY,NX)+Z2OS(L,NY,NX)+ZNH3S(L,NY,NX)+ZNH3B(L,NY,NX))/natomw &
+      ZN=trc_solml(idg_CO2,L,NY,NX)/catomw+trc_solml(idg_CH4,L,NY,NX)/catomw+trc_solml(idg_O2,L,NY,NX)/32.0 &
+        +(trc_solml(idg_N2,L,NY,NX)+trc_solml(idg_N2O,L,NY,NX)+trc_solml(idg_NH3,L,NY,NX)+trc_solml(idg_NH3B,L,NY,NX))/natomw &
         +ZALOH3(L,NY,NX)+ZFEOH3(L,NY,NX)+ZCAC(L,NY,NX)+ZCAS(L,NY,NX) &
         +ZMGC(L,NY,NX)+ZMGS(L,NY,NX)+H3PO4(L,NY,NX)+ZCA1P(L,NY,NX) &
         +ZMG1P(L,NY,NX)+H3POB(L,NY,NX)+ZCA1PB(L,NY,NX)+ZMG1PB(L,NY,NX)
@@ -1792,11 +1792,11 @@ module Hour1Mod
 !     C*=litter solute concentrations
 !
       trc_solcl(ids_NH4,0,NY,NX)=AZMAX1(trc_solml(ids_NH4,0,NY,NX)/VOLW(0,NY,NX))
-      trc_solcl(idg_NH3,0,NY,NX)=AZMAX1(ZNH3S(0,NY,NX)/VOLW(0,NY,NX))
-      trc_solcl(ids_NO3,0,NY,NX)=AZMAX1(ZNO3S(0,NY,NX)/VOLW(0,NY,NX))
-      trc_solcl(ids_NO2,0,NY,NX)=AZMAX1(ZNO2S(0,NY,NX)/VOLW(0,NY,NX))
-      trc_solcl(ids_H1PO4,0,NY,NX)=AZMAX1(H1PO4(0,NY,NX)/VOLW(0,NY,NX))
-      trc_solcl(ids_H2PO4,0,NY,NX)=AZMAX1(H2PO4(0,NY,NX)/VOLW(0,NY,NX))
+      trc_solcl(idg_NH3,0,NY,NX)=AZMAX1(trc_solml(idg_NH3,0,NY,NX)/VOLW(0,NY,NX))
+      trc_solcl(ids_NO3,0,NY,NX)=AZMAX1(trc_solml(ids_NO3,0,NY,NX)/VOLW(0,NY,NX))
+      trc_solcl(ids_NO2,0,NY,NX)=AZMAX1(trc_solml(ids_NO2,0,NY,NX)/VOLW(0,NY,NX))
+      trc_solcl(ids_H1PO4,0,NY,NX)=AZMAX1(trc_solml(ids_H1PO4,0,NY,NX)/VOLW(0,NY,NX))
+      trc_solcl(ids_H2PO4,0,NY,NX)=AZMAX1(trc_solml(ids_H2PO4,0,NY,NX)/VOLW(0,NY,NX))
     ELSE
       PSISM(0,NY,NX)=PSISM(NU(NY,NX),NY,NX)
       trc_solcl(ids_NH4,0,NY,NX)=0.0_r8
@@ -2301,8 +2301,8 @@ module Hour1Mod
 !     DPNHB,WDNHB=depth,width of NH4 band
 !     VLNHB,VLNH4=soil volume in NH4 band,non-band
 !
-    IF((Z4B+Z3B+ZUB.GT.0.0_r8).OR.((ZNH4B(LFDPTH,NY,NX).GT.0.0_r8 &
-      .OR.ZNH3B(LFDPTH,NY,NX).GT.0.0_r8).AND.IFNHB(NY,NX).EQ.0))THEN
+    IF((Z4B+Z3B+ZUB.GT.0.0_r8).OR.((trc_solml(ids_NH4B,LFDPTH,NY,NX).GT.0.0_r8 &
+      .OR.trc_solml(idg_NH3B,LFDPTH,NY,NX).GT.0.0_r8).AND.IFNHB(NY,NX).EQ.0))THEN
       IFNHB(NY,NX)=1
       ROWN(NY,NX)=ROWI(I,NY,NX)
       D50: DO L=NUI(NY,NX),JZ
@@ -2323,13 +2323,13 @@ module Hour1Mod
           VLNHB(L,NY,NX)=0.0_r8
         ENDIF
         VLNH4(L,NY,NX)=1.0_r8-VLNHB(L,NY,NX)
-        ZNH4T=trc_solml(ids_NH4,L,NY,NX)+ZNH4B(L,NY,NX)
-        ZNH3T=ZNH3S(L,NY,NX)+ZNH3B(L,NY,NX)
+        ZNH4T=trc_solml(ids_NH4,L,NY,NX)+trc_solml(ids_NH4B,L,NY,NX)
+        ZNH3T=trc_solml(idg_NH3,L,NY,NX)+trc_solml(idg_NH3B,L,NY,NX)
         XN4T=XN4(L,NY,NX)+XNB(L,NY,NX)
         trc_solml(ids_NH4,L,NY,NX)=ZNH4T*VLNH4(L,NY,NX)
-        ZNH3S(L,NY,NX)=ZNH3T*VLNH4(L,NY,NX)
-        ZNH4B(L,NY,NX)=ZNH4T*VLNHB(L,NY,NX)
-        ZNH3B(L,NY,NX)=ZNH3T*VLNHB(L,NY,NX)
+        trc_solml(idg_NH3,L,NY,NX)=ZNH3T*VLNH4(L,NY,NX)
+        trc_solml(ids_NH4B,L,NY,NX)=ZNH4T*VLNHB(L,NY,NX)
+        trc_solml(idg_NH3B,L,NY,NX)=ZNH3T*VLNHB(L,NY,NX)
         XN4(L,NY,NX)=XN4T*VLNH4(L,NY,NX)
         XNB(L,NY,NX)=XN4T*VLNHB(L,NY,NX)
       ENDDO D50
@@ -2343,8 +2343,8 @@ module Hour1Mod
 !     DPNOB,WDNOB=depth,width of NO3 band
 !     VLNOB,VLNO3=soil volume in NO3 band,non-band
 !
-    IF((Z4B+Z3B+ZUB+ZOB.GT.0.0_r8).OR.((ZNO3B(LFDPTH,NY,NX).GT.0.0_r8 &
-      .OR.ZNO2B(LFDPTH,NY,NX).GT.0.0_r8).AND.IFNOB(NY,NX).EQ.0))THEN
+    IF((Z4B+Z3B+ZUB+ZOB.GT.0.0_r8).OR.((trc_solml(ids_NO3B,LFDPTH,NY,NX).GT.0.0_r8 &
+      .OR.trc_solml(ids_NO2B,LFDPTH,NY,NX).GT.0.0_r8).AND.IFNOB(NY,NX).EQ.0))THEN
       IFNOB(NY,NX)=1
       ROWO(NY,NX)=ROWI(I,NY,NX)
       D45: DO L=NUI(NY,NX),JZ
@@ -2365,12 +2365,12 @@ module Hour1Mod
           VLNOB(L,NY,NX)=0.0_r8
         ENDIF
         VLNO3(L,NY,NX)=1.0_r8-VLNOB(L,NY,NX)
-        ZNO3T=ZNO3S(L,NY,NX)+ZNO3B(L,NY,NX)
-        ZNO2T=ZNO2S(L,NY,NX)+ZNO2B(L,NY,NX)
-        ZNO3S(L,NY,NX)=ZNO3T*VLNO3(L,NY,NX)
-        ZNO2S(L,NY,NX)=ZNO2T*VLNO3(L,NY,NX)
-        ZNO3B(L,NY,NX)=ZNO3T*VLNOB(L,NY,NX)
-        ZNO2B(L,NY,NX)=ZNO2T*VLNOB(L,NY,NX)
+        ZNO3T=trc_solml(ids_NO3,L,NY,NX)+trc_solml(ids_NO3B,L,NY,NX)
+        ZNO2T=trc_solml(ids_NO2,L,NY,NX)+trc_solml(ids_NO2B,L,NY,NX)
+        trc_solml(ids_NO3,L,NY,NX)=ZNO3T*VLNO3(L,NY,NX)
+        trc_solml(ids_NO2,L,NY,NX)=ZNO2T*VLNO3(L,NY,NX)
+        trc_solml(ids_NO3B,L,NY,NX)=ZNO3T*VLNOB(L,NY,NX)
+        trc_solml(ids_NO2B,L,NY,NX)=ZNO2T*VLNOB(L,NY,NX)
       ENDDO D45
       DPNO3(NY,NX)=DPNOB(LFDPTH,NY,NX)+CDPTH(LFDPTH-1,NY,NX)
     ENDIF
@@ -2404,8 +2404,8 @@ module Hour1Mod
         ENDIF
         VLPO4(L,NY,NX)=1.0-VLPOB(L,NY,NX)
         H0PO4T=H0PO4(L,NY,NX)+H0POB(L,NY,NX)
-        H1PO4T=H1PO4(L,NY,NX)+H1POB(L,NY,NX)
-        H2PO4T=H2PO4(L,NY,NX)+trc_solml(ids_H2PO4B,L,NY,NX)
+        H1PO4T=trc_solml(ids_H1PO4,L,NY,NX)+trc_solml(ids_H1PO4B,L,NY,NX)
+        H2PO4T=trc_solml(ids_H2PO4,L,NY,NX)+trc_solml(ids_H2PO4B,L,NY,NX)
         H3PO4T=H3PO4(L,NY,NX)+H3POB(L,NY,NX)
         ZFE1PT=ZFE1P(L,NY,NX)+ZFE1PB(L,NY,NX)
         ZFE2PT=ZFE2P(L,NY,NX)+ZFE2PB(L,NY,NX)
@@ -2424,8 +2424,8 @@ module Hour1Mod
         PCAPHT=PCAPH(L,NY,NX)+PCPHB(L,NY,NX)
         PCAPMT=PCAPM(L,NY,NX)+PCPMB(L,NY,NX)
         H0PO4(L,NY,NX)=H0PO4T*VLPO4(L,NY,NX)
-        H1PO4(L,NY,NX)=H1PO4T*VLPO4(L,NY,NX)
-        H2PO4(L,NY,NX)=H2PO4T*VLPO4(L,NY,NX)
+        trc_solml(ids_H1PO4,L,NY,NX)=H1PO4T*VLPO4(L,NY,NX)
+        trc_solml(ids_H2PO4,L,NY,NX)=H2PO4T*VLPO4(L,NY,NX)
         H3PO4(L,NY,NX)=H3PO4T*VLPO4(L,NY,NX)
         ZFE1P(L,NY,NX)=ZFE1PT*VLPO4(L,NY,NX)
         ZFE2P(L,NY,NX)=ZFE2PT*VLPO4(L,NY,NX)
@@ -2434,7 +2434,7 @@ module Hour1Mod
         ZCA2P(L,NY,NX)=ZCA2PT*VLPO4(L,NY,NX)
         ZMG1P(L,NY,NX)=ZMG1PT*VLPO4(L,NY,NX)
         H0POB(L,NY,NX)=H0PO4T*VLPOB(L,NY,NX)
-        H1POB(L,NY,NX)=H1PO4T*VLPOB(L,NY,NX)
+        trc_solml(ids_H1PO4B,L,NY,NX)=H1PO4T*VLPOB(L,NY,NX)
         trc_solml(ids_H2PO4B,L,NY,NX)=H2PO4T*VLPOB(L,NY,NX)
         H3POB(L,NY,NX)=H3PO4T*VLPOB(L,NY,NX)
         ZFE1PB(L,NY,NX)=ZFE1PT*VLPOB(L,NY,NX)
@@ -2577,12 +2577,12 @@ module Hour1Mod
       CH2GG(L,NY,NX)=0.0_r8
     ENDIF
     IF(VOLW(L,NY,NX).GT.ZEROS2(NY,NX))THEN
-      trc_solcl(idg_CO2,L,NY,NX)=AZMAX1(CO2S(L,NY,NX)/VOLW(L,NY,NX))
-      trc_solcl(idg_CH4,L,NY,NX)=AZMAX1(CH4S(L,NY,NX)/VOLW(L,NY,NX))
-      trc_solcl(idg_O2,L,NY,NX)=AZMAX1(OXYS(L,NY,NX)/VOLW(L,NY,NX))
-      trc_solcl(idg_N2,L,NY,NX)=AZMAX1(Z2GS(L,NY,NX)/VOLW(L,NY,NX))
-      trc_solcl(idg_N2O,L,NY,NX)=AZMAX1(Z2OS(L,NY,NX)/VOLW(L,NY,NX))
-      trc_solcl(idg_H2,L,NY,NX)=AZMAX1(H2GS(L,NY,NX)/VOLW(L,NY,NX))
+      trc_solcl(idg_CO2,L,NY,NX)=AZMAX1(trc_solml(idg_CO2,L,NY,NX)/VOLW(L,NY,NX))
+      trc_solcl(idg_CH4,L,NY,NX)=AZMAX1(trc_solml(idg_CH4,L,NY,NX)/VOLW(L,NY,NX))
+      trc_solcl(idg_O2,L,NY,NX)=AZMAX1(trc_solml(idg_O2,L,NY,NX)/VOLW(L,NY,NX))
+      trc_solcl(idg_N2,L,NY,NX)=AZMAX1(trc_solml(idg_N2,L,NY,NX)/VOLW(L,NY,NX))
+      trc_solcl(idg_N2O,L,NY,NX)=AZMAX1(trc_solml(idg_N2O,L,NY,NX)/VOLW(L,NY,NX))
+      trc_solcl(idg_H2,L,NY,NX)=AZMAX1(trc_solml(idg_H2,L,NY,NX)/VOLW(L,NY,NX))
     ELSE
       trc_solcl(idg_CO2,L,NY,NX)=0.0_r8
       trc_solcl(idg_CH4,L,NY,NX)=0.0_r8

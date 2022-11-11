@@ -299,16 +299,16 @@ module NitroDisturbMod
 !     REMOVE FERTILIZER IN RESIDUE
 !
         IF(ITILL(I,NY,NX).EQ.21)THEN
-          ON=ON+DCORPC*(trc_solml(ids_NH4,L,NY,NX)+ZNH3S(L,NY,NX) &
-            +ZNO3S(L,NY,NX)+ZNO2S(L,NY,NX))
-          OP=OP+DCORPC*(H1PO4(L,NY,NX)+H2PO4(L,NY,NX))
+          ON=ON+DCORPC*(trc_solml(ids_NH4,L,NY,NX)+trc_solml(idg_NH3,L,NY,NX) &
+            +trc_solml(ids_NO3,L,NY,NX)+trc_solml(ids_NO2,L,NY,NX))
+          OP=OP+DCORPC*(trc_solml(ids_H1PO4,L,NY,NX)+trc_solml(ids_H2PO4,L,NY,NX))
           DCORPC1=1.0_r8-DCORPC
           trc_solml(ids_NH4,L,NY,NX)=DCORPC1*trc_solml(ids_NH4,L,NY,NX)
-          ZNH3S(L,NY,NX)=DCORPC1*ZNH3S(L,NY,NX)
-          ZNO3S(L,NY,NX)=DCORPC1*ZNO3S(L,NY,NX)
-          ZNO2S(L,NY,NX)=DCORPC1*ZNO2S(L,NY,NX)
-          H1PO4(L,NY,NX)=DCORPC1*H1PO4(L,NY,NX)
-          H2PO4(L,NY,NX)=DCORPC1*H2PO4(L,NY,NX)
+          trc_solml(idg_NH3,L,NY,NX)=DCORPC1*trc_solml(idg_NH3,L,NY,NX)
+          trc_solml(ids_NO3,L,NY,NX)=DCORPC1*trc_solml(ids_NO3,L,NY,NX)
+          trc_solml(ids_NO2,L,NY,NX)=DCORPC1*trc_solml(ids_NO2,L,NY,NX)
+          trc_solml(ids_H1PO4,L,NY,NX)=DCORPC1*trc_solml(ids_H1PO4,L,NY,NX)
+          trc_solml(ids_H2PO4,L,NY,NX)=DCORPC1*trc_solml(ids_H2PO4,L,NY,NX)
           XN4(L,NY,NX)  =DCORPC1*XN4(L,NY,NX)
           PALPO(L,NY,NX)=DCORPC1*PALPO(L,NY,NX)
           PFEPO(L,NY,NX)=DCORPC1*PFEPO(L,NY,NX)

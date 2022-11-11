@@ -360,7 +360,7 @@ module SoluteMod
     RN4X=(-TUPNH4(L,NY,NX)+XNH4S(L,NY,NX)+natomw*RSN4AA)/VOLWNX
     RN3X=(-TUPN3S(L,NY,NX)+natomw*RSNUAA)/VOLWNX
     CN41=AZMAX1(trc_solml(ids_NH4,L,NY,NX)/VOLWNX+RN4X)
-    CN31=AZMAX1(ZNH3S(L,NY,NX)/VOLWNX+RN3X)
+    CN31=AZMAX1(trc_solml(idg_NH3,L,NY,NX)/VOLWNX+RN3X)
     XN41=AZMAX1(XN4(L,NY,NX)/BKVLNH)
   ELSE
     RN4X=0._r8
@@ -373,8 +373,8 @@ module SoluteMod
     VOLWNX=natomw*VOLWNB
     RNBX=(-TUPNHB(L,NY,NX)+XNH4B(L,NY,NX)+natomw*(RSN4BA+RSN4BB))/VOLWNX
     R3BX=(-TUPN3B(L,NY,NX)+natomw*(RSNUBA+RSNUBB))/VOLWNX
-    CN4B=AZMAX1(ZNH4B(L,NY,NX)/VOLWNX+RNBX)
-    CN3B=AZMAX1(ZNH3B(L,NY,NX)/VOLWNX+R3BX)
+    CN4B=AZMAX1(trc_solml(ids_NH4B,L,NY,NX)/VOLWNX+RNBX)
+    CN3B=AZMAX1(trc_solml(idg_NH3B,L,NY,NX)/VOLWNX+R3BX)
     XN4B=AZMAX1(XNB(L,NY,NX)/BKVLNB)
   ELSE
     RNBX=0._r8
@@ -408,8 +408,8 @@ module SoluteMod
     VOLWPX=patomw*VOLWPO
     RH1PX=(XH1PS(L,NY,NX)-TUPH1P(L,NY,NX))/VOLWPX
     RH2PX=(XH2PS(L,NY,NX)-TUPH2P(L,NY,NX))/VOLWPX
-    CH1P1=AZMAX1(H1PO4(L,NY,NX)/VOLWPX+RH1PX)
-    CH2P1=AZMAX1(H2PO4(L,NY,NX)/VOLWPX+RH2PX)
+    CH1P1=AZMAX1(trc_solml(ids_H1PO4,L,NY,NX)/VOLWPX+RH1PX)
+    CH2P1=AZMAX1(trc_solml(ids_H2PO4,L,NY,NX)/VOLWPX+RH2PX)
     XOH01=AZMAX1(XOH0(L,NY,NX))/BKVLPO
     XOH11=AZMAX1(XOH1(L,NY,NX))/BKVLPO
     XOH21=AZMAX1(XOH2(L,NY,NX))/BKVLPO
@@ -440,7 +440,7 @@ module SoluteMod
     VOLWPX=patomw*VOLWPB
     RH1BX=(XH1BS(L,NY,NX)-TUPH1B(L,NY,NX))/VOLWPX
     RH2BX=(XH2BS(L,NY,NX)-TUPH2B(L,NY,NX))/VOLWPX
-    CH1PB=AZMAX1(H1POB(L,NY,NX)/VOLWPX+RH1BX)
+    CH1PB=AZMAX1(trc_solml(ids_H1PO4B,L,NY,NX)/VOLWPX+RH1BX)
     CH2PB=AZMAX1(trc_solml(ids_H2PO4B,L,NY,NX)/VOLWPX+RH2BX)
     XH01B=AZMAX1(XOH0B(L,NY,NX))/BKVLPB
     XH11B=AZMAX1(XOH1B(L,NY,NX))/BKVLPB
@@ -541,7 +541,7 @@ module SoluteMod
 !     DNH4S,DNH3S,DXNH4=transfer of NH4,NH3,exchangeable NH4
 !
       DNH4S=FVLNH4*trc_solml(ids_NH4,L,NY,NX)/natomw
-      DNH3S=FVLNH4*ZNH3S(L,NY,NX)/natomw
+      DNH3S=FVLNH4*trc_solml(idg_NH3,L,NY,NX)/natomw
       DXNH4=FVLNH4*XN4(L,NY,NX)
       TRN4S(L,NY,NX)=TRN4S(L,NY,NX)+DNH4S
       TRN4B(L,NY,NX)=TRN4B(L,NY,NX)-DNH4S
@@ -557,10 +557,10 @@ module SoluteMod
       WDNHB(L,NY,NX)=0._r8
       VLNH4(L,NY,NX)=1._r8
       VLNHB(L,NY,NX)=0._r8
-      trc_solml(ids_NH4,L,NY,NX)=trc_solml(ids_NH4,L,NY,NX)+ZNH4B(L,NY,NX)
-      ZNH3S(L,NY,NX)=ZNH3S(L,NY,NX)+ZNH3B(L,NY,NX)
-      ZNH4B(L,NY,NX)=0._r8
-      ZNH3B(L,NY,NX)=0._r8
+      trc_solml(ids_NH4,L,NY,NX)=trc_solml(ids_NH4,L,NY,NX)+trc_solml(ids_NH4B,L,NY,NX)
+      trc_solml(idg_NH3,L,NY,NX)=trc_solml(idg_NH3,L,NY,NX)+trc_solml(idg_NH3B,L,NY,NX)
+      trc_solml(ids_NH4B,L,NY,NX)=0._r8
+      trc_solml(idg_NH3B,L,NY,NX)=0._r8
       XN4(L,NY,NX)=XN4(L,NY,NX)+XNB(L,NY,NX)
       XNB(L,NY,NX)=0._r8
     ENDIF
@@ -640,8 +640,8 @@ module SoluteMod
 !
       IF(ISALTG.NE.0)THEN
         DZH0P=FVLPO4*H0PO4(L,NY,NX)
-        DZH1P=FVLPO4*H1PO4(L,NY,NX)/patomw
-        DZH2P=FVLPO4*H2PO4(L,NY,NX)/patomw
+        DZH1P=FVLPO4*trc_solml(ids_H1PO4,L,NY,NX)/patomw
+        DZH2P=FVLPO4*trc_solml(ids_H2PO4,L,NY,NX)/patomw
         DZH3P=FVLPO4*H3PO4(L,NY,NX)
         DZF1P=FVLPO4*ZFE1P(L,NY,NX)
         DZF2P=FVLPO4*ZFE2P(L,NY,NX)
@@ -700,8 +700,8 @@ module SoluteMod
         TRCPHB(L,NY,NX)=TRCPHB(L,NY,NX)-DPCHP
         TRCPMB(L,NY,NX)=TRCPMB(L,NY,NX)-DPCMP
       ELSE
-        DZH1P=FVLPO4*H1PO4(L,NY,NX)/patomw
-        DZH2P=FVLPO4*H2PO4(L,NY,NX)/patomw
+        DZH1P=FVLPO4*trc_solml(ids_H1PO4,L,NY,NX)/patomw
+        DZH2P=FVLPO4*trc_solml(ids_H2PO4,L,NY,NX)/patomw
         DXOH1=FVLPO4*XOH1(L,NY,NX)
         DXOH2=FVLPO4*XOH2(L,NY,NX)
         DXH2P=FVLPO4*XH2P(L,NY,NX)
@@ -740,8 +740,8 @@ module SoluteMod
       VLPOB(L,NY,NX)=0._r8
       VLPO4(L,NY,NX)=1._r8
       H0PO4(L,NY,NX)=H0PO4(L,NY,NX)+H0POB(L,NY,NX)
-      H1PO4(L,NY,NX)=H1PO4(L,NY,NX)+H1POB(L,NY,NX)
-      H2PO4(L,NY,NX)=H2PO4(L,NY,NX)+trc_solml(ids_H2PO4B,L,NY,NX)
+      trc_solml(ids_H1PO4,L,NY,NX)=trc_solml(ids_H1PO4,L,NY,NX)+trc_solml(ids_H1PO4B,L,NY,NX)
+      trc_solml(ids_H2PO4,L,NY,NX)=trc_solml(ids_H2PO4,L,NY,NX)+trc_solml(ids_H2PO4B,L,NY,NX)
       H3PO4(L,NY,NX)=H3PO4(L,NY,NX)+H3POB(L,NY,NX)
       ZFE1P(L,NY,NX)=ZFE1P(L,NY,NX)+ZFE1PB(L,NY,NX)
       ZFE2P(L,NY,NX)=ZFE2P(L,NY,NX)+ZFE2PB(L,NY,NX)
@@ -750,7 +750,7 @@ module SoluteMod
       ZCA2P(L,NY,NX)=ZCA2P(L,NY,NX)+ZCA2PB(L,NY,NX)
       ZMG1P(L,NY,NX)=ZMG1P(L,NY,NX)+ZMG1PB(L,NY,NX)
       H0POB(L,NY,NX)=0._r8
-      H1POB(L,NY,NX)=0._r8
+      trc_solml(ids_H1PO4B,L,NY,NX)=0._r8
       trc_solml(ids_H2PO4B,L,NY,NX)=0._r8
       H3POB(L,NY,NX)=0._r8
       ZFE1PB(L,NY,NX)=0._r8
@@ -852,8 +852,8 @@ module SoluteMod
 !
 !     DNO3S,DNO2S=transfer of NO3,NO2
 !
-      DNO3S=FVLNO3*ZNO3S(L,NY,NX)/natomw
-      DNO2S=FVLNO3*ZNO2S(L,NY,NX)/natomw
+      DNO3S=FVLNO3*trc_solml(ids_NO3,L,NY,NX)/natomw
+      DNO2S=FVLNO3*trc_solml(ids_NO2,L,NY,NX)/natomw
       TRNO3(L,NY,NX)=TRNO3(L,NY,NX)+DNO3S
       TRNO2(L,NY,NX)=TRNO2(L,NY,NX)+DNO2S
       TRNOB(L,NY,NX)=TRNOB(L,NY,NX)-DNO3S
@@ -866,10 +866,10 @@ module SoluteMod
       WDNOB(L,NY,NX)=0._r8
       VLNO3(L,NY,NX)=1._r8
       VLNOB(L,NY,NX)=0._r8
-      ZNO3S(L,NY,NX)=ZNO3S(L,NY,NX)+ZNO3B(L,NY,NX)
-      ZNO2S(L,NY,NX)=ZNO2S(L,NY,NX)+ZNO2B(L,NY,NX)
-      ZNO3B(L,NY,NX)=0._r8
-      ZNO2B(L,NY,NX)=0._r8
+      trc_solml(ids_NO3,L,NY,NX)=trc_solml(ids_NO3,L,NY,NX)+trc_solml(ids_NO3B,L,NY,NX)
+      trc_solml(ids_NO2,L,NY,NX)=trc_solml(ids_NO2,L,NY,NX)+trc_solml(ids_NO2B,L,NY,NX)
+      trc_solml(ids_NO3B,L,NY,NX)=0._r8
+      trc_solml(ids_NO2B,L,NY,NX)=0._r8
     ENDIF
   ENDIF
   end subroutine UpdateNO3FertilizerBandinfo
@@ -979,7 +979,7 @@ module SoluteMod
       RN4X=(XNH4S(0,NY,NX)+natomw*RSN4AA)/VOLWMX
       RN3X=natomw*RSNUAA/VOLWMX
       CN41=AMAX1(ZERO,trc_solml(ids_NH4,0,NY,NX)/VOLWMX+RN4X)
-      CN31=AMAX1(ZERO,ZNH3S(0,NY,NX)/VOLWMX+RN3X)
+      CN31=AMAX1(ZERO,trc_solml(idg_NH3,0,NY,NX)/VOLWMX+RN3X)
       IF(BKVLX.GT.ZEROS(NY,NX))THEN
         XN41=AMAX1(ZERO,XN4(0,NY,NX)/BKVLX)
       ELSE
@@ -996,8 +996,8 @@ module SoluteMod
       VOLWMP=patomw*VOLWM(NPH,0,NY,NX)
       RH1PX=XH1PS(0,NY,NX)/VOLWMP
       RH2PX=XH2PS(0,NY,NX)/VOLWMP
-      CH1P1=AZMAX1(H1PO4(0,NY,NX)/VOLWMP+RH1PX)
-      CH2P1=AZMAX1(H2PO4(0,NY,NX)/VOLWMP+RH2PX)
+      CH1P1=AZMAX1(trc_solml(ids_H1PO4,0,NY,NX)/VOLWMP+RH1PX)
+      CH2P1=AZMAX1(trc_solml(ids_H2PO4,0,NY,NX)/VOLWMP+RH2PX)
     ELSE
       RN4X=0._r8
       RN3X=0._r8
