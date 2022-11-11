@@ -52,11 +52,11 @@ module StarteMod
 !
   DO   NX=NHW,NHE
     DO  NY=NVN,NVS
-      solutevar%CCO2M=CCO2EI(NY,NX)/12.0_r8
-      solutevar%CCH4M=AtmGgms(idg_CH4,NY,NX)/12.0_r8
+      solutevar%CCO2M=CCO2EI(NY,NX)/catomw
+      solutevar%CCH4M=AtmGgms(idg_CH4,NY,NX)/catomw
       solutevar%COXYM=AtmGgms(idg_O2,NY,NX)/32.0_r8
-      solutevar%CZ2GM=AtmGgms(idg_N2,NY,NX)/14.0_r8
-      solutevar%CZ2OM=AtmGgms(idg_N2O,NY,NX)/14.0_r8
+      solutevar%CZ2GM=AtmGgms(idg_N2,NY,NX)/natomw
+      solutevar%CZ2OM=AtmGgms(idg_N2O,NY,NX)/natomw
       solutevar%ATCA  = ATCA(NY,NX)
       solutevar%ZEROS = ZEROS(NY,NX)
 
@@ -355,6 +355,7 @@ module StarteMod
     trc_gasml(idg_N2O,L,NY,NX)=AtmGgms(idg_N2O,NY,NX)*VOLP(L,NY,NX)
     trc_gasml(idg_NH3,L,NY,NX)=AtmGgms(idg_NH3,NY,NX)*VOLP(L,NY,NX)
     trc_gasml(idg_H2,L,NY,NX)=AtmGgms(idg_H2,NY,NX)*VOLP(L,NY,NX)
+
     IF(CDPTH(L-1,NY,NX).LT.DTBLZ(NY,NX))THEN
       trc_solml(idg_O2,L,NY,NX)=AtmGgms(idg_O2,NY,NX)*gas_solubility(idg_O2, ATCA(NY,NX)) &
         /(EXP(AOXYX*solutevar%CSTR1))*solutevar%FH2O*VOLW(L,NY,NX)
@@ -374,16 +375,17 @@ module StarteMod
 !
 !     INITIAL STATE VARIABLES FOR MINERAL N AND P IN SOIL
 !
-    trc_solml(ids_NH4,L,NY,NX)=CN4U(L,NY,NX)*VOLW(L,NY,NX)*VLNH4(L,NY,NX)*14.0
-    trc_solml(ids_NH4B,L,NY,NX)=CN4U(L,NY,NX)*VOLW(L,NY,NX)*VLNHB(L,NY,NX)*14.0
-    trc_solml(idg_NH3,L,NY,NX)=CN3U(L,NY,NX)*VOLW(L,NY,NX)*VLNH4(L,NY,NX)*14.0
-    trc_solml(idg_NH3B,L,NY,NX)=CN3U(L,NY,NX)*VOLW(L,NY,NX)*VLNHB(L,NY,NX)*14.0
-    trc_solml(ids_NO3,L,NY,NX)=CNOU(L,NY,NX)*VOLW(L,NY,NX)*VLNO3(L,NY,NX)*14.0
-    trc_solml(ids_NO3B,L,NY,NX)=CNOU(L,NY,NX)*VOLW(L,NY,NX)*VLNOB(L,NY,NX)*14.0
-    trc_solml(ids_H2PO4,L,NY,NX)=CH2PU(L,NY,NX)*VOLW(L,NY,NX)*VLPO4(L,NY,NX)*31.0
-    trc_solml(ids_H2PO4B,L,NY,NX)=CH2PU(L,NY,NX)*VOLW(L,NY,NX)*VLPOB(L,NY,NX)*31.0
-    trc_solml(ids_H1PO4,L,NY,NX)=CH1PU(L,NY,NX)*VOLW(L,NY,NX)*VLPO4(L,NY,NX)*31.0
-    trc_solml(ids_H1PO4B,L,NY,NX)=CH1PU(L,NY,NX)*VOLW(L,NY,NX)*VLPOB(L,NY,NX)*31.0
+    trc_solml(ids_NH4,L,NY,NX)=CN4U(L,NY,NX)*VOLW(L,NY,NX)*VLNH4(L,NY,NX)*natomw
+    trc_solml(ids_NH4B,L,NY,NX)=CN4U(L,NY,NX)*VOLW(L,NY,NX)*VLNHB(L,NY,NX)*natomw
+    trc_solml(idg_NH3,L,NY,NX)=CN3U(L,NY,NX)*VOLW(L,NY,NX)*VLNH4(L,NY,NX)*natomw
+    trc_solml(idg_NH3B,L,NY,NX)=CN3U(L,NY,NX)*VOLW(L,NY,NX)*VLNHB(L,NY,NX)*natomw
+    trc_solml(ids_NO3,L,NY,NX)=CNOU(L,NY,NX)*VOLW(L,NY,NX)*VLNO3(L,NY,NX)*natomw
+    trc_solml(ids_NO3B,L,NY,NX)=CNOU(L,NY,NX)*VOLW(L,NY,NX)*VLNOB(L,NY,NX)*natomw
+    trc_solml(ids_H2PO4,L,NY,NX)=CH2PU(L,NY,NX)*VOLW(L,NY,NX)*VLPO4(L,NY,NX)*patomw
+    trc_solml(ids_H2PO4B,L,NY,NX)=CH2PU(L,NY,NX)*VOLW(L,NY,NX)*VLPOB(L,NY,NX)*patomw
+    trc_solml(ids_H1PO4,L,NY,NX)=CH1PU(L,NY,NX)*VOLW(L,NY,NX)*VLPO4(L,NY,NX)*patomw
+    trc_solml(ids_H1PO4B,L,NY,NX)=CH1PU(L,NY,NX)*VOLW(L,NY,NX)*VLPOB(L,NY,NX)*patomw
+
     trc_solml(ids_NO2,L,NY,NX)=0._r8
     trc_solml(ids_NO2B,L,NY,NX)=0._r8
 !
@@ -441,24 +443,9 @@ module StarteMod
 !
 !     INITIAL STATE VARIABLES FOR ALL MATERIAL IN SOIL MACROPORES
 !
-    CO2SH(L,NY,NX)=0._r8
-    CH4SH(L,NY,NX)=0._r8
-    OXYSH(L,NY,NX)=0._r8
-    Z2GSH(L,NY,NX)=0._r8
-    Z2OSH(L,NY,NX)=0._r8
-    H2GSH(L,NY,NX)=0._r8
-    ZNH4SH(L,NY,NX)=0._r8
-    ZNH4BH(L,NY,NX)=0._r8
-    ZNH3SH(L,NY,NX)=0._r8
-    ZNH3BH(L,NY,NX)=0._r8
-    ZNO3SH(L,NY,NX)=0._r8
-    ZNO3BH(L,NY,NX)=0._r8
-    ZNO2SH(L,NY,NX)=0._r8
-    ZNO2BH(L,NY,NX)=0._r8
-    H2PO4H(L,NY,NX)=0._r8
-    H2POBH(L,NY,NX)=0._r8
-    H1PO4H(L,NY,NX)=0._r8
-    H1POBH(L,NY,NX)=0._r8
+
+    trc_soHml(ids_beg:ids_end,L,NY,NX)=0._r8
+
     ZALH(L,NY,NX)=0._r8
     ZFEH(L,NY,NX)=0._r8
     ZHYH(L,NY,NX)=0._r8
@@ -493,7 +480,7 @@ module StarteMod
     ZNASH(L,NY,NX)=0._r8
     ZKASH(L,NY,NX)=0._r8
     H0PO4H(L,NY,NX)=0._r8
-    H1PO4H(L,NY,NX)=0._r8
+    trc_soHml(ids_H1PO4,L,NY,NX)=0._r8
     H3PO4H(L,NY,NX)=0._r8
     ZFE1PH(L,NY,NX)=0._r8
     ZFE2PH(L,NY,NX)=0._r8
@@ -502,7 +489,7 @@ module StarteMod
     ZCA2PH(L,NY,NX)=0._r8
     ZMG1PH(L,NY,NX)=0._r8
     H0POBH(L,NY,NX)=0._r8
-    H1POBH(L,NY,NX)=0._r8
+    trc_soHml(ids_H1PO4B,L,NY,NX)=0._r8
     H3POBH(L,NY,NX)=0._r8
     ZFE1BH(L,NY,NX)=0._r8
     ZFE2BH(L,NY,NX)=0._r8

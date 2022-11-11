@@ -412,8 +412,8 @@ module WthrMod
   !     ELSE
   !     N=12
   !     ENDIF
-  DO 9925 NX=NHW,NHE
-    DO 9920 NY=NVN,NVS
+  D9925: DO NX=NHW,NHE
+    D9920: DO NY=NVN,NVS
 !
       !     TEMPERATURE CHANGE
       !
@@ -492,8 +492,8 @@ module WthrMod
       CO2E(NY,NX)=CO2EI(NY,NX)*TDCO2(NY,NX,N)
       CN4R(NY,NX)=CN4RI(NY,NX)*TDCN4(NY,NX,N)
       CNOR(NY,NX)=CNORI(NY,NX)*TDCNO(NY,NX,N)
-9920  CONTINUE
-9925  CONTINUE
+    ENDDO D9920
+  ENDDO D9925  
   end subroutine ApplyClimateCorrection
 !------------------------------------------------------------------------------------------
 

@@ -540,26 +540,25 @@ module TrnsfrMod
 
   integer, intent(in) :: NY, NX
 
-  integer :: K
+  integer :: K,NTG,NTS
 
-  trc_solml2(idg_CO2,0,NY,NX)=trc_solml(idg_CO2,0,NY,NX)
-  trc_solml2(idg_CH4,0,NY,NX)=trc_solml(idg_CH4,0,NY,NX)
-  trc_solml2(idg_O2,0,NY,NX)=trc_solml(idg_O2,0,NY,NX)
-  trc_solml2(idg_N2,0,NY,NX)=trc_solml(idg_N2,0,NY,NX)
-  trc_solml2(idg_N2O,0,NY,NX)=trc_solml(idg_N2O,0,NY,NX)
-  trc_solml2(idg_H2,0,NY,NX)=trc_solml(idg_H2,0,NY,NX)
+! exclude banded nutrient
+  DO NTG=idg_beg,idg_end-1
+    trc_solml2(NTG,0,NY,NX)=trc_solml(NTG,0,NY,NX)
+  ENDDO
+
   D9979: DO K=1,jcplx
     OQC2(K,0,NY,NX)=OQC(K,0,NY,NX)-XOQCS(K,0,NY,NX)
     OQN2(K,0,NY,NX)=OQN(K,0,NY,NX)-XOQNS(K,0,NY,NX)
     OQP2(K,0,NY,NX)=OQP(K,0,NY,NX)-XOQPS(K,0,NY,NX)
     OQA2(K,0,NY,NX)=OQA(K,0,NY,NX)-XOQAS(K,0,NY,NX)
   ENDDO D9979
-  trc_solml2(ids_NH4,0,NY,NX)=trc_solml(ids_NH4,0,NY,NX)
-  trc_solml2(idg_NH3,0,NY,NX)=trc_solml(idg_NH3,0,NY,NX)
-  trc_solml2(ids_NO3,0,NY,NX)=trc_solml(ids_NO3,0,NY,NX)
-  trc_solml2(ids_NO2,0,NY,NX)=trc_solml(ids_NO2,0,NY,NX)
-  trc_solml2(ids_H1PO4,0,NY,NX)=trc_solml(ids_H1PO4,0,NY,NX)
-  trc_solml2(ids_H2PO4,0,NY,NX)=trc_solml(ids_H2PO4,0,NY,NX)
+
+! exclude banded nutrient
+  DO NTS=ids_nut_beg,ids_nuts_end
+    trc_solml2(NTS,0,NY,NX)=trc_solml(NTS,0,NY,NX)
+  ENDDO
+
   CHY0(0,NY,NX)=10.0_r8**(-(PH(0,NY,NX)-3.0_r8))
   end subroutine StateVarforGasandSolute
 !------------------------------------------------------------------------------------------
@@ -569,7 +568,7 @@ module TrnsfrMod
   integer, intent(in) :: NY, NX
   integer :: K
 
-  DO 8855 K=1,jcplx
+  D8855: DO K=1,jcplx
     IF(K.LE.2)THEN
       XOCFLS(K,3,0,NY,NX)=0.0
       XONFLS(K,3,0,NY,NX)=0.0
@@ -584,7 +583,7 @@ module TrnsfrMod
     XONFHS(K,3,NU(NY,NX),NY,NX)=0.0
     XOPFHS(K,3,NU(NY,NX),NY,NX)=0.0
     XOAFHS(K,3,NU(NY,NX),NY,NX)=0.0
-8855  CONTINUE
+  ENDDO D8855 
   end subroutine SurfaceSolutefromAtms
 !------------------------------------------------------------------------------------------
 
@@ -1004,21 +1003,11 @@ module TrnsfrMod
 !     CO2SH,CH4SH,OXYSH,Z2GSH,Z2OSH,H2GSH=aqueous CO2,CH4,O2,N2,N2O,H2 content in macropores
 !     ZNH4SH,ZNH3SH,ZNO3SH,ZNO2SH,H1PO4H,H2PO4H=aqueous NH4,NH3,NO3,NO2,HPO4,H2PO4 in non-band macropores
 !     ZNH4BH,ZNH3BH,ZNO3BH,ZNO2BH,H1POBH,H2POBH=aqueous NH4,NH3,NO3,NO2,HPO4,H2PO4 in band macropores
-!
-    trc_gasml2(idg_CO2,L,NY,NX)=trc_gasml(idg_CO2,L,NY,NX)
-    trc_gasml2(idg_CH4,L,NY,NX)=trc_gasml(idg_CH4,L,NY,NX)
-    trc_gasml2(idg_O2,L,NY,NX)=trc_gasml(idg_O2,L,NY,NX)
-    trc_gasml2(idg_NH3,L,NY,NX)=trc_gasml(idg_NH3,L,NY,NX)
-    trc_gasml2(idg_N2,L,NY,NX)=trc_gasml(idg_N2,L,NY,NX)
-    trc_gasml2(idg_N2O,L,NY,NX)=trc_gasml(idg_N2O,L,NY,NX)
-    trc_gasml2(idg_H2,L,NY,NX)=trc_gasml(idg_H2,L,NY,NX)
+! exclude NH3B
+    DO NTG=idg_beg,idg_end-1
+      trc_gasml2(NTG,L,NY,NX)=trc_gasml(NTG,L,NY,NX)
+    ENDDO
 
-    trc_solml2(idg_CO2,L,NY,NX)=trc_solml(idg_CO2,L,NY,NX)
-    trc_solml2(idg_CH4,L,NY,NX)=trc_solml(idg_CH4,L,NY,NX)
-    trc_solml2(idg_O2,L,NY,NX)=trc_solml(idg_O2,L,NY,NX)
-    trc_solml2(idg_N2,L,NY,NX)=trc_solml(idg_N2,L,NY,NX)
-    trc_solml2(idg_N2O,L,NY,NX)=trc_solml(idg_N2O,L,NY,NX)
-    trc_solml2(idg_H2,L,NY,NX)=trc_solml(idg_H2,L,NY,NX)
     DO  K=1,jcplx
       OQC2(K,L,NY,NX)=OQC(K,L,NY,NX)-XOQCS(K,L,NY,NX)
       OQN2(K,L,NY,NX)=OQN(K,L,NY,NX)-XOQNS(K,L,NY,NX)
@@ -1029,37 +1018,11 @@ module TrnsfrMod
       OQPH2(K,L,NY,NX)=OQPH(K,L,NY,NX)
       OQAH2(K,L,NY,NX)=OQAH(K,L,NY,NX)
     enddo
-    trc_solml2(ids_NH4,L,NY,NX)=trc_solml(ids_NH4,L,NY,NX)
-    trc_solml2(idg_NH3,L,NY,NX)=trc_solml(idg_NH3,L,NY,NX)
-    trc_solml2(ids_NO3,L,NY,NX)=trc_solml(ids_NO3,L,NY,NX)
-    trc_solml2(ids_NO2,L,NY,NX)=trc_solml(ids_NO2,L,NY,NX)
-    trc_solml2(ids_H1PO4,L,NY,NX)=trc_solml(ids_H1PO4,L,NY,NX)
-    trc_solml2(ids_H2PO4,L,NY,NX)=trc_solml(ids_H2PO4,L,NY,NX)
-    trc_solml2(ids_NH4B,L,NY,NX)=trc_solml(ids_NH4B,L,NY,NX)
-    trc_solml2(idg_NH3B,L,NY,NX)=trc_solml(idg_NH3B,L,NY,NX)
-    trc_solml2(ids_NO3B,L,NY,NX)=trc_solml(ids_NO3B,L,NY,NX)
-    trc_solml2(ids_NO2B,L,NY,NX)=trc_solml(ids_NO2B,L,NY,NX)
-    trc_solml2(ids_H1PO4B,L,NY,NX)=trc_solml(ids_H1PO4B,L,NY,NX)
-    trc_solml2(ids_H2PO4B,L,NY,NX)=trc_solml(ids_H2PO4B,L,NY,NX)
+    DO NTS=ids_beg,ids_end
+      trc_solml2(NTS,L,NY,NX)=trc_solml(NTS,L,NY,NX)
+      trc_soHml2(NTS,L,NY,NX)=trc_soHml(NTS,L,NY,NX)
+    ENDDO
 
-    trc_soHml2(idg_CO2,L,NY,NX)=CO2SH(L,NY,NX)
-    trc_soHml2(idg_CH4,L,NY,NX)=CH4SH(L,NY,NX)
-    trc_soHml2(idg_O2,L,NY,NX)=OXYSH(L,NY,NX)
-    trc_soHml2(idg_N2,L,NY,NX)=Z2GSH(L,NY,NX)
-    trc_soHml2(idg_N2O,L,NY,NX)=Z2OSH(L,NY,NX)
-    trc_soHml2(idg_H2,L,NY,NX)=H2GSH(L,NY,NX)
-    trc_soHml2(ids_NH4,L,NY,NX)=ZNH4SH(L,NY,NX)
-    trc_soHml2(idg_NH3,L,NY,NX)=ZNH3SH(L,NY,NX)
-    trc_soHml2(ids_NO3,L,NY,NX)=ZNO3SH(L,NY,NX)
-    trc_soHml2(ids_NO2,L,NY,NX)=ZNO2SH(L,NY,NX)
-    trc_soHml2(ids_H1PO4,L,NY,NX)=H1PO4H(L,NY,NX)
-    trc_soHml2(ids_H2PO4,L,NY,NX)=H2PO4H(L,NY,NX)
-    trc_soHml2(ids_NH4B,L,NY,NX)=ZNH4BH(L,NY,NX)
-    trc_soHml2(idg_NH3B,L,NY,NX)=ZNH3BH(L,NY,NX)
-    trc_soHml2(ids_NO3B,L,NY,NX)=ZNO3BH(L,NY,NX)
-    trc_soHml2(ids_NO2B,L,NY,NX)=ZNO2BH(L,NY,NX)
-    trc_soHml2(ids_H1PO4B,L,NY,NX)=H1POBH(L,NY,NX)
-    trc_soHml2(ids_H2PO4B,L,NY,NX)=H2POBH(L,NY,NX)
   enddo
   end subroutine ImportFluxFromOutsideModules
 !

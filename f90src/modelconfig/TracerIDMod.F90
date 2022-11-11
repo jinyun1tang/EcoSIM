@@ -47,7 +47,7 @@ implicit none
   ids_H1PO4=addone(ids_end);
   ids_H2PO4=addone(ids_end);
 
-  ids_nut_beg=ids_NH4;  !the first non-band nutrient tracer
+  ids_nut_beg=ids_NH4;  !the first non-band non-gaseous nutrient tracer
   ids_nuts_end=ids_H2PO4;!the last non-band nutrient tracer
   if(lsalt_model)then
 

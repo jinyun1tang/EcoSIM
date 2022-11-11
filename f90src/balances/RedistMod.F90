@@ -1343,24 +1343,24 @@ module RedistMod
     !
     !     MACROPORE SOLUTES FROM MACROPORE-MICROPORE EXCHANGE
     !
-    CO2SH(L,NY,NX)=CO2SH(L,NY,NX)+TCOFHS(L,NY,NX)-XCOFXS(L,NY,NX)
-    CH4SH(L,NY,NX)=CH4SH(L,NY,NX)+TCHFHS(L,NY,NX)-XCHFXS(L,NY,NX)
-    OXYSH(L,NY,NX)=OXYSH(L,NY,NX)+TOXFHS(L,NY,NX)-XOXFXS(L,NY,NX)
-    Z2GSH(L,NY,NX)=Z2GSH(L,NY,NX)+TNGFHS(L,NY,NX)-XNGFXS(L,NY,NX)
-    Z2OSH(L,NY,NX)=Z2OSH(L,NY,NX)+TN2FHS(L,NY,NX)-XN2FXS(L,NY,NX)
-    H2GSH(L,NY,NX)=H2GSH(L,NY,NX)+THGFHS(L,NY,NX)-XHGFXS(L,NY,NX)
-    ZNH4SH(L,NY,NX)=ZNH4SH(L,NY,NX)+TN4FHS(L,NY,NX)-XN4FXW(L,NY,NX)
-    ZNH3SH(L,NY,NX)=ZNH3SH(L,NY,NX)+TN3FHS(L,NY,NX)-XN3FXW(L,NY,NX)
-    ZNO3SH(L,NY,NX)=ZNO3SH(L,NY,NX)+TNOFHS(L,NY,NX)-XNOFXW(L,NY,NX)
-    ZNO2SH(L,NY,NX)=ZNO2SH(L,NY,NX)+TNXFHS(L,NY,NX)-XNXFXS(L,NY,NX)
-    H1PO4H(L,NY,NX)=H1PO4H(L,NY,NX)+TP1FHS(L,NY,NX)-XH1PXS(L,NY,NX)
-    H2PO4H(L,NY,NX)=H2PO4H(L,NY,NX)+TPOFHS(L,NY,NX)-XH2PXS(L,NY,NX)
-    ZNH4BH(L,NY,NX)=ZNH4BH(L,NY,NX)+TN4FHB(L,NY,NX)-XN4FXB(L,NY,NX)
-    ZNH3BH(L,NY,NX)=ZNH3BH(L,NY,NX)+TN3FHB(L,NY,NX)-XN3FXB(L,NY,NX)
-    ZNO3BH(L,NY,NX)=ZNO3BH(L,NY,NX)+TNOFHB(L,NY,NX)-XNOFXB(L,NY,NX)
-    ZNO2BH(L,NY,NX)=ZNO2BH(L,NY,NX)+TNXFHB(L,NY,NX)-XNXFXB(L,NY,NX)
-    H1POBH(L,NY,NX)=H1POBH(L,NY,NX)+TH1BHB(L,NY,NX)-XH1BXB(L,NY,NX)
-    H2POBH(L,NY,NX)=H2POBH(L,NY,NX)+TH2BHB(L,NY,NX)-XH2BXB(L,NY,NX)
+    trc_soHml(idg_CO2,L,NY,NX)=trc_soHml(idg_CO2,L,NY,NX)+TCOFHS(L,NY,NX)-XCOFXS(L,NY,NX)
+    trc_soHml(idg_CH4,L,NY,NX)=trc_soHml(idg_CH4,L,NY,NX)+TCHFHS(L,NY,NX)-XCHFXS(L,NY,NX)
+    trc_soHml(idg_O2,L,NY,NX)=trc_soHml(idg_O2,L,NY,NX)+TOXFHS(L,NY,NX)-XOXFXS(L,NY,NX)
+    trc_soHml(idg_N2,L,NY,NX)=trc_soHml(idg_N2,L,NY,NX)+TNGFHS(L,NY,NX)-XNGFXS(L,NY,NX)
+    trc_soHml(idg_N2O,L,NY,NX)=trc_soHml(idg_N2O,L,NY,NX)+TN2FHS(L,NY,NX)-XN2FXS(L,NY,NX)
+    trc_soHml(idg_H2,L,NY,NX)=trc_soHml(idg_H2,L,NY,NX)+THGFHS(L,NY,NX)-XHGFXS(L,NY,NX)
+    trc_soHml(ids_NH4,L,NY,NX)=trc_soHml(ids_NH4,L,NY,NX)+TN4FHS(L,NY,NX)-XN4FXW(L,NY,NX)
+    trc_soHml(idg_NH3,L,NY,NX)=trc_soHml(idg_NH3,L,NY,NX)+TN3FHS(L,NY,NX)-XN3FXW(L,NY,NX)
+    trc_soHml(ids_NO3,L,NY,NX)=trc_soHml(ids_NO3,L,NY,NX)+TNOFHS(L,NY,NX)-XNOFXW(L,NY,NX)
+    trc_soHml(ids_NO2,L,NY,NX)=trc_soHml(ids_NO2,L,NY,NX)+TNXFHS(L,NY,NX)-XNXFXS(L,NY,NX)
+    trc_soHml(ids_H1PO4,L,NY,NX)=trc_soHml(ids_H1PO4,L,NY,NX)+TP1FHS(L,NY,NX)-XH1PXS(L,NY,NX)
+    trc_soHml(ids_H2PO4,L,NY,NX)=trc_soHml(ids_H2PO4,L,NY,NX)+TPOFHS(L,NY,NX)-XH2PXS(L,NY,NX)
+    trc_soHml(ids_NH4B,L,NY,NX)=trc_soHml(ids_NH4B,L,NY,NX)+TN4FHB(L,NY,NX)-XN4FXB(L,NY,NX)
+    trc_soHml(idg_NH3B,L,NY,NX)=trc_soHml(idg_NH3B,L,NY,NX)+TN3FHB(L,NY,NX)-XN3FXB(L,NY,NX)
+    trc_soHml(ids_NO3B,L,NY,NX)=trc_soHml(ids_NO3B,L,NY,NX)+TNOFHB(L,NY,NX)-XNOFXB(L,NY,NX)
+    trc_soHml(ids_NO2B,L,NY,NX)=trc_soHml(ids_NO2B,L,NY,NX)+TNXFHB(L,NY,NX)-XNXFXB(L,NY,NX)
+    trc_soHml(ids_H1PO4B,L,NY,NX)=trc_soHml(ids_H1PO4B,L,NY,NX)+TH1BHB(L,NY,NX)-XH1BXB(L,NY,NX)
+    trc_soHml(ids_H2PO4B,L,NY,NX)=trc_soHml(ids_H2PO4B,L,NY,NX)+TH2BHB(L,NY,NX)-XH2BXB(L,NY,NX)
     !
     !     GASES FROM VOLATILIZATION-DISSOLUTION AND GAS TRANSFER
 !
@@ -1482,37 +1482,37 @@ module RedistMod
     HEATSO=HEATSO+VHCP(L,NY,NX)*TKS(L,NY,NX)
     SD=SAND(L,NY,NX)+SILT(L,NY,NX)+CLAY(L,NY,NX)
     TSEDSO=TSEDSO+SD
-    CS=trc_gasml(idg_CO2,L,NY,NX)+trc_solml(idg_CO2,L,NY,NX)+CO2SH(L,NY,NX)+TLCO2P(L,NY,NX) &
-      +trc_gasml(idg_CH4,L,NY,NX)+trc_solml(idg_CH4,L,NY,NX)+CH4SH(L,NY,NX)+TLCH4P(L,NY,NX)
+    CS=trc_gasml(idg_CO2,L,NY,NX)+trc_solml(idg_CO2,L,NY,NX)+trc_soHml(idg_CO2,L,NY,NX)+TLCO2P(L,NY,NX) &
+      +trc_gasml(idg_CH4,L,NY,NX)+trc_solml(idg_CH4,L,NY,NX)+trc_soHml(idg_CH4,L,NY,NX)+TLCH4P(L,NY,NX)
     TLCO2G=TLCO2G+CS
     UCO2S(NY,NX)=UCO2S(NY,NX)+CS
-    HS=trc_gasml(idg_H2,L,NY,NX)+trc_solml(idg_H2,L,NY,NX)+H2GSH(L,NY,NX)+TLH2GP(L,NY,NX)
+    HS=trc_gasml(idg_H2,L,NY,NX)+trc_solml(idg_H2,L,NY,NX)+trc_soHml(idg_H2,L,NY,NX)+TLH2GP(L,NY,NX)
     TLH2G=TLH2G+HS
 
-    OS=trc_gasml(idg_O2,L,NY,NX)+trc_solml(idg_O2,L,NY,NX)+OXYSH(L,NY,NX)+TLOXYP(L,NY,NX)
+    OS=trc_gasml(idg_O2,L,NY,NX)+trc_solml(idg_O2,L,NY,NX)+trc_soHml(idg_O2,L,NY,NX)+TLOXYP(L,NY,NX)
     OXYGSO=OXYGSO+OS
-    ZG=trc_gasml(idg_N2,L,NY,NX)+trc_solml(idg_N2,L,NY,NX)+Z2GSH(L,NY,NX)+TLN2OP(L,NY,NX) &
-      +trc_gasml(idg_N2O,L,NY,NX)+trc_solml(idg_N2O,L,NY,NX)+Z2OSH(L,NY,NX)+TLNH3P(L,NY,NX) &
+    ZG=trc_gasml(idg_N2,L,NY,NX)+trc_solml(idg_N2,L,NY,NX)+trc_soHml(idg_N2,L,NY,NX)+TLN2OP(L,NY,NX) &
+      +trc_gasml(idg_N2O,L,NY,NX)+trc_solml(idg_N2O,L,NY,NX)+trc_soHml(idg_N2O,L,NY,NX)+TLNH3P(L,NY,NX) &
       +trc_gasml(idg_NH3,L,NY,NX)
     TLN2G=TLN2G+ZG
-    Z4S=trc_solml(ids_NH4,L,NY,NX)+ZNH4SH(L,NY,NX)+trc_solml(ids_NH4B,L,NY,NX) &
-      +ZNH4BH(L,NY,NX)+trc_solml(idg_NH3,L,NY,NX)+ZNH3SH(L,NY,NX) &
-      +trc_solml(idg_NH3B,L,NY,NX)+ZNH3BH(L,NY,NX)
+    Z4S=trc_solml(ids_NH4,L,NY,NX)+trc_soHml(ids_NH4,L,NY,NX)+trc_solml(ids_NH4B,L,NY,NX) &
+      +trc_soHml(ids_NH4B,L,NY,NX)+trc_solml(idg_NH3,L,NY,NX)+trc_soHml(idg_NH3,L,NY,NX) &
+      +trc_solml(idg_NH3B,L,NY,NX)+trc_soHml(idg_NH3B,L,NY,NX)
     Z4X=14.0*(XN4(L,NY,NX)+XNB(L,NY,NX))
     Z4F=14.0*(ZNH4FA(L,NY,NX)+ZNHUFA(L,NY,NX)+ZNH3FA(L,NY,NX) &
       +ZNH4FB(L,NY,NX)+ZNHUFB(L,NY,NX)+ZNH3FB(L,NY,NX))
     TLNH4=TLNH4+Z4S+Z4X+Z4F
     UNH4(NY,NX)=UNH4(NY,NX)+Z4S+Z4X
 
-    ZOS=trc_solml(ids_NO3,L,NY,NX)+ZNO3SH(L,NY,NX)+trc_solml(ids_NO3B,L,NY,NX) &
-      +ZNO3BH(L,NY,NX)+trc_solml(ids_NO2,L,NY,NX)+ZNO2SH(L,NY,NX) &
-      +trc_solml(ids_NO2B,L,NY,NX)+ZNO2BH(L,NY,NX)
+    ZOS=trc_solml(ids_NO3,L,NY,NX)+trc_soHml(ids_NO3,L,NY,NX)+trc_solml(ids_NO3B,L,NY,NX) &
+      +trc_soHml(ids_NO3B,L,NY,NX)+trc_solml(ids_NO2,L,NY,NX)+trc_soHml(ids_NO2,L,NY,NX) &
+      +trc_solml(ids_NO2B,L,NY,NX)+trc_soHml(ids_NO2B,L,NY,NX)
     ZOF=14.0*(ZNO3FA(L,NY,NX)+ZNO3FA(L,NY,NX))
     TLNO3=TLNO3+ZOS+ZOF
     UNO3(NY,NX)=UNO3(NY,NX)+ZOS
-    POS=trc_solml(ids_H2PO4,L,NY,NX)+H2PO4H(L,NY,NX)+trc_solml(ids_H2PO4B,L,NY,NX) &
-      +H2POBH(L,NY,NX)+trc_solml(ids_H1PO4,L,NY,NX)+H1PO4H(L,NY,NX) &
-      +trc_solml(ids_H1PO4B,L,NY,NX)+H1POBH(L,NY,NX)
+    POS=trc_solml(ids_H2PO4,L,NY,NX)+trc_soHml(ids_H2PO4,L,NY,NX)+trc_solml(ids_H2PO4B,L,NY,NX) &
+      +trc_soHml(ids_H2PO4B,L,NY,NX)+trc_solml(ids_H1PO4,L,NY,NX)+trc_soHml(ids_H1PO4,L,NY,NX) &
+      +trc_solml(ids_H1PO4B,L,NY,NX)+trc_soHml(ids_H1PO4B,L,NY,NX)
     POX=patomw*(XH1P(L,NY,NX)+XH2P(L,NY,NX) &
       +XH1PB(L,NY,NX)+XH2PB(L,NY,NX))
     POP=patomw*(PALPO(L,NY,NX)+PFEPO(L,NY,NX)+PCAPD(L,NY,NX) &
