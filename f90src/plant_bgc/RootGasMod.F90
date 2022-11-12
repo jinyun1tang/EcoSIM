@@ -117,19 +117,16 @@ module RootGasMod
     H2GA   =>  plt_rbgc%H2GA     , &
     H2GP   =>  plt_rbgc%H2GP     , &
     TFND   =>  plt_soilchem%TFND , &
-    trc_solml  =>  plt_soilchem%trc_solml, &
-    CNH3G  =>  plt_soilchem%CNH3G, &
-    CH2GG  =>  plt_soilchem%CH2GG, &
-    CZ2OG  =>  plt_soilchem%CZ2OG, &
     VLNH4  =>  plt_soilchem%VLNH4, &
+    trc_solml  =>  plt_soilchem%trc_solml, &
+    trc_gascl  =>  plt_soilchem%trc_gascl, &
     GasDifc=>  plt_soilchem%GasDifc,&
-    CCH4G  =>  plt_soilchem%CCH4G, &
     SolDifc  =>  plt_soilchem%SolDifc, &
+    GSolbility=> plt_soilchem%GSolbility,&
+    trc_solcl  =>  plt_soilchem%trc_solcl, &
     THETY  =>  plt_soilchem%THETY, &
     VOLY   =>  plt_soilchem%VOLY , &
     VLNHB  =>  plt_soilchem%VLNHB, &
-    GSolbility=> plt_soilchem%GSolbility,&
-    trc_solcl  =>  plt_soilchem%trc_solcl, &
     THETPM =>  plt_soilchem%THETPM,&
     trc_gasml=> plt_soilchem%trc_gasml,&
     DFGS   =>  plt_soilchem%DFGS , &
@@ -361,10 +358,12 @@ module RootGasMod
         DIFNL=THETM*ZNSGL1*RTARRX*VLNH4(L)
         DIFNB=THETM*ZNSGL1*RTARRX*VLNHB(L)
         DIFHL=THETM*HLSGL1*RTARRX
-        CH4G1=CCH4G(L)*VOLPMM
-        Z2OG1=CZ2OG(L)*VOLPMM
-        ZH3G1=CNH3G(L)*VOLPMM
-        H2GG1=CH2GG(L)*VOLPMM
+
+        CH4G1=trc_gascl(idg_CH4,L)*VOLPMM
+        Z2OG1=trc_gascl(idg_N2O,L)*VOLPMM
+        ZH3G1=trc_gascl(idg_NH3,L)*VOLPMM
+        H2GG1=trc_gascl(idg_H2,L)*VOLPMM
+
         VOLWCO=VOLWMM*GSolbility(idg_CO2,L)
         VOLWOX=VOLWMM*GSolbility(idg_O2,L)
         VOLWCH=VOLWMM*GSolbility(idg_CH4,L)

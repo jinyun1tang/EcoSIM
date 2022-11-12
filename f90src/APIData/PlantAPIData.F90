@@ -375,12 +375,8 @@ implicit none
   real(r8), pointer :: RSCS(:)     => null()  !soil hydraulic resistance, [MPa h m-2]
   real(r8), pointer :: BKDS(:)     => null()  !soil bulk density, [Mg m-3]
   real(r8), pointer :: trc_solcl(:,:) => null() !aqueous tracer concentration [g m-3]
+  real(r8), pointer :: trc_gascl(:,:) => null() !gaseous tracer concentration [g m-3]
 
-  real(r8), pointer :: CCH4G(:)    => null()  !gaseous CH4 concentration	[gC m-3]
-
-  real(r8), pointer :: CZ2OG(:)    => null()  !gaseous N2O concentration	[gN m-3]
-  real(r8), pointer :: CNH3G(:)    => null()  !gaseous NH3 concentration	[gN m-3]
-  real(r8), pointer :: CH2GG(:)    => null()  !gaseous H2 concentration	[g m-3]
   real(r8), pointer :: CORGC(:)    => null()  !soil organic C content [gC kg soil-1]
 
   real(r8), pointer :: CNDU(:)     => null()  !soil micropore hydraulic conductivity for root water uptake [m MPa-1 h-1]
@@ -1696,11 +1692,7 @@ implicit none
   allocate(this%trc_solml(ids_beg:ids_end,0:JZ1))
 
   allocate(this%trc_gasml(idg_beg:idg_end,0:JZ1))
-
-  allocate(this%CCH4G(0:JZ1))
-  allocate(this%CZ2OG(0:JZ1))
-  allocate(this%CNH3G(0:JZ1))
-  allocate(this%CH2GG(0:JZ1))
+  allocate(this%trc_gascl(idg_beg:idg_end,0:JZ1))
   allocate(this%CORGC(0:JZ1))
 
   allocate(this%trc_solcl(ids_beg:ids_end,0:jZ1))

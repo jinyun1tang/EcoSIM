@@ -346,7 +346,14 @@ module StarteMod
     CC2PU(L,NY,NX)=solutevar%CC2P1
     CM1PU(L,NY,NX)=solutevar%CM1P1
 !
-!     INITIAL STATE VARIABLES FOR GAS IN SOIL
+!   INITIAL STATE VARIABLES FOR GAS IN SOIL
+!   CCO2EI is set to the first year, because AtmGgms(idg_CO2,x)
+!   varies year by year, while other tracer gases are fixed year by year,
+!   this is not quite right for CH4, and N2O. However, the current implementation
+!   make sure the inexact restart run works. When exact restart is used, trc_gasml
+!   and trc_solml will be read from restart file, so that the following inconsistent
+!   use between CO2 and other gas tracers can be avoided.
+!   Comment by Jinyun Tang, Nov 11, 2022
 !
     trc_gasml(idg_CO2,L,NY,NX)=CCO2EI(NY,NX)*VOLP(L,NY,NX)
     trc_gasml(idg_CH4,L,NY,NX)=AtmGgms(idg_CH4,NY,NX)*VOLP(L,NY,NX)
@@ -356,22 +363,26 @@ module StarteMod
     trc_gasml(idg_NH3,L,NY,NX)=AtmGgms(idg_NH3,NY,NX)*VOLP(L,NY,NX)
     trc_gasml(idg_H2,L,NY,NX)=AtmGgms(idg_H2,NY,NX)*VOLP(L,NY,NX)
 
+!   DTBLZ: external water table depth
     IF(CDPTH(L-1,NY,NX).LT.DTBLZ(NY,NX))THEN
+! above water table
       trc_solml(idg_O2,L,NY,NX)=AtmGgms(idg_O2,NY,NX)*gas_solubility(idg_O2, ATCA(NY,NX)) &
-        /(EXP(AOXYX*solutevar%CSTR1))*solutevar%FH2O*VOLW(L,NY,NX)
+        /(EXP(ACTCG(idg_O2)*solutevar%CSTR1))*solutevar%FH2O*VOLW(L,NY,NX)
     ELSE
+!below water table
       trc_solml(idg_O2,L,NY,NX)=0._r8
     ENDIF
+
     trc_solml(idg_CO2,L,NY,NX)=CCO2EI(NY,NX)*gas_solubility(idg_CO2, ATCA(NY,NX)) &
-      /(EXP(ACO2X*solutevar%CSTR1))*solutevar%FH2O*VOLW(L,NY,NX)
+      /(EXP(ACTCG(idg_CO2)*solutevar%CSTR1))*solutevar%FH2O*VOLW(L,NY,NX)
     trc_solml(idg_CH4,L,NY,NX)=AtmGgms(idg_CH4,NY,NX)*gas_solubility(idg_CH4, ATCA(NY,NX)) &
-      /(EXP(ACH4X*solutevar%CSTR1))*solutevar%FH2O*VOLW(L,NY,NX)
+      /(EXP(ACTCG(idg_CH4)*solutevar%CSTR1))*solutevar%FH2O*VOLW(L,NY,NX)
     trc_solml(idg_N2,L,NY,NX)=AtmGgms(idg_N2,NY,NX)*gas_solubility(idg_N2, ATCA(NY,NX)) &
-      /(EXP(AN2GX*solutevar%CSTR1))*solutevar%FH2O*VOLW(L,NY,NX)
+      /(EXP(ACTCG(idg_N2)*solutevar%CSTR1))*solutevar%FH2O*VOLW(L,NY,NX)
     trc_solml(idg_N2O,L,NY,NX)=AtmGgms(idg_N2O,NY,NX)*gas_solubility(idg_N2O, ATCA(NY,NX)) &
-      /(EXP(AN2OX*solutevar%CSTR1))*solutevar%FH2O*VOLW(L,NY,NX)
+      /(EXP(ACTCG(idg_N2O)*solutevar%CSTR1))*solutevar%FH2O*VOLW(L,NY,NX)
     trc_solml(idg_H2,L,NY,NX)=AtmGgms(idg_H2,NY,NX)*gas_solubility(idg_H2, ATCA(NY,NX)) &
-      /(EXP(AH2GX*solutevar%CSTR1))*solutevar%FH2O*VOLW(L,NY,NX)
+      /(EXP(ACTCG(idg_H2)*solutevar%CSTR1))*solutevar%FH2O*VOLW(L,NY,NX)
 !
 !     INITIAL STATE VARIABLES FOR MINERAL N AND P IN SOIL
 !

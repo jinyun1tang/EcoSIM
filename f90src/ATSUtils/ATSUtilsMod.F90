@@ -40,18 +40,13 @@ implicit none
   implicit none
   integer, intent(in) :: NY,NX
 
-  integer :: L
+  integer :: L,NTG
 
   DO L =0,NL(NY,NX)
-
-    call PhasePartition(VOLP(L,NY,NX),VOLW(L,NY,NX),GSolbility(idg_CO2,L,NY,NX),trc_solcl(idg_CO2,L,NY,NX),CCO2G(L,NY,NX))
-    call PhasePartition(VOLP(L,NY,NX),VOLW(L,NY,NX),GSolbility(idg_CH4,L,NY,NX),trc_solcl(idg_CH4,L,NY,NX),CCH4G(L,NY,NX))
-    call PhasePartition(VOLP(L,NY,NX),VOLW(L,NY,NX),GSolbility(idg_O2,L,NY,NX),trc_solcl(idg_O2,L,NY,NX),COXYG(L,NY,NX))
-    call PhasePartition(VOLP(L,NY,NX),VOLW(L,NY,NX),GSolbility(idg_N2,L,NY,NX),trc_solcl(idg_N2,L,NY,NX),CZ2GG(L,NY,NX))
-    call PhasePartition(VOLP(L,NY,NX),VOLW(L,NY,NX),GSolbility(idg_N2O,L,NY,NX),trc_solcl(idg_N2O,L,NY,NX),CZ2OG(L,NY,NX))
-    call PhasePartition(VOLP(L,NY,NX),VOLW(L,NY,NX),GSolbility(idg_NH3,L,NY,NX),trc_solcl(idg_NH3,L,NY,NX),CNH3G(L,NY,NX))
-    call PhasePartition(VOLP(L,NY,NX),VOLW(L,NY,NX),GSolbility(idg_H2,L,NY,NX),trc_solcl(idg_H2,L,NY,NX),CH2GG(L,NY,NX))
-
+    DO NTG=idg_beg,idg_end-1
+      call PhasePartition(VOLP(L,NY,NX),VOLW(L,NY,NX),GSolbility(NTG,L,NY,NX),&
+        trc_solcl(NTG,L,NY,NX),trc_gascl(NTG,L,NY,NX))
+    ENDDO
   ENDDO
 
   end subroutine ForceGasAquaEquil
