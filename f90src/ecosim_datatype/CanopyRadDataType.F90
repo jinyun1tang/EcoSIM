@@ -5,17 +5,17 @@ module CanopyRadDataType
   implicit none
   public
   character(len=*),private, parameter :: mod_filename = __FILE__
-  real(r8),allocatable :: ZSIN(:)                        !sine of leaf angle	-
-  real(r8),allocatable :: ZCOS(:)                        !cosine of leaf angle	-
-  real(r8),allocatable :: OMEGA(:,:,:)                   !sine of indirect sky radiation on leaf surface
-  real(r8),allocatable :: OMEGX(:,:,:)                   !sine of indirect sky radiation on leaf surface/sine of indirect sky radiation
-  integer,allocatable :: IALBY(:,:,:)                    !flag for calculating backscattering of radiation in canopy
-  real(r8), allocatable :: PARDIF(:,:,:,:,:,:)           !diffuse incoming PAR, [umol m-2 s-1]
-  real(r8), allocatable :: PAR(:,:,:,:,:,:)              !direct incoming PAR, [umol m-2 s-1]
-  real(r8), allocatable :: CLASS(:,:,:,:)                !fractionction of leaves in different angle classes, [-]
-  real(r8), allocatable :: SURF(:,:,:,:,:,:,:)           !leaf surface area, [m2 d-2]
-  real(r8), allocatable :: SURFX(:,:,:,:,:,:,:)          !leaf irradiated surface area, [m2 d-2]
-  real(r8), allocatable :: SURFB(:,:,:,:,:,:)            !stem surface area, [m2 d-2]
+  real(r8),target,allocatable :: ZSIN(:)                        !sine of leaf angle	-
+  real(r8),target,allocatable :: ZCOS(:)                        !cosine of leaf angle	-
+  real(r8),target,allocatable :: OMEGA(:,:,:)                   !sine of indirect sky radiation on leaf surface
+  real(r8),target,allocatable :: OMEGX(:,:,:)                   !sine of indirect sky radiation on leaf surface/sine of indirect sky radiation
+  integer,target,allocatable :: IALBY(:,:,:)                    !flag for calculating backscattering of radiation in canopy
+  real(r8),target,allocatable :: PARDIF(:,:,:,:,:,:)           !diffuse incoming PAR, [umol m-2 s-1]
+  real(r8),target,allocatable :: PAR(:,:,:,:,:,:)              !direct incoming PAR, [umol m-2 s-1]
+  real(r8),target,allocatable :: CLASS(:,:,:,:)                !fractionction of leaves in different angle classes, [-]
+  real(r8),target,allocatable :: SURF(:,:,:,:,:,:,:)           !leaf surface area, [m2 d-2]
+  real(r8),target,allocatable :: SURFX(:,:,:,:,:,:,:)          !leaf irradiated surface area, [m2 d-2]
+  real(r8),target,allocatable :: SURFB(:,:,:,:,:,:)            !stem surface area, [m2 d-2]
 
   real(r8) :: TYSIN
   real(r8) :: dangle

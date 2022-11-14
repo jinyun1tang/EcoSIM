@@ -7,25 +7,25 @@ module SurfLitterDataType
   save
   character(len=*), private, parameter :: mod_filename = __FILE__
 
-  real(r8) , pointer ::   BKRS(:)                              !surface litter bulk density	[Mg m-3]
-  real(r8) , pointer ::   PARR(:,:)                        !surface litter boundary layer conductance, [m t-1]
-  integer  , pointer ::   IXTYP(:,:,:)                     !surface litter type:1=plant,2=manure
-  real(r8) , pointer ::   XCORP(:,:)                       !factor for surface litter incorporation and soil mixing
-  real(r8) , pointer ::   FLWRM(:,:,:)                     !water transfer between soil surface and surface litter, [g d-2 t-1]
-  real(r8) , pointer ::   FLQRM(:,:,:)                     !meltwater flux into surface litter, [m3 d-2 h-1]
-  real(r8) , pointer ::   CVRD(:,:)                        !fraction of soil surface covered by surface litter, [-]
-  real(r8) , pointer ::   HFLWR(:,:)                       !net heat transfer to surface litter, [MJ d-2 t-1]
-  real(r8) , pointer ::   VOLR(:,:)                        !surface litter volume, [m3 d-2]
-  real(r8) , pointer ::   VHCPRX(:,:)                      !surface litter heat capacity from previous time step, [MJ d-2 K-1]
-  real(r8) , pointer ::   VOLWRX(:,:)                      !surface litter water holding capacity, [m3 d-2]
-  real(r8) , pointer ::   FLWR(:,:)                        !net water transfer to surface litter, [MJ d-2 t-1]
-  real(r8) , pointer ::   THAWR(:,:)                       !freeze (-ve) - thaw (+ve) in surface litter, [m3 d-2 h-1]
-  real(r8) , pointer ::   HTHAWR(:,:)                      !latent heat of freeze (-ve) - thaw (+ve) in surface litter, [MJ d-2 h-1]
-  real(r8) , pointer ::   FLQRQ(:,:)                       !precipitation flux into surface litter, [m3 d-2 h-1]
-  real(r8) , pointer ::   FLQRI(:,:)                       !irrigation flux into surface litter, [m3 d-2 h-1]
-  real(r8) , pointer ::   POROS0(:,:)                      !litter porosity
-  real(r8) , pointer ::   RC0(:,:,:)                       !surface litter in each complex	g d-2
-  real(r8), pointer ::  RC0ff(:,:)
+  real(r8) ,target,allocatable ::   BKRS(:)                              !surface litter bulk density	[Mg m-3]
+  real(r8) ,target,allocatable ::   PARR(:,:)                        !surface litter boundary layer conductance, [m t-1]
+  integer  ,target,allocatable ::   IXTYP(:,:,:)                     !surface litter type:1=plant,2=manure
+  real(r8) ,target,allocatable ::   XCORP(:,:)                       !factor for surface litter incorporation and soil mixing
+  real(r8) ,target,allocatable ::   FLWRM(:,:,:)                     !water transfer between soil surface and surface litter, [g d-2 t-1]
+  real(r8) ,target,allocatable ::   FLQRM(:,:,:)                     !meltwater flux into surface litter, [m3 d-2 h-1]
+  real(r8) ,target,allocatable ::   CVRD(:,:)                        !fraction of soil surface covered by surface litter, [-]
+  real(r8) ,target,allocatable ::   HFLWR(:,:)                       !net heat transfer to surface litter, [MJ d-2 t-1]
+  real(r8) ,target,allocatable ::   VOLR(:,:)                        !surface litter volume, [m3 d-2]
+  real(r8) ,target,allocatable ::   VHCPRX(:,:)                      !surface litter heat capacity from previous time step, [MJ d-2 K-1]
+  real(r8) ,target,allocatable ::   VOLWRX(:,:)                      !surface litter water holding capacity, [m3 d-2]
+  real(r8) ,target,allocatable ::   FLWR(:,:)                        !net water transfer to surface litter, [MJ d-2 t-1]
+  real(r8) ,target,allocatable ::   THAWR(:,:)                       !freeze (-ve) - thaw (+ve) in surface litter, [m3 d-2 h-1]
+  real(r8) ,target,allocatable ::   HTHAWR(:,:)                      !latent heat of freeze (-ve) - thaw (+ve) in surface litter, [MJ d-2 h-1]
+  real(r8) ,target,allocatable ::   FLQRQ(:,:)                       !precipitation flux into surface litter, [m3 d-2 h-1]
+  real(r8) ,target,allocatable ::   FLQRI(:,:)                       !irrigation flux into surface litter, [m3 d-2 h-1]
+  real(r8) ,target,allocatable ::   POROS0(:,:)                      !litter porosity
+  real(r8) ,target,allocatable ::   RC0(:,:,:)                       !surface litter in each complex	g d-2
+  real(r8),target,allocatable ::  RC0ff(:,:)
 
   private :: InitAllocate
   contains

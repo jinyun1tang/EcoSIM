@@ -1843,8 +1843,8 @@ module Hour1Mod
   integer :: LFDPTH = 0
 !     begin_execution
 
-  DO 8990 NX=NHW,NHE
-    DO 8995 NY=NVN,NVS
+  D8990: DO NX=NHW,NHE
+    D8995: DO NY=NVN,NVS
       IF(J.EQ.INT(ZNOON(NY,NX)))THEN
 
         call ApplyMineralFertilizer(I,J,NY,NX,LFDPTH,OFC,OFN,OFP)
@@ -1858,8 +1858,8 @@ module Hour1Mod
 
       ENDIF
 
-8995  CONTINUE
-8990  CONTINUE
+    ENDDO D8995
+  ENDDO D8990
   end subroutine ApplyFertilizerAtNoon
 !------------------------------------------------------------------------------------------
 

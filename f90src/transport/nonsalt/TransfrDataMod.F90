@@ -349,12 +349,6 @@ implicit none
   real(r8), pointer ::  RQROC(:,:,:,:,:)                   !
   real(r8), pointer ::  RQRON(:,:,:,:,:)                   !
 
-  real(r8), pointer ::  CGSGL2(:,:,:)                      !
-  real(r8), pointer ::  CHSGL2(:,:,:)                      !
-  real(r8), pointer ::  OGSGL2(:,:,:)                      !
-  real(r8), pointer ::  ZGSGL2(:,:,:)                      !
-  real(r8), pointer ::  Z2SGL2(:,:,:)                      !
-  real(r8), pointer ::  ZHSGL2(:,:,:)                      !
 
   real(r8), pointer ::  ZNH4H2(:,:,:)                      !
   real(r8), pointer ::  ZN4BH2(:,:,:)                      !
@@ -596,7 +590,7 @@ contains
   allocate(TH1BFB(JZ,JY,JX));   TH1BFB=0._r8
 
   allocate(GasDifcc(idg_beg:idg_end,JZ,JY,JX))
-  allocate(SolDifcc(ids_beg:ids_end,JZ,JY,JX))
+  allocate(SolDifcc(ids_beg:ids_end,0:JZ,JY,JX));SolDifcc=0._r8
   allocate(DifuscG(idg_beg:idg_end,3,JZ,JY,JX)); DifuscG=0._r8
   allocate(DCO2G(3,JZ,JY,JX));  DCO2G=0._r8
   allocate(DCH4G(3,JZ,JY,JX));  DCH4G=0._r8
@@ -760,12 +754,7 @@ contains
   allocate(RQROC(1:jcplx,2,2,JV,JH));RQROC=0._r8
   allocate(RQRON(1:jcplx,2,2,JV,JH));RQRON=0._r8
 
-  allocate(CGSGL2(JZ,JY,JX));   CGSGL2=0._r8
-  allocate(CHSGL2(JZ,JY,JX));   CHSGL2=0._r8
-  allocate(OGSGL2(JZ,JY,JX));   OGSGL2=0._r8
-  allocate(ZGSGL2(JZ,JY,JX));   ZGSGL2=0._r8
-  allocate(Z2SGL2(JZ,JY,JX));   Z2SGL2=0._r8
-  allocate(ZHSGL2(JZ,JY,JX));   ZHSGL2=0._r8
+
   allocate(ZNH4H2(JZ,JY,JX));   ZNH4H2=0._r8
   allocate(ZN4BH2(JZ,JY,JX));   ZN4BH2=0._r8
   allocate(ZNH3H2(JZ,JY,JX));   ZNH3H2=0._r8
@@ -845,7 +834,7 @@ contains
   allocate(RCOFHS(3,JD,JV,JH)); RCOFHS=0._r8
 
   allocate(R3PoreSoHFlx(ids_beg:ids_end,3,JD,JV,JH));R3PoreSoHFlx=0._r8
-  allocate(R3PoreSolFlx(ids_beg:ids_end,3,JD,JV,JH));R3PoreSolFlx=0._r8
+  allocate(R3PoreSolFlx(ids_beg:ids_end,3,0:JD,JV,JH));R3PoreSolFlx=0._r8
   allocate(RporeSoXFlx(ids_beg:ids_end,JZ,JY,JX));RporeSoXFlx=0._r8
   allocate(R3PorTSolFlx(ids_beg:ids_end,JZ,JY,JX));R3PorTSolFlx=0._r8
   allocate(R3PorTSoHFlx(ids_beg:ids_end,JZ,JY,JX));R3PorTSoHFlx=0._r8
@@ -1167,12 +1156,6 @@ contains
   call destroy(RQROC)
   call destroy(RQRON)
 
-  call destroy(CGSGL2)
-  call destroy(CHSGL2)
-  call destroy(OGSGL2)
-  call destroy(ZGSGL2)
-  call destroy(Z2SGL2)
-  call destroy(ZHSGL2)
 
   call destroy(ZNH4H2)
   call destroy(ZN4BH2)

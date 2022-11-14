@@ -7,86 +7,86 @@ module SoilWaterDataType
   save
   character(len=*), private, parameter :: mod_filename = __FILE__
 
-  real(r8),allocatable ::  THETP(:,:,:)                      !air concentration [m3 m-3]
-  real(r8),allocatable ::  VOLP(:,:,:)                       !soil air content [m3 d-2]
-  real(r8),allocatable ::  THETW(:,:,:)                      !volumetric water content [m3 m-3]
-  real(r8),allocatable ::  THETI(:,:,:)                      !volumetric ice content [m3 m-3]
-  real(r8),allocatable ::  THETWZ(:,:,:)                     !volumetric moblize water [m3 m-3]
-  real(r8),allocatable ::  THETIZ(:,:,:)                     !volumetric mobile ice [m3 m-3]
-  real(r8),allocatable ::  VOLW(:,:,:)                       !soil micropore water content [m3 d-2]
-  real(r8),allocatable ::  VOLI(:,:,:)                       !soil micropore ice content   [m3 d-2]
-  real(r8),allocatable ::  VOLWH(:,:,:)                      !soil macropore water content [m3 d-2]
-  real(r8),allocatable ::  PSISM(:,:,:)                      !soil micropore matric water potential [MPa]
-  real(r8),allocatable ::  PSIST(:,:,:)                      !soil micropore total water potential [MPa]
-  real(r8),allocatable ::  VOLWX(:,:,:)                      !soil micropore water content before wetting front [m3 d-2]
-  real(r8),allocatable ::  FINH(:,:,:)                       !soil macropore - micropore water transfer [m3 d-2 h-1]
-  real(r8),allocatable ::  VOLIH(:,:,:)                      !soil macropore ice content [m3 d-2]
-  real(r8),allocatable ::  VOLWM(:,:,:,:)                    !soil micropore water content, [m3 d-2]
-  real(r8),allocatable ::  VOLWHM(:,:,:,:)                   !soil macropore water content, [m3 d-2]
-  real(r8),allocatable ::  VOLPM(:,:,:,:)                    !soil air content, [m3 d-2]
-  real(r8),allocatable ::  FILM(:,:,:,:)                     !soil water film thickness , [m]
-  real(r8),allocatable ::  DTBLG(:,:)                        !slope of water table relative to surface slope, [-]
-  real(r8),allocatable ::  DTBLDI(:,:)                       !depth of artificial water table
-  real(r8),allocatable ::  DTBLY(:,:)                        !artificial water table depth, [m]
-  real(r8),allocatable ::  DTBLD(:,:)                        !depth of artificial water table adjusted for elevation
-  real(r8),allocatable ::  DPTHT(:,:)                        !internal water table depth, [m]
-  real(r8),allocatable ::  DTBLZ(:,:)                        !external water table depth, [m]
-  real(r8),allocatable ::  DTBLX(:,:)                        !external water table depth, [m]
-  real(r8),allocatable ::  DTBLI(:,:)                        !external water table depth, [m]
-  real(r8),allocatable ::  ENGYPM(:,:,:)                     !total energy impact for erosion
-  real(r8),allocatable ::  XVOLTM(:,:,:)                     !excess water+ice
-  real(r8),allocatable ::  XVOLWM(:,:,:)                     !excess water
-  real(r8),allocatable ::  XVOLIM(:,:,:)                     !excess ice
-  real(r8),allocatable ::  HCND(:,:,:,:,:)                   !saturated hydraulic conductivity
-  real(r8),allocatable ::  CNDH(:,:,:)                       !macropore hydraulic conductivity, [m MPa-1 h-1]
-  real(r8),allocatable ::  CNDU(:,:,:)                       !soil micropore hydraulic conductivity for root water uptake [m MPa-1 h-1]
-  real(r8),allocatable ::  QRM(:,:,:)                        !runoff water flux, [m3 d-2 t-1]
-  real(r8),allocatable ::  QRV(:,:,:)                        !runoff velocity, [m t-1]
-   integer,allocatable ::  IFLBM(:,:,:,:,:)                   !flag for directional surface runoff
-   integer,allocatable ::  IRCHG(:,:,:,:)                     !enables or disables boundary water flux depending on aspect, [-]
-   integer,allocatable ::  IFLBH(:,:,:,:)                     !flag for directional runoff, related to IFLBM
-  real(r8),allocatable ::  RCHGNU(:,:)                       !northern subsurface boundary water flux , [-]
-  real(r8),allocatable ::  RCHGEU(:,:)                       !eastern subsurface boundary water flux , [-]
-  real(r8),allocatable ::  RCHGSU(:,:)                       !southern subsurface boundary water flux , [-]
-  real(r8),allocatable ::  RCHGWU(:,:)                       !western subsurface boundary water flux , [-]
-  real(r8),allocatable ::  RCHGNT(:,:)                       !northern subsurface boundary water flux rate constant, [h-1]
-  real(r8),allocatable ::  RCHGET(:,:)                       !eastern subsurface boundary water flux  rate constant, [h-1]
-  real(r8),allocatable ::  RCHGST(:,:)                       !southern subsurface boundary water flux  rate constant, [h-1]
-  real(r8),allocatable ::  RCHGWT(:,:)                       !western subsurface boundary water flux  rate constant, [h-1]
-  real(r8),allocatable ::  RCHQN(:,:)                        !northern surface boundary water flux , [-]
-  real(r8),allocatable ::  RCHQE(:,:)                        !eastern surface boundary water flux , [-]
-  real(r8),allocatable ::  RCHQS(:,:)                        !southern surface boundary water flux , [-]
-  real(r8),allocatable ::  RCHQW(:,:)                        !western surface boundary water flux , [-]
-  real(r8),allocatable ::  RCHGD(:,:)                        !lower subsurface boundary water flux , [-]
-  real(r8),allocatable ::  FLWM(:,:,:,:,:)                   !micropore water flux, [m3 d-2 t-1]
-  real(r8),allocatable ::  FLWHM(:,:,:,:,:)                  !macropore water flux, [m3 d-2 t-1]
-  real(r8),allocatable ::  FLPM(:,:,:,:)                     !soil air flux, [g d-2 t-1]
-  real(r8),allocatable ::  FINHM(:,:,:,:)                    !soil macropore - micropore water transfer, [g d-2 t-1]
-  real(r8),allocatable ::  FLQSM(:,:,:)                      !meltwater flux into soil micropores
-  real(r8),allocatable ::  FLQHM(:,:,:)                      !meltwater flux into soil macropores
-  real(r8),allocatable ::  THETPM(:,:,:,:)                   !soil air-filled porosity, [m3 m-3]
-  real(r8),allocatable ::  TORT(:,:,:,:)                     !soil tortuosity, []
-  real(r8),allocatable ::  TORTH(:,:,:,:)                    !macropore tortuosity, []
-  real(r8),allocatable ::  DFGS(:,:,:,:)                     !coefficient for dissolution - volatilization, []
-  real(r8),allocatable ::  RSCS(:,:,:)                       !soil hydraulic resistance, [MPa h m-2]
-  real(r8),allocatable ::  PSISE(:,:,:)                      !soil water potential at saturation, [Mpa]
-  real(r8),allocatable ::  PSISA(:,:,:)                      !soil water potential at air entry, [Mpa]
-  real(r8),allocatable ::  PSISO(:,:,:)                      !osmotic soil water potential , [Mpa]
-  real(r8),allocatable ::  PSISH(:,:,:)                      !gravimetric soil water potential , [Mpa]
-  real(r8),allocatable ::  THETY(:,:,:)                      !air-dry water content, [m3 m-3]
-  real(r8),allocatable ::  THETS(:,:,:)                      !micropore class water content
-  real(r8),allocatable ::  FLWX(:,:,:,:)                     !unsaturated water flux , [m3 d-2 h-1]
-  real(r8),allocatable ::  UEVAP(:,:)                        !total evaporation, [m3 d-2]
-  real(r8),allocatable ::  URAIN(:,:)                        !total precipitation, [m3 d-2]
-  real(r8),allocatable ::  URUN(:,:)                         !total surface runoff, [m3 d-2]
-  real(r8),allocatable ::  UVOLW(:,:)                        !total soil water content, [m3 d-2]
-  real(r8),allocatable ::  UVOLO(:,:)                        !total subsurface water flux, [m3 d-2]
-  real(r8),allocatable ::  UDRAIN(:,:)                       !total water drainage below root zone, [m3 d-2]
-  real(r8),allocatable ::  QR(:,:,:,:)                       !soil surface runoff water, [m3 d-2 h-1]
-  real(r8),allocatable ::  HQR(:,:,:,:)                      !soil surface runoff heat, [MJ d-2 h-1]
-  real(r8),allocatable ::  WQRH(:,:)                         !runoff from surface water, [m3 d-2 h-1]
-  real(r8),allocatable ::  HVOLO(:,:)                        !water discharge, [m3 d-2 h-1]
-  real(r8),allocatable ::  QRMN(:,:,:,:,:)                   !surface runoff,
+  real(r8),target,allocatable ::  THETP(:,:,:)                      !air concentration [m3 m-3]
+  real(r8),target,allocatable ::  VOLP(:,:,:)                       !soil air content [m3 d-2]
+  real(r8),target,allocatable ::  THETW(:,:,:)                      !volumetric water content [m3 m-3]
+  real(r8),target,allocatable ::  THETI(:,:,:)                      !volumetric ice content [m3 m-3]
+  real(r8),target,allocatable ::  THETWZ(:,:,:)                     !volumetric moblize water [m3 m-3]
+  real(r8),target,allocatable ::  THETIZ(:,:,:)                     !volumetric mobile ice [m3 m-3]
+  real(r8),target,allocatable ::  VOLW(:,:,:)                       !soil micropore water content [m3 d-2]
+  real(r8),target,allocatable ::  VOLI(:,:,:)                       !soil micropore ice content   [m3 d-2]
+  real(r8),target,allocatable ::  VOLWH(:,:,:)                      !soil macropore water content [m3 d-2]
+  real(r8),target,allocatable ::  PSISM(:,:,:)                      !soil micropore matric water potential [MPa]
+  real(r8),target,allocatable ::  PSIST(:,:,:)                      !soil micropore total water potential [MPa]
+  real(r8),target,allocatable ::  VOLWX(:,:,:)                      !soil micropore water content before wetting front [m3 d-2]
+  real(r8),target,allocatable ::  FINH(:,:,:)                       !soil macropore - micropore water transfer [m3 d-2 h-1]
+  real(r8),target,allocatable ::  VOLIH(:,:,:)                      !soil macropore ice content [m3 d-2]
+  real(r8),target,allocatable ::  VOLWM(:,:,:,:)                    !soil micropore water content, [m3 d-2]
+  real(r8),target,allocatable ::  VOLWHM(:,:,:,:)                   !soil macropore water content, [m3 d-2]
+  real(r8),target,allocatable ::  VOLPM(:,:,:,:)                    !soil air content, [m3 d-2]
+  real(r8),target,allocatable ::  FILM(:,:,:,:)                     !soil water film thickness , [m]
+  real(r8),target,allocatable ::  DTBLG(:,:)                        !slope of water table relative to surface slope, [-]
+  real(r8),target,allocatable ::  DTBLDI(:,:)                       !depth of artificial water table
+  real(r8),target,allocatable ::  DTBLY(:,:)                        !artificial water table depth, [m]
+  real(r8),target,allocatable ::  DTBLD(:,:)                        !depth of artificial water table adjusted for elevation
+  real(r8),target,allocatable ::  DPTHT(:,:)                        !internal water table depth, [m]
+  real(r8),target,allocatable ::  DTBLZ(:,:)                        !external water table depth, [m]
+  real(r8),target,allocatable ::  DTBLX(:,:)                        !external water table depth, [m]
+  real(r8),target,allocatable ::  DTBLI(:,:)                        !external water table depth, [m]
+  real(r8),target,allocatable ::  ENGYPM(:,:,:)                     !total energy impact for erosion
+  real(r8),target,allocatable ::  XVOLTM(:,:,:)                     !excess water+ice
+  real(r8),target,allocatable ::  XVOLWM(:,:,:)                     !excess water
+  real(r8),target,allocatable ::  XVOLIM(:,:,:)                     !excess ice
+  real(r8),target,allocatable ::  HCND(:,:,:,:,:)                   !saturated hydraulic conductivity
+  real(r8),target,allocatable ::  CNDH(:,:,:)                       !macropore hydraulic conductivity, [m MPa-1 h-1]
+  real(r8),target,allocatable ::  CNDU(:,:,:)                       !soil micropore hydraulic conductivity for root water uptake [m MPa-1 h-1]
+  real(r8),target,allocatable ::  QRM(:,:,:)                        !runoff water flux, [m3 d-2 t-1]
+  real(r8),target,allocatable ::  QRV(:,:,:)                        !runoff velocity, [m t-1]
+   integer,target,allocatable ::  IFLBM(:,:,:,:,:)                   !flag for directional surface runoff
+   integer,target,allocatable ::  IRCHG(:,:,:,:)                     !enables or disables boundary water flux depending on aspect, [-]
+   integer,target,allocatable ::  IFLBH(:,:,:,:)                     !flag for directional runoff, related to IFLBM
+  real(r8),target,allocatable ::  RCHGNU(:,:)                       !northern subsurface boundary water flux , [-]
+  real(r8),target,allocatable ::  RCHGEU(:,:)                       !eastern subsurface boundary water flux , [-]
+  real(r8),target,allocatable ::  RCHGSU(:,:)                       !southern subsurface boundary water flux , [-]
+  real(r8),target,allocatable ::  RCHGWU(:,:)                       !western subsurface boundary water flux , [-]
+  real(r8),target,allocatable ::  RCHGNT(:,:)                       !northern subsurface boundary water flux rate constant, [h-1]
+  real(r8),target,allocatable ::  RCHGET(:,:)                       !eastern subsurface boundary water flux  rate constant, [h-1]
+  real(r8),target,allocatable ::  RCHGST(:,:)                       !southern subsurface boundary water flux  rate constant, [h-1]
+  real(r8),target,allocatable ::  RCHGWT(:,:)                       !western subsurface boundary water flux  rate constant, [h-1]
+  real(r8),target,allocatable ::  RCHQN(:,:)                        !northern surface boundary water flux , [-]
+  real(r8),target,allocatable ::  RCHQE(:,:)                        !eastern surface boundary water flux , [-]
+  real(r8),target,allocatable ::  RCHQS(:,:)                        !southern surface boundary water flux , [-]
+  real(r8),target,allocatable ::  RCHQW(:,:)                        !western surface boundary water flux , [-]
+  real(r8),target,allocatable ::  RCHGD(:,:)                        !lower subsurface boundary water flux , [-]
+  real(r8),target,allocatable ::  FLWM(:,:,:,:,:)                   !micropore water flux, [m3 d-2 t-1]
+  real(r8),target,allocatable ::  FLWHM(:,:,:,:,:)                  !macropore water flux, [m3 d-2 t-1]
+  real(r8),target,allocatable ::  FLPM(:,:,:,:)                     !soil air flux, [g d-2 t-1]
+  real(r8),target,allocatable ::  FINHM(:,:,:,:)                    !soil macropore - micropore water transfer, [g d-2 t-1]
+  real(r8),target,allocatable ::  FLQSM(:,:,:)                      !meltwater flux into soil micropores
+  real(r8),target,allocatable ::  FLQHM(:,:,:)                      !meltwater flux into soil macropores
+  real(r8),target,allocatable ::  THETPM(:,:,:,:)                   !soil air-filled porosity, [m3 m-3]
+  real(r8),target,allocatable ::  TORT(:,:,:,:)                     !soil tortuosity, []
+  real(r8),target,allocatable ::  TORTH(:,:,:,:)                    !macropore tortuosity, []
+  real(r8),target,allocatable ::  DFGS(:,:,:,:)                     !coefficient for dissolution - volatilization, []
+  real(r8),target,allocatable ::  RSCS(:,:,:)                       !soil hydraulic resistance, [MPa h m-2]
+  real(r8),target,allocatable ::  PSISE(:,:,:)                      !soil water potential at saturation, [Mpa]
+  real(r8),target,allocatable ::  PSISA(:,:,:)                      !soil water potential at air entry, [Mpa]
+  real(r8),target,allocatable ::  PSISO(:,:,:)                      !osmotic soil water potential , [Mpa]
+  real(r8),target,allocatable ::  PSISH(:,:,:)                      !gravimetric soil water potential , [Mpa]
+  real(r8),target,allocatable ::  THETY(:,:,:)                      !air-dry water content, [m3 m-3]
+  real(r8),target,allocatable ::  THETS(:,:,:)                      !micropore class water content
+  real(r8),target,allocatable ::  FLWX(:,:,:,:)                     !unsaturated water flux , [m3 d-2 h-1]
+  real(r8),target,allocatable ::  UEVAP(:,:)                        !total evaporation, [m3 d-2]
+  real(r8),target,allocatable ::  URAIN(:,:)                        !total precipitation, [m3 d-2]
+  real(r8),target,allocatable ::  URUN(:,:)                         !total surface runoff, [m3 d-2]
+  real(r8),target,allocatable ::  UVOLW(:,:)                        !total soil water content, [m3 d-2]
+  real(r8),target,allocatable ::  UVOLO(:,:)                        !total subsurface water flux, [m3 d-2]
+  real(r8),target,allocatable ::  UDRAIN(:,:)                       !total water drainage below root zone, [m3 d-2]
+  real(r8),target,allocatable ::  QR(:,:,:,:)                       !soil surface runoff water, [m3 d-2 h-1]
+  real(r8),target,allocatable ::  HQR(:,:,:,:)                      !soil surface runoff heat, [MJ d-2 h-1]
+  real(r8),target,allocatable ::  WQRH(:,:)                         !runoff from surface water, [m3 d-2 h-1]
+  real(r8),target,allocatable ::  HVOLO(:,:)                        !water discharge, [m3 d-2 h-1]
+  real(r8),target,allocatable ::  QRMN(:,:,:,:,:)                   !surface runoff,
   private :: InitAllocate
   contains
 

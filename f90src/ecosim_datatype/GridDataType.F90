@@ -10,30 +10,30 @@ implicit none
   integer :: NPX                  !number of E-W grid cells
   integer :: NPY                  !number of N-S grid cells
   real(r8) :: TAREA               !total area of landscape	[m2]
-  real(r8),allocatable ::  CDPTH(:,:,:)                       !depth to bottom of soil layer [m]
-  real(r8),allocatable ::  DLYR(:,:,:,:)                      !thickness of soil layer [m]
-  real(r8),allocatable ::  DLYRI(:,:,:,:)                     !thickness of soil layer [m]
-  real(r8),allocatable ::  XDPTH(:,:,:,:)                     !cross-sectional area / distance between adjacent grid cells [m]
-  real(r8),allocatable ::  DPTH(:,:,:)                        !depth to middle of soil layer [m]
-  real(r8),allocatable ::  CDPTHZ(:,:,:)                      !depth to bottom of soil layer from  surface of grid cell [m]
-  real(r8),allocatable ::  DPTHZ(:,:,:)                       !depth to middle of soil layer from  surface of grid cell [m]
-  real(r8),allocatable ::  AREA(:,:,:,:)                      !cross-sectional area  [m2 d-2]
-  real(r8),allocatable ::  DIST(:,:,:,:)                      !distance between adjacent layers:1=EW,2=NS,3=vertical [m]
-  integer,allocatable ::  NU(:,:)                             !soil surface layer number
-  integer,allocatable ::  NUI(:,:)                            !initial soil surface layer number
-  integer,allocatable ::  NJ(:,:)                             !maximum root layer number
-  integer,allocatable ::  NK(:,:)                             !additional soil lower boundary layers
-  integer,allocatable ::  NLI(:,:)                            !initial lowest soil layer number
-  integer,allocatable ::  NL(:,:)                             !lowest soil layer number
-  integer,allocatable ::  NUM(:,:)                            !new surface layer number
-  real(r8),allocatable ::  CDPTHI(:,:)                        !initial depth to bottom of soil layer [m]
-  REAL(R8),allocatable ::  ALAT(:,:)                          !latitude	[degrees]
-  real(r8),allocatable ::  DH(:,:)                            !number of EW grid cells, [-]
-  real(r8),allocatable ::  DV(:,:)                            !number of EW grid cells, [-]
-  integer,allocatable ::  NCN(:,:)                            !number of dimensions for grid cell connections
-  integer,allocatable ::  LSG(:,:,:)                          !match PFT from different scenarios
-  integer,allocatable ::  NP(:,:)                             !number of plant species
-  integer,allocatable ::  NP0(:,:)                            !intitial number of plant species
+  real(r8),target,allocatable ::  CDPTH(:,:,:)                       !depth to bottom of soil layer [m]
+  real(r8),target,allocatable ::  DLYR(:,:,:,:)                      !thickness of soil layer [m]
+  real(r8),target,allocatable ::  DLYRI(:,:,:,:)                     !thickness of soil layer [m]
+  real(r8),target,allocatable ::  XDPTH(:,:,:,:)                     !cross-sectional area / distance between adjacent grid cells [m]
+  real(r8),target,allocatable ::  DPTH(:,:,:)                        !depth to middle of soil layer [m]
+  real(r8),target,allocatable ::  CDPTHZ(:,:,:)                      !depth to bottom of soil layer from  surface of grid cell [m]
+  real(r8),target,allocatable ::  DPTHZ(:,:,:)                       !depth to middle of soil layer from  surface of grid cell [m]
+  real(r8),target,allocatable ::  AREA(:,:,:,:)                      !cross-sectional area  [m2 d-2]
+  real(r8),target,allocatable ::  DIST(:,:,:,:)                      !distance between adjacent layers:1=EW,2=NS,3=vertical [m]
+  integer,target,allocatable ::  NU(:,:)                             !soil surface layer number
+  integer,target,allocatable ::  NUI(:,:)                            !initial soil surface layer number
+  integer,target,allocatable ::  NJ(:,:)                             !maximum root layer number
+  integer,target,allocatable ::  NK(:,:)                             !additional soil lower boundary layers
+  integer,target,allocatable ::  NLI(:,:)                            !initial lowest soil layer number
+  integer,target,allocatable ::  NL(:,:)                             !lowest soil layer number
+  integer,target,allocatable ::  NUM(:,:)                            !new surface layer number
+  real(r8),target,allocatable ::  CDPTHI(:,:)                        !initial depth to bottom of soil layer [m]
+  REAL(R8),target,allocatable ::  ALAT(:,:)                          !latitude	[degrees]
+  real(r8),target,allocatable ::  DH(:,:)                            !number of EW grid cells, [-]
+  real(r8),target,allocatable ::  DV(:,:)                            !number of EW grid cells, [-]
+  integer,target,allocatable ::  NCN(:,:)                            !number of dimensions for grid cell connections
+  integer,target,allocatable ::  LSG(:,:,:)                          !match PFT from different scenarios
+  integer,target,allocatable ::  NP(:,:)                             !number of plant species
+  integer,target,allocatable ::  NP0(:,:)                            !intitial number of plant species
 !----------------------------------------------------------------------
 
 contains

@@ -7,23 +7,23 @@ module FertilizerDataType
   character(len=*), private, parameter :: mod_filename = __FILE__
 
 
-  real(r8),allocatable :: ZNH4FA(:,:,:)
-  real(r8),allocatable :: ZNH3FA(:,:,:)
-  real(r8),allocatable :: ZNHUFA(:,:,:)
-  real(r8),allocatable :: ZNO3FA(:,:,:)
-  real(r8),allocatable :: ZNH4FB(:,:,:)
-  real(r8),allocatable :: ZNH3FB(:,:,:)
-  real(r8),allocatable :: ZNHUFB(:,:,:)
-  real(r8),allocatable :: ZNO3FB(:,:,:)
+  real(r8),target,allocatable :: ZNH4FA(:,:,:)
+  real(r8),target,allocatable :: ZNH3FA(:,:,:)
+  real(r8),target,allocatable :: ZNHUFA(:,:,:)
+  real(r8),target,allocatable :: ZNO3FA(:,:,:)
+  real(r8),target,allocatable :: ZNH4FB(:,:,:)
+  real(r8),target,allocatable :: ZNH3FB(:,:,:)
+  real(r8),target,allocatable :: ZNHUFB(:,:,:)
+  real(r8),target,allocatable :: ZNO3FB(:,:,:)
 
-  real(r8),allocatable :: DCORP(:,:,:)                  !soil mixing fraction with tillage, [-]
-  real(r8),allocatable :: FERT(:,:,:,:)                !fertilizer application, [g m-2]
-  real(r8),allocatable :: FDPTH(:,:,:)                  !depth of fertilizer application, [m]
-  real(r8),allocatable :: ROWI(:,:,:)                   !row spacing of fertilizer band, [m]
+  real(r8),target,allocatable :: DCORP(:,:,:)                  !soil mixing fraction with tillage, [-]
+  real(r8),target,allocatable :: FERT(:,:,:,:)                !fertilizer application, [g m-2]
+  real(r8),target,allocatable :: FDPTH(:,:,:)                  !depth of fertilizer application, [m]
+  real(r8),target,allocatable :: ROWI(:,:,:)                   !row spacing of fertilizer band, [m]
 
-  real(r8), allocatable :: ROWN(:,:)                       !row spacing of NH4 fertilizer band, [m]
-  real(r8), allocatable :: ROWO(:,:)                       !row spacing of NO3 fertilizer band, [m]
-  real(r8), allocatable :: ROWP(:,:)                       !row spacing of PO4 fertilizer band, [m]
+  real(r8),target,allocatable :: ROWN(:,:)                       !row spacing of NH4 fertilizer band, [m]
+  real(r8),target,allocatable :: ROWO(:,:)                       !row spacing of NO3 fertilizer band, [m]
+  real(r8),target,allocatable :: ROWP(:,:)                       !row spacing of PO4 fertilizer band, [m]
 
   private :: InitAllocate
 

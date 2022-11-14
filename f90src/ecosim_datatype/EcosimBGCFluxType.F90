@@ -10,27 +10,27 @@ module EcosimBGCFluxType
   save
   character(len=*), private, parameter :: mod_filename = __FILE__
 
-  real(r8),allocatable ::  TCAN(:,:)                          !total net CO2 fixation
-  real(r8),allocatable ::  TRN(:,:)                           !ecosystem net radiation, [MJ d-2 h-1]
-  real(r8),allocatable ::  TLE(:,:)                           !ecosystem latent heat flux, [MJ d-2 h-1]
-  real(r8),allocatable ::  TSH(:,:)                           !ecosystem sensible heat flux, [MJ d-2 h-1]
-  real(r8),allocatable ::  TGH(:,:)                           !ecosystem storage heat flux, [MJ d-2 h-1]
-  real(r8),allocatable ::  TGPP(:,:)                          !ecosystem GPP, [g d-2 h-1]
-  real(r8),allocatable ::  TRAU(:,:)                          !ecosystem autotrophic respiration, [g d-2 h-1]
-  real(r8),allocatable ::  TNPP(:,:)                          !ecosystem NPP, [g d-2 h-1]
-  real(r8),allocatable ::  THRE(:,:)                          !ecosystem heterotrophic respiration, [g d-2 h-1]
-  real(r8),allocatable ::  XHVSTE(:,:,:)                      !ecosystem harvest , [g d-2]
-  real(r8),allocatable ::  TRINH4(:,:)                        !total NH4 net mineraln (-ve) or immobiln (+ve)
-  real(r8),allocatable ::  TRIPO4(:,:)                        !total H2PO4 net mineraln (-ve) or immobiln (+ve)
-  real(r8),allocatable ::  GPP(:,:)                           !gross primary productivity, [g d-2 h-1]
-  real(r8),allocatable ::  TCCAN(:,:)                         !total net CO2 fixation
-  real(r8),allocatable ::  ZESNC(:,:,:)                       !total litterfall element, [g d-2 h-1]
-  real(r8),allocatable ::  RECO(:,:)                          !ecosystem respiration, [g d-2 h-1]
-  real(r8),allocatable ::  TNBP(:,:)                          !total NBP, [g d-2]
-  real(r8),allocatable ::  RP14X(:,:,:)                       !HPO4 demand in non-band by all microbial,root,myco populations
-  real(r8),allocatable ::  RP14Y(:,:,:)                       !HPO4 demand in non-band by all microbial,root,myco populations
-  real(r8),allocatable ::  RP1BX(:,:,:)                       !HPO4 demand in band by all microbial,root,myco populations
-  real(r8),allocatable ::  RP1BY(:,:,:)                       !HPO4 demand in band by all microbial,root,myco populations
+  real(r8),target,allocatable ::  TCAN(:,:)                          !total net CO2 fixation
+  real(r8),target,allocatable ::  TRN(:,:)                           !ecosystem net radiation, [MJ d-2 h-1]
+  real(r8),target,allocatable ::  TLE(:,:)                           !ecosystem latent heat flux, [MJ d-2 h-1]
+  real(r8),target,allocatable ::  TSH(:,:)                           !ecosystem sensible heat flux, [MJ d-2 h-1]
+  real(r8),target,allocatable ::  TGH(:,:)                           !ecosystem storage heat flux, [MJ d-2 h-1]
+  real(r8),target,allocatable ::  TGPP(:,:)                          !ecosystem GPP, [g d-2 h-1]
+  real(r8),target,allocatable ::  TRAU(:,:)                          !ecosystem autotrophic respiration, [g d-2 h-1]
+  real(r8),target,allocatable ::  TNPP(:,:)                          !ecosystem NPP, [g d-2 h-1]
+  real(r8),target,allocatable ::  THRE(:,:)                          !ecosystem heterotrophic respiration, [g d-2 h-1]
+  real(r8),target,allocatable ::  XHVSTE(:,:,:)                      !ecosystem harvest , [g d-2]
+  real(r8),target,allocatable ::  TRINH4(:,:)                        !total NH4 net mineraln (-ve) or immobiln (+ve)
+  real(r8),target,allocatable ::  TRIPO4(:,:)                        !total H2PO4 net mineraln (-ve) or immobiln (+ve)
+  real(r8),target,allocatable ::  GPP(:,:)                           !gross primary productivity, [g d-2 h-1]
+  real(r8),target,allocatable ::  TCCAN(:,:)                         !total net CO2 fixation
+  real(r8),target,allocatable ::  ZESNC(:,:,:)                       !total litterfall element, [g d-2 h-1]
+  real(r8),target,allocatable ::  RECO(:,:)                          !ecosystem respiration, [g d-2 h-1]
+  real(r8),target,allocatable ::  TNBP(:,:)                          !total NBP, [g d-2]
+  real(r8),target,allocatable ::  RP14X(:,:,:)                       !HPO4 demand in non-band by all microbial,root,myco populations
+  real(r8),target,allocatable ::  RP14Y(:,:,:)                       !HPO4 demand in non-band by all microbial,root,myco populations
+  real(r8),target,allocatable ::  RP1BX(:,:,:)                       !HPO4 demand in band by all microbial,root,myco populations
+  real(r8),target,allocatable ::  RP1BY(:,:,:)                       !HPO4 demand in band by all microbial,root,myco populations
 !----------------------------------------------------------------------
 
 contains

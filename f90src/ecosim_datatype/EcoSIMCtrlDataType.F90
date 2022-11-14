@@ -8,11 +8,11 @@ module EcoSIMCtrlDataType
   public
   real(r8) :: ZERO
   real(r8) :: ZERO2
-  real(r8), allocatable :: ZEROS(:,:)
-  real(r8), allocatable :: ZEROP(:,:,:)
-  real(r8), allocatable :: ZEROQ(:,:,:)
-  real(r8), allocatable :: ZEROL(:,:,:)
-  real(r8), allocatable :: ZEROS2(:,:)
+  real(r8),target,allocatable :: ZEROS(:,:)
+  real(r8),target,allocatable :: ZEROP(:,:,:)
+  real(r8),target,allocatable :: ZEROQ(:,:,:)
+  real(r8),target,allocatable :: ZEROL(:,:,:)
+  real(r8),target,allocatable :: ZEROS2(:,:)
 
   integer :: IGO             !flag for first scenario
   integer :: IDAYR           !day of recovery from earlier run
