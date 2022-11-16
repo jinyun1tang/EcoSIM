@@ -88,8 +88,8 @@ module RedistMod
   VOLPT=0.0_r8
   VOLTT=0.0_r8
 
-  DO 9995 NX=NHW,NHE
-    DO 9990 NY=NVN,NVS
+  D9995: DO NX=NHW,NHE
+    D9990: DO NY=NVN,NVS
       TXCO2(NY,NX)=0.0_r8
       DORGE(NY,NX)=0.0_r8
       WQRH(NY,NX)=0.0_r8
@@ -140,8 +140,8 @@ module RedistMod
 2221    FORMAT(A8,5I6,21E14.6)
       ENDIF
 
-9990  CONTINUE
-9995  CONTINUE
+    ENDDO D9990
+  ENDDO D9995
   RETURN
 
   END subroutine redist
@@ -223,29 +223,29 @@ module RedistMod
     UVOLW(NY,NX)=UVOLW(NY,NX)+WS
     ENGYW=VHCPW(L,NY,NX)*TKW(L,NY,NX)
     HEATSO=HEATSO+ENGYW
-    TLCO2G=TLCO2G+CO2W(L,NY,NX)+CH4W(L,NY,NX)
-    UCO2S(NY,NX)=UCO2S(NY,NX)+CO2W(L,NY,NX)+CH4W(L,NY,NX)
-    OXYGSO=OXYGSO+OXYW(L,NY,NX)
-    TLN2G=TLN2G+ZNGW(L,NY,NX)+ZN2W(L,NY,NX)
-    TLNH4=TLNH4+ZN4W(L,NY,NX)+ZN3W(L,NY,NX)
-    TLNO3=TLNO3+ZNOW(L,NY,NX)
-    TLPO4=TLPO4+Z1PW(L,NY,NX)+ZHPW(L,NY,NX)
+    TLCO2G=TLCO2G+trcg_solsml(idg_CO2,L,NY,NX)+trcg_solsml(idg_CH4,L,NY,NX)
+    UCO2S(NY,NX)=UCO2S(NY,NX)+trcg_solsml(idg_CO2,L,NY,NX)+trcg_solsml(idg_CH4,L,NY,NX)
+    OXYGSO=OXYGSO+trcg_solsml(idg_O2,L,NY,NX)
+    TLN2G=TLN2G+trcg_solsml(idg_N2,L,NY,NX)+trcg_solsml(idg_N2O,L,NY,NX)
+    TLNH4=TLNH4+trcn_solsml(ids_NH4,L,NY,NX)+trcg_solsml(idg_NH3,L,NY,NX)
+    TLNO3=TLNO3+trcn_solsml(ids_NO3,L,NY,NX)
+    TLPO4=TLPO4+trcn_solsml(ids_H1PO4,L,NY,NX)+trcn_solsml(ids_H2PO4,L,NY,NX)
 
     IF(ISALTG.NE.0)THEN
-      SSW=ZALW(L,NY,NX)+ZFEW(L,NY,NX)+ZHYW(L,NY,NX)+ZCAW(L,NY,NX) &
-        +ZMGW(L,NY,NX)+ZNAW(L,NY,NX)+ZKAW(L,NY,NX)+ZOHW(L,NY,NX) &
-        +ZSO4W(L,NY,NX)+ZCLW(L,NY,NX)+ZCO3W(L,NY,NX)+H0PO4W(L,NY,NX) &
-        +2.0*(ZHCO3W(L,NY,NX)+ZALH1W(L,NY,NX) &
-        +ZALSW(L,NY,NX)+ZFEH1W(L,NY,NX)+ZFESW(L,NY,NX)+ZCAOW(L,NY,NX) &
-        +ZCACW(L,NY,NX)+ZCASW(L,NY,NX)+ZMGOW(L,NY,NX)+ZMGCW(L,NY,NX) &
-        +ZMGSW(L,NY,NX)+ZNACW(L,NY,NX)+ZNASW(L,NY,NX)+ZKASW(L,NY,NX) &
-        +ZCA0PW(L,NY,NX)) &
-        +3.0*(ZALH2W(L,NY,NX)+ZFEH2W(L,NY,NX)+ZCAHW(L,NY,NX) &
-        +ZMGHW(L,NY,NX)+ZFE1PW(L,NY,NX)+ZCA1PW(L,NY,NX) &
-        +ZMG1PW(L,NY,NX)) &
-        +4.0*(ZALH3W(L,NY,NX)+ZFEH3W(L,NY,NX)+H3PO4W(L,NY,NX) &
-        +ZFE2PW(L,NY,NX)+ZCA2PW(L,NY,NX)) &
-        +5.0*(ZALH4W(L,NY,NX)+ZFEH4W(L,NY,NX))
+      SSW=trcs_solsml(idsa_Al,L,NY,NX)+trcs_solsml(idsa_Fe,L,NY,NX)+trcs_solsml(idsa_Hp,L,NY,NX)+trcs_solsml(idsa_Ca,L,NY,NX) &
+        +trcs_solsml(idsa_Mg,L,NY,NX)+trcs_solsml(idsa_Na,L,NY,NX)+trcs_solsml(idsa_K,L,NY,NX)+trcs_solsml(idsa_OH,L,NY,NX) &
+        +trcs_solsml(idsa_SO4,L,NY,NX)+trcs_solsml(idsa_Cl,L,NY,NX)+trcs_solsml(idsa_CO3,L,NY,NX)+trcs_solsml(idsa_H0PO4,L,NY,NX) &
+        +2.0*(trcs_solsml(idsa_HCO3,L,NY,NX)+trcs_solsml(idsa_AlOH,L,NY,NX) &
+        +trcs_solsml(idsa_AlSO4,L,NY,NX)+trcs_solsml(idsa_FeOH,L,NY,NX)+trcs_solsml(idsa_FeSO4,L,NY,NX)+trcs_solsml(idsa_CaOH2,L,NY,NX) &
+        +trcs_solsml(idsa_CaCO3,L,NY,NX)+trcs_solsml(idsa_CaSO4,L,NY,NX)+trcs_solsml(idsa_MgOH2,L,NY,NX)+trcs_solsml(idsa_MgCO3,L,NY,NX) &
+        +trcs_solsml(idsa_MgSO4,L,NY,NX)+trcs_solsml(idsa_NaCO3,L,NY,NX)+trcs_solsml(idsa_NaSO4,L,NY,NX)+trcs_solsml(idsa_KSO4,L,NY,NX) &
+        +trcs_solsml(idsa_CaPO4,L,NY,NX)) &
+        +3.0*(trcs_solsml(idsa_AlOH2,L,NY,NX)+trcs_solsml(idsa_FeOH2,L,NY,NX)+trcs_solsml(idsa_CaHCO3,L,NY,NX) &
+        +trcs_solsml(idsa_MgHCO3,L,NY,NX)+trcs_solsml(idsa_FeHPO4,L,NY,NX)+trcs_solsml(idsa_CaHPO4,L,NY,NX) &
+        +trcs_solsml(idsa_MgHPO4,L,NY,NX)) &
+        +4.0*(trcs_solsml(idsa_AlOH3,L,NY,NX)+trcs_solsml(idsa_FeOH3,L,NY,NX)+trcs_solsml(idsa_H3PO4,L,NY,NX) &
+        +trcs_solsml(idsa_FeH2PO4,L,NY,NX)+trcs_solsml(idsa_CaH2PO4,L,NY,NX)) &
+        +5.0*(trcs_solsml(idsa_AlOH4,L,NY,NX)+trcs_solsml(idsa_FeOH4,L,NY,NX))
       TION=TION+SSW
 
     ENDIF
@@ -849,62 +849,22 @@ module RedistMod
   implicit none
   integer, intent(in) :: NY,NX
 
+  integer :: NTA,NTG,NTS
 !     begin_execution
 !     OVERLAND SNOW REDISTRIBUTION
 !
   IF(abs(TQS(NY,NX))>0._r8)THEN
-    CO2W(1,NY,NX)=CO2W(1,NY,NX)+TCOQSS(NY,NX)
-    CH4W(1,NY,NX)=CH4W(1,NY,NX)+TCHQSS(NY,NX)
-    OXYW(1,NY,NX)=OXYW(1,NY,NX)+TOXQSS(NY,NX)
-    ZNGW(1,NY,NX)=ZNGW(1,NY,NX)+TNGQSS(NY,NX)
-    ZN2W(1,NY,NX)=ZN2W(1,NY,NX)+TN2QSS(NY,NX)
-    ZN4W(1,NY,NX)=ZN4W(1,NY,NX)+TN4QSS(NY,NX)
-    ZN3W(1,NY,NX)=ZN3W(1,NY,NX)+TN3QSS(NY,NX)
-    ZNOW(1,NY,NX)=ZNOW(1,NY,NX)+TNOQSS(NY,NX)
-    Z1PW(1,NY,NX)=Z1PW(1,NY,NX)+TP1QSS(NY,NX)
-    ZHPW(1,NY,NX)=ZHPW(1,NY,NX)+TPOQSS(NY,NX)
+    DO NTG=idg_beg,idg_end-1
+      trcg_solsml(NTG,1,NY,NX)=trcg_solsml(NTG,1,NY,NX)+trcg_QSS(NTG,NY,NX)
+    ENDDO
+
+    DO NTS=ids_nut_beg,ids_nuts_end
+      trcn_solsml(NTS,1,NY,NX)=trcn_solsml(NTS,1,NY,NX)+trcn_QSS(NTS,NY,NX)
+    ENDDO
     IF(ISALTG.NE.0)THEN
-      ZALW(1,NY,NX)=ZALW(1,NY,NX)+TQSAL(NY,NX)
-      ZFEW(1,NY,NX)=ZFEW(1,NY,NX)+TQSFE(NY,NX)
-      ZHYW(1,NY,NX)=ZHYW(1,NY,NX)+TQSHY(NY,NX)
-      ZCAW(1,NY,NX)=ZCAW(1,NY,NX)+TQSCA(NY,NX)
-      ZMGW(1,NY,NX)=ZMGW(1,NY,NX)+TQSMG(NY,NX)
-      ZNAW(1,NY,NX)=ZNAW(1,NY,NX)+TQSNA(NY,NX)
-      ZKAW(1,NY,NX)=ZKAW(1,NY,NX)+TQSKA(NY,NX)
-      ZOHW(1,NY,NX)=ZOHW(1,NY,NX)+TQSOH(NY,NX)
-      ZSO4W(1,NY,NX)=ZSO4W(1,NY,NX)+TQSSO(NY,NX)
-      ZCLW(1,NY,NX)=ZCLW(1,NY,NX)+TQSCL(NY,NX)
-      ZCO3W(1,NY,NX)=ZCO3W(1,NY,NX)+TQSC3(NY,NX)
-      ZHCO3W(1,NY,NX)=ZHCO3W(1,NY,NX)+TQSHC(NY,NX)
-      ZALH1W(1,NY,NX)=ZALH1W(1,NY,NX)+TQSAL1(NY,NX)
-      ZALH2W(1,NY,NX)=ZALH2W(1,NY,NX)+TQSAL2(NY,NX)
-      ZALH3W(1,NY,NX)=ZALH3W(1,NY,NX)+TQSAL3(NY,NX)
-      ZALH4W(1,NY,NX)=ZALH4W(1,NY,NX)+TQSAL4(NY,NX)
-      ZALSW(1,NY,NX)=ZALSW(1,NY,NX)+TQSALS(NY,NX)
-      ZFEH1W(1,NY,NX)=ZFEH1W(1,NY,NX)+TQSFE1(NY,NX)
-      ZFEH2W(1,NY,NX)=ZFEH2W(1,NY,NX)+TQSFE2(NY,NX)
-      ZFEH3W(1,NY,NX)=ZFEH3W(1,NY,NX)+TQSFE3(NY,NX)
-      ZFEH4W(1,NY,NX)=ZFEH4W(1,NY,NX)+TQSFE4(NY,NX)
-      ZFESW(1,NY,NX)=ZFESW(1,NY,NX)+TQSFES(NY,NX)
-      ZCAOW(1,NY,NX)=ZCAOW(1,NY,NX)+TQSCAO(NY,NX)
-      ZCACW(1,NY,NX)=ZCACW(1,NY,NX)+TQSCAC(NY,NX)
-      ZCAHW(1,NY,NX)=ZCAHW(1,NY,NX)+TQSCAH(NY,NX)
-      ZCASW(1,NY,NX)=ZCASW(1,NY,NX)+TQSCAS(NY,NX)
-      ZMGOW(1,NY,NX)=ZMGOW(1,NY,NX)+TQSMGO(NY,NX)
-      ZMGCW(1,NY,NX)=ZMGCW(1,NY,NX)+TQSMGC(NY,NX)
-      ZMGHW(1,NY,NX)=ZMGHW(1,NY,NX)+TQSMGH(NY,NX)
-      ZMGSW(1,NY,NX)=ZMGSW(1,NY,NX)+TQSMGS(NY,NX)
-      ZNACW(1,NY,NX)=ZNACW(1,NY,NX)+TQSNAC(NY,NX)
-      ZNASW(1,NY,NX)=ZNASW(1,NY,NX)+TQSNAS(NY,NX)
-      ZKASW(1,NY,NX)=ZKASW(1,NY,NX)+TQSKAS(NY,NX)
-      H0PO4W(1,NY,NX)=H0PO4W(1,NY,NX)+TQSH0P(NY,NX)
-      H3PO4W(1,NY,NX)=H3PO4W(1,NY,NX)+TQSH3P(NY,NX)
-      ZFE1PW(1,NY,NX)=ZFE1PW(1,NY,NX)+TQSF1P(NY,NX)
-      ZFE2PW(1,NY,NX)=ZFE2PW(1,NY,NX)+TQSF2P(NY,NX)
-      ZCA0PW(1,NY,NX)=ZCA0PW(1,NY,NX)+TQSC0P(NY,NX)
-      ZCA1PW(1,NY,NX)=ZCA1PW(1,NY,NX)+TQSC1P(NY,NX)
-      ZCA2PW(1,NY,NX)=ZCA2PW(1,NY,NX)+TQSC2P(NY,NX)
-      ZMG1PW(1,NY,NX)=ZMG1PW(1,NY,NX)+TQSM1P(NY,NX)
+      DO NTA=idsa_beg,idsa_end
+        trcs_solsml(NTA,1,NY,NX)=trcs_solsml(NTA,1,NY,NX)+trcsa_TQS(NTA,NY,NX)
+      ENDDO
     ENDIF
   ENDIF
   end subroutine ChemicalBySnowRedistribution

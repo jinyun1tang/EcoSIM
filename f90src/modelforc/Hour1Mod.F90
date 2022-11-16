@@ -1482,28 +1482,28 @@ module Hour1Mod
 !
   DO L=NUI(NY,NX),NLI(NY,NX)
     IF(VOLW(L,NY,NX).GT.ZEROS2(NY,NX))THEN
-      IF(VLNH4(L,NY,NX).GT.ZERO)THEN
-        trc_solcl(ids_NH4,L,NY,NX)=AZMAX1(trc_solml(ids_NH4,L,NY,NX)/(VOLW(L,NY,NX)*VLNH4(L,NY,NX)))
-        trc_solcl(idg_NH3,L,NY,NX)=AZMAX1(trc_solml(idg_NH3,L,NY,NX)/(VOLW(L,NY,NX)*VLNH4(L,NY,NX)))
+      IF(trcs_VLN(ids_NH4,L,NY,NX).GT.ZERO)THEN
+        trc_solcl(ids_NH4,L,NY,NX)=AZMAX1(trc_solml(ids_NH4,L,NY,NX)/(VOLW(L,NY,NX)*trcs_VLN(ids_NH4,L,NY,NX)))
+        trc_solcl(idg_NH3,L,NY,NX)=AZMAX1(trc_solml(idg_NH3,L,NY,NX)/(VOLW(L,NY,NX)*trcs_VLN(ids_NH4,L,NY,NX)))
       ELSE
         trc_solcl(ids_NH4,L,NY,NX)=0.0_r8
         trc_solcl(idg_NH3,L,NY,NX)=0.0_r8
       ENDIF
-      IF(VLNO3(L,NY,NX).GT.ZERO)THEN
-        trc_solcl(ids_NO3,L,NY,NX)=AZMAX1(trc_solml(ids_NO3,L,NY,NX)/(VOLW(L,NY,NX)*VLNO3(L,NY,NX)))
-        trc_solcl(ids_NO2,L,NY,NX)=AZMAX1(trc_solml(ids_NO2,L,NY,NX)/(VOLW(L,NY,NX)*VLNO3(L,NY,NX)))
+      IF(trcs_VLN(ids_NO3,L,NY,NX).GT.ZERO)THEN
+        trc_solcl(ids_NO3,L,NY,NX)=AZMAX1(trc_solml(ids_NO3,L,NY,NX)/(VOLW(L,NY,NX)*trcs_VLN(ids_NO3,L,NY,NX)))
+        trc_solcl(ids_NO2,L,NY,NX)=AZMAX1(trc_solml(ids_NO2,L,NY,NX)/(VOLW(L,NY,NX)*trcs_VLN(ids_NO3,L,NY,NX)))
       ELSE
         trc_solcl(ids_NO3,L,NY,NX)=0.0_r8
         trc_solcl(ids_NO2,L,NY,NX)=0.0_r8
       ENDIF
-      IF(VLPO4(L,NY,NX).GT.ZERO)THEN
-        trc_solcl(ids_H1PO4,L,NY,NX)=AZMAX1(trc_solml(ids_H1PO4,L,NY,NX)/(VOLW(L,NY,NX)*VLPO4(L,NY,NX)))
-        trc_solcl(ids_H2PO4,L,NY,NX)=AZMAX1(trc_solml(ids_H2PO4,L,NY,NX)/(VOLW(L,NY,NX)*VLPO4(L,NY,NX)))
+      IF(trcs_VLN(ids_H1PO4,L,NY,NX).GT.ZERO)THEN
+        trc_solcl(ids_H1PO4,L,NY,NX)=AZMAX1(trc_solml(ids_H1PO4,L,NY,NX)/(VOLW(L,NY,NX)*trcs_VLN(ids_H1PO4,L,NY,NX)))
+        trc_solcl(ids_H2PO4,L,NY,NX)=AZMAX1(trc_solml(ids_H2PO4,L,NY,NX)/(VOLW(L,NY,NX)*trcs_VLN(ids_H1PO4,L,NY,NX)))
 
         CPO4S(L,NY,NX)=AZMAX1(((H0PO4(L,NY,NX)+H3PO4(L,NY,NX) &
           +ZFE1P(L,NY,NX)+ZFE2P(L,NY,NX)+ZCA0P(L,NY,NX) &
           +ZCA1P(L,NY,NX)+ZCA2P(L,NY,NX)+ZMG1P(L,NY,NX))*patomw &
-          +trc_solml(ids_H1PO4,L,NY,NX)+trc_solml(ids_H2PO4,L,NY,NX))/(VOLW(L,NY,NX)*VLPO4(L,NY,NX)))
+          +trc_solml(ids_H1PO4,L,NY,NX)+trc_solml(ids_H2PO4,L,NY,NX))/(VOLW(L,NY,NX)*trcs_VLN(ids_H1PO4,L,NY,NX)))
       ELSE
         trc_solcl(ids_H1PO4,L,NY,NX)=0.0_r8
         trc_solcl(ids_H2PO4,L,NY,NX)=0.0_r8
@@ -1515,27 +1515,27 @@ module Hour1Mod
 !     Z*B=P ion pair amounts in band (see solute.f)
 !     VLNHB,VLNOB,VLPOB=fraction of soil volume in NH4,NO3,PO4 band
 !
-      IF(VLNHB(L,NY,NX).GT.ZERO)THEN
-        trc_solcl(ids_NH4B,L,NY,NX)=AZMAX1(trc_solml(ids_NH4B,L,NY,NX)/(VOLW(L,NY,NX)*VLNHB(L,NY,NX)))
-        trc_solcl(idg_NH3B,L,NY,NX)=AZMAX1(trc_solml(idg_NH3B,L,NY,NX)/(VOLW(L,NY,NX)*VLNHB(L,NY,NX)))
+      IF(trcs_VLN(ids_NH4B,L,NY,NX).GT.ZERO)THEN
+        trc_solcl(ids_NH4B,L,NY,NX)=AZMAX1(trc_solml(ids_NH4B,L,NY,NX)/(VOLW(L,NY,NX)*trcs_VLN(ids_NH4B,L,NY,NX)))
+        trc_solcl(idg_NH3B,L,NY,NX)=AZMAX1(trc_solml(idg_NH3B,L,NY,NX)/(VOLW(L,NY,NX)*trcs_VLN(ids_NH4B,L,NY,NX)))
       ELSE
         trc_solcl(ids_NH4B,L,NY,NX)=0.0_r8
         trc_solcl(idg_NH3B,L,NY,NX)=0.0_r8
       ENDIF
-      IF(VLNOB(L,NY,NX).GT.ZERO)THEN
-        trc_solcl(ids_NO3B,L,NY,NX)=AZMAX1(trc_solml(ids_NO3B,L,NY,NX)/(VOLW(L,NY,NX)*VLNOB(L,NY,NX)))
-        trc_solcl(ids_NO2B,L,NY,NX)=AZMAX1(trc_solml(ids_NO2B,L,NY,NX)/(VOLW(L,NY,NX)*VLNOB(L,NY,NX)))
+      IF(trcs_VLN(ids_NO3B,L,NY,NX).GT.ZERO)THEN
+        trc_solcl(ids_NO3B,L,NY,NX)=AZMAX1(trc_solml(ids_NO3B,L,NY,NX)/(VOLW(L,NY,NX)*trcs_VLN(ids_NO3B,L,NY,NX)))
+        trc_solcl(ids_NO2B,L,NY,NX)=AZMAX1(trc_solml(ids_NO2B,L,NY,NX)/(VOLW(L,NY,NX)*trcs_VLN(ids_NO3B,L,NY,NX)))
       ELSE
         trc_solcl(ids_NO3B,L,NY,NX)=0.0_r8
         trc_solcl(ids_NO2B,L,NY,NX)=0.0_r8
       ENDIF
-      IF(VLPOB(L,NY,NX).GT.ZERO)THEN
-        trc_solcl(ids_H1PO4B,L,NY,NX)=AZMAX1(trc_solml(ids_H1PO4B,L,NY,NX)/(VOLW(L,NY,NX)*VLPOB(L,NY,NX)))
-        trc_solcl(ids_H2PO4B,L,NY,NX)=AZMAX1(trc_solml(ids_H2PO4B,L,NY,NX)/(VOLW(L,NY,NX)*VLPOB(L,NY,NX)))
+      IF(trcs_VLN(ids_H1PO4B,L,NY,NX).GT.ZERO)THEN
+        trc_solcl(ids_H1PO4B,L,NY,NX)=AZMAX1(trc_solml(ids_H1PO4B,L,NY,NX)/(VOLW(L,NY,NX)*trcs_VLN(ids_H1PO4B,L,NY,NX)))
+        trc_solcl(ids_H2PO4B,L,NY,NX)=AZMAX1(trc_solml(ids_H2PO4B,L,NY,NX)/(VOLW(L,NY,NX)*trcs_VLN(ids_H1PO4B,L,NY,NX)))
         CPO4B(L,NY,NX)=AZMAX1(((H0POB(L,NY,NX)+H3POB(L,NY,NX) &
           +ZFE1PB(L,NY,NX)+ZFE2PB(L,NY,NX)+ZCA0PB(L,NY,NX) &
           +ZCA1PB(L,NY,NX)+ZCA2PB(L,NY,NX)+ZMG1PB(L,NY,NX))*patomw &
-          +trc_solml(ids_H1PO4B,L,NY,NX)+trc_solml(ids_H2PO4B,L,NY,NX))/(VOLW(L,NY,NX)*VLPOB(L,NY,NX)))
+          +trc_solml(ids_H1PO4B,L,NY,NX)+trc_solml(ids_H2PO4B,L,NY,NX))/(VOLW(L,NY,NX)*trcs_VLN(ids_H1PO4B,L,NY,NX)))
       ELSE
         trc_solcl(ids_H1PO4B,L,NY,NX)=0.0_r8
         trc_solcl(ids_H2PO4B,L,NY,NX)=0.0_r8
@@ -2315,21 +2315,23 @@ module Hour1Mod
           WDNHB(L,NY,NX)=0.0_r8
         ENDIF
         IF(DLYR(3,L,NY,NX).GT.ZERO2)THEN
-          VLNHB(L,NY,NX)=AMIN1(0.999_r8,WDNHB(L,NY,NX)/ROWN(NY,NX) &
+          trcs_VLN(ids_NH4B,L,NY,NX)=AMIN1(0.999_r8,WDNHB(L,NY,NX)/ROWN(NY,NX) &
             *DPNHB(L,NY,NX)/DLYR(3,L,NY,NX))
         ELSE
-          VLNHB(L,NY,NX)=0.0_r8
+          trcs_VLN(ids_NH4B,L,NY,NX)=0.0_r8
         ENDIF
-        VLNH4(L,NY,NX)=1.0_r8-VLNHB(L,NY,NX)
+        trcs_VLN(ids_NH4,L,NY,NX)=1.0_r8-trcs_VLN(ids_NH4B,L,NY,NX)
+        trcs_VLN(idg_NH3B,L,NY,NX)=trcs_VLN(ids_NH4B,L,NY,NX)
+        trcs_VLN(idg_NH3,L,NY,NX)=trcs_VLN(ids_NH4,L,NY,NX)
         ZNH4T=trc_solml(ids_NH4,L,NY,NX)+trc_solml(ids_NH4B,L,NY,NX)
         ZNH3T=trc_solml(idg_NH3,L,NY,NX)+trc_solml(idg_NH3B,L,NY,NX)
         XN4T=XN4(L,NY,NX)+XNB(L,NY,NX)
-        trc_solml(ids_NH4,L,NY,NX)=ZNH4T*VLNH4(L,NY,NX)
-        trc_solml(idg_NH3,L,NY,NX)=ZNH3T*VLNH4(L,NY,NX)
-        trc_solml(ids_NH4B,L,NY,NX)=ZNH4T*VLNHB(L,NY,NX)
-        trc_solml(idg_NH3B,L,NY,NX)=ZNH3T*VLNHB(L,NY,NX)
-        XN4(L,NY,NX)=XN4T*VLNH4(L,NY,NX)
-        XNB(L,NY,NX)=XN4T*VLNHB(L,NY,NX)
+        trc_solml(ids_NH4,L,NY,NX)=ZNH4T*trcs_VLN(ids_NH4,L,NY,NX)
+        trc_solml(idg_NH3,L,NY,NX)=ZNH3T*trcs_VLN(idg_NH3,L,NY,NX)
+        trc_solml(ids_NH4B,L,NY,NX)=ZNH4T*trcs_VLN(ids_NH4B,L,NY,NX)
+        trc_solml(idg_NH3B,L,NY,NX)=ZNH3T*trcs_VLN(idg_NH3B,L,NY,NX)
+        XN4(L,NY,NX)=XN4T*trcs_VLN(ids_NH4,L,NY,NX)
+        XNB(L,NY,NX)=XN4T*trcs_VLN(ids_NH4B,L,NY,NX)
       ENDDO D50
       DPNH4(NY,NX)=DPNHB(LFDPTH,NY,NX)+CDPTH(LFDPTH-1,NY,NX)
     ENDIF
@@ -2357,18 +2359,20 @@ module Hour1Mod
           WDNOB(L,NY,NX)=0.0_r8
         ENDIF
         IF(DLYR(3,L,NY,NX).GT.ZERO2)THEN
-          VLNOB(L,NY,NX)=AMIN1(0.999_r8,WDNOB(L,NY,NX)/ROWO(NY,NX) &
+          trcs_VLN(ids_NO3B,L,NY,NX)=AMIN1(0.999_r8,WDNOB(L,NY,NX)/ROWO(NY,NX) &
             *DPNOB(L,NY,NX)/DLYR(3,L,NY,NX))
         ELSE
-          VLNOB(L,NY,NX)=0.0_r8
+          trcs_VLN(ids_NO3B,L,NY,NX)=0.0_r8
         ENDIF
-        VLNO3(L,NY,NX)=1.0_r8-VLNOB(L,NY,NX)
+        trcs_VLN(ids_NO3,L,NY,NX)=1.0_r8-trcs_VLN(ids_NO3B,L,NY,NX)
+        trcs_VLN(ids_NO2B,L,NY,NX)=trcs_VLN(ids_NO3B,L,NY,NX)
+        trcs_VLN(ids_NO2,L,NY,NX)=trcs_VLN(ids_NO3,L,NY,NX)
         ZNO3T=trc_solml(ids_NO3,L,NY,NX)+trc_solml(ids_NO3B,L,NY,NX)
         ZNO2T=trc_solml(ids_NO2,L,NY,NX)+trc_solml(ids_NO2B,L,NY,NX)
-        trc_solml(ids_NO3,L,NY,NX)=ZNO3T*VLNO3(L,NY,NX)
-        trc_solml(ids_NO2,L,NY,NX)=ZNO2T*VLNO3(L,NY,NX)
-        trc_solml(ids_NO3B,L,NY,NX)=ZNO3T*VLNOB(L,NY,NX)
-        trc_solml(ids_NO2B,L,NY,NX)=ZNO2T*VLNOB(L,NY,NX)
+        trc_solml(ids_NO3,L,NY,NX)=ZNO3T*trcs_VLN(ids_NO3,L,NY,NX)
+        trc_solml(ids_NO2,L,NY,NX)=ZNO2T*trcs_VLN(ids_NO2,L,NY,NX)
+        trc_solml(ids_NO3B,L,NY,NX)=ZNO3T*trcs_VLN(ids_NO3B,L,NY,NX)
+        trc_solml(ids_NO2B,L,NY,NX)=ZNO2T*trcs_VLN(ids_NO2B,L,NY,NX)
       ENDDO D45
       DPNO3(NY,NX)=DPNOB(LFDPTH,NY,NX)+CDPTH(LFDPTH-1,NY,NX)
     ENDIF
@@ -2395,12 +2399,14 @@ module Hour1Mod
           WDPOB(L,NY,NX)=0.0_r8
         ENDIF
         IF(DLYR(3,L,NY,NX).GT.ZERO2)THEN
-          VLPOB(L,NY,NX)=AMIN1(0.999,WDPOB(L,NY,NX)/ROWP(NY,NX) &
+          trcs_VLN(ids_H1PO4B,L,NY,NX)=AMIN1(0.999,WDPOB(L,NY,NX)/ROWP(NY,NX) &
           *DPPOB(L,NY,NX)/DLYR(3,L,NY,NX))
         ELSE
-          VLPOB(L,NY,NX)=0.0_r8
+          trcs_VLN(ids_H1PO4B,L,NY,NX)=0.0_r8
         ENDIF
-        VLPO4(L,NY,NX)=1.0-VLPOB(L,NY,NX)
+        trcs_VLN(ids_H1PO4,L,NY,NX)=1.0-trcs_VLN(ids_H1PO4B,L,NY,NX)
+        trcs_VLN(ids_H2PO4B,L,NY,NX)=trcs_VLN(ids_H1PO4B,L,NY,NX)
+        trcs_VLN(ids_H2PO4,L,NY,NX)=trcs_VLN(ids_H1PO4,L,NY,NX)
         H0PO4T=H0PO4(L,NY,NX)+H0POB(L,NY,NX)
         H1PO4T=trc_solml(ids_H1PO4,L,NY,NX)+trc_solml(ids_H1PO4B,L,NY,NX)
         H2PO4T=trc_solml(ids_H2PO4,L,NY,NX)+trc_solml(ids_H2PO4B,L,NY,NX)
@@ -2421,46 +2427,46 @@ module Hour1Mod
         PCAPDT=PCAPD(L,NY,NX)+PCPDB(L,NY,NX)
         PCAPHT=PCAPH(L,NY,NX)+PCPHB(L,NY,NX)
         PCAPMT=PCAPM(L,NY,NX)+PCPMB(L,NY,NX)
-        H0PO4(L,NY,NX)=H0PO4T*VLPO4(L,NY,NX)
-        trc_solml(ids_H1PO4,L,NY,NX)=H1PO4T*VLPO4(L,NY,NX)
-        trc_solml(ids_H2PO4,L,NY,NX)=H2PO4T*VLPO4(L,NY,NX)
-        H3PO4(L,NY,NX)=H3PO4T*VLPO4(L,NY,NX)
-        ZFE1P(L,NY,NX)=ZFE1PT*VLPO4(L,NY,NX)
-        ZFE2P(L,NY,NX)=ZFE2PT*VLPO4(L,NY,NX)
-        ZCA0P(L,NY,NX)=ZCA0PT*VLPO4(L,NY,NX)
-        ZCA1P(L,NY,NX)=ZCA1PT*VLPO4(L,NY,NX)
-        ZCA2P(L,NY,NX)=ZCA2PT*VLPO4(L,NY,NX)
-        ZMG1P(L,NY,NX)=ZMG1PT*VLPO4(L,NY,NX)
-        H0POB(L,NY,NX)=H0PO4T*VLPOB(L,NY,NX)
-        trc_solml(ids_H1PO4B,L,NY,NX)=H1PO4T*VLPOB(L,NY,NX)
-        trc_solml(ids_H2PO4B,L,NY,NX)=H2PO4T*VLPOB(L,NY,NX)
-        H3POB(L,NY,NX)=H3PO4T*VLPOB(L,NY,NX)
-        ZFE1PB(L,NY,NX)=ZFE1PT*VLPOB(L,NY,NX)
-        ZFE2PB(L,NY,NX)=ZFE2PT*VLPOB(L,NY,NX)
-        ZCA0PB(L,NY,NX)=ZCA0PT*VLPOB(L,NY,NX)
-        ZCA1PB(L,NY,NX)=ZCA1PT*VLPOB(L,NY,NX)
-        ZCA2PB(L,NY,NX)=ZCA2PT*VLPOB(L,NY,NX)
-        ZMG1PB(L,NY,NX)=ZMG1PT*VLPOB(L,NY,NX)
-        XOH0(L,NY,NX)=XOH0T*VLPO4(L,NY,NX)
-        XOH1(L,NY,NX)=XOH1T*VLPO4(L,NY,NX)
-        XOH2(L,NY,NX)=XOH2T*VLPO4(L,NY,NX)
-        XH1P(L,NY,NX)=XH1PT*VLPO4(L,NY,NX)
-        XH2P(L,NY,NX)=XH2PT*VLPO4(L,NY,NX)
-        XOH0B(L,NY,NX)=XOH0T*VLPOB(L,NY,NX)
-        XOH1B(L,NY,NX)=XOH1T*VLPOB(L,NY,NX)
-        XOH2B(L,NY,NX)=XOH2T*VLPOB(L,NY,NX)
-        XH1PB(L,NY,NX)=XH1PT*VLPOB(L,NY,NX)
-        XH2PB(L,NY,NX)=XH2PT*VLPOB(L,NY,NX)
-        PALPO(L,NY,NX)=PALPOT*VLPO4(L,NY,NX)
-        PFEPO(L,NY,NX)=PFEPOT*VLPO4(L,NY,NX)
-        PCAPD(L,NY,NX)=PCAPDT*VLPO4(L,NY,NX)
-        PCAPH(L,NY,NX)=PCAPHT*VLPO4(L,NY,NX)
-        PCAPM(L,NY,NX)=PCAPMT*VLPO4(L,NY,NX)
-        PALPB(L,NY,NX)=PALPOT*VLPOB(L,NY,NX)
-        PFEPB(L,NY,NX)=PFEPOT*VLPOB(L,NY,NX)
-        PCPDB(L,NY,NX)=PCAPDT*VLPOB(L,NY,NX)
-        PCPHB(L,NY,NX)=PCAPHT*VLPOB(L,NY,NX)
-        PCPMB(L,NY,NX)=PCAPMT*VLPOB(L,NY,NX)
+        H0PO4(L,NY,NX)=H0PO4T*trcs_VLN(ids_H1PO4,L,NY,NX)
+        trc_solml(ids_H1PO4,L,NY,NX)=H1PO4T*trcs_VLN(ids_H1PO4,L,NY,NX)
+        trc_solml(ids_H2PO4,L,NY,NX)=H2PO4T*trcs_VLN(ids_H1PO4,L,NY,NX)
+        H3PO4(L,NY,NX)=H3PO4T*trcs_VLN(ids_H1PO4,L,NY,NX)
+        ZFE1P(L,NY,NX)=ZFE1PT*trcs_VLN(ids_H1PO4,L,NY,NX)
+        ZFE2P(L,NY,NX)=ZFE2PT*trcs_VLN(ids_H1PO4,L,NY,NX)
+        ZCA0P(L,NY,NX)=ZCA0PT*trcs_VLN(ids_H1PO4,L,NY,NX)
+        ZCA1P(L,NY,NX)=ZCA1PT*trcs_VLN(ids_H1PO4,L,NY,NX)
+        ZCA2P(L,NY,NX)=ZCA2PT*trcs_VLN(ids_H1PO4,L,NY,NX)
+        ZMG1P(L,NY,NX)=ZMG1PT*trcs_VLN(ids_H1PO4,L,NY,NX)
+        H0POB(L,NY,NX)=H0PO4T*trcs_VLN(ids_H1PO4B,L,NY,NX)
+        trc_solml(ids_H1PO4B,L,NY,NX)=H1PO4T*trcs_VLN(ids_H1PO4B,L,NY,NX)
+        trc_solml(ids_H2PO4B,L,NY,NX)=H2PO4T*trcs_VLN(ids_H1PO4B,L,NY,NX)
+        H3POB(L,NY,NX)=H3PO4T*trcs_VLN(ids_H1PO4B,L,NY,NX)
+        ZFE1PB(L,NY,NX)=ZFE1PT*trcs_VLN(ids_H1PO4B,L,NY,NX)
+        ZFE2PB(L,NY,NX)=ZFE2PT*trcs_VLN(ids_H1PO4B,L,NY,NX)
+        ZCA0PB(L,NY,NX)=ZCA0PT*trcs_VLN(ids_H1PO4B,L,NY,NX)
+        ZCA1PB(L,NY,NX)=ZCA1PT*trcs_VLN(ids_H1PO4B,L,NY,NX)
+        ZCA2PB(L,NY,NX)=ZCA2PT*trcs_VLN(ids_H1PO4B,L,NY,NX)
+        ZMG1PB(L,NY,NX)=ZMG1PT*trcs_VLN(ids_H1PO4B,L,NY,NX)
+        XOH0(L,NY,NX)=XOH0T*trcs_VLN(ids_H1PO4,L,NY,NX)
+        XOH1(L,NY,NX)=XOH1T*trcs_VLN(ids_H1PO4,L,NY,NX)
+        XOH2(L,NY,NX)=XOH2T*trcs_VLN(ids_H1PO4,L,NY,NX)
+        XH1P(L,NY,NX)=XH1PT*trcs_VLN(ids_H1PO4,L,NY,NX)
+        XH2P(L,NY,NX)=XH2PT*trcs_VLN(ids_H1PO4,L,NY,NX)
+        XOH0B(L,NY,NX)=XOH0T*trcs_VLN(ids_H1PO4B,L,NY,NX)
+        XOH1B(L,NY,NX)=XOH1T*trcs_VLN(ids_H1PO4B,L,NY,NX)
+        XOH2B(L,NY,NX)=XOH2T*trcs_VLN(ids_H1PO4B,L,NY,NX)
+        XH1PB(L,NY,NX)=XH1PT*trcs_VLN(ids_H1PO4B,L,NY,NX)
+        XH2PB(L,NY,NX)=XH2PT*trcs_VLN(ids_H1PO4B,L,NY,NX)
+        PALPO(L,NY,NX)=PALPOT*trcs_VLN(ids_H1PO4,L,NY,NX)
+        PFEPO(L,NY,NX)=PFEPOT*trcs_VLN(ids_H1PO4,L,NY,NX)
+        PCAPD(L,NY,NX)=PCAPDT*trcs_VLN(ids_H1PO4,L,NY,NX)
+        PCAPH(L,NY,NX)=PCAPHT*trcs_VLN(ids_H1PO4,L,NY,NX)
+        PCAPM(L,NY,NX)=PCAPMT*trcs_VLN(ids_H1PO4,L,NY,NX)
+        PALPB(L,NY,NX)=PALPOT*trcs_VLN(ids_H1PO4B,L,NY,NX)
+        PFEPB(L,NY,NX)=PFEPOT*trcs_VLN(ids_H1PO4B,L,NY,NX)
+        PCPDB(L,NY,NX)=PCAPDT*trcs_VLN(ids_H1PO4B,L,NY,NX)
+        PCPHB(L,NY,NX)=PCAPHT*trcs_VLN(ids_H1PO4B,L,NY,NX)
+        PCPMB(L,NY,NX)=PCAPMT*trcs_VLN(ids_H1PO4B,L,NY,NX)
       ENDDO
       DPPO4(NY,NX)=DPPOB(LFDPTH,NY,NX)+CDPTH(LFDPTH-1,NY,NX)
     ENDIF
@@ -2494,10 +2500,10 @@ module Hour1Mod
     ZNH4FB(LFDPTH,NY,NX)=ZNH4FB(LFDPTH,NY,NX)+Z4BX*CVRDF
     ZNHUFB(LFDPTH,NY,NX)=ZNHUFB(LFDPTH,NY,NX)+ZUBX*CVRDF
     ZNO3FB(LFDPTH,NY,NX)=ZNO3FB(LFDPTH,NY,NX)+ZOBX*CVRDF
-    PCAPM(LFDPTH,NY,NX)=PCAPM(LFDPTH,NY,NX)+PMAX*VLPO4(LFDPTH,NY,NX)*CVRDF
-    PCPMB(LFDPTH,NY,NX)=PCPMB(LFDPTH,NY,NX)+PMAX*VLPOB(LFDPTH,NY,NX)*CVRDF+PMBX*CVRDF
-    PCAPH(LFDPTH,NY,NX)=PCAPH(LFDPTH,NY,NX)+PHAX*VLPO4(LFDPTH,NY,NX)*CVRDF
-    PCPHB(LFDPTH,NY,NX)=PCPHB(LFDPTH,NY,NX)+PHAX*VLPOB(LFDPTH,NY,NX)*CVRDF
+    PCAPM(LFDPTH,NY,NX)=PCAPM(LFDPTH,NY,NX)+PMAX*trcs_VLN(ids_H1PO4,LFDPTH,NY,NX)*CVRDF
+    PCPMB(LFDPTH,NY,NX)=PCPMB(LFDPTH,NY,NX)+PMAX*trcs_VLN(ids_H1PO4B,LFDPTH,NY,NX)*CVRDF+PMBX*CVRDF
+    PCAPH(LFDPTH,NY,NX)=PCAPH(LFDPTH,NY,NX)+PHAX*trcs_VLN(ids_H1PO4,LFDPTH,NY,NX)*CVRDF
+    PCPHB(LFDPTH,NY,NX)=PCPHB(LFDPTH,NY,NX)+PHAX*trcs_VLN(ids_H1PO4B,LFDPTH,NY,NX)*CVRDF
     IF(LFDPTH.EQ.0)THEN
       ZNH4FA(NU(NY,NX),NY,NX)=ZNH4FA(NU(NY,NX),NY,NX)+Z4AX*BAREF
       ZNH3FA(NU(NY,NX),NY,NX)=ZNH3FA(NU(NY,NX),NY,NX)+Z3AX
@@ -2507,10 +2513,10 @@ module Hour1Mod
       ZNH3FB(NU(NY,NX),NY,NX)=ZNH3FB(NU(NY,NX),NY,NX)+Z3BX
       ZNHUFB(NU(NY,NX),NY,NX)=ZNHUFB(NU(NY,NX),NY,NX)+ZUBX*BAREF
       ZNO3FB(NU(NY,NX),NY,NX)=ZNO3FB(NU(NY,NX),NY,NX)+ZOBX*BAREF
-      PCAPM(NU(NY,NX),NY,NX)=PCAPM(NU(NY,NX),NY,NX)+PMAX*VLPO4(NU(NY,NX),NY,NX)*BAREF
-      PCPMB(NU(NY,NX),NY,NX)=PCPMB(NU(NY,NX),NY,NX)+PMAX*VLPOB(NU(NY,NX),NY,NX)*BAREF+PMBX*BAREF
-      PCAPH(NU(NY,NX),NY,NX)=PCAPH(NU(NY,NX),NY,NX)+PHAX*VLPO4(NU(NY,NX),NY,NX)*BAREF
-      PCPHB(NU(NY,NX),NY,NX)=PCPHB(NU(NY,NX),NY,NX)+PHAX*VLPOB(NU(NY,NX),NY,NX)*BAREF
+      PCAPM(NU(NY,NX),NY,NX)=PCAPM(NU(NY,NX),NY,NX)+PMAX*trcs_VLN(ids_H1PO4,NU(NY,NX),NY,NX)*BAREF
+      PCPMB(NU(NY,NX),NY,NX)=PCPMB(NU(NY,NX),NY,NX)+PMAX*trcs_VLN(ids_H1PO4B,NU(NY,NX),NY,NX)*BAREF+PMBX*BAREF
+      PCAPH(NU(NY,NX),NY,NX)=PCAPH(NU(NY,NX),NY,NX)+PHAX*trcs_VLN(ids_H1PO4,NU(NY,NX),NY,NX)*BAREF
+      PCPHB(NU(NY,NX),NY,NX)=PCPHB(NU(NY,NX),NY,NX)+PHAX*trcs_VLN(ids_H1PO4B,NU(NY,NX),NY,NX)*BAREF
     ELSE
       ZNH3FA(LFDPTH,NY,NX)=ZNH3FA(LFDPTH,NY,NX)+Z3AX*CVRDF
       ZNH3FB(LFDPTH,NY,NX)=ZNH3FB(LFDPTH,NY,NX)+Z3BX*CVRDF

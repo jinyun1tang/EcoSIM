@@ -2142,12 +2142,17 @@ implicit none
           DPNHB(L1,NY,NX)=DPNHB(L1,NY,NX)+FXDPNHB
           DPNHB(L0,NY,NX)=DPNHB(L0,NY,NX)-FXDPNHB
         ENDIF
-        VLNHB(L1,NY,NX)=AZMAX1(AMIN1(0.999,WDNHB(L1,NY,NX) &
+        trcs_VLN(ids_NH4B,L1,NY,NX)=AZMAX1(AMIN1(0.999,WDNHB(L1,NY,NX) &
           /ROWN(NY,NX)*DPNHB(L1,NY,NX)/DLYR(3,L1,NY,NX)))
-        VLNHB(L0,NY,NX)=AZMAX1(AMIN1(0.999,WDNHB(L0,NY,NX) &
+        trcs_VLN(ids_NH4B,L0,NY,NX)=AZMAX1(AMIN1(0.999,WDNHB(L0,NY,NX) &
           /ROWN(NY,NX)*DPNHB(L0,NY,NX)/DLYR(3,L0,NY,NX)))
-        VLNH4(L1,NY,NX)=1.0-VLNHB(L1,NY,NX)
-        VLNH4(L0,NY,NX)=1.0-VLNHB(L0,NY,NX)
+        trcs_VLN(ids_NH4,L1,NY,NX)=1.0_r8-trcs_VLN(ids_NH4B,L1,NY,NX)
+        trcs_VLN(ids_NH4,L0,NY,NX)=1.0_r8-trcs_VLN(ids_NH4B,L0,NY,NX)
+
+        trcs_VLN(idg_NH3B,L1,NY,NX)=trcs_VLN(ids_NH4B,L1,NY,NX)
+        trcs_VLN(idg_NH3B,L0,NY,NX)=trcs_VLN(ids_NH4B,L0,NY,NX)
+        trcs_VLN(idg_NH3,L1,NY,NX)=trcs_VLN(ids_NH4,L1,NY,NX)
+        trcs_VLN(idg_NH3,L0,NY,NX)=trcs_VLN(ids_NH4,L0,NY,NX)
       ENDIF
     ENDIF
     IF(IFNOB(NY,NX).EQ.1.AND.ROWO(NY,NX).GT.0.0)THEN
@@ -2165,12 +2170,17 @@ implicit none
           DPNOB(L1,NY,NX)=DPNOB(L1,NY,NX)+FXDPNOB
           DPNOB(L0,NY,NX)=DPNOB(L0,NY,NX)-FXDPNOB
         ENDIF
-        VLNOB(L1,NY,NX)=AZMAX1(AMIN1(0.999,WDNOB(L1,NY,NX) &
+        trcs_VLN(ids_NO3B,L1,NY,NX)=AZMAX1(AMIN1(0.999,WDNOB(L1,NY,NX) &
           /ROWO(NY,NX)*DPNOB(L1,NY,NX)/DLYR(3,L1,NY,NX)))
-        VLNOB(L0,NY,NX)=AZMAX1(AMIN1(0.999,WDNOB(L0,NY,NX) &
+        trcs_VLN(ids_NO3B,L0,NY,NX)=AZMAX1(AMIN1(0.999,WDNOB(L0,NY,NX) &
           /ROWO(NY,NX)*DPNOB(L0,NY,NX)/DLYR(3,L0,NY,NX)))
-        VLNO3(L1,NY,NX)=1.0-VLNOB(L1,NY,NX)
-          VLNO3(L0,NY,NX)=1.0-VLNOB(L0,NY,NX)
+        trcs_VLN(ids_NO3,L1,NY,NX)=1.0-trcs_VLN(ids_NO3B,L1,NY,NX)
+        trcs_VLN(ids_NO3,L0,NY,NX)=1.0-trcs_VLN(ids_NO3B,L0,NY,NX)
+
+        trcs_VLN(ids_NO2,L1,NY,NX)=trcs_VLN(ids_NO3,L1,NY,NX)
+        trcs_VLN(ids_NO2,L0,NY,NX)=trcs_VLN(ids_NO3,L0,NY,NX)
+        trcs_VLN(ids_NO2B,L1,NY,NX)=trcs_VLN(ids_NO3B,L1,NY,NX)
+        trcs_VLN(ids_NO2B,L0,NY,NX)=trcs_VLN(ids_NO3B,L0,NY,NX)
       ENDIF
     ENDIF
     IF(IFPOB(NY,NX).EQ.1.AND.ROWP(NY,NX).GT.0.0)THEN
@@ -2188,12 +2198,17 @@ implicit none
           DPPOB(L1,NY,NX)=DPPOB(L1,NY,NX)+FXDPPOB
           DPPOB(L0,NY,NX)=DPPOB(L0,NY,NX)-FXDPPOB
         ENDIF
-        VLPOB(L1,NY,NX)=AZMAX1(AMIN1(0.999,WDPOB(L1,NY,NX) &
+        trcs_VLN(ids_H1PO4B,L1,NY,NX)=AZMAX1(AMIN1(0.999,WDPOB(L1,NY,NX) &
           /ROWP(NY,NX)*DPPOB(L1,NY,NX)/DLYR(3,L1,NY,NX)))
-        VLPOB(L0,NY,NX)=AZMAX1(AMIN1(0.999,WDPOB(L0,NY,NX) &
+        trcs_VLN(ids_H1PO4B,L0,NY,NX)=AZMAX1(AMIN1(0.999,WDPOB(L0,NY,NX) &
           /ROWP(NY,NX)*DPPOB(L0,NY,NX)/DLYR(3,L0,NY,NX)))
-        VLPO4(L1,NY,NX)=1.0-VLPOB(L1,NY,NX)
-        VLPO4(L0,NY,NX)=1.0-VLPOB(L0,NY,NX)
+        trcs_VLN(ids_H1PO4,L1,NY,NX)=1.0_r8-trcs_VLN(ids_H1PO4B,L1,NY,NX)
+        trcs_VLN(ids_H1PO4,L0,NY,NX)=1.0_r8-trcs_VLN(ids_H1PO4B,L0,NY,NX)
+
+        trcs_VLN(ids_H2PO4B,L1,NY,NX)=trcs_VLN(ids_H1PO4B,L1,NY,NX)
+        trcs_VLN(ids_H2PO4B,L0,NY,NX)=trcs_VLN(ids_H1PO4B,L0,NY,NX)
+        trcs_VLN(ids_H2PO4,L1,NY,NX)=trcs_VLN(ids_H1PO4,L1,NY,NX)
+        trcs_VLN(ids_H2PO4,L0,NY,NX)=trcs_VLN(ids_H1PO4,L0,NY,NX)
       ENDIF
     ENDIF
   ENDIF

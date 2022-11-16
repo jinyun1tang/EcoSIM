@@ -2,6 +2,7 @@ module TrnsfrsDataMod
   use data_kind_mod, only : r8 => SHR_KIND_R8
   use GridConsts
   use SoilPropertyDataType
+  use TracerIDMod
   use AqueChemDatatype
 implicit none
   public
@@ -297,47 +298,9 @@ implicit none
   real(r8),allocatable ::  RC1PBS(:,:,:)                      !
   real(r8),allocatable ::  RC2PBS(:,:,:)                      !
   real(r8),allocatable ::  RM1PBS(:,:,:)                      !
-  real(r8),allocatable ::  TALBLS(:,:,:)                      !
-  real(r8),allocatable ::  TFEBLS(:,:,:)                      !
-  real(r8),allocatable ::  THYBLS(:,:,:)                      !
-  real(r8),allocatable ::  TCABLS(:,:,:)                      !
-  real(r8),allocatable ::  TMGBLS(:,:,:)                      !
-  real(r8),allocatable ::  TNABLS(:,:,:)                      !
-  real(r8),allocatable ::  TKABLS(:,:,:)                      !
-  real(r8),allocatable ::  TOHBLS(:,:,:)                      !
-  real(r8),allocatable ::  TSOBLS(:,:,:)                      !
-  real(r8),allocatable ::  TCLBLS(:,:,:)                      !
-  real(r8),allocatable ::  TC3BLS(:,:,:)                      !
-  real(r8),allocatable ::  THCBLS(:,:,:)                      !
-  real(r8),allocatable ::  TAL1BS(:,:,:)                      !
-  real(r8),allocatable ::  TAL2BS(:,:,:)                      !
-  real(r8),allocatable ::  TAL3BS(:,:,:)                      !
-  real(r8),allocatable ::  TAL4BS(:,:,:)                      !
-  real(r8),allocatable ::  TALSBS(:,:,:)                      !
-  real(r8),allocatable ::  TFE1BS(:,:,:)                      !
-  real(r8),allocatable ::  TFE2BS(:,:,:)                      !
-  real(r8),allocatable ::  TFE3BS(:,:,:)                      !
-  real(r8),allocatable ::  TFE4BS(:,:,:)                      !
-  real(r8),allocatable ::  TFESBS(:,:,:)                      !
-  real(r8),allocatable ::  TCAOBS(:,:,:)                      !
-  real(r8),allocatable ::  TCACBS(:,:,:)                      !
-  real(r8),allocatable ::  TCAHBS(:,:,:)                      !
-  real(r8),allocatable ::  TCASBS(:,:,:)                      !
-  real(r8),allocatable ::  TMGOBS(:,:,:)                      !
-  real(r8),allocatable ::  TMGCBS(:,:,:)                      !
-  real(r8),allocatable ::  TMGHBS(:,:,:)                      !
-  real(r8),allocatable ::  TMGSBS(:,:,:)                      !
-  real(r8),allocatable ::  TNACBS(:,:,:)                      !
-  real(r8),allocatable ::  TNASBS(:,:,:)                      !
-  real(r8),allocatable ::  TKASBS(:,:,:)                      !
-  real(r8),allocatable ::  TH0PBS(:,:,:)                      !
-  real(r8),allocatable ::  TH3PBS(:,:,:)                      !
-  real(r8),allocatable ::  TF1PBS(:,:,:)                      !
-  real(r8),allocatable ::  TF2PBS(:,:,:)                      !
-  real(r8),allocatable ::  TC0PBS(:,:,:)                      !
-  real(r8),allocatable ::  TC1PBS(:,:,:)                      !
-  real(r8),allocatable ::  TC2PBS(:,:,:)                      !
-  real(r8),allocatable ::  TM1PBS(:,:,:)                      !
+
+  real(r8),allocatable ::  trcsa_TBLS(:,:,:,:)
+
   real(r8),allocatable ::  POSGL2(:,:,:)                      !
   real(r8),allocatable ::  RALFLS(:,:,:,:)                    !
   real(r8),allocatable ::  RFEFLS(:,:,:,:)                    !
@@ -535,47 +498,10 @@ implicit none
   real(r8),allocatable ::  RNACXS(:,:,:)                      !
   real(r8),allocatable :: RNASXS(:,:,:)                       !
   real(r8),allocatable ::  RKASXS(:,:,:)                      !
-  real(r8),allocatable ::  ZALW2(:,:,:)                       !
-  real(r8),allocatable ::  ZFEW2(:,:,:)                       !
-  real(r8),allocatable ::  ZHYW2(:,:,:)                       !
-  real(r8),allocatable ::  ZCAW2(:,:,:)                       !
-  real(r8),allocatable ::  ZMGW2(:,:,:)                       !
-  real(r8),allocatable ::  ZNAW2(:,:,:)                       !
-  real(r8),allocatable ::  ZKAW2(:,:,:)                       !
-  real(r8),allocatable ::  ZOHW2(:,:,:)                       !
-  real(r8),allocatable ::  ZSO4W2(:,:,:)                      !
-  real(r8),allocatable ::  ZCLW2(:,:,:)                       !
-  real(r8),allocatable ::  ZCO3W2(:,:,:)                      !
-  real(r8),allocatable ::  ZHCO3W2(:,:,:)                     !
-  real(r8),allocatable ::  ZALH1W2(:,:,:)                     !
-  real(r8),allocatable ::  ZALH2W2(:,:,:)                     !
-  real(r8),allocatable ::  ZALH3W2(:,:,:)                     !
-  real(r8),allocatable ::  ZALH4W2(:,:,:)                     !
-  real(r8),allocatable ::  ZALSW2(:,:,:)                      !
-  real(r8),allocatable ::  ZFEH1W2(:,:,:)                     !
-  real(r8),allocatable ::  ZFEH2W2(:,:,:)                     !
-  real(r8),allocatable ::  ZFEH3W2(:,:,:)                     !
-  real(r8),allocatable ::  ZFEH4W2(:,:,:)                     !
-  real(r8),allocatable ::  ZFESW2(:,:,:)                      !
-  real(r8),allocatable ::  ZCAOW2(:,:,:)                      !
-  real(r8),allocatable ::  ZCACW2(:,:,:)                      !
-  real(r8),allocatable ::  ZCAHW2(:,:,:)                      !
-  real(r8),allocatable ::  ZCASW2(:,:,:)                      !
-  real(r8),allocatable ::  ZMGOW2(:,:,:)                      !
-  real(r8),allocatable ::  ZMGCW2(:,:,:)                      !
-  real(r8),allocatable ::  ZMGHW2(:,:,:)                      !
-  real(r8),allocatable ::  ZMGSW2(:,:,:)                      !
-  real(r8),allocatable ::  ZNACW2(:,:,:)                      !
-  real(r8),allocatable ::  ZNASW2(:,:,:)                      !
-  real(r8),allocatable ::  ZKASW2(:,:,:)                      !
-  real(r8),allocatable ::  H0PO4W2(:,:,:)                     !
-  real(r8),allocatable ::  H3PO4W2(:,:,:)                     !
-  real(r8),allocatable ::  ZFE1PW2(:,:,:)                     !
-  real(r8),allocatable ::  ZFE2PW2(:,:,:)                     !
-  real(r8),allocatable ::  ZCA0PW2(:,:,:)                     !
-  real(r8),allocatable ::  ZCA1PW2(:,:,:)                     !
-  real(r8),allocatable ::  ZCA2PW2(:,:,:)                     !
-  real(r8),allocatable ::  ZMG1PW2(:,:,:)                     !
+
+  real(r8), allocatable ::  trcs_solsml2(:,:,:,:)               ! snowpack salt dissolved tracers
+
+
   real(r8),allocatable ::  RALFL0(:,:)                        !
   real(r8),allocatable ::  RFEFL0(:,:)                        !
   real(r8),allocatable ::  RHYFL0(:,:)                        !
@@ -946,47 +872,8 @@ contains
   allocate(RC1PBS(JS,JY,JX));   RC1PBS=0._r8
   allocate(RC2PBS(JS,JY,JX));   RC2PBS=0._r8
   allocate(RM1PBS(JS,JY,JX));   RM1PBS=0._r8
-  allocate(TALBLS(JS,JY,JX));   TALBLS=0._r8
-  allocate(TFEBLS(JS,JY,JX));   TFEBLS=0._r8
-  allocate(THYBLS(JS,JY,JX));   THYBLS=0._r8
-  allocate(TCABLS(JS,JY,JX));   TCABLS=0._r8
-  allocate(TMGBLS(JS,JY,JX));   TMGBLS=0._r8
-  allocate(TNABLS(JS,JY,JX));   TNABLS=0._r8
-  allocate(TKABLS(JS,JY,JX));   TKABLS=0._r8
-  allocate(TOHBLS(JS,JY,JX));   TOHBLS=0._r8
-  allocate(TSOBLS(JS,JY,JX));   TSOBLS=0._r8
-  allocate(TCLBLS(JS,JY,JX));   TCLBLS=0._r8
-  allocate(TC3BLS(JS,JY,JX));   TC3BLS=0._r8
-  allocate(THCBLS(JS,JY,JX));   THCBLS=0._r8
-  allocate(TAL1BS(JS,JY,JX));   TAL1BS=0._r8
-  allocate(TAL2BS(JS,JY,JX));   TAL2BS=0._r8
-  allocate(TAL3BS(JS,JY,JX));   TAL3BS=0._r8
-  allocate(TAL4BS(JS,JY,JX));   TAL4BS=0._r8
-  allocate(TALSBS(JS,JY,JX));   TALSBS=0._r8
-  allocate(TFE1BS(JS,JY,JX));   TFE1BS=0._r8
-  allocate(TFE2BS(JS,JY,JX));   TFE2BS=0._r8
-  allocate(TFE3BS(JS,JY,JX));   TFE3BS=0._r8
-  allocate(TFE4BS(JS,JY,JX));   TFE4BS=0._r8
-  allocate(TFESBS(JS,JY,JX));   TFESBS=0._r8
-  allocate(TCAOBS(JS,JY,JX));   TCAOBS=0._r8
-  allocate(TCACBS(JS,JY,JX));   TCACBS=0._r8
-  allocate(TCAHBS(JS,JY,JX));   TCAHBS=0._r8
-  allocate(TCASBS(JS,JY,JX));   TCASBS=0._r8
-  allocate(TMGOBS(JS,JY,JX));   TMGOBS=0._r8
-  allocate(TMGCBS(JS,JY,JX));   TMGCBS=0._r8
-  allocate(TMGHBS(JS,JY,JX));   TMGHBS=0._r8
-  allocate(TMGSBS(JS,JY,JX));   TMGSBS=0._r8
-  allocate(TNACBS(JS,JY,JX));   TNACBS=0._r8
-  allocate(TNASBS(JS,JY,JX));   TNASBS=0._r8
-  allocate(TKASBS(JS,JY,JX));   TKASBS=0._r8
-  allocate(TH0PBS(JS,JY,JX));   TH0PBS=0._r8
-  allocate(TH3PBS(JS,JY,JX));   TH3PBS=0._r8
-  allocate(TF1PBS(JS,JY,JX));   TF1PBS=0._r8
-  allocate(TF2PBS(JS,JY,JX));   TF2PBS=0._r8
-  allocate(TC0PBS(JS,JY,JX));   TC0PBS=0._r8
-  allocate(TC1PBS(JS,JY,JX));   TC1PBS=0._r8
-  allocate(TC2PBS(JS,JY,JX));   TC2PBS=0._r8
-  allocate(TM1PBS(JS,JY,JX));   TM1PBS=0._r8
+  allocate(trcsa_TBLS(idsa_beg:idsa_end,JS,JY,JX)); trcsa_TBLS=0._r8
+
   allocate(POSGL2(JZ,JY,JX));   POSGL2=0._r8
   allocate(RALFLS(3,0:JD,JV,JH));RALFLS=0._r8
   allocate(RFEFLS(3,0:JD,JV,JH));RFEFLS=0._r8
@@ -1184,47 +1071,9 @@ contains
   allocate(RNACXS(JZ,JY,JX));   RNACXS=0._r8
   allocate(RNASXS(JZ,JY,JX));   RNASXS=0._r8
   allocate(RKASXS(JZ,JY,JX));   RKASXS=0._r8
-  allocate(ZALW2(JS,JY,JX));    ZALW2=0._r8
-  allocate(ZFEW2(JS,JY,JX));    ZFEW2=0._r8
-  allocate(ZHYW2(JS,JY,JX));    ZHYW2=0._r8
-  allocate(ZCAW2(JS,JY,JX));    ZCAW2=0._r8
-  allocate(ZMGW2(JS,JY,JX));    ZMGW2=0._r8
-  allocate(ZNAW2(JS,JY,JX));    ZNAW2=0._r8
-  allocate(ZKAW2(JS,JY,JX));    ZKAW2=0._r8
-  allocate(ZOHW2(JS,JY,JX));    ZOHW2=0._r8
-  allocate(ZSO4W2(JS,JY,JX));   ZSO4W2=0._r8
-  allocate(ZCLW2(JS,JY,JX));    ZCLW2=0._r8
-  allocate(ZCO3W2(JS,JY,JX));   ZCO3W2=0._r8
-  allocate(ZHCO3W2(JS,JY,JX));  ZHCO3W2=0._r8
-  allocate(ZALH1W2(JS,JY,JX));  ZALH1W2=0._r8
-  allocate(ZALH2W2(JS,JY,JX));  ZALH2W2=0._r8
-  allocate(ZALH3W2(JS,JY,JX));  ZALH3W2=0._r8
-  allocate(ZALH4W2(JS,JY,JX));  ZALH4W2=0._r8
-  allocate(ZALSW2(JS,JY,JX));   ZALSW2=0._r8
-  allocate(ZFEH1W2(JS,JY,JX));  ZFEH1W2=0._r8
-  allocate(ZFEH2W2(JS,JY,JX));  ZFEH2W2=0._r8
-  allocate(ZFEH3W2(JS,JY,JX));  ZFEH3W2=0._r8
-  allocate(ZFEH4W2(JS,JY,JX));  ZFEH4W2=0._r8
-  allocate(ZFESW2(JS,JY,JX));   ZFESW2=0._r8
-  allocate(ZCAOW2(JS,JY,JX));   ZCAOW2=0._r8
-  allocate(ZCACW2(JS,JY,JX));   ZCACW2=0._r8
-  allocate(ZCAHW2(JS,JY,JX));   ZCAHW2=0._r8
-  allocate(ZCASW2(JS,JY,JX));   ZCASW2=0._r8
-  allocate(ZMGOW2(JS,JY,JX));   ZMGOW2=0._r8
-  allocate(ZMGCW2(JS,JY,JX));   ZMGCW2=0._r8
-  allocate(ZMGHW2(JS,JY,JX));   ZMGHW2=0._r8
-  allocate(ZMGSW2(JS,JY,JX));   ZMGSW2=0._r8
-  allocate(ZNACW2(JS,JY,JX));   ZNACW2=0._r8
-  allocate(ZNASW2(JS,JY,JX));   ZNASW2=0._r8
-  allocate(ZKASW2(JS,JY,JX));   ZKASW2=0._r8
-  allocate(H0PO4W2(JS,JY,JX));  H0PO4W2=0._r8
-  allocate(H3PO4W2(JS,JY,JX));  H3PO4W2=0._r8
-  allocate(ZFE1PW2(JS,JY,JX));  ZFE1PW2=0._r8
-  allocate(ZFE2PW2(JS,JY,JX));  ZFE2PW2=0._r8
-  allocate(ZCA0PW2(JS,JY,JX));  ZCA0PW2=0._r8
-  allocate(ZCA1PW2(JS,JY,JX));  ZCA1PW2=0._r8
-  allocate(ZCA2PW2(JS,JY,JX));  ZCA2PW2=0._r8
-  allocate(ZMG1PW2(JS,JY,JX));  ZMG1PW2=0._r8
+
+  allocate(trcs_solsml2(idsa_beg:idsa_end,JS,JY,JX)); trcs_solsml2=0._r8
+
   allocate(RALFL0(JY,JX));      RALFL0=0._r8
   allocate(RFEFL0(JY,JX));      RFEFL0=0._r8
   allocate(RHYFL0(JY,JX));      RHYFL0=0._r8
@@ -1595,47 +1444,7 @@ contains
   call destroy(RC1PBS)
   call destroy(RC2PBS)
   call destroy(RM1PBS)
-  call destroy(TALBLS)
-  call destroy(TFEBLS)
-  call destroy(THYBLS)
-  call destroy(TCABLS)
-  call destroy(TMGBLS)
-  call destroy(TNABLS)
-  call destroy(TKABLS)
-  call destroy(TOHBLS)
-  call destroy(TSOBLS)
-  call destroy(TCLBLS)
-  call destroy(TC3BLS)
-  call destroy(THCBLS)
-  call destroy(TAL1BS)
-  call destroy(TAL2BS)
-  call destroy(TAL3BS)
-  call destroy(TAL4BS)
-  call destroy(TALSBS)
-  call destroy(TFE1BS)
-  call destroy(TFE2BS)
-  call destroy(TFE3BS)
-  call destroy(TFE4BS)
-  call destroy(TFESBS)
-  call destroy(TCAOBS)
-  call destroy(TCACBS)
-  call destroy(TCAHBS)
-  call destroy(TCASBS)
-  call destroy(TMGOBS)
-  call destroy(TMGCBS)
-  call destroy(TMGHBS)
-  call destroy(TMGSBS)
-  call destroy(TNACBS)
-  call destroy(TNASBS)
-  call destroy(TKASBS)
-  call destroy(TH0PBS)
-  call destroy(TH3PBS)
-  call destroy(TF1PBS)
-  call destroy(TF2PBS)
-  call destroy(TC0PBS)
-  call destroy(TC1PBS)
-  call destroy(TC2PBS)
-  call destroy(TM1PBS)
+
   call destroy(POSGL2)
   call destroy(RALFLS)
   call destroy(RFEFLS)
@@ -1833,47 +1642,7 @@ contains
   call destroy(RNACXS)
   call destroy(RNASXS)
   call destroy(RKASXS)
-  call destroy(ZALW2)
-  call destroy(ZFEW2)
-  call destroy(ZHYW2)
-  call destroy(ZCAW2)
-  call destroy(ZMGW2)
-  call destroy(ZNAW2)
-  call destroy(ZKAW2)
-  call destroy(ZOHW2)
-  call destroy(ZSO4W2)
-  call destroy(ZCLW2)
-  call destroy(ZCO3W2)
-  call destroy(ZHCO3W2)
-  call destroy(ZALH1W2)
-  call destroy(ZALH2W2)
-  call destroy(ZALH3W2)
-  call destroy(ZALH4W2)
-  call destroy(ZALSW2)
-  call destroy(ZFEH1W2)
-  call destroy(ZFEH2W2)
-  call destroy(ZFEH3W2)
-  call destroy(ZFEH4W2)
-  call destroy(ZFESW2)
-  call destroy(ZCAOW2)
-  call destroy(ZCACW2)
-  call destroy(ZCAHW2)
-  call destroy(ZCASW2)
-  call destroy(ZMGOW2)
-  call destroy(ZMGCW2)
-  call destroy(ZMGHW2)
-  call destroy(ZMGSW2)
-  call destroy(ZNACW2)
-  call destroy(ZNASW2)
-  call destroy(ZKASW2)
-  call destroy(H0PO4W2)
-  call destroy(H3PO4W2)
-  call destroy(ZFE1PW2)
-  call destroy(ZFE2PW2)
-  call destroy(ZCA0PW2)
-  call destroy(ZCA1PW2)
-  call destroy(ZCA2PW2)
-  call destroy(ZMG1PW2)
+
   call destroy(RALFL0)
   call destroy(RFEFL0)
   call destroy(RHYFL0)

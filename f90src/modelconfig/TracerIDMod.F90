@@ -45,17 +45,17 @@ implicit none
   integer :: idsa_AlOH4   ! AlOH4
   integer :: idsa_AlSO4   ! AlSO4
   integer :: idsa_FeOH    ! FeOH
-  integer :: isda_FeOH2   ! FeOH2
+  integer :: idsa_FeOH2   ! FeOH2
   integer :: idsa_FeOH3   ! FeOH3
   integer :: idsa_FeOH4   ! FeOH4
   integer :: idsa_FeSO4   ! FeSO4
   integer :: idsa_CaOH2   ! CaOH2
   integer :: idsa_CaCO3   ! CaCO3
-  integer :: isda_CaHCO3  ! CaHCO3
+  integer :: idsa_CaHCO3  ! CaHCO3
   integer :: idsa_CaSO4   ! CaSO4
   integer :: idsa_MgOH2   ! MgOH2
   integer :: idsa_MgCO3   ! MgCO3
-  integer :: idas_MgHCO3  ! MgHCO3
+  integer :: idsa_MgHCO3  ! MgHCO3
   integer :: idsa_MgSO4   ! MgSO4
   integer :: idsa_NaCO3   ! NaCO3
   integer :: idsa_NaSO4   ! NaSO4
@@ -67,7 +67,7 @@ implicit none
   integer :: idsa_CaPO4   ! CaPO4
   integer :: idsa_CaHPO4  ! CaHPO4
   integer :: idsa_CaH2PO4 ! CaH2PO4
-  integer :: idsa_MgH1PO4 ! MgHPO4
+  integer :: idsa_MgHPO4 ! MgHPO4
 
 
   contains
@@ -119,17 +119,17 @@ implicit none
     idsa_AlOH4=addone(idsa_end)
     idsa_AlSO4=addone(idsa_end)
     idsa_FeOH =addone(idsa_end)
-    isda_FeOH2=addone(idsa_end)
+    idsa_FeOH2=addone(idsa_end)
     idsa_FeOH3=addone(idsa_end)
     idsa_FeOH4=addone(idsa_end)
     idsa_FeSO4=addone(idsa_end)
     idsa_CaOH2=addone(idsa_end)
     idsa_CaCO3=addone(idsa_end)
-    isda_CaHCO3=addone(idsa_end)
+    idsa_CaHCO3=addone(idsa_end)
     idsa_CaSO4 =addone(idsa_end)
     idsa_MgOH2 =addone(idsa_end)
     idsa_MgCO3 =addone(idsa_end)
-    idas_MgHCO3=addone(idsa_end)
+    idsa_MgHCO3=addone(idsa_end)
     idsa_MgSO4 =addone(idsa_end)
     idsa_NaCO3 =addone(idsa_end)
     idsa_NaSO4 =addone(idsa_end)
@@ -141,8 +141,8 @@ implicit none
     idsa_CaPO4 =addone(idsa_end)
     idsa_CaHPO4=addone(idsa_end)
     idsa_CaH2PO4=addone(idsa_end)
-    idsa_MgH1PO4=addone(idsa_end)
-    idsa_end=idsa_MgH1PO4
+    idsa_MgHPO4=addone(idsa_end)
+    idsa_end=idsa_MgHPO4
   else
 
   endif

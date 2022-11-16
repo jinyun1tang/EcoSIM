@@ -60,59 +60,6 @@ module SnowDataType
   real(r8),target, allocatable ::  trcn_solsml(:,:,:,:)               ! snowpack nutrient dissolved tracers
   real(r8),target, allocatable ::  trcs_solsml(:,:,:,:)               ! snowpack salt dissolved tracers
 
-  real(r8),target, allocatable ::  CO2W(:,:,:)                        !snowpack CO2, [mol d-2]
-  real(r8),target, allocatable ::  CH4W(:,:,:)                        !snowpack CH4, [mol d-2]
-  real(r8),target, allocatable ::  OXYW(:,:,:)                        !snowpack O2, [mol d-2]
-  real(r8),target, allocatable ::  ZN2W(:,:,:)                        !snowpack N2O, [mol d-2]
-  real(r8),target, allocatable ::  ZNGW(:,:,:)                        !snowpack N2, [mol d-2]
-  real(r8),target, allocatable ::  ZN3W(:,:,:)                        !snowpack NH3, [mol d-2]
-
-  real(r8),target, allocatable ::  ZN4W(:,:,:)                        !snowpack NH4, [mol d-2]
-  real(r8),target, allocatable ::  ZNOW(:,:,:)                        !snowpack NO3, [mol d-2]
-  real(r8),target, allocatable ::  Z1PW(:,:,:)                        !snowpack HPO4,[mol d-2]
-  real(r8),target, allocatable ::  ZHPW(:,:,:)                        !snowpack H2PO4, [mol d-2]
-
-  real(r8),target, allocatable ::  ZALW(:,:,:)                        !snowpack Al, [mol d-2]
-  real(r8),target, allocatable ::  ZFEW(:,:,:)                        !snowpack Fe, [mol d-2]
-  real(r8),target, allocatable ::  ZHYW(:,:,:)                        !snowpack H, [mol d-2]
-  real(r8),target, allocatable ::  ZCAW(:,:,:)                        !snowpack Ca, [mol d-2]
-  real(r8),target, allocatable ::  ZMGW(:,:,:)                        !snowpack Mg, [mol d-2]
-  real(r8),target, allocatable ::  ZNAW(:,:,:)                        !snowpack Na, [mol d-2]
-  real(r8),target, allocatable ::  ZKAW(:,:,:)                        !snowpack K, [mol d-2]
-  real(r8),target, allocatable ::  ZOHW(:,:,:)                        !snowpack OH, [mol d-2]
-  real(r8),target, allocatable ::  ZSO4W(:,:,:)                       !snowpack SO4, [mol d-2]
-  real(r8),target, allocatable ::  ZCLW(:,:,:)                        !snowpack Cl, [mol d-2]
-  real(r8),target, allocatable ::  ZCO3W(:,:,:)                       !snowpack CO3, [mol d-2]
-  real(r8),target, allocatable ::  ZHCO3W(:,:,:)                      !snowpack HCO3, [mol d-2]
-  real(r8),target, allocatable ::  ZALH1W(:,:,:)                      !snowpack AlOH, [mol d-2]
-  real(r8),target, allocatable ::  ZALH2W(:,:,:)                      !snowpack AlOH2, [mol d-2]
-  real(r8),target, allocatable ::  ZALH3W(:,:,:)                      !snowpack AlOH3, [mol d-2]
-  real(r8),target, allocatable ::  ZALH4W(:,:,:)                      !snowpack AlOH4, [mol d-2]
-  real(r8),target, allocatable ::  ZALSW(:,:,:)                       !snowpack AlSO4, [mol d-2]
-  real(r8),target, allocatable ::  ZFEH1W(:,:,:)                      !snowpack FeOH, [mol d-2]
-  real(r8),target, allocatable ::  ZFEH2W(:,:,:)                      !snowpack FeOH2, [mol d-2]
-  real(r8),target, allocatable ::  ZFEH3W(:,:,:)                      !snowpack FeOH3, [mol d-2]
-  real(r8),target, allocatable ::  ZFEH4W(:,:,:)                      !snowpack F3OH4, [mol d-2]
-  real(r8),target, allocatable ::  ZFESW(:,:,:)                       !snowpack FeSO4, [mol d-2]
-  real(r8),target, allocatable ::  ZCAOW(:,:,:)                       !snowpack CaOH2, [mol d-2]
-  real(r8),target, allocatable ::  ZCACW(:,:,:)                       !snowpack CaCO3, [mol d-2]
-  real(r8),target, allocatable ::  ZCAHW(:,:,:)                       !snowpack CaHCO3, [mol d-2]
-  real(r8),target, allocatable ::  ZCASW(:,:,:)                       !snowpack CaSO4, [mol d-2]
-  real(r8),target, allocatable ::  ZMGOW(:,:,:)                       !snowpack MgOH2, [mol d-2]
-  real(r8),target, allocatable ::  ZMGCW(:,:,:)                       !snowpack MgCO3, [mol d-2]
-  real(r8),target, allocatable ::  ZMGHW(:,:,:)                       !snowpack MgHCO3, [mol d-2]
-  real(r8),target, allocatable ::  ZMGSW(:,:,:)                       !snowpack MgSO4, [mol d-2]
-  real(r8),target, allocatable ::  ZNACW(:,:,:)                       !snowpack NaCO3, [mol d-2]
-  real(r8),target, allocatable ::  ZNASW(:,:,:)                       !snowpack NaSO4, [mol d-2]
-  real(r8),target, allocatable ::  ZKASW(:,:,:)                       !snowpack KSO4, [mol d-2]
-  real(r8),target, allocatable ::  H0PO4W(:,:,:)                      !snowpack PO4, [mol d-2]
-  real(r8),target, allocatable ::  H3PO4W(:,:,:)                      !snowpack H3PO4, [mol d-2]
-  real(r8),target, allocatable ::  ZFE1PW(:,:,:)                      !snowpack FeHPO4, [mol d-2]
-  real(r8),target, allocatable ::  ZFE2PW(:,:,:)                      !snowpack FeH2PO4, [mol d-2]
-  real(r8),target, allocatable ::  ZCA0PW(:,:,:)                      !snowpack CaPO4, [mol d-2]
-  real(r8),target, allocatable ::  ZCA1PW(:,:,:)                      !snowpack CaHPO4, [mol d-2]
-  real(r8),target, allocatable ::  ZCA2PW(:,:,:)                      !snowpack CaH2PO4, [mol d-2]
-  real(r8),target, allocatable ::  ZMG1PW(:,:,:)                      !snowpack MgHPO4, [mol d-2]
 
   real(r8),target, allocatable ::  XQSAL(:,:,:)                       !total Al in snow drift, [mol d-2 h-1]
   real(r8),target, allocatable ::  XQSFE(:,:,:)                       !total Fe in snow drift, [mol d-2 h-1]
@@ -217,59 +164,7 @@ contains
     allocate(trcs_solsml(idsa_beg:idsa_end,JS,JY,JX)); trcs_solsml=0._r8
   endif
 
-  allocate(CO2W(JS,JY,JX));     CO2W=0._r8
-  allocate(CH4W(JS,JY,JX));     CH4W=0._r8
-  allocate(OXYW(JS,JY,JX));     OXYW=0._r8
-  allocate(ZN2W(JS,JY,JX));     ZN2W=0._r8
-  allocate(ZNGW(JS,JY,JX));     ZNGW=0._r8
-  allocate(ZN4W(JS,JY,JX));     ZN4W=0._r8
-  allocate(ZN3W(JS,JY,JX));     ZN3W=0._r8
-  allocate(ZNOW(JS,JY,JX));     ZNOW=0._r8
-  allocate(Z1PW(JS,JY,JX));     Z1PW=0._r8
-  allocate(ZHPW(JS,JY,JX));     ZHPW=0._r8
-  if(salt_model)then
-    allocate(ZALW(JS,JY,JX));     ZALW=0._r8
-    allocate(ZFEW(JS,JY,JX));     ZFEW=0._r8
-    allocate(ZHYW(JS,JY,JX));     ZHYW=0._r8
-    allocate(ZCAW(JS,JY,JX));     ZCAW=0._r8
-    allocate(ZMGW(JS,JY,JX));     ZMGW=0._r8
-    allocate(ZNAW(JS,JY,JX));     ZNAW=0._r8
-    allocate(ZKAW(JS,JY,JX));     ZKAW=0._r8
-    allocate(ZOHW(JS,JY,JX));     ZOHW=0._r8
-    allocate(ZSO4W(JS,JY,JX));    ZSO4W=0._r8
-    allocate(ZCLW(JS,JY,JX));     ZCLW=0._r8
-    allocate(ZCO3W(JS,JY,JX));    ZCO3W=0._r8
-    allocate(ZHCO3W(JS,JY,JX));   ZHCO3W=0._r8
-    allocate(ZALH1W(JS,JY,JX));   ZALH1W=0._r8
-    allocate(ZALH2W(JS,JY,JX));   ZALH2W=0._r8
-    allocate(ZALH3W(JS,JY,JX));   ZALH3W=0._r8
-    allocate(ZALH4W(JS,JY,JX));   ZALH4W=0._r8
-    allocate(ZALSW(JS,JY,JX));    ZALSW=0._r8
-    allocate(ZFEH1W(JS,JY,JX));   ZFEH1W=0._r8
-    allocate(ZFEH2W(JS,JY,JX));   ZFEH2W=0._r8
-    allocate(ZFEH3W(JS,JY,JX));   ZFEH3W=0._r8
-    allocate(ZFEH4W(JS,JY,JX));   ZFEH4W=0._r8
-    allocate(ZFESW(JS,JY,JX));    ZFESW=0._r8
-    allocate(ZCAOW(JS,JY,JX));    ZCAOW=0._r8
-    allocate(ZCACW(JS,JY,JX));    ZCACW=0._r8
-    allocate(ZCAHW(JS,JY,JX));    ZCAHW=0._r8
-    allocate(ZCASW(JS,JY,JX));    ZCASW=0._r8
-    allocate(ZMGOW(JS,JY,JX));    ZMGOW=0._r8
-    allocate(ZMGCW(JS,JY,JX));    ZMGCW=0._r8
-    allocate(ZMGHW(JS,JY,JX));    ZMGHW=0._r8
-    allocate(ZMGSW(JS,JY,JX));    ZMGSW=0._r8
-    allocate(ZNACW(JS,JY,JX));    ZNACW=0._r8
-    allocate(ZNASW(JS,JY,JX));    ZNASW=0._r8
-    allocate(ZKASW(JS,JY,JX));    ZKASW=0._r8
-    allocate(H0PO4W(JS,JY,JX));   H0PO4W=0._r8
-    allocate(H3PO4W(JS,JY,JX));   H3PO4W=0._r8
-    allocate(ZFE1PW(JS,JY,JX));   ZFE1PW=0._r8
-    allocate(ZFE2PW(JS,JY,JX));   ZFE2PW=0._r8
-    allocate(ZCA0PW(JS,JY,JX));   ZCA0PW=0._r8
-    allocate(ZCA1PW(JS,JY,JX));   ZCA1PW=0._r8
-    allocate(ZCA2PW(JS,JY,JX));   ZCA2PW=0._r8
-    allocate(ZMG1PW(JS,JY,JX));   ZMG1PW=0._r8
-  endif
+
   allocate(XQSAL(2,JV,JH));     XQSAL=0._r8
   allocate(XQSFE(2,JV,JH));     XQSFE=0._r8
   allocate(XQSHY(2,JV,JH));     XQSHY=0._r8
@@ -365,59 +260,8 @@ contains
   call destroy(XNOQSS)
   call destroy(XP4QSS)
   call destroy(XP1QSS)
-  call destroy(CO2W)
-  call destroy(CH4W)
-  call destroy(OXYW)
-  call destroy(ZN2W)
-  call destroy(ZNGW)
-  call destroy(ZN4W)
-  call destroy(ZN3W)
-  call destroy(ZNOW)
-  call destroy(Z1PW)
-  call destroy(ZHPW)
 
-  call destroy(ZALW)
-  call destroy(ZFEW)
-  call destroy(ZHYW)
-  call destroy(ZCAW)
-  call destroy(ZMGW)
-  call destroy(ZNAW)
-  call destroy(ZKAW)
-  call destroy(ZOHW)
-  call destroy(ZSO4W)
-  call destroy(ZCLW)
-  call destroy(ZCO3W)
-  call destroy(ZHCO3W)
-  call destroy(ZALH1W)
-  call destroy(ZALH2W)
-  call destroy(ZALH3W)
-  call destroy(ZALH4W)
-  call destroy(ZALSW)
-  call destroy(ZFEH1W)
-  call destroy(ZFEH2W)
-  call destroy(ZFEH3W)
-  call destroy(ZFEH4W)
-  call destroy(ZFESW)
-  call destroy(ZCAOW)
-  call destroy(ZCACW)
-  call destroy(ZCAHW)
-  call destroy(ZCASW)
-  call destroy(ZMGOW)
-  call destroy(ZMGCW)
-  call destroy(ZMGHW)
-  call destroy(ZMGSW)
-  call destroy(ZNACW)
-  call destroy(ZNASW)
-  call destroy(ZKASW)
-  call destroy(H0PO4W)
-  call destroy(H3PO4W)
-  call destroy(ZFE1PW)
-  call destroy(ZFE2PW)
-  call destroy(ZCA0PW)
-  call destroy(ZCA1PW)
-  call destroy(ZCA2PW)
-  call destroy(ZMG1PW)
-  
+
   call destroy(XQSAL)
   call destroy(XQSFE)
   call destroy(XQSHY)

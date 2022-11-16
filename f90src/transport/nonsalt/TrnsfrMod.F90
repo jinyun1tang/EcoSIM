@@ -320,7 +320,7 @@ module TrnsfrMod
   subroutine UpdateStateVarInSnowpack(NY,NX)
   implicit none
   integer, intent(in) :: NY,NX
-  integer :: L
+  integer :: L,NTG,NTN
 !
 !     *W2=solute content of snowpack
 !     TQS*=net overland solute flux in snow
@@ -328,27 +328,22 @@ module TrnsfrMod
 !     solute code:CO=CO2,CH=CH4,OX=O2,NG=N2,N2=N2O,HG=H2
 !             :N4=NH4,N3=NH3,NO=NO3,1P=HPO4,HP=H2PO4
 !
-  CO2W2(1,NY,NX)=CO2W2(1,NY,NX)+TQSCOS(NY,NX)
-  CH4W2(1,NY,NX)=CH4W2(1,NY,NX)+TQSCHS(NY,NX)
-  OXYW2(1,NY,NX)=OXYW2(1,NY,NX)+TQSOXS(NY,NX)
-  ZNGW2(1,NY,NX)=ZNGW2(1,NY,NX)+TQSNGS(NY,NX)
-  ZN2W2(1,NY,NX)=ZN2W2(1,NY,NX)+TQSN2S(NY,NX)
-  ZN4W2(1,NY,NX)=ZN4W2(1,NY,NX)+TQSNH4(NY,NX)
-  ZN3W2(1,NY,NX)=ZN3W2(1,NY,NX)+TQSNH3(NY,NX)
-  ZNOW2(1,NY,NX)=ZNOW2(1,NY,NX)+TQSNO3(NY,NX)
-  Z1PW2(1,NY,NX)=Z1PW2(1,NY,NX)+TQSH1P(NY,NX)
-  ZHPW2(1,NY,NX)=ZHPW2(1,NY,NX)+TQSH2P(NY,NX)
+  DO NTG=idg_beg,idg_end-1
+    trcg_solsml2(NTG,1,NY,NX)=trcg_solsml2(NTG,1,NY,NX)+trcg_TQ(NTG,NY,NX)
+  ENDDO
+
+  DO NTN=ids_nut_beg,ids_nuts_end
+    trcn_solsml2(NTN,1,NY,NX)=trcn_solsml2(NTN,1,NY,NX)+trcn_TQ(NTN,NY,NX)
+  ENDDO
+
   DO  L=1,JS
-    CO2W2(L,NY,NX)=CO2W2(L,NY,NX)+TCOBLS(L,NY,NX)
-    CH4W2(L,NY,NX)=CH4W2(L,NY,NX)+TCHBLS(L,NY,NX)
-    OXYW2(L,NY,NX)=OXYW2(L,NY,NX)+TOXBLS(L,NY,NX)
-    ZNGW2(L,NY,NX)=ZNGW2(L,NY,NX)+TNGBLS(L,NY,NX)
-    ZN2W2(L,NY,NX)=ZN2W2(L,NY,NX)+TN2BLS(L,NY,NX)
-    ZN4W2(L,NY,NX)=ZN4W2(L,NY,NX)+TN4BLW(L,NY,NX)
-    ZN3W2(L,NY,NX)=ZN3W2(L,NY,NX)+TN3BLW(L,NY,NX)
-    ZNOW2(L,NY,NX)=ZNOW2(L,NY,NX)+TNOBLW(L,NY,NX)
-    Z1PW2(L,NY,NX)=Z1PW2(L,NY,NX)+TH1PBS(L,NY,NX)
-    ZHPW2(L,NY,NX)=ZHPW2(L,NY,NX)+TH2PBS(L,NY,NX)
+    DO NTG=idg_beg,idg_end-1
+      trcg_solsml2(NTG,L,NY,NX)=trcg_solsml2(NTG,L,NY,NX)+trcg_TBLS(NTG,L,NY,NX)
+    ENDDO
+
+    DO NTN=ids_nut_beg,ids_nuts_end
+      trcn_solsml2(NTN,L,NY,NX)=trcn_solsml2(NTN,L,NY,NX)+trcn_TBLS(NTN,L,NY,NX)
+    ENDDO
   ENDDO
   end subroutine UpdateStateVarInSnowpack
 
@@ -403,18 +398,21 @@ module TrnsfrMod
     OQA2(K,0,NY,NX)=OQA2(K,0,NY,NX)+TQROA(K,NY,NX)
   ENDDO D9680
 
-  trc_solml2(idg_CO2,0,NY,NX)=trc_solml2(idg_CO2,0,NY,NX)+TQRCOS(NY,NX)
-  trc_solml2(idg_CH4,0,NY,NX)=trc_solml2(idg_CH4,0,NY,NX)+TQRCHS(NY,NX)
-  trc_solml2(idg_O2,0,NY,NX)=trc_solml2(idg_O2,0,NY,NX)+TQROXS(NY,NX)
-  trc_solml2(idg_N2,0,NY,NX)=trc_solml2(idg_N2,0,NY,NX)+TQRNGS(NY,NX)
-  trc_solml2(idg_N2O,0,NY,NX)=trc_solml2(idg_N2O,0,NY,NX)+TQRN2S(NY,NX)
-  trc_solml2(idg_H2,0,NY,NX)=trc_solml2(idg_H2,0,NY,NX)+TQRHGS(NY,NX)
-  trc_solml2(ids_NH4,0,NY,NX)=trc_solml2(ids_NH4,0,NY,NX)+TQRNH4(NY,NX)
-  trc_solml2(idg_NH3,0,NY,NX)=trc_solml2(idg_NH3,0,NY,NX)+TQRNH3(NY,NX)
-  trc_solml2(ids_NO3,0,NY,NX)=trc_solml2(ids_NO3,0,NY,NX)+TQRNO3(NY,NX)
-  trc_solml2(ids_NO2,0,NY,NX)=trc_solml2(ids_NO2,0,NY,NX)+TQRNO2(NY,NX)
-  trc_solml2(ids_H1PO4,0,NY,NX)=trc_solml2(ids_H1PO4,0,NY,NX)+TQRH1P(NY,NX)
-  trc_solml2(ids_H2PO4,0,NY,NX)=trc_solml2(ids_H2PO4,0,NY,NX)+TQRH2P(NY,NX)
+
+  trc_solml2(idg_CO2,0,NY,NX)=trc_solml2(idg_CO2,0,NY,NX)+trcg_TQR(idg_CO2,NY,NX)
+  trc_solml2(idg_CH4,0,NY,NX)=trc_solml2(idg_CH4,0,NY,NX)+trcg_TQR(idg_CH4,NY,NX)
+  trc_solml2(idg_O2,0,NY,NX)=trc_solml2(idg_O2,0,NY,NX)+trcg_TQR(idg_O2,NY,NX)
+  trc_solml2(idg_N2,0,NY,NX)=trc_solml2(idg_N2,0,NY,NX)+trcg_TQR(idg_N2,NY,NX)
+  trc_solml2(idg_N2O,0,NY,NX)=trc_solml2(idg_N2O,0,NY,NX)+trcg_TQR(idg_N2O,NY,NX)
+  trc_solml2(idg_H2,0,NY,NX)=trc_solml2(idg_H2,0,NY,NX)+trcg_TQR(idg_H2,NY,NX)
+  trc_solml2(idg_NH3,0,NY,NX)=trc_solml2(idg_NH3,0,NY,NX)+trcg_TQR(idg_NH3,NY,NX)
+
+  trc_solml2(ids_NH4,0,NY,NX)=trc_solml2(ids_NH4,0,NY,NX)+trcn_TQR(ids_NH4,NY,NX)
+  trc_solml2(ids_NO3,0,NY,NX)=trc_solml2(ids_NO3,0,NY,NX)+trcn_TQR(ids_NO3,NY,NX)
+  trc_solml2(ids_NO2,0,NY,NX)=trc_solml2(ids_NO2,0,NY,NX)+trcn_TQR(ids_NO2,NY,NX)
+  trc_solml2(ids_H1PO4,0,NY,NX)=trc_solml2(ids_H1PO4,0,NY,NX)+trcn_TQR(ids_H1PO4,NY,NX)
+  trc_solml2(ids_H2PO4,0,NY,NX)=trc_solml2(ids_H2PO4,0,NY,NX)+trcn_TQR(ids_H2PO4,NY,NX)
+
   end subroutine UpdateStateVarInResidue
 
 !------------------------------------------------------------------------------------------
@@ -583,7 +581,7 @@ module TrnsfrMod
     XONFHS(K,3,NU(NY,NX),NY,NX)=0.0
     XOPFHS(K,3,NU(NY,NX),NY,NX)=0.0
     XOAFHS(K,3,NU(NY,NX),NY,NX)=0.0
-  ENDDO D8855 
+  ENDDO D8855
   end subroutine SurfaceSolutefromAtms
 !------------------------------------------------------------------------------------------
 
@@ -693,27 +691,27 @@ module TrnsfrMod
     XN2FLS(3,NU(NY,NX),NY,NX)=FLQGQ(NY,NX)*CN2R(NY,NX)+FLQGI(NY,NX)*CN2Q(NY,NX)
     XHGFLS(3,NU(NY,NX),NY,NX)=0.0_r8
     XN4FLW(3,NU(NY,NX),NY,NX)=((FLQGQ(NY,NX)*CN4R(NY,NX) &
-      +FLQGI(NY,NX)*CN4Q(I,NY,NX))*natomw)*VLNH4(NU(NY,NX),NY,NX)
+      +FLQGI(NY,NX)*CN4Q(I,NY,NX))*natomw)*trcs_VLN(ids_NH4,NU(NY,NX),NY,NX)
     XN3FLW(3,NU(NY,NX),NY,NX)=((FLQGQ(NY,NX)*CN3R(NY,NX) &
-      +FLQGI(NY,NX)*CN3Q(I,NY,NX))*natomw)*VLNH4(NU(NY,NX),NY,NX)
+      +FLQGI(NY,NX)*CN3Q(I,NY,NX))*natomw)*trcs_VLN(ids_NH4,NU(NY,NX),NY,NX)
     XNOFLW(3,NU(NY,NX),NY,NX)=((FLQGQ(NY,NX)*CNOR(NY,NX) &
-      +FLQGI(NY,NX)*CNOQ(I,NY,NX))*natomw)*VLNO3(NU(NY,NX),NY,NX)
+      +FLQGI(NY,NX)*CNOQ(I,NY,NX))*natomw)*trcs_VLN(ids_NO3,NU(NY,NX),NY,NX)
     XNXFLS(3,NU(NY,NX),NY,NX)=0.0_r8
     XH1PFS(3,NU(NY,NX),NY,NX)=((FLQGQ(NY,NX)*CH1PR(NY,NX) &
-      +FLQGI(NY,NX)*CH1PQ(I,NY,NX))*patomw)*VLPO4(NU(NY,NX),NY,NX)
+      +FLQGI(NY,NX)*CH1PQ(I,NY,NX))*patomw)*trcs_VLN(ids_H1PO4,NU(NY,NX),NY,NX)
     XH2PFS(3,NU(NY,NX),NY,NX)=((FLQGQ(NY,NX)*CPOR(NY,NX) &
-      +FLQGI(NY,NX)*CPOQ(I,NY,NX))*patomw)*VLPO4(NU(NY,NX),NY,NX)
+      +FLQGI(NY,NX)*CPOQ(I,NY,NX))*patomw)*trcs_VLN(ids_H1PO4,NU(NY,NX),NY,NX)
     XN4FLB(3,NU(NY,NX),NY,NX)=((FLQGQ(NY,NX)*CN4R(NY,NX) &
-      +FLQGI(NY,NX)*CN4Q(I,NY,NX))*natomw)*VLNHB(NU(NY,NX),NY,NX)
+      +FLQGI(NY,NX)*CN4Q(I,NY,NX))*natomw)*trcs_VLN(ids_NH4B,NU(NY,NX),NY,NX)
     XN3FLB(3,NU(NY,NX),NY,NX)=((FLQGQ(NY,NX)*CN3R(NY,NX) &
-      +FLQGI(NY,NX)*CN3Q(I,NY,NX))*natomw)*VLNHB(NU(NY,NX),NY,NX)
+      +FLQGI(NY,NX)*CN3Q(I,NY,NX))*natomw)*trcs_VLN(ids_NH4B,NU(NY,NX),NY,NX)
     XNOFLB(3,NU(NY,NX),NY,NX)=((FLQGQ(NY,NX)*CNOR(NY,NX) &
-      +FLQGI(NY,NX)*CNOQ(I,NY,NX))*natomw)*VLNOB(NU(NY,NX),NY,NX)
+      +FLQGI(NY,NX)*CNOQ(I,NY,NX))*natomw)*trcs_VLN(ids_NO3B,NU(NY,NX),NY,NX)
     XNXFLB(3,NU(NY,NX),NY,NX)=0.0_r8
     XH1BFB(3,NU(NY,NX),NY,NX)=((FLQGQ(NY,NX)*CH1PR(NY,NX) &
-      +FLQGI(NY,NX)*CH1PQ(I,NY,NX))*patomw)*VLPOB(NU(NY,NX),NY,NX)
+      +FLQGI(NY,NX)*CH1PQ(I,NY,NX))*patomw)*trcs_VLN(ids_H1PO4B,NU(NY,NX),NY,NX)
     XH2BFB(3,NU(NY,NX),NY,NX)=((FLQGQ(NY,NX)*CPOR(NY,NX) &
-      +FLQGI(NY,NX)*CPOQ(I,NY,NX))*patomw)*VLPOB(NU(NY,NX),NY,NX)
+      +FLQGI(NY,NX)*CPOQ(I,NY,NX))*patomw)*trcs_VLN(ids_H1PO4B,NU(NY,NX),NY,NX)
 !
 !     NO SOLUTE FLUXES FROM ATMOSPHERE
 !
@@ -865,16 +863,10 @@ module TrnsfrMod
 !     CO2W,CH4W,OXYW,ZNGW,ZN2W,ZN4W,ZN3W,ZNOW,Z1PW,ZHPW=CO2,CH4,O2,N2,N2O,H2 content in snowpack
 !
   DO L=1,JS
-    CO2W2(L,NY,NX)=CO2W(L,NY,NX)
-    CH4W2(L,NY,NX)=CH4W(L,NY,NX)
-    OXYW2(L,NY,NX)=OXYW(L,NY,NX)
-    ZNGW2(L,NY,NX)=ZNGW(L,NY,NX)
-    ZN2W2(L,NY,NX)=ZN2W(L,NY,NX)
-    ZN4W2(L,NY,NX)=ZN4W(L,NY,NX)
-    ZN3W2(L,NY,NX)=ZN3W(L,NY,NX)
-    ZNOW2(L,NY,NX)=ZNOW(L,NY,NX)
-    Z1PW2(L,NY,NX)=Z1PW(L,NY,NX)
-    ZHPW2(L,NY,NX)=ZHPW(L,NY,NX)
+
+    trcg_solsml2(idg_beg:idg_end-1,L,NY,NX)=trcg_solsml(idg_beg:idg_end-1,L,NY,NX)
+
+    trcn_solsml2(ids_nut_beg:ids_nuts_end,L,NY,NX)=trcn_solsml(ids_nut_beg:ids_nuts_end,L,NY,NX)
   enddo
   end subroutine SubHourlyFluxesFromSiteFile
 !------------------------------------------------------------------------------------------
@@ -933,16 +925,16 @@ module TrnsfrMod
     RNGFLU(L,NY,NX)=FLU(L,NY,NX)*CNNQ(NY,NX)
     RN2FLU(L,NY,NX)=FLU(L,NY,NX)*CN2Q(NY,NX)
     RHGFLU(L,NY,NX)=0.0_r8
-    RN4FLU(L,NY,NX)=FLU(L,NY,NX)*CN4Q(I,NY,NX)*VLNH4(L,NY,NX)*natomw
-    RN3FLU(L,NY,NX)=FLU(L,NY,NX)*CN3Q(I,NY,NX)*VLNH4(L,NY,NX)*natomw
-    RNOFLU(L,NY,NX)=FLU(L,NY,NX)*CNOQ(I,NY,NX)*VLNO3(L,NY,NX)*natomw
-    RH1PFU(L,NY,NX)=FLU(L,NY,NX)*CH1PQ(I,NY,NX)*VLPO4(L,NY,NX)*patomw
-    RH2PFU(L,NY,NX)=FLU(L,NY,NX)*CPOQ(I,NY,NX)*VLPO4(L,NY,NX)*patomw
-    RN4FBU(L,NY,NX)=FLU(L,NY,NX)*CN4Q(I,NY,NX)*VLNHB(L,NY,NX)*natomw
-    RN3FBU(L,NY,NX)=FLU(L,NY,NX)*CN3Q(I,NY,NX)*VLNHB(L,NY,NX)*natomw
-    RNOFBU(L,NY,NX)=FLU(L,NY,NX)*CNOQ(I,NY,NX)*VLNOB(L,NY,NX)*natomw
-    RH1BBU(L,NY,NX)=FLU(L,NY,NX)*CH1PQ(I,NY,NX)*VLPOB(L,NY,NX)*patomw
-    RH2BBU(L,NY,NX)=FLU(L,NY,NX)*CPOQ(I,NY,NX)*VLPOB(L,NY,NX)*patomw
+    RN4FLU(L,NY,NX)=FLU(L,NY,NX)*CN4Q(I,NY,NX)*trcs_VLN(ids_NH4,L,NY,NX)*natomw
+    RN3FLU(L,NY,NX)=FLU(L,NY,NX)*CN3Q(I,NY,NX)*trcs_VLN(ids_NH4,L,NY,NX)*natomw
+    RNOFLU(L,NY,NX)=FLU(L,NY,NX)*CNOQ(I,NY,NX)*trcs_VLN(ids_NO3,L,NY,NX)*natomw
+    RH1PFU(L,NY,NX)=FLU(L,NY,NX)*CH1PQ(I,NY,NX)*trcs_VLN(ids_H1PO4,L,NY,NX)*patomw
+    RH2PFU(L,NY,NX)=FLU(L,NY,NX)*CPOQ(I,NY,NX)*trcs_VLN(ids_H1PO4,L,NY,NX)*patomw
+    RN4FBU(L,NY,NX)=FLU(L,NY,NX)*CN4Q(I,NY,NX)*trcs_VLN(ids_NH4B,L,NY,NX)*natomw
+    RN3FBU(L,NY,NX)=FLU(L,NY,NX)*CN3Q(I,NY,NX)*trcs_VLN(ids_NH4B,L,NY,NX)*natomw
+    RNOFBU(L,NY,NX)=FLU(L,NY,NX)*CNOQ(I,NY,NX)*trcs_VLN(ids_NO3B,L,NY,NX)*natomw
+    RH1BBU(L,NY,NX)=FLU(L,NY,NX)*CH1PQ(I,NY,NX)*trcs_VLN(ids_H1PO4B,L,NY,NX)*patomw
+    RH2BBU(L,NY,NX)=FLU(L,NY,NX)*CPOQ(I,NY,NX)*trcs_VLN(ids_H1PO4B,L,NY,NX)*patomw
 !
 !     SUB-HOURLY SOLUTE FLUXES FROM SUBSURFACE IRRIGATION
 !

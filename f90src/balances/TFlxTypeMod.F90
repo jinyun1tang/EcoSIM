@@ -3,6 +3,7 @@ module TFlxTypeMod
   use GridDataType
   use data_kind_mod, only : r8 => SHR_KIND_R8
   use abortutils, only : destroy
+  use TracerIDMod
   use EcoSIMConfig, only : jcplx => jcplxc,jsken=>jskenc,NFGs=>NFGsc
   use EcoSIMConfig, only : nlbiomcp=>nlbiomcpc,ndbiomcp=>ndbiomcpc
 implicit none
@@ -10,57 +11,10 @@ implicit none
   character(len=*), private, parameter :: mod_filename = __FILE__
 
   public
-  real(r8),allocatable ::  TCOBLS(:,:,:)                      !
-  real(r8),allocatable ::  TCHBLS(:,:,:)                      !
-  real(r8),allocatable ::  TOXBLS(:,:,:)                      !
-  real(r8),allocatable ::  TNGBLS(:,:,:)                      !
-  real(r8),allocatable ::  TN2BLS(:,:,:)                      !
-  real(r8),allocatable ::  TN4BLW(:,:,:)                      !
-  real(r8),allocatable ::  TN3BLW(:,:,:)                      !
-  real(r8),allocatable ::  TNOBLW(:,:,:)                      !
-  real(r8),allocatable ::  TH1PBS(:,:,:)                      !
-  real(r8),allocatable ::  TH2PBS(:,:,:)                      !
-  real(r8),allocatable ::  TALBLS(:,:,:)                      !
-  real(r8),allocatable ::  TFEBLS(:,:,:)                      !
-  real(r8),allocatable ::  THYBLS(:,:,:)                      !
-  real(r8),allocatable ::  TCABLS(:,:,:)                      !
-  real(r8),allocatable ::  TMGBLS(:,:,:)                      !
-  real(r8),allocatable ::  TNABLS(:,:,:)                      !
-  real(r8),allocatable ::  TKABLS(:,:,:)                      !
-  real(r8),allocatable ::  TOHBLS(:,:,:)                      !
-  real(r8),allocatable ::  TSOBLS(:,:,:)                      !
-  real(r8),allocatable ::  TCLBLS(:,:,:)                      !
-  real(r8),allocatable ::  TC3BLS(:,:,:)                      !
-  real(r8),allocatable ::  THCBLS(:,:,:)                      !
-  real(r8),allocatable ::  TAL1BS(:,:,:)                      !
-  real(r8),allocatable ::  TAL2BS(:,:,:)                      !
-  real(r8),allocatable ::  TAL3BS(:,:,:)                      !
-  real(r8),allocatable ::  TAL4BS(:,:,:)                      !
-  real(r8),allocatable ::  TALSBS(:,:,:)                      !
-  real(r8),allocatable ::  TFE1BS(:,:,:)                      !
-  real(r8),allocatable ::  TFE2BS(:,:,:)                      !
-  real(r8),allocatable ::  TFE3BS(:,:,:)                      !
-  real(r8),allocatable ::  TFE4BS(:,:,:)                      !
-  real(r8),allocatable ::  TFESBS(:,:,:)                      !
-  real(r8),allocatable ::  TCAOBS(:,:,:)                      !
-  real(r8),allocatable ::  TCACBS(:,:,:)                      !
-  real(r8),allocatable ::  TCAHBS(:,:,:)                      !
-  real(r8),allocatable ::  TCASBS(:,:,:)                      !
-  real(r8),allocatable ::  TMGOBS(:,:,:)                      !
-  real(r8),allocatable ::  TMGCBS(:,:,:)                      !
-  real(r8),allocatable ::  TMGHBS(:,:,:)                      !
-  real(r8),allocatable ::  TMGSBS(:,:,:)                      !
-  real(r8),allocatable ::  TNACBS(:,:,:)                      !
-  real(r8),allocatable ::  TNASBS(:,:,:)                      !
-  real(r8),allocatable ::  TKASBS(:,:,:)                      !
-  real(r8),allocatable ::  TH0PBS(:,:,:)                      !
-  real(r8),allocatable ::  TH3PBS(:,:,:)                      !
-  real(r8),allocatable ::  TF1PBS(:,:,:)                      !
-  real(r8),allocatable ::  TF2PBS(:,:,:)                      !
-  real(r8),allocatable ::  TC0PBS(:,:,:)                      !
-  real(r8),allocatable ::  TC1PBS(:,:,:)                      !
-  real(r8),allocatable ::  TC2PBS(:,:,:)                      !
-  real(r8),allocatable ::  TM1PBS(:,:,:)                      !
+  real(r8),allocatable ::  trcg_TBLS(:,:,:,:)
+  real(r8),allocatable ::  trcn_TBLS(:,:,:,:)
+  real(r8),allocatable ::  trcsa_TBLS(:,:,:,:)                      !
+
   real(r8),allocatable ::  THGFLG(:,:,:)                      !
   real(r8),allocatable ::  THGFLS(:,:,:)                      !
   real(r8),allocatable ::  THGFHS(:,:,:)                      !
@@ -126,7 +80,10 @@ implicit none
   real(r8),allocatable ::  TQRC0P(:,:)                        !
   real(r8),allocatable ::  TQRC1P(:,:)                        !
   real(r8),allocatable ::  TQRC2P(:,:)                        !
-  real(r8),allocatable ::  TQRM1P(:,:)                        !
+  real(r8),allocatable ::  TQRM1P(:,:)
+                    !
+  real(r8),allocatable ::  trcg_QSS(:,:,:)
+  real(r8),allocatable ::  trcn_QSS(:,:,:)
   real(r8),allocatable ::  TCOQSS(:,:)                        !
   real(r8),allocatable ::  TCHQSS(:,:)                        !
   real(r8),allocatable ::  TOXQSS(:,:)                        !
@@ -137,47 +94,7 @@ implicit none
   real(r8),allocatable ::  TNOQSS(:,:)                        !
   real(r8),allocatable ::  TPOQSS(:,:)                        !
   real(r8),allocatable ::  TP1QSS(:,:)                        !
-  real(r8),allocatable ::  TQSAL(:,:)                         !
-  real(r8),allocatable ::  TQSFE(:,:)                         !
-  real(r8),allocatable ::  TQSHY(:,:)                         !
-  real(r8),allocatable ::  TQSCA(:,:)                         !
-  real(r8),allocatable ::  TQSMG(:,:)                         !
-  real(r8),allocatable ::  TQSNA(:,:)                         !
-  real(r8),allocatable ::  TQSKA(:,:)                         !
-  real(r8),allocatable ::  TQSOH(:,:)                         !
-  real(r8),allocatable ::  TQSSO(:,:)                         !
-  real(r8),allocatable ::  TQSCL(:,:)                         !
-  real(r8),allocatable ::  TQSC3(:,:)                         !
-  real(r8),allocatable ::  TQSHC(:,:)                         !
-  real(r8),allocatable ::  TQSAL1(:,:)                        !
-  real(r8),allocatable ::  TQSAL2(:,:)                        !
-  real(r8),allocatable ::  TQSAL3(:,:)                        !
-  real(r8),allocatable ::  TQSAL4(:,:)                        !
-  real(r8),allocatable ::  TQSALS(:,:)                        !
-  real(r8),allocatable ::  TQSFE1(:,:)                        !
-  real(r8),allocatable ::  TQSFE2(:,:)                        !
-  real(r8),allocatable ::  TQSFE3(:,:)                        !
-  real(r8),allocatable ::  TQSFE4(:,:)                        !
-  real(r8),allocatable ::  TQSFES(:,:)                        !
-  real(r8),allocatable ::  TQSCAO(:,:)                        !
-  real(r8),allocatable ::  TQSCAC(:,:)                        !
-  real(r8),allocatable ::  TQSCAH(:,:)                        !
-  real(r8),allocatable ::  TQSCAS(:,:)                        !
-  real(r8),allocatable ::  TQSMGO(:,:)                        !
-  real(r8),allocatable ::  TQSMGC(:,:)                        !
-  real(r8),allocatable ::  TQSMGH(:,:)                        !
-  real(r8),allocatable ::  TQSMGS(:,:)                        !
-  real(r8),allocatable ::  TQSNAC(:,:)                        !
-  real(r8),allocatable ::  TQSNAS(:,:)                        !
-  real(r8),allocatable ::  TQSKAS(:,:)                        !
-  real(r8),allocatable ::  TQSH0P(:,:)                        !
-  real(r8),allocatable ::  TQSH3P(:,:)                        !
-  real(r8),allocatable ::  TQSF1P(:,:)                        !
-  real(r8),allocatable ::  TQSF2P(:,:)                        !
-  real(r8),allocatable ::  TQSC0P(:,:)                        !
-  real(r8),allocatable ::  TQSC1P(:,:)                        !
-  real(r8),allocatable ::  TQSC2P(:,:)                        !
-  real(r8),allocatable ::  TQSM1P(:,:)                        !
+
   real(r8),allocatable ::  TALFLS(:,:,:)                      !
   real(r8),allocatable ::  TFEFLS(:,:,:)                      !
   real(r8),allocatable ::  TCAFLS(:,:,:)                      !
@@ -382,7 +299,7 @@ implicit none
   real(r8),allocatable :: TOMNER(:,:,:,:,:)
   real(r8),allocatable :: TOMPER(:,:,:,:,:)
 
-
+  real(r8),allocatable :: trcsa_TQS(:,:,:)
   real(r8),allocatable :: TOMCERff(:,:,:,:)
   real(r8),allocatable :: TOMNERff(:,:,:,:)
   real(r8),allocatable :: TOMPERff(:,:,:,:)
@@ -423,57 +340,11 @@ implicit none
   subroutine InitTflxType()
 
   implicit none
-  allocate(TCOBLS(JS,JY,JX));   TCOBLS=0._r8
-  allocate(TCHBLS(JS,JY,JX));   TCHBLS=0._r8
-  allocate(TOXBLS(JS,JY,JX));   TOXBLS=0._r8
-  allocate(TNGBLS(JS,JY,JX));   TNGBLS=0._r8
-  allocate(TN2BLS(JS,JY,JX));   TN2BLS=0._r8
-  allocate(TN4BLW(JS,JY,JX));   TN4BLW=0._r8
-  allocate(TN3BLW(JS,JY,JX));   TN3BLW=0._r8
-  allocate(TNOBLW(JS,JY,JX));   TNOBLW=0._r8
-  allocate(TH1PBS(JS,JY,JX));   TH1PBS=0._r8
-  allocate(TH2PBS(JS,JY,JX));   TH2PBS=0._r8
-  allocate(TALBLS(JS,JY,JX));   TALBLS=0._r8
-  allocate(TFEBLS(JS,JY,JX));   TFEBLS=0._r8
-  allocate(THYBLS(JS,JY,JX));   THYBLS=0._r8
-  allocate(TCABLS(JS,JY,JX));   TCABLS=0._r8
-  allocate(TMGBLS(JS,JY,JX));   TMGBLS=0._r8
-  allocate(TNABLS(JS,JY,JX));   TNABLS=0._r8
-  allocate(TKABLS(JS,JY,JX));   TKABLS=0._r8
-  allocate(TOHBLS(JS,JY,JX));   TOHBLS=0._r8
-  allocate(TSOBLS(JS,JY,JX));   TSOBLS=0._r8
-  allocate(TCLBLS(JS,JY,JX));   TCLBLS=0._r8
-  allocate(TC3BLS(JS,JY,JX));   TC3BLS=0._r8
-  allocate(THCBLS(JS,JY,JX));   THCBLS=0._r8
-  allocate(TAL1BS(JS,JY,JX));   TAL1BS=0._r8
-  allocate(TAL2BS(JS,JY,JX));   TAL2BS=0._r8
-  allocate(TAL3BS(JS,JY,JX));   TAL3BS=0._r8
-  allocate(TAL4BS(JS,JY,JX));   TAL4BS=0._r8
-  allocate(TALSBS(JS,JY,JX));   TALSBS=0._r8
-  allocate(TFE1BS(JS,JY,JX));   TFE1BS=0._r8
-  allocate(TFE2BS(JS,JY,JX));   TFE2BS=0._r8
-  allocate(TFE3BS(JS,JY,JX));   TFE3BS=0._r8
-  allocate(TFE4BS(JS,JY,JX));   TFE4BS=0._r8
-  allocate(TFESBS(JS,JY,JX));   TFESBS=0._r8
-  allocate(TCAOBS(JS,JY,JX));   TCAOBS=0._r8
-  allocate(TCACBS(JS,JY,JX));   TCACBS=0._r8
-  allocate(TCAHBS(JS,JY,JX));   TCAHBS=0._r8
-  allocate(TCASBS(JS,JY,JX));   TCASBS=0._r8
-  allocate(TMGOBS(JS,JY,JX));   TMGOBS=0._r8
-  allocate(TMGCBS(JS,JY,JX));   TMGCBS=0._r8
-  allocate(TMGHBS(JS,JY,JX));   TMGHBS=0._r8
-  allocate(TMGSBS(JS,JY,JX));   TMGSBS=0._r8
-  allocate(TNACBS(JS,JY,JX));   TNACBS=0._r8
-  allocate(TNASBS(JS,JY,JX));   TNASBS=0._r8
-  allocate(TKASBS(JS,JY,JX));   TKASBS=0._r8
-  allocate(TH0PBS(JS,JY,JX));   TH0PBS=0._r8
-  allocate(TH3PBS(JS,JY,JX));   TH3PBS=0._r8
-  allocate(TF1PBS(JS,JY,JX));   TF1PBS=0._r8
-  allocate(TF2PBS(JS,JY,JX));   TF2PBS=0._r8
-  allocate(TC0PBS(JS,JY,JX));   TC0PBS=0._r8
-  allocate(TC1PBS(JS,JY,JX));   TC1PBS=0._r8
-  allocate(TC2PBS(JS,JY,JX));   TC2PBS=0._r8
-  allocate(TM1PBS(JS,JY,JX));   TM1PBS=0._r8
+
+  allocate(trcg_TBLS(idg_beg:idg_end-1,JS,JY,JX)); trcg_TBLS=0._r8
+  allocate(trcn_TBLS(ids_nut_beg:ids_nuts_end,JS,JY,JX)); trcn_TBLS=0._r8
+  allocate(trcsa_TBLS(idsa_beg:idsa_end,JS,JY,JX));   trcsa_TBLS=0._r8
+
   allocate(THGFLG(JZ,JY,JX));   THGFLG=0._r8
   allocate(THGFLS(JZ,JY,JX));   THGFLS=0._r8
   allocate(THGFHS(JZ,JY,JX));   THGFHS=0._r8
@@ -540,6 +411,10 @@ implicit none
   allocate(TQRC1P(JY,JX));      TQRC1P=0._r8
   allocate(TQRC2P(JY,JX));      TQRC2P=0._r8
   allocate(TQRM1P(JY,JX));      TQRM1P=0._r8
+
+  allocate(trcg_QSS(idg_beg:idg_end-1,JY,JX));trcg_QSS=0._r8
+  allocate(trcn_QSS(ids_nut_beg:ids_nuts_end,JY,JX));trcn_QSS=0._r8
+
   allocate(TCOQSS(JY,JX));      TCOQSS=0._r8
   allocate(TCHQSS(JY,JX));      TCHQSS=0._r8
   allocate(TOXQSS(JY,JX));      TOXQSS=0._r8
@@ -550,47 +425,7 @@ implicit none
   allocate(TNOQSS(JY,JX));      TNOQSS=0._r8
   allocate(TPOQSS(JY,JX));      TPOQSS=0._r8
   allocate(TP1QSS(JY,JX));      TP1QSS=0._r8
-  allocate(TQSAL(JY,JX));       TQSAL=0._r8
-  allocate(TQSFE(JY,JX));       TQSFE=0._r8
-  allocate(TQSHY(JY,JX));       TQSHY=0._r8
-  allocate(TQSCA(JY,JX));       TQSCA=0._r8
-  allocate(TQSMG(JY,JX));       TQSMG=0._r8
-  allocate(TQSNA(JY,JX));       TQSNA=0._r8
-  allocate(TQSKA(JY,JX));       TQSKA=0._r8
-  allocate(TQSOH(JY,JX));       TQSOH=0._r8
-  allocate(TQSSO(JY,JX));       TQSSO=0._r8
-  allocate(TQSCL(JY,JX));       TQSCL=0._r8
-  allocate(TQSC3(JY,JX));       TQSC3=0._r8
-  allocate(TQSHC(JY,JX));       TQSHC=0._r8
-  allocate(TQSAL1(JY,JX));      TQSAL1=0._r8
-  allocate(TQSAL2(JY,JX));      TQSAL2=0._r8
-  allocate(TQSAL3(JY,JX));      TQSAL3=0._r8
-  allocate(TQSAL4(JY,JX));      TQSAL4=0._r8
-  allocate(TQSALS(JY,JX));      TQSALS=0._r8
-  allocate(TQSFE1(JY,JX));      TQSFE1=0._r8
-  allocate(TQSFE2(JY,JX));      TQSFE2=0._r8
-  allocate(TQSFE3(JY,JX));      TQSFE3=0._r8
-  allocate(TQSFE4(JY,JX));      TQSFE4=0._r8
-  allocate(TQSFES(JY,JX));      TQSFES=0._r8
-  allocate(TQSCAO(JY,JX));      TQSCAO=0._r8
-  allocate(TQSCAC(JY,JX));      TQSCAC=0._r8
-  allocate(TQSCAH(JY,JX));      TQSCAH=0._r8
-  allocate(TQSCAS(JY,JX));      TQSCAS=0._r8
-  allocate(TQSMGO(JY,JX));      TQSMGO=0._r8
-  allocate(TQSMGC(JY,JX));      TQSMGC=0._r8
-  allocate(TQSMGH(JY,JX));      TQSMGH=0._r8
-  allocate(TQSMGS(JY,JX));      TQSMGS=0._r8
-  allocate(TQSNAC(JY,JX));      TQSNAC=0._r8
-  allocate(TQSNAS(JY,JX));      TQSNAS=0._r8
-  allocate(TQSKAS(JY,JX));      TQSKAS=0._r8
-  allocate(TQSH0P(JY,JX));      TQSH0P=0._r8
-  allocate(TQSH3P(JY,JX));      TQSH3P=0._r8
-  allocate(TQSF1P(JY,JX));      TQSF1P=0._r8
-  allocate(TQSF2P(JY,JX));      TQSF2P=0._r8
-  allocate(TQSC0P(JY,JX));      TQSC0P=0._r8
-  allocate(TQSC1P(JY,JX));      TQSC1P=0._r8
-  allocate(TQSC2P(JY,JX));      TQSC2P=0._r8
-  allocate(TQSM1P(JY,JX));      TQSM1P=0._r8
+
   allocate(TALFLS(JZ,JY,JX));   TALFLS=0._r8
   allocate(TFEFLS(JZ,JY,JX));   TFEFLS=0._r8
   allocate(TCAFLS(JZ,JY,JX));   TCAFLS=0._r8
@@ -821,6 +656,7 @@ implicit none
   allocate(TOSAER(jsken,1:jcplx,JY,JX));TOSAER=0._r8
   allocate(TOSNER(jsken,1:jcplx,JY,JX));TOSNER=0._r8
   allocate(TOSPER(jsken,1:jcplx,JY,JX));TOSPER=0._r8
+  allocate(trcsa_TQS(idsa_beg:idsa_end,JY,JX));trcsa_TQS=0._r8
   end subroutine InitTflxType
 
 
@@ -860,57 +696,10 @@ implicit none
   call destroy(TOSNER)
   call destroy(TOSPER)
 
-  call destroy(TCOBLS)
-  call destroy(TCHBLS)
-  call destroy(TOXBLS)
-  call destroy(TNGBLS)
-  call destroy(TN2BLS)
-  call destroy(TN4BLW)
-  call destroy(TN3BLW)
-  call destroy(TNOBLW)
-  call destroy(TH1PBS)
-  call destroy(TH2PBS)
-  call destroy(TALBLS)
-  call destroy(TFEBLS)
-  call destroy(THYBLS)
-  call destroy(TCABLS)
-  call destroy(TMGBLS)
-  call destroy(TNABLS)
-  call destroy(TKABLS)
-  call destroy(TOHBLS)
-  call destroy(TSOBLS)
-  call destroy(TCLBLS)
-  call destroy(TC3BLS)
-  call destroy(THCBLS)
-  call destroy(TAL1BS)
-  call destroy(TAL2BS)
-  call destroy(TAL3BS)
-  call destroy(TAL4BS)
-  call destroy(TALSBS)
-  call destroy(TFE1BS)
-  call destroy(TFE2BS)
-  call destroy(TFE3BS)
-  call destroy(TFE4BS)
-  call destroy(TFESBS)
-  call destroy(TCAOBS)
-  call destroy(TCACBS)
-  call destroy(TCAHBS)
-  call destroy(TCASBS)
-  call destroy(TMGOBS)
-  call destroy(TMGCBS)
-  call destroy(TMGHBS)
-  call destroy(TMGSBS)
-  call destroy(TNACBS)
-  call destroy(TNASBS)
-  call destroy(TKASBS)
-  call destroy(TH0PBS)
-  call destroy(TH3PBS)
-  call destroy(TF1PBS)
-  call destroy(TF2PBS)
-  call destroy(TC0PBS)
-  call destroy(TC1PBS)
-  call destroy(TC2PBS)
-  call destroy(TM1PBS)
+  call destroy(trcsa_TQS)
+  call destroy(trcg_TBLS)
+  call destroy(trcn_TBLS)
+
   call destroy(THGFLG)
   call destroy(THGFLS)
   call destroy(THGFHS)
@@ -977,6 +766,9 @@ implicit none
   call destroy(TQRC1P)
   call destroy(TQRC2P)
   call destroy(TQRM1P)
+
+  call destroy(trcg_QSS)
+  call destroy(trcn_QSS)
   call destroy(TCOQSS)
   call destroy(TCHQSS)
   call destroy(TOXQSS)
@@ -987,47 +779,7 @@ implicit none
   call destroy(TNOQSS)
   call destroy(TPOQSS)
   call destroy(TP1QSS)
-  call destroy(TQSAL)
-  call destroy(TQSFE)
-  call destroy(TQSHY)
-  call destroy(TQSCA)
-  call destroy(TQSMG)
-  call destroy(TQSNA)
-  call destroy(TQSKA)
-  call destroy(TQSOH)
-  call destroy(TQSSO)
-  call destroy(TQSCL)
-  call destroy(TQSC3)
-  call destroy(TQSHC)
-  call destroy(TQSAL1)
-  call destroy(TQSAL2)
-  call destroy(TQSAL3)
-  call destroy(TQSAL4)
-  call destroy(TQSALS)
-  call destroy(TQSFE1)
-  call destroy(TQSFE2)
-  call destroy(TQSFE3)
-  call destroy(TQSFE4)
-  call destroy(TQSFES)
-  call destroy(TQSCAO)
-  call destroy(TQSCAC)
-  call destroy(TQSCAH)
-  call destroy(TQSCAS)
-  call destroy(TQSMGO)
-  call destroy(TQSMGC)
-  call destroy(TQSMGH)
-  call destroy(TQSMGS)
-  call destroy(TQSNAC)
-  call destroy(TQSNAS)
-  call destroy(TQSKAS)
-  call destroy(TQSH0P)
-  call destroy(TQSH3P)
-  call destroy(TQSF1P)
-  call destroy(TQSF2P)
-  call destroy(TQSC0P)
-  call destroy(TQSC1P)
-  call destroy(TQSC2P)
-  call destroy(TQSM1P)
+
   call destroy(TALFLS)
   call destroy(TFEFLS)
   call destroy(TCAFLS)

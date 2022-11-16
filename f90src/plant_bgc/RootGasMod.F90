@@ -117,7 +117,7 @@ module RootGasMod
     H2GA   =>  plt_rbgc%H2GA     , &
     H2GP   =>  plt_rbgc%H2GP     , &
     TFND   =>  plt_soilchem%TFND , &
-    VLNH4  =>  plt_soilchem%VLNH4, &
+    trcs_VLN  =>  plt_soilchem%trcs_VLN, &
     trc_solml  =>  plt_soilchem%trc_solml, &
     trc_gascl  =>  plt_soilchem%trc_gascl, &
     GasDifc=>  plt_soilchem%GasDifc,&
@@ -126,7 +126,7 @@ module RootGasMod
     trc_solcl  =>  plt_soilchem%trc_solcl, &
     THETY  =>  plt_soilchem%THETY, &
     VOLY   =>  plt_soilchem%VOLY , &
-    VLNHB  =>  plt_soilchem%VLNHB, &
+
     THETPM =>  plt_soilchem%THETPM,&
     trc_gasml=> plt_soilchem%trc_gasml,&
     DFGS   =>  plt_soilchem%DFGS , &
@@ -198,8 +198,8 @@ module RootGasMod
     H2GS1=trc_solml(idg_H2,L)*FPQ(N,L,NZ)
     CH2GS1=trc_solcl(idg_H2,L)
     CH2GP1=AZMAX1(H2GP1/RTVLW(N,L,NZ))
-    RTVLWA=RTVLW(N,L,NZ)*VLNH4(L)
-    RTVLWB=RTVLW(N,L,NZ)*VLNHB(L)
+    RTVLWA=RTVLW(N,L,NZ)*trcs_VLN(ids_NH4,L)
+    RTVLWB=RTVLW(N,L,NZ)*trcs_VLN(ids_NH4B,L)
     UPMXP=ROXYP(N,L,NZ)*XNPG/PP(NZ)
     ROXYFX=ROXYF(L)*FOXYX*XNPG
     RCO2FX=RCO2F(L)*FOXYX*XNPG
@@ -343,8 +343,8 @@ module RootGasMod
       VOLWMM=VOLWM(M,L)*FPQ(N,L,NZ)
       VOLPMM=VOLPM(M,L)*FPQ(N,L,NZ)
       VOLWSP=RTVLW(N,L,NZ)+VOLWMM
-      VOLWMA=VOLWMM*VLNH4(L)
-      VOLWMB=VOLWMM*VLNHB(L)
+      VOLWMA=VOLWMM*trcs_VLN(ids_NH4,L)
+      VOLWMB=VOLWMM*trcs_VLN(ids_NH4B,L)
       VOLWSA=RTVLWA+VOLWMA
       VOLWSB=RTVLWB+VOLWMB
       THETW1=AZMAX1(VOLWM(M,L)/VOLY(L))
@@ -355,8 +355,8 @@ module RootGasMod
         DIFOL=THETM*OLSGL1*RTARRX
         DIFCL=THETM*CQSGL1*RTARRX
         DIFZL=THETM*ZVSGL1*RTARRX
-        DIFNL=THETM*ZNSGL1*RTARRX*VLNH4(L)
-        DIFNB=THETM*ZNSGL1*RTARRX*VLNHB(L)
+        DIFNL=THETM*ZNSGL1*RTARRX*trcs_VLN(ids_NH4,L)
+        DIFNB=THETM*ZNSGL1*RTARRX*trcs_VLN(ids_NH4B,L)
         DIFHL=THETM*HLSGL1*RTARRX
 
         CH4G1=trc_gascl(idg_CH4,L)*VOLPMM
@@ -368,11 +368,11 @@ module RootGasMod
         VOLWOX=VOLWMM*GSolbility(idg_O2,L)
         VOLWCH=VOLWMM*GSolbility(idg_CH4,L)
         VOLWN2=VOLWMM*GSolbility(idg_N2O,L)
-        VOLWNH=VOLWMM*GSolbility(idg_NH3,L)*VLNH4(L)
-        VOLWNB=VOLWMM*GSolbility(idg_NH3,L)*VLNHB(L)
+        VOLWNH=VOLWMM*GSolbility(idg_NH3,L)*trcs_VLN(ids_NH4,L)
+        VOLWNB=VOLWMM*GSolbility(idg_NH3,L)*trcs_VLN(ids_NH4B,L)
         VOLWHG=VOLWMM*GSolbility(idg_H2,L)
-        VOLPNH=VOLPMM*VLNH4(L)
-        VOLPNB=VOLPMM*VLNHB(L)
+        VOLPNH=VOLPMM*trcs_VLN(ids_NH4,L)
+        VOLPNB=VOLPMM*trcs_VLN(ids_NH4B,L)
 !
 !     MASS FLOW OF GAS FROM SOIL TO ROOT AT SHORTER TIME STEP NPT
 !
@@ -422,8 +422,8 @@ module RootGasMod
           RMFOXS=UPWTRH*COXYS1
           RMFCHS=UPWTRH*CCH4S1
           RMFN2S=UPWTRH*CN2OS1
-          RMFN3S=UPWTRH*CNH3S1*VLNH4(L)
-          RMFN3B=UPWTRH*CNH3B1*VLNHB(L)
+          RMFN3S=UPWTRH*CNH3S1*trcs_VLN(ids_NH4,L)
+          RMFN3B=UPWTRH*CNH3B1*trcs_VLN(ids_NH4B,L)
           RMFHGS=UPWTRH*CH2GS1
 !
 !     SOLUTION FOR MASS FLOW + DIFFUSION OF O2 IN AQUEOUS PHASES OF
@@ -511,7 +511,7 @@ module RootGasMod
             ENDIF
             RDFN3S=RMFN3S+DIFNL*(CNH3S1-CNH3P1)
             IF(VOLWSA.GT.ZEROP(NZ))THEN
-              ZH3PA=ZH3P1*VLNH4(L)
+              ZH3PA=ZH3P1*trcs_VLN(ids_NH4,L)
               RDXNHS=(RTVLWA*AMAX1(ZEROP(NZ),ZH3S1) &
                 -VOLWMA*AMAX1(ZEROP(NZ),ZH3PA))/VOLWSA
             ELSE
@@ -524,7 +524,7 @@ module RootGasMod
             ENDIF
             RDFN3B=RMFN3B+DIFNB*(CNH3B1-CNH3P1)
             IF(VOLWSB.GT.ZEROP(NZ))THEN
-              ZH3PB=ZH3P1*VLNHB(L)
+              ZH3PB=ZH3P1*trcs_VLN(ids_NH4B,L)
               RDXNHB=(RTVLWB*AMAX1(ZEROP(NZ),ZH3B1) &
                 -VOLWMB*AMAX1(ZEROP(NZ),ZH3PB))/VOLWSB
             ELSE
@@ -589,7 +589,7 @@ module RootGasMod
               RN2DFQ=DFGSP*(AMAX1(ZEROP(NZ),Z2OG1)*VOLWN2 &
                 -(AMAX1(ZEROS,Z2OS1)-RUPZSX)*VOLPMM)/(VOLWN2+VOLPMM)
               IF(VOLWNH+VOLPNH.GT.ZEROP(NZ))THEN
-                ZH3GA=ZH3G1*VLNH4(L)
+                ZH3GA=ZH3G1*trcs_VLN(ids_NH4,L)
                 RNHDFQ=AMIN1(RUPNSX,AMAX1(-RUPNSX &
                   ,DFGSP*(AMAX1(ZEROP(NZ),ZH3GA)*VOLWNH &
                   -(AMAX1(ZEROS,ZH3S1)-RUPNSX)*VOLPNH)/(VOLWNH+VOLPNH)))
@@ -597,7 +597,7 @@ module RootGasMod
                 RNHDFQ=0.0_r8
               ENDIF
               IF(VOLWNB+VOLPNB.GT.ZEROP(NZ))THEN
-                ZH3GB=ZH3G1*VLNHB(L)
+                ZH3GB=ZH3G1*trcs_VLN(ids_NH4B,L)
                 RNBDFQ=AMIN1(RUPNSX,AMAX1(-RUPNSX &
                   ,DFGSP*(AMAX1(ZEROP(NZ),ZH3GB)*VOLWNB &
                   -(AMAX1(ZEROS,ZH3B1)-RUPNBX)*VOLPNB)/(VOLWNB+VOLPNB)))

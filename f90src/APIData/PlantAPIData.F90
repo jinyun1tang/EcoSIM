@@ -391,12 +391,8 @@ implicit none
   real(r8), pointer :: THETW(:)    => null()  !volumetric water content [m3 m-3]
   real(r8), pointer :: THETY(:)    => null()  !air-dry water content, [m3 m-3]
   real(r8), pointer :: VOLX(:)     => null()  !volume of soil layer	m3 d-2
-  real(r8), pointer :: VLPOB(:)    => null()  !PO4 band volume fracrion, [0-1]
-  real(r8), pointer :: VLNO3(:)    => null()  !NO3 non-band volume fracrion, []
-  real(r8), pointer :: VLPO4(:)    => null()  !PO4 non-band volume fracrion, []
-  real(r8), pointer :: VLNOB(:)    => null()  !NO3 band volume fraction, []
-  real(r8), pointer :: VLNH4(:)    => null()  !NH4 non-band volume fraction, []
-  real(r8), pointer :: VLNHB(:)    => null()  !NH4 band volume fraction, []
+  real(r8), pointer :: trcs_VLN(:,:)=> null()
+
   real(r8), pointer :: VOLY(:)     => null()  !total micropore volume [m3 d-2]
   real(r8), pointer :: VOLI(:)     => null()  !soil micropore ice content   [m3 d-2]
   real(r8), pointer :: VOLW(:)     => null()  !soil micropore water content [m3 d-2]
@@ -1675,16 +1671,12 @@ implicit none
   allocate(this%TFND(0:JZ1))
   allocate(this%THETPM(60,0:JZ1))
   allocate(this%DFGS(60,0:JZ1))
-  allocate(this%VLPOB(0:JZ1))
-  allocate(this%VLNO3(0:JZ1))
-  allocate(this%VLPO4(0:JZ1))
   allocate(this%VOLY(0:JZ1))
   allocate(this%VOLI(0:JZ1))
   allocate(this%VOLW(0:JZ1))
   allocate(this%VOLA(0:JZ1))
-  allocate(this%VLNOB(0:JZ1))
-  allocate(this%VLNH4(0:JZ1))
-  allocate(this%VLNHB(0:JZ1))
+
+  allocate(this%trcs_VLN(ids_nuts_beg:ids_nuts_end,0:JZ1))
   allocate(this%OQC(1:jcplx,0:JZ1))
   allocate(this%OQN(1:jcplx,0:JZ1))
   allocate(this%OQP(1:jcplx,0:JZ1))
@@ -1743,18 +1735,13 @@ implicit none
 !  if(allocated(H2PO4))deallocate(H2PO4)
 !  if(allocated(HLSGL))deallocate(HLSGL)
 
+   call destroy(this%trcs_VLN)
 !  if(allocated(OLSGL))deallocate(OLSGL)
 !  if(allocated(POSGL))deallocate(POSGL)
-!  if(allocated(VLPOB))deallocate(VLPOB)
-!  if(allocated(VLNO3))deallocate(VLNO3)
-!  if(allocated(VLPO4))deallocate(VLPO4)
 !  if(allocated(VOLY))deallocate(VOLY)
 !  if(allocated(VOLI))deallocate(VOLI)
 !  if(allocated(VOLW))deallocate(VOLW)
 !  if(allocated(VOLA))deallocate(VOLA)
-!  if(allocated(VLNOB))deallocate(VLNOB)
-!  if(allocated(VLNH4))deallocate(VLNH4)
-!  if(allocated(VLNHB))deallocate(VLNHB)
 !  if(allocated(ZOSGL))deallocate(ZOSGL)
 
 !  if(allocated(OQC))deallocate(OQC)

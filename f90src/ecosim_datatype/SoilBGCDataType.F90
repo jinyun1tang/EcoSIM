@@ -111,9 +111,10 @@ implicit none
   real(r8),target,allocatable ::  VOLQ(:,:,:)                        !soil water volume occupied by microial biomass, [m3 m-3]
   real(r8),target,allocatable ::  TFNQ(:,:,:)                        !constraints of temperature and water potential on microbial activity, []
   real(r8),target,allocatable ::  ESNT(:,:,:,:,:,:)                    !total litterfall C, [g d-2 h-1]
-  real(r8),target,allocatable ::  VLNH4(:,:,:)                       !NH4 non-band volume fracrion, []
+  real(r8),target,allocatable :: trcs_VLN(:,:,:,:)
+
   real(r8),target,allocatable ::  VLNHB(:,:,:)                       !NH4 band volume fracrion, []
-  real(r8),target,allocatable ::  VLNO3(:,:,:)                       !NO3 non-band volume fracrion, []
+
   real(r8),target,allocatable ::  VLNOB(:,:,:)                       !NO3 band volume fracrion, []
   real(r8),target,allocatable ::  VLPO4(:,:,:)                       !PO4 non-band volume fracrion, []
   real(r8),target,allocatable ::  VLPOB(:,:,:)                       !PO4 band volume fracrion, []
@@ -310,9 +311,10 @@ implicit none
   allocate(VOLQ(0:JZ,JY,JX));   VOLQ=0._r8
   allocate(TFNQ(0:JZ,JY,JX));   TFNQ=0._r8
   allocate(ESNT(jsken,npelms,1:n_pltlitrk,0:JZ,JY,JX));ESNT=0._r8
-  allocate(VLNH4(0:JZ,JY,JX));  VLNH4=0._r8
+  allocate(trcs_VLN(ids_nuts_beg:ids_nuts_end,0:JZ,JY,JX));trcs_VLN=0._r8
+
   allocate(VLNHB(0:JZ,JY,JX));  VLNHB=0._r8
-  allocate(VLNO3(0:JZ,JY,JX));  VLNO3=0._r8
+
   allocate(VLNOB(0:JZ,JY,JX));  VLNOB=0._r8
   allocate(VLPO4(0:JZ,JY,JX));  VLPO4=0._r8
   allocate(VLPOB(0:JZ,JY,JX));  VLPOB=0._r8
@@ -499,9 +501,10 @@ implicit none
   call destroy(VOLQ)
   call destroy(TFNQ)
   call destroy(ESNT)
-  call destroy(VLNH4)
+
+  call destroy(trcs_VLN)
   call destroy(VLNHB)
-  call destroy(VLNO3)
+
   call destroy(VLNOB)
   call destroy(VLPO4)
   call destroy(VLPOB)

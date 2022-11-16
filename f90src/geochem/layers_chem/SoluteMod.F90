@@ -330,17 +330,17 @@ module SoluteMod
 !     VLPO4,VLPOB=fractions of soil volume in H2PO4 non-band,band
 !     THETW=soil water concentration
 !
-  RSN4AA=SPNH4*ZNH4FA(L,NY,NX)*VLNH4(L,NY,NX)*THETW(L,NY,NX)
-  RSN3AA=SPNH3*ZNH3FA(L,NY,NX)*VLNH4(L,NY,NX)
-  RSNUAA=RSNUA*VLNH4(L,NY,NX)*THETW(L,NY,NX)
-  RSNOAA=SPNO3*ZNO3FA(L,NY,NX)*VLNO3(L,NY,NX)*THETW(L,NY,NX)
-  RSN4BA=SPNH4*ZNH4FA(L,NY,NX)*VLNHB(L,NY,NX)*THETW(L,NY,NX)
-  RSN3BA=SPNH3*ZNH3FA(L,NY,NX)*VLNHB(L,NY,NX)
-  RSNUBA=RSNUA*VLNHB(L,NY,NX)*THETW(L,NY,NX)
-  RSNOBA=SPNO3*ZNO3FA(L,NY,NX)*VLNOB(L,NY,NX)*THETW(L,NY,NX)
+  RSN4AA=SPNH4*ZNH4FA(L,NY,NX)*trcs_VLN(ids_NH4,L,NY,NX)*THETW(L,NY,NX)
+  RSN3AA=SPNH3*ZNH3FA(L,NY,NX)*trcs_VLN(ids_NH4,L,NY,NX)
+  RSNUAA=RSNUA*trcs_VLN(ids_NH4,L,NY,NX)*THETW(L,NY,NX)
+  RSNOAA=SPNO3*ZNO3FA(L,NY,NX)*trcs_VLN(ids_NO3,L,NY,NX)*THETW(L,NY,NX)
+  RSN4BA=SPNH4*ZNH4FA(L,NY,NX)*trcs_VLN(ids_NH4B,L,NY,NX)*THETW(L,NY,NX)
+  RSN3BA=SPNH3*ZNH3FA(L,NY,NX)*trcs_VLN(ids_NH4B,L,NY,NX)
+  RSNUBA=RSNUA*trcs_VLN(ids_NH4B,L,NY,NX)*THETW(L,NY,NX)
+  RSNOBA=SPNO3*ZNO3FA(L,NY,NX)*trcs_VLN(ids_NO3B,L,NY,NX)*THETW(L,NY,NX)
   RSN4BB=SPNH4*ZNH4FB(L,NY,NX)*THETW(L,NY,NX)
   RSN3BB=SPNH3*ZNH3FB(L,NY,NX)
-  RSNUBB=RSNUB*VLNHB(L,NY,NX)*THETW(L,NY,NX)
+  RSNUBB=RSNUB*trcs_VLN(ids_NH4B,L,NY,NX)*THETW(L,NY,NX)
   RSNOBB=SPNO3*ZNO3FB(L,NY,NX)*THETW(L,NY,NX)
 !
 !     SOLUBLE AND EXCHANGEABLE NH4 CONCENTRATIONS
@@ -525,15 +525,17 @@ module SoluteMod
 !     DLYR=soil layer thickness
 !     FVLNH4=relative change in VLNH4
 !
-      XVLNH4=VLNH4(L,NY,NX)
+      XVLNH4=trcs_VLN(ids_NH4,L,NY,NX)
       IF(DLYR(3,L,NY,NX).GT.ZERO)THEN
-        VLNHB(L,NY,NX)=AZMAX1(AMIN1(0.999_r8,WDNHB(L,NY,NX) &
+        trcs_VLN(ids_NH4B,L,NY,NX)=AZMAX1(AMIN1(0.999_r8,WDNHB(L,NY,NX) &
           /ROWN(NY,NX)*DPNHB(L,NY,NX)/DLYR(3,L,NY,NX)))
       ELSE
-        VLNHB(L,NY,NX)=0._r8
+        trcs_VLN(ids_NH4B,L,NY,NX)=0._r8
       ENDIF
-      VLNH4(L,NY,NX)=1._r8-VLNHB(L,NY,NX)
-      FVLNH4=AZMIN1((VLNH4(L,NY,NX)-XVLNH4)/XVLNH4)
+      trcs_VLN(ids_NH4,L,NY,NX)=1._r8-trcs_VLN(ids_NH4B,L,NY,NX)
+      trcs_VLN(idg_NH3,L,NY,NX)=trcs_VLN(ids_NH4,L,NY,NX)
+      trcs_VLN(idg_NH3B,L,NY,NX)=trcs_VLN(ids_NH4B,L,NY,NX)
+      FVLNH4=AZMIN1((trcs_VLN(ids_NH4,L,NY,NX)-XVLNH4)/XVLNH4)
 !
 !     TRANSFER NH4, NH3 FROM NON-BAND TO BAND
 !     DURING BAND GROWTH
@@ -555,8 +557,11 @@ module SoluteMod
 !
       DPNHB(L,NY,NX)=0._r8
       WDNHB(L,NY,NX)=0._r8
-      VLNH4(L,NY,NX)=1._r8
-      VLNHB(L,NY,NX)=0._r8
+      trcs_VLN(ids_NH4,L,NY,NX)=1._r8
+      trcs_VLN(ids_NH4B,L,NY,NX)=0._r8
+      trcs_VLN(idg_NH3,L,NY,NX)=trcs_VLN(ids_NH4,L,NY,NX)
+      trcs_VLN(idg_NH3B,L,NY,NX)=trcs_VLN(ids_NH4B,L,NY,NX)
+
       trc_solml(ids_NH4,L,NY,NX)=trc_solml(ids_NH4,L,NY,NX)+trc_solml(ids_NH4B,L,NY,NX)
       trc_solml(idg_NH3,L,NY,NX)=trc_solml(idg_NH3,L,NY,NX)+trc_solml(idg_NH3B,L,NY,NX)
       trc_solml(ids_NH4B,L,NY,NX)=0._r8
@@ -622,15 +627,18 @@ module SoluteMod
 !     DLYR=soil layer thickness
 !     FVLPO4=relative change in VLPO4
 !
-      XVLPO4=VLPO4(L,NY,NX)
+      XVLPO4=trcs_VLN(ids_H1PO4,L,NY,NX)
       IF(DLYR(3,L,NY,NX).GT.ZERO)THEN
-        VLPOB(L,NY,NX)=AZMAX1(AMIN1(0.999,WDPOB(L,NY,NX) &
+        trcs_VLN(ids_H1PO4B,L,NY,NX)=AZMAX1(AMIN1(0.999,WDPOB(L,NY,NX) &
           /ROWP(NY,NX)*DPPOB(L,NY,NX)/DLYR(3,L,NY,NX)))
       ELSE
-        VLPOB(L,NY,NX)=0._r8
+        trcs_VLN(ids_H1PO4B,L,NY,NX)=0._r8
       ENDIF
-      VLPO4(L,NY,NX)=1._r8-VLPOB(L,NY,NX)
-      FVLPO4=AZMIN1((VLPO4(L,NY,NX)-XVLPO4)/XVLPO4)
+      trcs_VLN(ids_H1PO4,L,NY,NX)=1._r8-trcs_VLN(ids_H1PO4B,L,NY,NX)
+
+      trcs_VLN(ids_H2PO4B,L,NY,NX)=trcs_VLN(ids_H1PO4B,L,NY,NX)
+      trcs_VLN(ids_H2PO4,L,NY,NX)=trcs_VLN(ids_H1PO4,L,NY,NX)
+      FVLPO4=AZMIN1((trcs_VLN(ids_H1PO4,L,NY,NX)-XVLPO4)/XVLPO4)
 !
 !     TRANSFER HPO4,H2PO4 FROM NON-BAND TO BAND
 !     DURING BAND GROWTH DEPENDING ON SALT
@@ -737,8 +745,11 @@ module SoluteMod
 !
       DPPOB(L,NY,NX)=0._r8
       WDPOB(L,NY,NX)=0._r8
-      VLPOB(L,NY,NX)=0._r8
-      VLPO4(L,NY,NX)=1._r8
+      trcs_VLN(ids_H1PO4B,L,NY,NX)=0._r8
+      trcs_VLN(ids_H1PO4,L,NY,NX)=1._r8
+      trcs_VLN(ids_H2PO4B,L,NY,NX)=trcs_VLN(ids_H1PO4B,L,NY,NX)
+      trcs_VLN(ids_H2PO4,L,NY,NX)=trcs_VLN(ids_H1PO4,L,NY,NX)
+
       H0PO4(L,NY,NX)=H0PO4(L,NY,NX)+H0POB(L,NY,NX)
       trc_solml(ids_H1PO4,L,NY,NX)=trc_solml(ids_H1PO4,L,NY,NX)+trc_solml(ids_H1PO4B,L,NY,NX)
       trc_solml(ids_H2PO4,L,NY,NX)=trc_solml(ids_H2PO4,L,NY,NX)+trc_solml(ids_H2PO4B,L,NY,NX)
@@ -837,15 +848,18 @@ module SoluteMod
 !     DLYR=soil layer thickness
 !     FVLNO3=relative change in VLNO3
 !
-      XVLNO3=VLNO3(L,NY,NX)
+      XVLNO3=trcs_VLN(ids_NO3,L,NY,NX)
       IF(DLYR(3,L,NY,NX).GT.ZERO)THEN
-        VLNOB(L,NY,NX)=AZMAX1(AMIN1(0.999,WDNOB(L,NY,NX) &
+        trcs_VLN(ids_NO3B,L,NY,NX)=AZMAX1(AMIN1(0.999,WDNOB(L,NY,NX) &
           /ROWO(NY,NX)*DPNOB(L,NY,NX)/DLYR(3,L,NY,NX)))
       ELSE
-        VLNOB(L,NY,NX)=0._r8
+        trcs_VLN(ids_NO3B,L,NY,NX)=0._r8
       ENDIF
-      VLNO3(L,NY,NX)=1._r8-VLNOB(L,NY,NX)
-      FVLNO3=AZMIN1((VLNO3(L,NY,NX)-XVLNO3)/XVLNO3)
+      trcs_VLN(ids_NO3,L,NY,NX)=1._r8-trcs_VLN(ids_NO3B,L,NY,NX)
+
+      trcs_VLN(ids_NO2B,L,NY,NX)=trcs_VLN(ids_NO3B,L,NY,NX)
+      trcs_VLN(ids_NO2,L,NY,NX)=trcs_VLN(ids_NO3,L,NY,NX)
+      FVLNO3=AZMIN1((trcs_VLN(ids_NO3,L,NY,NX)-XVLNO3)/XVLNO3)
 !
 !     TRANSFER NO3 FROM NON-BAND TO BAND
 !     DURING BAND GROWTH
@@ -864,8 +878,11 @@ module SoluteMod
 !
       DPNOB(L,NY,NX)=0._r8
       WDNOB(L,NY,NX)=0._r8
-      VLNO3(L,NY,NX)=1._r8
-      VLNOB(L,NY,NX)=0._r8
+      trcs_VLN(ids_NO3,L,NY,NX)=1._r8
+      trcs_VLN(ids_NO3B,L,NY,NX)=0._r8
+      trcs_VLN(ids_NO2,L,NY,NX)=trcs_VLN(ids_NO3,L,NY,NX)
+      trcs_VLN(ids_NO2B,L,NY,NX)=trcs_VLN(ids_NO3B,L,NY,NX)
+
       trc_solml(ids_NO3,L,NY,NX)=trc_solml(ids_NO3,L,NY,NX)+trc_solml(ids_NO3B,L,NY,NX)
       trc_solml(ids_NO2,L,NY,NX)=trc_solml(ids_NO2,L,NY,NX)+trc_solml(ids_NO2B,L,NY,NX)
       trc_solml(ids_NO3B,L,NY,NX)=0._r8
