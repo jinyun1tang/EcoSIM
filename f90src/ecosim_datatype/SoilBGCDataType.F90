@@ -148,6 +148,8 @@ implicit none
   real(r8),target,allocatable ::  FLW(:,:,:,:)                       !water flux micropore, [m3 d-2 h-1]
   real(r8),target,allocatable ::  FLWH(:,:,:,:)                      !water flux macropore, [m3 d-2 h-1]
   real(r8),target,allocatable ::  HFLW(:,:,:,:)                      !convective heat flux micropore, [MJ d-2 h-1]
+
+  real(r8),target,allocatable ::  trcs_XFLS(:,:,:,:,:)
   real(r8),target,allocatable ::  XCOFLS(:,:,:,:)                    !aqueous CO2 flux micropore, [g d-2 h-1]
   real(r8),target,allocatable ::  XCHFLS(:,:,:,:)                    !aqueous CH4 flux micropore, [g d-2 h-1]
   real(r8),target,allocatable ::  XOXFLS(:,:,:,:)                    !aqueous O2 flux micropore, [g d-2 h-1]
@@ -348,6 +350,8 @@ implicit none
   allocate(FLW(3,JD,JV,JH));    FLW=0._r8
   allocate(FLWH(3,JD,JV,JH));   FLWH=0._r8
   allocate(HFLW(3,JD,JV,JH));   HFLW=0._r8
+
+  allocate(trcs_XFLS(ids_beg:ids_end,3,0:JD,JV,JH));trcs_XFLS=0._r8
   allocate(XCOFLS(3,0:JD,JV,JH));XCOFLS=0._r8
   allocate(XCHFLS(3,0:JD,JV,JH));XCHFLS=0._r8
   allocate(XOXFLS(3,0:JD,JV,JH));XOXFLS=0._r8

@@ -482,21 +482,21 @@ implicit none
         ZOD=ZOD+XN*(XONFLS(K,N,N6,N5,N4)+XONFHS(K,N,N6,N5,N4))
         POD=POD+XN*(XOPFLS(K,N,N6,N5,N4)+XOPFHS(K,N,N6,N5,N4))
       ENDDO D450
-      CXD=XN*(XCOFLS(N,N6,N5,N4)+XCOFHS(N,N6,N5,N4) &
-        +R3GasADTFlx(idg_CO2,N,N6,N5,N4)+XCHFLS(N,N6,N5,N4) &
+      CXD=XN*(trcs_XFLS(idg_CO2,N,N6,N5,N4)+XCOFHS(N,N6,N5,N4) &
+        +R3GasADTFlx(idg_CO2,N,N6,N5,N4)+trcs_XFLS(idg_CH4,N,N6,N5,N4) &
         +XCHFHS(N,N6,N5,N4)+R3GasADTFlx(idg_CH4,N,N6,N5,N4))
-      ZXD=XN*(XN4FLW(N,N6,N5,N4)+XN3FLW(N,N6,N5,N4)+XNOFLW(N,N6,N5,N4) &
-        +XN4FLB(N,N6,N5,N4)+XN3FLB(N,N6,N5,N4)+XNOFLB(N,N6,N5,N4) &
-        +XNXFLS(N,N6,N5,N4)+XNXFLB(N,N6,N5,N4) &
+      ZXD=XN*(trcs_XFLS(ids_NH4,N,N6,N5,N4)+trcs_XFLS(idg_NH3,N,N6,N5,N4)+trcs_XFLS(ids_NO3,N,N6,N5,N4) &
+        +trcs_XFLS(ids_NH4B,N,N6,N5,N4)+trcs_XFLS(idg_NH3B,N,N6,N5,N4)+trcs_XFLS(ids_NO3B,N,N6,N5,N4) &
+        +trcs_XFLS(ids_NO2,N,N6,N5,N4)+trcs_XFLS(ids_NO2B,N,N6,N5,N4) &
         +XN4FHW(N,N6,N5,N4)+XN3FHW(N,N6,N5,N4)+XNOFHW(N,N6,N5,N4) &
         +XN4FHB(N,N6,N5,N4)+XN3FHB(N,N6,N5,N4)+XNOFHB(N,N6,N5,N4) &
         +XNXFHS(N,N6,N5,N4)+XNXFHB(N,N6,N5,N4))
-      ZGD=XN*(XNGFLS(N,N6,N5,N4)+R3GasADTFlx(idg_N2,N,N6,N5,N4)+XNGFHS(N,N6,N5,N4) &
-        +XN2FLS(N,N6,N5,N4)+R3GasADTFlx(idg_N2O,N,N6,N5,N4)+XN2FHS(N,N6,N5,N4) &
+      ZGD=XN*(trcs_XFLS(idg_N2,N,N6,N5,N4)+R3GasADTFlx(idg_N2,N,N6,N5,N4)+XNGFHS(N,N6,N5,N4) &
+        +trcs_XFLS(idg_N2O,N,N6,N5,N4)+R3GasADTFlx(idg_N2O,N,N6,N5,N4)+XN2FHS(N,N6,N5,N4) &
         +R3GasADTFlx(idg_NH3,N,N6,N5,N4))
-      PXD=XN*(XH2PFS(N,N6,N5,N4)+XH2BFB(N,N6,N5,N4) &
-        +XH2PHS(N,N6,N5,N4)+XH2BHB(N,N6,N5,N4)+XH1PFS(N,N6,N5,N4) &
-        +XH1BFB(N,N6,N5,N4)+XH1PHS(N,N6,N5,N4)+XH1BHB(N,N6,N5,N4))
+      PXD=XN*(trcs_XFLS(ids_H2PO4,N,N6,N5,N4)+trcs_XFLS(ids_H2PO4B,N,N6,N5,N4) &
+        +XH2PHS(N,N6,N5,N4)+XH2BHB(N,N6,N5,N4)+trcs_XFLS(ids_H1PO4,N,N6,N5,N4) &
+        +trcs_XFLS(ids_H1PO4B,N,N6,N5,N4)+XH1PHS(N,N6,N5,N4)+XH1BHB(N,N6,N5,N4))
       TCOU=TCOU-COD-CXD
       TZOU=TZOU-ZOD-ZXD-ZGD
       TPOU=TPOU-POD-PXD
@@ -513,9 +513,9 @@ implicit none
 !     X*FLG=convective+diffusive gas flux from trnsfr.f
 !     OXYGOU,H2GOU=cumulative O2,H2 loss through lateral and lower boundaries
 !
-      OOD=XN*(XOXFLS(N,N6,N5,N4)+XOXFHS(N,N6,N5,N4)+R3GasADTFlx(idg_O2,N,N6,N5,N4))
+      OOD=XN*(trcs_XFLS(idg_O2,N,N6,N5,N4)+XOXFHS(N,N6,N5,N4)+R3GasADTFlx(idg_O2,N,N6,N5,N4))
       OXYGOU=OXYGOU-OOD
-      HOD=XN*(XHGFLS(N,N6,N5,N4)+XHGFHS(N,N6,N5,N4)+R3GasADTFlx(idg_H2,N,N6,N5,N4))
+      HOD=XN*(trcs_XFLS(idg_H2,N,N6,N5,N4)+XHGFHS(N,N6,N5,N4)+R3GasADTFlx(idg_H2,N,N6,N5,N4))
       H2GOU=H2GOU-HOD
 !
 !     SUBSURFACE BOUNDARY FLUXES OF SOLUTES
@@ -605,7 +605,7 @@ implicit none
           ECHC=0.044*AZMAX1((XHCFLS(N,N6,N5,N4)+XHCFHS(N,N6,N5,N4))/WX)
           ECSO=0.080*AZMAX1((XSOFLS(N,N6,N5,N4)+XSOFHS(N,N6,N5,N4))*2.0/WX)
           ECCL=0.076*AZMAX1((XCLFLS(N,N6,N5,N4)+XCLFHS(N,N6,N5,N4))/WX)
-          ECNO=0.071*AZMAX1((XNOFLW(N,N6,N5,N4)+XNOFHW(N,N6,N5,N4))/(WX*14.0))
+          ECNO=0.071*AZMAX1((trcs_XFLS(ids_NO3,N,N6,N5,N4)+XNOFHW(N,N6,N5,N4))/(WX*14.0))
           ECNDX=ECHY+ECOH+ECAL+ECFE+ECCA+ECMG+ECNA+ECKA+ECCO+ECHC+ECSO+ECCL+ECNO
 !     IF((I/10)*10.EQ.I.AND.J.EQ.15)THEN
 !     WRITE(*,9992)'ECNDX',IYRC,I,J,N4,N5,N6,N,WX,ECNDX
@@ -616,7 +616,7 @@ implicit none
           ECNDX=0.0_r8
         ENDIF
       ENDIF
-      SG=SG+XHGFLS(N,N6,N5,N4)+R3GasADTFlx(idg_H2,N,N6,N5,N4)
+      SG=SG+trcs_XFLS(idg_H2,N,N6,N5,N4)+R3GasADTFlx(idg_H2,N,N6,N5,N4)
     ENDIF
   ENDIF
   end subroutine SubsurfaceBoundaryFluxes

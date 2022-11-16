@@ -406,18 +406,18 @@ module Hour1Mod
 !     GAS AND SOLUTE FLUXES
 !
       DO  L=0,NL(NY,NX)+1
-        XCOFLS(1:3,L,NY,NX)=0.0_r8
-        XCHFLS(1:3,L,NY,NX)=0.0_r8
-        XOXFLS(1:3,L,NY,NX)=0.0_r8
-        XNGFLS(1:3,L,NY,NX)=0.0_r8
-        XN2FLS(1:3,L,NY,NX)=0.0_r8
-        XHGFLS(1:3,L,NY,NX)=0.0_r8
-        XN4FLW(1:3,L,NY,NX)=0.0_r8
-        XN3FLW(1:3,L,NY,NX)=0.0_r8
-        XNOFLW(1:3,L,NY,NX)=0.0_r8
-        XNXFLS(1:3,L,NY,NX)=0.0_r8
-        XH1PFS(1:3,L,NY,NX)=0.0_r8
-        XH2PFS(1:3,L,NY,NX)=0.0_r8
+        trcs_XFLS(idg_CO2,1:3,L,NY,NX)=0.0_r8
+        trcs_XFLS(idg_CH4,1:3,L,NY,NX)=0.0_r8
+        trcs_XFLS(idg_O2,1:3,L,NY,NX)=0.0_r8
+        trcs_XFLS(idg_N2,1:3,L,NY,NX)=0.0_r8
+        trcs_XFLS(idg_N2O,1:3,L,NY,NX)=0.0_r8
+        trcs_XFLS(idg_H2,1:3,L,NY,NX)=0.0_r8
+        trcs_XFLS(ids_NH4,1:3,L,NY,NX)=0.0_r8
+        trcs_XFLS(idg_NH3,1:3,L,NY,NX)=0.0_r8
+        trcs_XFLS(ids_NO3,1:3,L,NY,NX)=0.0_r8
+        trcs_XFLS(ids_NO2,1:3,L,NY,NX)=0.0_r8
+        trcs_XFLS(ids_H1PO4,1:3,L,NY,NX)=0.0_r8
+        trcs_XFLS(ids_H2PO4,1:3,L,NY,NX)=0.0_r8
 
         XOCFLS(1:jcplx,1:3,L,NY,NX)=0.0_r8
         XONFLS(1:jcplx,1:3,L,NY,NX)=0.0_r8
@@ -432,12 +432,12 @@ module Hour1Mod
         FLWX(1:3,L,NY,NX)=0.0_r8
         FLWH(1:3,L,NY,NX)=0.0_r8
         HFLW(1:3,L,NY,NX)=0.0_r8
-        XN4FLB(1:3,L,NY,NX)=0.0_r8
-        XN3FLB(1:3,L,NY,NX)=0.0_r8
-        XNOFLB(1:3,L,NY,NX)=0.0_r8
-        XNXFLB(1:3,L,NY,NX)=0.0_r8
-        XH1BFB(1:3,L,NY,NX)=0.0_r8
-        XH2BFB(1:3,L,NY,NX)=0.0_r8
+        trcs_XFLS(ids_NH4B,1:3,L,NY,NX)=0.0_r8
+        trcs_XFLS(idg_NH3B,1:3,L,NY,NX)=0.0_r8
+        trcs_XFLS(ids_NO3B,1:3,L,NY,NX)=0.0_r8
+        trcs_XFLS(ids_NO2B,1:3,L,NY,NX)=0.0_r8
+        trcs_XFLS(ids_H1PO4B,1:3,L,NY,NX)=0.0_r8
+        trcs_XFLS(ids_H2PO4B,1:3,L,NY,NX)=0.0_r8
         XCOFHS(1:3,L,NY,NX)=0.0_r8
         XCHFHS(1:3,L,NY,NX)=0.0_r8
         XOXFHS(1:3,L,NY,NX)=0.0_r8
