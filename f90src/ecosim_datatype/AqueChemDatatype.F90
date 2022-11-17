@@ -35,6 +35,7 @@ module AqueChemDatatype
   real(r8),target,allocatable ::  ZHCO3(:,:,:)                       !soil aqueous HCO3 content micropore, [mol d-2]
   real(r8),target,allocatable ::  XN4(:,:,:)                         !exchangeable NH4 non-band, [mol d-2]
   real(r8),target,allocatable ::  XNB(:,:,:)                         !exchangeable NH4 band, [mol d-2]
+
   real(r8),target,allocatable ::  ZAL(:,:,:)                         !soil aqueous Al content micropore, [mol d-2]
   real(r8),target,allocatable ::  ZFE(:,:,:)                         !soil aqueous Fe content micropore, [mol d-2]
   real(r8),target,allocatable ::  ZHY(:,:,:)                         !soil aqueous H content micropore, [mol d-2]
@@ -82,6 +83,7 @@ module AqueChemDatatype
   real(r8),target,allocatable ::  ZCA1PB(:,:,:)                      !soil aqueous CaHPO4 content micropore band, [mol d-2]
   real(r8),target,allocatable ::  ZCA2PB(:,:,:)                      !soil aqueous CaH2PO4 content micropore band, [mol d-2]
   real(r8),target,allocatable ::  ZMG1PB(:,:,:)                      !soil aqueous MgHPO4 content micropore band, [mol d-2]
+
   real(r8),target,allocatable ::  XHY(:,:,:)                         !exchangeable H , [mol d-2]
   real(r8),target,allocatable ::  XAL(:,:,:)                         !exchangeable Al, [mol d-2]
   real(r8),target,allocatable ::  XCA(:,:,:)                         !exchangeable Ca, [mol d-2]
@@ -98,10 +100,12 @@ module AqueChemDatatype
   real(r8),target,allocatable ::  XOH0B(:,:,:)                       !exchangeable OH- band, [mol d-2]
   real(r8),target,allocatable ::  XFE(:,:,:)                         !exchangeable Fe, [mol d-2]
   real(r8),target,allocatable ::  XFEO2(:,:,:)                       !exchangeable Fe(OH)2, [mol d-2]
+
   real(r8),target,allocatable ::  XOH1B(:,:,:)                       !exchangeable OH  band, [mol d-2]
   real(r8),target,allocatable ::  XOH2B(:,:,:)                       !exchangeable OH2  band, [mol d-2]
   real(r8),target,allocatable ::  XH1PB(:,:,:)                       !exchangeable HPO4  band, [mol d-2]
   real(r8),target,allocatable ::  XH2PB(:,:,:)                       !exchangeable H2PO4  band, [mol d-2]
+
   real(r8),target,allocatable ::  PCAPD(:,:,:)                       !precipitated CaHPO4 non-band, [mol d-2]
   real(r8),target,allocatable ::  PCAPH(:,:,:)                       !precipitated hydroxyapatite non-band, [mol d-2]
   real(r8),target,allocatable ::  PALOH(:,:,:)                       !precipitated AlOH3, [mol d-2]
@@ -175,23 +179,7 @@ module AqueChemDatatype
   real(r8),target,allocatable ::  trcsa_XFHS(:,:,:,:,:)
   real(r8),target,allocatable ::  trcsa_XFLS(:,:,:,:,:)
 
-  real(r8),target,allocatable ::  XH0BFB(:,:,:,:)                    !total PO4 in micropore water flux band, [mol d-2 h-1]
-  real(r8),target,allocatable ::  XH3BFB(:,:,:,:)                    !total H3PO4 in micropore water flux band, [mol d-2 h-1]
-  real(r8),target,allocatable ::  XF1BFB(:,:,:,:)                    !total FeHPO4 in micropore water flux band, [mol d-2 h-1]
-  real(r8),target,allocatable ::  XF2BFB(:,:,:,:)                    !total FeH2PO4 in micropore water flux band, [mol d-2 h-1]
-  real(r8),target,allocatable ::  XC0BFB(:,:,:,:)                    !total CaPO4 in micropore water flux band, [mol d-2 h-1]
-  real(r8),target,allocatable ::  XC1BFB(:,:,:,:)                    !total CaHPO4 in micropore water flux band, [mol d-2 h-1]
-  real(r8),target,allocatable ::  XC2BFB(:,:,:,:)                    !total CaH2PO4 in micropore water flux band, [mol d-2 h-1]
-  real(r8),target,allocatable ::  XM1BFB(:,:,:,:)                    !total MgHPO4 in micropore water flux band, [mol d-2 h-1]
 
-  real(r8),target,allocatable ::  XH0BHB(:,:,:,:)                    !total PO4 in macropore water flux band, [mol d-2 h-1]
-  real(r8),target,allocatable ::  XH3BHB(:,:,:,:)                    !total H3PO4 in macropore water flux band, [mol d-2 h-1]
-  real(r8),target,allocatable ::  XF1BHB(:,:,:,:)                    !total FeHPO4 in macropore water flux band, [mol d-2 h-1]
-  real(r8),target,allocatable ::  XF2BHB(:,:,:,:)                    !total FeH2PO4 in macropore water flux band, [mol d-2 h-1]
-  real(r8),target,allocatable ::  XC0BHB(:,:,:,:)                    !total CaPO4 in macropore water flux band, [mol d-2 h-1]
-  real(r8),target,allocatable ::  XC1BHB(:,:,:,:)                    !total CaHPO4 in macropore water flux band, [mol d-2 h-1]
-  real(r8),target,allocatable ::  XC2BHB(:,:,:,:)                    !total CaH2PO4 in macropore water flux band, [mol d-2 h-1]
-  real(r8),target,allocatable ::  XM1BHB(:,:,:,:)                    !total MgHPO4 in macropore water flux band, [mol d-2 h-1]
   real(r8),target,allocatable ::  XOCFXS(:,:,:,:)                    !total DOC micropore-macropore transfer, [g d-2 h-1]
   real(r8),target,allocatable ::  XONFXS(:,:,:,:)                    !total DON micropore-macropore transfer, [g d-2 h-1]
   real(r8),target,allocatable ::  XOPFXS(:,:,:,:)                    !total DOP micropore-macropore transfer, [g d-2 h-1]
@@ -596,22 +584,6 @@ module AqueChemDatatype
   allocate(ZCA2BH(JZ,JY,JX));   ZCA2BH=0._r8
   allocate(ZMG1BH(JZ,JY,JX));   ZMG1BH=0._r8
 
-  allocate(XH0BFB(3,0:JD,JV,JH));XH0BFB=0._r8
-  allocate(XH3BFB(3,0:JD,JV,JH));XH3BFB=0._r8
-  allocate(XF1BFB(3,0:JD,JV,JH));XF1BFB=0._r8
-  allocate(XF2BFB(3,0:JD,JV,JH));XF2BFB=0._r8
-  allocate(XC0BFB(3,0:JD,JV,JH));XC0BFB=0._r8
-  allocate(XC1BFB(3,0:JD,JV,JH));XC1BFB=0._r8
-  allocate(XC2BFB(3,0:JD,JV,JH));XC2BFB=0._r8
-  allocate(XM1BFB(3,0:JD,JV,JH));XM1BFB=0._r8
-  allocate(XH0BHB(3,JD,JV,JH)); XH0BHB=0._r8
-  allocate(XH3BHB(3,JD,JV,JH)); XH3BHB=0._r8
-  allocate(XF1BHB(3,JD,JV,JH)); XF1BHB=0._r8
-  allocate(XF2BHB(3,JD,JV,JH)); XF2BHB=0._r8
-  allocate(XC0BHB(3,JD,JV,JH)); XC0BHB=0._r8
-  allocate(XC1BHB(3,JD,JV,JH)); XC1BHB=0._r8
-  allocate(XC2BHB(3,JD,JV,JH)); XC2BHB=0._r8
-  allocate(XM1BHB(3,JD,JV,JH)); XM1BHB=0._r8
   allocate(XOCFXS(1:jcplx,JZ,JY,JX));XOCFXS=0._r8
   allocate(XONFXS(1:jcplx,JZ,JY,JX));XONFXS=0._r8
   allocate(XOPFXS(1:jcplx,JZ,JY,JX));XOPFXS=0._r8
@@ -788,8 +760,8 @@ module AqueChemDatatype
   allocate(trcn_XBLS(ids_nut_beg:ids_nuts_end,JS,JY,JX)); trcn_XBLS=0._r8
   if(salt_model)then
     allocate(trcsa_XBLS(idsa_beg:idsa_end,JS,JY,JX)); trcsa_XBLS=0._r8
-    allocate(trcsa_XFLS(idsa_beg:idsa_end,3,0:JD,JV,JH));trcsa_XFLS=0._r8
-    allocate(trcsa_XFHS(idsa_beg:idsa_end,3,JD,JV,JH));trcsa_XFHS=0._r8
+    allocate(trcsa_XFLS(idsa_beg:idsab_end,3,0:JD,JV,JH));trcsa_XFLS=0._r8
+    allocate(trcsa_XFHS(idsa_beg:idsab_end,3,JD,JV,JH));trcsa_XFHS=0._r8
   endif
   allocate(XCOBLS(JS,JY,JX));   XCOBLS=0._r8
   allocate(XCHBLS(JS,JY,JX));   XCHBLS=0._r8
@@ -1013,22 +985,6 @@ module AqueChemDatatype
   call destroy(ZMG1BH)
   call destroy(trcsa_XFLS)
   call destroy(trcsa_XFHS)
-  call destroy(XH0BFB)
-  call destroy(XH3BFB)
-  call destroy(XF1BFB)
-  call destroy(XF2BFB)
-  call destroy(XC0BFB)
-  call destroy(XC1BFB)
-  call destroy(XC2BFB)
-  call destroy(XM1BFB)
-  call destroy(XH0BHB)
-  call destroy(XH3BHB)
-  call destroy(XF1BHB)
-  call destroy(XF2BHB)
-  call destroy(XC0BHB)
-  call destroy(XC1BHB)
-  call destroy(XC2BHB)
-  call destroy(XM1BHB)
   call destroy(XOCFXS)
   call destroy(XONFXS)
   call destroy(XOPFXS)

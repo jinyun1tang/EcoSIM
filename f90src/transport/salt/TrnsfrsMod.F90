@@ -816,14 +816,14 @@ module TrnsfrsMod
   trcsa_XFLS(idsa_CaHPO4,3,NU(NY,NX),NY,NX)=0.0
   trcsa_XFLS(idsa_CaH2PO4,3,NU(NY,NX),NY,NX)=0.0
   trcsa_XFLS(idsa_MgHPO4,3,NU(NY,NX),NY,NX)=0.0
-  XH0BFB(3,NU(NY,NX),NY,NX)=0.0
-  XH3BFB(3,NU(NY,NX),NY,NX)=0.0
-  XF1BFB(3,NU(NY,NX),NY,NX)=0.0
-  XF2BFB(3,NU(NY,NX),NY,NX)=0.0
-  XC0BFB(3,NU(NY,NX),NY,NX)=0.0
-  XC1BFB(3,NU(NY,NX),NY,NX)=0.0
-  XC2BFB(3,NU(NY,NX),NY,NX)=0.0
-  XM1BFB(3,NU(NY,NX),NY,NX)=0.0
+  trcsa_XFLS(idsa_H0PO4B,3,NU(NY,NX),NY,NX)=0.0
+  trcsa_XFLS(idsa_H3PO4B,3,NU(NY,NX),NY,NX)=0.0
+  trcsa_XFLS(idsa_FeHPO4B,3,NU(NY,NX),NY,NX)=0.0
+  trcsa_XFLS(idsa_FeH2PO4B,3,NU(NY,NX),NY,NX)=0.0
+  trcsa_XFLS(idsa_CaPO4B,3,NU(NY,NX),NY,NX)=0.0
+  trcsa_XFLS(idsa_CaHPO4B,3,NU(NY,NX),NY,NX)=0.0
+  trcsa_XFLS(idsa_CaH2PO4B,3,NU(NY,NX),NY,NX)=0.0
+  trcsa_XFLS(idsa_MgHPO4B,3,NU(NY,NX),NY,NX)=0.0
   end subroutine ZeroAtmosSoluteFlux
 !------------------------------------------------------------------------------------------
 
@@ -964,14 +964,14 @@ module TrnsfrsMod
   trcsa_XFLS(idsa_CaHPO4,3,NU(NY,NX),NY,NX)=0.0
   trcsa_XFLS(idsa_CaH2PO4,3,NU(NY,NX),NY,NX)=0.0
   trcsa_XFLS(idsa_MgHPO4,3,NU(NY,NX),NY,NX)=0.0
-  XH0BFB(3,NU(NY,NX),NY,NX)=0.0
-  XH3BFB(3,NU(NY,NX),NY,NX)=0.0
-  XF1BFB(3,NU(NY,NX),NY,NX)=0.0
-  XF2BFB(3,NU(NY,NX),NY,NX)=0.0
-  XC0BFB(3,NU(NY,NX),NY,NX)=0.0
-  XC1BFB(3,NU(NY,NX),NY,NX)=0.0
-  XC2BFB(3,NU(NY,NX),NY,NX)=0.0
-  XM1BFB(3,NU(NY,NX),NY,NX)=0.0
+  trcsa_XFLS(idsa_H0PO4B,3,NU(NY,NX),NY,NX)=0.0
+  trcsa_XFLS(idsa_H3PO4B,3,NU(NY,NX),NY,NX)=0.0
+  trcsa_XFLS(idsa_FeHPO4B,3,NU(NY,NX),NY,NX)=0.0
+  trcsa_XFLS(idsa_FeH2PO4B,3,NU(NY,NX),NY,NX)=0.0
+  trcsa_XFLS(idsa_CaPO4B,3,NU(NY,NX),NY,NX)=0.0
+  trcsa_XFLS(idsa_CaHPO4B,3,NU(NY,NX),NY,NX)=0.0
+  trcsa_XFLS(idsa_CaH2PO4B,3,NU(NY,NX),NY,NX)=0.0
+  trcsa_XFLS(idsa_MgHPO4B,3,NU(NY,NX),NY,NX)=0.0
   end subroutine AtmosSoluteFluxToSnowpack
 !------------------------------------------------------------------------------------------
 
@@ -1134,21 +1134,21 @@ module TrnsfrsMod
     *CC2PQ(I,NY,NX))*trcs_VLN(ids_H1PO4,NU(NY,NX),NY,NX)
   trcsa_XFLS(idsa_MgHPO4,3,NU(NY,NX),NY,NX)=(FLQGQ(NY,NX)*CM1PR(NY,NX)+FLQGI(NY,NX) &
     *CM1PQ(I,NY,NX))*trcs_VLN(ids_H1PO4,NU(NY,NX),NY,NX)
-  XH0BFB(3,NU(NY,NX),NY,NX)=(FLQGQ(NY,NX)*CH0PR(NY,NX)+FLQGI(NY,NX) &
+  trcsa_XFLS(idsa_H0PO4B,3,NU(NY,NX),NY,NX)=(FLQGQ(NY,NX)*CH0PR(NY,NX)+FLQGI(NY,NX) &
     *CH0PQ(I,NY,NX))*trcs_VLN(ids_H1PO4B,NU(NY,NX),NY,NX)
-  XH3BFB(3,NU(NY,NX),NY,NX)=(FLQGQ(NY,NX)*CH3PR(NY,NX)+FLQGI(NY,NX) &
+  trcsa_XFLS(idsa_H3PO4B,3,NU(NY,NX),NY,NX)=(FLQGQ(NY,NX)*CH3PR(NY,NX)+FLQGI(NY,NX) &
     *CH3PQ(I,NY,NX))*trcs_VLN(ids_H1PO4B,NU(NY,NX),NY,NX)
-  XF1BFB(3,NU(NY,NX),NY,NX)=(FLQGQ(NY,NX)*CF1PR(NY,NX)+FLQGI(NY,NX) &
+  trcsa_XFLS(idsa_FeHPO4B,3,NU(NY,NX),NY,NX)=(FLQGQ(NY,NX)*CF1PR(NY,NX)+FLQGI(NY,NX) &
     *CF1PQ(I,NY,NX))*trcs_VLN(ids_H1PO4B,NU(NY,NX),NY,NX)
-  XF2BFB(3,NU(NY,NX),NY,NX)=(FLQGQ(NY,NX)*CF2PR(NY,NX)+FLQGI(NY,NX) &
+  trcsa_XFLS(idsa_FeH2PO4B,3,NU(NY,NX),NY,NX)=(FLQGQ(NY,NX)*CF2PR(NY,NX)+FLQGI(NY,NX) &
     *CF2PQ(I,NY,NX))*trcs_VLN(ids_H1PO4B,NU(NY,NX),NY,NX)
-  XC0BFB(3,NU(NY,NX),NY,NX)=(FLQGQ(NY,NX)*CC0PR(NY,NX)+FLQGI(NY,NX) &
+  trcsa_XFLS(idsa_CaPO4B,3,NU(NY,NX),NY,NX)=(FLQGQ(NY,NX)*CC0PR(NY,NX)+FLQGI(NY,NX) &
     *CC0PQ(I,NY,NX))*trcs_VLN(ids_H1PO4B,NU(NY,NX),NY,NX)
-  XC1BFB(3,NU(NY,NX),NY,NX)=(FLQGQ(NY,NX)*CC1PR(NY,NX)+FLQGI(NY,NX) &
+  trcsa_XFLS(idsa_CaHPO4B,3,NU(NY,NX),NY,NX)=(FLQGQ(NY,NX)*CC1PR(NY,NX)+FLQGI(NY,NX) &
     *CC1PQ(I,NY,NX))*trcs_VLN(ids_H1PO4B,NU(NY,NX),NY,NX)
-  XC2BFB(3,NU(NY,NX),NY,NX)=(FLQGQ(NY,NX)*CC2PR(NY,NX)+FLQGI(NY,NX) &
+  trcsa_XFLS(idsa_CaH2PO4B,3,NU(NY,NX),NY,NX)=(FLQGQ(NY,NX)*CC2PR(NY,NX)+FLQGI(NY,NX) &
     *CC2PQ(I,NY,NX))*trcs_VLN(ids_H1PO4B,NU(NY,NX),NY,NX)
-  XM1BFB(3,NU(NY,NX),NY,NX)=(FLQGQ(NY,NX)*CM1PR(NY,NX)+FLQGI(NY,NX) &
+  trcsa_XFLS(idsa_MgHPO4B,3,NU(NY,NX),NY,NX)=(FLQGQ(NY,NX)*CM1PR(NY,NX)+FLQGI(NY,NX) &
     *CM1PQ(I,NY,NX))*trcs_VLN(ids_H1PO4B,NU(NY,NX),NY,NX)
   end subroutine AtmosSoluteFluxToTopsoil
 !------------------------------------------------------------------------------------------
@@ -1326,14 +1326,14 @@ module TrnsfrsMod
   RC1PF1(NY,NX)=trcsa_XFLS(idsa_CaHPO4,3,NU(NY,NX),NY,NX)*XNPH
   RC2PF1(NY,NX)=trcsa_XFLS(idsa_CaH2PO4,3,NU(NY,NX),NY,NX)*XNPH
   RM1PF1(NY,NX)=trcsa_XFLS(idsa_MgHPO4,3,NU(NY,NX),NY,NX)*XNPH
-  RH0BF2(NY,NX)=XH0BFB(3,NU(NY,NX),NY,NX)*XNPH
-  RH3BF2(NY,NX)=XH3BFB(3,NU(NY,NX),NY,NX)*XNPH
-  RF1BF2(NY,NX)=XF1BFB(3,NU(NY,NX),NY,NX)*XNPH
-  RF2BF2(NY,NX)=XF2BFB(3,NU(NY,NX),NY,NX)*XNPH
-  RC0BF2(NY,NX)=XC0BFB(3,NU(NY,NX),NY,NX)*XNPH
-  RC1BF2(NY,NX)=XC1BFB(3,NU(NY,NX),NY,NX)*XNPH
-  RC2BF2(NY,NX)=XC2BFB(3,NU(NY,NX),NY,NX)*XNPH
-  RM1BF2(NY,NX)=XM1BFB(3,NU(NY,NX),NY,NX)*XNPH
+  RH0BF2(NY,NX)=trcsa_XFLS(idsa_H0PO4B,3,NU(NY,NX),NY,NX)*XNPH
+  RH3BF2(NY,NX)=trcsa_XFLS(idsa_H3PO4B,3,NU(NY,NX),NY,NX)*XNPH
+  RF1BF2(NY,NX)=trcsa_XFLS(idsa_FeHPO4B,3,NU(NY,NX),NY,NX)*XNPH
+  RF2BF2(NY,NX)=trcsa_XFLS(idsa_FeH2PO4B,3,NU(NY,NX),NY,NX)*XNPH
+  RC0BF2(NY,NX)=trcsa_XFLS(idsa_CaPO4B,3,NU(NY,NX),NY,NX)*XNPH
+  RC1BF2(NY,NX)=trcsa_XFLS(idsa_CaHPO4B,3,NU(NY,NX),NY,NX)*XNPH
+  RC2BF2(NY,NX)=trcsa_XFLS(idsa_CaH2PO4B,3,NU(NY,NX),NY,NX)*XNPH
+  RM1BF2(NY,NX)=trcsa_XFLS(idsa_MgHPO4B,3,NU(NY,NX),NY,NX)*XNPH
   end subroutine GetSubHourFlux
 !------------------------------------------------------------------------------------------
 
@@ -2373,14 +2373,14 @@ real(r8) :: FQRM
       trcsa_XFLS(idsa_CaHPO4,N,M6,M5,M4)=trcsa_XFLS(idsa_CaHPO4,N,M6,M5,M4)+RC1PFS(N,M6,M5,M4)
       trcsa_XFLS(idsa_CaH2PO4,N,M6,M5,M4)=trcsa_XFLS(idsa_CaH2PO4,N,M6,M5,M4)+RC2PFS(N,M6,M5,M4)
       trcsa_XFLS(idsa_MgHPO4,N,M6,M5,M4)=trcsa_XFLS(idsa_MgHPO4,N,M6,M5,M4)+RM1PFS(N,M6,M5,M4)
-      XH0BFB(N,M6,M5,M4)=XH0BFB(N,M6,M5,M4)+RH0BFB(N,M6,M5,M4)
-      XH3BFB(N,M6,M5,M4)=XH3BFB(N,M6,M5,M4)+RH3BFB(N,M6,M5,M4)
-      XF1BFB(N,M6,M5,M4)=XF1BFB(N,M6,M5,M4)+RF1BFB(N,M6,M5,M4)
-      XF2BFB(N,M6,M5,M4)=XF2BFB(N,M6,M5,M4)+RF2BFB(N,M6,M5,M4)
-      XC0BFB(N,M6,M5,M4)=XC0BFB(N,M6,M5,M4)+RC0BFB(N,M6,M5,M4)
-      XC1BFB(N,M6,M5,M4)=XC1BFB(N,M6,M5,M4)+RC1BFB(N,M6,M5,M4)
-      XC2BFB(N,M6,M5,M4)=XC2BFB(N,M6,M5,M4)+RC2BFB(N,M6,M5,M4)
-      XM1BFB(N,M6,M5,M4)=XM1BFB(N,M6,M5,M4)+RM1BFB(N,M6,M5,M4)
+      trcsa_XFLS(idsa_H0PO4B,N,M6,M5,M4)=trcsa_XFLS(idsa_H0PO4B,N,M6,M5,M4)+RH0BFB(N,M6,M5,M4)
+      trcsa_XFLS(idsa_H3PO4B,N,M6,M5,M4)=trcsa_XFLS(idsa_H3PO4B,N,M6,M5,M4)+RH3BFB(N,M6,M5,M4)
+      trcsa_XFLS(idsa_FeHPO4B,N,M6,M5,M4)=trcsa_XFLS(idsa_FeHPO4B,N,M6,M5,M4)+RF1BFB(N,M6,M5,M4)
+      trcsa_XFLS(idsa_FeH2PO4B,N,M6,M5,M4)=trcsa_XFLS(idsa_FeH2PO4B,N,M6,M5,M4)+RF2BFB(N,M6,M5,M4)
+      trcsa_XFLS(idsa_CaPO4B,N,M6,M5,M4)=trcsa_XFLS(idsa_CaPO4B,N,M6,M5,M4)+RC0BFB(N,M6,M5,M4)
+      trcsa_XFLS(idsa_CaHPO4B,N,M6,M5,M4)=trcsa_XFLS(idsa_CaHPO4B,N,M6,M5,M4)+RC1BFB(N,M6,M5,M4)
+      trcsa_XFLS(idsa_CaH2PO4B,N,M6,M5,M4)=trcsa_XFLS(idsa_CaH2PO4B,N,M6,M5,M4)+RC2BFB(N,M6,M5,M4)
+      trcsa_XFLS(idsa_MgHPO4B,N,M6,M5,M4)=trcsa_XFLS(idsa_MgHPO4B,N,M6,M5,M4)+RM1BFB(N,M6,M5,M4)
       trcsa_XFHS(idsa_Al,N,M6,M5,M4)=trcsa_XFHS(idsa_Al,N,M6,M5,M4)+RALFHS(N,M6,M5,M4)
       trcsa_XFHS(idsa_Fe,N,M6,M5,M4)=trcsa_XFHS(idsa_Fe,N,M6,M5,M4)+RFEFHS(N,M6,M5,M4)
       trcsa_XFHS(idsa_Hp,N,M6,M5,M4)=trcsa_XFHS(idsa_Hp,N,M6,M5,M4)+RHYFHS(N,M6,M5,M4)
@@ -2423,14 +2423,14 @@ real(r8) :: FQRM
       trcsa_XFHS(idsa_CaH2PO4,N,M6,M5,M4)=trcsa_XFHS(idsa_CaH2PO4,N,M6,M5,M4)+RC2PHS(N,M6,M5,M4)
       trcsa_XFHS(idsa_MgHPO4,N,M6,M5,M4)=trcsa_XFHS(idsa_MgHPO4,N,M6,M5,M4)+RM1PHS(N,M6,M5,M4)
 
-      XH0BHB(N,M6,M5,M4)=XH0BHB(N,M6,M5,M4)+RH0BHB(N,M6,M5,M4)
-      XH3BHB(N,M6,M5,M4)=XH3BHB(N,M6,M5,M4)+RH3BHB(N,M6,M5,M4)
-      XF1BHB(N,M6,M5,M4)=XF1BHB(N,M6,M5,M4)+RF1BHB(N,M6,M5,M4)
-      XF2BHB(N,M6,M5,M4)=XF2BHB(N,M6,M5,M4)+RF2BHB(N,M6,M5,M4)
-      XC0BHB(N,M6,M5,M4)=XC0BHB(N,M6,M5,M4)+RC0BHB(N,M6,M5,M4)
-      XC1BHB(N,M6,M5,M4)=XC1BHB(N,M6,M5,M4)+RC1BHB(N,M6,M5,M4)
-      XC2BHB(N,M6,M5,M4)=XC2BHB(N,M6,M5,M4)+RC2BHB(N,M6,M5,M4)
-      XM1BHB(N,M6,M5,M4)=XM1BHB(N,M6,M5,M4)+RM1BHB(N,M6,M5,M4)
+      trcsa_XFHS(idsa_H0PO4B,N,M6,M5,M4)=trcsa_XFHS(idsa_H0PO4B,N,M6,M5,M4)+RH0BHB(N,M6,M5,M4)
+      trcsa_XFHS(idsa_H3PO4B,N,M6,M5,M4)=trcsa_XFHS(idsa_H3PO4B,N,M6,M5,M4)+RH3BHB(N,M6,M5,M4)
+      trcsa_XFHS(idsa_FeHPO4B,N,M6,M5,M4)=trcsa_XFHS(idsa_FeHPO4B,N,M6,M5,M4)+RF1BHB(N,M6,M5,M4)
+      trcsa_XFHS(idsa_FeH2PO4B,N,M6,M5,M4)=trcsa_XFHS(idsa_FeH2PO4B,N,M6,M5,M4)+RF2BHB(N,M6,M5,M4)
+      trcsa_XFHS(idsa_CaPO4B,N,M6,M5,M4)=trcsa_XFHS(idsa_CaPO4B,N,M6,M5,M4)+RC0BHB(N,M6,M5,M4)
+      trcsa_XFHS(idsa_CaHPO4B,N,M6,M5,M4)=trcsa_XFHS(idsa_CaHPO4B,N,M6,M5,M4)+RC1BHB(N,M6,M5,M4)
+      trcsa_XFHS(idsa_CaH2PO4B,N,M6,M5,M4)=trcsa_XFHS(idsa_CaH2PO4B,N,M6,M5,M4)+RC2BHB(N,M6,M5,M4)
+      trcsa_XFHS(idsa_MgHPO4B,N,M6,M5,M4)=trcsa_XFHS(idsa_MgHPO4B,N,M6,M5,M4)+RM1BHB(N,M6,M5,M4)
       end subroutine AccumFluxMacMicPores
 !------------------------------------------------------------------------------------------
 

@@ -657,14 +657,14 @@ module Hour1Mod
         trcsa_XFLS(idsa_CaHPO4,1:3,L,NY,NX)=0.0_r8
         trcsa_XFLS(idsa_CaH2PO4,1:3,L,NY,NX)=0.0_r8
         trcsa_XFLS(idsa_MgHPO4,1:3,L,NY,NX)=0.0_r8
-        XH0BFB(1:3,L,NY,NX)=0.0_r8
-        XH3BFB(1:3,L,NY,NX)=0.0_r8
-        XF1BFB(1:3,L,NY,NX)=0.0_r8
-        XF2BFB(1:3,L,NY,NX)=0.0_r8
-        XC0BFB(1:3,L,NY,NX)=0.0_r8
-        XC1BFB(1:3,L,NY,NX)=0.0_r8
-        XC2BFB(1:3,L,NY,NX)=0.0_r8
-        XM1BFB(1:3,L,NY,NX)=0.0_r8
+        trcsa_XFLS(idsa_H0PO4B,1:3,L,NY,NX)=0.0_r8
+        trcsa_XFLS(idsa_H3PO4B,1:3,L,NY,NX)=0.0_r8
+        trcsa_XFLS(idsa_FeHPO4B,1:3,L,NY,NX)=0.0_r8
+        trcsa_XFLS(idsa_FeH2PO4B,1:3,L,NY,NX)=0.0_r8
+        trcsa_XFLS(idsa_CaPO4B,1:3,L,NY,NX)=0.0_r8
+        trcsa_XFLS(idsa_CaHPO4B,1:3,L,NY,NX)=0.0_r8
+        trcsa_XFLS(idsa_CaH2PO4B,1:3,L,NY,NX)=0.0_r8
+        trcsa_XFLS(idsa_MgHPO4B,1:3,L,NY,NX)=0.0_r8
         trcsa_XFHS(idsa_Al,1:3,L,NY,NX)=0.0_r8
         trcsa_XFHS(idsa_Fe,1:3,L,NY,NX)=0.0_r8
         trcsa_XFHS(idsa_Hp,1:3,L,NY,NX)=0.0_r8
@@ -706,14 +706,14 @@ module Hour1Mod
         trcsa_XFHS(idsa_CaHPO4,1:3,L,NY,NX)=0.0_r8
         trcsa_XFHS(idsa_CaH2PO4,1:3,L,NY,NX)=0.0_r8
         trcsa_XFHS(idsa_MgHPO4,1:3,L,NY,NX)=0.0_r8
-        XH0BHB(1:3,L,NY,NX)=0.0_r8
-        XH3BHB(1:3,L,NY,NX)=0.0_r8
-        XF1BHB(1:3,L,NY,NX)=0.0_r8
-        XF2BHB(1:3,L,NY,NX)=0.0_r8
-        XC0BHB(1:3,L,NY,NX)=0.0_r8
-        XC1BHB(1:3,L,NY,NX)=0.0_r8
-        XC2BHB(1:3,L,NY,NX)=0.0_r8
-        XM1BHB(1:3,L,NY,NX)=0.0_r8
+        trcsa_XFHS(idsa_H0PO4B,1:3,L,NY,NX)=0.0_r8
+        trcsa_XFHS(idsa_H3PO4B,1:3,L,NY,NX)=0.0_r8
+        trcsa_XFHS(idsa_FeHPO4B,1:3,L,NY,NX)=0.0_r8
+        trcsa_XFHS(idsa_FeH2PO4B,1:3,L,NY,NX)=0.0_r8
+        trcsa_XFHS(idsa_CaPO4B,1:3,L,NY,NX)=0.0_r8
+        trcsa_XFHS(idsa_CaHPO4B,1:3,L,NY,NX)=0.0_r8
+        trcsa_XFHS(idsa_CaH2PO4B,1:3,L,NY,NX)=0.0_r8
+        trcsa_XFHS(idsa_MgHPO4B,1:3,L,NY,NX)=0.0_r8
       ENDDO
     ENDDO
   ENDDO
