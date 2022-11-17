@@ -1150,7 +1150,7 @@ module InsideTranspMod
   integer, intent(in) :: M,N,N1,N2,N3,N4,N5,N6
 
   real(r8) :: THETW1(JZ,JY,JX)
-  integer :: K
+  integer :: K,NTS
 
   THETW1(N3,N2,N1)=AZMAX1(safe_adb(VOLWM(M,N3,N2,N1),VOLY(N3,N2,N1)))
   THETW1(N6,N5,N4)=AZMAX1(safe_adb(VOLWM(M,N6,N5,N4),VOLY(N6,N5,N4)))
@@ -1221,43 +1221,11 @@ module InsideTranspMod
     XOAFHS(K,N,N6,N5,N4)=XOAFHS(K,N,N6,N5,N4)+ROAFHS(K,N,N6,N5,N4)
   ENDDO D9755
 
-  trcs_XFLS(idg_CO2,N,N6,N5,N4)=trcs_XFLS(idg_CO2,N,N6,N5,N4)+R3PoreSolFlx(idg_CO2,N,N6,N5,N4)
-  trcs_XFLS(idg_CH4,N,N6,N5,N4)=trcs_XFLS(idg_CH4,N,N6,N5,N4)+R3PoreSolFlx(idg_CH4,N,N6,N5,N4)
-  trcs_XFLS(idg_O2,N,N6,N5,N4)=trcs_XFLS(idg_O2,N,N6,N5,N4)+R3PoreSolFlx(idg_O2,N,N6,N5,N4)
-  trcs_XFLS(idg_N2,N,N6,N5,N4)=trcs_XFLS(idg_N2,N,N6,N5,N4)+R3PoreSolFlx(idg_N2,N,N6,N5,N4)
-  trcs_XFLS(idg_N2O,N,N6,N5,N4)=trcs_XFLS(idg_N2O,N,N6,N5,N4)+R3PoreSolFlx(idg_N2O,N,N6,N5,N4)
-  trcs_XFLS(idg_H2,N,N6,N5,N4)=trcs_XFLS(idg_H2,N,N6,N5,N4)+R3PoreSolFlx(idg_H2,N,N6,N5,N4)
-  trcs_XFLS(ids_NH4,N,N6,N5,N4)=trcs_XFLS(ids_NH4,N,N6,N5,N4)+R3PoreSolFlx(ids_NH4,N,N6,N5,N4)
-  trcs_XFLS(idg_NH3,N,N6,N5,N4)=trcs_XFLS(idg_NH3,N,N6,N5,N4)+R3PoreSolFlx(idg_NH3,N,N6,N5,N4)
-  trcs_XFLS(ids_NO3,N,N6,N5,N4)=trcs_XFLS(ids_NO3,N,N6,N5,N4)+R3PoreSolFlx(ids_NO3,N,N6,N5,N4)
-  trcs_XFLS(ids_NO2,N,N6,N5,N4)=trcs_XFLS(ids_NO2,N,N6,N5,N4)+R3PoreSolFlx(ids_NO2,N,N6,N5,N4)
-  trcs_XFLS(ids_H1PO4,N,N6,N5,N4)=trcs_XFLS(ids_H1PO4,N,N6,N5,N4)+R3PoreSolFlx(ids_H1PO4,N,N6,N5,N4)
-  trcs_XFLS(ids_H2PO4,N,N6,N5,N4)=trcs_XFLS(ids_H2PO4,N,N6,N5,N4)+R3PoreSolFlx(ids_H2PO4,N,N6,N5,N4)
-  trcs_XFLS(ids_NH4B,N,N6,N5,N4)=trcs_XFLS(ids_NH4B,N,N6,N5,N4)+R3PoreSolFlx(ids_NH4B,N,N6,N5,N4)
-  trcs_XFLS(idg_NH3B,N,N6,N5,N4)=trcs_XFLS(idg_NH3B,N,N6,N5,N4)+R3PoreSolFlx(idg_NH3B,N,N6,N5,N4)
-  trcs_XFLS(ids_NO3B,N,N6,N5,N4)=trcs_XFLS(ids_NO3B,N,N6,N5,N4)+R3PoreSolFlx(ids_NO3B,N,N6,N5,N4)
-  trcs_XFLS(ids_NO2B,N,N6,N5,N4)=trcs_XFLS(ids_NO2B,N,N6,N5,N4)+R3PoreSolFlx(ids_NO2B,N,N6,N5,N4)
-  trcs_XFLS(ids_H1PO4B,N,N6,N5,N4)=trcs_XFLS(ids_H1PO4B,N,N6,N5,N4)+R3PoreSolFlx(ids_H1PO4B,N,N6,N5,N4)
-  trcs_XFLS(ids_H2PO4B,N,N6,N5,N4)=trcs_XFLS(ids_H2PO4B,N,N6,N5,N4)+R3PoreSolFlx(ids_H2PO4B,N,N6,N5,N4)
+  DO NTS=ids_beg,ids_end
+    trcs_XFLS(NTS,N,N6,N5,N4)=trcs_XFLS(NTS,N,N6,N5,N4)+R3PoreSolFlx(NTS,N,N6,N5,N4)
+    trcs_XFHS(NTS,N,N6,N5,N4)=trcs_XFHS(NTS,N,N6,N5,N4)+R3PoreSoHFlx(NTS,N,N6,N5,N4)
+  ENDDO
 
-  XCOFHS(N,N6,N5,N4)=XCOFHS(N,N6,N5,N4)+R3PoreSoHFlx(idg_CO2,N,N6,N5,N4)
-  XCHFHS(N,N6,N5,N4)=XCHFHS(N,N6,N5,N4)+R3PoreSoHFlx(idg_CH4,N,N6,N5,N4)
-  XOXFHS(N,N6,N5,N4)=XOXFHS(N,N6,N5,N4)+R3PoreSoHFlx(idg_O2,N,N6,N5,N4)
-  XNGFHS(N,N6,N5,N4)=XNGFHS(N,N6,N5,N4)+R3PoreSoHFlx(idg_N2,N,N6,N5,N4)
-  XN2FHS(N,N6,N5,N4)=XN2FHS(N,N6,N5,N4)+R3PoreSoHFlx(idg_N2O,N,N6,N5,N4)
-  XHGFHS(N,N6,N5,N4)=XHGFHS(N,N6,N5,N4)+R3PoreSoHFlx(idg_H2,N,N6,N5,N4)
-  XN4FHW(N,N6,N5,N4)=XN4FHW(N,N6,N5,N4)+R3PoreSoHFlx(ids_NH4,N,N6,N5,N4)
-  XN3FHW(N,N6,N5,N4)=XN3FHW(N,N6,N5,N4)+R3PoreSoHFlx(idg_NH3,N,N6,N5,N4)
-  XNOFHW(N,N6,N5,N4)=XNOFHW(N,N6,N5,N4)+R3PoreSoHFlx(ids_NO3,N,N6,N5,N4)
-  XNXFHS(N,N6,N5,N4)=XNXFHS(N,N6,N5,N4)+R3PoreSoHFlx(ids_NO2,N,N6,N5,N4)
-  XH1PHS(N,N6,N5,N4)=XH1PHS(N,N6,N5,N4)+R3PoreSoHFlx(ids_H1PO4,N,N6,N5,N4)
-  XH2PHS(N,N6,N5,N4)=XH2PHS(N,N6,N5,N4)+R3PoreSoHFlx(ids_H2PO4,N,N6,N5,N4)
-  XN4FHB(N,N6,N5,N4)=XN4FHB(N,N6,N5,N4)+R3PoreSoHFlx(ids_NH4B,N,N6,N5,N4)
-  XN3FHB(N,N6,N5,N4)=XN3FHB(N,N6,N5,N4)+R3PoreSoHFlx(idg_NH3B,N,N6,N5,N4)
-  XNOFHB(N,N6,N5,N4)=XNOFHB(N,N6,N5,N4)+R3PoreSoHFlx(ids_NO3B,N,N6,N5,N4)
-  XNXFHB(N,N6,N5,N4)=XNXFHB(N,N6,N5,N4)+R3PoreSoHFlx(ids_NO2B,N,N6,N5,N4)
-  XH1BHB(N,N6,N5,N4)=XH1BHB(N,N6,N5,N4)+R3PoreSoHFlx(ids_H1PO4B,N,N6,N5,N4)
-  XH2BHB(N,N6,N5,N4)=XH2BHB(N,N6,N5,N4)+R3PoreSoHFlx(ids_H2PO4B,N,N6,N5,N4)
   end subroutine SoluteAdvDifTransport
 
 ! ----------------------------------------------------------------------

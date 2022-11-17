@@ -171,6 +171,7 @@ implicit none
 
   real(r8),target,allocatable ::  XOAFLS(:,:,:,:,:)                  !aqueous acetate flux, [g d-2 h-1]
 
+  real(r8),target,allocatable ::  trcs_XFHS(:,:,:,:,:)
   real(r8),target,allocatable ::  R3GasADTFlx(:,:,:,:,:)             !3D gaseous fluxes, [g d-2 h-1]
   real(r8),target,allocatable ::  XOPFLS(:,:,:,:,:)                  !DOP flux micropore, [g d-2 h-1]
   real(r8),target,allocatable ::  XH1PFS(:,:,:,:)                    !total HPO4 in micropore water flux non-band, [mol d-2 h-1]
@@ -372,6 +373,7 @@ implicit none
   allocate(XONFLS(1:jcplx,3,0:JD,JV,JH));XONFLS=0._r8
   allocate(XOAFLS(1:jcplx,3,0:JD,JV,JH));XOAFLS=0._r8
   allocate(R3GasADTFlx(idg_beg:idg_end,3,JD,JV,JH));R3GasADTFlx=0._r8
+  allocate(trcs_XFHS(ids_beg:ids_end,3,0:JD,JV,JH));trcs_XFHS=0._r8
   allocate(XOPFLS(1:jcplx,3,0:JD,JV,JH));XOPFLS=0._r8
   allocate(CPO4S(JZ,JY,JX));CPO4S(JZ,JY,JX)=0._r8
   allocate(XH1PFS(3,0:JD,JV,JH));XH1PFS=0._r8

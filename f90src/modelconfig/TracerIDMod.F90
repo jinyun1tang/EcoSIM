@@ -60,6 +60,7 @@ implicit none
   integer :: idsa_NaCO3   ! NaCO3
   integer :: idsa_NaSO4   ! NaSO4
   integer :: idsa_KSO4    ! KSO4
+
   integer :: idsa_H0PO4   ! PO4
   integer :: idsa_H3PO4   ! H3PO4
   integer :: idsa_FeHPO4  ! FeHPO4
@@ -68,7 +69,17 @@ implicit none
   integer :: idsa_CaHPO4  ! CaHPO4
   integer :: idsa_CaH2PO4 ! CaH2PO4
   integer :: idsa_MgHPO4 ! MgHPO4
-
+!band salt
+  integer :: idsa_H0PO4B   ! PO4
+  integer :: idsa_H3PO4B   ! H3PO4
+  integer :: idsa_FeHPO4B  ! FeHPO4
+  integer :: idsa_FeH2PO4B ! FeH2PO4
+  integer :: idsa_CaPO4B   ! CaPO4
+  integer :: idsa_CaHPO4B  ! CaHPO4
+  integer :: idsa_CaH2PO4B ! CaH2PO4
+  integer :: idsa_MgHPO4B ! MgHPO4
+  integer :: idsab_beg
+  integer :: idsab_end
 
   contains
 
@@ -143,6 +154,17 @@ implicit none
     idsa_CaH2PO4=addone(idsa_end)
     idsa_MgHPO4=addone(idsa_end)
     idsa_end=idsa_MgHPO4
+    idsab_beg=idsa_end+1
+    idsab_end=idsab_beg
+    idsa_H0PO4B=addone(idsab_end)   ! PO4
+    idsa_H3PO4B=addone(idsab_end)  ! H3PO4
+    idsa_FeHPO4B=addone(idsab_end)  ! FeHPO4
+    idsa_FeH2PO4B=addone(idsab_end) ! FeH2PO4
+    idsa_CaPO4B=addone(idsab_end)   ! CaPO4
+    idsa_CaHPO4B=addone(idsab_end)  ! CaHPO4
+    idsa_CaH2PO4B=addone(idsab_end) ! CaH2PO4
+    idsa_MgHPO4B =addone(idsab_end)! MgHPO4
+    idsab_end=idsa_MgHPO4B
   else
 
   endif

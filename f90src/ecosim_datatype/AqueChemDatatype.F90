@@ -1,6 +1,8 @@
 module AqueChemDatatype
   use data_kind_mod, only : r8 => SHR_KIND_R8
   use GridConsts
+  use TracerIDMod
+  use EcoSIMCtrlMod, only : salt_model
   use EcoSIMConfig, only : jcplx=> jcplxc
   implicit none
   public
@@ -170,47 +172,9 @@ module AqueChemDatatype
   real(r8),target,allocatable ::  ZCA2BH(:,:,:)                      !soil aqueous CaH2PO4 content band macropore, [mol d-2]
   real(r8),target,allocatable ::  ZMG1BH(:,:,:)                      !soil aqueous MgHPO4 content band macropore, [mol d-2]
 
-  real(r8),target,allocatable ::  XALFLS(:,:,:,:)                    !total Al in micropore water flux, [mol d-2 h-1]
-  real(r8),target,allocatable ::  XFEFLS(:,:,:,:)                    !total Fe in micropore water flux, [mol d-2 h-1]
-  real(r8),target,allocatable ::  XHYFLS(:,:,:,:)                    !total H in micropore water flux, [mol d-2 h-1]
-  real(r8),target,allocatable ::  XCAFLS(:,:,:,:)                    !total Ca in micropore water flux, [mol d-2 h-1]
-  real(r8),target,allocatable ::  XMGFLS(:,:,:,:)                    !total Mg in micropore water flux, [mol d-2 h-1]
-  real(r8),target,allocatable ::  XNAFLS(:,:,:,:)                    !total Na in micropore water flux, [mol d-2 h-1]
-  real(r8),target,allocatable ::  XKAFLS(:,:,:,:)                    !total K in micropore water flux, [mol d-2 h-1]
-  real(r8),target,allocatable ::  XOHFLS(:,:,:,:)                    !total OH in micropore water flux, [mol d-2 h-1]
-  real(r8),target,allocatable ::  XSOFLS(:,:,:,:)                    !total SO4 in micropore water flux, [mol d-2 h-1]
-  real(r8),target,allocatable ::  XCLFLS(:,:,:,:)                    !total Cl in micropore water flux, [mol d-2 h-1]
-  real(r8),target,allocatable ::  XC3FLS(:,:,:,:)                    !total CO3 in micropore water flux, [mol d-2 h-1]
-  real(r8),target,allocatable ::  XHCFLS(:,:,:,:)                    !total HCO3 in micropore water flux, [mol d-2 h-1]
-  real(r8),target,allocatable ::  XAL1FS(:,:,:,:)                    !total AlOH in micropore water flux, [mol d-2 h-1]
-  real(r8),target,allocatable ::  XAL2FS(:,:,:,:)                    !total AlOH2 in micropore water flux, [mol d-2 h-1]
-  real(r8),target,allocatable ::  XAL3FS(:,:,:,:)                    !total AlOH3 in micropore water flux, [mol d-2 h-1]
-  real(r8),target,allocatable ::  XAL4FS(:,:,:,:)                    !total AlOH4 in micropore water flux, [mol d-2 h-1]
-  real(r8),target,allocatable ::  XALSFS(:,:,:,:)                    !total AlSO4 in micropore water flux, [mol d-2 h-1]
-  real(r8),target,allocatable ::  XFE1FS(:,:,:,:)                    !total FeOH in micropore water flux, [mol d-2 h-1]
-  real(r8),target,allocatable ::  XFE2FS(:,:,:,:)                    !total FeOH2 in micropore water flux, [mol d-2 h-1]
-  real(r8),target,allocatable ::  XFE3FS(:,:,:,:)                    !total FeOH3 in micropore water flux, [mol d-2 h-1]
-  real(r8),target,allocatable ::  XFE4FS(:,:,:,:)                    !total FeOH4 in micropore water flux, [mol d-2 h-1]
-  real(r8),target,allocatable ::  XFESFS(:,:,:,:)                    !total FeSO4 in micropore water flux, [mol d-2 h-1]
-  real(r8),target,allocatable ::  XCAOFS(:,:,:,:)                    !total CaOH in micropore water flux, [mol d-2 h-1]
-  real(r8),target,allocatable ::  XCACFS(:,:,:,:)                    !total CaCO3 in micropore water flux, [mol d-2 h-1]
-  real(r8),target,allocatable ::  XCAHFS(:,:,:,:)                    !total CaHCO3 in micropore water flux, [mol d-2 h-1]
-  real(r8),target,allocatable ::  XCASFS(:,:,:,:)                    !total CaSO4 in micropore water flux, [mol d-2 h-1]
-  real(r8),target,allocatable ::  XMGOFS(:,:,:,:)                    !total MgOH in micropore water flux, [mol d-2 h-1]
-  real(r8),target,allocatable ::  XMGCFS(:,:,:,:)                    !total MgCO3 in micropore water flux, [mol d-2 h-1]
-  real(r8),target,allocatable ::  XMGHFS(:,:,:,:)                    !total MgHCO3 in micropore water flux, [mol d-2 h-1]
-  real(r8),target,allocatable ::  XMGSFS(:,:,:,:)                    !total MgSO4 in micropore water flux, [mol d-2 h-1]
-  real(r8),target,allocatable ::  XNACFS(:,:,:,:)                    !total NaCO3 in micropore water flux, [mol d-2 h-1]
-  real(r8),target,allocatable ::  XNASFS(:,:,:,:)                    !total NaSO4 in micropore water flux, [mol d-2 h-1]
-  real(r8),target,allocatable ::  XKASFS(:,:,:,:)                    !total KSO4 in micropore water flux, [mol d-2 h-1]
-  real(r8),target,allocatable ::  XH0PFS(:,:,:,:)                    !total PO4 in micropore water flux non-band, [mol d-2 h-1]
-  real(r8),target,allocatable ::  XH3PFS(:,:,:,:)                    !total H3PO4 in micropore water flux non-band, [mol d-2 h-1]
-  real(r8),target,allocatable ::  XF1PFS(:,:,:,:)                    !total FeHPO4 in micropore water flux non-band, [mol d-2 h-1]
-  real(r8),target,allocatable ::  XF2PFS(:,:,:,:)                    !total FeH2PO4 in micropore water flux non-band, [mol d-2 h-1]
-  real(r8),target,allocatable ::  XC0PFS(:,:,:,:)                    !total CaPO4 in micropore water flux non-band, [mol d-2 h-1]
-  real(r8),target,allocatable ::  XC1PFS(:,:,:,:)                    !total CaHPO4 in micropore water flux non-band, [mol d-2 h-1]
-  real(r8),target,allocatable ::  XC2PFS(:,:,:,:)                    !total CaH2PO4 in micropore water flux non-band, [mol d-2 h-1]
-  real(r8),target,allocatable ::  XM1PFS(:,:,:,:)                    !total MgHPO4 in micropore water flux non-band, [mol d-2 h-1]
+  real(r8),target,allocatable ::  trcsa_XFHS(:,:,:,:,:)
+  real(r8),target,allocatable ::  trcsa_XFLS(:,:,:,:,:)
+
   real(r8),target,allocatable ::  XH0BFB(:,:,:,:)                    !total PO4 in micropore water flux band, [mol d-2 h-1]
   real(r8),target,allocatable ::  XH3BFB(:,:,:,:)                    !total H3PO4 in micropore water flux band, [mol d-2 h-1]
   real(r8),target,allocatable ::  XF1BFB(:,:,:,:)                    !total FeHPO4 in micropore water flux band, [mol d-2 h-1]
@@ -219,47 +183,7 @@ module AqueChemDatatype
   real(r8),target,allocatable ::  XC1BFB(:,:,:,:)                    !total CaHPO4 in micropore water flux band, [mol d-2 h-1]
   real(r8),target,allocatable ::  XC2BFB(:,:,:,:)                    !total CaH2PO4 in micropore water flux band, [mol d-2 h-1]
   real(r8),target,allocatable ::  XM1BFB(:,:,:,:)                    !total MgHPO4 in micropore water flux band, [mol d-2 h-1]
-  real(r8),target,allocatable ::  XALFHS(:,:,:,:)                    !total Al in macropore water flux, [mol d-2 h-1]
-  real(r8),target,allocatable ::  XFEFHS(:,:,:,:)                    !total Fe in macropore water flux, [mol d-2 h-1]
-  real(r8),target,allocatable ::  XHYFHS(:,:,:,:)                    !total H in macropore water flux, [mol d-2 h-1]
-  real(r8),target,allocatable ::  XCAFHS(:,:,:,:)                    !total Ca in macropore water flux, [mol d-2 h-1]
-  real(r8),target,allocatable ::  XMGFHS(:,:,:,:)                    !total Mg in macropore water flux, [mol d-2 h-1]
-  real(r8),target,allocatable ::  XNAFHS(:,:,:,:)                    !total Na in macropore water flux, [mol d-2 h-1]
-  real(r8),target,allocatable ::  XKAFHS(:,:,:,:)                    !total K in macropore water flux, [mol d-2 h-1]
-  real(r8),target,allocatable ::  XOHFHS(:,:,:,:)                    !total OH in macropore water flux, [mol d-2 h-1]
-  real(r8),target,allocatable ::  XSOFHS(:,:,:,:)                    !total SO4 in macropore water flux, [mol d-2 h-1]
-  real(r8),target,allocatable ::  XCLFHS(:,:,:,:)                    !total Cl in macropore water flux, [mol d-2 h-1]
-  real(r8),target,allocatable ::  XC3FHS(:,:,:,:)                    !total CO3 in macropore water flux, [mol d-2 h-1]
-  real(r8),target,allocatable ::  XHCFHS(:,:,:,:)                    !total HCO3 in macropore water flux, [mol d-2 h-1]
-  real(r8),target,allocatable ::  XAL1HS(:,:,:,:)                    !total AlOH in macropore water flux, [mol d-2 h-1]
-  real(r8),target,allocatable ::  XAL2HS(:,:,:,:)                    !total AlOH2 in macropore water flux, [mol d-2 h-1]
-  real(r8),target,allocatable ::  XAL3HS(:,:,:,:)                    !total AlOH3 in macropore water flux, [mol d-2 h-1]
-  real(r8),target,allocatable ::  XAL4HS(:,:,:,:)                    !total AlOH4 in macropore water flux, [mol d-2 h-1]
-  real(r8),target,allocatable ::  XALSHS(:,:,:,:)                    !total AlSO4 in macropore water flux, [mol d-2 h-1]
-  real(r8),target,allocatable ::  XFE1HS(:,:,:,:)                    !total FeOH in macropore water flux, [mol d-2 h-1]
-  real(r8),target,allocatable ::  XFE2HS(:,:,:,:)                    !total FeOH2 in macropore water flux, [mol d-2 h-1]
-  real(r8),target,allocatable ::  XFE3HS(:,:,:,:)                    !total FeOH3 in macropore water flux, [mol d-2 h-1]
-  real(r8),target,allocatable ::  XFE4HS(:,:,:,:)                    !total FeOH4 in macropore water flux, [mol d-2 h-1]
-  real(r8),target,allocatable ::  XFESHS(:,:,:,:)                    !total FeSO4 in macropore water flux, [mol d-2 h-1]
-  real(r8),target,allocatable ::  XCAOHS(:,:,:,:)                    !total CaOH in macropore water flux, [mol d-2 h-1]
-  real(r8),target,allocatable ::  XCACHS(:,:,:,:)                    !total CaCO3 in macropore water flux, [mol d-2 h-1]
-  real(r8),target,allocatable ::  XCAHHS(:,:,:,:)                    !total CaHCO3 in macropore water flux, [mol d-2 h-1]
-  real(r8),target,allocatable ::  XCASHS(:,:,:,:)                    !total CaSO4 in macropore water flux, [mol d-2 h-1]
-  real(r8),target,allocatable ::  XMGOHS(:,:,:,:)                    !total MgOH in macropore water flux, [mol d-2 h-1]
-  real(r8),target,allocatable ::  XMGCHS(:,:,:,:)                    !total MgCO3 in macropore water flux, [mol d-2 h-1]
-  real(r8),target,allocatable ::  XMGHHS(:,:,:,:)                    !total MgHCO3 in macropore water flux, [mol d-2 h-1]
-  real(r8),target,allocatable ::  XMGSHS(:,:,:,:)                    !total MgSO4 in macropore water flux, [mol d-2 h-1]
-  real(r8),target,allocatable ::  XNACHS(:,:,:,:)                    !total NaCO3 in macropore water flux, [mol d-2 h-1]
-  real(r8),target,allocatable ::  XNASHS(:,:,:,:)                    !total NaSO4 in macropore water flux, [mol d-2 h-1]
-  real(r8),target,allocatable ::  XKASHS(:,:,:,:)                    !total KSO4 in macropore water flux, [mol d-2 h-1]
-  real(r8),target,allocatable ::  XH0PHS(:,:,:,:)                    !total PO4 in macropore water flux non-band, [mol d-2 h-1]
-  real(r8),target,allocatable ::  XH3PHS(:,:,:,:)                    !total H3PO4 in macropore water flux non-band, [mol d-2 h-1]
-  real(r8),target,allocatable ::  XF1PHS(:,:,:,:)                    !total FeHPO4 in macropore water flux non-band, [mol d-2 h-1]
-  real(r8),target,allocatable ::  XF2PHS(:,:,:,:)                    !total FeH2PO4 in macropore water flux non-band, [mol d-2 h-1]
-  real(r8),target,allocatable ::  XC0PHS(:,:,:,:)                    !total CaPO4 in macropore water flux non-band, [mol d-2 h-1]
-  real(r8),target,allocatable ::  XC1PHS(:,:,:,:)                    !total CaHPO4 in macropore water flux non-band, [mol d-2 h-1]
-  real(r8),target,allocatable ::  XC2PHS(:,:,:,:)                    !total CaH2PO4 in macropore water flux non-band, [mol d-2 h-1]
-  real(r8),target,allocatable ::  XM1PHS(:,:,:,:)                    !total MgHPO4 in macropore water flux non-band, [mol d-2 h-1]
+
   real(r8),target,allocatable ::  XH0BHB(:,:,:,:)                    !total PO4 in macropore water flux band, [mol d-2 h-1]
   real(r8),target,allocatable ::  XH3BHB(:,:,:,:)                    !total H3PO4 in macropore water flux band, [mol d-2 h-1]
   real(r8),target,allocatable ::  XF1BHB(:,:,:,:)                    !total FeHPO4 in macropore water flux band, [mol d-2 h-1]
@@ -440,6 +364,9 @@ module AqueChemDatatype
   real(r8),target,allocatable ::  TRFEPB(:,:,:)                      !total precipitated FePO4 transformation band, [mol d-2 h-1]
   real(r8),target,allocatable ::  TRCPDB(:,:,:)                      !total precipitated CaHPO4 transformation band, [mol d-2 h-1]
   real(r8),target,allocatable ::  TRCPHB(:,:,:)                      !total precipitated CaH2PO4 transformation band, [mol d-2 h-1]
+  real(r8),target,allocatable ::  trcg_XBLS(:,:,:,:)
+  real(r8),target,allocatable ::  trcn_XBLS(:,:,:,:)
+  real(r8),target,allocatable ::  trcsa_XBLS(:,:,:,:)
   real(r8),target,allocatable ::  XCOBLS(:,:,:)                      !wet deposition of CO2, [g d-2 h-1]
   real(r8),target,allocatable ::  XCHBLS(:,:,:)                      !wet deposition of CH4, [g d-2 h-1]
   real(r8),target,allocatable ::  XOXBLS(:,:,:)                      !wet deposition of O2, [g d-2 h-1]
@@ -668,47 +595,7 @@ module AqueChemDatatype
   allocate(ZCA1BH(JZ,JY,JX));   ZCA1BH=0._r8
   allocate(ZCA2BH(JZ,JY,JX));   ZCA2BH=0._r8
   allocate(ZMG1BH(JZ,JY,JX));   ZMG1BH=0._r8
-  allocate(XALFLS(3,0:JD,JV,JH));XALFLS=0._r8
-  allocate(XFEFLS(3,0:JD,JV,JH));XFEFLS=0._r8
-  allocate(XHYFLS(3,0:JD,JV,JH));XHYFLS=0._r8
-  allocate(XCAFLS(3,0:JD,JV,JH));XCAFLS=0._r8
-  allocate(XMGFLS(3,0:JD,JV,JH));XMGFLS=0._r8
-  allocate(XNAFLS(3,0:JD,JV,JH));XNAFLS=0._r8
-  allocate(XKAFLS(3,0:JD,JV,JH));XKAFLS=0._r8
-  allocate(XOHFLS(3,0:JD,JV,JH));XOHFLS=0._r8
-  allocate(XSOFLS(3,0:JD,JV,JH));XSOFLS=0._r8
-  allocate(XCLFLS(3,0:JD,JV,JH));XCLFLS=0._r8
-  allocate(XC3FLS(3,0:JD,JV,JH));XC3FLS=0._r8
-  allocate(XHCFLS(3,0:JD,JV,JH));XHCFLS=0._r8
-  allocate(XAL1FS(3,0:JD,JV,JH));XAL1FS=0._r8
-  allocate(XAL2FS(3,0:JD,JV,JH));XAL2FS=0._r8
-  allocate(XAL3FS(3,0:JD,JV,JH));XAL3FS=0._r8
-  allocate(XAL4FS(3,0:JD,JV,JH));XAL4FS=0._r8
-  allocate(XALSFS(3,0:JD,JV,JH));XALSFS=0._r8
-  allocate(XFE1FS(3,0:JD,JV,JH));XFE1FS=0._r8
-  allocate(XFE2FS(3,0:JD,JV,JH));XFE2FS=0._r8
-  allocate(XFE3FS(3,0:JD,JV,JH));XFE3FS=0._r8
-  allocate(XFE4FS(3,0:JD,JV,JH));XFE4FS=0._r8
-  allocate(XFESFS(3,0:JD,JV,JH));XFESFS=0._r8
-  allocate(XCAOFS(3,0:JD,JV,JH));XCAOFS=0._r8
-  allocate(XCACFS(3,0:JD,JV,JH));XCACFS=0._r8
-  allocate(XCAHFS(3,0:JD,JV,JH));XCAHFS=0._r8
-  allocate(XCASFS(3,0:JD,JV,JH));XCASFS=0._r8
-  allocate(XMGOFS(3,0:JD,JV,JH));XMGOFS=0._r8
-  allocate(XMGCFS(3,0:JD,JV,JH));XMGCFS=0._r8
-  allocate(XMGHFS(3,0:JD,JV,JH));XMGHFS=0._r8
-  allocate(XMGSFS(3,0:JD,JV,JH));XMGSFS=0._r8
-  allocate(XNACFS(3,0:JD,JV,JH));XNACFS=0._r8
-  allocate(XNASFS(3,0:JD,JV,JH));XNASFS=0._r8
-  allocate(XKASFS(3,0:JD,JV,JH));XKASFS=0._r8
-  allocate(XH0PFS(3,0:JD,JV,JH));XH0PFS=0._r8
-  allocate(XH3PFS(3,0:JD,JV,JH));XH3PFS=0._r8
-  allocate(XF1PFS(3,0:JD,JV,JH));XF1PFS=0._r8
-  allocate(XF2PFS(3,0:JD,JV,JH));XF2PFS=0._r8
-  allocate(XC0PFS(3,0:JD,JV,JH));XC0PFS=0._r8
-  allocate(XC1PFS(3,0:JD,JV,JH));XC1PFS=0._r8
-  allocate(XC2PFS(3,0:JD,JV,JH));XC2PFS=0._r8
-  allocate(XM1PFS(3,0:JD,JV,JH));XM1PFS=0._r8
+
   allocate(XH0BFB(3,0:JD,JV,JH));XH0BFB=0._r8
   allocate(XH3BFB(3,0:JD,JV,JH));XH3BFB=0._r8
   allocate(XF1BFB(3,0:JD,JV,JH));XF1BFB=0._r8
@@ -717,47 +604,6 @@ module AqueChemDatatype
   allocate(XC1BFB(3,0:JD,JV,JH));XC1BFB=0._r8
   allocate(XC2BFB(3,0:JD,JV,JH));XC2BFB=0._r8
   allocate(XM1BFB(3,0:JD,JV,JH));XM1BFB=0._r8
-  allocate(XALFHS(3,JD,JV,JH)); XALFHS=0._r8
-  allocate(XFEFHS(3,JD,JV,JH)); XFEFHS=0._r8
-  allocate(XHYFHS(3,JD,JV,JH)); XHYFHS=0._r8
-  allocate(XCAFHS(3,JD,JV,JH)); XCAFHS=0._r8
-  allocate(XMGFHS(3,JD,JV,JH)); XMGFHS=0._r8
-  allocate(XNAFHS(3,JD,JV,JH)); XNAFHS=0._r8
-  allocate(XKAFHS(3,JD,JV,JH)); XKAFHS=0._r8
-  allocate(XOHFHS(3,JD,JV,JH)); XOHFHS=0._r8
-  allocate(XSOFHS(3,JD,JV,JH)); XSOFHS=0._r8
-  allocate(XCLFHS(3,JD,JV,JH)); XCLFHS=0._r8
-  allocate(XC3FHS(3,JD,JV,JH)); XC3FHS=0._r8
-  allocate(XHCFHS(3,JD,JV,JH)); XHCFHS=0._r8
-  allocate(XAL1HS(3,JD,JV,JH)); XAL1HS=0._r8
-  allocate(XAL2HS(3,JD,JV,JH)); XAL2HS=0._r8
-  allocate(XAL3HS(3,JD,JV,JH)); XAL3HS=0._r8
-  allocate(XAL4HS(3,JD,JV,JH)); XAL4HS=0._r8
-  allocate(XALSHS(3,JD,JV,JH)); XALSHS=0._r8
-  allocate(XFE1HS(3,JD,JV,JH)); XFE1HS=0._r8
-  allocate(XFE2HS(3,JD,JV,JH)); XFE2HS=0._r8
-  allocate(XFE3HS(3,JD,JV,JH)); XFE3HS=0._r8
-  allocate(XFE4HS(3,JD,JV,JH)); XFE4HS=0._r8
-  allocate(XFESHS(3,JD,JV,JH)); XFESHS=0._r8
-  allocate(XCAOHS(3,JD,JV,JH)); XCAOHS=0._r8
-  allocate(XCACHS(3,JD,JV,JH)); XCACHS=0._r8
-  allocate(XCAHHS(3,JD,JV,JH)); XCAHHS=0._r8
-  allocate(XCASHS(3,JD,JV,JH)); XCASHS=0._r8
-  allocate(XMGOHS(3,JD,JV,JH)); XMGOHS=0._r8
-  allocate(XMGCHS(3,JD,JV,JH)); XMGCHS=0._r8
-  allocate(XMGHHS(3,JD,JV,JH)); XMGHHS=0._r8
-  allocate(XMGSHS(3,JD,JV,JH)); XMGSHS=0._r8
-  allocate(XNACHS(3,JD,JV,JH)); XNACHS=0._r8
-  allocate(XNASHS(3,JD,JV,JH)); XNASHS=0._r8
-  allocate(XKASHS(3,JD,JV,JH)); XKASHS=0._r8
-  allocate(XH0PHS(3,JD,JV,JH)); XH0PHS=0._r8
-  allocate(XH3PHS(3,JD,JV,JH)); XH3PHS=0._r8
-  allocate(XF1PHS(3,JD,JV,JH)); XF1PHS=0._r8
-  allocate(XF2PHS(3,JD,JV,JH)); XF2PHS=0._r8
-  allocate(XC0PHS(3,JD,JV,JH)); XC0PHS=0._r8
-  allocate(XC1PHS(3,JD,JV,JH)); XC1PHS=0._r8
-  allocate(XC2PHS(3,JD,JV,JH)); XC2PHS=0._r8
-  allocate(XM1PHS(3,JD,JV,JH)); XM1PHS=0._r8
   allocate(XH0BHB(3,JD,JV,JH)); XH0BHB=0._r8
   allocate(XH3BHB(3,JD,JV,JH)); XH3BHB=0._r8
   allocate(XF1BHB(3,JD,JV,JH)); XF1BHB=0._r8
@@ -938,6 +784,13 @@ module AqueChemDatatype
   allocate(TRFEPB(JZ,JY,JX));   TRFEPB=0._r8
   allocate(TRCPDB(JZ,JY,JX));   TRCPDB=0._r8
   allocate(TRCPHB(JZ,JY,JX));   TRCPHB=0._r8
+  allocate(trcg_XBLS(idg_beg:idg_end-1,JS,JY,JX)); trcg_XBLS=0._r8
+  allocate(trcn_XBLS(ids_nut_beg:ids_nuts_end,JS,JY,JX)); trcn_XBLS=0._r8
+  if(salt_model)then
+    allocate(trcsa_XBLS(idsa_beg:idsa_end,JS,JY,JX)); trcsa_XBLS=0._r8
+    allocate(trcsa_XFLS(idsa_beg:idsa_end,3,0:JD,JV,JH));trcsa_XFLS=0._r8
+    allocate(trcsa_XFHS(idsa_beg:idsa_end,3,JD,JV,JH));trcsa_XFHS=0._r8
+  endif
   allocate(XCOBLS(JS,JY,JX));   XCOBLS=0._r8
   allocate(XCHBLS(JS,JY,JX));   XCHBLS=0._r8
   allocate(XOXBLS(JS,JY,JX));   XOXBLS=0._r8
@@ -1158,47 +1011,8 @@ module AqueChemDatatype
   call destroy(ZCA1BH)
   call destroy(ZCA2BH)
   call destroy(ZMG1BH)
-  call destroy(XALFLS)
-  call destroy(XFEFLS)
-  call destroy(XHYFLS)
-  call destroy(XCAFLS)
-  call destroy(XMGFLS)
-  call destroy(XNAFLS)
-  call destroy(XKAFLS)
-  call destroy(XOHFLS)
-  call destroy(XSOFLS)
-  call destroy(XCLFLS)
-  call destroy(XC3FLS)
-  call destroy(XHCFLS)
-  call destroy(XAL1FS)
-  call destroy(XAL2FS)
-  call destroy(XAL3FS)
-  call destroy(XAL4FS)
-  call destroy(XALSFS)
-  call destroy(XFE1FS)
-  call destroy(XFE2FS)
-  call destroy(XFE3FS)
-  call destroy(XFE4FS)
-  call destroy(XFESFS)
-  call destroy(XCAOFS)
-  call destroy(XCACFS)
-  call destroy(XCAHFS)
-  call destroy(XCASFS)
-  call destroy(XMGOFS)
-  call destroy(XMGCFS)
-  call destroy(XMGHFS)
-  call destroy(XMGSFS)
-  call destroy(XNACFS)
-  call destroy(XNASFS)
-  call destroy(XKASFS)
-  call destroy(XH0PFS)
-  call destroy(XH3PFS)
-  call destroy(XF1PFS)
-  call destroy(XF2PFS)
-  call destroy(XC0PFS)
-  call destroy(XC1PFS)
-  call destroy(XC2PFS)
-  call destroy(XM1PFS)
+  call destroy(trcsa_XFLS)
+  call destroy(trcsa_XFHS)
   call destroy(XH0BFB)
   call destroy(XH3BFB)
   call destroy(XF1BFB)
@@ -1207,47 +1021,6 @@ module AqueChemDatatype
   call destroy(XC1BFB)
   call destroy(XC2BFB)
   call destroy(XM1BFB)
-  call destroy(XALFHS)
-  call destroy(XFEFHS)
-  call destroy(XHYFHS)
-  call destroy(XCAFHS)
-  call destroy(XMGFHS)
-  call destroy(XNAFHS)
-  call destroy(XKAFHS)
-  call destroy(XOHFHS)
-  call destroy(XSOFHS)
-  call destroy(XCLFHS)
-  call destroy(XC3FHS)
-  call destroy(XHCFHS)
-  call destroy(XAL1HS)
-  call destroy(XAL2HS)
-  call destroy(XAL3HS)
-  call destroy(XAL4HS)
-  call destroy(XALSHS)
-  call destroy(XFE1HS)
-  call destroy(XFE2HS)
-  call destroy(XFE3HS)
-  call destroy(XFE4HS)
-  call destroy(XFESHS)
-  call destroy(XCAOHS)
-  call destroy(XCACHS)
-  call destroy(XCAHHS)
-  call destroy(XCASHS)
-  call destroy(XMGOHS)
-  call destroy(XMGCHS)
-  call destroy(XMGHHS)
-  call destroy(XMGSHS)
-  call destroy(XNACHS)
-  call destroy(XNASHS)
-  call destroy(XKASHS)
-  call destroy(XH0PHS)
-  call destroy(XH3PHS)
-  call destroy(XF1PHS)
-  call destroy(XF2PHS)
-  call destroy(XC0PHS)
-  call destroy(XC1PHS)
-  call destroy(XC2PHS)
-  call destroy(XM1PHS)
   call destroy(XH0BHB)
   call destroy(XH3BHB)
   call destroy(XF1BHB)

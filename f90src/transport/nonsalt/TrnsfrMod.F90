@@ -591,18 +591,18 @@ module TrnsfrMod
   integer, intent(in) :: I
   integer, intent(in) :: NY,NX
 
-  IF(PRECW(NY,NX).GT.0.0.OR.(PRECR(NY,NX).GT.0.0 &
-    .AND.VHCPWM(1,1,NY,NX).GT.VHCPWX(NY,NX)))THEN
-    XCOBLS(1,NY,NX)=FLQGQ(NY,NX)*CCOR(NY,NX)+FLQGI(NY,NX)*CCOQ(NY,NX)
-    XCHBLS(1,NY,NX)=FLQGQ(NY,NX)*CCHR(NY,NX)+FLQGI(NY,NX)*CCHQ(NY,NX)
-    XOXBLS(1,NY,NX)=FLQGQ(NY,NX)*COXR(NY,NX)+FLQGI(NY,NX)*COXQ(NY,NX)
-    XNGBLS(1,NY,NX)=FLQGQ(NY,NX)*CNNR(NY,NX)+FLQGI(NY,NX)*CNNQ(NY,NX)
-    XN2BLS(1,NY,NX)=FLQGQ(NY,NX)*CN2R(NY,NX)+FLQGI(NY,NX)*CN2Q(NY,NX)
-    XN4BLW(1,NY,NX)=(FLQGQ(NY,NX)*CN4R(NY,NX)+FLQGI(NY,NX)*CN4Q(I,NY,NX))*natomw
-    XN3BLW(1,NY,NX)=(FLQGQ(NY,NX)*CN3R(NY,NX)+FLQGI(NY,NX)*CN3Q(I,NY,NX))*natomw
-    XNOBLW(1,NY,NX)=(FLQGQ(NY,NX)*CNOR(NY,NX)+FLQGI(NY,NX)*CNOQ(I,NY,NX))*natomw
-    XH1PBS(1,NY,NX)=(FLQGQ(NY,NX)*CH1PR(NY,NX)+FLQGI(NY,NX)*CH1PQ(I,NY,NX))*patomw
-    XH2PBS(1,NY,NX)=(FLQGQ(NY,NX)*CPOR(NY,NX)+FLQGI(NY,NX)*CPOQ(I,NY,NX))*patomw
+  IF(PRECW(NY,NX).GT.0.0_r8.OR.(PRECR(NY,NX).GT.0.0_r8.AND.VHCPWM(1,1,NY,NX).GT.VHCPWX(NY,NX)))THEN
+    trcg_XBLS(idg_CO2,1,NY,NX)=FLQGQ(NY,NX)*CCOR(NY,NX)+FLQGI(NY,NX)*CCOQ(NY,NX)
+    trcg_XBLS(idg_CH4,1,NY,NX)=FLQGQ(NY,NX)*CCHR(NY,NX)+FLQGI(NY,NX)*CCHQ(NY,NX)
+    trcg_XBLS(idg_O2,1,NY,NX)=FLQGQ(NY,NX)*COXR(NY,NX)+FLQGI(NY,NX)*COXQ(NY,NX)
+    trcg_XBLS(idg_N2,1,NY,NX)=FLQGQ(NY,NX)*CNNR(NY,NX)+FLQGI(NY,NX)*CNNQ(NY,NX)
+    trcg_XBLS(idg_N2O,1,NY,NX)=FLQGQ(NY,NX)*CN2R(NY,NX)+FLQGI(NY,NX)*CN2Q(NY,NX)
+    trcg_XBLS(idg_NH3,1,NY,NX)=(FLQGQ(NY,NX)*CN3R(NY,NX)+FLQGI(NY,NX)*CN3Q(I,NY,NX))*natomw
+
+    trcg_XBLS(ids_NH4,1,NY,NX)=(FLQGQ(NY,NX)*CN4R(NY,NX)+FLQGI(NY,NX)*CN4Q(I,NY,NX))*natomw
+    trcg_XBLS(ids_NO3,1,NY,NX)=(FLQGQ(NY,NX)*CNOR(NY,NX)+FLQGI(NY,NX)*CNOQ(I,NY,NX))*natomw
+    trcg_XBLS(ids_H1PO4,1,NY,NX)=(FLQGQ(NY,NX)*CH1PR(NY,NX)+FLQGI(NY,NX)*CH1PQ(I,NY,NX))*patomw
+    trcg_XBLS(ids_H2PO4,1,NY,NX)=(FLQGQ(NY,NX)*CPOR(NY,NX)+FLQGI(NY,NX)*CPOQ(I,NY,NX))*patomw
 !
 !     HOURLY SOLUTE FLUXES FROM ATMOSPHERE TO SOIL SURFACE
 !     IF RAINFALL AND IRRIGATION IS ZERO IF SNOWPACK IS PRESENT
@@ -662,16 +662,16 @@ module TrnsfrMod
 !     C*R,C*Q=precipitation,irrigation solute concentrations
 !     gas code: *CO*=CO2,*OX*=O2,*CH*=CH4,*NG*=N2,*N2*=N2O,*NH*=NH3,*H2*=H2
 !
-    XCOBLS(1,NY,NX)=0.0_r8
-    XCHBLS(1,NY,NX)=0.0_r8
-    XOXBLS(1,NY,NX)=0.0_r8
-    XNGBLS(1,NY,NX)=0.0_r8
-    XN2BLS(1,NY,NX)=0.0_r8
-    XN4BLW(1,NY,NX)=0.0_r8
-    XN3BLW(1,NY,NX)=0.0_r8
-    XNOBLW(1,NY,NX)=0.0_r8
-    XH1PBS(1,NY,NX)=0.0_r8
-    XH2PBS(1,NY,NX)=0.0_r8
+    trcg_XBLS(idg_CO2,1,NY,NX)=0.0_r8
+    trcg_XBLS(idg_CH4,1,NY,NX)=0.0_r8
+    trcg_XBLS(idg_O2,1,NY,NX)=0.0_r8
+    trcg_XBLS(idg_N2,1,NY,NX)=0.0_r8
+    trcg_XBLS(idg_N2O,1,NY,NX)=0.0_r8
+    trcg_XBLS(ids_NH4,1,NY,NX)=0.0_r8
+    trcg_XBLS(idg_NH3,1,NY,NX)=0.0_r8
+    trcg_XBLS(ids_NO3,1,NY,NX)=0.0_r8
+    trcg_XBLS(ids_H1PO4,1,NY,NX)=0.0_r8
+    trcg_XBLS(ids_H2PO4,1,NY,NX)=0.0_r8
     trcs_XFLS(idg_CO2,3,0,NY,NX)=FLQRQ(NY,NX)*CCOR(NY,NX)+FLQRI(NY,NX)*CCOQ(NY,NX)
     trcs_XFLS(idg_CH4,3,0,NY,NX)=FLQRQ(NY,NX)*CCHR(NY,NX)+FLQRI(NY,NX)*CCHQ(NY,NX)
     trcs_XFLS(idg_O2,3,0,NY,NX)=FLQRQ(NY,NX)*COXR(NY,NX)+FLQRI(NY,NX)*COXQ(NY,NX)
@@ -716,16 +716,16 @@ module TrnsfrMod
 !     NO SOLUTE FLUXES FROM ATMOSPHERE
 !
   ELSE
-    XCOBLS(1,NY,NX)=0.0_r8
-    XCHBLS(1,NY,NX)=0.0_r8
-    XOXBLS(1,NY,NX)=0.0_r8
-    XNGBLS(1,NY,NX)=0.0_r8
-    XN2BLS(1,NY,NX)=0.0_r8
-    XN4BLW(1,NY,NX)=0.0_r8
-    XN3BLW(1,NY,NX)=0.0_r8
-    XNOBLW(1,NY,NX)=0.0_r8
-    XH1PBS(1,NY,NX)=0.0_r8
-    XH2PBS(1,NY,NX)=0.0_r8
+    trcg_XBLS(idg_CO2,1,NY,NX)=0.0_r8
+    trcg_XBLS(idg_CH4,1,NY,NX)=0.0_r8
+    trcg_XBLS(idg_O2,1,NY,NX)=0.0_r8
+    trcg_XBLS(idg_N2,1,NY,NX)=0.0_r8
+    trcg_XBLS(idg_N2O,1,NY,NX)=0.0_r8
+    trcg_XBLS(ids_NH4,1,NY,NX)=0.0_r8
+    trcg_XBLS(idg_NH3,1,NY,NX)=0.0_r8
+    trcg_XBLS(ids_NO3,1,NY,NX)=0.0_r8
+    trcg_XBLS(ids_H1PO4,1,NY,NX)=0.0_r8
+    trcg_XBLS(ids_H2PO4,1,NY,NX)=0.0_r8
     trcs_XFLS(idg_CO2,3,0,NY,NX)=0.0_r8
     trcs_XFLS(idg_CH4,3,0,NY,NX)=0.0_r8
     trcs_XFLS(idg_O2,3,0,NY,NX)=0.0_r8
@@ -757,24 +757,24 @@ module TrnsfrMod
     trcs_XFLS(ids_H1PO4B,3,NU(NY,NX),NY,NX)=0.0_r8
     trcs_XFLS(ids_H2PO4B,3,NU(NY,NX),NY,NX)=0.0_r8
   ENDIF
-  XCOFHS(3,NU(NY,NX),NY,NX)=0.0_r8
-  XCHFHS(3,NU(NY,NX),NY,NX)=0.0_r8
-  XOXFHS(3,NU(NY,NX),NY,NX)=0.0_r8
-  XNGFHS(3,NU(NY,NX),NY,NX)=0.0_r8
-  XN2FHS(3,NU(NY,NX),NY,NX)=0.0_r8
-  XHGFHS(3,NU(NY,NX),NY,NX)=0.0_r8
-  XN4FHW(3,NU(NY,NX),NY,NX)=0.0_r8
-  XN3FHW(3,NU(NY,NX),NY,NX)=0.0_r8
-  XNOFHW(3,NU(NY,NX),NY,NX)=0.0_r8
-  XH1PHS(3,NU(NY,NX),NY,NX)=0.0_r8
-  XH2PHS(3,NU(NY,NX),NY,NX)=0.0_r8
-  XN4FHB(3,NU(NY,NX),NY,NX)=0.0_r8
-  XN3FHB(3,NU(NY,NX),NY,NX)=0.0_r8
-  XNOFHB(3,NU(NY,NX),NY,NX)=0.0_r8
-  XNXFHB(3,NU(NY,NX),NY,NX)=0.0_r8
-  XH1BHB(3,NU(NY,NX),NY,NX)=0.0_r8
-  XH2BHB(3,NU(NY,NX),NY,NX)=0.0_r8
-  XNXFHS(3,NU(NY,NX),NY,NX)=0.0_r8
+  trcs_XFHS(idg_CO2,3,NU(NY,NX),NY,NX)=0.0_r8
+  trcs_XFHS(idg_CH4,3,NU(NY,NX),NY,NX)=0.0_r8
+  trcs_XFHS(idg_O2,3,NU(NY,NX),NY,NX)=0.0_r8
+  trcs_XFHS(idg_N2,3,NU(NY,NX),NY,NX)=0.0_r8
+  trcs_XFHS(idg_N2O,3,NU(NY,NX),NY,NX)=0.0_r8
+  trcs_XFHS(idg_H2,3,NU(NY,NX),NY,NX)=0.0_r8
+  trcs_XFHS(ids_NH4,3,NU(NY,NX),NY,NX)=0.0_r8
+  trcs_XFHS(idg_NH3,3,NU(NY,NX),NY,NX)=0.0_r8
+  trcs_XFHS(ids_NO3,3,NU(NY,NX),NY,NX)=0.0_r8
+  trcs_XFHS(ids_H1PO4,3,NU(NY,NX),NY,NX)=0.0_r8
+  trcs_XFHS(ids_H2PO4,3,NU(NY,NX),NY,NX)=0.0_r8
+  trcs_XFHS(ids_NH4B,3,NU(NY,NX),NY,NX)=0.0_r8
+  trcs_XFHS(idg_NH3B,3,NU(NY,NX),NY,NX)=0.0_r8
+  trcs_XFHS(ids_NO3B,3,NU(NY,NX),NY,NX)=0.0_r8
+  trcs_XFHS(ids_NO2B,3,NU(NY,NX),NY,NX)=0.0_r8
+  trcs_XFHS(ids_H1PO4B,3,NU(NY,NX),NY,NX)=0.0_r8
+  trcs_XFHS(ids_H2PO4B,3,NU(NY,NX),NY,NX)=0.0_r8
+  trcs_XFHS(ids_NO2,3,NU(NY,NX),NY,NX)=0.0_r8
   end subroutine HourlySoluteFluxes
 !------------------------------------------------------------------------------------------
 
@@ -795,16 +795,16 @@ module TrnsfrMod
     ROPFL1(K,NY,NX)=XOPFLS(K,3,NU(NY,NX),NY,NX)*XNPH
     ROAFL1(K,NY,NX)=XOAFLS(K,3,NU(NY,NX),NY,NX)*XNPH
   enddo
-  RCOBLS(1,NY,NX)=XCOBLS(1,NY,NX)*XNPH
-  RCHBLS(1,NY,NX)=XCHBLS(1,NY,NX)*XNPH
-  ROXBLS(1,NY,NX)=XOXBLS(1,NY,NX)*XNPH
-  RNGBLS(1,NY,NX)=XNGBLS(1,NY,NX)*XNPH
-  RN2BLS(1,NY,NX)=XN2BLS(1,NY,NX)*XNPH
-  RN4BLW(1,NY,NX)=XN4BLW(1,NY,NX)*XNPH
-  RN3BLW(1,NY,NX)=XN3BLW(1,NY,NX)*XNPH
-  RNOBLW(1,NY,NX)=XNOBLW(1,NY,NX)*XNPH
-  RH1PBS(1,NY,NX)=XH1PBS(1,NY,NX)*XNPH
-  RH2PBS(1,NY,NX)=XH2PBS(1,NY,NX)*XNPH
+  RCOBLS(1,NY,NX)=trcg_XBLS(idg_CO2,1,NY,NX)*XNPH
+  RCHBLS(1,NY,NX)=trcg_XBLS(idg_CH4,1,NY,NX)*XNPH
+  ROXBLS(1,NY,NX)=trcg_XBLS(idg_O2,1,NY,NX)*XNPH
+  RNGBLS(1,NY,NX)=trcg_XBLS(idg_N2,1,NY,NX)*XNPH
+  RN2BLS(1,NY,NX)=trcg_XBLS(idg_N2O,1,NY,NX)*XNPH
+  RN4BLW(1,NY,NX)=trcg_XBLS(ids_NH4,1,NY,NX)*XNPH
+  RN3BLW(1,NY,NX)=trcg_XBLS(idg_NH3,1,NY,NX)*XNPH
+  RNOBLW(1,NY,NX)=trcg_XBLS(ids_NO3,1,NY,NX)*XNPH
+  RH1PBS(1,NY,NX)=trcg_XBLS(ids_H1PO4,1,NY,NX)*XNPH
+  RH2PBS(1,NY,NX)=trcg_XBLS(ids_H2PO4,1,NY,NX)*XNPH
   RCOFL0(NY,NX)=trcs_XFLS(idg_CO2,3,0,NY,NX)*XNPH
   RCHFL0(NY,NX)=trcs_XFLS(idg_CH4,3,0,NY,NX)*XNPH
   ROXFL0(NY,NX)=trcs_XFLS(idg_O2,3,0,NY,NX)*XNPH
