@@ -495,6 +495,7 @@ module TillageMixMod
         TNH3FB=TNH3FB+TI*ZNH3FB(L,NY,NX)
         TNHUFB=TNHUFB+TI*ZNHUFB(L,NY,NX)
         TNO3FB=TNO3FB+TI*ZNO3FB(L,NY,NX)
+
         TNH4S=TNH4S+TI*trc_solml(ids_NH4,L,NY,NX)
         TNH4B=TNH4B+TI*trc_solml(ids_NH4B,L,NY,NX)
         TNH3S=TNH3S+TI*trc_solml(idg_NH3,L,NY,NX)
@@ -503,59 +504,59 @@ module TillageMixMod
         TNO3B=TNO3B+TI*trc_solml(ids_NO3B,L,NY,NX)
         TNO2S=TNO2S+TI*trc_solml(ids_NO2,L,NY,NX)
         TNO2B=TNO2B+TI*trc_solml(ids_NO2B,L,NY,NX)
-        TZAL=TZAL+TI*ZAL(L,NY,NX)
-        TZFE=TZFE+TI*ZFE(L,NY,NX)
-        TZHY=TZHY+TI*ZHY(L,NY,NX)
-        TZCA=TZCA+TI*ZCA(L,NY,NX)
-        TZMG=TZMG+TI*ZMG(L,NY,NX)
-        TZNA=TZNA+TI*ZNA(L,NY,NX)
-        TZKA=TZKA+TI*ZKA(L,NY,NX)
-        TZOH=TZOH+TI*ZOH(L,NY,NX)
-        TZSO4=TZSO4+TI*ZSO4(L,NY,NX)
-        TZCL=TZCL+TI*ZCL(L,NY,NX)
-        TZCO3=TZCO3+TI*ZCO3(L,NY,NX)
-        TZHCO3=TZHCO3+TI*ZHCO3(L,NY,NX)
-        TZALO1=TZALO1+TI*ZALOH1(L,NY,NX)
-        TZALO2=TZALO2+TI*ZALOH2(L,NY,NX)
-        TZALO3=TZALO3+TI*ZALOH3(L,NY,NX)
-        TZALO4=TZALO4+TI*ZALOH4(L,NY,NX)
-        TZALS=TZALS+TI*ZALS(L,NY,NX)
-        TZFEO1=TZFEO1+TI*ZFEOH1(L,NY,NX)
-        TZFEO2=TZFEO2+TI*ZFEOH2(L,NY,NX)
-        TZFEO3=TZFEO3+TI*ZFEOH3(L,NY,NX)
-        TZFEO4=TZFEO4+TI*ZFEOH4(L,NY,NX)
-        TZFES=TZFES+TI*ZFES(L,NY,NX)
-        TZCAO=TZCAO+TI*ZCAO(L,NY,NX)
-        TZCAC=TZCAC+TI*ZCAC(L,NY,NX)
-        TZCAH=TZCAH+TI*ZCAH(L,NY,NX)
-        TZCAS=TZCAS+TI*ZCAS(L,NY,NX)
-        TZMGO=TZMGO+TI*ZMGO(L,NY,NX)
-        TZMGC=TZMGC+TI*ZMGC(L,NY,NX)
-        TZMGH=TZMGH+TI*ZMGH(L,NY,NX)
-        TZMGS=TZMGS+TI*ZMGS(L,NY,NX)
-        TZNAC=TZNAC+TI*ZNAC(L,NY,NX)
-        TZNAS=TZNAS+TI*ZNAS(L,NY,NX)
-        TZKAS=TZKAS+TI*ZKAS(L,NY,NX)
-        TH0PO4=TH0PO4+TI*H0PO4(L,NY,NX)
+        TZAL=TZAL+TI*trcsa_solml(idsa_Al,L,NY,NX)
+        TZFE=TZFE+TI*trcsa_solml(idsa_Fe,L,NY,NX)
+        TZHY=TZHY+TI*trcsa_solml(idsa_Hp,L,NY,NX)
+        TZCA=TZCA+TI*trcsa_solml(idsa_Ca,L,NY,NX)
+        TZMG=TZMG+TI*trcsa_solml(idsa_Mg,L,NY,NX)
+        TZNA=TZNA+TI*trcsa_solml(idsa_Na,L,NY,NX)
+        TZKA=TZKA+TI*trcsa_solml(idsa_K,L,NY,NX)
+        TZOH=TZOH+TI*trcsa_solml(idsa_OH,L,NY,NX)
+        TZSO4=TZSO4+TI*trcsa_solml(idsa_SO4,L,NY,NX)
+        TZCL=TZCL+TI*trcsa_solml(idsa_Cl,L,NY,NX)
+        TZCO3=TZCO3+TI*trcsa_solml(idsa_CO3,L,NY,NX)
+        TZHCO3=TZHCO3+TI*trcsa_solml(idsa_HCO3,L,NY,NX)
+        TZALO1=TZALO1+TI*trcsa_solml(idsa_AlOH,L,NY,NX)
+        TZALO2=TZALO2+TI*trcsa_solml(idsa_AlOH2,L,NY,NX)
+        TZALO3=TZALO3+TI*trcsa_solml(idsa_AlOH3,L,NY,NX)
+        TZALO4=TZALO4+TI*trcsa_solml(idsa_AlOH4,L,NY,NX)
+        TZALS=TZALS+TI*trcsa_solml(idsa_AlSO4,L,NY,NX)
+        TZFEO1=TZFEO1+TI*trcsa_solml(idsa_FeOH,L,NY,NX)
+        TZFEO2=TZFEO2+TI*trcsa_solml(idsa_FeOH2,L,NY,NX)
+        TZFEO3=TZFEO3+TI*trcsa_solml(idsa_FeOH3,L,NY,NX)
+        TZFEO4=TZFEO4+TI*trcsa_solml(idsa_FeOH4,L,NY,NX)
+        TZFES=TZFES+TI*trcsa_solml(idsa_FeSO4,L,NY,NX)
+        TZCAO=TZCAO+TI*trcsa_solml(idsa_CaOH2,L,NY,NX)
+        TZCAC=TZCAC+TI*trcsa_solml(idsa_CaCO3,L,NY,NX)
+        TZCAH=TZCAH+TI*trcsa_solml(idsa_CaHCO3,L,NY,NX)
+        TZCAS=TZCAS+TI*trcsa_solml(idsa_CaSO4,L,NY,NX)
+        TZMGO=TZMGO+TI*trcsa_solml(idsa_MgOH2,L,NY,NX)
+        TZMGC=TZMGC+TI*trcsa_solml(idsa_MgCO3,L,NY,NX)
+        TZMGH=TZMGH+TI*trcsa_solml(idsa_MgHCO3,L,NY,NX)
+        TZMGS=TZMGS+TI*trcsa_solml(idsa_MgSO4,L,NY,NX)
+        TZNAC=TZNAC+TI*trcsa_solml(idsa_NaCO3,L,NY,NX)
+        TZNAS=TZNAS+TI*trcsa_solml(idsa_NaSO4,L,NY,NX)
+        TZKAS=TZKAS+TI*trcsa_solml(idsa_KSO4,L,NY,NX)
+        TH0PO4=TH0PO4+TI*trcsa_solml(idsa_H0PO4,L,NY,NX)
         TH1PO4=TH1PO4+TI*trc_solml(ids_H1PO4,L,NY,NX)
         TH2PO4=TH2PO4+TI*trc_solml(ids_H2PO4,L,NY,NX)
-        TH3PO4=TH3PO4+TI*H3PO4(L,NY,NX)
-        TZFE1P=TZFE1P+TI*ZFE1P(L,NY,NX)
-        TZFE2P=TZFE2P+TI*ZFE2P(L,NY,NX)
-        TZCA0P=TZCA0P+TI*ZCA0P(L,NY,NX)
-        TZCA1P=TZCA1P+TI*ZCA1P(L,NY,NX)
-        TZCA2P=TZCA2P+TI*ZCA2P(L,NY,NX)
-        TZMG1P=TZMG1P+TI*ZMG1P(L,NY,NX)
-        TH0POB=TH0POB+TI*H0POB(L,NY,NX)
+        TH3PO4=TH3PO4+TI*trcsa_solml(idsa_H3PO4,L,NY,NX)
+        TZFE1P=TZFE1P+TI*trcsa_solml(idsa_FeHPO4,L,NY,NX)
+        TZFE2P=TZFE2P+TI*trcsa_solml(idsa_FeH2PO4,L,NY,NX)
+        TZCA0P=TZCA0P+TI*trcsa_solml(idsa_CaPO4,L,NY,NX)
+        TZCA1P=TZCA1P+TI*trcsa_solml(idsa_CaHPO4,L,NY,NX)
+        TZCA2P=TZCA2P+TI*trcsa_solml(idsa_CaH2PO4,L,NY,NX)
+        TZMG1P=TZMG1P+TI*trcsa_solml(idsa_MgHPO4,L,NY,NX)
+        TH0POB=TH0POB+TI*trcsa_solml(idsa_H0PO4B,L,NY,NX)
         TH1POB=TH1POB+TI*trc_solml(ids_H1PO4B,L,NY,NX)
         TH2POB=TH2POB+TI*trc_solml(ids_H2PO4B,L,NY,NX)
-        TH3POB=TH3POB+TI*H3POB(L,NY,NX)
-        TFE1PB=TFE1PB+TI*ZFE1PB(L,NY,NX)
-        TFE2PB=TFE2PB+TI*ZFE2PB(L,NY,NX)
-        TCA0PB=TCA0PB+TI*ZCA0PB(L,NY,NX)
-        TCA1PB=TCA1PB+TI*ZCA1PB(L,NY,NX)
-        TCA2PB=TCA2PB+TI*ZCA2PB(L,NY,NX)
-        TMG1PB=TMG1PB+TI*ZMG1PB(L,NY,NX)
+        TH3POB=TH3POB+TI*trcsa_solml(idsa_H3PO4B,L,NY,NX)
+        TFE1PB=TFE1PB+TI*trcsa_solml(idsa_FeHPO4B,L,NY,NX)
+        TFE2PB=TFE2PB+TI*trcsa_solml(idsa_FeH2PO4B,L,NY,NX)
+        TCA0PB=TCA0PB+TI*trcsa_solml(idsa_CaPO4B,L,NY,NX)
+        TCA1PB=TCA1PB+TI*trcsa_solml(idsa_CaHPO4B,L,NY,NX)
+        TCA2PB=TCA2PB+TI*trcsa_solml(idsa_CaH2PO4B,L,NY,NX)
+        TMG1PB=TMG1PB+TI*trcsa_solml(idsa_MgHPO4B,L,NY,NX)
         TXNH4=TXNH4+TI*XN4(L,NY,NX)
         TXNHB=TXNHB+TI*XNB(L,NY,NX)
         TXHY=TXHY+TI*XHY(L,NY,NX)
@@ -706,91 +707,91 @@ module TillageMixMod
         ZNHUFB(L,NY,NX)=TI*ZNHUFB(L,NY,NX)+CORP*(FI*TNHUFB-TI*ZNHUFB(L,NY,NX))+TX*ZNHUFB(L,NY,NX)
         ZNO3FB(L,NY,NX)=TI*ZNO3FB(L,NY,NX)+CORP*(FI*TNO3FB-TI*ZNO3FB(L,NY,NX))+TX*ZNO3FB(L,NY,NX)
 
-        ZAL(L,NY,NX)=TI*ZAL(L,NY,NX)+CORP*(FI*TZAL-TI*ZAL(L,NY,NX)) &
-          +TX*ZAL(L,NY,NX)+CORP*ZALH(L,NY,NX)
-        ZFE(L,NY,NX)=TI*ZFE(L,NY,NX)+CORP*(FI*TZFE-TI*ZFE(L,NY,NX)) &
-          +TX*ZFE(L,NY,NX)+CORP*ZFEH(L,NY,NX)
-        ZHY(L,NY,NX)=TI*ZHY(L,NY,NX)+CORP*(FI*TZHY-TI*ZHY(L,NY,NX)) &
-            +TX*ZHY(L,NY,NX)+CORP*ZHYH(L,NY,NX)
-        ZCA(L,NY,NX)=TI*ZCA(L,NY,NX)+CORP*(FI*TZCA-TI*ZCA(L,NY,NX)) &
-          +TX*ZCA(L,NY,NX)+CORP*ZCCH(L,NY,NX)
-        ZMG(L,NY,NX)=TI*ZMG(L,NY,NX)+CORP*(FI*TZMG-TI*ZMG(L,NY,NX)) &
-          +TX*ZMG(L,NY,NX)+CORP*ZMAH(L,NY,NX)
-        ZNA(L,NY,NX)=TI*ZNA(L,NY,NX)+CORP*(FI*TZNA-TI*ZNA(L,NY,NX)) &
-          +TX*ZNA(L,NY,NX)+CORP*ZNAH(L,NY,NX)
-        ZKA(L,NY,NX)=TI*ZKA(L,NY,NX)+CORP*(FI*TZKA-TI*ZKA(L,NY,NX)) &
-          +TX*ZKA(L,NY,NX)+CORP*ZKAH(L,NY,NX)
-        ZOH(L,NY,NX)=TI*ZOH(L,NY,NX)+CORP*(FI*TZOH-TI*ZOH(L,NY,NX)) &
-          +TX*ZOH(L,NY,NX)+CORP*ZOHH(L,NY,NX)
-        ZSO4(L,NY,NX)=TI*ZSO4(L,NY,NX)+CORP*(FI*TZSO4-TI*ZSO4(L,NY,NX)) &
-          +TX*ZSO4(L,NY,NX)+CORP*ZSO4H(L,NY,NX)
-        ZCL(L,NY,NX)=TI*ZCL(L,NY,NX)+CORP*(FI*TZCL-TI*ZCL(L,NY,NX)) &
-          +TX*ZCL(L,NY,NX)+CORP*ZCLH(L,NY,NX)
-        ZCO3(L,NY,NX)=TI*ZCO3(L,NY,NX)+CORP*(FI*TZCO3-TI*ZCO3(L,NY,NX)) &
-          +TX*ZCO3(L,NY,NX)+CORP*ZCO3H(L,NY,NX)
-        ZHCO3(L,NY,NX)=TI*ZHCO3(L,NY,NX)+CORP*(FI*TZHCO3 &
-          -TI*ZHCO3(L,NY,NX))+TX*ZHCO3(L,NY,NX)+CORP*ZHCO3H(L,NY,NX)
-        ZALOH1(L,NY,NX)=TI*ZALOH1(L,NY,NX)+CORP*(FI*TZALO1 &
-          -TI*ZALOH1(L,NY,NX))+TX*ZALOH1(L,NY,NX)+CORP*ZALO1H(L,NY,NX)
-        ZALOH2(L,NY,NX)=TI*ZALOH2(L,NY,NX)+CORP*(FI*TZALO2 &
-          -TI*ZALOH2(L,NY,NX))+TX*ZALOH2(L,NY,NX)+CORP*ZALO2H(L,NY,NX)
-        ZALOH3(L,NY,NX)=TI*ZALOH3(L,NY,NX)+CORP*(FI*TZALO3 &
-          -TI*ZALOH3(L,NY,NX))+TX*ZALOH3(L,NY,NX)+CORP*ZALO3H(L,NY,NX)
-        ZALOH4(L,NY,NX)=TI*ZALOH4(L,NY,NX)+CORP*(FI*TZALO4 &
-          -TI*ZALOH4(L,NY,NX))+TX*ZALOH4(L,NY,NX)+CORP*ZALO4H(L,NY,NX)
-        ZALS(L,NY,NX)=TI*ZALS(L,NY,NX)+CORP*(FI*TZALS-TI*ZALS(L,NY,NX)) &
-          +TX*ZALS(L,NY,NX)+CORP*ZALSH(L,NY,NX)
-        ZFEOH1(L,NY,NX)=TI*ZFEOH1(L,NY,NX)+CORP*(FI*TZFEO1 &
-          -TI*ZFEOH1(L,NY,NX))+TX*ZFEOH1(L,NY,NX)+CORP*ZFEO1H(L,NY,NX)
-        ZFEOH2(L,NY,NX)=TI*ZFEOH2(L,NY,NX)+CORP*(FI*TZFEO2 &
-          -TI*ZFEOH2(L,NY,NX))+TX*ZFEOH2(L,NY,NX)+CORP*ZFEO2H(L,NY,NX)
-        ZFEOH3(L,NY,NX)=TI*ZFEOH3(L,NY,NX)+CORP*(FI*TZFEO3 &
-          -TI*ZFEOH3(L,NY,NX))+TX*ZFEOH3(L,NY,NX)+CORP*ZFEO3H(L,NY,NX)
-        ZFEOH4(L,NY,NX)=TI*ZFEOH4(L,NY,NX)+CORP*(FI*TZFEO4 &
-          -TI*ZFEOH4(L,NY,NX))+TX*ZFEOH4(L,NY,NX)+CORP*ZFEO4H(L,NY,NX)
-        ZFES(L,NY,NX)=TI*ZFES(L,NY,NX)+CORP*(FI*TZFES-TI*ZFES(L,NY,NX)) &
-          +TX*ZFES(L,NY,NX)+CORP*ZFESH(L,NY,NX)
-        ZCAO(L,NY,NX)=TI*ZCAO(L,NY,NX)+CORP*(FI*TZCAO-TI*ZCAO(L,NY,NX)) &
-          +TX*ZCAO(L,NY,NX)+CORP*ZCAOH(L,NY,NX)
-        ZCAC(L,NY,NX)=TI*ZCAC(L,NY,NX)+CORP*(FI*TZCAC-TI*ZCAC(L,NY,NX)) &
-          +TX*ZCAC(L,NY,NX)+CORP*ZCACH(L,NY,NX)
-        ZCAH(L,NY,NX)=TI*ZCAH(L,NY,NX)+CORP*(FI*TZCAH-TI*ZCAH(L,NY,NX)) &
-          +TX*ZCAH(L,NY,NX)+CORP*ZCAHH(L,NY,NX)
-        ZCAS(L,NY,NX)=TI*ZCAS(L,NY,NX)+CORP*(FI*TZCAS-TI*ZCAS(L,NY,NX)) &
-          +TX*ZCAS(L,NY,NX)+CORP*ZCASH(L,NY,NX)
-        ZMGO(L,NY,NX)=TI*ZMGO(L,NY,NX)+CORP*(FI*TZMGO-TI*ZMGO(L,NY,NX)) &
-          +TX*ZMGO(L,NY,NX)+CORP*ZMGOH(L,NY,NX)
-        ZMGC(L,NY,NX)=TI*ZMGC(L,NY,NX)+CORP*(FI*TZMGC-TI*ZMGC(L,NY,NX)) &
-          +TX*ZMGC(L,NY,NX)+CORP*ZMGCH(L,NY,NX)
-        ZMGH(L,NY,NX)=TI*ZMGH(L,NY,NX)+CORP*(FI*TZMGH-TI*ZMGH(L,NY,NX)) &
-          +TX*ZMGH(L,NY,NX)+CORP*ZMGHH(L,NY,NX)
-        ZMGS(L,NY,NX)=TI*ZMGS(L,NY,NX)+CORP*(FI*TZMGS-TI*ZMGS(L,NY,NX)) &
-          +TX*ZMGS(L,NY,NX)+CORP*ZMGSH(L,NY,NX)
-        ZNAC(L,NY,NX)=TI*ZNAC(L,NY,NX)+CORP*(FI*TZNAC-TI*ZNAC(L,NY,NX)) &
-          +TX*ZNAC(L,NY,NX)+CORP*ZNACH(L,NY,NX)
-        ZNAS(L,NY,NX)=TI*ZNAS(L,NY,NX)+CORP*(FI*TZNAS-TI*ZNAS(L,NY,NX)) &
-          +TX*ZNAS(L,NY,NX)+CORP*ZNASH(L,NY,NX)
-        ZKAS(L,NY,NX)=TI*ZKAS(L,NY,NX)+CORP*(FI*TZKAS-TI*ZKAS(L,NY,NX)) &
-          +TX*ZKAS(L,NY,NX)+CORP*ZKASH(L,NY,NX)
-        H0PO4(L,NY,NX)=TI*H0PO4(L,NY,NX)+CORP*(FI*TH0PO4 &
-          -TI*H0PO4(L,NY,NX))+TX*H0PO4(L,NY,NX)+CORP*H0PO4H(L,NY,NX)
+        trcsa_solml(idsa_Al,L,NY,NX)=TI*trcsa_solml(idsa_Al,L,NY,NX)+CORP*(FI*TZAL-TI*trcsa_solml(idsa_Al,L,NY,NX)) &
+          +TX*trcsa_solml(idsa_Al,L,NY,NX)+CORP*trcsa_soHml(idsa_Al,L,NY,NX)
+        trcsa_solml(idsa_Fe,L,NY,NX)=TI*trcsa_solml(idsa_Fe,L,NY,NX)+CORP*(FI*TZFE-TI*trcsa_solml(idsa_Fe,L,NY,NX)) &
+          +TX*trcsa_solml(idsa_Fe,L,NY,NX)+CORP*trcsa_soHml(idsa_Fe,L,NY,NX)
+        trcsa_solml(idsa_Hp,L,NY,NX)=TI*trcsa_solml(idsa_Hp,L,NY,NX)+CORP*(FI*TZHY-TI*trcsa_solml(idsa_Hp,L,NY,NX)) &
+            +TX*trcsa_solml(idsa_Hp,L,NY,NX)+CORP*trcsa_soHml(idsa_Hp,L,NY,NX)
+        trcsa_solml(idsa_Ca,L,NY,NX)=TI*trcsa_solml(idsa_Ca,L,NY,NX)+CORP*(FI*TZCA-TI*trcsa_solml(idsa_Ca,L,NY,NX)) &
+          +TX*trcsa_solml(idsa_Ca,L,NY,NX)+CORP*trcsa_soHml(idsa_Ca,L,NY,NX)
+        trcsa_solml(idsa_Mg,L,NY,NX)=TI*trcsa_solml(idsa_Mg,L,NY,NX)+CORP*(FI*TZMG-TI*trcsa_solml(idsa_Mg,L,NY,NX)) &
+          +TX*trcsa_solml(idsa_Mg,L,NY,NX)+CORP*trcsa_soHml(idsa_Mg,L,NY,NX)
+        trcsa_solml(idsa_Na,L,NY,NX)=TI*trcsa_solml(idsa_Na,L,NY,NX)+CORP*(FI*TZNA-TI*trcsa_solml(idsa_Na,L,NY,NX)) &
+          +TX*trcsa_solml(idsa_Na,L,NY,NX)+CORP*trcsa_soHml(idsa_Na,L,NY,NX)
+        trcsa_solml(idsa_K,L,NY,NX)=TI*trcsa_solml(idsa_K,L,NY,NX)+CORP*(FI*TZKA-TI*trcsa_solml(idsa_K,L,NY,NX)) &
+          +TX*trcsa_solml(idsa_K,L,NY,NX)+CORP*trcsa_soHml(idsa_K,L,NY,NX)
+        trcsa_solml(idsa_OH,L,NY,NX)=TI*trcsa_solml(idsa_OH,L,NY,NX)+CORP*(FI*TZOH-TI*trcsa_solml(idsa_OH,L,NY,NX)) &
+          +TX*trcsa_solml(idsa_OH,L,NY,NX)+CORP*trcsa_soHml(idsa_OH,L,NY,NX)
+        trcsa_solml(idsa_SO4,L,NY,NX)=TI*trcsa_solml(idsa_SO4,L,NY,NX)+CORP*(FI*TZSO4-TI*trcsa_solml(idsa_SO4,L,NY,NX)) &
+          +TX*trcsa_solml(idsa_SO4,L,NY,NX)+CORP*trcsa_soHml(idsa_SO4,L,NY,NX)
+        trcsa_solml(idsa_Cl,L,NY,NX)=TI*trcsa_solml(idsa_Cl,L,NY,NX)+CORP*(FI*TZCL-TI*trcsa_solml(idsa_Cl,L,NY,NX)) &
+          +TX*trcsa_solml(idsa_Cl,L,NY,NX)+CORP*trcsa_soHml(idsa_Cl,L,NY,NX)
+        trcsa_solml(idsa_CO3,L,NY,NX)=TI*trcsa_solml(idsa_CO3,L,NY,NX)+CORP*(FI*TZCO3-TI*trcsa_solml(idsa_CO3,L,NY,NX)) &
+          +TX*trcsa_solml(idsa_CO3,L,NY,NX)+CORP*trcsa_soHml(idsa_CO3,L,NY,NX)
+        trcsa_solml(idsa_HCO3,L,NY,NX)=TI*trcsa_solml(idsa_HCO3,L,NY,NX)+CORP*(FI*TZHCO3 &
+          -TI*trcsa_solml(idsa_HCO3,L,NY,NX))+TX*trcsa_solml(idsa_HCO3,L,NY,NX)+CORP*trcsa_soHml(idsa_HCO3,L,NY,NX)
+        trcsa_solml(idsa_AlOH,L,NY,NX)=TI*trcsa_solml(idsa_AlOH,L,NY,NX)+CORP*(FI*TZALO1 &
+          -TI*trcsa_solml(idsa_AlOH,L,NY,NX))+TX*trcsa_solml(idsa_AlOH,L,NY,NX)+CORP*trcsa_soHml(idsa_AlOH,L,NY,NX)
+        trcsa_solml(idsa_AlOH2,L,NY,NX)=TI*trcsa_solml(idsa_AlOH2,L,NY,NX)+CORP*(FI*TZALO2 &
+          -TI*trcsa_solml(idsa_AlOH2,L,NY,NX))+TX*trcsa_solml(idsa_AlOH2,L,NY,NX)+CORP*trcsa_soHml(idsa_AlOH2,L,NY,NX)
+        trcsa_solml(idsa_AlOH3,L,NY,NX)=TI*trcsa_solml(idsa_AlOH3,L,NY,NX)+CORP*(FI*TZALO3 &
+          -TI*trcsa_solml(idsa_AlOH3,L,NY,NX))+TX*trcsa_solml(idsa_AlOH3,L,NY,NX)+CORP*trcsa_soHml(idsa_AlOH3,L,NY,NX)
+        trcsa_solml(idsa_AlOH4,L,NY,NX)=TI*trcsa_solml(idsa_AlOH4,L,NY,NX)+CORP*(FI*TZALO4 &
+          -TI*trcsa_solml(idsa_AlOH4,L,NY,NX))+TX*trcsa_solml(idsa_AlOH4,L,NY,NX)+CORP*trcsa_soHml(idsa_AlOH4,L,NY,NX)
+        trcsa_solml(idsa_AlSO4,L,NY,NX)=TI*trcsa_solml(idsa_AlSO4,L,NY,NX)+CORP*(FI*TZALS-TI*trcsa_solml(idsa_AlSO4,L,NY,NX)) &
+          +TX*trcsa_solml(idsa_AlSO4,L,NY,NX)+CORP*trcsa_soHml(idsa_AlSO4,L,NY,NX)
+        trcsa_solml(idsa_FeOH,L,NY,NX)=TI*trcsa_solml(idsa_FeOH,L,NY,NX)+CORP*(FI*TZFEO1 &
+          -TI*trcsa_solml(idsa_FeOH,L,NY,NX))+TX*trcsa_solml(idsa_FeOH,L,NY,NX)+CORP*trcsa_soHml(idsa_FeOH,L,NY,NX)
+        trcsa_solml(idsa_FeOH2,L,NY,NX)=TI*trcsa_solml(idsa_FeOH2,L,NY,NX)+CORP*(FI*TZFEO2 &
+          -TI*trcsa_solml(idsa_FeOH2,L,NY,NX))+TX*trcsa_solml(idsa_FeOH2,L,NY,NX)+CORP*trcsa_soHml(idsa_FeOH2,L,NY,NX)
+        trcsa_solml(idsa_FeOH3,L,NY,NX)=TI*trcsa_solml(idsa_FeOH3,L,NY,NX)+CORP*(FI*TZFEO3 &
+          -TI*trcsa_solml(idsa_FeOH3,L,NY,NX))+TX*trcsa_solml(idsa_FeOH3,L,NY,NX)+CORP*trcsa_soHml(idsa_FeOH3,L,NY,NX)
+        trcsa_solml(idsa_FeOH4,L,NY,NX)=TI*trcsa_solml(idsa_FeOH4,L,NY,NX)+CORP*(FI*TZFEO4 &
+          -TI*trcsa_solml(idsa_FeOH4,L,NY,NX))+TX*trcsa_solml(idsa_FeOH4,L,NY,NX)+CORP*trcsa_soHml(idsa_FeOH4,L,NY,NX)
+        trcsa_solml(idsa_FeSO4,L,NY,NX)=TI*trcsa_solml(idsa_FeSO4,L,NY,NX)+CORP*(FI*TZFES-TI*trcsa_solml(idsa_FeSO4,L,NY,NX)) &
+          +TX*trcsa_solml(idsa_FeSO4,L,NY,NX)+CORP*trcsa_soHml(idsa_FeSO4,L,NY,NX)
+        trcsa_solml(idsa_CaOH2,L,NY,NX)=TI*trcsa_solml(idsa_CaOH2,L,NY,NX)+CORP*(FI*TZCAO-TI*trcsa_solml(idsa_CaOH2,L,NY,NX)) &
+          +TX*trcsa_solml(idsa_CaOH2,L,NY,NX)+CORP*trcsa_soHml(idsa_CaOH2,L,NY,NX)
+        trcsa_solml(idsa_CaCO3,L,NY,NX)=TI*trcsa_solml(idsa_CaCO3,L,NY,NX)+CORP*(FI*TZCAC-TI*trcsa_solml(idsa_CaCO3,L,NY,NX)) &
+          +TX*trcsa_solml(idsa_CaCO3,L,NY,NX)+CORP*trcsa_soHml(idsa_CaCO3,L,NY,NX)
+        trcsa_solml(idsa_CaHCO3,L,NY,NX)=TI*trcsa_solml(idsa_CaHCO3,L,NY,NX)+CORP*(FI*TZCAH-TI*trcsa_solml(idsa_CaHCO3,L,NY,NX)) &
+          +TX*trcsa_solml(idsa_CaHCO3,L,NY,NX)+CORP*trcsa_soHml(idsa_CaHCO3,L,NY,NX)
+        trcsa_solml(idsa_CaSO4,L,NY,NX)=TI*trcsa_solml(idsa_CaSO4,L,NY,NX)+CORP*(FI*TZCAS-TI*trcsa_solml(idsa_CaSO4,L,NY,NX)) &
+          +TX*trcsa_solml(idsa_CaSO4,L,NY,NX)+CORP*trcsa_soHml(idsa_CaSO4,L,NY,NX)
+        trcsa_solml(idsa_MgOH2,L,NY,NX)=TI*trcsa_solml(idsa_MgOH2,L,NY,NX)+CORP*(FI*TZMGO-TI*trcsa_solml(idsa_MgOH2,L,NY,NX)) &
+          +TX*trcsa_solml(idsa_MgOH2,L,NY,NX)+CORP*trcsa_soHml(idsa_MgOH2,L,NY,NX)
+        trcsa_solml(idsa_MgCO3,L,NY,NX)=TI*trcsa_solml(idsa_MgCO3,L,NY,NX)+CORP*(FI*TZMGC-TI*trcsa_solml(idsa_MgCO3,L,NY,NX)) &
+          +TX*trcsa_solml(idsa_MgCO3,L,NY,NX)+CORP*trcsa_soHml(idsa_MgCO3,L,NY,NX)
+        trcsa_solml(idsa_MgHCO3,L,NY,NX)=TI*trcsa_solml(idsa_MgHCO3,L,NY,NX)+CORP*(FI*TZMGH-TI*trcsa_solml(idsa_MgHCO3,L,NY,NX)) &
+          +TX*trcsa_solml(idsa_MgHCO3,L,NY,NX)+CORP*trcsa_soHml(idsa_MgHCO3,L,NY,NX)
+        trcsa_solml(idsa_MgSO4,L,NY,NX)=TI*trcsa_solml(idsa_MgSO4,L,NY,NX)+CORP*(FI*TZMGS-TI*trcsa_solml(idsa_MgSO4,L,NY,NX)) &
+          +TX*trcsa_solml(idsa_MgSO4,L,NY,NX)+CORP*trcsa_soHml(idsa_MgSO4,L,NY,NX)
+        trcsa_solml(idsa_NaCO3,L,NY,NX)=TI*trcsa_solml(idsa_NaCO3,L,NY,NX)+CORP*(FI*TZNAC-TI*trcsa_solml(idsa_NaCO3,L,NY,NX)) &
+          +TX*trcsa_solml(idsa_NaCO3,L,NY,NX)+CORP*trcsa_soHml(idsa_NaCO3,L,NY,NX)
+        trcsa_solml(idsa_NaSO4,L,NY,NX)=TI*trcsa_solml(idsa_NaSO4,L,NY,NX)+CORP*(FI*TZNAS-TI*trcsa_solml(idsa_NaSO4,L,NY,NX)) &
+          +TX*trcsa_solml(idsa_NaSO4,L,NY,NX)+CORP*trcsa_soHml(idsa_NaSO4,L,NY,NX)
+        trcsa_solml(idsa_KSO4,L,NY,NX)=TI*trcsa_solml(idsa_KSO4,L,NY,NX)+CORP*(FI*TZKAS-TI*trcsa_solml(idsa_KSO4,L,NY,NX)) &
+          +TX*trcsa_solml(idsa_KSO4,L,NY,NX)+CORP*trcsa_soHml(idsa_KSO4,L,NY,NX)
+        trcsa_solml(idsa_H0PO4,L,NY,NX)=TI*trcsa_solml(idsa_H0PO4,L,NY,NX)+CORP*(FI*TH0PO4 &
+          -TI*trcsa_solml(idsa_H0PO4,L,NY,NX))+TX*trcsa_solml(idsa_H0PO4,L,NY,NX)+CORP*trcsa_soHml(idsa_H0PO4,L,NY,NX)
 
-        H3PO4(L,NY,NX)=TI*H3PO4(L,NY,NX)+CORP*(FI*TH3PO4 &
-          -TI*H3PO4(L,NY,NX))+TX*H3PO4(L,NY,NX)+CORP*H3PO4H(L,NY,NX)
-        ZFE1P(L,NY,NX)=TI*ZFE1P(L,NY,NX)+CORP*(FI*TZFE1P &
-          -TI*ZFE1P(L,NY,NX))+TX*ZFE1P(L,NY,NX)+CORP*ZFE1PH(L,NY,NX)
-        ZFE2P(L,NY,NX)=TI*ZFE2P(L,NY,NX)+CORP*(FI*TZFE2P &
-          -TI*ZFE2P(L,NY,NX))+TX*ZFE2P(L,NY,NX)+CORP*ZFE2PH(L,NY,NX)
-        ZCA0P(L,NY,NX)=TI*ZCA0P(L,NY,NX)+CORP*(FI*TZCA0P &
-          -TI*ZCA0P(L,NY,NX))+TX*ZCA0P(L,NY,NX)+CORP*ZCA0PH(L,NY,NX)
-        ZCA1P(L,NY,NX)=TI*ZCA1P(L,NY,NX)+CORP*(FI*TZCA1P &
-          -TI*ZCA1P(L,NY,NX))+TX*ZCA1P(L,NY,NX)+CORP*ZCA1PH(L,NY,NX)
-        ZCA2P(L,NY,NX)=TI*ZCA2P(L,NY,NX)+CORP*(FI*TZCA2P &
-          -TI*ZCA2P(L,NY,NX))+TX*ZCA2P(L,NY,NX)+CORP*ZCA2PH(L,NY,NX)
-        ZMG1P(L,NY,NX)=TI*ZMG1P(L,NY,NX)+CORP*(FI*TZMG1P &
-          -TI*ZMG1P(L,NY,NX))+TX*ZMG1P(L,NY,NX)+CORP*ZMG1PH(L,NY,NX)
-        H0POB(L,NY,NX)=TI*H0POB(L,NY,NX)+CORP*(FI*TH0POB &
-          -TI*H0POB(L,NY,NX))+TX*H0POB(L,NY,NX)+CORP*H0POBH(L,NY,NX)
+        trcsa_solml(idsa_H3PO4,L,NY,NX)=TI*trcsa_solml(idsa_H3PO4,L,NY,NX)+CORP*(FI*TH3PO4 &
+          -TI*trcsa_solml(idsa_H3PO4,L,NY,NX))+TX*trcsa_solml(idsa_H3PO4,L,NY,NX)+CORP*trcsa_soHml(idsa_H3PO4,L,NY,NX)
+        trcsa_solml(idsa_FeHPO4,L,NY,NX)=TI*trcsa_solml(idsa_FeHPO4,L,NY,NX)+CORP*(FI*TZFE1P &
+          -TI*trcsa_solml(idsa_FeHPO4,L,NY,NX))+TX*trcsa_solml(idsa_FeHPO4,L,NY,NX)+CORP*trcsa_soHml(idsa_FeHPO4,L,NY,NX)
+        trcsa_solml(idsa_FeH2PO4,L,NY,NX)=TI*trcsa_solml(idsa_FeH2PO4,L,NY,NX)+CORP*(FI*TZFE2P &
+          -TI*trcsa_solml(idsa_FeH2PO4,L,NY,NX))+TX*trcsa_solml(idsa_FeH2PO4,L,NY,NX)+CORP*trcsa_soHml(idsa_FeH2PO4,L,NY,NX)
+        trcsa_solml(idsa_CaPO4,L,NY,NX)=TI*trcsa_solml(idsa_CaPO4,L,NY,NX)+CORP*(FI*TZCA0P &
+          -TI*trcsa_solml(idsa_CaPO4,L,NY,NX))+TX*trcsa_solml(idsa_CaPO4,L,NY,NX)+CORP*trcsa_soHml(idsa_CaPO4,L,NY,NX)
+        trcsa_solml(idsa_CaHPO4,L,NY,NX)=TI*trcsa_solml(idsa_CaHPO4,L,NY,NX)+CORP*(FI*TZCA1P &
+          -TI*trcsa_solml(idsa_CaHPO4,L,NY,NX))+TX*trcsa_solml(idsa_CaHPO4,L,NY,NX)+CORP*trcsa_soHml(idsa_CaHPO4,L,NY,NX)
+        trcsa_solml(idsa_CaH2PO4,L,NY,NX)=TI*trcsa_solml(idsa_CaH2PO4,L,NY,NX)+CORP*(FI*TZCA2P &
+          -TI*trcsa_solml(idsa_CaH2PO4,L,NY,NX))+TX*trcsa_solml(idsa_CaH2PO4,L,NY,NX)+CORP*trcsa_soHml(idsa_CaH2PO4,L,NY,NX)
+        trcsa_solml(idsa_MgHPO4,L,NY,NX)=TI*trcsa_solml(idsa_MgHPO4,L,NY,NX)+CORP*(FI*TZMG1P &
+          -TI*trcsa_solml(idsa_MgHPO4,L,NY,NX))+TX*trcsa_solml(idsa_MgHPO4,L,NY,NX)+CORP*trcsa_soHml(idsa_MgHPO4,L,NY,NX)
+        trcsa_solml(idsa_H0PO4B,L,NY,NX)=TI*trcsa_solml(idsa_H0PO4B,L,NY,NX)+CORP*(FI*TH0POB &
+          -TI*trcsa_solml(idsa_H0PO4B,L,NY,NX))+TX*trcsa_solml(idsa_H0PO4B,L,NY,NX)+CORP*trcsa_soHml(idsa_H0PO4B,L,NY,NX)
 
         trc_solml(ids_NH4,L,NY,NX)=TI*trc_solml(ids_NH4,L,NY,NX)+CORP*(FI*TNH4S-TI*trc_solml(ids_NH4,L,NY,NX)) &
           +TX*trc_solml(ids_NH4,L,NY,NX)+CORP*trc_soHml(ids_NH4,L,NY,NX)
@@ -832,20 +833,20 @@ module TillageMixMod
         trc_solml(idg_H2,L,NY,NX)=TI*trc_solml(idg_H2,L,NY,NX)+CORP*(FI*TH2GS-TI*trc_solml(idg_H2,L,NY,NX)) &
           +TX*trc_solml(idg_H2,L,NY,NX)+CORP*trc_soHml(idg_H2,L,NY,NX)
 
-        H3POB(L,NY,NX)=TI*H3POB(L,NY,NX)+CORP*(FI*TH3POB &
-        -TI*H3POB(L,NY,NX))+TX*H3POB(L,NY,NX)+CORP*H3POBH(L,NY,NX)
-        ZFE1PB(L,NY,NX)=TI*ZFE1PB(L,NY,NX)+CORP*(FI*TFE1PB &
-          -TI*ZFE1PB(L,NY,NX))+TX*ZFE1PB(L,NY,NX)+CORP*ZFE1BH(L,NY,NX)
-        ZFE2PB(L,NY,NX)=TI*ZFE2PB(L,NY,NX)+CORP*(FI*TFE2PB &
-          -TI*ZFE2PB(L,NY,NX))+TX*ZFE2PB(L,NY,NX)+CORP*ZFE2BH(L,NY,NX)
-        ZCA0PB(L,NY,NX)=TI*ZCA0PB(L,NY,NX)+CORP*(FI*TCA0PB &
-          -TI*ZCA0PB(L,NY,NX))+TX*ZCA0PB(L,NY,NX)+CORP*ZCA0BH(L,NY,NX)
-        ZCA1PB(L,NY,NX)=TI*ZCA1PB(L,NY,NX)+CORP*(FI*TCA1PB &
-          -TI*ZCA1PB(L,NY,NX))+TX*ZCA1PB(L,NY,NX)+CORP*ZCA1BH(L,NY,NX)
-        ZCA2PB(L,NY,NX)=TI*ZCA2PB(L,NY,NX)+CORP*(FI*TCA2PB &
-          -TI*ZCA2PB(L,NY,NX))+TX*ZCA2PB(L,NY,NX)+CORP*ZCA2BH(L,NY,NX)
-        ZMG1PB(L,NY,NX)=TI*ZMG1PB(L,NY,NX)+CORP*(FI*TMG1PB &
-          -TI*ZMG1PB(L,NY,NX))+TX*ZMG1PB(L,NY,NX)+CORP*ZMG1BH(L,NY,NX)
+        trcsa_solml(idsa_H3PO4B,L,NY,NX)=TI*trcsa_solml(idsa_H3PO4B,L,NY,NX)+CORP*(FI*TH3POB &
+        -TI*trcsa_solml(idsa_H3PO4B,L,NY,NX))+TX*trcsa_solml(idsa_H3PO4B,L,NY,NX)+CORP*trcsa_soHml(idsa_H3PO4B,L,NY,NX)
+        trcsa_solml(idsa_FeHPO4B,L,NY,NX)=TI*trcsa_solml(idsa_FeHPO4B,L,NY,NX)+CORP*(FI*TFE1PB &
+          -TI*trcsa_solml(idsa_FeHPO4B,L,NY,NX))+TX*trcsa_solml(idsa_FeHPO4B,L,NY,NX)+CORP*trcsa_soHml(idsa_FeHPO4B,L,NY,NX)
+        trcsa_solml(idsa_FeH2PO4B,L,NY,NX)=TI*trcsa_solml(idsa_FeH2PO4B,L,NY,NX)+CORP*(FI*TFE2PB &
+          -TI*trcsa_solml(idsa_FeH2PO4B,L,NY,NX))+TX*trcsa_solml(idsa_FeH2PO4B,L,NY,NX)+CORP*trcsa_soHml(idsa_FeH2PO4B,L,NY,NX)
+        trcsa_solml(idsa_CaPO4B,L,NY,NX)=TI*trcsa_solml(idsa_CaPO4B,L,NY,NX)+CORP*(FI*TCA0PB &
+          -TI*trcsa_solml(idsa_CaPO4B,L,NY,NX))+TX*trcsa_solml(idsa_CaPO4B,L,NY,NX)+CORP*trcsa_soHml(idsa_CaPO4B,L,NY,NX)
+        trcsa_solml(idsa_CaHPO4B,L,NY,NX)=TI*trcsa_solml(idsa_CaHPO4B,L,NY,NX)+CORP*(FI*TCA1PB &
+          -TI*trcsa_solml(idsa_CaHPO4B,L,NY,NX))+TX*trcsa_solml(idsa_CaHPO4B,L,NY,NX)+CORP*trcsa_soHml(idsa_CaHPO4B,L,NY,NX)
+        trcsa_solml(idsa_CaH2PO4B,L,NY,NX)=TI*trcsa_solml(idsa_CaH2PO4B,L,NY,NX)+CORP*(FI*TCA2PB &
+          -TI*trcsa_solml(idsa_CaH2PO4B,L,NY,NX))+TX*trcsa_solml(idsa_CaH2PO4B,L,NY,NX)+CORP*trcsa_soHml(idsa_CaH2PO4B,L,NY,NX)
+        trcsa_solml(idsa_MgHPO4B,L,NY,NX)=TI*trcsa_solml(idsa_MgHPO4B,L,NY,NX)+CORP*(FI*TMG1PB &
+          -TI*trcsa_solml(idsa_MgHPO4B,L,NY,NX))+TX*trcsa_solml(idsa_MgHPO4B,L,NY,NX)+CORP*trcsa_soHml(idsa_MgHPO4B,L,NY,NX)
         XN4(L,NY,NX)=TI*XN4(L,NY,NX)+CORP*(FI*TXNH4-TI*XN4(L,NY,NX))+TX*XN4(L,NY,NX)
         XNB(L,NY,NX)=TI*XNB(L,NY,NX)+CORP*(FI*TXNHB-TI*XNB(L,NY,NX))+TX*XNB(L,NY,NX)
         XHY(L,NY,NX)=TI*XHY(L,NY,NX)+CORP*(FI*TXHY-TI*XHY(L,NY,NX)) +TX*XHY(L,NY,NX)
@@ -903,20 +904,20 @@ module TillageMixMod
           -TI*PCPMB(L,NY,NX))+TX*PCPMB(L,NY,NX)
 
 
-        trc_gasml(idg_CO2,L,NY,NX)=TI*trc_gasml(idg_CO2,L,NY,NX)+CORP*(FI*TCO2G-TI*trc_gasml(idg_CO2,L,NY,NX)) &
-          +TX*trc_gasml(idg_CO2,L,NY,NX)
-        trc_gasml(idg_CH4,L,NY,NX)=TI*trc_gasml(idg_CH4,L,NY,NX)+CORP*(FI*TCH4G-TI*trc_gasml(idg_CH4,L,NY,NX)) &
-            +TX*trc_gasml(idg_CH4,L,NY,NX)
-        trc_gasml(idg_O2,L,NY,NX)=TI*trc_gasml(idg_O2,L,NY,NX)+CORP*(FI*TOXYG-TI*trc_gasml(idg_O2,L,NY,NX)) &
-          +TX*trc_gasml(idg_O2,L,NY,NX)
-        trc_gasml(idg_N2,L,NY,NX)=TI*trc_gasml(idg_N2,L,NY,NX)+CORP*(FI*TZ2GG-TI*trc_gasml(idg_N2,L,NY,NX)) &
-          +TX*trc_gasml(idg_N2,L,NY,NX)
-        trc_gasml(idg_N2O,L,NY,NX)=TI*trc_gasml(idg_N2O,L,NY,NX)+CORP*(FI*TZ2OG-TI*trc_gasml(idg_N2O,L,NY,NX)) &
-          +TX*trc_gasml(idg_N2O,L,NY,NX)
+        trc_gasml(idg_CO2,L,NY,NX)=TI*trc_gasml(idg_CO2,L,NY,NX)+CORP*(FI*TCO2G &
+          -TI*trc_gasml(idg_CO2,L,NY,NX))+TX*trc_gasml(idg_CO2,L,NY,NX)
+        trc_gasml(idg_CH4,L,NY,NX)=TI*trc_gasml(idg_CH4,L,NY,NX)+CORP*(FI*TCH4G &
+          -TI*trc_gasml(idg_CH4,L,NY,NX))+TX*trc_gasml(idg_CH4,L,NY,NX)
+        trc_gasml(idg_O2,L,NY,NX)=TI*trc_gasml(idg_O2,L,NY,NX)+CORP*(FI*TOXYG &
+          -TI*trc_gasml(idg_O2,L,NY,NX))+TX*trc_gasml(idg_O2,L,NY,NX)
+        trc_gasml(idg_N2,L,NY,NX)=TI*trc_gasml(idg_N2,L,NY,NX)+CORP*(FI*TZ2GG &
+          -TI*trc_gasml(idg_N2,L,NY,NX))+TX*trc_gasml(idg_N2,L,NY,NX)
+        trc_gasml(idg_N2O,L,NY,NX)=TI*trc_gasml(idg_N2O,L,NY,NX)+CORP*(FI*TZ2OG &
+          -TI*trc_gasml(idg_N2O,L,NY,NX))+TX*trc_gasml(idg_N2O,L,NY,NX)
         trc_gasml(idg_NH3,L,NY,NX)=TI*trc_gasml(idg_NH3,L,NY,NX)+CORP*(FI*TZNH3G &
           -TI*trc_gasml(idg_NH3,L,NY,NX))+TX*trc_gasml(idg_NH3,L,NY,NX)
-        trc_gasml(idg_H2,L,NY,NX)=TI*trc_gasml(idg_H2,L,NY,NX)+CORP*(FI*TH2GG-TI*trc_gasml(idg_H2,L,NY,NX)) &
-          +TX*trc_gasml(idg_H2,L,NY,NX)
+        trc_gasml(idg_H2,L,NY,NX)=TI*trc_gasml(idg_H2,L,NY,NX)+CORP*(FI*TH2GG &
+          -TI*trc_gasml(idg_H2,L,NY,NX))+TX*trc_gasml(idg_H2,L,NY,NX)
 
         call MixSoluteH(L,NY,NX)
 
@@ -1178,55 +1179,55 @@ module TillageMixMod
     trc_soHml(NTS,L,NY,NX)=XCORP(NY,NX)*trc_soHml(NTS,L,NY,NX)
   ENDDO
 
-  ZALH(L,NY,NX)=XCORP(NY,NX)*ZALH(L,NY,NX)
-  ZFEH(L,NY,NX)=XCORP(NY,NX)*ZFEH(L,NY,NX)
-  ZHYH(L,NY,NX)=XCORP(NY,NX)*ZHYH(L,NY,NX)
-  ZCCH(L,NY,NX)=XCORP(NY,NX)*ZCCH(L,NY,NX)
-  ZMAH(L,NY,NX)=XCORP(NY,NX)*ZMAH(L,NY,NX)
-  ZNAH(L,NY,NX)=XCORP(NY,NX)*ZNAH(L,NY,NX)
-  ZKAH(L,NY,NX)=XCORP(NY,NX)*ZKAH(L,NY,NX)
-  ZOHH(L,NY,NX)=XCORP(NY,NX)*ZOHH(L,NY,NX)
-  ZSO4H(L,NY,NX)=XCORP(NY,NX)*ZSO4H(L,NY,NX)
-  ZCLH(L,NY,NX)=XCORP(NY,NX)*ZCLH(L,NY,NX)
-  ZCO3H(L,NY,NX)=XCORP(NY,NX)*ZCO3H(L,NY,NX)
-  ZHCO3H(L,NY,NX)=XCORP(NY,NX)*ZHCO3H(L,NY,NX)
-  ZALO1H(L,NY,NX)=XCORP(NY,NX)*ZALO1H(L,NY,NX)
-  ZALO2H(L,NY,NX)=XCORP(NY,NX)*ZALO2H(L,NY,NX)
-  ZALO3H(L,NY,NX)=XCORP(NY,NX)*ZALO3H(L,NY,NX)
-  ZALO4H(L,NY,NX)=XCORP(NY,NX)*ZALO4H(L,NY,NX)
-  ZALSH(L,NY,NX)=XCORP(NY,NX)*ZALSH(L,NY,NX)
-  ZFEO1H(L,NY,NX)=XCORP(NY,NX)*ZFEO1H(L,NY,NX)
-  ZFEO2H(L,NY,NX)=XCORP(NY,NX)*ZFEO2H(L,NY,NX)
-  ZFEO3H(L,NY,NX)=XCORP(NY,NX)*ZFEO3H(L,NY,NX)
-  ZFEO4H(L,NY,NX)=XCORP(NY,NX)*ZFEO4H(L,NY,NX)
-  ZFESH(L,NY,NX)=XCORP(NY,NX)*ZFESH(L,NY,NX)
-  ZCAOH(L,NY,NX)=XCORP(NY,NX)*ZCAOH(L,NY,NX)
-  ZCACH(L,NY,NX)=XCORP(NY,NX)*ZCACH(L,NY,NX)
-  ZCAHH(L,NY,NX)=XCORP(NY,NX)*ZCAHH(L,NY,NX)
-  ZCASH(L,NY,NX)=XCORP(NY,NX)*ZCASH(L,NY,NX)
-  ZMGOH(L,NY,NX)=XCORP(NY,NX)*ZMGOH(L,NY,NX)
-  ZMGCH(L,NY,NX)=XCORP(NY,NX)*ZMGCH(L,NY,NX)
-  ZMGHH(L,NY,NX)=XCORP(NY,NX)*ZMGHH(L,NY,NX)
-  ZMGSH(L,NY,NX)=XCORP(NY,NX)*ZMGSH(L,NY,NX)
-  ZNACH(L,NY,NX)=XCORP(NY,NX)*ZNACH(L,NY,NX)
-  ZNASH(L,NY,NX)=XCORP(NY,NX)*ZNASH(L,NY,NX)
-  ZKASH(L,NY,NX)=XCORP(NY,NX)*ZKASH(L,NY,NX)
-  H0PO4H(L,NY,NX)=XCORP(NY,NX)*H0PO4H(L,NY,NX)
-  H3PO4H(L,NY,NX)=XCORP(NY,NX)*H3PO4H(L,NY,NX)
-  ZFE1PH(L,NY,NX)=XCORP(NY,NX)*ZFE1PH(L,NY,NX)
-  ZFE2PH(L,NY,NX)=XCORP(NY,NX)*ZFE2PH(L,NY,NX)
-  ZCA0PH(L,NY,NX)=XCORP(NY,NX)*ZCA0PH(L,NY,NX)
-  ZCA1PH(L,NY,NX)=XCORP(NY,NX)*ZCA1PH(L,NY,NX)
-  ZCA2PH(L,NY,NX)=XCORP(NY,NX)*ZCA2PH(L,NY,NX)
-  ZMG1PH(L,NY,NX)=XCORP(NY,NX)*ZMG1PH(L,NY,NX)
-  H0POBH(L,NY,NX)=XCORP(NY,NX)*H0POBH(L,NY,NX)
-  H3POBH(L,NY,NX)=XCORP(NY,NX)*H3POBH(L,NY,NX)
-  ZFE1BH(L,NY,NX)=XCORP(NY,NX)*ZFE1BH(L,NY,NX)
-  ZFE2BH(L,NY,NX)=XCORP(NY,NX)*ZFE2BH(L,NY,NX)
-  ZCA0BH(L,NY,NX)=XCORP(NY,NX)*ZCA0BH(L,NY,NX)
-  ZCA1BH(L,NY,NX)=XCORP(NY,NX)*ZCA1BH(L,NY,NX)
-  ZCA2BH(L,NY,NX)=XCORP(NY,NX)*ZCA2BH(L,NY,NX)
-  ZMG1BH(L,NY,NX)=XCORP(NY,NX)*ZMG1BH(L,NY,NX)
+  trcsa_soHml(idsa_Al,L,NY,NX)=XCORP(NY,NX)*trcsa_soHml(idsa_Al,L,NY,NX)
+  trcsa_soHml(idsa_Fe,L,NY,NX)=XCORP(NY,NX)*trcsa_soHml(idsa_Fe,L,NY,NX)
+  trcsa_soHml(idsa_Hp,L,NY,NX)=XCORP(NY,NX)*trcsa_soHml(idsa_Hp,L,NY,NX)
+  trcsa_soHml(idsa_Ca,L,NY,NX)=XCORP(NY,NX)*trcsa_soHml(idsa_Ca,L,NY,NX)
+  trcsa_soHml(idsa_Mg,L,NY,NX)=XCORP(NY,NX)*trcsa_soHml(idsa_Mg,L,NY,NX)
+  trcsa_soHml(idsa_Na,L,NY,NX)=XCORP(NY,NX)*trcsa_soHml(idsa_Na,L,NY,NX)
+  trcsa_soHml(idsa_K,L,NY,NX)=XCORP(NY,NX)*trcsa_soHml(idsa_K,L,NY,NX)
+  trcsa_soHml(idsa_OH,L,NY,NX)=XCORP(NY,NX)*trcsa_soHml(idsa_OH,L,NY,NX)
+  trcsa_soHml(idsa_SO4,L,NY,NX)=XCORP(NY,NX)*trcsa_soHml(idsa_SO4,L,NY,NX)
+  trcsa_soHml(idsa_Cl,L,NY,NX)=XCORP(NY,NX)*trcsa_soHml(idsa_Cl,L,NY,NX)
+  trcsa_soHml(idsa_CO3,L,NY,NX)=XCORP(NY,NX)*trcsa_soHml(idsa_CO3,L,NY,NX)
+  trcsa_soHml(idsa_HCO3,L,NY,NX)=XCORP(NY,NX)*trcsa_soHml(idsa_HCO3,L,NY,NX)
+  trcsa_soHml(idsa_AlOH,L,NY,NX)=XCORP(NY,NX)*trcsa_soHml(idsa_AlOH,L,NY,NX)
+  trcsa_soHml(idsa_AlOH2,L,NY,NX)=XCORP(NY,NX)*trcsa_soHml(idsa_AlOH2,L,NY,NX)
+  trcsa_soHml(idsa_AlOH3,L,NY,NX)=XCORP(NY,NX)*trcsa_soHml(idsa_AlOH3,L,NY,NX)
+  trcsa_soHml(idsa_AlOH4,L,NY,NX)=XCORP(NY,NX)*trcsa_soHml(idsa_AlOH4,L,NY,NX)
+  trcsa_soHml(idsa_AlSO4,L,NY,NX)=XCORP(NY,NX)*trcsa_soHml(idsa_AlSO4,L,NY,NX)
+  trcsa_soHml(idsa_FeOH,L,NY,NX)=XCORP(NY,NX)*trcsa_soHml(idsa_FeOH,L,NY,NX)
+  trcsa_soHml(idsa_FeOH2,L,NY,NX)=XCORP(NY,NX)*trcsa_soHml(idsa_FeOH2,L,NY,NX)
+  trcsa_soHml(idsa_FeOH3,L,NY,NX)=XCORP(NY,NX)*trcsa_soHml(idsa_FeOH3,L,NY,NX)
+  trcsa_soHml(idsa_FeOH4,L,NY,NX)=XCORP(NY,NX)*trcsa_soHml(idsa_FeOH4,L,NY,NX)
+  trcsa_soHml(idsa_FeSO4,L,NY,NX)=XCORP(NY,NX)*trcsa_soHml(idsa_FeSO4,L,NY,NX)
+  trcsa_soHml(idsa_CaOH2,L,NY,NX)=XCORP(NY,NX)*trcsa_soHml(idsa_CaOH2,L,NY,NX)
+  trcsa_soHml(idsa_CaCO3,L,NY,NX)=XCORP(NY,NX)*trcsa_soHml(idsa_CaCO3,L,NY,NX)
+  trcsa_soHml(idsa_CaHCO3,L,NY,NX)=XCORP(NY,NX)*trcsa_soHml(idsa_CaHCO3,L,NY,NX)
+  trcsa_soHml(idsa_CaSO4,L,NY,NX)=XCORP(NY,NX)*trcsa_soHml(idsa_CaSO4,L,NY,NX)
+  trcsa_soHml(idsa_MgOH2,L,NY,NX)=XCORP(NY,NX)*trcsa_soHml(idsa_MgOH2,L,NY,NX)
+  trcsa_soHml(idsa_MgCO3,L,NY,NX)=XCORP(NY,NX)*trcsa_soHml(idsa_MgCO3,L,NY,NX)
+  trcsa_soHml(idsa_MgHCO3,L,NY,NX)=XCORP(NY,NX)*trcsa_soHml(idsa_MgHCO3,L,NY,NX)
+  trcsa_soHml(idsa_MgSO4,L,NY,NX)=XCORP(NY,NX)*trcsa_soHml(idsa_MgSO4,L,NY,NX)
+  trcsa_soHml(idsa_NaCO3,L,NY,NX)=XCORP(NY,NX)*trcsa_soHml(idsa_NaCO3,L,NY,NX)
+  trcsa_soHml(idsa_NaSO4,L,NY,NX)=XCORP(NY,NX)*trcsa_soHml(idsa_NaSO4,L,NY,NX)
+  trcsa_soHml(idsa_KSO4,L,NY,NX)=XCORP(NY,NX)*trcsa_soHml(idsa_KSO4,L,NY,NX)
+  trcsa_soHml(idsa_H0PO4,L,NY,NX)=XCORP(NY,NX)*trcsa_soHml(idsa_H0PO4,L,NY,NX)
+  trcsa_soHml(idsa_H3PO4,L,NY,NX)=XCORP(NY,NX)*trcsa_soHml(idsa_H3PO4,L,NY,NX)
+  trcsa_soHml(idsa_FeHPO4,L,NY,NX)=XCORP(NY,NX)*trcsa_soHml(idsa_FeHPO4,L,NY,NX)
+  trcsa_soHml(idsa_FeH2PO4,L,NY,NX)=XCORP(NY,NX)*trcsa_soHml(idsa_FeH2PO4,L,NY,NX)
+  trcsa_soHml(idsa_CaPO4,L,NY,NX)=XCORP(NY,NX)*trcsa_soHml(idsa_CaPO4,L,NY,NX)
+  trcsa_soHml(idsa_CaHPO4,L,NY,NX)=XCORP(NY,NX)*trcsa_soHml(idsa_CaHPO4,L,NY,NX)
+  trcsa_soHml(idsa_CaH2PO4,L,NY,NX)=XCORP(NY,NX)*trcsa_soHml(idsa_CaH2PO4,L,NY,NX)
+  trcsa_soHml(idsa_MgHPO4,L,NY,NX)=XCORP(NY,NX)*trcsa_soHml(idsa_MgHPO4,L,NY,NX)
+  trcsa_soHml(idsa_H0PO4B,L,NY,NX)=XCORP(NY,NX)*trcsa_soHml(idsa_H0PO4B,L,NY,NX)
+  trcsa_soHml(idsa_H3PO4B,L,NY,NX)=XCORP(NY,NX)*trcsa_soHml(idsa_H3PO4B,L,NY,NX)
+  trcsa_soHml(idsa_FeHPO4B,L,NY,NX)=XCORP(NY,NX)*trcsa_soHml(idsa_FeHPO4B,L,NY,NX)
+  trcsa_soHml(idsa_FeH2PO4B,L,NY,NX)=XCORP(NY,NX)*trcsa_soHml(idsa_FeH2PO4B,L,NY,NX)
+  trcsa_soHml(idsa_CaPO4B,L,NY,NX)=XCORP(NY,NX)*trcsa_soHml(idsa_CaPO4B,L,NY,NX)
+  trcsa_soHml(idsa_CaHPO4B,L,NY,NX)=XCORP(NY,NX)*trcsa_soHml(idsa_CaHPO4B,L,NY,NX)
+  trcsa_soHml(idsa_CaH2PO4B,L,NY,NX)=XCORP(NY,NX)*trcsa_soHml(idsa_CaH2PO4B,L,NY,NX)
+  trcsa_soHml(idsa_MgHPO4B,L,NY,NX)=XCORP(NY,NX)*trcsa_soHml(idsa_MgHPO4B,L,NY,NX)
   end subroutine MixSoluteH
 
 

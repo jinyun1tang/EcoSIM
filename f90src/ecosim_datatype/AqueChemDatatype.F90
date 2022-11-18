@@ -31,11 +31,8 @@ module AqueChemDatatype
   real(r8),target,allocatable ::  GKCM(:,:,:)                        !Ca-Mg Gapon selectivity coefficient, [-]
   real(r8),target,allocatable ::  GKCN(:,:,:)                        !Ca-Na Gapon selectivity coefficient, [-]
   real(r8),target,allocatable ::  GKCK(:,:,:)                        !Ca-K Gapon selectivity coefficient, [-]
-  real(r8),target,allocatable ::  ZCO3(:,:,:)                        !soil aqueous CO3 content micropore, [mol d-2]
-  real(r8),target,allocatable ::  ZHCO3(:,:,:)                       !soil aqueous HCO3 content micropore, [mol d-2]
-  real(r8),target,allocatable ::  XN4(:,:,:)                         !exchangeable NH4 non-band, [mol d-2]
-  real(r8),target,allocatable ::  XNB(:,:,:)                         !exchangeable NH4 band, [mol d-2]
 
+  real(r8),target,allocatable :: trcsa_solml(:,:,:,:)                !soil aqueous salt content micropre, [mol d-2]
   real(r8),target,allocatable ::  ZAL(:,:,:)                         !soil aqueous Al content micropore, [mol d-2]
   real(r8),target,allocatable ::  ZFE(:,:,:)                         !soil aqueous Fe content micropore, [mol d-2]
   real(r8),target,allocatable ::  ZHY(:,:,:)                         !soil aqueous H content micropore, [mol d-2]
@@ -46,6 +43,8 @@ module AqueChemDatatype
   real(r8),target,allocatable ::  ZOH(:,:,:)                         !soil aqueous OH content micropore, [mol d-2]
   real(r8),target,allocatable ::  ZSO4(:,:,:)                        !soil aqueous SO4 content micropore, [mol d-2]
   real(r8),target,allocatable ::  ZCL(:,:,:)                         !soil aqueous Cl content micropore, [mol d-2]
+  real(r8),target,allocatable ::  ZCO3(:,:,:)                        !soil aqueous CO3 content micropore, [mol d-2]
+  real(r8),target,allocatable ::  ZHCO3(:,:,:)                       !soil aqueous HCO3 content micropore, [mol d-2]
   real(r8),target,allocatable ::  ZALOH1(:,:,:)                      !soil aqueous AlOH content micropore, [mol d-2]
   real(r8),target,allocatable ::  ZALOH2(:,:,:)                      !soil aqueous AlOH2 content micropore, [mol d-2]
   real(r8),target,allocatable ::  ZALOH3(:,:,:)                      !soil aqueous AlOH3 content micropore, [mol d-2]
@@ -84,6 +83,8 @@ module AqueChemDatatype
   real(r8),target,allocatable ::  ZCA2PB(:,:,:)                      !soil aqueous CaH2PO4 content micropore band, [mol d-2]
   real(r8),target,allocatable ::  ZMG1PB(:,:,:)                      !soil aqueous MgHPO4 content micropore band, [mol d-2]
 
+  real(r8),target,allocatable ::  XN4(:,:,:)                         !exchangeable NH4 non-band, [mol d-2]
+  real(r8),target,allocatable ::  XNB(:,:,:)                         !exchangeable NH4 band, [mol d-2]
   real(r8),target,allocatable ::  XHY(:,:,:)                         !exchangeable H , [mol d-2]
   real(r8),target,allocatable ::  XAL(:,:,:)                         !exchangeable Al, [mol d-2]
   real(r8),target,allocatable ::  XCA(:,:,:)                         !exchangeable Ca, [mol d-2]
@@ -125,10 +126,11 @@ module AqueChemDatatype
   real(r8),target,allocatable ::  XCEC(:,:,:)                        !cation exchange capacity, [mol d-2]
   real(r8),target,allocatable ::  XAEC(:,:,:)                        !anion exchange capacity, [mol d-2]
 
+  real(r8),target,allocatable :: trcsa_soHml(:,:,:,:)
   real(r8),target,allocatable ::  ZALH(:,:,:)                        !aqueous Al content macropore, [mol d-2]
   real(r8),target,allocatable ::  ZFEH(:,:,:)                        !aqueous Fe content macropore, [mol d-2]
   real(r8),target,allocatable ::  ZHYH(:,:,:)                        !aqueous H content macropore, [mol d-2]
-  real(r8),target,allocatable ::  ZCCH(:,:,:)                        !aqueous CO3 content macropore, [mol d-2]
+  real(r8),target,allocatable ::  ZCCH(:,:,:)                        !aqueous Ca content macropore, [mol d-2]
   real(r8),target,allocatable ::  ZMAH(:,:,:)                        !aqueous Mg content macropore, [mol d-2]
   real(r8),target,allocatable ::  ZNAH(:,:,:)                        !aqueous Na content macropore, [mol d-2]
   real(r8),target,allocatable ::  ZKAH(:,:,:)                        !aqueous K content macropore, [mol d-2]
@@ -147,7 +149,7 @@ module AqueChemDatatype
   real(r8),target,allocatable ::  ZFEO3H(:,:,:)                      !aqueous FeOH3 content macropore, [mol d-2]
   real(r8),target,allocatable ::  ZFEO4H(:,:,:)                      !aqueous FeOH4 content macropore, [mol d-2]
   real(r8),target,allocatable ::  ZFESH(:,:,:)                       !aqueous FeSO4 content macropore, [mol d-2]
-  real(r8),target,allocatable ::  ZCAOH(:,:,:)                       !aqueous CaOH content macropore, [mol d-2]
+  real(r8),target,allocatable ::  ZCAOH(:,:,:)                       !aqueous CaOH2 content macropore, [mol d-2]
   real(r8),target,allocatable ::  ZCACH(:,:,:)                       !aqueous CaCO3 content macropore, [mol d-2]
   real(r8),target,allocatable ::  ZCAHH(:,:,:)                       !aqueous CaHCO3 content macropore, [mol d-2]
   real(r8),target,allocatable ::  ZCASH(:,:,:)                       !aqueous CaSO4 content macropore, [mol d-2]
@@ -448,6 +450,8 @@ module AqueChemDatatype
   allocate(ZHCO3(0:JZ,JY,JX));  ZHCO3=0._r8
   allocate(XN4(0:JZ,JY,JX));    XN4=0._r8
   allocate(XNB(0:JZ,JY,JX));    XNB=0._r8
+
+  allocate(trcsa_solml(idsa_beg:idsab_end,0:JZ,JY,JX));trcsa_solml=0._r8
   allocate(ZAL(0:JZ,JY,JX));    ZAL=0._r8
   allocate(ZFE(0:JZ,JY,JX));    ZFE=0._r8
   allocate(ZHY(0:JZ,JY,JX));    ZHY=0._r8
@@ -584,6 +588,7 @@ module AqueChemDatatype
   allocate(ZCA2BH(JZ,JY,JX));   ZCA2BH=0._r8
   allocate(ZMG1BH(JZ,JY,JX));   ZMG1BH=0._r8
 
+  allocate(trcsa_soHml(idsa_beg:idsab_end,JZ,JY,JX)); trcsa_soHml=0._r8
   allocate(XOCFXS(1:jcplx,JZ,JY,JX));XOCFXS=0._r8
   allocate(XONFXS(1:jcplx,JZ,JY,JX));XONFXS=0._r8
   allocate(XOPFXS(1:jcplx,JZ,JY,JX));XOPFXS=0._r8
@@ -895,6 +900,8 @@ module AqueChemDatatype
   call destroy(ZCA1PB)
   call destroy(ZCA2PB)
   call destroy(ZMG1PB)
+  call destroy(trcsa_solml)
+  call destroy(trcsa_soHml)
   call destroy(XHY)
   call destroy(XAL)
   call destroy(XCA)

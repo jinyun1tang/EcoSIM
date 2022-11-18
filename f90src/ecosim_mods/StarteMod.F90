@@ -182,6 +182,10 @@ module StarteMod
 !
 !     SOLUTE CONCENTRATIONS IN PRECIPITATION
 !
+  associate(                       &
+    iprotein  => micpar%iprotein,  &
+    k_manure  => micpar%k_manure   &
+  )
   IF(K.EQ.micpar%k_fine_litr.AND.L.EQ.1.AND.I.EQ.1)THEN
     CCOR(NY,NX)=solutevar%CCO21
     CCHR(NY,NX)=solutevar%CCH41
@@ -402,112 +406,60 @@ module StarteMod
 !
 !     INITIAL STATE VARIABLES FOR CATIONS, ANIONS AND ION PAIRS IN SOIL
 !
-    ZAL(L,NY,NX)=CALU(L,NY,NX)*VOLW(L,NY,NX)
-    ZFE(L,NY,NX)=CFEU(L,NY,NX)*VOLW(L,NY,NX)
-    ZHY(L,NY,NX)=CHYU(L,NY,NX)*VOLW(L,NY,NX)
-    ZCA(L,NY,NX)=CCAU(L,NY,NX)*VOLW(L,NY,NX)
-    ZMG(L,NY,NX)=CMGU(L,NY,NX)*VOLW(L,NY,NX)
-    ZNA(L,NY,NX)=CNAU(L,NY,NX)*VOLW(L,NY,NX)
-    ZKA(L,NY,NX)=CKAU(L,NY,NX)*VOLW(L,NY,NX)
-    ZOH(L,NY,NX)=COHU(L,NY,NX)*VOLW(L,NY,NX)
-    ZSO4(L,NY,NX)=CSOU(L,NY,NX)*VOLW(L,NY,NX)
-    ZCL(L,NY,NX)=CCLU(L,NY,NX)*VOLW(L,NY,NX)
-    ZCO3(L,NY,NX)=CC3U(L,NY,NX)*VOLW(L,NY,NX)
-    ZHCO3(L,NY,NX)=CHCU(L,NY,NX)*VOLW(L,NY,NX)
-    ZALOH1(L,NY,NX)=CAL1U(L,NY,NX)*VOLW(L,NY,NX)
-    ZALOH2(L,NY,NX)=CAL2U(L,NY,NX)*VOLW(L,NY,NX)
-    ZALOH3(L,NY,NX)=CAL3U(L,NY,NX)*VOLW(L,NY,NX)
-    ZALOH4(L,NY,NX)=CAL4U(L,NY,NX)*VOLW(L,NY,NX)
-    ZALS(L,NY,NX)=CALSU(L,NY,NX)*VOLW(L,NY,NX)
-    ZFEOH1(L,NY,NX)=CFE1U(L,NY,NX)*VOLW(L,NY,NX)
-    ZFEOH2(L,NY,NX)=CFE2U(L,NY,NX)*VOLW(L,NY,NX)
-    ZFEOH3(L,NY,NX)=CFE3U(L,NY,NX)*VOLW(L,NY,NX)
-    ZFEOH4(L,NY,NX)=CFE4U(L,NY,NX)*VOLW(L,NY,NX)
-    ZFES(L,NY,NX)=CFESU(L,NY,NX)*VOLW(L,NY,NX)
-    ZCAO(L,NY,NX)=CCAOU(L,NY,NX)*VOLW(L,NY,NX)
-    ZCAC(L,NY,NX)=CCACU(L,NY,NX)*VOLW(L,NY,NX)
-    ZCAH(L,NY,NX)=CCAHU(L,NY,NX)*VOLW(L,NY,NX)
-    ZCAS(L,NY,NX)=CCASU(L,NY,NX)*VOLW(L,NY,NX)
-    ZMGO(L,NY,NX)=CMGOU(L,NY,NX)*VOLW(L,NY,NX)
-    ZMGC(L,NY,NX)=CMGCU(L,NY,NX)*VOLW(L,NY,NX)
-    ZMGH(L,NY,NX)=CMGHU(L,NY,NX)*VOLW(L,NY,NX)
-    ZMGS(L,NY,NX)=CMGSU(L,NY,NX)*VOLW(L,NY,NX)
-    ZNAC(L,NY,NX)=CNACU(L,NY,NX)*VOLW(L,NY,NX)
-    ZNAS(L,NY,NX)=CNASU(L,NY,NX)*VOLW(L,NY,NX)
-    ZKAS(L,NY,NX)=CKASU(L,NY,NX)*VOLW(L,NY,NX)
-    H0PO4(L,NY,NX)=CH0PU(L,NY,NX)*VOLW(L,NY,NX)*trcs_VLN(ids_H1PO4,L,NY,NX)
-    H3PO4(L,NY,NX)=CH3PU(L,NY,NX)*VOLW(L,NY,NX)*trcs_VLN(ids_H1PO4,L,NY,NX)
-    ZFE1P(L,NY,NX)=CF1PU(L,NY,NX)*VOLW(L,NY,NX)*trcs_VLN(ids_H1PO4,L,NY,NX)
-    ZFE2P(L,NY,NX)=CF2PU(L,NY,NX)*VOLW(L,NY,NX)*trcs_VLN(ids_H1PO4,L,NY,NX)
-    ZCA0P(L,NY,NX)=CC0PU(L,NY,NX)*VOLW(L,NY,NX)*trcs_VLN(ids_H1PO4,L,NY,NX)
-    ZCA1P(L,NY,NX)=CC1PU(L,NY,NX)*VOLW(L,NY,NX)*trcs_VLN(ids_H1PO4,L,NY,NX)
-    ZCA2P(L,NY,NX)=CC2PU(L,NY,NX)*VOLW(L,NY,NX)*trcs_VLN(ids_H1PO4,L,NY,NX)
-    ZMG1P(L,NY,NX)=CM1PU(L,NY,NX)*VOLW(L,NY,NX)*trcs_VLN(ids_H1PO4,L,NY,NX)
-    H0POB(L,NY,NX)=CH0PU(L,NY,NX)*VOLW(L,NY,NX)*trcs_VLN(ids_H1PO4B,L,NY,NX)
-    H3POB(L,NY,NX)=CH3PU(L,NY,NX)*VOLW(L,NY,NX)*trcs_VLN(ids_H1PO4B,L,NY,NX)
-    ZFE1PB(L,NY,NX)=CF1PU(L,NY,NX)*VOLW(L,NY,NX)*trcs_VLN(ids_H1PO4B,L,NY,NX)
-    ZFE2PB(L,NY,NX)=CF2PU(L,NY,NX)*VOLW(L,NY,NX)*trcs_VLN(ids_H1PO4B,L,NY,NX)
-    ZCA0PB(L,NY,NX)=CC0PU(L,NY,NX)*VOLW(L,NY,NX)*trcs_VLN(ids_H1PO4B,L,NY,NX)
-    ZCA1PB(L,NY,NX)=CC1PU(L,NY,NX)*VOLW(L,NY,NX)*trcs_VLN(ids_H1PO4B,L,NY,NX)
-    ZCA2PB(L,NY,NX)=CC2PU(L,NY,NX)*VOLW(L,NY,NX)*trcs_VLN(ids_H1PO4B,L,NY,NX)
-    ZMG1PB(L,NY,NX)=CM1PU(L,NY,NX)*VOLW(L,NY,NX)*trcs_VLN(ids_H1PO4B,L,NY,NX)
+    trcsa_solml(idsa_Al,L,NY,NX)=CALU(L,NY,NX)*VOLW(L,NY,NX)
+    trcsa_solml(idsa_Fe,L,NY,NX)=CFEU(L,NY,NX)*VOLW(L,NY,NX)
+    trcsa_solml(idsa_Hp,L,NY,NX)=CHYU(L,NY,NX)*VOLW(L,NY,NX)
+    trcsa_solml(idsa_Ca,L,NY,NX)=CCAU(L,NY,NX)*VOLW(L,NY,NX)
+    trcsa_solml(idsa_Mg,L,NY,NX)=CMGU(L,NY,NX)*VOLW(L,NY,NX)
+    trcsa_solml(idsa_Na,L,NY,NX)=CNAU(L,NY,NX)*VOLW(L,NY,NX)
+    trcsa_solml(idsa_K,L,NY,NX)=CKAU(L,NY,NX)*VOLW(L,NY,NX)
+    trcsa_solml(idsa_OH,L,NY,NX)=COHU(L,NY,NX)*VOLW(L,NY,NX)
+    trcsa_solml(idsa_SO4,L,NY,NX)=CSOU(L,NY,NX)*VOLW(L,NY,NX)
+    trcsa_solml(idsa_Cl,L,NY,NX)=CCLU(L,NY,NX)*VOLW(L,NY,NX)
+    trcsa_solml(idsa_CO3,L,NY,NX)=CC3U(L,NY,NX)*VOLW(L,NY,NX)
+    trcsa_solml(idsa_HCO3,L,NY,NX)=CHCU(L,NY,NX)*VOLW(L,NY,NX)
+    trcsa_solml(idsa_AlOH,L,NY,NX)=CAL1U(L,NY,NX)*VOLW(L,NY,NX)
+    trcsa_solml(idsa_AlOH2,L,NY,NX)=CAL2U(L,NY,NX)*VOLW(L,NY,NX)
+    trcsa_solml(idsa_AlOH3,L,NY,NX)=CAL3U(L,NY,NX)*VOLW(L,NY,NX)
+    trcsa_solml(idsa_AlOH4,L,NY,NX)=CAL4U(L,NY,NX)*VOLW(L,NY,NX)
+    trcsa_solml(idsa_AlSO4,L,NY,NX)=CALSU(L,NY,NX)*VOLW(L,NY,NX)
+    trcsa_solml(idsa_FeOH,L,NY,NX)=CFE1U(L,NY,NX)*VOLW(L,NY,NX)
+    trcsa_solml(idsa_FeOH2,L,NY,NX)=CFE2U(L,NY,NX)*VOLW(L,NY,NX)
+    trcsa_solml(idsa_FeOH3,L,NY,NX)=CFE3U(L,NY,NX)*VOLW(L,NY,NX)
+    trcsa_solml(idsa_FeOH4,L,NY,NX)=CFE4U(L,NY,NX)*VOLW(L,NY,NX)
+    trcsa_solml(idsa_FeSO4,L,NY,NX)=CFESU(L,NY,NX)*VOLW(L,NY,NX)
+    trcsa_solml(idsa_CaOH2,L,NY,NX)=CCAOU(L,NY,NX)*VOLW(L,NY,NX)
+    trcsa_solml(idsa_CaCO3,L,NY,NX)=CCACU(L,NY,NX)*VOLW(L,NY,NX)
+    trcsa_solml(idsa_CaHCO3,L,NY,NX)=CCAHU(L,NY,NX)*VOLW(L,NY,NX)
+    trcsa_solml(idsa_CaSO4,L,NY,NX)=CCASU(L,NY,NX)*VOLW(L,NY,NX)
+    trcsa_solml(idsa_MgOH2,L,NY,NX)=CMGOU(L,NY,NX)*VOLW(L,NY,NX)
+    trcsa_solml(idsa_MgCO3,L,NY,NX)=CMGCU(L,NY,NX)*VOLW(L,NY,NX)
+    trcsa_solml(idsa_MgHCO3,L,NY,NX)=CMGHU(L,NY,NX)*VOLW(L,NY,NX)
+    trcsa_solml(idsa_MgSO4,L,NY,NX)=CMGSU(L,NY,NX)*VOLW(L,NY,NX)
+    trcsa_solml(idsa_NaCO3,L,NY,NX)=CNACU(L,NY,NX)*VOLW(L,NY,NX)
+    trcsa_solml(idsa_NaSO4,L,NY,NX)=CNASU(L,NY,NX)*VOLW(L,NY,NX)
+    trcsa_solml(idsa_KSO4,L,NY,NX)=CKASU(L,NY,NX)*VOLW(L,NY,NX)
+    trcsa_solml(idsa_H0PO4,L,NY,NX)=CH0PU(L,NY,NX)*VOLW(L,NY,NX)*trcs_VLN(ids_H1PO4,L,NY,NX)
+    trcsa_solml(idsa_H3PO4,L,NY,NX)=CH3PU(L,NY,NX)*VOLW(L,NY,NX)*trcs_VLN(ids_H1PO4,L,NY,NX)
+    trcsa_solml(idsa_FeHPO4,L,NY,NX)=CF1PU(L,NY,NX)*VOLW(L,NY,NX)*trcs_VLN(ids_H1PO4,L,NY,NX)
+    trcsa_solml(idsa_FeH2PO4,L,NY,NX)=CF2PU(L,NY,NX)*VOLW(L,NY,NX)*trcs_VLN(ids_H1PO4,L,NY,NX)
+    trcsa_solml(idsa_CaPO4,L,NY,NX)=CC0PU(L,NY,NX)*VOLW(L,NY,NX)*trcs_VLN(ids_H1PO4,L,NY,NX)
+    trcsa_solml(idsa_CaHPO4,L,NY,NX)=CC1PU(L,NY,NX)*VOLW(L,NY,NX)*trcs_VLN(ids_H1PO4,L,NY,NX)
+    trcsa_solml(idsa_CaH2PO4,L,NY,NX)=CC2PU(L,NY,NX)*VOLW(L,NY,NX)*trcs_VLN(ids_H1PO4,L,NY,NX)
+    trcsa_solml(idsa_MgHPO4,L,NY,NX)=CM1PU(L,NY,NX)*VOLW(L,NY,NX)*trcs_VLN(ids_H1PO4,L,NY,NX)
+    trcsa_solml(idsa_H0PO4B,L,NY,NX)=CH0PU(L,NY,NX)*VOLW(L,NY,NX)*trcs_VLN(ids_H1PO4B,L,NY,NX)
+    trcsa_solml(idsa_H3PO4B,L,NY,NX)=CH3PU(L,NY,NX)*VOLW(L,NY,NX)*trcs_VLN(ids_H1PO4B,L,NY,NX)
+    trcsa_solml(idsa_FeHPO4B,L,NY,NX)=CF1PU(L,NY,NX)*VOLW(L,NY,NX)*trcs_VLN(ids_H1PO4B,L,NY,NX)
+    trcsa_solml(idsa_FeH2PO4B,L,NY,NX)=CF2PU(L,NY,NX)*VOLW(L,NY,NX)*trcs_VLN(ids_H1PO4B,L,NY,NX)
+    trcsa_solml(idsa_CaPO4B,L,NY,NX)=CC0PU(L,NY,NX)*VOLW(L,NY,NX)*trcs_VLN(ids_H1PO4B,L,NY,NX)
+    trcsa_solml(idsa_CaHPO4B,L,NY,NX)=CC1PU(L,NY,NX)*VOLW(L,NY,NX)*trcs_VLN(ids_H1PO4B,L,NY,NX)
+    trcsa_solml(idsa_CaH2PO4B,L,NY,NX)=CC2PU(L,NY,NX)*VOLW(L,NY,NX)*trcs_VLN(ids_H1PO4B,L,NY,NX)
+    trcsa_solml(idsa_MgHPO4B,L,NY,NX)=CM1PU(L,NY,NX)*VOLW(L,NY,NX)*trcs_VLN(ids_H1PO4B,L,NY,NX)
 !
 !     INITIAL STATE VARIABLES FOR ALL MATERIAL IN SOIL MACROPORES
 !
-
     trc_soHml(ids_beg:ids_end,L,NY,NX)=0._r8
-
-    ZALH(L,NY,NX)=0._r8
-    ZFEH(L,NY,NX)=0._r8
-    ZHYH(L,NY,NX)=0._r8
-    ZCCH(L,NY,NX)=0._r8
-    ZMAH(L,NY,NX)=0._r8
-    ZNAH(L,NY,NX)=0._r8
-    ZKAH(L,NY,NX)=0._r8
-    ZOHH(L,NY,NX)=0._r8
-    ZSO4H(L,NY,NX)=0._r8
-    ZCLH(L,NY,NX)=0._r8
-    ZCO3H(L,NY,NX)=0._r8
-    ZHCO3H(L,NY,NX)=0._r8
-    ZALO1H(L,NY,NX)=0._r8
-    ZALO2H(L,NY,NX)=0._r8
-    ZALO3H(L,NY,NX)=0._r8
-    ZALO4H(L,NY,NX)=0._r8
-    ZALSH(L,NY,NX)=0._r8
-    ZFEO1H(L,NY,NX)=0._r8
-    ZFEO2H(L,NY,NX)=0._r8
-    ZFEO3H(L,NY,NX)=0._r8
-    ZFEO4H(L,NY,NX)=0._r8
-    ZFESH(L,NY,NX)=0._r8
-    ZCAOH(L,NY,NX)=0._r8
-    ZCACH(L,NY,NX)=0._r8
-    ZCAHH(L,NY,NX)=0._r8
-    ZCASH(L,NY,NX)=0._r8
-    ZMGOH(L,NY,NX)=0._r8
-    ZMGCH(L,NY,NX)=0._r8
-    ZMGHH(L,NY,NX)=0._r8
-    ZMGSH(L,NY,NX)=0._r8
-    ZNACH(L,NY,NX)=0._r8
-    ZNASH(L,NY,NX)=0._r8
-    ZKASH(L,NY,NX)=0._r8
-    H0PO4H(L,NY,NX)=0._r8
-    trc_soHml(ids_H1PO4,L,NY,NX)=0._r8
-    H3PO4H(L,NY,NX)=0._r8
-    ZFE1PH(L,NY,NX)=0._r8
-    ZFE2PH(L,NY,NX)=0._r8
-    ZCA0PH(L,NY,NX)=0._r8
-    ZCA1PH(L,NY,NX)=0._r8
-    ZCA2PH(L,NY,NX)=0._r8
-    ZMG1PH(L,NY,NX)=0._r8
-    H0POBH(L,NY,NX)=0._r8
-    trc_soHml(ids_H1PO4B,L,NY,NX)=0._r8
-    H3POBH(L,NY,NX)=0._r8
-    ZFE1BH(L,NY,NX)=0._r8
-    ZFE2BH(L,NY,NX)=0._r8
-    ZCA0BH(L,NY,NX)=0._r8
-    ZCA1BH(L,NY,NX)=0._r8
-    ZCA2BH(L,NY,NX)=0._r8
-    ZMG1BH(L,NY,NX)=0._r8
+    trcsa_soHml(idsa_beg:idsab_end,L,NY,NX)=0._r8
 !
 !     INITIAL STATE VARIABLES FOR EXCHANGEABLE CATIONS AND ANIONS
 !
@@ -553,10 +505,11 @@ module StarteMod
     ECND(L,NY,NX)=0._r8
     CSTR(L,NY,NX)=0._r8
     CION(L,NY,NX)=0._r8
-    trc_solml(ids_NH4,L,NY,NX)=trc_solml(ids_NH4,L,NY,NX)+0.5*OSN(1,2,L,NY,NX)
-    OSN(1,2,L,NY,NX)=OSN(1,2,L,NY,NX)-0.5*OSN(1,2,L,NY,NX)
+! the following line is quite interesting, Jinyun Tang, Nov 17, 2022
+    trc_solml(ids_NH4,L,NY,NX)=trc_solml(ids_NH4,L,NY,NX)+0.5_r8*OSN(iprotein,k_manure,L,NY,NX)
+    OSN(iprotein,k_manure,L,NY,NX)=OSN(iprotein,k_manure,L,NY,NX)-0.5_r8*OSN(iprotein,k_manure,L,NY,NX)
   ENDIF
-
+  end associate
   end subroutine SoluteConcentrations
 !------------------------------------------------------------------------------------------
 

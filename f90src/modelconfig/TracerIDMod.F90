@@ -60,7 +60,6 @@ implicit none
   integer :: idsa_NaCO3   ! NaCO3
   integer :: idsa_NaSO4   ! NaSO4
   integer :: idsa_KSO4    ! KSO4
-
   integer :: idsa_H0PO4   ! PO4
   integer :: idsa_H3PO4   ! H3PO4
   integer :: idsa_FeHPO4  ! FeHPO4
