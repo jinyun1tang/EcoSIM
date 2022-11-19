@@ -401,11 +401,11 @@ module TillageMixMod
     TXOH2G=XOH2(0,NY,NX)*CORP0
     TXH1PG=XH1P(0,NY,NX)*CORP0
     TXH2PG=XH2P(0,NY,NX)*CORP0
-    TALPOG=PALPO(0,NY,NX)*CORP0
-    TFEPOG=PFEPO(0,NY,NX)*CORP0
-    TCAPDG=PCAPD(0,NY,NX)*CORP0
-    TCAPHG=PCAPH(0,NY,NX)*CORP0
-    TCAPMG=PCAPM(0,NY,NX)*CORP0
+    TALPOG=trcp_salml(idsp_AlPO4,0,NY,NX)*CORP0
+    TFEPOG=trcp_salml(idsp_FePO4,0,NY,NX)*CORP0
+    TCAPDG=trcp_salml(idsp_CaHPO4,0,NY,NX)*CORP0
+    TCAPHG=trcp_salml(idsp_HA,0,NY,NX)*CORP0
+    TCAPMG=trcp_salml(idsp_CaH2PO4,0,NY,NX)*CORP0
     TNH4FG=ZNH4FA(0,NY,NX)*CORP0
     TNH3FG=ZNH3FA(0,NY,NX)*CORP0
     TNHUFG=ZNHUFA(0,NY,NX)*CORP0
@@ -437,11 +437,11 @@ module TillageMixMod
     XOH2(0,NY,NX)=XOH2(0,NY,NX)*XCORP0
     XH1P(0,NY,NX)=XH1P(0,NY,NX)*XCORP0
     XH2P(0,NY,NX)=XH2P(0,NY,NX)*XCORP0
-    PALPO(0,NY,NX)=PALPO(0,NY,NX)*XCORP0
-    PFEPO(0,NY,NX)=PFEPO(0,NY,NX)*XCORP0
-    PCAPD(0,NY,NX)=PCAPD(0,NY,NX)*XCORP0
-    PCAPH(0,NY,NX)=PCAPH(0,NY,NX)*XCORP0
-    PCAPM(0,NY,NX)=PCAPM(0,NY,NX)*XCORP0
+    trcp_salml(idsp_AlPO4,0,NY,NX)=trcp_salml(idsp_AlPO4,0,NY,NX)*XCORP0
+    trcp_salml(idsp_FePO4,0,NY,NX)=trcp_salml(idsp_FePO4,0,NY,NX)*XCORP0
+    trcp_salml(idsp_CaHPO4,0,NY,NX)=trcp_salml(idsp_CaHPO4,0,NY,NX)*XCORP0
+    trcp_salml(idsp_HA,0,NY,NX)=trcp_salml(idsp_HA,0,NY,NX)*XCORP0
+    trcp_salml(idsp_CaH2PO4,0,NY,NX)=trcp_salml(idsp_CaH2PO4,0,NY,NX)*XCORP0
     ZNH4FA(0,NY,NX)=ZNH4FA(0,NY,NX)*XCORP0
     ZNH3FA(0,NY,NX)=ZNH3FA(0,NY,NX)*XCORP0
     ZNHUFA(0,NY,NX)=ZNHUFA(0,NY,NX)*XCORP0
@@ -579,20 +579,20 @@ module TillageMixMod
         TXOH2B=TXOH2B+TI*XOH2B(L,NY,NX)
         TXH1PB=TXH1PB+TI*XH1PB(L,NY,NX)
         TXH2PB=TXH2PB+TI*XH2PB(L,NY,NX)
-        TPALOH=TPALOH+TI*PALOH(L,NY,NX)
-        TPFEOH=TPFEOH+TI*PFEOH(L,NY,NX)
-        TPCACO=TPCACO+TI*PCACO(L,NY,NX)
-        TPCASO=TPCASO+TI*PCASO(L,NY,NX)
-        TPALPO=TPALPO+TI*PALPO(L,NY,NX)
-        TPFEPO=TPFEPO+TI*PFEPO(L,NY,NX)
-        TPCAPD=TPCAPD+TI*PCAPD(L,NY,NX)
-        TPCAPH=TPCAPH+TI*PCAPH(L,NY,NX)
-        TPCAPM=TPCAPM+TI*PCAPM(L,NY,NX)
-        TPALPB=TPALPB+TI*PALPB(L,NY,NX)
-        TPFEPB=TPFEPB+TI*PFEPB(L,NY,NX)
-        TPCPDB=TPCPDB+TI*PCPDB(L,NY,NX)
-        TPCPHB=TPCPHB+TI*PCPHB(L,NY,NX)
-        TPCPMB=TPCPMB+TI*PCPMB(L,NY,NX)
+        TPALOH=TPALOH+TI*trcp_salml(idsp_AlOH3,L,NY,NX)
+        TPFEOH=TPFEOH+TI*trcp_salml(idsp_FeOH3,L,NY,NX)
+        TPCACO=TPCACO+TI*trcp_salml(idsp_CaCO3,L,NY,NX)
+        TPCASO=TPCASO+TI*trcp_salml(idsp_CaSO4,L,NY,NX)
+        TPALPO=TPALPO+TI*trcp_salml(idsp_AlPO4,L,NY,NX)
+        TPFEPO=TPFEPO+TI*trcp_salml(idsp_FePO4,L,NY,NX)
+        TPCAPD=TPCAPD+TI*trcp_salml(idsp_CaHPO4,L,NY,NX)
+        TPCAPH=TPCAPH+TI*trcp_salml(idsp_HA,L,NY,NX)
+        TPCAPM=TPCAPM+TI*trcp_salml(idsp_CaH2PO4,L,NY,NX)
+        TPALPB=TPALPB+TI*trcp_salml(idsp_AlPO4B,L,NY,NX)
+        TPFEPB=TPFEPB+TI*trcp_salml(idsp_FePO4B,L,NY,NX)
+        TPCPDB=TPCPDB+TI*trcp_salml(idsp_CaHPO4B,L,NY,NX)
+        TPCPHB=TPCPHB+TI*trcp_salml(idsp_HAB,L,NY,NX)
+        TPCPMB=TPCPMB+TI*trcp_salml(idsp_CaH2PO4B,L,NY,NX)
         TCO2G=TCO2G+TI*trc_gasml(idg_CO2,L,NY,NX)
         TCH4G=TCH4G+TI*trc_gasml(idg_CH4,L,NY,NX)
         TCOZS=TCOZS+TI*trc_solml(idg_CO2,L,NY,NX)
@@ -874,34 +874,34 @@ module TillageMixMod
         XH2PB(L,NY,NX)=TI*XH2PB(L,NY,NX)+CORP*(FI*TXH2PB &
           -TI*XH2PB(L,NY,NX))+TX*XH2PB(L,NY,NX)
 
-        PALOH(L,NY,NX)=TI*PALOH(L,NY,NX)+CORP*(FI*TPALOH &
-          -TI*PALOH(L,NY,NX))+TX*PALOH(L,NY,NX)
-        PFEOH(L,NY,NX)=TI*PFEOH(L,NY,NX)+CORP*(FI*TPFEOH &
-          -TI*PFEOH(L,NY,NX))+TX*PFEOH(L,NY,NX)
-        PCACO(L,NY,NX)=TI*PCACO(L,NY,NX)+CORP*(FI*TPCACO &
-          -TI*PCACO(L,NY,NX))+TX*PCACO(L,NY,NX)
-        PCASO(L,NY,NX)=TI*PCASO(L,NY,NX)+CORP*(FI*TPCASO &
-          -TI*PCASO(L,NY,NX))+TX*PCASO(L,NY,NX)
-        PALPO(L,NY,NX)=TI*PALPO(L,NY,NX)+CORP*(FI*TPALPO &
-          -TI*PALPO(L,NY,NX))+TX*PALPO(L,NY,NX)
-        PFEPO(L,NY,NX)=TI*PFEPO(L,NY,NX)+CORP*(FI*TPFEPO &
-          -TI*PFEPO(L,NY,NX))+TX*PFEPO(L,NY,NX)
-        PCAPD(L,NY,NX)=TI*PCAPD(L,NY,NX)+CORP*(FI*TPCAPD &
-          -TI*PCAPD(L,NY,NX))+TX*PCAPD(L,NY,NX)
-        PCAPH(L,NY,NX)=TI*PCAPH(L,NY,NX)+CORP*(FI*TPCAPH &
-          -TI*PCAPH(L,NY,NX))+TX*PCAPH(L,NY,NX)
-        PCAPM(L,NY,NX)=TI*PCAPM(L,NY,NX)+CORP*(FI*TPCAPM &
-          -TI*PCAPM(L,NY,NX))+TX*PCAPM(L,NY,NX)
-        PALPB(L,NY,NX)=TI*PALPB(L,NY,NX)+CORP*(FI*TPALPB &
-          -TI*PALPB(L,NY,NX))+TX*PALPB(L,NY,NX)
-        PFEPB(L,NY,NX)=TI*PFEPB(L,NY,NX)+CORP*(FI*TPFEPB &
-          -TI*PFEPB(L,NY,NX))+TX*PFEPB(L,NY,NX)
-        PCPDB(L,NY,NX)=TI*PCPDB(L,NY,NX)+CORP*(FI*TPCPDB &
-          -TI*PCPDB(L,NY,NX))+TX*PCPDB(L,NY,NX)
-        PCPHB(L,NY,NX)=TI*PCPHB(L,NY,NX)+CORP*(FI*TPCPHB &
-          -TI*PCPHB(L,NY,NX))+TX*PCPHB(L,NY,NX)
-        PCPMB(L,NY,NX)=TI*PCPMB(L,NY,NX)+CORP*(FI*TPCPMB &
-          -TI*PCPMB(L,NY,NX))+TX*PCPMB(L,NY,NX)
+        trcp_salml(idsp_AlOH3,L,NY,NX)=TI*trcp_salml(idsp_AlOH3,L,NY,NX)+CORP*(FI*TPALOH &
+          -TI*trcp_salml(idsp_AlOH3,L,NY,NX))+TX*trcp_salml(idsp_AlOH3,L,NY,NX)
+        trcp_salml(idsp_FeOH3,L,NY,NX)=TI*trcp_salml(idsp_FeOH3,L,NY,NX)+CORP*(FI*TPFEOH &
+          -TI*trcp_salml(idsp_FeOH3,L,NY,NX))+TX*trcp_salml(idsp_FeOH3,L,NY,NX)
+        trcp_salml(idsp_CaCO3,L,NY,NX)=TI*trcp_salml(idsp_CaCO3,L,NY,NX)+CORP*(FI*TPCACO &
+          -TI*trcp_salml(idsp_CaCO3,L,NY,NX))+TX*trcp_salml(idsp_CaCO3,L,NY,NX)
+        trcp_salml(idsp_CaSO4,L,NY,NX)=TI*trcp_salml(idsp_CaSO4,L,NY,NX)+CORP*(FI*TPCASO &
+          -TI*trcp_salml(idsp_CaSO4,L,NY,NX))+TX*trcp_salml(idsp_CaSO4,L,NY,NX)
+        trcp_salml(idsp_AlPO4,L,NY,NX)=TI*trcp_salml(idsp_AlPO4,L,NY,NX)+CORP*(FI*TPALPO &
+          -TI*trcp_salml(idsp_AlPO4,L,NY,NX))+TX*trcp_salml(idsp_AlPO4,L,NY,NX)
+        trcp_salml(idsp_FePO4,L,NY,NX)=TI*trcp_salml(idsp_FePO4,L,NY,NX)+CORP*(FI*TPFEPO &
+          -TI*trcp_salml(idsp_FePO4,L,NY,NX))+TX*trcp_salml(idsp_FePO4,L,NY,NX)
+        trcp_salml(idsp_CaHPO4,L,NY,NX)=TI*trcp_salml(idsp_CaHPO4,L,NY,NX)+CORP*(FI*TPCAPD &
+          -TI*trcp_salml(idsp_CaHPO4,L,NY,NX))+TX*trcp_salml(idsp_CaHPO4,L,NY,NX)
+        trcp_salml(idsp_HA,L,NY,NX)=TI*trcp_salml(idsp_HA,L,NY,NX)+CORP*(FI*TPCAPH &
+          -TI*trcp_salml(idsp_HA,L,NY,NX))+TX*trcp_salml(idsp_HA,L,NY,NX)
+        trcp_salml(idsp_CaH2PO4,L,NY,NX)=TI*trcp_salml(idsp_CaH2PO4,L,NY,NX)+CORP*(FI*TPCAPM &
+          -TI*trcp_salml(idsp_CaH2PO4,L,NY,NX))+TX*trcp_salml(idsp_CaH2PO4,L,NY,NX)
+        trcp_salml(idsp_AlPO4B,L,NY,NX)=TI*trcp_salml(idsp_AlPO4B,L,NY,NX)+CORP*(FI*TPALPB &
+          -TI*trcp_salml(idsp_AlPO4B,L,NY,NX))+TX*trcp_salml(idsp_AlPO4B,L,NY,NX)
+        trcp_salml(idsp_FePO4B,L,NY,NX)=TI*trcp_salml(idsp_FePO4B,L,NY,NX)+CORP*(FI*TPFEPB &
+          -TI*trcp_salml(idsp_FePO4B,L,NY,NX))+TX*trcp_salml(idsp_FePO4B,L,NY,NX)
+        trcp_salml(idsp_CaHPO4B,L,NY,NX)=TI*trcp_salml(idsp_CaHPO4B,L,NY,NX)+CORP*(FI*TPCPDB &
+          -TI*trcp_salml(idsp_CaHPO4B,L,NY,NX))+TX*trcp_salml(idsp_CaHPO4B,L,NY,NX)
+        trcp_salml(idsp_HAB,L,NY,NX)=TI*trcp_salml(idsp_HAB,L,NY,NX)+CORP*(FI*TPCPHB &
+          -TI*trcp_salml(idsp_HAB,L,NY,NX))+TX*trcp_salml(idsp_HAB,L,NY,NX)
+        trcp_salml(idsp_CaH2PO4B,L,NY,NX)=TI*trcp_salml(idsp_CaH2PO4B,L,NY,NX)+CORP*(FI*TPCPMB &
+          -TI*trcp_salml(idsp_CaH2PO4B,L,NY,NX))+TX*trcp_salml(idsp_CaH2PO4B,L,NY,NX)
 
 
         trc_gasml(idg_CO2,L,NY,NX)=TI*trc_gasml(idg_CO2,L,NY,NX)+CORP*(FI*TCO2G &
@@ -1137,11 +1137,11 @@ module TillageMixMod
         XOH2(L,NY,NX)=XOH2(L,NY,NX)+FI*TXOH2G
         XH1P(L,NY,NX)=XH1P(L,NY,NX)+FI*TXH1PG
         XH2P(L,NY,NX)=XH2P(L,NY,NX)+FI*TXH2PG
-        PALPO(L,NY,NX)=PALPO(L,NY,NX)+FI*TALPOG
-        PFEPO(L,NY,NX)=PFEPO(L,NY,NX)+FI*TFEPOG
-        PCAPD(L,NY,NX)=PCAPD(L,NY,NX)+FI*TCAPDG
-        PCAPH(L,NY,NX)=PCAPH(L,NY,NX)+FI*TCAPHG
-        PCAPM(L,NY,NX)=PCAPM(L,NY,NX)+FI*TCAPMG
+        trcp_salml(idsp_AlPO4,L,NY,NX)=trcp_salml(idsp_AlPO4,L,NY,NX)+FI*TALPOG
+        trcp_salml(idsp_FePO4,L,NY,NX)=trcp_salml(idsp_FePO4,L,NY,NX)+FI*TFEPOG
+        trcp_salml(idsp_CaHPO4,L,NY,NX)=trcp_salml(idsp_CaHPO4,L,NY,NX)+FI*TCAPDG
+        trcp_salml(idsp_HA,L,NY,NX)=trcp_salml(idsp_HA,L,NY,NX)+FI*TCAPHG
+        trcp_salml(idsp_CaH2PO4,L,NY,NX)=trcp_salml(idsp_CaH2PO4,L,NY,NX)+FI*TCAPMG
         ZNH4FA(L,NY,NX)=ZNH4FA(L,NY,NX)+FI*TNH4FG
         ZNH3FA(L,NY,NX)=ZNH3FA(L,NY,NX)+FI*TNH3FG
         ZNHUFA(L,NY,NX)=ZNHUFA(L,NY,NX)+FI*TNHUFG

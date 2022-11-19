@@ -488,20 +488,20 @@ module StarteMod
 !
 !     INITIAL STATE VARIABLES FOR PRECIPITATES
 !
-    PALOH(L,NY,NX)=solutevar%PALOH1*BKVL(L,NY,NX)
-    PFEOH(L,NY,NX)=solutevar%PFEOH1*BKVL(L,NY,NX)
-    PCACO(L,NY,NX)=solutevar%PCACO1*BKVL(L,NY,NX)
-    PCASO(L,NY,NX)=solutevar%PCASO1*BKVL(L,NY,NX)
-    PALPO(L,NY,NX)=solutevar%PALPO1*BKVL(L,NY,NX)*trcs_VLN(ids_H1PO4,L,NY,NX)
-    PFEPO(L,NY,NX)=solutevar%PFEPO1*BKVL(L,NY,NX)*trcs_VLN(ids_H1PO4,L,NY,NX)
-    PCAPD(L,NY,NX)=solutevar%PCAPD1*BKVL(L,NY,NX)*trcs_VLN(ids_H1PO4,L,NY,NX)
-    PCAPH(L,NY,NX)=solutevar%PCAPH1*BKVL(L,NY,NX)*trcs_VLN(ids_H1PO4,L,NY,NX)
-    PCAPM(L,NY,NX)=0._r8
-    PALPB(L,NY,NX)=solutevar%PALPO1*BKVL(L,NY,NX)*trcs_VLN(ids_H1PO4B,L,NY,NX)
-    PFEPB(L,NY,NX)=solutevar%PFEPO1*BKVL(L,NY,NX)*trcs_VLN(ids_H1PO4B,L,NY,NX)
-    PCPDB(L,NY,NX)=solutevar%PCAPD1*BKVL(L,NY,NX)*trcs_VLN(ids_H1PO4B,L,NY,NX)
-    PCPHB(L,NY,NX)=solutevar%PCAPH1*BKVL(L,NY,NX)*trcs_VLN(ids_H1PO4B,L,NY,NX)
-    PCPMB(L,NY,NX)=0._r8
+    trcp_salml(idsp_AlOH3,L,NY,NX)=solutevar%PALOH1*BKVL(L,NY,NX)
+    trcp_salml(idsp_FeOH3,L,NY,NX)=solutevar%PFEOH1*BKVL(L,NY,NX)
+    trcp_salml(idsp_CaCO3,L,NY,NX)=solutevar%PCACO1*BKVL(L,NY,NX)
+    trcp_salml(idsp_CaSO4,L,NY,NX)=solutevar%PCASO1*BKVL(L,NY,NX)
+    trcp_salml(idsp_AlPO4,L,NY,NX)=solutevar%PALPO1*BKVL(L,NY,NX)*trcs_VLN(ids_H1PO4,L,NY,NX)
+    trcp_salml(idsp_FePO4,L,NY,NX)=solutevar%PFEPO1*BKVL(L,NY,NX)*trcs_VLN(ids_H1PO4,L,NY,NX)
+    trcp_salml(idsp_CaHPO4,L,NY,NX)=solutevar%PCAPD1*BKVL(L,NY,NX)*trcs_VLN(ids_H1PO4,L,NY,NX)
+    trcp_salml(idsp_HA,L,NY,NX)=solutevar%PCAPH1*BKVL(L,NY,NX)*trcs_VLN(ids_H1PO4,L,NY,NX)
+    trcp_salml(idsp_CaH2PO4,L,NY,NX)=0._r8
+    trcp_salml(idsp_AlPO4B,L,NY,NX)=solutevar%PALPO1*BKVL(L,NY,NX)*trcs_VLN(ids_H1PO4B,L,NY,NX)
+    trcp_salml(idsp_FePO4B,L,NY,NX)=solutevar%PFEPO1*BKVL(L,NY,NX)*trcs_VLN(ids_H1PO4B,L,NY,NX)
+    trcp_salml(idsp_CaHPO4B,L,NY,NX)=solutevar%PCAPD1*BKVL(L,NY,NX)*trcs_VLN(ids_H1PO4B,L,NY,NX)
+    trcp_salml(idsp_HAB,L,NY,NX)=solutevar%PCAPH1*BKVL(L,NY,NX)*trcs_VLN(ids_H1PO4B,L,NY,NX)
+    trcp_salml(idsp_CaH2PO4B,L,NY,NX)=0._r8
     ECND(L,NY,NX)=0._r8
     CSTR(L,NY,NX)=0._r8
     CION(L,NY,NX)=0._r8
@@ -537,16 +537,16 @@ module StarteMod
     XOH2B(0,NY,NX)=0._r8
     XH1PB(0,NY,NX)=0._r8
     XH2PB(0,NY,NX)=0._r8
-    PALPO(0,NY,NX)=0._r8
-    PFEPO(0,NY,NX)=0._r8
-    PCAPD(0,NY,NX)=0._r8
-    PCAPH(0,NY,NX)=0._r8
-    PCAPM(0,NY,NX)=0._r8
-    PALPB(0,NY,NX)=0._r8
-    PFEPB(0,NY,NX)=0._r8
-    PCPDB(0,NY,NX)=0._r8
-    PCPHB(0,NY,NX)=0._r8
-    PCPMB(0,NY,NX)=0._r8
+    trcp_salml(idsp_AlPO4,0,NY,NX)=0._r8
+    trcp_salml(idsp_FePO4,0,NY,NX)=0._r8
+    trcp_salml(idsp_CaHPO4,0,NY,NX)=0._r8
+    trcp_salml(idsp_HA,0,NY,NX)=0._r8
+    trcp_salml(idsp_CaH2PO4,0,NY,NX)=0._r8
+    trcp_salml(idsp_AlPO4B,0,NY,NX)=0._r8
+    trcp_salml(idsp_FePO4B,0,NY,NX)=0._r8
+    trcp_salml(idsp_CaHPO4B,0,NY,NX)=0._r8
+    trcp_salml(idsp_HAB,0,NY,NX)=0._r8
+    trcp_salml(idsp_CaH2PO4B,0,NY,NX)=0._r8
 !
 !     INITIAL STATE VARIABLES FOR MINERAL N AND P IN SNOWPACK
 !

@@ -415,11 +415,11 @@ module SoluteMod
     XOH21=AZMAX1(XOH2(L,NY,NX))/BKVLPO
     XH1P1=AZMAX1(XH1P(L,NY,NX))/BKVLPO
     XH2P1=AZMAX1(XH2P(L,NY,NX))/BKVLPO
-    PALPO1=AZMAX1(PALPO(L,NY,NX))/BKVLPO
-    PFEPO1=AZMAX1(PFEPO(L,NY,NX))/BKVLPO
-    PCAPM1=AZMAX1(PCAPM(L,NY,NX))/BKVLPO
-    PCAPD1=AZMAX1(PCAPD(L,NY,NX))/BKVLPO
-    PCAPH1=AZMAX1(PCAPH(L,NY,NX))/BKVLPO
+    PALPO1=AZMAX1(trcp_salml(idsp_AlPO4,L,NY,NX))/BKVLPO
+    PFEPO1=AZMAX1(trcp_salml(idsp_FePO4,L,NY,NX))/BKVLPO
+    PCAPM1=AZMAX1(trcp_salml(idsp_CaH2PO4,L,NY,NX))/BKVLPO
+    PCAPD1=AZMAX1(trcp_salml(idsp_CaHPO4,L,NY,NX))/BKVLPO
+    PCAPH1=AZMAX1(trcp_salml(idsp_HA,L,NY,NX))/BKVLPO
   ELSE
     RH1PX=0._r8
     RH2PX=0._r8
@@ -447,11 +447,11 @@ module SoluteMod
     XH21B=AZMAX1(XOH2B(L,NY,NX))/BKVLPB
     X1P1B=AZMAX1(XH1PB(L,NY,NX))/BKVLPB
     X2P1B=AZMAX1(XH2PB(L,NY,NX))/BKVLPB
-    PALPOB=AZMAX1(PALPB(L,NY,NX))/BKVLPB
-    PFEPOB=AZMAX1(PFEPB(L,NY,NX))/BKVLPB
-    PCAPMB=AZMAX1(PCPMB(L,NY,NX))/BKVLPB
-    PCAPDB=AZMAX1(PCPDB(L,NY,NX))/BKVLPB
-    PCAPHB=AZMAX1(PCPHB(L,NY,NX))/BKVLPB
+    PALPOB=AZMAX1(trcp_salml(idsp_AlPO4B,L,NY,NX))/BKVLPB
+    PFEPOB=AZMAX1(trcp_salml(idsp_FePO4B,L,NY,NX))/BKVLPB
+    PCAPMB=AZMAX1(trcp_salml(idsp_CaH2PO4B,L,NY,NX))/BKVLPB
+    PCAPDB=AZMAX1(trcp_salml(idsp_CaHPO4B,L,NY,NX))/BKVLPB
+    PCAPHB=AZMAX1(trcp_salml(idsp_HAB,L,NY,NX))/BKVLPB
   ELSE
     RH1BX=0._r8
     RH2BX=0._r8
@@ -662,11 +662,11 @@ module SoluteMod
         DXOH2=FVLPO4*XOH2(L,NY,NX)
         DXH1P=FVLPO4*XH1P(L,NY,NX)
         DXH2P=FVLPO4*XH2P(L,NY,NX)
-        DPALP=FVLPO4*PALPO(L,NY,NX)
-        DPFEP=FVLPO4*PFEPO(L,NY,NX)
-        DPCDP=FVLPO4*PCAPD(L,NY,NX)
-        DPCHP=FVLPO4*PCAPH(L,NY,NX)
-        DPCMP=FVLPO4*PCAPM(L,NY,NX)
+        DPALP=FVLPO4*trcp_salml(idsp_AlPO4,L,NY,NX)
+        DPFEP=FVLPO4*trcp_salml(idsp_FePO4,L,NY,NX)
+        DPCDP=FVLPO4*trcp_salml(idsp_CaHPO4,L,NY,NX)
+        DPCHP=FVLPO4*trcp_salml(idsp_HA,L,NY,NX)
+        DPCMP=FVLPO4*trcp_salml(idsp_CaH2PO4,L,NY,NX)
         TRH0P(L,NY,NX)=TRH0P(L,NY,NX)+DZH0P
         TRH1P(L,NY,NX)=TRH1P(L,NY,NX)+DZH1P
         TRH2P(L,NY,NX)=TRH2P(L,NY,NX)+DZH2P
@@ -713,11 +713,11 @@ module SoluteMod
         DXOH1=FVLPO4*XOH1(L,NY,NX)
         DXOH2=FVLPO4*XOH2(L,NY,NX)
         DXH2P=FVLPO4*XH2P(L,NY,NX)
-        DPALP=FVLPO4*PALPO(L,NY,NX)
-        DPFEP=FVLPO4*PFEPO(L,NY,NX)
-        DPCDP=FVLPO4*PCAPD(L,NY,NX)
-        DPCHP=FVLPO4*PCAPH(L,NY,NX)
-        DPCMP=FVLPO4*PCAPM(L,NY,NX)
+        DPALP=FVLPO4*trcp_salml(idsp_AlPO4,L,NY,NX)
+        DPFEP=FVLPO4*trcp_salml(idsp_FePO4,L,NY,NX)
+        DPCDP=FVLPO4*trcp_salml(idsp_CaHPO4,L,NY,NX)
+        DPCHP=FVLPO4*trcp_salml(idsp_HA,L,NY,NX)
+        DPCMP=FVLPO4*trcp_salml(idsp_CaH2PO4,L,NY,NX)
         TRH1P(L,NY,NX)=TRH1P(L,NY,NX)+DZH1P
         TRH2P(L,NY,NX)=TRH2P(L,NY,NX)+DZH2P
         TRXH1(L,NY,NX)=TRXH1(L,NY,NX)+DXOH1
@@ -780,16 +780,16 @@ module SoluteMod
       XOH2B(L,NY,NX)=0._r8
       XH1PB(L,NY,NX)=0._r8
       XH2PB(L,NY,NX)=0._r8
-      PALPO(L,NY,NX)=PALPO(L,NY,NX)+PALPB(L,NY,NX)
-      PFEPO(L,NY,NX)=PFEPO(L,NY,NX)+PFEPB(L,NY,NX)
-      PCAPD(L,NY,NX)=PCAPD(L,NY,NX)+PCPDB(L,NY,NX)
-      PCAPH(L,NY,NX)=PCAPH(L,NY,NX)+PCPHB(L,NY,NX)
-      PCAPM(L,NY,NX)=PCAPM(L,NY,NX)+PCPMB(L,NY,NX)
-      PALPB(L,NY,NX)=0._r8
-      PFEPB(L,NY,NX)=0._r8
-      PCPDB(L,NY,NX)=0._r8
-      PCPHB(L,NY,NX)=0._r8
-      PCPMB(L,NY,NX)=0._r8
+      trcp_salml(idsp_AlPO4,L,NY,NX)=trcp_salml(idsp_AlPO4,L,NY,NX)+trcp_salml(idsp_AlPO4B,L,NY,NX)
+      trcp_salml(idsp_FePO4,L,NY,NX)=trcp_salml(idsp_FePO4,L,NY,NX)+trcp_salml(idsp_FePO4B,L,NY,NX)
+      trcp_salml(idsp_CaHPO4,L,NY,NX)=trcp_salml(idsp_CaHPO4,L,NY,NX)+trcp_salml(idsp_CaHPO4B,L,NY,NX)
+      trcp_salml(idsp_HA,L,NY,NX)=trcp_salml(idsp_HA,L,NY,NX)+trcp_salml(idsp_HAB,L,NY,NX)
+      trcp_salml(idsp_CaH2PO4,L,NY,NX)=trcp_salml(idsp_CaH2PO4,L,NY,NX)+trcp_salml(idsp_CaH2PO4B,L,NY,NX)
+      trcp_salml(idsp_AlPO4B,L,NY,NX)=0._r8
+      trcp_salml(idsp_FePO4B,L,NY,NX)=0._r8
+      trcp_salml(idsp_CaHPO4B,L,NY,NX)=0._r8
+      trcp_salml(idsp_HAB,L,NY,NX)=0._r8
+      trcp_salml(idsp_CaH2PO4B,L,NY,NX)=0._r8
     ENDIF
   ENDIF
   end subroutine UpdatePO4FertilizerBandinfo
@@ -1033,11 +1033,11 @@ module SoluteMod
 !     PCAPM1,PCAPD1,PCAPH1=concn of precip CaH2PO4,CaHPO4,apatite
 !
     IF(BKVLX.GT.ZEROS(NY,NX))THEN
-      PALPO1=AZMAX1(PALPO(0,NY,NX)/BKVLX)
-      PFEPO1=AZMAX1(PFEPO(0,NY,NX)/BKVLX)
-      PCAPM1=AZMAX1(PCAPM(0,NY,NX)/BKVLX)
-      PCAPD1=AZMAX1(PCAPD(0,NY,NX)/BKVLX)
-      PCAPH1=AZMAX1(PCAPH(0,NY,NX)/BKVLX)
+      PALPO1=AZMAX1(trcp_salml(idsp_AlPO4,0,NY,NX)/BKVLX)
+      PFEPO1=AZMAX1(trcp_salml(idsp_FePO4,0,NY,NX)/BKVLX)
+      PCAPM1=AZMAX1(trcp_salml(idsp_CaH2PO4,0,NY,NX)/BKVLX)
+      PCAPD1=AZMAX1(trcp_salml(idsp_CaHPO4,0,NY,NX)/BKVLX)
+      PCAPH1=AZMAX1(trcp_salml(idsp_HA,0,NY,NX)/BKVLX)
     ELSE
       PALPO1=0._r8
       PFEPO1=0._r8

@@ -519,20 +519,20 @@ module ErosionMod
 !       :PCPM,PCPD,PCPH=precip CaH2PO4,CaHPO4,apatite in non-band
 !       :PCPMB,PCPDB,PCPHB=precip CaH2PO4,CaHPO4,apatite in band
 !
-              PALOER(N,2,N5,N4)=FSEDER*PALOH(NU(N2,N1),N2,N1)
-              PFEOER(N,2,N5,N4)=FSEDER*PFEOH(NU(N2,N1),N2,N1)
-              PCACER(N,2,N5,N4)=FSEDER*PCACO(NU(N2,N1),N2,N1)
-              PCASER(N,2,N5,N4)=FSEDER*PCASO(NU(N2,N1),N2,N1)
-              PALPER(N,2,N5,N4)=FSEDER*PALPO(NU(N2,N1),N2,N1)
-              PFEPER(N,2,N5,N4)=FSEDER*PFEPO(NU(N2,N1),N2,N1)
-              PCPDER(N,2,N5,N4)=FSEDER*PCAPD(NU(N2,N1),N2,N1)
-              PCPHER(N,2,N5,N4)=FSEDER*PCAPH(NU(N2,N1),N2,N1)
-              PCPMER(N,2,N5,N4)=FSEDER*PCAPM(NU(N2,N1),N2,N1)
-              PALPEB(N,2,N5,N4)=FSEDER*PALPB(NU(N2,N1),N2,N1)
-              PFEPEB(N,2,N5,N4)=FSEDER*PFEPB(NU(N2,N1),N2,N1)
-              PCPDEB(N,2,N5,N4)=FSEDER*PCPDB(NU(N2,N1),N2,N1)
-              PCPHEB(N,2,N5,N4)=FSEDER*PCPHB(NU(N2,N1),N2,N1)
-              PCPMEB(N,2,N5,N4)=FSEDER*PCPMB(NU(N2,N1),N2,N1)
+              PALOER(N,2,N5,N4)=FSEDER*trcp_salml(idsp_AlOH3,NU(N2,N1),N2,N1)
+              PFEOER(N,2,N5,N4)=FSEDER*trcp_salml(idsp_FeOH3,NU(N2,N1),N2,N1)
+              PCACER(N,2,N5,N4)=FSEDER*trcp_salml(idsp_CaCO3,NU(N2,N1),N2,N1)
+              PCASER(N,2,N5,N4)=FSEDER*trcp_salml(idsp_CaSO4,NU(N2,N1),N2,N1)
+              PALPER(N,2,N5,N4)=FSEDER*trcp_salml(idsp_AlPO4,NU(N2,N1),N2,N1)
+              PFEPER(N,2,N5,N4)=FSEDER*trcp_salml(idsp_FePO4,NU(N2,N1),N2,N1)
+              PCPDER(N,2,N5,N4)=FSEDER*trcp_salml(idsp_CaHPO4,NU(N2,N1),N2,N1)
+              PCPHER(N,2,N5,N4)=FSEDER*trcp_salml(idsp_HA,NU(N2,N1),N2,N1)
+              PCPMER(N,2,N5,N4)=FSEDER*trcp_salml(idsp_CaH2PO4,NU(N2,N1),N2,N1)
+              PALPEB(N,2,N5,N4)=FSEDER*trcp_salml(idsp_AlPO4B,NU(N2,N1),N2,N1)
+              PFEPEB(N,2,N5,N4)=FSEDER*trcp_salml(idsp_FePO4B,NU(N2,N1),N2,N1)
+              PCPDEB(N,2,N5,N4)=FSEDER*trcp_salml(idsp_CaHPO4B,NU(N2,N1),N2,N1)
+              PCPHEB(N,2,N5,N4)=FSEDER*trcp_salml(idsp_HAB,NU(N2,N1),N2,N1)
+              PCPMEB(N,2,N5,N4)=FSEDER*trcp_salml(idsp_CaH2PO4B,NU(N2,N1),N2,N1)
 !
 !     ORGANIC MATTER
 !
@@ -745,20 +745,20 @@ module ErosionMod
 !       :PCPM,PCPD,PCPH=precip CaH2PO4,CaHPO4,apatite in non-band
 !       :PCPMB,PCPDB,PCPHB=precip CaH2PO4,CaHPO4,apatite in band
 !
-                PALOER(N,1,N5B,N4B)=FSEDER*PALOH(NU(N2,N1),N2,N1)
-                PFEOER(N,1,N5B,N4B)=FSEDER*PFEOH(NU(N2,N1),N2,N1)
-                PCACER(N,1,N5B,N4B)=FSEDER*PCACO(NU(N2,N1),N2,N1)
-                PCASER(N,1,N5B,N4B)=FSEDER*PCASO(NU(N2,N1),N2,N1)
-                PALPER(N,1,N5B,N4B)=FSEDER*PALPO(NU(N2,N1),N2,N1)
-                PFEPER(N,1,N5B,N4B)=FSEDER*PFEPO(NU(N2,N1),N2,N1)
-                PCPDER(N,1,N5B,N4B)=FSEDER*PCAPD(NU(N2,N1),N2,N1)
-                PCPHER(N,1,N5B,N4B)=FSEDER*PCAPH(NU(N2,N1),N2,N1)
-                PCPMER(N,1,N5B,N4B)=FSEDER*PCAPM(NU(N2,N1),N2,N1)
-                PALPEB(N,1,N5B,N4B)=FSEDER*PALPB(NU(N2,N1),N2,N1)
-                PFEPEB(N,1,N5B,N4B)=FSEDER*PFEPB(NU(N2,N1),N2,N1)
-                PCPDEB(N,1,N5B,N4B)=FSEDER*PCPDB(NU(N2,N1),N2,N1)
-                PCPHEB(N,1,N5B,N4B)=FSEDER*PCPHB(NU(N2,N1),N2,N1)
-                PCPMEB(N,1,N5B,N4B)=FSEDER*PCPMB(NU(N2,N1),N2,N1)
+                PALOER(N,1,N5B,N4B)=FSEDER*trcp_salml(idsp_AlOH3,NU(N2,N1),N2,N1)
+                PFEOER(N,1,N5B,N4B)=FSEDER*trcp_salml(idsp_FeOH3,NU(N2,N1),N2,N1)
+                PCACER(N,1,N5B,N4B)=FSEDER*trcp_salml(idsp_CaCO3,NU(N2,N1),N2,N1)
+                PCASER(N,1,N5B,N4B)=FSEDER*trcp_salml(idsp_CaSO4,NU(N2,N1),N2,N1)
+                PALPER(N,1,N5B,N4B)=FSEDER*trcp_salml(idsp_AlPO4,NU(N2,N1),N2,N1)
+                PFEPER(N,1,N5B,N4B)=FSEDER*trcp_salml(idsp_FePO4,NU(N2,N1),N2,N1)
+                PCPDER(N,1,N5B,N4B)=FSEDER*trcp_salml(idsp_CaHPO4,NU(N2,N1),N2,N1)
+                PCPHER(N,1,N5B,N4B)=FSEDER*trcp_salml(idsp_HA,NU(N2,N1),N2,N1)
+                PCPMER(N,1,N5B,N4B)=FSEDER*trcp_salml(idsp_CaH2PO4,NU(N2,N1),N2,N1)
+                PALPEB(N,1,N5B,N4B)=FSEDER*trcp_salml(idsp_AlPO4B,NU(N2,N1),N2,N1)
+                PFEPEB(N,1,N5B,N4B)=FSEDER*trcp_salml(idsp_FePO4B,NU(N2,N1),N2,N1)
+                PCPDEB(N,1,N5B,N4B)=FSEDER*trcp_salml(idsp_CaHPO4B,NU(N2,N1),N2,N1)
+                PCPHEB(N,1,N5B,N4B)=FSEDER*trcp_salml(idsp_HAB,NU(N2,N1),N2,N1)
+                PCPMEB(N,1,N5B,N4B)=FSEDER*trcp_salml(idsp_CaH2PO4B,NU(N2,N1),N2,N1)
 !
 !     ORGANIC MATTER
 !
@@ -1136,20 +1136,20 @@ module ErosionMod
 !
 !     PRECIPITATES
 !
-              PALOER(N,NN,M5,M4)=FSEDER*PALOH(NU(N2,N1),N2,N1)
-              PFEOER(N,NN,M5,M4)=FSEDER*PFEOH(NU(N2,N1),N2,N1)
-              PCACER(N,NN,M5,M4)=FSEDER*PCACO(NU(N2,N1),N2,N1)
-              PCASER(N,NN,M5,M4)=FSEDER*PCASO(NU(N2,N1),N2,N1)
-              PALPER(N,NN,M5,M4)=FSEDER*PALPO(NU(N2,N1),N2,N1)
-              PFEPER(N,NN,M5,M4)=FSEDER*PFEPO(NU(N2,N1),N2,N1)
-              PCPDER(N,NN,M5,M4)=FSEDER*PCAPD(NU(N2,N1),N2,N1)
-              PCPHER(N,NN,M5,M4)=FSEDER*PCAPH(NU(N2,N1),N2,N1)
-              PCPMER(N,NN,M5,M4)=FSEDER*PCAPM(NU(N2,N1),N2,N1)
-              PALPEB(N,NN,M5,M4)=FSEDER*PALPB(NU(N2,N1),N2,N1)
-              PFEPEB(N,NN,M5,M4)=FSEDER*PFEPB(NU(N2,N1),N2,N1)
-              PCPDEB(N,NN,M5,M4)=FSEDER*PCPDB(NU(N2,N1),N2,N1)
-              PCPHEB(N,NN,M5,M4)=FSEDER*PCPHB(NU(N2,N1),N2,N1)
-              PCPMEB(N,NN,M5,M4)=FSEDER*PCPMB(NU(N2,N1),N2,N1)
+              PALOER(N,NN,M5,M4)=FSEDER*trcp_salml(idsp_AlOH3,NU(N2,N1),N2,N1)
+              PFEOER(N,NN,M5,M4)=FSEDER*trcp_salml(idsp_FeOH3,NU(N2,N1),N2,N1)
+              PCACER(N,NN,M5,M4)=FSEDER*trcp_salml(idsp_CaCO3,NU(N2,N1),N2,N1)
+              PCASER(N,NN,M5,M4)=FSEDER*trcp_salml(idsp_CaSO4,NU(N2,N1),N2,N1)
+              PALPER(N,NN,M5,M4)=FSEDER*trcp_salml(idsp_AlPO4,NU(N2,N1),N2,N1)
+              PFEPER(N,NN,M5,M4)=FSEDER*trcp_salml(idsp_FePO4,NU(N2,N1),N2,N1)
+              PCPDER(N,NN,M5,M4)=FSEDER*trcp_salml(idsp_CaHPO4,NU(N2,N1),N2,N1)
+              PCPHER(N,NN,M5,M4)=FSEDER*trcp_salml(idsp_HA,NU(N2,N1),N2,N1)
+              PCPMER(N,NN,M5,M4)=FSEDER*trcp_salml(idsp_CaH2PO4,NU(N2,N1),N2,N1)
+              PALPEB(N,NN,M5,M4)=FSEDER*trcp_salml(idsp_AlPO4B,NU(N2,N1),N2,N1)
+              PFEPEB(N,NN,M5,M4)=FSEDER*trcp_salml(idsp_FePO4B,NU(N2,N1),N2,N1)
+              PCPDEB(N,NN,M5,M4)=FSEDER*trcp_salml(idsp_CaHPO4B,NU(N2,N1),N2,N1)
+              PCPHEB(N,NN,M5,M4)=FSEDER*trcp_salml(idsp_HAB,NU(N2,N1),N2,N1)
+              PCPMEB(N,NN,M5,M4)=FSEDER*trcp_salml(idsp_CaH2PO4B,NU(N2,N1),N2,N1)
 !
 !     ORGANIC MATTER
 !

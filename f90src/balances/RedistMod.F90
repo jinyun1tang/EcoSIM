@@ -617,11 +617,11 @@ module RedistMod
   XOH2(0,NY,NX)=XOH2(0,NY,NX)+TRXH2(0,NY,NX)
   XH1P(0,NY,NX)=XH1P(0,NY,NX)+TRX1P(0,NY,NX)
   XH2P(0,NY,NX)=XH2P(0,NY,NX)+TRX2P(0,NY,NX)
-  PALPO(0,NY,NX)=PALPO(0,NY,NX)+TRALPO(0,NY,NX)
-  PFEPO(0,NY,NX)=PFEPO(0,NY,NX)+TRFEPO(0,NY,NX)
-  PCAPD(0,NY,NX)=PCAPD(0,NY,NX)+TRCAPD(0,NY,NX)
-  PCAPH(0,NY,NX)=PCAPH(0,NY,NX)+TRCAPH(0,NY,NX)
-  PCAPM(0,NY,NX)=PCAPM(0,NY,NX)+TRCAPM(0,NY,NX)
+  trcp_salml(idsp_AlPO4,0,NY,NX)=trcp_salml(idsp_AlPO4,0,NY,NX)+TRALPO(0,NY,NX)
+  trcp_salml(idsp_FePO4,0,NY,NX)=trcp_salml(idsp_FePO4,0,NY,NX)+TRFEPO(0,NY,NX)
+  trcp_salml(idsp_CaHPO4,0,NY,NX)=trcp_salml(idsp_CaHPO4,0,NY,NX)+TRCAPD(0,NY,NX)
+  trcp_salml(idsp_HA,0,NY,NX)=trcp_salml(idsp_HA,0,NY,NX)+TRCAPH(0,NY,NX)
+  trcp_salml(idsp_CaH2PO4,0,NY,NX)=trcp_salml(idsp_CaH2PO4,0,NY,NX)+TRCAPM(0,NY,NX)
   !  !
 
   end subroutine HandleSurfaceBoundary
@@ -768,20 +768,20 @@ module RedistMod
 !
     !     PRECIPITATES
 !
-    PALOH(NU(NY,NX),NY,NX)=PALOH(NU(NY,NX),NY,NX)+TALOER(NY,NX)
-    PFEOH(NU(NY,NX),NY,NX)=PFEOH(NU(NY,NX),NY,NX)+TFEOER(NY,NX)
-    PCACO(NU(NY,NX),NY,NX)=PCACO(NU(NY,NX),NY,NX)+TCACER(NY,NX)
-    PCASO(NU(NY,NX),NY,NX)=PCASO(NU(NY,NX),NY,NX)+TCASER(NY,NX)
-    PALPO(NU(NY,NX),NY,NX)=PALPO(NU(NY,NX),NY,NX)+TALPER(NY,NX)
-    PFEPO(NU(NY,NX),NY,NX)=PFEPO(NU(NY,NX),NY,NX)+TFEPER(NY,NX)
-    PCAPD(NU(NY,NX),NY,NX)=PCAPD(NU(NY,NX),NY,NX)+TCPDER(NY,NX)
-    PCAPH(NU(NY,NX),NY,NX)=PCAPH(NU(NY,NX),NY,NX)+TCPHER(NY,NX)
-    PCAPM(NU(NY,NX),NY,NX)=PCAPM(NU(NY,NX),NY,NX)+TCPMER(NY,NX)
-    PALPB(NU(NY,NX),NY,NX)=PALPB(NU(NY,NX),NY,NX)+TALPEB(NY,NX)
-    PFEPB(NU(NY,NX),NY,NX)=PFEPB(NU(NY,NX),NY,NX)+TFEPEB(NY,NX)
-    PCPDB(NU(NY,NX),NY,NX)=PCPDB(NU(NY,NX),NY,NX)+TCPDEB(NY,NX)
-    PCPHB(NU(NY,NX),NY,NX)=PCPHB(NU(NY,NX),NY,NX)+TCPHEB(NY,NX)
-    PCPMB(NU(NY,NX),NY,NX)=PCPMB(NU(NY,NX),NY,NX)+TCPMEB(NY,NX)
+    trcp_salml(idsp_AlOH3,NU(NY,NX),NY,NX)=trcp_salml(idsp_AlOH3,NU(NY,NX),NY,NX)+TALOER(NY,NX)
+    trcp_salml(idsp_FeOH3,NU(NY,NX),NY,NX)=trcp_salml(idsp_FeOH3,NU(NY,NX),NY,NX)+TFEOER(NY,NX)
+    trcp_salml(idsp_CaCO3,NU(NY,NX),NY,NX)=trcp_salml(idsp_CaCO3,NU(NY,NX),NY,NX)+TCACER(NY,NX)
+    trcp_salml(idsp_CaSO4,NU(NY,NX),NY,NX)=trcp_salml(idsp_CaSO4,NU(NY,NX),NY,NX)+TCASER(NY,NX)
+    trcp_salml(idsp_AlPO4,NU(NY,NX),NY,NX)=trcp_salml(idsp_AlPO4,NU(NY,NX),NY,NX)+TALPER(NY,NX)
+    trcp_salml(idsp_FePO4,NU(NY,NX),NY,NX)=trcp_salml(idsp_FePO4,NU(NY,NX),NY,NX)+TFEPER(NY,NX)
+    trcp_salml(idsp_CaHPO4,NU(NY,NX),NY,NX)=trcp_salml(idsp_CaHPO4,NU(NY,NX),NY,NX)+TCPDER(NY,NX)
+    trcp_salml(idsp_HA,NU(NY,NX),NY,NX)=trcp_salml(idsp_HA,NU(NY,NX),NY,NX)+TCPHER(NY,NX)
+    trcp_salml(idsp_CaH2PO4,NU(NY,NX),NY,NX)=trcp_salml(idsp_CaH2PO4,NU(NY,NX),NY,NX)+TCPMER(NY,NX)
+    trcp_salml(idsp_AlPO4B,NU(NY,NX),NY,NX)=trcp_salml(idsp_AlPO4B,NU(NY,NX),NY,NX)+TALPEB(NY,NX)
+    trcp_salml(idsp_FePO4B,NU(NY,NX),NY,NX)=trcp_salml(idsp_FePO4B,NU(NY,NX),NY,NX)+TFEPEB(NY,NX)
+    trcp_salml(idsp_CaHPO4B,NU(NY,NX),NY,NX)=trcp_salml(idsp_CaHPO4B,NU(NY,NX),NY,NX)+TCPDEB(NY,NX)
+    trcp_salml(idsp_HAB,NU(NY,NX),NY,NX)=trcp_salml(idsp_HAB,NU(NY,NX),NY,NX)+TCPHEB(NY,NX)
+    trcp_salml(idsp_CaH2PO4B,NU(NY,NX),NY,NX)=trcp_salml(idsp_CaH2PO4B,NU(NY,NX),NY,NX)+TCPMEB(NY,NX)
 !
     !   ORGANIC CONSTITUENTS
 !
@@ -986,9 +986,9 @@ module RedistMod
   UNO3(NY,NX)=UNO3(NY,NX)+ZOS
   POS=trc_solml(ids_H1PO4,0,NY,NX)+trc_solml(ids_H2PO4,0,NY,NX)
   POX=patomw*(XH1P(0,NY,NX)+XH2P(0,NY,NX))
-  POP=patomw*(PALPO(0,NY,NX)+PFEPO(0,NY,NX) &
-    +PCAPD(0,NY,NX))+2._r8*patomw*PCAPM(0,NY,NX) &
-    +3._r8*patomw*PCAPH(0,NY,NX)
+  POP=patomw*(trcp_salml(idsp_AlPO4,0,NY,NX)+trcp_salml(idsp_FePO4,0,NY,NX) &
+    +trcp_salml(idsp_CaHPO4,0,NY,NX))+2._r8*patomw*trcp_salml(idsp_CaH2PO4,0,NY,NX) &
+    +3._r8*patomw*trcp_salml(idsp_HA,0,NY,NX)
   TLPO4=TLPO4+POS+POX+POP
   UPO4(NY,NX)=UPO4(NY,NX)+POX
   UPP4(NY,NX)=UPP4(NY,NX)+POP
@@ -1259,16 +1259,16 @@ module RedistMod
     !
     !     PRECIPITATES FROM PRECIPITATION-DISSOLUTION REACTIONS
     !
-    PALPO(L,NY,NX)=PALPO(L,NY,NX)+TRALPO(L,NY,NX)
-    PFEPO(L,NY,NX)=PFEPO(L,NY,NX)+TRFEPO(L,NY,NX)
-    PCAPD(L,NY,NX)=PCAPD(L,NY,NX)+TRCAPD(L,NY,NX)
-    PCAPH(L,NY,NX)=PCAPH(L,NY,NX)+TRCAPH(L,NY,NX)
-    PCAPM(L,NY,NX)=PCAPM(L,NY,NX)+TRCAPM(L,NY,NX)
-    PALPB(L,NY,NX)=PALPB(L,NY,NX)+TRALPB(L,NY,NX)
-    PFEPB(L,NY,NX)=PFEPB(L,NY,NX)+TRFEPB(L,NY,NX)
-    PCPDB(L,NY,NX)=PCPDB(L,NY,NX)+TRCPDB(L,NY,NX)
-    PCPHB(L,NY,NX)=PCPHB(L,NY,NX)+TRCPHB(L,NY,NX)
-    PCPMB(L,NY,NX)=PCPMB(L,NY,NX)+TRCPMB(L,NY,NX)
+    trcp_salml(idsp_AlPO4,L,NY,NX)=trcp_salml(idsp_AlPO4,L,NY,NX)+TRALPO(L,NY,NX)
+    trcp_salml(idsp_FePO4,L,NY,NX)=trcp_salml(idsp_FePO4,L,NY,NX)+TRFEPO(L,NY,NX)
+    trcp_salml(idsp_CaHPO4,L,NY,NX)=trcp_salml(idsp_CaHPO4,L,NY,NX)+TRCAPD(L,NY,NX)
+    trcp_salml(idsp_HA,L,NY,NX)=trcp_salml(idsp_HA,L,NY,NX)+TRCAPH(L,NY,NX)
+    trcp_salml(idsp_CaH2PO4,L,NY,NX)=trcp_salml(idsp_CaH2PO4,L,NY,NX)+TRCAPM(L,NY,NX)
+    trcp_salml(idsp_AlPO4B,L,NY,NX)=trcp_salml(idsp_AlPO4B,L,NY,NX)+TRALPB(L,NY,NX)
+    trcp_salml(idsp_FePO4B,L,NY,NX)=trcp_salml(idsp_FePO4B,L,NY,NX)+TRFEPB(L,NY,NX)
+    trcp_salml(idsp_CaHPO4B,L,NY,NX)=trcp_salml(idsp_CaHPO4B,L,NY,NX)+TRCPDB(L,NY,NX)
+    trcp_salml(idsp_HAB,L,NY,NX)=trcp_salml(idsp_HAB,L,NY,NX)+TRCPHB(L,NY,NX)
+    trcp_salml(idsp_CaH2PO4B,L,NY,NX)=trcp_salml(idsp_CaH2PO4B,L,NY,NX)+TRCPMB(L,NY,NX)
     !
     !     MACROPORE SOLUTES FROM MACROPORE-MICROPORE EXCHANGE
     !
@@ -1444,10 +1444,10 @@ module RedistMod
       +trc_solml(ids_H1PO4B,L,NY,NX)+trc_soHml(ids_H1PO4B,L,NY,NX)
     POX=patomw*(XH1P(L,NY,NX)+XH2P(L,NY,NX) &
       +XH1PB(L,NY,NX)+XH2PB(L,NY,NX))
-    POP=patomw*(PALPO(L,NY,NX)+PFEPO(L,NY,NX)+PCAPD(L,NY,NX) &
-      +PALPB(L,NY,NX)+PFEPB(L,NY,NX)+PCPDB(L,NY,NX)) &
-      +2._r8*patomw*(PCAPM(L,NY,NX)+PCPMB(L,NY,NX)) &
-      +3._r8*patomw*(PCAPH(L,NY,NX)+PCPHB(L,NY,NX))
+    POP=patomw*(trcp_salml(idsp_AlPO4,L,NY,NX)+trcp_salml(idsp_FePO4,L,NY,NX)+trcp_salml(idsp_CaHPO4,L,NY,NX) &
+      +trcp_salml(idsp_AlPO4B,L,NY,NX)+trcp_salml(idsp_FePO4B,L,NY,NX)+trcp_salml(idsp_CaHPO4B,L,NY,NX)) &
+      +2._r8*patomw*(trcp_salml(idsp_CaH2PO4,L,NY,NX)+trcp_salml(idsp_CaH2PO4B,L,NY,NX)) &
+      +3._r8*patomw*(trcp_salml(idsp_HA,L,NY,NX)+trcp_salml(idsp_HAB,L,NY,NX))
     TLPO4=TLPO4+POS+POX+POP
     UPO4(NY,NX)=UPO4(NY,NX)+POX
     UPP4(NY,NX)=UPP4(NY,NX)+POP
@@ -1591,10 +1591,10 @@ module RedistMod
   XHC(L,NY,NX)=XHC(L,NY,NX)+TRXHC(L,NY,NX)
   XALO2(L,NY,NX)=XALO2(L,NY,NX)+TRXAL2(L,NY,NX)
   XFEO2(L,NY,NX)=XFEO2(L,NY,NX)+TRXFE2(L,NY,NX)
-  PALOH(L,NY,NX)=PALOH(L,NY,NX)+TRALOH(L,NY,NX)
-  PFEOH(L,NY,NX)=PFEOH(L,NY,NX)+TRFEOH(L,NY,NX)
-  PCACO(L,NY,NX)=PCACO(L,NY,NX)+TRCACO(L,NY,NX)
-  PCASO(L,NY,NX)=PCASO(L,NY,NX)+TRCASO(L,NY,NX)
+  trcp_salml(idsp_AlOH3,L,NY,NX)=trcp_salml(idsp_AlOH3,L,NY,NX)+TRALOH(L,NY,NX)
+  trcp_salml(idsp_FeOH3,L,NY,NX)=trcp_salml(idsp_FeOH3,L,NY,NX)+TRFEOH(L,NY,NX)
+  trcp_salml(idsp_CaCO3,L,NY,NX)=trcp_salml(idsp_CaCO3,L,NY,NX)+TRCACO(L,NY,NX)
+  trcp_salml(idsp_CaSO4,L,NY,NX)=trcp_salml(idsp_CaSO4,L,NY,NX)+TRCASO(L,NY,NX)
 
   PSS=patomw*(trcsa_solml(idsa_H0PO4,L,NY,NX)+trcsa_solml(idsa_H3PO4,L,NY,NX) &
     +trcsa_solml(idsa_FeHPO4,L,NY,NX) &
@@ -1685,13 +1685,13 @@ module RedistMod
     +XOH2(L,NY,NX)+XOH2B(L,NY,NX) &
     +XH1P(L,NY,NX)+XH1PB(L,NY,NX)) &
     +4.0_r8*(XH2P(L,NY,NX)+XH2PB(L,NY,NX))
-  SSP=2.0_r8*(PCACO(L,NY,NX)+PCASO(L,NY,NX) &
-    +PALPO(L,NY,NX)+PFEPO(L,NY,NX) &
-    +PALPB(L,NY,NX)+PFEPB(L,NY,NX)) &
-    +3.0_r8*(PCAPD(L,NY,NX)+PCPDB(L,NY,NX)) &
-    +4.0_r8*(PALOH(L,NY,NX)+PFEOH(L,NY,NX)) &
-    +7.0_r8*(PCAPM(L,NY,NX)+PCPMB(L,NY,NX)) &
-    +9.0_r8*(PCAPH(L,NY,NX)+PCPHB(L,NY,NX))
+  SSP=2.0_r8*(trcp_salml(idsp_CaCO3,L,NY,NX)+trcp_salml(idsp_CaSO4,L,NY,NX) &
+    +trcp_salml(idsp_AlPO4,L,NY,NX)+trcp_salml(idsp_FePO4,L,NY,NX) &
+    +trcp_salml(idsp_AlPO4B,L,NY,NX)+trcp_salml(idsp_FePO4B,L,NY,NX)) &
+    +3.0_r8*(trcp_salml(idsp_CaHPO4,L,NY,NX)+trcp_salml(idsp_CaHPO4B,L,NY,NX)) &
+    +4.0_r8*(trcp_salml(idsp_AlOH3,L,NY,NX)+trcp_salml(idsp_FeOH3,L,NY,NX)) &
+    +7.0_r8*(trcp_salml(idsp_CaH2PO4,L,NY,NX)+trcp_salml(idsp_CaH2PO4B,L,NY,NX)) &
+    +9.0_r8*(trcp_salml(idsp_HA,L,NY,NX)+trcp_salml(idsp_HAB,L,NY,NX))
   SST=SSS+SSH+SSF+SSX+SSP
   TION=TION+SST
   UION(NY,NX)=UION(NY,NX)+SST

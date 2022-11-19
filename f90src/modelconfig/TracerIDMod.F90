@@ -80,6 +80,22 @@ implicit none
   integer :: idsab_beg
   integer :: idsab_end
 
+! precipitated tracers
+  integer :: idsp_beg,idsp_end
+  integer :: idsp_CaHPO4 !
+  integer :: idsp_HA     !hydroxyapatite
+  integer :: idsp_AlOH3  !
+  integer :: idsp_FeOH3  !
+  integer :: idsp_CaCO3  !
+  integer :: idsp_CaSO4
+  integer :: idsp_AlPO4
+  integer :: idsp_FePO4
+  integer :: idsp_CaH2PO4
+  integer :: idsp_CaHPO4B
+  integer :: idsp_HAB
+  integer :: idsp_AlPO4B
+  integer :: idsp_FePO4B
+  integer :: idsp_CaH2PO4B
   contains
 
   subroutine InitTracerIDs(lsalt_model)
@@ -164,7 +180,46 @@ implicit none
     idsa_CaH2PO4B=addone(idsab_end) ! CaH2PO4
     idsa_MgHPO4B =addone(idsab_end)! MgHPO4
     idsab_end=idsa_MgHPO4B
+
+
+
+    idsp_beg=1
+    idsp_end=0;
+    idsp_CaHPO4=addone(idsp_end) !
+    idsp_HA   =addone(idsp_end)     !hydroxyapatite
+    idsp_AlOH3=addone(idsp_end)  !
+    idsp_FeOH3=addone(idsp_end) !
+    idsp_CaCO3=addone(idsp_end) !
+    idsp_CaSO4=addone(idsp_end)
+    idsp_AlPO4=addone(idsp_end)
+    idsp_FePO4=addone(idsp_end)
+    idsp_CaH2PO4=addone(idsp_end)
+    idsp_HAB  =addone(idsp_end)
+    idsp_AlPO4B=addone(idsp_end)
+    idsp_FePO4B=addone(idsp_end)
+    idsp_CaHPO4B=addone(idsp_end)
+    idsp_CaH2PO4B=addone(idsp_end)
+    idsp_end=idsp_CaH2PO4B
+
   else
+!  double check
+    idsp_beg=1
+    idsp_end=0;
+    idsp_CaHPO4=addone(idsp_end) !
+    idsp_HA   =addone(idsp_end)     !hydroxyapatite
+    idsp_AlOH3=addone(idsp_end)  !
+    idsp_FeOH3=addone(idsp_end) !
+    idsp_CaCO3=addone(idsp_end) !
+    idsp_CaSO4=addone(idsp_end)
+    idsp_AlPO4=addone(idsp_end)
+    idsp_FePO4=addone(idsp_end)
+    idsp_CaH2PO4=addone(idsp_end)
+    idsp_HAB  =addone(idsp_end)
+    idsp_AlPO4B=addone(idsp_end)
+    idsp_FePO4B=addone(idsp_end)
+    idsp_CaHPO4B=addone(idsp_end)
+    idsp_CaH2PO4B=addone(idsp_end)
+    idsp_end=idsp_CaH2PO4B
 
   endif
   end subroutine InitTracerIDs
