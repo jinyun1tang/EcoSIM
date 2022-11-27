@@ -671,7 +671,7 @@ implicit none
   real(r8), intent(in) :: FX,FY
   real(r8), intent(inout) :: CDPTHY(0:JZ,JY,JX)
   integer, intent(in) ::  IFLGL(0:JZ,6)
-  integer :: N,M,NZ,K,NGL,NR,NE,NTU,NTSA,NTSAB,NTG
+  integer :: N,M,NZ,K,NGL,NR,NE,NTU,NTSA,NTSAB,NTG,NTP
   real(r8) :: ENGY0,ENGY1
 ! begin_execution
 
@@ -752,20 +752,11 @@ implicit none
     XOH2B(L1,NY,NX)=XOH2B(L1,NY,NX)+FX*XOH2B(L0,NY,NX)
     XH1PB(L1,NY,NX)=XH1PB(L1,NY,NX)+FX*XH1PB(L0,NY,NX)
     XH2PB(L1,NY,NX)=XH2PB(L1,NY,NX)+FX*XH2PB(L0,NY,NX)
-    trcp_salml(idsp_AlOH3,L1,NY,NX)=trcp_salml(idsp_AlOH3,L1,NY,NX)+FX*trcp_salml(idsp_AlOH3,L0,NY,NX)
-    trcp_salml(idsp_FeOH3,L1,NY,NX)=trcp_salml(idsp_FeOH3,L1,NY,NX)+FX*trcp_salml(idsp_FeOH3,L0,NY,NX)
-    trcp_salml(idsp_CaCO3,L1,NY,NX)=trcp_salml(idsp_CaCO3,L1,NY,NX)+FX*trcp_salml(idsp_CaCO3,L0,NY,NX)
-    trcp_salml(idsp_CaSO4,L1,NY,NX)=trcp_salml(idsp_CaSO4,L1,NY,NX)+FX*trcp_salml(idsp_CaSO4,L0,NY,NX)
-    trcp_salml(idsp_AlPO4,L1,NY,NX)=trcp_salml(idsp_AlPO4,L1,NY,NX)+FX*trcp_salml(idsp_AlPO4,L0,NY,NX)
-    trcp_salml(idsp_FePO4,L1,NY,NX)=trcp_salml(idsp_FePO4,L1,NY,NX)+FX*trcp_salml(idsp_FePO4,L0,NY,NX)
-    trcp_salml(idsp_CaHPO4,L1,NY,NX)=trcp_salml(idsp_CaHPO4,L1,NY,NX)+FX*trcp_salml(idsp_CaHPO4,L0,NY,NX)
-    trcp_salml(idsp_HA,L1,NY,NX)=trcp_salml(idsp_HA,L1,NY,NX)+FX*trcp_salml(idsp_HA,L0,NY,NX)
-    trcp_salml(idsp_CaH2PO4,L1,NY,NX)=trcp_salml(idsp_CaH2PO4,L1,NY,NX)+FX*trcp_salml(idsp_CaH2PO4,L0,NY,NX)
-    trcp_salml(idsp_AlPO4B,L1,NY,NX)=trcp_salml(idsp_AlPO4B,L1,NY,NX)+FX*trcp_salml(idsp_AlPO4B,L0,NY,NX)
-    trcp_salml(idsp_FePO4B,L1,NY,NX)=trcp_salml(idsp_FePO4B,L1,NY,NX)+FX*trcp_salml(idsp_FePO4B,L0,NY,NX)
-    trcp_salml(idsp_CaHPO4B,L1,NY,NX)=trcp_salml(idsp_CaHPO4B,L1,NY,NX)+FX*trcp_salml(idsp_CaHPO4B,L0,NY,NX)
-    trcp_salml(idsp_HAB,L1,NY,NX)=trcp_salml(idsp_HAB,L1,NY,NX)+FX*trcp_salml(idsp_HAB,L0,NY,NX)
-    trcp_salml(idsp_CaH2PO4B,L1,NY,NX)=trcp_salml(idsp_CaH2PO4B,L1,NY,NX)+FX*trcp_salml(idsp_CaH2PO4B,L0,NY,NX)
+
+    DO NTP=idsp_beg,idsp_end
+      trcp_salml(NTP,L1,NY,NX)=trcp_salml(NTP,L1,NY,NX)+FX*trcp_salml(NTP,L0,NY,NX)
+    ENDDO
+
     DO NTG=idg_beg,idg_end-1
       trc_gasml(NTG,L1,NY,NX)=trc_gasml(NTG,L1,NY,NX)+FX*trc_gasml(NTG,L0,NY,NX)
     ENDDO
@@ -962,20 +953,12 @@ implicit none
     XOH2B(L0,NY,NX)=FY*XOH2B(L0,NY,NX)
     XH1PB(L0,NY,NX)=FY*XH1PB(L0,NY,NX)
     XH2PB(L0,NY,NX)=FY*XH2PB(L0,NY,NX)
-    trcp_salml(idsp_AlOH3,L0,NY,NX)=FY*trcp_salml(idsp_AlOH3,L0,NY,NX)
-    trcp_salml(idsp_FeOH3,L0,NY,NX)=FY*trcp_salml(idsp_FeOH3,L0,NY,NX)
-    trcp_salml(idsp_CaCO3,L0,NY,NX)=FY*trcp_salml(idsp_CaCO3,L0,NY,NX)
-    trcp_salml(idsp_CaSO4,L0,NY,NX)=FY*trcp_salml(idsp_CaSO4,L0,NY,NX)
-    trcp_salml(idsp_AlPO4,L0,NY,NX)=FY*trcp_salml(idsp_AlPO4,L0,NY,NX)
-    trcp_salml(idsp_FePO4,L0,NY,NX)=FY*trcp_salml(idsp_FePO4,L0,NY,NX)
-    trcp_salml(idsp_CaHPO4,L0,NY,NX)=FY*trcp_salml(idsp_CaHPO4,L0,NY,NX)
-    trcp_salml(idsp_HA,L0,NY,NX)=FY*trcp_salml(idsp_HA,L0,NY,NX)
-    trcp_salml(idsp_CaH2PO4,L0,NY,NX)=FY*trcp_salml(idsp_CaH2PO4,L0,NY,NX)
-    trcp_salml(idsp_AlPO4B,L0,NY,NX)=FY*trcp_salml(idsp_AlPO4B,L0,NY,NX)
-    trcp_salml(idsp_FePO4B,L0,NY,NX)=FY*trcp_salml(idsp_FePO4B,L0,NY,NX)
-    trcp_salml(idsp_CaHPO4B,L0,NY,NX)=FY*trcp_salml(idsp_CaHPO4B,L0,NY,NX)
-    trcp_salml(idsp_HAB,L0,NY,NX)=FY*trcp_salml(idsp_HAB,L0,NY,NX)
-    trcp_salml(idsp_CaH2PO4B,L0,NY,NX)=FY*trcp_salml(idsp_CaH2PO4B,L0,NY,NX)
+
+    DO NTP=idsp_beg,idsp_end
+      trcp_salml(NTP,L0,NY,NX)=FY*trcp_salml(NTP,L0,NY,NX)
+    ENDDO
+
+
     DO NTG=idg_beg,idg_end-1
       trc_gasml(NTG,L0,NY,NX)=FY*trc_gasml(NTG,L0,NY,NX)
     ENDDO
@@ -1413,8 +1396,8 @@ implicit none
   real(r8) :: FXPCAPD,FXPCAPH,FXPCAPM,FXPALPB,FXPFEPB,FXPCPDB
   real(r8) :: FXPCPHB,FXPCPMB
   real(r8) :: FXH1POB,FXH2POB
-  integer  :: NTSAB
-  real(r8) :: FXB
+  integer  :: NTSAB,NTP
+  real(r8) :: FXB,FXP
 
 ! only phosphrous is considered below because there is no gaseous phase.
   FXH1POB=FWO*trc_solml(ids_H1PO4B,L0,NY,NX)
@@ -1522,48 +1505,12 @@ implicit none
 !
 !     SOIL PRECIPITATES IN BAND, NON-BAND
 !
-  FXPALOH=AMIN1(FX*trcp_salml(idsp_AlOH3,L,NY,NX),trcp_salml(idsp_AlOH3,L0,NY,NX))
-  trcp_salml(idsp_AlOH3,L1,NY,NX)=trcp_salml(idsp_AlOH3,L1,NY,NX)+FXPALOH
-  trcp_salml(idsp_AlOH3,L0,NY,NX)=trcp_salml(idsp_AlOH3,L0,NY,NX)-FXPALOH
-  FXPFEOH=AMIN1(FX*trcp_salml(idsp_FeOH3,L,NY,NX),trcp_salml(idsp_FeOH3,L0,NY,NX))
-  trcp_salml(idsp_FeOH3,L1,NY,NX)=trcp_salml(idsp_FeOH3,L1,NY,NX)+FXPFEOH
-  trcp_salml(idsp_FeOH3,L0,NY,NX)=trcp_salml(idsp_FeOH3,L0,NY,NX)-FXPFEOH
-  FXPCACO=AMIN1(FX*trcp_salml(idsp_CaCO3,L,NY,NX),trcp_salml(idsp_CaCO3,L0,NY,NX))
-  trcp_salml(idsp_CaCO3,L1,NY,NX)=trcp_salml(idsp_CaCO3,L1,NY,NX)+FXPCACO
-  trcp_salml(idsp_CaCO3,L0,NY,NX)=trcp_salml(idsp_CaCO3,L0,NY,NX)-FXPCACO
-  FXPCASO=AMIN1(FX*trcp_salml(idsp_CaSO4,L,NY,NX),trcp_salml(idsp_CaSO4,L0,NY,NX))
-  trcp_salml(idsp_CaSO4,L1,NY,NX)=trcp_salml(idsp_CaSO4,L1,NY,NX)+FXPCASO
-  trcp_salml(idsp_CaSO4,L0,NY,NX)=trcp_salml(idsp_CaSO4,L0,NY,NX)-FXPCASO
-  FXPALPO=AMIN1(FX*trcp_salml(idsp_AlPO4,L,NY,NX),trcp_salml(idsp_AlPO4,L0,NY,NX))
-  trcp_salml(idsp_AlPO4,L1,NY,NX)=trcp_salml(idsp_AlPO4,L1,NY,NX)+FXPALPO
-  trcp_salml(idsp_AlPO4,L0,NY,NX)=trcp_salml(idsp_AlPO4,L0,NY,NX)-FXPALPO
-  FXPFEPO=AMIN1(FX*trcp_salml(idsp_FePO4,L,NY,NX),trcp_salml(idsp_FePO4,L0,NY,NX))
-  trcp_salml(idsp_FePO4,L1,NY,NX)=trcp_salml(idsp_FePO4,L1,NY,NX)+FXPFEPO
-  trcp_salml(idsp_FePO4,L0,NY,NX)=trcp_salml(idsp_FePO4,L0,NY,NX)-FXPFEPO
-  FXPCAPD=AMIN1(FX*trcp_salml(idsp_CaHPO4,L,NY,NX),trcp_salml(idsp_CaHPO4,L0,NY,NX))
-  trcp_salml(idsp_CaHPO4,L1,NY,NX)=trcp_salml(idsp_CaHPO4,L1,NY,NX)+FXPCAPD
-  trcp_salml(idsp_CaHPO4,L0,NY,NX)=trcp_salml(idsp_CaHPO4,L0,NY,NX)-FXPCAPD
-  FXPCAPH=AMIN1(FX*trcp_salml(idsp_HA,L,NY,NX),trcp_salml(idsp_HA,L0,NY,NX))
-  trcp_salml(idsp_HA,L1,NY,NX)=trcp_salml(idsp_HA,L1,NY,NX)+FXPCAPH
-  trcp_salml(idsp_HA,L0,NY,NX)=trcp_salml(idsp_HA,L0,NY,NX)-FXPCAPH
-  FXPCAPM=AMIN1(FX*trcp_salml(idsp_CaH2PO4,L,NY,NX),trcp_salml(idsp_CaH2PO4,L0,NY,NX))
-  trcp_salml(idsp_CaH2PO4,L1,NY,NX)=trcp_salml(idsp_CaH2PO4,L1,NY,NX)+FXPCAPM
-  trcp_salml(idsp_CaH2PO4,L0,NY,NX)=trcp_salml(idsp_CaH2PO4,L0,NY,NX)-FXPCAPM
-  FXPALPB=AMIN1(FX*trcp_salml(idsp_AlPO4B,L,NY,NX),trcp_salml(idsp_AlPO4B,L0,NY,NX))
-  trcp_salml(idsp_AlPO4B,L1,NY,NX)=trcp_salml(idsp_AlPO4B,L1,NY,NX)+FXPALPB
-  trcp_salml(idsp_AlPO4B,L0,NY,NX)=trcp_salml(idsp_AlPO4B,L0,NY,NX)-FXPALPB
-  FXPFEPB=AMIN1(FX*trcp_salml(idsp_FePO4B,L,NY,NX),trcp_salml(idsp_FePO4B,L0,NY,NX))
-  trcp_salml(idsp_FePO4B,L1,NY,NX)=trcp_salml(idsp_FePO4B,L1,NY,NX)+FXPFEPB
-  trcp_salml(idsp_FePO4B,L0,NY,NX)=trcp_salml(idsp_FePO4B,L0,NY,NX)-FXPFEPB
-  FXPCPDB=AMIN1(FX*trcp_salml(idsp_CaHPO4B,L,NY,NX),trcp_salml(idsp_CaHPO4B,L0,NY,NX))
-  trcp_salml(idsp_CaHPO4B,L1,NY,NX)=trcp_salml(idsp_CaHPO4B,L1,NY,NX)+FXPCPDB
-  trcp_salml(idsp_CaHPO4B,L0,NY,NX)=trcp_salml(idsp_CaHPO4B,L0,NY,NX)-FXPCPDB
-  FXPCPHB=AMIN1(FX*trcp_salml(idsp_HAB,L,NY,NX),trcp_salml(idsp_HAB,L0,NY,NX))
-  trcp_salml(idsp_HAB,L1,NY,NX)=trcp_salml(idsp_HAB,L1,NY,NX)+FXPCPHB
-  trcp_salml(idsp_HAB,L0,NY,NX)=trcp_salml(idsp_HAB,L0,NY,NX)-FXPCPHB
-  FXPCPMB=AMIN1(FX*trcp_salml(idsp_CaH2PO4B,L,NY,NX),trcp_salml(idsp_CaH2PO4B,L0,NY,NX))
-  trcp_salml(idsp_CaH2PO4B,L1,NY,NX)=trcp_salml(idsp_CaH2PO4B,L1,NY,NX)+FXPCPMB
-  trcp_salml(idsp_CaH2PO4B,L0,NY,NX)=trcp_salml(idsp_CaH2PO4B,L0,NY,NX)-FXPCPMB
+  DO NTP=idsp_beg,idsp_end
+    FXP=AMIN1(FX*trcp_salml(NTP,L,NY,NX),trcp_salml(NTP,L0,NY,NX))
+    trcp_salml(NTP,L1,NY,NX)=trcp_salml(NTP,L1,NY,NX)+FXP
+    trcp_salml(NTP,L0,NY,NX)=trcp_salml(NTP,L0,NY,NX)-FXP
+  ENDDO
+
 
   end subroutine MoveBandSolute
 
@@ -1575,8 +1522,6 @@ implicit none
   integer, intent(in) :: L0,L1,NY,NX
   real(r8), intent(in) :: FX,FWO
 
-  real(r8) :: FXH2GS,FXCO2G,FXCH4G,FXOXYG,FXZ2GG,FXZ2OG
-  real(r8) :: FXZNH3G,FXH2GG,FXCO2S,FXCH4S,FXOXYS,FXZ2GS,FXZ2OS
   real(r8) :: FXG
   integer  :: NTG
 !

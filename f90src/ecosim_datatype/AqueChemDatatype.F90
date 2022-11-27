@@ -33,55 +33,6 @@ module AqueChemDatatype
   real(r8),target,allocatable ::  GKCK(:,:,:)                        !Ca-K Gapon selectivity coefficient, [-]
 
   real(r8),target,allocatable :: trcsa_solml(:,:,:,:)                !soil aqueous salt content micropre, [mol d-2]
-  real(r8),target,allocatable ::  ZAL(:,:,:)                         !soil aqueous Al content micropore, [mol d-2]
-  real(r8),target,allocatable ::  ZFE(:,:,:)                         !soil aqueous Fe content micropore, [mol d-2]
-  real(r8),target,allocatable ::  ZHY(:,:,:)                         !soil aqueous H content micropore, [mol d-2]
-  real(r8),target,allocatable ::  ZCA(:,:,:)                         !soil aqueous Ca content micropore, [mol d-2]
-  real(r8),target,allocatable ::  ZMG(:,:,:)                         !soil aqueous Mg content micropore, [mol d-2]
-  real(r8),target,allocatable ::  ZNA(:,:,:)                         !soil aqueous Na content micropore, [mol d-2]
-  real(r8),target,allocatable ::  ZKA(:,:,:)                         !soil aqueous K content micropore, [mol d-2]
-  real(r8),target,allocatable ::  ZOH(:,:,:)                         !soil aqueous OH content micropore, [mol d-2]
-  real(r8),target,allocatable ::  ZSO4(:,:,:)                        !soil aqueous SO4 content micropore, [mol d-2]
-  real(r8),target,allocatable ::  ZCL(:,:,:)                         !soil aqueous Cl content micropore, [mol d-2]
-  real(r8),target,allocatable ::  ZCO3(:,:,:)                        !soil aqueous CO3 content micropore, [mol d-2]
-  real(r8),target,allocatable ::  ZHCO3(:,:,:)                       !soil aqueous HCO3 content micropore, [mol d-2]
-  real(r8),target,allocatable ::  ZALOH1(:,:,:)                      !soil aqueous AlOH content micropore, [mol d-2]
-  real(r8),target,allocatable ::  ZALOH2(:,:,:)                      !soil aqueous AlOH2 content micropore, [mol d-2]
-  real(r8),target,allocatable ::  ZALOH3(:,:,:)                      !soil aqueous AlOH3 content micropore, [mol d-2]
-  real(r8),target,allocatable ::  ZALOH4(:,:,:)                      !soil aqueous AlOH4 content micropore, [mol d-2]
-  real(r8),target,allocatable ::  ZALS(:,:,:)                        !soil aqueous AlSO4 content micropore, [mol d-2]
-  real(r8),target,allocatable ::  ZFEOH1(:,:,:)                      !soil aqueous FeOH content micropore, [mol d-2]
-  real(r8),target,allocatable ::  ZFEOH2(:,:,:)                      !soil aqueous FeOH2 content micropore, [mol d-2]
-  real(r8),target,allocatable ::  ZFEOH3(:,:,:)                      !soil aqueous FeOH3 content micropore, [mol d-2]
-  real(r8),target,allocatable ::  ZFEOH4(:,:,:)                      !soil aqueous FeOH4 content micropore, [mol d-2]
-  real(r8),target,allocatable ::  ZFES(:,:,:)                        !soil aqueous FeSO4 content micropore, [mol d-2]
-  real(r8),target,allocatable ::  ZCAO(:,:,:)                        !soil aqueous CaOH2 content micropore, [mol d-2]
-  real(r8),target,allocatable ::  ZCAC(:,:,:)                        !soil aqueous CACO3 content micropore, [mol d-2]
-  real(r8),target,allocatable ::  ZCAH(:,:,:)                        !soil aqueous CaHCO3 content micropore, [mol d-2]
-  real(r8),target,allocatable ::  ZCAS(:,:,:)                        !soil aqueous CaSO4 content micropore, [mol d-2]
-  real(r8),target,allocatable ::  ZMGO(:,:,:)                        !soil aqueous MgOH content micropore, [mol d-2]
-  real(r8),target,allocatable ::  ZMGC(:,:,:)                        !soil aqueous MgCO3 content micropore, [mol d-2]
-  real(r8),target,allocatable ::  ZMGH(:,:,:)                        !soil aqueous MgHCO3 content micropore, [mol d-2]
-  real(r8),target,allocatable ::  ZMGS(:,:,:)                        !soil aqueous MgSO4 content micropore, [mol d-2]
-  real(r8),target,allocatable ::  ZNAC(:,:,:)                        !soil aqueous NaCO3 content micropore, [mol d-2]
-  real(r8),target,allocatable ::  ZNAS(:,:,:)                        !soil aqueous NaSO4 content micropore, [mol d-2]
-  real(r8),target,allocatable ::  ZKAS(:,:,:)                        !soil aqueous KSO4 content micropore, [mol d-2]
-  real(r8),target,allocatable ::  H0PO4(:,:,:)                       !soil aqueous PO4 content micropore non-band, [mol d-2]
-  real(r8),target,allocatable ::  H3PO4(:,:,:)                       !soil aqueous H3PO4 content micropore non-band, [mol d-2]
-  real(r8),target,allocatable ::  ZFE1P(:,:,:)                       !soil aqueous FeHPO4 content micropore non-band, [mol d-2]
-  real(r8),target,allocatable ::  ZFE2P(:,:,:)                       !soil aqueous FeH2PO4 content micropore non-band, [mol d-2]
-  real(r8),target,allocatable ::  ZCA0P(:,:,:)                       !soil aqueous CaPO4 content micropore non-band, [mol d-2]
-  real(r8),target,allocatable ::  ZCA1P(:,:,:)                       !soil aqueous CaHPO4 content micropore non-band, [mol d-2]
-  real(r8),target,allocatable ::  ZCA2P(:,:,:)                       !soil aqueous CaH2PO4 content micropore non-band, [mol d-2]
-  real(r8),target,allocatable ::  ZMG1P(:,:,:)                       !soil aqueous MgHPO4 content micropore non-band, [mol d-2]
-  real(r8),target,allocatable ::  H0POB(:,:,:)                       !soil aqueous PO4 content micropore band, [mol d-2]
-  real(r8),target,allocatable ::  H3POB(:,:,:)                       !soil aqueous H3PO4 content micropore band, [mol d-2]
-  real(r8),target,allocatable ::  ZFE1PB(:,:,:)                      !soil aqueous FeHPO4 content micropore band, [mol d-2]
-  real(r8),target,allocatable ::  ZFE2PB(:,:,:)                      !soil aqueous FeH2PO4 content micropore band, [mol d-2]
-  real(r8),target,allocatable ::  ZCA0PB(:,:,:)                      !soil aqueous CaPO4 content micropore band, [mol d-2]
-  real(r8),target,allocatable ::  ZCA1PB(:,:,:)                      !soil aqueous CaHPO4 content micropore band, [mol d-2]
-  real(r8),target,allocatable ::  ZCA2PB(:,:,:)                      !soil aqueous CaH2PO4 content micropore band, [mol d-2]
-  real(r8),target,allocatable ::  ZMG1PB(:,:,:)                      !soil aqueous MgHPO4 content micropore band, [mol d-2]
 
   real(r8),target,allocatable ::  XN4(:,:,:)                         !exchangeable NH4 non-band, [mol d-2]
   real(r8),target,allocatable ::  XNB(:,:,:)                         !exchangeable NH4 band, [mol d-2]
@@ -107,21 +58,7 @@ module AqueChemDatatype
   real(r8),target,allocatable ::  XH1PB(:,:,:)                       !exchangeable HPO4  band, [mol d-2]
   real(r8),target,allocatable ::  XH2PB(:,:,:)                       !exchangeable H2PO4  band, [mol d-2]
 
-  real(r8),target,allocatable ::  trcp_salml(:,:,:,:)
-  real(r8),target,allocatable ::  PCAPD(:,:,:)                       !precipitated CaHPO4 non-band, [mol d-2]
-  real(r8),target,allocatable ::  PCAPH(:,:,:)                       !precipitated hydroxyapatite non-band, [mol d-2]
-  real(r8),target,allocatable ::  PALOH(:,:,:)                       !precipitated AlOH3, [mol d-2]
-  real(r8),target,allocatable ::  PFEOH(:,:,:)                       !precipitated FeOH3, [mol d-2]
-  real(r8),target,allocatable ::  PCACO(:,:,:)                       !precipitated CaCO3, [mol d-2]
-  real(r8),target,allocatable ::  PCASO(:,:,:)                       !precipitated CaSO4, [mol d-2]
-  real(r8),target,allocatable ::  PALPO(:,:,:)                       !precipitated AlPO4 non-band, [mol d-2]
-  real(r8),target,allocatable ::  PFEPO(:,:,:)                       !precipitated FePO4 non-band, [mol d-2]
-  real(r8),target,allocatable ::  PCAPM(:,:,:)                       !precipitated CaH2PO4 non-band, [mol d-2]
-  real(r8),target,allocatable ::  PCPHB(:,:,:)                       !precipitated hydroxyapatite band, [mol d-2]
-  real(r8),target,allocatable ::  PALPB(:,:,:)                       !precipitated AlPO4 band, [mol d-2]
-  real(r8),target,allocatable ::  PFEPB(:,:,:)                       !precipitated FePO4 band, [mol d-2]
-  real(r8),target,allocatable ::  PCPDB(:,:,:)                       !precipitated CaHPO4 band, [mol d-2]
-  real(r8),target,allocatable ::  PCPMB(:,:,:)                       !precipitated CaH2PO4 band , [mol d-2]
+  real(r8),target,allocatable ::  trcp_salml(:,:,:,:)                !salt precipitate in micropore
 
   real(r8),target,allocatable ::  ECND(:,:,:)                        !electrical conductivity , [dS m-1]
   real(r8),target,allocatable ::  CSTR(:,:,:)                        !solution ion strength, [mol m-3]
@@ -399,59 +336,11 @@ module AqueChemDatatype
   allocate(GKCM(JZ,JY,JX));     GKCM=0._r8
   allocate(GKCN(JZ,JY,JX));     GKCN=0._r8
   allocate(GKCK(JZ,JY,JX));     GKCK=0._r8
-  allocate(ZCO3(0:JZ,JY,JX));   ZCO3=0._r8
-  allocate(ZHCO3(0:JZ,JY,JX));  ZHCO3=0._r8
   allocate(XN4(0:JZ,JY,JX));    XN4=0._r8
   allocate(XNB(0:JZ,JY,JX));    XNB=0._r8
 
   allocate(trcsa_solml(idsa_beg:idsab_end,0:JZ,JY,JX));trcsa_solml=0._r8
-  allocate(ZAL(0:JZ,JY,JX));    ZAL=0._r8
-  allocate(ZFE(0:JZ,JY,JX));    ZFE=0._r8
-  allocate(ZHY(0:JZ,JY,JX));    ZHY=0._r8
-  allocate(ZCA(0:JZ,JY,JX));    ZCA=0._r8
-  allocate(ZMG(0:JZ,JY,JX));    ZMG=0._r8
-  allocate(ZNA(0:JZ,JY,JX));    ZNA=0._r8
-  allocate(ZKA(0:JZ,JY,JX));    ZKA=0._r8
-  allocate(ZOH(0:JZ,JY,JX));    ZOH=0._r8
-  allocate(ZSO4(0:JZ,JY,JX));   ZSO4=0._r8
-  allocate(ZCL(0:JZ,JY,JX));    ZCL=0._r8
-  allocate(ZALOH1(0:JZ,JY,JX)); ZALOH1=0._r8
-  allocate(ZALOH2(0:JZ,JY,JX)); ZALOH2=0._r8
-  allocate(ZALOH3(0:JZ,JY,JX)); ZALOH3=0._r8
-  allocate(ZALOH4(0:JZ,JY,JX)); ZALOH4=0._r8
-  allocate(ZALS(0:JZ,JY,JX));   ZALS=0._r8
-  allocate(ZFEOH1(0:JZ,JY,JX)); ZFEOH1=0._r8
-  allocate(ZFEOH2(0:JZ,JY,JX)); ZFEOH2=0._r8
-  allocate(ZFEOH3(0:JZ,JY,JX)); ZFEOH3=0._r8
-  allocate(ZFEOH4(0:JZ,JY,JX)); ZFEOH4=0._r8
-  allocate(ZFES(0:JZ,JY,JX));   ZFES=0._r8
-  allocate(ZCAO(0:JZ,JY,JX));   ZCAO=0._r8
-  allocate(ZCAC(0:JZ,JY,JX));   ZCAC=0._r8
-  allocate(ZCAH(0:JZ,JY,JX));   ZCAH=0._r8
-  allocate(ZCAS(0:JZ,JY,JX));   ZCAS=0._r8
-  allocate(ZMGO(0:JZ,JY,JX));   ZMGO=0._r8
-  allocate(ZMGC(0:JZ,JY,JX));   ZMGC=0._r8
-  allocate(ZMGH(0:JZ,JY,JX));   ZMGH=0._r8
-  allocate(ZMGS(0:JZ,JY,JX));   ZMGS=0._r8
-  allocate(ZNAC(0:JZ,JY,JX));   ZNAC=0._r8
-  allocate(ZNAS(0:JZ,JY,JX));   ZNAS=0._r8
-  allocate(ZKAS(0:JZ,JY,JX));   ZKAS=0._r8
-  allocate(H0PO4(0:JZ,JY,JX));  H0PO4=0._r8
-  allocate(H3PO4(0:JZ,JY,JX));  H3PO4=0._r8
-  allocate(ZFE1P(0:JZ,JY,JX));  ZFE1P=0._r8
-  allocate(ZFE2P(0:JZ,JY,JX));  ZFE2P=0._r8
-  allocate(ZCA0P(0:JZ,JY,JX));  ZCA0P=0._r8
-  allocate(ZCA1P(0:JZ,JY,JX));  ZCA1P=0._r8
-  allocate(ZCA2P(0:JZ,JY,JX));  ZCA2P=0._r8
-  allocate(ZMG1P(0:JZ,JY,JX));  ZMG1P=0._r8
-  allocate(H0POB(JZ,JY,JX));    H0POB=0._r8
-  allocate(H3POB(JZ,JY,JX));    H3POB=0._r8
-  allocate(ZFE1PB(JZ,JY,JX));   ZFE1PB=0._r8
-  allocate(ZFE2PB(JZ,JY,JX));   ZFE2PB=0._r8
-  allocate(ZCA0PB(JZ,JY,JX));   ZCA0PB=0._r8
-  allocate(ZCA1PB(JZ,JY,JX));   ZCA1PB=0._r8
-  allocate(ZCA2PB(JZ,JY,JX));   ZCA2PB=0._r8
-  allocate(ZMG1PB(JZ,JY,JX));   ZMG1PB=0._r8
+
   allocate(XHY(JZ,JY,JX));      XHY=0._r8
   allocate(XAL(JZ,JY,JX));      XAL=0._r8
   allocate(XCA(JZ,JY,JX));      XCA=0._r8
@@ -475,19 +364,7 @@ module AqueChemDatatype
 
   allocate(trcp_salml(idsp_beg:idsp_end,0:JZ,JY,JX)); trcp_salml=0._r8
 
-  allocate(PCAPD(0:JZ,JY,JX));  PCAPD=0._r8
-  allocate(PCAPH(0:JZ,JY,JX));  PCAPH=0._r8
-  allocate(PALOH(JZ,JY,JX));    PALOH=0._r8
-  allocate(PFEOH(JZ,JY,JX));    PFEOH=0._r8
-  allocate(PCACO(JZ,JY,JX));    PCACO=0._r8
-  allocate(PCASO(JZ,JY,JX));    PCASO=0._r8
-  allocate(PALPO(0:JZ,JY,JX));  PALPO=0._r8
-  allocate(PFEPO(0:JZ,JY,JX));  PFEPO=0._r8
-  allocate(PCAPM(0:JZ,JY,JX));  PCAPM=0._r8
-  allocate(PALPB(0:JZ,JY,JX));  PALPB=0._r8
-  allocate(PFEPB(0:JZ,JY,JX));  PFEPB=0._r8
-  allocate(PCPDB(0:JZ,JY,JX));  PCPDB=0._r8
-  allocate(PCPMB(0:JZ,JY,JX));  PCPMB=0._r8
+
   allocate(ECND(JZ,JY,JX));     ECND=0._r8
   allocate(CSTR(JZ,JY,JX));     CSTR=0._r8
   allocate(CION(JZ,JY,JX));     CION=0._r8
@@ -755,57 +632,9 @@ module AqueChemDatatype
   call destroy(GKCM)
   call destroy(GKCN)
   call destroy(GKCK)
-  call destroy(ZCO3)
-  call destroy(ZHCO3)
   call destroy(XN4)
   call destroy(XNB)
-  call destroy(ZAL)
-  call destroy(ZFE)
-  call destroy(ZHY)
-  call destroy(ZCA)
-  call destroy(ZMG)
-  call destroy(ZNA)
-  call destroy(ZKA)
-  call destroy(ZOH)
-  call destroy(ZSO4)
-  call destroy(ZCL)
-  call destroy(ZALOH1)
-  call destroy(ZALOH2)
-  call destroy(ZALOH3)
-  call destroy(ZALOH4)
-  call destroy(ZALS)
-  call destroy(ZFEOH1)
-  call destroy(ZFEOH2)
-  call destroy(ZFEOH3)
-  call destroy(ZFEOH4)
-  call destroy(ZFES)
-  call destroy(ZCAO)
-  call destroy(ZCAC)
-  call destroy(ZCAH)
-  call destroy(ZCAS)
-  call destroy(ZMGO)
-  call destroy(ZMGC)
-  call destroy(ZMGH)
-  call destroy(ZMGS)
-  call destroy(ZNAC)
-  call destroy(ZNAS)
-  call destroy(ZKAS)
-  call destroy(H0PO4)
-  call destroy(H3PO4)
-  call destroy(ZFE1P)
-  call destroy(ZFE2P)
-  call destroy(ZCA0P)
-  call destroy(ZCA1P)
-  call destroy(ZCA2P)
-  call destroy(ZMG1P)
-  call destroy(H0POB)
-  call destroy(H3POB)
-  call destroy(ZFE1PB)
-  call destroy(ZFE2PB)
-  call destroy(ZCA0PB)
-  call destroy(ZCA1PB)
-  call destroy(ZCA2PB)
-  call destroy(ZMG1PB)
+
   call destroy(trcsa_solml)
   call destroy(trcsa_soHml)
   call destroy(XHY)
@@ -828,20 +657,7 @@ module AqueChemDatatype
   call destroy(XOH2B)
   call destroy(XH1PB)
   call destroy(XH2PB)
-  call destroy(PCAPD)
   call destroy(trcp_salml)
-  call destroy(PCAPH)
-  call destroy(PALOH)
-  call destroy(PFEOH)
-  call destroy(PCACO)
-  call destroy(PCASO)
-  call destroy(PALPO)
-  call destroy(PFEPO)
-  call destroy(PCAPM)
-  call destroy(PALPB)
-  call destroy(PFEPB)
-  call destroy(PCPDB)
-  call destroy(PCPMB)
   call destroy(ECND)
   call destroy(CSTR)
   call destroy(CION)
