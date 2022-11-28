@@ -188,10 +188,6 @@ module ExtractsMod
     RUPP2P=> plt_rbgc%RUPP2P , &
     RUNNBP=> plt_rbgc%RUNNBP , &
     RUPP1P=> plt_rbgc%RUPP1P , &
-    ZH3P  => plt_rbgc%ZH3P   , &
-    Z2OP  => plt_rbgc%Z2OP   , &
-    Z2OA  => plt_rbgc%Z2OA   , &
-    ZH3A  => plt_rbgc%ZH3A   , &
     RN2DFA=> plt_rbgc%RN2DFA , &
     RNO3X => plt_bgcr%RNO3X  , &
     RNH4X => plt_bgcr%RNH4X  , &
@@ -228,14 +224,8 @@ module ExtractsMod
     TUPHT => plt_ew%TUPHT    , &
     TUPWTR=> plt_ew%TUPWTR   , &
     UPWTR => plt_ew%UPWTR    , &
-    H2GP  => plt_rbgc%H2GP,&
-    CH4P  => plt_rbgc%CH4P,&
-    OXYP  => plt_rbgc%OXYP,&
-    CO2P  => plt_rbgc%CO2P,&
-    H2GA  => plt_rbgc%H2GA,&
-    CH4A  => plt_rbgc%CH4A,&
-    CO2A  => plt_rbgc%CO2A,&
-    OXYA  => plt_rbgc%OXYA,&
+    trcg_rootml  => plt_rbgc%trcg_rootml,&
+    trcs_rootml => plt_rbgc%trcs_rootml, &
     RTDNP => plt_morph%RTDNP , &
     RTDNT => plt_morph%RTDNT , &
     MY    => plt_morph%MY    , &
@@ -271,30 +261,31 @@ module ExtractsMod
 !     R*FLA=root gaseous-atmosphere CO2 exchange
 !     R*DFA=root aqueous-gaseous CO2 exchange
 !
-      CO2A(N,L,NZ)=CO2A(N,L,NZ)+RCOFLA(N,L,NZ)-RCODFA(N,L,NZ)
-      OXYA(N,L,NZ)=OXYA(N,L,NZ)+ROXFLA(N,L,NZ)-ROXDFA(N,L,NZ)
-      CH4A(N,L,NZ)=CH4A(N,L,NZ)+RCHFLA(N,L,NZ)-RCHDFA(N,L,NZ)
-      Z2OA(N,L,NZ)=Z2OA(N,L,NZ)+RN2FLA(N,L,NZ)-RN2DFA(N,L,NZ)
-      ZH3A(N,L,NZ)=ZH3A(N,L,NZ)+RNHFLA(N,L,NZ)-RNHDFA(N,L,NZ)
-      H2GA(N,L,NZ)=H2GA(N,L,NZ)+RHGFLA(N,L,NZ)-RHGDFA(N,L,NZ)
-      CO2P(N,L,NZ)=CO2P(N,L,NZ)+RCODFA(N,L,NZ)+RCO2P(N,L,NZ)
-      OXYP(N,L,NZ)=OXYP(N,L,NZ)+ROXDFA(N,L,NZ)-RUPOXP(N,L,NZ)
-      CH4P(N,L,NZ)=CH4P(N,L,NZ)+RCHDFA(N,L,NZ)+RUPCHS(N,L,NZ)
-      Z2OP(N,L,NZ)=Z2OP(N,L,NZ)+RN2DFA(N,L,NZ)+RUPN2S(N,L,NZ)
-      ZH3P(N,L,NZ)=ZH3P(N,L,NZ)+RNHDFA(N,L,NZ)+RUPN3S(N,L,NZ)+RUPN3B(N,L,NZ)
-      H2GP(N,L,NZ)=H2GP(N,L,NZ)+RHGDFA(N,L,NZ)+RUPHGS(N,L,NZ)
+      trcg_rootml(idg_CO2,N,L,NZ)=trcg_rootml(idg_CO2,N,L,NZ)+RCOFLA(N,L,NZ)-RCODFA(N,L,NZ)
+      trcg_rootml(idg_O2,N,L,NZ)=trcg_rootml(idg_O2,N,L,NZ)+ROXFLA(N,L,NZ)-ROXDFA(N,L,NZ)
+      trcg_rootml(idg_CH4,N,L,NZ)=trcg_rootml(idg_CH4,N,L,NZ)+RCHFLA(N,L,NZ)-RCHDFA(N,L,NZ)
+      trcg_rootml(idg_N2O,N,L,NZ)=trcg_rootml(idg_N2O,N,L,NZ)+RN2FLA(N,L,NZ)-RN2DFA(N,L,NZ)
+      trcg_rootml(idg_NH3,N,L,NZ)=trcg_rootml(idg_NH3,N,L,NZ)+RNHFLA(N,L,NZ)-RNHDFA(N,L,NZ)
+      trcg_rootml(idg_H2,N,L,NZ)=trcg_rootml(idg_H2,N,L,NZ)+RHGFLA(N,L,NZ)-RHGDFA(N,L,NZ)
+
+      trcs_rootml(idg_CO2,N,L,NZ)=trcs_rootml(idg_CO2,N,L,NZ)+RCODFA(N,L,NZ)+RCO2P(N,L,NZ)
+      trcs_rootml(idg_O2,N,L,NZ)=trcs_rootml(idg_O2,N,L,NZ)+ROXDFA(N,L,NZ)-RUPOXP(N,L,NZ)
+      trcs_rootml(idg_CH4,N,L,NZ)=trcs_rootml(idg_CH4,N,L,NZ)+RCHDFA(N,L,NZ)+RUPCHS(N,L,NZ)
+      trcs_rootml(idg_N2O,N,L,NZ)=trcs_rootml(idg_N2O,N,L,NZ)+RN2DFA(N,L,NZ)+RUPN2S(N,L,NZ)
+      trcs_rootml(idg_NH3,N,L,NZ)=trcs_rootml(idg_NH3,N,L,NZ)+RNHDFA(N,L,NZ)+RUPN3S(N,L,NZ)+RUPN3B(N,L,NZ)
+      trcs_rootml(idg_H2,N,L,NZ)=trcs_rootml(idg_H2,N,L,NZ)+RHGDFA(N,L,NZ)+RUPHGS(N,L,NZ)
 !
 !     TOTAL ROOT GAS CONTENTS
 !
 !     TL*P=total root gas content
 !     *A,*P=PFT root gaseous, aqueous gas content
 !
-      TLCO2P(L)=TLCO2P(L)+CO2P(N,L,NZ)+CO2A(N,L,NZ)
-      TLOXYP(L)=TLOXYP(L)+OXYP(N,L,NZ)+OXYA(N,L,NZ)
-      TLCH4P(L)=TLCH4P(L)+CH4P(N,L,NZ)+CH4A(N,L,NZ)
-      TLN2OP(L)=TLN2OP(L)+Z2OP(N,L,NZ)+Z2OA(N,L,NZ)
-      TLNH3P(L)=TLNH3P(L)+ZH3P(N,L,NZ)+ZH3A(N,L,NZ)
-      TLH2GP(L)=TLH2GP(L)+H2GP(N,L,NZ)+H2GA(N,L,NZ)
+      TLCO2P(L)=TLCO2P(L)+trcs_rootml(idg_CO2,N,L,NZ)+trcg_rootml(idg_CO2,N,L,NZ)
+      TLOXYP(L)=TLOXYP(L)+trcs_rootml(idg_O2,N,L,NZ)+trcg_rootml(idg_O2,N,L,NZ)
+      TLCH4P(L)=TLCH4P(L)+trcs_rootml(idg_CH4,N,L,NZ)+trcg_rootml(idg_CH4,N,L,NZ)
+      TLN2OP(L)=TLN2OP(L)+trcs_rootml(idg_N2O,N,L,NZ)+trcg_rootml(idg_N2O,N,L,NZ)
+      TLNH3P(L)=TLNH3P(L)+trcs_rootml(idg_NH3,N,L,NZ)+trcg_rootml(idg_NH3,N,L,NZ)
+      TLH2GP(L)=TLH2GP(L)+trcs_rootml(idg_H2,N,L,NZ)+trcg_rootml(idg_H2,N,L,NZ)
 !
 !     TOTAL ROOT BOUNDARY GAS FLUXES
 !

@@ -811,18 +811,10 @@ implicit none
       IF(WTRTL(ifineroot,L0,NZ,NY,NX).GT.ZEROP(NZ,NY,NX) &
         .AND.WTRTL(ifineroot,L1,NZ,NY,NX).GT.ZEROP(NZ,NY,NX))THEN
         DO N=1,MY(NZ,NY,NX)
-          CO2A(N,L1,NZ,NY,NX)=CO2A(N,L1,NZ,NY,NX)+FX*CO2A(N,L0,NZ,NY,NX)
-          OXYA(N,L1,NZ,NY,NX)=OXYA(N,L1,NZ,NY,NX)+FX*OXYA(N,L0,NZ,NY,NX)
-          CH4A(N,L1,NZ,NY,NX)=CH4A(N,L1,NZ,NY,NX)+FX*CH4A(N,L0,NZ,NY,NX)
-          Z2OA(N,L1,NZ,NY,NX)=Z2OA(N,L1,NZ,NY,NX)+FX*Z2OA(N,L0,NZ,NY,NX)
-          ZH3A(N,L1,NZ,NY,NX)=ZH3A(N,L1,NZ,NY,NX)+FX*ZH3A(N,L0,NZ,NY,NX)
-          H2GA(N,L1,NZ,NY,NX)=H2GA(N,L1,NZ,NY,NX)+FX*H2GA(N,L0,NZ,NY,NX)
-          CO2P(N,L1,NZ,NY,NX)=CO2P(N,L1,NZ,NY,NX)+FX*CO2P(N,L0,NZ,NY,NX)
-          OXYP(N,L1,NZ,NY,NX)=OXYP(N,L1,NZ,NY,NX)+FX*OXYP(N,L0,NZ,NY,NX)
-          CH4P(N,L1,NZ,NY,NX)=CH4P(N,L1,NZ,NY,NX)+FX*CH4P(N,L0,NZ,NY,NX)
-          Z2OP(N,L1,NZ,NY,NX)=Z2OP(N,L1,NZ,NY,NX)+FX*Z2OP(N,L0,NZ,NY,NX)
-          ZH3P(N,L1,NZ,NY,NX)=ZH3P(N,L1,NZ,NY,NX)+FX*ZH3P(N,L0,NZ,NY,NX)
-          H2GP(N,L1,NZ,NY,NX)=H2GP(N,L1,NZ,NY,NX)+FX*H2GP(N,L0,NZ,NY,NX)
+          DO NTG=idg_beg,idg_end-1
+            trcg_rootml(NTG,N,L1,NZ,NY,NX)=trcg_rootml(NTG,N,L1,NZ,NY,NX)+FX*trcg_rootml(NTG,N,L0,NZ,NY,NX)
+            trcs_rootml(NTG,N,L1,NZ,NY,NX)=trcs_rootml(NTG,N,L1,NZ,NY,NX)+FX*trcs_rootml(NTG,N,L0,NZ,NY,NX)
+          ENDDO
           DO  NR=1,NRT(NZ,NY,NX)
             DO NE=1,npelms
               WTRT1E(NE,N,L1,NR,NZ,NY,NX)=WTRT1E(NE,N,L1,NR,NZ,NY,NX)+FX*WTRT1E(NE,N,L0,NR,NZ,NY,NX)
@@ -998,18 +990,10 @@ implicit none
       IF(WTRTL(ifineroot,L0,NZ,NY,NX).GT.ZEROP(NZ,NY,NX) &
         .AND.WTRTL(ifineroot,L1,NZ,NY,NX).GT.ZEROP(NZ,NY,NX))THEN
         DO  N=1,MY(NZ,NY,NX)
-          CO2A(N,L0,NZ,NY,NX)=FY*CO2A(N,L0,NZ,NY,NX)
-          OXYA(N,L0,NZ,NY,NX)=FY*OXYA(N,L0,NZ,NY,NX)
-          CH4A(N,L0,NZ,NY,NX)=FY*CH4A(N,L0,NZ,NY,NX)
-          Z2OA(N,L0,NZ,NY,NX)=FY*Z2OA(N,L0,NZ,NY,NX)
-          ZH3A(N,L0,NZ,NY,NX)=FY*ZH3A(N,L0,NZ,NY,NX)
-          H2GA(N,L0,NZ,NY,NX)=FY*H2GA(N,L0,NZ,NY,NX)
-          CO2P(N,L0,NZ,NY,NX)=FY*CO2P(N,L0,NZ,NY,NX)
-          OXYP(N,L0,NZ,NY,NX)=FY*OXYP(N,L0,NZ,NY,NX)
-          CH4P(N,L0,NZ,NY,NX)=FY*CH4P(N,L0,NZ,NY,NX)
-          Z2OP(N,L0,NZ,NY,NX)=FY*Z2OP(N,L0,NZ,NY,NX)
-          ZH3P(N,L0,NZ,NY,NX)=FY*ZH3P(N,L0,NZ,NY,NX)
-          H2GP(N,L0,NZ,NY,NX)=FY*H2GP(N,L0,NZ,NY,NX)
+          DO NTG=idg_beg,idg_end-1
+            trcg_rootml(NTG,N,L0,NZ,NY,NX)=FY*trcg_rootml(NTG,N,L0,NZ,NY,NX)
+            trcs_rootml(NTG,N,L0,NZ,NY,NX)=FY*trcs_rootml(NTG,N,L0,NZ,NY,NX)
+          ENDDO
           DO NR=1,NRT(NZ,NY,NX)
             DO NE=1,npelms
               WTRT1E(NE,N,L0,NR,NZ,NY,NX)=FY*WTRT1E(NE,N,L0,NR,NZ,NY,NX)
@@ -1063,19 +1047,18 @@ implicit none
   real(r8),intent(in) :: FO
   integer, intent(in) :: IFLGL(0:JZ,6)
 
-  integer :: K,N,M,NGL,NR,NZ,NE
+  integer :: K,N,M,NGL,NR,NZ,NE,NTG
   real(r8) :: FXO,FRO
   real(r8) :: FXRTLG2,FXRTN2,FXEPOOLR,FXWTRTL
   real(r8) :: FXWTNDLE,FXEPOOLN
-  real(r8) :: FXCO2P,FXOXYP,FXCH4P,FXZ2OP,FXZH3P,FXH2GP,FXWTRT1E
+  real(r8) :: FXWTRT1E
   real(r8) :: FXWTRT2E,FXRTLG1
   real(r8) :: FXWTRTD,FXWSRTL,FXRTN1,FXRTNL,FXRTLGP,FXRTDNP
   real(r8) :: FXRTVLP,FXRTVLW,FXRRAD1,FXRRAD2,FXRTARP,FXRTLGA
-  real(r8) :: FXCO2A,FXOXYA,FXCH4A,FXZ2OA,FXZH3A,FXH2GA
   real(r8) :: FXOQN,FXOQP,FXOQA,FXOQCH,FXOQNH,FXOQPH,FXOQAH
   real(r8) :: FXOHC,FXOHN,FXOHP,FXOHA,FXOSC,FXOSA,FXOSN,FXOSP
   real(r8) :: FXOMC,FXOMN,FXOMP,FXORC,FXORN,FXORP,FXOQC
-
+  real(r8) :: FXGA,FXGP
 ! begin_execution
   IF(IFLGL(L,3).EQ.0.AND.L0.NE.0 &
     .AND.VOLX(L0,NY,NX).GT.ZEROS(NY,NX) &
@@ -1200,42 +1183,16 @@ implicit none
         ENDIF
 
         DO  N=1,MY(NZ,NY,NX)
-          FXCO2A=FRO*CO2A(N,L0,NZ,NY,NX)
-          CO2A(N,L1,NZ,NY,NX)=CO2A(N,L1,NZ,NY,NX)+FXCO2A
-          CO2A(N,L0,NZ,NY,NX)=CO2A(N,L0,NZ,NY,NX)-FXCO2A
-          FXOXYA=FRO*OXYA(N,L0,NZ,NY,NX)
-          OXYA(N,L1,NZ,NY,NX)=OXYA(N,L1,NZ,NY,NX)+FXOXYA
-          OXYA(N,L0,NZ,NY,NX)=OXYA(N,L0,NZ,NY,NX)-FXOXYA
-          FXCH4A=FRO*CH4A(N,L0,NZ,NY,NX)
-          CH4A(N,L1,NZ,NY,NX)=CH4A(N,L1,NZ,NY,NX)+FXCH4A
-          CH4A(N,L0,NZ,NY,NX)=CH4A(N,L0,NZ,NY,NX)-FXCH4A
-          FXZ2OA=FRO*Z2OA(N,L0,NZ,NY,NX)
-          Z2OA(N,L1,NZ,NY,NX)=Z2OA(N,L1,NZ,NY,NX)+FXZ2OA
-          Z2OA(N,L0,NZ,NY,NX)=Z2OA(N,L0,NZ,NY,NX)-FXZ2OA
-          FXZH3A=FRO*ZH3A(N,L0,NZ,NY,NX)
-          ZH3A(N,L1,NZ,NY,NX)=ZH3A(N,L1,NZ,NY,NX)+FXZH3A
-          ZH3A(N,L0,NZ,NY,NX)=ZH3A(N,L0,NZ,NY,NX)-FXZH3A
-          FXH2GA=FRO*H2GA(N,L0,NZ,NY,NX)
-          H2GA(N,L1,NZ,NY,NX)=H2GA(N,L1,NZ,NY,NX)+FXH2GA
-          H2GA(N,L0,NZ,NY,NX)=H2GA(N,L0,NZ,NY,NX)-FXH2GA
-          FXCO2P=FRO*CO2P(N,L0,NZ,NY,NX)
-          CO2P(N,L1,NZ,NY,NX)=CO2P(N,L1,NZ,NY,NX)+FXCO2P
-          CO2P(N,L0,NZ,NY,NX)=CO2P(N,L0,NZ,NY,NX)-FXCO2P
-          FXOXYP=FRO*OXYP(N,L0,NZ,NY,NX)
-          OXYP(N,L1,NZ,NY,NX)=OXYP(N,L1,NZ,NY,NX)+FXOXYP
-          OXYP(N,L0,NZ,NY,NX)=OXYP(N,L0,NZ,NY,NX)-FXOXYP
-          FXCH4P=FRO*CH4P(N,L0,NZ,NY,NX)
-          CH4P(N,L1,NZ,NY,NX)=CH4P(N,L1,NZ,NY,NX)+FXCH4P
-          CH4P(N,L0,NZ,NY,NX)=CH4P(N,L0,NZ,NY,NX)-FXCH4P
-          FXZ2OP=FRO*Z2OP(N,L0,NZ,NY,NX)
-          Z2OP(N,L1,NZ,NY,NX)=Z2OP(N,L1,NZ,NY,NX)+FXZ2OP
-          Z2OP(N,L0,NZ,NY,NX)=Z2OP(N,L0,NZ,NY,NX)-FXZ2OP
-          FXZH3P=FRO*ZH3P(N,L0,NZ,NY,NX)
-          ZH3P(N,L1,NZ,NY,NX)=ZH3P(N,L1,NZ,NY,NX)+FXZH3P
-          ZH3P(N,L0,NZ,NY,NX)=ZH3P(N,L0,NZ,NY,NX)-FXZH3P
-          FXH2GP=FRO*H2GP(N,L0,NZ,NY,NX)
-          H2GP(N,L1,NZ,NY,NX)=H2GP(N,L1,NZ,NY,NX)+FXH2GP
-          H2GP(N,L0,NZ,NY,NX)=H2GP(N,L0,NZ,NY,NX)-FXH2GP
+          DO NTG=idg_beg,idg_end-1
+            FXGA=FRO*trcg_rootml(NTG,N,L0,NZ,NY,NX)
+            trcg_rootml(NTG,N,L1,NZ,NY,NX)=trcg_rootml(NTG,N,L1,NZ,NY,NX)+FXGA
+            trcg_rootml(NTG,N,L0,NZ,NY,NX)=trcg_rootml(NTG,N,L0,NZ,NY,NX)-FXGA
+
+            FXGP=FRO*trcs_rootml(NTG,N,L0,NZ,NY,NX)
+            trcs_rootml(NTG,N,L1,NZ,NY,NX)=trcs_rootml(NTG,N,L1,NZ,NY,NX)+FXGP
+            trcs_rootml(NTG,N,L0,NZ,NY,NX)=trcs_rootml(NTG,N,L0,NZ,NY,NX)-FXGP
+          ENDDO
+
           DO  NR=1,NRT(NZ,NY,NX)
             DO NE=1,npelms
               FXWTRT1E=FRO*WTRT1E(NE,N,L0,NR,NZ,NY,NX)

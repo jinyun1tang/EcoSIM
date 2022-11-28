@@ -140,7 +140,6 @@ implicit none
   idg_NH3B=idg_NH3+1
   idg_end=idg_NH3B;
 
-
   ids_nuts_beg=idg_NH3;  !the first nutrient tracer, including band
   ids_end=idg_end   !initalize the solute counter
   ids_NH4B=addone(ids_end);ids_NO3B=addone(ids_end);

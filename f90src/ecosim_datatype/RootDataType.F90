@@ -6,6 +6,7 @@ module RootDataType
   use data_kind_mod, only : r8 => SHR_KIND_R8
   use GridConsts
   use ElmIDMod
+  use TracerIDMod
   implicit none
   character(len=*), private, parameter :: mod_filename = __FILE__
   integer,target,allocatable ::  NRT(:,:,:)                          !root primary axis number, [-]
@@ -67,16 +68,8 @@ module RootDataType
   real(r8),target,allocatable ::  PSIRT(:,:,:,:,:)                   !root total water potential , [Mpa]
   real(r8),target,allocatable ::  PSIRO(:,:,:,:,:)                   !root osmotic water potential , [Mpa]
   real(r8),target,allocatable ::  PSIRG(:,:,:,:,:)                   !root turgor water potential , [Mpa]
-  real(r8),target,allocatable ::  CO2A(:,:,:,:,:)                    !root gaseous CO2 content, [g d-2 ]
-  real(r8),target,allocatable ::  OXYA(:,:,:,:,:)                    !root gaseous O2 content, [g d-2 ]
-  real(r8),target,allocatable ::  CH4A(:,:,:,:,:)                    !root gaseous CH4 content, [g d-2 ]
-  real(r8),target,allocatable ::  Z2OA(:,:,:,:,:)                    !root gaseous N2O content, [g d-2 ]
-  real(r8),target,allocatable ::  ZH3A(:,:,:,:,:)                    !root gaseous NH3 content, [g d-2 ]
-  real(r8),target,allocatable ::  CO2P(:,:,:,:,:)                    !root aqueous CO2 content, [g d-2 ]
-  real(r8),target,allocatable ::  OXYP(:,:,:,:,:)                    !root aqueous O2 content, [g d-2 ]
-  real(r8),target,allocatable ::  CH4P(:,:,:,:,:)                    !root aqueous CH4 content, [g d-2 ]
-  real(r8),target,allocatable ::  Z2OP(:,:,:,:,:)                    !root aqueous N2O content, [g d-2 ]
-  real(r8),target,allocatable ::  ZH3P(:,:,:,:,:)                    !root aqueous NH3 content, [g d-2 ]
+  real(r8),target,allocatable ::  trcg_rootml(:,:,:,:,:,:)           !root gaseous tracer content [g d-2]
+  real(r8),target,allocatable ::  trcs_rootml(:,:,:,:,:,:)           !root dissolved gaseous tracer content [g d-2]
   real(r8),target,allocatable ::  TCO2Z(:,:)                         !total root CO2 content, [g d-2]
   real(r8),target,allocatable ::  TOXYZ(:,:)                         !total root O2 content, [g d-2]
   real(r8),target,allocatable ::  TCH4Z(:,:)                         !total root CH4 content, [g d-2]
@@ -165,16 +158,8 @@ contains
   allocate(PSIRT(2,JZ,JP,JY,JX));PSIRT=0._r8
   allocate(PSIRO(2,JZ,JP,JY,JX));PSIRO=0._r8
   allocate(PSIRG(2,JZ,JP,JY,JX));PSIRG=0._r8
-  allocate(CO2A(2,JZ,JP,JY,JX));CO2A=0._r8
-  allocate(OXYA(2,JZ,JP,JY,JX));OXYA=0._r8
-  allocate(CH4A(2,JZ,JP,JY,JX));CH4A=0._r8
-  allocate(Z2OA(2,JZ,JP,JY,JX));Z2OA=0._r8
-  allocate(ZH3A(2,JZ,JP,JY,JX));ZH3A=0._r8
-  allocate(CO2P(2,JZ,JP,JY,JX));CO2P=0._r8
-  allocate(OXYP(2,JZ,JP,JY,JX));OXYP=0._r8
-  allocate(CH4P(2,JZ,JP,JY,JX));CH4P=0._r8
-  allocate(Z2OP(2,JZ,JP,JY,JX));Z2OP=0._r8
-  allocate(ZH3P(2,JZ,JP,JY,JX));ZH3P=0._r8
+  allocate(trcg_rootml(idg_beg:idg_end-1,2,JZ,JP,JY,JX)); trcg_rootml =0._r8
+  allocate(trcs_rootml(idg_beg:idg_end-1,2,JZ,JP,JY,JX)); trcs_rootml =0._r8
   allocate(TCO2Z(JY,JX));       TCO2Z=0._r8
   allocate(TOXYZ(JY,JX));       TOXYZ=0._r8
   allocate(TCH4Z(JY,JX));       TCH4Z=0._r8
@@ -261,16 +246,8 @@ contains
   call destroy(PSIRT)
   call destroy(PSIRO)
   call destroy(PSIRG)
-  call destroy(CO2A)
-  call destroy(OXYA)
-  call destroy(CH4A)
-  call destroy(Z2OA)
-  call destroy(ZH3A)
-  call destroy(CO2P)
-  call destroy(OXYP)
-  call destroy(CH4P)
-  call destroy(Z2OP)
-  call destroy(ZH3P)
+  call destroy(trcg_rootml)
+  call destroy(trcs_rootml)
   call destroy(TCO2Z)
   call destroy(TOXYZ)
   call destroy(TCH4Z)

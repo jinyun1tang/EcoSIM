@@ -104,18 +104,8 @@ module RootGasMod
     RUPN3S =>  plt_rbgc%RUPN3S   , &
     RUPOXP =>  plt_rbgc%RUPOXP   , &
     RCO2A  =>  plt_rbgc%RCO2A    , &
-    CO2P   =>  plt_rbgc%CO2P     , &
-    CO2A   =>  plt_rbgc%CO2A     , &
-    OXYA   =>  plt_rbgc%OXYA     , &
-    OXYP   =>  plt_rbgc%OXYP     , &
-    CH4A   =>  plt_rbgc%CH4A     , &
-    CH4P   =>  plt_rbgc%CH4P     , &
-    Z2OA   =>  plt_rbgc%Z2OA     , &
-    Z2OP   =>  plt_rbgc%Z2OP     , &
-    ZH3A   =>  plt_rbgc%ZH3A     , &
-    ZH3P   =>  plt_rbgc%ZH3P     , &
-    H2GA   =>  plt_rbgc%H2GA     , &
-    H2GP   =>  plt_rbgc%H2GP     , &
+    trcg_rootml   =>  plt_rbgc%trcg_rootml     , &
+    trcs_rootml   =>  plt_rbgc%trcs_rootml     , &
     TFND   =>  plt_soilchem%TFND , &
     trcs_VLN  =>  plt_soilchem%trcs_VLN, &
     trc_solml  =>  plt_soilchem%trc_solml, &
@@ -126,7 +116,6 @@ module RootGasMod
     trc_solcl  =>  plt_soilchem%trc_solcl, &
     THETY  =>  plt_soilchem%THETY, &
     VOLY   =>  plt_soilchem%VOLY , &
-
     THETPM =>  plt_soilchem%THETPM,&
     trc_gasml=> plt_soilchem%trc_gasml,&
     DFGS   =>  plt_soilchem%DFGS , &
@@ -168,33 +157,33 @@ module RootGasMod
 !     RCO2FX=net CO2 gas flux at time step of flux calculation
 !     ROXYLX=net O2 aqueous flux at time step of flux calculation
 !
-    CO2A1=AMAX1(ZEROP(NZ),CO2A(N,L,NZ))
-    CO2P1=AMAX1(ZEROP(NZ),CO2P(N,L,NZ))
+    CO2A1=AMAX1(ZEROP(NZ),trcg_rootml(idg_CO2,N,L,NZ))
+    CO2P1=AMAX1(ZEROP(NZ),trcs_rootml(idg_CO2,N,L,NZ))
     CO2G1=AMAX1(ZEROP(NZ),trc_gasml(idg_CO2,L)*FPQ(N,L,NZ))
     CO2S1=AMAX1(ZEROP(NZ),trc_solml(idg_CO2,L)*FPQ(N,L,NZ))
-    OXYA1=AMAX1(ZEROP(NZ),OXYA(N,L,NZ))
-    OXYP1=AMAX1(ZEROP(NZ),OXYP(N,L,NZ))
+    OXYA1=AMAX1(ZEROP(NZ),trcg_rootml(idg_O2,N,L,NZ))
+    OXYP1=AMAX1(ZEROP(NZ),trcs_rootml(idg_O2,N,L,NZ))
     OXYG1=AMAX1(ZEROP(NZ),trc_gasml(idg_O2,L)*FOXYX)
     OXYS1=trc_solml(idg_O2,L)*FOXYX
-    CH4A1=CH4A(N,L,NZ)
-    CH4P1=CH4P(N,L,NZ)
+    CH4A1=trcg_rootml(idg_CH4,N,L,NZ)
+    CH4P1=trcs_rootml(idg_CH4,N,L,NZ)
     CH4S1=trc_solml(idg_CH4,L)*FPQ(N,L,NZ)
     CCH4S1=trc_solcl(idg_CH4,L)
     CCH4P1=AZMAX1(CH4P1/RTVLW(N,L,NZ))
-    Z2OA1=Z2OA(N,L,NZ)
-    Z2OP1=Z2OP(N,L,NZ)
+    Z2OA1=trcg_rootml(idg_N2O,N,L,NZ)
+    Z2OP1=trcs_rootml(idg_N2O,N,L,NZ)
     Z2OS1=trc_solml(idg_N2O,L)*FPQ(N,L,NZ)
     CN2OS1=trc_solcl(idg_N2O,L)
     CN2OP1=AZMAX1(Z2OP1/RTVLW(N,L,NZ))
-    ZH3A1=ZH3A(N,L,NZ)
-    ZH3P1=ZH3P(N,L,NZ)
+    ZH3A1=trcg_rootml(idg_NH3,N,L,NZ)
+    ZH3P1=trcs_rootml(idg_NH3,N,L,NZ)
     ZH3S1=trc_solml(idg_NH3,L)*FPQ(N,L,NZ)
     ZH3B1=trc_solml(idg_NH3B,L)*FPQ(N,L,NZ)
     CNH3S1=trc_solcl(idg_NH3,L)
     CNH3B1=trc_solcl(idg_NH3B,L)
     CNH3P1=AZMAX1(ZH3P1/RTVLW(N,L,NZ))
-    H2GA1=H2GA(N,L,NZ)
-    H2GP1=H2GP(N,L,NZ)
+    H2GA1=trcg_rootml(idg_H2,N,L,NZ)
+    H2GP1=trcs_rootml(idg_H2,N,L,NZ)
     H2GS1=trc_solml(idg_H2,L)*FPQ(N,L,NZ)
     CH2GS1=trc_solcl(idg_H2,L)
     CH2GP1=AZMAX1(H2GP1/RTVLW(N,L,NZ))
@@ -318,7 +307,7 @@ module RootGasMod
 !     SOLVE FOR GAS EXCHANGE IN SOIL AND ROOTS DURING ROOT UPTAKE
 !     AT SMALLER TIME STEP NPH
 !
-    DO 99 M=1,NPH
+    D99: DO M=1,NPH
 !
 !     AQUEOUS GAS DIFFUSIVITY THROUGH SOIL WATER TO ROOT
 !
@@ -387,7 +376,7 @@ module RootGasMod
 !     N2S=N2O,NHS=NH3 non-band,NHB=NH3 band,HGS=H2
 !     UPWTRH=water uptake
 !
-        DO 90 MX=1,NPT
+        D90: DO MX=1,NPT
           OXYS1=OXYS1+ROXYLX
           CCO2S1=AZMAX1(CO2S1/VOLWMM)
           COXYS1=AMIN1(COXYE*GSolbility(idg_O2,L),AZMAX1(OXYS1/VOLWMO))
@@ -761,9 +750,9 @@ module RootGasMod
           RUPOXP(N,L,NZ)=RUPOXP(N,L,NZ)+RUPOPX
           ROXSK(M,L)=ROXSK(M,L)+RUPOSX
 
-90      CONTINUE
+        ENDDO D90
       ENDIF
-99  CONTINUE
+    ENDDO D99
 !
 !     O2 CONSTRAINTS TO ROOT RESPIRATION DEPENDS UPON RATIO
 !     OF ROOT O2 UPTAKE 'RUPOXT' TO ROOT O2 DEMAND 'ROXYP'

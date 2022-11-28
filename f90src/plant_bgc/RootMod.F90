@@ -128,26 +128,16 @@ implicit none
     IGTYP    =>   plt_pheno%IGTYP     , &
     PSIRT    =>   plt_ew%PSIRT        , &
     PSIRG    =>   plt_ew%PSIRG        , &
-    ZH3P     =>   plt_rbgc%ZH3P       , &
-    Z2OP     =>   plt_rbgc%Z2OP       , &
-    ZH3A     =>   plt_rbgc%ZH3A       , &
-    Z2OA     =>   plt_rbgc%Z2OA       , &
     RH2GZ    =>   plt_bgcr%RH2GZ      , &
     RCH4Z    =>   plt_bgcr%RCH4Z      , &
     RN2OZ    =>   plt_bgcr%RN2OZ      , &
     ROXYZ    =>   plt_bgcr%ROXYZ      , &
     RCO2Z    =>   plt_bgcr%RCO2Z      , &
     RNH3Z    =>   plt_bgcr%RNH3Z      , &
-    CO2A     =>   plt_rbgc%CO2A       , &
+    trcg_rootml     =>   plt_rbgc%trcg_rootml       , &
+    trcs_rootml  => plt_rbgc%trcs_rootml, &
     RSCS     =>   plt_soilchem%RSCS   , &
     VOLX     =>   plt_soilchem%VOLX   , &
-    H2GP     =>   plt_rbgc%H2GP       , &
-    OXYA     =>   plt_rbgc%OXYA       , &
-    CH4P     =>   plt_rbgc%CH4P       , &
-    H2GA     =>   plt_rbgc%H2GA       , &
-    CO2P     =>   plt_rbgc%CO2P       , &
-    OXYP     =>   plt_rbgc%OXYP       , &
-    CH4A     =>   plt_rbgc%CH4A       , &
     NU       =>   plt_site%NU         , &
     ZERO     =>   plt_site%ZERO       , &
     PP       =>   plt_site%PP         , &
@@ -316,24 +306,14 @@ implicit none
           RRAD2(N,L,NZ)=RRAD2M(N,NZ)
           RTARP(N,L,NZ)=0._r8
           RTLGA(N,L,NZ)=RTLGAX
-          RCO2Z(NZ)=RCO2Z(NZ)-(CO2A(N,L,NZ)+CO2P(N,L,NZ))
-          ROXYZ(NZ)=ROXYZ(NZ)-(OXYA(N,L,NZ)+OXYP(N,L,NZ))
-          RCH4Z(NZ)=RCH4Z(NZ)-(CH4A(N,L,NZ)+CH4P(N,L,NZ))
-          RN2OZ(NZ)=RN2OZ(NZ)-(Z2OA(N,L,NZ)+Z2OP(N,L,NZ))
-          RNH3Z(NZ)=RNH3Z(NZ)-(ZH3A(N,L,NZ)+ZH3P(N,L,NZ))
-          RH2GZ(NZ)=RH2GZ(NZ)-(H2GA(N,L,NZ)+H2GP(N,L,NZ))
-          CO2A(N,L,NZ)=0._r8
-          OXYA(N,L,NZ)=0._r8
-          CH4A(N,L,NZ)=0._r8
-          Z2OA(N,L,NZ)=0._r8
-          ZH3A(N,L,NZ)=0._r8
-          H2GA(N,L,NZ)=0._r8
-          CO2P(N,L,NZ)=0._r8
-          OXYP(N,L,NZ)=0._r8
-          CH4P(N,L,NZ)=0._r8
-          Z2OP(N,L,NZ)=0._r8
-          ZH3P(N,L,NZ)=0._r8
-          H2GP(N,L,NZ)=0._r8
+          RCO2Z(NZ)=RCO2Z(NZ)-(trcg_rootml(idg_CO2,N,L,NZ)+trcs_rootml(idg_CO2,N,L,NZ))
+          ROXYZ(NZ)=ROXYZ(NZ)-(trcg_rootml(idg_O2,N,L,NZ)+trcs_rootml(idg_O2,N,L,NZ))
+          RCH4Z(NZ)=RCH4Z(NZ)-(trcg_rootml(idg_CH4,N,L,NZ)+trcs_rootml(idg_CH4,N,L,NZ))
+          RN2OZ(NZ)=RN2OZ(NZ)-(trcg_rootml(idg_N2O,N,L,NZ)+trcs_rootml(idg_N2O,N,L,NZ))
+          RNH3Z(NZ)=RNH3Z(NZ)-(trcg_rootml(idg_NH3,N,L,NZ)+trcs_rootml(idg_NH3,N,L,NZ))
+          RH2GZ(NZ)=RH2GZ(NZ)-(trcg_rootml(idg_H2,N,L,NZ)+trcs_rootml(idg_H2,N,L,NZ))
+          trcg_rootml(idg_beg:idg_end-1,N,L,NZ)=0._r8
+          trcs_rootml(idg_beg:idg_end-1,N,L,NZ)=0._r8
         ENDIF
       ENDIF
     ENDDO D5000
@@ -1371,7 +1351,7 @@ implicit none
   real(r8), intent(in):: RTDP1X
   real(r8), INTENT(IN) :: RLNT(2,JZ1)
   real(r8),intent(in) :: RTSK1(2,JZ1,10),RTSK2(2,JZ1,10),XRTN1
-  integer :: LL,NN,NE
+  integer :: LL,NN,NE,NTG
   real(r8) :: XFRD,XFRW,FRTN
   real(r8) :: XFRE(npelms)
 
@@ -1391,22 +1371,12 @@ implicit none
     RCH4Z    =>  plt_bgcr%RCH4Z    , &
     ROXYZ    =>  plt_bgcr%ROXYZ    , &
     RCO2Z    =>  plt_bgcr%RCO2Z    , &
-    ZH3P     =>  plt_rbgc%ZH3P     , &
-    Z2OA     =>  plt_rbgc%Z2OA     , &
-    Z2OP     =>  plt_rbgc%Z2OP     , &
-    ZH3A     =>  plt_rbgc%ZH3A     , &
     CDPTHZ   =>  plt_site%CDPTHZ   , &
     ZEROS2   =>  plt_site%ZEROS2   , &
     DLYR3    =>  plt_site%DLYR3    , &
-    CO2A     =>  plt_rbgc%CO2A , &
-    CH4A     =>  plt_rbgc%CH4A , &
-    OXYA     =>  plt_rbgc%OXYA , &
-    CO2P     =>  plt_rbgc%CO2P , &
-    H2GA     =>  plt_rbgc%H2GA , &
+    trcg_rootml     =>  plt_rbgc%trcg_rootml , &
+    trcs_rootml => plt_rbgc%trcs_rootml, &
     VOLX     =>  plt_soilchem%VOLX , &
-    OXYP     =>  plt_rbgc%OXYP , &
-    CH4P     =>  plt_rbgc%CH4P , &
-    H2GP     =>  plt_rbgc%H2GP , &
     RTN1     =>  plt_morph%RTN1    , &
     RTNL     =>  plt_morph%RTNL    , &
     RTLG1    =>  plt_morph%RTLG1   , &
@@ -1476,25 +1446,17 @@ implicit none
 !     CO2P,OXYP,CH4P,Z2OP,ZH3P,H2GP=root aqueous CO2, O2, CH4, N2O, NH3, H2
 !     FRTN=fraction of primary root sink strength in axis
 !
-        RCO2Z(NZ)=RCO2Z(NZ)-FRTN*(CO2A(NN,LL,NZ)+CO2P(NN,LL,NZ))
-        ROXYZ(NZ)=ROXYZ(NZ)-FRTN*(OXYA(NN,LL,NZ)+OXYP(NN,LL,NZ))
-        RCH4Z(NZ)=RCH4Z(NZ)-FRTN*(CH4A(NN,LL,NZ)+CH4P(NN,LL,NZ))
-        RN2OZ(NZ)=RN2OZ(NZ)-FRTN*(Z2OA(NN,LL,NZ)+Z2OP(NN,LL,NZ))
-        RNH3Z(NZ)=RNH3Z(NZ)-FRTN*(ZH3A(NN,LL,NZ)+ZH3P(NN,LL,NZ))
-        RH2GZ(NZ)=RH2GZ(NZ)-FRTN*(H2GA(NN,LL,NZ)+H2GP(NN,LL,NZ))
-        CO2A(NN,LL,NZ)=(1.0_r8-FRTN)*CO2A(NN,LL,NZ)
-        OXYA(NN,LL,NZ)=(1.0_r8-FRTN)*OXYA(NN,LL,NZ)
-        CH4A(NN,LL,NZ)=(1.0_r8-FRTN)*CH4A(NN,LL,NZ)
-        Z2OA(NN,LL,NZ)=(1.0_r8-FRTN)*Z2OA(NN,LL,NZ)
-        ZH3A(NN,LL,NZ)=(1.0_r8-FRTN)*ZH3A(NN,LL,NZ)
-        H2GA(NN,LL,NZ)=(1.0_r8-FRTN)*H2GA(NN,LL,NZ)
-        CO2P(NN,LL,NZ)=(1.0_r8-FRTN)*CO2P(NN,LL,NZ)
-        OXYP(NN,LL,NZ)=(1.0_r8-FRTN)*OXYP(NN,LL,NZ)
-        CH4P(NN,LL,NZ)=(1.0_r8-FRTN)*CH4P(NN,LL,NZ)
-        Z2OP(NN,LL,NZ)=(1.0_r8-FRTN)*Z2OP(NN,LL,NZ)
-        ZH3P(NN,LL,NZ)=(1.0_r8-FRTN)*ZH3P(NN,LL,NZ)
-        H2GP(NN,LL,NZ)=(1.0_r8-FRTN)*H2GP(NN,LL,NZ)
+        RCO2Z(NZ)=RCO2Z(NZ)-FRTN*(trcg_rootml(idg_CO2,NN,LL,NZ)+trcs_rootml(idg_CO2,NN,LL,NZ))
+        ROXYZ(NZ)=ROXYZ(NZ)-FRTN*(trcg_rootml(idg_O2,NN,LL,NZ)+trcs_rootml(idg_O2,NN,LL,NZ))
+        RCH4Z(NZ)=RCH4Z(NZ)-FRTN*(trcg_rootml(idg_CH4,NN,LL,NZ)+trcs_rootml(idg_CH4,NN,LL,NZ))
+        RN2OZ(NZ)=RN2OZ(NZ)-FRTN*(trcg_rootml(idg_N2O,NN,LL,NZ)+trcs_rootml(idg_N2O,NN,LL,NZ))
+        RNH3Z(NZ)=RNH3Z(NZ)-FRTN*(trcg_rootml(idg_NH3,NN,LL,NZ)+trcs_rootml(idg_NH3,NN,LL,NZ))
+        RH2GZ(NZ)=RH2GZ(NZ)-FRTN*(trcg_rootml(idg_H2,NN,LL,NZ)+trcs_rootml(idg_H2,NN,LL,NZ))
 
+        DO NTG=idg_beg,idg_end-1
+          trcg_rootml(NTG,NN,LL,NZ)=(1.0_r8-FRTN)*trcg_rootml(NTG,NN,LL,NZ)
+          trcs_rootml(NTG,NN,LL,NZ)=(1.0_r8-FRTN)*trcs_rootml(NTG,NN,LL,NZ)
+        ENDDO
       ENDDO D5110
 !
 !     RESET ROOT NUMBER AND PRIMARY ROOT LENGTH

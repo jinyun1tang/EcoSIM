@@ -758,18 +758,8 @@ implicit none
   real(r8), pointer :: RUPP1P(:,:,:)    => null()  !HPO4 demand in non-band by each root population
   real(r8), pointer :: RUPP1B(:,:,:)    => null()  !HPO4 demand in band by each root population
   real(r8), pointer :: WFR(:,:,:)       => null()  !O2 constraint to root respiration, []
-  real(r8), pointer :: CO2P(:,:,:)      => null()  !root aqueous CO2 content, [g d-2 ]
-  real(r8), pointer :: CO2A(:,:,:)      => null()  !root gaseous CO2 content, [g d-2 ]
-  real(r8), pointer :: CH4P(:,:,:)      => null()  !root aqueous CH4 content, [g d-2 ]
-  real(r8), pointer :: CH4A(:,:,:)      => null()  !root gaseous CH4 content, [g d-2 ]
-  real(r8), pointer :: H2GP(:,:,:)      => null()  !aqueous H2 content of roots, [g d-2]
-  real(r8), pointer :: H2GA(:,:,:)      => null()  !gaseous H2 content of roots, [g d-2]
-  real(r8), pointer :: OXYP(:,:,:)      => null()  !root aqueous O2 content, [g d-2 ]
-  real(r8), pointer :: OXYA(:,:,:)      => null()  !root gaseous O2 content, [g d-2 ]
-  real(r8), pointer :: Z2OP(:,:,:)      => null()  !root aqueous N2O content, [g d-2 ]
-  real(r8), pointer :: Z2OA(:,:,:)      => null()  !root gaseous N2O content, [g d-2 ]
-  real(r8), pointer :: ZH3P(:,:,:)      => null()  !root aqueous NH3 content, [g d-2 ]
-  real(r8), pointer :: ZH3A(:,:,:)      => null()  !root gaseous NH3 content, [g d-2 ]
+  real(r8), pointer :: trcg_rootml(:,:,:,:)=> null() !root gas content, [g d-2]
+  real(r8), pointer :: trcs_rootml(:,:,:,:)=> null() !root aqueous content, [g d-2]
   real(r8), pointer :: RNH3B(:,:)       => null()  !gaseous NH3 flux fron root disturbance band, [g d-2 h-1]
   real(r8), pointer :: RUPNHB(:,:,:)    => null()  !root uptake of NH4 band, [g d-2 h-1]
   real(r8), pointer :: RUPNH4(:,:,:)    => null()  !root uptake of NH4 non-band, [g d-2 h-1]
@@ -836,15 +826,8 @@ implicit none
   implicit none
   class(plant_rootbgc_type) :: this
 
-
-  allocate(this%CO2P(2,JZ1,JP1))
-  allocate(this%CO2A(2,JZ1,JP1))
-  allocate(this%CH4P(2,JZ1,JP1))
-  allocate(this%CH4A(2,JZ1,JP1))
-  allocate(this%H2GP(2,JZ1,JP1))
-  allocate(this%H2GA(2,JZ1,JP1))
-  allocate(this%OXYP(2,JZ1,JP1))
-  allocate(this%OXYA(2,JZ1,JP1))
+  allocate(this%trcg_rootml(idg_beg:idg_end-1,2,JZ1,JP1));this%trcg_rootml=0._r8
+  allocate(this%trcs_rootml(idg_beg:idg_end-1,2,JZ1,JP1));this%trcs_rootml=0._r8
   allocate(this%TUPNF(JZ1))
   allocate(this%ROXSK(60,0:JZ1))
   allocate(this%RDFOME(npelms,2,1:jcplx,0:JZ1,JP1))
@@ -919,10 +902,6 @@ implicit none
   allocate(this%RUPP1B(2,JZ1,JP1))
 
   allocate(this%WFR(2,JZ1,JP1))
-  allocate(this%Z2OP(2,JZ1,JP1))
-  allocate(this%Z2OA(2,JZ1,JP1))
-  allocate(this%ZH3P(2,JZ1,JP1))
-  allocate(this%ZH3A(2,JZ1,JP1))
   allocate(this%UPMNPO(2,JP1))
   allocate(this%UPMXPO(2,JP1))
   allocate(this%UPKMPO(2,JP1))
@@ -953,10 +932,10 @@ implicit none
   implicit none
   class(plant_rootbgc_type) :: this
 
+  call destroy(this%trcg_rootml)
+  call destroy(this%trcs_rootml)
 !  if(allocated(CO2P))deallocate(CO2P)
 !  if(allocated(CO2A))deallocate(CO2A)
-!  if(allocated(CH4P))deallocate(CH4P)
-!  if(allocated(CH4A))deallocate(CH4A)
 !  if(allocated(H2GP))deallocate(H2GP)
 !  if(allocated(H2GA))deallocate(H2GA)
 !  if(allocated(OXYP))deallocate(OXYP)
@@ -1049,10 +1028,6 @@ implicit none
 !  if(allocated(RUPP1P))deallocate(RUPP1P)
 !  if(allocated(RUPP1B))deallocate(RUPP1B)
 !  if(allocated(WFR))deallocate(WFR)
-!  if(allocated(Z2OP))deallocate(Z2OP)
-!  if(allocated(Z2OA))deallocate(Z2OA)
-!  if(allocated(ZH3P))deallocate(ZH3P)
-!  if(allocated(ZH3A))deallocate(ZH3A)
 !  if(allocated(UPMNPO))deallocate(UPMNPO)
 !  if(allocated(UPMXPO))deallocate(UPMXPO)
 !  if(allocated(UPKMPO))deallocate(UPKMPO)

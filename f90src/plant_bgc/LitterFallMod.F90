@@ -304,18 +304,8 @@ implicit none
     FWODRE    =>   plt_allom%FWODRE   , &
     IDTHR     =>   plt_pheno%IDTHR    , &
     CFOPE     =>   plt_soilchem%CFOPE , &
-    CO2P      =>   plt_rbgc%CO2P  , &
-    OXYP      =>   plt_rbgc%OXYP  , &
-    CO2A      =>   plt_rbgc%CO2A  , &
-    OXYA      =>   plt_rbgc%OXYA  , &
-    CH4P      =>   plt_rbgc%CH4P  , &
-    CH4A      =>   plt_rbgc%CH4A  , &
-    H2GP      =>   plt_rbgc%H2GP  , &
-    H2GA      =>   plt_rbgc%H2GA  , &
-    Z2OP      =>   plt_rbgc%Z2OP      , &
-    Z2OA      =>   plt_rbgc%Z2OA      , &
-    ZH3P      =>   plt_rbgc%ZH3P      , &
-    ZH3A      =>   plt_rbgc%ZH3A      , &
+    trcg_rootml      =>   plt_rbgc%trcg_rootml  , &
+    trcs_rootml => plt_rbgc%trcs_rootml, &
     NJ        =>   plt_site%NJ        , &
     NU        =>   plt_site%NU        , &
     RH2GZ     =>   plt_bgcr%RH2GZ     , &
@@ -385,24 +375,14 @@ implicit none
 !
 !     RELEASE GAS CONTENTS OF DEAD ROOTS
 !
-        RCO2Z(NZ)=RCO2Z(NZ)-CO2A(N,L,NZ)-CO2P(N,L,NZ)
-        ROXYZ(NZ)=ROXYZ(NZ)-OXYA(N,L,NZ)-OXYP(N,L,NZ)
-        RCH4Z(NZ)=RCH4Z(NZ)-CH4A(N,L,NZ)-CH4P(N,L,NZ)
-        RN2OZ(NZ)=RN2OZ(NZ)-Z2OA(N,L,NZ)-Z2OP(N,L,NZ)
-        RNH3Z(NZ)=RNH3Z(NZ)-ZH3A(N,L,NZ)-ZH3P(N,L,NZ)
-        RH2GZ(NZ)=RH2GZ(NZ)-H2GA(N,L,NZ)-H2GP(N,L,NZ)
-        CO2A(N,L,NZ)=0._r8
-        OXYA(N,L,NZ)=0._r8
-        CH4A(N,L,NZ)=0._r8
-        Z2OA(N,L,NZ)=0._r8
-        ZH3A(N,L,NZ)=0._r8
-        H2GA(N,L,NZ)=0._r8
-        CO2P(N,L,NZ)=0._r8
-        OXYP(N,L,NZ)=0._r8
-        CH4P(N,L,NZ)=0._r8
-        Z2OP(N,L,NZ)=0._r8
-        ZH3P(N,L,NZ)=0._r8
-        H2GP(N,L,NZ)=0._r8
+        RCO2Z(NZ)=RCO2Z(NZ)-trcg_rootml(idg_CO2,N,L,NZ)-trcs_rootml(idg_CO2,N,L,NZ)
+        ROXYZ(NZ)=ROXYZ(NZ)-trcg_rootml(idg_O2,N,L,NZ)-trcs_rootml(idg_O2,N,L,NZ)
+        RCH4Z(NZ)=RCH4Z(NZ)-trcg_rootml(idg_CH4,N,L,NZ)-trcs_rootml(idg_CH4,N,L,NZ)
+        RN2OZ(NZ)=RN2OZ(NZ)-trcg_rootml(idg_N2O,N,L,NZ)-trcs_rootml(idg_N2O,N,L,NZ)
+        RNH3Z(NZ)=RNH3Z(NZ)-trcg_rootml(idg_NH3,N,L,NZ)-trcs_rootml(idg_NH3,N,L,NZ)
+        RH2GZ(NZ)=RH2GZ(NZ)-trcg_rootml(idg_H2,N,L,NZ)-trcs_rootml(idg_H2,N,L,NZ)
+        trcg_rootml(idg_beg:idg_end-1,N,L,NZ)=0._r8
+        trcs_rootml(idg_beg:idg_end-1,N,L,NZ)=0._r8
 !
 !     RESET STATE VARIABLES OF DEAD ROOTS
 !

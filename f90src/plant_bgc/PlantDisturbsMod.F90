@@ -658,7 +658,7 @@ module PlantDisturbsMod
   implicit none
   integer , intent(in) :: I,J,NZ
   real(r8), intent(inout) :: CPOOLK(10,JP1)
-  integer :: L,K,M,N,NR,NB,NE
+  integer :: L,K,M,N,NR,NB,NE,NTG
   real(r8) :: XHVST,XHVST1
   REAL(R8) :: APSILT
   real(r8) :: FDM,VOLWPX
@@ -673,14 +673,8 @@ module PlantDisturbsMod
     IYRH     =>  plt_distb%IYRH      , &
     XCORP    =>  plt_distb%XCORP     , &
     CFOPE    =>  plt_soilchem%CFOPE  , &
-    CH4P     =>  plt_rbgc%CH4P       , &
-    CH4A     =>  plt_rbgc%CH4A       , &
-    H2GP     =>  plt_rbgc%H2GP       , &
-    H2GA     =>  plt_rbgc%H2GA       , &
-    OXYP     =>  plt_rbgc%OXYP       , &
-    CO2P     =>  plt_rbgc%CO2P       , &
-    OXYA     =>  plt_rbgc%OXYA       , &
-    CO2A     =>  plt_rbgc%CO2A       , &
+    trcg_rootml     =>  plt_rbgc%trcg_rootml       , &
+    trcs_rootml => plt_rbgc%trcs_rootml , &
     UVOLO    =>  plt_ew%UVOLO        , &
     VOLWP    =>  plt_ew%VOLWP        , &
     VHCPC    =>  plt_ew%VHCPC        , &
@@ -756,11 +750,7 @@ module PlantDisturbsMod
     RCO2Z    =>  plt_bgcr%RCO2Z      , &
     RCH4Z    =>  plt_bgcr%RCH4Z      , &
     ROXYZ    =>  plt_bgcr%ROXYZ      , &
-    ZH3P     =>  plt_rbgc%ZH3P       , &
-    Z2OP     =>  plt_rbgc%Z2OP       , &
-    ZH3A     =>  plt_rbgc%ZH3A       , &
     RCO2A    =>  plt_rbgc%RCO2A      , &
-    Z2OA     =>  plt_rbgc%Z2OA       , &
     RCO2M    =>  plt_rbgc%RCO2M      , &
     RCO2N    =>  plt_rbgc%RCO2N      , &
     FRADP    =>  plt_rad%FRADP       , &
@@ -1015,24 +1005,16 @@ module PlantDisturbsMod
 !     CO2P,OXYP,CH4P,Z2OP,ZH3P,H2GP=root aqueous CO2,O2,CH4,N2O,NH3,H2
 !     RCO2Z,ROXYZ,RCH4Z,RN2OZ,RNH3Z,RH2GZ=root gaseous CO2,O2,CH4,N2O,NH3,H2 loss from disturbance
 !
-            RCO2Z(NZ)=RCO2Z(NZ)-XHVST1*(CO2A(N,L,NZ)+CO2P(N,L,NZ))
-            ROXYZ(NZ)=ROXYZ(NZ)-XHVST1*(OXYA(N,L,NZ)+OXYP(N,L,NZ))
-            RCH4Z(NZ)=RCH4Z(NZ)-XHVST1*(CH4A(N,L,NZ)+CH4P(N,L,NZ))
-            RN2OZ(NZ)=RN2OZ(NZ)-XHVST1*(Z2OA(N,L,NZ)+Z2OP(N,L,NZ))
-            RNH3Z(NZ)=RNH3Z(NZ)-XHVST1*(ZH3A(N,L,NZ)+ZH3P(N,L,NZ))
-            RH2GZ(NZ)=RH2GZ(NZ)-XHVST1*(H2GA(N,L,NZ)+H2GP(N,L,NZ))
-            CO2A(N,L,NZ)=XHVST*CO2A(N,L,NZ)
-            OXYA(N,L,NZ)=XHVST*OXYA(N,L,NZ)
-            CH4A(N,L,NZ)=XHVST*CH4A(N,L,NZ)
-            Z2OA(N,L,NZ)=XHVST*Z2OA(N,L,NZ)
-            ZH3A(N,L,NZ)=XHVST*ZH3A(N,L,NZ)
-            H2GA(N,L,NZ)=XHVST*H2GA(N,L,NZ)
-            CO2P(N,L,NZ)=XHVST*CO2P(N,L,NZ)
-            OXYP(N,L,NZ)=XHVST*OXYP(N,L,NZ)
-            CH4P(N,L,NZ)=XHVST*CH4P(N,L,NZ)
-            Z2OP(N,L,NZ)=XHVST*Z2OP(N,L,NZ)
-            ZH3P(N,L,NZ)=XHVST*ZH3P(N,L,NZ)
-            H2GP(N,L,NZ)=XHVST*H2GP(N,L,NZ)
+            RCO2Z(NZ)=RCO2Z(NZ)-XHVST1*(trcg_rootml(idg_CO2,N,L,NZ)+trcs_rootml(idg_CO2,N,L,NZ))
+            ROXYZ(NZ)=ROXYZ(NZ)-XHVST1*(trcg_rootml(idg_O2,N,L,NZ)+trcs_rootml(idg_O2,N,L,NZ))
+            RCH4Z(NZ)=RCH4Z(NZ)-XHVST1*(trcg_rootml(idg_CH4,N,L,NZ)+trcs_rootml(idg_CH4,N,L,NZ))
+            RN2OZ(NZ)=RN2OZ(NZ)-XHVST1*(trcg_rootml(idg_N2O,N,L,NZ)+trcs_rootml(idg_N2O,N,L,NZ))
+            RNH3Z(NZ)=RNH3Z(NZ)-XHVST1*(trcg_rootml(idg_NH3,N,L,NZ)+trcs_rootml(idg_NH3,N,L,NZ))
+            RH2GZ(NZ)=RH2GZ(NZ)-XHVST1*(trcg_rootml(idg_H2,N,L,NZ)+trcs_rootml(idg_H2,N,L,NZ))
+            DO NTG=idg_beg,idg_end-1
+              trcg_rootml(NTG,N,L,NZ)=XHVST*trcg_rootml(NTG,N,L,NZ)
+              trcs_rootml(NTG,N,L,NZ)=XHVST*trcs_rootml(NTG,N,L,NZ)
+            ENDDO
 !
 !     ROOT STATE VARIABLES REMAINING AFTER TILLAGE
 !
@@ -1174,6 +1156,7 @@ module PlantDisturbsMod
   real(r8) :: WHVSBS,WHVSCX,WHVSNX,WVPLT
   real(r8) :: FHVSH1,FHVSHT
   real(r8) :: WGLFGE(npelms)
+  integer :: NTG
 !     begin_execution
   associate(                             &
     HVST     =>  plt_distb%HVST    , &
@@ -1285,14 +1268,8 @@ module PlantDisturbsMod
     k_fine_litr=> pltpar%k_fine_litr ,&
     k_woody_litr=> pltpar%k_woody_litr,&
     icwood   =>  pltpar%icwood    , &
-    H2GP     =>  plt_rbgc%H2GP     , &
-    CO2P     =>  plt_rbgc%CO2P     , &
-    CH4P     =>  plt_rbgc%CH4P     , &
-    OXYP     =>  plt_rbgc%OXYP     , &
-    H2GA     =>  plt_rbgc%H2GA     , &
-    CH4A     =>  plt_rbgc%CH4A     , &
-    OXYA     =>  plt_rbgc%OXYA     , &
-    CO2A     =>  plt_rbgc%CO2A     , &
+    trcg_rootml     =>  plt_rbgc%trcg_rootml     , &
+    trcs_rootml     =>  plt_rbgc%trcs_rootml     , &
     ESNC     =>  plt_bgcr%ESNC     , &
     TNBP     =>  plt_bgcr%TNBP     , &
     RCH4Z    =>  plt_bgcr%RCH4Z    , &
@@ -1302,13 +1279,9 @@ module PlantDisturbsMod
     RNH3Z    =>  plt_bgcr%RNH3Z    , &
     RH2GZ    =>  plt_bgcr%RH2GZ    , &
     CNET     =>  plt_bgcr%CNET     , &
-    ZH3P     =>  plt_rbgc%ZH3P     , &
-    Z2OP     =>  plt_rbgc%Z2OP     , &
-    Z2OA     =>  plt_rbgc%Z2OA     , &
     RCO2A    =>  plt_rbgc%RCO2A    , &
     RCO2M    =>  plt_rbgc%RCO2M    , &
     RCO2N    =>  plt_rbgc%RCO2N    , &
-    ZH3A     =>  plt_rbgc%ZH3A     , &
     RTNL     =>  plt_morph%RTNL    , &
     RTN2     =>  plt_morph%RTN2    , &
     RTLGP    =>  plt_morph%RTLGP   , &
@@ -2462,24 +2435,18 @@ module PlantDisturbsMod
 !     CO2P,OXYP,CH4P,Z2OP,ZH3P,H2GP=root aqueous CO2,O2,CH4,N2O,NH3,H2
 !     RCO2Z,ROXYZ,RCH4Z,RN2OZ,RNH3Z,RH2GZ=root gaseous CO2,O2,CH4,N2O,NH3,H2 loss from disturbance
 !
-            RCO2Z(NZ)=RCO2Z(NZ)-XHVST1(ielmc)*(CO2A(N,L,NZ)+CO2P(N,L,NZ))
-            ROXYZ(NZ)=ROXYZ(NZ)-XHVST1(ielmc)*(OXYA(N,L,NZ)+OXYP(N,L,NZ))
-            RCH4Z(NZ)=RCH4Z(NZ)-XHVST1(ielmc)*(CH4A(N,L,NZ)+CH4P(N,L,NZ))
-            RN2OZ(NZ)=RN2OZ(NZ)-XHVST1(ielmc)*(Z2OA(N,L,NZ)+Z2OP(N,L,NZ))
-            RNH3Z(NZ)=RNH3Z(NZ)-XHVST1(ielmc)*(ZH3A(N,L,NZ)+ZH3P(N,L,NZ))
-            RH2GZ(NZ)=RH2GZ(NZ)-XHVST1(ielmc)*(H2GA(N,L,NZ)+H2GP(N,L,NZ))
-            CO2A(N,L,NZ)=XHVST(ielmc)*CO2A(N,L,NZ)
-            OXYA(N,L,NZ)=XHVST(ielmc)*OXYA(N,L,NZ)
-            CH4A(N,L,NZ)=XHVST(ielmc)*CH4A(N,L,NZ)
-            Z2OA(N,L,NZ)=XHVST(ielmc)*Z2OA(N,L,NZ)
-            ZH3A(N,L,NZ)=XHVST(ielmc)*ZH3A(N,L,NZ)
-            H2GA(N,L,NZ)=XHVST(ielmc)*H2GA(N,L,NZ)
-            CO2P(N,L,NZ)=XHVST(ielmc)*CO2P(N,L,NZ)
-            OXYP(N,L,NZ)=XHVST(ielmc)*OXYP(N,L,NZ)
-            CH4P(N,L,NZ)=XHVST(ielmc)*CH4P(N,L,NZ)
-            Z2OP(N,L,NZ)=XHVST(ielmc)*Z2OP(N,L,NZ)
-            ZH3P(N,L,NZ)=XHVST(ielmc)*ZH3P(N,L,NZ)
-            H2GP(N,L,NZ)=XHVST(ielmc)*H2GP(N,L,NZ)
+            RCO2Z(NZ)=RCO2Z(NZ)-XHVST1(ielmc)*(trcg_rootml(idg_CO2,N,L,NZ)+trcs_rootml(idg_CO2,N,L,NZ))
+            ROXYZ(NZ)=ROXYZ(NZ)-XHVST1(ielmc)*(trcg_rootml(idg_O2,N,L,NZ)+trcs_rootml(idg_O2,N,L,NZ))
+            RCH4Z(NZ)=RCH4Z(NZ)-XHVST1(ielmc)*(trcg_rootml(idg_CH4,N,L,NZ)+trcs_rootml(idg_CH4,N,L,NZ))
+            RN2OZ(NZ)=RN2OZ(NZ)-XHVST1(ielmc)*(trcg_rootml(idg_N2O,N,L,NZ)+trcs_rootml(idg_N2O,N,L,NZ))
+            RNH3Z(NZ)=RNH3Z(NZ)-XHVST1(ielmc)*(trcg_rootml(idg_NH3,N,L,NZ)+trcs_rootml(idg_NH3,N,L,NZ))
+            RH2GZ(NZ)=RH2GZ(NZ)-XHVST1(ielmc)*(trcg_rootml(idg_H2,N,L,NZ)+trcs_rootml(idg_H2,N,L,NZ))
+
+            DO NTG=idg_beg,idg_end-1
+              trcg_rootml(NTG,N,L,NZ)=XHVST(ielmc)*trcg_rootml(NTG,N,L,NZ)
+              trcs_rootml(NTG,N,L,NZ)=XHVST(ielmc)*trcs_rootml(NTG,N,L,NZ)
+            ENDDO
+
 !
 !     REDUCE ROOT STATE VARIABLES DURING HARVESTING
 !
