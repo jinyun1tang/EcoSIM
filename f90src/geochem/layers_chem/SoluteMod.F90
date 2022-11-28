@@ -103,14 +103,14 @@ module SoluteMod
 !     RSNUBB=rate of banded urea fertilizer dissolution in band
 !     RSNOBB=rate of banded NO3 fertilizer dissolution in band
 !
-  ZNH4FA(L,NY,NX)=ZNH4FA(L,NY,NX)-RSN4AA-RSN4BA
-  ZNH3FA(L,NY,NX)=ZNH3FA(L,NY,NX)-RSN3AA-RSN3BA
-  ZNHUFA(L,NY,NX)=ZNHUFA(L,NY,NX)-RSNUAA-RSNUBA
-  ZNO3FA(L,NY,NX)=ZNO3FA(L,NY,NX)-RSNOAA-RSNOBA
-  ZNH4FB(L,NY,NX)=ZNH4FB(L,NY,NX)-RSN4BB
-  ZNH3FB(L,NY,NX)=ZNH3FB(L,NY,NX)-RSN3BB
-  ZNHUFB(L,NY,NX)=ZNHUFB(L,NY,NX)-RSNUBB
-  ZNO3FB(L,NY,NX)=ZNO3FB(L,NY,NX)-RSNOBB
+  FertN_soil(ifert_nh4,L,NY,NX)=FertN_soil(ifert_nh4,L,NY,NX)-RSN4AA-RSN4BA
+  FertN_soil(ifert_nh3,L,NY,NX)=FertN_soil(ifert_nh3,L,NY,NX)-RSN3AA-RSN3BA
+  FertN_soil(ifert_urea,L,NY,NX)=FertN_soil(ifert_urea,L,NY,NX)-RSNUAA-RSNUBA
+  FertN_soil(ifert_no3,L,NY,NX)=FertN_soil(ifert_no3,L,NY,NX)-RSNOAA-RSNOBA
+  FertN_band(ifert_nh4_band,L,NY,NX)=FertN_band(ifert_nh4_band,L,NY,NX)-RSN4BB
+  FertN_band(ifert_nh3_band,L,NY,NX)=FertN_band(ifert_nh3_band,L,NY,NX)-RSN3BB
+  FertN_band(ifert_urea_band,L,NY,NX)=FertN_band(ifert_urea_band,L,NY,NX)-RSNUBB
+  FertN_band(ifert_no3_band,L,NY,NX)=FertN_band(ifert_no3_band,L,NY,NX)-RSNOBB
 !
 !     ADD FERTILIZER DISSOLUTION TO ION FLUXES AND CONVERT TO MASS
 !
@@ -188,15 +188,15 @@ module SoluteMod
 !     TFNQ=temperature effect on microbial activity from nitro.f
 !     ZNHUI=current inhibition activity
 !
-  IF(ZNHUFA(L,NY,NX).GT.ZEROS(NY,NX).AND.BKVL(L,NY,NX).GT.ZEROS(NY,NX))THEN
-    CNHUA=ZNHUFA(L,NY,NX)/BKVL(L,NY,NX)
+  IF(FertN_soil(ifert_urea,L,NY,NX).GT.ZEROS(NY,NX).AND.BKVL(L,NY,NX).GT.ZEROS(NY,NX))THEN
+    CNHUA=FertN_soil(ifert_urea,L,NY,NX)/BKVL(L,NY,NX)
   ELSEIF(VOLW(L,NY,NX).GT.ZEROS2(NY,NX))THEN
-    CNHUA=ZNHUFA(L,NY,NX)/VOLW(L,NY,NX)
+    CNHUA=FertN_soil(ifert_urea,L,NY,NX)/VOLW(L,NY,NX)
   ELSE
     CNHUA=0._r8
   ENDIF
   DFNSA=CNHUA/(CNHUA+DUKD)
-  RSNUA=AMIN1(ZNHUFA(L,NY,NX),SPNHU*TOQCK(L,NY,NX)*DFNSA*TFNQ(L,NY,NX))*(1.0-ZNHUI(L,NY,NX))
+  RSNUA=AMIN1(FertN_soil(ifert_urea,L,NY,NX),SPNHU*TOQCK(L,NY,NX)*DFNSA*TFNQ(L,NY,NX))*(1.0-ZNHUI(L,NY,NX))
 !
 !     UREA CONCENTRATION AND HYDROLYSIS IN BAND
 !
@@ -207,15 +207,15 @@ module SoluteMod
 !     SPNHU=specific rate constant for urea hydrolysis
 !     TFNQ=temperature effect on microbial activity from nitro.f
 !
-  IF(ZNHUFB(L,NY,NX).GT.ZEROS(NY,NX).AND.BKVL(L,NY,NX).GT.ZEROS(NY,NX))THEN
-    CNHUB=ZNHUFB(L,NY,NX)/BKVL(L,NY,NX)
+  IF(FertN_band(ifert_urea_band,L,NY,NX).GT.ZEROS(NY,NX).AND.BKVL(L,NY,NX).GT.ZEROS(NY,NX))THEN
+    CNHUB=FertN_band(ifert_urea_band,L,NY,NX)/BKVL(L,NY,NX)
   ELSEIF(VOLW(L,NY,NX).GT.ZEROS2(NY,NX))THEN
-    CNHUB=ZNHUFB(L,NY,NX)/VOLW(L,NY,NX)
+    CNHUB=FertN_band(ifert_urea_band,L,NY,NX)/VOLW(L,NY,NX)
   ELSE
     CNHUB=0._r8
   ENDIF
   DFNSB=CNHUB/(CNHUB+DUKD)
-  RSNUB=AMIN1(ZNHUFB(L,NY,NX),SPNHU*TOQCK(L,NY,NX)*DFNSB*TFNQ(L,NY,NX))*(1.0-ZNHUI(L,NY,NX))
+  RSNUB=AMIN1(FertN_band(ifert_urea_band,L,NY,NX),SPNHU*TOQCK(L,NY,NX)*DFNSB*TFNQ(L,NY,NX))*(1.0-ZNHUI(L,NY,NX))
 
   end subroutine UreaHydrolysis
 !------------------------------------------------------------------------
@@ -330,18 +330,18 @@ module SoluteMod
 !     VLPO4,VLPOB=fractions of soil volume in H2PO4 non-band,band
 !     THETW=soil water concentration
 !
-  RSN4AA=SPNH4*ZNH4FA(L,NY,NX)*trcs_VLN(ids_NH4,L,NY,NX)*THETW(L,NY,NX)
-  RSN3AA=SPNH3*ZNH3FA(L,NY,NX)*trcs_VLN(ids_NH4,L,NY,NX)
+  RSN4AA=SPNH4*FertN_soil(ifert_nh4,L,NY,NX)*trcs_VLN(ids_NH4,L,NY,NX)*THETW(L,NY,NX)
+  RSN3AA=SPNH3*FertN_soil(ifert_nh3,L,NY,NX)*trcs_VLN(ids_NH4,L,NY,NX)
   RSNUAA=RSNUA*trcs_VLN(ids_NH4,L,NY,NX)*THETW(L,NY,NX)
-  RSNOAA=SPNO3*ZNO3FA(L,NY,NX)*trcs_VLN(ids_NO3,L,NY,NX)*THETW(L,NY,NX)
-  RSN4BA=SPNH4*ZNH4FA(L,NY,NX)*trcs_VLN(ids_NH4B,L,NY,NX)*THETW(L,NY,NX)
-  RSN3BA=SPNH3*ZNH3FA(L,NY,NX)*trcs_VLN(ids_NH4B,L,NY,NX)
+  RSNOAA=SPNO3*FertN_soil(ifert_no3,L,NY,NX)*trcs_VLN(ids_NO3,L,NY,NX)*THETW(L,NY,NX)
+  RSN4BA=SPNH4*FertN_soil(ifert_nh4,L,NY,NX)*trcs_VLN(ids_NH4B,L,NY,NX)*THETW(L,NY,NX)
+  RSN3BA=SPNH3*FertN_soil(ifert_nh3,L,NY,NX)*trcs_VLN(ids_NH4B,L,NY,NX)
   RSNUBA=RSNUA*trcs_VLN(ids_NH4B,L,NY,NX)*THETW(L,NY,NX)
-  RSNOBA=SPNO3*ZNO3FA(L,NY,NX)*trcs_VLN(ids_NO3B,L,NY,NX)*THETW(L,NY,NX)
-  RSN4BB=SPNH4*ZNH4FB(L,NY,NX)*THETW(L,NY,NX)
-  RSN3BB=SPNH3*ZNH3FB(L,NY,NX)
+  RSNOBA=SPNO3*FertN_soil(ifert_no3,L,NY,NX)*trcs_VLN(ids_NO3B,L,NY,NX)*THETW(L,NY,NX)
+  RSN4BB=SPNH4*FertN_band(ifert_nh4_band,L,NY,NX)*THETW(L,NY,NX)
+  RSN3BB=SPNH3*FertN_band(ifert_nh3_band,L,NY,NX)
   RSNUBB=RSNUB*trcs_VLN(ids_NH4B,L,NY,NX)*THETW(L,NY,NX)
-  RSNOBB=SPNO3*ZNO3FB(L,NY,NX)*THETW(L,NY,NX)
+  RSNOBB=SPNO3*FertN_band(ifert_no3_band,L,NY,NX)*THETW(L,NY,NX)
 !
 !     SOLUBLE AND EXCHANGEABLE NH4 CONCENTRATIONS
 !     IN NON-BAND AND BAND SOIL ZONES
@@ -957,11 +957,11 @@ module SoluteMod
 !     SPNHU=specific rate constant for urea hydrolysis
 !     TFNQ=temperature effect on microbial activity from nitro.f
 !
-    IF(ZNHUFA(0,NY,NX).GT.ZEROS(NY,NX) &
+    IF(FertN_soil(ifert_urea,0,NY,NX).GT.ZEROS(NY,NX) &
       .AND.BKVL(0,NY,NX).GT.ZEROS(NY,NX))THEN
-      CNHUA=ZNHUFA(0,NY,NX)/BKVL(0,NY,NX)
+      CNHUA=FertN_soil(ifert_urea,0,NY,NX)/BKVL(0,NY,NX)
       DFNSA=CNHUA/(CNHUA+DUKD)
-      RSNUA=AMIN1(ZNHUFA(0,NY,NX),SPNHU*TOQCK(0,NY,NX)*DFNSA*TFNQ(0,NY,NX))*(1.0-ZNHUI(0,NY,NX))
+      RSNUA=AMIN1(FertN_soil(ifert_urea,0,NY,NX),SPNHU*TOQCK(0,NY,NX)*DFNSA*TFNQ(0,NY,NX))*(1.0-ZNHUI(0,NY,NX))
     ELSE
       RSNUA=0._r8
     ENDIF
@@ -982,10 +982,10 @@ module SoluteMod
     ELSE
       THETWR=1._r8
     ENDIF
-    RSN4AA=SPNH4*ZNH4FA(0,NY,NX)*THETWR
-    RSN3AA=SPNH3*ZNH3FA(0,NY,NX)
+    RSN4AA=SPNH4*FertN_soil(ifert_nh4,0,NY,NX)*THETWR
+    RSN3AA=SPNH3*FertN_soil(ifert_nh3,0,NY,NX)
     RSNUAA=RSNUA*THETWR
-    RSNOAA=SPNO3*ZNO3FA(0,NY,NX)*THETWR
+    RSNOAA=SPNO3*FertN_soil(ifert_no3,0,NY,NX)*THETWR
 !
 !     SOLUBLE AND EXCHANGEABLE NH4 CONCENTRATIONS
 !
@@ -1221,10 +1221,10 @@ module SoluteMod
       TRCAPD(0,NY,NX)=TRCAPD(0,NY,NX)+RPCADX*VOLWM(NPH,0,NY,NX)
       TRCAPH(0,NY,NX)=TRCAPH(0,NY,NX)+RPCAHX*VOLWM(NPH,0,NY,NX)
       TRCAPM(0,NY,NX)=TRCAPM(0,NY,NX)+RPCAMX*VOLWM(NPH,0,NY,NX)
-      ZNH4FA(0,NY,NX)=ZNH4FA(0,NY,NX)-RSN4AA
-      ZNH3FA(0,NY,NX)=ZNH3FA(0,NY,NX)-RSN3AA
-      ZNHUFA(0,NY,NX)=ZNHUFA(0,NY,NX)-RSNUAA
-      ZNO3FA(0,NY,NX)=ZNO3FA(0,NY,NX)-RSNOAA
+      FertN_soil(ifert_nh4,0,NY,NX)=FertN_soil(ifert_nh4,0,NY,NX)-RSN4AA
+      FertN_soil(ifert_nh3,0,NY,NX)=FertN_soil(ifert_nh3,0,NY,NX)-RSN3AA
+      FertN_soil(ifert_urea,0,NY,NX)=FertN_soil(ifert_urea,0,NY,NX)-RSNUAA
+      FertN_soil(ifert_no3,0,NY,NX)=FertN_soil(ifert_no3,0,NY,NX)-RSNOAA
       TRN4S(0,NY,NX)=TRN4S(0,NY,NX)+RSN4AA
       TRN3S(0,NY,NX)=TRN3S(0,NY,NX)+RSN3AA+RSNUAA
       TRNO3(0,NY,NX)=TRNO3(0,NY,NX)+RSNOAA
@@ -1235,7 +1235,7 @@ module SoluteMod
       TRH2P(0,NY,NX)=TRH2P(0,NY,NX)*patomw
 !     WRITE(*,9989)'TRN4S',I,J,TRN4S(0,NY,NX)
 !    2,RN4S,RNH4,RXN4,RSN4AA,VOLWM(NPH,0,NY,NX)
-!    3,SPNH4,ZNH4FA(0,NY,NX),THETWR
+!    3,SPNH4,FertN_soil(ifert_nh4,0,NY,NX),THETWR
 !9989  FORMAT(A8,2I4,12E12.4)
   end subroutine UpdateSoluteinSurfaceResidue
 

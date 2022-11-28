@@ -965,32 +965,21 @@ module PlantDisturbsMod
         D8985: DO N=1,MY(NZ)
           D8980: DO L=NU,NJ
             D6385: DO M=1,jsken
-              ESNC(M,ielmc,k_fine_litr,L,NZ)=ESNC(M,ielmc,k_fine_litr,L,NZ)+XHVST1 &
-                *CFOPE(instruct,M,ielmc,NZ)*EPOOLR(ielmc,N,L,NZ)
-              ESNC(M,ielmn,k_fine_litr,L,NZ)=ESNC(M,ielmn,k_fine_litr,L,NZ)+XHVST1 &
-                *CFOPE(instruct,M,ielmn,NZ)*EPOOLR(ielmn,N,L,NZ)
-              ESNC(M,ielmp,k_fine_litr,L,NZ)=ESNC(M,ielmp,k_fine_litr,L,NZ)+XHVST1 &
-                *CFOPE(instruct,M,ielmp,NZ)*EPOOLR(ielmp,N,L,NZ)
+                DO NE=1,npelms
+                  ESNC(M,NE,k_fine_litr,L,NZ)=ESNC(M,NE,k_fine_litr,L,NZ)+XHVST1 &
+                    *CFOPE(instruct,M,NE,NZ)*EPOOLR(NE,N,L,NZ)
+                ENDDO
 
               DO NR=1,NRT(NZ)
-                ESNC(M,ielmc,k_woody_litr,L,NZ)=ESNC(M,ielmc,k_woody_litr,L,NZ)+XHVST1 &
-                  *CFOPE(icwood,M,ielmc,NZ)*(WTRT1E(ielmc,N,L,NR,NZ) &
-                  +WTRT2E(ielmc,N,L,NR,NZ))*FWODRE(ielmc,k_woody_litr)
-                ESNC(M,ielmn,k_woody_litr,L,NZ)=ESNC(M,ielmn,k_woody_litr,L,NZ)+XHVST1 &
-                  *CFOPE(icwood,M,ielmn,NZ)*(WTRT1E(ielmn,N,L,NR,NZ) &
-                  +WTRT2E(ielmn,N,L,NR,NZ))*FWODRE(ielmn,k_woody_litr)
-                ESNC(M,ielmp,k_woody_litr,L,NZ)=ESNC(M,ielmp,k_woody_litr,L,NZ)+XHVST1 &
-                  *CFOPE(icwood,M,ielmp,NZ)*(WTRT1E(ielmp,N,L,NR,NZ) &
-                  +WTRT2E(ielmp,N,L,NR,NZ))*FWODRE(ielmp,k_woody_litr)
-                ESNC(M,ielmc,k_fine_litr,L,NZ)=ESNC(M,ielmc,k_fine_litr,L,NZ)+XHVST1 &
-                  *CFOPE(iroot,M,ielmc,NZ)*(WTRT1E(ielmc,N,L,NR,NZ) &
-                  +WTRT2E(ielmc,N,L,NR,NZ))*FWODRE(ielmc,k_fine_litr)
-                ESNC(M,ielmn,k_fine_litr,L,NZ)=ESNC(M,ielmn,k_fine_litr,L,NZ)+XHVST1 &
-                  *CFOPE(iroot,M,ielmn,NZ)*(WTRT1E(ielmn,N,L,NR,NZ) &
-                  +WTRT2E(ielmn,N,L,NR,NZ))*FWODRE(ielmn,k_fine_litr)
-                ESNC(M,ielmp,k_fine_litr,L,NZ)=ESNC(M,ielmp,k_fine_litr,L,NZ)+XHVST1 &
-                  *CFOPE(iroot,M,ielmp,NZ)*(WTRT1E(ielmp,N,L,NR,NZ) &
-                  +WTRT2E(ielmp,N,L,NR,NZ))*FWODRE(ielmp,k_fine_litr)
+                DO NE=1,npelms
+                  ESNC(M,NE,k_woody_litr,L,NZ)=ESNC(M,NE,k_woody_litr,L,NZ)+XHVST1 &
+                    *CFOPE(icwood,M,NE,NZ)*(WTRT1E(NE,N,L,NR,NZ) &
+                    +WTRT2E(NE,N,L,NR,NZ))*FWODRE(NE,k_woody_litr)
+
+                  ESNC(M,NE,k_fine_litr,L,NZ)=ESNC(M,NE,k_fine_litr,L,NZ)+XHVST1 &
+                    *CFOPE(iroot,M,NE,NZ)*(WTRT1E(NE,N,L,NR,NZ) &
+                    +WTRT2E(NE,N,L,NR,NZ))*FWODRE(NE,k_fine_litr)
+                ENDDO
               ENDDO
             ENDDO D6385
 !

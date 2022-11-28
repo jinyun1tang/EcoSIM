@@ -65,7 +65,7 @@ module ErosionMod
   integer, intent(in) :: I, J
   integer, intent(in) :: NHW,NHE,NVN,NVS
   integer :: M
-
+  
 !     execution begins here
 !
   DO M=1,NPH
@@ -466,14 +466,14 @@ module ErosionMod
 !     sediment code:NH4,NH3,NHU,NO3=NH4,NH3,urea,NO3 in non-band
 !                  :NH4B,NH3B,NHUB,NO3B=NH4,NH3,urea,NO3 in band
 !
-              XNH4ER(N,2,N5,N4)=FSEDER*ZNH4FA(NU(N2,N1),N2,N1)
-              XNH3ER(N,2,N5,N4)=FSEDER*ZNH3FA(NU(N2,N1),N2,N1)
-              XNHUER(N,2,N5,N4)=FSEDER*ZNHUFA(NU(N2,N1),N2,N1)
-              XNO3ER(N,2,N5,N4)=FSEDER*ZNO3FA(NU(N2,N1),N2,N1)
-              XNH4EB(N,2,N5,N4)=FSEDER*ZNH4FB(NU(N2,N1),N2,N1)
-              XNH3EB(N,2,N5,N4)=FSEDER*ZNH3FB(NU(N2,N1),N2,N1)
-              XNHUEB(N,2,N5,N4)=FSEDER*ZNHUFB(NU(N2,N1),N2,N1)
-              XNO3EB(N,2,N5,N4)=FSEDER*ZNO3FB(NU(N2,N1),N2,N1)
+              XNH4ER(N,2,N5,N4)=FSEDER*FertN_soil(ifert_nh4,NU(N2,N1),N2,N1)
+              XNH3ER(N,2,N5,N4)=FSEDER*FertN_soil(ifert_nh3,NU(N2,N1),N2,N1)
+              XNHUER(N,2,N5,N4)=FSEDER*FertN_soil(ifert_urea,NU(N2,N1),N2,N1)
+              XNO3ER(N,2,N5,N4)=FSEDER*FertN_soil(ifert_no3,NU(N2,N1),N2,N1)
+              XNH4EB(N,2,N5,N4)=FSEDER*FertN_band(ifert_nh4_band,NU(N2,N1),N2,N1)
+              XNH3EB(N,2,N5,N4)=FSEDER*FertN_band(ifert_nh3_band,NU(N2,N1),N2,N1)
+              XNHUEB(N,2,N5,N4)=FSEDER*FertN_band(ifert_urea_band,NU(N2,N1),N2,N1)
+              XNO3EB(N,2,N5,N4)=FSEDER*FertN_band(ifert_no3_band,NU(N2,N1),N2,N1)
 !
 !     EXCHANGEABLE CATIONS AND ANIONS
 !
@@ -692,14 +692,14 @@ module ErosionMod
 !     sediment code:NH4,NH3,NHU,NO3=NH4,NH3,urea,NO3 in non-band
 !                  :NH4B,NH3B,NHUB,NO3B=NH4,NH3,urea,NO3 in band
 !
-                XNH4ER(N,1,N5B,N4B)=FSEDER*ZNH4FA(NU(N2,N1),N2,N1)
-                XNH3ER(N,1,N5B,N4B)=FSEDER*ZNH3FA(NU(N2,N1),N2,N1)
-                XNHUER(N,1,N5B,N4B)=FSEDER*ZNHUFA(NU(N2,N1),N2,N1)
-                XNO3ER(N,1,N5B,N4B)=FSEDER*ZNO3FA(NU(N2,N1),N2,N1)
-                XNH4EB(N,1,N5B,N4B)=FSEDER*ZNH4FB(NU(N2,N1),N2,N1)
-                XNH3EB(N,1,N5B,N4B)=FSEDER*ZNH3FB(NU(N2,N1),N2,N1)
-                XNHUEB(N,1,N5B,N4B)=FSEDER*ZNHUFB(NU(N2,N1),N2,N1)
-                XNO3EB(N,1,N5B,N4B)=FSEDER*ZNO3FB(NU(N2,N1),N2,N1)
+                XNH4ER(N,1,N5B,N4B)=FSEDER*FertN_soil(ifert_nh4,NU(N2,N1),N2,N1)
+                XNH3ER(N,1,N5B,N4B)=FSEDER*FertN_soil(ifert_nh3,NU(N2,N1),N2,N1)
+                XNHUER(N,1,N5B,N4B)=FSEDER*FertN_soil(ifert_urea,NU(N2,N1),N2,N1)
+                XNO3ER(N,1,N5B,N4B)=FSEDER*FertN_soil(ifert_no3,NU(N2,N1),N2,N1)
+                XNH4EB(N,1,N5B,N4B)=FSEDER*FertN_band(ifert_nh4_band,NU(N2,N1),N2,N1)
+                XNH3EB(N,1,N5B,N4B)=FSEDER*FertN_band(ifert_nh3_band,NU(N2,N1),N2,N1)
+                XNHUEB(N,1,N5B,N4B)=FSEDER*FertN_band(ifert_urea_band,NU(N2,N1),N2,N1)
+                XNO3EB(N,1,N5B,N4B)=FSEDER*FertN_band(ifert_no3_band,NU(N2,N1),N2,N1)
 !
 !     EXCHANGEABLE CATIONS AND ANIONS
 !
@@ -1100,14 +1100,14 @@ module ErosionMod
 !
 !     FERTILIZER POOLS
 !
-              XNH4ER(N,NN,M5,M4)=FSEDER*ZNH4FA(NU(N2,N1),N2,N1)
-              XNH3ER(N,NN,M5,M4)=FSEDER*ZNH3FA(NU(N2,N1),N2,N1)
-              XNHUER(N,NN,M5,M4)=FSEDER*ZNHUFA(NU(N2,N1),N2,N1)
-              XNO3ER(N,NN,M5,M4)=FSEDER*ZNO3FA(NU(N2,N1),N2,N1)
-              XNH4EB(N,NN,M5,M4)=FSEDER*ZNH4FB(NU(N2,N1),N2,N1)
-              XNH3EB(N,NN,M5,M4)=FSEDER*ZNH3FB(NU(N2,N1),N2,N1)
-              XNHUEB(N,NN,M5,M4)=FSEDER*ZNHUFB(NU(N2,N1),N2,N1)
-              XNO3EB(N,NN,M5,M4)=FSEDER*ZNO3FB(NU(N2,N1),N2,N1)
+              XNH4ER(N,NN,M5,M4)=FSEDER*FertN_soil(ifert_nh4,NU(N2,N1),N2,N1)
+              XNH3ER(N,NN,M5,M4)=FSEDER*FertN_soil(ifert_nh3,NU(N2,N1),N2,N1)
+              XNHUER(N,NN,M5,M4)=FSEDER*FertN_soil(ifert_urea,NU(N2,N1),N2,N1)
+              XNO3ER(N,NN,M5,M4)=FSEDER*FertN_soil(ifert_no3,NU(N2,N1),N2,N1)
+              XNH4EB(N,NN,M5,M4)=FSEDER*FertN_band(ifert_nh4_band,NU(N2,N1),N2,N1)
+              XNH3EB(N,NN,M5,M4)=FSEDER*FertN_band(ifert_nh3_band,NU(N2,N1),N2,N1)
+              XNHUEB(N,NN,M5,M4)=FSEDER*FertN_band(ifert_urea_band,NU(N2,N1),N2,N1)
+              XNO3EB(N,NN,M5,M4)=FSEDER*FertN_band(ifert_no3_band,NU(N2,N1),N2,N1)
 !
 !     EXCHANGEABLE CATIONS AND ANIONS
 !

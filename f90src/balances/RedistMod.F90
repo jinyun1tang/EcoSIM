@@ -566,6 +566,7 @@ module RedistMod
     OQP(K,0,NY,NX)=OQP(K,0,NY,NX)+XOPFLS(K,3,0,NY,NX)
     OQA(K,0,NY,NX)=OQA(K,0,NY,NX)+XOAFLS(K,3,0,NY,NX)
   ENDDO D9680
+
   trc_solml(idg_CO2,0,NY,NX)=trc_solml(idg_CO2,0,NY,NX)+XCODFR(NY,NX)+trcs_XFLS(idg_CO2,3,0,NY,NX) &
     +GasDisFlx(idg_CO2,0,NY,NX)-RCO2O(0,NY,NX)
   trc_solml(idg_CH4,0,NY,NX)=trc_solml(idg_CH4,0,NY,NX)+XCHDFR(NY,NX)+trcs_XFLS(idg_CH4,3,0,NY,NX) &
@@ -585,6 +586,7 @@ module RedistMod
   trc_solml(ids_NO3,0,NY,NX)=trc_solml(ids_NO3,0,NY,NX)+trcs_XFLS(ids_NO3,3,0,NY,NX) &
     +XNO3S(0,NY,NX)+TRNO3(0,NY,NX)
   trc_solml(ids_NO2,0,NY,NX)=trc_solml(ids_NO2,0,NY,NX)+trcs_XFLS(ids_NO2,3,0,NY,NX)+XNO2S(0,NY,NX)
+
   trc_solml(ids_H1PO4,0,NY,NX)=trc_solml(ids_H1PO4,0,NY,NX)+TRH1P(0,NY,NX)+trcs_XFLS(ids_H1PO4,3,0,NY,NX) &
     +XH1PS(0,NY,NX)
   trc_solml(ids_H2PO4,0,NY,NX)=trc_solml(ids_H2PO4,0,NY,NX)+TRH2P(0,NY,NX)+trcs_XFLS(ids_H2PO4,3,0,NY,NX) &
@@ -733,14 +735,14 @@ module RedistMod
     !
     !     FERTILIZER POOLS
 !
-    ZNH4FA(NU(NY,NX),NY,NX)=ZNH4FA(NU(NY,NX),NY,NX)+TNH4ER(NY,NX)
-    ZNH3FA(NU(NY,NX),NY,NX)=ZNH3FA(NU(NY,NX),NY,NX)+TNH3ER(NY,NX)
-    ZNHUFA(NU(NY,NX),NY,NX)=ZNHUFA(NU(NY,NX),NY,NX)+TNHUER(NY,NX)
-    ZNO3FA(NU(NY,NX),NY,NX)=ZNO3FA(NU(NY,NX),NY,NX)+TNO3ER(NY,NX)
-    ZNH4FB(NU(NY,NX),NY,NX)=ZNH4FB(NU(NY,NX),NY,NX)+TNH4EB(NY,NX)
-    ZNH3FB(NU(NY,NX),NY,NX)=ZNH3FB(NU(NY,NX),NY,NX)+TNH3EB(NY,NX)
-    ZNHUFB(NU(NY,NX),NY,NX)=ZNHUFB(NU(NY,NX),NY,NX)+TNHUEB(NY,NX)
-    ZNO3FB(NU(NY,NX),NY,NX)=ZNO3FB(NU(NY,NX),NY,NX)+TNO3EB(NY,NX)
+    FertN_soil(ifert_nh4,NU(NY,NX),NY,NX)=FertN_soil(ifert_nh4,NU(NY,NX),NY,NX)+TNH4ER(NY,NX)
+    FertN_soil(ifert_nh3,NU(NY,NX),NY,NX)=FertN_soil(ifert_nh3,NU(NY,NX),NY,NX)+TNH3ER(NY,NX)
+    FertN_soil(ifert_urea,NU(NY,NX),NY,NX)=FertN_soil(ifert_urea,NU(NY,NX),NY,NX)+TNHUER(NY,NX)
+    FertN_soil(ifert_no3,NU(NY,NX),NY,NX)=FertN_soil(ifert_no3,NU(NY,NX),NY,NX)+TNO3ER(NY,NX)
+    FertN_band(ifert_nh4_band,NU(NY,NX),NY,NX)=FertN_band(ifert_nh4_band,NU(NY,NX),NY,NX)+TNH4EB(NY,NX)
+    FertN_band(ifert_nh3_band,NU(NY,NX),NY,NX)=FertN_band(ifert_nh3_band,NU(NY,NX),NY,NX)+TNH3EB(NY,NX)
+    FertN_band(ifert_urea_band,NU(NY,NX),NY,NX)=FertN_band(ifert_urea_band,NU(NY,NX),NY,NX)+TNHUEB(NY,NX)
+    FertN_band(ifert_no3_band,NU(NY,NX),NY,NX)=FertN_band(ifert_no3_band,NU(NY,NX),NY,NX)+TNO3EB(NY,NX)
 !
     !   EXCHANGEABLE CATIONS AND ANIONS
 !
@@ -977,12 +979,12 @@ module RedistMod
   TLN2G=TLN2G+ZG
   Z4S=trc_solml(ids_NH4,0,NY,NX)+trc_solml(idg_NH3,0,NY,NX)
   Z4X=natomw*trcx_solml(idx_NH4,0,NY,NX)
-  Z4F=natomw*(ZNH4FA(0,NY,NX)+ZNHUFA(0,NY,NX)+ZNH3FA(0,NY,NX))
+  Z4F=natomw*(FertN_soil(ifert_nh4,0,NY,NX)+FertN_soil(ifert_urea,0,NY,NX)+FertN_soil(ifert_nh3,0,NY,NX))
   TLNH4=TLNH4+Z4S+Z4X+Z4F
   UNH4(NY,NX)=UNH4(NY,NX)+Z4S+Z4X
 
   ZOS=trc_solml(ids_NO3,0,NY,NX)+trc_solml(ids_NO2,0,NY,NX)
-  ZOF=natomw*ZNO3FA(0,NY,NX)
+  ZOF=natomw*FertN_soil(ifert_no3,0,NY,NX)
   TLNO3=TLNO3+ZOS+ZOF
   UNO3(NY,NX)=UNO3(NY,NX)+ZOS
   POS=trc_solml(ids_H1PO4,0,NY,NX)+trc_solml(ids_H2PO4,0,NY,NX)
@@ -1429,15 +1431,15 @@ module RedistMod
       +trc_soHml(ids_NH4B,L,NY,NX)+trc_solml(idg_NH3,L,NY,NX)+trc_soHml(idg_NH3,L,NY,NX) &
       +trc_solml(idg_NH3B,L,NY,NX)+trc_soHml(idg_NH3B,L,NY,NX)
     Z4X=14.0*(trcx_solml(idx_NH4,L,NY,NX)+trcx_solml(idx_NH4B,L,NY,NX))
-    Z4F=14.0*(ZNH4FA(L,NY,NX)+ZNHUFA(L,NY,NX)+ZNH3FA(L,NY,NX) &
-      +ZNH4FB(L,NY,NX)+ZNHUFB(L,NY,NX)+ZNH3FB(L,NY,NX))
+    Z4F=14.0*(FertN_soil(ifert_nh4,L,NY,NX)+FertN_soil(ifert_urea,L,NY,NX)+FertN_soil(ifert_nh3,L,NY,NX) &
+      +FertN_band(ifert_nh4_band,L,NY,NX)+FertN_band(ifert_urea_band,L,NY,NX)+FertN_band(ifert_nh3_band,L,NY,NX))
     TLNH4=TLNH4+Z4S+Z4X+Z4F
     UNH4(NY,NX)=UNH4(NY,NX)+Z4S+Z4X
 
     ZOS=trc_solml(ids_NO3,L,NY,NX)+trc_soHml(ids_NO3,L,NY,NX)+trc_solml(ids_NO3B,L,NY,NX) &
       +trc_soHml(ids_NO3B,L,NY,NX)+trc_solml(ids_NO2,L,NY,NX)+trc_soHml(ids_NO2,L,NY,NX) &
       +trc_solml(ids_NO2B,L,NY,NX)+trc_soHml(ids_NO2B,L,NY,NX)
-    ZOF=14.0*(ZNO3FA(L,NY,NX)+ZNO3FA(L,NY,NX))
+    ZOF=14.0*(FertN_soil(ifert_no3,L,NY,NX)+FertN_soil(ifert_no3,L,NY,NX))
     TLNO3=TLNO3+ZOS+ZOF
     UNO3(NY,NX)=UNO3(NY,NX)+ZOS
     POS=trc_solml(ids_H2PO4,L,NY,NX)+trc_soHml(ids_H2PO4,L,NY,NX)+trc_solml(ids_H2PO4B,L,NY,NX) &
@@ -1673,9 +1675,9 @@ module RedistMod
 !
 !     TOTAL FERILIZER,EXCHANGEABLE CATIONS AND ANIONS, PRECIPITATES
 !
-  SSF=ZNH3FA(L,NY,NX)+ZNHUFA(L,NY,NX)+ZNO3FA(L,NY,NX) &
-    +ZNH3FB(L,NY,NX)+ZNHUFB(L,NY,NX)+ZNO3FB(L,NY,NX) &
-    +2.0_r8*(ZNH4FA(L,NY,NX)+ZNH4FB(L,NY,NX))
+  SSF=FertN_soil(ifert_nh3,L,NY,NX)+FertN_soil(ifert_urea,L,NY,NX)+FertN_soil(ifert_no3,L,NY,NX) &
+    +FertN_band(ifert_nh3_band,L,NY,NX)+FertN_band(ifert_urea_band,L,NY,NX)+FertN_band(ifert_no3_band,L,NY,NX) &
+    +2.0_r8*(FertN_soil(ifert_nh4,L,NY,NX)+FertN_band(ifert_nh4_band,L,NY,NX))
   SSX=trcx_solml(idx_Hp,L,NY,NX)+trcx_solml(idx_Al,L,NY,NX) &
     +trcx_solml(idx_Fe,L,NY,NX)+trcx_solml(idx_Ca,L,NY,NX)+trcx_solml(idx_Mg,L,NY,NX) &
     +trcx_solml(idx_Na,L,NY,NX)+trcx_solml(idx_K,L,NY,NX)+trcx_solml(idx_COOH,L,NY,NX) &

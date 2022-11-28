@@ -1,6 +1,7 @@
 module TracerIDMod
 
   use MiniMathMod, only : addone
+  use ElmIDMod
 implicit none
   save
   CHARACTER(LEN=*), private, PARAMETER :: MOD_FILENAME=__FILE__
@@ -126,11 +127,19 @@ implicit none
   integer :: idx_H2PO4B ! XH2PB, exchangeable H2PO4  band, [mol d-2]
   integer :: idx_beg, idx_end
 
+
+  integer :: ifertn_beg,ifertn_end
+  integer :: ifertnb_beg,ifertnb_end
+
   contains
 
   subroutine InitTracerIDs(lsalt_model)
   implicit none
   logical, intent(in) :: lsalt_model
+
+
+  ifertn_beg=ifert_nh4;ifertn_end=ifert_no3
+  ifertnb_beg=ifert_nh4_band;ifertnb_end=ifert_no3_band
 
   idg_beg=1; ids_beg=1
 ! for better array manipulation of land-atmosphere exchange,

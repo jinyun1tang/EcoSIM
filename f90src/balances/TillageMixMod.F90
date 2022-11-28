@@ -295,10 +295,10 @@ module TillageMixMod
     TCAPHG=trcp_salml(idsp_HA,0,NY,NX)*CORP0
     TCAPMG=trcp_salml(idsp_CaH2PO4,0,NY,NX)*CORP0
 
-    TNH4FG=ZNH4FA(0,NY,NX)*CORP0
-    TNH3FG=ZNH3FA(0,NY,NX)*CORP0
-    TNHUFG=ZNHUFA(0,NY,NX)*CORP0
-    TNO3FG=ZNO3FA(0,NY,NX)*CORP0
+    TNH4FG=FertN_soil(ifert_NH4,0,NY,NX)*CORP0
+    TNH3FG=FertN_soil(ifert_NH3,0,NY,NX)*CORP0
+    TNHUFG=FertN_soil(ifert_urea,0,NY,NX)*CORP0
+    TNO3FG=FertN_soil(ifert_no3,0,NY,NX)*CORP0
     TZNFNG=ZNFNI(0,NY,NX)*CORP0
     TVOLWR=VOLW(0,NY,NX)*CORP0
     HFLXD=cpo*ORGC(0,NY,NX)*CORP0*TKS(0,NY,NX)
@@ -330,10 +330,10 @@ module TillageMixMod
     trcp_salml(idsp_HA,0,NY,NX)=trcp_salml(idsp_HA,0,NY,NX)*XCORP0
     trcp_salml(idsp_CaH2PO4,0,NY,NX)=trcp_salml(idsp_CaH2PO4,0,NY,NX)*XCORP0
 
-    ZNH4FA(0,NY,NX)=ZNH4FA(0,NY,NX)*XCORP0
-    ZNH3FA(0,NY,NX)=ZNH3FA(0,NY,NX)*XCORP0
-    ZNHUFA(0,NY,NX)=ZNHUFA(0,NY,NX)*XCORP0
-    ZNO3FA(0,NY,NX)=ZNO3FA(0,NY,NX)*XCORP0
+    FertN_soil(ifert_NH4,0,NY,NX)=FertN_soil(ifert_NH4,0,NY,NX)*XCORP0
+    FertN_soil(ifert_NH3,0,NY,NX)=FertN_soil(ifert_NH3,0,NY,NX)*XCORP0
+    FertN_soil(ifert_urea,0,NY,NX)=FertN_soil(ifert_urea,0,NY,NX)*XCORP0
+    FertN_soil(ifert_no3,0,NY,NX)=FertN_soil(ifert_no3,0,NY,NX)*XCORP0
     VOLW(0,NY,NX)=VOLW(0,NY,NX)*XCORP0
     VHCP(0,NY,NX)=cpo*ORGC(0,NY,NX)+cpw*VOLW(0,NY,NX)+cpi*VOLI(0,NY,NX)
     VOLR(NY,NX)=VOLR(NY,NX)*XCORP0
@@ -375,14 +375,14 @@ module TillageMixMod
 !     TVOLA=TVOLA+TI*VOLA(L,NY,NX)
         TENGY=TENGY+TI*(cpw*(VOLW(L,NY,NX)+VOLWH(L,NY,NX)) &
           +cpi*(VOLI(L,NY,NX)+VOLIH(L,NY,NX)))*TKS(L,NY,NX)
-        TNH4FA=TNH4FA+TI*ZNH4FA(L,NY,NX)
-        TNH3FA=TNH3FA+TI*ZNH3FA(L,NY,NX)
-        TNHUFA=TNHUFA+TI*ZNHUFA(L,NY,NX)
-        TNO3FA=TNO3FA+TI*ZNO3FA(L,NY,NX)
-        TNH4FB=TNH4FB+TI*ZNH4FB(L,NY,NX)
-        TNH3FB=TNH3FB+TI*ZNH3FB(L,NY,NX)
-        TNHUFB=TNHUFB+TI*ZNHUFB(L,NY,NX)
-        TNO3FB=TNO3FB+TI*ZNO3FB(L,NY,NX)
+        TNH4FA=TNH4FA+TI*FertN_soil(ifert_NH4,L,NY,NX)
+        TNH3FA=TNH3FA+TI*FertN_soil(ifert_NH3,L,NY,NX)
+        TNHUFA=TNHUFA+TI*FertN_soil(ifert_urea,L,NY,NX)
+        TNO3FA=TNO3FA+TI*FertN_soil(ifert_no3,L,NY,NX)
+        TNH4FB=TNH4FB+TI*FertN_band(ifert_nh4_band,L,NY,NX)
+        TNH3FB=TNH3FB+TI*FertN_band(ifert_nh3_band,L,NY,NX)
+        TNHUFB=TNHUFB+TI*FertN_band(ifert_urea_band,L,NY,NX)
+        TNO3FB=TNO3FB+TI*FertN_band(ifert_no3_band,L,NY,NX)
 
         DO NTS=ids_beg,ids_end
           TS_solml(NTS)=TS_solml(NTS)+TI*trc_solml(NTS,L,NY,NX)
@@ -502,14 +502,14 @@ module TillageMixMod
           +cpi*(VOLI(L,NY,NX)+VOLIH(L,NY,NX))
         TKS(L,NY,NX)=(ENGYM+ENGYL)/VHCP(L,NY,NX)
         TCS(L,NY,NX)=TKS(L,NY,NX)-TC2K
-        ZNH4FA(L,NY,NX)=TI*ZNH4FA(L,NY,NX)+CORP*(FI*TNH4FA-TI*ZNH4FA(L,NY,NX))+TX*ZNH4FA(L,NY,NX)
-        ZNH3FA(L,NY,NX)=TI*ZNH3FA(L,NY,NX)+CORP*(FI*TNH3FA-TI*ZNH3FA(L,NY,NX))+TX*ZNH3FA(L,NY,NX)
-        ZNHUFA(L,NY,NX)=TI*ZNHUFA(L,NY,NX)+CORP*(FI*TNHUFA-TI*ZNHUFA(L,NY,NX))+TX*ZNHUFA(L,NY,NX)
-        ZNO3FA(L,NY,NX)=TI*ZNO3FA(L,NY,NX)+CORP*(FI*TNO3FA-TI*ZNO3FA(L,NY,NX))+TX*ZNO3FA(L,NY,NX)
-        ZNH4FB(L,NY,NX)=TI*ZNH4FB(L,NY,NX)+CORP*(FI*TNH4FB-TI*ZNH4FB(L,NY,NX))+TX*ZNH4FB(L,NY,NX)
-        ZNH3FB(L,NY,NX)=TI*ZNH3FB(L,NY,NX)+CORP*(FI*TNH3FB-TI*ZNH3FB(L,NY,NX))+TX*ZNH3FB(L,NY,NX)
-        ZNHUFB(L,NY,NX)=TI*ZNHUFB(L,NY,NX)+CORP*(FI*TNHUFB-TI*ZNHUFB(L,NY,NX))+TX*ZNHUFB(L,NY,NX)
-        ZNO3FB(L,NY,NX)=TI*ZNO3FB(L,NY,NX)+CORP*(FI*TNO3FB-TI*ZNO3FB(L,NY,NX))+TX*ZNO3FB(L,NY,NX)
+        FertN_soil(ifert_NH4,L,NY,NX)=TI*FertN_soil(ifert_NH4,L,NY,NX)+CORP*(FI*TNH4FA-TI*FertN_soil(ifert_NH4,L,NY,NX))+TX*FertN_soil(ifert_NH4,L,NY,NX)
+        FertN_soil(ifert_NH3,L,NY,NX)=TI*FertN_soil(ifert_NH3,L,NY,NX)+CORP*(FI*TNH3FA-TI*FertN_soil(ifert_NH3,L,NY,NX))+TX*FertN_soil(ifert_NH3,L,NY,NX)
+        FertN_soil(ifert_urea,L,NY,NX)=TI*FertN_soil(ifert_urea,L,NY,NX)+CORP*(FI*TNHUFA-TI*FertN_soil(ifert_urea,L,NY,NX))+TX*FertN_soil(ifert_urea,L,NY,NX)
+        FertN_soil(ifert_no3,L,NY,NX)=TI*FertN_soil(ifert_no3,L,NY,NX)+CORP*(FI*TNO3FA-TI*FertN_soil(ifert_no3,L,NY,NX))+TX*FertN_soil(ifert_no3,L,NY,NX)
+        FertN_band(ifert_nh4_band,L,NY,NX)=TI*FertN_band(ifert_nh4_band,L,NY,NX)+CORP*(FI*TNH4FB-TI*FertN_band(ifert_nh4_band,L,NY,NX))+TX*FertN_band(ifert_nh4_band,L,NY,NX)
+        FertN_band(ifert_nh3_band,L,NY,NX)=TI*FertN_band(ifert_nh3_band,L,NY,NX)+CORP*(FI*TNH3FB-TI*FertN_band(ifert_nh3_band,L,NY,NX))+TX*FertN_band(ifert_nh3_band,L,NY,NX)
+        FertN_band(ifert_urea_band,L,NY,NX)=TI*FertN_band(ifert_urea_band,L,NY,NX)+CORP*(FI*TNHUFB-TI*FertN_band(ifert_urea_band,L,NY,NX))+TX*FertN_band(ifert_urea_band,L,NY,NX)
+        FertN_band(ifert_no3_band,L,NY,NX)=TI*FertN_band(ifert_no3_band,L,NY,NX)+CORP*(FI*TNO3FB-TI*FertN_band(ifert_no3_band,L,NY,NX))+TX*FertN_band(ifert_no3_band,L,NY,NX)
 
         !SALT
         DO NTSA=idsa_beg,idsa_end
@@ -765,10 +765,10 @@ module TillageMixMod
         trcp_salml(idsp_HA,L,NY,NX)=trcp_salml(idsp_HA,L,NY,NX)+FI*TCAPHG
         trcp_salml(idsp_CaH2PO4,L,NY,NX)=trcp_salml(idsp_CaH2PO4,L,NY,NX)+FI*TCAPMG
 
-        ZNH4FA(L,NY,NX)=ZNH4FA(L,NY,NX)+FI*TNH4FG
-        ZNH3FA(L,NY,NX)=ZNH3FA(L,NY,NX)+FI*TNH3FG
-        ZNHUFA(L,NY,NX)=ZNHUFA(L,NY,NX)+FI*TNHUFG
-        ZNO3FA(L,NY,NX)=ZNO3FA(L,NY,NX)+FI*TNO3FG
+        FertN_soil(ifert_NH4,L,NY,NX)=FertN_soil(ifert_NH4,L,NY,NX)+FI*TNH4FG
+        FertN_soil(ifert_NH3,L,NY,NX)=FertN_soil(ifert_NH3,L,NY,NX)+FI*TNH3FG
+        FertN_soil(ifert_urea,L,NY,NX)=FertN_soil(ifert_urea,L,NY,NX)+FI*TNHUFG
+        FertN_soil(ifert_no3,L,NY,NX)=FertN_soil(ifert_no3,L,NY,NX)+FI*TNO3FG
         ZNHU0(L,NY,NX)=ZNHUX0
         ZNHUI(L,NY,NX)=ZNHUXI
         ZNFN0(L,NY,NX)=ZNFNX0

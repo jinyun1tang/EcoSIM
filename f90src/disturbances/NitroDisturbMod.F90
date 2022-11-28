@@ -40,7 +40,7 @@ module NitroDisturbMod
   implicit none
   integer, intent(in) :: I,J,NY,NX
 
-  integer :: L,K,M,N,IFLGJ,NLL,NGL
+  integer :: L,K,M,N,IFLGJ,NLL,NGL,NTF
   real(r8) :: DC,DN,DP
   real(r8) :: DCORPC
   real(r8) :: FORGCX
@@ -315,10 +315,10 @@ module NitroDisturbMod
           trcp_salml(idsp_CaHPO4,L,NY,NX)=DCORPC1*trcp_salml(idsp_CaHPO4,L,NY,NX)
           trcp_salml(idsp_HA,L,NY,NX)=DCORPC1*trcp_salml(idsp_HA,L,NY,NX)
           trcp_salml(idsp_CaH2PO4,L,NY,NX)=DCORPC1*trcp_salml(idsp_CaH2PO4,L,NY,NX)
-          ZNH4FA(L,NY,NX)=DCORPC1*ZNH4FA(L,NY,NX)
-          ZNH3FA(L,NY,NX)=DCORPC1*ZNH3FA(L,NY,NX)
-          ZNHUFA(L,NY,NX)=DCORPC1*ZNHUFA(L,NY,NX)
-          ZNO3FA(L,NY,NX)=DCORPC1*ZNO3FA(L,NY,NX)
+
+          DO NTF=ifertn_beg,ifertn_end
+            FertN_soil(NTF,L,NY,NX)=DCORPC1*FertN_soil(NTF,L,NY,NX)
+          ENDDO
         ENDIF
         ORGC(L,NY,NX)=DC
         ORGN(L,NY,NX)=DN

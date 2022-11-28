@@ -1,20 +1,14 @@
 module FertilizerDataType
   use data_kind_mod, only : r8 => SHR_KIND_R8
   use GridConsts
+  use TracerIDMod
   implicit none
   public
   save
   character(len=*), private, parameter :: mod_filename = __FILE__
 
-
-  real(r8),target,allocatable :: ZNH4FA(:,:,:)
-  real(r8),target,allocatable :: ZNH3FA(:,:,:)
-  real(r8),target,allocatable :: ZNHUFA(:,:,:)
-  real(r8),target,allocatable :: ZNO3FA(:,:,:)
-  real(r8),target,allocatable :: ZNH4FB(:,:,:)
-  real(r8),target,allocatable :: ZNH3FB(:,:,:)
-  real(r8),target,allocatable :: ZNHUFB(:,:,:)
-  real(r8),target,allocatable :: ZNO3FB(:,:,:)
+  real(r8),target,allocatable :: FertN_soil(:,:,:,:)
+  real(r8),target,allocatable :: FertN_band(:,:,:,:)
 
   real(r8),target,allocatable :: DCORP(:,:,:)                  !soil mixing fraction with tillage, [-]
   real(r8),target,allocatable :: FERT(:,:,:,:)                !fertilizer application, [g m-2]
@@ -50,31 +44,19 @@ module FertilizerDataType
   allocate(FDPTH(366,JY,JX))                  !depth of fertilizer application, [m]
   allocate(ROWI(366,JY,JX))                   !row spacing of fertilizer band, [m]
 
-  allocate(ZNH4FA(0:JZ,JY,JX))
-  allocate(ZNH3FA(0:JZ,JY,JX))
-  allocate(ZNHUFA(0:JZ,JY,JX))
-  allocate(ZNO3FA(0:JZ,JY,JX))
-  allocate(ZNH4FB(0:JZ,JY,JX))
-  allocate(ZNH3FB(0:JZ,JY,JX))
-  allocate(ZNHUFB(0:JZ,JY,JX))
-  allocate(ZNO3FB(0:JZ,JY,JX))
+  allocate(FertN_soil(ifertn_beg:ifertn_end,0:JZ,JY,JX)); FertN_soil=0._r8
+  allocate(FertN_band(ifertnb_beg:ifertnb_end,1:JZ,JY,JX)); FertN_band=0._r8
 
   end subroutine InitAllocate
-
+!-------------------------------------------------------
   subroutine DestructFertilizerData
   use abortutils, only : destroy
 
   implicit none
 
 
-  call destroy(ZNH4FA)
-  call destroy(ZNH3FA)
-  call destroy(ZNHUFA)
-  call destroy(ZNO3FA)
-  call destroy(ZNH4FB)
-  call destroy(ZNH3FB)
-  call destroy(ZNHUFB)
-  call destroy(ZNO3FB)
+  call destroy(FertN_soil)
+  call destroy(FertN_band)
 
   call destroy(ROWN)                       !row spacing of NH4 fertilizer band, [m]
   call destroy(ROWO)                       !row spacing of NO3 fertilizer band, [m]

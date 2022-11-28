@@ -383,6 +383,7 @@ module ExtractsMod
   integer, intent(in) :: NZ
   integer :: L, NB,NE,NTG
   real(r8) :: ENGYC
+
   associate(                       &
     TBALE => plt_site%TBALE  , &
     BALE  => plt_site%BALE   , &

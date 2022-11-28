@@ -491,16 +491,13 @@ module StartsMod
 
 ! begin_execution
   L2=NL(NY,NX)
-  ZNH4FA(0:L2,NY,NX)=0.0_r8
-  ZNH3FA(0:L2,NY,NX)=0.0_r8
-  ZNHUFA(0:L2,NY,NX)=0.0_r8
-  ZNO3FA(0:L2,NY,NX)=0.0_r8
-
-  trcs_VLN(ids_NH4,0:L2,NY,NX)=1.0
+  FertN_soil(ifertn_beg:ifertn_end,0:L2,NY,NX)=0._r8
+  FertN_band(ifertnb_beg:ifertnb_end,1:L2,NY,NX)=0._r8
+  trcs_VLN(ids_NH4,0:L2,NY,NX)=1.0_r8
   trcs_VLN(idg_NH3,0:L2,NY,NX)=trcs_VLN(ids_NH4,0:L2,NY,NX)
-  trcs_VLN(ids_NO3,0:L2,NY,NX)=1.0
+  trcs_VLN(ids_NO3,0:L2,NY,NX)=1.0_r8
   trcs_VLN(ids_NO2,0:L2,NY,NX)=trcs_VLN(ids_NO3,0:L2,NY,NX)
-  trcs_VLN(ids_H1PO4,0:L2,NY,NX)=1.0
+  trcs_VLN(ids_H1PO4,0:L2,NY,NX)=1.0_r8
   trcs_VLN(ids_H2PO4,0:L2,NY,NX)=trcs_VLN(ids_H1PO4,0:L2,NY,NX)
   trcs_VLN(ids_NH4B,0:L2,NY,NX)=0.0_r8
   trcs_VLN(idg_NH3B,0:L2,NY,NX)= trcs_VLN(ids_NH4B,0:L2,NY,NX)
@@ -528,10 +525,6 @@ module StartsMod
   ZNFNI(0:L2,NY,NX)=0.0_r8
   ZNFN0(0:L2,NY,NX)=0.0_r8
 
-  ZNH4FB(1:L2,NY,NX)=0.0_r8
-  ZNH3FB(1:L2,NY,NX)=0.0_r8
-  ZNHUFB(1:L2,NY,NX)=0.0_r8
-  ZNO3FB(1:L2,NY,NX)=0.0_r8
   WDNHB(1:L2,NY,NX)=0.0_r8
   DPNHB(1:L2,NY,NX)=0.0_r8
   WDNOB(1:L2,NY,NX)=0.0_r8

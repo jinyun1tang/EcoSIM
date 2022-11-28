@@ -2377,32 +2377,32 @@ module Hour1Mod
     PHAX=PHA*AREA(3,LFDPTH,NY,NX)/(3.0_r8*patomw)
     CACX=CAC*AREA(3,LFDPTH,NY,NX)/40.0_r8
     CASX=CAS*AREA(3,LFDPTH,NY,NX)/40.0_r8
-    ZNH4FA(LFDPTH,NY,NX)=ZNH4FA(LFDPTH,NY,NX)+Z4AX*CVRDF
-    ZNHUFA(LFDPTH,NY,NX)=ZNHUFA(LFDPTH,NY,NX)+ZUAX*CVRDF
-    ZNO3FA(LFDPTH,NY,NX)=ZNO3FA(LFDPTH,NY,NX)+ZOAX*CVRDF
-    ZNH4FB(LFDPTH,NY,NX)=ZNH4FB(LFDPTH,NY,NX)+Z4BX*CVRDF
-    ZNHUFB(LFDPTH,NY,NX)=ZNHUFB(LFDPTH,NY,NX)+ZUBX*CVRDF
-    ZNO3FB(LFDPTH,NY,NX)=ZNO3FB(LFDPTH,NY,NX)+ZOBX*CVRDF
+    FertN_soil(ifert_nh4,LFDPTH,NY,NX)=FertN_soil(ifert_nh4,LFDPTH,NY,NX)+Z4AX*CVRDF
+    FertN_soil(ifert_urea,LFDPTH,NY,NX)=FertN_soil(ifert_urea,LFDPTH,NY,NX)+ZUAX*CVRDF
+    FertN_soil(ifert_no3,LFDPTH,NY,NX)=FertN_soil(ifert_no3,LFDPTH,NY,NX)+ZOAX*CVRDF
+    FertN_band(ifert_nh4_band,LFDPTH,NY,NX)=FertN_band(ifert_nh4_band,LFDPTH,NY,NX)+Z4BX*CVRDF
+    FertN_band(ifert_urea_band,LFDPTH,NY,NX)=FertN_band(ifert_urea_band,LFDPTH,NY,NX)+ZUBX*CVRDF
+    FertN_band(ifert_no3_band,LFDPTH,NY,NX)=FertN_band(ifert_no3_band,LFDPTH,NY,NX)+ZOBX*CVRDF
     trcp_salml(idsp_CaH2PO4,LFDPTH,NY,NX)=trcp_salml(idsp_CaH2PO4,LFDPTH,NY,NX)+PMAX*trcs_VLN(ids_H1PO4,LFDPTH,NY,NX)*CVRDF
     trcp_salml(idsp_CaH2PO4B,LFDPTH,NY,NX)=trcp_salml(idsp_CaH2PO4B,LFDPTH,NY,NX)+PMAX*trcs_VLN(ids_H1PO4B,LFDPTH,NY,NX)*CVRDF+PMBX*CVRDF
     trcp_salml(idsp_HA,LFDPTH,NY,NX)=trcp_salml(idsp_HA,LFDPTH,NY,NX)+PHAX*trcs_VLN(ids_H1PO4,LFDPTH,NY,NX)*CVRDF
     trcp_salml(idsp_HAB,LFDPTH,NY,NX)=trcp_salml(idsp_HAB,LFDPTH,NY,NX)+PHAX*trcs_VLN(ids_H1PO4B,LFDPTH,NY,NX)*CVRDF
     IF(LFDPTH.EQ.0)THEN
-      ZNH4FA(NU(NY,NX),NY,NX)=ZNH4FA(NU(NY,NX),NY,NX)+Z4AX*BAREF
-      ZNH3FA(NU(NY,NX),NY,NX)=ZNH3FA(NU(NY,NX),NY,NX)+Z3AX
-      ZNHUFA(NU(NY,NX),NY,NX)=ZNHUFA(NU(NY,NX),NY,NX)+ZUAX*BAREF
-      ZNO3FA(NU(NY,NX),NY,NX)=ZNO3FA(NU(NY,NX),NY,NX)+ZOAX*BAREF
-      ZNH4FB(NU(NY,NX),NY,NX)=ZNH4FB(NU(NY,NX),NY,NX)+Z4BX*BAREF
-      ZNH3FB(NU(NY,NX),NY,NX)=ZNH3FB(NU(NY,NX),NY,NX)+Z3BX
-      ZNHUFB(NU(NY,NX),NY,NX)=ZNHUFB(NU(NY,NX),NY,NX)+ZUBX*BAREF
-      ZNO3FB(NU(NY,NX),NY,NX)=ZNO3FB(NU(NY,NX),NY,NX)+ZOBX*BAREF
+      FertN_soil(ifert_nh4,NU(NY,NX),NY,NX)=FertN_soil(ifert_nh4,NU(NY,NX),NY,NX)+Z4AX*BAREF
+      FertN_soil(ifert_nh3,NU(NY,NX),NY,NX)=FertN_soil(ifert_nh3,NU(NY,NX),NY,NX)+Z3AX
+      FertN_soil(ifert_urea,NU(NY,NX),NY,NX)=FertN_soil(ifert_urea,NU(NY,NX),NY,NX)+ZUAX*BAREF
+      FertN_soil(ifert_no3,NU(NY,NX),NY,NX)=FertN_soil(ifert_no3,NU(NY,NX),NY,NX)+ZOAX*BAREF
+      FertN_band(ifert_nh4_band,NU(NY,NX),NY,NX)=FertN_band(ifert_nh4_band,NU(NY,NX),NY,NX)+Z4BX*BAREF
+      FertN_band(ifert_nh3_band,NU(NY,NX),NY,NX)=FertN_band(ifert_nh3_band,NU(NY,NX),NY,NX)+Z3BX
+      FertN_band(ifert_urea_band,NU(NY,NX),NY,NX)=FertN_band(ifert_urea_band,NU(NY,NX),NY,NX)+ZUBX*BAREF
+      FertN_band(ifert_no3_band,NU(NY,NX),NY,NX)=FertN_band(ifert_no3_band,NU(NY,NX),NY,NX)+ZOBX*BAREF
       trcp_salml(idsp_CaH2PO4,NU(NY,NX),NY,NX)=trcp_salml(idsp_CaH2PO4,NU(NY,NX),NY,NX)+PMAX*trcs_VLN(ids_H1PO4,NU(NY,NX),NY,NX)*BAREF
       trcp_salml(idsp_CaH2PO4B,NU(NY,NX),NY,NX)=trcp_salml(idsp_CaH2PO4B,NU(NY,NX),NY,NX)+PMAX*trcs_VLN(ids_H1PO4B,NU(NY,NX),NY,NX)*BAREF+PMBX*BAREF
       trcp_salml(idsp_HA,NU(NY,NX),NY,NX)=trcp_salml(idsp_HA,NU(NY,NX),NY,NX)+PHAX*trcs_VLN(ids_H1PO4,NU(NY,NX),NY,NX)*BAREF
       trcp_salml(idsp_HAB,NU(NY,NX),NY,NX)=trcp_salml(idsp_HAB,NU(NY,NX),NY,NX)+PHAX*trcs_VLN(ids_H1PO4B,NU(NY,NX),NY,NX)*BAREF
     ELSE
-      ZNH3FA(LFDPTH,NY,NX)=ZNH3FA(LFDPTH,NY,NX)+Z3AX*CVRDF
-      ZNH3FB(LFDPTH,NY,NX)=ZNH3FB(LFDPTH,NY,NX)+Z3BX*CVRDF
+      FertN_soil(ifert_nh3,LFDPTH,NY,NX)=FertN_soil(ifert_nh3,LFDPTH,NY,NX)+Z3AX*CVRDF
+      FertN_band(ifert_nh3_band,LFDPTH,NY,NX)=FertN_band(ifert_nh3_band,LFDPTH,NY,NX)+Z3BX*CVRDF
     ENDIF
     trcp_salml(idsp_CaCO3,NU(NY,NX),NY,NX)=trcp_salml(idsp_CaCO3,NU(NY,NX),NY,NX)+CACX
     trcp_salml(idsp_CaSO4,NU(NY,NX),NY,NX)=trcp_salml(idsp_CaSO4,NU(NY,NX),NY,NX)+CASX
@@ -2410,7 +2410,7 @@ module Hour1Mod
     TPIN=TPIN+62.0*(PMAX+PMBX)+93.0*PHAX
     TIONIN=TIONIN+2.0*(CACX+CASX)
     UFERTN(NY,NX)=UFERTN(NY,NX)+natomw*(Z4AX+Z4BX+Z3AX+Z3BX+ZUAX+ZUBX+ZOAX+ZOBX)
-    UFERTP(NY,NX)=UFERTP(NY,NX)+62.0*(PMAX+PMBX)+93.0*PHAX
+    UFERTP(NY,NX)=UFERTP(NY,NX)+62.0_r8*(PMAX+PMBX)+93.0_r8*PHAX
   ENDIF
   end subroutine ApplyMineralFertilizer
 !------------------------------------------------------------------------------------------

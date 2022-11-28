@@ -26,6 +26,7 @@ implicit none
   integer :: L,LL,M,N,K,NGL
 
   real(r8) :: FSINK,FSAN,FSIL,FCLA,FCEC,FAEC
+  real(r8) :: FNX
   real(r8) :: FNH4, FNH3,FNHU,FNO3
   real(r8) :: FN4,FHY,FAL,FFE,FCA,FMG,FNA,FKA
   real(r8) :: FHC,FAL2,FFE2,FOH0,FOH1,FOH2
@@ -34,7 +35,7 @@ implicit none
   real(r8) :: FOMC,FOMN,FOMP,FH1P,FH2P,FALO,FFEO
   real(r8) :: FORC,FORN,FORP,FOHC,FOHN,FOHP,FOHA
   real(r8) :: FOSC,FOSA,FOSN,FOSP
-
+  integer  :: NTF
 ! begin_execution
 ! SINK ALL SOLID C,N,P IN POND
 !
@@ -78,18 +79,25 @@ implicit none
 !     *ER=sediment flux from erosion.f
 !     sediment code:NH4,NH3,NHU,NO3=NH4,NH3,urea,NO3
 !
-      FNH4=FSINK*ZNH4FA(L,NY,NX)
-      FNH3=FSINK*ZNH3FA(L,NY,NX)
-      FNHU=FSINK*ZNHUFA(L,NY,NX)
-      FNO3=FSINK*ZNO3FA(L,NY,NX)
-      ZNH4FA(L,NY,NX)=ZNH4FA(L,NY,NX)-FNH4
-      ZNH3FA(L,NY,NX)=ZNH3FA(L,NY,NX)-FNH3
-      ZNHUFA(L,NY,NX)=ZNHUFA(L,NY,NX)-FNHU
-      ZNO3FA(L,NY,NX)=ZNO3FA(L,NY,NX)-FNO3
-      ZNH4FA(LL,NY,NX)=ZNH4FA(LL,NY,NX)+FNH4
-      ZNH3FA(LL,NY,NX)=ZNH3FA(LL,NY,NX)+FNH3
-      ZNHUFA(LL,NY,NX)=ZNHUFA(LL,NY,NX)+FNHU
-      ZNO3FA(LL,NY,NX)=ZNO3FA(LL,NY,NX)+FNO3
+      DO NTF=ifertn_beg,ifertn_end
+        FNX=FSINK*FertN_soil(NTF,L,NY,NX)
+        FertN_soil(NTF,L,NY,NX)=FertN_soil(NTF,L,NY,NX)-FNX
+        FertN_soil(NTF,LL,NY,NX)=FertN_soil(NTF,LL,NY,NX)+FNX
+      ENDDO
+!      FNH4=FSINK*ZNH4FA(L,NY,NX)
+!      FNH3=FSINK*ZNH3FA(L,NY,NX)
+!      FNHU=FSINK*ZNHUFA(L,NY,NX)
+!      FNO3=FSINK*ZNO3FA(L,NY,NX)
+
+!      ZNH4FA(L,NY,NX)=ZNH4FA(L,NY,NX)-FNH4
+!      ZNH3FA(L,NY,NX)=ZNH3FA(L,NY,NX)-FNH3
+!      ZNHUFA(L,NY,NX)=ZNHUFA(L,NY,NX)-FNHU
+!      ZNO3FA(L,NY,NX)=ZNO3FA(L,NY,NX)-FNO3
+
+!      ZNH4FA(LL,NY,NX)=ZNH4FA(LL,NY,NX)+FNH4
+!      ZNH3FA(LL,NY,NX)=ZNH3FA(LL,NY,NX)+FNH3
+!      ZNHUFA(LL,NY,NX)=ZNHUFA(LL,NY,NX)+FNHU
+!      ZNO3FA(LL,NY,NX)=ZNO3FA(LL,NY,NX)+FNO3
 !
 !     EXCHANGEABLE CATIONS AND ANIONS
 !
