@@ -373,12 +373,7 @@ module HfuncsMod
     ARSTP  =>  plt_morph%ARSTP   , &
     NI     =>  plt_morph%NI        &
   )
-  plt_bgcr%RCO2Z(NZ)=0.0_r8
-  plt_bgcr%ROXYZ(NZ)=0.0_r8
-  plt_bgcr%RCH4Z(NZ)=0.0_r8
-  plt_bgcr%RN2OZ(NZ)=0.0_r8
-  plt_bgcr%RNH3Z(NZ)=0.0_r8
-  plt_bgcr%RH2GZ(NZ)=0.0_r8
+  plt_bgcr%RFGas_root(idg_beg:idg_end-1,NZ)=0.0_r8
   EPOOLP(1:npelms,NZ)=0.0_r8
   NI(NZ)=NIX(NZ)
   NG(NZ)=MIN(NI(NZ),MAX(NG(NZ),NU))

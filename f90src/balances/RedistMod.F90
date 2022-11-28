@@ -395,11 +395,11 @@ module RedistMod
 ! XCODFR: soil surface CO2 dissolution (+ve) - volatilization
 ! UCO2G: total soil CO2 flux, [g d-2]
 ! HCO2G: hourly soil CO2 flux, [g d-2 h-1]
-  CI=GasSfAtmFlx(idg_CO2,NY,NX)+R3GasADTFlx(idg_CO2,3,NU(NY,NX),NY,NX)+TCO2Z(NY,NX) &
+  CI=GasSfAtmFlx(idg_CO2,NY,NX)+R3GasADTFlx(idg_CO2,3,NU(NY,NX),NY,NX)+TRFGas_root(idg_CO2,NY,NX) &
       +(FLQGQ(NY,NX)+FLQRQ(NY,NX))*CCOR(NY,NX) &
       +(FLQGI(NY,NX)+FLQRI(NY,NX))*CCOQ(NY,NX) &
       +GasDisFlx(idg_CO2,0,NY,NX)+XCODFR(NY,NX)
-  CH=GasSfAtmFlx(idg_CH4,NY,NX)+R3GasADTFlx(idg_CH4,3,NU(NY,NX),NY,NX)+TCH4Z(NY,NX) &
+  CH=GasSfAtmFlx(idg_CH4,NY,NX)+R3GasADTFlx(idg_CH4,3,NU(NY,NX),NY,NX)+TRFGas_root(idg_CH4,NY,NX) &
       +(FLQGQ(NY,NX)+FLQRQ(NY,NX))*CCHR(NY,NX) &
       +(FLQGI(NY,NX)+FLQRI(NY,NX))*CCHQ(NY,NX) &
       +GasDisFlx(idg_CH4,0,NY,NX)+XCHDFR(NY,NX)
@@ -414,7 +414,7 @@ module RedistMod
   !
   !     SURFACE BOUNDARY O2 FLUXES
   !
-  OI=GasSfAtmFlx(idg_O2,NY,NX)+R3GasADTFlx(idg_O2,3,NU(NY,NX),NY,NX)+TOXYZ(NY,NX) &
+  OI=GasSfAtmFlx(idg_O2,NY,NX)+R3GasADTFlx(idg_O2,3,NU(NY,NX),NY,NX)+TRFGas_root(idg_O2,NY,NX) &
       +(FLQGQ(NY,NX)+FLQRQ(NY,NX))*COXR(NY,NX) &
       +(FLQGI(NY,NX)+FLQRI(NY,NX))*COXQ(NY,NX) &
       +GasDisFlx(idg_O2,0,NY,NX)+XOXDFR(NY,NX)
@@ -423,7 +423,7 @@ module RedistMod
   OXYGOU=OXYGOU+OO
   UOXYG(NY,NX)=UOXYG(NY,NX)+OI
   HOXYG(NY,NX)=HOXYG(NY,NX)+OI
-  HI=GasSfAtmFlx(idg_H2,NY,NX)+R3GasADTFlx(idg_H2,3,NU(NY,NX),NY,NX)+TH2GZ(NY,NX) &
+  HI=GasSfAtmFlx(idg_H2,NY,NX)+R3GasADTFlx(idg_H2,3,NU(NY,NX),NY,NX)+TRFGas_root(idg_H2,NY,NX) &
       +GasDisFlx(idg_H2,0,NY,NX)+XHGDFR(NY,NX)
   H2GIN=H2GIN+HI
   HO=RH2GO(0,NY,NX)
@@ -444,7 +444,7 @@ module RedistMod
       +GasSfAtmFlx(idg_N2,NY,NX)+GasSfAtmFlx(idg_N2O,NY,NX)+GasSfAtmFlx(idg_NH3,NY,NX) &
       +GasSfAtmFlx(idg_NH3B,NY,NX)+R3GasADTFlx(idg_N2,3,NU(NY,NX),NY,NX) &
       +R3GasADTFlx(idg_N2O,3,NU(NY,NX),NY,NX)+R3GasADTFlx(idg_NH3,3,NU(NY,NX),NY,NX) &
-      +TN2OZ(NY,NX)+TNH3Z(NY,NX) &
+      +TRFGas_root(idg_N2O,NY,NX)+TRFGas_root(idg_NH3,NY,NX) &
       +GasDisFlx(idg_N2O,0,NY,NX)+GasDisFlx(idg_N2,0,NY,NX)+GasDisFlx(idg_NH3,0,NY,NX) &
       +XNGDFR(NY,NX)+XN2DFR(NY,NX)+XN3DFR(NY,NX)
   ZN2GIN=ZN2GIN+ZGI
@@ -489,7 +489,7 @@ module RedistMod
       +2.0_r8*(GasSfAtmFlx(idg_N2,NY,NX)+GasSfAtmFlx(idg_N2O,NY,NX))+GasSfAtmFlx(idg_NH3,NY,NX) &
       +GasSfAtmFlx(idg_NH3B,NY,NX)+2.0_r8*(R3GasADTFlx(idg_N2,3,NU(NY,NX),NY,NX) &
       +R3GasADTFlx(idg_N2O,3,NU(NY,NX),NY,NX))+R3GasADTFlx(idg_NH3,3,NU(NY,NX),NY,NX) &
-      +2.0_r8*TN2OZ(NY,NX)+TNH3Z(NY,NX) &
+      +2.0_r8*TRFGas_root(idg_N2O,NY,NX)+TRFGas_root(idg_NH3,NY,NX) &
       +2.0_r8*(GasDisFlx(idg_N2O,0,NY,NX)+GasDisFlx(idg_N2,0,NY,NX))+GasDisFlx(idg_NH3,0,NY,NX) &
       +2.0_r8*(XNGDFR(NY,NX)+XN2DFR(NY,NX))+XN3DFR(NY,NX))/natomw
   SIP=((FLQGQ(NY,NX)+FLQRQ(NY,NX))*(3.0_r8*CPOR(NY,NX)+2.0_r8*CH1PR(NY,NX)) &

@@ -3,6 +3,7 @@ module PlantDataRateType
   use data_kind_mod, only : r8 => SHR_KIND_R8
   use GridConsts
   use ElmIDMod
+  use TracerIDMod
   use EcoSIMConfig, only : jcplx => jcplxc,jsken=>jskenc
   implicit none
   character(len=*), private, parameter :: mod_filename = __FILE__
@@ -75,10 +76,7 @@ module PlantDataRateType
   real(r8),target,allocatable ::  UPH2P(:,:,:)                       !total root uptake of PO4, [g d-2 h-1]
   real(r8),target,allocatable ::  UPH1P(:,:,:)                       !total root uptake of HPO4, [g d-2 h-1]
   real(r8),target,allocatable ::  UPNF(:,:,:)                        !total root N2 fixation, [g d-2 h-1]
-  real(r8),target,allocatable ::  RCO2Z(:,:,:)                       !gaseous CO2 flux fron root disturbance, [g d-2 h-1]
-  real(r8),target,allocatable ::  ROXYZ(:,:,:)                       !gaseous O2 flux fron root disturbance, [g d-2 h-1]
-  real(r8),target,allocatable ::  RCH4Z(:,:,:)                       !gaseous CH4 flux fron root disturbance, [g d-2 h-1]
-  real(r8),target,allocatable ::  RN2OZ(:,:,:)                       !gaseous N2O flux fron root disturbance, [g d-2 h-1]
+  real(r8),target,allocatable ::  RFGas_root(:,:,:,:)                !gas flux from root disturbance [g d-2 h-1]
   real(r8),target,allocatable ::  RUONH4(:,:,:,:,:)                  !root uptake of NH4 non-band unconstrained by O2, [g d-2 h-1]
   real(r8),target,allocatable ::  RUONHB(:,:,:,:,:)                  !root uptake of NH4 band unconstrained by O2, [g d-2 h-1]
   real(r8),target,allocatable ::  RUONO3(:,:,:,:,:)                  !root uptake of NO3 non-band unconstrained by O2, [g d-2 h-1]
@@ -253,10 +251,7 @@ module PlantDataRateType
   allocate(UPH2P(JP,JY,JX));    UPH2P=0._r8
   allocate(UPH1P(JP,JY,JX));    UPH1P=0._r8
   allocate(UPNF(JP,JY,JX));     UPNF=0._r8
-  allocate(RCO2Z(JP,JY,JX));    RCO2Z=0._r8
-  allocate(ROXYZ(JP,JY,JX));    ROXYZ=0._r8
-  allocate(RCH4Z(JP,JY,JX));    RCH4Z=0._r8
-  allocate(RN2OZ(JP,JY,JX));    RN2OZ=0._r8
+  allocate(RFGas_root(idg_beg:idg_end-1,JP,JY,JX)); RFGas_root=0._r8
   allocate(RUONH4(2,JZ,JP,JY,JX));RUONH4=0._r8
   allocate(RUONHB(2,JZ,JP,JY,JX));RUONHB=0._r8
   allocate(RUONO3(2,JZ,JP,JY,JX));RUONO3=0._r8
@@ -419,10 +414,6 @@ module PlantDataRateType
   call destroy(UPH2P)
   call destroy(UPH1P)
   call destroy(UPNF)
-  call destroy(RCO2Z)
-  call destroy(ROXYZ)
-  call destroy(RCH4Z)
-  call destroy(RN2OZ)
   call destroy(RUONH4)
   call destroy(RUONHB)
   call destroy(RUONO3)

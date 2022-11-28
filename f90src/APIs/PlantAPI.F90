@@ -139,15 +139,8 @@ implicit none
   THFLXC(NY,NX)=plt_ew%THFLXC
   TVOLWP(NY,NX)=plt_ew%TVOLWP
   TENGYC(NY,NX)=plt_ew%TENGYC
-  TH2GZ(NY,NX) =plt_bgcr%TH2GZ
-  TN2OZ(NY,NX) =plt_rbgc%TN2OZ
-  TCO2Z(NY,NX) =plt_rbgc%TCO2Z
-
-  TNH3Z(NY,NX)=plt_rbgc%TNH3Z
-  TOXYZ(NY,NX)=plt_rbgc%TOXYZ
-
+  TRFGas_root(idg_beg:idg_end-1,NY,NX) =plt_rbgc%TRFGas_root(idg_beg:idg_end-1)
   TCCAN(NY,NX)=plt_bgcr%TCCAN
-  TCH4Z(NY,NX)=plt_rbgc%TCH4Z
 
   FERT(17:19,I1,NY,NX)=plt_distb%FERT(17:19)
   FERT(3,I1,NY,NX) =plt_distb%FERT(3)
@@ -317,12 +310,8 @@ implicit none
     PSILO(NZ,NY,NX) =plt_ew%PSILO(NZ)
     PSILG(NZ,NY,NX) =plt_ew%PSILG(NZ)
     PSILZ(NZ,NY,NX) =plt_ew%PSILZ(NZ)
-    RCO2Z(NZ,NY,NX) =plt_bgcr%RCO2Z(NZ)
-    ROXYZ(NZ,NY,NX) =plt_bgcr%ROXYZ(NZ)
-    RCH4Z(NZ,NY,NX) =plt_bgcr%RCH4Z(NZ)
-    RN2OZ(NZ,NY,NX) =plt_bgcr%RN2OZ(NZ)
-    RNH3Z(NZ,NY,NX) =plt_bgcr%RNH3Z(NZ)
-    RH2GZ(NZ,NY,NX) =plt_bgcr%RH2GZ(NZ)
+
+    RFGas_root(idg_beg:idg_end-1,NZ,NY,NX) =plt_bgcr%RFGas_root(idg_beg:idg_end-1,NZ)
     RSMN(NZ,NY,NX)  =plt_photo%RSMN(NZ)
     RSMH(NZ,NY,NX)  =plt_photo%RSMH(NZ)
     RCMX(NZ,NY,NX)  =plt_photo%RCMX(NZ)
@@ -1043,21 +1032,16 @@ implicit none
   plt_ew%UVOLO    =UVOLO(NY,NX)
   plt_distb%XHVSTE(1:npelms)=XHVSTE(1:npelms,NY,NX)
   plt_rad%TRN     =TRN(NY,NX)
-  plt_rbgc%TN2OZ=TN2OZ(NY,NX)
   plt_ew%TEVAPC=TEVAPC(NY,NX)
   plt_ew%TLE=TLE(NY,NX)
-  plt_rbgc%TCO2Z=TCO2Z(NY,NX)
+  plt_rbgc%TRFGas_root(idg_beg:idg_end-1)=TRFGas_root(idg_beg:idg_end-1,NY,NX)
   plt_ew%TGH    =TGH(NY,NX)
   plt_ew%TEVAPP =TEVAPP(NY,NX)
-  plt_bgcr%TH2GZ  =TH2GZ(NY,NX)
   plt_ew%THFLXC =THFLXC(NY,NX)
   plt_ew%THRMC  =THRMC(NY,NX)
-  plt_rbgc%TOXYZ=TOXYZ(NY,NX)
-  plt_rbgc%TNH3Z=TNH3Z(NY,NX)
   plt_ew%TVOLWP =TVOLWP(NY,NX)
   plt_ew%TENGYC =TENGYC(NY,NX)
   plt_bgcr%TCCAN=TCCAN(NY,NX)
-  plt_rbgc%TCH4Z=TCH4Z(NY,NX)
   plt_distb%FERT(1:20)=FERT(1:20,I1,NY,NX)
 
   DO  L=1,JC
@@ -1266,12 +1250,7 @@ implicit none
     plt_ew%PSILT(NZ)=PSILT(NZ,NY,NX)
     plt_ew%PSILG(NZ)=PSILG(NZ,NY,NX)
     plt_photo%RCMX(NZ)=RCMX(NZ,NY,NX)
-    plt_bgcr%RCO2Z(NZ)=RCO2Z(NZ,NY,NX)
-    plt_bgcr%ROXYZ(NZ)=ROXYZ(NZ,NY,NX)
-    plt_bgcr%RCH4Z(NZ)=RCH4Z(NZ,NY,NX)
-    plt_bgcr%RN2OZ(NZ)=RN2OZ(NZ,NY,NX)
-    plt_bgcr%RNH3Z(NZ)=RNH3Z(NZ,NY,NX)
-    plt_bgcr%RH2GZ(NZ)=RH2GZ(NZ,NY,NX)
+    plt_bgcr%RFGas_root(idg_beg:idg_end-1,NZ)=RFGas_root(idg_beg:idg_end-1,NZ,NY,NX)
     plt_ew%RAZ(NZ)=RAZ(NZ,NY,NX)
     plt_photo%SCO2(NZ)=SCO2(NZ,NY,NX)
     plt_morph%SDPTH(NZ)=SDPTH(NZ,NY,NX)

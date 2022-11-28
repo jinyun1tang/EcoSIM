@@ -684,12 +684,7 @@ implicit none
   real(r8), pointer :: CNET(:)       => null()  !canopy net CO2 exchange, [gC d-2 h-1]
   real(r8), pointer :: CARBN(:)      => null()  !total gross CO2 fixation, [gC d-2 ]
   real(r8), pointer :: HESNC(:,:)    => null()  !plant element litterfall, [g d-2 h-1]
-  real(r8), pointer :: RCO2Z(:)      => null()  !gaseous CO2 flux fron root disturbance, [gC d-2 h-1]
-  real(r8), pointer :: ROXYZ(:)      => null()  !gaseous O2 flux fron root disturbance, [g d-2 h-1]
-  real(r8), pointer :: RCH4Z(:)      => null()  !gaseous CH4 flux fron root disturbance, [g d-2 h-1]
-  real(r8), pointer :: RN2OZ(:)      => null()  !gaseous N2O flux fron root disturbance, [g d-2 h-1]
-  real(r8), pointer :: RNH3Z(:)      => null()  !gaseous NH3 flux fron root disturbance non-band, [g d-2 h-1]
-  real(r8), pointer :: RH2GZ(:)      => null()  !gaseous H2 flux fron root disturbance, [g d-2 h-1]
+  real(r8), pointer :: RFGas_root(:,:)=> null() !gaseous flux fron root disturbance, [g d-2 h-1]
   real(r8), pointer :: TESN0(:,:)    => null()  !total surface litterfall element, [g d-2]
   real(r8), pointer :: TESNC(:,:)    => null()  !total plant element litterfall , [g d-2 ]
   real(r8), pointer :: TCO2T(:)      => null()  !total plant respiration, [gC d-2 ]
@@ -703,11 +698,7 @@ implicit none
   end type plant_bgcrate_type
 
   type, public :: plant_rootbgc_type
-  real(r8) :: TCO2Z     !total root CO2 content, [gC d-2]
-  real(r8) :: TCH4Z     !total root CH4 content, [gC d-2]
-  real(r8) :: TN2OZ     !total root N2O content, [g d-2]
-  real(r8) :: TOXYZ     !total root O2 content, [g d-2]
-  real(r8) :: TNH3Z     !total root NH3 content, [g d-2]
+  real(r8), pointer :: TRFGas_root(:)   => null()  !total root gas content [g d-2]
   real(r8), pointer :: UPOME(:,:)       => null()  !total root uptake (+ve) - exudation (-ve) of dissolved element, [g d-2 h-1]
   real(r8), pointer :: UPNF(:)          => null()  !total root N2 fixation, [g d-2 h-1]
   real(r8), pointer :: UPNO3(:)         => null()  !total root uptake of NO3, [g d-2 h-1]
@@ -828,6 +819,7 @@ implicit none
 
   allocate(this%trcg_rootml(idg_beg:idg_end-1,2,JZ1,JP1));this%trcg_rootml=0._r8
   allocate(this%trcs_rootml(idg_beg:idg_end-1,2,JZ1,JP1));this%trcs_rootml=0._r8
+  allocate(this%TRFGas_root(idg_beg:idg_end-1));this%TRFGas_root=0._r8
   allocate(this%TUPNF(JZ1))
   allocate(this%ROXSK(60,0:JZ1))
   allocate(this%RDFOME(npelms,2,1:jcplx,0:JZ1,JP1))
@@ -932,8 +924,8 @@ implicit none
   implicit none
   class(plant_rootbgc_type) :: this
 
-  call destroy(this%trcg_rootml)
-  call destroy(this%trcs_rootml)
+!  call destroy(this%trcg_rootml)
+!  call destroy(this%trcs_rootml)
 !  if(allocated(CO2P))deallocate(CO2P)
 !  if(allocated(CO2A))deallocate(CO2A)
 !  if(allocated(H2GP))deallocate(H2GP)
@@ -1134,19 +1126,13 @@ implicit none
   allocate(this%RCO2F(0:JZ1))
   allocate(this%ROXYL(0:JZ1))
   allocate(this%ROXYY(0:JZ1))
-
-  allocate(this%RN2OZ(JP1))
-  allocate(this%RNH3Z(JP1))
-  allocate(this%RH2GZ(JP1))
   allocate(this%ESNT(jsken,npelms,n_pltlitrk,0:JZ1))
   allocate(this%CARBN(JP1))
   allocate(this%XOQCS(1:jcplx,0:JZ1))
   allocate(this%XOQNS(1:jcplx,0:JZ1))
   allocate(this%XOQPS(1:jcplx,0:JZ1))
   allocate(this%CNET(JP1))
-  allocate(this%RCO2Z(JP1))
-  allocate(this%ROXYZ(JP1))
-  allocate(this%RCH4Z(JP1))
+  allocate(this%RFGas_root(idg_beg:idg_end-1,JP1))
   allocate(this%TCO2T(JP1))
   allocate(this%TZUPFX(JP1))
   allocate(this%TNH3C(JP1))
@@ -1180,7 +1166,6 @@ implicit none
 
   implicit none
   class(plant_bgcrate_type) :: this
-
 
 !  if(allocated(TCO2S))deallocate(TCO2S)
 !  if(allocated(TCO2P))deallocate(TCO2P)
@@ -1223,9 +1208,6 @@ implicit none
 !  if(allocated(XOQNS))deallocate(XOQNS)
 !  if(allocated(XOQPS))deallocate(XOQPS)
 !  if(allocated(CNET))deallocate(CNET)
-!  if(allocated(RCO2Z))deallocate(RCO2Z)
-!  if(allocated(ROXYZ))deallocate(ROXYZ)
-!  if(allocated(RCH4Z))deallocate(RCH4Z)
 !  if(allocated(TCO2T))deallocate(TCO2T)
 !  if(allocated(TZUPFX))deallocate(TZUPFX)
 !  if(allocated(TNH3C))deallocate(TNH3C)
@@ -1698,7 +1680,7 @@ implicit none
 !  if(allocated(OGSGL))deallocate(OGSGL)
 !  if(allocated(RSCS))deallocate(RSCS)
 
-   call destroy(this%GSolbility)
+!   call destroy(this%GSolbility)
 !  if(allocated(THETW))deallocate(THETW)
 !  if(allocated(THETY))deallocate(THETY)
 !  if(allocated(VOLX))deallocate(VOLX)
@@ -1710,7 +1692,7 @@ implicit none
 !  if(allocated(H2PO4))deallocate(H2PO4)
 !  if(allocated(HLSGL))deallocate(HLSGL)
 
-   call destroy(this%trcs_VLN)
+!   call destroy(this%trcs_VLN)
 !  if(allocated(OLSGL))deallocate(OLSGL)
 !  if(allocated(POSGL))deallocate(POSGL)
 !  if(allocated(VOLY))deallocate(VOLY)

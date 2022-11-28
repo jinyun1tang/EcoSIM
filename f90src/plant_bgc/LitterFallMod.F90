@@ -289,7 +289,7 @@ implicit none
   subroutine LiterfallFromDeadRoots(I,J,NZ)
   implicit none
   integer, intent(in) :: I,J,NZ
-  integer :: L,M,NR,N,NE
+  integer :: L,M,NR,N,NE,NTG
 !     begin_execution
   associate(                                &
     WTRT2E    =>   plt_biom%WTRT2E    , &
@@ -308,12 +308,7 @@ implicit none
     trcs_rootml => plt_rbgc%trcs_rootml, &
     NJ        =>   plt_site%NJ        , &
     NU        =>   plt_site%NU        , &
-    RH2GZ     =>   plt_bgcr%RH2GZ     , &
-    RNH3Z     =>   plt_bgcr%RNH3Z     , &
-    RN2OZ     =>   plt_bgcr%RN2OZ     , &
-    RCH4Z     =>   plt_bgcr%RCH4Z     , &
-    ROXYZ     =>   plt_bgcr%ROXYZ     , &
-    RCO2Z     =>   plt_bgcr%RCO2Z     , &
+    RFGas_root     =>   plt_bgcr%RFGas_root     , &
     ESNC      =>   plt_bgcr%ESNC      , &
     icwood    =>   pltpar%icwood      , &
     iroot     =>   pltpar%iroot       , &
@@ -375,12 +370,9 @@ implicit none
 !
 !     RELEASE GAS CONTENTS OF DEAD ROOTS
 !
-        RCO2Z(NZ)=RCO2Z(NZ)-trcg_rootml(idg_CO2,N,L,NZ)-trcs_rootml(idg_CO2,N,L,NZ)
-        ROXYZ(NZ)=ROXYZ(NZ)-trcg_rootml(idg_O2,N,L,NZ)-trcs_rootml(idg_O2,N,L,NZ)
-        RCH4Z(NZ)=RCH4Z(NZ)-trcg_rootml(idg_CH4,N,L,NZ)-trcs_rootml(idg_CH4,N,L,NZ)
-        RN2OZ(NZ)=RN2OZ(NZ)-trcg_rootml(idg_N2O,N,L,NZ)-trcs_rootml(idg_N2O,N,L,NZ)
-        RNH3Z(NZ)=RNH3Z(NZ)-trcg_rootml(idg_NH3,N,L,NZ)-trcs_rootml(idg_NH3,N,L,NZ)
-        RH2GZ(NZ)=RH2GZ(NZ)-trcg_rootml(idg_H2,N,L,NZ)-trcs_rootml(idg_H2,N,L,NZ)
+        DO NTG=idg_beg,idg_end-1
+          RFGas_root(NTG,NZ)=RFGas_root(NTG,NZ)-trcg_rootml(NTG,N,L,NZ)-trcs_rootml(NTG,N,L,NZ)
+        ENDDO
         trcg_rootml(idg_beg:idg_end-1,N,L,NZ)=0._r8
         trcs_rootml(idg_beg:idg_end-1,N,L,NZ)=0._r8
 !

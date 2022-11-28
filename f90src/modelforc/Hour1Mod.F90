@@ -896,12 +896,8 @@ module Hour1Mod
   TEVAPC(NY,NX)=0.0_r8
   THFLXC(NY,NX)=0.0_r8
   TENGYC(NY,NX)=0.0_r8
-  TCO2Z(NY,NX)=0.0_r8
-  TOXYZ(NY,NX)=0.0_r8
-  TCH4Z(NY,NX)=0.0_r8
-  TN2OZ(NY,NX)=0.0_r8
-  TNH3Z(NY,NX)=0.0_r8
-  TH2GZ(NY,NX)=0.0_r8
+
+  TRFGas_root(idg_beg:idg_end-1,NY,NX)=0.0_r8
   ZESNC(NY,NX,:)=0.0_r8
   WTSTGT(NY,NX)=0.0_r8
   PPT(NY,NX)=0.0_r8

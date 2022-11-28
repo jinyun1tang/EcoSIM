@@ -381,21 +381,16 @@ module ExtractsMod
 
   implicit none
   integer, intent(in) :: NZ
-  integer :: L, NB,NE
+  integer :: L, NB,NE,NTG
   real(r8) :: ENGYC
   associate(                       &
     TBALE => plt_site%TBALE  , &
     BALE  => plt_site%BALE   , &
     TNH3C => plt_bgcr%TNH3C  , &
     RNH3C => plt_bgcr%RNH3C  , &
-    RCO2Z => plt_bgcr%RCO2Z  , &
-    ROXYZ => plt_bgcr%ROXYZ  , &
-    RCH4Z => plt_bgcr%RCH4Z  , &
-    RN2OZ => plt_bgcr%RN2OZ  , &
-    RNH3Z => plt_bgcr%RNH3Z  , &
-    RH2GZ => plt_bgcr%RH2GZ  , &
     TCCAN => plt_bgcr%TCCAN  , &
     ZESNC => plt_bgcr%ZESNC  , &
+    RFGas_root => plt_bgcr%RFGas_root, &
     RUPNF => plt_bgcr%RUPNF  , &
     CNET  => plt_bgcr%CNET   , &
     CTRAN => plt_ew%CTRAN    , &
@@ -403,11 +398,7 @@ module ExtractsMod
     RNH3B => plt_rbgc%RNH3B  , &
     HEUPTK=> plt_rbgc%HEUPTK , &
     TUPNF => plt_rbgc%TUPNF  , &
-    TOXYZ => plt_rbgc%TOXYZ  , &
-    TCH4Z => plt_rbgc%TCH4Z  , &
-    TCO2Z => plt_rbgc%TCO2Z  , &
-    TN2OZ => plt_rbgc%TN2OZ  , &
-    TNH3Z => plt_rbgc%TNH3Z  , &
+    TRFGas_root => plt_rbgc%TRFGas_root  , &
     EP    => plt_ew%EP       , &
     FLWC  => plt_ew%FLWC     , &
     EVAPC => plt_ew%EVAPC    , &
@@ -469,8 +460,8 @@ module ExtractsMod
 !     HCUPTK,HZUPTK,HPUPTK=PFT net root-soil C,N,P exchange
 !     TBALC,TBALN,TBALP=total C,N,P balance
 !     BALC,BALN,BALP=PFT C,N,P balance
-!     TCO2Z,TOXYZ,TCH4Z,TN2OZ,TNH3Z,TH2GZ=total loss of root CO2, O2, CH4, N2O, NH3, H2
-!     RCO2Z,ROXYZ,RCH4Z,RN2OZ,RNH3Z,RH2GZ=PFT loss of root CO2, O2, CH4, N2O, NH3, H2
+!     TRFGas_root=total loss of root CO2, O2, CH4, N2O, NH3, H2
+!     RFGas_root=PFT loss of root CO2, O2, CH4, N2O, NH3, H2
 !
   TRN=TRN+RAD1(NZ)
   TLE=TLE+EFLXC(NZ)
@@ -493,12 +484,10 @@ module ExtractsMod
     ZESNC(NE)=ZESNC(NE)-HEUPTK(NE,NZ)
     TBALE(NE)=TBALE(NE)+BALE(NE,NZ)
   ENDDO
-  TCO2Z=TCO2Z+RCO2Z(NZ)
-  TOXYZ=TOXYZ+ROXYZ(NZ)
-  TCH4Z=TCH4Z+RCH4Z(NZ)
-  TN2OZ=TN2OZ+RN2OZ(NZ)
-  TNH3Z=TNH3Z+RNH3Z(NZ)
-  TH2GZ=TH2GZ+RH2GZ(NZ)
+
+  DO NTG=idg_beg,idg_end-1
+    TRFGas_root(NTG)=TRFGas_root(NTG)+RFGas_root(NTG,NZ)
+  ENDDO
 !
 !     TOTAL CANOPY NH3 EXCHANGE AND EXUDATION
 !
