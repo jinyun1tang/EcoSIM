@@ -33,44 +33,16 @@ module AqueChemDatatype
   real(r8),target,allocatable ::  GKCK(:,:,:)                        !Ca-K Gapon selectivity coefficient, [-]
 
   real(r8),target,allocatable :: trcsa_solml(:,:,:,:)                !soil aqueous salt content micropre, [mol d-2]
-
-  real(r8),target,allocatable ::  XN4(:,:,:)                         !exchangeable NH4 non-band, [mol d-2]
-  real(r8),target,allocatable ::  XNB(:,:,:)                         !exchangeable NH4 band, [mol d-2]
-  real(r8),target,allocatable ::  XHY(:,:,:)                         !exchangeable H , [mol d-2]
-  real(r8),target,allocatable ::  XAL(:,:,:)                         !exchangeable Al, [mol d-2]
-  real(r8),target,allocatable ::  XCA(:,:,:)                         !exchangeable Ca, [mol d-2]
-  real(r8),target,allocatable ::  XMG(:,:,:)                         !exchangeable Mg , [mol d-2]
-  real(r8),target,allocatable ::  XNA(:,:,:)                         !exchangeable Na, [mol d-2]
-  real(r8),target,allocatable ::  XKA(:,:,:)                         !exchangeable K, [mol d-2]
-  real(r8),target,allocatable ::  XHC(:,:,:)                         !exchangeable COOH , [mol d-2]
-  real(r8),target,allocatable ::  XALO2(:,:,:)                       !exchangeable AlOH2 , [mol d-2]
-  real(r8),target,allocatable ::  XOH0(:,:,:)                        !exchangeable OH- non-band, [mol d-2]
-  real(r8),target,allocatable ::  XOH1(:,:,:)                        !exchangeable OH  non-band, [mol d-2]
-  real(r8),target,allocatable ::  XOH2(:,:,:)                        !exchangeable OH2  non-band, [mol d-2]
-  real(r8),target,allocatable ::  XH1P(:,:,:)                        !exchangeable HPO4  non-band, [mol d-2]
-  real(r8),target,allocatable ::  XH2P(:,:,:)                        !exchangeable H2PO4  non-band, [mol d-2]
-  real(r8),target,allocatable ::  XOH0B(:,:,:)                       !exchangeable OH- band, [mol d-2]
-  real(r8),target,allocatable ::  XFE(:,:,:)                         !exchangeable Fe, [mol d-2]
-  real(r8),target,allocatable ::  XFEO2(:,:,:)                       !exchangeable Fe(OH)2, [mol d-2]
-
-  real(r8),target,allocatable ::  XOH1B(:,:,:)                       !exchangeable OH  band, [mol d-2]
-  real(r8),target,allocatable ::  XOH2B(:,:,:)                       !exchangeable OH2  band, [mol d-2]
-  real(r8),target,allocatable ::  XH1PB(:,:,:)                       !exchangeable HPO4  band, [mol d-2]
-  real(r8),target,allocatable ::  XH2PB(:,:,:)                       !exchangeable H2PO4  band, [mol d-2]
-
-  real(r8),target,allocatable ::  trcp_salml(:,:,:,:)                !salt precipitate in micropore
+  real(r8),target,allocatable :: trcx_solml(:,:,:,:)                 !exchangeable tracers
+  real(r8),target,allocatable :: trcp_salml(:,:,:,:)                !salt precipitate in micropore
 
   real(r8),target,allocatable ::  ECND(:,:,:)                        !electrical conductivity , [dS m-1]
   real(r8),target,allocatable ::  CSTR(:,:,:)                        !solution ion strength, [mol m-3]
   real(r8),target,allocatable ::  CION(:,:,:)                        !solution ion concentratiom, [mol m-3]
-  real(r8),target,allocatable ::  XCEC(:,:,:)                        !cation exchange capacity, [mol d-2]
-  real(r8),target,allocatable ::  XAEC(:,:,:)                        !anion exchange capacity, [mol d-2]
 
   real(r8),target,allocatable :: trcsa_soHml(:,:,:,:)
-
-  real(r8),target,allocatable ::  trcsa_XFHS(:,:,:,:,:)
-  real(r8),target,allocatable ::  trcsa_XFLS(:,:,:,:,:)
-
+  real(r8),target,allocatable :: trcsa_XFHS(:,:,:,:,:)
+  real(r8),target,allocatable :: trcsa_XFLS(:,:,:,:,:)
 
   real(r8),target,allocatable ::  XOCFXS(:,:,:,:)                    !total DOC micropore-macropore transfer, [g d-2 h-1]
   real(r8),target,allocatable ::  XONFXS(:,:,:,:)                    !total DON micropore-macropore transfer, [g d-2 h-1]
@@ -336,40 +308,14 @@ module AqueChemDatatype
   allocate(GKCM(JZ,JY,JX));     GKCM=0._r8
   allocate(GKCN(JZ,JY,JX));     GKCN=0._r8
   allocate(GKCK(JZ,JY,JX));     GKCK=0._r8
-  allocate(XN4(0:JZ,JY,JX));    XN4=0._r8
-  allocate(XNB(0:JZ,JY,JX));    XNB=0._r8
 
   allocate(trcsa_solml(idsa_beg:idsab_end,0:JZ,JY,JX));trcsa_solml=0._r8
-
-  allocate(XHY(JZ,JY,JX));      XHY=0._r8
-  allocate(XAL(JZ,JY,JX));      XAL=0._r8
-  allocate(XCA(JZ,JY,JX));      XCA=0._r8
-  allocate(XMG(JZ,JY,JX));      XMG=0._r8
-  allocate(XNA(JZ,JY,JX));      XNA=0._r8
-  allocate(XKA(JZ,JY,JX));      XKA=0._r8
-  allocate(XHC(JZ,JY,JX));      XHC=0._r8
-  allocate(XALO2(JZ,JY,JX));    XALO2=0._r8
-  allocate(XOH0(0:JZ,JY,JX));   XOH0=0._r8
-  allocate(XOH1(0:JZ,JY,JX));   XOH1=0._r8
-  allocate(XOH2(0:JZ,JY,JX));   XOH2=0._r8
-  allocate(XH1P(0:JZ,JY,JX));   XH1P=0._r8
-  allocate(XH2P(0:JZ,JY,JX));   XH2P=0._r8
-  allocate(XOH0B(0:JZ,JY,JX));  XOH0B=0._r8
-  allocate(XFE(JZ,JY,JX));      XFE=0._r8
-  allocate(XFEO2(JZ,JY,JX));    XFEO2=0._r8
-  allocate(XOH1B(0:JZ,JY,JX));  XOH1B=0._r8
-  allocate(XOH2B(0:JZ,JY,JX));  XOH2B=0._r8
-  allocate(XH1PB(0:JZ,JY,JX));  XH1PB=0._r8
-  allocate(XH2PB(0:JZ,JY,JX));  XH2PB=0._r8
-
+  allocate(trcx_solml(idx_beg:idx_end,0:JZ,JY,JX));trcx_solml=0._r8
   allocate(trcp_salml(idsp_beg:idsp_end,0:JZ,JY,JX)); trcp_salml=0._r8
-
 
   allocate(ECND(JZ,JY,JX));     ECND=0._r8
   allocate(CSTR(JZ,JY,JX));     CSTR=0._r8
   allocate(CION(JZ,JY,JX));     CION=0._r8
-  allocate(XCEC(JZ,JY,JX));     XCEC=0._r8
-  allocate(XAEC(JZ,JY,JX));     XAEC=0._r8
 
   allocate(trcsa_soHml(idsa_beg:idsab_end,JZ,JY,JX)); trcsa_soHml=0._r8
   allocate(XOCFXS(1:jcplx,JZ,JY,JX));XOCFXS=0._r8
@@ -632,37 +578,14 @@ module AqueChemDatatype
   call destroy(GKCM)
   call destroy(GKCN)
   call destroy(GKCK)
-  call destroy(XN4)
-  call destroy(XNB)
 
+  call destroy(trcx_solml)
   call destroy(trcsa_solml)
   call destroy(trcsa_soHml)
-  call destroy(XHY)
-  call destroy(XAL)
-  call destroy(XCA)
-  call destroy(XMG)
-  call destroy(XNA)
-  call destroy(XKA)
-  call destroy(XHC)
-  call destroy(XALO2)
-  call destroy(XOH0)
-  call destroy(XOH1)
-  call destroy(XOH2)
-  call destroy(XH1P)
-  call destroy(XH2P)
-  call destroy(XOH0B)
-  call destroy(XFE)
-  call destroy(XFEO2)
-  call destroy(XOH1B)
-  call destroy(XOH2B)
-  call destroy(XH1PB)
-  call destroy(XH2PB)
   call destroy(trcp_salml)
   call destroy(ECND)
   call destroy(CSTR)
   call destroy(CION)
-  call destroy(XCEC)
-  call destroy(XAEC)
 
   call destroy(trcsa_XFLS)
   call destroy(trcsa_XFHS)

@@ -96,6 +96,36 @@ implicit none
   integer :: idsp_AlPO4B
   integer :: idsp_FePO4B
   integer :: idsp_CaH2PO4B
+
+! exchangeable tracers
+  integer :: idx_CEC    ! XCEC,  cation exchange capacity, [mol d-2]
+  integer :: idx_NH4    ! XN4, exchangeable NH4 non-band, [mol d-2]
+  integer :: idx_NH4B   ! XNB, exchangeable NH4 band, [mol d-2]
+  integer :: idx_Hp     ! XHY, exchangeable H , [mol d-2]
+  integer :: idx_Al     ! XAL, exchangeable Al, [mol d-2]
+  integer :: idx_Fe     ! XFE, exchangeable Fe, [mol d-2]
+  integer :: idx_Ca     ! XCA, exchangeable Ca, [mol d-2]
+  integer :: idx_Mg     ! XMG, exchangeable Mg , [mol d-2]
+  integer :: idx_Na     ! XNA, exchangeable Na, [mol d-2]
+  integer :: idx_K      ! XKA, exchangeable K, [mol d-2]
+  integer :: idx_COOH   ! XHC, exchangeable COOH , [mol d-2]
+  integer :: idx_AlOH2  ! XALO2, exchangeable AlOH2 , [mol d-2]
+  integer :: idx_FeOH2  ! XFEO2, exchangeable Fe(OH)2, [mol d-2]
+  integer :: idx_cation_end
+
+  integer :: idx_AEC    ! XAEC, anion exchange capacity, [mol d-2]
+  integer :: idx_OHe    ! XOH0, exchangeable OH- non-band, [mol d-2]
+  integer :: idx_OH     ! XOH1, exchangeable OH  non-band, [mol d-2]
+  integer :: idx_OHp    ! XOH2, exchangeable OH2  non-band, [mol d-2]
+  integer :: idx_HPO4   ! XH1P, exchangeable HPO4  non-band, [mol d-2]
+  integer :: idx_H2PO4  ! XH2P, exchangeable H2PO4  non-band, [mol d-2]
+  integer :: idx_OHeB   ! XOH0B, exchangeable OH- band, [mol d-2]
+  integer :: idx_OHB    ! XOH1B, exchangeable OH  band, [mol d-2]
+  integer :: idx_OHpB   ! XOH2B, exchangeable OH2  band, [mol d-2]
+  integer :: idx_HPO4B  ! XH1PB, exchangeable HPO4  band, [mol d-2]
+  integer :: idx_H2PO4B ! XH2PB, exchangeable H2PO4  band, [mol d-2]
+  integer :: idx_beg, idx_end
+
   contains
 
   subroutine InitTracerIDs(lsalt_model)
@@ -125,6 +155,7 @@ implicit none
 
   ids_nut_beg=ids_NH4;  !the first non-band non-gaseous nutrient tracer
   ids_nuts_end=ids_H2PO4;!the last non-band nutrient tracer
+
   if(lsalt_model)then
     idsa_beg=1;idsa_end=0
     idsa_Al=addone(idsa_end)
@@ -222,5 +253,37 @@ implicit none
     idsp_end=idsp_CaH2PO4B
 
   endif
+
+  idx_beg=1
+  idx_end=0
+
+  idx_CEC=addone(idx_end)    ! XCEC,  cation exchange capacity, [mol d-2]
+  idx_NH4=addone(idx_end)    ! XN4, exchangeable NH4 non-band, [mol d-2]
+  idx_NH4B=addone(idx_end)   ! XNB, exchangeable NH4 band, [mol d-2]
+  idx_Hp =addone(idx_end)    ! XHY, exchangeable H , [mol d-2]
+  idx_Al =addone(idx_end)    ! XAL, exchangeable Al, [mol d-2]
+  idx_Fe =addone(idx_end)    ! XFE, exchangeable Fe, [mol d-2]
+  idx_Ca =addone(idx_end)    ! XCA, exchangeable Ca, [mol d-2]
+  idx_Mg =addone(idx_end)    ! XMG, exchangeable Mg , [mol d-2]
+  idx_Na =addone(idx_end)    ! XNA, exchangeable Na, [mol d-2]
+  idx_K  =addone(idx_end)    ! XKA, exchangeable K, [mol d-2]
+  idx_COOH =addone(idx_end)  ! XHC, exchangeable COOH , [mol d-2]
+  idx_AlOH2 =addone(idx_end) ! XALO2, exchangeable AlOH2 , [mol d-2]
+  idx_FeOH2 =addone(idx_end) ! XFEO2, exchangeable Fe(OH)2, [mol d-2]
+  idx_cation_end=idx_FeOH2
+
+  idx_AEC =addone(idx_end)   ! XAEC, anion exchange capacity, [mol d-2]
+  idx_OHe =addone(idx_end)   ! XOH0, exchangeable OH- non-band, [mol d-2]
+  idx_OH  =addone(idx_end)   ! XOH1, exchangeable OH  non-band, [mol d-2]
+  idx_OHp =addone(idx_end)   ! XOH2, exchangeable OH2  non-band, [mol d-2]
+  idx_HPO4 =addone(idx_end)  ! XH1P, exchangeable HPO4  non-band, [mol d-2]
+  idx_H2PO4 =addone(idx_end) ! XH2P, exchangeable H2PO4  non-band, [mol d-2]
+  idx_OHeB  =addone(idx_end) ! XOH0B, exchangeable OH- band, [mol d-2]
+  idx_OHB  =addone(idx_end)  ! XOH1B, exchangeable OH  band, [mol d-2]
+  idx_OHpB  =addone(idx_end) ! XOH2B, exchangeable OH2  band, [mol d-2]
+  idx_HPO4B =addone(idx_end) ! XH1PB, exchangeable HPO4  band, [mol d-2]
+  idx_H2PO4B =addone(idx_end)! XH2PB, exchangeable H2PO4  band, [mol d-2]
+  idx_end=idx_H2PO4B
+
   end subroutine InitTracerIDs
 end module TracerIDMod

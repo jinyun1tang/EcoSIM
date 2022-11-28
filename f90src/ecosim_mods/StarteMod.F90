@@ -106,8 +106,8 @@ module StarteMod
                   ELSE
                     BKVLX=VOLA(L,NY,NX)
                   ENDIF
-                  XCEC(L,NY,NX)=AMAX1(CNH4(L,NY,NX),CEC(L,NY,NX))*BKVLX
-                  XAEC(L,NY,NX)=AMAX1(CPO4(L,NY,NX),AEC(L,NY,NX))*BKVLX
+                  trcx_solml(idx_CEC,L,NY,NX)=AMAX1(CNH4(L,NY,NX),CEC(L,NY,NX))*BKVLX
+                  trcx_solml(idx_AEC,L,NY,NX)=AMAX1(CPO4(L,NY,NX),AEC(L,NY,NX))*BKVLX
                   solutevar%CN4X=CNH4(L,NY,NX)
                   solutevar%CALX=CAL(L,NY,NX)
                   solutevar%CFEX=CFE(L,NY,NX)
@@ -146,11 +146,11 @@ module StarteMod
               ENDIF
             ENDIF
 
-            solutevar%XAEC  = XAEC(L,NY,NX)
+            solutevar%XAEC  = trcx_solml(idx_AEC,L,NY,NX)
             solutevar%CEC   = CEC(L,NY,NX)
             solutevar%ORGC  = ORGC(L,NY,NX)
             solutevar%VLPO4 = trcs_VLN(ids_H1PO4,L,NY,NX)
-            solutevar%XCEC  = XCEC(L,NY,NX)
+            solutevar%XCEC  = trcx_solml(idx_CEC,L,NY,NX)
             solutevar%GKC4  = GKC4(L,NY,NX)
             solutevar%GKCA  = GKCA(L,NY,NX)
             solutevar%GKCH  = GKCH(L,NY,NX)
@@ -463,28 +463,28 @@ module StarteMod
 !
 !     INITIAL STATE VARIABLES FOR EXCHANGEABLE CATIONS AND ANIONS
 !
-    XN4(L,NY,NX)=solutevar%XN41*BKVL(L,NY,NX)*trcs_VLN(ids_NH4,L,NY,NX)
-    XNB(L,NY,NX)=solutevar%XN41*BKVL(L,NY,NX)*trcs_VLN(ids_NH4B,L,NY,NX)
-    XHY(L,NY,NX)=solutevar%XHY1*BKVL(L,NY,NX)
-    XAL(L,NY,NX)=solutevar%XAL1*BKVL(L,NY,NX)
-    XFE(L,NY,NX)=solutevar%XFE1*BKVL(L,NY,NX)
-    XCA(L,NY,NX)=solutevar%XCA1*BKVL(L,NY,NX)
-    XMG(L,NY,NX)=solutevar%XMG1*BKVL(L,NY,NX)
-    XNA(L,NY,NX)=solutevar%XNA1*BKVL(L,NY,NX)
-    XKA(L,NY,NX)=solutevar%XKA1*BKVL(L,NY,NX)
-    XHC(L,NY,NX)=solutevar%XHC1*BKVL(L,NY,NX)
-    XALO2(L,NY,NX)=solutevar%XALO21*BKVL(L,NY,NX)
-    XFEO2(L,NY,NX)=solutevar%XFEO21*BKVL(L,NY,NX)
-    XOH0(L,NY,NX)=solutevar%XOH01*BKVL(L,NY,NX)*trcs_VLN(ids_H1PO4,L,NY,NX)
-    XOH1(L,NY,NX)=solutevar%XOH11*BKVL(L,NY,NX)*trcs_VLN(ids_H1PO4,L,NY,NX)
-    XOH2(L,NY,NX)=solutevar%XOH21*BKVL(L,NY,NX)*trcs_VLN(ids_H1PO4,L,NY,NX)
-    XH1P(L,NY,NX)=solutevar%XH1P1*BKVL(L,NY,NX)*trcs_VLN(ids_H1PO4,L,NY,NX)
-    XH2P(L,NY,NX)=solutevar%XH2P1*BKVL(L,NY,NX)*trcs_VLN(ids_H1PO4,L,NY,NX)
-    XOH0B(L,NY,NX)=solutevar%XOH01*BKVL(L,NY,NX)*trcs_VLN(ids_H1PO4B,L,NY,NX)
-    XOH1B(L,NY,NX)=solutevar%XOH11*BKVL(L,NY,NX)*trcs_VLN(ids_H1PO4B,L,NY,NX)
-    XOH2B(L,NY,NX)=solutevar%XOH21*BKVL(L,NY,NX)*trcs_VLN(ids_H1PO4B,L,NY,NX)
-    XH1PB(L,NY,NX)=solutevar%XH1P1*BKVL(L,NY,NX)*trcs_VLN(ids_H1PO4B,L,NY,NX)
-    XH2PB(L,NY,NX)=solutevar%XH2P1*BKVL(L,NY,NX)*trcs_VLN(ids_H1PO4B,L,NY,NX)
+    trcx_solml(idx_NH4,L,NY,NX)=solutevar%XN41*BKVL(L,NY,NX)*trcs_VLN(ids_NH4,L,NY,NX)
+    trcx_solml(idx_NH4B,L,NY,NX)=solutevar%XN41*BKVL(L,NY,NX)*trcs_VLN(ids_NH4B,L,NY,NX)
+    trcx_solml(idx_Hp,L,NY,NX)=solutevar%XHY1*BKVL(L,NY,NX)
+    trcx_solml(idx_Al,L,NY,NX)=solutevar%XAL1*BKVL(L,NY,NX)
+    trcx_solml(idx_Fe,L,NY,NX)=solutevar%XFE1*BKVL(L,NY,NX)
+    trcx_solml(idx_Ca,L,NY,NX)=solutevar%XCA1*BKVL(L,NY,NX)
+    trcx_solml(idx_Mg,L,NY,NX)=solutevar%XMG1*BKVL(L,NY,NX)
+    trcx_solml(idx_Na,L,NY,NX)=solutevar%XNA1*BKVL(L,NY,NX)
+    trcx_solml(idx_K,L,NY,NX)=solutevar%XKA1*BKVL(L,NY,NX)
+    trcx_solml(idx_COOH,L,NY,NX)=solutevar%XHC1*BKVL(L,NY,NX)
+    trcx_solml(idx_AlOH2,L,NY,NX)=solutevar%XALO21*BKVL(L,NY,NX)
+    trcx_solml(idx_FeOH2,L,NY,NX)=solutevar%XFEO21*BKVL(L,NY,NX)
+    trcx_solml(idx_OHe,L,NY,NX)=solutevar%XOH01*BKVL(L,NY,NX)*trcs_VLN(ids_H1PO4,L,NY,NX)
+    trcx_solml(idx_OH,L,NY,NX)=solutevar%XOH11*BKVL(L,NY,NX)*trcs_VLN(ids_H1PO4,L,NY,NX)
+    trcx_solml(idx_OHp,L,NY,NX)=solutevar%XOH21*BKVL(L,NY,NX)*trcs_VLN(ids_H1PO4,L,NY,NX)
+    trcx_solml(idx_HPO4,L,NY,NX)=solutevar%XH1P1*BKVL(L,NY,NX)*trcs_VLN(ids_H1PO4,L,NY,NX)
+    trcx_solml(idx_H2PO4,L,NY,NX)=solutevar%XH2P1*BKVL(L,NY,NX)*trcs_VLN(ids_H1PO4,L,NY,NX)
+    trcx_solml(idx_OHeB,L,NY,NX)=solutevar%XOH01*BKVL(L,NY,NX)*trcs_VLN(ids_H1PO4B,L,NY,NX)
+    trcx_solml(idx_OHB,L,NY,NX)=solutevar%XOH11*BKVL(L,NY,NX)*trcs_VLN(ids_H1PO4B,L,NY,NX)
+    trcx_solml(idx_OHpB,L,NY,NX)=solutevar%XOH21*BKVL(L,NY,NX)*trcs_VLN(ids_H1PO4B,L,NY,NX)
+    trcx_solml(idx_HPO4B,L,NY,NX)=solutevar%XH1P1*BKVL(L,NY,NX)*trcs_VLN(ids_H1PO4B,L,NY,NX)
+    trcx_solml(idx_H2PO4B,L,NY,NX)=solutevar%XH2P1*BKVL(L,NY,NX)*trcs_VLN(ids_H1PO4B,L,NY,NX)
 !
 !     INITIAL STATE VARIABLES FOR PRECIPITATES
 !
@@ -524,19 +524,19 @@ module StarteMod
   IF(.not.is_restart_run.AND.is_first_year)THEN
     trc_solml(ids_nuts_beg:ids_nuts_end,0,NY,NX)=0._r8
 
-    XN4(0,NY,NX)=0._r8
-    XNB(0,NY,NX)=0._r8
-    XOH0(0,NY,NX)=0._r8
-    XOH1(0,NY,NX)=0._r8
-    XOH2(0,NY,NX)=0._r8
-    XH1P(0,NY,NX)=0._r8
-    XH2P(0,NY,NX)=0._r8
-    XNB(0,NY,NX)=0._r8
-    XOH0B(0,NY,NX)=0._r8
-    XOH1B(0,NY,NX)=0._r8
-    XOH2B(0,NY,NX)=0._r8
-    XH1PB(0,NY,NX)=0._r8
-    XH2PB(0,NY,NX)=0._r8
+    trcx_solml(idx_NH4,0,NY,NX)=0._r8
+    trcx_solml(idx_NH4B,0,NY,NX)=0._r8
+    trcx_solml(idx_OHe,0,NY,NX)=0._r8
+    trcx_solml(idx_OH,0,NY,NX)=0._r8
+    trcx_solml(idx_OHp,0,NY,NX)=0._r8
+    trcx_solml(idx_HPO4,0,NY,NX)=0._r8
+    trcx_solml(idx_H2PO4,0,NY,NX)=0._r8
+    trcx_solml(idx_NH4B,0,NY,NX)=0._r8
+    trcx_solml(idx_OHeB,0,NY,NX)=0._r8
+    trcx_solml(idx_OHB,0,NY,NX)=0._r8
+    trcx_solml(idx_OHpB,0,NY,NX)=0._r8
+    trcx_solml(idx_HPO4B,0,NY,NX)=0._r8
+    trcx_solml(idx_H2PO4B,0,NY,NX)=0._r8
     trcp_salml(idsp_AlPO4,0,NY,NX)=0._r8
     trcp_salml(idsp_FePO4,0,NY,NX)=0._r8
     trcp_salml(idsp_CaHPO4,0,NY,NX)=0._r8

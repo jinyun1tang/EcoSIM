@@ -309,7 +309,7 @@ module NitroDisturbMod
           trc_solml(ids_NO2,L,NY,NX)=DCORPC1*trc_solml(ids_NO2,L,NY,NX)
           trc_solml(ids_H1PO4,L,NY,NX)=DCORPC1*trc_solml(ids_H1PO4,L,NY,NX)
           trc_solml(ids_H2PO4,L,NY,NX)=DCORPC1*trc_solml(ids_H2PO4,L,NY,NX)
-          XN4(L,NY,NX)  =DCORPC1*XN4(L,NY,NX)
+          trcx_solml(idx_NH4,L,NY,NX)  =DCORPC1*trcx_solml(idx_NH4,L,NY,NX)
           trcp_salml(idsp_AlPO4,L,NY,NX)=DCORPC1*trcp_salml(idsp_AlPO4,L,NY,NX)
           trcp_salml(idsp_FePO4,L,NY,NX)=DCORPC1*trcp_salml(idsp_FePO4,L,NY,NX)
           trcp_salml(idsp_CaHPO4,L,NY,NX)=DCORPC1*trcp_salml(idsp_CaHPO4,L,NY,NX)
