@@ -27,15 +27,11 @@ implicit none
 
   real(r8) :: FSINK,FSAN,FSIL,FCLA,FCEC,FAEC
   real(r8) :: FNX
-  real(r8) :: FNH4, FNH3,FNHU,FNO3
-  real(r8) :: FN4,FHY,FAL,FFE,FCA,FMG,FNA,FKA
-  real(r8) :: FHC,FAL2,FFE2,FOH0,FOH1,FOH2
-  real(r8) :: FCAC,FCAS,FALP,FFEP
-  real(r8) :: FCPD,FCPH,FCPM
-  real(r8) :: FOMC,FOMN,FOMP,FH1P,FH2P,FALO,FFEO
+  real(r8) :: FOMC,FOMN,FOMP
   real(r8) :: FORC,FORN,FORP,FOHC,FOHN,FOHP,FOHA
   real(r8) :: FOSC,FOSA,FOSN,FOSP
-  integer  :: NTF
+  integer  :: NTF,NTP,NTX
+  real(r8) :: FPX,FSNX
 ! begin_execution
 ! SINK ALL SOLID C,N,P IN POND
 !
@@ -61,18 +57,12 @@ implicit none
       FSAN=FSINK*SAND(L,NY,NX)
       FSIL=FSINK*SILT(L,NY,NX)
       FCLA=FSINK*CLAY(L,NY,NX)
-      FCEC=FSINK*trcx_solml(idx_CEC,L,NY,NX)
-      FAEC=FSINK*trcx_solml(idx_AEC,L,NY,NX)
       SAND(L,NY,NX)=SAND(L,NY,NX)-FSAN
       SILT(L,NY,NX)=SILT(L,NY,NX)-FSIL
       CLAY(L,NY,NX)=CLAY(L,NY,NX)-FCLA
-      trcx_solml(idx_CEC,L,NY,NX)=trcx_solml(idx_CEC,L,NY,NX)-FCEC
-      trcx_solml(idx_AEC,L,NY,NX)=trcx_solml(idx_AEC,L,NY,NX)-FAEC
       SAND(LL,NY,NX)=SAND(LL,NY,NX)+FSAN
       SILT(LL,NY,NX)=SILT(LL,NY,NX)+FSIL
       CLAY(LL,NY,NX)=CLAY(LL,NY,NX)+FCLA
-      trcx_solml(idx_CEC,LL,NY,NX)=trcx_solml(idx_CEC,LL,NY,NX)+FCEC
-      trcx_solml(idx_AEC,LL,NY,NX)=trcx_solml(idx_AEC,LL,NY,NX)+FAEC
 !
 !     FERTILIZER POOLS
 !
@@ -84,20 +74,6 @@ implicit none
         FertN_soil(NTF,L,NY,NX)=FertN_soil(NTF,L,NY,NX)-FNX
         FertN_soil(NTF,LL,NY,NX)=FertN_soil(NTF,LL,NY,NX)+FNX
       ENDDO
-!      FNH4=FSINK*ZNH4FA(L,NY,NX)
-!      FNH3=FSINK*ZNH3FA(L,NY,NX)
-!      FNHU=FSINK*ZNHUFA(L,NY,NX)
-!      FNO3=FSINK*ZNO3FA(L,NY,NX)
-
-!      ZNH4FA(L,NY,NX)=ZNH4FA(L,NY,NX)-FNH4
-!      ZNH3FA(L,NY,NX)=ZNH3FA(L,NY,NX)-FNH3
-!      ZNHUFA(L,NY,NX)=ZNHUFA(L,NY,NX)-FNHU
-!      ZNO3FA(L,NY,NX)=ZNO3FA(L,NY,NX)-FNO3
-
-!      ZNH4FA(LL,NY,NX)=ZNH4FA(LL,NY,NX)+FNH4
-!      ZNH3FA(LL,NY,NX)=ZNH3FA(LL,NY,NX)+FNH3
-!      ZNHUFA(LL,NY,NX)=ZNHUFA(LL,NY,NX)+FNHU
-!      ZNO3FA(LL,NY,NX)=ZNO3FA(LL,NY,NX)+FNO3
 !
 !     EXCHANGEABLE CATIONS AND ANIONS
 !
@@ -108,54 +84,19 @@ implicit none
 !     :XOH0,XOH1,XOH2=adsorbed R-,R-OH,R-OH2
 !     :XH1P,XH2P=adsorbed HPO4,H2PO4
 !
-      FN4=FSINK*trcx_solml(idx_NH4,L,NY,NX)
-      FHY=FSINK*trcx_solml(idx_Hp,L,NY,NX)
-      FAL=FSINK*trcx_solml(idx_Al,L,NY,NX)
-      FFE=FSINK*trcx_solml(idx_Fe,L,NY,NX)
-      FCA=FSINK*trcx_solml(idx_Ca,L,NY,NX)
-      FMG=FSINK*trcx_solml(idx_Mg,L,NY,NX)
-      FNA=FSINK*trcx_solml(idx_Na,L,NY,NX)
-      FKA=FSINK*trcx_solml(idx_K,L,NY,NX)
-      FHC=FSINK*trcx_solml(idx_COOH,L,NY,NX)
-      FAL2=FSINK*trcx_solml(idx_AlOH2,L,NY,NX)
-      FFE2=FSINK*trcx_solml(idx_FeOH2,L,NY,NX)
-      FOH0=FSINK*trcx_solml(idx_OHe,L,NY,NX)
-      FOH1=FSINK*trcx_solml(idx_OH,L,NY,NX)
-      FOH2=FSINK*trcx_solml(idx_OHp,L,NY,NX)
-      FH1P=FSINK*trcx_solml(idx_HPO4,L,NY,NX)
-      FH2P=FSINK*trcx_solml(idx_H2PO4,L,NY,NX)
-      trcx_solml(idx_NH4,L,NY,NX)=trcx_solml(idx_NH4,L,NY,NX)-FN4
-      trcx_solml(idx_Hp,L,NY,NX)=trcx_solml(idx_Hp,L,NY,NX)-FHY
-      trcx_solml(idx_Al,L,NY,NX)=trcx_solml(idx_Al,L,NY,NX)-FAL
-      trcx_solml(idx_Fe,L,NY,NX)=trcx_solml(idx_Fe,L,NY,NX)-FFE
-      trcx_solml(idx_Ca,L,NY,NX)=trcx_solml(idx_Ca,L,NY,NX)-FCA
-      trcx_solml(idx_Mg,L,NY,NX)=trcx_solml(idx_Mg,L,NY,NX)-FMG
-      trcx_solml(idx_Na,L,NY,NX)=trcx_solml(idx_Na,L,NY,NX)-FNA
-      trcx_solml(idx_K,L,NY,NX)=trcx_solml(idx_K,L,NY,NX)-FKA
-      trcx_solml(idx_COOH,L,NY,NX)=trcx_solml(idx_COOH,L,NY,NX)-FHC
-      trcx_solml(idx_AlOH2,L,NY,NX)=trcx_solml(idx_AlOH2,L,NY,NX)-FAL2
-      trcx_solml(idx_FeOH2,L,NY,NX)=trcx_solml(idx_FeOH2,L,NY,NX)-FFE2
-      trcx_solml(idx_OHe,L,NY,NX)=trcx_solml(idx_OHe,L,NY,NX)-FOH0
-      trcx_solml(idx_OH,L,NY,NX)=trcx_solml(idx_OH,L,NY,NX)-FOH1
-      trcx_solml(idx_OHp,L,NY,NX)=trcx_solml(idx_OHp,L,NY,NX)-FOH2
-      trcx_solml(idx_HPO4,L,NY,NX)=trcx_solml(idx_HPO4,L,NY,NX)-FH1P
-      trcx_solml(idx_H2PO4,L,NY,NX)=trcx_solml(idx_H2PO4,L,NY,NX)-FH2P
-      trcx_solml(idx_NH4,LL,NY,NX)=trcx_solml(idx_NH4,LL,NY,NX)+FN4
-      trcx_solml(idx_Hp,LL,NY,NX)=trcx_solml(idx_Hp,LL,NY,NX)+FHY
-      trcx_solml(idx_Al,LL,NY,NX)=trcx_solml(idx_Al,LL,NY,NX)+FAL
-      trcx_solml(idx_Fe,LL,NY,NX)=trcx_solml(idx_Fe,LL,NY,NX)+FFE
-      trcx_solml(idx_Ca,LL,NY,NX)=trcx_solml(idx_Ca,LL,NY,NX)+FCA
-      trcx_solml(idx_Mg,LL,NY,NX)=trcx_solml(idx_Mg,LL,NY,NX)+FMG
-      trcx_solml(idx_Na,LL,NY,NX)=trcx_solml(idx_Na,LL,NY,NX)+FNA
-      trcx_solml(idx_K,LL,NY,NX)=trcx_solml(idx_K,LL,NY,NX)+FKA
-      trcx_solml(idx_COOH,LL,NY,NX)=trcx_solml(idx_COOH,LL,NY,NX)+FHC
-      trcx_solml(idx_AlOH2,LL,NY,NX)=trcx_solml(idx_AlOH2,LL,NY,NX)+FAL2
-      trcx_solml(idx_FeOH2,LL,NY,NX)=trcx_solml(idx_FeOH2,LL,NY,NX)+FFE2
-      trcx_solml(idx_OHe,LL,NY,NX)=trcx_solml(idx_OHe,LL,NY,NX)+FOH0
-      trcx_solml(idx_OH,LL,NY,NX)=trcx_solml(idx_OH,LL,NY,NX)+FOH1
-      trcx_solml(idx_OHp,LL,NY,NX)=trcx_solml(idx_OHp,LL,NY,NX)+FOH2
-      trcx_solml(idx_HPO4,LL,NY,NX)=trcx_solml(idx_HPO4,LL,NY,NX)+FH1P
-      trcx_solml(idx_H2PO4,LL,NY,NX)=trcx_solml(idx_H2PO4,LL,NY,NX)+FH2P
+! exclude banded nutrients
+      DO NTX=idx_CEC,idx_cation_soil_end
+        FSNX=FSINK*trcx_solml(NTX,L,NY,NX)
+        trcx_solml(NTX,L,NY,NX)=trcx_solml(NTX,L,NY,NX)-FSNX
+        trcx_solml(NTX,LL,NY,NX)=trcx_solml(NTX,LL,NY,NX)+FSNX
+      ENDDO
+
+      DO NTX=idx_AEC,idx_anion_soil_end
+        FSNX=FSINK*trcx_solml(NTX,L,NY,NX)
+        trcx_solml(NTX,L,NY,NX)=trcx_solml(NTX,L,NY,NX)-FSNX
+        trcx_solml(NTX,LL,NY,NX)=trcx_solml(NTX,LL,NY,NX)+FSNX
+      ENDDO
+
 !
 !     PRECIPITATES
 !
@@ -165,34 +106,13 @@ implicit none
 !     :PALP,PFEP=precip AlPO4,FEPO4
 !     :PCPM,PCPD,PCPH=precip CaH2PO4,CaHPO4,apatite
 !
-      FALO=FSINK*trcp_salml(idsp_AlOH3,L,NY,NX)
-      FFEO=FSINK*trcp_salml(idsp_FeOH3,L,NY,NX)
-      FCAC=FSINK*trcp_salml(idsp_CaCO3,L,NY,NX)
-      FCAS=FSINK*trcp_salml(idsp_CaSO4,L,NY,NX)
-      FALP=FSINK*trcp_salml(idsp_AlPO4,L,NY,NX)
-      FFEP=FSINK*trcp_salml(idsp_FePO4,L,NY,NX)
-      FCPD=FSINK*trcp_salml(idsp_CaHPO4,L,NY,NX)
-      FCPH=FSINK*trcp_salml(idsp_HA,L,NY,NX)
-      FCPM=FSINK*trcp_salml(idsp_CaH2PO4,L,NY,NX)
-      trcp_salml(idsp_AlOH3,L,NY,NX)=trcp_salml(idsp_AlOH3,L,NY,NX)-FALO
-      trcp_salml(idsp_FeOH3,L,NY,NX)=trcp_salml(idsp_FeOH3,L,NY,NX)-FFEO
-      trcp_salml(idsp_CaCO3,L,NY,NX)=trcp_salml(idsp_CaCO3,L,NY,NX)-FCAC
-      trcp_salml(idsp_CaSO4,L,NY,NX)=trcp_salml(idsp_CaSO4,L,NY,NX)-FCAS
-      trcp_salml(idsp_AlPO4,L,NY,NX)=trcp_salml(idsp_AlPO4,L,NY,NX)-FALP
-      trcp_salml(idsp_FePO4,L,NY,NX)=trcp_salml(idsp_FePO4,L,NY,NX)-FFEP
-      trcp_salml(idsp_CaHPO4,L,NY,NX)=trcp_salml(idsp_CaHPO4,L,NY,NX)-FCPD
-      trcp_salml(idsp_HA,L,NY,NX)=trcp_salml(idsp_HA,L,NY,NX)-FCPH
-      trcp_salml(idsp_CaH2PO4,L,NY,NX)=trcp_salml(idsp_CaH2PO4,L,NY,NX)-FCPM
-      trcp_salml(idsp_AlOH3,LL,NY,NX)=trcp_salml(idsp_AlOH3,LL,NY,NX)+FALO
-      trcp_salml(idsp_FeOH3,LL,NY,NX)=trcp_salml(idsp_FeOH3,LL,NY,NX)+FFEO
-      trcp_salml(idsp_CaCO3,LL,NY,NX)=trcp_salml(idsp_CaCO3,LL,NY,NX)+FCAC
-      trcp_salml(idsp_CaSO4,LL,NY,NX)=trcp_salml(idsp_CaSO4,LL,NY,NX)+FCAS
-      trcp_salml(idsp_AlPO4,LL,NY,NX)=trcp_salml(idsp_AlPO4,LL,NY,NX)+FALP
-      trcp_salml(idsp_FePO4,LL,NY,NX)=trcp_salml(idsp_FePO4,LL,NY,NX)+FFEP
-      trcp_salml(idsp_CaHPO4,LL,NY,NX)=trcp_salml(idsp_CaHPO4,LL,NY,NX)+FCPD
-      trcp_salml(idsp_HA,LL,NY,NX)=trcp_salml(idsp_HA,LL,NY,NX)+FCPH
-      trcp_salml(idsp_CaH2PO4,LL,NY,NX)=trcp_salml(idsp_CaH2PO4,LL,NY,NX)+FCPM
-!
+! only for non-banded precipitates
+      DO NTP=idsp_beg,idsp_beg_band-1
+        FPX=FSINK*trcp_salml(NTP,L,NY,NX)
+        trcp_salml(NTP,L,NY,NX)=trcp_salml(NTP,L,NY,NX)-FPX
+        trcp_salml(NTP,LL,NY,NX)=trcp_salml(NTP,LL,NY,NX)+FPX
+      ENDDO
+
 !     MICROBIAL C,N,P
 !
       D1970: DO K=1,micpar%n_litrsfk

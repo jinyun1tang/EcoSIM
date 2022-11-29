@@ -391,10 +391,11 @@ module TillageMixMod
         DO NTSA=idsa_beg,idsa_end
           TSA_solml(NTSA)=TSA_solml(NTSA)+TI*trcsa_solml(NTSA,L,NY,NX)
         ENDDO
-
+!cation
         DO NTX=idx_CEC+1,idx_cation_end
           TX_solml(NTX)=TX_solml(NTX)+TI*trcx_solml(NTX,L,NY,NX)
         ENDDO
+!anion
         DO NTX=idx_AEC+1,idx_end
           TX_solml(NTX)=TX_solml(NTX)+TI*trcx_solml(NTX,L,NY,NX)
         ENDDO

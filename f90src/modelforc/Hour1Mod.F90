@@ -2252,6 +2252,7 @@ module Hour1Mod
         trcs_VLN(ids_NO2,L,NY,NX)=trcs_VLN(ids_NO3,L,NY,NX)
         ZNO3T=trc_solml(ids_NO3,L,NY,NX)+trc_solml(ids_NO3B,L,NY,NX)
         ZNO2T=trc_solml(ids_NO2,L,NY,NX)+trc_solml(ids_NO2B,L,NY,NX)
+
         trc_solml(ids_NO3,L,NY,NX)=ZNO3T*trcs_VLN(ids_NO3,L,NY,NX)
         trc_solml(ids_NO2,L,NY,NX)=ZNO2T*trcs_VLN(ids_NO2,L,NY,NX)
         trc_solml(ids_NO3B,L,NY,NX)=ZNO3T*trcs_VLN(ids_NO3B,L,NY,NX)
@@ -2290,6 +2291,7 @@ module Hour1Mod
         trcs_VLN(ids_H1PO4,L,NY,NX)=1.0-trcs_VLN(ids_H1PO4B,L,NY,NX)
         trcs_VLN(ids_H2PO4B,L,NY,NX)=trcs_VLN(ids_H1PO4B,L,NY,NX)
         trcs_VLN(ids_H2PO4,L,NY,NX)=trcs_VLN(ids_H1PO4,L,NY,NX)
+
         H0PO4T=trcsa_solml(idsa_H0PO4,L,NY,NX)+trcsa_solml(idsa_H0PO4B,L,NY,NX)
         H1PO4T=trc_solml(ids_H1PO4,L,NY,NX)+trc_solml(ids_H1PO4B,L,NY,NX)
         H2PO4T=trc_solml(ids_H2PO4,L,NY,NX)+trc_solml(ids_H2PO4B,L,NY,NX)
@@ -2300,6 +2302,7 @@ module Hour1Mod
         ZCA1PT=trcsa_solml(idsa_CaHPO4,L,NY,NX)+trcsa_solml(idsa_CaHPO4B,L,NY,NX)
         ZCA2PT=trcsa_solml(idsa_CaH2PO4,L,NY,NX)+trcsa_solml(idsa_CaH2PO4B,L,NY,NX)
         ZMG1PT=trcsa_solml(idsa_MgHPO4,L,NY,NX)+trcsa_solml(idsa_MgHPO4B,L,NY,NX)
+
         XOH0T=trcx_solml(idx_OHe,L,NY,NX)+trcx_solml(idx_OHeB,L,NY,NX)
         XOH1T=trcx_solml(idx_OH,L,NY,NX)+trcx_solml(idx_OHB,L,NY,NX)
         XOH2T=trcx_solml(idx_OHp,L,NY,NX)+trcx_solml(idx_OHpB,L,NY,NX)
@@ -2310,6 +2313,7 @@ module Hour1Mod
         PCAPDT=trcp_salml(idsp_CaHPO4,L,NY,NX)+trcp_salml(idsp_CaHPO4B,L,NY,NX)
         PCAPHT=trcp_salml(idsp_HA,L,NY,NX)+trcp_salml(idsp_HAB,L,NY,NX)
         PCAPMT=trcp_salml(idsp_CaH2PO4,L,NY,NX)+trcp_salml(idsp_CaH2PO4B,L,NY,NX)
+
         trcsa_solml(idsa_H0PO4,L,NY,NX)=H0PO4T*trcs_VLN(ids_H1PO4,L,NY,NX)
         trc_solml(ids_H1PO4,L,NY,NX)=H1PO4T*trcs_VLN(ids_H1PO4,L,NY,NX)
         trc_solml(ids_H2PO4,L,NY,NX)=H2PO4T*trcs_VLN(ids_H1PO4,L,NY,NX)
@@ -2330,6 +2334,7 @@ module Hour1Mod
         trcsa_solml(idsa_CaHPO4B,L,NY,NX)=ZCA1PT*trcs_VLN(ids_H1PO4B,L,NY,NX)
         trcsa_solml(idsa_CaH2PO4B,L,NY,NX)=ZCA2PT*trcs_VLN(ids_H1PO4B,L,NY,NX)
         trcsa_solml(idsa_MgHPO4B,L,NY,NX)=ZMG1PT*trcs_VLN(ids_H1PO4B,L,NY,NX)
+
         trcx_solml(idx_OHe,L,NY,NX)=XOH0T*trcs_VLN(ids_H1PO4,L,NY,NX)
         trcx_solml(idx_OH,L,NY,NX)=XOH1T*trcs_VLN(ids_H1PO4,L,NY,NX)
         trcx_solml(idx_OHp,L,NY,NX)=XOH2T*trcs_VLN(ids_H1PO4,L,NY,NX)
@@ -2377,12 +2382,15 @@ module Hour1Mod
     PHAX=PHA*AREA(3,LFDPTH,NY,NX)/(3.0_r8*patomw)
     CACX=CAC*AREA(3,LFDPTH,NY,NX)/40.0_r8
     CASX=CAS*AREA(3,LFDPTH,NY,NX)/40.0_r8
+
     FertN_soil(ifert_nh4,LFDPTH,NY,NX)=FertN_soil(ifert_nh4,LFDPTH,NY,NX)+Z4AX*CVRDF
     FertN_soil(ifert_urea,LFDPTH,NY,NX)=FertN_soil(ifert_urea,LFDPTH,NY,NX)+ZUAX*CVRDF
     FertN_soil(ifert_no3,LFDPTH,NY,NX)=FertN_soil(ifert_no3,LFDPTH,NY,NX)+ZOAX*CVRDF
+
     FertN_band(ifert_nh4_band,LFDPTH,NY,NX)=FertN_band(ifert_nh4_band,LFDPTH,NY,NX)+Z4BX*CVRDF
     FertN_band(ifert_urea_band,LFDPTH,NY,NX)=FertN_band(ifert_urea_band,LFDPTH,NY,NX)+ZUBX*CVRDF
     FertN_band(ifert_no3_band,LFDPTH,NY,NX)=FertN_band(ifert_no3_band,LFDPTH,NY,NX)+ZOBX*CVRDF
+
     trcp_salml(idsp_CaH2PO4,LFDPTH,NY,NX)=trcp_salml(idsp_CaH2PO4,LFDPTH,NY,NX)+PMAX*trcs_VLN(ids_H1PO4,LFDPTH,NY,NX)*CVRDF
     trcp_salml(idsp_CaH2PO4B,LFDPTH,NY,NX)=trcp_salml(idsp_CaH2PO4B,LFDPTH,NY,NX)+PMAX*trcs_VLN(ids_H1PO4B,LFDPTH,NY,NX)*CVRDF+PMBX*CVRDF
     trcp_salml(idsp_HA,LFDPTH,NY,NX)=trcp_salml(idsp_HA,LFDPTH,NY,NX)+PHAX*trcs_VLN(ids_H1PO4,LFDPTH,NY,NX)*CVRDF
@@ -2392,10 +2400,12 @@ module Hour1Mod
       FertN_soil(ifert_nh3,NU(NY,NX),NY,NX)=FertN_soil(ifert_nh3,NU(NY,NX),NY,NX)+Z3AX
       FertN_soil(ifert_urea,NU(NY,NX),NY,NX)=FertN_soil(ifert_urea,NU(NY,NX),NY,NX)+ZUAX*BAREF
       FertN_soil(ifert_no3,NU(NY,NX),NY,NX)=FertN_soil(ifert_no3,NU(NY,NX),NY,NX)+ZOAX*BAREF
+
       FertN_band(ifert_nh4_band,NU(NY,NX),NY,NX)=FertN_band(ifert_nh4_band,NU(NY,NX),NY,NX)+Z4BX*BAREF
       FertN_band(ifert_nh3_band,NU(NY,NX),NY,NX)=FertN_band(ifert_nh3_band,NU(NY,NX),NY,NX)+Z3BX
       FertN_band(ifert_urea_band,NU(NY,NX),NY,NX)=FertN_band(ifert_urea_band,NU(NY,NX),NY,NX)+ZUBX*BAREF
       FertN_band(ifert_no3_band,NU(NY,NX),NY,NX)=FertN_band(ifert_no3_band,NU(NY,NX),NY,NX)+ZOBX*BAREF
+
       trcp_salml(idsp_CaH2PO4,NU(NY,NX),NY,NX)=trcp_salml(idsp_CaH2PO4,NU(NY,NX),NY,NX)+PMAX*trcs_VLN(ids_H1PO4,NU(NY,NX),NY,NX)*BAREF
       trcp_salml(idsp_CaH2PO4B,NU(NY,NX),NY,NX)=trcp_salml(idsp_CaH2PO4B,NU(NY,NX),NY,NX)+PMAX*trcs_VLN(ids_H1PO4B,NU(NY,NX),NY,NX)*BAREF+PMBX*BAREF
       trcp_salml(idsp_HA,NU(NY,NX),NY,NX)=trcp_salml(idsp_HA,NU(NY,NX),NY,NX)+PHAX*trcs_VLN(ids_H1PO4,NU(NY,NX),NY,NX)*BAREF

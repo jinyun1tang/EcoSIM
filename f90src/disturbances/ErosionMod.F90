@@ -65,7 +65,7 @@ module ErosionMod
   integer, intent(in) :: I, J
   integer, intent(in) :: NHW,NHE,NVN,NVS
   integer :: M
-  
+
 !     execution begins here
 !
   DO M=1,NPH
@@ -470,6 +470,7 @@ module ErosionMod
               XNH3ER(N,2,N5,N4)=FSEDER*FertN_soil(ifert_nh3,NU(N2,N1),N2,N1)
               XNHUER(N,2,N5,N4)=FSEDER*FertN_soil(ifert_urea,NU(N2,N1),N2,N1)
               XNO3ER(N,2,N5,N4)=FSEDER*FertN_soil(ifert_no3,NU(N2,N1),N2,N1)
+
               XNH4EB(N,2,N5,N4)=FSEDER*FertN_band(ifert_nh4_band,NU(N2,N1),N2,N1)
               XNH3EB(N,2,N5,N4)=FSEDER*FertN_band(ifert_nh3_band,NU(N2,N1),N2,N1)
               XNHUEB(N,2,N5,N4)=FSEDER*FertN_band(ifert_urea_band,NU(N2,N1),N2,N1)

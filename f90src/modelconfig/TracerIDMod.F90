@@ -78,11 +78,12 @@ implicit none
   integer :: idsa_CaHPO4B  ! CaHPO4
   integer :: idsa_CaH2PO4B ! CaH2PO4
   integer :: idsa_MgHPO4B ! MgHPO4
-  integer :: idsab_beg
-  integer :: idsab_end
+  integer :: idsab_beg    !band begin
+  integer :: idsab_end    !band end
 
 ! precipitated tracers
   integer :: idsp_beg,idsp_end
+  integer :: idsp_beg_band
   integer :: idsp_CaHPO4 !
   integer :: idsp_HA     !hydroxyapatite
   integer :: idsp_AlOH3  !
@@ -101,7 +102,6 @@ implicit none
 ! exchangeable tracers
   integer :: idx_CEC    ! XCEC,  cation exchange capacity, [mol d-2]
   integer :: idx_NH4    ! XN4, exchangeable NH4 non-band, [mol d-2]
-  integer :: idx_NH4B   ! XNB, exchangeable NH4 band, [mol d-2]
   integer :: idx_Hp     ! XHY, exchangeable H , [mol d-2]
   integer :: idx_Al     ! XAL, exchangeable Al, [mol d-2]
   integer :: idx_Fe     ! XFE, exchangeable Fe, [mol d-2]
@@ -112,7 +112,9 @@ implicit none
   integer :: idx_COOH   ! XHC, exchangeable COOH , [mol d-2]
   integer :: idx_AlOH2  ! XALO2, exchangeable AlOH2 , [mol d-2]
   integer :: idx_FeOH2  ! XFEO2, exchangeable Fe(OH)2, [mol d-2]
+  integer :: idx_NH4B   ! XNB, exchangeable NH4 band, [mol d-2]
   integer :: idx_cation_end
+  integer :: idx_cation_soil_end
 
   integer :: idx_AEC    ! XAEC, anion exchange capacity, [mol d-2]
   integer :: idx_OHe    ! XOH0, exchangeable OH- non-band, [mol d-2]
@@ -126,8 +128,7 @@ implicit none
   integer :: idx_HPO4B  ! XH1PB, exchangeable HPO4  band, [mol d-2]
   integer :: idx_H2PO4B ! XH2PB, exchangeable H2PO4  band, [mol d-2]
   integer :: idx_beg, idx_end
-
-
+  integer :: idx_anion_soil_end
   integer :: ifertn_beg,ifertn_end
   integer :: ifertnb_beg,ifertnb_end
 
@@ -221,7 +222,6 @@ implicit none
     idsab_end=idsa_MgHPO4B
 
 
-
     idsp_beg=1
     idsp_end=0;
     idsp_CaHPO4=addone(idsp_end) !
@@ -233,12 +233,14 @@ implicit none
     idsp_AlPO4=addone(idsp_end)
     idsp_FePO4=addone(idsp_end)
     idsp_CaH2PO4=addone(idsp_end)
+
     idsp_HAB  =addone(idsp_end)
     idsp_AlPO4B=addone(idsp_end)
     idsp_FePO4B=addone(idsp_end)
     idsp_CaHPO4B=addone(idsp_end)
     idsp_CaH2PO4B=addone(idsp_end)
     idsp_end=idsp_CaH2PO4B
+    idsp_beg_band=idsp_HAB
 
   else
 !  double check
@@ -253,12 +255,14 @@ implicit none
     idsp_AlPO4=addone(idsp_end)
     idsp_FePO4=addone(idsp_end)
     idsp_CaH2PO4=addone(idsp_end)
+
     idsp_HAB  =addone(idsp_end)
     idsp_AlPO4B=addone(idsp_end)
     idsp_FePO4B=addone(idsp_end)
     idsp_CaHPO4B=addone(idsp_end)
     idsp_CaH2PO4B=addone(idsp_end)
     idsp_end=idsp_CaH2PO4B
+    idsp_beg_band=idsp_HAB
 
   endif
 
@@ -267,7 +271,6 @@ implicit none
 
   idx_CEC=addone(idx_end)    ! XCEC,  cation exchange capacity, [mol d-2]
   idx_NH4=addone(idx_end)    ! XN4, exchangeable NH4 non-band, [mol d-2]
-  idx_NH4B=addone(idx_end)   ! XNB, exchangeable NH4 band, [mol d-2]
   idx_Hp =addone(idx_end)    ! XHY, exchangeable H , [mol d-2]
   idx_Al =addone(idx_end)    ! XAL, exchangeable Al, [mol d-2]
   idx_Fe =addone(idx_end)    ! XFE, exchangeable Fe, [mol d-2]
@@ -278,7 +281,9 @@ implicit none
   idx_COOH =addone(idx_end)  ! XHC, exchangeable COOH , [mol d-2]
   idx_AlOH2 =addone(idx_end) ! XALO2, exchangeable AlOH2 , [mol d-2]
   idx_FeOH2 =addone(idx_end) ! XFEO2, exchangeable Fe(OH)2, [mol d-2]
-  idx_cation_end=idx_FeOH2
+  idx_NH4B=addone(idx_end)   ! XNB, exchangeable NH4 band, [mol d-2]
+  idx_cation_end=idx_NH4B
+  idx_cation_soil_end=idx_FeOH2
 
   idx_AEC =addone(idx_end)   ! XAEC, anion exchange capacity, [mol d-2]
   idx_OHe =addone(idx_end)   ! XOH0, exchangeable OH- non-band, [mol d-2]
@@ -292,6 +297,6 @@ implicit none
   idx_HPO4B =addone(idx_end) ! XH1PB, exchangeable HPO4  band, [mol d-2]
   idx_H2PO4B =addone(idx_end)! XH2PB, exchangeable H2PO4  band, [mol d-2]
   idx_end=idx_H2PO4B
-
+  idx_anion_soil_end=idx_H2PO4
   end subroutine InitTracerIDs
 end module TracerIDMod

@@ -680,8 +680,10 @@ implicit none
     SAND(L1,NY,NX)=SAND(L1,NY,NX)+FX*SAND(L0,NY,NX)
     SILT(L1,NY,NX)=SILT(L1,NY,NX)+FX*SILT(L0,NY,NX)
     CLAY(L1,NY,NX)=CLAY(L1,NY,NX)+FX*CLAY(L0,NY,NX)
-    trcx_solml(idx_CEC,L1,NY,NX)=trcx_solml(idx_CEC,L1,NY,NX)+FX*trcx_solml(idx_CEC,L0,NY,NX)
-    trcx_solml(idx_AEC,L1,NY,NX)=trcx_solml(idx_AEC,L1,NY,NX)+FX*trcx_solml(idx_AEC,L0,NY,NX)
+    trcx_solml(idx_CEC,L1,NY,NX)=trcx_solml(idx_CEC,L1,NY,NX) &
+      +FX*trcx_solml(idx_CEC,L0,NY,NX)
+    trcx_solml(idx_AEC,L1,NY,NX)=trcx_solml(idx_AEC,L1,NY,NX) &
+      +FX*trcx_solml(idx_AEC,L0,NY,NX)
   ENDIF
 
   VOLW(L1,NY,NX)=VOLW(L1,NY,NX)+FX*VOLW(L0,NY,NX)
@@ -708,23 +710,29 @@ implicit none
   DO NTF=ifertn_beg,ifertn_end
     FertN_soil(NTF,L1,NY,NX)=FertN_soil(NTF,L1,NY,NX)+FX*FertN_soil(NTF,L0,NY,NX)
   ENDDO
+
   DO NTF=ifertnb_beg,ifertnb_end
     FertN_band(NTF,L1,NY,NX)=FertN_band(NTF,L1,NY,NX)+FX*FertN_band(NTF,L0,NY,NX)
   ENDDO
+
   DO NTU=ids_nuts_beg,ids_nuts_end
     if(NTU/=ids_H2PO4B .and. NTU/=ids_H1PO4B)THEN
       trc_solml(NTU,L1,NY,NX)=trc_solml(NTU,L1,NY,NX)+FX*trc_solml(NTU,L0,NY,NX)
     ENDIF
   ENDDO
+
   IF(ISALTG.NE.0)THEN
     DO NTSA=idsa_beg,idsa_end
-      trcsa_solml(NTSA,L1,NY,NX)=trcsa_solml(NTSA,L1,NY,NX)+FX*trcsa_solml(NTSA,L0,NY,NX)
+      trcsa_solml(NTSA,L1,NY,NX)=trcsa_solml(NTSA,L1,NY,NX)&
+        +FX*trcsa_solml(NTSA,L0,NY,NX)
     ENDDO
   ENDIF
 
   IF(L0.NE.0)THEN
-    trc_solml(ids_H1PO4B,L1,NY,NX)=trc_solml(ids_H1PO4B,L1,NY,NX)+FX*trc_solml(ids_H1PO4B,L0,NY,NX)
-    trc_solml(ids_H2PO4B,L1,NY,NX)=trc_solml(ids_H2PO4B,L1,NY,NX)+FX*trc_solml(ids_H2PO4B,L0,NY,NX)
+    trc_solml(ids_H1PO4B,L1,NY,NX)=trc_solml(ids_H1PO4B,L1,NY,NX) &
+      +FX*trc_solml(ids_H1PO4B,L0,NY,NX)
+    trc_solml(ids_H2PO4B,L1,NY,NX)=trc_solml(ids_H2PO4B,L1,NY,NX) &
+      +FX*trc_solml(ids_H2PO4B,L0,NY,NX)
 
     IF(ISALTG.NE.0)THEN
       DO NTSAB=idsab_beg,idsab_end
@@ -1411,18 +1419,6 @@ implicit none
   implicit none
   integer, intent(in) :: L,L0,L1,NY,NX
   real(r8), intent(in):: FX,FWO
-  real(r8) :: FXZCA0P,FXZMG1P,FXZCA2P,FXZCA1P
-  real(r8) :: FXZSO4,FXZOH,FXZCO3
-  real(r8) :: FXZNHUFA,FXZNO3FA,FXZNH4FB,FXZNH3FB,FXZNHUFB,FXZNO3FB
-  real(r8) :: FXZNH4S,FXZNH4B,FXZNH3S,FXZNH3B,FXZNO3S,FXZNO3B
-  real(r8) :: FXZNO2S,FXZNO2B,FXH1PO4,FXH2PO4,FXZAL,FXZFE,FXZHY
-  real(r8) :: FXZNH4FA,FXZNH3FA
-  real(r8) :: FXZMGO,FXZMGC,FXZMGH,FXZMGS
-  real(r8) :: FXZNAC,FXZNAS,FXZKAS,FXH0PO4,FXH3PO4,FXZFE1P,FXZFE2P
-  real(r8) :: FXZHCO3,FXZALOH1,FXZALOH2,FXZALOH3,FXZALOH4,FXZALS
-  real(r8) :: FXZMG,FXZNA,FXZKA,FXZCL
-  real(r8) :: FXZFEOH1,FXZFEOH2,FXZFEOH3,FXZFEOH4,FXZFES,FXZCAO
-  real(r8) :: FXZCAC,FXZCAH,FXZCAS,FXZCA
   real(r8) :: FXZ,FXNUT,FXZN
   integer  :: NTS,NTSA,NTF
 
@@ -1520,12 +1516,12 @@ implicit none
           DPNOB(L1,NY,NX)=DPNOB(L1,NY,NX)+FXDPNOB
           DPNOB(L0,NY,NX)=DPNOB(L0,NY,NX)-FXDPNOB
         ENDIF
-        trcs_VLN(ids_NO3B,L1,NY,NX)=AZMAX1(AMIN1(0.999,WDNOB(L1,NY,NX) &
+        trcs_VLN(ids_NO3B,L1,NY,NX)=AZMAX1(AMIN1(0.999_r8,WDNOB(L1,NY,NX) &
           /ROWO(NY,NX)*DPNOB(L1,NY,NX)/DLYR(3,L1,NY,NX)))
-        trcs_VLN(ids_NO3B,L0,NY,NX)=AZMAX1(AMIN1(0.999,WDNOB(L0,NY,NX) &
+        trcs_VLN(ids_NO3B,L0,NY,NX)=AZMAX1(AMIN1(0.999_r8,WDNOB(L0,NY,NX) &
           /ROWO(NY,NX)*DPNOB(L0,NY,NX)/DLYR(3,L0,NY,NX)))
-        trcs_VLN(ids_NO3,L1,NY,NX)=1.0-trcs_VLN(ids_NO3B,L1,NY,NX)
-        trcs_VLN(ids_NO3,L0,NY,NX)=1.0-trcs_VLN(ids_NO3B,L0,NY,NX)
+        trcs_VLN(ids_NO3,L1,NY,NX)=1.0_r8-trcs_VLN(ids_NO3B,L1,NY,NX)
+        trcs_VLN(ids_NO3,L0,NY,NX)=1.0_r8-trcs_VLN(ids_NO3B,L0,NY,NX)
 
         trcs_VLN(ids_NO2,L1,NY,NX)=trcs_VLN(ids_NO3,L1,NY,NX)
         trcs_VLN(ids_NO2,L0,NY,NX)=trcs_VLN(ids_NO3,L0,NY,NX)
@@ -1571,7 +1567,7 @@ implicit none
     FBO=AMIN1(0.1,FX*BKDSI(L1,NY,NX)/BKDSI(L0,NY,NX))
   ENDIF
 !     BKDS(L1,NY,NX)=(1.0-FO)*BKDS(L1,NY,NX)+FO*BKDSI(L0,NY,NX)
-  PH(L1,NY,NX)=(1.0-FO)*PH(L1,NY,NX)+FO*PH(L0,NY,NX)
+  PH(L1,NY,NX)=(1.0_r8-FO)*PH(L1,NY,NX)+FO*PH(L0,NY,NX)
   FXSAND=FBO*SAND(L0,NY,NX)
   SAND(L1,NY,NX)=SAND(L1,NY,NX)+FXSAND
   SAND(L0,NY,NX)=SAND(L0,NY,NX)-FXSAND
@@ -1591,9 +1587,9 @@ implicit none
     IF(L0.EQ.L.OR.FHOLI(L0,NY,NX).LE.ZERO)THEN
       FHO=FO
     ELSE
-      FHO=AMIN1(0.5,FO*FHOLI(L1,NY,NX)/FHOLI(L0,NY,NX))
+      FHO=AMIN1(0.5_r8,FO*FHOLI(L1,NY,NX)/FHOLI(L0,NY,NX))
     ENDIF
-    FHOL(L1,NY,NX)=(1.0-FO)*FHOL(L1,NY,NX)+FO*FHOL(L0,NY,NX)
+    FHOL(L1,NY,NX)=(1.0_r8-FO)*FHOL(L1,NY,NX)+FO*FHOL(L0,NY,NX)
     FXVOLWH=FHO*VOLWH(L0,NY,NX)
     VOLWH(L1,NY,NX)=VOLWH(L1,NY,NX)+FXVOLWH
     VOLWH(L0,NY,NX)=VOLWH(L0,NY,NX)-FXVOLWH

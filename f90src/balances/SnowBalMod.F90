@@ -301,7 +301,7 @@ implicit none
   implicit none
   integer, intent(in) :: L,NY,NX
 
-  integer :: NTG,NTN
+  integer :: NTG,NTN,NTSA
   !     begin_execution
   !     SNOWPACK SOLUTE CONTENT
   !
@@ -329,47 +329,10 @@ implicit none
   !          :*C0P*=CaPO4-,*C1P*=CaHPO4,*C2P*=CaH2PO4+,*M1P*=MgHPO4,*COO*=COOH-
   !
   IF(ISALTG.NE.0)THEN
-    trcs_solsml(idsa_Al,L,NY,NX)=trcs_solsml(idsa_Al,L,NY,NX)+trcsa_TBLS(idsa_Al,L,NY,NX)
-    trcs_solsml(idsa_Fe,L,NY,NX)=trcs_solsml(idsa_Fe,L,NY,NX)+trcsa_TBLS(idsa_Fe,L,NY,NX)
-    trcs_solsml(idsa_Hp,L,NY,NX)=trcs_solsml(idsa_Hp,L,NY,NX)+trcsa_TBLS(idsa_Hp,L,NY,NX)
-    trcs_solsml(idsa_Ca,L,NY,NX)=trcs_solsml(idsa_Ca,L,NY,NX)+trcsa_TBLS(idsa_Ca,L,NY,NX)
-    trcs_solsml(idsa_Mg,L,NY,NX)=trcs_solsml(idsa_Mg,L,NY,NX)+trcsa_TBLS(idsa_Mg,L,NY,NX)
-    trcs_solsml(idsa_Na,L,NY,NX)=trcs_solsml(idsa_Na,L,NY,NX)+trcsa_TBLS(idsa_Na,L,NY,NX)
-    trcs_solsml(idsa_K,L,NY,NX)=trcs_solsml(idsa_K,L,NY,NX)+trcsa_TBLS(idsa_K,L,NY,NX)
-    trcs_solsml(idsa_OH,L,NY,NX)=trcs_solsml(idsa_OH,L,NY,NX)+trcsa_TBLS(idsa_OH,L,NY,NX)
-    trcs_solsml(idsa_SO4,L,NY,NX)=trcs_solsml(idsa_SO4,L,NY,NX)+trcsa_TBLS(idsa_SO4,L,NY,NX)
-    trcs_solsml(idsa_Cl,L,NY,NX)=trcs_solsml(idsa_Cl,L,NY,NX)+trcsa_TBLS(idsa_Cl,L,NY,NX)
-    trcs_solsml(idsa_CO3,L,NY,NX)=trcs_solsml(idsa_CO3,L,NY,NX)+trcsa_TBLS(idsa_CO3,L,NY,NX)
-    trcs_solsml(idsa_HCO3,L,NY,NX)=trcs_solsml(idsa_HCO3,L,NY,NX)+trcsa_TBLS(idsa_HCO3,L,NY,NX)
-    trcs_solsml(idsa_AlOH,L,NY,NX)=trcs_solsml(idsa_AlOH,L,NY,NX)+trcsa_TBLS(idsa_AlOH,L,NY,NX)
-    trcs_solsml(idsa_AlOH2,L,NY,NX)=trcs_solsml(idsa_AlOH2,L,NY,NX)+trcsa_TBLS(idsa_AlOH2,L,NY,NX)
-    trcs_solsml(idsa_AlOH3,L,NY,NX)=trcs_solsml(idsa_AlOH3,L,NY,NX)+trcsa_TBLS(idsa_AlOH3,L,NY,NX)
-    trcs_solsml(idsa_AlOH4,L,NY,NX)=trcs_solsml(idsa_AlOH4,L,NY,NX)+trcsa_TBLS(idsa_AlOH4,L,NY,NX)
-    trcs_solsml(idsa_AlSO4,L,NY,NX)=trcs_solsml(idsa_AlSO4,L,NY,NX)+trcsa_TBLS(idsa_AlSO4,L,NY,NX)
-    trcs_solsml(idsa_FeOH,L,NY,NX)=trcs_solsml(idsa_FeOH,L,NY,NX)+trcsa_TBLS(idsa_FeOH,L,NY,NX)
-    trcs_solsml(idsa_FeOH2,L,NY,NX)=trcs_solsml(idsa_FeOH2,L,NY,NX)+trcsa_TBLS(idsa_FeOH2,L,NY,NX)
-    trcs_solsml(idsa_FeOH3,L,NY,NX)=trcs_solsml(idsa_FeOH3,L,NY,NX)+trcsa_TBLS(idsa_FeOH3,L,NY,NX)
-    trcs_solsml(idsa_FeOH4,L,NY,NX)=trcs_solsml(idsa_FeOH4,L,NY,NX)+trcsa_TBLS(idsa_FeOH4,L,NY,NX)
-    trcs_solsml(idsa_FeSO4,L,NY,NX)=trcs_solsml(idsa_FeSO4,L,NY,NX)+trcsa_TBLS(idsa_FeSO4,L,NY,NX)
-    trcs_solsml(idsa_CaOH2,L,NY,NX)=trcs_solsml(idsa_CaOH2,L,NY,NX)+trcsa_TBLS(idsa_CaOH2,L,NY,NX)
-    trcs_solsml(idsa_CaCO3,L,NY,NX)=trcs_solsml(idsa_CaCO3,L,NY,NX)+trcsa_TBLS(idsa_CaCO3,L,NY,NX)
-    trcs_solsml(idsa_CaHCO3,L,NY,NX)=trcs_solsml(idsa_CaHCO3,L,NY,NX)+trcsa_TBLS(idsa_CaHCO3,L,NY,NX)
-    trcs_solsml(idsa_CaSO4,L,NY,NX)=trcs_solsml(idsa_CaSO4,L,NY,NX)+trcsa_TBLS(idsa_CaSO4,L,NY,NX)
-    trcs_solsml(idsa_MgOH2,L,NY,NX)=trcs_solsml(idsa_MgOH2,L,NY,NX)+trcsa_TBLS(idsa_MgOH2,L,NY,NX)
-    trcs_solsml(idsa_MgCO3,L,NY,NX)=trcs_solsml(idsa_MgCO3,L,NY,NX)+trcsa_TBLS(idsa_MgCO3,L,NY,NX)
-    trcs_solsml(idsa_MgHCO3,L,NY,NX)=trcs_solsml(idsa_MgHCO3,L,NY,NX)+trcsa_TBLS(idsa_MgHCO3,L,NY,NX)
-    trcs_solsml(idsa_MgSO4,L,NY,NX)=trcs_solsml(idsa_MgSO4,L,NY,NX)+trcsa_TBLS(idsa_MgSO4,L,NY,NX)
-    trcs_solsml(idsa_NaCO3,L,NY,NX)=trcs_solsml(idsa_NaCO3,L,NY,NX)+trcsa_TBLS(idsa_NaCO3,L,NY,NX)
-    trcs_solsml(idsa_NaSO4,L,NY,NX)=trcs_solsml(idsa_NaSO4,L,NY,NX)+trcsa_TBLS(idsa_NaSO4,L,NY,NX)
-    trcs_solsml(idsa_KSO4,L,NY,NX)=trcs_solsml(idsa_KSO4,L,NY,NX)+trcsa_TBLS(idsa_KSO4,L,NY,NX)
-    trcs_solsml(idsa_H0PO4,L,NY,NX)=trcs_solsml(idsa_H0PO4,L,NY,NX)+trcsa_TBLS(idsa_H0PO4,L,NY,NX)
-    trcs_solsml(idsa_H3PO4,L,NY,NX)=trcs_solsml(idsa_H3PO4,L,NY,NX)+trcsa_TBLS(idsa_H3PO4,L,NY,NX)
-    trcs_solsml(idsa_FeHPO4,L,NY,NX)=trcs_solsml(idsa_FeHPO4,L,NY,NX)+trcsa_TBLS(idsa_FeHPO4,L,NY,NX)
-    trcs_solsml(idsa_FeH2PO4,L,NY,NX)=trcs_solsml(idsa_FeH2PO4,L,NY,NX)+trcsa_TBLS(idsa_FeH2PO4,L,NY,NX)
-    trcs_solsml(idsa_CaPO4,L,NY,NX)=trcs_solsml(idsa_CaPO4,L,NY,NX)+trcsa_TBLS(idsa_CaPO4,L,NY,NX)
-    trcs_solsml(idsa_CaHPO4,L,NY,NX)=trcs_solsml(idsa_CaHPO4,L,NY,NX)+trcsa_TBLS(idsa_CaHPO4,L,NY,NX)
-    trcs_solsml(idsa_CaH2PO4,L,NY,NX)=trcs_solsml(idsa_CaH2PO4,L,NY,NX)+trcsa_TBLS(idsa_CaH2PO4,L,NY,NX)
-    trcs_solsml(idsa_MgHPO4,L,NY,NX)=trcs_solsml(idsa_MgHPO4,L,NY,NX)+trcsa_TBLS(idsa_MgHPO4,L,NY,NX)
+    DO NTSA=idsa_beg,idsa_end
+      trcs_solsml(NTSA,L,NY,NX)=trcs_solsml(NTSA,L,NY,NX)+trcsa_TBLS(NTSA,L,NY,NX)
+    ENDDO
+
   ENDIF
 
   end subroutine UpdateSoluteInSnow
@@ -384,11 +347,12 @@ implicit none
   real(r8) :: ENGY0X,ENGY0,ENGY1X,ENGY1
   real(r8) :: DDLYXS,DDLYRS
   real(r8) :: DDLYXX,VOLSLX
-  integer :: IFLGLS,NTN,NTG
+  integer :: IFLGLS,NTN,NTG,NTU,NTSA
+
 !     begin_execution
 !
   IF(VHCPW(1,NY,NX).GT.VHCPWX(NY,NX))THEN
-    DO 325 L=1,JS-1
+    D325: DO L=1,JS-1
 !      VOLSLX=VOLSL(L,NY,NX)
       IF(VOLSL(L,NY,NX).GT.ZEROS2(NY,NX))THEN
         DDLYXS=(VOLSI(L,NY,NX)-VOLSSL(L,NY,NX)/DENSS(L,NY,NX) &
@@ -463,47 +427,9 @@ implicit none
             trcn_solsml(NTN,L1,NY,NX)=trcn_solsml(NTN,L1,NY,NX)+FX*trcn_solsml(NTN,L0,NY,NX)
           ENDDO
           IF(ISALTG.NE.0)THEN
-            trcs_solsml(idsa_Al,L1,NY,NX)=trcs_solsml(idsa_Al,L1,NY,NX)+FX*trcs_solsml(idsa_Al,L0,NY,NX)
-            trcs_solsml(idsa_Fe,L1,NY,NX)=trcs_solsml(idsa_Fe,L1,NY,NX)+FX*trcs_solsml(idsa_Fe,L0,NY,NX)
-            trcs_solsml(idsa_Hp,L1,NY,NX)=trcs_solsml(idsa_Hp,L1,NY,NX)+FX*trcs_solsml(idsa_Hp,L0,NY,NX)
-            trcs_solsml(idsa_Ca,L1,NY,NX)=trcs_solsml(idsa_Ca,L1,NY,NX)+FX*trcs_solsml(idsa_Ca,L0,NY,NX)
-            trcs_solsml(idsa_Mg,L1,NY,NX)=trcs_solsml(idsa_Mg,L1,NY,NX)+FX*trcs_solsml(idsa_Mg,L0,NY,NX)
-            trcs_solsml(idsa_Na,L1,NY,NX)=trcs_solsml(idsa_Na,L1,NY,NX)+FX*trcs_solsml(idsa_Na,L0,NY,NX)
-            trcs_solsml(idsa_K,L1,NY,NX)=trcs_solsml(idsa_K,L1,NY,NX)+FX*trcs_solsml(idsa_K,L0,NY,NX)
-            trcs_solsml(idsa_OH,L1,NY,NX)=trcs_solsml(idsa_OH,L1,NY,NX)+FX*trcs_solsml(idsa_OH,L0,NY,NX)
-            trcs_solsml(idsa_SO4,L1,NY,NX)=trcs_solsml(idsa_SO4,L1,NY,NX)+FX*trcs_solsml(idsa_SO4,L0,NY,NX)
-            trcs_solsml(idsa_Cl,L1,NY,NX)=trcs_solsml(idsa_Cl,L1,NY,NX)+FX*trcs_solsml(idsa_Cl,L0,NY,NX)
-            trcs_solsml(idsa_CO3,L1,NY,NX)=trcs_solsml(idsa_CO3,L1,NY,NX)+FX*trcs_solsml(idsa_CO3,L0,NY,NX)
-            trcs_solsml(idsa_HCO3,L1,NY,NX)=trcs_solsml(idsa_HCO3,L1,NY,NX)+FX*trcs_solsml(idsa_HCO3,L0,NY,NX)
-            trcs_solsml(idsa_AlOH,L1,NY,NX)=trcs_solsml(idsa_AlOH,L1,NY,NX)+FX*trcs_solsml(idsa_AlOH,L0,NY,NX)
-            trcs_solsml(idsa_AlOH2,L1,NY,NX)=trcs_solsml(idsa_AlOH2,L1,NY,NX)+FX*trcs_solsml(idsa_AlOH2,L0,NY,NX)
-            trcs_solsml(idsa_AlOH3,L1,NY,NX)=trcs_solsml(idsa_AlOH3,L1,NY,NX)+FX*trcs_solsml(idsa_AlOH3,L0,NY,NX)
-            trcs_solsml(idsa_AlOH4,L1,NY,NX)=trcs_solsml(idsa_AlOH4,L1,NY,NX)+FX*trcs_solsml(idsa_AlOH4,L0,NY,NX)
-            trcs_solsml(idsa_AlSO4,L1,NY,NX)=trcs_solsml(idsa_AlSO4,L1,NY,NX)+FX*trcs_solsml(idsa_AlSO4,L0,NY,NX)
-            trcs_solsml(idsa_FeOH,L1,NY,NX)=trcs_solsml(idsa_FeOH,L1,NY,NX)+FX*trcs_solsml(idsa_FeOH,L0,NY,NX)
-            trcs_solsml(idsa_FeOH2,L1,NY,NX)=trcs_solsml(idsa_FeOH2,L1,NY,NX)+FX*trcs_solsml(idsa_FeOH2,L0,NY,NX)
-            trcs_solsml(idsa_FeOH3,L1,NY,NX)=trcs_solsml(idsa_FeOH3,L1,NY,NX)+FX*trcs_solsml(idsa_FeOH3,L0,NY,NX)
-            trcs_solsml(idsa_FeOH4,L1,NY,NX)=trcs_solsml(idsa_FeOH4,L1,NY,NX)+FX*trcs_solsml(idsa_FeOH4,L0,NY,NX)
-            trcs_solsml(idsa_FeSO4,L1,NY,NX)=trcs_solsml(idsa_FeSO4,L1,NY,NX)+FX*trcs_solsml(idsa_FeSO4,L0,NY,NX)
-            trcs_solsml(idsa_CaOH2,L1,NY,NX)=trcs_solsml(idsa_CaOH2,L1,NY,NX)+FX*trcs_solsml(idsa_CaOH2,L0,NY,NX)
-            trcs_solsml(idsa_CaCO3,L1,NY,NX)=trcs_solsml(idsa_CaCO3,L1,NY,NX)+FX*trcs_solsml(idsa_CaCO3,L0,NY,NX)
-            trcs_solsml(idsa_CaHCO3,L1,NY,NX)=trcs_solsml(idsa_CaHCO3,L1,NY,NX)+FX*trcs_solsml(idsa_CaHCO3,L0,NY,NX)
-            trcs_solsml(idsa_CaSO4,L1,NY,NX)=trcs_solsml(idsa_CaSO4,L1,NY,NX)+FX*trcs_solsml(idsa_CaSO4,L0,NY,NX)
-            trcs_solsml(idsa_MgOH2,L1,NY,NX)=trcs_solsml(idsa_MgOH2,L1,NY,NX)+FX*trcs_solsml(idsa_MgOH2,L0,NY,NX)
-            trcs_solsml(idsa_MgCO3,L1,NY,NX)=trcs_solsml(idsa_MgCO3,L1,NY,NX)+FX*trcs_solsml(idsa_MgCO3,L0,NY,NX)
-            trcs_solsml(idsa_MgHCO3,L1,NY,NX)=trcs_solsml(idsa_MgHCO3,L1,NY,NX)+FX*trcs_solsml(idsa_MgHCO3,L0,NY,NX)
-            trcs_solsml(idsa_MgSO4,L1,NY,NX)=trcs_solsml(idsa_MgSO4,L1,NY,NX)+FX*trcs_solsml(idsa_MgSO4,L0,NY,NX)
-            trcs_solsml(idsa_NaCO3,L1,NY,NX)=trcs_solsml(idsa_NaCO3,L1,NY,NX)+FX*trcs_solsml(idsa_NaCO3,L0,NY,NX)
-            trcs_solsml(idsa_NaSO4,L1,NY,NX)=trcs_solsml(idsa_NaSO4,L1,NY,NX)+FX*trcs_solsml(idsa_NaSO4,L0,NY,NX)
-            trcs_solsml(idsa_KSO4,L1,NY,NX)=trcs_solsml(idsa_KSO4,L1,NY,NX)+FX*trcs_solsml(idsa_KSO4,L0,NY,NX)
-            trcs_solsml(idsa_H0PO4,L1,NY,NX)=trcs_solsml(idsa_H0PO4,L1,NY,NX)+FX*trcs_solsml(idsa_H0PO4,L0,NY,NX)
-            trcs_solsml(idsa_H3PO4,L1,NY,NX)=trcs_solsml(idsa_H3PO4,L1,NY,NX)+FX*trcs_solsml(idsa_H3PO4,L0,NY,NX)
-            trcs_solsml(idsa_FeHPO4,L1,NY,NX)=trcs_solsml(idsa_FeHPO4,L1,NY,NX)+FX*trcs_solsml(idsa_FeHPO4,L0,NY,NX)
-            trcs_solsml(idsa_FeH2PO4,L1,NY,NX)=trcs_solsml(idsa_FeH2PO4,L1,NY,NX)+FX*trcs_solsml(idsa_FeH2PO4,L0,NY,NX)
-            trcs_solsml(idsa_CaPO4,L1,NY,NX)=trcs_solsml(idsa_CaPO4,L1,NY,NX)+FX*trcs_solsml(idsa_CaPO4,L0,NY,NX)
-            trcs_solsml(idsa_CaHPO4,L1,NY,NX)=trcs_solsml(idsa_CaHPO4,L1,NY,NX)+FX*trcs_solsml(idsa_CaHPO4,L0,NY,NX)
-            trcs_solsml(idsa_CaH2PO4,L1,NY,NX)=trcs_solsml(idsa_CaH2PO4,L1,NY,NX)+FX*trcs_solsml(idsa_CaH2PO4,L0,NY,NX)
-            trcs_solsml(idsa_MgHPO4,L1,NY,NX)=trcs_solsml(idsa_MgHPO4,L1,NY,NX)+FX*trcs_solsml(idsa_MgHPO4,L0,NY,NX)
+            DO NTSA=idsa_beg,idsa_end
+              trcs_solsml(NTSA,L1,NY,NX)=trcs_solsml(NTSA,L1,NY,NX)+FX*trcs_solsml(NTSA,L0,NY,NX)
+            ENDDO
           ENDIF
 !
 !     SOURCE SNOW LAYER
@@ -522,59 +448,19 @@ implicit none
             TKW(L0,NY,NX)=TKW(L1,NY,NX)
           ENDIF
           TCW(L0,NY,NX)=TKW(L0,NY,NX)-TC2K
-          trcg_solsml(idg_CO2,L0,NY,NX)=FY*trcg_solsml(idg_CO2,L0,NY,NX)
-          trcg_solsml(idg_CH4,L0,NY,NX)=FY*trcg_solsml(idg_CH4,L0,NY,NX)
-          trcg_solsml(idg_O2,L0,NY,NX)=FY*trcg_solsml(idg_O2,L0,NY,NX)
-          trcg_solsml(idg_N2,L0,NY,NX)=FY*trcg_solsml(idg_N2,L0,NY,NX)
-          trcg_solsml(idg_N2O,L0,NY,NX)=FY*trcg_solsml(idg_N2O,L0,NY,NX)
-          trcg_solsml(idg_NH3,L0,NY,NX)=FY*trcg_solsml(idg_NH3,L0,NY,NX)
 
-          trcn_solsml(ids_NH4,L0,NY,NX)=FY*trcn_solsml(ids_NH4,L0,NY,NX)
-          trcn_solsml(ids_NO3,L0,NY,NX)=FY*trcn_solsml(ids_NO3,L0,NY,NX)
-          trcn_solsml(ids_H1PO4,L0,NY,NX)=FY*trcn_solsml(ids_H1PO4,L0,NY,NX)
-          trcn_solsml(ids_H2PO4,L0,NY,NX)=FY*trcn_solsml(ids_H2PO4,L0,NY,NX)
+          DO NTG=idg_beg,idg_end-1
+            trcg_solsml(NTG,L0,NY,NX)=FY*trcg_solsml(NTG,L0,NY,NX)
+          ENDDO
+          DO NTU=ids_nut_beg,ids_nuts_end
+            trcn_solsml(NTU,L0,NY,NX)=FY*trcn_solsml(NTU,L0,NY,NX)
+          ENDDO
+
           IF(ISALTG.NE.0)THEN
-            trcs_solsml(idsa_Al,L0,NY,NX)=FY*trcs_solsml(idsa_Al,L0,NY,NX)
-            trcs_solsml(idsa_Fe,L0,NY,NX)=FY*trcs_solsml(idsa_Fe,L0,NY,NX)
-            trcs_solsml(idsa_Hp,L0,NY,NX)=FY*trcs_solsml(idsa_Hp,L0,NY,NX)
-            trcs_solsml(idsa_Ca,L0,NY,NX)=FY*trcs_solsml(idsa_Ca,L0,NY,NX)
-            trcs_solsml(idsa_Mg,L0,NY,NX)=FY*trcs_solsml(idsa_Mg,L0,NY,NX)
-            trcs_solsml(idsa_Na,L0,NY,NX)=FY*trcs_solsml(idsa_Na,L0,NY,NX)
-            trcs_solsml(idsa_K,L0,NY,NX)=FY*trcs_solsml(idsa_K,L0,NY,NX)
-            trcs_solsml(idsa_OH,L0,NY,NX)=FY*trcs_solsml(idsa_OH,L0,NY,NX)
-            trcs_solsml(idsa_SO4,L0,NY,NX)=FY*trcs_solsml(idsa_SO4,L0,NY,NX)
-            trcs_solsml(idsa_Cl,L0,NY,NX)=FY*trcs_solsml(idsa_Cl,L0,NY,NX)
-            trcs_solsml(idsa_CO3,L0,NY,NX)=FY*trcs_solsml(idsa_CO3,L0,NY,NX)
-            trcs_solsml(idsa_HCO3,L0,NY,NX)=FY*trcs_solsml(idsa_HCO3,L0,NY,NX)
-            trcs_solsml(idsa_AlOH,L0,NY,NX)=FY*trcs_solsml(idsa_AlOH,L0,NY,NX)
-            trcs_solsml(idsa_AlOH2,L0,NY,NX)=FY*trcs_solsml(idsa_AlOH2,L0,NY,NX)
-            trcs_solsml(idsa_AlOH3,L0,NY,NX)=FY*trcs_solsml(idsa_AlOH3,L0,NY,NX)
-            trcs_solsml(idsa_AlOH4,L0,NY,NX)=FY*trcs_solsml(idsa_AlOH4,L0,NY,NX)
-            trcs_solsml(idsa_AlSO4,L0,NY,NX)=FY*trcs_solsml(idsa_AlSO4,L0,NY,NX)
-            trcs_solsml(idsa_FeOH,L0,NY,NX)=FY*trcs_solsml(idsa_FeOH,L0,NY,NX)
-            trcs_solsml(idsa_FeOH2,L0,NY,NX)=FY*trcs_solsml(idsa_FeOH2,L0,NY,NX)
-            trcs_solsml(idsa_FeOH3,L0,NY,NX)=FY*trcs_solsml(idsa_FeOH3,L0,NY,NX)
-            trcs_solsml(idsa_FeOH4,L0,NY,NX)=FY*trcs_solsml(idsa_FeOH4,L0,NY,NX)
-            trcs_solsml(idsa_FeSO4,L0,NY,NX)=FY*trcs_solsml(idsa_FeSO4,L0,NY,NX)
-            trcs_solsml(idsa_CaOH2,L0,NY,NX)=FY*trcs_solsml(idsa_CaOH2,L0,NY,NX)
-            trcs_solsml(idsa_CaCO3,L0,NY,NX)=FY*trcs_solsml(idsa_CaCO3,L0,NY,NX)
-            trcs_solsml(idsa_CaHCO3,L0,NY,NX)=FY*trcs_solsml(idsa_CaHCO3,L0,NY,NX)
-            trcs_solsml(idsa_CaSO4,L0,NY,NX)=FY*trcs_solsml(idsa_CaSO4,L0,NY,NX)
-            trcs_solsml(idsa_MgOH2,L0,NY,NX)=FY*trcs_solsml(idsa_MgOH2,L0,NY,NX)
-            trcs_solsml(idsa_MgCO3,L0,NY,NX)=FY*trcs_solsml(idsa_MgCO3,L0,NY,NX)
-            trcs_solsml(idsa_MgHCO3,L0,NY,NX)=FY*trcs_solsml(idsa_MgHCO3,L0,NY,NX)
-            trcs_solsml(idsa_MgSO4,L0,NY,NX)=FY*trcs_solsml(idsa_MgSO4,L0,NY,NX)
-            trcs_solsml(idsa_NaCO3,L0,NY,NX)=FY*trcs_solsml(idsa_NaCO3,L0,NY,NX)
-            trcs_solsml(idsa_NaSO4,L0,NY,NX)=FY*trcs_solsml(idsa_NaSO4,L0,NY,NX)
-            trcs_solsml(idsa_KSO4,L0,NY,NX)=FY*trcs_solsml(idsa_KSO4,L0,NY,NX)
-            trcs_solsml(idsa_H0PO4,L0,NY,NX)=FY*trcs_solsml(idsa_H0PO4,L0,NY,NX)
-            trcs_solsml(idsa_H3PO4,L0,NY,NX)=FY*trcs_solsml(idsa_H3PO4,L0,NY,NX)
-            trcs_solsml(idsa_FeHPO4,L0,NY,NX)=FY*trcs_solsml(idsa_FeHPO4,L0,NY,NX)
-            trcs_solsml(idsa_FeH2PO4,L0,NY,NX)=FY*trcs_solsml(idsa_FeH2PO4,L0,NY,NX)
-            trcs_solsml(idsa_CaPO4,L0,NY,NX)=FY*trcs_solsml(idsa_CaPO4,L0,NY,NX)
-            trcs_solsml(idsa_CaHPO4,L0,NY,NX)=FY*trcs_solsml(idsa_CaHPO4,L0,NY,NX)
-            trcs_solsml(idsa_CaH2PO4,L0,NY,NX)=FY*trcs_solsml(idsa_CaH2PO4,L0,NY,NX)
-            trcs_solsml(idsa_MgHPO4,L0,NY,NX)=FY*trcs_solsml(idsa_MgHPO4,L0,NY,NX)
+            DO NTSA=idsa_beg,idsa_end
+              trcs_solsml(NTSA,L0,NY,NX)=FY*trcs_solsml(NTSA,L0,NY,NX)
+            ENDDO
+
           ENDIF
 !     IF(VOLWSL(L0,NY,NX)+VOLISL(L0,NY,NX)
 !    2+VOLSSL(L0,NY,NX).LE.ZEROS(NY,NX))THEN
@@ -596,7 +482,7 @@ implicit none
 !     ENDIF
         ENDIF
       ENDIF
-325 CONTINUE
+    ENDDO D325
   ENDIF
   end subroutine SnowpackLayering
 
