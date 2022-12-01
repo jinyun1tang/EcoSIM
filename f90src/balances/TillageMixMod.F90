@@ -74,26 +74,28 @@ module TillageMixMod
   real(r8) :: TBKDX,TFC,TWP,TSCNV,TSCNH,TSAND
   REAL(R8) :: ZNHUX0,ZNHUXI,ZNFNX0
   real(r8) :: TSILT,TCLAY,TGKC4,TGKCA,TGKCM,TGKCN,TGKCK
-  real(r8) :: TCAPMG,TNH4FG,TNH3FG,TNHUFG,TNO3FG,TZNFNG,TVOLWR
+  real(r8) :: TP_soil(idsp_psoi_beg:idsp_psoi_end)
+  real(r8) :: TFertNG_soil(ifertn_beg:ifertn_end),TZNFNG,TVOLWR
   real(r8) :: TZ2OG,TZ2OS,TZNH3G,TH2GG,TH2GS,TZNFN2,TZNFNI,TCO2GS
   real(r8) :: TCH4GS,TOXYGS,TZ2GSG,TZ2OGS,TH2GGS,TNH4GS,TNH3GS
-  real(r8) :: TXOH2G,TXH1PG,TXH2PG,TALPOG,TFEPOG,TCAPDG,TCAPHG
-  real(r8) :: TNO3GS,TNO2GS,TP14GS,TPO4GS,TXN4G,TXOH0G,TXOH1G
+  real(r8) :: TX_anion(idx_AEC+1:idx_anion_soil_end)
+  real(r8) :: TNO3GS,TNO2GS,TP14GS,TPO4GS,TXN4G
   real(r8) :: TX_solml(idx_beg:idx_end)
   real(r8) :: TP_salml(idsp_beg:idsp_end)
   real(r8) :: TG_gasml(idg_beg:idg_end-1)
   real(r8) :: TSA_solml(idsa_beg:idsa_end)
   real(r8) :: TS_solml(ids_beg:ids_end)
   real(r8) :: TS0_solml(ids_beg:ids_end)   !surface mass for incoporation
-  real(r8) :: TNH3FB,TNHUFB,TNO3FB,TNH4S,TNH4B,TNH3S,TNH3B,TNO3S
+  real(r8) :: TfertN_band(ifertn_beg:ifertnb_end)
+  real(r8) :: TNH4S,TNH4B,TNH3S,TNH3B,TNO3S
   real(r8) :: TNO3B,TNO2S,TNO2B,TZAL,TZFE,TZHY,TZCA,TZMG,TZNA
-  real(r8) :: TNFNIH,TNH4FA,TNH3FA,TNHUFA,TNO3FA,TNH4FB
+  real(r8) :: TNFNIH,TfertN_soil(ifertn_beg:ifertn_end)
   real(r8) :: TENGYR,TVOLW,TENGY
   real(r8) :: ENGYV,ENGYL,ENGYM
   real(r8) :: DC,DN,DP,OC,ON,OP
   real(r8) :: TVOLI,HFLXD
   real(r8) :: FI,TI,TX,TL
-  integer  :: NTX,NTP,NTG,NTSA
+  integer  :: NTX,NTP,NTG,NTSA,NTN
 !     begin_execution
 !
   IF(J.EQ.INT(ZNOON(NY,NX)).AND.XCORP(NY,NX).LT.1.0.AND.DCORP(I,NY,NX).GT.0.0)THEN
@@ -125,14 +127,9 @@ module TillageMixMod
 !     TVOLA=0.0_r8
     TENGY=0.0_r8
     TNFNIH=0.0_r8
-    TNH4FA=0.0_r8
-    TNH3FA=0.0_r8
-    TNHUFA=0.0_r8
-    TNO3FA=0.0_r8
-    TNH4FB=0.0_r8
-    TNH3FB=0.0_r8
-    TNHUFB=0.0_r8
-    TNO3FB=0.0_r8
+
+    TfertN_soil(ifertn_beg:ifertn_end)=0.0_r8
+    TfertN_band(ifertnb_beg:ifertnb_end)=0.0_r8
 
     TS_solml(ids_beg:ids_end)=0._r8
     TS0_solml(ids_beg:ids_end)=0._r8
@@ -283,22 +280,19 @@ module TillageMixMod
     ENDDO
 
     TXN4G=trcx_solml(idx_NH4,0,NY,NX)*CORP0
-    TXOH0G=trcx_solml(idx_OHe,0,NY,NX)*CORP0
-    TXOH1G=trcx_solml(idx_OH,0,NY,NX)*CORP0
-    TXOH2G=trcx_solml(idx_OHp,0,NY,NX)*CORP0
-    TXH1PG=trcx_solml(idx_HPO4,0,NY,NX)*CORP0
-    TXH2PG=trcx_solml(idx_H2PO4,0,NY,NX)*CORP0
 
-    TALPOG=trcp_salml(idsp_AlPO4,0,NY,NX)*CORP0
-    TFEPOG=trcp_salml(idsp_FePO4,0,NY,NX)*CORP0
-    TCAPDG=trcp_salml(idsp_CaHPO4,0,NY,NX)*CORP0
-    TCAPHG=trcp_salml(idsp_HA,0,NY,NX)*CORP0
-    TCAPMG=trcp_salml(idsp_CaH2PO4,0,NY,NX)*CORP0
+    DO NTX= idx_AEC+1,idx_anion_soil_end
+      TX_anion(NTX)=trcx_solml(NTX,0,NY,NX)*CORP0
+    ENDDO
 
-    TNH4FG=FertN_soil(ifert_NH4,0,NY,NX)*CORP0
-    TNH3FG=FertN_soil(ifert_NH3,0,NY,NX)*CORP0
-    TNHUFG=FertN_soil(ifert_urea,0,NY,NX)*CORP0
-    TNO3FG=FertN_soil(ifert_no3,0,NY,NX)*CORP0
+    DO NTP=idsp_psoi_beg,idsp_psoi_end
+      TP_soil(NTP)=trcp_salml(NTP,0,NY,NX)*CORP0
+    ENDDO
+
+    DO NTN=ifertn_beg,ifertn_end
+      TFertNG_soil(NTN)=FertN_soil(NTN,0,NY,NX)*CORP0
+    ENDDO
+
     TZNFNG=ZNFNI(0,NY,NX)*CORP0
     TVOLWR=VOLW(0,NY,NX)*CORP0
     HFLXD=cpo*ORGC(0,NY,NX)*CORP0*TKS(0,NY,NX)
@@ -318,11 +312,10 @@ module TillageMixMod
     ENDDO
 
     trcx_solml(idx_NH4,0,NY,NX)=trcx_solml(idx_NH4,0,NY,NX)*XCORP0
-    trcx_solml(idx_OHe,0,NY,NX)=trcx_solml(idx_OHe,0,NY,NX)*XCORP0
-    trcx_solml(idx_OH,0,NY,NX)=trcx_solml(idx_OH,0,NY,NX)*XCORP0
-    trcx_solml(idx_OHp,0,NY,NX)=trcx_solml(idx_OHp,0,NY,NX)*XCORP0
-    trcx_solml(idx_HPO4,0,NY,NX)=trcx_solml(idx_HPO4,0,NY,NX)*XCORP0
-    trcx_solml(idx_H2PO4,0,NY,NX)=trcx_solml(idx_H2PO4,0,NY,NX)*XCORP0
+
+    DO NTX=idx_AEC+1,idx_anion_soil_end
+      trcx_solml(idx_OHe,0,NY,NX)=trcx_solml(idx_OHe,0,NY,NX)*XCORP0
+    ENDDO
 
     trcp_salml(idsp_AlPO4,0,NY,NX)=trcp_salml(idsp_AlPO4,0,NY,NX)*XCORP0
     trcp_salml(idsp_FePO4,0,NY,NX)=trcp_salml(idsp_FePO4,0,NY,NX)*XCORP0
@@ -330,10 +323,10 @@ module TillageMixMod
     trcp_salml(idsp_HA,0,NY,NX)=trcp_salml(idsp_HA,0,NY,NX)*XCORP0
     trcp_salml(idsp_CaH2PO4,0,NY,NX)=trcp_salml(idsp_CaH2PO4,0,NY,NX)*XCORP0
 
-    FertN_soil(ifert_NH4,0,NY,NX)=FertN_soil(ifert_NH4,0,NY,NX)*XCORP0
-    FertN_soil(ifert_NH3,0,NY,NX)=FertN_soil(ifert_NH3,0,NY,NX)*XCORP0
-    FertN_soil(ifert_urea,0,NY,NX)=FertN_soil(ifert_urea,0,NY,NX)*XCORP0
-    FertN_soil(ifert_no3,0,NY,NX)=FertN_soil(ifert_no3,0,NY,NX)*XCORP0
+    DO NTN=ifertn_beg,ifertn_end
+      FertN_soil(NTN,0,NY,NX)=FertN_soil(NTN,0,NY,NX)*XCORP0
+    ENDDO
+
     VOLW(0,NY,NX)=VOLW(0,NY,NX)*XCORP0
     VHCP(0,NY,NX)=cpo*ORGC(0,NY,NX)+cpw*VOLW(0,NY,NX)+cpi*VOLI(0,NY,NX)
     VOLR(NY,NX)=VOLR(NY,NX)*XCORP0
@@ -362,8 +355,6 @@ module TillageMixMod
         TSAND=TSAND+TI*SAND(L,NY,NX)
         TSILT=TSILT+TI*SILT(L,NY,NX)
         TCLAY=TCLAY+TI*CLAY(L,NY,NX)
-        TX_solml(idx_CEC)=TX_solml(idx_CEC)+TI*trcx_solml(idx_CEC,L,NY,NX)
-        TX_solml(idx_AEC)=TX_solml(idx_AEC)+TI*trcx_solml(idx_AEC,L,NY,NX)
         TGKC4=TGKC4+FI*GKC4(L,NY,NX)
         TGKCA=TGKCA+FI*GKCA(L,NY,NX)
         TGKCM=TGKCM+FI*GKCM(L,NY,NX)
@@ -375,14 +366,13 @@ module TillageMixMod
 !     TVOLA=TVOLA+TI*VOLA(L,NY,NX)
         TENGY=TENGY+TI*(cpw*(VOLW(L,NY,NX)+VOLWH(L,NY,NX)) &
           +cpi*(VOLI(L,NY,NX)+VOLIH(L,NY,NX)))*TKS(L,NY,NX)
-        TNH4FA=TNH4FA+TI*FertN_soil(ifert_NH4,L,NY,NX)
-        TNH3FA=TNH3FA+TI*FertN_soil(ifert_NH3,L,NY,NX)
-        TNHUFA=TNHUFA+TI*FertN_soil(ifert_urea,L,NY,NX)
-        TNO3FA=TNO3FA+TI*FertN_soil(ifert_no3,L,NY,NX)
-        TNH4FB=TNH4FB+TI*FertN_band(ifert_nh4_band,L,NY,NX)
-        TNH3FB=TNH3FB+TI*FertN_band(ifert_nh3_band,L,NY,NX)
-        TNHUFB=TNHUFB+TI*FertN_band(ifert_urea_band,L,NY,NX)
-        TNO3FB=TNO3FB+TI*FertN_band(ifert_no3_band,L,NY,NX)
+        DO NTN=ifertn_beg,ifertn_end
+          TfertN_soil(NTN)=TfertN_soil(NTN)+TI*FertN_soil(NTN,L,NY,NX)
+        ENDDO
+
+        DO NTN=ifertnb_beg,ifertnb_end
+          TfertN_band(NTN)=TfertN_band(NTN)+TI*FertN_band(NTN,L,NY,NX)
+        ENDDO
 
         DO NTS=ids_beg,ids_end
           TS_solml(NTS)=TS_solml(NTS)+TI*trc_solml(NTS,L,NY,NX)
@@ -392,11 +382,11 @@ module TillageMixMod
           TSA_solml(NTSA)=TSA_solml(NTSA)+TI*trcsa_solml(NTSA,L,NY,NX)
         ENDDO
 !cation
-        DO NTX=idx_CEC+1,idx_cation_end
+        DO NTX=idx_CEC,idx_cation_end
           TX_solml(NTX)=TX_solml(NTX)+TI*trcx_solml(NTX,L,NY,NX)
         ENDDO
 !anion
-        DO NTX=idx_AEC+1,idx_end
+        DO NTX=idx_AEC,idx_end
           TX_solml(NTX)=TX_solml(NTX)+TI*trcx_solml(NTX,L,NY,NX)
         ENDDO
 
@@ -461,7 +451,8 @@ module TillageMixMod
 !
 !     CHANGE SOIL STATE VARIABLES IN TILLAGE MIXING ZONE
 !     TO ACCOUNT FOR REDISTRIBUTION FROM MIXING
-!
+!   but non-P related precipitated species are not mixed, Jinyun Tang, Nov 30,2022
+
     D2000: DO  L=NU(NY,NX),LL
       IF(DLYR(3,L,NY,NX).GT.ZERO)THEN
         TL=AMIN1(DLYR(3,L,NY,NX),DCORPZ-(CDPTHZ(L,NY,NX)-DLYR(3,L,NY,NX)))
@@ -476,10 +467,6 @@ module TillageMixMod
         SAND(L,NY,NX)=TI*SAND(L,NY,NX)+CORP*(FI*TSAND-TI*SAND(L,NY,NX))+TX*SAND(L,NY,NX)
         SILT(L,NY,NX)=TI*SILT(L,NY,NX)+CORP*(FI*TSILT-TI*SILT(L,NY,NX))+TX*SILT(L,NY,NX)
         CLAY(L,NY,NX)=TI*CLAY(L,NY,NX)+CORP*(FI*TCLAY-TI*CLAY(L,NY,NX))+TX*CLAY(L,NY,NX)
-        trcx_solml(idx_CEC,L,NY,NX)=TI*trcx_solml(idx_CEC,L,NY,NX)+ &
-          CORP*(FI*TX_solml(idx_CEC)-TI*trcx_solml(idx_CEC,L,NY,NX))+TX*trcx_solml(idx_CEC,L,NY,NX)
-        trcx_solml(idx_AEC,L,NY,NX)=TI*trcx_solml(idx_AEC,L,NY,NX)+&
-          CORP*(FI*TX_solml(idx_AEC)-TI*trcx_solml(idx_AEC,L,NY,NX))+TX*trcx_solml(idx_AEC,L,NY,NX)
 
         GKC4(L,NY,NX)=TI*(GKC4(L,NY,NX)+CORP*(TGKC4-GKC4(L,NY,NX)))+TX*GKC4(L,NY,NX)
         GKCA(L,NY,NX)=TI*(GKCA(L,NY,NX)+CORP*(TGKCA-GKCA(L,NY,NX)))+TX*GKCA(L,NY,NX)
@@ -503,14 +490,17 @@ module TillageMixMod
           +cpi*(VOLI(L,NY,NX)+VOLIH(L,NY,NX))
         TKS(L,NY,NX)=(ENGYM+ENGYL)/VHCP(L,NY,NX)
         TCS(L,NY,NX)=TKS(L,NY,NX)-TC2K
-        FertN_soil(ifert_NH4,L,NY,NX)=TI*FertN_soil(ifert_NH4,L,NY,NX)+CORP*(FI*TNH4FA-TI*FertN_soil(ifert_NH4,L,NY,NX))+TX*FertN_soil(ifert_NH4,L,NY,NX)
-        FertN_soil(ifert_NH3,L,NY,NX)=TI*FertN_soil(ifert_NH3,L,NY,NX)+CORP*(FI*TNH3FA-TI*FertN_soil(ifert_NH3,L,NY,NX))+TX*FertN_soil(ifert_NH3,L,NY,NX)
-        FertN_soil(ifert_urea,L,NY,NX)=TI*FertN_soil(ifert_urea,L,NY,NX)+CORP*(FI*TNHUFA-TI*FertN_soil(ifert_urea,L,NY,NX))+TX*FertN_soil(ifert_urea,L,NY,NX)
-        FertN_soil(ifert_no3,L,NY,NX)=TI*FertN_soil(ifert_no3,L,NY,NX)+CORP*(FI*TNO3FA-TI*FertN_soil(ifert_no3,L,NY,NX))+TX*FertN_soil(ifert_no3,L,NY,NX)
-        FertN_band(ifert_nh4_band,L,NY,NX)=TI*FertN_band(ifert_nh4_band,L,NY,NX)+CORP*(FI*TNH4FB-TI*FertN_band(ifert_nh4_band,L,NY,NX))+TX*FertN_band(ifert_nh4_band,L,NY,NX)
-        FertN_band(ifert_nh3_band,L,NY,NX)=TI*FertN_band(ifert_nh3_band,L,NY,NX)+CORP*(FI*TNH3FB-TI*FertN_band(ifert_nh3_band,L,NY,NX))+TX*FertN_band(ifert_nh3_band,L,NY,NX)
-        FertN_band(ifert_urea_band,L,NY,NX)=TI*FertN_band(ifert_urea_band,L,NY,NX)+CORP*(FI*TNHUFB-TI*FertN_band(ifert_urea_band,L,NY,NX))+TX*FertN_band(ifert_urea_band,L,NY,NX)
-        FertN_band(ifert_no3_band,L,NY,NX)=TI*FertN_band(ifert_no3_band,L,NY,NX)+CORP*(FI*TNO3FB-TI*FertN_band(ifert_no3_band,L,NY,NX))+TX*FertN_band(ifert_no3_band,L,NY,NX)
+        DO NTN=ifertn_beg,ifertn_end
+          FertN_soil(NTN,L,NY,NX)=TI*FertN_soil(NTN,L,NY,NX) &
+            +CORP*(FI*TfertN_soil(NTN)-TI*FertN_soil(NTN,L,NY,NX))&
+            +TX*FertN_soil(NTN,L,NY,NX)
+        ENDDO
+
+        DO NTN=ifertnb_beg,ifertnb_end
+          FertN_band(NTN,L,NY,NX)=TI*FertN_band(NTN,L,NY,NX) &
+            +CORP*(FI*TfertN_band(NTN)-TI*FertN_band(NTN,L,NY,NX)) &
+            +TX*FertN_band(NTN,L,NY,NX)
+        ENDDO
 
         !SALT
         DO NTSA=idsa_beg,idsa_end
@@ -526,12 +516,12 @@ module TillageMixMod
             +TX*trc_solml(NTS,L,NY,NX)+CORP*trc_soHml(NTS,L,NY,NX)
         ENDDO
 
-        DO NTX=idx_CEC+1,idx_cation_end
+        DO NTX=idx_CEC,idx_cation_end
           trcx_solml(NTX,L,NY,NX)=TI*trcx_solml(NTX,L,NY,NX)+ &
             CORP*(FI*TX_solml(NTX)-TI*trcx_solml(NTX,L,NY,NX))+TX*trcx_solml(NTX,L,NY,NX)
         ENDDO
 
-        DO NTX=idx_AEC+1,idx_end
+        DO NTX=idx_AEC,idx_end
           trcx_solml(NTX,L,NY,NX)=TI*trcx_solml(NTX,L,NY,NX)+ &
             CORP*(FI*TX_solml(NTX)-TI*trcx_solml(NTX,L,NY,NX))+TX*trcx_solml(NTX,L,NY,NX)
         ENDDO
@@ -754,22 +744,20 @@ module TillageMixMod
         ENDDO
 
         trcx_solml(idx_NH4,L,NY,NX)=trcx_solml(idx_NH4,L,NY,NX)+FI*TXN4G
-        trcx_solml(idx_OHe,L,NY,NX)=trcx_solml(idx_OHe,L,NY,NX)+FI*TXOH0G
-        trcx_solml(idx_OH,L,NY,NX)=trcx_solml(idx_OH,L,NY,NX)+FI*TXOH1G
-        trcx_solml(idx_OHp,L,NY,NX)=trcx_solml(idx_OHp,L,NY,NX)+FI*TXOH2G
-        trcx_solml(idx_HPO4,L,NY,NX)=trcx_solml(idx_HPO4,L,NY,NX)+FI*TXH1PG
-        trcx_solml(idx_H2PO4,L,NY,NX)=trcx_solml(idx_H2PO4,L,NY,NX)+FI*TXH2PG
 
-        trcp_salml(idsp_AlPO4,L,NY,NX)=trcp_salml(idsp_AlPO4,L,NY,NX)+FI*TALPOG
-        trcp_salml(idsp_FePO4,L,NY,NX)=trcp_salml(idsp_FePO4,L,NY,NX)+FI*TFEPOG
-        trcp_salml(idsp_CaHPO4,L,NY,NX)=trcp_salml(idsp_CaHPO4,L,NY,NX)+FI*TCAPDG
-        trcp_salml(idsp_HA,L,NY,NX)=trcp_salml(idsp_HA,L,NY,NX)+FI*TCAPHG
-        trcp_salml(idsp_CaH2PO4,L,NY,NX)=trcp_salml(idsp_CaH2PO4,L,NY,NX)+FI*TCAPMG
 
-        FertN_soil(ifert_NH4,L,NY,NX)=FertN_soil(ifert_NH4,L,NY,NX)+FI*TNH4FG
-        FertN_soil(ifert_NH3,L,NY,NX)=FertN_soil(ifert_NH3,L,NY,NX)+FI*TNH3FG
-        FertN_soil(ifert_urea,L,NY,NX)=FertN_soil(ifert_urea,L,NY,NX)+FI*TNHUFG
-        FertN_soil(ifert_no3,L,NY,NX)=FertN_soil(ifert_no3,L,NY,NX)+FI*TNO3FG
+        DO NTX=idx_AEC+1,idx_anion_soil_end
+          trcx_solml(NTX,L,NY,NX)=trcx_solml(NTX,L,NY,NX)+FI*TX_anion(NTX)
+        ENDDO
+
+        DO NTP=idsp_psoi_beg,idsp_psoi_end
+          trcp_salml(NTP,L,NY,NX)=trcp_salml(NTP,L,NY,NX)+FI*TP_soil(NTP)
+        ENDDO
+
+        DO NTN=ifertn_beg,ifertn_end
+          FertN_soil(NTN,L,NY,NX)=FertN_soil(NTN,L,NY,NX)+FI*TFertNG_soil(NTN)
+        ENDDO
+
         ZNHU0(L,NY,NX)=ZNHUX0
         ZNHUI(L,NY,NX)=ZNHUXI
         ZNFN0(L,NY,NX)=ZNFNX0
@@ -779,6 +767,7 @@ module TillageMixMod
       ENDIF
     ENDDO D2000
 
+! nitrogen inhibitor
     ZNFN0(0,NY,NX)=ZNFNX0
     ZNFNI(0,NY,NX)=ZNFNI(0,NY,NX)*XCORP0
     TZNFN2=TZNFN2+TZNFNG

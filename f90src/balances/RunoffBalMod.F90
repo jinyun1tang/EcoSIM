@@ -14,6 +14,7 @@ module RunoffBalMod
   USE EcoSIMCtrlDataType
   USE GridDataType
   use EcoSIMConfig, only : jcplx => jcplxc
+  use EcosimConst, only : patomw
 implicit none
   private
   character(len=*), parameter :: mod_filename = __FILE__
@@ -528,14 +529,14 @@ implicit none
 !     TIONOU,UIONOU=total salt loss through lateral and lower boundaries
 !
       IF(ISALTG.NE.0)THEN
-        PQD=XN*31.0*(trcsa_XFLS(idsa_H0PO4,N,N6,N5,N4)+trcsa_XFLS(idsa_H0PO4B,N,N6,N5,N4) &
+        PQD=XN*patomw*(trcsa_XFLS(idsa_H0PO4,N,N6,N5,N4)+trcsa_XFLS(idsa_H0PO4B,N,N6,N5,N4) &
           +trcsa_XFLS(idsa_CaPO4,N,N6,N5,N4)+trcsa_XFLS(idsa_CaPO4B,N,N6,N5,N4)+trcsa_XFLS(idsa_FeHPO4,N,N6,N5,N4) &
           +trcsa_XFLS(idsa_CaHPO4,N,N6,N5,N4)+trcsa_XFLS(idsa_MgHPO4,N,N6,N5,N4)+trcsa_XFLS(idsa_FeHPO4B,N,N6,N5,N4) &
           +trcsa_XFLS(idsa_CaHPO4B,N,N6,N5,N4)+trcsa_XFLS(idsa_MgHPO4B,N,N6,N5,N4)+trcsa_XFLS(idsa_H3PO4,N,N6,N5,N4) &
           +trcsa_XFLS(idsa_FeH2PO4,N,N6,N5,N4)+trcsa_XFLS(idsa_CaH2PO4,N,N6,N5,N4)+trcsa_XFLS(idsa_H3PO4B,N,N6,N5,N4) &
           +trcsa_XFLS(idsa_FeH2PO4B,N,N6,N5,N4)+trcsa_XFLS(idsa_CaH2PO4B,N,N6,N5,N4))
 
-        PHD=XN*31.0*(trcsa_XFHS(idsa_H0PO4,N,N6,N5,N4)+trcsa_XFHS(idsa_H0PO4B,N,N6,N5,N4) &
+        PHD=XN*patomw*(trcsa_XFHS(idsa_H0PO4,N,N6,N5,N4)+trcsa_XFHS(idsa_H0PO4B,N,N6,N5,N4) &
           +trcsa_XFHS(idsa_CaPO4,N,N6,N5,N4)+trcsa_XFHS(idsa_CaPO4B,N,N6,N5,N4)+trcsa_XFHS(idsa_FeHPO4,N,N6,N5,N4) &
           +trcsa_XFHS(idsa_CaHPO4,N,N6,N5,N4)+trcsa_XFHS(idsa_MgHPO4,N,N6,N5,N4)+trcsa_XFHS(idsa_FeHPO4B,N,N6,N5,N4) &
           +trcsa_XFHS(idsa_CaHPO4B,N,N6,N5,N4)+trcsa_XFHS(idsa_MgHPO4B,N,N6,N5,N4)+trcsa_XFHS(idsa_H3PO4,N,N6,N5,N4) &
@@ -657,7 +658,7 @@ implicit none
       OXS=XN*XOXQSS(N,N5,N4)
       OXYGOU=OXYGOU-OXS
       IF(ISALTG.NE.0)THEN
-        PSS=XN*31.0*(XQSC0P(N,N5,N4)+XQSF1P(N,N5,N4)+XQSC1P(N,N5,N4) &
+        PSS=XN*patomw*(XQSC0P(N,N5,N4)+XQSF1P(N,N5,N4)+XQSC1P(N,N5,N4) &
           +XQSM1P(N,N5,N4)+XQSH3P(N,N5,N4)+XQSF2P(N,N5,N4)+XQSC2P(N,N5,N4))
         TPOU=TPOU-PSS
         SS1=XN*(XQSAL(N,N5,N4)+XQSFE(N,N5,N4) &
