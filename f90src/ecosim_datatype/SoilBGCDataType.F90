@@ -314,7 +314,7 @@ implicit none
   allocate(VOLQ(0:JZ,JY,JX));   VOLQ=0._r8
   allocate(TFNQ(0:JZ,JY,JX));   TFNQ=0._r8
   allocate(ESNT(jsken,npelms,1:n_pltlitrk,0:JZ,JY,JX));ESNT=0._r8
-  allocate(trcs_VLN(ids_nuts_beg:ids_nuts_end,0:JZ,JY,JX));trcs_VLN=0._r8
+  allocate(trcs_VLN(ids_beg:ids_end,0:JZ,JY,JX));trcs_VLN=1._r8
 
   allocate(VLNHB(0:JZ,JY,JX));  VLNHB=0._r8
 

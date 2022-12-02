@@ -1332,6 +1332,7 @@ implicit none
   FXH1POB=FWO*trc_solml(ids_H1PO4B,L0,NY,NX)
   trc_solml(ids_H1PO4B,L1,NY,NX)=trc_solml(ids_H1PO4B,L1,NY,NX)+FXH1POB
   trc_solml(ids_H1PO4B,L0,NY,NX)=trc_solml(ids_H1PO4B,L0,NY,NX)-FXH1POB
+
   FXH2POB=FWO*trc_solml(ids_H2PO4B,L0,NY,NX)
   trc_solml(ids_H2PO4B,L1,NY,NX)=trc_solml(ids_H2PO4B,L1,NY,NX)+FXH2POB
   trc_solml(ids_H2PO4B,L0,NY,NX)=trc_solml(ids_H2PO4B,L0,NY,NX)-FXH2POB

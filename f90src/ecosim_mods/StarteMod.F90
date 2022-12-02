@@ -303,9 +303,13 @@ module StarteMod
     COXU=0._r8
     CNNU=solutevar%CZ2G1
     CN2U=solutevar%CZ2O1
-    CN4U(L,NY,NX)=solutevar%CN41
-    CN3U(L,NY,NX)=solutevar%CN31
-    CNOU(L,NY,NX)=solutevar%CNOX
+    trcn_irrig(ids_NH4,L,NY,NX)=solutevar%CN41
+    trcn_irrig(idg_NH3,L,NY,NX)=solutevar%CN31
+    trcn_irrig(ids_NO3,L,NY,NX)=solutevar%CNOX
+    trcn_irrig(ids_NH4B,L,NY,NX)=trcn_irrig(ids_NH4,L,NY,NX)
+    trcn_irrig(idg_NH3B,L,NY,NX)=trcn_irrig(idg_NH3,L,NY,NX)
+    trcn_irrig(ids_NO3B,L,NY,NX)=trcn_irrig(ids_NO3,L,NY,NX)
+
     CALU(L,NY,NX)=solutevar%CAL1
     CFEU(L,NY,NX)=solutevar%CFE1
     CHYU(L,NY,NX)=solutevar%CHY1
@@ -340,8 +344,10 @@ module StarteMod
     CNASU(L,NY,NX)=solutevar%CNAS1
     CKASU(L,NY,NX)=solutevar%CKAS1
     CH0PU(L,NY,NX)=solutevar%CH0P1
-    CH1PU(L,NY,NX)=solutevar%CH1P1
-    CH2PU(L,NY,NX)=solutevar%CH2P1
+    trcn_irrig(ids_H1PO4,L,NY,NX)=solutevar%CH1P1
+    trcn_irrig(ids_H2PO4,L,NY,NX)=solutevar%CH2P1
+    trcn_irrig(ids_H1PO4B,L,NY,NX)=trcn_irrig(ids_H1PO4,L,NY,NX)
+    trcn_irrig(ids_H2PO4B,L,NY,NX)=trcn_irrig(ids_H2PO4,L,NY,NX)
     CH3PU(L,NY,NX)=solutevar%CH3P1
     CF1PU(L,NY,NX)=solutevar%CF1P1
     CF2PU(L,NY,NX)=solutevar%CF2P1
@@ -390,16 +396,17 @@ module StarteMod
 !
 !     INITIAL STATE VARIABLES FOR MINERAL N AND P IN SOIL
 !
-    trc_solml(ids_NH4,L,NY,NX)=CN4U(L,NY,NX)*VOLW(L,NY,NX)*trcs_VLN(ids_NH4,L,NY,NX)*natomw
-    trc_solml(ids_NH4B,L,NY,NX)=CN4U(L,NY,NX)*VOLW(L,NY,NX)*trcs_VLN(ids_NH4B,L,NY,NX)*natomw
-    trc_solml(idg_NH3,L,NY,NX)=CN3U(L,NY,NX)*VOLW(L,NY,NX)*trcs_VLN(ids_NH4,L,NY,NX)*natomw
-    trc_solml(idg_NH3B,L,NY,NX)=CN3U(L,NY,NX)*VOLW(L,NY,NX)*trcs_VLN(ids_NH4B,L,NY,NX)*natomw
-    trc_solml(ids_NO3,L,NY,NX)=CNOU(L,NY,NX)*VOLW(L,NY,NX)*trcs_VLN(ids_NO3,L,NY,NX)*natomw
-    trc_solml(ids_NO3B,L,NY,NX)=CNOU(L,NY,NX)*VOLW(L,NY,NX)*trcs_VLN(ids_NO3B,L,NY,NX)*natomw
-    trc_solml(ids_H2PO4,L,NY,NX)=CH2PU(L,NY,NX)*VOLW(L,NY,NX)*trcs_VLN(ids_H1PO4,L,NY,NX)*patomw
-    trc_solml(ids_H2PO4B,L,NY,NX)=CH2PU(L,NY,NX)*VOLW(L,NY,NX)*trcs_VLN(ids_H1PO4B,L,NY,NX)*patomw
-    trc_solml(ids_H1PO4,L,NY,NX)=CH1PU(L,NY,NX)*VOLW(L,NY,NX)*trcs_VLN(ids_H1PO4,L,NY,NX)*patomw
-    trc_solml(ids_H1PO4B,L,NY,NX)=CH1PU(L,NY,NX)*VOLW(L,NY,NX)*trcs_VLN(ids_H1PO4B,L,NY,NX)*patomw
+    trc_solml(ids_NH4,L,NY,NX)=trcn_irrig(ids_NH4,L,NY,NX)*VOLW(L,NY,NX)*trcs_VLN(ids_NH4,L,NY,NX)*natomw
+    trc_solml(ids_NH4B,L,NY,NX)=trcn_irrig(ids_NH4B,L,NY,NX)*VOLW(L,NY,NX)*trcs_VLN(ids_NH4B,L,NY,NX)*natomw
+    trc_solml(idg_NH3,L,NY,NX)=trcn_irrig(idg_NH3,L,NY,NX)*VOLW(L,NY,NX)*trcs_VLN(ids_NH4,L,NY,NX)*natomw
+    trc_solml(idg_NH3B,L,NY,NX)=trcn_irrig(idg_NH3B,L,NY,NX)*VOLW(L,NY,NX)*trcs_VLN(ids_NH4B,L,NY,NX)*natomw
+    trc_solml(ids_NO3,L,NY,NX)=trcn_irrig(ids_NO3,L,NY,NX)*VOLW(L,NY,NX)*trcs_VLN(ids_NO3,L,NY,NX)*natomw
+    trc_solml(ids_NO3B,L,NY,NX)=trcn_irrig(ids_NO3B,L,NY,NX)*VOLW(L,NY,NX)*trcs_VLN(ids_NO3B,L,NY,NX)*natomw
+
+    trc_solml(ids_H2PO4,L,NY,NX)=trcn_irrig(ids_H2PO4,L,NY,NX)*VOLW(L,NY,NX)*trcs_VLN(ids_H1PO4,L,NY,NX)*patomw
+    trc_solml(ids_H2PO4B,L,NY,NX)=trcn_irrig(ids_H2PO4B,L,NY,NX)*VOLW(L,NY,NX)*trcs_VLN(ids_H1PO4B,L,NY,NX)*patomw
+    trc_solml(ids_H1PO4,L,NY,NX)=trcn_irrig(ids_H1PO4,L,NY,NX)*VOLW(L,NY,NX)*trcs_VLN(ids_H1PO4,L,NY,NX)*patomw
+    trc_solml(ids_H1PO4B,L,NY,NX)=trcn_irrig(ids_H1PO4B,L,NY,NX)*VOLW(L,NY,NX)*trcs_VLN(ids_H1PO4B,L,NY,NX)*patomw
 
     trc_solml(ids_NO2,L,NY,NX)=0._r8
     trc_solml(ids_NO2B,L,NY,NX)=0._r8

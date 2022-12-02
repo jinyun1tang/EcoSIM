@@ -398,20 +398,13 @@ module TrnsfrMod
     OQA2(K,0,NY,NX)=OQA2(K,0,NY,NX)+TQROA(K,NY,NX)
   ENDDO D9680
 
+  DO NTG=idg_beg,idg_end-1
+    trc_solml2(NTG,0,NY,NX)=trc_solml2(NTG,0,NY,NX)+trcg_TQR(NTG,NY,NX)
+  ENDDO
 
-  trc_solml2(idg_CO2,0,NY,NX)=trc_solml2(idg_CO2,0,NY,NX)+trcg_TQR(idg_CO2,NY,NX)
-  trc_solml2(idg_CH4,0,NY,NX)=trc_solml2(idg_CH4,0,NY,NX)+trcg_TQR(idg_CH4,NY,NX)
-  trc_solml2(idg_O2,0,NY,NX)=trc_solml2(idg_O2,0,NY,NX)+trcg_TQR(idg_O2,NY,NX)
-  trc_solml2(idg_N2,0,NY,NX)=trc_solml2(idg_N2,0,NY,NX)+trcg_TQR(idg_N2,NY,NX)
-  trc_solml2(idg_N2O,0,NY,NX)=trc_solml2(idg_N2O,0,NY,NX)+trcg_TQR(idg_N2O,NY,NX)
-  trc_solml2(idg_H2,0,NY,NX)=trc_solml2(idg_H2,0,NY,NX)+trcg_TQR(idg_H2,NY,NX)
-  trc_solml2(idg_NH3,0,NY,NX)=trc_solml2(idg_NH3,0,NY,NX)+trcg_TQR(idg_NH3,NY,NX)
-
-  trc_solml2(ids_NH4,0,NY,NX)=trc_solml2(ids_NH4,0,NY,NX)+trcn_TQR(ids_NH4,NY,NX)
-  trc_solml2(ids_NO3,0,NY,NX)=trc_solml2(ids_NO3,0,NY,NX)+trcn_TQR(ids_NO3,NY,NX)
-  trc_solml2(ids_NO2,0,NY,NX)=trc_solml2(ids_NO2,0,NY,NX)+trcn_TQR(ids_NO2,NY,NX)
-  trc_solml2(ids_H1PO4,0,NY,NX)=trc_solml2(ids_H1PO4,0,NY,NX)+trcn_TQR(ids_H1PO4,NY,NX)
-  trc_solml2(ids_H2PO4,0,NY,NX)=trc_solml2(ids_H2PO4,0,NY,NX)+trcn_TQR(ids_H2PO4,NY,NX)
+  DO NTS=ids_nut_beg,ids_nuts_end
+    trc_solml2(NTS,0,NY,NX)=trc_solml2(NTS,0,NY,NX)+trcn_TQR(NTS,NY,NX)
+  ENDDO
 
   end subroutine UpdateStateVarInResidue
 
@@ -556,6 +549,12 @@ module TrnsfrMod
   DO NTS=ids_nut_beg,ids_nuts_end
     trc_solml2(NTS,0,NY,NX)=trc_solml(NTS,0,NY,NX)
   ENDDO
+  trc_solml2(ids_H1PO4B,0,NY,NX)=trc_solml2(ids_H1PO4,0,NY,NX)
+  trc_solml2(ids_H2PO4B,0,NY,NX)=trc_solml2(ids_H2PO4,0,NY,NX)
+  trc_solml2(ids_NO3B,0,NY,NX)=trc_solml2(ids_NO3,0,NY,NX)
+  trc_solml2(ids_NO2B,0,NY,NX)=trc_solml2(ids_NO2,0,NY,NX)
+  trc_solml2(ids_NH4B,0,NY,NX)=trc_solml2(ids_NH4,0,NY,NX)
+  trc_solml2(idg_NH3B,0,NY,NX)=trc_solml2(idg_NH3,0,NY,NX)
 
   CHY0(0,NY,NX)=10.0_r8**(-(PH(0,NY,NX)-3.0_r8))
   end subroutine StateVarforGasandSolute

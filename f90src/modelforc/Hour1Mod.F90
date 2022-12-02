@@ -920,47 +920,7 @@ module Hour1Mod
   trcg_XBLS(ids_nut_beg:ids_nuts_end,1:JS,NY,NX)=0.0_r8
 
   IF(ISALTG.NE.0)THEN
-    trcsa_XBLS(idsa_Al,1:JS,NY,NX)=0.0_r8
-    trcsa_XBLS(idsa_Fe,1:JS,NY,NX)=0.0_r8
-    trcsa_XBLS(idsa_Hp,1:JS,NY,NX)=0.0_r8
-    trcsa_XBLS(idsa_Ca,1:JS,NY,NX)=0.0_r8
-    trcsa_XBLS(idsa_Mg,1:JS,NY,NX)=0.0_r8
-    trcsa_XBLS(idsa_Na,1:JS,NY,NX)=0.0_r8
-    trcsa_XBLS(idsa_K,1:JS,NY,NX)=0.0_r8
-    trcsa_XBLS(idsa_OH,1:JS,NY,NX)=0.0_r8
-    trcsa_XBLS(idsa_SO4,1:JS,NY,NX)=0.0_r8
-    trcsa_XBLS(idsa_Cl,1:JS,NY,NX)=0.0_r8
-    trcsa_XBLS(idsa_CO3,1:JS,NY,NX)=0.0_r8
-    trcsa_XBLS(idsa_HCO3,1:JS,NY,NX)=0.0_r8
-    trcsa_XBLS(idsa_AlOH,1:JS,NY,NX)=0.0_r8
-    trcsa_XBLS(idsa_AlOH2,1:JS,NY,NX)=0.0_r8
-    trcsa_XBLS(idsa_AlOH3,1:JS,NY,NX)=0.0_r8
-    trcsa_XBLS(idsa_AlOH4,1:JS,NY,NX)=0.0_r8
-    trcsa_XBLS(idsa_AlSO4,1:JS,NY,NX)=0.0_r8
-    trcsa_XBLS(idsa_FeOH,1:JS,NY,NX)=0.0_r8
-    trcsa_XBLS(idsa_FeOH2,1:JS,NY,NX)=0.0_r8
-    trcsa_XBLS(idsa_FeOH3,1:JS,NY,NX)=0.0_r8
-    trcsa_XBLS(idsa_FeOH4,1:JS,NY,NX)=0.0_r8
-    trcsa_XBLS(idsa_FeSO4,1:JS,NY,NX)=0.0_r8
-    trcsa_XBLS(idsa_CaOH2,1:JS,NY,NX)=0.0_r8
-    trcsa_XBLS(idsa_CaCO3,1:JS,NY,NX)=0.0_r8
-    trcsa_XBLS(idsa_CaHCO3,1:JS,NY,NX)=0.0_r8
-    trcsa_XBLS(idsa_CaSO4,1:JS,NY,NX)=0.0_r8
-    trcsa_XBLS(idsa_MgOH2,1:JS,NY,NX)=0.0_r8
-    trcsa_XBLS(idsa_MgCO3,1:JS,NY,NX)=0.0_r8
-    trcsa_XBLS(idsa_MgHCO3,1:JS,NY,NX)=0.0_r8
-    trcsa_XBLS(idsa_MgSO4,1:JS,NY,NX)=0.0_r8
-    trcsa_XBLS(idsa_NaCO3,1:JS,NY,NX)=0.0_r8
-    trcsa_XBLS(idsa_NaSO4,1:JS,NY,NX)=0.0_r8
-    trcsa_XBLS(idsa_KSO4,1:JS,NY,NX)=0.0_r8
-    trcsa_XBLS(idsa_H0PO4,1:JS,NY,NX)=0.0_r8
-    trcsa_XBLS(idsa_H3PO4,1:JS,NY,NX)=0.0_r8
-    trcsa_XBLS(idsa_FeHPO4,1:JS,NY,NX)=0.0_r8
-    trcsa_XBLS(idsa_FeH2PO4,1:JS,NY,NX)=0.0_r8
-    trcsa_XBLS(idsa_CaPO4,1:JS,NY,NX)=0.0_r8
-    trcsa_XBLS(idsa_CaHPO4,1:JS,NY,NX)=0.0_r8
-    trcsa_XBLS(idsa_CaH2PO4,1:JS,NY,NX)=0.0_r8
-    trcsa_XBLS(idsa_MgHPO4,1:JS,NY,NX)=0.0_r8
+    trcsa_XBLS(idsa_beg:idsa_end,1:JS,NY,NX)=0.0_r8
   ENDIF
   end subroutine SetHourlyAccumulators
 !------------------------------------------------------------------------------------------
@@ -1227,7 +1187,7 @@ module Hour1Mod
   real(r8) :: TFACR
   real(r8) :: TFACA
   real(r8) :: TFACW
-  integer :: K,L
+  integer :: K,L,NTG
 !     begin_execution
 !
 !     LITTER GAS CONCENTRATIOS
@@ -1245,25 +1205,20 @@ module Hour1Mod
   trc_gascl(idg_N2O,0,NY,NX)=Z2OE(NY,NX)*1.25E-03_r8*TREF/TKS(0,NY,NX)
   trc_gascl(idg_NH3,0,NY,NX)=ZNH3E(NY,NX)*6.25E-04_r8*TREF/TKS(0,NY,NX)
   trc_gascl(idg_H2,0,NY,NX)=H2GE(NY,NX)*8.92E-05*TREF/TKS(0,NY,NX)
+
   trc_solcl(ids_NH4B,0,NY,NX)=0.0_r8
   trc_solcl(idg_NH3B,0,NY,NX)=0.0_r8
   trc_solcl(ids_NO3B,0,NY,NX)=0.0_r8
   trc_solcl(ids_NO2B,0,NY,NX)=0.0_r8
   trc_solcl(ids_H2PO4B,0,NY,NX)=0.0_r8
   IF(VOLW(0,NY,NX).GT.ZEROS2(NY,NX))THEN
-    trc_solcl(idg_CO2,0,NY,NX)=AZMAX1(trc_solml(idg_CO2,0,NY,NX)/VOLW(0,NY,NX))
-    trc_solcl(idg_CH4,0,NY,NX)=AZMAX1(trc_solml(idg_CH4,0,NY,NX)/VOLW(0,NY,NX))
-    trc_solcl(idg_O2,0,NY,NX)=AZMAX1(trc_solml(idg_O2,0,NY,NX)/VOLW(0,NY,NX))
-    trc_solcl(idg_N2,0,NY,NX)=AZMAX1(trc_solml(idg_N2,0,NY,NX)/VOLW(0,NY,NX))
-    trc_solcl(idg_N2O,0,NY,NX)=AZMAX1(trc_solml(idg_N2O,0,NY,NX)/VOLW(0,NY,NX))
-    trc_solcl(idg_H2,0,NY,NX)=AZMAX1(trc_solml(idg_H2,0,NY,NX)/VOLW(0,NY,NX))
+! exclude NH3B,
+    DO NTG=idg_beg,idg_end-1
+      trc_solcl(NTG,0,NY,NX)=AZMAX1(trc_solml(NTG,0,NY,NX)/VOLW(0,NY,NX))
+    ENDDO
   ELSE
-    trc_solcl(idg_CO2,0,NY,NX)=0.0_r8
-    trc_solcl(idg_CH4,0,NY,NX)=0.0_r8
-    trc_solcl(idg_O2,0,NY,NX)=0.0_r8
-    trc_solcl(idg_N2,0,NY,NX)=0.0_r8
-    trc_solcl(idg_N2O,0,NY,NX)=0.0_r8
-    trc_solcl(idg_H2,0,NY,NX)=0.0_r8
+
+    trc_solcl(idg_beg:idg_end-1,0,NY,NX)=0.0_r8
   ENDIF
 !
 !     TFACL=temperature effect on diffusivity
@@ -1683,12 +1638,7 @@ module Hour1Mod
 
     ELSE
       PSISM(0,NY,NX)=PSISM(NU(NY,NX),NY,NX)
-      trc_solcl(ids_NH4,0,NY,NX)=0.0_r8
-      trc_solcl(idg_NH3,0,NY,NX)=0.0_r8
-      trc_solcl(ids_NO3,0,NY,NX)=0.0_r8
-      trc_solcl(ids_NO2,0,NY,NX)=0.0_r8
-      trc_solcl(ids_H1PO4,0,NY,NX)=0.0_r8
-      trc_solcl(ids_H2PO4,0,NY,NX)=0.0_r8
+      trc_solcl(ids_nut_beg:ids_nuts_end,0,NY,NX)=0.0_r8
     ENDIF
   ELSE
     VOLX(0,NY,NX)=0.0_r8
@@ -1703,14 +1653,8 @@ module Hour1Mod
     VOLWRX(NY,NX)=0.0_r8
     PSISM(0,NY,NX)=PSISM(NU(NY,NX),NY,NX)
 
-    trc_solcl(ids_NH4,0,NY,NX)=0.0_r8
-    trc_solcl(ids_NO3,0,NY,NX)=0.0_r8
-    trc_solcl(ids_NO2,0,NY,NX)=0.0_r8
-    trc_solcl(ids_H1PO4,0,NY,NX)=0.0_r8
-    trc_solcl(ids_H2PO4,0,NY,NX)=0.0_r8
-    DO NTG=idg_beg,idg_end-1
-      trc_solcl(NTG,0,NY,NX)=0.0_r8
-    ENDDO
+    trc_solcl(ids_nut_beg:ids_nuts_end,0,NY,NX)=0.0_r8
+    trc_solcl(idg_beg:idg_end-1,0,NY,NX)=0.0_r8
   ENDIF
   end subroutine GetSurfResidualProperties
 
