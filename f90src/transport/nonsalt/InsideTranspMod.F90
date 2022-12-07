@@ -20,6 +20,7 @@ module InsideTranspMod
   USE EcoSimConst
   USE SoilHeatDataType
   use SurfaceFluxMod
+  use TracerIDMod
   implicit none
 
   private
@@ -125,7 +126,8 @@ module InsideTranspMod
   real(r8), intent(inout) :: FLQM(3,JD,JV,JH)
   integer :: NY,NX
   real(r8) :: FLWRM1
-
+  real(r8) :: trcg_RFLS0(idg_beg:idg_end-1)
+  real(r8) :: trcn_RFLW0(ids_nut_beg:ids_nuts_end)
   DO NX=NHW,NHE
     DO  NY=NVN,NVS
 
@@ -139,13 +141,13 @@ module InsideTranspMod
 !     RESIDUE AND SOIL SURFACE FROM SNOWMELT IN 'WATSUB' AND
 !     CONCENTRATIONS IN SNOWPACK
 !
-        call SoluteFluxSnowpackDisch(M,NY,NX)
+        call SoluteFluxSnowpackDisch(M,NY,NX,trcg_RFLS0,trcn_RFLW0)
 !
 !     SOLUTE FLUXES AT SOIL SURFACE FROM SURFACE WATER
 !     CONTENTS, WATER FLUXES 'FLQM' AND ATMOSPHERE BOUNDARY
 !     LAYER RESISTANCES 'PARGM' FROM 'WATSUB'
 !
-        call SoluteFluxSurface(M,NY,NX,NHE,NHW,NVS,NVN,FLQM)
+        call SoluteFluxSurface(M,NY,NX,NHE,NHW,NVS,NVN,FLQM,trcg_RFLS0,trcn_RFLW0)
 !
       ENDIF
 !

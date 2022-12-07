@@ -14,7 +14,9 @@ implicit none
   real(r8),target,allocatable ::  CNO3(:,:,:)                       !soil NO3 content, [mg kg-1]
   real(r8),target,allocatable ::  CPO4(:,:,:)                       !soil PO4 content, [mg kg-1]
 
-  real(r8),target,allocatable :: CPO4B(:,:,:)          !PO4 concentration band micropore	[g m-3]
+  real(r8),target,allocatable :: CPO4B(:,:,:)                       !PO4 concentration band micropore	[g m-3]
+  real(r8),target,allocatable :: CPO4S(:,:,:)                       !PO4 concentration non-band micropore	[g m-3]
+
   real(r8),target,allocatable :: trc_soHml(:,:,:,:)                 !solute mass in macropore [g d-2]
   real(r8),target,allocatable :: trc_solml(:,:,:,:)                 !solute mass in micropore [g d-2]
   real(r8),target,allocatable :: trc_solcl(:,:,:,:)                 !solute concentration in micropre [g m-3]
@@ -25,22 +27,8 @@ implicit none
   real(r8),target,allocatable ::  ZNHUI(:,:,:)                      !current inhibition activity
   real(r8),target,allocatable ::  ZNHU0(:,:,:)                      !urea hydrolysis inhibition activity
 
-  real(r8),target,allocatable :: CNH3G(:,:,:)          !gaseous NH3 concentration	[g m-3]
-  real(r8),target,allocatable :: CZ2GG(:,:,:)          !gaseous N2 concentration	[g m-3]
-  real(r8),target,allocatable :: CZ2OG(:,:,:)          !gaseous N2O concentration	[g m-3]
-  real(r8),target,allocatable :: COXYG(:,:,:)          !gaseous O2 concentration	[g m-3]
-  real(r8),target,allocatable :: CCH4G(:,:,:)          !gaseous CH4 concentration	[g m-3]
-
-  real(r8),target,allocatable :: CCO2G(:,:,:)          !gaseous CO2 concentration	[g m-3]
-
-  real(r8),target,allocatable :: CH1P4(:,:,:)          !aqueous H1PO4 concentration non-band [g m-3]
-
-
-  real(r8),target,allocatable :: CH2GG(:,:,:)          !gaseous H2 concentration	[g m-3]
-
   real(r8),target,allocatable :: trc_gasml(:,:,:,:)     !layer mass of gases [g d-2]
 
-  real(r8),target,allocatable :: CPO4S(:,:,:)          !PO4 concentration non-band micropore	[g m-3]
   real(r8),target,allocatable :: PH(:,:,:)             !soil pH
   real(r8),target,allocatable :: CEC(:,:,:)            !soil cation exchange capacity	[cmol kg-1]
   real(r8),target,allocatable :: AEC(:,:,:)            !soil anion exchange capacity	[cmol kg-1]
@@ -114,7 +102,6 @@ implicit none
   real(r8),target,allocatable :: trcs_VLN(:,:,:,:)
 
   real(r8),target,allocatable ::  VLNHB(:,:,:)                       !NH4 band volume fracrion, []
-
   real(r8),target,allocatable ::  VLNOB(:,:,:)                       !NO3 band volume fracrion, []
   real(r8),target,allocatable ::  VLPO4(:,:,:)                       !PO4 non-band volume fracrion, []
   real(r8),target,allocatable ::  VLPOB(:,:,:)                       !PO4 band volume fracrion, []
@@ -231,19 +218,7 @@ implicit none
   allocate(ZNHUI(0:JZ,JY,JX));  ZNHUI=0._r8
   allocate(ZNHU0(0:JZ,JY,JX));  ZNHU0=0._r8
   allocate(CPO4B(0:JZ,JY,JX));CPO4B(0:JZ,JY,JX)=0._r8
-  allocate(CNH3G(0:JZ,JY,JX));CNH3G(0:JZ,JY,JX)=0._r8
-  allocate(CZ2GG(0:JZ,JY,JX));CZ2GG(0:JZ,JY,JX)=0._r8
-  allocate(CZ2OG(0:JZ,JY,JX));CZ2OG(0:JZ,JY,JX)=0._r8
 
-
-  allocate(COXYG(0:JZ,JY,JX));COXYG(0:JZ,JY,JX)=0._r8
-  allocate(CCH4G(0:JZ,JY,JX));CCH4G(0:JZ,JY,JX)=0._r8
-
-  allocate(CCO2G(0:JZ,JY,JX));CCO2G(0:JZ,JY,JX)=0._r8
-
-  allocate(CH1P4(0:JZ,JY,JX));CH1P4(0:JZ,JY,JX)=0._r8
-
-  allocate(CH2GG(0:JZ,JY,JX));CH2GG(0:JZ,JY,JX)=0._r8
   allocate(PH(0:JZ,JY,JX));PH(0:JZ,JY,JX)=0._r8
   allocate(CEC(JZ,JY,JX));CEC(JZ,JY,JX)=0._r8
   allocate(AEC(JZ,JY,JX));AEC(JZ,JY,JX)=0._r8
@@ -423,19 +398,7 @@ implicit none
   call destroy(ZNFN0)
   call destroy(ZNHUI)
   call destroy(ZNHU0)
-  call destroy(CNH3G)
-  call destroy(CZ2GG)
-  call destroy(CZ2OG)
 
-  call destroy(COXYG)
-  call destroy(CCH4G)
-
-  call destroy(CCO2G)
-
-  call destroy(CH1P4)
-
-
-  call destroy(CH2GG)
   call destroy(PH)
   call destroy(CEC)
   call destroy(AEC)

@@ -375,13 +375,13 @@ module TrnsfrMod
     OQP2(K,0,NY,NX)=OQP2(K,0,NY,NX)+ROPFLS(K,3,0,NY,NX)
     OQA2(K,0,NY,NX)=OQA2(K,0,NY,NX)+ROAFLS(K,3,0,NY,NX)
   ENDDO
-  trc_solml2(idg_CO2,0,NY,NX)=trc_solml2(idg_CO2,0,NY,NX)+RCODFR(NY,NX)
-  trc_solml2(idg_CH4,0,NY,NX)=trc_solml2(idg_CH4,0,NY,NX)+RCHDFR(NY,NX)
-  trc_solml2(idg_O2,0,NY,NX)=trc_solml2(idg_O2,0,NY,NX)+ROXDFR(NY,NX)
-  trc_solml2(idg_N2,0,NY,NX)=trc_solml2(idg_N2,0,NY,NX)+RNGDFR(NY,NX)
-  trc_solml2(idg_N2O,0,NY,NX)=trc_solml2(idg_N2O,0,NY,NX)+RN2DFR(NY,NX)
-  trc_solml2(idg_H2,0,NY,NX)=trc_solml2(idg_H2,0,NY,NX)+RHGDFR(NY,NX)
-  trc_solml2(idg_NH3,0,NY,NX)=trc_solml2(idg_NH3,0,NY,NX)+RN3DFR(NY,NX)
+  trc_solml2(idg_CO2,0,NY,NX)=trc_solml2(idg_CO2,0,NY,NX)+RDFR_gas(idg_CO2,NY,NX)
+  trc_solml2(idg_CH4,0,NY,NX)=trc_solml2(idg_CH4,0,NY,NX)+RDFR_gas(idg_CH4,NY,NX)
+  trc_solml2(idg_O2,0,NY,NX)=trc_solml2(idg_O2,0,NY,NX)+RDFR_gas(idg_O2,NY,NX)
+  trc_solml2(idg_N2,0,NY,NX)=trc_solml2(idg_N2,0,NY,NX)+RDFR_gas(idg_N2,NY,NX)
+  trc_solml2(idg_N2O,0,NY,NX)=trc_solml2(idg_N2O,0,NY,NX)+RDFR_gas(idg_N2O,NY,NX)
+  trc_solml2(idg_H2,0,NY,NX)=trc_solml2(idg_H2,0,NY,NX)+RDFR_gas(idg_H2,NY,NX)
+  trc_solml2(idg_NH3,0,NY,NX)=trc_solml2(idg_NH3,0,NY,NX)+RDFR_gas(idg_NH3,NY,NX)
 
 ! band does not exist in litter layer
   DO NTS=ids_beg,ids_end

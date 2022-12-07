@@ -313,13 +313,7 @@ implicit none
   real(r8), allocatable ::  RN3DFS(:,:)                        !
   real(r8), allocatable ::  RNBDFS(:,:)                        !
   real(r8), allocatable ::  RHGDFS(:,:)                        !
-  real(r8), allocatable ::  RCODFR(:,:)                        !
-  real(r8), allocatable ::  RCHDFR(:,:)                        !
-  real(r8), allocatable ::  ROXDFR(:,:)                        !
-  real(r8), allocatable ::  RNGDFR(:,:)                        !
-  real(r8), allocatable ::  RN2DFR(:,:)                        !
-  real(r8), allocatable ::  RN3DFR(:,:)                        !
-  real(r8), allocatable ::  RHGDFR(:,:)                        !
+  real(r8), allocatable ::  RDFR_gas(:,:,:)                        !
   real(r8), allocatable ::  R1BSK2(:,:,:)                      !
   real(r8), allocatable ::  RQROC(:,:,:,:,:)                   !
   real(r8), allocatable ::  RQRON(:,:,:,:,:)                   !
@@ -694,13 +688,7 @@ contains
   allocate(RN3DFS(JY,JX));      RN3DFS=0._r8
   allocate(RNBDFS(JY,JX));      RNBDFS=0._r8
   allocate(RHGDFS(JY,JX));      RHGDFS=0._r8
-  allocate(RCODFR(JY,JX));      RCODFR=0._r8
-  allocate(RCHDFR(JY,JX));      RCHDFR=0._r8
-  allocate(ROXDFR(JY,JX));      ROXDFR=0._r8
-  allocate(RNGDFR(JY,JX));      RNGDFR=0._r8
-  allocate(RN2DFR(JY,JX));      RN2DFR=0._r8
-  allocate(RN3DFR(JY,JX));      RN3DFR=0._r8
-  allocate(RHGDFR(JY,JX));      RHGDFR=0._r8
+  allocate(RDFR_gas(idg_beg:idg_end-1,JY,JX));      RDFR_gas=0._r8
   allocate(R1BSK2(JZ,JY,JX));   R1BSK2=0._r8
   allocate(RQROC(1:jcplx,2,2,JV,JH));RQROC=0._r8
   allocate(RQRON(1:jcplx,2,2,JV,JH));RQRON=0._r8
@@ -1064,13 +1052,7 @@ contains
   call destroy(RN3DFS)
   call destroy(RNBDFS)
   call destroy(RHGDFS)
-  call destroy(RCODFR)
-  call destroy(RCHDFR)
-  call destroy(ROXDFR)
-  call destroy(RNGDFR)
-  call destroy(RN2DFR)
-  call destroy(RN3DFR)
-  call destroy(RHGDFR)
+  call destroy(RDFR_gas)
   call destroy(R1BSK2)
   call destroy(RQROC)
   call destroy(RQRON)

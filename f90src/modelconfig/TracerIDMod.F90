@@ -24,7 +24,7 @@ implicit none
   integer :: idg_beg,idg_end
   integer :: ids_beg,ids_end
   integer :: ids_nut_beg,ids_nuts_beg,ids_nuts_end
-
+  integer :: ids_nutb_beg,ids_nutb_end
 ! salt tracers
   integer :: idsa_beg,idsa_end
 
@@ -152,9 +152,13 @@ implicit none
 
   ids_nuts_beg=idg_NH3;  !the first nutrient tracer, including band
   ids_end=idg_end   !initalize the solute counter
-  ids_NH4B=addone(ids_end);ids_NO3B=addone(ids_end);
-  ids_NO2B=addone(ids_end);ids_H1PO4B=addone(ids_end)
+  ids_NH4B=addone(ids_end);
+  ids_NO3B=addone(ids_end);
+  ids_NO2B=addone(ids_end);
+  ids_H1PO4B=addone(ids_end)
   ids_H2PO4B=addone(ids_end)
+
+  ids_nutb_beg=idg_NH3B;ids_nutb_end=ids_H2PO4B
 
   ids_NH4=addone(ids_end);
   ids_NO3=addone(ids_end);
