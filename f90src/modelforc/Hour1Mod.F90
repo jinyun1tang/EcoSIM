@@ -917,7 +917,7 @@ module Hour1Mod
 
   trcg_XBLS(idg_beg:idg_end-1,1:JS,NY,NX)=0.0_r8
 
-  trcg_XBLS(ids_nut_beg:ids_nuts_end,1:JS,NY,NX)=0.0_r8
+  trcn_XBLS(ids_nut_beg:ids_nuts_end,1:JS,NY,NX)=0.0_r8
 
   IF(ISALTG.NE.0)THEN
     trcsa_XBLS(idsa_beg:idsa_end,1:JS,NY,NX)=0.0_r8
@@ -1227,15 +1227,17 @@ module Hour1Mod
 !
   TFACL=TEFAQUDIF(TKS(0,NY,NX))
   TFND(0,NY,NX)=TFACL
+
+  SolDifc(idg_CO2,0,NY,NX)=CLSG*TFACL
   SolDifc(idg_CH4,0,NY,NX)=CQSG*TFACL
   SolDifc(idg_O2,0,NY,NX)=OLSG*TFACL
   SolDifc(idg_N2,0,NY,NX)=ZLSG*TFACL
   SolDifc(idg_NH3,0,NY,NX)=ZNSG*TFACL
   SolDifc(idg_H2,0,NY,NX)=HLSG*TFACL
   SolDifc(idg_N2O,0,NY,NX)=ZVSG*TFACL
+
   SolDifc(ids_NO3,0,NY,NX)=ZOSG*TFACL
   SolDifc(ids_H1PO4,0,NY,NX)=POSG*TFACL
-
   SolDifc(ids_NH4,0,NY,NX)   =SolDifc(idg_NH3,0,NY,NX)
   SolDifc(ids_NH4B,0,NY,NX)  =SolDifc(ids_NH4,0,NY,NX)
   SolDifc(idg_NH3B,0,NY,NX)  =SolDifc(idg_NH3,0,NY,NX)

@@ -128,6 +128,8 @@ module InsideTranspMod
   real(r8) :: FLWRM1
   real(r8) :: trcg_RFLS0(idg_beg:idg_end-1)
   real(r8) :: trcn_RFLW0(ids_nut_beg:ids_nuts_end)
+  real(r8) :: RDXS_gas(idg_beg:idg_end)
+
   DO NX=NHW,NHE
     DO  NY=NVN,NVS
 
@@ -147,7 +149,8 @@ module InsideTranspMod
 !     CONTENTS, WATER FLUXES 'FLQM' AND ATMOSPHERE BOUNDARY
 !     LAYER RESISTANCES 'PARGM' FROM 'WATSUB'
 !
-        call SoluteFluxSurface(M,NY,NX,NHE,NHW,NVS,NVN,FLQM,trcg_RFLS0,trcn_RFLW0)
+        call SoluteFluxSurface(M,NY,NX,NHE,NHW,NVS,NVN,&
+          FLQM,trcg_RFLS0,trcn_RFLW0,RDXS_gas)
 !
       ENDIF
 !
@@ -162,7 +165,7 @@ module InsideTranspMod
 !     SOIL SURFACE LAYER AND THROUGH ATMOSPHERE BOUNDARY
 !     LAYER
 !
-      call SurfSoilFluxGasDifAdv(M,NY,NX,FLQM)
+      call SurfSoilFluxGasDifAdv(M,NY,NX,FLQM,RDXS_gas)
 !
 !     SOIL SURFACE WATER-AIR GAS EXCHANGE
 !
@@ -191,13 +194,13 @@ module InsideTranspMod
 !     PARG=boundary layer conductance above soil surface from watsub.f
 !
     PARGM=PARG(M,NY,NX)*XNPT
-    PARGCO(NY,NX)=PARGM*0.74_r8
-    PARGCH(NY,NX)=PARGM*1.04_r8
-    PARGOX(NY,NX)=PARGM*0.83_r8
-    PARGNG(NY,NX)=PARGM*0.86_r8
-    PARGN2(NY,NX)=PARGM*0.74_r8
-    PARGN3(NY,NX)=PARGM*1.02_r8
-    PARGH2(NY,NX)=PARGM*2.08_r8
+    PARG_cef(idg_CO2,NY,NX)=PARGM*0.74_r8
+    PARG_cef(idg_CH4,NY,NX)=PARGM*1.04_r8
+    PARG_cef(idg_O2,NY,NX)=PARGM*0.83_r8
+    PARG_cef(idg_N2,NY,NX)=PARGM*0.86_r8
+    PARG_cef(idg_N2O,NY,NX)=PARGM*0.74_r8
+    PARG_cef(idg_NH3,NY,NX)=PARGM*1.02_r8
+    PARG_cef(idg_H2,NY,NX)=PARGM*2.08_r8
 !
 !     RESET RUNOFF SOLUTE FLUX ACCUMULATORS
 !
@@ -518,19 +521,14 @@ module InsideTranspMod
   real(r8), intent(in) :: THETW1(JZ,JY,JX)
   real(r8) :: VOLWOA,VOLWOB,VOLWPA,VOLWPB
   real(r8) :: VOLW2A,VOLW2B,VOLW3A,VOLW3B,VOLW4A,VOLW4B
-  real(r8) :: CCH4S1,COXYS1,CZ2GS1,CZ2OS1,CH2GS1,CNH4S1
-  real(r8) :: CNH3S1,CNO3S1,CNO2S1,CP14S1,CPO4S1,CCO2S1
-  real(r8) :: COXYS2,CZ2GS2,CZ2OS2,CH2GS2,CNH3S2,CNH4S2,CNO3S2
-  real(r8) :: CNO2S2,CP14S2,CPO4S2,CCH4S2,CCO2S2
-  real(r8) :: CNH3B2,CNH4B2,CNO2B2,CP14B2,CPO4B2,CNO3B2
-  real(r8) :: CNH4B1,CNH3B1,CNO3B1,CNO2B1,CP14B1
+  real(r8) :: trcsolc1(ids_beg:ids_end)
+  real(r8) :: trcsolc2(ids_beg:ids_end)
   real(r8) :: COXYG1,CZ2GG1,CZ2OG1,CNH3G1
-  real(r8) :: CPO4B1
 
   real(r8) :: SDifc(ids_beg:ids_end),SDifFlx(ids_beg:ids_end)
   real(r8) :: DISPN,DIFOC,DIFON,DIFOP,DIFOA
   real(r8) :: DLYR1,DLYR2,TORTL
-  integer  :: K,NTS
+  integer  :: K,NTS,NTG
 
   IF(THETW1(N3,N2,N1).GT.THETY(N3,N2,N1).AND.THETW1(N6,N5,N4).GT.THETY(N6,N5,N4) &
     .AND.VOLWM(M,N3,N2,N1).GT.ZEROS2(N2,N1).AND.VOLWM(M,N6,N5,N4).GT.ZEROS2(N5,N4))THEN
@@ -541,6 +539,7 @@ module InsideTranspMod
       VOLW3B=VOLWM(M,N3,N2,N1)*trcs_VLN(ids_NO3B,N3,N2,N1)
       VOLW4A=VOLWM(M,N3,N2,N1)*trcs_VLN(ids_NH4,N3,N2,N1)
       VOLW4B=VOLWM(M,N3,N2,N1)*trcs_VLN(ids_NH4B,N3,N2,N1)
+
       VOLWPA=VOLWM(M,N6,N5,N4)*trcs_VLN(ids_H1PO4,N6,N5,N4)
       VOLWPB=VOLWM(M,N6,N5,N4)*trcs_VLN(ids_H1PO4B,N6,N5,N4)
       VOLWOA=VOLWM(M,N6,N5,N4)*trcs_VLN(ids_NO3,N6,N5,N4)
@@ -567,106 +566,118 @@ module InsideTranspMod
       COQN1(K)=AZMAX1(OQN2(K,N3,N2,N1)/VOLWM(M,N3,N2,N1))
       COQP1(K)=AZMAX1(OQP2(K,N3,N2,N1)/VOLWM(M,N3,N2,N1))
       COQA1(K)=AZMAX1(OQA2(K,N3,N2,N1)/VOLWM(M,N3,N2,N1))
+
       COQC2(K)=AZMAX1(OQC2(K,N6,N5,N4)/VOLWM(M,N6,N5,N4))
       COQN2(K)=AZMAX1(OQN2(K,N6,N5,N4)/VOLWM(M,N6,N5,N4))
       COQP2(K)=AZMAX1(OQP2(K,N6,N5,N4)/VOLWM(M,N6,N5,N4))
       COQA2(K)=AZMAX1(OQA2(K,N6,N5,N4)/VOLWM(M,N6,N5,N4))
     ENDDO D9810
-    CCO2S1=AZMAX1(trc_solml2(idg_CO2,N3,N2,N1)/VOLWM(M,N3,N2,N1))
-    CCH4S1=AZMAX1(trc_solml2(idg_CH4,N3,N2,N1)/VOLWM(M,N3,N2,N1))
-    COXYS1=AZMAX1(trc_solml2(idg_O2,N3,N2,N1)/VOLWM(M,N3,N2,N1))
-    CZ2GS1=AZMAX1(trc_solml2(idg_N2,N3,N2,N1)/VOLWM(M,N3,N2,N1))
-    CZ2OS1=AZMAX1(trc_solml2(idg_N2O,N3,N2,N1)/VOLWM(M,N3,N2,N1))
-    CH2GS1=AZMAX1(trc_solml2(idg_H2,N3,N2,N1)/VOLWM(M,N3,N2,N1))
+
+    DO NTG=idg_beg,idg_end-2
+      trcsolc1(NTG)=AZMAX1(trc_solml2(NTG,N3,N2,N1)/VOLWM(M,N3,N2,N1))
+    ENDDO
+!    trcsolc1(idg_CO2)=AZMAX1(trc_solml2(idg_CO2,N3,N2,N1)/VOLWM(M,N3,N2,N1))
+!    trcsolc1(idg_CH4)=AZMAX1(trc_solml2(idg_CH4,N3,N2,N1)/VOLWM(M,N3,N2,N1))
+!    trcsolc1(idg_O2)=AZMAX1(trc_solml2(idg_O2,N3,N2,N1)/VOLWM(M,N3,N2,N1))
+!    trcsolc1(idg_N2)=AZMAX1(trc_solml2(idg_N2,N3,N2,N1)/VOLWM(M,N3,N2,N1))
+!    trcsolc1(idg_N2O)=AZMAX1(trc_solml2(idg_N2O,N3,N2,N1)/VOLWM(M,N3,N2,N1))
+!    trcsolc1(idg_H2)=AZMAX1(trc_solml2(idg_H2,N3,N2,N1)/VOLWM(M,N3,N2,N1))
+
     IF(VOLW4A.GT.ZEROS2(N2,N1))THEN
-      CNH4S1=AZMAX1(trc_solml2(ids_NH4,N3,N2,N1)/VOLW4A)
-      CNH3S1=AZMAX1(trc_solml2(idg_NH3,N3,N2,N1)/VOLW4A)
+      trcsolc1(ids_NH4)=AZMAX1(trc_solml2(ids_NH4,N3,N2,N1)/VOLW4A)
+      trcsolc1(idg_NH3)=AZMAX1(trc_solml2(idg_NH3,N3,N2,N1)/VOLW4A)
     ELSE
-      CNH4S1=0.0_r8
-      CNH3S1=0.0_r8
+      trcsolc1(ids_NH4)=0.0_r8
+      trcsolc1(idg_NH3)=0.0_r8
     ENDIF
     IF(VOLW3A.GT.ZEROS2(N2,N1))THEN
-      CNO3S1=AZMAX1(trc_solml2(ids_NO3,N3,N2,N1)/VOLW3A)
-      CNO2S1=AZMAX1(trc_solml2(ids_NO2,N3,N2,N1)/VOLW3A)
+      trcsolc1(ids_NO3)=AZMAX1(trc_solml2(ids_NO3,N3,N2,N1)/VOLW3A)
+      trcsolc1(ids_NO2)=AZMAX1(trc_solml2(ids_NO2,N3,N2,N1)/VOLW3A)
     ELSE
-      CNO3S1=0.0_r8
-      CNO2S1=0.0_r8
+      trcsolc1(ids_NO3)=0.0_r8
+      trcsolc1(ids_NO2)=0.0_r8
     ENDIF
     IF(VOLW2A.GT.ZEROS2(N2,N1))THEN
-      CP14S1=AZMAX1(trc_solml2(ids_H1PO4,N3,N2,N1)/VOLW2A)
-      CPO4S1=AZMAX1(trc_solml2(ids_H2PO4,N3,N2,N1)/VOLW2A)
+      trcsolc1(ids_H1PO4)=AZMAX1(trc_solml2(ids_H1PO4,N3,N2,N1)/VOLW2A)
+      trcsolc1(ids_H2PO4)=AZMAX1(trc_solml2(ids_H2PO4,N3,N2,N1)/VOLW2A)
     ELSE
-      CP14S1=0.0_r8
-      CPO4S1=0.0_r8
+      trcsolc1(ids_H1PO4)=0.0_r8
+      trcsolc1(ids_H2PO4)=0.0_r8
     ENDIF
     IF(VOLW4B.GT.ZEROS2(N2,N1))THEN
-      CNH4B1=AZMAX1(trc_solml2(ids_NH4B,N3,N2,N1)/VOLW4B)
-      CNH3B1=AZMAX1(trc_solml2(idg_NH3B,N3,N2,N1)/VOLW4B)
+      trcsolc1(ids_NH4B)=AZMAX1(trc_solml2(ids_NH4B,N3,N2,N1)/VOLW4B)
+      trcsolc1(idg_NH3B)=AZMAX1(trc_solml2(idg_NH3B,N3,N2,N1)/VOLW4B)
     ELSE
-      CNH4B1=0.0_r8
-      CNH3B1=0.0_r8
+      trcsolc1(ids_NH4B)=0.0_r8
+      trcsolc1(idg_NH3B)=0.0_r8
     ENDIF
     IF(VOLW3B.GT.ZEROS2(N2,N1))THEN
-      CNO3B1=AZMAX1(trc_solml2(ids_NO3B,N3,N2,N1)/VOLW3B)
-      CNO2B1=AZMAX1(trc_solml2(ids_NO2B,N3,N2,N1)/VOLW3B)
+      trcsolc1(ids_NO3B)=AZMAX1(trc_solml2(ids_NO3B,N3,N2,N1)/VOLW3B)
+      trcsolc1(ids_NO2B)=AZMAX1(trc_solml2(ids_NO2B,N3,N2,N1)/VOLW3B)
     ELSE
-      CNO3B1=CNO3S1
-      CNO2B1=CNO2S1
+      trcsolc1(ids_NO3B)=trcsolc1(ids_NO3)
+      trcsolc1(ids_NO2B)=trcsolc1(ids_NO2)
     ENDIF
     IF(VOLW2B.GT.ZEROS2(N2,N1))THEN
-      CP14B1=AZMAX1(trc_solml2(ids_H1PO4B,N3,N2,N1)/VOLW2B)
-      CPO4B1=AZMAX1(trc_solml2(ids_H2PO4B,N3,N2,N1)/VOLW2B)
+      trcsolc1(ids_H1PO4B)=AZMAX1(trc_solml2(ids_H1PO4B,N3,N2,N1)/VOLW2B)
+      trcsolc1(ids_H2PO4B)=AZMAX1(trc_solml2(ids_H2PO4B,N3,N2,N1)/VOLW2B)
     ELSE
-      CP14B1=CP14S1
-      CPO4B1=CPO4S1
+      trcsolc1(ids_H1PO4B)=trcsolc1(ids_H1PO4)
+      trcsolc1(ids_H2PO4B)=trcsolc1(ids_H2PO4)
     ENDIF
-    CCO2S2=AZMAX1(trc_solml2(idg_CO2,N6,N5,N4)/VOLWM(M,N6,N5,N4))
-    CCH4S2=AZMAX1(trc_solml2(idg_CH4,N6,N5,N4)/VOLWM(M,N6,N5,N4))
-    COXYS2=AZMAX1(trc_solml2(idg_O2,N6,N5,N4)/VOLWM(M,N6,N5,N4))
-    CZ2GS2=AZMAX1(trc_solml2(idg_N2,N6,N5,N4)/VOLWM(M,N6,N5,N4))
-    CZ2OS2=AZMAX1(trc_solml2(idg_N2O,N6,N5,N4)/VOLWM(M,N6,N5,N4))
-    CH2GS2=AZMAX1(trc_solml2(idg_H2,N6,N5,N4)/VOLWM(M,N6,N5,N4))
+
+    DO NTG=idg_beg,idg_end-2
+      trcsolc2(NTG)=AZMAX1(trc_solml2(NTG,N6,N5,N4)/VOLWM(M,N6,N5,N4))
+    ENDDO
+
+!    trcsolc2(idg_CO2)=AZMAX1(trc_solml2(idg_CO2,N6,N5,N4)/VOLWM(M,N6,N5,N4))
+!    trcsolc2(idg_CH4)=AZMAX1(trc_solml2(idg_CH4,N6,N5,N4)/VOLWM(M,N6,N5,N4))
+!    trcsolc2(idg_O2)=AZMAX1(trc_solml2(idg_O2,N6,N5,N4)/VOLWM(M,N6,N5,N4))
+!    trcsolc2(idg_N2)=AZMAX1(trc_solml2(idg_N2,N6,N5,N4)/VOLWM(M,N6,N5,N4))
+!    trcsolc2(idg_N2O)=AZMAX1(trc_solml2(idg_N2O,N6,N5,N4)/VOLWM(M,N6,N5,N4))
+!    trcsolc2(idg_H2)=AZMAX1(trc_solml2(idg_H2,N6,N5,N4)/VOLWM(M,N6,N5,N4))
+
     IF(VOLWMA(N6,N5,N4).GT.ZEROS2(N5,N4))THEN
-      CNH3S2=AZMAX1(trc_solml2(idg_NH3,N6,N5,N4)/VOLWMA(N6,N5,N4))
-      CNH4S2=AZMAX1(trc_solml2(ids_NH4,N6,N5,N4)/VOLWMA(N6,N5,N4))
+      trcsolc2(idg_NH3)=AZMAX1(trc_solml2(idg_NH3,N6,N5,N4)/VOLWMA(N6,N5,N4))
+      trcsolc2(ids_NH4)=AZMAX1(trc_solml2(ids_NH4,N6,N5,N4)/VOLWMA(N6,N5,N4))
     ELSE
-      CNH3S2=0.0_r8
-      CNH4S2=0.0_r8
+      trcsolc2(idg_NH3)=0.0_r8
+      trcsolc2(ids_NH4)=0.0_r8
     ENDIF
     IF(VOLWOA.GT.ZEROS2(N5,N4))THEN
-      CNO3S2=AZMAX1(trc_solml2(ids_NO3,N6,N5,N4)/VOLWOA)
-      CNO2S2=AZMAX1(trc_solml2(ids_NO2,N6,N5,N4)/VOLWOA)
+      trcsolc2(ids_NO3)=AZMAX1(trc_solml2(ids_NO3,N6,N5,N4)/VOLWOA)
+      trcsolc2(ids_NO2)=AZMAX1(trc_solml2(ids_NO2,N6,N5,N4)/VOLWOA)
     ELSE
-      CNO3S2=0.0_r8
-      CNO2S2=0.0_r8
+      trcsolc2(ids_NO3)=0.0_r8
+      trcsolc2(ids_NO2)=0.0_r8
     ENDIF
     IF(VOLWPA.GT.ZEROS2(N5,N4))THEN
-      CP14S2=AZMAX1(trc_solml2(ids_H1PO4,N6,N5,N4)/VOLWPA)
-      CPO4S2=AZMAX1(trc_solml2(ids_H2PO4,N6,N5,N4)/VOLWPA)
+      trcsolc2(ids_H1PO4)=AZMAX1(trc_solml2(ids_H1PO4,N6,N5,N4)/VOLWPA)
+      trcsolc2(ids_H2PO4)=AZMAX1(trc_solml2(ids_H2PO4,N6,N5,N4)/VOLWPA)
     ELSE
-      CP14S2=0.0_r8
-      CPO4S2=0.0_r8
+      trcsolc2(ids_H1PO4)=0.0_r8
+      trcsolc2(ids_H2PO4)=0.0_r8
     ENDIF
     IF(VOLWMB(N6,N5,N4).GT.ZEROS2(N5,N4))THEN
-      CNH3B2=AZMAX1(trc_solml2(idg_NH3B,N6,N5,N4)/VOLWMB(N6,N5,N4))
-      CNH4B2=AZMAX1(trc_solml2(ids_NH4B,N6,N5,N4)/VOLWMB(N6,N5,N4))
+      trcsolc2(idg_NH3B)=AZMAX1(trc_solml2(idg_NH3B,N6,N5,N4)/VOLWMB(N6,N5,N4))
+      trcsolc2(ids_NH4B)=AZMAX1(trc_solml2(ids_NH4B,N6,N5,N4)/VOLWMB(N6,N5,N4))
     ELSE
-      CNH3B2=CNH3S2
-      CNH4B2=CNH4S2
+      trcsolc2(idg_NH3B)=trcsolc2(idg_NH3)
+      trcsolc2(ids_NH4B)=trcsolc2(ids_NH4)
     ENDIF
     IF(VOLWOB.GT.ZEROS2(N5,N4))THEN
-      CNO3B2=AZMAX1(trc_solml2(ids_NO3B,N6,N5,N4)/VOLWOB)
-      CNO2B2=AZMAX1(trc_solml2(ids_NO2B,N6,N5,N4)/VOLWOB)
+      trcsolc2(ids_NO3B)=AZMAX1(trc_solml2(ids_NO3B,N6,N5,N4)/VOLWOB)
+      trcsolc2(ids_NO2B)=AZMAX1(trc_solml2(ids_NO2B,N6,N5,N4)/VOLWOB)
     ELSE
-      CNO3B2=CNO3S2
-      CNO2B2=CNO2S2
+      trcsolc2(ids_NO3B)=trcsolc2(ids_NO3)
+      trcsolc2(ids_NO2B)=trcsolc2(ids_NO2)
     ENDIF
     IF(VOLWPB.GT.ZEROS2(N5,N4))THEN
-      CP14B2=AZMAX1(trc_solml2(ids_H1PO4B,N6,N5,N4)/VOLWPB)
-      CPO4B2=AZMAX1(trc_solml2(ids_H2PO4B,N6,N5,N4)/VOLWPB)
+      trcsolc2(ids_H1PO4B)=AZMAX1(trc_solml2(ids_H1PO4B,N6,N5,N4)/VOLWPB)
+      trcsolc2(ids_H2PO4B)=AZMAX1(trc_solml2(ids_H2PO4B,N6,N5,N4)/VOLWPB)
     ELSE
-      CP14B2=CP14S2
-      CPO4B2=CPO4S2
+      trcsolc2(ids_H1PO4B)=trcsolc2(ids_H1PO4)
+      trcsolc2(ids_H2PO4B)=trcsolc2(ids_H2PO4)
     ENDIF
 !
 !     DIFFUSIVITIES IN CURRENT AND ADJACENT GRID CELL MICROPORES
@@ -711,24 +722,33 @@ module InsideTranspMod
       DFVOP(K)=DIFOP*(COQP1(K)-COQP2(K))
       DFVOA(K)=DIFOA*(COQA1(K)-COQA2(K))
     ENDDO D9805
-    SDifFlx(idg_CO2)=SDifc(idg_CO2)*(CCO2S1-CCO2S2)
-    SDifFlx(idg_CH4)=SDifc(idg_CH4)*(CCH4S1-CCH4S2)
-    SDifFlx(idg_O2)=SDifc(idg_O2)*(COXYS1-COXYS2)
-    SDifFlx(idg_N2)=SDifc(idg_N2)*(CZ2GS1-CZ2GS2)
-    SDifFlx(idg_N2O)=SDifc(idg_N2O)*(CZ2OS1-CZ2OS2)
-    SDifFlx(idg_H2)=SDifc(idg_H2)*(CH2GS1-CH2GS2)
-    SDifFlx(ids_NH4)=SDifc(ids_NH4)*(CNH4S1-CNH4S2)*AMIN1(trcs_VLN(ids_NH4,N3,N2,N1),trcs_VLN(ids_NH4,N6,N5,N4))
-    SDifFlx(idg_NH3)=SDifc(idg_NH3)*(CNH3S1-CNH3S2)*AMIN1(trcs_VLN(ids_NH4,N3,N2,N1),trcs_VLN(ids_NH4,N6,N5,N4))
-    SDifFlx(ids_NO3)=SDifc(ids_NO3)*(CNO3S1-CNO3S2)*AMIN1(trcs_VLN(ids_NO3,N3,N2,N1),trcs_VLN(ids_NO3,N6,N5,N4))
-    SDifFlx(ids_NO2)=SDifc(ids_NO2)*(CNO2S1-CNO2S2)*AMIN1(trcs_VLN(ids_NO3,N3,N2,N1),trcs_VLN(ids_NO3,N6,N5,N4))
-    SDifFlx(ids_H1PO4)=SDifc(ids_H1PO4)*(CP14S1-CP14S2)*AMIN1(trcs_VLN(ids_H1PO4,N3,N2,N1),trcs_VLN(ids_H1PO4,N6,N5,N4))
-    SDifFlx(ids_H2PO4)=SDifc(ids_H2PO4)*(CPO4S1-CPO4S2)*AMIN1(trcs_VLN(ids_H1PO4,N3,N2,N1),trcs_VLN(ids_H1PO4,N6,N5,N4))
-    SDifFlx(ids_NH4B)=SDifc(ids_NH4B)*(CNH4B1-CNH4B2)*AMIN1(trcs_VLN(ids_NH4B,N3,N2,N1),trcs_VLN(ids_NH4B,N6,N5,N4))
-    SDifFlx(idg_NH3B)=SDifc(idg_NH3B)*(CNH3B1-CNH3B2)*AMIN1(trcs_VLN(ids_NH4B,N3,N2,N1),trcs_VLN(ids_NH4B,N6,N5,N4))
-    SDifFlx(ids_NO3)=SDifc(ids_NO3)*(CNO3B1-CNO3B2)*AMIN1(trcs_VLN(ids_NO3B,N3,N2,N1),trcs_VLN(ids_NO3B,N6,N5,N4))
-    SDifFlx(ids_NO2)=SDifc(ids_NO3)*(CNO2B1-CNO2B2)*AMIN1(trcs_VLN(ids_NO3B,N3,N2,N1),trcs_VLN(ids_NO3B,N6,N5,N4))
-    SDifFlx(ids_H1PO4B)=SDifc(ids_H1PO4B)*(CP14B1-CP14B2)*AMIN1(trcs_VLN(ids_H1PO4B,N3,N2,N1),trcs_VLN(ids_H1PO4B,N6,N5,N4))
-    SDifFlx(ids_H2PO4B)=SDifc(ids_H2PO4B)*(CPO4B1-CPO4B2)*AMIN1(trcs_VLN(ids_H1PO4B,N3,N2,N1),trcs_VLN(ids_H1PO4B,N6,N5,N4))
+
+    DO NTG=idg_beg,idg_end-2
+      SDifFlx(NTG)=SDifc(NTG)*(trcsolc1(NTG)-trcsolc2(NTG))
+    ENDDO
+!    SDifFlx(idg_CO2)=SDifc(idg_CO2)*(trcsolc1(idg_CO2)-trcsolc2(idg_CO2))
+!    SDifFlx(idg_CH4)=SDifc(idg_CH4)*(trcsolc1(idg_CH4)-trcsolc2(idg_CH4))
+!    SDifFlx(idg_O2)=SDifc(idg_O2)*(trcsolc1(idg_O2)-trcsolc2(idg_O2))
+!    SDifFlx(idg_N2)=SDifc(idg_N2)*(trcsolc1(idg_N2)-trcsolc2(idg_N2))
+!    SDifFlx(idg_N2O)=SDifc(idg_N2O)*(trcsolc1(idg_N2O)-trcsolc2(idg_N2O))
+!    SDifFlx(idg_H2)=SDifc(idg_H2)*(trcsolc1(idg_H2)-trcsolc2(idg_H2))
+
+    DO NTS=ids_nuts_beg,ids_nuts_end
+      SDifFlx(NTS)=SDifc(NTS)*(trcsolc1(NTS)-trcsolc2(NTS)) &
+        *AMIN1(trcs_VLN(NTS,N3,N2,N1),trcs_VLN(NTS,N6,N5,N4))
+    ENDDO
+!    SDifFlx(idg_NH3)=SDifc(idg_NH3)*(trcsolc1(idg_NH3)-trcsolc2(idg_NH3))*AMIN1(trcs_VLN(idg_NH3,N3,N2,N1),trcs_VLN(idg_NH3,N6,N5,N4))
+!    SDifFlx(ids_NH4)=SDifc(ids_NH4)*(trcsolc1(ids_NH4)-trcsolc2(ids_NH4))*AMIN1(trcs_VLN(ids_NH4,N3,N2,N1),trcs_VLN(ids_NH4,N6,N5,N4))
+!    SDifFlx(ids_NO3)=SDifc(ids_NO3)*(trcsolc1(ids_NO3)-trcsolc2(ids_NO3))*AMIN1(trcs_VLN(ids_NO3,N3,N2,N1),trcs_VLN(ids_NO3,N6,N5,N4))
+!    SDifFlx(ids_NO2)=SDifc(ids_NO2)*(trcsolc1(ids_NO2)-trcsolc2(ids_NO2))*AMIN1(trcs_VLN(ids_NO2,N3,N2,N1),trcs_VLN(ids_NO2,N6,N5,N4))
+!    SDifFlx(ids_H1PO4)=SDifc(ids_H1PO4)*(trcsolc1(ids_H1PO4)-trcsolc2(ids_H1PO4))*AMIN1(trcs_VLN(ids_H1PO4,N3,N2,N1),trcs_VLN(ids_H1PO4,N6,N5,N4))
+!    SDifFlx(ids_H2PO4)=SDifc(ids_H2PO4)*(trcsolc1(ids_H2PO4)-trcsolc2(ids_H2PO4))*AMIN1(trcs_VLN(ids_H2PO4,N3,N2,N1),trcs_VLN(ids_H2PO4,N6,N5,N4))
+!    SDifFlx(ids_NH4B)=SDifc(ids_NH4B)*(trcsolc1(ids_NH4B)-trcsolc2(ids_NH4B))*AMIN1(trcs_VLN(ids_NH4B,N3,N2,N1),trcs_VLN(ids_NH4B,N6,N5,N4))
+!    SDifFlx(idg_NH3B)=SDifc(idg_NH3B)*(trcsolc1(idg_NH3B)-trcsolc2(idg_NH3B))*AMIN1(trcs_VLN(idg_NH3B,N3,N2,N1),trcs_VLN(idg_NH3B,N6,N5,N4))
+!    SDifFlx(ids_NO3B)=SDifc(ids_NO3B)*(trcsolc1(ids_NO3B)-trcsolc2(ids_NO3B))*AMIN1(trcs_VLN(ids_NO3B,N3,N2,N1),trcs_VLN(ids_NO3B,N6,N5,N4))
+!    SDifFlx(ids_NO2B)=SDifc(ids_NO2B)*(trcsolc1(ids_NO2B)-trcsolc2(ids_NO2B))*AMIN1(trcs_VLN(ids_NO2B,N3,N2,N1),trcs_VLN(ids_NO2B,N6,N5,N4))
+!    SDifFlx(ids_H1PO4B)=SDifc(ids_H1PO4B)*(trcsolc1(ids_H1PO4B)-trcsolc2(ids_H1PO4B))*AMIN1(trcs_VLN(ids_H1PO4B,N3,N2,N1),trcs_VLN(ids_H1PO4B,N6,N5,N4))
+!    SDifFlx(ids_H2PO4B)=SDifc(ids_H2PO4B)*(trcsolc1(ids_H2PO4B)-trcsolc2(ids_H2PO4B))*AMIN1(trcs_VLN(ids_H2PO4B,N3,N2,N1),trcs_VLN(ids_H2PO4B,N6,N5,N4))
   ELSE
     D9905: DO K=1,jcplx
       DFVOC(K)=0.0_r8
@@ -750,7 +770,7 @@ module InsideTranspMod
   implicit none
   integer, intent(in) :: M,N,N1,N2,N3,N4,N5,N6
   real(r8) :: trcs_RFH(ids_beg:ids_end)
-  integer  :: K
+  integer  :: K,NTG,NTS
   real(r8) :: VFLW
 !     FLWHM=water flux through soil macropore from watsub.f
 !
@@ -789,24 +809,16 @@ module InsideTranspMod
         RFHOP(K)=VFLW*AZMAX1((OQPH2(K,N3,N2,N1)-AZMIN1(ROPFXS(K,NU(N2,N1),N2,N1))))
         RFHOA(K)=VFLW*AZMAX1((OQAH2(K,N3,N2,N1)-AZMIN1(ROAFXS(K,NU(N2,N1),N2,N1))))
       ENDDO D9800
-      trcs_RFH(idg_CO2)=VFLW*AZMAX1((trc_soHml2(idg_CO2,N3,N2,N1)-AZMIN1(RporeSoXFlx(idg_CO2,NU(N2,N1),N2,N1))))
-      trcs_RFH(idg_CH4)=VFLW*AZMAX1((trc_soHml2(idg_CH4,N3,N2,N1)-AZMIN1(RporeSoXFlx(idg_CH4,NU(N2,N1),N2,N1))))
-      trcs_RFH(idg_O2)=VFLW*AZMAX1((trc_soHml2(idg_O2,N3,N2,N1)-AZMIN1(RporeSoXFlx(idg_O2,NU(N2,N1),N2,N1))))
-      trcs_RFH(idg_N2)=VFLW*AZMAX1((trc_soHml2(idg_N2,N3,N2,N1)-AZMIN1(RporeSoXFlx(idg_N2,NU(N2,N1),N2,N1))))
-      trcs_RFH(idg_N2O)=VFLW*AZMAX1((trc_soHml2(idg_N2O,N3,N2,N1)-AZMIN1(RporeSoXFlx(idg_N2O,NU(N2,N1),N2,N1))))
-      trcs_RFH(idg_H2)=VFLW*AZMAX1((trc_soHml2(idg_H2,N3,N2,N1)-AZMIN1(RporeSoXFlx(idg_H2,NU(N2,N1),N2,N1))))
-      trcs_RFH(ids_NH4)=VFLW*AZMAX1((trc_soHml2(ids_NH4,N3,N2,N1)-AZMIN1(RporeSoXFlx(ids_NH4,NU(N2,N1),N2,N1)*trcs_VLN(ids_NH4,N3,N2,N1))))*trcs_VLN(ids_NH4,N6,N5,N4)
-      trcs_RFH(idg_NH3)=VFLW*AZMAX1((trc_soHml2(idg_NH3,N3,N2,N1)-AZMIN1(RporeSoXFlx(idg_NH3,NU(N2,N1),N2,N1)*trcs_VLN(ids_NH4,N3,N2,N1))))*trcs_VLN(ids_NH4,N6,N5,N4)
-      trcs_RFH(ids_NO3)=VFLW*AZMAX1((trc_soHml2(ids_NO3,N3,N2,N1)-AZMIN1(RporeSoXFlx(ids_NO3,NU(N2,N1),N2,N1)*trcs_VLN(ids_NO3,N3,N2,N1))))*trcs_VLN(ids_NO3,N6,N5,N4)
-      trcs_RFH(ids_NO2)=VFLW*AZMAX1((trc_soHml2(ids_NO2,N3,N2,N1)-AZMIN1(RporeSoXFlx(ids_NO2,NU(N2,N1),N2,N1)*trcs_VLN(ids_NO3,N3,N2,N1))))*trcs_VLN(ids_NO3,N6,N5,N4)
-      trcs_RFH(ids_H1PO4)=VFLW*AZMAX1((trc_soHml2(ids_H1PO4,N3,N2,N1)-AZMIN1(RporeSoXFlx(ids_H1PO4,NU(N2,N1),N2,N1)*trcs_VLN(ids_H1PO4,N3,N2,N1))))*trcs_VLN(ids_H1PO4,N6,N5,N4)
-      trcs_RFH(ids_H2PO4)=VFLW*AZMAX1((trc_soHml2(ids_H2PO4,N3,N2,N1)-AZMIN1(RporeSoXFlx(ids_H2PO4,NU(N2,N1),N2,N1)*trcs_VLN(ids_H1PO4,N3,N2,N1))))*trcs_VLN(ids_H1PO4,N6,N5,N4)
-      trcs_RFH(ids_NH4B)=VFLW*AZMAX1((trc_soHml2(ids_NH4B,N3,N2,N1)-AZMIN1(RporeSoXFlx(ids_NH4B,NU(N2,N1),N2,N1)*trcs_VLN(ids_NH4B,N3,N2,N1))))*trcs_VLN(ids_NH4B,N6,N5,N4)
-      trcs_RFH(idg_NH3B)=VFLW*AZMAX1((trc_soHml2(idg_NH3B,N3,N2,N1)-AZMIN1(RporeSoXFlx(idg_NH3B,NU(N2,N1),N2,N1)*trcs_VLN(ids_NH4B,N3,N2,N1))))*trcs_VLN(ids_NH4B,N6,N5,N4)
-      trcs_RFH(ids_NO3B)=VFLW*AZMAX1((trc_soHml2(ids_NO3B,N3,N2,N1)-AZMIN1(RporeSoXFlx(ids_NO3B,NU(N2,N1),N2,N1)*trcs_VLN(ids_NO3B,N3,N2,N1))))*trcs_VLN(ids_NO3B,N6,N5,N4)
-      trcs_RFH(ids_NO2B)=VFLW*AZMAX1((trc_soHml2(ids_NO2B,N3,N2,N1)-AZMIN1(RporeSoXFlx(ids_NO2B,NU(N2,N1),N2,N1)*trcs_VLN(ids_NO3B,N3,N2,N1))))*trcs_VLN(ids_NO3B,N6,N5,N4)
-      trcs_RFH(ids_H1PO4B)=VFLW*AZMAX1((trc_soHml2(ids_H1PO4B,N3,N2,N1)-AZMIN1(RporeSoXFlx(ids_H1PO4B,NU(N2,N1),N2,N1)*trcs_VLN(ids_H1PO4B,N3,N2,N1))))*trcs_VLN(ids_H1PO4B,N6,N5,N4)
-      trcs_RFH(ids_H2PO4B)=VFLW*AZMAX1((trc_soHml2(ids_H2PO4B,N3,N2,N1)-AZMIN1(RporeSoXFlx(ids_H2PO4B,NU(N2,N1),N2,N1)*trcs_VLN(ids_H1PO4B,N3,N2,N1))))*trcs_VLN(ids_H1PO4B,N6,N5,N4)
+
+      DO NTG=idg_beg,idg_end-2
+        trcs_RFH(NTG)=VFLW*AZMAX1((trc_soHml2(NTG,N3,N2,N1) &
+          -AZMIN1(RporeSoXFlx(NTG,NU(N2,N1),N2,N1))))
+      ENDDO
+
+      DO NTS=ids_nuts_beg,ids_nuts_end
+        trcs_RFH(NTS)=VFLW*AZMAX1((trc_soHml2(NTS,N3,N2,N1) &
+          -AZMIN1(RporeSoXFlx(NTS,NU(N2,N1),N2,N1)*trcs_VLN(NTS,N3,N2,N1))))*trcs_VLN(NTS,N6,N5,N4)
+      ENDDO
 !
 !     OTHERWISE
 !
@@ -817,25 +829,14 @@ module InsideTranspMod
         RFHOP(K)=VFLW*AZMAX1(OQPH2(K,N3,N2,N1))
         RFHOA(K)=VFLW*AZMAX1(OQAH2(K,N3,N2,N1))
       ENDDO D9850
-      trcs_RFH(idg_CO2)=VFLW*AZMAX1(trc_soHml2(idg_CO2,N3,N2,N1))
-      trcs_RFH(idg_CH4)=VFLW*AZMAX1(trc_soHml2(idg_CH4,N3,N2,N1))
-      trcs_RFH(idg_O2)=VFLW*AZMAX1(trc_soHml2(idg_O2,N3,N2,N1))
-      trcs_RFH(idg_N2)=VFLW*AZMAX1(trc_soHml2(idg_N2,N3,N2,N1))
-      trcs_RFH(idg_N2O)=VFLW*AZMAX1(trc_soHml2(idg_N2O,N3,N2,N1))
-      trcs_RFH(idg_H2)=VFLW*AZMAX1(trc_soHml2(idg_H2,N3,N2,N1))
+!exclude NH3 and NH3B
+      DO NTG=idg_beg,idg_end-2
+        trcs_RFH(NTG)=VFLW*AZMAX1(trc_soHml2(NTG,N3,N2,N1))
+      ENDDO
 
-      trcs_RFH(ids_NH4)=VFLW*AZMAX1(trc_soHml2(ids_NH4,N3,N2,N1))*trcs_VLN(ids_NH4,N6,N5,N4)
-      trcs_RFH(idg_NH3)=VFLW*AZMAX1(trc_soHml2(idg_NH3,N3,N2,N1))*trcs_VLN(ids_NH4,N6,N5,N4)
-      trcs_RFH(ids_NO3)=VFLW*AZMAX1(trc_soHml2(ids_NO3,N3,N2,N1))*trcs_VLN(ids_NO3,N6,N5,N4)
-      trcs_RFH(ids_NO2)=VFLW*AZMAX1(trc_soHml2(ids_NO2,N3,N2,N1))*trcs_VLN(ids_NO3,N6,N5,N4)
-      trcs_RFH(ids_H1PO4)=VFLW*AZMAX1(trc_soHml2(ids_H1PO4,N3,N2,N1))*trcs_VLN(ids_H1PO4,N6,N5,N4)
-      trcs_RFH(ids_H2PO4)=VFLW*AZMAX1(trc_soHml2(ids_H2PO4,N3,N2,N1))*trcs_VLN(ids_H1PO4,N6,N5,N4)
-      trcs_RFH(ids_NH4B)=VFLW*AZMAX1(trc_soHml2(ids_NH4B,N3,N2,N1))*trcs_VLN(ids_NH4B,N6,N5,N4)
-      trcs_RFH(idg_NH3B)=VFLW*AZMAX1(trc_soHml2(idg_NH3B,N3,N2,N1))*trcs_VLN(ids_NH4B,N6,N5,N4)
-      trcs_RFH(ids_NO3B)=VFLW*AZMAX1(trc_soHml2(ids_NO3B,N3,N2,N1))*trcs_VLN(ids_NO3B,N6,N5,N4)
-      trcs_RFH(ids_NO2B)=VFLW*AZMAX1(trc_soHml2(ids_NO2B,N3,N2,N1))*trcs_VLN(ids_NO3B,N6,N5,N4)
-      trcs_RFH(ids_H1PO4B)=VFLW*AZMAX1(trc_soHml2(ids_H1PO4B,N3,N2,N1))*trcs_VLN(ids_H1PO4B,N6,N5,N4)
-      trcs_RFH(ids_H2PO4B)=VFLW*AZMAX1(trc_soHml2(ids_H2PO4B,N3,N2,N1))*trcs_VLN(ids_H1PO4B,N6,N5,N4)
+      DO NTS=ids_nuts_beg,ids_nuts_end
+        trcs_RFH(NTS)=VFLW*AZMAX1(trc_soHml2(NTS,N3,N2,N1))*trcs_VLN(NTS,N6,N5,N4)
+      ENDDO
     ENDIF
 !
 !     IF MACROPORE WATER FLUX FROM 'WATSUB' IS FROM ADJACENT TO
@@ -855,24 +856,14 @@ module InsideTranspMod
       RFHOP(K)=VFLW*AZMAX1(OQPH2(K,N6,N5,N4))
       RFHOA(K)=VFLW*AZMAX1(OQAH2(K,N6,N5,N4))
     ENDDO D9665
-    trcs_RFH(idg_CO2)=VFLW*AZMAX1(trc_soHml2(idg_CO2,N6,N5,N4))
-    trcs_RFH(idg_CH4)=VFLW*AZMAX1(trc_soHml2(idg_CH4,N6,N5,N4))
-    trcs_RFH(idg_O2)=VFLW*AZMAX1(trc_soHml2(idg_O2,N6,N5,N4))
-    trcs_RFH(idg_N2)=VFLW*AZMAX1(trc_soHml2(idg_N2,N6,N5,N4))
-    trcs_RFH(idg_N2O)=VFLW*AZMAX1(trc_soHml2(idg_N2O,N6,N5,N4))
-    trcs_RFH(idg_H2)=VFLW*AZMAX1(trc_soHml2(idg_H2,N6,N5,N4))
-    trcs_RFH(ids_NH4)=VFLW*AZMAX1(trc_soHml2(ids_NH4,N6,N5,N4))*trcs_VLN(ids_NH4,N6,N5,N4)
-    trcs_RFH(idg_NH3)=VFLW*AZMAX1(trc_soHml2(idg_NH3,N6,N5,N4))*trcs_VLN(ids_NH4,N6,N5,N4)
-    trcs_RFH(ids_NO3)=VFLW*AZMAX1(trc_soHml2(ids_NO3,N6,N5,N4))*trcs_VLN(ids_NO3,N6,N5,N4)
-    trcs_RFH(ids_NO2)=VFLW*AZMAX1(trc_soHml2(ids_NO2,N6,N5,N4))*trcs_VLN(ids_NO3,N6,N5,N4)
-    trcs_RFH(ids_H1PO4)=VFLW*AZMAX1(trc_soHml2(ids_H1PO4,N6,N5,N4))*trcs_VLN(ids_H1PO4,N6,N5,N4)
-    trcs_RFH(ids_H2PO4)=VFLW*AZMAX1(trc_soHml2(ids_H2PO4,N6,N5,N4))*trcs_VLN(ids_H1PO4,N6,N5,N4)
-    trcs_RFH(ids_NH4B)=VFLW*AZMAX1(trc_soHml2(ids_NH4B,N6,N5,N4))*trcs_VLN(ids_NH4B,N6,N5,N4)
-    trcs_RFH(idg_NH3B)=VFLW*AZMAX1(trc_soHml2(idg_NH3B,N6,N5,N4))*trcs_VLN(ids_NH4B,N6,N5,N4)
-    trcs_RFH(ids_NO3B)=VFLW*AZMAX1(trc_soHml2(ids_NO3B,N6,N5,N4))*trcs_VLN(ids_NO3B,N6,N5,N4)
-    trcs_RFH(ids_NO2B)=VFLW*AZMAX1(trc_soHml2(ids_NO2B,N6,N5,N4))*trcs_VLN(ids_NO3B,N6,N5,N4)
-    trcs_RFH(ids_H1PO4B)=VFLW*AZMAX1(trc_soHml2(ids_H1PO4B,N6,N5,N4))*trcs_VLN(ids_H1PO4B,N6,N5,N4)
-    trcs_RFH(ids_H2PO4B)=VFLW*AZMAX1(trc_soHml2(ids_H2PO4B,N6,N5,N4))*trcs_VLN(ids_H1PO4B,N6,N5,N4)
+
+    DO NTG=idg_beg,idg_end-2
+      trcs_RFH(NTG)=VFLW*AZMAX1(trc_soHml2(NTG,N6,N5,N4))
+    ENDDO
+
+    DO NTS=ids_nuts_beg,ids_nuts_end
+      trcs_RFH(NTS)=VFLW*AZMAX1(trc_soHml2(NTS,N6,N5,N4))*trcs_VLN(NTS,N6,N5,N4)
+    ENDDO
   ELSE
 !
 !     NO MACROPORE FLUX
@@ -886,24 +877,9 @@ module InsideTranspMod
     trcs_RFH(ids_beg:ids_end)=0.0_r8
   ENDIF
 
-  R3PoreSoHFlx(idg_CO2,N,N6,N5,N4)=trcs_RFH(idg_CO2)
-  R3PoreSoHFlx(idg_CH4,N,N6,N5,N4)=trcs_RFH(idg_CH4)
-  R3PoreSoHFlx(idg_O2,N,N6,N5,N4)=trcs_RFH(idg_O2)
-  R3PoreSoHFlx(idg_N2,N,N6,N5,N4)=trcs_RFH(idg_N2)
-  R3PoreSoHFlx(idg_N2O,N,N6,N5,N4)=trcs_RFH(idg_N2O)
-  R3PoreSoHFlx(idg_H2,N,N6,N5,N4)=trcs_RFH(idg_H2)
-  R3PoreSoHFlx(ids_NH4,N,N6,N5,N4)=trcs_RFH(ids_NH4)
-  R3PoreSoHFlx(idg_NH3,N,N6,N5,N4)=trcs_RFH(idg_NH3)
-  R3PoreSoHFlx(ids_NO3,N,N6,N5,N4)=trcs_RFH(ids_NO3)
-  R3PoreSoHFlx(ids_NO2,N,N6,N5,N4)=trcs_RFH(ids_NO2)
-  R3PoreSoHFlx(ids_H1PO4,N,N6,N5,N4)=trcs_RFH(ids_H1PO4)
-  R3PoreSoHFlx(ids_H2PO4,N,N6,N5,N4)=trcs_RFH(ids_H2PO4)
-  R3PoreSoHFlx(ids_NH4B,N,N6,N5,N4)=trcs_RFH(ids_NH4B)
-  R3PoreSoHFlx(idg_NH3B,N,N6,N5,N4)=trcs_RFH(idg_NH3B)
-  R3PoreSoHFlx(ids_NO3B,N,N6,N5,N4)=trcs_RFH(ids_NO3B)
-  R3PoreSoHFlx(ids_NO2B,N,N6,N5,N4)=trcs_RFH(ids_NO2B)
-  R3PoreSoHFlx(ids_H1PO4B,N,N6,N5,N4)=trcs_RFH(ids_H1PO4B)
-  R3PoreSoHFlx(ids_H2PO4B,N,N6,N5,N4)=trcs_RFH(ids_H2PO4B)
+  DO NTS=ids_beg,ids_end
+    R3PoreSoHFlx(NTS,N,N6,N5,N4)=trcs_RFH(NTS)
+  ENDDO
 
   end subroutine SoluteAdvTranspMacropore
 
@@ -913,12 +889,8 @@ module InsideTranspMod
   integer, intent(in) :: M,N,N1,N2,N3,N4,N5,N6
   real(r8) :: VOLH2A,VOLH2B,VOLH3A,VOLH3B,VOLH4A,VOLH4B
   real(r8) :: VOLHMA,VOLHMB,VOLHOA,VOLHOB,VOLHPA,VOLHPB
-  real(r8) :: CCH4SH1,COXYSH1,CZ2OSH1,CZ2GSH1,CPO4BH1
-  real(r8) :: CCO2SH1,CPO4SH1,CH2GSH1,CNH4SH1,CNH3SH1,CNO3SH1,CNO2SH1,CP14SH1
-  real(r8) :: CPO4SH2,CCO2SH2,COXYSH2,CZ2GSH2,CZ2OSH2,CCH4SH2
-  real(r8) :: CH2GSH2,CNH4SH2,CNH3SH2,CNO3SH2,CNO2SH2,CP14SH2
-  real(r8) :: CNH4BH1,CNH3BH1,CNO3BH1,CNO2BH1,CP14BH1
-  real(r8) :: CNH4BH2,CNH3BH2,CNO3BH2,CNO2BH2,CP14BH2,CPO4BH2
+  real(r8) :: trcs_coH1(ids_beg:ids_end)
+  real(r8) :: trcs_coH2(ids_beg:ids_end)
   real(r8) :: SDifc(ids_beg:ids_end),TORTL
   real(r8) :: DIFOC,DIFON,DIFOP,DIFOA
   real(r8) :: DISPN,DLYR1,DLYR2
@@ -969,107 +941,108 @@ module InsideTranspMod
       COQPH2(K)=AZMAX1(OQPH2(K,N6,N5,N4)/VOLWHM(M,N6,N5,N4))
       COQAH2(K)=AZMAX1(OQAH2(K,N6,N5,N4)/VOLWHM(M,N6,N5,N4))
     ENDDO D9790
-    CCO2SH1=AZMAX1(trc_soHml2(idg_CO2,N3,N2,N1)/VOLWHM(M,N3,N2,N1))
-    CCH4SH1=AZMAX1(trc_soHml2(idg_CH4,N3,N2,N1)/VOLWHM(M,N3,N2,N1))
-    COXYSH1=AZMAX1(trc_soHml2(idg_O2,N3,N2,N1)/VOLWHM(M,N3,N2,N1))
-    CZ2GSH1=AZMAX1(trc_soHml2(idg_N2,N3,N2,N1)/VOLWHM(M,N3,N2,N1))
-    CZ2OSH1=AZMAX1(trc_soHml2(idg_N2O,N3,N2,N1)/VOLWHM(M,N3,N2,N1))
-    CH2GSH1=AZMAX1(trc_soHml2(idg_H2,N3,N2,N1)/VOLWHM(M,N3,N2,N1))
+    trcs_coH1(idg_CO2)=AZMAX1(trc_soHml2(idg_CO2,N3,N2,N1)/VOLWHM(M,N3,N2,N1))
+    trcs_coH1(idg_CH4)=AZMAX1(trc_soHml2(idg_CH4,N3,N2,N1)/VOLWHM(M,N3,N2,N1))
+    trcs_coH1(idg_O2)=AZMAX1(trc_soHml2(idg_O2,N3,N2,N1)/VOLWHM(M,N3,N2,N1))
+    trcs_coH1(idg_N2)=AZMAX1(trc_soHml2(idg_N2,N3,N2,N1)/VOLWHM(M,N3,N2,N1))
+    trcs_coH1(idg_N2O)=AZMAX1(trc_soHml2(idg_N2O,N3,N2,N1)/VOLWHM(M,N3,N2,N1))
+    trcs_coH1(idg_H2)=AZMAX1(trc_soHml2(idg_H2,N3,N2,N1)/VOLWHM(M,N3,N2,N1))
     IF(VOLH4A.GT.ZEROS2(N2,N1))THEN
-      CNH4SH1=AZMAX1(trc_soHml2(ids_NH4,N3,N2,N1)/VOLH4A)
-      CNH3SH1=AZMAX1(trc_soHml2(idg_NH3,N3,N2,N1)/VOLH4A)
+      trcs_coH1(ids_NH4)=AZMAX1(trc_soHml2(ids_NH4,N3,N2,N1)/VOLH4A)
+      trcs_coH1(idg_NH3)=AZMAX1(trc_soHml2(idg_NH3,N3,N2,N1)/VOLH4A)
     ELSE
-      CNH4SH1=0.0_r8
-      CNH3SH1=0.0_r8
+      trcs_coH1(ids_NH4)=0.0_r8
+      trcs_coH1(idg_NH3)=0.0_r8
     ENDIF
     IF(VOLH3A.GT.ZEROS2(N2,N1))THEN
-      CNO3SH1=AZMAX1(trc_soHml2(ids_NO3,N3,N2,N1)/VOLH3A)
-      CNO2SH1=AZMAX1(trc_soHml2(ids_NO2,N3,N2,N1)/VOLH3A)
+      trcs_coH1(ids_NO3)=AZMAX1(trc_soHml2(ids_NO3,N3,N2,N1)/VOLH3A)
+      trcs_coH1(ids_NO2)=AZMAX1(trc_soHml2(ids_NO2,N3,N2,N1)/VOLH3A)
     ELSE
-      CNO3SH1=0.0_r8
-      CNO2SH1=0.0_r8
+      trcs_coH1(ids_NO3)=0.0_r8
+      trcs_coH1(ids_NO2)=0.0_r8
     ENDIF
     IF(VOLH2A.GT.ZEROS2(N2,N1))THEN
-      CP14SH1=AZMAX1(trc_soHml2(ids_H1PO4,N3,N2,N1)/VOLH2A)
-      CPO4SH1=AZMAX1(trc_soHml2(ids_H2PO4,N3,N2,N1)/VOLH2A)
+      trcs_coH1(ids_H1PO4)=AZMAX1(trc_soHml2(ids_H1PO4,N3,N2,N1)/VOLH2A)
+      trcs_coH1(ids_H2PO4)=AZMAX1(trc_soHml2(ids_H2PO4,N3,N2,N1)/VOLH2A)
     ELSE
-      CP14SH1=0.0_r8
-      CPO4SH1=0.0_r8
+      trcs_coH1(ids_H1PO4)=0.0_r8
+      trcs_coH1(ids_H2PO4)=0.0_r8
     ENDIF
     IF(VOLH4B.GT.ZEROS2(N2,N1))THEN
-      CNH4BH1=AZMAX1(trc_soHml2(ids_NH4B,N3,N2,N1)/VOLH4B)
-      CNH3BH1=AZMAX1(trc_soHml2(idg_NH3B,N3,N2,N1)/VOLH4B)
+      trcs_coH1(ids_NH4B)=AZMAX1(trc_soHml2(ids_NH4B,N3,N2,N1)/VOLH4B)
+      trcs_coH1(idg_NH3B)=AZMAX1(trc_soHml2(idg_NH3B,N3,N2,N1)/VOLH4B)
     ELSE
-      CNH4BH1=CNH4SH1
-      CNH3BH1=CNH3SH1
+      trcs_coH1(ids_NH4B)=trcs_coH1(ids_NH4)
+      trcs_coH1(idg_NH3B)=trcs_coH1(idg_NH3)
     ENDIF
     IF(VOLH3B.GT.ZEROS2(N2,N1))THEN
-      CNO3BH1=AZMAX1(trc_soHml2(ids_NO3B,N3,N2,N1)/VOLH3B)
-      CNO2BH1=AZMAX1(trc_soHml2(ids_NO2B,N3,N2,N1)/VOLH3B)
+      trcs_coH1(ids_NO3B)=AZMAX1(trc_soHml2(ids_NO3B,N3,N2,N1)/VOLH3B)
+      trcs_coH1(ids_NO2B)=AZMAX1(trc_soHml2(ids_NO2B,N3,N2,N1)/VOLH3B)
     ELSE
-      CNO3BH1=CNO3SH1
-      CNO2BH1=CNO2SH1
+      trcs_coH1(ids_NO3B)=trcs_coH1(ids_NO3)
+      trcs_coH1(ids_NO2B)=trcs_coH1(ids_NO2)
     ENDIF
     IF(VOLH2B.GT.ZEROS2(N2,N1))THEN
-      CP14BH1=AZMAX1(trc_soHml2(ids_H1PO4B,N3,N2,N1)/VOLH2B)
-      CPO4BH1=AZMAX1(trc_soHml2(ids_H2PO4B,N3,N2,N1)/VOLH2B)
+      trcs_coH1(ids_H1PO4B)=AZMAX1(trc_soHml2(ids_H1PO4B,N3,N2,N1)/VOLH2B)
+      trcs_coH1(ids_H2PO4B)=AZMAX1(trc_soHml2(ids_H2PO4B,N3,N2,N1)/VOLH2B)
     ELSE
-      CP14BH1=CP14SH1
-      CPO4BH1=CPO4SH1
+      trcs_coH1(ids_H1PO4B)=trcs_coH1(ids_H1PO4)
+      trcs_coH1(ids_H2PO4B)=trcs_coH1(ids_H2PO4)
     ENDIF
-    CCO2SH2=AZMAX1(trc_soHml2(idg_CO2,N6,N5,N4)/VOLWHM(M,N6,N5,N4))
-    CCH4SH2=AZMAX1(trc_soHml2(idg_CH4,N6,N5,N4)/VOLWHM(M,N6,N5,N4))
-    COXYSH2=AZMAX1(trc_soHml2(idg_O2,N6,N5,N4)/VOLWHM(M,N6,N5,N4))
-    CZ2GSH2=AZMAX1(trc_soHml2(idg_N2,N6,N5,N4)/VOLWHM(M,N6,N5,N4))
-    CZ2OSH2=AZMAX1(trc_soHml2(idg_N2O,N6,N5,N4)/VOLWHM(M,N6,N5,N4))
-    CH2GSH2=AZMAX1(trc_soHml2(idg_H2,N6,N5,N4)/VOLWHM(M,N6,N5,N4))
+
+    trcs_coH2(idg_CO2)=AZMAX1(trc_soHml2(idg_CO2,N6,N5,N4)/VOLWHM(M,N6,N5,N4))
+    trcs_coH2(idg_CH4)=AZMAX1(trc_soHml2(idg_CH4,N6,N5,N4)/VOLWHM(M,N6,N5,N4))
+    trcs_coH2(idg_O2)=AZMAX1(trc_soHml2(idg_O2,N6,N5,N4)/VOLWHM(M,N6,N5,N4))
+    trcs_coH2(idg_N2)=AZMAX1(trc_soHml2(idg_N2,N6,N5,N4)/VOLWHM(M,N6,N5,N4))
+    trcs_coH2(idg_N2O)=AZMAX1(trc_soHml2(idg_N2O,N6,N5,N4)/VOLWHM(M,N6,N5,N4))
+    trcs_coH2(idg_H2)=AZMAX1(trc_soHml2(idg_H2,N6,N5,N4)/VOLWHM(M,N6,N5,N4))
     VOLHMA=VOLWHM(M,N6,N5,N4)*trcs_VLN(ids_NH4,N6,N5,N4)
     IF(VOLHMA.GT.ZEROS2(N5,N4))THEN
-      CNH4SH2=AZMAX1(trc_soHml2(ids_NH4,N6,N5,N4)/VOLHMA)
-      CNH3SH2=AZMAX1(trc_soHml2(idg_NH3,N6,N5,N4)/VOLHMA)
+      trcs_coH2(ids_NH4)=AZMAX1(trc_soHml2(ids_NH4,N6,N5,N4)/VOLHMA)
+      trcs_coH2(idg_NH3)=AZMAX1(trc_soHml2(idg_NH3,N6,N5,N4)/VOLHMA)
     ELSE
-      CNH4SH2=0.0_r8
-      CNH3SH2=0.0_r8
+      trcs_coH2(ids_NH4)=0.0_r8
+      trcs_coH2(idg_NH3)=0.0_r8
     ENDIF
     VOLHOA=VOLWHM(M,N6,N5,N4)*trcs_VLN(ids_NO3,N6,N5,N4)
     IF(VOLHOA.GT.ZEROS2(N5,N4))THEN
-      CNO3SH2=AZMAX1(trc_soHml2(ids_NO3,N6,N5,N4)/VOLHOA)
-      CNO2SH2=AZMAX1(trc_soHml2(ids_NO2,N6,N5,N4)/VOLHOA)
+      trcs_coH2(ids_NO3)=AZMAX1(trc_soHml2(ids_NO3,N6,N5,N4)/VOLHOA)
+      trcs_coH2(ids_NO2)=AZMAX1(trc_soHml2(ids_NO2,N6,N5,N4)/VOLHOA)
     ELSE
-      CNO3SH2=0.0_r8
-      CNO2SH2=0.0_r8
+      trcs_coH2(ids_NO3)=0.0_r8
+      trcs_coH2(ids_NO2)=0.0_r8
     ENDIF
     VOLHPA=VOLWHM(M,N6,N5,N4)*trcs_VLN(ids_H1PO4,N6,N5,N4)
     IF(VOLHPA.GT.ZEROS2(N5,N4))THEN
-      CP14SH2=AZMAX1(trc_soHml2(ids_H1PO4,N6,N5,N4)/VOLHPA)
-      CPO4SH2=AZMAX1(trc_soHml2(ids_H2PO4,N6,N5,N4)/VOLHPA)
+      trcs_coH2(ids_H1PO4)=AZMAX1(trc_soHml2(ids_H1PO4,N6,N5,N4)/VOLHPA)
+      trcs_coH2(ids_H2PO4)=AZMAX1(trc_soHml2(ids_H2PO4,N6,N5,N4)/VOLHPA)
     ELSE
-      CP14SH2=0.0_r8
-      CPO4SH2=0.0_r8
+      trcs_coH2(ids_H1PO4)=0.0_r8
+      trcs_coH2(ids_H2PO4)=0.0_r8
     ENDIF
     VOLHMB=VOLWHM(M,N6,N5,N4)*trcs_VLN(ids_NH4B,N6,N5,N4)
     IF(VOLHMB.GT.ZEROS2(N5,N4))THEN
-      CNH4BH2=AZMAX1(trc_soHml2(ids_NH4B,N6,N5,N4)/VOLHMB)
-      CNH3BH2=AZMAX1(trc_soHml2(idg_NH3B,N6,N5,N4)/VOLHMB)
+      trcs_coH2(ids_NH4B)=AZMAX1(trc_soHml2(ids_NH4B,N6,N5,N4)/VOLHMB)
+      trcs_coH2(idg_NH3B)=AZMAX1(trc_soHml2(idg_NH3B,N6,N5,N4)/VOLHMB)
     ELSE
-      CNH4BH2=CNH4SH2
-      CNH3BH2=CNH3SH2
+      trcs_coH2(ids_NH4B)=trcs_coH2(ids_NH4)
+      trcs_coH2(idg_NH3B)=trcs_coH2(idg_NH3)
     ENDIF
     VOLHOB=VOLWHM(M,N6,N5,N4)*trcs_VLN(ids_NO3B,N6,N5,N4)
     IF(VOLHOB.GT.ZEROS2(N5,N4))THEN
-      CNO3BH2=AZMAX1(trc_soHml2(ids_NO3B,N6,N5,N4)/VOLHOB)
-      CNO2BH2=AZMAX1(trc_soHml2(ids_NO2B,N6,N5,N4)/VOLHOB)
+      trcs_coH2(ids_NO3B)=AZMAX1(trc_soHml2(ids_NO3B,N6,N5,N4)/VOLHOB)
+      trcs_coH2(ids_NO2B)=AZMAX1(trc_soHml2(ids_NO2B,N6,N5,N4)/VOLHOB)
     ELSE
-      CNO3BH2=CNO3SH2
-      CNO2BH2=CNO2SH2
+      trcs_coH2(ids_NO3B)=trcs_coH2(ids_NO3)
+      trcs_coH2(ids_NO2B)=trcs_coH2(ids_NO2)
     ENDIF
     VOLHPB=VOLWHM(M,N6,N5,N4)*trcs_VLN(ids_H1PO4B,N6,N5,N4)
     IF(VOLHPB.GT.ZEROS2(N5,N4))THEN
-      CP14BH2=AZMAX1(trc_soHml2(ids_H1PO4B,N6,N5,N4)/VOLHPB)
-      CPO4BH2=AZMAX1(trc_soHml2(ids_H2PO4B,N6,N5,N4)/VOLHPB)
+      trcs_coH2(ids_H1PO4B)=AZMAX1(trc_soHml2(ids_H1PO4B,N6,N5,N4)/VOLHPB)
+      trcs_coH2(ids_H2PO4B)=AZMAX1(trc_soHml2(ids_H2PO4B,N6,N5,N4)/VOLHPB)
     ELSE
-      CP14BH2=CP14SH2
-      CPO4BH2=CPO4SH2
+      trcs_coH2(ids_H1PO4B)=trcs_coH2(ids_H1PO4)
+      trcs_coH2(ids_H2PO4B)=trcs_coH2(ids_H2PO4)
     ENDIF
 !
 !     DIFFUSIVITIES IN CURRENT AND ADJACENT GRID CELL MACROPORES
@@ -1114,24 +1087,26 @@ module InsideTranspMod
       DFHOP(K)=DIFOP*(COQPH1(K)-COQPH2(K))
       DFHOA(K)=DIFOA*(COQAH1(K)-COQAH2(K))
     ENDDO D9785
-    SDifHFlx(idg_CO2)=SDifc(idg_CO2)*(CCO2SH1-CCO2SH2)
-    SDifHFlx(idg_CH4)=SDifc(idg_CH4)*(CCH4SH1-CCH4SH2)
-    SDifHFlx(idg_O2)=SDifc(idg_O2)*(COXYSH1-COXYSH2)
-    SDifHFlx(idg_N2)=SDifc(idg_N2)*(CZ2GSH1-CZ2GSH2)
-    SDifHFlx(idg_N2O)=SDifc(idg_N2O)*(CZ2OSH1-CZ2OSH2)
-    SDifHFlx(idg_H2)=SDifc(idg_H2)*(CH2GSH1-CH2GSH2)
-    SDifHFlx(ids_NH4)=SDifc(ids_NH4)*(CNH4SH1-CNH4SH2)*AMIN1(trcs_VLN(ids_NH4,N3,N2,N1),trcs_VLN(ids_NH4,N6,N5,N4))
-    SDifHFlx(idg_NH3)=SDifc(idg_NH3)*(CNH3SH1-CNH3SH2)*AMIN1(trcs_VLN(ids_NH4,N3,N2,N1),trcs_VLN(ids_NH4,N6,N5,N4))
-    SDifHFlx(ids_NO3)=SDifc(ids_NO3)*(CNO3SH1-CNO3SH2)*AMIN1(trcs_VLN(ids_NO3,N3,N2,N1),trcs_VLN(ids_NO3,N6,N5,N4))
-    SDifHFlx(ids_NO2)=SDifc(ids_NO2)*(CNO2SH1-CNO2SH2)*AMIN1(trcs_VLN(ids_NO3,N3,N2,N1),trcs_VLN(ids_NO3,N6,N5,N4))
-    SDifHFlx(ids_H1PO4)=SDifc(ids_H1PO4)*(CP14SH1-CP14SH2)*AMIN1(trcs_VLN(ids_H1PO4,N3,N2,N1),trcs_VLN(ids_H1PO4,N6,N5,N4))
-    SDifHFlx(ids_H2PO4)=SDifc(ids_H2PO4)*(CPO4SH1-CPO4SH2)*AMIN1(trcs_VLN(ids_H1PO4,N3,N2,N1),trcs_VLN(ids_H1PO4,N6,N5,N4))
-    SDifHFlx(ids_NH4B)=SDifc(ids_NH4B)*(CNH4BH1-CNH4BH2)*AMIN1(trcs_VLN(ids_NH4B,N3,N2,N1),trcs_VLN(ids_NH4B,N6,N5,N4))
-    SDifHFlx(idg_NH3B)=SDifc(idg_NH3B)*(CNH3BH1-CNH3BH2)*AMIN1(trcs_VLN(ids_NH4B,N3,N2,N1),trcs_VLN(ids_NH4B,N6,N5,N4))
-    SDifHFlx(ids_NO3B)=SDifc(ids_NO3B)*(CNO3BH1-CNO3BH2)*AMIN1(trcs_VLN(ids_NO3B,N3,N2,N1),trcs_VLN(ids_NO3B,N6,N5,N4))
-    SDifHFlx(ids_NO2B)=SDifc(ids_NO2B)*(CNO2BH1-CNO2BH2)*AMIN1(trcs_VLN(ids_NO3B,N3,N2,N1),trcs_VLN(ids_NO3B,N6,N5,N4))
-    SDifHFlx(ids_H1PO4B)=SDifc(ids_H1PO4B)*(CP14BH1-CP14BH2)*AMIN1(trcs_VLN(ids_H1PO4B,N3,N2,N1),trcs_VLN(ids_H1PO4B,N6,N5,N4))
-    SDifHFlx(ids_H2PO4B)=SDifc(ids_H2PO4B)*(CPO4BH1-CPO4BH2)*AMIN1(trcs_VLN(ids_H1PO4B,N3,N2,N1),trcs_VLN(ids_H1PO4B,N6,N5,N4))
+
+    SDifHFlx(idg_CO2)=SDifc(idg_CO2)*(trcs_coH1(idg_CO2)-trcs_coH2(idg_CO2))
+    SDifHFlx(idg_CH4)=SDifc(idg_CH4)*(trcs_coH1(idg_CH4)-trcs_coH2(idg_CH4))
+    SDifHFlx(idg_O2)=SDifc(idg_O2)*(trcs_coH1(idg_O2)-trcs_coH2(idg_O2))
+    SDifHFlx(idg_N2)=SDifc(idg_N2)*(trcs_coH1(idg_N2)-trcs_coH2(idg_N2))
+    SDifHFlx(idg_N2O)=SDifc(idg_N2O)*(trcs_coH1(idg_N2O)-trcs_coH2(idg_N2O))
+    SDifHFlx(idg_H2)=SDifc(idg_H2)*(trcs_coH1(idg_H2)-trcs_coH2(idg_H2))
+
+    SDifHFlx(ids_NH4)=SDifc(ids_NH4)*(trcs_coH1(ids_NH4)-trcs_coH2(ids_NH4))*AMIN1(trcs_VLN(ids_NH4,N3,N2,N1),trcs_VLN(ids_NH4,N6,N5,N4))
+    SDifHFlx(idg_NH3)=SDifc(idg_NH3)*(trcs_coH1(idg_NH3)-trcs_coH2(idg_NH3))*AMIN1(trcs_VLN(ids_NH4,N3,N2,N1),trcs_VLN(ids_NH4,N6,N5,N4))
+    SDifHFlx(ids_NO3)=SDifc(ids_NO3)*(trcs_coH1(ids_NO3)-trcs_coH2(ids_NO3))*AMIN1(trcs_VLN(ids_NO3,N3,N2,N1),trcs_VLN(ids_NO3,N6,N5,N4))
+    SDifHFlx(ids_NO2)=SDifc(ids_NO2)*(trcs_coH1(ids_NO2)-trcs_coH2(ids_NO2))*AMIN1(trcs_VLN(ids_NO3,N3,N2,N1),trcs_VLN(ids_NO3,N6,N5,N4))
+    SDifHFlx(ids_H1PO4)=SDifc(ids_H1PO4)*(trcs_coH1(ids_H1PO4)-trcs_coH2(ids_H1PO4))*AMIN1(trcs_VLN(ids_H1PO4,N3,N2,N1),trcs_VLN(ids_H1PO4,N6,N5,N4))
+    SDifHFlx(ids_H2PO4)=SDifc(ids_H2PO4)*(trcs_coH1(ids_H2PO4)-trcs_coH2(ids_H2PO4))*AMIN1(trcs_VLN(ids_H1PO4,N3,N2,N1),trcs_VLN(ids_H1PO4,N6,N5,N4))
+    SDifHFlx(ids_NH4B)=SDifc(ids_NH4B)*(trcs_coH1(ids_NH4B)-trcs_coH2(ids_NH4B))*AMIN1(trcs_VLN(ids_NH4B,N3,N2,N1),trcs_VLN(ids_NH4B,N6,N5,N4))
+    SDifHFlx(idg_NH3B)=SDifc(idg_NH3B)*(trcs_coH1(idg_NH3B)-trcs_coH2(idg_NH3B))*AMIN1(trcs_VLN(ids_NH4B,N3,N2,N1),trcs_VLN(ids_NH4B,N6,N5,N4))
+    SDifHFlx(ids_NO3B)=SDifc(ids_NO3B)*(trcs_coH1(ids_NO3B)-trcs_coH2(ids_NO3B))*AMIN1(trcs_VLN(ids_NO3B,N3,N2,N1),trcs_VLN(ids_NO3B,N6,N5,N4))
+    SDifHFlx(ids_NO2B)=SDifc(ids_NO2B)*(trcs_coH1(ids_NO2B)-trcs_coH2(ids_NO2B))*AMIN1(trcs_VLN(ids_NO3B,N3,N2,N1),trcs_VLN(ids_NO3B,N6,N5,N4))
+    SDifHFlx(ids_H1PO4B)=SDifc(ids_H1PO4B)*(trcs_coH1(ids_H1PO4B)-trcs_coH2(ids_H1PO4B))*AMIN1(trcs_VLN(ids_H1PO4B,N3,N2,N1),trcs_VLN(ids_H1PO4B,N6,N5,N4))
+    SDifHFlx(ids_H2PO4B)=SDifc(ids_H2PO4B)*(trcs_coH1(ids_H2PO4B)-trcs_coH2(ids_H2PO4B))*AMIN1(trcs_VLN(ids_H1PO4B,N3,N2,N1),trcs_VLN(ids_H1PO4B,N6,N5,N4))
   ELSE
     D9780: DO K=1,jcplx
       DFHOC(K)=0.0_r8

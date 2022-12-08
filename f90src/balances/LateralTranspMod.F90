@@ -68,6 +68,7 @@ implicit none
     VZ2OG2=trc_gasml(idg_N2O,L,NY,NX)/28.0_r8
     VNH3G2=trc_gasml(idg_NH3,L,NY,NX)/natomw
     VH2GG2=trc_gasml(idg_H2,L,NY,NX)/2.0_r8
+
     VTATM=AZMAX1(1.2194E+04*VOLP(L,NY,NX)/TKS(L,NY,NX))
     VTGAS=VCO2G2+VCH4G2+VOXYG2+VZ2GG2+VZ2OG2+VNH3G2+VH2GG2
     IF(THETP(L,NY,NX).LT.THETX.OR.VTGAS.GT.VTATM)LX=1
@@ -343,7 +344,7 @@ implicit none
 !
 !     INITIALIZE GAS AND SOLUTE NET FLUX ACCUMULATORS WITHIN SOIL
 !
-    DO 8595 K=1,jcplx
+    D8595: DO K=1,jcplx
       TOCFLS(K,L,NY,NX)=0.0_r8
       TONFLS(K,L,NY,NX)=0.0_r8
       TOPFLS(K,L,NY,NX)=0.0_r8
@@ -352,149 +353,149 @@ implicit none
       TONFHS(K,L,NY,NX)=0.0_r8
       TOPFHS(K,L,NY,NX)=0.0_r8
       TOAFHS(K,L,NY,NX)=0.0_r8
-8595  CONTINUE
+    ENDDO D8595
     TCOFLS(L,NY,NX)=0.0_r8
-      TCHFLS(L,NY,NX)=0.0_r8
-      TOXFLS(L,NY,NX)=0.0_r8
-      TNGFLS(L,NY,NX)=0.0_r8
-      TN2FLS(L,NY,NX)=0.0_r8
-      THGFLS(L,NY,NX)=0.0_r8
-      TN4FLS(L,NY,NX)=0.0_r8
-      TN3FLS(L,NY,NX)=0.0_r8
-      TNOFLS(L,NY,NX)=0.0_r8
-      TNXFLS(L,NY,NX)=0.0_r8
-      TP1FLS(L,NY,NX)=0.0_r8
-      TPOFLS(L,NY,NX)=0.0_r8
-      TN4FLB(L,NY,NX)=0.0_r8
-      TN3FLB(L,NY,NX)=0.0_r8
-      TNOFLB(L,NY,NX)=0.0_r8
-      TNXFLB(L,NY,NX)=0.0_r8
-      TH1BFB(L,NY,NX)=0.0_r8
-      TH2BFB(L,NY,NX)=0.0_r8
-      TCOFHS(L,NY,NX)=0.0_r8
-      TCHFHS(L,NY,NX)=0.0_r8
-      TOXFHS(L,NY,NX)=0.0_r8
-      TNGFHS(L,NY,NX)=0.0_r8
-      TN2FHS(L,NY,NX)=0.0_r8
-      THGFHS(L,NY,NX)=0.0_r8
-      TN4FHS(L,NY,NX)=0.0_r8
-      TN3FHS(L,NY,NX)=0.0_r8
-      TNOFHS(L,NY,NX)=0.0_r8
-      TNXFHS(L,NY,NX)=0.0_r8
-      TP1FHS(L,NY,NX)=0.0_r8
-      TPOFHS(L,NY,NX)=0.0_r8
-      TN4FHB(L,NY,NX)=0.0_r8
-      TN3FHB(L,NY,NX)=0.0_r8
-      TNOFHB(L,NY,NX)=0.0_r8
-      TNXFHB(L,NY,NX)=0.0_r8
-      TH1BHB(L,NY,NX)=0.0_r8
-      TH2BHB(L,NY,NX)=0.0_r8
-      TCOFLG(L,NY,NX)=0.0_r8
-      TCHFLG(L,NY,NX)=0.0_r8
-      TOXFLG(L,NY,NX)=0.0_r8
-      TNGFLG(L,NY,NX)=0.0_r8
-      TN2FLG(L,NY,NX)=0.0_r8
-      TNHFLG(L,NY,NX)=0.0_r8
-      THGFLG(L,NY,NX)=0.0_r8
+    TCHFLS(L,NY,NX)=0.0_r8
+    TOXFLS(L,NY,NX)=0.0_r8
+    TNGFLS(L,NY,NX)=0.0_r8
+    TN2FLS(L,NY,NX)=0.0_r8
+    THGFLS(L,NY,NX)=0.0_r8
+    TN4FLS(L,NY,NX)=0.0_r8
+    TN3FLS(L,NY,NX)=0.0_r8
+    TNOFLS(L,NY,NX)=0.0_r8
+    TNXFLS(L,NY,NX)=0.0_r8
+    TP1FLS(L,NY,NX)=0.0_r8
+    TPOFLS(L,NY,NX)=0.0_r8
+    TN4FLB(L,NY,NX)=0.0_r8
+    TN3FLB(L,NY,NX)=0.0_r8
+    TNOFLB(L,NY,NX)=0.0_r8
+    TNXFLB(L,NY,NX)=0.0_r8
+    TH1BFB(L,NY,NX)=0.0_r8
+    TH2BFB(L,NY,NX)=0.0_r8
+    TCOFHS(L,NY,NX)=0.0_r8
+    TCHFHS(L,NY,NX)=0.0_r8
+    TOXFHS(L,NY,NX)=0.0_r8
+    TNGFHS(L,NY,NX)=0.0_r8
+    TN2FHS(L,NY,NX)=0.0_r8
+    THGFHS(L,NY,NX)=0.0_r8
+    TN4FHS(L,NY,NX)=0.0_r8
+    TN3FHS(L,NY,NX)=0.0_r8
+    TNOFHS(L,NY,NX)=0.0_r8
+    TNXFHS(L,NY,NX)=0.0_r8
+    TP1FHS(L,NY,NX)=0.0_r8
+    TPOFHS(L,NY,NX)=0.0_r8
+    TN4FHB(L,NY,NX)=0.0_r8
+    TN3FHB(L,NY,NX)=0.0_r8
+    TNOFHB(L,NY,NX)=0.0_r8
+    TNXFHB(L,NY,NX)=0.0_r8
+    TH1BHB(L,NY,NX)=0.0_r8
+    TH2BHB(L,NY,NX)=0.0_r8
+    TCOFLG(L,NY,NX)=0.0_r8
+    TCHFLG(L,NY,NX)=0.0_r8
+    TOXFLG(L,NY,NX)=0.0_r8
+    TNGFLG(L,NY,NX)=0.0_r8
+    TN2FLG(L,NY,NX)=0.0_r8
+    TNHFLG(L,NY,NX)=0.0_r8
+    THGFLG(L,NY,NX)=0.0_r8
     IF(ISALTG.NE.0)THEN
-      TALFLS(L,NY,NX)=0.0_r8
-      TFEFLS(L,NY,NX)=0.0_r8
-      THYFLS(L,NY,NX)=0.0_r8
-      TCAFLS(L,NY,NX)=0.0_r8
-      TMGFLS(L,NY,NX)=0.0_r8
-      TNAFLS(L,NY,NX)=0.0_r8
-      TKAFLS(L,NY,NX)=0.0_r8
-      TOHFLS(L,NY,NX)=0.0_r8
-      TSOFLS(L,NY,NX)=0.0_r8
-      TCLFLS(L,NY,NX)=0.0_r8
-      TC3FLS(L,NY,NX)=0.0_r8
-      THCFLS(L,NY,NX)=0.0_r8
-      TAL1FS(L,NY,NX)=0.0_r8
-      TAL2FS(L,NY,NX)=0.0_r8
-      TAL3FS(L,NY,NX)=0.0_r8
-      TAL4FS(L,NY,NX)=0.0_r8
-      TALSFS(L,NY,NX)=0.0_r8
-      TFE1FS(L,NY,NX)=0.0_r8
-      TFE2FS(L,NY,NX)=0.0_r8
-      TFE3FS(L,NY,NX)=0.0_r8
-      TFE4FS(L,NY,NX)=0.0_r8
-      TFESFS(L,NY,NX)=0.0_r8
-      TCAOFS(L,NY,NX)=0.0_r8
-      TCACFS(L,NY,NX)=0.0_r8
-      TCAHFS(L,NY,NX)=0.0_r8
-      TCASFS(L,NY,NX)=0.0_r8
-      TMGOFS(L,NY,NX)=0.0_r8
-      TMGCFS(L,NY,NX)=0.0_r8
-      TMGHFS(L,NY,NX)=0.0_r8
-      TMGSFS(L,NY,NX)=0.0_r8
-      TNACFS(L,NY,NX)=0.0_r8
-      TNASFS(L,NY,NX)=0.0_r8
-      TKASFS(L,NY,NX)=0.0_r8
-      TH0PFS(L,NY,NX)=0.0_r8
-      TH3PFS(L,NY,NX)=0.0_r8
-      TF1PFS(L,NY,NX)=0.0_r8
-      TF2PFS(L,NY,NX)=0.0_r8
-      TC0PFS(L,NY,NX)=0.0_r8
-      TC1PFS(L,NY,NX)=0.0_r8
-      TC2PFS(L,NY,NX)=0.0_r8
-      TM1PFS(L,NY,NX)=0.0_r8
-      TH0BFB(L,NY,NX)=0.0_r8
-      TH3BFB(L,NY,NX)=0.0_r8
-      TF1BFB(L,NY,NX)=0.0_r8
-      TF2BFB(L,NY,NX)=0.0_r8
-      TC0BFB(L,NY,NX)=0.0_r8
-      TC1BFB(L,NY,NX)=0.0_r8
-      TC2BFB(L,NY,NX)=0.0_r8
-      TM1BFB(L,NY,NX)=0.0_r8
-      TALFHS(L,NY,NX)=0.0_r8
-      TFEFHS(L,NY,NX)=0.0_r8
-      THYFHS(L,NY,NX)=0.0_r8
-      TCAFHS(L,NY,NX)=0.0_r8
-      TMGFHS(L,NY,NX)=0.0_r8
-      TNAFHS(L,NY,NX)=0.0_r8
-      TKAFHS(L,NY,NX)=0.0_r8
-      TOHFHS(L,NY,NX)=0.0_r8
-      TSOFHS(L,NY,NX)=0.0_r8
-      TCLFHS(L,NY,NX)=0.0_r8
-      TC3FHS(L,NY,NX)=0.0_r8
-      THCFHS(L,NY,NX)=0.0_r8
-      TAL1HS(L,NY,NX)=0.0_r8
-      TAL2HS(L,NY,NX)=0.0_r8
-      TAL3HS(L,NY,NX)=0.0_r8
-      TAL4HS(L,NY,NX)=0.0_r8
-      TALSHS(L,NY,NX)=0.0_r8
-      TFE1HS(L,NY,NX)=0.0_r8
-      TFE2HS(L,NY,NX)=0.0_r8
-      TFE3HS(L,NY,NX)=0.0_r8
-      TFE4HS(L,NY,NX)=0.0_r8
-      TFESHS(L,NY,NX)=0.0_r8
-      TCAOHS(L,NY,NX)=0.0_r8
-      TCACHS(L,NY,NX)=0.0_r8
-      TCAHHS(L,NY,NX)=0.0_r8
-      TCASHS(L,NY,NX)=0.0_r8
-      TMGOHS(L,NY,NX)=0.0_r8
-      TMGCHS(L,NY,NX)=0.0_r8
-      TMGHHS(L,NY,NX)=0.0_r8
-      TMGSHS(L,NY,NX)=0.0_r8
-      TNACHS(L,NY,NX)=0.0_r8
-      TNASHS(L,NY,NX)=0.0_r8
-      TKASHS(L,NY,NX)=0.0_r8
-      TH0PHS(L,NY,NX)=0.0_r8
-      TH3PHS(L,NY,NX)=0.0_r8
-      TF1PHS(L,NY,NX)=0.0_r8
-      TF2PHS(L,NY,NX)=0.0_r8
-      TC0PHS(L,NY,NX)=0.0_r8
-      TC1PHS(L,NY,NX)=0.0_r8
-      TC2PHS(L,NY,NX)=0.0_r8
-      TM1PHS(L,NY,NX)=0.0_r8
-      TH0BHB(L,NY,NX)=0.0_r8
-      TH3BHB(L,NY,NX)=0.0_r8
-      TF1BHB(L,NY,NX)=0.0_r8
-      TF2BHB(L,NY,NX)=0.0_r8
-      TC0BHB(L,NY,NX)=0.0_r8
-      TC1BHB(L,NY,NX)=0.0_r8
-      TC2BHB(L,NY,NX)=0.0_r8
-      TM1BHB(L,NY,NX)=0.0_r8
+      trcsa_TFLS(idsa_Al,L,NY,NX)=0.0_r8
+      trcsa_TFLS(idsa_Fe,L,NY,NX)=0.0_r8
+      trcsa_TFLS(idsa_Hp,L,NY,NX)=0.0_r8
+      trcsa_TFLS(idsa_Ca,L,NY,NX)=0.0_r8
+      trcsa_TFLS(idsa_Mg,L,NY,NX)=0.0_r8
+      trcsa_TFLS(idsa_Na,L,NY,NX)=0.0_r8
+      trcsa_TFLS(idsa_K,L,NY,NX)=0.0_r8
+      trcsa_TFLS(idsa_OH,L,NY,NX)=0.0_r8
+      trcsa_TFLS(idsa_SO4,L,NY,NX)=0.0_r8
+      trcsa_TFLS(idsa_Cl,L,NY,NX)=0.0_r8
+      trcsa_TFLS(idsa_CO3,L,NY,NX)=0.0_r8
+      trcsa_TFLS(idsa_HCO3,L,NY,NX)=0.0_r8
+      trcsa_TFLS(idsa_AlOH,L,NY,NX)=0.0_r8
+      trcsa_TFLS(idsa_AlOH2,L,NY,NX)=0.0_r8
+      trcsa_TFLS(idsa_AlOH3,L,NY,NX)=0.0_r8
+      trcsa_TFLS(idsa_AlOH4,L,NY,NX)=0.0_r8
+      trcsa_TFLS(idsa_AlSO4,L,NY,NX)=0.0_r8
+      trcsa_TFLS(idsa_FeOH,L,NY,NX)=0.0_r8
+      trcsa_TFLS(idsa_FeOH2,L,NY,NX)=0.0_r8
+      trcsa_TFLS(idsa_FeOH3,L,NY,NX)=0.0_r8
+      trcsa_TFLS(idsa_FeOH4,L,NY,NX)=0.0_r8
+      trcsa_TFLS(idsa_SO4,L,NY,NX)=0.0_r8
+      trcsa_TFLS(idsa_CaOH2,L,NY,NX)=0.0_r8
+      trcsa_TFLS(idsa_CaCO3,L,NY,NX)=0.0_r8
+      trcsa_TFLS(idsa_CaHCO3,L,NY,NX)=0.0_r8
+      trcsa_TFLS(idsa_CaSO4,L,NY,NX)=0.0_r8
+      trcsa_TFLS(idsa_MgOH2,L,NY,NX)=0.0_r8
+      trcsa_TFLS(idsa_MgCO3,L,NY,NX)=0.0_r8
+      trcsa_TFLS(idsa_MgHCO3,L,NY,NX)=0.0_r8
+      trcsa_TFLS(idsa_MgSO4,L,NY,NX)=0.0_r8
+      trcsa_TFLS(idsa_NaCO3,L,NY,NX)=0.0_r8
+      trcsa_TFLS(idsa_NaSO4,L,NY,NX)=0.0_r8
+      trcsa_TFLS(idsa_KSO4,L,NY,NX)=0.0_r8
+      trcsa_TFLS(idsa_H0PO4,L,NY,NX)=0.0_r8
+      trcsa_TFLS(idsa_H3PO4,L,NY,NX)=0.0_r8
+      trcsa_TFLS(idsa_FeHPO4,L,NY,NX)=0.0_r8
+      trcsa_TFLS(idsa_FeH2PO4,L,NY,NX)=0.0_r8
+      trcsa_TFLS(idsa_CaPO4,L,NY,NX)=0.0_r8
+      trcsa_TFLS(idsa_CaHPO4,L,NY,NX)=0.0_r8
+      trcsa_TFLS(idsa_CaH2PO4,L,NY,NX)=0.0_r8
+      trcsa_TFLS(idsa_MgHPO4,L,NY,NX)=0.0_r8
+      trcsa_TFLS(idsa_H0PO4B,L,NY,NX)=0.0_r8
+      trcsa_TFLS(idsa_H3PO4B,L,NY,NX)=0.0_r8
+      trcsa_TFLS(idsa_FeHPO4B,L,NY,NX)=0.0_r8
+      trcsa_TFLS(idsa_FeH2PO4B,L,NY,NX)=0.0_r8
+      trcsa_TFLS(idsa_CaPO4B,L,NY,NX)=0.0_r8
+      trcsa_TFLS(idsa_CaHPO4B,L,NY,NX)=0.0_r8
+      trcsa_TFLS(idsa_CaH2PO4B,L,NY,NX)=0.0_r8
+      trcsa_TFLS(idsa_MgHPO4B,L,NY,NX)=0.0_r8
+      trcsa_TFHS(idsa_Al,L,NY,NX)=0.0_r8
+      trcsa_TFHS(idsa_Fe,L,NY,NX)=0.0_r8
+      trcsa_TFHS(idsa_Hp,L,NY,NX)=0.0_r8
+      trcsa_TFHS(idsa_Ca,L,NY,NX)=0.0_r8
+      trcsa_TFHS(idsa_Mg,L,NY,NX)=0.0_r8
+      trcsa_TFHS(idsa_Na,L,NY,NX)=0.0_r8
+      trcsa_TFHS(idsa_K,L,NY,NX)=0.0_r8
+      trcsa_TFHS(idsa_OH,L,NY,NX)=0.0_r8
+      trcsa_TFHS(idsa_SO4,L,NY,NX)=0.0_r8
+      trcsa_TFHS(idsa_Cl,L,NY,NX)=0.0_r8
+      trcsa_TFHS(idsa_CO3,L,NY,NX)=0.0_r8
+      trcsa_TFHS(idsa_HCO3,L,NY,NX)=0.0_r8
+      trcsa_TFHS(idsa_AlOH,L,NY,NX)=0.0_r8
+      trcsa_TFHS(idsa_AlOH2,L,NY,NX)=0.0_r8
+      trcsa_TFHS(idsa_AlOH3,L,NY,NX)=0.0_r8
+      trcsa_TFHS(idsa_AlOH4,L,NY,NX)=0.0_r8
+      trcsa_TFHS(idsa_AlSO4,L,NY,NX)=0.0_r8
+      trcsa_TFHS(idsa_FeOH,L,NY,NX)=0.0_r8
+      trcsa_TFHS(idsa_FeOH2,L,NY,NX)=0.0_r8
+      trcsa_TFHS(idsa_FeOH3,L,NY,NX)=0.0_r8
+      trcsa_TFHS(idsa_FeOH4,L,NY,NX)=0.0_r8
+      trcsa_TFHS(idsa_FeSO4,L,NY,NX)=0.0_r8
+      trcsa_TFHS(idsa_CaOH2,L,NY,NX)=0.0_r8
+      trcsa_TFHS(idsa_CaCO3,L,NY,NX)=0.0_r8
+      trcsa_TFHS(idsa_MgHPO4,L,NY,NX)=0.0_r8
+      trcsa_TFHS(idsa_CaSO4,L,NY,NX)=0.0_r8
+      trcsa_TFHS(idsa_MgOH2,L,NY,NX)=0.0_r8
+      trcsa_TFHS(idsa_MgCO3,L,NY,NX)=0.0_r8
+      trcsa_TFHS(idsa_MgHCO3,L,NY,NX)=0.0_r8
+      trcsa_TFHS(idsa_MgSO4,L,NY,NX)=0.0_r8
+      trcsa_TFHS(idsa_NaCO3,L,NY,NX)=0.0_r8
+      trcsa_TFHS(idsa_NaSO4,L,NY,NX)=0.0_r8
+      trcsa_TFHS(idsa_KSO4,L,NY,NX)=0.0_r8
+      trcsa_TFHS(idsa_H0PO4,L,NY,NX)=0.0_r8
+      trcsa_TFHS(idsa_H3PO4,L,NY,NX)=0.0_r8
+      trcsa_TFHS(idsa_FeHPO4,L,NY,NX)=0.0_r8
+      trcsa_TFHS(idsa_FeH2PO4,L,NY,NX)=0.0_r8
+      trcsa_TFHS(idsa_CaPO4,L,NY,NX)=0.0_r8
+      trcsa_TFHS(idsa_CaHPO4,L,NY,NX)=0.0_r8
+      trcsa_TFHS(idsa_CaH2PO4,L,NY,NX)=0.0_r8
+      trcsa_TFHS(idsa_MgHPO4,L,NY,NX)=0.0_r8
+      trcsa_TFHS(idsa_H0PO4B,L,NY,NX)=0.0_r8
+      trcsa_TFHS(idsa_H3PO4B,L,NY,NX)=0.0_r8
+      trcsa_TFHS(idsa_FeHPO4B,L,NY,NX)=0.0_r8
+      trcsa_TFHS(idsa_FeH2PO4B,L,NY,NX)=0.0_r8
+      trcsa_TFHS(idsa_CaPO4B,L,NY,NX)=0.0_r8
+      trcsa_TFHS(idsa_CaHPO4B,L,NY,NX)=0.0_r8
+      trcsa_TFHS(idsa_CaH2PO4B,L,NY,NX)=0.0_r8
+      trcsa_TFHS(idsa_MgHPO4B,L,NY,NX)=0.0_r8
     ENDIF
   ENDDO
   end subroutine ZeroFluxAccumulators
@@ -769,6 +770,7 @@ implicit none
         TQRM1P(N2,N1)=TQRM1P(N2,N1)-XQRM1P(N,NN,N5B,N4B)
       ENDIF
     ENDDO D1203
+
     trcsa_TQS(idsa_Al,N2,N1)=trcsa_TQS(idsa_Al,N2,N1)+XQSAL(N,N2,N1)-XQSAL(N,N5,N4)
     trcsa_TQS(idsa_Fe,N2,N1)=trcsa_TQS(idsa_Fe,N2,N1)+XQSFE(N,N2,N1)-XQSFE(N,N5,N4)
     trcsa_TQS(idsa_Hp,N2,N1)=trcsa_TQS(idsa_Hp,N2,N1)+XQSHY(N,N2,N1)-XQSHY(N,N5,N4)
@@ -865,8 +867,8 @@ implicit none
         ENDDO
 
         DO NTN=ids_nut_beg,ids_nuts_end
-          trcn_TBLS(NTN,LS,N2,N1)=trcn_TBLS(NTN,LS,N2,N1)+trcg_XBLS(NTN,LS,N2,N1) &
-            -trcg_XBLS(NTN,LS2,N2,N1)
+          trcn_TBLS(NTN,LS,N2,N1)=trcn_TBLS(NTN,LS,N2,N1)+trcn_XBLS(NTN,LS,N2,N1) &
+            -trcn_XBLS(NTN,LS2,N2,N1)
         ENDDO
 !
 !     NET SALT FLUXES THROUGH SNOWPACK
@@ -917,198 +919,198 @@ implicit none
           -trcs_XFHS(idg_NH3,3,NUM(N2,N1),N2,N1)-trcs_XFLS(idg_NH3B,3,NUM(N2,N1),N2,N1) &
           -trcs_XFHS(idg_NH3B,3,NUM(N2,N1),N2,N1)
 
-        trcn_TBLS(ids_NH4,LS,N2,N1)=trcn_TBLS(ids_NH4,LS,N2,N1)+trcg_XBLS(ids_NH4,LS,N2,N1) &
+        trcn_TBLS(ids_NH4,LS,N2,N1)=trcn_TBLS(ids_NH4,LS,N2,N1)+trcn_XBLS(ids_NH4,LS,N2,N1) &
           -trcs_XFLS(ids_NH4,3,0,N2,N1)-trcs_XFLS(ids_NH4,3,NUM(N2,N1),N2,N1) &
           -trcs_XFHS(ids_NH4,3,NUM(N2,N1),N2,N1)-trcs_XFLS(ids_NH4B,3,NUM(N2,N1),N2,N1) &
           -trcs_XFHS(ids_NH4B,3,NUM(N2,N1),N2,N1)
 
-        trcn_TBLS(ids_NO3,LS,N2,N1)=trcn_TBLS(ids_NO3,LS,N2,N1)+trcg_XBLS(ids_NO3,LS,N2,N1) &
+        trcn_TBLS(ids_NO3,LS,N2,N1)=trcn_TBLS(ids_NO3,LS,N2,N1)+trcn_XBLS(ids_NO3,LS,N2,N1) &
           -trcs_XFLS(ids_NO3,3,0,N2,N1)-trcs_XFLS(ids_NO3,3,NUM(N2,N1),N2,N1) &
           -trcs_XFHS(ids_NO3,3,NUM(N2,N1),N2,N1)-trcs_XFLS(ids_NO3B,3,NUM(N2,N1),N2,N1) &
           -trcs_XFHS(ids_NO3B,3,NUM(N2,N1),N2,N1)
 
-        trcn_TBLS(ids_H1PO4,LS,N2,N1)=trcn_TBLS(ids_H1PO4,LS,N2,N1)+trcg_XBLS(ids_H1PO4,LS,N2,N1) &
+        trcn_TBLS(ids_H1PO4,LS,N2,N1)=trcn_TBLS(ids_H1PO4,LS,N2,N1)+trcn_XBLS(ids_H1PO4,LS,N2,N1) &
           -trcs_XFLS(ids_H1PO4,3,0,N2,N1)-trcs_XFLS(ids_H1PO4,3,NUM(N2,N1),N2,N1) &
           -trcs_XFHS(ids_H1PO4,3,NUM(N2,N1),N2,N1)-trcs_XFLS(ids_H1PO4B,3,NUM(N2,N1),N2,N1) &
           -trcs_XFHS(ids_H1PO4B,3,NUM(N2,N1),N2,N1)
 
-        trcn_TBLS(ids_H2PO4,LS,N2,N1)=trcn_TBLS(ids_H2PO4,LS,N2,N1)+trcg_XBLS(ids_H2PO4,LS,N2,N1) &
+        trcn_TBLS(ids_H2PO4,LS,N2,N1)=trcn_TBLS(ids_H2PO4,LS,N2,N1)+trcn_XBLS(ids_H2PO4,LS,N2,N1) &
           -trcs_XFLS(ids_H2PO4,3,0,N2,N1)-trcs_XFLS(ids_H2PO4,3,NUM(N2,N1),N2,N1) &
           -trcs_XFHS(ids_H2PO4,3,NUM(N2,N1),N2,N1)-trcs_XFLS(ids_H2PO4B,3,NUM(N2,N1),N2,N1) &
           -trcs_XFHS(ids_H2PO4B,3,NUM(N2,N1),N2,N1)
 
         IF(ISALTG.NE.0)THEN
           trcsa_TBLS(idsa_Al,LS,NY,NX)=trcsa_TBLS(idsa_Al,LS,NY,NX)+trcsa_XBLS(idsa_Al,LS,NY,NX) &
-          -trcsa_XFLS(idsa_Al,3,0,N2,N1)-trcsa_XFLS(idsa_Al,3,NUM(N2,N1),N2,N1) &
-          -trcsa_XFHS(idsa_Al,3,NUM(N2,N1),N2,N1)
+            -trcsa_XFLS(idsa_Al,3,0,N2,N1)-trcsa_XFLS(idsa_Al,3,NUM(N2,N1),N2,N1) &
+            -trcsa_XFHS(idsa_Al,3,NUM(N2,N1),N2,N1)
 
           trcsa_TBLS(idsa_Fe,LS,NY,NX)=trcsa_TBLS(idsa_Fe,LS,NY,NX)+trcsa_XBLS(idsa_Fe,LS,NY,NX) &
-          -trcsa_XFLS(idsa_Fe,3,0,N2,N1)-trcsa_XFLS(idsa_Fe,3,NUM(N2,N1),N2,N1) &
-          -trcsa_XFHS(idsa_Fe,3,NUM(N2,N1),N2,N1)
+            -trcsa_XFLS(idsa_Fe,3,0,N2,N1)-trcsa_XFLS(idsa_Fe,3,NUM(N2,N1),N2,N1) &
+            -trcsa_XFHS(idsa_Fe,3,NUM(N2,N1),N2,N1)
 
           trcsa_TBLS(idsa_Hp,LS,NY,NX)=trcsa_TBLS(idsa_Hp,LS,NY,NX)+trcsa_XBLS(idsa_Hp,LS,NY,NX) &
-          -trcsa_XFLS(idsa_Hp,3,0,N2,N1)-trcsa_XFLS(idsa_Hp,3,NUM(N2,N1),N2,N1) &
-          -trcsa_XFHS(idsa_Hp,3,NUM(N2,N1),N2,N1)
+            -trcsa_XFLS(idsa_Hp,3,0,N2,N1)-trcsa_XFLS(idsa_Hp,3,NUM(N2,N1),N2,N1) &
+            -trcsa_XFHS(idsa_Hp,3,NUM(N2,N1),N2,N1)
 
           trcsa_TBLS(idsa_Ca,LS,NY,NX)=trcsa_TBLS(idsa_Ca,LS,NY,NX)+trcsa_XBLS(idsa_Ca,LS,NY,NX) &
-          -trcsa_XFLS(idsa_Ca,3,0,N2,N1)-trcsa_XFLS(idsa_Ca,3,NUM(N2,N1),N2,N1) &
-          -trcsa_XFHS(idsa_Ca,3,NUM(N2,N1),N2,N1)
+            -trcsa_XFLS(idsa_Ca,3,0,N2,N1)-trcsa_XFLS(idsa_Ca,3,NUM(N2,N1),N2,N1) &
+            -trcsa_XFHS(idsa_Ca,3,NUM(N2,N1),N2,N1)
 
           trcsa_TBLS(idsa_Mg,LS,NY,NX)=trcsa_TBLS(idsa_Mg,LS,NY,NX)+trcsa_XBLS(idsa_Mg,LS,NY,NX) &
-          -trcsa_XFLS(idsa_Mg,3,0,N2,N1)-trcsa_XFLS(idsa_Mg,3,NUM(N2,N1),N2,N1) &
-          -trcsa_XFHS(idsa_Mg,3,NUM(N2,N1),N2,N1)
+            -trcsa_XFLS(idsa_Mg,3,0,N2,N1)-trcsa_XFLS(idsa_Mg,3,NUM(N2,N1),N2,N1) &
+            -trcsa_XFHS(idsa_Mg,3,NUM(N2,N1),N2,N1)
 
           trcsa_TBLS(idsa_Na,LS,NY,NX)=trcsa_TBLS(idsa_Na,LS,NY,NX)+trcsa_XBLS(idsa_Na,LS,NY,NX) &
-          -trcsa_XFLS(idsa_Na,3,0,N2,N1)-trcsa_XFLS(idsa_Na,3,NUM(N2,N1),N2,N1) &
-          -trcsa_XFHS(idsa_Na,3,NUM(N2,N1),N2,N1)
+            -trcsa_XFLS(idsa_Na,3,0,N2,N1)-trcsa_XFLS(idsa_Na,3,NUM(N2,N1),N2,N1) &
+            -trcsa_XFHS(idsa_Na,3,NUM(N2,N1),N2,N1)
 
           trcsa_TBLS(idsa_K,LS,NY,NX)=trcsa_TBLS(idsa_K,LS,NY,NX)+trcsa_XBLS(idsa_K,LS,NY,NX) &
-          -trcsa_XFLS(idsa_K,3,0,N2,N1)-trcsa_XFLS(idsa_K,3,NUM(N2,N1),N2,N1) &
-          -trcsa_XFHS(idsa_K,3,NUM(N2,N1),N2,N1)
+            -trcsa_XFLS(idsa_K,3,0,N2,N1)-trcsa_XFLS(idsa_K,3,NUM(N2,N1),N2,N1) &
+            -trcsa_XFHS(idsa_K,3,NUM(N2,N1),N2,N1)
 
           trcsa_TBLS(idsa_OH,LS,NY,NX)=trcsa_TBLS(idsa_OH,LS,NY,NX)+trcsa_XBLS(idsa_OH,LS,NY,NX) &
-          -trcsa_XFLS(idsa_OH,3,0,N2,N1)-trcsa_XFLS(idsa_OH,3,NUM(N2,N1),N2,N1) &
-          -trcsa_XFHS(idsa_OH,3,NUM(N2,N1),N2,N1)
+            -trcsa_XFLS(idsa_OH,3,0,N2,N1)-trcsa_XFLS(idsa_OH,3,NUM(N2,N1),N2,N1) &
+            -trcsa_XFHS(idsa_OH,3,NUM(N2,N1),N2,N1)
 
           trcsa_TBLS(idsa_SO4,LS,NY,NX)=trcsa_TBLS(idsa_SO4,LS,NY,NX)+trcsa_XBLS(idsa_SO4,LS,NY,NX) &
-          -trcsa_XFLS(idsa_SO4,3,0,N2,N1)-trcsa_XFLS(idsa_SO4,3,NUM(N2,N1),N2,N1) &
-          -trcsa_XFHS(idsa_SO4,3,NUM(N2,N1),N2,N1)
+            -trcsa_XFLS(idsa_SO4,3,0,N2,N1)-trcsa_XFLS(idsa_SO4,3,NUM(N2,N1),N2,N1) &
+            -trcsa_XFHS(idsa_SO4,3,NUM(N2,N1),N2,N1)
 
           trcsa_TBLS(idsa_Cl,LS,NY,NX)=trcsa_TBLS(idsa_Cl,LS,NY,NX)+trcsa_XBLS(idsa_Cl,LS,NY,NX) &
-          -trcsa_XFLS(idsa_Cl,3,0,N2,N1)-trcsa_XFLS(idsa_Cl,3,NUM(N2,N1),N2,N1) &
-          -trcsa_XFHS(idsa_Cl,3,NUM(N2,N1),N2,N1)
+            -trcsa_XFLS(idsa_Cl,3,0,N2,N1)-trcsa_XFLS(idsa_Cl,3,NUM(N2,N1),N2,N1) &
+            -trcsa_XFHS(idsa_Cl,3,NUM(N2,N1),N2,N1)
 
           trcsa_TBLS(idsa_CO3,LS,NY,NX)=trcsa_TBLS(idsa_CO3,LS,NY,NX)+trcsa_XBLS(idsa_CO3,LS,NY,NX) &
-          -trcsa_XFLS(idsa_CO3,3,0,N2,N1)-trcsa_XFLS(idsa_CO3,3,NUM(N2,N1),N2,N1) &
-          -trcsa_XFHS(idsa_CO3,3,NUM(N2,N1),N2,N1)
+            -trcsa_XFLS(idsa_CO3,3,0,N2,N1)-trcsa_XFLS(idsa_CO3,3,NUM(N2,N1),N2,N1) &
+            -trcsa_XFHS(idsa_CO3,3,NUM(N2,N1),N2,N1)
 
           trcsa_TBLS(idsa_HCO3,LS,NY,NX)=trcsa_TBLS(idsa_HCO3,LS,NY,NX)+trcsa_XBLS(idsa_HCO3,LS,NY,NX) &
-          -trcsa_XFLS(idsa_HCO3,3,0,N2,N1)-trcsa_XFLS(idsa_HCO3,3,NUM(N2,N1),N2,N1) &
-          -trcsa_XFHS(idsa_HCO3,3,NUM(N2,N1),N2,N1)
+            -trcsa_XFLS(idsa_HCO3,3,0,N2,N1)-trcsa_XFLS(idsa_HCO3,3,NUM(N2,N1),N2,N1) &
+            -trcsa_XFHS(idsa_HCO3,3,NUM(N2,N1),N2,N1)
 
           trcsa_TBLS(idsa_AlOH,LS,NY,NX)=trcsa_TBLS(idsa_AlOH,LS,NY,NX)+trcsa_XBLS(idsa_AlOH,LS,NY,NX) &
-          -trcsa_XFLS(idsa_AlOH,3,0,N2,N1)-trcsa_XFLS(idsa_AlOH,3,NUM(N2,N1),N2,N1) &
-          -trcsa_XFHS(idsa_AlOH,3,NUM(N2,N1),N2,N1)
+            -trcsa_XFLS(idsa_AlOH,3,0,N2,N1)-trcsa_XFLS(idsa_AlOH,3,NUM(N2,N1),N2,N1) &
+            -trcsa_XFHS(idsa_AlOH,3,NUM(N2,N1),N2,N1)
 
           trcsa_TBLS(idsa_AlOH2,LS,NY,NX)=trcsa_TBLS(idsa_AlOH2,LS,NY,NX)+trcsa_XBLS(idsa_AlOH2,LS,NY,NX) &
-          -trcsa_XFLS(idsa_AlOH2,3,0,N2,N1)-trcsa_XFLS(idsa_AlOH2,3,NUM(N2,N1),N2,N1) &
-          -trcsa_XFHS(idsa_AlOH2,3,NUM(N2,N1),N2,N1)
+            -trcsa_XFLS(idsa_AlOH2,3,0,N2,N1)-trcsa_XFLS(idsa_AlOH2,3,NUM(N2,N1),N2,N1) &
+            -trcsa_XFHS(idsa_AlOH2,3,NUM(N2,N1),N2,N1)
 
           trcsa_TBLS(idsa_AlOH3,LS,NY,NX)=trcsa_TBLS(idsa_AlOH3,LS,NY,NX)+trcsa_XBLS(idsa_AlOH3,LS,NY,NX) &
-          -trcsa_XFLS(idsa_AlOH3,3,0,N2,N1)-trcsa_XFLS(idsa_AlOH3,3,NUM(N2,N1),N2,N1) &
-          -trcsa_XFHS(idsa_AlOH3,3,NUM(N2,N1),N2,N1)
+            -trcsa_XFLS(idsa_AlOH3,3,0,N2,N1)-trcsa_XFLS(idsa_AlOH3,3,NUM(N2,N1),N2,N1) &
+            -trcsa_XFHS(idsa_AlOH3,3,NUM(N2,N1),N2,N1)
 
           trcsa_TBLS(idsa_AlOH4,LS,NY,NX)=trcsa_TBLS(idsa_AlOH4,LS,NY,NX)+trcsa_XBLS(idsa_AlOH4,LS,NY,NX) &
-          -trcsa_XFLS(idsa_AlOH4,3,0,N2,N1)-trcsa_XFLS(idsa_AlOH4,3,NUM(N2,N1),N2,N1) &
-          -trcsa_XFHS(idsa_AlOH4,3,NUM(N2,N1),N2,N1)
+            -trcsa_XFLS(idsa_AlOH4,3,0,N2,N1)-trcsa_XFLS(idsa_AlOH4,3,NUM(N2,N1),N2,N1) &
+            -trcsa_XFHS(idsa_AlOH4,3,NUM(N2,N1),N2,N1)
 
           trcsa_TBLS(idsa_AlSO4,LS,NY,NX)=trcsa_TBLS(idsa_AlSO4,LS,NY,NX)+trcsa_XBLS(idsa_AlSO4,LS,NY,NX) &
-          -trcsa_XFLS(idsa_AlSO4,3,0,N2,N1)-trcsa_XFLS(idsa_AlSO4,3,NUM(N2,N1),N2,N1) &
-          -trcsa_XFHS(idsa_AlSO4,3,NUM(N2,N1),N2,N1)
+            -trcsa_XFLS(idsa_AlSO4,3,0,N2,N1)-trcsa_XFLS(idsa_AlSO4,3,NUM(N2,N1),N2,N1) &
+            -trcsa_XFHS(idsa_AlSO4,3,NUM(N2,N1),N2,N1)
 
           trcsa_TBLS(idsa_FeOH,LS,NY,NX)=trcsa_TBLS(idsa_FeOH,LS,NY,NX)+trcsa_XBLS(idsa_FeOH,LS,NY,NX) &
-          -trcsa_XFLS(idsa_FeOH,3,0,N2,N1)-trcsa_XFLS(idsa_FeOH,3,NUM(N2,N1),N2,N1) &
-          -trcsa_XFHS(idsa_FeOH,3,NUM(N2,N1),N2,N1)
+            -trcsa_XFLS(idsa_FeOH,3,0,N2,N1)-trcsa_XFLS(idsa_FeOH,3,NUM(N2,N1),N2,N1) &
+            -trcsa_XFHS(idsa_FeOH,3,NUM(N2,N1),N2,N1)
 
           trcsa_TBLS(idsa_FeOH2,LS,NY,NX)=trcsa_TBLS(idsa_FeOH2,LS,NY,NX)+trcsa_XBLS(idsa_FeOH2,LS,NY,NX) &
-          -trcsa_XFLS(idsa_FeOH2,3,0,N2,N1)-trcsa_XFLS(idsa_FeOH2,3,NUM(N2,N1),N2,N1) &
-          -trcsa_XFHS(idsa_FeOH2,3,NUM(N2,N1),N2,N1)
+            -trcsa_XFLS(idsa_FeOH2,3,0,N2,N1)-trcsa_XFLS(idsa_FeOH2,3,NUM(N2,N1),N2,N1) &
+            -trcsa_XFHS(idsa_FeOH2,3,NUM(N2,N1),N2,N1)
 
           trcsa_TBLS(idsa_FeOH3,LS,NY,NX)=trcsa_TBLS(idsa_FeOH3,LS,NY,NX)+trcsa_XBLS(idsa_FeOH3,LS,NY,NX) &
-          -trcsa_XFLS(idsa_FeOH3,3,0,N2,N1)-trcsa_XFLS(idsa_FeOH3,3,NUM(N2,N1),N2,N1) &
-          -trcsa_XFHS(idsa_FeOH3,3,NUM(N2,N1),N2,N1)
+            -trcsa_XFLS(idsa_FeOH3,3,0,N2,N1)-trcsa_XFLS(idsa_FeOH3,3,NUM(N2,N1),N2,N1) &
+            -trcsa_XFHS(idsa_FeOH3,3,NUM(N2,N1),N2,N1)
 
           trcsa_TBLS(idsa_FeOH4,LS,NY,NX)=trcsa_TBLS(idsa_FeOH4,LS,NY,NX)+trcsa_XBLS(idsa_FeOH4,LS,NY,NX) &
-          -trcsa_XFLS(idsa_FeOH4,3,0,N2,N1)-trcsa_XFLS(idsa_FeOH4,3,NUM(N2,N1),N2,N1) &
-          -trcsa_XFHS(idsa_FeOH4,3,NUM(N2,N1),N2,N1)
+            -trcsa_XFLS(idsa_FeOH4,3,0,N2,N1)-trcsa_XFLS(idsa_FeOH4,3,NUM(N2,N1),N2,N1) &
+            -trcsa_XFHS(idsa_FeOH4,3,NUM(N2,N1),N2,N1)
 
           trcsa_TBLS(idsa_FeSO4,LS,NY,NX)=trcsa_TBLS(idsa_FeSO4,LS,NY,NX)+trcsa_XBLS(idsa_FeSO4,LS,NY,NX) &
-          -trcsa_XFLS(idsa_FeSO4,3,0,N2,N1)-trcsa_XFLS(idsa_FeSO4,3,NUM(N2,N1),N2,N1) &
-          -trcsa_XFHS(idsa_FeSO4,3,NUM(N2,N1),N2,N1)
+            -trcsa_XFLS(idsa_FeSO4,3,0,N2,N1)-trcsa_XFLS(idsa_FeSO4,3,NUM(N2,N1),N2,N1) &
+            -trcsa_XFHS(idsa_FeSO4,3,NUM(N2,N1),N2,N1)
 
           trcsa_TBLS(idsa_CaOH2,LS,NY,NX)=trcsa_TBLS(idsa_CaOH2,LS,NY,NX)+trcsa_XBLS(idsa_CaOH2,LS,NY,NX) &
-          -trcsa_XFLS(idsa_CaOH2,3,0,N2,N1)-trcsa_XFLS(idsa_CaOH2,3,NUM(N2,N1),N2,N1) &
-          -trcsa_XFHS(idsa_CaOH2,3,NUM(N2,N1),N2,N1)
+            -trcsa_XFLS(idsa_CaOH2,3,0,N2,N1)-trcsa_XFLS(idsa_CaOH2,3,NUM(N2,N1),N2,N1) &
+            -trcsa_XFHS(idsa_CaOH2,3,NUM(N2,N1),N2,N1)
 
           trcsa_TBLS(idsa_CaCO3,LS,NY,NX)=trcsa_TBLS(idsa_CaCO3,LS,NY,NX)+trcsa_XBLS(idsa_CaCO3,LS,NY,NX) &
-          -trcsa_XFLS(idsa_CaCO3,3,0,N2,N1)-trcsa_XFLS(idsa_CaCO3,3,NUM(N2,N1),N2,N1) &
-          -trcsa_XFHS(idsa_CaCO3,3,NUM(N2,N1),N2,N1)
+            -trcsa_XFLS(idsa_CaCO3,3,0,N2,N1)-trcsa_XFLS(idsa_CaCO3,3,NUM(N2,N1),N2,N1) &
+            -trcsa_XFHS(idsa_CaCO3,3,NUM(N2,N1),N2,N1)
 
           trcsa_TBLS(idsa_CaHCO3,LS,NY,NX)=trcsa_TBLS(idsa_CaHCO3,LS,NY,NX)+trcsa_XBLS(idsa_CaHCO3,LS,NY,NX) &
-          -trcsa_XFLS(idsa_CaHCO3,3,0,N2,N1)-trcsa_XFLS(idsa_CaHCO3,3,NUM(N2,N1),N2,N1) &
-          -trcsa_XFHS(idsa_CaHCO3,3,NUM(N2,N1),N2,N1)
+            -trcsa_XFLS(idsa_CaHCO3,3,0,N2,N1)-trcsa_XFLS(idsa_CaHCO3,3,NUM(N2,N1),N2,N1) &
+            -trcsa_XFHS(idsa_CaHCO3,3,NUM(N2,N1),N2,N1)
 
           trcsa_TBLS(idsa_CaSO4,LS,NY,NX)=trcsa_TBLS(idsa_CaSO4,LS,NY,NX)+trcsa_XBLS(idsa_CaSO4,LS,NY,NX) &
-          -trcsa_XFLS(idsa_CaSO4,3,0,N2,N1)-trcsa_XFLS(idsa_CaSO4,3,NUM(N2,N1),N2,N1) &
-          -trcsa_XFHS(idsa_CaSO4,3,NUM(N2,N1),N2,N1)
+            -trcsa_XFLS(idsa_CaSO4,3,0,N2,N1)-trcsa_XFLS(idsa_CaSO4,3,NUM(N2,N1),N2,N1) &
+            -trcsa_XFHS(idsa_CaSO4,3,NUM(N2,N1),N2,N1)
 
           trcsa_TBLS(idsa_MgOH2,LS,NY,NX)=trcsa_TBLS(idsa_MgOH2,LS,NY,NX)+trcsa_XBLS(idsa_MgOH2,LS,NY,NX) &
-          -trcsa_XFLS(idsa_MgOH2,3,0,N2,N1)-trcsa_XFLS(idsa_MgOH2,3,NUM(N2,N1),N2,N1) &
-          -trcsa_XFHS(idsa_MgOH2,3,NUM(N2,N1),N2,N1)
+            -trcsa_XFLS(idsa_MgOH2,3,0,N2,N1)-trcsa_XFLS(idsa_MgOH2,3,NUM(N2,N1),N2,N1) &
+            -trcsa_XFHS(idsa_MgOH2,3,NUM(N2,N1),N2,N1)
 
           trcsa_TBLS(idsa_MgCO3,LS,NY,NX)=trcsa_TBLS(idsa_MgCO3,LS,NY,NX)+trcsa_XBLS(idsa_MgCO3,LS,NY,NX) &
-          -trcsa_XFLS(idsa_MgCO3,3,0,N2,N1)-trcsa_XFLS(idsa_MgCO3,3,NUM(N2,N1),N2,N1) &
-          -trcsa_XFHS(idsa_MgCO3,3,NUM(N2,N1),N2,N1)
+            -trcsa_XFLS(idsa_MgCO3,3,0,N2,N1)-trcsa_XFLS(idsa_MgCO3,3,NUM(N2,N1),N2,N1) &
+            -trcsa_XFHS(idsa_MgCO3,3,NUM(N2,N1),N2,N1)
 
           trcsa_TBLS(idsa_MgHCO3,LS,NY,NX)=trcsa_TBLS(idsa_MgHCO3,LS,NY,NX)+trcsa_XBLS(idsa_MgHCO3,LS,NY,NX) &
-          -trcsa_XFLS(idsa_MgHCO3,3,0,N2,N1)-trcsa_XFLS(idsa_MgHCO3,3,NUM(N2,N1),N2,N1) &
-          -trcsa_XFHS(idsa_MgHCO3,3,NUM(N2,N1),N2,N1)
+            -trcsa_XFLS(idsa_MgHCO3,3,0,N2,N1)-trcsa_XFLS(idsa_MgHCO3,3,NUM(N2,N1),N2,N1) &
+            -trcsa_XFHS(idsa_MgHCO3,3,NUM(N2,N1),N2,N1)
 
           trcsa_TBLS(idsa_MgSO4,LS,NY,NX)=trcsa_TBLS(idsa_MgSO4,LS,NY,NX)+trcsa_XBLS(idsa_MgSO4,LS,NY,NX) &
-          -trcsa_XFLS(idsa_MgSO4,3,0,N2,N1)-trcsa_XFLS(idsa_MgSO4,3,NUM(N2,N1),N2,N1) &
-          -trcsa_XFHS(idsa_MgSO4,3,NUM(N2,N1),N2,N1)
+            -trcsa_XFLS(idsa_MgSO4,3,0,N2,N1)-trcsa_XFLS(idsa_MgSO4,3,NUM(N2,N1),N2,N1) &
+            -trcsa_XFHS(idsa_MgSO4,3,NUM(N2,N1),N2,N1)
 
           trcsa_TBLS(idsa_NaCO3,LS,NY,NX)=trcsa_TBLS(idsa_NaCO3,LS,NY,NX)+trcsa_XBLS(idsa_NaCO3,LS,NY,NX) &
-          -trcsa_XFLS(idsa_NaCO3,3,0,N2,N1)-trcsa_XFLS(idsa_NaCO3,3,NUM(N2,N1),N2,N1) &
-          -trcsa_XFHS(idsa_NaCO3,3,NUM(N2,N1),N2,N1)
+            -trcsa_XFLS(idsa_NaCO3,3,0,N2,N1)-trcsa_XFLS(idsa_NaCO3,3,NUM(N2,N1),N2,N1) &
+            -trcsa_XFHS(idsa_NaCO3,3,NUM(N2,N1),N2,N1)
 
           trcsa_TBLS(idsa_NaSO4,LS,NY,NX)=trcsa_TBLS(idsa_NaSO4,LS,NY,NX)+trcsa_XBLS(idsa_NaSO4,LS,NY,NX) &
-          -trcsa_XFLS(idsa_NaSO4,3,0,N2,N1)-trcsa_XFLS(idsa_NaSO4,3,NUM(N2,N1),N2,N1) &
-          -trcsa_XFHS(idsa_NaSO4,3,NUM(N2,N1),N2,N1)
+            -trcsa_XFLS(idsa_NaSO4,3,0,N2,N1)-trcsa_XFLS(idsa_NaSO4,3,NUM(N2,N1),N2,N1) &
+            -trcsa_XFHS(idsa_NaSO4,3,NUM(N2,N1),N2,N1)
 
           trcsa_TBLS(idsa_KSO4,LS,NY,NX)=trcsa_TBLS(idsa_KSO4,LS,NY,NX)+trcsa_XBLS(idsa_KSO4,LS,NY,NX) &
-          -trcsa_XFLS(idsa_KSO4,3,0,N2,N1)-trcsa_XFLS(idsa_KSO4,3,NUM(N2,N1),N2,N1) &
-          -trcsa_XFHS(idsa_KSO4,3,NUM(N2,N1),N2,N1)
+            -trcsa_XFLS(idsa_KSO4,3,0,N2,N1)-trcsa_XFLS(idsa_KSO4,3,NUM(N2,N1),N2,N1) &
+            -trcsa_XFHS(idsa_KSO4,3,NUM(N2,N1),N2,N1)
 
           trcsa_TBLS(idsa_H0PO4,LS,NY,NX)=trcsa_TBLS(idsa_H0PO4,LS,NY,NX)+trcsa_XBLS(idsa_H0PO4,LS,NY,NX) &
-          -trcsa_XFLS(idsa_H0PO4,3,0,N2,N1)-trcsa_XFLS(idsa_H0PO4,3,NUM(N2,N1),N2,N1) &
-          -trcsa_XFHS(idsa_H0PO4,3,NUM(N2,N1),N2,N1)-trcsa_XFLS(idsa_H0PO4B,3,NUM(N2,N1),N2,N1) &
-          -trcsa_XFHS(idsa_H0PO4B,3,NUM(N2,N1),N2,N1)
+            -trcsa_XFLS(idsa_H0PO4,3,0,N2,N1)-trcsa_XFLS(idsa_H0PO4,3,NUM(N2,N1),N2,N1) &
+            -trcsa_XFHS(idsa_H0PO4,3,NUM(N2,N1),N2,N1)-trcsa_XFLS(idsa_H0PO4B,3,NUM(N2,N1),N2,N1) &
+            -trcsa_XFHS(idsa_H0PO4B,3,NUM(N2,N1),N2,N1)
 
           trcsa_TBLS(idsa_H3PO4,LS,NY,NX)=trcsa_TBLS(idsa_H3PO4,LS,NY,NX)+trcsa_XBLS(idsa_H3PO4,LS,NY,NX) &
-          -trcsa_XFLS(idsa_H3PO4,3,0,N2,N1)-trcsa_XFHS(idsa_H3PO4,3,NUM(N2,N1),N2,N1) &
-          -trcsa_XFHS(idsa_H3PO4,3,NUM(N2,N1),N2,N1)-trcsa_XFLS(idsa_H3PO4B,3,NUM(N2,N1),N2,N1) &
-          -trcsa_XFHS(idsa_H3PO4B,3,NUM(N2,N1),N2,N1)
+            -trcsa_XFLS(idsa_H3PO4,3,0,N2,N1)-trcsa_XFHS(idsa_H3PO4,3,NUM(N2,N1),N2,N1) &
+            -trcsa_XFHS(idsa_H3PO4,3,NUM(N2,N1),N2,N1)-trcsa_XFLS(idsa_H3PO4B,3,NUM(N2,N1),N2,N1) &
+            -trcsa_XFHS(idsa_H3PO4B,3,NUM(N2,N1),N2,N1)
 
           trcsa_TBLS(idsa_FeHPO4,LS,NY,NX)=trcsa_TBLS(idsa_FeHPO4,LS,NY,NX)+trcsa_XBLS(idsa_FeHPO4,LS,NY,NX) &
-          -trcsa_XFLS(idsa_FeHPO4,3,0,N2,N1)-trcsa_XFLS(idsa_FeHPO4,3,NUM(N2,N1),N2,N1) &
-          -trcsa_XFHS(idsa_FeHPO4,3,NUM(N2,N1),N2,N1)-trcsa_XFLS(idsa_FeHPO4B,3,NUM(N2,N1),N2,N1) &
-          -trcsa_XFHS(idsa_FeHPO4B,3,NUM(N2,N1),N2,N1)
+            -trcsa_XFLS(idsa_FeHPO4,3,0,N2,N1)-trcsa_XFLS(idsa_FeHPO4,3,NUM(N2,N1),N2,N1) &
+            -trcsa_XFHS(idsa_FeHPO4,3,NUM(N2,N1),N2,N1)-trcsa_XFLS(idsa_FeHPO4B,3,NUM(N2,N1),N2,N1) &
+            -trcsa_XFHS(idsa_FeHPO4B,3,NUM(N2,N1),N2,N1)
 
           trcsa_TBLS(idsa_FeH2PO4,LS,NY,NX)=trcsa_TBLS(idsa_FeH2PO4,LS,NY,NX)+trcsa_XBLS(idsa_FeH2PO4,LS,NY,NX) &
-          -trcsa_XFLS(idsa_FeH2PO4,3,0,N2,N1)-trcsa_XFLS(idsa_FeH2PO4,3,NUM(N2,N1),N2,N1) &
-          -trcsa_XFHS(idsa_FeH2PO4,3,NUM(N2,N1),N2,N1)-trcsa_XFLS(idsa_FeH2PO4B,3,NUM(N2,N1),N2,N1) &
-          -trcsa_XFHS(idsa_FeH2PO4B,3,NUM(N2,N1),N2,N1)
+            -trcsa_XFLS(idsa_FeH2PO4,3,0,N2,N1)-trcsa_XFLS(idsa_FeH2PO4,3,NUM(N2,N1),N2,N1) &
+            -trcsa_XFHS(idsa_FeH2PO4,3,NUM(N2,N1),N2,N1)-trcsa_XFLS(idsa_FeH2PO4B,3,NUM(N2,N1),N2,N1) &
+            -trcsa_XFHS(idsa_FeH2PO4B,3,NUM(N2,N1),N2,N1)
 
           trcsa_TBLS(idsa_CaPO4,LS,NY,NX)=trcsa_TBLS(idsa_CaPO4,LS,NY,NX)+trcsa_XBLS(idsa_CaPO4,LS,NY,NX) &
-          -trcsa_XFLS(idsa_CaPO4,3,0,N2,N1)-trcsa_XFLS(idsa_CaPO4,3,NUM(N2,N1),N2,N1) &
-          -trcsa_XFHS(idsa_CaPO4,3,NUM(N2,N1),N2,N1)-trcsa_XFLS(idsa_CaPO4B,3,NUM(N2,N1),N2,N1) &
-          -trcsa_XFHS(idsa_CaPO4B,3,NUM(N2,N1),N2,N1)
+            -trcsa_XFLS(idsa_CaPO4,3,0,N2,N1)-trcsa_XFLS(idsa_CaPO4,3,NUM(N2,N1),N2,N1) &
+            -trcsa_XFHS(idsa_CaPO4,3,NUM(N2,N1),N2,N1)-trcsa_XFLS(idsa_CaPO4B,3,NUM(N2,N1),N2,N1) &
+            -trcsa_XFHS(idsa_CaPO4B,3,NUM(N2,N1),N2,N1)
 
           trcsa_TBLS(idsa_CaHPO4,LS,NY,NX)=trcsa_TBLS(idsa_CaHPO4,LS,NY,NX)+trcsa_XBLS(idsa_CaHPO4,LS,NY,NX) &
-          -trcsa_XFLS(idsa_CaHPO4,3,0,N2,N1)-trcsa_XFLS(idsa_CaHPO4,3,NUM(N2,N1),N2,N1) &
-          -trcsa_XFHS(idsa_CaHPO4,3,NUM(N2,N1),N2,N1)-trcsa_XFLS(idsa_CaHPO4B,3,NUM(N2,N1),N2,N1) &
-          -trcsa_XFHS(idsa_CaHPO4B,3,NUM(N2,N1),N2,N1)
+            -trcsa_XFLS(idsa_CaHPO4,3,0,N2,N1)-trcsa_XFLS(idsa_CaHPO4,3,NUM(N2,N1),N2,N1) &
+            -trcsa_XFHS(idsa_CaHPO4,3,NUM(N2,N1),N2,N1)-trcsa_XFLS(idsa_CaHPO4B,3,NUM(N2,N1),N2,N1) &
+            -trcsa_XFHS(idsa_CaHPO4B,3,NUM(N2,N1),N2,N1)
 
           trcsa_TBLS(idsa_CaH2PO4,LS,NY,NX)=trcsa_TBLS(idsa_CaH2PO4,LS,NY,NX)+trcsa_XBLS(idsa_CaH2PO4,LS,NY,NX) &
-          -trcsa_XFLS(idsa_CaH2PO4,3,0,N2,N1)-trcsa_XFLS(idsa_CaH2PO4,3,NUM(N2,N1),N2,N1) &
-          -trcsa_XFHS(idsa_CaH2PO4,3,NUM(N2,N1),N2,N1)-trcsa_XFLS(idsa_CaH2PO4B,3,NUM(N2,N1),N2,N1) &
-          -trcsa_XFHS(idsa_CaH2PO4B,3,NUM(N2,N1),N2,N1)
+            -trcsa_XFLS(idsa_CaH2PO4,3,0,N2,N1)-trcsa_XFLS(idsa_CaH2PO4,3,NUM(N2,N1),N2,N1) &
+            -trcsa_XFHS(idsa_CaH2PO4,3,NUM(N2,N1),N2,N1)-trcsa_XFLS(idsa_CaH2PO4B,3,NUM(N2,N1),N2,N1) &
+            -trcsa_XFHS(idsa_CaH2PO4B,3,NUM(N2,N1),N2,N1)
 
           trcsa_TBLS(idsa_MgHPO4,LS,NY,NX)=trcsa_TBLS(idsa_MgHPO4,LS,NY,NX)+trcsa_XBLS(idsa_MgHPO4,LS,NY,NX) &
-          -trcsa_XFLS(idsa_MgHPO4,3,0,N2,N1)-trcsa_XFLS(idsa_MgHPO4,3,NUM(N2,N1),N2,N1) &
-          -trcsa_XFHS(idsa_MgHPO4,3,NUM(N2,N1),N2,N1)-trcsa_XFLS(idsa_MgHPO4B,3,NUM(N2,N1),N2,N1) &
-          -trcsa_XFHS(idsa_MgHPO4B,3,NUM(N2,N1),N2,N1)
+            -trcsa_XFLS(idsa_MgHPO4,3,0,N2,N1)-trcsa_XFLS(idsa_MgHPO4,3,NUM(N2,N1),N2,N1) &
+            -trcsa_XFHS(idsa_MgHPO4,3,NUM(N2,N1),N2,N1)-trcsa_XFLS(idsa_MgHPO4B,3,NUM(N2,N1),N2,N1) &
+            -trcsa_XFHS(idsa_MgHPO4B,3,NUM(N2,N1),N2,N1)
         ENDIF
       ENDIF
 !
@@ -1121,60 +1123,19 @@ implicit none
       TFLWI(LS,N2,N1)=TFLWI(LS,N2,N1)+XFLWI(LS,N2,N1)
       THFLWW(LS,N2,N1)=THFLWW(LS,N2,N1)+XHFLWW(LS,N2,N1)
 
-      trcg_TBLS(idg_CO2,LS,N2,N1)=trcg_TBLS(idg_CO2,LS,N2,N1)+trcg_XBLS(idg_CO2,LS,N2,N1)
-      trcg_TBLS(idg_CH4,LS,N2,N1)=trcg_TBLS(idg_CH4,LS,N2,N1)+trcg_XBLS(idg_CH4,LS,N2,N1)
-      trcg_TBLS(idg_O2,LS,N2,N1)=trcg_TBLS(idg_O2,LS,N2,N1)+trcg_XBLS(idg_O2,LS,N2,N1)
-      trcg_TBLS(idg_N2,LS,N2,N1)=trcg_TBLS(idg_N2,LS,N2,N1)+trcg_XBLS(idg_N2,LS,N2,N1)
-      trcg_TBLS(idg_N2O,LS,N2,N1)=trcg_TBLS(idg_N2O,LS,N2,N1)+trcg_XBLS(idg_N2O,LS,N2,N1)
-      trcg_TBLS(idg_NH3,LS,N2,N1)=trcg_TBLS(idg_NH3,LS,N2,N1)+trcg_XBLS(idg_NH3,LS,N2,N1)
+      DO NTG=idg_beg,idg_end-1
+        trcg_TBLS(NTG,LS,N2,N1)=trcg_TBLS(NTG,LS,N2,N1)+trcg_XBLS(NTG,LS,N2,N1)
+      ENDDO
 
-      trcn_TBLS(ids_NH4,LS,N2,N1)=trcn_TBLS(ids_NH4,LS,N2,N1)+trcg_XBLS(ids_NH4,LS,N2,N1)
-      trcn_TBLS(ids_NO3,LS,N2,N1)=trcn_TBLS(ids_NO3,LS,N2,N1)+trcg_XBLS(ids_NO3,LS,N2,N1)
-      trcn_TBLS(ids_H1PO4,LS,N2,N1)=trcn_TBLS(ids_H1PO4,LS,N2,N1)+trcg_XBLS(ids_H1PO4,LS,N2,N1)
-      trcn_TBLS(ids_H2PO4,LS,N2,N1)=trcn_TBLS(ids_H2PO4,LS,N2,N1)+trcg_XBLS(ids_H2PO4,LS,N2,N1)
+      DO NTN=ids_nut_beg,ids_nuts_end
+        trcn_TBLS(NTN,LS,N2,N1)=trcn_TBLS(NTN,LS,N2,N1)+trcn_XBLS(NTN,LS,N2,N1)
+      ENDDO
 
       IF(ISALTG.NE.0)THEN
-      trcsa_TBLS(idsa_Al,LS,N2,N1)=trcsa_TBLS(idsa_Al,LS,N2,N1)+trcsa_XBLS(idsa_Al,LS,N2,N1)
-      trcsa_TBLS(idsa_Fe,LS,N2,N1)=trcsa_TBLS(idsa_Fe,LS,N2,N1)+trcsa_XBLS(idsa_Fe,LS,N2,N1)
-      trcsa_TBLS(idsa_Hp,LS,N2,N1)=trcsa_TBLS(idsa_Hp,LS,N2,N1)+trcsa_XBLS(idsa_Hp,LS,N2,N1)
-      trcsa_TBLS(idsa_Ca,LS,N2,N1)=trcsa_TBLS(idsa_Ca,LS,N2,N1)+trcsa_XBLS(idsa_Ca,LS,N2,N1)
-      trcsa_TBLS(idsa_Mg,LS,N2,N1)=trcsa_TBLS(idsa_Mg,LS,N2,N1)+trcsa_XBLS(idsa_Mg,LS,N2,N1)
-      trcsa_TBLS(idsa_Na,LS,N2,N1)=trcsa_TBLS(idsa_Na,LS,N2,N1)+trcsa_XBLS(idsa_Na,LS,N2,N1)
-      trcsa_TBLS(idsa_K,LS,N2,N1)=trcsa_TBLS(idsa_K,LS,N2,N1)+trcsa_XBLS(idsa_K,LS,N2,N1)
-      trcsa_TBLS(idsa_OH,LS,N2,N1)=trcsa_TBLS(idsa_OH,LS,N2,N1)+trcsa_XBLS(idsa_OH,LS,N2,N1)
-      trcsa_TBLS(idsa_SO4,LS,N2,N1)=trcsa_TBLS(idsa_SO4,LS,N2,N1)+trcsa_XBLS(idsa_SO4,LS,N2,N1)
-      trcsa_TBLS(idsa_Cl,LS,N2,N1)=trcsa_TBLS(idsa_Cl,LS,N2,N1)+trcsa_XBLS(idsa_Cl,LS,N2,N1)
-      trcsa_TBLS(idsa_CO3,LS,N2,N1)=trcsa_TBLS(idsa_CO3,LS,N2,N1)+trcsa_XBLS(idsa_CO3,LS,N2,N1)
-      trcsa_TBLS(idsa_HCO3,LS,N2,N1)=trcsa_TBLS(idsa_HCO3,LS,N2,N1)+trcsa_XBLS(idsa_HCO3,LS,N2,N1)
-      trcsa_TBLS(idsa_AlOH,LS,N2,N1)=trcsa_TBLS(idsa_AlOH,LS,N2,N1)+trcsa_XBLS(idsa_AlOH,LS,N2,N1)
-      trcsa_TBLS(idsa_AlOH2,LS,N2,N1)=trcsa_TBLS(idsa_AlOH2,LS,N2,N1)+trcsa_XBLS(idsa_AlOH2,LS,N2,N1)
-      trcsa_TBLS(idsa_AlOH3,LS,N2,N1)=trcsa_TBLS(idsa_AlOH3,LS,N2,N1)+trcsa_XBLS(idsa_AlOH3,LS,N2,N1)
-      trcsa_TBLS(idsa_AlOH4,LS,N2,N1)=trcsa_TBLS(idsa_AlOH4,LS,N2,N1)+trcsa_XBLS(idsa_AlOH4,LS,N2,N1)
-      trcsa_TBLS(idsa_AlSO4,LS,N2,N1)=trcsa_TBLS(idsa_AlSO4,LS,N2,N1)+trcsa_XBLS(idsa_AlSO4,LS,N2,N1)
-      trcsa_TBLS(idsa_FeOH,LS,N2,N1)=trcsa_TBLS(idsa_FeOH,LS,N2,N1)+trcsa_XBLS(idsa_FeOH,LS,N2,N1)
-      trcsa_TBLS(idsa_FeOH2,LS,N2,N1)=trcsa_TBLS(idsa_FeOH2,LS,N2,N1)+trcsa_XBLS(idsa_FeOH2,LS,N2,N1)
-      trcsa_TBLS(idsa_FeOH3,LS,N2,N1)=trcsa_TBLS(idsa_FeOH3,LS,N2,N1)+trcsa_XBLS(idsa_FeOH3,LS,N2,N1)
-      trcsa_TBLS(idsa_FeOH4,LS,N2,N1)=trcsa_TBLS(idsa_FeOH4,LS,N2,N1)+trcsa_XBLS(idsa_FeOH4,LS,N2,N1)
-      trcsa_TBLS(idsa_FeSO4,LS,N2,N1)=trcsa_TBLS(idsa_FeSO4,LS,N2,N1)+trcsa_XBLS(idsa_FeSO4,LS,N2,N1)
-      trcsa_TBLS(idsa_CaOH2,LS,N2,N1)=trcsa_TBLS(idsa_CaOH2,LS,N2,N1)+trcsa_XBLS(idsa_CaOH2,LS,N2,N1)
-      trcsa_TBLS(idsa_CaCO3,LS,N2,N1)=trcsa_TBLS(idsa_CaCO3,LS,N2,N1)+trcsa_XBLS(idsa_CaCO3,LS,N2,N1)
-      trcsa_TBLS(idsa_CaHCO3,LS,N2,N1)=trcsa_TBLS(idsa_CaHCO3,LS,N2,N1)+trcsa_XBLS(idsa_CaHCO3,LS,N2,N1)
-      trcsa_TBLS(idsa_CaSO4,LS,N2,N1)=trcsa_TBLS(idsa_CaSO4,LS,N2,N1)+trcsa_XBLS(idsa_CaSO4,LS,N2,N1)
-      trcsa_TBLS(idsa_MgOH2,LS,N2,N1)=trcsa_TBLS(idsa_MgOH2,LS,N2,N1)+trcsa_XBLS(idsa_MgOH2,LS,N2,N1)
-      trcsa_TBLS(idsa_MgCO3,LS,N2,N1)=trcsa_TBLS(idsa_MgCO3,LS,N2,N1)+trcsa_XBLS(idsa_MgCO3,LS,N2,N1)
-      trcsa_TBLS(idsa_MgHCO3,LS,N2,N1)=trcsa_TBLS(idsa_MgHCO3,LS,N2,N1)+trcsa_XBLS(idsa_MgHCO3,LS,N2,N1)
-      trcsa_TBLS(idsa_MgSO4,LS,N2,N1)=trcsa_TBLS(idsa_MgSO4,LS,N2,N1)+trcsa_XBLS(idsa_MgSO4,LS,N2,N1)
-      trcsa_TBLS(idsa_NaCO3,LS,N2,N1)=trcsa_TBLS(idsa_NaCO3,LS,N2,N1)+trcsa_XBLS(idsa_NaCO3,LS,N2,N1)
-      trcsa_TBLS(idsa_NaSO4,LS,N2,N1)=trcsa_TBLS(idsa_NaSO4,LS,N2,N1)+trcsa_XBLS(idsa_NaSO4,LS,N2,N1)
-      trcsa_TBLS(idsa_KSO4,LS,N2,N1)=trcsa_TBLS(idsa_KSO4,LS,N2,N1)+trcsa_XBLS(idsa_KSO4,LS,N2,N1)
-      trcsa_TBLS(idsa_H0PO4,LS,N2,N1)=trcsa_TBLS(idsa_H0PO4,LS,N2,N1)+trcsa_XBLS(idsa_H0PO4,LS,N2,N1)
-      trcsa_TBLS(idsa_H3PO4,LS,N2,N1)=trcsa_TBLS(idsa_H3PO4,LS,N2,N1)+trcsa_XBLS(idsa_H3PO4,LS,N2,N1)
-      trcsa_TBLS(idsa_FeHPO4,LS,N2,N1)=trcsa_TBLS(idsa_FeHPO4,LS,N2,N1)+trcsa_XBLS(idsa_FeHPO4,LS,N2,N1)
-      trcsa_TBLS(idsa_FeH2PO4,LS,N2,N1)=trcsa_TBLS(idsa_FeH2PO4,LS,N2,N1)+trcsa_XBLS(idsa_FeH2PO4,LS,N2,N1)
-      trcsa_TBLS(idsa_CaPO4,LS,N2,N1)=trcsa_TBLS(idsa_CaPO4,LS,N2,N1)+trcsa_XBLS(idsa_CaPO4,LS,N2,N1)
-      trcsa_TBLS(idsa_CaHPO4,LS,N2,N1)=trcsa_TBLS(idsa_CaHPO4,LS,N2,N1)+trcsa_XBLS(idsa_CaHPO4,LS,N2,N1)
-      trcsa_TBLS(idsa_CaH2PO4,LS,N2,N1)=trcsa_TBLS(idsa_CaH2PO4,LS,N2,N1)+trcsa_XBLS(idsa_CaH2PO4,LS,N2,N1)
-      trcsa_TBLS(idsa_MgHPO4,LS,N2,N1)=trcsa_TBLS(idsa_MgHPO4,LS,N2,N1)+trcsa_XBLS(idsa_MgHPO4,LS,N2,N1)
+        DO NTSA=idsa_beg,idsa_end
+          trcsa_TBLS(NTSA,LS,N2,N1)=trcsa_TBLS(NTSA,LS,N2,N1)+trcsa_XBLS(NTSA,LS,N2,N1)
+        ENDDO
+
       ENDIF
       ENDIF
     ENDIF
@@ -1504,7 +1465,7 @@ implicit none
   implicit none
   integer, intent(in) :: N,N1,N2,N3,N4,N5,NY,NX
   integer, intent(inout) :: N6
-  integer :: LL,K
+  integer :: LL,K,NTSA
   !     begin_execution
   !     NET HEAT, WATER FLUXES BETWEEN ADJACENT
   !     GRID CELLS
@@ -1514,13 +1475,12 @@ implicit none
   !     FLWNU,FLWHNU,HFLWNU=lake surface water flux, heat flux from watsub.f if lake surface disappears
   !
   IF(NCN(N2,N1).NE.3.OR.N.EQ.3)THEN
-    DO 1200 LL=N6,NL(N5,N4)
+    D1200: DO LL=N6,NL(N5,N4)
       IF(VOLX(LL,N2,N1).GT.ZEROS2(N2,N1))THEN
         N6=LL
-        GO TO 1201
+        exit
       ENDIF
-1200  CONTINUE
-1201  CONTINUE
+    ENDDO D1200
     IF(VOLX(N3,N2,N1).GT.ZEROS2(N2,N1))THEN
       IF(N3.EQ.NU(N2,N1).AND.N.EQ.3)THEN
         TFLW(N3,N2,N1)=TFLW(N3,N2,N1)+FLW(N,N3,N2,N1)-FLWNU(N5,N4)
@@ -1562,7 +1522,7 @@ implicit none
       !             :NH4=NH4,NH3=NH3,NO3=NO3,NO2=NO2,P14=HPO4,PO4=H2PO4 in non-band
       !             :N4B=NH4,N3B=NH3,NOB=NO3,N2B=NO2,P1B=HPO4,POB=H2PO4 in band
       !
-      DO 8585 K=1,jcplx
+      D8585: DO K=1,jcplx
         TOCFLS(K,N3,N2,N1)=TOCFLS(K,N3,N2,N1)+XOCFLS(K,N,N3,N2,N1)-XOCFLS(K,N,N6,N5,N4)
         TONFLS(K,N3,N2,N1)=TONFLS(K,N3,N2,N1)+XONFLS(K,N,N3,N2,N1)-XONFLS(K,N,N6,N5,N4)
         TOPFLS(K,N3,N2,N1)=TOPFLS(K,N3,N2,N1)+XOPFLS(K,N,N3,N2,N1)-XOPFLS(K,N,N6,N5,N4)
@@ -1571,7 +1531,7 @@ implicit none
         TONFHS(K,N3,N2,N1)=TONFHS(K,N3,N2,N1)+XONFHS(K,N,N3,N2,N1)-XONFHS(K,N,N6,N5,N4)
         TOPFHS(K,N3,N2,N1)=TOPFHS(K,N3,N2,N1)+XOPFHS(K,N,N3,N2,N1)-XOPFHS(K,N,N6,N5,N4)
         TOAFHS(K,N3,N2,N1)=TOAFHS(K,N3,N2,N1)+XOAFHS(K,N,N3,N2,N1)-XOAFHS(K,N,N6,N5,N4)
-8585  CONTINUE
+      ENDDO D8585
       TCOFLS(N3,N2,N1)=TCOFLS(N3,N2,N1)+trcs_XFLS(idg_CO2,N,N3,N2,N1)-trcs_XFLS(idg_CO2,N,N6,N5,N4)
       TCHFLS(N3,N2,N1)=TCHFLS(N3,N2,N1)+trcs_XFLS(idg_CH4,N,N3,N2,N1)-trcs_XFLS(idg_CH4,N,N6,N5,N4)
       TOXFLS(N3,N2,N1)=TOXFLS(N3,N2,N1)+trcs_XFLS(idg_O2,N,N3,N2,N1)-trcs_XFLS(idg_O2,N,N6,N5,N4)
@@ -1639,106 +1599,111 @@ implicit none
       !          :*1=non-band,*B=band
 !
       IF(ISALTG.NE.0)THEN
-        TALFLS(N3,N2,N1)=TALFLS(N3,N2,N1)+trcsa_XFLS(idsa_Al,N,N3,N2,N1)-trcsa_XFLS(idsa_Al,N,N6,N5,N4)
-        TFEFLS(N3,N2,N1)=TFEFLS(N3,N2,N1)+trcsa_XFLS(idsa_Fe,N,N3,N2,N1)-trcsa_XFLS(idsa_Fe,N,N6,N5,N4)
-        THYFLS(N3,N2,N1)=THYFLS(N3,N2,N1)+trcsa_XFLS(idsa_Hp,N,N3,N2,N1)-trcsa_XFLS(idsa_Hp,N,N6,N5,N4)
-        TCAFLS(N3,N2,N1)=TCAFLS(N3,N2,N1)+trcsa_XFLS(idsa_Ca,N,N3,N2,N1)-trcsa_XFLS(idsa_Ca,N,N6,N5,N4)
-        TMGFLS(N3,N2,N1)=TMGFLS(N3,N2,N1)+trcsa_XFLS(idsa_Mg,N,N3,N2,N1)-trcsa_XFLS(idsa_Mg,N,N6,N5,N4)
-        TNAFLS(N3,N2,N1)=TNAFLS(N3,N2,N1)+trcsa_XFLS(idsa_Na,N,N3,N2,N1)-trcsa_XFLS(idsa_Na,N,N6,N5,N4)
-        TKAFLS(N3,N2,N1)=TKAFLS(N3,N2,N1)+trcsa_XFLS(idsa_K,N,N3,N2,N1)-trcsa_XFLS(idsa_K,N,N6,N5,N4)
-        TOHFLS(N3,N2,N1)=TOHFLS(N3,N2,N1)+trcsa_XFLS(idsa_OH,N,N3,N2,N1)-trcsa_XFLS(idsa_OH,N,N6,N5,N4)
-        TSOFLS(N3,N2,N1)=TSOFLS(N3,N2,N1)+trcsa_XFLS(idsa_SO4,N,N3,N2,N1)-trcsa_XFLS(idsa_SO4,N,N6,N5,N4)
-        TCLFLS(N3,N2,N1)=TCLFLS(N3,N2,N1)+trcsa_XFLS(idsa_Cl,N,N3,N2,N1)-trcsa_XFLS(idsa_Cl,N,N6,N5,N4)
-        TC3FLS(N3,N2,N1)=TC3FLS(N3,N2,N1)+trcsa_XFLS(idsa_CO3,N,N3,N2,N1)-trcsa_XFLS(idsa_CO3,N,N6,N5,N4)
-        THCFLS(N3,N2,N1)=THCFLS(N3,N2,N1)+trcsa_XFLS(idsa_HCO3,N,N3,N2,N1)-trcsa_XFLS(idsa_HCO3,N,N6,N5,N4)
-        TAL1FS(N3,N2,N1)=TAL1FS(N3,N2,N1)+trcsa_XFLS(idsa_AlOH,N,N3,N2,N1)-trcsa_XFLS(idsa_AlOH,N,N6,N5,N4)
-        TAL2FS(N3,N2,N1)=TAL2FS(N3,N2,N1)+trcsa_XFLS(idsa_AlOH2,N,N3,N2,N1)-trcsa_XFLS(idsa_AlOH2,N,N6,N5,N4)
-        TAL3FS(N3,N2,N1)=TAL3FS(N3,N2,N1)+trcsa_XFLS(idsa_AlOH3,N,N3,N2,N1)-trcsa_XFLS(idsa_AlOH3,N,N6,N5,N4)
-        TAL4FS(N3,N2,N1)=TAL4FS(N3,N2,N1)+trcsa_XFLS(idsa_AlOH4,N,N3,N2,N1)-trcsa_XFLS(idsa_AlOH4,N,N6,N5,N4)
-        TALSFS(N3,N2,N1)=TALSFS(N3,N2,N1)+trcsa_XFLS(idsa_AlSO4,N,N3,N2,N1)-trcsa_XFLS(idsa_AlSO4,N,N6,N5,N4)
-        TFE1FS(N3,N2,N1)=TFE1FS(N3,N2,N1)+trcsa_XFLS(idsa_FeOH,N,N3,N2,N1)-trcsa_XFLS(idsa_FeOH,N,N6,N5,N4)
-        TFE2FS(N3,N2,N1)=TFE2FS(N3,N2,N1)+trcsa_XFLS(idsa_FeOH2,N,N3,N2,N1)-trcsa_XFLS(idsa_FeOH2,N,N6,N5,N4)
-        TFE3FS(N3,N2,N1)=TFE3FS(N3,N2,N1)+trcsa_XFLS(idsa_FeOH3,N,N3,N2,N1)-trcsa_XFLS(idsa_FeOH3,N,N6,N5,N4)
-        TFE4FS(N3,N2,N1)=TFE4FS(N3,N2,N1)+trcsa_XFLS(idsa_FeOH4,N,N3,N2,N1)-trcsa_XFLS(idsa_FeOH4,N,N6,N5,N4)
-        TFESFS(N3,N2,N1)=TFESFS(N3,N2,N1)+trcsa_XFLS(idsa_FeSO4,N,N3,N2,N1)-trcsa_XFLS(idsa_FeSO4,N,N6,N5,N4)
-        TCAOFS(N3,N2,N1)=TCAOFS(N3,N2,N1)+trcsa_XFLS(idsa_CaOH2,N,N3,N2,N1)-trcsa_XFLS(idsa_CaOH2,N,N6,N5,N4)
-        TCACFS(N3,N2,N1)=TCACFS(N3,N2,N1)+trcsa_XFLS(idsa_CaCO3,N,N3,N2,N1)-trcsa_XFLS(idsa_CaCO3,N,N6,N5,N4)
-        TCAHFS(N3,N2,N1)=TCAHFS(N3,N2,N1)+trcsa_XFLS(idsa_CaHCO3,N,N3,N2,N1)-trcsa_XFLS(idsa_CaHCO3,N,N6,N5,N4)
-        TCASFS(N3,N2,N1)=TCASFS(N3,N2,N1)+trcsa_XFLS(idsa_CaSO4,N,N3,N2,N1)-trcsa_XFLS(idsa_CaSO4,N,N6,N5,N4)
-        TMGOFS(N3,N2,N1)=TMGOFS(N3,N2,N1)+trcsa_XFLS(idsa_MgOH2,N,N3,N2,N1)-trcsa_XFLS(idsa_MgOH2,N,N6,N5,N4)
-        TMGCFS(N3,N2,N1)=TMGCFS(N3,N2,N1)+trcsa_XFLS(idsa_MgCO3,N,N3,N2,N1)-trcsa_XFLS(idsa_MgCO3,N,N6,N5,N4)
-        TMGHFS(N3,N2,N1)=TMGHFS(N3,N2,N1)+trcsa_XFLS(idsa_MgHCO3,N,N3,N2,N1)-trcsa_XFLS(idsa_MgHCO3,N,N6,N5,N4)
-        TMGSFS(N3,N2,N1)=TMGSFS(N3,N2,N1)+trcsa_XFLS(idsa_MgSO4,N,N3,N2,N1)-trcsa_XFLS(idsa_MgSO4,N,N6,N5,N4)
-        TNACFS(N3,N2,N1)=TNACFS(N3,N2,N1)+trcsa_XFLS(idsa_NaCO3,N,N3,N2,N1)-trcsa_XFLS(idsa_NaCO3,N,N6,N5,N4)
-        TNASFS(N3,N2,N1)=TNASFS(N3,N2,N1)+trcsa_XFLS(idsa_NaSO4,N,N3,N2,N1)-trcsa_XFLS(idsa_NaSO4,N,N6,N5,N4)
-        TKASFS(N3,N2,N1)=TKASFS(N3,N2,N1)+trcsa_XFLS(idsa_KSO4,N,N3,N2,N1)-trcsa_XFLS(idsa_KSO4,N,N6,N5,N4)
-        TH0PFS(N3,N2,N1)=TH0PFS(N3,N2,N1)+trcsa_XFLS(idsa_H0PO4,N,N3,N2,N1)-trcsa_XFLS(idsa_H0PO4,N,N6,N5,N4)
-        TH3PFS(N3,N2,N1)=TH3PFS(N3,N2,N1)+trcsa_XFLS(idsa_H3PO4,N,N3,N2,N1)-trcsa_XFLS(idsa_H3PO4,N,N6,N5,N4)
-        TF1PFS(N3,N2,N1)=TF1PFS(N3,N2,N1)+trcsa_XFLS(idsa_FeHPO4,N,N3,N2,N1)-trcsa_XFLS(idsa_FeHPO4,N,N6,N5,N4)
-        TF2PFS(N3,N2,N1)=TF2PFS(N3,N2,N1)+trcsa_XFLS(idsa_FeH2PO4,N,N3,N2,N1)-trcsa_XFLS(idsa_FeH2PO4,N,N6,N5,N4)
-        TC0PFS(N3,N2,N1)=TC0PFS(N3,N2,N1)+trcsa_XFLS(idsa_CaPO4,N,N3,N2,N1)-trcsa_XFLS(idsa_CaPO4,N,N6,N5,N4)
-        TC1PFS(N3,N2,N1)=TC1PFS(N3,N2,N1)+trcsa_XFLS(idsa_CaHPO4,N,N3,N2,N1)-trcsa_XFLS(idsa_CaHPO4,N,N6,N5,N4)
-        TC2PFS(N3,N2,N1)=TC2PFS(N3,N2,N1)+trcsa_XFLS(idsa_CaH2PO4,N,N3,N2,N1)-trcsa_XFLS(idsa_CaH2PO4,N,N6,N5,N4)
-        TM1PFS(N3,N2,N1)=TM1PFS(N3,N2,N1)+trcsa_XFLS(idsa_MgHPO4,N,N3,N2,N1)-trcsa_XFLS(idsa_MgHPO4,N,N6,N5,N4)
-        TH0BFB(N3,N2,N1)=TH0BFB(N3,N2,N1)+trcsa_XFLS(idsa_H0PO4B,N,N3,N2,N1)-trcsa_XFLS(idsa_H0PO4B,N,N6,N5,N4)
-        TH3BFB(N3,N2,N1)=TH3BFB(N3,N2,N1)+trcsa_XFLS(idsa_H3PO4B,N,N3,N2,N1)-trcsa_XFLS(idsa_H3PO4B,N,N6,N5,N4)
-        TF1BFB(N3,N2,N1)=TF1BFB(N3,N2,N1)+trcsa_XFLS(idsa_FeHPO4B,N,N3,N2,N1)-trcsa_XFLS(idsa_FeHPO4B,N,N6,N5,N4)
-        TF2BFB(N3,N2,N1)=TF2BFB(N3,N2,N1)+trcsa_XFLS(idsa_FeH2PO4B,N,N3,N2,N1)-trcsa_XFLS(idsa_FeH2PO4B,N,N6,N5,N4)
-        TC0BFB(N3,N2,N1)=TC0BFB(N3,N2,N1)+trcsa_XFLS(idsa_CaPO4B,N,N3,N2,N1)-trcsa_XFLS(idsa_CaPO4B,N,N6,N5,N4)
-        TC1BFB(N3,N2,N1)=TC1BFB(N3,N2,N1)+trcsa_XFLS(idsa_CaHPO4B,N,N3,N2,N1)-trcsa_XFLS(idsa_CaHPO4B,N,N6,N5,N4)
-        TC2BFB(N3,N2,N1)=TC2BFB(N3,N2,N1)+trcsa_XFLS(idsa_CaH2PO4B,N,N3,N2,N1)-trcsa_XFLS(idsa_CaH2PO4B,N,N6,N5,N4)
-        TM1BFB(N3,N2,N1)=TM1BFB(N3,N2,N1)+trcsa_XFLS(idsa_MgHPO4B,N,N3,N2,N1)-trcsa_XFLS(idsa_MgHPO4B,N,N6,N5,N4)
+        DO NTSA=idsa_beg,idsab_end
+          trcsa_TFLS(NTSA,N3,N2,N1)=trcsa_TFLS(NTSA,N3,N2,N1)+trcsa_XFLS(NTSA,N,N3,N2,N1)-trcsa_XFLS(NTSA,N,N6,N5,N4)
+          trcsa_TFHS(NTSA,N3,N2,N1)=trcsa_TFHS(NTSA,N3,N2,N1)+trcsa_XFHS(NTSA,N,N3,N2,N1)-trcsa_XFHS(NTSA,N,N6,N5,N4)
+        ENDDO
+!        trcsa_TFLS(idsa_Al,N3,N2,N1)=trcsa_TFLS(idsa_Al,N3,N2,N1)+trcsa_XFLS(idsa_Al,N,N3,N2,N1)-trcsa_XFLS(idsa_Al,N,N6,N5,N4)
+!        trcsa_TFLS(idsa_Fe,N3,N2,N1)=trcsa_TFLS(idsa_Fe,N3,N2,N1)+trcsa_XFLS(idsa_Fe,N,N3,N2,N1)-trcsa_XFLS(idsa_Fe,N,N6,N5,N4)
+!        trcsa_TFLS(idsa_Hp,N3,N2,N1)=trcsa_TFLS(idsa_Hp,N3,N2,N1)+trcsa_XFLS(idsa_Hp,N,N3,N2,N1)-trcsa_XFLS(idsa_Hp,N,N6,N5,N4)
+!        trcsa_TFLS(idsa_Ca,N3,N2,N1)=trcsa_TFLS(idsa_Ca,N3,N2,N1)+trcsa_XFLS(idsa_Ca,N,N3,N2,N1)-trcsa_XFLS(idsa_Ca,N,N6,N5,N4)
+!        trcsa_TFLS(idsa_Mg,N3,N2,N1)=trcsa_TFLS(idsa_Mg,N3,N2,N1)+trcsa_XFLS(idsa_Mg,N,N3,N2,N1)-trcsa_XFLS(idsa_Mg,N,N6,N5,N4)
+!        trcsa_TFLS(idsa_Na,N3,N2,N1)=trcsa_TFLS(idsa_Na,N3,N2,N1)+trcsa_XFLS(idsa_Na,N,N3,N2,N1)-trcsa_XFLS(idsa_Na,N,N6,N5,N4)
+!        trcsa_TFLS(idsa_K,N3,N2,N1)=trcsa_TFLS(idsa_K,N3,N2,N1)+trcsa_XFLS(idsa_K,N,N3,N2,N1)-trcsa_XFLS(idsa_K,N,N6,N5,N4)
+!        trcsa_TFLS(idsa_OH,N3,N2,N1)=trcsa_TFLS(idsa_OH,N3,N2,N1)+trcsa_XFLS(idsa_OH,N,N3,N2,N1)-trcsa_XFLS(idsa_OH,N,N6,N5,N4)
+!        trcsa_TFLS(idsa_SO4,N3,N2,N1)=trcsa_TFLS(idsa_SO4,N3,N2,N1)+trcsa_XFLS(idsa_SO4,N,N3,N2,N1)-trcsa_XFLS(idsa_SO4,N,N6,N5,N4)
+!        trcsa_TFLS(idsa_Cl,N3,N2,N1)=trcsa_TFLS(idsa_Cl,N3,N2,N1)+trcsa_XFLS(idsa_Cl,N,N3,N2,N1)-trcsa_XFLS(idsa_Cl,N,N6,N5,N4)
+!        trcsa_TFLS(idsa_CO3,N3,N2,N1)=trcsa_TFLS(idsa_CO3,N3,N2,N1)+trcsa_XFLS(idsa_CO3,N,N3,N2,N1)-trcsa_XFLS(idsa_CO3,N,N6,N5,N4)
+!        trcsa_TFLS(idsa_HCO3,N3,N2,N1)=trcsa_TFLS(idsa_HCO3,N3,N2,N1)+trcsa_XFLS(idsa_HCO3,N,N3,N2,N1)-trcsa_XFLS(idsa_HCO3,N,N6,N5,N4)
+!        trcsa_TFLS(idsa_AlOH,N3,N2,N1)=trcsa_TFLS(idsa_AlOH,N3,N2,N1)+trcsa_XFLS(idsa_AlOH,N,N3,N2,N1)-trcsa_XFLS(idsa_AlOH,N,N6,N5,N4)
+!        trcsa_TFLS(idsa_AlOH2,N3,N2,N1)=trcsa_TFLS(idsa_AlOH2,N3,N2,N1)+trcsa_XFLS(idsa_AlOH2,N,N3,N2,N1)-trcsa_XFLS(idsa_AlOH2,N,N6,N5,N4)
+!        trcsa_TFLS(idsa_AlOH3,N3,N2,N1)=trcsa_TFLS(idsa_AlOH3,N3,N2,N1)+trcsa_XFLS(idsa_AlOH3,N,N3,N2,N1)-trcsa_XFLS(idsa_AlOH3,N,N6,N5,N4)
+!        trcsa_TFLS(idsa_AlOH4,N3,N2,N1)=trcsa_TFLS(idsa_AlOH4,N3,N2,N1)+trcsa_XFLS(idsa_AlOH4,N,N3,N2,N1)-trcsa_XFLS(idsa_AlOH4,N,N6,N5,N4)
+!        trcsa_TFLS(idsa_AlSO4,N3,N2,N1)=trcsa_TFLS(idsa_AlSO4,N3,N2,N1)+trcsa_XFLS(idsa_AlSO4,N,N3,N2,N1)-trcsa_XFLS(idsa_AlSO4,N,N6,N5,N4)
+!        trcsa_TFLS(idsa_FeOH,N3,N2,N1)=trcsa_TFLS(idsa_FeOH,N3,N2,N1)+trcsa_XFLS(idsa_FeOH,N,N3,N2,N1)-trcsa_XFLS(idsa_FeOH,N,N6,N5,N4)
+!        trcsa_TFLS(idsa_FeOH2,N3,N2,N1)=trcsa_TFLS(idsa_FeOH2,N3,N2,N1)+trcsa_XFLS(idsa_FeOH2,N,N3,N2,N1)-trcsa_XFLS(idsa_FeOH2,N,N6,N5,N4)
+!        trcsa_TFLS(idsa_FeOH3,N3,N2,N1)=trcsa_TFLS(idsa_FeOH3,N3,N2,N1)+trcsa_XFLS(idsa_FeOH3,N,N3,N2,N1)-trcsa_XFLS(idsa_FeOH3,N,N6,N5,N4)
+!        trcsa_TFLS(idsa_FeOH4,N3,N2,N1)=trcsa_TFLS(idsa_FeOH4,N3,N2,N1)+trcsa_XFLS(idsa_FeOH4,N,N3,N2,N1)-trcsa_XFLS(idsa_FeOH4,N,N6,N5,N4)
+!        trcsa_TFLS(idsa_SO4,N3,N2,N1)=trcsa_TFLS(idsa_SO4,N3,N2,N1)+trcsa_XFLS(idsa_FeSO4,N,N3,N2,N1)-trcsa_XFLS(idsa_FeSO4,N,N6,N5,N4)
+!        trcsa_TFLS(idsa_CaOH2,N3,N2,N1)=trcsa_TFLS(idsa_CaOH2,N3,N2,N1)+trcsa_XFLS(idsa_CaOH2,N,N3,N2,N1)-trcsa_XFLS(idsa_CaOH2,N,N6,N5,N4)
+!        trcsa_TFLS(idsa_CaCO3,N3,N2,N1)=trcsa_TFLS(idsa_CaCO3,N3,N2,N1)+trcsa_XFLS(idsa_CaCO3,N,N3,N2,N1)-trcsa_XFLS(idsa_CaCO3,N,N6,N5,N4)
+!        trcsa_TFLS(idsa_CaHCO3,N3,N2,N1)=trcsa_TFLS(idsa_CaHCO3,N3,N2,N1)+trcsa_XFLS(idsa_CaHCO3,N,N3,N2,N1)-trcsa_XFLS(idsa_CaHCO3,N,N6,N5,N4)
+!        trcsa_TFLS(idsa_CaSO4,N3,N2,N1)=trcsa_TFLS(idsa_CaSO4,N3,N2,N1)+trcsa_XFLS(idsa_CaSO4,N,N3,N2,N1)-trcsa_XFLS(idsa_CaSO4,N,N6,N5,N4)
+!        trcsa_TFLS(idsa_MgOH2,N3,N2,N1)=trcsa_TFLS(idsa_MgOH2,N3,N2,N1)+trcsa_XFLS(idsa_MgOH2,N,N3,N2,N1)-trcsa_XFLS(idsa_MgOH2,N,N6,N5,N4)
+!        trcsa_TFLS(idsa_MgCO3,N3,N2,N1)=trcsa_TFLS(idsa_MgCO3,N3,N2,N1)+trcsa_XFLS(idsa_MgCO3,N,N3,N2,N1)-trcsa_XFLS(idsa_MgCO3,N,N6,N5,N4)
+!        trcsa_TFLS(idsa_MgHCO3,N3,N2,N1)=trcsa_TFLS(idsa_MgHCO3,N3,N2,N1)+trcsa_XFLS(idsa_MgHCO3,N,N3,N2,N1)-trcsa_XFLS(idsa_MgHCO3,N,N6,N5,N4)
+!        trcsa_TFLS(idsa_MgSO4,N3,N2,N1)=trcsa_TFLS(idsa_MgSO4,N3,N2,N1)+trcsa_XFLS(idsa_MgSO4,N,N3,N2,N1)-trcsa_XFLS(idsa_MgSO4,N,N6,N5,N4)
+!        trcsa_TFLS(idsa_NaCO3,N3,N2,N1)=trcsa_TFLS(idsa_NaCO3,N3,N2,N1)+trcsa_XFLS(idsa_NaCO3,N,N3,N2,N1)-trcsa_XFLS(idsa_NaCO3,N,N6,N5,N4)
+!        trcsa_TFLS(idsa_NaSO4,N3,N2,N1)=trcsa_TFLS(idsa_NaSO4,N3,N2,N1)+trcsa_XFLS(idsa_NaSO4,N,N3,N2,N1)-trcsa_XFLS(idsa_NaSO4,N,N6,N5,N4)
+!        trcsa_TFLS(idsa_KSO4,N3,N2,N1)=trcsa_TFLS(idsa_KSO4,N3,N2,N1)+trcsa_XFLS(idsa_KSO4,N,N3,N2,N1)-trcsa_XFLS(idsa_KSO4,N,N6,N5,N4)
+!        trcsa_TFLS(idsa_H0PO4,N3,N2,N1)=trcsa_TFLS(idsa_H0PO4,N3,N2,N1)+trcsa_XFLS(idsa_H0PO4,N,N3,N2,N1)-trcsa_XFLS(idsa_H0PO4,N,N6,N5,N4)
+!        trcsa_TFLS(idsa_H3PO4,N3,N2,N1)=trcsa_TFLS(idsa_H3PO4,N3,N2,N1)+trcsa_XFLS(idsa_H3PO4,N,N3,N2,N1)-trcsa_XFLS(idsa_H3PO4,N,N6,N5,N4)
+!        trcsa_TFLS(idsa_FeHPO4,N3,N2,N1)=trcsa_TFLS(idsa_FeHPO4,N3,N2,N1)+trcsa_XFLS(idsa_FeHPO4,N,N3,N2,N1)-trcsa_XFLS(idsa_FeHPO4,N,N6,N5,N4)
+!        trcsa_TFLS(idsa_FeH2PO4,N3,N2,N1)=trcsa_TFLS(idsa_FeH2PO4,N3,N2,N1)+trcsa_XFLS(idsa_FeH2PO4,N,N3,N2,N1)-trcsa_XFLS(idsa_FeH2PO4,N,N6,N5,N4)
+!        trcsa_TFLS(idsa_CaPO4,N3,N2,N1)=trcsa_TFLS(idsa_CaPO4,N3,N2,N1)+trcsa_XFLS(idsa_CaPO4,N,N3,N2,N1)-trcsa_XFLS(idsa_CaPO4,N,N6,N5,N4)
+!        trcsa_TFLS(idsa_CaHPO4,N3,N2,N1)=trcsa_TFLS(idsa_CaHPO4,N3,N2,N1)+trcsa_XFLS(idsa_CaHPO4,N,N3,N2,N1)-trcsa_XFLS(idsa_CaHPO4,N,N6,N5,N4)
+!        trcsa_TFLS(idsa_CaH2PO4,N3,N2,N1)=trcsa_TFLS(idsa_CaH2PO4,N3,N2,N1)+trcsa_XFLS(idsa_CaH2PO4,N,N3,N2,N1)-trcsa_XFLS(idsa_CaH2PO4,N,N6,N5,N4)
+!        trcsa_TFLS(idsa_MgHPO4,N3,N2,N1)=trcsa_TFLS(idsa_MgHPO4,N3,N2,N1)+trcsa_XFLS(idsa_MgHPO4,N,N3,N2,N1)-trcsa_XFLS(idsa_MgHPO4,N,N6,N5,N4)
 
-        TALFHS(N3,N2,N1)=TALFHS(N3,N2,N1)+trcsa_XFHS(idsa_Al,N,N3,N2,N1)-trcsa_XFHS(idsa_Al,N,N6,N5,N4)
-        TFEFHS(N3,N2,N1)=TFEFHS(N3,N2,N1)+trcsa_XFHS(idsa_Fe,N,N3,N2,N1)-trcsa_XFHS(idsa_Fe,N,N6,N5,N4)
-        THYFHS(N3,N2,N1)=THYFHS(N3,N2,N1)+trcsa_XFHS(idsa_Hp,N,N3,N2,N1)-trcsa_XFHS(idsa_Hp,N,N6,N5,N4)
-        TCAFHS(N3,N2,N1)=TCAFHS(N3,N2,N1)+trcsa_XFHS(idsa_Ca,N,N3,N2,N1)-trcsa_XFHS(idsa_Ca,N,N6,N5,N4)
-        TMGFHS(N3,N2,N1)=TMGFHS(N3,N2,N1)+trcsa_XFHS(idsa_Mg,N,N3,N2,N1)-trcsa_XFHS(idsa_Mg,N,N6,N5,N4)
-        TNAFHS(N3,N2,N1)=TNAFHS(N3,N2,N1)+trcsa_XFHS(idsa_Na,N,N3,N2,N1)-trcsa_XFHS(idsa_Na,N,N6,N5,N4)
-        TKAFHS(N3,N2,N1)=TKAFHS(N3,N2,N1)+trcsa_XFHS(idsa_K,N,N3,N2,N1)-trcsa_XFHS(idsa_K,N,N6,N5,N4)
-        TOHFHS(N3,N2,N1)=TOHFHS(N3,N2,N1)+trcsa_XFHS(idsa_OH,N,N3,N2,N1)-trcsa_XFHS(idsa_OH,N,N6,N5,N4)
-        TSOFHS(N3,N2,N1)=TSOFHS(N3,N2,N1)+trcsa_XFHS(idsa_SO4,N,N3,N2,N1)-trcsa_XFHS(idsa_SO4,N,N6,N5,N4)
-        TCLFHS(N3,N2,N1)=TCLFHS(N3,N2,N1)+trcsa_XFHS(idsa_Cl,N,N3,N2,N1)-trcsa_XFHS(idsa_Cl,N,N6,N5,N4)
-        TC3FHS(N3,N2,N1)=TC3FHS(N3,N2,N1)+trcsa_XFHS(idsa_CO3,N,N3,N2,N1)-trcsa_XFHS(idsa_CO3,N,N6,N5,N4)
-        THCFHS(N3,N2,N1)=THCFHS(N3,N2,N1)+trcsa_XFHS(idsa_HCO3,N,N3,N2,N1)-trcsa_XFHS(idsa_HCO3,N,N6,N5,N4)
-        TAL1HS(N3,N2,N1)=TAL1HS(N3,N2,N1)+trcsa_XFHS(idsa_AlOH,N,N3,N2,N1)-trcsa_XFHS(idsa_AlOH,N,N6,N5,N4)
-        TAL2HS(N3,N2,N1)=TAL2HS(N3,N2,N1)+trcsa_XFHS(idsa_AlOH2,N,N3,N2,N1)-trcsa_XFHS(idsa_AlOH2,N,N6,N5,N4)
-        TAL3HS(N3,N2,N1)=TAL3HS(N3,N2,N1)+trcsa_XFHS(idsa_AlOH3,N,N3,N2,N1)-trcsa_XFHS(idsa_AlOH3,N,N6,N5,N4)
-        TAL4HS(N3,N2,N1)=TAL4HS(N3,N2,N1)+trcsa_XFHS(idsa_AlOH4,N,N3,N2,N1)-trcsa_XFHS(idsa_AlOH4,N,N6,N5,N4)
-        TALSHS(N3,N2,N1)=TALSHS(N3,N2,N1)+trcsa_XFHS(idsa_AlSO4,N,N3,N2,N1)-trcsa_XFHS(idsa_AlSO4,N,N6,N5,N4)
-        TFE1HS(N3,N2,N1)=TFE1HS(N3,N2,N1)+trcsa_XFHS(idsa_FeOH,N,N3,N2,N1)-trcsa_XFHS(idsa_FeOH,N,N6,N5,N4)
-        TFE2HS(N3,N2,N1)=TFE2HS(N3,N2,N1)+trcsa_XFHS(idsa_FeOH2,N,N3,N2,N1)-trcsa_XFHS(idsa_FeOH2,N,N6,N5,N4)
-        TFE3HS(N3,N2,N1)=TFE3HS(N3,N2,N1)+trcsa_XFHS(idsa_FeOH3,N,N3,N2,N1)-trcsa_XFHS(idsa_FeOH3,N,N6,N5,N4)
-        TFE4HS(N3,N2,N1)=TFE4HS(N3,N2,N1)+trcsa_XFHS(idsa_FeOH4,N,N3,N2,N1)-trcsa_XFHS(idsa_FeOH4,N,N6,N5,N4)
-        TFESHS(N3,N2,N1)=TFESHS(N3,N2,N1)+trcsa_XFHS(idsa_FeSO4,N,N3,N2,N1)-trcsa_XFHS(idsa_FeSO4,N,N6,N5,N4)
-        TCAOHS(N3,N2,N1)=TCAOHS(N3,N2,N1)+trcsa_XFHS(idsa_CaOH2,N,N3,N2,N1)-trcsa_XFHS(idsa_CaOH2,N,N6,N5,N4)
-        TCACHS(N3,N2,N1)=TCACHS(N3,N2,N1)+trcsa_XFHS(idsa_CaCO3,N,N3,N2,N1)-trcsa_XFHS(idsa_CaCO3,N,N6,N5,N4)
-        TCAHHS(N3,N2,N1)=TCAHHS(N3,N2,N1)+trcsa_XFHS(idsa_MgHPO4,N,N3,N2,N1)-trcsa_XFHS(idsa_CaHCO3,N,N6,N5,N4)
-        TCASHS(N3,N2,N1)=TCASHS(N3,N2,N1)+trcsa_XFHS(idsa_CaSO4,N,N3,N2,N1)-trcsa_XFHS(idsa_CaSO4,N,N6,N5,N4)
-        TMGOHS(N3,N2,N1)=TMGOHS(N3,N2,N1)+trcsa_XFHS(idsa_MgOH2,N,N3,N2,N1)-trcsa_XFHS(idsa_MgOH2,N,N6,N5,N4)
-        TMGCHS(N3,N2,N1)=TMGCHS(N3,N2,N1)+trcsa_XFHS(idsa_MgCO3,N,N3,N2,N1)-trcsa_XFHS(idsa_MgCO3,N,N6,N5,N4)
-        TMGHHS(N3,N2,N1)=TMGHHS(N3,N2,N1)+trcsa_XFHS(idsa_MgHCO3,N,N3,N2,N1)-trcsa_XFHS(idsa_MgHCO3,N,N6,N5,N4)
-        TMGSHS(N3,N2,N1)=TMGSHS(N3,N2,N1)+trcsa_XFHS(idsa_MgSO4,N,N3,N2,N1)-trcsa_XFHS(idsa_MgSO4,N,N6,N5,N4)
-        TNACHS(N3,N2,N1)=TNACHS(N3,N2,N1)+trcsa_XFHS(idsa_NaCO3,N,N3,N2,N1)-trcsa_XFHS(idsa_NaCO3,N,N6,N5,N4)
-        TNASHS(N3,N2,N1)=TNASHS(N3,N2,N1)+trcsa_XFHS(idsa_NaSO4,N,N3,N2,N1)-trcsa_XFHS(idsa_NaSO4,N,N6,N5,N4)
-        TKASHS(N3,N2,N1)=TKASHS(N3,N2,N1)+trcsa_XFHS(idsa_KSO4,N,N3,N2,N1)-trcsa_XFHS(idsa_KSO4,N,N6,N5,N4)
-        TH0PHS(N3,N2,N1)=TH0PHS(N3,N2,N1)+trcsa_XFHS(idsa_H0PO4,N,N3,N2,N1)-trcsa_XFHS(idsa_H0PO4,N,N6,N5,N4)
-        TH3PHS(N3,N2,N1)=TH3PHS(N3,N2,N1)+trcsa_XFHS(idsa_H3PO4,N,N3,N2,N1)-trcsa_XFHS(idsa_H3PO4,N,N6,N5,N4)
-        TF1PHS(N3,N2,N1)=TF1PHS(N3,N2,N1)+trcsa_XFHS(idsa_FeHPO4,N,N3,N2,N1)-trcsa_XFHS(idsa_FeHPO4,N,N6,N5,N4)
-        TF2PHS(N3,N2,N1)=TF2PHS(N3,N2,N1)+trcsa_XFHS(idsa_FeH2PO4,N,N3,N2,N1)-trcsa_XFHS(idsa_FeH2PO4,N,N6,N5,N4)
-        TC0PHS(N3,N2,N1)=TC0PHS(N3,N2,N1)+trcsa_XFHS(idsa_CaPO4,N,N3,N2,N1)-trcsa_XFHS(idsa_CaPO4,N,N6,N5,N4)
-        TC1PHS(N3,N2,N1)=TC1PHS(N3,N2,N1)+trcsa_XFHS(idsa_CaHPO4,N,N3,N2,N1)-trcsa_XFHS(idsa_CaHPO4,N,N6,N5,N4)
-        TC2PHS(N3,N2,N1)=TC2PHS(N3,N2,N1)+trcsa_XFHS(idsa_CaH2PO4,N,N3,N2,N1)-trcsa_XFHS(idsa_CaH2PO4,N,N6,N5,N4)
-        TM1PHS(N3,N2,N1)=TM1PHS(N3,N2,N1)+trcsa_XFHS(idsa_MgHPO4,N,N3,N2,N1)-trcsa_XFHS(idsa_MgHPO4,N,N6,N5,N4)
+!        trcsa_TFLS(idsa_H0PO4B,N3,N2,N1)=trcsa_TFLS(idsa_H0PO4B,N3,N2,N1)+trcsa_XFLS(idsa_H0PO4B,N,N3,N2,N1)-trcsa_XFLS(idsa_H0PO4B,N,N6,N5,N4)
+!        trcsa_TFLS(idsa_H3PO4B,N3,N2,N1)=trcsa_TFLS(idsa_H3PO4B,N3,N2,N1)+trcsa_XFLS(idsa_H3PO4B,N,N3,N2,N1)-trcsa_XFLS(idsa_H3PO4B,N,N6,N5,N4)
+!        trcsa_TFLS(idsa_FeHPO4B,N3,N2,N1)=trcsa_TFLS(idsa_FeHPO4B,N3,N2,N1)+trcsa_XFLS(idsa_FeHPO4B,N,N3,N2,N1)-trcsa_XFLS(idsa_FeHPO4B,N,N6,N5,N4)
+!        trcsa_TFLS(idsa_FeH2PO4B,N3,N2,N1)=trcsa_TFLS(idsa_FeH2PO4B,N3,N2,N1)+trcsa_XFLS(idsa_FeH2PO4B,N,N3,N2,N1)-trcsa_XFLS(idsa_FeH2PO4B,N,N6,N5,N4)
+!        trcsa_TFLS(idsa_CaPO4B,N3,N2,N1)=trcsa_TFLS(idsa_CaPO4B,N3,N2,N1)+trcsa_XFLS(idsa_CaPO4B,N,N3,N2,N1)-trcsa_XFLS(idsa_CaPO4B,N,N6,N5,N4)
+!        trcsa_TFLS(idsa_CaHPO4B,N3,N2,N1)=trcsa_TFLS(idsa_CaHPO4B,N3,N2,N1)+trcsa_XFLS(idsa_CaHPO4B,N,N3,N2,N1)-trcsa_XFLS(idsa_CaHPO4B,N,N6,N5,N4)
+!        trcsa_TFLS(idsa_CaH2PO4B,N3,N2,N1)=trcsa_TFLS(idsa_CaH2PO4B,N3,N2,N1)+trcsa_XFLS(idsa_CaH2PO4B,N,N3,N2,N1)-trcsa_XFLS(idsa_CaH2PO4B,N,N6,N5,N4)
+!        trcsa_TFLS(idsa_MgHPO4B,N3,N2,N1)=trcsa_TFLS(idsa_MgHPO4B,N3,N2,N1)+trcsa_XFLS(idsa_MgHPO4B,N,N3,N2,N1)-trcsa_XFLS(idsa_MgHPO4B,N,N6,N5,N4)
 
-        TH0BHB(N3,N2,N1)=TH0BHB(N3,N2,N1)+trcsa_XFHS(idsa_H0PO4B,N,N3,N2,N1)-trcsa_XFHS(idsa_H0PO4B,N,N6,N5,N4)
-        TH3BHB(N3,N2,N1)=TH3BHB(N3,N2,N1)+trcsa_XFHS(idsa_H3PO4B,N,N3,N2,N1)-trcsa_XFHS(idsa_H3PO4B,N,N6,N5,N4)
-        TF1BHB(N3,N2,N1)=TF1BHB(N3,N2,N1)+trcsa_XFHS(idsa_FeHPO4B,N,N3,N2,N1)-trcsa_XFHS(idsa_FeHPO4B,N,N6,N5,N4)
-        TF2BHB(N3,N2,N1)=TF2BHB(N3,N2,N1)+trcsa_XFHS(idsa_FeH2PO4B,N,N3,N2,N1)-trcsa_XFHS(idsa_FeH2PO4B,N,N6,N5,N4)
-        TC0BHB(N3,N2,N1)=TC0BHB(N3,N2,N1)+trcsa_XFHS(idsa_CaPO4B,N,N3,N2,N1)-trcsa_XFHS(idsa_CaPO4B,N,N6,N5,N4)
-        TC1BHB(N3,N2,N1)=TC1BHB(N3,N2,N1)+trcsa_XFHS(idsa_CaHPO4B,N,N3,N2,N1)-trcsa_XFHS(idsa_CaHPO4B,N,N6,N5,N4)
-        TC2BHB(N3,N2,N1)=TC2BHB(N3,N2,N1)+trcsa_XFHS(idsa_CaH2PO4B,N,N3,N2,N1)-trcsa_XFHS(idsa_CaH2PO4B,N,N6,N5,N4)
-        TM1BHB(N3,N2,N1)=TM1BHB(N3,N2,N1)+trcsa_XFHS(idsa_MgHPO4B,N,N3,N2,N1)-trcsa_XFHS(idsa_MgHPO4B,N,N6,N5,N4)
+!        trcsa_TFHS(idsa_Al,N3,N2,N1)=trcsa_TFHS(idsa_Al,N3,N2,N1)+trcsa_XFHS(idsa_Al,N,N3,N2,N1)-trcsa_XFHS(idsa_Al,N,N6,N5,N4)
+!        trcsa_TFHS(idsa_Fe,N3,N2,N1)=trcsa_TFHS(idsa_Fe,N3,N2,N1)+trcsa_XFHS(idsa_Fe,N,N3,N2,N1)-trcsa_XFHS(idsa_Fe,N,N6,N5,N4)
+!        trcsa_TFHS(idsa_Hp,N3,N2,N1)=trcsa_TFHS(idsa_Hp,N3,N2,N1)+trcsa_XFHS(idsa_Hp,N,N3,N2,N1)-trcsa_XFHS(idsa_Hp,N,N6,N5,N4)
+!        trcsa_TFHS(idsa_Ca,N3,N2,N1)=trcsa_TFHS(idsa_Ca,N3,N2,N1)+trcsa_XFHS(idsa_Ca,N,N3,N2,N1)-trcsa_XFHS(idsa_Ca,N,N6,N5,N4)
+!        trcsa_TFHS(idsa_Mg,N3,N2,N1)=trcsa_TFHS(idsa_Mg,N3,N2,N1)+trcsa_XFHS(idsa_Mg,N,N3,N2,N1)-trcsa_XFHS(idsa_Mg,N,N6,N5,N4)
+!        trcsa_TFHS(idsa_Na,N3,N2,N1)=trcsa_TFHS(idsa_Na,N3,N2,N1)+trcsa_XFHS(idsa_Na,N,N3,N2,N1)-trcsa_XFHS(idsa_Na,N,N6,N5,N4)
+!        trcsa_TFHS(idsa_K,N3,N2,N1)=trcsa_TFHS(idsa_K,N3,N2,N1)+trcsa_XFHS(idsa_K,N,N3,N2,N1)-trcsa_XFHS(idsa_K,N,N6,N5,N4)
+!        trcsa_TFHS(idsa_OH,N3,N2,N1)=trcsa_TFHS(idsa_OH,N3,N2,N1)+trcsa_XFHS(idsa_OH,N,N3,N2,N1)-trcsa_XFHS(idsa_OH,N,N6,N5,N4)
+!        trcsa_TFHS(idsa_SO4,N3,N2,N1)=trcsa_TFHS(idsa_SO4,N3,N2,N1)+trcsa_XFHS(idsa_SO4,N,N3,N2,N1)-trcsa_XFHS(idsa_SO4,N,N6,N5,N4)
+!        trcsa_TFHS(idsa_Cl,N3,N2,N1)=trcsa_TFHS(idsa_Cl,N3,N2,N1)+trcsa_XFHS(idsa_Cl,N,N3,N2,N1)-trcsa_XFHS(idsa_Cl,N,N6,N5,N4)
+!        trcsa_TFHS(idsa_CO3,N3,N2,N1)=trcsa_TFHS(idsa_CO3,N3,N2,N1)+trcsa_XFHS(idsa_CO3,N,N3,N2,N1)-trcsa_XFHS(idsa_CO3,N,N6,N5,N4)
+!        trcsa_TFHS(idsa_HCO3,N3,N2,N1)=trcsa_TFHS(idsa_HCO3,N3,N2,N1)+trcsa_XFHS(idsa_HCO3,N,N3,N2,N1)-trcsa_XFHS(idsa_HCO3,N,N6,N5,N4)
+!        trcsa_TFHS(idsa_AlOH,N3,N2,N1)=trcsa_TFHS(idsa_AlOH,N3,N2,N1)+trcsa_XFHS(idsa_AlOH,N,N3,N2,N1)-trcsa_XFHS(idsa_AlOH,N,N6,N5,N4)
+!        trcsa_TFHS(idsa_AlOH2,N3,N2,N1)=trcsa_TFHS(idsa_AlOH2,N3,N2,N1)+trcsa_XFHS(idsa_AlOH2,N,N3,N2,N1)-trcsa_XFHS(idsa_AlOH2,N,N6,N5,N4)
+!        trcsa_TFHS(idsa_AlOH3,N3,N2,N1)=trcsa_TFHS(idsa_AlOH3,N3,N2,N1)+trcsa_XFHS(idsa_AlOH3,N,N3,N2,N1)-trcsa_XFHS(idsa_AlOH3,N,N6,N5,N4)
+!        trcsa_TFHS(idsa_AlOH4,N3,N2,N1)=trcsa_TFHS(idsa_AlOH4,N3,N2,N1)+trcsa_XFHS(idsa_AlOH4,N,N3,N2,N1)-trcsa_XFHS(idsa_AlOH4,N,N6,N5,N4)
+!        trcsa_TFHS(idsa_AlSO4,N3,N2,N1)=trcsa_TFHS(idsa_AlSO4,N3,N2,N1)+trcsa_XFHS(idsa_AlSO4,N,N3,N2,N1)-trcsa_XFHS(idsa_AlSO4,N,N6,N5,N4)
+!        trcsa_TFHS(idsa_FeOH,N3,N2,N1)=trcsa_TFHS(idsa_FeOH,N3,N2,N1)+trcsa_XFHS(idsa_FeOH,N,N3,N2,N1)-trcsa_XFHS(idsa_FeOH,N,N6,N5,N4)
+!        trcsa_TFHS(idsa_FeOH2,N3,N2,N1)=trcsa_TFHS(idsa_FeOH2,N3,N2,N1)+trcsa_XFHS(idsa_FeOH2,N,N3,N2,N1)-trcsa_XFHS(idsa_FeOH2,N,N6,N5,N4)
+!        trcsa_TFHS(idsa_FeOH3,N3,N2,N1)=trcsa_TFHS(idsa_FeOH3,N3,N2,N1)+trcsa_XFHS(idsa_FeOH3,N,N3,N2,N1)-trcsa_XFHS(idsa_FeOH3,N,N6,N5,N4)
+!        trcsa_TFHS(idsa_FeOH4,N3,N2,N1)=trcsa_TFHS(idsa_FeOH4,N3,N2,N1)+trcsa_XFHS(idsa_FeOH4,N,N3,N2,N1)-trcsa_XFHS(idsa_FeOH4,N,N6,N5,N4)
+!        trcsa_TFHS(idsa_FeSO4,N3,N2,N1)=trcsa_TFHS(idsa_FeSO4,N3,N2,N1)+trcsa_XFHS(idsa_FeSO4,N,N3,N2,N1)-trcsa_XFHS(idsa_FeSO4,N,N6,N5,N4)
+!        trcsa_TFHS(idsa_CaOH2,N3,N2,N1)=trcsa_TFHS(idsa_CaOH2,N3,N2,N1)+trcsa_XFHS(idsa_CaOH2,N,N3,N2,N1)-trcsa_XFHS(idsa_CaOH2,N,N6,N5,N4)
+!        trcsa_TFHS(idsa_CaCO3,N3,N2,N1)=trcsa_TFHS(idsa_CaCO3,N3,N2,N1)+trcsa_XFHS(idsa_CaCO3,N,N3,N2,N1)-trcsa_XFHS(idsa_CaCO3,N,N6,N5,N4)
+!        trcsa_TFHS(idsa_MgHPO4,N3,N2,N1)=trcsa_TFHS(idsa_MgHPO4,N3,N2,N1)+trcsa_XFHS(idsa_MgHPO4,N,N3,N2,N1)-trcsa_XFHS(idsa_CaHCO3,N,N6,N5,N4)
+!        trcsa_TFHS(idsa_CaSO4,N3,N2,N1)=trcsa_TFHS(idsa_CaSO4,N3,N2,N1)+trcsa_XFHS(idsa_CaSO4,N,N3,N2,N1)-trcsa_XFHS(idsa_CaSO4,N,N6,N5,N4)
+!        trcsa_TFHS(idsa_MgOH2,N3,N2,N1)=trcsa_TFHS(idsa_MgOH2,N3,N2,N1)+trcsa_XFHS(idsa_MgOH2,N,N3,N2,N1)-trcsa_XFHS(idsa_MgOH2,N,N6,N5,N4)
+!        trcsa_TFHS(idsa_MgCO3,N3,N2,N1)=trcsa_TFHS(idsa_MgCO3,N3,N2,N1)+trcsa_XFHS(idsa_MgCO3,N,N3,N2,N1)-trcsa_XFHS(idsa_MgCO3,N,N6,N5,N4)
+!        trcsa_TFHS(idsa_MgHCO3,N3,N2,N1)=trcsa_TFHS(idsa_MgHCO3,N3,N2,N1)+trcsa_XFHS(idsa_MgHCO3,N,N3,N2,N1)-trcsa_XFHS(idsa_MgHCO3,N,N6,N5,N4)
+!        trcsa_TFHS(idsa_MgSO4,N3,N2,N1)=trcsa_TFHS(idsa_MgSO4,N3,N2,N1)+trcsa_XFHS(idsa_MgSO4,N,N3,N2,N1)-trcsa_XFHS(idsa_MgSO4,N,N6,N5,N4)
+!        trcsa_TFHS(idsa_NaCO3,N3,N2,N1)=trcsa_TFHS(idsa_NaCO3,N3,N2,N1)+trcsa_XFHS(idsa_NaCO3,N,N3,N2,N1)-trcsa_XFHS(idsa_NaCO3,N,N6,N5,N4)
+!        trcsa_TFHS(idsa_NaSO4,N3,N2,N1)=trcsa_TFHS(idsa_NaSO4,N3,N2,N1)+trcsa_XFHS(idsa_NaSO4,N,N3,N2,N1)-trcsa_XFHS(idsa_NaSO4,N,N6,N5,N4)
+!        trcsa_TFHS(idsa_KSO4,N3,N2,N1)=trcsa_TFHS(idsa_KSO4,N3,N2,N1)+trcsa_XFHS(idsa_KSO4,N,N3,N2,N1)-trcsa_XFHS(idsa_KSO4,N,N6,N5,N4)
+!        trcsa_TFHS(idsa_H0PO4,N3,N2,N1)=trcsa_TFHS(idsa_H0PO4,N3,N2,N1)+trcsa_XFHS(idsa_H0PO4,N,N3,N2,N1)-trcsa_XFHS(idsa_H0PO4,N,N6,N5,N4)
+!        trcsa_TFHS(idsa_H3PO4,N3,N2,N1)=trcsa_TFHS(idsa_H3PO4,N3,N2,N1)+trcsa_XFHS(idsa_H3PO4,N,N3,N2,N1)-trcsa_XFHS(idsa_H3PO4,N,N6,N5,N4)
+!        trcsa_TFHS(idsa_FeHPO4,N3,N2,N1)=trcsa_TFHS(idsa_FeHPO4,N3,N2,N1)+trcsa_XFHS(idsa_FeHPO4,N,N3,N2,N1)-trcsa_XFHS(idsa_FeHPO4,N,N6,N5,N4)
+!        trcsa_TFHS(idsa_FeH2PO4,N3,N2,N1)=trcsa_TFHS(idsa_FeH2PO4,N3,N2,N1)+trcsa_XFHS(idsa_FeH2PO4,N,N3,N2,N1)-trcsa_XFHS(idsa_FeH2PO4,N,N6,N5,N4)
+!        trcsa_TFHS(idsa_CaPO4,N3,N2,N1)=trcsa_TFHS(idsa_CaPO4,N3,N2,N1)+trcsa_XFHS(idsa_CaPO4,N,N3,N2,N1)-trcsa_XFHS(idsa_CaPO4,N,N6,N5,N4)
+!        trcsa_TFHS(idsa_CaHPO4,N3,N2,N1)=trcsa_TFHS(idsa_CaHPO4,N3,N2,N1)+trcsa_XFHS(idsa_CaHPO4,N,N3,N2,N1)-trcsa_XFHS(idsa_CaHPO4,N,N6,N5,N4)
+!        trcsa_TFHS(idsa_CaH2PO4,N3,N2,N1)=trcsa_TFHS(idsa_CaH2PO4,N3,N2,N1)+trcsa_XFHS(idsa_CaH2PO4,N,N3,N2,N1)-trcsa_XFHS(idsa_CaH2PO4,N,N6,N5,N4)
+!        trcsa_TFHS(idsa_MgHPO4,N3,N2,N1)=trcsa_TFHS(idsa_MgHPO4,N3,N2,N1)+trcsa_XFHS(idsa_MgHPO4,N,N3,N2,N1)-trcsa_XFHS(idsa_MgHPO4,N,N6,N5,N4)
+
+!        trcsa_TFHS(idsa_H0PO4B,N3,N2,N1)=trcsa_TFHS(idsa_H0PO4B,N3,N2,N1)+trcsa_XFHS(idsa_H0PO4B,N,N3,N2,N1)-trcsa_XFHS(idsa_H0PO4B,N,N6,N5,N4)
+!        trcsa_TFHS(idsa_H3PO4B,N3,N2,N1)=trcsa_TFHS(idsa_H3PO4B,N3,N2,N1)+trcsa_XFHS(idsa_H3PO4B,N,N3,N2,N1)-trcsa_XFHS(idsa_H3PO4B,N,N6,N5,N4)
+!        trcsa_TFHS(idsa_FeHPO4B,N3,N2,N1)=trcsa_TFHS(idsa_FeHPO4B,N3,N2,N1)+trcsa_XFHS(idsa_FeHPO4B,N,N3,N2,N1)-trcsa_XFHS(idsa_FeHPO4B,N,N6,N5,N4)
+!        trcsa_TFHS(idsa_FeH2PO4B,N3,N2,N1)=trcsa_TFHS(idsa_FeH2PO4B,N3,N2,N1)+trcsa_XFHS(idsa_FeH2PO4B,N,N3,N2,N1)-trcsa_XFHS(idsa_FeH2PO4B,N,N6,N5,N4)
+!        trcsa_TFHS(idsa_CaPO4B,N3,N2,N1)=trcsa_TFHS(idsa_CaPO4B,N3,N2,N1)+trcsa_XFHS(idsa_CaPO4B,N,N3,N2,N1)-trcsa_XFHS(idsa_CaPO4B,N,N6,N5,N4)
+!        trcsa_TFHS(idsa_CaHPO4B,N3,N2,N1)=trcsa_TFHS(idsa_CaHPO4B,N3,N2,N1)+trcsa_XFHS(idsa_CaHPO4B,N,N3,N2,N1)-trcsa_XFHS(idsa_CaHPO4B,N,N6,N5,N4)
+!        trcsa_TFHS(idsa_CaH2PO4B,N3,N2,N1)=trcsa_TFHS(idsa_CaH2PO4B,N3,N2,N1)+trcsa_XFHS(idsa_CaH2PO4B,N,N3,N2,N1)-trcsa_XFHS(idsa_CaH2PO4B,N,N6,N5,N4)
+!        trcsa_TFHS(idsa_MgHPO4B,N3,N2,N1)=trcsa_TFHS(idsa_MgHPO4B,N3,N2,N1)+trcsa_XFHS(idsa_MgHPO4B,N,N3,N2,N1)-trcsa_XFHS(idsa_MgHPO4B,N,N6,N5,N4)
       ENDIF
     ELSE
       TFLW(N3,N2,N1)=0.0_r8
@@ -1802,104 +1767,107 @@ implicit none
       TNHFLG(N3,N2,N1)=0.0_r8
       THGFLG(N3,N2,N1)=0.0_r8
       IF(ISALTG.NE.0)THEN
-        TALFLS(N3,N2,N1)=0.0_r8
-        TFEFLS(N3,N2,N1)=0.0_r8
-        THYFLS(N3,N2,N1)=0.0_r8
-        TCAFLS(N3,N2,N1)=0.0_r8
-        TMGFLS(N3,N2,N1)=0.0_r8
-        TNAFLS(N3,N2,N1)=0.0_r8
-        TKAFLS(N3,N2,N1)=0.0_r8
-        TOHFLS(N3,N2,N1)=0.0_r8
-        TSOFLS(N3,N2,N1)=0.0_r8
-        TCLFLS(N3,N2,N1)=0.0_r8
-        TC3FLS(N3,N2,N1)=0.0_r8
-        THCFLS(N3,N2,N1)=0.0_r8
-        TAL1FS(N3,N2,N1)=0.0_r8
-        TAL2FS(N3,N2,N1)=0.0_r8
-        TAL3FS(N3,N2,N1)=0.0_r8
-        TAL4FS(N3,N2,N1)=0.0_r8
-        TALSFS(N3,N2,N1)=0.0_r8
-        TFE1FS(N3,N2,N1)=0.0_r8
-        TFE2FS(N3,N2,N1)=0.0_r8
-        TFE3FS(N3,N2,N1)=0.0_r8
-        TFE4FS(N3,N2,N1)=0.0_r8
-        TFESFS(N3,N2,N1)=0.0_r8
-        TCAOFS(N3,N2,N1)=0.0_r8
-        TCACFS(N3,N2,N1)=0.0_r8
-        TCAHFS(N3,N2,N1)=0.0_r8
-        TCASFS(N3,N2,N1)=0.0_r8
-        TMGOFS(N3,N2,N1)=0.0_r8
-        TMGCFS(N3,N2,N1)=0.0_r8
-        TMGHFS(N3,N2,N1)=0.0_r8
-        TMGSFS(N3,N2,N1)=0.0_r8
-        TNACFS(N3,N2,N1)=0.0_r8
-        TNASFS(N3,N2,N1)=0.0_r8
-        TKASFS(N3,N2,N1)=0.0_r8
-        TH0PFS(N3,N2,N1)=0.0_r8
-        TH3PFS(N3,N2,N1)=0.0_r8
-        TF1PFS(N3,N2,N1)=0.0_r8
-        TF2PFS(N3,N2,N1)=0.0_r8
-        TC0PFS(N3,N2,N1)=0.0_r8
-        TC1PFS(N3,N2,N1)=0.0_r8
-        TC2PFS(N3,N2,N1)=0.0_r8
-        TM1PFS(N3,N2,N1)=0.0_r8
-        TH0BFB(N3,N2,N1)=0.0_r8
-        TH3BFB(N3,N2,N1)=0.0_r8
-        TF1BFB(N3,N2,N1)=0.0_r8
-        TF2BFB(N3,N2,N1)=0.0_r8
-        TC0BFB(N3,N2,N1)=0.0_r8
-        TC1BFB(N3,N2,N1)=0.0_r8
-        TC2BFB(N3,N2,N1)=0.0_r8
-        TM1BFB(N3,N2,N1)=0.0_r8
-        TALFHS(N3,N2,N1)=0.0_r8
-        TFEFHS(N3,N2,N1)=0.0_r8
-        THYFHS(N3,N2,N1)=0.0_r8
-        TCAFHS(N3,N2,N1)=0.0_r8
-        TMGFHS(N3,N2,N1)=0.0_r8
-        TNAFHS(N3,N2,N1)=0.0_r8
-        TKAFHS(N3,N2,N1)=0.0_r8
-        TOHFHS(N3,N2,N1)=0.0_r8
-        TSOFHS(N3,N2,N1)=0.0_r8
-        TCLFHS(N3,N2,N1)=0.0_r8
-        TC3FHS(N3,N2,N1)=0.0_r8
-        THCFHS(N3,N2,N1)=0.0_r8
-        TAL1HS(N3,N2,N1)=0.0_r8
-        TAL2HS(N3,N2,N1)=0.0_r8
-        TAL3HS(N3,N2,N1)=0.0_r8
-        TAL4HS(N3,N2,N1)=0.0_r8
-        TALSHS(N3,N2,N1)=0.0_r8
-        TFE1HS(N3,N2,N1)=0.0_r8
-        TFE2HS(N3,N2,N1)=0.0_r8
-        TFE3HS(N3,N2,N1)=0.0_r8
-        TFE4HS(N3,N2,N1)=0.0_r8
-        TFESHS(N3,N2,N1)=0.0_r8
-        TCAOHS(N3,N2,N1)=0.0_r8
-        TCACHS(N3,N2,N1)=0.0_r8
-        TCAHHS(N3,N2,N1)=0.0_r8
-        TCASHS(N3,N2,N1)=0.0_r8
-        TMGOHS(N3,N2,N1)=0.0_r8
-        TMGCHS(N3,N2,N1)=0.0_r8
-        TMGHHS(N3,N2,N1)=0.0_r8
-        TMGSHS(N3,N2,N1)=0.0_r8
-        TNACHS(N3,N2,N1)=0.0_r8
-        TNASHS(N3,N2,N1)=0.0_r8
-        TKASHS(N3,N2,N1)=0.0_r8
-        TH0PHS(N3,N2,N1)=0.0_r8
-        TH3PHS(N3,N2,N1)=0.0_r8
-        TF1PHS(N3,N2,N1)=0.0_r8
-        TF2PHS(N3,N2,N1)=0.0_r8
-        TC0PHS(N3,N2,N1)=0.0_r8
-        TC1PHS(N3,N2,N1)=0.0_r8
-        TC2PHS(N3,N2,N1)=0.0_r8
-        TM1PHS(N3,N2,N1)=0.0_r8
-        TH0BHB(N3,N2,N1)=0.0_r8
-        TH3BHB(N3,N2,N1)=0.0_r8
-        TF1BHB(N3,N2,N1)=0.0_r8
-        TF2BHB(N3,N2,N1)=0.0_r8
-        TC0BHB(N3,N2,N1)=0.0_r8
-        TC1BHB(N3,N2,N1)=0.0_r8
-        TC2BHB(N3,N2,N1)=0.0_r8
-        TM1BHB(N3,N2,N1)=0.0_r8
+        trcsa_TFLS(idsa_beg:idsab_end,N3,N2,N1)=0.0_r8
+!        trcsa_TFLS(idsa_Al,N3,N2,N1)=0.0_r8
+!        trcsa_TFLS(idsa_Fe,N3,N2,N1)=0.0_r8
+!        trcsa_TFLS(idsa_Hp,N3,N2,N1)=0.0_r8
+!        trcsa_TFLS(idsa_Ca,N3,N2,N1)=0.0_r8
+!        trcsa_TFLS(idsa_Mg,N3,N2,N1)=0.0_r8
+!        trcsa_TFLS(idsa_Na,N3,N2,N1)=0.0_r8
+!        trcsa_TFLS(idsa_K,N3,N2,N1)=0.0_r8
+!        trcsa_TFLS(idsa_OH,N3,N2,N1)=0.0_r8
+!        trcsa_TFLS(idsa_SO4,N3,N2,N1)=0.0_r8
+!        trcsa_TFLS(idsa_Cl,N3,N2,N1)=0.0_r8
+!        trcsa_TFLS(idsa_CO3,N3,N2,N1)=0.0_r8
+!        trcsa_TFLS(idsa_HCO3,N3,N2,N1)=0.0_r8
+!        trcsa_TFLS(idsa_AlOH,N3,N2,N1)=0.0_r8
+!        trcsa_TFLS(idsa_AlOH2,N3,N2,N1)=0.0_r8
+!        trcsa_TFLS(idsa_AlOH3,N3,N2,N1)=0.0_r8
+!        trcsa_TFLS(idsa_AlOH4,N3,N2,N1)=0.0_r8
+!        trcsa_TFLS(idsa_AlSO4,N3,N2,N1)=0.0_r8
+!        trcsa_TFLS(idsa_FeOH,N3,N2,N1)=0.0_r8
+!        trcsa_TFLS(idsa_FeOH2,N3,N2,N1)=0.0_r8
+!        trcsa_TFLS(idsa_FeOH3,N3,N2,N1)=0.0_r8
+!        trcsa_TFLS(idsa_FeOH4,N3,N2,N1)=0.0_r8
+!        trcsa_TFLS(idsa_SO4,N3,N2,N1)=0.0_r8
+!        trcsa_TFLS(idsa_CaOH2,N3,N2,N1)=0.0_r8
+!        trcsa_TFLS(idsa_CaCO3,N3,N2,N1)=0.0_r8
+!        trcsa_TFLS(idsa_CaHCO3,N3,N2,N1)=0.0_r8
+!        trcsa_TFLS(idsa_CaSO4,N3,N2,N1)=0.0_r8
+!        trcsa_TFLS(idsa_MgOH2,N3,N2,N1)=0.0_r8
+!        trcsa_TFLS(idsa_MgCO3,N3,N2,N1)=0.0_r8
+!        trcsa_TFLS(idsa_MgHCO3,N3,N2,N1)=0.0_r8
+!        trcsa_TFLS(idsa_MgSO4,N3,N2,N1)=0.0_r8
+!        trcsa_TFLS(idsa_NaCO3,N3,N2,N1)=0.0_r8
+!        trcsa_TFLS(idsa_NaSO4,N3,N2,N1)=0.0_r8
+!        trcsa_TFLS(idsa_KSO4,N3,N2,N1)=0.0_r8
+!        trcsa_TFLS(idsa_H0PO4,N3,N2,N1)=0.0_r8
+!        trcsa_TFLS(idsa_H3PO4,N3,N2,N1)=0.0_r8
+!        trcsa_TFLS(idsa_FeHPO4,N3,N2,N1)=0.0_r8
+!        trcsa_TFLS(idsa_FeH2PO4,N3,N2,N1)=0.0_r8
+!        trcsa_TFLS(idsa_CaPO4,N3,N2,N1)=0.0_r8
+!        trcsa_TFLS(idsa_CaHPO4,N3,N2,N1)=0.0_r8
+!        trcsa_TFLS(idsa_CaH2PO4,N3,N2,N1)=0.0_r8
+!        trcsa_TFLS(idsa_MgHPO4,N3,N2,N1)=0.0_r8
+!        trcsa_TFLS(idsa_H0PO4B,N3,N2,N1)=0.0_r8
+!        trcsa_TFLS(idsa_H3PO4B,N3,N2,N1)=0.0_r8
+!        trcsa_TFLS(idsa_FeHPO4B,N3,N2,N1)=0.0_r8
+!        trcsa_TFLS(idsa_FeH2PO4B,N3,N2,N1)=0.0_r8
+!        trcsa_TFLS(idsa_CaPO4B,N3,N2,N1)=0.0_r8
+!        trcsa_TFLS(idsa_CaHPO4B,N3,N2,N1)=0.0_r8
+!        trcsa_TFLS(idsa_CaH2PO4B,N3,N2,N1)=0.0_r8
+!        trcsa_TFLS(idsa_MgHPO4B,N3,N2,N1)=0.0_r8
+
+         trcsa_TFHS(idsa_beg:idsab_end,N3,N2,N1)=0.0_r8
+!        trcsa_TFHS(idsa_Al,N3,N2,N1)=0.0_r8
+!        trcsa_TFHS(idsa_Fe,N3,N2,N1)=0.0_r8
+!        trcsa_TFHS(idsa_Hp,N3,N2,N1)=0.0_r8
+!        trcsa_TFHS(idsa_Ca,N3,N2,N1)=0.0_r8
+!        trcsa_TFHS(idsa_Mg,N3,N2,N1)=0.0_r8
+!        trcsa_TFHS(idsa_Na,N3,N2,N1)=0.0_r8
+!        trcsa_TFHS(idsa_K,N3,N2,N1)=0.0_r8
+!        trcsa_TFHS(idsa_OH,N3,N2,N1)=0.0_r8
+!        trcsa_TFHS(idsa_SO4,N3,N2,N1)=0.0_r8
+!        trcsa_TFHS(idsa_Cl,N3,N2,N1)=0.0_r8
+!        trcsa_TFHS(idsa_CO3,N3,N2,N1)=0.0_r8
+!        trcsa_TFHS(idsa_HCO3,N3,N2,N1)=0.0_r8
+!        trcsa_TFHS(idsa_AlOH,N3,N2,N1)=0.0_r8
+!        trcsa_TFHS(idsa_AlOH2,N3,N2,N1)=0.0_r8
+!        trcsa_TFHS(idsa_AlOH3,N3,N2,N1)=0.0_r8
+!        trcsa_TFHS(idsa_AlOH4,N3,N2,N1)=0.0_r8
+!        trcsa_TFHS(idsa_AlSO4,N3,N2,N1)=0.0_r8
+!        trcsa_TFHS(idsa_FeOH,N3,N2,N1)=0.0_r8
+!        trcsa_TFHS(idsa_FeOH2,N3,N2,N1)=0.0_r8
+!        trcsa_TFHS(idsa_FeOH3,N3,N2,N1)=0.0_r8
+!        trcsa_TFHS(idsa_FeOH4,N3,N2,N1)=0.0_r8
+!        trcsa_TFHS(idsa_FeSO4,N3,N2,N1)=0.0_r8
+!        trcsa_TFHS(idsa_CaOH2,N3,N2,N1)=0.0_r8
+!        trcsa_TFHS(idsa_CaCO3,N3,N2,N1)=0.0_r8
+!        trcsa_TFHS(idsa_MgHPO4,N3,N2,N1)=0.0_r8
+!        trcsa_TFHS(idsa_CaSO4,N3,N2,N1)=0.0_r8
+!        trcsa_TFHS(idsa_MgOH2,N3,N2,N1)=0.0_r8
+!        trcsa_TFHS(idsa_MgCO3,N3,N2,N1)=0.0_r8
+!        trcsa_TFHS(idsa_MgHCO3,N3,N2,N1)=0.0_r8
+!        trcsa_TFHS(idsa_MgSO4,N3,N2,N1)=0.0_r8
+!        trcsa_TFHS(idsa_NaCO3,N3,N2,N1)=0.0_r8
+!        trcsa_TFHS(idsa_NaSO4,N3,N2,N1)=0.0_r8
+!        trcsa_TFHS(idsa_KSO4,N3,N2,N1)=0.0_r8
+!        trcsa_TFHS(idsa_H0PO4,N3,N2,N1)=0.0_r8
+!        trcsa_TFHS(idsa_H3PO4,N3,N2,N1)=0.0_r8
+!        trcsa_TFHS(idsa_FeHPO4,N3,N2,N1)=0.0_r8
+!        trcsa_TFHS(idsa_FeH2PO4,N3,N2,N1)=0.0_r8
+!        trcsa_TFHS(idsa_CaPO4,N3,N2,N1)=0.0_r8
+!        trcsa_TFHS(idsa_CaHPO4,N3,N2,N1)=0.0_r8
+!        trcsa_TFHS(idsa_CaH2PO4,N3,N2,N1)=0.0_r8
+!        trcsa_TFHS(idsa_MgHPO4,N3,N2,N1)=0.0_r8
+!        trcsa_TFHS(idsa_H0PO4B,N3,N2,N1)=0.0_r8
+!        trcsa_TFHS(idsa_H3PO4B,N3,N2,N1)=0.0_r8
+!        trcsa_TFHS(idsa_FeHPO4B,N3,N2,N1)=0.0_r8
+!        trcsa_TFHS(idsa_FeH2PO4B,N3,N2,N1)=0.0_r8
+!        trcsa_TFHS(idsa_CaPO4B,N3,N2,N1)=0.0_r8
+!        trcsa_TFHS(idsa_CaHPO4B,N3,N2,N1)=0.0_r8
+!        trcsa_TFHS(idsa_CaH2PO4B,N3,N2,N1)=0.0_r8
+!        trcsa_TFHS(idsa_MgHPO4B,N3,N2,N1)=0.0_r8
       ENDIF
     ENDIF
   ENDIF

@@ -202,13 +202,7 @@ implicit none
   real(r8), allocatable ::  VOLWMB(:,:,:)                      !
   real(r8), allocatable ::  VOLWXA(:,:,:)                      !
   real(r8), allocatable ::  VOLWXB(:,:,:)                      !
-  real(r8), allocatable ::  PARGCO(:,:)                        !
-  real(r8), allocatable ::  PARGCH(:,:)                        !
-  real(r8), allocatable ::  PARGOX(:,:)                        !
-  real(r8), allocatable ::  PARGNG(:,:)                        !
-  real(r8), allocatable ::  PARGN2(:,:)                        !
-  real(r8), allocatable ::  PARGN3(:,:)                        !
-  real(r8), allocatable ::  PARGH2(:,:)                        !
+  real(r8), allocatable ::  PARG_cef(:,:,:)                        !
 
   real(r8), allocatable ::  RCOSK2(:,:,:)                      !
   real(r8), allocatable ::  ROXSK2(:,:,:)                      !
@@ -570,13 +564,7 @@ contains
   allocate(VOLWMB(JZ,JY,JX));   VOLWMB=0._r8
   allocate(VOLWXA(0:JZ,JY,JX)); VOLWXA=0._r8
   allocate(VOLWXB(JZ,JY,JX));   VOLWXB=0._r8
-  allocate(PARGCO(JY,JX));      PARGCO=0._r8
-  allocate(PARGCH(JY,JX));      PARGCH=0._r8
-  allocate(PARGOX(JY,JX));      PARGOX=0._r8
-  allocate(PARGNG(JY,JX));      PARGNG=0._r8
-  allocate(PARGN2(JY,JX));      PARGN2=0._r8
-  allocate(PARGN3(JY,JX));      PARGN3=0._r8
-  allocate(PARGH2(JY,JX));      PARGH2=0._r8
+  allocate(PARG_cef(idg_beg:idg_end-1,JY,JX));      PARG_cef=0._r8
 
   allocate(RBGCSinkG(idg_beg:idg_end,0:JZ,JY,JX));RBGCSinkG=0._r8
   allocate(RBGCSinkS(ids_nuts_beg:ids_nuts_end,0:JZ,JY,JX));RBGCSinkS=0._r8
@@ -941,13 +929,7 @@ contains
   call destroy(VOLWMB)
   call destroy(VOLWXA)
   call destroy(VOLWXB)
-  call destroy(PARGCO)
-  call destroy(PARGCH)
-  call destroy(PARGOX)
-  call destroy(PARGNG)
-  call destroy(PARGN2)
-  call destroy(PARGN3)
-  call destroy(PARGH2)
+  call destroy(PARG_cef)
   call destroy(RCOSK2)
   call destroy(ROXSK2)
   call destroy(RCHSK2)

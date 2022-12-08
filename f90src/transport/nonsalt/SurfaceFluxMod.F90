@@ -20,7 +20,6 @@ module SurfaceFluxMod
 implicit none
   private
   CHARACTER(LEN=*), PARAMETER :: MOD_FILENAME=__FILE__
-  real(r8) :: RCODXS,RCHDXS,ROXDXS,RNGDXS,RN2DXS,RN3DXS,RNBDXS,RHGDXS
   real(r8) :: RCODXR,RCHDXR,ROXDXR,RNGDXR,RN2DXR,RN3DXR,RHGDXR
 
   real(r8) :: RCOFLS1,RCHFLS1,RNGFLS1,RN2FLS1,ROXFLS1
@@ -37,13 +36,15 @@ contains
 
 !------------------------------------------------------------------------------------------
 
-  subroutine SoluteFluxSurface(M,NY,NX,NHE,NHW,NVS,NVN,FLQM,trcg_RFLS0,trcn_RFLW0)
+  subroutine SoluteFluxSurface(M,NY,NX,NHE,NHW,NVS,NVN,&
+    FLQM,trcg_RFLS0,trcn_RFLW0,RDXS_gas)
   implicit none
   integer, intent(in) :: NY,NX,M
   integer, intent(in) :: NHE,NHW,NVS,NVN
   real(r8),intent(in) :: trcg_RFLS0(idg_beg:idg_end-1)
   real(r8),intent(in) :: trcn_RFLW0(ids_nut_beg:ids_nuts_end)
   real(r8),intent(inout) :: FLQM(3,JD,JV,JH)
+  real(r8),intent(out) :: RDXS_gas(idg_beg:idg_end)
   real(r8) :: FLWRM1
   real(r8) :: trcs_cl1(ids_beg:ids_end)
   real(r8) :: trcs_cl2(ids_beg:ids_end)
@@ -85,7 +86,7 @@ contains
 !
   call LitterAtmosExchange(M,NY,NX,trcs_cl1)
 
-  call SoilAtmosExchange(M,NY,NX,trcs_cl2)
+  call SoilAtmosExchange(M,NY,NX,trcs_cl2,RDXS_gas)
 
 !     CONVECTIVE SOLUTE EXCHANGE BETWEEN RESIDUE AND SOIL SURFACE
 !
@@ -1076,7 +1077,7 @@ contains
 
 !------------------------------------------------------------------------------------------
 
-  subroutine SurfSoilFluxGasDifAdv(M,NY,NX,FLQM)
+  subroutine SurfSoilFluxGasDifAdv(M,NY,NX,FLQM,RDXS_gas)
 !
 ! DESCRIPTION:
 ! surface soil gaseous diffusion, advection, dissolution & volatilization
@@ -1084,6 +1085,7 @@ contains
 
   integer, intent(in) :: M, NY, NX
   real(r8),intent(in) :: FLQM(3,JD,JV,JH)
+  real(r8),intent(in) :: RDXS_gas(idg_beg:idg_end)
   real(r8) :: VFLW
   integer :: NTG
 !
@@ -1113,7 +1115,7 @@ contains
     ENDDO
 
     IF(VOLWM(M,NU(NY,NX),NY,NX).GT.ZEROS2(NY,NX))THEN
-      call SurfSoilFluxDisolVapor(M,NY,NX)
+      call SurfSoilFluxDisolVapor(M,NY,NX,RDXS_gas)
 !
 !     ACCUMULATE HOURLY FLUXES FOR USE IN REDIST.F
 !
@@ -1220,15 +1222,15 @@ contains
   RHGDXR=RDFR_gas(idg_H2,NY,NX)*XNPT
   end subroutine LitterAtmosExchange
 !------------------------------------------------------------------------------------------
-  subroutine SoilAtmosExchange(M,NY,NX,trcs_cl2)
+  subroutine SoilAtmosExchange(M,NY,NX,trcs_cl2,RDXS_gas)
 
   implicit none
   integer, intent(in) :: M,NY,NX
   real(r8), intent(out) :: trcs_cl2(ids_beg:ids_end)
+  real(r8), intent(out) :: RDXS_gas(idg_beg:idg_end)
   real(r8) :: DLYR1,TORT1,VOLWOA,VOLWOB,VOLWPA,VOLWPB
-  real(r8) :: DFGS(idg_beg:idg_end)
-  real(r8) :: trc_gsolc(idg_beg:idg_end)
-  real(r8) :: trc_gsolc2
+  real(r8) :: DFGS
+  real(r8) :: trc_gsolc,trc_gsolc2
   integer  :: K,NTG
 !
 !     SURFACE EXCHANGE OF AQUEOUS CO2, CH4, O2, N2, NH3
@@ -1257,19 +1259,17 @@ contains
     DLYR1=AMAX1(ZERO2,DLYR(3,NU(NY,NX),NY,NX))
     TORT1=TORT(M,NU(NY,NX),NY,NX)*AREA(3,NU(NY,NX),NY,NX)/(0.5_r8*DLYR1)
 
-    DO  K=1,jcplx
+    D8910: DO  K=1,jcplx
       COQC2(K)=AZMAX1(OQC2(K,NU(NY,NX),NY,NX)/VOLWM(M,NU(NY,NX),NY,NX))
       COQN2(K)=AZMAX1(OQN2(K,NU(NY,NX),NY,NX)/VOLWM(M,NU(NY,NX),NY,NX))
       COQP2(K)=AZMAX1(OQP2(K,NU(NY,NX),NY,NX)/VOLWM(M,NU(NY,NX),NY,NX))
       COQA2(K)=AZMAX1(OQA2(K,NU(NY,NX),NY,NX)/VOLWM(M,NU(NY,NX),NY,NX))
-    ENDDO
+    ENDDO D8910
 
-    trcs_cl2(idg_CO2)=AZMAX1(trc_solml2(idg_CO2,NU(NY,NX),NY,NX)/VOLWM(M,NU(NY,NX),NY,NX))
-    trcs_cl2(idg_CH4)=AZMAX1(trc_solml2(idg_CH4,NU(NY,NX),NY,NX)/VOLWM(M,NU(NY,NX),NY,NX))
-    trcs_cl2(idg_O2)=AZMAX1(trc_solml2(idg_O2,NU(NY,NX),NY,NX)/VOLWM(M,NU(NY,NX),NY,NX))
-    trcs_cl2(idg_N2)=AZMAX1(trc_solml2(idg_N2,NU(NY,NX),NY,NX)/VOLWM(M,NU(NY,NX),NY,NX))
-    trcs_cl2(idg_N2O)=AZMAX1(trc_solml2(idg_N2O,NU(NY,NX),NY,NX)/VOLWM(M,NU(NY,NX),NY,NX))
-    trcs_cl2(idg_H2)=AZMAX1(trc_solml2(idg_H2,NU(NY,NX),NY,NX)/VOLWM(M,NU(NY,NX),NY,NX))
+!not include NH3 and NH3B
+    DO NTG=idg_beg,idg_end-2
+      trcs_cl2(NTG)=AZMAX1(trc_solml2(NTG,NU(NY,NX),NY,NX)/VOLWM(M,NU(NY,NX),NY,NX))
+    ENDDO
 
     IF(VOLWMA(NU(NY,NX),NY,NX).GT.ZEROS2(NY,NX))THEN
       trcs_cl2(idg_NH3)=AZMAX1(trc_solml2(idg_NH3,NU(NY,NX),NY,NX)/VOLWMA(NU(NY,NX),NY,NX))
@@ -1278,6 +1278,7 @@ contains
       trcs_cl2(idg_NH3)=0.0_r8
       trcs_cl2(ids_NH4)=0.0_r8
     ENDIF
+
     IF(VOLWOA.GT.ZEROS2(NY,NX))THEN
       trcs_cl2(ids_NO3)=AZMAX1(trc_solml2(ids_NO3,NU(NY,NX),NY,NX)/VOLWOA)
       trcs_cl2(ids_NO2)=AZMAX1(trc_solml2(ids_NO2,NU(NY,NX),NY,NX)/VOLWOA)
@@ -1328,13 +1329,12 @@ contains
 !             :*ZN3*=NH3,*H2G*=H2
 !     DFGS*=effective solute diffusivity
 !
-
+!include NH3B
     DO NTG=idg_beg,idg_end
-      DFGS(NTG)=SolDifcc(NTG,NU(NY,NX),NY,NX)*TORT1
+      DFGS=SolDifcc(NTG,NU(NY,NX),NY,NX)*TORT1
       trc_gsolc2=AZMAX1(trc_solml2(NTG,NU(NY,NX),NY,NX)/VOLWM(M,NU(NY,NX),NY,NX))
-      trc_gsolc(NTG)=(PARG(M,NY,NX)*AtmGgms(NTG,NY,NX)*GSolbility(NTG,NU(NY,NX),NY,NX) &
-        +DFGS(NTG)*trc_gsolc2)/(DFGS(NTG)+PARG(M,NY,NX))
-    ENDDO
+      trc_gsolc=(PARG(M,NY,NX)*AtmGgms(NTG,NY,NX)*GSolbility(NTG,NU(NY,NX),NY,NX) &
+        +DFGS*trc_gsolc2)/(DFGS+PARG(M,NY,NX))
 !
 !     SURFACE VOLATILIZATION-DISSOLUTION FROM DIFFERENCES
 !     BETWEEN ATMOSPHERIC AND SOIL SURFACE EQUILIBRIUM
@@ -1348,29 +1348,24 @@ contains
 !     DFGS*=effective solute diffusivity
 !     XNPT=1/number of cycles NPH-1 for gas flux calculations
 !     R*DXS=R*DFS for gas flux calculations
-!
-    DO NTG=idg_beg,idg_end
-      RGasSSVol(NTG,NY,NX)=(trc_gsolc(NTG)-trcs_cl2(NTG))&
-        *AMIN1(VOLWM(M,NU(NY,NX),NY,NX)*trcs_VLN(NTG,NU(NY,NX),NY,NX),DFGS(NTG))
-    ENDDO
+!  include NH3B
+
+      RGasSSVol(NTG,NY,NX)=(trc_gsolc-trcs_cl2(NTG))&
+        *AMIN1(VOLWM(M,NU(NY,NX),NY,NX)*trcs_VLN(NTG,NU(NY,NX),NY,NX),DFGS)
 !
 !     ACCUMULATE HOURLY FLUXES FOR USE IN REDIST.F
 !   seven gas species plus aqueous NH3 in band
-    DO NTG=idg_beg,idg_end
+
       GasSfAtmFlx(NTG,NY,NX)=GasSfAtmFlx(NTG,NY,NX)+RGasSSVol(NTG,NY,NX)
     ENDDO
 
   ELSE
     RGasSSVol(idg_beg:idg_end,NY,NX)=0.0_r8
   ENDIF
-  RCODXS=RGasSSVol(idg_CO2,NY,NX)*XNPT
-  RCHDXS=RGasSSVol(idg_CH4,NY,NX)*XNPT
-  ROXDXS=RGasSSVol(idg_O2,NY,NX)*XNPT
-  RNGDXS=RGasSSVol(idg_N2,NY,NX)*XNPT
-  RN2DXS=RGasSSVol(idg_N2O,NY,NX)*XNPT
-  RN3DXS=RGasSSVol(idg_NH3,NY,NX)*XNPT
-  RNBDXS=RGasSSVol(idg_NH3B,NY,NX)*XNPT
-  RHGDXS=RGasSSVol(idg_H2,NY,NX)*XNPT
+
+  DO NTG=idg_beg,idg_end
+    RDXS_gas(NTG)=RGasSSVol(NTG,NY,NX)*XNPT
+  ENDDO
   end subroutine SoilAtmosExchange
 !------------------------------------------------------------------------------------------
 
@@ -1420,11 +1415,11 @@ contains
         trcg_XBLS(idg_O2,L2,NY,NX)=trcg_XBLS(idg_O2,L2,NY,NX)+ROXBLS(L2,NY,NX)
         trcg_XBLS(idg_N2,L2,NY,NX)=trcg_XBLS(idg_N2,L2,NY,NX)+RNGBLS(L2,NY,NX)
         trcg_XBLS(idg_N2O,L2,NY,NX)=trcg_XBLS(idg_N2O,L2,NY,NX)+RN2BLS(L2,NY,NX)
-        trcg_XBLS(ids_NH4,L2,NY,NX)=trcg_XBLS(ids_NH4,L2,NY,NX)+RN4BLW(L2,NY,NX)
         trcg_XBLS(idg_NH3,L2,NY,NX)=trcg_XBLS(idg_NH3,L2,NY,NX)+RN3BLW(L2,NY,NX)
-        trcg_XBLS(ids_NO3,L2,NY,NX)=trcg_XBLS(ids_NO3,L2,NY,NX)+RNOBLW(L2,NY,NX)
-        trcg_XBLS(ids_H1PO4,L2,NY,NX)=trcg_XBLS(ids_H1PO4,L2,NY,NX)+RH1PBS(L2,NY,NX)
-        trcg_XBLS(ids_H2PO4,L2,NY,NX)=trcg_XBLS(ids_H2PO4,L2,NY,NX)+RH2PBS(L2,NY,NX)
+        trcn_XBLS(ids_NH4,L2,NY,NX)=trcn_XBLS(ids_NH4,L2,NY,NX)+RN4BLW(L2,NY,NX)
+        trcn_XBLS(ids_NO3,L2,NY,NX)=trcn_XBLS(ids_NO3,L2,NY,NX)+RNOBLW(L2,NY,NX)
+        trcn_XBLS(ids_H1PO4,L2,NY,NX)=trcn_XBLS(ids_H1PO4,L2,NY,NX)+RH1PBS(L2,NY,NX)
+        trcn_XBLS(ids_H2PO4,L2,NY,NX)=trcn_XBLS(ids_H2PO4,L2,NY,NX)+RH2PBS(L2,NY,NX)
       ELSE
         IF(L.LT.JS)THEN
           RCOBLS(L2,NY,NX)=0.0_r8
@@ -1563,10 +1558,10 @@ contains
   subroutine SurfSoilDifFlux(M,NY,NX)
   implicit none
   integer, intent(in) :: M,NY,NX
-  real(r8) :: DFV_g(idg_beg:idg_end-1)
+  real(r8) :: DFV_g
   real(r8) :: DFLG2
-  real(r8) :: trcg_cl2(idg_beg:idg_end-1)
-  real(r8) :: DCO2GQ,DCH4GQ,DOXYGQ,DZ2GGQ,DZ2OGQ,DNH3GQ,DH2GGQ
+  real(r8) :: trcg_cl2
+  real(r8) :: DGQ_cef
   integer  :: NTG
 !     GASEOUS DIFFUSIVITIES
 !
@@ -1583,9 +1578,8 @@ contains
       *THETPM(M,NU(NY,NX),NY,NX)/POROS(NU(NY,NX),NY,NX) &
       *AREA(3,NU(NY,NX),NY,NX)/AMAX1(ZERO2,DLYR(3,NU(NY,NX),NY,NX))
 
-    DO NTG=idg_beg,idg_end
+    DO NTG=idg_beg,idg_end-1
       DifuscG(NTG,3,NU(NY,NX),NY,NX)=DFLG2*GasDifcc(NTG,NU(NY,NX),NY,NX)
-    ENDDO
 !
 !     SURFACE GAS CONCENTRATIONS
 !
@@ -1595,9 +1589,7 @@ contains
 !             :*ZN3*=NH3,*H2G*=H2
 !     VOLPM=air-filled porosity
 !
-    DO NTG=idg_beg,idg_end-1
-      trcg_cl2(NTG)=AZMAX1(trc_gasml2(NTG,NU(NY,NX),NY,NX)/VOLPM(M,NU(NY,NX),NY,NX))
-    ENDDO
+      trcg_cl2=AZMAX1(trc_gasml2(NTG,NU(NY,NX),NY,NX)/VOLPM(M,NU(NY,NX),NY,NX))
 !
 !     EQUILIBRIUM CONCENTRATIONS AT SOIL SURFACE AT WHICH
 !     GASEOUS DIFFUSION THROUGH SOIL SURFACE LAYER = GASEOUS
@@ -1611,21 +1603,10 @@ contains
 !     C*E=atmospheric gas concentration from hour1.f
 !     C*G2=gaseous concentration
 !
-    DCO2GQ=DifuscG(idg_CO2,3,NU(NY,NX),NY,NX)*PARGCO(NY,NX)/(DifuscG(idg_CO2,3,NU(NY,NX),NY,NX)+PARGCO(NY,NX))
-    DCH4GQ=DifuscG(idg_CH4,3,NU(NY,NX),NY,NX)*PARGCH(NY,NX)/(DifuscG(idg_CH4,3,NU(NY,NX),NY,NX)+PARGCH(NY,NX))
-    DOXYGQ=DifuscG(idg_O2,3,NU(NY,NX),NY,NX)*PARGOX(NY,NX)/(DifuscG(idg_O2,3,NU(NY,NX),NY,NX)+PARGOX(NY,NX))
-    DZ2GGQ=DifuscG(idg_N2,3,NU(NY,NX),NY,NX)*PARGNG(NY,NX)/(DifuscG(idg_N2,3,NU(NY,NX),NY,NX)+PARGNG(NY,NX))
-    DZ2OGQ=DifuscG(idg_N2O,3,NU(NY,NX),NY,NX)*PARGN2(NY,NX)/(DifuscG(idg_N2O,3,NU(NY,NX),NY,NX)+PARGN2(NY,NX))
-    DNH3GQ=DifuscG(idg_NH3,3,NU(NY,NX),NY,NX)*PARGN3(NY,NX)/(DifuscG(idg_NH3,3,NU(NY,NX),NY,NX)+PARGN3(NY,NX))
-    DH2GGQ=DifuscG(idg_H2,3,NU(NY,NX),NY,NX)*PARGH2(NY,NX)/(DifuscG(idg_H2,3,NU(NY,NX),NY,NX)+PARGH2(NY,NX))
+      DGQ_cef=DifuscG(NTG,3,NU(NY,NX),NY,NX)*PARG_cef(NTG,NY,NX) &
+        /(DifuscG(NTG,3,NU(NY,NX),NY,NX)+PARG_cef(NTG,NY,NX))
 
-    DFV_g(idg_CO2)=DCO2GQ*(AtmGgms(idg_CO2,NY,NX)-trcg_cl2(idg_CO2))
-    DFV_g(idg_CH4)=DCH4GQ*(AtmGgms(idg_CH4,NY,NX)-trcg_cl2(idg_CH4))
-    DFV_g(idg_O2)=DOXYGQ*(AtmGgms(idg_O2,NY,NX)-trcg_cl2(idg_O2))
-    DFV_g(idg_N2)=DZ2GGQ*(AtmGgms(idg_N2,NY,NX)-trcg_cl2(idg_N2))
-    DFV_g(idg_N2O)=DZ2OGQ*(AtmGgms(idg_N2O,NY,NX)-trcg_cl2(idg_N2O))
-    DFV_g(idg_NH3)=DNH3GQ*(AtmGgms(idg_NH3,NY,NX)-trcg_cl2(idg_NH3))
-    DFV_g(idg_H2)=DH2GGQ*(AtmGgms(idg_H2,NY,NX)-trcg_cl2(idg_H2))
+      DFV_g=DGQ_cef*(AtmGgms(NTG,NY,NX)-trcg_cl2)
 
 !     TOTAL SOIL GAS FLUX FROM DIFFUSIVE
 !
@@ -1634,16 +1615,16 @@ contains
 !     DFV*G=diffusive gas flux
 !     RFL*G=convective gas flux
 
-    DO NTG=idg_beg,idg_end-1
-      R3GasADFlx(NTG,3,NU(NY,NX),NY,NX)=DFV_g(NTG)
+      R3GasADFlx(NTG,3,NU(NY,NX),NY,NX)=DFV_g
     ENDDO
 
   end subroutine SurfSoilDifFlux
 ! ----------------------------------------------------------------------
 
-  subroutine SurfSoilFluxDisolVapor(M,NY,NX)
+  subroutine SurfSoilFluxDisolVapor(M,NY,NX,RDXS_gas)
   implicit none
   integer, intent(in) :: M,NY,NX
+  real(r8),intent(in) :: RDXS_gas(idg_beg:idg_end)
   real(r8) :: CNH3B0,CNH4B0
   real(r8) :: VOLHGT(JY,JX),VOLNBT(JY,JX)
   real(r8) :: VOLN3T(JY,JX),VOLN2T(JY,JX)
@@ -1679,36 +1660,43 @@ contains
   VOLN3T(NY,NX)=VOLWN3(NU(NY,NX),NY,NX)+VOLPMA(NU(NY,NX),NY,NX)
   VOLNBT(NY,NX)=VOLWNB(NU(NY,NX),NY,NX)+VOLPMB(NU(NY,NX),NY,NX)
   VOLHGT(NY,NX)=VOLWHG(NU(NY,NX),NY,NX)+VOLPM(M,NU(NY,NX),NY,NX)
+
   RGasDSFlx(idg_CO2,NU(NY,NX),NY,NX)=DFGS(M,NU(NY,NX),NY,NX) &
     *(AMAX1(ZEROS(NY,NX),trc_gasml2(idg_CO2,NU(NY,NX),NY,NX)) &
     *VOLWCO(NU(NY,NX),NY,NX)-AMAX1(ZEROS(NY,NX) &
-    ,trc_solml2(idg_CO2,NU(NY,NX),NY,NX)+RCODXS) &
+    ,trc_solml2(idg_CO2,NU(NY,NX),NY,NX)+RDXS_gas(idg_CO2)) &
     *VOLPM(M,NU(NY,NX),NY,NX))/VOLCOT(NY,NX)
   RGasDSFlx(idg_CH4,NU(NY,NX),NY,NX)=DFGS(M,NU(NY,NX),NY,NX) &
     *(AMAX1(ZEROS(NY,NX),trc_gasml2(idg_CH4,NU(NY,NX),NY,NX)) &
     *VOLWCH(NU(NY,NX),NY,NX)-AMAX1(ZEROS(NY,NX) &
-    ,trc_solml2(idg_CH4,NU(NY,NX),NY,NX)+RCHDXS) &
+    ,trc_solml2(idg_CH4,NU(NY,NX),NY,NX)+RDXS_gas(idg_CH4)) &
     *VOLPM(M,NU(NY,NX),NY,NX))/VOLCHT(NY,NX)
   RGasDSFlx(idg_O2,NU(NY,NX),NY,NX)=DFGS(M,NU(NY,NX),NY,NX) &
     *(AMAX1(ZEROS(NY,NX),trc_gasml2(idg_O2,NU(NY,NX),NY,NX)) &
     *VOLWOX(NU(NY,NX),NY,NX)-AMAX1(ZEROS(NY,NX) &
-    ,trc_solml2(idg_O2,NU(NY,NX),NY,NX)+ROXDXS) &
+    ,trc_solml2(idg_O2,NU(NY,NX),NY,NX)+RDXS_gas(idg_O2)) &
     *VOLPM(M,NU(NY,NX),NY,NX))/VOLOXT(NY,NX)
   RGasDSFlx(idg_N2,NU(NY,NX),NY,NX)=DFGS(M,NU(NY,NX),NY,NX) &
     *(AMAX1(ZEROS(NY,NX),trc_gasml2(idg_N2,NU(NY,NX),NY,NX)) &
     *VOLWNG(NU(NY,NX),NY,NX)-AMAX1(ZEROS(NY,NX) &
-    ,trc_solml2(idg_N2,NU(NY,NX),NY,NX)+RNGDXS) &
+    ,trc_solml2(idg_N2,NU(NY,NX),NY,NX)+RDXS_gas(idg_N2)) &
   *VOLPM(M,NU(NY,NX),NY,NX))/VOLNGT(NY,NX)
   RGasDSFlx(idg_N2O,NU(NY,NX),NY,NX)=DFGS(M,NU(NY,NX),NY,NX) &
     *(AMAX1(ZEROS(NY,NX),trc_gasml2(idg_N2O,NU(NY,NX),NY,NX)) &
     *VOLWN2(NU(NY,NX),NY,NX)-AMAX1(ZEROS(NY,NX) &
-    ,trc_solml2(idg_N2O,NU(NY,NX),NY,NX)+RN2DXS) &
+    ,trc_solml2(idg_N2O,NU(NY,NX),NY,NX)+RDXS_gas(idg_N2O)) &
     *VOLPM(M,NU(NY,NX),NY,NX))/VOLN2T(NY,NX)
+  RGasDSFlx(idg_H2,NU(NY,NX),NY,NX)=DFGS(M,NU(NY,NX),NY,NX) &
+    *(AMAX1(ZEROS(NY,NX),trc_gasml2(idg_H2,NU(NY,NX),NY,NX)) &
+    *VOLWHG(NU(NY,NX),NY,NX)-AMAX1(ZEROS(NY,NX) &
+    ,trc_solml2(idg_H2,NU(NY,NX),NY,NX)+RDXS_gas(idg_H2)) &
+    *VOLPM(M,NU(NY,NX),NY,NX))/VOLHGT(NY,NX)
+
   IF(VOLN3T(NY,NX).GT.ZEROS2(NY,NX).AND.VOLWXA(NU(NY,NX),NY,NX).GT.ZEROS2(NY,NX))THEN
     RGasDSFlx(idg_NH3,NU(NY,NX),NY,NX)=DFGS(M,NU(NY,NX),NY,NX) &
       *(AMAX1(ZEROS(NY,NX),trc_gasml2(idg_NH3,NU(NY,NX),NY,NX)) &
       *VOLWN3(NU(NY,NX),NY,NX)-AMAX1(ZEROS(NY,NX) &
-      ,trc_solml2(idg_NH3,NU(NY,NX),NY,NX)+RN3DXS) &
+      ,trc_solml2(idg_NH3,NU(NY,NX),NY,NX)+RDXS_gas(idg_NH3)) &
       *VOLPMA(NU(NY,NX),NY,NX))/VOLN3T(NY,NX)
   ELSE
     RGasDSFlx(idg_NH3,NU(NY,NX),NY,NX)=0.0_r8
@@ -1717,7 +1705,7 @@ contains
     RGasDSFlx(idg_NH3B,NU(NY,NX),NY,NX)=DFGS(M,NU(NY,NX),NY,NX) &
       *(AMAX1(ZEROS(NY,NX),trc_gasml2(idg_NH3,NU(NY,NX),NY,NX)) &
       *VOLWNB(NU(NY,NX),NY,NX)-AMAX1(ZEROS(NY,NX) &
-      ,trc_solml2(idg_NH3B,NU(NY,NX),NY,NX)+RNBDXS) &
+      ,trc_solml2(idg_NH3B,NU(NY,NX),NY,NX)+RDXS_gas(idg_NH3B)) &
       *VOLPMB(NU(NY,NX),NY,NX))/VOLNBT(NY,NX)
     CNH3B0=AZMAX1((trc_solml2(idg_NH3B,NU(NY,NX),NY,NX) &
       +RGasDSFlx(idg_NH3B,NU(NY,NX),NY,NX))/VOLWXB(NU(NY,NX),NY,NX))
@@ -1725,11 +1713,6 @@ contains
   ELSE
     RGasDSFlx(idg_NH3B,NU(NY,NX),NY,NX)=0.0_r8
   ENDIF
-  RGasDSFlx(idg_H2,NU(NY,NX),NY,NX)=DFGS(M,NU(NY,NX),NY,NX) &
-    *(AMAX1(ZEROS(NY,NX),trc_gasml2(idg_H2,NU(NY,NX),NY,NX)) &
-    *VOLWHG(NU(NY,NX),NY,NX)-AMAX1(ZEROS(NY,NX) &
-    ,trc_solml2(idg_H2,NU(NY,NX),NY,NX)+RHGDXS) &
-    *VOLPM(M,NU(NY,NX),NY,NX))/VOLHGT(NY,NX)
   end subroutine SurfSoilFluxDisolVapor
 ! ----------------------------------------------------------------------
 end module SurfaceFluxMod
