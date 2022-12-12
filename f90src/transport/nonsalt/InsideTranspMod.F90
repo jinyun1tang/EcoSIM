@@ -1982,6 +1982,6 @@ module InsideTranspMod
 
   R3PoreSoHFlx(ids_beg:ids_end,N,N3,N2,N1)=0.0_r8
 
-  R3GasADFlx(idg_beg:ids_end,N,N3,N2,N1)=0.0_r8
+  R3GasADFlx(idg_beg:idg_end,N,N3,N2,N1)=0.0_r8
   end subroutine ZeroTransport2
 end module InsideTranspMod

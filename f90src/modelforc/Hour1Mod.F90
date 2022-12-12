@@ -359,6 +359,7 @@ module Hour1Mod
 !     begin_execution
   extragrid=1
   if(column_mode)extragrid=0
+
   DO  NX=NHW,NHE+extragrid
     DO  NY=NVN,NVS+extragrid
 !
@@ -946,17 +947,16 @@ module Hour1Mod
   TRNO2(0:NL(NY,NX),NY,NX)=0.0_r8
   TRH1P(0:NL(NY,NX),NY,NX)=0.0_r8
   TRH2P(0:NL(NY,NX),NY,NX)=0.0_r8
-  TRXN4(0:NL(NY,NX),NY,NX)=0.0_r8
-  TRXH0(0:NL(NY,NX),NY,NX)=0.0_r8
-  TRXH1(0:NL(NY,NX),NY,NX)=0.0_r8
-  TRXH2(0:NL(NY,NX),NY,NX)=0.0_r8
-  TRX1P(0:NL(NY,NX),NY,NX)=0.0_r8
-  TRX2P(0:NL(NY,NX),NY,NX)=0.0_r8
-  TRALPO(0:NL(NY,NX),NY,NX)=0.0_r8
-  TRFEPO(0:NL(NY,NX),NY,NX)=0.0_r8
-  TRCAPD(0:NL(NY,NX),NY,NX)=0.0_r8
-  TRCAPH(0:NL(NY,NX),NY,NX)=0.0_r8
-  TRCAPM(0:NL(NY,NX),NY,NX)=0.0_r8
+
+  trcx_TR(idx_NH4,0:NL(NY,NX),NY,NX)=0.0_r8
+  trcx_TR(idx_AEC+1:idx_anion_soil_end,0:NL(NY,NX),NY,NX)=0.0_r8
+
+  trcp_TR(idsp_AlPO4,0:NL(NY,NX),NY,NX)=0.0_r8
+  trcp_TR(idsp_FePO4,0:NL(NY,NX),NY,NX)=0.0_r8
+  trcp_TR(idsp_CaHPO4,0:NL(NY,NX),NY,NX)=0.0_r8
+  trcp_TR(idsp_HA,0:NL(NY,NX),NY,NX)=0.0_r8
+  trcp_TR(idsp_CaH2PO4,0:NL(NY,NX),NY,NX)=0.0_r8
+
   TUPWTR(0:NL(NY,NX),NY,NX)=0.0_r8
   TUPHT(0:NL(NY,NX),NY,NX)=0.0_r8
 
@@ -2440,7 +2440,7 @@ module Hour1Mod
   implicit none
   integer, intent(in) :: NY,NX
 
-  integer :: K,L
+  integer :: K,L,NTSA
 !     begin_execution
   DO L=NUI(NY,NX),NLI(NY,NX)
     FINH(L,NY,NX)=0.0_r8
@@ -2481,57 +2481,13 @@ module Hour1Mod
     TRN2B(L,NY,NX)=0.0_r8
     TRH1B(L,NY,NX)=0.0_r8
     TRH2B(L,NY,NX)=0.0_r8
-    TRAL(L,NY,NX)=0.0_r8
-    TRFE(L,NY,NX)=0.0_r8
-    TRHY(L,NY,NX)=0.0_r8
-    TRCA(L,NY,NX)=0.0_r8
-    TRMG(L,NY,NX)=0.0_r8
-    TRNA(L,NY,NX)=0.0_r8
-    TRKA(L,NY,NX)=0.0_r8
-    TROH(L,NY,NX)=0.0_r8
-    TRSO4(L,NY,NX)=0.0_r8
-    TRCO3(L,NY,NX)=0.0_r8
-    TRHCO(L,NY,NX)=0.0_r8
     TRCO2(L,NY,NX)=0.0_r8
     TBCO2(L,NY,NX)=0.0_r8
-    TRAL1(L,NY,NX)=0.0_r8
-    TRAL2(L,NY,NX)=0.0_r8
-    TRAL3(L,NY,NX)=0.0_r8
-    TRAL4(L,NY,NX)=0.0_r8
-    TRALS(L,NY,NX)=0.0_r8
-    TRFE1(L,NY,NX)=0.0_r8
-    TRFE2(L,NY,NX)=0.0_r8
-    TRFE3(L,NY,NX)=0.0_r8
-    TRFE4(L,NY,NX)=0.0_r8
-    TRFES(L,NY,NX)=0.0_r8
-    TRCAO(L,NY,NX)=0.0_r8
-    TRCAC(L,NY,NX)=0.0_r8
-    TRCAH(L,NY,NX)=0.0_r8
-    TRCAS(L,NY,NX)=0.0_r8
-    TRMGO(L,NY,NX)=0.0_r8
-    TRMGC(L,NY,NX)=0.0_r8
-    TRMGH(L,NY,NX)=0.0_r8
-    TRMGS(L,NY,NX)=0.0_r8
-    TRNAC(L,NY,NX)=0.0_r8
-    TRNAS(L,NY,NX)=0.0_r8
-    TRKAS(L,NY,NX)=0.0_r8
-    TRH0P(L,NY,NX)=0.0_r8
-    TRH3P(L,NY,NX)=0.0_r8
-    TRC0P(L,NY,NX)=0.0_r8
-    TRF1P(L,NY,NX)=0.0_r8
-    TRF2P(L,NY,NX)=0.0_r8
-    TRC1P(L,NY,NX)=0.0_r8
-    TRC2P(L,NY,NX)=0.0_r8
-    TRM1P(L,NY,NX)=0.0_r8
-    TRH0B(L,NY,NX)=0.0_r8
-    TRH3B(L,NY,NX)=0.0_r8
-    TRF1B(L,NY,NX)=0.0_r8
-    TRF2B(L,NY,NX)=0.0_r8
-    TRC0B(L,NY,NX)=0.0_r8
-    TRC1B(L,NY,NX)=0.0_r8
-    TRC2B(L,NY,NX)=0.0_r8
-    TRM1B(L,NY,NX)=0.0_r8
-    TRXNB(L,NY,NX)=0.0_r8
+
+
+    trcx_TR(idx_NH4B,L,NY,NX)=0.0_r8
+    trcx_TR(idx_OHeB:idx_end,L,NY,NX)=0.0_r8
+
     TRXHY(L,NY,NX)=0.0_r8
     TRXAL(L,NY,NX)=0.0_r8
     TRXFE(L,NY,NX)=0.0_r8
@@ -2542,20 +2498,17 @@ module Hour1Mod
     TRXHC(L,NY,NX)=0.0_r8
     TRXAL2(L,NY,NX)=0.0_r8
     TRXFE2(L,NY,NX)=0.0_r8
-    TRBH0(L,NY,NX)=0.0_r8
-    TRBH1(L,NY,NX)=0.0_r8
-    TRBH2(L,NY,NX)=0.0_r8
-    TRB1P(L,NY,NX)=0.0_r8
-    TRB2P(L,NY,NX)=0.0_r8
-    TRALOH(L,NY,NX)=0.0_r8
-    TRFEOH(L,NY,NX)=0.0_r8
-    TRCACO(L,NY,NX)=0.0_r8
-    TRCASO(L,NY,NX)=0.0_r8
-    TRALPB(L,NY,NX)=0.0_r8
-    TRFEPB(L,NY,NX)=0.0_r8
-    TRCPDB(L,NY,NX)=0.0_r8
-    TRCPHB(L,NY,NX)=0.0_r8
-    TRCPMB(L,NY,NX)=0.0_r8
+
+    trcp_TR(idsp_AlOH3,L,NY,NX)=0.0_r8
+    trcp_TR(idsp_FeOH3,L,NY,NX)=0.0_r8
+    trcp_TR(idsp_CaCO3,L,NY,NX)=0.0_r8
+    trcp_TR(idsp_CaSO4,L,NY,NX)=0.0_r8
+    trcp_TR(idsp_AlPO4B,L,NY,NX)=0.0_r8
+    trcp_TR(idsp_FePO4B,L,NY,NX)=0.0_r8
+    trcp_TR(idsp_CaHPO4B,L,NY,NX)=0.0_r8
+    trcp_TR(idsp_HAB,L,NY,NX)=0.0_r8
+    trcp_TR(idsp_CaH2PO4B,L,NY,NX)=0.0_r8
+
     XCOFXS(L,NY,NX)=0.0_r8
     XCHFXS(L,NY,NX)=0.0_r8
     XOXFXS(L,NY,NX)=0.0_r8
@@ -2574,55 +2527,12 @@ module Hour1Mod
     XNXFXB(L,NY,NX)=0.0_r8
     XH1BXB(L,NY,NX)=0.0_r8
     XH2BXB(L,NY,NX)=0.0_r8
-    XALFXS(L,NY,NX)=0.0_r8
-    XFEFXS(L,NY,NX)=0.0_r8
-    XHYFXS(L,NY,NX)=0.0_r8
-    XCAFXS(L,NY,NX)=0.0_r8
-    XMGFXS(L,NY,NX)=0.0_r8
-    XNAFXS(L,NY,NX)=0.0_r8
-    XKAFXS(L,NY,NX)=0.0_r8
-    XOHFXS(L,NY,NX)=0.0_r8
-    XSOFXS(L,NY,NX)=0.0_r8
-    XCLFXS(L,NY,NX)=0.0_r8
-    XC3FXS(L,NY,NX)=0.0_r8
-    XHCFXS(L,NY,NX)=0.0_r8
-    XAL1XS(L,NY,NX)=0.0_r8
-    XAL2XS(L,NY,NX)=0.0_r8
-    XAL3XS(L,NY,NX)=0.0_r8
-    XAL4XS(L,NY,NX)=0.0_r8
-    XALSXS(L,NY,NX)=0.0_r8
-    XFE1XS(L,NY,NX)=0.0_r8
-    XFE2XS(L,NY,NX)=0.0_r8
-    XFE3XS(L,NY,NX)=0.0_r8
-    XFE4XS(L,NY,NX)=0.0_r8
-    XFESXS(L,NY,NX)=0.0_r8
-    XCAOXS(L,NY,NX)=0.0_r8
-    XCACXS(L,NY,NX)=0.0_r8
-    XCAHXS(L,NY,NX)=0.0_r8
-    XCASXS(L,NY,NX)=0.0_r8
-    XMGOXS(L,NY,NX)=0.0_r8
-    XMGCXS(L,NY,NX)=0.0_r8
-    XMGHXS(L,NY,NX)=0.0_r8
-    XMGSXS(L,NY,NX)=0.0_r8
-    XNACXS(L,NY,NX)=0.0_r8
-    XNASXS(L,NY,NX)=0.0_r8
-    XKASXS(L,NY,NX)=0.0_r8
-    XH0PXS(L,NY,NX)=0.0_r8
-    XH3PXS(L,NY,NX)=0.0_r8
-    XF1PXS(L,NY,NX)=0.0_r8
-    XF2PXS(L,NY,NX)=0.0_r8
-    XC0PXS(L,NY,NX)=0.0_r8
-    XC1PXS(L,NY,NX)=0.0_r8
-    XC2PXS(L,NY,NX)=0.0_r8
-    XM1PXS(L,NY,NX)=0.0_r8
-    XH0BXB(L,NY,NX)=0.0_r8
-    XH3BXB(L,NY,NX)=0.0_r8
-    XF1BXB(L,NY,NX)=0.0_r8
-    XF2BXB(L,NY,NX)=0.0_r8
-    XC0BXB(L,NY,NX)=0.0_r8
-    XC1BXB(L,NY,NX)=0.0_r8
-    XC2BXB(L,NY,NX)=0.0_r8
-    XM1BXB(L,NY,NX)=0.0_r8
+
+    DO NTSA=idsa_beg,idsab_end
+      trcsa_TR(NTSA,L,NY,NX)=0.0_r8
+      trcsa_XFXS(NTSA,L,NY,NX)=0.0_r8
+    ENDDO
+
     DO  K=1,jcplx
       XOCFXS(K,L,NY,NX)=0.0_r8
       XONFXS(K,L,NY,NX)=0.0_r8

@@ -99,6 +99,7 @@ implicit none
   integer :: idsp_FePO4B
   integer :: idsp_CaH2PO4B
   integer :: idsp_psoi_beg,idsp_psoi_end
+  integer :: idsp_p_beg, idsp_p_end
 ! exchangeable tracers
   integer :: idx_CEC    ! XCEC,  cation exchange capacity, [mol d-2]
   integer :: idx_NH4    ! XN4, exchangeable NH4 non-band, [mol d-2]
@@ -234,6 +235,7 @@ implicit none
     idsp_FeOH3=addone(idsp_end) !
     idsp_CaCO3=addone(idsp_end) !
     idsp_CaSO4=addone(idsp_end)
+
     idsp_HA   =addone(idsp_end)     !hydroxyapatite
     idsp_AlPO4=addone(idsp_end)
     idsp_FePO4=addone(idsp_end)
@@ -245,17 +247,21 @@ implicit none
     idsp_FePO4B=addone(idsp_end)
     idsp_CaHPO4B=addone(idsp_end)
     idsp_CaH2PO4B=addone(idsp_end)
+
     idsp_end=idsp_CaH2PO4B
     idsp_beg_band=idsp_HAB
+    idsp_p_beg=idsp_HA;idsp_p_end=idsp_CaH2PO4B
 
   else
 !  double check
     idsp_beg=1
     idsp_end=0;
+
     idsp_AlOH3=addone(idsp_end)  !
     idsp_FeOH3=addone(idsp_end) !
     idsp_CaCO3=addone(idsp_end) !
     idsp_CaSO4=addone(idsp_end)
+
     idsp_HA   =addone(idsp_end)     !hydroxyapatite
     idsp_AlPO4=addone(idsp_end)
     idsp_FePO4=addone(idsp_end)
@@ -271,6 +277,7 @@ implicit none
     idsp_end=idsp_CaH2PO4B
     idsp_beg_band=idsp_HAB
 
+    idsp_p_beg=idsp_HA;idsp_p_end=idsp_CaH2PO4B
   endif
 
   idx_beg=1

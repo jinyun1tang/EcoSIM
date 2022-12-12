@@ -148,20 +148,11 @@ implicit none
   real(r8), allocatable ::  trcn_TQR(:,:,:)
   real(r8), allocatable ::  R3PorTSolFlx(:,:,:,:) !total 3D micropore flux
   real(r8), allocatable ::  R3PorTSoHFlx(:,:,:,:) !total 3D macropore flux
-  real(r8), allocatable ::  TCOFLS(:,:,:)                      !
-  real(r8), allocatable ::  TCHFLS(:,:,:)                      !
-  real(r8), allocatable ::  TOXFLS(:,:,:)                      !
-  real(r8), allocatable ::  TNGFLS(:,:,:)                      !
-  real(r8), allocatable ::  TN2FLS(:,:,:)                      !
+
   real(r8), allocatable ::  TN4FLW(:,:,:)                      !
   real(r8), allocatable ::  TN3FLW(:,:,:)                      !
   real(r8), allocatable ::  TNOFLW(:,:,:)                      !
   real(r8), allocatable ::  TH2PFS(:,:,:)                      !
-  real(r8), allocatable ::  TN4FLB(:,:,:)                      !
-  real(r8), allocatable ::  TN3FLB(:,:,:)                      !
-  real(r8), allocatable ::  TNOFLB(:,:,:)                      !
-  real(r8), allocatable ::  TH2BFB(:,:,:)                      !
-  real(r8), allocatable ::  TNXFLS(:,:,:)                      !
   real(r8), allocatable ::  TCOFLG(:,:,:)                      !
   real(r8), allocatable ::  TCHFLG(:,:,:)                      !
   real(r8), allocatable ::  TOXFLG(:,:,:)                      !
@@ -169,7 +160,6 @@ implicit none
   real(r8), allocatable ::  TN2FLG(:,:,:)                      !
   real(r8), allocatable ::  TQRH1P(:,:)                        !
   real(r8), allocatable ::  TH1PFS(:,:,:)                      !
-  real(r8), allocatable ::  TH1BFB(:,:,:)                      !
 
   real(r8), allocatable ::  GasDifcc(:,:,:,:)
   real(r8), allocatable ::  SolDifcc(:,:,:,:)
@@ -191,7 +181,6 @@ implicit none
   real(r8), allocatable ::  HGSGL2(:,:,:)                      !
   real(r8), allocatable ::  DH2GG(:,:,:,:)                     !
   real(r8), allocatable ::  RHGFXS(:,:,:)                      !
-  real(r8), allocatable ::  THGFHS(:,:,:)                      !
   real(r8), allocatable ::  THGFLG(:,:,:)                      !
   real(r8), allocatable ::  FLVM(:,:,:)                        !
   real(r8), allocatable ::  THETH2(:,:,:)                      !
@@ -251,28 +240,15 @@ implicit none
   real(r8), allocatable ::  TONFHS(:,:,:,:)                    !
   real(r8), allocatable ::  TOPFHS(:,:,:,:)                    !
   real(r8), allocatable ::  TOAFHS(:,:,:,:)                    !
-  real(r8), allocatable ::  TCOFHS(:,:,:)                      !
-  real(r8), allocatable ::  TCHFHS(:,:,:)                      !
-  real(r8), allocatable ::  TOXFHS(:,:,:)                      !
-  real(r8), allocatable ::  TNGFHS(:,:,:)                      !
-  real(r8), allocatable ::  TN2FHS(:,:,:)                      !
   real(r8), allocatable ::  TN4FHW(:,:,:)                      !
   real(r8), allocatable ::  TN3FHW(:,:,:)                      !
   real(r8), allocatable ::  TNOFHW(:,:,:)                      !
   real(r8), allocatable ::  TH2PHS(:,:,:)                      !
-  real(r8), allocatable ::  TN4FHB(:,:,:)                      !
-  real(r8), allocatable ::  TN3FHB(:,:,:)                      !
-  real(r8), allocatable ::  TNOFHB(:,:,:)                      !
-  real(r8), allocatable ::  TH2BHB(:,:,:)                      !
-  real(r8), allocatable ::  TNXFHS(:,:,:)                      !
   real(r8), allocatable ::  ZNO2B2(:,:,:)                      !
   real(r8), allocatable ::  ZN2BH2(:,:,:)                      !
-  real(r8), allocatable ::  TNXFLB(:,:,:)                      !
-  real(r8), allocatable ::  TNXFHB(:,:,:)                      !
   real(r8), allocatable ::  H1P4H2(:,:,:)                      !
   real(r8), allocatable ::  H1PBH2(:,:,:)                      !
   real(r8), allocatable ::  TH1PHS(:,:,:)                      !
-  real(r8), allocatable ::  TH1BHB(:,:,:)                      !
   REAL(R8), allocatable ::  H1PO42(:,:,:)                      !
   real(r8), allocatable ::  H1POB2(:,:,:)                      !
   real(r8), allocatable ::  OCSGL2(:,:,:)                      !
@@ -335,7 +311,6 @@ implicit none
   real(r8), allocatable ::  RQSOXS(:,:,:)                      !
   real(r8), allocatable ::  RQR_trcn(:,:,:,:,:)                    !
 
-  real(r8), allocatable ::  THGFLS(:,:,:)                      !
   real(r8), allocatable ::  RNXFHS(:,:,:,:)                    !
   real(r8), allocatable ::  RNXFHB(:,:,:,:)                    !
   real(r8), allocatable ::  RH1PFS(:,:,:,:)                    !
@@ -510,20 +485,10 @@ contains
   allocate(trcn_TQ(ids_nut_beg:ids_nuts_end,JY,JX)); trcn_TQ=0._r8
   allocate(trcg_TQR(idg_beg:idg_end-1,JY,JX)); trcg_TQR=0._r8
   allocate(trcn_TQR(ids_nut_beg:ids_nuts_end,JY,JX));trcn_TQR=0._r8
-  allocate(TCOFLS(JZ,JY,JX));   TCOFLS=0._r8
-  allocate(TCHFLS(JZ,JY,JX));   TCHFLS=0._r8
-  allocate(TOXFLS(JZ,JY,JX));   TOXFLS=0._r8
-  allocate(TNGFLS(JZ,JY,JX));   TNGFLS=0._r8
-  allocate(TN2FLS(JZ,JY,JX));   TN2FLS=0._r8
   allocate(TN4FLW(JZ,JY,JX));   TN4FLW=0._r8
   allocate(TN3FLW(JZ,JY,JX));   TN3FLW=0._r8
   allocate(TNOFLW(JZ,JY,JX));   TNOFLW=0._r8
   allocate(TH2PFS(JZ,JY,JX));   TH2PFS=0._r8
-  allocate(TN4FLB(JZ,JY,JX));   TN4FLB=0._r8
-  allocate(TN3FLB(JZ,JY,JX));   TN3FLB=0._r8
-  allocate(TNOFLB(JZ,JY,JX));   TNOFLB=0._r8
-  allocate(TH2BFB(JZ,JY,JX));   TH2BFB=0._r8
-  allocate(TNXFLS(JZ,JY,JX));   TNXFLS=0._r8
   allocate(TCOFLG(JZ,JY,JX));   TCOFLG=0._r8
   allocate(TCHFLG(JZ,JY,JX));   TCHFLG=0._r8
   allocate(TOXFLG(JZ,JY,JX));   TOXFLG=0._r8
@@ -531,7 +496,6 @@ contains
   allocate(TN2FLG(JZ,JY,JX));   TN2FLG=0._r8
   allocate(TQRH1P(JY,JX));      TQRH1P=0._r8
   allocate(TH1PFS(JZ,JY,JX));   TH1PFS=0._r8
-  allocate(TH1BFB(JZ,JY,JX));   TH1BFB=0._r8
 
   allocate(GasDifcc(idg_beg:idg_end,JZ,JY,JX))
   allocate(SolDifcc(ids_beg:ids_end,0:JZ,JY,JX));SolDifcc=0._r8
@@ -553,7 +517,6 @@ contains
   allocate(HGSGL2(JZ,JY,JX));   HGSGL2=0._r8
   allocate(DH2GG(3,JZ,JY,JX));  DH2GG=0._r8
   allocate(RHGFXS(JZ,JY,JX));   RHGFXS=0._r8
-  allocate(THGFHS(JZ,JY,JX));   THGFHS=0._r8
   allocate(THGFLG(JZ,JY,JX));   THGFLG=0._r8
   allocate(FLVM(JZ,JY,JX));     FLVM=0._r8
   allocate(THETH2(JZ,JY,JX));   THETH2=0._r8
@@ -616,28 +579,15 @@ contains
   allocate(TONFHS(1:jcplx,JZ,JY,JX));TONFHS=0._r8
   allocate(TOPFHS(1:jcplx,JZ,JY,JX));TOPFHS=0._r8
   allocate(TOAFHS(1:jcplx,JZ,JY,JX));TOAFHS=0._r8
-  allocate(TCOFHS(JZ,JY,JX));   TCOFHS=0._r8
-  allocate(TCHFHS(JZ,JY,JX));   TCHFHS=0._r8
-  allocate(TOXFHS(JZ,JY,JX));   TOXFHS=0._r8
-  allocate(TNGFHS(JZ,JY,JX));   TNGFHS=0._r8
-  allocate(TN2FHS(JZ,JY,JX));   TN2FHS=0._r8
   allocate(TN4FHW(JZ,JY,JX));   TN4FHW=0._r8
   allocate(TN3FHW(JZ,JY,JX));   TN3FHW=0._r8
   allocate(TNOFHW(JZ,JY,JX));   TNOFHW=0._r8
   allocate(TH2PHS(JZ,JY,JX));   TH2PHS=0._r8
-  allocate(TN4FHB(JZ,JY,JX));   TN4FHB=0._r8
-  allocate(TN3FHB(JZ,JY,JX));   TN3FHB=0._r8
-  allocate(TNOFHB(JZ,JY,JX));   TNOFHB=0._r8
-  allocate(TH2BHB(JZ,JY,JX));   TH2BHB=0._r8
-  allocate(TNXFHS(JZ,JY,JX));   TNXFHS=0._r8
   allocate(ZNO2B2(JZ,JY,JX));   ZNO2B2=0._r8
   allocate(ZN2BH2(JZ,JY,JX));   ZN2BH2=0._r8
-  allocate(TNXFLB(JZ,JY,JX));   TNXFLB=0._r8
-  allocate(TNXFHB(JZ,JY,JX));   TNXFHB=0._r8
   allocate(H1P4H2(JZ,JY,JX));   H1P4H2=0._r8
   allocate(H1PBH2(JZ,JY,JX));   H1PBH2=0._r8
   allocate(TH1PHS(JZ,JY,JX));   TH1PHS=0._r8
-  allocate(TH1BHB(JZ,JY,JX));   TH1BHB=0._r8
   allocate(H1PO42(0:JZ,JY,JX)); H1PO42=0._r8
   allocate(H1POB2(0:JZ,JY,JX)); H1POB2=0._r8
   allocate(OCSGL2(0:JZ,JY,JX)); OCSGL2=0._r8
@@ -702,7 +652,6 @@ contains
   allocate(RQSCOS(2,JV,JH));    RQSCOS=0._r8
   allocate(RQSCHS(2,JV,JH));    RQSCHS=0._r8
   allocate(RQSOXS(2,JV,JH));    RQSOXS=0._r8
-  allocate(THGFLS(JZ,JY,JX));   THGFLS=0._r8
   allocate(RQR_trcn(ids_nut_beg:ids_nuts_end,2,2,JV,JH));  RQR_trcn=0._r8
   allocate(R3GasADFlx(idg_beg:idg_end,3,JD,JV,JH));R3GasADFlx=0._r8
   allocate(RTGasADFlx(idg_beg:idg_end,JZ,JY,JH));RTGasADFlx=0._r8
@@ -879,20 +828,11 @@ contains
   call destroy(trcn_TQR)
   call destroy(trcg_TQ)
   call destroy(trcn_TQ)
-  call destroy(TCOFLS)
-  call destroy(TCHFLS)
-  call destroy(TOXFLS)
-  call destroy(TNGFLS)
-  call destroy(TN2FLS)
+
   call destroy(TN4FLW)
   call destroy(TN3FLW)
   call destroy(TNOFLW)
   call destroy(TH2PFS)
-  call destroy(TN4FLB)
-  call destroy(TN3FLB)
-  call destroy(TNOFLB)
-  call destroy(TH2BFB)
-  call destroy(TNXFLS)
   call destroy(TCOFLG)
   call destroy(TCHFLG)
   call destroy(TOXFLG)
@@ -900,7 +840,6 @@ contains
   call destroy(TN2FLG)
   call destroy(TQRH1P)
   call destroy(TH1PFS)
-  call destroy(TH1BFB)
   call destroy(DCO2G)
   call destroy(DCH4G)
   call destroy(DOXYG)
@@ -918,7 +857,6 @@ contains
   call destroy(HGSGL2)
   call destroy(DH2GG)
   call destroy(RHGFXS)
-  call destroy(THGFHS)
   call destroy(THGFLG)
   call destroy(FLVM)
   call destroy(THETH2)
@@ -976,28 +914,15 @@ contains
   call destroy(TONFHS)
   call destroy(TOPFHS)
   call destroy(TOAFHS)
-  call destroy(TCOFHS)
-  call destroy(TCHFHS)
-  call destroy(TOXFHS)
-  call destroy(TNGFHS)
-  call destroy(TN2FHS)
   call destroy(TN4FHW)
   call destroy(TN3FHW)
   call destroy(TNOFHW)
   call destroy(TH2PHS)
-  call destroy(TN4FHB)
-  call destroy(TN3FHB)
-  call destroy(TNOFHB)
-  call destroy(TH2BHB)
-  call destroy(TNXFHS)
   call destroy(ZNO2B2)
   call destroy(ZN2BH2)
-  call destroy(TNXFLB)
-  call destroy(TNXFHB)
   call destroy(H1P4H2)
   call destroy(H1PBH2)
   call destroy(TH1PHS)
-  call destroy(TH1BHB)
   call destroy(H1PO42)
   call destroy(H1POB2)
   call destroy(OCSGL2)
@@ -1061,7 +986,6 @@ contains
   call destroy(RQSCHS)
   call destroy(RQSOXS)
 
-  call destroy(THGFLS)
   call destroy(RNXFHS)
   call destroy(RNXFHB)
   call destroy(RH1PFS)

@@ -65,55 +65,7 @@ module AqueChemDatatype
   real(r8),target,allocatable ::  XNXFXS(:,:,:)                      !total NO2 micropore-macropore transfer non-band, [g d-2 h-1]
   real(r8),target,allocatable ::  XH1PXS(:,:,:)                      !total HPO4 micropore-macropore transfer non-band, [g d-2 h-1]
   real(r8),target,allocatable ::  XH1BXB(:,:,:)                      !total HPO4 micropore-macropore transfer band, [g d-2 h-1]
-  real(r8),target,allocatable ::  XH0PXS(:,:,:)                      !total PO4 micropore-macropore transfer non-band, [g d-2 h-1]
-  real(r8),target,allocatable ::  XH3PXS(:,:,:)                      !total H3PO4 micropore-macropore transfer non-band, [g d-2 h-1]
-  real(r8),target,allocatable ::  XALFXS(:,:,:)                      !total Al micropore-macropore transfer, [g d-2 h-1]
-  real(r8),target,allocatable ::  XFEFXS(:,:,:)                      !total Fe micropore-macropore transfer, [g d-2 h-1]
-  real(r8),target,allocatable ::  XHYFXS(:,:,:)                      !total H micropore-macropore transfer, [g d-2 h-1]
-  real(r8),target,allocatable ::  XCAFXS(:,:,:)                      !total Ca micropore-macropore transfer, [g d-2 h-1]
-  real(r8),target,allocatable ::  XMGFXS(:,:,:)                      !total Mg micropore-macropore transfer, [g d-2 h-1]
-  real(r8),target,allocatable ::  XNAFXS(:,:,:)                      !total Na micropore-macropore transfer, [g d-2 h-1]
-  real(r8),target,allocatable ::  XKAFXS(:,:,:)                      !total K micropore-macropore transfer, [g d-2 h-1]
-  real(r8),target,allocatable ::  XOHFXS(:,:,:)                      !total OH micropore-macropore transfer, [g d-2 h-1]
-  real(r8),target,allocatable ::  XSOFXS(:,:,:)                      !total SO4 micropore-macropore transfer, [g d-2 h-1]
-  real(r8),target,allocatable ::  XCLFXS(:,:,:)                      !total Cl micropore-macropore transfer, [g d-2 h-1]
-  real(r8),target,allocatable ::  XC3FXS(:,:,:)                      !total CO3 micropore-macropore transfer, [g d-2 h-1]
-  real(r8),target,allocatable ::  XHCFXS(:,:,:)                      !total HCO3 micropore-macropore transfer, [g d-2 h-1]
-  real(r8),target,allocatable ::  XAL1XS(:,:,:)                      !total AlOH micropore-macropore transfer, [g d-2 h-1]
-  real(r8),target,allocatable ::  XAL2XS(:,:,:)                      !total AlOH2 micropore-macropore transfer, [g d-2 h-1]
-  real(r8),target,allocatable ::  XAL3XS(:,:,:)                      !total AlOH3 micropore-macropore transfer, [g d-2 h-1]
-  real(r8),target,allocatable ::  XAL4XS(:,:,:)                      !total AlOH4 micropore-macropore transfer, [g d-2 h-1]
-  real(r8),target,allocatable ::  XALSXS(:,:,:)                      !total AlSO4 micropore-macropore transfer, [g d-2 h-1]
-  real(r8),target,allocatable ::  XFE1XS(:,:,:)                      !total FeOH micropore-macropore transfer, [g d-2 h-1]
-  real(r8),target,allocatable ::  XFE2XS(:,:,:)                      !total FeOH2 micropore-macropore transfer, [g d-2 h-1]
-  real(r8),target,allocatable ::  XFE3XS(:,:,:)                      !total FeOH3 micropore-macropore transfer, [g d-2 h-1]
-  real(r8),target,allocatable ::  XFE4XS(:,:,:)                      !total FeOH4 micropore-macropore transfer, [g d-2 h-1]
-  real(r8),target,allocatable ::  XFESXS(:,:,:)                      !total FeSO4 micropore-macropore transfer, [g d-2 h-1]
-  real(r8),target,allocatable ::  XCAOXS(:,:,:)                      !total CaOH micropore-macropore transfer, [g d-2 h-1]
-  real(r8),target,allocatable ::  XCACXS(:,:,:)                      !total CaCO3 micropore-macropore transfer, [g d-2 h-1]
-  real(r8),target,allocatable ::  XCAHXS(:,:,:)                      !total CaHCO3 micropore-macropore transfer, [g d-2 h-1]
-  real(r8),target,allocatable ::  XCASXS(:,:,:)                      !total CaSO4 micropore-macropore transfer, [g d-2 h-1]
-  real(r8),target,allocatable ::  XMGOXS(:,:,:)                      !total MgOH micropore-macropore transfer, [g d-2 h-1]
-  real(r8),target,allocatable ::  XMGCXS(:,:,:)                      !total MgCO3 micropore-macropore transfer, [g d-2 h-1]
-  real(r8),target,allocatable ::  XMGHXS(:,:,:)                      !total MgHCO3 micropore-macropore transfer, [g d-2 h-1]
-  real(r8),target,allocatable ::  XMGSXS(:,:,:)                      !total MgSO4 micropore-macropore transfer, [g d-2 h-1]
-  real(r8),target,allocatable ::  XNACXS(:,:,:)                      !total NaCO3 micropore-macropore transfer, [g d-2 h-1]
-  real(r8),target,allocatable ::  XNASXS(:,:,:)                      !total NaSO4 micropore-macropore transfer, [g d-2 h-1]
-  real(r8),target,allocatable ::  XKASXS(:,:,:)                      !total KSO4 micropore-macropore transfer, [g d-2 h-1]
-  real(r8),target,allocatable ::  XF1PXS(:,:,:)                      !total FeHPO4 micropore-macropore transfer non-band, [g d-2 h-1]
-  real(r8),target,allocatable ::  XF2PXS(:,:,:)                      !total FeH2PO4 micropore-macropore transfer non-band, [g d-2 h-1]
-  real(r8),target,allocatable ::  XC0PXS(:,:,:)                      !total CaPO4 micropore-macropore transfer non-band, [g d-2 h-1]
-  real(r8),target,allocatable ::  XC1PXS(:,:,:)                      !total CaHPO4 micropore-macropore transfer non-band, [g d-2 h-1]
-  real(r8),target,allocatable ::  XC2PXS(:,:,:)                      !total CaH2PO4 micropore-macropore transfer non-band, [g d-2 h-1]
-  real(r8),target,allocatable ::  XM1PXS(:,:,:)                      !total MgHPO4 micropore-macropore transfer non-band, [g d-2 h-1]
-  real(r8),target,allocatable ::  XH0BXB(:,:,:)                      !total PO4 micropore-macropore transfer band, [g d-2 h-1]
-  real(r8),target,allocatable ::  XH3BXB(:,:,:)                      !total H3PO4 micropore-macropore transfer band, [g d-2 h-1]
-  real(r8),target,allocatable ::  XF1BXB(:,:,:)                      !total FeHPO4 micropore-macropore transfer band, [g d-2 h-1]
-  real(r8),target,allocatable ::  XF2BXB(:,:,:)                      !total FeH2PO4 micropore-macropore transfer band, [g d-2 h-1]
-  real(r8),target,allocatable ::  XC0BXB(:,:,:)                      !total CaPO4 micropore-macropore transfer band, [g d-2 h-1]
-  real(r8),target,allocatable ::  XC1BXB(:,:,:)                      !total CaHPO4 micropore-macropore transfer band, [g d-2 h-1]
-  real(r8),target,allocatable ::  XC2BXB(:,:,:)                      !total CaH2PO4 micropore-macropore transfer band, [g d-2 h-1]
-  real(r8),target,allocatable ::  XM1BXB(:,:,:)                      !total MgHPO4 micropore-macropore transfer band, [g d-2 h-1]
+  real(r8),target,allocatable ::  trcsa_XFXS(:,:,:,:)                      !total salt micropore-macropore transfer non-band, [g d-2 h-1]
   real(r8),target,allocatable ::  XNXFXB(:,:,:)                      !total MgHPO4 micropore-macropore transfer band, [g d-2 h-1]
   real(r8),target,allocatable ::  TRN4S(:,:,:)                       !total solute NH4 transformation non-band, [mol d-2 h-1]
   real(r8),target,allocatable ::  TRN3S(:,:,:)                       !total solute NH3 transformation non-band, [mol d-2 h-1]
@@ -121,61 +73,15 @@ module AqueChemDatatype
   real(r8),target,allocatable ::  TRNO3(:,:,:)                       !total solute NO3 transformation non-band, [mol d-2 h-1]
   real(r8),target,allocatable ::  TRN3B(:,:,:)                       !total solute NH3 transformation band, [mol d-2 h-1]
   real(r8),target,allocatable ::  TRNOB(:,:,:)                       !total solute NO3 transformation band, [mol d-2 h-1]
-  real(r8),target,allocatable ::  TRH0P(:,:,:)                       !total solute PO4 transformation non-band, [mol d-2 h-1]
+  real(r8),target,allocatable ::  trcsa_TR(:,:,:,:)                  !total salt solute transformation non-band, [mol d-2 h-1]
   real(r8),target,allocatable ::  TRH1P(:,:,:)                       !total solute HPO4 transformation non-band, [mol d-2 h-1]
   real(r8),target,allocatable ::  TRH2P(:,:,:)                       !total solute H2PO4 transformation non-band, [mol d-2 h-1]
-  real(r8),target,allocatable ::  TRH3P(:,:,:)                       !total solute H3PO4 transformation non-band, [mol d-2 h-1]
-  real(r8),target,allocatable ::  TRH0B(:,:,:)                       !total solute PO4 transformation band, [mol d-2 h-1]
   real(r8),target,allocatable ::  TRH1B(:,:,:)                       !total solute HPO4 transformation band, [mol d-2 h-1]
   real(r8),target,allocatable ::  TRH2B(:,:,:)                       !total solute H2PO4 transformation band, [mol d-2 h-1]
-  real(r8),target,allocatable ::  TRH3B(:,:,:)                       !total solute H3PO4 transformation band, [mol d-2 h-1]
-  real(r8),target,allocatable ::  TRAL(:,:,:)                        !total solute Al transformation, [mol d-2 h-1]
-  real(r8),target,allocatable ::  TRFE(:,:,:)                        !total solute Fe transformation, [mol d-2 h-1]
-  real(r8),target,allocatable ::  TRHY(:,:,:)                        !total solute H transformation, [mol d-2 h-1]
-  real(r8),target,allocatable ::  TRCA(:,:,:)                        !total solute Ca transformation, [mol d-2 h-1]
-  real(r8),target,allocatable ::  TRMG(:,:,:)                        !total solute Mg transformation, [mol d-2 h-1]
-  real(r8),target,allocatable ::  TRNA(:,:,:)                        !total solute Na transformation, [mol d-2 h-1]
-  real(r8),target,allocatable ::  TRKA(:,:,:)                        !total solute K transformation, [mol d-2 h-1]
-  real(r8),target,allocatable ::  TROH(:,:,:)                        !total solute OH transformation, [mol d-2 h-1]
-  real(r8),target,allocatable ::  TRSO4(:,:,:)                       !total solute SO4 transformation, [mol d-2 h-1]
-  real(r8),target,allocatable ::  TRCO3(:,:,:)                       !total solute CO3 transformation, [mol d-2 h-1]
   real(r8),target,allocatable ::  TRHCO(:,:,:)                       !total solute HCO3 transformation, [mol d-2 h-1]
   real(r8),target,allocatable ::  TRCO2(:,:,:)                       !total solute CO2 transformation, [mol d-2 h-1]
   real(r8),target,allocatable ::  TRH2O(:,:,:)                       !total solute H2O transformation, [mol d-2 h-1]
-  real(r8),target,allocatable ::  TRAL1(:,:,:)                       !total solute AlOH transformation, [mol d-2 h-1]
-  real(r8),target,allocatable ::  TRAL2(:,:,:)                       !total solute AlOH2 transformation, [mol d-2 h-1]
-  real(r8),target,allocatable ::  TRAL3(:,:,:)                       !total solute AlOH3 transformation, [mol d-2 h-1]
-  real(r8),target,allocatable ::  TRAL4(:,:,:)                       !total solute AlOH4 transformation, [mol d-2 h-1]
-  real(r8),target,allocatable ::  TRALS(:,:,:)                       !total solute AlSO4 transformation, [mol d-2 h-1]
-  real(r8),target,allocatable ::  TRFE1(:,:,:)                       !total solute FeOH transformation, [mol d-2 h-1]
-  real(r8),target,allocatable ::  TRFE2(:,:,:)                       !total solute FeOH2 transformation, [mol d-2 h-1]
   real(r8),target,allocatable ::  TRFE3(:,:,:)                       !total solute FeOH3 transformation, [mol d-2 h-1]
-  real(r8),target,allocatable ::  TRFE4(:,:,:)                       !total solute FeOH4 transformation, [mol d-2 h-1]
-  real(r8),target,allocatable ::  TRFES(:,:,:)                       !total solute FeSO4 transformation, [mol d-2 h-1]
-  real(r8),target,allocatable ::  TRCAO(:,:,:)                       !total solute CaOH transformation, [mol d-2 h-1]
-  real(r8),target,allocatable ::  TRCAC(:,:,:)                       !total solute CaCO3 transformation, [mol d-2 h-1]
-  real(r8),target,allocatable ::  TRCAH(:,:,:)                       !total solute CaHCO3 transformation, [mol d-2 h-1]
-  real(r8),target,allocatable ::  TRCAS(:,:,:)                       !total solute CaSO4 transformation, [mol d-2 h-1]
-  real(r8),target,allocatable ::  TRMGO(:,:,:)                       !total solute MgOH transformation, [mol d-2 h-1]
-  real(r8),target,allocatable ::  TRMGC(:,:,:)                       !total solute MgCO3 transformation, [mol d-2 h-1]
-  real(r8),target,allocatable ::  TRMGH(:,:,:)                       !total solute MgHCO3 transformation, [mol d-2 h-1]
-  real(r8),target,allocatable ::  TRMGS(:,:,:)                       !total solute MgSO4 transformation, [mol d-2 h-1]
-  real(r8),target,allocatable ::  TRNAC(:,:,:)                       !total solute NaCO3 transformation, [mol d-2 h-1]
-  real(r8),target,allocatable ::  TRNAS(:,:,:)                       !total solute NaSO4 transformation, [mol d-2 h-1]
-  real(r8),target,allocatable ::  TRF1P(:,:,:)                       !total solute FeHPO4 transformation non-band, [mol d-2 h-1]
-  real(r8),target,allocatable ::  TRF2P(:,:,:)                       !total solute FeH2PO4 transformation non-band, [mol d-2 h-1]
-  real(r8),target,allocatable ::  TRC0P(:,:,:)                       !total solute CaPO4 transformation non-band, [mol d-2 h-1]
-  real(r8),target,allocatable ::  TRC1P(:,:,:)                       !total solute CaHPO4 transformation non-band, [mol d-2 h-1]
-  real(r8),target,allocatable ::  TRC2P(:,:,:)                       !total solute CaH2PO4 transformation non-band, [mol d-2 h-1]
-  real(r8),target,allocatable ::  TRM1P(:,:,:)                       !total solute MgHPO4 transformation non-band, [mol d-2 h-1]
-  real(r8),target,allocatable ::  TRF1B(:,:,:)                       !total solute FeHPO4 transformation band, [mol d-2 h-1]
-  real(r8),target,allocatable ::  TRF2B(:,:,:)                       !total solute FeH2PO4 transformation band, [mol d-2 h-1]
-  real(r8),target,allocatable ::  TRC0B(:,:,:)                       !total solute CaPO4 transformation band, [mol d-2 h-1]
-  real(r8),target,allocatable ::  TRC1B(:,:,:)                       !total solute CaHPO4 transformation band, [mol d-2 h-1]
-  real(r8),target,allocatable ::  TRC2B(:,:,:)                       !total solute CaH2PO4 transformation band, [mol d-2 h-1]
-  real(r8),target,allocatable ::  TRM1B(:,:,:)                       !total solute MgHPO4 transformation band, [mol d-2 h-1]
-  real(r8),target,allocatable ::  TRXN4(:,:,:)                       !total adsorbed NH4 transformation non-band, [mol d-2 h-1]
-  real(r8),target,allocatable ::  TRXNB(:,:,:)                       !total adsorbed NH4 transformation band, [mol d-2 h-1]
   real(r8),target,allocatable ::  TRXHY(:,:,:)                       !total adsorbed H transformation, [mol d-2 h-1]
   real(r8),target,allocatable ::  TRXAL(:,:,:)                       !total adsorbed Al transformation, [mol d-2 h-1]
   real(r8),target,allocatable ::  TRXCA(:,:,:)                       !total adsorbed Ca transformation, [mol d-2 h-1]
@@ -187,35 +93,13 @@ module AqueChemDatatype
   real(r8),target,allocatable ::  TRKAS(:,:,:)                       !total solute KSO4 transformation, [mol d-2 h-1]
   real(r8),target,allocatable ::  TRXFE(:,:,:)                       !total Fe adsorption
   real(r8),target,allocatable ::  TRXFE2(:,:,:)                      !total FeOH2 adsorption
-  real(r8),target,allocatable ::  TRXH0(:,:,:)                       !total adsorbed OH- transformation non-band, [mol d-2 h-1]
-  real(r8),target,allocatable ::  TRXH1(:,:,:)                       !total adsorbed OH transformation non-band, [mol d-2 h-1]
-  real(r8),target,allocatable ::  TRXH2(:,:,:)                       !total adsorbed OH2 transformation non-band, [mol d-2 h-1]
-  real(r8),target,allocatable ::  TRX1P(:,:,:)                       !total adsorbed HPO4 transformation non-band, [mol d-2 h-1]
-  real(r8),target,allocatable ::  TRX2P(:,:,:)                       !total adsorbed H2PO4 transformation non-band, [mol d-2 h-1]
-  real(r8),target,allocatable ::  TRBH0(:,:,:)                       !total adsorbed OH- transformation band, [mol d-2 h-1]
-  real(r8),target,allocatable ::  TRBH1(:,:,:)                       !total adsorbed OH transformation band, [mol d-2 h-1]
-  real(r8),target,allocatable ::  TRBH2(:,:,:)                       !total adsorbed OH2 transformation band, [mol d-2 h-1]
-  real(r8),target,allocatable ::  TRB1P(:,:,:)                       !total adsorbed HPO4 transformation band, [mol d-2 h-1]
-  real(r8),target,allocatable ::  TRB2P(:,:,:)                       !total adsorbed H2PO4 transformation band, [mol d-2 h-1]
-  real(r8),target,allocatable ::  TRCPMB(:,:,:)                      !total precipitated apatite transformation band, [mol d-2 h-1]
+  real(r8),target,allocatable ::  trcx_TR(:,:,:,:)                   !total adsorbed OH- transformation non-band, [mol d-2 h-1]
   real(r8),target,allocatable ::  TBCO2(:,:,:)                       !total solute CO2 transformation boundary, [mol d-2 h-1]
   real(r8),target,allocatable ::  TBION(:,:,:)                       !total solute ion transformation boundary, [mol d-2 h-1]
   real(r8),target,allocatable ::  TRNO2(:,:,:)                       !total solute NO2 transformation non-band, [mol d-2 h-1]
   real(r8),target,allocatable ::  TRN2B(:,:,:)                       !total solute NO2 transformation band, [mol d-2 h-1]
   real(r8),target,allocatable ::  TRN3G(:,:,:)                       !total gaseous NH3 transformation, [mol d-2 h-1]
-  real(r8),target,allocatable ::  TRALOH(:,:,:)                      !total precipitated AlOH3 transformation, [mol d-2 h-1]
-  real(r8),target,allocatable ::  TRFEOH(:,:,:)                      !total precipitated FeOH3 transformation, [mol d-2 h-1]
-  real(r8),target,allocatable ::  TRCACO(:,:,:)                      !total precipitated CaCO3 transformation, [mol d-2 h-1]
-  real(r8),target,allocatable ::  TRCASO(:,:,:)                      !total precipitated CaSO4 transformation, [mol d-2 h-1]
-  real(r8),target,allocatable ::  TRALPO(:,:,:)                      !total precipitated AlPO4 transformation non-band, [mol d-2 h-1]
-  real(r8),target,allocatable ::  TRFEPO(:,:,:)                      !total precipitated FePO4 transformation non-band, [mol d-2 h-1]
-  real(r8),target,allocatable ::  TRCAPD(:,:,:)                      !total precipitated CaHPO4 transformation non-band, [mol d-2 h-1]
-  real(r8),target,allocatable ::  TRCAPH(:,:,:)                      !total precipitated CaH2PO4 transformation non-band, [mol d-2 h-1]
-  real(r8),target,allocatable ::  TRCAPM(:,:,:)                      !total precipitated apatite transformation non-band, [mol d-2 h-1]
-  real(r8),target,allocatable ::  TRALPB(:,:,:)                      !total precipitated AlPO4 transformation band, [mol d-2 h-1]
-  real(r8),target,allocatable ::  TRFEPB(:,:,:)                      !total precipitated FePO4 transformation band, [mol d-2 h-1]
-  real(r8),target,allocatable ::  TRCPDB(:,:,:)                      !total precipitated CaHPO4 transformation band, [mol d-2 h-1]
-  real(r8),target,allocatable ::  TRCPHB(:,:,:)                      !total precipitated CaH2PO4 transformation band, [mol d-2 h-1]
+  real(r8),target,allocatable ::  trcp_TR(:,:,:,:)                   !total precipitated P containing transformation non-band, [mol d-2 h-1]
   real(r8),target,allocatable ::  trcg_XBLS(:,:,:,:)
   real(r8),target,allocatable ::  trcn_XBLS(:,:,:,:)
   real(r8),target,allocatable ::  trcsa_XBLS(:,:,:,:)
@@ -339,55 +223,7 @@ module AqueChemDatatype
   allocate(XNXFXS(JZ,JY,JX));   XNXFXS=0._r8
   allocate(XH1PXS(JZ,JY,JX));   XH1PXS=0._r8
   allocate(XH1BXB(JZ,JY,JX));   XH1BXB=0._r8
-  allocate(XH0PXS(JZ,JY,JX));   XH0PXS=0._r8
-  allocate(XH3PXS(JZ,JY,JX));   XH3PXS=0._r8
-  allocate(XALFXS(JZ,JY,JX));   XALFXS=0._r8
-  allocate(XFEFXS(JZ,JY,JX));   XFEFXS=0._r8
-  allocate(XHYFXS(JZ,JY,JX));   XHYFXS=0._r8
-  allocate(XCAFXS(JZ,JY,JX));   XCAFXS=0._r8
-  allocate(XMGFXS(JZ,JY,JX));   XMGFXS=0._r8
-  allocate(XNAFXS(JZ,JY,JX));   XNAFXS=0._r8
-  allocate(XKAFXS(JZ,JY,JX));   XKAFXS=0._r8
-  allocate(XOHFXS(JZ,JY,JX));   XOHFXS=0._r8
-  allocate(XSOFXS(JZ,JY,JX));   XSOFXS=0._r8
-  allocate(XCLFXS(JZ,JY,JX));   XCLFXS=0._r8
-  allocate(XC3FXS(JZ,JY,JX));   XC3FXS=0._r8
-  allocate(XHCFXS(JZ,JY,JX));   XHCFXS=0._r8
-  allocate(XAL1XS(JZ,JY,JX));   XAL1XS=0._r8
-  allocate(XAL2XS(JZ,JY,JX));   XAL2XS=0._r8
-  allocate(XAL3XS(JZ,JY,JX));   XAL3XS=0._r8
-  allocate(XAL4XS(JZ,JY,JX));   XAL4XS=0._r8
-  allocate(XALSXS(JZ,JY,JX));   XALSXS=0._r8
-  allocate(XFE1XS(JZ,JY,JX));   XFE1XS=0._r8
-  allocate(XFE2XS(JZ,JY,JX));   XFE2XS=0._r8
-  allocate(XFE3XS(JZ,JY,JX));   XFE3XS=0._r8
-  allocate(XFE4XS(JZ,JY,JX));   XFE4XS=0._r8
-  allocate(XFESXS(JZ,JY,JX));   XFESXS=0._r8
-  allocate(XCAOXS(JZ,JY,JX));   XCAOXS=0._r8
-  allocate(XCACXS(JZ,JY,JX));   XCACXS=0._r8
-  allocate(XCAHXS(JZ,JY,JX));   XCAHXS=0._r8
-  allocate(XCASXS(JZ,JY,JX));   XCASXS=0._r8
-  allocate(XMGOXS(JZ,JY,JX));   XMGOXS=0._r8
-  allocate(XMGCXS(JZ,JY,JX));   XMGCXS=0._r8
-  allocate(XMGHXS(JZ,JY,JX));   XMGHXS=0._r8
-  allocate(XMGSXS(JZ,JY,JX));   XMGSXS=0._r8
-  allocate(XNACXS(JZ,JY,JX));   XNACXS=0._r8
-  allocate(XNASXS(JZ,JY,JX));   XNASXS=0._r8
-  allocate(XKASXS(JZ,JY,JX));   XKASXS=0._r8
-  allocate(XF1PXS(JZ,JY,JX));   XF1PXS=0._r8
-  allocate(XF2PXS(JZ,JY,JX));   XF2PXS=0._r8
-  allocate(XC0PXS(JZ,JY,JX));   XC0PXS=0._r8
-  allocate(XC1PXS(JZ,JY,JX));   XC1PXS=0._r8
-  allocate(XC2PXS(JZ,JY,JX));   XC2PXS=0._r8
-  allocate(XM1PXS(JZ,JY,JX));   XM1PXS=0._r8
-  allocate(XH0BXB(JZ,JY,JX));   XH0BXB=0._r8
-  allocate(XH3BXB(JZ,JY,JX));   XH3BXB=0._r8
-  allocate(XF1BXB(JZ,JY,JX));   XF1BXB=0._r8
-  allocate(XF2BXB(JZ,JY,JX));   XF2BXB=0._r8
-  allocate(XC0BXB(JZ,JY,JX));   XC0BXB=0._r8
-  allocate(XC1BXB(JZ,JY,JX));   XC1BXB=0._r8
-  allocate(XC2BXB(JZ,JY,JX));   XC2BXB=0._r8
-  allocate(XM1BXB(JZ,JY,JX));   XM1BXB=0._r8
+  allocate(trcsa_XFXS(idsa_beg:idsab_end,JZ,JY,JX));   trcsa_XFXS=0._r8
   allocate(XNXFXB(JZ,JY,JX));   XNXFXB=0._r8
   allocate(TRN4S(0:JZ,JY,JX));  TRN4S=0._r8
   allocate(TRN3S(0:JZ,JY,JX));  TRN3S=0._r8
@@ -395,61 +231,17 @@ module AqueChemDatatype
   allocate(TRNO3(0:JZ,JY,JX));  TRNO3=0._r8
   allocate(TRN3B(JZ,JY,JX));    TRN3B=0._r8
   allocate(TRNOB(JZ,JY,JX));    TRNOB=0._r8
-  allocate(TRH0P(JZ,JY,JX));    TRH0P=0._r8
+  allocate(trcsa_TR(idsa_beg:idsab_end,JZ,JY,JX));    trcsa_TR=0._r8
+  allocate(trcx_TR(idx_beg:idx_end,0:JZ,JY,JX));  trcx_TR=0._r8
+
   allocate(TRH1P(0:JZ,JY,JX));  TRH1P=0._r8
   allocate(TRH2P(0:JZ,JY,JX));  TRH2P=0._r8
-  allocate(TRH3P(JZ,JY,JX));    TRH3P=0._r8
-  allocate(TRH0B(JZ,JY,JX));    TRH0B=0._r8
   allocate(TRH1B(JZ,JY,JX));    TRH1B=0._r8
   allocate(TRH2B(JZ,JY,JX));    TRH2B=0._r8
-  allocate(TRH3B(JZ,JY,JX));    TRH3B=0._r8
-  allocate(TRAL(JZ,JY,JX));     TRAL=0._r8
-  allocate(TRFE(JZ,JY,JX));     TRFE=0._r8
-  allocate(TRHY(JZ,JY,JX));     TRHY=0._r8
-  allocate(TRCA(JZ,JY,JX));     TRCA=0._r8
-  allocate(TRMG(JZ,JY,JX));     TRMG=0._r8
-  allocate(TRNA(JZ,JY,JX));     TRNA=0._r8
-  allocate(TRKA(JZ,JY,JX));     TRKA=0._r8
-  allocate(TROH(JZ,JY,JX));     TROH=0._r8
-  allocate(TRSO4(JZ,JY,JX));    TRSO4=0._r8
-  allocate(TRCO3(JZ,JY,JX));    TRCO3=0._r8
   allocate(TRHCO(JZ,JY,JX));    TRHCO=0._r8
   allocate(TRCO2(JZ,JY,JX));    TRCO2=0._r8
   allocate(TRH2O(0:JZ,JY,JX));  TRH2O=0._r8
-  allocate(TRAL1(JZ,JY,JX));    TRAL1=0._r8
-  allocate(TRAL2(JZ,JY,JX));    TRAL2=0._r8
-  allocate(TRAL3(JZ,JY,JX));    TRAL3=0._r8
-  allocate(TRAL4(JZ,JY,JX));    TRAL4=0._r8
-  allocate(TRALS(JZ,JY,JX));    TRALS=0._r8
-  allocate(TRFE1(JZ,JY,JX));    TRFE1=0._r8
-  allocate(TRFE2(JZ,JY,JX));    TRFE2=0._r8
   allocate(TRFE3(JZ,JY,JX));    TRFE3=0._r8
-  allocate(TRFE4(JZ,JY,JX));    TRFE4=0._r8
-  allocate(TRFES(JZ,JY,JX));    TRFES=0._r8
-  allocate(TRCAO(JZ,JY,JX));    TRCAO=0._r8
-  allocate(TRCAC(JZ,JY,JX));    TRCAC=0._r8
-  allocate(TRCAH(JZ,JY,JX));    TRCAH=0._r8
-  allocate(TRCAS(JZ,JY,JX));    TRCAS=0._r8
-  allocate(TRMGO(JZ,JY,JX));    TRMGO=0._r8
-  allocate(TRMGC(JZ,JY,JX));    TRMGC=0._r8
-  allocate(TRMGH(JZ,JY,JX));    TRMGH=0._r8
-  allocate(TRMGS(JZ,JY,JX));    TRMGS=0._r8
-  allocate(TRNAC(JZ,JY,JX));    TRNAC=0._r8
-  allocate(TRNAS(JZ,JY,JX));    TRNAS=0._r8
-  allocate(TRF1P(JZ,JY,JX));    TRF1P=0._r8
-  allocate(TRF2P(JZ,JY,JX));    TRF2P=0._r8
-  allocate(TRC0P(JZ,JY,JX));    TRC0P=0._r8
-  allocate(TRC1P(JZ,JY,JX));    TRC1P=0._r8
-  allocate(TRC2P(JZ,JY,JX));    TRC2P=0._r8
-  allocate(TRM1P(JZ,JY,JX));    TRM1P=0._r8
-  allocate(TRF1B(JZ,JY,JX));    TRF1B=0._r8
-  allocate(TRF2B(JZ,JY,JX));    TRF2B=0._r8
-  allocate(TRC0B(JZ,JY,JX));    TRC0B=0._r8
-  allocate(TRC1B(JZ,JY,JX));    TRC1B=0._r8
-  allocate(TRC2B(JZ,JY,JX));    TRC2B=0._r8
-  allocate(TRM1B(JZ,JY,JX));    TRM1B=0._r8
-  allocate(TRXN4(0:JZ,JY,JX));  TRXN4=0._r8
-  allocate(TRXNB(JZ,JY,JX));    TRXNB=0._r8
   allocate(TRXHY(JZ,JY,JX));    TRXHY=0._r8
   allocate(TRXAL(JZ,JY,JX));    TRXAL=0._r8
   allocate(TRXCA(JZ,JY,JX));    TRXCA=0._r8
@@ -461,35 +253,12 @@ module AqueChemDatatype
   allocate(TRKAS(JZ,JY,JX));    TRKAS=0._r8
   allocate(TRXFE(JZ,JY,JX));    TRXFE=0._r8
   allocate(TRXFE2(JZ,JY,JX));   TRXFE2=0._r8
-  allocate(TRXH0(0:JZ,JY,JX));  TRXH0=0._r8
-  allocate(TRXH1(0:JZ,JY,JX));  TRXH1=0._r8
-  allocate(TRXH2(0:JZ,JY,JX));  TRXH2=0._r8
-  allocate(TRX1P(0:JZ,JY,JX));  TRX1P=0._r8
-  allocate(TRX2P(0:JZ,JY,JX));  TRX2P=0._r8
-  allocate(TRBH0(JZ,JY,JX));    TRBH0=0._r8
-  allocate(TRBH1(JZ,JY,JX));    TRBH1=0._r8
-  allocate(TRBH2(JZ,JY,JX));    TRBH2=0._r8
-  allocate(TRB1P(JZ,JY,JX));    TRB1P=0._r8
-  allocate(TRB2P(JZ,JY,JX));    TRB2P=0._r8
-  allocate(TRCPMB(JZ,JY,JX));   TRCPMB=0._r8
   allocate(TBCO2(JZ,JY,JX));    TBCO2=0._r8
   allocate(TBION(0:JZ,JY,JX));  TBION=0._r8
   allocate(TRNO2(0:JZ,JY,JX));  TRNO2=0._r8
   allocate(TRN2B(JZ,JY,JX));    TRN2B=0._r8
   allocate(TRN3G(0:JZ,JY,JX));  TRN3G=0._r8
-  allocate(TRALOH(JZ,JY,JX));   TRALOH=0._r8
-  allocate(TRFEOH(JZ,JY,JX));   TRFEOH=0._r8
-  allocate(TRCACO(JZ,JY,JX));   TRCACO=0._r8
-  allocate(TRCASO(JZ,JY,JX));   TRCASO=0._r8
-  allocate(TRALPO(0:JZ,JY,JX)); TRALPO=0._r8
-  allocate(TRFEPO(0:JZ,JY,JX)); TRFEPO=0._r8
-  allocate(TRCAPD(0:JZ,JY,JX)); TRCAPD=0._r8
-  allocate(TRCAPH(0:JZ,JY,JX)); TRCAPH=0._r8
-  allocate(TRCAPM(0:JZ,JY,JX)); TRCAPM=0._r8
-  allocate(TRALPB(JZ,JY,JX));   TRALPB=0._r8
-  allocate(TRFEPB(JZ,JY,JX));   TRFEPB=0._r8
-  allocate(TRCPDB(JZ,JY,JX));   TRCPDB=0._r8
-  allocate(TRCPHB(JZ,JY,JX));   TRCPHB=0._r8
+  allocate(trcp_TR(idsp_beg:idsp_end,0:JZ,JY,JX)); trcp_TR=0._r8
   allocate(trcg_XBLS(idg_beg:idg_end-1,JS,JY,JX)); trcg_XBLS=0._r8
   allocate(trcn_XBLS(ids_nut_beg:ids_nuts_end,JS,JY,JX)); trcn_XBLS=0._r8
   if(salt_model)then
@@ -579,6 +348,7 @@ module AqueChemDatatype
   call destroy(GKCN)
   call destroy(GKCK)
 
+  call destroy(trcsa_TR)
   call destroy(trcx_solml)
   call destroy(trcsa_solml)
   call destroy(trcsa_soHml)
@@ -586,7 +356,7 @@ module AqueChemDatatype
   call destroy(ECND)
   call destroy(CSTR)
   call destroy(CION)
-
+  call destroy(trcsa_XFXS)
   call destroy(trcsa_XFLS)
   call destroy(trcsa_XFHS)
   call destroy(XOCFXS)
@@ -607,58 +377,6 @@ module AqueChemDatatype
   call destroy(XN3FXB)
   call destroy(XNOFXB)
   call destroy(XH2BXB)
-  call destroy(XNXFXS)
-  call destroy(XH1PXS)
-  call destroy(XH1BXB)
-  call destroy(XH0PXS)
-  call destroy(XH3PXS)
-  call destroy(XALFXS)
-  call destroy(XFEFXS)
-  call destroy(XHYFXS)
-  call destroy(XCAFXS)
-  call destroy(XMGFXS)
-  call destroy(XNAFXS)
-  call destroy(XKAFXS)
-  call destroy(XOHFXS)
-  call destroy(XSOFXS)
-  call destroy(XCLFXS)
-  call destroy(XC3FXS)
-  call destroy(XHCFXS)
-  call destroy(XAL1XS)
-  call destroy(XAL2XS)
-  call destroy(XAL3XS)
-  call destroy(XAL4XS)
-  call destroy(XALSXS)
-  call destroy(XFE1XS)
-  call destroy(XFE2XS)
-  call destroy(XFE3XS)
-  call destroy(XFE4XS)
-  call destroy(XFESXS)
-  call destroy(XCAOXS)
-  call destroy(XCACXS)
-  call destroy(XCAHXS)
-  call destroy(XCASXS)
-  call destroy(XMGOXS)
-  call destroy(XMGCXS)
-  call destroy(XMGHXS)
-  call destroy(XMGSXS)
-  call destroy(XNACXS)
-  call destroy(XNASXS)
-  call destroy(XKASXS)
-  call destroy(XF1PXS)
-  call destroy(XF2PXS)
-  call destroy(XC0PXS)
-  call destroy(XC1PXS)
-  call destroy(XC2PXS)
-  call destroy(XM1PXS)
-  call destroy(XH0BXB)
-  call destroy(XH3BXB)
-  call destroy(XF1BXB)
-  call destroy(XF2BXB)
-  call destroy(XC0BXB)
-  call destroy(XC1BXB)
-  call destroy(XC2BXB)
-  call destroy(XM1BXB)
   call destroy(XNXFXB)
   call destroy(TRN4S)
   call destroy(TRN3S)
@@ -666,62 +384,14 @@ module AqueChemDatatype
   call destroy(TRNO3)
   call destroy(TRN3B)
   call destroy(TRNOB)
-  call destroy(TRH0P)
   call destroy(TRH1P)
   call destroy(TRH2P)
-  call destroy(TRH3P)
-  call destroy(TRH0B)
   call destroy(TRH1B)
   call destroy(TRH2B)
-  call destroy(TRH3B)
-  call destroy(TRAL)
-  call destroy(TRFE)
-  call destroy(TRHY)
-  call destroy(TRCA)
-  call destroy(TRMG)
-  call destroy(TRNA)
-  call destroy(TRKA)
-  call destroy(TROH)
-  call destroy(TRSO4)
-  call destroy(TRCO3)
   call destroy(TRHCO)
   call destroy(TRCO2)
   call destroy(TRH2O)
-  call destroy(TRAL1)
-  call destroy(TRAL2)
-  call destroy(TRAL3)
-  call destroy(TRAL4)
-  call destroy(TRALS)
-  call destroy(TRFE1)
-  call destroy(TRFE2)
   call destroy(TRFE3)
-  call destroy(TRFE4)
-  call destroy(TRFES)
-  call destroy(TRCAO)
-  call destroy(TRCAC)
-  call destroy(TRCAH)
-  call destroy(TRCAS)
-  call destroy(TRMGO)
-  call destroy(TRMGC)
-  call destroy(TRMGH)
-  call destroy(TRMGS)
-  call destroy(TRNAC)
-  call destroy(TRNAS)
-  call destroy(TRF1P)
-  call destroy(TRF2P)
-  call destroy(TRC0P)
-  call destroy(TRC1P)
-  call destroy(TRC2P)
-  call destroy(TRM1P)
-  call destroy(TRF1B)
-  call destroy(TRF2B)
-  call destroy(TRC0B)
-  call destroy(TRC1B)
-  call destroy(TRC2B)
-  call destroy(TRM1B)
-  call destroy(TRXN4)
-  call destroy(TRXNB)
-  call destroy(TRXHY)
   call destroy(TRXAL)
   call destroy(TRXCA)
   call destroy(TRXMG)
@@ -732,35 +402,11 @@ module AqueChemDatatype
   call destroy(TRKAS)
   call destroy(TRXFE)
   call destroy(TRXFE2)
-  call destroy(TRXH0)
-  call destroy(TRXH1)
-  call destroy(TRXH2)
-  call destroy(TRX1P)
-  call destroy(TRX2P)
-  call destroy(TRBH0)
-  call destroy(TRBH1)
-  call destroy(TRBH2)
-  call destroy(TRB1P)
-  call destroy(TRB2P)
-  call destroy(TRCPMB)
   call destroy(TBCO2)
   call destroy(TBION)
   call destroy(TRNO2)
   call destroy(TRN2B)
   call destroy(TRN3G)
-  call destroy(TRALOH)
-  call destroy(TRFEOH)
-  call destroy(TRCACO)
-  call destroy(TRCASO)
-  call destroy(TRALPO)
-  call destroy(TRFEPO)
-  call destroy(TRCAPD)
-  call destroy(TRCAPH)
-  call destroy(TRCAPM)
-  call destroy(TRALPB)
-  call destroy(TRFEPB)
-  call destroy(TRCPDB)
-  call destroy(TRCPHB)
   call destroy(XCOBLS)
   call destroy(XCHBLS)
   call destroy(XOXBLS)
