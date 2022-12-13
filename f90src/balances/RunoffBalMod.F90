@@ -162,11 +162,11 @@ implicit none
 !     UDONQ,UDINQ=dissolved organic,inorganic N loss through runoff
 !     UDOPQ,UDIPQ=dissolved organic,inorganic P loss through runoff
 !
-      CXR=XN*(XCOQRS(N,NN,N5,N4)+XCHQRS(N,NN,N5,N4))
-      ZXR=XN*(XN4QRW(N,NN,N5,N4)+XN3QRW(N,NN,N5,N4) &
-        +XNOQRW(N,NN,N5,N4)+XNXQRS(N,NN,N5,N4))
-      ZGR=XN*(XN2QRS(N,NN,N5,N4)+XNGQRS(N,NN,N5,N4))
-      PXR=XN*(XP4QRW(N,NN,N5,N4)+XP1QRW(N,NN,N5,N4))
+      CXR=XN*(trcg_XRS(idg_CO2,N,NN,N5,N4)+trcg_XRS(idg_CH4,N,NN,N5,N4))
+      ZXR=XN*(trcn_XRS(ids_NH4,N,NN,N5,N4)+trcg_XRS(idg_NH3,N,NN,N5,N4) &
+        +trcn_XRS(ids_NO3,N,NN,N5,N4)+trcn_XRS(ids_NO2,N,NN,N5,N4))
+      ZGR=XN*(trcg_XRS(idg_N2O,N,NN,N5,N4)+trcg_XRS(idg_N2,N,NN,N5,N4))
+      PXR=XN*(trcn_XRS(ids_H2PO4,N,NN,N5,N4)+trcn_XRS(ids_H1PO4,N,NN,N5,N4))
       COR=0.0_r8
       ZOR=0.0_r8
       POR=0.0_r8
@@ -184,9 +184,9 @@ implicit none
       UDINQ(NY,NX)=UDINQ(NY,NX)-ZXR-ZGR
       UDOPQ(NY,NX)=UDOPQ(NY,NX)-POR
       UDIPQ(NY,NX)=UDIPQ(NY,NX)-PXR
-      OXR=XN*XOXQRS(N,NN,N5,N4)
+      OXR=XN*trcg_XRS(idg_O2,N,NN,N5,N4)
       OXYGOU=OXYGOU-OXR
-      HGR=XN*XHGQRS(N,NN,N5,N4)
+      HGR=XN*trcg_XRS(idg_H2,N,NN,N5,N4)
       H2GOU=H2GOU+HGR
 !
 !     RUNOFF BOUNDARY FLUXES OF SOLUTES
@@ -227,7 +227,7 @@ implicit none
         SS4=XN*4.0*(XQRAL3(N,NN,N5,N4)+XQRFE3(N,NN,N5,N4) &
           +XQRH3P(N,NN,N5,N4)+XQRF2P(N,NN,N5,N4)+XQRC2P(N,NN,N5,N4)) &
           +XN*5.0*(XQRAL4(N,NN,N5,N4)+XQRFE4(N,NN,N5,N4))
-        PSS=PSS+XN*31.0*XQSH0P(N,N5,N4)
+        PSS=PSS+XN*31.0*trcsa_XQS(idsa_H0PO4,N,N5,N4)
         TPOU=TPOU-PSS
         SSR=SS1+SS2+SS3+SS4
         TIONOU=TIONOU-SSR
@@ -255,7 +255,7 @@ implicit none
           ECHC=0.044*AZMAX1(XQRHC(N,NN,N5,N4)/WX)
           ECSO=0.080*AZMAX1(XQRSO(N,NN,N5,N4)*2.0/WX)
           ECCL=0.076*AZMAX1(XQRCL(N,NN,N5,N4)/WX)
-          ECNO=0.071*AZMAX1(XNOQRW(N,NN,N5,N4)/(WX*14.0))
+          ECNO=0.071*AZMAX1(trcn_XRS(ids_NO3,N,NN,N5,N4)/(WX*14.0))
           ECNDQ=ECHY+ECOH+ECAL+ECFE+ECCA+ECMG+ECNA+ECKA &
             +ECCO+ECHC+ECSO+ECCL+ECNO
 !     WRITE(*,9991)'ECNDQ',IYRC,I,J,N4,N5,N,NN,WX,ECNDQ
@@ -486,18 +486,26 @@ implicit none
       CXD=XN*(trcs_XFLS(idg_CO2,N,N6,N5,N4)+trcs_XFHS(idg_CO2,N,N6,N5,N4) &
         +R3GasADTFlx(idg_CO2,N,N6,N5,N4)+trcs_XFLS(idg_CH4,N,N6,N5,N4) &
         +trcs_XFHS(idg_CH4,N,N6,N5,N4)+R3GasADTFlx(idg_CH4,N,N6,N5,N4))
-      ZXD=XN*(trcs_XFLS(ids_NH4,N,N6,N5,N4)+trcs_XFLS(idg_NH3,N,N6,N5,N4)+trcs_XFLS(ids_NO3,N,N6,N5,N4) &
-        +trcs_XFLS(ids_NH4B,N,N6,N5,N4)+trcs_XFLS(idg_NH3B,N,N6,N5,N4)+trcs_XFLS(ids_NO3B,N,N6,N5,N4) &
+      ZXD=XN*(trcs_XFLS(ids_NH4,N,N6,N5,N4)+trcs_XFLS(idg_NH3,N,N6,N5,N4) &
+        +trcs_XFLS(ids_NO3,N,N6,N5,N4) &
+        +trcs_XFLS(ids_NH4B,N,N6,N5,N4)+trcs_XFLS(idg_NH3B,N,N6,N5,N4)&
+        +trcs_XFLS(ids_NO3B,N,N6,N5,N4) &
         +trcs_XFLS(ids_NO2,N,N6,N5,N4)+trcs_XFLS(ids_NO2B,N,N6,N5,N4) &
-        +trcs_XFHS(ids_NH4,N,N6,N5,N4)+trcs_XFHS(idg_NH3,N,N6,N5,N4)+trcs_XFHS(ids_NO3,N,N6,N5,N4) &
-        +trcs_XFHS(ids_NH4B,N,N6,N5,N4)+trcs_XFHS(idg_NH3B,N,N6,N5,N4)+trcs_XFHS(ids_NO3B,N,N6,N5,N4) &
+        +trcs_XFHS(ids_NH4,N,N6,N5,N4)+trcs_XFHS(idg_NH3,N,N6,N5,N4) &
+        +trcs_XFHS(ids_NO3,N,N6,N5,N4) &
+        +trcs_XFHS(ids_NH4B,N,N6,N5,N4)+trcs_XFHS(idg_NH3B,N,N6,N5,N4) &
+        +trcs_XFHS(ids_NO3B,N,N6,N5,N4) &
         +trcs_XFHS(ids_NO2,N,N6,N5,N4)+trcs_XFHS(ids_NO2B,N,N6,N5,N4))
-      ZGD=XN*(trcs_XFLS(idg_N2,N,N6,N5,N4)+R3GasADTFlx(idg_N2,N,N6,N5,N4)+trcs_XFHS(idg_N2,N,N6,N5,N4) &
-        +trcs_XFLS(idg_N2O,N,N6,N5,N4)+R3GasADTFlx(idg_N2O,N,N6,N5,N4)+trcs_XFHS(idg_N2O,N,N6,N5,N4) &
+      ZGD=XN*(trcs_XFLS(idg_N2,N,N6,N5,N4)+R3GasADTFlx(idg_N2,N,N6,N5,N4) &
+        +trcs_XFHS(idg_N2,N,N6,N5,N4) &
+        +trcs_XFLS(idg_N2O,N,N6,N5,N4)+R3GasADTFlx(idg_N2O,N,N6,N5,N4) &
+        +trcs_XFHS(idg_N2O,N,N6,N5,N4) &
         +R3GasADTFlx(idg_NH3,N,N6,N5,N4))
       PXD=XN*(trcs_XFLS(ids_H2PO4,N,N6,N5,N4)+trcs_XFLS(ids_H2PO4B,N,N6,N5,N4) &
-        +trcs_XFHS(ids_H2PO4,N,N6,N5,N4)+trcs_XFHS(ids_H2PO4B,N,N6,N5,N4)+trcs_XFLS(ids_H1PO4,N,N6,N5,N4) &
-        +trcs_XFLS(ids_H1PO4B,N,N6,N5,N4)+trcs_XFHS(ids_H1PO4,N,N6,N5,N4)+trcs_XFHS(ids_H1PO4B,N,N6,N5,N4))
+        +trcs_XFHS(ids_H2PO4,N,N6,N5,N4)+trcs_XFHS(ids_H2PO4B,N,N6,N5,N4)&
+        +trcs_XFLS(ids_H1PO4,N,N6,N5,N4) &
+        +trcs_XFLS(ids_H1PO4B,N,N6,N5,N4)+trcs_XFHS(ids_H1PO4,N,N6,N5,N4) &
+        +trcs_XFHS(ids_H1PO4B,N,N6,N5,N4))
 
       TCOU=TCOU-COD-CXD
       TZOU=TZOU-ZOD-ZXD-ZGD
@@ -530,56 +538,91 @@ implicit none
 !
       IF(ISALTG.NE.0)THEN
         PQD=XN*patomw*(trcsa_XFLS(idsa_H0PO4,N,N6,N5,N4)+trcsa_XFLS(idsa_H0PO4B,N,N6,N5,N4) &
-          +trcsa_XFLS(idsa_CaPO4,N,N6,N5,N4)+trcsa_XFLS(idsa_CaPO4B,N,N6,N5,N4)+trcsa_XFLS(idsa_FeHPO4,N,N6,N5,N4) &
-          +trcsa_XFLS(idsa_CaHPO4,N,N6,N5,N4)+trcsa_XFLS(idsa_MgHPO4,N,N6,N5,N4)+trcsa_XFLS(idsa_FeHPO4B,N,N6,N5,N4) &
-          +trcsa_XFLS(idsa_CaHPO4B,N,N6,N5,N4)+trcsa_XFLS(idsa_MgHPO4B,N,N6,N5,N4)+trcsa_XFLS(idsa_H3PO4,N,N6,N5,N4) &
-          +trcsa_XFLS(idsa_FeH2PO4,N,N6,N5,N4)+trcsa_XFLS(idsa_CaH2PO4,N,N6,N5,N4)+trcsa_XFLS(idsa_H3PO4B,N,N6,N5,N4) &
+          +trcsa_XFLS(idsa_CaPO4,N,N6,N5,N4)+trcsa_XFLS(idsa_CaPO4B,N,N6,N5,N4) &
+          +trcsa_XFLS(idsa_FeHPO4,N,N6,N5,N4) &
+          +trcsa_XFLS(idsa_CaHPO4,N,N6,N5,N4)+trcsa_XFLS(idsa_MgHPO4,N,N6,N5,N4) &
+          +trcsa_XFLS(idsa_FeHPO4B,N,N6,N5,N4) &
+          +trcsa_XFLS(idsa_CaHPO4B,N,N6,N5,N4)+trcsa_XFLS(idsa_MgHPO4B,N,N6,N5,N4) &
+          +trcsa_XFLS(idsa_H3PO4,N,N6,N5,N4) &
+          +trcsa_XFLS(idsa_FeH2PO4,N,N6,N5,N4)+trcsa_XFLS(idsa_CaH2PO4,N,N6,N5,N4) &
+          +trcsa_XFLS(idsa_H3PO4B,N,N6,N5,N4) &
           +trcsa_XFLS(idsa_FeH2PO4B,N,N6,N5,N4)+trcsa_XFLS(idsa_CaH2PO4B,N,N6,N5,N4))
 
         PHD=XN*patomw*(trcsa_XFHS(idsa_H0PO4,N,N6,N5,N4)+trcsa_XFHS(idsa_H0PO4B,N,N6,N5,N4) &
-          +trcsa_XFHS(idsa_CaPO4,N,N6,N5,N4)+trcsa_XFHS(idsa_CaPO4B,N,N6,N5,N4)+trcsa_XFHS(idsa_FeHPO4,N,N6,N5,N4) &
-          +trcsa_XFHS(idsa_CaHPO4,N,N6,N5,N4)+trcsa_XFHS(idsa_MgHPO4,N,N6,N5,N4)+trcsa_XFHS(idsa_FeHPO4B,N,N6,N5,N4) &
-          +trcsa_XFHS(idsa_CaHPO4B,N,N6,N5,N4)+trcsa_XFHS(idsa_MgHPO4B,N,N6,N5,N4)+trcsa_XFHS(idsa_H3PO4,N,N6,N5,N4) &
-          +trcsa_XFHS(idsa_FeH2PO4,N,N6,N5,N4)+trcsa_XFHS(idsa_CaH2PO4,N,N6,N5,N4)+trcsa_XFHS(idsa_H3PO4B,N,N6,N5,N4) &
+          +trcsa_XFHS(idsa_CaPO4,N,N6,N5,N4)+trcsa_XFHS(idsa_CaPO4B,N,N6,N5,N4) &
+          +trcsa_XFHS(idsa_FeHPO4,N,N6,N5,N4) &
+          +trcsa_XFHS(idsa_CaHPO4,N,N6,N5,N4)+trcsa_XFHS(idsa_MgHPO4,N,N6,N5,N4) &
+          +trcsa_XFHS(idsa_FeHPO4B,N,N6,N5,N4) &
+          +trcsa_XFHS(idsa_CaHPO4B,N,N6,N5,N4)+trcsa_XFHS(idsa_MgHPO4B,N,N6,N5,N4) &
+          +trcsa_XFHS(idsa_H3PO4,N,N6,N5,N4) &
+          +trcsa_XFHS(idsa_FeH2PO4,N,N6,N5,N4)+trcsa_XFHS(idsa_CaH2PO4,N,N6,N5,N4) &
+          +trcsa_XFHS(idsa_H3PO4B,N,N6,N5,N4) &
           +trcsa_XFHS(idsa_FeH2PO4B,N,N6,N5,N4)+trcsa_XFHS(idsa_CaH2PO4B,N,N6,N5,N4))
 
         TPOU=TPOU-PQD-PHD
-        SSD=XN*(trcsa_XFLS(idsa_Al,N,N6,N5,N4)+trcsa_XFLS(idsa_Fe,N,N6,N5,N4)+trcsa_XFLS(idsa_Hp,N,N6,N5,N4) &
-          +trcsa_XFLS(idsa_Ca,N,N6,N5,N4)+trcsa_XFLS(idsa_Mg,N,N6,N5,N4)+trcsa_XFLS(idsa_Na,N,N6,N5,N4) &
-          +trcsa_XFLS(idsa_K,N,N6,N5,N4)+trcsa_XFLS(idsa_OH,N,N6,N5,N4)+trcsa_XFLS(idsa_SO4,N,N6,N5,N4) &
-          +trcsa_XFLS(idsa_Cl,N,N6,N5,N4)+trcsa_XFLS(idsa_CO3,N,N6,N5,N4)+trcsa_XFLS(idsa_H0PO4,N,N6,N5,N4) &
-          +trcsa_XFLS(idsa_H0PO4B,N,N6,N5,N4)+2.0*(trcsa_XFLS(idsa_HCO3,N,N6,N5,N4)+trcsa_XFLS(idsa_AlOH,N,N6,N5,N4) &
-          +trcsa_XFLS(idsa_AlSO4,N,N6,N5,N4)+trcsa_XFLS(idsa_FeOH,N,N6,N5,N4)+trcsa_XFLS(idsa_FeSO4,N,N6,N5,N4) &
+        SSD=XN*(trcsa_XFLS(idsa_Al,N,N6,N5,N4)+trcsa_XFLS(idsa_Fe,N,N6,N5,N4) &
+          +trcsa_XFLS(idsa_Hp,N,N6,N5,N4) &
+          +trcsa_XFLS(idsa_Ca,N,N6,N5,N4)+trcsa_XFLS(idsa_Mg,N,N6,N5,N4) &
+          +trcsa_XFLS(idsa_Na,N,N6,N5,N4) &
+          +trcsa_XFLS(idsa_K,N,N6,N5,N4)+trcsa_XFLS(idsa_OH,N,N6,N5,N4) &
+          +trcsa_XFLS(idsa_SO4,N,N6,N5,N4) &
+          +trcsa_XFLS(idsa_Cl,N,N6,N5,N4)+trcsa_XFLS(idsa_CO3,N,N6,N5,N4) &
+          +trcsa_XFLS(idsa_H0PO4,N,N6,N5,N4) &
+          +trcsa_XFLS(idsa_H0PO4B,N,N6,N5,N4)+2.0*(trcsa_XFLS(idsa_HCO3,N,N6,N5,N4) &
+          +trcsa_XFLS(idsa_AlOH,N,N6,N5,N4) &
+          +trcsa_XFLS(idsa_AlSO4,N,N6,N5,N4)+trcsa_XFLS(idsa_FeOH,N,N6,N5,N4) &
+          +trcsa_XFLS(idsa_FeSO4,N,N6,N5,N4) &
           +trcsa_XFLS(idsa_CaOH2,N,N6,N5,N4)+trcsa_XFLS(idsa_CaCO3,N,N6,N5,N4) &
-          +trcsa_XFLS(idsa_CaSO4,N,N6,N5,N4)+trcsa_XFLS(idsa_MgOH2,N,N6,N5,N4)+trcsa_XFLS(idsa_MgCO3,N,N6,N5,N4) &
-          +trcsa_XFLS(idsa_MgSO4,N,N6,N5,N4)+trcsa_XFLS(idsa_NaCO3,N,N6,N5,N4)+trcsa_XFLS(idsa_NaSO4,N,N6,N5,N4) &
-          +trcsa_XFLS(idsa_KSO4,N,N6,N5,N4)+trcsa_XFLS(idsa_CaPO4,N,N6,N5,N4)+trcsa_XFLS(idsa_CaPO4B,N,N6,N5,N4)) &
+          +trcsa_XFLS(idsa_CaSO4,N,N6,N5,N4)+trcsa_XFLS(idsa_MgOH2,N,N6,N5,N4) &
+          +trcsa_XFLS(idsa_MgCO3,N,N6,N5,N4) &
+          +trcsa_XFLS(idsa_MgSO4,N,N6,N5,N4)+trcsa_XFLS(idsa_NaCO3,N,N6,N5,N4) &
+          +trcsa_XFLS(idsa_NaSO4,N,N6,N5,N4) &
+          +trcsa_XFLS(idsa_KSO4,N,N6,N5,N4)+trcsa_XFLS(idsa_CaPO4,N,N6,N5,N4) &
+          +trcsa_XFLS(idsa_CaPO4B,N,N6,N5,N4)) &
           +3.0*(trcsa_XFLS(idsa_AlOH2,N,N6,N5,N4) &
-          +trcsa_XFLS(idsa_FeOH2,N,N6,N5,N4)+trcsa_XFLS(idsa_CaHCO3,N,N6,N5,N4)+trcsa_XFLS(idsa_MgHCO3,N,N6,N5,N4) &
-          +trcsa_XFLS(idsa_FeHPO4,N,N6,N5,N4)+trcsa_XFLS(idsa_CaHPO4,N,N6,N5,N4)+trcsa_XFLS(idsa_MgHPO4,N,N6,N5,N4) &
-          +trcsa_XFLS(idsa_FeHPO4B,N,N6,N5,N4)+trcsa_XFLS(idsa_CaHPO4B,N,N6,N5,N4)+trcsa_XFLS(idsa_MgHPO4B,N,N6,N5,N4)) &
-          +4.0*(trcsa_XFLS(idsa_AlOH3,N,N6,N5,N4)+trcsa_XFLS(idsa_FeOH3,N,N6,N5,N4)+trcsa_XFLS(idsa_H3PO4,N,N6,N5,N4) &
-          +trcsa_XFLS(idsa_FeH2PO4,N,N6,N5,N4)+trcsa_XFLS(idsa_CaH2PO4,N,N6,N5,N4)+trcsa_XFLS(idsa_H3PO4B,N,N6,N5,N4) &
+          +trcsa_XFLS(idsa_FeOH2,N,N6,N5,N4)+trcsa_XFLS(idsa_CaHCO3,N,N6,N5,N4) &
+          +trcsa_XFLS(idsa_MgHCO3,N,N6,N5,N4) &
+          +trcsa_XFLS(idsa_FeHPO4,N,N6,N5,N4)+trcsa_XFLS(idsa_CaHPO4,N,N6,N5,N4) &
+          +trcsa_XFLS(idsa_MgHPO4,N,N6,N5,N4) &
+          +trcsa_XFLS(idsa_FeHPO4B,N,N6,N5,N4)+trcsa_XFLS(idsa_CaHPO4B,N,N6,N5,N4) &
+          +trcsa_XFLS(idsa_MgHPO4B,N,N6,N5,N4)) &
+          +4.0*(trcsa_XFLS(idsa_AlOH3,N,N6,N5,N4)+trcsa_XFLS(idsa_FeOH3,N,N6,N5,N4) &
+          +trcsa_XFLS(idsa_H3PO4,N,N6,N5,N4) &
+          +trcsa_XFLS(idsa_FeH2PO4,N,N6,N5,N4)+trcsa_XFLS(idsa_CaH2PO4,N,N6,N5,N4) &
+          +trcsa_XFLS(idsa_H3PO4B,N,N6,N5,N4) &
           +trcsa_XFLS(idsa_FeH2PO4B,N,N6,N5,N4)+trcsa_XFLS(idsa_CaH2PO4B,N,N6,N5,N4)) &
           +5.0*(trcsa_XFLS(idsa_AlOH4,N,N6,N5,N4)+trcsa_XFLS(idsa_FeOH4,N,N6,N5,N4)))
 
-        SHD=XN*(trcsa_XFHS(idsa_Al,N,N6,N5,N4)+trcsa_XFHS(idsa_Fe,N,N6,N5,N4)+trcsa_XFHS(idsa_Hp,N,N6,N5,N4) &
-          +trcsa_XFHS(idsa_Ca,N,N6,N5,N4)+trcsa_XFHS(idsa_Mg,N,N6,N5,N4)+trcsa_XFHS(idsa_Na,N,N6,N5,N4) &
-          +trcsa_XFHS(idsa_K,N,N6,N5,N4)+trcsa_XFHS(idsa_OH,N,N6,N5,N4)+trcsa_XFHS(idsa_SO4,N,N6,N5,N4) &
-          +trcsa_XFHS(idsa_Cl,N,N6,N5,N4)+trcsa_XFHS(idsa_CO3,N,N6,N5,N4)+trcsa_XFHS(idsa_H0PO4,N,N6,N5,N4) &
+        SHD=XN*(trcsa_XFHS(idsa_Al,N,N6,N5,N4)+trcsa_XFHS(idsa_Fe,N,N6,N5,N4) &
+          +trcsa_XFHS(idsa_Hp,N,N6,N5,N4) &
+          +trcsa_XFHS(idsa_Ca,N,N6,N5,N4)+trcsa_XFHS(idsa_Mg,N,N6,N5,N4) &
+          +trcsa_XFHS(idsa_Na,N,N6,N5,N4) &
+          +trcsa_XFHS(idsa_K,N,N6,N5,N4)+trcsa_XFHS(idsa_OH,N,N6,N5,N4) &
+          +trcsa_XFHS(idsa_SO4,N,N6,N5,N4) &
+          +trcsa_XFHS(idsa_Cl,N,N6,N5,N4)+trcsa_XFHS(idsa_CO3,N,N6,N5,N4) &
+          +trcsa_XFHS(idsa_H0PO4,N,N6,N5,N4) &
           +trcsa_XFHS(idsa_H0PO4B,N,N6,N5,N4) &
           +2.0*(trcsa_XFHS(idsa_HCO3,N,N6,N5,N4)+trcsa_XFHS(idsa_AlOH,N,N6,N5,N4) &
-          +trcsa_XFHS(idsa_AlSO4,N,N6,N5,N4)+trcsa_XFHS(idsa_FeOH,N,N6,N5,N4)+trcsa_XFHS(idsa_FeSO4,N,N6,N5,N4) &
+          +trcsa_XFHS(idsa_AlSO4,N,N6,N5,N4)+trcsa_XFHS(idsa_FeOH,N,N6,N5,N4) &
+          +trcsa_XFHS(idsa_FeSO4,N,N6,N5,N4) &
           +trcsa_XFHS(idsa_CaOH2,N,N6,N5,N4)+trcsa_XFHS(idsa_CaCO3,N,N6,N5,N4) &
-          +trcsa_XFHS(idsa_CaSO4,N,N6,N5,N4)+trcsa_XFHS(idsa_MgOH2,N,N6,N5,N4)+trcsa_XFHS(idsa_MgCO3,N,N6,N5,N4) &
-          +trcsa_XFHS(idsa_MgSO4,N,N6,N5,N4)+trcsa_XFHS(idsa_NaCO3,N,N6,N5,N4)+trcsa_XFHS(idsa_NaSO4,N,N6,N5,N4) &
-          +trcsa_XFHS(idsa_KSO4,N,N6,N5,N4)+trcsa_XFHS(idsa_CaPO4,N,N6,N5,N4)+trcsa_XFHS(idsa_CaPO4B,N,N6,N5,N4)) &
+          +trcsa_XFHS(idsa_CaSO4,N,N6,N5,N4)+trcsa_XFHS(idsa_MgOH2,N,N6,N5,N4) &
+          +trcsa_XFHS(idsa_MgCO3,N,N6,N5,N4) &
+          +trcsa_XFHS(idsa_MgSO4,N,N6,N5,N4)+trcsa_XFHS(idsa_NaCO3,N,N6,N5,N4) &
+          +trcsa_XFHS(idsa_NaSO4,N,N6,N5,N4) &
+          +trcsa_XFHS(idsa_KSO4,N,N6,N5,N4)+trcsa_XFHS(idsa_CaPO4,N,N6,N5,N4) &
+          +trcsa_XFHS(idsa_CaPO4B,N,N6,N5,N4)) &
           +3.0*(trcsa_XFHS(idsa_AlOH2,N,N6,N5,N4) &
-          +trcsa_XFHS(idsa_FeOH2,N,N6,N5,N4)+trcsa_XFHS(idsa_CaHCO3,N,N6,N5,N4)+trcsa_XFHS(idsa_MgHCO3,N,N6,N5,N4) &
-          +trcsa_XFHS(idsa_FeHPO4,N,N6,N5,N4)+trcsa_XFHS(idsa_CaHPO4,N,N6,N5,N4)+trcsa_XFHS(idsa_MgHPO4,N,N6,N5,N4) &
-          +trcsa_XFHS(idsa_FeHPO4B,N,N6,N5,N4)+trcsa_XFHS(idsa_CaHPO4B,N,N6,N5,N4)+trcsa_XFHS(idsa_MgHPO4B,N,N6,N5,N4)) &
-          +4.0*(trcsa_XFHS(idsa_AlOH3,N,N6,N5,N4)+trcsa_XFHS(idsa_FeOH3,N,N6,N5,N4)+trcsa_XFHS(idsa_H3PO4,N,N6,N5,N4) &
-          +trcsa_XFHS(idsa_FeH2PO4,N,N6,N5,N4)+trcsa_XFHS(idsa_CaH2PO4,N,N6,N5,N4)+trcsa_XFHS(idsa_H3PO4B,N,N6,N5,N4) &
+          +trcsa_XFHS(idsa_FeOH2,N,N6,N5,N4)+trcsa_XFHS(idsa_CaHCO3,N,N6,N5,N4) &
+          +trcsa_XFHS(idsa_MgHCO3,N,N6,N5,N4) &
+          +trcsa_XFHS(idsa_FeHPO4,N,N6,N5,N4)+trcsa_XFHS(idsa_CaHPO4,N,N6,N5,N4) &
+          +trcsa_XFHS(idsa_MgHPO4,N,N6,N5,N4) &
+          +trcsa_XFHS(idsa_FeHPO4B,N,N6,N5,N4)+trcsa_XFHS(idsa_CaHPO4B,N,N6,N5,N4) &
+          +trcsa_XFHS(idsa_MgHPO4B,N,N6,N5,N4)) &
+          +4.0*(trcsa_XFHS(idsa_AlOH3,N,N6,N5,N4)+trcsa_XFHS(idsa_FeOH3,N,N6,N5,N4) &
+          +trcsa_XFHS(idsa_H3PO4,N,N6,N5,N4) &
+          +trcsa_XFHS(idsa_FeH2PO4,N,N6,N5,N4)+trcsa_XFHS(idsa_CaH2PO4,N,N6,N5,N4) &
+          +trcsa_XFHS(idsa_H3PO4B,N,N6,N5,N4) &
           +trcsa_XFHS(idsa_FeH2PO4B,N,N6,N5,N4)+trcsa_XFHS(idsa_CaH2PO4B,N,N6,N5,N4)) &
           +5.0*(trcsa_XFHS(idsa_AlOH4,N,N6,N5,N4)+trcsa_XFHS(idsa_AlOH4,N,N6,N5,N4)))
 
@@ -658,22 +701,33 @@ implicit none
       OXS=XN*XOXQSS(N,N5,N4)
       OXYGOU=OXYGOU-OXS
       IF(ISALTG.NE.0)THEN
-        PSS=XN*patomw*(XQSC0P(N,N5,N4)+XQSF1P(N,N5,N4)+XQSC1P(N,N5,N4) &
-          +XQSM1P(N,N5,N4)+XQSH3P(N,N5,N4)+XQSF2P(N,N5,N4)+XQSC2P(N,N5,N4))
+        PSS=XN*patomw*(trcsa_XQS(idsa_CaPO4,N,N5,N4) &
+          +trcsa_XQS(idsa_FeHPO4,N,N5,N4)+trcsa_XQS(idsa_CaHPO4,N,N5,N4) &
+          +trcsa_XQS(idsa_MgHPO4,N,N5,N4)+trcsa_XQS(idsa_H3PO4,N,N5,N4) &
+          +trcsa_XQS(idsa_FeH2PO4,N,N5,N4)+trcsa_XQS(idsa_CaH2PO4,N,N5,N4))
         TPOU=TPOU-PSS
-        SS1=XN*(XQSAL(N,N5,N4)+XQSFE(N,N5,N4) &
-          +XQSHY(N,N5,N4)+XQSCA(N,N5,N4)+XQSMG(N,N5,N4)+XQSNA(N,N5,N4) &
-          +XQSKA(N,N5,N4)+XQSOH(N,N5,N4)+XQSSO(N,N5,N4)+XQSCL(N,N5,N4) &
-          +XQSC3(N,N5,N4)+XQSH0P(N,N5,N4))
-        SS2=XN*2.0*(XQSHC(N,N5,N4)+XQSAL1(N,N5,N4)+XQSALS(N,N5,N4) &
-          +XQSFE1(N,N5,N4)+XQSFES(N,N5,N4)+XQSCAO(N,N5,N4)+XQSCAC(N,N5,N4) &
-          +XQSCAS(N,N5,N4)+XQSMGO(N,N5,N4)+XQSMGC(N,N5,N4)+XQSMGS(N,N5,N4) &
-          +XQSNAC(N,N5,N4)+XQSNAS(N,N5,N4)+XQSKAS(N,N5,N4)+XQSC0P(N,N5,N4))
-        SS3=XN*3.0*(XQSAL2(N,N5,N4)+XQSFE2(N,N5,N4)+XQSCAH(N,N5,N4) &
-          +XQSMGH(N,N5,N4)+XQSF1P(N,N5,N4)+XQSC1P(N,N5,N4)+XQSM1P(N,N5,N4))
-        SS4=XN*4.0*(XQSAL3(N,N5,N4)+XQSFE3(N,N5,N4) &
-          +XQSH3P(N,N5,N4)+XQSF2P(N,N5,N4)+XQSC2P(N,N5,N4)) &
-          +XN*5.0*(XQSAL4(N,N5,N4)+XQSFE4(N,N5,N4))
+        SS1=XN*(trcsa_XQS(idsa_Al,N,N5,N4)+trcsa_XQS(idsa_Fe,N,N5,N4) &
+          +trcsa_XQS(idsa_Hp,N,N5,N4)+trcsa_XQS(idsa_Ca,N,N5,N4) &
+          +trcsa_XQS(idsa_Mg,N,N5,N4)+trcsa_XQS(idsa_Na,N,N5,N4) &
+          +trcsa_XQS(idsa_K,N,N5,N4)+trcsa_XQS(idsa_OH,N,N5,N4) &
+          +trcsa_XQS(idsa_SO4,N,N5,N4)+trcsa_XQS(idsa_Cl,N,N5,N4) &
+          +trcsa_XQS(idsa_CO3,N,N5,N4)+trcsa_XQS(idsa_H0PO4,N,N5,N4))
+        SS2=XN*2.0*(trcsa_XQS(idsa_HCO3,N,N5,N4)+trcsa_XQS(idsa_AlOH,N,N5,N4) &
+          +trcsa_XQS(idsa_AlSO4,N,N5,N4) &
+          +trcsa_XQS(idsa_FeOH,N,N5,N4)+trcsa_XQS(idsa_FeSO4,N,N5,N4) &
+          +trcsa_XQS(idsa_CaOH2,N,N5,N4)+trcsa_XQS(idsa_CaCO3,N,N5,N4) &
+          +trcsa_XQS(idsa_CaSO4,N,N5,N4)+trcsa_XQS(idsa_MgOH2,N,N5,N4)&
+          +trcsa_XQS(idsa_MgCO3,N,N5,N4)+trcsa_XQS(idsa_MgSO4,N,N5,N4) &
+          +trcsa_XQS(idsa_NaCO3,N,N5,N4)+trcsa_XQS(idsa_NaSO4,N,N5,N4) &
+          +trcsa_XQS(idsa_KSO4,N,N5,N4)+trcsa_XQS(idsa_CaPO4,N,N5,N4))
+        SS3=XN*3.0*(trcsa_XQS(idsa_AlOH2,N,N5,N4)+trcsa_XQS(idsa_FeOH2,N,N5,N4)&
+          +trcsa_XQS(idsa_CaHCO3,N,N5,N4) &
+          +trcsa_XQS(idsa_MgHCO3,N,N5,N4)+trcsa_XQS(idsa_FeHPO4,N,N5,N4) &
+          +trcsa_XQS(idsa_CaHPO4,N,N5,N4)+trcsa_XQS(idsa_MgHPO4,N,N5,N4))
+        SS4=XN*4.0*(trcsa_XQS(idsa_AlOH3,N,N5,N4)+trcsa_XQS(idsa_FeOH3,N,N5,N4) &
+          +trcsa_XQS(idsa_H3PO4,N,N5,N4)+trcsa_XQS(idsa_FeH2PO4,N,N5,N4)&
+          +trcsa_XQS(idsa_CaH2PO4,N,N5,N4)) &
+          +XN*5.0*(trcsa_XQS(idsa_AlOH4,N,N5,N4)+trcsa_XQS(idsa_FeOH4,N,N5,N4))
         SSR=SS1+SS2+SS3+SS4
         TIONOU=TIONOU-SSR
         UIONOU(NY,NX)=UIONOU(NY,NX)-SSR

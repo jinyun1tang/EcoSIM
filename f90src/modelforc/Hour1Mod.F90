@@ -374,18 +374,8 @@ module Hour1Mod
       XOPQRS(1:jcplx,1:2,1:2,NY,NX)=0.0_r8
       XOAQRS(1:jcplx,1:2,1:2,NY,NX)=0.0_r8
 
-      XCOQRS(1:2,1:2,NY,NX)=0.0_r8
-      XCHQRS(1:2,1:2,NY,NX)=0.0_r8
-      XOXQRS(1:2,1:2,NY,NX)=0.0_r8
-      XNGQRS(1:2,1:2,NY,NX)=0.0_r8
-      XN2QRS(1:2,1:2,NY,NX)=0.0_r8
-      XHGQRS(1:2,1:2,NY,NX)=0.0_r8
-      XN4QRW(1:2,1:2,NY,NX)=0.0_r8
-      XN3QRW(1:2,1:2,NY,NX)=0.0_r8
-      XNOQRW(1:2,1:2,NY,NX)=0.0_r8
-      XNXQRS(1:2,1:2,NY,NX)=0.0_r8
-      XP1QRW(1:2,1:2,NY,NX)=0.0_r8
-      XP4QRW(1:2,1:2,NY,NX)=0.0_r8
+      trcg_XRS(idg_beg:idg_end-1,1:2,1:2,NY,NX)=0.0_r8
+      trcn_XRS(ids_nut_beg:ids_nuts_end,1:2,1:2,NY,NX)=0.0_r8
 
       QS(1:2,NY,NX)=0.0_r8
       QW(1:2,NY,NX)=0.0_r8
@@ -401,7 +391,6 @@ module Hour1Mod
       XNOQSS(1:2,NY,NX)=0.0_r8
       XP1QSS(1:2,NY,NX)=0.0_r8
       XP4QSS(1:2,NY,NX)=0.0_r8
-
 !
 !
 !     GAS AND SOLUTE FLUXES
@@ -573,48 +562,7 @@ module Hour1Mod
       XQRC2P(1:2,1:2,NY,NX)=0.0_r8
       XQRM1P(1:2,1:2,NY,NX)=0.0_r8
 
-      XQSAL(1:2,NY,NX)=0.0_r8
-      XQSFE(1:2,NY,NX)=0.0_r8
-      XQSHY(1:2,NY,NX)=0.0_r8
-      XQSCA(1:2,NY,NX)=0.0_r8
-      XQSMG(1:2,NY,NX)=0.0_r8
-      XQSNA(1:2,NY,NX)=0.0_r8
-      XQSKA(1:2,NY,NX)=0.0_r8
-      XQSOH(1:2,NY,NX)=0.0_r8
-      XQSSO(1:2,NY,NX)=0.0_r8
-      XQSCL(1:2,NY,NX)=0.0_r8
-      XQSC3(1:2,NY,NX)=0.0_r8
-      XQSHC(1:2,NY,NX)=0.0_r8
-      XQSAL1(1:2,NY,NX)=0.0_r8
-      XQSAL2(1:2,NY,NX)=0.0_r8
-      XQSAL3(1:2,NY,NX)=0.0_r8
-      XQSAL4(1:2,NY,NX)=0.0_r8
-      XQSALS(1:2,NY,NX)=0.0_r8
-      XQSFE1(1:2,NY,NX)=0.0_r8
-      XQSFE2(1:2,NY,NX)=0.0_r8
-      XQSFE3(1:2,NY,NX)=0.0_r8
-      XQSFE4(1:2,NY,NX)=0.0_r8
-      XQSFES(1:2,NY,NX)=0.0_r8
-      XQSCAO(1:2,NY,NX)=0.0_r8
-      XQSCAC(1:2,NY,NX)=0.0_r8
-      XQSCAH(1:2,NY,NX)=0.0_r8
-      XQSCAS(1:2,NY,NX)=0.0_r8
-      XQSMGO(1:2,NY,NX)=0.0_r8
-      XQSMGC(1:2,NY,NX)=0.0_r8
-      XQSMGH(1:2,NY,NX)=0.0_r8
-      XQSMGS(1:2,NY,NX)=0.0_r8
-      XQSNAC(1:2,NY,NX)=0.0_r8
-      XQSNAS(1:2,NY,NX)=0.0_r8
-      XQSKAS(1:2,NY,NX)=0.0_r8
-      XQSH0P(1:2,NY,NX)=0.0_r8
-      XQSH1P(1:2,NY,NX)=0.0_r8
-      XQSH3P(1:2,NY,NX)=0.0_r8
-      XQSF1P(1:2,NY,NX)=0.0_r8
-      XQSF2P(1:2,NY,NX)=0.0_r8
-      XQSC0P(1:2,NY,NX)=0.0_r8
-      XQSC1P(1:2,NY,NX)=0.0_r8
-      XQSC2P(1:2,NY,NX)=0.0_r8
-      XQSM1P(1:2,NY,NX)=0.0_r8
+      trcsa_XQS(idsa_beg:idsa_end,1:2,NY,NX)=0.0_r8
 
       DO  L=1,NL(NY,NX)+1
         DO NSA=idsa_beg,idsab_end
@@ -1372,19 +1320,8 @@ module Hour1Mod
       ENDIF
 
     ELSE
-      trc_solcl(ids_NH4,L,NY,NX)=0.0_r8
-      trc_solcl(idg_NH3,L,NY,NX)=0.0_r8
-      trc_solcl(ids_NO3,L,NY,NX)=0.0_r8
-      trc_solcl(ids_NO2,L,NY,NX)=0.0_r8
-      trc_solcl(ids_H1PO4,L,NY,NX)=0.0_r8
-      trc_solcl(ids_H2PO4,L,NY,NX)=0.0_r8
+      trc_solcl(ids_nuts_beg:ids_nuts_end,L,NY,NX)=0.0_r8
       CPO4S(L,NY,NX)=0.0_r8
-      trc_solcl(ids_NH4B,L,NY,NX)=0.0_r8
-      trc_solcl(idg_NH3B,L,NY,NX)=0.0_r8
-      trc_solcl(ids_NO3B,L,NY,NX)=0.0_r8
-      trc_solcl(ids_NO2B,L,NY,NX)=0.0_r8
-      trc_solcl(ids_H1PO4B,L,NY,NX)=0.0_r8
-      trc_solcl(ids_H2PO4B,L,NY,NX)=0.0_r8
       CPO4B(L,NY,NX)=0.0_r8
     ENDIF
   ENDDO
@@ -1434,6 +1371,7 @@ module Hour1Mod
     RN2BX(L,NY,NX)=0.0_r8
     RP1BX(L,NY,NX)=0.0_r8
     RPOBX(L,NY,NX)=0.0_r8
+
     D5050: DO K=1,jcplx
       ROQCY(K,L,NY,NX)=ROQCX(K,L,NY,NX)
       ROQAY(K,L,NY,NX)=ROQAX(K,L,NY,NX)
@@ -2193,6 +2131,7 @@ module Hour1Mod
         ELSE
           trcs_VLN(ids_NO3B,L,NY,NX)=0.0_r8
         ENDIF
+
         trcs_VLN(ids_NO3,L,NY,NX)=1.0_r8-trcs_VLN(ids_NO3B,L,NY,NX)
         trcs_VLN(ids_NO2B,L,NY,NX)=trcs_VLN(ids_NO3B,L,NY,NX)
         trcs_VLN(ids_NO2,L,NY,NX)=trcs_VLN(ids_NO3,L,NY,NX)
@@ -2409,20 +2348,13 @@ module Hour1Mod
     ELSE
       trc_gascl(idg_beg:idg_end-1,L,NY,NX)=0.0_r8
     ENDIF
+
     IF(VOLW(L,NY,NX).GT.ZEROS2(NY,NX))THEN
-      trc_solcl(idg_CO2,L,NY,NX)=AZMAX1(trc_solml(idg_CO2,L,NY,NX)/VOLW(L,NY,NX))
-      trc_solcl(idg_CH4,L,NY,NX)=AZMAX1(trc_solml(idg_CH4,L,NY,NX)/VOLW(L,NY,NX))
-      trc_solcl(idg_O2,L,NY,NX)=AZMAX1(trc_solml(idg_O2,L,NY,NX)/VOLW(L,NY,NX))
-      trc_solcl(idg_N2,L,NY,NX)=AZMAX1(trc_solml(idg_N2,L,NY,NX)/VOLW(L,NY,NX))
-      trc_solcl(idg_N2O,L,NY,NX)=AZMAX1(trc_solml(idg_N2O,L,NY,NX)/VOLW(L,NY,NX))
-      trc_solcl(idg_H2,L,NY,NX)=AZMAX1(trc_solml(idg_H2,L,NY,NX)/VOLW(L,NY,NX))
+      DO NTG=idg_beg,idg_end-1
+        trc_solcl(NTG,L,NY,NX)=AZMAX1(trc_solml(NTG,L,NY,NX)/VOLW(L,NY,NX))
+      ENDDO
     ELSE
-      trc_solcl(idg_CO2,L,NY,NX)=0.0_r8
-      trc_solcl(idg_CH4,L,NY,NX)=0.0_r8
-      trc_solcl(idg_O2,L,NY,NX)=0.0_r8
-      trc_solcl(idg_N2,L,NY,NX)=0.0_r8
-      trc_solcl(idg_N2O,L,NY,NX)=0.0_r8
-      trc_solcl(idg_H2,L,NY,NX)=0.0_r8
+      trc_solcl(idg_beg:idg_end-1,L,NY,NX)=0.0_r8
     ENDIF
 !
 !     CORGC=SOC concentration

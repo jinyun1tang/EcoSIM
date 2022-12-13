@@ -220,7 +220,7 @@ contains
   real(r8) :: DIFOC1,DIFON1,DIFOP1,DIFOA1
   real(r8) :: DISPN,DIF0,DIF1
   real(r8) :: SDifc(ids_beg:ids_end)
-  integer  :: K,NTS
+  integer  :: K,NTS,NTG,NTN
 !
 !     VOLT,DLYR,AREA=soil surface volume, thickness, area
 !     VOLWM=micropore water-filled porosity from watsub.f
@@ -285,26 +285,25 @@ contains
       DFVOP(K)=DIFOP*(COQP1(K)-COQP2(K))
       DFVOA(K)=DIFOA*(COQA1(K)-COQA2(K))
     ENDDO
-    SDifFlx(idg_CO2)=SDifc(idg_CO2)*(trcs_cl1(idg_CO2)-trcs_cl2(idg_CO2))
-    SDifFlx(idg_CH4)=SDifc(idg_CH4)*(trcs_cl1(idg_CH4)-trcs_cl2(idg_CH4))
-    SDifFlx(idg_O2) =SDifc(idg_O2)*(trcs_cl1(idg_O2)-trcs_cl2(idg_O2))
-    SDifFlx(idg_N2) =SDifc(idg_N2)*(trcs_cl1(idg_N2)-trcs_cl2(idg_N2))
-    SDifFlx(idg_N2O)=SDifc(idg_N2O)*(trcs_cl1(idg_N2O)-trcs_cl2(idg_N2O))
-    SDifFlx(idg_H2)=SDifc(idg_H2)*(trcs_cl1(idg_H2)-trcs_cl2(idg_H2))
+!exclude NH3B and NH3
+    DO NTG=idg_beg,idg_end-2
+        SDifFlx(NTG)=SDifc(NTG)*(trcs_cl1(NTG)-trcs_cl2(NTG))
+    ENDDO
 
-    SDifFlx(idg_NH3)=SDifc(idg_NH3)*(trcs_cl1(idg_NH3)-trcs_cl2(idg_NH3))*trcs_VLN(ids_NH4,NU(NY,NX),NY,NX)
-    SDifFlx(ids_NH4)=SDifc(ids_NH4)*(trcs_cl1(ids_NH4)-trcs_cl2(ids_NH4))*trcs_VLN(ids_NH4,NU(NY,NX),NY,NX)
-    SDifFlx(ids_NO3)=SDifc(ids_NO3)*(trcs_cl1(ids_NO3)-trcs_cl2(ids_NO3))*trcs_VLN(ids_NO3,NU(NY,NX),NY,NX)
-    SDifFlx(ids_NO2)=SDifc(ids_NO2)*(trcs_cl1(ids_NO2)-trcs_cl2(ids_NO2))*trcs_VLN(ids_NO3,NU(NY,NX),NY,NX)
-    SDifFlx(ids_H1PO4)=SDifc(ids_H1PO4)*(trcs_cl1(ids_H1PO4)-trcs_cl2(ids_H1PO4))*trcs_VLN(ids_H1PO4,NU(NY,NX),NY,NX)
-    SDifFlx(ids_H2PO4)=SDifc(ids_H2PO4)*(trcs_cl1(ids_H2PO4)-trcs_cl2(ids_H2PO4))*trcs_VLN(ids_H1PO4,NU(NY,NX),NY,NX)
-
-    SDifFlx(ids_NH4B)=SDifc(ids_NH4B)*(trcs_cl1(ids_NH4)-trcs_cl2(ids_NH4B))*trcs_VLN(ids_NH4B,NU(NY,NX),NY,NX)
-    SDifFlx(idg_NH3B)=SDifc(idg_NH3B)*(trcs_cl1(idg_NH3)-trcs_cl2(idg_NH3B))*trcs_VLN(ids_NH4B,NU(NY,NX),NY,NX)
-    SDifFlx(ids_NO3B)=SDifc(ids_NO3B)*(trcs_cl1(ids_NO3)-trcs_cl2(ids_NO3B))*trcs_VLN(ids_NO3B,NU(NY,NX),NY,NX)
-    SDifFlx(ids_NO2B)=SDifc(ids_NO2B)*(trcs_cl1(ids_NO2)-trcs_cl2(ids_NO2))*trcs_VLN(ids_NO3B,NU(NY,NX),NY,NX)
-    SDifFlx(ids_H1PO4B)=SDifc(ids_H1PO4B)*(trcs_cl1(ids_H1PO4)-trcs_cl2(ids_H1PO4B))*trcs_VLN(ids_H1PO4B,NU(NY,NX),NY,NX)
-    SDifFlx(ids_H2PO4B)=SDifc(ids_H2PO4B)*(trcs_cl1(ids_H2PO4)-trcs_cl2(ids_H2PO4B))*trcs_VLN(ids_H1PO4B,NU(NY,NX),NY,NX)
+    DO NTN=ids_nuts_beg,ids_nuts_end
+      SDifFlx(NTN)=SDifc(NTN)*(trcs_cl1(NTN)-trcs_cl2(NTN))*trcs_VLN(NTN,NU(NY,NX),NY,NX)
+    ENDDO
+!    SDifFlx(ids_NH4)=SDifc(ids_NH4)*(trcs_cl1(ids_NH4)-trcs_cl2(ids_NH4))*trcs_VLN(ids_NH4,NU(NY,NX),NY,NX)
+!    SDifFlx(ids_NO3)=SDifc(ids_NO3)*(trcs_cl1(ids_NO3)-trcs_cl2(ids_NO3))*trcs_VLN(ids_NO3,NU(NY,NX),NY,NX)
+!    SDifFlx(ids_NO2)=SDifc(ids_NO2)*(trcs_cl1(ids_NO2)-trcs_cl2(ids_NO2))*trcs_VLN(ids_NO2,NU(NY,NX),NY,NX)
+!    SDifFlx(ids_H1PO4)=SDifc(ids_H1PO4)*(trcs_cl1(ids_H1PO4)-trcs_cl2(ids_H1PO4))*trcs_VLN(ids_H1PO4,NU(NY,NX),NY,NX)
+!    SDifFlx(ids_H2PO4)=SDifc(ids_H2PO4)*(trcs_cl1(ids_H2PO4)-trcs_cl2(ids_H2PO4))*trcs_VLN(ids_H2PO4,NU(NY,NX),NY,NX)
+!    SDifFlx(ids_NH4B)=SDifc(ids_NH4B)*(trcs_cl1(ids_NH4)-trcs_cl2(ids_NH4B))*trcs_VLN(ids_NH4B,NU(NY,NX),NY,NX)
+!    SDifFlx(idg_NH3B)=SDifc(idg_NH3B)*(trcs_cl1(idg_NH3)-trcs_cl2(idg_NH3B))*trcs_VLN(idg_NH3B,NU(NY,NX),NY,NX)
+!    SDifFlx(ids_NO3B)=SDifc(ids_NO3B)*(trcs_cl1(ids_NO3)-trcs_cl2(ids_NO3B))*trcs_VLN(ids_NO3B,NU(NY,NX),NY,NX)
+!    SDifFlx(ids_NO2B)=SDifc(ids_NO2B)*(trcs_cl1(ids_NO2)-trcs_cl2(ids_NO2))*trcs_VLN(ids_NO2B,NU(NY,NX),NY,NX)
+!    SDifFlx(ids_H1PO4B)=SDifc(ids_H1PO4B)*(trcs_cl1(ids_H1PO4)-trcs_cl2(ids_H1PO4B))*trcs_VLN(ids_H1PO4B,NU(NY,NX),NY,NX)
+!    SDifFlx(ids_H2PO4B)=SDifc(ids_H2PO4B)*(trcs_cl1(ids_H2PO4)-trcs_cl2(ids_H2PO4B))*trcs_VLN(ids_H2PO4B,NU(NY,NX),NY,NX)
   ELSE
     DO  K=1,jcplx
       DFVOC(K)=0.0_r8
@@ -327,7 +326,8 @@ contains
   real(r8), intent(in) :: RFLs_adv(ids_beg:ids_end)
   real(r8), intent(in) :: trcg_RFLS0(idg_beg:idg_end-1)
   real(r8), intent(in) :: trcn_RFLW0(ids_nut_beg:ids_nuts_end)
-  integer :: K
+  integer :: K,NTG
+
 !     R*FLS=convective + diffusive solute flux between litter, soil surface
 !     R*FLW,R*FLB=convective + diffusive solute flux into soil in non-band,band
 !     solute code:CO=CO2,CH=CH4,OX=O2,NG=N2,N2=N2O,HG=H2
@@ -349,13 +349,11 @@ contains
     ROAFLS(K,3,NU(NY,NX),NY,NX)=ROAFL1(K,NY,NX)+RFLOA(K)+DFVOA(K)
   ENDDO
 
-  R3PoreSolFlx(idg_CO2,3,0,NY,NX)=RCOFL0(NY,NX)+trcg_RFLS0(idg_CO2)-RFLs_adv(idg_CO2)-SDifFlx(idg_CO2)
-  R3PoreSolFlx(idg_CH4,3,0,NY,NX)=RCHFL0(NY,NX)+trcg_RFLS0(idg_CH4)-RFLs_adv(idg_CH4)-SDifFlx(idg_CH4)
-  R3PoreSolFlx(idg_O2,3,0,NY,NX)=ROXFL0(NY,NX)+trcg_RFLS0(idg_O2)-RFLs_adv(idg_O2)-SDifFlx(idg_O2)
-  R3PoreSolFlx(idg_N2,3,0,NY,NX)=RNGFL0(NY,NX)+trcg_RFLS0(idg_N2)-RFLs_adv(idg_N2)-SDifFlx(idg_N2)
-  R3PoreSolFlx(idg_N2O,3,0,NY,NX)=RN2FL0(NY,NX)+trcg_RFLS0(idg_N2O)-RFLs_adv(idg_N2O)-SDifFlx(idg_N2O)
-  R3PoreSolFlx(idg_H2,3,0,NY,NX)=RHGFL0(NY,NX)+trcg_RFLS0(idg_H2)-RFLs_adv(idg_H2)-SDifFlx(idg_H2)
-  R3PoreSolFlx(idg_NH3,3,0,NY,NX)=RN3FL0(NY,NX)+trcg_RFLS0(idg_NH3)-RFLs_adv(idg_NH3)-SDifFlx(idg_NH3)-RFLs_adv(idg_NH3B)-SDifFlx(idg_NH3B)
+  DO NTG=idg_beg,idg_end-1
+    R3PoreSolFlx(NTG,3,0,NY,NX)=trcg_RFL0(NTG,NY,NX)+trcg_RFLS0(NTG)-RFLs_adv(NTG)-SDifFlx(NTG)
+  ENDDO
+
+  R3PoreSolFlx(idg_NH3,3,0,NY,NX)=R3PoreSolFlx(idg_NH3,3,0,NY,NX)-RFLs_adv(idg_NH3B)-SDifFlx(idg_NH3B)
 
   R3PoreSolFlx(ids_NH4,3,0,NY,NX)=RN4FL0(NY,NX)+trcn_RFLW0(ids_NH4)-RFLs_adv(ids_NH4)-SDifFlx(ids_NH4)-RFLs_adv(ids_NH4B)-SDifFlx(ids_NH4B)
   R3PoreSolFlx(ids_NO3,3,0,NY,NX)=RNOFL0(NY,NX)+trcn_RFLW0(ids_NO3)-RFLs_adv(ids_NO3)-SDifFlx(ids_NO3)-RFLs_adv(ids_NO3B)-SDifFlx(ids_NO3B)
@@ -369,12 +367,14 @@ contains
   R3PoreSolFlx(idg_N2,3,NU(NY,NX),NY,NX)=RNGFL1(NY,NX)+RNGFLS1+RFLs_adv(idg_N2)+SDifFlx(idg_N2)
   R3PoreSolFlx(idg_N2O,3,NU(NY,NX),NY,NX)=RN2FL1(NY,NX)+RN2FLS1+RFLs_adv(idg_N2O)+SDifFlx(idg_N2O)
   R3PoreSolFlx(idg_H2,3,NU(NY,NX),NY,NX)=RHGFL1(NY,NX)+RFLs_adv(idg_H2)+SDifFlx(idg_H2)
-  R3PoreSolFlx(ids_NH4,3,NU(NY,NX),NY,NX)=RN4FL1(NY,NX)+RN4FLW1+RFLs_adv(ids_NH4)+SDifFlx(ids_NH4)
   R3PoreSolFlx(idg_NH3,3,NU(NY,NX),NY,NX)=RN3FL1(NY,NX)+RN3FLW1+RFLs_adv(idg_NH3)+SDifFlx(idg_NH3)
+
+  R3PoreSolFlx(ids_NH4,3,NU(NY,NX),NY,NX)=RN4FL1(NY,NX)+RN4FLW1+RFLs_adv(ids_NH4)+SDifFlx(ids_NH4)
   R3PoreSolFlx(ids_NO3,3,NU(NY,NX),NY,NX)=RNOFL1(NY,NX)+RNOFLW1+RFLs_adv(ids_NO3)+SDifFlx(ids_NO3)
   R3PoreSolFlx(ids_NO2,3,NU(NY,NX),NY,NX)=RNXFL1(NY,NX)+RFLs_adv(ids_NO2)+SDifFlx(ids_NO2)
   R3PoreSolFlx(ids_H1PO4,3,NU(NY,NX),NY,NX)=RH1PF1(NY,NX)+RH1PFS1+RFLs_adv(ids_H1PO4)+SDifFlx(ids_H1PO4)
   R3PoreSolFlx(ids_H2PO4,3,NU(NY,NX),NY,NX)=RH2PF1(NY,NX)+RH2PFS1+RFLs_adv(ids_H2PO4)+SDifFlx(ids_H2PO4)
+
   R3PoreSolFlx(ids_NH4B,3,NU(NY,NX),NY,NX)=RN4FL2(NY,NX)+RN4FLB1+RFLs_adv(ids_NH4B)+SDifFlx(ids_NH4B)
   R3PoreSolFlx(idg_NH3B,3,NU(NY,NX),NY,NX)=RN3FL2(NY,NX)+RN3FLB1+RFLs_adv(idg_NH3B)+SDifFlx(idg_NH3B)
   R3PoreSolFlx(ids_NO3B,3,NU(NY,NX),NY,NX)=RNOFL2(NY,NX)+RNOFLB1+RFLs_adv(ids_NO3B)+SDifFlx(ids_NO3B)
@@ -681,7 +681,7 @@ contains
 
   integer, intent(in) :: M, NY, NX, NHE, NHW, NVS, NVN
   real(r8) :: FQRM,VFLW
-  integer :: K,N,NN,N1,N2,N4,N5,N4B,N5B
+  integer :: K,N,NN,N1,N2,N4,N5,N4B,N5B,NTG,NTN
 !     QRM=runoff from watsub.f
 !     RQR*=solute in runoff
 !     solute code:CO=CO2,CH=CH4,OX=O2,NG=N2,N2=N2O,HG=H2
@@ -785,18 +785,19 @@ contains
             RQROP(K,N,2,N5,N4)=RQROP0(K,N2,N1)*FQRM
             RQROA(K,N,2,N5,N4)=RQROA0(K,N2,N1)*FQRM
           ENDDO
-          RQR_trcg(idg_CO2,N,2,N5,N4)=RQRCOS0(N2,N1)*FQRM
-          RQR_trcg(idg_CH4,N,2,N5,N4)=RQRCHS0(N2,N1)*FQRM
-          RQR_trcg(idg_O2,N,2,N5,N4)=RQROXS0(N2,N1)*FQRM
-          RQR_trcg(idg_N2,N,2,N5,N4)=RQRNGS0(N2,N1)*FQRM
-          RQR_trcg(idg_N2O,N,2,N5,N4)=RQRN2S0(N2,N1)*FQRM
-          RQR_trcg(idg_H2,N,2,N5,N4)=RQRHGS0(N2,N1)*FQRM
-          RQR_trcn(ids_NH4,N,2,N5,N4)=RQRNH40(N2,N1)*FQRM
-          RQR_trcg(idg_NH3,N,2,N5,N4)=RQRNH30(N2,N1)*FQRM
-          RQR_trcn(ids_NO3,N,2,N5,N4)=RQRNO30(N2,N1)*FQRM
-          RQR_trcn(ids_NO2,N,2,N5,N4)=RQRNO20(N2,N1)*FQRM
-          RQR_trcn(ids_H1PO4,N,2,N5,N4)=RQRH1P0(N2,N1)*FQRM
-          RQR_trcn(ids_H2PO4,N,2,N5,N4)=RQRH2P0(N2,N1)*FQRM
+          trcg_RQR(idg_CO2,N,2,N5,N4)=RQRCOS0(N2,N1)*FQRM
+          trcg_RQR(idg_CH4,N,2,N5,N4)=RQRCHS0(N2,N1)*FQRM
+          trcg_RQR(idg_O2,N,2,N5,N4)=RQROXS0(N2,N1)*FQRM
+          trcg_RQR(idg_N2,N,2,N5,N4)=RQRNGS0(N2,N1)*FQRM
+          trcg_RQR(idg_N2O,N,2,N5,N4)=RQRN2S0(N2,N1)*FQRM
+          trcg_RQR(idg_H2,N,2,N5,N4)=RQRHGS0(N2,N1)*FQRM
+          trcg_RQR(idg_NH3,N,2,N5,N4)=RQRNH30(N2,N1)*FQRM
+
+          trcn_RQR(ids_NH4,N,2,N5,N4)=RQRNH40(N2,N1)*FQRM
+          trcn_RQR(ids_NO3,N,2,N5,N4)=RQRNO30(N2,N1)*FQRM
+          trcn_RQR(ids_NO2,N,2,N5,N4)=RQRNO20(N2,N1)*FQRM
+          trcn_RQR(ids_H1PO4,N,2,N5,N4)=RQRH1P0(N2,N1)*FQRM
+          trcn_RQR(ids_H2PO4,N,2,N5,N4)=RQRH2P0(N2,N1)*FQRM
 !
 !     ACCUMULATE HOURLY FLUXES FOR USE IN REDIST.F
 !
@@ -809,18 +810,13 @@ contains
             XOPQRS(K,N,2,N5,N4)=XOPQRS(K,N,2,N5,N4)+RQROP(K,N,2,N5,N4)
             XOAQRS(K,N,2,N5,N4)=XOAQRS(K,N,2,N5,N4)+RQROA(K,N,2,N5,N4)
           ENDDO
-          XCOQRS(N,2,N5,N4)=XCOQRS(N,2,N5,N4)+RQR_trcg(idg_CO2,N,2,N5,N4)
-          XCHQRS(N,2,N5,N4)=XCHQRS(N,2,N5,N4)+RQR_trcg(idg_CH4,N,2,N5,N4)
-          XOXQRS(N,2,N5,N4)=XOXQRS(N,2,N5,N4)+RQR_trcg(idg_O2,N,2,N5,N4)
-          XNGQRS(N,2,N5,N4)=XNGQRS(N,2,N5,N4)+RQR_trcg(idg_N2,N,2,N5,N4)
-          XN2QRS(N,2,N5,N4)=XN2QRS(N,2,N5,N4)+RQR_trcg(idg_N2O,N,2,N5,N4)
-          XHGQRS(N,2,N5,N4)=XHGQRS(N,2,N5,N4)+RQR_trcg(idg_H2,N,2,N5,N4)
-          XN4QRW(N,2,N5,N4)=XN4QRW(N,2,N5,N4)+RQR_trcn(ids_NH4,N,2,N5,N4)
-          XN3QRW(N,2,N5,N4)=XN3QRW(N,2,N5,N4)+RQR_trcg(idg_NH3,N,2,N5,N4)
-          XNOQRW(N,2,N5,N4)=XNOQRW(N,2,N5,N4)+RQR_trcn(ids_NO3,N,2,N5,N4)
-          XNXQRS(N,2,N5,N4)=XNXQRS(N,2,N5,N4)+RQR_trcn(ids_NO2,N,2,N5,N4)
-          XP1QRW(N,2,N5,N4)=XP1QRW(N,2,N5,N4)+RQR_trcn(ids_H1PO4,N,2,N5,N4)
-          XP4QRW(N,2,N5,N4)=XP4QRW(N,2,N5,N4)+RQR_trcn(ids_H2PO4,N,2,N5,N4)
+          DO NTG=idg_beg,idg_end-1
+            trcg_XRS(NTG,N,2,N5,N4)=trcg_XRS(NTG,N,2,N5,N4)+trcg_RQR(NTG,N,2,N5,N4)
+          ENDDO
+
+          DO NTN=ids_nut_beg,ids_nuts_end
+            trcn_XRS(NTN,N,2,N5,N4)=trcn_XRS(NTN,N,2,N5,N4)+trcn_RQR(NTN,N,2,N5,N4)
+          ENDDO
         ELSE
           DO K=1,jcplx
             RQROC(K,N,2,N5,N4)=0.0_r8
@@ -828,9 +824,9 @@ contains
             RQROP(K,N,2,N5,N4)=0.0_r8
             RQROA(K,N,2,N5,N4)=0.0_r8
           ENDDO
-          RQR_trcg(idg_beg:idg_end-1,N,2,N5,N4)=0.0_r8
+          trcg_RQR(idg_beg:idg_end-1,N,2,N5,N4)=0.0_r8
 
-          RQR_trcn(ids_nut_beg:ids_nuts_end,N,2,N5,N4)=0.0_r8
+          trcn_RQR(ids_nut_beg:ids_nuts_end,N,2,N5,N4)=0.0_r8
         ENDIF
 !
 !     IF OVERLAND FLOW IS FROM CURRENT TO ADJACENT GRID CELL
@@ -844,36 +840,32 @@ contains
               RQROP(K,N,1,N5B,N4B)=RQROP0(K,N2,N1)*FQRM
               RQROA(K,N,1,N5B,N4B)=RQROA0(K,N2,N1)*FQRM
             ENDDO
-            RQR_trcg(idg_CO2,N,1,N5B,N4B)=RQRCOS0(N2,N1)*FQRM
-            RQR_trcg(idg_CH4,N,1,N5B,N4B)=RQRCHS0(N2,N1)*FQRM
-            RQR_trcg(idg_O2,N,1,N5B,N4B)=RQROXS0(N2,N1)*FQRM
-            RQR_trcg(idg_N2,N,1,N5B,N4B)=RQRNGS0(N2,N1)*FQRM
-            RQR_trcg(idg_N2O,N,1,N5B,N4B)=RQRN2S0(N2,N1)*FQRM
-            RQR_trcg(idg_H2,N,1,N5B,N4B)=RQRHGS0(N2,N1)*FQRM
-            RQR_trcn(ids_NH4,N,1,N5B,N4B)=RQRNH40(N2,N1)*FQRM
-            RQR_trcg(idg_NH3,N,1,N5B,N4B)=RQRNH30(N2,N1)*FQRM
-            RQR_trcn(ids_NO3,N,1,N5B,N4B)=RQRNO30(N2,N1)*FQRM
-            RQR_trcn(ids_NO2,N,1,N5B,N4B)=RQRNO20(N2,N1)*FQRM
-            RQR_trcn(ids_H1PO4,N,1,N5B,N4B)=RQRH1P0(N2,N1)*FQRM
-            RQR_trcn(ids_H2PO4,N,1,N5B,N4B)=RQRH2P0(N2,N1)*FQRM
+            trcg_RQR(idg_CO2,N,1,N5B,N4B)=RQRCOS0(N2,N1)*FQRM
+            trcg_RQR(idg_CH4,N,1,N5B,N4B)=RQRCHS0(N2,N1)*FQRM
+            trcg_RQR(idg_O2,N,1,N5B,N4B)=RQROXS0(N2,N1)*FQRM
+            trcg_RQR(idg_N2,N,1,N5B,N4B)=RQRNGS0(N2,N1)*FQRM
+            trcg_RQR(idg_N2O,N,1,N5B,N4B)=RQRN2S0(N2,N1)*FQRM
+            trcg_RQR(idg_H2,N,1,N5B,N4B)=RQRHGS0(N2,N1)*FQRM
+            trcg_RQR(idg_NH3,N,1,N5B,N4B)=RQRNH30(N2,N1)*FQRM
+
+            trcn_RQR(ids_NH4,N,1,N5B,N4B)=RQRNH40(N2,N1)*FQRM
+            trcn_RQR(ids_NO3,N,1,N5B,N4B)=RQRNO30(N2,N1)*FQRM
+            trcn_RQR(ids_NO2,N,1,N5B,N4B)=RQRNO20(N2,N1)*FQRM
+            trcn_RQR(ids_H1PO4,N,1,N5B,N4B)=RQRH1P0(N2,N1)*FQRM
+            trcn_RQR(ids_H2PO4,N,1,N5B,N4B)=RQRH2P0(N2,N1)*FQRM
             DO K=1,jcplx
               XOCQRS(K,N,1,N5B,N4B)=XOCQRS(K,N,1,N5B,N4B)+RQROC(K,N,1,N5B,N4B)
               XONQRS(K,N,1,N5B,N4B)=XONQRS(K,N,1,N5B,N4B)+RQRON(K,N,1,N5B,N4B)
               XOPQRS(K,N,1,N5B,N4B)=XOPQRS(K,N,1,N5B,N4B)+RQROP(K,N,1,N5B,N4B)
               XOAQRS(K,N,1,N5B,N4B)=XOAQRS(K,N,1,N5B,N4B)+RQROA(K,N,1,N5B,N4B)
             ENDDO
-            XCOQRS(N,1,N5B,N4B)=XCOQRS(N,1,N5B,N4B)+RQR_trcg(idg_CO2,N,1,N5B,N4B)
-            XCHQRS(N,1,N5B,N4B)=XCHQRS(N,1,N5B,N4B)+RQR_trcg(idg_CH4,N,1,N5B,N4B)
-            XOXQRS(N,1,N5B,N4B)=XOXQRS(N,1,N5B,N4B)+RQR_trcg(idg_O2,N,1,N5B,N4B)
-            XNGQRS(N,1,N5B,N4B)=XNGQRS(N,1,N5B,N4B)+RQR_trcg(idg_N2,N,1,N5B,N4B)
-            XN2QRS(N,1,N5B,N4B)=XN2QRS(N,1,N5B,N4B)+RQR_trcg(idg_N2O,N,1,N5B,N4B)
-            XHGQRS(N,1,N5B,N4B)=XHGQRS(N,1,N5B,N4B)+RQR_trcg(idg_H2,N,1,N5B,N4B)
-            XN4QRW(N,1,N5B,N4B)=XN4QRW(N,1,N5B,N4B)+RQR_trcn(ids_NH4,N,1,N5B,N4B)
-            XN3QRW(N,1,N5B,N4B)=XN3QRW(N,1,N5B,N4B)+RQR_trcg(idg_NH3,N,1,N5B,N4B)
-            XNOQRW(N,1,N5B,N4B)=XNOQRW(N,1,N5B,N4B)+RQR_trcn(ids_NO3,N,1,N5B,N4B)
-            XNXQRS(N,1,N5B,N4B)=XNXQRS(N,1,N5B,N4B)+RQR_trcn(ids_NO2,N,1,N5B,N4B)
-            XP1QRW(N,1,N5B,N4B)=XP1QRW(N,1,N5B,N4B)+RQR_trcn(ids_H1PO4,N,1,N5B,N4B)
-            XP4QRW(N,1,N5B,N4B)=XP4QRW(N,1,N5B,N4B)+RQR_trcn(ids_H2PO4,N,1,N5B,N4B)
+            DO NTG=idg_beg,idg_end-1
+              trcg_XRS(NTG,N,1,N5B,N4B)=trcg_XRS(NTG,N,1,N5B,N4B)+trcg_RQR(NTG,N,1,N5B,N4B)
+            ENDDO
+
+            DO NTN=ids_nut_beg,ids_nuts_end
+              trcn_XRS(NTN,N,1,N5B,N4B)=trcn_XRS(NTN,N,1,N5B,N4B)+trcn_RQR(NTN,N,1,N5B,N4B)
+            ENDDO
           ELSE
             DO  K=1,jcplx
               RQROC(K,N,1,N5B,N4B)=0.0_r8
@@ -881,8 +873,8 @@ contains
               RQROP(K,N,1,N5B,N4B)=0.0_r8
               RQROA(K,N,1,N5B,N4B)=0.0_r8
             ENDDO
-            RQR_trcg(idg_beg:idg_end,N,1,N5B,N4B)=0.0_r8
-            RQR_trcn(ids_nut_beg:ids_nuts_end,N,1,N5B,N4B)=0.0_r8
+            trcg_RQR(idg_beg:idg_end,N,1,N5B,N4B)=0.0_r8
+            trcn_RQR(ids_nut_beg:ids_nuts_end,N,1,N5B,N4B)=0.0_r8
           ENDIF
         ENDIF
       ELSE
@@ -892,8 +884,8 @@ contains
           RQROP(K,N,2,N5,N4)=0.0_r8
           RQROA(K,N,2,N5,N4)=0.0_r8
         ENDDO
-        RQR_trcg(idg_beg:idg_end-1,N,2,N5,N4)=0.0_r8
-        RQR_trcn(ids_nut_beg:ids_nuts_end,N,2,N5,N4)=0.0_r8
+        trcg_RQR(idg_beg:idg_end-1,N,2,N5,N4)=0.0_r8
+        trcn_RQR(ids_nut_beg:ids_nuts_end,N,2,N5,N4)=0.0_r8
 
         IF(N4B.GT.0.AND.N5B.GT.0)THEN
           DO  K=1,jcplx
@@ -902,8 +894,8 @@ contains
             RQROP(K,N,1,N5B,N4B)=0.0_r8
             RQROA(K,N,1,N5B,N4B)=0.0_r8
           ENDDO
-          RQR_trcg(idg_beg:idg_end-1,N,1,N5B,N4B)=0.0_r8
-          RQR_trcn(ids_nut_beg:ids_nuts_end,N,1,N5B,N4B)=0.0_r8
+          trcg_RQR(idg_beg:idg_end-1,N,1,N5B,N4B)=0.0_r8
+          trcn_RQR(ids_nut_beg:ids_nuts_end,N,1,N5B,N4B)=0.0_r8
         ENDIF
       ENDIF
 !
@@ -925,13 +917,9 @@ contains
 !     IF NO SNOW DRIFT THEN NO TRANSPORT
 !
         IF(ABS(QSM(M,N,N5,N4)).LE.ZEROS2(N2,N1))THEN
-          RQSCOS(N,N5,N4)=0.0_r8
-          RQSCHS(N,N5,N4)=0.0_r8
-          RQSOXS(N,N5,N4)=0.0_r8
-          RQSNGS(N,N5,N4)=0.0_r8
-          RQSN2S(N,N5,N4)=0.0_r8
+          trcg_RQS(idg_beg:idg_end-1,N,N5,N4)=0.0_r8
+
           RQSNH4(N,N5,N4)=0.0_r8
-          RQSNH3(N,N5,N4)=0.0_r8
           RQSNO3(N,N5,N4)=0.0_r8
           RQSH1P(N,N5,N4)=0.0_r8
           RQSH2P(N,N5,N4)=0.0_r8
@@ -944,13 +932,12 @@ contains
           ELSE
             VFLW=VFLWX
           ENDIF
-          RQSCOS(N,N5,N4)=VFLW*AZMAX1(trcg_solsml2(idg_O2,1,N2,N1))
-          RQSCHS(N,N5,N4)=VFLW*AZMAX1(trcg_solsml2(idg_CH4,1,N2,N1))
-          RQSOXS(N,N5,N4)=VFLW*AZMAX1(trcg_solsml2(idg_O2,1,N2,N1))
-          RQSNGS(N,N5,N4)=VFLW*AZMAX1(trcg_solsml2(idg_N2,1,N2,N1))
-          RQSN2S(N,N5,N4)=VFLW*AZMAX1(trcg_solsml2(idg_N2O,1,N2,N1))
+
+          DO NTG=idg_beg,idg_end-1
+            trcg_RQS(NTG,N,N5,N4)=VFLW*AZMAX1(trcg_solsml2(NTG,1,N2,N1))
+          ENDDO
+
           RQSNH4(N,N5,N4)=VFLW*AZMAX1(trcn_solsml2(ids_NH4,1,N2,N1))
-          RQSNH3(N,N5,N4)=VFLW*AZMAX1(trcg_solsml2(idg_NH3,1,N2,N1))
           RQSNO3(N,N5,N4)=VFLW*AZMAX1(trcn_solsml2(ids_NO3,1,N2,N1))
           RQSH1P(N,N5,N4)=VFLW*AZMAX1(trcn_solsml2(ids_H1PO4,1,N2,N1))
           RQSH2P(N,N5,N4)=VFLW*AZMAX1(trcn_solsml2(ids_H2PO4,1,N2,N1))
@@ -963,13 +950,12 @@ contains
           ELSE
             VFLW=-VFLWX
           ENDIF
-          RQSCOS(N,N5,N4)=VFLW*AZMAX1(trcg_solsml2(idg_O2,1,N5,N4))
-          RQSCHS(N,N5,N4)=VFLW*AZMAX1(trcg_solsml2(idg_CH4,1,N5,N4))
-          RQSOXS(N,N5,N4)=VFLW*AZMAX1(trcg_solsml2(idg_O2,1,N5,N4))
-          RQSNGS(N,N5,N4)=VFLW*AZMAX1(trcg_solsml2(idg_N2,1,N5,N4))
-          RQSN2S(N,N5,N4)=VFLW*AZMAX1(trcg_solsml2(idg_N2O,1,N5,N4))
+
+          DO NTG=idg_beg,idg_end-1
+            trcg_RQS(NTG,N,N5,N4)=VFLW*AZMAX1(trcg_solsml2(NTG,1,N5,N4))
+          ENDDO
+
           RQSNH4(N,N5,N4)=VFLW*AZMAX1(trcn_solsml2(ids_NH4,1,N5,N4))
-          RQSNH3(N,N5,N4)=VFLW*AZMAX1(trcg_solsml2(idg_NH3,1,N5,N4))
           RQSNO3(N,N5,N4)=VFLW*AZMAX1(trcn_solsml2(ids_NO3,1,N5,N4))
           RQSH1P(N,N5,N4)=VFLW*AZMAX1(trcn_solsml2(ids_H1PO4,1,N5,N4))
           RQSH2P(N,N5,N4)=VFLW*AZMAX1(trcn_solsml2(ids_H2PO4,1,N5,N4))
@@ -980,13 +966,14 @@ contains
 !     X*QSS=hourly solute in snow flux
 !     RQS*=solute in snow flux
 !
-        XCOQSS(N,N5,N4)=XCOQSS(N,N5,N4)+RQSCOS(N,N5,N4)
-        XCHQSS(N,N5,N4)=XCHQSS(N,N5,N4)+RQSCHS(N,N5,N4)
-        XOXQSS(N,N5,N4)=XOXQSS(N,N5,N4)+RQSOXS(N,N5,N4)
-        XNGQSS(N,N5,N4)=XNGQSS(N,N5,N4)+RQSNGS(N,N5,N4)
-        XN2QSS(N,N5,N4)=XN2QSS(N,N5,N4)+RQSN2S(N,N5,N4)
+        XCOQSS(N,N5,N4)=XCOQSS(N,N5,N4)+trcg_RQS(idg_CO2,N,N5,N4)
+        XCHQSS(N,N5,N4)=XCHQSS(N,N5,N4)+trcg_RQS(idg_CH4,N,N5,N4)
+        XOXQSS(N,N5,N4)=XOXQSS(N,N5,N4)+trcg_RQS(idg_O2,N,N5,N4)
+        XNGQSS(N,N5,N4)=XNGQSS(N,N5,N4)+trcg_RQS(idg_N2,N,N5,N4)
+        XN2QSS(N,N5,N4)=XN2QSS(N,N5,N4)+trcg_RQS(idg_N2O,N,N5,N4)
+        XN3QSS(N,N5,N4)=XN3QSS(N,N5,N4)+trcg_RQS(idg_NH3,N,N5,N4)
+
         XN4QSS(N,N5,N4)=XN4QSS(N,N5,N4)+RQSNH4(N,N5,N4)
-        XN3QSS(N,N5,N4)=XN3QSS(N,N5,N4)+RQSNH3(N,N5,N4)
         XNOQSS(N,N5,N4)=XNOQSS(N,N5,N4)+RQSNO3(N,N5,N4)
         XP1QSS(N,N5,N4)=XP1QSS(N,N5,N4)+RQSH1P(N,N5,N4)
         XP4QSS(N,N5,N4)=XP4QSS(N,N5,N4)+RQSH2P(N,N5,N4)
@@ -1404,8 +1391,9 @@ contains
         ROXBLS(L2,NY,NX)=trcg_solsml2(idg_O2,L,NY,NX)*VFLWW
         RNGBLS(L2,NY,NX)=trcg_solsml2(idg_N2,L,NY,NX)*VFLWW
         RN2BLS(L2,NY,NX)=trcg_solsml2(idg_N2O,L,NY,NX)*VFLWW
-        RN4BLW(L2,NY,NX)=trcn_solsml2(ids_NH4,L,NY,NX)*VFLWW
         RN3BLW(L2,NY,NX)=trcg_solsml2(idg_NH3,L,NY,NX)*VFLWW
+
+        RN4BLW(L2,NY,NX)=trcn_solsml2(ids_NH4,L,NY,NX)*VFLWW
         RNOBLW(L2,NY,NX)=trcn_solsml2(ids_NO3,L,NY,NX)*VFLWW
         RH1PBS(L2,NY,NX)=trcn_solsml2(ids_H1PO4,L,NY,NX)*VFLWW
         RH2PBS(L2,NY,NX)=trcn_solsml2(ids_H2PO4,L,NY,NX)*VFLWW
@@ -1416,6 +1404,7 @@ contains
         trcg_XBLS(idg_N2,L2,NY,NX)=trcg_XBLS(idg_N2,L2,NY,NX)+RNGBLS(L2,NY,NX)
         trcg_XBLS(idg_N2O,L2,NY,NX)=trcg_XBLS(idg_N2O,L2,NY,NX)+RN2BLS(L2,NY,NX)
         trcg_XBLS(idg_NH3,L2,NY,NX)=trcg_XBLS(idg_NH3,L2,NY,NX)+RN3BLW(L2,NY,NX)
+
         trcn_XBLS(ids_NH4,L2,NY,NX)=trcn_XBLS(ids_NH4,L2,NY,NX)+RN4BLW(L2,NY,NX)
         trcn_XBLS(ids_NO3,L2,NY,NX)=trcn_XBLS(ids_NO3,L2,NY,NX)+RNOBLW(L2,NY,NX)
         trcn_XBLS(ids_H1PO4,L2,NY,NX)=trcn_XBLS(ids_H1PO4,L2,NY,NX)+RH1PBS(L2,NY,NX)
@@ -1473,8 +1462,8 @@ contains
           ROXFLS1=trcg_solsml2(idg_O2,L,NY,NX)*VFLWS
           RNGFLS1=trcg_solsml2(idg_N2,L,NY,NX)*VFLWS
           RN2FLS1=trcg_solsml2(idg_N2O,L,NY,NX)*VFLWS
-
           RN3FLW1=trcg_solsml2(idg_NH3,L,NY,NX)*VFLWNH4
+
           RN4FLW1=trcn_solsml2(ids_NH4,L,NY,NX)*VFLWNH4
           RNOFLW1=trcn_solsml2(ids_NO3,L,NY,NX)*VFLWNO3
           RH1PFS1=trcn_solsml2(ids_H1PO4,L,NY,NX)*VFLWPO4

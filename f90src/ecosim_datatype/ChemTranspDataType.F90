@@ -38,7 +38,6 @@ module ChemTranspDataType
   real(r8),target,allocatable ::  WGSGA(:,:)                         !water vapor diffusivity, [m2 h-1]
 
   real(r8),target,allocatable ::  GSolbility(:,:,:,:)                !solubility of gases
-
   real(r8),target,allocatable ::  HGSGL(:,:,:)                       !gaseous H2 diffusivity, [m2 h-1]
   real(r8),target,allocatable ::  HLSGL(:,:,:)                       !aqueous H2 diffusivity, [m2 h-1]
   real(r8),target,allocatable ::  XCODFG(:,:,:)                      !soil CO2 dissolution (+ve) - volatilization (-ve) , [g d-2 h-1]
@@ -107,18 +106,8 @@ module ChemTranspDataType
   real(r8),target,allocatable ::  XQRC1P(:,:,:,:)                    !total CaHPO4 in runoff non-band, [mol d-2 h-1]
   real(r8),target,allocatable ::  XQRC2P(:,:,:,:)                    !total CaH2PO4 in runoff non-band, [mol d-2 h-1]
   real(r8),target,allocatable ::  XQRM1P(:,:,:,:)                    !total MgHPO4 in runoff non-band, [mol d-2 h-1]
-  real(r8),target,allocatable ::  XCOQRS(:,:,:,:)                    !surface runoff CO2 flux, [g d-2 h-1]
-  real(r8),target,allocatable ::  XCHQRS(:,:,:,:)                    !surface brunoff CH4 flux, [g d-2 h-1]
-  real(r8),target,allocatable ::  XOXQRS(:,:,:,:)                    !surface runoff O2 flux, [g d-2 h-1]
-  real(r8),target,allocatable ::  XNGQRS(:,:,:,:)                    !surface runoff N2 flux, [g d-2 h-1]
-  real(r8),target,allocatable ::  XN2QRS(:,:,:,:)                    !surface runoff N2O flux, [g d-2 h-1]
-  real(r8),target,allocatable ::  XHGQRS(:,:,:,:)                    !surface runoff H2 flux, [g d-2 h-1]
-  real(r8),target,allocatable ::  XN4QRW(:,:,:,:)                    !surface runoff NH4 flux non-band, [g d-2 h-1]
-  real(r8),target,allocatable ::  XN3QRW(:,:,:,:)                    !surface runoff NH3 flux non-band, [g d-2 h-1]
-  real(r8),target,allocatable ::  XNOQRW(:,:,:,:)                    !surface runoff NO3 flux non-band, [g d-2 h-1]
-  real(r8),target,allocatable ::  XNXQRS(:,:,:,:)                    !surface runoff NO2 flux, [g d-2 h-1]
-  real(r8),target,allocatable ::  XP4QRW(:,:,:,:)                    !surface runoff PO4 flux, [g d-2 h-1]
-  real(r8),target,allocatable ::  XP1QRW(:,:,:,:)                    !surface runoff HPO4 flux, [g d-2 h-1]
+  real(r8),target,allocatable ::  trcg_XRS(:,:,:,:,:)                    !surface runoff gas flux, [g d-2 h-1]
+  real(r8),target,allocatable ::  trcn_XRS(:,:,:,:,:)                    !surface runoff nutrient flux, [g d-2 h-1]
   real(r8),target,allocatable ::  XOCQRS(:,:,:,:,:)                  !surface runoff DOC flux, [g d-2 h-1]
   real(r8),target,allocatable ::  XONQRS(:,:,:,:,:)                  !surface runoff DON flux, [g d-2 h-1]
   real(r8),target,allocatable ::  XOPQRS(:,:,:,:,:)                  !surface runoff DOP flux, [g d-2 h-1]
@@ -167,7 +156,6 @@ module ChemTranspDataType
   allocate(WGSGW(JS,JY,JX));    WGSGW=0._r8
   allocate(WGSGR(JY,JX));       WGSGR=0._r8
   allocate(WGSGA(JY,JX));       WGSGA=0._r8
-
   allocate(GSolbility(idg_beg:idg_end,0:JZ,JY,JX)); GSolbility=0._r8
 
   allocate(GasDisFlx(idg_beg:idg_end,0:JZ,JY,JX)); GasDisFlx=0._r8
@@ -240,18 +228,8 @@ module ChemTranspDataType
   allocate(XQRC1P(2,2,JV,JH));  XQRC1P=0._r8
   allocate(XQRC2P(2,2,JV,JH));  XQRC2P=0._r8
   allocate(XQRM1P(2,2,JV,JH));  XQRM1P=0._r8
-  allocate(XCOQRS(2,2,JV,JH));  XCOQRS=0._r8
-  allocate(XCHQRS(2,2,JV,JH));  XCHQRS=0._r8
-  allocate(XOXQRS(2,2,JV,JH));  XOXQRS=0._r8
-  allocate(XNGQRS(2,2,JV,JH));  XNGQRS=0._r8
-  allocate(XN2QRS(2,2,JV,JH));  XN2QRS=0._r8
-  allocate(XHGQRS(2,2,JV,JH));  XHGQRS=0._r8
-  allocate(XN4QRW(2,2,JV,JH));  XN4QRW=0._r8
-  allocate(XN3QRW(2,2,JV,JH));  XN3QRW=0._r8
-  allocate(XNOQRW(2,2,JV,JH));  XNOQRW=0._r8
-  allocate(XNXQRS(2,2,JV,JH));  XNXQRS=0._r8
-  allocate(XP4QRW(2,2,JV,JH));  XP4QRW=0._r8
-  allocate(XP1QRW(2,2,JV,JH));  XP1QRW=0._r8
+  allocate(trcg_XRS(idg_beg:idg_end-1,2,2,JV,JH));  trcg_XRS=0._r8
+  allocate(trcn_XRS(ids_nut_beg:ids_nuts_end,2,2,JV,JH));  trcn_XRS=0._r8
   allocate(XOCQRS(1:jcplx,2,2,JV,JH));XOCQRS=0._r8
   allocate(XONQRS(1:jcplx,2,2,JV,JH));XONQRS=0._r8
   allocate(XOPQRS(1:jcplx,2,2,JV,JH));XOPQRS=0._r8
@@ -292,6 +270,8 @@ module ChemTranspDataType
   call destroy(WGSGR)
   call destroy(WGSGA)
 
+  call destroy(trcn_XRS)
+  call destroy(trcg_XRS)
   call destroy(GSolbility)
 
   call destroy(HGSGL)
@@ -362,18 +342,6 @@ module ChemTranspDataType
   call destroy(XQRC1P)
   call destroy(XQRC2P)
   call destroy(XQRM1P)
-  call destroy(XCOQRS)
-  call destroy(XCHQRS)
-  call destroy(XOXQRS)
-  call destroy(XNGQRS)
-  call destroy(XN2QRS)
-  call destroy(XHGQRS)
-  call destroy(XN4QRW)
-  call destroy(XN3QRW)
-  call destroy(XNOQRW)
-  call destroy(XNXQRS)
-  call destroy(XP4QRW)
-  call destroy(XP1QRW)
   call destroy(XOCQRS)
   call destroy(XONQRS)
   call destroy(XOPQRS)

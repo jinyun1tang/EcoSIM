@@ -61,48 +61,7 @@ module SnowDataType
   real(r8),target, allocatable ::  trcs_solsml(:,:,:,:)               ! snowpack salt dissolved tracers
 
 
-  real(r8),target, allocatable ::  XQSAL(:,:,:)                       !total Al in snow drift, [mol d-2 h-1]
-  real(r8),target, allocatable ::  XQSFE(:,:,:)                       !total Fe in snow drift, [mol d-2 h-1]
-  real(r8),target, allocatable ::  XQSHY(:,:,:)                       !total H in snow drift, [mol d-2 h-1]
-  real(r8),target, allocatable ::  XQSCA(:,:,:)                       !total Ca in snow drift, [mol d-2 h-1]
-  real(r8),target, allocatable ::  XQSMG(:,:,:)                       !total Mg in snow drift, [mol d-2 h-1]
-  real(r8),target, allocatable ::  XQSNA(:,:,:)                       !total Na in snow drift, [mol d-2 h-1]
-  real(r8),target, allocatable ::  XQSKA(:,:,:)                       !total K in snow drift, [mol d-2 h-1]
-  real(r8),target, allocatable ::  XQSOH(:,:,:)                       !total OH in snow drift, [mol d-2 h-1]
-  real(r8),target, allocatable ::  XQSSO(:,:,:)                       !total SO4 in snow drift, [mol d-2 h-1]
-  real(r8),target, allocatable ::  XQSCL(:,:,:)                       !total Cl in snow drift, [mol d-2 h-1]
-  real(r8),target, allocatable ::  XQSC3(:,:,:)                       !total CO3 in snow drift, [mol d-2 h-1]
-  real(r8),target, allocatable ::  XQSHC(:,:,:)                       !total HCO3 in snow drift, [mol d-2 h-1]
-  real(r8),target, allocatable ::  XQSAL1(:,:,:)                      !total AlOH in snow drift, [mol d-2 h-1]
-  real(r8),target, allocatable ::  XQSAL2(:,:,:)                      !total AlOH2 in snow drift, [mol d-2 h-1]
-  real(r8),target, allocatable ::  XQSAL3(:,:,:)                      !total AlOH3 in snow drift, [mol d-2 h-1]
-  real(r8),target, allocatable ::  XQSAL4(:,:,:)                      !total AlOH4 in snow drift, [mol d-2 h-1]
-  real(r8),target, allocatable ::  XQSALS(:,:,:)                      !total AlSO4 in snow drift, [mol d-2 h-1]
-  real(r8),target, allocatable ::  XQSFE1(:,:,:)                      !total FeOH in snow drift, [mol d-2 h-1]
-  real(r8),target, allocatable ::  XQSFE2(:,:,:)                      !total FeOH2 in snow drift, [mol d-2 h-1]
-  real(r8),target, allocatable ::  XQSFE3(:,:,:)                      !total FeOH3 in snow drift, [mol d-2 h-1]
-  real(r8),target, allocatable ::  XQSFE4(:,:,:)                      !total FeOH4 in snow drift, [mol d-2 h-1]
-  real(r8),target, allocatable ::  XQSFES(:,:,:)                      !total FeSO4 in snow drift, [mol d-2 h-1]
-  real(r8),target, allocatable ::  XQSCAO(:,:,:)                      !total CaOH in snow drift, [mol d-2 h-1]
-  real(r8),target, allocatable ::  XQSCAC(:,:,:)                      !total CaCO3 in snow drift, [mol d-2 h-1]
-  real(r8),target, allocatable ::  XQSCAH(:,:,:)                      !total CaHCO3 in snow drift, [mol d-2 h-1]
-  real(r8),target, allocatable ::  XQSCAS(:,:,:)                      !total CaSO4 in snow drift, [mol d-2 h-1]
-  real(r8),target, allocatable ::  XQSMGO(:,:,:)                      !total MgOH in snow drift, [mol d-2 h-1]
-  real(r8),target, allocatable ::  XQSMGC(:,:,:)                      !total MgCO3 in snow drift, [mol d-2 h-1]
-  real(r8),target, allocatable ::  XQSMGH(:,:,:)                      !total MgHCO3 in snow drift, [mol d-2 h-1]
-  real(r8),target, allocatable ::  XQSMGS(:,:,:)                      !total MgSO4 in snow drift, [mol d-2 h-1]
-  real(r8),target, allocatable ::  XQSNAC(:,:,:)                      !total NaCO3 in snow drift, [mol d-2 h-1]
-  real(r8),target, allocatable ::  XQSNAS(:,:,:)                      !total NaSO4 in snow drift, [mol d-2 h-1]
-  real(r8),target, allocatable ::  XQSKAS(:,:,:)                      !total KSO4 in snow drift, [mol d-2 h-1]
-  real(r8),target, allocatable ::  XQSH0P(:,:,:)                      !total PO4 in snow drif, [mol d-2 h-1]
-  real(r8),target, allocatable ::  XQSH1P(:,:,:)                      !total HPO4 in snow drift , [mol d-2 h-1]
-  real(r8),target, allocatable ::  XQSH3P(:,:,:)                      !total H3PO4 in snow drift , [mol d-2 h-1]
-  real(r8),target, allocatable ::  XQSF1P(:,:,:)                      !total FeHPO4 in snow drift , [mol d-2 h-1]
-  real(r8),target, allocatable ::  XQSF2P(:,:,:)                      !total FeH2PO4 in snow drift , [mol d-2 h-1]
-  real(r8),target, allocatable ::  XQSC0P(:,:,:)                      !total CaPO4 in snow drift , [mol d-2 h-1]
-  real(r8),target, allocatable ::  XQSC1P(:,:,:)                      !total CaHPO4 in snow drift, [mol d-2 h-1]
-  real(r8),target, allocatable ::  XQSC2P(:,:,:)                      !total CaH2PO4 in snow drift , [mol d-2 h-1]
-  real(r8),target, allocatable ::  XQSM1P(:,:,:)                      !total MgHPO4 in snow drift , [mol d-2 h-1]
+  real(r8),target, allocatable ::  trcsa_XQS(:,:,:,:)                       !total salt in snow drift, [mol d-2 h-1]
 !----------------------------------------------------------------------
 
 contains
@@ -164,55 +123,17 @@ contains
     allocate(trcs_solsml(idsa_beg:idsa_end,JS,JY,JX)); trcs_solsml=0._r8
   endif
 
-
-  allocate(XQSAL(2,JV,JH));     XQSAL=0._r8
-  allocate(XQSFE(2,JV,JH));     XQSFE=0._r8
-  allocate(XQSHY(2,JV,JH));     XQSHY=0._r8
-  allocate(XQSCA(2,JV,JH));     XQSCA=0._r8
-  allocate(XQSMG(2,JV,JH));     XQSMG=0._r8
-  allocate(XQSNA(2,JV,JH));     XQSNA=0._r8
-  allocate(XQSKA(2,JV,JH));     XQSKA=0._r8
-  allocate(XQSOH(2,JV,JH));     XQSOH=0._r8
-  allocate(XQSSO(2,JV,JH));     XQSSO=0._r8
-  allocate(XQSCL(2,JV,JH));     XQSCL=0._r8
-  allocate(XQSC3(2,JV,JH));     XQSC3=0._r8
-  allocate(XQSHC(2,JV,JH));     XQSHC=0._r8
-  allocate(XQSAL1(2,JV,JH));    XQSAL1=0._r8
-  allocate(XQSAL2(2,JV,JH));    XQSAL2=0._r8
-  allocate(XQSAL3(2,JV,JH));    XQSAL3=0._r8
-  allocate(XQSAL4(2,JV,JH));    XQSAL4=0._r8
-  allocate(XQSALS(2,JV,JH));    XQSALS=0._r8
-  allocate(XQSFE1(2,JV,JH));    XQSFE1=0._r8
-  allocate(XQSFE2(2,JV,JH));    XQSFE2=0._r8
-  allocate(XQSFE3(2,JV,JH));    XQSFE3=0._r8
-  allocate(XQSFE4(2,JV,JH));    XQSFE4=0._r8
-  allocate(XQSFES(2,JV,JH));    XQSFES=0._r8
-  allocate(XQSCAO(2,JV,JH));    XQSCAO=0._r8
-  allocate(XQSCAC(2,JV,JH));    XQSCAC=0._r8
-  allocate(XQSCAH(2,JV,JH));    XQSCAH=0._r8
-  allocate(XQSCAS(2,JV,JH));    XQSCAS=0._r8
-  allocate(XQSMGO(2,JV,JH));    XQSMGO=0._r8
-  allocate(XQSMGC(2,JV,JH));    XQSMGC=0._r8
-  allocate(XQSMGH(2,JV,JH));    XQSMGH=0._r8
-  allocate(XQSMGS(2,JV,JH));    XQSMGS=0._r8
-  allocate(XQSNAC(2,JV,JH));    XQSNAC=0._r8
-  allocate(XQSNAS(2,JV,JH));    XQSNAS=0._r8
-  allocate(XQSKAS(2,JV,JH));    XQSKAS=0._r8
-  allocate(XQSH0P(2,JV,JH));    XQSH0P=0._r8
-  allocate(XQSH1P(2,JV,JH));    XQSH1P=0._r8
-  allocate(XQSH3P(2,JV,JH));    XQSH3P=0._r8
-  allocate(XQSF1P(2,JV,JH));    XQSF1P=0._r8
-  allocate(XQSF2P(2,JV,JH));    XQSF2P=0._r8
-  allocate(XQSC0P(2,JV,JH));    XQSC0P=0._r8
-  allocate(XQSC1P(2,JV,JH));    XQSC1P=0._r8
-  allocate(XQSC2P(2,JV,JH));    XQSC2P=0._r8
-  allocate(XQSM1P(2,JV,JH));    XQSM1P=0._r8
+  allocate(trcsa_XQS(idsa_beg:idsa_end,2,JV,JH));     trcsa_XQS=0._r8
   end subroutine InitSnowData
 
 !----------------------------------------------------------------------
   subroutine DestructSnowData
   use abortutils, only : destroy
   implicit none
+  if(salt_model)then
+    call destroy(trcs_solsml)
+    call destroy(trcsa_XQS)
+  endif
   call destroy(VHCPWM)
   call destroy(FLQWM)
   call destroy(QSM)
@@ -260,50 +181,9 @@ contains
   call destroy(XNOQSS)
   call destroy(XP4QSS)
   call destroy(XP1QSS)
-
-
-  call destroy(XQSAL)
-  call destroy(XQSFE)
-  call destroy(XQSHY)
-  call destroy(XQSCA)
-  call destroy(XQSMG)
-  call destroy(XQSNA)
-  call destroy(XQSKA)
-  call destroy(XQSOH)
-  call destroy(XQSSO)
-  call destroy(XQSCL)
-  call destroy(XQSC3)
-  call destroy(XQSHC)
-  call destroy(XQSAL1)
-  call destroy(XQSAL2)
-  call destroy(XQSAL3)
-  call destroy(XQSAL4)
-  call destroy(XQSALS)
-  call destroy(XQSFE1)
-  call destroy(XQSFE2)
-  call destroy(XQSFE3)
-  call destroy(XQSFE4)
-  call destroy(XQSFES)
-  call destroy(XQSCAO)
-  call destroy(XQSCAC)
-  call destroy(XQSCAH)
-  call destroy(XQSCAS)
-  call destroy(XQSMGO)
-  call destroy(XQSMGC)
-  call destroy(XQSMGH)
-  call destroy(XQSMGS)
-  call destroy(XQSNAC)
-  call destroy(XQSNAS)
-  call destroy(XQSKAS)
-  call destroy(XQSH0P)
-  call destroy(XQSH1P)
-  call destroy(XQSH3P)
-  call destroy(XQSF1P)
-  call destroy(XQSF2P)
-  call destroy(XQSC0P)
-  call destroy(XQSC1P)
-  call destroy(XQSC2P)
-  call destroy(XQSM1P)
+  if(salt_model)then
+    call destroy(trcsa_XQS)
+  endif
   end subroutine DestructSnowData
 
 end module SnowDataType

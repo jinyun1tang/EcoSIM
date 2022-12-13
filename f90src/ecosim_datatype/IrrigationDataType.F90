@@ -139,62 +139,12 @@ module IrrigationDataType
   real(r8),target,allocatable ::  RN4FBU(:,:,:)                     !aqueous NH4 in underground irrigation band, [g d-2 h-1]
   real(r8),target,allocatable ::  RN3FBU(:,:,:)                     !aqueous NH3 in underground irrigation band, [g d-2 h-1]
   real(r8),target,allocatable ::  RNOFBU(:,:,:)                     !aqueous NO3 in underground irrigation band, [g d-2 h-1]
-  real(r8),target,allocatable ::  RH2BBU(:,:,:)                     !aqueous H2PO4 in underground irrigation band, [g d-2 h-1]
-  real(r8),target,allocatable ::  RH0PFU(:,:,:)                     !aqueous PO4 in underground irrigation non-band, [g d-2 h-1]
-  real(r8),target,allocatable ::  RH1PFU(:,:,:)                     !aqueous HPO4 in underground irrigation non-band, [g d-2 h-1]
-  real(r8),target,allocatable ::  RH3PFU(:,:,:)                     !aqueous H3PO4 in underground irrigation non-band, [g d-2 h-1]
   real(r8),target,allocatable ::  RH1BBU(:,:,:)                     !aqueous HPO4 in underground irrigation non-band, [g d-2 h-1]
-  real(r8),target,allocatable ::  RALFLU(:,:,:)                     !aqueous Al in underground irrigation, [g d-2 h-1]
-  real(r8),target,allocatable ::  RFEFLU(:,:,:)                     !aqueous Fe in underground irrigation, [g d-2 h-1]
-  real(r8),target,allocatable ::  RHYFLU(:,:,:)                     !aqueous H in underground irrigation, [g d-2 h-1]
-  real(r8),target,allocatable ::  RCAFLU(:,:,:)                     !aqueous Ca in underground irrigation, [g d-2 h-1]
-  real(r8),target,allocatable ::  RMGFLU(:,:,:)                     !aqueous Mg in underground irrigation, [g d-2 h-1]
-  real(r8),target,allocatable ::  RNAFLU(:,:,:)                     !aqueous Na in underground irrigation, [g d-2 h-1]
-  real(r8),target,allocatable ::  RKAFLU(:,:,:)                     !aqueous K in underground irrigation, [g d-2 h-1]
-  real(r8),target,allocatable ::  ROHFLU(:,:,:)                     !aqueous OH in underground irrigation, [g d-2 h-1]
-  real(r8),target,allocatable ::  RSOFLU(:,:,:)                     !aqueous SO4 in underground irrigation, [g d-2 h-1]
-  real(r8),target,allocatable ::  RCLFLU(:,:,:)                     !aqueous Cl in underground irrigation, [g d-2 h-1]
-  real(r8),target,allocatable ::  RC3FLU(:,:,:)                     !aqueous CO3 in underground irrigation, [g d-2 h-1]
-  real(r8),target,allocatable ::  RHCFLU(:,:,:)                     !aqueous HCO3 in underground irrigation, [g d-2 h-1]
-  real(r8),target,allocatable ::  RAL1FU(:,:,:)                     !aqueous AlOH in underground irrigation, [g d-2 h-1]
-  real(r8),target,allocatable ::  RAL2FU(:,:,:)                     !aqueous AlOH2 in underground irrigation, [g d-2 h-1]
-  real(r8),target,allocatable ::  RAL3FU(:,:,:)                     !aqueous AlOH3 in underground irrigation, [g d-2 h-1]
-  real(r8),target,allocatable ::  RAL4FU(:,:,:)                     !aqueous AlOH4 in underground irrigation, [g d-2 h-1]
-  real(r8),target,allocatable ::  RALSFU(:,:,:)                     !aqueous AlSO4 in underground irrigation, [g d-2 h-1]
-  real(r8),target,allocatable ::  RFE1FU(:,:,:)                     !aqueous FeOH in underground irrigation, [g d-2 h-1]
-  real(r8),target,allocatable ::  RFE2FU(:,:,:)                     !aqueous FeOH2 in underground irrigation, [g d-2 h-1]
-  real(r8),target,allocatable ::  RFE3FU(:,:,:)                     !aqueous FeOH3 in underground irrigation, [g d-2 h-1]
-  real(r8),target,allocatable ::  RFE4FU(:,:,:)                     !aqueous FeOH4 in underground irrigation, [g d-2 h-1]
-  real(r8),target,allocatable ::  RFESFU(:,:,:)                     !aqueous FeSO4 in underground irrigation, [g d-2 h-1]
-  real(r8),target,allocatable ::  RCAOFU(:,:,:)                     !aqueous CaOH in underground irrigation, [g d-2 h-1]
-  real(r8),target,allocatable ::  RCACFU(:,:,:)                     !aqueous CaCO3 in underground irrigation, [g d-2 h-1]
-  real(r8),target,allocatable ::  RCAHFU(:,:,:)                     !aqueous CaHCO3 in underground irrigation, [g d-2 h-1]
-  real(r8),target,allocatable ::  RCASFU(:,:,:)                     !aqueous CaSO4 in underground irrigation, [g d-2 h-1]
-  real(r8),target,allocatable ::  RMGOFU(:,:,:)                     !aqueous MgOH in underground irrigation, [g d-2 h-1]
-  real(r8),target,allocatable ::  RMGCFU(:,:,:)                     !aqueous MgCO3 in underground irrigation, [g d-2 h-1]
-  real(r8),target,allocatable ::  RMGHFU(:,:,:)                     !aqueous MgHCO3 in underground irrigation, [g d-2 h-1]
-  real(r8),target,allocatable ::  RMGSFU(:,:,:)                     !aqueous MgSO4 in underground irrigation, [g d-2 h-1]
-  real(r8),target,allocatable ::  RNACFU(:,:,:)                     !aqueous NaCO3 in underground irrigation, [g d-2 h-1]
-  real(r8),target,allocatable ::  RNASFU(:,:,:)                     !aqueous NaSO4 in underground irrigation, [g d-2 h-1]
-  real(r8),target,allocatable ::  RKASFU(:,:,:)                     !aqueous KSO4 in underground irrigation, [g d-2 h-1]
-  real(r8),target,allocatable ::  RF1PFU(:,:,:)                     !aqueous FeHPO4 in underground irrigation non-band, [g d-2 h-1]
-  real(r8),target,allocatable ::  RF2PFU(:,:,:)                     !aqueous FeH2PO4 in underground irrigation non-band, [g d-2 h-1]
-  real(r8),target,allocatable ::  RC0PFU(:,:,:)                     !aqueous CaPO4 in underground irrigation non-band, [g d-2 h-1]
-  real(r8),target,allocatable ::  RC1PFU(:,:,:)                     !aqueous CaHPO4 in underground irrigation non-band, [g d-2 h-1]
+  real(r8),target,allocatable ::  RH2BBU(:,:,:)                     !aqueous H2PO4 in underground irrigation band, [g d-2 h-1]
+  real(r8),target,allocatable ::  RH1PFU(:,:,:)                     !aqueous HPO4 in underground irrigation non-band, [g d-2 h-1]
+  real(r8),target,allocatable ::  trcsa_RFLU(:,:,:,:)                     !aqueous PO4 in underground irrigation non-band, [g d-2 h-1]
   real(r8),target,allocatable ::  RHGFLU(:,:,:)                     !aqueous H2 in underground irrigation non-band, [g d-2 h-1]
-  real(r8),target,allocatable ::  RC2PFU(:,:,:)                     !aqueous CaH2PO4 in underground irrigation non-band, [g d-2 h-1]
-  real(r8),target,allocatable ::  RM1PFU(:,:,:)                     !aqueous MgHPO4 in underground irrigation non-band, [g d-2 h-1]
-  real(r8),target,allocatable ::  RF1BBU(:,:,:)                     !aqueous FeHPO4 in underground irrigation non-band, [g d-2 h-1]
-  real(r8),target,allocatable ::  RF2BBU(:,:,:)                     !aqueous FeH2PO4 in underground irrigation non-band, [g d-2 h-1]
-  real(r8),target,allocatable ::  RC0BBU(:,:,:)                     !aqueous CaPO4 in underground irrigation non-band, [g d-2 h-1]
-  real(r8),target,allocatable ::  RC1BBU(:,:,:)                     !aqueous CaHPO4 in underground irrigation non-band, [g d-2 h-1]
-  real(r8),target,allocatable ::  RC2BBU(:,:,:)                     !aqueous CaH2PO4 in underground irrigation non-band, [g d-2 h-1]
-  real(r8),target,allocatable ::  RM1BBU(:,:,:)                     !aqueous MgHPO4 in underground irrigation non-band, [g d-2 h-1]
-  real(r8),target,allocatable ::  RH0BBU(:,:,:)                     !aqueous PO4 in underground irrigation non-band, [g d-2 h-1]
-  real(r8),target,allocatable ::  RH3BBU(:,:,:)                     !aqueous H3PO4 in underground irrigation non-band, [g d-2 h-1]
-
-
-   private :: InitAllocate
+  private :: InitAllocate
   contains
 
   subroutine InitIrrigation
@@ -336,58 +286,11 @@ module IrrigationDataType
   allocate(RN3FBU(JZ,JY,JX));   RN3FBU=0._r8
   allocate(RNOFBU(JZ,JY,JX));   RNOFBU=0._r8
   allocate(RH2BBU(JZ,JY,JX));   RH2BBU=0._r8
-  allocate(RH0PFU(JZ,JY,JX));   RH0PFU=0._r8
+  allocate(trcsa_RFLU(idsa_beg:idsab_end,JZ,JY,JX));   trcsa_RFLU=0._r8
   allocate(RH1PFU(JZ,JY,JX));   RH1PFU=0._r8
-  allocate(RH3PFU(JZ,JY,JX));   RH3PFU=0._r8
+
   allocate(RH1BBU(JZ,JY,JX));   RH1BBU=0._r8
-  allocate(RALFLU(JZ,JY,JX));   RALFLU=0._r8
-  allocate(RFEFLU(JZ,JY,JX));   RFEFLU=0._r8
-  allocate(RHYFLU(JZ,JY,JX));   RHYFLU=0._r8
-  allocate(RCAFLU(JZ,JY,JX));   RCAFLU=0._r8
-  allocate(RMGFLU(JZ,JY,JX));   RMGFLU=0._r8
-  allocate(RNAFLU(JZ,JY,JX));   RNAFLU=0._r8
-  allocate(RKAFLU(JZ,JY,JX));   RKAFLU=0._r8
-  allocate(ROHFLU(JZ,JY,JX));   ROHFLU=0._r8
-  allocate(RSOFLU(JZ,JY,JX));   RSOFLU=0._r8
-  allocate(RCLFLU(JZ,JY,JX));   RCLFLU=0._r8
-  allocate(RC3FLU(JZ,JY,JX));   RC3FLU=0._r8
-  allocate(RHCFLU(JZ,JY,JX));   RHCFLU=0._r8
-  allocate(RAL1FU(JZ,JY,JX));   RAL1FU=0._r8
-  allocate(RAL2FU(JZ,JY,JX));   RAL2FU=0._r8
-  allocate(RAL3FU(JZ,JY,JX));   RAL3FU=0._r8
-  allocate(RAL4FU(JZ,JY,JX));   RAL4FU=0._r8
-  allocate(RALSFU(JZ,JY,JX));   RALSFU=0._r8
-  allocate(RFE1FU(JZ,JY,JX));   RFE1FU=0._r8
-  allocate(RFE2FU(JZ,JY,JX));   RFE2FU=0._r8
-  allocate(RFE3FU(JZ,JY,JX));   RFE3FU=0._r8
-  allocate(RFE4FU(JZ,JY,JX));   RFE4FU=0._r8
-  allocate(RFESFU(JZ,JY,JX));   RFESFU=0._r8
-  allocate(RCAOFU(JZ,JY,JX));   RCAOFU=0._r8
-  allocate(RCACFU(JZ,JY,JX));   RCACFU=0._r8
-  allocate(RCAHFU(JZ,JY,JX));   RCAHFU=0._r8
-  allocate(RCASFU(JZ,JY,JX));   RCASFU=0._r8
-  allocate(RMGOFU(JZ,JY,JX));   RMGOFU=0._r8
-  allocate(RMGCFU(JZ,JY,JX));   RMGCFU=0._r8
-  allocate(RMGHFU(JZ,JY,JX));   RMGHFU=0._r8
-  allocate(RMGSFU(JZ,JY,JX));   RMGSFU=0._r8
-  allocate(RNACFU(JZ,JY,JX));   RNACFU=0._r8
-  allocate(RNASFU(JZ,JY,JX));   RNASFU=0._r8
-  allocate(RKASFU(JZ,JY,JX));   RKASFU=0._r8
-  allocate(RF1PFU(JZ,JY,JX));   RF1PFU=0._r8
-  allocate(RF2PFU(JZ,JY,JX));   RF2PFU=0._r8
-  allocate(RC0PFU(JZ,JY,JX));   RC0PFU=0._r8
-  allocate(RC1PFU(JZ,JY,JX));   RC1PFU=0._r8
   allocate(RHGFLU(JZ,JY,JX));   RHGFLU=0._r8
-  allocate(RC2PFU(JZ,JY,JX));   RC2PFU=0._r8
-  allocate(RM1PFU(JZ,JY,JX));   RM1PFU=0._r8
-  allocate(RF1BBU(JZ,JY,JX));   RF1BBU=0._r8
-  allocate(RF2BBU(JZ,JY,JX));   RF2BBU=0._r8
-  allocate(RC0BBU(JZ,JY,JX));   RC0BBU=0._r8
-  allocate(RC1BBU(JZ,JY,JX));   RC1BBU=0._r8
-  allocate(RC2BBU(JZ,JY,JX));   RC2BBU=0._r8
-  allocate(RM1BBU(JZ,JY,JX));   RM1BBU=0._r8
-  allocate(RH0BBU(JZ,JY,JX));   RH0BBU=0._r8
-  allocate(RH3BBU(JZ,JY,JX));   RH3BBU=0._r8
   end subroutine InitAllocate
 
 !----------------------------------------------------------------------
@@ -520,58 +423,8 @@ module IrrigationDataType
   call destroy(RN3FBU)
   call destroy(RNOFBU)
   call destroy(RH2BBU)
-  call destroy(RH0PFU)
   call destroy(RH1PFU)
-  call destroy(RH3PFU)
   call destroy(RH1BBU)
-  call destroy(RALFLU)
-  call destroy(RFEFLU)
-  call destroy(RHYFLU)
-  call destroy(RCAFLU)
-  call destroy(RMGFLU)
-  call destroy(RNAFLU)
-  call destroy(RKAFLU)
-  call destroy(ROHFLU)
-  call destroy(RSOFLU)
-  call destroy(RCLFLU)
-  call destroy(RC3FLU)
-  call destroy(RHCFLU)
-  call destroy(RAL1FU)
-  call destroy(RAL2FU)
-  call destroy(RAL3FU)
-  call destroy(RAL4FU)
-  call destroy(RALSFU)
-  call destroy(RFE1FU)
-  call destroy(RFE2FU)
-  call destroy(RFE3FU)
-  call destroy(RFE4FU)
-  call destroy(RFESFU)
-  call destroy(RCAOFU)
-  call destroy(RCACFU)
-  call destroy(RCAHFU)
-  call destroy(RCASFU)
-  call destroy(RMGOFU)
-  call destroy(RMGCFU)
-  call destroy(RMGHFU)
-  call destroy(RMGSFU)
-  call destroy(RNACFU)
-  call destroy(RNASFU)
-  call destroy(RKASFU)
-  call destroy(RF1PFU)
-  call destroy(RF2PFU)
-  call destroy(RC0PFU)
-  call destroy(RC1PFU)
-  call destroy(RHGFLU)
-  call destroy(RC2PFU)
-  call destroy(RM1PFU)
-  call destroy(RF1BBU)
-  call destroy(RF2BBU)
-  call destroy(RC0BBU)
-  call destroy(RC1BBU)
-  call destroy(RC2BBU)
-  call destroy(RM1BBU)
-  call destroy(RH0BBU)
-  call destroy(RH3BBU)
 
   end subroutine DestructIrrigation
 

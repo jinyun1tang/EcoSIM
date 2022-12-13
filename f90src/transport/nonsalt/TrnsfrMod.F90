@@ -392,14 +392,14 @@ module TrnsfrMod
           trc_solml2(NTS,L,NY,NX)=trc_solml2(NTS,L,NY,NX)+RFLZ_sol(NTS,L,NY,NX)
         ENDDO
 
-        trc_solml2(idg_CO2,L,NY,NX)=trc_solml2(idg_CO2,L,NY,NX)+RCOBBL(L,NY,NX)
-        trc_solml2(idg_CH4,L,NY,NX)=trc_solml2(idg_CH4,L,NY,NX)+RCHBBL(L,NY,NX)
-        trc_solml2(idg_O2,L,NY,NX)=trc_solml2(idg_O2,L,NY,NX)+ROXBBL(L,NY,NX)
-        trc_solml2(idg_N2,L,NY,NX)=trc_solml2(idg_N2,L,NY,NX)+RNGBBL(L,NY,NX)
-        trc_solml2(idg_N2O,L,NY,NX)=trc_solml2(idg_N2O,L,NY,NX)+RN2BBL(L,NY,NX)
-        trc_solml2(idg_NH3,L,NY,NX)=trc_solml2(idg_NH3,L,NY,NX)+RN3BBL(L,NY,NX)
-        trc_solml2(idg_NH3B,L,NY,NX)=trc_solml2(idg_NH3B,L,NY,NX)+RNBBBL(L,NY,NX)
-        trc_solml2(idg_H2,L,NY,NX)=trc_solml2(idg_H2,L,NY,NX)+RHGBBL(L,NY,NX)
+        trc_solml2(idg_CO2,L,NY,NX)=trc_solml2(idg_CO2,L,NY,NX)+trcg_BBL(idg_CO2,L,NY,NX)
+        trc_solml2(idg_CH4,L,NY,NX)=trc_solml2(idg_CH4,L,NY,NX)+trcg_BBL(idg_CH4,L,NY,NX)
+        trc_solml2(idg_O2,L,NY,NX)=trc_solml2(idg_O2,L,NY,NX)+trcg_BBL(idg_O2,L,NY,NX)
+        trc_solml2(idg_N2,L,NY,NX)=trc_solml2(idg_N2,L,NY,NX)+trcg_BBL(idg_N2,L,NY,NX)
+        trc_solml2(idg_N2O,L,NY,NX)=trc_solml2(idg_N2O,L,NY,NX)+trcg_BBL(idg_N2O,L,NY,NX)
+        trc_solml2(idg_NH3,L,NY,NX)=trc_solml2(idg_NH3,L,NY,NX)+trcg_BBL(idg_NH3,L,NY,NX)
+        trc_solml2(idg_NH3B,L,NY,NX)=trc_solml2(idg_NH3B,L,NY,NX)+trcg_BBL(idg_NH3B,L,NY,NX)
+        trc_solml2(idg_H2,L,NY,NX)=trc_solml2(idg_H2,L,NY,NX)+trcg_BBL(idg_H2,L,NY,NX)
 
         DO  K=1,jcplx
           OQC2(K,L,NY,NX)=OQC2(K,L,NY,NX)+TOCFLS(K,L,NY,NX)+ROCFXS(K,L,NY,NX)
@@ -611,17 +611,10 @@ module TrnsfrMod
 !     C*R,C*Q=precipitation,irrigation solute concentrations
 !     gas code: *CO*=CO2,*OX*=O2,*CH*=CH4,*NG*=N2,*N2*=N2O,*NH*=NH3,*H2*=H2
 !
-    trcg_XBLS(idg_CO2,1,NY,NX)=0.0_r8
-    trcg_XBLS(idg_CH4,1,NY,NX)=0.0_r8
-    trcg_XBLS(idg_O2,1,NY,NX)=0.0_r8
-    trcg_XBLS(idg_N2,1,NY,NX)=0.0_r8
-    trcg_XBLS(idg_N2O,1,NY,NX)=0.0_r8
-    trcg_XBLS(idg_NH3,1,NY,NX)=0.0_r8
+    trcg_XBLS(idg_beg:idg_end-1,1,NY,NX)=0.0_r8
 
-    trcn_XBLS(ids_NH4,1,NY,NX)=0.0_r8
-    trcn_XBLS(ids_NO3,1,NY,NX)=0.0_r8
-    trcn_XBLS(ids_H1PO4,1,NY,NX)=0.0_r8
-    trcn_XBLS(ids_H2PO4,1,NY,NX)=0.0_r8
+    trcn_XBLS(ids_nut_beg:ids_nuts_end,1,NY,NX)=0.0_r8
+
     trcs_XFLS(idg_CO2,3,0,NY,NX)=FLQRQ(NY,NX)*CCOR(NY,NX)+FLQRI(NY,NX)*CCOQ(NY,NX)
     trcs_XFLS(idg_CH4,3,0,NY,NX)=FLQRQ(NY,NX)*CCHR(NY,NX)+FLQRI(NY,NX)*CCHQ(NY,NX)
     trcs_XFLS(idg_O2,3,0,NY,NX)=FLQRQ(NY,NX)*COXR(NY,NX)+FLQRI(NY,NX)*COXQ(NY,NX)
@@ -687,7 +680,7 @@ module TrnsfrMod
   implicit none
 
   integer, intent(in) :: NY, NX
-  INTEGER :: K,L,NTS
+  INTEGER :: K,L,NTS,NTG
 
   DO  K=1,micpar%n_litrsfk
     ROCFL0(K,NY,NX)=XOCFLS(K,3,0,NY,NX)*XNPH
@@ -699,6 +692,7 @@ module TrnsfrMod
     ROPFL1(K,NY,NX)=XOPFLS(K,3,NU(NY,NX),NY,NX)*XNPH
     ROAFL1(K,NY,NX)=XOAFLS(K,3,NU(NY,NX),NY,NX)*XNPH
   enddo
+
   RCOBLS(1,NY,NX)=trcg_XBLS(idg_CO2,1,NY,NX)*XNPH
   RCHBLS(1,NY,NX)=trcg_XBLS(idg_CH4,1,NY,NX)*XNPH
   ROXBLS(1,NY,NX)=trcg_XBLS(idg_O2,1,NY,NX)*XNPH
@@ -709,14 +703,12 @@ module TrnsfrMod
   RNOBLW(1,NY,NX)=trcn_XBLS(ids_NO3,1,NY,NX)*XNPH
   RH1PBS(1,NY,NX)=trcn_XBLS(ids_H1PO4,1,NY,NX)*XNPH
   RH2PBS(1,NY,NX)=trcn_XBLS(ids_H2PO4,1,NY,NX)*XNPH
-  RCOFL0(NY,NX)=trcs_XFLS(idg_CO2,3,0,NY,NX)*XNPH
-  RCHFL0(NY,NX)=trcs_XFLS(idg_CH4,3,0,NY,NX)*XNPH
-  ROXFL0(NY,NX)=trcs_XFLS(idg_O2,3,0,NY,NX)*XNPH
-  RNGFL0(NY,NX)=trcs_XFLS(idg_N2,3,0,NY,NX)*XNPH
-  RN2FL0(NY,NX)=trcs_XFLS(idg_N2O,3,0,NY,NX)*XNPH
-  RHGFL0(NY,NX)=trcs_XFLS(idg_H2,3,0,NY,NX)*XNPH
+
+  DO NTG=idg_beg,idg_end-1
+    trcg_RFL0(NTG,NY,NX)=trcs_XFLS(NTG,3,0,NY,NX)*XNPH
+  ENDDO
+
   RN4FL0(NY,NX)=trcs_XFLS(ids_NH4,3,0,NY,NX)*XNPH
-  RN3FL0(NY,NX)=trcs_XFLS(idg_NH3,3,0,NY,NX)*XNPH
   RNOFL0(NY,NX)=trcs_XFLS(ids_NO3,3,0,NY,NX)*XNPH
   RNXFL0(NY,NX)=trcs_XFLS(ids_NO2,3,0,NY,NX)*XNPH
   RH1PF0(NY,NX)=trcs_XFLS(ids_H1PO4,3,0,NY,NX)*XNPH

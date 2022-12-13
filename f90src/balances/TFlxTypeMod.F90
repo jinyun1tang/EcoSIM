@@ -28,59 +28,10 @@ implicit none
   real(r8),allocatable ::  TFLWW(:,:,:)                       !
   real(r8),allocatable ::  TFLWI(:,:,:)                       !
   real(r8),allocatable ::  THFLWW(:,:,:)                      !
-  real(r8),allocatable ::  THGQRS(:,:)                        !
-  real(r8),allocatable ::  TCOQRS(:,:)                        !
-  real(r8),allocatable ::  TCHQRS(:,:)                        !
-  real(r8),allocatable ::  TOXQRS(:,:)                        !
-  real(r8),allocatable ::  TNGQRS(:,:)                        !
-  real(r8),allocatable ::  TN2QRS(:,:)                        !
-  real(r8),allocatable ::  TN4QRS(:,:)                        !
-  real(r8),allocatable ::  TN3QRS(:,:)                        !
-  real(r8),allocatable ::  TNOQRS(:,:)                        !
-  real(r8),allocatable ::  TPOQRS(:,:)                        !
-  real(r8),allocatable ::  TNXQRS(:,:)                        !
-  real(r8),allocatable ::  TQRAL(:,:)                         !
-  real(r8),allocatable ::  TQRFE(:,:)                         !
-  real(r8),allocatable ::  TQRHY(:,:)                         !
-  real(r8),allocatable ::  TQRCA(:,:)                         !
-  real(r8),allocatable ::  TQRMG(:,:)                         !
-  real(r8),allocatable ::  TQRNA(:,:)                         !
-  real(r8),allocatable ::  TQRKA(:,:)                         !
-  real(r8),allocatable ::  TQROH(:,:)                         !
-  real(r8),allocatable ::  TQRSO(:,:)                         !
-  real(r8),allocatable ::  TQRCL(:,:)                         !
-  real(r8),allocatable ::  TQRC3(:,:)                         !
-  real(r8),allocatable ::  TQRHC(:,:)                         !
-  real(r8),allocatable ::  TQRAL1(:,:)                        !
-  real(r8),allocatable ::  TQRAL2(:,:)                        !
-  real(r8),allocatable ::  TQRAL3(:,:)                        !
-  real(r8),allocatable ::  TQRAL4(:,:)                        !
-  real(r8),allocatable ::  TQRALS(:,:)                        !
-  real(r8),allocatable ::  TQRFE1(:,:)                        !
-  real(r8),allocatable ::  TQRFE2(:,:)                        !
-  real(r8),allocatable ::  TQRFE3(:,:)                        !
-  real(r8),allocatable ::  TQRFE4(:,:)                        !
-  real(r8),allocatable ::  TQRFES(:,:)                        !
-  real(r8),allocatable ::  TQRCAO(:,:)                        !
-  real(r8),allocatable ::  TQRCAC(:,:)                        !
-  real(r8),allocatable ::  TQRCAH(:,:)                        !
-  real(r8),allocatable ::  TQRCAS(:,:)                        !
-  real(r8),allocatable ::  TQRMGO(:,:)                        !
-  real(r8),allocatable ::  TQRMGC(:,:)                        !
-  real(r8),allocatable ::  TQRMGH(:,:)                        !
-  real(r8),allocatable ::  TQRMGS(:,:)                        !
-  real(r8),allocatable ::  TQRNAC(:,:)                        !
-  real(r8),allocatable ::  TQRNAS(:,:)                        !
-  real(r8),allocatable ::  TQRKAS(:,:)                        !
-  real(r8),allocatable ::  TQRH0P(:,:)                        !
-  real(r8),allocatable ::  TQRH3P(:,:)                        !
-  real(r8),allocatable ::  TQRF1P(:,:)                        !
-  real(r8),allocatable ::  TP1QRS(:,:)                        !
-  real(r8),allocatable ::  TQRF2P(:,:)                        !
-  real(r8),allocatable ::  TQRC0P(:,:)                        !
-  real(r8),allocatable ::  TQRC1P(:,:)                        !
-  real(r8),allocatable ::  TQRC2P(:,:)                        !
-  real(r8),allocatable ::  TQRM1P(:,:)
+  real(r8),allocatable ::  trcg_TQR(:,:,:)                        !
+  real(r8),allocatable ::  trcn_TQR(:,:,:)                        !
+
+  real(r8),allocatable ::  trcsa_TQR(:,:,:)                         !
                     !
   real(r8),allocatable ::  trcg_QSS(:,:,:)
   real(r8),allocatable ::  trcn_QSS(:,:,:)
@@ -229,60 +180,10 @@ implicit none
   allocate(TFLWW(JS,JY,JX));    TFLWW=0._r8
   allocate(TFLWI(JS,JY,JX));    TFLWI=0._r8
   allocate(THFLWW(JS,JY,JX));   THFLWW=0._r8
-  allocate(THGQRS(JY,JX));      THGQRS=0._r8
-  allocate(TCOQRS(JY,JX));      TCOQRS=0._r8
-  allocate(TCHQRS(JY,JX));      TCHQRS=0._r8
-  allocate(TOXQRS(JY,JX));      TOXQRS=0._r8
-  allocate(TNGQRS(JY,JX));      TNGQRS=0._r8
-  allocate(TN2QRS(JY,JX));      TN2QRS=0._r8
-  allocate(TN4QRS(JY,JX));      TN4QRS=0._r8
-  allocate(TN3QRS(JY,JX));      TN3QRS=0._r8
-  allocate(TNOQRS(JY,JX));      TNOQRS=0._r8
-  allocate(TPOQRS(JY,JX));      TPOQRS=0._r8
-  allocate(TNXQRS(JY,JX));      TNXQRS=0._r8
-  allocate(TQRAL(JY,JX));       TQRAL=0._r8
-  allocate(TQRFE(JY,JX));       TQRFE=0._r8
-  allocate(TQRHY(JY,JX));       TQRHY=0._r8
-  allocate(TQRCA(JY,JX));       TQRCA=0._r8
-  allocate(TQRMG(JY,JX));       TQRMG=0._r8
-  allocate(TQRNA(JY,JX));       TQRNA=0._r8
-  allocate(TQRKA(JY,JX));       TQRKA=0._r8
-  allocate(TQROH(JY,JX));       TQROH=0._r8
-  allocate(TQRSO(JY,JX));       TQRSO=0._r8
-  allocate(TQRCL(JY,JX));       TQRCL=0._r8
-  allocate(TQRC3(JY,JX));       TQRC3=0._r8
-  allocate(TQRHC(JY,JX));       TQRHC=0._r8
-  allocate(TQRAL1(JY,JX));      TQRAL1=0._r8
-  allocate(TQRAL2(JY,JX));      TQRAL2=0._r8
-  allocate(TQRAL3(JY,JX));      TQRAL3=0._r8
-  allocate(TQRAL4(JY,JX));      TQRAL4=0._r8
-  allocate(TQRALS(JY,JX));      TQRALS=0._r8
-  allocate(TQRFE1(JY,JX));      TQRFE1=0._r8
-  allocate(TQRFE2(JY,JX));      TQRFE2=0._r8
-  allocate(TQRFE3(JY,JX));      TQRFE3=0._r8
-  allocate(TQRFE4(JY,JX));      TQRFE4=0._r8
-  allocate(TQRFES(JY,JX));      TQRFES=0._r8
-  allocate(TQRCAO(JY,JX));      TQRCAO=0._r8
-  allocate(TQRCAC(JY,JX));      TQRCAC=0._r8
-  allocate(TQRCAH(JY,JX));      TQRCAH=0._r8
-  allocate(TQRCAS(JY,JX));      TQRCAS=0._r8
-  allocate(TQRMGO(JY,JX));      TQRMGO=0._r8
-  allocate(TQRMGC(JY,JX));      TQRMGC=0._r8
-  allocate(TQRMGH(JY,JX));      TQRMGH=0._r8
-  allocate(TQRMGS(JY,JX));      TQRMGS=0._r8
-  allocate(TQRNAC(JY,JX));      TQRNAC=0._r8
-  allocate(TQRNAS(JY,JX));      TQRNAS=0._r8
-  allocate(TQRKAS(JY,JX));      TQRKAS=0._r8
-  allocate(TQRH0P(JY,JX));      TQRH0P=0._r8
-  allocate(TQRH3P(JY,JX));      TQRH3P=0._r8
-  allocate(TQRF1P(JY,JX));      TQRF1P=0._r8
-  allocate(TP1QRS(JY,JX));      TP1QRS=0._r8
-  allocate(TQRF2P(JY,JX));      TQRF2P=0._r8
-  allocate(TQRC0P(JY,JX));      TQRC0P=0._r8
-  allocate(TQRC1P(JY,JX));      TQRC1P=0._r8
-  allocate(TQRC2P(JY,JX));      TQRC2P=0._r8
-  allocate(TQRM1P(JY,JX));      TQRM1P=0._r8
 
+  allocate(trcg_TQR(idg_beg:idg_end-1,JY,JX));      trcg_TQR=0._r8
+  allocate(trcsa_TQR(idsa_beg:idsa_end,JY,JX));       trcsa_TQR=0._r8
+  allocate(trcn_TQR(ids_nut_beg:ids_nuts_end,JY,JX));      trcn_TQR=0._r8
   allocate(trcg_QSS(idg_beg:idg_end-1,JY,JX));trcg_QSS=0._r8
   allocate(trcn_QSS(ids_nut_beg:ids_nuts_end,JY,JX));trcn_QSS=0._r8
 
@@ -444,6 +345,7 @@ implicit none
   call destroy(trcg_TBLS)
   call destroy(trcn_TBLS)
 
+  call destroy(trcsa_TQR)
   call destroy(trcsa_TFHS)
   call destroy(THGFLG)
   call destroy(TQR)
@@ -456,59 +358,6 @@ implicit none
   call destroy(TFLWW)
   call destroy(TFLWI)
   call destroy(THFLWW)
-  call destroy(THGQRS)
-  call destroy(TCOQRS)
-  call destroy(TCHQRS)
-  call destroy(TOXQRS)
-  call destroy(TNGQRS)
-  call destroy(TN2QRS)
-  call destroy(TN4QRS)
-  call destroy(TN3QRS)
-  call destroy(TNOQRS)
-  call destroy(TPOQRS)
-  call destroy(TNXQRS)
-  call destroy(TQRAL)
-  call destroy(TQRFE)
-  call destroy(TQRHY)
-  call destroy(TQRCA)
-  call destroy(TQRMG)
-  call destroy(TQRNA)
-  call destroy(TQRKA)
-  call destroy(TQROH)
-  call destroy(TQRSO)
-  call destroy(TQRCL)
-  call destroy(TQRC3)
-  call destroy(TQRHC)
-  call destroy(TQRAL1)
-  call destroy(TQRAL2)
-  call destroy(TQRAL3)
-  call destroy(TQRAL4)
-  call destroy(TQRALS)
-  call destroy(TQRFE1)
-  call destroy(TQRFE2)
-  call destroy(TQRFE3)
-  call destroy(TQRFE4)
-  call destroy(TQRFES)
-  call destroy(TQRCAO)
-  call destroy(TQRCAC)
-  call destroy(TQRCAH)
-  call destroy(TQRCAS)
-  call destroy(TQRMGO)
-  call destroy(TQRMGC)
-  call destroy(TQRMGH)
-  call destroy(TQRMGS)
-  call destroy(TQRNAC)
-  call destroy(TQRNAS)
-  call destroy(TQRKAS)
-  call destroy(TQRH0P)
-  call destroy(TQRH3P)
-  call destroy(TQRF1P)
-  call destroy(TP1QRS)
-  call destroy(TQRF2P)
-  call destroy(TQRC0P)
-  call destroy(TQRC1P)
-  call destroy(TQRC2P)
-  call destroy(TQRM1P)
 
   call destroy(trcs_TFHS)
   call destroy(trcg_QSS)
@@ -592,5 +441,7 @@ implicit none
   call destroy(VOLWH1)
   call destroy(VOLIH1)
 
+  call destroy(trcg_TQR)
+  call destroy(trcn_TQR)
   end subroutine DestructTflxType
 end module TFlxTypeMod

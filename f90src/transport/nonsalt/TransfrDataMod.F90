@@ -74,14 +74,8 @@ implicit none
   real(r8), allocatable ::  RONFL1(:,:,:)                      !
   real(r8), allocatable ::  ROPFL1(:,:,:)                      !
   real(r8), allocatable ::  ROAFL1(:,:,:)                      !
-  real(r8), allocatable ::  RCOFL0(:,:)                        !
-  real(r8), allocatable ::  RCHFL0(:,:)                        !
-  real(r8), allocatable ::  ROXFL0(:,:)                        !
-  real(r8), allocatable ::  RNGFL0(:,:)                        !
-  real(r8), allocatable ::  RN2FL0(:,:)                        !
-  real(r8), allocatable ::  RHGFL0(:,:)                        !
+  real(r8), allocatable ::  trcg_RFL0(:,:,:)                        !
   real(r8), allocatable ::  RN4FL0(:,:)                        !
-  real(r8), allocatable ::  RN3FL0(:,:)                        !
   real(r8), allocatable ::  RNOFL0(:,:)                        !
   real(r8), allocatable ::  RNXFL0(:,:)                        !
   real(r8), allocatable ::  RH2PF0(:,:)                        !
@@ -213,14 +207,7 @@ implicit none
   real(r8), allocatable ::  R1PSK2(:,:,:)                      !
 
   real(r8), allocatable ::  TN3FLG(:,:,:)                      !
-  real(r8), allocatable ::  RCOBBL(:,:,:)                      !
-  real(r8), allocatable ::  RCHBBL(:,:,:)                      !
-  real(r8), allocatable ::  ROXBBL(:,:,:)                      !
-  real(r8), allocatable ::  RNGBBL(:,:,:)                      !
-  real(r8), allocatable ::  RN2BBL(:,:,:)                      !
-  real(r8), allocatable ::  RN3BBL(:,:,:)                      !
-  real(r8), allocatable ::  RNBBBL(:,:,:)                      !
-  real(r8), allocatable ::  RHGBBL(:,:,:)                      !
+  real(r8), allocatable ::  trcg_BBL(:,:,:,:)                      !
   real(r8), allocatable ::  RQRCOS0(:,:)                       !
   real(r8), allocatable ::  RQRCHS0(:,:)                       !
   real(r8), allocatable ::  RQROXS0(:,:)                       !
@@ -272,7 +259,7 @@ implicit none
   real(r8), allocatable ::  trcn_TBLS(:,:,:,:)
   real(r8), allocatable ::  RQROP(:,:,:,:,:)                   !
   real(r8), allocatable ::  RQROA(:,:,:,:,:)                   !
-  real(r8), allocatable ::  RQR_trcg(:,:,:,:,:)                    !
+  real(r8), allocatable ::  trcg_RQR(:,:,:,:,:)                    !
   real(r8), allocatable ::  RQRHGS(:,:,:,:)                    !
   real(r8), allocatable ::  RQRNH4(:,:,:,:)                    !
   real(r8), allocatable ::  RCODFS(:,:)                        !
@@ -306,10 +293,8 @@ implicit none
 
   real(r8), allocatable ::  RQSH2P(:,:,:)                      !
   real(r8), allocatable ::  RQSH1P(:,:,:)                      !
-  real(r8), allocatable ::  RQSCOS(:,:,:)                      !
-  real(r8), allocatable ::  RQSCHS(:,:,:)                      !
-  real(r8), allocatable ::  RQSOXS(:,:,:)                      !
-  real(r8), allocatable ::  RQR_trcn(:,:,:,:,:)                    !
+  real(r8), allocatable ::  trcg_RQS(:,:,:,:)                      !
+  real(r8), allocatable ::  trcn_RQR(:,:,:,:,:)                    !
 
   real(r8), allocatable ::  RNXFHS(:,:,:,:)                    !
   real(r8), allocatable ::  RNXFHB(:,:,:,:)                    !
@@ -336,10 +321,7 @@ implicit none
   real(r8), allocatable ::  RCHFHS(:,:,:,:)                    !
   real(r8), allocatable ::  ROXFHS(:,:,:,:)                    !
   real(r8), allocatable ::  RNGFHS(:,:,:,:)                    !
-  real(r8), allocatable ::  RQSNGS(:,:,:)                      !
-  real(r8), allocatable ::  RQSN2S(:,:,:)                      !
   real(r8), allocatable ::  RQSNH4(:,:,:)                      !
-  real(r8), allocatable ::  RQSNH3(:,:,:)                      !
   real(r8), allocatable ::  RQSNO3(:,:,:)                      !
   real(r8), allocatable ::  RCOFLS(:,:,:,:)                    !
   real(r8), allocatable ::  RCHFLS(:,:,:,:)                    !
@@ -413,14 +395,8 @@ contains
   allocate(RONFL1(1:n_litrsfk,JY,JX));  RONFL1=0._r8
   allocate(ROPFL1(1:n_litrsfk,JY,JX));  ROPFL1=0._r8
   allocate(ROAFL1(1:n_litrsfk,JY,JX));  ROAFL1=0._r8
-  allocate(RCOFL0(JY,JX));      RCOFL0=0._r8
-  allocate(RCHFL0(JY,JX));      RCHFL0=0._r8
-  allocate(ROXFL0(JY,JX));      ROXFL0=0._r8
-  allocate(RNGFL0(JY,JX));      RNGFL0=0._r8
-  allocate(RN2FL0(JY,JX));      RN2FL0=0._r8
-  allocate(RHGFL0(JY,JX));      RHGFL0=0._r8
+  allocate(trcg_RFL0(idg_beg:idg_end-1,JY,JX));      trcg_RFL0=0._r8
   allocate(RN4FL0(JY,JX));      RN4FL0=0._r8
-  allocate(RN3FL0(JY,JX));      RN3FL0=0._r8
   allocate(RNOFL0(JY,JX));      RNOFL0=0._r8
   allocate(RNXFL0(JY,JX));      RNXFL0=0._r8
   allocate(RH2PF0(JY,JX));      RH2PF0=0._r8
@@ -552,14 +528,7 @@ contains
   allocate(R1PSK2(0:JZ,JY,JX)); R1PSK2=0._r8
 
   allocate(TN3FLG(JZ,JY,JX));   TN3FLG=0._r8
-  allocate(RCOBBL(JZ,JY,JX));   RCOBBL=0._r8
-  allocate(RCHBBL(JZ,JY,JX));   RCHBBL=0._r8
-  allocate(ROXBBL(JZ,JY,JX));   ROXBBL=0._r8
-  allocate(RNGBBL(JZ,JY,JX));   RNGBBL=0._r8
-  allocate(RN2BBL(JZ,JY,JX));   RN2BBL=0._r8
-  allocate(RN3BBL(JZ,JY,JX));   RN3BBL=0._r8
-  allocate(RNBBBL(JZ,JY,JX));   RNBBBL=0._r8
-  allocate(RHGBBL(JZ,JY,JX));   RHGBBL=0._r8
+  allocate(trcg_BBL(idg_beg:idg_end,JZ,JY,JX));   trcg_BBL=0._r8
   allocate(RQRCOS0(JV,JH));     RQRCOS0=0._r8
   allocate(RQRCHS0(JV,JH));     RQRCHS0=0._r8
   allocate(RQROXS0(JV,JH));     RQROXS0=0._r8
@@ -615,7 +584,7 @@ contains
 
   allocate(RQROP(1:jcplx,2,2,JV,JH));RQROP=0._r8
   allocate(RQROA(1:jcplx,2,2,JV,JH));RQROA=0._r8
-  allocate(RQR_trcg(idg_beg:idg_end-1,2,2,JV,JH));  RQR_trcg=0._r8
+  allocate(trcg_RQR(idg_beg:idg_end-1,2,2,JV,JH));  trcg_RQR=0._r8
   allocate(RQRHGS(2,2,JV,JH));  RQRHGS=0._r8
   allocate(RQRNH4(2,2,JV,JH));  RQRNH4=0._r8
   allocate(RCODFS(JY,JX));      RCODFS=0._r8
@@ -649,10 +618,8 @@ contains
 
   allocate(RQSH2P(2,JV,JH));    RQSH2P=0._r8
   allocate(RQSH1P(2,JV,JH));    RQSH1P=0._r8
-  allocate(RQSCOS(2,JV,JH));    RQSCOS=0._r8
-  allocate(RQSCHS(2,JV,JH));    RQSCHS=0._r8
-  allocate(RQSOXS(2,JV,JH));    RQSOXS=0._r8
-  allocate(RQR_trcn(ids_nut_beg:ids_nuts_end,2,2,JV,JH));  RQR_trcn=0._r8
+  allocate(trcg_RQS(idg_beg:idg_end-1,2,JV,JH));    trcg_RQS=0._r8
+  allocate(trcn_RQR(ids_nut_beg:ids_nuts_end,2,2,JV,JH));  trcn_RQR=0._r8
   allocate(R3GasADFlx(idg_beg:idg_end,3,JD,JV,JH));R3GasADFlx=0._r8
   allocate(RTGasADFlx(idg_beg:idg_end,JZ,JY,JH));RTGasADFlx=0._r8
 
@@ -678,10 +645,7 @@ contains
   allocate(RCHFHS(3,JD,JV,JH)); RCHFHS=0._r8
   allocate(ROXFHS(3,JD,JV,JH)); ROXFHS=0._r8
   allocate(RNGFHS(3,JD,JV,JH)); RNGFHS=0._r8
-  allocate(RQSNGS(2,JV,JH));    RQSNGS=0._r8
-  allocate(RQSN2S(2,JV,JH));    RQSN2S=0._r8
   allocate(RQSNH4(2,JV,JH));    RQSNH4=0._r8
-  allocate(RQSNH3(2,JV,JH));    RQSNH3=0._r8
   allocate(RQSNO3(2,JV,JH));    RQSNO3=0._r8
   allocate(RCOFLS(3,0:JD,JV,JH));RCOFLS=0._r8
   allocate(RCHFLS(3,0:JD,JV,JH));RCHFLS=0._r8
@@ -756,14 +720,7 @@ contains
   call destroy(RONFL1)
   call destroy(ROPFL1)
   call destroy(ROAFL1)
-  call destroy(RCOFL0)
-  call destroy(RCHFL0)
-  call destroy(ROXFL0)
-  call destroy(RNGFL0)
-  call destroy(RN2FL0)
-  call destroy(RHGFL0)
   call destroy(RN4FL0)
-  call destroy(RN3FL0)
   call destroy(RNOFL0)
   call destroy(RNXFL0)
   call destroy(RH2PF0)
@@ -809,6 +766,7 @@ contains
   call destroy(RH1PXS)
   call destroy(RH1BXB)
 
+  call destroy(trcg_BBL)
   call destroy(CLSGL2)
   call destroy(CQSGL2)
   call destroy(POSGL2)
@@ -887,14 +845,6 @@ contains
   call destroy(RNHSK2)
   call destroy(R1PSK2)
   call destroy(TN3FLG)
-  call destroy(RCOBBL)
-  call destroy(RCHBBL)
-  call destroy(ROXBBL)
-  call destroy(RNGBBL)
-  call destroy(RN2BBL)
-  call destroy(RN3BBL)
-  call destroy(RNBBBL)
-  call destroy(RHGBBL)
   call destroy(RQRCOS0)
   call destroy(RQRCHS0)
   call destroy(RQROXS0)
@@ -946,6 +896,7 @@ contains
 
   call destroy(trcg_TBLS)
   call destroy(trcn_TBLS)
+  call destroy(trcg_RFL0)
 
   call destroy(RQROP)
   call destroy(RQROA)
@@ -964,7 +915,7 @@ contains
   call destroy(RQROC)
   call destroy(RQRON)
 
-
+  call destroy(trcg_RQS)
   call destroy(ZNH4H2)
   call destroy(ZN4BH2)
   call destroy(ZNH3H2)
@@ -982,9 +933,6 @@ contains
 
   call destroy(RQSH2P)
   call destroy(RQSH1P)
-  call destroy(RQSCOS)
-  call destroy(RQSCHS)
-  call destroy(RQSOXS)
 
   call destroy(RNXFHS)
   call destroy(RNXFHB)
@@ -1003,15 +951,11 @@ contains
   call destroy(RN3FHW)
 
   call destroy(RGasDSFlx)
-
   call destroy(RHGFHS)
   call destroy(RCHFHS)
   call destroy(ROXFHS)
   call destroy(RNGFHS)
-  call destroy(RQSNGS)
-  call destroy(RQSN2S)
   call destroy(RQSNH4)
-  call destroy(RQSNH3)
   call destroy(RQSNO3)
   call destroy(RCOFLS)
   call destroy(RCHFLS)

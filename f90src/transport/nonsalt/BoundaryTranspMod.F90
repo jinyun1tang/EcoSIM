@@ -194,7 +194,7 @@ module BoundaryTranspMod
   integer, intent(in) :: M,N,NN,N1,N2,M4,M5
   real(r8), intent(in) :: RCHQF
   real(r8) :: FQRM
-  integer :: K
+  integer :: K,NTG,NTN
 
   IF(IRCHG(NN,N,N2,N1).EQ.0.OR.test_aeqb(RCHQF,0.0_r8).OR.QRM(M,N2,N1).LE.ZEROS(N2,N1))THEN
     DO  K=1,jcplx
@@ -203,8 +203,8 @@ module BoundaryTranspMod
       RQROP(K,N,NN,M5,M4)=0.0_r8
       RQROA(K,N,NN,M5,M4)=0.0_r8
     ENDDO
-    RQR_trcg(idg_beg:idg_end-1,N,NN,M5,M4)=0.0_r8
-    RQR_trcn(ids_nut_beg:ids_nuts_end,N,NN,M5,M4)=0.0_r8
+    trcg_RQR(idg_beg:idg_end-1,N,NN,M5,M4)=0.0_r8
+    trcn_RQR(ids_nut_beg:ids_nuts_end,N,NN,M5,M4)=0.0_r8
   ELSE
 !
 !     SOLUTE LOSS FROM RUNOFF DEPENDING ON ASPECT
@@ -219,18 +219,20 @@ module BoundaryTranspMod
         RQROP(K,N,NN,M5,M4)=RQROP0(K,N2,N1)*FQRM
         RQROA(K,N,NN,M5,M4)=RQROA0(K,N2,N1)*FQRM
       enddo
-      RQR_trcg(idg_CO2,N,NN,M5,M4)=RQRCOS0(N2,N1)*FQRM
-      RQR_trcg(idg_CH4,N,NN,M5,M4)=RQRCHS0(N2,N1)*FQRM
-      RQR_trcg(idg_O2,N,NN,M5,M4)=RQROXS0(N2,N1)*FQRM
-      RQR_trcg(idg_N2,N,NN,M5,M4)=RQRNGS0(N2,N1)*FQRM
-      RQR_trcg(idg_N2O,N,NN,M5,M4)=RQRN2S0(N2,N1)*FQRM
-      RQR_trcg(idg_H2,N,NN,M5,M4)=RQRHGS0(N2,N1)*FQRM
-      RQR_trcn(ids_NH4,N,NN,M5,M4)=RQRNH40(N2,N1)*FQRM
-      RQR_trcg(idg_NH3,N,NN,M5,M4)=RQRNH30(N2,N1)*FQRM
-      RQR_trcn(ids_NO3,N,NN,M5,M4)=RQRNO30(N2,N1)*FQRM
-      RQR_trcn(ids_NO2,N,NN,M5,M4)=RQRNO20(N2,N1)*FQRM
-      RQR_trcn(ids_H1PO4,N,NN,M5,M4)=RQRH1P0(N2,N1)*FQRM
-      RQR_trcn(ids_H2PO4,N,NN,M5,M4)=RQRH2P0(N2,N1)*FQRM
+
+      trcg_RQR(idg_CO2,N,NN,M5,M4)=RQRCOS0(N2,N1)*FQRM
+      trcg_RQR(idg_CH4,N,NN,M5,M4)=RQRCHS0(N2,N1)*FQRM
+      trcg_RQR(idg_O2,N,NN,M5,M4)=RQROXS0(N2,N1)*FQRM
+      trcg_RQR(idg_N2,N,NN,M5,M4)=RQRNGS0(N2,N1)*FQRM
+      trcg_RQR(idg_N2O,N,NN,M5,M4)=RQRN2S0(N2,N1)*FQRM
+      trcg_RQR(idg_H2,N,NN,M5,M4)=RQRHGS0(N2,N1)*FQRM
+      trcg_RQR(idg_NH3,N,NN,M5,M4)=RQRNH30(N2,N1)*FQRM
+
+      trcn_RQR(ids_NH4,N,NN,M5,M4)=RQRNH40(N2,N1)*FQRM
+      trcn_RQR(ids_NO3,N,NN,M5,M4)=RQRNO30(N2,N1)*FQRM
+      trcn_RQR(ids_NO2,N,NN,M5,M4)=RQRNO20(N2,N1)*FQRM
+      trcn_RQR(ids_H1PO4,N,NN,M5,M4)=RQRH1P0(N2,N1)*FQRM
+      trcn_RQR(ids_H2PO4,N,NN,M5,M4)=RQRH2P0(N2,N1)*FQRM
 !
 !     ACCUMULATE HOURLY FLUXES FOR USE IN REDIST.F
 !
@@ -243,18 +245,13 @@ module BoundaryTranspMod
         XOPQRS(K,N,NN,M5,M4)=XOPQRS(K,N,NN,M5,M4)+RQROP(K,N,NN,M5,M4)
         XOAQRS(K,N,NN,M5,M4)=XOAQRS(K,N,NN,M5,M4)+RQROA(K,N,NN,M5,M4)
       enddo
-      XCOQRS(N,NN,M5,M4)=XCOQRS(N,NN,M5,M4)+RQR_trcg(idg_CO2,N,NN,M5,M4)
-      XCHQRS(N,NN,M5,M4)=XCHQRS(N,NN,M5,M4)+RQR_trcg(idg_CH4,N,NN,M5,M4)
-      XOXQRS(N,NN,M5,M4)=XOXQRS(N,NN,M5,M4)+RQR_trcg(idg_O2,N,NN,M5,M4)
-      XNGQRS(N,NN,M5,M4)=XNGQRS(N,NN,M5,M4)+RQR_trcg(idg_N2,N,NN,M5,M4)
-      XN2QRS(N,NN,M5,M4)=XN2QRS(N,NN,M5,M4)+RQR_trcg(idg_N2O,N,NN,M5,M4)
-      XHGQRS(N,NN,M5,M4)=XHGQRS(N,NN,M5,M4)+RQR_trcg(idg_H2,N,NN,M5,M4)
-      XN4QRW(N,NN,M5,M4)=XN4QRW(N,NN,M5,M4)+RQR_trcn(ids_NH4,N,NN,M5,M4)
-      XN3QRW(N,NN,M5,M4)=XN3QRW(N,NN,M5,M4)+RQR_trcg(idg_NH3,N,NN,M5,M4)
-      XNOQRW(N,NN,M5,M4)=XNOQRW(N,NN,M5,M4)+RQR_trcn(ids_NO3,N,NN,M5,M4)
-      XNXQRS(N,NN,M5,M4)=XNXQRS(N,NN,M5,M4)+RQR_trcn(ids_NO2,N,NN,M5,M4)
-      XP1QRW(N,NN,M5,M4)=XP1QRW(N,NN,M5,M4)+RQR_trcn(ids_H1PO4,N,NN,M5,M4)
-      XP4QRW(N,NN,M5,M4)=XP4QRW(N,NN,M5,M4)+RQR_trcn(ids_H2PO4,N,NN,M5,M4)
+      DO NTG=idg_beg,idg_end-1
+        trcg_XRS(NTG,N,NN,M5,M4)=trcg_XRS(NTG,N,NN,M5,M4)+trcg_RQR(NTG,N,NN,M5,M4)
+      ENDDO
+
+      DO NTN=ids_nut_beg,ids_nuts_end
+        trcn_XRS(NTN,N,NN,M5,M4)=trcn_XRS(NTN,N,NN,M5,M4)+trcn_RQR(NTN,N,NN,M5,M4)
+      ENDDO
 !
 !     SOLUTE GAIN FROM RUNON DEPENDING ON ASPECT
 !     AND BOUNDARY CONDITIONS SET IN SITE FILE
@@ -267,21 +264,20 @@ module BoundaryTranspMod
         RQROP(K,N,NN,M5,M4)=0.0_r8
         RQROA(K,N,NN,M5,M4)=0.0_r8
       enddo
-      RQR_trcg(idg_CO2,N,NN,M5,M4)=QRMN(M,N,NN,M5,M4)*CCOU
-      RQR_trcg(idg_CH4,N,NN,M5,M4)=QRMN(M,N,NN,M5,M4)*CCHU
-      RQR_trcg(idg_O2,N,NN,M5,M4)=QRMN(M,N,NN,M5,M4)*COXU
-      RQR_trcg(idg_N2,N,NN,M5,M4)=QRMN(M,N,NN,M5,M4)*CNNU
-      RQR_trcg(idg_N2O,N,NN,M5,M4)=QRMN(M,N,NN,M5,M4)*CN2U
-      RQR_trcg(idg_H2,N,NN,M5,M4)=0.0_r8
-      RQR_trcg(idg_NH3,N,NN,M5,M4)=0.0_r8
 
-      RQR_trcn(ids_nut_beg:ids_nuts_end,N,NN,M5,M4)=0.0_r8
+      trcg_RQR(idg_CO2,N,NN,M5,M4)=QRMN(M,N,NN,M5,M4)*CCOU
+      trcg_RQR(idg_CH4,N,NN,M5,M4)=QRMN(M,N,NN,M5,M4)*CCHU
+      trcg_RQR(idg_O2,N,NN,M5,M4)=QRMN(M,N,NN,M5,M4)*COXU
+      trcg_RQR(idg_N2,N,NN,M5,M4)=QRMN(M,N,NN,M5,M4)*CNNU
+      trcg_RQR(idg_N2O,N,NN,M5,M4)=QRMN(M,N,NN,M5,M4)*CN2U
+      trcg_RQR(idg_H2,N,NN,M5,M4)=0.0_r8
+      trcg_RQR(idg_NH3,N,NN,M5,M4)=0.0_r8
 
-      XCOQRS(N,NN,M5,M4)=XCOQRS(N,NN,M5,M4)+RQR_trcg(idg_CO2,N,NN,M5,M4)
-      XCHQRS(N,NN,M5,M4)=XCHQRS(N,NN,M5,M4)+RQR_trcg(idg_CH4,N,NN,M5,M4)
-      XOXQRS(N,NN,M5,M4)=XOXQRS(N,NN,M5,M4)+RQR_trcg(idg_O2,N,NN,M5,M4)
-      XNGQRS(N,NN,M5,M4)=XNGQRS(N,NN,M5,M4)+RQR_trcg(idg_N2,N,NN,M5,M4)
-      XN2QRS(N,NN,M5,M4)=XN2QRS(N,NN,M5,M4)+RQR_trcg(idg_N2O,N,NN,M5,M4)
+      trcn_RQR(ids_nut_beg:ids_nuts_end,N,NN,M5,M4)=0.0_r8
+
+      DO NTG=idg_beg,idg_end-1
+        trcg_XRS(NTG,N,NN,M5,M4)=trcg_XRS(NTG,N,NN,M5,M4)+trcg_RQR(NTG,N,NN,M5,M4)
+      ENDDO
     ELSE
       DO  K=1,jcplx
         RQROC(K,N,NN,M5,M4)=0.0_r8
@@ -289,8 +285,8 @@ module BoundaryTranspMod
         RQROP(K,N,NN,M5,M4)=0.0_r8
         RQROA(K,N,NN,M5,M4)=0.0_r8
       enddo
-      RQR_trcg(idg_beg:idg_end-1,N,NN,M5,M4)=0.0_r8
-      RQR_trcn(ids_nut_beg:ids_nuts_end,N,NN,M5,M4)=0.0_r8
+      trcg_RQR(idg_beg:idg_end-1,N,NN,M5,M4)=0.0_r8
+      trcn_RQR(ids_nut_beg:ids_nuts_end,N,NN,M5,M4)=0.0_r8
     ENDIF
 
   ENDIF
@@ -298,13 +294,8 @@ module BoundaryTranspMod
 !     BOUNDARY SNOW FLUX
 !
   IF(NN.EQ.1)THEN
-    RQSCOS(N,M5,M4)=0.0_r8
-    RQSCHS(N,M5,M4)=0.0_r8
-    RQSOXS(N,M5,M4)=0.0_r8
-    RQSNGS(N,M5,M4)=0.0_r8
-    RQSN2S(N,M5,M4)=0.0_r8
+    trcg_RQS(idg_beg:idg_end-1,N,M5,M4)=0.0_r8
     RQSNH4(N,M5,M4)=0.0_r8
-    RQSNH3(N,M5,M4)=0.0_r8
     RQSNO3(N,M5,M4)=0.0_r8
     RQSH1P(N,M5,M4)=0.0_r8
     RQSH2P(N,M5,M4)=0.0_r8
@@ -527,11 +518,11 @@ module BoundaryTranspMod
     enddo
 
     DO NTG=idg_beg,idg_end-1
-      trcg_TQR(NTG,N2,N1)=trcg_TQR(NTG,N2,N1)+RQR_trcg(NTG,N,NN,N2,N1)
+      trcg_TQR(NTG,N2,N1)=trcg_TQR(NTG,N2,N1)+trcg_RQR(NTG,N,NN,N2,N1)
     ENDDO
 
     DO NTS=ids_nut_beg,ids_nuts_end
-      trcn_TQR(NTS,N2,N1)=trcn_TQR(NTS,N2,N1)+RQR_trcn(NTS,N,NN,N2,N1)
+      trcn_TQR(NTS,N2,N1)=trcn_TQR(NTS,N2,N1)+trcn_RQR(NTS,N,NN,N2,N1)
     ENDDO
 
     IF(IFLBM(M,N,NN,N5,N4).EQ.0)THEN
@@ -543,11 +534,11 @@ module BoundaryTranspMod
       enddo
 
       DO NTG=idg_beg,idg_end-1
-        trcg_TQR(NTG,N2,N1)=trcg_TQR(NTG,N2,N1)-RQR_trcg(NTG,N,NN,N5,N4)
+        trcg_TQR(NTG,N2,N1)=trcg_TQR(NTG,N2,N1)-trcg_RQR(NTG,N,NN,N5,N4)
       ENDDO
 
       DO NTS=ids_nut_beg,ids_nuts_end
-        trcn_TQR(NTS,N2,N1)=trcn_TQR(NTS,N2,N1)-RQR_trcn(NTS,N,NN,N5,N4)
+        trcn_TQR(NTS,N2,N1)=trcn_TQR(NTS,N2,N1)-trcn_RQR(NTS,N,NN,N5,N4)
       ENDDO
     ENDIF
     IF(N4B.GT.0.AND.N5B.GT.0.AND.NN.EQ.1)THEN
@@ -558,11 +549,11 @@ module BoundaryTranspMod
         TQROA(K,N2,N1)=TQROA(K,N2,N1)-RQROA(K,N,NN,N5B,N4B)
       enddo
       DO NTG=idg_beg,idg_end-1
-        trcg_TQR(NTG,N2,N1)=trcg_TQR(NTG,N2,N1)-RQR_trcg(NTG,N,NN,N5B,N4B)
+        trcg_TQR(NTG,N2,N1)=trcg_TQR(NTG,N2,N1)-trcg_RQR(NTG,N,NN,N5B,N4B)
       ENDDO
 
       DO NTS=ids_nut_beg,ids_nuts_end
-        trcn_TQR(NTS,N2,N1)=trcn_TQR(NTS,N2,N1)-RQR_trcn(NTS,N,NN,N5B,N4B)
+        trcn_TQR(NTS,N2,N1)=trcn_TQR(NTS,N2,N1)-trcn_RQR(NTS,N,NN,N5B,N4B)
       ENDDO
     ENDIF
   enddo
@@ -572,12 +563,9 @@ module BoundaryTranspMod
 !     TQS*=net solute flux in snow transfer
 !     RQS*=solute flux in snow transfer
 !
-  trcg_TQ(idg_O2,N2,N1)=trcg_TQ(idg_O2,N2,N1)+RQSCOS(N,N2,N1)-RQSCOS(N,N5,N4)
-  trcg_TQ(idg_CH4,N2,N1)=trcg_TQ(idg_CH4,N2,N1)+RQSCHS(N,N2,N1)-RQSCHS(N,N5,N4)
-  trcg_TQ(idg_O2,N2,N1)=trcg_TQ(idg_O2,N2,N1)+RQSOXS(N,N2,N1)-RQSOXS(N,N5,N4)
-  trcg_TQ(idg_N2,N2,N1)=trcg_TQ(idg_N2,N2,N1)+RQSNGS(N,N2,N1)-RQSNGS(N,N5,N4)
-  trcg_TQ(idg_N2O,N2,N1)=trcg_TQ(idg_N2O,N2,N1)+RQSN2S(N,N2,N1)-RQSN2S(N,N5,N4)
-  trcg_TQ(idg_NH3,N2,N1)=trcg_TQ(idg_NH3,N2,N1)+RQSNH3(N,N2,N1)-RQSNH3(N,N5,N4)
+  DO NTG=idg_beg,idg_end-1
+    trcg_TQ(NTG,N2,N1)=trcg_TQ(NTG,N2,N1)+trcg_RQS(NTG,N,N2,N1)-trcg_RQS(NTG,N,N5,N4)
+  ENDDO
 
   trcn_TQ(ids_NH4,N2,N1)=trcn_TQ(ids_NH4,N2,N1)+RQSNH4(N,N2,N1)-RQSNH4(N,N5,N4)
   trcn_TQ(ids_NO3,N2,N1)=trcn_TQ(ids_NO3,N2,N1)+RQSNO3(N,N2,N1)-RQSNO3(N,N5,N4)

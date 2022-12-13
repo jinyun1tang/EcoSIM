@@ -77,47 +77,7 @@ implicit none
   real(r8),allocatable ::  RQRC1P(:,:,:,:)                    !
   real(r8),allocatable ::  RQRC2P(:,:,:,:)                    !
   real(r8),allocatable ::  RQRM1P(:,:,:,:)                    !
-  real(r8),allocatable ::  RQSAL(:,:,:)                       !
-  real(r8),allocatable ::  RQSFE(:,:,:)                       !
-  real(r8),allocatable ::  RQSHY(:,:,:)                       !
-  real(r8),allocatable ::  RQSCA(:,:,:)                       !
-  real(r8),allocatable ::  RQSMG(:,:,:)                       !
-  real(r8),allocatable ::  RQSNA(:,:,:)                       !
-  real(r8),allocatable ::  RQSKA(:,:,:)                       !
-  real(r8),allocatable ::  RQSOH(:,:,:)                       !
-  real(r8),allocatable ::  RQSSO(:,:,:)                       !
-  real(r8),allocatable ::  RQSCL(:,:,:)                       !
-  real(r8),allocatable ::  RQSC3(:,:,:)                       !
-  real(r8),allocatable ::  RQSHC(:,:,:)                       !
-  real(r8),allocatable ::  RQSAL1(:,:,:)                      !
-  real(r8),allocatable ::  RQSAL2(:,:,:)                      !
-  real(r8),allocatable ::  RQSAL3(:,:,:)                      !
-  real(r8),allocatable ::  RQSAL4(:,:,:)                      !
-  real(r8),allocatable ::  RQSALS(:,:,:)                      !
-  real(r8),allocatable ::  RQSFE1(:,:,:)                      !
-  real(r8),allocatable ::  RQSFE2(:,:,:)                      !
-  real(r8),allocatable ::  RQSFE3(:,:,:)                      !
-  real(r8),allocatable ::  RQSFE4(:,:,:)                      !
-  real(r8),allocatable ::  RQSFES(:,:,:)                      !
-  real(r8),allocatable ::  RQSCAO(:,:,:)                      !
-  real(r8),allocatable ::  RQSCAC(:,:,:)                      !
-  real(r8),allocatable ::  RQSCAH(:,:,:)                      !
-  real(r8),allocatable ::  RQSCAS(:,:,:)                      !
-  real(r8),allocatable ::  RQSMGO(:,:,:)                      !
-  real(r8),allocatable ::  RQSMGC(:,:,:)                      !
-  real(r8),allocatable ::  RQSMGH(:,:,:)                      !
-  real(r8),allocatable ::  RQSMGS(:,:,:)                      !
-  real(r8),allocatable ::  RQSNAC(:,:,:)                      !
-  real(r8),allocatable ::  RQSNAS(:,:,:)                      !
-  real(r8),allocatable ::  RQSKAS(:,:,:)                      !
-  real(r8),allocatable ::  RQSH0P(:,:,:)                      !
-  real(r8),allocatable ::  RQSH3P(:,:,:)                      !
-  real(r8),allocatable ::  RQSF1P(:,:,:)                      !
-  real(r8),allocatable ::  RQSF2P(:,:,:)                      !
-  real(r8),allocatable ::  RQSC0P(:,:,:)                      !
-  real(r8),allocatable ::  RQSC1P(:,:,:)                      !
-  real(r8),allocatable ::  RQSC2P(:,:,:)                      !
-  real(r8),allocatable ::  RQSM1P(:,:,:)                      !
+  real(r8),allocatable ::  trcsa_RQ(:,:,:,:)                       !
   real(r8),allocatable ::  RQRAL0(:,:)                        !
   real(r8),allocatable ::  RQRFE0(:,:)                        !
   real(r8),allocatable ::  RQRHY0(:,:)                        !
@@ -159,104 +119,11 @@ implicit none
   real(r8),allocatable ::  RQRC1P0(:,:)                       !
   real(r8),allocatable ::  RQRC2P0(:,:)                       !
   real(r8),allocatable ::  RQRM1P0(:,:)                       !
-  real(r8),allocatable ::  RH0POB2(:,:,:)                     !
-  real(r8),allocatable ::  RH3POB2(:,:,:)                     !
-  real(r8),allocatable ::  RZF1PB2(:,:,:)                     !
-  real(r8),allocatable ::  RZF2PB2(:,:,:)                     !
-  real(r8),allocatable ::  RZC0PB2(:,:,:)                     !
-  real(r8),allocatable ::  RZC1PB2(:,:,:)                     !
-  real(r8),allocatable ::  RZC2PB2(:,:,:)                     !
-  real(r8),allocatable ::  RZM1PB2(:,:,:)                     !
-  real(r8),allocatable ::  H0PO42(:,:,:)                      !
-  real(r8),allocatable ::  H3PO42(:,:,:)                      !
-  real(r8),allocatable ::  ZFE1P2(:,:,:)                      !
-  real(r8),allocatable ::  ZFE2P2(:,:,:)                      !
-  real(r8),allocatable ::  ZCA0P2(:,:,:)                      !
-  real(r8),allocatable ::  ZCA1P2(:,:,:)                      !
-  real(r8),allocatable ::  ZCA2P2(:,:,:)                      !
-  real(r8),allocatable ::  ZMG1P2(:,:,:)                      !
-  real(r8),allocatable ::  H0POB2(:,:,:)                      !
-  real(r8),allocatable ::  H3POB2(:,:,:)                      !
-  real(r8),allocatable ::  ZF1PB2(:,:,:)                      !
-  real(r8),allocatable ::  ZF2PB2(:,:,:)                      !
-  real(r8),allocatable ::  ZC0PB2(:,:,:)                      !
-  real(r8),allocatable ::  ZC1PB2(:,:,:)                      !
-  real(r8),allocatable ::  ZC2PB2(:,:,:)                      !
-  real(r8),allocatable ::  ZM1PB2(:,:,:)                      !
-  real(r8),allocatable ::  ZAL2(:,:,:)                        !
+
+  real(r8),allocatable ::  trcsa_solml2(:,:,:,:)              !
   real(r8),allocatable ::  ZFE2(:,:,:)                        !
-  real(r8),allocatable ::  ZHY2(:,:,:)                        !
-  real(r8),allocatable ::  ZCA2(:,:,:)                        !
-  real(r8),allocatable ::  ZMG2(:,:,:)                        !
-  real(r8),allocatable ::  ZNA2(:,:,:)                        !
-  real(r8),allocatable ::  ZKA2(:,:,:)                        !
-  real(r8),allocatable ::  ZOH2(:,:,:)                        !
-  real(r8),allocatable ::  ZSO42(:,:,:)                       !
   real(r8),allocatable ::  ZHCO32(:,:,:)                      !
-  real(r8),allocatable ::  ZCL2(:,:,:)                        !
-  real(r8),allocatable ::  ZCO32(:,:,:)                       !
-  real(r8),allocatable ::  ZAL12(:,:,:)                       !
-  real(r8),allocatable ::  ZAL22(:,:,:)                       !
-  real(r8),allocatable ::  ZAL32(:,:,:)                       !
-  real(r8),allocatable ::  ZAL42(:,:,:)                       !
-  real(r8),allocatable ::  ZALS2(:,:,:)                       !
-  real(r8),allocatable ::  ZFE12(:,:,:)                       !
-  real(r8),allocatable ::  ZFE22(:,:,:)                       !
-  real(r8),allocatable ::  ZFE32(:,:,:)                       !
-  real(r8),allocatable ::  ZFE42(:,:,:)                       !
-  real(r8),allocatable ::  ZFES2(:,:,:)                       !
-  real(r8),allocatable ::  ZCAO2(:,:,:)                       !
-  real(r8),allocatable ::  ZCAC2(:,:,:)                       !
-  real(r8),allocatable ::  ZCAH2(:,:,:)                       !
-  real(r8),allocatable ::  ZCAS2(:,:,:)                       !
-  real(r8),allocatable ::  ZMGO2(:,:,:)                       !
-  real(r8),allocatable ::  ZMGC2(:,:,:)                       !
-  real(r8),allocatable ::  ZMGH2(:,:,:)                       !
-  real(r8),allocatable ::  ZMGS2(:,:,:)                       !
-  real(r8),allocatable ::  ZNAC2(:,:,:)                       !
-  real(r8),allocatable ::  ZNAS2(:,:,:)                       !
-  real(r8),allocatable ::  ZKAS2(:,:,:)                       !
-  real(r8),allocatable ::  RZAL2(:,:,:)                       !
-  real(r8),allocatable ::  RZFE2(:,:,:)                       !
-  real(r8),allocatable ::  RZHY2(:,:,:)                       !
-  real(r8),allocatable ::  RZCA2(:,:,:)                       !
-  real(r8),allocatable ::  RZMG2(:,:,:)                       !
-  real(r8),allocatable ::  RZNA2(:,:,:)                       !
-  real(r8),allocatable ::  RZKA2(:,:,:)                       !
-  real(r8),allocatable ::  RZOH2(:,:,:)                       !
-  real(r8),allocatable ::  RZSO42(:,:,:)                      !
-  real(r8),allocatable ::  RZHCO32(:,:,:)                     !
-  real(r8),allocatable ::  RZCL2(:,:,:)                       !
-  real(r8),allocatable ::  RZCO32(:,:,:)                      !
-  real(r8),allocatable ::  RZAL12(:,:,:)                      !
-  real(r8),allocatable ::  RZAL22(:,:,:)                      !
-  real(r8),allocatable ::  RZAL32(:,:,:)                      !
-  real(r8),allocatable ::  RZAL42(:,:,:)                      !
-  real(r8),allocatable ::  RZALS2(:,:,:)                      !
-  real(r8),allocatable ::  RZFE12(:,:,:)                      !
-  real(r8),allocatable ::  RZFE22(:,:,:)                      !
-  real(r8),allocatable ::  RZFE32(:,:,:)                      !
-  real(r8),allocatable ::  RZFE42(:,:,:)                      !
-  real(r8),allocatable ::  RZFES2(:,:,:)                      !
-  real(r8),allocatable ::  RZCAO2(:,:,:)                      !
-  real(r8),allocatable ::  RZCAC2(:,:,:)                      !
-  real(r8),allocatable ::  RZCAH2(:,:,:)                      !
-  real(r8),allocatable ::  RZCAS2(:,:,:)                      !
-  real(r8),allocatable ::  RZMGO2(:,:,:)                      !
-  real(r8),allocatable ::  RZMGC2(:,:,:)                      !
-  real(r8),allocatable ::  RZMGH2(:,:,:)                      !
-  real(r8),allocatable ::  RZMGS2(:,:,:)                      !
-  real(r8),allocatable ::  RZNAC2(:,:,:)                      !
-  real(r8),allocatable ::  RZNAS2(:,:,:)                      !
-  real(r8),allocatable ::  RZKAS2(:,:,:)                      !
-  real(r8),allocatable ::  RH0PO42(:,:,:)                     !
-  real(r8),allocatable ::  RH3PO42(:,:,:)                     !
-  real(r8),allocatable ::  RZFE1P2(:,:,:)                     !
-  real(r8),allocatable ::  RZFE2P2(:,:,:)                     !
-  real(r8),allocatable ::  RZCA0P2(:,:,:)                     !
-  real(r8),allocatable ::  RZCA1P2(:,:,:)                     !
-  real(r8),allocatable ::  RZCA2P2(:,:,:)                     !
-  real(r8),allocatable ::  RZMG1P2(:,:,:)                     !
+  real(r8),allocatable ::  trcsa_solml2R(:,:,:,:)                       !
   real(r8),allocatable ::  RALBLS(:,:,:)                      !
   real(r8),allocatable ::  RFEBLS(:,:,:)                      !
   real(r8),allocatable ::  RHYBLS(:,:,:)                      !
@@ -302,55 +169,7 @@ implicit none
   real(r8),allocatable ::  trcsa_TBLS(:,:,:,:)
 
   real(r8),allocatable ::  POSGL2(:,:,:)                      !
-  real(r8),allocatable ::  RALFLS(:,:,:,:)                    !
-  real(r8),allocatable ::  RFEFLS(:,:,:,:)                    !
-  real(r8),allocatable ::  RHYFLS(:,:,:,:)                    !
-  real(r8),allocatable ::  RCAFLS(:,:,:,:)                    !
-  real(r8),allocatable ::  RMGFLS(:,:,:,:)                    !
-  real(r8),allocatable ::  RNAFLS(:,:,:,:)                    !
-  real(r8),allocatable ::  RKAFLS(:,:,:,:)                    !
-  real(r8),allocatable ::  ROHFLS(:,:,:,:)                    !
-  real(r8),allocatable ::  RSOFLS(:,:,:,:)                    !
-  real(r8),allocatable ::  RCLFLS(:,:,:,:)                    !
-  real(r8),allocatable ::  RC3FLS(:,:,:,:)                    !
-  real(r8),allocatable ::  RHCFLS(:,:,:,:)                    !
-  real(r8),allocatable ::  RAL1FS(:,:,:,:)                    !
-  real(r8),allocatable ::  RAL2FS(:,:,:,:)                    !
-  real(r8),allocatable ::  RAL3FS(:,:,:,:)                    !
-  real(r8),allocatable ::  RAL4FS(:,:,:,:)                    !
-  real(r8),allocatable ::  RALSFS(:,:,:,:)                    !
-  real(r8),allocatable ::  RFE1FS(:,:,:,:)                    !
-  real(r8),allocatable ::  RFE2FS(:,:,:,:)                    !
-  real(r8),allocatable ::  RFE3FS(:,:,:,:)                    !
-  real(r8),allocatable ::  RFE4FS(:,:,:,:)                    !
-  real(r8),allocatable ::  RFESFS(:,:,:,:)                    !
-  real(r8),allocatable ::  RCAOFS(:,:,:,:)                    !
-  real(r8),allocatable ::  RCACFS(:,:,:,:)                    !
-  real(r8),allocatable ::  RCAHFS(:,:,:,:)                    !
-  real(r8),allocatable ::  RCASFS(:,:,:,:)                    !
-  real(r8),allocatable ::  RMGOFS(:,:,:,:)                    !
-  real(r8),allocatable ::  RMGCFS(:,:,:,:)                    !
-  real(r8),allocatable ::  RMGHFS(:,:,:,:)                    !
-  real(r8),allocatable ::  RMGSFS(:,:,:,:)                    !
-  real(r8),allocatable ::  RNACFS(:,:,:,:)                    !
-  real(r8),allocatable ::  RNASFS(:,:,:,:)                    !
-  real(r8),allocatable ::  RKASFS(:,:,:,:)                    !
-  real(r8),allocatable ::  RH0PFS(:,:,:,:)                    !
-  real(r8),allocatable ::  RH3PFS(:,:,:,:)                    !
-  real(r8),allocatable ::  RF1PFS(:,:,:,:)                    !
-  real(r8),allocatable ::  RF2PFS(:,:,:,:)                    !
-  real(r8),allocatable ::  RC0PFS(:,:,:,:)                    !
-  real(r8),allocatable ::  RC1PFS(:,:,:,:)                    !
-  real(r8),allocatable ::  RC2PFS(:,:,:,:)                    !
-  real(r8),allocatable ::  RM1PFS(:,:,:,:)                    !
-  real(r8),allocatable ::  RH0BFB(:,:,:,:)                    !
-  real(r8),allocatable ::  RH3BFB(:,:,:,:)                    !
-  real(r8),allocatable ::  RF1BFB(:,:,:,:)                    !
-  real(r8),allocatable ::  RF2BFB(:,:,:,:)                    !
-  real(r8),allocatable ::  RC0BFB(:,:,:,:)                    !
-  real(r8),allocatable ::  RC1BFB(:,:,:,:)                    !
-  real(r8),allocatable ::  RC2BFB(:,:,:,:)                    !
-  real(r8),allocatable ::  RM1BFB(:,:,:,:)                    !
+  real(r8),allocatable ::  trcsa_RFLS(:,:,:,:,:)                    !
   real(r8),allocatable ::  RALFHS(:,:,:,:)                    !
   real(r8),allocatable ::  RFEFHS(:,:,:,:)                    !
   real(r8),allocatable ::  RHYFHS(:,:,:,:)                    !
@@ -651,47 +470,7 @@ contains
   allocate(RQRC1P(2,2,JV,JH));  RQRC1P=0._r8
   allocate(RQRC2P(2,2,JV,JH));  RQRC2P=0._r8
   allocate(RQRM1P(2,2,JV,JH));  RQRM1P=0._r8
-  allocate(RQSAL(2,JV,JH));     RQSAL=0._r8
-  allocate(RQSFE(2,JV,JH));     RQSFE=0._r8
-  allocate(RQSHY(2,JV,JH));     RQSHY=0._r8
-  allocate(RQSCA(2,JV,JH));     RQSCA=0._r8
-  allocate(RQSMG(2,JV,JH));     RQSMG=0._r8
-  allocate(RQSNA(2,JV,JH));     RQSNA=0._r8
-  allocate(RQSKA(2,JV,JH));     RQSKA=0._r8
-  allocate(RQSOH(2,JV,JH));     RQSOH=0._r8
-  allocate(RQSSO(2,JV,JH));     RQSSO=0._r8
-  allocate(RQSCL(2,JV,JH));     RQSCL=0._r8
-  allocate(RQSC3(2,JV,JH));     RQSC3=0._r8
-  allocate(RQSHC(2,JV,JH));     RQSHC=0._r8
-  allocate(RQSAL1(2,JV,JH));    RQSAL1=0._r8
-  allocate(RQSAL2(2,JV,JH));    RQSAL2=0._r8
-  allocate(RQSAL3(2,JV,JH));    RQSAL3=0._r8
-  allocate(RQSAL4(2,JV,JH));    RQSAL4=0._r8
-  allocate(RQSALS(2,JV,JH));    RQSALS=0._r8
-  allocate(RQSFE1(2,JV,JH));    RQSFE1=0._r8
-  allocate(RQSFE2(2,JV,JH));    RQSFE2=0._r8
-  allocate(RQSFE3(2,JV,JH));    RQSFE3=0._r8
-  allocate(RQSFE4(2,JV,JH));    RQSFE4=0._r8
-  allocate(RQSFES(2,JV,JH));    RQSFES=0._r8
-  allocate(RQSCAO(2,JV,JH));    RQSCAO=0._r8
-  allocate(RQSCAC(2,JV,JH));    RQSCAC=0._r8
-  allocate(RQSCAH(2,JV,JH));    RQSCAH=0._r8
-  allocate(RQSCAS(2,JV,JH));    RQSCAS=0._r8
-  allocate(RQSMGO(2,JV,JH));    RQSMGO=0._r8
-  allocate(RQSMGC(2,JV,JH));    RQSMGC=0._r8
-  allocate(RQSMGH(2,JV,JH));    RQSMGH=0._r8
-  allocate(RQSMGS(2,JV,JH));    RQSMGS=0._r8
-  allocate(RQSNAC(2,JV,JH));    RQSNAC=0._r8
-  allocate(RQSNAS(2,JV,JH));    RQSNAS=0._r8
-  allocate(RQSKAS(2,JV,JH));    RQSKAS=0._r8
-  allocate(RQSH0P(2,JV,JH));    RQSH0P=0._r8
-  allocate(RQSH3P(2,JV,JH));    RQSH3P=0._r8
-  allocate(RQSF1P(2,JV,JH));    RQSF1P=0._r8
-  allocate(RQSF2P(2,JV,JH));    RQSF2P=0._r8
-  allocate(RQSC0P(2,JV,JH));    RQSC0P=0._r8
-  allocate(RQSC1P(2,JV,JH));    RQSC1P=0._r8
-  allocate(RQSC2P(2,JV,JH));    RQSC2P=0._r8
-  allocate(RQSM1P(2,JV,JH));    RQSM1P=0._r8
+  allocate(trcsa_RQ(idsa_beg:idsab_end,2,JV,JH));     trcsa_RQ=0._r8
   allocate(RQRAL0(JY,JX));      RQRAL0=0._r8
   allocate(RQRFE0(JY,JX));      RQRFE0=0._r8
   allocate(RQRHY0(JY,JX));      RQRHY0=0._r8
@@ -733,104 +512,6 @@ contains
   allocate(RQRC1P0(JY,JX));     RQRC1P0=0._r8
   allocate(RQRC2P0(JY,JX));     RQRC2P0=0._r8
   allocate(RQRM1P0(JY,JX));     RQRM1P0=0._r8
-  allocate(RH0POB2(JZ,JY,JX));  RH0POB2=0._r8
-  allocate(RH3POB2(JZ,JY,JX));  RH3POB2=0._r8
-  allocate(RZF1PB2(JZ,JY,JX));  RZF1PB2=0._r8
-  allocate(RZF2PB2(JZ,JY,JX));  RZF2PB2=0._r8
-  allocate(RZC0PB2(JZ,JY,JX));  RZC0PB2=0._r8
-  allocate(RZC1PB2(JZ,JY,JX));  RZC1PB2=0._r8
-  allocate(RZC2PB2(JZ,JY,JX));  RZC2PB2=0._r8
-  allocate(RZM1PB2(JZ,JY,JX));  RZM1PB2=0._r8
-  allocate(H0PO42(0:JZ,JY,JX)); H0PO42=0._r8
-  allocate(H3PO42(0:JZ,JY,JX)); H3PO42=0._r8
-  allocate(ZFE1P2(0:JZ,JY,JX)); ZFE1P2=0._r8
-  allocate(ZFE2P2(0:JZ,JY,JX)); ZFE2P2=0._r8
-  allocate(ZCA0P2(0:JZ,JY,JX)); ZCA0P2=0._r8
-  allocate(ZCA1P2(0:JZ,JY,JX)); ZCA1P2=0._r8
-  allocate(ZCA2P2(0:JZ,JY,JX)); ZCA2P2=0._r8
-  allocate(ZMG1P2(0:JZ,JY,JX)); ZMG1P2=0._r8
-  allocate(H0POB2(JZ,JY,JX));   H0POB2=0._r8
-  allocate(H3POB2(JZ,JY,JX));   H3POB2=0._r8
-  allocate(ZF1PB2(JZ,JY,JX));   ZF1PB2=0._r8
-  allocate(ZF2PB2(JZ,JY,JX));   ZF2PB2=0._r8
-  allocate(ZC0PB2(JZ,JY,JX));   ZC0PB2=0._r8
-  allocate(ZC1PB2(JZ,JY,JX));   ZC1PB2=0._r8
-  allocate(ZC2PB2(JZ,JY,JX));   ZC2PB2=0._r8
-  allocate(ZM1PB2(JZ,JY,JX));   ZM1PB2=0._r8
-  allocate(ZAL2(0:JZ,JY,JX));   ZAL2=0._r8
-  allocate(ZFE2(0:JZ,JY,JX));   ZFE2=0._r8
-  allocate(ZHY2(0:JZ,JY,JX));   ZHY2=0._r8
-  allocate(ZCA2(0:JZ,JY,JX));   ZCA2=0._r8
-  allocate(ZMG2(0:JZ,JY,JX));   ZMG2=0._r8
-  allocate(ZNA2(0:JZ,JY,JX));   ZNA2=0._r8
-  allocate(ZKA2(0:JZ,JY,JX));   ZKA2=0._r8
-  allocate(ZOH2(0:JZ,JY,JX));   ZOH2=0._r8
-  allocate(ZSO42(0:JZ,JY,JX));  ZSO42=0._r8
-  allocate(ZHCO32(0:JZ,JY,JX)); ZHCO32=0._r8
-  allocate(ZCL2(0:JZ,JY,JX));   ZCL2=0._r8
-  allocate(ZCO32(0:JZ,JY,JX));  ZCO32=0._r8
-  allocate(ZAL12(0:JZ,JY,JX));  ZAL12=0._r8
-  allocate(ZAL22(0:JZ,JY,JX));  ZAL22=0._r8
-  allocate(ZAL32(0:JZ,JY,JX));  ZAL32=0._r8
-  allocate(ZAL42(0:JZ,JY,JX));  ZAL42=0._r8
-  allocate(ZALS2(0:JZ,JY,JX));  ZALS2=0._r8
-  allocate(ZFE12(0:JZ,JY,JX));  ZFE12=0._r8
-  allocate(ZFE22(0:JZ,JY,JX));  ZFE22=0._r8
-  allocate(ZFE32(0:JZ,JY,JX));  ZFE32=0._r8
-  allocate(ZFE42(0:JZ,JY,JX));  ZFE42=0._r8
-  allocate(ZFES2(0:JZ,JY,JX));  ZFES2=0._r8
-  allocate(ZCAO2(0:JZ,JY,JX));  ZCAO2=0._r8
-  allocate(ZCAC2(0:JZ,JY,JX));  ZCAC2=0._r8
-  allocate(ZCAH2(0:JZ,JY,JX));  ZCAH2=0._r8
-  allocate(ZCAS2(0:JZ,JY,JX));  ZCAS2=0._r8
-  allocate(ZMGO2(0:JZ,JY,JX));  ZMGO2=0._r8
-  allocate(ZMGC2(0:JZ,JY,JX));  ZMGC2=0._r8
-  allocate(ZMGH2(0:JZ,JY,JX));  ZMGH2=0._r8
-  allocate(ZMGS2(0:JZ,JY,JX));  ZMGS2=0._r8
-  allocate(ZNAC2(0:JZ,JY,JX));  ZNAC2=0._r8
-  allocate(ZNAS2(0:JZ,JY,JX));  ZNAS2=0._r8
-  allocate(ZKAS2(0:JZ,JY,JX));  ZKAS2=0._r8
-  allocate(RZAL2(0:JZ,JY,JX));  RZAL2=0._r8
-  allocate(RZFE2(0:JZ,JY,JX));  RZFE2=0._r8
-  allocate(RZHY2(0:JZ,JY,JX));  RZHY2=0._r8
-  allocate(RZCA2(0:JZ,JY,JX));  RZCA2=0._r8
-  allocate(RZMG2(0:JZ,JY,JX));  RZMG2=0._r8
-  allocate(RZNA2(0:JZ,JY,JX));  RZNA2=0._r8
-  allocate(RZKA2(0:JZ,JY,JX));  RZKA2=0._r8
-  allocate(RZOH2(0:JZ,JY,JX));  RZOH2=0._r8
-  allocate(RZSO42(0:JZ,JY,JX)); RZSO42=0._r8
-  allocate(RZHCO32(0:JZ,JY,JX));RZHCO32=0._r8
-  allocate(RZCL2(0:JZ,JY,JX));  RZCL2=0._r8
-  allocate(RZCO32(0:JZ,JY,JX)); RZCO32=0._r8
-  allocate(RZAL12(0:JZ,JY,JX)); RZAL12=0._r8
-  allocate(RZAL22(0:JZ,JY,JX)); RZAL22=0._r8
-  allocate(RZAL32(0:JZ,JY,JX)); RZAL32=0._r8
-  allocate(RZAL42(0:JZ,JY,JX)); RZAL42=0._r8
-  allocate(RZALS2(0:JZ,JY,JX)); RZALS2=0._r8
-  allocate(RZFE12(0:JZ,JY,JX)); RZFE12=0._r8
-  allocate(RZFE22(0:JZ,JY,JX)); RZFE22=0._r8
-  allocate(RZFE32(0:JZ,JY,JX)); RZFE32=0._r8
-  allocate(RZFE42(0:JZ,JY,JX)); RZFE42=0._r8
-  allocate(RZFES2(0:JZ,JY,JX)); RZFES2=0._r8
-  allocate(RZCAO2(0:JZ,JY,JX)); RZCAO2=0._r8
-  allocate(RZCAC2(0:JZ,JY,JX)); RZCAC2=0._r8
-  allocate(RZCAH2(0:JZ,JY,JX)); RZCAH2=0._r8
-  allocate(RZCAS2(0:JZ,JY,JX)); RZCAS2=0._r8
-  allocate(RZMGO2(0:JZ,JY,JX)); RZMGO2=0._r8
-  allocate(RZMGC2(0:JZ,JY,JX)); RZMGC2=0._r8
-  allocate(RZMGH2(0:JZ,JY,JX)); RZMGH2=0._r8
-  allocate(RZMGS2(0:JZ,JY,JX)); RZMGS2=0._r8
-  allocate(RZNAC2(0:JZ,JY,JX)); RZNAC2=0._r8
-  allocate(RZNAS2(0:JZ,JY,JX)); RZNAS2=0._r8
-  allocate(RZKAS2(0:JZ,JY,JX)); RZKAS2=0._r8
-  allocate(RH0PO42(0:JZ,JY,JX));RH0PO42=0._r8
-  allocate(RH3PO42(0:JZ,JY,JX));RH3PO42=0._r8
-  allocate(RZFE1P2(0:JZ,JY,JX));RZFE1P2=0._r8
-  allocate(RZFE2P2(0:JZ,JY,JX));RZFE2P2=0._r8
-  allocate(RZCA0P2(0:JZ,JY,JX));RZCA0P2=0._r8
-  allocate(RZCA1P2(0:JZ,JY,JX));RZCA1P2=0._r8
-  allocate(RZCA2P2(0:JZ,JY,JX));RZCA2P2=0._r8
-  allocate(RZMG1P2(0:JZ,JY,JX));RZMG1P2=0._r8
   allocate(RALBLS(JS,JY,JX));   RALBLS=0._r8
   allocate(RFEBLS(JS,JY,JX));   RFEBLS=0._r8
   allocate(RHYBLS(JS,JY,JX));   RHYBLS=0._r8
@@ -875,55 +556,7 @@ contains
   allocate(trcsa_TBLS(idsa_beg:idsa_end,JS,JY,JX)); trcsa_TBLS=0._r8
 
   allocate(POSGL2(JZ,JY,JX));   POSGL2=0._r8
-  allocate(RALFLS(3,0:JD,JV,JH));RALFLS=0._r8
-  allocate(RFEFLS(3,0:JD,JV,JH));RFEFLS=0._r8
-  allocate(RHYFLS(3,0:JD,JV,JH));RHYFLS=0._r8
-  allocate(RCAFLS(3,0:JD,JV,JH));RCAFLS=0._r8
-  allocate(RMGFLS(3,0:JD,JV,JH));RMGFLS=0._r8
-  allocate(RNAFLS(3,0:JD,JV,JH));RNAFLS=0._r8
-  allocate(RKAFLS(3,0:JD,JV,JH));RKAFLS=0._r8
-  allocate(ROHFLS(3,0:JD,JV,JH));ROHFLS=0._r8
-  allocate(RSOFLS(3,0:JD,JV,JH));RSOFLS=0._r8
-  allocate(RCLFLS(3,0:JD,JV,JH));RCLFLS=0._r8
-  allocate(RC3FLS(3,0:JD,JV,JH));RC3FLS=0._r8
-  allocate(RHCFLS(3,0:JD,JV,JH));RHCFLS=0._r8
-  allocate(RAL1FS(3,0:JD,JV,JH));RAL1FS=0._r8
-  allocate(RAL2FS(3,0:JD,JV,JH));RAL2FS=0._r8
-  allocate(RAL3FS(3,0:JD,JV,JH));RAL3FS=0._r8
-  allocate(RAL4FS(3,0:JD,JV,JH));RAL4FS=0._r8
-  allocate(RALSFS(3,0:JD,JV,JH));RALSFS=0._r8
-  allocate(RFE1FS(3,0:JD,JV,JH));RFE1FS=0._r8
-  allocate(RFE2FS(3,0:JD,JV,JH));RFE2FS=0._r8
-  allocate(RFE3FS(3,0:JD,JV,JH));RFE3FS=0._r8
-  allocate(RFE4FS(3,0:JD,JV,JH));RFE4FS=0._r8
-  allocate(RFESFS(3,0:JD,JV,JH));RFESFS=0._r8
-  allocate(RCAOFS(3,0:JD,JV,JH));RCAOFS=0._r8
-  allocate(RCACFS(3,0:JD,JV,JH));RCACFS=0._r8
-  allocate(RCAHFS(3,0:JD,JV,JH));RCAHFS=0._r8
-  allocate(RCASFS(3,0:JD,JV,JH));RCASFS=0._r8
-  allocate(RMGOFS(3,0:JD,JV,JH));RMGOFS=0._r8
-  allocate(RMGCFS(3,0:JD,JV,JH));RMGCFS=0._r8
-  allocate(RMGHFS(3,0:JD,JV,JH));RMGHFS=0._r8
-  allocate(RMGSFS(3,0:JD,JV,JH));RMGSFS=0._r8
-  allocate(RNACFS(3,0:JD,JV,JH));RNACFS=0._r8
-  allocate(RNASFS(3,0:JD,JV,JH));RNASFS=0._r8
-  allocate(RKASFS(3,0:JD,JV,JH));RKASFS=0._r8
-  allocate(RH0PFS(3,0:JD,JV,JH));RH0PFS=0._r8
-  allocate(RH3PFS(3,0:JD,JV,JH));RH3PFS=0._r8
-  allocate(RF1PFS(3,0:JD,JV,JH));RF1PFS=0._r8
-  allocate(RF2PFS(3,0:JD,JV,JH));RF2PFS=0._r8
-  allocate(RC0PFS(3,0:JD,JV,JH));RC0PFS=0._r8
-  allocate(RC1PFS(3,0:JD,JV,JH));RC1PFS=0._r8
-  allocate(RC2PFS(3,0:JD,JV,JH));RC2PFS=0._r8
-  allocate(RM1PFS(3,0:JD,JV,JH));RM1PFS=0._r8
-  allocate(RH0BFB(3,0:JD,JV,JH));RH0BFB=0._r8
-  allocate(RH3BFB(3,0:JD,JV,JH));RH3BFB=0._r8
-  allocate(RF1BFB(3,0:JD,JV,JH));RF1BFB=0._r8
-  allocate(RF2BFB(3,0:JD,JV,JH));RF2BFB=0._r8
-  allocate(RC0BFB(3,0:JD,JV,JH));RC0BFB=0._r8
-  allocate(RC1BFB(3,0:JD,JV,JH));RC1BFB=0._r8
-  allocate(RC2BFB(3,0:JD,JV,JH));RC2BFB=0._r8
-  allocate(RM1BFB(3,0:JD,JV,JH));RM1BFB=0._r8
+  allocate(trcsa_RFLS(idsa_beg:idsab_end,3,0:JD,JV,JH));trcsa_RFLS=0._r8
   allocate(RALFHS(3,JD,JV,JH)); RALFHS=0._r8
   allocate(RFEFHS(3,JD,JV,JH)); RFEFHS=0._r8
   allocate(RHYFHS(3,JD,JV,JH)); RHYFHS=0._r8
@@ -1170,6 +803,11 @@ contains
   subroutine DestructTrnsfrsData
   use abortutils, only : destroy
   implicit none
+
+  call destroy(trcsa_RFLS)
+  call destroy(trcsa_solml2)
+  call destroy(trcsa_solml2R)
+
   call destroy(ALSGL2)
   call destroy(FESGL2)
   call destroy(HYSGL2)
@@ -1223,47 +861,7 @@ contains
   call destroy(RQRC1P)
   call destroy(RQRC2P)
   call destroy(RQRM1P)
-  call destroy(RQSAL)
-  call destroy(RQSFE)
-  call destroy(RQSHY)
-  call destroy(RQSCA)
-  call destroy(RQSMG)
-  call destroy(RQSNA)
-  call destroy(RQSKA)
-  call destroy(RQSOH)
-  call destroy(RQSSO)
-  call destroy(RQSCL)
-  call destroy(RQSC3)
-  call destroy(RQSHC)
-  call destroy(RQSAL1)
-  call destroy(RQSAL2)
-  call destroy(RQSAL3)
-  call destroy(RQSAL4)
-  call destroy(RQSALS)
-  call destroy(RQSFE1)
-  call destroy(RQSFE2)
-  call destroy(RQSFE3)
-  call destroy(RQSFE4)
-  call destroy(RQSFES)
-  call destroy(RQSCAO)
-  call destroy(RQSCAC)
-  call destroy(RQSCAH)
-  call destroy(RQSCAS)
-  call destroy(RQSMGO)
-  call destroy(RQSMGC)
-  call destroy(RQSMGH)
-  call destroy(RQSMGS)
-  call destroy(RQSNAC)
-  call destroy(RQSNAS)
-  call destroy(RQSKAS)
-  call destroy(RQSH0P)
-  call destroy(RQSH3P)
-  call destroy(RQSF1P)
-  call destroy(RQSF2P)
-  call destroy(RQSC0P)
-  call destroy(RQSC1P)
-  call destroy(RQSC2P)
-  call destroy(RQSM1P)
+  call destroy(trcsa_RQ)
   call destroy(RQRAL0)
   call destroy(RQRFE0)
   call destroy(RQRHY0)
@@ -1305,104 +903,6 @@ contains
   call destroy(RQRC1P0)
   call destroy(RQRC2P0)
   call destroy(RQRM1P0)
-  call destroy(RH0POB2)
-  call destroy(RH3POB2)
-  call destroy(RZF1PB2)
-  call destroy(RZF2PB2)
-  call destroy(RZC0PB2)
-  call destroy(RZC1PB2)
-  call destroy(RZC2PB2)
-  call destroy(RZM1PB2)
-  call destroy(H0PO42)
-  call destroy(H3PO42)
-  call destroy(ZFE1P2)
-  call destroy(ZFE2P2)
-  call destroy(ZCA0P2)
-  call destroy(ZCA1P2)
-  call destroy(ZCA2P2)
-  call destroy(ZMG1P2)
-  call destroy(H0POB2)
-  call destroy(H3POB2)
-  call destroy(ZF1PB2)
-  call destroy(ZF2PB2)
-  call destroy(ZC0PB2)
-  call destroy(ZC1PB2)
-  call destroy(ZC2PB2)
-  call destroy(ZM1PB2)
-  call destroy(ZAL2)
-  call destroy(ZFE2)
-  call destroy(ZHY2)
-  call destroy(ZCA2)
-  call destroy(ZMG2)
-  call destroy(ZNA2)
-  call destroy(ZKA2)
-  call destroy(ZOH2)
-  call destroy(ZSO42)
-  call destroy(ZHCO32)
-  call destroy(ZCL2)
-  call destroy(ZCO32)
-  call destroy(ZAL12)
-  call destroy(ZAL22)
-  call destroy(ZAL32)
-  call destroy(ZAL42)
-  call destroy(ZALS2)
-  call destroy(ZFE12)
-  call destroy(ZFE22)
-  call destroy(ZFE32)
-  call destroy(ZFE42)
-  call destroy(ZFES2)
-  call destroy(ZCAO2)
-  call destroy(ZCAC2)
-  call destroy(ZCAH2)
-  call destroy(ZCAS2)
-  call destroy(ZMGO2)
-  call destroy(ZMGC2)
-  call destroy(ZMGH2)
-  call destroy(ZMGS2)
-  call destroy(ZNAC2)
-  call destroy(ZNAS2)
-  call destroy(ZKAS2)
-  call destroy(RZAL2)
-  call destroy(RZFE2)
-  call destroy(RZHY2)
-  call destroy(RZCA2)
-  call destroy(RZMG2)
-  call destroy(RZNA2)
-  call destroy(RZKA2)
-  call destroy(RZOH2)
-  call destroy(RZSO42)
-  call destroy(RZHCO32)
-  call destroy(RZCL2)
-  call destroy(RZCO32)
-  call destroy(RZAL12)
-  call destroy(RZAL22)
-  call destroy(RZAL32)
-  call destroy(RZAL42)
-  call destroy(RZALS2)
-  call destroy(RZFE12)
-  call destroy(RZFE22)
-  call destroy(RZFE32)
-  call destroy(RZFE42)
-  call destroy(RZFES2)
-  call destroy(RZCAO2)
-  call destroy(RZCAC2)
-  call destroy(RZCAH2)
-  call destroy(RZCAS2)
-  call destroy(RZMGO2)
-  call destroy(RZMGC2)
-  call destroy(RZMGH2)
-  call destroy(RZMGS2)
-  call destroy(RZNAC2)
-  call destroy(RZNAS2)
-  call destroy(RZKAS2)
-  call destroy(RH0PO42)
-  call destroy(RH3PO42)
-  call destroy(RZFE1P2)
-  call destroy(RZFE2P2)
-  call destroy(RZCA0P2)
-  call destroy(RZCA1P2)
-  call destroy(RZCA2P2)
-  call destroy(RZMG1P2)
   call destroy(RALBLS)
   call destroy(RFEBLS)
   call destroy(RHYBLS)
@@ -1446,55 +946,6 @@ contains
   call destroy(RM1PBS)
 
   call destroy(POSGL2)
-  call destroy(RALFLS)
-  call destroy(RFEFLS)
-  call destroy(RHYFLS)
-  call destroy(RCAFLS)
-  call destroy(RMGFLS)
-  call destroy(RNAFLS)
-  call destroy(RKAFLS)
-  call destroy(ROHFLS)
-  call destroy(RSOFLS)
-  call destroy(RCLFLS)
-  call destroy(RC3FLS)
-  call destroy(RHCFLS)
-  call destroy(RAL1FS)
-  call destroy(RAL2FS)
-  call destroy(RAL3FS)
-  call destroy(RAL4FS)
-  call destroy(RALSFS)
-  call destroy(RFE1FS)
-  call destroy(RFE2FS)
-  call destroy(RFE3FS)
-  call destroy(RFE4FS)
-  call destroy(RFESFS)
-  call destroy(RCAOFS)
-  call destroy(RCACFS)
-  call destroy(RCAHFS)
-  call destroy(RCASFS)
-  call destroy(RMGOFS)
-  call destroy(RMGCFS)
-  call destroy(RMGHFS)
-  call destroy(RMGSFS)
-  call destroy(RNACFS)
-  call destroy(RNASFS)
-  call destroy(RKASFS)
-  call destroy(RH0PFS)
-  call destroy(RH3PFS)
-  call destroy(RF1PFS)
-  call destroy(RF2PFS)
-  call destroy(RC0PFS)
-  call destroy(RC1PFS)
-  call destroy(RC2PFS)
-  call destroy(RM1PFS)
-  call destroy(RH0BFB)
-  call destroy(RH3BFB)
-  call destroy(RF1BFB)
-  call destroy(RF2BFB)
-  call destroy(RC0BFB)
-  call destroy(RC1BFB)
-  call destroy(RC2BFB)
-  call destroy(RM1BFB)
   call destroy(RALFHS)
   call destroy(RFEFHS)
   call destroy(RHYFHS)
