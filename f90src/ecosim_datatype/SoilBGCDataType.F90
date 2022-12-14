@@ -123,14 +123,7 @@ implicit none
   real(r8),target,allocatable ::  XN2DFR(:,:)                        !soil surface N2O dissolution (+ve) - volatilization (-ve), [g d-2 h-1]
   real(r8),target,allocatable ::  XN3DFR(:,:)                        !soil surface NH3 dissolution (+ve) - volatilization (-ve), [g d-2 h-1]
   real(r8),target,allocatable ::  XHGDFR(:,:)                        !soil surface H2 dissolution (+ve) - volatilization (-ve), [g d-2 h-1]
-  real(r8),target,allocatable ::  XCOBBL(:,:,:)                      !CO2 bubbling, [g d-2 h-1]
-  real(r8),target,allocatable ::  XCHBBL(:,:,:)                      !CH4 bubbling, [g d-2 h-1]
-  real(r8),target,allocatable ::  XOXBBL(:,:,:)                      !O2 bubbling, [g d-2 h-1]
-  real(r8),target,allocatable ::  XNGBBL(:,:,:)                      !N2 bubbling, [g d-2 h-1]
-  real(r8),target,allocatable ::  XN2BBL(:,:,:)                      !N2O bubbling, [g d-2 h-1]
-  real(r8),target,allocatable ::  XN3BBL(:,:,:)                      !NH3 bubbling non-band, [g d-2 h-1]
-  real(r8),target,allocatable ::  XNBBBL(:,:,:)                      !NH3 bubbling band, [g d-2 h-1]
-  real(r8),target,allocatable ::  XHGBBL(:,:,:)                      !H2 bubbling, [g d-2 h-1]
+  real(r8),target,allocatable ::  trcg_XBLL(:,:,:,:)                      !CO2 bubbling, [g d-2 h-1]
   real(r8),target,allocatable ::  XZHYS(:,:,:)                       !total H+ production
   real(r8),target,allocatable ::  FLW(:,:,:,:)                       !water flux micropore, [m3 d-2 h-1]
   real(r8),target,allocatable ::  FLWH(:,:,:,:)                      !water flux macropore, [m3 d-2 h-1]
@@ -314,14 +307,7 @@ implicit none
   allocate(XN2DFR(JY,JX));      XN2DFR=0._r8
   allocate(XN3DFR(JY,JX));      XN3DFR=0._r8
   allocate(XHGDFR(JY,JX));      XHGDFR=0._r8
-  allocate(XCOBBL(JZ,JY,JX));   XCOBBL=0._r8
-  allocate(XCHBBL(JZ,JY,JX));   XCHBBL=0._r8
-  allocate(XOXBBL(JZ,JY,JX));   XOXBBL=0._r8
-  allocate(XNGBBL(JZ,JY,JX));   XNGBBL=0._r8
-  allocate(XN2BBL(JZ,JY,JX));   XN2BBL=0._r8
-  allocate(XN3BBL(JZ,JY,JX));   XN3BBL=0._r8
-  allocate(XNBBBL(JZ,JY,JX));   XNBBBL=0._r8
-  allocate(XHGBBL(JZ,JY,JX));   XHGBBL=0._r8
+  allocate(trcg_XBLL(idg_beg:idg_end,JZ,JY,JX));  trcg_XBLL=0._r8
   allocate(XZHYS(0:JZ,JY,JX));  XZHYS=0._r8
   allocate(FLW(3,JD,JV,JH));    FLW=0._r8
   allocate(FLWH(3,JD,JV,JH));   FLWH=0._r8
@@ -472,6 +458,7 @@ implicit none
   call destroy(ESNT)
 
   call destroy(trcs_VLN)
+  call destroy(trcg_XBLL)
   call destroy(VLNHB)
 
   call destroy(VLNOB)
@@ -495,14 +482,6 @@ implicit none
   call destroy(XN2DFR)
   call destroy(XN3DFR)
   call destroy(XHGDFR)
-  call destroy(XCOBBL)
-  call destroy(XCHBBL)
-  call destroy(XOXBBL)
-  call destroy(XNGBBL)
-  call destroy(XN2BBL)
-  call destroy(XN3BBL)
-  call destroy(XNBBBL)
-  call destroy(XHGBBL)
   call destroy(XZHYS)
   call destroy(FLW)
   call destroy(FLWH)

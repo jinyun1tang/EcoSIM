@@ -713,24 +713,25 @@ module TrnsfrMod
   RNXFL0(NY,NX)=trcs_XFLS(ids_NO2,3,0,NY,NX)*XNPH
   RH1PF0(NY,NX)=trcs_XFLS(ids_H1PO4,3,0,NY,NX)*XNPH
   RH2PF0(NY,NX)=trcs_XFLS(ids_H2PO4,3,0,NY,NX)*XNPH
-  RCOFL1(NY,NX)=trcs_XFLS(idg_CO2,3,NU(NY,NX),NY,NX)*XNPH
-  RCHFL1(NY,NX)=trcs_XFLS(idg_CH4,3,NU(NY,NX),NY,NX)*XNPH
-  ROXFL1(NY,NX)=trcs_XFLS(idg_O2,3,NU(NY,NX),NY,NX)*XNPH
-  RNGFL1(NY,NX)=trcs_XFLS(idg_N2,3,NU(NY,NX),NY,NX)*XNPH
-  RN2FL1(NY,NX)=trcs_XFLS(idg_N2O,3,NU(NY,NX),NY,NX)*XNPH
-  RHGFL1(NY,NX)=trcs_XFLS(idg_H2,3,NU(NY,NX),NY,NX)*XNPH
-  RN4FL1(NY,NX)=trcs_XFLS(ids_NH4,3,NU(NY,NX),NY,NX)*XNPH
-  RN3FL1(NY,NX)=trcs_XFLS(idg_NH3,3,NU(NY,NX),NY,NX)*XNPH
-  RNOFL1(NY,NX)=trcs_XFLS(ids_NO3,3,NU(NY,NX),NY,NX)*XNPH
-  RNXFL1(NY,NX)=trcs_XFLS(ids_NO2,3,NU(NY,NX),NY,NX)*XNPH
-  RH1PF1(NY,NX)=trcs_XFLS(ids_H1PO4,3,NU(NY,NX),NY,NX)*XNPH
-  RH2PF1(NY,NX)=trcs_XFLS(ids_H2PO4,3,NU(NY,NX),NY,NX)*XNPH
-  RN4FL2(NY,NX)=trcs_XFLS(ids_NH4B,3,NU(NY,NX),NY,NX)*XNPH
-  RN3FL2(NY,NX)=trcs_XFLS(idg_NH3B,3,NU(NY,NX),NY,NX)*XNPH
-  RNOFL2(NY,NX)=trcs_XFLS(ids_NO3B,3,NU(NY,NX),NY,NX)*XNPH
-  RNXFL2(NY,NX)=trcs_XFLS(ids_NO2B,3,NU(NY,NX),NY,NX)*XNPH
-  RH1BF2(NY,NX)=trcs_XFLS(ids_H1PO4B,3,NU(NY,NX),NY,NX)*XNPH
-  RH2BF2(NY,NX)=trcs_XFLS(ids_H2PO4B,3,NU(NY,NX),NY,NX)*XNPH
+
+  trcs_RFL1(idg_CO2,NY,NX)=trcs_XFLS(idg_CO2,3,NU(NY,NX),NY,NX)*XNPH
+  trcs_RFL1(idg_CH4,NY,NX)=trcs_XFLS(idg_CH4,3,NU(NY,NX),NY,NX)*XNPH
+  trcs_RFL1(idg_O2,NY,NX)=trcs_XFLS(idg_O2,3,NU(NY,NX),NY,NX)*XNPH
+  trcs_RFL1(idg_N2,NY,NX)=trcs_XFLS(idg_N2,3,NU(NY,NX),NY,NX)*XNPH
+  trcs_RFL1(idg_N2O,NY,NX)=trcs_XFLS(idg_N2O,3,NU(NY,NX),NY,NX)*XNPH
+  trcs_RFL1(idg_H2,NY,NX)=trcs_XFLS(idg_H2,3,NU(NY,NX),NY,NX)*XNPH
+  trcs_RFL1(idg_NH3,NY,NX)=trcs_XFLS(idg_NH3,3,NU(NY,NX),NY,NX)*XNPH
+  trcs_RFL1(ids_NH4,NY,NX)=trcs_XFLS(ids_NH4,3,NU(NY,NX),NY,NX)*XNPH
+  trcs_RFL1(ids_NO3,NY,NX)=trcs_XFLS(ids_NO3,3,NU(NY,NX),NY,NX)*XNPH
+  trcs_RFL1(ids_NO2,NY,NX)=trcs_XFLS(ids_NO2,3,NU(NY,NX),NY,NX)*XNPH
+  trcs_RFL1(ids_H1PO4,NY,NX)=trcs_XFLS(ids_H1PO4,3,NU(NY,NX),NY,NX)*XNPH
+  trcs_RFL1(ids_H2PO4,NY,NX)=trcs_XFLS(ids_H2PO4,3,NU(NY,NX),NY,NX)*XNPH
+  trcs_RFL1(ids_NH4B,NY,NX)=trcs_XFLS(ids_NH4B,3,NU(NY,NX),NY,NX)*XNPH
+  trcs_RFL1(idg_NH3B,NY,NX)=trcs_XFLS(idg_NH3B,3,NU(NY,NX),NY,NX)*XNPH
+  trcs_RFL1(ids_NO3B,NY,NX)=trcs_XFLS(ids_NO3B,3,NU(NY,NX),NY,NX)*XNPH
+  trcs_RFL1(ids_NO2B,NY,NX)=trcs_XFLS(ids_NO2B,3,NU(NY,NX),NY,NX)*XNPH
+  trcs_RFL1(ids_H1PO4B,NY,NX)=trcs_XFLS(ids_H1PO4B,3,NU(NY,NX),NY,NX)*XNPH
+  trcs_RFL1(ids_H2PO4B,NY,NX)=trcs_XFLS(ids_H2PO4B,3,NU(NY,NX),NY,NX)*XNPH
 !
 !     GAS AND SOLUTE SINKS AND SOURCES IN SOIL LAYERS FROM MICROBIAL
 !     TRANSFORMATIONS IN 'NITRO' + ROOT EXCHANGE IN 'EXTRACT'
@@ -815,44 +816,31 @@ module TrnsfrMod
 !     VLNH4,VLNO3,VLPO4=non-band NH4,NO3,PO4 volume fraction
 !     VLNHB,VLNOB,VLPOB=band NH4,NO3,PO4 volume fraction
 !
-    RCOFLU(L,NY,NX)=FLU(L,NY,NX)*CCOQ(NY,NX)
-    RCHFLU(L,NY,NX)=FLU(L,NY,NX)*CCHQ(NY,NX)
-    ROXFLU(L,NY,NX)=FLU(L,NY,NX)*COXQ(NY,NX)
-    RNGFLU(L,NY,NX)=FLU(L,NY,NX)*CNNQ(NY,NX)
-    RN2FLU(L,NY,NX)=FLU(L,NY,NX)*CN2Q(NY,NX)
-    RHGFLU(L,NY,NX)=0.0_r8
-    RN4FLU(L,NY,NX)=FLU(L,NY,NX)*CN4Q(I,NY,NX)*trcs_VLN(ids_NH4,L,NY,NX)*natomw
-    RN3FLU(L,NY,NX)=FLU(L,NY,NX)*CN3Q(I,NY,NX)*trcs_VLN(ids_NH4,L,NY,NX)*natomw
-    RNOFLU(L,NY,NX)=FLU(L,NY,NX)*CNOQ(I,NY,NX)*trcs_VLN(ids_NO3,L,NY,NX)*natomw
-    RH1PFU(L,NY,NX)=FLU(L,NY,NX)*CH1PQ(I,NY,NX)*trcs_VLN(ids_H1PO4,L,NY,NX)*patomw
-    RH2PFU(L,NY,NX)=FLU(L,NY,NX)*CPOQ(I,NY,NX)*trcs_VLN(ids_H1PO4,L,NY,NX)*patomw
-    RN4FBU(L,NY,NX)=FLU(L,NY,NX)*CN4Q(I,NY,NX)*trcs_VLN(ids_NH4B,L,NY,NX)*natomw
-    RN3FBU(L,NY,NX)=FLU(L,NY,NX)*CN3Q(I,NY,NX)*trcs_VLN(ids_NH4B,L,NY,NX)*natomw
-    RNOFBU(L,NY,NX)=FLU(L,NY,NX)*CNOQ(I,NY,NX)*trcs_VLN(ids_NO3B,L,NY,NX)*natomw
-    RH1BBU(L,NY,NX)=FLU(L,NY,NX)*CH1PQ(I,NY,NX)*trcs_VLN(ids_H1PO4B,L,NY,NX)*patomw
-    RH2BBU(L,NY,NX)=FLU(L,NY,NX)*CPOQ(I,NY,NX)*trcs_VLN(ids_H1PO4B,L,NY,NX)*patomw
+    trcs_RFLU(idg_CO2,L,NY,NX)=FLU(L,NY,NX)*CCOQ(NY,NX)
+    trcs_RFLU(idg_CH4,L,NY,NX)=FLU(L,NY,NX)*CCHQ(NY,NX)
+    trcs_RFLU(idg_O2,L,NY,NX)=FLU(L,NY,NX)*COXQ(NY,NX)
+    trcs_RFLU(idg_N2,L,NY,NX)=FLU(L,NY,NX)*CNNQ(NY,NX)
+    trcs_RFLU(idg_N2O,L,NY,NX)=FLU(L,NY,NX)*CN2Q(NY,NX)
+    trcs_RFLU(idg_H2,L,NY,NX)=0.0_r8
+    trcs_RFLU(ids_NH4,L,NY,NX)=FLU(L,NY,NX)*CN4Q(I,NY,NX)*trcs_VLN(ids_NH4,L,NY,NX)*natomw
+    trcs_RFLU(idg_NH3,L,NY,NX)=FLU(L,NY,NX)*CN3Q(I,NY,NX)*trcs_VLN(ids_NH4,L,NY,NX)*natomw
+    trcs_RFLU(ids_NO3,L,NY,NX)=FLU(L,NY,NX)*CNOQ(I,NY,NX)*trcs_VLN(ids_NO3,L,NY,NX)*natomw
+    trcs_RFLU(ids_H1PO4,L,NY,NX)=FLU(L,NY,NX)*CH1PQ(I,NY,NX)*trcs_VLN(ids_H1PO4,L,NY,NX)*patomw
+    trcs_RFLU(ids_H2PO4,L,NY,NX)=FLU(L,NY,NX)*CPOQ(I,NY,NX)*trcs_VLN(ids_H1PO4,L,NY,NX)*patomw
+    trcs_RFLU(ids_NH4B,L,NY,NX)=FLU(L,NY,NX)*CN4Q(I,NY,NX)*trcs_VLN(ids_NH4B,L,NY,NX)*natomw
+    trcs_RFLU(idg_NH3B,L,NY,NX)=FLU(L,NY,NX)*CN3Q(I,NY,NX)*trcs_VLN(ids_NH4B,L,NY,NX)*natomw
+    trcs_RFLU(ids_NO3B,L,NY,NX)=FLU(L,NY,NX)*CNOQ(I,NY,NX)*trcs_VLN(ids_NO3B,L,NY,NX)*natomw
+    trcs_RFLU(ids_H1PO4B,L,NY,NX)=FLU(L,NY,NX)*CH1PQ(I,NY,NX)*trcs_VLN(ids_H1PO4B,L,NY,NX)*patomw
+    trcs_RFLU(ids_H2PO4B,L,NY,NX)=FLU(L,NY,NX)*CPOQ(I,NY,NX)*trcs_VLN(ids_H1PO4B,L,NY,NX)*patomw
 !
 !     SUB-HOURLY SOLUTE FLUXES FROM SUBSURFACE IRRIGATION
 !
 !     R*FLZ,R*FBZ=subsurface solute flux in non-band,band
 !     XNPH=1/no. of cycles h-1 for water, heat and solute flux calculations
 !
-    RFLZ_sol(idg_CO2,L,NY,NX)=RCOFLU(L,NY,NX)*XNPH
-    RFLZ_sol(idg_CH4,L,NY,NX)=RCHFLU(L,NY,NX)*XNPH
-    RFLZ_sol(idg_O2,L,NY,NX)=ROXFLU(L,NY,NX)*XNPH
-    RFLZ_sol(idg_N2,L,NY,NX)=RNGFLU(L,NY,NX)*XNPH
-    RFLZ_sol(idg_N2O,L,NY,NX)=RN2FLU(L,NY,NX)*XNPH
-    RFLZ_sol(idg_H2,L,NY,NX)=RHGFLU(L,NY,NX)*XNPH
-    RFLZ_sol(ids_NH4,L,NY,NX)=RN4FLU(L,NY,NX)*XNPH
-    RFLZ_sol(idg_NH3,L,NY,NX)=RN3FLU(L,NY,NX)*XNPH
-    RFLZ_sol(ids_NO3,L,NY,NX)=RNOFLU(L,NY,NX)*XNPH
-    RFLZ_sol(ids_H1PO4,L,NY,NX)=RH1PFU(L,NY,NX)*XNPH
-    RFLZ_sol(ids_H2PO4,L,NY,NX)=RH2PFU(L,NY,NX)*XNPH
-    RFLZ_sol(ids_NH4B,L,NY,NX)=RN4FBU(L,NY,NX)*XNPH
-    RFLZ_sol(idg_NH3B,L,NY,NX)=RN3FBU(L,NY,NX)*XNPH
-    RFLZ_sol(ids_NO3B,L,NY,NX)=RNOFBU(L,NY,NX)*XNPH
-    RFLZ_sol(ids_H1PO4B,L,NY,NX)=RH1BBU(L,NY,NX)*XNPH
-    RFLZ_sol(ids_H2PO4B,L,NY,NX)=RH2BBU(L,NY,NX)*XNPH
+    DO NTS=ids_beg,ids_end
+      RFLZ_sol(NTS,L,NY,NX)=trcs_RFLU(NTS,L,NY,NX)*XNPH
+    ENDDO
 !
 !     GAS AND SOLUTE DIFFUSIVITIES AT SUB-HOURLY TIME STEP
 !

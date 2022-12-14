@@ -861,6 +861,7 @@ module MicBGCMod
 !
   IF(N.EQ.micpar%n_anero_faculb.AND.ROXYM(NGL,K).GT.0.0_r8 &
     .AND.(.not.litrm.OR.VOLX.GT.ZEROS))THEN
+
     call HeteroDenitrificCatabolism(NGL,N,K,FOQC,RGOCP,&
       VOLWZ,micfor,micstt,naqfdiag,nmicf,nmics,ncplxs,micflx)
   ELSE
@@ -2468,8 +2469,8 @@ module MicBGCMod
     TKS  => micfor%TKS &
   )
   GOMX=RGAS*1.E-3_r8*TKS*LOG((AMAX1(ZERO,COQA(K))/OAKI))
-  GOMM=GOMX/24.0
-  ECHZ=AMAX1(EO2X,AMIN1(1.0_r8,1.0/(1.0+AZMAX1((GC4X+GOMM))/EOMH)))
+  GOMM=GOMX/24.0_r8
+  ECHZ=AMAX1(EO2X,AMIN1(1.0_r8,1.0_r8/(1.0_r8+AZMAX1((GC4X+GOMM))/EOMH)))
 !
 !     RESPIRATION RATES BY ACETOTROPHIC METHANOGENS 'RGOMP' FROM
 !     SPECIFIC OXIDATION RATE, ACTIVE BIOMASS, DOC CONCENTRATION,

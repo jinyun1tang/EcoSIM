@@ -1154,18 +1154,14 @@ module Hour1Mod
   trc_gascl(idg_NH3,0,NY,NX)=ZNH3E(NY,NX)*6.25E-04_r8*TREF/TKS(0,NY,NX)
   trc_gascl(idg_H2,0,NY,NX)=H2GE(NY,NX)*8.92E-05*TREF/TKS(0,NY,NX)
 
-  trc_solcl(ids_NH4B,0,NY,NX)=0.0_r8
-  trc_solcl(idg_NH3B,0,NY,NX)=0.0_r8
-  trc_solcl(ids_NO3B,0,NY,NX)=0.0_r8
-  trc_solcl(ids_NO2B,0,NY,NX)=0.0_r8
-  trc_solcl(ids_H2PO4B,0,NY,NX)=0.0_r8
+! initialize all band nutrients to zero
+  trc_solcl(ids_nutb_beg:ids_nutb_end,0,NY,NX)=0.0_r8
   IF(VOLW(0,NY,NX).GT.ZEROS2(NY,NX))THEN
 ! exclude NH3B,
     DO NTG=idg_beg,idg_end-1
       trc_solcl(NTG,0,NY,NX)=AZMAX1(trc_solml(NTG,0,NY,NX)/VOLW(0,NY,NX))
     ENDDO
   ELSE
-
     trc_solcl(idg_beg:idg_end-1,0,NY,NX)=0.0_r8
   ENDIF
 !
@@ -2441,24 +2437,7 @@ module Hour1Mod
     trcp_TR(idsp_HAB,L,NY,NX)=0.0_r8
     trcp_TR(idsp_CaH2PO4B,L,NY,NX)=0.0_r8
 
-    XCOFXS(L,NY,NX)=0.0_r8
-    XCHFXS(L,NY,NX)=0.0_r8
-    XOXFXS(L,NY,NX)=0.0_r8
-    XNGFXS(L,NY,NX)=0.0_r8
-    XN2FXS(L,NY,NX)=0.0_r8
-    XHGFXS(L,NY,NX)=0.0_r8
-    XN4FXW(L,NY,NX)=0.0_r8
-    XN3FXW(L,NY,NX)=0.0_r8
-    XNOFXW(L,NY,NX)=0.0_r8
-    XNXFXS(L,NY,NX)=0.0_r8
-    XH1PXS(L,NY,NX)=0.0_r8
-    XH2PXS(L,NY,NX)=0.0_r8
-    XN4FXB(L,NY,NX)=0.0_r8
-    XN3FXB(L,NY,NX)=0.0_r8
-    XNOFXB(L,NY,NX)=0.0_r8
-    XNXFXB(L,NY,NX)=0.0_r8
-    XH1BXB(L,NY,NX)=0.0_r8
-    XH2BXB(L,NY,NX)=0.0_r8
+    trcs_XFXS(ids_beg:ids_end,L,NY,NX)=0.0_r8
 
     DO NTSA=idsa_beg,idsab_end
       trcsa_TR(NTSA,L,NY,NX)=0.0_r8
@@ -2474,14 +2453,7 @@ module Hour1Mod
     THAW(L,NY,NX)=0.0_r8
     THAWH(L,NY,NX)=0.0_r8
     HTHAW(L,NY,NX)=0.0_r8
-    XCOBBL(L,NY,NX)=0.0_r8
-    XCHBBL(L,NY,NX)=0.0_r8
-    XOXBBL(L,NY,NX)=0.0_r8
-    XNGBBL(L,NY,NX)=0.0_r8
-    XN2BBL(L,NY,NX)=0.0_r8
-    XN3BBL(L,NY,NX)=0.0_r8
-    XNBBBL(L,NY,NX)=0.0_r8
-    XHGBBL(L,NY,NX)=0.0_r8
+    trcg_XBLL(idg_beg:idg_end,L,NY,NX)=0.0_r8
     RTDNT(L,NY,NX)=0.0_r8
   ENDDO
   end subroutine ZeroHourlyArrays

@@ -127,23 +127,8 @@ module IrrigationDataType
   real(r8),target,allocatable ::  COPU(:,:,:,:)                     !subsurface irrigation  DOP concentration, [g m-3]
   real(r8),target,allocatable ::  FLU(:,:,:)                        !underground irrigation, [m3 d-2 h-1]
   real(r8),target,allocatable ::  HWFLU(:,:,:)                      !convective heat of underground irrigation, [MJ d-2 h-1]
-  real(r8),target,allocatable ::  RCOFLU(:,:,:)                     !aqueous CO2 in underground irrigation, [g d-2 h-1]
-  real(r8),target,allocatable ::  RCHFLU(:,:,:)                     !aqueous CH4 in underground irrigation, [g d-2 h-1]
-  real(r8),target,allocatable ::  ROXFLU(:,:,:)                     !aqueous O2 in underground irrigation, [g d-2 h-1]
-  real(r8),target,allocatable ::  RNGFLU(:,:,:)                     !aqueousN2 in underground irrigation, [g d-2 h-1]
-  real(r8),target,allocatable ::  RN2FLU(:,:,:)                     !aqueous N2O in underground irrigation, [g d-2 h-1]
-  real(r8),target,allocatable ::  RN4FLU(:,:,:)                     !aqueous NH4 in underground irrigation non-band, [g d-2 h-1]
-  real(r8),target,allocatable ::  RN3FLU(:,:,:)                     !aqueous NH3 in underground irrigation non-band, [g d-2 h-1]
-  real(r8),target,allocatable ::  RNOFLU(:,:,:)                     !aqueous NO3 in underground irrigation non-band, [g d-2 h-1]
-  real(r8),target,allocatable ::  RH2PFU(:,:,:)                     !aqueous H2PO4 in underground irrigation non-band, [g d-2 h-1]
-  real(r8),target,allocatable ::  RN4FBU(:,:,:)                     !aqueous NH4 in underground irrigation band, [g d-2 h-1]
-  real(r8),target,allocatable ::  RN3FBU(:,:,:)                     !aqueous NH3 in underground irrigation band, [g d-2 h-1]
-  real(r8),target,allocatable ::  RNOFBU(:,:,:)                     !aqueous NO3 in underground irrigation band, [g d-2 h-1]
-  real(r8),target,allocatable ::  RH1BBU(:,:,:)                     !aqueous HPO4 in underground irrigation non-band, [g d-2 h-1]
-  real(r8),target,allocatable ::  RH2BBU(:,:,:)                     !aqueous H2PO4 in underground irrigation band, [g d-2 h-1]
-  real(r8),target,allocatable ::  RH1PFU(:,:,:)                     !aqueous HPO4 in underground irrigation non-band, [g d-2 h-1]
+  real(r8),target,allocatable ::  trcs_RFLU(:,:,:,:)                     !aqueous non-salt solutes in underground irrigation, [g d-2 h-1]
   real(r8),target,allocatable ::  trcsa_RFLU(:,:,:,:)                     !aqueous PO4 in underground irrigation non-band, [g d-2 h-1]
-  real(r8),target,allocatable ::  RHGFLU(:,:,:)                     !aqueous H2 in underground irrigation non-band, [g d-2 h-1]
   private :: InitAllocate
   contains
 
@@ -273,24 +258,8 @@ module IrrigationDataType
   allocate(COPU(1:jcplx,JZ,JY,JX)); COPU=0._r8
   allocate(FLU(JZ,JY,JX));      FLU=0._r8
   allocate(HWFLU(JZ,JY,JX));    HWFLU=0._r8
-  allocate(RCOFLU(JZ,JY,JX));   RCOFLU=0._r8
-  allocate(RCHFLU(JZ,JY,JX));   RCHFLU=0._r8
-  allocate(ROXFLU(JZ,JY,JX));   ROXFLU=0._r8
-  allocate(RNGFLU(JZ,JY,JX));   RNGFLU=0._r8
-  allocate(RN2FLU(JZ,JY,JX));   RN2FLU=0._r8
-  allocate(RN4FLU(JZ,JY,JX));   RN4FLU=0._r8
-  allocate(RN3FLU(JZ,JY,JX));   RN3FLU=0._r8
-  allocate(RNOFLU(JZ,JY,JX));   RNOFLU=0._r8
-  allocate(RH2PFU(JZ,JY,JX));   RH2PFU=0._r8
-  allocate(RN4FBU(JZ,JY,JX));   RN4FBU=0._r8
-  allocate(RN3FBU(JZ,JY,JX));   RN3FBU=0._r8
-  allocate(RNOFBU(JZ,JY,JX));   RNOFBU=0._r8
-  allocate(RH2BBU(JZ,JY,JX));   RH2BBU=0._r8
+  allocate(trcs_RFLU(ids_beg:ids_end,JZ,JY,JX));   trcs_RFLU=0._r8
   allocate(trcsa_RFLU(idsa_beg:idsab_end,JZ,JY,JX));   trcsa_RFLU=0._r8
-  allocate(RH1PFU(JZ,JY,JX));   RH1PFU=0._r8
-
-  allocate(RH1BBU(JZ,JY,JX));   RH1BBU=0._r8
-  allocate(RHGFLU(JZ,JY,JX));   RHGFLU=0._r8
   end subroutine InitAllocate
 
 !----------------------------------------------------------------------
@@ -299,6 +268,7 @@ module IrrigationDataType
   implicit none
 
   call destroy(trcn_irrig)
+  call destroy(trcs_RFLU)
   call destroy(PHQ)
   call destroy(CN4Q)
   call destroy(CN3Q)
@@ -410,21 +380,6 @@ module IrrigationDataType
   call destroy(COPU)
   call destroy(FLU)
   call destroy(HWFLU)
-  call destroy(RCOFLU)
-  call destroy(RCHFLU)
-  call destroy(ROXFLU)
-  call destroy(RNGFLU)
-  call destroy(RN2FLU)
-  call destroy(RN4FLU)
-  call destroy(RN3FLU)
-  call destroy(RNOFLU)
-  call destroy(RH2PFU)
-  call destroy(RN4FBU)
-  call destroy(RN3FBU)
-  call destroy(RNOFBU)
-  call destroy(RH2BBU)
-  call destroy(RH1PFU)
-  call destroy(RH1BBU)
 
   end subroutine DestructIrrigation
 

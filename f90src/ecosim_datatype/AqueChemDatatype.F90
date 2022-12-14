@@ -48,25 +48,8 @@ module AqueChemDatatype
   real(r8),target,allocatable ::  XONFXS(:,:,:,:)                    !total DON micropore-macropore transfer, [g d-2 h-1]
   real(r8),target,allocatable ::  XOPFXS(:,:,:,:)                    !total DOP micropore-macropore transfer, [g d-2 h-1]
   real(r8),target,allocatable ::  XOAFXS(:,:,:,:)                    !total acetate micropore-macropore transfer, [g d-2 h-1]
-  real(r8),target,allocatable ::  XCOFXS(:,:,:)                      !total CO2 micropore-macropore transfer, [g d-2 h-1]
-  real(r8),target,allocatable ::  XCHFXS(:,:,:)                      !total CH4 micropore-macropore transfer, [g d-2 h-1]
-  real(r8),target,allocatable ::  XOXFXS(:,:,:)                      !total O2 micropore-macropore transfer, [g d-2 h-1]
-  real(r8),target,allocatable ::  XHGFXS(:,:,:)                      !total H2 micropore-macropore transfer, [g d-2 h-1]
-  real(r8),target,allocatable ::  XNGFXS(:,:,:)                      !total N2 micropore-macropore transfer, [g d-2 h-1]
-  real(r8),target,allocatable ::  XN2FXS(:,:,:)                      !total N2O micropore-macropore transfer, [g d-2 h-1]
-  real(r8),target,allocatable ::  XN4FXW(:,:,:)                      !total NH4 micropore-macropore transfer non-band, [g d-2 h-1]
-  real(r8),target,allocatable ::  XN3FXW(:,:,:)                      !total NH3 micropore-macropore transfer non-band, [g d-2 h-1]
-  real(r8),target,allocatable ::  XNOFXW(:,:,:)                      !total NO3 micropore-macropore transfer non-band, [g d-2 h-1]
-  real(r8),target,allocatable ::  XH2PXS(:,:,:)                      !total H2PO4 micropore-macropore transfer non-band, [g d-2 h-1]
-  real(r8),target,allocatable ::  XN4FXB(:,:,:)                      !total NH4 micropore-macropore transfer band, [g d-2 h-1]
-  real(r8),target,allocatable ::  XN3FXB(:,:,:)                      !total NH3 micropore-macropore transfer band, [g d-2 h-1]
-  real(r8),target,allocatable ::  XNOFXB(:,:,:)                      !total NO3 micropore-macropore transfer band, [g d-2 h-1]
-  real(r8),target,allocatable ::  XH2BXB(:,:,:)                      !total H2PO4 micropore-macropore transfer band, [g d-2 h-1]
-  real(r8),target,allocatable ::  XNXFXS(:,:,:)                      !total NO2 micropore-macropore transfer non-band, [g d-2 h-1]
-  real(r8),target,allocatable ::  XH1PXS(:,:,:)                      !total HPO4 micropore-macropore transfer non-band, [g d-2 h-1]
-  real(r8),target,allocatable ::  XH1BXB(:,:,:)                      !total HPO4 micropore-macropore transfer band, [g d-2 h-1]
-  real(r8),target,allocatable ::  trcsa_XFXS(:,:,:,:)                      !total salt micropore-macropore transfer non-band, [g d-2 h-1]
-  real(r8),target,allocatable ::  XNXFXB(:,:,:)                      !total MgHPO4 micropore-macropore transfer band, [g d-2 h-1]
+  real(r8),target,allocatable ::  trcs_XFXS(:,:,:,:)                 !total non-salt solute micropore-macropore transfer, [g d-2 h-1]
+  real(r8),target,allocatable ::  trcsa_XFXS(:,:,:,:)                !total salt micropore-macropore transfer non-band, [g d-2 h-1]
   real(r8),target,allocatable ::  TRN4S(:,:,:)                       !total solute NH4 transformation non-band, [mol d-2 h-1]
   real(r8),target,allocatable ::  TRN3S(:,:,:)                       !total solute NH3 transformation non-band, [mol d-2 h-1]
   real(r8),target,allocatable ::  TRN4B(:,:,:)                       !total solute NH4 transformation band, [mol d-2 h-1]
@@ -206,25 +189,8 @@ module AqueChemDatatype
   allocate(XONFXS(1:jcplx,JZ,JY,JX));XONFXS=0._r8
   allocate(XOPFXS(1:jcplx,JZ,JY,JX));XOPFXS=0._r8
   allocate(XOAFXS(1:jcplx,JZ,JY,JX));XOAFXS=0._r8
-  allocate(XCOFXS(JZ,JY,JX));   XCOFXS=0._r8
-  allocate(XCHFXS(JZ,JY,JX));   XCHFXS=0._r8
-  allocate(XOXFXS(JZ,JY,JX));   XOXFXS=0._r8
-  allocate(XHGFXS(JZ,JY,JX));   XHGFXS=0._r8
-  allocate(XNGFXS(JZ,JY,JX));   XNGFXS=0._r8
-  allocate(XN2FXS(JZ,JY,JX));   XN2FXS=0._r8
-  allocate(XN4FXW(JZ,JY,JX));   XN4FXW=0._r8
-  allocate(XN3FXW(JZ,JY,JX));   XN3FXW=0._r8
-  allocate(XNOFXW(JZ,JY,JX));   XNOFXW=0._r8
-  allocate(XH2PXS(JZ,JY,JX));   XH2PXS=0._r8
-  allocate(XN4FXB(JZ,JY,JX));   XN4FXB=0._r8
-  allocate(XN3FXB(JZ,JY,JX));   XN3FXB=0._r8
-  allocate(XNOFXB(JZ,JY,JX));   XNOFXB=0._r8
-  allocate(XH2BXB(JZ,JY,JX));   XH2BXB=0._r8
-  allocate(XNXFXS(JZ,JY,JX));   XNXFXS=0._r8
-  allocate(XH1PXS(JZ,JY,JX));   XH1PXS=0._r8
-  allocate(XH1BXB(JZ,JY,JX));   XH1BXB=0._r8
+  allocate(trcs_XFXS(ids_beg:ids_end,JZ,JY,JX));   trcs_XFXS=0._r8
   allocate(trcsa_XFXS(idsa_beg:idsab_end,JZ,JY,JX));   trcsa_XFXS=0._r8
-  allocate(XNXFXB(JZ,JY,JX));   XNXFXB=0._r8
   allocate(TRN4S(0:JZ,JY,JX));  TRN4S=0._r8
   allocate(TRN3S(0:JZ,JY,JX));  TRN3S=0._r8
   allocate(TRN4B(JZ,JY,JX));    TRN4B=0._r8
@@ -363,21 +329,6 @@ module AqueChemDatatype
   call destroy(XONFXS)
   call destroy(XOPFXS)
   call destroy(XOAFXS)
-  call destroy(XCOFXS)
-  call destroy(XCHFXS)
-  call destroy(XOXFXS)
-  call destroy(XHGFXS)
-  call destroy(XNGFXS)
-  call destroy(XN2FXS)
-  call destroy(XN4FXW)
-  call destroy(XN3FXW)
-  call destroy(XNOFXW)
-  call destroy(XH2PXS)
-  call destroy(XN4FXB)
-  call destroy(XN3FXB)
-  call destroy(XNOFXB)
-  call destroy(XH2BXB)
-  call destroy(XNXFXB)
   call destroy(TRN4S)
   call destroy(TRN3S)
   call destroy(TRN4B)
@@ -460,6 +411,7 @@ module AqueChemDatatype
   call destroy(XC2PBS)
   call destroy(XM1PBS)
 
+  call destroy(trcs_XFXS)
   end subroutine DestructAquaChem
 
 end module AqueChemDatatype

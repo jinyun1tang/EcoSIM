@@ -79,25 +79,8 @@ implicit none
   real(r8), allocatable ::  RNOFL0(:,:)                        !
   real(r8), allocatable ::  RNXFL0(:,:)                        !
   real(r8), allocatable ::  RH2PF0(:,:)                        !
-  real(r8), allocatable ::  RCOFL1(:,:)                        !
-  real(r8), allocatable ::  RCHFL1(:,:)                        !
-  real(r8), allocatable ::  ROXFL1(:,:)                        !
-  real(r8), allocatable ::  RNGFL1(:,:)                        !
-  real(r8), allocatable ::  RN2FL1(:,:)                        !
-  real(r8), allocatable ::  RHGFL1(:,:)                        !
-  real(r8), allocatable ::  RN4FL1(:,:)                        !
-  real(r8), allocatable ::  RN3FL1(:,:)                        !
-  real(r8), allocatable ::  RNOFL1(:,:)                        !
-  real(r8), allocatable ::  RNXFL1(:,:)                        !
-  real(r8), allocatable ::  RH2PF1(:,:)                        !
-  real(r8), allocatable ::  RN4FL2(:,:)                        !
-  real(r8), allocatable ::  RN3FL2(:,:)                        !
-  real(r8), allocatable ::  RNOFL2(:,:)                        !
-  real(r8), allocatable ::  RNXFL2(:,:)                        !
-  real(r8), allocatable ::  RH2BF2(:,:)                        !
+  real(r8), allocatable ::  trcs_RFL1(:,:,:)                        !
   real(r8), allocatable ::  RH1PF0(:,:)                        !
-  real(r8), allocatable ::  RH1PF1(:,:)                        !
-  real(r8), allocatable ::  RH1BF2(:,:)                        !
   real(r8), allocatable ::  ROCFXS(:,:,:,:)                    !
   real(r8), allocatable ::  RONFXS(:,:,:,:)                    !
   real(r8), allocatable ::  ROPFXS(:,:,:,:)                    !
@@ -400,25 +383,8 @@ contains
   allocate(RNOFL0(JY,JX));      RNOFL0=0._r8
   allocate(RNXFL0(JY,JX));      RNXFL0=0._r8
   allocate(RH2PF0(JY,JX));      RH2PF0=0._r8
-  allocate(RCOFL1(JY,JX));      RCOFL1=0._r8
-  allocate(RCHFL1(JY,JX));      RCHFL1=0._r8
-  allocate(ROXFL1(JY,JX));      ROXFL1=0._r8
-  allocate(RNGFL1(JY,JX));      RNGFL1=0._r8
-  allocate(RN2FL1(JY,JX));      RN2FL1=0._r8
-  allocate(RHGFL1(JY,JX));      RHGFL1=0._r8
-  allocate(RN4FL1(JY,JX));      RN4FL1=0._r8
-  allocate(RN3FL1(JY,JX));      RN3FL1=0._r8
-  allocate(RNOFL1(JY,JX));      RNOFL1=0._r8
-  allocate(RNXFL1(JY,JX));      RNXFL1=0._r8
-  allocate(RH2PF1(JY,JX));      RH2PF1=0._r8
-  allocate(RN4FL2(JY,JX));      RN4FL2=0._r8
-  allocate(RN3FL2(JY,JX));      RN3FL2=0._r8
-  allocate(RNOFL2(JY,JX));      RNOFL2=0._r8
-  allocate(RNXFL2(JY,JX));      RNXFL2=0._r8
-  allocate(RH2BF2(JY,JX));      RH2BF2=0._r8
+  allocate(trcs_RFL1(ids_beg:ids_end,JY,JX));      trcs_RFL1=0._r8
   allocate(RH1PF0(JY,JX));      RH1PF0=0._r8
-  allocate(RH1PF1(JY,JX));      RH1PF1=0._r8
-  allocate(RH1BF2(JY,JX));      RH1BF2=0._r8
   allocate(ROCFXS(1:jcplx,JZ,JY,JX));ROCFXS=0._r8
   allocate(RONFXS(1:jcplx,JZ,JY,JX));RONFXS=0._r8
   allocate(ROPFXS(1:jcplx,JZ,JY,JX));ROPFXS=0._r8
@@ -724,25 +690,9 @@ contains
   call destroy(RNOFL0)
   call destroy(RNXFL0)
   call destroy(RH2PF0)
-  call destroy(RCOFL1)
-  call destroy(RCHFL1)
-  call destroy(ROXFL1)
-  call destroy(RNGFL1)
-  call destroy(RN2FL1)
-  call destroy(RHGFL1)
-  call destroy(RN4FL1)
-  call destroy(RN3FL1)
-  call destroy(RNOFL1)
-  call destroy(RNXFL1)
-  call destroy(RH2PF1)
-  call destroy(RN4FL2)
-  call destroy(RN3FL2)
-  call destroy(RNOFL2)
-  call destroy(RNXFL2)
-  call destroy(RH2BF2)
   call destroy(RH1PF0)
-  call destroy(RH1PF1)
-  call destroy(RH1BF2)
+
+  call destroy(trcs_RFL1)
 
   call destroy(ROCFXS)
   call destroy(RONFXS)
