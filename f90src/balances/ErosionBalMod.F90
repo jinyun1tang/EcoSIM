@@ -16,7 +16,6 @@ implicit none
   public :: SinkChemicals
   contains
 
-
 !------------------------------------------------------------------------------------------
 
   subroutine SinkChemicals(NY,NX)

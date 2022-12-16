@@ -130,11 +130,6 @@ implicit none
   real(r8), allocatable ::  TN3FLW(:,:,:)                      !
   real(r8), allocatable ::  TNOFLW(:,:,:)                      !
   real(r8), allocatable ::  TH2PFS(:,:,:)                      !
-  real(r8), allocatable ::  TCOFLG(:,:,:)                      !
-  real(r8), allocatable ::  TCHFLG(:,:,:)                      !
-  real(r8), allocatable ::  TOXFLG(:,:,:)                      !
-  real(r8), allocatable ::  TNGFLG(:,:,:)                      !
-  real(r8), allocatable ::  TN2FLG(:,:,:)                      !
   real(r8), allocatable ::  TQRH1P(:,:)                        !
   real(r8), allocatable ::  TH1PFS(:,:,:)                      !
 
@@ -431,11 +426,6 @@ contains
   allocate(TN3FLW(JZ,JY,JX));   TN3FLW=0._r8
   allocate(TNOFLW(JZ,JY,JX));   TNOFLW=0._r8
   allocate(TH2PFS(JZ,JY,JX));   TH2PFS=0._r8
-  allocate(TCOFLG(JZ,JY,JX));   TCOFLG=0._r8
-  allocate(TCHFLG(JZ,JY,JX));   TCHFLG=0._r8
-  allocate(TOXFLG(JZ,JY,JX));   TOXFLG=0._r8
-  allocate(TNGFLG(JZ,JY,JX));   TNGFLG=0._r8
-  allocate(TN2FLG(JZ,JY,JX));   TN2FLG=0._r8
   allocate(TQRH1P(JY,JX));      TQRH1P=0._r8
   allocate(TH1PFS(JZ,JY,JX));   TH1PFS=0._r8
 
@@ -586,8 +576,8 @@ contains
   allocate(RQSH1P(2,JV,JH));    RQSH1P=0._r8
   allocate(trcg_RQS(idg_beg:idg_end-1,2,JV,JH));    trcg_RQS=0._r8
   allocate(trcn_RQR(ids_nut_beg:ids_nuts_end,2,2,JV,JH));  trcn_RQR=0._r8
-  allocate(R3GasADFlx(idg_beg:idg_end,3,JD,JV,JH));R3GasADFlx=0._r8
-  allocate(RTGasADFlx(idg_beg:idg_end,JZ,JY,JH));RTGasADFlx=0._r8
+  allocate(R3GasADFlx(idg_beg:idg_end-1,3,JD,JV,JH));R3GasADFlx=0._r8
+  allocate(RTGasADFlx(idg_beg:idg_end-1,JZ,JY,JH));RTGasADFlx=0._r8
 
   allocate(RNXFHS(3,JD,JV,JH)); RNXFHS=0._r8
   allocate(RNXFHB(3,JD,JV,JH)); RNXFHB=0._r8
@@ -741,11 +731,6 @@ contains
   call destroy(TN3FLW)
   call destroy(TNOFLW)
   call destroy(TH2PFS)
-  call destroy(TCOFLG)
-  call destroy(TCHFLG)
-  call destroy(TOXFLG)
-  call destroy(TNGFLG)
-  call destroy(TN2FLG)
   call destroy(TQRH1P)
   call destroy(TH1PFS)
   call destroy(DCO2G)

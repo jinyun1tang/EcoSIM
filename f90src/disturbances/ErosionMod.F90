@@ -410,7 +410,7 @@ module ErosionMod
   implicit none
   integer, intent(in) :: NHW,NHE,NVN,NVS
 
-  integer :: NGL
+  integer :: NGL,NTX,NTP
   integer :: K,NN,N,NO,M,NY,NX
   integer :: N1,N2,N4,N5,N4B,N5B
   real(r8) :: FSEDER
@@ -457,8 +457,6 @@ module ErosionMod
               XSANER(N,2,N5,N4)=FSEDER*SAND(NU(N2,N1),N2,N1)
               XSILER(N,2,N5,N4)=FSEDER*SILT(NU(N2,N1),N2,N1)
               XCLAER(N,2,N5,N4)=FSEDER*CLAY(NU(N2,N1),N2,N1)
-              XCECER(N,2,N5,N4)=FSEDER*trcx_solml(idx_CEC,NU(N2,N1),N2,N1)
-              XAECER(N,2,N5,N4)=FSEDER*trcx_solml(idx_AEC,NU(N2,N1),N2,N1)
 !
 !     FERTILIZER POOLS
 !
@@ -487,28 +485,9 @@ module ErosionMod
 !       :XH1P,XH2P=adsorbed HPO4,H2PO4 in non-band
 !       :XH1PB,XP2PB=adsorbed HPO4,H2PO4 in band
 !
-              XN4ER(N,2,N5,N4)=FSEDER*trcx_solml(idx_NH4,NU(N2,N1),N2,N1)
-              XNBER(N,2,N5,N4)=FSEDER*trcx_solml(idx_NH4B,NU(N2,N1),N2,N1)
-              XHYER(N,2,N5,N4)=FSEDER*trcx_solml(idx_Hp,NU(N2,N1),N2,N1)
-              XALER(N,2,N5,N4)=FSEDER*trcx_solml(idx_Al,NU(N2,N1),N2,N1)
-              XFEER(N,2,N5,N4)=FSEDER*trcx_solml(idx_Fe,NU(N2,N1),N2,N1)
-              XCAER(N,2,N5,N4)=FSEDER*trcx_solml(idx_Ca,NU(N2,N1),N2,N1)
-              XMGER(N,2,N5,N4)=FSEDER*trcx_solml(idx_Mg,NU(N2,N1),N2,N1)
-              XNAER(N,2,N5,N4)=FSEDER*trcx_solml(idx_Na,NU(N2,N1),N2,N1)
-              XKAER(N,2,N5,N4)=FSEDER*trcx_solml(idx_K,NU(N2,N1),N2,N1)
-              XHCER(N,2,N5,N4)=FSEDER*trcx_solml(idx_COOH,NU(N2,N1),N2,N1)
-              XAL2ER(N,2,N5,N4)=FSEDER*trcx_solml(idx_AlOH2,NU(N2,N1),N2,N1)
-              XFE2ER(N,2,N5,N4)=FSEDER*trcx_solml(idx_FeOH2,NU(N2,N1),N2,N1)
-              XOH0ER(N,2,N5,N4)=FSEDER*trcx_solml(idx_OHe,NU(N2,N1),N2,N1)
-              XOH1ER(N,2,N5,N4)=FSEDER*trcx_solml(idx_OH,NU(N2,N1),N2,N1)
-              XOH2ER(N,2,N5,N4)=FSEDER*trcx_solml(idx_OHp,NU(N2,N1),N2,N1)
-              XH1PER(N,2,N5,N4)=FSEDER*trcx_solml(idx_HPO4,NU(N2,N1),N2,N1)
-              XH2PER(N,2,N5,N4)=FSEDER*trcx_solml(idx_H2PO4,NU(N2,N1),N2,N1)
-              XOH0EB(N,2,N5,N4)=FSEDER*trcx_solml(idx_OHeB,NU(N2,N1),N2,N1)
-              XOH1EB(N,2,N5,N4)=FSEDER*trcx_solml(idx_OHB,NU(N2,N1),N2,N1)
-              XOH2EB(N,2,N5,N4)=FSEDER*trcx_solml(idx_OHpB,NU(N2,N1),N2,N1)
-              XH1PEB(N,2,N5,N4)=FSEDER*trcx_solml(idx_HPO4B,NU(N2,N1),N2,N1)
-              XH2PEB(N,2,N5,N4)=FSEDER*trcx_solml(idx_H2PO4B,NU(N2,N1),N2,N1)
+              DO NTX=idx_beg,idx_end
+                trcx_XER(NTX,N,2,N5,N4)=FSEDER*trcx_solml(NTX,NU(N2,N1),N2,N1)
+              ENDDO
 !
 !     PRECIPITATES
 !
@@ -520,20 +499,9 @@ module ErosionMod
 !       :PCPM,PCPD,PCPH=precip CaH2PO4,CaHPO4,apatite in non-band
 !       :PCPMB,PCPDB,PCPHB=precip CaH2PO4,CaHPO4,apatite in band
 !
-              PALOER(N,2,N5,N4)=FSEDER*trcp_salml(idsp_AlOH3,NU(N2,N1),N2,N1)
-              PFEOER(N,2,N5,N4)=FSEDER*trcp_salml(idsp_FeOH3,NU(N2,N1),N2,N1)
-              PCACER(N,2,N5,N4)=FSEDER*trcp_salml(idsp_CaCO3,NU(N2,N1),N2,N1)
-              PCASER(N,2,N5,N4)=FSEDER*trcp_salml(idsp_CaSO4,NU(N2,N1),N2,N1)
-              PALPER(N,2,N5,N4)=FSEDER*trcp_salml(idsp_AlPO4,NU(N2,N1),N2,N1)
-              PFEPER(N,2,N5,N4)=FSEDER*trcp_salml(idsp_FePO4,NU(N2,N1),N2,N1)
-              PCPDER(N,2,N5,N4)=FSEDER*trcp_salml(idsp_CaHPO4,NU(N2,N1),N2,N1)
-              PCPHER(N,2,N5,N4)=FSEDER*trcp_salml(idsp_HA,NU(N2,N1),N2,N1)
-              PCPMER(N,2,N5,N4)=FSEDER*trcp_salml(idsp_CaH2PO4,NU(N2,N1),N2,N1)
-              PALPEB(N,2,N5,N4)=FSEDER*trcp_salml(idsp_AlPO4B,NU(N2,N1),N2,N1)
-              PFEPEB(N,2,N5,N4)=FSEDER*trcp_salml(idsp_FePO4B,NU(N2,N1),N2,N1)
-              PCPDEB(N,2,N5,N4)=FSEDER*trcp_salml(idsp_CaHPO4B,NU(N2,N1),N2,N1)
-              PCPHEB(N,2,N5,N4)=FSEDER*trcp_salml(idsp_HAB,NU(N2,N1),N2,N1)
-              PCPMEB(N,2,N5,N4)=FSEDER*trcp_salml(idsp_CaH2PO4B,NU(N2,N1),N2,N1)
+              DO NTP=idsp_beg,idsp_end
+                trcp_ER(NTP,N,2,N5,N4)   =FSEDER*trcp_salml(NTP,NU(N2,N1),N2,N1)
+              ENDDO
 !
 !     ORGANIC MATTER
 !
@@ -580,8 +548,6 @@ module ErosionMod
               XSANER(N,2,N5,N4)=0._r8
               XSILER(N,2,N5,N4)=0._r8
               XCLAER(N,2,N5,N4)=0._r8
-              XCECER(N,2,N5,N4)=0._r8
-              XAECER(N,2,N5,N4)=0._r8
 !
 !     FERTILIZER POOLS
 !
@@ -596,45 +562,11 @@ module ErosionMod
 !
 !     EXCHANGEABLE CATIONS AND ANIONS
 !
-              XN4ER(N,2,N5,N4)=0._r8
-              XNBER(N,2,N5,N4)=0._r8
-              XHYER(N,2,N5,N4)=0._r8
-              XALER(N,2,N5,N4)=0._r8
-              XFEER(N,2,N5,N4)=0._r8
-              XCAER(N,2,N5,N4)=0._r8
-              XMGER(N,2,N5,N4)=0._r8
-              XNAER(N,2,N5,N4)=0._r8
-              XKAER(N,2,N5,N4)=0._r8
-              XHCER(N,2,N5,N4)=0._r8
-              XAL2ER(N,2,N5,N4)=0._r8
-              XFE2ER(N,2,N5,N4)=0._r8
-              XOH0ER(N,2,N5,N4)=0._r8
-              XOH1ER(N,2,N5,N4)=0._r8
-              XOH2ER(N,2,N5,N4)=0._r8
-              XH1PER(N,2,N5,N4)=0._r8
-              XH2PER(N,2,N5,N4)=0._r8
-              XOH0EB(N,2,N5,N4)=0._r8
-              XOH1EB(N,2,N5,N4)=0._r8
-              XOH2EB(N,2,N5,N4)=0._r8
-              XH1PEB(N,2,N5,N4)=0._r8
-              XH2PEB(N,2,N5,N4)=0._r8
+              trcx_XER(idx_beg:idx_end,N,2,N5,N4)=0._r8
 !
 !     PRECIPITATES
 !
-              PALOER(N,2,N5,N4)=0._r8
-              PFEOER(N,2,N5,N4)=0._r8
-              PCACER(N,2,N5,N4)=0._r8
-              PCASER(N,2,N5,N4)=0._r8
-              PALPER(N,2,N5,N4)=0._r8
-              PFEPER(N,2,N5,N4)=0._r8
-              PCPDER(N,2,N5,N4)=0._r8
-              PCPHER(N,2,N5,N4)=0._r8
-              PCPMER(N,2,N5,N4)=0._r8
-              PALPEB(N,2,N5,N4)=0._r8
-              PFEPEB(N,2,N5,N4)=0._r8
-              PCPDEB(N,2,N5,N4)=0._r8
-              PCPHEB(N,2,N5,N4)=0._r8
-              PCPMEB(N,2,N5,N4)=0._r8
+              trcp_ER(idsp_beg:idsp_end,N,2,N5,N4)=0._r8
 !
 !     ORGANIC MATTER
 !
@@ -684,8 +616,6 @@ module ErosionMod
                 XSANER(N,1,N5B,N4B)=FSEDER*SAND(NU(N2,N1),N2,N1)
                 XSILER(N,1,N5B,N4B)=FSEDER*SILT(NU(N2,N1),N2,N1)
                 XCLAER(N,1,N5B,N4B)=FSEDER*CLAY(NU(N2,N1),N2,N1)
-                XCECER(N,1,N5B,N4B)=FSEDER*trcx_solml(idx_CEC,NU(N2,N1),N2,N1)
-                XAECER(N,1,N5B,N4B)=FSEDER*trcx_solml(idx_AEC,NU(N2,N1),N2,N1)
 !
 !     FERTILIZER POOLS
 !
@@ -713,28 +643,9 @@ module ErosionMod
 !       :XH1P,XH2P=adsorbed HPO4,H2PO4 in non-band
 !       :XH1PB,XP2PB=adsorbed HPO4,H2PO4 in band
 !
-                XN4ER(N,1,N5B,N4B)=FSEDER*trcx_solml(idx_NH4,NU(N2,N1),N2,N1)
-                XNBER(N,1,N5B,N4B)=FSEDER*trcx_solml(idx_NH4B,NU(N2,N1),N2,N1)
-                XHYER(N,1,N5B,N4B)=FSEDER*trcx_solml(idx_Hp,NU(N2,N1),N2,N1)
-                XALER(N,1,N5B,N4B)=FSEDER*trcx_solml(idx_Al,NU(N2,N1),N2,N1)
-                XFEER(N,1,N5B,N4B)=FSEDER*trcx_solml(idx_Fe,NU(N2,N1),N2,N1)
-                XCAER(N,1,N5B,N4B)=FSEDER*trcx_solml(idx_Ca,NU(N2,N1),N2,N1)
-                XMGER(N,1,N5B,N4B)=FSEDER*trcx_solml(idx_Mg,NU(N2,N1),N2,N1)
-                XNAER(N,1,N5B,N4B)=FSEDER*trcx_solml(idx_Na,NU(N2,N1),N2,N1)
-                XKAER(N,1,N5B,N4B)=FSEDER*trcx_solml(idx_K,NU(N2,N1),N2,N1)
-                XHCER(N,1,N5B,N4B)=FSEDER*trcx_solml(idx_COOH,NU(N2,N1),N2,N1)
-                XAL2ER(N,1,N5B,N4B)=FSEDER*trcx_solml(idx_AlOH2,NU(N2,N1),N2,N1)
-                XFE2ER(N,1,N5B,N4B)=FSEDER*trcx_solml(idx_FeOH2,NU(N2,N1),N2,N1)
-                XOH0ER(N,1,N5B,N4B)=FSEDER*trcx_solml(idx_OHe,NU(N2,N1),N2,N1)
-                XOH1ER(N,1,N5B,N4B)=FSEDER*trcx_solml(idx_OH,NU(N2,N1),N2,N1)
-                XOH2ER(N,1,N5B,N4B)=FSEDER*trcx_solml(idx_OHp,NU(N2,N1),N2,N1)
-                XH1PER(N,1,N5B,N4B)=FSEDER*trcx_solml(idx_HPO4,NU(N2,N1),N2,N1)
-                XH2PER(N,1,N5B,N4B)=FSEDER*trcx_solml(idx_H2PO4,NU(N2,N1),N2,N1)
-                XOH0EB(N,1,N5B,N4B)=FSEDER*trcx_solml(idx_OHeB,NU(N2,N1),N2,N1)
-                XOH1EB(N,1,N5B,N4B)=FSEDER*trcx_solml(idx_OHB,NU(N2,N1),N2,N1)
-                XOH2EB(N,1,N5B,N4B)=FSEDER*trcx_solml(idx_OHpB,NU(N2,N1),N2,N1)
-                XH1PEB(N,1,N5B,N4B)=FSEDER*trcx_solml(idx_HPO4B,NU(N2,N1),N2,N1)
-                XH2PEB(N,1,N5B,N4B)=FSEDER*trcx_solml(idx_H2PO4B,NU(N2,N1),N2,N1)
+                DO NTX=idx_beg,idx_end
+                  trcx_XER(NTX,N,1,N5B,N4B)=FSEDER*trcx_solml(NTX,NU(N2,N1),N2,N1)
+                ENDDO
 !
 !     PRECIPITATES
 !
@@ -746,20 +657,9 @@ module ErosionMod
 !       :PCPM,PCPD,PCPH=precip CaH2PO4,CaHPO4,apatite in non-band
 !       :PCPMB,PCPDB,PCPHB=precip CaH2PO4,CaHPO4,apatite in band
 !
-                PALOER(N,1,N5B,N4B)=FSEDER*trcp_salml(idsp_AlOH3,NU(N2,N1),N2,N1)
-                PFEOER(N,1,N5B,N4B)=FSEDER*trcp_salml(idsp_FeOH3,NU(N2,N1),N2,N1)
-                PCACER(N,1,N5B,N4B)=FSEDER*trcp_salml(idsp_CaCO3,NU(N2,N1),N2,N1)
-                PCASER(N,1,N5B,N4B)=FSEDER*trcp_salml(idsp_CaSO4,NU(N2,N1),N2,N1)
-                PALPER(N,1,N5B,N4B)=FSEDER*trcp_salml(idsp_AlPO4,NU(N2,N1),N2,N1)
-                PFEPER(N,1,N5B,N4B)=FSEDER*trcp_salml(idsp_FePO4,NU(N2,N1),N2,N1)
-                PCPDER(N,1,N5B,N4B)=FSEDER*trcp_salml(idsp_CaHPO4,NU(N2,N1),N2,N1)
-                PCPHER(N,1,N5B,N4B)=FSEDER*trcp_salml(idsp_HA,NU(N2,N1),N2,N1)
-                PCPMER(N,1,N5B,N4B)=FSEDER*trcp_salml(idsp_CaH2PO4,NU(N2,N1),N2,N1)
-                PALPEB(N,1,N5B,N4B)=FSEDER*trcp_salml(idsp_AlPO4B,NU(N2,N1),N2,N1)
-                PFEPEB(N,1,N5B,N4B)=FSEDER*trcp_salml(idsp_FePO4B,NU(N2,N1),N2,N1)
-                PCPDEB(N,1,N5B,N4B)=FSEDER*trcp_salml(idsp_CaHPO4B,NU(N2,N1),N2,N1)
-                PCPHEB(N,1,N5B,N4B)=FSEDER*trcp_salml(idsp_HAB,NU(N2,N1),N2,N1)
-                PCPMEB(N,1,N5B,N4B)=FSEDER*trcp_salml(idsp_CaH2PO4B,NU(N2,N1),N2,N1)
+                DO NTP=idsp_beg,idsp_end
+                  trcp_ER(NTP,N,1,N5B,N4B)=FSEDER*trcp_salml(NTP,NU(N2,N1),N2,N1)
+                ENDDO
 !
 !     ORGANIC MATTER
 !
@@ -805,8 +705,6 @@ module ErosionMod
                 XSANER(N,1,N5B,N4B)=0._r8
                 XSILER(N,1,N5B,N4B)=0._r8
                 XCLAER(N,1,N5B,N4B)=0._r8
-                XCECER(N,1,N5B,N4B)=0._r8
-                XAECER(N,1,N5B,N4B)=0._r8
 !
 !     FERTILIZER POOLS
 !
@@ -821,45 +719,11 @@ module ErosionMod
 !
 !     EXCHANGEABLE CATIONS AND ANIONS
 !
-                XN4ER(N,1,N5B,N4B)=0._r8
-                XNBER(N,1,N5B,N4B)=0._r8
-                XHYER(N,1,N5B,N4B)=0._r8
-                XALER(N,1,N5B,N4B)=0._r8
-                XFEER(N,1,N5B,N4B)=0._r8
-                XCAER(N,1,N5B,N4B)=0._r8
-                XMGER(N,1,N5B,N4B)=0._r8
-                XNAER(N,1,N5B,N4B)=0._r8
-                XKAER(N,1,N5B,N4B)=0._r8
-                XHCER(N,1,N5B,N4B)=0._r8
-                XAL2ER(N,1,N5B,N4B)=0._r8
-                XFE2ER(N,1,N5B,N4B)=0._r8
-                XOH0ER(N,1,N5B,N4B)=0._r8
-                XOH1ER(N,1,N5B,N4B)=0._r8
-                XOH2ER(N,1,N5B,N4B)=0._r8
-                XH1PER(N,1,N5B,N4B)=0._r8
-                XH2PER(N,1,N5B,N4B)=0._r8
-                XOH0EB(N,1,N5B,N4B)=0._r8
-                XOH1EB(N,1,N5B,N4B)=0._r8
-                XOH2EB(N,1,N5B,N4B)=0._r8
-                XH1PEB(N,1,N5B,N4B)=0._r8
-                XH2PEB(N,1,N5B,N4B)=0._r8
+                trcx_XER(idx_beg:idx_end,N,1,N5B,N4B)=0._r8
 !
 !     PRECIPITATES
 !
-                PALOER(N,1,N5B,N4B)=0._r8
-                PFEOER(N,1,N5B,N4B)=0._r8
-                PCACER(N,1,N5B,N4B)=0._r8
-                PCASER(N,1,N5B,N4B)=0._r8
-                PALPER(N,1,N5B,N4B)=0._r8
-                PFEPER(N,1,N5B,N4B)=0._r8
-                PCPDER(N,1,N5B,N4B)=0._r8
-                PCPHER(N,1,N5B,N4B)=0._r8
-                PCPMER(N,1,N5B,N4B)=0._r8
-                PALPEB(N,1,N5B,N4B)=0._r8
-                PFEPEB(N,1,N5B,N4B)=0._r8
-                PCPDEB(N,1,N5B,N4B)=0._r8
-                PCPHEB(N,1,N5B,N4B)=0._r8
-                PCPMEB(N,1,N5B,N4B)=0._r8
+                trcp_ER(idsp_beg:idsp_end,N,1,N5B,N4B)=0._r8
 !
 !     ORGANIC MATTER
 !
@@ -920,7 +784,7 @@ module ErosionMod
   real(r8) :: RCHQF,FSEDER
   integer :: NGL
   integer :: NY,NX
-  integer :: N,NN,K,NO,M
+  integer :: N,NN,K,NO,M,NTX,NTP
   integer :: N1,N2,N4,N5
   integer :: M1,M2,M4,M5
   real(r8) :: XN
@@ -990,8 +854,6 @@ module ErosionMod
               XSANER(N,NN,M5,M4)=0._r8
               XSILER(N,NN,M5,M4)=0._r8
               XCLAER(N,NN,M5,M4)=0._r8
-              XCECER(N,NN,M5,M4)=0._r8
-              XAECER(N,NN,M5,M4)=0._r8
 !
 !     FERTILIZER POOLS
 !
@@ -1006,45 +868,11 @@ module ErosionMod
 !
 !     EXCHANGEABLE CATIONS AND ANIONS
 !
-              XN4ER(N,NN,M5,M4)=0._r8
-              XNBER(N,NN,M5,M4)=0._r8
-              XHYER(N,NN,M5,M4)=0._r8
-              XALER(N,NN,M5,M4)=0._r8
-              XFEER(N,NN,M5,M4)=0._r8
-              XCAER(N,NN,M5,M4)=0._r8
-              XMGER(N,NN,M5,M4)=0._r8
-              XNAER(N,NN,M5,M4)=0._r8
-              XKAER(N,NN,M5,M4)=0._r8
-              XHCER(N,NN,M5,M4)=0._r8
-              XAL2ER(N,NN,M5,M4)=0._r8
-              XFE2ER(N,NN,M5,M4)=0._r8
-              XOH0ER(N,NN,M5,M4)=0._r8
-              XOH1ER(N,NN,M5,M4)=0._r8
-              XOH2ER(N,NN,M5,M4)=0._r8
-              XH1PER(N,NN,M5,M4)=0._r8
-              XH2PER(N,NN,M5,M4)=0._r8
-              XOH0EB(N,NN,M5,M4)=0._r8
-              XOH1EB(N,NN,M5,M4)=0._r8
-              XOH2EB(N,NN,M5,M4)=0._r8
-              XH1PEB(N,NN,M5,M4)=0._r8
-              XH2PEB(N,NN,M5,M4)=0._r8
+              trcx_XER(idx_beg:idx_end,N,NN,M5,M4)=0._r8
 !
 !     PRECIPITATES
 !
-              PALOER(N,NN,M5,M4)=0._r8
-              PFEOER(N,NN,M5,M4)=0._r8
-              PCACER(N,NN,M5,M4)=0._r8
-              PCASER(N,NN,M5,M4)=0._r8
-              PALPER(N,NN,M5,M4)=0._r8
-              PFEPER(N,NN,M5,M4)=0._r8
-              PCPDER(N,NN,M5,M4)=0._r8
-              PCPHER(N,NN,M5,M4)=0._r8
-              PCPMER(N,NN,M5,M4)=0._r8
-              PALPEB(N,NN,M5,M4)=0._r8
-              PFEPEB(N,NN,M5,M4)=0._r8
-              PCPDEB(N,NN,M5,M4)=0._r8
-              PCPHEB(N,NN,M5,M4)=0._r8
-              PCPMEB(N,NN,M5,M4)=0._r8
+              trcp_ER(idsp_beg:idsp_end,N,NN,M5,M4)=0._r8
 !
 !     ORGANIC MATTER
 !
@@ -1096,8 +924,6 @@ module ErosionMod
               XSANER(N,NN,M5,M4)=FSEDER*SAND(NU(N2,N1),N2,N1)
               XSILER(N,NN,M5,M4)=FSEDER*SILT(NU(N2,N1),N2,N1)
               XCLAER(N,NN,M5,M4)=FSEDER*CLAY(NU(N2,N1),N2,N1)
-              XCECER(N,NN,M5,M4)=FSEDER*trcx_solml(idx_CEC,NU(N2,N1),N2,N1)
-              XAECER(N,NN,M5,M4)=FSEDER*trcx_solml(idx_AEC,NU(N2,N1),N2,N1)
 !
 !     FERTILIZER POOLS
 !
@@ -1112,45 +938,15 @@ module ErosionMod
 !
 !     EXCHANGEABLE CATIONS AND ANIONS
 !
-              XN4ER(N,NN,M5,M4)=FSEDER*trcx_solml(idx_NH4,NU(N2,N1),N2,N1)
-              XNBER(N,NN,M5,M4)=FSEDER*trcx_solml(idx_NH4B,NU(N2,N1),N2,N1)
-              XHYER(N,NN,M5,M4)=FSEDER*trcx_solml(idx_Hp,NU(N2,N1),N2,N1)
-              XALER(N,NN,M5,M4)=FSEDER*trcx_solml(idx_Al,NU(N2,N1),N2,N1)
-              XFEER(N,NN,M5,M4)=FSEDER*trcx_solml(idx_Fe,NU(N2,N1),N2,N1)
-              XCAER(N,NN,M5,M4)=FSEDER*trcx_solml(idx_Ca,NU(N2,N1),N2,N1)
-              XMGER(N,NN,M5,M4)=FSEDER*trcx_solml(idx_Mg,NU(N2,N1),N2,N1)
-              XNAER(N,NN,M5,M4)=FSEDER*trcx_solml(idx_Na,NU(N2,N1),N2,N1)
-              XKAER(N,NN,M5,M4)=FSEDER*trcx_solml(idx_K,NU(N2,N1),N2,N1)
-              XHCER(N,NN,M5,M4)=FSEDER*trcx_solml(idx_COOH,NU(N2,N1),N2,N1)
-              XAL2ER(N,NN,M5,M4)=FSEDER*trcx_solml(idx_AlOH2,NU(N2,N1),N2,N1)
-              XFE2ER(N,NN,M5,M4)=FSEDER*trcx_solml(idx_FeOH2,NU(N2,N1),N2,N1)
-              XOH0ER(N,NN,M5,M4)=FSEDER*trcx_solml(idx_OHe,NU(N2,N1),N2,N1)
-              XOH1ER(N,NN,M5,M4)=FSEDER*trcx_solml(idx_OH,NU(N2,N1),N2,N1)
-              XOH2ER(N,NN,M5,M4)=FSEDER*trcx_solml(idx_OHp,NU(N2,N1),N2,N1)
-              XH1PER(N,NN,M5,M4)=FSEDER*trcx_solml(idx_HPO4,NU(N2,N1),N2,N1)
-              XH2PER(N,NN,M5,M4)=FSEDER*trcx_solml(idx_H2PO4,NU(N2,N1),N2,N1)
-              XOH0EB(N,NN,M5,M4)=FSEDER*trcx_solml(idx_OHeB,NU(N2,N1),N2,N1)
-              XOH1EB(N,NN,M5,M4)=FSEDER*trcx_solml(idx_OHB,NU(N2,N1),N2,N1)
-              XOH2EB(N,NN,M5,M4)=FSEDER*trcx_solml(idx_OHpB,NU(N2,N1),N2,N1)
-              XH1PEB(N,NN,M5,M4)=FSEDER*trcx_solml(idx_HPO4B,NU(N2,N1),N2,N1)
-              XH2PEB(N,NN,M5,M4)=FSEDER*trcx_solml(idx_H2PO4B,NU(N2,N1),N2,N1)
+              DO NTX=idx_beg,idx_end
+                trcx_XER(NTX,N,NN,M5,M4)=FSEDER*trcx_solml(NTX,NU(N2,N1),N2,N1)
+              ENDDO
 !
 !     PRECIPITATES
 !
-              PALOER(N,NN,M5,M4)=FSEDER*trcp_salml(idsp_AlOH3,NU(N2,N1),N2,N1)
-              PFEOER(N,NN,M5,M4)=FSEDER*trcp_salml(idsp_FeOH3,NU(N2,N1),N2,N1)
-              PCACER(N,NN,M5,M4)=FSEDER*trcp_salml(idsp_CaCO3,NU(N2,N1),N2,N1)
-              PCASER(N,NN,M5,M4)=FSEDER*trcp_salml(idsp_CaSO4,NU(N2,N1),N2,N1)
-              PALPER(N,NN,M5,M4)=FSEDER*trcp_salml(idsp_AlPO4,NU(N2,N1),N2,N1)
-              PFEPER(N,NN,M5,M4)=FSEDER*trcp_salml(idsp_FePO4,NU(N2,N1),N2,N1)
-              PCPDER(N,NN,M5,M4)=FSEDER*trcp_salml(idsp_CaHPO4,NU(N2,N1),N2,N1)
-              PCPHER(N,NN,M5,M4)=FSEDER*trcp_salml(idsp_HA,NU(N2,N1),N2,N1)
-              PCPMER(N,NN,M5,M4)=FSEDER*trcp_salml(idsp_CaH2PO4,NU(N2,N1),N2,N1)
-              PALPEB(N,NN,M5,M4)=FSEDER*trcp_salml(idsp_AlPO4B,NU(N2,N1),N2,N1)
-              PFEPEB(N,NN,M5,M4)=FSEDER*trcp_salml(idsp_FePO4B,NU(N2,N1),N2,N1)
-              PCPDEB(N,NN,M5,M4)=FSEDER*trcp_salml(idsp_CaHPO4B,NU(N2,N1),N2,N1)
-              PCPHEB(N,NN,M5,M4)=FSEDER*trcp_salml(idsp_HAB,NU(N2,N1),N2,N1)
-              PCPMEB(N,NN,M5,M4)=FSEDER*trcp_salml(idsp_CaH2PO4B,NU(N2,N1),N2,N1)
+              DO NTP=idsp_beg,idsp_end
+                trcp_ER(NTP,N,NN,M5,M4)=FSEDER*trcp_salml(NTP,NU(N2,N1),N2,N1)
+              ENDDO
 !
 !     ORGANIC MATTER
 !

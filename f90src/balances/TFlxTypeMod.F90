@@ -15,8 +15,6 @@ implicit none
   real(r8),allocatable ::  trcn_TBLS(:,:,:,:)
   real(r8),allocatable ::  trcsa_TBLS(:,:,:,:)                      !
   real(r8),allocatable ::  trcs_TFLS(:,:,:,:)                      !
-
-  real(r8),allocatable ::  THGFLG(:,:,:)                      !
   real(r8),allocatable ::  trcs_TFHS(:,:,:,:)                      !
   real(r8),allocatable ::  TQR(:,:)                           !
   real(r8),allocatable ::  THQR(:,:)                          !
@@ -52,8 +50,6 @@ implicit none
   real(r8),allocatable ::  TSANER(:,:)                        !
   real(r8),allocatable ::  TSILER(:,:)                        !
   real(r8),allocatable ::  TCLAER(:,:)                        !
-  real(r8),allocatable ::  TCECER(:,:)                        !
-  real(r8),allocatable ::  TAECER(:,:)                        !
   real(r8),allocatable ::  TNH4ER(:,:)                        !
   real(r8),allocatable ::  TNH3ER(:,:)                        !
   real(r8),allocatable ::  TNHUER(:,:)                        !
@@ -62,54 +58,16 @@ implicit none
   real(r8),allocatable ::  TNH3EB(:,:)                        !
   real(r8),allocatable ::  TNHUEB(:,:)                        !
   real(r8),allocatable ::  TNO3EB(:,:)                        !
-  real(r8),allocatable ::  TN4ER(:,:)                         !
-  real(r8),allocatable ::  TNBER(:,:)                         !
-  real(r8),allocatable ::  THYER(:,:)                         !
-  real(r8),allocatable ::  TALER(:,:)                         !
-  real(r8),allocatable ::  TCAER(:,:)                         !
-  real(r8),allocatable ::  TMGER(:,:)                         !
-  real(r8),allocatable ::  TNAER(:,:)                         !
-  real(r8),allocatable ::  TKAER(:,:)                         !
-  real(r8),allocatable ::  THCER(:,:)                         !
-  real(r8),allocatable ::  TAL2ER(:,:)                        !
-  real(r8),allocatable ::  TOH0ER(:,:)                        !
-  real(r8),allocatable ::  TOH1ER(:,:)                        !
-  real(r8),allocatable ::  TOH2ER(:,:)                        !
-  real(r8),allocatable ::  TH1PER(:,:)                        !
-  real(r8),allocatable ::  TH2PER(:,:)                        !
-  real(r8),allocatable ::  TOH0EB(:,:)                        !
-  real(r8),allocatable ::  TOH1EB(:,:)                        !
-  real(r8),allocatable ::  TOH2EB(:,:)                        !
-  real(r8),allocatable ::  TH1PEB(:,:)                        !
-  real(r8),allocatable ::  TH2PEB(:,:)                        !
-  real(r8),allocatable ::  TALOER(:,:)                        !
-  real(r8),allocatable ::  TFEOER(:,:)                        !
-  real(r8),allocatable ::  TCACER(:,:)                        !
-  real(r8),allocatable ::  TCASER(:,:)                        !
-  real(r8),allocatable ::  TALPER(:,:)                        !
-  real(r8),allocatable ::  TFEPER(:,:)                        !
-  real(r8),allocatable ::  TCPDER(:,:)                        !
-  real(r8),allocatable ::  TCPHER(:,:)                        !
-  real(r8),allocatable ::  TCPMER(:,:)                        !
-  real(r8),allocatable ::  TALPEB(:,:)                        !
-  real(r8),allocatable ::  TFEPEB(:,:)                        !
-  real(r8),allocatable ::  TCPDEB(:,:)                        !
-  real(r8),allocatable ::  TCPHEB(:,:)                        !
-  real(r8),allocatable ::  TCPMEB(:,:)                        !
-  real(r8),allocatable ::  TFEER(:,:)                         !
-  real(r8),allocatable ::  TFE2ER(:,:)                        !
+  real(r8),allocatable ::  trcx_TER(:,:,:)                         !
+  real(r8),allocatable ::  trcp_TER(:,:,:)                        !
   real(r8),allocatable ::  TSEDER(:,:)                        !
   real(r8),allocatable ::  TFLW(:,:,:)                        !
   real(r8),allocatable ::  TFLWX(:,:,:)                       !
   real(r8),allocatable ::  THFLW(:,:,:)                       !
   real(r8),allocatable ::  TFLWH(:,:,:)                       !
 
-  real(r8),allocatable ::  TCOFLG(:,:,:)                      !
-  real(r8),allocatable ::  TCHFLG(:,:,:)                      !
-  real(r8),allocatable ::  TOXFLG(:,:,:)                      !
-  real(r8),allocatable ::  TNGFLG(:,:,:)                      !
-  real(r8),allocatable ::  TN2FLG(:,:,:)                      !
-  real(r8),allocatable ::  TNHFLG(:,:,:)                      !
+  real(r8),allocatable ::  RTGasADFlx(:,:,:,:)                      !
+
   real(r8),allocatable ::  TTHAW(:,:,:)                       !
   real(r8),allocatable ::  THTHAW(:,:,:)                      !
   real(r8),allocatable ::  TTHAWH(:,:,:)                      !
@@ -168,8 +126,8 @@ implicit none
   allocate(trcn_TBLS(ids_nut_beg:ids_nuts_end,JS,JY,JX)); trcn_TBLS=0._r8
   allocate(trcsa_TBLS(idsa_beg:idsa_end,JS,JY,JX));   trcsa_TBLS=0._r8
   allocate(trcs_TFHS(ids_beg:ids_end,JZ,JY,JX));   trcs_TFHS=0._r8
+  allocate(RTGasADFlx(idg_beg:idg_end-1,JZ,JY,JX));   RTGasADFlx=0._r8
 
-  allocate(THGFLG(JZ,JY,JX));   THGFLG=0._r8
   allocate(TQR(JY,JX));         TQR=0._r8
   allocate(THQR(JY,JX));        THQR=0._r8
   allocate(TQS(JY,JX));         TQS=0._r8
@@ -204,8 +162,6 @@ implicit none
   allocate(TSANER(JY,JX));      TSANER=0._r8
   allocate(TSILER(JY,JX));      TSILER=0._r8
   allocate(TCLAER(JY,JX));      TCLAER=0._r8
-  allocate(TCECER(JY,JX));      TCECER=0._r8
-  allocate(TAECER(JY,JX));      TAECER=0._r8
   allocate(TNH4ER(JY,JX));      TNH4ER=0._r8
   allocate(TNH3ER(JY,JX));      TNH3ER=0._r8
   allocate(TNHUER(JY,JX));      TNHUER=0._r8
@@ -214,54 +170,16 @@ implicit none
   allocate(TNH3EB(JY,JX));      TNH3EB=0._r8
   allocate(TNHUEB(JY,JX));      TNHUEB=0._r8
   allocate(TNO3EB(JY,JX));      TNO3EB=0._r8
-  allocate(TN4ER(JY,JX));       TN4ER=0._r8
-  allocate(TNBER(JY,JX));       TNBER=0._r8
-  allocate(THYER(JY,JX));       THYER=0._r8
-  allocate(TALER(JY,JX));       TALER=0._r8
-  allocate(TCAER(JY,JX));       TCAER=0._r8
-  allocate(TMGER(JY,JX));       TMGER=0._r8
-  allocate(TNAER(JY,JX));       TNAER=0._r8
-  allocate(TKAER(JY,JX));       TKAER=0._r8
-  allocate(THCER(JY,JX));       THCER=0._r8
-  allocate(TAL2ER(JY,JX));      TAL2ER=0._r8
-  allocate(TOH0ER(JY,JX));      TOH0ER=0._r8
-  allocate(TOH1ER(JY,JX));      TOH1ER=0._r8
-  allocate(TOH2ER(JY,JX));      TOH2ER=0._r8
-  allocate(TH1PER(JY,JX));      TH1PER=0._r8
-  allocate(TH2PER(JY,JX));      TH2PER=0._r8
-  allocate(TOH0EB(JY,JX));      TOH0EB=0._r8
-  allocate(TOH1EB(JY,JX));      TOH1EB=0._r8
-  allocate(TOH2EB(JY,JX));      TOH2EB=0._r8
-  allocate(TH1PEB(JY,JX));      TH1PEB=0._r8
-  allocate(TH2PEB(JY,JX));      TH2PEB=0._r8
-  allocate(TALOER(JY,JX));      TALOER=0._r8
-  allocate(TFEOER(JY,JX));      TFEOER=0._r8
-  allocate(TCACER(JY,JX));      TCACER=0._r8
-  allocate(TCASER(JY,JX));      TCASER=0._r8
-  allocate(TALPER(JY,JX));      TALPER=0._r8
-  allocate(TFEPER(JY,JX));      TFEPER=0._r8
-  allocate(TCPDER(JY,JX));      TCPDER=0._r8
-  allocate(TCPHER(JY,JX));      TCPHER=0._r8
-  allocate(TCPMER(JY,JX));      TCPMER=0._r8
-  allocate(TALPEB(JY,JX));      TALPEB=0._r8
-  allocate(TFEPEB(JY,JX));      TFEPEB=0._r8
-  allocate(TCPDEB(JY,JX));      TCPDEB=0._r8
-  allocate(TCPHEB(JY,JX));      TCPHEB=0._r8
-  allocate(TCPMEB(JY,JX));      TCPMEB=0._r8
-  allocate(TFEER(JY,JX));       TFEER=0._r8
-  allocate(TFE2ER(JY,JX));      TFE2ER=0._r8
+
+  allocate(trcx_TER(idx_beg:idx_end,JY,JX));    trcx_TER=0._r8
+  allocate(trcp_TER(idsp_beg:idsp_end,JY,JX));      trcp_TER=0._r8
+  allocate(trcs_TFLS(ids_beg:ids_end,JZ,JY,JX));   trcs_TFLS=0._r8
+
   allocate(TSEDER(JY,JX));      TSEDER=0._r8
   allocate(TFLW(JZ,JY,JX));     TFLW=0._r8
   allocate(TFLWX(JZ,JY,JX));    TFLWX=0._r8
   allocate(THFLW(JZ,JY,JX));    THFLW=0._r8
   allocate(TFLWH(JZ,JY,JX));    TFLWH=0._r8
-  allocate(trcs_TFLS(ids_beg:ids_end,JZ,JY,JX));   trcs_TFLS=0._r8
-  allocate(TCOFLG(JZ,JY,JX));   TCOFLG=0._r8
-  allocate(TCHFLG(JZ,JY,JX));   TCHFLG=0._r8
-  allocate(TOXFLG(JZ,JY,JX));   TOXFLG=0._r8
-  allocate(TNGFLG(JZ,JY,JX));   TNGFLG=0._r8
-  allocate(TN2FLG(JZ,JY,JX));   TN2FLG=0._r8
-  allocate(TNHFLG(JZ,JY,JX));   TNHFLG=0._r8
   allocate(TTHAW(JZ,JY,JX));    TTHAW=0._r8
   allocate(THTHAW(JZ,JY,JX));   THTHAW=0._r8
   allocate(TTHAWH(JZ,JY,JX));   TTHAWH=0._r8
@@ -310,6 +228,8 @@ implicit none
 
   implicit none
 
+  call destroy(trcx_TER)
+
   call destroy(TOMCER)
   call destroy(TOMNER)
   call destroy(TOMPER)
@@ -347,7 +267,6 @@ implicit none
 
   call destroy(trcsa_TQR)
   call destroy(trcsa_TFHS)
-  call destroy(THGFLG)
   call destroy(TQR)
   call destroy(THQR)
   call destroy(TQS)
@@ -376,8 +295,6 @@ implicit none
   call destroy(TSANER)
   call destroy(TSILER)
   call destroy(TCLAER)
-  call destroy(TCECER)
-  call destroy(TAECER)
   call destroy(TNH4ER)
   call destroy(TNH3ER)
   call destroy(TNHUER)
@@ -386,53 +303,11 @@ implicit none
   call destroy(TNH3EB)
   call destroy(TNHUEB)
   call destroy(TNO3EB)
-  call destroy(TN4ER)
-  call destroy(TNBER)
-  call destroy(THYER)
-  call destroy(TALER)
-  call destroy(TCAER)
-  call destroy(TMGER)
-  call destroy(TNAER)
-  call destroy(TKAER)
-  call destroy(THCER)
-  call destroy(TAL2ER)
-  call destroy(TOH0ER)
-  call destroy(TOH1ER)
-  call destroy(TOH2ER)
-  call destroy(TH1PER)
-  call destroy(TH2PER)
-  call destroy(TOH0EB)
-  call destroy(TOH1EB)
-  call destroy(TOH2EB)
-  call destroy(TH1PEB)
-  call destroy(TH2PEB)
-  call destroy(TALOER)
-  call destroy(TFEOER)
-  call destroy(TCACER)
-  call destroy(TCASER)
-  call destroy(TALPER)
-  call destroy(TFEPER)
-  call destroy(TCPDER)
-  call destroy(TCPHER)
-  call destroy(TCPMER)
-  call destroy(TALPEB)
-  call destroy(TFEPEB)
-  call destroy(TCPDEB)
-  call destroy(TCPHEB)
-  call destroy(TCPMEB)
-  call destroy(TFEER)
-  call destroy(TFE2ER)
   call destroy(TSEDER)
   call destroy(TFLW)
   call destroy(TFLWX)
   call destroy(THFLW)
   call destroy(TFLWH)
-  call destroy(TCOFLG)
-  call destroy(TCHFLG)
-  call destroy(TOXFLG)
-  call destroy(TNGFLG)
-  call destroy(TN2FLG)
-  call destroy(TNHFLG)
   call destroy(TTHAW)
   call destroy(THTHAW)
   call destroy(TTHAWH)
@@ -441,6 +316,8 @@ implicit none
   call destroy(VOLWH1)
   call destroy(VOLIH1)
 
+  call destroy(trcp_TER)
+  call destroy(RTGasADFlx)
   call destroy(trcg_TQR)
   call destroy(trcn_TQR)
   end subroutine DestructTflxType

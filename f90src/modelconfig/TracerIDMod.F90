@@ -292,7 +292,7 @@ implicit none
   idx_Mg =addone(idx_end)    ! XMG, exchangeable Mg , [mol d-2]
   idx_Na =addone(idx_end)    ! XNA, exchangeable Na, [mol d-2]
   idx_K  =addone(idx_end)    ! XKA, exchangeable K, [mol d-2]
-  idx_COOH =addone(idx_end)  ! XHC, exchangeable COOH , [mol d-2]
+  idx_COOH  =addone(idx_end)  ! XHC, exchangeable COOH , [mol d-2]
   idx_AlOH2 =addone(idx_end) ! XALO2, exchangeable AlOH2 , [mol d-2]
   idx_FeOH2 =addone(idx_end) ! XFEO2, exchangeable Fe(OH)2, [mol d-2]
   idx_NH4B=addone(idx_end)   ! XNB, exchangeable NH4 band, [mol d-2]

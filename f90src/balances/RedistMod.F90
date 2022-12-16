@@ -673,7 +673,7 @@ module RedistMod
   implicit none
   integer, intent(in) :: NY,NX
   real(r8), intent(out) :: DORGE(JY,JX)
-  integer :: K,NO,M,NGL
+  integer :: K,NO,M,NGL,NTX,NTP
 
   REAL(R8) :: DORGP
 
@@ -689,8 +689,6 @@ module RedistMod
     SAND(NU(NY,NX),NY,NX)=SAND(NU(NY,NX),NY,NX)+TSANER(NY,NX)
     SILT(NU(NY,NX),NY,NX)=SILT(NU(NY,NX),NY,NX)+TSILER(NY,NX)
     CLAY(NU(NY,NX),NY,NX)=CLAY(NU(NY,NX),NY,NX)+TCLAER(NY,NX)
-    trcx_solml(idx_CEC,NU(NY,NX),NY,NX)=trcx_solml(idx_CEC,NU(NY,NX),NY,NX)+TCECER(NY,NX)
-    trcx_solml(idx_AEC,NU(NY,NX),NY,NX)=trcx_solml(idx_AEC,NU(NY,NX),NY,NX)+TAECER(NY,NX)
     !
     !     FERTILIZER POOLS
 !
@@ -705,47 +703,18 @@ module RedistMod
 !
     !   EXCHANGEABLE CATIONS AND ANIONS
 !
-    trcx_solml(idx_NH4,NU(NY,NX),NY,NX)=trcx_solml(idx_NH4,NU(NY,NX),NY,NX)+TN4ER(NY,NX)
-    trcx_solml(idx_NH4B,NU(NY,NX),NY,NX)=trcx_solml(idx_NH4B,NU(NY,NX),NY,NX)+TNBER(NY,NX)
-    trcx_solml(idx_Hp,NU(NY,NX),NY,NX)=trcx_solml(idx_Hp,NU(NY,NX),NY,NX)+THYER(NY,NX)
-    trcx_solml(idx_Al,NU(NY,NX),NY,NX)=trcx_solml(idx_Al,NU(NY,NX),NY,NX)+TALER(NY,NX)
-    trcx_solml(idx_Fe,NU(NY,NX),NY,NX)=trcx_solml(idx_Fe,NU(NY,NX),NY,NX)+TFEER(NY,NX)
-    trcx_solml(idx_Ca,NU(NY,NX),NY,NX)=trcx_solml(idx_Ca,NU(NY,NX),NY,NX)+TCAER(NY,NX)
-    trcx_solml(idx_Mg,NU(NY,NX),NY,NX)=trcx_solml(idx_Mg,NU(NY,NX),NY,NX)+TMGER(NY,NX)
-    trcx_solml(idx_Na,NU(NY,NX),NY,NX)=trcx_solml(idx_Na,NU(NY,NX),NY,NX)+TNAER(NY,NX)
-    trcx_solml(idx_K,NU(NY,NX),NY,NX)=trcx_solml(idx_K,NU(NY,NX),NY,NX)+TKAER(NY,NX)
-    trcx_solml(idx_COOH,NU(NY,NX),NY,NX)=trcx_solml(idx_COOH,NU(NY,NX),NY,NX)+THCER(NY,NX)
-    trcx_solml(idx_AlOH2,NU(NY,NX),NY,NX)=trcx_solml(idx_AlOH2,NU(NY,NX),NY,NX)+TAL2ER(NY,NX)
-    trcx_solml(idx_FeOH2,NU(NY,NX),NY,NX)=trcx_solml(idx_FeOH2,NU(NY,NX),NY,NX)+TFE2ER(NY,NX)
-    trcx_solml(idx_OHe,NU(NY,NX),NY,NX)=trcx_solml(idx_OHe,NU(NY,NX),NY,NX)+TOH0ER(NY,NX)
-    trcx_solml(idx_OH,NU(NY,NX),NY,NX)=trcx_solml(idx_OH,NU(NY,NX),NY,NX)+TOH1ER(NY,NX)
-    trcx_solml(idx_OHp,NU(NY,NX),NY,NX)=trcx_solml(idx_OHp,NU(NY,NX),NY,NX)+TOH2ER(NY,NX)
-    trcx_solml(idx_HPO4,NU(NY,NX),NY,NX)=trcx_solml(idx_HPO4,NU(NY,NX),NY,NX)+TH1PER(NY,NX)
-    trcx_solml(idx_H2PO4,NU(NY,NX),NY,NX)=trcx_solml(idx_H2PO4,NU(NY,NX),NY,NX)+TH2PER(NY,NX)
-    trcx_solml(idx_OHeB,NU(NY,NX),NY,NX)=trcx_solml(idx_OHeB,NU(NY,NX),NY,NX)+TOH0EB(NY,NX)
-    trcx_solml(idx_OHB,NU(NY,NX),NY,NX)=trcx_solml(idx_OHB,NU(NY,NX),NY,NX)+TOH1EB(NY,NX)
-    trcx_solml(idx_OHpB,NU(NY,NX),NY,NX)=trcx_solml(idx_OHpB,NU(NY,NX),NY,NX)+TOH2EB(NY,NX)
-    trcx_solml(idx_HPO4B,NU(NY,NX),NY,NX)=trcx_solml(idx_HPO4B,NU(NY,NX),NY,NX)+TH1PEB(NY,NX)
-    trcx_solml(idx_H2PO4B,NU(NY,NX),NY,NX)=trcx_solml(idx_H2PO4B,NU(NY,NX),NY,NX)+TH2PEB(NY,NX)
+    DO NTX=idx_beg,idx_end
+      trcx_solml(NTX,NU(NY,NX),NY,NX)=trcx_solml(NTX,NU(NY,NX),NY,NX)+trcx_TER(NTX,NY,NX)
+    ENDDO
+
 !
 !     PRECIPITATES
 !
-    trcp_salml(idsp_AlOH3,NU(NY,NX),NY,NX)=trcp_salml(idsp_AlOH3,NU(NY,NX),NY,NX)+TALOER(NY,NX)
-    trcp_salml(idsp_FeOH3,NU(NY,NX),NY,NX)=trcp_salml(idsp_FeOH3,NU(NY,NX),NY,NX)+TFEOER(NY,NX)
-    trcp_salml(idsp_CaCO3,NU(NY,NX),NY,NX)=trcp_salml(idsp_CaCO3,NU(NY,NX),NY,NX)+TCACER(NY,NX)
-    trcp_salml(idsp_CaSO4,NU(NY,NX),NY,NX)=trcp_salml(idsp_CaSO4,NU(NY,NX),NY,NX)+TCASER(NY,NX)
-    trcp_salml(idsp_AlPO4,NU(NY,NX),NY,NX)=trcp_salml(idsp_AlPO4,NU(NY,NX),NY,NX)+TALPER(NY,NX)
-    trcp_salml(idsp_FePO4,NU(NY,NX),NY,NX)=trcp_salml(idsp_FePO4,NU(NY,NX),NY,NX)+TFEPER(NY,NX)
-    trcp_salml(idsp_CaHPO4,NU(NY,NX),NY,NX)=trcp_salml(idsp_CaHPO4,NU(NY,NX),NY,NX)+TCPDER(NY,NX)
-    trcp_salml(idsp_HA,NU(NY,NX),NY,NX)=trcp_salml(idsp_HA,NU(NY,NX),NY,NX)+TCPHER(NY,NX)
-    trcp_salml(idsp_CaH2PO4,NU(NY,NX),NY,NX)=trcp_salml(idsp_CaH2PO4,NU(NY,NX),NY,NX)+TCPMER(NY,NX)
-    trcp_salml(idsp_AlPO4B,NU(NY,NX),NY,NX)=trcp_salml(idsp_AlPO4B,NU(NY,NX),NY,NX)+TALPEB(NY,NX)
-    trcp_salml(idsp_FePO4B,NU(NY,NX),NY,NX)=trcp_salml(idsp_FePO4B,NU(NY,NX),NY,NX)+TFEPEB(NY,NX)
-    trcp_salml(idsp_CaHPO4B,NU(NY,NX),NY,NX)=trcp_salml(idsp_CaHPO4B,NU(NY,NX),NY,NX)+TCPDEB(NY,NX)
-    trcp_salml(idsp_HAB,NU(NY,NX),NY,NX)=trcp_salml(idsp_HAB,NU(NY,NX),NY,NX)+TCPHEB(NY,NX)
-    trcp_salml(idsp_CaH2PO4B,NU(NY,NX),NY,NX)=trcp_salml(idsp_CaH2PO4B,NU(NY,NX),NY,NX)+TCPMEB(NY,NX)
+    DO NTP=idsp_beg,idsp_end
+      trcp_salml(NTP,NU(NY,NX),NY,NX)=trcp_salml(NTP,NU(NY,NX),NY,NX)+trcp_TER(NTP,NY,NX)
+    ENDDO
 !
-    !   ORGANIC CONSTITUENTS
+!   ORGANIC CONSTITUENTS
 !
     DORGP=0.0_r8
     D9280: DO K=1,jcplx
@@ -1015,7 +984,7 @@ module RedistMod
   real(r8), intent(inout) :: TXCO2(JY,JX)
   real(r8), intent(in) :: DORGE(JY,JX)
   real(r8) :: DVOLW(JZ,JY,JX)   !change in water volume
-  integer  :: L,K,M,N,LL,NGL,NTX,NTP
+  integer  :: L,K,M,N,LL,NGL,NTX,NTP,NTG,NTS
   real(r8) :: TKS00,TKSX
   real(r8) :: ENGY
   real(r8) :: HS,CS
@@ -1244,38 +1213,20 @@ module RedistMod
     !
     !     MACROPORE SOLUTES FROM MACROPORE-MICROPORE EXCHANGE
     !
-    trc_soHml(idg_CO2,L,NY,NX)=trc_soHml(idg_CO2,L,NY,NX)+trcs_TFHS(idg_CO2,L,NY,NX)-trcs_XFXS(idg_CO2,L,NY,NX)
-    trc_soHml(idg_CH4,L,NY,NX)=trc_soHml(idg_CH4,L,NY,NX)+trcs_TFHS(idg_CH4,L,NY,NX)-trcs_XFXS(idg_CH4,L,NY,NX)
-    trc_soHml(idg_O2,L,NY,NX)=trc_soHml(idg_O2,L,NY,NX)+trcs_TFHS(idg_O2,L,NY,NX)-trcs_XFXS(idg_O2,L,NY,NX)
-    trc_soHml(idg_N2,L,NY,NX)=trc_soHml(idg_N2,L,NY,NX)+trcs_TFHS(idg_N2,L,NY,NX)-trcs_XFXS(idg_N2,L,NY,NX)
-    trc_soHml(idg_N2O,L,NY,NX)=trc_soHml(idg_N2O,L,NY,NX)+trcs_TFHS(idg_N2O,L,NY,NX)-trcs_XFXS(idg_N2O,L,NY,NX)
-    trc_soHml(idg_H2,L,NY,NX)=trc_soHml(idg_H2,L,NY,NX)+trcs_TFHS(idg_H2,L,NY,NX)-trcs_XFXS(idg_H2,L,NY,NX)
-    trc_soHml(ids_NH4,L,NY,NX)=trc_soHml(ids_NH4,L,NY,NX)+trcs_TFHS(ids_NH4,L,NY,NX)-trcs_XFXS(ids_NH4,L,NY,NX)
-    trc_soHml(idg_NH3,L,NY,NX)=trc_soHml(idg_NH3,L,NY,NX)+trcs_TFHS(idg_NH3,L,NY,NX)-trcs_XFXS(idg_NH3,L,NY,NX)
-    trc_soHml(ids_NO3,L,NY,NX)=trc_soHml(ids_NO3,L,NY,NX)+trcs_TFHS(ids_NO3,L,NY,NX)-trcs_XFXS(ids_NO3,L,NY,NX)
-    trc_soHml(ids_NO2,L,NY,NX)=trc_soHml(ids_NO2,L,NY,NX)+trcs_TFHS(ids_NO2,L,NY,NX)-trcs_XFXS(ids_NO2,L,NY,NX)
-    trc_soHml(ids_H1PO4,L,NY,NX)=trc_soHml(ids_H1PO4,L,NY,NX)+trcs_TFHS(ids_H1PO4,L,NY,NX)-trcs_XFXS(ids_H1PO4,L,NY,NX)
-    trc_soHml(ids_H2PO4,L,NY,NX)=trc_soHml(ids_H2PO4,L,NY,NX)+trcs_TFHS(ids_H2PO4,L,NY,NX)-trcs_XFXS(ids_H2PO4,L,NY,NX)
-    trc_soHml(ids_NH4B,L,NY,NX)=trc_soHml(ids_NH4B,L,NY,NX)+trcs_TFHS(ids_NH4B,L,NY,NX)-trcs_XFXS(ids_NH4B,L,NY,NX)
-    trc_soHml(idg_NH3B,L,NY,NX)=trc_soHml(idg_NH3B,L,NY,NX)+trcs_TFHS(idg_NH3B,L,NY,NX)-trcs_XFXS(idg_NH3B,L,NY,NX)
-    trc_soHml(ids_NO3B,L,NY,NX)=trc_soHml(ids_NO3B,L,NY,NX)+trcs_TFHS(ids_NO3B,L,NY,NX)-trcs_XFXS(ids_NO3B,L,NY,NX)
-    trc_soHml(ids_NO2B,L,NY,NX)=trc_soHml(ids_NO2B,L,NY,NX)+trcs_TFHS(ids_NO2B,L,NY,NX)-trcs_XFXS(ids_NO2B,L,NY,NX)
-    trc_soHml(ids_H1PO4B,L,NY,NX)=trc_soHml(ids_H1PO4B,L,NY,NX)+trcs_TFHS(ids_H1PO4B,L,NY,NX)-trcs_XFXS(ids_H1PO4B,L,NY,NX)
-    trc_soHml(ids_H2PO4B,L,NY,NX)=trc_soHml(ids_H2PO4B,L,NY,NX)+trcs_TFHS(ids_H2PO4B,L,NY,NX)-trcs_XFXS(ids_H2PO4B,L,NY,NX)
+    DO NTS=ids_beg,ids_end
+      trc_soHml(NTS,L,NY,NX)=trc_soHml(NTS,L,NY,NX)+trcs_TFHS(NTS,L,NY,NX)-trcs_XFXS(NTS,L,NY,NX)
+    ENDDO
     !
     !     GASES FROM VOLATILIZATION-DISSOLUTION AND GAS TRANSFER
 !
-    trc_gasml(idg_CO2,L,NY,NX)=trc_gasml(idg_CO2,L,NY,NX)+TCOFLG(L,NY,NX)-GasDisFlx(idg_CO2,L,NY,NX)
-    trc_gasml(idg_CH4,L,NY,NX)=trc_gasml(idg_CH4,L,NY,NX)+TCHFLG(L,NY,NX)-GasDisFlx(idg_CH4,L,NY,NX)
-    trc_gasml(idg_O2,L,NY,NX)=trc_gasml(idg_O2,L,NY,NX)+TOXFLG(L,NY,NX)-GasDisFlx(idg_O2,L,NY,NX)
-    trc_gasml(idg_N2,L,NY,NX)=trc_gasml(idg_N2,L,NY,NX)+TNGFLG(L,NY,NX)-GasDisFlx(idg_N2,L,NY,NX)
-    trc_gasml(idg_N2O,L,NY,NX)=trc_gasml(idg_N2O,L,NY,NX)+TN2FLG(L,NY,NX)-GasDisFlx(idg_N2O,L,NY,NX)
-    trc_gasml(idg_NH3,L,NY,NX)=trc_gasml(idg_NH3,L,NY,NX)+TNHFLG(L,NY,NX)-GasDisFlx(idg_NH3,L,NY,NX) &
-      -GasDisFlx(idg_NH3B,L,NY,NX)+TRN3G(L,NY,NX)
-    trc_gasml(idg_H2,L,NY,NX)=trc_gasml(idg_H2,L,NY,NX)+THGFLG(L,NY,NX)-GasDisFlx(idg_H2,L,NY,NX)
-    ROXYF(L,NY,NX)=TOXFLG(L,NY,NX)
-    RCO2F(L,NY,NX)=TCOFLG(L,NY,NX)
-    RCH4F(L,NY,NX)=TCHFLG(L,NY,NX)
+    DO NTG=idg_beg,idg_end-1
+      trc_gasml(NTG,L,NY,NX)=trc_gasml(NTG,L,NY,NX)+RTGasADFlx(NTG,L,NY,NX)-GasDisFlx(NTG,L,NY,NX)
+    ENDDO
+
+    trc_gasml(idg_NH3,L,NY,NX)=trc_gasml(idg_NH3,L,NY,NX)-GasDisFlx(idg_NH3B,L,NY,NX)+TRN3G(L,NY,NX)
+    ROXYF(L,NY,NX)=RTGasADFlx(idg_O2,L,NY,NX)
+    RCO2F(L,NY,NX)=RTGasADFlx(idg_CO2,L,NY,NX)
+    RCH4F(L,NY,NX)=RTGasADFlx(idg_CH4,L,NY,NX)
     ROXYL(L,NY,NX)=trcs_TFLS(idg_O2,L,NY,NX)+trcs_RFLU(idg_O2,L,NY,NX)+trcs_XFXS(idg_O2,L,NY,NX)+trcg_XBLL(idg_O2,L,NY,NX)
     RCH4L(L,NY,NX)=trcs_TFLS(idg_CH4,L,NY,NX)+trcs_RFLU(idg_CH4,L,NY,NX)+trcs_XFXS(idg_CH4,L,NY,NX)+trcg_XBLL(idg_CH4,L,NY,NX)
     !
@@ -1304,13 +1255,11 @@ module RedistMod
       HGB=HGB+trcg_XBLL(idg_H2,L,NY,NX)
     ELSE
       LL=MIN(L,LG)
-      trc_gasml(idg_CO2,LL,NY,NX)=trc_gasml(idg_CO2,LL,NY,NX)-trcg_XBLL(idg_CO2,L,NY,NX)
-      trc_gasml(idg_CH4,LL,NY,NX)=trc_gasml(idg_CH4,LL,NY,NX)-trcg_XBLL(idg_CH4,L,NY,NX)
-      trc_gasml(idg_O2,LL,NY,NX)=trc_gasml(idg_O2,LL,NY,NX)-trcg_XBLL(idg_O2,L,NY,NX)
-      trc_gasml(idg_N2,LL,NY,NX)=trc_gasml(idg_N2,LL,NY,NX)-trcg_XBLL(idg_N2,L,NY,NX)
-      trc_gasml(idg_N2O,LL,NY,NX)=trc_gasml(idg_N2O,LL,NY,NX)-trcg_XBLL(idg_N2O,L,NY,NX)
-      trc_gasml(idg_NH3,LL,NY,NX)=trc_gasml(idg_NH3,LL,NY,NX)-trcg_XBLL(idg_NH3,L,NY,NX)-trcg_XBLL(idg_NH3B,L,NY,NX)
-      trc_gasml(idg_H2,LL,NY,NX)=trc_gasml(idg_H2,LL,NY,NX)-trcg_XBLL(idg_H2,L,NY,NX)
+      DO NTG=idg_beg,idg_end-1
+        trc_gasml(NTG,LL,NY,NX)=trc_gasml(NTG,LL,NY,NX)-trcg_XBLL(NTG,L,NY,NX)
+      ENDDO
+      trc_gasml(idg_NH3,LL,NY,NX)=trc_gasml(idg_NH3,LL,NY,NX)-trcg_XBLL(idg_NH3B,L,NY,NX)
+
       IF(LG.LT.L)THEN
         TLCO2G=TLCO2G-trcg_XBLL(idg_CO2,L,NY,NX)-trcg_XBLL(idg_CH4,L,NY,NX)
         UCO2S(NY,NX)=UCO2S(NY,NX)-trcg_XBLL(idg_CO2,L,NY,NX)-trcg_XBLL(idg_CH4,L,NY,NX)

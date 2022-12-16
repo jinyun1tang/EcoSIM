@@ -730,12 +730,12 @@ module BoundaryTranspMod
 !     gas code:*CO*=CO2,*OX*=O2,*CH*=CH4,*NG*=N2,*N2*=N2O,*NH*=NH3,*HG*=H2
 !
   IF(VOLX(N3,N2,N1).GT.ZEROS2(N2,N1))THEN
-    DO NTG=idg_beg,idg_end
+    DO NTG=idg_beg,idg_end-1
       RTGasADFlx(NTG,N3,N2,N1)=RTGasADFlx(NTG,N3,N2,N1) &
         +R3GasADFlx(NTG,N,N3,N2,N1)-R3GasADFlx(NTG,N,N6,N5,N4)
     ENDDO
   ELSE
-    RTGasADFlx(idg_beg:idg_end,N3,N2,N1)=0._r8
+    RTGasADFlx(idg_beg:idg_end-1,N3,N2,N1)=0._r8
   ENDIF
   end subroutine NetFluxMicroandMacropores
 

@@ -1552,12 +1552,12 @@ contains
 !     gas code:*CO2*=CO2,*OXY*=O2,*CH4*=CH4,*Z2G*=N2,*Z2O*=N2O
 !             :*ZN3*=NH3,*H2G*=H2
 !
-    DFLG2=AZMAX1(THETPM(M,NU(NY,NX),NY,NX))*POROQ &
-      *THETPM(M,NU(NY,NX),NY,NX)/POROS(NU(NY,NX),NY,NX) &
-      *AREA(3,NU(NY,NX),NY,NX)/AMAX1(ZERO2,DLYR(3,NU(NY,NX),NY,NX))
+  DFLG2=AZMAX1(THETPM(M,NU(NY,NX),NY,NX))*POROQ &
+    *THETPM(M,NU(NY,NX),NY,NX)/POROS(NU(NY,NX),NY,NX) &
+    *AREA(3,NU(NY,NX),NY,NX)/AMAX1(ZERO2,DLYR(3,NU(NY,NX),NY,NX))
 
-    DO NTG=idg_beg,idg_end-1
-      DifuscG(NTG,3,NU(NY,NX),NY,NX)=DFLG2*GasDifcc(NTG,NU(NY,NX),NY,NX)
+  DO NTG=idg_beg,idg_end-1
+    DifuscG(NTG,3,NU(NY,NX),NY,NX)=DFLG2*GasDifcc(NTG,NU(NY,NX),NY,NX)
 !
 !     SURFACE GAS CONCENTRATIONS
 !
@@ -1567,7 +1567,7 @@ contains
 !             :*ZN3*=NH3,*H2G*=H2
 !     VOLPM=air-filled porosity
 !
-      trcg_cl2=AZMAX1(trc_gasml2(NTG,NU(NY,NX),NY,NX)/VOLPM(M,NU(NY,NX),NY,NX))
+    trcg_cl2=AZMAX1(trc_gasml2(NTG,NU(NY,NX),NY,NX)/VOLPM(M,NU(NY,NX),NY,NX))
 !
 !     EQUILIBRIUM CONCENTRATIONS AT SOIL SURFACE AT WHICH
 !     GASEOUS DIFFUSION THROUGH SOIL SURFACE LAYER = GASEOUS
@@ -1581,10 +1581,10 @@ contains
 !     C*E=atmospheric gas concentration from hour1.f
 !     C*G2=gaseous concentration
 !
-      DGQ_cef=DifuscG(NTG,3,NU(NY,NX),NY,NX)*PARG_cef(NTG,NY,NX) &
-        /(DifuscG(NTG,3,NU(NY,NX),NY,NX)+PARG_cef(NTG,NY,NX))
+    DGQ_cef=DifuscG(NTG,3,NU(NY,NX),NY,NX)*PARG_cef(NTG,NY,NX) &
+      /(DifuscG(NTG,3,NU(NY,NX),NY,NX)+PARG_cef(NTG,NY,NX))
 
-      DFV_g=DGQ_cef*(AtmGgms(NTG,NY,NX)-trcg_cl2)
+    DFV_g=DGQ_cef*(AtmGgms(NTG,NY,NX)-trcg_cl2)
 
 !     TOTAL SOIL GAS FLUX FROM DIFFUSIVE
 !
@@ -1593,8 +1593,8 @@ contains
 !     DFV*G=diffusive gas flux
 !     RFL*G=convective gas flux
 
-      R3GasADFlx(NTG,3,NU(NY,NX),NY,NX)=DFV_g
-    ENDDO
+    R3GasADFlx(NTG,3,NU(NY,NX),NY,NX)=DFV_g
+  ENDDO
 
   end subroutine SurfSoilDifFlux
 ! ----------------------------------------------------------------------

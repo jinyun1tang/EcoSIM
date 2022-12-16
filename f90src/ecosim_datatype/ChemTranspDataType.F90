@@ -65,47 +65,7 @@ module ChemTranspDataType
   real(r8),target,allocatable ::  HCSGL(:,:,:)                       !aqueous HCO3 diffusivity, [m2 h-1]
   real(r8),target,allocatable ::  SOSGL(:,:,:)                       !aqueous SO4 diffusivity, [m2 h-1]
   real(r8),target,allocatable ::  CLSXL(:,:,:)                       !aqueous Cl diffusivity, [m2 h-1]
-  real(r8),target,allocatable ::  XQRAL(:,:,:,:)                     !total Al in runoff, [mol d-2 h-1]
-  real(r8),target,allocatable ::  XQRFE(:,:,:,:)                     !total Fe in runoff, [mol d-2 h-1]
-  real(r8),target,allocatable ::  XQRHY(:,:,:,:)                     !total H in runoff, [mol d-2 h-1]
-  real(r8),target,allocatable ::  XQRCA(:,:,:,:)                     !total Ca in runoff, [mol d-2 h-1]
-  real(r8),target,allocatable ::  XQRMG(:,:,:,:)                     !total Mg in runoff, [mol d-2 h-1]
-  real(r8),target,allocatable ::  XQRNA(:,:,:,:)                     !total Na in runoff, [mol d-2 h-1]
-  real(r8),target,allocatable ::  XQRKA(:,:,:,:)                     !total K in runoff, [mol d-2 h-1]
-  real(r8),target,allocatable ::  XQROH(:,:,:,:)                     !total OH in runoff, [mol d-2 h-1]
-  real(r8),target,allocatable ::  XQRSO(:,:,:,:)                     !total SO4 in runoff, [mol d-2 h-1]
-  real(r8),target,allocatable ::  XQRCL(:,:,:,:)                     !total Cl in runoff, [mol d-2 h-1]
-  real(r8),target,allocatable ::  XQRC3(:,:,:,:)                     !total CO3 in runoff, [mol d-2 h-1]
-  real(r8),target,allocatable ::  XQRHC(:,:,:,:)                     !total HCO3 in runoff, [mol d-2 h-1]
-  real(r8),target,allocatable ::  XQRAL1(:,:,:,:)                    !total AlOH in runoff, [mol d-2 h-1]
-  real(r8),target,allocatable ::  XQRAL2(:,:,:,:)                    !total AlOH2 in runoff, [mol d-2 h-1]
-  real(r8),target,allocatable ::  XQRAL3(:,:,:,:)                    !total AlOH3 in runoff, [mol d-2 h-1]
-  real(r8),target,allocatable ::  XQRAL4(:,:,:,:)                    !total AlOH4 in runoff, [mol d-2 h-1]
-  real(r8),target,allocatable ::  XQRALS(:,:,:,:)                    !total AlSO4 in runoff, [mol d-2 h-1]
-  real(r8),target,allocatable ::  XQRFE1(:,:,:,:)                    !total FeOH in runoff, [mol d-2 h-1]
-  real(r8),target,allocatable ::  XQRFE2(:,:,:,:)                    !total FeOH2 in runoff, [mol d-2 h-1]
-  real(r8),target,allocatable ::  XQRFE3(:,:,:,:)                    !total FeOH3 in runoff, [mol d-2 h-1]
-  real(r8),target,allocatable ::  XQRFE4(:,:,:,:)                    !total FeOH4 in runoff, [mol d-2 h-1]
-  real(r8),target,allocatable ::  XQRFES(:,:,:,:)                    !total FeSO4 in runoff, [mol d-2 h-1]
-  real(r8),target,allocatable ::  XQRCAO(:,:,:,:)                    !total CaOH in runoff, [mol d-2 h-1]
-  real(r8),target,allocatable ::  XQRCAC(:,:,:,:)                    !total CaCO3 in runoff, [mol d-2 h-1]
-  real(r8),target,allocatable ::  XQRCAH(:,:,:,:)                    !total CaHCO3 in runoff, [mol d-2 h-1]
-  real(r8),target,allocatable ::  XQRCAS(:,:,:,:)                    !total CaSO4 in runoff, [mol d-2 h-1]
-  real(r8),target,allocatable ::  XQRMGO(:,:,:,:)                    !total MgOH in runoff, [mol d-2 h-1]
-  real(r8),target,allocatable ::  XQRMGC(:,:,:,:)                    !total MgCO3 in runoff, [mol d-2 h-1]
-  real(r8),target,allocatable ::  XQRMGH(:,:,:,:)                    !total MgHCO3 in runoff, [mol d-2 h-1]
-  real(r8),target,allocatable ::  XQRMGS(:,:,:,:)                    !total MgSO4 in runoff, [mol d-2 h-1]
-  real(r8),target,allocatable ::  XQRNAC(:,:,:,:)                    !total NaCO3 in runoff, [mol d-2 h-1]
-  real(r8),target,allocatable ::  XQRNAS(:,:,:,:)                    !total NaSO4 in runoff, [mol d-2 h-1]
-  real(r8),target,allocatable ::  XQRKAS(:,:,:,:)                    !total KSO4 in runoff, [mol d-2 h-1]
-  real(r8),target,allocatable ::  XQRH0P(:,:,:,:)                    !total PO4 in runoff non-band, [mol d-2 h-1]
-  real(r8),target,allocatable ::  XQRH3P(:,:,:,:)                    !total H3PO4 in runoff non-band, [mol d-2 h-1]
-  real(r8),target,allocatable ::  XQRF1P(:,:,:,:)                    !total FeHPO4 in runoff non-band, [mol d-2 h-1]
-  real(r8),target,allocatable ::  XQRF2P(:,:,:,:)                    !total FeH2PO4 in runoff non-band, [mol d-2 h-1]
-  real(r8),target,allocatable ::  XQRC0P(:,:,:,:)                    !total CaPO4 in runoff non-band, [mol d-2 h-1]
-  real(r8),target,allocatable ::  XQRC1P(:,:,:,:)                    !total CaHPO4 in runoff non-band, [mol d-2 h-1]
-  real(r8),target,allocatable ::  XQRC2P(:,:,:,:)                    !total CaH2PO4 in runoff non-band, [mol d-2 h-1]
-  real(r8),target,allocatable ::  XQRM1P(:,:,:,:)                    !total MgHPO4 in runoff non-band, [mol d-2 h-1]
+  real(r8),target,allocatable ::  trcsa_XQR(:,:,:,:,:)                     !total Al in runoff, [mol d-2 h-1]
   real(r8),target,allocatable ::  trcg_XRS(:,:,:,:,:)                    !surface runoff gas flux, [g d-2 h-1]
   real(r8),target,allocatable ::  trcn_XRS(:,:,:,:,:)                    !surface runoff nutrient flux, [g d-2 h-1]
   real(r8),target,allocatable ::  XOCQRS(:,:,:,:,:)                  !surface runoff DOC flux, [g d-2 h-1]
@@ -187,47 +147,7 @@ module ChemTranspDataType
   allocate(HCSGL(JZ,JY,JX));    HCSGL=0._r8
   allocate(SOSGL(JZ,JY,JX));    SOSGL=0._r8
   allocate(CLSXL(JZ,JY,JX));    CLSXL=0._r8
-  allocate(XQRAL(2,2,JV,JH));   XQRAL=0._r8
-  allocate(XQRFE(2,2,JV,JH));   XQRFE=0._r8
-  allocate(XQRHY(2,2,JV,JH));   XQRHY=0._r8
-  allocate(XQRCA(2,2,JV,JH));   XQRCA=0._r8
-  allocate(XQRMG(2,2,JV,JH));   XQRMG=0._r8
-  allocate(XQRNA(2,2,JV,JH));   XQRNA=0._r8
-  allocate(XQRKA(2,2,JV,JH));   XQRKA=0._r8
-  allocate(XQROH(2,2,JV,JH));   XQROH=0._r8
-  allocate(XQRSO(2,2,JV,JH));   XQRSO=0._r8
-  allocate(XQRCL(2,2,JV,JH));   XQRCL=0._r8
-  allocate(XQRC3(2,2,JV,JH));   XQRC3=0._r8
-  allocate(XQRHC(2,2,JV,JH));   XQRHC=0._r8
-  allocate(XQRAL1(2,2,JV,JH));  XQRAL1=0._r8
-  allocate(XQRAL2(2,2,JV,JH));  XQRAL2=0._r8
-  allocate(XQRAL3(2,2,JV,JH));  XQRAL3=0._r8
-  allocate(XQRAL4(2,2,JV,JH));  XQRAL4=0._r8
-  allocate(XQRALS(2,2,JV,JH));  XQRALS=0._r8
-  allocate(XQRFE1(2,2,JV,JH));  XQRFE1=0._r8
-  allocate(XQRFE2(2,2,JV,JH));  XQRFE2=0._r8
-  allocate(XQRFE3(2,2,JV,JH));  XQRFE3=0._r8
-  allocate(XQRFE4(2,2,JV,JH));  XQRFE4=0._r8
-  allocate(XQRFES(2,2,JV,JH));  XQRFES=0._r8
-  allocate(XQRCAO(2,2,JV,JH));  XQRCAO=0._r8
-  allocate(XQRCAC(2,2,JV,JH));  XQRCAC=0._r8
-  allocate(XQRCAH(2,2,JV,JH));  XQRCAH=0._r8
-  allocate(XQRCAS(2,2,JV,JH));  XQRCAS=0._r8
-  allocate(XQRMGO(2,2,JV,JH));  XQRMGO=0._r8
-  allocate(XQRMGC(2,2,JV,JH));  XQRMGC=0._r8
-  allocate(XQRMGH(2,2,JV,JH));  XQRMGH=0._r8
-  allocate(XQRMGS(2,2,JV,JH));  XQRMGS=0._r8
-  allocate(XQRNAC(2,2,JV,JH));  XQRNAC=0._r8
-  allocate(XQRNAS(2,2,JV,JH));  XQRNAS=0._r8
-  allocate(XQRKAS(2,2,JV,JH));  XQRKAS=0._r8
-  allocate(XQRH0P(2,2,JV,JH));  XQRH0P=0._r8
-  allocate(XQRH3P(2,2,JV,JH));  XQRH3P=0._r8
-  allocate(XQRF1P(2,2,JV,JH));  XQRF1P=0._r8
-  allocate(XQRF2P(2,2,JV,JH));  XQRF2P=0._r8
-  allocate(XQRC0P(2,2,JV,JH));  XQRC0P=0._r8
-  allocate(XQRC1P(2,2,JV,JH));  XQRC1P=0._r8
-  allocate(XQRC2P(2,2,JV,JH));  XQRC2P=0._r8
-  allocate(XQRM1P(2,2,JV,JH));  XQRM1P=0._r8
+  allocate(trcsa_XQR(idsa_beg:idsa_end,2,2,JV,JH));   trcsa_XQR=0._r8
   allocate(trcg_XRS(idg_beg:idg_end-1,2,2,JV,JH));  trcg_XRS=0._r8
   allocate(trcn_XRS(ids_nut_beg:ids_nuts_end,2,2,JV,JH));  trcn_XRS=0._r8
   allocate(XOCQRS(1:jcplx,2,2,JV,JH));XOCQRS=0._r8
@@ -243,6 +163,8 @@ module ChemTranspDataType
   use abortutils, only : destroy
 
   implicit none
+
+  call destroy(trcsa_XQR)
   call destroy(GasDifc)
   call destroy(SolDifc)
   call destroy(TFND)
@@ -301,47 +223,6 @@ module ChemTranspDataType
   call destroy(HCSGL)
   call destroy(SOSGL)
   call destroy(CLSXL)
-  call destroy(XQRAL)
-  call destroy(XQRFE)
-  call destroy(XQRHY)
-  call destroy(XQRCA)
-  call destroy(XQRMG)
-  call destroy(XQRNA)
-  call destroy(XQRKA)
-  call destroy(XQROH)
-  call destroy(XQRSO)
-  call destroy(XQRCL)
-  call destroy(XQRC3)
-  call destroy(XQRHC)
-  call destroy(XQRAL1)
-  call destroy(XQRAL2)
-  call destroy(XQRAL3)
-  call destroy(XQRAL4)
-  call destroy(XQRALS)
-  call destroy(XQRFE1)
-  call destroy(XQRFE2)
-  call destroy(XQRFE3)
-  call destroy(XQRFE4)
-  call destroy(XQRFES)
-  call destroy(XQRCAO)
-  call destroy(XQRCAC)
-  call destroy(XQRCAH)
-  call destroy(XQRCAS)
-  call destroy(XQRMGO)
-  call destroy(XQRMGC)
-  call destroy(XQRMGH)
-  call destroy(XQRMGS)
-  call destroy(XQRNAC)
-  call destroy(XQRNAS)
-  call destroy(XQRKAS)
-  call destroy(XQRH0P)
-  call destroy(XQRH3P)
-  call destroy(XQRF1P)
-  call destroy(XQRF2P)
-  call destroy(XQRC0P)
-  call destroy(XQRC1P)
-  call destroy(XQRC2P)
-  call destroy(XQRM1P)
   call destroy(XOCQRS)
   call destroy(XONQRS)
   call destroy(XOPQRS)

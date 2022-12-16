@@ -296,13 +296,7 @@ module InsideTranspMod
 !     CO2S,CH4S,OXYS,Z2GS,Z2OS,H2GS=aqueous CO2,CH4,O2,N2,N2O,H2 in micropores
 !     ZN3G=gaseous NH3
 !
-    TCOFLG(L,NY,NX)=0.0_r8
-    TCHFLG(L,NY,NX)=0.0_r8
-    TOXFLG(L,NY,NX)=0.0_r8
-    TNGFLG(L,NY,NX)=0.0_r8
-    TN2FLG(L,NY,NX)=0.0_r8
-    TN3FLG(L,NY,NX)=0.0_r8
-    THGFLG(L,NY,NX)=0.0_r8
+    RTGasADFlx(idg_beg:idg_end-1,L,NY,NX)=0._r8
     DO NTG=idg_beg,idg_end-1
       if(NTG/=idg_NH3)then
         trc_solml2(NTG,L,NY,NX)=trc_solml2(NTG,L,NY,NX)-RBGCSinkG(NTG,L,NY,NX)
@@ -523,7 +517,6 @@ module InsideTranspMod
   real(r8) :: VOLW2A,VOLW2B,VOLW3A,VOLW3B,VOLW4A,VOLW4B
   real(r8) :: trcsolc1(ids_beg:ids_end)
   real(r8) :: trcsolc2(ids_beg:ids_end)
-  real(r8) :: COXYG1,CZ2GG1,CZ2OG1,CNH3G1
 
   real(r8) :: SDifc(ids_beg:ids_end),SDifFlx(ids_beg:ids_end)
   real(r8) :: DISPN,DIFOC,DIFON,DIFOP,DIFOA
@@ -1511,12 +1504,8 @@ module InsideTranspMod
   real(r8) :: trc_gasc1(idg_beg:idg_end)
   real(r8) :: trc_gasc2(idg_beg:idg_end)
 
-  real(r8) :: CCH4G2,CH2GG2,CCH4G1,CH2GG1
-  real(r8) :: COXYG2,CZ2GG2,CZ2OG2,CNH3G2
-
-  real(r8) :: CNH3G1,COXYG1,CZ2GG1,CZ2OG1
-  real(r8) :: CND21,CND22,CND41,CNDO1,CNDG1,CNDH1,CNDC1
-  real(r8) :: CNDC2,CND42,CNDO2,CNDG2,CNDH2,CNHG2,CNHG1
+  real(r8) :: CNDC1
+  real(r8) :: CNDC2
   real(r8) :: DFLG2,DFLGL
   real(r8) :: DFVGG(idg_beg:idg_end)
   integer :: NTG

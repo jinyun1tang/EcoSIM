@@ -1,6 +1,7 @@
 module SedimentDataType
   use data_kind_mod, only : r8 => SHR_KIND_R8
   use GridConsts
+  use TracerIDMod
   use EcoSIMConfig, only : jcplx => jcplxc,ndbiomcp=>ndbiomcpc,jsken=>jskenc
 implicit none
 
@@ -26,45 +27,9 @@ implicit none
   real(r8),target,allocatable ::  XNH3EB(:,:,:,:)                   !total NH3 fertilizer erosion band, [g d-2 h-1]
   real(r8),target,allocatable ::  XNHUEB(:,:,:,:)                   !total urea fertilizer erosion band , [g d-2 h-1]
   real(r8),target,allocatable ::  XNO3EB(:,:,:,:)                   !total NO3 fertilizer erosion band , [g d-2 h-1]
-  real(r8),target,allocatable ::  XN4ER(:,:,:,:)                    !total adsorbed NH4 erosion non-band , [g d-2 h-1]
-  real(r8),target,allocatable ::  XNBER(:,:,:,:)                    !total adsorbed NH4 erosion band , [g d-2 h-1]
-  real(r8),target,allocatable ::  XH1PEB(:,:,:,:)                   !total adsorbed HPO4  erosion band , [g d-2 h-1]
-  real(r8),target,allocatable ::  XH2PEB(:,:,:,:)                   !total adsorbed H2PO4  erosion band , [g d-2 h-1]
-  real(r8),target,allocatable ::  XCECER(:,:,:,:)                   !total CEC erosion , [cmol kg-1 d-2 h-1]
-  real(r8),target,allocatable ::  XAECER(:,:,:,:)                   !total AEC erosion , [cmol kg-1 d-2 h-1]
-  real(r8),target,allocatable ::  PALOER(:,:,:,:)                   !total adsorbed ALOH3  erosion , [g d-2 h-1]
-  real(r8),target,allocatable ::  XHYER(:,:,:,:)                    !total adsorbed H  erosion , [g d-2 h-1]
-  real(r8),target,allocatable ::  XALER(:,:,:,:)                    !total adsorbed Al  erosion , [g d-2 h-1]
-  real(r8),target,allocatable ::  XCAER(:,:,:,:)                    !total adsorbed Ca  erosion , [g d-2 h-1]
-  real(r8),target,allocatable ::  XMGER(:,:,:,:)                    !total adsorbed Mg  erosion , [g d-2 h-1]
-  real(r8),target,allocatable ::  XNAER(:,:,:,:)                    !total adsorbed Na  erosion , [g d-2 h-1]
-  real(r8),target,allocatable ::  XKAER(:,:,:,:)                    !total adsorbed K  erosion , [g d-2 h-1]
-  real(r8),target,allocatable ::  XHCER(:,:,:,:)                    !total adsorbed COOH  erosion , [g d-2 h-1]
-  real(r8),target,allocatable ::  XAL2ER(:,:,:,:)                   !total adsorbed AlOH2  erosion , [g d-2 h-1]
-  real(r8),target,allocatable ::  XOH0ER(:,:,:,:)                   !total adsorbed OH-  erosion non-band , [g d-2 h-1]
-  real(r8),target,allocatable ::  XOH1ER(:,:,:,:)                   !total adsorbed OH  erosion non-band , [g d-2 h-1]
-  real(r8),target,allocatable ::  XOH2ER(:,:,:,:)                   !total adsorbed OH2  erosion non-band , [g d-2 h-1]
-  real(r8),target,allocatable ::  XH1PER(:,:,:,:)                   !total adsorbed HPO4  erosion non-band , [g d-2 h-1]
-  real(r8),target,allocatable ::  XH2PER(:,:,:,:)                   !total adsorbed H2PO4  erosion non-band , [g d-2 h-1]
-  real(r8),target,allocatable ::  XOH0EB(:,:,:,:)                   !total adsorbed OH-  erosion band , [g d-2 h-1]
-  real(r8),target,allocatable ::  XOH1EB(:,:,:,:)                   !total adsorbed OH  erosion band , [g d-2 h-1]
-  real(r8),target,allocatable ::  XOH2EB(:,:,:,:)                   !total adsorbed OH2  erosion band , [g d-2 h-1]
-  real(r8),target,allocatable ::  PFEOER(:,:,:,:)                   !total adsorbed FeOH3  erosion , [g d-2 h-1]
-  real(r8),target,allocatable ::  PCACER(:,:,:,:)                   !total adsorbed CaCO3  erosion , [g d-2 h-1]
-  real(r8),target,allocatable ::  PCASER(:,:,:,:)                   !total adsorbed CaSO4  erosion , [g d-2 h-1]
-  real(r8),target,allocatable ::  PALPER(:,:,:,:)                   !total adsorbed AlPO4  erosion non-band , [g d-2 h-1]
-  real(r8),target,allocatable ::  PFEPER(:,:,:,:)                   !total adsorbed FePO4  erosion non-band , [g d-2 h-1]
-  real(r8),target,allocatable ::  PCPDER(:,:,:,:)                   !total adsorbed CaHPO4  erosion non-band , [g d-2 h-1]
-  real(r8),target,allocatable ::  PCPHER(:,:,:,:)                   !total adsorbed apatite  erosion non-band , [g d-2 h-1]
-  real(r8),target,allocatable ::  PCPMER(:,:,:,:)                   !total adsorbed CaH2PO4  erosion non-band , [g d-2 h-1]
-  real(r8),target,allocatable ::  PALPEB(:,:,:,:)                   !total adsorbed AlPO4  erosion band , [g d-2 h-1]
-  real(r8),target,allocatable ::  PFEPEB(:,:,:,:)                   !total adsorbed FePO4  erosion band , [g d-2 h-1]
-  real(r8),target,allocatable ::  PCPDEB(:,:,:,:)                   !total adsorbed CaHPO4  erosion band , [g d-2 h-1]
-  real(r8),target,allocatable ::  PCPHEB(:,:,:,:)                   !total adsorbed apatite  erosion band , [g d-2 h-1]
-  real(r8),target,allocatable ::  PCPMEB(:,:,:,:)                   !total adsorbed CaH2PO4  erosion band , [g d-2 h-1]
-  real(r8),target,allocatable ::  XFE2ER(:,:,:,:)                   !sedimentation rate of Fe(OH)2
+  real(r8),target,allocatable ::  trcx_XER(:,:,:,:,:)               !total adsorbed sediment erosion non-band , [g d-2 h-1]
+  real(r8),target,allocatable ::  trcp_ER(:,:,:,:,:)                   !total adsorbed ALOH3  erosion , [g d-2 h-1]
   real(r8),target,allocatable ::  XSEDER(:,:,:,:)                   !sediment erosion, [Mg d-2 h-1]
-  real(r8),target,allocatable ::  XFEER(:,:,:,:)                    !erosion loss rate of Fe
   real(r8),target,allocatable ::  ORCER(:,:,:,:,:,:)                !microbial residue C  erosion , [g d-2 h-1]
   real(r8),target,allocatable ::  ORNER(:,:,:,:,:,:)                !microbial residue N  erosion , [g d-2 h-1]
   real(r8),target,allocatable ::  ORPER(:,:,:,:,:,:)                !microbial residue P  erosion , [g d-2 h-1]
@@ -112,45 +77,9 @@ implicit none
   allocate(XNH3EB(2,2,JV,JH));  XNH3EB=0._r8
   allocate(XNHUEB(2,2,JV,JH));  XNHUEB=0._r8
   allocate(XNO3EB(2,2,JV,JH));  XNO3EB=0._r8
-  allocate(XN4ER(2,2,JV,JH));   XN4ER=0._r8
-  allocate(XNBER(2,2,JV,JH));   XNBER=0._r8
-  allocate(XH1PEB(2,2,JV,JH));  XH1PEB=0._r8
-  allocate(XH2PEB(2,2,JV,JH));  XH2PEB=0._r8
-  allocate(XCECER(2,2,JV,JH));  XCECER=0._r8
-  allocate(XAECER(2,2,JV,JH));  XAECER=0._r8
-  allocate(PALOER(2,2,JV,JH));  PALOER=0._r8
-  allocate(XHYER(2,2,JV,JH));   XHYER=0._r8
-  allocate(XALER(2,2,JV,JH));   XALER=0._r8
-  allocate(XCAER(2,2,JV,JH));   XCAER=0._r8
-  allocate(XMGER(2,2,JV,JH));   XMGER=0._r8
-  allocate(XNAER(2,2,JV,JH));   XNAER=0._r8
-  allocate(XKAER(2,2,JV,JH));   XKAER=0._r8
-  allocate(XHCER(2,2,JV,JH));   XHCER=0._r8
-  allocate(XAL2ER(2,2,JV,JH));  XAL2ER=0._r8
-  allocate(XOH0ER(2,2,JV,JH));  XOH0ER=0._r8
-  allocate(XOH1ER(2,2,JV,JH));  XOH1ER=0._r8
-  allocate(XOH2ER(2,2,JV,JH));  XOH2ER=0._r8
-  allocate(XH1PER(2,2,JV,JH));  XH1PER=0._r8
-  allocate(XH2PER(2,2,JV,JH));  XH2PER=0._r8
-  allocate(XOH0EB(2,2,JV,JH));  XOH0EB=0._r8
-  allocate(XOH1EB(2,2,JV,JH));  XOH1EB=0._r8
-  allocate(XOH2EB(2,2,JV,JH));  XOH2EB=0._r8
-  allocate(PFEOER(2,2,JV,JH));  PFEOER=0._r8
-  allocate(PCACER(2,2,JV,JH));  PCACER=0._r8
-  allocate(PCASER(2,2,JV,JH));  PCASER=0._r8
-  allocate(PALPER(2,2,JV,JH));  PALPER=0._r8
-  allocate(PFEPER(2,2,JV,JH));  PFEPER=0._r8
-  allocate(PCPDER(2,2,JV,JH));  PCPDER=0._r8
-  allocate(PCPHER(2,2,JV,JH));  PCPHER=0._r8
-  allocate(PCPMER(2,2,JV,JH));  PCPMER=0._r8
-  allocate(PALPEB(2,2,JV,JH));  PALPEB=0._r8
-  allocate(PFEPEB(2,2,JV,JH));  PFEPEB=0._r8
-  allocate(PCPDEB(2,2,JV,JH));  PCPDEB=0._r8
-  allocate(PCPHEB(2,2,JV,JH));  PCPHEB=0._r8
-  allocate(PCPMEB(2,2,JV,JH));  PCPMEB=0._r8
-  allocate(XFE2ER(2,2,JV,JH));  XFE2ER=0._r8
+  allocate(trcx_XER(idx_beg:idx_end,2,2,JV,JH));   trcx_XER=0._r8
+  allocate(trcp_ER(idsp_beg:idsp_end,2,2,JV,JH));  trcp_ER=0._r8
   allocate(XSEDER(2,2,JV,JH));  XSEDER=0._r8
-  allocate(XFEER(2,2,JV,JH));   XFEER=0._r8
   allocate(ORCER(ndbiomcp,1:jcplx,2,2,JV,JH));ORCER=0._r8
   allocate(ORNER(ndbiomcp,1:jcplx,2,2,JV,JH));ORNER=0._r8
   allocate(ORPER(ndbiomcp,1:jcplx,2,2,JV,JH));ORPER=0._r8
@@ -166,75 +95,43 @@ implicit none
 
 !----------------------------------------------------------------------
   subroutine DestructSedimentData
-  if (allocated(TSED))     deallocate(TSED)
-  if (allocated(DETS))     deallocate(DETS)
-  if (allocated(DETE))     deallocate(DETE)
-  if (allocated(CER))      deallocate(CER)
-  if (allocated(XER))      deallocate(XER)
-  if (allocated(PTDSNU))   deallocate(PTDSNU)
-  if (allocated(VLS))      deallocate(VLS)
-  if (allocated(SED))      deallocate(SED)
-  if (allocated(XSANER))   deallocate(XSANER)
-  if (allocated(XSILER))   deallocate(XSILER)
-  if (allocated(XCLAER))   deallocate(XCLAER)
-  if (allocated(XNH4ER))   deallocate(XNH4ER)
-  if (allocated(XNH3ER))   deallocate(XNH3ER)
-  if (allocated(XNHUER))   deallocate(XNHUER)
-  if (allocated(XNO3ER))   deallocate(XNO3ER)
-  if (allocated(XNH4EB))   deallocate(XNH4EB)
-  if (allocated(XNH3EB))   deallocate(XNH3EB)
-  if (allocated(XNHUEB))   deallocate(XNHUEB)
-  if (allocated(XNO3EB))   deallocate(XNO3EB)
-  if (allocated(XN4ER))    deallocate(XN4ER)
-  if (allocated(XNBER))    deallocate(XNBER)
-  if (allocated(XH1PEB))   deallocate(XH1PEB)
-  if (allocated(XH2PEB))   deallocate(XH2PEB)
-  if (allocated(XCECER))   deallocate(XCECER)
-  if (allocated(XAECER))   deallocate(XAECER)
-  if (allocated(PALOER))   deallocate(PALOER)
-  if (allocated(XHYER))    deallocate(XHYER)
-  if (allocated(XALER))    deallocate(XALER)
-  if (allocated(XCAER))    deallocate(XCAER)
-  if (allocated(XMGER))    deallocate(XMGER)
-  if (allocated(XNAER))    deallocate(XNAER)
-  if (allocated(XKAER))    deallocate(XKAER)
-  if (allocated(XHCER))    deallocate(XHCER)
-  if (allocated(XAL2ER))   deallocate(XAL2ER)
-  if (allocated(XOH0ER))   deallocate(XOH0ER)
-  if (allocated(XOH1ER))   deallocate(XOH1ER)
-  if (allocated(XOH2ER))   deallocate(XOH2ER)
-  if (allocated(XH1PER))   deallocate(XH1PER)
-  if (allocated(XH2PER))   deallocate(XH2PER)
-  if (allocated(XOH0EB))   deallocate(XOH0EB)
-  if (allocated(XOH1EB))   deallocate(XOH1EB)
-  if (allocated(XOH2EB))   deallocate(XOH2EB)
-  if (allocated(PFEOER))   deallocate(PFEOER)
-  if (allocated(PCACER))   deallocate(PCACER)
-  if (allocated(PCASER))   deallocate(PCASER)
-  if (allocated(PALPER))   deallocate(PALPER)
-  if (allocated(PFEPER))   deallocate(PFEPER)
-  if (allocated(PCPDER))   deallocate(PCPDER)
-  if (allocated(PCPHER))   deallocate(PCPHER)
-  if (allocated(PCPMER))   deallocate(PCPMER)
-  if (allocated(PALPEB))   deallocate(PALPEB)
-  if (allocated(PFEPEB))   deallocate(PFEPEB)
-  if (allocated(PCPDEB))   deallocate(PCPDEB)
-  if (allocated(PCPHEB))   deallocate(PCPHEB)
-  if (allocated(PCPMEB))   deallocate(PCPMEB)
-  if (allocated(XFE2ER))   deallocate(XFE2ER)
-  if (allocated(XSEDER))   deallocate(XSEDER)
-  if (allocated(XFEER))    deallocate(XFEER)
-  if (allocated(ORCER))    deallocate(ORCER)
-  if (allocated(ORNER))    deallocate(ORNER)
-  if (allocated(ORPER))    deallocate(ORPER)
-  if (allocated(OHCER))    deallocate(OHCER)
-  if (allocated(OHNER))    deallocate(OHNER)
-  if (allocated(OHPER))    deallocate(OHPER)
-  if (allocated(OHAER))    deallocate(OHAER)
-  if (allocated(OSCER))    deallocate(OSCER)
-  if (allocated(OSAER))    deallocate(OSAER)
-  if (allocated(OSNER))    deallocate(OSNER)
-  if (allocated(OSPER))    deallocate(OSPER)
+
+  use abortutils, only : destroy
+  implicit none
+
+  call destroy(trcp_ER)
+  call destroy(trcx_XER)
+  call destroy(TSED)
+  call destroy(DETS)
+  call destroy(DETE)
+  call destroy(CER)
+  call destroy(XER)
+  call destroy(PTDSNU)
+  call destroy(VLS)
+  call destroy(SED)
+  call destroy(XSANER)
+  call destroy(XSILER)
+  call destroy(XCLAER)
+  call destroy(XNH4ER)
+  call destroy(XNH3ER)
+  call destroy(XNHUER)
+  call destroy(XNO3ER)
+  call destroy(XNH4EB)
+  call destroy(XNH3EB)
+  call destroy(XNHUEB)
+  call destroy(XNO3EB)
+  call destroy(XSEDER)
+  call destroy(ORCER)
+  call destroy(ORNER)
+  call destroy(ORPER)
+  call destroy(OHCER)
+  call destroy(OHNER)
+  call destroy(OHPER)
+  call destroy(OHAER)
+  call destroy(OSCER)
+  call destroy(OSAER)
+  call destroy(OSNER)
+  call destroy(OSPER)
   end subroutine DestructSedimentData
 
 
