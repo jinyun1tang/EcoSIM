@@ -80,6 +80,8 @@ implicit none
   integer :: idsa_MgHPO4B ! MgHPO4
   integer :: idsab_beg    !band begin
   integer :: idsab_end    !band end
+  integer :: idsa_psoil_beg,idsa_psoil_end
+  integer :: idsa_pband_beg,idsa_pband_end
 
 ! precipitated tracers
   integer :: idsp_beg,idsp_end
@@ -205,6 +207,7 @@ implicit none
     idsa_NaCO3 =addone(idsa_end)
     idsa_NaSO4 =addone(idsa_end)
     idsa_KSO4  =addone(idsa_end)
+
     idsa_H0PO4 =addone(idsa_end)
     idsa_H3PO4 =addone(idsa_end)
     idsa_FeHPO4=addone(idsa_end)
@@ -216,6 +219,8 @@ implicit none
     idsa_end=idsa_MgHPO4
     idsab_beg=idsa_end+1
     idsab_end=idsab_beg
+    idsa_psoil_beg=idsa_H0PO4;idsa_psoil_end=idsa_MgHPO4
+
     idsa_H0PO4B=addone(idsab_end)   ! PO4
     idsa_H3PO4B=addone(idsab_end)  ! H3PO4
     idsa_FeHPO4B=addone(idsab_end)  ! FeHPO4
@@ -224,6 +229,8 @@ implicit none
     idsa_CaHPO4B=addone(idsab_end)  ! CaHPO4
     idsa_CaH2PO4B=addone(idsab_end) ! CaH2PO4
     idsa_MgHPO4B =addone(idsab_end)! MgHPO4
+    idsa_pband_beg=idsa_H0PO4B;idsa_pband_end=idsa_MgHPO4B
+
     idsab_end=idsa_MgHPO4B
 
 

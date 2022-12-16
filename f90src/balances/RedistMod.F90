@@ -307,7 +307,7 @@ module RedistMod
   implicit none
   integer, intent(in) :: I,NY,NX
 
-  integer :: L,K,LS,NTG
+  integer :: L,K,LS,NTG,NTP,NTX
   real(r8):: tkspre,vhcp1s
   real(r8) :: CI,CH,CO,CX
   real(r8) :: ENGYZ,ENGYR,HFLXO
@@ -614,18 +614,15 @@ module RedistMod
   !
   !     SURFACE LITTER ION EXCHANGE AND PRECIPITATION
   !
-  trcx_solml(idx_NH4,0,NY,NX)=trcx_solml(idx_NH4,0,NY,NX)+trcx_TR(idx_NH4,0,NY,NX)
-  trcx_solml(idx_OHe,0,NY,NX)=trcx_solml(idx_OHe,0,NY,NX)+trcx_TR(idx_OHe,0,NY,NX)
-  trcx_solml(idx_OH,0,NY,NX)=trcx_solml(idx_OH,0,NY,NX)+trcx_TR(idx_OH,0,NY,NX)
-  trcx_solml(idx_OHp,0,NY,NX)=trcx_solml(idx_OHp,0,NY,NX)+trcx_TR(idx_OHp,0,NY,NX)
-  trcx_solml(idx_HPO4,0,NY,NX)=trcx_solml(idx_HPO4,0,NY,NX)+trcx_TR(idx_HPO4,0,NY,NX)
-  trcx_solml(idx_H2PO4,0,NY,NX)=trcx_solml(idx_H2PO4,0,NY,NX)+trcx_TR(idx_H2PO4,0,NY,NX)
 
-  trcp_salml(idsp_AlPO4,0,NY,NX)=trcp_salml(idsp_AlPO4,0,NY,NX)+trcp_TR(idsp_AlPO4,0,NY,NX)
-  trcp_salml(idsp_FePO4,0,NY,NX)=trcp_salml(idsp_FePO4,0,NY,NX)+trcp_TR(idsp_FePO4,0,NY,NX)
-  trcp_salml(idsp_CaHPO4,0,NY,NX)=trcp_salml(idsp_CaHPO4,0,NY,NX)+trcp_TR(idsp_CaHPO4,0,NY,NX)
-  trcp_salml(idsp_HA,0,NY,NX)=trcp_salml(idsp_HA,0,NY,NX)+trcp_TR(idsp_HA,0,NY,NX)
-  trcp_salml(idsp_CaH2PO4,0,NY,NX)=trcp_salml(idsp_CaH2PO4,0,NY,NX)+trcp_TR(idsp_CaH2PO4,0,NY,NX)
+  trcx_solml(idx_NH4,0,NY,NX)=trcx_solml(idx_NH4,0,NY,NX)+trcx_TR(idx_NH4,0,NY,NX)
+  DO NTX=idx_AEC+1,idx_anion_soil_end
+    trcx_solml(NTX,0,NY,NX)=trcx_solml(NTX,0,NY,NX)+trcx_TR(NTX,0,NY,NX)
+  ENDDO
+
+  DO NTP=idsp_psoi_beg,idsp_psoi_end
+    trcp_salml(NTP,0,NY,NX)=trcp_salml(NTP,0,NY,NX)+trcp_TR(NTP,0,NY,NX)
+  ENDDO
   !  !
 
   end subroutine HandleSurfaceBoundary
