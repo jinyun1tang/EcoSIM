@@ -1178,17 +1178,14 @@ contains
 !
 !     ACCUMULATE HOURLY FLUXES FOR USE IN REDIST.F
 !
-    XCODFR(NY,NX)=XCODFR(NY,NX)+RDFR_gas(idg_CO2,NY,NX)
-    XCHDFR(NY,NX)=XCHDFR(NY,NX)+RDFR_gas(idg_CH4,NY,NX)
-    XOXDFR(NY,NX)=XOXDFR(NY,NX)+RDFR_gas(idg_O2,NY,NX)
-    XNGDFR(NY,NX)=XNGDFR(NY,NX)+RDFR_gas(idg_N2,NY,NX)
-    XN2DFR(NY,NX)=XN2DFR(NY,NX)+RDFR_gas(idg_N2O,NY,NX)
-    XN3DFR(NY,NX)=XN3DFR(NY,NX)+RDFR_gas(idg_NH3,NY,NX)
-    XHGDFR(NY,NX)=XHGDFR(NY,NX)+RDFR_gas(idg_H2,NY,NX)
+    DO NTG=idg_beg,idg_end-1
+      trcg_XDFR(NTG,NY,NX)=trcg_XDFR(NTG,NY,NX)+RDFR_gas(NTG,NY,NX)
+    ENDDO
 
   ELSE
     RDFR_gas(idg_beg:idg_end-1,NY,NX)=0.0_r8
   ENDIF
+
   RCODXR=RDFR_gas(idg_CO2,NY,NX)*XNPT
   RCHDXR=RDFR_gas(idg_CH4,NY,NX)*XNPT
   ROXDXR=RDFR_gas(idg_O2,NY,NX)*XNPT

@@ -799,13 +799,8 @@ module Hour1Mod
 
 
   GasSfAtmFlx(idg_beg:idg_end,NY,NX)=0._r8
-  XCODFR(NY,NX)=0.0_r8
-  XCHDFR(NY,NX)=0.0_r8
-  XOXDFR(NY,NX)=0.0_r8
-  XNGDFR(NY,NX)=0.0_r8
-  XN2DFR(NY,NX)=0.0_r8
-  XN3DFR(NY,NX)=0.0_r8
-  XHGDFR(NY,NX)=0.0_r8
+  trcg_XDFR(idg_beg:idg_end-1,NY,NX)=0.0_r8
+
   TVOLWP(NY,NX)=0.0_r8
   TVOLWC(NY,NX)=0.0_r8
   TFLWCI(NY,NX)=0.0_r8
@@ -868,11 +863,7 @@ module Hour1Mod
   trcx_TR(idx_NH4,0:NL(NY,NX),NY,NX)=0.0_r8
   trcx_TR(idx_AEC+1:idx_anion_soil_end,0:NL(NY,NX),NY,NX)=0.0_r8
 
-  trcp_TR(idsp_AlPO4,0:NL(NY,NX),NY,NX)=0.0_r8
-  trcp_TR(idsp_FePO4,0:NL(NY,NX),NY,NX)=0.0_r8
-  trcp_TR(idsp_CaHPO4,0:NL(NY,NX),NY,NX)=0.0_r8
-  trcp_TR(idsp_HA,0:NL(NY,NX),NY,NX)=0.0_r8
-  trcp_TR(idsp_CaH2PO4,0:NL(NY,NX),NY,NX)=0.0_r8
+  trcp_TR(idsp_psoi_beg:idsp_psoi_end,0:NL(NY,NX),NY,NX)=0.0_r8
 
   TUPWTR(0:NL(NY,NX),NY,NX)=0.0_r8
   TUPHT(0:NL(NY,NX),NY,NX)=0.0_r8
@@ -2396,15 +2387,9 @@ module Hour1Mod
     TRXAL2(L,NY,NX)=0.0_r8
     TRXFE2(L,NY,NX)=0.0_r8
 
-    trcp_TR(idsp_AlOH3,L,NY,NX)=0.0_r8
-    trcp_TR(idsp_FeOH3,L,NY,NX)=0.0_r8
-    trcp_TR(idsp_CaCO3,L,NY,NX)=0.0_r8
-    trcp_TR(idsp_CaSO4,L,NY,NX)=0.0_r8
-    trcp_TR(idsp_AlPO4B,L,NY,NX)=0.0_r8
-    trcp_TR(idsp_FePO4B,L,NY,NX)=0.0_r8
-    trcp_TR(idsp_CaHPO4B,L,NY,NX)=0.0_r8
-    trcp_TR(idsp_HAB,L,NY,NX)=0.0_r8
-    trcp_TR(idsp_CaH2PO4B,L,NY,NX)=0.0_r8
+    trcp_TR(idsp_beg:idsp_psoi_beg-1,L,NY,NX)=0.0_r8
+
+    trcp_TR(idsp_beg_band:idsp_end,L,NY,NX)=0.0_r8
 
     trcs_XFXS(ids_beg:ids_end,L,NY,NX)=0.0_r8
 
