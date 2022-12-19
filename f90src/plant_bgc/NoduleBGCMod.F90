@@ -36,18 +36,19 @@ module NoduleBGCMod
   real(r8) :: RGNDL,RSNDL
   real(r8) :: RGN2P,RGN2F
   real(r8) :: RUPNFB
-  real(r8) :: RXNDLC,RXNDLN,RXNDLP
-  real(r8) :: RDNDLC,RDNDLN,RDNDLP
-  real(r8) :: RCNDLC,RCNDLN,RCNDLP
+  real(r8) :: RXNDLE(npelms)
+  real(r8) :: RDNDLE(npelms)
+  real(r8) :: RCNDLE(npelms)
   real(r8) :: RGNDG
-  real(r8) :: RXNSNC,RXNSNN,RXNSNP
-  real(r8) :: RDNSNC,RDNSNN,RDNSNP
-  real(r8) :: RCNSNC,RCNSNN,RCNSNP
+  real(r8) :: RXNSNE(npelms)
+  real(r8) :: RDNSNE(npelms)
+  real(r8) :: RCNSNE(npelms)
   real(r8) :: SPNDLI
   real(r8) :: SPNDX
   real(r8) :: WTLSB1,WTNDB1,WTLSBT
   real(r8) :: XFRC,XFRN,XFRP
   REAL(R8) :: RCCC,RCCN,RCCP
+  integer :: NE
 !     begin_execution
   associate(                         &
     NU       =>  plt_site%NU       , &
@@ -198,23 +199,25 @@ module NoduleBGCMod
 !     SPNDX=specific bacterial decomposition rate at current CCNDLB
 !     SPNDL=specific decomposition rate by bacterial N2 fixers
 !     WTNDB,WTNDBN,WTNDBP=bacterial C,N,P mass
-!     RXNDLC,RXNDLN,RXNDLP=bacterial C,N,P loss from decomposition
-!     RDNDLC,RDNDLN,RDNDLP=bacterial C,N,P decomposition to litterfall
-!     RCNDLC,RCNDLN,RCNDLP=bacterial C,N,P decomposition to recycling
+!     RXNDLE(ielmc),RXNDLE(ielmn),RXNDLE(ielmp)=bacterial C,N,P loss from decomposition
+!     RDNDLE(ielmc),RDNDLE(ielmn),RDNDLE(ielmp)=bacterial C,N,P decomposition to litterfall
+!     RCNDLE(ielmc),RCNDLE(ielmn),RCNDLE(ielmp)=bacterial C,N,P decomposition to recycling
 !
     RCCC=RCCZN+CCC*RCCYN
     RCCN=CNC*RCCXN
     RCCP=CPC*RCCQN
     SPNDX=SPNDL*SQRT(TFN3(NZ)*WFNG)
-    RXNDLC=SPNDX*WTNDBE(NB,ielmc,NZ)
-    RXNDLN=SPNDX*WTNDBE(NB,ielmn,NZ)
-    RXNDLP=SPNDX*WTNDBE(NB,ielmp,NZ)
-    RDNDLC=RXNDLC*(1.0_r8-RCCC)
-    RDNDLN=RXNDLN*(1.0_r8-RCCC)*(1.0_r8-RCCN)
-    RDNDLP=RXNDLP*(1.0_r8-RCCC)*(1.0_r8-RCCP)
-    RCNDLC=RXNDLC-RDNDLC
-    RCNDLN=RXNDLN-RDNDLN
-    RCNDLP=RXNDLP-RDNDLP
+    DO NE=1,npelms
+      RXNDLE(NE)=SPNDX*WTNDBE(NB,NE,NZ)
+    ENDDO
+
+    RDNDLE(ielmc)=RXNDLE(ielmc)*(1.0_r8-RCCC)
+    RDNDLE(ielmn)=RXNDLE(ielmn)*(1.0_r8-RCCC)*(1.0_r8-RCCN)
+    RDNDLE(ielmp)=RXNDLE(ielmp)*(1.0_r8-RCCC)*(1.0_r8-RCCP)
+
+    DO NE=1,npelms
+      RCNDLE(NE)=RXNDLE(NE)-RDNDLE(NE)
+    ENDDO
 !
 !     TOTAL NON-STRUCTURAL C,N,P USED IN NODULE GROWTH
 !     AND GROWTH RESPIRATION DEPENDS ON GROWTH YIELD
@@ -224,7 +227,7 @@ module NoduleBGCMod
 !     CPOLNB,ZPOLNB,PPOLNB=nonstructural C,N,P in bacteria
 !     RMNDL=bacterial maintenance respiration
 !     RCNDL=respiration from non-structural C
-!     RCNDLC=bacterial C decomposition to recycling
+!     RCNDLE(ielmc)=bacterial C decomposition to recycling
 !     RGNDL=growth respiration ltd by O2
 !     RGN2F=respiration for N2 fixation
 !     GRNDG=bacterial growth
@@ -236,7 +239,7 @@ module NoduleBGCMod
 !     CZKM,CPKM=Km for nonstructural N,P uptake by bacteria
 !
     CGNDL=AMIN1(EPOLNB(NB,ielmc,NZ)-AMIN1(RMNDL,RCNDL) &
-      -RGN2F+RCNDLC,(RGNDL-RGN2F)/(1.0_r8-DMND(NZ)))
+      -RGN2F+RCNDLE(ielmc),(RGNDL-RGN2F)/(1.0_r8-DMND(NZ)))
     GRNDG=CGNDL*DMND(NZ)
     RGNDG=RGN2F+CGNDL*(1.0_r8-DMND(NZ))
     ZADDN=AZMAX1(AMIN1(EPOLNB(NB,ielmn,NZ),GRNDG*CNND(NZ)))*CZPOLN/(CZPOLN+CZKM)
@@ -247,30 +250,28 @@ module NoduleBGCMod
 !     RSNDL=excess maintenance respiration
 !     WTNDB,WTNDBN,WTNDBP=bacterial C,N,P mass
 !     RCCC,RCCN,RCCP=remobilization coefficient for C,N,P
-!     RXNSNC,RXNSNC,RXNSNP=bacterial C,N,P loss from senescence
-!     RDNSNC,RDNSNC,RDNSNP=bacterial C,N,P senescence to litterfall
-!     RCNSNC,RCNSNC,RCNSNP=bacterial C,N,P senescence to recycling
+!     RXNSNE(ielmc),RXNSNE(ielmc),RXNSNE(ielmp)=bacterial C,N,P loss from senescence
+!     RDNSNE(ielmc),RDNSNE(ielmc),RDNSNE(ielmp)=bacterial C,N,P senescence to litterfall
+!     RCNSNE(ielmc),RCNSNE(ielmc),RCNSNE(ielmp)=bacterial C,N,P senescence to recycling
 !
     IF(RSNDL.GT.0.0.AND.WTNDBE(NB,ielmc,NZ).GT.ZEROP(NZ).AND.RCCC.GT.ZERO)THEN
-      RXNSNC=RSNDL/RCCC
-      RXNSNN=RXNSNC*WTNDBE(NB,ielmn,NZ)/WTNDBE(NB,ielmc,NZ)
-      RXNSNP=RXNSNC*WTNDBE(NB,ielmp,NZ)/WTNDBE(NB,ielmc,NZ)
-      RDNSNC=RXNSNC*(1.0_r8-RCCC)
-      RDNSNN=RXNSNN*(1.0_r8-RCCC)*(1.0_r8-RCCN)
-      RDNSNP=RXNSNP*(1.0_r8-RCCC)*(1.0_r8-RCCP)
-      RCNSNC=RXNSNC-RDNSNC
-      RCNSNN=RXNSNN-RDNSNN
-      RCNSNP=RXNSNP-RDNSNP
+      RXNSNE(ielmc)=RSNDL/RCCC
+      RXNSNE(ielmn)=RXNSNE(ielmc)*WTNDBE(NB,ielmn,NZ)/WTNDBE(NB,ielmc,NZ)
+      RXNSNE(ielmp)=RXNSNE(ielmc)*WTNDBE(NB,ielmp,NZ)/WTNDBE(NB,ielmc,NZ)
+      RDNSNE(ielmc)=RXNSNE(ielmc)*(1.0_r8-RCCC)
+      RDNSNE(ielmn)=RXNSNE(ielmn)*(1.0_r8-RCCC)*(1.0_r8-RCCN)
+      RDNSNE(ielmp)=RXNSNE(ielmp)*(1.0_r8-RCCC)*(1.0_r8-RCCP)
+      RCNSNE(ielmc)=RXNSNE(ielmc)-RDNSNE(ielmc)
+      RCNSNE(ielmn)=RXNSNE(ielmn)-RDNSNE(ielmn)
+      RCNSNE(ielmp)=RXNSNE(ielmp)-RDNSNE(ielmp)
     ELSE
-      RXNSNC=0._r8
-      RXNSNN=0._r8
-      RXNSNP=0._r8
-      RDNSNC=0._r8
-      RDNSNN=0._r8
-      RDNSNP=0._r8
-      RCNSNC=0._r8
-      RCNSNN=0._r8
-      RCNSNP=0._r8
+      RXNSNE(ielmc)=0._r8
+      RXNSNE(ielmn)=0._r8
+      RXNSNE(ielmp)=0._r8
+      RDNSNE(1:npelms)=0._r8
+      RCNSNE(ielmc)=0._r8
+      RCNSNE(ielmn)=0._r8
+      RCNSNE(ielmp)=0._r8
     ENDIF
 !
 !     TOTAL NODULE RESPIRATION
@@ -279,13 +280,13 @@ module NoduleBGCMod
 !     RMNDL=bacterial maintenance respiration
 !     RCNDL=respiration from non-structural C
 !     RGNDG=bacterial respiration for growth and N2 fixation
-!     RCNSNC=bacterial C senescence to recycling
+!     RCNSNE(ielmc)=bacterial C senescence to recycling
 !     TCO2T,TCO2A=total,above-ground PFT respiration
 !     CNET=PFT net CO2 fixation
 !     RECO=ecosystem respiration
 !     TRAU=total autotrophic respiration
 !
-    RCO2T=AMIN1(RMNDL,RCNDL)+RGNDG+RCNSNC
+    RCO2T=AMIN1(RMNDL,RCNDL)+RGNDG+RCNSNE(ielmc)
     TCO2T(NZ)=TCO2T(NZ)-RCO2T
     TCO2A(NZ)=TCO2A(NZ)-RCO2T
     CNET(NZ)=CNET(NZ)-RCO2T
@@ -296,13 +297,14 @@ module NoduleBGCMod
 !
 !     CSNC,ZSNC,PSNC=C,N,P litterfall from decomposition and senescence
 !     CFOPC,CFOPN,CFOPC=fraction of litterfall C,N,P allocated to litter components
-!     RDNDLC,RDNDLN,RDNDLP=bacterial C,N,P decomposition to litterfall
-!     RDNSNC,RDNSNC,RDNSNP=bacterial C,N,P senescence to litterfall
+!     RDNDLE(ielmc),RDNDLE(ielmn),RDNDLE(ielmp)=bacterial C,N,P decomposition to litterfall
+!     RDNSNE(ielmc),RDNSNE(ielmc),RDNSNE(ielmp)=bacterial C,N,P senescence to litterfall
 !
     D6470: DO M=1,jsken
-      ESNC(M,ielmc,k_fine_litr,0,NZ)=ESNC(M,ielmc,k_fine_litr,0,NZ)+CFOPE(ifoliar,M,ielmc,NZ)*(RDNDLC+RDNSNC)
-      ESNC(M,ielmn,k_fine_litr,0,NZ)=ESNC(M,ielmn,k_fine_litr,0,NZ)+CFOPE(ifoliar,M,ielmn,NZ)*(RDNDLN+RDNSNN)
-      ESNC(M,ielmp,k_fine_litr,0,NZ)=ESNC(M,ielmp,k_fine_litr,0,NZ)+CFOPE(ifoliar,M,ielmp,NZ)*(RDNDLP+RDNSNP)
+      DO NE=1,npelms
+        ESNC(M,NE,k_fine_litr,0,NZ)=ESNC(M,NE,k_fine_litr,0,NZ) &
+          +CFOPE(ifoliar,M,NE,NZ)*(RDNDLE(NE)+RDNSNE(NE))
+      ENDDO
     ENDDO D6470
 !
 !     CONSUMPTION OF NON-STRUCTURAL C,N,P BY NODULE
@@ -312,26 +314,26 @@ module NoduleBGCMod
 !     RCNDL=respiration from non-structural C
 !     RGN2F=respiration for N2 fixation
 !     CGNDL=total non-structural C used in bacterial growth and growth respiration
-!     RCNDLC,RCNDLN,RCNDLP=bacterial C,N,P decomposition to recycling
-!     RCNSNC,RCNSNC,RCNSNP=bacterial C,N,P senescence to recycling
+!     RCNDLE(ielmc),RCNDLE(ielmn),RCNDLE(ielmp)=bacterial C,N,P decomposition to recycling
+!     RCNSNE(ielmc),RCNSNE(ielmc),RCNSNE(ielmp)=bacterial C,N,P senescence to recycling
 !     ZADDN,PADDN=nonstructural N,P used in growth
 !     RUPNFB=branch N2 fixation
 !
-    EPOLNB(NB,ielmc,NZ)=EPOLNB(NB,ielmc,NZ)-AMIN1(RMNDL,RCNDL)-RGN2F-CGNDL+RCNDLC
-    EPOLNB(NB,ielmn,NZ)=EPOLNB(NB,ielmn,NZ)-ZADDN+RCNDLN+RCNSNN+RUPNFB
-    EPOLNB(NB,ielmp,NZ)=EPOLNB(NB,ielmp,NZ)-PADDN+RCNDLP+RCNSNP
+    EPOLNB(NB,ielmc,NZ)=EPOLNB(NB,ielmc,NZ)-AMIN1(RMNDL,RCNDL)-RGN2F-CGNDL+RCNDLE(ielmc)
+    EPOLNB(NB,ielmn,NZ)=EPOLNB(NB,ielmn,NZ)-ZADDN+RCNDLE(ielmn)+RCNSNE(ielmn)+RUPNFB
+    EPOLNB(NB,ielmp,NZ)=EPOLNB(NB,ielmp,NZ)-PADDN+RCNDLE(ielmp)+RCNSNE(ielmp)
 !
 !     UPDATE STATE VARIABLES FOR NODULE C, N, P
 !
 !     WTNDB,WTNDBN,WTNDBP=bacterial C,N,P mass
 !     GRNDG=bacterial growth
-!     RXNDLC,RXNDLN,RXNDLP=bacterial C,N,P loss from decomposition
-!     RXNSNC,RXNSNC,RXNSNP=bacterial C,N,P loss from senescence
+!     RXNDLE(ielmc),RXNDLE(ielmn),RXNDLE(ielmp)=bacterial C,N,P loss from decomposition
+!     RXNSNE(ielmc),RXNSNE(ielmc),RXNSNE(ielmp)=bacterial C,N,P loss from senescence
 !     ZADDN,PADDN=nonstructural N,P used in growth
 !
-    WTNDBE(NB,ielmc,NZ)=WTNDBE(NB,ielmc,NZ)+GRNDG-RXNDLC-RXNSNC
-    WTNDBE(NB,ielmn,NZ)=WTNDBE(NB,ielmn,NZ)+ZADDN-RXNDLN-RXNSNN
-    WTNDBE(NB,ielmp,NZ)=WTNDBE(NB,ielmp,NZ)+PADDN-RXNDLP-RXNSNP
+    WTNDBE(NB,ielmc,NZ)=WTNDBE(NB,ielmc,NZ)+GRNDG-RXNDLE(ielmc)-RXNSNE(ielmc)
+    WTNDBE(NB,ielmn,NZ)=WTNDBE(NB,ielmn,NZ)+ZADDN-RXNDLE(ielmn)-RXNSNE(ielmn)
+    WTNDBE(NB,ielmp,NZ)=WTNDBE(NB,ielmp,NZ)+PADDN-RXNDLE(ielmp)-RXNSNE(ielmp)
 !
 !     TRANSFER NON-STRUCTURAL C,N,P BETWEEN BRANCH AND NODULES
 !     FROM NON-STRUCTURAL C,N,P CONCENTRATION DIFFERENCES
@@ -402,13 +404,13 @@ module NoduleBGCMod
   real(r8) :: RCNDL,RMNDL,RXNDL
   real(r8) :: RGNDL,RSNDL
   real(r8) :: RGN2P,RGN2F
-  real(r8) :: RXNDLC,RXNDLN,RXNDLP
-  real(r8) :: RDNDLC,RDNDLN,RDNDLP
-  real(r8) :: RCNDLC,RCNDLN,RCNDLP
+  real(r8) :: RXNDLE(npelms)
+  real(r8) :: RDNDLE(npelms)
+  real(r8) :: RCNDLE(npelms)
   real(r8) :: RGNDG
-  real(r8) :: RXNSNC,RXNSNN,RXNSNP
-  real(r8) :: RDNSNC,RDNSNN,RDNSNP
-  real(r8) :: RCNSNC,RCNSNN,RCNSNP
+  real(r8) :: RXNSNE(npelms)
+  real(r8) :: RDNSNE(npelms)
+  real(r8) :: RCNSNE(npelms)
   real(r8) :: RCNDLM,RXNDLM,RGNDLM
   real(r8) :: RSNDLM
   real(r8) :: SPNDLI
@@ -416,6 +418,7 @@ module NoduleBGCMod
   real(r8) :: WTRTD1,WTNDL1,WTRTDT
   real(r8) :: XFRC,XFRN,XFRP
   real(r8) :: RCCC,RCCN,RCCP
+  integer  :: NE
 !     begin_execution
   associate(                           &
     NU       =>   plt_site%NU        , &
@@ -580,23 +583,24 @@ module NoduleBGCMod
 !     CCNKR=Km for bacterial vs root mass in decomposition
 !     SPNDX=specific bacterial decomposition rate at current CCNDLR
 !     WTNDL,WTNDLN,WTNDLP=bacterial C,N,P mass
-!     RXNDLC,RXNDLN,RXNDLP=bacterial C,N,P loss from decomposition
-!     RDNDLC,RDNDLN,RDNDLP=bacterial C,N,P decomposition to litterfall
-!     RCNDLC,RCNDLN,RCNDLP=bacterial C,N,P decomposition to recycling
+!     RXNDLE(ielmc),RXNDLE(ielmn),RXNDLE(ielmp)=bacterial C,N,P loss from decomposition
+!     RDNDLE(ielmc),RDNDLE(ielmn),RDNDLE(ielmp)=bacterial C,N,P decomposition to litterfall
+!     RCNDLE(ielmc),RCNDLE(ielmn),RCNDLE(ielmp)=bacterial C,N,P decomposition to recycling
 !
         RCCC=RCCZN+CCC*RCCYN
         RCCN=CNC*RCCXN
         RCCP=CPC*RCCQN
         SPNDX=SPNDL*SQRT(TFN4(L,NZ)*WFNGR(1,L))
-        RXNDLC=SPNDX*WTNDLE(L,ielmc,NZ)
-        RXNDLN=SPNDX*WTNDLE(L,ielmn,NZ)
-        RXNDLP=SPNDX*WTNDLE(L,ielmp,NZ)
-        RDNDLC=RXNDLC*(1.0_r8-RCCC)
-        RDNDLN=RXNDLN*(1.0_r8-RCCC)*(1.0_r8-RCCN)
-        RDNDLP=RXNDLP*(1.0_r8-RCCC)*(1.0_r8-RCCP)
-        RCNDLC=RXNDLC-RDNDLC
-        RCNDLN=RXNDLN-RDNDLN
-        RCNDLP=RXNDLP-RDNDLP
+        DO NE=1,npelms
+          RXNDLE(NE)=SPNDX*WTNDLE(L,NE,NZ)
+        ENDDO
+
+        RDNDLE(ielmc)=RXNDLE(ielmc)*(1.0_r8-RCCC)
+        RDNDLE(ielmn)=RXNDLE(ielmn)*(1.0_r8-RCCC)*(1.0_r8-RCCN)
+        RDNDLE(ielmp)=RXNDLE(ielmp)*(1.0_r8-RCCC)*(1.0_r8-RCCP)
+        RCNDLE(ielmc)=RXNDLE(ielmc)-RDNDLE(ielmc)
+        RCNDLE(ielmn)=RXNDLE(ielmn)-RDNDLE(ielmn)
+        RCNDLE(ielmp)=RXNDLE(ielmp)-RDNDLE(ielmp)
 !
 !     TOTAL NON-STRUCTURAL C,N,P USED IN NODULE GROWTH
 !     AND GROWTH RESPIRATION DEPENDS ON GROWTH YIELD
@@ -606,7 +610,7 @@ module NoduleBGCMod
 !     CPOOLN,ZPOOLN,PPOOLN=nonstructural C,N,P in bacteria
 !     RMNDL=bacterial maintenance respiration
 !     RCNDL=respiration from non-structural C
-!     RCNDLC=bacterial C decomposition to recycling
+!     RCNDLE(ielmc)=bacterial C decomposition to recycling
 !     RGNDL=growth respiration ltd by O2
 !     RGN2F=respiration for N2 fixation
 !     GRNDG=bacterial growth
@@ -618,7 +622,7 @@ module NoduleBGCMod
 !     CZKM,CPKM=Km for nonstructural N,P uptake by bacteria
 !
         CGNDL=AMIN1(EPOOLN(L,ielmc,NZ)-AMIN1(RMNDL,RCNDL) &
-          -RGN2F+RCNDLC,(RGNDL-RGN2F)/(1.0_r8-DMND(NZ)))
+          -RGN2F+RCNDLE(ielmc),(RGNDL-RGN2F)/(1.0_r8-DMND(NZ)))
         GRNDG=CGNDL*DMND(NZ)
         RGNDG=RGN2F+CGNDL*(1.0_r8-DMND(NZ))
         ZADDN=AZMAX1(AMIN1(EPOOLN(L,ielmn,NZ),GRNDG*CNND(NZ)))*CZPOLN/(CZPOLN+CZKM)
@@ -629,30 +633,24 @@ module NoduleBGCMod
 !     RSNDL=excess maintenance respiration
 !     WTNDL,WTNDLN,WTNDLP=bacterial C,N,P mass
 !     RCCC,RCCN,RCCP=remobilization coefficient for C,N,P
-!     RXNSNC,RXNSNC,RXNSNP=bacterial C,N,P loss from senescence
-!     RDNSNC,RDNSNC,RDNSNP=bacterial C,N,P senescence to litterfall
-!     RCNSNC,RCNSNC,RCNSNP=bacterial C,N,P senescence to recycling
+!     RXNSNE(ielmc),RXNSNE(ielmc),RXNSNE(ielmp)=bacterial C,N,P loss from senescence
+!     RDNSNE(ielmc),RDNSNE(ielmc),RDNSNE(ielmp)=bacterial C,N,P senescence to litterfall
+!     RCNSNE(ielmc),RCNSNE(ielmc),RCNSNE(ielmp)=bacterial C,N,P senescence to recycling
 !
         IF(RSNDL.GT.0.0.AND.WTNDLE(L,ielmc,NZ).GT.ZEROP(NZ).AND.RCCC.GT.ZERO)THEN
-          RXNSNC=RSNDL/RCCC
-          RXNSNN=RXNSNC*WTNDLE(L,ielmn,NZ)/WTNDLE(L,ielmc,NZ)
-          RXNSNP=RXNSNC*WTNDLE(L,ielmp,NZ)/WTNDLE(L,ielmc,NZ)
-          RDNSNC=RXNSNC*(1.0_r8-RCCC)
-          RDNSNN=RXNSNN*(1.0_r8-RCCC)*(1.0_r8-RCCN)
-          RDNSNP=RXNSNP*(1.0_r8-RCCC)*(1.0_r8-RCCP)
-          RCNSNC=RXNSNC-RDNSNC
-          RCNSNN=RXNSNN-RDNSNN
-          RCNSNP=RXNSNP-RDNSNP
+          RXNSNE(ielmc)=RSNDL/RCCC
+          RXNSNE(ielmn)=RXNSNE(ielmc)*WTNDLE(L,ielmn,NZ)/WTNDLE(L,ielmc,NZ)
+          RXNSNE(ielmp)=RXNSNE(ielmc)*WTNDLE(L,ielmp,NZ)/WTNDLE(L,ielmc,NZ)
+          RDNSNE(ielmc)=RXNSNE(ielmc)*(1.0_r8-RCCC)
+          RDNSNE(ielmn)=RXNSNE(ielmn)*(1.0_r8-RCCC)*(1.0_r8-RCCN)
+          RDNSNE(ielmp)=RXNSNE(ielmp)*(1.0_r8-RCCC)*(1.0_r8-RCCP)
+          DO NE=1,npelms
+            RCNSNE(NE)=RXNSNE(NE)-RDNSNE(NE)
+          ENDDO
         ELSE
-          RXNSNC=0._r8
-          RXNSNN=0._r8
-          RXNSNP=0._r8
-          RDNSNC=0._r8
-          RDNSNN=0._r8
-          RDNSNP=0._r8
-          RCNSNC=0._r8
-          RCNSNN=0._r8
-          RCNSNP=0._r8
+          RXNSNE(1:npelms)=0._r8
+          RDNSNE(1:npelms)=0._r8
+          RCNSNE(1:npelms)=0._r8
         ENDIF
 !
 !     TOTAL NODULE RESPIRATION
@@ -662,12 +660,12 @@ module NoduleBGCMod
 !     RMNDL=bacterial maintenance respiration
 !     RCNDL=respiration from non-structural C
 !     RGNDG=bacterial respiration for growth and N2 fixation
-!     RCNSNC=bacterial C senescence to recycling
+!     RCNSNE(ielmc)=bacterial C senescence to recycling
 !     RCO2A=total root respiration
 !     RCO2M,RCO2N,RCO2A unlimited by O2,nonstructural C
 !
-        RCO2TM=AMIN1(RMNDL,RCNDLM)+RGNDLM+RCNSNC
-        RCO2T=AMIN1(RMNDL,RCNDL)+RGNDG+RCNSNC
+        RCO2TM=AMIN1(RMNDL,RCNDLM)+RGNDLM+RCNSNE(ielmc)
+        RCO2T=AMIN1(RMNDL,RCNDL)+RGNDG+RCNSNE(ielmc)
         RCO2M(1,L,NZ)=RCO2M(1,L,NZ)+RCO2TM
         RCO2N(1,L,NZ)=RCO2N(1,L,NZ)+RCO2T
         RCO2A(1,L,NZ)=RCO2A(1,L,NZ)-RCO2T
@@ -676,13 +674,14 @@ module NoduleBGCMod
 !
 !     CSNC,ZSNC,PSNC=C,N,P litterfall from decomposition and senescence
 !     CFOPC,CFOPN,CFOPC=fraction of litterfall C,N,P allocated to litter components
-!     RDNDLC,RDNDLN,RDNDLP=bacterial C,N,P decomposition to litterfall
-!     RDNSNC,RDNSNC,RDNSNP=bacterial C,N,P senescence to litterfall
+!     RDNDLE(ielmc),RDNDLE(ielmn),RDNDLE(ielmp)=bacterial C,N,P decomposition to litterfall
+!     RDNSNE(ielmc),RDNSNE(ielmc),RDNSNE(ielmp)=bacterial C,N,P senescence to litterfall
 !
         D6370: DO M=1,jsken
-          ESNC(M,ielmc,k_fine_litr,L,NZ)=ESNC(M,ielmc,k_fine_litr,L,NZ)+CFOPE(iroot,M,ielmc,NZ)*(RDNDLC+RDNSNC)
-          ESNC(M,ielmn,k_fine_litr,L,NZ)=ESNC(M,ielmn,k_fine_litr,L,NZ)+CFOPE(iroot,M,ielmn,NZ)*(RDNDLN+RDNSNN)
-          ESNC(M,ielmp,k_fine_litr,L,NZ)=ESNC(M,ielmp,k_fine_litr,L,NZ)+CFOPE(iroot,M,ielmp,NZ)*(RDNDLP+RDNSNP)
+          DO NE=1,npelms
+            ESNC(M,NE,k_fine_litr,L,NZ)=ESNC(M,NE,k_fine_litr,L,NZ)&
+              +CFOPE(iroot,M,NE,NZ)*(RDNDLE(NE)+RDNSNE(NE))
+          ENDDO
         ENDDO D6370
 !
 !     CONSUMPTION OF NON-STRUCTURAL C,N,P BY NODULE
@@ -692,26 +691,26 @@ module NoduleBGCMod
 !     RCNDL=respiration from non-structural C
 !     RGN2F=respiration for N2 fixation
 !     CGNDL=total non-structural C used in bacterial growth and growth respiration
-!     RCNDLC,RCNDLN,RCNDLP=bacterial C,N,P decomposition to recycling
-!     RCNSNC,RCNSNC,RCNSNP=bacterial C,N,P senescence to recycling
+!     RCNDLE(ielmc),RCNDLE(ielmn),RCNDLE(ielmp)=bacterial C,N,P decomposition to recycling
+!     RCNSNE(ielmc),RCNSNE(ielmc),RCNSNE(ielmp)=bacterial C,N,P senescence to recycling
 !     ZADDN,PADDN=nonstructural N,P used in growth
 !     RUPNF=root N2 fixation
 !
-        EPOOLN(L,ielmc,NZ)=EPOOLN(L,ielmc,NZ)-AMIN1(RMNDL,RCNDL)-RGN2F-CGNDL+RCNDLC
-        EPOOLN(L,ielmn,NZ)=EPOOLN(L,ielmn,NZ)-ZADDN+RCNDLN+RCNSNN+RUPNF(L,NZ)
-        EPOOLN(L,ielmp,NZ)=EPOOLN(L,ielmp,NZ)-PADDN+RCNDLP+RCNSNP
+        EPOOLN(L,ielmc,NZ)=EPOOLN(L,ielmc,NZ)-AMIN1(RMNDL,RCNDL)-RGN2F-CGNDL+RCNDLE(ielmc)
+        EPOOLN(L,ielmn,NZ)=EPOOLN(L,ielmn,NZ)-ZADDN+RCNDLE(ielmn)+RCNSNE(ielmn)+RUPNF(L,NZ)
+        EPOOLN(L,ielmp,NZ)=EPOOLN(L,ielmp,NZ)-PADDN+RCNDLE(ielmp)+RCNSNE(ielmp)
 !
 !     UPDATE STATE VARIABLES FOR NODULE C, N, P
 !
 !     WTNDL,WTNDLN,WTNDLP=bacterial C,N,P mass
 !     GRNDG=bacterial growth
-!     RXNDLC,RXNDLN,RXNDLP=bacterial C,N,P loss from decomposition
-!     RXNSNC,RXNSNC,RXNSNP=bacterial C,N,P loss from senescence
+!     RXNDLE(ielmc),RXNDLE(ielmn),RXNDLE(ielmp)=bacterial C,N,P loss from decomposition
+!     RXNSNE(ielmc),RXNSNE(ielmc),RXNSNE(ielmp)=bacterial C,N,P loss from senescence
 !     ZADDN,PADDN=nonstructural N,P used in growth
 !
-        WTNDLE(L,ielmc,NZ)=WTNDLE(L,ielmc,NZ)+GRNDG-RXNDLC-RXNSNC
-        WTNDLE(L,ielmn,NZ)=WTNDLE(L,ielmn,NZ)+ZADDN-RXNDLN-RXNSNN
-        WTNDLE(L,ielmp,NZ)=WTNDLE(L,ielmp,NZ)+PADDN-RXNDLP-RXNSNP
+        WTNDLE(L,ielmc,NZ)=WTNDLE(L,ielmc,NZ)+GRNDG-RXNDLE(ielmc)-RXNSNE(ielmc)
+        WTNDLE(L,ielmn,NZ)=WTNDLE(L,ielmn,NZ)+ZADDN-RXNDLE(ielmn)-RXNSNE(ielmn)
+        WTNDLE(L,ielmp,NZ)=WTNDLE(L,ielmp,NZ)+PADDN-RXNDLE(ielmp)-RXNSNE(ielmp)
 !
 !     TRANSFER NON-STRUCTURAL C,N,P BETWEEN ROOT AND NODULES
 !     FROM NON-STRUCTURAL C,N,P CONCENTRATION DIFFERENCES

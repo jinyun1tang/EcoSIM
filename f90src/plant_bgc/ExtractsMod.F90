@@ -134,7 +134,7 @@ module ExtractsMod
   implicit none
   integer, intent(in) :: NZ
 
-  integer :: N,L,K
+  integer :: N,L,K,NTG
 
   associate(                       &
     NU    => plt_site%NU     , &
@@ -173,12 +173,8 @@ module ExtractsMod
     RUPH1B=> plt_rbgc%RUPH1B , &
     TNHFLA=> plt_rbgc%TNHFLA , &
     TCHFLA=> plt_rbgc%TCHFLA , &
-    TLCH4P=> plt_rbgc%TLCH4P , &
+    trcg_TLP=> plt_rbgc%trcg_TLP , &
     TN2FLA=> plt_rbgc%TN2FLA , &
-    TLCO2P=> plt_rbgc%TLCO2P , &
-    TLNH3P=> plt_rbgc%TLNH3P , &
-    TLN2OP=> plt_rbgc%TLN2OP , &
-    TLOXYP=> plt_rbgc%TLOXYP , &
     TCOFLA=> plt_rbgc%TCOFLA , &
     TOXFLA=> plt_rbgc%TOXFLA , &
     ROXYP => plt_rbgc%ROXYP  , &
@@ -215,7 +211,6 @@ module ExtractsMod
     TUPN2S=> plt_bgcr%TUPN2S , &
     THGFLA=> plt_bgcr%THGFLA , &
     TUPOXP=> plt_bgcr%TUPOXP , &
-    TLH2GP=> plt_bgcr%TLH2GP , &
     TCO2S => plt_bgcr%TCO2S  , &
     TCO2P => plt_bgcr%TCO2P  , &
     RPOBX => plt_bgcr%RPOBX  , &
@@ -280,12 +275,9 @@ module ExtractsMod
 !     TL*P=total root gas content
 !     *A,*P=PFT root gaseous, aqueous gas content
 !
-      TLCO2P(L)=TLCO2P(L)+trcs_rootml(idg_CO2,N,L,NZ)+trcg_rootml(idg_CO2,N,L,NZ)
-      TLOXYP(L)=TLOXYP(L)+trcs_rootml(idg_O2,N,L,NZ)+trcg_rootml(idg_O2,N,L,NZ)
-      TLCH4P(L)=TLCH4P(L)+trcs_rootml(idg_CH4,N,L,NZ)+trcg_rootml(idg_CH4,N,L,NZ)
-      TLN2OP(L)=TLN2OP(L)+trcs_rootml(idg_N2O,N,L,NZ)+trcg_rootml(idg_N2O,N,L,NZ)
-      TLNH3P(L)=TLNH3P(L)+trcs_rootml(idg_NH3,N,L,NZ)+trcg_rootml(idg_NH3,N,L,NZ)
-      TLH2GP(L)=TLH2GP(L)+trcs_rootml(idg_H2,N,L,NZ)+trcg_rootml(idg_H2,N,L,NZ)
+    DO NTG=idg_beg,idg_end-1
+      trcg_TLP(NTG,L)=trcg_TLP(NTG,L)+trcs_rootml(NTG,N,L,NZ)+trcg_rootml(NTG,N,L,NZ)
+    ENDDO
 !
 !     TOTAL ROOT BOUNDARY GAS FLUXES
 !

@@ -339,11 +339,13 @@ module IngridTranspMod
   ENDDO
 
   DO NTSA=idsa_psoil_beg,idsa_psoil_end
-    trcsa_RFL(NTSA)=VFLW*AZMAX1(trcsa_solml2(NTSA,0,NY,NX))*trcs_VLN(ids_H1PO4,NU(NY,NX),NY,NX)
+    trcsa_RFL(NTSA)=VFLW*AZMAX1(trcsa_solml2(NTSA,0,NY,NX)) &
+      *trcs_VLN(ids_H1PO4,NU(NY,NX),NY,NX)
   ENDDO
 
   DO NTSA=idsa_pband_beg,idsa_pband_end
-    trcsa_RFL(NTSA)=VFLW*AZMAX1(trcsa_solml2(NTSA,0,NY,NX))*trcs_VLN(ids_H1PO4B,NU(NY,NX),NY,NX)
+    trcsa_RFL(NTSA)=VFLW*AZMAX1(trcsa_solml2(NTSA,0,NY,NX)) &
+      *trcs_VLN(ids_H1PO4B,NU(NY,NX),NY,NX)
   ENDDO
   end subroutine Residue2TopsoilSoluteAdvExch
 !------------------------------------------------------------------------------------------
@@ -438,14 +440,9 @@ module IngridTranspMod
       trcsa_solCl2(NTSA)=AZMAX1(trcsa_solml2(NTSA,NU(NY,NX),NY,NX)/VOLWPB)
     ENDDO
   ELSE
-    trcsa_solCl2(idsa_H0PO4B)=trcsa_solCl2(idsa_H0PO4)
-    trcsa_solCl2(idsa_H3PO4B)=trcsa_solCl2(idsa_H3PO4)
-    trcsa_solCl2(idsa_FeHPO4B)=trcsa_solCl2(idsa_FeHPO4)
-    trcsa_solCl2(idsa_FeH2PO4B)=trcsa_solCl2(idsa_FeH2PO4)
-    trcsa_solCl2(idsa_CaPO4B)=trcsa_solCl2(idsa_CaPO4)
-    trcsa_solCl2(idsa_CaHPO4B)=trcsa_solCl2(idsa_CaHPO4)
-    trcsa_solCl2(idsa_CaH2PO4B)=trcsa_solCl2(idsa_CaH2PO4)
-    trcsa_solCl2(idsa_MgHPO4B)=trcsa_solCl2(idsa_MgHPO4)
+    DO NTSA=0,idsa_nuts
+      trcsa_solCl2(idsa_H0PO4B+NTSA)=trcsa_solCl2(idsa_H0PO4+NTSA)
+    ENDDO
   ENDIF
 !
 !     DIFFUSIVITIES IN RESIDUE AND SOIL SURFACE
@@ -527,17 +524,14 @@ module IngridTranspMod
   ENDDO
 
   DO NTSA=idsa_psoil_beg,idsa_psoil_end
-    trcsa_DFV(NTSA)=DIFPO*(trcsa_solCl1(NTSA)-trcsa_solCl2(NTSA))*trcs_VLN(ids_H1PO4,NU(NY,NX),NY,NX)
+    trcsa_DFV(NTSA)=DIFPO*(trcsa_solCl1(NTSA)-trcsa_solCl2(NTSA)) &
+      *trcs_VLN(ids_H1PO4,NU(NY,NX),NY,NX)
   ENDDO
 
-  trcsa_DFV(idsa_H0PO4B)=DIFPO*(trcsa_solCl1(idsa_H0PO4)-trcsa_solCl2(idsa_H0PO4B))*trcs_VLN(ids_H1PO4B,NU(NY,NX),NY,NX)
-  trcsa_DFV(idsa_H3PO4B)=DIFPO*(trcsa_solCl1(idsa_H3PO4)-trcsa_solCl2(idsa_H3PO4B))*trcs_VLN(ids_H1PO4B,NU(NY,NX),NY,NX)
-  trcsa_DFV(idsa_FeHPO4B)=DIFPO*(trcsa_solCl1(idsa_FeHPO4)-trcsa_solCl2(idsa_FeHPO4B))*trcs_VLN(ids_H1PO4B,NU(NY,NX),NY,NX)
-  trcsa_DFV(idsa_FeH2PO4B)=DIFPO*(trcsa_solCl1(idsa_FeH2PO4)-trcsa_solCl2(idsa_FeH2PO4B))*trcs_VLN(ids_H1PO4B,NU(NY,NX),NY,NX)
-  trcsa_DFV(idsa_CaPO4B)=DIFPO*(trcsa_solCl1(idsa_CaPO4)-trcsa_solCl2(idsa_CaPO4B))*trcs_VLN(ids_H1PO4B,NU(NY,NX),NY,NX)
-  trcsa_DFV(idsa_CaHPO4B)=DIFPO*(trcsa_solCl1(idsa_CaHPO4)-trcsa_solCl2(idsa_CaHPO4B))*trcs_VLN(ids_H1PO4B,NU(NY,NX),NY,NX)
-  trcsa_DFV(idsa_CaH2PO4B)=DIFPO*(trcsa_solCl1(idsa_CaH2PO4)-trcsa_solCl2(idsa_CaH2PO4B))*trcs_VLN(ids_H1PO4B,NU(NY,NX),NY,NX)
-  trcsa_DFV(idsa_MgHPO4B)=DIFPO*(trcsa_solCl1(idsa_MgHPO4)-trcsa_solCl2(idsa_MgHPO4B))*trcs_VLN(ids_H1PO4B,NU(NY,NX),NY,NX)
+  DO NTSA=0,idsa_nuts
+    trcsa_DFV(idsa_H0PO4B+NTSA)=DIFPO*(trcsa_solCl1(idsa_H0PO4+NTSA)&
+      -trcsa_solCl2(idsa_H0PO4B+NTSA))*trcs_VLN(ids_H1PO4B,NU(NY,NX),NY,NX)
+  ENDDO
   end subroutine TopsoilResidueSolutedifusExch
 !------------------------------------------------------------------------------------------
 
@@ -636,11 +630,13 @@ module IngridTranspMod
   ENDDO
 
   DO NTSA=idsa_psoil_beg,idsa_psoil_end
-    trcsa_RFL(NTSA)=VFLW*AZMAX1(trcsa_soHml2(NTSA,NU(NY,NX),NY,NX))*trcs_VLN(ids_H1PO4,NU(NY,NX),NY,NX)
+    trcsa_RFL(NTSA)=VFLW*AZMAX1(trcsa_soHml2(NTSA,NU(NY,NX),NY,NX)) &
+      *trcs_VLN(ids_H1PO4,NU(NY,NX),NY,NX)
   ENDDO
 
   DO NTSA=idsa_pband_beg,idsa_pband_end
-    trcsa_RFL(NTSA)=VFLW*AZMAX1(trcsa_soHml2(NTSA,NU(NY,NX),NY,NX))*trcs_VLN(ids_H1PO4B,NU(NY,NX),NY,NX)
+    trcsa_RFL(NTSA)=VFLW*AZMAX1(trcsa_soHml2(NTSA,NU(NY,NX),NY,NX)) &
+      *trcs_VLN(ids_H1PO4B,NU(NY,NX),NY,NX)
   ENDDO
 
   DO NTSA=idsa_beg,idsab_end
@@ -1112,14 +1108,9 @@ module IngridTranspMod
         trcsa_solCl1(NTSA)=AZMAX1(trcsa_solml2(NTSA,N3,N2,N1)/VLWPB1)
       ENDDO
     ELSE
-      trcsa_solCl1(idsa_H0PO4B)=trcsa_solCl1(idsa_H0PO4)
-      trcsa_solCl1(idsa_H3PO4B)=trcsa_solCl1(idsa_H3PO4)
-      trcsa_solCl1(idsa_FeHPO4B)=trcsa_solCl1(idsa_FeHPO4)
-      trcsa_solCl1(idsa_FeH2PO4B)=trcsa_solCl1(idsa_FeH2PO4)
-      trcsa_solCl1(idsa_CaPO4B)=trcsa_solCl1(idsa_CaPO4)
-      trcsa_solCl1(idsa_CaHPO4B)=trcsa_solCl1(idsa_CaHPO4)
-      trcsa_solCl1(idsa_CaH2PO4B)=trcsa_solCl1(idsa_CaH2PO4)
-      trcsa_solCl1(idsa_MgHPO4B)=trcsa_solCl1(idsa_MgHPO4)
+      DO NTSA=0,idsa_nuts
+        trcsa_solCl1(idsa_H0PO4B+NTSA)=trcsa_solCl1(idsa_H0PO4+NTSA)
+      ENDDO
     ENDIF
 
     DO NTSA=idsa_beg,idsa_psoil_beg-1
@@ -1138,14 +1129,9 @@ module IngridTranspMod
         trcsa_solCl2(NTSA)=AZMAX1(trcsa_solml2(NTSA,N6,N5,N4)/VOLWM(M,N6,N5,N4))
       ENDDO
     ELSE
-      trcsa_solCl2(idsa_H0PO4B)=trcsa_solCl2(idsa_H0PO4)
-      trcsa_solCl2(idsa_H3PO4B)=trcsa_solCl2(idsa_H3PO4)
-      trcsa_solCl2(idsa_FeHPO4B)=trcsa_solCl2(idsa_FeHPO4)
-      trcsa_solCl2(idsa_FeH2PO4B)=trcsa_solCl2(idsa_FeH2PO4)
-      trcsa_solCl2(idsa_CaPO4B)=trcsa_solCl2(idsa_CaPO4)
-      trcsa_solCl2(idsa_CaHPO4B)=trcsa_solCl2(idsa_CaHPO4)
-      trcsa_solCl2(idsa_CaH2PO4B)=trcsa_solCl2(idsa_CaH2PO4)
-      trcsa_solCl2(idsa_MgHPO4B)=trcsa_solCl2(idsa_MgHPO4)
+      DO NTSA=0,idsa_nuts
+        trcsa_solCl2(idsa_H0PO4B+NTSA)=trcsa_solCl2(idsa_H0PO4+NTSA)
+      ENDDO
     ENDIF
 !
 !     DIFFUSIVITIES IN CURRENT AND ADJACENT GRID CELL MICROPORES
@@ -1299,11 +1285,13 @@ module IngridTranspMod
       ENDDO
 
       DO NTSA=idsa_psoil_beg,idsa_psoil_end
-        trcsa_RFH(NTSA)=VFLW*AZMAX1(trcsa_soHml2(NTSA,N3,N2,N1))*trcs_VLN(ids_H1PO4,N6,N5,N4)
+        trcsa_RFH(NTSA)=VFLW*AZMAX1(trcsa_soHml2(NTSA,N3,N2,N1)) &
+          *trcs_VLN(ids_H1PO4,N6,N5,N4)
       ENDDO
 
       DO NTSA=idsa_pband_beg,idsa_pband_end
-        trcsa_RFH(NTSA)=VFLW*AZMAX1(trcsa_soHml2(NTSA,N3,N2,N1))*trcs_VLN(ids_H1PO4B,N6,N5,N4)
+        trcsa_RFH(NTSA)=VFLW*AZMAX1(trcsa_soHml2(NTSA,N3,N2,N1)) &
+          *trcs_VLN(ids_H1PO4B,N6,N5,N4)
       ENDDO
     ENDIF
   ELSEIF(FLWHM(M,N,N6,N5,N4).LT.0.0)THEN
@@ -1323,11 +1311,13 @@ module IngridTranspMod
       trcsa_RFH(NTSA)=VFLW*AZMAX1(trcsa_soHml2(NTSA,N6,N5,N4))
     ENDDO
     DO NTSA=idsa_psoil_beg,idsa_psoil_end
-      trcsa_RFH(NTSA)=VFLW*AZMAX1(trcsa_soHml2(NTSA,N6,N5,N4))*trcs_VLN(ids_H1PO4,N6,N5,N4)
+      trcsa_RFH(NTSA)=VFLW*AZMAX1(trcsa_soHml2(NTSA,N6,N5,N4)) &
+        *trcs_VLN(ids_H1PO4,N6,N5,N4)
     ENDDO
 
     DO NTSA=idsa_pband_beg,idsa_pband_end
-      trcsa_RFH(NTSA)=VFLW*AZMAX1(trcsa_soHml2(NTSA,N6,N5,N4))*trcs_VLN(ids_H1PO4B,N6,N5,N4)
+      trcsa_RFH(NTSA)=VFLW*AZMAX1(trcsa_soHml2(NTSA,N6,N5,N4)) &
+        *trcs_VLN(ids_H1PO4B,N6,N5,N4)
     ENDDO
 !
 !     NO MACROPORE FLUX

@@ -927,29 +927,25 @@ module TrnsfrsMod
 !
 !     IF LOWER LAYER IS IN THE SNOWPACK
   !
-    IF(LS.LT.JS.AND.VHCPWM(M,LS2,N2,N1).GT.VHCPWX(N2,N1))THEN
-      DO NTSA=idsa_beg,idsa_end
-        trcsa_TBLS(NTSA,LS,NY,NX)=trcsa_TBLS(NTSA,LS,NY,NX) &
-          +trcsa_RBLS(NTSA,LS,NY,NX)-trcsa_RBLS(NTSA,LS2,NY,NX)
-      ENDDO
-    ELSE
+      IF(LS.LT.JS.AND.VHCPWM(M,LS2,N2,N1).GT.VHCPWX(N2,N1))THEN
+        DO NTSA=idsa_beg,idsa_end
+          trcsa_TBLS(NTSA,LS,NY,NX)=trcsa_TBLS(NTSA,LS,NY,NX) &
+            +trcsa_RBLS(NTSA,LS,NY,NX)-trcsa_RBLS(NTSA,LS2,NY,NX)
+        ENDDO
+      ELSE
   !
   !     IF LOWER LAYER IS THE LITTER AND SOIL SURFACE
   !
-      DO NTSA=idsa_beg,idsa_end
-        trcsa_TBLS(NTSA,LS,NY,NX)=trcsa_TBLS(NTSA,LS,NY,NX)+trcsa_RBLS(NTSA,LS,NY,NX) &
-          -trcsa_RFLS(NTSA,3,0,N2,N1)-trcsa_RFLS(NTSA,3,NUM(N2,N1),N2,N1) &
-          -trcsa_RFHS(NTSA,3,NUM(N2,N1),N2,N1)
-      ENDDO
+        DO NTSA=idsa_beg,idsa_end
+          trcsa_TBLS(NTSA,LS,NY,NX)=trcsa_TBLS(NTSA,LS,NY,NX)+trcsa_RBLS(NTSA,LS,NY,NX) &
+            -trcsa_RFLS(NTSA,3,0,N2,N1)-trcsa_RFLS(NTSA,3,NUM(N2,N1),N2,N1) &
+            -trcsa_RFHS(NTSA,3,NUM(N2,N1),N2,N1)
+        ENDDO
 
-      trcsa_TBLS(idsa_H0PO4,LS,NY,NX)=trcsa_TBLS(idsa_H0PO4,LS,NY,NX)-trcsa_RFLS(idsa_H0PO4B,3,NUM(N2,N1),N2,N1)
-      trcsa_TBLS(idsa_H3PO4,LS,NY,NX)=trcsa_TBLS(idsa_H3PO4,LS,NY,NX)-trcsa_RFLS(idsa_H3PO4B,3,NUM(N2,N1),N2,N1)
-      trcsa_TBLS(idsa_FeHPO4,LS,NY,NX)=trcsa_TBLS(idsa_FeHPO4,LS,NY,NX)-trcsa_RFLS(idsa_FeHPO4B,3,NUM(N2,N1),N2,N1)
-      trcsa_TBLS(idsa_FeH2PO4,LS,NY,NX)=trcsa_TBLS(idsa_FeH2PO4,LS,NY,NX)-trcsa_RFLS(idsa_FeH2PO4B,3,NUM(N2,N1),N2,N1)
-      trcsa_TBLS(idsa_CaPO4,LS,NY,NX)=trcsa_TBLS(idsa_CaPO4,LS,NY,NX)-trcsa_RFLS(idsa_CaPO4B,3,NUM(N2,N1),N2,N1)
-      trcsa_TBLS(idsa_CaHPO4,LS,NY,NX)=trcsa_TBLS(idsa_CaHPO4,LS,NY,NX)-trcsa_RFLS(idsa_CaHPO4B,3,NUM(N2,N1),N2,N1)
-      trcsa_TBLS(idsa_CaH2PO4,LS,NY,NX)=trcsa_TBLS(idsa_CaH2PO4,LS,NY,NX)-trcsa_RFLS(idsa_CaH2PO4B,3,NUM(N2,N1),N2,N1)
-      trcsa_TBLS(idsa_MgHPO4,LS,NY,NX)=trcsa_TBLS(idsa_MgHPO4,LS,NY,NX)-trcsa_RFLS(idsa_MgHPO4B,3,NUM(N2,N1),N2,N1)
+        DO NTSA=0,idsa_nuts
+          trcsa_TBLS(idsa_H0PO4+NTSA,LS,NY,NX)=trcsa_TBLS(idsa_H0PO4+NTSA,LS,NY,NX) &
+            -trcsa_RFLS(idsa_H0PO4B+NTSA,3,NUM(N2,N1),N2,N1)
+        ENDDO
       ENDIF
     ENDIF
   ENDDO D1205
@@ -1372,7 +1368,8 @@ module TrnsfrsMod
     IF(VOLX(L,NY,NX).GT.ZEROS2(NY,NX))THEN
       DO NTSA=idsa_beg,idsab_end
         trcsa_solml2(NTSA,L,NY,NX)=trcsa_solml2(NTSA,L,NY,NX) &
-          +trcsa_TFLS(NTSA,L,NY,NX)+trcsa_RFXS(NTSA,L,NY,NX)+trcsa_RFLZ(NTSA,L,NY,NX)
+          +trcsa_TFLS(NTSA,L,NY,NX)+trcsa_RFXS(NTSA,L,NY,NX) &
+          +trcsa_RFLZ(NTSA,L,NY,NX)
         trcsa_soHml2(NTSA,L,NY,NX)=trcsa_soHml2(NTSA,L,NY,NX) &
           +trcsa_TFHS(NTSA,L,NY,NX)-trcsa_RFXS(NTSA,L,NY,NX)
       ENDDO

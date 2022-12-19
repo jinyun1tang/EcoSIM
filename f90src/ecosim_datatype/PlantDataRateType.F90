@@ -113,11 +113,7 @@ module PlantDataRateType
   real(r8),target,allocatable ::  TCHFLA(:,:,:)                      !total internal root CH4 flux , [g d-2 h-1]
   real(r8),target,allocatable ::  TN2FLA(:,:,:)                      !total internal root N2O flux , [g d-2 h-1]
   real(r8),target,allocatable ::  TNHFLA(:,:,:)                      !total internal root NH3 flux , [g d-2 h-1]
-  real(r8),target,allocatable ::  TLCO2P(:,:,:)                      !total root internal CO2 flux, [g d-2 h-1]
-  real(r8),target,allocatable ::  TLOXYP(:,:,:)                      !total root internal O2 flux, [g d-2 h-1]
-  real(r8),target,allocatable ::  TLCH4P(:,:,:)                      !total root internal CH4 flux, [g d-2 h-1]
-  real(r8),target,allocatable ::  TLN2OP(:,:,:)                      !total root internal N2O flux, [g d-2 h-1]
-  real(r8),target,allocatable ::  TLNH3P(:,:,:)                      !total root internal NH3 flux, [g d-2 h-1]
+  real(r8),target,allocatable ::  trcg_TLP(:,:,:,:)                  !total root internal gas flux, [g d-2 h-1]
   real(r8),target,allocatable ::  TCO2S(:,:,:)                       !total root-soil CO2 flux, [g d-2 h-1]
   real(r8),target,allocatable ::  TUPOXS(:,:,:)                      !total root-soil O2 flux, [g d-2 h-1]
   real(r8),target,allocatable ::  TUPCHS(:,:,:)                      !total root-soil CH4 flux, [g d-2 h-1]
@@ -166,7 +162,6 @@ module PlantDataRateType
   real(r8),target,allocatable ::  TH2GZ(:,:)                         !total root H2 flux, [g d-2]
   real(r8),target,allocatable ::  TUPHGS(:,:,:)                      !total root-soil H2 flux, [g d-2 h-1]
   real(r8),target,allocatable ::  THGFLA(:,:,:)                      !total root-atmosphere H2 flux, [g d-2 h-1]
-  real(r8),target,allocatable ::  TLH2GP(:,:,:)                      !total root-soil H2 flux, [g d-2 h-1]
   private :: InitAllocate
   contains
 
@@ -288,11 +283,7 @@ module PlantDataRateType
   allocate(TCHFLA(JZ,JY,JX));   TCHFLA=0._r8
   allocate(TN2FLA(JZ,JY,JX));   TN2FLA=0._r8
   allocate(TNHFLA(JZ,JY,JX));   TNHFLA=0._r8
-  allocate(TLCO2P(JZ,JY,JX));   TLCO2P=0._r8
-  allocate(TLOXYP(JZ,JY,JX));   TLOXYP=0._r8
-  allocate(TLCH4P(JZ,JY,JX));   TLCH4P=0._r8
-  allocate(TLN2OP(JZ,JY,JX));   TLN2OP=0._r8
-  allocate(TLNH3P(JZ,JY,JX));   TLNH3P=0._r8
+  allocate(trcg_TLP(idg_beg:idg_end-1,JZ,JY,JX));   trcg_TLP=0._r8
   allocate(TCO2S(JZ,JY,JX));    TCO2S=0._r8
   allocate(TUPOXS(JZ,JY,JX));   TUPOXS=0._r8
   allocate(TUPCHS(JZ,JY,JX));   TUPCHS=0._r8
@@ -341,7 +332,6 @@ module PlantDataRateType
   allocate(TH2GZ(JY,JX));       TH2GZ=0._r8
   allocate(TUPHGS(JZ,JY,JX));   TUPHGS=0._r8
   allocate(THGFLA(JZ,JY,JX));   THGFLA=0._r8
-  allocate(TLH2GP(JZ,JY,JX));   TLH2GP=0._r8
   end subroutine InitAllocate
 
 !----------------------------------------------------------------------
@@ -450,11 +440,6 @@ module PlantDataRateType
   call destroy(TCHFLA)
   call destroy(TN2FLA)
   call destroy(TNHFLA)
-  call destroy(TLCO2P)
-  call destroy(TLOXYP)
-  call destroy(TLCH4P)
-  call destroy(TLN2OP)
-  call destroy(TLNH3P)
   call destroy(TCO2S)
   call destroy(TUPOXS)
   call destroy(TUPCHS)
@@ -503,7 +488,6 @@ module PlantDataRateType
   call destroy(TH2GZ)
   call destroy(TUPHGS)
   call destroy(THGFLA)
-  call destroy(TLH2GP)
   end subroutine DestructPlantRates
 
 end module PlantDataRateType

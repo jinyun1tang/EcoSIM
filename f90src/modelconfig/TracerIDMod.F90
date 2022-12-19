@@ -134,7 +134,8 @@ implicit none
   integer :: idx_anion_soil_end
   integer :: ifertn_beg,ifertn_end
   integer :: ifertnb_beg,ifertnb_end
-
+  integer :: ids_nuts
+  integer :: idsa_nuts
   contains
 
   subroutine InitTracerIDs(lsalt_model)
@@ -160,6 +161,7 @@ implicit none
   ids_NO2B=addone(ids_end);
   ids_H1PO4B=addone(ids_end)
   ids_H2PO4B=addone(ids_end)
+  ids_nuts=ids_H2PO4B-ids_NH4B
 
   ids_nutb_beg=idg_NH3B;ids_nutb_end=ids_H2PO4B
 
@@ -220,6 +222,8 @@ implicit none
     idsab_beg=idsa_end+1
     idsab_end=idsab_beg
     idsa_psoil_beg=idsa_H0PO4;idsa_psoil_end=idsa_MgHPO4
+
+    idsa_nuts=idsa_MgHPO4-idsa_H0PO4
 
     idsa_H0PO4B=addone(idsab_end)   ! PO4
     idsa_H3PO4B=addone(idsab_end)  ! H3PO4

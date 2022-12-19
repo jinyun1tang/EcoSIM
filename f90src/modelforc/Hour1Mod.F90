@@ -2336,7 +2336,7 @@ module Hour1Mod
     TCO2P(L,NY,NX)=0.0_r8
     TCOFLA(L,NY,NX)=0.0_r8
     TCHFLA(L,NY,NX)=0.0_r8
-    TLCO2P(L,NY,NX)=0.0_r8
+    trcg_TLP(idg_beg:idg_end-1,L,NY,NX)=0.0_r8
     TUPOXP(L,NY,NX)=0.0_r8
     TUPOXS(L,NY,NX)=0.0_r8
     TUPCHS(L,NY,NX)=0.0_r8
@@ -2349,11 +2349,6 @@ module Hour1Mod
     TN2FLA(L,NY,NX)=0.0_r8
     TNHFLA(L,NY,NX)=0.0_r8
     THGFLA(L,NY,NX)=0.0_r8
-    TLOXYP(L,NY,NX)=0.0_r8
-    TLCH4P(L,NY,NX)=0.0_r8
-    TLN2OP(L,NY,NX)=0.0_r8
-    TLNH3P(L,NY,NX)=0.0_r8
-    TLH2GP(L,NY,NX)=0.0_r8
     TUPNH4(L,NY,NX)=0.0_r8
     TUPNO3(L,NY,NX)=0.0_r8
     TUPH2P(L,NY,NX)=0.0_r8

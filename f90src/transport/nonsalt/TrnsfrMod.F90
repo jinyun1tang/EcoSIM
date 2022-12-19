@@ -539,7 +539,6 @@ module TrnsfrMod
 
   integer, intent(in) :: I
   integer, intent(in) :: NY,NX
-
   IF(PRECW(NY,NX).GT.0.0_r8.OR.(PRECR(NY,NX).GT.0.0_r8.AND.VHCPWM(1,1,NY,NX).GT.VHCPWX(NY,NX)))THEN
     trcg_XBLS(idg_CO2,1,NY,NX)=FLQGQ(NY,NX)*CCOR(NY,NX)+FLQGI(NY,NX)*CCOQ(NY,NX)
     trcg_XBLS(idg_CH4,1,NY,NX)=FLQGQ(NY,NX)*CCHR(NY,NX)+FLQGI(NY,NX)*CCHQ(NY,NX)
@@ -558,36 +557,8 @@ module TrnsfrMod
 !
 !     X*FLS,X*FLB=hourly solute flux to micropores in non-band,band
 !
-    trcs_XFLS(idg_CO2,3,0,NY,NX)=0.0_r8
-    trcs_XFLS(idg_CH4,3,0,NY,NX)=0.0_r8
-    trcs_XFLS(idg_O2,3,0,NY,NX)=0.0_r8
-    trcs_XFLS(idg_N2,3,0,NY,NX)=0.0_r8
-    trcs_XFLS(idg_N2O,3,0,NY,NX)=0.0_r8
-    trcs_XFLS(idg_H2,3,0,NY,NX)=0.0_r8
-    trcs_XFLS(ids_NH4,3,0,NY,NX)=0.0_r8
-    trcs_XFLS(idg_NH3,3,0,NY,NX)=0.0_r8
-    trcs_XFLS(ids_NO3,3,0,NY,NX)=0.0_r8
-    trcs_XFLS(ids_NO2,3,0,NY,NX)=0.0_r8
-    trcs_XFLS(ids_H1PO4,3,0,NY,NX)=0.0_r8
-    trcs_XFLS(ids_H2PO4,3,0,NY,NX)=0.0_r8
-    trcs_XFLS(idg_CO2,3,NU(NY,NX),NY,NX)=0.0_r8
-    trcs_XFLS(idg_CH4,3,NU(NY,NX),NY,NX)=0.0_r8
-    trcs_XFLS(idg_O2,3,NU(NY,NX),NY,NX)=0.0_r8
-    trcs_XFLS(idg_N2,3,NU(NY,NX),NY,NX)=0.0_r8
-    trcs_XFLS(idg_N2O,3,NU(NY,NX),NY,NX)=0.0_r8
-    trcs_XFLS(idg_H2,3,NU(NY,NX),NY,NX)=0.0_r8
-    trcs_XFLS(ids_NH4,3,NU(NY,NX),NY,NX)=0.0_r8
-    trcs_XFLS(idg_NH3,3,NU(NY,NX),NY,NX)=0.0_r8
-    trcs_XFLS(ids_NO3,3,NU(NY,NX),NY,NX)=0.0_r8
-    trcs_XFLS(ids_NO2,3,NU(NY,NX),NY,NX)=0.0_r8
-    trcs_XFLS(ids_H1PO4,3,NU(NY,NX),NY,NX)=0.0_r8
-    trcs_XFLS(ids_H2PO4,3,NU(NY,NX),NY,NX)=0.0_r8
-    trcs_XFLS(ids_NH4B,3,NU(NY,NX),NY,NX)=0.0_r8
-    trcs_XFLS(idg_NH3B,3,NU(NY,NX),NY,NX)=0.0_r8
-    trcs_XFLS(ids_NO3B,3,NU(NY,NX),NY,NX)=0.0_r8
-    trcs_XFLS(ids_NO2B,3,NU(NY,NX),NY,NX)=0.0_r8
-    trcs_XFLS(ids_H1PO4B,3,NU(NY,NX),NY,NX)=0.0_r8
-    trcs_XFLS(ids_H2PO4B,3,NU(NY,NX),NY,NX)=0.0_r8
+    trcs_XFLS(ids_beg:ids_end,3,0,NY,NX)=0.0_r8
+    trcs_XFLS(ids_beg:ids_end,3,NU(NY,NX),NY,NX)=0.0_r8
 !
 !     HOURLY SOLUTE FLUXES FROM ATMOSPHERE TO SOIL SURFACE
 !     IN RAINFALL AND IRRIGATION ACCORDING TO CONCENTRATIONS
@@ -680,7 +651,7 @@ module TrnsfrMod
   implicit none
 
   integer, intent(in) :: NY, NX
-  INTEGER :: K,L,NTS,NTG
+  INTEGER :: K,L,NTS,NTG,NTN
 
   DO  K=1,micpar%n_litrsfk
     ROCFL0(K,NY,NX)=XOCFLS(K,3,0,NY,NX)*XNPH
@@ -693,45 +664,27 @@ module TrnsfrMod
     ROAFL1(K,NY,NX)=XOAFLS(K,3,NU(NY,NX),NY,NX)*XNPH
   enddo
 
-  RCOBLS(1,NY,NX)=trcg_XBLS(idg_CO2,1,NY,NX)*XNPH
-  RCHBLS(1,NY,NX)=trcg_XBLS(idg_CH4,1,NY,NX)*XNPH
-  ROXBLS(1,NY,NX)=trcg_XBLS(idg_O2,1,NY,NX)*XNPH
-  RNGBLS(1,NY,NX)=trcg_XBLS(idg_N2,1,NY,NX)*XNPH
-  RN2BLS(1,NY,NX)=trcg_XBLS(idg_N2O,1,NY,NX)*XNPH
-  RN3BLW(1,NY,NX)=trcg_XBLS(idg_NH3,1,NY,NX)*XNPH
-  RN4BLW(1,NY,NX)=trcn_XBLS(ids_NH4,1,NY,NX)*XNPH
-  RNOBLW(1,NY,NX)=trcn_XBLS(ids_NO3,1,NY,NX)*XNPH
-  RH1PBS(1,NY,NX)=trcn_XBLS(ids_H1PO4,1,NY,NX)*XNPH
-  RH2PBS(1,NY,NX)=trcn_XBLS(ids_H2PO4,1,NY,NX)*XNPH
+  DO NTG=idg_beg,idg_end-1
+    trcg_RBLS(idg_CO2,1,NY,NX)=trcg_XBLS(idg_CO2,1,NY,NX)*XNPH
+  ENDDO
+
+  DO NTN=ids_nut_beg,ids_nuts_end
+    trcn_RBLS(NTN,1,NY,NX)=trcn_XBLS(NTN,1,NY,NX)*XNPH
+  ENDDO
 
   DO NTG=idg_beg,idg_end-1
     trcg_RFL0(NTG,NY,NX)=trcs_XFLS(NTG,3,0,NY,NX)*XNPH
   ENDDO
 
-  RN4FL0(NY,NX)=trcs_XFLS(ids_NH4,3,0,NY,NX)*XNPH
-  RNOFL0(NY,NX)=trcs_XFLS(ids_NO3,3,0,NY,NX)*XNPH
-  RNXFL0(NY,NX)=trcs_XFLS(ids_NO2,3,0,NY,NX)*XNPH
-  RH1PF0(NY,NX)=trcs_XFLS(ids_H1PO4,3,0,NY,NX)*XNPH
-  RH2PF0(NY,NX)=trcs_XFLS(ids_H2PO4,3,0,NY,NX)*XNPH
+  trcn_RFL0(ids_NH4,NY,NX)=trcs_XFLS(ids_NH4,3,0,NY,NX)*XNPH
+  trcn_RFL0(ids_NO3,NY,NX)=trcs_XFLS(ids_NO3,3,0,NY,NX)*XNPH
+  trcn_RFL0(ids_NO2,NY,NX)=trcs_XFLS(ids_NO2,3,0,NY,NX)*XNPH
+  trcn_RFL0(ids_H1PO4,NY,NX)=trcs_XFLS(ids_H1PO4,3,0,NY,NX)*XNPH
+  trcn_RFL0(ids_H2PO4,NY,NX)=trcs_XFLS(ids_H2PO4,3,0,NY,NX)*XNPH
 
-  trcs_RFL1(idg_CO2,NY,NX)=trcs_XFLS(idg_CO2,3,NU(NY,NX),NY,NX)*XNPH
-  trcs_RFL1(idg_CH4,NY,NX)=trcs_XFLS(idg_CH4,3,NU(NY,NX),NY,NX)*XNPH
-  trcs_RFL1(idg_O2,NY,NX)=trcs_XFLS(idg_O2,3,NU(NY,NX),NY,NX)*XNPH
-  trcs_RFL1(idg_N2,NY,NX)=trcs_XFLS(idg_N2,3,NU(NY,NX),NY,NX)*XNPH
-  trcs_RFL1(idg_N2O,NY,NX)=trcs_XFLS(idg_N2O,3,NU(NY,NX),NY,NX)*XNPH
-  trcs_RFL1(idg_H2,NY,NX)=trcs_XFLS(idg_H2,3,NU(NY,NX),NY,NX)*XNPH
-  trcs_RFL1(idg_NH3,NY,NX)=trcs_XFLS(idg_NH3,3,NU(NY,NX),NY,NX)*XNPH
-  trcs_RFL1(ids_NH4,NY,NX)=trcs_XFLS(ids_NH4,3,NU(NY,NX),NY,NX)*XNPH
-  trcs_RFL1(ids_NO3,NY,NX)=trcs_XFLS(ids_NO3,3,NU(NY,NX),NY,NX)*XNPH
-  trcs_RFL1(ids_NO2,NY,NX)=trcs_XFLS(ids_NO2,3,NU(NY,NX),NY,NX)*XNPH
-  trcs_RFL1(ids_H1PO4,NY,NX)=trcs_XFLS(ids_H1PO4,3,NU(NY,NX),NY,NX)*XNPH
-  trcs_RFL1(ids_H2PO4,NY,NX)=trcs_XFLS(ids_H2PO4,3,NU(NY,NX),NY,NX)*XNPH
-  trcs_RFL1(ids_NH4B,NY,NX)=trcs_XFLS(ids_NH4B,3,NU(NY,NX),NY,NX)*XNPH
-  trcs_RFL1(idg_NH3B,NY,NX)=trcs_XFLS(idg_NH3B,3,NU(NY,NX),NY,NX)*XNPH
-  trcs_RFL1(ids_NO3B,NY,NX)=trcs_XFLS(ids_NO3B,3,NU(NY,NX),NY,NX)*XNPH
-  trcs_RFL1(ids_NO2B,NY,NX)=trcs_XFLS(ids_NO2B,3,NU(NY,NX),NY,NX)*XNPH
-  trcs_RFL1(ids_H1PO4B,NY,NX)=trcs_XFLS(ids_H1PO4B,3,NU(NY,NX),NY,NX)*XNPH
-  trcs_RFL1(ids_H2PO4B,NY,NX)=trcs_XFLS(ids_H2PO4B,3,NU(NY,NX),NY,NX)*XNPH
+  DO NTS=ids_beg,ids_end
+    trcs_RFL1(NTS,NY,NX)=trcs_XFLS(NTS,3,NU(NY,NX),NY,NX)*XNPH
+  ENDDO
 !
 !     GAS AND SOLUTE SINKS AND SOURCES IN SOIL LAYERS FROM MICROBIAL
 !     TRANSFORMATIONS IN 'NITRO' + ROOT EXCHANGE IN 'EXTRACT'

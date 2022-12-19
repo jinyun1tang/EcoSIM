@@ -1333,22 +1333,23 @@ module RedistMod
     SD=SAND(L,NY,NX)+SILT(L,NY,NX)+CLAY(L,NY,NX)
     TSEDSO=TSEDSO+SD
     CS=trc_gasml(idg_CO2,L,NY,NX)+trc_solml(idg_CO2,L,NY,NX) &
-      +trc_soHml(idg_CO2,L,NY,NX)+TLCO2P(L,NY,NX) &
+      +trc_soHml(idg_CO2,L,NY,NX)+trcg_TLP(idg_CO2,L,NY,NX) &
       +trc_gasml(idg_CH4,L,NY,NX)+trc_solml(idg_CH4,L,NY,NX) &
-      +trc_soHml(idg_CH4,L,NY,NX)+TLCH4P(L,NY,NX)
+      +trc_soHml(idg_CH4,L,NY,NX)+trcg_TLP(idg_CH4,L,NY,NX)
     TLCO2G=TLCO2G+CS
     UCO2S(NY,NX)=UCO2S(NY,NX)+CS
     HS=trc_gasml(idg_H2,L,NY,NX)+trc_solml(idg_H2,L,NY,NX) &
-      +trc_soHml(idg_H2,L,NY,NX)+TLH2GP(L,NY,NX)
+      +trc_soHml(idg_H2,L,NY,NX)+trcg_TLP(idg_H2,L,NY,NX)
     TLH2G=TLH2G+HS
 
     OS=trc_gasml(idg_O2,L,NY,NX)+trc_solml(idg_O2,L,NY,NX) &
-      +trc_soHml(idg_O2,L,NY,NX)+TLOXYP(L,NY,NX)
+      +trc_soHml(idg_O2,L,NY,NX)+trcg_TLP(idg_O2,L,NY,NX)
     OXYGSO=OXYGSO+OS
+!  should I add N2 to ZG below? Dec, 18, 2022.
     ZG=trc_gasml(idg_N2,L,NY,NX)+trc_solml(idg_N2,L,NY,NX) &
-      +trc_soHml(idg_N2,L,NY,NX)+TLN2OP(L,NY,NX) &
+      +trc_soHml(idg_N2,L,NY,NX)+trcg_TLP(idg_N2O,L,NY,NX) &
       +trc_gasml(idg_N2O,L,NY,NX)+trc_solml(idg_N2O,L,NY,NX) &
-      +trc_soHml(idg_N2O,L,NY,NX)+TLNH3P(L,NY,NX) &
+      +trc_soHml(idg_N2O,L,NY,NX)+trcg_TLP(idg_NH3,L,NY,NX) &
       +trc_gasml(idg_NH3,L,NY,NX)
     TLN2G=TLN2G+ZG
     Z4S=trc_solml(ids_NH4,L,NY,NX)+trc_soHml(ids_NH4,L,NY,NX) &

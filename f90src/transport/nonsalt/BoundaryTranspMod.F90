@@ -194,7 +194,7 @@ module BoundaryTranspMod
   integer, intent(in) :: M,N,NN,N1,N2,M4,M5
   real(r8), intent(in) :: RCHQF
   real(r8) :: FQRM
-  integer :: K,NTG,NTN
+  integer :: K,NTG,NTN,NTS
 
   IF(IRCHG(NN,N,N2,N1).EQ.0.OR.test_aeqb(RCHQF,0.0_r8).OR.QRM(M,N2,N1).LE.ZEROS(N2,N1))THEN
     DO  K=1,jcplx
@@ -220,19 +220,13 @@ module BoundaryTranspMod
         RQROA(K,N,NN,M5,M4)=RQROA0(K,N2,N1)*FQRM
       enddo
 
-      trcg_RQR(idg_CO2,N,NN,M5,M4)=RQRCOS0(N2,N1)*FQRM
-      trcg_RQR(idg_CH4,N,NN,M5,M4)=RQRCHS0(N2,N1)*FQRM
-      trcg_RQR(idg_O2,N,NN,M5,M4)=RQROXS0(N2,N1)*FQRM
-      trcg_RQR(idg_N2,N,NN,M5,M4)=RQRNGS0(N2,N1)*FQRM
-      trcg_RQR(idg_N2O,N,NN,M5,M4)=RQRN2S0(N2,N1)*FQRM
-      trcg_RQR(idg_H2,N,NN,M5,M4)=RQRHGS0(N2,N1)*FQRM
-      trcg_RQR(idg_NH3,N,NN,M5,M4)=RQRNH30(N2,N1)*FQRM
+      DO NTG=idg_beg,idg_end-1
+        trcg_RQR(NTG,N,NN,M5,M4)=trcg_RQR0(NTG,N2,N1)*FQRM
+      ENDDO
 
-      trcn_RQR(ids_NH4,N,NN,M5,M4)=RQRNH40(N2,N1)*FQRM
-      trcn_RQR(ids_NO3,N,NN,M5,M4)=RQRNO30(N2,N1)*FQRM
-      trcn_RQR(ids_NO2,N,NN,M5,M4)=RQRNO20(N2,N1)*FQRM
-      trcn_RQR(ids_H1PO4,N,NN,M5,M4)=RQRH1P0(N2,N1)*FQRM
-      trcn_RQR(ids_H2PO4,N,NN,M5,M4)=RQRH2P0(N2,N1)*FQRM
+      DO NTS=ids_nut_beg,ids_nuts_end
+        trcn_RQR(NTS,N,NN,M5,M4)=trcn_RQR0(NTS,N2,N1)*FQRM
+      ENDDO
 !
 !     ACCUMULATE HOURLY FLUXES FOR USE IN REDIST.F
 !
@@ -614,6 +608,7 @@ module BoundaryTranspMod
   integer, intent(in) :: M,N1,N2,NY,NX
 
   integer :: LS,LS2
+  integer :: NTG,NTN
 
   DO  LS=1,JS
     IF(VHCPWM(M,LS,NY,NX).GT.VHCPWX(NY,NX))THEN
@@ -622,51 +617,39 @@ module BoundaryTranspMod
 !     IF LOWER LAYER IS IN THE SNOWPACK
 !
       IF(LS.LT.JS.AND.VHCPWM(M,LS2,N2,N1).GT.VHCPWX(N2,N1))THEN
-        trcg_TBLS(idg_CO2,LS,N2,N1)=trcg_TBLS(idg_CO2,LS,N2,N1)+RCOBLS(LS,N2,N1)-RCOBLS(LS2,N2,N1)
-        trcg_TBLS(idg_CH4,LS,N2,N1)=trcg_TBLS(idg_CH4,LS,N2,N1)+RCHBLS(LS,N2,N1)-RCHBLS(LS2,N2,N1)
-        trcg_TBLS(idg_O2,LS,N2,N1)=trcg_TBLS(idg_O2,LS,N2,N1)+ROXBLS(LS,N2,N1)-ROXBLS(LS2,N2,N1)
-        trcg_TBLS(idg_N2,LS,N2,N1)=trcg_TBLS(idg_N2,LS,N2,N1)+RNGBLS(LS,N2,N1)-RNGBLS(LS2,N2,N1)
-        trcg_TBLS(idg_N2O,LS,N2,N1)=trcg_TBLS(idg_N2O,LS,N2,N1)+RN2BLS(LS,N2,N1)-RN2BLS(LS2,N2,N1)
-        trcg_TBLS(idg_NH3,LS,N2,N1)=trcg_TBLS(idg_NH3,LS,N2,N1)+RN3BLW(LS,N2,N1)-RN3BLW(LS2,N2,N1)
+        DO NTG=idg_beg,idg_end-1
+          trcg_TBLS(NTG,LS,N2,N1)=trcg_TBLS(NTG,LS,N2,N1) &
+            +trcg_RBLS(NTG,LS,N2,N1)-trcg_RBLS(NTG,LS2,N2,N1)
+        ENDDO
 
-        trcn_TBLS(ids_NH4,LS,N2,N1)=trcn_TBLS(ids_NH4,LS,N2,N1)+RN4BLW(LS,N2,N1)-RN4BLW(LS2,N2,N1)
-        trcn_TBLS(ids_NO3,LS,N2,N1)=trcn_TBLS(ids_NO3,LS,N2,N1)+RNOBLW(LS,N2,N1)-RNOBLW(LS2,N2,N1)
-        trcn_TBLS(ids_H1PO4,LS,N2,N1)=trcn_TBLS(ids_H1PO4,LS,N2,N1)+RH1PBS(LS,N2,N1)-RH1PBS(LS2,N2,N1)
-        trcn_TBLS(ids_H2PO4,LS,N2,N1)=trcn_TBLS(ids_H2PO4,LS,N2,N1)+RH2PBS(LS,N2,N1)-RH2PBS(LS2,N2,N1)
+        DO NTN=ids_nut_beg,ids_nuts_end
+          trcn_TBLS(NTN,LS,N2,N1)=trcn_TBLS(NTN,LS,N2,N1) &
+            +trcn_RBLS(NTN,LS,N2,N1)-trcn_RBLS(NTN,LS2,N2,N1)
+        ENDDO
       ELSE
 !
 !     IF LOWER LAYER IS THE LITTER AND SOIL SURFACE
 !
-        trcg_TBLS(idg_CO2,LS,N2,N1)=trcg_TBLS(idg_CO2,LS,N2,N1)+RCOBLS(LS,N2,N1)-R3PoreSolFlx(idg_CO2,3,0,N2,N1)-R3PoreSolFlx(idg_CO2,3,NUM(N2,N1),N2,N1)
-!    3-R3PoreSoHFlx(idg_CO2,3,NUM(N2,N1),N2,N1)
-        trcg_TBLS(idg_CH4,LS,N2,N1)=trcg_TBLS(idg_CH4,LS,N2,N1)+RCHBLS(LS,N2,N1)-R3PoreSolFlx(idg_CH4,3,0,N2,N1)-R3PoreSolFlx(idg_CH4,3,NUM(N2,N1),N2,N1)
-!    3-R3PoreSoHFlx(idg_CH4,3,NUM(N2,N1),N2,N1)
-        trcg_TBLS(idg_O2,LS,N2,N1)=trcg_TBLS(idg_O2,LS,N2,N1)+ROXBLS(LS,N2,N1)-R3PoreSolFlx(idg_O2,3,0,N2,N1)-R3PoreSolFlx(idg_O2,3,NUM(N2,N1),N2,N1)
-!    3-R3PoreSoHFlx(idg_O2,3,NUM(N2,N1),N2,N1)
-        trcg_TBLS(idg_N2,LS,N2,N1)=trcg_TBLS(idg_N2,LS,N2,N1)+RNGBLS(LS,N2,N1)-R3PoreSolFlx(idg_N2,3,0,N2,N1)-R3PoreSolFlx(idg_N2,3,NUM(N2,N1),N2,N1)
-!    3-R3PoreSoHFlx(idg_N2,3,NUM(N2,N1),N2,N1)
-      trcg_TBLS(idg_N2O,LS,N2,N1)=trcg_TBLS(idg_N2O,LS,N2,N1)+RN2BLS(LS,N2,N1)-R3PoreSolFlx(idg_N2O,3,0,N2,N1)-R3PoreSolFlx(idg_N2O,3,NUM(N2,N1),N2,N1)
-!    3-R3PoreSoHFlx(idg_N2O,3,NUM(N2,N1),N2,N1)
-        trcn_TBLS(ids_NH4,LS,N2,N1)=trcn_TBLS(ids_NH4,LS,N2,N1)+RN4BLW(LS,N2,N1) &
-          -R3PoreSolFlx(ids_NH4,3,0,N2,N1)-R3PoreSolFlx(ids_NH4,3,NUM(N2,N1),N2,N1) &
-          -R3PoreSolFlx(ids_NH4B,3,NUM(N2,N1),N2,N1)
-!    3-R3PoreSoHFlx(ids_NH4,3,NUM(N2,N1),N2,N1)-R3PoreSoHFlx(ids_NH4B,3,NUM(N2,N1),N2,N1)
-        trcg_TBLS(idg_NH3,LS,N2,N1)=trcg_TBLS(idg_NH3,LS,N2,N1)+RN3BLW(LS,N2,N1) &
-          -R3PoreSolFlx(idg_NH3,3,0,N2,N1)-R3PoreSolFlx(idg_NH3,3,NUM(N2,N1),N2,N1) &
+    ! exclude NH3 and NH3B
+        DO NTG=idg_beg,idg_end-1
+          trcg_TBLS(NTG,LS,N2,N1)=trcg_TBLS(NTG,LS,N2,N1) &
+            +trcg_RBLS(NTG,LS,N2,N1)-R3PoreSolFlx(NTG,3,0,N2,N1) &
+            -R3PoreSolFlx(NTG,3,NUM(N2,N1),N2,N1)
+  !    3-R3PoreSoHFlx(NTG,3,NUM(N2,N1),N2,N1)
+        ENDDO
+
+        trcg_TBLS(idg_NH3,LS,N2,N1)=trcg_TBLS(idg_NH3,LS,N2,N1) &
           -R3PoreSolFlx(idg_NH3B,3,NUM(N2,N1),N2,N1)
-!    3-R3PoreSoHFlx(idg_NH3,3,NUM(N2,N1),N2,N1)-R3PoreSoHFlx(idg_NH3B,3,NUM(N2,N1),N2,N1)
-        trcn_TBLS(ids_NO3,LS,N2,N1)=trcn_TBLS(ids_NO3,LS,N2,N1)+RNOBLW(LS,N2,N1) &
-          -R3PoreSolFlx(ids_NO3,3,0,N2,N1)-R3PoreSolFlx(ids_NO3,3,NUM(N2,N1),N2,N1) &
-          -R3PoreSolFlx(ids_NO3B,3,NUM(N2,N1),N2,N1)
-!    3-R3PoreSoHFlx(ids_NO3,3,NUM(N2,N1),N2,N1)-R3PoreSoHFlx(ids_NO3B,3,NUM(N2,N1),N2,N1)
-        trcn_TBLS(ids_H1PO4,LS,N2,N1)=trcn_TBLS(ids_H1PO4,LS,N2,N1)+RH1PBS(LS,N2,N1) &
-          -R3PoreSolFlx(ids_H1PO4,3,0,N2,N1)-R3PoreSolFlx(ids_H1PO4,3,NUM(N2,N1),N2,N1) &
-          -R3PoreSolFlx(ids_H1PO4B,3,NUM(N2,N1),N2,N1)
-!    3-R3PoreSoHFlx(ids_H1PO4,3,NUM(N2,N1),N2,N1)-R3PoreSoHFlx(ids_H1PO4B,3,NUM(N2,N1),N2,N1)
-        trcn_TBLS(ids_H2PO4,LS,N2,N1)=trcn_TBLS(ids_H2PO4,LS,N2,N1)+RH2PBS(LS,N2,N1) &
-          -R3PoreSolFlx(ids_H2PO4,3,0,N2,N1)-R3PoreSolFlx(ids_H2PO4,3,NUM(N2,N1),N2,N1) &
-          -R3PoreSolFlx(ids_H2PO4B,3,NUM(N2,N1),N2,N1)
-!    3-R3PoreSoHFlx(ids_H2PO4,3,NUM(N2,N1),N2,N1)-R3PoreSoHFlx(ids_H2PO4B,3,NUM(N2,N1),N2,N1)
+!    3-R3PoreSoHFlx(idg_NH3B,3,NUM(N2,N1),N2,N1)
+
+        DO NTN=0,ids_nuts
+          trcn_TBLS(ids_NH4+NTN,LS,N2,N1)=trcn_TBLS(ids_NH4+NTN,LS,N2,N1) &
+            +trcn_RBLS(ids_NH4+NTN,LS,N2,N1)-R3PoreSolFlx(ids_NH4+NTN,3,0,N2,N1) &
+            -R3PoreSolFlx(ids_NH4+NTN,3,NUM(N2,N1),N2,N1) &
+            -R3PoreSolFlx(ids_NH4B+NTN,3,NUM(N2,N1),N2,N1)
+!    -R3PoreSoHFlx(ids_NH4+NTN,3,NUM(N2,N1),N2,N1) &
+!    -R3PoreSoHFlx(ids_NH4B+NTN,3,NUM(N2,N1),N2,N1)
+        ENDDO
       ENDIF
     ENDIF
   enddo

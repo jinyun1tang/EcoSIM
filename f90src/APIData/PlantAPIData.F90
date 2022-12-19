@@ -666,7 +666,6 @@ implicit none
   real(r8), pointer :: TCO2P(:)      => null()   !total root CO2 flux, [gC d-2 h-1]
   real(r8), pointer :: TUPOXP(:)     => null()   !total root internal O2 flux, [g d-2 h-1]
   real(r8), pointer :: THGFLA(:)     => null()   !total root-atmosphere H2 flux, [g d-2 h-1]
-  real(r8), pointer :: TLH2GP(:)     => null()   !total root-soil H2 flux, [g d-2 h-1]
   real(r8), pointer :: TUPOXS(:)     => null()   !total root-soil O2 flux, [g d-2 h-1]
   real(r8), pointer :: TUPHGS(:)     => null()   !total root-soil H2 flux, [g d-2 h-1]
   real(r8), pointer :: TUPCHS(:)     => null()   !total root-soil CH4 flux, [gC d-2 h-1]
@@ -780,16 +779,12 @@ implicit none
   real(r8), pointer :: RCO2N(:,:,:)     => null()  !root CO2 efflux unconstrained by root nonstructural C, [g d-2 h-1]
   real(r8), pointer :: RCO2A(:,:,:)     => null()  !root respiration constrained by O2, [g d-2 h-1]
   real(r8), pointer :: TEUPTK(:,:)      => null()  !total net root element uptake (+ve) - exudation (-ve), [gC d-2 ]
-  real(r8), pointer :: TLOXYP(:)        => null()   !total root internal O2 flux, [g d-2 h-1]
-  real(r8), pointer :: TLN2OP(:)        => null()   !total root internal N2O flux, [gN d-2 h-1]
+  real(r8), pointer :: trcg_TLP(:,:)    => null()   !total root internal gas flux, [g d-2 h-1]
   real(r8), pointer :: TCOFLA(:)        => null()   !total internal root CO2 flux , [gC d-2 h-1]
   real(r8), pointer :: TNHFLA(:)        => null()   !total internal root NH3 flux , [gN d-2 h-1]
   real(r8), pointer :: TOXFLA(:)        => null()   !total internal root O2 flux , [g d-2 h-1]
   real(r8), pointer :: TN2FLA(:)        => null()   !total internal root N2O flux , [gN d-2 h-1]
   real(r8), pointer :: TCHFLA(:)        => null()   !total internal root CH4 flux , [gC d-2 h-1]
-  real(r8), pointer :: TLCH4P(:)        => null()   !total root internal CH4 flux, [gC d-2 h-1]
-  real(r8), pointer :: TLCO2P(:)        => null()   !total root internal CO2 flux, [gC d-2 h-1]
-  real(r8), pointer :: TLNH3P(:)        => null()   !total root internal NH3 flux, [gN d-2 h-1]
   real(r8), pointer :: TUPNF(:)         => null()   !total root N2 fixation, [g d-2 h-1]
 
   contains
@@ -868,12 +863,7 @@ implicit none
   allocate(this%TN2FLA(JZ1))
   allocate(this%TOXFLA(JZ1))
   allocate(this%TCHFLA(JZ1))
-  allocate(this%TLCH4P(JZ1))
-  allocate(this%TLOXYP(JZ1))
-  allocate(this%TLNH3P(JZ1))
-  allocate(this%TLCO2P(JZ1))
-  allocate(this%TLN2OP(JZ1))
-
+  allocate(this%trcg_TLP(idg_beg:idg_end-1,JZ1))
 
   allocate(this%RN2FLA(2,JZ1,JP1))
   allocate(this%RNHFLA(2,JZ1,JP1))
@@ -1096,7 +1086,6 @@ implicit none
   allocate(this%TCO2S(JZ1))
   allocate(this%TCO2P(JZ1))
   allocate(this%THGFLA(JZ1))
-  allocate(this%TLH2GP(JZ1))
   allocate(this%TUPN3B(JZ1))
   allocate(this%TUPH1B(JZ1))
   allocate(this%TUPN3S(JZ1))
