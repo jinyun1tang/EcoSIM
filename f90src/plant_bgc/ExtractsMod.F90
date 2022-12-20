@@ -143,20 +143,11 @@ module ExtractsMod
     RUPP1B=> plt_rbgc%RUPP1B , &
     RUPP2B=> plt_rbgc%RUPP2B , &
     RUNNXP=> plt_rbgc%RUNNXP , &
-    RCODFA=> plt_rbgc%RCODFA , &
-    RCOFLA=> plt_rbgc%RCOFLA , &
-    ROXFLA=> plt_rbgc%ROXFLA , &
-    RCHFLA=> plt_rbgc%RCHFLA , &
-    RHGDFA=> plt_rbgc%RHGDFA , &
-    ROXDFA=> plt_rbgc%ROXDFA , &
-    RCHDFA=> plt_rbgc%RCHDFA , &
-    RHGFLA=> plt_rbgc%RHGFLA , &
+    trcg_RDFA=> plt_rbgc%trcg_RDFA , &
+    trcg_RFLA=> plt_rbgc%trcg_RFLA , &
     RCO2P => plt_rbgc%RCO2P  , &
     RUPCHS=> plt_rbgc%RUPCHS , &
     RUPOXP=> plt_rbgc%RUPOXP , &
-    RNHDFA=> plt_rbgc%RNHDFA , &
-    RN2FLA=> plt_rbgc%RN2FLA , &
-    RNHFLA=> plt_rbgc%RNHFLA , &
     RUPN2S=> plt_rbgc%RUPN2S , &
     RUPN3B=> plt_rbgc%RUPN3B , &
     RUPHGS=> plt_rbgc%RUPHGS , &
@@ -171,12 +162,8 @@ module ExtractsMod
     RUPNHB=> plt_rbgc%RUPNHB , &
     RUPH2B=> plt_rbgc%RUPH2B , &
     RUPH1B=> plt_rbgc%RUPH1B , &
-    TNHFLA=> plt_rbgc%TNHFLA , &
-    TCHFLA=> plt_rbgc%TCHFLA , &
+    trcg_TFLA=> plt_rbgc%trcg_TFLA , &
     trcg_TLP=> plt_rbgc%trcg_TLP , &
-    TN2FLA=> plt_rbgc%TN2FLA , &
-    TCOFLA=> plt_rbgc%TCOFLA , &
-    TOXFLA=> plt_rbgc%TOXFLA , &
     ROXYP => plt_rbgc%ROXYP  , &
     RDFOME=> plt_rbgc%RDFOME , &
     RUNNHP=> plt_rbgc%RUNNHP , &
@@ -184,7 +171,6 @@ module ExtractsMod
     RUPP2P=> plt_rbgc%RUPP2P , &
     RUNNBP=> plt_rbgc%RUNNBP , &
     RUPP1P=> plt_rbgc%RUPP1P , &
-    RN2DFA=> plt_rbgc%RN2DFA , &
     RNO3X => plt_bgcr%RNO3X  , &
     RNH4X => plt_bgcr%RNH4X  , &
     RPO4X => plt_bgcr%RPO4X  , &
@@ -209,7 +195,6 @@ module ExtractsMod
     TUPOXS=> plt_bgcr%TUPOXS , &
     TUPCHS=> plt_bgcr%TUPCHS , &
     TUPN2S=> plt_bgcr%TUPN2S , &
-    THGFLA=> plt_bgcr%THGFLA , &
     TUPOXP=> plt_bgcr%TUPOXP , &
     TCO2S => plt_bgcr%TCO2S  , &
     TCO2P => plt_bgcr%TCO2P  , &
@@ -256,19 +241,16 @@ module ExtractsMod
 !     R*FLA=root gaseous-atmosphere CO2 exchange
 !     R*DFA=root aqueous-gaseous CO2 exchange
 !
-      trcg_rootml(idg_CO2,N,L,NZ)=trcg_rootml(idg_CO2,N,L,NZ)+RCOFLA(N,L,NZ)-RCODFA(N,L,NZ)
-      trcg_rootml(idg_O2,N,L,NZ)=trcg_rootml(idg_O2,N,L,NZ)+ROXFLA(N,L,NZ)-ROXDFA(N,L,NZ)
-      trcg_rootml(idg_CH4,N,L,NZ)=trcg_rootml(idg_CH4,N,L,NZ)+RCHFLA(N,L,NZ)-RCHDFA(N,L,NZ)
-      trcg_rootml(idg_N2O,N,L,NZ)=trcg_rootml(idg_N2O,N,L,NZ)+RN2FLA(N,L,NZ)-RN2DFA(N,L,NZ)
-      trcg_rootml(idg_NH3,N,L,NZ)=trcg_rootml(idg_NH3,N,L,NZ)+RNHFLA(N,L,NZ)-RNHDFA(N,L,NZ)
-      trcg_rootml(idg_H2,N,L,NZ)=trcg_rootml(idg_H2,N,L,NZ)+RHGFLA(N,L,NZ)-RHGDFA(N,L,NZ)
+      DO NTG=idg_beg,idg_end-1
+        trcg_rootml(NTG,N,L,NZ)=trcg_rootml(NTG,N,L,NZ)+trcg_RFLA(NTG,N,L,NZ)-trcg_RDFA(NTG,N,L,NZ)
+      ENDDO
 
-      trcs_rootml(idg_CO2,N,L,NZ)=trcs_rootml(idg_CO2,N,L,NZ)+RCODFA(N,L,NZ)+RCO2P(N,L,NZ)
-      trcs_rootml(idg_O2,N,L,NZ)=trcs_rootml(idg_O2,N,L,NZ)+ROXDFA(N,L,NZ)-RUPOXP(N,L,NZ)
-      trcs_rootml(idg_CH4,N,L,NZ)=trcs_rootml(idg_CH4,N,L,NZ)+RCHDFA(N,L,NZ)+RUPCHS(N,L,NZ)
-      trcs_rootml(idg_N2O,N,L,NZ)=trcs_rootml(idg_N2O,N,L,NZ)+RN2DFA(N,L,NZ)+RUPN2S(N,L,NZ)
-      trcs_rootml(idg_NH3,N,L,NZ)=trcs_rootml(idg_NH3,N,L,NZ)+RNHDFA(N,L,NZ)+RUPN3S(N,L,NZ)+RUPN3B(N,L,NZ)
-      trcs_rootml(idg_H2,N,L,NZ)=trcs_rootml(idg_H2,N,L,NZ)+RHGDFA(N,L,NZ)+RUPHGS(N,L,NZ)
+      trcs_rootml(idg_CO2,N,L,NZ)=trcs_rootml(idg_CO2,N,L,NZ)+trcg_RDFA(idg_CO2,N,L,NZ)+RCO2P(N,L,NZ)
+      trcs_rootml(idg_O2,N,L,NZ)=trcs_rootml(idg_O2,N,L,NZ)+trcg_RDFA(idg_O2,N,L,NZ)-RUPOXP(N,L,NZ)
+      trcs_rootml(idg_CH4,N,L,NZ)=trcs_rootml(idg_CH4,N,L,NZ)+trcg_RDFA(idg_CH4,N,L,NZ)+RUPCHS(N,L,NZ)
+      trcs_rootml(idg_N2O,N,L,NZ)=trcs_rootml(idg_N2O,N,L,NZ)+trcg_RDFA(idg_N2O,N,L,NZ)+RUPN2S(N,L,NZ)
+      trcs_rootml(idg_NH3,N,L,NZ)=trcs_rootml(idg_NH3,N,L,NZ)+trcg_RDFA(idg_NH3,N,L,NZ)+RUPN3S(N,L,NZ)+RUPN3B(N,L,NZ)
+      trcs_rootml(idg_H2,N,L,NZ)=trcs_rootml(idg_H2,N,L,NZ)+trcg_RDFA(idg_H2,N,L,NZ)+RUPHGS(N,L,NZ)
 !
 !     TOTAL ROOT GAS CONTENTS
 !
@@ -290,12 +272,10 @@ module ExtractsMod
 !     solute code:NH4=NH4,NO3=NO3,H2P=H2PO4,H1P=H1PO4 in non-band
 !                :NHB=NH4,NOB=NO3,H2B=H2PO4,H1B=H1PO4 in band
 !
-      TCOFLA(L)=TCOFLA(L)+RCOFLA(N,L,NZ)
-      TOXFLA(L)=TOXFLA(L)+ROXFLA(N,L,NZ)
-      TCHFLA(L)=TCHFLA(L)+RCHFLA(N,L,NZ)
-      TN2FLA(L)=TN2FLA(L)+RN2FLA(N,L,NZ)
-      TNHFLA(L)=TNHFLA(L)+RNHFLA(N,L,NZ)
-      THGFLA(L)=THGFLA(L)+RHGFLA(N,L,NZ)
+      DO NTG=idg_beg,idg_end-1
+        trcg_TFLA(NTG,L)=trcg_TFLA(NTG,L)+trcg_RFLA(NTG,N,L,NZ)
+      ENDDO
+
       TCO2P(L)=TCO2P(L)-RCO2P(N,L,NZ)
       TUPOXP(L)=TUPOXP(L)+RUPOXP(N,L,NZ)
       TCO2S(L)=TCO2S(L)+RCO2S(N,L,NZ)

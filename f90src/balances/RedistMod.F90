@@ -1231,16 +1231,16 @@ module RedistMod
     RCH4L(L,NY,NX)=trcs_TFLS(idg_CH4,L,NY,NX)+trcs_RFLU(idg_CH4,L,NY,NX)+trcs_XFXS(idg_CH4,L,NY,NX)+trcg_XBLL(idg_CH4,L,NY,NX)
     !
     !     GRID CELL BOUNDARY FLUXES FROM ROOT GAS TRANSFER
-!
+!   watch out the following code for changes
     HEATIN=HEATIN+THTHAW(L,NY,NX)+TUPHT(L,NY,NX)
-    CIB=TCOFLA(L,NY,NX)
-    CHB=TCHFLA(L,NY,NX)
-    OIB=TOXFLA(L,NY,NX)
-!    HGB=THGFLA(L,NY,NX)
+    CIB=trcg_TFLA(idg_CO2,L,NY,NX)
+    CHB=trcg_TFLA(idg_CH4,L,NY,NX)
+    OIB=trcg_TFLA(idg_O2,L,NY,NX)
+!    HGB=trcg_TFLA(idg_H2,L,NY,NX)
     HGB=0.0_r8
     ZGB=0.0_r8
-    Z2B=TN2FLA(L,NY,NX)
-    ZHB=TNHFLA(L,NY,NX)
+    Z2B=trcg_TFLA(idg_N2O,L,NY,NX)
+    ZHB=trcg_TFLA(idg_NH3,L,NY,NX)
 !
 !     GRID CELL BOUNDARY FLUXES BUBBLING
 !

@@ -50,16 +50,8 @@ module PlantDataRateType
   real(r8),target,allocatable ::  VN2OF(:,:,:)                       !plant N2O emission from fire, [g d-2 ]
   real(r8),target,allocatable ::  VPO4F(:,:,:)                       !plant PO4 emission from fire, [g d-2 ]
   real(r8),target,allocatable ::  ROXYP(:,:,:,:,:)                   !root  O2 demand from respiration, [g d-2 h-1]
-  real(r8),target,allocatable ::  RCOFLA(:,:,:,:,:)                  !gaseous CO2 flux through roots, [g d-2 h-1]
-  real(r8),target,allocatable ::  ROXFLA(:,:,:,:,:)                  !gaseous O2 flux through roots, [g d-2 h-1]
-  real(r8),target,allocatable ::  RCHFLA(:,:,:,:,:)                  !gaseous CH4 flux through roots, [g d-2 h-1]
-  real(r8),target,allocatable ::  RN2FLA(:,:,:,:,:)                  !gaseous N2O flux through roots, [g d-2 h-1]
-  real(r8),target,allocatable ::  RNHFLA(:,:,:,:,:)                  !gaseous NH3 flux through roots, [g d-2 h-1]
-  real(r8),target,allocatable ::  RCODFA(:,:,:,:,:)                  !dissolution (+ve) - volatilization (-ve) CO2 flux in roots, [g d-2 h-1]
-  real(r8),target,allocatable ::  ROXDFA(:,:,:,:,:)                  !dissolution (+ve) - volatilization (-ve) O2 flux in roots, [g d-2 h-1]
-  real(r8),target,allocatable ::  RCHDFA(:,:,:,:,:)                  !dissolution (+ve) - volatilization (-ve) CH4 flux in roots, [g d-2 h-1]
-  real(r8),target,allocatable ::  RN2DFA(:,:,:,:,:)                  !dissolution (+ve) - volatilization (-ve) N2O flux in roots, [g d-2 h-1]
-  real(r8),target,allocatable ::  RNHDFA(:,:,:,:,:)                  !dissolution (+ve) - volatilization (-ve) NH3 flux in roots, [g d-2 h-1]
+  real(r8),target,allocatable ::  trcg_RFLA(:,:,:,:,:,:)                  !gaseous tracer flux through roots, [g d-2 h-1]
+  real(r8),target,allocatable ::  trcg_RDFA(:,:,:,:,:,:)                  !dissolution (+ve) - volatilization (-ve) gas flux in roots, [g d-2 h-1]
   real(r8),target,allocatable ::  RCO2S(:,:,:,:,:)                   !aqueous CO2 flux from roots to soil water, [g d-2 h-1]
   real(r8),target,allocatable ::  RUPOXS(:,:,:,:,:)                  !aqueous O2 flux from roots to soil water, [g d-2 h-1]
   real(r8),target,allocatable ::  RUPCHS(:,:,:,:,:)                  !aqueous CH4 flux from roots to soil water, [g d-2 h-1]
@@ -101,18 +93,12 @@ module PlantDataRateType
   real(r8),target,allocatable ::  RNH3Z(:,:,:)                       !gaseous NH3 flux fron root disturbance non-band, [g d-2 h-1]
   real(r8),target,allocatable ::  RNH3B(:,:,:,:)                     !gaseous NH3 flux fron root disturbance band, [g d-2 h-1]
   real(r8),target,allocatable ::  WFR(:,:,:,:,:)                     !O2 constraint to root respiration, []
-  real(r8),target,allocatable ::  RHGFLA(:,:,:,:,:)                  !gaseous H2 flux through roots, [g d-2 h-1]
-  real(r8),target,allocatable ::  RHGDFA(:,:,:,:,:)                  !dissolution (+ve) - volatilization (-ve) H2 flux in roots, [g d-2 h-1]
   real(r8),target,allocatable ::  RH2GZ(:,:,:)                       !gaseous H2 flux fron root disturbance, [g d-2 h-1]
   real(r8),target,allocatable ::  HEUPTK(:,:,:,:)                    !net root element uptake (+ve) - exudation (-ve), [g d-2 h-1]
   real(r8),target,allocatable ::  TEUPTK(:,:,:,:)                    !total net root element uptake (+ve) - exudation (-ve), [g d-2 ]
   real(r8),target,allocatable ::  TUPWTR(:,:,:)                      !total root water uptake, [m3 d-2]
   real(r8),target,allocatable ::  TUPHT(:,:,:)                       !total root heat uptake, [MJ d-2]
-  real(r8),target,allocatable ::  TCOFLA(:,:,:)                      !total internal root CO2 flux , [g d-2 h-1]
-  real(r8),target,allocatable ::  TOXFLA(:,:,:)                      !total internal root O2 flux , [g d-2 h-1]
-  real(r8),target,allocatable ::  TCHFLA(:,:,:)                      !total internal root CH4 flux , [g d-2 h-1]
-  real(r8),target,allocatable ::  TN2FLA(:,:,:)                      !total internal root N2O flux , [g d-2 h-1]
-  real(r8),target,allocatable ::  TNHFLA(:,:,:)                      !total internal root NH3 flux , [g d-2 h-1]
+  real(r8),target,allocatable ::  trcg_TFLA(:,:,:,:)                 !total internal root gas flux , [g d-2 h-1]
   real(r8),target,allocatable ::  trcg_TLP(:,:,:,:)                  !total root internal gas flux, [g d-2 h-1]
   real(r8),target,allocatable ::  TCO2S(:,:,:)                       !total root-soil CO2 flux, [g d-2 h-1]
   real(r8),target,allocatable ::  TUPOXS(:,:,:)                      !total root-soil O2 flux, [g d-2 h-1]
@@ -161,7 +147,6 @@ module PlantDataRateType
   real(r8),target,allocatable ::  ROQAY(:,:,:,:)                     !total root + microbial acetate uptake, [g d-2 h-1]
   real(r8),target,allocatable ::  TH2GZ(:,:)                         !total root H2 flux, [g d-2]
   real(r8),target,allocatable ::  TUPHGS(:,:,:)                      !total root-soil H2 flux, [g d-2 h-1]
-  real(r8),target,allocatable ::  THGFLA(:,:,:)                      !total root-atmosphere H2 flux, [g d-2 h-1]
   private :: InitAllocate
   contains
 
@@ -220,16 +205,8 @@ module PlantDataRateType
   allocate(VN2OF(JP,JY,JX));    VN2OF=0._r8
   allocate(VPO4F(JP,JY,JX));    VPO4F=0._r8
   allocate(ROXYP(2,JZ,JP,JY,JX));ROXYP=0._r8
-  allocate(RCOFLA(2,JZ,JP,JY,JX));RCOFLA=0._r8
-  allocate(ROXFLA(2,JZ,JP,JY,JX));ROXFLA=0._r8
-  allocate(RCHFLA(2,JZ,JP,JY,JX));RCHFLA=0._r8
-  allocate(RN2FLA(2,JZ,JP,JY,JX));RN2FLA=0._r8
-  allocate(RNHFLA(2,JZ,JP,JY,JX));RNHFLA=0._r8
-  allocate(RCODFA(2,JZ,JP,JY,JX));RCODFA=0._r8
-  allocate(ROXDFA(2,JZ,JP,JY,JX));ROXDFA=0._r8
-  allocate(RCHDFA(2,JZ,JP,JY,JX));RCHDFA=0._r8
-  allocate(RN2DFA(2,JZ,JP,JY,JX));RN2DFA=0._r8
-  allocate(RNHDFA(2,JZ,JP,JY,JX));RNHDFA=0._r8
+  allocate(trcg_RFLA(idg_beg:idg_end-1,2,JZ,JP,JY,JX));trcg_RFLA=0._r8
+  allocate(trcg_RDFA(idg_beg:idg_end-1,2,JZ,JP,JY,JX));trcg_RDFA=0._r8
   allocate(RCO2S(2,JZ,JP,JY,JX));RCO2S=0._r8
   allocate(RUPOXS(2,JZ,JP,JY,JX));RUPOXS=0._r8
   allocate(RUPCHS(2,JZ,JP,JY,JX));RUPCHS=0._r8
@@ -271,18 +248,12 @@ module PlantDataRateType
   allocate(RNH3Z(JP,JY,JX));    RNH3Z=0._r8
   allocate(RNH3B(JBR,JP,JY,JX)); RNH3B=0._r8
   allocate(WFR(2,JZ,JP,JY,JX)); WFR=0._r8
-  allocate(RHGFLA(2,JZ,JP,JY,JX));RHGFLA=0._r8
-  allocate(RHGDFA(2,JZ,JP,JY,JX));RHGDFA=0._r8
   allocate(RH2GZ(JP,JY,JX));    RH2GZ=0._r8
   allocate(HEUPTK(npelms,JP,JY,JX));   HEUPTK=0._r8
   allocate(TEUPTK(npelms,JP,JY,JX));   TEUPTK=0._r8
   allocate(TUPWTR(0:JZ,JY,JX)); TUPWTR=0._r8
   allocate(TUPHT(0:JZ,JY,JX));  TUPHT=0._r8
-  allocate(TCOFLA(JZ,JY,JX));   TCOFLA=0._r8
-  allocate(TOXFLA(JZ,JY,JX));   TOXFLA=0._r8
-  allocate(TCHFLA(JZ,JY,JX));   TCHFLA=0._r8
-  allocate(TN2FLA(JZ,JY,JX));   TN2FLA=0._r8
-  allocate(TNHFLA(JZ,JY,JX));   TNHFLA=0._r8
+  allocate(trcg_TFLA(idg_beg:idg_end-1,JZ,JY,JX));   trcg_TFLA=0._r8
   allocate(trcg_TLP(idg_beg:idg_end-1,JZ,JY,JX));   trcg_TLP=0._r8
   allocate(TCO2S(JZ,JY,JX));    TCO2S=0._r8
   allocate(TUPOXS(JZ,JY,JX));   TUPOXS=0._r8
@@ -331,7 +302,6 @@ module PlantDataRateType
   allocate(ROQAY(1:jcplx,0:JZ,JY,JX));ROQAY=0._r8
   allocate(TH2GZ(JY,JX));       TH2GZ=0._r8
   allocate(TUPHGS(JZ,JY,JX));   TUPHGS=0._r8
-  allocate(THGFLA(JZ,JY,JX));   THGFLA=0._r8
   end subroutine InitAllocate
 
 !----------------------------------------------------------------------
@@ -378,16 +348,6 @@ module PlantDataRateType
   call destroy(VN2OF)
   call destroy(VPO4F)
   call destroy(ROXYP)
-  call destroy(RCOFLA)
-  call destroy(ROXFLA)
-  call destroy(RCHFLA)
-  call destroy(RN2FLA)
-  call destroy(RNHFLA)
-  call destroy(RCODFA)
-  call destroy(ROXDFA)
-  call destroy(RCHDFA)
-  call destroy(RN2DFA)
-  call destroy(RNHDFA)
   call destroy(RCO2S)
   call destroy(RUPOXS)
   call destroy(RUPCHS)
@@ -428,18 +388,11 @@ module PlantDataRateType
   call destroy(RNH3Z)
   call destroy(RNH3B)
   call destroy(WFR)
-  call destroy(RHGFLA)
-  call destroy(RHGDFA)
   call destroy(RH2GZ)
   call destroy(HEUPTK)
   call destroy(TEUPTK)
   call destroy(TUPWTR)
   call destroy(TUPHT)
-  call destroy(TCOFLA)
-  call destroy(TOXFLA)
-  call destroy(TCHFLA)
-  call destroy(TN2FLA)
-  call destroy(TNHFLA)
   call destroy(TCO2S)
   call destroy(TUPOXS)
   call destroy(TUPCHS)
@@ -487,7 +440,6 @@ module PlantDataRateType
   call destroy(ROQAY)
   call destroy(TH2GZ)
   call destroy(TUPHGS)
-  call destroy(THGFLA)
   end subroutine DestructPlantRates
 
 end module PlantDataRateType

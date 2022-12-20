@@ -665,7 +665,6 @@ implicit none
   real(r8), pointer :: TCO2S(:)      => null()   !total root-soil CO2 flux, [gC d-2 h-1]
   real(r8), pointer :: TCO2P(:)      => null()   !total root CO2 flux, [gC d-2 h-1]
   real(r8), pointer :: TUPOXP(:)     => null()   !total root internal O2 flux, [g d-2 h-1]
-  real(r8), pointer :: THGFLA(:)     => null()   !total root-atmosphere H2 flux, [g d-2 h-1]
   real(r8), pointer :: TUPOXS(:)     => null()   !total root-soil O2 flux, [g d-2 h-1]
   real(r8), pointer :: TUPHGS(:)     => null()   !total root-soil H2 flux, [g d-2 h-1]
   real(r8), pointer :: TUPCHS(:)     => null()   !total root-soil CH4 flux, [gC d-2 h-1]
@@ -726,18 +725,8 @@ implicit none
   real(r8), pointer :: RUPN3S(:,:,:)    => null()  !aqueous NH3 flux from roots to soil water non-band, [g d-2 h-1]
   real(r8), pointer :: RUPN3B(:,:,:)    => null()  !aqueous NH3 flux from roots to soil water band, [g d-2 h-1]
   real(r8), pointer :: RUPHGS(:,:,:)    => null()  !aqueous H2 flux from roots to soil water, [g d-2 h-1]
-  real(r8), pointer :: RCOFLA(:,:,:)    => null()  !gaseous CO2 flux through roots, [g d-2 h-1]
-  real(r8), pointer :: ROXFLA(:,:,:)    => null()  !gaseous O2 flux through roots, [g d-2 h-1]
-  real(r8), pointer :: RCHFLA(:,:,:)    => null()  !gaseous CH4 flux through roots, [g d-2 h-1]
-  real(r8), pointer :: RN2FLA(:,:,:)    => null()  !gaseous N2O flux through roots, [g d-2 h-1]
-  real(r8), pointer :: RNHFLA(:,:,:)    => null()  !gaseous NH3 flux through roots, [g d-2 h-1]
-  real(r8), pointer :: RHGFLA(:,:,:)    => null()  !gaseous H2 flux through roots, [g d-2 h-1]
-  real(r8), pointer :: RCODFA(:,:,:)    => null()  !dissolution (+ve) - volatilization (-ve) CO2 flux in roots, [g d-2 h-1]
-  real(r8), pointer :: ROXDFA(:,:,:)    => null()  !dissolution (+ve) - volatilization (-ve) O2 flux in roots, [g d-2 h-1]
-  real(r8), pointer :: RCHDFA(:,:,:)    => null()  !dissolution (+ve) - volatilization (-ve) CH4 flux in roots, [g d-2 h-1]
-  real(r8), pointer :: RN2DFA(:,:,:)    => null()  !dissolution (+ve) - volatilization (-ve) N2O flux in roots, [g d-2 h-1]
-  real(r8), pointer :: RNHDFA(:,:,:)    => null()  !dissolution (+ve) - volatilization (-ve) NH3 flux in roots, [g d-2 h-1]
-  real(r8), pointer :: RHGDFA(:,:,:)    => null()  !dissolution (+ve) - volatilization (-ve) H2 flux in roots, [g d-2 h-1]
+  real(r8), pointer :: trcg_RFLA(:,:,:,:)    => null()  !gaseous tracer flux through roots, [g d-2 h-1]
+  real(r8), pointer :: trcg_RDFA(:,:,:,:)    => null()  !dissolution (+ve) - volatilization (-ve) gas flux in roots, [g d-2 h-1]
   real(r8), pointer :: ROXYP(:,:,:)     => null()  !root  O2 demand from respiration, [g d-2 h-1]
   real(r8), pointer :: RUNNHP(:,:,:)    => null()  !root uptake of NH4 non-band unconstrained by NH4, [g d-2 h-1]
   real(r8), pointer :: RUNNBP(:,:,:)    => null()  !root uptake of NO3 band unconstrained by NO3, [g d-2 h-1]
@@ -780,11 +769,7 @@ implicit none
   real(r8), pointer :: RCO2A(:,:,:)     => null()  !root respiration constrained by O2, [g d-2 h-1]
   real(r8), pointer :: TEUPTK(:,:)      => null()  !total net root element uptake (+ve) - exudation (-ve), [gC d-2 ]
   real(r8), pointer :: trcg_TLP(:,:)    => null()   !total root internal gas flux, [g d-2 h-1]
-  real(r8), pointer :: TCOFLA(:)        => null()   !total internal root CO2 flux , [gC d-2 h-1]
-  real(r8), pointer :: TNHFLA(:)        => null()   !total internal root NH3 flux , [gN d-2 h-1]
-  real(r8), pointer :: TOXFLA(:)        => null()   !total internal root O2 flux , [g d-2 h-1]
-  real(r8), pointer :: TN2FLA(:)        => null()   !total internal root N2O flux , [gN d-2 h-1]
-  real(r8), pointer :: TCHFLA(:)        => null()   !total internal root CH4 flux , [gC d-2 h-1]
+  real(r8), pointer :: trcg_TFLA(:,:)   => null()   !total internal root gas flux , [gC d-2 h-1]
   real(r8), pointer :: TUPNF(:)         => null()   !total root N2 fixation, [g d-2 h-1]
 
   contains
@@ -858,21 +843,11 @@ implicit none
   allocate(this%RNH3B(JBR,JP1))
 
 
-  allocate(this%TNHFLA(JZ1))
-  allocate(this%TCOFLA(JZ1))
-  allocate(this%TN2FLA(JZ1))
-  allocate(this%TOXFLA(JZ1))
-  allocate(this%TCHFLA(JZ1))
+  allocate(this%trcg_TFLA(idg_beg:idg_end-1,JZ1))
   allocate(this%trcg_TLP(idg_beg:idg_end-1,JZ1))
 
-  allocate(this%RN2FLA(2,JZ1,JP1))
-  allocate(this%RNHFLA(2,JZ1,JP1))
-  allocate(this%RHGFLA(2,JZ1,JP1))
-  allocate(this%RCODFA(2,JZ1,JP1))
-  allocate(this%ROXDFA(2,JZ1,JP1))
-  allocate(this%RCHDFA(2,JZ1,JP1))
-  allocate(this%RN2DFA(2,JZ1,JP1))
-  allocate(this%RHGDFA(2,JZ1,JP1))
+  allocate(this%trcg_RFLA(idg_beg:idg_end-1,2,JZ1,JP1))
+  allocate(this%trcg_RDFA(idg_beg:idg_end-1,2,JZ1,JP1))
   allocate(this%ROXYP(2,JZ1,JP1))
   allocate(this%RUNNHP(2,JZ1,JP1))
   allocate(this%RUNNBP(2,JZ1,JP1))
@@ -893,7 +868,6 @@ implicit none
   allocate(this%UPMNZH(2,JP1))
   allocate(this%UPMXZH(2,JP1))
   allocate(this%UPKMZH(2,JP1))
-  allocate(this%RNHDFA(2,JZ1,JP1))
   allocate(this%RCO2P(2,JZ1,JP1))
   allocate(this%RUPOXP(2,JZ1,JP1))
   allocate(this%RCO2S(2,JZ1,JP1))
@@ -903,9 +877,6 @@ implicit none
   allocate(this%RUPN3S(2,JZ1,JP1))
   allocate(this%RUPN3B(2,JZ1,JP1))
   allocate(this%RUPHGS(2,JZ1,JP1))
-  allocate(this%RCOFLA(2,JZ1,JP1))
-  allocate(this%ROXFLA(2,JZ1,JP1))
-  allocate(this%RCHFLA(2,JZ1,JP1))
   end subroutine plt_rootbgc_init
 !----------------------------------------------------------------------
 
@@ -1085,7 +1056,6 @@ implicit none
 
   allocate(this%TCO2S(JZ1))
   allocate(this%TCO2P(JZ1))
-  allocate(this%THGFLA(JZ1))
   allocate(this%TUPN3B(JZ1))
   allocate(this%TUPH1B(JZ1))
   allocate(this%TUPN3S(JZ1))

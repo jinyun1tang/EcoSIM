@@ -237,7 +237,7 @@ module UptakesMod
 !
 
   ARLSC=0.0_r8
-  DO 9984 NZ=1,NP0
+  D9984: DO NZ=1,NP0
 !     TKC(NZ)=TKA+DTKC(NZ)
 !     TCC(NZ)=TKC(NZ)-TC2K
     ARLSC=ARLSC+ARLFP(NZ)+ARSTP(NZ)
@@ -269,21 +269,11 @@ module UptakesMod
         plt_rbgc%RUPN3S(N,L,NZ)=0.0_r8
         plt_rbgc%RUPN3B(N,L,NZ)=0.0_r8
         plt_rbgc%RUPHGS(N,L,NZ)=0.0_r8
-        plt_rbgc%RCOFLA(N,L,NZ)=0.0_r8
-        plt_rbgc%ROXFLA(N,L,NZ)=0.0_r8
-        plt_rbgc%RCHFLA(N,L,NZ)=0.0_r8
-        plt_rbgc%RN2FLA(N,L,NZ)=0.0_r8
-        plt_rbgc%RNHFLA(N,L,NZ)=0.0_r8
-        plt_rbgc%RHGFLA(N,L,NZ)=0.0_r8
-        plt_rbgc%RCODFA(N,L,NZ)=0.0_r8
-        plt_rbgc%ROXDFA(N,L,NZ)=0.0_r8
-        plt_rbgc%RCHDFA(N,L,NZ)=0.0_r8
-        plt_rbgc%RN2DFA(N,L,NZ)=0.0_r8
-        plt_rbgc%RNHDFA(N,L,NZ)=0.0_r8
-        plt_rbgc%RHGDFA(N,L,NZ)=0.0_r8
+        plt_rbgc%trcg_RFLA(idg_beg:idg_end-1,N,L,NZ)=0.0_r8
+        plt_rbgc%trcg_RDFA(idg_beg:idg_end-1,N,L,NZ)=0.0_r8
       enddo
     enddo
-9984  CONTINUE
+  ENDDO D9984
 !
 !     PSIST1=total soil water potential PSIST adjusted for surf elevn
 !     ALT=surface elevation
