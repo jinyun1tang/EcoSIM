@@ -811,6 +811,7 @@ implicit none
   GRWTB(NB,NZ)=0._r8
   ARLFB(NB,NZ)=0._r8
   WTSTXBE(NB,1:npelms,NZ)=0._r8
+
   D8855: DO K=0,JNODS1
     IF(K.NE.0)THEN
       CPOOL3(K,NB,NZ)=0._r8

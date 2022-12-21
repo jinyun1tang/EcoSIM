@@ -31,18 +31,18 @@ module InitVegBGC
   !     IALBY:1=backscattering,2=forward scattering of sky radiation
   !
 
-  DO 205 L=1,JLA
+  D205: DO L=1,JLA
     ZAZI(L)=(L-0.5)*PICON/real(JLA,r8)
-205   CONTINUE
+  ENDDO D205
   !JSA: number of sky azimuth sectors
   !JLA: number of leaf azimuth sectors
-  DO 230 N=1,JSA
+  D230: DO N=1,JSA
     YAZI(N)=PICON*(2*N-1)/real(JSA,r8)
     YAGL=PICON/real(JSA,r8)
     YSIN(N)=SIN(YAGL)
     YCOS(N)=COS(YAGL)
     TYSIN=TYSIN+YSIN(N)
-    DO 225 L=1,JLA
+    D225: DO L=1,JLA
       DAZI=COS(ZAZI(L)-YAZI(N))
       DO  M=1,JLI
         OMEGY=ZCOS(M)*YSIN(N)+ZSIN(M)*YCOS(N)*DAZI
@@ -54,18 +54,18 @@ module InitVegBGC
           OMEGZ=-ACOS(OMEGY)
         ENDIF
         IF(OMEGZ.GT.-PICON2h)THEN
-          ZAGL=YAGL+2.0*OMEGZ
+          ZAGL=YAGL+2.0_r8*OMEGZ
         ELSE
-          ZAGL=YAGL-2.0*(PICON+OMEGZ)
+          ZAGL=YAGL-2.0_r8*(PICON+OMEGZ)
         ENDIF
-        IF(ZAGL.GT.0.0.AND.ZAGL.LT.PICON)THEN
+        IF(ZAGL.GT.0.0_r8.AND.ZAGL.LT.PICON)THEN
           IALBY(N,M,L)=1
         ELSE
           IALBY(N,M,L)=2
         ENDIF
       ENDDO
-225 CONTINUE
-230 CONTINUE
+    ENDDO D225
+  ENDDO D230
   end subroutine InitIrradianceGeometry
 
 end module InitVegBGC

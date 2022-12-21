@@ -994,7 +994,7 @@ module UptakesMod
         .AND.VOLWM(NPH,L).GT.ZEROS2 &
         .AND.RTDNP(N,L,NZ).GT.ZERO &
         .AND.CNDU(L).GT.ZERO &
-        .AND.RTN1(ifineroot,L,NZ).GT.ZEROP(NZ) &
+        .AND.RTN1(ipltroot,L,NZ).GT.ZEROP(NZ) &
         .AND.RTNL(N,L,NZ).GT.ZEROP(NZ) &
         .AND.THETW(L).GT.ZERO)THEN
         ILYR(N,L)=1
@@ -1035,8 +1035,8 @@ module UptakesMod
         !     RTN1,RTNL=number of primary,secondary axes
 !
         FRAD1=(RRAD1(N,L,NZ)/RRAD2M(N,NZ))**4._r8
-        RSR1(N,L)=RSRA(N,NZ)*DPTHZ(L)/(FRAD1*RTN1(ifineroot,L,NZ)) &
-          +RSRA(ifineroot,NZ)*HTSTZ(NZ)/(FRADW*RTN1(ifineroot,L,NZ))
+        RSR1(N,L)=RSRA(N,NZ)*DPTHZ(L)/(FRAD1*RTN1(ipltroot,L,NZ)) &
+          +RSRA(ipltroot,NZ)*HTSTZ(NZ)/(FRADW*RTN1(ipltroot,L,NZ))
         FRAD2=(RRAD2(N,L,NZ)/RRAD2M(N,NZ))**4._r8
         RSR2(N,L)=RSRA(N,NZ)*RTLGA(N,L,NZ)/(FRAD2*RTNL(N,L,NZ))
       ELSE

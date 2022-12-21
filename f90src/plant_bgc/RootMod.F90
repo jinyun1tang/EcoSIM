@@ -57,16 +57,16 @@ implicit none
 !     ADD SEED DIMENSIONS TO ROOT DIMENSIONS (ONLY IMPORTANT DURING
 !     GERMINATION)
 !
-  RTLGP(1,NG(NZ),NZ)=RTLGP(1,NG(NZ),NZ)+SDLG(NZ)
+  RTLGP(ipltroot,NG(NZ),NZ)=RTLGP(ipltroot,NG(NZ),NZ)+SDLG(NZ)
   IF(DLYR3(NG(NZ)).GT.ZERO)THEN
-    RTDNP(1,NG(NZ),NZ)=RTLGP(1,NG(NZ),NZ)/DLYR3(NG(NZ))
+    RTDNP(ipltroot,NG(NZ),NZ)=RTLGP(ipltroot,NG(NZ),NZ)/DLYR3(NG(NZ))
   ELSE
-    RTDNP(1,NG(NZ),NZ)=0._r8
+    RTDNP(ipltroot,NG(NZ),NZ)=0._r8
   ENDIF
-  RTVL=RTVLP(1,NG(NZ),NZ)+RTVLW(1,NG(NZ),NZ)+SDVL(NZ)*PP(NZ)
-  RTVLP(1,NG(NZ),NZ)=PORT(1,NZ)*RTVL
-  RTVLW(1,NG(NZ),NZ)=(1.0_r8-PORT(1,NZ))*RTVL
-  RTARP(1,NG(NZ),NZ)=RTARP(1,NG(NZ),NZ)+SDAR(NZ)
+  RTVL=RTVLP(ipltroot,NG(NZ),NZ)+RTVLW(ipltroot,NG(NZ),NZ)+SDVL(NZ)*PP(NZ)
+  RTVLP(ipltroot,NG(NZ),NZ)=PORT(ipltroot,NZ)*RTVL
+  RTVLW(ipltroot,NG(NZ),NZ)=(1.0_r8-PORT(ipltroot,NZ))*RTVL
+  RTARP(ipltroot,NG(NZ),NZ)=RTARP(ipltroot,NG(NZ),NZ)+SDAR(NZ)
   IF(IDTHRN.EQ.NRT(NZ).OR.(WTRVE(ielmc,NZ).LE.ZEROL(NZ)&
     .AND.ISTYP(NZ).NE.iplt_annual))THEN
     IDTHR(NZ)=idead
@@ -258,7 +258,7 @@ implicit none
 !     CO2A,OXYA,CH4A,Z2OA,ZH3A,H2GA=root gaseous CO2,O2,CH4,N2O,NH3,H2
 !     CO2P,OXYP,CH4P,Z2OP,ZH3P,H2GP=root aqueous CO2,O2,CH4,N2O,NH3,H2
 !
-        IF(N.EQ.1)THEN
+        IF(N.EQ.ipltroot)THEN
           RTLGZ=RTLGZ*FWODRE(ielmc,k_fine_litr)
           RTLGL=RTLGL*FWODRE(ielmc,k_fine_litr)
         ENDIF
@@ -277,12 +277,11 @@ implicit none
             ,WTRTT*DMVL(N,NZ)*PSIRG(N,L,NZ))
           RTVLP(N,L,NZ)=PORT(N,NZ)*RTVL
           RTVLW(N,L,NZ)=(1.0_r8-PORT(N,NZ))*RTVL
-          RRAD1(N,L,NZ)=AMAX1(RRAD1X(N,NZ) &
-            ,(1.0_r8+PSIRT(N,L,NZ)/EMODR)*RRAD1M(N,NZ))
-          RRAD2(N,L,NZ)=AMAX1(RRAD2X(N,NZ) &
-            ,(1.0_r8+PSIRT(N,L,NZ)/EMODR)*RRAD2M(N,NZ))
-          RTAR=PICON2s*RRAD1(N,L,NZ)*RTLGX &
-            +PICON2s*RRAD2(N,L,NZ)*RTLGL
+!primary roots
+          RRAD1(N,L,NZ)=AMAX1(RRAD1X(N,NZ),(1.0_r8+PSIRT(N,L,NZ)/EMODR)*RRAD1M(N,NZ))
+!secondary roots
+          RRAD2(N,L,NZ)=AMAX1(RRAD2X(N,NZ),(1.0_r8+PSIRT(N,L,NZ)/EMODR)*RRAD2M(N,NZ))
+          RTAR=PICON2s*(RRAD1(N,L,NZ)*RTLGX+RRAD2(N,L,NZ)*RTLGL)
           IF(RTNL(N,L,NZ).GT.ZEROP(NZ))THEN
             RTLGA(N,L,NZ)=AMAX1(RTLGAX,RTLGL/RTNL(N,L,NZ))
           ELSE
@@ -517,7 +516,7 @@ implicit none
       ZPOOLB=AZMAX1(EPOOLR(ielmn,N,L,NZ))
       PPOOLB=AZMAX1(EPOOLR(ielmp,N,L,NZ))
       FNP=AMIN1(ZPOOLB*DMRTR/CNRTS(NZ),PPOOLB*DMRTR/CPRTS(NZ))
-      IF(RCO2YM.GT.0.0)THEN
+      IF(RCO2YM.GT.0.0_r8)THEN
         RCO2GM=AMIN1(RCO2YM,FNP)
       ELSE
         RCO2GM=0._r8
@@ -546,8 +545,8 @@ implicit none
       ZADD2M=AZMAX1(GRTWGM*CNRTW)
       ZADD2=AZMAX1(AMIN1(FRTN*EPOOLR(ielmn,N,L,NZ),GRTWTG*CNRTW))
       PADD2=AZMAX1(AMIN1(FRTN*EPOOLR(ielmp,N,L,NZ),GRTWTG*CPRTW))
-      CNRDM=AZMAX1(1.70*ZADD2M)
-      CNRDA=AZMAX1(1.70*ZADD2)
+      CNRDM=AZMAX1(1.70_r8*ZADD2M)
+      CNRDA=AZMAX1(1.70_r8*ZADD2)
 !
 !     SECONDARY ROOT GROWTH RESPIRATION FROM TOTAL - MAINTENANCE
 !     IF > 0 DRIVES GROWTH, IF < 0 DRIVES REMOBILIZATION, ALSO
@@ -589,7 +588,7 @@ implicit none
 !     RCCC,RCCN,RCCP=remobilization coefficient for C,N,P
 !     FSNC2=fraction of secondary root C to be remobilized
 !
-      IF(-RCO2XM.GT.0.0)THEN
+      IF(-RCO2XM.GT.0.0_r8)THEN
         IF(-RCO2XM.LT.WTRT2E(ielmc,N,L,NR,NZ)*RCCC)THEN
           SNCRM=-RCO2XM
         ELSE
@@ -598,7 +597,7 @@ implicit none
       ELSE
         SNCRM=0._r8
       ENDIF
-      IF(-RCO2X.GT.0.0)THEN
+      IF(-RCO2X.GT.0.0_r8)THEN
         IF(-RCO2X.LT.WTRT2E(ielmc,N,L,NR,NZ)*RCCC)THEN
           SNCR=-RCO2X
         ELSE
@@ -728,7 +727,7 @@ implicit none
 !     RTN1=number of primary root axes
 !     XRTN1=multiplier for number of primary root axes
 !
-      IF(N.EQ.1)THEN
+      IF(N.EQ.ipltroot)THEN
         IF(BKDS(L).GT.ZERO)THEN
           RTDP1X=RTDP1(N,NR,NZ)-CDPTHZ(0)
         ELSE
@@ -990,13 +989,13 @@ implicit none
 !     CPOOLR,ZPOOLR,PPOOLR=non-structural C,N,P mass in mycorrhizae
 !
                   IF(GRTWTM.LT.0.0_r8)THEN
-                    IF(WTRT2E(ielmc,ifineroot,LL,NR,NZ).GT.ZEROP(NZ))THEN
-                      FSNCM=AMIN1(1.0_r8,ABS(GRTWTM)/WTRT2E(ielmc,ifineroot,LL,NR,NZ))
+                    IF(WTRT2E(ielmc,ipltroot,LL,NR,NZ).GT.ZEROP(NZ))THEN
+                      FSNCM=AMIN1(1.0_r8,ABS(GRTWTM)/WTRT2E(ielmc,ipltroot,LL,NR,NZ))
                     ELSE
                       FSNCM=1.0_r8
                     ENDIF
-                    IF(WTRTL(ifineroot,LL,NZ).GT.ZEROP(NZ))THEN
-                      FSNCP=AMIN1(1.0_r8,ABS(GRTWTM)/WTRTL(ifineroot,LL,NZ))
+                    IF(WTRTL(ipltroot,LL,NZ).GT.ZEROP(NZ))THEN
+                      FSNCP=AMIN1(1.0_r8,ABS(GRTWTM)/WTRTL(ipltroot,LL,NZ))
                     ELSE
                       FSNCP=1.0_r8
                     ENDIF
@@ -1669,25 +1668,25 @@ implicit none
 !
   IF(MY(NZ).EQ.mycorarbu)THEN
     D425: DO L=NU,NIX(NZ)
-      IF(EPOOLR(ielmc,ifineroot,L,NZ).GT.ZEROP(NZ).AND.WTRTD(ifineroot,L,NZ).GT.ZEROL(NZ))THEN
+      IF(EPOOLR(ielmc,ipltroot,L,NZ).GT.ZEROP(NZ).AND.WTRTD(ipltroot,L,NZ).GT.ZEROL(NZ))THEN
 !root
-        WTRTD1=WTRTD(ifineroot,L,NZ)
-        WTRTD2=AMIN1(WTRTD(ifineroot,L,NZ),AMAX1(FSNK &
-          *WTRTD(ifineroot,L,NZ),WTRTD(imycorrhz,L,NZ)))
+        WTRTD1=WTRTD(ipltroot,L,NZ)
+        WTRTD2=AMIN1(WTRTD(ipltroot,L,NZ),AMAX1(FSNK &
+          *WTRTD(ipltroot,L,NZ),WTRTD(imycorrhz,L,NZ)))
         WTPLTT=WTRTD1+WTRTD2
         IF(WTPLTT.GT.ZEROP(NZ))THEN
-          CPOOLD=(EPOOLR(ielmc,ifineroot,L,NZ)*WTRTD2-EPOOLR(ielmc,imycorrhz,L,NZ)*WTRTD1)/WTPLTT
+          CPOOLD=(EPOOLR(ielmc,ipltroot,L,NZ)*WTRTD2-EPOOLR(ielmc,imycorrhz,L,NZ)*WTRTD1)/WTPLTT
           XFRE(ielmc)=FMYC*CPOOLD
-          EPOOLR(ielmc,ifineroot,L,NZ)=EPOOLR(ielmc,ifineroot,L,NZ)-XFRE(ielmc)
+          EPOOLR(ielmc,ipltroot,L,NZ)=EPOOLR(ielmc,ipltroot,L,NZ)-XFRE(ielmc)
           EPOOLR(ielmc,imycorrhz,L,NZ)=EPOOLR(ielmc,imycorrhz,L,NZ)+XFRE(ielmc)
-          CPOOLT=EPOOLR(ielmc,ifineroot,L,NZ)+EPOOLR(ielmc,imycorrhz,L,NZ)
+          CPOOLT=EPOOLR(ielmc,ipltroot,L,NZ)+EPOOLR(ielmc,imycorrhz,L,NZ)
 
           IF(CPOOLT.GT.ZEROP(NZ))THEN
             DO NE=2,npelms
-              EPOOLD=(EPOOLR(NE,ifineroot,L,NZ)*EPOOLR(ielmc,imycorrhz,L,NZ) &
-                -EPOOLR(NE,imycorrhz,L,NZ)*EPOOLR(ielmc,ifineroot,L,NZ))/CPOOLT
+              EPOOLD=(EPOOLR(NE,ipltroot,L,NZ)*EPOOLR(ielmc,imycorrhz,L,NZ) &
+                -EPOOLR(NE,imycorrhz,L,NZ)*EPOOLR(ielmc,ipltroot,L,NZ))/CPOOLT
               XFRE(NE)=FMYC*EPOOLD
-              EPOOLR(NE,ifineroot,L,NZ)=EPOOLR(NE,ifineroot,L,NZ)-XFRE(NE)
+              EPOOLR(NE,ipltroot,L,NZ)=EPOOLR(NE,ipltroot,L,NZ)-XFRE(NE)
               EPOOLR(NE,imycorrhz,L,NZ)=EPOOLR(NE,imycorrhz,L,NZ)+XFRE(NE)
             ENDDO
           ENDIF
@@ -1823,23 +1822,23 @@ implicit none
       ENDIF
       D415: DO L=NU,NI(NZ)
         WTLSBX=WTLSB(NB,NZ)*FWODBE(ielmc,k_fine_litr)*FWTR(L)*FWTC
-        WTRTLX=WTRTL(ifineroot,L,NZ)*FWODRE(ielmc,k_fine_litr)*FWTB(NB)*FWTS
+        WTRTLX=WTRTL(ipltroot,L,NZ)*FWODRE(ielmc,k_fine_litr)*FWTB(NB)*FWTS
         WTLSBB=AZMAX1(WTLSBX,FSNK*WTRTLX)
         WTRTLR=AZMAX1(WTRTLX,FSNK*WTLSBX)
         WTPLTT=WTLSBB+WTRTLR
         IF(WTPLTT.GT.ZEROP(NZ))THEN
           CPOOLB=AZMAX1(EPOOL(NB,ielmc,NZ)*FWTR(L))
-          CPOOLS=AZMAX1(EPOOLR(ielmc,ifineroot,L,NZ)*FWTB(NB))
+          CPOOLS=AZMAX1(EPOOLR(ielmc,ipltroot,L,NZ)*FWTB(NB))
           CPOOLD=(CPOOLB*WTRTLR-CPOOLS*WTLSBB)/WTPLTT
           XFRE(ielmc)=PTSHTR*CPOOLD
           CPOOLT=CPOOLS+CPOOLB
           IF(CPOOLT.GT.ZEROP(NZ))THEN
             ZPOOLB=AZMAX1(EPOOL(NB,ielmn,NZ)*FWTR(L))
-            ZPOOLS=AZMAX1(EPOOLR(ielmn,ifineroot,L,NZ)*FWTB(NB))
+            ZPOOLS=AZMAX1(EPOOLR(ielmn,ipltroot,L,NZ)*FWTB(NB))
             ZPOOLD=(ZPOOLB*CPOOLS-ZPOOLS*CPOOLB)/CPOOLT
             XFRE(ielmn)=PTSHTR*ZPOOLD
             PPOOLB=AZMAX1(EPOOL(NB,ielmp,NZ)*FWTR(L))
-            PPOOLS=AZMAX1(EPOOLR(ielmp,ifineroot,L,NZ)*FWTB(NB))
+            PPOOLS=AZMAX1(EPOOLR(ielmp,ipltroot,L,NZ)*FWTB(NB))
             PPOOLD=(PPOOLB*CPOOLS-PPOOLS*CPOOLB)/CPOOLT
             XFRE(ielmp)=PTSHTR*PPOOLD
           ELSE
@@ -1848,7 +1847,7 @@ implicit none
           ENDIF
           DO NE=1,npelms
             EPOOL(NB,NE,NZ)=EPOOL(NB,NE,NZ)-XFRE(NE)
-            EPOOLR(NE,ifineroot,L,NZ)=EPOOLR(NE,ifineroot,L,NZ)+XFRE(NE)
+            EPOOLR(NE,ipltroot,L,NZ)=EPOOLR(NE,ipltroot,L,NZ)+XFRE(NE)
           ENDDO
 
         ENDIF

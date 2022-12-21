@@ -814,8 +814,8 @@ implicit none
 !
   IF(L0.NE.0)THEN
     DO  NZ=1,NP(NY,NX)
-      IF(WTRTL(ifineroot,L0,NZ,NY,NX).GT.ZEROP(NZ,NY,NX) &
-        .AND.WTRTL(ifineroot,L1,NZ,NY,NX).GT.ZEROP(NZ,NY,NX))THEN
+      IF(WTRTL(ipltroot,L0,NZ,NY,NX).GT.ZEROP(NZ,NY,NX) &
+        .AND.WTRTL(ipltroot,L1,NZ,NY,NX).GT.ZEROP(NZ,NY,NX))THEN
         DO N=1,MY(NZ,NY,NX)
           DO NTG=idg_beg,idg_end-1
             trcg_rootml(NTG,N,L1,NZ,NY,NX)=trcg_rootml(NTG,N,L1,NZ,NY,NX)+FX*trcg_rootml(NTG,N,L0,NZ,NY,NX)
@@ -992,8 +992,8 @@ implicit none
           !
   IF(L0.NE.0)THEN
     DO  NZ=1,NP(NY,NX)
-      IF(WTRTL(ifineroot,L0,NZ,NY,NX).GT.ZEROP(NZ,NY,NX) &
-        .AND.WTRTL(ifineroot,L1,NZ,NY,NX).GT.ZEROP(NZ,NY,NX))THEN
+      IF(WTRTL(ipltroot,L0,NZ,NY,NX).GT.ZEROP(NZ,NY,NX) &
+        .AND.WTRTL(ipltroot,L1,NZ,NY,NX).GT.ZEROP(NZ,NY,NX))THEN
         DO  N=1,MY(NZ,NY,NX)
           DO NTG=idg_beg,idg_end-1
             trcg_rootml(NTG,N,L0,NZ,NY,NX)=FY*trcg_rootml(NTG,N,L0,NZ,NY,NX)
@@ -1179,8 +1179,8 @@ implicit none
 !
     return
     DO NZ=1,NP(NY,NX)
-      IF(WTRTL(ifineroot,L0,NZ,NY,NX).GT.ZEROP(NZ,NY,NX) &
-        .AND.WTRTL(ifineroot,L1,NZ,NY,NX).GT.ZEROP(NZ,NY,NX))THEN
+      IF(WTRTL(ipltroot,L0,NZ,NY,NX).GT.ZEROP(NZ,NY,NX) &
+        .AND.WTRTL(ipltroot,L1,NZ,NY,NX).GT.ZEROP(NZ,NY,NX))THEN
         IF(L0.EQ.L.OR.DPTHZ(L1,NY,NX).LE.ZERO)THEN
           FRO=FO
         ELSE

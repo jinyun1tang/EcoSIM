@@ -175,9 +175,9 @@ module HfuncsMod
 ! begin_execution
   associate(                        &
     IYR0    =>  plt_distb%IYR0    , &
-    IYRH    =>  plt_distb%IYRH    , &
-    IDAY0   =>  plt_distb%IDAY0   , &
-    IDAYH   =>  plt_distb%IDAYH   , &
+    IYRH    =>  plt_distb%IYRH    , &  !year of harvest
+    IDAY0   =>  plt_distb%IDAY0   , &  !day of planting
+    IDAYH   =>  plt_distb%IDAYH   , &  !day of harvest
     DATAP   =>  plt_site%DATAP    , &
     IDATA   =>  plt_site%IDATA    , &
     IYRC    =>  plt_site%IYRC     , &

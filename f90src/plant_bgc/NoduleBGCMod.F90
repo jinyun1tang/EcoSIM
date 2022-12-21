@@ -258,20 +258,17 @@ module NoduleBGCMod
       RXNSNE(ielmc)=RSNDL/RCCC
       RXNSNE(ielmn)=RXNSNE(ielmc)*WTNDBE(NB,ielmn,NZ)/WTNDBE(NB,ielmc,NZ)
       RXNSNE(ielmp)=RXNSNE(ielmc)*WTNDBE(NB,ielmp,NZ)/WTNDBE(NB,ielmc,NZ)
+
       RDNSNE(ielmc)=RXNSNE(ielmc)*(1.0_r8-RCCC)
       RDNSNE(ielmn)=RXNSNE(ielmn)*(1.0_r8-RCCC)*(1.0_r8-RCCN)
       RDNSNE(ielmp)=RXNSNE(ielmp)*(1.0_r8-RCCC)*(1.0_r8-RCCP)
-      RCNSNE(ielmc)=RXNSNE(ielmc)-RDNSNE(ielmc)
-      RCNSNE(ielmn)=RXNSNE(ielmn)-RDNSNE(ielmn)
-      RCNSNE(ielmp)=RXNSNE(ielmp)-RDNSNE(ielmp)
+      DO NE=1,npelms
+        RCNSNE(NE)=RXNSNE(NE)-RDNSNE(NE)
+      ENDDO
     ELSE
-      RXNSNE(ielmc)=0._r8
-      RXNSNE(ielmn)=0._r8
-      RXNSNE(ielmp)=0._r8
+      RXNSNE(1:npelms)=0._r8
       RDNSNE(1:npelms)=0._r8
-      RCNSNE(ielmc)=0._r8
-      RCNSNE(ielmn)=0._r8
-      RCNSNE(ielmp)=0._r8
+      RCNSNE(1:npelms)=0._r8
     ENDIF
 !
 !     TOTAL NODULE RESPIRATION
@@ -454,8 +451,8 @@ module NoduleBGCMod
 !     CNND,CPND=bacterial N:C,P:C ratio from PFT file
 !
   IF(INTYP(NZ).GE.1.AND.INTYP(NZ).LE.3)THEN
-    DO 5400 L=NU,NIX(NZ)
-      IF(WTRTD(ifineroot,L,NZ).GT.ZEROL(NZ))THEN
+    D5400: DO L=NU,NIX(NZ)
+      IF(WTRTD(ipltroot,L,NZ).GT.ZEROL(NZ))THEN
 !
 !     INITIAL INFECTION
 !
@@ -666,9 +663,9 @@ module NoduleBGCMod
 !
         RCO2TM=AMIN1(RMNDL,RCNDLM)+RGNDLM+RCNSNE(ielmc)
         RCO2T=AMIN1(RMNDL,RCNDL)+RGNDG+RCNSNE(ielmc)
-        RCO2M(1,L,NZ)=RCO2M(1,L,NZ)+RCO2TM
-        RCO2N(1,L,NZ)=RCO2N(1,L,NZ)+RCO2T
-        RCO2A(1,L,NZ)=RCO2A(1,L,NZ)-RCO2T
+        RCO2M(ipltroot,L,NZ)=RCO2M(ipltroot,L,NZ)+RCO2TM
+        RCO2N(ipltroot,L,NZ)=RCO2N(ipltroot,L,NZ)+RCO2T
+        RCO2A(ipltroot,L,NZ)=RCO2A(ipltroot,L,NZ)-RCO2T
 !
 !     NODULE LITTERFALL CAUSED BY REMOBILIZATION
 !
@@ -725,35 +722,36 @@ module NoduleBGCMod
 !     XFRC,XFRN,XFRC=nonstructural C,N,P transfer
 !     CPOOLN,ZPOOLN,PPOOLN=nonstructural C,N,P in bacteria
 !
-        IF(EPOOLR(ielmc,ifineroot,L,NZ).GT.ZEROP(NZ).AND.WTRTD(ifineroot,L,NZ).GT.ZEROL(NZ))THEN
-          CCNDLR=WTNDLE(L,ielmc,NZ)/WTRTD(ifineroot,L,NZ)
-          WTRTD1=WTRTD(ifineroot,L,NZ)
-          WTNDL1=AMIN1(WTRTD(ifineroot,L,NZ),AMAX1(WTNDI*AREA3(NU),WTNDLE(L,ielmc,NZ)))
+        IF(EPOOLR(ielmc,ipltroot,L,NZ).GT.ZEROP(NZ) &
+          .AND.WTRTD(ipltroot,L,NZ).GT.ZEROL(NZ))THEN
+          CCNDLR=WTNDLE(L,ielmc,NZ)/WTRTD(ipltroot,L,NZ)
+          WTRTD1=WTRTD(ipltroot,L,NZ)
+          WTNDL1=AMIN1(WTRTD(ipltroot,L,NZ),AMAX1(WTNDI*AREA3(NU),WTNDLE(L,ielmc,NZ)))
           WTRTDT=WTRTD1+WTNDL1
           IF(WTRTDT.GT.ZEROP(NZ))THEN
             FXRNX=FXRN(INTYP(NZ))/(1.0_r8+CCNDLR/CCNGR)
 !    2/(1.0+CCNDLR/(CCNGR*FXRN(INTYP(NZ))))
-            CPOOLD=(EPOOLR(ielmc,ifineroot,L,NZ)*WTNDL1-EPOOLN(L,ielmc,NZ)*WTRTD1)/WTRTDT
+            CPOOLD=(EPOOLR(ielmc,ipltroot,L,NZ)*WTNDL1-EPOOLN(L,ielmc,NZ)*WTRTD1)/WTRTDT
             XFRC=FXRNX*CPOOLD
-            EPOOLR(ielmc,ifineroot,L,NZ)=EPOOLR(ielmc,ifineroot,L,NZ)-XFRC
+            EPOOLR(ielmc,ipltroot,L,NZ)=EPOOLR(ielmc,ipltroot,L,NZ)-XFRC
             EPOOLN(L,ielmc,NZ)=EPOOLN(L,ielmc,NZ)+XFRC
-            CPOOLT=EPOOLR(ielmc,ifineroot,L,NZ)+EPOOLN(L,ielmc,NZ)
+            CPOOLT=EPOOLR(ielmc,ipltroot,L,NZ)+EPOOLN(L,ielmc,NZ)
             IF(CPOOLT.GT.ZEROP(NZ))THEN
-              ZPOOLD=(EPOOLR(ielmn,1,L,NZ)*EPOOLN(L,ielmc,NZ) &
-                -EPOOLN(L,ielmn,NZ)*EPOOLR(ielmc,ifineroot,L,NZ))/CPOOLT
+              ZPOOLD=(EPOOLR(ielmn,ipltroot,L,NZ)*EPOOLN(L,ielmc,NZ) &
+                -EPOOLN(L,ielmn,NZ)*EPOOLR(ielmc,ipltroot,L,NZ))/CPOOLT
               XFRN=FXRNX*ZPOOLD
-              PPOOLD=(EPOOLR(ielmp,1,L,NZ)*EPOOLN(L,ielmc,NZ) &
-                -EPOOLN(L,ielmp,NZ)*EPOOLR(ielmc,ifineroot,L,NZ))/CPOOLT
+              PPOOLD=(EPOOLR(ielmp,ipltroot,L,NZ)*EPOOLN(L,ielmc,NZ) &
+                -EPOOLN(L,ielmp,NZ)*EPOOLR(ielmc,ipltroot,L,NZ))/CPOOLT
               XFRP=FXRNX*PPOOLD
-              EPOOLR(ielmn,1,L,NZ)=EPOOLR(ielmn,1,L,NZ)-XFRN
-              EPOOLR(ielmp,1,L,NZ)=EPOOLR(ielmp,1,L,NZ)-XFRP
+              EPOOLR(ielmn,ipltroot,L,NZ)=EPOOLR(ielmn,ipltroot,L,NZ)-XFRN
+              EPOOLR(ielmp,ipltroot,L,NZ)=EPOOLR(ielmp,ipltroot,L,NZ)-XFRP
               EPOOLN(L,ielmn,NZ)=EPOOLN(L,ielmn,NZ)+XFRN
               EPOOLN(L,ielmp,NZ)=EPOOLN(L,ielmp,NZ)+XFRP
             ENDIF
           ENDIF
         ENDIF
       ENDIF
-5400  CONTINUE
+    ENDDO D5400
   ENDIF
   end associate
   end subroutine RootNoduleBiomchemistry

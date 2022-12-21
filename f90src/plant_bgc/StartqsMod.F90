@@ -1059,13 +1059,13 @@ module StartqsMod
   VOLWC(NZ)=0._r8
   EPOOL(1,ielmn,NZ)=CNGR(NZ)*EPOOL(1,ielmc,NZ)
   EPOOL(1,ielmp,NZ)=CPGR(NZ)*EPOOL(1,ielmc,NZ)
-  WTRT1E(ielmn,ifineroot,NG(NZ),1,NZ)=CNGR(NZ)*WTRT1E(ielmc,ifineroot,NG(NZ),1,NZ)
-  WTRT1E(ielmp,ifineroot,NG(NZ),1,NZ)=CPGR(NZ)*WTRT1E(ielmc,ifineroot,NG(NZ),1,NZ)
+  WTRT1E(ielmn,ipltroot,NG(NZ),1,NZ)=CNGR(NZ)*WTRT1E(ielmc,ipltroot,NG(NZ),1,NZ)
+  WTRT1E(ielmp,ipltroot,NG(NZ),1,NZ)=CPGR(NZ)*WTRT1E(ielmc,ipltroot,NG(NZ),1,NZ)
   RTWT1E(1,1,ielmn,NZ)=CNGR(NZ)*RTWT1E(1,1,ielmc,NZ)
   RTWT1E(1,1,ielmp,NZ)=CPGR(NZ)*RTWT1E(1,1,ielmc,NZ)
-  WTRTL(ifineroot,NG(NZ),NZ)=WTRT1E(ielmc,ifineroot,NG(NZ),1,NZ)
-  WTRTD(ifineroot,NG(NZ),NZ)=WTRT1E(ielmc,ifineroot,NG(NZ),1,NZ)
-  WSRTL(1,NG(NZ),NZ)=WTRTL(ifineroot,NG(NZ),NZ)*CWSRT(NZ)
+  WTRTL(ipltroot,NG(NZ),NZ)=WTRT1E(ielmc,ipltroot,NG(NZ),1,NZ)
+  WTRTD(ipltroot,NG(NZ),NZ)=WTRT1E(ielmc,ipltroot,NG(NZ),1,NZ)
+  WSRTL(1,NG(NZ),NZ)=WTRTL(ipltroot,NG(NZ),NZ)*CWSRT(NZ)
   EPOOLR(ielmn,1,NG(NZ),NZ)=CNGR(NZ)*EPOOLR(ielmc,1,NG(NZ),NZ)
   EPOOLR(ielmp,1,NG(NZ),NZ)=CPGR(NZ)*EPOOLR(ielmc,1,NG(NZ),NZ)
 

@@ -2884,8 +2884,8 @@ module PlantBranchMod
     WTRTM=0._r8
     EPOOLM(ielmc)=0._r8
     D4: DO L=NU,NI(NZ)
-      WTRTM=WTRTM+AZMAX1(WTRTD(ifineroot,L,NZ))
-      EPOOLM(ielmc)=EPOOLM(ielmc)+AZMAX1(EPOOLR(ielmc,ifineroot,L,NZ))
+      WTRTM=WTRTM+AZMAX1(WTRTD(ipltroot,L,NZ))
+      EPOOLM(ielmc)=EPOOLM(ielmc)+AZMAX1(EPOOLR(ielmc,ipltroot,L,NZ))
     ENDDO D4
 !
   ! RESET TIME COUNTER
@@ -2944,11 +2944,11 @@ module PlantBranchMod
           EPOOL(NB,ielmc,NZ)=EPOOL(NB,ielmc,NZ)+CH2OH*FXSH(ISTYP(NZ))
           IF(WTRTM.GT.ZEROP(NZ).AND.EPOOLM(ielmc).GT.ZEROP(NZ))THEN
             D50: DO L=NU,NI(NZ)
-              FXFC=AZMAX1(WTRTD(ifineroot,L,NZ))/WTRTM
-              EPOOLR(ielmc,ifineroot,L,NZ)=EPOOLR(ielmc,ifineroot,L,NZ)+FXFC*CH2OH*FXRT(ISTYP(NZ))
+              FXFC=AZMAX1(WTRTD(ipltroot,L,NZ))/WTRTM
+              EPOOLR(ielmc,ipltroot,L,NZ)=EPOOLR(ielmc,ipltroot,L,NZ)+FXFC*CH2OH*FXRT(ISTYP(NZ))
             ENDDO D50
           ELSE
-            EPOOLR(ielmc,ifineroot,NG(NZ),NZ)=EPOOLR(ielmc,ifineroot,NG(NZ),NZ)+CH2OH*FXRT(ISTYP(NZ))
+            EPOOLR(ielmc,ipltroot,NG(NZ),NZ)=EPOOLR(ielmc,ipltroot,NG(NZ),NZ)+CH2OH*FXRT(ISTYP(NZ))
           ENDIF
         ELSE
           CH2OH=0._r8
@@ -3031,15 +3031,15 @@ module PlantBranchMod
       EPOOL(NB,ielmp,NZ)=EPOOL(NB,ielmp,NZ)+UPPO4B
       IF(WTRTM.GT.ZEROP(NZ).AND.EPOOLM(ielmc).GT.ZEROP(NZ))THEN
         D51: DO L=NU,NI(NZ)
-          FXFN=AZMAX1(EPOOLR(ielmc,ifineroot,L,NZ))/EPOOLM(ielmc)
+          FXFN=AZMAX1(EPOOLR(ielmc,ipltroot,L,NZ))/EPOOLM(ielmc)
 
-          EPOOLR(ielmn,ifineroot,L,NZ)=EPOOLR(ielmn,ifineroot,L,NZ)+FXFN*UPNH4R
-          EPOOLR(ielmp,ifineroot,L,NZ)=EPOOLR(ielmp,ifineroot,L,NZ)+FXFN*UPPO4R
+          EPOOLR(ielmn,ipltroot,L,NZ)=EPOOLR(ielmn,ipltroot,L,NZ)+FXFN*UPNH4R
+          EPOOLR(ielmp,ipltroot,L,NZ)=EPOOLR(ielmp,ipltroot,L,NZ)+FXFN*UPPO4R
         ENDDO D51
       ELSE
 
-        EPOOLR(ielmn,ifineroot,NG(NZ),NZ)=EPOOLR(ielmn,ifineroot,NG(NZ),NZ)+UPNH4R
-        EPOOLR(ielmp,ifineroot,NG(NZ),NZ)=EPOOLR(ielmp,ifineroot,NG(NZ),NZ)+UPPO4R
+        EPOOLR(ielmn,ipltroot,NG(NZ),NZ)=EPOOLR(ielmn,ipltroot,NG(NZ),NZ)+UPNH4R
+        EPOOLR(ielmp,ipltroot,NG(NZ),NZ)=EPOOLR(ielmp,ipltroot,NG(NZ),NZ)+UPPO4R
       ENDIF
     ENDIF
   !
@@ -3168,17 +3168,17 @@ module PlantBranchMod
     IF(ISTYP(NZ).EQ.iplt_annual.AND.IDAY(8,NB,NZ).NE.0)THEN
       D2050: DO L=NU,NI(NZ)
         IF(VOLX(L).GT.ZEROS2)THEN
-          WTRTRX=AMAX1(ZEROP(NZ),WTRTL(ifineroot,L,NZ)*FWODRE(ielmc,1))
+          WTRTRX=AMAX1(ZEROP(NZ),WTRTL(ipltroot,L,NZ)*FWODRE(ielmc,1))
           WTPLTX=WTRTRX+WVSTKB(NB,NZ)
           IF(WTPLTX.GT.ZEROP(NZ))THEN
-            CPOOLD=(EPOOLR(ielmc,ifineroot,L,NZ)*WVSTKB(NB,NZ)-WTRSVBE(NB,ielmc,NZ)*WTRTRX)/WTPLTX
+            CPOOLD=(EPOOLR(ielmc,ipltroot,L,NZ)*WVSTKB(NB,NZ)-WTRSVBE(NB,ielmc,NZ)*WTRTRX)/WTPLTX
             XFRE(ielmc)=AZMAX1(FXFY(ISTYP(NZ))*CPOOLD)
-            EPOOLR(ielmc,ifineroot,L,NZ)=EPOOLR(ielmc,ifineroot,L,NZ)-XFRE(ielmc)
+            EPOOLR(ielmc,ipltroot,L,NZ)=EPOOLR(ielmc,ipltroot,L,NZ)-XFRE(ielmc)
             WTRSVBE(NB,ielmc,NZ)=WTRSVBE(NB,ielmc,NZ)+XFRE(ielmc)
-            CPOOLT=EPOOLR(ielmc,ifineroot,L,NZ)+WTRSVBE(NB,ielmc,NZ)
+            CPOOLT=EPOOLR(ielmc,ipltroot,L,NZ)+WTRSVBE(NB,ielmc,NZ)
             IF(CPOOLT.GT.ZEROP(NZ))THEN
-              ZPOOLD=(EPOOLR(ielmn,ifineroot,L,NZ)*WTRSVBE(NB,ielmc,NZ)-WTRSVBE(NB,ielmn,NZ)*EPOOLR(ielmc,ifineroot,L,NZ))/CPOOLT
-              PPOOLD=(EPOOLR(ielmp,ifineroot,L,NZ)*WTRSVBE(NB,ielmc,NZ)-WTRSVBE(NB,ielmp,NZ)*EPOOLR(ielmc,ifineroot,L,NZ))/CPOOLT
+              ZPOOLD=(EPOOLR(ielmn,ipltroot,L,NZ)*WTRSVBE(NB,ielmc,NZ)-WTRSVBE(NB,ielmn,NZ)*EPOOLR(ielmc,ipltroot,L,NZ))/CPOOLT
+              PPOOLD=(EPOOLR(ielmp,ipltroot,L,NZ)*WTRSVBE(NB,ielmc,NZ)-WTRSVBE(NB,ielmp,NZ)*EPOOLR(ielmc,ipltroot,L,NZ))/CPOOLT
               XFRE(ielmn)=AZMAX1(FXFZ(ISTYP(NZ))*ZPOOLD)
               XFRE(ielmp)=AZMAX1(FXFZ(ISTYP(NZ))*PPOOLD)
               DO NE=2,npelms

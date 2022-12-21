@@ -39,7 +39,7 @@ implicit none
   integer, parameter :: mycornone=1
   integer, parameter :: mycorarbu=2   !arbuscular
 
-  integer, parameter :: ifineroot=1
+  integer, parameter :: ipltroot=1
   integer, parameter :: imycorrhz=2
 
   integer, parameter :: iliving_branch=0
