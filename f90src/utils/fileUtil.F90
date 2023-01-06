@@ -44,19 +44,20 @@ module fileUtil
 
 !------------------------------------------------------------------------------------------
 
-  subroutine check_read(ios,nelm,lineno,modfile)
+  subroutine check_read(ios,nelm,ifile,lineno,modfile)
   implicit none
   integer, intent(in) :: ios
   integer, intent(in) :: nelm
+  character(len=*),intent(in) :: ifile
   integer, intent(in) :: lineno
   character(len=*), intent(in) :: modfile
 
   if(ios>0)then
     write(*,*)'input error'
-    call endrun('read error in '//trim(modfile),lineno)
+    call endrun('read error when reading '//trim(ifile)//' in'//trim(modfile),lineno)
   elseif(ios<0)then
     write(*,*)'number of inputs is less than ',nelm
-    call endrun('read error in '//trim(modfile),lineno)
+    call endrun('read error when reading '//trim(ifile)//' in'//trim(modfile),lineno)
   endif
   end subroutine check_read
 

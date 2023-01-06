@@ -115,7 +115,7 @@ module readiMod
 
   read(1,'(A)')tline
   READ(tline,*,iostat=ierr)(datav(jj),jj=1,4)
-  call check_read(ierr,4,__LINE__,mod_filename)
+  call check_read(ierr,4,DATA1(1),__LINE__,mod_filename)
 
   ALATG=datav(1)
   ALTIG=datav(2)
@@ -124,11 +124,11 @@ module readiMod
 
   read(1,'(A)')tline
   READ(tline,*,iostat=ierr)OXYEG,Z2GEG,CO2EIG,CH4EG,Z2OEG,ZNH3EG
-  call check_read(ierr,6,__LINE__,mod_filename)
+  call check_read(ierr,6,DATA1(1),__LINE__,mod_filename)
 
   read(1,'(A)')tline
   READ(tline,*,iostat=ierr)IETYPG,ISALTG,IERSNG,NCNG,DTBLIG,DTBLDIG,DTBLGG
-  call check_read(ierr,7,__LINE__,mod_filename)
+  call check_read(ierr,7,DATA1(1),__LINE__,mod_filename)
 
 
   if(column_mode)then
@@ -140,15 +140,15 @@ module readiMod
   read(1,'(A)')tline
   READ(tline,*,iostat=ierr)RCHQNG,RCHQEG,RCHQSG,RCHQWG,RCHGNUG,RCHGEUG,RCHGSUG &
       ,RCHGWUG,RCHGNTG,RCHGETG,RCHGSTG,RCHGWTG,RCHGDG
-  call check_read(ierr,13,__LINE__,mod_filename)
+  call check_read(ierr,13,DATA1(1),__LINE__,mod_filename)
 
   read(1,'(A)')tline
   READ(tline,*,iostat=ierr)(DHI(NX),NX=1,NHE)
-  call check_read(ierr,NHE,__LINE__,mod_filename)
+  call check_read(ierr,NHE,DATA1(1),__LINE__,mod_filename)
 
   read(1,'(A)')tline
   READ(tline,*,iostat=ierr)(DVI(NY),NY=1,NVS)
-  call check_read(ierr,NVS,__LINE__,mod_filename)
+  call check_read(ierr,NVS,DATA1(1),__LINE__,mod_filename)
 
   CLOSE(1)
 
@@ -304,7 +304,7 @@ module readiMod
 !
       read(9,'(A)')tline
       READ(tline,*,iostat=ierr)(datav(jj),jj=1,20)
-      call check_read(ierr,20,__LINE__,mod_filename)
+      call check_read(ierr,20,DATA1(7),__LINE__,mod_filename)
       PSIFC(NY,NX)=datav(1)
       PSIWP(NY,NX)=datav(2)
       ALBS(NY,NX) =datav(3)
@@ -367,10 +367,10 @@ module readiMod
 !
       read(9,'(A)')tline
       READ(tline,*,iostat=ierr)(CDPTH(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
-      call check_read(ierr,1-NU(NY,NX)+NM(NY,NX),__LINE__,mod_filename)
+      call check_read(ierr,1-NU(NY,NX)+NM(NY,NX),DATA1(7),__LINE__,mod_filename)
       read(9,'(A)')tline
       READ(tline,*,iostat=ierr)(BKDSI(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
-      call check_read(ierr,1-NU(NY,NX)+NM(NY,NX),__LINE__,mod_filename)
+      call check_read(ierr,1-NU(NY,NX)+NM(NY,NX),DATA1(7),__LINE__,mod_filename)
 
       if(lverb)then
         write(*,*)'Depth to bottom of soil layer (m): CDPTH'
@@ -386,16 +386,16 @@ module readiMod
 !
       read(9,'(A)')tline
       READ(tline,*,iostat=ierr)(FC(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
-      call check_read(ierr,1-NU(NY,NX)+NM(NY,NX),__LINE__,mod_filename)
+      call check_read(ierr,1-NU(NY,NX)+NM(NY,NX),DATA1(7),__LINE__,mod_filename)
       read(9,'(A)')tline
       READ(tline,*,iostat=ierr)(WP(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
-      call check_read(ierr,1-NU(NY,NX)+NM(NY,NX),__LINE__,mod_filename)
+      call check_read(ierr,1-NU(NY,NX)+NM(NY,NX),DATA1(7),__LINE__,mod_filename)
       read(9,'(A)')tline
       READ(tline,*,iostat=ierr)(SCNV(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
-      call check_read(ierr,1-NU(NY,NX)+NM(NY,NX),__LINE__,mod_filename)
+      call check_read(ierr,1-NU(NY,NX)+NM(NY,NX),DATA1(7),__LINE__,mod_filename)
       read(9,'(A)')tline
       READ(tline,*,iostat=ierr)(SCNH(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
-      call check_read(ierr,1-NU(NY,NX)+NM(NY,NX),__LINE__,mod_filename)
+      call check_read(ierr,1-NU(NY,NX)+NM(NY,NX),DATA1(7),__LINE__,mod_filename)
 
       if(lverb)then
         write(*,*)''
@@ -417,19 +417,19 @@ module readiMod
 !
       read(9,'(A)')tline
       READ(tline,*,iostat=ierr)(CSAND(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
-      call check_read(ierr,1-NU(NY,NX)+NM(NY,NX),__LINE__,mod_filename)
+      call check_read(ierr,1-NU(NY,NX)+NM(NY,NX),DATA1(7),__LINE__,mod_filename)
 
       read(9,'(A)')tline
       READ(tline,*,iostat=ierr)(CSILT(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
-      call check_read(ierr,1-NU(NY,NX)+NM(NY,NX),__LINE__,mod_filename)
+      call check_read(ierr,1-NU(NY,NX)+NM(NY,NX),DATA1(7),__LINE__,mod_filename)
 
       read(9,'(A)')tline
       READ(tline,*,iostat=ierr)(FHOL(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
-      call check_read(ierr,1-NU(NY,NX)+NM(NY,NX),__LINE__,mod_filename)
+      call check_read(ierr,1-NU(NY,NX)+NM(NY,NX),DATA1(7),__LINE__,mod_filename)
 
       read(9,'(A)')tline
       READ(tline,*,iostat=ierr)(ROCK(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
-      call check_read(ierr,1-NU(NY,NX)+NM(NY,NX),__LINE__,mod_filename)
+      call check_read(ierr,1-NU(NY,NX)+NM(NY,NX),DATA1(7),__LINE__,mod_filename)
 
       if(lverb)then
         write(*,*)''
@@ -451,15 +451,15 @@ module readiMod
 !
       read(9,'(A)')tline
       READ(tline,*,iostat=ierr)(PH(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
-      call check_read(ierr,1-NU(NY,NX)+NM(NY,NX),__LINE__,mod_filename)
+      call check_read(ierr,1-NU(NY,NX)+NM(NY,NX),DATA1(7),__LINE__,mod_filename)
 
       read(9,'(A)')tline
       READ(tline,*,iostat=ierr)(CEC(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
-      call check_read(ierr,1-NU(NY,NX)+NM(NY,NX),__LINE__,mod_filename)
+      call check_read(ierr,1-NU(NY,NX)+NM(NY,NX),DATA1(7),__LINE__,mod_filename)
 
       read(9,'(A)')tline
       READ(tline,*,iostat=ierr)(AEC(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
-      call check_read(ierr,1-NU(NY,NX)+NM(NY,NX),__LINE__,mod_filename)
+      call check_read(ierr,1-NU(NY,NX)+NM(NY,NX),DATA1(7),__LINE__,mod_filename)
 
       if(lverb)then
         write(*,*)''
@@ -479,19 +479,19 @@ module readiMod
 !
       read(9,'(A)')tline
       READ(tline,*,iostat=ierr)(CORGC(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
-      call check_read(ierr,1-NU(NY,NX)+NM(NY,NX),__LINE__,mod_filename)
+      call check_read(ierr,1-NU(NY,NX)+NM(NY,NX),DATA1(7),__LINE__,mod_filename)
 
       read(9,'(A)')tline
       READ(tline,*,iostat=ierr)(CORGR(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
-      call check_read(ierr,1-NU(NY,NX)+NM(NY,NX),__LINE__,mod_filename)
+      call check_read(ierr,1-NU(NY,NX)+NM(NY,NX),DATA1(7),__LINE__,mod_filename)
 
       read(9,'(A)')tline
       READ(tline,*,iostat=ierr)(CORGN(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
-      call check_read(ierr,1-NU(NY,NX)+NM(NY,NX),__LINE__,mod_filename)
+      call check_read(ierr,1-NU(NY,NX)+NM(NY,NX),DATA1(7),__LINE__,mod_filename)
 
       read(9,'(A)')tline
       READ(tline,*,iostat=ierr)(CORGP(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
-      call check_read(ierr,1-NU(NY,NX)+NM(NY,NX),__LINE__,mod_filename)
+      call check_read(ierr,1-NU(NY,NX)+NM(NY,NX),DATA1(7),__LINE__,mod_filename)
 
       if(lverb)then
         write(*,*)''
@@ -512,15 +512,15 @@ module readiMod
 !
       read(9,'(A)')tline
       READ(tline,*,iostat=ierr)(CNH4(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
-      call check_read(ierr,1-NU(NY,NX)+NM(NY,NX),__LINE__,mod_filename)
+      call check_read(ierr,1-NU(NY,NX)+NM(NY,NX),DATA1(7),__LINE__,mod_filename)
 
       read(9,'(A)')tline
       READ(tline,*,iostat=ierr)(CNO3(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
-      call check_read(ierr,1-NU(NY,NX)+NM(NY,NX),__LINE__,mod_filename)
+      call check_read(ierr,1-NU(NY,NX)+NM(NY,NX),DATA1(7),__LINE__,mod_filename)
 
       read(9,'(A)')tline
       READ(tline,*,iostat=ierr)(CPO4(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
-      call check_read(ierr,1-NU(NY,NX)+NM(NY,NX),__LINE__,mod_filename)
+      call check_read(ierr,1-NU(NY,NX)+NM(NY,NX),DATA1(7),__LINE__,mod_filename)
 
       if(lverb)then
         write(*,*)''
@@ -540,35 +540,35 @@ module readiMod
 !
       read(9,'(A)')tline
       READ(tline,*,iostat=ierr)(CAL(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
-      call check_read(ierr,1-NU(NY,NX)+NM(NY,NX),__LINE__,mod_filename)
+      call check_read(ierr,1-NU(NY,NX)+NM(NY,NX),DATA1(7),__LINE__,mod_filename)
 
       read(9,'(A)')tline
       READ(tline,*,iostat=ierr)(CFE(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
-      call check_read(ierr,1-NU(NY,NX)+NM(NY,NX),__LINE__,mod_filename)
+      call check_read(ierr,1-NU(NY,NX)+NM(NY,NX),DATA1(7),__LINE__,mod_filename)
 
       read(9,'(A)')tline
       READ(tline,*,iostat=ierr)(CCA(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
-      call check_read(ierr,1-NU(NY,NX)+NM(NY,NX),__LINE__,mod_filename)
+      call check_read(ierr,1-NU(NY,NX)+NM(NY,NX),DATA1(7),__LINE__,mod_filename)
 
       read(9,'(A)')tline
       READ(tline,*,iostat=ierr)(CMG(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
-      call check_read(ierr,1-NU(NY,NX)+NM(NY,NX),__LINE__,mod_filename)
+      call check_read(ierr,1-NU(NY,NX)+NM(NY,NX),DATA1(7),__LINE__,mod_filename)
 
       read(9,'(A)')tline
       READ(tline,*,iostat=ierr)(CNA(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
-      call check_read(ierr,1-NU(NY,NX)+NM(NY,NX),__LINE__,mod_filename)
+      call check_read(ierr,1-NU(NY,NX)+NM(NY,NX),DATA1(7),__LINE__,mod_filename)
 
       read(9,'(A)')tline
       READ(tline,*,iostat=ierr)(CKA(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
-      call check_read(ierr,1-NU(NY,NX)+NM(NY,NX),__LINE__,mod_filename)
+      call check_read(ierr,1-NU(NY,NX)+NM(NY,NX),DATA1(7),__LINE__,mod_filename)
 
       read(9,'(A)')tline
       READ(tline,*,iostat=ierr)(CSO4(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
-      call check_read(ierr,1-NU(NY,NX)+NM(NY,NX),__LINE__,mod_filename)
+      call check_read(ierr,1-NU(NY,NX)+NM(NY,NX),DATA1(7),__LINE__,mod_filename)
 
       read(9,'(A)')tline
       READ(tline,*,iostat=ierr)(CCL(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
-      call check_read(ierr,1-NU(NY,NX)+NM(NY,NX),__LINE__,mod_filename)
+      call check_read(ierr,1-NU(NY,NX)+NM(NY,NX),DATA1(7),__LINE__,mod_filename)
 
       if(lverb)then
         write(*,*)''
@@ -596,35 +596,35 @@ module readiMod
 !
       read(9,'(A)')tline
       READ(tline,*,iostat=ierr)(CALPO(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
-      call check_read(ierr,1-NU(NY,NX)+NM(NY,NX),__LINE__,mod_filename)
+      call check_read(ierr,1-NU(NY,NX)+NM(NY,NX),DATA1(7),__LINE__,mod_filename)
 
       read(9,'(A)')tline
       READ(tline,*,iostat=ierr)(CFEPO(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
-      call check_read(ierr,1-NU(NY,NX)+NM(NY,NX),__LINE__,mod_filename)
+      call check_read(ierr,1-NU(NY,NX)+NM(NY,NX),DATA1(7),__LINE__,mod_filename)
 
       read(9,'(A)')tline
       READ(tline,*,iostat=ierr)(CCAPD(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
-      call check_read(ierr,1-NU(NY,NX)+NM(NY,NX),__LINE__,mod_filename)
+      call check_read(ierr,1-NU(NY,NX)+NM(NY,NX),DATA1(7),__LINE__,mod_filename)
 
       read(9,'(A)')tline
       READ(tline,*,iostat=ierr)(CCAPH(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
-      call check_read(ierr,1-NU(NY,NX)+NM(NY,NX),__LINE__,mod_filename)
+      call check_read(ierr,1-NU(NY,NX)+NM(NY,NX),DATA1(7),__LINE__,mod_filename)
 
       read(9,'(A)')tline
       READ(tline,*,iostat=ierr)(CALOH(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
-      call check_read(ierr,1-NU(NY,NX)+NM(NY,NX),__LINE__,mod_filename)
+      call check_read(ierr,1-NU(NY,NX)+NM(NY,NX),DATA1(7),__LINE__,mod_filename)
 
       read(9,'(A)')tline
       READ(tline,*,iostat=ierr)(CFEOH(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
-      call check_read(ierr,1-NU(NY,NX)+NM(NY,NX),__LINE__,mod_filename)
+      call check_read(ierr,1-NU(NY,NX)+NM(NY,NX),DATA1(7),__LINE__,mod_filename)
 
       read(9,'(A)')tline
       READ(tline,*,iostat=ierr)(CCACO(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
-      call check_read(ierr,1-NU(NY,NX)+NM(NY,NX),__LINE__,mod_filename)
+      call check_read(ierr,1-NU(NY,NX)+NM(NY,NX),DATA1(7),__LINE__,mod_filename)
 
       read(9,'(A)')tline
       READ(tline,*,iostat=ierr)(CCASO(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
-      call check_read(ierr,1-NU(NY,NX)+NM(NY,NX),__LINE__,mod_filename)
+      call check_read(ierr,1-NU(NY,NX)+NM(NY,NX),DATA1(7),__LINE__,mod_filename)
 
       if(lverb)then
         write(*,*)''
@@ -654,27 +654,27 @@ module readiMod
 !
       read(9,'(A)')tline
       READ(tline,*,iostat=ierr)(GKC4(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
-      call check_read(ierr,1-NU(NY,NX)+NM(NY,NX),__LINE__,mod_filename)
+      call check_read(ierr,1-NU(NY,NX)+NM(NY,NX),DATA1(7),__LINE__,mod_filename)
 
       read(9,'(A)')tline
       READ(tline,*,iostat=ierr)(GKCH(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
-      call check_read(ierr,1-NU(NY,NX)+NM(NY,NX),__LINE__,mod_filename)
+      call check_read(ierr,1-NU(NY,NX)+NM(NY,NX),DATA1(7),__LINE__,mod_filename)
 
       read(9,'(A)')tline
       READ(tline,*,iostat=ierr)(GKCA(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
-      call check_read(ierr,1-NU(NY,NX)+NM(NY,NX),__LINE__,mod_filename)
+      call check_read(ierr,1-NU(NY,NX)+NM(NY,NX),DATA1(7),__LINE__,mod_filename)
 
       read(9,'(A)')tline
       READ(tline,*,iostat=ierr)(GKCM(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
-      call check_read(ierr,1-NU(NY,NX)+NM(NY,NX),__LINE__,mod_filename)
+      call check_read(ierr,1-NU(NY,NX)+NM(NY,NX),DATA1(7),__LINE__,mod_filename)
 
       read(9,'(A)')tline
       READ(tline,*,iostat=ierr)(GKCN(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
-      call check_read(ierr,1-NU(NY,NX)+NM(NY,NX),__LINE__,mod_filename)
+      call check_read(ierr,1-NU(NY,NX)+NM(NY,NX),DATA1(7),__LINE__,mod_filename)
 
       read(9,'(A)')tline
       READ(tline,*,iostat=ierr)(GKCK(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
-      call check_read(ierr,1-NU(NY,NX)+NM(NY,NX),__LINE__,mod_filename)
+      call check_read(ierr,1-NU(NY,NX)+NM(NY,NX),DATA1(7),__LINE__,mod_filename)
 
       if(lverb)then
         write(*,*)''
@@ -697,11 +697,11 @@ module readiMod
 !
       read(9,'(A)')tline
       READ(tline,*,iostat=ierr)(THW(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
-      call check_read(ierr,1-NU(NY,NX)+NM(NY,NX),__LINE__,mod_filename)
+      call check_read(ierr,1-NU(NY,NX)+NM(NY,NX),DATA1(7),__LINE__,mod_filename)
 
       read(9,'(A)')tline
       READ(tline,*,iostat=ierr)(THI(L,NY,NX),L=NU(NY,NX),NM(NY,NX))
-      call check_read(ierr,1-NU(NY,NX)+NM(NY,NX),__LINE__,mod_filename)
+      call check_read(ierr,1-NU(NY,NX)+NM(NY,NX),DATA1(7),__LINE__,mod_filename)
 
       if(lverb)then
         write(*,*)'Initial soil water content (m3/m3): THW'
@@ -718,39 +718,39 @@ module readiMod
 !
       read(9,'(A)')tline
       READ(tline,*,iostat=ierr)(RSC(k_fine_litr,L,NY,NX),L=NU(NY,NX),NM(NY,NX))
-      call check_read(ierr,1-NU(NY,NX)+NM(NY,NX),__LINE__,mod_filename)
+      call check_read(ierr,1-NU(NY,NX)+NM(NY,NX),DATA1(7),__LINE__,mod_filename)
 
       read(9,'(A)')tline
       READ(tline,*,iostat=ierr)(RSN(k_fine_litr,L,NY,NX),L=NU(NY,NX),NM(NY,NX))
-      call check_read(ierr,1-NU(NY,NX)+NM(NY,NX),__LINE__,mod_filename)
+      call check_read(ierr,1-NU(NY,NX)+NM(NY,NX),DATA1(7),__LINE__,mod_filename)
 
       read(9,'(A)')tline
       READ(tline,*,iostat=ierr)(RSP(k_fine_litr,L,NY,NX),L=NU(NY,NX),NM(NY,NX))
-      call check_read(ierr,1-NU(NY,NX)+NM(NY,NX),__LINE__,mod_filename)
+      call check_read(ierr,1-NU(NY,NX)+NM(NY,NX),DATA1(7),__LINE__,mod_filename)
 
       read(9,'(A)')tline
       READ(tline,*,iostat=ierr)(RSC(k_woody_litr,L,NY,NX),L=NU(NY,NX),NM(NY,NX))
-      call check_read(ierr,1-NU(NY,NX)+NM(NY,NX),__LINE__,mod_filename)
+      call check_read(ierr,1-NU(NY,NX)+NM(NY,NX),DATA1(7),__LINE__,mod_filename)
 
       read(9,'(A)')tline
       READ(tline,*,iostat=ierr)(RSN(k_woody_litr,L,NY,NX),L=NU(NY,NX),NM(NY,NX))
-      call check_read(ierr,1-NU(NY,NX)+NM(NY,NX),__LINE__,mod_filename)
+      call check_read(ierr,1-NU(NY,NX)+NM(NY,NX),DATA1(7),__LINE__,mod_filename)
 
       read(9,'(A)')tline
       READ(tline,*,iostat=ierr)(RSP(k_woody_litr,L,NY,NX),L=NU(NY,NX),NM(NY,NX))
-      call check_read(ierr,1-NU(NY,NX)+NM(NY,NX),__LINE__,mod_filename)
+      call check_read(ierr,1-NU(NY,NX)+NM(NY,NX),DATA1(7),__LINE__,mod_filename)
 
       read(9,'(A)')tline
       READ(tline,*,iostat=ierr)(RSC(k_manure,L,NY,NX),L=NU(NY,NX),NM(NY,NX))
-      call check_read(ierr,1-NU(NY,NX)+NM(NY,NX),__LINE__,mod_filename)
+      call check_read(ierr,1-NU(NY,NX)+NM(NY,NX),DATA1(7),__LINE__,mod_filename)
 
       read(9,'(A)')tline
       READ(tline,*,iostat=ierr)(RSN(k_manure,L,NY,NX),L=NU(NY,NX),NM(NY,NX))
-      call check_read(ierr,1-NU(NY,NX)+NM(NY,NX),__LINE__,mod_filename)
+      call check_read(ierr,1-NU(NY,NX)+NM(NY,NX),DATA1(7),__LINE__,mod_filename)
 
       read(9,'(A)')tline
       READ(tline,*,iostat=ierr)(RSP(k_manure,L,NY,NX),L=NU(NY,NX),NM(NY,NX))
-      call check_read(ierr,1-NU(NY,NX)+NM(NY,NX),__LINE__,mod_filename)
+      call check_read(ierr,1-NU(NY,NX)+NM(NY,NX),DATA1(7),__LINE__,mod_filename)
 
       REWIND(9)
       if(lverb)then

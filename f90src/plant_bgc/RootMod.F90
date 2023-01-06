@@ -759,7 +759,7 @@ implicit none
 !     WFNR=water function for root extension
 !     WFNRG=respiration function of root water potential
 !
-              RSCS1=RSCS(L)*RRAD1(N,L,NZ)/1.0E-03
+              RSCS1=RSCS(L)*RRAD1(N,L,NZ)/1.0E-03_r8
               WFNR=AMIN1(1.0_r8,AZMAX1(PSIRG(N,L,NZ)-PSILM-RSCS1))
               IF(IGTYP(NZ).EQ.0)THEN
                 WFNRG=WFNR**0.10_r8
@@ -842,12 +842,12 @@ implicit none
               ZPOOLB=AZMAX1(EPOOLR(ielmn,N,L,NZ))
               PPOOLB=AZMAX1(EPOOLR(ielmp,N,L,NZ))
               FNP=AMIN1(ZPOOLB*DMRTR/CNRTS(NZ),PPOOLB*DMRTR/CPRTS(NZ))
-              IF(RCO2YM.GT.0.0)THEN
+              IF(RCO2YM.GT.0.0_r8)THEN
                 RCO2GM=AMIN1(RCO2YM,FNP)
               ELSE
                 RCO2GM=0._r8
               ENDIF
-              IF(RCO2Y.GT.0.0)THEN
+              IF(RCO2Y.GT.0.0_r8)THEN
                 RCO2G=AMIN1(RCO2Y,FNP*WFR(N,L,NZ))
               ELSE
                 RCO2G=0._r8
@@ -872,8 +872,8 @@ implicit none
               ZADD1M=AZMAX1(GRTWGM*CNRTW)
               ZADD1=AZMAX1(AMIN1(FRTN*EPOOLR(ielmn,N,L,NZ),GRTWTG*CNRTW))
               PADD1=AZMAX1(AMIN1(FRTN*EPOOLR(ielmp,N,L,NZ),GRTWTG*CPRTW))
-              CNRDM=AZMAX1(1.70*ZADD1M)
-              CNRDA=AZMAX1(1.70*ZADD1)
+              CNRDM=AZMAX1(1.70_r8*ZADD1M)
+              CNRDA=AZMAX1(1.70_r8*ZADD1)
 
               call PrimRootRemobilization(N,L,NZ,NR,FSNC1,RCO2X,RCO2XM)
 
@@ -1777,7 +1777,7 @@ implicit none
 !     ENDIF
   D290: DO L=NU,NI(NZ)
     IF(RTNT(1).GT.ZEROP(NZ))THEN
-      FWTR(L)=AZMAX1(RLNT(1,L)/RTNT(1))
+      FWTR(L)=AZMAX1(RLNT(ipltroot,L)/RTNT(1))
     ELSE
       FWTR(L)=1.0_r8
     ENDIF
@@ -2033,7 +2033,7 @@ implicit none
 !     RTNT,RLNT=total root sink strength
 !
           IF(N.EQ.1)THEN
-            RTDPL(NR,L)=AZMAX1(RTDP1(1,NR,NZ)-CDPTHZ(L-1)-RTDPX)
+            RTDPL(NR,L)=AZMAX1(RTDP1(ipltroot,NR,NZ)-CDPTHZ(L-1)-RTDPX)
             RTDPL(NR,L)=AZMAX1(AMIN1(DLYR3(L),RTDPL(NR,L)) &
               -AZMAX1(SDPTH(NZ)-CDPTHZ(L-1)-HTCTL(NZ)))
             RTDPS=AMAX1(SDPTH(NZ),CDPTHZ(L-1))+0.5*RTDPL(NR,L)+HTSTZ(NZ)

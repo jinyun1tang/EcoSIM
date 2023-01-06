@@ -320,7 +320,7 @@ module readqmod
       ,IDTYP(NZ,NY,NX),INTYP(NZ,NY,NX),IWTYP(NZ,NY,NX) &
       ,IPTYP(NZ,NY,NX),IBTYP(NZ,NY,NX),IRTYP(NZ,NY,NX),MY(NZ,NY,NX) &
       ,ZTYPI(NZ,NY,NX)
-    call check_read(ierr,11,__LINE__,mod_filename)
+    call check_read(ierr,11,DATAP(NZ,NY,NX),__LINE__,mod_filename)
 
     if(lverb)then
       call pft_display(NZ,NY,NX)
@@ -342,7 +342,7 @@ module readqmod
       ,XKCO2(NZ,NY,NX),XKO2(NZ,NY,NX),XKCO24(NZ,NY,NX) &
       ,RUBP(NZ,NY,NX),PEPC(NZ,NY,NX),ETMX(NZ,NY,NX),CHL(NZ,NY,NX) &
       ,CHL4(NZ,NY,NX),FCO2(NZ,NY,NX)
-    call check_read(ierr,12,__LINE__,mod_filename)
+    call check_read(ierr,12,DATAP(NZ,NY,NX),__LINE__,mod_filename)
 
     if(lverb)then
       call photosyns_trait_disp(NZ,NY,NX)
@@ -354,7 +354,7 @@ module readqmod
 !
     read(11,'(A)')tline
     READ(tline,*,iostat=ierr)ALBR(NZ,NY,NX),ALBP(NZ,NY,NX),TAUR(NZ,NY,NX),TAUP(NZ,NY,NX)
-    call check_read(ierr,4,__LINE__,mod_filename)
+    call check_read(ierr,4,DATAP(NZ,NY,NX),__LINE__,mod_filename)
 
     if(lverb)then
       write(*,*)'OPTICAL PROPERTIES'
@@ -378,12 +378,12 @@ module readqmod
     read(11,'(A)')tline
     READ(tline,*,iostat=ierr)XRNI(NZ,NY,NX),XRLA(NZ,NY,NX),CTC(NZ,NY,NX)  &
       ,VRNLI,VRNXI,WDLF(NZ,NY,NX),PB(NZ,NY,NX)
-    call check_read(ierr,7,__LINE__,mod_filename)
+    call check_read(ierr,7,DATAP(NZ,NY,NX),__LINE__,mod_filename)
 
     read(11,'(A)')tline
     READ(tline,*,iostat=ierr)GROUPX(NZ,NY,NX),XTLI(NZ,NY,NX),XDL(NZ,NY,NX) &
       ,XPPD(NZ,NY,NX)
-    call check_read(ierr,4,__LINE__,mod_filename)
+    call check_read(ierr,4,DATAP(NZ,NY,NX),__LINE__,mod_filename)
 
     if(lverb)then
       call Phenology_trait_disp(NZ,NY,NX,VRNLI,VRNXI)
@@ -404,17 +404,17 @@ module readqmod
 !
     read(11,'(A)')tline
     READ(tline,*,iostat=ierr)SLA1(NZ,NY,NX),SSL1(NZ,NY,NX),SNL1(NZ,NY,NX)
-    call check_read(ierr,3,__LINE__,mod_filename)
+    call check_read(ierr,3,DATAP(NZ,NY,NX),__LINE__,mod_filename)
 
     read(11,'(A)')tline
     READ(tline,*,iostat=ierr)(CLASS(N,NZ,NY,NX),N=1,JLI),CFI(NZ,NY,NX),ANGBR(NZ,NY,NX) &
       ,ANGSH(NZ,NY,NX)
-    call check_read(ierr,JLI+3,__LINE__,mod_filename)
+    call check_read(ierr,JLI+3,DATAP(NZ,NY,NX),__LINE__,mod_filename)
 
     read(11,'(A)')tline
     READ(tline,*,iostat=ierr)STMX(NZ,NY,NX),SDMX(NZ,NY,NX),GRMX(NZ,NY,NX) &
       ,GRDM(NZ,NY,NX),GFILL(NZ,NY,NX),WTSTDI(NZ,NY,NX)
-    call check_read(ierr,6,__LINE__,mod_filename)
+    call check_read(ierr,6,DATAP(NZ,NY,NX),__LINE__,mod_filename)
 
     if(lverb)then
       call morphology_trait_disp(NZ,NY,NX)
@@ -432,7 +432,7 @@ module readqmod
     read(11,'(A)')tline
     READ(tline,*,iostat=ierr)RRAD1M(1,NZ,NY,NX),RRAD2M(1,NZ,NY,NX),PORT(1,NZ,NY,NX) &
       ,PR(NZ,NY,NX),RSRR(1,NZ,NY,NX),RSRA(1,NZ,NY,NX),PTSHT(NZ,NY,NX),RTFQ(NZ,NY,NX)
-    call check_read(ierr,8,__LINE__,mod_filename)
+    call check_read(ierr,8,DATAP(NZ,NY,NX),__LINE__,mod_filename)
 
     if(lverb)then
       call Root_trait_disp(NZ,NY,NX)
@@ -446,15 +446,15 @@ module readqmod
 !
     read(11,'(A)')tline
     READ(tline,*,iostat=ierr)UPMXZH(1,NZ,NY,NX),UPKMZH(1,NZ,NY,NX),UPMNZH(1,NZ,NY,NX)
-    call check_read(ierr,3,__LINE__,mod_filename)
+    call check_read(ierr,3,DATAP(NZ,NY,NX),__LINE__,mod_filename)
 
     read(11,'(A)')tline
     READ(tline,*,iostat=ierr)UPMXZO(1,NZ,NY,NX),UPKMZO(1,NZ,NY,NX),UPMNZO(1,NZ,NY,NX)
-    call check_read(ierr,3,__LINE__,mod_filename)
+    call check_read(ierr,3,DATAP(NZ,NY,NX),__LINE__,mod_filename)
 
     read(11,'(A)')tline
     READ(tline,*,iostat=ierr)UPMXPO(1,NZ,NY,NX),UPKMPO(1,NZ,NY,NX),UPMNPO(1,NZ,NY,NX)
-    call check_read(ierr,3,__LINE__,mod_filename)
+    call check_read(ierr,3,DATAP(NZ,NY,NX),__LINE__,mod_filename)
 
     if(lverb)then
       call Root_nutrient_trait_disp(NZ,NY,NX)
@@ -468,7 +468,7 @@ module readqmod
 !
     read(11,'(A)')tline
     READ(tline,*,iostat=ierr)OSMO(NZ,NY,NX),RCS(NZ,NY,NX),RSMX(NZ,NY,NX)
-    call check_read(ierr,3,__LINE__,mod_filename)
+    call check_read(ierr,3,DATAP(NZ,NY,NX),__LINE__,mod_filename)
 
     if(lverb)then
       write(*,*)'WATER RELATIONS'
@@ -489,7 +489,7 @@ module readqmod
     READ(tline,*,iostat=ierr)DMLF(NZ,NY,NX),DMSHE(NZ,NY,NX),DMSTK(NZ,NY,NX) &
       ,DMRSV(NZ,NY,NX),DMHSK(NZ,NY,NX),DMEAR(NZ,NY,NX) &
       ,DMGR(NZ,NY,NX),DMRT(NZ,NY,NX),DMND(NZ,NY,NX)
-    call check_read(ierr,9,__LINE__,mod_filename)
+    call check_read(ierr,9,DATAP(NZ,NY,NX),__LINE__,mod_filename)
 
 !
 !   ORGAN N AND P CONCENTRATIONS
@@ -500,13 +500,13 @@ module readqmod
     READ(tline,*,iostat=ierr)CNLF(NZ,NY,NX),CNSHE(NZ,NY,NX),CNSTK(NZ,NY,NX) &
       ,CNRSV(NZ,NY,NX),CNHSK(NZ,NY,NX),CNEAR(NZ,NY,NX) &
       ,CNGR(NZ,NY,NX),CNRT(NZ,NY,NX),CNND(NZ,NY,NX)
-    call check_read(ierr,9,__LINE__,mod_filename)
+    call check_read(ierr,9,DATAP(NZ,NY,NX),__LINE__,mod_filename)
 
     read(11,'(A)')tline
     READ(tline,*,iostat=ierr)CPLF(NZ,NY,NX),CPSHE(NZ,NY,NX),CPSTK(NZ,NY,NX) &
       ,CPRSV(NZ,NY,NX),CPHSK(NZ,NY,NX),CPEAR(NZ,NY,NX) &
       ,CPGR(NZ,NY,NX),CPRT(NZ,NY,NX),CPND(NZ,NY,NX)
-    call check_read(ierr,9,__LINE__,mod_filename)
+    call check_read(ierr,9,DATAP(NZ,NY,NX),__LINE__,mod_filename)
 
     if(lverb)then
       write(*,*)'ORGAN GROWTH YIELDS'

@@ -938,8 +938,7 @@ module TrnsfrsMod
   !
         DO NTSA=idsa_beg,idsa_end
           trcsa_TBLS(NTSA,LS,NY,NX)=trcsa_TBLS(NTSA,LS,NY,NX)+trcsa_RBLS(NTSA,LS,NY,NX) &
-            -trcsa_RFLS(NTSA,3,0,N2,N1)-trcsa_RFLS(NTSA,3,NUM(N2,N1),N2,N1) &
-            -trcsa_RFHS(NTSA,3,NUM(N2,N1),N2,N1)
+            -trcsa_RFLS(NTSA,3,0,N2,N1)-trcsa_RFLS(NTSA,3,NUM(N2,N1),N2,N1)
         ENDDO
 
         DO NTSA=0,idsa_nuts
