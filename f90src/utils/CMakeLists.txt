@@ -3,6 +3,7 @@ set(ECOSIM_UTIL_SOURCES
   data_const_mod.F90
   shr_assert_mod.F90
   shr_infnan_mod.F90
+  ncdio_pio.F90
   abortutils.F90
   TestMod.F90
   clock.c

@@ -28,6 +28,7 @@ implicit none
   real(r8) :: RAIN(366)                         !daily precipitation, [mm d-1 ]
   real(r8) :: WIND(366)                         !daily wind travel, [m d-1]
   real(r8) :: DWPT(2,366)                       !daily dewpoint temperature, [oC]
+
   real(r8) :: TMPH(24,366)                      !hourly air temperature, [oC]
   real(r8) :: SRADH(24,366)                     !hourly solar radiation, [MJ m-2 h-1]
   real(r8) :: RAINH(24,366)                     !hourly precipitation, [mm h-1]

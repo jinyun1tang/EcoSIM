@@ -20,7 +20,6 @@ module readqmod
   implicit none
   private
 
-
   character(len=*), parameter :: mod_filename = __FILE__
 
   integer :: IDX,IMO,IYR,IDY,ICUT,IDYE,IDYG,IDYS,JCUT,LPY
@@ -36,8 +35,7 @@ module readqmod
   implicit none
   integer, intent(in) :: NEX
   integer, intent(in) :: NA(1:NEX),ND(1:NEX)
-  integer, intent(in) :: NT,NE,NTX,NF,NFX,NTZ &
-    ,NTZX,NHW,NHE,NVN,NVS
+  integer, intent(in) :: NT,NE,NTX,NF,NFX,NTZ,NTZX,NHW,NHE,NVN,NVS
 
 
   integer :: NX,NY,NZ
@@ -109,7 +107,7 @@ module readqmod
     IDAYH(NZ,NY,NX)=1E+06
     IYRH(NZ,NY,NX)=1E+06
     do while(.TRUE.)
-    IF(N.EQ.0)THEN
+      IF(N.EQ.0)THEN
 !
 !     PLANTING
 !
@@ -117,14 +115,14 @@ module readqmod
 !     PPI=initial planting density (m-2)
 !     SDPTHI=seeding depth (m)
 !
-      READ(12,*,END=540)DY,PPI(NZ,NY,NX),SDPTHI(NZ,NY,NX)
-      SDPTHI(NZ,NY,NX)=AMAX1(ppmc,SDPTHI(NZ,NY,NX))
-      if(lverb)then
-        write(*,*)'planting date DDMMYYYY: DY',DY
-        write(*,*)'initial planting density (m-2): PPI',PPI(NZ,NY,NX)
-        write(*,*)'seeding depth (m): SDPTHI',SDPTHI(NZ,NY,NX)
-      endif
-    ELSE
+        READ(12,*,END=540)DY,PPI(NZ,NY,NX),SDPTHI(NZ,NY,NX)
+        SDPTHI(NZ,NY,NX)=AMAX1(ppmc,SDPTHI(NZ,NY,NX))
+        if(lverb)then
+          write(*,*)'planting date DDMMYYYY: DY',DY
+          write(*,*)'initial planting density (m-2): PPI',PPI(NZ,NY,NX)
+          write(*,*)'seeding depth (m): SDPTHI',SDPTHI(NZ,NY,NX)
+        endif
+      ELSE
 !
 !     HARVESTING
 !
@@ -142,70 +140,70 @@ module readqmod
 !     ECUT21,ECUT22,ECUT23,ECUT124=fraction of leaf,non-foliar,woody,standing dead
 !     removed from ecosystem
 !
-      READ(12,*,END=540)DY,ICUT,JCUT,HCUT,PCUT &
-        ,ECUT11,ECUT12,ECUT13,ECUT14,ECUT21,ECUT22,ECUT23,ECUT24
+        READ(12,*,END=540)DY,ICUT,JCUT,HCUT,PCUT &
+          ,ECUT11,ECUT12,ECUT13,ECUT14,ECUT21,ECUT22,ECUT23,ECUT24
 
-      if(lverb)then
-        write(*,*)'HARVESTING'
-        write(*,*)'if harvesting: harvesting date DDMMYYYY '// &
-          'if grazing: first grazing date DDMMYYYY, followed by '// &
-          'last grazing date in next line: DY',DY
-        write(*,*)'harvest type:0=none,1=grain,2=all '// &
-          'above-ground,3=pruning: ICUT',ICUT
-        write(*,*)'terminate PFT:0=no,1=yes,2=yes,but reseed: JCUT',JCUT
-        write(*,*)'if harvesting: >0=cutting height,<0=fraction'// &
-          ' of LAI removed; if grazing: grazer consumption rate'// &
-          ' (g DW g FW-1 d-1)): PCUT',PCUT
-        write(*,*)'fraction of leaf removed from PFT: ECUT11',ECUT11
-        write(*,*)'fraction of non-foliar removed from PFT: ECUT12' &
-          ,ECUT12
-        write(*,*)'fraction of wood removed from PFT: ECUT13',ECUT13
-        write(*,*)'fraction of standing dead removed from PFT: ECUT14' &
-          ,ECUT14
-        write(*,*)'fraction of leaf removed from ecosystem: ECUT21',ECUT21
-        write(*,*)'fraction of non-foliar removed from ecosystem: ECUT22' &
-          ,ECUT22
-        write(*,*)'fraction of woody removed from ecosystem: ECUT23' &
-          ,ECUT23
-        write(*,*)'fraction of standing dead removed from ecosystem:'// &
-          ' ECUT24',ECUT24
-      endif
-    ENDIF
+        if(lverb)then
+          write(*,*)'HARVESTING'
+          write(*,*)'if harvesting: harvesting date DDMMYYYY '// &
+            'if grazing: first grazing date DDMMYYYY, followed by '// &
+            'last grazing date in next line: DY',DY
+          write(*,*)'harvest type:0=none,1=grain,2=all '// &
+            'above-ground,3=pruning: ICUT',ICUT
+          write(*,*)'terminate PFT:0=no,1=yes,2=yes,but reseed: JCUT',JCUT
+          write(*,*)'if harvesting: >0=cutting height,<0=fraction'// &
+            ' of LAI removed; if grazing: grazer consumption rate'// &
+            ' (g DW g FW-1 d-1)): PCUT',PCUT
+          write(*,*)'fraction of leaf removed from PFT: ECUT11',ECUT11
+          write(*,*)'fraction of non-foliar removed from PFT: ECUT12' &
+            ,ECUT12
+          write(*,*)'fraction of wood removed from PFT: ECUT13',ECUT13
+          write(*,*)'fraction of standing dead removed from PFT: ECUT14' &
+            ,ECUT14
+          write(*,*)'fraction of leaf removed from ecosystem: ECUT21',ECUT21
+          write(*,*)'fraction of non-foliar removed from ecosystem: ECUT22' &
+            ,ECUT22
+          write(*,*)'fraction of woody removed from ecosystem: ECUT23' &
+            ,ECUT23
+          write(*,*)'fraction of standing dead removed from ecosystem:'// &
+            ' ECUT24',ECUT24
+        endif
+      ENDIF
 !
 !   DERIVE PLANTING,HARVESTING DATES,YEARS
 !
 !   IDAY0,IYR0,IDAYH,IYRH=day,year of planting,harvesting
 !
-    IDX=INT(DY/1.0E+06)
-    IMO=INT(DY/1.0E+04-IDX*1.0E+02)
-    IYR=INT(DY-(IDX*1.0E+06+IMO*1.0E+04))
-    LPY=0
+      IDX=INT(DY/1.0E+06)
+      IMO=INT(DY/1.0E+04-IDX*1.0E+02)
+      IYR=INT(DY-(IDX*1.0E+06+IMO*1.0E+04))
+      LPY=0
 
-    if(isLeap(iyr) .and. IMO.GT.2)LPY=1
-    IF(IMO.EQ.1)then
-      IDY=IDX
-    else
-      IDY=30*(IMO-1)+ICOR(IMO-1)+IDX+LPY
-    endif
-    IF(N.EQ.0)THEN
-      IF(IDY.GT.0.AND.IYR.GT.0)THEN
-!       IDY=IDY-0.5*(NTX-1)
-        IDAY0(NZ,NY,NX)=IDY
+      if(isLeap(iyr) .and. IMO.GT.2)LPY=1
+      IF(IMO.EQ.1)then
+        IDY=IDX
+      else
+        IDY=30*(IMO-1)+ICOR(IMO-1)+IDX+LPY
+      endif
+      IF(N.EQ.0)THEN
+        IF(IDY.GT.0.AND.IYR.GT.0)THEN
+!        IDY=IDY-0.5*(NTX-1)
+          IDAY0(NZ,NY,NX)=IDY
 !       IF(ISTYP(NZ,NY,NX).EQ.0)THEN
-        IYR=IYR+(NT-1)*NF+(NTX-1)*NFX-NTZX
+          IYR=IYR+(NT-1)*NF+(NTX-1)*NFX-NTZX
 !       ENDIF
-        IYR0(NZ,NY,NX)=MIN(IYR,IYRC)
-        IDAYX(NZ,NY,NX)=IDAY0(NZ,NY,NX)
-        IYRX(NZ,NY,NX)=IYR0(NZ,NY,NX)
-        PPZ(NZ,NY,NX)=PPI(NZ,NY,NX)
-      ENDIF
-    ELSE
-      IF(IDY.GT.0.AND.JCUT.EQ.1)THEN
+          IYR0(NZ,NY,NX)=MIN(IYR,IYRC)
+          IDAYX(NZ,NY,NX)=IDAY0(NZ,NY,NX)
+          IYRX(NZ,NY,NX)=IYR0(NZ,NY,NX)
+          PPZ(NZ,NY,NX)=PPI(NZ,NY,NX)
+        ENDIF
+      ELSE
+        IF(IDY.GT.0.AND.JCUT.EQ.1)THEN
 !       IDY=IDY+0.5*(NTX-1)
-        IDAYH(NZ,NY,NX)=IDY
-        IYR=IYR+(NT-1)*NF+(NTX-1)*NFX-NTZX
-        IYRH(NZ,NY,NX)=MIN(IYR,IYRC)
-      ENDIF
+          IDAYH(NZ,NY,NX)=IDY
+          IYR=IYR+(NT-1)*NF+(NTX-1)*NFX-NTZX
+          IYRH(NZ,NY,NX)=MIN(IYR,IYRC)
+        ENDIF
 !
 !     LOAD MODEL ARRAYS WITH PFT MANAGEMENT FOR SPECIFIED DATES
 !
@@ -221,47 +219,46 @@ module readqmod
 !     EHVST(2,1,EHVST(2,2,EHVST(2,3,EHVST(2,4=fraction of
 !           leaf,non-foliar,woody, standing dead removed from ecosystem
 !
-      IHVST(NZ,IDY,NY,NX)=ICUT
-      JHVST(NZ,IDY,NY,NX)=JCUT
-      HVST(NZ,IDY,NY,NX)=HCUT
-      THIN(NZ,IDY,NY,NX)=PCUT
-      EHVST(1,1,NZ,IDY,NY,NX)=ECUT11
-      EHVST(1,2,NZ,IDY,NY,NX)=ECUT12
-      EHVST(1,3,NZ,IDY,NY,NX)=ECUT13
-      EHVST(1,4,NZ,IDY,NY,NX)=ECUT14
-      EHVST(2,1,NZ,IDY,NY,NX)=ECUT21
-      EHVST(2,2,NZ,IDY,NY,NX)=ECUT22
-      EHVST(2,3,NZ,IDY,NY,NX)=ECUT23
-      EHVST(2,4,NZ,IDY,NY,NX)=ECUT24
+        IHVST(NZ,IDY,NY,NX)=ICUT
+        JHVST(NZ,IDY,NY,NX)=JCUT
+        HVST(NZ,IDY,NY,NX)=HCUT
+        THIN(NZ,IDY,NY,NX)=PCUT
+        EHVST(1,1,NZ,IDY,NY,NX)=ECUT11
+        EHVST(1,2,NZ,IDY,NY,NX)=ECUT12
+        EHVST(1,3,NZ,IDY,NY,NX)=ECUT13
+        EHVST(1,4,NZ,IDY,NY,NX)=ECUT14
+        EHVST(2,1,NZ,IDY,NY,NX)=ECUT21
+        EHVST(2,2,NZ,IDY,NY,NX)=ECUT22
+        EHVST(2,3,NZ,IDY,NY,NX)=ECUT23
+        EHVST(2,4,NZ,IDY,NY,NX)=ECUT24
 !
 !     IF ANIMAL OR INSECT GRAZING LOAD ALL DATES BETWEEN FIRST AND LAST
 !
-      IF(IHVST(NZ,IDY,NY,NX).EQ.4.OR.IHVST(NZ,IDY,NY,NX).EQ.6)THEN
-        NN=NN+1
+        IF(IHVST(NZ,IDY,NY,NX).EQ.4.OR.IHVST(NZ,IDY,NY,NX).EQ.6)THEN
+          NN=NN+1
 
-        if(mod(nn,2)==0)then
-          IDYE=IDY
-
-          D580: DO IDYG=IDYS+1,IDYE-1
-            IHVST(NZ,IDYG,NY,NX)=ICUT
-            JHVST(NZ,IDYG,NY,NX)=JCUT
-            HVST(NZ,IDYG,NY,NX)=HCUT
-            THIN(NZ,IDYG,NY,NX)=PCUT
-            EHVST(1,1,NZ,IDYG,NY,NX)=ECUT11
-            EHVST(1,2,NZ,IDYG,NY,NX)=ECUT12
-            EHVST(1,3,NZ,IDYG,NY,NX)=ECUT13
-            EHVST(1,4,NZ,IDYG,NY,NX)=ECUT14
-            EHVST(2,1,NZ,IDYG,NY,NX)=ECUT21
-            EHVST(2,2,NZ,IDYG,NY,NX)=ECUT22
-            EHVST(2,3,NZ,IDYG,NY,NX)=ECUT23
-            EHVST(2,4,NZ,IDYG,NY,NX)=ECUT24
-          ENDDO D580
-        endif
+          if(mod(nn,2)==0)then
+            IDYE=IDY
+            D580: DO IDYG=IDYS+1,IDYE-1
+              IHVST(NZ,IDYG,NY,NX)=ICUT
+              JHVST(NZ,IDYG,NY,NX)=JCUT
+              HVST(NZ,IDYG,NY,NX)=HCUT
+              THIN(NZ,IDYG,NY,NX)=PCUT
+              EHVST(1,1,NZ,IDYG,NY,NX)=ECUT11
+              EHVST(1,2,NZ,IDYG,NY,NX)=ECUT12
+              EHVST(1,3,NZ,IDYG,NY,NX)=ECUT13
+              EHVST(1,4,NZ,IDYG,NY,NX)=ECUT14
+              EHVST(2,1,NZ,IDYG,NY,NX)=ECUT21
+              EHVST(2,2,NZ,IDYG,NY,NX)=ECUT22
+              EHVST(2,3,NZ,IDYG,NY,NX)=ECUT23
+              EHVST(2,4,NZ,IDYG,NY,NX)=ECUT24
+            ENDDO D580
+          endif
 !570     IDYS=IDY
-        IDYS=IDY
+          IDYS=IDY
+        ENDIF
       ENDIF
-    ENDIF
-    N=N+1
+      N=N+1
     enddo
 540 CLOSE(12)
   ELSE
@@ -279,287 +276,30 @@ module readqmod
   implicit none
   integer, intent(in) :: NZ,NY,NX
 
-  integer :: N, NB, ierr
+  integer :: N, NB
   real(r8) :: VRNXI,VRNLI
-  character(len=200) :: tline
 
 ! begin_execution
 
-  IF(DATAP(NZ,NY,NX).NE.'NO')THEN
-!   WRITE(*,2233)'READQ',NX,NY,NZ,IETYP(NY,NX),DATAP(NZ,NY,NX)
-!2233     FORMAT(A8,4I4,2A16)
-    call OPEN_safe(11,PREFIX,DATAP(NZ,NY,NX),'OLD',mod_filename,__LINE__)
-    if(lverb)then
-      write(*,*)'read parameters for pft ',NZ,' from ',DATAP(NZ,NY,NX)
-    endif
-  ENDIF
 !
 ! READ INPUTS FOR EACH PLANT SPECIES
 !
   IF(DATAP(NZ,NY,NX).NE.'NO')THEN
-!
-!   PLANT FUNCTIONAL TYPE
-!
-!   ICTYP=photosynthesis type:3=C3,4=C4
-!   IGTYP=root profile:0=shallow (eg bryophytes),1=intermediate(eg herbs),2=deep (eg trees)
-!   ISTYP=growth habit:0=annual,1=perennial
-!   IDTYP=growth habit:0=determinate,1=indetermimate
-!   INTYP=N2 fixation:1,2,3=rapid to slow root symbiosis (e.g.legumes),
-!   4,5,6=rapid to slow canopy symbiosis (e.g. cyanobacteria)
-!   IWTYP=phenology type:0=evergreen,1=cold deciduous,2=drought deciduous,3=1+2
-!   IPTYP=photoperiod type:0=day neutral,1=short day,2=long day
-!   IBTYP=turnover:if IGTYP=0 or 1:all above-ground:0,1=rapid(deciduous),2=very slow(evergreen),3=slow(semi-deciduous)
-!                   :if IGTYP=2:trees:1=rapid(deciduous),2=very slow(coniferous),3=slow(semi-deciduous)
-!   IRTYP=storage organ:0=above ground,1=below ground
-!   MY=mycorrhizal:1=no,2=yes
-!   ZTYPI=thermal adaptation zone:1=arctic,boreal,2=cool temperate,
-!   3=warm temperate,4=subtropical,5=tropical
-!
-    read(11,'(A)')tline
-    READ(tline,*,iostat=ierr)ICTYP(NZ,NY,NX),IGTYP(NZ,NY,NX),ISTYP(NZ,NY,NX) &
-      ,IDTYP(NZ,NY,NX),INTYP(NZ,NY,NX),IWTYP(NZ,NY,NX) &
-      ,IPTYP(NZ,NY,NX),IBTYP(NZ,NY,NX),IRTYP(NZ,NY,NX),MY(NZ,NY,NX) &
-      ,ZTYPI(NZ,NY,NX)
-    call check_read(ierr,11,DATAP(NZ,NY,NX),__LINE__,mod_filename)
 
-    if(lverb)then
-      call pft_display(NZ,NY,NX)
-    endif
-!
-!   PHOTOSYNTHETIC PROPERTIES
-!
-!   VCMX,VOMX=specific rubisco carboxylase,oxygenase activity (umol C,O g-1 s-1)
-!   VCMX4=specific PEP carboxylase activity (umol g-1 s-1)
-!   XKCO2,XKO2,XKCO24=Km for VCMX,VOMX,VCMX4 (uM)
-!   RUBP,PEPC=fraction of leaf protein in rubisco, PEP carboxylase
-!   ETMX=specific chlorophyll activity (umol e- g-1 s-1)
-!   CHL=fraction of leaf protein in mesophyll(C3), bundle sheath(C4) chlorophyll
-!   CHL4=fraction of leaf protein in mesophyll chlorophyll(C4)
-!   FCO2=intercellular:atmospheric CO2 concentration ratio
-!
-    read(11,'(A)')tline
-    READ(tline,*,iostat=ierr)VCMX(NZ,NY,NX),VOMX(NZ,NY,NX),VCMX4(NZ,NY,NX) &
-      ,XKCO2(NZ,NY,NX),XKO2(NZ,NY,NX),XKCO24(NZ,NY,NX) &
-      ,RUBP(NZ,NY,NX),PEPC(NZ,NY,NX),ETMX(NZ,NY,NX),CHL(NZ,NY,NX) &
-      ,CHL4(NZ,NY,NX),FCO2(NZ,NY,NX)
-    call check_read(ierr,12,DATAP(NZ,NY,NX),__LINE__,mod_filename)
+!    call ReadPlantTraitsAscii(NZ,NY,NX,VRNXI,VRNLI)
 
-    if(lverb)then
-      call photosyns_trait_disp(NZ,NY,NX)
-    endif
-!
-!   OPTICAL PROPERTIES
-!
-!   ALBP,ALBP,TAUR,TAUP=leaf SW,PAR albedo,transmission
-!
-    read(11,'(A)')tline
-    READ(tline,*,iostat=ierr)ALBR(NZ,NY,NX),ALBP(NZ,NY,NX),TAUR(NZ,NY,NX),TAUP(NZ,NY,NX)
-    call check_read(ierr,4,DATAP(NZ,NY,NX),__LINE__,mod_filename)
-
-    if(lverb)then
-      write(*,*)'OPTICAL PROPERTIES'
-      write(*,*)'leaf SW albedo: ALBR',ALBR(NZ,NY,NX)
-      write(*,*)'leaf PAR albedo: ALBP',ALBP(NZ,NY,NX)
-      write(*,*)'leaf SW transmission: TAUR',TAUR(NZ,NY,NX)
-      write(*,*)'leaf PAR transmission: TAUP',TAUP(NZ,NY,NX)
-    endif
-!
-!   PHENOLOGICAL PROPERTIES
-!
-!   XRNI,XRLA=rate of node initiation,leaf appearance at 25oC (h-1)
-!   CTC=chilling temperature for CO2 fixation, seed loss (oC)
-!   VRNLI,VRNXI=hour requirement for spring leafout,autumn leafoff
-!   WDLF=leaf length:width ratio
-!   PB=nonstructural C concentration needed for branching
-!   GROUPX,XTLI=node number required for floral initiation,at planting
-!   XDL=critical photoperiod (h):<0=maximum daylength from site file
-!   XPPD=photoperiod sensitivity (node h-1)
-!
-    read(11,'(A)')tline
-    READ(tline,*,iostat=ierr)XRNI(NZ,NY,NX),XRLA(NZ,NY,NX),CTC(NZ,NY,NX)  &
-      ,VRNLI,VRNXI,WDLF(NZ,NY,NX),PB(NZ,NY,NX)
-    call check_read(ierr,7,DATAP(NZ,NY,NX),__LINE__,mod_filename)
-
-    read(11,'(A)')tline
-    READ(tline,*,iostat=ierr)GROUPX(NZ,NY,NX),XTLI(NZ,NY,NX),XDL(NZ,NY,NX) &
-      ,XPPD(NZ,NY,NX)
-    call check_read(ierr,4,DATAP(NZ,NY,NX),__LINE__,mod_filename)
-
-    if(lverb)then
-      call Phenology_trait_disp(NZ,NY,NX,VRNLI,VRNXI)
-    endif
-!
-!   MORPHOLOGICAL PROPERTIES
-!
-!   SLA1,SSL1,SNL1=growth in leaf area,petiole length,internode length vs mass
-!   CLASS=fraction of leaf area in 0-22.5,45,67.5,90o inclination classes
-!   CFI=initial clumping factor
-!   ANGBR,ANGSH=stem,petiole angle from horizontal
-!   STMX=maximum potential seed mumber from pre-anthesis stalk growth
-!   SDMX=maximum seed number per STMX
-!   GRMX=maximum seed size per SDMX (g)
-!   GRDM=seed size at planting (g)
-!   GFILL=grain filling rate at 25 oC (g seed-1 h-1)
-!   WTSTDI=mass of dead standing biomass at planting
-!
-    read(11,'(A)')tline
-    READ(tline,*,iostat=ierr)SLA1(NZ,NY,NX),SSL1(NZ,NY,NX),SNL1(NZ,NY,NX)
-    call check_read(ierr,3,DATAP(NZ,NY,NX),__LINE__,mod_filename)
-
-    read(11,'(A)')tline
-    READ(tline,*,iostat=ierr)(CLASS(N,NZ,NY,NX),N=1,JLI),CFI(NZ,NY,NX),ANGBR(NZ,NY,NX) &
-      ,ANGSH(NZ,NY,NX)
-    call check_read(ierr,JLI+3,DATAP(NZ,NY,NX),__LINE__,mod_filename)
-
-    read(11,'(A)')tline
-    READ(tline,*,iostat=ierr)STMX(NZ,NY,NX),SDMX(NZ,NY,NX),GRMX(NZ,NY,NX) &
-      ,GRDM(NZ,NY,NX),GFILL(NZ,NY,NX),WTSTDI(NZ,NY,NX)
-    call check_read(ierr,6,DATAP(NZ,NY,NX),__LINE__,mod_filename)
-
-    if(lverb)then
-      call morphology_trait_disp(NZ,NY,NX)
-    endif
-!
-!   ROOT CHARACTERISTICS
-!
-!   RRAD1M,RRAD2M=radius of primary,secondary roots
-!   PORT=root porosity
-!   PR=nonstructural C concentration needed for root branching
-!   RSRR,RSRA=radial,axial root resistivity (m2 MPa-1 h-1)
-!   PTSHT=rate constant for equilibrating shoot-root nonstructural C concn
-!   RTFQ=root branching frequency (m-1)
-!
-    read(11,'(A)')tline
-    READ(tline,*,iostat=ierr)RRAD1M(1,NZ,NY,NX),RRAD2M(1,NZ,NY,NX),PORT(1,NZ,NY,NX) &
-      ,PR(NZ,NY,NX),RSRR(1,NZ,NY,NX),RSRA(1,NZ,NY,NX),PTSHT(NZ,NY,NX),RTFQ(NZ,NY,NX)
-    call check_read(ierr,8,DATAP(NZ,NY,NX),__LINE__,mod_filename)
-
-    if(lverb)then
-      call Root_trait_disp(NZ,NY,NX)
-    endif
-!
-!   ROOT UPTAKE PARAMETERS
-!
-!   UPMXZH,UPKMZH,UPMNZH=NH4 max uptake (g m-2 h-1),Km (uM), min concn (uM)
-!   UPMXZO,UPKMZO,UPMNZO=NO3 max uptake (g m-2 h-1),Km (uM), min concn (uM)
-!   UPMXPO,UPKMPO,UPMNPO=H2PO4 max uptake (g m-2 h-1),Km (uM), min concn (uM)
-!
-    read(11,'(A)')tline
-    READ(tline,*,iostat=ierr)UPMXZH(1,NZ,NY,NX),UPKMZH(1,NZ,NY,NX),UPMNZH(1,NZ,NY,NX)
-    call check_read(ierr,3,DATAP(NZ,NY,NX),__LINE__,mod_filename)
-
-    read(11,'(A)')tline
-    READ(tline,*,iostat=ierr)UPMXZO(1,NZ,NY,NX),UPKMZO(1,NZ,NY,NX),UPMNZO(1,NZ,NY,NX)
-    call check_read(ierr,3,DATAP(NZ,NY,NX),__LINE__,mod_filename)
-
-    read(11,'(A)')tline
-    READ(tline,*,iostat=ierr)UPMXPO(1,NZ,NY,NX),UPKMPO(1,NZ,NY,NX),UPMNPO(1,NZ,NY,NX)
-    call check_read(ierr,3,DATAP(NZ,NY,NX),__LINE__,mod_filename)
-
-    if(lverb)then
-      call Root_nutrient_trait_disp(NZ,NY,NX)
-    endif
-!
-!   WATER RELATIONS
-!
-!   OSMO=leaf osmotic potential at zero leaf water potential (MPa)
-!   RCS=shape parameter for stomatal resistance vs leaf turgor potential
-!   RSMX=cuticular resistance (s m-1)
-!
-    read(11,'(A)')tline
-    READ(tline,*,iostat=ierr)OSMO(NZ,NY,NX),RCS(NZ,NY,NX),RSMX(NZ,NY,NX)
-    call check_read(ierr,3,DATAP(NZ,NY,NX),__LINE__,mod_filename)
-
-    if(lverb)then
-      write(*,*)'WATER RELATIONS'
-      write(*,*)'leaf osmotic potential at zero leaf water '// &
-         'potential (MPa): OSMO',OSMO(NZ,NY,NX)
-      write(*,*)'shape parameter for stomatal resistance vs '// &
-         'leaf turgor potential: RCS',RCS(NZ,NY,NX)
-      write(*,*)'cuticular resistance (s m-1): RSMX',RSMX(NZ,NY,NX)
-    endif
-!
-!   ORGAN GROWTH YIELDS
-!
-!   DM*=DM-C production vs nonstructural C consumption (g g-1)
-!     *LF=leaf,*SHE=petiole,*STK=stalk,*RSV=stalk reserve,*HSK=husk
-!     *EAR=ear,*GR=grain,*RT=root,*ND=bacteria in root nodule,canopy
-!
-    read(11,'(A)')tline
-    READ(tline,*,iostat=ierr)DMLF(NZ,NY,NX),DMSHE(NZ,NY,NX),DMSTK(NZ,NY,NX) &
-      ,DMRSV(NZ,NY,NX),DMHSK(NZ,NY,NX),DMEAR(NZ,NY,NX) &
-      ,DMGR(NZ,NY,NX),DMRT(NZ,NY,NX),DMND(NZ,NY,NX)
-    call check_read(ierr,9,DATAP(NZ,NY,NX),__LINE__,mod_filename)
-
-!
-!   ORGAN N AND P CONCENTRATIONS
-!
-!   CN*,CP*=N:C,P:C ratios in plant organs
-!
-    read(11,'(A)')tline
-    READ(tline,*,iostat=ierr)CNLF(NZ,NY,NX),CNSHE(NZ,NY,NX),CNSTK(NZ,NY,NX) &
-      ,CNRSV(NZ,NY,NX),CNHSK(NZ,NY,NX),CNEAR(NZ,NY,NX) &
-      ,CNGR(NZ,NY,NX),CNRT(NZ,NY,NX),CNND(NZ,NY,NX)
-    call check_read(ierr,9,DATAP(NZ,NY,NX),__LINE__,mod_filename)
-
-    read(11,'(A)')tline
-    READ(tline,*,iostat=ierr)CPLF(NZ,NY,NX),CPSHE(NZ,NY,NX),CPSTK(NZ,NY,NX) &
-      ,CPRSV(NZ,NY,NX),CPHSK(NZ,NY,NX),CPEAR(NZ,NY,NX) &
-      ,CPGR(NZ,NY,NX),CPRT(NZ,NY,NX),CPND(NZ,NY,NX)
-    call check_read(ierr,9,DATAP(NZ,NY,NX),__LINE__,mod_filename)
-
-    if(lverb)then
-      write(*,*)'ORGAN GROWTH YIELDS'
-      write(*,*)'leaf dry matter C production vs '// &
-        'nonstructural C consumption (g g-1): DMLF',DMLF(NZ,NY,NX)
-      write(*,*)'petiole dry matter C production vs '// &
-        'nonstructural C consumption (g g-1): DMSHE',DMSHE(NZ,NY,NX)
-      write(*,*)'stalk dry matter C production vs '// &
-        'nonstructural C consumption (g g-1): DMSTK',DMSTK(NZ,NY,NX)
-      write(*,*)'stalk reserve C production vs '// &
-        'nonstructural C consumption (g g-1): DMRSV',DMRSV(NZ,NY,NX)
-      write(*,*)'husk dry matter C production vs '// &
-        'nonstructural Cconsumption (g g-1): DMHSK',DMHSK(NZ,NY,NX)
-      write(*,*)'ear dry matter C production vs '// &
-        'nonstructural Cconsumption (g g-1): DMEAR',DMEAR(NZ,NY,NX)
-      write(*,*)'grain C production vs nonstructural C'// &
-        ' consumption (g g-1): DMGR',DMGR(NZ,NY,NX)
-      write(*,*)'root dry matter C production vs nonstructural C'// &
-        ' consumption (g g-1): DMRT',DMRT(NZ,NY,NX)
-      write(*,*)'nodule bacteria in root nodule,canopy dry matter'// &
-        'C production vs nonstructural C consumption (g g-1): DMND' &
-        ,DMND(NZ,NY,NX)
-      write(*,*)'ORGAN N AND P CONCENTRATIONS'
-      write(*,*)'NC ratio in plant leaves: CNLF',CNLF(NZ,NY,NX)
-      write(*,*)'NC ratio in plant petiole: CNSHE',CNSHE(NZ,NY,NX)
-      write(*,*)'NC ratio in plant stalk: CNSTK',CNSTK(NZ,NY,NX)
-      write(*,*)'NC ratio in plant stalk reserve: CNRSV',CNRSV(NZ,NY,NX)
-      write(*,*)'NC ratio in plant husk: CNHSK',CNHSK(NZ,NY,NX)
-      write(*,*)'NC ratio in plant ear: CNEAR',CNEAR(NZ,NY,NX)
-      write(*,*)'NC ratio in plant grain: CNGR',CNGR(NZ,NY,NX)
-      write(*,*)'NC ratio in plant root: CNRT',CNRT(NZ,NY,NX)
-      write(*,*)'NC ratio in plant module: CNND',CNND(NZ,NY,NX)
-      write(*,*)'PC ratio in plant leaves: CPLF',CPLF(NZ,NY,NX)
-      write(*,*)'PC ratio in plant petiole: CPSHE',CPSHE(NZ,NY,NX)
-      write(*,*)'PC ratio in plant stalk: CPSTK',CPSTK(NZ,NY,NX)
-      write(*,*)'PC ratio in plant stalk reserve: CPRSV',CPRSV(NZ,NY,NX)
-      write(*,*)'PC ratio in plant husk: CPHSK',CPHSK(NZ,NY,NX)
-      write(*,*)'PC ratio in plant ear: CPEAR',CPEAR(NZ,NY,NX)
-      write(*,*)'PC ratio in plant grain: CPGR',CPGR(NZ,NY,NX)
-      write(*,*)'PC ratio in plant root: CPRT',CPRT(NZ,NY,NX)
-      write(*,*)'PC ratio in plant module: CPND',CPND(NZ,NY,NX)
-    endif
+    call ReadPlantTraitsNC(NZ,NY,NX,VRNLI,VRNXI)
 !
 !   RE-CALCULATE PLANT INPUTS IN MODEL UNITS
 !
 !   ABSR,ABSP=leaf SW,PAR absorbtivity
 !
-    VCMX(NZ,NY,NX)=2.5*VCMX(NZ,NY,NX)
-    VOMX(NZ,NY,NX)=2.5*VOMX(NZ,NY,NX)
-    VCMX4(NZ,NY,NX)=2.5*VCMX4(NZ,NY,NX)
-    ETMX(NZ,NY,NX)=2.5*ETMX(NZ,NY,NX)
-    ABSR(NZ,NY,NX)=1.0-ALBR(NZ,NY,NX)-TAUR(NZ,NY,NX)
-    ABSP(NZ,NY,NX)=1.0-ALBP(NZ,NY,NX)-TAUP(NZ,NY,NX)
+    VCMX(NZ,NY,NX)=2.5_r8*VCMX(NZ,NY,NX)
+    VOMX(NZ,NY,NX)=2.5_r8*VOMX(NZ,NY,NX)
+    VCMX4(NZ,NY,NX)=2.5_r8*VCMX4(NZ,NY,NX)
+    ETMX(NZ,NY,NX)=2.5_r8*ETMX(NZ,NY,NX)
+    ABSR(NZ,NY,NX)=1.0_r8-ALBR(NZ,NY,NX)-TAUR(NZ,NY,NX)
+    ABSP(NZ,NY,NX)=1.0_r8-ALBP(NZ,NY,NX)-TAUP(NZ,NY,NX)
     ALBR(NZ,NY,NX)=ALBR(NZ,NY,NX)/ABSR(NZ,NY,NX)
     ALBP(NZ,NY,NX)=ALBP(NZ,NY,NX)/ABSP(NZ,NY,NX)
     TAUR(NZ,NY,NX)=TAUR(NZ,NY,NX)/ABSR(NZ,NY,NX)
@@ -567,7 +307,9 @@ module readqmod
     ANGBR(NZ,NY,NX)=SIN(ANGBR(NZ,NY,NX)/57.29578_r8)
     ANGSH(NZ,NY,NX)=SIN(ANGSH(NZ,NY,NX)/57.29578_r8)
     GROUPI(NZ,NY,NX)=GROUPX(NZ,NY,NX)
+
     IF(IBTYP(NZ,NY,NX).NE.0)THEN
+!
       XRNI(NZ,NY,NX)=XRNI(NZ,NY,NX)/25.0_r8
       XRLA(NZ,NY,NX)=XRLA(NZ,NY,NX)/25.0_r8
       GROUPI(NZ,NY,NX)=GROUPI(NZ,NY,NX)/25.0_r8
@@ -586,7 +328,6 @@ module readqmod
         VRNX(NB,NZ,NY,NX)=VRNXI
       ENDIF
     ENDDO D5
-    CLOSE(11)
   ENDIF
 ! WRITE(*,1111)'CRITICAL DAYLENGTH',IGO,NZ,XDL(NZ,NY,NX)
 !1111    FORMAT(A20,2I8,E12.4)
@@ -846,5 +587,456 @@ module readqmod
   write(*,*)'H2PO4 uptake Km (uM): UPKMPO',UPKMPO(1,NZ,NY,NX)
   write(*,*)'H2PO4 uptake min conc (uM): UPMNPO',UPMNPO(1,NZ,NY,NX)
   end subroutine Root_nutrient_trait_disp
+
+!------------------------------------------------------------------------------------------
+  subroutine ReadPlantTraitsAscii(NZ,NY,NX,VRNXI,VRNLI)
+!
+! DESCRIPTION
+! read plant trait data from ascii file
+  implicit none
+  integer, intent(in) :: NZ,NY,NX
+  real(r8), intent(out) :: VRNXI,VRNLI
+  INTEGER :: ierr,N
+  character(len=200) :: tline
+
+!   WRITE(*,2233)'READQ',NX,NY,NZ,IETYP(NY,NX),DATAP(NZ,NY,NX)
+!2233     FORMAT(A8,4I4,2A16)
+  call OPEN_safe(11,PREFIX,DATAP(NZ,NY,NX),'OLD',mod_filename,__LINE__)
+  if(lverb)then
+    write(*,*)'read parameters for pft ',NZ,' from ',DATAP(NZ,NY,NX)
+  endif
+
+!
+!   PLANT FUNCTIONAL TYPE
+!
+!   ICTYP=photosynthesis type:3=C3,4=C4
+!   IGTYP=root profile:0=shallow (eg bryophytes),1=intermediate(eg herbs),2=deep (eg trees)
+!   ISTYP=growth habit:0=annual,1=perennial
+!   IDTYP=growth habit:0=determinate,1=indetermimate
+!   INTYP=N2 fixation:1,2,3=rapid to slow root symbiosis (e.g.legumes),
+!   4,5,6=rapid to slow canopy symbiosis (e.g. cyanobacteria)
+!   IWTYP=phenology type:0=evergreen,1=cold deciduous,2=drought deciduous,3=1+2
+!   IPTYP=photoperiod type:0=day neutral,1=short day,2=long day
+!   IBTYP=turnover:if IGTYP=0 or 1:all above-ground:0,1=rapid(deciduous),2=very slow(evergreen),3=slow(semi-deciduous)
+!                   :if IGTYP=2:trees:1=rapid(deciduous),2=very slow(coniferous),3=slow(semi-deciduous)
+!   IRTYP=storage organ:0=above ground,1=below ground
+!   MY=mycorrhizal:1=no,2=yes
+!   ZTYPI=thermal adaptation zone:1=arctic,boreal,2=cool temperate,
+!   3=warm temperate,4=subtropical,5=tropical
+!
+  read(11,'(A)')tline
+  READ(tline,*,iostat=ierr)ICTYP(NZ,NY,NX),IGTYP(NZ,NY,NX),ISTYP(NZ,NY,NX) &
+    ,IDTYP(NZ,NY,NX),INTYP(NZ,NY,NX),IWTYP(NZ,NY,NX) &
+    ,IPTYP(NZ,NY,NX),IBTYP(NZ,NY,NX),IRTYP(NZ,NY,NX),MY(NZ,NY,NX) &
+    ,ZTYPI(NZ,NY,NX)
+  call check_read(ierr,11,DATAP(NZ,NY,NX),__LINE__,mod_filename)
+
+  if(lverb)then
+    call pft_display(NZ,NY,NX)
+  endif
+!
+!   PHOTOSYNTHETIC PROPERTIES
+!
+!   VCMX,VOMX=specific rubisco carboxylase,oxygenase activity (umol C,O g-1 s-1)
+!   VCMX4=specific PEP carboxylase activity (umol g-1 s-1)
+!   XKCO2,XKO2,XKCO24=Km for VCMX,VOMX,VCMX4 (uM)
+!   RUBP,PEPC=fraction of leaf protein in rubisco, PEP carboxylase
+!   ETMX=specific chlorophyll activity (umol e- g-1 s-1)
+!   CHL=fraction of leaf protein in mesophyll(C3), bundle sheath(C4) chlorophyll
+!   CHL4=fraction of leaf protein in mesophyll chlorophyll(C4)
+!   FCO2=intercellular:atmospheric CO2 concentration ratio
+!
+  read(11,'(A)')tline
+  READ(tline,*,iostat=ierr)VCMX(NZ,NY,NX),VOMX(NZ,NY,NX),VCMX4(NZ,NY,NX) &
+    ,XKCO2(NZ,NY,NX),XKO2(NZ,NY,NX),XKCO24(NZ,NY,NX) &
+    ,RUBP(NZ,NY,NX),PEPC(NZ,NY,NX),ETMX(NZ,NY,NX),CHL(NZ,NY,NX) &
+    ,CHL4(NZ,NY,NX),FCO2(NZ,NY,NX)
+  call check_read(ierr,12,DATAP(NZ,NY,NX),__LINE__,mod_filename)
+
+  if(lverb)then
+    call photosyns_trait_disp(NZ,NY,NX)
+  endif
+!
+!   OPTICAL PROPERTIES
+!
+!   ALBP,ALBP,TAUR,TAUP=leaf SW,PAR albedo,transmission
+!
+  read(11,'(A)')tline
+  READ(tline,*,iostat=ierr)ALBR(NZ,NY,NX),ALBP(NZ,NY,NX),TAUR(NZ,NY,NX),TAUP(NZ,NY,NX)
+  call check_read(ierr,4,DATAP(NZ,NY,NX),__LINE__,mod_filename)
+
+  if(lverb)then
+    call plant_optic_trait_disp(NZ,NY,NX)
+  endif
+!
+!   PHENOLOGICAL PROPERTIES
+!
+!   XRNI,XRLA=rate of node initiation, leaf appearance at 25oC (h-1)
+!   CTC=chilling temperature for CO2 fixation, seed loss (oC)
+!   VRNLI,VRNXI=hour requirement for spring leafout,autumn leafoff
+!   WDLF=leaf length:width ratio
+!   PB=nonstructural C concentration needed for branching
+!   GROUPX,XTLI=node number required for floral initiation,at planting
+!   XDL=critical photoperiod (h):<0=maximum daylength from site file
+!   XPPD=photoperiod sensitivity (node h-1)
+!
+  read(11,'(A)')tline
+  READ(tline,*,iostat=ierr)XRNI(NZ,NY,NX),XRLA(NZ,NY,NX),CTC(NZ,NY,NX)  &
+    ,VRNLI,VRNXI,WDLF(NZ,NY,NX),PB(NZ,NY,NX)
+  call check_read(ierr,7,DATAP(NZ,NY,NX),__LINE__,mod_filename)
+
+  read(11,'(A)')tline
+  READ(tline,*,iostat=ierr)GROUPX(NZ,NY,NX),XTLI(NZ,NY,NX),XDL(NZ,NY,NX) &
+    ,XPPD(NZ,NY,NX)
+  call check_read(ierr,4,DATAP(NZ,NY,NX),__LINE__,mod_filename)
+
+  if(lverb)then
+    call Phenology_trait_disp(NZ,NY,NX,VRNLI,VRNXI)
+  endif
+!
+!   MORPHOLOGICAL PROPERTIES
+!
+!   SLA1,SSL1,SNL1=growth in leaf area,petiole length,internode length vs mass
+!   CLASS=fraction of leaf area in 0-22.5,45,67.5,90o inclination classes
+!   CFI=initial clumping factor
+!   ANGBR,ANGSH=stem,petiole angle from horizontal
+!   STMX=maximum potential seed mumber from pre-anthesis stalk growth
+!   SDMX=maximum seed number per STMX
+!   GRMX=maximum seed size per SDMX (g)
+!   GRDM=seed size at planting (g)
+!   GFILL=grain filling rate at 25 oC (g seed-1 h-1)
+!   WTSTDI=mass of dead standing biomass at planting
+!
+  read(11,'(A)')tline
+  READ(tline,*,iostat=ierr)SLA1(NZ,NY,NX),SSL1(NZ,NY,NX),SNL1(NZ,NY,NX)
+  call check_read(ierr,3,DATAP(NZ,NY,NX),__LINE__,mod_filename)
+
+  read(11,'(A)')tline
+  READ(tline,*,iostat=ierr)(CLASS(N,NZ,NY,NX),N=1,JLI),CFI(NZ,NY,NX),ANGBR(NZ,NY,NX) &
+    ,ANGSH(NZ,NY,NX)
+  call check_read(ierr,JLI+3,DATAP(NZ,NY,NX),__LINE__,mod_filename)
+
+  read(11,'(A)')tline
+  READ(tline,*,iostat=ierr)STMX(NZ,NY,NX),SDMX(NZ,NY,NX),GRMX(NZ,NY,NX) &
+    ,GRDM(NZ,NY,NX),GFILL(NZ,NY,NX),WTSTDI(NZ,NY,NX)
+  call check_read(ierr,6,DATAP(NZ,NY,NX),__LINE__,mod_filename)
+
+  if(lverb)then
+    call morphology_trait_disp(NZ,NY,NX)
+  endif
+!
+!   ROOT CHARACTERISTICS
+!
+!   RRAD1M,RRAD2M=radius of primary,secondary roots
+!   PORT=root porosity
+!   PR=nonstructural C concentration needed for root branching
+!   RSRR,RSRA=radial,axial root resistivity (m2 MPa-1 h-1)
+!   PTSHT=rate constant for equilibrating shoot-root nonstructural C concn
+!   RTFQ=root branching frequency (m-1)
+!
+  read(11,'(A)')tline
+  READ(tline,*,iostat=ierr)RRAD1M(1,NZ,NY,NX),RRAD2M(1,NZ,NY,NX),PORT(1,NZ,NY,NX) &
+    ,PR(NZ,NY,NX),RSRR(1,NZ,NY,NX),RSRA(1,NZ,NY,NX),PTSHT(NZ,NY,NX),RTFQ(NZ,NY,NX)
+  call check_read(ierr,8,DATAP(NZ,NY,NX),__LINE__,mod_filename)
+
+  if(lverb)then
+    call Root_trait_disp(NZ,NY,NX)
+  endif
+!
+!   ROOT UPTAKE PARAMETERS
+!
+!   UPMXZH,UPKMZH,UPMNZH=NH4 max uptake (g m-2 h-1),Km (uM), min concn (uM)
+!   UPMXZO,UPKMZO,UPMNZO=NO3 max uptake (g m-2 h-1),Km (uM), min concn (uM)
+!   UPMXPO,UPKMPO,UPMNPO=H2PO4 max uptake (g m-2 h-1),Km (uM), min concn (uM)
+!
+  read(11,'(A)')tline
+  READ(tline,*,iostat=ierr)UPMXZH(1,NZ,NY,NX),UPKMZH(1,NZ,NY,NX),UPMNZH(1,NZ,NY,NX)
+  call check_read(ierr,3,DATAP(NZ,NY,NX),__LINE__,mod_filename)
+
+  read(11,'(A)')tline
+  READ(tline,*,iostat=ierr)UPMXZO(1,NZ,NY,NX),UPKMZO(1,NZ,NY,NX),UPMNZO(1,NZ,NY,NX)
+  call check_read(ierr,3,DATAP(NZ,NY,NX),__LINE__,mod_filename)
+
+  read(11,'(A)')tline
+  READ(tline,*,iostat=ierr)UPMXPO(1,NZ,NY,NX),UPKMPO(1,NZ,NY,NX),UPMNPO(1,NZ,NY,NX)
+  call check_read(ierr,3,DATAP(NZ,NY,NX),__LINE__,mod_filename)
+
+  if(lverb)then
+    call Root_nutrient_trait_disp(NZ,NY,NX)
+  endif
+!
+!   WATER RELATIONS
+!
+!   OSMO=leaf osmotic potential at zero leaf water potential (MPa)
+!   RCS=shape parameter for stomatal resistance vs leaf turgor potential
+!   RSMX=cuticular resistance (s m-1)
+!
+  read(11,'(A)')tline
+  READ(tline,*,iostat=ierr)OSMO(NZ,NY,NX),RCS(NZ,NY,NX),RSMX(NZ,NY,NX)
+  call check_read(ierr,3,DATAP(NZ,NY,NX),__LINE__,mod_filename)
+
+  if(lverb)then
+    call plant_water_trait_disp(NZ,NY,NX)
+  endif
+!
+!   ORGAN GROWTH YIELDS
+!
+!   DM*=DM-C production vs nonstructural C consumption (g g-1)
+!     *LF=leaf,*SHE=petiole,*STK=stalk,*RSV=stalk reserve,*HSK=husk
+!     *EAR=ear,*GR=grain,*RT=root,*ND=bacteria in root nodule,canopy
+!
+  read(11,'(A)')tline
+  READ(tline,*,iostat=ierr)DMLF(NZ,NY,NX),DMSHE(NZ,NY,NX),DMSTK(NZ,NY,NX) &
+    ,DMRSV(NZ,NY,NX),DMHSK(NZ,NY,NX),DMEAR(NZ,NY,NX) &
+    ,DMGR(NZ,NY,NX),DMRT(NZ,NY,NX),DMND(NZ,NY,NX)
+  call check_read(ierr,9,DATAP(NZ,NY,NX),__LINE__,mod_filename)
+
+!
+!   ORGAN N AND P CONCENTRATIONS
+!
+!   CN*,CP*=N:C,P:C ratios in plant organs
+!
+  read(11,'(A)')tline
+  READ(tline,*,iostat=ierr)CNLF(NZ,NY,NX),CNSHE(NZ,NY,NX),CNSTK(NZ,NY,NX) &
+    ,CNRSV(NZ,NY,NX),CNHSK(NZ,NY,NX),CNEAR(NZ,NY,NX) &
+    ,CNGR(NZ,NY,NX),CNRT(NZ,NY,NX),CNND(NZ,NY,NX)
+  call check_read(ierr,9,DATAP(NZ,NY,NX),__LINE__,mod_filename)
+
+  read(11,'(A)')tline
+  READ(tline,*,iostat=ierr)CPLF(NZ,NY,NX),CPSHE(NZ,NY,NX),CPSTK(NZ,NY,NX) &
+    ,CPRSV(NZ,NY,NX),CPHSK(NZ,NY,NX),CPEAR(NZ,NY,NX) &
+    ,CPGR(NZ,NY,NX),CPRT(NZ,NY,NX),CPND(NZ,NY,NX)
+  call check_read(ierr,9,DATAP(NZ,NY,NX),__LINE__,mod_filename)
+
+  if(lverb)then
+    call plant_biomyield_trait_disp(NZ,NY,NX)
+
+    call plant_biomstoich_trait_disp(NZ,NY,NX)
+
+  endif
+  CLOSE(11)
+  end subroutine ReadPlantTraitsAscii
+
+!------------------------------------------------------------------------------------------
+  subroutine ReadPlantTraitsNC(NZ,NY,NX,VRNLI,VRNXI)
+  use EcoSIMCtrlMod, only : pft_nfid
+  use GrosubPars, only : get_pft_loc
+  use ncdio_pio
+  implicit none
+  integer, intent(in) :: NZ,NY,NX
+  real(r8), intent(out) :: VRNLI,VRNXI
+  integer :: loc,N
+
+  loc=get_pft_loc(DATAP(NZ,NY,NX)(1:6))
+  print*,loc,DATAP(NZ,NY,NX)(1:6)
+  call ncd_getvar(pft_nfid, 'ICTYP', loc, ICTYP(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'IGTYP', loc, IGTYP(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'ISTYP', loc, ISTYP(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'IDTYP', loc, IDTYP(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'INTYP', loc, INTYP(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'IWTYP', loc, IWTYP(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'IPTYP', loc, IPTYP(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'IBTYP', loc, IBTYP(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'IRTYP', loc, IRTYP(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'MY', loc, MY(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'ZTYPI', loc, ZTYPI(NZ,NY,NX))
+
+  call ncd_getvar(pft_nfid, 'VCMX', loc, VCMX(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'VOMX', loc, VOMX(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'VCMX4', loc, VCMX4(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'XKCO2', loc, XKCO2(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'XKO2', loc, XKO2(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'XKCO24', loc, XKCO24(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'RUBP', loc, RUBP(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'PEPC', loc, PEPC(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'ETMX', loc, ETMX(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'CHL', loc, CHL(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'CHL4', loc, CHL4(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'FCO2', loc, FCO2(NZ,NY,NX))
+
+  call ncd_getvar(pft_nfid, 'ALBR', loc, ALBR(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'ALBP', loc, ALBP(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'TAUR', loc, TAUR(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'TAUP', loc, TAUP(NZ,NY,NX))
+
+  call ncd_getvar(pft_nfid, 'XRNI', loc, XRNI(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'XRLA', loc, XRLA(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'CTC', loc, CTC(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'VRNLI', loc,VRNLI)
+  call ncd_getvar(pft_nfid, 'VRNXI', loc,VRNXI)
+  call ncd_getvar(pft_nfid, 'WDLF', loc,WDLF(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'PB', loc,PB(NZ,NY,NX))
+
+  call ncd_getvar(pft_nfid, 'GROUPX', loc,GROUPX(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'XTLI', loc,XTLI(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'XDL', loc,XDL(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'XPPD', loc,XPPD(NZ,NY,NX))
+
+  call ncd_getvar(pft_nfid, 'SLA1', loc,SLA1(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'SSL1', loc,SSL1(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'SNL1', loc,SNL1(NZ,NY,NX))
+
+
+  call ncd_getvar(pft_nfid, 'CLASS', loc,CLASS(1:JLI,NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'CFI', loc,CFI(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'ANGBR', loc,ANGBR(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'ANGSH', loc,ANGSH(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'STMX', loc,STMX(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'SDMX', loc,SDMX(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'GRMX', loc,GRMX(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'GRDM', loc,GRDM(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'GFILL', loc,GFILL(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'WTSTDI', loc,WTSTDI(NZ,NY,NX))
+
+  call ncd_getvar(pft_nfid, 'RRAD1M', loc,RRAD1M(1,NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'RRAD2M', loc,RRAD2M(1,NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'PORT', loc,PORT(1,NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'PR', loc,PR(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'RSRR', loc,RSRR(1,NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'RSRA', loc,RSRA(1,NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'PTSHT', loc,PTSHT(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'RTFQ', loc,RTFQ(NZ,NY,NX))
+
+  call ncd_getvar(pft_nfid, 'UPMXZH', loc,UPMXZH(1,NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'UPKMZH', loc,UPKMZH(1,NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'UPMNZH', loc,UPMNZH(1,NZ,NY,NX))
+
+  call ncd_getvar(pft_nfid, 'UPMXZO', loc,UPMXZO(1,NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'UPKMZO', loc,UPKMZO(1,NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'UPMNZO', loc,UPMNZO(1,NZ,NY,NX))
+
+  call ncd_getvar(pft_nfid, 'UPMXPO', loc,UPMXPO(1,NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'UPKMPO', loc,UPKMPO(1,NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'UPMNPO', loc,UPMNPO(1,NZ,NY,NX))
+
+  call ncd_getvar(pft_nfid, 'OSMO', loc,OSMO(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'RCS', loc,RCS(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'RSMX', loc,RSMX(NZ,NY,NX))
+
+  call ncd_getvar(pft_nfid, 'DMLF', loc,DMLF(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'DMSHE', loc,DMSHE(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'DMSTK', loc,DMSTK(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'DMRSV', loc,DMRSV(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'DMHSK', loc,DMHSK(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'DMEAR', loc,DMEAR(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'DMGR', loc,DMGR(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'DMRT', loc,DMRT(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'DMND', loc,DMND(NZ,NY,NX))
+
+  call ncd_getvar(pft_nfid, 'CNLF', loc,CNLF(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'CNSHE', loc,CNSHE(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'CNSTK', loc,CNSTK(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'CNRSV', loc,CNRSV(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'CNHSK', loc,CNHSK(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'CNEAR', loc,CNEAR(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'CNGR', loc,CNGR(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'CNRT', loc,CNRT(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'CNND', loc,CNND(NZ,NY,NX))
+
+  call ncd_getvar(pft_nfid, 'CPLF', loc,CPLF(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'CPSHE', loc,CPSHE(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'CPSTK', loc,CPSTK(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'CPRSV', loc,CPRSV(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'CPHSK', loc,CPHSK(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'CPEAR', loc,CPEAR(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'CPGR', loc,CPGR(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'CPRT', loc,CPRT(NZ,NY,NX))
+  call ncd_getvar(pft_nfid, 'CPND', loc,CPND(NZ,NY,NX))
+
+  if(lverb)then
+    call pft_display(NZ,NY,NX)
+    call photosyns_trait_disp(NZ,NY,NX)
+    call plant_optic_trait_disp(NZ,NY,NX)
+    call Phenology_trait_disp(NZ,NY,NX,VRNLI,VRNXI)
+    call morphology_trait_disp(NZ,NY,NX)
+    call Root_trait_disp(NZ,NY,NX)
+    call Root_nutrient_trait_disp(NZ,NY,NX)
+    call plant_water_trait_disp(NZ,NY,NX)
+    call plant_biomyield_trait_disp(NZ,NY,NX)
+    call plant_biomstoich_trait_disp(NZ,NY,NX)
+  endif
+
+  end subroutine ReadPlantTraitsNC
+
+!------------------------------------------------------------------------------------------
+  subroutine plant_water_trait_disp(NZ,NY,NX)
+  implicit none
+  integer, intent(in) :: NZ,NY,NX
+
+  write(*,*)'WATER RELATIONS'
+  write(*,*)'leaf osmotic potential at zero leaf water '// &
+     'potential (MPa): OSMO',OSMO(NZ,NY,NX)
+  write(*,*)'shape parameter for stomatal resistance vs '// &
+     'leaf turgor potential: RCS',RCS(NZ,NY,NX)
+  write(*,*)'cuticular resistance (s m-1): RSMX',RSMX(NZ,NY,NX)
+  end subroutine plant_water_trait_disp
+
+!------------------------------------------------------------------------------------------
+  subroutine plant_biomyield_trait_disp(NZ,NY,NX)
+  implicit none
+  integer, intent(in) :: NZ,NY,NX
+
+
+  write(*,*)'ORGAN GROWTH YIELDS'
+  write(*,*)'leaf dry matter C production vs '// &
+    'nonstructural C consumption (g g-1): DMLF',DMLF(NZ,NY,NX)
+  write(*,*)'petiole dry matter C production vs '// &
+    'nonstructural C consumption (g g-1): DMSHE',DMSHE(NZ,NY,NX)
+  write(*,*)'stalk dry matter C production vs '// &
+    'nonstructural C consumption (g g-1): DMSTK',DMSTK(NZ,NY,NX)
+  write(*,*)'stalk reserve C production vs '// &
+    'nonstructural C consumption (g g-1): DMRSV',DMRSV(NZ,NY,NX)
+  write(*,*)'husk dry matter C production vs '// &
+    'nonstructural Cconsumption (g g-1): DMHSK',DMHSK(NZ,NY,NX)
+  write(*,*)'ear dry matter C production vs '// &
+    'nonstructural Cconsumption (g g-1): DMEAR',DMEAR(NZ,NY,NX)
+  write(*,*)'grain C production vs nonstructural C'// &
+    ' consumption (g g-1): DMGR',DMGR(NZ,NY,NX)
+  write(*,*)'root dry matter C production vs nonstructural C'// &
+    ' consumption (g g-1): DMRT',DMRT(NZ,NY,NX)
+  write(*,*)'nodule bacteria in root nodule,canopy dry matter'// &
+    'C production vs nonstructural C consumption (g g-1): DMND' &
+    ,DMND(NZ,NY,NX)
+  end subroutine plant_biomyield_trait_disp
+
+!------------------------------------------------------------------------------------------
+  subroutine plant_biomstoich_trait_disp(NZ,NY,NX)
+  implicit none
+  integer, intent(in) :: NZ,NY,NX
+
+  write(*,*)'ORGAN N AND P CONCENTRATIONS'
+  write(*,*)'NC ratio in plant leaves: CNLF',CNLF(NZ,NY,NX)
+  write(*,*)'NC ratio in plant petiole: CNSHE',CNSHE(NZ,NY,NX)
+  write(*,*)'NC ratio in plant stalk: CNSTK',CNSTK(NZ,NY,NX)
+  write(*,*)'NC ratio in plant stalk reserve: CNRSV',CNRSV(NZ,NY,NX)
+  write(*,*)'NC ratio in plant husk: CNHSK',CNHSK(NZ,NY,NX)
+  write(*,*)'NC ratio in plant ear: CNEAR',CNEAR(NZ,NY,NX)
+  write(*,*)'NC ratio in plant grain: CNGR',CNGR(NZ,NY,NX)
+  write(*,*)'NC ratio in plant root: CNRT',CNRT(NZ,NY,NX)
+  write(*,*)'NC ratio in plant nodule: CNND',CNND(NZ,NY,NX)
+  write(*,*)'PC ratio in plant leaves: CPLF',CPLF(NZ,NY,NX)
+  write(*,*)'PC ratio in plant petiole: CPSHE',CPSHE(NZ,NY,NX)
+  write(*,*)'PC ratio in plant stalk: CPSTK',CPSTK(NZ,NY,NX)
+  write(*,*)'PC ratio in plant stalk reserve: CPRSV',CPRSV(NZ,NY,NX)
+  write(*,*)'PC ratio in plant husk: CPHSK',CPHSK(NZ,NY,NX)
+  write(*,*)'PC ratio in plant ear: CPEAR',CPEAR(NZ,NY,NX)
+  write(*,*)'PC ratio in plant grain: CPGR',CPGR(NZ,NY,NX)
+  write(*,*)'PC ratio in plant root: CPRT',CPRT(NZ,NY,NX)
+  write(*,*)'PC ratio in plant nodule: CPND',CPND(NZ,NY,NX)
+  end subroutine plant_biomstoich_trait_disp
+
+
+!------------------------------------------------------------------------------------------
+
+  subroutine plant_optic_trait_disp(NZ,NY,NX)
+  implicit none
+  integer, intent(in) :: NZ,NY,NX
+
+  write(*,*)'OPTICAL PROPERTIES'
+  write(*,*)'leaf SW albedo: ALBR',ALBR(NZ,NY,NX)
+  write(*,*)'leaf PAR albedo: ALBP',ALBP(NZ,NY,NX)
+  write(*,*)'leaf SW transmission: TAUR',TAUR(NZ,NY,NX)
+  write(*,*)'leaf PAR transmission: TAUP',TAUP(NZ,NY,NX)
+  end subroutine plant_optic_trait_disp
 
 end module readqmod

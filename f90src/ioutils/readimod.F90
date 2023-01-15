@@ -197,8 +197,8 @@ module readiMod
     write(*,*)(DVI(NY),NY=1,NVS)
     write(*,'(100A)')('=',ll=1,100)
   endif
-  DO 9895 NX=NHW,NHE
-    DO 9890 NY=NVN,NVS
+  D9895: DO NX=NHW,NHE
+    D9890: DO NY=NVN,NVS
       ALAT(NY,NX)=ALATG
       ALTI(NY,NX)=ALTIG
       ATCAI(NY,NX)=ATCAG
@@ -243,8 +243,8 @@ module readiMod
       ENDIF
       DYLM(NY,NX)=GetDayLength(ALAT(NY,NX),XI)
 
-9890  CONTINUE
-9895  CONTINUE
+    ENDDO D9890
+  ENDDO D9895
 !
 ! READ TOPOGRAPHY DATA AND SOIL FILE NAME FOR EACH GRID CELL
 !

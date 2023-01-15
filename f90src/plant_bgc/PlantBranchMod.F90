@@ -2331,8 +2331,7 @@ module PlantBranchMod
     IF(IDAY(7,NB,NZ).NE.0.AND.IDAY(9,NB,NZ).EQ.0)THEN
       GRMXB=GRMX(NZ)
       GRWTB(NB,NZ)=AMIN1(GRMX(NZ),GRWTB(NB,NZ) &
-        +GRMXB*AMAX1(0.50,SET**0.25)*DGSTGF(NB,NZ))
-
+        +GRMXB*AMAX1(0.50_r8,SET**0.25_r8)*DGSTGF(NB,NZ))
     ENDIF
   ENDIF
 !
@@ -2355,8 +2354,7 @@ module PlantBranchMod
     ELSEIF(IRTYP(NZ).EQ.0)THEN
       GROLM=AZMAX1(GFILL(NZ)*GRNOB(NB,NZ)*SQRT(TFN3(NZ)))
     ELSE
-      GROLM=AZMAX1(GFILL(NZ)*GRNOB(NB,NZ) &
-        *SQRT(TFN4(NG(NZ),NZ)))
+      GROLM=AZMAX1(GFILL(NZ)*GRNOB(NB,NZ)*SQRT(TFN4(NG(NZ),NZ)))
     ENDIF
 !
 !     GRAIN FILL RATE MAY BE CONSTRAINED BY HIGH GRAIN C:N OR C:P
@@ -3316,7 +3314,7 @@ module PlantBranchMod
 ! CNLFX,CPLFX=diff between min and max leaf N,P prodn vs nonstruct C consumption
 ! CNPG=N,P constraint on growth respiration
 !
-  IF(RCO2Y.GT.0.0.AND.(CNSHX.GT.0.0.OR.CNLFX.GT.0.0))THEN
+  IF(RCO2Y.GT.0.0_r8.AND.(CNSHX.GT.0.0_r8.OR.CNLFX.GT.0.0_r8))THEN
     ZPOOLB=AZMAX1(EPOOL(NB,ielmn,NZ))
     PPOOLB=AZMAX1(EPOOL(NB,ielmp,NZ))
     RCO2G=AMIN1(RCO2Y,ZPOOLB*DMSHD/(CNSHX+CNLFM+CNLFX*CNPG) &
@@ -3496,7 +3494,7 @@ module PlantBranchMod
     ELSE
       RCO2GM=0._r8
     ENDIF
-    IF(RCO2Y.GT.0.0)THEN
+    IF(RCO2Y.GT.0.0_r8)THEN
       RCO2G=AMIN1(RCO2Y,FNP*WFR(1,NG(NZ),NZ))
     ELSE
       RCO2G=0._r8

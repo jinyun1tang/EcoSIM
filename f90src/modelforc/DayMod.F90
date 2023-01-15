@@ -61,7 +61,7 @@
 !
   N=0
   NN=0
-  DO 500 M=1,12
+  D500: DO M=1,12
     N=30*M+ICOR(M)
 
 !  leap year February.
@@ -78,8 +78,7 @@
         exit
       ENDIF
       NN=N
-500 CONTINUE
-!     501
+  ENDDO D500
 
   call TillageandIrrigationEvents(I, NHW, NHE, NVN, NVS)
   RETURN
@@ -95,8 +94,8 @@
 
 !  real(r8) :: AZI
 !  REAL(R8) :: DEC
-  DO 955 NX=NHW,NHE
-    DO 950 NY=NVN,NVS
+  D955: DO NX=NHW,NHE
+    D950: DO NY=NVN,NVS
       TRAD(NY,NX)=0._r8
       TAMX(NY,NX)=-100.0
       TAMN(NY,NX)=100.0
@@ -274,7 +273,7 @@
 !     TDPRC,TDIRRI=change in precipitation,irrigation
 !     TDCO2,TDCN4,TDCNO=change in atm CO2,NH4,NO3 concn in precipitation
 !
-      DO 600 N=1,12
+      D600: DO N=1,12
 !
 !     STEP CHANGES
 !
@@ -304,9 +303,9 @@
           TDCN4(NY,NX,N)=TDCN4(NY,NX,N)+(DCN4R(N)-1.0)/LYRC
           TDCNO(NY,NX,N)=TDCNO(NY,NX,N)+(DCNOR(N)-1.0)/LYRC
         ENDIF
-600   CONTINUE
-950 CONTINUE
-955   CONTINUE
+      ENDDO D600
+    ENDDO D950
+  ENDDO D955
 
   END subroutine WriteDailyAccumulators
 !-----------------------------------------------------------------------------------------
@@ -316,8 +315,8 @@
 
   integer, intent(in) :: I, NHW, NHE, NVN, NVS
 
-  DO 9995 NX=NHW,NHE
-    DO 9990 NY=NVN,NVS
+  D9995: DO NX=NHW,NHE
+    D9990: DO NY=NVN,NVS
 !
 !     ATTRIBUTE MIXING COEFFICIENTS AND SURFACE ROUGHNESS PARAMETERS
 !     TO TILLAGE EVENTS FROM SOIL MANAGEMENT FILE IN 'READS'
@@ -358,7 +357,7 @@
           TVW=0._r8
           DIRRA1=DIRRA(1,NY,NX)+CDPTH(NU(NY,NX)-1,NY,NX)
           DIRRA2=DIRRA(2,NY,NX)+CDPTH(NU(NY,NX)-1,NY,NX)
-          DO 165 L=NU(NY,NX),NL(NY,NX)
+          D165: DO L=NU(NY,NX),NL(NY,NX)
             IF(CDPTH(L-1,NY,NX).LT.DIRRA1)THEN
               FW=AMIN1(1.0,(DIRRA1-CDPTH(L-1,NY,NX))/(CDPTH(L,NY,NX)-CDPTH(L-1,NY,NX)))
               FZ=AMIN1(POROS(L,NY,NX),WP(L,NY,NX)+CIRRA(NY,NX)*(FC(L,NY,NX)-WP(L,NY,NX)))
@@ -366,14 +365,14 @@
               TWP=TWP+FW*WP(L,NY,NX)*VOLX(L,NY,NX)
               TVW=TVW+FW*(VOLW(L,NY,NX)+VOLI(L,NY,NX))
             ENDIF
-165       CONTINUE
+          ENDDO D165
           IF((IFLGV(NY,NX).EQ.0.AND.TVW.LT.TWP+FIRRA(NY,NX)*(TFZ-TWP)) &
             .OR.(IFLGV(NY,NX).EQ.1.AND.PSILZ(1,NY,NX).LT.FIRRA(NY,NX)))THEN
             RR=AZMAX1(TFZ-TVW)
             IF(RR.GT.0.0)THEN
-              DO 170 J=IIRRA(3,NY,NX),IIRRA(4,NY,NX)
+              D170: DO J=IIRRA(3,NY,NX),IIRRA(4,NY,NX)
                 RRIG(J,I,NY,NX)=RR/(IIRRA(4,NY,NX)-IIRRA(3,NY,NX)+1)
-170           CONTINUE
+              ENDDO D170
               WDPTH(I,NY,NX)=DIRRA(2,NY,NX)
               WRITE(*,2222)'auto',IYRC,I,IIRRA(3,NY,NX),IIRRA(4,NY,NX) &
                 ,IFLGV(NY,NX),RR,TFZ,TVW,TWP,FIRRA(NY,NX),PSILZ(1,NY,NX) &
@@ -384,7 +383,7 @@
           ENDIF
         ENDIF
       ENDIF
-9990  CONTINUE
-9995  CONTINUE
+    ENDDO D9990
+  ENDDO D9995
   end subroutine TillageandIrrigationEvents
 END module DayMod

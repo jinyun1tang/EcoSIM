@@ -120,6 +120,7 @@ module WthrMod
       !     DYLN=daylength
 !
       IF(IETYP(NY,NX).NE.-2)THEN
+!       not phytotron
         IF(DYLN(NY,NX).GT.ZERO)THEN
           RADN(NY,NX)=AZMAX1(RMAX*SIN((J-(ZNOON(NY,NX) &
             -DYLN(NY,NX)/2.0_r8))*PICON/DYLN(NY,NX)))
@@ -127,6 +128,7 @@ module WthrMod
           RADN(NY,NX)=0.0_r8
         ENDIF
       ELSE
+!       phytotron
         RADN(NY,NX)=RMAX/24.0_r8
       ENDIF
       !
@@ -211,10 +213,11 @@ module WthrMod
 !
       RADN(NY,NX)=SRADH(J,I)
       TCA(NY,NX)=TMPH(J,I)
+
       TKA(NY,NX)=TCA(NY,NX)+TC2K
-      vps(ny,nx)=vapsat0(tka(ny,nx))*EXP(-ALTI(NY,NX)/7272.0_r8)
+      VPS(NY,NX)=vapsat0(TKA(ny,nx))*EXP(-ALTI(NY,NX)/7272.0_r8)
       VPK(NY,NX)=AMIN1(DWPTH(J,I),VPS(NY,NX))
-      UA(NY,NX)=AMAX1(3600.0,WINDH(J,I))
+      UA(NY,NX)=AMAX1(3600.0_r8,WINDH(J,I))
       IF(TCA(NY,NX).GT.TSNOW)THEN
         PRECRI(NY,NX)=RAINH(J,I)
         PRECWI(NY,NX)=0.0_r8
@@ -251,7 +254,8 @@ module WthrMod
 !     SSIN,SSINN=sine solar angle of current,next hour
 !     RADX=solar constant at horizontal surface
 !     RADN=SW radiation at horizontal surface
-!
+!     radian per degree 1.7453E-02_r8
+!     IETYP: koppen climate zone
       IF(IETYP(NY,NX).GE.-1)THEN
         AZI=SIN(ALAT(NY,NX)*1.7453E-02_r8)*SIN(DECLIN*1.7453E-02_r8)
         DEC=COS(ALAT(NY,NX)*1.7453E-02_r8)*COS(DECLIN*1.7453E-02_r8)
@@ -311,7 +315,7 @@ module WthrMod
       !     THSX=longwave radiation from weather file or calculated from
       !     atmospheric properties
 !
-      IF(XRADH(J,I).GT.0.0)THEN
+      IF(XRADH(J,I).GT.0.0_r8)THEN
         !     THSX(NY,NX)=EMM*(2.04E-10*TKA(NY,NX)**4)
         !     THSX(NY,NX)=THSX(NY,NX)+XRADH(J,I)
         THSX(NY,NX)=XRADH(J,I)
@@ -493,7 +497,7 @@ module WthrMod
       CN4R(NY,NX)=CN4RI(NY,NX)*TDCN4(NY,NX,N)
       CNOR(NY,NX)=CNORI(NY,NX)*TDCNO(NY,NX,N)
     ENDDO D9920
-  ENDDO D9925  
+  ENDDO D9925
   end subroutine ApplyClimateCorrection
 !------------------------------------------------------------------------------------------
 

@@ -21,6 +21,8 @@ module EcoSIMDesctruct
   use PlantTraitDataType  , only : DestructPlantTraits
   use LandSurfDataType    , only : DestructLandSurfData
   use EcoSIMCtrlDataType  , only : DestructEcoSIMCtrlData
+  use EcoSIMCtrlMod       , only : pft_nfid
+  use ncdio_pio           , only : ncd_pio_closefile
   use EcosimBGCFluxType   , only : DestructEcosimBGCFluxData
   use EcoSIMHistMod       , only : DestructEcoSIMHistData
   use CanopyDataType      , only : DestructCanopyData
@@ -109,6 +111,8 @@ module EcoSIMDesctruct
   call DestructWatSubData
 
   call DestructEcoSimSum
+
+  call ncd_pio_closefile(pft_nfid)
   end subroutine DestructEcoSIM
 
 end module EcoSIMDesctruct

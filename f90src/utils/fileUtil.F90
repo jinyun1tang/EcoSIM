@@ -7,6 +7,7 @@ module fileUtil
   public :: open_safe
   public :: check_read
   public :: remove_filename_extension
+  public :: file_exists
   integer, parameter :: ecosim_filename_length=128
   integer, parameter :: stdout=6
   integer, parameter :: iulog=6
@@ -17,6 +18,18 @@ module fileUtil
   integer , public, parameter :: ecosim_namelist_buffer_size = 4096
   logical, save :: continue_run = .false.
   contains
+
+  function file_exists(filename) result(res)
+!
+!! DESCRIPTION
+! check existence of a file
+  implicit none
+  character(len=*),intent(in) :: filename
+  logical                     :: res
+
+  ! Check if the file exists
+  inquire( file=trim(filename), exist=res )
+  end function
 
   subroutine open_safe(lun,prefix,fname,status,location,lineno,lverb)
 

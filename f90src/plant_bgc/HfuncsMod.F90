@@ -891,10 +891,10 @@ module HfuncsMod
 !     VSTGX=node number on date of floral initiation
 !
       IF(IPTYP(NZ).EQ.0)THEN
-        PPD=0.0
+        PPD=0.0_r8
       ELSE
         PPD=AZMAX1(XDL(NZ)-DYLN)
-        IF(IPTYP(NZ).EQ.1.AND.DYLN.GE.DYLX)PPD=0.0
+        IF(IPTYP(NZ).EQ.1.AND.DYLN.GE.DYLX)PPD=0.0_r8
       ENDIF
 
       IF(IPTYP(NZ).EQ.0 &

@@ -86,6 +86,8 @@ module ncdio_pio
     module procedure ncd_getvar_real_sp_all_2d
     module procedure ncd_getvar_real_sp_all_3d
     module procedure ncd_getvar_real_sp_all_4d
+
+    module procedure ncd_getvar_str_1d
   end interface ncd_getvar
 
   interface get_dim_len
@@ -945,6 +947,24 @@ module ncdio_pio
   end subroutine ncd_getvar_real_sp
 !----------------------------------------------------------------------
 
+  subroutine ncd_getvar_str_1d(ncid, varname, data)
+  implicit none
+  class(file_desc_t), intent(in) :: ncid
+  character(len=*),intent(in) :: varname
+  character(len=*), intent(inout) :: data(:)
+
+  integer :: varid
+  logical :: readvar
+  type(Var_desc_t)  :: vardesc
+
+  call check_var(ncid, trim(varname), vardesc, readvar)
+
+  call check_ret(nf90_get_var(ncid%fh, vardesc%varid, data), &
+    'ncd_getvar_str_1d')
+
+  end subroutine ncd_getvar_str_1d
+!----------------------------------------------------------------------
+
   subroutine ncd_getvar_real_sp_scalar(ncid, varname,  data)
   !
   !DESCRIPTION
@@ -1139,7 +1159,6 @@ module ncdio_pio
    call check_ret(nf90_inquire_dimension (ncid%fh, dimid, name,  &
         dimlen), 'check_dim')
 
-
    end function get_dim_len_idn
 
 !-----------------------------------------------------------------------
@@ -1155,8 +1174,7 @@ module ncdio_pio
    integer :: ncid_local, ans
    type(file_desc_t) :: ncid
 
-   call check_ret(nf90_open(fname,      &
-     NF90_NOWRITE, ncid_local),'open file '//trim(fname))
+   call check_ret(nf90_open(fname, NF90_NOWRITE, ncid_local),'open file '//trim(fname))
    ncid%fh=ncid_local
    ans = get_dim_len_idn(ncid,trim(dim_name))
 
@@ -1484,10 +1502,8 @@ module ncdio_pio
     ier = nf90_inq_dimid (ncid%fh, 'lsmlon', dimid)
     if (ier == nf90_noerr) ier = nf90_inquire_dimension(ncid%fh, dimid, len=ni)
 
-
     ier = nf90_inq_dimid (ncid%fh, 'lsmlat', dimid)
     if (ier == nf90_noerr) ier = nf90_inquire_dimension(ncid%fh, dimid, len=nj)
-
 
     ier = nf90_inq_dimid (ncid%fh, 'ni', dimid)
     if (ier == nf90_noerr) ier = nf90_inquire_dimension(ncid%fh, dimid, len=ni)
@@ -1500,7 +1516,6 @@ module ncdio_pio
       ier = nf90_inquire_dimension(ncid%fh, dimid, len=ni)
       if(ier == nf90_noerr) nj = 1
     endif
-
 
     if (ni == 0 .or. nj == 0) then
        write(iulog,*) trim(subname),' ERROR: ni,nj = ',ni,nj,' cannot be zero '

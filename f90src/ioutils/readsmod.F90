@@ -129,10 +129,10 @@ module readsmod
     write(*,*)'read chkpt file?: DATA1(20) ',DATA1(20)
   endif
   is_restart_run=(data1(20)=='YES')
-  DO 25 N=1,4
+  D25: DO N=1,4
     READ(4,*)DRAD(N),DTMPX(N),DTMPN(N),DHUM(N),DPREC(N) &
       ,DIRRI(N),DWIND(N),DCO2E(N),DCN4R(N),DCNOR(N)
-25    CONTINUE
+  ENDDO D25
   if(lverb)then
     write(*,*)'annual changes in radiation: DRAD(1:4)',DRAD(1:4)
     write(*,*)'annual changes in max temperature: DTMPX(1:4)',DTMPX(1:4)
@@ -145,7 +145,7 @@ module readsmod
     write(*,*)'annual changes in atm NH4 conc: DCN4R(1:4)',DCN4R(1:4)
     write(*,*)'annual changes in atm NO3 conc: DCNOR(1:4)',DCNOR(1:4)
   endif
-  DO 26 N=5,12
+  D26: DO N=5,12
     DRAD(N)=DRAD(N-1)
     DTMPX(N)=DTMPX(N-1)
     DTMPN(N)=DTMPN(N-1)
@@ -156,7 +156,7 @@ module readsmod
     DCO2E(N)=DCO2E(N-1)
     DCN4R(N)=DCN4R(N-1)
     DCNOR(N)=DCNOR(N-1)
-26  CONTINUE
+  ENDDO D26
   READ(4,*)NPX,NPY,JOUT,IOUT,KOUT,ICLM
   if(lverb)then
     write(*,*)'number of cycles per hour for water, heat, and '// &
@@ -247,7 +247,7 @@ module readsmod
   LPY=0
   LYRC=365   ! # days for current year
   LYRX=365   ! # days for last year
-  DO 575 N=1,7,3
+  D575: DO N=1,7,3
     IF(isLeap(IDATA(N+2)))then
       IF(IDATA(N+1).GT.2)LPY=1
       IF(N.EQ.1)LYRC=366
@@ -265,7 +265,7 @@ module readsmod
     IF(isLeap(IDATA(N+2)-1))then
       IF(N.EQ.1)LYRX=366
     endif
-575 CONTINUE
+  ENDDO D575
 
   IF(is_first_year)THEN
     IF(.NOT.is_restart_run)IRUN=ISTART
@@ -303,6 +303,7 @@ module readsmod
     Z0G=datav(1)
     IFLGW=int(datav(2))
     ZNOONG=datav(3)
+!  fourth in the weather file
     READ(3,*)PHRG,CN4RIG,CNORIG,CPORG,CALRG,CFERG,CCARG,CMGRG,CNARG &
       ,CKARG,CSORG,CCLRG
     if(lverb)then
@@ -332,9 +333,9 @@ module readsmod
       write(*,*)'Cl conc in precip: CCLRG ',CCLRG
       write(*,*)'weather data are in the format time,weather variable'
     endif
-    DO 55 K=1,NN
-      DATK(K)=0.0
-55  CONTINUE
+    D55: DO K=1,NN
+      DATK(K)=0.0_r8
+    ENDDO D55
     IH=1
 ! the file reading loop
     DO while(.TRUE.)
@@ -376,6 +377,7 @@ module readsmod
 !
     IF(I.EQ.365)THEN
       IF(TTYPE.EQ.'D')THEN
+! daily
         TMPX(I+1)=TMPX(I)
         TMPN(I+1)=TMPN(I)
         SRAD(I+1)=SRAD(I)
@@ -384,36 +386,36 @@ module readsmod
         DWPT(2,I+1)=DWPT(2,I)
         RAIN(I+1)=RAIN(I)
       ELSE
-        DO 130 J=1,24
+        D130: DO J=1,24
           TMPH(J,I+1)=TMPH(J,I)
           SRADH(J,I+1)=SRADH(J,I)
           WINDH(J,I+1)=WINDH(J,I)
           DWPTH(J,I+1)=DWPTH(J,I)
           RAINH(J,I+1)=RAINH(J,I)
           XRADH(J,I+1)=XRADH(J,I)
-130     CONTINUE
+        ENDDO D130
       ENDIF
       IX=I+1
     ENDIF
 
   ELSE
     IFLGW=1
-    Z0G=2.0
-    ZNOONG=12.0
-    PHRG=7.0
-    CN4RIG=0.0
-    CNORIG=0.0
+    Z0G=2.0_r8
+    ZNOONG=12.0_r8
+    PHRG=7.0_r8
+    CN4RIG=0.0_r8
+    CNORIG=0.0_r8
     CN4RG=CN4RIG
     CNORG=CNORIG
-    CPORG=0.0
-    CALRG=0.0
-    CFERG=0.0
-    CCARG=0.0
-    CMGRG=0.0
-    CNARG=0.0
-    CKARG=0.0
-    CSORG=0.0
-    CCLRG=0.0
+    CPORG=0.0_r8
+    CALRG=0.0_r8
+    CFERG=0.0_r8
+    CCARG=0.0_r8
+    CMGRG=0.0_r8
+    CNARG=0.0_r8
+    CKARG=0.0_r8
+    CSORG=0.0_r8
+    CCLRG=0.0_r8
     IX=365
   ENDIF
 !
@@ -432,9 +434,10 @@ module readsmod
   CKARG=CKARG/39.1_r8
   CSORG=CSORG/32.0_r8
   CCLRG=CCLRG/35.5_r8
-  DO 8970 NX=NHW,NHE
-    DO 8975 NY=NVN,NVS
-      Z0(NY,NX)=Z0G
+
+  D8970: DO NX=NHW,NHE
+    D8975: DO NY=NVN,NVS
+      Z0(NY,NX)=Z0G         !windspeed meast height
       ZNOON(NY,NX)=ZNOONG
       PHR(NY,NX)=PHRG
       CN4RI(NY,NX)=CN4RIG
@@ -450,8 +453,8 @@ module readsmod
       CKAR(NY,NX)=CKARG
       CSOR(NY,NX)=CSORG
       CCLR(NY,NX)=CCLRG
-8975  CONTINUE
-8970  CONTINUE
+    ENDDO D8975
+  ENDDO D8970
 !
 ! DERIVE END DATES FROM TIME VARIABLES
 !
@@ -476,28 +479,28 @@ module readsmod
 !
 !     READ LAND MANAGEMENT FILE NAMES FOR EACH GRID CELL
 !
-  DO 9980 NX=NHW,NHE
-    DO 9985 NY=NVN,NVS
+  D9980: DO NX=NHW,NHE
+    D9985: DO NY=NVN,NVS
       ROWN(NY,NX)=0.0
       ROWO(NY,NX)=0.0
       ROWP(NY,NX)=0.0
-      DO 325 I=1,366
+      D325: DO I=1,366
         ITILL(I,NY,NX)=0
         DCORP(I,NY,NX)=0.0
-325   CONTINUE
-      DO 40 I=1,366
-        DO 45 N=1,20
+      ENDDO D325
+      D40: DO I=1,366
+        D45: DO N=1,20
           FERT(N,I,NY,NX)=0.0
-45      CONTINUE
-        DO 35 N=0,2
+        ENDDO D45
+        D35: DO N=0,2
           IYTYP(N,I,NY,NX)=0
-35      CONTINUE
+        ENDDO D35
         FDPTH(I,NY,NX)=0.0
-40    CONTINUE
-      DO 125 I=1,366
-        DO 120 J=1,24
+      ENDDO D40
+      D125: DO I=1,366
+        D120: DO J=1,24
           RRIG(J,I,NY,NX)=0.0_r8
-120     CONTINUE
+        ENDDO D120
         PHQ(I,NY,NX)=7.0_r8
         CN4Q(I,NY,NX)=0.0_r8
         CNOQ(I,NY,NX)=0.0_r8
@@ -512,9 +515,9 @@ module readsmod
         CCLQ(I,NY,NX)=0.0_r8
         WDPTH(I,NY,NX)=0.0_r8
         ROWI(I,NY,NX)=0.0_r8
-125   CONTINUE
-9985  CONTINUE
-9980  CONTINUE
+      ENDDO D125
+    ENDDO D9985
+  ENDDO D9980
 !
 ! READ LAND MANAGEMENT FILE DATAC(9 LOADED IN 'MAIN'.
 ! THIS FILE CONTAINS NAMES OF TILLAGE, IRRIGATION
@@ -567,7 +570,7 @@ module readsmod
     WINDH(J-1,I)=0.333*WINDH(JJ,II)+0.667*WINDH(J,I)
     DWPTH(J-2,I)=0.667*DWPTH(JJ,II)+0.333*DWPTH(J,I)
     DWPTH(J-1,I)=0.333*DWPTH(JJ,II)+0.667*DWPTH(J,I)
-    RAINH(J,I)=RAINH(J,I)/3.0
+    RAINH(J,I)=RAINH(J,I)/3.0_r8
     RAINH(J-2,I)=RAINH(J,I)
     RAINH(J-1,I)=RAINH(J,I)
     XRADH(J-2,I)=0.667*XRADH(JJ,II)+0.333*XRADH(J,I)
@@ -598,22 +601,21 @@ module readsmod
   go60=.false.
 
   IWTHR(L)=2
-  DO 190 K=1,NI
-!      write(*,'(A,A,A,X,I4)')'IVAR=',IVAR(K),' IDAT=',IDAT(K)
+  D190: DO K=1,NI
     IF(IVAR(K).EQ.'M')THEN
-!    month
+     !  month
       M=IDAT(K)
     ELSEIF(IVAR(K).EQ.'D')THEN
-! julian day
+     ! julian day
       N=IDAT(K)
     ELSEIF(IVAR(K).EQ.'H')THEN
-! hour
+     ! hour
       J=IDAT(K)
     ENDIF
     IF(IVAR(K).EQ.'Y')THEN
       IFLGY=1
     ENDIF
-190  CONTINUE
+  ENDDO D190
 
 !  write(*,'(4(A,X,I4))')'IFLGY=',IFLGY,' IYRX=',IYRX,&
 !    ' IYRC=',IYRC,' J=',J
@@ -633,18 +635,16 @@ module readsmod
      ENDIF
    ENDIF
 
-!  write(*,'(A,X,I4)')'J=',J
    IF(J.GT.24.AND.(J/100)*100.NE.J)THEN
-     DO 80 K=1,NN
+     D80: DO K=1,NN
        DATK(K)=DATK(K)+DAT(K)
-80   CONTINUE
+     ENDDO D80
      IH=IH+1
      go60=.true.
      return
    ENDIF
 
    IF(J.GT.24)J=INT(J/100)
-!      write(*,'(2(A,X,I4))')'J=',J,' I=',I
      IF(J.EQ.0)THEN
        J=24
        I=I-1
@@ -662,7 +662,6 @@ module readsmod
         IFLG3=1
       ENDIF
 
-!      write(*,'(3(A,X,I4))')'L=',L,' I=',I,' ILAST=',ILAST
       IF(L.NE.1)THEN
         IF(I.LE.ILAST)then
           GO60=.true.
@@ -681,7 +680,7 @@ module readsmod
 !     RAINH=precipitation (m h-1)
 !     XRADH=longwave radiation (MJ m-2 h-1)
 !
-      DO 95 K=1,NN
+      D95: DO K=1,NN
 !
 !       TEMPERATURE
 !
@@ -738,30 +737,30 @@ module readsmod
 !
           IF(TYP(K).EQ.'D')THEN
 ! given as celcius degree
-            DWPTH(J,I)=0.61*EXP(5360.0*(3.661E-03-1.0/(TC2K+(DAT(K)+DATK(K))/IH)))
+            DWPTH(J,I)=0.61_r8*EXP(5360.0_r8*(3.661E-03_r8-1.0_r8/(TC2K+(DAT(K)+DATK(K))/IH)))
           ELSEIF(TYP(K).EQ.'F')THEN
 ! given as Fahrenheit
-            DAT(K)=(DAT(K)-32.0)*0.556
-            DWPTH(J,I)=0.61*EXP(5360.0*(3.661E-03-1.0/(TC2K+(DAT(K)+DATK(K))/IH)))
+            DAT(K)=(DAT(K)-32.0_r8)*0.556_r8
+            DWPTH(J,I)=0.61_r8*EXP(5360.0_r8*(3.661E-03_r8-1.0_r8/(TC2K+(DAT(K)+DATK(K))/IH)))
           ELSEIF(TYP(K).EQ.'H')THEN
 ! given as relative humidity, [0, 1]
-            DWPTH(J,I)=0.61*EXP(5360.0*(3.661E-03-1.0/(TC2K+TMPH(J,I)))) &
-              *AZMAX1(AMIN1(1.0,(DAT(K)+DATK(K))/IH))
+            DWPTH(J,I)=0.61_r8*EXP(5360.0_r8*(3.661E-03_r8-1.0_r8/(TC2K+TMPH(J,I)))) &
+              *AZMAX1(AMIN1(1.0_r8,(DAT(K)+DATK(K))/IH))
           ELSEIF(TYP(K).EQ.'R')THEN
 ! given as relative humidity [0, 100]
-            DWPTH(J,I)=0.61*EXP(5360.0*(3.661E-03-1.0/(TC2K+TMPH(J,I)))) &
-              *AZMAX1(AMIN1(100.0,(DAT(K)+DATK(K))/IH))*0.01
+            DWPTH(J,I)=0.61_r8*EXP(5360.0_r8*(3.661E-03_r8-1.0_r8/(TC2K+TMPH(J,I)))) &
+              *AZMAX1(AMIN1(100.0_r8,(DAT(K)+DATK(K))/IH))*0.01_r8
           ELSEIF(TYP(K).EQ.'S')THEN
 ! what is the unit? mass mixing ratio? [0,100]
-            DWPTH(J,I)=AZMAX1((DAT(K)+DATK(K))/IH)*0.0289/18.0*101.325 &
-              *EXP(-ALTIG/7272.0)*288.15/(TC2K+TMPH(J,I))
+            DWPTH(J,I)=AZMAX1((DAT(K)+DATK(K))/IH)*0.0289_r8/18.0_r8*101.325_r8 &
+              *EXP(-ALTIG/7272.0_r8)*288.15_r8/(TC2K+TMPH(J,I))
           ELSEIF(TYP(K).EQ.'G')THEN
 ! what is the unit? mass mixing ratio? [0, 1] ALTIG is doing altitude correction,
-            DWPTH(J,I)=AZMAX1((DAT(K)+DATK(K))/IH)*28.9/18.0*101.325 &
-              *EXP(-ALTIG/7272.0)*288.15/(TC2K+TMPH(J,I))
+            DWPTH(J,I)=AZMAX1((DAT(K)+DATK(K))/IH)*28.9_r8/18.0_r8*101.325_r8 &
+              *EXP(-ALTIG/7272.0_r8)*288.15_r8/(TC2K+TMPH(J,I))
           ELSEIF(TYP(K).EQ.'M')THEN
 ! given as hPa
-            DWPTH(J,I)=AZMAX1((DAT(K)+DATK(K))/IH*0.1)
+            DWPTH(J,I)=AZMAX1((DAT(K)+DATK(K))/IH*0.1_r8)
           ELSE
             DWPTH(J,I)=AZMAX1((DAT(K)+DATK(K))/IH)
           ENDIF
@@ -795,19 +794,19 @@ module readsmod
 !
       ELSEIF(VAR(K).EQ.'L')THEN
         IF(TYP(K).EQ.'W')THEN
-! watss m-2, into MJ per hour, *3600 seconds * 1.0-6 = 0.0036
+          ! watss m-2, into MJ per hour, *3600 seconds * 1.0-6 = 0.0036
           XRADH(J,I)=AZMAX1((DAT(K)+DATK(K))/IH*0.0036)
         ELSEIF(TYP(K).EQ.'J')THEN
           XRADH(J,I)=AZMAX1((DAT(K)+DATK(K))/IH*0.01)
         ELSEIF(TYP(K).EQ.'K')THEN
-! kJ m-2, into MJ per hour, * 0.001
+          ! kJ m-2, into MJ per hour, * 0.001
           XRADH(J,I)=AZMAX1((DAT(K)+DATK(K))/IH*0.001)
         ELSE
           XRADH(J,I)=AZMAX1((DAT(K)+DATK(K))/IH)
         ENDIF
       ENDIF
       DATK(K)=0.0
-95  CONTINUE
+  ENDDO D95
   end subroutine readhourweather
 !------------------------------------------------------------------------------------------
 
@@ -830,7 +829,7 @@ module readsmod
   go110=.false.
   go60=.false.
   IWTHR(L)=1
-  DO 160 K=1,NI
+  D160: DO K=1,NI
     IF(IVAR(K).EQ.'M')THEN
       M=IDAT(K)
     ELSEIF(IVAR(K).EQ.'D')THEN
@@ -845,7 +844,7 @@ module readsmod
         IYRD=365
       endif
     ENDIF
-160 CONTINUE
+  ENDDO D160
   IF(IFLGY.EQ.1.AND.IYRX.LT.IYRC)THEN
     GO60=.TRUE.
     RETURN
@@ -885,7 +884,7 @@ module readsmod
 ! DWPT=vapor pressure (kPa)
 ! RAIN=precipitation (mm d-1)
 !
-  DO 65 K=1,NN
+  D65: DO K=1,NN
 !
 !   MAX,MIN REMPERATURE
 !
@@ -936,33 +935,33 @@ module readsmod
 !
     ELSEIF(VAR(K).EQ.'H')THEN
       IF(TYP(K).EQ.'D')THEN
-        DWPT(1,I)=0.61*EXP(5360.0*(3.661E-03-1.0/(TC2K+DAT(K))))
-        DWPT(2,I)=0.61*EXP(5360.0*(3.661E-03-1.0/(TC2K+DAT(K))))
+        DWPT(1,I)=0.61_r8*EXP(5360.0_r8*(3.661E-03_r8-1.0_r8/(TC2K+DAT(K))))
+        DWPT(2,I)=0.61_r8*EXP(5360.0_r8*(3.661E-03_r8-1.0_r8/(TC2K+DAT(K))))
       ELSEIF(TYP(K).EQ.'F')THEN
-        DAT(K)=(DAT(K)-32.0)*0.556
-        DWPT(1,I)=0.61*EXP(5360.0*(3.661E-03-1.0/(TC2K+DAT(K))))
-        DWPT(2,I)=0.61*EXP(5360.0*(3.661E-03-1.0/(TC2K+DAT(K))))
+        DAT(K)=(DAT(K)-32.0_r8)*0.556_r8
+        DWPT(1,I)=0.61_r8*EXP(5360.0_r8*(3.661E-03_r8-1.0_r8/(TC2K+DAT(K))))
+        DWPT(2,I)=0.61_r8*EXP(5360.0_r8*(3.661E-03_r8-1.0_r8/(TC2K+DAT(K))))
       ELSEIF(TYP(K).EQ.'H')THEN
-        DAT(K)=AZMAX1(AMIN1(1.0,DAT(K)))
-        DWPT(1,I)=0.61*EXP(5360.0*(3.661E-03-1.0/(TC2K+(TMPN(I)+TMPX(I))/2)))*DAT(K)
-        DWPT(2,I)=0.61*EXP(5360.0*(3.661E-03-1.0/(TC2K+TMPN(I))))
+        DAT(K)=AZMAX1(AMIN1(1.0_r8,DAT(K)))
+        DWPT(1,I)=0.61_r8*EXP(5360.0_r8*(3.661E-03_r8-1.0_r8/(TC2K+(TMPN(I)+TMPX(I))/2)))*DAT(K)
+        DWPT(2,I)=0.61_r8*EXP(5360.0_r8*(3.661E-03_r8-1.0_r8/(TC2K+TMPN(I))))
       ELSEIF(TYP(K).EQ.'R')THEN
-        DAT(K)=AZMAX1(AMIN1(100.0,DAT(K)))
-        DWPT(1,I)=0.61*EXP(5360.0*(3.661E-03-1.0/(TC2K+(TMPN(I)+TMPX(I))/2)))*DAT(K)*0.01
-        DWPT(2,I)=0.61*EXP(5360.0*(3.661E-03-1.0/(TC2K+TMPN(I))))
+        DAT(K)=AZMAX1(AMIN1(100.0_r8,DAT(K)))
+        DWPT(1,I)=0.61_r8*EXP(5360.0_r8*(3.661E-03_r8-1.0_r8/(TC2K+(TMPN(I)+TMPX(I))/2)))*DAT(K)*0.01_r8
+        DWPT(2,I)=0.61_r8*EXP(5360.0_r8*(3.661E-03_r8-1.0_r8/(TC2K+TMPN(I))))
       ELSEIF(TYP(K).EQ.'S')THEN
-        DWPT(1,I)=AZMAX1(DAT(K))*0.0289/18.0*101.325 &
-          *EXP(-ALTIG/7272.0)*288.15/(TC2K+(TMPN(I)+TMPX(I))/2)
-        DWPT(2,I)=AZMAX1(DAT(K))*0.0289/18.0*101.325 &
-          *EXP(-ALTIG/7272.0)*288.15/(TC2K+TMPN(I))
+        DWPT(1,I)=AZMAX1(DAT(K))*0.0289_r8/18.0_r8*101.325_r8 &
+          *EXP(-ALTIG/7272.0_r8)*288.15_r8/(TC2K+(TMPN(I)+TMPX(I))/2)
+        DWPT(2,I)=AZMAX1(DAT(K))*0.0289_r8/18.0_r8*101.325_r8 &
+          *EXP(-ALTIG/7272.0_r8)*288.15_r8/(TC2K+TMPN(I))
       ELSEIF(TYP(K).EQ.'G')THEN
-        DWPT(1,I)=AZMAX1(DAT(K))*28.9/18.0*101.325 &
-          *EXP(-ALTIG/7272.0)*288.15/(TC2K+(TMPN(I)+TMPX(I))/2)
-        DWPT(2,I)=AZMAX1(DAT(K))*28.9/18.0*101.325 &
-          *EXP(-ALTIG/7272.0)*288.15/(TC2K+TMPN(I))
+        DWPT(1,I)=AZMAX1(DAT(K))*28.9_r8/18.0_r8*101.325_r8 &
+          *EXP(-ALTIG/7272.0_r8)*288.15_r8/(TC2K+(TMPN(I)+TMPX(I))/2._r8)
+        DWPT(2,I)=AZMAX1(DAT(K))*28.9_r8/18.0_r8*101.325_r8 &
+          *EXP(-ALTIG/7272.0_r8)*288.15_r8/(TC2K+TMPN(I))
       ELSEIF(TYP(K).EQ.'M')THEN
-        DWPT(1,I)=AZMAX1(DAT(K)*0.1)
-        DWPT(2,I)=AZMAX1(DAT(K)*0.1)
+        DWPT(1,I)=AZMAX1(DAT(K)*0.1_r8)
+        DWPT(2,I)=AZMAX1(DAT(K)*0.1_r8)
       ELSE
         DWPT(1,I)=AZMAX1(DAT(K))
         DWPT(2,I)=AZMAX1(DAT(K))
@@ -972,16 +971,16 @@ module readsmod
 !
     ELSEIF(VAR(K).EQ.'P')THEN
       IF(TYP(K).EQ.'M')THEN
-        RAIN(I)=AZMAX1(DAT(K))/1.0E+03
+        RAIN(I)=AZMAX1(DAT(K))/1.0E+03_r8
       ELSEIF(TYP(K).EQ.'C')THEN
-        RAIN(I)=AZMAX1(DAT(K))/1.0E+02
+        RAIN(I)=AZMAX1(DAT(K))/1.0E+02_r8
       ELSEIF(TYP(K).EQ.'I')THEN
-        RAIN(I)=AZMAX1(DAT(K))*0.0254
+        RAIN(I)=AZMAX1(DAT(K))*0.0254_r8
       ELSE
         RAIN(I)=AZMAX1(DAT(K))
       ENDIF
     ENDIF
-65  CONTINUE
+  ENDDO D65
   IX=I
   IF(IFLGY.EQ.1.AND.I.EQ.IYRD)THEN
     GO110=.true.
@@ -1023,6 +1022,5 @@ module readsmod
     ans='not julian day'
   end select
   end function getclimctype
-
 
 end module readsmod

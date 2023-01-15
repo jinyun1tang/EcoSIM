@@ -15,7 +15,6 @@ set(IOUTILS_SOURCES
 	wouts.F90
 	splitp.c
 	splits.c
-  ncdio_pio.F90
 #  HistFileMod.F90
   bhistMod.F90
 	)

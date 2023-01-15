@@ -146,7 +146,7 @@ module GrosubPars
   real(r8) :: ATRPX(0:1)
   real(r8) :: GVMX(0:1)
   real(r8) :: RTSK(0:3)
-
+  character(len=6), allocatable :: pftss(:)
   type, public :: plant_bgc_par_type
    !nonstructural(0,*),
    !     foliar(1,*),non-foliar(2,*),stalk(3,*),root(4,*), coarse woody (5,*)
@@ -181,13 +181,27 @@ module GrosubPars
   integer :: jroots
   end type plant_bgc_par_type
 
-
   contains
 
   subroutine InitVegPars(pltpar)
+  use EcoSIMCtrlMod, only : pft_file_in,pft_nfid
+  use abortutils, only : endrun
+  use fileUtil, only : file_exists
+  use ncdio_pio
   implicit none
   type(plant_bgc_par_type)  :: pltpar
+  integer :: npfts
 
+  if(.not. file_exists(pft_file_in))then
+    call endrun(msg='Fail to locate plant trait file specified by pft_file_in in ' &
+      //mod_filename,line=__LINE__)
+  else
+    npfts=get_dim_len(pft_file_in, 'npfts')
+    allocate(pftss(npfts))
+
+    call ncd_pio_openfile(pft_nfid, pft_file_in, ncd_nowrite)
+    call ncd_getvar(pft_nfid, 'pfts', pftss)
+  endif
   pltpar%instruct=0
   pltpar%ifoliar=1
   pltpar%infoliar=2
@@ -288,6 +302,21 @@ module GrosubPars
   FLG4Y=real((/360.0,1440.0,720.0,720.0/),r8)
   ATRPX=real((/68.96,276.9/),r8);GVMX=real((/0.010,0.0025/),r8)
   end subroutine InitVegPars
+!------------------------------------------------------------------------------------------
 
+  function get_pft_loc(pft_name)result(loc)
+!
+!!DESCRIPTION
+! return the id of pft to be read
+  implicit none
+  character(len=6), intent(in) :: pft_name
 
+  integer :: loc
+
+  loc=1
+  DO
+    if(pftss(loc)==pft_name)exit
+    loc=loc+1
+  enddo
+  end function get_pft_loc
 end module GrosubPars

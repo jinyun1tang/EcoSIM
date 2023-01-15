@@ -61,13 +61,13 @@ implicit none
 
 ! FOR EACH CANOPY LAYER
 !
-  DO 210 L=JC1,1,-1
+  D210: DO L=JC1,1,-1
     IF(ARLFL(L,K,NB,NZ).GT.ZEROP(NZ))THEN
 !
 !     FOR EACH LEAF AZIMUTH AND INCLINATION
 !
-      DO 215 N=1,JLI1
-        DO 220 M=1,JSA1
+      D215: DO N=1,JLI1
+        D220: DO M=1,JSA1
 !
 !         CO2 FIXATION BY SUNLIT LEAVES
 !
@@ -139,24 +139,24 @@ implicit none
 !               GSL=leaf stomatal conductance (mol m-2 s-1)
 !
                 CO2X=CO2I(NZ)
-                DO 225 NN=1,100
+                D225: DO NN=1,100
                   CO2C=CO2X*SCO2(NZ)
                   CO2Y=AZMAX1(CO2C-COMPL(K,NB,NZ))
-                  CBXNX=CO2Y/(ELEC3*CO2C+10.5*COMPL(K,NB,NZ))
+                  CBXNX=CO2Y/(ELEC3*CO2C+10.5_r8*COMPL(K,NB,NZ))
                   VGROX=VCGRO(K,NB,NZ)*CO2Y/(CO2C+XKCO2O(NZ))
                   EGROX=ETLF*CBXNX
                   VL=AMIN1(VGROX,EGROX)*WFNB*FDBK(NB,NZ)
                   VG=(CO2Q(NZ)-CO2X)*GSL
                   IF(VL+VG.GT.ZERO)THEN
                     DIFF=(VL-VG)/(VL+VG)
-                    IF(ABS(DIFF).LT.0.005)exit
-                    VA=0.95*VG+0.05*VL
+                    IF(ABS(DIFF).LT.0.005_r8)exit
+                    VA=0.95_r8*VG+0.05_r8*VL
                     CO2X=CO2Q(NZ)-VA/GSL
                   ELSE
                     VL=0._r8
                     exit
                   ENDIF
-225             CONTINUE
+                ENDDO D225
 !
 !               ACCUMULATE C3 FIXATION PRODUCT IN MESOPHYLL
 !
@@ -164,8 +164,7 @@ implicit none
 !               SURFX=unself-shaded leaf surface area
 !               TAUS=fraction of direct radiation transmitted from layer above
 !
-                CH2O3(K)=CH2O3(K)+VL*SURFX(N,L,K,NB,NZ) &
-                  *TAUS(L+1)
+                CH2O3(K)=CH2O3(K)+VL*SURFX(N,L,K,NB,NZ)*TAUS(L+1)
 !               ICO2I=MAX(1,MIN(400,INT(CO2X)))
 !               VCO2(ICO2I,I,NZ)=VCO2(ICO2I,I,NZ)
 !              2+(VL*SURFX(N,L,K,NB,NZ)*TAUS(L+1))*0.0432
@@ -175,7 +174,7 @@ implicit none
 !
 !           CO2 FIXATION IN MESOPHYLL BY SHADED LEAVES
 !
-            IF(PARDIF(N,M,L,NZ).GT.0.0)THEN
+            IF(PARDIF(N,M,L,NZ).GT.0.0_r8)THEN
 !
 !             C3 CARBOXYLATION REACTIONS USING VARIABLES FROM 'STOMATE'
 !
@@ -240,7 +239,7 @@ implicit none
 !               GSL=leaf stomatal conductance (mol m-2 s-1)
 !
                 CO2X=CO2I(NZ)
-                DO 235 NN=1,100
+                D235: DO NN=1,100
                   CO2C=CO2X*SCO2(NZ)
                   CO2Y=AZMAX1(CO2C-COMPL(K,NB,NZ))
                   CBXNX=CO2Y/(ELEC3*CO2C+10.5*COMPL(K,NB,NZ))
@@ -250,14 +249,14 @@ implicit none
                   VG=(CO2Q(NZ)-CO2X)*GSL
                   IF(VL+VG.GT.ZERO)THEN
                     DIFF=(VL-VG)/(VL+VG)
-                    IF(ABS(DIFF).LT.0.005)exit
-                    VA=0.95*VG+0.05*VL
+                    IF(ABS(DIFF).LT.0.005_r8)exit
+                    VA=0.95_r8*VG+0.05_r8*VL
                     CO2X=CO2Q(NZ)-VA/GSL
                   ELSE
                     VL=0._r8
                     exit
                   ENDIF
-235             CONTINUE
+                ENDDO D235
 !
 !               ACCUMULATE C3 FIXATION PRODUCT IN MESOPHYLL
 !
@@ -265,18 +264,17 @@ implicit none
 !               SURFX=unself-shaded leaf surface area
 !               TAU0=fraction of diffuse radiation transmitted from layer above
 !
-                CH2O3(K)=CH2O3(K)+VL*SURFX(N,L,K,NB,NZ) &
-                  *TAU0(L+1)
+                CH2O3(K)=CH2O3(K)+VL*SURFX(N,L,K,NB,NZ)*TAU0(L+1)
 !               ICO2I=MAX(1,MIN(400,INT(CO2X)))
 !               VCO2(ICO2I,I,NZ)=VCO2(ICO2I,I,NZ)
 !              2+(VL*SURFX(N,L,K,NB,NZ)*TAU0(L+1))*0.0432
               ENDIF
             ENDIF
           ENDIF
-220     CONTINUE
-215   CONTINUE
+        ENDDO D220
+      ENDDO D215
     ENDIF
-210   CONTINUE
+  ENDDO D210
   CO2F=CO2F+CH2O3(K)
   CH2O=CH2O+CH2O3(K)
   end associate

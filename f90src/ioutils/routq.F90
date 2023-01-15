@@ -82,7 +82,8 @@ SUBROUTINE routq(NT,NE,NTX,NEX,NHW,NHE,NVN,NVS)
 
     IF(NS.GT.0)THEN
 !DATAX(NZ): pft file defines pft properties
-!DATAY(NZ): management file, seeding etc
+!DATAY(NZ): management file, seeding information
+!IETYP=Koppen climate zone:-2=phytotron
       READ(14,*)(DATAX(NZ),DATAY(NZ),NZ=1,NS)
       D4975: DO NX=NH1,NH2
         D4970: DO NY=NV1,NV2
@@ -96,6 +97,7 @@ SUBROUTINE routq(NT,NE,NTX,NEX,NHW,NHE,NVN,NVS)
         ENDDO D4970
       ENDDO D4975
     ENDIF
+
     IF(.not. is_restart_run)THEN
       D8995: DO NX=NH1,NH2
         D8990: DO NY=NV1,NV2
