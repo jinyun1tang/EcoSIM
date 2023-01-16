@@ -200,7 +200,7 @@
       WRITE(21,91)I,IDATA(3),(trcsa_solml(idsa_Fe,L,NY,NX),L=1,NLI(NY,NX))
       WRITE(21,91)I,IDATA(3),(trcsa_solml(idsa_Hp,L,NY,NX),L=1,NLI(NY,NX))
       WRITE(21,91)I,IDATA(3),(trcsa_solml(idsa_Ca,L,NY,NX),L=1,NLI(NY,NX))
-      IF(ISALTG.NE.0)THEN
+      IF(salt_model)THEN
         WRITE(21,91)I,IDATA(3),(trcs_solsml(idsa_Al,L,NY,NX),L=1,JS)
         WRITE(21,91)I,IDATA(3),(trcs_solsml(idsa_Fe,L,NY,NX),L=1,JS)
         WRITE(21,91)I,IDATA(3),(trcs_solsml(idsa_Hp,L,NY,NX),L=1,JS)

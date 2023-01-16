@@ -21,7 +21,7 @@ module EcoSIMDesctruct
   use PlantTraitDataType  , only : DestructPlantTraits
   use LandSurfDataType    , only : DestructLandSurfData
   use EcoSIMCtrlDataType  , only : DestructEcoSIMCtrlData
-  use EcoSIMCtrlMod       , only : pft_nfid
+  use EcoSIMCtrlMod       , only : pft_nfid,salt_model
   use ncdio_pio           , only : ncd_pio_closefile
   use EcosimBGCFluxType   , only : DestructEcosimBGCFluxData
   use EcoSIMHistMod       , only : DestructEcoSIMHistData
@@ -44,7 +44,6 @@ module EcoSIMDesctruct
   use PlantMngmtDataType  , only : DestructPlantMngmtData
   use InitSOMBGCMOD       , only : DestructSOMBGC
   use TrnsfrMod           , only : DestructTrnsfr
-
   implicit none
 
   call DestructMicrobialData
@@ -77,7 +76,7 @@ module EcoSIMDesctruct
 
   call DestructFlagData
 
-  if(ISALTG/=0)then
+  if(salt_model)then
     call DestructTrnsfrs
   else
     call DestructTrnsfr

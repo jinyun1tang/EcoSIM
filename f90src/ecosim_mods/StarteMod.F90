@@ -544,6 +544,7 @@ module StarteMod
     trcx_solml(idx_OHpB,0,NY,NX)=0._r8
     trcx_solml(idx_HPO4B,0,NY,NX)=0._r8
     trcx_solml(idx_H2PO4B,0,NY,NX)=0._r8
+
     trcp_salml(idsp_AlPO4,0,NY,NX)=0._r8
     trcp_salml(idsp_FePO4,0,NY,NX)=0._r8
     trcp_salml(idsp_CaHPO4,0,NY,NX)=0._r8
@@ -574,7 +575,7 @@ module StarteMod
 !
 !     INITIAL STATE VARIABLES FOR CATIONS AND ANIONS IN SNOWPACK
 !
-        IF(ISALTG.NE.0)THEN
+        IF(salt_model)THEN
           trcs_solsml(idsa_Al,L,NY,NX)=VOLWW*CALR(NY,NX)
           trcs_solsml(idsa_Fe,L,NY,NX)=VOLWW*CFER(NY,NX)
           trcs_solsml(idsa_Hp,L,NY,NX)=VOLWW*CHYR(NY,NX)
@@ -623,48 +624,8 @@ module StarteMod
 !
 !     INITIAL STATE VARIABLES FOR CATIONS AND ANIONS IN SNOWPACK
 !
-        IF(ISALTG.NE.0)THEN
-          trcs_solsml(idsa_Al,L,NY,NX)=0._r8
-          trcs_solsml(idsa_Fe,L,NY,NX)=0._r8
-          trcs_solsml(idsa_Hp,L,NY,NX)=0._r8
-          trcs_solsml(idsa_Ca,L,NY,NX)=0._r8
-          trcs_solsml(idsa_Mg,L,NY,NX)=0._r8
-          trcs_solsml(idsa_Na,L,NY,NX)=0._r8
-          trcs_solsml(idsa_K,L,NY,NX)=0._r8
-          trcs_solsml(idsa_OH,L,NY,NX)=0._r8
-          trcs_solsml(idsa_SO4,L,NY,NX)=0._r8
-          trcs_solsml(idsa_Cl,L,NY,NX)=0._r8
-          trcs_solsml(idsa_CO3,L,NY,NX)=0._r8
-          trcs_solsml(idsa_HCO3,L,NY,NX)=0._r8
-          trcs_solsml(idsa_AlOH,L,NY,NX)=0._r8
-          trcs_solsml(idsa_AlOH2,L,NY,NX)=0._r8
-          trcs_solsml(idsa_AlOH3,L,NY,NX)=0._r8
-          trcs_solsml(idsa_AlOH4,L,NY,NX)=0._r8
-          trcs_solsml(idsa_AlSO4,L,NY,NX)=0._r8
-          trcs_solsml(idsa_FeOH,L,NY,NX)=0._r8
-          trcs_solsml(idsa_FeOH2,L,NY,NX)=0._r8
-          trcs_solsml(idsa_FeOH3,L,NY,NX)=0._r8
-          trcs_solsml(idsa_FeOH4,L,NY,NX)=0._r8
-          trcs_solsml(idsa_FeSO4,L,NY,NX)=0._r8
-          trcs_solsml(idsa_CaOH2,L,NY,NX)=0._r8
-          trcs_solsml(idsa_CaCO3,L,NY,NX)=0._r8
-          trcs_solsml(idsa_CaHCO3,L,NY,NX)=0._r8
-          trcs_solsml(idsa_CaSO4,L,NY,NX)=0._r8
-          trcs_solsml(idsa_MgOH2,L,NY,NX)=0._r8
-          trcs_solsml(idsa_MgCO3,L,NY,NX)=0._r8
-          trcs_solsml(idsa_MgHCO3,L,NY,NX)=0._r8
-          trcs_solsml(idsa_MgSO4,L,NY,NX)=0._r8
-          trcs_solsml(idsa_NaCO3,L,NY,NX)=0._r8
-          trcs_solsml(idsa_NaSO4,L,NY,NX)=0._r8
-          trcs_solsml(idsa_KSO4,L,NY,NX)=0._r8
-          trcs_solsml(idsa_H0PO4,L,NY,NX)=0._r8
-          trcs_solsml(idsa_H3PO4,L,NY,NX)=0._r8
-          trcs_solsml(idsa_FeHPO4,L,NY,NX)=0._r8
-          trcs_solsml(idsa_FeH2PO4,L,NY,NX)=0._r8
-          trcs_solsml(idsa_CaPO4,L,NY,NX)=0._r8
-          trcs_solsml(idsa_CaHPO4,L,NY,NX)=0._r8
-          trcs_solsml(idsa_CaH2PO4,L,NY,NX)=0._r8
-          trcs_solsml(idsa_MgHPO4,L,NY,NX)=0._r8
+        IF(salt_model)THEN
+          trcs_solsml(idsa_beg:idsa_end,L,NY,NX)=0._r8
         ENDIF
       ENDIF
     ENDDO D9985

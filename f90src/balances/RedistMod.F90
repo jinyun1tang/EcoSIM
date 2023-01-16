@@ -231,7 +231,7 @@ module RedistMod
     TLNO3=TLNO3+trcn_solsml(ids_NO3,L,NY,NX)
     TLPO4=TLPO4+trcn_solsml(ids_H1PO4,L,NY,NX)+trcn_solsml(ids_H2PO4,L,NY,NX)
 
-    IF(ISALTG.NE.0)THEN
+    IF(salt_model)THEN
       SSW=trcs_solsml(idsa_Al,L,NY,NX)+trcs_solsml(idsa_Fe,L,NY,NX)+trcs_solsml(idsa_Hp,L,NY,NX)+trcs_solsml(idsa_Ca,L,NY,NX) &
         +trcs_solsml(idsa_Mg,L,NY,NX)+trcs_solsml(idsa_Na,L,NY,NX)+trcs_solsml(idsa_K,L,NY,NX)+trcs_solsml(idsa_OH,L,NY,NX) &
         +trcs_solsml(idsa_SO4,L,NY,NX)+trcs_solsml(idsa_Cl,L,NY,NX)+trcs_solsml(idsa_CO3,L,NY,NX)+trcs_solsml(idsa_H0PO4,L,NY,NX) &
@@ -260,7 +260,7 @@ module RedistMod
 !     begin_execution
 !     ZNOON=hour of solar noon from weather file
 !     ITILL=soil disturbance type 1-20:tillage,21=litter removal,22=fire,23-24=drainage
-!     DCORP=intensity (fire) or depth (tillage,drainage) of disturbance
+!     DCORP=mixing intensity (fire) or depth (tillage,drainage) of disturbance
 !     CDPTH(NU=soil surface elevation
 !     DTBLI,DTBLDI=depth of natural,artificial water table from readi.f
 !     DTBLX,DTBLZ=current,initial natural water table depth
@@ -272,12 +272,15 @@ module RedistMod
 !     HVOLO=hourly water loss through lateral and lower boundaries
 !
   IF(J.EQ.INT(ZNOON(NY,NX)).AND.ITILL(I,NY,NX).EQ.23)THEN
+! drainage is on
     DCORPW=DCORP(I,NY,NX)+CDPTH(NU(NY,NX)-1,NY,NX)
     DTBLI(NY,NX)=DCORPW
     DTBLZ(NY,NX)=DTBLI(NY,NX)-(ALTZ(NY,NX)-ALT(NY,NX))*(1.0_r8-DTBLG(NY,NX))
     DTBLX(NY,NX)=DTBLZ(NY,NX)+CDPTH(NU(NY,NX)-1,NY,NX)
   ENDIF
+
   IF(J.EQ.INT(ZNOON(NY,NX)).AND.ITILL(I,NY,NX).EQ.24)THEN
+! drainage in on
     DCORPW=DCORP(I,NY,NX)+CDPTH(NU(NY,NX)-1,NY,NX)
     IF(IDTBL(NY,NX).EQ.1)THEN
       IDTBL(NY,NX)=3
@@ -290,15 +293,16 @@ module RedistMod
   ENDIF
 !
 !     SET DEPTH OF MOBILE EXTERNAL WATER TABLE
-!
+! switched on for change of water table due to discharge/drainage
+! why 0.00167?
   IF(IDTBL(NY,NX).EQ.2.OR.IDTBL(NY,NX).EQ.4)THEN
-!     DTBLX(NY,NX)=DTBLX(NY,NX)-0.0*HVOLO(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-!    2-0.00167*(DTBLX(NY,NX)-DTBLZ(NY,NX)-CDPTH(NU(NY,NX)-1,NY,NX))
+    DTBLX(NY,NX)=DTBLX(NY,NX)-HVOLO(NY,NX)/AREA(3,NU(NY,NX),NY,NX) &
+      -0.00167_r8*(DTBLX(NY,NX)-DTBLZ(NY,NX)-CDPTH(NU(NY,NX)-1,NY,NX))
     DTBLX(NY,NX)=DTBLZ(NY,NX)+CDPTH(NU(NY,NX)-1,NY,NX)
   ENDIF
   IF(IDTBL(NY,NX).EQ.4)THEN
-    DTBLY(NY,NX)=DTBLY(NY,NX)-0.0*HVOLO(NY,NX)/AREA(3,NU(NY,NX),NY,NX) &
-      -0.00167*(DTBLY(NY,NX)-DTBLD(NY,NX))
+    DTBLY(NY,NX)=DTBLY(NY,NX)-HVOLO(NY,NX)/AREA(3,NU(NY,NX),NY,NX) &
+      -0.00167_r8*(DTBLY(NY,NX)-DTBLD(NY,NX))
   ENDIF
   end subroutine ModifyExWTBLByDisturbance
 !------------------------------------------------------------------------------------------
@@ -378,9 +382,9 @@ module RedistMod
   !
   HEATIN=HEATIN+cpw*TKA(NY,NX)*PRECA(NY,NX)+cps*TKA(NY,NX)*PRECW(NY,NX)
   HEATIN=HEATIN+HEATH(NY,NX)+THFLXC(NY,NX)
-  DO 5150 L=1,JS
+  D5150: DO L=1,JS
     HEATIN=HEATIN+XTHAWW(L,NY,NX)
-5150  CONTINUE
+  ENDDO D5150
   HEATOU=HEATOU-cpw*TKA(NY,NX)*PRECU(NY,NX)
 !
 ! SURFACE BOUNDARY CO2, CH4 AND DOC FLUXES
@@ -513,7 +517,7 @@ module RedistMod
   !
   !     SURFACE BOUNDARY SALT FLUXES FROM RAINFALL AND SURFACE IRRIGATION
   !
-  IF(ISALTG.NE.0)THEN
+  IF(salt_model)THEN
     SIR=PRECQ(NY,NX)*(CALR(NY,NX)+CFER(NY,NX)+CHYR(NY,NX)+CCAR(NY,NX) &
       +CMGR(NY,NX)+CNAR(NY,NX)+CKAR(NY,NX)+COHR(NY,NX)+CSOR(NY,NX) &
       +CCLR(NY,NX)+CC3R(NY,NX)+CH0PR(NY,NX) &
@@ -660,7 +664,7 @@ module RedistMod
       trc_solml(NTU,0,NY,NX)=trc_solml(NTU,0,NY,NX)+trcn_TQR(NTU,NY,NX)
     ENDDO
 
-    IF(ISALTG.NE.0)THEN
+    IF(salt_model)THEN
       DO NTSA=idsa_beg,idsa_end
         trcsa_solml(NTSA,0,NY,NX)=trcsa_solml(NTSA,0,NY,NX)+trcsa_TQR(NTSA,NY,NX)
       ENDDO
@@ -786,7 +790,7 @@ module RedistMod
     DO NTS=ids_nut_beg,ids_nuts_end
       trcn_solsml(NTS,1,NY,NX)=trcn_solsml(NTS,1,NY,NX)+trcn_QSS(NTS,NY,NX)
     ENDDO
-    IF(ISALTG.NE.0)THEN
+    IF(salt_model)THEN
       DO NTA=idsa_beg,idsa_end
         trcs_solsml(NTA,1,NY,NX)=trcs_solsml(NTA,1,NY,NX)+trcsa_TQS(NTA,NY,NX)
       ENDDO
@@ -924,7 +928,7 @@ module RedistMod
   UPO4(NY,NX)=UPO4(NY,NX)+POX
   UPP4(NY,NX)=UPP4(NY,NX)+POP
 
-  IF(ISALTG.NE.0)call UpdateSurfaceLayerSalt(NY,NX,TLPO4)
+  IF(salt_model)call UpdateSurfaceLayerSalt(NY,NX,TLPO4)
 
   end subroutine CalcLitterLayerChemicalMass
 !------------------------------------------------------------------------------------------
@@ -1390,7 +1394,7 @@ module RedistMod
 !
 !     TOTAL SALT IONS
 !
-    IF(ISALTG.NE.0)call UpdateSaltIonInSoilLayers(L,NY,NX,TLPO4)
+    IF(salt_model)call UpdateSaltIonInSoilLayers(L,NY,NX,TLPO4)
 
   ENDDO D125
   end subroutine UpdateChemInSoilLayers

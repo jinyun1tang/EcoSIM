@@ -111,7 +111,7 @@ module Hour1Mod
 !
 !     IF SALT FLAG SET
 !
-  IF(ISALTG.NE.0)THEN
+  IF(salt_model)THEN
     call ResetSaltModelArrays(NHW,NHE,NVN,NVS)
   ENDIF
 !
@@ -832,7 +832,7 @@ module Hour1Mod
 
   trcn_XBLS(ids_nut_beg:ids_nuts_end,1:JS,NY,NX)=0.0_r8
 
-  IF(ISALTG.NE.0)THEN
+  IF(salt_model)THEN
     trcsa_XBLS(idsa_beg:idsa_end,1:JS,NY,NX)=0.0_r8
   ENDIF
   end subroutine SetHourlyAccumulators
@@ -1381,7 +1381,7 @@ module Hour1Mod
     OASGL(L,NY,NX)=OASG*TFACL
     WGSGL(L,NY,NX)=WGSG*TFACG
 
-    IF(ISALTG.NE.0)THEN
+    IF(salt_model)THEN
       ALSGL(L,NY,NX)=ALSG*TFACL
       FESGL(L,NY,NX)=FESG*TFACL
       HYSGL(L,NY,NX)=HYSG*TFACL

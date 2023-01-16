@@ -7,6 +7,7 @@ module InitSoluteMod
   use TracerPropMod
   use TracerIDMod
   use EcoSiMParDataMod, only : micpar
+  use EcoSIMCtrlMod, only : salt_model
   implicit none
 
   private
@@ -290,11 +291,9 @@ module InitSoluteMod
 !     CONVERGE TOWARDS ALL SOLUBILITY EQUILIBRIA
 !     IF SALT OPTION IS SELECTED
 !
-  IF(ISALTG.NE.0)THEN
+  IF(salt_model)THEN
     DO   M=1,MRXN1
-
       call SolubilityEquilibiriaSalt(K,M,BKVLX)
-
     ENDDO
 !
 !     CONVERGE TOWARDS ALL SOLUBILITY EQUILIBRIA
@@ -343,7 +342,7 @@ module InitSoluteMod
   FSTR2=CSTR2/(1.0_r8+CSTR2)
   FH2O=5.56E+04/(5.56E+04+CION2)
 
-  IF(ISALTG.NE.0)THEN
+  IF(salt_model)THEN
     A1=AMIN1(1.0,10.0**(-0.509*1.0*FSTR2+0.20*CSTR2))
     A2=AMIN1(1.0,10.0**(-0.509*4.0*FSTR2+0.20*CSTR2))
     A3=AMIN1(1.0,10.0**(-0.509*9.0*FSTR2+0.20*CSTR2))

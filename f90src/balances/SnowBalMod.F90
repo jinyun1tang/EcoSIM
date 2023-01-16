@@ -328,7 +328,7 @@ implicit none
   !     phosphorus code: *H0P*=PO43-,*H3P*=H3PO4,*F1P*=FeHPO42-,*F2P*=F1H2PO4-
   !          :*C0P*=CaPO4-,*C1P*=CaHPO4,*C2P*=CaH2PO4+,*M1P*=MgHPO4,*COO*=COOH-
   !
-  IF(ISALTG.NE.0)THEN
+  IF(salt_model)THEN
     DO NTSA=idsa_beg,idsa_end
       trcs_solsml(NTSA,L,NY,NX)=trcs_solsml(NTSA,L,NY,NX)+trcsa_TBLS(NTSA,L,NY,NX)
     ENDDO
@@ -426,7 +426,7 @@ implicit none
           DO NTN=ids_nut_beg,ids_nuts_end
             trcn_solsml(NTN,L1,NY,NX)=trcn_solsml(NTN,L1,NY,NX)+FX*trcn_solsml(NTN,L0,NY,NX)
           ENDDO
-          IF(ISALTG.NE.0)THEN
+          IF(salt_model)THEN
             DO NTSA=idsa_beg,idsa_end
               trcs_solsml(NTSA,L1,NY,NX)=trcs_solsml(NTSA,L1,NY,NX)+FX*trcs_solsml(NTSA,L0,NY,NX)
             ENDDO
@@ -456,7 +456,7 @@ implicit none
             trcn_solsml(NTU,L0,NY,NX)=FY*trcn_solsml(NTU,L0,NY,NX)
           ENDDO
 
-          IF(ISALTG.NE.0)THEN
+          IF(salt_model)THEN
             DO NTSA=idsa_beg,idsa_end
               trcs_solsml(NTSA,L0,NY,NX)=FY*trcs_solsml(NTSA,L0,NY,NX)
             ENDDO

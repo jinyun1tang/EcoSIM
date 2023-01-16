@@ -7,4 +7,8 @@ case_name='sample'
 prefix='../../inputs/sample/'
 runfile='./runfile.sample'
 do_regression_test=.false.
+pft_file_in='/Users/jinyuntang/work/github/ecosim2/EcoSIM/python_tools/ecosim_pft_20230113.nc'
+lverbose=.false.
+/
+&bbgcforc
 /

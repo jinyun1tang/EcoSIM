@@ -130,7 +130,6 @@ module readiMod
   READ(tline,*,iostat=ierr)IETYPG,ISALTG,IERSNG,NCNG,DTBLIG,DTBLDIG,DTBLGG
   call check_read(ierr,7,DATA1(1),__LINE__,mod_filename)
 
-
   if(column_mode)then
     if(NCNG/=3)then
       call endrun('Because the column_mode in on, no lateral transport is allowed, in '// &
@@ -284,7 +283,7 @@ module readiMod
       SL(NY,NX)=SL0
       DPTHS(NY,NX)=DPTHSX
 !
-!     CONVERT ASPECT TO GEOMETRIC FORMAT
+!     CONVERT ASPECT from geographic format TO GEOMETRIC FORMAT
 !
 !     what is geometric format mean? 0 is north, 90 east, 180 south,
 !     geometric format 0/360 is east,

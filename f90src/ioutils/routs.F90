@@ -226,7 +226,7 @@
       READ(21,91)IDATE,IYR,(trcsa_solml(idsa_Fe,L,NY,NX),L=1,NLI(NY,NX))
       READ(21,91)IDATE,IYR,(trcsa_solml(idsa_Hp,L,NY,NX),L=1,NLI(NY,NX))
       READ(21,91)IDATE,IYR,(trcsa_solml(idsa_Ca,L,NY,NX),L=1,NLI(NY,NX))
-      IF(ISALTG.NE.0)THEN
+      IF(salt_model)THEN
         READ(21,91)IDATE,IYR,(trcs_solsml(idsa_Al,L,NY,NX),L=1,JS)
         READ(21,91)IDATE,IYR,(trcs_solsml(idsa_Fe,L,NY,NX),L=1,JS)
         READ(21,91)IDATE,IYR,(trcs_solsml(idsa_Hp,L,NY,NX),L=1,JS)

@@ -721,7 +721,7 @@ implicit none
     ENDIF
   ENDDO
 
-  IF(ISALTG.NE.0)THEN
+  IF(salt_model)THEN
     DO NTSA=idsa_beg,idsa_end
       trcsa_solml(NTSA,L1,NY,NX)=trcsa_solml(NTSA,L1,NY,NX)&
         +FX*trcsa_solml(NTSA,L0,NY,NX)
@@ -734,7 +734,7 @@ implicit none
     trc_solml(ids_H2PO4B,L1,NY,NX)=trc_solml(ids_H2PO4B,L1,NY,NX) &
       +FX*trc_solml(ids_H2PO4B,L0,NY,NX)
 
-    IF(ISALTG.NE.0)THEN
+    IF(salt_model)THEN
       DO NTSAB=idsab_beg,idsab_end
         trcsa_solml(NTSAB,L1,NY,NX)=trcsa_solml(NTSAB,L1,NY,NX)+FX*trcsa_solml(NTSAB,L0,NY,NX)
       ENDDO
@@ -904,7 +904,7 @@ implicit none
       trc_solml(NTU,L0,NY,NX)=FY*trc_solml(NTU,L0,NY,NX)
     ENDIF
   ENDDO
-  IF(ISALTG.NE.0)THEN
+  IF(salt_model)THEN
     DO NTSA=idsa_beg,idsa_end
       trcsa_solml(NTSA,L0,NY,NX)=FY*trcsa_solml(NTSA,L0,NY,NX)
     ENDDO
@@ -912,7 +912,7 @@ implicit none
   IF(L0.NE.0)THEN
     trc_solml(ids_H1PO4B,L0,NY,NX)=FY*trc_solml(ids_H1PO4B,L0,NY,NX)
     trc_solml(ids_H2PO4B,L0,NY,NX)=FY*trc_solml(ids_H2PO4B,L0,NY,NX)
-    IF(ISALTG.NE.0)THEN
+    IF(salt_model)THEN
       DO NTSAB=idsab_beg,idsab_end
         trcsa_solml(NTSAB,L0,NY,NX)=FY*trcsa_solml(NTSAB,L0,NY,NX)
       ENDDO
@@ -1306,7 +1306,7 @@ implicit none
 !
 !     SOIL MACROPORE SOLUBLE SALTS
 !
-    IF(ISALTG.NE.0)THEN
+    IF(salt_model)THEN
       DO NTSA=idsa_beg,idsab_end
         FXH=FHO*trcsa_soHml(NTSA,L0,NY,NX)
         trcsa_soHml(NTSA,L1,NY,NX)=trcsa_soHml(NTSA,L1,NY,NX)+FXH
@@ -1337,7 +1337,7 @@ implicit none
   trc_solml(ids_H2PO4B,L1,NY,NX)=trc_solml(ids_H2PO4B,L1,NY,NX)+FXH2POB
   trc_solml(ids_H2PO4B,L0,NY,NX)=trc_solml(ids_H2PO4B,L0,NY,NX)-FXH2POB
 
-  IF(ISALTG.NE.0)THEN
+  IF(salt_model)THEN
     DO NTSAB=idsab_beg,idsab_end
       FXB=FWO*trcsa_solml(NTSAB,L0,NY,NX)
       trcsa_solml(NTSAB,L1,NY,NX)=trcsa_solml(NTSAB,L1,NY,NX)+FXB
@@ -1449,7 +1449,7 @@ implicit none
 !
 !     SOIL SALT SOLUTES
 !
-  IF(ISALTG.NE.0)THEN
+  IF(salt_model)THEN
     DO NTSA=idsa_beg,idsa_end
       FXZ=FWO*trcsa_solml(NTSA,L0,NY,NX)
       trcsa_solml(NTSA,L1,NY,NX)=trcsa_solml(NTSA,L1,NY,NX)+FXZ

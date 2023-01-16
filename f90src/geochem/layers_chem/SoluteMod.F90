@@ -48,10 +48,8 @@ module SoluteMod
   type(chem_var_type), intent(inout) :: chemvar
   type(solute_flx_type), intent(inout) :: solflx
 
-  IF(ISALTG.NE.0)THEN
-
+  IF(salt_model)THEN
     call SaltChemEquilibria(chemvar,solflx)
-
   ELSE
     call NoSaltChemEquilibria(chemvar,solflx)
   ENDIF
@@ -646,7 +644,7 @@ module SoluteMod
 !
 !     DZ*,DX*,DP*=transfer of solute,adsorbed,precipitated HPO4,H2PO4
 !
-      IF(ISALTG.NE.0)THEN
+      IF(salt_model)THEN
         DZH0P=FVLPO4*trcsa_solml(idsa_H0PO4,L,NY,NX)
         DZH1P=FVLPO4*trc_solml(ids_H1PO4,L,NY,NX)/patomw
         DZH2P=FVLPO4*trc_solml(ids_H2PO4,L,NY,NX)/patomw

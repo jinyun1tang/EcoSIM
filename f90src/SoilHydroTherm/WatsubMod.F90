@@ -4822,7 +4822,7 @@ module WatsubMod
 !     IF(VOLAH1(LL,NY,NX).LE.ZEROS(NY,NX))THEN
 !     IFLGUH=1
 !     ENDIF
-!     ENDIF
+!     ENDIFx
 !9566  CONTINUE
   ELSE
     IFLGUH=1

@@ -7,5 +7,8 @@ case_name='dryland_maize'
 prefix='../../inputs/dryland_maize/'
 runfile='runfile.dryland'
 do_regression_test=.false.
-lverbose=.true.
+pft_file_in='/Users/jinyuntang/work/github/ecosim2/EcoSIM/python_tools/ecosim_pft_20230113.nc'
+lverbose=.false.
+/
+&bbgcforc
 /

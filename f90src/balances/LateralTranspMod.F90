@@ -179,7 +179,7 @@ implicit none
     trcn_TBLS(ids_nut_beg:ids_nuts_end,L,NY,NX)=0.0_r8
   ENDDO
 
-  IF(ISALTG.NE.0)THEN
+  IF(salt_model)THEN
     trcsa_TQR(idsa_beg:idsa_end,NY,NX)=0.0_r8
 
     trcsa_TQS(idsa_beg:idsa_end,NY,NX)=0.0_r8
@@ -279,7 +279,7 @@ implicit none
 
     RTGasADFlx(idg_beg:idg_end-1,L,NY,NX)=0.0_r8
 
-    IF(ISALTG.NE.0)THEN
+    IF(salt_model)THEN
       trcsa_TFLS(idsa_beg:idsab_end,L,NY,NX)=0.0_r8
       trcsa_TFHS(idsa_beg:idsab_end,L,NY,NX)=0.0_r8
     ENDIF
@@ -413,7 +413,7 @@ implicit none
 !          :*C0P*=CaPO4-,*C1P*=CaHPO4,*C2P*=CaH2PO4+,*M1P*=MgHPO4,*COO*=COOH-
 !          :*1=non-band,*B=band
 !
-  IF(ISALTG.NE.0)THEN
+  IF(salt_model)THEN
     D1203: DO NN=1,2
 
       DO NTSA=idsa_beg,idsa_end
@@ -505,7 +505,7 @@ implicit none
 !          :*C0P*=CaPO4-,*C1P*=CaHPO4,*C2P*=CaH2PO4+,*M1P*=MgHPO4,*COO*=COOH-
 !          :*1=non-band,*B=band
 !
-        IF(ISALTG.NE.0)THEN
+        IF(salt_model)THEN
           DO NTSA=idsa_beg,idsa_end
             trcsa_TBLS(NTSA,LS,N2,N1)=trcsa_TBLS(NTSA,LS,N2,N1)+trcsa_XBLS(NTSA,LS,N2,N1) &
             -trcsa_XBLS(NTSA,LS2,N2,N1)
@@ -543,7 +543,7 @@ implicit none
             -trcs_XFLS(ids_NH4B+NTS,3,NUM(N2,N1),N2,N1)-trcs_XFHS(ids_NH4B+NTS,3,NUM(N2,N1),N2,N1)
         ENDDO
 
-        IF(ISALTG.NE.0)THEN
+        IF(salt_model)THEN
           DO NTSA=idsa_beg,idsa_end
             trcsa_TBLS(NTSA,LS,NY,NX)=trcsa_TBLS(NTSA,LS,NY,NX)+trcsa_XBLS(NTSA,LS,NY,NX) &
               -trcsa_XFLS(NTSA,3,0,N2,N1)-trcsa_XFLS(NTSA,3,NUM(N2,N1),N2,N1) &
@@ -576,7 +576,7 @@ implicit none
           trcn_TBLS(NTN,LS,N2,N1)=trcn_TBLS(NTN,LS,N2,N1)+trcn_XBLS(NTN,LS,N2,N1)
         ENDDO
 
-        IF(ISALTG.NE.0)THEN
+        IF(salt_model)THEN
           DO NTSA=idsa_beg,idsa_end
             trcsa_TBLS(NTSA,LS,N2,N1)=trcsa_TBLS(NTSA,LS,N2,N1)+trcsa_XBLS(NTSA,LS,N2,N1)
           ENDDO
@@ -938,7 +938,7 @@ implicit none
       !          :*C0P*=CaPO4-,*C1P*=CaHPO4,*C2P*=CaH2PO4+,*M1P*=MgHPO4,*COO*=COOH-
       !          :*1=non-band,*B=band
 !
-      IF(ISALTG.NE.0)THEN
+      IF(salt_model)THEN
         DO NTSA=idsa_beg,idsab_end
           trcsa_TFLS(NTSA,N3,N2,N1)=trcsa_TFLS(NTSA,N3,N2,N1) &
             +trcsa_XFLS(NTSA,N,N3,N2,N1)-trcsa_XFLS(NTSA,N,N6,N5,N4)
@@ -970,7 +970,7 @@ implicit none
 
       RTGasADFlx(idg_beg:idg_end-1,N3,N2,N1)=0.0_r8
 
-      IF(ISALTG.NE.0)THEN
+      IF(salt_model)THEN
         trcsa_TFLS(idsa_beg:idsab_end,N3,N2,N1)=0.0_r8
         trcsa_TFHS(idsa_beg:idsab_end,N3,N2,N1)=0.0_r8
       ENDIF

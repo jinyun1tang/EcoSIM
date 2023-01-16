@@ -85,7 +85,7 @@ module TrnsfrsMod
   integer :: NX,NY,L,M
 !     execution begins here
 
-  IF(ISALTG.EQ.0)RETURN
+  IF(.not.salt_model)RETURN
 !
 !     TIME STEPS FOR SOLUTE FLUX CALCULATIONS
 !

@@ -206,7 +206,7 @@ implicit none
 !     XN=direction indicator
 !     TPOU,TIONOU=total P,salt loss through lateral and lower boundaries
 !
-      IF(ISALTG.NE.0)THEN
+      IF(salt_model)THEN
         PSS=XN*31.0*(trcsa_XQR(idsa_H0PO4,N,NN,N5,N4) &
           +trcsa_XQR(idsa_CaPO4,N,NN,N5,N4)+trcsa_XQR(idsa_FeHPO4,N,NN,N5,N4) &
           +trcsa_XQR(idsa_CaHPO4,N,NN,N5,N4) &
@@ -395,7 +395,7 @@ implicit none
 !           :PCPMB,PCPDB,PCPHB=precip CaH2PO4,CaHPO4,apatite in band
 !         TIONOU,UIONOU=total salt loss through lateral and lower boundaries
 !
-          IF(ISALTG.NE.0)THEN
+          IF(salt_model)THEN
             SEF=XN*(XNH3ER(N,NN,N5,N4)+XNHUER(N,NN,N5,N4)+XNO3ER(N,NN,N5,N4) &
               +XNH3EB(N,NN,N5,N4)+XNHUEB(N,NN,N5,N4)+XNO3EB(N,NN,N5,N4)) &
               +2.0*(XNH4ER(N,NN,N5,N4)+XNH4EB(N,NN,N5,N4))
@@ -545,7 +545,7 @@ implicit none
 !     X*FHW,X*FHB= hourly convective + diffusive solute flux through macropores in non-band,band from trnsfrs.f
 !     TIONOU,UIONOU=total salt loss through lateral and lower boundaries
 !
-      IF(ISALTG.NE.0)THEN
+      IF(salt_model)THEN
         PQD=XN*patomw*(trcsa_XFLS(idsa_H0PO4,N,N6,N5,N4)+trcsa_XFLS(idsa_H0PO4B,N,N6,N5,N4) &
           +trcsa_XFLS(idsa_CaPO4,N,N6,N5,N4)+trcsa_XFLS(idsa_CaPO4B,N,N6,N5,N4) &
           +trcsa_XFLS(idsa_FeHPO4,N,N6,N5,N4) &
@@ -709,7 +709,7 @@ implicit none
       UDIPQ(NY,NX)=UDIPQ(NY,NX)-PXR
       OXS=XN*XOXQSS(N,N5,N4)
       OXYGOU=OXYGOU-OXS
-      IF(ISALTG.NE.0)THEN
+      IF(salt_model)THEN
         PSS=XN*patomw*(trcsa_XQS(idsa_CaPO4,N,N5,N4) &
           +trcsa_XQS(idsa_FeHPO4,N,N5,N4)+trcsa_XQS(idsa_CaHPO4,N,N5,N4) &
           +trcsa_XQS(idsa_MgHPO4,N,N5,N4)+trcsa_XQS(idsa_H3PO4,N,N5,N4) &

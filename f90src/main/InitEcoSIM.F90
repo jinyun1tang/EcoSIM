@@ -1,5 +1,8 @@
 module InitEcoSIM
-
+!
+!! DESCRIPTION
+! initialize the data structure for EcoSIM
+  use EcoSIMCtrlMod
   implicit none
   private
   character(len=*),private, parameter :: mod_filename = __FILE__
@@ -49,7 +52,6 @@ module InitEcoSIM
   use PlantMngmtDataType  , only : InitPlantMngmtData
   use InitSOMBGCMod       , only : InitSOMBGC
   use GridConsts
-  use EcoSIMCtrlMod
   use EcoSIMConfig        , only : jcplx1 => jcplx1c
   use TracerIDMod         , only : InitTracerIDs
   implicit  none
@@ -151,7 +153,7 @@ module InitEcoSIM
   implicit none
 
 
-  if(ISALTG/=0)then
+  if(salt_model)then
     call InitTrnsfrs
   else
     call InitTrnsfr
