@@ -294,7 +294,8 @@ module RedistMod
 !
 !     SET DEPTH OF MOBILE EXTERNAL WATER TABLE
 ! switched on for change of water table due to discharge/drainage
-! why 0.00167?
+! why 0.00167, time relaxization constant, ?
+! 4 is mobile tile drainge.
   IF(IDTBL(NY,NX).EQ.2.OR.IDTBL(NY,NX).EQ.4)THEN
     DTBLX(NY,NX)=DTBLX(NY,NX)-HVOLO(NY,NX)/AREA(3,NU(NY,NX),NY,NX) &
       -0.00167_r8*(DTBLX(NY,NX)-DTBLZ(NY,NX)-CDPTH(NU(NY,NX)-1,NY,NX))

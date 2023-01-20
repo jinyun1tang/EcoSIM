@@ -73,7 +73,7 @@ PROGRAM main
   write(iulog,*)'input files at:',trim(prefix)
   IGO=0
 !
-! NUMBER OF COLUMNS AND ROWS
+! NUMBER OF COLUMNS AND ROWS for the whole land scape
 !
   READ(5,*)NHW,NVN,NHE,NVS
 
@@ -127,13 +127,13 @@ PROGRAM main
 !
       D115: DO N=21,30
         READ(5,10)DATAC(N,NE,NEX)
-      ENDDO D115   
+      ENDDO D115
     ENDDO D110
   ENDDO D105
 !
 !  RUN THIS SCRIPT
 !
-  DO 120 NTX=1,NDX        !repeat scenario NDX times, usually set to 1, though multiple scenes is possible
+  D120: DO NTX=1,NDX        !repeat scenario NDX times, usually set to 1, though multiple scenes is possible
     DO  NEX=1,NAX         !run nax scenes for scenario ntx, each scene could have periods, where each period has multiple years
       DO  NT=1,ND(NEX)    !ND(NEX)=NDY, period NT
         DO  NE=1,NA(NEX)  !NA(NEX)=NAY, year NE in period NT
@@ -144,7 +144,7 @@ PROGRAM main
         enddo
       enddo
     enddo
-120   CONTINUE
+  ENDDO D120
 !
 !   SCRIPT COMPLETED, START NEXT SCRIPT
 !

@@ -1031,7 +1031,7 @@ module ncdio_pio
   call check_var(ncid, trim(varname), vardesc, readvar)
 
   call check_ret( nf90_get_var(ncid%fh, vardesc%varid, data,  &
-     start = (/1,rec/)),'ncd_getvar_real_sp_1d')
+     start = (/1,rec/)),'ncd_getvar_real_sp_1d '//trim(varname))
 
   end subroutine ncd_getvar_real_sp_1d
 

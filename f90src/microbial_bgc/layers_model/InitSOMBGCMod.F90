@@ -590,7 +590,7 @@ module InitSOMBGCMOD
   real(r8), intent(in) :: CDPTHG
   real(r8), intent(out):: FCX
   real(r8), intent(out):: CORGCM
-  real(r8) :: FCO,FCY,FC0,FC1
+  real(r8) :: FCY,FC0,FC1
 
 ! begin_execution
   associate(                      &
@@ -631,7 +631,7 @@ module InitSOMBGCMOD
           FC0=FCY*EXP(-5.0_r8*(AMIN1(CORGNX(k_humus), &
             10.0_r8*CORGPX(k_humus))/CORGCX(k_humus)))
         ELSE
-          FCO=FCY
+          FC0=FCY
         ENDIF
         FCX=EXP(HCX*TORGL)
         !     WETLAND
@@ -642,7 +642,7 @@ module InitSOMBGCMOD
           FC0=FCY*EXP(-5.0_r8*(AMIN1(CORGNX(k_humus), &
             10.0_r8*CORGPX(k_humus))/CORGCX(k_humus)))
         ELSE
-          FCO=FCY
+          FC0=FCY
         ENDIF
 !     FCX=(EXP(HCX*TORGL))**0.5_r8
         FCX=EXP(HCX*TORGL)
@@ -656,7 +656,7 @@ module InitSOMBGCMOD
         FC0=FCY*EXP(-5.0_r8*(AMIN1(CORGNX(k_humus), &
           10.0_r8*CORGPX(k_humus))/CORGCX(k_humus)))
       ELSE
-        FCO=FCY
+        FC0=FCY
       ENDIF
       FCX=1.0_r8
     ENDIF

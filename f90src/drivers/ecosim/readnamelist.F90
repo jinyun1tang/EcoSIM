@@ -7,7 +7,7 @@
   use EcoSIMConfig , only : transport_on,column_mode, do_instequil
   use ForcWriterMod, only : bgc_forc_conf,do_bgcforc_write
   use fileUtil     , only : iulog
-  use EcoSIMCtrlMod, only : salt_model, pft_file_in
+  use EcoSIMCtrlMod, only : salt_model, pft_file_in,grid_file_in
 
   implicit none
   character(len=*), parameter :: mod_filename = __FILE__
@@ -29,7 +29,7 @@
 
   namelist /ecosys/case_name, prefix, runfile, do_regression_test, &
   num_of_simdays,lverbose,num_microbial_guilds,transport_on,column_mode,&
-  do_instequil,salt_model, pft_file_in
+  do_instequil,salt_model, pft_file_in,grid_file_in
 
 
   logical :: laddband
@@ -54,6 +54,7 @@
   bgc_fname='bbforc.nc'
   do_instequil=.false.
   pft_file_in=''
+  grid_file_in=''
   inquire (file=nmlfile, iostat=rc)
   if (rc /= 0) then
     write (iulog, '(3a)') 'Error: input file ', trim(nmlfile), &

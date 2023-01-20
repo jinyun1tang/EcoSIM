@@ -2657,7 +2657,7 @@ module WatsubMod
     D=VX/AREA(3,0,N2,N1)
     R=D/2.828_r8
     V=R**0.67_r8*safe_adb(SQRT(SLOPE(0,N2,N1)),ZM(N2,N1))
-    Q=V*D*AREA(3,NUM(N2,N1),N2,N1)*3.6E+03*XNPH
+    Q=V*D*AREA(3,NUM(N2,N1),N2,N1)*3.6E+03_r8*XNPH
     VOLW1X=AZMAX1(VOLW1(0,N2,N1)+WFLXR(N2,N1))
     QRM(M,N2,N1)=AMIN1(Q,VX*XNPX,VOLW1X*XNPX)*XVOLW(N2,N1)/XVOLT(N2,N1)
     QRV(M,N2,N1)=V
@@ -3465,7 +3465,6 @@ module WatsubMod
 
   DO  NX=NHW,NHE
     DO  NY=NVN,NVS
-
       D9585: DO L=NUM(NY,NX),NL(NY,NX)
         VOLP2=VOLA1(L,NY,NX)-VOLW1(L,NY,NX)-VOLI1(L,NY,NX)
         VOLPX2=VOLP2
@@ -3490,8 +3489,8 @@ module WatsubMod
 !
 !     LOCATE EXTERNAL BOUNDARIES
 !
-        DO 9580 N=NCN(NY,NX),3
-          DO 9575 NN=1,2
+        D9580: DO N=NCN(NY,NX),3
+          D9575: DO NN=1,2
             IF(N.EQ.1)THEN
               N4=NX+1
               N5=NY
@@ -3506,7 +3505,7 @@ module WatsubMod
                   M4=NX+1
                   M5=NY
                   M6=L
-                  XN=-1.0
+                  XN=-1.0_r8
                   RCHQF=RCHQE(M2,M1)
                   RCHGFU=RCHGEU(M2,M1)
                   RCHGFT=RCHGET(M2,M1)
@@ -3624,8 +3623,7 @@ module WatsubMod
                 DPTHW2=VOLWG(N2,N1)/AREA(3,NUM(N2,N1),N2,N1)
                 ALT1=ALTG(N2,N1)+DPTHW1
                 ALT2=ALTG(N2,N1)+DPTHW2-XN*SLOPE(N,N2,N1)*DLYR(N,NUM(N2,N1),N2,N1)
-                IF(ALT1.GT.ALT2 &
-                  .AND.CDPTH(NU(N2,N1)-1,N2,N1)-DPTHW1.LT.DTBLX(N2,N1))THEN
+                IF(ALT1.GT.ALT2.AND.CDPTH(NU(N2,N1)-1,N2,N1)-DPTHW1.LT.DTBLX(N2,N1))THEN
                   QR1(N,NN,M5,M4)=-XN*QRM(M,N2,N1)*RCHQF
                   HQR1(N,NN,M5,M4)=cpw*TK1(0,N2,N1)*QR1(N,NN,M5,M4)
                   QR(N,NN,M5,M4)=QR(N,NN,M5,M4)+QR1(N,NN,M5,M4)
@@ -3977,7 +3975,7 @@ module WatsubMod
             FLWM(M,N,M6,M5,M4)=0.0
             FLWHM(M,N,M6,M5,M4)=0.0
           ENDIF
-9575    CONTINUE
+        ENDDO D9575
     !
     !     NET WATER AND HEAT FLUXES IN RUNOFF AND SNOW DRIFT
     !
@@ -3988,7 +3986,7 @@ module WatsubMod
     !     HQS1=convective heat transfer from snow,water,ice transfer
 !
         IF(L.EQ.NUM(N2,N1).AND.N.NE.3)THEN
-          DO 1202 NN=1,2
+          D1202: DO NN=1,2
             TQR1(N2,N1)=TQR1(N2,N1)+QR1(N,NN,N2,N1)
             THQR1(N2,N1)=THQR1(N2,N1)+HQR1(N,NN,N2,N1)
             IF(IFLBM(M,N,NN,N5,N4).EQ.0)THEN
@@ -4007,7 +4005,7 @@ module WatsubMod
                 IFLBH(N,NN,N5B,N4B)=IFLBM(M,N,NN,N5B,N4B)
               ENDIF
             ENDIF
-1202      CONTINUE
+          ENDDO D1202
           TQS1(N2,N1)=TQS1(N2,N1)+QS1(N,N2,N1)-QS1(N,N5,N4)
           TQW1(N2,N1)=TQW1(N2,N1)+QW1(N,N2,N1)-QW1(N,N5,N4)
           TQI1(N2,N1)=TQI1(N2,N1)+QI1(N,N2,N1)-QI1(N,N5,N4)
@@ -4042,7 +4040,7 @@ module WatsubMod
             THFLWL(N3,N2,N1)=0.0
           ENDIF
         ENDIF
-9580  CONTINUE
+      ENDDO D9580
 !
 !     INFILTRATION OF WATER FROM MACROPORES INTO MICROPORES
 !
