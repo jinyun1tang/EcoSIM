@@ -515,9 +515,7 @@ implicit none
     DO  L=1,JZ
       DO N=1,pltpar%jroots
         EPOOLR(1:npelms,N,L,NZ,NY,NX)=plt_biom%EPOOLR(1:npelms,N,L,NZ)
-        CCPOLR(N,L,NZ,NY,NX)=plt_biom%CCPOLR(N,L,NZ)
-        CZPOLR(N,L,NZ,NY,NX)=plt_biom%CZPOLR(N,L,NZ)
-        CPPOLR(N,L,NZ,NY,NX)=plt_biom%CPPOLR(N,L,NZ)
+        CEPOLR(1:npelms,N,L,NZ,NY,NX)=plt_biom%CEPOLR(1:npelms,N,L,NZ)
         CWSRTL(N,L,NZ,NY,NX)=plt_biom%CWSRTL(N,L,NZ)
         trcg_rootml(idg_beg:idg_end-1,N,L,NZ,NY,NX)  =plt_rbgc%trcg_rootml(idg_beg:idg_end-1,N,L,NZ)
         trcs_rootml(idg_beg:idg_end-1,N,L,NZ,NY,NX)  =plt_rbgc%trcs_rootml(idg_beg:idg_end-1,N,L,NZ)
@@ -1357,9 +1355,7 @@ implicit none
         plt_rbgc%trcs_rootml(idg_beg:idg_end-1,N,L,NZ)=trcs_rootml(idg_beg:idg_end-1,N,L,NZ,NY,NX)
         plt_rbgc%trcg_rootml(idg_beg:idg_end-1,N,L,NZ)=trcg_rootml(idg_beg:idg_end-1,N,L,NZ,NY,NX)
 
-        plt_biom%CCPOLR(N,L,NZ)=CCPOLR(N,L,NZ,NY,NX)
-        plt_biom%CZPOLR(N,L,NZ)=CZPOLR(N,L,NZ,NY,NX)
-        plt_biom%CPPOLR(N,L,NZ)=CPPOLR(N,L,NZ,NY,NX)
+        plt_biom%CEPOLR(1:npelms,N,L,NZ)=CEPOLR(1:npelms,N,L,NZ,NY,NX)
         plt_biom%CWSRTL(N,L,NZ)=CWSRTL(N,L,NZ,NY,NX)
 
         plt_ew%PSIRT(N,L,NZ)=PSIRT(N,L,NZ,NY,NX)

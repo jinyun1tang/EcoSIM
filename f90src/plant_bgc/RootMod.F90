@@ -367,11 +367,9 @@ implicit none
   associate(                          &
     RTWT1E  =>  plt_biom%RTWT1E     , &
     WTRT2E  =>  plt_biom%WTRT2E     , &
-    CCPOLR  =>  plt_biom%CCPOLR     , &
-    CZPOLR  =>  plt_biom%CZPOLR     , &
+    CEPOLR  =>  plt_biom%CEPOLR     , &
     WTRT1E  =>  plt_biom%WTRT1E     , &
     EPOOLR  =>  plt_biom%EPOOLR     , &
-    CPPOLR  =>  plt_biom%CPPOLR     , &
     WSRTL   =>  plt_biom%WSRTL      , &
     WTRTL   =>  plt_biom%WTRTL      , &
     ZEROP   =>  plt_biom%ZEROP      , &
@@ -451,10 +449,10 @@ implicit none
 !     CNPG=N,P constraint on growth respiration
 !     CNKI,CPKI=nonstructural N,P inhibition constant on growth
 !
-      IF(CCPOLR(N,L,NZ).GT.ZERO)THEN
-        CNPG=AMIN1(CZPOLR(N,L,NZ)/(CZPOLR(N,L,NZ) &
-          +CCPOLR(N,L,NZ)*CNKI),CPPOLR(N,L,NZ) &
-          /(CPPOLR(N,L,NZ)+CCPOLR(N,L,NZ)*CPKI))
+      IF(CEPOLR(ielmc,N,L,NZ).GT.ZERO)THEN
+        CNPG=AMIN1(CEPOLR(ielmn,N,L,NZ)/(CEPOLR(ielmn,N,L,NZ) &
+          +CEPOLR(ielmc,N,L,NZ)*CNKI),CEPOLR(ielmp,N,L,NZ) &
+          /(CEPOLR(ielmp,N,L,NZ)+CEPOLR(ielmc,N,L,NZ)*CPKI))
       ELSE
         CNPG=1.0_r8
       ENDIF
@@ -559,15 +557,15 @@ implicit none
 !     RCCZR,RCCYR=min,max fractions for root C recycling
 !     RCCXR,RCCQR=max fractions for root N,P recycling
 !
-      IF(IDAY(1,NB1(NZ),NZ).NE.0.AND.CCPOLR(N,L,NZ).GT.ZERO)THEN
-        CCC=AZMAX1(AMIN1(1.0_r8,safe_adb(CZPOLR(N,L,NZ),CZPOLR(N,L,NZ) &
-          +CCPOLR(N,L,NZ)*CNKI) &
-          ,safe_adb(CPPOLR(N,L,NZ),CPPOLR(N,L,NZ) &
-          +CCPOLR(N,L,NZ)*CPKI)))
+      IF(IDAY(1,NB1(NZ),NZ).NE.0.AND.CEPOLR(ielmc,N,L,NZ).GT.ZERO)THEN
+        CCC=AZMAX1(AMIN1(1.0_r8,safe_adb(CEPOLR(ielmn,N,L,NZ),CEPOLR(ielmn,N,L,NZ) &
+          +CEPOLR(ielmc,N,L,NZ)*CNKI) &
+          ,safe_adb(CEPOLR(ielmp,N,L,NZ),CEPOLR(ielmp,N,L,NZ) &
+          +CEPOLR(ielmc,N,L,NZ)*CPKI)))
         CNC=AZMAX1(AMIN1(1.0_r8 &
-          ,safe_adb(CCPOLR(N,L,NZ),CCPOLR(N,L,NZ)+CZPOLR(N,L,NZ)/CNKI)))
+          ,safe_adb(CEPOLR(ielmc,N,L,NZ),CEPOLR(ielmc,N,L,NZ)+CEPOLR(ielmn,N,L,NZ)/CNKI)))
         CPC=AZMAX1(AMIN1(1.0_r8 &
-          ,safe_adb(CCPOLR(N,L,NZ),CCPOLR(N,L,NZ)+CPPOLR(N,L,NZ)/CPKI)))
+          ,safe_adb(CEPOLR(ielmc,N,L,NZ),CEPOLR(ielmc,N,L,NZ)+CEPOLR(ielmp,N,L,NZ)/CPKI)))
       ELSE
         CCC=0._r8
         CNC=0._r8
@@ -774,10 +772,10 @@ implicit none
 !     CNPG=N,P constraint on growth respiration
 !     CNKI,CPKI=nonstructural N,P inhibition constant on growth
 !
-              IF(CCPOLR(N,L,NZ).GT.ZERO)THEN
-                CNPG=AMIN1(CZPOLR(N,L,NZ)/(CZPOLR(N,L,NZ) &
-                  +CCPOLR(N,L,NZ)*CNKI),CPPOLR(N,L,NZ) &
-                  /(CPPOLR(N,L,NZ)+CCPOLR(N,L,NZ)*CPKI))
+              IF(CEPOLR(ielmc,N,L,NZ).GT.ZERO)THEN
+                CNPG=AMIN1(CEPOLR(ielmn,N,L,NZ)/(CEPOLR(ielmn,N,L,NZ) &
+                  +CEPOLR(ielmc,N,L,NZ)*CNKI),CEPOLR(ielmp,N,L,NZ) &
+                  /(CEPOLR(ielmp,N,L,NZ)+CEPOLR(ielmc,N,L,NZ)*CPKI))
               ELSE
                 CNPG=1.0_r8
               ENDIF
@@ -1081,9 +1079,7 @@ implicit none
 ! begin_execution
   associate(                          &
     RTWT1E  =>  plt_biom%RTWT1E     , &
-    CCPOLR  =>  plt_biom%CCPOLR     , &
-    CZPOLR  =>  plt_biom%CZPOLR     , &
-    CPPOLR  =>  plt_biom%CPPOLR     , &
+    CEPOLR  =>  plt_biom%CEPOLR     , &
     ZEROP   =>  plt_biom%ZEROP      , &
     ZERO    =>  plt_site%ZERO       , &
     icwood  =>  pltpar%icwood       , &
@@ -1110,11 +1106,11 @@ implicit none
 !     RCCXR,RCCQR=max fractions for root N,P recycling
 !
   IF(IDAY(1,NB1(NZ),NZ).NE.0 &
-    .AND.CCPOLR(N,L,NZ).GT.ZERO)THEN
-    CCC=AZMAX1(AMIN1(1.0_r8,safe_adb(CZPOLR(N,L,NZ),CZPOLR(N,L,NZ)+CCPOLR(N,L,NZ)*CNKI) &
-      ,safe_adb(CPPOLR(N,L,NZ),CPPOLR(N,L,NZ)+CCPOLR(N,L,NZ)*CPKI)))
-    CNC=AZMAX1(AMIN1(1.0_r8,safe_adb(CCPOLR(N,L,NZ),CCPOLR(N,L,NZ)+CZPOLR(N,L,NZ)/CNKI)))
-    CPC=AZMAX1(AMIN1(1.0_r8,safe_adb(CCPOLR(N,L,NZ),CCPOLR(N,L,NZ)+CPPOLR(N,L,NZ)/CPKI)))
+    .AND.CEPOLR(ielmc,N,L,NZ).GT.ZERO)THEN
+    CCC=AZMAX1(AMIN1(1.0_r8,safe_adb(CEPOLR(ielmn,N,L,NZ),CEPOLR(ielmn,N,L,NZ)+CEPOLR(ielmc,N,L,NZ)*CNKI) &
+      ,safe_adb(CEPOLR(ielmp,N,L,NZ),CEPOLR(ielmp,N,L,NZ)+CEPOLR(ielmc,N,L,NZ)*CPKI)))
+    CNC=AZMAX1(AMIN1(1.0_r8,safe_adb(CEPOLR(ielmc,N,L,NZ),CEPOLR(ielmc,N,L,NZ)+CEPOLR(ielmn,N,L,NZ)/CNKI)))
+    CPC=AZMAX1(AMIN1(1.0_r8,safe_adb(CEPOLR(ielmc,N,L,NZ),CEPOLR(ielmc,N,L,NZ)+CEPOLR(ielmp,N,L,NZ)/CPKI)))
   ELSE
     CCC=0._r8
     CNC=0._r8
@@ -1524,13 +1520,11 @@ implicit none
   associate(                                &
     FWODBE     =>   plt_allom%FWODBE  , &
     FWODRE     =>   plt_allom%FWODRE  , &
-    CCPOLR     =>   plt_biom%CCPOLR   , &
-    CZPOLR     =>   plt_biom%CZPOLR   , &
+    CEPOLR     =>   plt_biom%CEPOLR   , &
     RTWT1E     =>   plt_biom%RTWT1E   , &
     WTRT1E     =>   plt_biom%WTRT1E   , &
     WTRT2E     =>   plt_biom%WTRT2E   , &
     WTRTL      =>   plt_biom%WTRTL    , &
-    CPPOLR     =>   plt_biom%CPPOLR   , &
     EPOOLR     =>   plt_biom%EPOOLR   , &
     WTLSB      =>   plt_biom%WTLSB    , &
     EPOOL      =>   plt_biom%EPOOL    , &
@@ -1701,9 +1695,9 @@ implicit none
   IF(IFLGZ.EQ.1.AND.ISTYP(NZ).NE.iplt_annual)THEN
     D5545: DO N=1,MY(NZ)
       D5550: DO L=NU,NI(NZ)
-        IF(CCPOLR(N,L,NZ).GT.ZERO)THEN
-          CNL=CCPOLR(N,L,NZ)/(CCPOLR(N,L,NZ)+CZPOLR(N,L,NZ)/CNKI)
-          CPL=CCPOLR(N,L,NZ)/(CCPOLR(N,L,NZ)+CPPOLR(N,L,NZ)/CPKI)
+        IF(CEPOLR(ielmc,N,L,NZ).GT.ZERO)THEN
+          CNL=CEPOLR(ielmc,N,L,NZ)/(CEPOLR(ielmc,N,L,NZ)+CEPOLR(ielmn,N,L,NZ)/CNKI)
+          CPL=CEPOLR(ielmc,N,L,NZ)/(CEPOLR(ielmc,N,L,NZ)+CEPOLR(ielmp,N,L,NZ)/CPKI)
         ELSE
           CNL=0._r8
           CPL=0._r8

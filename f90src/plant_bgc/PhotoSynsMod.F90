@@ -334,13 +334,13 @@ implicit none
   )
 ! FOR EACH CANOPY LAYER
 !
-  DO 110 L=JC1,1,-1
+  D110: DO L=JC1,1,-1
     IF(ARLFL(L,K,NB,NZ).GT.ZEROP(NZ))THEN
 !
 !     FOR EACH LEAF AZIMUTH AND INCLINATION
 !
-      DO 115 N =1,JLI1
-        DO 120 M =1,JSA1
+      D115: DO N =1,JLI1
+        D120: DO M =1,JSA1
 !
 !         CO2 FIXATION IN MESOPHYLL BY SUNLIT LEAVES
 !
@@ -417,15 +417,15 @@ implicit none
                 D125: DO NN=1,100
                   CO2C=CO2X*SCO2(NZ)
                   CO2Y=AZMAX1(CO2C-COMP4)
-                  CBXNX=CO2Y/(ELEC4*CO2C+10.5*COMP4)
+                  CBXNX=CO2Y/(ELEC4*CO2C+10.5_r8*COMP4)
                   VGROX=VCGR4(K,NB,NZ)*CO2Y/(CO2C+XKCO24(NZ))
                   EGROX=ETLF4*CBXNX
                   VL=AMIN1(VGROX,EGROX)*WFN4*FDBK4(K,NB,NZ)
                   VG=(CO2Q(NZ)-CO2X)*GSL
                   IF(VL+VG.GT.ZERO)THEN
                     DIFF=(VL-VG)/(VL+VG)
-                    IF(ABS(DIFF).LT.0.005)exit
-                    VA=0.95*VG+0.05*VL
+                    IF(ABS(DIFF).LT.0.005_r8)exit
+                    VA=0.95_r8*VG+0.05_r8*VL
                     CO2X=CO2Q(NZ)-VA/GSL
                   ELSE
                     VL=0._r8
@@ -516,7 +516,7 @@ implicit none
 !               WFN4,WFNB=non-stomatal effects of water stress on C4,C3 CO2 fixation
 !
                 IF(IGTYP(NZ).NE.0)THEN
-                  WFN4=(RS/RSL)**1.00
+                  WFN4=(RS/RSL)**1.00_r8
                   WFNB=SQRT(RS/RSL)
                 ELSE
                   WFN4=WFNG
@@ -541,24 +541,24 @@ implicit none
 !               GSL=leaf stomatal conductance (mol m-2 s-1)
 !
                 CO2X=CO2I(NZ)
-                DO 135 NN=1,100
+                D135: DO NN=1,100
                   CO2C=CO2X*SCO2(NZ)
                   CO2Y=AZMAX1(CO2C-COMP4)
-                  CBXNX=CO2Y/(ELEC4*CO2C+10.5*COMP4)
+                  CBXNX=CO2Y/(ELEC4*CO2C+10.5_r8*COMP4)
                   VGROX=VCGR4(K,NB,NZ)*CO2Y/(CO2C+XKCO24(NZ))
                   EGROX=ETLF4*CBXNX
                   VL=AMIN1(VGROX,EGROX)*WFN4*FDBK4(K,NB,NZ)
                   VG=(CO2Q(NZ)-CO2X)*GSL
                   IF(VL+VG.GT.ZERO)THEN
                     DIFF=(VL-VG)/(VL+VG)
-                    IF(ABS(DIFF).LT.0.005)exit
-                    VA=0.95*VG+0.05*VL
+                    IF(ABS(DIFF).LT.0.005_r8)exit
+                    VA=0.95_r8*VG+0.05_r8*VL
                     CO2X=CO2Q(NZ)-VA/GSL
                   ELSE
                     VL=0._r8
                     exit
                   ENDIF
-135             CONTINUE
+                ENDDO D135
 !
 !               ACCUMULATE C4 FIXATION PRODUCT IN MESOPHYLL
 !
@@ -566,8 +566,7 @@ implicit none
 !               SURFX=unself-shaded leaf surface area
 !               TAU0=fraction of diffuse radiation transmitted from layer above
 !
-                CH2O4(K)=CH2O4(K)+VL*SURFX(N,L,K,NB,NZ) &
-                  *TAU0(L+1)
+                CH2O4(K)=CH2O4(K)+VL*SURFX(N,L,K,NB,NZ)*TAU0(L+1)
 !               ICO2I=MAX(1,MIN(400,INT(CO2X)))
 !               VCO2(ICO2I,I,NZ)=VCO2(ICO2I,I,NZ)
 !              2+(VL*SURFX(N,L,K,NB,NZ)*TAU0(L+1))*0.0432
@@ -594,15 +593,14 @@ implicit none
 !               SURFX=unself-shaded leaf surface area
 !               TAU0=fraction of diffuse radiation transmitted from layer above
 !
-                CH2O3(K)=CH2O3(K)+VL*SURFX(N,L,K,NB,NZ) &
-                  *TAU0(L+1)
+                CH2O3(K)=CH2O3(K)+VL*SURFX(N,L,K,NB,NZ)*TAU0(L+1)
               ENDIF
             ENDIF
           ENDIF
-120     CONTINUE
-115   CONTINUE
+        ENDDO D120
+      ENDDO D115
     ENDIF
-110   CONTINUE
+  ENDDO D110
   CO2F=CO2F+CH2O4(K)
   CH2O=CH2O+CH2O3(K)
   end associate
@@ -676,8 +674,8 @@ implicit none
 !         CONVERT UMOL M-2 S-1 TO G C M-2 H-1
 !
         D150: DO K=1,JNODS1
-          CH2O3(K)=CH2O3(K)*0.0432
-          CH2O4(K)=CH2O4(K)*0.0432
+          CH2O3(K)=CH2O3(K)*0.0432_r8
+          CH2O4(K)=CH2O4(K)*0.0432_r8
         ENDDO D150
       ELSE
         CO2F=0._r8

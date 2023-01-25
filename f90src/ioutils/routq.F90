@@ -84,6 +84,8 @@ SUBROUTINE routq(NT,NE,NTX,NEX,NHW,NHE,NVN,NVS)
 !DATAX(NZ): pft file defines pft properties
 !DATAY(NZ): management file, seeding information
 !IETYP=Koppen climate zone:-2=phytotron
+!the following code assumes there is only one grid specified by
+!the coordinates NH1,NV1,NH2,NV2
       READ(14,*)(DATAX(NZ),DATAY(NZ),NZ=1,NS)
       D4975: DO NX=NH1,NH2
         D4970: DO NY=NV1,NV2

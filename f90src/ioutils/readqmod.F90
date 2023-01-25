@@ -81,21 +81,22 @@ module readqmod
     call OPEN_safe(12,PREFIX,DATAM(NZ,NY,NX),'OLD',mod_filename,__LINE__)
   ENDIF
 
-!
+! initialize the disturbance arrays
   D15: DO M=1,366
     IHVST(NZ,M,NY,NX)=-1
     JHVST(NZ,M,NY,NX)=0
-    HVST(NZ,M,NY,NX)=1.0E+06
-    THIN(NZ,M,NY,NX)=-1.0
-    EHVST(1,1,NZ,M,NY,NX)=1.0
-    EHVST(1,2,NZ,M,NY,NX)=1.0
-    EHVST(1,3,NZ,M,NY,NX)=1.0
-    EHVST(1,4,NZ,M,NY,NX)=1.0
-    EHVST(2,1,NZ,M,NY,NX)=1.0
-    EHVST(2,2,NZ,M,NY,NX)=1.0
-    EHVST(2,3,NZ,M,NY,NX)=1.0
-    EHVST(2,4,NZ,M,NY,NX)=1.0
+    HVST(NZ,M,NY,NX)=1.0E+06_r8
+    THIN(NZ,M,NY,NX)=-1.0_r8
+    EHVST(1,ipld_leaf,NZ,M,NY,NX)=1.0_r8
+    EHVST(1,ipld_nofoliar,NZ,M,NY,NX)=1.0_r8
+    EHVST(1,ipld_woody,NZ,M,NY,NX)=1.0_r8
+    EHVST(1,ipld_stdead,NZ,M,NY,NX)=1.0_r8
+    EHVST(2,ipld_leaf,NZ,M,NY,NX)=1.0_r8
+    EHVST(2,ipld_nofoliar,NZ,M,NY,NX)=1.0_r8
+    EHVST(2,ipld_woody,NZ,M,NY,NX)=1.0_r8
+    EHVST(2,ipld_stdead,NZ,M,NY,NX)=1.0_r8
   ENDDO D15
+
   if(lverb)then
     write(*,*)'read pft management file ',DATAM(NZ,NY,NX)
   endif
@@ -106,6 +107,7 @@ module readqmod
     IYR0(NZ,NY,NX)=-1E+06
     IDAYH(NZ,NY,NX)=1E+06
     IYRH(NZ,NY,NX)=1E+06
+
     do while(.TRUE.)
       IF(N.EQ.0)THEN
 !
@@ -149,7 +151,7 @@ module readqmod
             'if grazing: first grazing date DDMMYYYY, followed by '// &
             'last grazing date in next line: DY',DY
           write(*,*)'harvest type:0=none,1=grain,2=all '// &
-            'above-ground,3=pruning: ICUT',ICUT
+            'above-ground,3=pruning,4=grazing,5=fire,6=herbivory: ICUT',ICUT
           write(*,*)'terminate PFT:0=no,1=yes,2=yes,but reseed: JCUT',JCUT
           write(*,*)'if harvesting: >0=cutting height,<0=fraction'// &
             ' of LAI removed; if grazing: grazer consumption rate'// &
@@ -223,14 +225,14 @@ module readqmod
         JHVST(NZ,IDY,NY,NX)=JCUT
         HVST(NZ,IDY,NY,NX)=HCUT
         THIN(NZ,IDY,NY,NX)=PCUT
-        EHVST(1,1,NZ,IDY,NY,NX)=ECUT11
-        EHVST(1,2,NZ,IDY,NY,NX)=ECUT12
-        EHVST(1,3,NZ,IDY,NY,NX)=ECUT13
-        EHVST(1,4,NZ,IDY,NY,NX)=ECUT14
-        EHVST(2,1,NZ,IDY,NY,NX)=ECUT21
-        EHVST(2,2,NZ,IDY,NY,NX)=ECUT22
-        EHVST(2,3,NZ,IDY,NY,NX)=ECUT23
-        EHVST(2,4,NZ,IDY,NY,NX)=ECUT24
+        EHVST(1,ipld_leaf,NZ,IDY,NY,NX)=ECUT11
+        EHVST(1,ipld_nofoliar,NZ,IDY,NY,NX)=ECUT12
+        EHVST(1,ipld_woody,NZ,IDY,NY,NX)=ECUT13
+        EHVST(1,ipld_stdead,NZ,IDY,NY,NX)=ECUT14
+        EHVST(2,ipld_leaf,NZ,IDY,NY,NX)=ECUT21
+        EHVST(2,ipld_nofoliar,NZ,IDY,NY,NX)=ECUT22
+        EHVST(2,ipld_woody,NZ,IDY,NY,NX)=ECUT23
+        EHVST(2,ipld_stdead,NZ,IDY,NY,NX)=ECUT24
 !
 !     IF ANIMAL OR INSECT GRAZING LOAD ALL DATES BETWEEN FIRST AND LAST
 !
@@ -244,14 +246,14 @@ module readqmod
               JHVST(NZ,IDYG,NY,NX)=JCUT
               HVST(NZ,IDYG,NY,NX)=HCUT
               THIN(NZ,IDYG,NY,NX)=PCUT
-              EHVST(1,1,NZ,IDYG,NY,NX)=ECUT11
-              EHVST(1,2,NZ,IDYG,NY,NX)=ECUT12
-              EHVST(1,3,NZ,IDYG,NY,NX)=ECUT13
-              EHVST(1,4,NZ,IDYG,NY,NX)=ECUT14
-              EHVST(2,1,NZ,IDYG,NY,NX)=ECUT21
-              EHVST(2,2,NZ,IDYG,NY,NX)=ECUT22
-              EHVST(2,3,NZ,IDYG,NY,NX)=ECUT23
-              EHVST(2,4,NZ,IDYG,NY,NX)=ECUT24
+              EHVST(1,ipld_leaf,NZ,IDYG,NY,NX)=ECUT11
+              EHVST(1,ipld_nofoliar,NZ,IDYG,NY,NX)=ECUT12
+              EHVST(1,ipld_woody,NZ,IDYG,NY,NX)=ECUT13
+              EHVST(1,ipld_stdead,NZ,IDYG,NY,NX)=ECUT14
+              EHVST(2,ipld_leaf,NZ,IDYG,NY,NX)=ECUT21
+              EHVST(2,ipld_nofoliar,NZ,IDYG,NY,NX)=ECUT22
+              EHVST(2,ipld_woody,NZ,IDYG,NY,NX)=ECUT23
+              EHVST(2,ipld_stdead,NZ,IDYG,NY,NX)=ECUT24
             ENDDO D580
           endif
 !570     IDYS=IDY

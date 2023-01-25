@@ -922,9 +922,7 @@ module StartqsMod
       PSIRO(N,L,NZ)=OSMO(NZ)+PSIRT(N,L,NZ)
       PSIRG(N,L,NZ)=AZMAX1(PSIRT(N,L,NZ)-PSIRO(N,L,NZ))
       plt_biom%EPOOLR(1:npelms,N,L,NZ)=0._r8
-      plt_biom%CCPOLR(N,L,NZ)=0._r8
-      plt_biom%CZPOLR(N,L,NZ)=0._r8
-      plt_biom%CPPOLR(N,L,NZ)=0._r8
+      plt_biom%CEPOLR(1:npelms,N,L,NZ)=0._r8
       CWSRTL(N,L,NZ)=CWSRT(NZ)
       plt_biom%WTRTL(N,L,NZ)=0._r8
       plt_biom%WTRTD(N,L,NZ)=0._r8

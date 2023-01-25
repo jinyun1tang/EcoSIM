@@ -542,9 +542,7 @@ module UptakesMod
    NI      => plt_morph%NI     , &
    NG      => plt_morph%NG     , &
    MY      => plt_morph%MY     , &
-   CCPOLR  => plt_biom%CCPOLR  , &
-   CZPOLR  => plt_biom%CZPOLR  , &
-   CPPOLR  => plt_biom%CPPOLR  , &
+   CEPOLR  => plt_biom%CEPOLR  , &
    CEPOLP  => plt_biom%CEPOLP  , &
    WTSHTE  => plt_biom%WTSHTE  , &
    RA      => plt_photo%RA     , &
@@ -586,7 +584,7 @@ module UptakesMod
           PSIRT(N,L,NZ)=PSIST1(L)
           APSIRT=ABS(PSIRT(N,L,NZ))
           FDMR=0.16_r8+0.10_r8*APSIRT/(0.05_r8*APSIRT+2.0_r8)
-          CCPOLT=CCPOLR(N,L,NZ)+CZPOLR(N,L,NZ)+CPPOLR(N,L,NZ)
+          CCPOLT=sum(CEPOLR(1:npelms,N,L,NZ))
           OSWT=36.0_r8+840.0_r8*AZMAX1(CCPOLT)
           PSIRO(N,L,NZ)=FDMR/0.16_r8*OSMO(NZ)-RGAS*TKS(L)*FDMR*CCPOLT/OSWT
           PSIRG(N,L,NZ)=AZMAX1(PSIRT(N,L,NZ)-PSIRO(N,L,NZ))
@@ -1106,9 +1104,7 @@ module UptakesMod
     ZERO   =>  plt_site%ZERO    , &
     AREA3  =>  plt_site%AREA3   , &
     CEPOLP =>  plt_biom%CEPOLP  , &
-    CCPOLR =>  plt_biom%CCPOLR  , &
-    CZPOLR =>  plt_biom%CZPOLR  , &
-    CPPOLR =>  plt_biom%CPPOLR  , &
+    CEPOLR =>  plt_biom%CEPOLR  , &
     WTSHTE =>  plt_biom%WTSHTE  , &
     NI     =>  plt_morph%NI     , &
     ZC     =>  plt_morph%ZC     , &
@@ -1153,8 +1149,8 @@ module UptakesMod
     DO  L=NU,NI(NZ)
       PSIRT(N,L,NZ)=PSIST1(L)
       APSIRT=ABS(PSIRT(N,L,NZ))
-      FDMR=0.16_r8+0.10_r8*APSIRT/(0.05*APSIRT+2.0_r8)
-      CCPOLT=CCPOLR(N,L,NZ)+CZPOLR(N,L,NZ)+CPPOLR(N,L,NZ)
+      FDMR=0.16_r8+0.10_r8*APSIRT/(0.05_r8*APSIRT+2.0_r8)
+      CCPOLT=sum(CEPOLR(1:npelms,N,L,NZ))
       OSWT=36.0_r8+840.0_r8*AZMAX1(CCPOLT)
       PSIRO(N,L,NZ)=FDMR/0.16_r8*OSMO(NZ)-RGAS*TKS(L)*FDMR*CCPOLT/OSWT
       PSIRG(N,L,NZ)=AZMAX1(PSIRT(N,L,NZ)-PSIRO(N,L,NZ))
@@ -1199,9 +1195,7 @@ module UptakesMod
     PSIRO    => plt_ew%PSIRO     , &
     PSIRG    => plt_ew%PSIRG     , &
     PSILT    => plt_ew%PSILT     , &
-    CCPOLR   => plt_biom%CCPOLR  , &
-    CZPOLR   => plt_biom%CZPOLR  , &
-    CPPOLR   => plt_biom%CPPOLR  , &
+    CEPOLR   => plt_biom%CEPOLR  , &
     MY       => plt_morph%MY     , &
     NI       => plt_morph%NI       &
   )
@@ -1231,30 +1225,28 @@ module UptakesMod
   !     OSMO=osmotic potential at PSIRT=0 from PFT file
 !
   !
-  DO 4505 N=1,MY(NZ)
-    DO 4510 L=NU,NI(NZ)
+  D4505: DO N=1,MY(NZ)
+    D4510: DO L=NU,NI(NZ)
       IF(ILYR(N,L).EQ.1)THEN
         PSIRT(N,L,NZ)=AZMIN1((PSIST1(L)*RSRT(N,L) &
           +PSILT(NZ)*RSSX(N,L))/RSRS(N,L))
         APSIRT=ABS(PSIRT(N,L,NZ))
-        FDMR=0.16+0.10*APSIRT/(0.05*APSIRT+2.0)
-        CCPOLT=CCPOLR(N,L,NZ)+CZPOLR(N,L,NZ)+CPPOLR(N,L,NZ)
-        OSWT=36.0+840.0*AZMAX1(CCPOLT)
-        PSIRO(N,L,NZ)=FDMR/0.16*OSMO(NZ) &
-          -RGAS*TKS(L)*FDMR*CCPOLT/OSWT
+        FDMR=0.16_r8+0.10_r8*APSIRT/(0.05_r8*APSIRT+2.0_r8)
+        CCPOLT=sum(CEPOLR(1:npelms,N,L,NZ))
+        OSWT=36.0_r8+840.0_r8*AZMAX1(CCPOLT)
+        PSIRO(N,L,NZ)=FDMR/0.16_r8*OSMO(NZ)-RGAS*TKS(L)*FDMR*CCPOLT/OSWT
         PSIRG(N,L,NZ)=AZMAX1(PSIRT(N,L,NZ)-PSIRO(N,L,NZ))
       ELSE
         PSIRT(N,L,NZ)=PSIST1(L)
         APSIRT=ABS(PSIRT(N,L,NZ))
-        FDMR=0.16+0.10*APSIRT/(0.05*APSIRT+2.0)
-        CCPOLT=CCPOLR(N,L,NZ)+CZPOLR(N,L,NZ)+CPPOLR(N,L,NZ)
-        OSWT=36.0+840.0*AZMAX1(CCPOLT)
-        PSIRO(N,L,NZ)=FDMR/0.16*OSMO(NZ) &
-          -RGAS*TKS(L)*FDMR*CCPOLT/OSWT
+        FDMR=0.16_r8+0.10_r8*APSIRT/(0.05_r8*APSIRT+2.0_r8)
+        CCPOLT=sum(CEPOLR(1:npelms,N,L,NZ))
+        OSWT=36.0_r8+840.0_r8*AZMAX1(CCPOLT)
+        PSIRO(N,L,NZ)=FDMR/0.16_r8*OSMO(NZ)-RGAS*TKS(L)*FDMR*CCPOLT/OSWT
         PSIRG(N,L,NZ)=AZMAX1(PSIRT(N,L,NZ)-PSIRO(N,L,NZ))
       ENDIF
-4510  CONTINUE
-4505  CONTINUE
+    ENDDO D4510
+  ENDDO D4505
   end associate
   end subroutine UpdateCanopyWater
 !------------------------------------------------------------------------

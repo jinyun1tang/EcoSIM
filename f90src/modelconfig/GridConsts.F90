@@ -15,7 +15,7 @@ implicit none
   integer :: jpstgs  !number of plant growth states
   integer :: JRS     !maximum number of root layers
   integer :: Jlitgrp !number of liter groups
-  integer, PARAMETER :: JP=5
+  integer, PARAMETER :: JP=5    !maximum pft in a given topgraphic column
   integer, PARAMETER :: JC=10   !# of canopy layers
   integer, PARAMETER :: JS=5
   integer, PARAMETER :: JLI=4   !# of sectors for the leaf zenith [0,pi/2]

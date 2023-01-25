@@ -1090,10 +1090,8 @@ module NutUptakeMod
     ZEROP   => plt_biom%ZEROP   , &
     CWSRTL  => plt_biom%CWSRTL  , &
     WSRTL   => plt_biom%WSRTL   , &
-    CPPOLR  => plt_biom%CPPOLR  , &
-    CZPOLR  => plt_biom%CZPOLR  , &
     EPOOLR  => plt_biom%EPOOLR  , &
-    CCPOLR  => plt_biom%CCPOLR  , &
+    CEPOLR  => plt_biom%CEPOLR  , &
     WTRTL   => plt_biom%WTRTL     &
   )
   !
@@ -1132,11 +1130,11 @@ module NutUptakeMod
   !     ZCKI,PCKI,ZPKI,PZKI=N,P inhibition effect on N,P uptake
   !     UPWTRH=water uptake at time step for gas flux calculations
   !
-  IF(CCPOLR(N,L,NZ).GT.ZERO)THEN
-    FZUP=AMIN1(safe_adb(CCPOLR(N,L,NZ),CCPOLR(N,L,NZ)+CZPOLR(N,L,NZ)/ZCKI) &
-      ,safe_adb(CPPOLR(N,L,NZ),CPPOLR(N,L,NZ)+CZPOLR(N,L,NZ)/ZPKI))
-    FPUP=AMIN1(safe_adb(CCPOLR(N,L,NZ),CCPOLR(N,L,NZ)+CPPOLR(N,L,NZ)/PCKI) &
-      ,safe_adb(CZPOLR(N,L,NZ),CZPOLR(N,L,NZ)+CPPOLR(N,L,NZ)/PZKI))
+  IF(CEPOLR(ielmc,N,L,NZ).GT.ZERO)THEN
+    FZUP=AMIN1(safe_adb(CEPOLR(ielmc,N,L,NZ),CEPOLR(ielmc,N,L,NZ)+CEPOLR(ielmn,N,L,NZ)/ZCKI) &
+      ,safe_adb(CEPOLR(ielmp,N,L,NZ),CEPOLR(ielmp,N,L,NZ)+CEPOLR(ielmn,N,L,NZ)/ZPKI))
+    FPUP=AMIN1(safe_adb(CEPOLR(ielmc,N,L,NZ),CEPOLR(ielmc,N,L,NZ)+CEPOLR(ielmp,N,L,NZ)/PCKI) &
+      ,safe_adb(CEPOLR(ielmn,N,L,NZ),CEPOLR(ielmn,N,L,NZ)+CEPOLR(ielmp,N,L,NZ)/PZKI))
   ELSE
     FZUP=0.0_r8
     FPUP=0.0_r8

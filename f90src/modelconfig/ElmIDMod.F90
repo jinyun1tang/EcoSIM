@@ -7,6 +7,11 @@ implicit none
   integer, parameter :: ielmn=2    !nitrogen element
   integer, parameter :: ielmp=3    !phosphorus element
   integer, parameter :: npelms=3   !totally three elements
+! plant harvest
+  integer, parameter :: ipld_leaf=1 !leaf
+  integer, parameter :: ipld_nofoliar=2 !leaf
+  integer, parameter :: ipld_woody=3 !leaf
+  integer, parameter :: ipld_stdead=4 !leaf     
 ! photosynthesis
   integer, parameter :: ic4_photo=4
   integer, parameter :: ic3_photo=3

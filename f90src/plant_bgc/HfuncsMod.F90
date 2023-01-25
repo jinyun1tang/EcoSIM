@@ -348,9 +348,7 @@ module HfuncsMod
     EPOLNB =>  plt_biom%EPOLNB   , &
     EPOOLR =>  plt_biom%EPOOLR   , &
     EPOOL  =>  plt_biom%EPOOL    , &
-    CCPOLR =>  plt_biom%CCPOLR   , &
-    CZPOLR =>  plt_biom%CZPOLR   , &
-    CPPOLR =>  plt_biom%CPPOLR   , &
+    CEPOLR =>  plt_biom%CEPOLR   , &
     ZEROL  =>  plt_biom%ZEROL    , &
     ZEROP  =>  plt_biom%ZEROP    , &
     WTRTL  =>  plt_biom%WTRTL    , &
@@ -413,14 +411,13 @@ module HfuncsMod
   D180: DO N=1,MY(NZ)
     D160: DO L=NU,NI(NZ)
       IF(WTRTL(N,L,NZ).GT.ZEROL(NZ))THEN
-        CCPOLR(N,L,NZ)=AZMAX1(EPOOLR(ielmc,N,L,NZ)/WTRTL(N,L,NZ))
-        CZPOLR(N,L,NZ)=AZMAX1(EPOOLR(ielmn,N,L,NZ)/WTRTL(N,L,NZ))
-        CPPOLR(N,L,NZ)=AZMAX1(EPOOLR(ielmp,N,L,NZ)/WTRTL(N,L,NZ))
-!       CCPOLR(N,L,NZ)=AMIN1(1.0_r8,CCPOLR(N,L,NZ))
+        DO NE=1,npelms
+          CEPOLR(NE,N,L,NZ)=AZMAX1(EPOOLR(NE,N,L,NZ)/WTRTL(N,L,NZ))
+        ENDDO
       ELSE
-        CCPOLR(N,L,NZ)=1.0_r8
-        CZPOLR(N,L,NZ)=1.0_r8
-        CPPOLR(N,L,NZ)=1.0_r8
+        DO NE=1,npelms
+          CEPOLR(NE,N,L,NZ)=1.0_r8
+        ENDDO
       ENDIF
     ENDDO D160
   ENDDO D180

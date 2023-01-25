@@ -45,8 +45,6 @@ module RootDataType
   real(r8),target,allocatable ::  RRAD2M(:,:,:,:)                    !maximum radius of secondary roots, [m]
   real(r8),target,allocatable ::  RTFQ(:,:,:)                        !root brancing frequency, [m-1]
   real(r8),target,allocatable ::  PORTX(:,:,:,:)                     !power function of root porosity used to calculate root gaseous diffusivity, [-]
-  real(r8),target,allocatable ::  CPPOLR(:,:,:,:,:)                  !root layer nonstructural P concentration, [g g-1]
-  real(r8),target,allocatable ::  CZPOLR(:,:,:,:,:)                  !root layer nonstructural N concentration, [g g-1]
   real(r8),target,allocatable ::  EPOOLN(:,:,:,:,:)                  !root  layer nonstructural element, [g d-2]
   real(r8),target,allocatable ::  RTLGP(:,:,:,:,:)                   !root layer length per plant, [m p-1]
   real(r8),target,allocatable ::  RTLG1(:,:,:,:,:,:)                 !root layer length primary axes, [m d-2]
@@ -82,7 +80,7 @@ module RootDataType
   real(r8),target,allocatable ::  WTNDE(:,:,:,:)                     !root total nodule mass, [g d-2]
   real(r8),target,allocatable ::  WTRTL(:,:,:,:,:)                   !root layer structural C, [g d-2]
   real(r8),target,allocatable ::  EPOOLR(:,:,:,:,:,:)                !root  layer nonstructural element, [g d-2]
-  real(r8),target,allocatable ::  CCPOLR(:,:,:,:,:)                  !root  layer nonstructural C concentration, [g g-1]
+  real(r8),target,allocatable ::  CEPOLR(:,:,:,:,:,:)                !root  layer nonstructural element concentration, [g g-1]
   real(r8),target,allocatable ::  RTWT1E(:,:,:,:,:,:)                   !root C primary axes, [g d-2]
   real(r8),target,allocatable ::  CWSRTL(:,:,:,:,:)                  !root layer protein C concentration, [g g-1]
 !----------------------------------------------------------------------
@@ -129,8 +127,6 @@ contains
   allocate(RRAD2M(2,JP,JY,JX)); RRAD2M=0._r8
   allocate(RTFQ(JP,JY,JX));     RTFQ=0._r8
   allocate(PORTX(2,JP,JY,JX));  PORTX=0._r8
-  allocate(CPPOLR(2,JZ,JP,JY,JX));CPPOLR=0._r8
-  allocate(CZPOLR(2,JZ,JP,JY,JX));CZPOLR=0._r8
   allocate(EPOOLN(JZ,npelms,JP,JY,JX));EPOOLN=0._r8
   allocate(RTLGP(jroots,JZ,JP,JY,JX));RTLGP=0._r8
   allocate(RTLG1(jroots,JZ,JC,JP,JY,JX));RTLG1=0._r8
@@ -166,7 +162,7 @@ contains
   allocate(WTNDE(npelms,JP,JY,JX));  WTNDE=0._r8
   allocate(WTRTL(jroots,JZ,JP,JY,JX));WTRTL=0._r8
   allocate(EPOOLR(npelms,jroots,JZ,JP,JY,JX));EPOOLR=0._r8
-  allocate(CCPOLR(2,JZ,JP,JY,JX));CCPOLR=0._r8
+  allocate(CEPOLR(npelms,jroots,JZ,JP,JY,JX));CEPOLR=0._r8
   allocate(RTWT1E(2,JRS,npelms,JP,JY,JX));RTWT1E=0._r8
   allocate(CWSRTL(2,JZ,JP,JY,JX));CWSRTL=0._r8
   end subroutine InitRootData
@@ -211,8 +207,6 @@ contains
   call destroy(RRAD2M)
   call destroy(RTFQ)
   call destroy(PORTX)
-  call destroy(CPPOLR)
-  call destroy(CZPOLR)
   call destroy(EPOOLN)
   call destroy(RTLGP)
   call destroy(RTLG1)
@@ -248,7 +242,7 @@ contains
   call destroy(WTNDE)
   call destroy(WTRTL)
   call destroy(EPOOLR)
-  call destroy(CCPOLR)
+  call destroy(CEPOLR)
   call destroy(RTWT1E)
   call destroy(CWSRTL)
   end subroutine DestructRootData

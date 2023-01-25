@@ -473,9 +473,7 @@ implicit none
   real(r8), pointer :: WSRTL(:,:,:)   => null()    !root layer protein C, [g d-2]
   real(r8), pointer :: CWSRTL(:,:,:)  => null()    !root layer protein C concentration, [g g-1]
   real(r8), pointer :: EPOOLR(:,:,:,:)=> null()    !root  layer nonstructural element, [g d-2]
-  real(r8), pointer :: CCPOLR(:,:,:)  => null()    !root  layer nonstructural C concentration, [g g-1]
-  real(r8), pointer :: CZPOLR(:,:,:)  => null()    !root layer nonstructural N concentration, [g g-1]
-  real(r8), pointer :: CPPOLR(:,:,:)  => null()    !root layer nonstructural P concentration, [g g-1]
+  real(r8), pointer :: CEPOLR(:,:,:,:)  => null()    !root  layer nonstructural C concentration, [g g-1]
   real(r8), pointer :: CEPOLB(:,:,:)    => null()    !branch nonstructural C concentration, [g d-2]
   real(r8), pointer :: WGNODE(:,:,:,:)  => null()    !internode C, [g d-2]
   real(r8), pointer :: WGLFE(:,:,:,:)    => null()    !leaf element, [g d-2]
@@ -1450,9 +1448,7 @@ implicit none
   allocate(this%WTRTL(jroots,JZ1,JP1))
   allocate(this%WTRTD(jroots,JZ1,JP1))
   allocate(this%EPOOLR(npelms,jroots,JZ1,JP1))
-  allocate(this%CCPOLR(2,JZ1,JP1))
-  allocate(this%CZPOLR(2,JZ1,JP1))
-  allocate(this%CPPOLR(2,JZ1,JP1))
+  allocate(this%CEPOLR(npelms,jroots,JZ1,JP1))
   allocate(this%EPOOL(JBR,npelms,JP1))
   allocate(this%WVSTK(JP1))
   allocate(this%WSLF(0:JNODS1,JBR,JP1))
@@ -1524,9 +1520,6 @@ implicit none
 !  if(allocated(WTRTL))deallocate(WTRTL)
 !  if(allocated(WTRTD))deallocate(WTRTD)
 !  if(allocated(EPOOLR))deallocate(EPOOLR)
-!  if(allocated(CCPOLR))deallocate(CCPOLR)
-!  if(allocated(CZPOLR))deallocate(CZPOLR)
-!  if(allocated(CPPOLR))deallocate(CPPOLR)
 !  if(allocated(WVSTK))deallocate(WVSTK)
 !  if(allocated(WGLFE))deallocate(WGLFE)
 !  if(allocated(WSLF))deallocate(WSLF)

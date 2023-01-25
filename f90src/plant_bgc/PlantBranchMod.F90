@@ -2749,6 +2749,7 @@ module PlantBranchMod
         HTNODX(K,NB,NZ)=FSNR1*HTNODX(K,NB,NZ)
       ENDDO D2010
     ENDIF
+
 !
 !     SELF-SEEDING ANNUALS IF COLD OR DROUGHT DECIDUOUS
 !
@@ -2771,7 +2772,9 @@ module PlantBranchMod
 !     IFLGI=PFT initialization flag:0=no,1=yes
 !
 !     IF(J.EQ.INT(ZNOON))THEN
+
     IF(NB.EQ.NB1(NZ))THEN
+      !deciduous annual plant
       IF(ISTYP(NZ).EQ.iplt_annual.AND.IWTYP(NZ).NE.0)THEN
         IDAYH(NZ)=I
         IYRH(NZ)=IYRC
@@ -2779,14 +2782,14 @@ module PlantBranchMod
         JHVST(NZ)=ihv_tmareseed
         HVST(NZ)=0._r8
         THIN(NZ)=0._r8
-        EHVST(1,1,NZ)=1.0_r8
-        EHVST(1,2,NZ)=1.0_r8
-        EHVST(1,3,NZ)=1.0_r8
-        EHVST(1,4,NZ)=1.0_r8
-        EHVST(2,1,NZ)=0._r8
-        EHVST(2,2,NZ)=1.0_r8
-        EHVST(2,3,NZ)=0._r8
-        EHVST(2,4,NZ)=0._r8
+        EHVST(1,ipld_leaf,NZ)=1.0_r8
+        EHVST(1,ipld_nofoliar,NZ)=1.0_r8
+        EHVST(1,ipld_woody,NZ)=1.0_r8
+        EHVST(1,ipld_stdead,NZ)=1.0_r8
+        EHVST(2,ipld_leaf,NZ)=0._r8
+        EHVST(2,ipld_nofoliar,NZ)=1.0_r8
+        EHVST(2,ipld_woody,NZ)=0._r8
+        EHVST(2,ipld_stdead,NZ)=0._r8
         IDAY0(NZ)=-1E+06
         IYR0(NZ)=-1E+06
         IFLGI(NZ)=1
