@@ -48,7 +48,7 @@ module readqmod
 !
 !       OPEN PFT(11), PFT MANAGEMENT(12) FILES FROM
 !       FILE NAMES IN DATA ARRAYS LOADED IN MAIN.F
-!
+!       each column has its own management 
 !       PREFIX=path for files in current or higher level directory
 !       DATAP=PFT file name
         call ReadPlantProperties(NZ,NY,NX)

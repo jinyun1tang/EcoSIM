@@ -158,7 +158,7 @@ module PlantDisturbsMod
 
     ZEROP(NZ)=ZERO*PP(NZ)
     ZEROQ(NZ)=ZERO*PP(NZ)/AREA3(NU)
-    ZEROL(NZ)=ZERO*PP(NZ)*1.0E+06
+    ZEROL(NZ)=ZERO*PP(NZ)*1.0E+06_r8
   ENDIF
   end associate
   end subroutine RemoveBiomassByDisturbance

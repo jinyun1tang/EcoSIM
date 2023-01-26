@@ -53,12 +53,12 @@ implicit none
     else
       IDY=30*(IDY2-1)+ICOR(IDY2-1)+IDY1+LPY
     endif
-    DO 8995 NX=NH1,NH2
-      DO 8990 NY=NV1,NV2
+    D8995: DO NX=NH1,NH2
+      D8990: DO NY=NV1,NV2
         ITILL(IDY,NY,NX)=IPLOW
         DCORP(IDY,NY,NX)=DPLOW
-8990  CONTINUE
-8995  CONTINUE
+      ENDDO D8990
+    ENDDO D8995
   enddo
 305   CONTINUE
   CLOSE(10)
@@ -124,8 +124,8 @@ implicit none
 !
 !   TRANSFER INPUTS TO MODEL ARRAYS
 !
-    DO 7965 NX=NH1,NH2
-      DO 7960 NY=NV1,NV2
+    D7965: DO NX=NH1,NH2
+      D7960: DO NY=NV1,NV2
         IFLGV(NY,NX)=IFLGVX
         IIRRA(1,NY,NX)=IDYS
         IIRRA(2,NY,NX)=IDYE
@@ -135,22 +135,22 @@ implicit none
         CIRRA(NY,NX)=CIRRX
         DIRRA(1,NY,NX)=DIRRX
         DIRRA(2,NY,NX)=WDPTHI
-        DO 220 I=1,366
+        D220: DO I=1,366
           PHQ(IDY,NY,NX)=PHQX
-          CN4Q(IDY,NY,NX)=CN4QX/14.0
-          CNOQ(IDY,NY,NX)=CNOQX/14.0
-          CPOQ(IDY,NY,NX)=CPOQX/31.0
-          CALQ(IDY,NY,NX)=CALQX/27.0
-          CFEQ(IDY,NY,NX)=CFEQX/55.8
-          CCAQ(IDY,NY,NX)=CCAQX/40.0
-          CMGQ(IDY,NY,NX)=CMGQX/24.3
-          CNAQ(IDY,NY,NX)=CNAQX/23.0
-          CKAQ(IDY,NY,NX)=CKAQX/39.1
-          CSOQ(IDY,NY,NX)=CSOQX/32.0
-          CCLQ(IDY,NY,NX)=CCLQX/35.5
-220     CONTINUE
-7960  CONTINUE
-7965  CONTINUE
+          CN4Q(IDY,NY,NX)=CN4QX/14.0_r8
+          CNOQ(IDY,NY,NX)=CNOQX/14.0_r8
+          CPOQ(IDY,NY,NX)=CPOQX/31.0_r8
+          CALQ(IDY,NY,NX)=CALQX/27.0_r8
+          CFEQ(IDY,NY,NX)=CFEQX/55.8_r8
+          CCAQ(IDY,NY,NX)=CCAQX/40.0_r8
+          CMGQ(IDY,NY,NX)=CMGQX/24.3_r8
+          CNAQ(IDY,NY,NX)=CNAQX/23.0_r8
+          CKAQ(IDY,NY,NX)=CKAQX/39.1_r8
+          CSOQ(IDY,NY,NX)=CSOQX/32.0_r8
+          CCLQ(IDY,NY,NX)=CCLQX/35.5_r8
+        ENDDO D220
+      ENDDO D7960
+    ENDDO D7965
   ELSE
 !
 !       SCHEDULED IRRIGATION
@@ -175,30 +175,30 @@ implicit none
         IDY=30*(IDY2-1)+ICOR(IDY2-1)+IDY1+LPY
       endif
       RRH=RR/(JEN-(JST-1))
-      DO 8965 NX=NH1,NH2
-        DO 8960 NY=NV1,NV2
-          DO 2535 J=1,24
-            IF(J.GE.JST.AND.J.LE.JEN)RRIG(J,IDY,NY,NX)=RRH/1000.0
-2535      CONTINUE
+      D8965: DO NX=NH1,NH2
+        D8960: DO NY=NV1,NV2
+          D2535: DO J=1,24
+            IF(J.GE.JST.AND.J.LE.JEN)RRIG(J,IDY,NY,NX)=RRH/1000.0_r8
+          ENDDO D2535
 !
 !           TRANSFER INPUTS TO MODEL ARRAYS
 !
           PHQ(IDY,NY,NX)=PHQX
-          CN4Q(IDY,NY,NX)=CN4QX/14.0
-          CNOQ(IDY,NY,NX)=CNOQX/14.0
-          CPOQ(IDY,NY,NX)=CPOQX/31.0
-          CALQ(IDY,NY,NX)=CALQX/27.0
-          CFEQ(IDY,NY,NX)=CFEQX/55.8
-          CCAQ(IDY,NY,NX)=CCAQX/40.0
-          CMGQ(IDY,NY,NX)=CMGQX/24.3
-          CNAQ(IDY,NY,NX)=CNAQX/23.0
-          CKAQ(IDY,NY,NX)=CKAQX/39.1
-          CSOQ(IDY,NY,NX)=CSOQX/32.0
-          CCLQ(IDY,NY,NX)=CCLQX/35.5
+          CN4Q(IDY,NY,NX)=CN4QX/14.0_r8
+          CNOQ(IDY,NY,NX)=CNOQX/14.0_r8
+          CPOQ(IDY,NY,NX)=CPOQX/31.0_r8
+          CALQ(IDY,NY,NX)=CALQX/27.0_r8
+          CFEQ(IDY,NY,NX)=CFEQX/55.8_r8
+          CCAQ(IDY,NY,NX)=CCAQX/40.0_r8
+          CMGQ(IDY,NY,NX)=CMGQX/24.3_r8
+          CNAQ(IDY,NY,NX)=CNAQX/23.0_r8
+          CKAQ(IDY,NY,NX)=CKAQX/39.1_r8
+          CSOQ(IDY,NY,NX)=CSOQX/32.0_r8
+          CCLQ(IDY,NY,NX)=CCLQX/35.5_r8
           WDPTH(IDY,NY,NX)=WDPTHI
-8960    CONTINUE
-8965  CONTINUE
-  enddo
+        ENDDO D8960
+      ENDDO D8965
+    enddo
   ENDIF
 105 CONTINUE
   CLOSE(2)
@@ -247,8 +247,8 @@ implicit none
       IDY=30*(IDY2-1)+ICOR(IDY2-1)+IDY1+LPY
     endif
 
-    DO 8985 NX=NH1,NH2
-      DO 8980 NY=NV1,NV2
+    D8985: DO NX=NH1,NH2
+      D8980: DO NY=NV1,NV2
 !
 !         ENTER AMENDMENTS INTO MODEL ARRAYS
 !
@@ -294,8 +294,8 @@ implicit none
         IYTYP(0,IDY,NY,NX)=IR0
         IYTYP(1,IDY,NY,NX)=IR1
         IYTYP(2,IDY,NY,NX)=IR2
-8980    CONTINUE
-8985  CONTINUE
+      ENDDO D8980
+    ENDDO D8985
   enddo
 85 CONTINUE
   CLOSE(8)
@@ -315,6 +315,7 @@ implicit none
 !   PREFIX=path for files in current or higher level directory
 
   call OPEN_safe(13,PREFIX,FileManage,'OLD',mod_filename,__LINE__)
+
   do while(.TRUE.)
     READ(13,*,END=200)NH1,NV1,NH2,NV2
     READ(13,*)DATA1(8),DATA1(5),DATA1(6)
