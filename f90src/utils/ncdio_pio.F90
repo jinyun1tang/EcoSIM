@@ -52,8 +52,9 @@ module ncdio_pio
   public :: ncd_putvar         ! write local data
   public :: ncd_getvar         ! read data
   public :: ncd_io
-
   public :: ncd_init
+  public :: ncd_getvint
+
   interface ncd_putvar
     module procedure ncd_putvar_int
     module procedure ncd_putvar_real_sp
@@ -804,6 +805,32 @@ module ncdio_pio
      start = (/1,1,1,rec/)),'ncd_putvar_real_sp_2d')
 
       end subroutine ncd_putvar_real_sp_3d
+
+!----------------------------------------------------------------------
+
+  subroutine ncd_getvint(ncid, varname,  data)
+  !
+  !DESCRIPTION
+  ! read a integer scalar
+
+  use data_kind_mod, only : r8 => shr_kind_r8
+!**********************************************************************
+  implicit none
+  class(file_desc_t), intent(in) :: ncid
+  character(len=*),intent(in) :: varname
+  integer, intent(out) :: data
+
+  integer :: varid
+  logical :: readvar
+  type(Var_desc_t)  :: vardesc
+
+  call check_var(ncid, trim(varname), vardesc, readvar)
+
+  call check_ret(nf90_get_var(ncid%fh, vardesc%varid, data),&
+    'ncd_getvint')
+
+  end subroutine ncd_getvint
+
 !*********************************************************************
   subroutine ncd_getvar_int(ncid, varname, rec, data)
   !
@@ -835,7 +862,7 @@ module ncdio_pio
     ! read a real scalar
 
     use data_kind_mod, only : r8 => shr_kind_r8
-  !**********************************************************************
+   !**********************************************************************
     implicit none
     class(file_desc_t), intent(in) :: ncid
     character(len=*),intent(in) :: varname
@@ -1837,7 +1864,7 @@ module ncdio_pio
       if(present(readvar))readvar=.true.
     endif
   end subroutine ncd_io_1d_double_glob
-
+!------------------------------------------------------------------------------------------
   subroutine ncd_io_2d_double_glob(varname, data, flag, ncid, readvar, nt, posNOTonfile)
     !
     ! !DESCRIPTION:

@@ -609,14 +609,14 @@ implicit none
 
 !------------------------------------------------------------------------------------------
 
-  subroutine ComputeGPP(NB,NZ,WFNG,WFNC,CH2O3,CH2O4,CH2O)
+  subroutine ComputeGPP(NB,NZ,WFNG,WFNC,CH2O3,CH2O4,CH2O,CO2F)
   implicit none
   integer, intent(in) :: NB,NZ
   real(r8), intent(in) :: WFNG
   real(r8), intent(in) :: WFNC
   real(r8), intent(out) :: CH2O3(JNODS1),CH2O4(JNODS1)
-  real(r8), intent(out) :: CH2O
-  real(r8) :: CO2F,ZADDB,PADDB
+  real(r8), intent(out) :: CO2F,CH2O
+  real(r8) :: ZADDB,PADDB
 
   integer :: K
 

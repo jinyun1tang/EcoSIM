@@ -19,7 +19,6 @@ module readsmod
   implicit none
   private
 
-
   character(len=*), parameter :: mod_filename = __FILE__
   integer, SAVE :: N1,N2,N1X,N2X,IFLGY,IYRX,IYRD
 

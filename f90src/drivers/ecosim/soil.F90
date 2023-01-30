@@ -12,7 +12,7 @@ SUBROUTINE soil(NA,ND,NT,NE,NAX,NTX,NEX,NHW,NHE,NVN,NVS)
   use VisualMod    , only : visual
   use WthrMod      , only : wthr
   use readiMod     , only : readi
-  use readqmod     , only : readq
+  use PlantInfoMod , only : ReadPlantInfo
   use readsmod     , only : reads
   use Hist1Mod     , only : fouts,foutp,outpd,outph,outsd,outsh
   use timings      , only : init_timer, start_timer, end_timer,end_timer_loop
@@ -76,16 +76,8 @@ SUBROUTINE soil(NA,ND,NT,NE,NAX,NTX,NEX,NHW,NHE,NVN,NVS)
     ENDIF
   ENDIF
 !
-! RECOVER PLANT SPECIES DISTRIBUTION IN 'ROUTQ'
-!
-  if(lverb)WRITE(*,333)'ROUTQ'
-  CALL ROUTQ(NT,NE,NTX,NEX,NHW,NHE,NVN,NVS)
-!
-!   READ INPUT DATA FOR PLANT SPECIES AND MANAGEMENT IN 'READQ'
-!   AND SET UP OUTPUT AND CHECKPOINT FILES IN 'FOUTP'
-!
-  if(lverb)WRITE(*,333)'READQ'
-  CALL READQ(NA,ND,NT,NE,NTX,NEX,NF,NFX,NTZ,NTZX,NHW,NHE,NVN,NVS)
+  call ReadPlantInfo(NA,ND,NT,NE,NTX,NEX,NF,NFX,NTZ,NTZX,NHW,NHE,NVN,NVS)
+
 
   if(lverb)WRITE(*,333)'FOUTP'
   CALL FOUTP(NT,NE,NTX,NEX,NF,NFX,NHW,NHE,NVN,NVS)
@@ -170,6 +162,7 @@ SUBROUTINE soil(NA,ND,NT,NE,NAX,NTX,NEX,NHW,NHE,NVN,NVS)
     call end_timer_loop()
 
   ENDDO D9995
+
   IF(DATA1(19).EQ.'YES'.AND.KOUT.GT.0)THEN
 !
 !   WRITE ALL SOIL AND PLANT STATE VARIABLES AND OTHER INFORMATION

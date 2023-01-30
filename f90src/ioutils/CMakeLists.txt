@@ -2,11 +2,12 @@ set(IOUTILS_SOURCES
 	Hist1Mod.F90
   ReadManagementMod.F90
   ForcWriterMod.F90
+  PlantInfoMod.F90
 	readimod.F90
 	readqmod.F90
 	readsmod.F90
 	routp.F90
-	routq.F90
+	routqMod.F90
 	routs.F90
 	split.F90
 	splitc.F90
