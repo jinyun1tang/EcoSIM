@@ -51,8 +51,27 @@ module readqmod
 !       each column has its own management
 !       PREFIX=path for files in current or higher level directory
 !       DATAP=PFT file name
+        print*,DATAP(NZ,NY,NX)
         call ReadPlantProperties(NZ,NY,NX)
 
+      ENDDO D9985
+    ENDDO D9990
+  ENDDO D9995
+
+!  call ReadPlantManagement_ascii(NHW,NHE,NVN,NVS,NF,NFX,NT,NTX,NTZX)
+  call ReadPlantManagementNC(NHW,NHE,NVN,NVS,NF,NFX,NT,NTX,NTZX)
+  RETURN
+  END SUBROUTINE readq
+!------------------------------------------------------------------------------------------
+
+  subroutine ReadPlantManagement_ascii(NHW,NHE,NVN,NVS,NF,NFX,NT,NTX,NTZX)
+  implicit none
+  integer, intent(in) :: NT,NTX,NF,NFX,NTZX,NHW,NHE,NVN,NVS
+  integer :: NY,NX,NZ
+
+  D9995: DO NX=NHW,NHE
+    D9990: DO NY=NVN,NVS
+      D9985: DO NZ=1,NP(NY,NX)
 !
 !  READ INPUTS FOR PLANT MANAGEMENT
         call ReadPlantManagement(NZ,NY,NX,NF,NFX,NT,NTX,NTZX)
@@ -62,9 +81,7 @@ module readqmod
       ENDDO D9985
     ENDDO D9990
   ENDDO D9995
-  RETURN
-  END SUBROUTINE readq
-
+  end subroutine ReadPlantManagement_ascii
 
 !------------------------------------------------------------------------------------------
 
@@ -100,6 +117,7 @@ module readqmod
   if(lverb)then
     write(*,*)'read pft management file ',DATAM(NZ,NY,NX)
   endif
+
   IF(DATAM(NZ,NY,NX).NE.'NO')THEN
     N=0
     NN=0
@@ -287,8 +305,6 @@ module readqmod
 ! READ INPUTS FOR EACH PLANT SPECIES
 !
   IF(DATAP(NZ,NY,NX).NE.'NO')THEN
-
-!    call ReadPlantTraitsAscii(NZ,NY,NX,VRNXI,VRNLI)
 
     call ReadPlantTraitsNC(NZ,NY,NX,VRNLI,VRNXI)
 !
@@ -830,7 +846,7 @@ module readqmod
   integer :: loc,N
 
   loc=get_pft_loc(DATAP(NZ,NY,NX)(1:6))
-  print*,loc,DATAP(NZ,NY,NX)(1:6)
+
   call ncd_getvar(pft_nfid, 'ICTYP', loc, ICTYP(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'IGTYP', loc, IGTYP(NZ,NY,NX))
   call ncd_getvar(pft_nfid, 'ISTYP', loc, ISTYP(NZ,NY,NX))
@@ -1041,4 +1057,214 @@ module readqmod
   write(*,*)'leaf PAR transmission: TAUP',TAUP(NZ,NY,NX)
   end subroutine plant_optic_trait_disp
 
+
+
+!------------------------------------------------------------------------------------------
+
+  subroutine ReadPlantManagementNC(NHW,NHE,NVN,NVS,NF,NFX,NT,NTX,NTZX)
+
+  USE EcoSIMCtrlMod, only : pft_mgmt_in
+  use netcdf
+  use ncdio_pio
+  use abortutils, only : endrun
+  implicit none
+  integer, intent(in) :: NT,NTX,NF,NFX,NTZX,NHW,NHE,NVN,NVS
+  integer :: NY,NX,NZ
+
+  type(file_desc_t) :: pftinfo_nfid
+  type(Var_desc_t) :: vardesc
+  logical :: readvar
+  integer :: pft_dflag
+  integer :: iyear,nyears
+  integer :: NTOPO,ntopou
+  integer :: M,NN,N,nn1
+  real(r8) :: DY,ECUT11,ECUT12,ECUT13,ECUT14,ECUT21,ECUT22,ECUT23
+  real(r8) :: ECUT24,HCUT,PCUT
+  integer :: pft_nmgnt(JP)
+  integer :: NH1,NV1,NH2,NV2,NS
+  character(len=128) :: pft_pltinfo(JP),tstr
+  character(len=128) :: pft_mgmtinfo(24,JP)
+
+  if (len_trim(pft_mgmt_in)==0)then
+    return
+  else
+    print*,'ReadPlantManagementNC'
+  ! initialize the disturbance arrays
+    DO NX=NHW,NHE
+      DO NY=NVN,NVS
+        DO NZ=1,NP(NY,NX)
+          DO M=1,366
+            IHVST(NZ,M,NY,NX)=-1
+            JHVST(NZ,M,NY,NX)=0
+            HVST(NZ,M,NY,NX)=1.0E+06_r8
+            THIN(NZ,M,NY,NX)=-1.0_r8
+            EHVST(1,ipld_leaf,NZ,M,NY,NX)=1.0_r8
+            EHVST(1,ipld_nofoliar,NZ,M,NY,NX)=1.0_r8
+            EHVST(1,ipld_woody,NZ,M,NY,NX)=1.0_r8
+            EHVST(1,ipld_stdead,NZ,M,NY,NX)=1.0_r8
+            EHVST(2,ipld_leaf,NZ,M,NY,NX)=1.0_r8
+            EHVST(2,ipld_nofoliar,NZ,M,NY,NX)=1.0_r8
+            EHVST(2,ipld_woody,NZ,M,NY,NX)=1.0_r8
+            EHVST(2,ipld_stdead,NZ,M,NY,NX)=1.0_r8
+          ENDDO
+          SDPTHI(NZ,NY,NX)=ppmc
+        ENDDO
+      ENDDO
+    ENDDO
+
+    call ncd_pio_openfile(pftinfo_nfid, pft_mgmt_in, ncd_nowrite)
+
+    call check_var(pftinfo_nfid, 'pft_dflag', vardesc, readvar)
+
+    call check_ret(nf90_get_var(pftinfo_nfid%fh, vardesc%varid, pft_dflag), &
+      'in '//trim(mod_filename))
+
+    if(pft_dflag==0)then
+      ! constant pft data
+      iyear=1
+      if(IGO>0)return
+    else
+      iyear=1+IGO
+    endif
+    PRINT*,'IYEAR',IYEAR
+    !obtain the number of topographic units
+    ntopou=get_dim_len(pftinfo_nfid, 'ntopou')
+    nyears=get_dim_len(pftinfo_nfid, 'year')
+
+    DO NTOPO=1,ntopou
+      call ncd_getvar(pftinfo_nfid,'NH1',ntopo,NH1)
+      call ncd_getvar(pftinfo_nfid,'NV1',ntopo,NV1)
+      call ncd_getvar(pftinfo_nfid,'NH2',ntopo,NH2)
+      call ncd_getvar(pftinfo_nfid,'NV2',ntopo,NV2)
+      call ncd_getvar(pftinfo_nfid,'NZ',ntopo,NS)
+
+      call check_var(pftinfo_nfid, 'pft_pltinfo', vardesc, readvar)
+      if(.not. readvar)then
+        call endrun('fail to find pft_pltinfo in '//trim(mod_filename), __LINE__)
+      endif
+
+      call check_ret(nf90_get_var(pftinfo_nfid%fh, vardesc%varid, pft_pltinfo, &
+        start = (/1,1,ntopou,iyear/),count = (/len(pft_pltinfo(1)),JP,1,1/)),trim(mod_filename))
+
+      call check_var(pftinfo_nfid, 'nmgnts', vardesc, readvar)
+      if(.not. readvar)then
+        call endrun('fail to find pft_type in '//trim(mod_filename), __LINE__)
+      endif
+
+      call check_ret(nf90_get_var(pftinfo_nfid%fh, vardesc%varid, pft_nmgnt, &
+        start = (/1,ntopou,iyear/),count = (/JP,1,1/)),trim(mod_filename))
+
+      if(any(pft_nmgnt(1:NS)>0))then
+        call check_var(pftinfo_nfid, 'pft_mgmt', vardesc, readvar)
+        if(.not. readvar)then
+          call endrun('fail to find pft_mgmt in '//trim(mod_filename), __LINE__)
+        endif
+
+        call check_ret(nf90_get_var(pftinfo_nfid%fh, vardesc%varid, pft_mgmtinfo, &
+          start = (/1,1,1,ntopou,iyear/),count = (/len(pft_mgmtinfo(1,1)),24,JP,1,1/)),&
+          trim(mod_filename))
+      endif
+      DO NX=NH1,NH2
+        DO NY=NV1,NV2
+          DO NZ=1,MIN(NS,NP(NY,NX))
+            tstr=trim(pft_pltinfo(NZ))
+            read(tstr,'(I2,I2,I4)')IDX,IMO,IYR
+            read(tstr,*)DY,PPI(NZ,NY,NX),SDPTHI(NZ,NY,NX)
+
+            LPY=0
+            if(isLeap(iyr) .and. IMO.GT.2)LPY=1
+            !obtain the ordinal day
+            IF(IMO.EQ.1)then
+              IDY=IDX
+            else
+              IDY=30*(IMO-1)+ICOR(IMO-1)+IDX+LPY
+            endif
+
+            IF(IDY.GT.0.AND.IYR.GT.0)THEN
+              IDAY0(NZ,NY,NX)=IDY
+              IYR=IYR+(NT-1)*NF+(NTX-1)*NFX-NTZX
+              IYR0(NZ,NY,NX)=MIN(IYR,IYRC)
+              IDAYX(NZ,NY,NX)=IDAY0(NZ,NY,NX)
+              IYRX(NZ,NY,NX)=IYR0(NZ,NY,NX)
+              PPZ(NZ,NY,NX)=PPI(NZ,NY,NX)
+            ENDIF
+
+            if(pft_nmgnt(NZ)>0)then
+              NN=0
+              DO nn1=1,pft_nmgnt(NZ)
+                tstr=trim(pft_mgmtinfo(NN1,NZ))
+                read(tstr,'(I2,I2,I4)')IDX,IMO,IYR
+                READ(TSTR,*)DY,ICUT,JCUT,HCUT,PCUT &
+                  ,ECUT11,ECUT12,ECUT13,ECUT14,ECUT21,ECUT22,ECUT23,ECUT24
+
+                if(isLeap(iyr) .and. IMO.GT.2)LPY=1
+
+                !obtain the ordinal day
+                IF(IMO.EQ.1)then
+                  IDY=IDX
+                else
+                  IDY=30*(IMO-1)+ICOR(IMO-1)+IDX+LPY
+                endif
+
+                IF(IDY.GT.0.AND.JCUT.EQ.1)THEN
+                  IDAYH(NZ,NY,NX)=IDY
+                  IYR=IYR+(NT-1)*NF+(NTX-1)*NFX-NTZX
+                  IYRH(NZ,NY,NX)=MIN(IYR,IYRC)
+                ENDIF
+
+                IHVST(NZ,IDY,NY,NX)=ICUT
+                JHVST(NZ,IDY,NY,NX)=JCUT
+                HVST(NZ,IDY,NY,NX)=HCUT
+                THIN(NZ,IDY,NY,NX)=PCUT
+                EHVST(1,ipld_leaf,NZ,IDY,NY,NX)=ECUT11
+                EHVST(1,ipld_nofoliar,NZ,IDY,NY,NX)=ECUT12
+                EHVST(1,ipld_woody,NZ,IDY,NY,NX)=ECUT13
+                EHVST(1,ipld_stdead,NZ,IDY,NY,NX)=ECUT14
+                EHVST(2,ipld_leaf,NZ,IDY,NY,NX)=ECUT21
+                EHVST(2,ipld_nofoliar,NZ,IDY,NY,NX)=ECUT22
+                EHVST(2,ipld_woody,NZ,IDY,NY,NX)=ECUT23
+                EHVST(2,ipld_stdead,NZ,IDY,NY,NX)=ECUT24
+
+                IF(IHVST(NZ,IDY,NY,NX).EQ.4.OR.IHVST(NZ,IDY,NY,NX).EQ.6)THEN
+                  !animal or insect biomass
+                  NN=NN+1
+                  if(mod(nn,2)==0)then
+                    IDYE=IDY
+                    D580: DO IDYG=IDYS+1,IDYE-1
+                      IHVST(NZ,IDYG,NY,NX)=ICUT
+                      JHVST(NZ,IDYG,NY,NX)=JCUT
+                      HVST(NZ,IDYG,NY,NX)=HCUT
+                      THIN(NZ,IDYG,NY,NX)=PCUT
+                      EHVST(1,ipld_leaf,NZ,IDYG,NY,NX)=ECUT11
+                      EHVST(1,ipld_nofoliar,NZ,IDYG,NY,NX)=ECUT12
+                      EHVST(1,ipld_woody,NZ,IDYG,NY,NX)=ECUT13
+                      EHVST(1,ipld_stdead,NZ,IDYG,NY,NX)=ECUT14
+                      EHVST(2,ipld_leaf,NZ,IDYG,NY,NX)=ECUT21
+                      EHVST(2,ipld_nofoliar,NZ,IDYG,NY,NX)=ECUT22
+                      EHVST(2,ipld_woody,NZ,IDYG,NY,NX)=ECUT23
+                      EHVST(2,ipld_stdead,NZ,IDYG,NY,NX)=ECUT24
+                    ENDDO D580
+                  endif
+                  IDYS=IDY
+                ENDIF
+              ENDDO
+            endif
+          ENDDO
+        ENDDO
+      ENDDO
+    ENDDO
+
+    call ncd_pio_closefile(pftinfo_nfid)
+
+  ENDIF
+
+  DO NX=NHW,NHE
+    DO NY=NVN,NVS
+      DO NZ=1,NP(NY,NX)
+        IDAYY(NZ,NY,NX)=IDAYH(NZ,NY,NX)
+        IYRY(NZ,NY,NX)=IYRH(NZ,NY,NX)
+      ENDDO
+    ENDDO
+  ENDDO
+  end subroutine ReadPlantManagementNC
 end module readqmod

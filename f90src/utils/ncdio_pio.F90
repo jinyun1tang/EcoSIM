@@ -55,6 +55,7 @@ module ncdio_pio
   public :: ncd_init
   public :: ncd_getvint
 
+  public :: ncd_getvar_str1d
   interface ncd_putvar
     module procedure ncd_putvar_int
     module procedure ncd_putvar_real_sp
@@ -88,7 +89,8 @@ module ncdio_pio
     module procedure ncd_getvar_real_sp_all_3d
     module procedure ncd_getvar_real_sp_all_4d
 
-    module procedure ncd_getvar_str_1d
+    module procedure ncd_getvar_str_1ds
+
   end interface ncd_getvar
 
   interface get_dim_len
@@ -974,7 +976,7 @@ module ncdio_pio
   end subroutine ncd_getvar_real_sp
 !----------------------------------------------------------------------
 
-  subroutine ncd_getvar_str_1d(ncid, varname, data)
+  subroutine ncd_getvar_str_1ds(ncid, varname, data)
   implicit none
   class(file_desc_t), intent(in) :: ncid
   character(len=*),intent(in) :: varname
@@ -987,9 +989,29 @@ module ncdio_pio
   call check_var(ncid, trim(varname), vardesc, readvar)
 
   call check_ret(nf90_get_var(ncid%fh, vardesc%varid, data), &
-    'ncd_getvar_str_1d')
+    'ncd_getvar_str_1ds')
 
-  end subroutine ncd_getvar_str_1d
+  end subroutine ncd_getvar_str_1ds
+
+!----------------------------------------------------------------------
+
+  subroutine ncd_getvar_str1d(ncid, varname, rec1, rec2,data)
+  implicit none
+  type(file_desc_t), intent(in) :: ncid
+  integer, intent(in) :: rec1,rec2
+  character(len=*),intent(in) :: varname
+  character(len=*), intent(inout) :: data(:)
+
+  integer :: varid
+  logical :: readvar
+  type(Var_desc_t)  :: vardesc
+
+  call check_var(ncid, trim(varname), vardesc, readvar)
+
+  call check_ret(nf90_get_var(ncid%fh, vardesc%varid, data, &
+    start = (/rec1,rec2/)),'ncd_getvar_str1d')
+
+  end subroutine ncd_getvar_str1d
 !----------------------------------------------------------------------
 
   subroutine ncd_getvar_real_sp_scalar(ncid, varname,  data)

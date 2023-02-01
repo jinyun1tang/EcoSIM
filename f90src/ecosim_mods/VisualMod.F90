@@ -44,6 +44,7 @@ module VisualMod
   integer, intent(in) :: I, J
   integer, intent(in) :: NHW,NHE,NVN,NVS
   real(r8) :: SWC(JY,JX)
+
 ! begin_execution
   IF(ICHECK.EQ.0)THEN
     call OPEN_safe(16,PREFIX,'years','OLD',mod_filename,__LINE__)
@@ -111,21 +112,21 @@ module VisualMod
 !    6,'kg C m-2       '
 8990  CONTINUE
 8995  CONTINUE
-    TCSNX=0.0
+    TCSNX=0.0_r8
     ICHECK=1
   ENDIF
 !
 ! SELECT YEARS
 !
   IF(IYRC.GE.IYR1.AND.IYRC.LE.IYR2)THEN
-    TTRN=0.0
-    TTLE=0.0
-    TTSH=0.0
-    TTGH=0.0
-    TTCO=0.0
-    TTCH=0.0
-    DO 9995 NX=NHW,NHE
-      DO 9990 NY=NVN,NVS
+    TTRN=0.0_r8
+    TTLE=0.0_r8
+    TTSH=0.0_r8
+    TTGH=0.0_r8
+    TTCO=0.0_r8
+    TTCH=0.0_r8
+    D9995: DO NX=NHW,NHE
+      D9990: DO NY=NVN,NVS
         TTRN=TTRN+TRN(NY,NX)
         TTLE=TTLE+TLE(NY,NX)
         TTSH=TTSH+TSH(NY,NX)
@@ -186,9 +187,9 @@ module VisualMod
 !     XP=REAL(IDAY0(NZ,NY,NX))
 !     XH=REAL(IDAYH(NZ,NY,NX))
 !     IF(I.EQ.IDAY0(NZ,NY,NX))THEN
-         DO 9980 N=1,100
-           OUT(N)=0.0
-9980     CONTINUE
+         D9980: DO N=1,100
+           OUT(N)=0.0_r8
+         ENDDO D9980
 !     ENDIF
 !     IF(I.EQ.1)THEN
 !     TCSNY=0.0
@@ -201,33 +202,33 @@ module VisualMod
 !     ICHKM=0
 !     TCSNX=0.0
 !     ENDIF
-          OUT(1)=0.001*CARBN(1,NY,NX)/(AREA(3,NU(NY,NX),NY,NX)*3600)
-          OUT(2)=0.001*CARBN(3,NY,NX)/(AREA(3,NU(NY,NX),NY,NX)*3600)
-          OUT(3)=0.001*CARBN(2,NY,NX)/(AREA(3,NU(NY,NX),NY,NX)*3600)
-          OUT(4)=-0.001*TCO2T(1,NY,NX)/(AREA(3,NU(NY,NX),NY,NX)*3600)
-          OUT(5)=-0.001*TCO2T(3,NY,NX)/(AREA(3,NU(NY,NX),NY,NX)*3600)
-          OUT(6)=-0.001*TCO2T(2,NY,NX)/(AREA(3,NU(NY,NX),NY,NX)*3600)
-          OUT(7)=0.001*TGPP(NY,NX)/(AREA(3,NU(NY,NX),NY,NX)*3600)
-          OUT(8)=0.001*TNPP(NY,NX)/(AREA(3,NU(NY,NX),NY,NX)*3600)
-          OUT(9)=-0.001*TRAU(NY,NX)/(AREA(3,NU(NY,NX),NY,NX)*3600)
-          OUT(10)=-0.001*THRE(NY,NX)/(AREA(3,NU(NY,NX),NY,NX)*3600)
-          OUT(11)=0.001*TNBP(NY,NX)/(AREA(3,NU(NY,NX),NY,NX)*3600)
-          OUT(12)=-0.001*HCO2G(NY,NX)/(AREA(3,NU(NY,NX),NY,NX)*3600)
-          OUT(13)=-0.001*HCH4G(NY,NX)/(AREA(3,NU(NY,NX),NY,NX)*3600)
+          OUT(1)=0.001_r8*CARBN(1,NY,NX)/(AREA(3,NU(NY,NX),NY,NX)*3600._r8)
+          OUT(2)=0.001_r8*CARBN(3,NY,NX)/(AREA(3,NU(NY,NX),NY,NX)*3600._r8)
+          OUT(3)=0.001_r8*CARBN(2,NY,NX)/(AREA(3,NU(NY,NX),NY,NX)*3600._r8)
+          OUT(4)=-0.001_r8*TCO2T(1,NY,NX)/(AREA(3,NU(NY,NX),NY,NX)*3600._r8)
+          OUT(5)=-0.001_r8*TCO2T(3,NY,NX)/(AREA(3,NU(NY,NX),NY,NX)*3600._r8)
+          OUT(6)=-0.001_r8*TCO2T(2,NY,NX)/(AREA(3,NU(NY,NX),NY,NX)*3600._r8)
+          OUT(7)=0.001_r8*TGPP(NY,NX)/(AREA(3,NU(NY,NX),NY,NX)*3600._r8)
+          OUT(8)=0.001_r8*TNPP(NY,NX)/(AREA(3,NU(NY,NX),NY,NX)*3600._r8)
+          OUT(9)=-0.001_r8*TRAU(NY,NX)/(AREA(3,NU(NY,NX),NY,NX)*3600._r8)
+          OUT(10)=-0.001_r8*THRE(NY,NX)/(AREA(3,NU(NY,NX),NY,NX)*3600._r8)
+          OUT(11)=0.001_r8*TNBP(NY,NX)/(AREA(3,NU(NY,NX),NY,NX)*3600._r8)
+          OUT(12)=-0.001_r8*HCO2G(NY,NX)/(AREA(3,NU(NY,NX),NY,NX)*3600._r8)
+          OUT(13)=-0.001_r8*HCH4G(NY,NX)/(AREA(3,NU(NY,NX),NY,NX)*3600._r8)
           OUT(14)=TRN(NY,NX)*277.8/AREA(3,NU(NY,NX),NY,NX)
           OUT(15)=-TLE(NY,NX)*277.8/AREA(3,NU(NY,NX),NY,NX)
           OUT(16)=-TSH(NY,NX)*277.8/AREA(3,NU(NY,NX),NY,NX)
           L=1
-          DO 60 N=17,27
-            OUT(N)=(VOLW(L,NY,NX)+AMIN1(VOLAH(L,NY,NX) &
-              ,VOLWH(L,NY,NX)))/VOLT(L,NY,NX)
+          D60: DO N=17,27
+            OUT(N)=(VOLW(L,NY,NX)+AMIN1(VOLAH(L,NY,NX),VOLWH(L,NY,NX)))/VOLT(L,NY,NX)
             L=L+1
-60        CONTINUE
+          ENDDO D60
+
           L=1
-          DO 61 N=28,38
+          D61: DO N=28,38
             OUT(N)=TKS(L,NY,NX)
             L=L+1
-61        CONTINUE
+          ENDDO D61
           OUT(39)=-1000.0*CTRAN(1,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
           OUT(40)=-1000.0*CTRAN(3,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
           OUT(41)=-1000.0*CTRAN(2,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
@@ -238,20 +239,20 @@ module VisualMod
           OUT(46)=-(DPTHT(NY,NX)-CDPTH(NU(NY,NX)-1,NY,NX))
           OUT(47)=DPTHS(NY,NX)
           OUT(48)=ARLFC(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-          OUT(49)=0.001*WTLFE(ielmc,1,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-          OUT(50)=0.001*WTLFE(ielmc,3,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-          OUT(51)=0.001*WTLFE(ielmc,2,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-          OUT(52)=0.001*WTSTKE(ielmc,1,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-          OUT(53)=0.001*WTSTKE(ielmc,3,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-          OUT(54)=0.001*WTSTKE(ielmc,2,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-          OUT(55)=0.001*WTRTE(ielmc,1,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-          OUT(56)=0.001*WTRTE(ielmc,3,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-          OUT(57)=0.001*WTRTE(ielmc,2,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+          OUT(49)=0.001_r8*WTLFE(ielmc,1,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+          OUT(50)=0.001_r8*WTLFE(ielmc,3,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+          OUT(51)=0.001_r8*WTLFE(ielmc,2,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+          OUT(52)=0.001_r8*WTSTKE(ielmc,1,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+          OUT(53)=0.001_r8*WTSTKE(ielmc,3,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+          OUT(54)=0.001_r8*WTSTKE(ielmc,2,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+          OUT(55)=0.001_r8*WTRTE(ielmc,1,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+          OUT(56)=0.001_r8*WTRTE(ielmc,3,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+          OUT(57)=0.001_r8*WTRTE(ielmc,2,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
           L=0
-          DO 62 N=58,68
-            OUT(N)=0.001*ORGC(L,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+          D62: DO N=58,68
+            OUT(N)=0.001_r8*ORGC(L,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
             L=L+1
-62        CONTINUE
+          ENDDO D62
 !
 !     WRITE OUTPUT
 !
@@ -264,8 +265,8 @@ module VisualMod
 95        FORMAT(50A16)
 91        FORMAT(A16,3I16,38E16.6)
 96        FORMAT(A16,2I16,30E16.6)
-9990    CONTINUE
-9995  CONTINUE
+      ENDDO D9990
+    ENDDO D9995
 !
 !     WRITE LANDSCAPE OUTPUT
 !

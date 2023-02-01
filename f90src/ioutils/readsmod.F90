@@ -54,7 +54,6 @@ module readsmod
   integer, intent(inout) :: NF, NFX, NTZ
   integer, intent(out) :: NTZX
 
-
   integer :: kk,N,L,NN,NY,NX,NZ,K,NI
   integer :: LL,J
   integer :: LPY
@@ -106,10 +105,13 @@ module readsmod
 ! NPY=number of cycles per NPX for gas flux calcns
 ! JOUT,IOUT,KOUT=output frequency for hourly,daily,checkpoint data
 ! ICLM=changes to weather data (0=none,1=step,2=transient)
-!
-  READ(4,'(2I2,I4)')IDATA(1),IDATA(2),IDATA(3)
-  READ(4,'(2I2,I4)')IDATA(4),IDATA(5),IDATA(6)
-  READ(4,'(2I2,I4)')IDATA(7),IDATA(8),IDATA(9)
+
+! this reads the option file that sets up frequency of model output and # of
+! iterations used by the ecosim solvers
+
+  READ(4,'(2I2,I4)')IDATA(1),IDATA(2),IDATA(3)       !beginning of the current year
+  READ(4,'(2I2,I4)')IDATA(4),IDATA(5),IDATA(6)       !end of current year
+  READ(4,'(2I2,I4)')IDATA(7),IDATA(8),IDATA(9)       !beginning of the past year
   READ(4,'(A3)')DATA1(18)
   READ(4,'(A3)')DATA1(19)
   READ(4,'(A3)')DATA1(20)
@@ -127,11 +129,14 @@ module readsmod
     write(*,*)'write checkpoint file?: DATA1(19) ',DATA1(19)
     write(*,*)'read chkpt file?: DATA1(20) ',DATA1(20)
   endif
+! determine whether to read checkpoing file (i.e. an actual restart run)
   is_restart_run=(data1(20)=='YES')
+! read changing factor for climate variables
   D25: DO N=1,4
     READ(4,*)DRAD(N),DTMPX(N),DTMPN(N),DHUM(N),DPREC(N) &
       ,DIRRI(N),DWIND(N),DCO2E(N),DCN4R(N),DCNOR(N)
   ENDDO D25
+
   if(lverb)then
     write(*,*)'annual changes in radiation: DRAD(1:4)',DRAD(1:4)
     write(*,*)'annual changes in max temperature: DTMPX(1:4)',DTMPX(1:4)
@@ -144,6 +149,7 @@ module readsmod
     write(*,*)'annual changes in atm NH4 conc: DCN4R(1:4)',DCN4R(1:4)
     write(*,*)'annual changes in atm NO3 conc: DCNOR(1:4)',DCNOR(1:4)
   endif
+
   D26: DO N=5,12
     DRAD(N)=DRAD(N-1)
     DTMPX(N)=DTMPX(N-1)
@@ -181,7 +187,9 @@ module readsmod
     IDATA(6)=IDATA(6)+(NT-1)*NF+(NTX-1)*NFX-NTZX
     IYRC=IDATA(3)
   ELSE
+    !not the first year
     IF(IDATA(1).EQ.1.AND.IDATA(2).EQ.1)THEN
+      !jan 1st
       IDATA(3)=IYRC+1
     ELSE
       IDATA(3)=IYRC
@@ -189,6 +197,7 @@ module readsmod
     IDATA(6)=IDATA(3)
     IYRC=IDATA(3)
   ENDIF
+
   IF(NE.EQ.1)THEN
     N1=IDATA(3)
   ENDIF
@@ -246,6 +255,7 @@ module readsmod
   LPY=0
   LYRC=365   ! # days for current year
   LYRX=365   ! # days for last year
+!
   D575: DO N=1,7,3
     IF(isLeap(IDATA(N+2)))then
       IF(IDATA(N+1).GT.2)LPY=1
@@ -253,13 +263,16 @@ module readsmod
     endif
 
     IF(IDATA(N+1).EQ.1)then
+! Jan
       IDY=IDATA(N)
     else
+! total ordinal days counted till month IDATA(N+1)
       IDY=30*(IDATA(N+1)-1)+ICOR(IDATA(N+1)-1)+IDATA(N)+LPY
     endif
-    IF(N.EQ.1)ISTART=IDY
-    IF(N.EQ.4)IFIN=IDY
-    IF(N.EQ.7)IRUN=IDY
+
+    IF(N.EQ.1)ISTART=IDY      !
+    IF(N.EQ.4)IFIN=IDY        !
+    IF(N.EQ.7)IRUN=IDY        !starting date of the restart run
 
     IF(isLeap(IDATA(N+2)-1))then
       IF(N.EQ.1)LYRX=366
@@ -460,11 +473,7 @@ module readsmod
 
   ICHECK=0
   IF(TTYPE.EQ.'H'.AND.J.NE.24)ICHECK=1
-! write(*,*)'TTYPE=',TTYPE
-! write(*,*)'IFIN=',IFIN
-! write(*,*)'IX=',IX
   IEND=IX-ICHECK
-! write(*,'(3(A,X,I4))')'IFIN=',IFIN,' IEND=',IEND,' IX=',IX
   IFIN=MIN(IFIN,IEND)
   IDAYR=MIN(ISTART-1,ILAST) !day of recovery from earlier run
   IYRR=IDATA(3)

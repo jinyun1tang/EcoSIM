@@ -94,6 +94,7 @@
 
 !  real(r8) :: AZI
 !  REAL(R8) :: DEC
+
   D955: DO NX=NHW,NHE
     D950: DO NY=NVN,NVS
       TRAD(NY,NX)=0._r8
@@ -103,10 +104,10 @@
       HUDN(NY,NX)=100.0
       TWIND(NY,NX)=0._r8
       TRAI(NY,NX)=0._r8
-      DO 945 L=0,JZ
+      D945: DO L=0,JZ
         TSMX(L,NY,NX)=-9999
         TSMN(L,NY,NX)=9999
-945   CONTINUE
+      ENDDO D945
 !
 !     RESET ANNUAL FLUX ACCUMULATORS AT START OF ANNUAL CYCLE
 !     ALAT=latitude +ve=N,-ve=S
@@ -199,19 +200,9 @@
 !
       DYLX(NY,NX)=DYLN(NY,NX)
       XI=I
-      IF(I.EQ.366)XI=365.5
+      IF(I.EQ.366)XI=365.5_r8
       DECDAY=XI+100
 
-!      DECLIN=SIN((DECDAY*0.9863)*1.7453E-02)*(-23.47)
-!      AZI=SIN(ALAT(NY,NX)*1.7453E-02)*SIN(DECLIN*1.7453E-02)
-!      DEC=COS(ALAT(NY,NX)*1.7453E-02)*COS(DECLIN*1.7453E-02)
-!      IF(AZI/DEC.GE.1.0-TWILGT)THEN
-!        DYLN(NY,NX)=24.0
-!      ELSEIF(AZI/DEC.LE.-1.0+TWILGT)THEN
-!        DYLN(NY,NX)=0._r8
-!      ELSE
-!        DYLN(NY,NX)=12.0*(1.0+2.0/PICON*ASIN(TWILGT+AZI/DEC))
-!      ENDIF
       DYLN(NY,NX)=GetDayLength(ALAT(NY,NX),XI,DECLIN)
 !
 !     TIME STEP OF WEARHER DATA
@@ -233,11 +224,12 @@
 !     TMPX,TMPN=maximum,minimum daily temperature from weather file
 !     DWPT=daily vapor pressure from weather file
 !     TAVG*,AMP*,VAVG*,VMP*=daily avgs, amps to calc hourly values in wthr.f
-!
+!     IETYP=Koppen climate zone
+
       IF(ITYPE.EQ.1)THEN
         IF(IETYP(NY,NX).GE.-1)THEN
           IF(DYLN(NY,NX).GT.ZERO)THEN
-            RMAX=SRAD(I)/(DYLN(NY,NX)*0.658)
+            RMAX=SRAD(I)/(DYLN(NY,NX)*0.658_r8)
           ELSE
             RMAX=0._r8
           ENDIF
@@ -249,15 +241,15 @@
         IF(I.EQ.1)I2=LYRX
         IF(I.EQ.IBEGIN)I2=I
         IF(I.EQ.LYRC)I3=I
-        TAVG1=(TMPX(I2)+TMPN(I))/2
-        TAVG2=(TMPX(I)+TMPN(I))/2
-        TAVG3=(TMPX(I)+TMPN(I3))/2
+        TAVG1=(TMPX(I2)+TMPN(I))/2._r8
+        TAVG2=(TMPX(I)+TMPN(I))/2._r8
+        TAVG3=(TMPX(I)+TMPN(I3))/2._r8
         AMP1=TAVG1-TMPN(I)
         AMP2=TAVG2-TMPN(I)
         AMP3=TAVG3-TMPN(I3)
-        VAVG1=(DWPT(1,I2)+DWPT(2,I))/2
-        VAVG2=(DWPT(1,I)+DWPT(2,I))/2
-        VAVG3=(DWPT(1,I)+DWPT(2,I3))/2
+        VAVG1=(DWPT(1,I2)+DWPT(2,I))/2._r8
+        VAVG2=(DWPT(1,I)+DWPT(2,I))/2._r8
+        VAVG3=(DWPT(1,I)+DWPT(2,I3))/2._r8
         VMP1=VAVG1-DWPT(2,I)
         VMP2=VAVG2-DWPT(2,I)
         VMP3=VAVG3-DWPT(2,I3)
@@ -292,16 +284,17 @@
 !     INCRENENTAL CHANGES
 !
         ELSEIF(ICLM.EQ.2)THEN
+! LYRC: number of days in current year
           TDTPX(NY,NX,N)=TDTPX(NY,NX,N)+DTMPX(N)/LYRC
           TDTPN(NY,NX,N)=TDTPN(NY,NX,N)+DTMPN(N)/LYRC
-          TDRAD(NY,NX,N)=TDRAD(NY,NX,N)+(DRAD(N)-1.0)/LYRC
-          TDWND(NY,NX,N)=TDWND(NY,NX,N)+(DWIND(N)-1.0)/LYRC
-          TDHUM(NY,NX,N)=TDHUM(NY,NX,N)+(DHUM(N)-1.0)/LYRC
-          TDPRC(NY,NX,N)=TDPRC(NY,NX,N)+(DPREC(N)-1.0)/LYRC
-          TDIRI(NY,NX,N)=TDIRI(NY,NX,N)+(DIRRI(N)-1.0)/LYRC
+          TDRAD(NY,NX,N)=TDRAD(NY,NX,N)+(DRAD(N)-1.0_r8)/LYRC
+          TDWND(NY,NX,N)=TDWND(NY,NX,N)+(DWIND(N)-1.0_r8)/LYRC
+          TDHUM(NY,NX,N)=TDHUM(NY,NX,N)+(DHUM(N)-1.0_r8)/LYRC
+          TDPRC(NY,NX,N)=TDPRC(NY,NX,N)+(DPREC(N)-1.0_r8)/LYRC
+          TDIRI(NY,NX,N)=TDIRI(NY,NX,N)+(DIRRI(N)-1.0_r8)/LYRC
           TDCO2(NY,NX,N)=TDCO2(NY,NX,N)*EXP(LOG(DCO2E(N))/LYRC)
-          TDCN4(NY,NX,N)=TDCN4(NY,NX,N)+(DCN4R(N)-1.0)/LYRC
-          TDCNO(NY,NX,N)=TDCNO(NY,NX,N)+(DCNOR(N)-1.0)/LYRC
+          TDCN4(NY,NX,N)=TDCN4(NY,NX,N)+(DCN4R(N)-1.0_r8)/LYRC
+          TDCNO(NY,NX,N)=TDCNO(NY,NX,N)+(DCNOR(N)-1.0_r8)/LYRC
         ENDIF
       ENDDO D600
     ENDDO D950

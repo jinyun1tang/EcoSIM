@@ -49,10 +49,11 @@ module routqMod
         enddo
       enddo
     ENDDO D9999
+
     IF(is_restart_run)THEN
-      IDATE=IDATA(9)
+      IDATE=IDATA(9)         !read from the past year
     ELSE
-      IDATE=IDATA(3)
+      IDATE=IDATA(3)         !it is the current year
     ENDIF
 !   open checkpoint files for i/o
     WRITE(CHARY,'(I4)')IDATE
@@ -61,7 +62,6 @@ module routqMod
     OUTM='M'//DATA1(1)(1:2)//CHARY(1:4)
     OUTR='R'//DATA1(1)(1:2)//CHARY(1:4)
     OUTQ='Q'//DATA1(1)(1:2)//CHARY(1:4)
-    print*,'file 30: ',outq
     call OPEN_safe(26,outdir,outx,'UNKNOWN',mod_filename,__LINE__)
     call OPEN_safe(27,outdir,outc,'UNKNOWN',mod_filename,__LINE__)
     call OPEN_safe(28,outdir,outm,'UNKNOWN',mod_filename,__LINE__)
@@ -69,7 +69,9 @@ module routqMod
     call OPEN_safe(30,outdir,outq,'UNKNOWN',mod_filename,__LINE__)
   ENDIF
 
-  call ReadPlantInfo_ascii(NT,NE,NTX,NEX,NHW,NHE,NVN,NVS)
+!  call ReadPlantInfo_ascii(NT,NE,NTX,NEX,NHW,NHE,NVN,NVS)
+
+  call ReadPlantInfoNC(NT,NE,NTX,NEX,NHW,NHE,NVN,NVS)
 
   END subroutine routq
 
@@ -81,20 +83,18 @@ module routqMod
   implicit none
   integer, intent(in) :: NT,NE,NTX,NEX,NHW,NHE,NVN,NVS
   integer :: IDATE
-  integer :: NPP(JY,JX)
   integer :: IYR,NX,NY,NZ,NN,NH1,NH2,NV1,NV2,NS
   CHARACTER(len=2) :: CLIMATE
-  CHARACTER(len=16) :: DATAA(JP,JY,JX),DATAB(JP,JY,JX)
 !
 ! READ PLANT MANAGEMENT FILE NAMES FOR EACH GRID CELL
 !
 !  if(lverb)
   write(*,*)'plant management file: ',DATAC(10,NE,NEX)
 
-  NPP=0
   IF(DATAC(10,NE,NEX).NE.'NO')THEN
     NN=0
     call OPEN_safe(14,PREFIX,DATAC(10,NE,NEX),'OLD',mod_filename,__LINE__)
+
 50  READ(14,*,END=1000)NH1,NV1,NH2,NV2,NS
 
 !   NN=NN+1
@@ -130,17 +130,14 @@ module routqMod
           ENDDO D4965
         ENDDO D4970
       ENDDO D4975
-      print*,'redxx:  ', (DATAX(NZ),DATAY(NZ),NZ=1,NS)
     ENDIF
 
-    print*,'is_restart_run',is_restart_run
     IF(.not. is_restart_run)THEN
 ! there was no chechk point file read in, so update pft info
 ! from input file
       D8995: DO NX=NH1,NH2
         D8990: DO NY=NV1,NV2
           NP(NY,NX)=NS
-          NPP(NY,NX)=0
 !DATAP(NZ,NY,NX) and DATAM(NZ,NY,NX) are to be read in readqmod.F90
           D100: DO NZ=1,NP(NY,NX)
             DATAP(NZ,NY,NX)=DATAX(NZ)
@@ -158,135 +155,11 @@ module routqMod
 !
 !     READ PLANT SPECIES NAMES FROM EARLIER RUN IF NEEDED
 !
-      print*,'rewind'
-      REWIND(30)
-8000  CONTINUE
+      call read_checkpt(NS,NH1,NH2,NV1,NV2,NHW,NHE,NVN,NVS)
 
-      print*,'here 8000 cont'
-!  recover DATAZ from checkpoint file
-      D9995: DO NX=NHW,NHE
-        D9990: DO NY=NVN,NVS
-          READ(30,90,END=1001)IDATE,IYR,NPP(NY,NX) &
-            ,(DATAZ(NZ,NY,NX),IFLGC(NZ,NY,NX),NZ=1,NPP(NY,NX))
-90        FORMAT(2I4,1I3,5(A16,I4))
-          print*,IDATE,IYR,NPP(NY,NX),(DATAZ(NZ,NY,NX),IFLGC(NZ,NY,NX),NZ=1,NPP(NY,NX))
-        ENDDO D9990
-      ENDDO D9995
-
-      print*,IDAYR,IYRR
-      IF(IDATE.LT.IDAYR.OR.IYR.LT.IYRR)THEN
-        GO TO 8000
-      ELSEIF(IDATE.GE.IDAYR.AND.IYR.EQ.IYRR)THEN
-!
-!       MATCH PREVIOUS AND CURRENT PLANT SPECIES
-!
-        print*,'match pft',NS,NHW,NHE,NVN,NVS
-        D7975: DO NX=NHW,NHE
-          D7970: DO NY=NVN,NVS
-            D7965: DO NZ=1,NS
-              print*,'mat ',DATAX(NZ),DATAY(NZ)
-              DATAA(NZ,NY,NX)=DATAX(NZ)
-              DATAB(NZ,NY,NX)=DATAY(NZ)
-            ENDDO D7965
-          ENDDO D7970
-        ENDDO D7975
-
-        D7995: DO NX=NH1,NH2
-          D7990: DO NY=NV1,NV2
-            NP(NY,NX)=MAX(NS,NPP(NY,NX))
-            D195: DO NN=1,NP(NY,NX)
-              DATAP(NN,NY,NX)='NO'
-              DATAM(NN,NY,NX)='NO'
-            ENDDO D195
-
-            IF(NPP(NY,NX).GT.0)THEN
-              D200: DO NN=1,NPP(NY,NX)
-                D205: DO NZ=1,NS
-                  IF(DATAZ(NN,NY,NX).EQ.DATAX(NZ).AND.IFLGC(NN,NY,NX).EQ.1)THEN
-                    DATAP(NN,NY,NX)=DATAX(NZ)
-                    DATAM(NN,NY,NX)=DATAY(NZ)
-                    DATAA(NZ,NY,NX)='NO'
-                    DATAB(NZ,NY,NX)='NO'
-                  ENDIF
-                ENDDO D205
-              ENDDO D200
-!
-!             ADD NEW PLANT SPECIES
-!
-              D250: DO NN=1,NP(NY,NX)
-!               WRITE(*,2223)'250',NX,NY,NZ,NN,NP(NY,NX),NS
-!                2,(DATAB(NZ,NY,NX),NZ=1,NS),DATAP(NN,NY,NX),DATAM(NN,NY,NX)
-                IF(DATAP(NN,NY,NX).EQ.'NO')THEN
-                  D255: DO NZ=1,NS
-!                   WRITE(*,2223)'255',NX,NY,NZ,NN,NP(NY,NX),NS
-!                    2,DATAM(NN,NY,NX),DATAB(NZ,NY,NX)
-!2223                FORMAT(A8,6I4,10A16)
-                    IF(DATAA(NZ,NY,NX).NE.'NO')THEN
-                      DATAP(NN,NY,NX)=DATAA(NZ,NY,NX)
-                      DATAM(NN,NY,NX)=DATAB(NZ,NY,NX)
-                      DATAA(NZ,NY,NX)='NO'
-                      DATAB(NZ,NY,NX)='NO'
-                      EXIT
-                    ENDIF
-                  ENDDO D255
-                ENDIF
-              ENDDO D250
-
-              D201: DO NZ=NP(NY,NX)+1,JP
-                DATAP(NZ,NY,NX)='NO'
-                DATAM(NZ,NY,NX)='NO'
-              ENDDO D201
-            ELSE
-
-              D265: DO NZ=1,NS
-                DATAP(NZ,NY,NX)=DATAX(NZ)
-                DATAM(NZ,NY,NX)=DATAY(NZ)
-              ENDDO D265
-              D270: DO NZ=NS+1,JP
-                DATAP(NZ,NY,NX)='NO'
-                DATAM(NZ,NY,NX)='NO'
-              ENDDO D270
-            ENDIF
-!
-!           SET NUMBER OF PLANT SPECIES
-!
-            NN=5
-            D202: DO NZ=JP,1,-1
-              IF(DATAP(NZ,NY,NX).EQ.'NO')THEN
-                NN=NN-1
-              ELSE
-                EXIT
-              ENDIF
-            ENDDO D202
-            NP(NY,NX)=NN
-            NP0(NY,NX)=NN
-          ENDDO D7990
-        ENDDO D7995
-      ENDIF
     ENDIF
-    print*,'goto 50:1'
-    print*,''
-    GO TO 50
-1001 CONTINUE
-
-    print*,'NxxxS',NS
-    D6995: DO NX=NHW,NHE
-      D6990: DO NY=NVN,NVS
-        NP(NY,NX)=NS
-        D300: DO NZ=1,NP(NY,NX)
-          DATAP(NZ,NY,NX)=DATAX(NZ)
-          DATAM(NZ,NY,NX)=DATAY(NZ)
-        ENDDO D300
-        D301: DO NZ=NP(NY,NX)+1,JP
-          DATAP(NZ,NY,NX)='NO'
-          DATAM(NZ,NY,NX)='NO'
-        ENDDO D301
-      ENDDO D6990
-    ENDDO D6995
-    print*,'goto 50:2'
     GO TO 50
 1000  CLOSE(14)
-    print*,'close14 ',IGO
   ELSE
     D5995: DO NX=NHW,NHE
       DO  NY=NVN,NVS
@@ -302,6 +175,136 @@ module routqMod
 !------------------------------------------------------------------------------------------
 
 
+  subroutine read_checkpt(NS,NH1,NH2,NV1,NV2,NHW,NHE,NVN,NVS)
+  implicit none
+  integer, intent(in) :: NS,NH1,NH2,NV1,NV2,NHW,NHE,NVN,NVS
+  integer :: NY,NX,NZ,NN
+  integer :: IDATE,IYR
+  integer :: NPP(JY,JX)
+  CHARACTER(len=16) :: DATAA(JP,JY,JX),DATAB(JP,JY,JX)
+
+  NPP =0
+
+  REWIND(30)
+
+8000  CONTINUE
+
+!  recover DATAZ from checkpoint file, read year by year
+  D9995: DO NX=NHW,NHE
+    D9990: DO NY=NVN,NVS
+! read one line
+      READ(30,90,END=1002)IDATE,IYR,NPP(NY,NX) &
+        ,(DATAZ(NZ,NY,NX),IFLGC(NZ,NY,NX),NZ=1,NPP(NY,NX))
+90        FORMAT(2I4,1I3,5(A16,I4))
+    ENDDO D9990
+  ENDDO D9995
+
+  IF(IDATE.LT.IDAYR.OR.IYR.LT.IYRR)THEN
+! mot reaching the recovery date, keep reading
+    GO TO 8000
+  ELSEIF(IDATE.GE.IDAYR.AND.IYR.EQ.IYRR)THEN
+!
+!       MATCH PREVIOUS AND CURRENT PLANT SPECIES
+! make of copy using pft information from the topographic unit just read in
+    D7975: DO NX=NHW,NHE
+      D7970: DO NY=NVN,NVS
+        D7965: DO NZ=1,NS
+          DATAA(NZ,NY,NX)=DATAX(NZ)
+          DATAB(NZ,NY,NX)=DATAY(NZ)
+        ENDDO D7965
+      ENDDO D7970
+    ENDDO D7975
+
+    D7995: DO NX=NH1,NH2
+      D7990: DO NY=NV1,NV2
+        NP(NY,NX)=MAX(NS,NPP(NY,NX))
+        D195: DO NN=1,NP(NY,NX)
+          DATAP(NN,NY,NX)='NO'
+          DATAM(NN,NY,NX)='NO'
+        ENDDO D195
+! assign the values fo active pft from the record
+        IF(NPP(NY,NX).GT.0)THEN
+! the check point file has non-zero pft
+          D200: DO NN=1,NPP(NY,NX)
+            D205: DO NZ=1,NS
+              IF(DATAZ(NN,NY,NX).EQ.DATAX(NZ).AND.IFLGC(NN,NY,NX).EQ.1)THEN
+                DATAP(NN,NY,NX)=DATAX(NZ)
+                DATAM(NN,NY,NX)=DATAY(NZ)
+                DATAA(NZ,NY,NX)='NO'
+                DATAB(NZ,NY,NX)='NO'
+              ENDIF
+            ENDDO D205
+          ENDDO D200
+!
+!             ADD NEW PLANT SPECIES
+!
+          D250: DO NN=1,NP(NY,NX)
+            IF(DATAP(NN,NY,NX).EQ.'NO')THEN
+              D255: DO NZ=1,NS
+                IF(DATAA(NZ,NY,NX).NE.'NO')THEN
+                  DATAP(NN,NY,NX)=DATAA(NZ,NY,NX)
+                  DATAM(NN,NY,NX)=DATAB(NZ,NY,NX)
+                  DATAA(NZ,NY,NX)='NO'
+                  DATAB(NZ,NY,NX)='NO'
+                  EXIT
+                ENDIF
+              ENDDO D255
+            ENDIF
+          ENDDO D250
+
+          D201: DO NZ=NP(NY,NX)+1,JP
+            DATAP(NZ,NY,NX)='NO'
+            DATAM(NZ,NY,NX)='NO'
+          ENDDO D201
+        ELSE
+
+! assign using information from pft files
+          D265: DO NZ=1,NS
+            DATAP(NZ,NY,NX)=DATAX(NZ)
+            DATAM(NZ,NY,NX)=DATAY(NZ)
+          ENDDO D265
+          D270: DO NZ=NS+1,JP
+            DATAP(NZ,NY,NX)='NO'
+            DATAM(NZ,NY,NX)='NO'
+          ENDDO D270
+        ENDIF
+!
+!           SET NUMBER OF PLANT SPECIES
+!
+        NN=JP
+        D202: DO NZ=JP,1,-1
+          IF(DATAP(NZ,NY,NX).EQ.'NO')THEN
+            NN=NN-1
+          ELSE
+            EXIT
+          ENDIF
+        ENDDO D202
+        NP(NY,NX)=NN
+        NP0(NY,NX)=NN
+      ENDDO D7990
+    ENDDO D7995
+  ENDIF
+1002 continue
+  D6995: DO NX=NHW,NHE
+    D6990: DO NY=NVN,NVS
+      NP(NY,NX)=NS
+      D300: DO NZ=1,NP(NY,NX)
+        DATAP(NZ,NY,NX)=DATAX(NZ)
+        DATAM(NZ,NY,NX)=DATAY(NZ)
+      ENDDO D300
+      D301: DO NZ=NP(NY,NX)+1,JP
+        DATAP(NZ,NY,NX)='NO'
+        DATAM(NZ,NY,NX)='NO'
+      ENDDO D301
+    ENDDO D6990
+  ENDDO D6995
+
+  end subroutine read_checkpt
+
+
+!------------------------------------------------------------------------------------------
+
+
   subroutine ReadPlantInfoNC(NT,NE,NTX,NEX,NHW,NHE,NVN,NVS)
 
   USE EcoSIMCtrlMod, only : pft_mgmt_in
@@ -314,7 +317,6 @@ module routqMod
   integer :: NPP(JY,JX)
   integer :: IYR,NX,NY,NZ,NN,NH1,NH2,NV1,NV2,NS
   CHARACTER(len=2) :: CLIMATE
-  CHARACTER(len=16) :: DATAA(JP,JY,JX),DATAB(JP,JY,JX)
   integer :: ntopou,NTOPO
   type(file_desc_t) :: pftinfo_nfid
   type(Var_desc_t) :: vardesc
@@ -322,6 +324,7 @@ module routqMod
   integer :: pft_dflag
   integer :: iyear
   integer :: ret
+  character(len=10) :: pft_gtype(JP)
 
   if (len_trim(pft_mgmt_in)==0)then
     D5995: DO NX=NHW,NHE
@@ -334,19 +337,20 @@ module routqMod
       enddo
     ENDDO D5995
   else
+
     call ncd_pio_openfile(pftinfo_nfid, pft_mgmt_in, ncd_nowrite)
 
     call check_var(pftinfo_nfid, 'pft_dflag', vardesc, readvar)
-    if(readvar)then
+
+    if(.not. readvar)then
       call endrun('fail to find pft_dflag in '//trim(mod_filename), __LINE__)
     endif
 
     call check_ret(nf90_get_var(pftinfo_nfid%fh, vardesc%varid, pft_dflag), &
       'in '//trim(mod_filename))
-!    call ncd_getvint(pftinfo_nfid,'pft_dflag',pft_dflag)
 
     if (pft_dflag==-1)then
-!not pft data
+      !no pft data
       DO NX=NHW,NHE
         DO  NY=NVN,NVS
           NP(NY,NX)=0
@@ -358,6 +362,7 @@ module routqMod
       ENDDO
     else
       if(pft_dflag==0)then
+        ! constant pft data
         iyear=1
       else
         iyear=1+IGO
@@ -367,9 +372,9 @@ module routqMod
 
       DO NTOPO=1,ntopou
         call ncd_getvar(pftinfo_nfid,'NH1',ntopo,NH1)
-        call ncd_getvar(pftinfo_nfid,'NV1',ntopo,NH1)
-        call ncd_getvar(pftinfo_nfid,'NH2',ntopo,NH1)
-        call ncd_getvar(pftinfo_nfid,'NV2',ntopo,NH1)
+        call ncd_getvar(pftinfo_nfid,'NV1',ntopo,NV1)
+        call ncd_getvar(pftinfo_nfid,'NH2',ntopo,NH2)
+        call ncd_getvar(pftinfo_nfid,'NV2',ntopo,NV2)
         call ncd_getvar(pftinfo_nfid,'NZ',ntopo,NS)
 
         NN=1
@@ -383,11 +388,53 @@ module routqMod
         ENDDO D4995
 
         IF(NS.GT.0)THEN
-  ! a vegetated topo unit
-  !  input data is of shape 'pft_type(year, ntopou, maxpfts, nchar1)'
 
+          ! a vegetated topo unit
+          call check_var(pftinfo_nfid, 'pft_type', vardesc, readvar)
+          if(.not. readvar)then
+            call endrun('fail to find pft_type in '//trim(mod_filename), __LINE__)
+          endif
+
+          call check_ret(nf90_get_var(pftinfo_nfid%fh, vardesc%varid, pft_gtype, &
+            start = (/1,1,ntopou,iyear/),count = (/len(pft_gtype(1)),JP,1,1/)),trim(mod_filename))
+
+          D4975: DO NX=NH1,NH2
+            D4970: DO NY=NV1,NV2
+              D4965: DO NZ=1,NS
+
+                IF(IETYP(NY,NX).GT.0)THEN
+                  WRITE(CLIMATE,'(I2)')IETYP(NY,NX)
+    !the type of pft is specified by genra+Koppen climate zone
+                  DATAX(NZ)=pft_gtype(NZ)(1:4)//CLIMATE
+                ENDIF
+
+              ENDDO D4965
+            ENDDO D4970
+          ENDDO D4975
+!          pause
         ENDIF
+        print*,'is_restart_run',is_restart_run
+        IF(.not. is_restart_run)THEN
+    ! there was no chechk point file read in, so update pft info
+    ! from input file
+          D8995: DO NX=NH1,NH2
+            D8990: DO NY=NV1,NV2
+              NP(NY,NX)=NS
+    !DATAP(NZ,NY,NX) and DATAM(NZ,NY,NX) are to be read in readqmod.F90
+              D100: DO NZ=1,NP(NY,NX)
+                DATAP(NZ,NY,NX)=DATAX(NZ)
+                print*,'DATAP(NZ,NY,NX) ',DATAP(NZ,NY,NX)
+              ENDDO D100
 
+              D101: DO NZ=NP(NY,NX)+1,JP
+                DATAP(NZ,NY,NX)='NO'
+              ENDDO D101
+            ENDDO D8990
+          ENDDO D8995
+        ELSE
+!read from chck point file
+          call read_checkpt(NS,NH1,NH2,NV1,NV2,NHW,NHE,NVN,NVS)
+        ENDIF
       ENDDO
     ENDIF
     call ncd_pio_closefile(pftinfo_nfid)

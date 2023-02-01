@@ -33,7 +33,7 @@ module HfuncsMod
   real(r8), PARAMETER :: GSTGR=0.667_r8
   real(r8), PARAMETER :: VRNE=3600.0_r8
   real(r8), parameter :: PSILY(0:3)=real((/-200.0,-2.0,-2.0,-2.0/),r8)
-  integer, parameter :: NBX(0:3)=(/5,1,1,1/)
+  integer , parameter :: NBX(0:3)=(/5,1,1,1/)
 
   public :: hfuncs
   contains
@@ -279,7 +279,7 @@ module HfuncsMod
 ! FNOD=scales node number for perennial vegetation (e.g. trees)
 ! NNOD=number of concurrently growing nodes
 ! XTLI,GROUP=node number at planting,floral initiation
-
+! IBTYP: setup for phenologically-driven above-ground turnover 
 
 
   IF(IFLGI(NZ).EQ.0)THEN

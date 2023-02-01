@@ -12,6 +12,7 @@ SUBROUTINE soil(NA,ND,NT,NE,NAX,NTX,NEX,NHW,NHE,NVN,NVS)
   use VisualMod    , only : visual
   use WthrMod      , only : wthr
   use readiMod     , only : readi
+  use RestartMod   , only : restart
   use PlantInfoMod , only : ReadPlantInfo
   use readsmod     , only : reads
   use Hist1Mod     , only : fouts,foutp,outpd,outph,outsd,outsh
@@ -44,6 +45,7 @@ SUBROUTINE soil(NA,ND,NT,NE,NAX,NTX,NEX,NHW,NHE,NVN,NVS)
 333   FORMAT(A8)
 
   is_first_year=IGO.EQ.0
+
   call init_timer(outdir)
 
   IF(is_first_year)THEN
@@ -69,6 +71,7 @@ SUBROUTINE soil(NA,ND,NT,NE,NAX,NTX,NEX,NHW,NHE,NVN,NVS)
 !   IN 'ROUTS' IF NEEDED
 !
     IF(is_restart_run)THEN
+!IRUN: start date of current scenario
       IF((IDAYR.GE.IRUN.AND.IYRR.EQ.IDATA(9)).OR.IYRR.GT.IDATA(9))THEN
         if(lverb)WRITE(*,333)'ROUTS'
         CALL ROUTS(NHW,NHE,NVN,NVS)
@@ -77,7 +80,6 @@ SUBROUTINE soil(NA,ND,NT,NE,NAX,NTX,NEX,NHW,NHE,NVN,NVS)
   ENDIF
 !
   call ReadPlantInfo(NA,ND,NT,NE,NTX,NEX,NF,NFX,NTZ,NTZX,NHW,NHE,NVN,NVS)
-
 
   if(lverb)WRITE(*,333)'FOUTP'
   CALL FOUTP(NT,NE,NTX,NEX,NF,NFX,NHW,NHE,NVN,NVS)
@@ -117,8 +119,10 @@ SUBROUTINE soil(NA,ND,NT,NE,NAX,NTX,NEX,NHW,NHE,NVN,NVS)
       IYRR=IYRR+1
     ENDIF
   ENDIF
+
   IF(do_rgres .and. I.eq.LYRG)RETURN
   if(lverb)write(*,'(2(A,I4))')'I=',I,' IFIN=',IFIN
+
   IF(I.GT.IFIN)GO TO 9999
   if(lverb)WRITE(*,333)'FINISH'
 !
@@ -170,12 +174,7 @@ SUBROUTINE soil(NA,ND,NT,NE,NAX,NTX,NEX,NHW,NHE,NVN,NVS)
 !   IN 'WOUTS', 'WOUTP' AND 'WOUTQ'
 !
     IF((I/KOUT)*KOUT.EQ.I.OR.I.EQ.IFIN)THEN
-      if(lverb)WRITE(*,333)'WOUTS'
-      CALL WOUTS(I,NHW,NHE,NVN,NVS)
-      if(lverb)WRITE(*,333)'WOUTP'
-      CALL WOUTP(I,NHW,NHE,NVN,NVS)
-      if(lverb)WRITE(*,333)'WOUTQ'
-      CALL WOUTQ(I,NHW,NHE,NVN,NVS)
+      call restart(I,NHW,NHE,NVN,NVS)
     ENDIF
   ENDIF
 !
@@ -211,7 +210,7 @@ SUBROUTINE soil(NA,ND,NT,NE,NAX,NTX,NEX,NHW,NHE,NVN,NVS)
 
   call MicAPI_cleanup
 
-! WRITE(*,333)'LOOP'
+  WRITE(*,*)'LOOP DONE',IYRC
 !
 ! WRITE OUTPUT FILES FOR EACH GRID CELL IN 'SPLIT'
 !
