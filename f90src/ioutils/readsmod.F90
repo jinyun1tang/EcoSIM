@@ -27,9 +27,9 @@ module readsmod
   real(r8) :: Z0G,ZNOONG
   real(r8) :: PHRG
 
+  CHARACTER(len=1) :: IVAR(20),VAR(50),TYP(50),CTYPE
   CHARACTER(len=16) :: OUTW,OUTI,OUTT,OUTN,OUTF
   CHARACTER(len=4) :: CHARY
-  CHARACTER(len=1) :: TTYPE,CTYPE,IVAR(20),VAR(50),TYP(50)
   integer :: IDAT(20)
   real(r8) :: DAT(50),DATK(50),OUT(50)
   real(r8) :: datav(40)
@@ -54,11 +54,11 @@ module readsmod
   integer, intent(inout) :: NF, NFX, NTZ
   integer, intent(out) :: NTZX
 
-  integer :: kk,N,L,NN,NY,NX,NZ,K,NI
+  CHARACTER(len=1) :: TTYPE
+  integer :: kk,N,L,NY,NX,NZ,K
   integer :: LL,J
   integer :: LPY
-  LOGICAL :: GO110,GO60
-  integer :: IH
+
 
 ! begin_execution
 
@@ -306,83 +306,8 @@ module readsmod
 ! IDAT,DAT=time,weather variable
 !
   IF(DATAC(3,NE,NEX).NE.'NO')THEN
-! OPEN WEATHER(3,
-    call OPEN_safe(3,PREFIX,DATAC(3,NE,NEX),'OLD',mod_filename,__LINE__)
-    IFLG3=0
-    READ(3,'(2A1,2I2,50A1)')TTYPE,CTYPE,NI,NN,(IVAR(K),K=1,NI),(VAR(K),K=1,NN)
-    READ(3,'(50A1)')(TYP(K),K=1,NN)
-    read(3,*)(datav(kk),kk=1,3)
-    Z0G=datav(1)
-    IFLGW=int(datav(2))
-    ZNOONG=datav(3)
-!  fourth in the weather file
-    READ(3,*)PHRG,CN4RIG,CNORIG,CPORG,CALRG,CFERG,CCARG,CMGRG,CNARG &
-      ,CKARG,CSORG,CCLRG
-    if(lverb)then
-      write(*,'(40A)')('-',ll=1,40)
-      write(*,*)'read weather file head from ',DATAC(3,NE,NEX)
-      write(*,*)'time step format: TTYPE ',TTYPE,trim(getclimttype(TTYPE))
-      write(*,*)'calendar format: CTYPE ',CTYPE,trim(getclimctype(CTYPE))
-      write(*,*)'number of time variables: NI ',NI
-      write(*,*)'time var type: IVAR ',(IVAR(K),K=1,NI)
-      write(*,*)'number of weather data variables: NN ',NN
-      write(*,*)'weather var type: VAR ',(VAR(K),K=1,NN)
-      write(*,*)'weather var units: TYP ',(TYP(K),K=1,NN)
-      write(*,*)'windspeed measurement height: Z0G',Z0G
-      write(*,*)'flag for raising Z0G with vegn: IFLGW ',IFLGW
-      write(*,*)'time of solar noon: ZNOONG ',ZNOONG
-      write(*,*)'pH in precipitation: PHRG ',PHRG
-      write(*,*)'NH4 conc in precip: CN4RIG ',CN4RIG
-      write(*,*)'NO3 conc in precip: CNORIG ',CNORIG
-      write(*,*)'H2PO4 conc in precip: CPORG ',CPORG
-      write(*,*)'Al conc in precip: CALRG ',CALRG
-      write(*,*)'Fe conc in precip: CFERG ',CFERG
-      write(*,*)'Ca conc in precip: CCARG ',CCARG
-      write(*,*)'Mg conc in precip: CMGRG ',CMGRG
-      write(*,*)'Na conc in precip: CNARG ',CNARG
-      write(*,*)'K conc in precip: CKARG ',CKARG
-      write(*,*)'SO4 conc in precip: CSORG ',CSORG
-      write(*,*)'Cl conc in precip: CCLRG ',CCLRG
-      write(*,*)'weather data are in the format time,weather variable'
-    endif
-    D55: DO K=1,NN
-      DATK(K)=0.0_r8
-    ENDDO D55
-    IH=1
-! the file reading loop
-    DO while(.TRUE.)
-      read(3,*,END=110)(datav(k),k=1,NI),(DAT(K),K=1,NN)
-      do k = 1, ni
-        idat(k)=int(datav(k))
-      enddo
-!
-      IF(TTYPE.EQ.'D')THEN
-!   READ DAILY WEATHER DATA AND CONVERT TO MODEL UNITS
-        call readdayweather(I,L,GO110,GO60,NTX,NFX,NN,NI,LPY)
-        IF(GO60)cycle
-        IF(GO110)EXIT
-!!
-      ELSE
-!     READ HOURLY WEATHER DATA AND CONVERT TO MODEL UNITS
-        call readhourweather(I,J,IH,go60,L,NN,NI,LPY)
-!     write(*,*)'goto60=',go60
-        IF(GO60)cycle
-        IH=1
-        IX=I
-!     write(*,*)'344IX=',IX
-        IF(TTYPE.EQ.'3')THEN
-!       weather data is every 3 hrs, do interpolation
-          call interp3hourweather(I,J)
-        ENDIF
 
-        IF(IFLGY.EQ.1.AND.I.EQ.IYRD.AND.J.EQ.24)THEN
-          EXIT
-        ENDIF
-        cycle
-      ENDIF
-    enddo
-110 CONTINUE
-    CLOSE(3)
+    call ReadClim(NE,NEX,NTX,NFX,L,I,IX,TTYPE)
 
 !
 ! ACCOUNT FOR LEAP YEAR
@@ -588,7 +513,7 @@ module readsmod
 
 !------------------------------------------------------------------------------------------
 
-  subroutine readhourweather(I,J,IH,go60,L,NN,NI,LPY)
+  subroutine readhourweather(I,J,IH,go60,L,NN,NI,TTYPE)
 
 !     read hourly weather data
 !
@@ -598,10 +523,12 @@ module readsmod
   integer, intent(inout) :: I      !julian day
   integer, intent(inout) :: J      !hour
   integer, intent(inout) :: IH
-  integer, intent(inout) :: LPY
+
   integer, intent(in) :: L,NN,NI
+  character(len=1),intent(in) :: TTYPE
   logical, intent(out) :: go60
 
+  integer :: LPY
   integer :: K
   integer :: M
   integer :: N
@@ -818,7 +745,7 @@ module readsmod
   end subroutine readhourweather
 !------------------------------------------------------------------------------------------
 
-  subroutine readdayweather(I,L,go110,go60,NTX,NFX,NN,NI,LPY)
+  subroutine readdayweather(I,L,go110,go60,NTX,NFX,NN,NI)
 !     read daily weather data
 !
 !     DERIVE DAY I FROM TIME VARIABLES IVAR
@@ -828,10 +755,10 @@ module readsmod
   implicit none
 
   integer, intent(in) :: L,NTX,NFX,NN,NI
-  integer, intent(inout) :: LPY
+
   integer, intent(out) :: I
   logical, intent(out) :: go110, go60
-
+  integer :: LPY
   integer :: K,M,N
 
   go110=.false.
@@ -1031,4 +958,95 @@ module readsmod
   end select
   end function getclimctype
 
+!------------------------------------------------------------------------------------------
+
+  subroutine ReadClim(NE,NEX,NTX,NFX,L,I,IX,TTYPE)
+  implicit none
+  integer, intent(in) :: NE,NEX,NTX,NFX,L
+  integer, intent(out) :: I,IX
+
+  CHARACTER(len=1),intent(out) :: TTYPE
+  integer :: K, KK, IH, NI, NN, J
+  integer :: LL
+  LOGICAL :: GO110,GO60
+
+! OPEN WEATHER(3,
+  call OPEN_safe(3,PREFIX,DATAC(3,NE,NEX),'OLD',mod_filename,__LINE__)
+  IFLG3=0
+  READ(3,'(2A1,2I2,50A1)')TTYPE,CTYPE,NI,NN,(IVAR(K),K=1,NI),(VAR(K),K=1,NN)
+  READ(3,'(50A1)')(TYP(K),K=1,NN)
+  read(3,*)(datav(kk),kk=1,3)
+  Z0G=datav(1)
+  IFLGW=int(datav(2))
+  ZNOONG=datav(3)
+
+!  fourth line in the weather file
+  READ(3,*)PHRG,CN4RIG,CNORIG,CPORG,CALRG,CFERG,CCARG,CMGRG,CNARG,CKARG,CSORG,CCLRG
+  if(lverb)then
+    write(*,'(40A)')('-',ll=1,40)
+    write(*,*)'read weather file head from ',DATAC(3,NE,NEX)
+    write(*,*)'time step format: TTYPE ',TTYPE,trim(getclimttype(TTYPE))
+    write(*,*)'calendar format: CTYPE ',CTYPE,trim(getclimctype(CTYPE))
+    write(*,*)'number of time variables: NI ',NI
+    write(*,*)'time var type: IVAR ',(IVAR(K),K=1,NI)
+    write(*,*)'number of weather data variables: NN ',NN
+    write(*,*)'weather var type: VAR ',(VAR(K),K=1,NN)
+    write(*,*)'weather var units: TYP ',(TYP(K),K=1,NN)
+    write(*,*)'windspeed measurement height: Z0G',Z0G
+    write(*,*)'flag for raising Z0G with vegn: IFLGW ',IFLGW
+    write(*,*)'time of solar noon: ZNOONG ',ZNOONG
+    write(*,*)'pH in precipitation: PHRG ',PHRG
+    write(*,*)'NH4 conc in precip: CN4RIG ',CN4RIG
+    write(*,*)'NO3 conc in precip: CNORIG ',CNORIG
+    write(*,*)'H2PO4 conc in precip: CPORG ',CPORG
+    write(*,*)'Al conc in precip: CALRG ',CALRG
+    write(*,*)'Fe conc in precip: CFERG ',CFERG
+    write(*,*)'Ca conc in precip: CCARG ',CCARG
+    write(*,*)'Mg conc in precip: CMGRG ',CMGRG
+    write(*,*)'Na conc in precip: CNARG ',CNARG
+    write(*,*)'K conc in precip: CKARG ',CKARG
+    write(*,*)'SO4 conc in precip: CSORG ',CSORG
+    write(*,*)'Cl conc in precip: CCLRG ',CCLRG
+    write(*,*)'weather data are in the format time,weather variable'
+  endif
+  D55: DO K=1,NN
+    DATK(K)=0.0_r8
+  ENDDO D55
+  IH=1
+
+! the file reading loop
+  DO while(.TRUE.)
+    read(3,*,END=110)(datav(k),k=1,NI),(DAT(K),K=1,NN)
+    do k = 1, ni
+      idat(k)=int(datav(k))
+    enddo
+!
+    IF(TTYPE.EQ.'D')THEN
+!   READ DAILY WEATHER DATA AND CONVERT TO MODEL UNITS
+      call readdayweather(I,L,GO110,GO60,NTX,NFX,NN,NI)
+      IF(GO60)cycle
+      IF(GO110)EXIT
+!!
+    ELSE
+!     READ HOURLY WEATHER DATA AND CONVERT TO MODEL UNITS
+      call readhourweather(I,J,IH,go60,L,NN,NI,TTYPE)
+!     write(*,*)'goto60=',go60
+      IF(GO60)cycle
+      IH=1
+      IX=I
+!     write(*,*)'344IX=',IX
+      IF(TTYPE.EQ.'3')THEN
+!       weather data is every 3 hrs, do interpolation
+        call interp3hourweather(I,J)
+      ENDIF
+
+      IF(IFLGY.EQ.1.AND.I.EQ.IYRD.AND.J.EQ.24)THEN
+        EXIT
+      ENDIF
+      cycle
+    ENDIF
+  enddo
+110 CONTINUE
+  CLOSE(3)
+  end subroutine ReadClim
 end module readsmod
