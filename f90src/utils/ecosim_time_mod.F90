@@ -40,11 +40,11 @@ module ecosim_Time_Mod
      procedure, public :: get_step_size
      procedure, public :: get_cur_time
      procedure, public :: get_cur_timef
-     procedure, private:: proc_nextstep
+
      procedure, public :: proc_initstep
      procedure, public :: print_cur_time
      procedure, public :: its_time_to_histflush
-     procedure, private:: ReadNamelist
+
      procedure, public :: setClock
      procedure, public :: its_a_new_hour
      procedure, public :: its_a_new_day
@@ -56,6 +56,8 @@ module ecosim_Time_Mod
      procedure, public :: get_cur_day
      procedure, public :: is_first_step
      procedure, public :: print_model_time_stamp
+     procedure, private:: proc_nextstep
+     procedure, private:: ReadNamelist
   end type ecosim_time_type
 
   integer, parameter, private :: daz(12)=(/31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31/)
@@ -110,6 +112,7 @@ contains
     this%moy    = 1
     this%hist_freq=-1
     this%nelapstep=0
+    this%stop_opt=3
     if(present(namelist_buffer))then
       if(present(masterproc))then
         call this%ReadNamelist(namelist_buffer, masterproc)
@@ -161,7 +164,7 @@ contains
     delta_time = 1800._r8                !half hourly time step
     stop_n=2       !by default 2 cycle
     stop_option='nyears'  !by default years
-    this%stop_opt=1
+    this%stop_opt=3
     hist_freq=-1   !write every time step
     restart_dtime = -1._r8
 
@@ -193,6 +196,9 @@ contains
     this%delta_time = delta_time
     this%stop_time = delta_time*stop_n
     select case (trim(stop_option))
+    case ('nsteps')
+      this%stop_time = stop_n * this%delta_time
+      this%stop_opt=1
     case ('ndays')
       !day
       this%stop_time= stop_n * 86400._r8
@@ -201,9 +207,6 @@ contains
       !year
       this%stop_time= stop_n * 86400._r8 * 365._r8
       this%stop_opt=3
-    case ('nsteps')
-      this%stop_time = stop_n * this%delta_time
-      this%stop_opt=1
     case default
       call endrun(msg="ERROR setting up stop_option "//errmsg(mod_filename, __LINE__))
     end select
@@ -543,9 +546,10 @@ contains
   class(ecosim_time_type), intent(in) :: this
   integer, intent(in) :: iulog
 
+  print*,this%stop_opt,this%its_a_new_year(),this%get_cur_year()
   select case(this%stop_opt)
   case (1)
-      write(iulog,*)'step', this%get_nstep()
+    write(iulog,*)'step', this%get_nstep()
   case (2)
     if (this%its_a_new_day()) then
       write(iulog,*)'day', this%get_cur_day()

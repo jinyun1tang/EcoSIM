@@ -115,7 +115,7 @@ module MicBGCMod
         !
   DO K=1,KL
 !
-          !write(*,*)'DECOMPOSITION OF ORGANIC SUBSTRATES'
+    !write(*,*)'DECOMPOSITION OF ORGANIC SUBSTRATES'
 !
     call SolidOMDecomposition(K,micfor,micstt,naqfdiag,nmicdiag,ncplxf,ncplxs)
 !
@@ -1909,6 +1909,7 @@ module MicBGCMod
   type(NitroOMcplxStateType),intent(inout) :: ncplxs
   integer  :: K,M
   real(r8) :: DOSAK
+
 !     begin_execution
   associate(                  &
     ROQCK  => ncplxf%ROQCK ,  &
@@ -1932,6 +1933,7 @@ module MicBGCMod
       OSAT(K)=OSAT(K)+OSA(M,K)
     enddo
   ENDDO D475
+
   D480: DO K=1,KL
     IF(OSCT(K).GT.ZEROS)THEN
       DOSAK=DOSA(K)*AZMAX1(ROQCK(K))
@@ -1943,7 +1945,6 @@ module MicBGCMod
         OSA(M,K)=AMIN1(OSC(M,K),OSA(M,K))
       ENDDO D490
     ENDIF
-
   ENDDO D480
   end associate
   end subroutine MicrobialLitterColonization

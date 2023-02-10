@@ -7,7 +7,8 @@
   use EcoSIMConfig , only : transport_on,column_mode, do_instequil
   use ForcWriterMod, only : bgc_forc_conf,do_bgcforc_write
   use fileUtil     , only : iulog
-  use EcoSIMCtrlMod, only : salt_model, pft_file_in,grid_file_in,pft_mgmt_in
+  use EcoSIMCtrlMod, only : salt_model, pft_file_in,grid_file_in
+  use EcoSIMCtrlMod, only : pft_mgmt_in,clm_file_in,sim_periods
 
   implicit none
   character(len=*), parameter :: mod_filename = __FILE__
@@ -29,7 +30,8 @@
 
   namelist /ecosys/case_name, prefix, runfile, do_regression_test, &
   num_of_simdays,lverbose,num_microbial_guilds,transport_on,column_mode,&
-  do_instequil,salt_model, pft_file_in,grid_file_in,pft_mgmt_in
+  do_instequil,salt_model, pft_file_in,grid_file_in,pft_mgmt_in, &
+  clm_file_in,sim_periods
 
 
   logical :: laddband
@@ -56,30 +58,32 @@
   pft_file_in=''
   grid_file_in=''
   pft_mgmt_in=''
+  clm_file_in=''
+  sim_periods=0
   inquire (file=nmlfile, iostat=rc)
   if (rc /= 0) then
     write (iulog, '(3a)') 'Error: input file ', trim(nmlfile), &
   ' does not exist.'
-    call endrun('stopped in readnml', __LINE__)
+    call endrun('stopped in readnml ', __LINE__)
   end if
 
   open (action='read', file=nmlfile, iostat=rc, newunit=fu)
   if (rc /= 0) then
     write (iulog, '(2a)') 'Error openning input file "', &
   trim(nmlfile)
-    call endrun('stopped in readnml', 32)
+    call endrun('stopped in readnml ', __LINE__)
   end if
 
   read(unit=fu, nml=ecosys, iostat=nml_error, iomsg=ioerror_msg)
   if (nml_error /= 0) then
      write(iulog,'(a)')"ERROR reading ecosys namelist "
-     call endrun('stopped in readnml', 38)
+     call endrun('stopped in readnml', __LINE__)
   end if
 
   read(unit=fu, nml=bbgcforc, iostat=nml_error, iomsg=ioerror_msg)
   if (nml_error /= 0) then
      write(iulog,'(a)')"ERROR reading bbgcforc namelist "
-     call endrun('stopped in readnml', 38)
+     call endrun('stopped in readnml ', __LINE__)
   end if
 
   close(fu)

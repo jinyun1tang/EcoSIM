@@ -18,14 +18,16 @@ SUBROUTINE soil(NA,ND,NT,NE,NAX,NTX,NEX,NHW,NHE,NVN,NVS)
   use Hist1Mod     , only : fouts,foutp,outpd,outph,outsd,outsh
   use timings      , only : init_timer, start_timer, end_timer,end_timer_loop
   use InitEcoSIM   , only : InitModules2
-  use GridConsts
-  use EcoSIMCtrlDataType
-  use EcoSIMHistMod
-  use EcoSIMConfig
+  use EcoSIMCtrlMod, only : etimer
   use PlantAPI     , only : PlantModel
   use MicBGCAPI    , only : MicrobeModel, MicAPI_Init, MicAPI_cleanup
   use ForcWriterMod, only : do_bgcforc_write,WriteBBGCForc
   use EcoSIMAPI    , only : Run_EcoSIM_one_step
+  use GridConsts
+  use EcoSIMCtrlDataType
+  use EcoSIMHistMod
+  use EcoSIMConfig
+
   implicit none
 
   integer, intent(in) :: NT,NE,NAX,NTX,NEX,NHW,NHE,NVN,NVS
@@ -147,24 +149,24 @@ SUBROUTINE soil(NA,ND,NT,NE,NAX,NTX,NEX,NHW,NHE,NVN,NVS)
   !
   !   WRITE HOURLY SOIL AND PLANT OUTPUT IN 'OUTSH' AND 'OUTPH'
   !
-  IF((J/JOUT)*JOUT.EQ.J)THEN
-    if(lverb)WRITE(*,333)'OUTSH'
-    CALL OUTSH(I,J,NT,NE,NTX,NEX,NHW,NHE,NVN,NVS)
+    IF((J/JOUT)*JOUT.EQ.J)THEN
+      if(lverb)WRITE(*,333)'OUTSH'
+      CALL OUTSH(I,J,NT,NE,NTX,NEX,NHW,NHE,NVN,NVS)
 
-    if(lverb)WRITE(*,333)'OUTPH'
-    CALL OUTPH(I,J,NT,NE,NTX,NEX,NHW,NHE,NVN,NVS)
-  ENDIF
+      if(lverb)WRITE(*,333)'OUTPH'
+      CALL OUTPH(I,J,NT,NE,NTX,NEX,NHW,NHE,NVN,NVS)
+    ENDIF
   !
   !   WRITE OUTPUT FOR DYNAMIC VISUALIZATION
   !
-  IF(DATA1(18).EQ.'YES')THEN
-    IF((J/JOUT)*JOUT.EQ.J)THEN
-      if(lverb)WRITE(*,333)'VIS'
-      CALL VISUAL(I,J,NHW,NHE,NVN,NVS)
+    IF(DATA1(18).EQ.'YES')THEN
+      IF((J/JOUT)*JOUT.EQ.J)THEN
+        if(lverb)WRITE(*,333)'VIS'
+        CALL VISUAL(I,J,NHW,NHE,NVN,NVS)
+      ENDIF
     ENDIF
-  ENDIF
     call end_timer_loop()
-
+    call etimer%update_time_stamp()
   ENDDO D9995
 
   IF(DATA1(19).EQ.'YES'.AND.KOUT.GT.0)THEN

@@ -142,8 +142,6 @@ module readiMod
   character(len=40) :: status
 
   select case(NCNG)
-  case (0)
-    status='No lateral connnection'
   case (1)
     status='Along the west-east direction'
   case (2)

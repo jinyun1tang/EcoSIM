@@ -44,6 +44,7 @@ implicit none
   integer :: recordDimID
   real(r8),pointer :: data1d(:)
   real(r8), allocatable :: dat1d(:)
+
   if(year==bgc_forc_conf%year .and. doy==bgc_forc_conf%doy)then
     NY=1;NX=1;L=bgc_forc_conf%Layer
     write(*,*)'write bbgc forc on day ',doy,'year',year

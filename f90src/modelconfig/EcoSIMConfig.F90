@@ -16,4 +16,5 @@ implicit none
   integer, parameter :: jcplx1c   = jcplxc-1
   integer, parameter :: NFGsc     = 7 !# of microbial functional groups in each complex
   character(len=36):: case_name
+
 end module EcoSIMConfig

@@ -1368,7 +1368,7 @@ module ncdio_pio
     endif
 
   end subroutine ncd_putatt_real
-
+!------------------------------------------------------------------------------------------
   subroutine ncd_putatt_char(ncid,varid,attrib,value,xtype)
     !
     ! !DESCRIPTION:
@@ -1389,7 +1389,7 @@ module ncdio_pio
 
   end subroutine ncd_putatt_char
 
-
+!------------------------------------------------------------------------------------------
   subroutine ncd_getatt_char(ncid,varname,attrib,value)
     !
     ! !DESCRIPTION:
@@ -1490,7 +1490,7 @@ module ncdio_pio
 
   end subroutine ncd_inqdname
 
-
+!------------------------------------------------------------------------------------------
   subroutine ncd_inqdlen(ncid,dimid,len,name)
     !
     ! !DESCRIPTION:

@@ -9,8 +9,8 @@ module minimathmod
   private
   public :: safe_adb
   public :: p_adb
-  public :: test_aeqb
-  public :: test_aneb
+  public :: test_aeqb     !a equals b test, with precision tiny_val
+  public :: test_aneb     !a not equals b test
   public :: vapsat, vapsat0
   public :: isLeap
   public :: AZMAX1,AZMIN1

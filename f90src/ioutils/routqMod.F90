@@ -388,7 +388,6 @@ module routqMod
         ENDDO D4995
 
         IF(NS.GT.0)THEN
-
           ! a vegetated topo unit
           call check_var(pftinfo_nfid, 'pft_type', vardesc, readvar)
           if(.not. readvar)then
@@ -396,24 +395,25 @@ module routqMod
           endif
 
           call check_ret(nf90_get_var(pftinfo_nfid%fh, vardesc%varid, pft_gtype, &
-            start = (/1,1,ntopou,iyear/),count = (/len(pft_gtype(1)),JP,1,1/)),trim(mod_filename))
-
+            start = (/1,1,ntopou,iyear/),count = (/len(pft_gtype(1)),JP,1,1/)), &
+            trim(mod_filename))
+          print*,NH1,NH2,NV1,NV2
           D4975: DO NX=NH1,NH2
             D4970: DO NY=NV1,NV2
               D4965: DO NZ=1,NS
-
+                print*,'IETYP(NY,NX) ',IETYP(NY,NX)
                 IF(IETYP(NY,NX).GT.0)THEN
                   WRITE(CLIMATE,'(I2)')IETYP(NY,NX)
-    !the type of pft is specified by genra+Koppen climate zone
+                  !the type of pft is specified by genra+Koppen climate zone
                   DATAX(NZ)=pft_gtype(NZ)(1:4)//CLIMATE
+                  print*,pft_gtype(NZ)(1:4),CLIMATE
                 ENDIF
 
               ENDDO D4965
             ENDDO D4970
           ENDDO D4975
-!          pause
         ENDIF
-        print*,'is_restart_run',is_restart_run
+        print*,'is_restart_run',is_restart_run,NS
         IF(.not. is_restart_run)THEN
     ! there was no chechk point file read in, so update pft info
     ! from input file
@@ -423,7 +423,7 @@ module routqMod
     !DATAP(NZ,NY,NX) and DATAM(NZ,NY,NX) are to be read in readqmod.F90
               D100: DO NZ=1,NP(NY,NX)
                 DATAP(NZ,NY,NX)=DATAX(NZ)
-                print*,'DATAP(NZ,NY,NX) ',DATAP(NZ,NY,NX)
+                print*,'DATAP(NZ,NY,NX) ',DATAX(NZ),NP(NY,NX)
               ENDDO D100
 
               D101: DO NZ=NP(NY,NX)+1,JP

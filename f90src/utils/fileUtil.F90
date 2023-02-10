@@ -3,6 +3,7 @@ module fileUtil
 ! subroutines for file open with error check
   use abortutils, only : endrun
   implicit none
+  character(len=*), private, parameter :: mod_filename = __FILE__
 
   public :: open_safe
   public :: check_read
@@ -18,6 +19,7 @@ module fileUtil
   integer , public, parameter :: ecosim_namelist_buffer_size = 4096
   logical, save :: continue_run = .false.
   contains
+!------------------------------------------------------------------------------------------
 
   function file_exists(filename) result(res)
 !
@@ -30,9 +32,12 @@ module fileUtil
   ! Check if the file exists
   inquire( file=trim(filename), exist=res )
   end function
+!------------------------------------------------------------------------------------------
 
   subroutine open_safe(lun,prefix,fname,status,location,lineno,lverb)
-
+!
+! Description
+! safely open a file for IO
   implicit none
   integer, intent(in) :: lun
   character(len=*), intent(in) :: prefix
@@ -44,11 +49,17 @@ module fileUtil
   character(len=2560) :: pathfile
   integer :: ierr
 
-  call getfilename(prefix,fname,pathfile)
+  call getfilenamef(prefix,fname,pathfile)
+
+  if(.not.file_exists(pathfile))then
+    call endrun(msg='Fail to find file '//trim(pathfile)//' in ' &
+      //mod_filename,line=__LINE__)
+  endif
+
   if(present(lverb))then
     if(lverb)write(*,*)'open file ',trim(pathfile)
   endif
-  OPEN(lun,FILE=pathfile,STATUS=status,iostat=ierr)
+  OPEN(lun,FILE=trim(pathfile),STATUS=status,iostat=ierr)
   if(ierr/=0)then
     call endrun(msg="error in "//location//" while reading file " &
       //TRIM(pathfile), line=lineno)
@@ -147,4 +158,41 @@ module fileUtil
   end if
   close(nml_unit)
   end subroutine namelist_to_buffer
+
+!------------------------------------------------------------------------------------------
+  subroutine getfilenamef(s1,s2,s3)
+  implicit none
+  character(len=*), intent(in) :: s1
+  character(len=*), intent(in) :: s2
+  character(len=*), intent(out) :: s3
+
+  integer :: k,k1,l3
+  l3=len(s3)
+  k=1
+  do while(.true.)
+
+    if(s1(k:k)/=' '.and. ichar(s1(k:k))/=0 .and. k<=l3)then
+       s3(k:k)=s1(k:k)
+    else
+       exit
+    endif
+    k=k+1
+  enddo
+  if(k>l3)then
+    call endrun("Not sufficient memory allocated for string s3 in " &
+      //trim(mod_filename),__LINE__)
+  endif
+  k1=1
+  do while(.true.)
+    if(s2(k1:k1)/=' '.and. ichar(s2(k1:k1))/=0 .and. k<=l3)then
+       s3(k:k)=s2(k1:k1)
+    else
+       exit
+    endif
+    k=k+1
+    k1=k1+1
+  enddo
+  s3(k:)=' '
+
+  end subroutine getfilenamef
 end module fileUtil

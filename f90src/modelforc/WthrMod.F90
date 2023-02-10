@@ -143,7 +143,7 @@ module WthrMod
           /(ZNOON(NY,NX)+9.0-DYLN(NY,NX)/2.0))+PICON2h)
       ELSE
         TCA(NY,NX)=TAVG2+AMP2*SIN(((J-(ZNOON(NY,NX) &
-          -DYLN(NY,NX)/2.0))*PICON/(3.0+DYLN(NY,NX)/2.0))-PICON2h)
+          -DYLN(NY,NX)/2.0_r8))*PICON/(3.0_r8+DYLN(NY,NX)/2.0_r8))-PICON2h)
       ENDIF
       TKA(NY,NX)=TCA(NY,NX)+TC2K
       !
@@ -152,34 +152,34 @@ module WthrMod
       !      ALTI=altitude
       !
       IF(J.LT.(ZNOON(NY,NX)-DYLN(NY,NX)/2))THEN
-        VPK(NY,NX)=VAVG1+VMP1*SIN(((J+ZNOON(NY,NX)-3.0)*PICON &
-          /(ZNOON(NY,NX)+9.0-DYLN(NY,NX)/2.0))+PICON2h)
+        VPK(NY,NX)=VAVG1+VMP1*SIN(((J+ZNOON(NY,NX)-3.0_r8)*PICON &
+          /(ZNOON(NY,NX)+9.0_r8-DYLN(NY,NX)/2.0_r8))+PICON2h)
       ELSEIF(J.GT.ZNOON(NY,NX)+3)THEN
-        VPK(NY,NX)=VAVG3+VMP3*SIN(((J-ZNOON(NY,NX)-3.0)*PICON &
-          /(ZNOON(NY,NX)+9.0-DYLN(NY,NX)/2.0))+PICON2h)
+        VPK(NY,NX)=VAVG3+VMP3*SIN(((J-ZNOON(NY,NX)-3.0_r8)*PICON &
+          /(ZNOON(NY,NX)+9.0_r8-DYLN(NY,NX)/2.0_r8))+PICON2h)
       ELSE
         VPK(NY,NX)=VAVG2+VMP2*SIN(((J-(ZNOON(NY,NX) &
-          -DYLN(NY,NX)/2.0))*PICON /(3.0+DYLN(NY,NX)/2.0))-PICON2h)
+          -DYLN(NY,NX)/2.0_r8))*PICON /(3.0_r8+DYLN(NY,NX)/2.0_r8))-PICON2h)
       ENDIF
-      !VPS(NY,NX)=0.61*EXP(5360.0*(3.661E-03-1.0/TKA(NY,NX))) &
-      VPS(NY,NX)=vapsat0(tka(ny,nx))*EXP(-ALTI(NY,NX)/7272.0)
+      !VPS(NY,NX)=0.61_r8*EXP(5360.0_r8*(3.661E-03_r8-1.0_r8/TKA(NY,NX))) &
+      VPS(NY,NX)=vapsat0(tka(ny,nx))*EXP(-ALTI(NY,NX)/7272.0_r8)
       VPK(NY,NX)=AMIN1(VPS(NY,NX),VPK(NY,NX))
 !
       !     UA=wind speed
 !
-      UA(NY,NX)=AMAX1(3600.0,WIND(I))
+      UA(NY,NX)=AMAX1(3600.0_r8,WIND(I))
 !
 !     TSNOW=temperature below which precipitation is snow (oC)
 !     PRECRI,PRECWI=rainfall,snowfall
 !
       IF(J.GE.13.AND.J.LE.24)THEN
         IF(TCA(NY,NX).GT.TSNOW)THEN
-          PRECRI(NY,NX)=RAIN(I)/12.0
+          PRECRI(NY,NX)=RAIN(I)/12.0_r8
           PRECWI(NY,NX)=0.0_r8
         ELSE
           PRECRI(NY,NX)=0.0_r8
-          PRECWI(NY,NX)=RAIN(I)/12.0
-    !     IF(PRECWI(NY,NX).LT.0.25E-03)PRECWI(NY,NX)=0.0_r8
+          PRECWI(NY,NX)=RAIN(I)/12.0_r8
+    !     IF(PRECWI(NY,NX).LT.0.25E-03_r8)PRECWI(NY,NX)=0.0_r8
         ENDIF
       ELSE
         PRECRI(NY,NX)=0.0_r8
