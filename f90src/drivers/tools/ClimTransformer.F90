@@ -1,4 +1,3 @@
-
 program main
   use ClimReadMod
   use data_kind_mod, only : r8 => SHR_KIND_R8
@@ -32,8 +31,7 @@ implicit none
   real(r8) :: data1(1)
   integer :: idata(1)
 
-
-  CALL GETARG(1,progname)
+  CALL GETARG(0,progname)
   clmfile=''
   L=1
   NTX=1
@@ -45,9 +43,6 @@ implicit none
   endif
   CALL GETARG(1,flistnm)
   CALL GETARG(2,ncfilenm)
-  if (trim(ncfilenm)=='')then
-
-  endif
   if(.not.file_exists(flistnm))then
     call endrun(msg='Fail to find the list file '//trim(flistnm)//' in ' &
       //mod_filename,line=__LINE__)
@@ -148,9 +143,9 @@ implicit none
     if(isleap(iyear))LYR=1
     DO II=1,365+LYR
       DO JJ=1,24
-        SRADH(JJ,II)=SRADH(JJ,II)*1.e6/3600._r8  !convert into W m^-2
-        WINDH(JJ,II)=WINDH(JJ,II)/3600._r8       !convert into m s^-1
-        RAINH(JJ,II)=RAINH(JJ,II)*1.e3_r8        !convert into mm hr^-1
+        SRADH(JJ,II)=SRADH(JJ,II)*1.e6/3600._r8  !convert from MJ/m2 into W m^-2
+        WINDH(JJ,II)=WINDH(JJ,II)/3600._r8       !convert from m/hour to m s^-1
+        RAINH(JJ,II)=RAINH(JJ,II)*1.e3_r8        !convert from m/hr into mm hr^-1
       enddo
     ENDDO
     k=k+1

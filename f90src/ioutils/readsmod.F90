@@ -33,8 +33,6 @@ module readsmod
 
   integer :: IDATE,IDY,IFLG3,I,ICHECK
 
-
-
   public :: reads
   contains
 
@@ -43,6 +41,7 @@ module readsmod
 ! THIS SUBROUTINE READS ALL SOIL AND PLANT MANAGEMENT INPUT FILES
 !
   use ReadManagementMod, only : ReadManagementFiles
+  use EcoSIMCtrlMod, only : soil_mgmt_in
   implicit none
   integer, intent(in) :: NEX
   integer, intent(in) :: NA(1:NEX),ND(1:NEX)
@@ -455,9 +454,9 @@ module readsmod
 ! THIS FILE CONTAINS NAMES OF TILLAGE, IRRIGATION
 ! AND FERTILIZER FILES
 !
-  IF(DATAC(9,NE,NEX).NE.'NO')THEN
+  IF(trim(soil_mgmt_in).NE.'NO')THEN
 !
-    call ReadManagementFiles(DATAC(9,NE,NEX))
+    call ReadManagementFiles(igo)
 
   ENDIF
   IMNG=1

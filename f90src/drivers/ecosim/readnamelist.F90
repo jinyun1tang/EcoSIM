@@ -9,7 +9,7 @@
   use fileUtil     , only : iulog
   use EcoSIMCtrlMod, only : salt_model, pft_file_in,grid_file_in
   use EcoSIMCtrlMod, only : pft_mgmt_in,clm_file_in,sim_periods
-
+  use EcoSIMCtrlMod, only : soil_mgmt_in
   implicit none
   character(len=*), parameter :: mod_filename = __FILE__
   character(len=*), intent(in) :: nmlfile
@@ -31,7 +31,7 @@
   namelist /ecosys/case_name, prefix, runfile, do_regression_test, &
   num_of_simdays,lverbose,num_microbial_guilds,transport_on,column_mode,&
   do_instequil,salt_model, pft_file_in,grid_file_in,pft_mgmt_in, &
-  clm_file_in,sim_periods
+  clm_file_in,sim_periods,soil_mgmt_in
 
 
   logical :: laddband
@@ -55,10 +55,12 @@
   do_bgcforc_write=.false.
   bgc_fname='bbforc.nc'
   do_instequil=.false.
+
   pft_file_in=''
   grid_file_in=''
   pft_mgmt_in=''
   clm_file_in=''
+  soil_mgmt_in=''
   sim_periods=0
   inquire (file=nmlfile, iostat=rc)
   if (rc /= 0) then

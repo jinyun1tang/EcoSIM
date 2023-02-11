@@ -804,7 +804,7 @@ module ncdio_pio
   call check_var(ncid, trim(varname), vardesc, readvar)
 
   call check_ret( nf90_put_var(ncid%fh, vardesc%varid, data,  &
-     start = (/1,1,1,rec/)),'ncd_putvar_real_sp_2d')
+     start = (/1,1,1,rec/)),trim(varname)//' in ncd_putvar_real_sp_3d')
 
       end subroutine ncd_putvar_real_sp_3d
 
@@ -1128,9 +1128,9 @@ module ncdio_pio
   type(Var_desc_t)  :: vardesc
 
   call check_var(ncid, trim(varname), vardesc, readvar)
-
+  print*,'rec',rec,varname
   call check_ret( nf90_get_var(ncid%fh, vardesc%varid, data,  &
-    start = (/1,1,rec/)),'ncd_getvar_real_sp_2d')
+    start = (/1,1,rec/)),trim(varname)//' in ncd_getvar_real_sp_2d')
 
   end subroutine ncd_getvar_real_sp_2d
 !----------------------------------------------------------------------
@@ -1177,7 +1177,7 @@ module ncdio_pio
   call check_var(ncid, trim(varname), vardesc, readvar)
 
   call check_ret( nf90_get_var(ncid%fh, vardesc%varid, data,  &
-    start = (/1,1,1,rec/)),'ncd_getvar_real_sp_2d')
+    start = (/1,1,1,rec/)),trim(varname)//' in ncd_getvar_real_sp_3d')
 
   end subroutine ncd_getvar_real_sp_3d
 

@@ -16,6 +16,8 @@ module ReadManagementMod
   use IrrigationDataType
   use GridDataType
   use EcoSIMConfig
+  USE ncdio_pio
+  use netcdf
 implicit none
   private
   character(len=*), parameter :: mod_filename = __FILE__
@@ -24,16 +26,33 @@ implicit none
   contains
 
 !------------------------------------------------------------------------------------------
-  subroutine ReadTillageFile(FileTillage,NH1,NH2,NV1,NV2)
+  subroutine ReadTillageFile(soilmgmt_nfid,FileTillage,NH1,NH2,NV1,NV2)
   implicit none
   character(len=*), intent(in) :: FileTillage
   integer, intent(in) :: NH1,NH2,NV1,NV2
+  type(file_desc_t), intent(in) :: soilmgmt_nfid
 
   integer :: NY,NX
   integer  :: IPLOW,IDY
   real(r8) :: DPLOW,DY
   integer  :: LPY,IDY1,IDY2,IDY3
-  call OPEN_safe(10,PREFIX,DATA1(8),'OLD',mod_filename,__LINE__)
+  integer :: kk
+  logical :: readvar
+  type(Var_desc_t) :: vardesc
+  character(len=24) :: tillf(12)
+  integer :: ntill
+
+  ntill=get_dim_len(soilmgmt_nfid,'ntill')
+  if(ntill>12)then
+    call endrun('Not enough memory size for array tillf in '//trim(mod_filename),__LINE__)
+  endif
+  call check_var(soilmgmt_nfid, FileTillage, vardesc, readvar)
+  if(.not. readvar)then
+    call endrun('fail to find '//trim(FileTillage)//' in '//trim(mod_filename), __LINE__)
+  endif
+
+  call check_ret(nf90_get_var(soilmgmt_nfid%fh, vardesc%varid, tillf),&
+      trim(mod_filename))
 
 !
 !     DY=date DDMMYYYY
@@ -41,17 +60,21 @@ implicit none
 !     ITILL=soil disturbance type 1-20:tillage,21=litter removal,22=fire,23-24=drainage
 !     DCORP=intensity (fire) or depth (tillage,drainage) of disturbance
 !
-  do while(.TRUE.)
-    READ(10,*,END=305)DY,IPLOW,DPLOW
+  kk=1
+  do while(len_trim(tillf(kk))>0)
+
+    read(tillf(kk),'(I2,I2,I4)')IDY1,IDY2,IDY3
     LPY=0
-    IDY1=INT(DY/1.0E+06)
-    IDY2=INT(DY/1.0E+04-IDY1*1.0E+02)
-    IDY3=INT(DY-(IDY1*1.0E+06+IDY2*1.0E+04))
     IF(isLeap(IDY3).and.IDY2.GT.2)LPY=1
     IF(IDY2.EQ.1)then
       IDY=IDY1
     else
       IDY=30*(IDY2-1)+ICOR(IDY2-1)+IDY1+LPY
+    endif
+    read(tillf(kk),*)DY,IPLOW,DPLOW
+    if(lverb)then
+      print*,tillf(kk)
+      print*,idy1,idy2,idy3,IPLOW,DPLOW
     endif
     D8995: DO NX=NH1,NH2
       D8990: DO NY=NV1,NV2
@@ -59,17 +82,18 @@ implicit none
         DCORP(IDY,NY,NX)=DPLOW
       ENDDO D8990
     ENDDO D8995
+    kk=kk+1
   enddo
-305   CONTINUE
-  CLOSE(10)
   end subroutine ReadTillageFile
 !------------------------------------------------------------------------------------------
 
-  subroutine ReadIrrigationFile(FileIrrig,NH1,NH2,NV1,NV2)
+  subroutine ReadIrrigationFile(soilmgmt_nfid,FileIrrig,NH1,NH2,NV1,NV2)
 
   implicit none
   character(len=*), intent(in) :: FileIrrig
   integer, intent(in) :: NH1,NH2,NV1,NV2
+  type(file_desc_t), intent(in) :: soilmgmt_nfid
+
   integer :: NY,NX,LPY,J,JEN
   integer :: IDY1,IDY2,IDY3,I,IDY
   integer :: IDYS,IHRS,IFLGVX,JST,IDYE,IHRE
@@ -78,7 +102,22 @@ implicit none
   real(r8) :: DIRRX,PHQX,CKAQX,RRH,WDPTHI,CCLQX
   real(r8) :: CMGQX,CNAQX,CSOQX
   real(r8) :: CN4QX,CNOQX,CPOQX,CALQX,CFEQX,CCAQX
-  call OPEN_safe(2,PREFIX,FileIrrig,'OLD',mod_filename,__LINE__)
+  integer :: kk
+  logical :: readvar
+  type(Var_desc_t) :: vardesc
+  character(len=128) :: irrigf(24)
+  integer :: nirrig
+
+  nirrig=get_dim_len(soilmgmt_nfid,'nirrig')
+  if(nirrig>24)then
+    call endrun("not enough size for array irrigf in "//trim(mod_filename), __LINE__)
+  endif
+
+  call check_var(soilmgmt_nfid, FileIrrig, vardesc, readvar)
+
+  if(.not. readvar)then
+    call endrun('fail to find '//trim(FileIrrig)//' in '//trim(mod_filename), __LINE__)
+  endif
 
   IF(FileIrrig(1:4).EQ.'auto')THEN
 !
@@ -95,14 +134,24 @@ implicit none
 !       CSOQX,CCLQX=pH,NH4,NO3,H2PO4,Al,Fe,Ca,Mg,Na,K,SO4,Cl
 !       concentration in irrigation water
 !
-    READ(2,*,END=105)DST,DEN,IFLGVX,FIRRX,CIRRX,DIRRX,WDPTHI &
+
+    call check_ret(nf90_get_var(soilmgmt_nfid%fh, vardesc%varid, irrigf(1)),&
+      trim(mod_filename))
+
+    READ(irrigf(1),*)DST,DEN,IFLGVX,FIRRX,CIRRX,DIRRX,WDPTHI &
       ,PHQX,CN4QX,CNOQX,CPOQX,CALQX,CFEQX,CCAQX,CMGQX,CNAQX,CKAQX &
       ,CSOQX,CCLQX
+    READ(irrigf(1),'(I2,I2,I4)')IDY1,IDY2,IDY3
+
+    IF(lverb)then
+      print*,irrigf(1)
+      print*,IDY1,IDY2,IDY3,DEN,IFLGVX,FIRRX,CIRRX,DIRRX,WDPTHI &
+        ,PHQX,CN4QX,CNOQX,CPOQX,CALQX,CFEQX,CCAQX,CMGQX,CNAQX,CKAQX &
+        ,CSOQX,CCLQX
+    endif
+
     LPY=0
 !   idy1: day, idy2:mon, idy3:hour
-    IDY1=INT(DST/1.0E+06)
-    IDY2=INT(DST/1.0E+04-IDY1*1.0E+02)
-    IDY3=INT(DST-(IDY1*1.0E+06+IDY2*1.0E+04))
     IF(isLeap(IDY3).and.IDY2.GT.2)LPY=1
     IF(IDY2.EQ.1)then
       IDYS=IDY1
@@ -111,6 +160,7 @@ implicit none
     endif
     IHRS=IDY3
     LPY=0
+
     IDY1=INT(DEN/1.0E+06)
     IDY2=INT(DEN/1.0E+04-IDY1*1.0E+02)
     IDY3=INT(DEN-(IDY1*1.0E+06+IDY2*1.0E+04))
@@ -155,19 +205,27 @@ implicit none
 !
 !       SCHEDULED IRRIGATION
 !
-    do while(.TRUE.)
+    call check_ret(nf90_get_var(soilmgmt_nfid%fh, vardesc%varid, irrigf),&
+      trim(mod_filename))
+
+    do kk=1,24
+      if(len_trim(irrigf(kk))==0)exit
 !
 !     DY,RR,JST,JEN=date DDMMYYYY,amount (mm),start and end hours
 !     PHQX,CN4QX,CNOQX,CPOQX,CALQX,CFEQX,CCAQX,CMGQX,CNAQX,CKAQX,
 !     CSOQX,CCLQX=pH,NH4,NO3,H2PO4,Al,Fe,Ca,Mg,Na,K,SO4,Cl
 !     concentration in irrigation water
 !
-      READ(2,*,END=105)DY,RR,JST,JEN,WDPTHI,PHQX,CN4QX,CNOQX,CPOQX &
+      READ(irrigf(kk),*)DY,RR,JST,JEN,WDPTHI,PHQX,CN4QX,CNOQX,CPOQX &
           ,CALQX,CFEQX,CCAQX,CMGQX,CNAQX,CKAQX,CSOQX,CCLQX
+      READ(irrigf(kk),'(I2,I2,I4)')IDY1,IDY2,IDY3
+
+      IF(lverb)then
+        PRINT*,irrigf(kk)
+        print*,IDY1,IDY2,IDY3,DY,RR,JST,JEN,WDPTHI,PHQX,CN4QX,CNOQX,CPOQX &
+            ,CALQX,CFEQX,CCAQX,CMGQX,CNAQX,CKAQX,CSOQX,CCLQX
+      endif
       LPY=0
-      IDY1=INT(DY/1.0E+06)
-      IDY2=INT(DY/1.0E+04-IDY1*1.0E+02)
-      IDY3=INT(DY-(IDY1*1.0E+06+IDY2*1.0E+04))
       IF(isLeap(IDY3).and.IDY2.GT.2)LPY=1
       IF(IDY2.EQ.1)then
         IDY=IDY1
@@ -200,17 +258,17 @@ implicit none
       ENDDO D8965
     enddo
   ENDIF
-105 CONTINUE
-  CLOSE(2)
   end subroutine ReadIrrigationFile
 
 !------------------------------------------------------------------------------------------
 
-  subroutine ReadFertlizerFile(FertFile,NH1,NH2,NV1,NV2)
+  subroutine ReadFertlizerFile(soilmgmt_nfid,FertFile,NH1,NH2,NV1,NV2)
 
   implicit none
   character(len=*), intent(in) :: FertFile
   integer,intent(in) :: NH1,NH2,NV1,NV2
+  type(file_desc_t), intent(in) :: soilmgmt_nfid
+
   integer :: NY,NX,LPY
   integer :: IDY1,IDY2,IDY3,IDY
   real(r8) :: FDPTHI,DY
@@ -219,6 +277,16 @@ implicit none
   real(r8) :: RSC1,RSN1,RSP1,RSC2,RSN2,RSP2
   real(r8) :: ROWX
   integer  :: IR0,IR1,IR2
+  integer  :: kk
+  logical :: readvar
+  type(Var_desc_t) :: vardesc
+  character(len=128) :: fertf(12)
+  integer :: nfert
+
+  nfert=get_dim_len(soilmgmt_nfid,'nfert')
+  if(nfert>12)then
+    call endrun('Not enough size for array fertf in '//trim(mod_filename), __LINE__)
+  endif
 !
 !     DY=date DDMMYYYY
 !     *A,*B=broadcast,banded fertilizer application
@@ -231,15 +299,30 @@ implicit none
 !     ROWX=band row width
 !     IRO,IR1,IR2=fertilizer,litter,manure type
 !
-  call OPEN_safe(8,PREFIX,FertFile,'OLD',mod_filename,__LINE__)
-  do while(.TRUE.)
-    READ(8,*,END=85)DY,Z4A,Z3A,ZUA,ZOA,Z4B,Z3B,ZUB,ZOB &
+
+  call check_var(soilmgmt_nfid, FertFile, vardesc, readvar)
+  if(.not. readvar)then
+    call endrun('fail to find '//trim(FertFile)//' in '//trim(mod_filename), __LINE__)
+  endif
+
+  call check_ret(nf90_get_var(soilmgmt_nfid%fh, vardesc%varid, fertf),&
+      trim(mod_filename))
+
+  do kk=1,12
+    if(len_trim(fertf(kk))==0)exit
+
+    READ(fertf(kk),*)DY,Z4A,Z3A,ZUA,ZOA,Z4B,Z3B,ZUB,ZOB &
       ,PMA,PMB,PHA,CAC,CAS,RSC1,RSN1,RSP1,RSC2,RSN2,RSP2,FDPTHI &
       ,ROWX,IR0,IR1,IR2
+
     LPY=0
-    IDY1=INT(DY/1.0E+06)
-    IDY2=INT(DY/1.0E+04-IDY1*1.0E+02)
-    IDY3=INT(DY-(IDY1*1.0E+06+IDY2*1.0E+04))
+    read(fertf(kk),'(I2,I2,I4)')IDY1,IDY2,IDY3
+    IF(LVERB)then
+      print*,fertf(kk)
+      PRINT*,IDY1,IDY2,IDY3,Z4A,Z3A,ZUA,ZOA,Z4B,Z3B,ZUB,ZOB &
+        ,PMA,PMB,PHA,CAC,CAS,RSC1,RSN1,RSP1,RSC2,RSN2,RSP2,FDPTHI &
+        ,ROWX,IR0,IR1,IR2
+    endif
     IF(isLeap(IDY3).and.IDY2.GT.2)LPY=1
     IF(IDY2.EQ.1)then
       IDY=IDY1
@@ -297,48 +380,94 @@ implicit none
       ENDDO D8980
     ENDDO D8985
   enddo
-85 CONTINUE
-  CLOSE(8)
   end subroutine ReadFertlizerFile
 
 !------------------------------------------------------------------------------------------
 
-  subroutine ReadManagementFiles(FileManage)
-
+  subroutine ReadManagementFiles(iyear)
+  use EcoSIMCtrlMod, only : soil_mgmt_in
   implicit none
-  character(len=*), intent(in) :: FileManage
+  integer, intent(in) :: iyear
 
   integer :: NH1,NV1,NH2,NV2
+  type(file_desc_t) :: soilmgmt_nfid
+  type(Var_desc_t) :: vardesc
+  logical :: readvar
+  integer :: ntopou
+  integer :: NTOPO
+  character(len=10) :: fertf
+  character(len=10) :: tillf
+  character(len=10) :: irrigf
+
 !
 !   NH1,NV1,NH2,NV2=N,W and S,E corners of landscape unit
 !   DATA1(8),DATA1(5),DATA1(6)=disturbance,fertilizer,irrigation files
 !   PREFIX=path for files in current or higher level directory
 
-  call OPEN_safe(13,PREFIX,FileManage,'OLD',mod_filename,__LINE__)
+  call ncd_pio_openfile(soilmgmt_nfid, soil_mgmt_in, ncd_nowrite)
 
-  do while(.TRUE.)
-    READ(13,*,END=200)NH1,NV1,NH2,NV2
-    READ(13,*)DATA1(8),DATA1(5),DATA1(6)
+  ntopou=get_dim_len(soilmgmt_nfid, 'ntopou')
+  if(ntopou==0)return
+  DO NTOPO=1,ntopou
+    call ncd_getvar(soilmgmt_nfid,'NH1',ntopo,NH1)
+    call ncd_getvar(soilmgmt_nfid,'NV1',ntopo,NV1)
+    call ncd_getvar(soilmgmt_nfid,'NH2',ntopo,NH2)
+    call ncd_getvar(soilmgmt_nfid,'NV2',ntopo,NV2)
+
+    if(any((/NH1,NH2,NV1,NV2/)<0))THEN
+      call endrun('something wrong in NHx or NHy indices on file '//trim(soil_mgmt_in)&
+        //' in '//trim(mod_filename), __LINE__)
+    endif
+
+    call check_var(soilmgmt_nfid, 'fertf', vardesc, readvar)
+    if(.not. readvar)then
+      call endrun('fail to find fertf in '//trim(mod_filename), __LINE__)
+    endif
+
+    call check_ret(nf90_get_var(soilmgmt_nfid%fh, vardesc%varid, fertf, &
+      start = (/1,ntopou,iyear/),count = (/len(fertf),1/)), &
+      trim(mod_filename))
+!!!!
+    call check_var(soilmgmt_nfid, 'tillf', vardesc, readvar)
+    if(.not. readvar)then
+      call endrun('fail to find tillf in '//trim(mod_filename), __LINE__)
+    endif
+
+    call check_ret(nf90_get_var(soilmgmt_nfid%fh, vardesc%varid, tillf, &
+      start = (/1,ntopou,iyear/),count = (/len(tillf),1/)), &
+      trim(mod_filename))
+!!!!
+    call check_var(soilmgmt_nfid, 'irrigf', vardesc, readvar)
+    if(.not. readvar)then
+      call endrun('fail to find irrigf in '//trim(mod_filename), __LINE__)
+    endif
+
+    call check_ret(nf90_get_var(soilmgmt_nfid%fh, vardesc%varid, irrigf, &
+      start = (/1,ntopou,iyear/),count = (/len(irrigf),1/)), &
+      trim(mod_filename))
 !
 !   READ TILLAGE INPUT FILE
 !
-    IF(DATA1(8).NE.'NO')THEN
-      call ReadTillageFile(DATA1(8),NH1,NH2,NV1,NV2)
+    IF(trim(tillf).NE.'NO')THEN
+      if(lverb)print*,'ReadTillageFile'
+      call ReadTillageFile(soilmgmt_nfid,tillf,NH1,NH2,NV1,NV2)
     ENDIF
 !
 !   READ FERTLIZER INPUT FILE
 !
-    IF(DATA1(5).NE.'NO')THEN
-      call ReadFertlizerFile(DATA1(5),NH1,NH2,NV1,NV2)
+    IF(trim(fertf).NE.'NO')THEN
+      if(lverb)print*,'ReadFertlizerFile'
+      call ReadFertlizerFile(soilmgmt_nfid,fertf,NH1,NH2,NV1,NV2)
     ENDIF
 !
 !   READ IRRIGATION INPUT FILE
 !
-    IF(DATA1(6).NE.'NO')THEN
-      call ReadIrrigationFile(DATA1(6),NH1,NH2,NV1,NV2)
+    IF(trim(irrigf).NE.'NO')THEN
+      if(lverb)print*,'ReadIrrigationFile'
+      call ReadIrrigationFile(soilmgmt_nfid,irrigf,NH1,NH2,NV1,NV2)
     ENDIF
-  enddo
-200 CONTINUE
-  CLOSE(13)
+  ENDDO
+  call ncd_pio_closefile(soilmgmt_nfid)
+
   end subroutine ReadManagementFiles
 end module ReadManagementMod

@@ -10,6 +10,8 @@ implicit none
   type(file_desc_t) :: pft_nfid
   character(len=300) :: grid_file_in
   character(len=300) :: clm_file_in
+  character(len=300) :: soil_mgmt_in
+
   type(ecosim_time_type) :: etimer
 ! define the simulation controler
 ! sim_periods(:,1)=(/year1,year2,1/)     cold start

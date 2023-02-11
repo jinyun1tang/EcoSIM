@@ -38,7 +38,7 @@ implicit none
     real(r8) :: CCLRG
   end type atm_forc_type
   public :: ReadClim
-
+  public :: ReadClimNC
   contains
 
 !------------------------------------------------------------------------------------------
@@ -644,24 +644,23 @@ implicit none
 
 !----------------------------------------------------------------------
 
-  subroutine ReadClimNC(iyear,irec,clmfile,L,atmf)
+  subroutine ReadClimNC(iyear,irec,L,atmf)
   use ncdio_pio
   use EcoSIMCtrlMod, only : clm_file_in
   implicit none
-  character(len=*), intent(in) :: clmfile
   integer, intent(in) :: iyear  ! # read data for iyear
   integer, intent(in) :: irec
   integer, intent(in) :: L
   type(atm_forc_type), intent(out) :: atmf
 
   type(file_desc_t) :: clm_nfid
-  integer :: nyears,ngrid
+  integer :: nyears,ngrid,LYR
   type(Var_desc_t) :: vardesc
   logical :: readvar
   real(r8), allocatable :: fdatam(:,:,:)
   integer , allocatable :: idatav(:)
   real(r8), allocatable ::fdatav(:)
-  integer :: yeari,I,J
+  integer :: yeari,I,J,II,JJ
 
   IWTHR(L)=2
 
@@ -671,9 +670,11 @@ implicit none
   if (nyears<irec)then
     call endrun('requested data exceeds the recorded data in '//trim(mod_filename), __LINE__)
   endif
+! while the climate data may be for multiple grid, only the first grid of the data
+! read is assigned to current climate arrays
   ngrid=get_dim_len(clm_nfid,'ngrid')
 
-  allocate(fdatam(24,366,ngrid))
+  allocate(fdatam(ngrid,24,366))
   allocate(idatav(ngrid))
   allocate(fdatav(ngrid))
 
@@ -681,35 +682,35 @@ implicit none
   yeari=idatav(1)
   I=365
   if(isleap(yeari))I=366
-
   call ncd_getvar(clm_nfid,'TMPH',irec,fdatam); call reshape2(TMPH,fdatam)
   call ncd_getvar(clm_nfid,'WINDH',irec,fdatam); call reshape2(WINDH,fdatam)
-  call ncd_putvar(clm_nfid,'DWPTH',irec,fdatam); call reshape2(DWPTH,fdatam)
-  call ncd_putvar(clm_nfid,'RAINH',irec,fdatam); call reshape2(RAINH,fdatam)
-  call ncd_putvar(clm_nfid,'SRADH',irec,fdatam); call reshape2(SRADH,fdatam)
+  call ncd_getvar(clm_nfid,'DWPTH',irec,fdatam); call reshape2(DWPTH,fdatam)
+  call ncd_getvar(clm_nfid,'RAINH',irec,fdatam); call reshape2(RAINH,fdatam)
+  call ncd_getvar(clm_nfid,'SRADH',irec,fdatam); call reshape2(SRADH,fdatam)
 
-  call ncd_putvar(clm_nfid,'Z0G',irec,fdatav); atmf%Z0G=fdatav(1)
-  call ncd_putvar(clm_nfid,'ZNOONG',irec,fdatav); atmf%ZNOONG=fdatav(1)
-  call ncd_putvar(clm_nfid,'PHRG',irec,fdatav); atmf%PHRG=fdatav(1)
-  call ncd_putvar(clm_nfid,'CN4RIG',irec,fdatav); atmf%CN4RIG=fdatav(1)
-  call ncd_putvar(clm_nfid,'CNORIG',irec,fdatav); atmf%CNORIG=fdatav(1)
-  call ncd_putvar(clm_nfid,'CPORG',irec,fdatav); atmf%CPORG=fdatav(1)
-  call ncd_putvar(clm_nfid,'CALRG',irec,fdatav); atmf%CALRG=fdatav(1)
-  call ncd_putvar(clm_nfid,'CFERG',irec,fdatav); atmf%CFERG=fdatav(1)
-  call ncd_putvar(clm_nfid,'CCARG',irec,fdatav); atmf%CCARG=fdatav(1)
-  call ncd_putvar(clm_nfid,'CMGRG',irec,fdatav); atmf%CMGRG=fdatav(1)
-  call ncd_putvar(clm_nfid,'CNARG',irec,fdatav); atmf%CNARG=fdatav(1)
-  call ncd_putvar(clm_nfid,'CKARG',irec,fdatav); atmf%CKARG=fdatav(1)
-  call ncd_putvar(clm_nfid,'CSORG',irec,fdatav); atmf%CSORG=fdatav(1)
-  call ncd_putvar(clm_nfid,'CCLRG',irec,fdatav); atmf%CCLRG=fdatav(1)
-  call ncd_putvar(clm_nfid,'IFLGW',irec,idatav); IFLGW=idatav(1)
+  call ncd_getvar(clm_nfid,'Z0G',irec,fdatav); atmf%Z0G=fdatav(1)
+  call ncd_getvar(clm_nfid,'ZNOONG',irec,fdatav); atmf%ZNOONG=fdatav(1)
+  call ncd_getvar(clm_nfid,'PHRG',irec,fdatav); atmf%PHRG=fdatav(1)
+  call ncd_getvar(clm_nfid,'CN4RIG',irec,fdatav); atmf%CN4RIG=fdatav(1)
+  call ncd_getvar(clm_nfid,'CNORIG',irec,fdatav); atmf%CNORIG=fdatav(1)
+  call ncd_getvar(clm_nfid,'CPORG',irec,fdatav); atmf%CPORG=fdatav(1)
+  call ncd_getvar(clm_nfid,'CALRG',irec,fdatav); atmf%CALRG=fdatav(1)
+  call ncd_getvar(clm_nfid,'CFERG',irec,fdatav); atmf%CFERG=fdatav(1)
+  call ncd_getvar(clm_nfid,'CCARG',irec,fdatav); atmf%CCARG=fdatav(1)
+  call ncd_getvar(clm_nfid,'CMGRG',irec,fdatav); atmf%CMGRG=fdatav(1)
+  call ncd_getvar(clm_nfid,'CNARG',irec,fdatav); atmf%CNARG=fdatav(1)
+  call ncd_getvar(clm_nfid,'CKARG',irec,fdatav); atmf%CKARG=fdatav(1)
+  call ncd_getvar(clm_nfid,'CSORG',irec,fdatav); atmf%CSORG=fdatav(1)
+  call ncd_getvar(clm_nfid,'CCLRG',irec,fdatav); atmf%CCLRG=fdatav(1)
+  call ncd_getvar(clm_nfid,'IFLGW',irec,idatav); IFLGW=idatav(1)
 
   call check_var(clm_nfid, 'XRADH', vardesc, readvar)
   if(readvar)then
-    call ncd_putvar(clm_nfid,'XRADH',irec,fdatam); call reshape2(XRADH,fdatam)
+    call ncd_getvar(clm_nfid,'XRADH',irec,fdatam); call reshape2(XRADH,fdatam)
   else
     XRADH=0._r8
   endif
+
 
   if (I==365 .and. isLeap(iyear))then
     DO J=1,24
@@ -722,6 +723,22 @@ implicit none
     ENDDO
   endif
 
+  if(isleap(iyear))LYR=1
+  DO II=1,365+LYR
+    DO JJ=1,24
+      SRADH(JJ,II)=SRADH(JJ,II)*3600._r8*1.e-6_r8  !convert from W/m2 to MJ/m^2/hour
+      WINDH(JJ,II)=WINDH(JJ,II)*3600._r8       !convert from m/s to m/hour
+      RAINH(JJ,II)=RAINH(JJ,II)*1.e-3_r8        !convert into m hr^-1
+    enddo
+  ENDDO
+
+  if(lverb)then
+  DO II=1,365+LYR
+    DO JJ=1,24
+      print*,TMPH(JJ,II),SRADH(JJ,II),WINDH(JJ,II),RAINH(JJ,II),DWPTH(JJ,II)
+    ENDDO
+  ENDDO
+  endif
   deallocate(fdatam)
   deallocate(fdatav)
   deallocate(idatav)
