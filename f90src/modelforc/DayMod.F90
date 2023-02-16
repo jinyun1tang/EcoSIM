@@ -65,11 +65,11 @@
     N=30*M+ICOR(M)
 
 !  leap year February.
-    IF(isLeap(IDATA(3)) .and. M.GE.2)N=N+1
+    IF(isLeap(iyear_cur) .and. M.GE.2)N=N+1
       IF(I.LE.N)THEN
         N1=I-NN
         N2=M
-        N3=IDATA(3)
+        N3=iyear_cur
         WRITE(CHARN1,'(I3)')N1+100
         WRITE(CHARN2,'(I3)')N2+100
         WRITE(CHARN3,'(I4)')N3
@@ -304,6 +304,8 @@
 !-----------------------------------------------------------------------------------------
 
   subroutine TillageandIrrigationEvents(I, NHW, NHE, NVN, NVS)
+!
+  use EcoSIMCtrlMod, only : Lirri_auto
   implicit none
 
   integer, intent(in) :: I, NHW, NHE, NVN, NVS
@@ -343,7 +345,7 @@
 !     RR=total irrigation requirement
 !     RRIG=hourly irrigation amount applied in wthr.f
 !
-      IF(DATA1(6)(1:4).EQ.'auto')THEN
+      IF(Lirri_auto)THEN
         IF(I.GE.IIRRA(1,NY,NX).AND.I.LE.IIRRA(2,NY,NX))THEN
           TFZ=0._r8
           TWP=0._r8
@@ -370,7 +372,7 @@
               WRITE(*,2222)'auto',IYRC,I,IIRRA(3,NY,NX),IIRRA(4,NY,NX) &
                 ,IFLGV(NY,NX),RR,TFZ,TVW,TWP,FIRRA(NY,NX),PSILZ(1,NY,NX) &
                 ,CIRRA(NY,NX),DIRRA1,WDPTH(I,NY,NX)
-!    3,(RRIG(J,I,NY,NX),J=1,24)
+
 2222  FORMAT(A8,5I6,40E12.4)
             ENDIF
           ENDIF

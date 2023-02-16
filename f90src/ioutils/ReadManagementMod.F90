@@ -385,7 +385,7 @@ implicit none
 !------------------------------------------------------------------------------------------
 
   subroutine ReadManagementFiles(iyear)
-  use EcoSIMCtrlMod, only : soil_mgmt_in
+  use EcoSIMCtrlMod, only : soil_mgmt_in,Lirri_auto
   implicit none
   integer, intent(in) :: iyear
 
@@ -463,6 +463,7 @@ implicit none
 !   READ IRRIGATION INPUT FILE
 !
     IF(trim(irrigf).NE.'NO')THEN
+      Lirri_auto=irrigf(1:4)=='auto'
       if(lverb)print*,'ReadIrrigationFile'
       call ReadIrrigationFile(soilmgmt_nfid,irrigf,NH1,NH2,NV1,NV2)
     ENDIF

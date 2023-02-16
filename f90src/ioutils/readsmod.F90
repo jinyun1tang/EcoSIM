@@ -110,6 +110,7 @@ module readsmod
   READ(4,'(A3)')DATA1(18)
   READ(4,'(A3)')DATA1(19)
   READ(4,'(A3)')DATA1(20)
+
   if(lverb)then
     write(*,'(100A)')('-',ll=1,100)
     write(*,*)'read option file ',DATAC(4,NE,NEX)
@@ -127,6 +128,7 @@ module readsmod
 ! determine whether to read checkpoing file (i.e. an actual restart run)
   is_restart_run=(data1(20)=='YES')
 ! read changing factor for climate variables
+
   D25: DO N=1,4
     READ(4,*)DRAD(N),DTMPX(N),DTMPN(N),DHUM(N),DPREC(N) &
       ,DIRRI(N),DWIND(N),DCO2E(N),DCN4R(N),DCNOR(N)
@@ -157,6 +159,7 @@ module readsmod
     DCN4R(N)=DCN4R(N-1)
     DCNOR(N)=DCNOR(N-1)
   ENDDO D26
+
   READ(4,*)NPX,NPY,JOUT,IOUT,KOUT,ICLM
   if(lverb)then
     write(*,*)'number of cycles per hour for water, heat, and '// &
@@ -192,34 +195,40 @@ module readsmod
     IDATA(6)=IDATA(3)
     IYRC=IDATA(3)
   ENDIF
-
+  iyear_cur=idata(3)
   IF(NE.EQ.1)THEN
+  !first year of the simulation
     N1=IDATA(3)
   ENDIF
+
   IF(NE.EQ.NA(NEX))THEN
+    !last year of a scene
     N2=IDATA(6)
+    !compute the number of years for a scene
     NF=N2-N1+1
+    !add one more year, even though it is incomplete
     IF(IDATA(4).NE.31.OR.IDATA(5).NE.12)THEN
       NTZ=NTZ+1
     ENDIF
   ENDIF
+  !first year, first period in the first scene, 
   IF(NE.EQ.1.AND.NT.EQ.1.AND.NEX.EQ.1)THEN
     N1X=IDATA(3)   !beginning of current year
   ENDIF
 
+  !last year of the last period of the last scene 
   IF(NE.EQ.NA(NEX).AND.NT.EQ.ND(NEX).AND.NEX.EQ.NAX)THEN
     N2X=IDATA(6)   !end of current year
+    !compute the scene length
     NFX=N2X-N1X+1
+
+    !the following line is useless
     IF(NE.NE.NA(NEX))THEN
       IF(IDATA(4).NE.31.OR.IDATA(5).NE.12)THEN
         NTZ=NTZ+1
       ENDIF
     ENDIF
   ENDIF
-! WRITE(*,7766)'IDATA3',IGO,IDATA(3),IDATA(6),IYRR,IYRC
-!    2,NE,NT,NEX,NF,NTX,NFX,NTZ,NTZX,N1,N2,N1X,N2X
-!    3,NA(NEX),ND(NEX),NAX
-!7766  FORMAT(A8,30I8)
 !
 ! OPEN CHECKPOINT FILES FOR SOIL VARIABLES
 !
@@ -227,11 +236,13 @@ module readsmod
 ! DATA(1)=site file name
 ! W,N=water+heat,nutrient checkpoint files
 !
-
+  iyear_rest=IDATA(9)
   IF(is_first_year)THEN
     IF(is_restart_run)THEN
+    ! reset to restart point
       IDATE=IDATA(9)
     ELSE
+    !set to current year
       IDATE=IDATA(3)
     ENDIF
     WRITE(CHARY,'(I4)')IDATE
@@ -258,6 +269,7 @@ module readsmod
       IF(N.EQ.1)LYRC=366
     endif
 
+!get current julian day 
     IF(IDATA(N+1).EQ.1)then
 ! Jan
       IDY=IDATA(N)
@@ -266,10 +278,10 @@ module readsmod
       IDY=30*(IDATA(N+1)-1)+ICOR(IDATA(N+1)-1)+IDATA(N)+LPY
     endif
 
-    IF(N.EQ.1)ISTART=IDY      !
-    IF(N.EQ.4)IFIN=IDY        !
+    IF(N.EQ.1)ISTART=IDY      !beginning day
+    IF(N.EQ.4)IFIN=IDY        !end day
     IF(N.EQ.7)IRUN=IDY        !starting date of the restart run
-
+    !get number of days for the last year
     IF(isLeap(IDATA(N+2)-1))then
       IF(N.EQ.1)LYRX=366
     endif
@@ -462,5 +474,49 @@ module readsmod
   IMNG=1
   RETURN
   END subroutine reads
+!------------------------------------------------------------------------------------------
+  subroutine readCLMfactors(iyear)
+  !
+  !DESCRIPTION
+  !read climate change factors
+  use EcoSIMCtrlMod, only : clm_factor_in
+  use netcdf
+  use ncdio_pio
+  implicit none
+  integer, intent(in) :: iyear  
+  type(file_desc_t) :: clm_factor_nfid
+!  type(Var_desc_t) :: vardesc
+!  logical :: readvar
+  INTEGER :: N
 
+  call ncd_pio_openfile(clm_factor_nfid, clm_factor_in, ncd_nowrite)
+  
+  call ncd_getvar(clm_factor_nfid,'DRAD',iyear,DRAD(1))
+  call ncd_getvar(clm_factor_nfid,'DTMPX',iyear,DTMPX(1))
+  call ncd_getvar(clm_factor_nfid,'DTMPN',iyear,DTMPN(1))
+  call ncd_getvar(clm_factor_nfid,'DHUM',iyear,DHUM(1))
+  call ncd_getvar(clm_factor_nfid,'DPREC',iyear,DPREC(1))
+  call ncd_getvar(clm_factor_nfid,'DIRRI',iyear,DIRRI(1))
+  call ncd_getvar(clm_factor_nfid,'DWIND',iyear,DWIND(1))
+  call ncd_getvar(clm_factor_nfid,'DCO2E',iyear,DCO2E(1))
+  call ncd_getvar(clm_factor_nfid,'DCN4R',iyear,DCN4R(1))
+  call ncd_getvar(clm_factor_nfid,'DCNOR',iyear,DCNOR(1))
+  call ncd_getvar(clm_factor_nfid,'ICLM',iyear,ICLM)
+
+  call ncd_pio_closefile(clm_factor_nfid)
+
+  DO N=2,12
+    DRAD(N)=DRAD(1)
+    DTMPX(N)=DTMPX(1)
+    DTMPN(N)=DTMPN(1)
+    DHUM(N)=DHUM(1)
+    DPREC(N)=DPREC(1)
+    DIRRI(N)=DIRRI(1)
+    DWIND(N)=DWIND(1)
+    DCO2E(N)=DCO2E(1)
+    DCN4R(N)=DCN4R(1)
+    DCNOR(N)=DCNOR(1)
+  ENDDO
+
+  end subroutine readCLMfactors
 end module readsmod

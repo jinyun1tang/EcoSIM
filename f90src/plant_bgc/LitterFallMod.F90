@@ -119,6 +119,8 @@ implicit none
 !------------------------------------------------------------------------------------------
 
   subroutine LiterfallFromRootShootStorage(I,J,NZ,CPOOLK)
+  
+  use EcoSIMCtrlDataType, only : iyear_cur
   implicit none
   integer, intent(in) :: I,J,NZ
   REAL(R8),INTENT(INOUT) :: CPOOLK(JC1,JP1)
@@ -277,10 +279,10 @@ implicit none
     IF(ISTYP(NZ).NE.iplt_annual.AND.JHVST(NZ).EQ.ihv_noaction)THEN
       IF(I.LT.LYRC)THEN
         IDAY0(NZ)=I+1
-        IYR0(NZ)=IDATA(3)
+        IYR0(NZ)=iyear_cur
       ELSE
         IDAY0(NZ)=1
-        IYR0(NZ)=IDATA(3)+1
+        IYR0(NZ)=iyear_cur+1
       ENDIF
     ENDIF
   ENDIF

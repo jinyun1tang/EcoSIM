@@ -190,8 +190,9 @@ contains
       FCD(L,NY,NX)=FCL(L,NY,NX)-WPL(L,NY,NX)
     ENDIF
 !   IBEGIN:   start date of model run
+
     !IDATA(9): start year of model run
-    IF(I.EQ.IBEGIN.AND.J.EQ.1.AND.IYRC.EQ.IDATA(9))THEN
+    IF(I.EQ.IBEGIN.AND.J.EQ.1.AND.IYRC.EQ.iyear_rest)THEN
       IF(THW(L,NY,NX).GT.1.0_r8.OR.DPTH(L,NY,NX).GE.DTBLZ(NY,NX))THEN
         THETW(L,NY,NX)=POROS(L,NY,NX)
       ELSEIF(test_aeqb(THW(L,NY,NX),1._r8))THEN

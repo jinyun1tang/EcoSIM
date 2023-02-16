@@ -74,7 +74,7 @@ SUBROUTINE soil(NA,ND,NT,NE,NAX,NTX,NEX,NHW,NHE,NVN,NVS)
 !
     IF(is_restart_run)THEN
 !IRUN: start date of current scenario
-      IF((IDAYR.GE.IRUN.AND.IYRR.EQ.IDATA(9)).OR.IYRR.GT.IDATA(9))THEN
+      IF((IDAYR.GE.IRUN.AND.IYRR.EQ.iyear_rest).OR.IYRR.GT.iyear_rest)THEN
         if(lverb)WRITE(*,333)'ROUTS'
         CALL ROUTS(NHW,NHE,NVN,NVS)
       ENDIF
@@ -97,7 +97,7 @@ SUBROUTINE soil(NA,ND,NT,NE,NAX,NTX,NEX,NHW,NHE,NVN,NVS)
 !   IN 'ROUTP' IF NEEDED
 !
     IF(is_restart_run)THEN
-      IF((IDAYR.GT.IRUN.AND.IYRR.EQ.IDATA(9)).OR.IYRR.GT.IDATA(9))THEN
+      IF((IDAYR.GT.IRUN.AND.IYRR.EQ.iyear_rest).OR.IYRR.GT.iyear_rest)THEN
         if(lverb)WRITE(*,333)'ROUTP'
         CALL ROUTP(NHW,NHE,NVN,NVS)
       ENDIF

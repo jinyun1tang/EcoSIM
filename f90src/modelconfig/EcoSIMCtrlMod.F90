@@ -11,13 +11,13 @@ implicit none
   character(len=300) :: grid_file_in
   character(len=300) :: clm_file_in
   character(len=300) :: soil_mgmt_in
-
+  character(len=300) :: clm_factor_in          !file for climate change factors
   type(ecosim_time_type) :: etimer
 ! define the simulation controler
 ! sim_periods(:,1)=(/year1,year2,1/)     cold start
 ! sim_periods(:,2)=(/year1,year2,ncycs/) spin up
 ! sim_periods(:,3)=(/year1,year2,1/)     regular sims
   integer :: sim_periods(3,3)
-
+  logical :: Lirri_auto=.false.
 
 end module EcoSIMCtrlMod

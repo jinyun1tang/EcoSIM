@@ -166,6 +166,7 @@ module HfuncsMod
 !------------------------------------------------------------------------------------------
 
   subroutine set_flags(I,J,NZ)
+  use EcoSIMCtrlDataType, only : iyear_cur
 
   implicit none
   integer, intent(in) :: I,J,NZ
@@ -189,11 +190,11 @@ module HfuncsMod
   )
   IF(J.EQ.1)THEN
     IF(IDAY0(NZ).LE.IDAYH(NZ).OR.IYR0(NZ).LT.IYRH(NZ))THEN
-      IF(I.GE.IDAY0(NZ).OR.IDATA(3).GT.IYR0(NZ))THEN
+      IF(I.GE.IDAY0(NZ).OR.iyear_cur.GT.IYR0(NZ))THEN
         IF(I.GT.IDAYH(NZ).AND.IYRC.GE.IYRH(NZ).AND.IDTH(NZ).EQ.1)THEN
           IFLGC(NZ)=0
         ELSE
-          IF(I.EQ.IDAY0(NZ).AND.IDATA(3).EQ.IYR0(NZ))THEN
+          IF(I.EQ.IDAY0(NZ).AND.iyear_cur.EQ.IYR0(NZ))THEN
             IFLGC(NZ)=0
             IDTH(NZ)=0
             CALL STARTQs(NZ,NZ)
@@ -212,7 +213,7 @@ module HfuncsMod
         .GT.IYRH(NZ)))THEN
         IFLGC(NZ)=0
       ELSE
-        IF(I.EQ.IDAY0(NZ).AND.IDATA(3).EQ.IYR0(NZ))THEN
+        IF(I.EQ.IDAY0(NZ).AND.iyear_cur.EQ.IYR0(NZ))THEN
           IFLGC(NZ)=0
           IDTH(NZ)=0
           CALL STARTQs(NZ,NZ)

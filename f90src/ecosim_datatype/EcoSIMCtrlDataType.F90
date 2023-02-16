@@ -37,6 +37,9 @@ module EcoSIMCtrlDataType
   logical :: lverb           !logical switch for verbose output
   logical :: do_rgres        !logical switch for regression tests
 
+  integer :: iYear_cur        !current year
+  integer :: iyear_pre        !previous year
+  integer :: iyear_rest       !restart year
   contains
 
   subroutine InitEcoSIMCtrlData
