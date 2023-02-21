@@ -15,6 +15,13 @@ module ecosim_Time_Mod
   real(r8), parameter :: secpyear=86400._r8*365._r8   !seconds in a normal year
   integer , parameter :: daz(12)=(/31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31/)  
   integer , parameter :: cdaz(12)=(/31,59,90,120,151,181,212,243,273,304,334,365/)
+
+  type, public :: ecosim_time_dat_type
+    integer :: year0   !year0 of the simulation
+    integer :: nstep   !number of steps has passed
+    integer :: tstep   !number of steps in the current year
+  end type ecosim_time_dat_type
+
   type, public:: ecosim_time_type
      ! NOTE(bja, 201603) all real variables have units of seconds!
      real(r8) :: delta_time
@@ -69,7 +76,7 @@ module ecosim_Time_Mod
      procedure, private:: ReadNamelist
   end type ecosim_time_type
   public :: getdow
-
+  public :: get_steps_from_ymdhs
 contains
 
   subroutine setClock(this, dtime, nelapstep)
@@ -154,6 +161,8 @@ contains
           if(isLeap(this%year0))this%leap_yr=1
         endif
         this%stop_time=this%stop_time * 86400._r8
+      else
+        if(this%year0 > 0)this%leap_yr=isLeapi(this%year0)
       endif   
     endif
   end subroutine Init
@@ -426,6 +435,7 @@ contains
     endif
     cdtime=this%nelapstep*this%delta_time
     this%cdays=int(cdtime/secpday)
+
     if(cdtime>0._r8)then
       if(this%year0>0)then        
         if(this%cdays>365)then
@@ -700,6 +710,17 @@ contains
   ans =(mod(year,400)== 0) .or. (mod(year,4)==0 .and. mod(year,100)/=0)
   end function isLeap  
 !------------------------------------------------------------------------------------------
+  function isLeapi(year)result(ans)
+  implicit none
+  integer, intent(in) :: year
+
+  integer :: ans
+
+  ans=0
+  if(isLeap(year))ans=1
+  return
+  end function isLeapi
+!------------------------------------------------------------------------------------------
 
   function getdow(year,doy)result(ans)
   !
@@ -737,4 +758,36 @@ contains
     if(ans==0)ans=7
   endif
   end function getdow
+
+!------------------------------------------------------------------------------------------
+  subroutine get_steps_from_ymdhs(ymdhs,dtime_sec,etime_dat,year0) 
+
+  implicit none
+  character(len=*), intent(in) :: ymdhs
+  integer, intent(in) :: dtime_sec
+  type(ecosim_time_dat_type), intent(out) :: etime_dat
+  integer, optional, intent(in) :: year0
+  integer :: year,mon,day,hh,ss
+  integer :: cdays1,cdays2,nn
+
+  read(ymdhs,'(I4,I2,I2,I2,I4)')year,mon,day,hh,ss
+
+  cdays1=sum(daz(1:mon-1))
+  if(mon>2)cdays1=cdays1+isLeapi(year)
+  cdays1=cdays1+day-1
+
+  cdays2=cdays1
+  if (present(year0))then
+    etime_dat%year0=year0    
+    do nn=year0,year-1
+      cdays1=cdays1+365+isLeapi(nn)
+    enddo
+  else 
+    etime_dat%year0=year
+  endif
+
+  etime_dat%nstep=int((cdays1*secpday+hh*3600._r8+ss)/dtime_sec)  
+  etime_dat%tstep=int((cdays2*secpday+hh*3600._r8+ss)/dtime_sec)  
+
+  end subroutine get_steps_from_ymdhs
 end module ecosim_Time_Mod

@@ -208,8 +208,6 @@ module Hour1Mod
 
       if(do_instequil)call ForceGasAquaEquil(NY,NX)
 !
-!      call CanopyConditionModel(I,J,NY,NX,DPTH0)
-
       call PlantCanopyRadsModel(I,J,NY,NX,DPTH0(NY,NX))
 !
 !     RESET HOURLY INDICATORS
