@@ -16,6 +16,7 @@ module SoilHydroParaMod
   use EcoSIMConfig
   use WatsubPars
   use SurfLitterDataType
+  use EcoSIMCtrlMod  
   use EcoSiMParDataMod   , only : micpar
   use minimathmod  , only : test_aeqb,AZMAX1,AZMIN1
 implicit none
@@ -56,11 +57,9 @@ contains
     THETW1=AZMAX1(AMIN1(POROS(L,NY,NX),VOLW(L,NY,NX)/VOLY(L,NY,NX)))
     IF(THETW1.LT.FC(L,NY,NX))THEN
       PSISM(L,NY,NX)=AMAX1(PSIHY,-EXP(PSIMX(NY,NX) &
-        +((FCL(L,NY,NX)-LOG(THETW1)) &
-        /FCD(L,NY,NX)*PSIMD(NY,NX))))
+        +((FCL(L,NY,NX)-LOG(THETW1))/FCD(L,NY,NX)*PSIMD(NY,NX))))
     ELSEIF(THETW1.LT.POROS(L,NY,NX)-DTHETW)THEN
-      PSISM(L,NY,NX)=-EXP(PSIMS(NY,NX) &
-        +(((PSL(L,NY,NX)-LOG(THETW1)) &
+      PSISM(L,NY,NX)=-EXP(PSIMS(NY,NX)+(((PSL(L,NY,NX)-LOG(THETW1)) &
         /PSD(L,NY,NX))**SRP(L,NY,NX)*PSISD(NY,NX)))
     ELSE
       PSISM(L,NY,NX)=PSISE(L,NY,NX)
@@ -122,6 +121,8 @@ contains
 !------------------------------------------------------------------------------------------
 
   subroutine SoilHydroProperty(L,NY,NX,I,J)
+  !
+  !Set up soil hydraulic property
   implicit none
   integer, intent(in) :: L,NY,NX
   integer, intent(in) :: I,J
@@ -134,14 +135,14 @@ contains
 
   IF(CORGC(L,NY,NX).GT.FORGC)THEN
     SRP(L,NY,NX)=0.25_r8
-  ELSEIF(CORGC(L,NY,NX).GT.0.5*FORGC)THEN
+  ELSEIF(CORGC(L,NY,NX).GT.0.5_r8*FORGC)THEN
     SRP(L,NY,NX)=0.33_r8
   ELSE
     SRP(L,NY,NX)=1.00_r8
   ENDIF
 
   PSL(L,NY,NX)=LOG(POROS(L,NY,NX))
-  IF((ISOIL(1,L,NY,NX).EQ.0.AND.ISOIL(2,L,NY,NX).EQ.0).OR.is_restart_run)THEN
+  IF((ISOIL(1,L,NY,NX).EQ.0.AND.ISOIL(2,L,NY,NX).EQ.0).OR.(.not.cold_run))THEN
     FCL(L,NY,NX)=LOG(FC(L,NY,NX))
     WPL(L,NY,NX)=LOG(WP(L,NY,NX))
     PSD(L,NY,NX)=PSL(L,NY,NX)-FCL(L,NY,NX)
@@ -153,7 +154,8 @@ contains
     !
     !     THW,THI=initial soil water,ice content from soil file
     !
-    IF(.not.is_restart_run)THEN
+    IF(.not.cold_run)THEN
+    ! restart is defined as simulation starting from a previous run
       IF(ISOIL(1,L,NY,NX).EQ.1.OR.ISOIL(2,L,NY,NX).EQ.1)THEN
         !calculating FC or WP
         IF(CORGC(L,NY,NX).LT.FORGW)THEN
@@ -192,7 +194,7 @@ contains
 !   IBEGIN:   start date of model run
 
     !IDATA(9): start year of model run
-    IF(I.EQ.IBEGIN.AND.J.EQ.1.AND.IYRC.EQ.iyear_rest)THEN
+    IF(I.EQ.IBEGIN.AND.J.EQ.1.AND.is_first_year)THEN
       IF(THW(L,NY,NX).GT.1.0_r8.OR.DPTH(L,NY,NX).GE.DTBLZ(NY,NX))THEN
         THETW(L,NY,NX)=POROS(L,NY,NX)
       ELSEIF(test_aeqb(THW(L,NY,NX),1._r8))THEN
@@ -211,7 +213,8 @@ contains
       ELSEIF(THI(L,NY,NX).LT.0.0_r8)THEN
         THETI(L,NY,NX)=0.0_r8
       ENDIF
-      IF(.not.is_restart_run)THEN
+      
+      IF(cold_run)THEN
         VOLW(L,NY,NX)=THETW(L,NY,NX)*VOLX(L,NY,NX)
         VOLWX(L,NY,NX)=VOLW(L,NY,NX)
         VOLWH(L,NY,NX)=THETW(L,NY,NX)*VOLAH(L,NY,NX)
@@ -224,9 +227,8 @@ contains
       ENDIF
     ENDIF
   ENDIF
-  VOLP(L,NY,NX)=AZMAX1(VOLA(L,NY,NX)-VOLW(L,NY,NX) &
-    -VOLI(L,NY,NX))+AZMAX1(VOLAH(L,NY,NX)-VOLWH(L,NY,NX) &
-    -VOLIH(L,NY,NX))
+  VOLP(L,NY,NX)=AZMAX1(VOLA(L,NY,NX)-VOLW(L,NY,NX)-VOLI(L,NY,NX)) &
+    +AZMAX1(VOLAH(L,NY,NX)-VOLWH(L,NY,NX)-VOLIH(L,NY,NX))
   IF(VOLT(L,NY,NX).GT.ZEROS2(NY,NX))THEN
     THETP(L,NY,NX)=VOLP(L,NY,NX)/VOLY(L,NY,NX)
   ELSE

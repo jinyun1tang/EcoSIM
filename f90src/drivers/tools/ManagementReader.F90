@@ -1,10 +1,9 @@
 program main
   use ReadManagementMod
-  use EcoSIMCtrlMod, only : soil_mgmt_in
+  use EcoSIMCtrlMod, only : soil_mgmt_in, lverb
   use abortutils, only : endrun
   USE FertilizerDataType
   use FlagDataType
-  USE EcoSIMCtrlDataType, ONLY : LVERB
 implicit none
 
   character(len=40) :: progname

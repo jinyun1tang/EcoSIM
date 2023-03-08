@@ -10,39 +10,31 @@ PROGRAM main
   use InitEcoSIM        , only : InitModules
   use EcoSIMDesctruct   , only : DestructEcoSIM
   use EcoSIMAPI         , only : SetMesh
-  use EcoSIMCtrlMod     , only : etimer
+  use EcoSIMCtrlMod  
+  use EcoSIMCtrlDataType
+  use readiMod          , only : readi
   USE fileUtil          , ONLY : iulog
   use EcoSIMConfig      , only : case_name
-  use EcoSIMCtrlDataType
   use EcoSIMHistMod
   use EcosimConst
-
+  use StartsMod         , only : set_ecosim_solver
+  use MicBGCAPI         , only : MicAPI_Init, MicAPI_cleanup
   implicit none
 
   character(len=*), parameter :: mod_filename = __FILE__
 
-  interface
-    subroutine readRunFile(funit,NA,ND,goto1000,NAX,NDX)
-
-    implicit none
-    integer, intent(in)  :: funit
-    integer, dimension(:), intent(out) :: NA
-    integer, dimension(:), intent(out) :: ND
-    logical, intent(out) :: goto1000
-    integer, intent(out) :: NAX,NDX
-    end subroutine readRunFile
-  end interface
-
   integer :: NA(250),ND(250)
   integer :: NAX,NDX,NEX,NAY,NDY,NE,N,NTX,NT
   integer :: NHW,NVN,NHE,NVS
-
+  integer :: nn1,nn2,nn3
+  integer :: year_beg,year_ini,nyr1,yeari
   CHARACTER(len=640):: BUF
-  character(len=80):: runfile
   character(len=36):: nmlfile
+  character(len=14) :: ymdhs
+  character(len=14) :: ymdhs0 
   logical :: is_dos
   integer :: nmicbguilds
-  logical :: goto1000
+ 
 !!
 ! begin_execution
 
@@ -68,14 +60,7 @@ PROGRAM main
   CALL GETARG(1,nmlfile)
 
   write(iulog,*)'read namelist'
-  call readnamelist(trim(nmlfile),runfile, case_name, prefix, &
-    do_rgres,LYRG,lverb, nmicbguilds)
-
-  write(iulog,*)'read runfile',trim(runfile)
-  OPEN(5,FILE=runfile,STATUS='OLD')
-!
-! READ INPUT FILES
-!
+  call readnamelist(trim(nmlfile), case_name, prefix, LYRG, nmicbguilds)
 
   if(is_dos)then
     outdir=trim(buf)//'\\'//trim(case_name)//'_outputs\\'
@@ -83,127 +68,71 @@ PROGRAM main
     outdir=trim(buf)//'/'//trim(case_name)//'_outputs/'
   endif
   call system('mkdir -p '//trim(outdir))
-  write(iulog,*)'input files at:',trim(prefix)
-  IGO=0
-  call etimer%Init()
 
-  call etimer%setClock(dtime=3600._r8,nelapstep=0)
-!
+  read(sim_yyyymmdd,'(I4)')year_ini  
+
 ! NUMBER OF COLUMNS AND ROWS for the whole land scape
 !
-
-  READ(5,*)NHW,NVN,NHE,NVS
 
   call SetMesh(NHW,NVN,NHE,NVS)
 
   call  InitModules(nmicbguilds)
-10    FORMAT(A16)
 
-!
-! SITE FILE
-!
-  READ(5,10)DATA1(1)
-!
-! TOPOGRAPHY FILE
-!
-  READ(5,10)DATA1(2)
-!
-! READ THE NUMBER OF TIMES THE SCENARIOS IN THE MODEL RUN ARE TO BE EXECUTED
-!
-100 call readRunFile(5,NA,ND,goto1000,NAX,NDX)
-  if(goto1000)go to 1000
-!
-!  RUN THIS SCRIPT
-!
-! repeat scenario NDX times, usually set to 1, though multiple scenes is possible
-  D120: DO NTX=1,NDX
-! run nax scenes for scenario ntx, each scene could have periods, where each
-! period has multiple years
-    DO  NEX=1,NAX
-      DO  NT=1,ND(NEX)    !ND(NEX)=NDY, period NT, ND(NEXT) repetions
-        DO  NE=1,NA(NEX)  !NA(NEX)=NAY, year NE in period NT, NA(NEX) in a given period
-  ! run simulation for one year
-  ! each year has its own climate forcing, land/pft management and io setup
+  if(lverb)WRITE(*,*)'read initialization information READI'
+  CALL readi(NE,NEX,NHW,NHE,NVN,NVS)
 
-          CALL SOIL(NA,ND,NT,NE,NAX,NTX,NEX,NHW,NHE,NVN,NVS)
-          IGO=IGO+1
-          call etimer%print_model_time_stamp(6)
-        enddo
-      enddo
-    enddo
-  ENDDO D120
-!
-!   SCRIPT COMPLETED, START NEXT SCRIPT
-!
-  GO TO 100
-  close(5)
-1000  continue
+  NE=1;NEX=1
+
+  if(continue_run)then
+    print*,'read restart/checkpoint info file: ecosim_rst'
+    ymdhs0='18820114000000'
+    read(ymdhs0,'(I4)')year_beg
+    call etimer%Init(year0=year_beg)   
+  else
+    ymdhs0='00000000000000'
+    year_beg=year_ini
+    ymdhs0(1:8)=sim_yyyymmdd
+    call etimer%Init(year0=year_beg)
+  endif
+  call frectyp%Init()
+
+  frectyp%ymdhs0=ymdhs0
+
+  call etimer%setClock(dtime=3600._r8,nelapstep=0)
+
+  IGO=0
+  yeari=year_ini
+  DO nn1=1,3
+    call set_ecosim_solver(NPXS(NN1),NPYS(NN1))
+
+   !set up output frequency
+    JOUT=JOUTS(NN1)   !frequency on hourly scale
+    IOUT=IOUTS(NN1)   !frequency on daily scale
+    KOUT=KOUTS(NN1) !frequency on restart file writing, >365 means 1 time per year
+
+    call MicAPI_Init
+    
+    do nn2=1,forc_periods(nn1*3)
+      nn3=(nn1-1)*3
+      do nyr1=forc_periods(nn3+1),forc_periods(nn3+2)
+        
+        frectyp%yearclm=nyr1
+        frectyp%yearcur=etimer%get_cur_yearAD()
+        if(frectyp%yearcur==yeari)then
+          call soil(NE,NEX,NHW,NHE,NVN,NVS)
+        endif
+        frectyp%yearacc=frectyp%yearacc+1
+        call etimer%get_ymdhs(ymdhs)        
+        if(.not.frectyp%lskip_loop)print*,frectyp%yearcur,nyr1,ymdhs
+        yeari=yeari+1
+      end do  
+    end do
+    call MicAPI_cleanup
+  end do  
+
   if(do_rgres)then
     call regressiontest(trim(nmlfile),trim(case_name),NHW,NVN)
   endif
   call DestructEcoSIM
 END program main
 
-!--------------------------------------------
-
-  subroutine readRunFile(funit,NA,ND,goto1000,NAX,NDX)
-  use EcoSIMHistMod
-  implicit none
-  integer, intent(in)  :: funit
-  integer, dimension(:), intent(out) :: NA
-  integer, dimension(:), intent(out) :: ND
-  logical, intent(out) :: goto1000
-  integer, intent(out) :: NAX,NDX
-  integer :: NE,NAY,NDY,NEX,N
-
-10    FORMAT(A16)
-
-  goto1000=.false.
-  READ(funit,*)NAX,NDX
-
-  IF(NAX.EQ.0.AND.NDX.EQ.0)then
-    goto1000=.true.
-    return
-  endif
-!
-!   NUMBER OF SCENES IN THE NEXT SCENARIO OF THE MODEL RUN
-!   AND THE NUMBER OF TIMES THIS SCENARIO IS TO BE EXECUTED
-!
-  print*,'NAX,NDX=',NAX,NDX
-  D105: DO NEX=1,NAX
-    READ(funit,*)NAY,NDY       !
-    NA(NEX)=NAY
-    ND(NEX)=NDY
-!    sim_periods(1,NEX)=NDY     !repeats NDY times
-!
-!   FOR EACH SCENE IN THIS SCENARIO:
-!
-    D110: DO NE=1,NA(NEX)
-!
-!     WEATHER FILE
-!
-      READ(funit,10,END=1001)DATAC(3,NE,NEX)
-!
-!     WEATHER OPTIONS
-!
-      READ(funit,10)DATAC(4,NE,NEX)
-!
-!     LAND MANAGEMENT FILE
-!
-      READ(funit,10)DATAC(9,NE,NEX)
-!
-!     PLANT MANAGEMENT FILE
-!
-      READ(funit,10)DATAC(10,NE,NEX)
-!
-!     OUTPUT DATA CONTROL
-!
-      D115: DO N=21,30
-        READ(funit,10)DATAC(N,NE,NEX)
-      ENDDO D115
-    ENDDO D110
-  ENDDO D105
-  return
-1001 goto1000=.true.
-
-  end subroutine readRunFile

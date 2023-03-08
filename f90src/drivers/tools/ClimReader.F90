@@ -1,7 +1,7 @@
 program main
   use ClimReadMod
   use abortutils, only : endrun
-  USE EcoSIMCtrlDataType, ONLY : LVERB
+  USE EcoSIMCtrlMod, ONLY : LVERB
   use EcoSIMCtrlMod, only : clm_file_in
 implicit none
 
@@ -9,7 +9,7 @@ implicit none
   integer :: num_args
   integer :: iyear
   type(atm_forc_type)  :: atmf
-  integer :: L
+  integer :: L,I
   integer :: irec
   character(len=20) :: buf
 

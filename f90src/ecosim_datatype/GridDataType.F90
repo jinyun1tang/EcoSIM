@@ -6,9 +6,6 @@ implicit none
   save
   character(len=*), private, parameter :: mod_filename = __FILE__
 
-
-  integer :: NPX                  !number of E-W grid cells
-  integer :: NPY                  !number of N-S grid cells
   real(r8) :: TAREA               !total area of landscape	[m2]
   real(r8),target,allocatable ::  CDPTH(:,:,:)                       !depth to bottom of soil layer [m]
   real(r8),target,allocatable ::  DLYR(:,:,:,:)                      !thickness of soil layer [m]

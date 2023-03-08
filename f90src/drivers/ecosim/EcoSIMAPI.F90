@@ -9,6 +9,7 @@ module EcoSIMAPI
   use MicBGCAPI    , only : MicrobeModel, MicAPI_Init, MicAPI_cleanup
   use TrnsfrMod    , only : trnsfr
   use TrnsfrsMod   , only : trnsfrs
+  use EcoSIMCtrlMod, only : lverb
   use WatsubMod    , only : watsub
 implicit none
 
@@ -98,7 +99,11 @@ contains
   subroutine SetMesh(NHW,NVN,NHE,NVS)
 
   use EcoSIMConfig, only : column_mode
+  use EcoSIMCtrlMod,only : grid_file_in
+  use ncdio_pio
+  use netcdf
   USE fileUtil, ONLY : iulog
+  use abortutils, only : endrun
   use GridConsts, only : JX,JY,JZ,JH,JV,JD,bounds,JP
 !  set up the landscape rectangular mesh
 !  beginning(NHW,NVN)
@@ -111,12 +116,43 @@ contains
 !                             end (NHE,NVS)
 
   implicit none
-  integer, intent(in) :: NHW   !upper corner x index
-  integer, intent(in) :: NVN   !upper corner y index
-  integer, intent(in) :: NHE   !lower corner x index
-  integer, intent(in) :: NVS   !lower corner y index
+  integer, intent(out) :: NHW   !upper corner x index
+  integer, intent(out) :: NVN   !upper corner y index
+  integer, intent(out) :: NHE   !lower corner x index
+  integer, intent(out) :: NVS   !lower corner y index
   integer :: nextra_grid
   INTEGER :: NZ,NY,NX,ic,ip
+  type(file_desc_t) :: grid_nfid
+  type(Var_desc_t) :: vardesc
+  logical :: readvar
+
+  call ncd_pio_openfile(grid_nfid, grid_file_in, ncd_nowrite)
+
+  call check_var(grid_nfid, 'NHW', vardesc, readvar)
+  if(.not. readvar)then
+    call endrun('fail to find NHW in '//trim(mod_filename), __LINE__)
+  endif
+  call check_ret(nf90_get_var(grid_nfid%fh, vardesc%varid, NHW), 'in '//trim(mod_filename))
+
+  call check_var(grid_nfid, 'NHE', vardesc, readvar)
+  if(.not. readvar)then
+    call endrun('fail to find NHE in '//trim(mod_filename), __LINE__)
+  endif
+  call check_ret(nf90_get_var(grid_nfid%fh, vardesc%varid, NHE), 'in '//trim(mod_filename))
+
+  call check_var(grid_nfid, 'NVN', vardesc, readvar)
+  if(.not. readvar)then
+    call endrun('fail to find NVN in '//trim(mod_filename), __LINE__)
+  endif
+  call check_ret(nf90_get_var(grid_nfid%fh, vardesc%varid, NVN), 'in '//trim(mod_filename))
+
+  call check_var(grid_nfid, 'NVS', vardesc, readvar)
+  if(.not. readvar)then
+    call endrun('fail to find NVS in '//trim(mod_filename), __LINE__)
+  endif
+  call check_ret(nf90_get_var(grid_nfid%fh, vardesc%varid, NVS), 'in '//trim(mod_filename))
+
+  call ncd_pio_closefile(grid_nfid)
 
   bounds%NHW =NHW
   bounds%NVN =NVN

@@ -6,7 +6,7 @@ program main
   use minimathmod, only : isLeap
   use fileUtil, only : file_exists, open_safe
   use EcoSIMHistMod, only : PREFIX
-  USE EcoSIMCtrlDataType, ONLY : LVERB
+  USE EcoSIMCtrlMod, ONLY : LVERB
   use data_const_mod, only : spval  => SHR_CONST_SPVAL
   use ncdio_pio
   use netcdf

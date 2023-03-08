@@ -44,7 +44,7 @@ implicit none
   contains
 
   subroutine restart(I,NHW,NHE,NVN,NVS)
-  use EcoSIMCtrlDataType, only : lverb
+  use EcoSIMCtrlMod, only : lverb
   implicit none
   integer, intent (in) :: I,NHW,NHE,NVN,NVS
 

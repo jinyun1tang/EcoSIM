@@ -8,6 +8,7 @@ module ReadManagementMod
   use FlagDataType
   use FertilizerDataType
   use ClimForcDataType
+  use EcoSIMCtrlMod, only : lverb
   use SoilWaterDataType
   use LandSurfDataType
   use EcoSIMCtrlDataType

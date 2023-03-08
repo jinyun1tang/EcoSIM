@@ -9,6 +9,7 @@ module ClimReadMod
   use EcoSimConst
   USE LandSurfDataType
   use EcoSIMCtrlDataType
+  use EcoSIMCtrlMod
   use EcoSIMConfig
 implicit none
   private
@@ -644,12 +645,14 @@ implicit none
 
 !----------------------------------------------------------------------
 
-  subroutine ReadClimNC(iyear,irec,L,atmf)
+  subroutine ReadClimNC(yearc,yeari,L,atmf)
   use ncdio_pio
   use EcoSIMCtrlMod, only : clm_file_in
+  use fileUtil, only : file_exists
+  use abortutils, only : endrun
   implicit none
-  integer, intent(in) :: iyear  ! # read data for iyear
-  integer, intent(in) :: irec
+  integer, intent(in) :: yearc  ! current year
+  integer, intent(in) :: yeari  !
   integer, intent(in) :: L
   type(atm_forc_type), intent(out) :: atmf
 
@@ -660,16 +663,22 @@ implicit none
   real(r8), allocatable :: fdatam(:,:,:)
   integer , allocatable :: idatav(:)
   real(r8), allocatable ::fdatav(:)
-  integer :: yeari,I,J,II,JJ
+  integer :: year,J,II,JJ,I,irec
 
   IWTHR(L)=2
+  LYR=0
+  if(.not.file_exists(clm_file_in))then
+    call endrun("Do not find clm_file_in file "//trim(clm_file_in)//" in "//mod_filename, __LINE__)
+  endif
 
   call ncd_pio_openfile(clm_nfid, clm_file_in, ncd_nowrite)
 
   nyears=get_dim_len(clm_nfid, 'year')
-  if (nyears<irec)then
-    call endrun('requested data exceeds the recorded data in '//trim(mod_filename), __LINE__)
-  endif
+  do irec=1,nyears
+    call ncd_getvar(clm_nfid,'year',irec,year)
+    if(year==yeari)exit
+  enddo
+
 ! while the climate data may be for multiple grid, only the first grid of the data
 ! read is assigned to current climate arrays
   ngrid=get_dim_len(clm_nfid,'ngrid')
@@ -678,9 +687,6 @@ implicit none
   allocate(idatav(ngrid))
   allocate(fdatav(ngrid))
 
-  call ncd_getvar(clm_nfid,'year',irec,idatav)
-  yeari=idatav(1)
-  I=365
   if(isleap(yeari))I=366
   call ncd_getvar(clm_nfid,'TMPH',irec,fdatam); call reshape2(TMPH,fdatam)
   call ncd_getvar(clm_nfid,'WINDH',irec,fdatam); call reshape2(WINDH,fdatam)
@@ -704,7 +710,7 @@ implicit none
   call ncd_getvar(clm_nfid,'CCLRG',irec,fdatav); atmf%CCLRG=fdatav(1)
   call ncd_getvar(clm_nfid,'IFLGW',irec,idatav); IFLGW=idatav(1)
 
-  call check_var(clm_nfid, 'XRADH', vardesc, readvar)
+  call check_var(clm_nfid, 'XRADH', vardesc, readvar,print_err=.false.)
   if(readvar)then
     call ncd_getvar(clm_nfid,'XRADH',irec,fdatam); call reshape2(XRADH,fdatam)
   else
@@ -712,7 +718,7 @@ implicit none
   endif
 
 
-  if (I==365 .and. isLeap(iyear))then
+  if (I==365 .and. isLeap(yearc))then
     DO J=1,24
       TMPH(J,I+1) = TMPH(J,I)
       WINDH(J,I+1)= WINDH(J,I)
@@ -723,7 +729,7 @@ implicit none
     ENDDO
   endif
 
-  if(isleap(iyear))LYR=1
+  if(isleap(yearc))LYR=1
   DO II=1,365+LYR
     DO JJ=1,24
       SRADH(JJ,II)=SRADH(JJ,II)*3600._r8*1.e-6_r8  !convert from W/m2 to MJ/m^2/hour

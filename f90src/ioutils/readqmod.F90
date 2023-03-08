@@ -17,6 +17,7 @@ module readqmod
   use EcoSIMHistMod
   use CanopyRadDataType
   use GridDataType
+  use EcoSIMCtrlMod
   implicit none
   private
 
@@ -26,18 +27,15 @@ module readqmod
   PUBLIC :: readq
   CONTAINS
 
-  SUBROUTINE readq(NA,ND,NT,NE,NTX,NEX,NF,NFX,NTZ,NTZX,NHW,NHE,NVN,NVS)
+  SUBROUTINE readq(yearc,yeari,NE,NEX,NHW,NHE,NVN,NVS)
 !!
 ! Description
 ! THIS SUBROUTINE READS INPUT DATA FROM PLANT SPECIES
 !     AND MANAGEMENT FILES IDENTIFIED IN 'ROUTQ'
 !
   implicit none
-  integer, intent(in) :: NEX
-  integer, intent(in) :: NA(1:NEX),ND(1:NEX)
-  integer, intent(in) :: NT,NE,NTX,NF,NFX,NTZ,NTZX,NHW,NHE,NVN,NVS
-
-
+  integer, intent(in) :: yearc,yeari,NEX
+  integer, intent(in) :: NE,NHW,NHE,NVN,NVS
   integer :: NX,NY,NZ
 
 ! begin_execution
@@ -58,8 +56,7 @@ module readqmod
     ENDDO D9990
   ENDDO D9995
 
-!  call ReadPlantManagement_ascii(NHW,NHE,NVN,NVS,NF,NFX,NT,NTX,NTZX)
-  call ReadPlantManagementNC(NHW,NHE,NVN,NVS,NF,NFX,NT,NTX,NTZX)
+  call ReadPlantManagementNC(yearc,yeari,NHW,NHE,NVN,NVS)
   RETURN
   END SUBROUTINE readq
 !------------------------------------------------------------------------------------------
@@ -1061,14 +1058,14 @@ module readqmod
 
 !------------------------------------------------------------------------------------------
 
-  subroutine ReadPlantManagementNC(NHW,NHE,NVN,NVS,NF,NFX,NT,NTX,NTZX)
+  subroutine ReadPlantManagementNC(yearc,yeari,NHW,NHE,NVN,NVS)
 
   USE EcoSIMCtrlMod, only : pft_mgmt_in
   use netcdf
   use ncdio_pio
   use abortutils, only : endrun
   implicit none
-  integer, intent(in) :: NT,NTX,NF,NFX,NTZX,NHW,NHE,NVN,NVS
+  integer, intent(in) :: NHW,NHE,NVN,NVS,yeari,yearc
   integer :: NY,NX,NZ
 
   type(file_desc_t) :: pftinfo_nfid
@@ -1124,7 +1121,7 @@ module readqmod
       iyear=1
       if(IGO>0)return
     else
-      iyear=1+IGO
+      iyear=yeari
     endif
     PRINT*,'IYEAR',IYEAR
     !obtain the number of topographic units
@@ -1164,6 +1161,7 @@ module readqmod
           start = (/1,1,1,ntopou,iyear/),count = (/len(pft_mgmtinfo(1,1)),24,JP,1,1/)),&
           trim(mod_filename))
       endif
+
       DO NX=NH1,NH2
         DO NY=NV1,NV2
           DO NZ=1,MIN(NS,NP(NY,NX))
@@ -1182,7 +1180,7 @@ module readqmod
 
             IF(IDY.GT.0.AND.IYR.GT.0)THEN
               IDAY0(NZ,NY,NX)=IDY
-              IYR=IYR+(NT-1)*NF+(NTX-1)*NFX-NTZX
+              IYR=yearc
               IYR0(NZ,NY,NX)=MIN(IYR,IYRC)
               IDAYX(NZ,NY,NX)=IDAY0(NZ,NY,NX)
               IYRX(NZ,NY,NX)=IYR0(NZ,NY,NX)
@@ -1194,8 +1192,7 @@ module readqmod
               DO nn1=1,pft_nmgnt(NZ)
                 tstr=trim(pft_mgmtinfo(NN1,NZ))
                 read(tstr,'(I2,I2,I4)')IDX,IMO,IYR
-                READ(TSTR,*)DY,ICUT,JCUT,HCUT,PCUT &
-                  ,ECUT11,ECUT12,ECUT13,ECUT14,ECUT21,ECUT22,ECUT23,ECUT24
+                READ(TSTR,*)DY,ICUT,JCUT,HCUT,PCUT,ECUT11,ECUT12,ECUT13,ECUT14,ECUT21,ECUT22,ECUT23,ECUT24
 
                 if(isLeap(iyr) .and. IMO.GT.2)LPY=1
 
@@ -1208,7 +1205,7 @@ module readqmod
 
                 IF(IDY.GT.0.AND.JCUT.EQ.1)THEN
                   IDAYH(NZ,NY,NX)=IDY
-                  IYR=IYR+(NT-1)*NF+(NTX-1)*NFX-NTZX
+                  IYR=yearc
                   IYRH(NZ,NY,NX)=MIN(IYR,IYRC)
                 ENDIF
 

@@ -44,6 +44,7 @@ module EcoSIMDesctruct
   use PlantMngmtDataType  , only : DestructPlantMngmtData
   use InitSOMBGCMOD       , only : DestructSOMBGC
   use TrnsfrMod           , only : DestructTrnsfr
+
   implicit none
 
   call DestructMicrobialData
@@ -112,6 +113,9 @@ module EcoSIMDesctruct
   call DestructEcoSimSum
 
   call ncd_pio_closefile(pft_nfid)
+  
+
+
   end subroutine DestructEcoSIM
 
 end module EcoSIMDesctruct

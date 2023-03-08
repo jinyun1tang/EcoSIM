@@ -9,6 +9,8 @@ runfile='runfile.dryland'
 do_regression_test=.false.
 pft_file_in='/Users/jinyuntang/work/github/ecosim2/EcoSIM/python_tools/ecosim_pft_20230113.nc'
 grid_file_in='/Users/jinyuntang/work/github/ecosim2/EcoSIM/python_tools/dryland_grid_20230119.nc'
+pft_mgmt_in='/Users/jinyuntang/work/github/ecosim2/EcoSIM/python_tools/dryland_pft_20230131.nc'
+soil_mgmt_in='/Users/jinyuntang/work/github/ecosim2/EcoSIM/python_tools/dryland_soilmgmt_20230209.nc'
 lverbose=.false.
 /
 &bbgcforc

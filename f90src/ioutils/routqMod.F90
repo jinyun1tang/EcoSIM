@@ -5,6 +5,7 @@ module routqMod
   use GridConsts
   use fileUtil, only : open_safe
   use FlagDataType
+  use EcoSIMCtrlMod, only : lverb
   use EcoSIMCtrlDataType
   use PlantMngmtDataType
   use EcoSIMHistMod
@@ -19,14 +20,15 @@ module routqMod
   public :: routq
   contains
 
-  SUBROUTINE routq(NT,NE,NTX,NEX,NHW,NHE,NVN,NVS)
+  SUBROUTINE routq(yearc,yeari,NE,NEX,NHW,NHE,NVN,NVS)
 !
 !     THIS SUBROUTINE OPENS CHECKPOINT FILES AND READS
 !     FILE NAMES FOR PLANT SPECIES AND MANAGEMENT
 !
       use data_kind_mod, only : r8 => SHR_KIND_R8
   implicit none
-  integer, intent(in) :: NT,NE,NTX,NEX,NHW,NHE,NVN,NVS
+  integer, intent(in) :: yearc,yeari
+  integer, intent(in) :: NE,NEX,NHW,NHE,NVN,NVS
 
   CHARACTER(len=16) :: OUTX,OUTC,OUTM,OUTR,OUTQ
   CHARACTER(len=4) :: CHARY
@@ -53,25 +55,25 @@ module routqMod
     IF(is_restart_run)THEN
       IDATE=IDATA(9)         !read from the past year
     ELSE
-      IDATE=IDATA(3)         !it is the current year
+      IDATE=yearc         !it is the current year
     ENDIF
+    
 !   open checkpoint files for i/o
     WRITE(CHARY,'(I4)')IDATE
-    OUTX='P'//DATA1(1)(1:2)//CHARY(1:4)
-    OUTC='C'//DATA1(1)(1:2)//CHARY(1:4)
-    OUTM='M'//DATA1(1)(1:2)//CHARY(1:4)
-    OUTR='R'//DATA1(1)(1:2)//CHARY(1:4)
-    OUTQ='Q'//DATA1(1)(1:2)//CHARY(1:4)
+    OUTX='P'//case_name(1:2)//CHARY(1:4)
+    OUTC='C'//case_name(1:2)//CHARY(1:4)
+    OUTM='M'//case_name(1:2)//CHARY(1:4)
+    OUTR='R'//case_name(1:2)//CHARY(1:4)
+    OUTQ='Q'//case_name(1:2)//CHARY(1:4)
+    print*,outx,outc,outm,outr,outq
     call OPEN_safe(26,outdir,outx,'UNKNOWN',mod_filename,__LINE__)
     call OPEN_safe(27,outdir,outc,'UNKNOWN',mod_filename,__LINE__)
     call OPEN_safe(28,outdir,outm,'UNKNOWN',mod_filename,__LINE__)
     call OPEN_safe(29,outdir,outr,'UNKNOWN',mod_filename,__LINE__)
     call OPEN_safe(30,outdir,outq,'UNKNOWN',mod_filename,__LINE__)
   ENDIF
-
-!  call ReadPlantInfo_ascii(NT,NE,NTX,NEX,NHW,NHE,NVN,NVS)
-
-  call ReadPlantInfoNC(NT,NE,NTX,NEX,NHW,NHE,NVN,NVS)
+  if(lverb)write(*,*)'ReadPlantInfoNC'
+  call ReadPlantInfoNC(yeari,NE,NEX,NHW,NHE,NVN,NVS)
 
   END subroutine routq
 
@@ -305,14 +307,15 @@ module routqMod
 !------------------------------------------------------------------------------------------
 
 
-  subroutine ReadPlantInfoNC(NT,NE,NTX,NEX,NHW,NHE,NVN,NVS)
+  subroutine ReadPlantInfoNC(yeari,NE,NEX,NHW,NHE,NVN,NVS)
 
   USE EcoSIMCtrlMod, only : pft_mgmt_in
   use netcdf
   use ncdio_pio
   use abortutils, only : endrun
   implicit none
-  integer, intent(in) :: NT,NE,NTX,NEX,NHW,NHE,NVN,NVS
+  integer, intent(in) :: NE,NEX,NHW,NHE,NVN,NVS
+  integer, intent(in) :: yeari
   integer :: IDATE
   integer :: NPP(JY,JX)
   integer :: IYR,NX,NY,NZ,NN,NH1,NH2,NV1,NV2,NS
@@ -327,6 +330,7 @@ module routqMod
   character(len=10) :: pft_gtype(JP)
 
   if (len_trim(pft_mgmt_in)==0)then
+   !no plant management info to read
     D5995: DO NX=NHW,NHE
       DO  NY=NVN,NVS
         NP(NY,NX)=0
@@ -365,7 +369,7 @@ module routqMod
         ! constant pft data
         iyear=1
       else
-        iyear=1+IGO
+        iyear=yeari
       endif
       !obtain the number of topographic units
       ntopou=get_dim_len(pftinfo_nfid, 'ntopou')

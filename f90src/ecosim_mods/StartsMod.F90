@@ -55,6 +55,7 @@ module StartsMod
   !
 
   public :: starts
+  public :: set_ecosim_solver
   contains
 
   SUBROUTINE starts(NHW,NHE,NVN,NVS)
@@ -616,8 +617,8 @@ module StartsMod
 ! IRCHG=runoff boundary flags:0=not possible,1=possible
 !
   ALTY=0.0
-  DO 9985 NX=NHW,NHE
-    DO 9980 NY=NVN,NVS
+  D9985: DO NX=NHW,NHE
+    D9980: DO NY=NVN,NVS
       ZEROS(NY,NX)=ZERO*DH(NY,NX)*DV(NY,NX)
       ZEROS2(NY,NX)=ZERO2*DH(NY,NX)*DV(NY,NX)
 !     compute slopes
@@ -665,10 +666,10 @@ module StartsMod
 !    compute incident sky aNGLe at ground surface
       GSIN(NY,NX)=SLOPE(0,NY,NX)
       GCOS(NY,NX)=SQRT(1.0-GSIN(NY,NX)**2)
-      DO 240 N=1,JSA
+      D240: DO N=1,JSA
         DGAZI=COS(GAZI(NY,NX)-YAZI(N))
         OMEGAG(N,NY,NX)=AZMAX1(AMIN1(1.0,GCOS(NY,NX)*YSIN(N)+GSIN(NY,NX)*YCOS(N)*DGAZI))
-240   CONTINUE
+      ENDDO D240
 !     compute ground surface elevation
       IF(NX.EQ.NHW)THEN
         IF(NY.EQ.NVN)THEN
@@ -705,14 +706,13 @@ module StartsMod
         ,SLOPE(0,NY,NX),SLOPE(1,NY,NX),SLOPE(2,NY,NX) &
         ,GSIN(NY,NX),GCOSA(NY,NX),GSINA(NY,NX)
 1111  FORMAT(A8,6I4,20E12.4)
-9980  CONTINUE
-9985  CONTINUE
+    ENDDO D9980
+  ENDDO D9985
   end subroutine InitGridElevation
 !------------------------------------------------------------------------------------------
   subroutine InitControlParms
   implicit none
   !     begin_execution
-  real(r8) :: XNPV
   !
   !     NPH=no. of cycles per hour for water, heat and solute flux calculns
   !     NPT=number of cycles per water iteration for gas flux calculations
@@ -724,26 +724,6 @@ module StartsMod
   BKRS=(/0.0333_r8,0.0167_r8,0.0167_r8/)
 
   call InitSOMConsts
-
-  NPH=NPX
-  NPT=NPY
-  NPG=NPH*NPT
-  NPR=30
-  NPS=10
-  XNPH=1.0_r8/NPH
-  XNPT=1.0_r8/NPT
-  XNPG=1.0_r8/NPG
-  XNPR=1.0_r8/NPR
-  XNPS=1.0_r8/NPS
-  XNPY=XNPH*XNPS
-  XNPZ=XNPH*XNPR
-  XNPQ=XNPZ*XNPS
-  XNPV=XNPR*XNPS
-  XNPD=600.0*XNPG
-  XNPX=AMIN1(1.0_r8,20.0_r8*XNPH)
-  XNPA=XNPX*XNPS
-  XNPB=XNPX*XNPR
-  XNPC=XNPX*XNPV
   !     NDIM=1
   !     IF(NHE.GT.NHW)NDIM=NDIM+1
   !     IF(NVS.GT.NVN)NDIM=NDIM+1
@@ -956,4 +936,40 @@ module StartsMod
 
   end associate
   end subroutine InitLayerDepths
+    
+!------------------------------------------------------------------------------------------
+  
+  subroutine set_ecosim_solver(NPXS1,NPYS1)
+  
+  implicit none
+  integer, intent(in) :: NPXS1,NPYS1
+  !     begin_execution
+  real(r8) :: XNPV
+  
+  NPX=NPXS1   !number of cycles per hour for water,heat,solute flux calcns
+  NPY=NPYS1   !number of cycles per NPX for gas flux calcns
+    
+  NPH=NPX
+  NPT=NPY
+  NPG=NPH*NPT
+
+  NPR=30
+  NPS=10
+  XNPH=1.0_r8/NPH
+  XNPT=1.0_r8/NPT
+  XNPG=1.0_r8/NPG
+  XNPR=1.0_r8/NPR
+  XNPS=1.0_r8/NPS
+  XNPY=XNPH*XNPS
+  XNPZ=XNPH*XNPR
+  XNPQ=XNPZ*XNPS
+  XNPV=XNPR*XNPS
+  XNPD=600.0*XNPG
+  XNPX=AMIN1(1.0_r8,20.0_r8*XNPH)
+  XNPA=XNPX*XNPS
+  XNPB=XNPX*XNPR
+  XNPC=XNPX*XNPV
+  
+  end subroutine set_ecosim_solver
+
 end module StartsMod

@@ -52,6 +52,7 @@ module InitEcoSIM
   use PlantMngmtDataType  , only : InitPlantMngmtData
   use InitSOMBGCMod       , only : InitSOMBGC
   use GridConsts
+
   use EcoSIMConfig        , only : jcplx1 => jcplx1c
   use TracerIDMod         , only : InitTracerIDs
   implicit  none
@@ -140,6 +141,10 @@ module InitEcoSIM
   call InitErosion
 
   call InitEcoSimSum
+
+  call InitModules2
+    
+
   end subroutine InitModules
 
 !------------------------------------------------------------------------------------------

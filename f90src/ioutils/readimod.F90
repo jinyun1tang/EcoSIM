@@ -9,7 +9,7 @@ module readiMod
   use minimathmod  , only : test_aeqb, AZMAX1
   use MiniFuncMod  , only : GetDayLength
   use EcoSIMConfig, only : column_mode
-  use EcoSIMCtrlMod, only : grid_file_in
+  use EcoSIMCtrlMod, only : grid_file_in,lverb
   use EcoSiMParDataMod, only : micpar
   use SOMDataType
   use CanopyRadDataType
@@ -37,7 +37,6 @@ module readiMod
   CHARACTER(len=16) :: OUTW,OUTI,OUTT,OUTN,OUTF
   CHARACTER(len=4) :: CHARY
   CHARACTER(len=1) :: TTYPE,CTYPE,IVAR(20),VAR(50),TYP(50)
-  character(len=*), parameter :: subname='readi.f'
   character(len=3), parameter :: model_status(0:1)=(/'off','on '/)
 
   integer :: ll
@@ -55,15 +54,13 @@ module readiMod
   public :: readi
   contains
 
-  SUBROUTINE readi(NA,ND,NT,NE,NTX,NEX,NF,NFX,NTZ,NTZX,NHW,NHE,NVN,NVS)
+  SUBROUTINE readi(NE,NEX,NHW,NHE,NVN,NVS)
 !!
 ! Description:
 ! THIS SUBROUTINE READS ALL SOIL AND TOPOGRAPHIC INPUT FILES
 !
   implicit none
-  integer, intent(in) :: NT,NE,NTX,NEX,NTZX,NHW,NHE,NVN,NVS
-  integer, intent(out) :: NF, NFX, NTZ
-  integer, intent(in) :: NA(1:NEX),ND(1:NEX)
+  integer, intent(in) :: NE,NEX,NHW,NHE,NVN,NVS
   integer :: jj,NX,NY
   integer :: ierr
   character(len=200) :: tline
@@ -76,14 +73,8 @@ module readiMod
   OPEN(19,FILE=trim(outdir)//'logfile2',STATUS='UNKNOWN')
   OPEN(20,FILE=trim(outdir)//'logfile3',STATUS='UNKNOWN')
 
-
-  call OPEN_safe(7,PREFIX,DATA1(2),'OLD',mod_filename,__LINE__)
-
   WRITE(18,5000)' 08 JUL 2021'
 5000  FORMAT(A16)
-  NF=1
-  NFX=1
-  NTZ=0
 
   call ncd_pio_openfile(grid_nfid, grid_file_in, ncd_nowrite)
 
@@ -253,7 +244,6 @@ module readiMod
   CLOSE(1)
 
   if(lverb)then
-    write(*,*)'read data in '//trim(subname)
     write(*,*)'read site data file: ',DATA1(1)
     write(*,'(40A)')('-',ll=1,40)
     write(*,*)'Latitude (o): ALATG',ALATG
@@ -425,7 +415,6 @@ module readiMod
   call ncd_getvar(grid_nfid,'DVI',loc,DVI(1:NVS))
 
   if(lverb)then
-    write(*,*)'read data in '//trim(subname)
     write(*,*)'read site data file: ',DATA1(1)
     write(*,'(40A)')('-',ll=1,40)
     write(*,*)'Latitude (o): ALATG',ALATG
@@ -1101,14 +1090,15 @@ module readiMod
 !   BKDSI: initial bulk density
 
       DO  L=1,NL(NY,NX)
-!   FHOL: micropore fraction
-!     BKDSI(L,NY,NX)=BKDSI(L,NY,NX)/(1.0_r8-FHOL(L,NY,NX))
+!       FHOL: micropore fraction
+!       BKDSI(L,NY,NX)=BKDSI(L,NY,NX)/(1.0_r8-FHOL(L,NY,NX))
         BKDS(L,NY,NX)=BKDSI(L,NY,NX)
-        IF(test_aeqb(BKDS(L,NY,NX),0.0_r8))FHOL(L,NY,NX)=0.0
-!     fraction of soil has micropore
+        IF(test_aeqb(BKDS(L,NY,NX),0.0_r8))FHOL(L,NY,NX)=0.0_r8
+!       fraction of soil has micropore
         FMPR(L,NY,NX)=(1.0_r8-ROCK(L,NY,NX))*(1.0_r8-FHOL(L,NY,NX))
-!     FC(L,NY,NX)=FC(L,NY,NX)/(1.0-FHOL(L,NY,NX))
-!     WP(L,NY,NX)=WP(L,NY,NX)/(1.0-FHOL(L,NY,NX))
+
+!       FC(L,NY,NX)=FC(L,NY,NX)/(1.0-FHOL(L,NY,NX))
+!       WP(L,NY,NX)=WP(L,NY,NX)/(1.0-FHOL(L,NY,NX))
 !
         SCNV(L,NY,NX)=0.098_r8*SCNV(L,NY,NX)*FMPR(L,NY,NX)
         SCNH(L,NY,NX)=0.098_r8*SCNH(L,NY,NX)*FMPR(L,NY,NX)

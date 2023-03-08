@@ -52,7 +52,11 @@ config_dry_dict={
 'topf':'metopo',
 'ntopu':'1',
 'ncol':'1',
-'nrow':'1'
+'nrow':'1',
+'NHW':'1',
+'NVN':'1',
+'NHE':'1',
+'NVS':'1'
 }
 
 config_lake_dict={
@@ -62,7 +66,11 @@ config_lake_dict={
 'topf':'vatopo',
 'ntopu':'2',
 'ncol':'2',
-'nrow':'1'
+'nrow':'1',
+'NHW':'1',
+'NVN':'1',
+'NHE':'2',
+'NVS':'1'
 }
 
 config_sample_dict={
@@ -72,10 +80,14 @@ config_sample_dict={
 'topf':'tp022852',
 'ntopu':'1',
 'ncol':'1',
-'nrow':'1'
+'nrow':'1',
+'NHW':'1',
+'NVN':'1',
+'NHE':'1',
+'NVS':'1'
 }
 
-config_dict=config_sample_dict
+config_dict=config_lake_dict
 
 print('generate grid data for '+config_dict['case'])
 
@@ -217,8 +229,6 @@ topo_unit_info={
 }
 
 
-
-
 DHI=np.zeros(ncol,dtype=np.float32)
 DVI=np.zeros(nrow,dtype=np.float32)
 with open(sfilenm,"r") as sfile:
@@ -332,6 +342,14 @@ for v in topo_unit_info:
   if flags:
     w_nc_var.flags=flags
 
+NHW = nc_fid.createVariable('NHW', 'i4', ())
+NHE = nc_fid.createVariable('NHE', 'i4', ())
+NVN = nc_fid.createVariable('NVN', 'i4', ())
+NVS = nc_fid.createVariable('NVS', 'i4', ())
+NHW[:] = int(config_dict['NHW'])
+NHE[:] = int(config_dict['NHE'])
+NVN[:] = int(config_dict['NVN'])
+NVS[:] = int(config_dict['NVS'])
 
 nc_fid.variables['ALATG'][:]=[ALATG]
 nc_fid.variables['ALTIG'][:]=[ALTIG]
@@ -365,7 +383,6 @@ nc_fid.variables['RCHGWTG'][:]=[RCHGWTG]
 nc_fid.variables['RCHGDG'][:]=[RCHGDG]
 nc_fid.variables['DHI'][:]=[DHI]
 nc_fid.variables['DVI'][:]=[DVI]
-
 
 
 k=0

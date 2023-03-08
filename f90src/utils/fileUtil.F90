@@ -51,7 +51,7 @@ module fileUtil
 
   call getfilenamef(prefix,fname,pathfile)
 
-  if(.not.file_exists(pathfile))then
+  if(trim(status)/='UNKNOWN' .and. .not.file_exists(pathfile))then
     call endrun(msg='Fail to find file '//trim(pathfile)//' in ' &
       //mod_filename,line=__LINE__)
   endif
@@ -167,10 +167,10 @@ module fileUtil
   character(len=*), intent(out) :: s3
 
   integer :: k,k1,l3
+  
   l3=len(s3)
   k=1
   do while(.true.)
-
     if(s1(k:k)/=' '.and. ichar(s1(k:k))/=0 .and. k<=l3)then
        s3(k:k)=s1(k:k)
     else
@@ -193,6 +193,14 @@ module fileUtil
     k1=k1+1
   enddo
   s3(k:)=' '
-
   end subroutine getfilenamef
+  
+!------------------------------------------------------------------------------------------
+
+  logical function isprtablesymb(c)
+  implicit none
+  character(len=1), intent(in) :: c
+  
+  isprtablesymb=ICHAR(c) >= ICHAR(' ') .AND. ICHAR(c) <= ICHAR('~')
+  end function isprtablesymb
 end module fileUtil

@@ -32,14 +32,14 @@ module Hist1Mod
   public :: fouts,foutp, outpd, outph, outsd, outsh
   contains
 
-  SUBROUTINE foutp(NT,NE,NTX,NEX,NF,NFX,NHW,NHE,NVN,NVS)
+  SUBROUTINE foutp(NE,NEX,NHW,NHE,NVN,NVS)
 !
 !     THIS SUBROUTINE OPENS AND LABELS OUTPUT FILES
 !     FOR PLANT DATA
 ! write file head for plant variable output
   implicit none
-  integer, intent(in) :: NT,NE,NTX,NEX
-  integer, intent(in) :: NF,NFX,NHW,NHE,NVN,NVS
+  integer, intent(in) :: NE,NEX
+  integer, intent(in) :: NHW,NHE,NVN,NVS
 
 
   integer, SAVE :: LUN
@@ -393,14 +393,14 @@ module Hist1Mod
 !------------------------------------------------------------------------
 
 
-  SUBROUTINE fouts(NT,NE,NTX,NEX,NF,NFX,NHW,NHE,NVN,NVS)
+  SUBROUTINE fouts(NE,NEX,NHW,NHE,NVN,NVS)
 !
 !     THIS SUBROUTINE OPENS AND LABELS OUTPUT FILES FOR SOIL DATA
 !
 
   implicit none
-  integer, intent(in) :: NT,NE,NTX,NEX
-  integer, intent(in) :: NF,NFX,NHW,NHE,NVN,NVS
+  integer, intent(in) :: NE,NEX
+  integer, intent(in) :: NHW,NHE,NVN,NVS
 
 
   character(len=*), parameter :: mod_filename = __FILE__
@@ -433,7 +433,6 @@ module Hist1Mod
 !     OPEN AND NAME OUTPUT FILES
 !
   DO N=21,30
-  !  write(*,*)'N=',N,'output config file ',DATAC(N,NE,NEX)
     IF(DATAC(N,NE,NEX).NE.'NO')THEN
       call OPEN_safe(15,PREFIX,DATAC(N,NE,NEX),'OLD',mod_filename,__LINE__)
       WRITE(CHARR,'(I4)')IYRC
@@ -1004,7 +1003,7 @@ module Hist1Mod
 
 !------------------------------------------------------------------------
 
-  SUBROUTINE outpd(I,NT,NE,NTX,NEX,NHW,NHE,NVN,NVS)
+  SUBROUTINE outpd(I,NE,NEX,NHW,NHE,NVN,NVS)
 !
 !     THIS SUBROUTINE WRITES DAILY OUTPUT FOR PLANT
 !     C, N, P, WATER AND HEAT TO OUTPUT FILES DEPENDING
@@ -1013,8 +1012,8 @@ module Hist1Mod
 !
 
   implicit none
-  integer, intent(in) :: I,NT,NE
-  integer, intent(in) :: NTX,NEX,NHW,NHE,NVN,NVS
+  integer, intent(in) :: I,NE
+  integer, intent(in) :: NEX,NHW,NHE,NVN,NVS
 
 
   CHARACTER(len=16) :: CHEAD
@@ -1263,7 +1262,7 @@ module Hist1Mod
 !------------------------------------------------------------------------
 
 
-  SUBROUTINE outph(I,J,NT,NE,NTX,NEX,NHW,NHE,NVN,NVS)
+  SUBROUTINE outph(I,J,NE,NEX,NHW,NHE,NVN,NVS)
 !
 !     THIS SUBROUTINE WRITES HOURLY OUTPUT FOR PLANT
 !     C, N, P, WATER AND HEAT TO OUTPUT FILES DEPENDING
@@ -1272,7 +1271,7 @@ module Hist1Mod
 !
 
   implicit none
-  integer, intent(in) :: I,J,NT,NE,NTX
+  integer, intent(in) :: I,J,NE
   integer, intent(in) :: NEX,NHW,NHE,NVN,NVS
 
 
@@ -1503,7 +1502,7 @@ module Hist1Mod
 !------------------------------------------------------------------------
 
 
-  SUBROUTINE outsd(I,NT,NE,NTX,NEX,NHW,NHE,NVN,NVS)
+  SUBROUTINE outsd(I,NE,NEX,NHW,NHE,NVN,NVS)
 !
 !     THIS SUBROUTINE WRITES DAILY OUTPUT FOR SOIL
 !     C, N, P, WATER AND HEAT TO OUTPUT FILES DEPENDING
@@ -1512,7 +1511,7 @@ module Hist1Mod
 !
 
   implicit none
-  integer, intent(in) :: I,NT,NE,NTX,NEX,NHW,NHE,NVN,NVS
+  integer, intent(in) :: I,NE,NEX,NHW,NHE,NVN,NVS
 
 
   real(r8) :: HEAD(50)
@@ -1596,12 +1595,12 @@ module Hist1Mod
               DO K=1,50
                 IF(CHOICE(K,N-20).EQ.'YES')THEN
                   M=M+1
-                  IF(K.EQ.1)HEAD(M)=1000.0*URAIN(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-                  IF(K.EQ.2)HEAD(M)=1000.0*UEVAP(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-                  IF(K.EQ.3)HEAD(M)=1000.0*URUN(NY,NX)/TAREA
-                  IF(K.EQ.4)HEAD(M)=1000.0*UVOLW(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-                  IF(K.EQ.5)HEAD(M)=1000.0*UVOLO(NY,NX)/TAREA
-                  IF(K.EQ.6)HEAD(M)=1000.0*DPTHS(NY,NX)
+                  IF(K.EQ.1)HEAD(M)=1000.0_r8*URAIN(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+                  IF(K.EQ.2)HEAD(M)=1000.0_r8*UEVAP(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+                  IF(K.EQ.3)HEAD(M)=1000.0_r8*URUN(NY,NX)/TAREA
+                  IF(K.EQ.4)HEAD(M)=1000.0_r8*UVOLW(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+                  IF(K.EQ.5)HEAD(M)=1000.0_r8*UVOLO(NY,NX)/TAREA
+                  IF(K.EQ.6)HEAD(M)=1000.0_r8*DPTHS(NY,NX)
                   IF(K.EQ.7)HEAD(M)=THETWZ(1,NY,NX)
                   IF(K.EQ.8)HEAD(M)=THETWZ(2,NY,NX)
                   IF(K.EQ.9)HEAD(M)=THETWZ(3,NY,NX)
@@ -2104,7 +2103,7 @@ module Hist1Mod
 
 !------------------------------------------------------------------------
 
-  SUBROUTINE outsh(I,J,NT,NE,NTX,NEX,NHW,NHE,NVN,NVS)
+  SUBROUTINE outsh(I,J,NE,NEX,NHW,NHE,NVN,NVS)
 !
 !     THIS SUBROUTINE WRITES HOURLY OUTPUT FOR SOIL
 !     C, N, P, WATER AND HEAT TO OUTPUT FILES DEPENDING
@@ -2113,7 +2112,7 @@ module Hist1Mod
 !
 
   implicit none
-  integer, intent(in) :: I,J,NT,NE,NTX
+  integer, intent(in) :: I,J,NE
   integer, intent(in) :: NEX,NHW,NHE,NVN,NVS
 
 

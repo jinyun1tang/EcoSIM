@@ -54,7 +54,7 @@ module ecosim_Time_Mod
      procedure, public :: get_step_size
      procedure, public :: get_cur_time
      procedure, public :: get_cur_timef
-
+     procedure, public :: get_days_cur_year
      procedure, public :: proc_initstep
      procedure, public :: print_cur_time
      procedure, public :: its_time_to_histflush
@@ -501,24 +501,29 @@ contains
   end subroutine proc_initstep
 
   !-------------------------------------------------------------------------------
-  integer function get_days_per_year(this, offset)
+  integer function get_days_per_year(this)
 
     implicit none
 
     class(ecosim_time_type), intent(in) :: this
-    integer, optional, intent(in) :: offset  ! Offset from current time in seconds.
 
     ! Positive for future times, negative
     ! for previous times.
 
     ! remove unused dummy arg compiler warning
-    if (offset > 0) continue
     if (this%tstep > 0) continue
 
     !hardwire at the moment
     get_days_per_year = 365
   end function get_days_per_year
 
+  !-------------------------------------------------------------------------------
+  integer function get_days_cur_year(this)
+    implicit none
+    class(ecosim_time_type), intent(in) :: this
+
+    get_days_cur_year=365+this%leap_yr
+  end function  get_days_cur_year
   !-------------------------------------------------------------------------------
 
   subroutine print_cur_time(this)

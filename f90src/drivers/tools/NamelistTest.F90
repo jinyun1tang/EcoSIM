@@ -42,7 +42,6 @@ PROGRAM main
   forc_year0=1980
   forc_periods=(/1981,1988,2,1989,2008/)
 
-
   inquire (file=nmlfile, iostat=rc)
   if (rc /= 0) then
     write (iulog, '(3a)') 'Error: input file ', trim(nmlfile), &
