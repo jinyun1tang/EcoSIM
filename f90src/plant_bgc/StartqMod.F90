@@ -32,7 +32,8 @@ module StartqMod
 !     THIS SUBROUTINE INITIALIZES ALL PLANT VARIABLES
 !
   implicit none
-  integer, intent(in) :: NHWQ,NHEQ,NVNQ,NVSQ,NZ1Q,NZ2Q
+  integer, intent(in) :: NHWQ,NHEQ,NVNQ,NVSQ
+  integer, intent(in) :: NZ1Q,NZ2Q
 
   integer :: NY,NX,K,L,M,NZ,NZ2X
 !     begin_execution
@@ -50,10 +51,10 @@ module StartqMod
 !     O2I=intercellular O2 concentration in C3,C4 PFT (umol mol-1)
 !
 
-  DO 9995 NX=NHWQ,NHEQ
-    DO 9990 NY=NVNQ,NVSQ
+  D9995: DO NX=NHWQ,NHEQ
+    D9990: DO NY=NVNQ,NVSQ
       NZ2X=MIN(NZ2Q,NP(NY,NX))
-      DO 9985 NZ=NZ1Q,NZ2X
+      D9985: DO NZ=NZ1Q,NZ2X
         IF(IFLGC(NZ,NY,NX).EQ.0)THEN
 
           call InitShootGrowth(NZ,NY,NX)
@@ -73,12 +74,11 @@ module StartqMod
           call InitRootMychorMorphoBio(NZ,NY,NX)
 
           call InitSeedMorphoBio(NZ,NY,NX)
-        !     ENDIF
         ENDIF
         ZEROP(NZ,NY,NX)=ZERO*PP(NZ,NY,NX)
         ZEROQ(NZ,NY,NX)=ZERO*PP(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         ZEROL(NZ,NY,NX)=ZERO*PP(NZ,NY,NX)*1.0E+06
-9985  CONTINUE
+      ENDDO D9985
 !
 !     FILL OUT UNUSED ARRAYS
 !
@@ -94,8 +94,8 @@ module StartqMod
           enddo
         ENDDO D6401
       ENDDO D9986
-9990  CONTINUE
-9995  CONTINUE
+    ENDDO D9990
+  ENDDO D9995
   RETURN
   END subroutine startq
 !------------------------------------------------------------------------------------------
@@ -105,14 +105,14 @@ module StartqMod
   implicit none
   integer, intent(in) :: NZ, NY, NX
 
-  IYR0(NZ,NY,NX)=IYRX(NZ,NY,NX)
-  IDAY0(NZ,NY,NX)=IDAYX(NZ,NY,NX)
+  IYR0(NZ,NY,NX)=IYRX(NZ,NY,NX)   !planting year
+  IDAY0(NZ,NY,NX)=IDAYX(NZ,NY,NX) !planting day
   IYRH(NZ,NY,NX)=IYRY(NZ,NY,NX)
   IDAYH(NZ,NY,NX)=IDAYY(NZ,NY,NX)
   PPI(NZ,NY,NX)=PPZ(NZ,NY,NX)
   PPX(NZ,NY,NX)=PPI(NZ,NY,NX)
-  CF(NZ,NY,NX)=CFI(NZ,NY,NX)
-
+  CF(NZ,NY,NX)=CFI(NZ,NY,NX)       !clumping factor
+  
   RSMH(NZ,NY,NX)=RSMX(NZ,NY,NX)/3600.0_r8
   RCMX(NZ,NY,NX)=RSMX(NZ,NY,NX)*1.56_r8
   CNWS(NZ,NY,NX)=2.5_r8

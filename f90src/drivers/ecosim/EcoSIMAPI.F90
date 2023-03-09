@@ -59,7 +59,6 @@ contains
   !   CALCULATE GAS AND SOLUTE FLUXES IN 'TRNSFR'
   !
   if(lverb)WRITE(*,334)'TRN'
-  !    if(I>=170)print*,TKS(0,NVN,NHW)
   call start_timer(t1)
   CALL TRNSFR(I,J,NHW,NHE,NVN,NVS)
   call end_timer('TRN',t1)

@@ -1618,8 +1618,7 @@ module InsideTranspMod
     ENDDO
 
   ELSE
-    R3GasADFlx(idg_beg:idg_end,N,N6,N5,N4)=0.0_r8
-
+    R3GasADFlx(idg_beg:idg_end-1,N,N6,N5,N4)=0.0_r8
   ENDIF
   call VolatilizationDissolution(M,N,N1,N2,N3,N4,N5,N6)
   end subroutine GaseousTransport
@@ -1737,7 +1736,7 @@ module InsideTranspMod
 
   R3PoreSoHFlx(ids_beg:ids_end,N,N6,N5,N4)=0.0_r8
 
-  R3GasADFlx(idg_beg:idg_end,N,N6,N5,N4)=0.0_r8
+  R3GasADFlx(idg_beg:idg_end-1,N,N6,N5,N4)=0.0_r8
   end subroutine ZeroTransport1
 ! ----------------------------------------------------------------------
 
@@ -1763,6 +1762,6 @@ module InsideTranspMod
 
   R3PoreSolFlx(ids_beg:ids_end,N,N3,N2,N1)=0.0_r8
   R3PoreSoHFlx(ids_beg:ids_end,N,N3,N2,N1)=0.0_r8
-  R3GasADFlx(idg_beg:idg_end,N,N3,N2,N1)=0.0_r8
+  R3GasADFlx(idg_beg:idg_end-1,N,N3,N2,N1)=0.0_r8
   end subroutine ZeroTransport2
 end module InsideTranspMod

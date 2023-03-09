@@ -271,7 +271,6 @@ module readqmod
               EHVST(2,ipld_stdead,NZ,IDYG,NY,NX)=ECUT24
             ENDDO D580
           endif
-!570     IDYS=IDY
           IDYS=IDY
         ENDIF
       ENDIF
@@ -284,7 +283,6 @@ module readqmod
   IDAYY(NZ,NY,NX)=IDAYH(NZ,NY,NX)
   IYRY(NZ,NY,NX)=IYRH(NZ,NY,NX)
   end subroutine ReadPlantManagement
-
 
 !------------------------------------------------------------------------------------------
 
@@ -1164,6 +1162,7 @@ module readqmod
 
       DO NX=NH1,NH2
         DO NY=NV1,NV2
+          print*,'NS',NP(NY,NX),NS
           DO NZ=1,MIN(NS,NP(NY,NX))
             tstr=trim(pft_pltinfo(NZ))
             read(tstr,'(I2,I2,I4)')IDX,IMO,IYR
@@ -1177,14 +1176,13 @@ module readqmod
             else
               IDY=30*(IMO-1)+ICOR(IMO-1)+IDX+LPY
             endif
-
             IF(IDY.GT.0.AND.IYR.GT.0)THEN
               IDAY0(NZ,NY,NX)=IDY
               IYR=yearc
               IYR0(NZ,NY,NX)=MIN(IYR,IYRC)
-              IDAYX(NZ,NY,NX)=IDAY0(NZ,NY,NX)
-              IYRX(NZ,NY,NX)=IYR0(NZ,NY,NX)
-              PPZ(NZ,NY,NX)=PPI(NZ,NY,NX)
+              IDAYX(NZ,NY,NX)=IDAY0(NZ,NY,NX) !planting day
+              IYRX(NZ,NY,NX)=IYR0(NZ,NY,NX)   !planting year
+              PPZ(NZ,NY,NX)=PPI(NZ,NY,NX)     !population density
             ENDIF
 
             if(pft_nmgnt(NZ)>0)then
@@ -1195,7 +1193,6 @@ module readqmod
                 READ(TSTR,*)DY,ICUT,JCUT,HCUT,PCUT,ECUT11,ECUT12,ECUT13,ECUT14,ECUT21,ECUT22,ECUT23,ECUT24
 
                 if(isLeap(iyr) .and. IMO.GT.2)LPY=1
-
                 !obtain the ordinal day
                 IF(IMO.EQ.1)then
                   IDY=IDX

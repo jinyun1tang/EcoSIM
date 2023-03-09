@@ -1085,8 +1085,7 @@ module PlantBranchMod
 !     IFLGY,IFLGZ=remobilization flags
 !     FLGZ=control rate of remobilization
 !
-  IF((ISTYP(NZ).NE.iplt_annual.AND.VRNF(NB,NZ) &
-    .GE.FVRN(IWTYP(NZ))*VRNX(NB,NZ)) &
+  IF((ISTYP(NZ).NE.iplt_annual.AND.VRNF(NB,NZ).GE.FVRN(IWTYP(NZ))*VRNX(NB,NZ)) &
     .OR.(ISTYP(NZ).EQ.iplt_annual.AND.IDAY(8,NB,NZ).NE.0))THEN
     IFLGZ=1
     IF(ISTYP(NZ).EQ.iplt_annual.OR.IWTYP(NZ).EQ.0)THEN

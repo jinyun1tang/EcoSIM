@@ -67,15 +67,13 @@ implicit none
   RTVLP(ipltroot,NG(NZ),NZ)=PORT(ipltroot,NZ)*RTVL
   RTVLW(ipltroot,NG(NZ),NZ)=(1.0_r8-PORT(ipltroot,NZ))*RTVL
   RTARP(ipltroot,NG(NZ),NZ)=RTARP(ipltroot,NG(NZ),NZ)+SDAR(NZ)
-  IF(IDTHRN.EQ.NRT(NZ).OR.(WTRVE(ielmc,NZ).LE.ZEROL(NZ)&
-    .AND.ISTYP(NZ).NE.iplt_annual))THEN
+  IF(IDTHRN.EQ.NRT(NZ).OR.(WTRVE(ielmc,NZ).LE.ZEROL(NZ).AND.ISTYP(NZ).NE.iplt_annual))THEN
     IDTHR(NZ)=idead
     IDTHP(NZ)=idead
   ENDIF
 !
 !     ROOT N2 FIXATION (RHIZOBIA)
-!
-  call RootNoduleBiomchemistry(I,J,NZ,TFN6,WFNGR)
+  call RootNoduleBiomchemistry(I,J,NZ,TFN6,WFNGR)  
 
   call NonstructlBiomTransfer(I,J,NZ,PTRT,RLNT,RTSK1,RTSK2,RTNT,IFLGZ)
   end associate
@@ -1050,7 +1048,7 @@ implicit none
 !
             RTLGZ=RTLGZ+RTLG1(N,L,NR,NZ)
             WTRTZ=WTRTZ+WTRT1E(ielmc,N,L,NR,NZ)
-            NINR(NR,NZ)=MIN(NINR(NR,NZ),NJ)
+            NINR(NR,NZ)=MIN(NINR(NR,NZ),NJ)            
             IF(L.EQ.NINR(NR,NZ))NRX(N,NR)=1
           ENDIF
         ENDIF
@@ -1105,8 +1103,7 @@ implicit none
 !     RCCZR,RCCYR=min,max fractions for root C recycling
 !     RCCXR,RCCQR=max fractions for root N,P recycling
 !
-  IF(IDAY(1,NB1(NZ),NZ).NE.0 &
-    .AND.CEPOLR(ielmc,N,L,NZ).GT.ZERO)THEN
+  IF(IDAY(1,NB1(NZ),NZ).NE.0.AND.CEPOLR(ielmc,N,L,NZ).GT.ZERO)THEN
     CCC=AZMAX1(AMIN1(1.0_r8,safe_adb(CEPOLR(ielmn,N,L,NZ),CEPOLR(ielmn,N,L,NZ)+CEPOLR(ielmc,N,L,NZ)*CNKI) &
       ,safe_adb(CEPOLR(ielmp,N,L,NZ),CEPOLR(ielmp,N,L,NZ)+CEPOLR(ielmc,N,L,NZ)*CPKI)))
     CNC=AZMAX1(AMIN1(1.0_r8,safe_adb(CEPOLR(ielmc,N,L,NZ),CEPOLR(ielmc,N,L,NZ)+CEPOLR(ielmn,N,L,NZ)/CNKI)))

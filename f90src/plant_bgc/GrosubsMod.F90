@@ -21,7 +21,6 @@ module grosubsMod
   character(len=*), private, parameter :: mod_filename = __FILE__
 ! DIMENSION VCO2(400,366,05)
 !
-!
 !     RTSK=relative primary root sink strength 0.25=shallow,4.0=deep root profile
 !     FXRN=rate constant for plant-bacteria nonstructl C,N,P exchange (h-1)
 !     FXFB=rate constant for leaf-storage nonstructl C,N,P exchange (h-1)
@@ -108,8 +107,7 @@ module grosubsMod
       call GrowPlant(I,J,NZ,ZCX,CPOOLK)
     ENDIF
 
-!     HARVEST STANDING DEAD
-
+!   HARVEST STANDING DEAD
     call RemoveBiomassByDisturbance(I,J,NZ,CPOOLK)
   ENDDO D9985
 !
@@ -343,7 +341,6 @@ module grosubsMod
     ENDDO
 !
     call RootBGCModel(I,J,NZ,IFLGZ,ICHK1,IDTHRN,NRX,PTRT,TFN6,CNRTW,CPRTW,XRTN1)
-
 !
     call ComputeTotalBiom(NZ,CPOOLK)
   ELSE

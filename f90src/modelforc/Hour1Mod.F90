@@ -252,7 +252,7 @@ module Hour1Mod
         NG(NZ,NY,NX)=MAX(NG(NZ,NY,NX),NU(NY,NX))
         NIX(NZ,NY,NX)=MAX(NIX(NZ,NY,NX),NU(NY,NX))
         DO  NR=1,JC
-          NINR(NR,NZ,NY,NX)=MAX(NINR(NR,NZ,NY,NX),NU(NY,NX))
+          NINR(NR,NZ,NY,NX)=MAX(NINR(NR,NZ,NY,NX),NU(NY,NX))   
         ENDDO
       ENDDO
 !
@@ -486,48 +486,7 @@ module Hour1Mod
   DO  NX=NHW,NHE+extragrid
     DO  NY=NVN,NVS+extragrid
 
-      trcsa_XQR(idsa_Al,1:2,1:2,NY,NX)=0.0_r8
-      trcsa_XQR(idsa_Fe,1:2,1:2,NY,NX)=0.0_r8
-      trcsa_XQR(idsa_Hp,1:2,1:2,NY,NX)=0.0_r8
-      trcsa_XQR(idsa_Ca,1:2,1:2,NY,NX)=0.0_r8
-      trcsa_XQR(idsa_Mg,1:2,1:2,NY,NX)=0.0_r8
-      trcsa_XQR(idsa_Na,1:2,1:2,NY,NX)=0.0_r8
-      trcsa_XQR(idsa_K,1:2,1:2,NY,NX)=0.0_r8
-      trcsa_XQR(idsa_OH,1:2,1:2,NY,NX)=0.0_r8
-      trcsa_XQR(idsa_SO4,1:2,1:2,NY,NX)=0.0_r8
-      trcsa_XQR(idsa_Cl,1:2,1:2,NY,NX)=0.0_r8
-      trcsa_XQR(idsa_CO3,1:2,1:2,NY,NX)=0.0_r8
-      trcsa_XQR(idsa_HCO3,1:2,1:2,NY,NX)=0.0_r8
-      trcsa_XQR(idsa_AlOH,1:2,1:2,NY,NX)=0.0_r8
-      trcsa_XQR(idsa_AlOH2,1:2,1:2,NY,NX)=0.0_r8
-      trcsa_XQR(idsa_AlOH3,1:2,1:2,NY,NX)=0.0_r8
-      trcsa_XQR(idsa_AlOH4,1:2,1:2,NY,NX)=0.0_r8
-      trcsa_XQR(idsa_AlSO4,1:2,1:2,NY,NX)=0.0_r8
-      trcsa_XQR(idsa_FeOH,1:2,1:2,NY,NX)=0.0_r8
-      trcsa_XQR(idsa_FeOH2,1:2,1:2,NY,NX)=0.0_r8
-      trcsa_XQR(idsa_FeOH3,1:2,1:2,NY,NX)=0.0_r8
-      trcsa_XQR(idsa_FeOH4,1:2,1:2,NY,NX)=0.0_r8
-      trcsa_XQR(idsa_FeSO4,1:2,1:2,NY,NX)=0.0_r8
-      trcsa_XQR(idsa_CaOH2,1:2,1:2,NY,NX)=0.0_r8
-      trcsa_XQR(idsa_CaCO3,1:2,1:2,NY,NX)=0.0_r8
-      trcsa_XQR(idsa_CaHCO3,1:2,1:2,NY,NX)=0.0_r8
-      trcsa_XQR(idsa_CaSO4,1:2,1:2,NY,NX)=0.0_r8
-      trcsa_XQR(idsa_MgOH2,1:2,1:2,NY,NX)=0.0_r8
-      trcsa_XQR(idsa_MgCO3,1:2,1:2,NY,NX)=0.0_r8
-      trcsa_XQR(idsa_MgHCO3,1:2,1:2,NY,NX)=0.0_r8
-      trcsa_XQR(idsa_MgSO4,1:2,1:2,NY,NX)=0.0_r8
-      trcsa_XQR(idsa_NaCO3,1:2,1:2,NY,NX)=0.0_r8
-      trcsa_XQR(idsa_NaSO4,1:2,1:2,NY,NX)=0.0_r8
-      trcsa_XQR(idsa_KSO4,1:2,1:2,NY,NX)=0.0_r8
-      trcsa_XQR(idsa_H0PO4,1:2,1:2,NY,NX)=0.0_r8
-      trcsa_XQR(idsa_H3PO4,1:2,1:2,NY,NX)=0.0_r8
-      trcsa_XQR(idsa_FeHPO4,1:2,1:2,NY,NX)=0.0_r8
-      trcsa_XQR(idsa_FeH2PO4,1:2,1:2,NY,NX)=0.0_r8
-      trcsa_XQR(idsa_CaPO4,1:2,1:2,NY,NX)=0.0_r8
-      trcsa_XQR(idsa_CaHPO4,1:2,1:2,NY,NX)=0.0_r8
-      trcsa_XQR(idsa_CaH2PO4,1:2,1:2,NY,NX)=0.0_r8
-      trcsa_XQR(idsa_MgHPO4,1:2,1:2,NY,NX)=0.0_r8
-
+      trcsa_XQR(idsa_beg:idsa_end,1:2,1:2,NY,NX)=0.0_r8
       trcsa_XQS(idsa_beg:idsa_end,1:2,NY,NX)=0.0_r8
 
       DO  L=1,NL(NY,NX)+1
@@ -627,15 +586,14 @@ module Hour1Mod
     VOLA(L,NY,NX)=POROS(L,NY,NX)*VOLY(L,NY,NX)
     VOLAH(L,NY,NX)=FHOL(L,NY,NX)*VOLT(L,NY,NX)
     IF(BKDS(L,NY,NX).GT.ZERO)THEN
-      VOLP(L,NY,NX)=AZMAX1(VOLA(L,NY,NX)-VOLW(L,NY,NX) &
-        -VOLI(L,NY,NX))+AZMAX1(VOLAH(L,NY,NX)-VOLWH(L,NY,NX) &
-        -VOLIH(L,NY,NX))
+      VOLP(L,NY,NX)=AZMAX1(VOLA(L,NY,NX)-VOLW(L,NY,NX)-VOLI(L,NY,NX)) &
+        +AZMAX1(VOLAH(L,NY,NX)-VOLWH(L,NY,NX)-VOLIH(L,NY,NX))
     ELSE
       VOLP(L,NY,NX)=0.0_r8
     ENDIF
     EHUM(L,NY,NX)=0.200_r8+0.333_r8*AMIN1(0.5_r8,CCLAY(L,NY,NX))
-
     EPOC(L,NY,NX)=1.0_r8
+    
     call SoilHydroProperty(L,NY,NX,I,J)
 !
 !     SOIL HEAT CAPACITY AND THERMAL CONDUCTIVITY OF SOLID PHASE
@@ -896,51 +854,51 @@ module Hour1Mod
 !     THETW1,THETWP=water content at PSIS1,minimum SWC for water table
 !     DPTHT=water table depth
 !
-  IF(IDTBL(NY,NX).NE.0)THEN
-    IF(IFLGY.EQ.0)THEN
-      IF(THETPZ(L,NY,NX).LT.THETPW.OR.L.EQ.NL(NY,NX))THEN
-        IFLGY=1
-        IF(DPTH(L,NY,NX).LT.DTBLX(NY,NX))THEN
-          D5705: DO LL=MIN(L+1,NL(NY,NX)),NL(NY,NX)
-            IF(THETPZ(LL,NY,NX).GE.THETPW.AND.LL.NE.NL(NY,NX))THEN
-              IFLGY=0
-              exit
-            ELSEIF(DPTH(LL,NY,NX).GE.DTBLX(NY,NX))THEN
-              exit
-            ENDIF
-          ENDDO D5705
-        ENDIF
-        IF(IFLGY.EQ.1)THEN
-          IF(THETPZ(L,NY,NX).GE.THETPW.AND.L.NE.NL(NY,NX))THEN
-            PSIS1=PSISM(L+1,NY,NX)-0.0098*(DPTH(L+1,NY,NX)-DPTH(L,NY,NX))
-            THETWM=THETWP*POROS(L,NY,NX)
-            THETW1=AMIN1(THETWM,EXP((PSIMS(NY,NX)-LOG(-PSIS1)) &
-              *PSD(L,NY,NX)/PSISD(NY,NX)+PSL(L,NY,NX)))
-            IF(THETWM.GT.THETW1)THEN
-              THETPX=AMIN1(1.0,AZMAX1((THETWM-THETW(L,NY,NX))/(THETWM-THETW1)))
-              DPTHT(NY,NX)=CDPTH(L,NY,NX)-DLYR(3,L,NY,NX)*(1.0-THETPX)
+    IF(IDTBL(NY,NX).NE.0)THEN
+      IF(IFLGY.EQ.0)THEN
+        IF(THETPZ(L,NY,NX).LT.THETPW.OR.L.EQ.NL(NY,NX))THEN
+          IFLGY=1
+          IF(DPTH(L,NY,NX).LT.DTBLX(NY,NX))THEN
+            D5705: DO LL=MIN(L+1,NL(NY,NX)),NL(NY,NX)
+              IF(THETPZ(LL,NY,NX).GE.THETPW.AND.LL.NE.NL(NY,NX))THEN
+                IFLGY=0
+                exit
+              ELSE IF(DPTH(LL,NY,NX).GE.DTBLX(NY,NX))THEN
+                exit
+              ENDIF
+            END DO D5705
+          ENDIF
+          IF(IFLGY.EQ.1)THEN
+            IF(THETPZ(L,NY,NX).GE.THETPW.AND.L.NE.NL(NY,NX))THEN
+              PSIS1=PSISM(L+1,NY,NX)-0.0098*(DPTH(L+1,NY,NX)-DPTH(L,NY,NX))
+              THETWM=THETWP*POROS(L,NY,NX)
+              THETW1=AMIN1(THETWM,EXP((PSIMS(NY,NX)-LOG(-PSIS1)) &
+                *PSD(L,NY,NX)/PSISD(NY,NX)+PSL(L,NY,NX)))
+              IF(THETWM.GT.THETW1)THEN
+                THETPX=AMIN1(1.0,AZMAX1((THETWM-THETW(L,NY,NX))/(THETWM-THETW1)))
+                DPTHT(NY,NX)=CDPTH(L,NY,NX)-DLYR(3,L,NY,NX)*(1.0-THETPX)
+              ELSE
+                DPTHT(NY,NX)=CDPTH(L,NY,NX)-DLYR(3,L,NY,NX)
+              ENDIF
+            ELSE IF(L.GT.NU(NY,NX))THEN
+              PSIS1=PSISM(L,NY,NX)-0.0098_r8*(DPTH(L,NY,NX)-DPTH(L-1,NY,NX))
+              THETWM=THETWP*POROS(L-1,NY,NX)
+              THETW1=AMIN1(THETWM,EXP((PSIMS(NY,NX)-LOG(-PSIS1)) &
+                *PSD(L-1,NY,NX)/PSISD(NY,NX)+PSL(L-1,NY,NX)))
+              IF(THETWM.GT.THETW1)THEN
+                THETPX=AMIN1(1.0,AZMAX1((THETWM-THETW(L-1,NY,NX))/(THETWM-THETW1)))
+                DPTHT(NY,NX)=CDPTH(L-1,NY,NX)-DLYR(3,L-1,NY,NX)*(1.0-THETPX)
+              ELSE
+                DPTHT(NY,NX)=CDPTH(L-1,NY,NX)-DLYR(3,L-1,NY,NX)
+              ENDIF
             ELSE
               DPTHT(NY,NX)=CDPTH(L,NY,NX)-DLYR(3,L,NY,NX)
             ENDIF
-          ELSEIF(L.GT.NU(NY,NX))THEN
-            PSIS1=PSISM(L,NY,NX)-0.0098_r8*(DPTH(L,NY,NX)-DPTH(L-1,NY,NX))
-            THETWM=THETWP*POROS(L-1,NY,NX)
-            THETW1=AMIN1(THETWM,EXP((PSIMS(NY,NX)-LOG(-PSIS1)) &
-              *PSD(L-1,NY,NX)/PSISD(NY,NX)+PSL(L-1,NY,NX)))
-            IF(THETWM.GT.THETW1)THEN
-              THETPX=AMIN1(1.0,AZMAX1((THETWM-THETW(L-1,NY,NX))/(THETWM-THETW1)))
-              DPTHT(NY,NX)=CDPTH(L-1,NY,NX)-DLYR(3,L-1,NY,NX)*(1.0-THETPX)
-            ELSE
-              DPTHT(NY,NX)=CDPTH(L-1,NY,NX)-DLYR(3,L-1,NY,NX)
-            ENDIF
-          ELSE
-            DPTHT(NY,NX)=CDPTH(L,NY,NX)-DLYR(3,L,NY,NX)
           ENDIF
         ENDIF
       ENDIF
     ENDIF
-  ENDIF
-  ENDDO
+  END DO
   end subroutine GetOutput4WaterTableDepth
 !------------------------------------------------------------------------------------------
 

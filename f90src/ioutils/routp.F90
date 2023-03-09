@@ -395,10 +395,10 @@
 9885  CONTINUE
 9890  CONTINUE
     !for pft 1 to 5, for each grid, only 5 pfts are allowed at maximum
-    CALL STARTQ(NHW,NHE,NVN,NVS,1,5)
+    CALL STARTQ(NHW,NHE,NVN,NVS,1,JP)
     GO TO 1000
   ELSE
-    CALL STARTQ(NHW,NHE,NVN,NVS,1,5)
+    CALL STARTQ(NHW,NHE,NVN,NVS,1,JP)
     GO TO 1000
   ENDIF
 90    FORMAT(30I4)

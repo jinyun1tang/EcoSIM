@@ -49,6 +49,7 @@
 
   visual_out=.false.
   restart_out=.false.
+  cold_run=.true.
   hist_config='NO'
   sim_yyyymmdd='18000101'
   forc_periods=(/1980,1980,1,1981,1988,2,1989,2008,1/)

@@ -61,9 +61,8 @@ implicit none
   plt_site%TBALE(:)=TBALE(:)
   DO NX=NHW,NHE
     DO NY=NVN,NVS
-
-    call  PlantAPISend(I,J,NY,NX)
-
+!
+      call  PlantAPISend(I,J,NY,NX)
 !   UPDATE PLANT PHENOLOGY IN 'HFUNC'
 !
     !if(lverb)WRITE(*,333)'HFUNC'
@@ -597,9 +596,9 @@ implicit none
       ENDDO
     ENDDO
 
-    DO NR=1,NRT(NZ,NY,NX)
+    DO NR=1,JC
       NINR(NR,NZ,NY,NX)=plt_morph%NINR(NR,NZ)
-      DO N=1,2
+      DO N=1,jroots
         RTWT1E(N,NR,1:npelms,NZ,NY,NX) =plt_biom%RTWT1E(N,NR,1:npelms,NZ)
         RTDP1(N,NR,NZ,NY,NX) =plt_morph%RTDP1(N,NR,NZ)
       ENDDO
@@ -1445,8 +1444,7 @@ implicit none
       plt_morph%RRADP(N,NZ) =RRADP(N,NZ,NY,NX)
       plt_morph%RTLG2X(N,NZ)=RTLG2X(N,NZ,NY,NX)
     ENDDO
-
-    DO NR=1,NRT(NZ,NY,NX)
+    DO NR=1,JC
       plt_morph%NINR(NR,NZ)=NINR(NR,NZ,NY,NX)
       DO L=1,NJ(NY,NX)
         DO N=1,MY(NZ,NY,NX)
