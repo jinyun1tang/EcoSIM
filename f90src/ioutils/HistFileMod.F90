@@ -3,6 +3,8 @@ module HistFileMod
   use data_kind_mod, only : r8 => SHR_KIND_R8
   use ncdio_pio
   use fileUtil, only : iulog
+  use abortutils, only : endrun
+  use TestMod, only : errMsg
 implicit none
   save
   private
@@ -12,7 +14,21 @@ implicit none
   integer , public, parameter :: max_tapes = 6          ! max number of history tapes
   integer , public, parameter :: max_flds = 2500        ! max number of history fields
   integer , public, parameter :: max_namlen = 64        ! maximum number of characters for field name
-  integer , private, parameter :: hist_dim_name_length = 16 ! lenngth of character strings in dimension names
+  integer , parameter :: hist_dim_name_length = 16 ! lenngth of character strings in dimension names
+
+  ! Pointers into datatype  arrays
+  integer, parameter :: max_mapflds = 2500     ! Maximum number of fields to track
+
+  type ecosimpoint_rs                             ! Pointer to real scalar data (1D)
+     real(r8), pointer :: ptr(:) => null()
+  end type ecosimpoint_rs
+
+  type ecosimpoint_ra                             ! Pointer to real array data (2D)
+     real(r8), pointer :: ptr(:,:) => null()
+  end type ecosimpoint_ra
+
+  type (ecosimpoint_rs), public :: elmptr_rs(max_mapflds) ! Real scalar data (1D)
+  type (ecosimpoint_ra), public :: elmptr_ra(max_mapflds) ! Real array data (2D)
 
   type field_info
      character(len=max_namlen) :: name         ! field name
@@ -40,7 +56,6 @@ implicit none
      integer :: no_snow_behavior               ! for multi-layer snow fields, flag saying how to treat times when a given snow layer is absent
   end type field_info
 
-
   type history_entry
      type (field_info) :: field                ! field information
      character(len=1)  :: avgflag              ! time averaging flag
@@ -60,7 +75,6 @@ implicit none
      type (history_entry) :: hlist(max_flds)   ! array of active history tape entries
   end type history_tape
 
-
   character(len=max_chars) :: locfnh(max_tapes)  ! local history file names
   ! Master list: an array of master_entry entities
   !
@@ -71,7 +85,6 @@ implicit none
   end type master_entry
 
   type (master_entry) :: masterlist(max_flds)  ! master field list
-
 
   character(len=16), parameter :: namec  = 'column'       ! name of columns
   character(len=16), parameter :: namep  = 'pft'          ! name of patches
@@ -87,19 +100,17 @@ implicit none
   type(file_desc_t) :: nfid(max_tapes)       ! file ids
   type(file_desc_t) :: ncid_hist(max_tapes)  ! file ids for history restart files
 
-
   public :: hist_addfld1d        ! Add a 1d single-level field to the master field list
   public :: hist_addfld2d        ! Add a 2d multi-level field to the master field list
-  public :: hist_addfld3d        ! Add a 2d multi-level field to the master field list
+!  public :: hist_addfld3d        ! Add a 2d multi-level field to the master field list
   public :: hist_printflds       ! Print summary of master field list
-  public :: hist_htapes_build    ! Initialize history file handler for initial or continue run
-  public :: hist_update_hbuf     ! Updates history buffer for all fields and tapes
-  public :: hist_htapes_wrapup   ! Write history tape(s)
-  public :: hist_restart_ncd     ! Read/write history file restart data
-  public :: htapes_fieldlist     ! Define the contents of each history file based on namelist
+!  public :: hist_htapes_build    ! Initialize history file handler for initial or continue run
+!  public :: hist_update_hbuf     ! Updates history buffer for all fields and tapes
+!  public :: hist_htapes_wrapup   ! Write history tape(s)
+!  public :: hist_restart_ncd     ! Read/write history file restart data
+!  public :: htapes_fieldlist     ! Define the contents of each history file based on namelist
 
   contains
-
 
   subroutine htape_create(t,histrest)
 
@@ -187,15 +198,12 @@ implicit none
 
   else
     ncid_hist(t) = lnfid
-
     write(iulog,*) trim(subname), &
                       ' : Successfully defined netcdf restart history file ',t
     flush(iulog)
   end if
 
   end subroutine htape_create
-
-
 
 !-----------------------------------------------------------------------
 !BOP
@@ -247,7 +255,6 @@ implicit none
   np=bounds%npfts
   end subroutine get_grid_info
 
-
   !-----------------------------------------------------------------------
   subroutine hist_printflds()
     !
@@ -259,7 +266,7 @@ implicit none
     ! !LOCAL VARIABLES:
   implicit none
   integer :: nf
-  character(len=*),parameter :: subname = 'ELM_hist_printflds'
+  character(len=*),parameter :: subname = 'ecosim_hist_printflds'
     !-----------------------------------------------------------------------
 
 !    if (masterproc) then
@@ -271,6 +278,183 @@ implicit none
      end do
      flush(iulog)
 !    end if
-
   end subroutine hist_printflds
+!-----------------------------------------------------------------------
+
+  subroutine hist_addfld1d(fname,units,ptr_gcell,ptr_topo,ptr_col,ptr_patch, default)
+  ! Add a 1d single-level field to the master field list
+  implicit none
+  character(len=*), intent(in)           :: fname          ! field name
+  character(len=*), intent(in)           :: units          ! units of field
+  real(r8)        , optional, pointer    :: ptr_gcell(:)   ! pointer to gridcell array
+  real(r8)        , optional, pointer    :: ptr_topo(:)    ! pointer to topounit array
+  real(r8)        , optional, pointer    :: ptr_col(:)     ! pointer to column array
+  real(r8)        , optional, pointer    :: ptr_patch(:)   ! pointer to pft array  
+  character(len=*), optional, intent(in) :: default        ! if set to 'inactive, field will not appear on primary tape
+
+  integer :: hpindex                 ! history buffer pointer index
+  character(len=16):: l_default      ! local version of 'default'
+
+  hpindex = pointer_index()
+
+  call masterlist_addfld (fname=trim(fname),units=units, hpindex= hpindex)
+
+  l_default = 'active'
+  if (present(default)) then
+    l_default = default
+  end if
+
+  if (trim(l_default) == 'inactive') then
+    return
+  else
+    call masterlist_make_active (name=trim(fname), tape_index=1)
+  end if
+
+  end subroutine hist_addfld1d
+
+!-----------------------------------------------------------------------
+
+  subroutine masterlist_addfld (fname, units, hpindex)
+  implicit none
+  character(len=*), intent(in)  :: fname          ! field name
+  character(len=*), intent(in)  :: units          ! units of field
+  integer         , intent(in)  :: hpindex          ! data type index for history buffer output
+
+  character(len=*), parameter :: subname='masterlist_addfld'
+  integer :: n,f
+
+  if (fname == ' ') then
+    write(iulog,*) trim(subname),' ERROR: blank field name not allowed'
+    call endrun(msg=errMsg(__FILE__, __LINE__))
+  end if
+
+  do n = 1,nfmaster
+    if (masterlist(n)%field%name == fname) then
+      write(iulog,*) trim(subname),' ERROR:', fname, ' already on list'
+      call endrun(msg=errMsg(__FILE__, __LINE__))
+    end if
+  end do
+
+  ! Increase number of fields on master field list
+  nfmaster = nfmaster + 1
+  f = nfmaster
+
+    ! Check number of fields in master list against maximum number for master list
+
+  if (nfmaster > max_flds) then
+    write(iulog,*) trim(subname),' ERROR: too many fields for primary history file ', &
+          '-- max_flds,nfmaster=', max_flds, nfmaster
+    call endrun(msg=errMsg(__FILE__, __LINE__))
+  end if
+
+  masterlist(f)%field%name           = fname
+  masterlist(f)%field%units          = units
+  masterlist(f)%field%hpindex        = hpindex
+
+  end subroutine masterlist_addfld
+  !-----------------------------------------------------------------------
+  integer function pointer_index ()
+    !
+    ! !DESCRIPTION:
+    ! Set the current pointer index and increment the value of the index.
+    !
+    ! !ARGUMENTS:
+    !
+    integer, save :: lastindex = 1
+    character(len=*),parameter :: subname = 'pointer_index'
+    !-----------------------------------------------------------------------
+
+    pointer_index = lastindex
+    lastindex = lastindex + 1
+    if (lastindex > max_mapflds) then
+       write(iulog,*) trim(subname),' ERROR: ',&
+            ' lastindex = ',lastindex,' greater than max_mapflds= ',max_mapflds
+       call endrun(msg=errMsg(__FILE__, __LINE__))
+    endif
+
+  end function pointer_index
+!-----------------------------------------------------------------------
+
+  subroutine hist_addfld2d(fname,units, default)        
+  ! Add a 1d single-level field to the master field list
+  implicit none
+  character(len=*), intent(in)           :: fname          ! field name
+  character(len=*), intent(in)           :: units          ! units of field
+  character(len=*), optional, intent(in) :: default        ! if set to 'inactive, field will not appear on primary tape
+
+  integer :: hpindex                 ! history buffer pointer index
+  character(len=16):: l_default      ! local version of 'default'
+
+  hpindex = pointer_index()
+
+  call masterlist_addfld (fname=trim(fname),units=units, hpindex= hpindex)
+
+  l_default = 'active'
+  if (present(default)) then
+    l_default = default
+  end if
+
+  if (trim(l_default) == 'inactive') then
+    return
+  else
+    call masterlist_make_active (name=trim(fname), tape_index=1)
+  end if  
+  end subroutine hist_addfld2d
+
+  !-----------------------------------------------------------------------
+  subroutine masterlist_make_active (name, tape_index, avgflag)
+    !
+    ! !DESCRIPTION:
+    ! Add a field to the default ``on'' list for a given history file.
+    ! Also change the default time averaging flag if requested.
+    !
+    ! !ARGUMENTS:
+    character(len=*), intent(in) :: name          ! field name
+    integer, intent(in) :: tape_index             ! history tape index
+    character(len=1), intent(in), optional :: avgflag  ! time averaging flag
+    !
+    ! !LOCAL VARIABLES:
+    integer :: f            ! field index
+    logical :: found        ! flag indicates field found in masterlist
+    character(len=*),parameter :: subname = 'masterlist_make_active'
+
+    ! Check validity of input arguments
+
+    if (tape_index > max_tapes) then
+       write(iulog,*) trim(subname),' ERROR: tape index=', tape_index, ' is too big'
+       call endrun(msg=errMsg(__FILE__, __LINE__))
+    end if
+
+    if (present(avgflag)) then
+       if ( avgflag /= ' ' .and. &   !is not defined
+            avgflag /= 'A' .and. &   !is not temporal average
+            avgflag /= 'I' .and. &   !is not instantaneous
+            avgflag /= 'X' .and. &   !is not the maximum over the time period
+            avgflag /= 'M') then     !is not the minimum over the time period
+          write(iulog,*) trim(subname),' ERROR: unknown averaging flag=', avgflag
+          call endrun(msg=errMsg(__FILE__, __LINE__))
+       endif
+    end if
+
+    ! Look through master list for input field name.
+    ! When found, set active flag for that tape to true.
+    ! Also reset averaging flag if told to use other than default.
+
+    found = .false.
+    do f = 1,nfmaster
+       if (trim(name) == trim(masterlist(f)%field%name)) then
+          masterlist(f)%actflag(tape_index) = .true.
+          if (present(avgflag)) then
+             if (avgflag/= ' ') masterlist(f)%avgflag(tape_index) = avgflag
+          end if
+          found = .true.
+          exit
+       end if
+    end do
+    if (.not. found) then
+       write(iulog,*) trim(subname),' ERROR: field=', name, ' not found'
+       call endrun(msg=errMsg(__FILE__, __LINE__))
+    end if
+
+  end subroutine masterlist_make_active    
 end module HistFileMod

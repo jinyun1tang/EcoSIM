@@ -4,6 +4,7 @@ set(TOOLS_SOURCES
   ClimReader.F90
   etimerTest.F90
   NamelistTest.F90
+  HFileTest.F90
 )
 
 include_directories(${ECOSIM_INCLUDE_DIRS})
@@ -26,6 +27,7 @@ add_ecosim_executable(ManagementReader.x ManagementReader.F90)
 add_ecosim_executable(ClimReader.x ClimReader.F90)
 add_ecosim_executable(etimerTest.x etimerTest.F90)
 add_ecosim_executable(NamelistTest.x NamelistTest.F90)
+add_ecosim_executable(HFileTest.x HFileTest.F90)
 
 if (NOT CMAKE_INSTALL_PREFIX STREQUAL "INSTALL_DISABLED")
   install(TARGETS ClimTransformer.x DESTINATION bin)
@@ -33,6 +35,7 @@ if (NOT CMAKE_INSTALL_PREFIX STREQUAL "INSTALL_DISABLED")
   install(TARGETS ClimReader.x DESTINATION bin)
   install(TARGETS etimerTest.x DESTINATION bin)
   install(TARGETS NamelistTest.x DESTINATION bin)
+  install(TARGETS HFileTest.x DESTINATION bin)
   file(GLOB HEADERS *.mod)
   install(FILES ${HEADERS} DESTINATION include/ecosim/drivers/tools)
 endif()

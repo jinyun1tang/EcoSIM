@@ -1,10 +1,10 @@
 set(IOUTILS_SOURCES
 	Hist1Mod.F90
-  ReadManagementMod.F90
-  ForcWriterMod.F90
+    ReadManagementMod.F90
+    ForcWriterMod.F90
 	ClimReadMod.F90
-  PlantInfoMod.F90
-  RestartMod.F90
+    PlantInfoMod.F90
+    RestartMod.F90
 	readimod.F90
 	readqmod.F90
 	readsmod.F90
@@ -15,9 +15,9 @@ set(IOUTILS_SOURCES
 	splitc.F90
 	splitp.c
 	splits.c
-#  HistFileMod.F90
-  bhistMod.F90
-	)
+    HistFileMod.F90
+    bhistMod.F90
+)
 include_directories(${CMAKE_BINARY_DIR}/f90src/utils/)
 include_directories(${CMAKE_BINARY_DIR}/f90src/minimath/)
 include_directories(${CMAKE_BINARY_DIR}/f90src/modelconfig/)

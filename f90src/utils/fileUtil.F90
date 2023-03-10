@@ -14,9 +14,9 @@ module fileUtil
   integer, parameter :: iulog=6
   integer, parameter :: error_errmsg_len=256
   integer, parameter :: ecosim_string_length_long=256
-  integer , public, parameter :: var_flux_type =1
-  integer , public, parameter :: var_state_type=2
-  integer , public, parameter :: ecosim_namelist_buffer_size = 4096
+  integer, public, parameter :: var_flux_type =1
+  integer, public, parameter :: var_state_type=2
+  integer, public, parameter :: ecosim_namelist_buffer_size = 4096
   logical, save :: continue_run = .false.
   contains
 !------------------------------------------------------------------------------------------

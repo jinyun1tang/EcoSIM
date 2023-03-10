@@ -54,6 +54,7 @@ implicit none
 
   type(ecosys_regression_type), public :: regression
   public :: create_error_status_type
+  public :: errMsg
 contains
 
     subroutine Init(this, namelist_file, case_name)
@@ -318,8 +319,7 @@ contains
   print_err = this%error
   end function print_err
 
-
-
+!-------------------------------------------------------------------------------
 
   function errMsg(file, line)
 
