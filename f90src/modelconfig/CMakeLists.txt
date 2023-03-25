@@ -1,10 +1,9 @@
 set(ECOSIM_CONFG_SOURCES
   EcoSIMSolverPar.F90
-  EcoSIMConfig.F90
   EcoSIMCtrlMod.F90
+  EcoSIMConfig.F90
   ElmIDMod.F90
   TracerIDMod.F90
-  GridConsts.F90
 )
 
 include_directories(${CMAKE_BINARY_DIR}/f90src/utils/)

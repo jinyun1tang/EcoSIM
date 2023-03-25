@@ -14,7 +14,7 @@ module RunoffBalMod
   USE EcoSIMCtrlDataType
   USE GridDataType
   use EcoSIMConfig, only : jcplx => jcplxc
-  use EcosimConst, only : patomw
+  use EcosimConst, only : patomw,natomw
 implicit none
   private
   character(len=*), parameter :: mod_filename = __FILE__
@@ -207,7 +207,7 @@ implicit none
 !     TPOU,TIONOU=total P,salt loss through lateral and lower boundaries
 !
       IF(salt_model)THEN
-        PSS=XN*31.0*(trcsa_XQR(idsa_H0PO4,N,NN,N5,N4) &
+        PSS=XN*patomw*(trcsa_XQR(idsa_H0PO4,N,NN,N5,N4) &
           +trcsa_XQR(idsa_CaPO4,N,NN,N5,N4)+trcsa_XQR(idsa_FeHPO4,N,NN,N5,N4) &
           +trcsa_XQR(idsa_CaHPO4,N,NN,N5,N4) &
           +trcsa_XQR(idsa_MgHPO4,N,NN,N5,N4)+trcsa_XQR(idsa_H3PO4,N,NN,N5,N4) &
@@ -236,7 +236,7 @@ implicit none
         SS4=XN*4.0*(trcsa_XQR(idsa_AlOH3,N,NN,N5,N4)+trcsa_XQR(idsa_FeOH3,N,NN,N5,N4) &
           +trcsa_XQR(idsa_H3PO4,N,NN,N5,N4)+trcsa_XQR(idsa_FeH2PO4,N,NN,N5,N4)+trcsa_XQR(idsa_CaH2PO4,N,NN,N5,N4)) &
           +XN*5.0*(trcsa_XQR(idsa_AlOH4,N,NN,N5,N4)+trcsa_XQR(idsa_FeOH4,N,NN,N5,N4))
-        PSS=PSS+XN*31.0*trcsa_XQS(idsa_H0PO4,N,N5,N4)
+        PSS=PSS+XN*patomw*trcsa_XQS(idsa_H0PO4,N,N5,N4)
         TPOU=TPOU-PSS
         SSR=SS1+SS2+SS3+SS4
         TIONOU=TIONOU-SSR
@@ -264,7 +264,7 @@ implicit none
           ECHC=0.044*AZMAX1(trcsa_XQR(idsa_HCO3,N,NN,N5,N4)/WX)
           ECSO=0.080*AZMAX1(trcsa_XQR(idsa_SO4,N,NN,N5,N4)*2.0/WX)
           ECCL=0.076*AZMAX1(trcsa_XQR(idsa_Cl,N,NN,N5,N4)/WX)
-          ECNO=0.071*AZMAX1(trcn_XRS(ids_NO3,N,NN,N5,N4)/(WX*14.0))
+          ECNO=0.071*AZMAX1(trcn_XRS(ids_NO3,N,NN,N5,N4)/(WX*natomw))
           ECNDQ=ECHY+ECOH+ECAL+ECFE+ECCA+ECMG+ECNA+ECKA &
             +ECCO+ECHC+ECSO+ECCL+ECNO
 !     WRITE(*,9991)'ECNDQ',IYRC,I,J,N4,N5,N,NN,WX,ECNDQ
@@ -302,17 +302,17 @@ implicit none
 !         MICROBIAL C IN RUNOFF SEDIMENT
 !
           CXE=0.0_r8
-          ZXE=XN*14.0*(trcx_XER(idx_NH4,N,NN,N5,N4)+trcx_XER(idx_NH4B,N,NN,N5,N4))
-          ZPE=XN*14.0*(XNH4ER(N,NN,N5,N4)+XNH3ER(N,NN,N5,N4) &
+          ZXE=XN*natomw*(trcx_XER(idx_NH4,N,NN,N5,N4)+trcx_XER(idx_NH4B,N,NN,N5,N4))
+          ZPE=XN*natomw*(XNH4ER(N,NN,N5,N4)+XNH3ER(N,NN,N5,N4) &
             +XNHUER(N,NN,N5,N4)+XNO3ER(N,NN,N5,N4)+XNH4EB(N,NN,N5,N4) &
             +XNH3EB(N,NN,N5,N4)+XNHUEB(N,NN,N5,N4)+XNO3EB(N,NN,N5,N4))
-          PXE=XN*31.0*(trcx_XER(idx_HPO4,N,NN,N5,N4)+trcx_XER(idx_H2PO4,N,NN,N5,N4) &
+          PXE=XN*patomw*(trcx_XER(idx_HPO4,N,NN,N5,N4)+trcx_XER(idx_H2PO4,N,NN,N5,N4) &
             +trcx_XER(idx_HPO4B,N,NN,N5,N4)+trcx_XER(idx_H2PO4B,N,NN,N5,N4))
-          PPE=XN*(31.0*(trcp_ER(idsp_AlPO4,N,NN,N5,N4)+trcp_ER(idsp_FePO4,N,NN,N5,N4) &
+          PPE=XN*patomw*(1._r8*(trcp_ER(idsp_AlPO4,N,NN,N5,N4)+trcp_ER(idsp_FePO4,N,NN,N5,N4) &
             +trcp_ER(idsp_CaHPO4,N,NN,N5,N4)+trcp_ER(idsp_AlPO4B,N,NN,N5,N4) &
             +trcp_ER(idsp_FePO4B,N,NN,N5,N4)+trcp_ER(idsp_CaHPO4B,N,NN,N5,N4)) &
-            +62.0*(trcp_ER(idsp_CaH2PO4,N,NN,N5,N4)+trcp_ER(idsp_CaH2PO4B,N,NN,N5,N4)) &
-            +93.0*(trcp_ER(idsp_HA,N,NN,N5,N4)+trcp_ER(idsp_HAB,N,NN,N5,N4)))
+            +2.0_r8*(trcp_ER(idsp_CaH2PO4,N,NN,N5,N4)+trcp_ER(idsp_CaH2PO4B,N,NN,N5,N4)) &
+            +3.0_r8*(trcp_ER(idsp_HA,N,NN,N5,N4)+trcp_ER(idsp_HAB,N,NN,N5,N4)))
           COE=0.0_r8
           ZOE=0.0_r8
           POE=0.0_r8
@@ -663,7 +663,7 @@ implicit none
           ECHC=0.044*AZMAX1((trcsa_XFLS(idsa_HCO3,N,N6,N5,N4)+trcsa_XFHS(idsa_HCO3,N,N6,N5,N4))/WX)
           ECSO=0.080*AZMAX1((trcsa_XFLS(idsa_SO4,N,N6,N5,N4)+trcsa_XFHS(idsa_SO4,N,N6,N5,N4))*2.0/WX)
           ECCL=0.076*AZMAX1((trcsa_XFLS(idsa_Cl,N,N6,N5,N4)+trcsa_XFHS(idsa_Cl,N,N6,N5,N4))/WX)
-          ECNO=0.071*AZMAX1((trcs_XFLS(ids_NO3,N,N6,N5,N4)+trcs_XFHS(ids_NO3,N,N6,N5,N4))/(WX*14.0))
+          ECNO=0.071*AZMAX1((trcs_XFLS(ids_NO3,N,N6,N5,N4)+trcs_XFHS(ids_NO3,N,N6,N5,N4))/(WX*natomw))
           ECNDX=ECHY+ECOH+ECAL+ECFE+ECCA+ECMG+ECNA+ECKA+ECCO+ECHC+ECSO+ECCL+ECNO
 !     IF((I/10)*10.EQ.I.AND.J.EQ.15)THEN
 !     WRITE(*,9992)'ECNDX',IYRC,I,J,N4,N5,N6,N,WX,ECNDX

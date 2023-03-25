@@ -9,12 +9,12 @@ PROGRAM main
   use TestMod           , only : regression
   use InitEcoSIM        , only : InitModules
   use EcoSIMDesctruct   , only : DestructEcoSIM
-  use EcoSIMAPI         , only : SetMesh
+  use GridMod           , only : SetMesh
   use EcoSIMCtrlMod  
   use EcoSIMCtrlDataType
   use readiMod          , only : readi
   USE fileUtil          , ONLY : iulog
-  use EcoSIMConfig      , only : case_name
+  use EcoSIMConfig      , only : case_name,set_sim_type,nsrContinue
   use EcoSIMHistMod
   use EcosimConst
   use StartsMod         , only : set_ecosim_solver
@@ -73,7 +73,6 @@ PROGRAM main
 
 ! NUMBER OF COLUMNS AND ROWS for the whole land scape
 !
-
   call SetMesh(NHW,NVN,NHE,NVS)
 
   call  InitModules(nmicbguilds)
@@ -82,6 +81,8 @@ PROGRAM main
   CALL readi(NE,NEX,NHW,NHE,NVN,NVS)
 
   NE=1;NEX=1
+
+  call set_sim_type()
 
   if(continue_run)then
     print*,'read restart/checkpoint info file: ecosim_rst'
@@ -117,7 +118,7 @@ PROGRAM main
       do nyr1=forc_periods(nn3+1),forc_periods(nn3+2)
         
         frectyp%yearclm=nyr1
-        frectyp%yearcur=etimer%get_cur_yearAD()
+        frectyp%yearcur=etimer%get_curr_yearAD()
         if(frectyp%yearcur==yeari)then
           call soil(NE,NEX,NHW,NHE,NVN,NVS)
         endif

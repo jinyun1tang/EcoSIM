@@ -7,6 +7,11 @@ implicit none
   integer, parameter :: ielmn=2    !nitrogen element
   integer, parameter :: ielmp=3    !phosphorus element
   integer, parameter :: npelms=3   !totally three elements
+! soil properties
+  integer, parameter :: isoi_fc=1
+  integer, parameter :: isoi_wp=2
+  integer, parameter :: isoi_scnv=3
+  integer, parameter :: isoi_scnh=4  
 ! plant harvest
   integer, parameter :: ipld_leaf=1 !leaf
   integer, parameter :: ipld_nofoliar=2 !leaf

@@ -1321,6 +1321,7 @@ module PlantDisturbsMod
 !
     IF(IHVST(NZ).NE.4.AND.IHVST(NZ).NE.6)THEN
       IF(JHVST(NZ).NE.ihv_tmareseed)THEN
+        !terminate and reseed
         PPX(NZ)=PPX(NZ)*(1._r8-THIN(NZ))
         PP(NZ)=PP(NZ)*(1._r8-THIN(NZ))
       ELSE

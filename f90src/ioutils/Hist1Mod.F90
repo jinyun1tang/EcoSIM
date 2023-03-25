@@ -25,6 +25,7 @@ module Hist1Mod
   use SoilBGCDataType
   use AqueChemDatatype
   use SurfSoilDataType
+  use MiniMathMod, only : AZMAX1
   implicit none
 
   private
@@ -189,7 +190,6 @@ module Hist1Mod
             IF(L.EQ.83)HEAD(M)='UP_NO3_13'
             IF(L.EQ.84)HEAD(M)='UP_NO3_14'
             IF(L.EQ.85)HEAD(M)='UP_NO3_15'
-!            print*,M,HEAD(M)
           ENDIF
         ENDDO
         NOUTP(N-20)=M
@@ -216,7 +216,6 @@ module Hist1Mod
             IF(L.EQ.65)HEAD(M)='UP_PO4_13'
             IF(L.EQ.66)HEAD(M)='UP_PO4_14'
             IF(L.EQ.67)HEAD(M)='UP_PO4_15'
-!            print*,M,HEAD(M)
           ENDIF
         ENDDO
         NOUTP(N-20)=M
@@ -232,7 +231,6 @@ module Hist1Mod
             IF(L.EQ.54)HEAD(M)='CAN_G'
             IF(L.EQ.55)HEAD(M)='CAN_TEMP'
             IF(L.EQ.56)HEAD(M)='TEMP_FN'
-!            print*,M,HEAD(M)
           ENDIF
         ENDDO
         NOUTP(N-20)=M
@@ -297,7 +295,6 @@ module Hist1Mod
             IF(L.EQ.51)HEAD(M)='TRANSPN'
             IF(L.EQ.52)HEAD(M)='WTR_STRESS'
             IF(L.EQ.53)HEAD(M)='OXY_STRESS'
-!            print*,M,HEAD(M)
           ENDIF
         ENDDO
         NOUTP(N-20)=M
@@ -378,7 +375,6 @@ module Hist1Mod
             IF(L.EQ.57)HEAD(M)='MIN_LWP'
             IF(L.EQ.58)HEAD(M)='O2_STRESS'
             IF(L.EQ.59)HEAD(M)='TEMP_STRESS'
-!            print*,M,HEAD(M)
           ENDIF
         ENDDO
         NOUTP(N-20)=M
@@ -536,7 +532,7 @@ module Hist1Mod
             IF(L.EQ.48)HEAD(M)='O2_14'
             IF(L.EQ.49)HEAD(M)='O2_15'
             IF(L.EQ.50)HEAD(M)='O2_LIT'
-!            print*,M,HEAD(M)
+
           ENDIF
         ENDDO
         NOUTS(N-20)=M
@@ -596,7 +592,6 @@ module Hist1Mod
             IF(L.EQ.48)HEAD(M)='SURF_ICE'
             IF(L.EQ.49)HEAD(M)='ACTV_LYR'
             IF(L.EQ.50)HEAD(M)='WTR_TBL'
-!            print*,M,HEAD(M)
           ENDIF
         ENDDO
         NOUTS(N-20)=M
@@ -643,7 +638,6 @@ module Hist1Mod
             IF(L.EQ.35)HEAD(M)='NH3_15'
             IF(L.EQ.36)HEAD(M)='N2O_LIT'
             IF(L.EQ.37)HEAD(M)='NH3_LIT'
-!            print*,M,HEAD(M)
           ENDIF
         ENDDO
         NOUTS(N-20)=M
@@ -655,7 +649,6 @@ module Hist1Mod
             M=M+1
             IF(L.EQ.1)HEAD(M)='SURF_P_FLUX'
             IF(L.EQ.2)HEAD(M)='SUBS_P_FLUX'
-!            print*,M,HEAD(M)
           ENDIF
         ENDDO
         NOUTS(N-20)=M
@@ -700,7 +693,6 @@ module Hist1Mod
             IF(L.EQ.33)HEAD(M)='TEMP_20'
             IF(L.EQ.34)HEAD(M)='TEMP_LITTER'
             IF(L.EQ.35)HEAD(M)='TEMP_SNOW'
-!            print*,M,HEAD(M)
           ENDIF
         ENDDO
         NOUTS(N-20)=M
@@ -812,7 +804,6 @@ module Hist1Mod
             IF(L.EQ.48)HEAD(M)='SURF_ELEV'
             IF(L.EQ.49)HEAD(M)='ACTV_LYR'
             IF(L.EQ.50)HEAD(M)='WTR_TBL'
-!            print*,M,HEAD(M)
           ENDIF
         ENDDO
         NOUTS(N-20)=M
@@ -872,7 +863,6 @@ module Hist1Mod
             IF(L.EQ.48)HEAD(M)='NET_N_MIN'
             IF(L.EQ.49)HEAD(M)='FIRE_N'
             IF(L.EQ.50)HEAD(M)='N2_FLUX'
-!            print*,M,HEAD(M)
           ENDIF
         ENDDO
         NOUTS(N-20)=M
@@ -928,7 +918,7 @@ module Hist1Mod
             IF(L.EQ.44)HEAD(M)='EXCH_P_RES'
             IF(L.EQ.47)HEAD(M)='ECO_HVST_P'
             IF(L.EQ.48)HEAD(M)='NET_P_MIN'
-!            print*,M,HEAD(M)
+
           ENDIF
         ENDDO
         NOUTS(N-20)=M
@@ -988,7 +978,6 @@ module Hist1Mod
             IF(L.EQ.48)HEAD(M)='ECND_11'
             IF(L.EQ.49)HEAD(M)='ECND_12'
             IF(L.EQ.50)HEAD(M)='TTL_SALT_DISCHG'
-!            print*,M,HEAD(M)
           ENDIF
         ENDDO
         NOUTS(N-20)=M
@@ -999,7 +988,6 @@ module Hist1Mod
   ENDDO
   RETURN
   END SUBROUTINE fouts
-
 
 !------------------------------------------------------------------------
 
@@ -1138,7 +1126,7 @@ module Hist1Mod
                       IF(K.EQ.66)HEAD(M)=CEPOLP(ielmp,NZ,NY,NX)
                       IF(K.EQ.67)THEN
                         IF(WTLFE(ielmc,NZ,NY,NX).GT.ZEROP(NZ,NY,NX))THEN
-                          HEAD(M)=(WTLFE(ielmn,NZ,NY,NX)+EPOOLP(ielmp,NZ,NY,NX))/(WTLFE(ielmc,NZ,NY,NX)+EPOOLP(ielmc,NZ,NY,NX))
+                          HEAD(M)=(WTLFE(ielmp,NZ,NY,NX)+EPOOLP(ielmp,NZ,NY,NX))/(WTLFE(ielmc,NZ,NY,NX)+EPOOLP(ielmc,NZ,NY,NX))
                         ELSE
                           HEAD(M)=0.0
                         ENDIF
@@ -1305,8 +1293,8 @@ module Hist1Mod
                       IF(K.EQ.52)HEAD(M)=CARBN(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
                       IF(K.EQ.53)HEAD(M)=TCO2A(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
                       IF(K.EQ.54)HEAD(M)=CEPOLP(ielmc,NZ,NY,NX)
-                      IF(K.EQ.55)HEAD(M)=RC(NZ,NY,NX)*1.56*3600.0
-                      IF(K.EQ.56)HEAD(M)=RA(NZ,NY,NX)*1.34*3600.0
+                      IF(K.EQ.55)HEAD(M)=RC(NZ,NY,NX)*1.56*3600.0_r8
+                      IF(K.EQ.56)HEAD(M)=RA(NZ,NY,NX)*1.34*3600.0_r8
                       IF(K.EQ.57)HEAD(M)=CO2Q(NZ,NY,NX)
                       IF(K.EQ.58)HEAD(M)=ARLFS(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
                     ENDIF
@@ -1937,6 +1925,7 @@ module Hist1Mod
                       HEAD(M)=(trc_solml(ids_H1PO4,15,NY,NX)+trc_solml(ids_H1PO4B,15,NY,NX)+trc_solml(ids_H2PO4,15,NY,NX)+trc_solml(ids_H2PO4B,15,NY,NX))/VOLW(15,NY,NX)
                     ENDIF
                   ENDIF
+
                   IF(K.EQ.28)THEN
                     IF(BKVL(1,NY,NX).GT.ZEROS(NY,NX))THEN
                       HEAD(M)=31.0*(trcx_solml(idx_HPO4,1,NY,NX)+trcx_solml(idx_H2PO4,1,NY,NX)+trcx_solml(idx_HPO4B,1,NY,NX)+trcx_solml(idx_H2PO4B,1,NY,NX))/BKVL(1,NY,NX)
@@ -2210,9 +2199,8 @@ module Hist1Mod
                   IF(K.EQ.3)HEAD(M)=USEDOU(NY,NX)*1000.0/TAREA
                   IF(K.EQ.4)HEAD(M)=UVOLW(NY,NX)*1000.0/AREA(3,NU(NY,NX),NY,NX)
                   IF(K.EQ.5)HEAD(M)=HVOLO(NY,NX)*1000.0/TAREA
-                  IF(K.EQ.6)HEAD(M)=AMAX1(1.0E-64,(VOLSS(NY,NX)+VOLIS(NY,NX) &
+                  IF(K.EQ.6)HEAD(M)=AZMAX1((VOLSS(NY,NX)+VOLIS(NY,NX) &
                     *DENSI+VOLWS(NY,NX))*1000.0/AREA(3,NU(NY,NX),NY,NX))
-
                   IF(K.EQ.7)HEAD(M)=THETWZ(1,NY,NX)
                   IF(K.EQ.8)HEAD(M)=THETWZ(2,NY,NX)
                   IF(K.EQ.9)HEAD(M)=THETWZ(3,NY,NX)
@@ -2233,7 +2221,6 @@ module Hist1Mod
                   IF(K.EQ.24.AND.JZ>=18)HEAD(M)=THETWZ(18,NY,NX)
                   IF(K.EQ.25.AND.JZ>=19)HEAD(M)=THETWZ(19,NY,NX)
                   IF(K.EQ.26.AND.JZ>=20)HEAD(M)=THETWZ(20,NY,NX)
-
                   IF(K.EQ.27)HEAD(M)=THETWZ(0,NY,NX)
                   IF(K.EQ.28)HEAD(M)=THETIZ(1,NY,NX)
                   IF(K.EQ.29)HEAD(M)=THETIZ(2,NY,NX)
@@ -2255,7 +2242,6 @@ module Hist1Mod
                   IF(K.EQ.45.AND.JZ>=18)HEAD(M)=THETIZ(18,NY,NX)
                   IF(K.EQ.46.AND.JZ>=19)HEAD(M)=THETIZ(19,NY,NX)
                   IF(K.EQ.47.AND.JZ>=20)HEAD(M)=THETIZ(20,NY,NX)
-
                   IF(K.EQ.48)HEAD(M)=THETIZ(0,NY,NX)
                   IF(K.EQ.49)HEAD(M)=-(DPTHA(NY,NX)-CDPTH(NU(NY,NX)-1,NY,NX))
                   IF(K.EQ.50)HEAD(M)=-(DPTHT(NY,NX)-CDPTH(NU(NY,NX)-1,NY,NX))

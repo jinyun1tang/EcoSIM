@@ -159,7 +159,7 @@ subroutine RunModel(namelist_buffer)
     call hist%hist_wrap(ystatesf, timer)
 
     if(timer%its_a_new_year())then
-      write(iulog,*)'year ',timer%get_cur_year()
+      write(iulog,*)'year ',timer%get_curr_year()
     endif
     if(timer%its_time_to_exit())exit
   enddo

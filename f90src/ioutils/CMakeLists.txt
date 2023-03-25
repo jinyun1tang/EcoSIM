@@ -15,12 +15,14 @@ set(IOUTILS_SOURCES
 	splitc.F90
 	splitp.c
 	splits.c
+	HistIdTypeMod.F90
     HistFileMod.F90
     bhistMod.F90
 )
 include_directories(${CMAKE_BINARY_DIR}/f90src/utils/)
 include_directories(${CMAKE_BINARY_DIR}/f90src/minimath/)
 include_directories(${CMAKE_BINARY_DIR}/f90src/modelconfig/)
+include_directories(${CMAKE_BINARY_DIR}/f90src/mesh/)
 include_directories(${CMAKE_BINARY_DIR}/f90src/modelpars/)
 include_directories(${CMAKE_BINARY_DIR}/f90src/ecosim_datatype/)
 include_directories(${CMAKE_BINARY_DIR}/f90src/plant_bgc/)

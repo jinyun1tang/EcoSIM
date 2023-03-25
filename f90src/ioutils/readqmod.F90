@@ -559,11 +559,9 @@ module readqmod
     'pre-anthesis stalk growth: STMX',STMX(NZ,NY,NX)
   write(*,*)'maximum seed number per STMX: SDMX',SDMX(NZ,NY,NX)
   write(*,*)'maximum seed size per SDMX (g): GRMX',GRMX(NZ,NY,NX)
-  write(*,*)'seed size at planting (g): GRDM',GRDM(NZ,NY,NX)
-  write(*,*)'grain filling rate at 25 oC (g seed-1 h-1): GFILL' &
-    ,GFILL(NZ,NY,NX)
-  write(*,*)'mass of dead standing biomass at planting: WTSTDI' &
-    ,WTSTDI(NZ,NY,NX)
+  write(*,*)'seed size at planting (g): GRDM',GRDM(NZ,NY,NX)    !could be greater than GRMX, accouting for seedling
+  write(*,*)'grain filling rate at 25 oC (g seed-1 h-1): GFILL',GFILL(NZ,NY,NX)
+  write(*,*)'mass of dead standing biomass at planting: WTSTDI',WTSTDI(NZ,NY,NX)
   end subroutine morphology_trait_disp
 
 !------------------------------------------------------------------------------------------

@@ -1,5 +1,5 @@
 module EcoSIMConfig
-
+  
 implicit none
   character(len=*),private, parameter :: mod_filename = __FILE__
   logical :: is_restart_run=.false.
@@ -15,6 +15,51 @@ implicit none
   integer, parameter :: jcplxc    = 5 !# of microbe-substrate complexes
   integer, parameter :: jcplx1c   = jcplxc-1
   integer, parameter :: NFGsc     = 7 !# of microbial functional groups in each complex
-  character(len=36):: case_name
+  character(len=36)  :: case_name
+  character(len=256) :: finidat =' '
+  integer, public :: nsrest
+  integer, public, parameter :: nsrBranch   = 2        ! Branch from restart files 
+  integer, public, parameter :: nsrStartup  = 0        ! Startup from initial conditions
+  integer, public, parameter :: nsrContinue = 1        ! Continue from restart files
+  public :: is_restart,   &
+            set_sim_type, &
+            cold_run
+contains
 
+  logical function is_restart( )
+  !
+  ! Determine if restart run
+  implicit none
+  
+  if (nsrest == nsrContinue) then
+    is_restart = .true.
+  else
+    is_restart = .false.
+  end if
+  end function is_restart
+!-----------------------------------------------------------------------
+
+  subroutine set_sim_type()
+  use EcoSIMCtrlMod, only : continue_run
+  implicit none
+  !determine simulation type
+
+  if(continue_run)then
+    nsrest=nsrContinue
+  else
+    if(finidat ==' ')then
+      nsrest=nsrStartup
+    else
+      nsrest=nsrBranch
+    endif
+  endif
+  end subroutine set_sim_type
+!-----------------------------------------------------------------------
+
+logical function cold_run()
+implicit none
+
+cold_run=(nsrest==nsrStartup)
+
+end function cold_run
 end module EcoSIMConfig

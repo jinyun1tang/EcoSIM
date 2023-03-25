@@ -494,7 +494,6 @@ contains
   allocate(trcg_TBLS(idg_beg:idg_end-1,JS,JY,JX));   trcg_TBLS=0._r8
   allocate(trcn_TBLS(ids_nut_beg:ids_nuts_end,JS,JY,JX));trcn_TBLS=0._r8
 
-
   allocate(RQROP(1:jcplx,2,2,JV,JH));RQROP=0._r8
   allocate(RQROA(1:jcplx,2,2,JV,JH));RQROA=0._r8
   allocate(trcg_RQR(idg_beg:idg_end-1,2,2,JV,JH));  trcg_RQR=0._r8
@@ -512,7 +511,6 @@ contains
   allocate(R1BSK2(JZ,JY,JX));   R1BSK2=0._r8
   allocate(RQROC(1:jcplx,2,2,JV,JH));RQROC=0._r8
   allocate(RQRON(1:jcplx,2,2,JV,JH));RQRON=0._r8
-
 
   allocate(ZNH4H2(JZ,JY,JX));   ZNH4H2=0._r8
   allocate(ZN4BH2(JZ,JY,JX));   ZN4BH2=0._r8
@@ -762,6 +760,7 @@ contains
   call destroy(trcg_TBLS)
   call destroy(trcn_TBLS)
   call destroy(trcg_RFL0)
+  call destroy(trcg_RQS)
 
   call destroy(RQROP)
   call destroy(RQROA)
@@ -780,7 +779,6 @@ contains
   call destroy(RQROC)
   call destroy(RQRON)
 
-  call destroy(trcg_RQS)
   call destroy(ZNH4H2)
   call destroy(ZN4BH2)
   call destroy(ZNH3H2)
@@ -843,6 +841,5 @@ contains
   call destroy(R3PoreSolFlx)
   call destroy(RporeSoXFlx)
   end subroutine DestructTransfrData
-
 
 end module TransfrDataMod

@@ -9,6 +9,8 @@ module fileUtil
   public :: check_read
   public :: remove_filename_extension
   public :: file_exists
+  public :: getfil
+  public :: strip_null
   integer, parameter :: ecosim_filename_length=128
   integer, parameter :: stdout=6
   integer, parameter :: iulog=6
@@ -203,4 +205,101 @@ module fileUtil
   
   isprtablesymb=ICHAR(c) >= ICHAR(' ') .AND. ICHAR(c) <= ICHAR('~')
   end function isprtablesymb
+
+  !------------------------------------------------------------------------
+  subroutine getfil (fulpath, locfn, iflag)
+    !
+    ! !DESCRIPTION:
+    ! Obtain local copy of file
+    ! First check current working directory
+    ! Next check full pathname[fulpath] on disk
+    ! 
+    ! !USES:
+    implicit none
+    !
+    ! !ARGUMENTS:
+    character(len=*), intent(in)  :: fulpath !Archival or permanent disk full pathname
+    character(len=*), intent(out) :: locfn   !output local file name
+    integer,          intent(in)  :: iflag   !0=>abort if file not found 1=>do not abort
+    !
+    ! !LOCAL VARIABLES:
+    integer :: i               !loop index
+    integer :: klen            !length of fulpath character string
+    logical :: lexist          !true if local file exists
+    !------------------------------------------------------------------------
+
+    ! get local file name from full name
+
+    locfn = get_filename( fulpath )
+    if (len_trim(locfn) == 0) then
+        write(iulog,*)'(GETFIL): local filename has zero length'
+       call endrun()
+    else
+        write(iulog,*)'(GETFIL): attempting to find local file ',  &
+            trim(locfn)
+    endif
+
+    ! first check if file is in current working directory.
+
+    inquire (file=locfn,exist=lexist)
+    if (lexist) then
+       write(iulog,*) '(GETFIL): using ',trim(locfn), &
+            ' in current working directory'
+       RETURN
+    endif
+
+    ! second check for full pathname on disk
+    locfn = fulpath
+
+    inquire (file=fulpath,exist=lexist)
+    if (lexist) then
+        write(iulog,*) '(GETFIL): using ',trim(fulpath)
+       RETURN
+    else
+       write(iulog,*)'(GETFIL): failed getting file from full path: ', fulpath
+       if (iflag==0) then
+          call endrun('GETFIL: FAILED to get '//trim(fulpath)//' in ' &
+      //mod_filename,line=__LINE__)
+       else
+          RETURN
+       endif
+    endif
+
+  end subroutine getfil  
+
+  !-----------------------------------------------------------------------
+  character(len=512) function get_filename (fulpath)
+    !
+    ! !DESCRIPTION:
+    ! Returns filename given full pathname
+    !
+    implicit none
+    ! !ARGUMENTS:
+    character(len=*), intent(in)  :: fulpath !full pathname
+    !
+    ! !LOCAL VARIABLES:
+    integer :: i               !loop index
+    integer :: klen            !length of fulpath character string
+    !------------------------------------------------------------------------
+
+    klen = len_trim(fulpath)
+    do i = klen, 1, -1
+       if (fulpath(i:i) == '/') go to 10
+    end do
+    i = 0
+10  get_filename = fulpath(i+1:klen)
+
+    return
+  end function get_filename  
+
+  !-----------------------------------------------------------------------
+  subroutine strip_null(str)
+  implicit none
+  character(len=*), intent(inout) :: str
+  integer :: i	
+  do i=1,len(str)
+      if(ichar(str(i:i))==0) str(i:i)=' '
+  end do
+  end subroutine strip_null  
+
 end module fileUtil

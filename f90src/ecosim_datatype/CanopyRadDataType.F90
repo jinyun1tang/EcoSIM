@@ -50,7 +50,9 @@ module CanopyRadDataType
   implicit none
 
   !JLS: number of leaf sectors divide the whole horizontal circle
-
+  integer :: ncols
+  ncols = bounds%ncols
+  
   allocate(ZSIN(JLI))
   allocate(ZCOS(JLI))
   allocate(OMEGA(JSA,JLI,JLA))

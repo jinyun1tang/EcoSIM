@@ -141,8 +141,10 @@ contains
     SRP(L,NY,NX)=1.00_r8
   ENDIF
 
+! double check cold_run() setup
   PSL(L,NY,NX)=LOG(POROS(L,NY,NX))
-  IF((ISOIL(1,L,NY,NX).EQ.0.AND.ISOIL(2,L,NY,NX).EQ.0).OR.(.not.cold_run))THEN
+  IF((ISOIL(isoi_fc,L,NY,NX).EQ.0.AND.ISOIL(isoi_wp,L,NY,NX).EQ.0).OR.(.not.cold_run()))THEN
+  ! read from check point file or if soil properties are set with soil file
     FCL(L,NY,NX)=LOG(FC(L,NY,NX))
     WPL(L,NY,NX)=LOG(WP(L,NY,NX))
     PSD(L,NY,NX)=PSL(L,NY,NX)-FCL(L,NY,NX)
@@ -154,9 +156,9 @@ contains
     !
     !     THW,THI=initial soil water,ice content from soil file
     !
-    IF(cold_run)THEN
+    IF(cold_run())THEN
     ! restart is defined as simulation starting from a previous run
-      IF(ISOIL(1,L,NY,NX).EQ.1.OR.ISOIL(2,L,NY,NX).EQ.1)THEN
+      IF(ISOIL(isoi_fc,L,NY,NX).EQ.1.OR.ISOIL(isoi_wp,L,NY,NX).EQ.1)THEN
         !calculating FC or WP
         IF(CORGC(L,NY,NX).LT.FORGW)THEN
           FC(L,NY,NX)=0.2576_r8-0.20_r8*CSAND(L,NY,NX) &
@@ -214,7 +216,7 @@ contains
         THETI(L,NY,NX)=0.0_r8
       ENDIF
       
-      IF(cold_run)THEN
+      IF(cold_run())THEN
         VOLW(L,NY,NX)=THETW(L,NY,NX)*VOLX(L,NY,NX)
         VOLWX(L,NY,NX)=VOLW(L,NY,NX)
         VOLWH(L,NY,NX)=THETW(L,NY,NX)*VOLAH(L,NY,NX)

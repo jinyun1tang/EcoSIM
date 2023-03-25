@@ -34,8 +34,6 @@ module TrnsfrMod
   private
   CHARACTER(LEN=*), PARAMETER :: MOD_FILENAME=__FILE__
 
-  real(r8) :: XN
-
   real(r8), allocatable :: CHY0(:,:,:)
   real(r8), allocatable :: RFLZ_sol(:,:,:,:)
 
@@ -91,10 +89,11 @@ module TrnsfrMod
 !
 ! TIME STEP USED IN GAS AND SOLUTE FLUX CALCULATIONS
 ! NPH=no. of cycles per hour for water, heat and solute flux calculations
-! NPG=number of cycles per hour for gas flux calculations
-! XNPT=1/number of cycles NPH-1 for gas flux calculations
+! NPG=number of cycles per hour for gas flux calculations, NPG=NPH*NPT
+! XNPT=1/number of cycles NPH-1 for gas flux calculations, =1.0_r8/NPT
   MX=0
   DO  MM=1,NPG
+    !compute the ordinal number of the current iteration
     M=MIN(NPH,INT((MM-1)*XNPT)+1)
 
     call ModelTracerHydroFlux(M,MX,NHW, NHE, NVN, NVS,FLQM)
@@ -775,6 +774,7 @@ module TrnsfrMod
     trcs_RFLU(idg_N2,L,NY,NX)=FLU(L,NY,NX)*CNNQ(NY,NX)
     trcs_RFLU(idg_N2O,L,NY,NX)=FLU(L,NY,NX)*CN2Q(NY,NX)
     trcs_RFLU(idg_H2,L,NY,NX)=0.0_r8
+
     trcs_RFLU(ids_NH4,L,NY,NX)=FLU(L,NY,NX)*CN4Q(I,NY,NX)*trcs_VLN(ids_NH4,L,NY,NX)*natomw
     trcs_RFLU(idg_NH3,L,NY,NX)=FLU(L,NY,NX)*CN3Q(I,NY,NX)*trcs_VLN(ids_NH4,L,NY,NX)*natomw
     trcs_RFLU(ids_NO3,L,NY,NX)=FLU(L,NY,NX)*CNOQ(I,NY,NX)*trcs_VLN(ids_NO3,L,NY,NX)*natomw

@@ -3,7 +3,7 @@
 ! Description:
 ! read control namelist
   use abortutils   , only : endrun
-  use EcoSIMConfig , only : transport_on,column_mode, do_instequil
+  use EcoSIMConfig , only : transport_on,column_mode, do_instequil,finidat
   use ForcWriterMod, only : bgc_forc_conf,do_bgcforc_write
   use fileUtil     , only : iulog
   use EcoSIMHistMod, only : DATAC
@@ -28,8 +28,7 @@
   do_instequil,salt_model, pft_file_in,grid_file_in,pft_mgmt_in, clm_factor_in,&
   clm_file_in,soil_mgmt_in,hist_config,sim_yyyymmdd,forc_periods,&
     NPXS,NPYS,JOUTS,IOUTS,KOUTS,continue_run,visual_out,restart_out,&
-    cold_run
-
+    finidat
 
   logical :: laddband
   namelist /bbgcforc/do_bgcforc_write,do_year,do_doy,laddband,do_layer,&
@@ -48,8 +47,8 @@
   KOUTS=500 !frequency on restart file writing
 
   visual_out=.false.
-  restart_out=.false.
-  cold_run=.true.
+  restart_out=.false.  
+  finidat=' '
   hist_config='NO'
   sim_yyyymmdd='18000101'
   forc_periods=(/1980,1980,1,1981,1988,2,1989,2008,1/)

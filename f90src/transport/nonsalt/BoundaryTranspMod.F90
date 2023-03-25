@@ -55,6 +55,7 @@ module BoundaryTranspMod
               N5B=NY
               N6=L
               IF(NN.EQ.1)THEN
+                !eastern boundary
                 IF(NX.EQ.NHE)THEN
                   M1=NX
                   M2=NY
@@ -70,6 +71,7 @@ module BoundaryTranspMod
                   cycle
                 ENDIF
               ELSEIF(NN.EQ.2)THEN
+                !western boundary
                 IF(NX.EQ.NHW)THEN
                   M1=NX
                   M2=NY
@@ -93,6 +95,7 @@ module BoundaryTranspMod
               N5B=NY-1
               N6=L
               IF(NN.EQ.1)THEN
+              ! southern boundary
                 IF(NY.EQ.NVS)THEN
                   M1=NX
                   M2=NY
@@ -100,7 +103,7 @@ module BoundaryTranspMod
                   M4=NX
                   M5=NY+1
                   M6=L
-                  XN=-1.0
+                  XN=-1.0_r8
                   RCHQF=RCHQS(M2,M1)
                   RCHGFU=RCHGSU(M2,M1)
                   RCHGFT=RCHGST(M2,M1)
@@ -108,6 +111,7 @@ module BoundaryTranspMod
                   cycle
                 ENDIF
               ELSEIF(NN.EQ.2)THEN
+              ! northern boundary
                 IF(NY.EQ.NVN)THEN
                   M1=NX
                   M2=NY
@@ -115,7 +119,7 @@ module BoundaryTranspMod
                   M4=NX
                   M5=NY
                   M6=L
-                  XN=1.0
+                  XN=1.0_r8
                   RCHQF=RCHQN(M5,M4)
                   RCHGFU=RCHGNU(M5,M4)
                   RCHGFT=RCHGNT(M5,M4)
@@ -132,6 +136,7 @@ module BoundaryTranspMod
               N5=NY
               N6=L+1
               IF(NN.EQ.1)THEN
+              !lower boundary
                 IF(L.EQ.NL(NY,NX))THEN
                   M1=NX
                   M2=NY
@@ -139,11 +144,12 @@ module BoundaryTranspMod
                   M4=NX
                   M5=NY
                   M6=L+1
-                  XN=-1.0
+                  XN=-1.0_r8
                 ELSE
                   cycle
                 ENDIF
               ELSEIF(NN.EQ.2)THEN
+                !nothing for the upper boundary
                 cycle
               ENDIF
             ENDIF

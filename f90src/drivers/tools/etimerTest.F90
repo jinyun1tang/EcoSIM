@@ -31,7 +31,7 @@ PROGRAM main
         call etimer%update_time_stamp()
       ENDDO
 
-      if(etimer%its_a_new_month())print*,ymdhs,etimer%get_cur_day()
+      if(etimer%its_a_new_month())print*,ymdhs,etimer%get_curr_day()
       if(etimer%its_a_new_year())exit
     enddo
     if(etimer%its_time_to_exit())exit

@@ -809,6 +809,7 @@ module RedistMod
   real(r8) :: POS,POX,POP
   real(r8) :: SSS,ZG,Z4S,WS,Z4X
   real(r8) :: Z4F,ZOS,ZOF
+  real(r8) :: tDC,tDN,tDP
   integer :: n_litrsfk
 !     begin_execution
 !     TOTAL C,N,P, SALTS IN SURFACE RESIDUE
@@ -831,30 +832,36 @@ module RedistMod
     !
     ! TOTAL heterotrophic MICROBIAL C,N,P
     !
-    DC=DC+SUM(OMC(1:nlbiomcp,1:NMICBSO,K,0,NY,NX))
-    DN=DN+SUM(OMN(1:nlbiomcp,1:NMICBSO,K,0,NY,NX))
-    DP=DP+SUM(OMP(1:nlbiomcp,1:NMICBSO,K,0,NY,NX))
-    RC0(K,NY,NX)=RC0(K,NY,NX)+SUM(OMC(1:nlbiomcp,1:NMICBSO,K,0,NY,NX))
-    TOMT(NY,NX)=TOMT(NY,NX)+SUM(OMC(1:nlbiomcp,1:NMICBSO,K,0,NY,NX))
-    TONT(NY,NX)=TONT(NY,NX)+SUM(OMN(1:nlbiomcp,1:NMICBSO,K,0,NY,NX))
-    TOPT(NY,NX)=TOPT(NY,NX)+SUM(OMP(1:nlbiomcp,1:NMICBSO,K,0,NY,NX))
-    OMCL(0,NY,NX)=OMCL(0,NY,NX)+SUM(OMC(1:nlbiomcp,1:NMICBSO,K,0,NY,NX))
-    OMNL(0,NY,NX)=OMNL(0,NY,NX)+SUM(OMN(1:nlbiomcp,1:NMICBSO,K,0,NY,NX))
+    tDC=SUM(OMC(1:nlbiomcp,1:NMICBSO,K,0,NY,NX))
+    tDN=SUM(OMN(1:nlbiomcp,1:NMICBSO,K,0,NY,NX))
+    tDP=SUM(OMP(1:nlbiomcp,1:NMICBSO,K,0,NY,NX))
+    DC=DC+tDC
+    DN=DN+tDN
+    DP=DP+tDP
+    RC0(K,NY,NX)=RC0(K,NY,NX)+tDC
+    TOMT(NY,NX)=TOMT(NY,NX)+tDC
+    TONT(NY,NX)=TONT(NY,NX)+tDN
+    TOPT(NY,NX)=TOPT(NY,NX)+tDP
+    OMCL(0,NY,NX)=OMCL(0,NY,NX)+tDC
+    OMNL(0,NY,NX)=OMNL(0,NY,NX)+tDN
   ENDDO
 
   !
   ! TOTAL autotrophic MICROBIAL C,N,P
   !
-  DC=DC+SUM(OMCff(1:nlbiomcp,1:NMICBSA,0,NY,NX))
-  DN=DN+SUM(OMNff(1:nlbiomcp,1:NMICBSA,0,NY,NX))
-  DP=DP+SUM(OMPff(1:nlbiomcp,1:NMICBSA,0,NY,NX))
+  tDC=SUM(OMCff(1:nlbiomcp,1:NMICBSA,0,NY,NX))
+  tDN=SUM(OMNff(1:nlbiomcp,1:NMICBSA,0,NY,NX))
+  tDP=SUM(OMPff(1:nlbiomcp,1:NMICBSA,0,NY,NX))
+  DC=DC+tDC
+  DN=DN+tDN
+  DP=DP+tDP
 
-  RC0ff(NY,NX)=RC0ff(NY,NX)+SUM(OMCff(1:nlbiomcp,1:NMICBSA,0,NY,NX))
-  TOMT(NY,NX)=TOMT(NY,NX)+SUM(OMCff(1:nlbiomcp,1:NMICBSA,0,NY,NX))
-  TONT(NY,NX)=TONT(NY,NX)+SUM(OMNff(1:nlbiomcp,1:NMICBSA,0,NY,NX))
-  TOPT(NY,NX)=TOPT(NY,NX)+SUM(OMPff(1:nlbiomcp,1:NMICBSA,0,NY,NX))
-  OMCL(0,NY,NX)=OMCL(0,NY,NX)+SUM(OMCff(1:nlbiomcp,1:NMICBSA,0,NY,NX))
-  OMNL(0,NY,NX)=OMNL(0,NY,NX)+SUM(OMNff(1:nlbiomcp,1:NMICBSA,0,NY,NX))
+  RC0ff(NY,NX)=RC0ff(NY,NX)+tDC
+  TOMT(NY,NX)=TOMT(NY,NX)+tDC
+  TONT(NY,NX)=TONT(NY,NX)+tDN
+  TOPT(NY,NX)=TOPT(NY,NX)+tDP
+  OMCL(0,NY,NX)=OMCL(0,NY,NX)+tDC
+  OMNL(0,NY,NX)=OMNL(0,NY,NX)+tDN
 
   !
   !     TOTAL MICROBIAL RESIDUE C,N,P
@@ -870,7 +877,7 @@ module RedistMod
   ENDDO
 
 !
-    !     TOTAL DOC, DON, DOP
+!     TOTAL DOC, DON, DOP
 !
   DC=DC+SUM(OQC(1:n_litrsfk,0,NY,NX))+SUM(OQCH(1:n_litrsfk,0,NY,NX)) &
        +SUM(OHC(1:n_litrsfk,0,NY,NX))+SUM(OQA(1:n_litrsfk,0,NY,NX)) &
@@ -880,7 +887,6 @@ module RedistMod
        +SUM(OHN(1:n_litrsfk,0,NY,NX))
   DP=DP+SUM(OQP(1:n_litrsfk,0,NY,NX))+SUM(OQPH(1:n_litrsfk,0,NY,NX)) &
        +SUM(OHP(1:n_litrsfk,0,NY,NX))
-
 !
     !     TOTAL PLANT RESIDUE C,N,P
 !
@@ -912,7 +918,8 @@ module RedistMod
   TLN2G=TLN2G+ZG
   Z4S=trc_solml(ids_NH4,0,NY,NX)+trc_solml(idg_NH3,0,NY,NX)
   Z4X=natomw*trcx_solml(idx_NH4,0,NY,NX)
-  Z4F=natomw*(FertN_soil(ifert_nh4,0,NY,NX)+FertN_soil(ifert_urea,0,NY,NX)+FertN_soil(ifert_nh3,0,NY,NX))
+  Z4F=natomw*(FertN_soil(ifert_nh4,0,NY,NX)+FertN_soil(ifert_urea,0,NY,NX) &
+    +FertN_soil(ifert_nh3,0,NY,NX))
   TLNH4=TLNH4+Z4S+Z4X+Z4F
   UNH4(NY,NX)=UNH4(NY,NX)+Z4S+Z4X
 
@@ -933,7 +940,6 @@ module RedistMod
 
   end subroutine CalcLitterLayerChemicalMass
 !------------------------------------------------------------------------------------------
-
 
   subroutine UpdateSurfaceLayerSalt(NY,NX,TLPO4)
   implicit none
@@ -1362,8 +1368,8 @@ module RedistMod
       +trc_solml(idg_NH3,L,NY,NX)+trc_soHml(idg_NH3,L,NY,NX) &
       +trc_solml(idg_NH3B,L,NY,NX)+trc_soHml(idg_NH3B,L,NY,NX)
 
-    Z4X=14.0*(trcx_solml(idx_NH4,L,NY,NX)+trcx_solml(idx_NH4B,L,NY,NX))
-    Z4F=14.0*(FertN_soil(ifert_nh4,L,NY,NX)+FertN_soil(ifert_urea,L,NY,NX) &
+    Z4X=natomw*(trcx_solml(idx_NH4,L,NY,NX)+trcx_solml(idx_NH4B,L,NY,NX))
+    Z4F=natomw*(FertN_soil(ifert_nh4,L,NY,NX)+FertN_soil(ifert_urea,L,NY,NX) &
       +FertN_soil(ifert_nh3,L,NY,NX)+FertN_band(ifert_nh4_band,L,NY,NX) &
       +FertN_band(ifert_urea_band,L,NY,NX)+FertN_band(ifert_nh3_band,L,NY,NX))
     TLNH4=TLNH4+Z4S+Z4X+Z4F
@@ -1372,7 +1378,7 @@ module RedistMod
     ZOS=trc_solml(ids_NO3,L,NY,NX)+trc_soHml(ids_NO3,L,NY,NX)+trc_solml(ids_NO3B,L,NY,NX) &
       +trc_soHml(ids_NO3B,L,NY,NX)+trc_solml(ids_NO2,L,NY,NX)+trc_soHml(ids_NO2,L,NY,NX) &
       +trc_solml(ids_NO2B,L,NY,NX)+trc_soHml(ids_NO2B,L,NY,NX)
-    ZOF=14.0*(FertN_soil(ifert_no3,L,NY,NX)+FertN_soil(ifert_no3,L,NY,NX))
+    ZOF=natomw*(FertN_soil(ifert_no3,L,NY,NX)+FertN_soil(ifert_no3,L,NY,NX))
     TLNO3=TLNO3+ZOS+ZOF
     UNO3(NY,NX)=UNO3(NY,NX)+ZOS
     POS=trc_solml(ids_H2PO4,L,NY,NX)+trc_soHml(ids_H2PO4,L,NY,NX)+trc_solml(ids_H2PO4B,L,NY,NX) &
@@ -1576,6 +1582,7 @@ module RedistMod
 
   integer :: K,N,M,NGL
   integer :: n_litrsfk
+  real(r8) :: tDC,tDN,tDP
     !     TOTAL SOC,SON,SOP
     !
     !     OMC=microbial biomass, ORC=microbial residue
@@ -1598,49 +1605,51 @@ module RedistMod
 
 ! add living microbes
   DO K=1,jcplx
+    tDC=SUM(OMC(1:nlbiomcp,1:NMICBSO,K,L,NY,NX))
+    tDN=SUM(OMN(1:nlbiomcp,1:NMICBSO,K,L,NY,NX))
+    tDP=SUM(OMP(1:nlbiomcp,1:NMICBSO,K,L,NY,NX))
     IF(micpar%is_litter(K))THEN  !K=0,1,2: woody litr, nonwoody litr, and manure
-      DC=DC+SUM(OMC(1:nlbiomcp,1:NMICBSO,K,L,NY,NX))
-      DN=DN+SUM(OMN(1:nlbiomcp,1:NMICBSO,K,L,NY,NX))
-      DP=DP+SUM(OMP(1:nlbiomcp,1:NMICBSO,K,L,NY,NX))
+      DC=DC+tDC
+      DN=DN+tDN
+      DP=DP+tDP
 
-      TOMT(NY,NX)=TOMT(NY,NX)+SUM(OMC(1:nlbiomcp,1:NMICBSO,K,L,NY,NX))
-      TONT(NY,NX)=TONT(NY,NX)+SUM(OMN(1:nlbiomcp,1:NMICBSO,K,L,NY,NX))
-      TOPT(NY,NX)=TOPT(NY,NX)+SUM(OMP(1:nlbiomcp,1:NMICBSO,K,L,NY,NX))
-      OMCL(L,NY,NX)=OMCL(L,NY,NX)+SUM(OMC(1:nlbiomcp,1:NMICBSO,K,L,NY,NX))
-      OMNL(L,NY,NX)=OMNL(L,NY,NX)+SUM(OMN(1:nlbiomcp,1:NMICBSO,K,L,NY,NX))
-
+      TOMT(NY,NX)=TOMT(NY,NX)+tDC
+      TONT(NY,NX)=TONT(NY,NX)+tDN
+      TOPT(NY,NX)=TOPT(NY,NX)+tDP
+      OMCL(L,NY,NX)=OMCL(L,NY,NX)+tDC
+      OMNL(L,NY,NX)=OMNL(L,NY,NX)+tDN
     ELSE
+      OC=OC+tDC
+      ON=ON+tDN
+      OP=OP+tDP
 
-      OC=OC+SUM(OMC(1:nlbiomcp,1:NMICBSO,K,L,NY,NX))
-      ON=ON+SUM(OMN(1:nlbiomcp,1:NMICBSO,K,L,NY,NX))
-      OP=OP+SUM(OMP(1:nlbiomcp,1:NMICBSO,K,L,NY,NX))
-
-      TOMT(NY,NX)=TOMT(NY,NX)+SUM(OMC(1:nlbiomcp,1:NMICBSO,K,L,NY,NX))
-      TONT(NY,NX)=TONT(NY,NX)+SUM(OMN(1:nlbiomcp,1:NMICBSO,K,L,NY,NX))
-      TOPT(NY,NX)=TOPT(NY,NX)+SUM(OMP(1:nlbiomcp,1:NMICBSO,K,L,NY,NX))
-      OMCL(L,NY,NX)=OMCL(L,NY,NX)+SUM(OMC(1:nlbiomcp,1:NMICBSO,K,L,NY,NX))
-      OMNL(L,NY,NX)=OMNL(L,NY,NX)+SUM(OMN(1:nlbiomcp,1:NMICBSO,K,L,NY,NX))
+      TOMT(NY,NX)=TOMT(NY,NX)+tDC
+      TONT(NY,NX)=TONT(NY,NX)+tDN
+      TOPT(NY,NX)=TOPT(NY,NX)+tDP
+      OMCL(L,NY,NX)=OMCL(L,NY,NX)+tDC
+      OMNL(L,NY,NX)=OMNL(L,NY,NX)+tDN
     ENDIF
   ENDDO
 
 ! add autotrophs
-  OC=OC+SUM(OMCff(1:nlbiomcp,1:NMICBSA,L,NY,NX))
-  ON=ON+SUM(OMNff(1:nlbiomcp,1:NMICBSA,L,NY,NX))
-  OP=OP+SUM(OMPff(1:nlbiomcp,1:NMICBSA,L,NY,NX))
-  TOMT(NY,NX)=TOMT(NY,NX)+SUM(OMCff(1:nlbiomcp,1:NMICBSA,L,NY,NX))
-  TONT(NY,NX)=TONT(NY,NX)+SUM(OMNff(1:nlbiomcp,1:NMICBSA,L,NY,NX))
-  TOPT(NY,NX)=TOPT(NY,NX)+SUM(OMPff(1:nlbiomcp,1:NMICBSA,L,NY,NX))
-  OMCL(L,NY,NX)=OMCL(L,NY,NX)+SUM(OMCff(1:nlbiomcp,1:NMICBSA,L,NY,NX))
-  OMNL(L,NY,NX)=OMNL(L,NY,NX)+SUM(OMNff(1:nlbiomcp,1:NMICBSA,L,NY,NX))
+  tDC=SUM(OMCff(1:nlbiomcp,1:NMICBSA,L,NY,NX))
+  tDN=SUM(OMNff(1:nlbiomcp,1:NMICBSA,L,NY,NX))
+  tDP=SUM(OMPff(1:nlbiomcp,1:NMICBSA,L,NY,NX))
+  OC=OC+tDC
+  ON=ON+tDN
+  OP=OP+tDP
+  TOMT(NY,NX)=TOMT(NY,NX)+tDC
+  TONT(NY,NX)=TONT(NY,NX)+tDN
+  TOPT(NY,NX)=TOPT(NY,NX)+tDP
+  OMCL(L,NY,NX)=OMCL(L,NY,NX)+tDC
+  OMNL(L,NY,NX)=OMNL(L,NY,NX)+tDN
 
   DO K=1,jcplx
-! litter + manure
     IF(micpar%is_litter(K))THEN
-
+! litter + manure
       DC=DC+SUM(ORC(1:ndbiomcp,K,L,NY,NX))
       DN=DN+SUM(ORN(1:ndbiomcp,K,L,NY,NX))
       DP=DP+SUM(ORP(1:ndbiomcp,K,L,NY,NX))
-
       DC=DC+OQC(K,L,NY,NX)+OQCH(K,L,NY,NX)+OHC(K,L,NY,NX) &
         +OQA(K,L,NY,NX)+OQAH(K,L,NY,NX)+OHA(K,L,NY,NX)
       DN=DN+OQN(K,L,NY,NX)+OQNH(K,L,NY,NX)+OHN(K,L,NY,NX)

@@ -18,7 +18,6 @@ implicit none
   logical :: continue_run
   logical :: restart_out
   logical :: visual_out
-  logical :: cold_run
   character(len=16) :: hist_config(10)
   character(len=8)  :: sim_yyyymmdd
   integer :: forc_periods(9)
@@ -54,4 +53,6 @@ implicit none
   this%lskip_loop=.true.
   this%ymdhs0='00000000000000'
   end subroutine Init_frectyp
+
+  
 end module EcoSIMCtrlMod

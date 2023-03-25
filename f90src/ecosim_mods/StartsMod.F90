@@ -431,7 +431,8 @@ module StartsMod
 !
       !     INITIAL SOIL WATER AND ICE CONTENTS
 !
-      IF(ISOIL(1,L,NY,NX).EQ.0.AND.ISOIL(2,L,NY,NX).EQ.0)THEN
+      IF(ISOIL(isoi_fc,L,NY,NX).EQ.0.AND.ISOIL(isoi_wp,L,NY,NX).EQ.0)THEN
+      ! field capacity and wilting point are read from input
         IF(THW(L,NY,NX).GT.1.0)THEN
           THETW(L,NY,NX)=POROS(L,NY,NX)
         ELSEIF(test_aeqb(THW(L,NY,NX),1.0_r8))THEN
