@@ -11,8 +11,8 @@ implicit none
   integer :: JH
   integer :: JV
   integer :: JD
-  integer :: JBR     !number of plant branches
-  integer :: jpstgs  !number of plant growth states
+  integer :: JBR=10     !number of plant branches
+  integer :: jpstgs=10  !number of plant growth states
   integer :: JRS     !maximum number of root layers
   integer :: Jlitgrp !number of liter groups
   integer, PARAMETER :: JP=5    !maximum pft in a given topgraphic column

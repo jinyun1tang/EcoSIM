@@ -1,0 +1,18 @@
+&ecosys_ctrl
+!set up output variable lists
+hist_config='NO','NO','NO','NO','NO','NO','NO','NO','NO','abc'
+!set up the first year of simulation
+sim_yyyymmdd='18000101'
+continue_run=.true.
+!set up simulation periods, spinup starts at 1, ends at 2, with 3 cycles, regular starts at 4, ends at 5.
+forc_periods=1980,1980,1,1981,1988,9,1989,2008,1
+
+!set up solvers
+NPXS=30,30,30   !number of cycles per hour for water,heat,solute flux calcns
+NPYS=10,10,10   !number of cycles per NPX for gas flux calcns
+!set up output frequency
+JOUTS=1,3,3   !frequency on hourly scale
+IOUTS=1,365,1   !frequency on daily scale
+KOUTS=500,500,500 !frequency on restart file writing, >365 means 1 time per year
+
+/

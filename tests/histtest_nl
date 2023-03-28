@@ -1,0 +1,7 @@
+&hist_nml
+hist_yrclose =.true.
+hist_nhtfrq = -24, 0
+hist_mfilt = 366,12
+hist_fincl1 = 'VSM','VMXSM','VMNSM'
+hist_fincl2 = 'TSOI','VSM'
+/

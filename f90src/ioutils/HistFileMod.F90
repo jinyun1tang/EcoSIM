@@ -9,7 +9,7 @@ module HistFileMod
   use data_const_mod    , only : spval => SHR_CONST_SPVAL
   use EcosimConst       , only : secspday
   use EcoSIMCtrlMod     , only : etimer
-  use EcoSIMConfig      , only : case_name
+  use EcoSIMConfig      , only : case_name,hostname,version,source,username
 implicit none
   save
   private
@@ -199,6 +199,7 @@ implicit none
   character(len=  1) :: avgflag  ! time averaging flag
   integer :: numc
   integer :: nump
+  integer :: numg,numl,numt
   integer :: dimid               ! dimension id temporary
   character(len=*),parameter :: subname = 'htape_create'
   integer :: ier
@@ -209,10 +210,10 @@ implicit none
     lhistrest = .false.
   end if
 
-  call get_grid_info(nc=numc, np=nump)
+  call get_grid_info(ng=numg,nt=numt,nc=numc, np=nump)
 
   ncprec = tape(t)%ncprec
-
+  
   if ( .not. lhistrest )then
     call ncd_pio_createfile(lnfid, trim(locfnh(t)))
     call check_ret(ncd_putatt(lnfid, ncd_global, 'title', 'EcoSIM History file information' ),&
@@ -225,19 +226,18 @@ implicit none
                    "This entire file NOT needed for startup or branch simulations"),trim(subname)//' comment1')
   endif
 
-!  call ncd_putatt(lnfid, ncd_global, 'source'  , trim(source))
-!  call ncd_putatt(lnfid, ncd_global, 'source_id'  , trim(version))
-!  call ncd_putatt(lnfid, ncd_global, 'product'  , 'model-output')
+  call check_ret(ncd_putatt(lnfid, ncd_global, 'source'     , trim(source)),trim(subname)//' source')
+  call check_ret(ncd_putatt(lnfid, ncd_global, 'source_id'  , trim(version)),trim(subname)//' source_id')
+  call check_ret(ncd_putatt(lnfid, ncd_global, 'product'  , 'model-output'),trim(subname)//' product')
   call check_ret(ncd_putatt(lnfid, ncd_global, 'case', trim(case_name)),trim(subname)//'case')
-!  call ncd_putatt(lnfid, ncd_global, 'username', trim(username))
-!  call ncd_putatt(lnfid, ncd_global, 'hostname', trim(hostname))
-!  call ncd_putatt(lnfid, ncd_global, 'git_version' , trim(version))
+  call check_ret(ncd_putatt(lnfid, ncd_global, 'username', trim(username)),trim(subname)//' username')
+  call check_ret(ncd_putatt(lnfid, ncd_global, 'hostname', trim(hostname)),trim(subname)//' hostname')
+  call check_ret(ncd_putatt(lnfid, ncd_global, 'git_version' , trim(version)),trim(subname)//' git_version')
   call getdatetime(curdate, curtime)
 
   ! Global compressed dimensions (not including non-land points)
-!  call ncd_defdim(lnfid, trim(nameg), numg, dimid)
-!  call ncd_defdim(lnfid, trim(namet), numt, dimid)
-!  call ncd_defdim(lnfid, trim(namel), numl, dimid)
+  call ncd_defdim(lnfid, trim(nameg), numg, dimid)
+  call ncd_defdim(lnfid, trim(namet), numt, dimid)
   call ncd_defdim(lnfid, trim(namec), numc, dimid)
   call ncd_defdim(lnfid, trim(namep), nump, dimid)
 
@@ -293,7 +293,6 @@ implicit none
   integer, dimension(8) :: values !temporary
   integer               :: ier    !MPI error code
 
-
   call date_and_time (date, time, zone, values)
 
   cdate(1:2) = date(5:6)
@@ -310,12 +309,14 @@ implicit none
 
   end subroutine getdatetime
 !-----------------------------------------------------------------------
-  subroutine get_grid_info(nc,np)
+  subroutine get_grid_info(ng,nt,nc,np)
   implicit none
-  integer, intent(out) :: nc,np
+  integer, intent(out) :: ng,nt,nc,np
 
   nc=bounds%ncols
   np=bounds%npfts
+  ng=bounds%ngrid
+  nt=bounds%ntopou
   end subroutine get_grid_info
 
   !-----------------------------------------------------------------------
@@ -692,7 +693,7 @@ implicit none
     !-----------------------------------------------------------------------
 
 !    if (masterproc) then
-       write(iulog,*)  trim(subname),' Initializing elm history files'
+       write(iulog,*)  trim(subname),' Initializing ecosim history files'
        write(iulog,'(72a1)') ("-",i=1,60)
        call flush(iulog)
 !    endif
@@ -1192,13 +1193,13 @@ implicit none
 
     do f = 1,nfmaster
        select case (avgflag)
-       case ('A')
+       case ('A')  !average
           masterlist(f)%avgflag(t) = avgflag
-       case ('I')
+       case ('I')  !instantaneous
           masterlist(f)%avgflag(t) = avgflag
-       case ('X')
+       case ('X')  !maximum
           masterlist(f)%avgflag(t) = avgflag
-       case ('M')
+       case ('M')  !minimum
           masterlist(f)%avgflag(t) = avgflag
        case default
           write(iulog,*) trim(subname),' ERROR: unknown avgflag=',avgflag
@@ -1592,8 +1593,10 @@ implicit none
   end subroutine hist_update_hbuf_field_2d
 
   !-----------------------------------------------------------------------
-  subroutine hist_htapes_wrapup( rstwr, nlend, bounds, &
-       watsat_col, sucsat_col, bsw_col, hksat_col)
+  subroutine hist_htapes_wrapup( rstwr, nlend, bounds, lnyr )
+
+!  subroutine hist_htapes_wrapup( rstwr, nlend, bounds, &
+!       watsat_col, sucsat_col, bsw_col, hksat_col)
     !
     ! !DESCRIPTION:
     ! Write history tape(s)
@@ -1623,11 +1626,12 @@ implicit none
     ! !ARGUMENTS:
     logical, intent(in) :: rstwr    ! true => write restart file this step
     logical, intent(in) :: nlend    ! true => end of run on this step
+    logical, intent(in) :: lnyr     ! true => close current hist file and open a new one
     type(bounds_type) , intent(in) :: bounds           
-    real(r8)          , intent(in) :: watsat_col( bounds%begc:,1: ) 
-    real(r8)          , intent(in) :: sucsat_col( bounds%begc:,1: ) 
-    real(r8)          , intent(in) :: bsw_col( bounds%begc:,1: ) 
-    real(r8)          , intent(in) :: hksat_col( bounds%begc:,1: ) 
+!    real(r8)          , intent(in) :: watsat_col( bounds%begc:,1: ) 
+!    real(r8)          , intent(in) :: sucsat_col( bounds%begc:,1: ) 
+!    real(r8)          , intent(in) :: bsw_col( bounds%begc:,1: ) 
+!    real(r8)          , intent(in) :: hksat_col( bounds%begc:,1: ) 
     !
     ! !LOCAL VARIABLES:
     integer :: t                          ! tape index
@@ -1681,7 +1685,6 @@ implicit none
        end if
 
        ! If end of history interval
-
        if (tape(t)%is_endhist) then
 
           ! Normalize history buffer if time averaged
@@ -1707,6 +1710,7 @@ implicit none
                      ' at nstep = ',etimer%get_nstep()
                 write(iulog,*)'calling htape_create for file t = ',t
 !             endif
+             !'call htape_create'
              call htape_create (t)
 
              ! Define time-constant field variables
@@ -1719,10 +1723,10 @@ implicit none
 !                TimeConst3DVars_Filename = trim(locfnh(t))
 !             end if
 
-             ! Define model field variables
+             !' Define model field variables'
              call hfields_write(t, mode='define')
 
-             ! Exit define model
+             !' Exit define model'
              call ncd_enddef(nfid(t))
 !             call t_stopf('hist_htapes_wrapup_define')
           endif
@@ -1788,12 +1792,22 @@ implicit none
                 write(iulog,*) trim(subname),' : history tape ',t,': no open file to close'
  !            end if
           endif
+       else
+          if(lnyr)then 
+!            if (masterproc) then
+               write(iulog,*)
+               write(iulog,*)  trim(subname),' : Closing local history file ',&
+                    trim(locfnh(t)),' at nstep = ', etimer%get_nstep()
+               write(iulog,*)
+!            endif
+	          call ncd_pio_closefile(nfid(t))
+          endif  
        endif
     end do
     ! Reset number of time samples to zero if file is full 
     
     do t = 1, ntapes
-       if (if_disphist(t) .and. tape(t)%ntimes==tape(t)%mfilt) then
+       if ((if_disphist(t) .and. tape(t)%ntimes==tape(t)%mfilt) .or. lnyr) then
           tape(t)%ntimes = 0
        end if
     end do
@@ -1949,6 +1963,7 @@ implicit none
 
   !------------------------------------------------------------------------
   subroutine hist_do_disp (ntapes, hist_ntimes, hist_mfilt, if_stop, if_disphist, rstwr, nlend)
+!  subroutine hist_do_disp (ntapes, hist_ntimes, hist_mfilt, if_stop, if_disphist)
     !
     ! !DESCRIPTION:
     ! Determine logic for closeing and/or disposing history file
@@ -2810,5 +2825,5 @@ implicit none
     end do
 
   end subroutine hfields_zero
-  
+
 end module HistFileMod

@@ -61,10 +61,6 @@ implicit none
   real(r8),pointer   :: histr_1D_ECO_HVST_P_col(:)     !XHVSTE(ielmp,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: histr_1D_NET_P_MIN_col(:)      !-TRIPO4(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: histr_1D_RADN_col(:)           !TRAD(NY,NX)
-  real(r8),pointer   :: histr_1D_TMAX_AIR_col(:)       !TAMX(NY,NX)
-  real(r8),pointer   :: histr_1D_TMIN_AIR_col(:)       !TAMN(NY,NX)
-  real(r8),pointer   :: histr_1D_HMAX_AIR_col(:)       !HUDX(NY,NX)
-  real(r8),pointer   :: histr_1D_HMIN_AIR_col(:)       !HUDN(NY,NX)
   real(r8),pointer   :: histr_1D_tSALT_DISCHG_FLX_col(:)    !UIONOU(NY,NX)/TAREA
   real(r8),pointer   :: histr_1D_PSI_SURF_col(:)       !PSISM(0,NY,NX)
   real(r8),pointer   :: histr_1D_SURF_ELEV_col(:)      !-CDPTH(NU(NY,NX)-1,NY,NX)+DLYR(3,0,NY,NX)
@@ -254,10 +250,6 @@ implicit none
                                                                   !+trc_solml(ids_NO2,1,NY,NX)+trc_solml(ids_NO2B,1,NY,NX))/BKVL(1,NY,NX)
   real(r8),pointer   :: histr_2D_cPO4_vr_col(:,:)        !(trc_solml(ids_H1PO4,1:JZ,NY,NX)+trc_solml(ids_H1PO4B,1,NY,NX)+trc_solml(ids_H2PO4,1,NY,NX)+trc_solml(ids_H2PO4B,1,NY,NX))/VOLW(1,NY,NX)
   real(r8),pointer   :: histr_2D_cEXCH_P_vr_col(:,:)     !31.0*(trcx_solml(idx_HPO4,1,NY,NX)+trcx_solml(idx_H2PO4,1,NY,NX)+trcx_solml(idx_HPO4B,1,NY,NX)+trcx_solml(idx_H2PO4B,1,NY,NX))/BKVL(1,NY,NX)
-  real(r8),pointer   :: histr_2D_TMAX_SOIL_vr_col(:,:)    !TSMX(1:JZ,NY,NX)
-  real(r8),pointer   :: histr_2D_TMIN_SOIL_vr_col(:,:)    !TSMN(1:JZ,NY,NX)
-  real(r8),pointer   :: histr_1D_TMAX_LITR_col(:)    !TSMX(0,NY,NX)
-  real(r8),pointer   :: histr_1D_TMIN_LITR_col(:)    !TSMN(0,NY,NX)
   real(r8),pointer   :: histr_2D_ECND_vr_col(:,:)         !ECND(1:JZ,NY,NX)
 
   real(r8),pointer   :: histr_2D_PSI_RT_vr_ptc(:,:)     !PSIRT(1,1:JZ,NZ,NY,NX), root total water potential , MPa
@@ -325,10 +317,6 @@ implicit none
   allocate(this%histr_1D_cEXCH_P_LITR_col(beg_col:end_col))      !31.0*(trcx_solml(idx_HPO4,0,NY,NX)+trcx_solml(idx_H2PO4,0,NY,NX))/BKVL(0,NY,NX)
   allocate(this%histr_1D_NET_P_MIN_col(beg_col:end_col))       !-TRIPO4(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   allocate(this%histr_1D_RADN_col(beg_col:end_col))            !TRAD(NY,NX)
-  allocate(this%histr_1D_TMAX_AIR_col(beg_col:end_col))        !TAMX(NY,NX)
-  allocate(this%histr_1D_TMIN_AIR_col(beg_col:end_col))        !TAMN(NY,NX)
-  allocate(this%histr_1D_HMAX_AIR_col(beg_col:end_col))        !HUDX(NY,NX)
-  allocate(this%histr_1D_HMIN_AIR_col(beg_col:end_col))        !HUDN(NY,NX)
 
   allocate(this%histr_1D_PSI_SURF_col(beg_col:end_col))        !PSISM(0,NY,NX)
   allocate(this%histr_1D_SURF_ELEV_col(beg_col:end_col))       !-CDPTH(NU(NY,NX)-1,NY,NX)+DLYR(3,0,NY,NX)
@@ -506,10 +494,6 @@ implicit none
                                                                !+trc_solml(ids_NO2,1,NY,NX)+trc_solml(ids_NO2B,1,NY,NX))/BKVL(1,NY,NX)
   allocate(this%histr_2D_cPO4_vr_col(beg_col:end_col,1:JZ))         !(trc_solml(ids_H1PO4,1:JZ,NY,NX)+trc_solml(ids_H1PO4B,1,NY,NX)+trc_solml(ids_H2PO4,1,NY,NX)+trc_solml(ids_H2PO4B,1,NY,NX))/VOLW(1,NY,NX)
   allocate(this%histr_2D_cEXCH_P_vr_col(beg_col:end_col,1:JZ))      !31.0*(trcx_solml(idx_HPO4,1:JZ,NY,NX)+trcx_solml(idx_H2PO4,1:JZ,NY,NX)+trcx_solml(idx_HPO4B,1:JZ,NY,NX)+trcx_solml(idx_H2PO4B,1,NY,NX))/BKVL(1,NY,NX)
-  allocate(this%histr_2D_TMAX_SOIL_vr_col(beg_col:end_col,1:JZ))    !TSMX(1:JZ,NY,NX)
-  allocate(this%histr_2D_TMIN_SOIL_vr_col(beg_col:end_col,1:JZ))    !TSMN(1:JZ,NY,NX)
-  allocate(this%histr_1D_TMAX_LITR_col(beg_col:end_col))    !TSMX(0,NY,NX)
-  allocate(this%histr_1D_TMIN_LITR_col(beg_col:end_col))    !TSMN(0,NY,NX)
   allocate(this%histr_2D_ECND_vr_col(beg_col:end_col,1:JZ))         !ECND(1:JZ,NY,NX)
   allocate(this%histr_2D_PSI_RT_vr_ptc(beg_ptc:end_ptc,1:JZ))       !PSIRT(1,1:JZ,NZ,NY,NX), root total water potential , MPa
   allocate(this%histr_2D_prtUP_NH4_vr_ptc(beg_ptc:end_ptc,1:JZ))       !(RUPNH4(1,1:JZ,NZ,NY,NX)+RUPNH4(2,1:JZ,NZ,NY,NX) &
@@ -698,20 +682,20 @@ implicit none
   call hist_addfld1d(fname='RADN',units='MJ/day',avgflag='A',&
     long_name='*total daily solar radiation',ptr_col=data1d_ptr)      
 
-  data1d_ptr => this%histr_1D_TMAX_AIR_col(beg_col:end_col)    
-  call hist_addfld1d(fname='TMAX_AIR',units='oC',avgflag='A',&
+  data1d_ptr => this%histr_1D_AIR_TEMP_col(beg_col:end_col)    
+  call hist_addfld1d(fname='TMAX_AIR',units='oC',avgflag='X',&
     long_name='daily maximum air temperature',ptr_col=data1d_ptr)      
 
-  data1d_ptr => this%histr_1D_TMIN_AIR_col(beg_col:end_col)     
-  call hist_addfld1d(fname='TMIN_AIR',units='oC',avgflag='A',&
+  data1d_ptr => this%histr_1D_AIR_TEMP_col(beg_col:end_col)     
+  call hist_addfld1d(fname='TMIN_AIR',units='oC',avgflag='M',&
     long_name='daily minimum air temperature',ptr_col=data1d_ptr)      
 
-  data1d_ptr => this%histr_1D_HMAX_AIR_col(beg_col:end_col)       
-  call hist_addfld1d(fname='HMAX_AIR',units='kPa',avgflag='A',&
+  data1d_ptr => this%histr_1D_HUM_col(beg_col:end_col)       
+  call hist_addfld1d(fname='HMAX_AIR',units='kPa',avgflag='X',&
     long_name='daily maximum vapor pressure',ptr_col=data1d_ptr)      
 
-  data1d_ptr => this%histr_1D_HMIN_AIR_col(beg_col:end_col)    
-  call hist_addfld1d(fname='HMIN_AIR',units='kPa',avgflag='A',&
+  data1d_ptr => this%histr_1D_HUM_col(beg_col:end_col)    
+  call hist_addfld1d(fname='HMIN_AIR',units='kPa',avgflag='M',&
     long_name='daily maximum vapor pressure',ptr_col=data1d_ptr)      
     
   data1d_ptr => this%histr_1D_PSI_SURF_col(beg_col:end_col)    
@@ -1379,20 +1363,20 @@ implicit none
   call hist_addfld2d(fname='cEXCH_P_vr',units='gP/Mg soil',type2d='JZ',avgflag='A',&
     long_name='total exchangeable soil PO4 concentration',ptr_col=data2d_ptr)      
 
-  data2d_ptr => this%histr_2D_TMAX_SOIL_vr_col(beg_col:end_col,1:JZ)    !TSMX(1:JZ,NY,NX)
-  call hist_addfld2d(fname='TMAX_SOIL_vr',units='oC',type2d='JZ',avgflag='A',&
+  data2d_ptr => this%histr_2D_TEMP_vr_col(beg_col:end_col,1:JZ)  
+  call hist_addfld2d(fname='TMAX_SOIL_vr',units='oC',type2d='JZ',avgflag='X',&
     long_name='Soil maximum temperature profile',ptr_col=data2d_ptr)      
 
-  data2d_ptr => this%histr_2D_TMIN_SOIL_vr_col(beg_col:end_col,1:JZ)    !TSMN(1:JZ,NY,NX)
-  call hist_addfld2d(fname='TMIN_SOIL_vr',units='oC',type2d='JZ',avgflag='A',&
+  data2d_ptr => this%histr_2D_TEMP_vr_col(beg_col:end_col,1:JZ)  
+  call hist_addfld2d(fname='TMIN_SOIL_vr',units='oC',type2d='JZ',avgflag='M',&
     long_name='Soil minimum temperature profile',ptr_col=data2d_ptr)      
 
-  data1d_ptr => this%histr_1D_TMAX_LITR_col(beg_col:end_col)    
-  call hist_addfld1d(fname='TMAX_LITR',units='oC',avgflag='A',&
+  data1d_ptr => this%histr_1D_TEMP_LITR_col(beg_col:end_col)    
+  call hist_addfld1d(fname='TMAX_LITR',units='oC',avgflag='X',&
     long_name='Litter maximum temperature',ptr_col=data1d_ptr)      
 
-  data1d_ptr => this%histr_1D_TMIN_LITR_col(beg_col:end_col)    
-  call hist_addfld1d(fname='TMIN_LITR',units='oC',avgflag='A',&
+  data1d_ptr => this%histr_1D_TEMP_LITR_col(beg_col:end_col)    
+  call hist_addfld1d(fname='TMIN_LITR',units='oC',avgflag='M',&
     long_name='Litter minimum temperature',ptr_col=data1d_ptr)      
 
   data2d_ptr => this%histr_2D_ECND_vr_col(beg_col:end_col,1:JZ)         !ECND(1:JZ,NY,NX)
@@ -1472,10 +1456,6 @@ implicit none
       this%histr_1D_ECO_HVST_P_col(ncol)  = XHVSTE(ielmp,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%histr_1D_NET_P_MIN_col(ncol)   =  -TRIPO4(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%histr_1D_RADN_col(ncol)        = TRAD(NY,NX)
-      this%histr_1D_TMAX_AIR_col(ncol)    = TAMX(NY,NX)
-      this%histr_1D_TMIN_AIR_col(ncol)    = TAMN(NY,NX)
-      this%histr_1D_HMAX_AIR_col(ncol)    = HUDX(NY,NX)
-      this%histr_1D_HMIN_AIR_col(ncol)    = HUDN(NY,NX)
       this%histr_1D_PSI_SURF_col(ncol)    = PSISM(0,NY,NX)
       this%histr_1D_SURF_ELEV_col(ncol)   = -CDPTH(NU(NY,NX)-1,NY,NX)+DLYR(3,0,NY,NX)
       this%histr_1D_SURF_tLITR_N_FLX_col(ncol)   = URSDN(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
@@ -1537,8 +1517,6 @@ implicit none
       this%histr_1D_N2O_FLX_col(ncol)     =  HN2OG(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%histr_1D_N2G_FLX_col(ncol)     =  HN2GG(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%histr_1D_NH3_FLX_col(ncol)     =  HNH3G(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-      this%histr_1D_TMAX_LITR_col(ncol)   = TSMX(0,NY,NX)
-      this%histr_1D_TMIN_LITR_col(ncol)   = TSMN(0,NY,NX)
 
       DO L=1,JZ
         this%histr_2D_tSOC_vr_col(ncol,L) =  ORGC(L,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
@@ -1559,8 +1537,6 @@ implicit none
                                                +trc_solml(ids_H2PO4,L,NY,NX)+trc_solml(ids_H2PO4B,L,NY,NX),VOLW(L,NY,NX))
         this%histr_2D_cEXCH_P_vr_col(ncol,L)= patomw*safe_adb(trcx_solml(idx_HPO4,L,NY,NX)+trcx_solml(idx_H2PO4,L,NY,NX) &
                                                +trcx_solml(idx_HPO4B,L,NY,NX)+trcx_solml(idx_H2PO4B,L,NY,NX),BKVL(L,NY,NX))
-        this%histr_2D_TMAX_SOIL_vr_col(ncol,L)= TSMX(L,NY,NX)
-        this%histr_2D_TMIN_SOIL_vr_col(ncol,L)= TSMN(L,NY,NX)
         this%histr_2D_ECND_vr_col(ncol,L)     = ECND(L,NY,NX)
       ENDDO
 

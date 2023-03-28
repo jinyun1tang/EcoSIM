@@ -51,6 +51,7 @@ module ecosim_Time_Mod
      procedure, public :: set_time_offset
      procedure, public :: get_prev_date
      procedure, public :: get_curr_date
+     procedure, public :: get_curr_doy
      procedure, public :: get_days_per_year
      procedure, public :: get_step_size
      procedure, public :: get_prev_time
@@ -852,6 +853,15 @@ contains
   yr=this%cyears+this%year0
 
   end subroutine get_curr_date
+  !-------------------------------------------------------------------------------
 
+  integer function get_curr_doy(this)
+  !
+  !get current day of year
+  implicit none
+  class(ecosim_time_type), intent(in) :: this
+
+  get_curr_doy=this%doy
+  end function get_curr_doy
 
 end module ecosim_Time_Mod

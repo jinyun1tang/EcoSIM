@@ -17,7 +17,15 @@ implicit none
   integer, parameter :: NFGsc     = 7 !# of microbial functional groups in each complex
   character(len=36)  :: case_name
   character(len=256) :: finidat =' '
-  integer, public :: nsrest
+
+  character(len=256), public :: hostname = ' '
+  character(len=256), public :: username = ' '          ! Current user
+  ! description of this source
+  character(len=256), public :: source   = "ECOSIM"
+  ! version of program
+  character(len=256), public :: version  = " "
+ 
+  integer, public :: nsrest  
   integer, public, parameter :: nsrBranch   = 2        ! Branch from restart files 
   integer, public, parameter :: nsrStartup  = 0        ! Startup from initial conditions
   integer, public, parameter :: nsrContinue = 1        ! Continue from restart files

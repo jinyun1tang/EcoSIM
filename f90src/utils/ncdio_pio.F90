@@ -456,7 +456,6 @@ module ncdio_pio
 
   write(subname,'(A)')'ncd_def_var '//trim(varname)
 
-  !print*,'define:',trim(varname)
     ! Determine dimension ids for variable
   ncid_local = ncid%fh
   dimid(:) = 0
@@ -485,8 +484,6 @@ module ncdio_pio
     call check_ret(nf90_inq_dimid(ncid_local, dim5name, dimid(5)), subname//' dim5: '//dim5name)
   endif
 
-  !print*,'Define variable'
-
   if (present(dim1name)) then
     ndims = 0
     do n = 1, size(dimid)
@@ -496,7 +493,7 @@ module ncdio_pio
   else
     call check_ret(nf90_def_var(ncid_local, trim(varname), xtype,  varid), subname)
   end if
-  !print*,'define att'
+
   if (present(long_name)) then
     call check_ret(nf90_put_att(ncid_local, varid, 'long_name',  trim(long_name)), subname)
   end if
@@ -1291,7 +1288,7 @@ module ncdio_pio
   type(Var_desc_t)  :: vardesc
 
   call check_var(ncid, trim(varname), vardesc, readvar)
-  print*,'rec',rec,varname
+
   call check_ret( nf90_get_var(ncid%fh, vardesc%varid, data,  &
     start = (/1,1,rec/)),trim(varname)//' in ncd_getvar_real_sp_2d')
 
@@ -1634,8 +1631,8 @@ module ncdio_pio
     integer :: status
     character(len=*), parameter :: subname = 'ncd_defdim'
     !-----------------------------------------------------------------------
-
-    call check_ret(nf90_def_dim(ncid%fh,attrib,value,dimid), subname)
+    
+    call check_ret(nf90_def_dim(ncid%fh,attrib,value,dimid), trim(subname)//' '//trim(attrib))
 
   end subroutine ncd_defdim
     !-----------------------------------------------------------------------
@@ -1858,6 +1855,7 @@ module ncdio_pio
     character(len=*),parameter :: subname='ncd_io_char_var0_start_glob'
 
   end subroutine ncd_io_char_var0_start_glob
+    !-----------------------------------------------------------------------
 
   subroutine ncd_io_0d_log_glob(varname, data, flag, ncid, readvar, nt, posNOTonfile)
     !
@@ -1886,6 +1884,7 @@ module ncdio_pio
 
   end subroutine ncd_io_0d_log_glob
 
+    !-----------------------------------------------------------------------
 
   subroutine ncd_io_1d_log_glob(varname, data, flag, ncid, readvar, nt, posNOTonfile)
     !
@@ -1912,6 +1911,7 @@ module ncdio_pio
     type(var_desc_t)  :: vardesc            ! local vardesc pointer
     character(len=*),parameter :: subname='ncd_io_1d_log_glob'
   end subroutine ncd_io_1d_log_glob
+    !-----------------------------------------------------------------------
 
   subroutine ncd_io_0d_int_glob(varname, data, flag, ncid, readvar, nt, posNOTonfile)
     !
@@ -2101,6 +2101,7 @@ module ncdio_pio
     type(var_desc_t)  :: vardesc            ! local vardesc pointer
     real(r8) :: temp(1)
     character(len=*),parameter :: subname='ncd_io_0d_double_glob'
+    
   end subroutine ncd_io_0d_double_glob
 !------------------------------------------------------------------------------------------
   subroutine ncd_io_1d_double_glob(varname, data, flag, ncid, readvar, nt, posNOTonfile)
@@ -2131,10 +2132,18 @@ module ncdio_pio
     character(len=*),parameter :: subname='ncd_io_1d_double_glob'
 
     if(flag=='read')then
-      call ncd_getvar_real_sp_all_1d(ncid, varname, data)
+      if(present(nt))then
+        call ncd_getvar_real_sp_1d(ncid, varname, nt, data)
+      else
+        call ncd_getvar_real_sp_all_1d(ncid, varname, data)
+      endif
       if(present(readvar))readvar=.true.
     else if(flag=='write')then
-      call ncd_putvar_real_sp_all_1d(ncid, varname, data)
+      if(present(nt))then
+        call ncd_putvar_real_sp_1d(ncid, varname, nt, data)
+      else
+        call ncd_putvar_real_sp_all_1d(ncid, varname, data)
+      endif
     endif
   end subroutine ncd_io_1d_double_glob
 !------------------------------------------------------------------------------------------
@@ -2353,13 +2362,27 @@ module ncdio_pio
     integer                          :: count(3)   ! netcdf count index
     integer                          :: status     ! error code
     logical                          :: varpresent ! if true, variable is on tape
-    integer                , pointer :: idata(:)   ! Temporary integer data to send to file
     integer                , pointer :: compDOF(:)
     type(iodesc_plus_type) , pointer :: iodesc_plus
     type(var_desc_t)                 :: vardesc
     character(len=*),parameter       :: subname='ncd_io_1d_double' ! subroutine name
-  end subroutine ncd_io_1d_double
 
+    if(flag=='read')then
+      if(present(nt))then
+        call ncd_getvar_real_sp_1d(ncid, varname, nt, data)
+      else
+        call ncd_getvar_real_sp_all_1d(ncid, varname, data)
+      endif
+      if(present(readvar))readvar=.true.
+    else if(flag=='write')then
+      if(present(nt))then
+        call ncd_putvar_real_sp_1d(ncid, varname, nt, data)
+      else
+        call ncd_putvar_real_sp_all_1d(ncid, varname, data)
+      endif
+    endif
+  end subroutine ncd_io_1d_double
+  !-----------------------------------------------------------------------
   subroutine ncd_io_1d_logical(varname, data, dim1name, flag, ncid, nt, readvar, cnvrtnan2fill)
     !
     ! !DESCRIPTION:
