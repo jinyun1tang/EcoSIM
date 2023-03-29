@@ -27,6 +27,9 @@ SUBROUTINE soil(NE,NEX,NHW,NHE,NVN,NVS)
   use EcoSIMCtrlDataType
   use EcoSIMHistMod
   use EcoSIMConfig
+  use HistDataType , only : hist_ecosim
+  use HistFileMod  , only : hist_update_hbuf,hist_htapes_wrapup
+  use GridConsts   , only : bounds
 
   implicit none
   integer :: yearc, yeari
@@ -37,7 +40,7 @@ SUBROUTINE soil(NE,NEX,NHW,NHE,NVN,NVS)
   integer :: I,J
   integer :: idaz
   character(len=14) :: ymdhs
-
+  logical :: nlend, rstwr, lnyr
 ! begin_execution
 !
 ! READ INPUT DATA FOR SITE, SOILS AND MANAGEMENT IN 'READS'
@@ -147,8 +150,14 @@ SUBROUTINE soil(NE,NEX,NHW,NHE,NVN,NVS)
       ENDIF
     
       call end_timer_loop()
+      call hist_ecosim%hist_update(bounds)
+      call hist_update_hbuf(bounds)      
       call etimer%update_time_stamp()      
-      
+
+      nlend=etimer%its_time_to_exit()
+      rstwr=.false.
+      lnyr=etimer%its_a_new_year().and.hist_yrclose
+      call hist_htapes_wrapup( rstwr, nlend, bounds, lnyr )      
     END DO
     
     IF(restart_out.AND.KOUT.GT.0)THEN

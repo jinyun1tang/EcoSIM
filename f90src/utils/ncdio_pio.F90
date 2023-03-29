@@ -2174,12 +2174,19 @@ module ncdio_pio
     real(r8) :: temp(1)
     character(len=*),parameter :: subname='ncd_io_2d_double_glob'
 
-
     if(trim(flag)=='read')then
-      call ncd_getvar_real_sp_all_2d(ncid, varname, data)
+      if(present(nt))then
+        call ncd_getvar_real_sp_2d(ncid, varname, nt, data)      
+      else
+        call ncd_getvar_real_sp_all_2d(ncid, varname, data)
+      endif
       if(present(readvar))readvar=.true.
     else if(trim(flag)=='write')then
-      call ncd_putvar_real_sp_all_2d(ncid, varname, data)  
+      if(present(nt))then
+        call ncd_putvar_real_sp_2d(ncid, varname, nt, data)        
+      else
+        call ncd_putvar_real_sp_all_2d(ncid, varname, data)  
+      endif
     endif
   end subroutine ncd_io_2d_double_glob
   !-----------------------------------------------------------------------
@@ -2418,6 +2425,7 @@ module ncdio_pio
     type(var_desc_t)                 :: vardesc
     character(len=*),parameter       :: subname='ncd_io_1d_logical' ! subroutine name
   end subroutine ncd_io_1d_logical
+!----------------------------------------------------------------------
 
   subroutine ncd_io_2d_int(varname, data, dim1name, lowerb2, upperb2, &
        flag, ncid, nt, readvar, switchdim, cnvrtnan2fill)
@@ -2437,6 +2445,7 @@ module ncdio_pio
     logical, optional, intent(in)  :: switchdim       ! true=> permute dim1 and dim2 for output
     logical, optional, intent(in)  :: cnvrtnan2fill   ! true => convert any NaN's to _FillValue (spval)
   end subroutine ncd_io_2d_int
+!----------------------------------------------------------------------
 
   subroutine ncd_io_2d_double(varname, data, dim1name, lowerb2, upperb2, &
        flag, ncid, nt, readvar, switchdim, cnvrtnan2fill)
@@ -2455,7 +2464,24 @@ module ncdio_pio
     logical, optional, intent(out) :: readvar         ! true => variable is on initial dataset (read only)
     logical, optional, intent(in)  :: switchdim       ! true=> permute dim1 and dim2 for output
     logical, optional, intent(in)  :: cnvrtnan2fill   ! true => convert any NaN's to _FillValue (spval)
+
+    if(trim(flag)=='read')then
+      if(present(nt))then
+        call ncd_getvar_real_sp_2d(ncid, varname, nt, data)      
+      else
+        call ncd_getvar_real_sp_all_2d(ncid, varname, data)
+      endif
+      if(present(readvar))readvar=.true.
+    else if(trim(flag)=='write')then
+      if(present(nt))then
+        call ncd_putvar_real_sp_2d(ncid, varname, nt, data)        
+      else
+        call ncd_putvar_real_sp_all_2d(ncid, varname, data)  
+      endif
+    endif
+
   end subroutine ncd_io_2d_double
+!----------------------------------------------------------------------
 
   subroutine ncd_io_3d_int(varname, data, dim1name, flag, ncid, nt, readvar)
     !

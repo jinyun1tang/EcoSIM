@@ -14,6 +14,7 @@ PROGRAM main
   use EcoSIMCtrlDataType
   use readiMod          , only : readi
   USE fileUtil          , ONLY : iulog
+  use HistFileMod       , only : hist_htapes_build
   use EcoSIMConfig      , only : case_name,set_sim_type,nsrContinue
   use EcoSIMHistMod
   use EcosimConst
@@ -89,12 +90,14 @@ PROGRAM main
     ymdhs0='18820114000000'
     read(ymdhs0,'(I4)')year_beg
     call etimer%Init(year0=year_beg)   
-  else
+  else  
     ymdhs0='00000000000000'
     year_beg=year_ini
     ymdhs0(1:8)=sim_yyyymmdd
     call etimer%Init(year0=year_beg)
+    call hist_htapes_build()
   endif
+  
   call frectyp%Init()
 
   frectyp%ymdhs0=ymdhs0

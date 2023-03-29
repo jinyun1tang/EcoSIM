@@ -242,7 +242,7 @@ implicit none
   call ncd_defdim(lnfid, trim(namep), nump, dimid)
 
   ! "level" dimensions
-  call ncd_defdim(lnfid, 'levgsoi', JZ, dimid)
+  call ncd_defdim(lnfid, 'levsoi', JZ, dimid)
   call ncd_defdim(lnfid, 'levsno',  JS,dimid)
   call ncd_defdim(lnfid, 'levcanopy',JC,dimid)
   call ncd_defdim(lnfid, 'npfts',  JP,dimid)
@@ -553,14 +553,14 @@ implicit none
   hpindex = pointer_index()
 
   select case (type2d)
-  case ('JZ')
+  case ('levsoi')
       num2d = JZ
-  case ('JBR')
+  case ('nbranches')
       num2d = JBR
   case default
       write(iulog,*) trim(subname),' ERROR: unsupported 2d type ',type2d, &
         ' currently supported types for multi level fields are: ', &
-        '[levgrnd,levlak,numrad,nmonthlevdcmp,levtrc,ltype,natpft,cft,glc_nec,elevclas,levsno,levsoi]'
+        '[levgrnd,levlak,numrad,nmonthlevdcmp,levtrc,ltype,natpft,cft,glc_nec,elevclas,levsno,levsoi,nbranches]'
       call endrun(msg=errMsg(__FILE__, __LINE__))
   end select    
   if (present(ptr_gcell)) then
@@ -1703,8 +1703,7 @@ implicit none
 
           if (tape(t)%ntimes == 1) then
 !             call t_startf('hist_htapes_wrapup_define')
-             locfnh(t) = set_hist_filename (hist_freq=tape(t)%nhtfrq, &
-                                            hist_mfilt=tape(t)%mfilt, hist_file=t)
+             locfnh(t) = set_hist_filename (hist_freq=tape(t)%nhtfrq,hist_mfilt=tape(t)%mfilt, hist_file=t)
 !             if (masterproc) then
                 write(iulog,*) trim(subname),' : Creating history file ', trim(locfnh(t)), &
                      ' at nstep = ',etimer%get_nstep()
@@ -1963,7 +1962,7 @@ implicit none
 
   !------------------------------------------------------------------------
   subroutine hist_do_disp (ntapes, hist_ntimes, hist_mfilt, if_stop, if_disphist, rstwr, nlend)
-!  subroutine hist_do_disp (ntapes, hist_ntimes, hist_mfilt, if_stop, if_disphist)
+
     !
     ! !DESCRIPTION:
     ! Determine logic for closeing and/or disposing history file
@@ -2179,12 +2178,14 @@ implicit none
             comment="This variable NOT needed for startup or branch simulations", &
             dim1name='max_chars', dim2name="ntapes" )
        ier = ncd_inq_varid(ncid, 'locfnh', vardesc)
-
+ !      ier = ncd_putatt(ncid, vardesc%varid, 'interpinic_flag', iflag_skip)
+ 
        call ncd_defvar(ncid=ncid, varname='locfnhr', xtype=ncd_char, &
             long_name="Restart history filename",     &
             comment="This variable NOT needed for startup or branch simulations", &
             dim1name='max_chars', dim2name="ntapes" )
        ier = ncd_inq_varid(ncid, 'locfnhr', vardesc)
+!       ier = ncd_putatt(ncid, vardesc%varid, 'interpinic_flag', iflag_skip)
 
        ! max_nflds is the maximum number of fields on any tape
        ! max_flds is the maximum number possible number of fields 

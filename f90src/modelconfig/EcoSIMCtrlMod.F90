@@ -18,6 +18,7 @@ implicit none
   logical :: continue_run
   logical :: restart_out
   logical :: visual_out
+  logical :: hist_yrclose
   character(len=16) :: hist_config(10)
   character(len=8)  :: sim_yyyymmdd
   integer :: forc_periods(9)

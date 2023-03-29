@@ -64,6 +64,6 @@ else
   nc-config --prefix
   elif [[ "$1" == *"flibs"* ]];
   then
-  nc-config --flibs
+  nf-config --flibs
   fi
 fi

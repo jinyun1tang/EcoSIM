@@ -52,10 +52,11 @@ module InitEcoSIM
   use PlantMngmtDataType  , only : InitPlantMngmtData
   use InitSOMBGCMod       , only : InitSOMBGC
   use GridConsts
-
+  use HistDataType        , only : hist_ecosim
   use EcoSIMConfig        , only : jcplx1 => jcplx1c
   use TracerIDMod         , only : InitTracerIDs
   implicit  none
+  
   integer                 , intent(in) :: nmicbguilds   !number of microbial guilds per group
 
 ! begin_execution
@@ -82,7 +83,7 @@ module InitEcoSIM
 
   call InitPlantMngmtData
 
-  call InitPlantRates(micpar%n_pltlitrk)
+  call InitPlantRates(micpar%n_pltlitrk,pltpar%jroots)
 
   call InitSoilProperty
 
@@ -144,6 +145,7 @@ module InitEcoSIM
 
   call InitModules2
     
+  call hist_ecosim%Init(bounds)
 
   end subroutine InitModules
 

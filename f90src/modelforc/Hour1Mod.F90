@@ -767,7 +767,7 @@ module Hour1Mod
 
   TRFGas_root(idg_beg:idg_end-1,NY,NX)=0.0_r8
   ZESNC(NY,NX,:)=0.0_r8
-  WTSTGT(NY,NX)=0.0_r8
+  WTSTGET(1:npelms,NY,NX)=0.0_r8
   PPT(NY,NX)=0.0_r8
 ! zero arrays in the snow layers
   FLSW(1:JS,NY,NX)=0.0_r8
@@ -825,9 +825,7 @@ module Hour1Mod
 
   GasDisFlx(idg_beg:idg_end,0:NL(NY,NX),NY,NX)=0.0_r8
 
-  TDFOMC(1:jcplx,NU(NY,NX):NL(NY,NX),NY,NX)=0.0_r8
-  TDFOMN(1:jcplx,NU(NY,NX):NL(NY,NX),NY,NX)=0.0_r8
-  TDFOMP(1:jcplx,NU(NY,NX):NL(NY,NX),NY,NX)=0.0_r8
+  TDFOME(1:npelms,1:jcplx,NU(NY,NX):NL(NY,NX),NY,NX)=0.0_r8
   ROXSK(1:NPH,NU(NY,NX):NL(NY,NX),NY,NX)=0.0_r8
   end subroutine SetArrays4PlantSoilTransfer
 !------------------------------------------------------------------------------------------

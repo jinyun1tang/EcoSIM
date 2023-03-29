@@ -25,6 +25,7 @@ module Hist1Mod
   use SoilBGCDataType
   use AqueChemDatatype
   use SurfSoilDataType
+  use ElmIDMod 
   use MiniMathMod, only : AZMAX1
   implicit none
 
@@ -1569,7 +1570,7 @@ module Hist1Mod
                   IF(K.EQ.47)HEAD(M)=THRE(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
                   IF(K.EQ.48)HEAD(M)=UCH4F(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
                   IF(K.EQ.49)HEAD(M)=UCO2S(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-                  IF(K.EQ.50)HEAD(M)=WTSTGT(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+                  IF(K.EQ.50)HEAD(M)=WTSTGET(ielmc,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
                 ENDIF
               ENDDO
               WRITE(LUN,'(A16,F8.3,4X,A8,50E16.7E3)')OUTFILS(N-20,NY,NX),DOY,CDATE,(HEAD(K),K=1,M)

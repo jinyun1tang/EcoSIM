@@ -69,7 +69,7 @@ implicit none
   real(r8),target,allocatable ::  UDIND(:,:)                         !total subsurface DIN flux, [g d-2]
   real(r8),target,allocatable ::  UDIPQ(:,:)                         !total surface DIP flux, [g d-2]
   real(r8),target,allocatable ::  UDIPD(:,:)                         !total subsurface DIP flux, [g d-2]
-  real(r8),target,allocatable ::  WTSTGT(:,:)                        !total standing dead C, [g d-2]
+  real(r8),target,allocatable ::  WTSTGET(:,:,:)                        !total standing dead C, [g d-2]
   real(r8),target,allocatable ::  ZDRAIN(:,:)                        !total N drainage below root zone, [g d-2]
   real(r8),target,allocatable ::  PDRAIN(:,:)                        !total P drainage below root zone, [g d-2]
   real(r8),target,allocatable ::  UION(:,:)                          !total soil ion content, [mol d-2]
@@ -210,7 +210,7 @@ implicit none
   allocate(UDIND(JY,JX));       UDIND=0._r8
   allocate(UDIPQ(JY,JX));       UDIPQ=0._r8
   allocate(UDIPD(JY,JX));       UDIPD=0._r8
-  allocate(WTSTGT(JY,JX));      WTSTGT=0._r8
+  allocate(WTSTGET(npelms,JY,JX));      WTSTGET=0._r8
   allocate(ZDRAIN(JY,JX));      ZDRAIN=0._r8
   allocate(PDRAIN(JY,JX));      PDRAIN=0._r8
   allocate(UION(JY,JX));        UION=0._r8
@@ -342,7 +342,7 @@ implicit none
   call destroy(UDIND)
   call destroy(UDIPQ)
   call destroy(UDIPD)
-  call destroy(WTSTGT)
+  call destroy(WTSTGET)
   call destroy(ZDRAIN)
   call destroy(PDRAIN)
   call destroy(UION)

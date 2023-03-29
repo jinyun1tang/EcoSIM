@@ -49,7 +49,7 @@ module ExtractsMod
   associate(                             &
    NP0      => plt_site%NP0        , &
    WGLFT    => plt_biom%WGLFT      , &
-   WTSTGT   => plt_biom%WTSTGT     , &
+   WTSTGET  => plt_biom%WTSTGET   , &
    WTSTGE   => plt_biom%WTSTGE     , &
    HESNC    => plt_bgcr%HESNC      , &
    ZESNC    => plt_bgcr%ZESNC      , &
@@ -67,15 +67,16 @@ module ExtractsMod
 !
 !   ZCSNC,ZZSNC,ZPSNC=total C,N,P litterfall
 !   HCSNC,HZSNC,HPSNC=hourly PFT C,N,P litterfall from grosub.f
-!   WTSTGT=total standing dead C,N,P mass
+!   WTSTGET=total standing dead C,N,P mass
 !   WTSTG=PFT standing dead C,N,P mass
 !   ESNC,=cumulative PFT C,N,P litterfall from grosub.f
 !   ESNT,=cumulative total C,N,P litterfall
 !
     DO NE=1,npelms
       ZESNC(NE)=ZESNC(NE)+HESNC(NE,NZ)
+      WTSTGET(NE)=WTSTGET(NE)+WTSTGE(NE,NZ)
     ENDDO
-    WTSTGT=WTSTGT+WTSTGE(ielmc,NZ)
+    
     DO  L=0,NI(NZ)
       DO K=1,pltpar%n_pltlitrk
         DO NE=1,npelms
@@ -134,7 +135,7 @@ module ExtractsMod
   implicit none
   integer, intent(in) :: NZ
 
-  integer :: N,L,K,NTG
+  integer :: N,L,K,NTG,NE
 
   associate(                       &
     NU    => plt_site%NU     , &
@@ -178,9 +179,7 @@ module ExtractsMod
     RP14X => plt_bgcr%RP14X  , &
     RNHBX => plt_bgcr%RNHBX  , &
     ROXYX => plt_bgcr%ROXYX  , &
-    TDFOMP=> plt_bgcr%TDFOMP , &
-    TDFOMN=> plt_bgcr%TDFOMN , &
-    TDFOMC=> plt_bgcr%TDFOMC , &
+    TDFOME=> plt_bgcr%TDFOME , &
     TUPH1B=> plt_bgcr%TUPH1B , &
     TUPH2B=> plt_bgcr%TUPH2B , &
     TUPNOB=> plt_bgcr%TUPNOB , &
@@ -296,13 +295,13 @@ module ExtractsMod
 !
 !     TOTAL ROOT C,N,P EXUDATION
 !
-!     TDFOMC,TDFOMN,TDFOMP=total nonstructl C,N,P exchange
+!     TDFOME=total nonstructl C,N,P exchange
 !     RDFOMC,RDFOMN,RDFOMP=PFT nonstructl C,N,P exchange
 !
       DO K=1,jcplx
-        TDFOMC(K,L)=TDFOMC(K,L)-RDFOME(ielmc,N,K,L,NZ)
-        TDFOMN(K,L)=TDFOMN(K,L)-RDFOME(ielmn,N,K,L,NZ)
-        TDFOMP(K,L)=TDFOMP(K,L)-RDFOME(ielmp,N,K,L,NZ)
+        DO NE=1,npelms
+          TDFOME(NE,K,L)=TDFOME(NE,K,L)-RDFOME(ielmc,N,K,L,NZ)
+        ENDDO
       ENDDO
 !
 !     TOTAL ROOT O2, NH4, NO3, PO4 UPTAKE CONTRIBUTES TO

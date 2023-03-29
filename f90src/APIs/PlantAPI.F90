@@ -125,7 +125,7 @@ implicit none
   XHVSTE(1:npelms,NY,NX)=plt_distb%XHVSTE(1:npelms)
   TVOLWC(NY,NX)=plt_ew%TVOLWC
   TSH(NY,NX)   =plt_ew%TSH
-  WTSTGT(NY,NX)=plt_biom%WTSTGT
+  WTSTGET(1:npelms,NY,NX)=plt_biom%WTSTGET(1:npelms)
   UVOLO(NY,NX) =plt_ew%UVOLO
   ARSTC(NY,NX) =plt_morph%ARSTC
   ARLFC(NY,NX) =plt_morph%ARLFC
@@ -209,9 +209,7 @@ implicit none
     TUPH1P(L,NY,NX)=plt_bgcr%TUPH1P(L)
     TUPH2P(L,NY,NX)=plt_bgcr%TUPH2P(L)
     DO  K=1,jcplx
-      TDFOMP(K,L,NY,NX)=plt_bgcr%TDFOMP(K,L)
-      TDFOMN(K,L,NY,NX)=plt_bgcr%TDFOMN(K,L)
-      TDFOMC(K,L,NY,NX)=plt_bgcr%TDFOMC(K,L)
+      TDFOME(1:npelms,K,L,NY,NX)=plt_bgcr%TDFOME(1:npelms,K,L)
     ENDDO
   ENDDO
   DO NZ=1,NP0(NY,NX)
@@ -959,7 +957,7 @@ implicit none
   plt_site%VOLWOU=VOLWOU
   plt_site%PPT=PPT(NY,NX)
   plt_bgcr%RECO=RECO(NY,NX)
-  plt_biom%WTSTGT=WTSTGT(NY,NX)
+  plt_biom%WTSTGET(1:npelms)=WTSTGET(1:npelms,NY,NX)
   plt_bgcr%ZESNC(1:npelms)=ZESNC(1:npelms,NY,NX)
   plt_morph%ARSTC=ARSTC(NY,NX)
   plt_ew%TSH=TSH(NY,NX)
@@ -1046,9 +1044,7 @@ implicit none
     plt_bgcr%TUPH1P(L)=TUPH1P(L,NY,NX)
     plt_bgcr%TUPH2P(L)=TUPH2P(L,NY,NX)
     DO  K=1,jcplx
-      plt_bgcr%TDFOMP(K,L)=TDFOMP(K,L,NY,NX)
-      plt_bgcr%TDFOMN(K,L)=TDFOMN(K,L,NY,NX)
-      plt_bgcr%TDFOMC(K,L)=TDFOMC(K,L,NY,NX)
+      plt_bgcr%TDFOME(1:npelms,K,L)=TDFOME(1:npelms,K,L,NY,NX)
     ENDDO
   ENDDO
 

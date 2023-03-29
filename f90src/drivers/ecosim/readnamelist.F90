@@ -2,12 +2,13 @@
 !!
 ! Description:
 ! read control namelist
-  use abortutils   , only : endrun
-  use EcoSIMConfig , only : transport_on,column_mode, do_instequil,finidat
-  use ForcWriterMod, only : bgc_forc_conf,do_bgcforc_write
-  use fileUtil     , only : iulog
-  use EcoSIMHistMod, only : DATAC
+  use abortutils     , only : endrun
+  use EcoSIMConfig   , only : transport_on,column_mode, do_instequil,finidat
+  use ForcWriterMod  , only : bgc_forc_conf,do_bgcforc_write
+  use fileUtil       , only : iulog
+  use EcoSIMHistMod  , only : DATAC
   use EcoSIMCtrlMod
+  use HistFileMod
   implicit none
   character(len=*), parameter :: mod_filename = __FILE__
   character(len=*), intent(in) :: nmlfile
@@ -24,11 +25,13 @@
   character(len=64) :: bgc_fname
 
   namelist /ecosys/case_name, prefix, do_regression_test, &
-  num_of_simdays,lverbose,num_microbial_guilds,transport_on,column_mode,&
-  do_instequil,salt_model, pft_file_in,grid_file_in,pft_mgmt_in, clm_factor_in,&
-  clm_file_in,soil_mgmt_in,hist_config,sim_yyyymmdd,forc_periods,&
+    num_of_simdays,lverbose,num_microbial_guilds,transport_on,column_mode,&
+    do_instequil,salt_model, pft_file_in,grid_file_in,pft_mgmt_in, clm_factor_in,&
+    clm_file_in,soil_mgmt_in,hist_config,sim_yyyymmdd,forc_periods,&
     NPXS,NPYS,JOUTS,IOUTS,KOUTS,continue_run,visual_out,restart_out,&
     finidat
+  
+  namelist /ecosys/hist_nhtfrq,hist_mfilt,hist_fincl1,hist_fincl2,hist_yrclose
 
   logical :: laddband
   namelist /bbgcforc/do_bgcforc_write,do_year,do_doy,laddband,do_layer,&
@@ -50,6 +53,7 @@
   restart_out=.false.  
   finidat=' '
   hist_config='NO'
+  hist_yrclose=.false.
   sim_yyyymmdd='18000101'
   forc_periods=(/1980,1980,1,1981,1988,2,1989,2008,1/)
 

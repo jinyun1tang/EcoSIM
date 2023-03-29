@@ -15,7 +15,7 @@ set(IOUTILS_SOURCES
 	splitc.F90
 	splitp.c
 	splits.c
-	HistIdTypeMod.F90
+	HistDataType.F90
     HistFileMod.F90
     bhistMod.F90
 )

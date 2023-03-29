@@ -309,6 +309,8 @@ module RedistMod
 !------------------------------------------------------------------------------------------
 
   subroutine HandleSurfaceBoundary(I,NY,NX)
+  
+  use ElmIDMod
   implicit none
   integer, intent(in) :: I,NY,NX
 
@@ -985,8 +987,9 @@ module RedistMod
   end subroutine UpdateSurfaceLayerSalt
 !------------------------------------------------------------------------------------------
 
-
   subroutine UpdateChemInSoilLayers(NY,NX,LG,VOLISO,DORGC,DVOLI,TXCO2,DORGE)
+  !
+  use ElmIDMod
   implicit none
   integer, intent(in) :: NY,NX,LG
   real(r8), intent(inout) :: VOLISO
@@ -1117,9 +1120,9 @@ module RedistMod
     !     DOC, DON, DOP FROM PLANT EXUDATION
     !
     D195: DO K=1,jcplx
-      OQC(K,L,NY,NX)=OQC(K,L,NY,NX)+TDFOMC(K,L,NY,NX)
-      OQN(K,L,NY,NX)=OQN(K,L,NY,NX)+TDFOMN(K,L,NY,NX)
-      OQP(K,L,NY,NX)=OQP(K,L,NY,NX)+TDFOMP(K,L,NY,NX)
+      OQC(K,L,NY,NX)=OQC(K,L,NY,NX)+TDFOME(ielmc,K,L,NY,NX)
+      OQN(K,L,NY,NX)=OQN(K,L,NY,NX)+TDFOME(ielmn,K,L,NY,NX)
+      OQP(K,L,NY,NX)=OQP(K,L,NY,NX)+TDFOME(ielmp,K,L,NY,NX)
     ENDDO D195
     !
     !     SOIL SOLUTES FROM AQUEOUS TRANSPORT, MICROBIAL AND ROOT
@@ -1238,8 +1241,10 @@ module RedistMod
     ROXYF(L,NY,NX)=RTGasADFlx(idg_O2,L,NY,NX)
     RCO2F(L,NY,NX)=RTGasADFlx(idg_CO2,L,NY,NX)
     RCH4F(L,NY,NX)=RTGasADFlx(idg_CH4,L,NY,NX)
-    ROXYL(L,NY,NX)=trcs_TFLS(idg_O2,L,NY,NX)+trcs_RFLU(idg_O2,L,NY,NX)+trcs_XFXS(idg_O2,L,NY,NX)+trcg_XBLL(idg_O2,L,NY,NX)
-    RCH4L(L,NY,NX)=trcs_TFLS(idg_CH4,L,NY,NX)+trcs_RFLU(idg_CH4,L,NY,NX)+trcs_XFXS(idg_CH4,L,NY,NX)+trcg_XBLL(idg_CH4,L,NY,NX)
+    ROXYL(L,NY,NX)=trcs_TFLS(idg_O2,L,NY,NX)+trcs_RFLU(idg_O2,L,NY,NX) &
+      +trcs_XFXS(idg_O2,L,NY,NX)+trcg_XBLL(idg_O2,L,NY,NX)
+    RCH4L(L,NY,NX)=trcs_TFLS(idg_CH4,L,NY,NX)+trcs_RFLU(idg_CH4,L,NY,NX) &
+      +trcs_XFXS(idg_CH4,L,NY,NX)+trcg_XBLL(idg_CH4,L,NY,NX)
     !
     !     GRID CELL BOUNDARY FLUXES FROM ROOT GAS TRANSFER
 !   watch out the following code for changes

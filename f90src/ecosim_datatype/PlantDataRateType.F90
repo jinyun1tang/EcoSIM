@@ -113,9 +113,7 @@ module PlantDataRateType
   real(r8),target,allocatable ::  TUPNOB(:,:,:)                      !total root-soil NO3 flux band, [g d-2 h-1]
   real(r8),target,allocatable ::  TUPH2B(:,:,:)                      !total root-soil PO4 flux band, [g d-2 h-1]
   real(r8),target,allocatable ::  TUPNF(:,:,:)                       !total root N2 fixation, [g d-2 h-1]
-  real(r8),target,allocatable ::  TDFOMC(:,:,:,:)                    !total root C exchange, [g d-2 h-1]
-  real(r8),target,allocatable ::  TDFOMN(:,:,:,:)                    !total root N exchange, [g d-2 h-1]
-  real(r8),target,allocatable ::  TDFOMP(:,:,:,:)                    !total root P exchange, [g d-2 h-1]
+  real(r8),target,allocatable ::  TDFOME(:,:,:,:,:)                  !total root element exchange, [g d-2 h-1]
   real(r8),target,allocatable ::  TCO2P(:,:,:)                       !total root CO2 flux, [g d-2 h-1]
   real(r8),target,allocatable ::  TUPOXP(:,:,:)                      !total root internal O2 flux, [g d-2 h-1]
   real(r8),target,allocatable ::  RTDNT(:,:,:)                       !total root length density, [m m-3]
@@ -151,39 +149,39 @@ module PlantDataRateType
   contains
 
 !----------------------------------------------------------------------
-  subroutine InitPlantRates(n_pltlitrk)
+  subroutine InitPlantRates(n_pltlitrk,jroots)
   implicit none
   integer, intent(in) :: n_pltlitrk
-
-  call InitAllocate(n_pltlitrk)
+  integer, intent(in) :: jroots
+  call InitAllocate(n_pltlitrk,jroots)
 
   end subroutine InitPlantRates
 !----------------------------------------------------------------------
 
-  subroutine InitAllocate(n_pltlitrk)
+  subroutine InitAllocate(n_pltlitrk,jroots)
 
   implicit none
   integer, intent(in) :: n_pltlitrk
-
+  integer, intent(in) :: jroots    !number of root types, root,mycos
   allocate(TCNET(JY,JX));       TCNET=0._r8
   allocate(RNH3C(JP,JY,JX));    RNH3C=0._r8
   allocate(TNH3C(JP,JY,JX));    TNH3C=0._r8
   allocate(TESN0(npelms,JP,JY,JX));    TESN0=0._r8
   allocate(RDFOME(npelms,2,1:jcplx,JZ,JP,JY,JX));RDFOME=0._r8
-  allocate(RUPNH4(2,JZ,JP,JY,JX));RUPNH4=0._r8
-  allocate(RUPNHB(2,JZ,JP,JY,JX));RUPNHB=0._r8
-  allocate(RUPNO3(2,JZ,JP,JY,JX));RUPNO3=0._r8
-  allocate(RUPNOB(2,JZ,JP,JY,JX));RUPNOB=0._r8
-  allocate(RUPH2P(2,JZ,JP,JY,JX));RUPH2P=0._r8
-  allocate(RUPH2B(2,JZ,JP,JY,JX));RUPH2B=0._r8
+  allocate(RUPNH4(jroots,JZ,JP,JY,JX));RUPNH4=0._r8
+  allocate(RUPNHB(jroots,JZ,JP,JY,JX));RUPNHB=0._r8
+  allocate(RUPNO3(jroots,JZ,JP,JY,JX));RUPNO3=0._r8
+  allocate(RUPNOB(jroots,JZ,JP,JY,JX));RUPNOB=0._r8
+  allocate(RUPH2P(jroots,JZ,JP,JY,JX));RUPH2P=0._r8
+  allocate(RUPH2B(jroots,JZ,JP,JY,JX));RUPH2B=0._r8
   allocate(RUPNF(JZ,JP,JY,JX)); RUPNF=0._r8
-  allocate(RUPHGS(2,JZ,JP,JY,JX));RUPHGS=0._r8
-  allocate(RUPH1P(2,JZ,JP,JY,JX));RUPH1P=0._r8
-  allocate(RUPH1B(2,JZ,JP,JY,JX));RUPH1B=0._r8
-  allocate(RUPP2P(2,JZ,JP,JY,JX));RUPP2P=0._r8
-  allocate(RUPP2B(2,JZ,JP,JY,JX));RUPP2B=0._r8
-  allocate(RUPP1P(2,JZ,JP,JY,JX));RUPP1P=0._r8
-  allocate(RUPP1B(2,JZ,JP,JY,JX));RUPP1B=0._r8
+  allocate(RUPHGS(jroots,JZ,JP,JY,JX));RUPHGS=0._r8
+  allocate(RUPH1P(jroots,JZ,JP,JY,JX));RUPH1P=0._r8
+  allocate(RUPH1B(jroots,JZ,JP,JY,JX));RUPH1B=0._r8
+  allocate(RUPP2P(jroots,JZ,JP,JY,JX));RUPP2P=0._r8
+  allocate(RUPP2B(jroots,JZ,JP,JY,JX));RUPP2B=0._r8
+  allocate(RUPP1P(jroots,JZ,JP,JY,JX));RUPP1P=0._r8
+  allocate(RUPP1B(jroots,JZ,JP,JY,JX));RUPP1B=0._r8
   allocate(RCELX(JBR,npelms,JP,JY,JX)); RCELX=0._r8
   allocate(RCESX(JBR,npelms,JP,JY,JX)); RCESX=0._r8
   allocate(CARBN(JP,JY,JX));    CARBN=0._r8
@@ -204,19 +202,19 @@ module PlantDataRateType
   allocate(VNH3F(JP,JY,JX));    VNH3F=0._r8
   allocate(VN2OF(JP,JY,JX));    VN2OF=0._r8
   allocate(VPO4F(JP,JY,JX));    VPO4F=0._r8
-  allocate(ROXYP(2,JZ,JP,JY,JX));ROXYP=0._r8
+  allocate(ROXYP(jroots,JZ,JP,JY,JX));ROXYP=0._r8
   allocate(trcg_RFLA(idg_beg:idg_end-1,2,JZ,JP,JY,JX));trcg_RFLA=0._r8
   allocate(trcg_RDFA(idg_beg:idg_end-1,2,JZ,JP,JY,JX));trcg_RDFA=0._r8
-  allocate(RCO2S(2,JZ,JP,JY,JX));RCO2S=0._r8
-  allocate(RUPOXS(2,JZ,JP,JY,JX));RUPOXS=0._r8
-  allocate(RUPCHS(2,JZ,JP,JY,JX));RUPCHS=0._r8
-  allocate(RUPN2S(2,JZ,JP,JY,JX));RUPN2S=0._r8
-  allocate(RUPN3S(2,JZ,JP,JY,JX));RUPN3S=0._r8
-  allocate(RUPN3B(2,JZ,JP,JY,JX));RUPN3B=0._r8
-  allocate(RCO2P(2,JZ,JP,JY,JX));RCO2P=0._r8
-  allocate(RUPOXP(2,JZ,JP,JY,JX));RUPOXP=0._r8
-  allocate(RCO2M(2,JZ,JP,JY,JX));RCO2M=0._r8
-  allocate(RCO2A(2,JZ,JP,JY,JX));RCO2A=0._r8
+  allocate(RCO2S(jroots,JZ,JP,JY,JX));RCO2S=0._r8
+  allocate(RUPOXS(jroots,JZ,JP,JY,JX));RUPOXS=0._r8
+  allocate(RUPCHS(jroots,JZ,JP,JY,JX));RUPCHS=0._r8
+  allocate(RUPN2S(jroots,JZ,JP,JY,JX));RUPN2S=0._r8
+  allocate(RUPN3S(jroots,JZ,JP,JY,JX));RUPN3S=0._r8
+  allocate(RUPN3B(jroots,JZ,JP,JY,JX));RUPN3B=0._r8
+  allocate(RCO2P(jroots,JZ,JP,JY,JX));RCO2P=0._r8
+  allocate(RUPOXP(jroots,JZ,JP,JY,JX));RUPOXP=0._r8
+  allocate(RCO2M(jroots,JZ,JP,JY,JX));RCO2M=0._r8
+  allocate(RCO2A(jroots,JZ,JP,JY,JX));RCO2A=0._r8
   allocate(UPOME(1:npelms,JP,JY,JX));    UPOME=0._r8
   allocate(UPNH4(JP,JY,JX));    UPNH4=0._r8
   allocate(UPNO3(JP,JY,JX));    UPNO3=0._r8
@@ -224,27 +222,27 @@ module PlantDataRateType
   allocate(UPH1P(JP,JY,JX));    UPH1P=0._r8
   allocate(UPNF(JP,JY,JX));     UPNF=0._r8
   allocate(RFGas_root(idg_beg:idg_end-1,JP,JY,JX)); RFGas_root=0._r8
-  allocate(RUONH4(2,JZ,JP,JY,JX));RUONH4=0._r8
-  allocate(RUONHB(2,JZ,JP,JY,JX));RUONHB=0._r8
-  allocate(RUONO3(2,JZ,JP,JY,JX));RUONO3=0._r8
-  allocate(RUONOB(2,JZ,JP,JY,JX));RUONOB=0._r8
-  allocate(RUOH2P(2,JZ,JP,JY,JX));RUOH2P=0._r8
-  allocate(RUOH2B(2,JZ,JP,JY,JX));RUOH2B=0._r8
-  allocate(RUCNH4(2,JZ,JP,JY,JX));RUCNH4=0._r8
-  allocate(RUCNHB(2,JZ,JP,JY,JX));RUCNHB=0._r8
-  allocate(RUCNO3(2,JZ,JP,JY,JX));RUCNO3=0._r8
-  allocate(RUCNOB(2,JZ,JP,JY,JX));RUCNOB=0._r8
-  allocate(RUCH2P(2,JZ,JP,JY,JX));RUCH2P=0._r8
-  allocate(RUCH2B(2,JZ,JP,JY,JX));RUCH2B=0._r8
-  allocate(RUOH1P(2,JZ,JP,JY,JX));RUOH1P=0._r8
-  allocate(RUCH1P(2,JZ,JP,JY,JX));RUCH1P=0._r8
-  allocate(RUOH1B(2,JZ,JP,JY,JX));RUOH1B=0._r8
-  allocate(RUCH1B(2,JZ,JP,JY,JX));RUCH1B=0._r8
-  allocate(RCO2N(2,JZ,JP,JY,JX));RCO2N=0._r8
-  allocate(RUNNHP(2,JZ,JP,JY,JX));RUNNHP=0._r8
-  allocate(RUNNOP(2,JZ,JP,JY,JX));RUNNOP=0._r8
-  allocate(RUNNBP(2,JZ,JP,JY,JX));RUNNBP=0._r8
-  allocate(RUNNXP(2,JZ,JP,JY,JX));RUNNXP=0._r8
+  allocate(RUONH4(jroots,JZ,JP,JY,JX));RUONH4=0._r8
+  allocate(RUONHB(jroots,JZ,JP,JY,JX));RUONHB=0._r8
+  allocate(RUONO3(jroots,JZ,JP,JY,JX));RUONO3=0._r8
+  allocate(RUONOB(jroots,JZ,JP,JY,JX));RUONOB=0._r8
+  allocate(RUOH2P(jroots,JZ,JP,JY,JX));RUOH2P=0._r8
+  allocate(RUOH2B(jroots,JZ,JP,JY,JX));RUOH2B=0._r8
+  allocate(RUCNH4(jroots,JZ,JP,JY,JX));RUCNH4=0._r8
+  allocate(RUCNHB(jroots,JZ,JP,JY,JX));RUCNHB=0._r8
+  allocate(RUCNO3(jroots,JZ,JP,JY,JX));RUCNO3=0._r8
+  allocate(RUCNOB(jroots,JZ,JP,JY,JX));RUCNOB=0._r8
+  allocate(RUCH2P(jroots,JZ,JP,JY,JX));RUCH2P=0._r8
+  allocate(RUCH2B(jroots,JZ,JP,JY,JX));RUCH2B=0._r8
+  allocate(RUOH1P(jroots,JZ,JP,JY,JX));RUOH1P=0._r8
+  allocate(RUCH1P(jroots,JZ,JP,JY,JX));RUCH1P=0._r8
+  allocate(RUOH1B(jroots,JZ,JP,JY,JX));RUOH1B=0._r8
+  allocate(RUCH1B(jroots,JZ,JP,JY,JX));RUCH1B=0._r8
+  allocate(RCO2N(jroots,JZ,JP,JY,JX));RCO2N=0._r8
+  allocate(RUNNHP(jroots,JZ,JP,JY,JX));RUNNHP=0._r8
+  allocate(RUNNOP(jroots,JZ,JP,JY,JX));RUNNOP=0._r8
+  allocate(RUNNBP(jroots,JZ,JP,JY,JX));RUNNBP=0._r8
+  allocate(RUNNXP(jroots,JZ,JP,JY,JX));RUNNXP=0._r8
   allocate(RNH3Z(JP,JY,JX));    RNH3Z=0._r8
   allocate(RNH3B(JBR,JP,JY,JX)); RNH3B=0._r8
   allocate(WFR(2,JZ,JP,JY,JX)); WFR=0._r8
@@ -268,9 +266,7 @@ module PlantDataRateType
   allocate(TUPNOB(JZ,JY,JX));   TUPNOB=0._r8
   allocate(TUPH2B(JZ,JY,JX));   TUPH2B=0._r8
   allocate(TUPNF(JZ,JY,JX));    TUPNF=0._r8
-  allocate(TDFOMC(1:jcplx,JZ,JY,JX));TDFOMC=0._r8
-  allocate(TDFOMN(1:jcplx,JZ,JY,JX));TDFOMN=0._r8
-  allocate(TDFOMP(1:jcplx,JZ,JY,JX));TDFOMP=0._r8
+  allocate(TDFOME(npelms,1:jcplx,JZ,JY,JX));TDFOME=0._r8
   allocate(TCO2P(JZ,JY,JX));    TCO2P=0._r8
   allocate(TUPOXP(JZ,JY,JX));   TUPOXP=0._r8
   allocate(RTDNT(JZ,JY,JX));    RTDNT=0._r8
@@ -406,9 +402,7 @@ module PlantDataRateType
   call destroy(TUPNOB)
   call destroy(TUPH2B)
   call destroy(TUPNF)
-  call destroy(TDFOMC)
-  call destroy(TDFOMN)
-  call destroy(TDFOMP)
+  call destroy(TDFOME)
   call destroy(TCO2P)
   call destroy(TUPOXP)
   call destroy(RTDNT)

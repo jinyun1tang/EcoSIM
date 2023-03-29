@@ -1,8 +1,9 @@
-module HistIdTypeMod
+module HistDataType
 !
 ! this module is an intermediate step to support ascii output
 ! when output is done with netcdf, no id is needed.
-  use data_kind_mod, only : r8 => SHR_KIND_R8
+  use data_kind_mod , only : r8 => SHR_KIND_R8
+  use data_const_mod, only : spval  => SHR_CONST_SPVAL
   use GridConsts
   use GridMod
   use HistFileMod
@@ -96,7 +97,9 @@ implicit none
   real(r8),pointer   :: histr_1D_ECO_NPP_col(:)        !TNPP(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: histr_1D_ECO_RH_col(:)         !THRE(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: histr_1D_tDIC_col(:)        !UCO2S(NY,NX)/AREA(3,NU(NY,NX),NY,NX), total soil DIC
-  real(r8),pointer   :: histr_1D_STG_DEAD_C_col(:)       !WTSTGT(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+  real(r8),pointer   :: histr_1D_tSTG_DEAD_C_col(:)       !WTSTGET(ielmc,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+  real(r8),pointer   :: histr_1D_tSTG_DEAD_N_col(:)       !WTSTGET(ielmn,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+  real(r8),pointer   :: histr_1D_tSTG_DEAD_P_col(:)       !WTSTGET(ielmp,NY,NX)/AREA(3,NU(NY,NX),NY,NX)    
   real(r8),pointer   :: histr_1D_tPRECN_col(:)          !1000.0_r8*URAIN(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: histr_1D_ET_col(:)             !1000.0_r8*UEVAP(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: histr_1D_N2O_LITR_col(:)       !trc_solcl(idg_N2O,0,NY,NX)
@@ -131,9 +134,9 @@ implicit none
   real(r8),pointer   :: histr_1D_SURF_ICE_col(:)       !THETIZ(0,NY,NX)
   real(r8),pointer   :: histr_1D_ACTV_LYR_col(:)       !-(DPTHA(NY,NX)-CDPTH(NU(NY,NX)-1,NY,NX))
   real(r8),pointer   :: histr_1D_WTR_TBL_col(:)        !-(DPTHT(NY,NX)-CDPTH(NU(NY,NX)-1,NY,NX))
-  real(r8),pointer   :: histr_1D_N2O_FLX_col(:)        !HN2OG(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: histr_1D_N2G_FLX_col(:)        !HN2GG(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: histr_1D_NH3_FLX_col(:)        !HNH3G(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+  real(r8),pointer   :: histr_1D_sN2O_FLX_col(:)        !HN2OG(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+  real(r8),pointer   :: histr_1D_sN2G_FLX_col(:)        !HN2GG(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+  real(r8),pointer   :: histr_1D_sNH3_FLX_col(:)        !HNH3G(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
 
   real(r8),pointer   :: histr_1D_LEAF_PC_ptc(:)       !(WTLFE(ielmp,NZ,NY,NX)+EPOOLP(ielmp,NZ,NY,NX))/(WTLFE(ielmc,NZ,NY,NX)+EPOOLP(ielmc,NZ,NY,NX)),mass based CP ratio of leaf
   real(r8),pointer   :: histr_2D_tSOC_vr_col(:,:)        !ORGC(1:JZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX), total soil C
@@ -162,7 +165,7 @@ implicit none
   real(r8),pointer   :: histr_1D_NH4_UPTK_FLX_ptc(:)      !UPNH4(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: histr_1D_NO3_UPTK_FLX_ptc(:)      !UPNO3(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: histr_1D_N2_FIXN_FLX_ptc(:)       !UPNF(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: histr_1D_NH3_FLX_ptc(:)       !RNH3C(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+  real(r8),pointer   :: histr_1D_cNH3_FLX_ptc(:)       !RNH3C(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: histr_1D_PO4_UPTK_FLX_ptc(:)      !UPH2P(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: histr_1D_SHOOT_C_ptc(:)       !WTSHTE(ielmc,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: histr_1D_LEAF_C_ptc(:)        !WTLFE(ielmc,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
@@ -265,6 +268,7 @@ implicit none
     procedure, public :: hist_update
   end type histdata_type
 
+  type(histdata_type),public :: hist_ecosim
   contains
 
   subroutine init_hist_data(this,bounds)
@@ -343,9 +347,11 @@ implicit none
   allocate(this%histr_1D_ECO_RA_col(beg_col:end_col))        !TRAU(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   allocate(this%histr_1D_ECO_NPP_col(beg_col:end_col))       !TNPP(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   allocate(this%histr_1D_ECO_RH_col(beg_col:end_col))        !THRE(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  allocate(this%histr_1D_tDIC_col(beg_col:end_col))       !UCO2S(NY,NX)/AREA(3,NU(NY,NX),NY,NX), total soil DIC
-  allocate(this%histr_1D_STG_DEAD_C_col(beg_col:end_col))      !WTSTGT(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  allocate(this%histr_1D_tPRECN_col(beg_col:end_col))         !1000.0_r8*URAIN(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+  allocate(this%histr_1D_tDIC_col(beg_col:end_col))       ;  this%histr_1D_tDIC_col=spval
+  allocate(this%histr_1D_tSTG_DEAD_C_col(beg_col:end_col));  this%histr_1D_tSTG_DEAD_C_col=spval 
+  allocate(this%histr_1D_tSTG_DEAD_N_col(beg_col:end_col));  this%histr_1D_tSTG_DEAD_N_col=spval  
+  allocate(this%histr_1D_tSTG_DEAD_P_col(beg_col:end_col));  this%histr_1D_tSTG_DEAD_P_col=spval  
+  allocate(this%histr_1D_tPRECN_col(beg_col:end_col))        !1000.0_r8*URAIN(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   allocate(this%histr_1D_ET_col(beg_col:end_col))            !1000.0_r8*UEVAP(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   allocate(this%histr_1D_N2O_LITR_col(beg_col:end_col))      !trc_solcl(idg_N2O,0,NY,NX)
   allocate(this%histr_1D_NH3_LITR_col(beg_col:end_col))      !trc_solcl(idg_NH3,0,NY,NX)
@@ -377,9 +383,9 @@ implicit none
   allocate(this%histr_1D_SURF_ICE_col(beg_col:end_col))      !THETIZ(0,NY,NX)
   allocate(this%histr_1D_ACTV_LYR_col(beg_col:end_col))      !-(DPTHA(NY,NX)-CDPTH(NU(NY,NX)-1,NY,NX))
   allocate(this%histr_1D_WTR_TBL_col(beg_col:end_col))       !-(DPTHT(NY,NX)-CDPTH(NU(NY,NX)-1,NY,NX))
-  allocate(this%histr_1D_N2O_FLX_col(beg_col:end_col))       !HN2OG(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  allocate(this%histr_1D_N2G_FLX_col(beg_col:end_col))       !HN2GG(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  allocate(this%histr_1D_NH3_FLX_col(beg_col:end_col))       !HNH3G(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+  allocate(this%histr_1D_sN2O_FLX_col(beg_col:end_col))       !HN2OG(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+  allocate(this%histr_1D_sN2G_FLX_col(beg_col:end_col))       !HN2GG(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+  allocate(this%histr_1D_sNH3_FLX_col(beg_col:end_col))       !HNH3G(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   allocate(this%histr_1D_RUNOFF_FLX_col(beg_col:end_col))        !-WQRH(NY,NX)*1000.0/TAREA, 
   allocate(this%histr_1D_SEDIMENT_FLX_col(beg_col:end_col))      !USEDOU(NY,NX)*1000.0/TAREA, soil mass 
   allocate(this%histr_1D_DISCHG_FLX_col(beg_col:end_col))        !HVOLO(NY,NX)*1000.0/TAREA
@@ -409,7 +415,7 @@ implicit none
   allocate(this%histr_1D_NH4_UPTK_FLX_ptc(beg_ptc:end_ptc))     !UPNH4(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   allocate(this%histr_1D_NO3_UPTK_FLX_ptc(beg_ptc:end_ptc))     !UPNO3(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   allocate(this%histr_1D_N2_FIXN_FLX_ptc(beg_ptc:end_ptc))      !UPNF(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  allocate(this%histr_1D_NH3_FLX_ptc(beg_ptc:end_ptc))      !RNH3C(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+  allocate(this%histr_1D_cNH3_FLX_ptc(beg_ptc:end_ptc))      !RNH3C(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   allocate(this%histr_1D_PO4_UPTK_FLX_ptc(beg_ptc:end_ptc))     !UPH2P(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   allocate(this%histr_1D_SHOOT_C_ptc(beg_ptc:end_ptc))      !WTSHTE(ielmc,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   allocate(this%histr_1D_LEAF_C_ptc(beg_ptc:end_ptc))       !WTLFE(ielmc,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
@@ -424,7 +430,8 @@ implicit none
   allocate(this%histr_1D_GRAIN_NO_ptc(beg_ptc:end_ptc))     !GRNO(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   allocate(this%histr_1D_LAIb_ptc(beg_ptc:end_ptc))         !ARLFP(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX), total branch leaf area
   allocate(this%histr_1D_EXUD_C_FLX_ptc(beg_ptc:end_ptc))       !TEUPTK(ielmc,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  allocate(this%histr_1D_LITRf_C_FLX_ptc(beg_ptc:end_ptc))      !TESNC(ielmc,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+  allocate(this%histr_1D_LITRf_C_FLX_ptc(beg_ptc:end_ptc));  this%histr_1D_LITRf_C_FLX_ptc=spval
+  allocate(this%histr_1D_LITRf_P_FLX_ptc(beg_ptc:end_ptc));  this%histr_1D_LITRf_P_FLX_ptc=spval
   allocate(this%histr_1D_SURF_LITRf_C_FLX_ptc(beg_ptc:end_ptc)) !TESN0(ielmc,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   allocate(this%histr_1D_AUTO_RESP_FLX_ptc(beg_ptc:end_ptc))    !TCO2T(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   allocate(this%histr_1D_ABV_GRD_RESP_FLX_ptc(beg_ptc:end_ptc))  !TCO2A(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
@@ -453,6 +460,9 @@ implicit none
   allocate(this%histr_1D_TL_N_FIXED_FLX_ptc(beg_ptc:end_ptc))    !TZUPFX(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX), total plant N2 fixation
   allocate(this%histr_1D_HVST_N_FLX_ptc(beg_ptc:end_ptc))        !HVSTE(ielmn,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   allocate(this%histr_1D_NH3can_FLX_ptc(beg_ptc:end_ptc))    !TNH3C(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+  allocate(this%histr_1D_PLANT_BALANCE_C_ptc(beg_ptc:end_ptc)); this%histr_1D_PLANT_BALANCE_C_ptc=spval
+  allocate(this%histr_1D_PLANT_BALANCE_N_ptc(beg_ptc:end_ptc)); this%histr_1D_PLANT_BALANCE_N_ptc=spval
+  allocate(this%histr_1D_PLANT_BALANCE_P_ptc(beg_ptc:end_ptc)); this%histr_1D_PLANT_BALANCE_P_ptc=spval
   allocate(this%histr_1D_STG_DEAD_N_ptc(beg_ptc:end_ptc))    !WTSTGE(ielmn,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   allocate(this%histr_1D_FIREp_N_FLX_ptc(beg_ptc:end_ptc))        !VNH3F(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX), plant N emission from fire
   allocate(this%histr_1D_SURF_LITRf_N_FLX_ptc(beg_ptc:end_ptc))   !TESN0(ielmn,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX), surface litter fall
@@ -473,14 +483,13 @@ implicit none
   allocate(this%histr_1D_FIREp_P_FLX_ptc(beg_ptc:end_ptc))               !VPO4F(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   allocate(this%histr_1D_SURF_LITRf_P_FLX_ptc(beg_ptc:end_ptc))         !TESN0(ielmp,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   allocate(this%histr_1D_BRANCH_NO_ptc(beg_ptc:end_ptc))            !NBR(NZ,NY,NX)
-  allocate(this%histr_1D_GROWTH_STG_ptc(beg_ptc:end_ptc))           !plant development stage, integer, 0-10, planting, emergence, floral_init, jointing, 
-                                                               !elongation, heading, anthesis, seed_fill, see_no_set, seed_mass_set, end_seed_fill
+  allocate(this%histr_1D_GROWTH_STG_ptc(beg_ptc:end_ptc));      this%histr_1D_GROWTH_STG_ptc=spval
   allocate(this%histr_1D_LEAF_NC_ptc(beg_ptc:end_ptc))              !(WTLFE(ielmn,NZ,NY,NX)+EPOOLP(ielmn,NZ,NY,NX))/(WTLFE(ielmc,NZ,NY,NX)+EPOOLP(ielmc,NZ,NY,NX)),mass based CN ratio of leaf  
   allocate(this%histr_2D_tSOC_vr_col(beg_col:end_col,1:JZ))         !ORGC(1:JZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX), total soil C                                          
   allocate(this%histr_2D_LEAF_NODE_NO_ptc(beg_ptc:end_ptc,1:JBR))        !VSTG(NB1(NZ,NY,NX),NZ,NY,NX), leaf NO
-  allocate(this%histr_2D_RUB_ACTVN_ptc(beg_ptc:end_ptc,1:JBR))      !FDBK(NB1(NZ,NY,NX),NZ,NY,NX), branch down-regulation of CO2 fixation
+  allocate(this%histr_2D_RUB_ACTVN_ptc(beg_ptc:end_ptc,1:JBR));      this%histr_2D_RUB_ACTVN_ptc=spval
   allocate(this%histr_2D_CO2_vr_col(beg_col:end_col,1:JZ))          !trc_solcl(idg_CO2,1:JZ,NY,NX)
-  allocate(this%histr_2D_CH4_vr_col(beg_col:end_col,1:JZ))          !trc_solcl(idg_CH4,1:JZ,NY,NX)
+  allocate(this%histr_2D_CH4_vr_col(beg_col:end_col,1:JZ));    this%histr_2D_CH4_vr_col=spval
   allocate(this%histr_2D_O2_vr_col(beg_col:end_col,1:JZ))           !trc_solcl(idg_O2,1:JZ,NY,NX)
   allocate(this%histr_2D_N2O_vr_col(beg_col:end_col,1:JZ))          !trc_solcl(idg_N2O,1:JZ,NY,NX)
   allocate(this%histr_2D_NH3_vr_col(beg_col:end_col,1:JZ))          !trc_solcl(idg_NH3,1:JZ,NY,NX)
@@ -762,9 +771,17 @@ implicit none
   call hist_addfld1d(fname='tDIC',units='gC/m2',avgflag='A',&
     long_name='column integrated total soil DIC: CO2+CH4',ptr_col=data1d_ptr)      
 
-  data1d_ptr => this%histr_1D_STG_DEAD_C_col(beg_col:end_col)     
-  call hist_addfld1d(fname='STG_DEAD_C',units='gC/m2',avgflag='A',&
+  data1d_ptr => this%histr_1D_tSTG_DEAD_C_col(beg_col:end_col)     
+  call hist_addfld1d(fname='tSTG_DEAD_C',units='gC/m2',avgflag='A',&
     long_name='total standing dead C',ptr_col=data1d_ptr)      
+
+  data1d_ptr => this%histr_1D_tSTG_DEAD_N_col(beg_col:end_col)     
+  call hist_addfld1d(fname='tSTG_DEAD_N',units='gN/m2',avgflag='A',&
+    long_name='total standing dead N',ptr_col=data1d_ptr)      
+
+  data1d_ptr => this%histr_1D_tSTG_DEAD_P_col(beg_col:end_col)     
+  call hist_addfld1d(fname='tSTG_DEAD_P',units='gP/m2',avgflag='A',&
+    long_name='total standing dead P',ptr_col=data1d_ptr)      
 
   data1d_ptr => this%histr_1D_tPRECN_col(beg_col:end_col)      
   call hist_addfld1d(fname='tPRECN',units='mm/m2',avgflag='A',&
@@ -783,7 +800,7 @@ implicit none
     long_name='NH3 solute concentration in soil micropres',ptr_col=data1d_ptr)      
 
   data1d_ptr => this%histr_1D_SOL_RADN_col(beg_col:end_col)      
-  call hist_addfld1d(fname='RADN',units='W/m2',avgflag='A',&
+  call hist_addfld1d(fname='SOL_RADN',units='W/m2',avgflag='A',&
     long_name='shortwave radiation in solar beam',ptr_col=data1d_ptr)      
 
   data1d_ptr => this%histr_1D_AIR_TEMP_col(beg_col:end_col)      
@@ -890,16 +907,16 @@ implicit none
   call hist_addfld1d(fname='WTR_TBL',units='m',avgflag='A',&
     long_name='internal water table depth',ptr_col=data1d_ptr)      
 
-  data1d_ptr => this%histr_1D_N2O_FLX_col(beg_col:end_col)      
-  call hist_addfld1d(fname='N2O_FLX',units='g/m2/hr',avgflag='A',&
+  data1d_ptr => this%histr_1D_sN2O_FLX_col(beg_col:end_col)      
+  call hist_addfld1d(fname='sN2O_FLX',units='g/m2/hr',avgflag='A',&
     long_name='*soil N2O flux',ptr_col=data1d_ptr)      
 
-  data1d_ptr => this%histr_1D_N2G_FLX_col(beg_col:end_col)      
-  call hist_addfld1d(fname='N2G_FLX',units='g/m2/hr',&
+  data1d_ptr => this%histr_1D_sN2G_FLX_col(beg_col:end_col)      
+  call hist_addfld1d(fname='sN2G_FLX',units='g/m2/hr',&
     avgflag='A',long_name='soil N2 flux',ptr_col=data1d_ptr)      
 
-  data1d_ptr => this%histr_1D_NH3_FLX_col(beg_col:end_col)       
-  call hist_addfld1d(fname='NH3_FLX',units='gN/m2/hr',avgflag='A',&
+  data1d_ptr => this%histr_1D_sNH3_FLX_col(beg_col:end_col)       
+  call hist_addfld1d(fname='sNH3_FLX',units='gN/m2/hr',avgflag='A',&
     long_name='soil NH3 flux',ptr_col=data1d_ptr)      
 
   data1d_ptr => this%histr_1D_RUNOFF_FLX_col(beg_col:end_col)   
@@ -1018,8 +1035,8 @@ implicit none
   call hist_addfld1d(fname='N2_FIXN_FLX',units='gN/m2/hr',avgflag='A',&
     long_name='total root N2 fixation',ptr_patch=data1d_ptr)      
 
-  data1d_ptr => this%histr_1D_NH3_FLX_ptc(beg_ptc:end_ptc)   
-  call hist_addfld1d(fname='NH3_FLX',units='gN/m2/hr',avgflag='A',&
+  data1d_ptr => this%histr_1D_cNH3_FLX_ptc(beg_ptc:end_ptc)   
+  call hist_addfld1d(fname='cNH3_FLX',units='gN/m2/hr',avgflag='A',&
     long_name='*canopy NH3 flux',ptr_patch=data1d_ptr)      
 
   data1d_ptr => this%histr_1D_PO4_UPTK_FLX_ptc(beg_ptc:end_ptc)    
@@ -1104,7 +1121,7 @@ implicit none
 
   data1d_ptr => this%histr_1D_STG_DEAD_C_ptc(beg_ptc:end_ptc)  
   call hist_addfld1d(fname='STG_DEAD_C',units='gC/m2',avgflag='A',&
-    long_name='Standing dead C',ptr_patch=data1d_ptr)      
+    long_name='pft Standing dead C',ptr_patch=data1d_ptr)      
 
   data1d_ptr => this%histr_1D_FIREp_CO2_FLX_ptc(beg_ptc:end_ptc)   
   call hist_addfld1d(fname='FIREp_CO2_FLX',units='gC/m2/hr',avgflag='A',&
@@ -1204,7 +1221,7 @@ implicit none
 
   data1d_ptr => this%histr_1D_STG_DEAD_N_ptc(beg_ptc:end_ptc)  
   call hist_addfld1d(fname='STG_DEAD_N',units='gN/m2',avgflag='A',&
-    long_name='standing dead N',ptr_patch=data1d_ptr)      
+    long_name='pft standing dead N',ptr_patch=data1d_ptr)      
 
   data1d_ptr => this%histr_1D_FIREp_N_FLX_ptc(beg_ptc:end_ptc)     
   call hist_addfld1d(fname='FIREp_N_FLX',units='gN/m2/hr',avgflag='A',&
@@ -1272,7 +1289,7 @@ implicit none
 
   data1d_ptr => this%histr_1D_STG_DEAD_P_ptc(beg_ptc:end_ptc)   
   call hist_addfld1d(fname='STG_DEAD_P',units='gP/m2',avgflag='A',&
-    long_name='Standing dead P',ptr_patch=data1d_ptr)      
+    long_name='pft Standing dead P',ptr_patch=data1d_ptr)      
 
   data1d_ptr => this%histr_1D_FIREp_P_FLX_ptc(beg_ptc:end_ptc)             
   call hist_addfld1d(fname='FIREp_P_FLX',units='gP/m2/hr',avgflag='A',&
@@ -1283,12 +1300,12 @@ implicit none
     long_name='plant litterfall P to the soil surface',ptr_patch=data1d_ptr)      
 
   data1d_ptr => this%histr_1D_BRANCH_NO_ptc(beg_ptc:end_ptc)            !NBR(NZ,NY,NX)
-  call hist_addfld1d(fname='BRANCH_NO',units='none',avgflag='A',&
+  call hist_addfld1d(fname='BRANCH_NO',units='none',avgflag='I',&
     long_name='Plant branch number',ptr_patch=data1d_ptr)      
 
   data1d_ptr => this%histr_1D_GROWTH_STG_ptc(beg_ptc:end_ptc)  !plant development stage, integer, 0-10, planting, emergence, floral_init, jointing, 
                                                                !elongation, heading, anthesis, seed_fill, see_no_set, seed_mass_set, end_seed_fill
-  call hist_addfld1d(fname='GROWTH_STG',units='none',avgflag='A',&
+  call hist_addfld1d(fname='GROWTH_STG',units='none',avgflag='I',&
     long_name='plant development stage, integer, 0-planting, 1-emergence, 2-floral_init, 3-jointing,'// &
     '4-elongation, 5-heading, 6-anthesis, 7-seed_fill, 8-see_no_set, 9-seed_mass_set, 10-end_seed_fill',&
     ptr_patch=data1d_ptr)      
@@ -1298,77 +1315,75 @@ implicit none
     long_name='mass based plant leaf NC ratio',ptr_patch=data1d_ptr)      
 
   data2d_ptr => this%histr_2D_tSOC_vr_col(beg_col:end_col,1:JZ)       
-  call hist_addfld2d(fname='tSOC_vr',units='gC/m3',type2d='JZ',avgflag='A',&
+  call hist_addfld2d(fname='tSOC_vr',units='gC/m3',type2d='levsoi',avgflag='A',&
     long_name='*Vertically resolved total soil organic C',ptr_col=data2d_ptr)      
 
   data2d_ptr => this%histr_2D_LEAF_NODE_NO_ptc(beg_ptc:end_ptc,1:JBR)        !VSTG(NB1(NZ,NY,NX),NZ,NY,NX), leaf NO
-  call hist_addfld2d(fname='LEAF_NODE_NO',units='none',type2d='JBR',avgflag='A',&
+  call hist_addfld2d(fname='LEAF_NODE_NO',units='none',type2d='nbranches',avgflag='I',&
     long_name='Leaf number',ptr_patch=data2d_ptr)      
 
   data2d_ptr => this%histr_2D_RUB_ACTVN_ptc(beg_ptc:end_ptc,1:JBR)      !FDBK(NB1(NZ,NY,NX),NZ,NY,NX), branch down-regulation of CO2 fixation
-  call hist_addfld2d(fname='RUB_ACTVN',units='none',type2d='JBR',avgflag='A',&
+  call hist_addfld2d(fname='RUB_ACTVN',units='none',type2d='nbranches',avgflag='A',&
     long_name='branch nutrient-based down-regulation factor of CO2 fixation, 0-1',ptr_patch=data2d_ptr)      
 
   data2d_ptr => this%histr_2D_CO2_vr_col(beg_col:end_col,1:JZ)          !trc_solcl(idg_CO2,1:JZ,NY,NX)
-  call hist_addfld2d(fname='CO2_vr',units='gC/m3',type2d='JZ',avgflag='A',&
+  call hist_addfld2d(fname='CO2_vr',units='gC/m3',type2d='levsoi',avgflag='A',&
     long_name='solute concentration of CO2 in soil micropre',ptr_col=data2d_ptr)      
 
   data2d_ptr => this%histr_2D_CH4_vr_col(beg_col:end_col,1:JZ)          !trc_solcl(idg_CH4,1:JZ,NY,NX)
-  call hist_addfld2d(fname='CH4_vr',units='gC/m3',type2d='JZ',avgflag='A',&
+  call hist_addfld2d(fname='CH4_vr',units='gC/m3',type2d='levsoi',avgflag='A',&
     long_name='solute concentration of CH4 in soil micropre',ptr_col=data2d_ptr)      
 
   data2d_ptr => this%histr_2D_O2_vr_col(beg_col:end_col,1:JZ)           !trc_solcl(idg_O2,1:JZ,NY,NX)
-  call hist_addfld2d(fname='O2_vr',units='g/m3',type2d='JZ',avgflag='A',&
+  call hist_addfld2d(fname='O2_vr',units='g/m3',type2d='levsoi',avgflag='A',&
     long_name='solute concentration of O2 in soil micropre',ptr_col=data2d_ptr)      
 
   data2d_ptr => this%histr_2D_N2O_vr_col(beg_col:end_col,1:JZ)          !trc_solcl(idg_N2O,1:JZ,NY,NX)
-  call hist_addfld2d(fname='N2O_vr',units='g/m3',type2d='JZ',avgflag='A',&
+  call hist_addfld2d(fname='N2O_vr',units='g/m3',type2d='levsoi',avgflag='A',&
     long_name='solute concentration of N2O in soil micropre',ptr_col=data2d_ptr)      
 
   data2d_ptr => this%histr_2D_NH3_vr_col(beg_col:end_col,1:JZ)          !trc_solcl(idg_NH3,1:JZ,NY,NX)
-  call hist_addfld2d(fname='NH3_vr',units='g/m3',type2d='JZ',avgflag='A',&
+  call hist_addfld2d(fname='NH3_vr',units='g/m3',type2d='levsoi',avgflag='A',&
     long_name='solute concentration of NH3 in soil micropre',ptr_col=data2d_ptr)      
 
   data2d_ptr => this%histr_2D_TEMP_vr_col(beg_col:end_col,1:JZ)         !TCS(1:JZ,NY,NX)
-  call hist_addfld2d(fname='TEMP_vr',units='oC',type2d='JZ',avgflag='A',&
+  call hist_addfld2d(fname='TEMP_vr',units='oC',type2d='levsoi',avgflag='A',&
     long_name='soil temperature profile',ptr_col=data2d_ptr)      
 
   data2d_ptr => this%histr_2D_vWATER_vr_col(beg_col:end_col,1:JZ)        !THETWZ(1:JZ,NY,NX)
-  call hist_addfld2d(fname='vWATER_vr',units='m3/m3',type2d='JZ',avgflag='A',&
+  call hist_addfld2d(fname='vWATER_vr',units='m3/m3',type2d='levsoi',avgflag='A',&
     long_name='volumetric soil water content',ptr_col=data2d_ptr)      
 
-  data2d_ptr => this%histr_2D_vICE_vr_col(beg_col:end_col,1:JZ)          !THETIZ(1:JZ,NY,NX)
-  call hist_addfld2d(fname='vICE_vr',units='m3/m3',type2d='JZ',avgflag='A',&
+  data2d_ptr => this%histr_2D_vICE_vr_col(beg_col:end_col,1:JZ)        
+  call hist_addfld2d(fname='vICE_vr',units='m3/m3',type2d='levsoi',avgflag='A',&
     long_name='volumetric soil ice content',ptr_col=data2d_ptr)      
 
-  data2d_ptr => this%histr_2D_PSI_vr_col(beg_col:end_col,1:JZ)          !PSISM(1:JZ,NY,NX)+PSISO(1:JZ,NY,NX)
-  call hist_addfld2d(fname='PSI_vr',units='MPa',type2d='JZ',avgflag='A',&
+  data2d_ptr => this%histr_2D_PSI_vr_col(beg_col:end_col,1:JZ)         
+  call hist_addfld2d(fname='PSI_vr',units='MPa',type2d='levsoi',avgflag='A',&
     long_name='soil matric pressure+osmotic pressure',ptr_col=data2d_ptr)      
 
-  data2d_ptr => this%histr_2D_cNH4t_vr_col(beg_col:end_col,1:JZ)        !(trc_solml(ids_NH4,1:JZ,NY,NX)+trc_solml(ids_NH4B,1:JZ,NY,NX) &
-                                                               !+14.0*(trcx_solml(idx_NH4,1:JZ,NY,NX)+trcx_solml(idx_NH4B,1:JZ,NY,NX)))/BKVL(1:JZ,NY,NX)
-  call hist_addfld2d(fname='cNH4t_vr',units='gN/Mg soil',type2d='JZ',avgflag='A',&
+  data2d_ptr => this%histr_2D_cNH4t_vr_col(beg_col:end_col,1:JZ)       
+  call hist_addfld2d(fname='cNH4t_vr',units='gN/Mg soil',type2d='levsoi',avgflag='A',&
     long_name='soil NH4x concentration',ptr_col=data2d_ptr)      
 
-  data2d_ptr => this%histr_2D_cNO3t_vr_col(beg_col:end_col,1:JZ)        !(trc_solml(ids_NO3,1:JZ,NY,NX)+trc_solml(ids_NO3B,1:JZ,NY,NX) &
-                                                               !+trc_solml(ids_NO2,1,NY,NX)+trc_solml(ids_NO2B,1,NY,NX))/BKVL(1,NY,NX)
-  call hist_addfld2d(fname='cNO3t_vr',units='gN/Mg soil',type2d='JZ',avgflag='A',&
+  data2d_ptr => this%histr_2D_cNO3t_vr_col(beg_col:end_col,1:JZ)        
+  call hist_addfld2d(fname='cNO3t_vr',units='gN/Mg soil',type2d='levsoi',avgflag='A',&
     long_name='Soil NO3+NO2 concentration',ptr_col=data2d_ptr)      
 
-  data2d_ptr => this%histr_2D_cPO4_vr_col(beg_col:end_col,1:JZ)         !(trc_solml(ids_H1PO4,1:JZ,NY,NX)+trc_solml(ids_H1PO4B,1,NY,NX)+trc_solml(ids_H2PO4,1,NY,NX)+trc_solml(ids_H2PO4B,1,NY,NX))/BKVL(1,NY,NX)
-  call hist_addfld2d(fname='cPO4_vr',units='gP/Mg soil',type2d='JZ',avgflag='A',&
+  data2d_ptr => this%histr_2D_cPO4_vr_col(beg_col:end_col,1:JZ)        
+  call hist_addfld2d(fname='cPO4_vr',units='gP/Mg soil',type2d='levsoi',avgflag='A',&
     long_name='soil dissolved PO4 concentration',ptr_col=data2d_ptr)      
 
-  data2d_ptr => this%histr_2D_cEXCH_P_vr_col(beg_col:end_col,1:JZ)      !31.0*(trcx_solml(idx_HPO4,1:JZ,NY,NX)+trcx_solml(idx_H2PO4,1:JZ,NY,NX)+trcx_solml(idx_HPO4B,1:JZ,NY,NX)+trcx_solml(idx_H2PO4B,1,NY,NX))/BKVL(1,NY,NX)
-  call hist_addfld2d(fname='cEXCH_P_vr',units='gP/Mg soil',type2d='JZ',avgflag='A',&
+  data2d_ptr => this%histr_2D_cEXCH_P_vr_col(beg_col:end_col,1:JZ)     
+  call hist_addfld2d(fname='cEXCH_P_vr',units='gP/Mg soil',type2d='levsoi',avgflag='A',&
     long_name='total exchangeable soil PO4 concentration',ptr_col=data2d_ptr)      
 
   data2d_ptr => this%histr_2D_TEMP_vr_col(beg_col:end_col,1:JZ)  
-  call hist_addfld2d(fname='TMAX_SOIL_vr',units='oC',type2d='JZ',avgflag='X',&
+  call hist_addfld2d(fname='TMAX_SOIL_vr',units='oC',type2d='levsoi',avgflag='X',&
     long_name='Soil maximum temperature profile',ptr_col=data2d_ptr)      
 
   data2d_ptr => this%histr_2D_TEMP_vr_col(beg_col:end_col,1:JZ)  
-  call hist_addfld2d(fname='TMIN_SOIL_vr',units='oC',type2d='JZ',avgflag='M',&
+  call hist_addfld2d(fname='TMIN_SOIL_vr',units='oC',type2d='levsoi',avgflag='M',&
     long_name='Soil minimum temperature profile',ptr_col=data2d_ptr)      
 
   data1d_ptr => this%histr_1D_TEMP_LITR_col(beg_col:end_col)    
@@ -1379,31 +1394,28 @@ implicit none
   call hist_addfld1d(fname='TMIN_LITR',units='oC',avgflag='M',&
     long_name='Litter minimum temperature',ptr_col=data1d_ptr)      
 
-  data2d_ptr => this%histr_2D_ECND_vr_col(beg_col:end_col,1:JZ)         !ECND(1:JZ,NY,NX)
-  call hist_addfld2d(fname='ECND_vr',units='dS m-1',type2d='JZ',avgflag='A',&
+  data2d_ptr => this%histr_2D_ECND_vr_col(beg_col:end_col,1:JZ)     
+  call hist_addfld2d(fname='ECND_vr',units='dS m-1',type2d='levsoi',avgflag='A',&
     long_name='electrical conductivity',ptr_col=data2d_ptr)      
 
-  data2d_ptr => this%histr_2D_PSI_RT_vr_ptc(beg_ptc:end_ptc,1:JZ)       !PSIRT(1,1:JZ,NZ,NY,NX),  , MPa
-  call hist_addfld2d(fname='PSI_RT_vr',units='MPa',type2d='JZ',avgflag='A',&
+  data2d_ptr => this%histr_2D_PSI_RT_vr_ptc(beg_ptc:end_ptc,1:JZ)  
+  call hist_addfld2d(fname='PSI_RT_vr',units='MPa',type2d='levsoi',avgflag='A',&
     long_name='root total water potential',ptr_patch=data2d_ptr)      
 
-  data2d_ptr => this%histr_2D_prtUP_NH4_vr_ptc(beg_ptc:end_ptc,1:JZ)       !(RUPNH4(1,1:JZ,NZ,NY,NX)+RUPNH4(2,1:JZ,NZ,NY,NX) &  
-                                                               !+RUPNHB(1,1:JZ,NZ,NY,NX)+RUPNHB(2,1:JZ,NZ,NY,NX))/AREA(3,1,NY,NX)
-  call hist_addfld2d(fname='prtUP_NH4_vr',units='gN/m3/hr',type2d='JZ',avgflag='A',&
+  data2d_ptr => this%histr_2D_prtUP_NH4_vr_ptc(beg_ptc:end_ptc,1:JZ) 
+  call hist_addfld2d(fname='prtUP_NH4_vr',units='gN/m3/hr',type2d='levsoi',avgflag='A',&
     long_name='root uptake of NH4',ptr_patch=data2d_ptr)      
 
-  data2d_ptr => this%histr_2D_prtUP_NO3_vr_ptc(beg_ptc:end_ptc,1:JZ)       !(RUPNO3(1,1:JZ,NZ,NY,NX)+RUPNO3(2,1:JZ,NZ,NY,NX) &
-                                                               !+RUPNOB(1,1:JZ,NZ,NY,NX)+RUPNOB(2,1:JZ,NZ,NY,NX))/AREA(3,1,NY,NX)
-  call hist_addfld2d(fname='prtUP_NO3_vr',units='gN/m3/hr',type2d='JZ',&
+  data2d_ptr => this%histr_2D_prtUP_NO3_vr_ptc(beg_ptc:end_ptc,1:JZ)      
+  call hist_addfld2d(fname='prtUP_NO3_vr',units='gN/m3/hr',type2d='levsoi',&
     avgflag='A',long_name='root uptake of NO3',ptr_patch=data2d_ptr)      
 
-  data2d_ptr => this%histr_2D_prtUP_PO4_vr_ptc(beg_ptc:end_ptc,1:JZ)       !(RUPH2P(1,1:JZ,NZ,NY,NX)+RUPH2P(2,1:JZ,NZ,NY,NX) &
-                                                               !+RUPH2B(1,1:JZ,NZ,NY,NX)+RUPH2B(2,1:JZ,NZ,NY,NX))/AREA(3,1,NY,NX)
-  call hist_addfld2d(fname='prtUP_PO4_vr',units='gP/m3/hr',type2d='JZ',avgflag='A',&
+  data2d_ptr => this%histr_2D_prtUP_PO4_vr_ptc(beg_ptc:end_ptc,1:JZ)     
+  call hist_addfld2d(fname='prtUP_PO4_vr',units='gP/m3/hr',type2d='levsoi',avgflag='A',&
     long_name='root uptake of PO4',ptr_patch=data2d_ptr)      
 
-  data2d_ptr => this%histr_2D_DNS_RT_vr_ptc(beg_ptc:end_ptc,1:JZ)       !RTDNP(1,1:JZ,NZ,NY,NX)*PP(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  call hist_addfld2d(fname='DNS_RT_vr',units='m/m3',type2d='JZ',avgflag='A',&
+  data2d_ptr => this%histr_2D_DNS_RT_vr_ptc(beg_ptc:end_ptc,1:JZ)       
+  call hist_addfld2d(fname='DNS_RT_vr',units='m/m3',type2d='levsoi',avgflag='A',&
     long_name='root layer length density',ptr_patch=data2d_ptr)      
 
   end subroutine init_hist_data
@@ -1414,7 +1426,7 @@ implicit none
   class(histdata_type) :: this
   type(bounds_type), intent(in) :: bounds
   integer :: ncol,nptc
-  integer :: L,NZ,NY,NX,KN
+  integer :: L,NZ,NY,NX,KN,NB
 
   DO NX=bounds%NHW,bounds%NHE
     DO NY=bounds%NVN,bounds%NVS
@@ -1480,7 +1492,9 @@ implicit none
       this%histr_1D_ECO_NPP_col(ncol)     = TNPP(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%histr_1D_ECO_RH_col(ncol)      = THRE(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%histr_1D_tDIC_col(ncol)     = UCO2S(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-      this%histr_1D_STG_DEAD_C_col(ncol)    = WTSTGT(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+      this%histr_1D_tSTG_DEAD_C_col(ncol)    = WTSTGET(ielmc,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+      this%histr_1D_tSTG_DEAD_N_col(ncol)    = WTSTGET(ielmn,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+      this%histr_1D_tSTG_DEAD_P_col(ncol)    = WTSTGET(ielmp,NY,NX)/AREA(3,NU(NY,NX),NY,NX)            
       this%histr_1D_tPRECN_col(ncol)       = 1000.0_r8*URAIN(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%histr_1D_ET_col(ncol)          = 1000.0_r8*UEVAP(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%histr_1D_N2O_LITR_col(ncol)    = trc_solcl(idg_N2O,0,NY,NX)
@@ -1514,9 +1528,9 @@ implicit none
       this%histr_1D_SURF_ICE_col(ncol)    = THETIZ(0,NY,NX)
       this%histr_1D_ACTV_LYR_col(ncol)    = -(DPTHA(NY,NX)-CDPTH(NU(NY,NX)-1,NY,NX))
       this%histr_1D_WTR_TBL_col(ncol)     = -(DPTHT(NY,NX)-CDPTH(NU(NY,NX)-1,NY,NX))
-      this%histr_1D_N2O_FLX_col(ncol)     =  HN2OG(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-      this%histr_1D_N2G_FLX_col(ncol)     =  HN2GG(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-      this%histr_1D_NH3_FLX_col(ncol)     =  HNH3G(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+      this%histr_1D_sN2O_FLX_col(ncol)     =  HN2OG(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+      this%histr_1D_sN2G_FLX_col(ncol)     =  HN2GG(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+      this%histr_1D_sNH3_FLX_col(ncol)     =  HNH3G(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
 
       DO L=1,JZ
         this%histr_2D_tSOC_vr_col(ncol,L) =  ORGC(L,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
@@ -1570,7 +1584,7 @@ implicit none
         this%histr_1D_NH4_UPTK_FLX_ptc(nptc)     = UPNH4(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%histr_1D_NO3_UPTK_FLX_ptc(nptc)     = UPNO3(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%histr_1D_N2_FIXN_FLX_ptc(nptc)      = UPNF(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-        this%histr_1D_NH3_FLX_ptc(nptc)      = RNH3C(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+        this%histr_1D_cNH3_FLX_ptc(nptc)      = RNH3C(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%histr_1D_PO4_UPTK_FLX_ptc(nptc)     = UPH2P(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%histr_1D_SHOOT_C_ptc(nptc)      = WTSHTE(ielmc,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%histr_1D_LEAF_C_ptc(nptc)       = WTLFE(ielmc,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
@@ -1639,26 +1653,30 @@ implicit none
         this%histr_1D_BRANCH_NO_ptc(nptc)    = NBR(NZ,NY,NX)
         this%histr_1D_LEAF_NC_ptc(nptc)      = safe_adb(WTLFE(ielmn,NZ,NY,NX)+EPOOLP(ielmn,NZ,NY,NX),&
                                                  WTLFE(ielmc,NZ,NY,NX)+EPOOLP(ielmc,NZ,NY,NX))
-        DO KN=0,10                                         
-          if(IDAY(KN,NB1(NZ,NY,NX),NZ,NY,NX)/=0)then
-            this%histr_1D_GROWTH_STG_ptc(nptc)   =KN
-          endif
-        ENDDO
-        this%histr_2D_LEAF_NODE_NO_ptc(nptc,NB1(NZ,NY,NX)) = VSTG(NB1(NZ,NY,NX),NZ,NY,NX)
-        this%histr_2D_RUB_ACTVN_ptc(nptc,NB1(NZ,NY,NX))  = FDBK(NB1(NZ,NY,NX),NZ,NY,NX)
+        if(NB1(NZ,NY,NX)> 0)then
+          DO KN=10,0,-1
+            IF(KN==0)THEN
+              this%histr_1D_GROWTH_STG_ptc(nptc)   =KN
+            ELSE
+              if(IDAY(KN,NB1(NZ,NY,NX),NZ,NY,NX)>0)this%histr_1D_GROWTH_STG_ptc(nptc) =KN
+              exit    
+            ENDIF  
+          ENDDO
+          DO NB=1,NB1(NZ,NY,NX)
+            this%histr_2D_LEAF_NODE_NO_ptc(nptc,NB) = VSTG(NB,NZ,NY,NX)
+            this%histr_2D_RUB_ACTVN_ptc(nptc,NB)  = FDBK(NB,NZ,NY,NX)
+          ENDDO
+        endif
         DO L=1,JZ
-          this%histr_2D_PSI_RT_vr_ptc(nptc,L)  = PSIRT(L,L,NZ,NY,NX)
-          this%histr_2D_prtUP_NH4_vr_ptc(nptc,L)  = (RUPNH4(L,L,NZ,NY,NX)+RUPNH4(2,L,NZ,NY,NX) &
-                                                 +RUPNHB(L,L,NZ,NY,NX)+RUPNHB(2,L,NZ,NY,NX))/AREA(3,L,NY,NX)
-          this%histr_2D_prtUP_NO3_vr_ptc(nptc,L)  = (RUPNO3(L,L,NZ,NY,NX)+RUPNO3(2,L,NZ,NY,NX) &
-                                                 +RUPNOB(L,L,NZ,NY,NX)+RUPNOB(2,L,NZ,NY,NX))/AREA(3,L,NY,NX)
-          this%histr_2D_prtUP_PO4_vr_ptc(nptc,L)  = (RUPH2P(L,L,NZ,NY,NX)+RUPH2P(2,L,NZ,NY,NX) &
-                                                 +RUPH2B(L,L,NZ,NY,NX)+RUPH2B(2,L,NZ,NY,NX))/AREA(3,L,NY,NX)
-          this%histr_2D_DNS_RT_vr_ptc(nptc,L)  = RTDNP(L,L,NZ,NY,NX)*PP(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+          this%histr_2D_PSI_RT_vr_ptc(nptc,L)  = PSIRT(ipltroot,L,NZ,NY,NX)
+          this%histr_2D_prtUP_NH4_vr_ptc(nptc,L)  = (sum(RUPNH4(:,L,NZ,NY,NX))+sum(RUPNHB(:,L,NZ,NY,NX)))/AREA(3,L,NY,NX)
+          this%histr_2D_prtUP_NO3_vr_ptc(nptc,L)  = (sum(RUPNO3(:,L,NZ,NY,NX))+sum(RUPNOB(:,L,NZ,NY,NX)))/AREA(3,L,NY,NX)
+          this%histr_2D_prtUP_PO4_vr_ptc(nptc,L)  = (sum(RUPH2P(:,L,NZ,NY,NX))+sum(RUPH2B(:,L,NZ,NY,NX)))/AREA(3,L,NY,NX)
+          this%histr_2D_DNS_RT_vr_ptc(nptc,L)  = RTDNP(ipltroot,L,NZ,NY,NX)*PP(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         ENDDO
       ENDDO 
     ENDDO 
   ENDDO    
   end subroutine hist_update
   
-end module HistIdTypeMod
+end module HistDataType

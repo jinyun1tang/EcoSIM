@@ -34,7 +34,7 @@ implicit none
   integer,target,allocatable ::  IWTYP(:,:,:)                        !climate signal for phenological progress none, temperature, water stress)
   integer,target,allocatable ::  IPTYP(:,:,:)                        !photoperiod type (neutral, long day, short day)
   integer,target,allocatable ::  IBTYP(:,:,:)                        !phenologically-driven above-ground turnover (all, foliar only, none)
-  integer,target,allocatable ::  IRTYP(:,:,:)                        !grain type (below or above-ground)
+  integer,target,allocatable ::  IRTYP(:,:,:)                        !grain type (below or above-ground), e.g. potato and onion are below 
   integer,target,allocatable ::  MY(:,:,:)                           !mycorrhizal type (no or yes)
   integer,target,allocatable ::  IDTBL(:,:)                          !water table flag from site file
 !----------------------------------------------------------------------
