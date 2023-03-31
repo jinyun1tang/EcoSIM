@@ -28,7 +28,7 @@ PROGRAM main
   integer :: NAX,NDX,NEX,NAY,NDY,NE,N,NTX,NT
   integer :: NHW,NVN,NHE,NVS
   integer :: nn1,nn2,nn3
-  integer :: year_beg,year_ini,nyr1,yeari
+  integer :: year_beg,year_ini,nyr1,yeari,nstopyr
   CHARACTER(len=640):: BUF
   character(len=36):: nmlfile
   character(len=14) :: ymdhs
@@ -84,17 +84,18 @@ PROGRAM main
   NE=1;NEX=1
 
   call set_sim_type()
+  nstopyr=get_sim_len(forc_periods)
 
   if(continue_run)then
     print*,'read restart/checkpoint info file: ecosim_rst'
     ymdhs0='18820114000000'
     read(ymdhs0,'(I4)')year_beg
-    call etimer%Init(year0=year_beg)   
+    call etimer%Init(year0=year_beg,nyears=nstopyr)   
   else  
     ymdhs0='00000000000000'
     year_beg=year_ini
     ymdhs0(1:8)=sim_yyyymmdd
-    call etimer%Init(year0=year_beg)
+    call etimer%Init(year0=year_beg,nyears=nstopyr)
     call hist_htapes_build()
   endif
   

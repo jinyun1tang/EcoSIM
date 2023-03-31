@@ -5,8 +5,8 @@ module ecosim_Time_Mod
 
   use data_kind_mod  , only : r8 => shr_kind_r8
   use data_kind_mod  , only : i8 => shr_kind_i8
-  use fileUtil, only : stdout, ecosim_string_length_long
-  use EcosimConst, only : secspday,secspyear
+  use fileUtil       , only : stdout, ecosim_string_length_long
+  use EcosimConst    , only : secspday,secspyear
   implicit none
   private
   character(len=*), private, parameter :: mod_filename = __FILE__
@@ -163,9 +163,12 @@ contains
           enddo
           if(isLeap(this%year0))this%leap_yr=1
         endif
-        this%stop_time=this%stop_time * 86400._r8
+        this%stop_time=this%stop_time * 86400._r8      
+        
       else
         if(this%year0 > 0)this%leap_yr=isLeapi(this%year0)
+        !set to maximum number of years
+        this%stop_time=10000._r8*365._r8*86400._r8
       endif   
     endif
   end subroutine Init

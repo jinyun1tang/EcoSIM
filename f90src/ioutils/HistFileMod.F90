@@ -1707,7 +1707,6 @@ implicit none
 !             if (masterproc) then
                 write(iulog,*) trim(subname),' : Creating history file ', trim(locfnh(t)), &
                      ' at nstep = ',etimer%get_nstep()
-                write(iulog,*)'calling htape_create for file t = ',t
 !             endif
              !'call htape_create'
              call htape_create (t)
@@ -1789,6 +1788,7 @@ implicit none
           else
  !            if (masterproc) then
                 write(iulog,*) trim(subname),' : history tape ',t,': no open file to close'
+                print*,tape(t)%ntimes,tape(t)%mfilt,rstwr, nlend
  !            end if
           endif
        else

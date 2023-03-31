@@ -79,9 +79,8 @@ contains
   bounds%begg=1;bounds%endg=bounds%ngrid
   bounds%begt=1;bounds%endt=bounds%ntopou
   nextra_grid=1
-  if(column_mode)nextra_grid=0
-  JX=(NHE-NHW)+1+nextra_grid
-  JY=(NVS-NVN)+1+nextra_grid
+  JX=(NHE-NHW)+1
+  JY=(NVS-NVN)+1
 
   bounds%ncols=JX*JY
   bounds%npfts=bounds%ncols*JP
@@ -90,6 +89,10 @@ contains
 
   allocate(bounds%icol(JY,JX))
   allocate(bounds%ipft(JP,JY,JX))
+  
+  if(column_mode)nextra_grid=0
+  JX=JX+nextra_grid
+  JY=JY+nextra_grid
 
   ic=0;ip=0
   DO  NX=NHW,NHE
@@ -102,7 +105,7 @@ contains
       ENDDO
     ENDDO
   ENDDO
-
+  !read JZ from input data? 
   JZ=14
   JH=JX+nextra_grid
   JV=JY+nextra_grid

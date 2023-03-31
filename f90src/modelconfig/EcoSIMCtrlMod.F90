@@ -55,5 +55,17 @@ implicit none
   this%ymdhs0='00000000000000'
   end subroutine Init_frectyp
 
-  
+  !-----------------------------------------------------------------------
+  integer function get_sim_len(forc_periods)
+  implicit none
+  integer, intent(in) :: forc_periods(9)
+
+  integer :: nn1,id
+
+  get_sim_len=0
+  DO nn1=0,2
+    id=nn1*3+1
+    get_sim_len=get_sim_len+(forc_periods(id+1)-forc_periods(id)+1)*forc_periods(id+2)
+  enddo
+  end function get_sim_len  
 end module EcoSIMCtrlMod
