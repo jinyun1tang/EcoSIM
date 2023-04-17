@@ -17,7 +17,7 @@ module ncdio_pio
 
   use netcdf
   use abortutils,  only : endrun
-  use data_kind_mod, only : r8 => shr_kind_r8, i4 => shr_kind_i4
+  use data_kind_mod, only : r8 => DAT_kind_r8, i4 => DAT_kind_i4
   use ecosim_log_mod , only : errMsg => shr_log_errMsg
 
   implicit none
@@ -73,8 +73,12 @@ module ncdio_pio
     module procedure ncd_putvar_int_3d
     module procedure ncd_putvar_int_all_3d
     module procedure ncd_putvar_real_sp_3d
+    module procedure ncd_putvar_real_sp_4d    
+    module procedure ncd_putvar_real_sp_5d    
+
     module procedure ncd_putvar_real_sp_all_3d
     module procedure ncd_putvar_real_sp_all_4d
+    module procedure ncd_putvar_real_sp_all_5d
   end interface ncd_putvar
 
   interface ncd_getvar
@@ -90,13 +94,14 @@ module ncdio_pio
     module procedure ncd_getvar_int_3d
     module procedure ncd_getvar_int_all_3d  
     module procedure ncd_getvar_real_sp_3d
-
+    module procedure ncd_getvar_real_sp_4d
+    module procedure ncd_getvar_real_sp_5d    
     module procedure ncd_getvar_real_sp_scalar
     module procedure ncd_getvar_real_sp_all_1d
     module procedure ncd_getvar_real_sp_all_2d
     module procedure ncd_getvar_real_sp_all_3d
     module procedure ncd_getvar_real_sp_all_4d
-
+    module procedure ncd_getvar_real_sp_all_5d
     module procedure ncd_getvar_str_1ds
 
   end interface ncd_getvar
@@ -150,6 +155,7 @@ module ncdio_pio
      !DIMS 0,1,2,3
      module procedure ncd_io_3d_double_glob
 
+     module procedure ncd_io_4d_double_glob
      !TYPE text
      !DIMS 0,1,2
      module procedure ncd_io_0d_text_glob
@@ -179,6 +185,10 @@ module ncdio_pio
      !DIMS 1,2,3
      module procedure ncd_io_3d_double
 
+     !TYPE int,double
+     !DIMS 1,2,3
+     module procedure ncd_io_4d_double
+     module procedure ncd_io_5d_double
      !TYPE logical
      !DIMS 1
      module procedure ncd_io_1d_logical
@@ -413,7 +423,7 @@ module ncdio_pio
 !
 
   use abortutils, only : endrun
-  use data_kind_mod, only : r8 => shr_kind_r8
+  use data_kind_mod, only : r8 => DAT_kind_r8
 ! !ARGUMENTS:
   implicit none
   class(file_desc_t)     , intent(inout)  :: ncid                    ! input unit
@@ -508,8 +518,8 @@ module ncdio_pio
   end if
 
   if (present(fill_value)) then
-    call check_ret(ncd_putatt(ncid, varid, '_FillValue',  fill_value, lxtype),subname)
-  end if
+      call check_ret(nf90_put_att(ncid_local, varid, '_FillValue',  fill_value),subname)
+  endif
 
   if (present(comment)) then
     call check_ret(ncd_putatt(ncid, varid, 'comment', trim(comment)),subname)
@@ -595,7 +605,7 @@ module ncdio_pio
   !DESCRIPTION
   !put a real scalar to file
 
-  use data_kind_mod, only : r8 => shr_kind_r8
+  use data_kind_mod, only : r8 => DAT_kind_r8
 !**********************************************************************
   implicit none
   class(file_desc_t), intent(in) :: ncid
@@ -618,7 +628,7 @@ module ncdio_pio
   !DESCRIPTION
   !put a real scalar to file
 
-  use data_kind_mod, only : r8 => shr_kind_r8
+  use data_kind_mod, only : r8 => DAT_kind_r8
 !**********************************************************************
   implicit none
   class(file_desc_t), intent(in) :: ncid
@@ -684,7 +694,7 @@ module ncdio_pio
   ! DESCRIPTIONS
   ! put 1d real array to file
 
-  use data_kind_mod, only : r8 => shr_kind_r8
+  use data_kind_mod, only : r8 => DAT_kind_r8
 !**********************************************************************
   implicit none
   class(file_desc_t), intent(in) :: ncid
@@ -695,11 +705,17 @@ module ncdio_pio
   integer :: varid
   logical :: readvar
   type(Var_desc_t)  :: vardesc
-
+  integer :: j
+  character(len=*) :: subname=trim(mod_filename)//'::ncd_putvar_real_sp_1d'
   call check_var(ncid, trim(varname), vardesc, readvar)
 
+  if(varname=='ABV_GRD_RESP')then
+    print*,'datsize',size(data),rec
+    print*,(data(j),j=1,size(data))
+    return
+  endif
   call check_ret( nf90_put_var(ncid%fh, vardesc%varid, data, &
-     start = (/1,rec/)),'ncd_putvar_real_sp_1d')
+     start = (/1,rec/)),trim(subname)//'::'//trim(varname))
 
   end subroutine ncd_putvar_real_sp_1d
 
@@ -709,7 +725,7 @@ module ncdio_pio
     ! DESCRIPTIONS
     ! put 1d real array to file
 
-    use data_kind_mod, only : r8 => shr_kind_r8
+    use data_kind_mod, only : r8 => DAT_kind_r8
   !**********************************************************************
     implicit none
     class(file_desc_t), intent(in) :: ncid
@@ -732,7 +748,7 @@ module ncdio_pio
     ! DESCRIPTIONS
     ! put 1d real array to file
 
-    use data_kind_mod, only : r8 => shr_kind_r8
+    use data_kind_mod, only : r8 => DAT_kind_r8
   !**********************************************************************
     implicit none
     class(file_desc_t), intent(in) :: ncid
@@ -797,7 +813,7 @@ module ncdio_pio
   ! DESCRIPTION
   ! put 2d real array to file
 
-  use data_kind_mod, only : r8 => shr_kind_r8
+  use data_kind_mod, only : r8 => DAT_kind_r8
 
 !**********************************************************************
   implicit none
@@ -854,18 +870,18 @@ module ncdio_pio
   integer, dimension(:,:,:), intent(in) :: data
   character(len=*), intent(in) :: varname
   integer :: varid
-  logical :: readvar
+  logical :: readvar  
   type(Var_desc_t)  :: vardesc
-
+  character(len=*)  :: subname=trim(mod_filename)//'::ncd_putvar_int_all_3d'
   call check_var(ncid, trim(varname), vardesc, readvar)
 
-  call check_ret( nf90_put_var(ncid%fh, vardesc%varid, data),'ncd_putvar_int_all_3d')
+  call check_ret( nf90_put_var(ncid%fh, vardesc%varid, data),subname)
 
   end subroutine ncd_putvar_int_all_3d
 !----------------------------------------------------------------------
   subroutine ncd_putvar_real_sp_all_3d(ncid,varname,data)
 
-    use data_kind_mod, only : r8 => shr_kind_r8
+    use data_kind_mod, only : r8 => DAT_kind_r8
   !**********************************************************************
     implicit none
     class(file_desc_t), intent(in) :: ncid
@@ -884,7 +900,7 @@ module ncdio_pio
 !----------------------------------------------------------------------
   subroutine ncd_putvar_real_sp_all_4d(ncid,varname,data)
 
-    use data_kind_mod, only : r8 => shr_kind_r8
+    use data_kind_mod, only : r8 => DAT_kind_r8
   !**********************************************************************
     implicit none
     class(file_desc_t), intent(in) :: ncid
@@ -900,12 +916,30 @@ module ncdio_pio
     call check_ret( nf90_put_var(ncid%fh, vardesc%varid, data),'ncd_putvar_real_sp_all_4d')
   end subroutine ncd_putvar_real_sp_all_4d
 !----------------------------------------------------------------------
+  subroutine ncd_putvar_real_sp_all_5d(ncid,varname,data)
+
+    use data_kind_mod, only : r8 => DAT_kind_r8
+  !**********************************************************************
+    implicit none
+    class(file_desc_t), intent(in) :: ncid
+    real(r8),dimension(:,:,:,:,:), intent(in) :: data
+
+    character(len=*), intent(in) :: varname
+    integer :: varid
+    logical :: readvar
+    type(Var_desc_t)  :: vardesc
+
+    call check_var(ncid, trim(varname), vardesc, readvar)
+
+    call check_ret( nf90_put_var(ncid%fh, vardesc%varid, data),'ncd_putvar_real_sp_all_5d')
+  end subroutine ncd_putvar_real_sp_all_5d  
+!----------------------------------------------------------------------
   subroutine ncd_putvar_real_sp_3d(ncid, varname, rec, data)
   !
   ! DESCRIPTION
   ! put 3d real array to file
 
-  use data_kind_mod, only : r8 => shr_kind_r8
+  use data_kind_mod, only : r8 => DAT_kind_r8
 !**********************************************************************
   implicit none
   class(file_desc_t), intent(in) :: ncid
@@ -922,8 +956,55 @@ module ncdio_pio
   call check_ret( nf90_put_var(ncid%fh, vardesc%varid, data,  &
      start = (/1,1,1,rec/)),trim(varname)//' in ncd_putvar_real_sp_3d')
 
-      end subroutine ncd_putvar_real_sp_3d
+  end subroutine ncd_putvar_real_sp_3d
+!----------------------------------------------------------------------
+  subroutine ncd_putvar_real_sp_4d(ncid, varname, rec, data)
+  !
+  ! DESCRIPTION
+  ! put 3d real array to file
 
+  use data_kind_mod, only : r8 => DAT_kind_r8
+!**********************************************************************
+  implicit none
+  class(file_desc_t), intent(in) :: ncid
+  integer, intent(in) :: rec
+  real(r8),dimension(:,:,:,:), intent(in) :: data
+
+  character(len=*), intent(in) :: varname
+  integer :: varid
+  logical :: readvar
+  type(Var_desc_t)  :: vardesc
+
+  call check_var(ncid, trim(varname), vardesc, readvar)
+
+  call check_ret( nf90_put_var(ncid%fh, vardesc%varid, data,  &
+     start = (/1,1,1,1,rec/)),trim(varname)//' in ncd_putvar_real_sp_4d')
+
+  end subroutine ncd_putvar_real_sp_4d
+!----------------------------------------------------------------------
+  subroutine ncd_putvar_real_sp_5d(ncid, varname, rec, data)
+  !
+  ! DESCRIPTION
+  ! put 3d real array to file
+
+  use data_kind_mod, only : r8 => DAT_kind_r8
+!**********************************************************************
+  implicit none
+  class(file_desc_t), intent(in) :: ncid
+  integer, intent(in) :: rec
+  real(r8),dimension(:,:,:,:,:), intent(in) :: data
+
+  character(len=*), intent(in) :: varname
+  integer :: varid
+  logical :: readvar
+  type(Var_desc_t)  :: vardesc
+
+  call check_var(ncid, trim(varname), vardesc, readvar)
+
+  call check_ret( nf90_put_var(ncid%fh, vardesc%varid, data,  &
+     start = (/1,1,1,1,rec/)),trim(varname)//' in ncd_putvar_real_sp_5d')
+
+  end subroutine ncd_putvar_real_sp_5d
 !----------------------------------------------------------------------
 
   subroutine ncd_getvint(ncid, varname,  data)
@@ -931,7 +1012,7 @@ module ncdio_pio
   !DESCRIPTION
   ! read a integer scalar
 
-  use data_kind_mod, only : r8 => shr_kind_r8
+  use data_kind_mod, only : r8 => DAT_kind_r8
 !**********************************************************************
   implicit none
   class(file_desc_t), intent(in) :: ncid
@@ -979,7 +1060,7 @@ module ncdio_pio
     !DESCRIPTION
     ! read a real scalar
 
-    use data_kind_mod, only : r8 => shr_kind_r8
+    use data_kind_mod, only : r8 => DAT_kind_r8
    !**********************************************************************
     implicit none
     class(file_desc_t), intent(in) :: ncid
@@ -1003,7 +1084,7 @@ module ncdio_pio
       !DESCRIPTION
       ! read a real scalar
 
-      use data_kind_mod, only : r8 => shr_kind_r8
+      use data_kind_mod, only : r8 => DAT_kind_r8
     !**********************************************************************
       implicit none
       class(file_desc_t), intent(in) :: ncid
@@ -1026,7 +1107,7 @@ module ncdio_pio
         !DESCRIPTION
         ! read a real scalar
 
-        use data_kind_mod, only : r8 => shr_kind_r8
+        use data_kind_mod, only : r8 => DAT_kind_r8
       !**********************************************************************
         implicit none
         class(file_desc_t), intent(in) :: ncid
@@ -1042,29 +1123,53 @@ module ncdio_pio
         call check_ret( nf90_get_var(ncid%fh, vardesc%varid, data),'ncd_getvar_real_sp_all_3d')
 
         end subroutine ncd_getvar_real_sp_all_3d
-        !----------------------------------------------------------------------
+  !----------------------------------------------------------------------
 
-          subroutine ncd_getvar_real_sp_all_4d(ncid, varname, data)
-          !
-          !DESCRIPTION
-          ! read a real scalar
+    subroutine ncd_getvar_real_sp_all_4d(ncid, varname, data)
+    !
+    !DESCRIPTION
+    ! read a real scalar
 
-          use data_kind_mod, only : r8 => shr_kind_r8
-        !**********************************************************************
-          implicit none
-          class(file_desc_t), intent(in) :: ncid
-          character(len=*),intent(in) :: varname
-          REAL(r8), dimension(:,:,:,:), intent(out) :: data
+    use data_kind_mod, only : r8 => DAT_kind_r8
+  !**********************************************************************
+    implicit none
+    class(file_desc_t), intent(in) :: ncid
+    character(len=*),intent(in) :: varname
+    REAL(r8), dimension(:,:,:,:), intent(out) :: data
 
-          integer :: varid
-          logical :: readvar
-          type(Var_desc_t)  :: vardesc
+    integer :: varid
+    logical :: readvar
+    type(Var_desc_t)  :: vardesc
 
-          call check_var(ncid, trim(varname), vardesc, readvar)
+    call check_var(ncid, trim(varname), vardesc, readvar)
 
-          call check_ret( nf90_get_var(ncid%fh, vardesc%varid, data),'ncd_getvar_real_sp_all_4d')
+    call check_ret( nf90_get_var(ncid%fh, vardesc%varid, data),'ncd_getvar_real_sp_all_4d')
 
-          end subroutine ncd_getvar_real_sp_all_4d
+    end subroutine ncd_getvar_real_sp_all_4d
+  !----------------------------------------------------------------------
+
+    subroutine ncd_getvar_real_sp_all_5d(ncid, varname, data)
+    !
+    !DESCRIPTION
+    ! read a real scalar
+
+    use data_kind_mod, only : r8 => DAT_kind_r8
+  !**********************************************************************
+    implicit none
+    class(file_desc_t), intent(in) :: ncid
+    character(len=*),intent(in) :: varname
+    REAL(r8), dimension(:,:,:,:,:), intent(out) :: data
+
+    integer :: varid
+    logical :: readvar
+    type(Var_desc_t)  :: vardesc
+
+    call check_var(ncid, trim(varname), vardesc, readvar)
+
+    call check_ret( nf90_get_var(ncid%fh, vardesc%varid, data),'ncd_getvar_real_sp_all_5d')
+
+    end subroutine ncd_getvar_real_sp_all_5d
+
 !----------------------------------------------------------------------
 
   subroutine ncd_getvar_real_sp(ncid, varname, rec, data)
@@ -1072,7 +1177,7 @@ module ncdio_pio
   !DESCRIPTION
   ! read a real scalar
 
-  use data_kind_mod, only : r8 => shr_kind_r8
+  use data_kind_mod, only : r8 => DAT_kind_r8
 !**********************************************************************
   implicit none
   class(file_desc_t), intent(in) :: ncid
@@ -1135,7 +1240,7 @@ module ncdio_pio
   !DESCRIPTION
   ! read a real scalar
 
-  use data_kind_mod, only : r8 => shr_kind_r8
+  use data_kind_mod, only : r8 => DAT_kind_r8
 !**********************************************************************
   implicit none
   class(file_desc_t), intent(in) :: ncid
@@ -1202,7 +1307,7 @@ module ncdio_pio
   ! DESCRIPTION
   ! read 1d real array
 
-  use data_kind_mod, only : r8 => shr_kind_r8
+  use data_kind_mod, only : r8 => DAT_kind_r8
 !**********************************************************************
   implicit none
   class(file_desc_t), intent(in) :: ncid
@@ -1275,7 +1380,7 @@ module ncdio_pio
   ! DESCRIPTION
   ! read 2d real array
 
-  use data_kind_mod, only : r8 => shr_kind_r8
+  use data_kind_mod, only : r8 => DAT_kind_r8
 !**********************************************************************
   implicit none
   class(file_desc_t), intent(in) :: ncid
@@ -1344,7 +1449,7 @@ module ncdio_pio
   ! DESCRIPTION
   ! read 3d real array
 
-  use data_kind_mod, only : r8 => shr_kind_r8
+  use data_kind_mod, only : r8 => DAT_kind_r8
 !**********************************************************************
   implicit none
   class(file_desc_t), intent(in) :: ncid
@@ -1362,6 +1467,54 @@ module ncdio_pio
     start = (/1,1,1,rec/)),trim(varname)//' in ncd_getvar_real_sp_3d')
 
   end subroutine ncd_getvar_real_sp_3d
+!----------------------------------------------------------------------
+  subroutine ncd_getvar_real_sp_4d(ncid, varname, rec, data)
+  !
+  ! DESCRIPTION
+  ! read 3d real array
+
+  use data_kind_mod, only : r8 => DAT_kind_r8
+!**********************************************************************
+  implicit none
+  class(file_desc_t), intent(in) :: ncid
+  integer,           intent(in) :: rec
+  real(r8),dimension(:,:,:,:), intent(out) :: data
+
+  character(len=*), intent(in) :: varname
+  integer :: varid
+  logical :: readvar
+  type(Var_desc_t)  :: vardesc
+
+  call check_var(ncid, trim(varname), vardesc, readvar)
+
+  call check_ret( nf90_get_var(ncid%fh, vardesc%varid, data,  &
+    start = (/1,1,1,1,rec/)),trim(varname)//' in ncd_getvar_real_sp_4d')
+
+  end subroutine ncd_getvar_real_sp_4d
+!----------------------------------------------------------------------
+  subroutine ncd_getvar_real_sp_5d(ncid, varname, rec, data)
+  !
+  ! DESCRIPTION
+  ! read 3d real array
+
+  use data_kind_mod, only : r8 => DAT_kind_r8
+!**********************************************************************
+  implicit none
+  class(file_desc_t), intent(in) :: ncid
+  integer,           intent(in) :: rec
+  real(r8),dimension(:,:,:,:,:), intent(out) :: data
+
+  character(len=*), intent(in) :: varname
+  integer :: varid
+  logical :: readvar
+  type(Var_desc_t)  :: vardesc
+
+  call check_var(ncid, trim(varname), vardesc, readvar)
+
+  call check_ret( nf90_get_var(ncid%fh, vardesc%varid, data,  &
+    start = (/1,1,1,1,1,rec/)),trim(varname)//' in ncd_getvar_real_sp_5d')
+
+  end subroutine ncd_getvar_real_sp_5d
 
 !------------------------------------------------------
   function get_dim_len_idn(ncid, dimname ) result(dimlen)
@@ -1423,8 +1576,9 @@ module ncdio_pio
     character(len=*) ,  intent(in)    :: fname   ! File name to create
     !
     !-----------------------------------------------------------------------
-
-    call check_ret(nf90_create(fname, nf90_clobber, file%fh), 'create file '//fname)
+    print*,trim(fname)
+    call check_ret(nf90_create(fname, nf90_clobber, file%fh), &
+      trim(mod_filename)//'::ncd_pio_createfile')
 
     !write(iulog,*) 'Opened file ', trim(fname),  ' to write', file%fh
 
@@ -1489,14 +1643,15 @@ module ncdio_pio
     ! !DESCRIPTION:
     ! enddef netcdf file
     !
-    ! !ARGUMENTS:
-    class(file_desc_t),intent(inout) :: ncid      ! netcdf file id
-    !
-    ! !LOCAL VARIABLES:
-    integer :: status   ! error status
-    !-----------------------------------------------------------------------
-
-    call check_ret(nf90_enddef(ncid%fh), 'ncd_enddef')
+  implicit none
+  ! !ARGUMENTS:
+  class(file_desc_t),intent(inout) :: ncid      ! netcdf file id
+  !
+  ! !LOCAL VARIABLES:
+  integer :: status   ! error status
+  !-----------------------------------------------------------------------
+  print*,ncid%fh
+  call check_ret(nf90_enddef(ncid%fh), trim(mod_filename)//'::ncd_enddef')
 
   end subroutine ncd_enddef
 
@@ -1629,7 +1784,7 @@ module ncdio_pio
     !
     ! !LOCAL VARIABLES:
     integer :: status
-    character(len=*), parameter :: subname = 'ncd_defdim'
+    character(len=*), parameter :: subname = trim(mod_filename)//'::ncd_defdim'
     !-----------------------------------------------------------------------
     
     call check_ret(nf90_def_dim(ncid%fh,attrib,value,dimid), trim(subname)//' '//trim(attrib))
@@ -1817,7 +1972,7 @@ module ncdio_pio
     !
     ! !LOCAL VARIABLES:
     integer :: ret               ! return code
-    character(len=*),parameter :: subname='ncd_inqvid' ! subroutine name
+    character(len=*),parameter :: subname=trim(mod_filename)//'::ncd_inqvid' ! subroutine name
     !-----------------------------------------------------------------------
 
     if (present(readvar)) then
@@ -1852,7 +2007,7 @@ module ncdio_pio
     !
     ! !LOCAL VARIABLES:
     integer :: status               ! error code
-    character(len=*),parameter :: subname='ncd_io_char_var0_start_glob'
+    character(len=*),parameter :: subname=trim(mod_filename)//'::ncd_io_char_var0_start_glob'
 
   end subroutine ncd_io_char_var0_start_glob
     !-----------------------------------------------------------------------
@@ -1880,7 +2035,7 @@ module ncdio_pio
     integer, pointer  :: idata1d(:)         ! Temporary integer data to send to file
     character(len=32) :: vname              ! variable error checking
     type(var_desc_t)  :: vardesc            ! local vardesc pointer
-    character(len=*),parameter :: subname='ncd_io_0d_log_glob'
+    character(len=*),parameter :: subname=trim(mod_filename)//'::ncd_io_0d_log_glob'
 
   end subroutine ncd_io_0d_log_glob
 
@@ -1909,7 +2064,8 @@ module ncdio_pio
     integer, pointer  :: idata1d(:)         ! Temporary integer data to send to file
     character(len=32) :: vname              ! variable error checking
     type(var_desc_t)  :: vardesc            ! local vardesc pointer
-    character(len=*),parameter :: subname='ncd_io_1d_log_glob'
+    character(len=*),parameter :: subname=trim(mod_filename)//'::ncd_io_1d_log_glob'
+
   end subroutine ncd_io_1d_log_glob
     !-----------------------------------------------------------------------
 
@@ -1938,7 +2094,8 @@ module ncdio_pio
     character(len=1)  :: tmpString(128)     ! temp for manipulating output string
     type(var_desc_t)  :: vardesc            ! local vardesc pointer
     integer(i4) :: temp(1)
-    character(len=*),parameter :: subname='ncd_io_0d_int_glob'
+    character(len=*),parameter :: subname=trim(mod_filename)//'::ncd_io_0d_int_glob'
+
   end subroutine ncd_io_0d_int_glob
   !-------------------------------------------------------------------------------
 
@@ -1967,7 +2124,7 @@ module ncdio_pio
     character(len=1)  :: tmpString(128)     ! temp for manipulating output string
     type(var_desc_t)  :: vardesc            ! local vardesc pointer
     integer(i4) :: temp(1)
-    character(len=*),parameter :: subname='ncd_io_1d_int_glob'
+    character(len=*),parameter :: subname=trim(mod_filename)//'::ncd_io_1d_int_glob'
 
     if (flag == 'read') then
       if(present(nt))then
@@ -2011,7 +2168,7 @@ module ncdio_pio
     character(len=1)  :: tmpString(128)     ! temp for manipulating output string
     type(var_desc_t)  :: vardesc            ! local vardesc pointer
     integer(i4) :: temp(1)
-    character(len=*),parameter :: subname='ncd_io_2d_int_glob'
+    character(len=*),parameter :: subname=trim(mod_filename)//'::ncd_io_2d_int_glob'
 
     if (flag == 'read') then
       if(present(nt))then
@@ -2056,7 +2213,7 @@ module ncdio_pio
     character(len=1)  :: tmpString(128)     ! temp for manipulating output string
     type(var_desc_t)  :: vardesc            ! local vardesc pointer
     integer(i4) :: temp(1)
-    character(len=*),parameter :: subname='ncd_io_3d_int_glob'
+    character(len=*),parameter :: subname=trim(mod_filename)//'::ncd_io_3d_int_glob'
 
     if (flag == 'read') then
       if(present(nt))then
@@ -2100,7 +2257,7 @@ module ncdio_pio
     character(len=1)  :: tmpString(128)     ! temp for manipulating output string
     type(var_desc_t)  :: vardesc            ! local vardesc pointer
     real(r8) :: temp(1)
-    character(len=*),parameter :: subname='ncd_io_0d_double_glob'
+    character(len=*),parameter :: subname=trim(mod_filename)//'::ncd_io_0d_double_glob'
     
   end subroutine ncd_io_0d_double_glob
 !------------------------------------------------------------------------------------------
@@ -2113,7 +2270,7 @@ module ncdio_pio
     class(file_desc_t),         intent(inout) :: ncid         ! netcdf file id
     character(len=*),           intent(in)    :: flag         ! 'read' or 'write'
     character(len=*),           intent(in)    :: varname      ! variable name
-    real(r8)         ,           intent(inout) :: data(:) ! raw data
+    real(r8)        ,           intent(inout) :: data(:)      ! raw data
     logical         , optional, intent(out)   :: readvar      ! was var read?
     integer         , optional, intent(in)    :: nt           ! time sample index
     logical         , optional, intent(in)    :: posNOTonfile ! position is NOT on this file
@@ -2129,7 +2286,7 @@ module ncdio_pio
     character(len=1)  :: tmpString(128)     ! temp for manipulating output string
     type(var_desc_t)  :: vardesc            ! local vardesc pointer
     real(r8) :: temp(1)
-    character(len=*),parameter :: subname='ncd_io_1d_double_glob'
+    character(len=*),parameter :: subname=trim(mod_filename)//'::ncd_io_1d_double_glob'
 
     if(flag=='read')then
       if(present(nt))then
@@ -2172,7 +2329,7 @@ module ncdio_pio
     character(len=1)  :: tmpString(128)     ! temp for manipulating output string
     type(var_desc_t)  :: vardesc            ! local vardesc pointer
     real(r8) :: temp(1)
-    character(len=*),parameter :: subname='ncd_io_2d_double_glob'
+    character(len=*),parameter :: subname=trim(mod_filename)//'::ncd_io_2d_double_glob'
 
     if(trim(flag)=='read')then
       if(present(nt))then
@@ -2215,7 +2372,7 @@ module ncdio_pio
     character(len=1)  :: tmpString(128)     ! temp for manipulating output string
     type(var_desc_t)  :: vardesc            ! local vardesc pointer
     real(r8) :: temp(1)
-    character(len=*),parameter :: subname='ncd_io_3d_double_glob'
+    character(len=*),parameter :: subname=trim(mod_filename)//'::ncd_io_3d_double_glob'
 
     if(trim(flag)=='read')then
       call ncd_getvar_real_sp_all_3d(ncid, varname, data)
@@ -2224,6 +2381,42 @@ module ncdio_pio
       call ncd_putvar_real_sp_all_3d(ncid, varname, data)  
     endif
   end subroutine ncd_io_3d_double_glob
+  !-----------------------------------------------------------------------
+  subroutine ncd_io_4d_double_glob(varname, data, flag, ncid, readvar, nt, posNOTonfile)
+    !
+    ! !DESCRIPTION:
+    ! netcdf I/O of global variable
+    !
+    ! !ARGUMENTS:
+    class(file_desc_t),         intent(inout) :: ncid         ! netcdf file id
+    character(len=*),           intent(in)    :: flag         ! 'read' or 'write'
+    character(len=*),           intent(in)    :: varname      ! variable name
+    real(r8)         ,           intent(inout) :: data(:,:,:,:) ! raw data
+    logical         , optional, intent(out)   :: readvar      ! was var read?
+    integer         , optional, intent(in)    :: nt           ! time sample index
+    logical         , optional, intent(in)    :: posNOTonfile ! position is NOT on this file
+    !
+    ! !LOCAL VARIABLES:
+    integer           :: m
+    integer           :: varid              ! netCDF variable id
+    integer           :: start(4), count(4) ! output bounds
+    integer           :: status             ! error code
+    logical           :: varpresent         ! if true, variable is on tape
+    logical           :: found              ! if true, found lat/lon dims on file
+    character(len=32) :: vname              ! variable error checking
+    character(len=1)  :: tmpString(128)     ! temp for manipulating output string
+    type(var_desc_t)  :: vardesc            ! local vardesc pointer
+    real(r8) :: temp(1)
+    character(len=*),parameter :: subname=trim(mod_filename)//'::ncd_io_4d_double_glob'
+
+    if(trim(flag)=='read')then
+      call ncd_getvar_real_sp_all_4d(ncid, varname, data)
+      if(present(readvar))readvar=.true.
+    else if(trim(flag)=='write')then
+      call ncd_putvar_real_sp_all_4d(ncid, varname, data)  
+    endif
+  end subroutine ncd_io_4d_double_glob
+
   !-----------------------------------------------------------------------
   subroutine ncd_io_0d_text_glob(varname, data, flag, ncid, readvar, nt, posNOTonfile)
     !
@@ -2247,7 +2440,8 @@ module ncdio_pio
     logical           :: varpresent         ! if true, variable is on tape
     character(len=1)  :: tmpString(128)     ! temp for manipulating output string
     type(var_desc_t)  :: vardesc            ! local vardesc pointer
-    character(len=*),parameter :: subname='ncd_io_0d_text_glob'
+    character(len=*),parameter :: subname=trim(mod_filename)//'::ncd_io_0d_text_glob'
+
   end subroutine ncd_io_0d_text_glob
   !-----------------------------------------------------------------------
   subroutine ncd_io_1d_text_glob(varname, data, flag, ncid, readvar, nt, posNOTonfile)
@@ -2272,7 +2466,8 @@ module ncdio_pio
     logical           :: varpresent         ! if true, variable is on tape
     character(len=1)  :: tmpString(128)     ! temp for manipulating output string
     type(var_desc_t)  :: vardesc            ! local vardesc pointer
-    character(len=*),parameter :: subname='ncd_io_1d_text_glob'
+    character(len=*),parameter :: subname=trim(mod_filename)//'::ncd_io_1d_text_glob'
+
   end subroutine ncd_io_1d_text_glob
   !-----------------------------------------------------------------------
   subroutine ncd_io_2d_text_glob(varname, data, flag, ncid, readvar, nt, posNOTonfile)
@@ -2297,7 +2492,8 @@ module ncdio_pio
     logical           :: varpresent         ! if true, variable is on tape
     character(len=1)  :: tmpString(128)     ! temp for manipulating output string
     type(var_desc_t)  :: vardesc            ! local vardesc pointer
-    character(len=*),parameter :: subname='ncd_io_2d_text_glob'
+    character(len=*),parameter :: subname=trim(mod_filename)//'::ncd_io_2d_text_glob'
+
   end subroutine ncd_io_2d_text_glob
   !-----------------------------------------------------------------------
   subroutine ncd_io_1d_int(varname, data, dim1name, flag, ncid, nt, readvar, cnvrtnan2fill)
@@ -2333,7 +2529,7 @@ module ncdio_pio
     integer                , pointer :: compDOF(:)
     type(iodesc_plus_type) , pointer :: iodesc_plus
     type(var_desc_t)                 :: vardesc
-    character(len=*),parameter       :: subname='ncd_io_1d_int' ! subroutine name
+    character(len=*),parameter       :: subname=trim(mod_filename)//'::ncd_io_1d_int' ! subroutine name
     if (flag == 'read') then
 
     else if (flag == 'write') then
@@ -2423,7 +2619,7 @@ module ncdio_pio
     integer                , pointer :: compDOF(:)
     type(iodesc_plus_type) , pointer :: iodesc_plus
     type(var_desc_t)                 :: vardesc
-    character(len=*),parameter       :: subname='ncd_io_1d_logical' ! subroutine name
+    character(len=*),parameter       :: subname=trim(mod_filename)//'::ncd_io_1d_logical' ! subroutine name
   end subroutine ncd_io_1d_logical
 !----------------------------------------------------------------------
 
@@ -2514,7 +2710,7 @@ module ncdio_pio
     logical                          :: varpresent ! if true, variable is on tape
     type(iodesc_plus_type) , pointer :: iodesc_plus
     type(var_desc_t)                 :: vardesc
-    character(len=*),parameter :: subname='ncd_io_3d_int' ! subroutine name
+    character(len=*),parameter :: subname=trim(mod_filename)//'::ncd_io_3d_int' ! subroutine name
   end subroutine ncd_io_3d_int
     !-----------------------------------------------------------------------
   subroutine ncd_io_3d_double(varname, data, dim1name, flag, ncid, nt, readvar)
@@ -2548,8 +2744,125 @@ module ncdio_pio
     logical                          :: varpresent ! if true, variable is on tape
     type(iodesc_plus_type) , pointer :: iodesc_plus
     type(var_desc_t)                 :: vardesc
-    character(len=*),parameter :: subname='ncd_io_3d_double' ! subroutine name
+    character(len=*),parameter :: subname=trim(mod_filename)//'::ncd_io_3d_double' ! subroutine name
+
+    if(trim(flag)=='read')then
+      if(present(nt))then
+        call ncd_getvar_real_sp_3d(ncid, varname, nt, data)      
+      else
+        call ncd_getvar_real_sp_all_3d(ncid, varname, data)
+      endif
+      if(present(readvar))readvar=.true.
+    else if(trim(flag)=='write')then
+      if(present(nt))then
+        call ncd_putvar_real_sp_3d(ncid, varname, nt, data)        
+      else
+        call ncd_putvar_real_sp_all_3d(ncid, varname, data)  
+      endif
+    endif
+
   end subroutine ncd_io_3d_double
+    !-----------------------------------------------------------------------
+  subroutine ncd_io_4d_double(varname, data, dim1name, flag, ncid, nt, readvar)
+    !
+    ! !DESCRIPTION:
+    ! Netcdf i/o of 3d
+    !
+    ! !ARGUMENTS:
+    class(file_desc_t), intent(inout) :: ncid         ! netcdf file id
+    character(len=*) , intent(in)  :: flag            ! 'read' or 'write'
+    character(len=*) , intent(in)  :: varname         ! variable name
+    real(r8)          , pointer     :: data(:,:,:,:)     ! local decomposition input data
+    character(len=*) , intent(in)  :: dim1name        ! dimension 1 name
+    integer, optional, intent(in)  :: nt              ! time sample index
+    logical, optional, intent(out) :: readvar         ! true => variable is on initial dataset (read only)
+    !
+    ! !LOCAL VARIABLES:
+    integer                          :: ndim1,ndim2
+    character(len=8)                 :: clmlevel   ! clmlevel
+    character(len=32)                :: dimname    ! temporary
+    integer                          :: status     ! error status
+    integer                          :: ndims      ! ndims total for var
+    integer                          :: ndims_iod  ! ndims iodesc for var
+    integer                          :: varid      ! varid
+    integer                          :: n          ! index
+    integer                          :: dims(4)    ! dim sizes
+    integer                          :: dids(4)    ! dim ids
+    integer                          :: iodnum     ! iodesc num in list
+    integer                          :: start(5)   ! netcdf start index
+    integer                          :: count(5)   ! netcdf count index
+    logical                          :: varpresent ! if true, variable is on tape
+    type(iodesc_plus_type) , pointer :: iodesc_plus
+    type(var_desc_t)                 :: vardesc
+    character(len=*),parameter :: subname=trim(mod_filename)//'::ncd_io_4d_double' ! subroutine name
+
+    if(trim(flag)=='read')then
+      if(present(nt))then
+        call ncd_getvar_real_sp_4d(ncid, varname, nt, data)      
+      else
+        call ncd_getvar_real_sp_all_4d(ncid, varname, data)
+      endif
+      if(present(readvar))readvar=.true.
+    else if(trim(flag)=='write')then
+      if(present(nt))then
+        call ncd_putvar_real_sp_4d(ncid, varname, nt, data)        
+      else
+        call ncd_putvar_real_sp_all_4d(ncid, varname, data)  
+      endif
+    endif
+
+  end subroutine ncd_io_4d_double  
+    !-----------------------------------------------------------------------
+  subroutine ncd_io_5d_double(varname, data, dim1name, flag, ncid, nt, readvar)
+    !
+    ! !DESCRIPTION:
+    ! Netcdf i/o of 3d
+    !
+    ! !ARGUMENTS:
+    class(file_desc_t), intent(inout) :: ncid         ! netcdf file id
+    character(len=*) , intent(in)  :: flag            ! 'read' or 'write'
+    character(len=*) , intent(in)  :: varname         ! variable name
+    real(r8)          , pointer     :: data(:,:,:,:,:)     ! local decomposition input data
+    character(len=*) , intent(in)  :: dim1name        ! dimension 1 name
+    integer, optional, intent(in)  :: nt              ! time sample index
+    logical, optional, intent(out) :: readvar         ! true => variable is on initial dataset (read only)
+    !
+    ! !LOCAL VARIABLES:
+    integer                          :: ndim1,ndim2
+    character(len=8)                 :: clmlevel   ! clmlevel
+    character(len=32)                :: dimname    ! temporary
+    integer                          :: status     ! error status
+    integer                          :: ndims      ! ndims total for var
+    integer                          :: ndims_iod  ! ndims iodesc for var
+    integer                          :: varid      ! varid
+    integer                          :: n          ! index
+    integer                          :: dims(4)    ! dim sizes
+    integer                          :: dids(4)    ! dim ids
+    integer                          :: iodnum     ! iodesc num in list
+    integer                          :: start(5)   ! netcdf start index
+    integer                          :: count(5)   ! netcdf count index
+    logical                          :: varpresent ! if true, variable is on tape
+    type(iodesc_plus_type) , pointer :: iodesc_plus
+    type(var_desc_t)                 :: vardesc
+    character(len=*),parameter :: subname=trim(mod_filename)//'::ncd_io_5d_double' ! subroutine name
+
+    if(trim(flag)=='read')then
+      if(present(nt))then
+        call ncd_getvar_real_sp_5d(ncid, varname, nt, data)      
+      else
+        call ncd_getvar_real_sp_all_5d(ncid, varname, data)
+      endif
+      if(present(readvar))readvar=.true.
+    else if(trim(flag)=='write')then
+      if(present(nt))then
+        call ncd_putvar_real_sp_5d(ncid, varname, nt, data)        
+      else
+        call ncd_putvar_real_sp_all_5d(ncid, varname, data)  
+      endif
+    endif
+
+  end subroutine ncd_io_5d_double  
+
     !-----------------------------------------------------------------------
   integer function ncd_inq_varid(ncid, varname, vardesc)
   implicit none

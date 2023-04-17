@@ -3,7 +3,7 @@
 !     THIS SUBROUTINE READS SOIL CHECKPOINT FILES TO
 !     RE-INITILIAZE THE MODEL FROM A SELECTED DATE IN AN EARLIER RUN
 !
-  use data_kind_mod, only : r8 => SHR_KIND_R8
+  use data_kind_mod, only : r8 => DAT_KIND_R8
   use StartsMod    , only : starts
   use MicrobialDataType
   use SOMDataType
@@ -74,12 +74,12 @@
       ,CRUN,HEATOU,OXYGOU,TCOU,TZOU,TPOU,TZIN,TPIN,XCSN,XZSN,XPSN
   D9995: DO NX=NHW,NHE
     D9990: DO NY=NVN,NVS
-      READ(21,95)IDATE,IYR,(TDTPX(NY,NX,N),N=1,12) &
-        ,(TDTPN(NY,NX,N),N=1,12),(TDRAD(NY,NX,N),N=1,12) &
-        ,(TDWND(NY,NX,N),N=1,12),(TDHUM(NY,NX,N),N=1,12) &
-        ,(TDPRC(NY,NX,N),N=1,12),(TDIRI(NY,NX,N),N=1,12) &
-        ,(TDCO2(NY,NX,N),N=1,12),(TDCN4(NY,NX,N),N=1,12) &
-        ,(TDCNO(NY,NX,N),N=1,12)
+      READ(21,95)IDATE,IYR,(TDTPX(N,NY,NX),N=1,12) &
+        ,(TDTPN(N,NY,NX),N=1,12),(TDRAD(N,NY,NX),N=1,12) &
+        ,(TDWND(N,NY,NX),N=1,12),(TDHUM(N,NY,NX),N=1,12) &
+        ,(TDPRC(N,NY,NX),N=1,12),(TDIRI(N,NY,NX),N=1,12) &
+        ,(TDCO2(N,NY,NX),N=1,12),(TDCN4(N,NY,NX),N=1,12) &
+        ,(TDCNO(N,NY,NX),N=1,12)
       READ(21,93)IDATE,IYR,IFLGT(NY,NX),IFNHB(NY,NX),IDTBL(NY,NX) &
         ,IFNOB(NY,NX),IFPOB(NY,NX),IUTYP(NY,NX) &
         ,ZT(NY,NX),TFLWC(NY,NX),TSED(NY,NX) &

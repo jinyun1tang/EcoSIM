@@ -1,6 +1,6 @@
 module NutUptakeMod
 
-  use data_kind_mod, only : r8 => SHR_KIND_R8
+  use data_kind_mod, only : r8 => DAT_KIND_R8
   use StomatesMod   , only : stomates
   use minimathmod  , only : safe_adb,vapsat,test_aneb,AZMAX1
   use EcosimConst
@@ -83,8 +83,8 @@ module NutUptakeMod
   D105: DO NB=1,NBR(NZ)
     IF(WTLSB(NB,NZ).GT.ZEROP(NZ).AND.ARLFB(NB,NZ).GT.ZEROP(NZ) &
       .AND.ARLFP(NZ).GT.ZEROP(NZ))THEN
-      CNH3P=AZMAX1(FNH3P*CEPOLB(NB,ielmn,NZ)/SNH3P)
-      ZPOOLB=AZMAX1(EPOOL(NB,ielmn,NZ))
+      CNH3P=AZMAX1(FNH3P*CEPOLB(ielmn,NB,NZ)/SNH3P)
+      ZPOOLB=AZMAX1(EPOOL(ielmn,NB,NZ))
       RNH3B(NB,NZ)=AMIN1(0.1_r8*ZPOOLB,AMAX1((CNH3E-CNH3P)/(RA(NZ)+RC(NZ)) &
         *FRADP(NZ)*AREA3(NU)*ARLFB(NB,NZ)/ARLFP(NZ),-0.1_r8*ZPOOLB))
     ELSE

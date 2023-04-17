@@ -1,5 +1,5 @@
 module ErosionBalMod
-  use data_kind_mod, only : r8 => SHR_KIND_R8
+  use data_kind_mod, only : r8 => DAT_KIND_R8
   use SoilPropertyDataType
   use RootDataType
   use EcoSiMParDataMod, only : micpar

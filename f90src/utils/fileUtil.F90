@@ -2,24 +2,32 @@ module fileUtil
 !!
 ! subroutines for file open with error check
   use abortutils, only : endrun
+  use data_kind_mod
   implicit none
-  character(len=*), private, parameter :: mod_filename = __FILE__
-
+  private
+  character(len=*),  parameter :: mod_filename = __FILE__
   public :: open_safe
   public :: check_read
   public :: remove_filename_extension
   public :: file_exists
-  public :: getfil
-  public :: strip_null
-  integer, parameter :: ecosim_filename_length=128
-  integer, parameter :: stdout=6
-  integer, parameter :: iulog=6
-  integer, parameter :: error_errmsg_len=256
-  integer, parameter :: ecosim_string_length_long=256
+  public :: getfil,getavu
+  public :: strip_null,print_ichar,strip_space
+  public :: namelist_to_buffer
+  public :: opnfil,relavu
+  integer, public, parameter :: ecosim_filename_length=128
+  integer, public, parameter :: stdout=6
+  integer, public, parameter :: iulog=6
+  integer, public, parameter :: error_errmsg_len=256
+  integer, public, parameter :: ecosim_string_length_long=256
   integer, public, parameter :: var_flux_type =1
   integer, public, parameter :: var_state_type=2
   integer, public, parameter :: ecosim_namelist_buffer_size = 4096
-  logical, save :: continue_run = .false.
+  logical, public, save :: continue_run = .false.
+
+  integer(DAT_KIND_IN) :: s_loglev = 0
+  integer(DAT_KIND_IN),parameter :: file_maxUnit = 99 
+  integer(DAT_KIND_IN),parameter :: file_minUnit = 10  
+  logical, save :: UnitTag(0:file_maxUnit) = .false. ! Logical units in use
   contains
 !------------------------------------------------------------------------------------------
 
@@ -302,4 +310,199 @@ module fileUtil
   end do
   end subroutine strip_null  
 
+  !------------------------------------------------------------------------
+  integer function getavu()
+    !
+    ! !DESCRIPTION:
+    ! Get next available Fortran unit number.
+    !
+    ! !USES:
+    !------------------------------------------------------------------------
+  implicit none
+
+  getavu = file_getunit()
+
+  end function getavu
+  !------------------------------------------------------------------------
+  subroutine relavu (iunit)
+  implicit none
+    !
+    ! !DESCRIPTION:
+    ! Close and release Fortran unit no longer in use!
+    !
+    ! !USES:
+    !
+    ! !ARGUMENTS:
+    integer, intent(in) :: iunit    !Fortran unit number
+    !------------------------------------------------------------------------
+
+    close(iunit)
+    call file_freeUnit(iunit)
+
+  end subroutine relavu  
+  !------------------------------------------------------------------------
+INTEGER FUNCTION file_getUnit ( unit )
+
+   implicit none
+
+! !INPUT/OUTPUT PARAMETERS:
+
+   integer(DAT_KIND_IN),intent(in),optional :: unit ! desired unit number
+
+!EOP
+
+   !----- local -----
+   integer(DAT_KIND_IN)   :: n      ! loop index
+   logical                :: opened ! If unit opened or not
+
+   !----- formats -----
+   character(*),parameter :: subName = '(file_getUnit) '
+   character(*),parameter :: F00   = "('(file_getUnit) ',A,I4,A)"
+
+!-------------------------------------------------------------------------------
+! Notes:
+!-------------------------------------------------------------------------------
+
+   if (present (unit)) then
+      inquire( unit, opened=opened )
+      if (unit < 0 .or. unit > file_maxUnit) then
+         write(iulog,F00) 'invalid unit number request:', unit
+         call endrun( 'ERROR: bad input unit number '//trim(mod_filename),__LINE__)
+      else if (opened .or. UnitTag(unit) .or. unit == 0 .or. unit == 5 &
+               .or. unit == 6) then
+         write(iulog,F00) 'unit number ', unit, ' is already in use'
+         call endrun( 'ERROR: Input unit number already in use '//trim(mod_filename),__LINE__)
+      else
+         file_getUnit = unit
+         UnitTag (unit)   = .true.
+         return
+      end if
+
+   else
+      ! --- Choose first available unit other than 0, 5, or 6  ------
+      do n=file_maxUnit, file_minUnit, -1
+         inquire( n, opened=opened )
+         if (n == 5 .or. n == 6 .or. opened) then
+            cycle
+         end if
+         if ( .not. UnitTag(n) ) then
+            file_getUnit = n
+            UnitTag(n)       = .true.
+            return
+         end if
+      end do
+   end if
+
+   call endrun( subName//': Error: no available units found '//trim(mod_filename),__LINE__ )
+
+END FUNCTION file_getUnit
+
+
+!===============================================================================
+!BOP ===========================================================================
+!
+! !IROUTINE: file_freeUnit -- Free up a FORTRAN unit number
+!
+! !DESCRIPTION: Free up the given unit number
+!
+! !REVISION HISTORY:
+!     2005-Dec-14 - E. Kluzek - creation
+!
+! !INTERFACE: ------------------------------------------------------------------
+
+SUBROUTINE file_freeUnit ( unit)
+
+   implicit none
+
+! !INPUT/OUTPUT PARAMETERS:
+
+   integer(DAT_KIND_IN),intent(in) :: unit  ! unit number to be freed
+
+!EOP
+
+   !----- local -----
+
+   !----- formats -----
+   character(*), parameter :: subName = '(file_freeUnit) '
+   character(*), parameter :: F00 =   "('(file_freeUnit) ',A,I4,A)"
+
+!-------------------------------------------------------------------------------
+! Notes:
+!-------------------------------------------------------------------------------
+
+   if (unit < 0 .or. unit > file_maxUnit) then
+      write(iulog,F00) 'invalid unit number request:', unit
+   else if (unit == 0 .or. unit == 5 .or. unit == 6) then
+      call endrun( subName//': Error: units 0, 5, and 6 must not be freed '//trim(mod_filename),__LINE__ )
+   else if (UnitTag(unit)) then
+      UnitTag (unit) = .false.
+   else
+      write(iulog,F00) 'unit ', unit, ' was not in use'
+   end if
+
+   return
+
+END SUBROUTINE file_freeUnit
+
+  !------------------------------------------------------------------------
+  subroutine opnfil (locfn, iun, form)
+    !
+    ! !DESCRIPTION:
+    ! Open file locfn in unformatted or formatted form on unit iun
+    !
+    ! !ARGUMENTS:
+    character(len=*), intent(in):: locfn  !file name
+    integer, intent(in):: iun             !fortran unit number
+    character(len=1), intent(in):: form   !file format: u = unformatted, f = formatted
+    !
+    ! !LOCAL VARIABLES:
+    integer ioe             !error return from fortran open
+    character(len=11) ft    !format type: formatted. unformatted
+    !------------------------------------------------------------------------
+
+    if (len_trim(locfn) == 0) then
+       call endrun('(OPNFIL): local filename has zero length in '//trim(mod_filename),__LINE__)
+    endif
+    if (form=='u' .or. form=='U') then
+       ft = 'unformatted'
+    else
+       ft = 'formatted  '
+    end if
+    open (unit=iun,file=locfn,status='unknown',form=ft,iostat=ioe)
+    if (ioe /= 0) then
+       write(iulog,*)'(OPNFIL): failed to open file ',trim(locfn),        &
+            &     ' on unit ',iun,' ierr=',ioe
+       call endrun('Stopped in '//trim(mod_filename), __LINE__)
+    else !if ( masterproc )then
+       write(iulog,*)'(OPNFIL): Successfully opened file ',trim(locfn),   &
+            &     ' on unit= ',iun
+    end if
+
+  end subroutine opnfil
+
+  !------------------------------------------------------------------------
+  subroutine print_ichar(instr)
+  implicit none
+  character(len=*), intent(in) ::instr 
+  integer :: j
+  do j=1,len(instr)
+    print*,ichar(instr(j:j))
+  enddo
+  end subroutine print_ichar
+  !------------------------------------------------------------------------
+  subroutine strip_space(instr)
+  implicit none
+  character(len=*), intent(inout) ::instr 
+  character(len=len(instr)) :: tstr
+  integer :: j,k
+  tstr=' '
+  k=1
+  do j=1,len(instr)
+    if (ichar(instr(j:j))/=32)then
+      tstr(k:k)=instr(j:j)
+      k=k+1
+    endif
+  enddo
+  instr=tstr
+  end subroutine strip_space
 end module fileUtil

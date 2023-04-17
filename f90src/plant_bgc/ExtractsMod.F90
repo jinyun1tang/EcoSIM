@@ -4,7 +4,7 @@ module ExtractsMod
 !     THIS SUBROUTINE AGGREGATES ALL SOIL-PLANT C,N,P EXCHANGES
 !     FROM 'UPTAKE' AMD 'GROSUB' AND SENDS RESULTS TO 'REDIST'
 !
-  use data_kind_mod, only : r8 => SHR_KIND_R8
+  use data_kind_mod, only : r8 => DAT_KIND_R8
   use EcosimConst
   use GrosubPars
   use PlantAPIData
@@ -81,7 +81,7 @@ module ExtractsMod
       DO K=1,pltpar%n_pltlitrk
         DO NE=1,npelms
           DO  M=1,pltpar%jsken
-            ESNT(M,NE,K,L)=ESNT(M,NE,K,L)+ESNC(M,NE,K,L,NZ)
+            ESNT(NE,M,K,L)=ESNT(NE,M,K,L)+ESNC(NE,M,K,L,NZ)
           enddo
         ENDDO
       ENDDO
@@ -352,7 +352,7 @@ module ExtractsMod
 
   implicit none
   integer, intent(in) :: NZ
-  integer :: L, NB,NE,NTG
+  integer :: L, NE,NB,NTG
   real(r8) :: ENGYC
 
   associate(                       &

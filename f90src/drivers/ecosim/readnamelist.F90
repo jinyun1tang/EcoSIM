@@ -3,7 +3,8 @@
 ! Description:
 ! read control namelist
   use abortutils     , only : endrun
-  use EcoSIMConfig   , only : transport_on,column_mode, do_instequil,finidat
+  use EcoSIMConfig   , only : transport_on,column_mode, do_instequil
+  use EcoSIMConfig   , only : finidat,nrevsn,brnch_retain_casename
   use ForcWriterMod  , only : bgc_forc_conf,do_bgcforc_write
   use fileUtil       , only : iulog
   use EcoSIMHistMod  , only : DATAC
@@ -29,9 +30,10 @@
     do_instequil,salt_model, pft_file_in,grid_file_in,pft_mgmt_in, clm_factor_in,&
     clm_file_in,soil_mgmt_in,hist_config,sim_yyyymmdd,forc_periods,&
     NPXS,NPYS,JOUTS,IOUTS,KOUTS,continue_run,visual_out,restart_out,&
-    finidat
+    finidat,nrevsn,brnch_retain_casename
   
-  namelist /ecosys/hist_nhtfrq,hist_mfilt,hist_fincl1,hist_fincl2,hist_yrclose
+  namelist /ecosys/hist_nhtfrq,hist_mfilt,hist_fincl1,hist_fincl2,hist_yrclose, &
+    do_budgets
 
   logical :: laddband
   namelist /bbgcforc/do_bgcforc_write,do_year,do_doy,laddband,do_layer,&
@@ -49,9 +51,13 @@
   IOUTS=1   !frequency on daily scale
   KOUTS=500 !frequency on restart file writing
 
-  visual_out=.false.
+  visual_out =.false.
   restart_out=.false.  
+  do_budgets =.false.
   finidat=' '
+  nrevsn = ' '
+
+  brnch_retain_casename=.false.
   hist_config='NO'
   hist_yrclose=.false.
   sim_yyyymmdd='18000101'

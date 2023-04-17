@@ -4,7 +4,7 @@
 !     THIS SUBROUTINE READS PLANT CHECKPOINT FILES TO
 !     RE-INITIALIZE THE MODEL FROM A SELECTED DATE IN AN EARLIER RUN
 !
-  use data_kind_mod, only : r8 => SHR_KIND_R8
+  use data_kind_mod, only : r8 => DAT_KIND_R8
   use StartqMod    , only : startq
   use GridConsts
   use FlagDataType
@@ -41,9 +41,9 @@
         ,(IFLGC(NZ,NY,NX),NZ=1,NPP(NY,NX)) &
         ,(IDTH(NZ,NY,NX),NZ=1,NPP(NY,NX))
       READ(26,97)IDATE,IYR,NPP(NY,NX) &
-        ,((WTSTDE(M,ielmc,NZ,NY,NX),M=1,jsken),NZ=1,NPP(NY,NX)) &
-        ,((WTSTDE(M,ielmn,NZ,NY,NX),M=1,jsken),NZ=1,NPP(NY,NX)) &
-        ,((WTSTDE(M,ielmp,NZ,NY,NX),M=1,jsken),NZ=1,NPP(NY,NX))
+        ,((WTSTDE(ielmc,M,NZ,NY,NX),M=1,jsken),NZ=1,NPP(NY,NX)) &
+        ,((WTSTDE(ielmn,M,NZ,NY,NX),M=1,jsken),NZ=1,NPP(NY,NX)) &
+        ,((WTSTDE(ielmp,M,NZ,NY,NX),M=1,jsken),NZ=1,NPP(NY,NX))
       IF(IFLGT(NY,NX).GT.0)THEN
         D9980: DO NQ=1,NPP(NY,NX)
           IF(IFLGC(NQ,NY,NX).EQ.1)THEN
@@ -104,62 +104,62 @@
               ,WTRVE(ielmc,NZ,NY,NX),WTRVE(ielmn,NZ,NY,NX),WTRVE(ielmp,NZ,NY,NX),HTCTL(NZ,NY,NX) &
               ,SDPTH(NZ,NY,NX),WSTR(NZ,NY,NX) &
               ,CHILL(NZ,NY,NX),WTRTSE(ielmc,NZ,NY,NX),FRADP(NZ,NY,NX)
-            READ(27,92)IDATE,IYR,NZ,(EPOOL(NB,ielmc,NZ,NY,NX),NB=1,NBR(NZ,NY,NX))
-            READ(27,92)IDATE,IYR,NZ,(EPOOL(NB,ielmn,NZ,NY,NX),NB=1,NBR(NZ,NY,NX))
-            READ(27,92)IDATE,IYR,NZ,(EPOOL(NB,ielmp,NZ,NY,NX),NB=1,NBR(NZ,NY,NX))
-            READ(27,92)IDATE,IYR,NZ,(EPOLNB(NB,ielmc,NZ,NY,NX),NB=1,NBR(NZ,NY,NX))
-            READ(27,92)IDATE,IYR,NZ,(EPOLNB(NB,ielmn,NZ,NY,NX),NB=1,NBR(NZ,NY,NX))
-            READ(27,92)IDATE,IYR,NZ,(EPOLNB(NB,ielmp,NZ,NY,NX),NB=1,NBR(NZ,NY,NX))
-            READ(27,92)IDATE,IYR,NZ,(WTSHTBE(NB,ielmc,NZ,NY,NX),NB=1,NBR(NZ,NY,NX))
-            READ(27,92)IDATE,IYR,NZ,(WTLFBE(NB,ielmc,NZ,NY,NX),NB=1,NBR(NZ,NY,NX))
-            READ(27,92)IDATE,IYR,NZ,(WTNDBE(NB,ielmc,NZ,NY,NX),NB=1,NBR(NZ,NY,NX))
-            READ(27,92)IDATE,IYR,NZ,(WTSHEBE(NB,ielmc,NZ,NY,NX),NB=1,NBR(NZ,NY,NX))
-            READ(27,92)IDATE,IYR,NZ,(WTSTKBE(NB,ielmc,NZ,NY,NX),NB=1,NBR(NZ,NY,NX))
+            READ(27,92)IDATE,IYR,NZ,(EPOOL(ielmc,NB,NZ,NY,NX),NB=1,NBR(NZ,NY,NX))
+            READ(27,92)IDATE,IYR,NZ,(EPOOL(ielmn,NB,NZ,NY,NX),NB=1,NBR(NZ,NY,NX))
+            READ(27,92)IDATE,IYR,NZ,(EPOOL(ielmp,NB,NZ,NY,NX),NB=1,NBR(NZ,NY,NX))
+            READ(27,92)IDATE,IYR,NZ,(EPOLNB(ielmc,NB,NZ,NY,NX),NB=1,NBR(NZ,NY,NX))
+            READ(27,92)IDATE,IYR,NZ,(EPOLNB(ielmn,NB,NZ,NY,NX),NB=1,NBR(NZ,NY,NX))
+            READ(27,92)IDATE,IYR,NZ,(EPOLNB(ielmp,NB,NZ,NY,NX),NB=1,NBR(NZ,NY,NX))
+            READ(27,92)IDATE,IYR,NZ,(WTSHTBE(ielmc,NB,NZ,NY,NX),NB=1,NBR(NZ,NY,NX))
+            READ(27,92)IDATE,IYR,NZ,(WTLFBE(ielmc,NB,NZ,NY,NX),NB=1,NBR(NZ,NY,NX))
+            READ(27,92)IDATE,IYR,NZ,(WTNDBE(ielmc,NB,NZ,NY,NX),NB=1,NBR(NZ,NY,NX))
+            READ(27,92)IDATE,IYR,NZ,(WTSHEBE(ielmc,NB,NZ,NY,NX),NB=1,NBR(NZ,NY,NX))
+            READ(27,92)IDATE,IYR,NZ,(WTSTKBE(ielmc,NB,NZ,NY,NX),NB=1,NBR(NZ,NY,NX))
             READ(27,92)IDATE,IYR,NZ,(WVSTKB(NB,NZ,NY,NX),NB=1,NBR(NZ,NY,NX))
-            READ(27,92)IDATE,IYR,NZ,(WTRSVBE(NB,ielmc,NZ,NY,NX),NB=1,NBR(NZ,NY,NX))
-            READ(27,92)IDATE,IYR,NZ,(WTHSKBE(NB,ielmc,NZ,NY,NX),NB=1,NBR(NZ,NY,NX))
-            READ(27,92)IDATE,IYR,NZ,(WTEARBE(NB,ielmc,NZ,NY,NX),NB=1,NBR(NZ,NY,NX))
-            READ(27,92)IDATE,IYR,NZ,(WTGRBE(NB,ielmc,NZ,NY,NX),NB=1,NBR(NZ,NY,NX))
+            READ(27,92)IDATE,IYR,NZ,(WTRSVBE(ielmc,NB,NZ,NY,NX),NB=1,NBR(NZ,NY,NX))
+            READ(27,92)IDATE,IYR,NZ,(WTHSKBE(ielmc,NB,NZ,NY,NX),NB=1,NBR(NZ,NY,NX))
+            READ(27,92)IDATE,IYR,NZ,(WTEARBE(ielmc,NB,NZ,NY,NX),NB=1,NBR(NZ,NY,NX))
+            READ(27,92)IDATE,IYR,NZ,(WTGRBE(ielmc,NB,NZ,NY,NX),NB=1,NBR(NZ,NY,NX))
             READ(27,92)IDATE,IYR,NZ,(WTLSB(NB,NZ,NY,NX),NB=1,NBR(NZ,NY,NX))
-            READ(27,92)IDATE,IYR,NZ,(WTSHTBE(NB,ielmn,NZ,NY,NX),NB=1,NBR(NZ,NY,NX))
-            READ(27,92)IDATE,IYR,NZ,(WTLFBE(NB,ielmn,NZ,NY,NX),NB=1,NBR(NZ,NY,NX))
-            READ(27,92)IDATE,IYR,NZ,(WTNDBE(NB,ielmn,NZ,NY,NX),NB=1,NBR(NZ,NY,NX))
-            READ(27,92)IDATE,IYR,NZ,(WTSHEBE(NB,ielmn,NZ,NY,NX),NB=1,NBR(NZ,NY,NX))
-            READ(27,92)IDATE,IYR,NZ,(WTSTKBE(NB,ielmn,NZ,NY,NX),NB=1,NBR(NZ,NY,NX))
-            READ(27,92)IDATE,IYR,NZ,(WTRSVBE(NB,ielmn,NZ,NY,NX),NB=1,NBR(NZ,NY,NX))
-            READ(27,92)IDATE,IYR,NZ,(WTHSKBE(NB,ielmn,NZ,NY,NX),NB=1,NBR(NZ,NY,NX))
-            READ(27,92)IDATE,IYR,NZ,(WTEARBE(NB,ielmn,NZ,NY,NX),NB=1,NBR(NZ,NY,NX))
-            READ(27,92)IDATE,IYR,NZ,(WTGRBE(NB,ielmn,NZ,NY,NX),NB=1,NBR(NZ,NY,NX))
-            READ(27,92)IDATE,IYR,NZ,(WTSHTBE(NB,ielmp,NZ,NY,NX),NB=1,NBR(NZ,NY,NX))
-            READ(27,92)IDATE,IYR,NZ,(WTLFBE(NB,ielmp,NZ,NY,NX),NB=1,NBR(NZ,NY,NX))
-            READ(27,92)IDATE,IYR,NZ,(WTNDBE(NB,ielmp,NZ,NY,NX),NB=1,NBR(NZ,NY,NX))
-            READ(27,92)IDATE,IYR,NZ,(WTSHEBE(NB,ielmp,NZ,NY,NX),NB=1,NBR(NZ,NY,NX))
-            READ(27,92)IDATE,IYR,NZ,(WTSTKBE(NB,ielmp,NZ,NY,NX),NB=1,NBR(NZ,NY,NX))
-            READ(27,92)IDATE,IYR,NZ,(WTRSVBE(NB,ielmp,NZ,NY,NX),NB=1,NBR(NZ,NY,NX))
-            READ(27,92)IDATE,IYR,NZ,(WTHSKBE(NB,ielmp,NZ,NY,NX),NB=1,NBR(NZ,NY,NX))
-            READ(27,92)IDATE,IYR,NZ,(WTEARBE(NB,ielmp,NZ,NY,NX),NB=1,NBR(NZ,NY,NX))
-            READ(27,92)IDATE,IYR,NZ,(WTGRBE(NB,ielmp,NZ,NY,NX),NB=1,NBR(NZ,NY,NX))
+            READ(27,92)IDATE,IYR,NZ,(WTSHTBE(ielmn,NB,NZ,NY,NX),NB=1,NBR(NZ,NY,NX))
+            READ(27,92)IDATE,IYR,NZ,(WTLFBE(ielmn,NB,NZ,NY,NX),NB=1,NBR(NZ,NY,NX))
+            READ(27,92)IDATE,IYR,NZ,(WTNDBE(ielmn,NB,NZ,NY,NX),NB=1,NBR(NZ,NY,NX))
+            READ(27,92)IDATE,IYR,NZ,(WTSHEBE(ielmn,NB,NZ,NY,NX),NB=1,NBR(NZ,NY,NX))
+            READ(27,92)IDATE,IYR,NZ,(WTSTKBE(ielmn,NB,NZ,NY,NX),NB=1,NBR(NZ,NY,NX))
+            READ(27,92)IDATE,IYR,NZ,(WTRSVBE(ielmn,NB,NZ,NY,NX),NB=1,NBR(NZ,NY,NX))
+            READ(27,92)IDATE,IYR,NZ,(WTHSKBE(ielmn,NB,NZ,NY,NX),NB=1,NBR(NZ,NY,NX))
+            READ(27,92)IDATE,IYR,NZ,(WTEARBE(ielmn,NB,NZ,NY,NX),NB=1,NBR(NZ,NY,NX))
+            READ(27,92)IDATE,IYR,NZ,(WTGRBE(ielmn,NB,NZ,NY,NX),NB=1,NBR(NZ,NY,NX))
+            READ(27,92)IDATE,IYR,NZ,(WTSHTBE(ielmp,NB,NZ,NY,NX),NB=1,NBR(NZ,NY,NX))
+            READ(27,92)IDATE,IYR,NZ,(WTLFBE(ielmp,NB,NZ,NY,NX),NB=1,NBR(NZ,NY,NX))
+            READ(27,92)IDATE,IYR,NZ,(WTNDBE(ielmp,NB,NZ,NY,NX),NB=1,NBR(NZ,NY,NX))
+            READ(27,92)IDATE,IYR,NZ,(WTSHEBE(ielmp,NB,NZ,NY,NX),NB=1,NBR(NZ,NY,NX))
+            READ(27,92)IDATE,IYR,NZ,(WTSTKBE(ielmp,NB,NZ,NY,NX),NB=1,NBR(NZ,NY,NX))
+            READ(27,92)IDATE,IYR,NZ,(WTRSVBE(ielmp,NB,NZ,NY,NX),NB=1,NBR(NZ,NY,NX))
+            READ(27,92)IDATE,IYR,NZ,(WTHSKBE(ielmp,NB,NZ,NY,NX),NB=1,NBR(NZ,NY,NX))
+            READ(27,92)IDATE,IYR,NZ,(WTEARBE(ielmp,NB,NZ,NY,NX),NB=1,NBR(NZ,NY,NX))
+            READ(27,92)IDATE,IYR,NZ,(WTGRBE(ielmp,NB,NZ,NY,NX),NB=1,NBR(NZ,NY,NX))
             READ(27,92)IDATE,IYR,NZ,(GRNXB(NB,NZ,NY,NX),NB=1,NBR(NZ,NY,NX))
             READ(27,92)IDATE,IYR,NZ,(GRNOB(NB,NZ,NY,NX),NB=1,NBR(NZ,NY,NX))
             READ(27,92)IDATE,IYR,NZ,(GRWTB(NB,NZ,NY,NX),NB=1,NBR(NZ,NY,NX))
             READ(27,92)IDATE,IYR,NZ,(ARLFB(NB,NZ,NY,NX),NB=1,NBR(NZ,NY,NX))
-            READ(27,92)IDATE,IYR,NZ,(WGLFEX(NB,ielmc,NZ,NY,NX),NB=1,NBR(NZ,NY,NX))
-            READ(27,92)IDATE,IYR,NZ,(WGLFEX(NB,ielmn,NZ,NY,NX),NB=1,NBR(NZ,NY,NX))
-            READ(27,92)IDATE,IYR,NZ,(WGLFEX(NB,ielmp,NZ,NY,NX),NB=1,NBR(NZ,NY,NX))
+            READ(27,92)IDATE,IYR,NZ,(WGLFEX(ielmc,NB,NZ,NY,NX),NB=1,NBR(NZ,NY,NX))
+            READ(27,92)IDATE,IYR,NZ,(WGLFEX(ielmn,NB,NZ,NY,NX),NB=1,NBR(NZ,NY,NX))
+            READ(27,92)IDATE,IYR,NZ,(WGLFEX(ielmp,NB,NZ,NY,NX),NB=1,NBR(NZ,NY,NX))
             READ(27,92)IDATE,IYR,NZ,(ARLFZ(NB,NZ,NY,NX),NB=1,NBR(NZ,NY,NX))
-            READ(27,92)IDATE,IYR,NZ,(RCELX(NB,ielmn,NZ,NY,NX),NB=1,NBR(NZ,NY,NX))
-            READ(27,92)IDATE,IYR,NZ,(RCELX(NB,ielmp,NZ,NY,NX),NB=1,NBR(NZ,NY,NX))
-            READ(27,92)IDATE,IYR,NZ,(RCELX(NB,ielmc,NZ,NY,NX),NB=1,NBR(NZ,NY,NX))
-            READ(27,92)IDATE,IYR,NZ,(WGSHEXE(NB,ielmc,NZ,NY,NX),NB=1,NBR(NZ,NY,NX))
-            READ(27,92)IDATE,IYR,NZ,(WGSHEXE(NB,ielmn,NZ,NY,NX),NB=1,NBR(NZ,NY,NX))
-            READ(27,92)IDATE,IYR,NZ,(WGSHEXE(NB,ielmp,NZ,NY,NX),NB=1,NBR(NZ,NY,NX))
+            READ(27,92)IDATE,IYR,NZ,(RCELX(ielmn,NB,NZ,NY,NX),NB=1,NBR(NZ,NY,NX))
+            READ(27,92)IDATE,IYR,NZ,(RCELX(ielmp,NB,NZ,NY,NX),NB=1,NBR(NZ,NY,NX))
+            READ(27,92)IDATE,IYR,NZ,(RCELX(ielmc,NB,NZ,NY,NX),NB=1,NBR(NZ,NY,NX))
+            READ(27,92)IDATE,IYR,NZ,(WGSHEXE(ielmc,NB,NZ,NY,NX),NB=1,NBR(NZ,NY,NX))
+            READ(27,92)IDATE,IYR,NZ,(WGSHEXE(ielmn,NB,NZ,NY,NX),NB=1,NBR(NZ,NY,NX))
+            READ(27,92)IDATE,IYR,NZ,(WGSHEXE(ielmp,NB,NZ,NY,NX),NB=1,NBR(NZ,NY,NX))
             READ(27,92)IDATE,IYR,NZ,(HTSHEX(NB,NZ,NY,NX),NB=1,NBR(NZ,NY,NX))
-            READ(27,92)IDATE,IYR,NZ,(RCESX(NB,ielmn,NZ,NY,NX),NB=1,NBR(NZ,NY,NX))
-            READ(27,92)IDATE,IYR,NZ,(RCESX(NB,ielmp,NZ,NY,NX),NB=1,NBR(NZ,NY,NX))
-            READ(27,92)IDATE,IYR,NZ,(RCESX(NB,ielmc,NZ,NY,NX),NB=1,NBR(NZ,NY,NX))
-            READ(27,92)IDATE,IYR,NZ,(WTSTXBE(NB,ielmc,NZ,NY,NX),NB=1,NBR(NZ,NY,NX))
-            READ(27,92)IDATE,IYR,NZ,(WTSTXBE(NB,ielmn,NZ,NY,NX),NB=1,NBR(NZ,NY,NX))
-            READ(27,92)IDATE,IYR,NZ,(WTSTXBE(NB,ielmp,NZ,NY,NX),NB=1,NBR(NZ,NY,NX))
+            READ(27,92)IDATE,IYR,NZ,(RCESX(ielmn,NB,NZ,NY,NX),NB=1,NBR(NZ,NY,NX))
+            READ(27,92)IDATE,IYR,NZ,(RCESX(ielmp,NB,NZ,NY,NX),NB=1,NBR(NZ,NY,NX))
+            READ(27,92)IDATE,IYR,NZ,(RCESX(ielmc,NB,NZ,NY,NX),NB=1,NBR(NZ,NY,NX))
+            READ(27,92)IDATE,IYR,NZ,(WTSTXBE(ielmc,NB,NZ,NY,NX),NB=1,NBR(NZ,NY,NX))
+            READ(27,92)IDATE,IYR,NZ,(WTSTXBE(ielmn,NB,NZ,NY,NX),NB=1,NBR(NZ,NY,NX))
+            READ(27,92)IDATE,IYR,NZ,(WTSTXBE(ielmp,NB,NZ,NY,NX),NB=1,NBR(NZ,NY,NX))
             READ(27,94)IDATE,IYR,NZ,(ARLFV(L,NZ,NY,NX),L=1,JC)
             READ(27,94)IDATE,IYR,NZ,(ARSTV(L,NZ,NY,NX),L=1,JC)
             D9945: DO NB=1,NBR(NQ,NY,NX)
@@ -168,25 +168,25 @@
               READ(28,93)IDATE,IYR,NZ,(CO2B(K,NB,NZ,NY,NX),K=1,JNODS)
               READ(28,93)IDATE,IYR,NZ,(HCOB(K,NB,NZ,NY,NX),K=1,JNODS)
               READ(28,93)IDATE,IYR,NZ,(ARLF(K,NB,NZ,NY,NX),K=0,JNODS)
-              READ(28,93)IDATE,IYR,NZ,(WGLFE(K,NB,ielmc,NZ,NY,NX),K=0,JNODS)
+              READ(28,93)IDATE,IYR,NZ,(WGLFE(ielmc,K,NB,NZ,NY,NX),K=0,JNODS)
               READ(28,93)IDATE,IYR,NZ,(WSLF(K,NB,NZ,NY,NX),K=0,JNODS)
               READ(28,93)IDATE,IYR,NZ,(HTSHE(K,NB,NZ,NY,NX),K=0,JNODS)
-              READ(28,93)IDATE,IYR,NZ,(WGSHE(K,NB,ielmc,NZ,NY,NX),K=0,JNODS)
+              READ(28,93)IDATE,IYR,NZ,(WGSHE(ielmc,K,NB,NZ,NY,NX),K=0,JNODS)
               READ(28,93)IDATE,IYR,NZ,(WSSHE(K,NB,NZ,NY,NX),K=0,JNODS)
               READ(28,93)IDATE,IYR,NZ,(HTNODE(K,NB,NZ,NY,NX),K=0,JNODS)
               READ(28,93)IDATE,IYR,NZ,(HTNODX(K,NB,NZ,NY,NX),K=0,JNODS)
-              READ(28,93)IDATE,IYR,NZ,(WGNODE(K,NB,ielmc,NZ,NY,NX),K=0,JNODS)
-              READ(28,93)IDATE,IYR,NZ,(WGLFE(K,NB,ielmn,NZ,NY,NX),K=0,JNODS)
-              READ(28,93)IDATE,IYR,NZ,(WGSHE(K,NB,ielmn,NZ,NY,NX),K=0,JNODS)
-              READ(28,93)IDATE,IYR,NZ,(WGNODE(K,NB,ielmn,NZ,NY,NX),K=0,JNODS)
-              READ(28,93)IDATE,IYR,NZ,(WGLFE(K,NB,ielmp,NZ,NY,NX),K=0,JNODS)
-              READ(28,93)IDATE,IYR,NZ,(WGSHE(K,NB,ielmp,NZ,NY,NX),K=0,JNODS)
-              READ(28,93)IDATE,IYR,NZ,(WGNODE(K,NB,ielmp,NZ,NY,NX),K=0,JNODS)
+              READ(28,93)IDATE,IYR,NZ,(WGNODE(ielmc,K,NB,NZ,NY,NX),K=0,JNODS)
+              READ(28,93)IDATE,IYR,NZ,(WGLFE(ielmn,K,NB,NZ,NY,NX),K=0,JNODS)
+              READ(28,93)IDATE,IYR,NZ,(WGSHE(ielmn,K,NB,NZ,NY,NX),K=0,JNODS)
+              READ(28,93)IDATE,IYR,NZ,(WGNODE(ielmn,K,NB,NZ,NY,NX),K=0,JNODS)
+              READ(28,93)IDATE,IYR,NZ,(WGLFE(ielmp,K,NB,NZ,NY,NX),K=0,JNODS)
+              READ(28,93)IDATE,IYR,NZ,(WGSHE(ielmp,K,NB,NZ,NY,NX),K=0,JNODS)
+              READ(28,93)IDATE,IYR,NZ,(WGNODE(ielmp,K,NB,NZ,NY,NX),K=0,JNODS)
               D9950: DO K=0,JNODS
                 READ(28,94)IDATE,IYR,NZ,(ARLFL(L,K,NB,NZ,NY,NX),L=1,JC)
-                READ(28,94)IDATE,IYR,NZ,(WGLFLE(L,K,NB,ielmc,NZ,NY,NX),L=1,JC)
-                READ(28,94)IDATE,IYR,NZ,(WGLFLE(L,K,NB,ielmn,NZ,NY,NX),L=1,JC)
-                READ(28,94)IDATE,IYR,NZ,(WGLFLE(L,K,NB,ielmp,NZ,NY,NX),L=1,JC)
+                READ(28,94)IDATE,IYR,NZ,(WGLFLE(ielmc,L,K,NB,NZ,NY,NX),L=1,JC)
+                READ(28,94)IDATE,IYR,NZ,(WGLFLE(ielmn,L,K,NB,NZ,NY,NX),L=1,JC)
+                READ(28,94)IDATE,IYR,NZ,(WGLFLE(ielmp,L,K,NB,NZ,NY,NX),L=1,JC)
                 IF(K.NE.0)THEN
                   D9940: DO N=1,4
                     READ(28,94)IDATE,IYR,NZ,(SURF(N,L,K,NB,NZ,NY,NX),L=1,JC)
@@ -244,9 +244,9 @@
               READ(29,94)IDATE,IYR,NZ,(EPOOLR(ielmn,N,L,NZ,NY,NX),L=1,NJ(NY,NX))
               READ(29,94)IDATE,IYR,NZ,(EPOOLR(ielmp,N,L,NZ,NY,NX),L=1,NJ(NY,NX))
               READ(29,94)IDATE,IYR,NZ,(RTDP1(N,NR,NZ,NY,NX),NR=1,NRT(NZ,NY,NX))
-              READ(29,94)IDATE,IYR,NZ,(RTWT1E(N,NR,ielmc,NZ,NY,NX),NR=1,NRT(NZ,NY,NX))
-              READ(29,94)IDATE,IYR,NZ,(RTWT1E(N,NR,ielmn,NZ,NY,NX),NR=1,NRT(NZ,NY,NX))
-              READ(29,94)IDATE,IYR,NZ,(RTWT1E(N,NR,ielmp,NZ,NY,NX),NR=1,NRT(NZ,NY,NX))
+              READ(29,94)IDATE,IYR,NZ,(RTWT1E(ielmc,N,NR,NZ,NY,NX),NR=1,NRT(NZ,NY,NX))
+              READ(29,94)IDATE,IYR,NZ,(RTWT1E(ielmn,N,NR,NZ,NY,NX),NR=1,NRT(NZ,NY,NX))
+              READ(29,94)IDATE,IYR,NZ,(RTWT1E(ielmp,N,NR,NZ,NY,NX),NR=1,NRT(NZ,NY,NX))
               D9965: DO NR=1,NRT(NZ,NY,NX)
                 READ(29,94)IDATE,IYR,NZ,(RTN2(N,L,NR,NZ,NY,NX),L=1,NJ(NY,NX))
                 READ(29,94)IDATE,IYR,NZ,(RTLG1(N,L,NR,NZ,NY,NX),L=1,NJ(NY,NX))
@@ -259,12 +259,12 @@
                 READ(29,94)IDATE,IYR,NZ,(RTLG2(N,L,NR,NZ,NY,NX),L=1,NJ(NY,NX))
               ENDDO D9965
             ENDDO D9970
-            READ(29,94)IDATE,IYR,NZ,(EPOOLN(L,ielmc,NZ,NY,NX),L=1,NJ(NY,NX))
-            READ(29,94)IDATE,IYR,NZ,(EPOOLN(L,ielmn,NZ,NY,NX),L=1,NJ(NY,NX))
-            READ(29,94)IDATE,IYR,NZ,(EPOOLN(L,ielmp,NZ,NY,NX),L=1,NJ(NY,NX))
-            READ(29,94)IDATE,IYR,NZ,(WTNDLE(L,ielmc,NZ,NY,NX),L=1,NJ(NY,NX))
-            READ(29,94)IDATE,IYR,NZ,(WTNDLE(L,ielmn,NZ,NY,NX),L=1,NJ(NY,NX))
-            READ(29,94)IDATE,IYR,NZ,(WTNDLE(L,ielmp,NZ,NY,NX),L=1,NJ(NY,NX))
+            READ(29,94)IDATE,IYR,NZ,(EPOOLN(ielmc,L,NZ,NY,NX),L=1,NJ(NY,NX))
+            READ(29,94)IDATE,IYR,NZ,(EPOOLN(ielmn,L,NZ,NY,NX),L=1,NJ(NY,NX))
+            READ(29,94)IDATE,IYR,NZ,(EPOOLN(ielmp,L,NZ,NY,NX),L=1,NJ(NY,NX))
+            READ(29,94)IDATE,IYR,NZ,(WTNDLE(ielmc,L,NZ,NY,NX),L=1,NJ(NY,NX))
+            READ(29,94)IDATE,IYR,NZ,(WTNDLE(ielmn,L,NZ,NY,NX),L=1,NJ(NY,NX))
+            READ(29,94)IDATE,IYR,NZ,(WTNDLE(ielmp,L,NZ,NY,NX),L=1,NJ(NY,NX))
           ENDIF
         ENDDO D9980
       ENDIF
@@ -319,28 +319,28 @@
                 D15: DO M=1,10
                   IDAY(M,NB,NZ,NY,NX)=0
                 ENDDO D15
-                EPOOL(NB,1:npelms,NZ,NY,NX)=0.0
-                WTSHTBE(NB,1:npelms,NZ,NY,NX)=0.0
-                WTSHEBE(NB,1:npelms,NZ,NY,NX)=0.0
-                WTSTKBE(NB,1:npelms,NZ,NY,NX)=0.0
-                WTLFBE(NB,1:npelms,NZ,NY,NX)=0.0
-                WTRSVBE(NB,1:npelms,NZ,NY,NX)=0.0
+                EPOOL(1:npelms,NB,NZ,NY,NX)=0.0
+                WTSHTBE(1:npelms,NB,NZ,NY,NX)=0.0
+                WTSHEBE(1:npelms,NB,NZ,NY,NX)=0.0
+                WTSTKBE(1:npelms,NB,NZ,NY,NX)=0.0
+                WTLFBE(1:npelms,NB,NZ,NY,NX)=0.0
+                WTRSVBE(1:npelms,NB,NZ,NY,NX)=0.0
                 WVSTKB(NB,NZ,NY,NX)=0.0
-                WTHSKBE(NB,1:npelms,NZ,NY,NX)=0.0
-                WTEARBE(NB,1:npelms,NZ,NY,NX)=0.0
-                WTGRBE(NB,1:npelms,NZ,NY,NX)=0.0
+                WTHSKBE(1:npelms,NB,NZ,NY,NX)=0.0
+                WTEARBE(1:npelms,NB,NZ,NY,NX)=0.0
+                WTGRBE(1:npelms,NB,NZ,NY,NX)=0.0
                 WTLSB(NB,NZ,NY,NX)=0.0
                 GRNXB(NB,NZ,NY,NX)=0.0
                 GRNOB(NB,NZ,NY,NX)=0.0
                 GRWTB(NB,NZ,NY,NX)=0.0
                 ARLFB(NB,NZ,NY,NX)=0.0
                 RNH3B(NB,NZ,NY,NX)=0.0
-                RCELX(NB,1:npelms,NZ,NY,NX)=0.0
-                WGLFEX(NB,1:npelms,NZ,NY,NX)=0.0
+                RCELX(1:npelms,NB,NZ,NY,NX)=0.0
+                WGLFEX(1:npelms,NB,NZ,NY,NX)=0.0
                 ARLFZ(NB,NZ,NY,NX)=0.0
-                RCESX(NB,1:npelms,NZ,NY,NX)=0.0
-                WTSTXBE(NB,1:npelms,NZ,NY,NX)=0.0
-                WGSHEXE(NB,1:npelms,NZ,NY,NX)=0.0
+                RCESX(1:npelms,NB,NZ,NY,NX)=0.0
+                WTSTXBE(1:npelms,NB,NZ,NY,NX)=0.0
+                WGSHEXE(1:npelms,NB,NZ,NY,NX)=0.0
                 HTSHEX(NB,NZ,NY,NX)=0.0
                 D5: DO L=1,JZ
                   ARSTK(L,NB,NZ,NY,NX)=0.0
@@ -355,14 +355,14 @@
                   HTNODE(K,NB,NZ,NY,NX)=0.0
                   HTNODX(K,NB,NZ,NY,NX)=0.0
                   HTSHE(K,NB,NZ,NY,NX)=0.0
-                  WGLFE(K,NB,1:npelms,NZ,NY,NX)=0.0
+                  WGLFE(1:npelms,K,NB,NZ,NY,NX)=0.0
                   WSLF(K,NB,NZ,NY,NX)=0.0
-                  WGSHE(K,NB,1:npelms,NZ,NY,NX)=0.0
+                  WGSHE(1:npelms,K,NB,NZ,NY,NX)=0.0
                   WSSHE(K,NB,NZ,NY,NX)=0.0
-                  WGNODE(K,NB,1:npelms,NZ,NY,NX)=0.0
-                  D55: DO L=1,JZ
+                  WGNODE(1:npelms,K,NB,NZ,NY,NX)=0.0
+                  D55: DO L=1,JC
                     ARLFL(L,K,NB,NZ,NY,NX)=0.0
-                    WGLFLE(L,K,NB,1:npelms,NZ,NY,NX)=0.0
+                    WGLFLE(1:npelms,L,K,NB,NZ,NY,NX)=0.0
                   ENDDO D55
                   IF(K.NE.0)THEN
                     CPOOL3(K,NB,NZ,NY,NX)=0.0
@@ -370,7 +370,7 @@
                     HCOB(K,NB,NZ,NY,NX)=0.0
                     CPOOL4(K,NB,NZ,NY,NX)=0.0
                     D45: DO L=1,JC
-                      DO N=1,4
+                      DO N=1,JLI
                         SURF(N,L,K,NB,NZ,NY,NX)=0.0
                       ENDDO
                     ENDDO D45

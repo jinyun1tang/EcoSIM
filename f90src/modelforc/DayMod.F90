@@ -1,6 +1,6 @@
 
   module DayMod
-  use data_kind_mod, only : r8 => SHR_KIND_R8
+  use data_kind_mod, only : r8 => DAT_KIND_R8
   use EcosimConst
   use minimathmod  , only : isLeap,AZMAX1
   use MiniFuncMod  , only : GetDayLength
@@ -270,31 +270,31 @@
 !     STEP CHANGES
 !
         IF(ICLM.EQ.1)THEN
-          TDTPX(NY,NX,N)=DTMPX(N)
-          TDTPN(NY,NX,N)=DTMPN(N)
-          TDRAD(NY,NX,N)=DRAD(N)
-          TDWND(NY,NX,N)=DWIND(N)
-          TDHUM(NY,NX,N)=DHUM(N)
-          TDPRC(NY,NX,N)=DPREC(N)
-          TDIRI(NY,NX,N)=DIRRI(N)
-          TDCO2(NY,NX,N)=DCO2E(N)
-          TDCN4(NY,NX,N)=DCN4R(N)
-          TDCNO(NY,NX,N)=DCNOR(N)
+          TDTPX(N,NY,NX)=DTMPX(N)
+          TDTPN(N,NY,NX)=DTMPN(N)
+          TDRAD(N,NY,NX)=DRAD(N)
+          TDWND(N,NY,NX)=DWIND(N)
+          TDHUM(N,NY,NX)=DHUM(N)
+          TDPRC(N,NY,NX)=DPREC(N)
+          TDIRI(N,NY,NX)=DIRRI(N)
+          TDCO2(N,NY,NX)=DCO2E(N)
+          TDCN4(N,NY,NX)=DCN4R(N)
+          TDCNO(N,NY,NX)=DCNOR(N)
 !
 !     INCRENENTAL CHANGES
 !
         ELSEIF(ICLM.EQ.2)THEN
 ! LYRC: number of days in current year
-          TDTPX(NY,NX,N)=TDTPX(NY,NX,N)+DTMPX(N)/LYRC
-          TDTPN(NY,NX,N)=TDTPN(NY,NX,N)+DTMPN(N)/LYRC
-          TDRAD(NY,NX,N)=TDRAD(NY,NX,N)+(DRAD(N)-1.0_r8)/LYRC
-          TDWND(NY,NX,N)=TDWND(NY,NX,N)+(DWIND(N)-1.0_r8)/LYRC
-          TDHUM(NY,NX,N)=TDHUM(NY,NX,N)+(DHUM(N)-1.0_r8)/LYRC
-          TDPRC(NY,NX,N)=TDPRC(NY,NX,N)+(DPREC(N)-1.0_r8)/LYRC
-          TDIRI(NY,NX,N)=TDIRI(NY,NX,N)+(DIRRI(N)-1.0_r8)/LYRC
-          TDCO2(NY,NX,N)=TDCO2(NY,NX,N)*EXP(LOG(DCO2E(N))/LYRC)
-          TDCN4(NY,NX,N)=TDCN4(NY,NX,N)+(DCN4R(N)-1.0_r8)/LYRC
-          TDCNO(NY,NX,N)=TDCNO(NY,NX,N)+(DCNOR(N)-1.0_r8)/LYRC
+          TDTPX(N,NY,NX)=TDTPX(N,NY,NX)+DTMPX(N)/LYRC
+          TDTPN(N,NY,NX)=TDTPN(N,NY,NX)+DTMPN(N)/LYRC
+          TDRAD(N,NY,NX)=TDRAD(N,NY,NX)+(DRAD(N)-1.0_r8)/LYRC
+          TDWND(N,NY,NX)=TDWND(N,NY,NX)+(DWIND(N)-1.0_r8)/LYRC
+          TDHUM(N,NY,NX)=TDHUM(N,NY,NX)+(DHUM(N)-1.0_r8)/LYRC
+          TDPRC(N,NY,NX)=TDPRC(N,NY,NX)+(DPREC(N)-1.0_r8)/LYRC
+          TDIRI(N,NY,NX)=TDIRI(N,NY,NX)+(DIRRI(N)-1.0_r8)/LYRC
+          TDCO2(N,NY,NX)=TDCO2(N,NY,NX)*EXP(LOG(DCO2E(N))/LYRC)
+          TDCN4(N,NY,NX)=TDCN4(N,NY,NX)+(DCN4R(N)-1.0_r8)/LYRC
+          TDCNO(N,NY,NX)=TDCNO(N,NY,NX)+(DCNOR(N)-1.0_r8)/LYRC
         ENDIF
       ENDDO D600
     ENDDO D950

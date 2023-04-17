@@ -25,7 +25,7 @@ module routqMod
 !     THIS SUBROUTINE OPENS CHECKPOINT FILES AND READS
 !     FILE NAMES FOR PLANT SPECIES AND MANAGEMENT
 !
-      use data_kind_mod, only : r8 => SHR_KIND_R8
+      use data_kind_mod, only : r8 => DAT_KIND_R8
   implicit none
   integer, intent(in) :: yearc,yeari
   integer, intent(in) :: NE,NEX,NHW,NHE,NVN,NVS

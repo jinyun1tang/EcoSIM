@@ -4,6 +4,9 @@ set(IOUTILS_SOURCES
     ForcWriterMod.F90
 	ClimReadMod.F90
     PlantInfoMod.F90
+	HistDataType.F90
+    HistFileMod.F90
+    restUtilMod.F90
     RestartMod.F90
 	readimod.F90
 	readqmod.F90
@@ -15,8 +18,6 @@ set(IOUTILS_SOURCES
 	splitc.F90
 	splitp.c
 	splits.c
-	HistDataType.F90
-    HistFileMod.F90
     bhistMod.F90
 )
 include_directories(${CMAKE_BINARY_DIR}/f90src/utils/)

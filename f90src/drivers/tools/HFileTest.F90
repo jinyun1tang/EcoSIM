@@ -1,9 +1,9 @@
 program MAIN
   use HistFileMod
-  use data_kind_mod, only : r8 => SHR_KIND_R8
-  use data_const_mod, only : pi=> SHR_CONST_PI
-  use GridConsts   , only : bounds,JP
-  use fileUtil     , only : iulog  
+  use data_kind_mod , only : r8 => DAT_KIND_R8
+  use data_const_mod, only : pi=> DAT_CONST_PI
+  use GridConsts    , only : bounds,JP
+  use fileUtil      , only : iulog  
   use abortutils        , only : endrun
   use EcoSIMCtrlMod     , only : etimer
   use EcoSIMConfig

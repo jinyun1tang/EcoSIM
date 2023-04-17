@@ -3,7 +3,7 @@ module HfuncsMod
 ! Description:
 ! code to do plant phenology
 
-  use data_kind_mod, only : r8 => SHR_KIND_R8
+  use data_kind_mod, only : r8 => DAT_KIND_R8
   use EcosimConst
   use PlantAPIData
   use minimathmod, only : AZMAX1
@@ -316,11 +316,17 @@ module HfuncsMod
 !     CONCENTRATION PERMIT
 !
 !     PR=nonstructural C concentration needed for root branching
-!
-      IF(PSIRG(1,NG(NZ),NZ).GT.PSILM)THEN
-        IF(NRT(NZ).EQ.0.OR.PSTG(NB1(NZ),NZ).GT.NRT(NZ)/FNOD(NZ)+XTLI(NZ))THEN
-          IF((NRT(NZ).EQ.0.AND.WTRVE(ielmc,NZ).GT.0.0_r8) &
-            .OR.(CEPOLP(ielmc,NZ).GT.PR(NZ).AND.PR(NZ).GT.0.0_r8))THEN
+!     FNOD: parameter for allocation of growth to nodes
+!     XLI: number of nodes in seed
+!     PSTG: node number
+!     NB1: number of main branch
+!     CEPOLP: canopy nonstructural element concentration
+!     PSIRG: root turgor pressure
+!     WTRVE: non-structural carbon
+      IF(PSIRG(ipltroot,NG(NZ),NZ).GT.PSILM)THEN
+        IF(NRT(NZ).EQ.0 .OR. PSTG(NB1(NZ),NZ).GT.NRT(NZ)/FNOD(NZ)+XTLI(NZ))THEN
+          IF((NRT(NZ).EQ.0 .AND. WTRVE(ielmc,NZ).GT.0.0_r8) &
+            .OR.(CEPOLP(ielmc,NZ).GT.PR(NZ) .AND. PR(NZ).GT.0.0_r8))THEN
             NRT(NZ)=MIN(JC1,NRT(NZ)+1)
             IDTHR(NZ)=0
           ENDIF
@@ -388,8 +394,8 @@ module HfuncsMod
   DO NE=1,npelms
     D140: DO NB=1,NBR(NZ)
       IF(IDTHB(NB,NZ).EQ.ialive)THEN
-        EPOOLP(NE,NZ)=EPOOLP(NE,NZ)+EPOOL(NB,NE,NZ)
-        EPOLNP(NE,NZ)=EPOLNP(NE,NZ)+EPOLNB(NB,NE,NZ)
+        EPOOLP(NE,NZ)=EPOOLP(NE,NZ)+EPOOL(NE,NB,NZ)
+        EPOLNP(NE,NZ)=EPOLNP(NE,NZ)+EPOLNB(NE,NB,NZ)
       ENDIF
     ENDDO D140
   ENDDO
@@ -441,9 +447,9 @@ module HfuncsMod
   DO NE=1,npelms
     D190: DO NB=1,NBR(NZ)
       IF(WTLSB(NB,NZ).GT.ZEROP(NZ))THEN
-        CEPOLB(NB,NE,NZ)=AZMAX1(EPOOL(NB,NE,NZ)/WTLSB(NB,NZ))
+        CEPOLB(NE,NB,NZ)=AZMAX1(EPOOL(NE,NB,NZ)/WTLSB(NB,NZ))
       ELSE
-        CEPOLB(NB,NE,NZ)=1.0_r8
+        CEPOLB(NE,NB,NZ)=1.0_r8
       ENDIF
     ENDDO D190
   ENDDO

@@ -1,5 +1,5 @@
 module ClimReadMod
-  use data_kind_mod, only : r8 => SHR_KIND_R8
+  use data_kind_mod, only : r8 => DAT_KIND_R8
   use abortutils , only : endrun
   use fileUtil   , only : open_safe
   use minimathmod, only : isLeap,AZMAX1,vapsat0

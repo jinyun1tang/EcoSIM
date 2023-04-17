@@ -2,7 +2,7 @@ module SoilBGCDataType
 
 !
 ! USES:
-  use data_kind_mod, only : r8 => SHR_KIND_R8
+  use data_kind_mod, only : r8 => DAT_KIND_R8
   use GridConsts
   use ElmIDMod    , only : npelms
   use TracerIDMod
@@ -239,7 +239,7 @@ implicit none
   allocate(TOQCK(0:JZ,JY,JX));  TOQCK=0._r8
   allocate(VOLQ(0:JZ,JY,JX));   VOLQ=0._r8
   allocate(TFNQ(0:JZ,JY,JX));   TFNQ=0._r8
-  allocate(ESNT(jsken,npelms,1:n_pltlitrk,0:JZ,JY,JX));ESNT=0._r8
+  allocate(ESNT(npelms,jsken,1:n_pltlitrk,0:JZ,JY,JX));ESNT=0._r8
   allocate(trcs_VLN(ids_beg:ids_end,0:JZ,JY,JX));trcs_VLN=1._r8
 
   allocate(VLNHB(0:JZ,JY,JX));  VLNHB=0._r8

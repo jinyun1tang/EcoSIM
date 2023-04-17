@@ -1,6 +1,6 @@
 module PlantDataRateType
 
-  use data_kind_mod, only : r8 => SHR_KIND_R8
+  use data_kind_mod, only : r8 => DAT_KIND_R8
   use GridConsts
   use ElmIDMod
   use TracerIDMod
@@ -182,15 +182,15 @@ module PlantDataRateType
   allocate(RUPP2B(jroots,JZ,JP,JY,JX));RUPP2B=0._r8
   allocate(RUPP1P(jroots,JZ,JP,JY,JX));RUPP1P=0._r8
   allocate(RUPP1B(jroots,JZ,JP,JY,JX));RUPP1B=0._r8
-  allocate(RCELX(JBR,npelms,JP,JY,JX)); RCELX=0._r8
-  allocate(RCESX(JBR,npelms,JP,JY,JX)); RCESX=0._r8
+  allocate(RCELX(npelms,JBR,JP,JY,JX)); RCELX=0._r8
+  allocate(RCESX(npelms,JBR,JP,JY,JX)); RCESX=0._r8
   allocate(CARBN(JP,JY,JX));    CARBN=0._r8
   allocate(TESNC(npelms,JP,JY,JX));    TESNC=0._r8
   allocate(TZUPFX(JP,JY,JX));   TZUPFX=0._r8
   allocate(TCO2T(JP,JY,JX));    TCO2T=0._r8
   allocate(BALE(npelms,JP,JY,JX));     BALE=0._r8
   allocate(HESNC(npelms,JP,JY,JX));    HESNC=0._r8
-  allocate(ESNC(jsken,npelms,1:n_pltlitrk,0:JZ,JP,JY,JX));ESNC=0._r8
+  allocate(ESNC(npelms,jsken,1:n_pltlitrk,0:JZ,JP,JY,JX));ESNC=0._r8
   allocate(ZNPP(JP,JY,JX));     ZNPP=0._r8
   allocate(CTRAN(JP,JY,JX));    CTRAN=0._r8
   allocate(TCO2A(JP,JY,JX));    TCO2A=0._r8

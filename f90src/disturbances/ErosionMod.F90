@@ -1,5 +1,5 @@
 module ErosionMod
-  use data_kind_mod, only : r8 => SHR_KIND_R8
+  use data_kind_mod, only : r8 => DAT_KIND_R8
   use minimathmod, only : test_aeqb,AZMAX1
   use MicrobialDataType
   use SOMDataType

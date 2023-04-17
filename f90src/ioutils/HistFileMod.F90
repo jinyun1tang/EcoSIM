@@ -1,12 +1,12 @@
 module HistFileMod
 
-  use data_kind_mod, only : r8 => SHR_KIND_R8
+  use data_kind_mod, only : r8 => DAT_KIND_R8
   use ncdio_pio
   use fileUtil          , only : iulog,strip_null
   use abortutils        , only : endrun
   use TestMod           , only : errMsg
   use GridConsts        , only : JZ,JS,JBR,bounds,bounds_type  
-  use data_const_mod    , only : spval => SHR_CONST_SPVAL
+  use data_const_mod    , only : spval => DAT_CONST_SPVAL
   use EcosimConst       , only : secspday
   use EcoSIMCtrlMod     , only : etimer
   use EcoSIMConfig      , only : case_name,hostname,version,source,username
@@ -244,7 +244,7 @@ implicit none
   ! "level" dimensions
   call ncd_defdim(lnfid, 'levsoi', JZ, dimid)
   call ncd_defdim(lnfid, 'levsno',  JS,dimid)
-  call ncd_defdim(lnfid, 'levcanopy',JC,dimid)
+  call ncd_defdim(lnfid, 'levcan',JC,dimid)
   call ncd_defdim(lnfid, 'npfts',  JP,dimid)
   call ncd_defdim(lnfid, 'nbranches',JBR,dimid)
   call ncd_defdim(lnfid, 'ngrstages',jpstgs,dimid)
@@ -2139,18 +2139,18 @@ implicit none
 
     ! If branch run, initialize file times and return
 
-    if (flag == 'read') then
-       if (nsrest == nsrBranch) then
-          do t = 1,ntapes
-             tape(t)%ntimes = 0
-          end do
-          return
-       end if
-       ! If startup run just return
-       if (nsrest == nsrStartup) then
-          RETURN
-       end if
-    endif
+   if (flag == 'read') then
+      if (nsrest == nsrBranch) then
+         do t = 1,ntapes
+            tape(t)%ntimes = 0
+         end do
+         return
+      end if
+      ! If startup run just return
+      if (nsrest == nsrStartup) then
+         RETURN
+      end if
+   endif
 
     ! Read history file data only for restart run (not for branch run)
 
@@ -2342,7 +2342,7 @@ implicit none
           call ncd_enddef(ncid_hist(t))
 
        end do   ! end of ntapes loop   
-
+ 
        RETURN
 
     !

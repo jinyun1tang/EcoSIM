@@ -1,6 +1,6 @@
 PROGRAM main
 
-  use data_kind_mod     , only : r8 => SHR_KIND_R8
+  use data_kind_mod     , only : r8 => DAT_KIND_R8
   use EcoSIMCtrlMod     , only : etimer
   use ecosim_time_mod   , only : getdow,ecosim_time_dat_type,get_steps_from_ymdhs
   implicit none

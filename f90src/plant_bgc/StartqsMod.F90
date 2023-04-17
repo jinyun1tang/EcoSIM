@@ -1,5 +1,5 @@
 module StartqsMod
-  use data_kind_mod, only : r8 => SHR_KIND_R8
+  use data_kind_mod, only : r8 => DAT_KIND_R8
   use EcosimConst
   use minimathmod, only : AZMAX1
   use EcoSIMConfig
@@ -85,7 +85,7 @@ module StartqsMod
         plt_biom%WTSTGE(1:npelms,NZ)=0._r8
         D6401: DO L=1,NL
           DO  K=1,pltpar%n_pltlitrk
-            plt_bgcr%ESNC(1:jsken,1:npelms,K,L,NZ)=0._r8
+            plt_bgcr%ESNC(1:npelms,1:jsken,K,L,NZ)=0._r8
           enddo
         ENDDO D6401
       ENDDO D9986
@@ -183,75 +183,75 @@ module StartqsMod
 !
 !     NONSTRUCTURAL
 !
-  CFOPE(instruct,iprotein,ielmc,NZ)=0.0_r8
-  CFOPE(instruct,icarbhyro,ielmc,NZ)=0.67_r8
-  CFOPE(instruct,icellulos,ielmc,NZ)=0.33_r8
-  CFOPE(instruct,ilignin,ielmc,NZ)=0.0_r8
+  CFOPE(ielmc,instruct,iprotein,NZ)=0.0_r8
+  CFOPE(ielmc,instruct,icarbhyro,NZ)=0.67_r8
+  CFOPE(ielmc,instruct,icellulos,NZ)=0.33_r8
+  CFOPE(ielmc,instruct,ilignin,NZ)=0.0_r8
 !
 !     NON-VASCULAR (E.G. MOSSES)
 !
   IF(IGTYP(NZ).EQ.0)THEN
-    CFOPE(ifoliar,iprotein,ielmc,NZ)=0.07_r8
-    CFOPE(ifoliar,icarbhyro,ielmc,NZ)=0.25_r8
-    CFOPE(ifoliar,icellulos,ielmc,NZ)=0.30_r8
-    CFOPE(ifoliar,ilignin,ielmc,NZ)=0.38_r8
+    CFOPE(ielmc,ifoliar,iprotein,NZ)=0.07_r8
+    CFOPE(ielmc,ifoliar,icarbhyro,NZ)=0.25_r8
+    CFOPE(ielmc,ifoliar,icellulos,NZ)=0.30_r8
+    CFOPE(ielmc,ifoliar,ilignin,NZ)=0.38_r8
 
-    CFOPE(infoliar,iprotein,ielmc,NZ)=0.07_r8
-    CFOPE(infoliar,icarbhyro,ielmc,NZ)=0.25_r8
-    CFOPE(infoliar,icellulos,ielmc,NZ)=0.30_r8
-    CFOPE(infoliar,ilignin,ielmc,NZ)=0.38_r8
+    CFOPE(ielmc,infoliar,iprotein,NZ)=0.07_r8
+    CFOPE(ielmc,infoliar,icarbhyro,NZ)=0.25_r8
+    CFOPE(ielmc,infoliar,icellulos,NZ)=0.30_r8
+    CFOPE(ielmc,infoliar,ilignin,NZ)=0.38_r8
 !
 !     LEGUMES
 !
   ELSEIF(INTYP(NZ).NE.0)THEN
-    CFOPE(ifoliar,iprotein,ielmc,NZ)=0.16_r8
-    CFOPE(ifoliar,icarbhyro,ielmc,NZ)=0.38_r8
-    CFOPE(ifoliar,icellulos,ielmc,NZ)=0.34_r8
-    CFOPE(ifoliar,ilignin,ielmc,NZ)=0.12_r8
+    CFOPE(ielmc,ifoliar,iprotein,NZ)=0.16_r8
+    CFOPE(ielmc,ifoliar,icarbhyro,NZ)=0.38_r8
+    CFOPE(ielmc,ifoliar,icellulos,NZ)=0.34_r8
+    CFOPE(ielmc,ifoliar,ilignin,NZ)=0.12_r8
 
-    CFOPE(infoliar,iprotein,ielmc,NZ)=0.07_r8
-    CFOPE(infoliar,icarbhyro,ielmc,NZ)=0.41_r8
-    CFOPE(infoliar,icellulos,ielmc,NZ)=0.37_r8
-    CFOPE(infoliar,ilignin,ielmc,NZ)=0.15_r8
+    CFOPE(ielmc,infoliar,iprotein,NZ)=0.07_r8
+    CFOPE(ielmc,infoliar,icarbhyro,NZ)=0.41_r8
+    CFOPE(ielmc,infoliar,icellulos,NZ)=0.37_r8
+    CFOPE(ielmc,infoliar,ilignin,NZ)=0.15_r8
 !
 !     ANNUALS, GRASSES, SHRUBS
 !
   ELSEIF(IBTYP(NZ).EQ.0.OR.IGTYP(NZ).LE.1)THEN
-    CFOPE(ifoliar,iprotein,ielmc,NZ)=0.08_r8
-    CFOPE(ifoliar,icarbhyro,ielmc,NZ)=0.41_r8
-    CFOPE(ifoliar,icellulos,ielmc,NZ)=0.36_r8
-    CFOPE(ifoliar,ilignin,ielmc,NZ)=0.15_r8
+    CFOPE(ielmc,ifoliar,iprotein,NZ)=0.08_r8
+    CFOPE(ielmc,ifoliar,icarbhyro,NZ)=0.41_r8
+    CFOPE(ielmc,ifoliar,icellulos,NZ)=0.36_r8
+    CFOPE(ielmc,ifoliar,ilignin,NZ)=0.15_r8
 
-    CFOPE(infoliar,iprotein,ielmc,NZ)=0.07_r8
-    CFOPE(infoliar,icarbhyro,ielmc,NZ)=0.41_r8
-    CFOPE(infoliar,icellulos,ielmc,NZ)=0.36_r8
-    CFOPE(infoliar,ilignin,ielmc,NZ)=0.16_r8
+    CFOPE(ielmc,infoliar,iprotein,NZ)=0.07_r8
+    CFOPE(ielmc,infoliar,icarbhyro,NZ)=0.41_r8
+    CFOPE(ielmc,infoliar,icellulos,NZ)=0.36_r8
+    CFOPE(ielmc,infoliar,ilignin,NZ)=0.16_r8
 !
 !     DECIDUOUS TREES
 !
   ELSEIF(IBTYP(NZ).EQ.1.OR.IBTYP(NZ).GE.3)THEN
-    CFOPE(ifoliar,iprotein,ielmc,NZ)=0.07_r8
-    CFOPE(ifoliar,icarbhyro,ielmc,NZ)=0.34_r8
-    CFOPE(ifoliar,icellulos,ielmc,NZ)=0.36_r8
-    CFOPE(ifoliar,ilignin,ielmc,NZ)=0.23_r8
+    CFOPE(ielmc,ifoliar,iprotein,NZ)=0.07_r8
+    CFOPE(ielmc,ifoliar,icarbhyro,NZ)=0.34_r8
+    CFOPE(ielmc,ifoliar,icellulos,NZ)=0.36_r8
+    CFOPE(ielmc,ifoliar,ilignin,NZ)=0.23_r8
 
-    CFOPE(infoliar,iprotein,ielmc,NZ)=0.0_r8
-    CFOPE(infoliar,icarbhyro,ielmc,NZ)=0.045_r8
-    CFOPE(infoliar,icellulos,ielmc,NZ)=0.660_r8
-    CFOPE(infoliar,ilignin,ielmc,NZ)=0.295_r8
+    CFOPE(ielmc,infoliar,iprotein,NZ)=0.0_r8
+    CFOPE(ielmc,infoliar,icarbhyro,NZ)=0.045_r8
+    CFOPE(ielmc,infoliar,icellulos,NZ)=0.660_r8
+    CFOPE(ielmc,infoliar,ilignin,NZ)=0.295_r8
 !
 !     CONIFEROUS TREES
 !
   ELSE
-    CFOPE(ifoliar,iprotein,ielmc,NZ)=0.07_r8
-    CFOPE(ifoliar,icarbhyro,ielmc,NZ)=0.25_r8
-    CFOPE(ifoliar,icellulos,ielmc,NZ)=0.38_r8
-    CFOPE(ifoliar,ilignin,ielmc,NZ)=0.30_r8
+    CFOPE(ielmc,ifoliar,iprotein,NZ)=0.07_r8
+    CFOPE(ielmc,ifoliar,icarbhyro,NZ)=0.25_r8
+    CFOPE(ielmc,ifoliar,icellulos,NZ)=0.38_r8
+    CFOPE(ielmc,ifoliar,ilignin,NZ)=0.30_r8
 
-    CFOPE(infoliar,iprotein,ielmc,NZ)=0.0_r8
-    CFOPE(infoliar,icarbhyro,ielmc,NZ)=0.045_r8
-    CFOPE(infoliar,icellulos,ielmc,NZ)=0.660_r8
-    CFOPE(infoliar,ilignin,ielmc,NZ)=0.295_r8
+    CFOPE(ielmc,infoliar,iprotein,NZ)=0.0_r8
+    CFOPE(ielmc,infoliar,icarbhyro,NZ)=0.045_r8
+    CFOPE(ielmc,infoliar,icellulos,NZ)=0.660_r8
+    CFOPE(ielmc,infoliar,ilignin,NZ)=0.295_r8
   ENDIF
 !
 !     FRACTIONS OF WOODY LITTER ALLOCATED TO
@@ -260,26 +260,26 @@ module StartqsMod
 !     NON-VASCULAR
 !
   IF(IGTYP(NZ).EQ.0)THEN
-    CFOPE(istalk,iprotein,ielmc,NZ)=0.07_r8
-    CFOPE(istalk,icarbhyro,ielmc,NZ)=0.25_r8
-    CFOPE(istalk,icellulos,ielmc,NZ)=0.30_r8
-    CFOPE(istalk,ilignin,ielmc,NZ)=0.38_r8
+    CFOPE(ielmc,istalk,iprotein,NZ)=0.07_r8
+    CFOPE(ielmc,istalk,icarbhyro,NZ)=0.25_r8
+    CFOPE(ielmc,istalk,icellulos,NZ)=0.30_r8
+    CFOPE(ielmc,istalk,ilignin,NZ)=0.38_r8
 !
 !     ANNUALS, GRASSES, SHRUBS
 !
   ELSEIF(IBTYP(NZ).EQ.0.OR.IGTYP(NZ).LE.1)THEN
-    CFOPE(istalk,iprotein,ielmc,NZ)=0.03_r8
-    CFOPE(istalk,icarbhyro,ielmc,NZ)=0.25_r8
-    CFOPE(istalk,icellulos,ielmc,NZ)=0.57_r8
-    CFOPE(istalk,ilignin,ielmc,NZ)=0.15_r8
+    CFOPE(ielmc,istalk,iprotein,NZ)=0.03_r8
+    CFOPE(ielmc,istalk,icarbhyro,NZ)=0.25_r8
+    CFOPE(ielmc,istalk,icellulos,NZ)=0.57_r8
+    CFOPE(ielmc,istalk,ilignin,NZ)=0.15_r8
 !
 !     DECIDUOUS AND CONIFEROUS TREES
 !
   ELSE
-    CFOPE(istalk,iprotein,ielmc,NZ)=0.0_r8
-    CFOPE(istalk,icarbhyro,ielmc,NZ)=0.045_r8
-    CFOPE(istalk,icellulos,ielmc,NZ)=0.660_r8
-    CFOPE(istalk,ilignin,ielmc,NZ)=0.295_r8
+    CFOPE(ielmc,istalk,iprotein,NZ)=0.0_r8
+    CFOPE(ielmc,istalk,icarbhyro,NZ)=0.045_r8
+    CFOPE(ielmc,istalk,icellulos,NZ)=0.660_r8
+    CFOPE(ielmc,istalk,ilignin,NZ)=0.295_r8
   ENDIF
 !
 !     FRACTIONS OF FINE ROOT LITTER ALLOCATED TO
@@ -288,42 +288,42 @@ module StartqsMod
 !     NON-VASCULAR
 !
   IF(IGTYP(NZ).EQ.0)THEN
-    CFOPE(iroot,iprotein,ielmc,NZ)=0.07_r8
-    CFOPE(iroot,icarbhyro,ielmc,NZ)=0.25_r8
-    CFOPE(iroot,icellulos,ielmc,NZ)=0.30_r8
-    CFOPE(iroot,ilignin,ielmc,NZ)=0.38_r8
+    CFOPE(ielmc,iroot,iprotein,NZ)=0.07_r8
+    CFOPE(ielmc,iroot,icarbhyro,NZ)=0.25_r8
+    CFOPE(ielmc,iroot,icellulos,NZ)=0.30_r8
+    CFOPE(ielmc,iroot,ilignin,NZ)=0.38_r8
 !
 !     ANNUALS, GRASSES, SHRUBS
 !
   ELSEIF(IBTYP(NZ).EQ.0.OR.IGTYP(NZ).LE.1)THEN
-    CFOPE(iroot,iprotein,ielmc,NZ)=0.057_r8
-    CFOPE(iroot,icarbhyro,ielmc,NZ)=0.263_r8
-    CFOPE(iroot,icellulos,ielmc,NZ)=0.542_r8
-    CFOPE(iroot,ilignin,ielmc,NZ)=0.138_r8
+    CFOPE(ielmc,iroot,iprotein,NZ)=0.057_r8
+    CFOPE(ielmc,iroot,icarbhyro,NZ)=0.263_r8
+    CFOPE(ielmc,iroot,icellulos,NZ)=0.542_r8
+    CFOPE(ielmc,iroot,ilignin,NZ)=0.138_r8
 !
 !     DECIDUOUS TREES
 !
   ELSEIF(IBTYP(NZ).EQ.1.OR.IBTYP(NZ).GE.3)THEN
-    CFOPE(iroot,iprotein,ielmc,NZ)=0.059_r8
-    CFOPE(iroot,icarbhyro,ielmc,NZ)=0.308_r8
-    CFOPE(iroot,icellulos,ielmc,NZ)=0.464_r8
-    CFOPE(iroot,ilignin,ielmc,NZ)=0.169_r8
+    CFOPE(ielmc,iroot,iprotein,NZ)=0.059_r8
+    CFOPE(ielmc,iroot,icarbhyro,NZ)=0.308_r8
+    CFOPE(ielmc,iroot,icellulos,NZ)=0.464_r8
+    CFOPE(ielmc,iroot,ilignin,NZ)=0.169_r8
 !
 !     CONIFEROUS TREES
 !
   ELSE
-    CFOPE(iroot,iprotein,ielmc,NZ)=0.059_r8
-    CFOPE(iroot,icarbhyro,ielmc,NZ)=0.308_r8
-    CFOPE(iroot,icellulos,ielmc,NZ)=0.464_r8
-    CFOPE(iroot,ilignin,ielmc,NZ)=0.169_r8
+    CFOPE(ielmc,iroot,iprotein,NZ)=0.059_r8
+    CFOPE(ielmc,iroot,icarbhyro,NZ)=0.308_r8
+    CFOPE(ielmc,iroot,icellulos,NZ)=0.464_r8
+    CFOPE(ielmc,iroot,ilignin,NZ)=0.169_r8
   ENDIF
 !
 !     COARSE WOODY LITTER FROM BOLES AND ROOTS
 !
-  CFOPE(icwood,iprotein,ielmc,NZ)=0.00_r8
-  CFOPE(icwood,icarbhyro,ielmc,NZ)=0.045_r8
-  CFOPE(icwood,icellulos,ielmc,NZ)=0.660_r8
-  CFOPE(icwood,ilignin,ielmc,NZ)=0.295_r8
+  CFOPE(ielmc,icwood,iprotein,NZ)=0.00_r8
+  CFOPE(ielmc,icwood,icarbhyro,NZ)=0.045_r8
+  CFOPE(ielmc,icwood,icellulos,NZ)=0.660_r8
+  CFOPE(ielmc,icwood,ilignin,NZ)=0.295_r8
 !
 !     INITIALIZE C-N AND C-P RATIOS IN PLANT LITTER
 !
@@ -344,12 +344,12 @@ module StartqsMod
     CNOPCT=0.0_r8
     CPOPCT=0.0_r8
     D100: DO M=1,jsken
-      CNOPCT=CNOPCT+CFOPE(N,M,ielmc,NZ)*CNOPC(M)
-      CPOPCT=CPOPCT+CFOPE(N,M,ielmc,NZ)*CPOPC(M)
+      CNOPCT=CNOPCT+CFOPE(ielmc,N,M,NZ)*CNOPC(M)
+      CPOPCT=CPOPCT+CFOPE(ielmc,N,M,NZ)*CPOPC(M)
     ENDDO D100
     D105: DO M=1,jsken
-      CFOPE(N,M,ielmn,NZ)=CFOPE(N,M,ielmc,NZ)*CNOPC(M)/CNOPCT
-      CFOPE(N,M,ielmp,NZ)=CFOPE(N,M,ielmc,NZ)*CPOPC(M)/CPOPCT
+      CFOPE(ielmn,N,M,NZ)=CFOPE(ielmc,N,M,NZ)*CNOPC(M)/CNOPCT
+      CFOPE(ielmp,N,M,NZ)=CFOPE(ielmc,N,M,NZ)*CPOPC(M)/CPOPCT
     ENDDO D105
   ENDDO D110
 !
@@ -662,22 +662,22 @@ module StartqsMod
 !
   WSTR(NZ)=0._r8
   CHILL(NZ)=0._r8
-  plt_biom%EPOOL(1:JBR,1:npelms,NZ)=0._r8
-  plt_biom%EPOLNB(1:JBR,1:npelms,NZ)=0._r8
-  plt_biom%WTSHEBE(1:JBR,1:npelms,NZ)=0._r8
-  plt_biom%WTSHTBE(1:JBR,1:npelms,NZ)=0._r8
-  plt_biom%WTSTKBE(1:JBR,1:npelms,NZ)=0._r8
-  plt_biom%WTLFBE(1:JBR,1:npelms,NZ)=0._r8
-  plt_biom%WTRSVBE(1:JBR,1:npelms,NZ)=0._r8
-  plt_biom%WTHSKBE(1:JBR,1:npelms,NZ)=0._r8
-  plt_biom%WTGRBE(1:JBR,1:npelms,NZ)=0._r8
-  plt_biom%WTEARBE(1:JBR,1:npelms,NZ)=0._r8
-  plt_biom%WTNDBE(1:JBR,1:npelms,NZ)=0._r8
-  plt_pheno%RCELX(1:JBR,1:npelms,NZ)=0._r8
-  plt_biom%WGLFEX(1:JBR,1:npelms,NZ)=0._r8
-  plt_pheno%RCESX(1:JBR,1:npelms,NZ)=0._r8
-  plt_biom%WGSHEXE(1:JBR,1:npelms,NZ)=0._r8
-  plt_biom%WTSTXBE(1:JBR,1:npelms,NZ)=0._r8
+  plt_biom%EPOOL(1:npelms,1:JBR,NZ)=0._r8
+  plt_biom%EPOLNB(1:npelms,1:JBR,NZ)=0._r8
+  plt_biom%WTSHEBE(1:npelms,1:JBR,NZ)=0._r8
+  plt_biom%WTSHTBE(1:npelms,1:JBR,NZ)=0._r8
+  plt_biom%WTSTKBE(1:npelms,1:JBR,NZ)=0._r8
+  plt_biom%WTLFBE(1:npelms,1:JBR,NZ)=0._r8
+  plt_biom%WTRSVBE(1:npelms,1:JBR,NZ)=0._r8
+  plt_biom%WTHSKBE(1:npelms,1:JBR,NZ)=0._r8
+  plt_biom%WTGRBE(1:npelms,1:JBR,NZ)=0._r8
+  plt_biom%WTEARBE(1:npelms,1:JBR,NZ)=0._r8
+  plt_biom%WTNDBE(1:npelms,1:JBR,NZ)=0._r8
+  plt_pheno%RCELX(1:npelms,1:JBR,NZ)=0._r8
+  plt_biom%WGLFEX(1:npelms,1:JBR,NZ)=0._r8
+  plt_pheno%RCESX(1:npelms,1:JBR,NZ)=0._r8
+  plt_biom%WGSHEXE(1:npelms,1:JBR,NZ)=0._r8
+  plt_biom%WTSTXBE(1:npelms,1:JBR,NZ)=0._r8
 
   D25: DO NB=1,JBR
     plt_biom%WVSTKB(NB,NZ)=0._r8
@@ -700,14 +700,16 @@ module StartqsMod
       HTNODE(K,NB,NZ)=0._r8
       plt_morph%HTNODX(K,NB,NZ)=0._r8
       plt_morph%HTSHE(K,NB,NZ)=0._r8
-      plt_biom%WGLFE(K,NB,1:npelms,NZ)=0._r8
       plt_biom%WSLF(K,NB,NZ)=0._r8
-      plt_biom%WGSHE(K,NB,1:npelms,NZ)=0._r8
       plt_biom%WSSHE(K,NB,NZ)=0._r8
-      plt_biom%WGNODE(K,NB,1:npelms,NZ)=0._r8
+      plt_biom%WGLFE(1:npelms,K,NB,NZ)=0._r8
+      plt_biom%WGNODE(1:npelms,K,NB,NZ)=0._r8
+      plt_biom%WGSHE(1:npelms,K,NB,NZ)=0._r8
+
+
       D55: DO L=1,JC1
         ARLFL(L,K,NB,NZ)=0._r8
-        plt_biom%WGLFLE(L,K,NB,1:npelms,NZ)=0._r8
+        plt_biom%WGLFLE(1:npelms,L,K,NB,NZ)=0._r8
       ENDDO D55
       IF(K.NE.0)THEN
         CPOOL3(K,NB,NZ)=0._r8
@@ -808,12 +810,12 @@ module StartqsMod
     WTSTGE(1:npelms,NZ)=0._r8
     WTSTDX=WTSTDI(NZ)*AREA3(NU)
     D155: DO M=1,jsken
-      WTSTDE(M,ielmc,NZ)=WTSTDX*CFOPE(icwood,M,ielmc,NZ)
-      WTSTDE(M,ielmn,NZ)=WTSTDX*CNSTK(NZ)*CFOPE(icwood,M,ielmn,NZ)
-      WTSTDE(M,ielmp,NZ)=WTSTDX*CPSTK(NZ)*CFOPE(icwood,M,ielmp,NZ)
+      WTSTDE(ielmc,M,NZ)=WTSTDX*CFOPE(ielmc,icwood,M,NZ)
+      WTSTDE(ielmn,M,NZ)=WTSTDX*CNSTK(NZ)*CFOPE(ielmn,icwood,M,NZ)
+      WTSTDE(ielmp,M,NZ)=WTSTDX*CPSTK(NZ)*CFOPE(ielmp,icwood,M,NZ)
     ENDDO D155
     DO NE=1,npelms
-      WTSTGE(NE,NZ)=WTSTGE(NE,NZ)+sum(WTSTDE(1:jsken,NE,NZ))
+      WTSTGE(NE,NZ)=WTSTGE(NE,NZ)+sum(WTSTDE(NE,1:jsken,NZ))
     ENDDO
   ENDIF
   end associate
@@ -976,14 +978,14 @@ module StartqsMod
         plt_morph%RTDP1(N,NR,NZ)=SDPTH(NZ)
         plt_biom%WTRT1E(1:npelms,N,L,NR,NZ)=0._r8
         plt_biom%WTRT2E(1:npelms,N,L,NR,NZ)=0._r8
-        plt_biom%RTWT1E(N,NR,1:npelms,NZ)=0._r8
+        plt_biom%RTWT1E(1:npelms,N,NR,NZ)=0._r8
       ENDDO D30
       IF(N.EQ.1)THEN
         D6400: DO K=1,pltpar%n_pltlitrk
-          plt_bgcr%ESNC(1:jsken,1:npelms,K,L,NZ)=0._r8
+          plt_bgcr%ESNC(1:npelms,1:jsken,K,L,NZ)=0._r8
         ENDDO D6400
-        plt_biom%EPOOLN(L,1:npelms,NZ)=0._r8
-        plt_biom%WTNDLE(L,1:npelms,NZ)=0._r8
+        plt_biom%EPOOLN(1:npelms,L,NZ)=0._r8
+        plt_biom%WTNDLE(1:npelms,L,NZ)=0._r8
         RUPNF(L,NZ)=0._r8
       ENDIF
     ENDDO D20
@@ -1048,19 +1050,19 @@ module StartqsMod
   WTRVE(ielmc,NZ)=WTRVX(NZ)
   WTRVE(ielmn,NZ)=CNGR(NZ)*WTRVE(ielmc,NZ)
   WTRVE(ielmp,NZ)=CPGR(NZ)*WTRVE(ielmc,NZ)
-  WTLFBE(1,ielmn,NZ)=CNGR(NZ)*WTLFBE(1,ielmc,NZ)
-  WTLFBE(1,ielmp,NZ)=CPGR(NZ)*WTLFBE(1,ielmc,NZ)
-  WTLSB(1,NZ)=WTLFBE(1,ielmc,NZ)+WTSHEBE(1,ielmc,NZ)
+  WTLFBE(ielmn,1,NZ)=CNGR(NZ)*WTLFBE(ielmc,1,NZ)
+  WTLFBE(ielmp,1,NZ)=CPGR(NZ)*WTLFBE(ielmc,1,NZ)
+  WTLSB(1,NZ)=WTLFBE(ielmc,1,NZ)+WTSHEBE(ielmc,1,NZ)
   WTLS(NZ)=WTLS(NZ)+WTLSB(1,NZ)
   FDM=AMIN1(1.0_r8,0.16_r8-0.045_r8*PSILT(NZ))
   VOLWP(NZ)=ppmc*WTLS(NZ)/FDM
   VOLWC(NZ)=0._r8
-  EPOOL(1,ielmn,NZ)=CNGR(NZ)*EPOOL(1,ielmc,NZ)
-  EPOOL(1,ielmp,NZ)=CPGR(NZ)*EPOOL(1,ielmc,NZ)
+  EPOOL(ielmn,1,NZ)=CNGR(NZ)*EPOOL(ielmc,1,NZ)
+  EPOOL(ielmp,1,NZ)=CPGR(NZ)*EPOOL(ielmc,1,NZ)
   WTRT1E(ielmn,ipltroot,NG(NZ),1,NZ)=CNGR(NZ)*WTRT1E(ielmc,ipltroot,NG(NZ),1,NZ)
   WTRT1E(ielmp,ipltroot,NG(NZ),1,NZ)=CPGR(NZ)*WTRT1E(ielmc,ipltroot,NG(NZ),1,NZ)
-  RTWT1E(1,1,ielmn,NZ)=CNGR(NZ)*RTWT1E(1,1,ielmc,NZ)
-  RTWT1E(1,1,ielmp,NZ)=CPGR(NZ)*RTWT1E(1,1,ielmc,NZ)
+  RTWT1E(ielmn,1,1,NZ)=CNGR(NZ)*RTWT1E(ielmc,1,1,NZ)
+  RTWT1E(ielmp,1,1,NZ)=CPGR(NZ)*RTWT1E(ielmc,1,1,NZ)
   WTRTL(ipltroot,NG(NZ),NZ)=WTRT1E(ielmc,ipltroot,NG(NZ),1,NZ)
   WTRTD(ipltroot,NG(NZ),NZ)=WTRT1E(ielmc,ipltroot,NG(NZ),1,NZ)
   WSRTL(1,NG(NZ),NZ)=WTRTL(ipltroot,NG(NZ),NZ)*CWSRT(NZ)

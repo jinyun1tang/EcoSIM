@@ -4,7 +4,7 @@ module PlantMod
  use abortutils        , only : endrun
  use fileUtil          , only : stdout
  use ModelStatusType   , only : model_status_type
- use data_kind_mod     , only : r8 => SHR_KIND_R8
+ use data_kind_mod     , only : r8 => DAT_KIND_R8
 implicit none
   character(len=*), private,parameter :: mod_filename = __FILE__
 

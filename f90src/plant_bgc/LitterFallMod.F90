@@ -1,6 +1,6 @@
 module LitterFallMod
 
-  use data_kind_mod, only : r8 => SHR_KIND_R8
+  use data_kind_mod, only : r8 => DAT_KIND_R8
   use EcosimConst
   use GrosubPars
   use PlantAPIData
@@ -203,32 +203,32 @@ implicit none
       D6425: DO M=1,jsken
         D8825: DO NB=1,NBR(NZ)
 
-          ESNC(M,ielmc,k_fine_litr,0,NZ)=ESNC(M,ielmc,k_fine_litr,0,NZ) &
-            +CFOPE(instruct,M,ielmc,NZ)*CPOOLK(NB,NZ)
+          ESNC(ielmc,M,k_fine_litr,0,NZ)=ESNC(ielmc,M,k_fine_litr,0,NZ) &
+            +CFOPE(ielmc,instruct,M,NZ)*CPOOLK(NB,NZ)
 
           DO NE=1,npelms
-            ESNC(M,NE,k_woody_litr,0,NZ)=ESNC(M,NE,k_woody_litr,0,NZ) &
-              +CFOPE(icwood,M,NE,NZ)*(WTLFBE(NB,NE,NZ)*FWODLE(NE,k_woody_litr) &
-              +WTSHEBE(NB,NE,NZ)*FWODBE(NE,k_woody_litr))
+            ESNC(NE,M,k_woody_litr,0,NZ)=ESNC(NE,M,k_woody_litr,0,NZ) &
+              +CFOPE(NE,icwood,M,NZ)*(WTLFBE(NE,NB,NZ)*FWODLE(NE,k_woody_litr) &
+              +WTSHEBE(NE,NB,NZ)*FWODBE(NE,k_woody_litr))
 
-            ESNC(M,NE,k_fine_litr,0,NZ)=ESNC(M,NE,k_fine_litr,0,NZ) &
-              +CFOPE(instruct,M,NE,NZ)*(EPOOL(NB,NE,NZ)+EPOLNB(NB,NE,NZ) &
-              +WTRSVBE(NB,NE,NZ)) &
-              +CFOPE(ifoliar,M,NE,NZ)*(WTLFBE(NB,NE,NZ)*FWODLE(NE,k_fine_litr) &
-              +WTNDBE(NB,NE,NZ)) &
-              +CFOPE(infoliar,M,NE,NZ)*(WTSHEBE(NB,NE,NZ)*FWODBE(NE,k_fine_litr) &
-              +WTHSKBE(NB,NE,NZ)+WTEARBE(NB,NE,NZ))
+            ESNC(NE,M,k_fine_litr,0,NZ)=ESNC(NE,M,k_fine_litr,0,NZ) &
+              +CFOPE(NE,instruct,M,NZ)*(EPOOL(NE,NB,NZ)+EPOLNB(NE,NB,NZ) &
+              +WTRSVBE(NE,NB,NZ)) &
+              +CFOPE(NE,ifoliar,M,NZ)*(WTLFBE(NE,NB,NZ)*FWODLE(NE,k_fine_litr) &
+              +WTNDBE(NE,NB,NZ)) &
+              +CFOPE(NE,infoliar,M,NZ)*(WTSHEBE(NE,NB,NZ)*FWODBE(NE,k_fine_litr) &
+              +WTHSKBE(NE,NB,NZ)+WTEARBE(NE,NB,NZ))
 
             IF(ISTYP(NZ).EQ.iplt_annual.AND.IWTYP(NZ).NE.0)THEN
-              WTRVE(NE,NZ)=WTRVE(NE,NZ)+CFOPE(infoliar,M,NE,NZ)*WTGRBE(NB,NE,NZ)
+              WTRVE(NE,NZ)=WTRVE(NE,NZ)+CFOPE(NE,infoliar,M,NZ)*WTGRBE(NE,NB,NZ)
             ELSE
-              ESNC(M,NE,k_fine_litr,0,NZ)=ESNC(M,NE,k_fine_litr,0,NZ)+CFOPE(infoliar,M,NE,NZ)*WTGRBE(NB,NE,NZ)
+              ESNC(NE,M,k_fine_litr,0,NZ)=ESNC(NE,M,k_fine_litr,0,NZ)+CFOPE(NE,infoliar,M,NZ)*WTGRBE(NE,NB,NZ)
             ENDIF
             IF(IBTYP(NZ).EQ.0.OR.IGTYP(NZ).LE.1)THEN
 !all above ground
-              ESNC(M,NE,k_fine_litr,0,NZ)=ESNC(M,NE,k_fine_litr,0,NZ)+CFOPE(istalk,M,NE,NZ)*WTSTKBE(NB,NE,NZ)
+              ESNC(NE,M,k_fine_litr,0,NZ)=ESNC(NE,M,k_fine_litr,0,NZ)+CFOPE(NE,istalk,M,NZ)*WTSTKBE(NE,NB,NZ)
             ELSE
-              WTSTDE(M,NE,NZ)=WTSTDE(M,NE,NZ)+CFOPE(icwood,M,NE,NZ)*WTSTKBE(NB,NE,NZ)
+              WTSTDE(NE,M,NZ)=WTSTDE(NE,M,NZ)+CFOPE(NE,icwood,M,NZ)*WTSTKBE(NE,NB,NZ)
             ENDIF
           ENDDO
         ENDDO D8825
@@ -247,22 +247,22 @@ implicit none
         DO NE=1,npelms
           D6415: DO L=NU,NJ
             DO N=1,MY(NZ)
-              ESNC(M,NE,k_fine_litr,L,NZ)=ESNC(M,NE,k_fine_litr,L,NZ) &
-                +CFOPE(instruct,M,NE,NZ)*EPOOLR(NE,N,L,NZ)
+              ESNC(NE,M,k_fine_litr,L,NZ)=ESNC(NE,M,k_fine_litr,L,NZ) &
+                +CFOPE(NE,instruct,M,NZ)*EPOOLR(NE,N,L,NZ)
               DO NR=1,NRT(NZ)
-                ESNC(M,NE,k_woody_litr,L,NZ)=ESNC(M,NE,k_woody_litr,L,NZ)+CFOPE(icwood,M,NE,NZ) &
+                ESNC(NE,M,k_woody_litr,L,NZ)=ESNC(NE,M,k_woody_litr,L,NZ)+CFOPE(NE,icwood,M,NZ) &
                   *(WTRT1E(NE,N,L,NR,NZ)+WTRT2E(NE,N,L,NR,NZ))*FWODRE(NE,k_woody_litr)
 
-                ESNC(M,NE,k_fine_litr,L,NZ)=ESNC(M,NE,k_fine_litr,L,NZ)+CFOPE(iroot,M,NE,NZ) &
+                ESNC(NE,M,k_fine_litr,L,NZ)=ESNC(NE,M,k_fine_litr,L,NZ)+CFOPE(NE,iroot,M,NZ) &
                   *(WTRT1E(NE,N,L,NR,NZ)+WTRT2E(NE,N,L,NR,NZ))*FWODRE(NE,k_fine_litr)
               ENDDO
             ENDDO
           ENDDO D6415
-          ESNC(M,NE,k_woody_litr,NG(NZ),NZ)=ESNC(M,NE,k_woody_litr,NG(NZ),NZ) &
-            +CFOPE(instruct,M,NE,NZ)*WTRVE(NE,NZ)*FWOODE(NE,k_woody_litr)
+          ESNC(NE,M,k_woody_litr,NG(NZ),NZ)=ESNC(NE,M,k_woody_litr,NG(NZ),NZ) &
+            +CFOPE(NE,instruct,M,NZ)*WTRVE(NE,NZ)*FWOODE(NE,k_woody_litr)
 
-          ESNC(M,NE,k_fine_litr,NG(NZ),NZ)=ESNC(M,NE,k_fine_litr,NG(NZ),NZ) &
-            +CFOPE(instruct,M,NE,NZ)*WTRVE(NE,NZ)*FWOODE(NE,k_fine_litr)
+          ESNC(NE,M,k_fine_litr,NG(NZ),NZ)=ESNC(NE,M,k_fine_litr,NG(NZ),NZ) &
+            +CFOPE(NE,instruct,M,NZ)*WTRVE(NE,NZ)*FWOODE(NE,k_fine_litr)
         ENDDO
       ENDDO D6425
 !
@@ -361,13 +361,13 @@ implicit none
       D8895: DO L=NU,NJ
         DO NE=1,npelms
           D6410: DO M=1,jsken
-            ESNC(M,NE,k_fine_litr,L,NZ)=ESNC(M,NE,k_fine_litr,L,NZ) &
-              +CFOPE(instruct,M,NE,NZ)*EPOOLR(NE,N,L,NZ)
+            ESNC(NE,M,k_fine_litr,L,NZ)=ESNC(NE,M,k_fine_litr,L,NZ) &
+              +CFOPE(NE,instruct,M,NZ)*EPOOLR(NE,N,L,NZ)
             DO  NR=1,NRT(NZ)
-              ESNC(M,NE,k_woody_litr,L,NZ)=ESNC(M,NE,k_woody_litr,L,NZ)+CFOPE(icwood,M,NE,NZ) &
+              ESNC(NE,M,k_woody_litr,L,NZ)=ESNC(NE,M,k_woody_litr,L,NZ)+CFOPE(NE,icwood,M,NZ) &
                 *(WTRT1E(NE,N,L,NR,NZ)+WTRT2E(NE,N,L,NR,NZ))*FWODRE(NE,k_woody_litr)
 
-              ESNC(M,NE,k_fine_litr,L,NZ)=ESNC(M,NE,k_fine_litr,L,NZ)+CFOPE(iroot,M,NE,NZ) &
+              ESNC(NE,M,k_fine_litr,L,NZ)=ESNC(NE,M,k_fine_litr,L,NZ)+CFOPE(NE,iroot,M,NZ) &
                 *(WTRT1E(NE,N,L,NR,NZ)+WTRT2E(NE,N,L,NR,NZ))*FWODRE(NE,k_fine_litr)
             enddo
           ENDDO D6410
@@ -400,7 +400,7 @@ implicit none
         D8870: DO NR=1,NRT(NZ)
           WTRT1E(1:npelms,N,L,NR,NZ)=0._r8
           WTRT2E(1:npelms,N,L,NR,NZ)=0._r8
-          RTWT1E(N,NR,1:npelms,NZ)=0._r8
+          RTWT1E(1:npelms,N,NR,NZ)=0._r8
           RTLG1(N,L,NR,NZ)=0._r8
           RTLG2(N,L,NR,NZ)=0._r8
           RTN2(N,L,NR,NZ)=0._r8
@@ -429,14 +429,14 @@ implicit none
 !     CPOOLN,ZPOOLN,PPOOLN=nonstructural C,N,P in bacteria
 !
         IF(INTYP(NZ).NE.0.AND.N.EQ.1)THEN
-          DO NE=1,npelms
-            D6420: DO M=1,jsken
-              ESNC(M,NE,k_fine_litr,L,NZ)=ESNC(M,NE,k_fine_litr,L,NZ)+CFOPE(iroot,M,NE,NZ) &
-                *WTNDLE(L,NE,NZ)+CFOPE(instruct,M,NE,NZ)*EPOOLN(L,NE,NZ)
-            ENDDO D6420
-            WTNDLE(L,NE,NZ)=0._r8
-            EPOOLN(L,NE,NZ)=0._r8
-          ENDDO
+          D6420: DO M=1,jsken
+            DO NE=1,npelms            
+              ESNC(NE,M,k_fine_litr,L,NZ)=ESNC(NE,M,k_fine_litr,L,NZ)+CFOPE(NE,iroot,M,NZ) &
+                *WTNDLE(NE,L,NZ)+CFOPE(NE,instruct,M,NZ)*EPOOLN(NE,L,NZ)
+            ENDDO    
+          ENDDO D6420
+          WTNDLE(1:npelms,L,NZ)=0._r8
+          EPOOLN(1:npelms,L,NZ)=0._r8          
         ENDIF
       ENDDO D8895
     ENDDO D8900
@@ -451,7 +451,7 @@ implicit none
       NINR(NR,NZ)=NG(NZ)
       D8790: DO N=1,MY(NZ)
         RTDP1(N,NR,NZ)=SDPTH(NZ)
-        RTWT1E(N,NR,1:npelms,NZ)=0._r8
+        RTWT1E(1:npelms,N,NR,NZ)=0._r8
       ENDDO D8790
     ENDDO D8795
     NIX(NZ)=NG(NZ)
@@ -466,7 +466,7 @@ implicit none
   integer, intent(in) :: I,J,NZ
   integer, intent(inout) :: IDTHY
   real(r8), intent(inout) :: CPOOLK(JC1,JP1)
-  integer :: M,NB,NE
+  integer :: M,NE,NB
 !     begin_execution
   associate(                                &
     IHVST     =>  plt_distb%IHVST     , &
@@ -579,33 +579,34 @@ implicit none
 !     IBTYP=turnover:0=all abve-grd,1=all leaf+petiole,2=none,3=between 1,2
 !     IGTYP=growth type:0=bryophyte,1=graminoid,2=shrub,tree
 !
-      DO NE=1,npelms
-        D6405: DO M=1,jsken
-          ESNC(M,NE,k_fine_litr,0,NZ)=ESNC(M,NE,k_fine_litr,0,NZ) &
-            +CFOPE(instruct,M,NE,NZ)*EPOLNB(NB,NE,NZ) &
-            +CFOPE(ifoliar,M,NE,NZ)*(WTLFBE(NB,NE,NZ)*FWODLE(NE,k_fine_litr) &
-            +WTNDBE(NB,NE,NZ)) &
-            +CFOPE(infoliar,M,NE,NZ)*(WTSHEBE(NB,NE,NZ)*FWODBE(NE,k_fine_litr) &
-            +WTHSKBE(NB,NE,NZ)+WTEARBE(NB,NE,NZ))
+      D6405: DO M=1,jsken
+        DO NE=1,npelms        
+          ESNC(NE,M,k_fine_litr,0,NZ)=ESNC(NE,M,k_fine_litr,0,NZ) &
+            +CFOPE(NE,instruct,M,NZ)*EPOLNB(NE,NB,NZ) &
+            +CFOPE(NE,ifoliar,M,NZ)*(WTLFBE(NE,NB,NZ)*FWODLE(NE,k_fine_litr) &
+            +WTNDBE(NE,NB,NZ)) &
+            +CFOPE(NE,infoliar,M,NZ)*(WTSHEBE(NE,NB,NZ)*FWODBE(NE,k_fine_litr) &
+            +WTHSKBE(NE,NB,NZ)+WTEARBE(NE,NB,NZ))
 
-          ESNC(M,NE,k_woody_litr,0,NZ)=ESNC(M,NE,k_woody_litr,0,NZ) &
-            +CFOPE(icwood,M,NE,NZ)*(WTLFBE(NB,NE,NZ)*FWODBE(NE,k_woody_litr) &
-            +WTSHEBE(NB,NE,NZ)*FWODBE(NE,k_woody_litr))
+          ESNC(NE,M,k_woody_litr,0,NZ)=ESNC(NE,M,k_woody_litr,0,NZ) &
+            +CFOPE(NE,icwood,M,NZ)*(WTLFBE(NE,NB,NZ)*FWODBE(NE,k_woody_litr) &
+            +WTSHEBE(NE,NB,NZ)*FWODBE(NE,k_woody_litr))
 
           IF(ISTYP(NZ).EQ.iplt_annual.AND.IWTYP(NZ).NE.0)THEN
-            WTRVE(NE,NZ)=WTRVE(NE,NZ)+CFOPE(infoliar,M,NE,NZ)*WTGRBE(NB,NE,NZ)
+            WTRVE(NE,NZ)=WTRVE(NE,NZ)+CFOPE(NE,infoliar,M,NZ)*WTGRBE(NE,NB,NZ)
           ELSE
-            ESNC(M,NE,k_fine_litr,0,NZ)=ESNC(M,NE,k_fine_litr,0,NZ) &
-              +CFOPE(infoliar,M,NE,NZ)*WTGRBE(NB,NE,NZ)
+            ESNC(NE,M,k_fine_litr,0,NZ)=ESNC(NE,M,k_fine_litr,0,NZ) &
+              +CFOPE(NE,infoliar,M,NZ)*WTGRBE(NE,NB,NZ)
           ENDIF
           IF(IBTYP(NZ).EQ.0.OR.IGTYP(NZ).LE.1)THEN
-            ESNC(M,NE,k_fine_litr,0,NZ)=ESNC(M,NE,k_fine_litr,0,NZ) &
-              +CFOPE(istalk,M,NE,NZ)*WTSTKBE(NB,NE,NZ)
+            ESNC(NE,M,k_fine_litr,0,NZ)=ESNC(NE,M,k_fine_litr,0,NZ) &
+              +CFOPE(NE,istalk,M,NZ)*WTSTKBE(NE,NB,NZ)
           ELSE
-            WTSTDE(M,NE,NZ)=WTSTDE(M,NE,NZ)+CFOPE(icwood,M,NE,NZ)*WTSTKBE(NB,NE,NZ)
+            WTSTDE(NE,M,NZ)=WTSTDE(NE,M,NZ)+CFOPE(NE,icwood,M,NZ)*WTSTKBE(NE,NB,NZ)
           ENDIF
-        ENDDO D6405
-      ENDDO
+        ENDDO  
+      ENDDO D6405
+      
 !
 !     RECOVER NON-STRUCTURAL C,N,P FROM BRANCH TO
 !     SEASONAL STORAGE RESERVES
@@ -619,14 +620,14 @@ implicit none
 !
       WTRVE(ielmc,NZ)=WTRVE(ielmc,NZ)+CPOOLK(NB,NZ)
       DO NE=1,npelms
-        WTRVE(NE,NZ)=WTRVE(NE,NZ)+EPOOL(NB,NE,NZ)
+        WTRVE(NE,NZ)=WTRVE(NE,NZ)+EPOOL(NE,NB,NZ)
         IF(IHVST(NZ).NE.4.AND.IHVST(NZ).NE.6)THEN
           D6406: DO M=1,jsken
-            ESNC(M,NE,k_fine_litr,0,NZ)=ESNC(M,NE,k_fine_litr,0,NZ) &
-              +CFOPE(instruct,M,NE,NZ)*WTRSVBE(NB,NE,NZ)
+            ESNC(NE,M,k_fine_litr,0,NZ)=ESNC(NE,M,k_fine_litr,0,NZ) &
+              +CFOPE(NE,instruct,M,NZ)*WTRSVBE(NE,NB,NZ)
           ENDDO D6406
         ELSE
-          WTRVE(NE,NZ)=WTRVE(NE,NZ)+WTRSVBE(NB,NE,NZ)
+          WTRVE(NE,NZ)=WTRVE(NE,NZ)+WTRSVBE(NE,NB,NZ)
         ENDIF
       ENDDO
 !
@@ -644,7 +645,7 @@ implicit none
   implicit none
   integer, intent(in) :: NZ
   real(r8),INTENT(OUT) :: CPOOLK(JC1,JP1)
-  integer :: L,NR,N,NB,NE
+  integer :: L,NR,N,NE,NB
 !     begin_execution
   associate(                           &
     EPOOL  => plt_biom%EPOOL         , &
@@ -680,24 +681,24 @@ implicit none
 !
   DO NE=1,npelms
     DO NB=1,NBR(NZ)
-      EPOOL(NB,NE,NZ)=0._r8
-      EPOLNB(NB,NE,NZ)=0._r8
-      WTSHTBE(NB,NE,NZ)=0._r8
-      WTLFBE(NB,NE,NZ)=0._r8
-      WTSHEBE(NB,NE,NZ)=0._r8
-      WTSTKBE(NB,NE,NZ)=0._r8
-      WTRSVBE(NB,NE,NZ)=0._r8
+      EPOOL(NE,NB,NZ)=0._r8
+      EPOLNB(NE,NB,NZ)=0._r8
+      WTSHTBE(NE,NB,NZ)=0._r8
+      WTLFBE(NE,NB,NZ)=0._r8
+      WTSHEBE(NE,NB,NZ)=0._r8
+      WTSTKBE(NE,NB,NZ)=0._r8
+      WTRSVBE(NE,NB,NZ)=0._r8
     ENDDO
   ENDDO
   D8835: DO NB=1,NBR(NZ)
     CPOOLK(NB,NZ)=0._r8
     WVSTKB(NB,NZ)=0._r8
-    WTNDBE(NB,1:npelms,NZ)=0._r8
-    WTHSKBE(NB,1:npelms,NZ)=0._r8
-    WTEARBE(NB,1:npelms,NZ)=0._r8
-    WTGRBE(NB,1:npelms,NZ)=0._r8
+    WTNDBE(1:npelms,NB,NZ)=0._r8
+    WTHSKBE(1:npelms,NB,NZ)=0._r8
+    WTEARBE(1:npelms,NB,NZ)=0._r8
+    WTGRBE(1:npelms,NB,NZ)=0._r8
     WTLSB(NB,NZ)=0._r8
-    WTSTXBE(NB,1:npelms,NZ)=0._r8
+    WTSTXBE(1:npelms,NB,NZ)=0._r8
   ENDDO D8835
 !
 !     RESET ROOT STATE VARIABLES
@@ -708,7 +709,7 @@ implicit none
       DO  NR=1,NRT(NZ)
         WTRT1E(1:npelms,N,L,NR,NZ)=0._r8
         WTRT2E(1:npelms,N,L,NR,NZ)=0._r8
-        RTWT1E(N,NR,1:npelms,NZ)=0._r8
+        RTWT1E(1:npelms,N,NR,NZ)=0._r8
         RTLG1(N,L,NR,NZ)=0._r8
         RTLG2(N,L,NR,NZ)=0._r8
         RTN2(N,L,NR,NZ)=0._r8
@@ -796,24 +797,24 @@ implicit none
 !     WGNODE,WGNODN,WGNODP=node stalk C,N,P mass
 !
   CPOOLK(NB,NZ)=0._r8
-  EPOOL(NB,1:npelms,NZ)=0._r8
-  EPOLNB(NB,1:npelms,NZ)=0._r8
-  WTSHTBE(NB,1:npelms,NZ)=0._r8
-  WTLFBE(NB,1:npelms,NZ)=0._r8
-  WTNDBE(NB,1:npelms,NZ)=0._r8
-  WTSHEBE(NB,1:npelms,NZ)=0._r8
-  WTSTKBE(NB,1:npelms,NZ)=0._r8
-  WTRSVBE(NB,1:npelms,NZ)=0._r8
-  WTHSKBE(NB,1:npelms,NZ)=0._r8
-  WTEARBE(NB,1:npelms,NZ)=0._r8
-  WTGRBE(NB,1:npelms,NZ)=0._r8
+  EPOOL(1:npelms,NB,NZ)=0._r8
+  EPOLNB(1:npelms,NB,NZ)=0._r8
+  WTSHTBE(1:npelms,NB,NZ)=0._r8
+  WTLFBE(1:npelms,NB,NZ)=0._r8
+  WTNDBE(1:npelms,NB,NZ)=0._r8
+  WTSHEBE(1:npelms,NB,NZ)=0._r8
+  WTSTKBE(1:npelms,NB,NZ)=0._r8
+  WTRSVBE(1:npelms,NB,NZ)=0._r8
+  WTHSKBE(1:npelms,NB,NZ)=0._r8
+  WTEARBE(1:npelms,NB,NZ)=0._r8
+  WTGRBE(1:npelms,NB,NZ)=0._r8
   WVSTKB(NB,NZ)=0._r8
   WTLSB(NB,NZ)=0._r8
   GRNXB(NB,NZ)=0._r8
   GRNOB(NB,NZ)=0._r8
   GRWTB(NB,NZ)=0._r8
   ARLFB(NB,NZ)=0._r8
-  WTSTXBE(NB,1:npelms,NZ)=0._r8
+  WTSTXBE(1:npelms,NB,NZ)=0._r8
 
   D8855: DO K=0,JNODS1
     IF(K.NE.0)THEN
@@ -828,14 +829,14 @@ implicit none
     HTSHE(K,NB,NZ)=0._r8
     WSLF(K,NB,NZ)=0._r8
     WSSHE(K,NB,NZ)=0._r8
-    WGLFE(K,NB,1:npelms,NZ)=0._r8
-    WGSHE(K,NB,1:npelms,NZ)=0._r8
-    WGNODE(K,NB,1:npelms,NZ)=0._r8
+    WGLFE(1:npelms,K,NB,NZ)=0._r8
+    WGSHE(1:npelms,K,NB,NZ)=0._r8
+    WGNODE(1:npelms,K,NB,NZ)=0._r8
     D8865: DO L=1,JC1
       ARLFV(L,NZ)=ARLFV(L,NZ)-ARLFL(L,K,NB,NZ)
-      WGLFV(L,NZ)=WGLFV(L,NZ)-WGLFLE(L,K,NB,ielmc,NZ)
+      WGLFV(L,NZ)=WGLFV(L,NZ)-WGLFLE(ielmc,L,K,NB,NZ)
       ARLFL(L,K,NB,NZ)=0._r8
-      WGLFLE(L,K,NB,1:npelms,NZ)=0._r8
+      WGLFLE(1:npelms,L,K,NB,NZ)=0._r8
       IF(K.NE.0)THEN
         D8860: DO N=1,JLI1
           SURF(N,L,K,NB,NZ)=0._r8

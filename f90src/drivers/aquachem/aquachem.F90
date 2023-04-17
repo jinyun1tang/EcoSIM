@@ -43,10 +43,11 @@ end subroutine usage
 ! ----------------------------------------------------------------------
 
 subroutine RunModel(namelist_buffer)
-  use ecosim_Time_Mod, only : ecosim_time_type
-  use ModelStatusType, only : model_status_type
-  use data_kind_mod  , only : r8 => SHR_KIND_R8
+  use ecosim_Time_Mod  , only : ecosim_time_type
+  use ModelStatusType  , only : model_status_type
+  use data_kind_mod    , only : r8 => DAT_KIND_R8
   use ecosim_log_mod   , only : errMsg => shr_log_errMsg
+  use abortutils       , only : endrun
   use AquachemMod
   use bhistMod
   use fileUtil

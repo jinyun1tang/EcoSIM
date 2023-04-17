@@ -1,7 +1,7 @@
 module TestMod
 ! DESCRIPTION
 ! codes to do regression tests
-  use data_kind_mod, only : r8 => SHR_KIND_R8
+  use data_kind_mod, only : r8 => DAT_KIND_R8
   use abortutils, only : endrun
   use fileUtil, only : error_errmsg_len
 implicit none

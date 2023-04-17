@@ -3,7 +3,7 @@ module grosubsMod
 ! Description:
 ! module for plant biological transformations
   use minimathmod, only : test_aeqb,safe_adb,AZMAX1
-  use data_kind_mod, only : r8 => SHR_KIND_R8
+  use data_kind_mod, only : r8 => DAT_KIND_R8
   use EcosimConst
   use EcoSiMParDataMod, only : pltpar
   use GrosubPars
@@ -65,7 +65,7 @@ module grosubsMod
 
   real(r8) :: ZCX(JP1)
   integer :: L,K,M
-  integer :: NZ
+  integer :: NZ,NE
   real(r8) :: CPOOLK(JC1,JP1)
 ! begin_execution
   associate(                            &
@@ -88,7 +88,9 @@ module grosubsMod
     D1: DO L=0,NJ
       DO K=1,pltpar%n_pltlitrk
         DO M=1,jsken
-          ESNC(M,1:npelms,K,L,NZ)=0._r8
+          DO NE=1,npelms
+            ESNC(NE,M,K,L,NZ)=0._r8
+          ENDDO
         ENDDO
       ENDDO
     ENDDO D1
@@ -122,7 +124,7 @@ module grosubsMod
   implicit none
   integer, intent(in) :: I,J
 
-  integer :: L,K,NZ,M,NB,NE
+  integer :: L,K,NZ,M,NE,NB
   real(r8) :: XFRC,XFRN,XFRP,XFRE
 !     begin_execution
 
@@ -195,13 +197,13 @@ module grosubsMod
 !
     DO NE=1,npelms
       D6235: DO M=1,jsken
-        XFRE=1.5814E-05_r8*TFN3(NZ)*WTSTDE(M,NE,NZ)
+        XFRE=1.5814E-05_r8*TFN3(NZ)*WTSTDE(NE,M,NZ)
         IF(IBTYP(NZ).EQ.0.OR.IGTYP(NZ).LE.1)THEN
-          ESNC(M,NE,k_fine_litr,0,NZ)=ESNC(M,NE,k_fine_litr,0,NZ)+XFRE
+          ESNC(NE,M,k_fine_litr,0,NZ)=ESNC(NE,M,k_fine_litr,0,NZ)+XFRE
         ELSE
-          ESNC(M,NE,k_woody_litr,0,NZ)=ESNC(M,NE,k_woody_litr,0,NZ)+XFRE
+          ESNC(NE,M,k_woody_litr,0,NZ)=ESNC(NE,M,k_woody_litr,0,NZ)+XFRE
         ENDIF
-        WTSTDE(M,NE,NZ)=WTSTDE(M,NE,NZ)-XFRE
+        WTSTDE(NE,M,NZ)=WTSTDE(NE,M,NZ)-XFRE
       ENDDO D6235
     ENDDO
 !
@@ -214,10 +216,10 @@ module grosubsMod
     DO K=1,pltpar%n_pltlitrk
       DO NE=1,npelms
         D6430: DO M=1,jsken
-          TESN0(NE,NZ)=TESN0(NE,NZ)+ESNC(M,NE,K,0,NZ)
+          TESN0(NE,NZ)=TESN0(NE,NZ)+ESNC(NE,M,K,0,NZ)
           D8955: DO L=0,NJ
-            HESNC(NE,NZ)=HESNC(NE,NZ)+ESNC(M,NE,K,L,NZ)
-            TESNC(NE,NZ)=TESNC(NE,NZ)+ESNC(M,NE,K,L,NZ)
+            HESNC(NE,NZ)=HESNC(NE,NZ)+ESNC(NE,M,K,L,NZ)
+            TESNC(NE,NZ)=TESNC(NE,NZ)+ESNC(NE,M,K,L,NZ)
           ENDDO D8955
         ENDDO D6430
       enddo
@@ -228,7 +230,7 @@ module grosubsMod
 !     WTSTG,WTSTDN,WTSTDP=standing dead C,N,P mass
 !
     DO NE=1,npelms
-      WTSTGE(NE,NZ)=sum(WTSTDE(1:jsken,NE,NZ))
+      WTSTGE(NE,NZ)=sum(WTSTDE(NE,1:jsken,NZ))
     ENDDO
 !
 !     PLANT C BALANCE = TOTAL C STATE VARIABLES + TOTAL
@@ -553,7 +555,7 @@ module grosubsMod
 
   integer, intent(in) :: NZ
   real(r8), intent(out) :: CPOOLK(JC1,JP1)
-  integer :: L,K,N,NB,NE
+  integer :: L,K,N,NE,NB
 !     begin_execution
   associate(                                 &
     WTLFBE     =>  plt_biom%WTLFBE     , &
@@ -600,10 +602,10 @@ module grosubsMod
 !
   DO NE=1,npelms
     DO NB=1,NBR(NZ)
-      WTSHTBE(NB,NE,NZ)=WTLFBE(NB,NE,NZ) &
-        +WTSHEBE(NB,NE,NZ)+WTSTKBE(NB,NE,NZ)+WTRSVBE(NB,NE,NZ) &
-        +WTHSKBE(NB,NE,NZ)+WTEARBE(NB,NE,NZ)+WTGRBE(NB,NE,NZ) &
-        +EPOOL(NB,NE,NZ)
+      WTSHTBE(NE,NB,NZ)=WTLFBE(NE,NB,NZ) &
+        +WTSHEBE(NE,NB,NZ)+WTSTKBE(NE,NB,NZ)+WTRSVBE(NE,NB,NZ) &
+        +WTHSKBE(NE,NB,NZ)+WTEARBE(NE,NB,NZ)+WTGRBE(NE,NB,NZ) &
+        +EPOOL(NE,NB,NZ)
     ENDDO
   ENDDO
 
@@ -613,7 +615,7 @@ module grosubsMod
       CPOOLK(NB,NZ)=CPOOLK(NB,NZ)+CPOOL3(K,NB,NZ)+CPOOL4(K,NB,NZ) &
         +CO2B(K,NB,NZ)+HCOB(K,NB,NZ)
     ENDDO D325
-    WTSHTBE(NB,ielmc,NZ)=WTSHTBE(NB,ielmc,NZ)+CPOOLK(NB,NZ)
+    WTSHTBE(ielmc,NB,NZ)=WTSHTBE(ielmc,NB,NZ)+CPOOLK(NB,NZ)
   ENDDO D320
 
 !
@@ -639,7 +641,7 @@ module grosubsMod
   implicit none
   integer, intent(in) :: I,J,NZ
   real(r8), intent(in) :: UPNFC(JP1)
-  integer :: L,NR,N,NB,NE
+  integer :: L,NR,N,NE,NB
 !     begin_execution
   associate(                            &
     EPOOL    =>  plt_biom%EPOOL   , &
@@ -717,15 +719,15 @@ module grosubsMod
 !     GRNOB=seed set number
 !
   DO NE=1,npelms
-    EPOOLP(NE,NZ)=sum(EPOOL(1:NBR(NZ),NE,NZ))
-    WTSHTE(NE,NZ)=sum(WTSHTBE(1:NBR(NZ),NE,NZ))
-    WTSHEE(NE,NZ)=sum(WTSHEBE(1:NBR(NZ),NE,NZ))
-    WTSTKE(NE,NZ)=sum(WTSTKBE(1:NBR(NZ),NE,NZ))
-    WTLFE(NE,NZ)=sum(WTLFBE(1:NBR(NZ),NE,NZ))
-    WTRSVE(NE,NZ)=sum(WTRSVBE(1:NBR(NZ),NE,NZ))
-    WTHSKE(NE,NZ)=sum(WTHSKBE(1:NBR(NZ),NE,NZ))
-    WTGRE(NE,NZ)=sum(WTGRBE(1:NBR(NZ),NE,NZ))
-    WTEARE(NE,NZ)=sum(WTEARBE(1:NBR(NZ),NE,NZ))
+    EPOOLP(NE,NZ)=sum(EPOOL(NE,1:NBR(NZ),NZ))
+    WTSHTE(NE,NZ)=sum(WTSHTBE(NE,1:NBR(NZ),NZ))
+    WTSHEE(NE,NZ)=sum(WTSHEBE(NE,1:NBR(NZ),NZ))
+    WTSTKE(NE,NZ)=sum(WTSTKBE(NE,1:NBR(NZ),NZ))
+    WTLFE(NE,NZ)=sum(WTLFBE(NE,1:NBR(NZ),NZ))
+    WTRSVE(NE,NZ)=sum(WTRSVBE(NE,1:NBR(NZ),NZ))
+    WTHSKE(NE,NZ)=sum(WTHSKBE(NE,1:NBR(NZ),NZ))
+    WTGRE(NE,NZ)=sum(WTGRBE(NE,1:NBR(NZ),NZ))
+    WTEARE(NE,NZ)=sum(WTEARBE(NE,1:NBR(NZ),NZ))
 !root state variables
     WTRTE(NE,NZ)=sum(EPOOLR(NE,1:MY(NZ),NU:NJ,NZ))
     WTRTSE(NE,NZ)=sum(WTRT1E(NE,1:MY(NZ),NU:NJ,1:NRT(NZ),NZ)) &
@@ -756,13 +758,13 @@ module grosubsMod
     IF(INTYP(NZ).GE.4)THEN
       DO NE=1,npelms
         D7950: DO NB=1,NBR(NZ)
-          EPOLNP(NE,NZ)=EPOLNP(NE,NZ)+EPOLNB(NB,NE,NZ)
+          EPOLNP(NE,NZ)=EPOLNP(NE,NZ)+EPOLNB(NE,NB,NZ)
         ENDDO D7950
-        WTNDE(NE,NZ)=sum(WTNDBE(1:NBR(NZ),NE,NZ))+sum(EPOLNB(1:NBR(NZ),NE,NZ))
+        WTNDE(NE,NZ)=sum(WTNDBE(NE,1:NBR(NZ),NZ))+sum(EPOLNB(NE,1:NBR(NZ),NZ))
       ENDDO
     ELSEIF(INTYP(NZ).GE.1.AND.INTYP(NZ).LE.3)THEN
       DO NE=1,npelms
-        WTNDE(NE,NZ)=sum(WTNDLE(NU:NI(NZ),NE,NZ))+sum(EPOOLN(NU:NI(NZ),NE,NZ))
+        WTNDE(NE,NZ)=sum(WTNDLE(NE,NU:NI(NZ),NZ))+sum(EPOOLN(NE,NU:NI(NZ),NZ))
       ENDDO
     ENDIF
   ENDIF

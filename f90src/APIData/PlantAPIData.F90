@@ -1,5 +1,5 @@
 module PlantAPIData
-  use data_kind_mod, only : r8 => SHR_KIND_R8
+  use data_kind_mod, only : r8 => DAT_KIND_R8
   use ElmIDMod
   use abortutils, only : destroy
   use EcoSiMParDataMod, only : pltpar
@@ -1081,7 +1081,7 @@ implicit none
   allocate(this%RCO2F(0:JZ1))
   allocate(this%ROXYL(0:JZ1))
   allocate(this%ROXYY(0:JZ1))
-  allocate(this%ESNT(jsken,npelms,n_pltlitrk,0:JZ1))
+  allocate(this%ESNT(npelms,jsken,n_pltlitrk,0:JZ1))
   allocate(this%CARBN(JP1))
   allocate(this%XOQCS(1:jcplx,0:JZ1))
   allocate(this%XOQNS(1:jcplx,0:JZ1))
@@ -1110,7 +1110,7 @@ implicit none
 
   allocate(this%HESNC(npelms,JP1))
   allocate(this%TESNC(npelms,JP1))
-  allocate(this%ESNC(jsken,npelms,1:n_pltlitrk,0:JZ1,JP1))
+  allocate(this%ESNC(npelms,jsken,1:n_pltlitrk,0:JZ1,JP1))
 
 
   end subroutine plt_bgcrate_init
@@ -1365,10 +1365,10 @@ implicit none
   allocate(this%ZEROL(JP1))
   allocate(this%ZEROP(JP1))
   allocate(this%WTSTGET(npelms))
-  allocate(this%WTNDLE(JZ1,npelms,JP1))
+  allocate(this%WTNDLE(npelms,JZ1,JP1))
   allocate(this%WGLFV(JC1,JP1))
-  allocate(this%EPOOLN(JZ1,npelms,JP1))
-  allocate(this%WTSTDE(jsken,npelms,JP1))
+  allocate(this%EPOOLN(npelms,JZ1,JP1))
+  allocate(this%WTSTDE(npelms,jsken,JP1))
   allocate(this%WTRT2E(npelms,jroots,JZ1,JC1,JP1))
   allocate(this%WTRT1E(npelms,jroots,JZ1,JC1,JP1))
   allocate(this%CEPOLP(npelms,JP1))
@@ -1381,17 +1381,17 @@ implicit none
   allocate(this%WTRTD(jroots,JZ1,JP1))
   allocate(this%EPOOLR(npelms,jroots,JZ1,JP1))
   allocate(this%CEPOLR(npelms,jroots,JZ1,JP1))
-  allocate(this%EPOOL(JBR,npelms,JP1))
+  allocate(this%EPOOL(npelms,JBR,JP1))
   allocate(this%WVSTK(JP1))
   allocate(this%WSLF(0:JNODS1,JBR,JP1))
   allocate(this%WSSHE(0:JNODS1,JBR,JP1))
-  allocate(this%WGNODE(0:JNODS1,JBR,npelms,JP1))
-  allocate(this%WGLFE(0:JNODS1,JBR,npelms,JP1))
-  allocate(this%WGSHE(0:JNODS1,JBR,npelms,JP1))
-  allocate(this%WGLFLE(JC1,0:JNODS1,JBR,npelms,JP1))
+  allocate(this%WGNODE(npelms,0:JNODS1,JBR,JP1))
+  allocate(this%WGLFE(npelms,0:JNODS1,JBR,JP1))
+  allocate(this%WGSHE(npelms,0:JNODS1,JBR,JP1))
+  allocate(this%WGLFLE(npelms,JC1,0:JNODS1,JBR,JP1))
   allocate(this%WVSTKB(JBR,JP1))
-  allocate(this%EPOLNB(JBR,npelms,JP1))
-  allocate(this%CEPOLB(JBR,npelms,JP1))
+  allocate(this%EPOLNB(npelms,JBR,JP1))
+  allocate(this%CEPOLB(npelms,JBR,JP1))
   allocate(this%WTRTSE(npelms,JP1))
   allocate(this%WGLFT(JC1))
   allocate(this%WTRTE(npelms,JP1))
@@ -1407,24 +1407,24 @@ implicit none
   allocate(this%WTHSKE(npelms,JP1))
   allocate(this%WTEARE(npelms,JP1))
   allocate(this%WTNDE(npelms,JP1))
-  allocate(this%WGLFEX(JBR,npelms,JP1))
-  allocate(this%WGSHEXE(JBR,npelms,JP1))
+  allocate(this%WGLFEX(npelms,JBR,JP1))
+  allocate(this%WGSHEXE(npelms,JBR,JP1))
   allocate(this%WTSHTE(npelms,JP1))
   allocate(this%WTSHTA(JP1))
   allocate(this%WTLFE(npelms,JP1))
   allocate(this%WTSTDI(JP1))
   allocate(this%WTLSB(JBR,JP1))
-  allocate(this%WTRSVBE(JBR,npelms,JP1))
-  allocate(this%WTLFBE(JBR,npelms,JP1))
-  allocate(this%WTNDBE(JBR,npelms,JP1))
-  allocate(this%WTSHEBE(JBR,npelms,JP1))
-  allocate(this%WTEARBE(JBR,npelms,JP1))
-  allocate(this%WTHSKBE(JBR,npelms,JP1))
-  allocate(this%WTGRBE(JBR,npelms,JP1))
-  allocate(this%WTSTKBE(JBR,npelms,JP1))
-  allocate(this%WTSHTBE(JBR,npelms,JP1))
-  allocate(this%WTSTXBE(JBR,npelms,JP1))
-  allocate(this%RTWT1E(jroots,JRS,npelms,JP1))
+  allocate(this%WTRSVBE(npelms,JBR,JP1))
+  allocate(this%WTLFBE(npelms,JBR,JP1))
+  allocate(this%WTNDBE(npelms,JBR,JP1))
+  allocate(this%WTSHEBE(npelms,JBR,JP1))
+  allocate(this%WTEARBE(npelms,JBR,JP1))
+  allocate(this%WTHSKBE(npelms,JBR,JP1))
+  allocate(this%WTGRBE(npelms,JBR,JP1))
+  allocate(this%WTSTKBE(npelms,JBR,JP1))
+  allocate(this%WTSHTBE(npelms,JBR,JP1))
+  allocate(this%WTSTXBE(npelms,JBR,JP1))
+  allocate(this%RTWT1E(npelms,jroots,JRS,JP1))
 
   end subroutine plt_biom_init
 !----------------------------------------------------------------------
@@ -1508,7 +1508,7 @@ implicit none
   class(plant_soilchem_type) :: this
 
   allocate(this%FOSRH(1:jcplx,0:JZ1))
-  allocate(this%CFOPE(0:Jlitgrp,jsken,npelms,JP1))
+  allocate(this%CFOPE(npelms,0:Jlitgrp,jsken,JP1))
   allocate(this%TFND(0:JZ1))
   allocate(this%THETPM(60,0:JZ1))
   allocate(this%DFGS(60,0:JZ1))
@@ -1878,8 +1878,8 @@ implicit none
   allocate(this%TKG(JP1))
   allocate(this%TCX(JP1))
   allocate(this%WSTR(JP1))
-  allocate(this%RCELX(JBR,npelms,JP1))
-  allocate(this%RCESX(JBR,npelms,JP1))
+  allocate(this%RCELX(npelms,JBR,JP1))
+  allocate(this%RCESX(npelms,JBR,JP1))
 
   allocate(this%TFN4(JZ1,JP1))
   allocate(this%GFILL(JP1))

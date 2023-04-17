@@ -1,5 +1,5 @@
 module TillageMixMod
-  use data_kind_mod, only : r8 => SHR_KIND_R8
+  use data_kind_mod, only : r8 => DAT_KIND_R8
   use EcoSiMParDataMod, only : micpar
   use EcosimConst
   use SOMDataType

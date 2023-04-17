@@ -2,7 +2,7 @@ module WthrMod
   !
   ! Description:
   ! code to process the weather forcing
-  use data_kind_mod, only : r8 => SHR_KIND_R8
+  use data_kind_mod, only : r8 => DAT_KIND_R8
   use MiniMathMod, only : safe_adb,vapsat0,test_aneb,test_aeqb
   use EcosimConst
   use CanopyRadDataType
@@ -425,9 +425,9 @@ module WthrMod
       !     DTA,AMP,DHR=change in daily average,amplitude of air temperature
       !     DHR=diurnal effect on AMP
       !
-      IF(test_aneb(TDTPX(NY,NX,N),0.0_r8).OR.test_aneb(TDTPN(NY,NX,N),0.0_r8))THEN
-        DTA=0.5_r8*(TDTPX(NY,NX,N)+TDTPN(NY,NX,N))
-        AMP=0.5_r8*(TDTPX(NY,NX,N)-TDTPN(NY,NX,N))
+      IF(test_aneb(TDTPX(N,NY,NX),0.0_r8).OR.test_aneb(TDTPN(N,NY,NX),0.0_r8))THEN
+        DTA=0.5_r8*(TDTPX(N,NY,NX)+TDTPN(N,NY,NX))
+        AMP=0.5_r8*(TDTPX(N,NY,NX)-TDTPN(N,NY,NX))
         DHR=SIN(0.2618_r8*(J-(ZNOON(NY,NX)+3.0_r8))+PICON2h)
         TCA(NY,NX)=TCA(NY,NX)+DTA+AMP*DHR
         TKA(NY,NX)=TCA(NY,NX)+TC2K
@@ -483,19 +483,19 @@ module WthrMod
       !     TDPRC,TDIRRI=change in precipitation,irrigation
       !     TDCO2,TDCN4,TDCNO=change in atm CO2,NH4,NO3 concn in precipitation
 !
-      RADS(NY,NX)=RADS(NY,NX)*TDRAD(NY,NX,N)
-      RADY(NY,NX)=RADY(NY,NX)*TDRAD(NY,NX,N)
-      RAPS(NY,NX)=RAPS(NY,NX)*TDRAD(NY,NX,N)
-      RAPY(NY,NX)=RAPY(NY,NX)*TDRAD(NY,NX,N)
-      UA(NY,NX)=UA(NY,NX)*TDWND(NY,NX,N)
-      VPK(NY,NX)=AMIN1(VPS(NY,NX),VPK(NY,NX)*TDHUM(NY,NX,N))
-      PRECRI(NY,NX)=PRECRI(NY,NX)*TDPRC(NY,NX,N)
-      PRECWI(NY,NX)=PRECWI(NY,NX)*TDPRC(NY,NX,N)
-      PRECII(NY,NX)=PRECII(NY,NX)*TDIRI(NY,NX,N)
-      PRECUI(NY,NX)=PRECUI(NY,NX)*TDIRI(NY,NX,N)
-      CO2E(NY,NX)=CO2EI(NY,NX)*TDCO2(NY,NX,N)   !used in photosynthesis, soil CO2 transport
-      CN4R(NY,NX)=CN4RI(NY,NX)*TDCN4(NY,NX,N)
-      CNOR(NY,NX)=CNORI(NY,NX)*TDCNO(NY,NX,N)
+      RADS(NY,NX)=RADS(NY,NX)*TDRAD(N,NY,NX)
+      RADY(NY,NX)=RADY(NY,NX)*TDRAD(N,NY,NX)
+      RAPS(NY,NX)=RAPS(NY,NX)*TDRAD(N,NY,NX)
+      RAPY(NY,NX)=RAPY(NY,NX)*TDRAD(N,NY,NX)
+      UA(NY,NX)=UA(NY,NX)*TDWND(N,NY,NX)
+      VPK(NY,NX)=AMIN1(VPS(NY,NX),VPK(NY,NX)*TDHUM(N,NY,NX))
+      PRECRI(NY,NX)=PRECRI(NY,NX)*TDPRC(N,NY,NX)
+      PRECWI(NY,NX)=PRECWI(NY,NX)*TDPRC(N,NY,NX)
+      PRECII(NY,NX)=PRECII(NY,NX)*TDIRI(N,NY,NX)
+      PRECUI(NY,NX)=PRECUI(NY,NX)*TDIRI(N,NY,NX)
+      CO2E(NY,NX)=CO2EI(NY,NX)*TDCO2(N,NY,NX)   !used in photosynthesis, soil CO2 transport
+      CN4R(NY,NX)=CN4RI(NY,NX)*TDCN4(N,NY,NX)
+      CNOR(NY,NX)=CNORI(NY,NX)*TDCNO(N,NY,NX)
     ENDDO D9920
   ENDDO D9925
   end subroutine ApplyClimateCorrection

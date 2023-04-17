@@ -2,7 +2,7 @@ module EcosimBGCFluxType
 
 !
 ! Ecosystm fluxes for C, N, and P budget
-  use data_kind_mod, only : r8 => SHR_KIND_R8
+  use data_kind_mod, only : r8 => DAT_KIND_R8
   use GridConsts
   use ElmIDMod
   implicit none

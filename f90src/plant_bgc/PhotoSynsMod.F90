@@ -1,5 +1,5 @@
 module PhotoSynsMod
-  use data_kind_mod, only : r8 => SHR_KIND_R8
+  use data_kind_mod, only : r8 => DAT_KIND_R8
   use EcosimConst
   use GrosubPars
   use minimathmod, only : AZMAX1

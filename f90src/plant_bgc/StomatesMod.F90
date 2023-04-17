@@ -1,5 +1,5 @@
   module stomatesMod
-  use data_kind_mod, only : r8 => SHR_KIND_R8
+  use data_kind_mod, only : r8 => DAT_KIND_R8
   use EcosimConst
   use minimathmod, only : AZMAX1
   use PlantAPIData
@@ -375,8 +375,8 @@
 !     FBS,FMP=leaf water content in bundle sheath, mesophyll
 !     FDBK4=N,P feedback inhibition on C4 CO2 fixation
 !
-  CC4M=AZMAX1(0.021E+09_r8*CPOOL4(K,NB,NZ)/(WGLFE(K,NB,ielmc,NZ)*FMP))
-  CCBS=AZMAX1(0.083E+09_r8*CO2B(K,NB,NZ)/(WGLFE(K,NB,ielmc,NZ)*FBS))
+  CC4M=AZMAX1(0.021E+09_r8*CPOOL4(K,NB,NZ)/(WGLFE(ielmc,K,NB,NZ)*FMP))
+  CCBS=AZMAX1(0.083E+09_r8*CO2B(K,NB,NZ)/(WGLFE(ielmc,K,NB,NZ)*FBS))
   FDBK4(K,NB,NZ)=1.0_r8/(1.0_r8+CC4M/C4KI)
   FDBK4(K,NB,NZ)=FDBK4(K,NB,NZ)*FDBKX(NB,NZ)
 !
@@ -627,7 +627,7 @@
     ARLF1    => plt_morph%ARLF1     &
   )
   DO K=1,JNODS1
-    IF(ARLF1(K,NB,NZ).GT.ZEROP(NZ).AND.WGLFE(K,NB,ielmc,NZ).GT.ZEROP(NZ))THEN
+    IF(ARLF1(K,NB,NZ).GT.ZEROP(NZ).AND.WGLFE(ielmc,K,NB,NZ).GT.ZEROP(NZ))THEN
       WSDN=WSLF(K,NB,NZ)/ARLF1(K,NB,NZ)
     ELSE
       WSDN=0.0_r8
@@ -679,9 +679,9 @@
 !     FDBK=N,P feedback inhibition on C3 CO2 fixation
 !     CNKI,CPKI=nonstructural N,P inhibition constant on rubisco
 !
-  IF(CEPOLB(NB,ielmc,NZ).GT.ZERO)THEN
-    FDBK(NB,NZ)=AMIN1(CEPOLB(NB,ielmn,NZ)/(CEPOLB(NB,ielmn,NZ)+CEPOLB(NB,ielmc,NZ)/CNKI) &
-      ,CEPOLB(NB,ielmp,NZ)/(CEPOLB(NB,ielmp,NZ)+CEPOLB(NB,ielmc,NZ)/CPKI))
+  IF(CEPOLB(ielmc,NB,NZ).GT.ZERO)THEN
+    FDBK(NB,NZ)=AMIN1(CEPOLB(ielmn,NB,NZ)/(CEPOLB(ielmn,NB,NZ)+CEPOLB(ielmc,NB,NZ)/CNKI) &
+      ,CEPOLB(ielmp,NB,NZ)/(CEPOLB(ielmp,NB,NZ)+CEPOLB(ielmc,NB,NZ)/CPKI))
   ELSE
     FDBK(NB,NZ)=1.0_r8
   ENDIF

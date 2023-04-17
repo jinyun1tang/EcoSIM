@@ -1,5 +1,5 @@
 module RedistMod
-  use data_kind_mod, only : r8 => SHR_KIND_R8
+  use data_kind_mod, only : r8 => DAT_KIND_R8
   use abortutils, only : padr, print_info,endrun,destroy
   use minimathmod, only : safe_adb,AZMAX1
   use EcoSiMParDataMod, only : micpar
@@ -1096,10 +1096,10 @@ module RedistMod
 !
     D8565: DO K=1,micpar%n_pltlitrk
       DO  M=1,jsken
-        OSC(M,K,L,NY,NX)=OSC(M,K,L,NY,NX)+ESNT(M,ielmc,K,L,NY,NX)
-        OSA(M,K,L,NY,NX)=OSA(M,K,L,NY,NX)+ESNT(M,ielmc,K,L,NY,NX)*micpar%OMCI(1,K)
-        OSN(M,K,L,NY,NX)=OSN(M,K,L,NY,NX)+ESNT(M,ielmn,K,L,NY,NX)
-        OSP(M,K,L,NY,NX)=OSP(M,K,L,NY,NX)+ESNT(M,ielmp,K,L,NY,NX)
+        OSC(M,K,L,NY,NX)=OSC(M,K,L,NY,NX)+ESNT(ielmc,M,K,L,NY,NX)
+        OSA(M,K,L,NY,NX)=OSA(M,K,L,NY,NX)+ESNT(ielmc,M,K,L,NY,NX)*micpar%OMCI(1,K)
+        OSN(M,K,L,NY,NX)=OSN(M,K,L,NY,NX)+ESNT(ielmn,M,K,L,NY,NX)
+        OSP(M,K,L,NY,NX)=OSP(M,K,L,NY,NX)+ESNT(ielmp,M,K,L,NY,NX)
       enddo
     ENDDO D8565
 !
@@ -1730,12 +1730,12 @@ module RedistMod
 !
   DO   K=1,micpar%n_pltlitrk
     DO  M=1,jsken
-      OSC(M,K,0,NY,NX)=OSC(M,K,0,NY,NX)+ESNT(M,ielmc,K,0,NY,NX)
-      OSA(M,K,0,NY,NX)=OSA(M,K,0,NY,NX)+ESNT(M,ielmc,K,0,NY,NX)*micpar%OMCI(1,K)
-      OSN(M,K,0,NY,NX)=OSN(M,K,0,NY,NX)+ESNT(M,ielmn,K,0,NY,NX)
-      OSP(M,K,0,NY,NX)=OSP(M,K,0,NY,NX)+ESNT(M,ielmp,K,0,NY,NX)
-      ORGC(0,NY,NX)=ORGC(0,NY,NX)+ESNT(M,ielmc,K,0,NY,NX)
-      RAINR=ESNT(M,ielmc,K,0,NY,NX)*THETCX(K)
+      OSC(M,K,0,NY,NX)=OSC(M,K,0,NY,NX)+ESNT(ielmc,M,K,0,NY,NX)
+      OSA(M,K,0,NY,NX)=OSA(M,K,0,NY,NX)+ESNT(ielmc,M,K,0,NY,NX)*micpar%OMCI(1,K)
+      OSN(M,K,0,NY,NX)=OSN(M,K,0,NY,NX)+ESNT(ielmn,M,K,0,NY,NX)
+      OSP(M,K,0,NY,NX)=OSP(M,K,0,NY,NX)+ESNT(ielmp,M,K,0,NY,NX)
+      ORGC(0,NY,NX)=ORGC(0,NY,NX)+ESNT(ielmc,M,K,0,NY,NX)
+      RAINR=ESNT(ielmc,M,K,0,NY,NX)*THETCX(K)
       HRAINR=RAINR*cpw*TKA(NY,NX)
       FLWR(NY,NX)=FLWR(NY,NX)+RAINR
       HFLWR(NY,NX)=HFLWR(NY,NX)+HRAINR

@@ -1,5 +1,5 @@
 module ClimForcDataType
-  use data_kind_mod, only : r8 => SHR_KIND_R8
+  use data_kind_mod, only : r8 => DAT_KIND_R8
   use GridConsts
 implicit none
   character(len=*), private, parameter :: mod_filename = __FILE__
@@ -176,15 +176,15 @@ implicit none
   use TracerIDMod
   implicit none
   allocate(WDPTHD(366,JY,JX));  WDPTHD=0._r8
-  allocate(TDTPX(JY,JX,12));    TDTPX=0._r8
-  allocate(TDTPN(JY,JX,12));    TDTPN=0._r8
-  allocate(TDRAD(JY,JX,12));    TDRAD=0._r8
-  allocate(TDHUM(JY,JX,12));    TDHUM=0._r8
-  allocate(TDPRC(JY,JX,12));    TDPRC=0._r8
-  allocate(TDWND(JY,JX,12));    TDWND=0._r8
-  allocate(TDCO2(JY,JX,12));    TDCO2=0._r8
-  allocate(TDCN4(JY,JX,12));    TDCN4=0._r8
-  allocate(TDCNO(JY,JX,12));    TDCNO=0._r8
+  allocate(TDTPX(12,JY,JX));    TDTPX=0._r8
+  allocate(TDTPN(12,JY,JX));    TDTPN=0._r8
+  allocate(TDRAD(12,JY,JX));    TDRAD=0._r8
+  allocate(TDHUM(12,JY,JX));    TDHUM=0._r8
+  allocate(TDPRC(12,JY,JX));    TDPRC=0._r8
+  allocate(TDWND(12,JY,JX));    TDWND=0._r8
+  allocate(TDCO2(12,JY,JX));    TDCO2=0._r8
+  allocate(TDCN4(12,JY,JX));    TDCN4=0._r8
+  allocate(TDCNO(12,JY,JX));    TDCNO=0._r8
   allocate(TCA(JY,JX));         TCA=0._r8
   allocate(TKA(JY,JX));         TKA=0._r8
   allocate(UA(JY,JX));          UA=0._r8

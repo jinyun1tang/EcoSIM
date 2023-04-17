@@ -2,8 +2,8 @@ module HistDataType
 !
 ! this module is an intermediate step to support ascii output
 ! when output is done with netcdf, no id is needed.
-  use data_kind_mod , only : r8 => SHR_KIND_R8
-  use data_const_mod, only : spval  => SHR_CONST_SPVAL
+  use data_kind_mod , only : r8 => DAT_KIND_R8
+  use data_const_mod, only : spval  => DAT_CONST_SPVAL
   use GridConsts
   use GridMod
   use HistFileMod

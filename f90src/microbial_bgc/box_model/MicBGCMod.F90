@@ -4,7 +4,7 @@ module MicBGCMod
 ! codes to do soil biological transformations
 !
 ! USES:
-  use data_kind_mod, only : r8 => SHR_KIND_R8
+  use data_kind_mod, only : r8 => DAT_KIND_R8
   use abortutils  , only : endrun,destroy
   use MicAutoCPLXMod
   use minimathmod, only : safe_adb,AZMAX1

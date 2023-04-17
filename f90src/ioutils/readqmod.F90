@@ -2,7 +2,7 @@ module readqmod
 !!
 ! Description:
 ! code to read plant relevant files
-  use data_kind_mod, only : r8 => SHR_KIND_R8
+  use data_kind_mod, only : r8 => DAT_KIND_R8
   use fileUtil, only : open_safe, check_read
   use minimathmod, only : isLeap
   use GridConsts

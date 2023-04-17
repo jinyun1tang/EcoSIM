@@ -11,6 +11,7 @@ implicit none
   character(len=300) :: clm_file_in
   character(len=300) :: soil_mgmt_in
   character(len=300) :: clm_factor_in          !file for climate change factors
+  logical :: do_budgets   = .false.
   type(file_desc_t)  :: pft_nfid 
   type(ecosim_time_type) :: etimer
   logical :: Lirri_auto=.false.

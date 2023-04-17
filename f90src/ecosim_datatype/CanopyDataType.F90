@@ -1,6 +1,6 @@
 module CanopyDataType
 
-  use data_kind_mod, only : r8 => SHR_KIND_R8
+  use data_kind_mod, only : r8 => DAT_KIND_R8
   use GridConsts
   use ElmIDMod
   use EcoSIMConfig, only : jsken => jskenc
@@ -252,7 +252,7 @@ module CanopyDataType
   allocate(CPOOL3(JNODS,JBR,JP,JY,JX));CPOOL3=0._r8
   allocate(RSETE(npelms,JP,JY,JX));    RSETE=0._r8
   allocate(WGLFT(JC,JY,JX));    WGLFT=0._r8
-  allocate(CFOPE(0:Jlitgrp,jsken,npelms,JP,JY,JX));CFOPE=0._r8
+  allocate(CFOPE(npelms,0:Jlitgrp,jsken,JP,JY,JX));CFOPE=0._r8
   allocate(WTSHTE(npelms,JP,JY,JX)); WTSHTE=0._r8
   allocate(WTLFE(npelms,JP,JY,JX));  WTLFE=0._r8
   allocate(WTSHEE(npelms,JP,JY,JX)); WTSHEE=0._r8
@@ -271,32 +271,32 @@ module CanopyDataType
   allocate(ARSTV(JC,JP,JY,JX)); ARSTV=0._r8
   allocate(EPOLNP(npelms,JP,JY,JX));   EPOLNP=0._r8
   allocate(WVSTKB(JBR,JP,JY,JX));WVSTKB=0._r8
-  allocate(EPOOL(JBR,npelms,JP,JY,JX)); EPOOL=0._r8
+  allocate(EPOOL(npelms,JBR,JP,JY,JX)); EPOOL=0._r8
   allocate(WTLSB(JBR,JP,JY,JX)); WTLSB=0._r8
-  allocate(WTSHTBE(JBR,npelms,JP,JY,JX));WTSHTBE=0._r8
-  allocate(WTLFBE(JBR,npelms,JP,JY,JX)); WTLFBE=0._r8
-  allocate(WTSHEBE(JBR,npelms,JP,JY,JX));WTSHEBE=0._r8
-  allocate(WTSTKBE(JBR,npelms,JP,JY,JX));WTSTKBE=0._r8
-  allocate(WTRSVBE(JBR,npelms,JP,JY,JX));WTRSVBE=0._r8
-  allocate(WTHSKBE(JBR,npelms,JP,JY,JX));WTHSKBE=0._r8
-  allocate(WTEARBE(JBR,npelms,JP,JY,JX));WTEARBE=0._r8
-  allocate(WTGRBE(JBR,npelms,JP,JY,JX)); WTGRBE=0._r8
-  allocate(CEPOLB(JBR,npelms,JP,JY,JX));CEPOLB=0._r8
-  allocate(EPOLNB(JBR,npelms,JP,JY,JX));EPOLNB=0._r8
-  allocate(WTNDBE(JBR,npelms,JP,JY,JX)); WTNDBE=0._r8
-  allocate(WGSHEXE(JBR,npelms,JP,JY,JX));WGSHEXE=0._r8
-  allocate(WTSTXBE(JBR,npelms,JP,JY,JX));WTSTXBE=0._r8
-  allocate(WGLFEX(JBR,npelms,JP,JY,JX)); WGLFEX=0._r8
-  allocate(WGLFE(0:JNODS,JBR,npelms,JP,JY,JX));WGLFE=0._r8
-  allocate(WGSHE(0:JNODS,JBR,npelms,JP,JY,JX));WGSHE=0._r8
-  allocate(WGNODE(0:JNODS,JBR,npelms,JP,JY,JX));WGNODE=0._r8
-  allocate(WGLFLE(JC,0:JNODS,JBR,npelms,JP,JY,JX));WGLFLE=0._r8
+  allocate(WTSHTBE(npelms,JBR,JP,JY,JX));WTSHTBE=0._r8
+  allocate(WTLFBE(npelms,JBR,JP,JY,JX)); WTLFBE=0._r8
+  allocate(WTSHEBE(npelms,JBR,JP,JY,JX));WTSHEBE=0._r8
+  allocate(WTSTKBE(npelms,JBR,JP,JY,JX));WTSTKBE=0._r8
+  allocate(WTRSVBE(npelms,JBR,JP,JY,JX));WTRSVBE=0._r8
+  allocate(WTHSKBE(npelms,JBR,JP,JY,JX));WTHSKBE=0._r8
+  allocate(WTEARBE(npelms,JBR,JP,JY,JX));WTEARBE=0._r8
+  allocate(WTGRBE(npelms,JBR,JP,JY,JX)); WTGRBE=0._r8
+  allocate(CEPOLB(npelms,JBR,JP,JY,JX));CEPOLB=0._r8
+  allocate(EPOLNB(npelms,JBR,JP,JY,JX));EPOLNB=0._r8
+  allocate(WTNDBE(npelms,JBR,JP,JY,JX)); WTNDBE=0._r8
+  allocate(WGSHEXE(npelms,JBR,JP,JY,JX));WGSHEXE=0._r8
+  allocate(WTSTXBE(npelms,JBR,JP,JY,JX));WTSTXBE=0._r8
+  allocate(WGLFEX(npelms,JBR,JP,JY,JX)); WGLFEX=0._r8
+  allocate(WGLFE(npelms,0:JNODS,JBR,JP,JY,JX));WGLFE=0._r8
+  allocate(WGSHE(npelms,0:JNODS,JBR,JP,JY,JX));WGSHE=0._r8
+  allocate(WGNODE(npelms,0:JNODS,JBR,JP,JY,JX));WGNODE=0._r8
+  allocate(WGLFLE(npelms,JC,0:JNODS,JBR,JP,JY,JX));WGLFLE=0._r8
   allocate(ARLFL(JC,0:JNODS,JBR,JP,JY,JX));ARLFL=0._r8
   allocate(WSLF(0:JNODS,JBR,JP,JY,JX));WSLF=0._r8
   allocate(WSSHE(0:JNODS,JBR,JP,JY,JX));WSSHE=0._r8
   allocate(CCPLNP(JP,JY,JX));   CCPLNP=0._r8
   allocate(GRWTB(JBR,JP,JY,JX)); GRWTB=0._r8
-  allocate(WTSTDE(jsken,npelms,JP,JY,JX)); WTSTDE=0._r8
+  allocate(WTSTDE(npelms,jsken,JP,JY,JX)); WTSTDE=0._r8
   allocate(WTSTGE(npelms,JP,JY,JX));    WTSTGE=0._r8
   allocate(WTRVE(npelms,JP,JY,JX));  WTRVE=0._r8
   allocate(WTRVX(JP,JY,JX));    WTRVX=0._r8

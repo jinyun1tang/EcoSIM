@@ -1,13 +1,13 @@
 program main
   use ClimReadMod
-  use data_kind_mod, only : r8 => SHR_KIND_R8
+  use data_kind_mod  , only : r8 => DAT_KIND_R8
   use ClimForcDataType
-  use abortutils, only : endrun
-  use minimathmod, only : isLeap
-  use fileUtil, only : file_exists, open_safe
-  use EcoSIMHistMod, only : PREFIX
-  USE EcoSIMCtrlMod, ONLY : LVERB
-  use data_const_mod, only : spval  => SHR_CONST_SPVAL
+  use abortutils     , only : endrun
+  use minimathmod    , only : isLeap
+  use fileUtil       , only : file_exists, open_safe
+  use EcoSIMHistMod  , only : PREFIX
+  USE EcoSIMCtrlMod  , ONLY : LVERB
+  use data_const_mod , only : spval  => DAT_CONST_SPVAL
   use ncdio_pio
   use netcdf
   use EcoSIMConfig, only : IFLGW

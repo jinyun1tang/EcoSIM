@@ -3,7 +3,7 @@ module RootDataType
 !
 !!
 ! data types of plant characteristics
-  use data_kind_mod, only : r8 => SHR_KIND_R8
+  use data_kind_mod, only : r8 => DAT_KIND_R8
   use GridConsts
   use ElmIDMod
   use TracerIDMod
@@ -127,7 +127,7 @@ contains
   allocate(RRAD2M(jroots,JP,JY,JX)); RRAD2M=0._r8
   allocate(RTFQ(JP,JY,JX));     RTFQ=0._r8
   allocate(PORTX(jroots,JP,JY,JX));  PORTX=0._r8
-  allocate(EPOOLN(JZ,npelms,JP,JY,JX));EPOOLN=0._r8
+  allocate(EPOOLN(npelms,JZ,JP,JY,JX));EPOOLN=0._r8
   allocate(RTLGP(jroots,JZ,JP,JY,JX));RTLGP=0._r8
   allocate(RTLG1(jroots,JZ,JC,JP,JY,JX));RTLG1=0._r8
   allocate(RTLG2(jroots,JZ,JC,JP,JY,JX));RTLG2=0._r8
@@ -158,12 +158,12 @@ contains
   allocate(WTRT1E(npelms,jroots,JZ,JC,JP,JY,JX));WTRT1E=0._r8
   allocate(WTRT2E(npelms,jroots,JZ,JC,JP,JY,JX));WTRT2E=0._r8
   allocate(WTRTD(jroots,JZ,JP,JY,JX));WTRTD=0._r8
-  allocate(WTNDLE(JZ,npelms,JP,JY,JX)); WTNDLE=0._r8
+  allocate(WTNDLE(npelms,JZ,JP,JY,JX)); WTNDLE=0._r8
   allocate(WTNDE(npelms,JP,JY,JX));  WTNDE=0._r8
   allocate(WTRTL(jroots,JZ,JP,JY,JX));WTRTL=0._r8
   allocate(EPOOLR(npelms,jroots,JZ,JP,JY,JX));EPOOLR=0._r8
   allocate(CEPOLR(npelms,jroots,JZ,JP,JY,JX));CEPOLR=0._r8
-  allocate(RTWT1E(jroots,JRS,npelms,JP,JY,JX));RTWT1E=0._r8
+  allocate(RTWT1E(npelms,jroots,JRS,JP,JY,JX));RTWT1E=0._r8
   allocate(CWSRTL(jroots,JZ,JP,JY,JX));CWSRTL=0._r8
   end subroutine InitRootData
 

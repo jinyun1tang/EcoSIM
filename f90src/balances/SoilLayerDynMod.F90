@@ -1,7 +1,7 @@
 module SoilLayerDynMod
 ! Description:
 ! subroutines to do soil relayering
-  use data_kind_mod, only : r8 => SHR_KIND_R8
+  use data_kind_mod, only : r8 => DAT_KIND_R8
   use RootDataType
   use GridDataType
   use minimathmod, only : AZMAX1
@@ -848,9 +848,8 @@ implicit none
           RTLGA(N,L1,NZ,NY,NX)=RTLGA(N,L1,NZ,NY,NX)+FX*RTLGA(N,L0,NZ,NY,NX)
         ENDDO
         DO NE=1,npelms
-          WTNDLE(L1,NE,NZ,NY,NX)=WTNDLE(L1,NE,NZ,NY,NX)+FX*WTNDLE(L0,NE,NZ,NY,NX)
-
-          EPOOLN(L1,NE,NZ,NY,NX)=EPOOLN(L1,NE,NZ,NY,NX)+FX*EPOOLN(L0,NE,NZ,NY,NX)
+          WTNDLE(NE,L1,NZ,NY,NX)=WTNDLE(NE,L1,NZ,NY,NX)+FX*WTNDLE(NE,L0,NZ,NY,NX)
+          EPOOLN(NE,L1,NZ,NY,NX)=EPOOLN(NE,L1,NZ,NY,NX)+FX*EPOOLN(NE,L0,NZ,NY,NX)
         ENDDO
       ENDIF
     ENDDO
@@ -1026,9 +1025,9 @@ implicit none
           RTLGA(N,L0,NZ,NY,NX)=FY*RTLGA(N,L0,NZ,NY,NX)
         ENDDO
         DO NE=1,npelms
-          WTNDLE(L0,NE,NZ,NY,NX)=FY*WTNDLE(L0,NE,NZ,NY,NX)
+          WTNDLE(NE,L0,NZ,NY,NX)=FY*WTNDLE(NE,L0,NZ,NY,NX)
 
-          EPOOLN(L0,NE,NZ,NY,NX)=FY*EPOOLN(L0,NE,NZ,NY,NX)
+          EPOOLN(NE,L0,NZ,NY,NX)=FY*EPOOLN(NE,L0,NZ,NY,NX)
         ENDDO
       ENDIF
     ENDDO
@@ -1268,13 +1267,13 @@ implicit none
 !     ROOT NODULES
 !
         DO NE=1,npelms
-          FXWTNDLE=FRO*WTNDLE(L0,NE,NZ,NY,NX)
-          WTNDLE(L1,NE,NZ,NY,NX)=WTNDLE(L1,NE,NZ,NY,NX)+FXWTNDLE
-          WTNDLE(L0,NE,NZ,NY,NX)=WTNDLE(L0,NE,NZ,NY,NX)-FXWTNDLE
+          FXWTNDLE=FRO*WTNDLE(NE,L0,NZ,NY,NX)
+          WTNDLE(NE,L1,NZ,NY,NX)=WTNDLE(NE,L1,NZ,NY,NX)+FXWTNDLE
+          WTNDLE(NE,L0,NZ,NY,NX)=WTNDLE(NE,L0,NZ,NY,NX)-FXWTNDLE
 
-          FXEPOOLN=FRO*EPOOLN(L0,NE,NZ,NY,NX)
-          EPOOLN(L1,NE,NZ,NY,NX)=EPOOLN(L1,NE,NZ,NY,NX)+FXEPOOLN
-          EPOOLN(L0,NE,NZ,NY,NX)=EPOOLN(L0,NE,NZ,NY,NX)-FXEPOOLN
+          FXEPOOLN=FRO*EPOOLN(NE,L0,NZ,NY,NX)
+          EPOOLN(NE,L1,NZ,NY,NX)=EPOOLN(NE,L1,NZ,NY,NX)+FXEPOOLN
+          EPOOLN(NE,L0,NZ,NY,NX)=EPOOLN(NE,L0,NZ,NY,NX)-FXEPOOLN
 
         ENDDO
       ENDIF

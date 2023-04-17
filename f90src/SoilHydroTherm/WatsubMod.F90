@@ -3,7 +3,7 @@ module WatsubMod
 ! Description:
 ! code to do water and enerby balance calculation
 
-  use data_kind_mod, only : r8 => SHR_KIND_R8
+  use data_kind_mod, only : r8 => DAT_KIND_R8
   use abortutils   , only : endrun, print_info
   use minimathmod  , only : test_aeqb, test_aneb,safe_adb,vapsat,AZMAX1,AZMIN1
   use EcosimConst

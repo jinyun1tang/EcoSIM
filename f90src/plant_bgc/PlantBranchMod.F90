@@ -3,7 +3,7 @@ module PlantBranchMod
 ! Description:
 ! module for plant biological transformations
   use minimathmod, only : test_aeqb,safe_adb,AZMAX1
-  use data_kind_mod, only : r8 => SHR_KIND_R8
+  use data_kind_mod, only : r8 => DAT_KIND_R8
   use EcosimConst
   use GrosubPars
   use PlantAPIData
@@ -169,7 +169,7 @@ module PlantBranchMod
     HTNODX     =>   plt_morph%HTNODX  , &
     NNOD       =>   plt_morph%NNOD      &
   )
-  WTLSB(NB,NZ)=AZMAX1(WTLFBE(NB,ielmc,NZ)+WTSHEBE(NB,ielmc,NZ))
+  WTLSB(NB,NZ)=AZMAX1(WTLFBE(ielmc,NB,NZ)+WTSHEBE(ielmc,NB,NZ))
 
   IF(IDTHB(NB,NZ).EQ.ialive)THEN
     call CalcPartitionCoeff(I,J,NB,NZ,PART,PTRT,IFLGY,IFLGZ)
@@ -234,11 +234,11 @@ module PlantBranchMod
 !   CNSTK,WVSTKB=stalk N:C,sapwood mass
 !   IDAY(10=date of physiological maturity
 !
-    WTSHXN=AZMAX1(WTLFBE(NB,ielmn,NZ)+WTSHEBE(NB,ielmn,NZ) &
+    WTSHXN=AZMAX1(WTLFBE(ielmn,NB,NZ)+WTSHEBE(ielmn,NB,NZ) &
       +CNSTK(NZ)*WVSTKB(NB,NZ))
     IF(IDAY(10,NB,NZ).EQ.0)THEN
-      WTSHXN=WTSHXN+AZMAX1(WTHSKBE(NB,ielmn,NZ) &
-        +WTEARBE(NB,ielmn,NZ)+WTGRBE(NB,ielmn,NZ))
+      WTSHXN=WTSHXN+AZMAX1(WTHSKBE(ielmn,NB,NZ) &
+        +WTEARBE(ielmn,NB,NZ)+WTGRBE(ielmn,NB,NZ))
     ENDIF
 !
 !   GROSS PRIMARY PRODUCTIVITY
@@ -300,12 +300,12 @@ module PlantBranchMod
     GROGRE(ielmp)=GROGRE(ielmc)*CPRSV(NZ)
 
     DO NE=1,npelms
-      WTLFBE(NB,NE,NZ)=WTLFBE(NB,NE,NZ)+GROLFE(NE)
-      WTSHEBE(NB,NE,NZ)=WTSHEBE(NB,NE,NZ)+GROSHE(NE)
-      WTSTKBE(NB,NE,NZ)=WTSTKBE(NB,NE,NZ)+GROSTKE(NE)
-      WTRSVBE(NB,NE,NZ)=WTRSVBE(NB,NE,NZ)+GRORSVE(NE)
-      WTHSKBE(NB,NE,NZ)=WTHSKBE(NB,NE,NZ)+GROHSKE(NE)
-      WTEARBE(NB,NE,NZ)=WTEARBE(NB,NE,NZ)+GROEARE(NE)
+      WTLFBE(NE,NB,NZ)=WTLFBE(NE,NB,NZ)+GROLFE(NE)
+      WTSHEBE(NE,NB,NZ)=WTSHEBE(NE,NB,NZ)+GROSHE(NE)
+      WTSTKBE(NE,NB,NZ)=WTSTKBE(NE,NB,NZ)+GROSTKE(NE)
+      WTRSVBE(NE,NB,NZ)=WTRSVBE(NE,NB,NZ)+GRORSVE(NE)
+      WTHSKBE(NE,NB,NZ)=WTHSKBE(NE,NB,NZ)+GROHSKE(NE)
+      WTEARBE(NE,NB,NZ)=WTEARBE(NE,NB,NZ)+GROEARE(NE)
     ENDDO
 
 !
@@ -315,8 +315,8 @@ module PlantBranchMod
 !   CNKI,CPKI=nonstruct N,P inhibition constant on growth (g N,P g-1 C)
 !   ETOL=coefficient for etoliation effects on expansion,extension
 !
-    CCE=AMIN1(safe_adb(CEPOLB(NB,ielmn,NZ),CEPOLB(NB,ielmn,NZ)+CEPOLB(NB,ielmc,NZ)*CNKI) &
-      ,safe_adb(CEPOLB(NB,ielmp,NZ),CEPOLB(NB,ielmp,NZ)+CEPOLB(NB,ielmc,NZ)*CPKI))
+    CCE=AMIN1(safe_adb(CEPOLB(ielmn,NB,NZ),CEPOLB(ielmn,NB,NZ)+CEPOLB(ielmc,NB,NZ)*CNKI) &
+      ,safe_adb(CEPOLB(ielmp,NB,NZ),CEPOLB(ielmp,NB,NZ)+CEPOLB(ielmc,NB,NZ)*CPKI))
 
     ETOL=1.0_r8+CCE
 !
@@ -358,7 +358,7 @@ module PlantBranchMod
         K=MOD(KK,JNODS1)
         IF(K.EQ.0.AND.KK.NE.0)K=25
           DO NE=1,npelms
-            WGLFE(K,NB,NE,NZ)=WGLFE(K,NB,NE,NZ)+GROE(NE)
+            WGLFE(NE,K,NB,NZ)=WGLFE(NE,K,NB,NZ)+GROE(NE)
           ENDDO
           WSLF(K,NB,NZ)=WSLF(K,NB,NZ)+AMIN1(GROE(ielmn)*CNWS(NZ),GROE(ielmp)*CPWS(NZ))
 !
@@ -377,7 +377,7 @@ module PlantBranchMod
 !         ARLFB,ARLF=branch,node leaf area
 !
           SLA=ETOL*SLA1(NZ)*(AMAX1(ZEROL(NZ) &
-            ,WGLFE(K,NB,ielmc,NZ))/(PP(NZ)*GSLA))**SLA2*WFNS
+            ,WGLFE(ielmc,K,NB,NZ))/(PP(NZ)*GSLA))**SLA2*WFNS
           GROA=GROE(ielmc)*SLA
           ARLFB(NB,NZ)=ARLFB(NB,NZ)+GROA
           ARLF1(K,NB,NZ)=ARLF1(K,NB,NZ)+GROA
@@ -416,7 +416,7 @@ module PlantBranchMod
           K=MOD(KK,JNODS1)
           IF(K.EQ.0.AND.KK.NE.0)K=25
             DO NE=1,npelms
-              WGSHE(K,NB,NE,NZ)=WGSHE(K,NB,NE,NZ)+GROE(NE)
+              WGSHE(NE,K,NB,NZ)=WGSHE(NE,K,NB,NZ)+GROE(NE)
             ENDDO
             WSSHE(K,NB,NZ)=WSSHE(K,NB,NZ) &
               +AMIN1(GROE(ielmn)*CNWS(NZ),GROE(ielmp)*CPWS(NZ))
@@ -435,9 +435,9 @@ module PlantBranchMod
         !   GROS,GRO=petiole length,mass growth
         !   HTSHE=petiole length
 !
-            IF(WGLFE(K,NB,ielmc,NZ).GT.0.0_r8)THEN
+            IF(WGLFE(ielmc,K,NB,NZ).GT.0.0_r8)THEN
               SSL=ETOL*SSL1(NZ)*(AMAX1(ZEROL(NZ) &
-                ,WGSHE(K,NB,ielmc,NZ))/(PP(NZ)*GSSL))**SSL2*WFNS
+                ,WGSHE(ielmc,K,NB,NZ))/(PP(NZ)*GSSL))**SSL2*WFNS
               GROS=GROE(ielmc)/PP(NZ)*SSL
               HTSHE(K,NB,NZ)=HTSHE(K,NB,NZ)+GROS*ANGSH(NZ)
             ENDIF
@@ -478,7 +478,7 @@ module PlantBranchMod
     !     PP=PFT population
     !     GROH,GRO=stalk length,mass growth
 !
-          SNL=ETOL*SNL1(NZ)*(WTSTKBE(NB,ielmc,NZ)/PP(NZ))**SNL2
+          SNL=ETOL*SNL1(NZ)*(WTSTKBE(ielmc,NB,NZ)/PP(NZ))**SNL2
           GROH=GROE(ielmc)/PP(NZ)*SNL
           KX=MOD(MNNOD-1,JNODS1)
           IF(KX.EQ.0.AND.MNNOD-1.NE.0)KX=25
@@ -496,7 +496,7 @@ module PlantBranchMod
             K2=MOD(KK-1,JNODS1)
             IF(K2.EQ.0.AND.KK-1.NE.0)K2=25
             DO NE=1,npelms
-              WGNODE(K1,NB,NE,NZ)=WGNODE(K1,NB,NE,NZ)+GROE(NE)
+              WGNODE(NE,K1,NB,NZ)=WGNODE(NE,K1,NB,NZ)+GROE(NE)
             ENDDO
             HTNODX(K1,NB,NZ)=HTNODX(K1,NB,NZ)+GROH*ANGBR(NZ)
             IF(K1.NE.0)THEN
@@ -517,18 +517,18 @@ module PlantBranchMod
     !   RCCX,RCCQ=max fractions for shoot N,P recycling
     !   IGTYP=growth type:0=bryophyte,1=graminoid,2=shrub,tree
 !
-        IF(IDAY(1,NB,NZ).NE.0.AND.CEPOLB(NB,ielmc,NZ).GT.ZERO)THEN
+        IF(IDAY(1,NB,NZ).NE.0.AND.CEPOLB(ielmc,NB,NZ).GT.ZERO)THEN
           CCC=AZMAX1(AMIN1(1.0_r8 &
-            ,safe_adb(CEPOLB(NB,ielmn,NZ),CEPOLB(NB,ielmn,NZ) &
-            +CEPOLB(NB,ielmc,NZ)*CNKI) &
-            ,safe_adb(CEPOLB(NB,ielmp,NZ),CEPOLB(NB,ielmp,NZ) &
-            +CEPOLB(NB,ielmc,NZ)*CPKI)))
+            ,safe_adb(CEPOLB(ielmn,NB,NZ),CEPOLB(ielmn,NB,NZ) &
+            +CEPOLB(ielmc,NB,NZ)*CNKI) &
+            ,safe_adb(CEPOLB(ielmp,NB,NZ),CEPOLB(ielmp,NB,NZ) &
+            +CEPOLB(ielmc,NB,NZ)*CPKI)))
           CNC=AZMAX1(AMIN1(1.0_r8 &
-            ,safe_adb(CEPOLB(NB,ielmc,NZ),CEPOLB(NB,ielmc,NZ) &
-            +CEPOLB(NB,ielmn,NZ)/CNKI)))
+            ,safe_adb(CEPOLB(ielmc,NB,NZ),CEPOLB(ielmc,NB,NZ) &
+            +CEPOLB(ielmn,NB,NZ)/CNKI)))
           CPC=AZMAX1(AMIN1(1.0_r8 &
-            ,safe_adb(CEPOLB(NB,ielmc,NZ),CEPOLB(NB,ielmc,NZ) &
-            +CEPOLB(NB,ielmp,NZ)/CPKI)))
+            ,safe_adb(CEPOLB(ielmc,NB,NZ),CEPOLB(ielmc,NB,NZ) &
+            +CEPOLB(ielmp,NB,NZ)/CPKI)))
         ELSE
           CCC=0._r8
           CNC=0._r8
@@ -565,15 +565,15 @@ module PlantBranchMod
 !
             IF(IFLGP(NB,NZ).EQ.1)THEN
               DO NE=1,npelms
-                WGLFEX(NB,NE,NZ)=AZMAX1(WGLFE(K,NB,NE,NZ))
+                WGLFEX(NE,NB,NZ)=AZMAX1(WGLFE(NE,K,NB,NZ))
               ENDDO
               ARLFZ(NB,NZ)=AZMAX1(ARLF1(K,NB,NZ))
-              IF(WGLFEX(NB,ielmc,NZ).GT.ZEROP(NZ))THEN
-                RCELX(NB,ielmc,NZ)=WGLFEX(NB,ielmc,NZ)*RCCC
-                RCELX(NB,ielmn,NZ)=WGLFEX(NB,ielmn,NZ)*(RCCN+(1.0_r8-RCCN)*RCCC)
-                RCELX(NB,ielmp,NZ)=WGLFEX(NB,ielmp,NZ)*(RCCP+(1.0_r8-RCCP)*RCCC)
+              IF(WGLFEX(ielmc,NB,NZ).GT.ZEROP(NZ))THEN
+                RCELX(ielmc,NB,NZ)=WGLFEX(ielmc,NB,NZ)*RCCC
+                RCELX(ielmn,NB,NZ)=WGLFEX(ielmn,NB,NZ)*(RCCN+(1.0_r8-RCCN)*RCCC)
+                RCELX(ielmp,NB,NZ)=WGLFEX(ielmp,NB,NZ)*(RCCP+(1.0_r8-RCCP)*RCCC)
               ELSE
-                RCELX(NB,1:npelms,NZ)=0._r8
+                RCELX(1:npelms,NB,NZ)=0._r8
               ENDIF
             ENDIF
 !
@@ -581,9 +581,9 @@ module PlantBranchMod
     !
     !       FSNC,FSNCL=fraction of lowest leaf to be remobilized
     !
-            IF(FSNC*WGLFEX(NB,ielmc,NZ).GT.WGLFE(K,NB,ielmc,NZ) &
-              .AND.WGLFEX(NB,ielmc,NZ).GT.ZEROP(NZ))THEN
-              FSNCL=AZMAX1(WGLFE(K,NB,ielmc,NZ)/WGLFEX(NB,ielmc,NZ))
+            IF(FSNC*WGLFEX(ielmc,NB,NZ).GT.WGLFE(ielmc,K,NB,NZ) &
+              .AND.WGLFEX(ielmc,NB,NZ).GT.ZEROP(NZ))THEN
+              FSNCL=AZMAX1(WGLFE(ielmc,K,NB,NZ)/WGLFEX(ielmc,NB,NZ))
             ELSE
               FSNCL=FSNC
             ENDIF
@@ -601,10 +601,10 @@ module PlantBranchMod
 !
             DO NE=1,npelms
               D6300: DO M=1,jsken
-                ESNC(M,NE,k_woody_litr,0,NZ)=ESNC(M,NE,k_woody_litr,0,NZ)+CFOPE(icwood,M,NE,NZ) &
-                  *FSNCL*(WGLFEX(NB,NE,NZ)-RCELX(NB,NE,NZ))*FWODLE(NE,k_woody_litr)
-                ESNC(M,NE,k_fine_litr,0,NZ)=ESNC(M,NE,k_fine_litr,0,NZ)+CFOPE(ifoliar,M,NE,NZ) &
-                  *FSNCL*(WGLFEX(NB,NE,NZ)-RCELX(NB,NE,NZ))*FWODBE(NE,k_fine_litr)
+                ESNC(NE,M,k_woody_litr,0,NZ)=ESNC(NE,M,k_woody_litr,0,NZ)+CFOPE(NE,icwood,M,NZ) &
+                  *FSNCL*(WGLFEX(NE,NB,NZ)-RCELX(NE,NB,NZ))*FWODLE(NE,k_woody_litr)
+                ESNC(NE,M,k_fine_litr,0,NZ)=ESNC(NE,M,k_fine_litr,0,NZ)+CFOPE(NE,ifoliar,M,NZ) &
+                  *FSNCL*(WGLFEX(NE,NB,NZ)-RCELX(NE,NB,NZ))*FWODBE(NE,k_fine_litr)
               ENDDO D6300
             ENDDO
 !
@@ -620,14 +620,14 @@ module PlantBranchMod
 !
             ARLFB(NB,NZ)=ARLFB(NB,NZ)-FSNCL*ARLFZ(NB,NZ)
             DO NE=1,npelms
-              WTLFBE(NB,NE,NZ)=WTLFBE(NB,NE,NZ)-FSNCL*WGLFEX(NB,NE,NZ)
-              WGLFE(K,NB,NE,NZ)=WGLFE(K,NB,NE,NZ)-FSNCL*WGLFEX(NB,NE,NZ)
-              EPOOL(NB,NE,NZ)=EPOOL(NB,NE,NZ)+FSNCL*RCELX(NB,NE,NZ)
+              WTLFBE(NE,NB,NZ)=WTLFBE(NE,NB,NZ)-FSNCL*WGLFEX(NE,NB,NZ)
+              WGLFE(NE,K,NB,NZ)=WGLFE(NE,K,NB,NZ)-FSNCL*WGLFEX(NE,NB,NZ)
+              EPOOL(NE,NB,NZ)=EPOOL(NE,NB,NZ)+FSNCL*RCELX(NE,NB,NZ)
             ENDDO
             ARLF1(K,NB,NZ)=ARLF1(K,NB,NZ)-FSNCL*ARLFZ(NB,NZ)
             WSLF(K,NB,NZ)=AZMAX1(WSLF(K,NB,NZ) &
-              -FSNCL*AMAX1(WGLFEX(NB,ielmn,NZ)*CNWS(NZ) &
-              ,WGLFEX(NB,ielmp,NZ)*CPWS(NZ)))
+              -FSNCL*AMAX1(WGLFEX(ielmn,NB,NZ)*CNWS(NZ) &
+              ,WGLFEX(ielmp,NB,NZ)*CPWS(NZ)))
 !
     !       REMOBILIZATION OF SHEATHS OR PETIOLE C,N,P ALSO DEPENDS ON
     !       STRUCTURAL C:N:P
@@ -639,22 +639,22 @@ module PlantBranchMod
 !
             IF(IFLGP(NB,NZ).EQ.1)THEN
               DO NE=1,npelms
-                WGSHEXE(NB,NE,NZ)=AZMAX1(WGSHE(K,NB,NE,NZ))
+                WGSHEXE(NE,NB,NZ)=AZMAX1(WGSHE(NE,K,NB,NZ))
               ENDDO
               HTSHEX(NB,NZ)=AZMAX1(HTSHE(K,NB,NZ))
-              IF(WGSHEXE(NB,ielmc,NZ).GT.ZEROP(NZ))THEN
-                RCESX(NB,ielmc,NZ)=RCCC*WGSHEXE(NB,ielmc,NZ)
-                RCESX(NB,ielmn,NZ)=WGSHEXE(NB,ielmn,NZ) &
-                  *(RCCN+(1.0_r8-RCCN)*RCESX(NB,ielmc,NZ)/WGSHEXE(NB,ielmc,NZ))
-                RCESX(NB,ielmp,NZ)=WGSHEXE(NB,ielmp,NZ) &
-                  *(RCCP+(1.0_r8-RCCP)*RCESX(NB,ielmc,NZ)/WGSHEXE(NB,ielmc,NZ))
+              IF(WGSHEXE(ielmc,NB,NZ).GT.ZEROP(NZ))THEN
+                RCESX(ielmc,NB,NZ)=RCCC*WGSHEXE(ielmc,NB,NZ)
+                RCESX(ielmn,NB,NZ)=WGSHEXE(ielmn,NB,NZ) &
+                  *(RCCN+(1.0_r8-RCCN)*RCESX(ielmc,NB,NZ)/WGSHEXE(ielmc,NB,NZ))
+                RCESX(ielmp,NB,NZ)=WGSHEXE(ielmp,NB,NZ) &
+                  *(RCCP+(1.0_r8-RCCP)*RCESX(ielmc,NB,NZ)/WGSHEXE(ielmc,NB,NZ))
               ELSE
-                RCESX(NB,1:npelms,NZ)=0._r8
+                RCESX(1:npelms,NB,NZ)=0._r8
               ENDIF
               DO NE=1,npelms
-                WTSTXBE(NB,NE,NZ)=WTSTXBE(NB,NE,NZ)+WGNODE(K,NB,NE,NZ)
+                WTSTXBE(NE,NB,NZ)=WTSTXBE(NE,NB,NZ)+WGNODE(NE,K,NB,NZ)
               ENDDO
-              WGNODE(K,NB,1:npelms,NZ)=0._r8
+              WGNODE(1:npelms,K,NB,NZ)=0._r8
               HTNODX(K,NB,NZ)=0._r8
             ENDIF
 !
@@ -662,9 +662,9 @@ module PlantBranchMod
     !
     !       FSNCS=fraction of lowest petiole to be remobilized
     !
-            IF(FSNC*WGSHEXE(NB,ielmc,NZ).GT.WGSHE(K,NB,ielmc,NZ) &
-              .AND.WGSHEXE(NB,ielmc,NZ).GT.ZEROP(NZ))THEN
-              FSNCS=AZMAX1(WGSHE(K,NB,ielmc,NZ)/WGSHEXE(NB,ielmc,NZ))
+            IF(FSNC*WGSHEXE(ielmc,NB,NZ).GT.WGSHE(ielmc,K,NB,NZ) &
+              .AND.WGSHEXE(ielmc,NB,NZ).GT.ZEROP(NZ))THEN
+              FSNCS=AZMAX1(WGSHE(ielmc,K,NB,NZ)/WGSHEXE(ielmc,NB,NZ))
             ELSE
               FSNCS=FSNC
             ENDIF
@@ -682,11 +682,11 @@ module PlantBranchMod
 !
             DO NE=1,npelms
               D6305: DO M=1,jsken
-                ESNC(M,NE,k_woody_litr,0,NZ)=ESNC(M,NE,k_woody_litr,0,NZ)+CFOPE(icwood,M,NE,NZ) &
-                  *FSNCS*(WGSHEXE(NB,NE,NZ)-RCESX(NB,NE,NZ))*FWODBE(NE,k_woody_litr)
+                ESNC(NE,M,k_woody_litr,0,NZ)=ESNC(NE,M,k_woody_litr,0,NZ)+CFOPE(NE,icwood,M,NZ) &
+                  *FSNCS*(WGSHEXE(NE,NB,NZ)-RCESX(NE,NB,NZ))*FWODBE(NE,k_woody_litr)
 
-                ESNC(M,NE,k_fine_litr,0,NZ)=ESNC(M,NE,k_fine_litr,0,NZ)+CFOPE(infoliar,M,NE,NZ) &
-                  *FSNCS*(WGSHEXE(NB,NE,NZ)-RCESX(NB,NE,NZ))*FWODBE(NE,k_fine_litr)
+                ESNC(NE,M,k_fine_litr,0,NZ)=ESNC(NE,M,k_fine_litr,0,NZ)+CFOPE(NE,infoliar,M,NZ) &
+                  *FSNCS*(WGSHEXE(NE,NB,NZ)-RCESX(NE,NB,NZ))*FWODBE(NE,k_fine_litr)
               ENDDO D6305
             ENDDO
 !
@@ -701,15 +701,15 @@ module PlantBranchMod
     !       RCES(ielmc)X,RCES(ielmn)X,RCES(ielmp)X=remobilization of C,N,P from senescing petiole
 !
             DO NE=1,npelms
-              WTSHEBE(NB,NE,NZ)=WTSHEBE(NB,NE,NZ)-FSNCS*WGSHEXE(NB,NE,NZ)
-              WGSHE(K,NB,NE,NZ)=WGSHE(K,NB,NE,NZ)-FSNCS*WGSHEXE(NB,NE,NZ)
-              EPOOL(NB,NE,NZ)=EPOOL(NB,NE,NZ)+FSNCS*RCESX(NB,NE,NZ)
+              WTSHEBE(NE,NB,NZ)=WTSHEBE(NE,NB,NZ)-FSNCS*WGSHEXE(NE,NB,NZ)
+              WGSHE(NE,K,NB,NZ)=WGSHE(NE,K,NB,NZ)-FSNCS*WGSHEXE(NE,NB,NZ)
+              EPOOL(NE,NB,NZ)=EPOOL(NE,NB,NZ)+FSNCS*RCESX(NE,NB,NZ)
             ENDDO
             HTSHE(K,NB,NZ)=HTSHE(K,NB,NZ)-FSNCS*HTSHEX(NB,NZ)
 
             WSSHE(K,NB,NZ)=AZMAX1(WSSHE(K,NB,NZ) &
-              -FSNCS*AMAX1(WGSHEXE(NB,ielmn,NZ)*CNWS(NZ) &
-              ,WGSHEXE(NB,ielmp,NZ)*CPWS(NZ)))
+              -FSNCS*AMAX1(WGSHEXE(ielmn,NB,NZ)*CNWS(NZ) &
+              ,WGSHEXE(ielmp,NB,NZ)*CPWS(NZ)))
 
           ENDIF
         ENDIF
@@ -723,9 +723,9 @@ module PlantBranchMod
   !     TFN3=temperature function for canopy growth
   !
         IF(IFLGZ.EQ.0)THEN
-          IF(SNCR.GT.0.0.AND.WTRSVBE(NB,ielmc,NZ).GT.0.0)THEN
-            RCO2V=AMIN1(SNCR,VMXC*WTRSVBE(NB,ielmc,NZ)*TFN3(NZ))
-            WTRSVBE(NB,ielmc,NZ)=WTRSVBE(NB,ielmc,NZ)-RCO2V
+          IF(SNCR.GT.0.0.AND.WTRSVBE(ielmc,NB,NZ).GT.0.0)THEN
+            RCO2V=AMIN1(SNCR,VMXC*WTRSVBE(ielmc,NB,NZ)*TFN3(NZ))
+            WTRSVBE(ielmc,NB,NZ)=WTRSVBE(ielmc,NB,NZ)-RCO2V
             SNCR=SNCR-RCO2V
           ENDIF
         ENDIF
@@ -788,23 +788,23 @@ module PlantBranchMod
           D580: DO NBL=1,NBR(NZ)
             IF(NBZ(NBL).NE.0)THEN
               IF(NBTB(NBZ(NBL),NZ).LT.KK)THEN
-                IF(EPOOL(NBZ(NBL),ielmc,NZ).GT.0)THEN
-                  XFRE(ielmc)=1.0E-02_r8*AMIN1(SNCX,EPOOL(NBZ(NBL),ielmc,NZ))
+                IF(EPOOL(ielmc,NBZ(NBL),NZ).GT.0)THEN
+                  XFRE(ielmc)=1.0E-02_r8*AMIN1(SNCX,EPOOL(ielmc,NBZ(NBL),NZ))
                   DO NE=2,npelms
-                    XFRE(NE)=XFRE(NE)*EPOOL(NBZ(NBL),NE,NZ)/EPOOL(NBZ(NBL),ielmc,NZ)
+                    XFRE(NE)=XFRE(NE)*EPOOL(NE,NBZ(NBL),NZ)/EPOOL(ielmc,NBZ(NBL),NZ)
                   ENDDO
                 ELSE
                   XFRE(ielmc)=0._r8
                   DO NE=2,npelms
-                    XFRE(NE)=1.0E-02_r8*EPOOL(NBZ(NBL),NE,NZ)
+                    XFRE(NE)=1.0E-02_r8*EPOOL(NE,NBZ(NBL),NZ)
                   ENDDO
                 ENDIF
                 DO NE=1,npelms
-                  EPOOL(NBZ(NBL),NE,NZ)=EPOOL(NBZ(NBL),NE,NZ)-XFRE(NE)
+                  EPOOL(NE,NBZ(NBL),NZ)=EPOOL(NE,NBZ(NBL),NZ)-XFRE(NE)
                 ENDDO
-                EPOOL(NB1(NZ),ielmc,NZ)=EPOOL(NB1(NZ),ielmc,NZ)+XFRE(ielmc)*SNCF
+                EPOOL(ielmc,NB1(NZ),NZ)=EPOOL(ielmc,NB1(NZ),NZ)+XFRE(ielmc)*SNCF
                 DO NE=2,npelms
-                  EPOOL(NB1(NZ),NE,NZ)=EPOOL(NB1(NZ),NE,NZ)+XFRE(NE)
+                  EPOOL(NE,NB1(NZ),NZ)=EPOOL(NE,NB1(NZ),NZ)+XFRE(NE)
                 ENDDO
                 SNCX=SNCX-XFRE(ielmc)
                 IF(SNCX.LE.0.0_r8)exit
@@ -836,23 +836,23 @@ module PlantBranchMod
     D495: DO KK=KVSTGX,KVSTG(NB,NZ)
       K=MOD(KK,JNODS1)
       IF(K.EQ.0.AND.KK.NE.0)K=25
-      IF(WGLFE(K,NB,ielmc,NZ).GT.0.0)THEN
-        CPOOLT=WGLFE(K,NB,ielmc,NZ)+EPOOL(NB,ielmc,NZ)
+      IF(WGLFE(ielmc,K,NB,NZ).GT.0.0)THEN
+        CPOOLT=WGLFE(ielmc,K,NB,NZ)+EPOOL(ielmc,NB,NZ)
         IF(CPOOLT.GT.ZEROP(NZ))THEN
-          ZPOOLD=WGLFE(K,NB,ielmn,NZ)*EPOOL(NB,ielmc,NZ) &
-            -EPOOL(NB,ielmn,NZ)*WGLFE(K,NB,ielmc,NZ)
-          XFRN1=AZMAX1(AMIN1(1.0E-03_r8*ZPOOLD/CPOOLT,WGLFE(K,NB,ielmn,NZ) &
-            -ZPLFM*CNLFB*WGLFE(K,NB,ielmc,NZ)))
-          PPOOLD=WGLFE(K,NB,ielmp,NZ)*EPOOL(NB,ielmc,NZ) &
-            -EPOOL(NB,ielmp,NZ)*WGLFE(K,NB,ielmc,NZ)
-          XFRP1=AZMAX1(AMIN1(1.0E-03*PPOOLD/CPOOLT,WGLFE(K,NB,ielmp,NZ) &
-            -ZPLFM*CPLFB*WGLFE(K,NB,ielmc,NZ)))
+          ZPOOLD=WGLFE(ielmn,K,NB,NZ)*EPOOL(ielmc,NB,NZ) &
+            -EPOOL(ielmn,NB,NZ)*WGLFE(ielmc,K,NB,NZ)
+          XFRN1=AZMAX1(AMIN1(1.0E-03_r8*ZPOOLD/CPOOLT,WGLFE(ielmn,K,NB,NZ) &
+            -ZPLFM*CNLFB*WGLFE(ielmc,K,NB,NZ)))
+          PPOOLD=WGLFE(ielmp,K,NB,NZ)*EPOOL(ielmc,NB,NZ) &
+            -EPOOL(ielmp,NB,NZ)*WGLFE(ielmc,K,NB,NZ)
+          XFRP1=AZMAX1(AMIN1(1.0E-03*PPOOLD/CPOOLT,WGLFE(ielmp,K,NB,NZ) &
+            -ZPLFM*CPLFB*WGLFE(ielmc,K,NB,NZ)))
           XFRE(ielmn)=AMAX1(XFRN1,10.0_r8*XFRP1)
           XFRE(ielmp)=AMAX1(XFRP1,0.10_r8*XFRN1)
           DO NE=2,npelms
-            WGLFE(K,NB,NE,NZ)=WGLFE(K,NB,NE,NZ)-XFRE(NE)
-            WTLFBE(NB,NE,NZ)=WTLFBE(NB,NE,NZ)-XFRE(NE)
-            EPOOL(NB,NE,NZ)=EPOOL(NB,NE,NZ)+XFRE(NE)
+            WGLFE(NE,K,NB,NZ)=WGLFE(NE,K,NB,NZ)-XFRE(NE)
+            WTLFBE(NE,NB,NZ)=WTLFBE(NE,NB,NZ)-XFRE(NE)
+            EPOOL(NE,NB,NZ)=EPOOL(NE,NB,NZ)+XFRE(NE)
           ENDDO
           WSLF(K,NB,NZ)=AZMAX1(WSLF(K,NB,NZ)-AMAX1(XFRE(ielmn)*CNWS(NZ),XFRE(ielmp)*CPWS(NZ)))
         ENDIF
@@ -1042,7 +1042,7 @@ module PlantBranchMod
 !     XFRX=maximum storage C content for remobiln from stalk,root reserves
 !
   IF(IDAY(2,NB,NZ).NE.0)THEN
-    IF(WTRSVBE(NB,ielmc,NZ).LT.XFRX*WVSTKB(NB,NZ))THEN
+    IF(WTRSVBE(ielmc,NB,NZ).LT.XFRX*WVSTKB(NB,NZ))THEN
       D1020: DO N=1,JPRT
         IF(N.NE.4)THEN
           PART(4)=PART(4)+0.10*PART(N)
@@ -1052,7 +1052,7 @@ module PlantBranchMod
 !
 !     REDIRECT FROM STALK RESERVES TO STALK IF RESERVES BECOME TOO LARGE
 !
-    ELSEIF(WTRSVBE(NB,ielmc,NZ).GT.1.0*WVSTKB(NB,NZ))THEN
+    ELSEIF(WTRSVBE(ielmc,NB,NZ).GT.1.0*WVSTKB(NB,NZ))THEN
       PART(3)=PART(3)+PART(4)+PART(7)
       PART(4)=0._r8
       PART(7)=0._r8
@@ -1190,9 +1190,9 @@ module PlantBranchMod
 !   RNH3B=NH3 flux between atmosphere and branch from uptake.f
 !   XFRE(ielmc),XFRE(ielmn),XFRE(ielmp)=branch-root layer C,N,P transfer
 !
-  EPOOL(NB,ielmc,NZ)=EPOOL(NB,ielmc,NZ)+CH2O-AMIN1(RMNCS,RCO2C)-CGROS-CNRDA
-  EPOOL(NB,ielmn,NZ)=EPOOL(NB,ielmn,NZ)-ZADDB+RNH3B(NB,NZ)
-  EPOOL(NB,ielmp,NZ)=EPOOL(NB,ielmp,NZ)-PADDB
+  EPOOL(ielmc,NB,NZ)=EPOOL(ielmc,NB,NZ)+CH2O-AMIN1(RMNCS,RCO2C)-CGROS-CNRDA
+  EPOOL(ielmn,NB,NZ)=EPOOL(ielmn,NB,NZ)-ZADDB+RNH3B(NB,NZ)
+  EPOOL(ielmp,NB,NZ)=EPOOL(ielmp,NB,NZ)-PADDB
   end associate
   end subroutine UpdatePhotosynthates
 !------------------------------------------------------------------------------------------
@@ -1220,7 +1220,7 @@ module PlantBranchMod
     CO2L    =>  plt_photo%CO2L        &
   )
   D170: DO K=1,JNODS1
-    IF(WGLFE(K,NB,ielmc,NZ).GT.ZEROP(NZ))THEN
+    IF(WGLFE(ielmc,K,NB,NZ).GT.ZEROP(NZ))THEN
 !
 !     MESOPHYLL TO BUNDLE SHEATH TRANSFER
 !
@@ -1232,9 +1232,9 @@ module PlantBranchMod
 !
       CPOOL3(K,NB,NZ)=CPOOL3(K,NB,NZ)-CH2O3(K)
       CPOOL4(K,NB,NZ)=CPOOL4(K,NB,NZ)+CH2O4(K)
-      CPL4M=1.0_r8*(CPOOL4(K,NB,NZ)*WGLFE(K,NB,ielmc,NZ)*FBS &
-        -CPOOL3(K,NB,NZ)*WGLFE(K,NB,ielmc,NZ)*FMP) &
-        /(WGLFE(K,NB,ielmc,NZ)*(FBS+FMP))
+      CPL4M=1.0_r8*(CPOOL4(K,NB,NZ)*WGLFE(ielmc,K,NB,NZ)*FBS &
+        -CPOOL3(K,NB,NZ)*WGLFE(ielmc,K,NB,NZ)*FMP) &
+        /(WGLFE(ielmc,K,NB,NZ)*(FBS+FMP))
       CPOOL4(K,NB,NZ)=CPOOL4(K,NB,NZ)-CPL4M
       CPOOL3(K,NB,NZ)=CPOOL3(K,NB,NZ)+CPL4M
 !
@@ -1249,7 +1249,7 @@ module PlantBranchMod
 !     FCO2B,FHCOB=partition decarboxylation to CO2,HCO3
 !     CPOOL3=C4 nonstructural C mass in bundle sheath
 !
-      CCBS=AZMAX1(0.083E+09*CO2B(K,NB,NZ)/(WGLFE(K,NB,ielmc,NZ)*FBS))
+      CCBS=AZMAX1(0.083E+09*CO2B(K,NB,NZ)/(WGLFE(ielmc,K,NB,NZ)*FBS))
       CPL3K=2.5E-02*CPOOL3(K,NB,NZ)/(1.0+CCBS/CO2KI)
       CPOOL3(K,NB,NZ)=CPOOL3(K,NB,NZ)-CPL3K
       CO2B(K,NB,NZ)=CO2B(K,NB,NZ)+FCO2B*CPL3K
@@ -1265,7 +1265,7 @@ module PlantBranchMod
 !     FCO2B,FHCOB=partition decarboxylation to CO2,HCO3
 !     CO2B,HCOB=aqueous CO2,HCO3-C mass in bundle sheath
 !
-      CO2LK=5.0E-07*(CCBS-CO2L(NZ))*WGLFE(K,NB,ielmc,NZ)*FBS
+      CO2LK=5.0E-07*(CCBS-CO2L(NZ))*WGLFE(ielmc,K,NB,NZ)*FBS
       CO2B(K,NB,NZ)=CO2B(K,NB,NZ)-FCO2B*CO2LK
       HCOB(K,NB,NZ)=HCOB(K,NB,NZ)-FHCOB*CO2LK
 
@@ -1380,13 +1380,13 @@ module PlantBranchMod
     !       RCCC,RCCN,RCCP=remobilization coefficient for C,N,P
     !       RCCZ,RCCY=min,max fractions for shoot C recycling
     !
-      IF(WGLFE(K,NB,ielmc,NZ).GT.ZEROP(NZ))THEN
-        FNCLF=WGLFE(K,NB,ielmc,NZ)/(WGLFE(K,NB,ielmc,NZ)+WGSHE(K,NB,ielmc,NZ))
+      IF(WGLFE(ielmc,K,NB,NZ).GT.ZEROP(NZ))THEN
+        FNCLF=WGLFE(ielmc,K,NB,NZ)/(WGLFE(ielmc,K,NB,NZ)+WGSHE(ielmc,K,NB,NZ))
         SNCLF=FNCLF*SNCT
         SNCSH=SNCT-SNCLF
-        RCEL(ielmc)=RCCC*WGLFE(K,NB,ielmc,NZ)
-        RCEL(ielmn)=WGLFE(K,NB,ielmn,NZ)*(RCCN+(1.0_r8-RCCN)*RCCC)
-        RCEL(ielmp)=WGLFE(K,NB,ielmp,NZ)*(RCCP+(1.0_r8-RCCP)*RCCC)
+        RCEL(ielmc)=RCCC*WGLFE(ielmc,K,NB,NZ)
+        RCEL(ielmn)=WGLFE(ielmn,K,NB,NZ)*(RCCN+(1.0_r8-RCCN)*RCCC)
+        RCEL(ielmp)=WGLFE(ielmp,K,NB,NZ)*(RCCP+(1.0_r8-RCCP)*RCCC)
 !
     !         FRACTION OF CURRENT LEAF TO BE REMOBILIZED
     !
@@ -1414,15 +1414,15 @@ module PlantBranchMod
         !
         DO NE=1,npelms
           D6310: DO M=1,jsken
-            ESNC(M,NE,k_woody_litr,0,NZ)=ESNC(M,NE,k_woody_litr,0,NZ)+CFOPE(icwood,M,NE,NZ) &
-              *FSNCL*(WGLFE(K,NB,NE,NZ)-RCEL(NE))*FWODLE(NE,k_woody_litr)
+            ESNC(NE,M,k_woody_litr,0,NZ)=ESNC(NE,M,k_woody_litr,0,NZ)+CFOPE(NE,icwood,M,NZ) &
+              *FSNCL*(WGLFE(NE,K,NB,NZ)-RCEL(NE))*FWODLE(NE,k_woody_litr)
 
-            ESNC(M,NE,k_fine_litr,0,NZ)=ESNC(M,NE,k_fine_litr,0,NZ)+CFOPE(ifoliar,M,NE,NZ) &
-              *FSNCL*(WGLFE(K,NB,NE,NZ)-RCEL(NE))*FWODLE(NE,k_fine_litr)
+            ESNC(NE,M,k_fine_litr,0,NZ)=ESNC(NE,M,k_fine_litr,0,NZ)+CFOPE(NE,ifoliar,M,NZ) &
+              *FSNCL*(WGLFE(NE,K,NB,NZ)-RCEL(NE))*FWODLE(NE,k_fine_litr)
           ENDDO D6310
         ENDDO
         IF(K.NE.0)THEN
-          ESNC(icarbhyro,ielmc,k_fine_litr,0,NZ)=ESNC(icarbhyro,ielmc,k_fine_litr,0,NZ) &
+          ESNC(ielmc,icarbhyro,k_fine_litr,0,NZ)=ESNC(ielmc,icarbhyro,k_fine_litr,0,NZ) &
             +FSNCL*(CPOOL3(K,NB,NZ)+CPOOL4(K,NB,NZ))
           CPOOL3(K,NB,NZ)=CPOOL3(K,NB,NZ)-FSNCL*CPOOL3(K,NB,NZ)
           CPOOL4(K,NB,NZ)=CPOOL4(K,NB,NZ)-FSNCL*CPOOL4(K,NB,NZ)
@@ -1440,12 +1440,12 @@ module PlantBranchMod
         ARLF1(K,NB,NZ)=ARLF1(K,NB,NZ)-FSNAL*ARLF1(K,NB,NZ)
 
         DO NE=1,npelms
-          WTLFBE(NB,NE,NZ)=AZMAX1(WTLFBE(NB,NE,NZ)-FSNCL*WGLFE(K,NB,NE,NZ))
-          WGLFE(K,NB,NE,NZ)=WGLFE(K,NB,NE,NZ)-FSNCL*WGLFE(K,NB,NE,NZ)
+          WTLFBE(NE,NB,NZ)=AZMAX1(WTLFBE(NE,NB,NZ)-FSNCL*WGLFE(NE,K,NB,NZ))
+          WGLFE(NE,K,NB,NZ)=WGLFE(NE,K,NB,NZ)-FSNCL*WGLFE(NE,K,NB,NZ)
         ENDDO
         WSLF(K,NB,NZ)=AZMAX1(WSLF(K,NB,NZ) &
-          -FSNCL*AMAX1(WGLFE(K,NB,ielmn,NZ)*CNWS(NZ) &
-          ,WGLFE(K,NB,ielmp,NZ)*CPWS(NZ)))
+          -FSNCL*AMAX1(WGLFE(ielmn,K,NB,NZ)*CNWS(NZ) &
+          ,WGLFE(ielmp,K,NB,NZ)*CPWS(NZ)))
 !
 !     FRACTION OF C REMOBILIZED FOR GROWTH RESPIRATION < 0 IS
 !     RESPIRED AND NOT TRANSFERRED TO NON-STRUCTURAL POOLS
@@ -1455,14 +1455,14 @@ module PlantBranchMod
 !     RCEL(ielmc),RCEL(ielmn),RCEL(ielmp)=remobilization of C,N,P from senescing leaf
 !     SNCLF,SNCT=remaining senescence respiration carried to next node
 !
-        EPOOL(NB,ielmc,NZ)=EPOOL(NB,ielmc,NZ)+FSNCL*RCEL(ielmc)*SNCF
+        EPOOL(ielmc,NB,NZ)=EPOOL(ielmc,NB,NZ)+FSNCL*RCEL(ielmc)*SNCF
         DO NE=2,npelms
-          EPOOL(NB,NE,NZ)=EPOOL(NB,NE,NZ)+FSNCL*RCEL(NE)
+          EPOOL(NE,NB,NZ)=EPOOL(NE,NB,NZ)+FSNCL*RCEL(NE)
         ENDDO
         SNCLF=SNCLF-FSNCL*RCEL(ielmc)
         SNCT=SNCT-FSNCL*RCEL(ielmc)
-        IF(WTLFBE(NB,ielmc,NZ).LE.ZEROL(NZ))THEN
-          WTLFBE(NB,ielmc,NZ)=0._r8
+        IF(WTLFBE(ielmc,NB,NZ).LE.ZEROL(NZ))THEN
+          WTLFBE(ielmc,NB,NZ)=0._r8
           ARLFB(NB,NZ)=0._r8
         ENDIF
       !
@@ -1485,27 +1485,27 @@ module PlantBranchMod
       ELSE
         DO NE=1,npelms
           D6315: DO M=1,jsken
-            ESNC(M,NE,k_woody_litr,0,NZ)=ESNC(M,NE,k_woody_litr,0,NZ)+CFOPE(icwood,M,NE,NZ) &
-              *WGLFE(K,NB,NE,NZ)*FWODLE(NE,k_woody_litr)
+            ESNC(NE,M,k_woody_litr,0,NZ)=ESNC(NE,M,k_woody_litr,0,NZ)+CFOPE(NE,icwood,M,NZ) &
+              *WGLFE(NE,K,NB,NZ)*FWODLE(NE,k_woody_litr)
 
-            ESNC(M,NE,k_fine_litr,0,NZ)=ESNC(M,NE,k_fine_litr,0,NZ)+CFOPE(ifoliar,M,NE,NZ) &
-              *WGLFE(K,NB,NE,NZ)*FWODLE(NE,k_fine_litr)
+            ESNC(NE,M,k_fine_litr,0,NZ)=ESNC(NE,M,k_fine_litr,0,NZ)+CFOPE(NE,ifoliar,M,NZ) &
+              *WGLFE(NE,K,NB,NZ)*FWODLE(NE,k_fine_litr)
           ENDDO D6315
         ENDDO
         IF(K.NE.0)THEN
-          ESNC(icarbhyro,ielmc,k_fine_litr,0,NZ)=ESNC(icarbhyro,ielmc,k_fine_litr,0,NZ)+CPOOL3(K,NB,NZ)+CPOOL4(K,NB,NZ)
+          ESNC(ielmc,icarbhyro,k_fine_litr,0,NZ)=ESNC(ielmc,icarbhyro,k_fine_litr,0,NZ)+CPOOL3(K,NB,NZ)+CPOOL4(K,NB,NZ)
           CPOOL3(K,NB,NZ)=0._r8
           CPOOL4(K,NB,NZ)=0._r8
         ENDIF
         ARLFB(NB,NZ)=AZMAX1(ARLFB(NB,NZ)-ARLF1(K,NB,NZ))
         DO NE=1,npelms
-          WTLFBE(NB,NE,NZ)=AZMAX1(WTLFBE(NB,NE,NZ)-WGLFE(K,NB,NE,NZ))
-          WGLFE(K,NB,NE,NZ)=0._r8
+          WTLFBE(NE,NB,NZ)=AZMAX1(WTLFBE(NE,NB,NZ)-WGLFE(NE,K,NB,NZ))
+          WGLFE(NE,K,NB,NZ)=0._r8
         ENDDO
         ARLF1(K,NB,NZ)=0._r8
         WSLF(K,NB,NZ)=0._r8
-        IF(WTLFBE(NB,ielmc,NZ).LE.ZEROL(NZ))THEN
-          WTLFBE(NB,ielmc,NZ)=0._r8
+        IF(WTLFBE(ielmc,NB,NZ).LE.ZEROL(NZ))THEN
+          WTLFBE(ielmc,NB,NZ)=0._r8
           ARLFB(NB,NZ)=0._r8
         ENDIF
       ENDIF
@@ -1518,10 +1518,10 @@ module PlantBranchMod
     !     RCES(ielmc),RCES(ielmn),RCES(ielmp)=remobilization of C,N,P from senescing petiole
     !     RCCC,RCCN,RCCP=remobilization coefficient for C,N,P
     !
-      IF(WGSHE(K,NB,ielmc,NZ).GT.ZEROP(NZ))THEN
-        RCES(ielmc)=WGSHE(K,NB,ielmc,NZ)*RCCC
-        RCES(ielmn)=WGSHE(K,NB,ielmn,NZ)*(RCCN+(1.0_r8-RCCN)*RCCC)
-        RCES(ielmp)=WGSHE(K,NB,ielmp,NZ)*(RCCP+(1.0_r8-RCCP)*RCCC)
+      IF(WGSHE(ielmc,K,NB,NZ).GT.ZEROP(NZ))THEN
+        RCES(ielmc)=WGSHE(ielmc,K,NB,NZ)*RCCC
+        RCES(ielmn)=WGSHE(ielmn,K,NB,NZ)*(RCCN+(1.0_r8-RCCN)*RCCC)
+        RCES(ielmp)=WGSHE(ielmp,K,NB,NZ)*(RCCP+(1.0_r8-RCCP)*RCCC)
 !
       !     FRACTION OF REMOBILIZATION THAT CAN BE MET FROM CURRENT SHEATH
       !     OR PETIOLE
@@ -1549,13 +1549,13 @@ module PlantBranchMod
       !
         DO NE=1,npelms
           D6320: DO M=1,jsken
-            ESNC(M,NE,k_woody_litr,0,NZ)=ESNC(M,NE,k_woody_litr,0,NZ)+CFOPE(icwood,M,NE,NZ) &
-              *FSNCS*(WGSHE(K,NB,NE,NZ)-RCES(NE))*FWODBE(NE,k_woody_litr)
-            ESNC(M,NE,k_fine_litr,0,NZ)=ESNC(M,NE,k_fine_litr,0,NZ)+CFOPE(infoliar,M,NE,NZ) &
-              *FSNCS*(WGSHE(K,NB,NE,NZ)-RCES(NE))*FWODBE(NE,k_fine_litr)
+            ESNC(NE,M,k_woody_litr,0,NZ)=ESNC(NE,M,k_woody_litr,0,NZ)+CFOPE(NE,icwood,M,NZ) &
+              *FSNCS*(WGSHE(NE,K,NB,NZ)-RCES(NE))*FWODBE(NE,k_woody_litr)
+            ESNC(NE,M,k_fine_litr,0,NZ)=ESNC(NE,M,k_fine_litr,0,NZ)+CFOPE(NE,infoliar,M,NZ) &
+              *FSNCS*(WGSHE(NE,K,NB,NZ)-RCES(NE))*FWODBE(NE,k_fine_litr)
           ENDDO D6320
-          WTSHEBE(NB,NE,NZ)=AZMAX1(WTSHEBE(NB,NE,NZ)-FSNCS*WGSHE(K,NB,NE,NZ))
-          WGSHE(K,NB,NE,NZ)=WGSHE(K,NB,NE,NZ)-FSNCS*WGSHE(K,NB,NE,NZ)
+          WTSHEBE(NE,NB,NZ)=AZMAX1(WTSHEBE(NE,NB,NZ)-FSNCS*WGSHE(NE,K,NB,NZ))
+          WGSHE(NE,K,NB,NZ)=WGSHE(NE,K,NB,NZ)-FSNCS*WGSHE(NE,K,NB,NZ)
         ENDDO
 !
       !     UPDATE STATE VARIABLES FOR REMOBILIZATION AND LITTERFALL
@@ -1569,8 +1569,8 @@ module PlantBranchMod
 
         HTSHE(K,NB,NZ)=HTSHE(K,NB,NZ)-FSNAS*HTSHE(K,NB,NZ)
         WSSHE(K,NB,NZ)=AZMAX1(WSSHE(K,NB,NZ) &
-          -FSNCS*AMAX1(WGSHE(K,NB,ielmn,NZ)*CNWS(NZ) &
-          ,WGSHE(K,NB,ielmp,NZ)*CPWS(NZ)))
+          -FSNCS*AMAX1(WGSHE(ielmn,K,NB,NZ)*CNWS(NZ) &
+          ,WGSHE(ielmp,K,NB,NZ)*CPWS(NZ)))
 !
 !     FRACTION OF C REMOBILIZED FOR GROWTH RESPIRATION < 0 IS
   !     RESPIRED AND NOT TRANSFERRED TO NON-STRUCTURAL POOLS
@@ -1580,14 +1580,14 @@ module PlantBranchMod
   !     RCES(ielmc),RCES(ielmn),RCES(ielmp)=remobilization of C,N,P from senescing petiole
   !     SNCSH,SNCT=remaining senescence respiration carried to next node
   !
-        EPOOL(NB,ielmc,NZ)=EPOOL(NB,ielmc,NZ)+FSNCS*RCES(ielmc)*SNCF
+        EPOOL(ielmc,NB,NZ)=EPOOL(ielmc,NB,NZ)+FSNCS*RCES(ielmc)*SNCF
         DO NE=2,npelms
-          EPOOL(NB,NE,NZ)=EPOOL(NB,NE,NZ)+FSNCS*RCES(NE)
+          EPOOL(NE,NB,NZ)=EPOOL(NE,NB,NZ)+FSNCS*RCES(NE)
         ENDDO
         SNCSH=SNCSH-FSNCS*RCES(ielmc)
         SNCT=SNCT-FSNCS*RCES(ielmc)
-        IF(WTSHEBE(NB,ielmc,NZ).LE.ZEROL(NZ))THEN
-          WTSHEBE(NB,ielmc,NZ)=0._r8
+        IF(WTSHEBE(ielmc,NB,NZ).LE.ZEROL(NZ))THEN
+          WTSHEBE(ielmc,NB,NZ)=0._r8
         ENDIF
 !
   !     EXIT LOOP IF REMOBILIZATION REQUIREMENT HAS BEEN MET
@@ -1608,18 +1608,18 @@ module PlantBranchMod
       ELSE
         DO NE=1,npelms
           D6325: DO M=1,jsken
-            ESNC(M,NE,k_woody_litr,0,NZ)=ESNC(M,NE,k_woody_litr,0,NZ)+CFOPE(icwood,M,NE,NZ) &
-              *WGSHE(K,NB,NE,NZ)*FWODBE(NE,k_woody_litr)
-            ESNC(M,NE,k_fine_litr,0,NZ)=ESNC(M,NE,k_fine_litr,0,NZ)+CFOPE(infoliar,M,NE,NZ) &
-              *WGSHE(K,NB,NE,NZ)*FWODBE(NE,k_fine_litr)
+            ESNC(NE,M,k_woody_litr,0,NZ)=ESNC(NE,M,k_woody_litr,0,NZ)+CFOPE(NE,icwood,M,NZ) &
+              *WGSHE(NE,K,NB,NZ)*FWODBE(NE,k_woody_litr)
+            ESNC(NE,M,k_fine_litr,0,NZ)=ESNC(NE,M,k_fine_litr,0,NZ)+CFOPE(NE,infoliar,M,NZ) &
+              *WGSHE(NE,K,NB,NZ)*FWODBE(NE,k_fine_litr)
           ENDDO D6325
-          WTSHEBE(NB,NE,NZ)=AZMAX1(WTSHEBE(NB,NE,NZ)-WGSHE(K,NB,NE,NZ))
-          WGSHE(K,NB,NE,NZ)=0._r8
+          WTSHEBE(NE,NB,NZ)=AZMAX1(WTSHEBE(NE,NB,NZ)-WGSHE(NE,K,NB,NZ))
+          WGSHE(NE,K,NB,NZ)=0._r8
         ENDDO
         HTSHE(K,NB,NZ)=0._r8
         WSSHE(K,NB,NZ)=0._r8
-        IF(WTSHEBE(NB,ielmc,NZ).LE.ZEROL(NZ))THEN
-          WTSHEBE(NB,ielmc,NZ)=0._r8
+        IF(WTSHEBE(ielmc,NB,NZ).LE.ZEROL(NZ))THEN
+          WTSHEBE(ielmc,NB,NZ)=0._r8
         ENDIF
       ENDIF
     ENDDO D650
@@ -1631,8 +1631,8 @@ module PlantBranchMod
 !     WTRSVB=stalk reserve C mass
 !     SNCR=excess maintenance respiration
 !
-    IF(WTRSVBE(NB,ielmc,NZ).GT.SNCR)THEN
-      WTRSVBE(NB,ielmc,NZ)=WTRSVBE(NB,ielmc,NZ)-SNCR
+    IF(WTRSVBE(ielmc,NB,NZ).GT.SNCR)THEN
+      WTRSVBE(ielmc,NB,NZ)=WTRSVBE(ielmc,NB,NZ)-SNCR
       SNCR=0._r8
       cycle
     ENDIF
@@ -1651,9 +1651,9 @@ module PlantBranchMod
     SNCZ=FXFS*SNCR
     SNCT=SNCR+SNCZ
     IF(ISTYP(NZ).NE.iplt_annual.AND.SNCT.GT.ZEROP(NZ) &
-      .AND.WTSTKBE(NB,ielmc,NZ).GT.ZEROP(NZ))THEN
+      .AND.WTSTKBE(ielmc,NB,NZ).GT.ZEROP(NZ))THEN
       SNCF=SNCZ/SNCT
-      FRCC=WVSTKB(NB,NZ)/WTSTKBE(NB,ielmc,NZ)
+      FRCC=WVSTKB(NB,NZ)/WTSTKBE(ielmc,NB,NZ)
       RCSC=RCCC*FRCC
       RCSN=RCCN*FRCC
       RCSP=RCCP*FRCC
@@ -1669,10 +1669,10 @@ module PlantBranchMod
     !     RCEK(ielmc),RCEK(ielmn),RCEK(ielmp)=remobilization of C,N,P from senescing internode
     !     WGNODE,WGNODN,WGNODP=node stalk C,N,P mass
     !
-        IF(WGNODE(K,NB,ielmc,NZ).GT.ZEROP(NZ))THEN
-          RCEK(ielmc)=WGNODE(K,NB,ielmc,NZ)*RCSC
-          RCEK(ielmn)=WGNODE(K,NB,ielmn,NZ)*(RCSN+(1.0_r8-RCSN)*RCSC)
-          RCEK(ielmp)=WGNODE(K,NB,ielmp,NZ)*(RCSP+(1.0_r8-RCSP)*RCSC)
+        IF(WGNODE(ielmc,K,NB,NZ).GT.ZEROP(NZ))THEN
+          RCEK(ielmc)=WGNODE(ielmc,K,NB,NZ)*RCSC
+          RCEK(ielmn)=WGNODE(ielmn,K,NB,NZ)*(RCSN+(1.0_r8-RCSN)*RCSC)
+          RCEK(ielmp)=WGNODE(ielmp,K,NB,NZ)*(RCSP+(1.0_r8-RCSP)*RCSC)
     !
       !     FRACTION OF CURRENT NODE TO BE REMOBILIZED
       !
@@ -1695,11 +1695,11 @@ module PlantBranchMod
 !
           DO NE=1,npelms
             D7310: DO M=1,jsken
-              ESNC(M,NE,k_woody_litr,0,NZ)=ESNC(M,NE,k_woody_litr,0,NZ)+CFOPE(istalk,M,NE,NZ) &
-                *FSNCK*(WGNODE(K,NB,NE,NZ)-RCEK(NE))*FWOODE(NE,k_woody_litr)
+              ESNC(NE,M,k_woody_litr,0,NZ)=ESNC(NE,M,k_woody_litr,0,NZ)+CFOPE(NE,istalk,M,NZ) &
+                *FSNCK*(WGNODE(NE,K,NB,NZ)-RCEK(NE))*FWOODE(NE,k_woody_litr)
 
-              ESNC(M,NE,k_fine_litr,0,NZ)=ESNC(M,NE,k_woody_litr,0,NZ)+CFOPE(istalk,M,NE,NZ) &
-                *FSNCK*(WGNODE(K,NB,NE,NZ)-RCEK(NE))*FWOODE(NE,k_fine_litr)
+              ESNC(NE,M,k_fine_litr,0,NZ)=ESNC(NE,M,k_woody_litr,0,NZ)+CFOPE(NE,istalk,M,NZ) &
+                *FSNCK*(WGNODE(NE,K,NB,NZ)-RCEK(NE))*FWOODE(NE,k_fine_litr)
             ENDDO D7310
 
 !
@@ -1709,8 +1709,8 @@ module PlantBranchMod
       !     HTNODE,HTNODX=living,senescing internode length
       !     WTSTKB,WTSTBN,WTSTBP,WGNODE,WGNODN,WGNODP=C,N,P mass in senescing internode
       !
-            WTSTKBE(NB,NE,NZ)=AZMAX1(WTSTKBE(NB,NE,NZ)-FSNCK*WGNODE(K,NB,NE,NZ))
-            WGNODE(K,NB,NE,NZ)=WGNODE(K,NB,NE,NZ)-FSNCK*WGNODE(K,NB,NE,NZ)
+            WTSTKBE(NE,NB,NZ)=AZMAX1(WTSTKBE(NE,NB,NZ)-FSNCK*WGNODE(NE,K,NB,NZ))
+            WGNODE(NE,K,NB,NZ)=WGNODE(NE,K,NB,NZ)-FSNCK*WGNODE(NE,K,NB,NZ)
           ENDDO
           HTNODE(K,NB,NZ)=HTNODE(K,NB,NZ)-FSNCK*HTNODX(K,NB,NZ)
           HTNODX(K,NB,NZ)=HTNODX(K,NB,NZ)-FSNCK*HTNODX(K,NB,NZ)
@@ -1723,9 +1723,9 @@ module PlantBranchMod
       !     FSNCK=fraction of lowest internode to be remobilized
       !     SNCT=remaining node senescence respiration
       !
-          WTRSVBE(NB,ielmc,NZ)=WTRSVBE(NB,ielmc,NZ)+FSNCK*RCEK(ielmc)*SNCF
+          WTRSVBE(ielmc,NB,NZ)=WTRSVBE(ielmc,NB,NZ)+FSNCK*RCEK(ielmc)*SNCF
           DO NE=2,npelms
-            WTRSVBE(NB,NE,NZ)=WTRSVBE(NB,NE,NZ)+FSNCK*RCEK(NE)
+            WTRSVBE(NE,NB,NZ)=WTRSVBE(NE,NB,NZ)+FSNCK*RCEK(NE)
           ENDDO
           SNCT=SNCT-FSNCK*RCEK(ielmc)
     !
@@ -1743,14 +1743,14 @@ module PlantBranchMod
         ELSE
           DO NE=1,npelms
             D7315: DO M=1,jsken
-              ESNC(M,NE,k_woody_litr,0,NZ)=ESNC(M,NE,k_woody_litr,0,NZ)+CFOPE(istalk,M,NE,NZ) &
-                *WGNODE(K,NB,NE,NZ)*FWOODE(NE,k_woody_litr)
+              ESNC(NE,M,k_woody_litr,0,NZ)=ESNC(NE,M,k_woody_litr,0,NZ)+CFOPE(NE,istalk,M,NZ) &
+                *WGNODE(NE,K,NB,NZ)*FWOODE(NE,k_woody_litr)
 
-              ESNC(M,NE,k_fine_litr,0,NZ)=ESNC(M,NE,k_woody_litr,0,NZ)+CFOPE(istalk,M,NE,NZ) &
-                *WGNODE(K,NB,NE,NZ)*FWOODE(NE,k_fine_litr)
+              ESNC(NE,M,k_fine_litr,0,NZ)=ESNC(NE,M,k_woody_litr,0,NZ)+CFOPE(NE,istalk,M,NZ) &
+                *WGNODE(NE,K,NB,NZ)*FWOODE(NE,k_fine_litr)
             ENDDO D7315
-            WTSTKBE(NB,NE,NZ)=AZMAX1(WTSTKBE(NB,NE,NZ)-WGNODE(K,NB,NE,NZ))
-            WGNODE(K,NB,NE,NZ)=0._r8
+            WTSTKBE(NE,NB,NZ)=AZMAX1(WTSTKBE(NE,NB,NZ)-WGNODE(NE,K,NB,NZ))
+            WGNODE(NE,K,NB,NZ)=0._r8
           ENDDO
           HTNODE(K,NB,NZ)=HTNODE(K,NB,NZ)-HTNODX(K,NB,NZ)
           HTNODX(K,NB,NZ)=0._r8
@@ -1762,10 +1762,10 @@ module PlantBranchMod
     !   RCEK(ielmc),RCEK(ielmn),RCEK(ielmp)=remobilization of C,N,P from senescing internode
     !   WTSTXB,WTSTXN,WTSTXP=residual C,N,P mass in senescing stalk
     !
-      IF(WTSTXBE(NB,ielmc,NZ).GT.ZEROP(NZ))THEN
-        RCEK(ielmc)=WTSTXBE(NB,ielmc,NZ)*RCSC
-        RCEK(ielmn)=WTSTXBE(NB,ielmn,NZ)*(RCSN+(1.0_r8-RCSN)*RCSC)
-        RCEK(ielmp)=WTSTXBE(NB,ielmp,NZ)*(RCSP+(1.0_r8-RCSP)*RCSC)
+      IF(WTSTXBE(ielmc,NB,NZ).GT.ZEROP(NZ))THEN
+        RCEK(ielmc)=WTSTXBE(ielmc,NB,NZ)*RCSC
+        RCEK(ielmn)=WTSTXBE(ielmn,NB,NZ)*(RCSN+(1.0_r8-RCSN)*RCSC)
+        RCEK(ielmp)=WTSTXBE(ielmp,NB,NZ)*(RCSP+(1.0_r8-RCSP)*RCSC)
     !
     !     FRACTION OF RESIDUAL STALK TO BE REMOBILIZED
     !
@@ -1785,11 +1785,11 @@ module PlantBranchMod
     !
         DO NE=1,npelms
           D8310: DO M=1,jsken
-            ESNC(M,NE,k_woody_litr,0,NZ)=ESNC(M,NE,k_woody_litr,0,NZ)+CFOPE(istalk,M,NE,NZ) &
-              *FSNCR*(WTSTXBE(NB,NE,NZ)-RCEK(NE))*FWOODE(NE,k_woody_litr)
+            ESNC(NE,M,k_woody_litr,0,NZ)=ESNC(NE,M,k_woody_litr,0,NZ)+CFOPE(NE,istalk,M,NZ) &
+              *FSNCR*(WTSTXBE(NE,NB,NZ)-RCEK(NE))*FWOODE(NE,k_woody_litr)
 
-            ESNC(M,NE,k_fine_litr,0,NZ)=ESNC(M,NE,k_woody_litr,0,NZ)+CFOPE(istalk,M,NE,NZ) &
-              *FSNCR*(WTSTXBE(NB,NE,NZ)-RCEK(NE))*FWOODE(NE,k_fine_litr)
+            ESNC(NE,M,k_fine_litr,0,NZ)=ESNC(NE,M,k_woody_litr,0,NZ)+CFOPE(NE,istalk,M,NZ) &
+              *FSNCR*(WTSTXBE(NE,NB,NZ)-RCEK(NE))*FWOODE(NE,k_fine_litr)
           ENDDO D8310
 
     !
@@ -1800,9 +1800,9 @@ module PlantBranchMod
     !     WTSTXB,WTSTXN,WTSTXP=residual C,N,P mass in senescing stalk
     !     HTNODE,HTNODX=living,senescing internode length
     !
-          WTSTKBE(NB,NE,NZ)=AZMAX1(WTSTKBE(NB,NE,NZ)-FSNCR*WTSTXBE(NB,NE,NZ))
+          WTSTKBE(NE,NB,NZ)=AZMAX1(WTSTKBE(NE,NB,NZ)-FSNCR*WTSTXBE(NE,NB,NZ))
 
-          WTSTXBE(NB,NE,NZ)=AZMAX1(WTSTXBE(NB,NE,NZ)-FSNCR*WTSTXBE(NB,NE,NZ))
+          WTSTXBE(NE,NB,NZ)=AZMAX1(WTSTXBE(NE,NB,NZ)-FSNCR*WTSTXBE(NE,NB,NZ))
         ENDDO
         HTNODZ=0._r8
         D8320: DO K=0,JNODS1
@@ -1821,9 +1821,9 @@ module PlantBranchMod
     !     FSNCR=fraction of residual stalk to be remobilized
     !     SNCT=remaining node senescence respiration
     !
-        WTRSVBE(NB,ielmc,NZ)=WTRSVBE(NB,ielmc,NZ)+FSNCR*RCEK(ielmc)*SNCF
+        WTRSVBE(ielmc,NB,NZ)=WTRSVBE(ielmc,NB,NZ)+FSNCR*RCEK(ielmc)*SNCF
         DO NE=2,npelms
-          WTRSVBE(NB,NE,NZ)=WTRSVBE(NB,NE,NZ)+FSNCR*RCEK(NE)
+          WTRSVBE(NE,NB,NZ)=WTRSVBE(NE,NB,NZ)+FSNCR*RCEK(NE)
         ENDDO
         SNCT=SNCT-FSNCR*RCEK(ielmc)
       ENDIF
@@ -1841,14 +1841,14 @@ module PlantBranchMod
     ELSE
       DO NE=1,npelms
         D8315: DO M=1,jsken
-          ESNC(M,NE,k_woody_litr,0,NZ)=ESNC(M,NE,k_woody_litr,0,NZ)+CFOPE(istalk,M,NE,NZ) &
-            *WTSTXBE(NB,NE,NZ)*FWOODE(NE,k_woody_litr)
+          ESNC(NE,M,k_woody_litr,0,NZ)=ESNC(NE,M,k_woody_litr,0,NZ)+CFOPE(NE,istalk,M,NZ) &
+            *WTSTXBE(NE,NB,NZ)*FWOODE(NE,k_woody_litr)
 
-          ESNC(M,NE,k_fine_litr,0,NZ)=ESNC(M,NE,k_woody_litr,0,NZ)+CFOPE(istalk,M,NE,NZ) &
-            *WTSTXBE(NB,NE,NZ)*FWOODE(NE,k_fine_litr)
+          ESNC(NE,M,k_fine_litr,0,NZ)=ESNC(NE,M,k_woody_litr,0,NZ)+CFOPE(NE,istalk,M,NZ) &
+            *WTSTXBE(NE,NB,NZ)*FWOODE(NE,k_fine_litr)
         ENDDO D8315
-        WTSTKBE(NB,NE,NZ)=AZMAX1(WTSTKBE(NB,NE,NZ)-WTSTXBE(NB,NE,NZ))
-        WTSTXBE(NB,NE,NZ)=0._r8
+        WTSTKBE(NE,NB,NZ)=AZMAX1(WTSTKBE(NE,NB,NZ)-WTSTXBE(NE,NB,NZ))
+        WTSTXBE(NE,NB,NZ)=0._r8
       ENDDO
     ENDIF
 !
@@ -1943,7 +1943,7 @@ module PlantBranchMod
     D540: DO K=0,JNODS1
       DO  L=1,JC1
         ARLFL(L,K,NB,NZ)=0._r8
-        WGLFLE(L,K,NB,1:npelms,NZ)=0._r8
+        WGLFLE(1:npelms,L,K,NB,NZ)=0._r8
       enddo
     ENDDO D540
     D535: DO L=1,JC1
@@ -2040,7 +2040,7 @@ module PlantBranchMod
           ENDIF
           YARLF=FRACL*ARLF1(K,NB,NZ)
           DO NE=1,npelms
-            YWGLFE(NE)=FRACL*WGLFE(K,NB,NE,NZ)
+            YWGLFE(NE)=FRACL*WGLFE(NE,K,NB,NZ)
           ENDDO
 !
     !     ACCUMULATE LAYER LEAF AREAS, C, N AND P CONTENTS
@@ -2052,7 +2052,7 @@ module PlantBranchMod
     !
           ARLFL(L,K,NB,NZ)=ARLFL(L,K,NB,NZ)+YARLF
           DO NE=1,npelms
-            WGLFLE(L,K,NB,NE,NZ)=WGLFLE(L,K,NB,NE,NZ)+YWGLFE(NE)
+            WGLFLE(NE,L,K,NB,NZ)=WGLFLE(NE,L,K,NB,NZ)+YWGLFE(NE)
           ENDDO
           ARLFV(L,NZ)=ARLFV(L,NZ)+YARLF
           WGLFV(L,NZ)=WGLFV(L,NZ)+YWGLFE(ielmc)
@@ -2106,10 +2106,10 @@ module PlantBranchMod
           LL=1
         ENDIF
       ENDDO D545
-      RSTK=SQRT(VSTK*(AZMAX1(WTSTKBE(NB,ielmc,NZ))/PP(NZ))/(PICON*HTNODE(K1,NB,NZ)))
+      RSTK=SQRT(VSTK*(AZMAX1(WTSTKBE(ielmc,NB,NZ))/PP(NZ))/(PICON*HTNODE(K1,NB,NZ)))
       ARSTKB=PICON*HTNODE(K1,NB,NZ)*PP(NZ)*RSTK
       IF(ISTYP(NZ).EQ.iplt_annual)THEN
-        WVSTKB(NB,NZ)=WTSTKBE(NB,ielmc,NZ)
+        WVSTKB(NB,NZ)=WTSTKBE(ielmc,NB,NZ)
       ELSE
         ZSTK=AMIN1(ZSTX,FSTK*RSTK)
         ASTV=PICON*(2.0_r8*RSTK*ZSTK-ZSTK**2)
@@ -2290,9 +2290,9 @@ module PlantBranchMod
 !   DGSTGF=change in reproductive node number normalized for maturity group
 !
   IF(IDAY(6,NB,NZ).NE.0.AND.IDAY(9,NB,NZ).EQ.0)THEN
-    SET=AMIN1(CEPOLB(NB,ielmc,NZ)/(CEPOLB(NB,ielmc,NZ)+SETC) &
-      ,CEPOLB(NB,ielmn,NZ)/(CEPOLB(NB,ielmn,NZ)+SETN) &
-      ,CEPOLB(NB,ielmp,NZ)/(CEPOLB(NB,ielmp,NZ)+SETP))
+    SET=AMIN1(CEPOLB(ielmc,NB,NZ)/(CEPOLB(ielmc,NB,NZ)+SETC) &
+      ,CEPOLB(ielmn,NB,NZ)/(CEPOLB(ielmn,NB,NZ)+SETN) &
+      ,CEPOLB(ielmp,NB,NZ)/(CEPOLB(ielmp,NB,NZ)+SETP))
     IF(TCC(NZ).LT.CTC(NZ))THEN
       IF(IDAY(7,NB,NZ).EQ.0)THEN
         FGRNX=SSTX(NZ)*(CTC(NZ)-TCC(NZ))
@@ -2348,7 +2348,7 @@ module PlantBranchMod
 !   TFN4=temperature function for root growth
 !
   IF(IDAY(7,NB,NZ).NE.0)THEN
-    IF(WTGRBE(NB,ielmc,NZ).GE.GRWTB(NB,NZ)*GRNOB(NB,NZ))THEN
+    IF(WTGRBE(ielmc,NB,NZ).GE.GRWTB(NB,NZ)*GRNOB(NB,NZ))THEN
       GROLM=0._r8
     ELSEIF(IRTYP(NZ).EQ.0)THEN
       GROLM=AZMAX1(GFILL(NZ)*GRNOB(NB,NZ)*SQRT(TFN3(NZ)))
@@ -2364,15 +2364,15 @@ module PlantBranchMod
 !     GROLM,GROLC=maximum,actual grain fill rate
 !     XLOCM,XLOCE(ielmc)=maximum,actual C translocation rate from reserve to grain
 !
-    IF(WTGRBE(NB,ielmn,NZ).LT.ZPGRM*CNGR(NZ) &
-      *WTGRBE(NB,ielmc,NZ).OR.WTGRBE(NB,ielmp,NZ).LT.ZPGRM &
-      *CPGR(NZ)*WTGRBE(NB,ielmc,NZ))THEN
+    IF(WTGRBE(ielmn,NB,NZ).LT.ZPGRM*CNGR(NZ) &
+      *WTGRBE(ielmc,NB,NZ).OR.WTGRBE(ielmp,NB,NZ).LT.ZPGRM &
+      *CPGR(NZ)*WTGRBE(ielmc,NB,NZ))THEN
       GROLC=0._r8
     ELSE
       GROLC=GROLM
     ENDIF
-    XLOCM=AMIN1(GROLM,WTRSVBE(NB,ielmc,NZ))
-    XLOCE(ielmc)=AMIN1(GROLC,WTRSVBE(NB,ielmc,NZ))
+    XLOCM=AMIN1(GROLM,WTRSVBE(ielmc,NB,NZ))
+    XLOCE(ielmc)=AMIN1(GROLC,WTRSVBE(ielmc,NB,NZ))
 !
 !     GRAIN N OR P FILL RATE MAY BE LIMITED BY C:N OR C:P RATIOS
 !     OF STALK RESERVES
@@ -2387,19 +2387,19 @@ module PlantBranchMod
 !     CNGR,CPGR=maximum N:C,P:C ratios in grain from PFT file
 !     XLOCE(ielmn),XLOCE(ielmp)=N,P translocation rate from reserve to grain
 !
-    IF(WTRSVBE(NB,ielmc,NZ).GT.ZEROP(NZ))THEN
-      ZNPGN=WTRSVBE(NB,ielmn,NZ)/(WTRSVBE(NB,ielmn,NZ) &
-        +SETN*WTRSVBE(NB,ielmc,NZ))
-      ZNPGP=WTRSVBE(NB,ielmp,NZ)/(WTRSVBE(NB,ielmp,NZ) &
-        +SETP*WTRSVBE(NB,ielmc,NZ))
+    IF(WTRSVBE(ielmc,NB,NZ).GT.ZEROP(NZ))THEN
+      ZNPGN=WTRSVBE(ielmn,NB,NZ)/(WTRSVBE(ielmn,NB,NZ) &
+        +SETN*WTRSVBE(ielmc,NB,NZ))
+      ZNPGP=WTRSVBE(ielmp,NB,NZ)/(WTRSVBE(ielmp,NB,NZ) &
+        +SETP*WTRSVBE(ielmc,NB,NZ))
       ZPGRN=ZPGRM+ZPGRD*AZMAX1(AMIN1(1.0_r8,ZNPGN))
       ZPGRP=ZPGRM+ZPGRD*AZMAX1(AMIN1(1.0_r8,ZNPGP))
       XLOCE(ielmn)=AMIN1(XLOCM*CNGR(NZ) &
-        ,AZMAX1(WTRSVBE(NB,ielmn,NZ)*ZPGRN) &
-        ,(WTGRBE(NB,ielmc,NZ)+XLOCE(ielmc))*CNGR(NZ)-WTGRBE(NB,ielmn,NZ))
+        ,AZMAX1(WTRSVBE(ielmn,NB,NZ)*ZPGRN) &
+        ,(WTGRBE(ielmc,NB,NZ)+XLOCE(ielmc))*CNGR(NZ)-WTGRBE(ielmn,NB,NZ))
       XLOCE(ielmp)=AMIN1(XLOCM*CPGR(NZ) &
-        ,AZMAX1(WTRSVBE(NB,ielmp,NZ)*ZPGRP) &
-        ,(WTGRBE(NB,ielmc,NZ)+XLOCE(ielmc))*CPGR(NZ)-WTGRBE(NB,ielmp,NZ))
+        ,AZMAX1(WTRSVBE(ielmp,NB,NZ)*ZPGRP) &
+        ,(WTGRBE(ielmc,NB,NZ)+XLOCE(ielmc))*CPGR(NZ)-WTGRBE(ielmp,NB,NZ))
     ELSE
       XLOCE(ielmn)=0._r8
       XLOCE(ielmp)=0._r8
@@ -2412,8 +2412,8 @@ module PlantBranchMod
 !     XLOCE(ielmc),XLOCE(ielmn),XLOCE(ielmp)=C,N,P translocation rate from reserve to grain
 !
     DO NE=1,npelms
-      WTRSVBE(NB,NE,NZ)=WTRSVBE(NB,NE,NZ)+GROGRE(NE)-XLOCE(NE)
-      WTGRBE(NB,NE,NZ)=WTGRBE(NB,NE,NZ)+XLOCE(NE)
+      WTRSVBE(NE,NB,NZ)=WTRSVBE(NE,NB,NZ)+GROGRE(NE)-XLOCE(NE)
+      WTGRBE(NE,NB,NZ)=WTGRBE(NE,NB,NZ)+XLOCE(NE)
     ENDDO
   ELSE
     XLOCE(1:npelms)=0._r8
@@ -2618,34 +2618,34 @@ module PlantBranchMod
             KVSTG(NB,NZ)=1
             FLG4(NB,NZ)=0._r8
             D5330: DO M=1,jsken
-              ESNC(M,ielmc,k_woody_litr,0,NZ)=ESNC(M,ielmc,k_woody_litr,0,NZ) &
-                +CFOPE(icwood,M,ielmc,NZ)*WTLFBE(NB,ielmc,NZ)*FWODBE(ielmc,k_woody_litr) &
-                +CFOPE(icwood,M,ielmc,NZ)*WTSHEBE(NB,ielmc,NZ)*FWODBE(ielmc,k_woody_litr)
-              ESNC(M,ielmn,k_woody_litr,0,NZ)=ESNC(M,ielmn,k_woody_litr,0,NZ) &
-                +CFOPE(icwood,M,ielmn,NZ)*WTLFBE(NB,ielmn,NZ)*FWODLE(ielmn,k_woody_litr) &
-                +CFOPE(icwood,M,ielmn,NZ)*WTSHEBE(NB,ielmn,NZ)*FWODBE(ielmn,k_woody_litr)
-              ESNC(M,ielmp,k_woody_litr,0,NZ)=ESNC(M,ielmp,k_woody_litr,0,NZ) &
-                +CFOPE(icwood,M,ielmp,NZ)*WTLFBE(NB,ielmp,NZ)*FWODLE(ielmp,k_woody_litr) &
-                +CFOPE(icwood,M,ielmp,NZ)*WTSHEBE(NB,ielmp,NZ)*FWODBE(ielmp,k_woody_litr)
-              ESNC(M,ielmc,k_fine_litr,0,NZ)=ESNC(M,ielmc,k_fine_litr,0,NZ) &
-                +CFOPE(ifoliar,M,ielmc,NZ)*WTLFBE(NB,ielmc,NZ)*FWODBE(ielmc,k_fine_litr) &
-                +CFOPE(infoliar,M,ielmc,NZ)*WTSHEBE(NB,ielmc,NZ)*FWODBE(ielmc,k_fine_litr)
-              ESNC(M,ielmn,k_fine_litr,0,NZ)=ESNC(M,ielmn,k_fine_litr,0,NZ) &
-                +CFOPE(ifoliar,M,ielmn,NZ)*WTLFBE(NB,ielmn,NZ)*FWODLE(ielmn,k_fine_litr) &
-                +CFOPE(infoliar,M,ielmn,NZ)*WTSHEBE(NB,ielmn,NZ)*FWODBE(ielmn,k_fine_litr)
-              ESNC(M,ielmp,k_fine_litr,0,NZ)=ESNC(M,ielmp,k_fine_litr,0,NZ) &
-                +CFOPE(ifoliar,M,ielmp,NZ)*WTLFBE(NB,ielmp,NZ)*FWODLE(ielmp,k_fine_litr) &
-                +CFOPE(infoliar,M,ielmp,NZ)*WTSHEBE(NB,ielmp,NZ)*FWODBE(ielmp,1)
+              ESNC(ielmc,M,k_woody_litr,0,NZ)=ESNC(ielmc,M,k_woody_litr,0,NZ) &
+                +CFOPE(ielmc,icwood,M,NZ)*WTLFBE(ielmc,NB,NZ)*FWODBE(ielmc,k_woody_litr) &
+                +CFOPE(ielmc,icwood,M,NZ)*WTSHEBE(ielmc,NB,NZ)*FWODBE(ielmc,k_woody_litr)
+              ESNC(ielmn,M,k_woody_litr,0,NZ)=ESNC(ielmn,M,k_woody_litr,0,NZ) &
+                +CFOPE(ielmn,icwood,M,NZ)*WTLFBE(ielmn,NB,NZ)*FWODLE(ielmn,k_woody_litr) &
+                +CFOPE(ielmn,icwood,M,NZ)*WTSHEBE(ielmn,NB,NZ)*FWODBE(ielmn,k_woody_litr)
+              ESNC(ielmp,M,k_woody_litr,0,NZ)=ESNC(ielmp,M,k_woody_litr,0,NZ) &
+                +CFOPE(ielmp,icwood,M,NZ)*WTLFBE(ielmp,NB,NZ)*FWODLE(ielmp,k_woody_litr) &
+                +CFOPE(ielmp,icwood,M,NZ)*WTSHEBE(ielmp,NB,NZ)*FWODBE(ielmp,k_woody_litr)
+              ESNC(ielmc,M,k_fine_litr,0,NZ)=ESNC(ielmc,M,k_fine_litr,0,NZ) &
+                +CFOPE(ielmc,ifoliar,M,NZ)*WTLFBE(ielmc,NB,NZ)*FWODBE(ielmc,k_fine_litr) &
+                +CFOPE(ielmc,infoliar,M,NZ)*WTSHEBE(ielmc,NB,NZ)*FWODBE(ielmc,k_fine_litr)
+              ESNC(ielmn,M,k_fine_litr,0,NZ)=ESNC(ielmn,M,k_fine_litr,0,NZ) &
+                +CFOPE(ielmn,ifoliar,M,NZ)*WTLFBE(ielmn,NB,NZ)*FWODLE(ielmn,k_fine_litr) &
+                +CFOPE(ielmn,infoliar,M,NZ)*WTSHEBE(ielmn,NB,NZ)*FWODBE(ielmn,k_fine_litr)
+              ESNC(ielmp,M,k_fine_litr,0,NZ)=ESNC(ielmp,M,k_fine_litr,0,NZ) &
+                +CFOPE(ielmp,ifoliar,M,NZ)*WTLFBE(ielmp,NB,NZ)*FWODLE(ielmp,k_fine_litr) &
+                +CFOPE(ielmp,infoliar,M,NZ)*WTSHEBE(ielmp,NB,NZ)*FWODBE(ielmp,1)
             ENDDO D5330
             ARLFB(NB,NZ)=0._r8
-            WTLFBE(NB,1:npelms,NZ)=0._r8
-            WTSHEBE(NB,1:npelms,NZ)=0._r8
+            WTLFBE(1:npelms,NB,NZ)=0._r8
+            WTSHEBE(1:npelms,NB,NZ)=0._r8
             D5335: DO K=0,JNODS1
               ARLF1(K,NB,NZ)=0._r8
               HTSHE(K,NB,NZ)=0._r8
               WSLF(K,NB,NZ)=0._r8
-              WGLFE(K,NB,1:npelms,NZ)=0._r8
-              WGSHE(K,NB,1:npelms,NZ)=0._r8
+              WGLFE(1:npelms,K,NB,NZ)=0._r8
+              WGSHE(1:npelms,K,NB,NZ)=0._r8
               WSSHE(K,NB,NZ)=0._r8
             ENDDO D5335
           ENDIF
@@ -2655,27 +2655,32 @@ module PlantBranchMod
     !     START OF SEASON
     !
         IF((IFLGE(NB,NZ).EQ.0.AND.ISTYP(NZ).NE.iplt_annual).AND.VRNS(NB,NZ).GE.VRNL(NB,NZ))THEN
-          DO NE=1,npelms
-            D6245: DO M=1,jsken
-              ESNC(M,NE,k_fine_litr,0,NZ)=ESNC(M,NE,k_fine_litr,0,NZ)+CFOPE(infoliar,M,NE,NZ) &
-                *(WTHSKBE(NB,NE,NZ)+WTEARBE(NB,NE,NZ)+WTGRBE(NB,NE,NZ))
-            ENDDO D6245
-            WTHSKBE(NB,NE,NZ)=0._r8
-            WTEARBE(NB,NE,NZ)=0._r8
-            WTGRBE(NB,NE,NZ)=0._r8
-          ENDDO
+          
+          D6245: DO M=1,jsken
+            DO NE=1,npelms
+              ESNC(NE,M,k_fine_litr,0,NZ)=ESNC(NE,M,k_fine_litr,0,NZ)+CFOPE(NE,infoliar,M,NZ) &
+                *(WTHSKBE(NE,NB,NZ)+WTEARBE(NE,NB,NZ)+WTGRBE(NE,NB,NZ))
+            ENDDO    
+          ENDDO D6245
+            
+          WTHSKBE(1:npelms,NB,NZ)=0._r8
+          WTEARBE(1:npelms,NB,NZ)=0._r8
+          WTGRBE(1:npelms,NB,NZ)=0._r8
+          
           GRNXB(NB,NZ)=0._r8
           GRNOB(NB,NZ)=0._r8
           GRWTB(NB,NZ)=0._r8
-          IF(IBTYP(NZ).EQ.0.OR.IGTYP(NZ).LE.1)THEN
-            DO NE=1,npelms
-              D6345: DO M=1,jsken
-                ESNC(M,NE,k_fine_litr,0,NZ)=ESNC(M,NE,k_fine_litr,0,NZ)+CFOPE(istalk,M,NE,NZ)*WTSTKBE(NB,NE,NZ)
-              ENDDO D6345
-              WTSTKBE(NB,NE,NZ)=0._r8
-              WTSTXBE(NB,NE,NZ)=0._r8
-              DO K=0,JNODS1
-                WGNODE(K,NB,NE,NZ)=0._r8
+          IF(IBTYP(NZ).EQ.0.OR.IGTYP(NZ).LE.1)THEN            
+            D6345: DO M=1,jsken
+              DO NE=1,npelms
+                ESNC(NE,M,k_fine_litr,0,NZ)=ESNC(NE,M,k_fine_litr,0,NZ)+CFOPE(NE,istalk,M,NZ)*WTSTKBE(NE,NB,NZ)
+              ENDDO  
+            ENDDO D6345
+            WTSTKBE(1:npelms,NB,NZ)=0._r8
+            WTSTXBE(1:npelms,NB,NZ)=0._r8
+            DO K=0,JNODS1
+              DO NE=1,npelms
+                WGNODE(NE,K,NB,NZ)=0._r8
               ENDDO
             ENDDO
             D6340: DO K=0,JNODS1
@@ -2712,19 +2717,23 @@ module PlantBranchMod
       IFLGQ(NB,NZ)=0
     ENDIF
     FSNR1=1.0_r8-FSNR
-    DO NE=1,npelms
-      D6330: DO M=1,jsken
-        ESNC(M,NE,k_fine_litr,0,NZ)=ESNC(M,NE,k_fine_litr,0,NZ)+FSNR*CFOPE(infoliar,M,NE,NZ) &
-          *(WTHSKBE(NB,NE,NZ)+WTEARBE(NB,NE,NZ))
+    
+    D6330: DO M=1,jsken
+      DO NE=1,npelms
+        ESNC(NE,M,k_fine_litr,0,NZ)=ESNC(NE,M,k_fine_litr,0,NZ)+FSNR*CFOPE(NE,infoliar,M,NZ) &
+          *(WTHSKBE(NE,NB,NZ)+WTEARBE(NE,NB,NZ))
         IF(ISTYP(NZ).EQ.iplt_annual.AND.IWTYP(NZ).NE.0)THEN
-          WTRVE(NE,NZ)=WTRVE(NE,NZ)+FSNR*CFOPE(infoliar,M,NE,NZ)*WTGRBE(NB,NE,NZ)
+          WTRVE(NE,NZ)=WTRVE(NE,NZ)+FSNR*CFOPE(NE,infoliar,M,NZ)*WTGRBE(NE,NB,NZ)
         ELSE
-          ESNC(M,NE,k_fine_litr,0,NZ)=ESNC(M,NE,k_fine_litr,0,NZ)+FSNR*CFOPE(infoliar,M,NE,NZ)*WTGRBE(NB,NE,NZ)
+          ESNC(NE,M,k_fine_litr,0,NZ)=ESNC(NE,M,k_fine_litr,0,NZ)+FSNR*CFOPE(NE,infoliar,M,NZ)*WTGRBE(NE,NB,NZ)
         ENDIF
-      ENDDO D6330
-      WTHSKBE(NB,NE,NZ)=FSNR1*WTHSKBE(NB,NE,NZ)
-      WTEARBE(NB,NE,NZ)=FSNR1*WTEARBE(NB,NE,NZ)
-      WTGRBE(NB,NE,NZ)=FSNR1*WTGRBE(NB,NE,NZ)
+      ENDDO  
+    ENDDO D6330
+
+    DO NE=1,npelms  
+      WTHSKBE(NE,NB,NZ)=FSNR1*WTHSKBE(NE,NB,NZ)
+      WTEARBE(NE,NB,NZ)=FSNR1*WTEARBE(NE,NB,NZ)
+      WTGRBE(NE,NB,NZ)=FSNR1*WTGRBE(NE,NB,NZ)
     ENDDO
     GRNXB(NB,NZ)=FSNR1*GRNXB(NB,NZ)
     GRNOB(NB,NZ)=FSNR1*GRNOB(NB,NZ)
@@ -2733,14 +2742,19 @@ module PlantBranchMod
 !     STALKS BECOME LITTERFALL IN GRASSES AT END OF SEASON
 !
     IF((IBTYP(NZ).EQ.0.OR.IGTYP(NZ).LE.1).AND.ISTYP(NZ).NE.iplt_annual)THEN
-      DO NE=1,npelms
-        D6335: DO M=1,jsken
-          ESNC(M,NE,k_fine_litr,0,NZ)=ESNC(M,NE,k_fine_litr,0,NZ)+FSNR*CFOPE(istalk,M,NE,NZ)*WTSTKBE(NB,NE,NZ)
-        ENDDO D6335
-        WTSTKBE(NB,NE,NZ)=FSNR1*WTSTKBE(NB,NE,NZ)
-        WTSTXBE(NB,NE,NZ)=FSNR1*WTSTXBE(NB,NE,NZ)
-        DO K=0,JNODS1
-          WGNODE(K,NB,NE,NZ)=FSNR1*WGNODE(K,NB,NE,NZ)
+      
+      D6335: DO M=1,jsken
+        DO NE=1,npelms
+          ESNC(NE,M,k_fine_litr,0,NZ)=ESNC(NE,M,k_fine_litr,0,NZ)+FSNR*CFOPE(NE,istalk,M,NZ)*WTSTKBE(NE,NB,NZ)
+        ENDDO  
+      ENDDO D6335
+      DO NE=1,npelms  
+        WTSTKBE(NE,NB,NZ)=FSNR1*WTSTKBE(NE,NB,NZ)
+        WTSTXBE(NE,NB,NZ)=FSNR1*WTSTXBE(NE,NB,NZ)
+      ENDDO  
+      DO K=0,JNODS1
+        DO NE=1,npelms
+          WGNODE(NE,K,NB,NZ)=FSNR1*WGNODE(NE,K,NB,NZ)
         ENDDO
       ENDDO
       D2010: DO K=0,JNODS1
@@ -2926,7 +2940,7 @@ module PlantBranchMod
       IF(ATRP(NB,NZ).LE.ATRPX(ISTYP(NZ)) &
         .OR.(ISTYP(NZ).EQ.iplt_annual.AND.IWTYP(NZ).EQ.0))THEN
         IF(WTRVE(ielmc,NZ).GT.ZEROP(NZ))THEN
-          CPOOLT=EPOOLM(ielmc)+EPOOL(NB,ielmc,NZ)
+          CPOOLT=EPOOLM(ielmc)+EPOOL(ielmc,NB,NZ)
   !
   !       REMOBILIZE C FROM SEASONAL STORAGE AT FIRST-ORDER RATE
   !       MODIFIED BY SOIL TEMPERATURE AT SEED DEPTH
@@ -2941,7 +2955,7 @@ module PlantBranchMod
           GFNX=GVMX(ISTYP(NZ))*DATRP
           CH2OH=AZMAX1(GFNX*WTRVE(ielmc,NZ))
           WTRVE(ielmc,NZ)=WTRVE(ielmc,NZ)-CH2OH
-          EPOOL(NB,ielmc,NZ)=EPOOL(NB,ielmc,NZ)+CH2OH*FXSH(ISTYP(NZ))
+          EPOOL(ielmc,NB,NZ)=EPOOL(ielmc,NB,NZ)+CH2OH*FXSH(ISTYP(NZ))
           IF(WTRTM.GT.ZEROP(NZ).AND.EPOOLM(ielmc).GT.ZEROP(NZ))THEN
             D50: DO L=NU,NI(NZ)
               FXFC=AZMAX1(WTRTD(ipltroot,L,NZ))/WTRTM
@@ -2970,9 +2984,9 @@ module PlantBranchMod
       !
       IF(WTRVE(ielmc,NZ).GT.ZEROP(NZ))THEN
         IF(ISTYP(NZ).NE.iplt_annual)THEN
-          CPOOLT=AZMAX1(WTRVE(ielmc,NZ)+EPOOL(NB,ielmc,NZ))
-          ZPOOLD=(WTRVE(ielmn,NZ)*EPOOL(NB,ielmc,NZ)-EPOOL(NB,ielmn,NZ)*WTRVE(ielmc,NZ))/CPOOLT
-          PPOOLD=(WTRVE(ielmp,NZ)*EPOOL(NB,ielmc,NZ)-EPOOL(NB,ielmp,NZ)*WTRVE(ielmc,NZ))/CPOOLT
+          CPOOLT=AZMAX1(WTRVE(ielmc,NZ)+EPOOL(ielmc,NB,NZ))
+          ZPOOLD=(WTRVE(ielmn,NZ)*EPOOL(ielmc,NB,NZ)-EPOOL(ielmn,NB,NZ)*WTRVE(ielmc,NZ))/CPOOLT
+          PPOOLD=(WTRVE(ielmp,NZ)*EPOOL(ielmc,NB,NZ)-EPOOL(ielmp,NB,NZ)*WTRVE(ielmc,NZ))/CPOOLT
           UPNH4B=AZMAX1(FRSV(IBTYP(NZ))*ZPOOLD)
           UPPO4B=AZMAX1(FRSV(IBTYP(NZ))*PPOOLD)
         ELSE
@@ -3027,8 +3041,8 @@ module PlantBranchMod
 !
       WTRVE(ielmn,NZ)=WTRVE(ielmn,NZ)-UPNH4B-UPNH4R
       WTRVE(ielmp,NZ)=WTRVE(ielmp,NZ)-UPPO4B-UPPO4R
-      EPOOL(NB,ielmn,NZ)=EPOOL(NB,ielmn,NZ)+UPNH4B
-      EPOOL(NB,ielmp,NZ)=EPOOL(NB,ielmp,NZ)+UPPO4B
+      EPOOL(ielmn,NB,NZ)=EPOOL(ielmn,NB,NZ)+UPNH4B
+      EPOOL(ielmp,NB,NZ)=EPOOL(ielmp,NB,NZ)+UPPO4B
       IF(WTRTM.GT.ZEROP(NZ).AND.EPOOLM(ielmc).GT.ZEROP(NZ))THEN
         D51: DO L=NU,NI(NZ)
           FXFN=AZMAX1(EPOOLR(ielmc,ipltroot,L,NZ))/EPOOLM(ielmc)
@@ -3056,9 +3070,9 @@ module PlantBranchMod
       ATRP(NB,NZ)=ATRP(NB,NZ)+TFN3(NZ)*WFNG
       DO NE=1,npelms
         XFRE(NE)=AZMAX1(0.05_r8*TFN3(NZ) &
-          *(0.5_r8*(EPOOL(NB1(NZ),NE,NZ)+EPOOL(NB,NE,NZ))-EPOOL(NB,NE,NZ)))
-        EPOOL(NB,NE,NZ)=EPOOL(NB,NE,NZ)+XFRE(NE)
-        EPOOL(NB1(NZ),NE,NZ)=EPOOL(NB1(NZ),NE,NZ)-XFRE(NE)
+          *(0.5_r8*(EPOOL(NE,NB1(NZ),NZ)+EPOOL(NE,NB,NZ))-EPOOL(NE,NB,NZ)))
+        EPOOL(NE,NB,NZ)=EPOOL(NE,NB,NZ)+XFRE(NE)
+        EPOOL(NE,NB1(NZ),NZ)=EPOOL(NE,NB1(NZ),NZ)-XFRE(NE)
       ENDDO
     ENDIF
   ENDIF
@@ -3087,41 +3101,41 @@ module PlantBranchMod
 ! CPOOL,ZPOOL,PPOOL=non-structural C,N,P mass
 !
   IF(IFLGZ.EQ.1.AND.ISTYP(NZ).NE.iplt_annual)THEN
-    IF(WVSTKB(NB,NZ).GT.ZEROP(NZ).AND.WTRSVBE(NB,ielmc,NZ).GT.ZEROP(NZ))THEN
-      CWTRSV=AZMAX1(WTRSVBE(NB,ielmc,NZ)/WVSTKB(NB,NZ))
-      CWTRSN=AZMAX1(WTRSVBE(NB,ielmn,NZ)/WVSTKB(NB,NZ))
-      CWTRSP=AZMAX1(WTRSVBE(NB,ielmp,NZ)/WVSTKB(NB,NZ))
+    IF(WVSTKB(NB,NZ).GT.ZEROP(NZ).AND.WTRSVBE(ielmc,NB,NZ).GT.ZEROP(NZ))THEN
+      CWTRSV=AZMAX1(WTRSVBE(ielmc,NB,NZ)/WVSTKB(NB,NZ))
+      CWTRSN=AZMAX1(WTRSVBE(ielmn,NB,NZ)/WVSTKB(NB,NZ))
+      CWTRSP=AZMAX1(WTRSVBE(ielmp,NB,NZ)/WVSTKB(NB,NZ))
       CNR=CWTRSV/(CWTRSV+CWTRSN/CNKI)
       CPR=CWTRSV/(CWTRSV+CWTRSP/CPKI)
     ELSE
       CNR=0._r8
       CPR=0._r8
     ENDIF
-    XFRCX=FXFB(IBTYP(NZ))*AZMAX1(WTRSVBE(NB,ielmc,NZ))
-    XFRNX=FXFB(IBTYP(NZ))*AZMAX1(WTRSVBE(NB,ielmn,NZ))*(1.0+CNR)
-    XFRPX=FXFB(IBTYP(NZ))*AZMAX1(WTRSVBE(NB,ielmp,NZ))*(1.0+CPR)
+    XFRCX=FXFB(IBTYP(NZ))*AZMAX1(WTRSVBE(ielmc,NB,NZ))
+    XFRNX=FXFB(IBTYP(NZ))*AZMAX1(WTRSVBE(ielmn,NB,NZ))*(1.0+CNR)
+    XFRPX=FXFB(IBTYP(NZ))*AZMAX1(WTRSVBE(ielmp,NB,NZ))*(1.0+CPR)
     XFRE(ielmc)=AMIN1(XFRCX,XFRNX/CNMN,XFRPX/CPMN)
     XFRE(ielmn)=AMIN1(XFRNX,XFRE(ielmc)*CNMX,XFRPX*CNMX/CPMN*0.5)
     XFRE(ielmp)=AMIN1(XFRPX,XFRE(ielmc)*CPMX,XFRNX*CPMX/CNMN*0.5)
     DO NE=1,npelms
-      WTRSVBE(NB,NE,NZ)=WTRSVBE(NB,NE,NZ)-XFRE(NE)
+      WTRSVBE(NE,NB,NZ)=WTRSVBE(NE,NB,NZ)-XFRE(NE)
       WTRVE(NE,NZ)=WTRVE(NE,NZ)+XFRE(NE)
     ENDDO
-    IF(CEPOLB(NB,ielmc,NZ).GT.ZEROP(NZ))THEN
-      CNL=CEPOLB(NB,ielmc,NZ)/(CEPOLB(NB,ielmc,NZ)+CEPOLB(NB,ielmn,NZ)/CNKI)
-      CPL=CEPOLB(NB,ielmc,NZ)/(CEPOLB(NB,ielmc,NZ)+CEPOLB(NB,ielmp,NZ)/CPKI)
+    IF(CEPOLB(ielmc,NB,NZ).GT.ZEROP(NZ))THEN
+      CNL=CEPOLB(ielmc,NB,NZ)/(CEPOLB(ielmc,NB,NZ)+CEPOLB(ielmn,NB,NZ)/CNKI)
+      CPL=CEPOLB(ielmc,NB,NZ)/(CEPOLB(ielmc,NB,NZ)+CEPOLB(ielmp,NB,NZ)/CPKI)
     ELSE
       CNL=0._r8
       CPL=0._r8
     ENDIF
-    XFRCX=FXFB(IBTYP(NZ))*AZMAX1(EPOOL(NB,ielmc,NZ))
-    XFRNX=FXFB(IBTYP(NZ))*AZMAX1(EPOOL(NB,ielmn,NZ))*(1.0+CNL)
-    XFRPX=FXFB(IBTYP(NZ))*AZMAX1(EPOOL(NB,ielmp,NZ))*(1.0+CPL)
+    XFRCX=FXFB(IBTYP(NZ))*AZMAX1(EPOOL(ielmc,NB,NZ))
+    XFRNX=FXFB(IBTYP(NZ))*AZMAX1(EPOOL(ielmn,NB,NZ))*(1.0+CNL)
+    XFRPX=FXFB(IBTYP(NZ))*AZMAX1(EPOOL(ielmp,NB,NZ))*(1.0+CPL)
     XFRE(ielmc)=AMIN1(XFRCX,XFRNX/CNMN,XFRPX/CPMN)
     XFRE(ielmn)=AMIN1(XFRNX,XFRE(ielmc)*CNMX,XFRPX*CNMX/CPMN*0.5_r8)
     XFRE(ielmp)=AMIN1(XFRPX,XFRE(ielmc)*CPMX,XFRNX*CPMX/CNMN*0.5_r8)
     DO NE=1,npelms
-      EPOOL(NB,NE,NZ)=EPOOL(NB,NE,NZ)-XFRE(NE)
+      EPOOL(NE,NB,NZ)=EPOOL(NE,NB,NZ)-XFRE(NE)
       WTRVE(NE,NZ)=WTRVE(NE,NZ)+XFRE(NE)
     ENDDO
   ENDIF
@@ -3144,24 +3158,24 @@ module PlantBranchMod
   IF((ISTYP(NZ).EQ.iplt_annual.AND.IDAY(8,NB,NZ).NE.0) &
     .OR.(ISTYP(NZ).EQ.iplt_preanu.AND.IDAY(3,NB,NZ).NE.0))THEN
     WTPLTT=WTLSB(NB,NZ)+WVSTKB(NB,NZ)
-    CPOOLT=EPOOL(NB,ielmc,NZ)+WTRSVBE(NB,ielmc,NZ)
+    CPOOLT=EPOOL(ielmc,NB,NZ)+WTRSVBE(ielmc,NB,NZ)
     IF(WTPLTT.GT.ZEROP(NZ))THEN
-      CPOOLD=(EPOOL(NB,ielmc,NZ)*WVSTKB(NB,NZ) &
-        -WTRSVBE(NB,ielmc,NZ)*WTLSB(NB,NZ))/WTPLTT
+      CPOOLD=(EPOOL(ielmc,NB,NZ)*WVSTKB(NB,NZ) &
+        -WTRSVBE(ielmc,NB,NZ)*WTLSB(NB,NZ))/WTPLTT
       XFRE(ielmc)=FXFY(ISTYP(NZ))*CPOOLD
-      EPOOL(NB,ielmc,NZ)=EPOOL(NB,ielmc,NZ)-XFRE(ielmc)
-      WTRSVBE(NB,ielmc,NZ)=WTRSVBE(NB,ielmc,NZ)+XFRE(ielmc)
+      EPOOL(ielmc,NB,NZ)=EPOOL(ielmc,NB,NZ)-XFRE(ielmc)
+      WTRSVBE(ielmc,NB,NZ)=WTRSVBE(ielmc,NB,NZ)+XFRE(ielmc)
     ENDIF
     IF(CPOOLT.GT.ZEROP(NZ))THEN
-      ZPOOLD=(EPOOL(NB,ielmn,NZ)*WTRSVBE(NB,ielmc,NZ) &
-        -WTRSVBE(NB,ielmn,NZ)*EPOOL(NB,ielmc,NZ))/CPOOLT
-      PPOOLD=(EPOOL(NB,ielmp,NZ)*WTRSVBE(NB,ielmc,NZ) &
-        -WTRSVBE(NB,ielmp,NZ)*EPOOL(NB,ielmc,NZ))/CPOOLT
+      ZPOOLD=(EPOOL(ielmn,NB,NZ)*WTRSVBE(ielmc,NB,NZ) &
+        -WTRSVBE(ielmn,NB,NZ)*EPOOL(ielmc,NB,NZ))/CPOOLT
+      PPOOLD=(EPOOL(ielmp,NB,NZ)*WTRSVBE(ielmc,NB,NZ) &
+        -WTRSVBE(ielmp,NB,NZ)*EPOOL(ielmc,NB,NZ))/CPOOLT
       XFRE(ielmn)=FXFZ(ISTYP(NZ))*ZPOOLD
       XFRE(ielmp)=FXFZ(ISTYP(NZ))*PPOOLD
       DO NE=2,npelms
-        EPOOL(NB,NE,NZ)=EPOOL(NB,NE,NZ)-XFRE(NE)
-        WTRSVBE(NB,NE,NZ)=WTRSVBE(NB,NE,NZ)+XFRE(NE)
+        EPOOL(NE,NB,NZ)=EPOOL(NE,NB,NZ)-XFRE(NE)
+        WTRSVBE(NE,NB,NZ)=WTRSVBE(NE,NB,NZ)+XFRE(NE)
       ENDDO
     ENDIF
 
@@ -3171,19 +3185,19 @@ module PlantBranchMod
           WTRTRX=AMAX1(ZEROP(NZ),WTRTL(ipltroot,L,NZ)*FWODRE(ielmc,1))
           WTPLTX=WTRTRX+WVSTKB(NB,NZ)
           IF(WTPLTX.GT.ZEROP(NZ))THEN
-            CPOOLD=(EPOOLR(ielmc,ipltroot,L,NZ)*WVSTKB(NB,NZ)-WTRSVBE(NB,ielmc,NZ)*WTRTRX)/WTPLTX
+            CPOOLD=(EPOOLR(ielmc,ipltroot,L,NZ)*WVSTKB(NB,NZ)-WTRSVBE(ielmc,NB,NZ)*WTRTRX)/WTPLTX
             XFRE(ielmc)=AZMAX1(FXFY(ISTYP(NZ))*CPOOLD)
             EPOOLR(ielmc,ipltroot,L,NZ)=EPOOLR(ielmc,ipltroot,L,NZ)-XFRE(ielmc)
-            WTRSVBE(NB,ielmc,NZ)=WTRSVBE(NB,ielmc,NZ)+XFRE(ielmc)
-            CPOOLT=EPOOLR(ielmc,ipltroot,L,NZ)+WTRSVBE(NB,ielmc,NZ)
+            WTRSVBE(ielmc,NB,NZ)=WTRSVBE(ielmc,NB,NZ)+XFRE(ielmc)
+            CPOOLT=EPOOLR(ielmc,ipltroot,L,NZ)+WTRSVBE(ielmc,NB,NZ)
             IF(CPOOLT.GT.ZEROP(NZ))THEN
-              ZPOOLD=(EPOOLR(ielmn,ipltroot,L,NZ)*WTRSVBE(NB,ielmc,NZ)-WTRSVBE(NB,ielmn,NZ)*EPOOLR(ielmc,ipltroot,L,NZ))/CPOOLT
-              PPOOLD=(EPOOLR(ielmp,ipltroot,L,NZ)*WTRSVBE(NB,ielmc,NZ)-WTRSVBE(NB,ielmp,NZ)*EPOOLR(ielmc,ipltroot,L,NZ))/CPOOLT
+              ZPOOLD=(EPOOLR(ielmn,ipltroot,L,NZ)*WTRSVBE(ielmc,NB,NZ)-WTRSVBE(ielmn,NB,NZ)*EPOOLR(ielmc,ipltroot,L,NZ))/CPOOLT
+              PPOOLD=(EPOOLR(ielmp,ipltroot,L,NZ)*WTRSVBE(ielmc,NB,NZ)-WTRSVBE(ielmp,NB,NZ)*EPOOLR(ielmc,ipltroot,L,NZ))/CPOOLT
               XFRE(ielmn)=AZMAX1(FXFZ(ISTYP(NZ))*ZPOOLD)
               XFRE(ielmp)=AZMAX1(FXFZ(ISTYP(NZ))*PPOOLD)
               DO NE=2,npelms
                 EPOOLR(NE,1,L,NZ)=EPOOLR(NE,1,L,NZ)-XFRE(NE)
-                WTRSVBE(NB,NE,NZ)=WTRSVBE(NB,NE,NZ)+XFRE(NE)
+                WTRSVBE(NE,NB,NZ)=WTRSVBE(NE,NB,NZ)+XFRE(NE)
               ENDDO
             ENDIF
           ENDIF
@@ -3203,16 +3217,16 @@ module PlantBranchMod
 !
   IF(WVSTKB(NB,NZ).GT.ZEROP(NZ).AND.WVSTK(NZ).GT.ZEROP(NZ) &
     .AND.WTRTE(ielmc,NZ).GT.ZEROP(NZ) &
-    .AND.WTRSVBE(NB,ielmc,NZ).LE.XFRX*WVSTKB(NB,NZ))THEN
+    .AND.WTRSVBE(ielmc,NB,NZ).LE.XFRX*WVSTKB(NB,NZ))THEN
     FWTBR=WVSTKB(NB,NZ)/WVSTK(NZ)
     WVSTBX=WVSTKB(NB,NZ)
     WTRTTX=WTRTE(ielmc,NZ)*FWTBR
     WTPLTT=WVSTBX+WTRTTX
-    WTRSBX=AZMAX1(WTRSVBE(NB,ielmc,NZ))
+    WTRSBX=AZMAX1(WTRSVBE(ielmc,NB,NZ))
     WTRVCX=AZMAX1(WTRVE(ielmc,NZ)*FWTBR)
     CPOOLD=(WTRVCX*WVSTBX-WTRSBX*WTRTTX)/WTPLTT
     XFRE(ielmc)=AZMAX1(XFRY*CPOOLD)
-    WTRSVBE(NB,ielmc,NZ)=WTRSVBE(NB,ielmc,NZ)+XFRE(ielmc)
+    WTRSVBE(ielmc,NB,NZ)=WTRSVBE(ielmc,NB,NZ)+XFRE(ielmc)
     WTRVE(ielmc,NZ)=WTRVE(ielmc,NZ)-XFRE(ielmc)
   ENDIF
   end associate
@@ -3256,10 +3270,10 @@ module PlantBranchMod
 ! CCPOLB,CZPOLB,CPPOLB=nonstructural C,N,P concn in branch(g g-1)
 ! CNKI,CPKI=nonstruct N,P inhibn constant on growth(g N,P g-1 C)
 !
-  IF(CEPOLB(NB,ielmc,NZ).GT.ZERO)THEN
-    CNPG=AMIN1(CEPOLB(NB,ielmn,NZ)/(CEPOLB(NB,ielmn,NZ) &
-      +CEPOLB(NB,ielmc,NZ)*CNKI),CEPOLB(NB,ielmp,NZ)/(CEPOLB(NB,ielmp,NZ) &
-      +CEPOLB(NB,ielmc,NZ)*CPKI))
+  IF(CEPOLB(ielmc,NB,NZ).GT.ZERO)THEN
+    CNPG=AMIN1(CEPOLB(ielmn,NB,NZ)/(CEPOLB(ielmn,NB,NZ) &
+      +CEPOLB(ielmc,NB,NZ)*CNKI),CEPOLB(ielmp,NB,NZ)/(CEPOLB(ielmp,NB,NZ) &
+      +CEPOLB(ielmc,NB,NZ)*CPKI))
   ELSE
     CNPG=1.0_r8
   ENDIF
@@ -3275,7 +3289,7 @@ module PlantBranchMod
 ! CNPG=N,P constraint on respiration
 ! FDBKX=termination feedback inhibition on C3 CO2
 !
-  RCO2C=AZMAX1(VMXC*EPOOL(NB,ielmc,NZ) &
+  RCO2C=AZMAX1(VMXC*EPOOL(ielmc,NB,NZ) &
     *TFN3(NZ))*CNPG*FDBKX(NB,NZ)*WFNG
 !
 ! MAINTENANCE RESPIRATION FROM TEMPERATURE, PLANT STRUCTURAL N
@@ -3317,8 +3331,8 @@ module PlantBranchMod
 ! CNPG=N,P constraint on growth respiration
 !
   IF(RCO2Y.GT.0.0_r8.AND.(CNSHX.GT.0.0_r8.OR.CNLFX.GT.0.0_r8))THEN
-    ZPOOLB=AZMAX1(EPOOL(NB,ielmn,NZ))
-    PPOOLB=AZMAX1(EPOOL(NB,ielmp,NZ))
+    ZPOOLB=AZMAX1(EPOOL(ielmn,NB,NZ))
+    PPOOLB=AZMAX1(EPOOL(ielmp,NB,NZ))
     RCO2G=AMIN1(RCO2Y,ZPOOLB*DMSHD/(CNSHX+CNLFM+CNLFX*CNPG) &
       ,PPOOLB*DMSHD/(CPSHX+CPLFM+CPLFX*CNPG))
   ELSE
@@ -3342,8 +3356,8 @@ module PlantBranchMod
 ! CH2O=total CH2O production
 !
   CGROS=RCO2G/DMSHD
-  ZADDB=AZMAX1(AMIN1(EPOOL(NB,ielmn,NZ),CGROS*(CNSHX+CNLFM+CNLFX*CNPG)))
-  PADDB=AZMAX1(AMIN1(EPOOL(NB,ielmp,NZ) &
+  ZADDB=AZMAX1(AMIN1(EPOOL(ielmn,NB,NZ),CGROS*(CNSHX+CNLFM+CNLFX*CNPG)))
+  PADDB=AZMAX1(AMIN1(EPOOL(ielmp,NB,NZ) &
     ,CGROS*(CPSHX+CPLFM+CPLFX*CNPG)))
   CNRDA=AZMAX1(1.70*ZADDB-0.025*CH2O)
 !
@@ -3419,9 +3433,9 @@ module PlantBranchMod
 ! CCPOLB,CZPOLB,CPPOLB=nonstructural C,N,P concn in branch
 ! CNKI,CPKI=nonstructural N,P inhibition constant on growth
 !
-  IF(CEPOLB(NB,ielmc,NZ).GT.ZERO)THEN
-    CNPG=AMIN1(CEPOLB(NB,ielmn,NZ)/(CEPOLB(NB,ielmn,NZ)+CEPOLB(NB,ielmc,NZ)*CNKI), &
-      CEPOLB(NB,ielmp,NZ)/(CEPOLB(NB,ielmp,NZ)+CEPOLB(NB,ielmc,NZ)*CPKI))
+  IF(CEPOLB(ielmc,NB,NZ).GT.ZERO)THEN
+    CNPG=AMIN1(CEPOLB(ielmn,NB,NZ)/(CEPOLB(ielmn,NB,NZ)+CEPOLB(ielmc,NB,NZ)*CNKI), &
+      CEPOLB(ielmp,NB,NZ)/(CEPOLB(ielmp,NB,NZ)+CEPOLB(ielmc,NB,NZ)*CPKI))
   ELSE
     CNPG=1.0_r8
   ENDIF
@@ -3438,7 +3452,7 @@ module PlantBranchMod
 ! FDBKX=termination feedback inhibition on C3 CO2
 ! WFR=constraint by O2 consumption on all root processes
 !
-  RCO2CM=AZMAX1(VMXC*EPOOL(NB,ielmc,NZ) &
+  RCO2CM=AZMAX1(VMXC*EPOOL(ielmc,NB,NZ) &
     *TFN4(NG(NZ),NZ))*CNPG*WFNG*FDBKX(NB,NZ)
   RCO2C=RCO2CM*WFR(1,NG(NZ),NZ)
 !
@@ -3487,8 +3501,8 @@ module PlantBranchMod
 ! WFR=constraint by O2 consumption on all root processes
 !
   IF(CNSHX.GT.0.0_r8.OR.CNLFX.GT.0.0_r8)THEN
-    ZPOOLB=AZMAX1(EPOOL(NB,ielmn,NZ))
-    PPOOLB=AZMAX1(EPOOL(NB,ielmp,NZ))
+    ZPOOLB=AZMAX1(EPOOL(ielmn,NB,NZ))
+    PPOOLB=AZMAX1(EPOOL(ielmp,NB,NZ))
     FNP=AMIN1(ZPOOLB*DMSHD/(CNSHX+CNLFM+CNLFX*CNPG) &
       ,PPOOLB*DMSHD/(CPSHX+CPLFM+CPLFX*CNPG))
     IF(RCO2YM.GT.0.0_r8)THEN

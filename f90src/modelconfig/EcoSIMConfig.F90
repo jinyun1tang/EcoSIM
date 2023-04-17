@@ -7,7 +7,12 @@ implicit none
   logical :: transport_on=.true.
   logical :: column_mode=.false.
   logical :: do_instequil=.false.
+  logical :: brnch_retain_casename = .false.
   integer :: IFLGW                 !flag for raising Z0G with vegn
+
+  character(len=256), public :: rpntdir = '.'
+  character(len=256), public :: rpntfil = 'rpointer.lnd'
+  character(len=16) , public :: inst_suffix=''
 
   integer, parameter :: ndbiomcpc = 2 !# of microbial residue components
   integer, parameter :: nlbiomcpc = 3 !# of living biomass components
@@ -15,9 +20,12 @@ implicit none
   integer, parameter :: jcplxc    = 5 !# of microbe-substrate complexes
   integer, parameter :: jcplx1c   = jcplxc-1
   integer, parameter :: NFGsc     = 7 !# of microbial functional groups in each complex
+  character(len=18)  :: ref_date  = '18000101000000'
+  character(len=18)  :: start_date= '18000101000000'
   character(len=36)  :: case_name
   character(len=256) :: finidat =' '
-
+  character(len=256) :: ctitle  = ' '
+  character(len=256) :: nrevsn 
   character(len=256), public :: hostname = ' '
   character(len=256), public :: username = ' '          ! Current user
   ! description of this source

@@ -2,7 +2,7 @@ module readiMod
 !!
 ! code to read site, topographic data
 !
-  use data_kind_mod, only : r8 => SHR_KIND_R8
+  use data_kind_mod, only : r8 => DAT_KIND_R8
   use abortutils   , only : endrun
   use ncdio_pio
   use fileUtil     , only : open_safe, check_read

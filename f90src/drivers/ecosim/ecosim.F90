@@ -5,7 +5,7 @@ PROGRAM main
 ! FOR USE IN 'READS' AND 'READQ'. WHEN FINISHED THIS SUBROUTINE CALLS
 ! 'SOIL' WHICH IS THE MAIN SUBROUTINE FROM WHICH ALL OTHERS ARE CALLED
 !
-  use data_kind_mod     , only : r8 => SHR_KIND_R8
+  use data_kind_mod     , only : r8 => DAT_KIND_R8
   use TestMod           , only : regression
   use InitEcoSIM        , only : InitModules
   use EcoSIMDesctruct   , only : DestructEcoSIM

@@ -2,7 +2,7 @@ module PlantDisturbMod
 !
 !! Description:
 ! code to apply distance to plants
-  use data_kind_mod, only : r8 => SHR_KIND_R8
+  use data_kind_mod, only : r8 => DAT_KIND_R8
   use minimathmod, only : test_aeqb
   use SOMDataType
   use GrosubPars
@@ -56,7 +56,7 @@ module PlantDisturbMod
             D1990: DO NY1=NVN,NVS
               IF(LSG(NZ,NY1,NX1).EQ.LSG(NZ,NY,NX))THEN
                 IF(IFLGC(NZ,NY1,NX1).EQ.1)THEN
-                  WTSHTZ=WTSHTZ+WTSHTE(NZ,NY1,NX1,ielmc)
+                  WTSHTZ=WTSHTZ+WTSHTE(ielmc,NZ,NY1,NX1)
                   NN=NN+1
                 ENDIF
               ENDIF

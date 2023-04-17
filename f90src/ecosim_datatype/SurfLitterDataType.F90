@@ -1,5 +1,5 @@
 module SurfLitterDataType
-  use data_kind_mod, only : r8 => SHR_KIND_R8
+  use data_kind_mod, only : r8 => DAT_KIND_R8
   use GridConsts
   use EcoSIMConfig, only : jcplx=> jcplxc, jcplx1=>jcplx1c
   implicit none

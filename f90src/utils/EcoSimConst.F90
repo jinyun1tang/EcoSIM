@@ -1,5 +1,5 @@
 module EcosimConst
-  use data_kind_mod, only : r8 => SHR_KIND_R8
+  use data_kind_mod, only : r8 => DAT_KIND_R8
   implicit none
   character(len=*),private, parameter :: mod_filename = __FILE__
   real(r8), parameter :: secspday=86400._r8

@@ -1,10 +1,11 @@
 module bhistMod
 
 #include "shr_assert.h"
-  use data_kind_mod, only : r8 => shr_kind_r8, i4 => shr_kind_i4
+  use data_kind_mod  , only : r8 => DAT_Kind_r8, i4 => DAT_Kind_i4
   use ecosim_log_mod , only : errMsg => shr_log_errMsg
-  use ncdio_pio   , only : file_desc_t
-  use fileUtil , only : var_flux_type, var_state_type
+  use ncdio_pio      , only : file_desc_t
+  use data_const_mod , only : spval => DAT_CONST_SPVAL  
+  use fileUtil       , only : var_flux_type, var_state_type
 implicit none
  private
 
@@ -68,7 +69,6 @@ contains
   use ncdio_pio, only : ncd_pio_closefile, ncd_defdim, ncd_defvar
   use ncdio_pio, only : ncd_putvar, ncd_enddef, ncd_unlimited
   use ncdio_pio, only : ncd_nowrite, ncd_float, ncd_getvar
-  use data_const_mod, only : spval => SHR_CONST_SPVAL
   implicit none
   class(histf_type), intent(inout):: this
   character(len=*), intent(in) :: gfname
@@ -333,7 +333,6 @@ contains
   !DESCRIPTION
   ! create history file for writting
   use ncdio_pio, only : ncd_pio_createfile, get_dim_len
-  use data_const_mod, only : spval  => SHR_CONST_SPVAL
   use fileUtil  , only : continue_run, iulog
   use ncdio_pio, only : ncd_defvar
   use ncdio_pio, only : ncd_defdim, ncd_unlimited, ncd_float
@@ -377,7 +376,7 @@ contains
   subroutine hist_add_var(this, ncid, varname, varnamel, units, freq)
 
   use ncdio_pio,  only : ncd_defvar,  ncd_float, file_desc_t
-  use data_const_mod, only : spval => SHR_CONST_SPVAL
+
   implicit none
   class(histf_type) , intent(inout):: this
   character(len=*), intent(in) :: varname

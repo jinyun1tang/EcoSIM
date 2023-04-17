@@ -1,5 +1,5 @@
 module Hour1Mod
-  use data_kind_mod, only : r8 => SHR_KIND_R8
+  use data_kind_mod, only : r8 => DAT_KIND_R8
   use minimathmod  , only : test_aeqb,AZMAX1,AZMIN1
   use abortutils   , only : endrun, print_info
   use ATSUtilsMod
@@ -799,7 +799,7 @@ module Hour1Mod
 
 !     begin_execution
 
-  ESNT(1:jsken,1:npelms,1:pltpar%n_pltlitrk,0:NL(NY,NX),NY,NX)=0.0_r8
+  ESNT(1:npelms,1:jsken,1:pltpar%n_pltlitrk,0:NL(NY,NX),NY,NX)=0.0_r8
 
   XOQCS(1:jcplx,0:NL(NY,NX),NY,NX)=0.0_r8
   XOQNS(1:jcplx,0:NL(NY,NX),NY,NX)=0.0_r8

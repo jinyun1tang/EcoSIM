@@ -2,7 +2,7 @@ module batchmod
 !j6aG$1bZcd5xgo1eAroLF36nN^
   use abortutils     , only : endrun
   use minimathMod    , only : addone
-  use data_kind_mod  , only : r8 => SHR_KIND_R8
+  use data_kind_mod  , only : r8 => DAT_KIND_R8
   use ModelStatusType, only : model_status_type
   use EcoSiMParDataMod  , only : micpar
   use MicForcTypeMod    , only : micforctype

@@ -1,5 +1,5 @@
 module IrrigationDataType
-  use data_kind_mod, only : r8 => SHR_KIND_R8
+  use data_kind_mod, only : r8 => DAT_KIND_R8
   use GridConsts
   use EcoSIMConfig, only : jcplx => jcplxc
   use TracerIDMod
@@ -202,7 +202,7 @@ module IrrigationDataType
   allocate(FIRRA(JY,JX));       FIRRA=0._r8
   allocate(CIRRA(JY,JX));       CIRRA=0._r8
   allocate(DIRRA(2,JY,JX));     DIRRA=0._r8
-  allocate(TDIRI(JY,JX,12));    TDIRI=0._r8
+  allocate(TDIRI(12,JY,JX));    TDIRI=0._r8
   allocate(CSTRR(JY,JX));       CSTRR=0._r8
   allocate(CCOQ(JY,JX));        CCOQ=0._r8
   allocate(CCHQ(JY,JX));        CCHQ=0._r8

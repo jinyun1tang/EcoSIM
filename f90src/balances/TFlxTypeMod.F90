@@ -1,7 +1,7 @@
 module TFlxTypeMod
 
   use GridDataType
-  use data_kind_mod, only : r8 => SHR_KIND_R8
+  use data_kind_mod, only : r8 => DAT_KIND_R8
   use abortutils, only : destroy
   use TracerIDMod
   use EcoSIMConfig, only : jcplx => jcplxc,jsken=>jskenc,NFGs=>NFGsc

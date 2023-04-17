@@ -1,5 +1,5 @@
 module RootGasMod
-  use data_kind_mod, only : r8 => SHR_KIND_R8
+  use data_kind_mod, only : r8 => DAT_KIND_R8
   use StomatesMod   , only : stomates
   use minimathmod  , only : safe_adb,vapsat,test_aneb,AZMAX1,AZMIN1
   use EcosimConst

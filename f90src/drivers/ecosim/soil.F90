@@ -3,7 +3,7 @@ SUBROUTINE soil(NE,NEX,NHW,NHE,NVN,NVS)
 ! Description:
 ! THIS IS THE MAIN SUBROUTINE FROM WHICH ALL OTHERS ARE CALLED
 !
-  use data_kind_mod, only : r8 => SHR_KIND_R8
+  use data_kind_mod, only : r8 => DAT_KIND_R8
   use DayMod       , only : day
   use ExecMod      , only : exec
   use StarteMod    , only : starte

@@ -12,7 +12,7 @@ module ForcWriterMod
   use SoilWaterDataType
   use ncdio_pio
   use EcoSIMConfig, only : jcplx => jcplxc
-  use data_const_mod, only : spval  => SHR_CONST_SPVAL
+  use data_const_mod, only : spval  => DAT_CONST_SPVAL
 implicit none
 
   type, public :: bgc_forc_config_type

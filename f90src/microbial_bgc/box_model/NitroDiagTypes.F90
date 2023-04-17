@@ -1,6 +1,6 @@
 module NitroDiagTypes
   ! !PUBLIC TYPES:
-  use data_kind_mod, only : r8 => SHR_KIND_R8
+  use data_kind_mod, only : r8 => DAT_KIND_R8
   USE abortutils, only : destroy
   use EcoSiMParDataMod, only : micpar
   implicit none

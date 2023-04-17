@@ -3,16 +3,19 @@ module ecosim_Time_Mod
 ! DESCRIPTION
 ! the module contains subroutine to march the time
 
-  use data_kind_mod  , only : r8 => shr_kind_r8
-  use data_kind_mod  , only : i8 => shr_kind_i8
+  use data_kind_mod  , only : r8 => DAT_kind_r8
+  use data_kind_mod  , only : i8 => DAT_kind_i8
   use fileUtil       , only : stdout, ecosim_string_length_long
   use EcosimConst    , only : secspday,secspyear
   implicit none
   private
   character(len=*), private, parameter :: mod_filename = __FILE__
 
+
+  real(r8), parameter :: uninit_r8  = -999999999.0
   integer , parameter :: daz(12)=(/31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31/)  
   integer , parameter :: cdaz(12)=(/31,59,90,120,151,181,212,243,273,304,334,365/)
+  integer , parameter :: cal_str_len=18   !YYYY-MM-DD-HHMMSS
 
   type, public :: ecosim_time_dat_type
     integer :: year0   !year0 of the simulation
@@ -37,10 +40,11 @@ module ecosim_Time_Mod
      integer  :: cyears              !cumulative years
      integer  :: cdays               !cumulative days
      integer  :: year0   !beginning year AD
-     real(r8) :: tod     !time of day
+     real(r8) :: tod     !time of day in seconds
      integer  :: hist_freq   !negative number, steps, positive number, 1: day, 30:mon, 365:year
      integer  :: stop_opt
      integer  :: leap_yr     
+     
    contains
      procedure, public :: Init
      procedure, public :: its_time_to_write_restart
@@ -55,13 +59,14 @@ module ecosim_Time_Mod
      procedure, public :: get_days_per_year
      procedure, public :: get_step_size
      procedure, public :: get_prev_time
-     procedure, public :: get_curr_time     
+     procedure, public :: get_curr_time   
+     procedure, public :: getdatetime       
      procedure, public :: get_curr_timeful  !current time + offset
      procedure, public :: get_days_cur_year     
      procedure, public :: proc_initstep
      procedure, public :: print_curr_time
      procedure, public :: its_time_to_histflush
-
+     procedure, public :: get_calendar
      procedure, public :: setClock
      procedure, public :: its_a_new_hour
      procedure, public :: its_a_new_day
@@ -867,4 +872,75 @@ contains
   get_curr_doy=this%doy
   end function get_curr_doy
 
+
+
+  !-----------------------------------------------------------------------
+  function get_calendar(this,prev)
+
+  implicit none
+  class(ecosim_time_type)  :: this
+  logical, optional, intent(in) :: prev
+  character(len=cal_str_len) :: get_calendar
+
+  integer :: year,mon,day,hh,mm,ss,tod
+  logical :: prev_loc
+
+  prev_loc=.false.
+  if(present(prev))prev_loc=prev
+  if(prev_loc)then    
+    call this%get_prev_date(year, mon, day, tod)
+  else
+    call this%get_curr_date(year, mon, day, tod)
+  endif  
+  hh=tod/3600
+  ss=mod(tod,60)
+  mm=(tod-hh*3600-ss)/60
+  write(get_calendar,'(I4.4,I2.2,I2.2,I2.2,I2.2,I2.2)')year,mon,day,hh,mm,ss
+
+  end function get_calendar
+
+!-----------------------------------------------------------------------
+  subroutine getdatetime (this, cdate, ctime)
+!
+! !DESCRIPTION:
+! A generic Date and Time routine
+!
+! !USES:
+!  use spmdMod      , only : mpicom, masterproc, MPI_CHARACTER
+! !ARGUMENTS:
+  implicit none
+  class(ecosim_time_type)  :: this
+  character(len=8), intent(out) :: cdate  !current date
+  character(len=8), intent(out) :: ctime  !current time
+!
+! !REVISION HISTORY:
+! Created by Mariana Vertenstein
+!
+!
+! !LOCAL VARIABLES:
+!EOP
+  character(len=8)      :: date       !current date
+  character(len=10)     :: time       !current time
+  character(len=5)      :: zone       !zone
+  integer, dimension(8) :: values !temporary
+  integer               :: ier    !MPI error code
+!-----------------------------------------------------------------------
+!  if (masterproc) then
+
+    call date_and_time (date, time, zone, values)
+
+    cdate(1:2) = date(5:6)
+    cdate(3:3) = '/'
+    cdate(4:5) = date(7:8)
+    cdate(6:6) = '/'
+    cdate(7:8) = date(3:4)
+
+    ctime(1:2) = time(1:2)
+    ctime(3:3) = ':'
+    ctime(4:5) = time(3:4)
+    ctime(6:6) = ':'
+    ctime(7:8) = time(5:6)
+
+!  endif
+  end subroutine getdatetime
 end module ecosim_Time_Mod

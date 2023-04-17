@@ -3,7 +3,7 @@ module StartsMod
 ! Description:
 ! code to initalize soil variables
 
-  use data_kind_mod, only : r8 => SHR_KIND_R8
+  use data_kind_mod, only : r8 => DAT_KIND_R8
   use abortutils, only : padr, print_info,check_bool
   use minimathMod, only : test_aeqb, test_aneb, AZMAX1,AZMIN1
   use EcosimConst
