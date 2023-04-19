@@ -5,7 +5,6 @@ module RestartMod
 ! code to read/write restart files
   use data_kind_mod     , only : r8 => DAT_KIND_R8
   use data_const_mod    , only : spval => DAT_CONST_SPVAL, ispval => DAT_CONST_ISPVAL  
-  use data_const_mod    , only : spval => DAT_CONST_SPVAL, ispval => DAT_CONST_ISPVAL  
   use EcoSIMConfig      , only : jcplx=> jcplxc, NFGs=> NFGsc,nlbiomcp=>nlbiomcpc
   use EcoSIMConfig      , only : ndbiomcp=>ndbiomcpc,jsken=>jskenc, cold_run
   use EcoSIMConfig      , only : inst_suffix,ref_date,start_date, ctitle

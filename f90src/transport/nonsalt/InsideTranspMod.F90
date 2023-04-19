@@ -130,6 +130,7 @@ module InsideTranspMod
   real(r8) :: trcn_RFLW0(ids_nut_beg:ids_nuts_end)
   real(r8) :: RDXS_gas(idg_beg:idg_end)
 
+  RDXS_gas(idg_beg:idg_end)=0._r8
   DO NX=NHW,NHE
     DO  NY=NVN,NVS
 

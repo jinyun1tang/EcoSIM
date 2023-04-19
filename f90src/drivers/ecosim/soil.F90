@@ -23,13 +23,11 @@ SUBROUTINE soil(NE,NEX,NHW,NHE,NVN,NVS)
   use ForcWriterMod, only : do_bgcforc_write,WriteBBGCForc
   use EcoSIMAPI    , only : Run_EcoSIM_one_step
   use GridConsts
-  use EcoSIMCtrlMod, only : frectyp
   use EcoSIMCtrlDataType
   use EcoSIMHistMod
   use EcoSIMConfig
   use HistDataType , only : hist_ecosim
   use HistFileMod  , only : hist_update_hbuf,hist_htapes_wrapup
-  use GridConsts   , only : bounds
 
   implicit none
   integer :: yearc, yeari

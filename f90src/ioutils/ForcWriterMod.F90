@@ -1,5 +1,4 @@
 module ForcWriterMod
-  use SOMDataType          , only : ORGC,CFOMC
   use SoilPhysDataType
   use SOMDataType
   USE MicrobialDataType

@@ -518,7 +518,7 @@ module ncdio_pio
   end if
 
   if (present(fill_value)) then
-      call check_ret(nf90_put_att(ncid_local, varid, '_FillValue',  fill_value),subname)
+      call check_ret(ncd_putatt(ncid, varid, '_FillValue', fill_value,lxtype),subname)
   endif
 
   if (present(comment)) then
@@ -706,14 +706,9 @@ module ncdio_pio
   logical :: readvar
   type(Var_desc_t)  :: vardesc
   integer :: j
-  character(len=*) :: subname=trim(mod_filename)//'::ncd_putvar_real_sp_1d'
+  character(len=*), parameter :: subname=trim(mod_filename)//'::ncd_putvar_real_sp_1d'
   call check_var(ncid, trim(varname), vardesc, readvar)
 
-  if(varname=='ABV_GRD_RESP')then
-    print*,'datsize',size(data),rec
-    print*,(data(j),j=1,size(data))
-    return
-  endif
   call check_ret( nf90_put_var(ncid%fh, vardesc%varid, data, &
      start = (/1,rec/)),trim(subname)//'::'//trim(varname))
 
@@ -872,7 +867,7 @@ module ncdio_pio
   integer :: varid
   logical :: readvar  
   type(Var_desc_t)  :: vardesc
-  character(len=*)  :: subname=trim(mod_filename)//'::ncd_putvar_int_all_3d'
+  character(len=*), parameter  :: subname=trim(mod_filename)//'::ncd_putvar_int_all_3d'
   call check_var(ncid, trim(varname), vardesc, readvar)
 
   call check_ret( nf90_put_var(ncid%fh, vardesc%varid, data),subname)
@@ -1878,7 +1873,7 @@ module ncdio_pio
     ! !LOCAL VARIABLES:
     integer  :: dimid                                ! netCDF id
     integer  :: ier                                  ! error status
-    character(len=32) :: subname = 'ncd_inqfdims' ! subroutine name
+    character(len=*), parameter :: subname = trim(mod_filename)//'::ncd_inqfdims' ! subroutine name
     !-----------------------------------------------------------------------
 
     if (single_column) then

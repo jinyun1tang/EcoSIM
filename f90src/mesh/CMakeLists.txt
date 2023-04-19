@@ -12,7 +12,7 @@ add_ecosim_library(mesh ${ECOSIM_MESH_SOURCES})
 set(ECOSIM_LIBRARIES mesh;${ECOSIM_LIBRARIES} PARENT_SCOPE)
 
 if (NOT CMAKE_INSTALL_PREFIX STREQUAL "INSTALL_DISABLED")
-  install(TARGETS util DESTINATION lib)
+  install(TARGETS mesh DESTINATION lib)
   file(GLOB HEADERS *.h)
   install(FILES ${HEADERS} DESTINATION include/ecosim/mesh)
 endif()

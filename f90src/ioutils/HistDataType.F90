@@ -9,7 +9,6 @@ module HistDataType
   use HistFileMod
   use MiniMathMod, only : safe_adb,AZMAX1
   use ElmIDMod
-  use GridConsts
   use GridDataType
   use EcoSIMCtrlDataType
   use EcosimConst
@@ -32,7 +31,6 @@ module HistDataType
   use SoilBGCDataType
   use AqueChemDatatype
   use SurfSoilDataType
-  use EcosimConst, only : patomw,natomw
 implicit none
 
   type, public :: histdata_type

@@ -15,7 +15,7 @@ add_ecosim_library(modelconfig ${ECOSIM_CONFG_SOURCES})
 set(ECOSIM_LIBRARIES modelconfig;${ECOSIM_LIBRARIES} PARENT_SCOPE)
 
 if (NOT CMAKE_INSTALL_PREFIX STREQUAL "INSTALL_DISABLED")
-  install(TARGETS util DESTINATION lib)
+  install(TARGETS modelconfig DESTINATION lib)
   file(GLOB HEADERS *.h)
   install(FILES ${HEADERS} DESTINATION include/ecosim/config)
 endif()

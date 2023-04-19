@@ -688,7 +688,7 @@ implicit none
     integer :: ier                 ! error code
     integer :: t, f                ! tape, field indices
     integer :: day, sec            ! day and seconds from base date
-    character(len=*),parameter :: subname = 'hist_htapes_build'
+    character(len=*),parameter :: subname = trim(mod_filename)//'::hist_htapes_build'
 
     !-----------------------------------------------------------------------
 
@@ -1848,7 +1848,7 @@ implicit none
     character(len=32) :: dim2name        ! temporary
     real(r8), pointer :: histo(:,:)      ! temporary
     real(r8), pointer :: hist1do(:)      ! temporary
-    character(len=*),parameter :: subname = 'hfields_write'
+    character(len=*),parameter :: subname = trim(mod_filename)//'::hfields_write'
 !-----------------------------------------------------------------------
     ! Write/define 1d topological info
 
@@ -1897,6 +1897,7 @@ implicit none
           dim1name = type1d_out ; dim2name = 'undefined'
 
           if (dim2name == 'undefined') then
+
              if (numdims == 1) then
                 call ncd_defvar(ncid=nfid(t), varname=varname, xtype=tape(t)%ncprec, &
                      dim1name=dim1name, dim2name='time', &
