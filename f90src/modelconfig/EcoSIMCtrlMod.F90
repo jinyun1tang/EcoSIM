@@ -16,6 +16,8 @@ implicit none
   type(ecosim_time_type) :: etimer
   logical :: Lirri_auto=.false.
 
+  character(len=8) :: diag_opt ='nsteps'
+  integer :: diag_frq=-999999999
   logical :: continue_run
   logical :: restart_out
   logical :: visual_out

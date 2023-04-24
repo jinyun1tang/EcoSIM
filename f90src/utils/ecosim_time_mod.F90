@@ -44,10 +44,16 @@ module ecosim_Time_Mod
      integer  :: hist_freq   !negative number, steps, positive number, 1: day, 30:mon, 365:year
      integer  :: stop_opt
      integer  :: leap_yr     
-     
+     integer  :: rest_n
+     integer  :: rest_frq
+     integer  :: diag_n
+     character(len=8)  :: diag_opt
+     integer  :: diag_frq
+     character(len=8) :: rest_opt
    contains
      procedure, public :: Init
      procedure, public :: its_time_to_write_restart
+     procedure, public :: its_time_to_diag
      procedure, public :: its_time_to_exit
      procedure, public :: update_time_stamp
      procedure, public :: set_nstep
@@ -79,6 +85,8 @@ module ecosim_Time_Mod
      procedure, public :: get_curr_day
      procedure, public :: get_curr_mon     
      procedure, public :: is_first_step
+     procedure, public :: config_restart
+     procedure, public :: config_diag
      procedure, public :: print_model_time_stamp
      procedure, private:: proc_nextstep
      procedure, private:: ReadNamelist
@@ -134,7 +142,8 @@ contains
     integer, optional, intent(in) :: year0    !beginning year, used to record in the AD format
     integer, optional, intent(in) :: nyears   !run the timer for nyears
     integer :: N
-
+    this%rest_n=0
+    this%diag_n=0
     this%tstep = 0
     this%time0 = 0._r8
     this%curr_time  = 0._r8
@@ -178,6 +187,28 @@ contains
     endif
   end subroutine Init
 
+  ! ----------------------------------------------------------------------
+  subroutine config_diag(this,diag_frq,diag_opt)
+  implicit none
+  ! !ARGUMENTS:
+  class(ecosim_time_type), intent(inout) :: this
+  character(len=*), intent(in) :: diag_opt
+  integer, intent(in) :: diag_frq
+
+  this%diag_frq=diag_frq
+  this%diag_opt=diag_opt
+  end subroutine config_diag
+  ! ----------------------------------------------------------------------
+  subroutine config_restart(this,rest_frq,rest_opt)
+  implicit none
+  ! !ARGUMENTS:
+  class(ecosim_time_type), intent(inout) :: this
+  character(len=*), intent(in) :: rest_opt
+  integer, intent(in) :: rest_frq
+
+  this%rest_frq=rest_frq
+  this%rest_opt=rest_opt
+  end subroutine config_restart  
   ! ----------------------------------------------------------------------
 
   subroutine ReadNamelist(this, namelist_buffer, masterproc)
@@ -290,14 +321,92 @@ contains
      !
 
      implicit none
-     class(ecosim_time_type), intent(in) :: this
+     class(ecosim_time_type), intent(inout) :: this
      logical :: ans
 
-     character(len=80) :: subname = 'its_time_to_write_restart'
+     character(len=80) :: subname = trim(mod_filename)//'::its_time_to_write_restart'
 
-     ans = (mod(this%curr_time,this%restart_dtime) == 0)
+     ans=.false.      
+     select case (this%rest_opt)
+     case ('nsteps')
+       this%rest_n=this%rest_n+1
+       this%rest_n=mod(this%rest_n,this%rest_frq)
+       ans=(this%rest_n==0)
+     case ('nhours')
+       if(this%its_a_new_hour())then
+         this%rest_n=mod(this%rest_n+1,this%rest_frq)
+         ans=(this%rest_n==0)
+       endif
+     case ('ndays')
+       if(this%its_a_new_day())then
+         this%rest_n=mod(this%rest_n+1,this%rest_frq)
+         ans=(this%rest_n==0)
+       endif       
+     case ('nweeks')
+       if(this%its_a_new_week())then
+         this%rest_n=mod(this%rest_n+1,this%rest_frq)
+         ans=(this%rest_n==0)
+       endif  
+     case ('nmonths')
+       if(this%its_a_new_month())then
+         this%rest_n=mod(this%rest_n+1,this%rest_frq)
+         ans=(this%rest_n==0)
+       endif   
+     case ('nyears')
+       if(this%its_a_new_year())then 
+         this%rest_n=mod(this%rest_n+1,this%rest_frq)
+         ans=(this%rest_n==0)
+       endif           
+     end select
+
      end function its_time_to_write_restart
+  !-------------------------------------------------------------------------------
+    function its_time_to_diag(this)result(ans)
+     !
+     ! DESCRIPTION
+     ! decide if to write restart file
+     !
 
+     implicit none
+     class(ecosim_time_type), intent(inout) :: this
+     logical :: ans
+
+     character(len=80) :: subname = trim(mod_filename)//'::its_time_to_diag'
+
+     ans=.false.     
+     select case (this%diag_opt)
+     case ('nsteps')
+       this%diag_n=this%diag_n+1
+       this%diag_n=mod(this%diag_n,this%diag_frq)
+       ans=(this%diag_n==0)
+     case ('nhours')
+       if(this%its_a_new_hour())then
+         this%diag_n=mod(this%diag_n+1,this%diag_frq)
+         ans=(this%diag_n==0)
+       endif
+     case ('ndays')
+       if(this%its_a_new_day())then
+         this%diag_n=mod(this%diag_n+1,this%diag_frq)
+         ans=(this%diag_n==0)
+       endif
+     case ('nweeks')
+       if(this%its_a_new_week())then
+         this%diag_n=mod(this%diag_n+1,this%diag_frq)
+         ans=(this%diag_n==0)
+       endif  
+     case ('nmonths')
+       if(this%its_a_new_month())then
+         this%diag_n=mod(this%diag_n+1,this%diag_frq)
+         ans=(this%diag_n==0)         
+       endif   
+     case ('nyears')
+       if(this%its_a_new_year())then 
+         this%diag_n=mod(this%diag_n+1,this%diag_frq)
+         ans=(this%diag_n==0)         
+       endif            
+     end select
+
+     end function its_time_to_diag
   !-------------------------------------------------------------------------------
   function its_time_to_exit(this) result(ans)
     !

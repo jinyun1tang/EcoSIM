@@ -461,10 +461,9 @@ module ncdio_pio
   integer :: lxtype
   type(file_desc_t) :: ncid_tmp
   character(len=256) :: str ! temporary
-  character(len=256) :: subname
+  character(len=*), parameter :: subname=trim(mod_filename)//'::ncd_defvar'
 !-----------------------------------------------------------------------
 
-  write(subname,'(A)')'ncd_def_var '//trim(varname)
 
     ! Determine dimension ids for variable
   ncid_local = ncid%fh
@@ -475,7 +474,8 @@ module ncdio_pio
     lxtype = xtype
   endif
   if (present(dim1name)) then
-    call check_ret(nf90_inq_dimid(ncid_local, dim1name, dimid(1)), subname//' dim1: '//dim1name)
+    call check_ret(nf90_inq_dimid(ncid_local, dim1name, dimid(1)), &
+      subname//' dim1: '//dim1name//' var: '//trim(varname))
   endif
 
   if (present(dim2name)) then
@@ -499,13 +499,16 @@ module ncdio_pio
     do n = 1, size(dimid)
       if (dimid(n) /= 0) ndims = ndims + 1
     end do
-    call check_ret(nf90_def_var(ncid_local, trim(varname), xtype, dimid(1:ndims), varid), subname)
+    call check_ret(nf90_def_var(ncid_local, trim(varname), lxtype, dimid(1:ndims), varid), &
+      trim(subname)//'::'//trim(varname))
   else
-    call check_ret(nf90_def_var(ncid_local, trim(varname), xtype,  varid), subname)
+    call check_ret(nf90_def_var(ncid_local, trim(varname), lxtype,  varid), &
+      trim(subname)//'::'//trim(varname))
   end if
 
   if (present(long_name)) then
-    call check_ret(nf90_put_att(ncid_local, varid, 'long_name',  trim(long_name)), subname)
+    call check_ret(nf90_put_att(ncid_local, varid, 'long_name',  trim(long_name)), &
+      trim(subname)//'::'//trim(long_name))
   end if
 
   if (present(units)) then

@@ -797,7 +797,7 @@ module readiMod
   !   FHOL: micropore fraction
   !     BKDSI(L,NY,NX)=BKDSI(L,NY,NX)/(1.0_r8-FHOL(L,NY,NX))
           BKDS(L,NY,NX)=BKDSI(L,NY,NX)
-          IF(test_aeqb(BKDS(L,NY,NX),0.0_r8))FHOL(L,NY,NX)=0.0
+          IF(test_aeqb(BKDS(L,NY,NX),0.0_r8))FHOL(L,NY,NX)=0.0_r8
   !     fraction of soil has micropore
           FMPR(L,NY,NX)=(1.0_r8-ROCK(L,NY,NX))*(1.0_r8-FHOL(L,NY,NX))
   !     FC(L,NY,NX)=FC(L,NY,NX)/(1.0-FHOL(L,NY,NX))

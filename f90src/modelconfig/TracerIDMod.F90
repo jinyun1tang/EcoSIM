@@ -137,6 +137,16 @@ implicit none
   integer :: ifertnb_beg,ifertnb_end
   integer :: ids_nuts
   integer :: idsa_nuts
+  type, public :: trc_def_type
+   integer :: ngtracers    !number of gas tracers
+   integer :: nstracers    !number of solute tracers
+   integer :: nsatracers   !number of salt tracers
+   integer :: nptracers    !number of precipitate tracers
+   integer :: nxtracers    !number of exchangeable tracers
+   integer :: nutracers    !number of nutrient tracers
+  end type trc_def_type
+
+  type(trc_def_type), public :: trc_confs
   contains
 
   subroutine InitTracerIDs(lsalt_model)
@@ -324,5 +334,15 @@ implicit none
   idx_H2PO4B =addone(idx_end)! XH2PB, exchangeable H2PO4  band, [mol d-2]
   idx_end=idx_H2PO4B
   idx_anion_soil_end=idx_H2PO4
+
+
+  trc_confs%ngtracers=idg_end-idg_beg
+  trc_confs%nstracers=ids_end-ids_beg+1
+  if(lsalt_model)trc_confs%nsatracers=idsab_end-idsa_beg+1
+  trc_confs%nptracers=idsp_end-idsp_beg+1
+  trc_confs%nxtracers=idx_end-idx_beg+1
+  trc_confs%nutracers=ids_nuts_end-ids_nut_beg+1
+
   end subroutine InitTracerIDs
 end module TracerIDMod
+

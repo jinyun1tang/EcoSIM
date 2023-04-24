@@ -1787,8 +1787,8 @@ implicit none
              end if
           else
  !            if (masterproc) then
-                write(iulog,*) trim(subname),' : history tape ',t,': no open file to close'
-                print*,tape(t)%ntimes,tape(t)%mfilt,rstwr, nlend
+!                write(iulog,*) trim(subname),' : history tape ',t,': no open file to close'
+!                print*,tape(t)%ntimes,tape(t)%mfilt,rstwr, nlend
  !            end if
           endif
        else
@@ -2273,7 +2273,7 @@ implicit none
           call ncd_defdim( ncid_hist(t), 'max_chars'    , max_chars   , dimid)
           call ncd_defdim( ncid_hist(t), 'max_nflds'    , max_nflds   ,  dimid)   
           call ncd_defdim( ncid_hist(t), 'max_flds'     , max_flds    , dimid)   
-       
+          call ncd_defdim( ncid_hist(t), 'string_length', 64          , dimid)
           call ncd_defvar(ncid=ncid_hist(t), varname='nhtfrq', xtype=ncd_int, &
                long_name="Frequency of history writes",               &
                comment="Namelist item", &
@@ -2304,8 +2304,10 @@ implicit none
           call ncd_defvar(ncid=ncid_hist(t), varname='ntimes', xtype=ncd_int, &
                long_name="Number of time steps on file", units="time-step",     &
                dim1name='scalar')
+          print*,'is_endhist'     
           call ncd_defvar(ncid=ncid_hist(t), varname='is_endhist', xtype=ncd_log, &
                long_name="End of history file", dim1name='scalar')
+          print*,'begtime'
           call ncd_defvar(ncid=ncid_hist(t), varname='begtime', xtype=ncd_double, &
                long_name="Beginning time", units="time units",     &
                dim1name='scalar')
@@ -2495,6 +2497,7 @@ implicit none
              call ncd_io('begtime', tape(t)%begtime, 'read', ncid_hist(t) )
 
              call ncd_io(varname='is_endhist', data=tape(t)%is_endhist, ncid=ncid_hist(t), flag='read')
+
              call ncd_io(varname='num2d', data=itemp2d(:,t), ncid=ncid_hist(t), flag='read')
              do f=1,tape(t)%nflds
                 tape(t)%hlist(f)%field%num2d = itemp2d(f,t)

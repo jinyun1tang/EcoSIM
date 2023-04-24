@@ -10,6 +10,7 @@
   use EcoSIMHistMod  , only : DATAC
   use EcoSIMCtrlMod
   use HistFileMod
+  use RestartMod     , only : rest_frq,rest_opt
   implicit none
   character(len=*), parameter :: mod_filename = __FILE__
   character(len=*), intent(in) :: nmlfile
@@ -25,15 +26,15 @@
   integer :: do_doy,do_year,do_layer
   character(len=64) :: bgc_fname
 
-  namelist /ecosys/case_name, prefix, do_regression_test, &
+  namelist /ecosim/case_name, prefix, do_regression_test, &
     num_of_simdays,lverbose,num_microbial_guilds,transport_on,column_mode,&
     do_instequil,salt_model, pft_file_in,grid_file_in,pft_mgmt_in, clm_factor_in,&
     clm_file_in,soil_mgmt_in,hist_config,sim_yyyymmdd,forc_periods,&
     NPXS,NPYS,JOUTS,IOUTS,KOUTS,continue_run,visual_out,restart_out,&
     finidat,nrevsn,brnch_retain_casename
   
-  namelist /ecosys/hist_nhtfrq,hist_mfilt,hist_fincl1,hist_fincl2,hist_yrclose, &
-    do_budgets
+  namelist /ecosim/hist_nhtfrq,hist_mfilt,hist_fincl1,hist_fincl2,hist_yrclose, &
+    do_budgets,rest_frq,rest_opt,diag_frq,diag_opt
 
   logical :: laddband
   namelist /bbgcforc/do_bgcforc_write,do_year,do_doy,laddband,do_layer,&
@@ -87,33 +88,33 @@
   if (rc /= 0) then
     write (iulog, '(3a)') 'Error: input file ', trim(nmlfile), &
   ' does not exist.'
-    call endrun('stopped in readnml ', __LINE__)
+    call endrun('stopped in '//trim(mod_filename), __LINE__)
   end if
 
   open (action='read', file=nmlfile, iostat=rc, newunit=fu)
   if (rc /= 0) then
     write (iulog, '(2a)') 'Error openning input file "', &
   trim(nmlfile)
-    call endrun('stopped in readnml ', __LINE__)
+    call endrun('stopped in '//trim(mod_filename), __LINE__)
   end if
 
-  read(unit=fu, nml=ecosys, iostat=nml_error, iomsg=ioerror_msg)
+  read(unit=fu, nml=ecosim, iostat=nml_error, iomsg=ioerror_msg)
   if (nml_error /= 0) then
-     write(iulog,'(a)')"ERROR reading ecosys namelist "
-     call endrun('stopped in readnml', __LINE__)
+     write(iulog,'(a)')"ERROR reading ecosim namelist "
+     call endrun('stopped in '//trim(mod_filename), __LINE__)
   end if
 
   read(unit=fu, nml=bbgcforc, iostat=nml_error, iomsg=ioerror_msg)
   if (nml_error /= 0) then
      write(iulog,'(a)')"ERROR reading bbgcforc namelist "
-     call endrun('stopped in readnml ', __LINE__)
+     call endrun('stopped in '//trim(mod_filename), __LINE__)
   end if
 
   close(fu)
   if (.true.) then
     write(iulog, *)
     write(iulog, *) '--------------------'
-    write(iulog,ecosys)
+    write(iulog,ecosim)
     write(iulog, *)
     write(iulog, *) '--------------------'
     write(iulog,bbgcforc)
@@ -121,6 +122,8 @@
     write(iulog, *) '--------------------'
 
   endif
+  call etimer%config_restart(rest_frq,rest_opt)
+  call etimer%config_diag(diag_frq,diag_opt)
   if(do_bgcforc_write)then
     bgc_forc_conf%doy =do_doy
     bgc_forc_conf%year=do_year

@@ -7,6 +7,7 @@ module ExecMod
   use GridConsts
   use FlagDataType
   use EcoSimConst
+  use EcoSIMCtrlMod     , only : etimer
   use EcoSIMCtrlDataType
   use EcoSimSumDataType
   use GridDataType
@@ -53,7 +54,7 @@ module ExecMod
 !
 ! CALCULATE DEVIATION SINCE MASS BALANCE WAS LAST RESET
 !
-  IF((I/IOUT)*IOUT.EQ.I)THEN
+  IF(etimer%its_time_to_diag())THEN
     DIFFQ=(VOLWSO-CRAIN+CRUN+CEVAP+VOLWOU-TLW)/TAREA
     DIFFH=(HEATSO-HEATIN+HEATOU-TLH)/TAREA
     DIFFO=(OXYGSO-OXYGIN+OXYGOU-TLO)/TAREA

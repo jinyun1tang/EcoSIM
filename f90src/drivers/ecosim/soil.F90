@@ -11,7 +11,7 @@ SUBROUTINE soil(NE,NEX,NHW,NHE,NVN,NVS)
   use StartsMod    , only : starts
   use VisualMod    , only : visual
   use WthrMod      , only : wthr
-  use RestartMod   , only : restart
+  use RestartMod   , only : restart,restFile
   use PlantInfoMod , only : ReadPlantInfo
   use readsmod     , only : reads
   use Hist1Mod     , only : fouts,foutp,outpd,outph,outsd,outsh
@@ -153,9 +153,13 @@ SUBROUTINE soil(NE,NEX,NHW,NHE,NVN,NVS)
       call etimer%update_time_stamp()      
 
       nlend=etimer%its_time_to_exit()
-      rstwr=.false.
+      rstwr=etimer%its_time_to_write_restart()
       lnyr=etimer%its_a_new_year().and.hist_yrclose
       call hist_htapes_wrapup( rstwr, nlend, bounds, lnyr )      
+      if(rstwr)then
+        write(*,*)'write restart file'
+        call restFile(flag='write')
+      endif
     END DO
     
     IF(restart_out.AND.KOUT.GT.0)THEN
