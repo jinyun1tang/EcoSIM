@@ -1,17 +1,17 @@
 module ForcWriterMod
-  use SOMDataType          , only : ORGC,CFOMC
   use SoilPhysDataType
   use SOMDataType
   USE MicrobialDataType
   use SoilBGCDataType
   use GridDataType
+  use GridConsts
   use AqueChemDatatype
   use SoilPropertyDataType
   use ClimForcDataType
   use SoilWaterDataType
   use ncdio_pio
   use EcoSIMConfig, only : jcplx => jcplxc
-  use data_const_mod, only : spval  => SHR_CONST_SPVAL
+  use data_const_mod, only : spval  => DAT_CONST_SPVAL
 implicit none
 
   type, public :: bgc_forc_config_type
@@ -43,6 +43,7 @@ implicit none
   integer :: recordDimID
   real(r8),pointer :: data1d(:)
   real(r8), allocatable :: dat1d(:)
+
   if(year==bgc_forc_conf%year .and. doy==bgc_forc_conf%doy)then
     NY=1;NX=1;L=bgc_forc_conf%Layer
     write(*,*)'write bbgc forc on day ',doy,'year',year
@@ -51,8 +52,8 @@ implicit none
     call ncd_defdim(ncf,'jsken',jsken,recordDimID)
     call ncd_defdim(ncf,'ndbiomcp',2,recordDimID)
     call ncd_defdim(ncf,'nlbiomcp',3,recordDimID)
-    call ncd_defdim(ncf,'JG',JG,recordDimID)
-    call ncd_defdim(ncf,'NFGs',NFGs,recordDimID)
+    call ncd_defdim(ncf,'NMICBSO',NMICBSO,recordDimID)
+    call ncd_defdim(ncf,'NMICBSA',NMICBSA,recordDimID)
 
     call ncd_defvar(ncf, 'pH', ncd_float, long_name='soil pH',  &
             units='none', missing_value=spval, fill_value=spval)
@@ -187,30 +188,27 @@ implicit none
             dim2name='jcplx',long_name='microbial residue P in each complex',  &
             units='gP d-2', missing_value=spval, fill_value=spval)
     call ncd_defvar(ncf, 'OMC', ncd_float, dim1name='nlbiomcp',&
-            dim2name='JG',dim3name='NFGs',dim4name='jcplx',&
+            dim2name='NMICBSO',dim3name='jcplx',&
             long_name='microbial biomass C in each complex',  &
             units='gC d-2', missing_value=spval, fill_value=spval)
     call ncd_defvar(ncf, 'OMN', ncd_float, dim1name='nlbiomcp',&
-            dim2name='JG',dim3name='NFGs',dim4name='jcplx',&
+            dim2name='NMICBSO',dim3name='jcplx',&
             long_name='microbial biomass N in each complex',  &
             units='gN d-2', missing_value=spval, fill_value=spval)
     call ncd_defvar(ncf, 'OMP', ncd_float, dim1name='nlbiomcp',&
-            dim2name='JG',dim3name='NFGs',dim4name='jcplx',&
+            dim2name='NMICBSO',dim3name='jcplx',&
             long_name='microbial biomass P in each complex',  &
             units='gP d-2', missing_value=spval, fill_value=spval)
 
-    call ncd_defvar(ncf, 'OMCff', ncd_float, dim1name='nlbiomcp',&
-            dim2name='JG',dim3name='NFGs',&
+    call ncd_defvar(ncf, 'OMCff', ncd_float, dim1name='nlbiomcp',dim2name='NMICBSA',&
             long_name='microbial biomass C in autotrophic complex',  &
             units='gC d-2', missing_value=spval, fill_value=spval)
 
-    call ncd_defvar(ncf, 'OMNff', ncd_float, dim1name='nlbiomcp',&
-            dim2name='JG',dim3name='NFGs',&
+    call ncd_defvar(ncf, 'OMNff', ncd_float, dim1name='nlbiomcp',dim2name='NMICBSA',&
             long_name='microbial biomass N in autotrophic complex',  &
             units='gN d-2', missing_value=spval, fill_value=spval)
 
-    call ncd_defvar(ncf, 'OMPff', ncd_float, dim1name='nlbiomcp',&
-            dim2name='JG',dim3name='NFGs',&
+    call ncd_defvar(ncf, 'OMPff', ncd_float, dim1name='nlbiomcp',dim2name='NMICBSA',&
             long_name='microbial biomass P in autotrophic complex',  &
             units='gP d-2', missing_value=spval, fill_value=spval)
 
@@ -272,9 +270,9 @@ implicit none
     call ncd_putvar(ncf,'PSISE',PSISE(L,NY,NX))
     call ncd_putvar(ncf,'DLYR3',DLYR(3,L,NY,NX))
     call ncd_putvar(ncf,'CEC',CEC(L,NY,NX))
-    call ncd_putvar(ncf,'XCEC',XCEC(L,NY,NX))
+    call ncd_putvar(ncf,'XCEC',trcx_solml(idx_CEC,L,NY,NX))
     call ncd_putvar(ncf,'AEC',AEC(L,NY,NX))
-    call ncd_putvar(ncf,'XAEC',XAEC(L,NY,NX))
+    call ncd_putvar(ncf,'XAEC',trcx_solml(idx_AEC,L,NY,NX))
     call ncd_putvar(ncf,'CFE',CFE(L,NY,NX))
     call ncd_putvar(ncf,'CCA',CCA(L,NY,NX))
     call ncd_putvar(ncf,'CMG',CMG(L,NY,NX))
@@ -283,9 +281,9 @@ implicit none
     call ncd_putvar(ncf,'CSO4',CSO4(L,NY,NX))
     call ncd_putvar(ncf,'CCL',CCL(L,NY,NX))
     call ncd_putvar(ncf,'CAL',CAL(L,NY,NX))
-    call ncd_putvar(ncf,'ZMG',ZMG(L,NY,NX))
-    call ncd_putvar(ncf,'ZNA',ZNA(L,NY,NX))
-    call ncd_putvar(ncf,'ZKA',ZNA(L,NY,NX))
+    call ncd_putvar(ncf,'ZMG',trcsa_solml(idsa_Mg,L,NY,NX))
+    call ncd_putvar(ncf,'ZNA',trcsa_solml(idsa_Na,L,NY,NX))
+    call ncd_putvar(ncf,'ZKA',trcsa_solml(idsa_K,L,NY,NX))
     call ncd_putvar(ncf,'CALPO',CALPO(L,NY,NX))
     call ncd_putvar(ncf,'CFEPO',CFEPO(L,NY,NX))
     call ncd_putvar(ncf,'CCAPD',CCAPD(L,NY,NX))
@@ -317,26 +315,26 @@ implicit none
     call ncd_putvar(ncf,'ORN',ORN(:,:,L,NY,NX))
     call ncd_putvar(ncf,'ORP',ORP(:,:,L,NY,NX))
 
-    call ncd_putvar(ncf,'OMC',OMC(:,:,:,:,L,NY,NX))
-    call ncd_putvar(ncf,'OMN',OMN(:,:,:,:,L,NY,NX))
-    call ncd_putvar(ncf,'OMP',OMP(:,:,:,:,L,NY,NX))
+    call ncd_putvar(ncf,'OMC',OMC(:,:,:,L,NY,NX))
+    call ncd_putvar(ncf,'OMN',OMN(:,:,:,L,NY,NX))
+    call ncd_putvar(ncf,'OMP',OMP(:,:,:,L,NY,NX))
 
-    call ncd_putvar(ncf,'OMCff',OMCff(:,:,:,L,NY,NX))
-    call ncd_putvar(ncf,'OMNff',OMNff(:,:,:,L,NY,NX))
-    call ncd_putvar(ncf,'OMPff',OMPff(:,:,:,L,NY,NX))
+    call ncd_putvar(ncf,'OMCff',OMCff(:,:,L,NY,NX))
+    call ncd_putvar(ncf,'OMNff',OMNff(:,:,L,NY,NX))
+    call ncd_putvar(ncf,'OMPff',OMPff(:,:,L,NY,NX))
 
     if(bgc_forc_conf%laddband)then
-      call ncd_putvar(ncf,'ZNH4S',ZNH4S(L,NY,NX)+ZNH4B(L,NY,NX))
-      call ncd_putvar(ncf,'ZNO3S',ZNO3S(L,NY,NX)+ZNO3B(L,NY,NX))
-      call ncd_putvar(ncf,'ZNO2S',ZNO2S(L,NY,NX)+ZNO2B(L,NY,NX))
-      call ncd_putvar(ncf,'H2PO4',H2PO4(L,NY,NX)+H2POB(L,NY,NX))
-      call ncd_putvar(ncf,'H1PO4',H1PO4(L,NY,NX)+H1POB(L,NY,NX))
+      call ncd_putvar(ncf,'ZNH4S',trc_solml(ids_NH4,L,NY,NX)+trc_solml(ids_NH4B,L,NY,NX))
+      call ncd_putvar(ncf,'ZNO3S',trc_solml(ids_NO3,L,NY,NX)+trc_solml(ids_NO3B,L,NY,NX))
+      call ncd_putvar(ncf,'ZNO2S',trc_solml(ids_NO2,L,NY,NX)+trc_solml(ids_NO2B,L,NY,NX))
+      call ncd_putvar(ncf,'H2PO4',trc_solml(ids_H2PO4,L,NY,NX)+trc_solml(ids_H2PO4B,L,NY,NX))
+      call ncd_putvar(ncf,'H1PO4',trc_solml(ids_H1PO4,L,NY,NX)+trc_solml(ids_H1PO4B,L,NY,NX))
     else
-      call ncd_putvar(ncf,'ZNH4S',ZNH4S(L,NY,NX))
-      call ncd_putvar(ncf,'ZNO3S',ZNO3S(L,NY,NX))
-      call ncd_putvar(ncf,'ZNO2S',ZNO2S(L,NY,NX))
-      call ncd_putvar(ncf,'H2PO4',H2PO4(L,NY,NX))
-      call ncd_putvar(ncf,'H1PO4',H1PO4(L,NY,NX))
+      call ncd_putvar(ncf,'ZNH4S',trc_solml(ids_NH4,L,NY,NX))
+      call ncd_putvar(ncf,'ZNO3S',trc_solml(ids_NO3,L,NY,NX))
+      call ncd_putvar(ncf,'ZNO2S',trc_solml(ids_NO2,L,NY,NX))
+      call ncd_putvar(ncf,'H2PO4',trc_solml(ids_H2PO4,L,NY,NX))
+      call ncd_putvar(ncf,'H1PO4',trc_solml(ids_H1PO4,L,NY,NX))
     endif
     call ncd_pio_closefile(ncf)
   endif

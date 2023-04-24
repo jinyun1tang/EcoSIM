@@ -19,6 +19,9 @@ set(PLANT_BGC_SOURCES
   HfuncsMod.F90
 )
 include_directories(${CMAKE_BINARY_DIR}/f90src/utils/)
+include_directories(${CMAKE_BINARY_DIR}/f90src/minimath/)
+include_directories(${CMAKE_BINARY_DIR}/f90src/modelconfig/)
+include_directories(${CMAKE_BINARY_DIR}/f90src/mesh/)
 include_directories(${CMAKE_BINARY_DIR}/f90src/ecosim_datatype/)
 include_directories(${CMAKE_BINARY_DIR}/f90src/APIData/)
 include_directories(${CMAKE_BINARY_DIR}/f90src/modelpars/)

@@ -1,9 +1,10 @@
 module CanopyCondsMod
 
-  use data_kind_mod, only : r8 => SHR_KIND_R8
+  use data_kind_mod, only : r8 => DAT_KIND_R8
   use EcoSimConst
   use EcoSIMConfig
   use PlantAPIData
+  use minimathmod, only : AZMAX1
   implicit none
   private
   CHARACTER(LEN=*), PARAMETER :: MOD_FILENAME=__FILE__
@@ -73,12 +74,11 @@ module CanopyCondsMod
 !     ZZ=reference height for wind speed
 !
   ARLSC=ARLFC+ARSTC
-  IF(ARLSC.GT.ZEROS.AND.ZT.GE.DPTHS-ZERO &
-    .AND.ZT.GE.DPTH0-ZERO)THEN
+  IF(ARLSC.GT.ZEROS.AND.ZT.GE.DPTHS-ZERO.AND.ZT.GE.DPTH0-ZERO)THEN
     ARLSG=ARLSC/AREA3(NU)
-    ZX=EXP(-0.5*ARLSG)
-    ZY=1.0-ZX
-    ZD=ZT*AMAX1(0.0_r8,1.0_r8-2.0_r8/ARLSG*ZY)
+    ZX=EXP(-0.5_r8*ARLSG)
+    ZY=1.0_r8-ZX
+    ZD=ZT*AZMAX1(1.0_r8-2.0_r8/ARLSG*ZY)
     ZE=ZT*AMAX1(0.05_r8,ZX*ZY)
   ELSE
     ZD=0.0_r8
@@ -102,8 +102,8 @@ module CanopyCondsMod
 !     UA=wind speed
 !     RIB=canopy isothermal Richardson number
 !
-    RAB=AMAX1(RAM,(LOG((ZZ-ZD)/ZR))**2/(0.168*UA))
-    RIB=1.27E+08*(ZZ-ZR)/(UA**2*TKA)
+    RAB=AMAX1(RAM,(LOG((ZZ-ZD)/ZR))**2._r8/(0.168_r8*UA))
+    RIB=1.27E+08_r8*(ZZ-ZR)/(UA**2*TKA)
   ELSE
     RAB=RAM
     RIB=0.0_r8
@@ -167,11 +167,11 @@ module CanopyCondsMod
         ZL1(L-1)=ZL(L-1)
       ENDIF
 2765  CONTINUE
-    DO 2770 L=JC1,2,-1
+    D2770: DO L=JC1,2,-1
       ZL(L-1)=ZL1(L-1)
-!     ZL(L-1)=AMAX1(0.0,AMIN1(ZL(L)-1.0E-06
+!     ZL(L-1)=AZMAX1(AMIN1(ZL(L)-ppmc
 !    2,ZL(L-1)))
-2770  CONTINUE
+    ENDDO D2770
   ENDIF
   end associate
   end subroutine DivideCanopyLayerByLAI
@@ -365,7 +365,7 @@ module CanopyCondsMod
     SAZI=0.2618_r8*(ZNOON-J)+4.7124_r8
     SCOS=SQRT(1.0-SSIN**2)
     DGAZI=COS(GAZI-SAZI)
-    BETAG=AMAX1(0.0,AMIN1(1.0,GCOS*SSIN &
+    BETAG=AZMAX1(AMIN1(1.0,GCOS*SSIN &
       +GSIN*SCOS*DGAZI))
     IF(ARLSS.GT.0.0)THEN
       SAGL=ASIN(SSIN)
@@ -401,7 +401,7 @@ module CanopyCondsMod
           ELSE
             BETZ=-ACOS(BETY)
           ENDIF
-          IF(BETZ.GT.-PICON2)THEN
+          IF(BETZ.GT.-PICON2h)THEN
             ZAGL=SAGL+2.0*BETZ
           ELSE
             ZAGL=SAGL-2.0*(PICON+BETZ)
@@ -769,7 +769,7 @@ module CanopyCondsMod
         ELSE
           THETW1=0.0
         ENDIF
-        ALBG=AMIN1(ALBX,ALBS+AMAX1(0.0_r8,ALBX-THETW1))
+        ALBG=AMIN1(ALBX,ALBS+AZMAX1(ALBX-THETW1))
       ENDIF
       RABSL(0)=RASG*ALBG*0.25_r8
       RABPL(0)=RAPG*ALBG*0.25_r8

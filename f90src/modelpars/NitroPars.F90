@@ -3,7 +3,8 @@ module NitroPars
 ! DESCRIPTION:
 ! code defining parameters for nitro
 ! USES:
-  use data_kind_mod, only : r8 => SHR_KIND_R8
+  use data_kind_mod, only : r8 => DAT_KIND_R8
+  use EcoSimConst
   implicit none
   public
   character(len=*), private, parameter :: mod_filename = __FILE__
@@ -195,8 +196,8 @@ module NitroPars
   subroutine initNitroPars
   implicit none
 
-  ORAD=1.0E-06_r8
-  BIOS=1.0E-06_r8/(4.19*ORAD**3)
+  ORAD=ppmc
+  BIOS=ppmc/(4.19*ORAD**3)
   BIOA=BIOS*12.57_r8*ORAD**2
   DCKI=2.5_r8
   RCCX=0.833_r8
@@ -204,7 +205,7 @@ module NitroPars
   RCCZ=0.167_r8
   RCCY=0.833_r8
   FPRIM=5.0E-02_r8
-  FPRIMM=1.0E-06_r8
+  FPRIMM=ppmc
   OMGR=2.5E-01_r8
   OQKI=1.2E+03_r8
   H2KI=1.0_r8

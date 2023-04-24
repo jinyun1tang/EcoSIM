@@ -3,9 +3,9 @@ module WatsubMod
 ! Description:
 ! code to do water and enerby balance calculation
 
-  use data_kind_mod, only : r8 => SHR_KIND_R8
+  use data_kind_mod, only : r8 => DAT_KIND_R8
   use abortutils   , only : endrun, print_info
-  use minimathmod  , only : test_aeqb, test_aneb,safe_adb,vapsat,AZMAX1
+  use minimathmod  , only : test_aeqb, test_aneb,safe_adb,vapsat,AZMAX1,AZMIN1
   use EcosimConst
   use MiniFuncMod
   use EcoSIMSolverPar
@@ -44,7 +44,7 @@ module WatsubMod
   real(r8) :: ALBG,ALBL,AVCNDR,ALT1,ALT2,ALTB,ALTS1,ALTS2,AVCNDL
   real(r8) :: ATCNVL,ATCNDL,CNV1,CNV2,CNVR,CNDR,CND1,CNDL,CNVL
   real(r8) :: DFVR,DENSW1,DENSW2,DTKX,DTHW0,DTHA0,DTHW1,DTHA1
-  real(r8) :: D,DTHW2,DTHA2,DTBLXX,DPTHH,DTBLYX,DPTHW1,DPTHW2
+  real(r8) :: D,DTHW2,DTHA2,DTBLXX,DPTHH,DPTHW1,DPTHW2
   real(r8) :: ENGYD,ENGYB,EFLXW,EVAPT2,EVAPW2,EVAPX2,EVAPS2
   real(r8) :: EFLXW2,ENGY0,EFLXG,EFLXR,EVAPR2,EFLXR2,ENGYR,ENGY1
   real(r8) :: FLWQW,FLWSW,FLWQB,FLWQBX,FLWQAX,FLWQAS,FLWQAH
@@ -86,7 +86,7 @@ module WatsubMod
   real(r8) :: WFLXIX,WTHET0,WTHET1,XNUSW0,XNUSA0,XNUSW1,XNUSA1
   real(r8) :: XNUSW2,XNUSA2,XN,Z3S
 
-  integer :: ICHKL,IFLGH,IFLGU,IFLGUH,IFLGD,IFLGDH
+  integer :: ICHKL,IFLGH,IFLGU,IFLGUH,IFLGD
 
   REAL(r8) :: RI,THETWR,THETW1,THETA1,THETAL,THETWL &
     ,TKR1,TKS1,TKY,TKW1,TK11,TK12,TK0X,TKXR,TK1X,TKX1,TFND1
@@ -186,7 +186,7 @@ module WatsubMod
 ! VHCPWM,VHCPW=snowpack heat capacity
 ! TK0,TKW=snowpack temperature
 !
-  DO 60 L=1,JS
+  D60: DO L=1,JS
     VOLS0(L,NY,NX)=VOLSSL(L,NY,NX)
     VOLI0(L,NY,NX)=VOLISL(L,NY,NX)
     VOLW0(L,NY,NX)=VOLWSL(L,NY,NX)
@@ -194,7 +194,7 @@ module WatsubMod
     DLYRS0(L,NY,NX)=DLYRS(L,NY,NX)
     VHCPWM(1,L,NY,NX)=VHCPW(L,NY,NX)
     TK0(L,NY,NX)=TKW(L,NY,NX)
-60  CONTINUE
+  ENDDO D60
 !
 ! SET INITIAL SOIL VALUES
 !
@@ -204,13 +204,13 @@ module WatsubMod
 !
   WFLXR(NY,NX)=0.0_r8
   TFLXR(NY,NX)=0.0_r8
-  DO 65 L=NUM(NY,NX),NL(NY,NX)
+  D65: DO L=NUM(NY,NX),NL(NY,NX)
     IF(CDPTH(L,NY,NX).GE.WDPTH(I,NY,NX))THEN
       LWDPTH=L
       exit
     ENDIF
-65  CONTINUE
-  DO 30 L=NUM(NY,NX),NL(NY,NX)
+  ENDDO D65
+  D30: DO L=NUM(NY,NX),NL(NY,NX)
 !
 !   ENTER STATE VARIABLES AND DRIVERS INTO LOCAL ARRAYS
 !   FOR USE AT INTERNAL TIME STEP IN30    con SOIL LAYERS
@@ -323,7 +323,7 @@ module WatsubMod
     ELSE
       AREAUD(L,NY,NX)=0.0_r8
     ENDIF
-30  CONTINUE
+  ENDDO D30
 !
 ! ENTER STATE VARIABLES AND DRIVERS INTO LOCAL ARRAYS
 !     FOR USE AT INTERNAL TIME STEP IN SURFACE LITTER
@@ -385,8 +385,8 @@ module WatsubMod
   integer :: NY,NX,L
 !     begin_execution
 
-  DO 9995 NX=NHW,NHE
-    DO 9990 NY=NVN,NVS
+  D9995: DO NX=NHW,NHE
+    D9990: DO NY=NVN,NVS
       NUM(NY,NX)=NU(NY,NX)
 !
 !     ADJUST SURFACE ELEVATION USED IN RUNOFF FOR FREEZE-THAW, EROSION
@@ -620,36 +620,19 @@ module WatsubMod
 !
       RAS=0.0_r8
       IF(VOLS(NY,NX).GT.ZEROS2(NY,NX))THEN
-        DO 9775 L=1,JS
+        D9775: DO L=1,JS
           IF(VOLS1(L,NY,NX).GT.ZEROS2(NY,NX))THEN
             RASX=DLYRS(L,NY,NX)/WGSGW(L,NY,NX)
             THETPL=AMAX1(THETPI,1.0_r8-(VOLS0(L,NY,NX)+VOLI0(L,NY,NX) &
               +VOLW0(L,NY,NX))/VOLS1(L,NY,NX))
             RASL=RASX/AMAX1(ZERO,THETPL)**2.0_r8
             RAS=RAS+RASL
-!     WRITE(*,3113)'RAS',I,J,NX,NY,L,ALFZ,RAS,RASL,RASX
-!    2,DLYRS(L,NY,NX),WGSGW(L,NY,NX),THETPL,THETPI,VOLS0(L,NY,NX)
-!    3,VOLI0(L,NY,NX),VOLW0(L,NY,NX),VOLS1(L,NY,NX),TKW(L,NY,NX)
-!3113  FORMAT(A8,5I4,40E12.4)
           ENDIF
-9775    CONTINUE
+        ENDDO D9775
       ENDIF
       PARR(NY,NX)=AREA(3,NUM(NY,NX),NY,NX)*XNPH/(RAGR(NY,NX)+RAS)   !this includes snow layer resistance
-!     IF(NX.EQ.1)THEN
-!     WRITE(*,3111)'RAC',I,J,NX,NY,ALFZ,RAC(NY,NX)
-!    2,PARR(NY,NX),ZT(NY,NX),RAB(NY,NX)
-!    2,RAGR(NY,NX),RAS,VOLS(NY,NX)
-!    3,DLYRR(NY,NX),RAG(NY,NX),RAGR(NY,NX)
-!    4,THETX,THETPX(0,NY,NX),VHCP1(0,NY,NX)
-!    5,WGSGR(NY,NX),VOLW1(0,NY,NX)
-!    5,VOLI1(0,NY,NX),VOLP1(0,NY,NX),VOLR(NY,NX),VOLA1(0,NY,NX)
-!    4,TLEX(NY,NX),TSHX(NY,NX),RADG(NY,NX),THS(NY,NX)
-!    5,FRADG(NY,NX),THRMCX(NY,NX),ZS(NY,NX)
-!    6,XVOLW(NY,NX),VHCPRX(NY,NX)/cpw,VOLWD(NY,NX),ORGC(0,NY,NX)
-!3111  FORMAT(A8,4I4,40E12.4)
-!     ENDIF
-9990  CONTINUE
-9995  CONTINUE
+    ENDDO D9990
+  ENDDO D9995
 
   call InitSoilHydrauics(NHW,NHE,NVN,NVS)
 
@@ -671,34 +654,34 @@ module WatsubMod
 !     N3,N2,N1=L,NY,NX of source grid cell
 !     N6,N5,N4=L,NY,NX of destination grid cell
 !
-  DO 9985 NX=NHW,NHE
-    DO 9980 NY=NVN,NVS
-      DO 35 L=NUM(NY,NX),NL(NY,NX)
-        DO 40 N=NCN(NY,NX),3
+  DO  NX=NHW,NHE
+    DO  NY=NVN,NVS
+      D35: DO L=NUM(NY,NX),NL(NY,NX)
+        D40: DO N=NCN(NY,NX),3
           N1=NX
           N2=NY
           N3=L
+! in the EW direction
           IF(N.EQ.1)THEN
             IF(NX.EQ.NHE)THEN
-!              GO TO 50
               cycle
             ELSE
               N4=NX+1
               N5=NY
               N6=L
             ENDIF
+! in the NS direction
           ELSEIF(N.EQ.2)THEN
             IF(NY.EQ.NVS)THEN
-!              GO TO 50
               cycle
             ELSE
               N4=NX
               N5=NY+1
               N6=L
             ENDIF
+! in the vertical direction
           ELSEIF(N.EQ.3)THEN
             IF(L.EQ.NL(NY,NX))THEN
-!              GO TO 50
               cycle
             ELSE
               N4=NX
@@ -714,19 +697,17 @@ module WatsubMod
     !     AVCNHL=macropore hydraulic conductance
     !     DLYR=layer depth
     !
-          IF(CNDH1(N3,N2,N1).GT.ZERO.AND.CNDH1(N6,N5,N4) &
-            .GT.ZERO)THEN
-            AVCNHL(N,N6,N5,N4)=2.0*CNDH1(N3,N2,N1)*CNDH1(N6,N5,N4) &
+          IF(CNDH1(N3,N2,N1).GT.ZERO.AND.CNDH1(N6,N5,N4).GT.ZERO)THEN
+            AVCNHL(N,N6,N5,N4)=2.0_r8*CNDH1(N3,N2,N1)*CNDH1(N6,N5,N4) &
               /(CNDH1(N3,N2,N1)*DLYR(N,N6,N5,N4)+CNDH1(N6,N5,N4) &
               *DLYR(N,N3,N2,N1))
           ELSE
             AVCNHL(N,N6,N5,N4)=0.0_r8
           ENDIF
-!50      CONTINUE
-40    CONTINUE
-35  CONTINUE
-9980  CONTINUE
-9985  CONTINUE
+        ENDDO D40
+      ENDDO D35
+    ENDDO
+  ENDDO
   end subroutine InitSoilHydrauics
 !------------------------------------------------------------------------------------------
 
@@ -736,7 +717,7 @@ module WatsubMod
 
   integer :: NN
 ! begin_execution
-  DO 4000 NN=1,NPR
+  D4000: DO NN=1,NPR
     !
     ! VAPOR FLUX BETWEEN SNOWPACK AND SURFACE RESIDUE
     !
@@ -751,8 +732,8 @@ module WatsubMod
     ! HFLVRSX=convective heat flux from snow-litter vapor flux
     !
     !VPR=2.173E-03_r8/TKXR*0.61_r8*EXP(5360.0_r8*(3.661E-03_r8-1.0_r8/TKXR)) &
-    !  *EXP(18.0_r8*PSISM1(0,NY,NX)/(8.3143_r8*TKXR))    !in residue vapor pressure
-    VPR=vapsat(TKXR)*EXP(18.0_r8*PSISM1(0,NY,NX)/(8.3143_r8*TKXR))
+    !  *EXP(18.0_r8*PSISM1(0,NY,NX)/(RGAS*TKXR))    !in residue vapor pressure
+    VPR=vapsat(TKXR)*EXP(18.0_r8*PSISM1(0,NY,NX)/(RGAS*TKXR))
     if(abs(VPR)>1.e20_r8)then
       write(*,*)'TKXR=',TKXR,TK1(0,NY,NX),TK1(NUM(NY,NX),NY,NX)
       write(*,*)'PSISM1(0,NY,NX)=',PSISM1(0,NY,NX)
@@ -768,7 +749,7 @@ module WatsubMod
         FLVSRX=AZMAX1(AMIN1(FLVC,FLVX))
         HFLVSRX=(cpw*TK0X+VAP)*FLVSRX
       ELSE
-        FLVSRX=AMIN1(0.0_r8,AMAX1(FLVC,FLVX))
+        FLVSRX=AZMIN1(AMAX1(FLVC,FLVX))
         HFLVSRX=(cpw*TKXR+VAP)*FLVSRX
       ENDIF
     ELSE
@@ -788,7 +769,7 @@ module WatsubMod
     IF(HFLWC.GE.0.0_r8)THEN
       HFLWSRX=AZMAX1(AMIN1(HFLWX,HFLWC))
     ELSE
-      HFLWSRX=AMIN1(0.0_r8,AMAX1(HFLWX,HFLWC))
+      HFLWSRX=AZMIN1(AMAX1(HFLWX,HFLWC))
     ENDIF
 !     WRITE(*,7752)'TKXR',I,J,M,MM,NX,NY,L
 !    2,FLVC,FLVX,VP1,VPR,VPY,ATCNVS,FSNW(NY,NX),BARE(NY,NX)
@@ -811,8 +792,8 @@ module WatsubMod
     IF(VOLPM(M,0,NY,NX).GT.ZEROS(NY,NX) &
       .AND.VOLPM(M,NUM(NY,NX),NY,NX).GT.ZEROS(NY,NX))THEN
       !VP1=2.173E-03/TK1X*0.61*EXP(5360.0*(3.661E-03-1.0/TK1X)) &
-      !  *EXP(18.0*PSISV1/(8.3143*TK1X))
-      VP1=vapsat(TK1X)*EXP(18.0*PSISV1/(8.3143*TK1X))
+      !  *EXP(18.0*PSISV1/(RGAS*TK1X))
+      VP1=vapsat(TK1X)*EXP(18.0*PSISV1/(RGAS*TK1X))
       FLVC=ATCNVS*(VPR-VP1)*AREA(3,NUM(NY,NX),NY,NX)*FSNW(NY,NX)*CVRD(NY,NX)*XNPQ
       if(abs(FLVC)>1.e20_r8)then
         write(*,*)'ATCNVS=',ATCNVS,VPR,VP1
@@ -832,7 +813,7 @@ module WatsubMod
         endif
         HFLVR1X=(cpw*TKXR+VAP)*FLVR1X
       ELSE
-        FLVR1X=AMIN1(0.0_r8,AMAX1(FLVC,FLVX))
+        FLVR1X=AZMIN1(AMAX1(FLVC,FLVX))
         if(abs(FLVR1X)>1.0e20_r8)then
           write(*,*)'FLVC,FLVX=',FLVC,FLVX
           write(*,*)'at line',__LINE__
@@ -860,7 +841,7 @@ module WatsubMod
     IF(HFLWC.GE.0.0_r8)THEN
       HFLWR1X=AZMAX1(AMIN1(HFLWX,HFLWC))
     ELSE
-      HFLWR1X=AMIN1(0.0_r8,AMAX1(HFLWX,HFLWC))
+      HFLWR1X=AZMIN1(AMAX1(HFLWX,HFLWC))
     ENDIF
 !
 !     ACCUMULATE SNOW-LITTER, LITTER-SOIL HEAT FLUXES
@@ -881,7 +862,7 @@ module WatsubMod
     TKXR=TKXR+(HFLVSRX-HFLWR1X)/VHCP1(0,NY,NX)
     TK1X=TK1X+HFLWR1X/VHCP1(NUM(NY,NX),NY,NX)
 
-4000  CONTINUE
+  ENDDO D4000
   end subroutine SnowSurfaceResidualIteration
 !------------------------------------------------------------------------------------------
 
@@ -907,7 +888,7 @@ module WatsubMod
   ! WGSGW=vapor diffusivity
   ! DENSW1=snowpack density
   ICHKL=0
-  DO 9880 L=1,JS
+  D9880: DO L=1,JS
     IF(VHCPWMM(L,NY,NX).GT.VHCPWX(NY,NX))THEN
       VOLS1(L,NY,NX)=VOLS0M(L,NY,NX)/DENSS(L,NY,NX) &
         +VOLW0M(L,NY,NX)+VOLI0M(L,NY,NX)
@@ -980,7 +961,7 @@ module WatsubMod
             FLVSS=AZMAX1(AMIN1(FLVC,FLVX,VOLW0M(L,NY,NX)*XNPX))
             HFLVSS=(cpw*TK0M(L,NY,NX)+VAP)*FLVSS
           ELSE
-            FLVSS=AMIN1(0.0_r8,AMAX1(FLVC,FLVX,-VOLW0M(L2,NY,NX)*XNPX))
+            FLVSS=AZMIN1(AMAX1(FLVC,FLVX,-VOLW0M(L2,NY,NX)*XNPX))
             HFLVSS=(cpw*TK0M(L2,NY,NX)+VAP)*FLVSS
           ENDIF
         ELSE
@@ -1020,7 +1001,7 @@ module WatsubMod
         IF(HFLWC.GE.0.0_r8)THEN
           HFLWSS=AZMAX1(AMIN1(HFLWX,HFLWC))
         ELSE
-          HFLWSS=AMIN1(0.0_r8,AMAX1(HFLWX,HFLWC))
+          HFLWSS=AZMIN1(AMAX1(HFLWX,HFLWC))
         ENDIF
         FLW0T=FLWQM+FLVSS
         HFLW0T=HFLWQM+HFLVSS+HFLWSS
@@ -1029,13 +1010,6 @@ module WatsubMod
         FLW0I(L2,NY,NX)=0.0_r8
         HFLW0W(L2,NY,NX)=HFLW0T
         FLQWM(M,L2,NY,NX)=FLQWM(M,L2,NY,NX)+FLWQM
-        !     IF(NX.EQ.3.AND.NY.EQ.3.AND.L.EQ.1)THEN
-        !     WRITE(*,7757)'FLW0',I,J,M,MM,L2,FLW0W(L2,NY,NX),FLW0T,FLWQM,FLVSS
-        !    2,HFLW0W(L2,NY,NX),HFLW0T,HFLWQM,HFLVSS,HFLWSS,VP1,VP2,FLVX
-        !    3,TCND1W,TCND2W,DENSW1,DENSW2,HFLXW2,VHCPWM2,THETP2,FLWQX
-        !    2,VOLS0M(L,NY,NX),VOLW0M(L,NY,NX),TK0M(L2,NY,NX),TK0M(L,NY,NX)
-        !7757  FORMAT(A8,5I4,30E14.6)
-        !     ENDIF
         !
         ! DISCHARGE OF MELTWATER AND ITS HEAT FROM LOWEST SNOWPACK LAYER
         ! TO RESIDUE, SURFACE SOIL MICROPORES AND MACROPORES
@@ -1150,7 +1124,7 @@ module WatsubMod
               *THETPM(M,NUM(NY,NX),NY,NX)/POROS(NUM(NY,NX),NY,NX)
             !VP2=2.173E-03_r8/TK1(NUM(NY,NX),NY,NX) &
             !  *0.61_r8*EXP(5360.0_r8*(3.661E-03_r8-1.0_r8/TK1(NUM(NY,NX),NY,NX))) &
-            VP2=vapsat(TK1(NUM(NY,NX),NY,NX))*EXP(18.0_r8*PSISV1/(8.3143_r8*TK1(NUM(NY,NX),NY,NX)))
+            VP2=vapsat(TK1(NUM(NY,NX),NY,NX))*EXP(18.0_r8*PSISV1/(RGAS*TK1(NUM(NY,NX),NY,NX)))
             ATCNVS=2.0_r8*CNV1*CNV2 &
               /(CNV1*DLYR(3,NUM(NY,NX),NY,NX)+CNV2*DLYRS0(L,NY,NX))
             FLVC=ATCNVS*(VP1-VP2)*AREA(3,NUM(NY,NX),NY,NX) &
@@ -1162,7 +1136,7 @@ module WatsubMod
               FLVS1=AZMAX1(AMIN1(FLVC,FLVX))
               HFLVS1=(cpw*TK0M(L,NY,NX)+VAP)*FLVS1
             ELSE
-              FLVS1=AMIN1(0.0_r8,AMAX1(FLVC,FLVX))
+              FLVS1=AZMIN1(AMAX1(FLVC,FLVX))
               HFLVS1=(cpw*TK1(NUM(NY,NX),NY,NX)+VAP)*FLVS1
             ENDIF
           ELSE
@@ -1207,7 +1181,7 @@ module WatsubMod
           IF(HFLWC.GE.0.0_r8)THEN
             HFLWS1=AZMAX1(AMIN1(HFLWX,HFLWC))
           ELSE
-            HFLWS1=AMIN1(0.0_r8,AMAX1(HFLWX,HFLWC))
+            HFLWS1=AZMIN1(AMAX1(HFLWX,HFLWC))
           ENDIF
           !
           ! HEAT FLUX AMONG SNOWPACK, SURFACE RESIDUE AND SURFACE SOIL
@@ -1319,7 +1293,7 @@ module WatsubMod
         ENDIF
       ENDIF
     ENDIF
-9880  CONTINUE
+  ENDDO D9880
   end subroutine SnowPackIteration
 !------------------------------------------------------------------------------------------
 
@@ -1343,7 +1317,7 @@ module WatsubMod
   !     TK0M=snowpack surface temperature
   !     RFLXW2=net radiation
 
-  DO 3000 MM=1,NPS
+  D3000: DO MM=1,NPS
 
     ALBW=(0.85_r8*VOLS0M(1,NY,NX)+0.30_r8*VOLI0M(1,NY,NX)+0.06_r8*VOLW0M(1,NY,NX)) &
       /(VOLS0M(1,NY,NX)+VOLI0M(1,NY,NX)+VOLW0M(1,NY,NX))
@@ -1384,7 +1358,7 @@ module WatsubMod
     VP0=vapsat(TK0M(1,NY,NX))
     EVAPT2=PARE*(VPQ(NY,NX)-VP0)
     EVAPW2=AMAX1(EVAPT2,-AZMAX1(VOLW0M(1,NY,NX)*XNPA))
-    EVAPX2=AMIN1(0.0_r8,EVAPT2-EVAPW2)
+    EVAPX2=AZMIN1(EVAPT2-EVAPW2)
     EVAPS2=AMAX1(EVAPX2,-AZMAX1(VOLS0M(1,NY,NX)*XNPA))
     EFLXW2=EVAPW2*VAP+EVAPS2*VAPS
     IF(EVAPT2.LT.0.0_r8)THEN
@@ -1453,7 +1427,7 @@ module WatsubMod
 !     THFLWW=convective heat flux from accumd snow,water,ice transfer
 !
     THRMG(NY,NX)=THRMG(NY,NX)+THRMX
-    DO 9860 L=1,JS
+    D9860: DO L=1,JS
       XFLWS(L,NY,NX)=XFLWS(L,NY,NX)+FLW0S(L,NY,NX)
       XFLWW(L,NY,NX)=XFLWW(L,NY,NX)+FLW0W(L,NY,NX)
       XFLWI(L,NY,NX)=XFLWI(L,NY,NX)+FLW0I(L,NY,NX)
@@ -1607,8 +1581,8 @@ module WatsubMod
 !    3,XFLWS(L,NY,NX),XFLWW(L,NY,NX),XFLWI(L,NY,NX)
 !    4,XHFLWW(L,NY,NX),VHCPWMM(L,NY,NX)
 !     ENDIF
-9860  CONTINUE
-3000  CONTINUE
+    ENDDO D9860
+  ENDDO D3000
   end subroutine SolveSnowpack
 !------------------------------------------------------------------------------------------
 
@@ -1622,7 +1596,7 @@ module WatsubMod
   real(r8) :: RAa
 ! begin_execution
 
-  DO 5000 NN=1,NPR
+  D5000: DO NN=1,NPR
     IF(VHCPR2.GT.VHCPRX(NY,NX))THEN
       !
       ! AERODYNAMIC RESISTANCE ABOVE RESIDUE INCLUDING
@@ -1685,14 +1659,14 @@ module WatsubMod
 !     VAP=latent heat of evaporation
 !     VFLXR2=convective heat of evaporation flux
 !
-      VPR=vapsat(TKR1)*EXP(18.0_r8*PSISM1(0,NY,NX)/(8.3143_r8*TKR1))   !in litter
+      VPR=vapsat(TKR1)*EXP(18.0_r8*PSISM1(0,NY,NX)/(RGAS*TKR1))   !in litter
       if(abs(VPR)>1.e20_r8)then
         write(*,*)'TKR1=',TKR1,TK1(0,NY,NX),TK1(NUM(NY,NX),NY,NX)
         write(*,*)'PSISM1(0,NY,NX)=',PSISM1(0,NY,NX)
         call endrun(trim(mod_filename)//'at line',__LINE__)
       endif
 
-      VP1=vapsat(TKS1)*EXP(18.0_r8*PSISV1/(8.3143_r8*TKS1))    !in soil
+      VP1=vapsat(TKS1)*EXP(18.0_r8*PSISV1/(RGAS*TKS1))    !in soil
       EVAPR2=AMAX1(-AZMAX1(VOLWR2*XNPX),PARE*(VPQ(NY,NX)-VPR))
 
       EFLXR2=EVAPR2*VAP             !energy flux
@@ -1735,7 +1709,7 @@ module WatsubMod
           HWFLV2=(cpw*TKR1+VAP)*FLV2
         ELSE
           !from soil to litter
-          FLV2=AMIN1(0.0_r8,AMAX1(FLVC,FLVX))
+          FLV2=AZMIN1(AMAX1(FLVC,FLVX))
           if(abs(FLV2)>1.e20_r8)then
             write(*,*)'FLVC,FLVX',FLVC,FLVX
             call endrun(trim(mod_filename)//' at line',__LINE__)
@@ -1766,7 +1740,7 @@ module WatsubMod
       IF(HFLWC.GE.0.0_r8)THEN
         HFLCR2=AZMAX1(AMIN1(HFLWX,HFLWC))
       ELSE
-        HFLCR2=AMIN1(0.0_r8,AMAX1(HFLWX,HFLWC))
+        HFLCR2=AZMIN1(AMAX1(HFLWX,HFLWC))
       ENDIF
 !
 !     SOLVE FOR RESIDUE LATENT, SENSIBLE AND STORAGE HEAT FLUXES
@@ -1830,7 +1804,7 @@ module WatsubMod
     endif
     TKS1=TKS1+(HWFLV2+HFLCR2)/VHCP12
 
-5000  CONTINUE
+  ENDDO D5000
   end subroutine SoilSurfaceResidualIteration
 !------------------------------------------------------------------------------------------
 
@@ -1905,7 +1879,7 @@ module WatsubMod
     ATCNVR=0.0_r8
   ENDIF
   THETRR=AZMAX1(1.0_r8-THETPX(0,NY,NX)-THETWX(0,NY,NX)-THETIX(0,NY,NX))
-  DTKX=ABS(TK1(0,NY,NX)-TK1(NUM(NY,NX),NY,NX))*1.0E-06_r8
+  DTKX=ABS(TK1(0,NY,NX)-TK1(NUM(NY,NX),NY,NX))*ppmc
   DTHW0=AZMAX1(THETWX(0,NY,NX)-TRBW)**3
   DTHA0=AZMAX1(THETPX(0,NY,NX)-TRBA)**3
   DTHW1=AZMAX1(THETWX(NUM(NY,NX),NY,NX)-TRBW)**3
@@ -2105,7 +2079,7 @@ module WatsubMod
   TKX1=TK1(NUM(NY,NX),NY,NX)
   !VP1=2.173E-03/TKX1 &
   !    *0.61*EXP(5360.0*(3.661E-03-1.0/TKX1)) &
-  VP1=vapsat(TKX1)*EXP(18.0*PSISV1/(8.3143*TKX1))
+  VP1=vapsat(TKX1)*EXP(18.0*PSISV1/(RGAS*TKX1))
   EVAPG(NY,NX)=AMAX1(PARE*(VPQ(NY,NX)-VP1) &
       ,-AZMAX1(VOLW2(NUM(NY,NX),NY,NX)*XNPX))
   EFLXG=EVAPG(NY,NX)*VAP
@@ -2270,12 +2244,12 @@ module WatsubMod
 !  TFLWS,TFLWW,TFLWI=net fluxes of snow,water,ice in snowpack
 !  THFLWW=convective heat fluxes of snow,water,ice in snowpack
 !
-  DO 9875 L=1,JS
+  D9875: DO L=1,JS
     TFLWS(L,NY,NX)=0.0_r8
     TFLWW(L,NY,NX)=0.0_r8
     TFLWI(L,NY,NX)=0.0_r8
     THFLWW(L,NY,NX)=0.0_r8
-9875  CONTINUE
+  ENDDO D9875
 !
 ! SURFACE FLUX ACCUMULATORS
 !
@@ -2284,7 +2258,7 @@ module WatsubMod
 ! TFLWL,TFLWHL=net water flux in micropores,macropores
 ! THFLWL=net heat flux
 !
-  DO 9885 L=NUM(NY,NX),NL(NY,NX)
+  D9885: DO L=NUM(NY,NX),NL(NY,NX)
     TWFLXL(L,NY,NX)=0.0_r8
     TWFLXH(L,NY,NX)=0.0_r8
     TTFLXL(L,NY,NX)=0.0_r8
@@ -2314,22 +2288,22 @@ module WatsubMod
       scalar=TFND1*XNPD
       DFGS(M,L,NY,NX)=fDFGS(scalar,THETWA,Z3S)
     ELSE
-      DFGS(M,L,NY,NX)=0.0
+      DFGS(M,L,NY,NX)=0.0_r8
     ENDIF
     IF(BKDS(L,NY,NX).GT.ZERO)THEN
       THETWT=safe_adb(VOLWM(M,L,NY,NX),VOLY(L,NY,NX))
       TORT(M,L,NY,NX)=TortMicporew(THETWT)*(1.0_r8-FHOL(L,NY,NX))
     ELSE
 !   standing water has tortuosity 0.7?
-      TORT(M,L,NY,NX)=0.7
+      TORT(M,L,NY,NX)=0.7_r8
     ENDIF
     IF(VOLAH1(L,NY,NX).GT.ZEROS2(NY,NX))THEN
       THETWH=VOLWHM(M,L,NY,NX)/VOLAH1(L,NY,NX)
       TORTH(M,L,NY,NX)=TortMacporew(THETWH)*FHOL(L,NY,NX)
     ELSE
-      TORTH(M,L,NY,NX)=0.0
+      TORTH(M,L,NY,NX)=0.0_r8
     ENDIF
-9885  CONTINUE
+  ENDDO D9885
 
 !
 ! ENERGY EXCHANGE VARIABLES AT SNOW SURFACE IF PRESENT
@@ -2375,7 +2349,7 @@ module WatsubMod
 ! VHCPWMM=volumetric heat capacity
 ! TK0M=temperature
 !
-  DO 9765 L=1,JS
+  D9765: DO L=1,JS
     TFLX0(L,NY,NX)=0.0_r8
     WFLXS(L,NY,NX)=0.0_r8
     WFLXI(L,NY,NX)=0.0_r8
@@ -2389,7 +2363,7 @@ module WatsubMod
     VOLI0M(L,NY,NX)=VOLI0(L,NY,NX)
     VHCPWMM(L,NY,NX)=VHCPWM(M,L,NY,NX)
     TK0M(L,NY,NX)=TK0(L,NY,NX)
-9765  CONTINUE
+  ENDDO D9765
 !
   end subroutine PrepForIterationM
 !------------------------------------------------------------------------------------------
@@ -2515,18 +2489,18 @@ module WatsubMod
     ELSE
       IF(THETW1.GT.THETS(NUM(NY,NX),NY,NX))THEN
         FLQZ=FLQX+AMAX1((THETS(NUM(NY,NX),NY,NX)-THETW1) &
-          *VOLY(NUM(NY,NX),NY,NX),AMIN1(0.0_r8,(THETWR-THETS(0,NY,NX)) &
+          *VOLY(NUM(NY,NX),NY,NX),AZMIN1((THETWR-THETS(0,NY,NX)) &
           *VOLR(NY,NX)))*XNPX
       ELSE
         FLQZ=FLQX
       ENDIF
-      FLQR=AMIN1(0.0_r8,AMAX1(FLQZ,-VOLW1(NUM(NY,NX),NY,NX)*XNPX,-VOLP1(0,NY,NX)))
-      FLQ2=AMIN1(0.0_r8,AMAX1(FLQX,-VOLW1(NUM(NY,NX),NY,NX)*XNPX,-VOLP1(0,NY,NX)))
+      FLQR=AZMIN1(AMAX1(FLQZ,-VOLW1(NUM(NY,NX),NY,NX)*XNPX,-VOLP1(0,NY,NX)))
+      FLQ2=AZMIN1(AMAX1(FLQX,-VOLW1(NUM(NY,NX),NY,NX)*XNPX,-VOLP1(0,NY,NX)))
     ENDIF
     IF(VOLP1Z(NUM(NY,NX),NY,NX).LT.0.0_r8)THEN
-      FLQR=FLQR+AMIN1(0.0_r8,AMAX1(-VOLW1(NUM(NY,NX),NY,NX)*XNPX &
+      FLQR=FLQR+AZMIN1(AMAX1(-VOLW1(NUM(NY,NX),NY,NX)*XNPX &
         ,VOLP1Z(NUM(NY,NX),NY,NX)))
-      FLQ2=FLQ2+AMIN1(0.0_r8,AMAX1(-VOLW1(NUM(NY,NX),NY,NX)*XNPX &
+      FLQ2=FLQ2+AZMIN1(AMAX1(-VOLW1(NUM(NY,NX),NY,NX)*XNPX &
         ,VOLP1Z(NUM(NY,NX),NY,NX)))
     ENDIF
     IF(FLQR.GT.0.0_r8)THEN
@@ -2665,7 +2639,7 @@ module WatsubMod
     D=VX/AREA(3,0,N2,N1)
     R=D/2.828_r8
     V=R**0.67_r8*safe_adb(SQRT(SLOPE(0,N2,N1)),ZM(N2,N1))
-    Q=V*D*AREA(3,NUM(N2,N1),N2,N1)*3.6E+03*XNPH
+    Q=V*D*AREA(3,NUM(N2,N1),N2,N1)*3.6E+03_r8*XNPH
     VOLW1X=AZMAX1(VOLW1(0,N2,N1)+WFLXR(N2,N1))
     QRM(M,N2,N1)=AMIN1(Q,VX*XNPX,VOLW1X*XNPX)*XVOLW(N2,N1)/XVOLT(N2,N1)
     QRV(M,N2,N1)=V
@@ -2842,14 +2816,14 @@ module WatsubMod
   !     N6,N5,N4=L,NY,NX of destination grid cell
   !
   IFLGH=0
-  DO 4400 L=1,NL(NY,NX)
+  D4400: DO L=1,NL(NY,NX)
     N1=NX
     N2=NY
     N3=L
     !
     !     LOCATE INTERNAL BOUNDARIES BETWEEN ADJACENT GRID CELLS
     !
-    DO 4320 N=NCN(N2,N1),3
+    D4320: DO N=NCN(N2,N1),3
       IF(N.EQ.1)THEN
         IF(NX.EQ.NHE)THEN
           cycle
@@ -2893,13 +2867,13 @@ module WatsubMod
 !
 !     SKIP NON-EXISTENT DESTINATION SOIL LAYERS
 !
-      DO 1100 LL=N6,NL(NY,NX)
+      D1100: DO LL=N6,NL(NY,NX)
         IF(VOLX(LL,N5,N4).GT.ZEROS2(N5,N4))THEN
           N6=LL
           exit
         ENDIF
-1100  CONTINUE
-!1101  CONTINUE
+      ENDDO D1100
+
       IF(N3.EQ.NU(N2,N1))N6X(N2,N1)=N6
       !
       !     POROSITIES 'THETP*', WATER CONTENTS 'THETA*', AND POTENTIALS
@@ -3034,9 +3008,9 @@ module WatsubMod
             .AND.PSISA1(N6,N5,N4).GT.PSISA(N6,N5,N4))THEN
             THETW1=THETA1
             THETWL=THETAL
-            K1=MAX(1,MIN(100,INT(100.0*(POROS(N3,N2,N1) &
+            K1=MAX(1,MIN(100,INT(100.0_r8*(POROS(N3,N2,N1) &
               -THETW1)/POROS(N3,N2,N1))+1))
-            KL=MAX(1,MIN(100,INT(100.0*(POROS(N6,N5,N4) &
+            KL=MAX(1,MIN(100,INT(100.0_r8*(POROS(N6,N5,N4) &
               -THETWL)/POROS(N6,N5,N4))+1))
             PSISM1(N3,N2,N1)=PSISA1(N3,N2,N1)
             PSISM1(N6,N5,N4)=PSISA1(N6,N5,N4)
@@ -3086,11 +3060,9 @@ module WatsubMod
             IF(BKVL(N3,N2,N1).GT.ZEROS(NY,NX))THEN
               IF(THETW1.LT.FC(N3,N2,N1))THEN
                 PSISM1(N3,N2,N1)=AMAX1(PSIHY,-EXP(PSIMX(N2,N1) &
-                  +((FCL(N3,N2,N1)-LOG(THETW1)) &
-                  /FCD(N3,N2,N1)*PSIMD(N2,N1))))
+                  +((FCL(N3,N2,N1)-LOG(THETW1))/FCD(N3,N2,N1)*PSIMD(N2,N1))))
               ELSEIF(THETW1.LT.POROS(N3,N2,N1)-DTHETW)THEN
-                PSISM1(N3,N2,N1)=-EXP(PSIMS(N2,N1) &
-                  +(((PSL(N3,N2,N1)-LOG(THETW1)) &
+                PSISM1(N3,N2,N1)=-EXP(PSIMS(N2,N1)+(((PSL(N3,N2,N1)-LOG(THETW1)) &
                   /PSD(N3,N2,N1))**SRP(N3,N2,N1)*PSISD(N2,N1)))
               ELSE
                 THETW1=POROS(N3,N2,N1)
@@ -3107,10 +3079,8 @@ module WatsubMod
           ELSE
             THETW1=THETA1
             THETWL=THETAL
-            K1=MAX(1,MIN(100,INT(100.0*(POROS(N3,N2,N1) &
-              -THETW1)/POROS(N3,N2,N1))+1))
-            KL=MAX(1,MIN(100,INT(100.0*(POROS(N6,N5,N4) &
-              -THETWL)/POROS(N6,N5,N4))+1))
+            K1=MAX(1,MIN(100,INT(100.0*(POROS(N3,N2,N1)-THETW1)/POROS(N3,N2,N1))+1))
+            KL=MAX(1,MIN(100,INT(100.0*(POROS(N6,N5,N4)-THETWL)/POROS(N6,N5,N4))+1))
             PSISM1(N3,N2,N1)=PSISA1(N3,N2,N1)
             PSISM1(N6,N5,N4)=PSISA1(N6,N5,N4)
           ENDIF
@@ -3169,10 +3139,8 @@ module WatsubMod
             ELSE
               FLQZ=FLQX
             ENDIF
-            FLQL=AZMAX1(AMIN1(FLQZ,VOLW2(N3,N2,N1)*XNPX &
-              ,VOLP1(N6,N5,N4)*XNPX))
-            FLQ2=AZMAX1(AMIN1(FLQX,VOLW2(N3,N2,N1)*XNPX &
-              ,VOLP1(N6,N5,N4)*XNPX))
+            FLQL=AZMAX1(AMIN1(FLQZ,VOLW2(N3,N2,N1)*XNPX,VOLP1(N6,N5,N4)*XNPX))
+            FLQ2=AZMAX1(AMIN1(FLQX,VOLW2(N3,N2,N1)*XNPX,VOLP1(N6,N5,N4)*XNPX))
             !     FLQL1=(THETW1-THETS(N3,N2,N1))*VOLY(N3,N2,N1)
             !     FLQL2=(THETS(N6,N5,N4)-THETWL)*VOLY(N6,N5,N4)
             !     FLQL3=FLQX+AMIN1(FLQL1,AZMAX1(FLQL2))*XNPX
@@ -3180,21 +3148,21 @@ module WatsubMod
           ELSE
             IF(THETWL.GT.THETS(N6,N5,N4))THEN
               FLQZ=FLQX+AMAX1((THETS(N6,N5,N4)-THETWL) &
-                *VOLY(N6,N5,N4),AMIN1(0.0_r8,(THETW1-THETS(N3,N2,N1)) &
+                *VOLY(N6,N5,N4),AZMIN1((THETW1-THETS(N3,N2,N1)) &
                 *VOLY(N3,N2,N1)))*XNPX
             ELSE
               FLQZ=FLQX
             ENDIF
-            FLQL=AMIN1(0.0_r8,AMAX1(FLQZ,-VOLW2(N6,N5,N4)*XNPX,-VOLP1(N3,N2,N1)*XNPX))
-            FLQ2=AMIN1(0.0_r8,AMAX1(FLQX,-VOLW2(N6,N5,N4)*XNPX,-VOLP1(N3,N2,N1)*XNPX))
+            FLQL=AZMIN1(AMAX1(FLQZ,-VOLW2(N6,N5,N4)*XNPX,-VOLP1(N3,N2,N1)*XNPX))
+            FLQ2=AZMIN1(AMAX1(FLQX,-VOLW2(N6,N5,N4)*XNPX,-VOLP1(N3,N2,N1)*XNPX))
             !     FLQL1=(THETS(N6,N5,N4)-THETWL)*VOLY(N6,N5,N4)
             !     FLQL2=(THETW1-THETS(N3,N2,N1))*VOLY(N3,N2,N1)
-            !     FLQL3=FLQX+AMAX1(FLQL1,AMIN1(0.0_r8,FLQL2))*XNPX
-            !     FLQL4=AMIN1(0.0_r8,AMAX1(FLQL3,-VOLP1(N3,N2,N1)*XNPX))
+            !     FLQL3=FLQX+AMAX1(FLQL1,AZMIN1(FLQL2))*XNPX
+            !     FLQL4=AZMIN1(AMAX1(FLQL3,-VOLP1(N3,N2,N1)*XNPX))
           ENDIF
           IF(N.EQ.3.AND.VOLP1Z(N6,N5,N4).LT.0.0_r8)THEN
-            FLQL=FLQL+AMIN1(0.0_r8,AMAX1(-VOLW2(N6,N5,N4)*XNPX,VOLP1Z(N6,N5,N4)))
-            FLQ2=FLQ2+AMIN1(0.0_r8,AMAX1(-VOLW2(N6,N5,N4)*XNPX,VOLP1Z(N6,N5,N4)))
+            FLQL=FLQL+AZMIN1(AMAX1(-VOLW2(N6,N5,N4)*XNPX,VOLP1Z(N6,N5,N4)))
+            FLQ2=FLQ2+AZMIN1(AMAX1(-VOLW2(N6,N5,N4)*XNPX,VOLP1Z(N6,N5,N4)))
           ENDIF
           IF(FLQL.GT.0.0_r8)THEN
             HWFLQL=cpw*TK1(N3,N2,N1)*FLQL
@@ -3231,7 +3199,7 @@ module WatsubMod
                 FLWHL(N,N6,N5,N4)=AZMAX1(AMIN1(AMIN1(VOLWH1(N3,N2,N1) &
                   ,VOLPH1(N6,N5,N4))*XNPX,FLWHX))
               ELSEIF(PSISH1.LT.PSISHL)THEN
-                FLWHL(N,N6,N5,N4)=AMIN1(0.0_r8,AMAX1(AMAX1(-VOLWH1(N6,N5,N4) &
+                FLWHL(N,N6,N5,N4)=AZMIN1(AMAX1(AMAX1(-VOLWH1(N6,N5,N4) &
                   ,-VOLPH1(N3,N2,N1))*XNPX,FLWHX))
               ELSE
                 FLWHL(N,N6,N5,N4)=0.0
@@ -3241,7 +3209,7 @@ module WatsubMod
                 +FLWHL(N,N3,N2,N1),VOLPH1(N6,N5,N4)*XNPX),FLWHX))
             ENDIF
             IF(N.EQ.3)THEN
-              FLWHL(N,N6,N5,N4)=FLWHL(N,N6,N5,N4)+AMIN1(0.0_r8,VOLPH1Z(N6,N5,N4))
+              FLWHL(N,N6,N5,N4)=FLWHL(N,N6,N5,N4)+AZMIN1(VOLPH1Z(N6,N5,N4))
             ENDIF
             FLWHM(M,N,N6,N5,N4)=FLWHL(N,N6,N5,N4)
           ELSE
@@ -3277,10 +3245,10 @@ module WatsubMod
             TK12=TK1(N6,N5,N4)
             !VP1=2.173E-03/TK11 &
             !*0.61*EXP(5360.0*(3.661E-03-1.0/TK11)) &
-            VP1=vapsat(TK11)*EXP(18.0*PSISV1/(8.3143*TK11))
+            VP1=vapsat(TK11)*EXP(18.0*PSISV1/(RGAS*TK11))
             !VPL=2.173E-03/TK12 &
             !*0.61*EXP(5360.0*(3.661E-03-1.0/TK12)) &
-            VPL=vapsat(TK12)*EXP(18.0*PSISVL/(8.3143*TK12))
+            VPL=vapsat(TK12)*EXP(18.0*PSISVL/(RGAS*TK12))
             CNV1=WGSGL(N3,N2,N1)*THETPM(M,N3,N2,N1)*POROQ &
               *THETPM(M,N3,N2,N1)/POROS(N3,N2,N1)
             CNVL=WGSGL(N6,N5,N4)*THETPM(M,N6,N5,N4)*POROQ &
@@ -3299,7 +3267,7 @@ module WatsubMod
               FLVL=AZMAX1(AMIN1(FLVC,FLVX))
               HWFLVL=(cpw*TK1(N3,N2,N1)+VAP)*FLVL
             ELSE
-              FLVL=AMIN1(0.0_r8,AMAX1(FLVC,FLVX))
+              FLVL=AZMIN1(AMAX1(FLVC,FLVX))
               HWFLVL=(cpw*TK1(N6,N5,N4)+VAP)*FLVL
             ENDIF
           ELSE
@@ -3324,7 +3292,7 @@ module WatsubMod
           !     WTHET*=multiplier for air concn in thermal conductivity
           !     ATCNDL=source-destination thermal conductance
       !
-          DTKX=ABS(TK1(N3,N2,N1)-TK1(N6,N5,N4))*1.0E-06
+          DTKX=ABS(TK1(N3,N2,N1)-TK1(N6,N5,N4))*ppmc
           IF(BKDS(N3,N2,N1).GT.ZERO.OR.THETWX(N3,N2,N1)+THETIX(N3,N2,N1).GT.ZERO)THEN
             DTHW1=AZMAX1(THETWX(N3,N2,N1)-TRBW)**3
             DTHA1=AZMAX1(THETPX(N3,N2,N1)-TRBA)**3
@@ -3347,26 +3315,26 @@ module WatsubMod
           ENDIF
           IF(BKDS(N6,N5,N4).GT.ZERO.OR.THETWX(N6,N5,N4) &
             +THETIX(N6,N5,N4).GT.ZERO)THEN
-            DTHW2=AZMAX1(THETWX(N6,N5,N4)-TRBW)**3
-            DTHA2=AZMAX1(THETPX(N6,N5,N4)-TRBA)**3
+            DTHW2=AZMAX1(THETWX(N6,N5,N4)-TRBW)**3._r8
+            DTHA2=AZMAX1(THETPX(N6,N5,N4)-TRBA)**3._r8
             RYLXW2=DTKX*DTHW2
             RYLXA2=DTKX*DTHA2
             RYLNW2=AMIN1(1.0E+04_r8,RYLXW*RYLXW2)
             RYLNA2=AMIN1(1.0E+04_r8,RYLXA*RYLXA2)
-            XNUSW2=AMAX1(1.0_r8,0.68+0.67*RYLNW2**0.25/DNUSW)
-            XNUSA2=AMAX1(1.0_r8,0.68+0.67*RYLNA2**0.25/DNUSA)
-            TCNDW2=2.067E-03*XNUSW2
-            TCNDA2=9.050E-05*XNUSA2
-            WTHET2=1.467-0.467*THETPY(N6,N5,N4)
+            XNUSW2=AMAX1(1.0_r8,0.68_r8+0.67_r8*RYLNW2**0.25_r8/DNUSW)
+            XNUSA2=AMAX1(1.0_r8,0.68_r8+0.67_r8*RYLNA2**0.25_r8/DNUSA)
+            TCNDW2=2.067E-03_r8*XNUSW2
+            TCNDA2=9.050E-05_r8*XNUSA2
+            WTHET2=1.467_r8-0.467_r8*THETPY(N6,N5,N4)
             TCND2=(STC(N6,N5,N4)+THETWX(N6,N5,N4)*TCNDW2 &
               +0.611*THETIX(N6,N5,N4)*7.844E-03 &
               +WTHET2*THETPX(N6,N5,N4)*TCNDA2) &
               /(DTC(N6,N5,N4)+THETWX(N6,N5,N4)+0.611*THETIX(N6,N5,N4) &
               +WTHET2*THETPX(N6,N5,N4))
           ELSE
-            TCND2=0.0
+            TCND2=0.0_r8
           ENDIF
-          ATCNDL=(2.0*TCND1*TCND2)/(TCND1*DLYR(N,N6,N5,N4)+TCND2*DLYR(N,N3,N2,N1))
+          ATCNDL=(2.0_r8*TCND1*TCND2)/(TCND1*DLYR(N,N6,N5,N4)+TCND2*DLYR(N,N3,N2,N1))
           !
           !     HEAT FLOW FROM THERMAL CONDUCTIVITY AND TEMPERATURE GRADIENT
           !
@@ -3407,14 +3375,13 @@ module WatsubMod
           ELSE
             TKLX=TK1(N6,N5,N4)
           ENDIF
-          TKY=(VHCP1(N3,N2,N1)*TK1X+VHCP1(N6,N5,N4)*TKLX) &
-            /(VHCP1(N3,N2,N1)+VHCP1(N6,N5,N4))
+          TKY=(VHCP1(N3,N2,N1)*TK1X+VHCP1(N6,N5,N4)*TKLX)/(VHCP1(N3,N2,N1)+VHCP1(N6,N5,N4))
           HFLWX=(TK1X-TKY)*VHCP1(N3,N2,N1)*XNPX
           HFLWC=ATCNDL*(TK1X-TKLX)*AREA(N,N3,N2,N1)*XNPH
           IF(HFLWC.GE.0.0_r8)THEN
             HFLWSX=AZMAX1(AMIN1(HFLWX,HFLWC))
           ELSE
-            HFLWSX=AMIN1(0.0_r8,AMAX1(HFLWX,HFLWC))
+            HFLWSX=AZMIN1(AMAX1(HFLWX,HFLWC))
           ENDIF
           HFLWL(N,N6,N5,N4)=HWFLWL+HWFLHL+HFLWSX
 
@@ -3461,8 +3428,8 @@ module WatsubMod
           FLWHM(M,N,N6,N5,N4)=0.0
         ENDIF
       ENDIF
-4320  CONTINUE
-4400  CONTINUE
+    ENDDO D4320
+  ENDDO D4400
   end subroutine Subsurface3DFlow
 !------------------------------------------------------------------------------------------
 
@@ -3476,130 +3443,21 @@ module WatsubMod
   integer :: L,LL
   integer :: N,NN,N1,N2,N3,N4,N5,N4B,N5B,N6
   integer :: M1,M2,M3,M4,M5,M6,K1,KL
+  integer :: IFLGDH
 !     begin_execution
 
-  DO 9595 NX=NHW,NHE
-    DO 9590 NY=NVN,NVS
-
-      DO 9585 L=NUM(NY,NX),NL(NY,NX)
+  DO  NX=NHW,NHE
+    DO  NY=NVN,NVS
+      D9585: DO L=NUM(NY,NX),NL(NY,NX)
         VOLP2=VOLA1(L,NY,NX)-VOLW1(L,NY,NX)-VOLI1(L,NY,NX)
         VOLPX2=VOLP2
         VOLPH2=VOLAH1(L,NY,NX)-VOLWH1(L,NY,NX)-VOLIH1(L,NY,NX)
 !
-!     IDENTIFY CONDITIONS FOR MICROPRE DISCHARGE TO WATER TABLE
-!
-!     IDTBL=water table flag
-!     DPTH,DTBLX=depth to layer midpoint,natural water table
-!     PSISM1,PSISE=matric,air entry water potential
-!     DTBLXX=equilibrium water potential with natural water table
-!     DPTHA=active layer depth
-!     IFLGU=micropore discharge flag to natural water table
-!
-        IF(IDTBL(NY,NX).NE.0.AND.DPTH(L,NY,NX).LT.DTBLX(NY,NX))THEN
-          IF(PSISM1(L,NY,NX).GT.0.0098_r8*(DPTH(L,NY,NX)-DTBLX(NY,NX)))THEN
-            IFLGU=0
-            DO 9565 LL=MIN(L+1,NL(NY,NX)),NL(NY,NX)
-              DTBLXX=DTBLX(NY,NX)+PSISE(LL,NY,NX)/0.0098
-              IF(DPTH(LL,NY,NX).LT.DTBLXX)THEN
-                IF((PSISM1(LL,NY,NX).LE.0.0098_r8*(DPTH(LL,NY,NX)-DTBLXX) &
-                  .AND.L.NE.NL(NY,NX)).OR.DPTH(LL,NY,NX).GT.DPTHA(NY,NX))THEN
-                  IFLGU=1
-                ENDIF
-              ENDIF
-9565        CONTINUE
-          ELSE
-            IFLGU=1
-          ENDIF
-        ELSE
-          IFLGU=1
-        ENDIF
-!
-!     IDENTIFY CONDITIONS FOR MACROPORE DISCHARGE TO WATER TABLE
-!
-!     VOLAH1,VOLWH1,VOLIH1=macropore volume,water,ice content
-!     DPTHH depth to layer macropore water
-!     CDPTH=depth to layer bottom
-!     DLYR=layer thickness
-!     IFLGUH=macropore discharge flag to natural water table
-!
-        IF(VOLAH1(L,NY,NX).GT.ZEROS2(NY,NX))THEN
-          DPTHH=CDPTH(L,NY,NX)-(VOLWH1(L,NY,NX)+VOLIH1(L,NY,NX)) &
-            /VOLAH1(L,NY,NX)*DLYR(3,L,NY,NX)
-        ELSE
-          DPTHH=CDPTH(L,NY,NX)
-        ENDIF
-        IF(IDTBL(NY,NX).NE.0.AND.DPTHH.LT.DTBLX(NY,NX) &
-          .AND.VOLWH1(L,NY,NX).GT.ZEROS2(NY,NX))THEN
-          IFLGUH=0
-    !     DO 9566 LL=MIN(L+1,NL(NY,NX)),NL(NY,NX)
-    !     IF(DPTH(LL,NY,NX).LT.DTBLX(NY,NX))THEN
-    !     IF(VOLAH1(LL,NY,NX).LE.ZEROS(NY,NX))THEN
-    !     IFLGUH=1
-    !     ENDIF
-    !     ENDIF
-!9566  CONTINUE
-        ELSE
-          IFLGUH=1
-        ENDIF
+        call Config4WaterTableDrain(L,NY,NX,IFLGU,DPTHH)
 
 !
 !     IDENTIFY CONDITIONS FOR MICROPRE DISCHARGE TO TILE DRAIN
-!
-!     IDTBL=water table flag
-!     DPTH,DTBLY=depth to layer midpoint, artificial water table
-!     PSISM1,PSISE=soil,air entry matric potential
-!     DTBLYX=equilibrium water potential with artificial water table
-!     IFLGD=micropore discharge flag to artificial water table
-!
-        IF(IDTBL(NY,NX).GE.3.AND.DPTH(L,NY,NX).LT.DTBLY(NY,NX))THEN
-          IF(PSISM1(L,NY,NX).GT.0.0098_r8*(DPTH(L,NY,NX)-DTBLY(NY,NX)))THEN
-            IFLGD=0
-            IF(L.LT.NL(NY,NX))THEN
-              DO 9568 LL=L+1,NL(NY,NX)
-                DTBLYX=DTBLY(NY,NX)+PSISE(LL,NY,NX)/0.0098
-                IF(DPTH(LL,NY,NX).LT.DTBLYX)THEN
-                  IF((PSISM1(LL,NY,NX).LE.0.0098_r8*(DPTH(LL,NY,NX)-DTBLYX) &
-                    .AND.L.NE.NL(NY,NX)).OR.DPTH(LL,NY,NX).GT.DPTHA(NY,NX))THEN
-                    IFLGD=1
-                  ENDIF
-                ENDIF
-9568          CONTINUE
-            ENDIF
-          ELSE
-            IFLGD=1
-          ENDIF
-        ELSE
-          IFLGD=1
-        ENDIF
-!
-!     IDENTIFY CONDITIONS FOR MACROPORE DISCHARGE TO TILE DRAIN
-!
-!     VOLAH1,VOLWH1,VOLIH1=macropore volume,water,ice content
-!     CDPTH=depth to layer bottom
-!     DLYR=layer thickness
-!     IFLGDH=macropore discharge flag to artificial water table
-!
-        IF(VOLAH1(L,NY,NX).GT.ZEROS2(NY,NX))THEN
-          DPTHH=CDPTH(L,NY,NX)-(VOLWH1(L,NY,NX)+VOLIH1(L,NY,NX)) &
-            /VOLAH1(L,NY,NX)*DLYR(3,L,NY,NX)
-        ELSE
-          DPTHH=CDPTH(L,NY,NX)
-        ENDIF
-        IF(IDTBL(NY,NX).GE.3.AND.DPTHH.LT.DTBLY(NY,NX) &
-          .AND.VOLWH1(L,NY,NX).GT.ZEROS2(NY,NX))THEN
-          IFLGDH=0
-          IF(L.LT.NL(NY,NX))THEN
-            DO 9569 LL=L+1,NL(NY,NX)
-              IF(DPTH(LL,NY,NX).LT.DTBLY(NY,NX))THEN
-                IF(VOLAH1(LL,NY,NX).LE.ZEROS(NY,NX))THEN
-                  IFLGDH=1
-                ENDIF
-              ENDIF
-9569        CONTINUE
-          ENDIF
-        ELSE
-          IFLGDH=1
-        ENDIF
+        call Config4TileDrainage(L,NY,NX,IFLGD,IFLGDH,DPTHH)
 
 !
 !     LOCATE ALL EXTERNAL BOUNDARIES AND SET BOUNDARY CONDITIONS
@@ -3614,9 +3472,10 @@ module WatsubMod
 !
 !     LOCATE EXTERNAL BOUNDARIES
 !
-        DO 9580 N=1,3
-          DO 9575 NN=1,2
+        D9580: DO N=NCN(NY,NX),3
+          D9575: DO NN=1,2
             IF(N.EQ.1)THEN
+! along the W-E direction
               N4=NX+1
               N5=NY
               N4B=NX-1
@@ -3630,7 +3489,7 @@ module WatsubMod
                   M4=NX+1
                   M5=NY
                   M6=L
-                  XN=-1.0
+                  XN=-1.0_r8
                   RCHQF=RCHQE(M2,M1)
                   RCHGFU=RCHGEU(M2,M1)
                   RCHGFT=RCHGET(M2,M1)
@@ -3654,6 +3513,7 @@ module WatsubMod
                 ENDIF
               ENDIF
             ELSEIF(N.EQ.2)THEN
+! along the N-S direction
               N4=NX
               N5=NY+1
               N4B=NX
@@ -3667,7 +3527,7 @@ module WatsubMod
                   M4=NX
                   M5=NY+1
                   M6=L
-                  XN=-1.0
+                  XN=-1.0_r8
                   RCHQF=RCHQS(M2,M1)
                   RCHGFU=RCHGSU(M2,M1)
                   RCHGFT=RCHGST(M2,M1)
@@ -3682,7 +3542,7 @@ module WatsubMod
                   M4=NX
                   M5=NY
                   M6=L
-                  XN=1.0
+                  XN=1.0_r8
                   RCHQF=RCHQN(M5,M4)
                   RCHGFU=RCHGNU(M5,M4)
                   RCHGFT=RCHGNT(M5,M4)
@@ -3691,6 +3551,7 @@ module WatsubMod
                 ENDIF
               ENDIF
             ELSEIF(N.EQ.3)THEN
+! in the vertical direction
               N4=NX
               N5=NY
               N6=L+1
@@ -3702,9 +3563,9 @@ module WatsubMod
                   M4=NX
                   M5=NY
                   M6=L+1
-                  XN=-1.0
+                  XN=-1.0_r8
                   RCHGFU=RCHGD(M2,M1)
-                  RCHGFT=1.0
+                  RCHGFT=1.0_r8
                 ELSE
                   cycle
                 ENDIF
@@ -3748,8 +3609,7 @@ module WatsubMod
                 DPTHW2=VOLWG(N2,N1)/AREA(3,NUM(N2,N1),N2,N1)
                 ALT1=ALTG(N2,N1)+DPTHW1
                 ALT2=ALTG(N2,N1)+DPTHW2-XN*SLOPE(N,N2,N1)*DLYR(N,NUM(N2,N1),N2,N1)
-                IF(ALT1.GT.ALT2 &
-                  .AND.CDPTH(NU(N2,N1)-1,N2,N1)-DPTHW1.LT.DTBLX(N2,N1))THEN
+                IF(ALT1.GT.ALT2.AND.CDPTH(NU(N2,N1)-1,N2,N1)-DPTHW1.LT.DTBLX(N2,N1))THEN
                   QR1(N,NN,M5,M4)=-XN*QRM(M,N2,N1)*FSLOPE(N,N2,N1)*RCHQF
                   HQR1(N,NN,M5,M4)=cpw*TK1(0,N2,N1)*QR1(N,NN,M5,M4)
                   QR(N,NN,M5,M4)=QR(N,NN,M5,M4)+QR1(N,NN,M5,M4)
@@ -3759,8 +3619,7 @@ module WatsubMod
                 ! RUNON
 !
               ELSEIF(CDPTH(NU(N2,N1)-1,N2,N1)-DPTHW1.GT.DTBLX(N2,N1))THEN
-                VX=AMIN1(0.0_r8,(DTBLX(N2,N1)-CDPTH(NU(N2,N1)-1,N2,N1)+DPTHW1) &
-                  *AREA(3,NUM(N2,N1),N2,N1))
+                VX=AZMIN1((DTBLX(N2,N1)-CDPTH(NU(N2,N1)-1,N2,N1)+DPTHW1)*AREA(3,NUM(N2,N1),N2,N1))
                 QRM(M,N2,N1)=VX*XNPX
                 QRV(M,N2,N1)=0.0_r8
                 QR1(N,NN,M5,M4)=-XN*QRM(M,N2,N1)*FSLOPE(N,N2,N1)*RCHQF
@@ -3826,7 +3685,7 @@ module WatsubMod
                   ,safe_adb(VOLW1(N3,N2,N1),VOLY(N3,N2,N1))))
                 THETAX=AMAX1(THETY(N3,N2,N1),AMIN1(POROS(N3,N2,N1) &
                   ,safe_adb(VOLWX1(N3,N2,N1),VOLY(N3,N2,N1))))
-                K1=MAX(1,MIN(100,INT(100.0*(POROS(N3,N2,N1) &
+                K1=MAX(1,MIN(100,INT(100.0_r8*(POROS(N3,N2,N1) &
                   -THETA1)/POROS(N3,N2,N1))+1))
                 KL=MAX(1,MIN(100,INT(100.0*(POROS(N3,N2,N1) &
                   -THETAX)/POROS(N3,N2,N1))+1))
@@ -3871,9 +3730,9 @@ module WatsubMod
           !     AREAU=fraction of layer below natural water table
 !
                 IF(IFLGU.EQ.0.AND.test_aneb(RCHGFT,0._r8))THEN
-                  PSISWD=XN*0.005*SLOPE(N,N2,N1)*DLYR(N,N3,N2,N1) &
+                  PSISWD=XN*0.005_r8*SLOPE(N,N2,N1)*DLYR(N,N3,N2,N1) &
                     *(1.0_r8-DTBLG(N2,N1))
-                  PSISWT=AMIN1(0.0_r8,-PSISA1(N3,N2,N1)-0.03*PSISO(N3,N2,N1) &
+                  PSISWT=AZMIN1(-PSISA1(N3,N2,N1)-0.03*PSISO(N3,N2,N1) &
                     +0.0098_r8*(DPTH(N3,N2,N1)-DTBLX(N2,N1)) &
                     -0.0098_r8*AZMAX1(DPTH(N3,N2,N1)-DPTHT(N2,N1)))
                   IF(PSISWT.LT.0.0_r8)PSISWT=PSISWT-PSISWD
@@ -3883,9 +3742,9 @@ module WatsubMod
                   FLWLX(N,M6,M5,M4)=XN*FLWT
                   HFLWL(N,M6,M5,M4)=cpw*TK1(N3,N2,N1)*XN*FLWT
                 ELSE
-                  FLWL(N,M6,M5,M4)=0.0
-                  FLWLX(N,M6,M5,M4)=0.0
-                  HFLWL(N,M6,M5,M4)=0.0
+                  FLWL(N,M6,M5,M4)=0.0_r8
+                  FLWLX(N,M6,M5,M4)=0.0_r8
+                  HFLWL(N,M6,M5,M4)=0.0_r8
                 ENDIF
 !
           !     MACROPORE DISCHARGE ABOVE WATER TABLE
@@ -3917,7 +3776,7 @@ module WatsubMod
                   IF(PSISWTH.LT.0.0_r8)PSISWTH=PSISWTH-PSISWD
                   FLWTH=PSISWTH*CNDH1(N3,N2,N1)*AREA(N,N3,N2,N1) &
                     *(1.0_r8-AREAU(N3,N2,N1))/(RCHGFU+1.0)*RCHGFT*XNPH
-                  FLWTHL=AMAX1(FLWTH,AMIN1(0.0_r8,-(VOLWH1(N3,N2,N1)*XNPX &
+                  FLWTHL=AMAX1(FLWTH,AZMIN1(-(VOLWH1(N3,N2,N1)*XNPX &
                     +FLWHL(3,N3,N2,N1)-FLWHL(3,N3+1,N2,N1))))
                   FLWHL(N,M6,M5,M4)=XN*FLWTHL
                   HFLWL(N,M6,M5,M4)=HFLWL(N,M6,M5,M4)+cpw*TK1(N3,N2,N1)*XN*FLWTHL
@@ -3945,7 +3804,7 @@ module WatsubMod
                 IF(IFLGD.EQ.0.AND.test_aneb(RCHGFT,0._r8))THEN
                   PSISWD=XN*0.005*SLOPE(N,N2,N1)*DLYR(N,N3,N2,N1) &
                     *(1.0_r8-DTBLG(N2,N1))
-                  PSISWT=AMIN1(0.0_r8,-PSISA1(N3,N2,N1)-0.03*PSISO(N3,N2,N1) &
+                  PSISWT=AZMIN1(-PSISA1(N3,N2,N1)-0.03*PSISO(N3,N2,N1) &
                     +0.0098_r8*(DPTH(N3,N2,N1)-DTBLY(N2,N1)) &
                     -0.0098_r8*AZMAX1(DPTH(N3,N2,N1)-DPTHT(N2,N1)))
                   IF(PSISWT.LT.0.0_r8)PSISWT=PSISWT-PSISWD
@@ -4101,7 +3960,7 @@ module WatsubMod
             FLWM(M,N,M6,M5,M4)=0.0
             FLWHM(M,N,M6,M5,M4)=0.0
           ENDIF
-9575    CONTINUE
+        ENDDO D9575
     !
     !     NET WATER AND HEAT FLUXES IN RUNOFF AND SNOW DRIFT
     !
@@ -4112,7 +3971,7 @@ module WatsubMod
     !     HQS1=convective heat transfer from snow,water,ice transfer
 !
         IF(L.EQ.NUM(N2,N1).AND.N.NE.3)THEN
-          DO 1202 NN=1,2
+          D1202: DO NN=1,2
             TQR1(N2,N1)=TQR1(N2,N1)+QR1(N,NN,N2,N1)
             THQR1(N2,N1)=THQR1(N2,N1)+HQR1(N,NN,N2,N1)
             IF(IFLBM(M,N,NN,N5,N4).EQ.0)THEN
@@ -4131,7 +3990,7 @@ module WatsubMod
                 IFLBH(N,NN,N5B,N4B)=IFLBM(M,N,NN,N5B,N4B)
               ENDIF
             ENDIF
-1202      CONTINUE
+          ENDDO D1202
           TQS1(N2,N1)=TQS1(N2,N1)+QS1(N,N2,N1)-QS1(N,N5,N4)
           TQW1(N2,N1)=TQW1(N2,N1)+QW1(N,N2,N1)-QW1(N,N5,N4)
           TQI1(N2,N1)=TQI1(N2,N1)+QI1(N,N2,N1)-QI1(N,N5,N4)
@@ -4147,26 +4006,25 @@ module WatsubMod
         !     HFLWL=soil heat flux
 !
         IF(NCN(N2,N1).NE.3.OR.N.EQ.3)THEN
-          DO 1200 LL=N6,NL(N5,N4)
+          D1200: DO LL=N6,NL(N5,N4)
             IF(VOLX(LL,N2,N1).GT.ZEROS2(N2,N1))THEN
               N6=LL
               exit
             ENDIF
-1200      CONTINUE
-!1201      CONTINUE
+          ENDDO D1200
           IF(VOLX(N3,N2,N1).GT.ZEROS2(N2,N1))THEN
             TFLWL(N3,N2,N1)=TFLWL(N3,N2,N1)+FLWL(N,N3,N2,N1)-FLWL(N,N6,N5,N4)
             TFLWLX(N3,N2,N1)=TFLWLX(N3,N2,N1)+FLWLX(N,N3,N2,N1)-FLWLX(N,N6,N5,N4)
             TFLWHL(N3,N2,N1)=TFLWHL(N3,N2,N1)+FLWHL(N,N3,N2,N1)-FLWHL(N,N6,N5,N4)
             THFLWL(N3,N2,N1)=THFLWL(N3,N2,N1)+HFLWL(N,N3,N2,N1)-HFLWL(N,N6,N5,N4)
           ELSE
-            TFLWL(N3,N2,N1)=0.0
-            TFLWLX(N3,N2,N1)=0.0
-            TFLWHL(N3,N2,N1)=0.0
-            THFLWL(N3,N2,N1)=0.0
+            TFLWL(N3,N2,N1)=0.0_r8
+            TFLWLX(N3,N2,N1)=0.0_r8
+            TFLWHL(N3,N2,N1)=0.0_r8
+            THFLWL(N3,N2,N1)=0.0_r8
           ENDIF
         ENDIF
-9580  CONTINUE
+      ENDDO D9580
 !
 !     INFILTRATION OF WATER FROM MACROPORES INTO MICROPORES
 !
@@ -4181,7 +4039,7 @@ module WatsubMod
 !     VOLWH1X,VOLPH1X=current macropore water,air volume
 !
       IF(VOLWH1(N3,N2,N1).GT.ZEROS2(N2,N1))THEN
-        FINHX=6.283*HCND(2,1,N3,N2,N1)*AREA(3,N3,N2,N1) &
+        FINHX=PICON2s*HCND(2,1,N3,N2,N1)*AREA(3,N3,N2,N1) &
           *(PSISE(N3,N2,N1)-PSISA1(N3,N2,N1)) &
           /LOG(PHOL(N3,N2,N1)/HRAD(N3,N2,N1))*XNPH
         VOLW1X=VOLW1(N3,N2,N1)+TFLWL(N3,N2,N1)+FLU1(N3,N2,N1)
@@ -4191,7 +4049,7 @@ module WatsubMod
         IF(FINHX.GT.0.0_r8)THEN
           FINHL(N3,N2,N1)=AZMAX1(AMIN1(FINHX,VOLWH1X,VOLP1X))
         ELSE
-          FINHL(N3,N2,N1)=AMIN1(0.0_r8,AMAX1(FINHX,-VOLPH1X,-VOLW1X))
+          FINHL(N3,N2,N1)=AZMIN1(AMAX1(FINHX,-VOLPH1X,-VOLW1X))
         ENDIF
         FINHM(M,N3,N2,N1)=FINHL(N3,N2,N1)
         FINH(N3,N2,N1)=FINH(N3,N2,N1)+FINHL(N3,N2,N1)
@@ -4238,14 +4096,14 @@ module WatsubMod
           ELSE
             TFLX=AMIN1(333.0*VOLW1X*XNPX,TFLX1)
           ENDIF
-            WFLXL(N3,N2,N1)=-TFLX/333.0
+            WFLXL(N3,N2,N1)=-TFLX/333.0_r8
           ELSE
-            TFLX=0.0
-            WFLXL(N3,N2,N1)=0.0
+            TFLX=0.0_r8
+            WFLXL(N3,N2,N1)=0.0_r8
           ENDIF
         ELSE
-          TFLX=0.0
-          WFLXL(N3,N2,N1)=0.0
+          TFLX=0.0_r8
+          WFLXL(N3,N2,N1)=0.0_r8
         ENDIF
 !
 !     FREEZE-THAW IN SOIL LAYER MACROPORE FROM NET CHANGE IN SOIL
@@ -4289,9 +4147,9 @@ module WatsubMod
 !     VOLWX1=soil micropore water content behind wetting front
 !     FLWVL=water flux from wetted to drier soil
 !
-9585  CONTINUE
-9590  CONTINUE
-9595  CONTINUE
+      ENDDO D9585
+    ENDDO
+  ENDDO
 
   end subroutine WaterHeatExchThruBoundaryFlow
 !------------------------------------------------------------------------------------------
@@ -4308,11 +4166,8 @@ module WatsubMod
   real(r8) :: tk1pres,tk1l
 
 ! begin_execution
-!  if(curday>=176)then
-!    write(*,*)'UpdateStateSolutionNotNPH at line',__LINE__,M,tk1(8,NVN,NHW)
-!  endif
-  DO 9795 NX=NHW,NHE
-    DO 9790 NY=NVN,NVS
+  D9795: DO NX=NHW,NHE
+    D9790: DO NY=NVN,NVS
       !     SNOWPACK WATER, ICE, SNOW AND TEMPERATURE
       !
       !     VOLS0,VOLW0,VOLI0=snow,water,ice volumes in snowpack
@@ -4324,13 +4179,12 @@ module WatsubMod
       !     THFLWW=total snowpack conductive+convective heat flux
       !     TFLX0=snowpack latent heat flux from freeze-thaw
       !
-      DO 9780 L=1,JS
+      D9780: DO L=1,JS
         VOLS0(L,NY,NX)=VOLS0(L,NY,NX)+TFLWS(L,NY,NX)-WFLXS(L,NY,NX)
         VOLW0(L,NY,NX)=VOLW0(L,NY,NX)+TFLWW(L,NY,NX)+WFLXS(L,NY,NX)+WFLXI(L,NY,NX)
         VOLI0(L,NY,NX)=VOLI0(L,NY,NX)-WFLXI(L,NY,NX)/DENSI
         ENGY0=VHCPWM(M,L,NY,NX)*TK0(L,NY,NX)
-        VHCPWM(M+1,L,NY,NX)=cps*VOLS0(L,NY,NX)+cpw*VOLW0(L,NY,NX) &
-          +cpi*VOLI0(L,NY,NX)
+        VHCPWM(M+1,L,NY,NX)=cps*VOLS0(L,NY,NX)+cpw*VOLW0(L,NY,NX)+cpi*VOLI0(L,NY,NX)
         IF(VHCPWM(M+1,L,NY,NX).GT.VHCPWX(NY,NX))THEN
           TK0(L,NY,NX)=(ENGY0+THFLWW(L,NY,NX)+TFLX0(L,NY,NX))/VHCPWM(M+1,L,NY,NX)
         ELSEIF(L.EQ.1)THEN
@@ -4338,19 +4192,7 @@ module WatsubMod
         ELSE
           TK0(L,NY,NX)=TK0(L-1,NY,NX)
         ENDIF
-        !       IF(L.EQ.1)THEN
-        !         WRITE(*,7753)'TKM',I,J,M,NX,NY,L,TK0(L,NY,NX)
-        !          2,THFLWW(L,NY,NX),TFLX0(L,NY,NX),HFLW0W(L,NY,NX)
-        !          3,HFLWRLW,HFLWLW
-        !          3,VOLS0(L,NY,NX),VOLW0(L,NY,NX),VOLI0(L,NY,NX),VOLS1(L,NY,NX)
-        !          2,WFLXS(L,NY,NX),WFLXI(L,NY,NX)
-        !          3,TFLWS(L,NY,NX),TFLWW(L,NY,NX),TFLWI(L,NY,NX)
-        !          3,XFLWS(L,NY,NX),XFLWW(L,NY,NX),XFLWI(L,NY,NX)
-        !          4,XHFLWW(L,NY,NX),HFLSW(L,NY,NX)
-        !          5,VHCPWM(M+1,L,NY,NX)
-!7753  FORMAT(A8,6I4,80E14.6)
-        !       ENDIF
-9780  CONTINUE
+      ENDDO D9780
 !      if(curday>=176)then
 !        write(*,*)'line',__LINE__,'tk1',TK1(8,ny,nx),TK1(9,ny,nx),M
 !      endif
@@ -4499,13 +4341,8 @@ module WatsubMod
       ! VHCP1A,VHCP1B=volumetric heat capacities of soil+micropore,macropore
       ! TK1=soil temperature
       !
-      !if(curday>=176)then
-      !  write(*,*)'line',__LINE__,'tk1',TK1(8,ny,nx),TK1(9,ny,nx),M
-      !endif
-      DO 9785 L=NUM(NY,NX),NL(NY,NX)
-!        if(curday>=176)then
-!          write(*,*)'at line',__LINE__,'tk',TK1(L,NY,NX),L
-!        endif
+
+      D9785: DO L=NUM(NY,NX),NL(NY,NX)
         IF(VOLT(L,NY,NX).GT.ZEROS2(NY,NX))THEN
           VOLW1(L,NY,NX)=VOLW1(L,NY,NX)+TFLWL(L,NY,NX)+FINHL(L,NY,NX)+TWFLXL(L,NY,NX)+FLU1(L,NY,NX)
           if(abs(VOLW1(L,NY,NX))>1.e20_r8)then
@@ -4614,7 +4451,7 @@ module WatsubMod
           THETPM(M+1,L,NY,NX)=0.0
         ENDIF
 
-9785  CONTINUE
+      ENDDO D9785
       !
       !       RESET SURFACE LAYER NUMBER AND TRANSFER ALL WATER TO SOIL SURFACE LAYER
       !       IF LAKE SURFACE LAYER IS LOST TO EVAPORATION
@@ -4636,8 +4473,8 @@ module WatsubMod
           ENDIF
         ENDDO
       ENDIF
-9790  CONTINUE
-9795  CONTINUE
+    ENDDO D9790
+  ENDDO D9795
 
   end subroutine UpdateStateSolutionNotNPH
 !------------------------------------------------------------------------------------------
@@ -4737,8 +4574,8 @@ module WatsubMod
 
   integer :: NY,NX
 ! begin_execution
-  DO 9695 NX=NHW,NHE
-    DO 9690 NY=NVN,NVS
+  D9695: DO NX=NHW,NHE
+    D9690: DO NY=NVN,NVS
       IF(NUM(NY,NX).EQ.NU(NY,NX))THEN
         FLWNU(NY,NX)=FLW(3,N6X(NY,NX),NY,NX)
         FLWXNU(NY,NX)=FLWX(3,N6X(NY,NX),NY,NX)
@@ -4750,8 +4587,8 @@ module WatsubMod
         FLWHNU(NY,NX)=FLWHNX(NY,NX)
         HFLWNU(NY,NX)=HFLWNX(NY,NX)
       ENDIF
-9690  CONTINUE
-9695  CONTINUE
+    ENDDO D9690
+  ENDDO D9695
   end subroutine UpdateFLuxAtNPH
 !------------------------------------------------------------------------------------------
 
@@ -4820,6 +4657,141 @@ module WatsubMod
   HFLWRL(NY,NX)=HFLWRLW+HFLWRLG
 
   end subroutine AtmosLandSurfaceExchange
+!--------------------------------------------------------------------------
 
+  subroutine Config4TileDrainage(L,NY,NX,IFLGD,IFLGDH,DPTHH)
+
+  implicit none
+  integer , intent(in) :: L,NY,NX
+  integer, intent(out) :: IFLGD,IFLGDH
+  real(r8),intent(out) :: DPTHH
+
+  integer :: LL
+  real(r8) :: DTBLYX
+!
+!     IDTBL=water table flag
+!     DPTH,DTBLY=depth to layer midpoint, artificial water table
+!     PSISM1,PSISE=soil,air entry matric potential
+!     DTBLYX=equilibrium water potential with artificial water table
+!     IFLGD=micropore discharge flag to artificial water table
+!
+  IF(IDTBL(NY,NX).GE.3.AND.DPTH(L,NY,NX).LT.DTBLY(NY,NX))THEN
+    IF(PSISM1(L,NY,NX).GT.0.0098_r8*(DPTH(L,NY,NX)-DTBLY(NY,NX)))THEN
+      IFLGD=0
+      IF(L.LT.NL(NY,NX))THEN
+        D9568: DO  LL=L+1,NL(NY,NX)
+          DTBLYX=DTBLY(NY,NX)+PSISE(LL,NY,NX)/0.0098_r8
+          IF(DPTH(LL,NY,NX).LT.DTBLYX)THEN
+            IF((PSISM1(LL,NY,NX).LE.0.0098_r8*(DPTH(LL,NY,NX)-DTBLYX) &
+              .AND.L.NE.NL(NY,NX)).OR.DPTH(LL,NY,NX).GT.DPTHA(NY,NX))THEN
+              IFLGD=1
+            ENDIF
+          ENDIF
+        ENDDO D9568
+      ENDIF
+    ELSE
+      IFLGD=1
+    ENDIF
+  ELSE
+    IFLGD=1
+  ENDIF
+!
+!     IDENTIFY CONDITIONS FOR MACROPORE DISCHARGE TO TILE DRAIN
+!
+!     VOLAH1,VOLWH1,VOLIH1=macropore volume,water,ice content
+!     CDPTH=depth to layer bottom
+!     DLYR=layer thickness
+!     IFLGDH=macropore discharge flag to artificial water table
+!
+  IF(VOLAH1(L,NY,NX).GT.ZEROS2(NY,NX))THEN
+    DPTHH=CDPTH(L,NY,NX)-(VOLWH1(L,NY,NX)+VOLIH1(L,NY,NX))/VOLAH1(L,NY,NX)*DLYR(3,L,NY,NX)
+  ELSE
+    DPTHH=CDPTH(L,NY,NX)
+  ENDIF
+
+  IF(IDTBL(NY,NX).GE.3.AND.DPTHH.LT.DTBLY(NY,NX).AND.VOLWH1(L,NY,NX).GT.ZEROS2(NY,NX))THEN
+! artificial water table, e.g. tile drainage
+    IFLGDH=0
+    IF(L.LT.NL(NY,NX))THEN
+      D9569: DO  LL=L+1,NL(NY,NX)
+        IF(DPTH(LL,NY,NX).LT.DTBLY(NY,NX))THEN
+! the layer is above tile drain water table
+          IF(VOLAH1(LL,NY,NX).LE.ZEROS(NY,NX))THEN
+! no macropore flow
+            IFLGDH=1
+          ENDIF
+        ENDIF
+      ENDDO D9569
+    ENDIF
+  ELSE
+    IFLGDH=1
+  ENDIF
+  end subroutine Config4TileDrainage
+!------------------------------------------------------------------
+
+  subroutine Config4WaterTableDrain(L,NY,NX,IFLGU,DPTHH)
+
+  implicit none
+  integer , intent(in) :: L,NY,NX
+  integer , intent(out):: IFLGU
+  real(r8), intent(out):: DPTHH
+
+  real(r8) :: DTBLXX
+  integer :: LL
+!     IDENTIFY CONDITIONS FOR MICROPRE DISCHARGE TO WATER TABLE
+!
+!     IDTBL=water table flag
+!     DPTH,DTBLX=depth to layer midpoint,natural water table
+!     PSISM1,PSISE=matric,air entry water potential
+!     DTBLXX=equilibrium water potential with natural water table
+!     DPTHA=active layer depth
+!     IFLGU=micropore discharge flag to natural water table
+!
+  IF(IDTBL(NY,NX).NE.0.AND.DPTH(L,NY,NX).LT.DTBLX(NY,NX))THEN
+    IF(PSISM1(L,NY,NX).GT.0.0098_r8*(DPTH(L,NY,NX)-DTBLX(NY,NX)))THEN
+      IFLGU=0
+      D9565: DO LL=MIN(L+1,NL(NY,NX)),NL(NY,NX)
+        DTBLXX=DTBLX(NY,NX)+PSISE(LL,NY,NX)/0.0098_r8
+        IF(DPTH(LL,NY,NX).LT.DTBLXX)THEN
+          IF((PSISM1(LL,NY,NX).LE.0.0098_r8*(DPTH(LL,NY,NX)-DTBLXX) &
+            .AND.L.NE.NL(NY,NX)).OR.DPTH(LL,NY,NX).GT.DPTHA(NY,NX))THEN
+            IFLGU=1
+          ENDIF
+        ENDIF
+      ENDDO D9565
+    ELSE
+      IFLGU=1
+    ENDIF
+  ELSE
+    IFLGU=1
+  ENDIF
+!
+!     IDENTIFY CONDITIONS FOR MACROPORE DISCHARGE TO WATER TABLE
+!
+!     VOLAH1,VOLWH1,VOLIH1=macropore volume,water,ice content
+!     DPTHH depth to layer macropore water
+!     CDPTH=depth to layer bottom
+!     DLYR=layer thickness
+!     IFLGUH=macropore discharge flag to natural water table
+!
+  IF(VOLAH1(L,NY,NX).GT.ZEROS2(NY,NX))THEN
+    DPTHH=CDPTH(L,NY,NX)-(VOLWH1(L,NY,NX)+VOLIH1(L,NY,NX))/VOLAH1(L,NY,NX)*DLYR(3,L,NY,NX)
+  ELSE
+    DPTHH=CDPTH(L,NY,NX)
+  ENDIF
+  IF(IDTBL(NY,NX).NE.0.AND.DPTHH.LT.DTBLX(NY,NX).AND.VOLWH1(L,NY,NX).GT.ZEROS2(NY,NX))THEN
+!active water table
+    IFLGUH=0
+!     DO 9566 LL=MIN(L+1,NL(NY,NX)),NL(NY,NX)
+!     IF(DPTH(LL,NY,NX).LT.DTBLX(NY,NX))THEN
+!     IF(VOLAH1(LL,NY,NX).LE.ZEROS(NY,NX))THEN
+!     IFLGUH=1
+!     ENDIF
+!     ENDIFx
+!9566  CONTINUE
+  ELSE
+    IFLGUH=1
+  ENDIF
+  end subroutine Config4WaterTableDrain
 
 end module WatsubMod

@@ -1,7 +1,7 @@
 module TestMod
 ! DESCRIPTION
 ! codes to do regression tests
-  use data_kind_mod, only : r8 => SHR_KIND_R8
+  use data_kind_mod, only : r8 => DAT_KIND_R8
   use abortutils, only : endrun
   use fileUtil, only : error_errmsg_len
 implicit none
@@ -54,6 +54,7 @@ implicit none
 
   type(ecosys_regression_type), public :: regression
   public :: create_error_status_type
+  public :: errMsg
 contains
 
     subroutine Init(this, namelist_file, case_name)
@@ -318,8 +319,7 @@ contains
   print_err = this%error
   end function print_err
 
-
-
+!-------------------------------------------------------------------------------
 
   function errMsg(file, line)
 

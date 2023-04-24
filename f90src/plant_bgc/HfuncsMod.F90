@@ -3,9 +3,10 @@ module HfuncsMod
 ! Description:
 ! code to do plant phenology
 
-  use data_kind_mod, only : r8 => SHR_KIND_R8
+  use data_kind_mod, only : r8 => DAT_KIND_R8
   use EcosimConst
   use PlantAPIData
+  use minimathmod, only : AZMAX1
   use StartqsMod, only : startqs
   implicit none
 
@@ -32,7 +33,7 @@ module HfuncsMod
   real(r8), PARAMETER :: GSTGR=0.667_r8
   real(r8), PARAMETER :: VRNE=3600.0_r8
   real(r8), parameter :: PSILY(0:3)=real((/-200.0,-2.0,-2.0,-2.0/),r8)
-  integer, parameter :: NBX(0:3)=(/5,1,1,1/)
+  integer , parameter :: NBX(0:3)=(/5,1,1,1/)
 
   public :: hfuncs
   contains
@@ -71,7 +72,7 @@ module HfuncsMod
     NBR     =>  plt_morph%NBR    , &
     NB1     =>  plt_morph%NB1      &
   )
-  DO 9985 NZ=1,NP
+  D9985: DO NZ=1,NP
 
     IF(DATAP(NZ).NE.'NO')THEN
 !
@@ -105,9 +106,9 @@ module HfuncsMod
 !           IFLGA,IFLGE=flags for initializing leafout,leafoff
 !           VRNS=leafout hours
 !
-        IF(IDAY(1,NB1(NZ),NZ).NE.0.OR.IFLGI(NZ).EQ.1)THEN
-          DO 2010 NB=1,NBR(NZ)
-            IF(IDTHB(NB,NZ).EQ.0)THEN
+        IF(IDAY(1,NB1(NZ),NZ).NE.0.OR.IFLGI(NZ).EQ.itrue)THEN
+          D2010: DO NB=1,NBR(NZ)
+            IF(IDTHB(NB,NZ).EQ.iliving_branch)THEN
               call living_branch_phenology(I,J,NB,nz)
             ENDIF
 !
@@ -115,7 +116,7 @@ module HfuncsMod
 !               IFLGP=flag for remobilization
 !
             KVSTGX=KVSTG(NB,NZ)
-            IF(VSTGX(NB,NZ).LE.1.0E-06)THEN
+            IF(VSTGX(NB,NZ).LE.ppmc)THEN
               KVSTG(NB,NZ)=INT(VSTG(NB,NZ))+1
             ELSE
               KVSTG(NB,NZ)=INT(AMIN1(VSTG(NB,NZ),VSTGX(NB,NZ)))+1
@@ -132,19 +133,19 @@ module HfuncsMod
 !               DYLX,DLYN=daylength of previous,current day
 !               VRNY,VRNZ=hourly counter for lengthening,shortening photoperiods
 !
-            IF(IDTHB(NB,NZ).EQ.0.OR.IFLGI(NZ).EQ.1)THEN
+            IF(IDTHB(NB,NZ).EQ.iliving_branch.OR.IFLGI(NZ).EQ.itrue)THEN
               IF(DYLN.GE.DYLX)THEN
-                VRNY(NB,NZ)=VRNY(NB,NZ)+1.0
-                VRNZ(NB,NZ)=0.0
+                VRNY(NB,NZ)=VRNY(NB,NZ)+1.0_r8
+                VRNZ(NB,NZ)=0.0_r8
               ELSE
-                VRNY(NB,NZ)=0.0
-                VRNZ(NB,NZ)=VRNZ(NB,NZ)+1.0
+                VRNY(NB,NZ)=0.0_r8
+                VRNZ(NB,NZ)=VRNZ(NB,NZ)+1.0_r8
               ENDIF
 
               call pft_specific_phenology(I,J,NZ)
 
             ENDIF
-2010      CONTINUE
+          ENDDO D2010
 !
 !             WATER STRESS INDICATOR
 !
@@ -152,19 +153,20 @@ module HfuncsMod
 !             PSILY=minimum canopy water potential for leafoff
 !             WSTR=number of hours PSILT < PSILY (for output only)
 !
-            IF(PSILT(NZ).LT.PSILY(IGTYP(NZ)))THEN
-              WSTR(NZ)=WSTR(NZ)+1.0
-            ENDIF
+          IF(PSILT(NZ).LT.PSILY(IGTYP(NZ)))THEN
+            WSTR(NZ)=WSTR(NZ)+1.0_r8
           ENDIF
         ENDIF
       ENDIF
-9985  CONTINUE
+    ENDIF
+  ENDDO D9985
   RETURN
   end associate
   END subroutine hfuncs
 !------------------------------------------------------------------------------------------
 
   subroutine set_flags(I,J,NZ)
+  use EcoSIMCtrlDataType, only : iyear_cur
 
   implicit none
   integer, intent(in) :: I,J,NZ
@@ -172,11 +174,11 @@ module HfuncsMod
   INTEGER :: L
 
 ! begin_execution
-  associate(                            &
+  associate(                        &
     IYR0    =>  plt_distb%IYR0    , &
-    IYRH    =>  plt_distb%IYRH    , &
-    IDAY0   =>  plt_distb%IDAY0   , &
-    IDAYH   =>  plt_distb%IDAYH   , &
+    IYRH    =>  plt_distb%IYRH    , &  !year of harvest
+    IDAY0   =>  plt_distb%IDAY0   , &  !day of planting
+    IDAYH   =>  plt_distb%IDAYH   , &  !day of harvest
     DATAP   =>  plt_site%DATAP    , &
     IDATA   =>  plt_site%IDATA    , &
     IYRC    =>  plt_site%IYRC     , &
@@ -188,11 +190,11 @@ module HfuncsMod
   )
   IF(J.EQ.1)THEN
     IF(IDAY0(NZ).LE.IDAYH(NZ).OR.IYR0(NZ).LT.IYRH(NZ))THEN
-      IF(I.GE.IDAY0(NZ).OR.IDATA(3).GT.IYR0(NZ))THEN
+      IF(I.GE.IDAY0(NZ).OR.iyear_cur.GT.IYR0(NZ))THEN
         IF(I.GT.IDAYH(NZ).AND.IYRC.GE.IYRH(NZ).AND.IDTH(NZ).EQ.1)THEN
           IFLGC(NZ)=0
         ELSE
-          IF(I.EQ.IDAY0(NZ).AND.IDATA(3).EQ.IYR0(NZ))THEN
+          IF(I.EQ.IDAY0(NZ).AND.iyear_cur.EQ.IYR0(NZ))THEN
             IFLGC(NZ)=0
             IDTH(NZ)=0
             CALL STARTQs(NZ,NZ)
@@ -211,7 +213,7 @@ module HfuncsMod
         .GT.IYRH(NZ)))THEN
         IFLGC(NZ)=0
       ELSE
-        IF(I.EQ.IDAY0(NZ).AND.IDATA(3).EQ.IYR0(NZ))THEN
+        IF(I.EQ.IDAY0(NZ).AND.iyear_cur.EQ.IYR0(NZ))THEN
           IFLGC(NZ)=0
           IDTH(NZ)=0
           CALL STARTQs(NZ,NZ)
@@ -233,8 +235,8 @@ module HfuncsMod
 
 ! begin_execution
   associate(                            &
-    CCPOLP  =>   plt_biom%CCPOLP  , &
-    WTRVC   =>   plt_biom%WTRVC   , &
+    CEPOLP  =>   plt_biom%CEPOLP  , &
+    WTRVE   =>   plt_biom%WTRVE   , &
     GROUP   =>   plt_pheno%GROUP  , &
     IDAY    =>   plt_pheno%IDAY   , &
     IFLGI   =>   plt_pheno%IFLGI  , &
@@ -278,35 +280,34 @@ module HfuncsMod
 ! FNOD=scales node number for perennial vegetation (e.g. trees)
 ! NNOD=number of concurrently growing nodes
 ! XTLI,GROUP=node number at planting,floral initiation
-!
+! IBTYP: setup for phenologically-driven above-ground turnover 
 
 
   IF(IFLGI(NZ).EQ.0)THEN
-    IF(J.EQ.1.AND.PP(NZ).GT.0.0)THEN
+    IF(J.EQ.1.AND.PP(NZ).GT.0.0_r8)THEN
       IF(PSIRG(1,NG(NZ),NZ).GT.PSILM)THEN
-        IF(ISTYP(NZ).NE.0.OR.IDAY(2,NB1(NZ),NZ).EQ.0)THEN
-          IF((NBR(NZ).EQ.0.AND.WTRVC(NZ).GT.0.0) &
-            .OR.(CCPOLP(NZ).GT.PB(NZ).AND.PB(NZ).GT.0.0))THEN
-            DO 120 NB=1,JC1
-              IF(IDTHB(NB,NZ).EQ.1)THEN
-                IF(NB.EQ.NB1(NZ) &
-                  .OR.PSTG(NB1(NZ),NZ).GT.NBT(NZ) &
+        IF(ISTYP(NZ).NE.iplt_annual.OR.IDAY(2,NB1(NZ),NZ).EQ.0)THEN
+          IF((NBR(NZ).EQ.0.AND.WTRVE(ielmc,NZ).GT.0.0_r8) &
+            .OR.(CEPOLP(ielmc,NZ).GT.PB(NZ).AND.PB(NZ).GT.0.0_r8))THEN
+            D120: DO NB=1,JC1
+              IF(IDTHB(NB,NZ).EQ.idead)THEN
+                IF(NB.EQ.NB1(NZ).OR.PSTG(NB1(NZ),NZ).GT.NBT(NZ) &
                   +NNOD(NZ)/FNOD(NZ)+XTLI(NZ))THEN
                   NBT(NZ)=NBT(NZ)+1
                   NBR(NZ)=MIN(NBX(IBTYP(NZ)),MAX(NB,NBR(NZ)))
                   NBTB(NB,NZ)=NBT(NZ)-1
-                  IDTHP(NZ)=0
-                  IDTHB(NB,NZ)=0
-                  VRNS(NB,NZ)=0.0
-                  IF(ISTYP(NZ).EQ.0)THEN
-                    GROUP(NB,NZ)=AMAX1(0.0,GROUPI(NZ)-NBTB(NB,NZ))
+                  IDTHP(NZ)=ialive
+                  IDTHB(NB,NZ)=ialive
+                  VRNS(NB,NZ)=0.0_r8
+                  IF(ISTYP(NZ).EQ.iplt_annual)THEN
+                    GROUP(NB,NZ)=AZMAX1(GROUPI(NZ)-NBTB(NB,NZ))
                   ELSE
                     GROUP(NB,NZ)=GROUPI(NZ)
                   ENDIF
                   exit
                 ENDIF
               ENDIF
-120         CONTINUE
+            ENDDO D120
           ENDIF
         ENDIF
       ENDIF
@@ -315,12 +316,17 @@ module HfuncsMod
 !     CONCENTRATION PERMIT
 !
 !     PR=nonstructural C concentration needed for root branching
-!
-      IF(PSIRG(1,NG(NZ),NZ).GT.PSILM)THEN
-        IF(NRT(NZ).EQ.0.OR.PSTG(NB1(NZ),NZ) &
-          .GT.NRT(NZ)/FNOD(NZ)+XTLI(NZ))THEN
-          IF((NRT(NZ).EQ.0.AND.WTRVC(NZ).GT.0.0) &
-            .OR.(CCPOLP(NZ).GT.PR(NZ).AND.PR(NZ).GT.0.0))THEN
+!     FNOD: parameter for allocation of growth to nodes
+!     XLI: number of nodes in seed
+!     PSTG: node number
+!     NB1: number of main branch
+!     CEPOLP: canopy nonstructural element concentration
+!     PSIRG: root turgor pressure
+!     WTRVE: non-structural carbon
+      IF(PSIRG(ipltroot,NG(NZ),NZ).GT.PSILM)THEN
+        IF(NRT(NZ).EQ.0 .OR. PSTG(NB1(NZ),NZ).GT.NRT(NZ)/FNOD(NZ)+XTLI(NZ))THEN
+          IF((NRT(NZ).EQ.0 .AND. WTRVE(ielmc,NZ).GT.0.0_r8) &
+            .OR.(CEPOLP(ielmc,NZ).GT.PR(NZ) .AND. PR(NZ).GT.0.0_r8))THEN
             NRT(NZ)=MIN(JC1,NRT(NZ)+1)
             IDTHR(NZ)=0
           ENDIF
@@ -336,40 +342,24 @@ module HfuncsMod
   implicit none
   integer, intent(in) :: I,J,NZ
 
-  integer :: NB,N,L
+  integer :: NB,N,L,NE
   real(r8):: ARLSP
   associate(                           &
     WTLS   =>  plt_biom%WTLS     , &
     WTLSB  =>  plt_biom%WTLSB    , &
-    WTSHT  =>  plt_biom%WTSHT    , &
+    WTSHTE =>  plt_biom%WTSHTE   , &
     CCPLNP =>  plt_biom%CCPLNP   , &
-    CCPOLB =>  plt_biom%CCPOLB   , &
-    CZPOLB =>  plt_biom%CZPOLB   , &
-    CPPOLB =>  plt_biom%CPPOLB   , &
-    CCPOLP =>  plt_biom%CCPOLP   , &
-    CZPOLP =>  plt_biom%CZPOLP   , &
-    CPPOLP =>  plt_biom%CPPOLP   , &
-    CPOOLP =>  plt_biom%CPOOLP   , &
-    ZPOOLP =>  plt_biom%ZPOOLP   , &
-    PPOOLP =>  plt_biom%PPOOLP   , &
-    CPOLNB =>  plt_biom%CPOLNB   , &
-    ZPOLNB =>  plt_biom%ZPOLNB   , &
-    PPOLNB =>  plt_biom%PPOLNB   , &
-    CPOOLR =>  plt_biom%CPOOLR   , &
-    ZPOOLR =>  plt_biom%ZPOOLR   , &
-    PPOOLR =>  plt_biom%PPOOLR   , &
-    CPOOL  =>  plt_biom%CPOOL    , &
-    ZPOOL  =>  plt_biom%ZPOOL    , &
-    PPOOL  =>  plt_biom%PPOOL    , &
-    CCPOLR =>  plt_biom%CCPOLR   , &
-    CZPOLR =>  plt_biom%CZPOLR   , &
-    CPPOLR =>  plt_biom%CPPOLR   , &
+    CEPOLB =>  plt_biom%CEPOLB   , &
+    CEPOLP =>  plt_biom%CEPOLP   , &
+    EPOOLP =>  plt_biom%EPOOLP   , &
+    EPOLNB =>  plt_biom%EPOLNB   , &
+    EPOOLR =>  plt_biom%EPOOLR   , &
+    EPOOL  =>  plt_biom%EPOOL    , &
+    CEPOLR =>  plt_biom%CEPOLR   , &
     ZEROL  =>  plt_biom%ZEROL    , &
     ZEROP  =>  plt_biom%ZEROP    , &
     WTRTL  =>  plt_biom%WTRTL    , &
-    CPOLNP =>  plt_biom%CPOLNP   , &
-    ZPOLNP =>  plt_biom%ZPOLNP   , &
-    PPOLNP =>  plt_biom%PPOLNP   , &
+    EPOLNP =>  plt_biom%EPOLNP   , &
     VOLWC  =>  plt_ew%VOLWC      , &
     VHCPC  =>  plt_ew%VHCPC      , &
     NU     =>  plt_site%NU       , &
@@ -388,19 +378,12 @@ module HfuncsMod
     ARSTP  =>  plt_morph%ARSTP   , &
     NI     =>  plt_morph%NI        &
   )
-  plt_bgcr%RCO2Z(NZ)=0.0_r8
-  plt_bgcr%ROXYZ(NZ)=0.0_r8
-  plt_bgcr%RCH4Z(NZ)=0.0_r8
-  plt_bgcr%RN2OZ(NZ)=0.0_r8
-  plt_bgcr%RNH3Z(NZ)=0.0_r8
-  plt_bgcr%RH2GZ(NZ)=0.0_r8
-  CPOOLP(NZ)=0.0_r8
-  ZPOOLP(NZ)=0.0_r8
-  PPOOLP(NZ)=0.0_r8
+  plt_bgcr%RFGas_root(idg_beg:idg_end-1,NZ)=0.0_r8
+  EPOOLP(1:npelms,NZ)=0.0_r8
   NI(NZ)=NIX(NZ)
   NG(NZ)=MIN(NI(NZ),MAX(NG(NZ),NU))
   NB1(NZ)=1
-  NBTX=1.0E+06
+  NBTX=1.0E+06_r8
 !
 ! TOTAL PLANT NON-STRUCTURAL C, N, P
 !
@@ -408,20 +391,23 @@ module HfuncsMod
 ! CPOLN*,ZPOLN*,PPOLN*=non-structl C,N,P in branch,canopy nodules (g)
 ! NB1=main branch number
 !
-  DO 140 NB=1,NBR(NZ)
-    IF(IDTHB(NB,NZ).EQ.0)THEN
-      CPOOLP(NZ)=CPOOLP(NZ)+CPOOL(NB,NZ)
-      ZPOOLP(NZ)=ZPOOLP(NZ)+ZPOOL(NB,NZ)
-      PPOOLP(NZ)=PPOOLP(NZ)+PPOOL(NB,NZ)
-      CPOLNP(NZ)=CPOLNP(NZ)+CPOLNB(NB,NZ)
-      ZPOLNP(NZ)=ZPOLNP(NZ)+ZPOLNB(NB,NZ)
-      PPOLNP(NZ)=PPOLNP(NZ)+PPOLNB(NB,NZ)
+  DO NE=1,npelms
+    D140: DO NB=1,NBR(NZ)
+      IF(IDTHB(NB,NZ).EQ.ialive)THEN
+        EPOOLP(NE,NZ)=EPOOLP(NE,NZ)+EPOOL(NE,NB,NZ)
+        EPOLNP(NE,NZ)=EPOLNP(NE,NZ)+EPOLNB(NE,NB,NZ)
+      ENDIF
+    ENDDO D140
+  ENDDO
+
+  DO NB=1,NBR(NZ)
+    IF(IDTHB(NB,NZ).EQ.ialive)THEN
       IF(NBTB(NB,NZ).LT.NBTX)THEN
         NB1(NZ)=NB
         NBTX=NBTB(NB,NZ)
       ENDIF
     ENDIF
-140   CONTINUE
+  ENDDO
 !
 ! NON-STRUCTURAL C, N, P CONCENTRATIONS IN ROOT
 !
@@ -429,20 +415,19 @@ module HfuncsMod
 ! CPOOLR,ZPOOLR,PPOOLR=non-structl C,N,P in root(1),myco(2)(g)
 ! CCPOLR,CZPOLR,CPPOLR=non-structl C,N,P concn in root(1),myco(2)(g g-1)
 !
-  DO 180 N=1,MY(NZ)
-    DO 160 L=NU,NI(NZ)
+  D180: DO N=1,MY(NZ)
+    D160: DO L=NU,NI(NZ)
       IF(WTRTL(N,L,NZ).GT.ZEROL(NZ))THEN
-        CCPOLR(N,L,NZ)=AMAX1(0.0,CPOOLR(N,L,NZ)/WTRTL(N,L,NZ))
-        CZPOLR(N,L,NZ)=AMAX1(0.0,ZPOOLR(N,L,NZ)/WTRTL(N,L,NZ))
-        CPPOLR(N,L,NZ)=AMAX1(0.0,PPOOLR(N,L,NZ)/WTRTL(N,L,NZ))
-!       CCPOLR(N,L,NZ)=AMIN1(1.0,CCPOLR(N,L,NZ))
+        DO NE=1,npelms
+          CEPOLR(NE,N,L,NZ)=AZMAX1(EPOOLR(NE,N,L,NZ)/WTRTL(N,L,NZ))
+        ENDDO
       ELSE
-        CCPOLR(N,L,NZ)=1.0
-        CZPOLR(N,L,NZ)=1.0
-        CPPOLR(N,L,NZ)=1.0
+        DO NE=1,npelms
+          CEPOLR(NE,N,L,NZ)=1.0_r8
+        ENDDO
       ENDIF
-160 CONTINUE
-180 CONTINUE
+    ENDDO D160
+  ENDDO D180
 !
 ! NON-STRUCTURAL C, N, P CONCENTRATIONS IN SHOOT
 !
@@ -451,27 +436,23 @@ module HfuncsMod
 ! CCPOLB,CZPOLB,CPPOLB=nonstructural C,N,P concn in branch(g g-1)
 !
   IF(WTLS(NZ).GT.ZEROL(NZ))THEN
-    CCPOLP(NZ)=AMAX1(0.0,AMIN1(1.0,CPOOLP(NZ)/WTLS(NZ)))
-    CCPLNP(NZ)=AMAX1(0.0,AMIN1(1.0,CPOLNP(NZ)/WTLS(NZ)))
-    CZPOLP(NZ)=AMAX1(0.0,AMIN1(1.0,ZPOOLP(NZ)/WTLS(NZ)))
-    CPPOLP(NZ)=AMAX1(0.0,AMIN1(1.0,PPOOLP(NZ)/WTLS(NZ)))
+    DO NE=1,npelms
+      CEPOLP(NE,NZ)=AZMAX1(AMIN1(1.0_r8,EPOOLP(NE,NZ)/WTLS(NZ)))
+    ENDDO
+    CCPLNP(NZ)=AZMAX1(AMIN1(1.0_r8,EPOLNP(ielmc,NZ)/WTLS(NZ)))
   ELSE
-    CCPOLP(NZ)=1.0
-    CCPLNP(NZ)=1.0
-    CZPOLP(NZ)=1.0
-    CPPOLP(NZ)=1.0
+    CEPOLP(1:npelms,NZ)=1.0_r8
+    CCPLNP(NZ)=1.0_r8
   ENDIF
-  DO 190 NB=1,NBR(NZ)
-    IF(WTLSB(NB,NZ).GT.ZEROP(NZ))THEN
-      CCPOLB(NB,NZ)=AMAX1(0.0,CPOOL(NB,NZ)/WTLSB(NB,NZ))
-      CZPOLB(NB,NZ)=AMAX1(0.0,ZPOOL(NB,NZ)/WTLSB(NB,NZ))
-      CPPOLB(NB,NZ)=AMAX1(0.0,PPOOL(NB,NZ)/WTLSB(NB,NZ))
-    ELSE
-      CCPOLB(NB,NZ)=1.0
-      CZPOLB(NB,NZ)=1.0
-      CPPOLB(NB,NZ)=1.0
-    ENDIF
-190 CONTINUE
+  DO NE=1,npelms
+    D190: DO NB=1,NBR(NZ)
+      IF(WTLSB(NB,NZ).GT.ZEROP(NZ))THEN
+        CEPOLB(NE,NB,NZ)=AZMAX1(EPOOL(NE,NB,NZ)/WTLSB(NB,NZ))
+      ELSE
+        CEPOLB(NE,NB,NZ)=1.0_r8
+      ENDIF
+    ENDDO D190
+  ENDDO
 !
 ! EMERGENCE DATE FROM COTYLEDON HEIGHT, LEAF AREA, ROOT DEPTH
 !
@@ -484,11 +465,10 @@ module HfuncsMod
 !
   IF(IDAY(1,NB1(NZ),NZ).EQ.0)THEN
     ARLSP=ARLFP(NZ)+ARSTP(NZ)
-    IF((HTCTL(NZ).GT.SDPTH(NZ)) &
-      .AND.(ARLSP.GT.ZEROL(NZ)) &
-      .AND.(RTDP1(1,1,NZ).GT.SDPTH(NZ)+1.0E-06))THEN
+    IF((HTCTL(NZ).GT.SDPTH(NZ)).AND.(ARLSP.GT.ZEROL(NZ)) &
+      .AND.(RTDP1(1,1,NZ).GT.SDPTH(NZ)+ppmc))THEN
       IDAY(1,NB1(NZ),NZ)=I
-      VHCPC(NZ)=cpw*(WTSHT(NZ)*10.0E-06+VOLWC(NZ))
+      VHCPC(NZ)=cpw*(WTSHTE(ielmc,NZ)*10.0E-06_r8+VOLWC(NZ))
     ENDIF
   ENDIF
   end associate
@@ -536,8 +516,8 @@ module HfuncsMod
     IF(DYLN.GE.DYLX)THEN
       VRNS(NB,NZ)=VRNY(NB,NZ)
       IF(VRNS(NB,NZ).GE.VRNL(NB,NZ) &
-        .OR.(ALAT.GT.0.0.AND.I.EQ.173) &
-        .OR.(ALAT.LT.0.0.AND.I.EQ.355))THEN
+        .OR.(ALAT.GT.0.0_r8.AND.I.EQ.173) &
+        .OR.(ALAT.LT.0.0_r8.AND.I.EQ.355))THEN
         VRNF(NB,NZ)=0.0
         IFLGF(NB,NZ)=0
       ENDIF
@@ -553,8 +533,8 @@ module HfuncsMod
     IF(DYLN.LT.DYLX)THEN
       VRNF(NB,NZ)=VRNZ(NB,NZ)
       IF(VRNF(NB,NZ).GE.VRNX(NB,NZ) &
-        .OR.(ALAT.GT.0.0.AND.I.EQ.355) &
-        .OR.(ALAT.LT.0.0.AND.I.EQ.173))THEN
+        .OR.(ALAT.GT.0.0_r8.AND.I.EQ.355) &
+        .OR.(ALAT.LT.0.0_r8.AND.I.EQ.173))THEN
         VRNS(NB,NZ)=0.0
         IFLGE(NB,NZ)=0
       ENDIF
@@ -580,7 +560,7 @@ module HfuncsMod
         ENDIF
         IF(VRNS(NB,NZ).LT.VRNL(NB,NZ))THEN
           IF(TCG(NZ).LT.CTC(NZ))THEN
-            VRNS(NB,NZ)=AMAX1(0.0,VRNS(NB,NZ)-1.0)
+            VRNS(NB,NZ)=AZMAX1(VRNS(NB,NZ)-1.0)
           ENDIF
         ENDIF
         IF(VRNS(NB,NZ).GE.VRNL(NB,NZ) &
@@ -636,7 +616,7 @@ module HfuncsMod
         ENDIF
         IF(VRNS(NB,NZ).LT.VRNL(NB,NZ))THEN
           IF(PSILT(NZ).LT.PSILY(IGTYP(NZ)))THEN
-            VRNS(NB,NZ)=AMAX1(0.0,VRNS(NB,NZ)-12.0)
+            VRNS(NB,NZ)=AZMAX1(VRNS(NB,NZ)-12.0)
           ENDIF
         ENDIF
         IF(VRNS(NB,NZ).GE.VRNL(NB,NZ))THEN
@@ -702,7 +682,7 @@ module HfuncsMod
         IF(VRNS(NB,NZ).LT.VRNL(NB,NZ))THEN
           IF(TCG(NZ).LT.CTC(NZ) &
             .OR.PSILG(NZ).LT.PSILM)THEN
-            VRNS(NB,NZ)=AMAX1(0.0,VRNS(NB,NZ)-1.5)
+            VRNS(NB,NZ)=AZMAX1(VRNS(NB,NZ)-1.5)
           ENDIF
         ENDIF
         IF(VRNS(NB,NZ).GE.VRNL(NB,NZ))THEN
@@ -818,19 +798,19 @@ module HfuncsMod
 !
   IF(IWTYP(NZ).EQ.0.OR.VRNF(NB,NZ).LT.VRNX(NB,NZ))THEN
     TKCO=TKG(NZ)+OFFST(NZ)
-    RTK=8.3143_r8*TKCO
+    RTK=RGAS*TKCO
     STK=710.0_r8*TKCO
     ACTV=1+EXP((197500_r8-STK)/RTK)+EXP((STK-218500._r8)/RTK)
     TFNP=EXP(24.269_r8-60000._r8/RTK)/ACTV
-    RNI=AMAX1(0.0_r8,XRNI(NZ)*TFNP)
-    RLA=AMAX1(0.0_r8,XRLA(NZ)*TFNP)
+    RNI=AZMAX1(XRNI(NZ)*TFNP)
+    RLA=AZMAX1(XRLA(NZ)*TFNP)
 !
 !   NODE INITIATION AND LEAF APPEARANCE RATES SLOWED BY LOW TURGOR
 !
 !   PSILG=leaf turgor potential
 !   WFNG=water stress effect on phenology
 !
-    IF(ISTYP(NZ).EQ.0)THEN
+    IF(ISTYP(NZ).EQ.iplt_annual)THEN
       IF(IDAY(6,NB,NZ).EQ.0)THEN
         WFNG=EXP(0.025_r8*PSILT(NZ))
         RNI=RNI*WFNG
@@ -898,9 +878,9 @@ module HfuncsMod
       .AND.((VRNS(NB,NZ).GE.VRNL(NB,NZ)) &
       .OR.(I.GE.IDAY0(NZ).AND.IYRC.EQ.IYR0(NZ) &
       .AND.DYLN.GT.DYLX)) &
-      .OR.(((ISTYP(NZ).EQ.1.AND.(IWTYP(NZ).EQ.1 &
+      .OR.(((ISTYP(NZ).EQ.iplt_preanu.AND.(IWTYP(NZ).EQ.1 &
       .OR.IWTYP(NZ).EQ.3)) &
-      .OR.(ISTYP(NZ).EQ.0.AND.IWTYP(NZ).EQ.0)) &
+      .OR.(ISTYP(NZ).EQ.iplt_annual.AND.IWTYP(NZ).EQ.0)) &
       .AND.ZC(NZ).GE.DPTHS-ZERO &
       .AND.DYLN.LT.DYLX))THEN
 !
@@ -915,23 +895,23 @@ module HfuncsMod
 !     VSTGX=node number on date of floral initiation
 !
       IF(IPTYP(NZ).EQ.0)THEN
-        PPD=0.0
+        PPD=0.0_r8
       ELSE
-        PPD=AMAX1(0.0,XDL(NZ)-DYLN)
-        IF(IPTYP(NZ).EQ.1.AND.DYLN.GE.DYLX)PPD=0.0
+        PPD=AZMAX1(XDL(NZ)-DYLN)
+        IF(IPTYP(NZ).EQ.1.AND.DYLN.GE.DYLX)PPD=0.0_r8
       ENDIF
 
       IF(IPTYP(NZ).EQ.0 &
         .OR.(IPTYP(NZ).EQ.1.AND.PPD.GT.XPPD(NZ)) &
         .OR.(IPTYP(NZ).EQ.2.AND.PPD.LT.XPPD(NZ)) &
-        .OR.(((ISTYP(NZ).EQ.1.AND.(IWTYP(NZ).EQ.1 &
+        .OR.(((ISTYP(NZ).EQ.iplt_preanu.AND.(IWTYP(NZ).EQ.1 &
         .OR.IWTYP(NZ).EQ.3)) &
-        .OR.(ISTYP(NZ).EQ.0.AND.IWTYP(NZ).EQ.0)) &
+        .OR.(ISTYP(NZ).EQ.iplt_annual.AND.IWTYP(NZ).EQ.0)) &
         .AND.ZC(NZ).GE.DPTHS-ZERO &
         .AND.DYLN.LT.DYLX))THEN
         IDAY(2,NB,NZ)=I
         PSTGI(NB,NZ)=PSTG(NB,NZ)
-        IF(ISTYP(NZ).EQ.0.AND.IDTYP(NZ).EQ.0)THEN
+        IF(ISTYP(NZ).EQ.iplt_annual.AND.IDTYP(NZ).EQ.0)THEN
           VSTGX(NB,NZ)=PSTG(NB,NZ)
         ENDIF
       ENDIF
@@ -946,10 +926,10 @@ module HfuncsMod
   ELSEIF(IDAY(3,NB,NZ).EQ.0)THEN
     IF(GSTGI(NB,NZ).GT.0.25_r8*GSTGG &
       .OR.((IWTYP(NZ).EQ.1.OR.IWTYP(NZ).EQ.3) &
-      .AND.ISTYP(NZ).NE.0.AND.IPTYP(NZ).NE.1 &
+      .AND.ISTYP(NZ).NE.iplt_annual.AND.IPTYP(NZ).NE.1 &
       .AND.DYLN.LT.DYLX.AND.IFLGE(NB,NZ).EQ.1 &
       .AND.VRNF(NB,NZ).GT.VRNX(NB,NZ)) &
-      .OR.(IWTYP(NZ).EQ.2.AND.ISTYP(NZ).EQ.0) &
+      .OR.(IWTYP(NZ).EQ.2.AND.ISTYP(NZ).EQ.iplt_annual) &
       .AND.IFLGE(NB,NZ).EQ.1 &
       .AND.VRNF(NB,NZ).GT.VRNX(NB,NZ))THEN
       IDAY(3,NB,NZ)=I
@@ -960,14 +940,14 @@ module HfuncsMod
   ELSEIF(IDAY(4,NB,NZ).EQ.0)THEN
     IF(GSTGI(NB,NZ).GT.0.50*GSTGG &
       .OR.((IWTYP(NZ).EQ.1.OR.IWTYP(NZ).EQ.3) &
-      .AND.ISTYP(NZ).NE.0.AND.IPTYP(NZ).NE.1 &
+      .AND.ISTYP(NZ).NE.iplt_annual.AND.IPTYP(NZ).NE.1 &
       .AND.DYLN.LT.DYLX.AND.IFLGE(NB,NZ).EQ.1 &
       .AND.VRNF(NB,NZ).GT.VRNX(NB,NZ)) &
-      .OR.(IWTYP(NZ).EQ.2.AND.ISTYP(NZ).EQ.0) &
+      .OR.(IWTYP(NZ).EQ.2.AND.ISTYP(NZ).EQ.iplt_annual) &
       .AND.IFLGE(NB,NZ).EQ.1 &
       .AND.VRNF(NB,NZ).GT.VRNX(NB,NZ))THEN
       IDAY(4,NB,NZ)=I
-      IF(ISTYP(NZ).EQ.0.AND.IDTYP(NZ).NE.0)THEN
+      IF(ISTYP(NZ).EQ.iplt_annual.AND.IDTYP(NZ).NE.0)THEN
         VSTGX(NB,NZ)=PSTG(NB,NZ)
       ENDIF
     ENDIF
@@ -977,10 +957,10 @@ module HfuncsMod
   ELSEIF(IDAY(5,NB,NZ).EQ.0)THEN
     IF(GSTGI(NB,NZ).GT.1.00*GSTGG &
       .OR.((IWTYP(NZ).EQ.1.OR.IWTYP(NZ).EQ.3) &
-      .AND.ISTYP(NZ).NE.0.AND.IPTYP(NZ).NE.1 &
+      .AND.ISTYP(NZ).NE.iplt_annual.AND.IPTYP(NZ).NE.1 &
       .AND.DYLN.LT.DYLX.AND.IFLGE(NB,NZ).EQ.1 &
       .AND.VRNF(NB,NZ).GT.VRNX(NB,NZ)) &
-      .OR.(IWTYP(NZ).EQ.2.AND.ISTYP(NZ).EQ.0) &
+      .OR.(IWTYP(NZ).EQ.2.AND.ISTYP(NZ).EQ.iplt_annual) &
       .AND.IFLGE(NB,NZ).EQ.1 &
       .AND.VRNF(NB,NZ).GT.VRNX(NB,NZ))THEN
       IDAY(5,NB,NZ)=I
@@ -1001,12 +981,12 @@ module HfuncsMod
 !
   ELSEIF(IDAY(6,NB,NZ).EQ.0)THEN
     IF((VSTG(NB,NZ).GT.PSTGI(NB,NZ)) &
-      .OR.(ISTYP(NZ).NE.0.AND.IDAY(5,NB,NZ).NE.0) &
+      .OR.(ISTYP(NZ).NE.iplt_annual.AND.IDAY(5,NB,NZ).NE.0) &
       .OR.((IWTYP(NZ).EQ.1.OR.IWTYP(NZ).EQ.3) &
-      .AND.ISTYP(NZ).NE.0.AND.IPTYP(NZ).NE.1 &
+      .AND.ISTYP(NZ).NE.iplt_annual.AND.IPTYP(NZ).NE.1 &
       .AND.DYLN.LT.DYLX.AND.IFLGE(NB,NZ).EQ.1 &
       .AND.VRNF(NB,NZ).GT.VRNX(NB,NZ)) &
-      .OR.(IWTYP(NZ).EQ.2.AND.ISTYP(NZ).EQ.0) &
+      .OR.(IWTYP(NZ).EQ.2.AND.ISTYP(NZ).EQ.iplt_annual) &
       .AND.IFLGE(NB,NZ).EQ.1 &
       .AND.VRNF(NB,NZ).GT.VRNX(NB,NZ))THEN
       IF(NB.EQ.NB1(NZ).OR.IDAY(6,NB1(NZ),NZ).NE.0)THEN
@@ -1025,10 +1005,10 @@ module HfuncsMod
   ELSEIF(IDAY(7,NB,NZ).EQ.0)THEN
     IF(GSTGF(NB,NZ).GT.0.50*GSTGR &
       .OR.((IWTYP(NZ).EQ.1.OR.IWTYP(NZ).EQ.3) &
-      .AND.ISTYP(NZ).NE.0.AND.IPTYP(NZ).NE.1 &
+      .AND.ISTYP(NZ).NE.iplt_annual.AND.IPTYP(NZ).NE.1 &
       .AND.DYLN.LT.DYLX.AND.IFLGE(NB,NZ).EQ.1 &
       .AND.VRNF(NB,NZ).GT.VRNX(NB,NZ)) &
-      .OR.(IWTYP(NZ).EQ.2.AND.ISTYP(NZ).EQ.0) &
+      .OR.(IWTYP(NZ).EQ.2.AND.ISTYP(NZ).EQ.iplt_annual) &
       .AND.IFLGE(NB,NZ).EQ.1 &
       .AND.VRNF(NB,NZ).GT.VRNX(NB,NZ))THEN
         IDAY(7,NB,NZ)=I

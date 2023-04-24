@@ -1,6 +1,6 @@
 module AquachemMod
-  use data_kind_mod  , only : r8 => SHR_KIND_R8
-  use MiscUtilMod    , only : addone
+  use data_kind_mod  , only : r8 => DAT_KIND_R8
+  use MiniMathMod    , only : addone
   use ModelStatusType, only : model_status_type
   use EcosimConst
   use ChemIDMod
@@ -102,7 +102,7 @@ contains
 !------------------------------------------------------------------
   subroutine getvarlist(nvars, varl, varlnml,unitl, vartypes, salton)
 
-  use histMod, only : hist_var_str_len,hist_unit_str_len,hist_var_lon_str_len
+  use bhistMod, only : hist_var_str_len,hist_unit_str_len,hist_var_lon_str_len
   use fileUtil, only :  var_flux_type, var_state_type
   implicit none
   integer, intent(in) :: nvars

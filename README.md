@@ -1,6 +1,6 @@
 # EcoSIM
 
-A biogeochemical modeling library spin off the ecosys model.
+A biogeochemical modeling library spins off the ecosys model.
 
 ## Building
 

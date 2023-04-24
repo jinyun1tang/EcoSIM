@@ -7,4 +7,9 @@ case_name='lake'
 prefix='../../inputs/lake/'
 runfile='./runfile.lake'
 do_regression_test=.false.
+pft_file_in='/Users/jinyuntang/work/github/ecosim2/EcoSIM/python_tools/ecosim_pft_20230113.nc'
+grid_file_in='/Users/jinyuntang/work/github/ecosim2/EcoSIM/python_tools/lake_grid_20230119.nc'
+pft_mgmt_in='/Users/jinyuntang/work/github/ecosim2/EcoSIM/python_tools/lake_pft_20230131.nc'
+/
+&bbgcforc
 /

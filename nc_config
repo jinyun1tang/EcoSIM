@@ -48,12 +48,22 @@ then
       echo ""
     fi
   fi
+elif [[ $(hostname) == *"biome"* ]]; then
+#  echo "running on $(hostname)"
+  ncdir=/local/software/sl-7.x86_64/modules/gcc/12.2.0/netcdf/4.9.0-gcc-s/
+  if [[ "$1" == *"prefix"* ]];
+  then
+  echo "$ncdir"
+  elif [[ "$1" == *"flibs"* ]];
+  then
+   $ncdir/bin/nf-config --flibs
+  fi  
 else
   if [[ "$1" == *"prefix"* ]];
   then
   nc-config --prefix
   elif [[ "$1" == *"flibs"* ]];
   then
-  nc-config --flibs
+  nf-config --flibs
   fi
 fi

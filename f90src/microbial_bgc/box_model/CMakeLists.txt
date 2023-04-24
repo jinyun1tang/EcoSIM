@@ -1,13 +1,14 @@
 set(BOX_MODEL_SOURCES
   MicAutoCPLXMod.F90
   MicBGCMod.F90
-  MicBGCPars.F90
   MicFluxTypeMod.F90
   MicForcTypeMod.F90
   MicStateTraitTypeMod.F90
   NitroDiagTypes.F90
 )
 include_directories(${CMAKE_BINARY_DIR}/f90src/utils/)
+include_directories(${CMAKE_BINARY_DIR}/f90src/minimath/)
+include_directories(${CMAKE_BINARY_DIR}/f90src/modelconfig/)
 include_directories(${CMAKE_BINARY_DIR}/f90src/ecosim_datatype/)
 include_directories(${CMAKE_BINARY_DIR}/f90src/ioutils/)
 include_directories(${CMAKE_BINARY_DIR}/f90src/modelpars/)

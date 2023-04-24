@@ -1,6 +1,6 @@
 module TillageMixMod
-  use data_kind_mod, only : r8 => SHR_KIND_R8
-  use MicBGCPars, only : micpar
+  use data_kind_mod, only : r8 => DAT_KIND_R8
+  use EcoSiMParDataMod, only : micpar
   use EcosimConst
   use SOMDataType
   USE GridDataType
@@ -30,73 +30,75 @@ module TillageMixMod
   implicit none
   integer, intent(in) :: I,J,NY,NX
 
-  integer :: K,N,M,L,LL,NGL
+  integer :: K,N,M,L,LL,NGL,NTS
 
-  REAL(R8) :: TOSGC(4,0:2),TOSGA(4,0:2),TOSGN(4,0:2),TOSGP(4,0:2) &
-    ,TORXC(2,0:2),TORXN(2,0:2),TORXP(2,0:2),TOQGC(0:2),TOQGN(0:2) &
-    ,TOQGP(0:2),TOQHC(0:2),TOQHN(0:2),TOQHP(0:2),TOHGC(0:2) &
-    ,TOHGN(0:2),TOHGP(0:2),TOHGA(0:2),TOQGA(0:2),TOQHA(0:2)
+  REAL(R8) :: TOSGC(jsken,0:micpar%n_litrsfk),TOSGA(jsken,0:micpar%n_litrsfk)
+  real(r8) :: TOSGN(jsken,0:micpar%n_litrsfk),TOSGP(jsken,0:micpar%n_litrsfk)
+  real(r8) :: TORXC(ndbiomcp,0:micpar%n_litrsfk)
+  real(r8) :: TORXN(ndbiomcp,0:micpar%n_litrsfk),TORXP(ndbiomcp,0:micpar%n_litrsfk)
+  real(r8) :: TOQGC(0:micpar%n_litrsfk),TOQGN(0:micpar%n_litrsfk)
+  real(r8) :: TOQGP(0:micpar%n_litrsfk),TOQHC(0:micpar%n_litrsfk)
+  real(r8) :: TOQHN(0:micpar%n_litrsfk),TOQHP(0:micpar%n_litrsfk)
+  real(r8) :: TOHGC(0:micpar%n_litrsfk),TOHGN(0:micpar%n_litrsfk)
+  real(r8) :: TOHGP(0:micpar%n_litrsfk),TOHGA(0:micpar%n_litrsfk)
+  real(r8) :: TOQGA(0:micpar%n_litrsfk),TOQHA(0:micpar%n_litrsfk)
 
-  real(r8) :: TOMGCff(3,JG,NFGs)
-  real(r8) :: TOMGNff(3,JG,NFGs)
-  real(r8) :: TOMGPff(3,JG,NFGs)
-  real(r8) :: TOMGC(3,JG,NFGs,0:jcplx1)
-  real(r8) :: TOMGN(3,JG,NFGs,0:jcplx1)
-  real(r8) :: TOMGP(3,JG,NFGs,0:jcplx1)
-  REAL(R8) :: TOMC(3,JG,NFGs,0:jcplx1)
-  REAL(R8) :: TOMN(3,JG,NFGs,0:jcplx1)
-  REAL(R8) :: TOMP(3,JG,NFGs,0:jcplx1)
-  REAL(R8) :: TOMCff(3,JG,NFGs)
-  REAL(R8) :: TOMNff(3,JG,NFGs)
-  REAL(R8) :: TOMPff(3,JG,NFGs)
-  real(r8) :: TORC(2,0:jcplx1)
-  real(r8) :: TORN(2,0:jcplx1)
-  real(r8) :: TORP(2,0:jcplx1)
-  real(r8) :: TOQC(0:jcplx1)
-  real(r8) :: TOQN(0:jcplx1)
-  real(r8) :: TOQP(0:jcplx1)
-  real(r8) :: TOQA(0:jcplx1)
-  real(r8) :: TOHC(0:jcplx1)
-  real(r8) :: TOHN(0:jcplx1)
-  real(r8) :: TOHP(0:jcplx1)
-  real(r8) :: TOHA(0:jcplx1)
-  real(r8) :: TOSC(jsken,0:jcplx1)
-  real(r8) :: TOSA(jsken,0:jcplx1)
-  real(r8) :: TOSN(jsken,0:jcplx1)
-  real(r8) :: TOSP(jsken,0:jcplx1)
+  real(r8) :: TOMGCff(nlbiomcp,NMICBSA)
+  real(r8) :: TOMGNff(nlbiomcp,NMICBSA)
+  real(r8) :: TOMGPff(nlbiomcp,NMICBSA)
+  real(r8) :: TOMGC(nlbiomcp,NMICBSO,1:jcplx)
+  real(r8) :: TOMGN(nlbiomcp,NMICBSO,1:jcplx)
+  real(r8) :: TOMGP(nlbiomcp,NMICBSO,1:jcplx)
+  REAL(R8) :: TOMC(nlbiomcp,NMICBSO,1:jcplx)
+  REAL(R8) :: TOMN(nlbiomcp,NMICBSO,1:jcplx)
+  REAL(R8) :: TOMP(nlbiomcp,NMICBSO,1:jcplx)
+  REAL(R8) :: TOMCff(nlbiomcp,NMICBSA)
+  REAL(R8) :: TOMNff(nlbiomcp,NMICBSA)
+  REAL(R8) :: TOMPff(nlbiomcp,NMICBSA)
+  real(r8) :: TORC(ndbiomcp,1:jcplx)
+  real(r8) :: TORN(ndbiomcp,1:jcplx)
+  real(r8) :: TORP(ndbiomcp,1:jcplx)
+  real(r8) :: TOQC(1:jcplx)
+  real(r8) :: TOQN(1:jcplx)
+  real(r8) :: TOQP(1:jcplx)
+  real(r8) :: TOQA(1:jcplx)
+  real(r8) :: TOHC(1:jcplx)
+  real(r8) :: TOHN(1:jcplx)
+  real(r8) :: TOHP(1:jcplx)
+  real(r8) :: TOHA(1:jcplx)
+  real(r8) :: TOSC(jsken,1:jcplx)
+  real(r8) :: TOSA(jsken,1:jcplx)
+  real(r8) :: TOSN(jsken,1:jcplx)
+  real(r8) :: TOSP(jsken,1:jcplx)
   real(r8) :: CORP,CORP0,XCORP0,DCORPZ
   real(r8) :: TBKDX,TFC,TWP,TSCNV,TSCNH,TSAND
   REAL(R8) :: ZNHUX0,ZNHUXI,ZNFNX0
-  real(r8) :: TSILT,TCLAY,TXCEC,TXAEC,TGKC4,TGKCA,TGKCM,TGKCN,TGKCK
-  real(r8) :: TCAPMG,TNH4FG,TNH3FG,TNHUFG,TNO3FG,TZNFNG,TVOLWR
+  real(r8) :: TSILT,TCLAY,TGKC4,TGKCA,TGKCM,TGKCN,TGKCK
+  real(r8) :: TP_soil(idsp_psoi_beg:idsp_psoi_end)
+  real(r8) :: TFertNG_soil(ifertn_beg:ifertn_end),TZNFNG,TVOLWR
   real(r8) :: TZ2OG,TZ2OS,TZNH3G,TH2GG,TH2GS,TZNFN2,TZNFNI,TCO2GS
   real(r8) :: TCH4GS,TOXYGS,TZ2GSG,TZ2OGS,TH2GGS,TNH4GS,TNH3GS
-  real(r8) :: TXOH2G,TXH1PG,TXH2PG,TALPOG,TFEPOG,TCAPDG,TCAPHG
-  real(r8) :: TNO3GS,TNO2GS,TP14GS,TPO4GS,TXN4G,TXOH0G,TXOH1G
-  real(r8) :: TCO2G,TCH4G,TCOZS,TCHFS,TOXYG,TOXYS,TZ2GG,TZ2GS
-  real(r8) :: TPALOH,TPFEOH,TPCACO,TPCASO,TPALPO,TPFEPO,TPCAPD
-  real(r8) :: TPCAPH,TPCAPM,TPALPB,TPFEPB,TPCPDB,TPCPHB,TPCPMB
-  real(r8) :: TZFE1P,TZFE2P,TZCA0P,TZCA1P,TZCA2P,TZMG1P,TH0POB
-  real(r8) :: TH1POB,TH2POB,TH3POB,TFE1PB,TFE2PB,TCA0PB,TCA1PB
-  real(r8) :: TXH1P,TXH2P,TXOH0B,TXOH1B,TXOH2B,TXH1PB,TXH2PB
-  real(r8) :: TZKA,TZOH,TZSO4,TZCL,TZCO3,TZHCO3,TZALO1,TZALO2
-  real(r8) :: TZALO3,TZALO4,TZALS,TZFEO1,TZFEO2,TZFEO3,TZFEO4
-  real(r8) :: TZFES,TZCAO,TZCAC,TZCAH,TZCAS,TZMGO,TZMGC,TZMGH
-  real(r8) :: TZMGS,TZNAC,TZNAS,TZKAS,TH0PO4,TH1PO4,TH2PO4,TH3PO4
-  real(r8) :: TCA2PB,TMG1PB,TXNH4,TXNHB,TXHY,TXAL,TXFE,TXCA
-  real(r8) :: TXMG,TXNA,TXKA,TXHC,TXAL2,TXFE2,TXOH0,TXOH1,TXOH2
-  real(r8) :: TNH3FB,TNHUFB,TNO3FB,TNH4S,TNH4B,TNH3S,TNH3B,TNO3S
+  real(r8) :: TX_anion(idx_AEC+1:idx_anion_soil_end)
+  real(r8) :: TNO3GS,TNO2GS,TP14GS,TPO4GS,TXN4G
+  real(r8) :: TX_solml(idx_beg:idx_end)
+  real(r8) :: TP_salml(idsp_beg:idsp_end)
+  real(r8) :: TG_gasml(idg_beg:idg_end-1)
+  real(r8) :: TSA_solml(idsa_beg:idsa_end)
+  real(r8) :: TS_solml(ids_beg:ids_end)
+  real(r8) :: TS0_solml(ids_beg:ids_end)   !surface mass for incoporation
+  real(r8) :: TfertN_band(ifertn_beg:ifertnb_end)
+  real(r8) :: TNH4S,TNH4B,TNH3S,TNH3B,TNO3S
   real(r8) :: TNO3B,TNO2S,TNO2B,TZAL,TZFE,TZHY,TZCA,TZMG,TZNA
-  real(r8) :: TNFNIH,TNH4FA,TNH3FA,TNHUFA,TNO3FA,TNH4FB
+  real(r8) :: TNFNIH,TfertN_soil(ifertn_beg:ifertn_end)
   real(r8) :: TENGYR,TVOLW,TENGY
   real(r8) :: ENGYV,ENGYL,ENGYM
   real(r8) :: DC,DN,DP,OC,ON,OP
   real(r8) :: TVOLI,HFLXD
   real(r8) :: FI,TI,TX,TL
+  integer  :: NTX,NTP,NTG,NTSA,NTN
 !     begin_execution
 !
-  IF(J.EQ.INT(ZNOON(NY,NX)).AND.XCORP(NY,NX).LT.1.0 &
-    .AND.DCORP(I,NY,NX).GT.0.0)THEN
+  IF(J.EQ.INT(ZNOON(NY,NX)).AND.XCORP(NY,NX).LT.1.0.AND.DCORP(I,NY,NX).GT.0.0)THEN
 !
 !     EXTENT OF MIXING
 !
@@ -114,8 +116,6 @@ module TillageMixMod
     TSAND=0.0_r8
     TSILT=0.0_r8
     TCLAY=0.0_r8
-    TXCEC=0.0_r8
-    TXAEC=0.0_r8
     TGKC4=0.0_r8
     TGKCA=0.0_r8
     TGKCM=0.0_r8
@@ -127,145 +127,37 @@ module TillageMixMod
 !     TVOLA=0.0_r8
     TENGY=0.0_r8
     TNFNIH=0.0_r8
-    TNH4FA=0.0_r8
-    TNH3FA=0.0_r8
-    TNHUFA=0.0_r8
-    TNO3FA=0.0_r8
-    TNH4FB=0.0_r8
-    TNH3FB=0.0_r8
-    TNHUFB=0.0_r8
-    TNO3FB=0.0_r8
-    TNH4S=0.0_r8
-    TNH4B=0.0_r8
-    TNH3S=0.0_r8
-    TNH3B=0.0_r8
-    TNO3S=0.0_r8
-    TNO3B=0.0_r8
-    TNO2S=0.0_r8
-    TNO2B=0.0_r8
-    TZAL=0.0_r8
-    TZFE=0.0_r8
-    TZHY=0.0_r8
-    TZCA=0.0_r8
-    TZMG=0.0_r8
-    TZNA=0.0_r8
-    TZKA=0.0_r8
-    TZOH=0.0_r8
-    TZSO4=0.0_r8
-    TZCL=0.0_r8
-    TZCO3=0.0_r8
-    TZHCO3=0.0_r8
-    TZALO1=0.0_r8
-    TZALO2=0.0_r8
-    TZALO3=0.0_r8
-    TZALO4=0.0_r8
-    TZALS=0.0_r8
-    TZFEO1=0.0_r8
-    TZFEO2=0.0_r8
-    TZFEO3=0.0_r8
-    TZFEO4=0.0_r8
-    TZFES=0.0_r8
-    TZCAO=0.0_r8
-    TZCAC=0.0_r8
-    TZCAH=0.0_r8
-    TZCAS=0.0_r8
-    TZMGO=0.0_r8
-    TZMGC=0.0_r8
-    TZMGH=0.0_r8
-    TZMGS=0.0_r8
-    TZNAC=0.0_r8
-    TZNAS=0.0_r8
-    TZKAS=0.0_r8
-    TH0PO4=0.0_r8
-    TH1PO4=0.0_r8
-    TH2PO4=0.0_r8
-    TH3PO4=0.0_r8
-    TZFE1P=0.0_r8
-    TZFE2P=0.0_r8
-    TZCA0P=0.0_r8
-    TZCA1P=0.0_r8
-    TZCA2P=0.0_r8
-    TZMG1P=0.0_r8
-    TH0POB=0.0_r8
-    TH1POB=0.0_r8
-    TH2POB=0.0_r8
-    TH3POB=0.0_r8
-    TFE1PB=0.0_r8
-    TFE2PB=0.0_r8
-    TCA0PB=0.0_r8
-    TCA1PB=0.0_r8
-    TCA2PB=0.0_r8
-    TMG1PB=0.0_r8
-    TXNH4=0.0_r8
-    TXNHB=0.0_r8
-    TXHY=0.0_r8
-    TXAL=0.0_r8
-    TXFE=0.0_r8
-    TXCA=0.0_r8
-    TXMG=0.0_r8
-    TXNA=0.0_r8
-    TXKA=0.0_r8
-    TXHC=0.0_r8
-    TXAL2=0.0_r8
-    TXFE2=0.0_r8
-    TXOH0=0.0_r8
-    TXOH1=0.0_r8
-    TXOH2=0.0_r8
-    TXH1P=0.0_r8
-    TXH2P=0.0_r8
-    TXOH0B=0.0_r8
-    TXOH1B=0.0_r8
-    TXOH2B=0.0_r8
-    TXH1PB=0.0_r8
-    TXH2PB=0.0_r8
-    TPALOH=0.0_r8
-    TPFEOH=0.0_r8
-    TPCACO=0.0_r8
-    TPCASO=0.0_r8
-    TPALPO=0.0_r8
-    TPFEPO=0.0_r8
-    TPCAPD=0.0_r8
-    TPCAPH=0.0_r8
-    TPCAPM=0.0_r8
-    TPALPB=0.0_r8
-    TPFEPB=0.0_r8
-    TPCPDB=0.0_r8
-    TPCPHB=0.0_r8
-    TPCPMB=0.0_r8
-    TCO2G=0.0_r8
-    TCH4G=0.0_r8
-    TCOZS=0.0_r8
-    TCHFS=0.0_r8
-    TOXYG=0.0_r8
-    TOXYS=0.0_r8
-    TZ2GG=0.0_r8
-    TZ2GS=0.0_r8
-    TZ2OG=0.0_r8
-    TZ2OS=0.0_r8
-    TZNH3G=0.0_r8
-    TH2GG=0.0_r8
-    TH2GS=0.0_r8
-    TOMC(:,:,:,:)=0.0_r8
-    TOMN(:,:,:,:)=0.0_r8
-    TOMP(:,:,:,:)=0.0_r8
-    TOMCff(:,:,:)=0.0_r8
-    TOMNff(:,:,:)=0.0_r8
-    TOMPff(:,:,:)=0.0_r8
-    TORC(:,:)=0.0_r8
-    TORN(:,:)=0.0_r8
-    TORP(:,:)=0.0_r8
-    TOQC(:)=0.0_r8
-    TOQN(:)=0.0_r8
-    TOQP(:)=0.0_r8
-    TOQA(:)=0.0_r8
-    TOHC(:)=0.0_r8
-    TOHN(:)=0.0_r8
-    TOHP(:)=0.0_r8
-    TOHA(:)=0.0_r8
-    TOSC(:,:)=0.0_r8
-    TOSA(:,:)=0.0_r8
-    TOSN(:,:)=0.0_r8
-    TOSP(:,:)=0.0_r8
+
+    TfertN_soil(ifertn_beg:ifertn_end)=0.0_r8
+    TfertN_band(ifertnb_beg:ifertnb_end)=0.0_r8
+
+    TS_solml(ids_beg:ids_end)=0._r8
+    TS0_solml(ids_beg:ids_end)=0._r8
+    TX_solml(idx_beg:idx_end)=0._r8
+    TP_salml(idsp_beg:idsp_end)=0._r8
+    TG_gasml(idg_beg:idg_end-1)=0._r8
+
+    TOMC=0.0_r8
+    TOMN=0.0_r8
+    TOMP=0.0_r8
+    TOMCff=0.0_r8
+    TOMNff=0.0_r8
+    TOMPff=0.0_r8
+    TORC=0.0_r8
+    TORN=0.0_r8
+    TORP=0.0_r8
+    TOQC=0.0_r8
+    TOQN=0.0_r8
+    TOQP=0.0_r8
+    TOQA=0.0_r8
+    TOHC=0.0_r8
+    TOHN=0.0_r8
+    TOHP=0.0_r8
+    TOHA=0.0_r8
+    TOSC=0.0_r8
+    TOSA=0.0_r8
+    TOSN=0.0_r8
+    TOSP=0.0_r8
     TZNFN2=0.0_r8
     TZNFNI=0.0_r8
     ZNHUX0=0.0_r8
@@ -278,52 +170,51 @@ module TillageMixMod
 !     IF(ORGC(0,NY,NX).GT.ZEROS(NY,NX))THEN
 !     XCORP0=AMAX1(XCORP(NY,NX),AMIN1(1.0,
 !    2(VHCPRX(NY,NX)/cpo)/ORGC(0,NY,NX)))
-    XCORP0=AMAX1(0.001,XCORP(NY,NX))
+    XCORP0=AMAX1(0.001_r8,XCORP(NY,NX))
 !     ELSE
 !     XCORP0=1.0
 !     ENDIF
-    CORP0=1.0_r8-XCORP0
+    CORP0=1.0_r8-XCORP0   !fraction mixed into next layer
+
     DC=0.0_r8
     DN=0.0_r8
     DP=0.0_r8
 
-    DO  K=0,jcplx1
-      IF(K.NE.micpar%k_POM.AND.K.NE.micpar%k_humus)THEN
-        DO  N=1,NFGs
+    DO  K=1,micpar%n_litrsfk
+      DO  N=1,NFGs
+        DO NGL=JGnio(N),JGnfo(N)
           DO  M=1,nlbiomcp
-            DO NGL=1,JG
-              TOMGC(M,NGL,N,K)=OMC(M,NGL,N,K,0,NY,NX)*CORP0
-              TOMGN(M,NGL,N,K)=OMN(M,NGL,N,K,0,NY,NX)*CORP0
-              TOMGP(M,NGL,N,K)=OMP(M,NGL,N,K,0,NY,NX)*CORP0
-              OMC(M,NGL,N,K,0,NY,NX)=OMC(M,NGL,N,K,0,NY,NX)*XCORP0
-              OMN(M,NGL,N,K,0,NY,NX)=OMN(M,NGL,N,K,0,NY,NX)*XCORP0
-              OMP(M,NGL,N,K,0,NY,NX)=OMP(M,NGL,N,K,0,NY,NX)*XCORP0
-              DC=DC+OMC(M,NGL,N,K,0,NY,NX)
-              DN=DN+OMN(M,NGL,N,K,0,NY,NX)
-              DP=DP+OMP(M,NGL,N,K,0,NY,NX)
-            enddo
+            TOMGC(M,NGL,K)=OMC(M,NGL,K,0,NY,NX)*CORP0
+            TOMGN(M,NGL,K)=OMN(M,NGL,K,0,NY,NX)*CORP0
+            TOMGP(M,NGL,K)=OMP(M,NGL,K,0,NY,NX)*CORP0
+            OMC(M,NGL,K,0,NY,NX)=OMC(M,NGL,K,0,NY,NX)*XCORP0
+            OMN(M,NGL,K,0,NY,NX)=OMN(M,NGL,K,0,NY,NX)*XCORP0
+            OMP(M,NGL,K,0,NY,NX)=OMP(M,NGL,K,0,NY,NX)*XCORP0
+            DC=DC+OMC(M,NGL,K,0,NY,NX)
+            DN=DN+OMN(M,NGL,K,0,NY,NX)
+            DP=DP+OMP(M,NGL,K,0,NY,NX)
           enddo
-        ENDDO
-      ENDIF
+        enddo
+      ENDDO
     ENDDO
 
     DO  N=1,NFGs
-      DO  M=1,nlbiomcp
-        DO NGL=1,JG
-          TOMGCff(M,NGL,N)=OMCff(M,NGL,N,0,NY,NX)*CORP0
-          TOMGNff(M,NGL,N)=OMNff(M,NGL,N,0,NY,NX)*CORP0
-          TOMGPff(M,NGL,N)=OMPff(M,NGL,N,0,NY,NX)*CORP0
-          OMCff(M,NGL,N,0,NY,NX)=OMCff(M,NGL,N,0,NY,NX)*XCORP0
-          OMNff(M,NGL,N,0,NY,NX)=OMNff(M,NGL,N,0,NY,NX)*XCORP0
-          OMPff(M,NGL,N,0,NY,NX)=OMPff(M,NGL,N,0,NY,NX)*XCORP0
-          DC=DC+OMCff(M,NGL,N,0,NY,NX)
-          DN=DN+OMNff(M,NGL,N,0,NY,NX)
-          DP=DP+OMPff(M,NGL,N,0,NY,NX)
+      DO NGL=JGniA(N),JGnfA(N)
+        DO  M=1,nlbiomcp
+          TOMGCff(M,NGL)=OMCff(M,NGL,0,NY,NX)*CORP0
+          TOMGNff(M,NGL)=OMNff(M,NGL,0,NY,NX)*CORP0
+          TOMGPff(M,NGL)=OMPff(M,NGL,0,NY,NX)*CORP0
+          OMCff(M,NGL,0,NY,NX)=OMCff(M,NGL,0,NY,NX)*XCORP0
+          OMNff(M,NGL,0,NY,NX)=OMNff(M,NGL,0,NY,NX)*XCORP0
+          OMPff(M,NGL,0,NY,NX)=OMPff(M,NGL,0,NY,NX)*XCORP0
+          DC=DC+OMCff(M,NGL,0,NY,NX)
+          DN=DN+OMNff(M,NGL,0,NY,NX)
+          DP=DP+OMPff(M,NGL,0,NY,NX)
         enddo
       enddo
     ENDDO
 
-    DO K=0,2
+    DO K=1,micpar%n_litrsfk
       DO M=1,ndbiomcp
         TORXC(M,K)=ORC(M,K,0,NY,NX)*CORP0
         TORXN(M,K)=ORN(M,K,0,NY,NX)*CORP0
@@ -347,9 +238,9 @@ module TillageMixMod
       TOHGN(K)=OHN(K,0,NY,NX)*CORP0
       TOHGP(K)=OHP(K,0,NY,NX)*CORP0
       TOHGA(K)=OHA(K,0,NY,NX)*CORP0
-!
-!     REDUCE SURFACE RESIDUE STATE VARIABLES FOR INCORPORATION
-!
+  !
+  !     REDUCE SURFACE RESIDUE STATE VARIABLES FOR INCORPORATION
+  !
       OQC(K,0,NY,NX)=OQC(K,0,NY,NX)*XCORP0
       OQN(K,0,NY,NX)=OQN(K,0,NY,NX)*XCORP0
       OQP(K,0,NY,NX)=OQP(K,0,NY,NX)*XCORP0
@@ -380,33 +271,28 @@ module TillageMixMod
         DP=DP+OSP(M,K,0,NY,NX)
       ENDDO
     ENDDO
-    TCO2GS=CO2S(0,NY,NX)*CORP0
-    TCH4GS=CH4S(0,NY,NX)*CORP0
-    TOXYGS=OXYS(0,NY,NX)*CORP0
-    TZ2GSG=Z2GS(0,NY,NX)*CORP0
-    TZ2OGS=Z2OS(0,NY,NX)*CORP0
-    TH2GGS=H2GS(0,NY,NX)*CORP0
-    TNH4GS=ZNH4S(0,NY,NX)*CORP0
-    TNH3GS=ZNH3S(0,NY,NX)*CORP0
-    TNO3GS=ZNO3S(0,NY,NX)*CORP0
-    TNO2GS=ZNO2S(0,NY,NX)*CORP0
-    TP14GS=H1PO4(0,NY,NX)*CORP0
-    TPO4GS=H2PO4(0,NY,NX)*CORP0
-    TXN4G=XN4(0,NY,NX)*CORP0
-    TXOH0G=XOH0(0,NY,NX)*CORP0
-    TXOH1G=XOH1(0,NY,NX)*CORP0
-    TXOH2G=XOH2(0,NY,NX)*CORP0
-    TXH1PG=XH1P(0,NY,NX)*CORP0
-    TXH2PG=XH2P(0,NY,NX)*CORP0
-    TALPOG=PALPO(0,NY,NX)*CORP0
-    TFEPOG=PFEPO(0,NY,NX)*CORP0
-    TCAPDG=PCAPD(0,NY,NX)*CORP0
-    TCAPHG=PCAPH(0,NY,NX)*CORP0
-    TCAPMG=PCAPM(0,NY,NX)*CORP0
-    TNH4FG=ZNH4FA(0,NY,NX)*CORP0
-    TNH3FG=ZNH3FA(0,NY,NX)*CORP0
-    TNHUFG=ZNHUFA(0,NY,NX)*CORP0
-    TNO3FG=ZNO3FA(0,NY,NX)*CORP0
+
+    DO NTS=ids_beg,idg_NH3
+      TS0_solml(NTS)=trc_solml(NTS,0,NY,NX)*CORP0
+    ENDDO
+    DO NTS=ids_nut_beg,ids_nuts_end
+      TS0_solml(NTS)=trc_solml(NTS,0,NY,NX)*CORP0
+    ENDDO
+
+    TXN4G=trcx_solml(idx_NH4,0,NY,NX)*CORP0
+
+    DO NTX= idx_AEC+1,idx_anion_soil_end
+      TX_anion(NTX)=trcx_solml(NTX,0,NY,NX)*CORP0
+    ENDDO
+
+    DO NTP=idsp_psoi_beg,idsp_psoi_end
+      TP_soil(NTP)=trcp_salml(NTP,0,NY,NX)*CORP0
+    ENDDO
+
+    DO NTN=ifertn_beg,ifertn_end
+      TFertNG_soil(NTN)=FertN_soil(NTN,0,NY,NX)*CORP0
+    ENDDO
+
     TZNFNG=ZNFNI(0,NY,NX)*CORP0
     TVOLWR=VOLW(0,NY,NX)*CORP0
     HFLXD=cpo*ORGC(0,NY,NX)*CORP0*TKS(0,NY,NX)
@@ -416,36 +302,33 @@ module TillageMixMod
     ORGC(0,NY,NX)=DC
     ORGN(0,NY,NX)=DN
     ORGR(0,NY,NX)=DC
-    CO2S(0,NY,NX)=CO2S(0,NY,NX)*XCORP0
-    CH4S(0,NY,NX)=CH4S(0,NY,NX)*XCORP0
-    OXYS(0,NY,NX)=OXYS(0,NY,NX)*XCORP0
-    Z2GS(0,NY,NX)=Z2GS(0,NY,NX)*XCORP0
-    Z2OS(0,NY,NX)=Z2OS(0,NY,NX)*XCORP0
-    H2GS(0,NY,NX)=H2GS(0,NY,NX)*XCORP0
-    ZNH4S(0,NY,NX)=ZNH4S(0,NY,NX)*XCORP0
-    ZNH3S(0,NY,NX)=ZNH3S(0,NY,NX)*XCORP0
-    ZNO3S(0,NY,NX)=ZNO3S(0,NY,NX)*XCORP0
-    ZNO2S(0,NY,NX)=ZNO2S(0,NY,NX)*XCORP0
-    H1PO4(0,NY,NX)=H1PO4(0,NY,NX)*XCORP0
-    H2PO4(0,NY,NX)=H2PO4(0,NY,NX)*XCORP0
-    XN4(0,NY,NX)=XN4(0,NY,NX)*XCORP0
-    XOH0(0,NY,NX)=XOH0(0,NY,NX)*XCORP0
-    XOH1(0,NY,NX)=XOH1(0,NY,NX)*XCORP0
-    XOH2(0,NY,NX)=XOH2(0,NY,NX)*XCORP0
-    XH1P(0,NY,NX)=XH1P(0,NY,NX)*XCORP0
-    XH2P(0,NY,NX)=XH2P(0,NY,NX)*XCORP0
-    PALPO(0,NY,NX)=PALPO(0,NY,NX)*XCORP0
-    PFEPO(0,NY,NX)=PFEPO(0,NY,NX)*XCORP0
-    PCAPD(0,NY,NX)=PCAPD(0,NY,NX)*XCORP0
-    PCAPH(0,NY,NX)=PCAPH(0,NY,NX)*XCORP0
-    PCAPM(0,NY,NX)=PCAPM(0,NY,NX)*XCORP0
-    ZNH4FA(0,NY,NX)=ZNH4FA(0,NY,NX)*XCORP0
-    ZNH3FA(0,NY,NX)=ZNH3FA(0,NY,NX)*XCORP0
-    ZNHUFA(0,NY,NX)=ZNHUFA(0,NY,NX)*XCORP0
-    ZNO3FA(0,NY,NX)=ZNO3FA(0,NY,NX)*XCORP0
+
+    DO NTS=ids_beg,idg_NH3
+      trc_solml(NTS,0,NY,NX)=trc_solml(NTS,0,NY,NX)*XCORP0
+    ENDDO
+
+    DO NTS=ids_nut_beg,ids_nuts_end
+      trc_solml(NTS,0,NY,NX)=trc_solml(NTS,0,NY,NX)*XCORP0
+    ENDDO
+
+    trcx_solml(idx_NH4,0,NY,NX)=trcx_solml(idx_NH4,0,NY,NX)*XCORP0
+
+    DO NTX=idx_AEC+1,idx_anion_soil_end
+      trcx_solml(idx_OHe,0,NY,NX)=trcx_solml(idx_OHe,0,NY,NX)*XCORP0
+    ENDDO
+
+    trcp_salml(idsp_AlPO4,0,NY,NX)=trcp_salml(idsp_AlPO4,0,NY,NX)*XCORP0
+    trcp_salml(idsp_FePO4,0,NY,NX)=trcp_salml(idsp_FePO4,0,NY,NX)*XCORP0
+    trcp_salml(idsp_CaHPO4,0,NY,NX)=trcp_salml(idsp_CaHPO4,0,NY,NX)*XCORP0
+    trcp_salml(idsp_HA,0,NY,NX)=trcp_salml(idsp_HA,0,NY,NX)*XCORP0
+    trcp_salml(idsp_CaH2PO4,0,NY,NX)=trcp_salml(idsp_CaH2PO4,0,NY,NX)*XCORP0
+
+    DO NTN=ifertn_beg,ifertn_end
+      FertN_soil(NTN,0,NY,NX)=FertN_soil(NTN,0,NY,NX)*XCORP0
+    ENDDO
+
     VOLW(0,NY,NX)=VOLW(0,NY,NX)*XCORP0
-    VHCP(0,NY,NX)=cpo*ORGC(0,NY,NX)+cpw*VOLW(0,NY,NX) &
-      +cpi*VOLI(0,NY,NX)
+    VHCP(0,NY,NX)=cpo*ORGC(0,NY,NX)+cpw*VOLW(0,NY,NX)+cpi*VOLI(0,NY,NX)
     VOLR(NY,NX)=VOLR(NY,NX)*XCORP0
     VOLT(0,NY,NX)=VOLT(0,NY,NX)*XCORP0
     ZNHUX0=AMAX1(ZNHUX0,ZNHU0(0,NY,NX))
@@ -460,8 +343,7 @@ module TillageMixMod
 !     ACCUMULATE SOIL STATE VARIABLES WITHIN TILLAGE MIXING ZONE
 !
     DO L=NU(NY,NX),NL(NY,NX)
-      IF(CDPTHZ(L,NY,NX)-DLYR(3,L,NY,NX).LT.DCORPZ &
-        .AND.DLYR(3,L,NY,NX).GT.ZERO)THEN
+      IF(CDPTHZ(L,NY,NX)-DLYR(3,L,NY,NX).LT.DCORPZ.AND.DLYR(3,L,NY,NX).GT.ZERO)THEN
         TL=AMIN1(DLYR(3,L,NY,NX),DCORPZ-(CDPTHZ(L,NY,NX)-DLYR(3,L,NY,NX)))
         FI=TL/DCORPZ
         TI=TL/DLYR(3,L,NY,NX)
@@ -473,8 +355,6 @@ module TillageMixMod
         TSAND=TSAND+TI*SAND(L,NY,NX)
         TSILT=TSILT+TI*SILT(L,NY,NX)
         TCLAY=TCLAY+TI*CLAY(L,NY,NX)
-        TXCEC=TXCEC+TI*XCEC(L,NY,NX)
-        TXAEC=TXAEC+TI*XAEC(L,NY,NX)
         TGKC4=TGKC4+FI*GKC4(L,NY,NX)
         TGKCA=TGKCA+FI*GKCA(L,NY,NX)
         TGKCM=TGKCM+FI*GKCM(L,NY,NX)
@@ -486,147 +366,61 @@ module TillageMixMod
 !     TVOLA=TVOLA+TI*VOLA(L,NY,NX)
         TENGY=TENGY+TI*(cpw*(VOLW(L,NY,NX)+VOLWH(L,NY,NX)) &
           +cpi*(VOLI(L,NY,NX)+VOLIH(L,NY,NX)))*TKS(L,NY,NX)
-        TNH4FA=TNH4FA+TI*ZNH4FA(L,NY,NX)
-        TNH3FA=TNH3FA+TI*ZNH3FA(L,NY,NX)
-        TNHUFA=TNHUFA+TI*ZNHUFA(L,NY,NX)
-        TNO3FA=TNO3FA+TI*ZNO3FA(L,NY,NX)
-        TNH4FB=TNH4FB+TI*ZNH4FB(L,NY,NX)
-        TNH3FB=TNH3FB+TI*ZNH3FB(L,NY,NX)
-        TNHUFB=TNHUFB+TI*ZNHUFB(L,NY,NX)
-        TNO3FB=TNO3FB+TI*ZNO3FB(L,NY,NX)
-        TNH4S=TNH4S+TI*ZNH4S(L,NY,NX)
-        TNH4B=TNH4B+TI*ZNH4B(L,NY,NX)
-        TNH3S=TNH3S+TI*ZNH3S(L,NY,NX)
-        TNH3B=TNH3B+TI*ZNH3B(L,NY,NX)
-        TNO3S=TNO3S+TI*ZNO3S(L,NY,NX)
-        TNO3B=TNO3B+TI*ZNO3B(L,NY,NX)
-        TNO2S=TNO2S+TI*ZNO2S(L,NY,NX)
-        TNO2B=TNO2B+TI*ZNO2B(L,NY,NX)
-        TZAL=TZAL+TI*ZAL(L,NY,NX)
-        TZFE=TZFE+TI*ZFE(L,NY,NX)
-        TZHY=TZHY+TI*ZHY(L,NY,NX)
-        TZCA=TZCA+TI*ZCA(L,NY,NX)
-        TZMG=TZMG+TI*ZMG(L,NY,NX)
-        TZNA=TZNA+TI*ZNA(L,NY,NX)
-        TZKA=TZKA+TI*ZKA(L,NY,NX)
-        TZOH=TZOH+TI*ZOH(L,NY,NX)
-        TZSO4=TZSO4+TI*ZSO4(L,NY,NX)
-        TZCL=TZCL+TI*ZCL(L,NY,NX)
-        TZCO3=TZCO3+TI*ZCO3(L,NY,NX)
-        TZHCO3=TZHCO3+TI*ZHCO3(L,NY,NX)
-        TZALO1=TZALO1+TI*ZALOH1(L,NY,NX)
-        TZALO2=TZALO2+TI*ZALOH2(L,NY,NX)
-        TZALO3=TZALO3+TI*ZALOH3(L,NY,NX)
-        TZALO4=TZALO4+TI*ZALOH4(L,NY,NX)
-        TZALS=TZALS+TI*ZALS(L,NY,NX)
-        TZFEO1=TZFEO1+TI*ZFEOH1(L,NY,NX)
-        TZFEO2=TZFEO2+TI*ZFEOH2(L,NY,NX)
-        TZFEO3=TZFEO3+TI*ZFEOH3(L,NY,NX)
-        TZFEO4=TZFEO4+TI*ZFEOH4(L,NY,NX)
-        TZFES=TZFES+TI*ZFES(L,NY,NX)
-        TZCAO=TZCAO+TI*ZCAO(L,NY,NX)
-        TZCAC=TZCAC+TI*ZCAC(L,NY,NX)
-        TZCAH=TZCAH+TI*ZCAH(L,NY,NX)
-        TZCAS=TZCAS+TI*ZCAS(L,NY,NX)
-        TZMGO=TZMGO+TI*ZMGO(L,NY,NX)
-        TZMGC=TZMGC+TI*ZMGC(L,NY,NX)
-        TZMGH=TZMGH+TI*ZMGH(L,NY,NX)
-        TZMGS=TZMGS+TI*ZMGS(L,NY,NX)
-        TZNAC=TZNAC+TI*ZNAC(L,NY,NX)
-        TZNAS=TZNAS+TI*ZNAS(L,NY,NX)
-        TZKAS=TZKAS+TI*ZKAS(L,NY,NX)
-        TH0PO4=TH0PO4+TI*H0PO4(L,NY,NX)
-        TH1PO4=TH1PO4+TI*H1PO4(L,NY,NX)
-        TH2PO4=TH2PO4+TI*H2PO4(L,NY,NX)
-        TH3PO4=TH3PO4+TI*H3PO4(L,NY,NX)
-        TZFE1P=TZFE1P+TI*ZFE1P(L,NY,NX)
-        TZFE2P=TZFE2P+TI*ZFE2P(L,NY,NX)
-        TZCA0P=TZCA0P+TI*ZCA0P(L,NY,NX)
-        TZCA1P=TZCA1P+TI*ZCA1P(L,NY,NX)
-        TZCA2P=TZCA2P+TI*ZCA2P(L,NY,NX)
-        TZMG1P=TZMG1P+TI*ZMG1P(L,NY,NX)
-        TH0POB=TH0POB+TI*H0POB(L,NY,NX)
-        TH1POB=TH1POB+TI*H1POB(L,NY,NX)
-        TH2POB=TH2POB+TI*H2POB(L,NY,NX)
-        TH3POB=TH3POB+TI*H3POB(L,NY,NX)
-        TFE1PB=TFE1PB+TI*ZFE1PB(L,NY,NX)
-        TFE2PB=TFE2PB+TI*ZFE2PB(L,NY,NX)
-        TCA0PB=TCA0PB+TI*ZCA0PB(L,NY,NX)
-        TCA1PB=TCA1PB+TI*ZCA1PB(L,NY,NX)
-        TCA2PB=TCA2PB+TI*ZCA2PB(L,NY,NX)
-        TMG1PB=TMG1PB+TI*ZMG1PB(L,NY,NX)
-        TXNH4=TXNH4+TI*XN4(L,NY,NX)
-        TXNHB=TXNHB+TI*XNB(L,NY,NX)
-        TXHY=TXHY+TI*XHY(L,NY,NX)
-        TXAL=TXAL+TI*XAL(L,NY,NX)
-        TXFE=TXFE+TI*XFE(L,NY,NX)
-        TXCA=TXCA+TI*XCA(L,NY,NX)
-        TXMG=TXMG+TI*XMG(L,NY,NX)
-        TXNA=TXNA+TI*XNA(L,NY,NX)
-        TXKA=TXKA+TI*XKA(L,NY,NX)
-        TXHC=TXHC+TI*XHC(L,NY,NX)
-        TXAL2=TXAL2+TI*XALO2(L,NY,NX)
-        TXFE2=TXFE2+TI*XFEO2(L,NY,NX)
-        TXOH0=TXOH0+TI*XOH0(L,NY,NX)
-        TXOH1=TXOH1+TI*XOH1(L,NY,NX)
-        TXOH2=TXOH2+TI*XOH2(L,NY,NX)
-        TXH1P=TXH1P+TI*XH1P(L,NY,NX)
-        TXH2P=TXH2P+TI*XH2P(L,NY,NX)
-        TXOH0B=TXOH0B+TI*XOH0B(L,NY,NX)
-        TXOH1B=TXOH1B+TI*XOH1B(L,NY,NX)
-        TXOH2B=TXOH2B+TI*XOH2B(L,NY,NX)
-        TXH1PB=TXH1PB+TI*XH1PB(L,NY,NX)
-        TXH2PB=TXH2PB+TI*XH2PB(L,NY,NX)
-        TPALOH=TPALOH+TI*PALOH(L,NY,NX)
-        TPFEOH=TPFEOH+TI*PFEOH(L,NY,NX)
-        TPCACO=TPCACO+TI*PCACO(L,NY,NX)
-        TPCASO=TPCASO+TI*PCASO(L,NY,NX)
-        TPALPO=TPALPO+TI*PALPO(L,NY,NX)
-        TPFEPO=TPFEPO+TI*PFEPO(L,NY,NX)
-        TPCAPD=TPCAPD+TI*PCAPD(L,NY,NX)
-        TPCAPH=TPCAPH+TI*PCAPH(L,NY,NX)
-        TPCAPM=TPCAPM+TI*PCAPM(L,NY,NX)
-        TPALPB=TPALPB+TI*PALPB(L,NY,NX)
-        TPFEPB=TPFEPB+TI*PFEPB(L,NY,NX)
-        TPCPDB=TPCPDB+TI*PCPDB(L,NY,NX)
-        TPCPHB=TPCPHB+TI*PCPHB(L,NY,NX)
-        TPCPMB=TPCPMB+TI*PCPMB(L,NY,NX)
-        TCO2G=TCO2G+TI*CO2G(L,NY,NX)
-        TCH4G=TCH4G+TI*CH4G(L,NY,NX)
-        TCOZS=TCOZS+TI*CO2S(L,NY,NX)
-        TCHFS=TCHFS+TI*CH4S(L,NY,NX)
-        TOXYG=TOXYG+TI*OXYG(L,NY,NX)
-        TOXYS=TOXYS+TI*OXYS(L,NY,NX)
-        TZ2GG=TZ2GG+TI*Z2GG(L,NY,NX)
-        TZ2GS=TZ2GS+TI*Z2GS(L,NY,NX)
-        TZ2OG=TZ2OG+TI*Z2OG(L,NY,NX)
-        TZ2OS=TZ2OS+TI*Z2OS(L,NY,NX)
-        TZNH3G=TZNH3G+TI*ZNH3G(L,NY,NX)
-        TH2GG=TH2GG+TI*H2GG(L,NY,NX)
-        TH2GS=TH2GS+TI*H2GS(L,NY,NX)
-        DO  K=0,jcplx1
+        DO NTN=ifertn_beg,ifertn_end
+          TfertN_soil(NTN)=TfertN_soil(NTN)+TI*FertN_soil(NTN,L,NY,NX)
+        ENDDO
+
+        DO NTN=ifertnb_beg,ifertnb_end
+          TfertN_band(NTN)=TfertN_band(NTN)+TI*FertN_band(NTN,L,NY,NX)
+        ENDDO
+
+        DO NTS=ids_beg,ids_end
+          TS_solml(NTS)=TS_solml(NTS)+TI*trc_solml(NTS,L,NY,NX)
+        ENDDO
+
+        DO NTSA=idsa_beg,idsa_end
+          TSA_solml(NTSA)=TSA_solml(NTSA)+TI*trcsa_solml(NTSA,L,NY,NX)
+        ENDDO
+!cation
+        DO NTX=idx_CEC,idx_cation_end
+          TX_solml(NTX)=TX_solml(NTX)+TI*trcx_solml(NTX,L,NY,NX)
+        ENDDO
+!anion
+        DO NTX=idx_AEC,idx_end
+          TX_solml(NTX)=TX_solml(NTX)+TI*trcx_solml(NTX,L,NY,NX)
+        ENDDO
+
+        DO NTP=idsp_beg,idsp_end
+          TP_salml(NTP)=TP_salml(NTP)+TI*trcp_salml(NTP,L,NY,NX)
+        ENDDO
+
+        DO NTG=idg_beg,idg_end-1
+          TG_gasml(NTG)=TG_gasml(NTG)+TI*trc_gasml(NTG,L,NY,NX)
+        ENDDO
+
+        DO  K=1,jcplx
           DO  N=1,NFGs
-            DO  M=1,nlbiomcp
-              DO NGL=1,JG
-                TOMC(M,NGL,N,K)=TOMC(M,NGL,N,K)+TI*OMC(M,NGL,N,K,L,NY,NX)
-                TOMN(M,NGL,N,K)=TOMN(M,NGL,N,K)+TI*OMN(M,NGL,N,K,L,NY,NX)
-                TOMP(M,NGL,N,K)=TOMP(M,NGL,N,K)+TI*OMP(M,NGL,N,K,L,NY,NX)
+            DO NGL=JGnio(N),JGnfo(N)
+              DO  M=1,nlbiomcp
+                TOMC(M,NGL,K)=TOMC(M,NGL,K)+TI*OMC(M,NGL,K,L,NY,NX)
+                TOMN(M,NGL,K)=TOMN(M,NGL,K)+TI*OMN(M,NGL,K,L,NY,NX)
+                TOMP(M,NGL,K)=TOMP(M,NGL,K)+TI*OMP(M,NGL,K,L,NY,NX)
               enddo
             enddo
           enddo
         ENDDO
 
         DO  N=1,NFGs
-          DO  M=1,nlbiomcp
-            DO NGL=1,JG
-              TOMCff(M,NGL,N)=TOMCff(M,NGL,N)+TI*OMCff(M,NGL,N,L,NY,NX)
-              TOMNff(M,NGL,N)=TOMNff(M,NGL,N)+TI*OMNff(M,NGL,N,L,NY,NX)
-              TOMPff(M,NGL,N)=TOMPff(M,NGL,N)+TI*OMPff(M,NGL,N,L,NY,NX)
+          DO NGL=JGniA(N),JGnfA(N)
+            DO  M=1,nlbiomcp
+              TOMCff(M,NGL)=TOMCff(M,NGL)+TI*OMCff(M,NGL,L,NY,NX)
+              TOMNff(M,NGL)=TOMNff(M,NGL)+TI*OMNff(M,NGL,L,NY,NX)
+              TOMPff(M,NGL)=TOMPff(M,NGL)+TI*OMPff(M,NGL,L,NY,NX)
             enddo
           enddo
         enddo
 
-      DO K=0,jcplx1
+      DO K=1,jcplx
         DO  M=1,ndbiomcp
           TORC(M,K)=TORC(M,K)+TI*ORC(M,K,L,NY,NX)
           TORN(M,K)=TORN(M,K)+TI*ORN(M,K,L,NY,NX)
@@ -657,35 +451,32 @@ module TillageMixMod
 !
 !     CHANGE SOIL STATE VARIABLES IN TILLAGE MIXING ZONE
 !     TO ACCOUNT FOR REDISTRIBUTION FROM MIXING
-!
-  DO  L=NU(NY,NX),LL
-    IF(DLYR(3,L,NY,NX).GT.ZERO)THEN
-      TL=AMIN1(DLYR(3,L,NY,NX),DCORPZ-(CDPTHZ(L,NY,NX)-DLYR(3,L,NY,NX)))
-      FI=TL/DCORPZ
-      TI=TL/DLYR(3,L,NY,NX)
-      TX=1.0_r8-TI
-      BKDSI(L,NY,NX)=TI*(BKDSI(L,NY,NX)+CORP*(TBKDX-BKDSI(L,NY,NX)))+TX*BKDSI(L,NY,NX)
-      FC(L,NY,NX)=TI*(FC(L,NY,NX)+CORP*(TFC-FC(L,NY,NX)))+TX*FC(L,NY,NX)
-      WP(L,NY,NX)=TI*(WP(L,NY,NX)+CORP*(TWP-WP(L,NY,NX)))+TX*WP(L,NY,NX)
-      SCNV(L,NY,NX)=TI*(SCNV(L,NY,NX)+CORP*(TSCNV-SCNV(L,NY,NX)))+TX*SCNV(L,NY,NX)
-      SCNH(L,NY,NX)=TI*(SCNH(L,NY,NX)+CORP*(TSCNH-SCNH(L,NY,NX)))+TX*SCNH(L,NY,NX)
-      SAND(L,NY,NX)=TI*SAND(L,NY,NX)+CORP*(FI*TSAND-TI*SAND(L,NY,NX))+TX*SAND(L,NY,NX)
-      SILT(L,NY,NX)=TI*SILT(L,NY,NX)+CORP*(FI*TSILT-TI*SILT(L,NY,NX))+TX*SILT(L,NY,NX)
-      CLAY(L,NY,NX)=TI*CLAY(L,NY,NX)+CORP*(FI*TCLAY-TI*CLAY(L,NY,NX))+TX*CLAY(L,NY,NX)
-      XCEC(L,NY,NX)=TI*XCEC(L,NY,NX)+CORP*(FI*TXCEC-TI*XCEC(L,NY,NX))+TX*XCEC(L,NY,NX)
-      XAEC(L,NY,NX)=TI*XAEC(L,NY,NX)+CORP*(FI*TXAEC-TI*XAEC(L,NY,NX))+TX*XAEC(L,NY,NX)
-      GKC4(L,NY,NX)=TI*(GKC4(L,NY,NX)+CORP*(TGKC4-GKC4(L,NY,NX)))+TX*GKC4(L,NY,NX)
-      GKCA(L,NY,NX)=TI*(GKCA(L,NY,NX)+CORP*(TGKCA-GKCA(L,NY,NX)))+TX*GKCA(L,NY,NX)
-      GKCM(L,NY,NX)=TI*(GKCM(L,NY,NX)+CORP*(TGKCM-GKCM(L,NY,NX)))+TX*GKCM(L,NY,NX)
-      GKCN(L,NY,NX)=TI*(GKCN(L,NY,NX)+CORP*(TGKCN-GKCN(L,NY,NX)))+TX*GKCN(L,NY,NX)
-      GKCK(L,NY,NX)=TI*(GKCK(L,NY,NX)+CORP*(TGKCK-GKCK(L,NY,NX)))+TX*GKCK(L,NY,NX)
-      ENGYM=VHCM(L,NY,NX)*TKS(L,NY,NX)
-      ENGYV=(cpw*(VOLW(L,NY,NX)+VOLWH(L,NY,NX)) &
-        +cpi*(VOLI(L,NY,NX)+VOLIH(L,NY,NX)))*TKS(L,NY,NX)
-      VOLW(L,NY,NX)=TI*VOLW(L,NY,NX)+CORP*(FI*TVOLW-TI*VOLW(L,NY,NX)) &
-        +TX*VOLW(L,NY,NX)+FI*TVOLWR
-      VOLI(L,NY,NX)=TI*VOLI(L,NY,NX)+CORP*(FI*TVOLI-TI*VOLI(L,NY,NX)) &
-        +TX*VOLI(L,NY,NX)
+!   but non-P related precipitated species are not mixed, Jinyun Tang, Nov 30,2022
+
+    D2000: DO  L=NU(NY,NX),LL
+      IF(DLYR(3,L,NY,NX).GT.ZERO)THEN
+        TL=AMIN1(DLYR(3,L,NY,NX),DCORPZ-(CDPTHZ(L,NY,NX)-DLYR(3,L,NY,NX)))
+        FI=TL/DCORPZ
+        TI=TL/DLYR(3,L,NY,NX)
+        TX=1.0_r8-TI
+        BKDSI(L,NY,NX)=TI*(BKDSI(L,NY,NX)+CORP*(TBKDX-BKDSI(L,NY,NX)))+TX*BKDSI(L,NY,NX)
+        FC(L,NY,NX)=TI*(FC(L,NY,NX)+CORP*(TFC-FC(L,NY,NX)))+TX*FC(L,NY,NX)
+        WP(L,NY,NX)=TI*(WP(L,NY,NX)+CORP*(TWP-WP(L,NY,NX)))+TX*WP(L,NY,NX)
+        SCNV(L,NY,NX)=TI*(SCNV(L,NY,NX)+CORP*(TSCNV-SCNV(L,NY,NX)))+TX*SCNV(L,NY,NX)
+        SCNH(L,NY,NX)=TI*(SCNH(L,NY,NX)+CORP*(TSCNH-SCNH(L,NY,NX)))+TX*SCNH(L,NY,NX)
+        SAND(L,NY,NX)=TI*SAND(L,NY,NX)+CORP*(FI*TSAND-TI*SAND(L,NY,NX))+TX*SAND(L,NY,NX)
+        SILT(L,NY,NX)=TI*SILT(L,NY,NX)+CORP*(FI*TSILT-TI*SILT(L,NY,NX))+TX*SILT(L,NY,NX)
+        CLAY(L,NY,NX)=TI*CLAY(L,NY,NX)+CORP*(FI*TCLAY-TI*CLAY(L,NY,NX))+TX*CLAY(L,NY,NX)
+
+        GKC4(L,NY,NX)=TI*(GKC4(L,NY,NX)+CORP*(TGKC4-GKC4(L,NY,NX)))+TX*GKC4(L,NY,NX)
+        GKCA(L,NY,NX)=TI*(GKCA(L,NY,NX)+CORP*(TGKCA-GKCA(L,NY,NX)))+TX*GKCA(L,NY,NX)
+        GKCM(L,NY,NX)=TI*(GKCM(L,NY,NX)+CORP*(TGKCM-GKCM(L,NY,NX)))+TX*GKCM(L,NY,NX)
+        GKCN(L,NY,NX)=TI*(GKCN(L,NY,NX)+CORP*(TGKCN-GKCN(L,NY,NX)))+TX*GKCN(L,NY,NX)
+        GKCK(L,NY,NX)=TI*(GKCK(L,NY,NX)+CORP*(TGKCK-GKCK(L,NY,NX)))+TX*GKCK(L,NY,NX)
+        ENGYM=VHCM(L,NY,NX)*TKS(L,NY,NX)
+        ENGYV=(cpw*(VOLW(L,NY,NX)+VOLWH(L,NY,NX))+cpi*(VOLI(L,NY,NX)+VOLIH(L,NY,NX)))*TKS(L,NY,NX)
+        VOLW(L,NY,NX)=TI*VOLW(L,NY,NX)+CORP*(FI*TVOLW-TI*VOLW(L,NY,NX))+TX*VOLW(L,NY,NX)+FI*TVOLWR
+        VOLI(L,NY,NX)=TI*VOLI(L,NY,NX)+CORP*(FI*TVOLI-TI*VOLI(L,NY,NX))+TX*VOLI(L,NY,NX)
       VOLWX(L,NY,NX)=VOLW(L,NY,NX)
 !     VOLW(L,NY,NX)=VOLW(L,NY,NX)+CORP*VOLWH(L,NY,NX)
 !     VOLI(L,NY,NX)=VOLI(L,NY,NX)+CORP*VOLIH(L,NY,NX)
@@ -694,543 +485,318 @@ module TillageMixMod
 !     VOLIH(L,NY,NX)=XCORP(NY,NX)*VOLIH(L,NY,NX)
 !     VOLAH(L,NY,NX)=XCORP(NY,NX)*VOLAH(L,NY,NX)
 !     FHOL(L,NY,NX)=XCORP(NY,NX)*FHOL(L,NY,NX)
-      ENGYL=TI*ENGYV+CORP*(FI*TENGY-TI*ENGYV)+TX*ENGYV+FI*TENGYR
-      VHCP(L,NY,NX)=VHCM(L,NY,NX)+cpw*(VOLW(L,NY,NX)+VOLWH(L,NY,NX)) &
-        +cpi*(VOLI(L,NY,NX)+VOLIH(L,NY,NX))
-      TKS(L,NY,NX)=(ENGYM+ENGYL)/VHCP(L,NY,NX)
-      TCS(L,NY,NX)=TKS(L,NY,NX)-TC2K
-      ZNH4FA(L,NY,NX)=TI*ZNH4FA(L,NY,NX)+CORP*(FI*TNH4FA &
-        -TI*ZNH4FA(L,NY,NX))+TX*ZNH4FA(L,NY,NX)
-      ZNH3FA(L,NY,NX)=TI*ZNH3FA(L,NY,NX)+CORP*(FI*TNH3FA &
-        -TI*ZNH3FA(L,NY,NX))+TX*ZNH3FA(L,NY,NX)
-      ZNHUFA(L,NY,NX)=TI*ZNHUFA(L,NY,NX)+CORP*(FI*TNHUFA &
-        -TI*ZNHUFA(L,NY,NX))+TX*ZNHUFA(L,NY,NX)
-      ZNO3FA(L,NY,NX)=TI*ZNO3FA(L,NY,NX)+CORP*(FI*TNO3FA &
-        -TI*ZNO3FA(L,NY,NX))+TX*ZNO3FA(L,NY,NX)
-      ZNH4FB(L,NY,NX)=TI*ZNH4FB(L,NY,NX)+CORP*(FI*TNH4FB &
-        -TI*ZNH4FB(L,NY,NX))+TX*ZNH4FB(L,NY,NX)
-      ZNH3FB(L,NY,NX)=TI*ZNH3FB(L,NY,NX)+CORP*(FI*TNH3FB &
-        -TI*ZNH3FB(L,NY,NX))+TX*ZNH3FB(L,NY,NX)
-      ZNHUFB(L,NY,NX)=TI*ZNHUFB(L,NY,NX)+CORP*(FI*TNHUFB &
-        -TI*ZNHUFB(L,NY,NX))+TX*ZNHUFB(L,NY,NX)
-      ZNO3FB(L,NY,NX)=TI*ZNO3FB(L,NY,NX)+CORP*(FI*TNO3FB &
-        -TI*ZNO3FB(L,NY,NX))+TX*ZNO3FB(L,NY,NX)
-      ZNH4S(L,NY,NX)=TI*ZNH4S(L,NY,NX)+CORP*(FI*TNH4S-TI*ZNH4S(L,NY,NX)) &
-        +TX*ZNH4S(L,NY,NX)+CORP*ZNH4SH(L,NY,NX)
-      ZNH4B(L,NY,NX)=TI*ZNH4B(L,NY,NX)+CORP*(FI*TNH4B-TI*ZNH4B(L,NY,NX)) &
-        +TX*ZNH4B(L,NY,NX)+CORP*ZNH4BH(L,NY,NX)
-      ZNH3S(L,NY,NX)=TI*ZNH3S(L,NY,NX)+CORP*(FI*TNH3S-TI*ZNH3S(L,NY,NX)) &
-        +TX*ZNH3S(L,NY,NX)+CORP*ZNH3SH(L,NY,NX)
-      ZNH3B(L,NY,NX)=TI*ZNH3B(L,NY,NX)+CORP*(FI*TNH3B-TI*ZNH3B(L,NY,NX)) &
-        +TX*ZNH3B(L,NY,NX)+CORP*ZNH3BH(L,NY,NX)
-      ZNO3S(L,NY,NX)=TI*ZNO3S(L,NY,NX)+CORP*(FI*TNO3S-TI*ZNO3S(L,NY,NX)) &
-        +TX*ZNO3S(L,NY,NX)+CORP*ZNO3SH(L,NY,NX)
-      ZNO3B(L,NY,NX)=TI*ZNO3B(L,NY,NX)+CORP*(FI*TNO3B-TI*ZNO3B(L,NY,NX)) &
-        +TX*ZNO3B(L,NY,NX)+CORP*ZNO3BH(L,NY,NX)
-      ZNO2S(L,NY,NX)=TI*ZNO2S(L,NY,NX)+CORP*(FI*TNO2S-TI*ZNO2S(L,NY,NX)) &
-        +TX*ZNO2S(L,NY,NX)+CORP*ZNO2SH(L,NY,NX)
-      ZNO2B(L,NY,NX)=TI*ZNO2B(L,NY,NX)+CORP*(FI*TNO2B-TI*ZNO2B(L,NY,NX)) &
-        +TX*ZNO2B(L,NY,NX)+CORP*ZNO2BH(L,NY,NX)
-      ZAL(L,NY,NX)=TI*ZAL(L,NY,NX)+CORP*(FI*TZAL-TI*ZAL(L,NY,NX)) &
-        +TX*ZAL(L,NY,NX)+CORP*ZALH(L,NY,NX)
-      ZFE(L,NY,NX)=TI*ZFE(L,NY,NX)+CORP*(FI*TZFE-TI*ZFE(L,NY,NX)) &
-        +TX*ZFE(L,NY,NX)+CORP*ZFEH(L,NY,NX)
-      ZHY(L,NY,NX)=TI*ZHY(L,NY,NX)+CORP*(FI*TZHY-TI*ZHY(L,NY,NX)) &
-        +TX*ZHY(L,NY,NX)+CORP*ZHYH(L,NY,NX)
-      ZCA(L,NY,NX)=TI*ZCA(L,NY,NX)+CORP*(FI*TZCA-TI*ZCA(L,NY,NX)) &
-        +TX*ZCA(L,NY,NX)+CORP*ZCCH(L,NY,NX)
-      ZMG(L,NY,NX)=TI*ZMG(L,NY,NX)+CORP*(FI*TZMG-TI*ZMG(L,NY,NX)) &
-        +TX*ZMG(L,NY,NX)+CORP*ZMAH(L,NY,NX)
-      ZNA(L,NY,NX)=TI*ZNA(L,NY,NX)+CORP*(FI*TZNA-TI*ZNA(L,NY,NX)) &
-        +TX*ZNA(L,NY,NX)+CORP*ZNAH(L,NY,NX)
-      ZKA(L,NY,NX)=TI*ZKA(L,NY,NX)+CORP*(FI*TZKA-TI*ZKA(L,NY,NX)) &
-        +TX*ZKA(L,NY,NX)+CORP*ZKAH(L,NY,NX)
-      ZOH(L,NY,NX)=TI*ZOH(L,NY,NX)+CORP*(FI*TZOH-TI*ZOH(L,NY,NX)) &
-        +TX*ZOH(L,NY,NX)+CORP*ZOHH(L,NY,NX)
-      ZSO4(L,NY,NX)=TI*ZSO4(L,NY,NX)+CORP*(FI*TZSO4-TI*ZSO4(L,NY,NX)) &
-        +TX*ZSO4(L,NY,NX)+CORP*ZSO4H(L,NY,NX)
-      ZCL(L,NY,NX)=TI*ZCL(L,NY,NX)+CORP*(FI*TZCL-TI*ZCL(L,NY,NX)) &
-        +TX*ZCL(L,NY,NX)+CORP*ZCLH(L,NY,NX)
-      ZCO3(L,NY,NX)=TI*ZCO3(L,NY,NX)+CORP*(FI*TZCO3-TI*ZCO3(L,NY,NX)) &
-        +TX*ZCO3(L,NY,NX)+CORP*ZCO3H(L,NY,NX)
-      ZHCO3(L,NY,NX)=TI*ZHCO3(L,NY,NX)+CORP*(FI*TZHCO3 &
-        -TI*ZHCO3(L,NY,NX))+TX*ZHCO3(L,NY,NX)+CORP*ZHCO3H(L,NY,NX)
-      ZALOH1(L,NY,NX)=TI*ZALOH1(L,NY,NX)+CORP*(FI*TZALO1 &
-        -TI*ZALOH1(L,NY,NX))+TX*ZALOH1(L,NY,NX)+CORP*ZALO1H(L,NY,NX)
-      ZALOH2(L,NY,NX)=TI*ZALOH2(L,NY,NX)+CORP*(FI*TZALO2 &
-        -TI*ZALOH2(L,NY,NX))+TX*ZALOH2(L,NY,NX)+CORP*ZALO2H(L,NY,NX)
-      ZALOH3(L,NY,NX)=TI*ZALOH3(L,NY,NX)+CORP*(FI*TZALO3 &
-        -TI*ZALOH3(L,NY,NX))+TX*ZALOH3(L,NY,NX)+CORP*ZALO3H(L,NY,NX)
-      ZALOH4(L,NY,NX)=TI*ZALOH4(L,NY,NX)+CORP*(FI*TZALO4 &
-        -TI*ZALOH4(L,NY,NX))+TX*ZALOH4(L,NY,NX)+CORP*ZALO4H(L,NY,NX)
-      ZALS(L,NY,NX)=TI*ZALS(L,NY,NX)+CORP*(FI*TZALS-TI*ZALS(L,NY,NX)) &
-        +TX*ZALS(L,NY,NX)+CORP*ZALSH(L,NY,NX)
-      ZFEOH1(L,NY,NX)=TI*ZFEOH1(L,NY,NX)+CORP*(FI*TZFEO1 &
-        -TI*ZFEOH1(L,NY,NX))+TX*ZFEOH1(L,NY,NX)+CORP*ZFEO1H(L,NY,NX)
-      ZFEOH2(L,NY,NX)=TI*ZFEOH2(L,NY,NX)+CORP*(FI*TZFEO2 &
-        -TI*ZFEOH2(L,NY,NX))+TX*ZFEOH2(L,NY,NX)+CORP*ZFEO2H(L,NY,NX)
-      ZFEOH3(L,NY,NX)=TI*ZFEOH3(L,NY,NX)+CORP*(FI*TZFEO3 &
-        -TI*ZFEOH3(L,NY,NX))+TX*ZFEOH3(L,NY,NX)+CORP*ZFEO3H(L,NY,NX)
-      ZFEOH4(L,NY,NX)=TI*ZFEOH4(L,NY,NX)+CORP*(FI*TZFEO4 &
-        -TI*ZFEOH4(L,NY,NX))+TX*ZFEOH4(L,NY,NX)+CORP*ZFEO4H(L,NY,NX)
-      ZFES(L,NY,NX)=TI*ZFES(L,NY,NX)+CORP*(FI*TZFES-TI*ZFES(L,NY,NX)) &
-        +TX*ZFES(L,NY,NX)+CORP*ZFESH(L,NY,NX)
-      ZCAO(L,NY,NX)=TI*ZCAO(L,NY,NX)+CORP*(FI*TZCAO-TI*ZCAO(L,NY,NX)) &
-        +TX*ZCAO(L,NY,NX)+CORP*ZCAOH(L,NY,NX)
-      ZCAC(L,NY,NX)=TI*ZCAC(L,NY,NX)+CORP*(FI*TZCAC-TI*ZCAC(L,NY,NX)) &
-        +TX*ZCAC(L,NY,NX)+CORP*ZCACH(L,NY,NX)
-      ZCAH(L,NY,NX)=TI*ZCAH(L,NY,NX)+CORP*(FI*TZCAH-TI*ZCAH(L,NY,NX)) &
-        +TX*ZCAH(L,NY,NX)+CORP*ZCAHH(L,NY,NX)
-      ZCAS(L,NY,NX)=TI*ZCAS(L,NY,NX)+CORP*(FI*TZCAS-TI*ZCAS(L,NY,NX)) &
-        +TX*ZCAS(L,NY,NX)+CORP*ZCASH(L,NY,NX)
-      ZMGO(L,NY,NX)=TI*ZMGO(L,NY,NX)+CORP*(FI*TZMGO-TI*ZMGO(L,NY,NX)) &
-        +TX*ZMGO(L,NY,NX)+CORP*ZMGOH(L,NY,NX)
-      ZMGC(L,NY,NX)=TI*ZMGC(L,NY,NX)+CORP*(FI*TZMGC-TI*ZMGC(L,NY,NX)) &
-        +TX*ZMGC(L,NY,NX)+CORP*ZMGCH(L,NY,NX)
-      ZMGH(L,NY,NX)=TI*ZMGH(L,NY,NX)+CORP*(FI*TZMGH-TI*ZMGH(L,NY,NX)) &
-        +TX*ZMGH(L,NY,NX)+CORP*ZMGHH(L,NY,NX)
-      ZMGS(L,NY,NX)=TI*ZMGS(L,NY,NX)+CORP*(FI*TZMGS-TI*ZMGS(L,NY,NX)) &
-        +TX*ZMGS(L,NY,NX)+CORP*ZMGSH(L,NY,NX)
-      ZNAC(L,NY,NX)=TI*ZNAC(L,NY,NX)+CORP*(FI*TZNAC-TI*ZNAC(L,NY,NX)) &
-        +TX*ZNAC(L,NY,NX)+CORP*ZNACH(L,NY,NX)
-      ZNAS(L,NY,NX)=TI*ZNAS(L,NY,NX)+CORP*(FI*TZNAS-TI*ZNAS(L,NY,NX)) &
-        +TX*ZNAS(L,NY,NX)+CORP*ZNASH(L,NY,NX)
-      ZKAS(L,NY,NX)=TI*ZKAS(L,NY,NX)+CORP*(FI*TZKAS-TI*ZKAS(L,NY,NX)) &
-        +TX*ZKAS(L,NY,NX)+CORP*ZKASH(L,NY,NX)
-      H0PO4(L,NY,NX)=TI*H0PO4(L,NY,NX)+CORP*(FI*TH0PO4 &
-        -TI*H0PO4(L,NY,NX))+TX*H0PO4(L,NY,NX)+CORP*H0PO4H(L,NY,NX)
-      H1PO4(L,NY,NX)=TI*H1PO4(L,NY,NX)+CORP*(FI*TH1PO4 &
-        -TI*H1PO4(L,NY,NX))+TX*H1PO4(L,NY,NX)+CORP*H1PO4H(L,NY,NX)
-      H2PO4(L,NY,NX)=TI*H2PO4(L,NY,NX)+CORP*(FI*TH2PO4 &
-        -TI*H2PO4(L,NY,NX))+TX*H2PO4(L,NY,NX)+CORP*H2PO4H(L,NY,NX)
-      H3PO4(L,NY,NX)=TI*H3PO4(L,NY,NX)+CORP*(FI*TH3PO4 &
-        -TI*H3PO4(L,NY,NX))+TX*H3PO4(L,NY,NX)+CORP*H3PO4H(L,NY,NX)
-      ZFE1P(L,NY,NX)=TI*ZFE1P(L,NY,NX)+CORP*(FI*TZFE1P &
-        -TI*ZFE1P(L,NY,NX))+TX*ZFE1P(L,NY,NX)+CORP*ZFE1PH(L,NY,NX)
-      ZFE2P(L,NY,NX)=TI*ZFE2P(L,NY,NX)+CORP*(FI*TZFE2P &
-        -TI*ZFE2P(L,NY,NX))+TX*ZFE2P(L,NY,NX)+CORP*ZFE2PH(L,NY,NX)
-      ZCA0P(L,NY,NX)=TI*ZCA0P(L,NY,NX)+CORP*(FI*TZCA0P &
-        -TI*ZCA0P(L,NY,NX))+TX*ZCA0P(L,NY,NX)+CORP*ZCA0PH(L,NY,NX)
-      ZCA1P(L,NY,NX)=TI*ZCA1P(L,NY,NX)+CORP*(FI*TZCA1P &
-        -TI*ZCA1P(L,NY,NX))+TX*ZCA1P(L,NY,NX)+CORP*ZCA1PH(L,NY,NX)
-      ZCA2P(L,NY,NX)=TI*ZCA2P(L,NY,NX)+CORP*(FI*TZCA2P &
-        -TI*ZCA2P(L,NY,NX))+TX*ZCA2P(L,NY,NX)+CORP*ZCA2PH(L,NY,NX)
-      ZMG1P(L,NY,NX)=TI*ZMG1P(L,NY,NX)+CORP*(FI*TZMG1P &
-        -TI*ZMG1P(L,NY,NX))+TX*ZMG1P(L,NY,NX)+CORP*ZMG1PH(L,NY,NX)
-      H0POB(L,NY,NX)=TI*H0POB(L,NY,NX)+CORP*(FI*TH0POB &
-        -TI*H0POB(L,NY,NX))+TX*H0POB(L,NY,NX)+CORP*H0POBH(L,NY,NX)
-      H1POB(L,NY,NX)=TI*H1POB(L,NY,NX)+CORP*(FI*TH1POB &
-        -TI*H1POB(L,NY,NX))+TX*H1POB(L,NY,NX)+CORP*H1POBH(L,NY,NX)
-      H2POB(L,NY,NX)=TI*H2POB(L,NY,NX)+CORP*(FI*TH2POB &
-        -TI*H2POB(L,NY,NX))+TX*H2POB(L,NY,NX)+CORP*H2POBH(L,NY,NX)
-      H3POB(L,NY,NX)=TI*H3POB(L,NY,NX)+CORP*(FI*TH3POB &
-        -TI*H3POB(L,NY,NX))+TX*H3POB(L,NY,NX)+CORP*H3POBH(L,NY,NX)
-      ZFE1PB(L,NY,NX)=TI*ZFE1PB(L,NY,NX)+CORP*(FI*TFE1PB &
-        -TI*ZFE1PB(L,NY,NX))+TX*ZFE1PB(L,NY,NX)+CORP*ZFE1BH(L,NY,NX)
-      ZFE2PB(L,NY,NX)=TI*ZFE2PB(L,NY,NX)+CORP*(FI*TFE2PB &
-        -TI*ZFE2PB(L,NY,NX))+TX*ZFE2PB(L,NY,NX)+CORP*ZFE2BH(L,NY,NX)
-      ZCA0PB(L,NY,NX)=TI*ZCA0PB(L,NY,NX)+CORP*(FI*TCA0PB &
-        -TI*ZCA0PB(L,NY,NX))+TX*ZCA0PB(L,NY,NX)+CORP*ZCA0BH(L,NY,NX)
-      ZCA1PB(L,NY,NX)=TI*ZCA1PB(L,NY,NX)+CORP*(FI*TCA1PB &
-        -TI*ZCA1PB(L,NY,NX))+TX*ZCA1PB(L,NY,NX)+CORP*ZCA1BH(L,NY,NX)
-      ZCA2PB(L,NY,NX)=TI*ZCA2PB(L,NY,NX)+CORP*(FI*TCA2PB &
-        -TI*ZCA2PB(L,NY,NX))+TX*ZCA2PB(L,NY,NX)+CORP*ZCA2BH(L,NY,NX)
-      ZMG1PB(L,NY,NX)=TI*ZMG1PB(L,NY,NX)+CORP*(FI*TMG1PB &
-        -TI*ZMG1PB(L,NY,NX))+TX*ZMG1PB(L,NY,NX)+CORP*ZMG1BH(L,NY,NX)
-      XN4(L,NY,NX)=TI*XN4(L,NY,NX)+CORP*(FI*TXNH4-TI*XN4(L,NY,NX))+TX*XN4(L,NY,NX)
-      XNB(L,NY,NX)=TI*XNB(L,NY,NX)+CORP*(FI*TXNHB-TI*XNB(L,NY,NX))+TX*XNB(L,NY,NX)
-      XHY(L,NY,NX)=TI*XHY(L,NY,NX)+CORP*(FI*TXHY-TI*XHY(L,NY,NX)) +TX*XHY(L,NY,NX)
-      XAL(L,NY,NX)=TI*XAL(L,NY,NX)+CORP*(FI*TXAL-TI*XAL(L,NY,NX))+TX*XAL(L,NY,NX)
-      XFE(L,NY,NX)=TI*XFE(L,NY,NX)+CORP*(FI*TXFE-TI*XFE(L,NY,NX))+TX*XFE(L,NY,NX)
-      XCA(L,NY,NX)=TI*XCA(L,NY,NX)+CORP*(FI*TXCA-TI*XCA(L,NY,NX))+TX*XCA(L,NY,NX)
-      XMG(L,NY,NX)=TI*XMG(L,NY,NX)+CORP*(FI*TXMG-TI*XMG(L,NY,NX))+TX*XMG(L,NY,NX)
-      XNA(L,NY,NX)=TI*XNA(L,NY,NX)+CORP*(FI*TXNA-TI*XNA(L,NY,NX))+TX*XNA(L,NY,NX)
-      XKA(L,NY,NX)=TI*XKA(L,NY,NX)+CORP*(FI*TXKA-TI*XKA(L,NY,NX))+TX*XKA(L,NY,NX)
-      XHC(L,NY,NX)=TI*XHC(L,NY,NX)+CORP*(FI*TXHC-TI*XHC(L,NY,NX))+TX*XHC(L,NY,NX)
-      XALO2(L,NY,NX)=TI*XALO2(L,NY,NX)+CORP*(FI*TXAL2-TI*XALO2(L,NY,NX)) &
-        +TX*XALO2(L,NY,NX)
-      XFEO2(L,NY,NX)=TI*XFEO2(L,NY,NX)+CORP*(FI*TXFE2-TI*XFEO2(L,NY,NX)) &
-        +TX*XFEO2(L,NY,NX)
-      XOH0(L,NY,NX)=TI*XOH0(L,NY,NX)+CORP*(FI*TXOH0-TI*XOH0(L,NY,NX))+TX*XOH0(L,NY,NX)
-      XOH1(L,NY,NX)=TI*XOH1(L,NY,NX)+CORP*(FI*TXOH1-TI*XOH1(L,NY,NX))+TX*XOH1(L,NY,NX)
-      XOH2(L,NY,NX)=TI*XOH2(L,NY,NX)+CORP*(FI*TXOH2-TI*XOH2(L,NY,NX))+TX*XOH2(L,NY,NX)
-      XH1P(L,NY,NX)=TI*XH1P(L,NY,NX)+CORP*(FI*TXH1P-TI*XH1P(L,NY,NX))+TX*XH1P(L,NY,NX)
-      XH2P(L,NY,NX)=TI*XH2P(L,NY,NX)+CORP*(FI*TXH2P-TI*XH2P(L,NY,NX))+TX*XH2P(L,NY,NX)
-      XOH0B(L,NY,NX)=TI*XOH0B(L,NY,NX)+CORP*(FI*TXOH0B &
-        -TI*XOH0B(L,NY,NX))+TX*XOH0B(L,NY,NX)
-      XOH1B(L,NY,NX)=TI*XOH1B(L,NY,NX)+CORP*(FI*TXOH1B &
-        -TI*XOH1B(L,NY,NX))+TX*XOH1B(L,NY,NX)
-      XOH2B(L,NY,NX)=TI*XOH2B(L,NY,NX)+CORP*(FI*TXOH2B &
-        -TI*XOH2B(L,NY,NX))+TX*XOH2B(L,NY,NX)
-      XH1PB(L,NY,NX)=TI*XH1PB(L,NY,NX)+CORP*(FI*TXH1PB &
-        -TI*XH1PB(L,NY,NX))+TX*XH1PB(L,NY,NX)
-      XH2PB(L,NY,NX)=TI*XH2PB(L,NY,NX)+CORP*(FI*TXH2PB &
-        -TI*XH2PB(L,NY,NX))+TX*XH2PB(L,NY,NX)
-      PALOH(L,NY,NX)=TI*PALOH(L,NY,NX)+CORP*(FI*TPALOH &
-        -TI*PALOH(L,NY,NX))+TX*PALOH(L,NY,NX)
-      PFEOH(L,NY,NX)=TI*PFEOH(L,NY,NX)+CORP*(FI*TPFEOH &
-        -TI*PFEOH(L,NY,NX))+TX*PFEOH(L,NY,NX)
-      PCACO(L,NY,NX)=TI*PCACO(L,NY,NX)+CORP*(FI*TPCACO &
-        -TI*PCACO(L,NY,NX))+TX*PCACO(L,NY,NX)
-      PCASO(L,NY,NX)=TI*PCASO(L,NY,NX)+CORP*(FI*TPCASO &
-        -TI*PCASO(L,NY,NX))+TX*PCASO(L,NY,NX)
-      PALPO(L,NY,NX)=TI*PALPO(L,NY,NX)+CORP*(FI*TPALPO &
-        -TI*PALPO(L,NY,NX))+TX*PALPO(L,NY,NX)
-      PFEPO(L,NY,NX)=TI*PFEPO(L,NY,NX)+CORP*(FI*TPFEPO &
-        -TI*PFEPO(L,NY,NX))+TX*PFEPO(L,NY,NX)
-      PCAPD(L,NY,NX)=TI*PCAPD(L,NY,NX)+CORP*(FI*TPCAPD &
-        -TI*PCAPD(L,NY,NX))+TX*PCAPD(L,NY,NX)
-      PCAPH(L,NY,NX)=TI*PCAPH(L,NY,NX)+CORP*(FI*TPCAPH &
-        -TI*PCAPH(L,NY,NX))+TX*PCAPH(L,NY,NX)
-      PCAPM(L,NY,NX)=TI*PCAPM(L,NY,NX)+CORP*(FI*TPCAPM &
-        -TI*PCAPM(L,NY,NX))+TX*PCAPM(L,NY,NX)
-      PALPB(L,NY,NX)=TI*PALPB(L,NY,NX)+CORP*(FI*TPALPB &
-        -TI*PALPB(L,NY,NX))+TX*PALPB(L,NY,NX)
-      PFEPB(L,NY,NX)=TI*PFEPB(L,NY,NX)+CORP*(FI*TPFEPB &
-        -TI*PFEPB(L,NY,NX))+TX*PFEPB(L,NY,NX)
-      PCPDB(L,NY,NX)=TI*PCPDB(L,NY,NX)+CORP*(FI*TPCPDB &
-        -TI*PCPDB(L,NY,NX))+TX*PCPDB(L,NY,NX)
-      PCPHB(L,NY,NX)=TI*PCPHB(L,NY,NX)+CORP*(FI*TPCPHB &
-        -TI*PCPHB(L,NY,NX))+TX*PCPHB(L,NY,NX)
-      PCPMB(L,NY,NX)=TI*PCPMB(L,NY,NX)+CORP*(FI*TPCPMB &
-        -TI*PCPMB(L,NY,NX))+TX*PCPMB(L,NY,NX)
-      CO2G(L,NY,NX)=TI*CO2G(L,NY,NX)+CORP*(FI*TCO2G-TI*CO2G(L,NY,NX)) &
-        +TX*CO2G(L,NY,NX)
-      CH4G(L,NY,NX)=TI*CH4G(L,NY,NX)+CORP*(FI*TCH4G-TI*CH4G(L,NY,NX)) &
-        +TX*CH4G(L,NY,NX)
-      CO2S(L,NY,NX)=TI*CO2S(L,NY,NX)+CORP*(FI*TCOZS-TI*CO2S(L,NY,NX)) &
-        +TX*CO2S(L,NY,NX)+CORP*CO2SH(L,NY,NX)
-      CH4S(L,NY,NX)=TI*CH4S(L,NY,NX)+CORP*(FI*TCHFS-TI*CH4S(L,NY,NX)) &
-        +TX*CH4S(L,NY,NX)+CORP*CH4SH(L,NY,NX)
-      OXYG(L,NY,NX)=TI*OXYG(L,NY,NX)+CORP*(FI*TOXYG-TI*OXYG(L,NY,NX)) &
-        +TX*OXYG(L,NY,NX)
-      OXYS(L,NY,NX)=TI*OXYS(L,NY,NX)+CORP*(FI*TOXYS-TI*OXYS(L,NY,NX)) &
-        +TX*OXYS(L,NY,NX)+CORP*OXYSH(L,NY,NX)
-      Z2GG(L,NY,NX)=TI*Z2GG(L,NY,NX)+CORP*(FI*TZ2GG-TI*Z2GG(L,NY,NX)) &
-        +TX*Z2GG(L,NY,NX)
-      Z2GS(L,NY,NX)=TI*Z2GS(L,NY,NX)+CORP*(FI*TZ2GS-TI*Z2GS(L,NY,NX)) &
-        +TX*Z2GS(L,NY,NX)+CORP*Z2GSH(L,NY,NX)
-      Z2OG(L,NY,NX)=TI*Z2OG(L,NY,NX)+CORP*(FI*TZ2OG-TI*Z2OG(L,NY,NX)) &
-        +TX*Z2OG(L,NY,NX)
-      Z2OS(L,NY,NX)=TI*Z2OS(L,NY,NX)+CORP*(FI*TZ2OS-TI*Z2OS(L,NY,NX)) &
-        +TX*Z2OS(L,NY,NX)+CORP*Z2OSH(L,NY,NX)
-      ZNH3G(L,NY,NX)=TI*ZNH3G(L,NY,NX)+CORP*(FI*TZNH3G &
-        -TI*ZNH3G(L,NY,NX))+TX*ZNH3G(L,NY,NX)
-      H2GG(L,NY,NX)=TI*H2GG(L,NY,NX)+CORP*(FI*TH2GG-TI*H2GG(L,NY,NX)) &
-        +TX*H2GG(L,NY,NX)
-      H2GS(L,NY,NX)=TI*H2GS(L,NY,NX)+CORP*(FI*TH2GS-TI*H2GS(L,NY,NX)) &
-        +TX*H2GS(L,NY,NX)+CORP*H2GSH(L,NY,NX)
-      ZNH4SH(L,NY,NX)=XCORP(NY,NX)*ZNH4SH(L,NY,NX)
-      ZNH3SH(L,NY,NX)=XCORP(NY,NX)*ZNH3SH(L,NY,NX)
-      ZNO3SH(L,NY,NX)=XCORP(NY,NX)*ZNO3SH(L,NY,NX)
-      ZNO2SH(L,NY,NX)=XCORP(NY,NX)*ZNO2SH(L,NY,NX)
-      H1PO4H(L,NY,NX)=XCORP(NY,NX)*H1PO4H(L,NY,NX)
-      H2PO4H(L,NY,NX)=XCORP(NY,NX)*H2PO4H(L,NY,NX)
-      ZNH4BH(L,NY,NX)=XCORP(NY,NX)*ZNH4BH(L,NY,NX)
-      ZNH3BH(L,NY,NX)=XCORP(NY,NX)*ZNH3BH(L,NY,NX)
-      ZNO3BH(L,NY,NX)=XCORP(NY,NX)*ZNO3BH(L,NY,NX)
-      ZNO2BH(L,NY,NX)=XCORP(NY,NX)*ZNO2BH(L,NY,NX)
-      H1POBH(L,NY,NX)=XCORP(NY,NX)*H1POBH(L,NY,NX)
-      H2POBH(L,NY,NX)=XCORP(NY,NX)*H2POBH(L,NY,NX)
-      ZALH(L,NY,NX)=XCORP(NY,NX)*ZALH(L,NY,NX)
-      ZFEH(L,NY,NX)=XCORP(NY,NX)*ZFEH(L,NY,NX)
-      ZHYH(L,NY,NX)=XCORP(NY,NX)*ZHYH(L,NY,NX)
-      ZCCH(L,NY,NX)=XCORP(NY,NX)*ZCCH(L,NY,NX)
-      ZMAH(L,NY,NX)=XCORP(NY,NX)*ZMAH(L,NY,NX)
-      ZNAH(L,NY,NX)=XCORP(NY,NX)*ZNAH(L,NY,NX)
-      ZKAH(L,NY,NX)=XCORP(NY,NX)*ZKAH(L,NY,NX)
-      ZOHH(L,NY,NX)=XCORP(NY,NX)*ZOHH(L,NY,NX)
-      ZSO4H(L,NY,NX)=XCORP(NY,NX)*ZSO4H(L,NY,NX)
-      ZCLH(L,NY,NX)=XCORP(NY,NX)*ZCLH(L,NY,NX)
-      ZCO3H(L,NY,NX)=XCORP(NY,NX)*ZCO3H(L,NY,NX)
-      ZHCO3H(L,NY,NX)=XCORP(NY,NX)*ZHCO3H(L,NY,NX)
-      ZALO1H(L,NY,NX)=XCORP(NY,NX)*ZALO1H(L,NY,NX)
-      ZALO2H(L,NY,NX)=XCORP(NY,NX)*ZALO2H(L,NY,NX)
-      ZALO3H(L,NY,NX)=XCORP(NY,NX)*ZALO3H(L,NY,NX)
-      ZALO4H(L,NY,NX)=XCORP(NY,NX)*ZALO4H(L,NY,NX)
-      ZALSH(L,NY,NX)=XCORP(NY,NX)*ZALSH(L,NY,NX)
-      ZFEO1H(L,NY,NX)=XCORP(NY,NX)*ZFEO1H(L,NY,NX)
-      ZFEO2H(L,NY,NX)=XCORP(NY,NX)*ZFEO2H(L,NY,NX)
-      ZFEO3H(L,NY,NX)=XCORP(NY,NX)*ZFEO3H(L,NY,NX)
-      ZFEO4H(L,NY,NX)=XCORP(NY,NX)*ZFEO4H(L,NY,NX)
-      ZFESH(L,NY,NX)=XCORP(NY,NX)*ZFESH(L,NY,NX)
-      ZCAOH(L,NY,NX)=XCORP(NY,NX)*ZCAOH(L,NY,NX)
-      ZCACH(L,NY,NX)=XCORP(NY,NX)*ZCACH(L,NY,NX)
-      ZCAHH(L,NY,NX)=XCORP(NY,NX)*ZCAHH(L,NY,NX)
-      ZCASH(L,NY,NX)=XCORP(NY,NX)*ZCASH(L,NY,NX)
-      ZMGOH(L,NY,NX)=XCORP(NY,NX)*ZMGOH(L,NY,NX)
-      ZMGCH(L,NY,NX)=XCORP(NY,NX)*ZMGCH(L,NY,NX)
-      ZMGHH(L,NY,NX)=XCORP(NY,NX)*ZMGHH(L,NY,NX)
-      ZMGSH(L,NY,NX)=XCORP(NY,NX)*ZMGSH(L,NY,NX)
-      ZNACH(L,NY,NX)=XCORP(NY,NX)*ZNACH(L,NY,NX)
-      ZNASH(L,NY,NX)=XCORP(NY,NX)*ZNASH(L,NY,NX)
-      ZKASH(L,NY,NX)=XCORP(NY,NX)*ZKASH(L,NY,NX)
-      H0PO4H(L,NY,NX)=XCORP(NY,NX)*H0PO4H(L,NY,NX)
-      H3PO4H(L,NY,NX)=XCORP(NY,NX)*H3PO4H(L,NY,NX)
-      ZFE1PH(L,NY,NX)=XCORP(NY,NX)*ZFE1PH(L,NY,NX)
-      ZFE2PH(L,NY,NX)=XCORP(NY,NX)*ZFE2PH(L,NY,NX)
-      ZCA0PH(L,NY,NX)=XCORP(NY,NX)*ZCA0PH(L,NY,NX)
-      ZCA1PH(L,NY,NX)=XCORP(NY,NX)*ZCA1PH(L,NY,NX)
-      ZCA2PH(L,NY,NX)=XCORP(NY,NX)*ZCA2PH(L,NY,NX)
-      ZMG1PH(L,NY,NX)=XCORP(NY,NX)*ZMG1PH(L,NY,NX)
-      H0POBH(L,NY,NX)=XCORP(NY,NX)*H0POBH(L,NY,NX)
-      H1POBH(L,NY,NX)=XCORP(NY,NX)*H1POBH(L,NY,NX)
-      H3POBH(L,NY,NX)=XCORP(NY,NX)*H3POBH(L,NY,NX)
-      ZFE1BH(L,NY,NX)=XCORP(NY,NX)*ZFE1BH(L,NY,NX)
-      ZFE2BH(L,NY,NX)=XCORP(NY,NX)*ZFE2BH(L,NY,NX)
-      ZCA0BH(L,NY,NX)=XCORP(NY,NX)*ZCA0BH(L,NY,NX)
-      ZCA1BH(L,NY,NX)=XCORP(NY,NX)*ZCA1BH(L,NY,NX)
-      ZCA2BH(L,NY,NX)=XCORP(NY,NX)*ZCA2BH(L,NY,NX)
-      ZMG1BH(L,NY,NX)=XCORP(NY,NX)*ZMG1BH(L,NY,NX)
-      CO2SH(L,NY,NX)=XCORP(NY,NX)*CO2SH(L,NY,NX)
-      CH4SH(L,NY,NX)=XCORP(NY,NX)*CH4SH(L,NY,NX)
-      OXYSH(L,NY,NX)=XCORP(NY,NX)*OXYSH(L,NY,NX)
-      Z2GSH(L,NY,NX)=XCORP(NY,NX)*Z2GSH(L,NY,NX)
-      Z2OSH(L,NY,NX)=XCORP(NY,NX)*Z2OSH(L,NY,NX)
-      H2GSH(L,NY,NX)=XCORP(NY,NX)*H2GSH(L,NY,NX)
+        ENGYL=TI*ENGYV+CORP*(FI*TENGY-TI*ENGYV)+TX*ENGYV+FI*TENGYR
+        VHCP(L,NY,NX)=VHCM(L,NY,NX)+cpw*(VOLW(L,NY,NX)+VOLWH(L,NY,NX)) &
+          +cpi*(VOLI(L,NY,NX)+VOLIH(L,NY,NX))
+        TKS(L,NY,NX)=(ENGYM+ENGYL)/VHCP(L,NY,NX)
+        TCS(L,NY,NX)=TKS(L,NY,NX)-TC2K
+        DO NTN=ifertn_beg,ifertn_end
+          FertN_soil(NTN,L,NY,NX)=TI*FertN_soil(NTN,L,NY,NX) &
+            +CORP*(FI*TfertN_soil(NTN)-TI*FertN_soil(NTN,L,NY,NX))&
+            +TX*FertN_soil(NTN,L,NY,NX)
+        ENDDO
 
-      DO  K=0,jcplx1
+        DO NTN=ifertnb_beg,ifertnb_end
+          FertN_band(NTN,L,NY,NX)=TI*FertN_band(NTN,L,NY,NX) &
+            +CORP*(FI*TfertN_band(NTN)-TI*FertN_band(NTN,L,NY,NX)) &
+            +TX*FertN_band(NTN,L,NY,NX)
+        ENDDO
+
+        !SALT
+        DO NTSA=idsa_beg,idsa_end
+          trcsa_solml(NTSA,L,NY,NX)=TI*trcsa_solml(NTSA,L,NY,NX)  &
+            +CORP*(FI*TSA_solml(NTSA)-TI*trcsa_solml(NTSA,L,NY,NX)) &
+            +TX*trcsa_solml(NTSA,L,NY,NX)+CORP*trcsa_soHml(NTSA,L,NY,NX)
+        ENDDO
+
+        ! solute
+        DO NTS=ids_beg,ids_end
+          trc_solml(NTS,L,NY,NX)=TI*trc_solml(NTS,L,NY,NX) &
+            +CORP*(FI*TS_solml(NTS)-TI*trc_solml(NTS,L,NY,NX)) &
+            +TX*trc_solml(NTS,L,NY,NX)+CORP*trc_soHml(NTS,L,NY,NX)
+        ENDDO
+
+        DO NTX=idx_CEC,idx_cation_end
+          trcx_solml(NTX,L,NY,NX)=TI*trcx_solml(NTX,L,NY,NX)+ &
+            CORP*(FI*TX_solml(NTX)-TI*trcx_solml(NTX,L,NY,NX))+TX*trcx_solml(NTX,L,NY,NX)
+        ENDDO
+
+        DO NTX=idx_AEC,idx_end
+          trcx_solml(NTX,L,NY,NX)=TI*trcx_solml(NTX,L,NY,NX)+ &
+            CORP*(FI*TX_solml(NTX)-TI*trcx_solml(NTX,L,NY,NX))+TX*trcx_solml(NTX,L,NY,NX)
+        ENDDO
+
+        DO NTP=idsp_beg,idsp_end
+          trcp_salml(NTP,L,NY,NX)=TI*trcp_salml(NTP,L,NY,NX)+CORP*(FI*TP_salml(NTP) &
+            -TI*trcp_salml(NTP,L,NY,NX))+TX*trcp_salml(NTP,L,NY,NX)
+        ENDDO
+
+        DO NTG=idg_beg,idg_end-1
+          trc_gasml(NTG,L,NY,NX)=TI*trc_gasml(NTG,L,NY,NX)+CORP*(FI*TG_gasml(NTG) &
+            -TI*trc_gasml(NTG,L,NY,NX))+TX*trc_gasml(NTG,L,NY,NX)
+        ENDDO
+
+        call MixSoluteH(L,NY,NX)
+
+        DO  K=1,jcplx
+          DO  N=1,NFGs
+            DO NGL=JGnio(N),JGnfo(N)
+              DO  M=1,nlbiomcp
+                OMC(M,NGL,K,L,NY,NX)=TI*OMC(M,NGL,K,L,NY,NX)+CORP*(FI*TOMC(M,NGL,K) &
+                  -TI*OMC(M,NGL,K,L,NY,NX))+TX*OMC(M,NGL,K,L,NY,NX)
+                OMN(M,NGL,K,L,NY,NX)=TI*OMN(M,NGL,K,L,NY,NX)+CORP*(FI*TOMN(M,NGL,K) &
+                  -TI*OMN(M,NGL,K,L,NY,NX))+TX*OMN(M,NGL,K,L,NY,NX)
+                OMP(M,NGL,K,L,NY,NX)=TI*OMP(M,NGL,K,L,NY,NX)+CORP*(FI*TOMP(M,NGL,K) &
+                  -TI*OMP(M,NGL,K,L,NY,NX))+TX*OMP(M,NGL,K,L,NY,NX)
+              enddo
+            enddo
+          enddo
+        ENDDO
         DO  N=1,NFGs
-          DO  M=1,nlbiomcp
-            DO NGL=1,JG
-              OMC(M,NGL,N,K,L,NY,NX)=TI*OMC(M,NGL,N,K,L,NY,NX)+CORP*(FI*TOMC(M,NGL,N,K) &
-                -TI*OMC(M,NGL,N,K,L,NY,NX))+TX*OMC(M,NGL,N,K,L,NY,NX)
-              OMN(M,NGL,N,K,L,NY,NX)=TI*OMN(M,NGL,N,K,L,NY,NX)+CORP*(FI*TOMN(M,NGL,N,K) &
-                -TI*OMN(M,NGL,N,K,L,NY,NX))+TX*OMN(M,NGL,N,K,L,NY,NX)
-              OMP(M,NGL,N,K,L,NY,NX)=TI*OMP(M,NGL,N,K,L,NY,NX)+CORP*(FI*TOMP(M,NGL,N,K) &
-                -TI*OMP(M,NGL,N,K,L,NY,NX))+TX*OMP(M,NGL,N,K,L,NY,NX)
+          DO NGL=JGniA(N),JGnfA(N)
+            DO  M=1,nlbiomcp
+              OMCff(M,NGL,L,NY,NX)=TI*OMCff(M,NGL,L,NY,NX)+CORP*(FI*TOMCff(M,NGL) &
+                -TI*OMCff(M,NGL,L,NY,NX))+TX*OMCff(M,NGL,L,NY,NX)
+              OMNff(M,NGL,L,NY,NX)=TI*OMNff(M,NGL,L,NY,NX)+CORP*(FI*TOMNff(M,NGL) &
+                -TI*OMNff(M,NGL,L,NY,NX))+TX*OMNff(M,NGL,L,NY,NX)
+              OMPff(M,NGL,L,NY,NX)=TI*OMPff(M,NGL,L,NY,NX)+CORP*(FI*TOMPff(M,NGL) &
+                -TI*OMPff(M,NGL,L,NY,NX))+TX*OMPff(M,NGL,L,NY,NX)
             enddo
           enddo
         enddo
-      ENDDO
-      DO  N=1,NFGs
-        DO  M=1,nlbiomcp
-          DO NGL=1,JG
-            OMCff(M,NGL,N,L,NY,NX)=TI*OMCff(M,NGL,N,L,NY,NX)+CORP*(FI*TOMCff(M,NGL,N) &
-              -TI*OMCff(M,NGL,N,L,NY,NX))+TX*OMCff(M,NGL,N,L,NY,NX)
-            OMNff(M,NGL,N,L,NY,NX)=TI*OMNff(M,NGL,N,L,NY,NX)+CORP*(FI*TOMNff(M,NGL,N) &
-              -TI*OMNff(M,NGL,N,L,NY,NX))+TX*OMNff(M,NGL,N,L,NY,NX)
-            OMPff(M,NGL,N,L,NY,NX)=TI*OMPff(M,NGL,N,L,NY,NX)+CORP*(FI*TOMPff(M,NGL,N) &
-              -TI*OMPff(M,NGL,N,L,NY,NX))+TX*OMPff(M,NGL,N,L,NY,NX)
-          enddo
-        enddo
-      enddo
 
-      DO  K=0,jcplx1
-        DO  M=1,ndbiomcp
-          ORC(M,K,L,NY,NX)=TI*ORC(M,K,L,NY,NX)+CORP*(FI*TORC(M,K) &
-            -TI*ORC(M,K,L,NY,NX))+TX*ORC(M,K,L,NY,NX)
-          ORN(M,K,L,NY,NX)=TI*ORN(M,K,L,NY,NX)+CORP*(FI*TORN(M,K) &
-            -TI*ORN(M,K,L,NY,NX))+TX*ORN(M,K,L,NY,NX)
-          ORP(M,K,L,NY,NX)=TI*ORP(M,K,L,NY,NX)+CORP*(FI*TORP(M,K) &
-            -TI*ORP(M,K,L,NY,NX))+TX*ORP(M,K,L,NY,NX)
+        DO  K=1,jcplx
+          DO  M=1,ndbiomcp
+            ORC(M,K,L,NY,NX)=TI*ORC(M,K,L,NY,NX)+CORP*(FI*TORC(M,K) &
+              -TI*ORC(M,K,L,NY,NX))+TX*ORC(M,K,L,NY,NX)
+            ORN(M,K,L,NY,NX)=TI*ORN(M,K,L,NY,NX)+CORP*(FI*TORN(M,K) &
+              -TI*ORN(M,K,L,NY,NX))+TX*ORN(M,K,L,NY,NX)
+            ORP(M,K,L,NY,NX)=TI*ORP(M,K,L,NY,NX)+CORP*(FI*TORP(M,K) &
+              -TI*ORP(M,K,L,NY,NX))+TX*ORP(M,K,L,NY,NX)
+          ENDDO
+          OQC(K,L,NY,NX)=TI*OQC(K,L,NY,NX)+CORP*(FI*TOQC(K) &
+            -TI*OQC(K,L,NY,NX))+TX*OQC(K,L,NY,NX)+CORP*OQCH(K,L,NY,NX)
+          OQN(K,L,NY,NX)=TI*OQN(K,L,NY,NX)+CORP*(FI*TOQN(K) &
+            -TI*OQN(K,L,NY,NX))+TX*OQN(K,L,NY,NX)+CORP*OQNH(K,L,NY,NX)
+          OQP(K,L,NY,NX)=TI*OQP(K,L,NY,NX)+CORP*(FI*TOQP(K) &
+            -TI*OQP(K,L,NY,NX))+TX*OQP(K,L,NY,NX)+CORP*OQPH(K,L,NY,NX)
+          OQA(K,L,NY,NX)=TI*OQA(K,L,NY,NX)+CORP*(FI*TOQA(K) &
+            -TI*OQA(K,L,NY,NX))+TX*OQA(K,L,NY,NX)+CORP*OQAH(K,L,NY,NX)
+
+          OQCH(K,L,NY,NX)=XCORP(NY,NX)*OQCH(K,L,NY,NX)
+          OQNH(K,L,NY,NX)=XCORP(NY,NX)*OQNH(K,L,NY,NX)
+          OQPH(K,L,NY,NX)=XCORP(NY,NX)*OQPH(K,L,NY,NX)
+          OQAH(K,L,NY,NX)=XCORP(NY,NX)*OQAH(K,L,NY,NX)
+
+          OHC(K,L,NY,NX)=TI*OHC(K,L,NY,NX)+CORP*(FI*TOHC(K) &
+            -TI*OHC(K,L,NY,NX))+TX*OHC(K,L,NY,NX)
+          OHN(K,L,NY,NX)=TI*OHN(K,L,NY,NX)+CORP*(FI*TOHN(K) &
+            -TI*OHN(K,L,NY,NX))+TX*OHN(K,L,NY,NX)
+          OHP(K,L,NY,NX)=TI*OHP(K,L,NY,NX)+CORP*(FI*TOHP(K) &
+            -TI*OHP(K,L,NY,NX))+TX*OHP(K,L,NY,NX)
+          OHA(K,L,NY,NX)=TI*OHA(K,L,NY,NX)+CORP*(FI*TOHA(K) &
+            -TI*OHA(K,L,NY,NX))+TX*OHA(K,L,NY,NX)
+          DO  M=1,jsken
+            OSC(M,K,L,NY,NX)=TI*OSC(M,K,L,NY,NX)+CORP*(FI*TOSC(M,K) &
+              -TI*OSC(M,K,L,NY,NX))+TX*OSC(M,K,L,NY,NX)
+            OSA(M,K,L,NY,NX)=TI*OSA(M,K,L,NY,NX)+CORP*(FI*TOSA(M,K) &
+              -TI*OSA(M,K,L,NY,NX))+TX*OSA(M,K,L,NY,NX)
+            OSN(M,K,L,NY,NX)=TI*OSN(M,K,L,NY,NX)+CORP*(FI*TOSN(M,K) &
+              -TI*OSN(M,K,L,NY,NX))+TX*OSN(M,K,L,NY,NX)
+            OSP(M,K,L,NY,NX)=TI*OSP(M,K,L,NY,NX)+CORP*(FI*TOSP(M,K) &
+              -TI*OSP(M,K,L,NY,NX))+TX*OSP(M,K,L,NY,NX)
+          ENDDO
         ENDDO
-        OQC(K,L,NY,NX)=TI*OQC(K,L,NY,NX)+CORP*(FI*TOQC(K) &
-          -TI*OQC(K,L,NY,NX))+TX*OQC(K,L,NY,NX)+CORP*OQCH(K,L,NY,NX)
-        OQN(K,L,NY,NX)=TI*OQN(K,L,NY,NX)+CORP*(FI*TOQN(K) &
-          -TI*OQN(K,L,NY,NX))+TX*OQN(K,L,NY,NX)+CORP*OQNH(K,L,NY,NX)
-        OQP(K,L,NY,NX)=TI*OQP(K,L,NY,NX)+CORP*(FI*TOQP(K) &
-          -TI*OQP(K,L,NY,NX))+TX*OQP(K,L,NY,NX)+CORP*OQPH(K,L,NY,NX)
-        OQA(K,L,NY,NX)=TI*OQA(K,L,NY,NX)+CORP*(FI*TOQA(K) &
-          -TI*OQA(K,L,NY,NX))+TX*OQA(K,L,NY,NX)+CORP*OQAH(K,L,NY,NX)
-        OQCH(K,L,NY,NX)=XCORP(NY,NX)*OQCH(K,L,NY,NX)
-        OQNH(K,L,NY,NX)=XCORP(NY,NX)*OQNH(K,L,NY,NX)
-        OQPH(K,L,NY,NX)=XCORP(NY,NX)*OQPH(K,L,NY,NX)
-        OQAH(K,L,NY,NX)=XCORP(NY,NX)*OQAH(K,L,NY,NX)
-        OHC(K,L,NY,NX)=TI*OHC(K,L,NY,NX)+CORP*(FI*TOHC(K) &
-          -TI*OHC(K,L,NY,NX))+TX*OHC(K,L,NY,NX)
-        OHN(K,L,NY,NX)=TI*OHN(K,L,NY,NX)+CORP*(FI*TOHN(K) &
-          -TI*OHN(K,L,NY,NX))+TX*OHN(K,L,NY,NX)
-        OHP(K,L,NY,NX)=TI*OHP(K,L,NY,NX)+CORP*(FI*TOHP(K) &
-          -TI*OHP(K,L,NY,NX))+TX*OHP(K,L,NY,NX)
-        OHA(K,L,NY,NX)=TI*OHA(K,L,NY,NX)+CORP*(FI*TOHA(K) &
-          -TI*OHA(K,L,NY,NX))+TX*OHA(K,L,NY,NX)
-        DO  M=1,jsken
-          OSC(M,K,L,NY,NX)=TI*OSC(M,K,L,NY,NX)+CORP*(FI*TOSC(M,K) &
-            -TI*OSC(M,K,L,NY,NX))+TX*OSC(M,K,L,NY,NX)
-          OSA(M,K,L,NY,NX)=TI*OSA(M,K,L,NY,NX)+CORP*(FI*TOSA(M,K) &
-            -TI*OSA(M,K,L,NY,NX))+TX*OSA(M,K,L,NY,NX)
-          OSN(M,K,L,NY,NX)=TI*OSN(M,K,L,NY,NX)+CORP*(FI*TOSN(M,K) &
-            -TI*OSN(M,K,L,NY,NX))+TX*OSN(M,K,L,NY,NX)
-          OSP(M,K,L,NY,NX)=TI*OSP(M,K,L,NY,NX)+CORP*(FI*TOSP(M,K) &
-            -TI*OSP(M,K,L,NY,NX))+TX*OSP(M,K,L,NY,NX)
-        ENDDO
-      ENDDO
 !
 !     ADD STATE VARIABLES IN SURFACE RESIDUE INCORPORATED
 !     WITHIN TILLAGE MIXING ZONE
 !
-      DO  K=0,jcplx1
-        IF(K.NE.micpar%k_POM.AND.K.NE.micpar%k_humus)THEN
+        DO  K=1,micpar%n_litrsfk
           DO  N=1,NFGs
-            DO M=1,nlbiomcp
-              DO NGL=1,JG
-                OMC(M,NGL,N,K,L,NY,NX)=OMC(M,NGL,N,K,L,NY,NX)+FI*TOMGC(M,NGL,N,K)
-                OMN(M,NGL,N,K,L,NY,NX)=OMN(M,NGL,N,K,L,NY,NX)+FI*TOMGN(M,NGL,N,K)
-                OMP(M,NGL,N,K,L,NY,NX)=OMP(M,NGL,N,K,L,NY,NX)+FI*TOMGP(M,NGL,N,K)
+            DO NGL=JGnio(N),JGnfo(N)
+              DO M=1,nlbiomcp
+                OMC(M,NGL,K,L,NY,NX)=OMC(M,NGL,K,L,NY,NX)+FI*TOMGC(M,NGL,K)
+                OMN(M,NGL,K,L,NY,NX)=OMN(M,NGL,K,L,NY,NX)+FI*TOMGN(M,NGL,K)
+                OMP(M,NGL,K,L,NY,NX)=OMP(M,NGL,K,L,NY,NX)+FI*TOMGP(M,NGL,K)
               enddo
             enddo
           ENDDO
-        ENDIF
-      ENDDO
-      DO  N=1,NFGs
-        DO M=1,nlbiomcp
-          DO NGL=1,JG
-            OMCff(M,NGL,N,L,NY,NX)=OMCff(M,NGL,N,L,NY,NX)+FI*TOMGCff(M,NGL,N)
-            OMNff(M,NGL,N,L,NY,NX)=OMNff(M,NGL,N,L,NY,NX)+FI*TOMGNff(M,NGL,N)
-            OMPff(M,NGL,N,L,NY,NX)=OMPff(M,NGL,N,L,NY,NX)+FI*TOMGPff(M,NGL,N)
-          enddo
-        enddo
-      ENDDO
-
-      DO K=0,2
-        DO  M=1,ndbiomcp
-          ORC(M,K,L,NY,NX)=ORC(M,K,L,NY,NX)+FI*TORXC(M,K)
-          ORN(M,K,L,NY,NX)=ORN(M,K,L,NY,NX)+FI*TORXN(M,K)
-          ORP(M,K,L,NY,NX)=ORP(M,K,L,NY,NX)+FI*TORXP(M,K)
         ENDDO
-        OQC(K,L,NY,NX)=OQC(K,L,NY,NX)+FI*TOQGC(K)
-        OQN(K,L,NY,NX)=OQN(K,L,NY,NX)+FI*TOQGN(K)
-        OQP(K,L,NY,NX)=OQP(K,L,NY,NX)+FI*TOQGP(K)
-        OQA(K,L,NY,NX)=OQA(K,L,NY,NX)+FI*TOQGA(K)
-        OQCH(K,L,NY,NX)=OQCH(K,L,NY,NX)+FI*TOQHC(K)
-        OQNH(K,L,NY,NX)=OQNH(K,L,NY,NX)+FI*TOQHN(K)
-        OQPH(K,L,NY,NX)=OQPH(K,L,NY,NX)+FI*TOQHP(K)
-        OQAH(K,L,NY,NX)=OQAH(K,L,NY,NX)+FI*TOQHA(K)
-        OHC(K,L,NY,NX)=OHC(K,L,NY,NX)+FI*TOHGC(K)
-        OHN(K,L,NY,NX)=OHN(K,L,NY,NX)+FI*TOHGN(K)
-        OHP(K,L,NY,NX)=OHP(K,L,NY,NX)+FI*TOHGP(K)
-        OHA(K,L,NY,NX)=OHA(K,L,NY,NX)+FI*TOHGA(K)
-        DO  M=1,jsken
-          OSC(M,K,L,NY,NX)=OSC(M,K,L,NY,NX)+FI*TOSGC(M,K)
-          OSA(M,K,L,NY,NX)=OSA(M,K,L,NY,NX)+FI*TOSGA(M,K)
-          OSN(M,K,L,NY,NX)=OSN(M,K,L,NY,NX)+FI*TOSGN(M,K)
-          OSP(M,K,L,NY,NX)=OSP(M,K,L,NY,NX)+FI*TOSGP(M,K)
-        ENDDO
-      ENDDO
-      OC=0.0_r8
-      ON=0.0_r8
-      OP=0.0_r8
-      DC=0.0_r8
-      DN=0.0_r8
-      DP=0.0_r8
 
-      DO  K=0,jcplx1
         DO  N=1,NFGs
-          DO  M=1,nlbiomcp
-            DO NGL=1,JG
-              OC=OC+OMC(M,NGL,N,K,L,NY,NX)
-              ON=ON+OMN(M,NGL,N,K,L,NY,NX)
-              OP=OP+OMP(M,NGL,N,K,L,NY,NX)
+          DO NGL=JGniA(N),JGnfA(N)
+            DO M=1,nlbiomcp
+              OMCff(M,NGL,L,NY,NX)=OMCff(M,NGL,L,NY,NX)+FI*TOMGCff(M,NGL)
+              OMNff(M,NGL,L,NY,NX)=OMNff(M,NGL,L,NY,NX)+FI*TOMGNff(M,NGL)
+              OMPff(M,NGL,L,NY,NX)=OMPff(M,NGL,L,NY,NX)+FI*TOMGPff(M,NGL)
+            enddo
+          enddo
+        ENDDO
+
+        DO K=1,micpar%n_litrsfk
+          DO  M=1,ndbiomcp
+            ORC(M,K,L,NY,NX)=ORC(M,K,L,NY,NX)+FI*TORXC(M,K)
+            ORN(M,K,L,NY,NX)=ORN(M,K,L,NY,NX)+FI*TORXN(M,K)
+            ORP(M,K,L,NY,NX)=ORP(M,K,L,NY,NX)+FI*TORXP(M,K)
+          ENDDO
+          OQC(K,L,NY,NX)=OQC(K,L,NY,NX)+FI*TOQGC(K)
+          OQN(K,L,NY,NX)=OQN(K,L,NY,NX)+FI*TOQGN(K)
+          OQP(K,L,NY,NX)=OQP(K,L,NY,NX)+FI*TOQGP(K)
+          OQA(K,L,NY,NX)=OQA(K,L,NY,NX)+FI*TOQGA(K)
+          OQCH(K,L,NY,NX)=OQCH(K,L,NY,NX)+FI*TOQHC(K)
+          OQNH(K,L,NY,NX)=OQNH(K,L,NY,NX)+FI*TOQHN(K)
+          OQPH(K,L,NY,NX)=OQPH(K,L,NY,NX)+FI*TOQHP(K)
+          OQAH(K,L,NY,NX)=OQAH(K,L,NY,NX)+FI*TOQHA(K)
+          OHC(K,L,NY,NX)=OHC(K,L,NY,NX)+FI*TOHGC(K)
+          OHN(K,L,NY,NX)=OHN(K,L,NY,NX)+FI*TOHGN(K)
+          OHP(K,L,NY,NX)=OHP(K,L,NY,NX)+FI*TOHGP(K)
+          OHA(K,L,NY,NX)=OHA(K,L,NY,NX)+FI*TOHGA(K)
+          DO  M=1,jsken
+            OSC(M,K,L,NY,NX)=OSC(M,K,L,NY,NX)+FI*TOSGC(M,K)
+            OSA(M,K,L,NY,NX)=OSA(M,K,L,NY,NX)+FI*TOSGA(M,K)
+            OSN(M,K,L,NY,NX)=OSN(M,K,L,NY,NX)+FI*TOSGN(M,K)
+            OSP(M,K,L,NY,NX)=OSP(M,K,L,NY,NX)+FI*TOSGP(M,K)
+          ENDDO
+        ENDDO
+        OC=0.0_r8
+        ON=0.0_r8
+        OP=0.0_r8
+        DC=0.0_r8
+        DN=0.0_r8
+        DP=0.0_r8
+
+        DO  K=1,jcplx
+          DO  N=1,NFGs
+            DO NGL=JGnio(N),JGnfo(N)
+              DO  M=1,nlbiomcp
+                OC=OC+OMC(M,NGL,K,L,NY,NX)
+                ON=ON+OMN(M,NGL,K,L,NY,NX)
+                OP=OP+OMP(M,NGL,K,L,NY,NX)
+              enddo
+            enddo
+          enddo
+        ENDDO
+
+        DO  K=1,micpar%n_litrsfk
+          DO  N=1,NFGs
+            DO NGL=JGnio(N),JGnfo(N)
+              DO  M=1,nlbiomcp
+                DC=DC+OMC(M,NGL,K,L,NY,NX)
+                DN=DN+OMN(M,NGL,K,L,NY,NX)
+                DP=DP+OMP(M,NGL,K,L,NY,NX)
+              enddo
+            enddo
+          enddo
+        ENDDO
+        DO  N=1,NFGs
+          DO NGL=JGniA(N),JGnfA(N)
+            DO  M=1,nlbiomcp
+              OC=OC+OMCff(M,NGL,L,NY,NX)
+              ON=ON+OMNff(M,NGL,L,NY,NX)
+              OP=OP+OMPff(M,NGL,L,NY,NX)
             enddo
           enddo
         enddo
-      ENDDO
 
-      DO  K=0,2
-        DO  N=1,NFGs
-          DO  M=1,nlbiomcp
-            DO NGL=1,JG
-              DC=DC+OMC(M,NGL,N,K,L,NY,NX)
-              DN=DN+OMN(M,NGL,N,K,L,NY,NX)
-              DP=DP+OMP(M,NGL,N,K,L,NY,NX)
-            enddo
-          enddo
-        enddo
-      ENDDO
-      DO  N=1,NFGs
-        DO  M=1,nlbiomcp
-          DO NGL=1,JG
-            OC=OC+OMCff(M,NGL,N,L,NY,NX)
-            ON=ON+OMNff(M,NGL,N,L,NY,NX)
-            OP=OP+OMPff(M,NGL,N,L,NY,NX)
-          enddo
-        enddo
-      enddo
+        DO K=1,jcplx
+          DO  M=1,ndbiomcp
+            OC=OC+ORC(M,K,L,NY,NX)
+            ON=ON+ORN(M,K,L,NY,NX)
+            OP=OP+ORP(M,K,L,NY,NX)
+            IF(micpar%is_litter(K))THEN
+              DC=DC+ORC(M,K,L,NY,NX)
+              DN=DN+ORN(M,K,L,NY,NX)
+              DP=DP+ORP(M,K,L,NY,NX)
+            ENDIF
+          ENDDO
 
-      DO K=0,jcplx1
-        DO  M=1,ndbiomcp
-          OC=OC+ORC(M,K,L,NY,NX)
-          ON=ON+ORN(M,K,L,NY,NX)
-          OP=OP+ORP(M,K,L,NY,NX)
-          IF(K.LE.2)THEN
-            DC=DC+ORC(M,K,L,NY,NX)
-            DN=DN+ORN(M,K,L,NY,NX)
-            DP=DP+ORP(M,K,L,NY,NX)
-          ENDIF
-        ENDDO
-
-        OC=OC+OQC(K,L,NY,NX)+OQCH(K,L,NY,NX)+OHC(K,L,NY,NX) &
-          +OQA(K,L,NY,NX)+OQAH(K,L,NY,NX)+OHA(K,L,NY,NX)
-        ON=ON+OQN(K,L,NY,NX)+OQNH(K,L,NY,NX)+OHN(K,L,NY,NX)
-        OP=OP+OQP(K,L,NY,NX)+OQPH(K,L,NY,NX)+OHP(K,L,NY,NX)
-        IF(K.LE.2)THEN
-          DC=DC+OQC(K,L,NY,NX)+OQCH(K,L,NY,NX)+OHC(K,L,NY,NX) &
+          OC=OC+OQC(K,L,NY,NX)+OQCH(K,L,NY,NX)+OHC(K,L,NY,NX) &
             +OQA(K,L,NY,NX)+OQAH(K,L,NY,NX)+OHA(K,L,NY,NX)
-          DN=DN+OQN(K,L,NY,NX)+OQNH(K,L,NY,NX)+OHN(K,L,NY,NX)
-          DC=DC+OQC(K,L,NY,NX)+OQCH(K,L,NY,NX)+OHC(K,L,NY,NX)
-        ENDIF
-        DO  M=1,jsken
-          OC=OC+OSC(M,K,L,NY,NX)
-          ON=ON+OSN(M,K,L,NY,NX)
-          OP=OP+OSP(M,K,L,NY,NX)
-          IF(K.LE.2)THEN
-            DC=DC+OSC(M,K,L,NY,NX)
-            DN=DN+OSN(M,K,L,NY,NX)
-            DP=DP+OSP(M,K,L,NY,NX)
+          ON=ON+OQN(K,L,NY,NX)+OQNH(K,L,NY,NX)+OHN(K,L,NY,NX)
+          OP=OP+OQP(K,L,NY,NX)+OQPH(K,L,NY,NX)+OHP(K,L,NY,NX)
+          IF(micpar%is_litter(K))THEN
+            DC=DC+OQC(K,L,NY,NX)+OQCH(K,L,NY,NX)+OHC(K,L,NY,NX) &
+                +OQA(K,L,NY,NX)+OQAH(K,L,NY,NX)+OHA(K,L,NY,NX)
+            DN=DN+OQN(K,L,NY,NX)+OQNH(K,L,NY,NX)+OHN(K,L,NY,NX)
+            DC=DC+OQC(K,L,NY,NX)+OQCH(K,L,NY,NX)+OHC(K,L,NY,NX)
           ENDIF
+          DO  M=1,jsken
+            OC=OC+OSC(M,K,L,NY,NX)
+            ON=ON+OSN(M,K,L,NY,NX)
+            OP=OP+OSP(M,K,L,NY,NX)
+            IF(micpar%is_litter(K))THEN
+              DC=DC+OSC(M,K,L,NY,NX)
+              DN=DN+OSN(M,K,L,NY,NX)
+              DP=DP+OSP(M,K,L,NY,NX)
+            ENDIF
+          ENDDO
         ENDDO
-      ENDDO
-      ORGC(L,NY,NX)=OC
-      ORGN(L,NY,NX)=ON
-      ORGR(L,NY,NX)=DC
-      CO2S(L,NY,NX)=CO2S(L,NY,NX)+FI*TCO2GS
-      CH4S(L,NY,NX)=CH4S(L,NY,NX)+FI*TCH4GS
-      OXYS(L,NY,NX)=OXYS(L,NY,NX)+FI*TOXYGS
-      Z2GS(L,NY,NX)=Z2GS(L,NY,NX)+FI*TZ2GSG
-      Z2OS(L,NY,NX)=Z2OS(L,NY,NX)+FI*TZ2OGS
-      H2GS(L,NY,NX)=H2GS(L,NY,NX)+FI*TH2GGS
-      ZNH4S(L,NY,NX)=ZNH4S(L,NY,NX)+FI*TNH4GS
-      ZNH3S(L,NY,NX)=ZNH3S(L,NY,NX)+FI*TNH3GS
-      ZNO3S(L,NY,NX)=ZNO3S(L,NY,NX)+FI*TNO3GS
-      ZNO2S(L,NY,NX)=ZNO2S(L,NY,NX)+FI*TNO2GS
-      H1PO4(L,NY,NX)=H1PO4(L,NY,NX)+FI*TP14GS
-      H2PO4(L,NY,NX)=H2PO4(L,NY,NX)+FI*TPO4GS
-      XN4(L,NY,NX)=XN4(L,NY,NX)+FI*TXN4G
-      XOH0(L,NY,NX)=XOH0(L,NY,NX)+FI*TXOH0G
-      XOH1(L,NY,NX)=XOH1(L,NY,NX)+FI*TXOH1G
-      XOH2(L,NY,NX)=XOH2(L,NY,NX)+FI*TXOH2G
-      XH1P(L,NY,NX)=XH1P(L,NY,NX)+FI*TXH1PG
-      XH2P(L,NY,NX)=XH2P(L,NY,NX)+FI*TXH2PG
-      PALPO(L,NY,NX)=PALPO(L,NY,NX)+FI*TALPOG
-      PFEPO(L,NY,NX)=PFEPO(L,NY,NX)+FI*TFEPOG
-      PCAPD(L,NY,NX)=PCAPD(L,NY,NX)+FI*TCAPDG
-      PCAPH(L,NY,NX)=PCAPH(L,NY,NX)+FI*TCAPHG
-      PCAPM(L,NY,NX)=PCAPM(L,NY,NX)+FI*TCAPMG
-      ZNH4FA(L,NY,NX)=ZNH4FA(L,NY,NX)+FI*TNH4FG
-      ZNH3FA(L,NY,NX)=ZNH3FA(L,NY,NX)+FI*TNH3FG
-      ZNHUFA(L,NY,NX)=ZNHUFA(L,NY,NX)+FI*TNHUFG
-      ZNO3FA(L,NY,NX)=ZNO3FA(L,NY,NX)+FI*TNO3FG
-      ZNHU0(L,NY,NX)=ZNHUX0
-      ZNHUI(L,NY,NX)=ZNHUXI
-      ZNFN0(L,NY,NX)=ZNFNX0
-      ZNFNI(L,NY,NX)=(TI*ZNFNI(L,NY,NX)+CORP*(FI*TZNFNI &
-        -TI*ZNFNI(L,NY,NX))+TX*ZNFNI(L,NY,NX)+FI*TZNFNG)/FI
-      TZNFN2=TZNFN2+ZNFNI(L,NY,NX)
-    ENDIF
-  ENDDO
-  ZNFN0(0,NY,NX)=ZNFNX0
-  ZNFNI(0,NY,NX)=ZNFNI(0,NY,NX)*XCORP0
-  TZNFN2=TZNFN2+TZNFNG
-  TZNFNI=TZNFNI+TZNFNG
-  DO  L=NU(NY,NX),LL
+        ORGC(L,NY,NX)=OC
+        ORGN(L,NY,NX)=ON
+        ORGR(L,NY,NX)=DC
+
+        DO NTS=ids_beg,idg_NH3
+          trc_solml(NTS,L,NY,NX)=trc_solml(NTS,L,NY,NX)+FI*TS0_solml(NTS)
+        ENDDO
+
+        DO NTS=ids_nut_beg,ids_nuts_end
+          trc_solml(NTS,L,NY,NX)=trc_solml(NTS,L,NY,NX)+FI*TS0_solml(NTS)
+        ENDDO
+
+        trcx_solml(idx_NH4,L,NY,NX)=trcx_solml(idx_NH4,L,NY,NX)+FI*TXN4G
+
+
+        DO NTX=idx_AEC+1,idx_anion_soil_end
+          trcx_solml(NTX,L,NY,NX)=trcx_solml(NTX,L,NY,NX)+FI*TX_anion(NTX)
+        ENDDO
+
+        DO NTP=idsp_psoi_beg,idsp_psoi_end
+          trcp_salml(NTP,L,NY,NX)=trcp_salml(NTP,L,NY,NX)+FI*TP_soil(NTP)
+        ENDDO
+
+        DO NTN=ifertn_beg,ifertn_end
+          FertN_soil(NTN,L,NY,NX)=FertN_soil(NTN,L,NY,NX)+FI*TFertNG_soil(NTN)
+        ENDDO
+
+        ZNHU0(L,NY,NX)=ZNHUX0
+        ZNHUI(L,NY,NX)=ZNHUXI
+        ZNFN0(L,NY,NX)=ZNFNX0
+        ZNFNI(L,NY,NX)=(TI*ZNFNI(L,NY,NX)+CORP*(FI*TZNFNI &
+          -TI*ZNFNI(L,NY,NX))+TX*ZNFNI(L,NY,NX)+FI*TZNFNG)/FI
+        TZNFN2=TZNFN2+ZNFNI(L,NY,NX)
+      ENDIF
+    ENDDO D2000
+
+! nitrogen inhibitor
+    ZNFN0(0,NY,NX)=ZNFNX0
+    ZNFNI(0,NY,NX)=ZNFNI(0,NY,NX)*XCORP0
+    TZNFN2=TZNFN2+TZNFNG
+    TZNFNI=TZNFNI+TZNFNG
+    DO  L=NU(NY,NX),LL
       IF(TZNFN2.GT.ZERO)THEN
       ZNFNI(L,NY,NX)=ZNFNI(L,NY,NX)*TZNFNI/TZNFN2
-      ZNFNI(L,NY,NX)=ZNFNI(L,NY,NX) &
-      +0.5*(ZNFN0(L,NY,NX)-ZNFNI(L,NY,NX))
+      ZNFNI(L,NY,NX)=ZNFNI(L,NY,NX)+0.5_r8*(ZNFN0(L,NY,NX)-ZNFNI(L,NY,NX))
       ENDIF
-  ENDDO
+    ENDDO
   ENDIF
   end subroutine ApplyTillageMixing
+
+
+!--------------------------------------------------------------------------------
+
+  subroutine MixSoluteH(L,NY,NX)
+  implicit none
+  integer, intent(in) :: L,NY,NX
+  integer :: NTS,NTSA
+
+  DO NTS=ids_beg,ids_end
+    trc_soHml(NTS,L,NY,NX)=XCORP(NY,NX)*trc_soHml(NTS,L,NY,NX)
+  ENDDO
+
+  DO NTSA=idsa_beg,idsa_end
+    trcsa_soHml(ntsa,L,NY,NX)=XCORP(NY,NX)*trcsa_soHml(ntsa,L,NY,NX)
+  ENDDO
+  end subroutine MixSoluteH
+
 
 end module TillageMixMod

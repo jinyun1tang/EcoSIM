@@ -7,7 +7,7 @@
 !     GRID CELL AT THE END OF THE SCENE WITH FILE NAME PREFIXES
 !     INDICATING ITS COLUMN AND ROW POSITION.
 !
-      use data_kind_mod, only : r8 => SHR_KIND_R8
+      use data_kind_mod, only : r8 => DAT_KIND_R8
   use GridConsts
   use ClimForcDataType, only : DOY
   use EcoSIMHistMod

@@ -1,10 +1,12 @@
 module ForcTypeMod
-  use data_kind_mod     , only : r8 => SHR_KIND_R8
+  use data_kind_mod     , only : r8 => DAT_KIND_R8
   use EcoSimConst
   use TracerPropMod
   use EcoSIMSolverPar
+  use TracerIDMod
   use ChemTracerParsMod
   use MiniFuncMod
+  use minimathmod, only : AZMAX1
 implicit none
 
   character(len=*),private, parameter :: mod_filename = __FILE__
@@ -78,12 +80,12 @@ implicit none
     real(r8), allocatable :: OQN(:)
     real(r8), allocatable :: OQP(:)
     real(r8), allocatable :: OQA(:)
-    real(r8), allocatable :: OMC(:,:,:,:)
-    real(r8), allocatable :: OMN(:,:,:,:)
-    real(r8), allocatable :: OMP(:,:,:,:)
-    real(r8), allocatable :: OMCff(:,:,:)
-    real(r8), allocatable :: OMNff(:,:,:)
-    real(r8), allocatable :: OMPff(:,:,:)
+    real(r8), allocatable :: OMC(:,:,:)
+    real(r8), allocatable :: OMN(:,:,:)
+    real(r8), allocatable :: OMP(:,:,:)
+    real(r8), allocatable :: OMCff(:,:)
+    real(r8), allocatable :: OMNff(:,:)
+    real(r8), allocatable :: OMPff(:,:)
 
 !    real(r8) :: COXQ        !surface irrigation  O2 concentration, [g m-3]
 !    real(r8) :: COXR        !precipitation  O2 concentration, [g m-3]
@@ -229,42 +231,43 @@ implicit none
   implicit none
   type(forc_type), intent(inout) :: forc
   character(len=*), intent(in) :: fname
-  integer :: jcplx1,JG,ndbiomcp,nlbiomcp
-  integer :: NFGs,jsken
+  integer :: jcplx,ndbiomcp,nlbiomcp
+  integer :: NFGs,jsken,NMICBSO,NMICBSA
   type(file_desc_t) :: ncf
 
   call ncd_pio_openfile(ncf, fname, ncd_nowrite)
 
-  jcplx1=get_dim_len(ncf,'jcplx')-1
+  jcplx=get_dim_len(ncf,'jcplx')
   jsken =get_dim_len(ncf,'jsken')
-  JG    =get_dim_len(ncf,'JG')
+  NMICBSO=get_dim_len(ncf,'NMICBSO')
+  NMICBSA=get_dim_len(ncf,'NMICBSA')
   nlbiomcp=get_dim_len(ncf,'nlbiomcp')
   ndbiomcp=get_dim_len(ncf,'ndbiomcp')
   NFGs    =get_dim_len(ncf,'NFGs')
-  allocate(forc%OMC(nlbiomcp,JG,NFGs,0:jcplx1))
-  allocate(forc%OMN(nlbiomcp,JG,NFGs,0:jcplx1))
-  allocate(forc%OMP(nlbiomcp,JG,NFGs,0:jcplx1))
-  allocate(forc%OQC(0:jcplx1))
-  allocate(forc%OQN(0:jcplx1))
-  allocate(forc%OQP(0:jcplx1))
-  allocate(forc%OQA(0:jcplx1))
-  allocate(forc%OSC(jsken,0:jcplx1))
-  allocate(forc%OSA(jsken,0:jcplx1))
-  allocate(forc%OSN(jsken,0:jcplx1))
-  allocate(forc%OSP(jsken,0:jcplx1))
-  allocate(forc%ORC(ndbiomcp,0:jcplx1))
-  allocate(forc%ORN(ndbiomcp,0:jcplx1))
-  allocate(forc%ORP(ndbiomcp,0:jcplx1))
-  allocate(forc%OMCff(nlbiomcp,JG,NFGs))
-  allocate(forc%OMNff(nlbiomcp,JG,NFGs))
-  allocate(forc%OMPff(nlbiomcp,JG,NFGs))
-  allocate(forc%OHC(0:jcplx1))
-  allocate(forc%OHN(0:jcplx1))
-  allocate(forc%OHP(0:jcplx1))
-  allocate(forc%OHA(0:jcplx1))
+  allocate(forc%OMC(nlbiomcp,NMICBSO,1:jcplx))
+  allocate(forc%OMN(nlbiomcp,NMICBSO,1:jcplx))
+  allocate(forc%OMP(nlbiomcp,NMICBSO,1:jcplx))
+  allocate(forc%OQC(1:jcplx))
+  allocate(forc%OQN(1:jcplx))
+  allocate(forc%OQP(1:jcplx))
+  allocate(forc%OQA(1:jcplx))
+  allocate(forc%OSC(jsken,1:jcplx))
+  allocate(forc%OSA(jsken,1:jcplx))
+  allocate(forc%OSN(jsken,1:jcplx))
+  allocate(forc%OSP(jsken,1:jcplx))
+  allocate(forc%ORC(ndbiomcp,1:jcplx))
+  allocate(forc%ORN(ndbiomcp,1:jcplx))
+  allocate(forc%ORP(ndbiomcp,1:jcplx))
+  allocate(forc%OMCff(nlbiomcp,NMICBSA))
+  allocate(forc%OMNff(nlbiomcp,NMICBSA))
+  allocate(forc%OMPff(nlbiomcp,NMICBSA))
+  allocate(forc%OHC(1:jcplx))
+  allocate(forc%OHN(1:jcplx))
+  allocate(forc%OHP(1:jcplx))
+  allocate(forc%OHA(1:jcplx))
   allocate(forc%CFOMC(ndbiomcp))
-  allocate(forc%CNOSC(1:jsken,0:jcplx1))
-  allocate(forc%CPOSC(1:jsken,0:jcplx1))
+  allocate(forc%CNOSC(1:jsken,1:jcplx))
+  allocate(forc%CPOSC(1:jsken,1:jcplx))
   call ncd_getvar(ncf,'ZNH4S',forc%ZNH4S)
   call ncd_getvar(ncf,'ZNO3S',forc%ZNO3S)
   call ncd_getvar(ncf,'ZNO2S',forc%ZNO2S)
@@ -436,13 +439,13 @@ implicit none
   if(first .or. forctype ==0 .or. forctype==2)then
 
     TCS=TKS-TC2K
-    forc%SCH4L=gas_solubility(id_ch4g,TCS)
-    forc%SOXYL=gas_solubility(id_o2g, TCS)
-    forc%SCO2L=gas_solubility(id_co2g, TCS)     !solubility of CO2, [m3 m-3]
-    forc%SN2GL=gas_solubility(id_n2g, TCS)      !solubility of N2, [m3 m-3]
-    forc%SN2OL=gas_solubility(id_n2og, TCS)     !solubility of N2O, [m3 m-3]
-    forc%SNH3L=gas_solubility(id_nh3g, TCS)     !solubility of NH3, [m3 m-3]
-    forc%SH2GL=gas_solubility(id_h2g, TCS)       !solubility of H2, [m3 m-3]
+    forc%SCH4L=gas_solubility(idg_CH4,TCS)
+    forc%SOXYL=gas_solubility(idg_O2, TCS)
+    forc%SCO2L=gas_solubility(idg_CO2, TCS)     !solubility of CO2, [m3 m-3]
+    forc%SN2GL=gas_solubility(idg_N2, TCS)      !solubility of N2, [m3 m-3]
+    forc%SN2OL=gas_solubility(idg_N2O, TCS)     !solubility of N2O, [m3 m-3]
+    forc%SNH3L=gas_solubility(idg_NH3, TCS)     !solubility of NH3, [m3 m-3]
+    forc%SH2GL=gas_solubility(idg_H2, TCS)       !solubility of H2, [m3 m-3]
 
 
     forc%CCO2E=forc%CO2E*5.36E-04_r8*Tref/TKS    ![gC/m3]
@@ -471,7 +474,7 @@ implicit none
     scalar=forc%TFND*XNPD
     forc%DFGS=fDFGS(scalar,THETW,Z3S)
 
-    DFLG2=2.0_r8*AMAX1(0.0_r8,forc%THETPM)*POROQ &
+    DFLG2=2.0_r8*AZMAX1(forc%THETPM)*POROQ &
       *forc%THETPM/forc%POROS*forc%AREA3/forc%DLYR3
     TFACG=TEFGASDIF(forc%TKS)
     forc%CGSGL=CGSG*TFACG*DFLG2

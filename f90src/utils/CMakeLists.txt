@@ -3,21 +3,16 @@ set(ECOSIM_UTIL_SOURCES
   data_const_mod.F90
   shr_assert_mod.F90
   shr_infnan_mod.F90
-  LinearAlgebraMod.F90
-  MiniMathMod.F90
-  MiniFuncMod.F90
+  ncdio_pio.F90
   abortutils.F90
   TestMod.F90
   clock.c
   getfilename.c
   timings.F90
   fileUtil.F90
-  EcoSIMSolverPar.F90
   EcoSimConst.F90
-  EcoSIMConfig.F90
   ecosim_log_mod.F90
   ecosim_time_mod.F90
-  MiscUtilMod.F90
   ModelStatusType.F90
 )
 

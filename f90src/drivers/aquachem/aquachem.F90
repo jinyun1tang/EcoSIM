@@ -43,12 +43,13 @@ end subroutine usage
 ! ----------------------------------------------------------------------
 
 subroutine RunModel(namelist_buffer)
-  use ecosim_Time_Mod, only : ecosim_time_type
-  use ModelStatusType, only : model_status_type
-  use data_kind_mod  , only : r8 => SHR_KIND_R8
+  use ecosim_Time_Mod  , only : ecosim_time_type
+  use ModelStatusType  , only : model_status_type
+  use data_kind_mod    , only : r8 => DAT_KIND_R8
   use ecosim_log_mod   , only : errMsg => shr_log_errMsg
+  use abortutils       , only : endrun
   use AquachemMod
-  use histMod
+  use bhistMod
   use fileUtil
   implicit none
   character(len=*), intent(in) :: namelist_buffer
@@ -159,7 +160,7 @@ subroutine RunModel(namelist_buffer)
     call hist%hist_wrap(ystatesf, timer)
 
     if(timer%its_a_new_year())then
-      write(iulog,*)'year ',timer%get_cur_year()
+      write(iulog,*)'year ',timer%get_curr_year()
     endif
     if(timer%its_time_to_exit())exit
   enddo

@@ -1,7 +1,9 @@
 module EcosimConst
-  use data_kind_mod, only : r8 => SHR_KIND_R8
+  use data_kind_mod, only : r8 => DAT_KIND_R8
   implicit none
   character(len=*),private, parameter :: mod_filename = __FILE__
+  real(r8), parameter :: secspday=86400._r8
+  real(r8), parameter :: secspyear=86400._r8*365._r8   !seconds in a normal year
   real(r8), parameter :: Cpw=4.19_r8           !heat capacity for water
   real(r8), parameter :: cpi=1.9274_r8         !heat capacity for ice
   real(r8), parameter :: cpo=2.496E-06_r8      !heat capacity for organic matter
@@ -16,7 +18,8 @@ module EcosimConst
   real(r8), parameter :: VHCPNMin=4.190E-03_r8 !minimum heat capacities for solving
                                                !soil water and heat fluxes, [MJ/K]
   real(r8), parameter :: PICON=3.14159265358979323846_r8
-  real(r8), parameter :: PICON2=PICON*0.5_r8
+  real(r8), parameter :: PICON2h=PICON*0.5_r8
+  real(r8), parameter :: PICON2s=PICON*2._r8
   real(r8), PARAMETER :: PSIPS=-0.5E-03_r8
   real(r8), parameter :: RDN=57.29577951_r8
   real(r8), parameter :: VAP=2465.0_r8         !latent heat of vaporization of water, kJ/kg
@@ -40,4 +43,6 @@ module EcosimConst
   real(r8), parameter :: Patomw=31._r8         !P 31 molar mass [g/mol]
   integer :: ICOR(12)=(/1,-1,0,0,1,1,2,3,3,4,4,5/)
   real(r8), parameter :: TWILGT=0.06976_r8
+  real(r8), parameter :: MWC2Soil=1.82E-06_r8  !convert organic carbon (g C/d2) to soil mass (Mg/d2)
+  real(r8), parameter :: ppmc=1.0E-06_r8        !part per million
 end module EcosimConst

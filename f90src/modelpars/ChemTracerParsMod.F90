@@ -1,5 +1,5 @@
 module ChemTracerParsMod
-  use data_kind_mod, only : r8 => SHR_KIND_R8
+  use data_kind_mod, only : r8 => DAT_KIND_R8
   implicit none
   public
   save
@@ -61,13 +61,17 @@ module ChemTracerParsMod
   real(r8), parameter :: SN2OX=5.241E-01_r8  !N2O solubility coeficient
   real(r8), parameter :: SNH3X=2.852E+02_r8  !NH3 solubility coeficient
   real(r8), parameter :: SH2GX=3.156E-02_r8  !H2 solubility coeficient
-  real(r8), parameter :: ACO2X=0.14_r8  !CO2 activity coefficient
-  real(r8), parameter :: ACH4X=0.14_r8  !CH4 activity coefficient
-  real(r8), parameter :: AOXYX=0.31_r8  !O2 activity coefficient
-  real(r8), parameter :: AN2GX=0.23_r8  !N2 activity coefficient
-  real(r8), parameter :: AN2OX=0.23_r8  !N2O activity coefficient
-  real(r8), parameter :: ANH3X=0.07_r8  !NH3 activity coefficient
-  real(r8), parameter :: AH2GX=0.14_r8  !H2 activity coefficient
+
+
+  real(r8), parameter :: ACTCG(7)=real((/0.14,0.14,0.31,0.23,0.23,0.14,0.07/),r8)
+
+!  real(r8), parameter :: ACO2X=0.14_r8  !CO2 activity coefficient
+!  real(r8), parameter :: ACH4X=0.14_r8  !CH4 activity coefficient
+!  real(r8), parameter :: AOXYX=0.31_r8  !O2 activity coefficient
+!  real(r8), parameter :: AN2GX=0.23_r8  !N2 activity coefficient
+!  real(r8), parameter :: AN2OX=0.23_r8  !N2O activity coefficient
+!  real(r8), parameter :: AH2GX=0.14_r8  !H2 activity coefficient
+!  real(r8), parameter :: ANH3X=0.07_r8  !NH3 activity coefficient
   real(r8), parameter :: VISCW=1.0E-06_r8 !water viscosity (Mg m-1 s)
 
 end module ChemTracerParsMod

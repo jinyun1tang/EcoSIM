@@ -3,7 +3,7 @@ module timings
 ! Description:
 ! code to do runtime timing
 !
-  use data_kind_mod, only : r8 => SHR_KIND_R8
+  use data_kind_mod, only : r8 => DAT_KIND_R8
 
   implicit none
   private

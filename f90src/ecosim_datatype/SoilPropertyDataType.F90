@@ -1,38 +1,38 @@
 module SoilPropertyDataType
-  use data_kind_mod, only : r8 => SHR_KIND_R8
+  use data_kind_mod, only : r8 => DAT_KIND_R8
   use GridConsts
 implicit none
 
   save
   character(len=*), private, parameter :: mod_filename = __FILE__
 
-   real(r8) ,allocatable ::  CORGCI(:,:,:)                    !soil organic C content   [g kg-1]
-   real(r8) ,allocatable ::  POROSI(:,:,:)                    !soil porosity            [m3 m-3]
-   real(r8) ,allocatable ::  FHOLI(:,:,:)                     !soil macropore fraction
-   real(r8) ,allocatable ::  CSAND(:,:,:)                     !soil sand content [kg Mg-1]
-   real(r8) ,allocatable ::  CSILT(:,:,:)                     !soil silt content [kg Mg-1]
-   real(r8) ,allocatable ::  CCLAY(:,:,:)                     !soil clay content [kg Mg-1]
-   real(r8) ,allocatable ::  ROCK(:,:,:)                      !Rock fraction
-   real(r8) ,allocatable ::  BKDSI(:,:,:)                     !initial bulk density [Mg m-3,0=water]
-   real(r8) ,allocatable ::  FMPR(:,:,:)                      !micropore fraction
-   real(r8) ,allocatable ::  FHOL(:,:,:)                      !macropore fraction
-   real(r8) ,allocatable ::  PHOL(:,:,:)                      !path length between macopores
-   real(r8) ,allocatable ::  HRAD(:,:,:)                      !radius of macropores
-   real(r8) ,allocatable ::  BKDS(:,:,:)                      !soil bulk density, [Mg m-3]
-   integer  ,allocatable ::  NHOL(:,:,:)                      !number of macropores
-   real(r8) ,allocatable ::  POROS(:,:,:)                     !soil porosity
-   real(r8) ,allocatable ::  VOLX(:,:,:)                      !volume of soil layer	m3 d-2
-   real(r8) ,allocatable ::  VOLY(:,:,:)                      !micropore volume
-   real(r8) ,allocatable ::  BKVL(:,:,:)                      !mass of soil layer	Mg d-2
-   real(r8) ,allocatable ::  BKVLNM(:,:)                      !minimum soil layer mass
-   real(r8) ,allocatable ::  BKVLNU(:,:)                      !maximum soil layer mass
-   real(r8) ,allocatable ::  SAND(:,:,:)                      !soil sand content	Mg d-2
-   real(r8) ,allocatable ::  SILT(:,:,:)                      !soil silt content	Mg d-2
-   real(r8) ,allocatable ::  CLAY(:,:,:)                      !soil clay content	Mg d-2
-   real(r8) ,allocatable ::  VOLA(:,:,:)                      !total volume in micropores
-   real(r8) ,allocatable ::  VOLAH(:,:,:)                     !total volume in macropores
-   real(r8) ,allocatable ::  VOLT(:,:,:)                      !soil volume including  macropores+rock [m3 d-2]
-   real(r8) ,allocatable ::  VOLTI(:,:,:)                     !initial soil volume including  macropores+rock [m3 d-2]
+   real(r8) ,target,allocatable ::  CORGCI(:,:,:)                    !soil organic C content   [g kg-1]
+   real(r8) ,target,allocatable ::  POROSI(:,:,:)                    !soil porosity            [m3 m-3]
+   real(r8) ,target,allocatable ::  FHOLI(:,:,:)                     !soil macropore fraction
+   real(r8) ,target,allocatable ::  CSAND(:,:,:)                     !soil sand content [kg Mg-1]
+   real(r8) ,target,allocatable ::  CSILT(:,:,:)                     !soil silt content [kg Mg-1]
+   real(r8) ,target,allocatable ::  CCLAY(:,:,:)                     !soil clay content [kg Mg-1]
+   real(r8) ,target,allocatable ::  ROCK(:,:,:)                      !Rock fraction
+   real(r8) ,target,allocatable ::  BKDSI(:,:,:)                     !initial bulk density [Mg m-3,0=water]
+   real(r8) ,target,allocatable ::  FMPR(:,:,:)                      !micropore fraction
+   real(r8) ,target,allocatable ::  FHOL(:,:,:)                      !macropore fraction
+   real(r8) ,target,allocatable ::  PHOL(:,:,:)                      !path length between macopores
+   real(r8) ,target,allocatable ::  HRAD(:,:,:)                      !radius of macropores
+   real(r8) ,target,allocatable ::  BKDS(:,:,:)                      !soil bulk density, [Mg m-3]
+   integer  ,target,allocatable ::  NHOL(:,:,:)                      !number of macropores
+   real(r8) ,target,allocatable ::  POROS(:,:,:)                     !soil porosity
+   real(r8) ,target,allocatable ::  VOLX(:,:,:)                      !volume of soil layer	m3 d-2
+   real(r8) ,target,allocatable ::  VOLY(:,:,:)                      !micropore volume
+   real(r8) ,target,allocatable ::  BKVL(:,:,:)                      !mass of soil layer	Mg d-2
+   real(r8) ,target,allocatable ::  BKVLNM(:,:)                      !minimum soil layer mass
+   real(r8) ,target,allocatable ::  BKVLNU(:,:)                      !maximum soil layer mass
+   real(r8) ,target,allocatable ::  SAND(:,:,:)                      !soil sand content	Mg d-2
+   real(r8) ,target,allocatable ::  SILT(:,:,:)                      !soil silt content	Mg d-2
+   real(r8) ,target,allocatable ::  CLAY(:,:,:)                      !soil clay content	Mg d-2
+   real(r8) ,target,allocatable ::  VOLA(:,:,:)                      !total volume in micropores
+   real(r8) ,target,allocatable ::  VOLAH(:,:,:)                     !total volume in macropores
+   real(r8) ,target,allocatable ::  VOLT(:,:,:)                      !soil volume including  macropores+rock [m3 d-2]
+   real(r8) ,target,allocatable ::  VOLTI(:,:,:)                     !initial soil volume including  macropores+rock [m3 d-2]
   private :: InitAllocate
 
 contains

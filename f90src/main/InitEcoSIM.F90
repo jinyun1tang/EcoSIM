@@ -1,5 +1,8 @@
 module InitEcoSIM
-
+!
+!! DESCRIPTION
+! initialize the data structure for EcoSIM
+  use EcoSIMCtrlMod
   implicit none
   private
   character(len=*),private, parameter :: mod_filename = __FILE__
@@ -8,7 +11,8 @@ module InitEcoSIM
   contains
 
   subroutine InitModules(nmicbguilds)
-
+  use EcoSiMParDataMod    , only : micpar,pltpar
+  use EcoSimSumDataType   , only : InitEcoSimSum
   use SnowDataType        , only : InitSnowData
   use ErosionMod          , only : InitErosion
   use FlagDataType        , only : InitFlagData
@@ -30,14 +34,14 @@ module InitEcoSIM
   use ChemTranspDataType  , only : InitChemTranspData
   use FertilizerDataType  , only : InitFertilizerData
   use CanopyRadDataType   , only : InitCanopyRad
-  use GrosubsMod           , only : InitGrosub
+  use GrosubsMod          , only : InitGrosub
   use WatsubMod           , only : initWatsub
   use AqueChemDatatype    , only : initaquachem
   use PlantDataRateType   , only : InitPlantRates
   use PlantDisturbsMod     , only : InitPlantDisturbance
   use PlantTraitDataType   , only : InitPlantTraits
   use UptakesMod           , only : InitUptake
-  use Hour1Mod            , only : InitHour1
+  use Hour1Mod             , only : InitHour1
   use SoilPropertyDataType, only : InitSoilProperty
   use SurfLitterDataType  , only : InitSurfLitter
   use IrrigationDataType  , only : InitIrrigation
@@ -48,14 +52,24 @@ module InitEcoSIM
   use PlantMngmtDataType  , only : InitPlantMngmtData
   use InitSOMBGCMod       , only : InitSOMBGC
   use GridConsts
+  use HistDataType        , only : hist_ecosim
   use EcoSIMConfig        , only : jcplx1 => jcplx1c
+  use TracerIDMod         , only : InitTracerIDs
   implicit  none
+  
   integer                 , intent(in) :: nmicbguilds   !number of microbial guilds per group
 
 ! begin_execution
+
   call InitSOMBGC(nmicbguilds)
 
+  call InitPlantMorphSize()
+
+  call InitGrosub(jpstgs,JRS)
+
   call InitGridData
+
+  call InitTracerIDs(salt_model)
 
   call InitLandSurfData
 
@@ -69,11 +83,11 @@ module InitEcoSIM
 
   call InitPlantMngmtData
 
-  call InitPlantRates
+  call InitPlantRates(micpar%n_pltlitrk,pltpar%jroots)
 
   call InitSoilProperty
 
-  call InitSurfLitter
+  call InitSurfLitter(micpar%n_litrsfk)
 
   call InitSedimentData
 
@@ -81,27 +95,25 @@ module InitEcoSIM
 
   call InitIrrigation
 
-  call InitPlantAPIData(JZ,JC,JP,JSA,jcplx1,JLI,JLA,JNODS)
+  call InitPlantAPIData()
 
   call InitMicrobialData
 
   call InitChemTranspData
 
-  call InitSoilBGCData
+  call InitSoilBGCData(pltpar%n_pltlitrk)
 
-  call InitSOMData
+  call InitSOMData(micpar%n_litrsfk)
 
   call InitFertilizerData
 
-  call InitPlantTraits
+  call InitPlantTraits(pltpar%n_pltlitrk)
 
   call InitFlagData
 
   call InitPlantDisturbance
 
-  call InitHour1
-
-  call InitGrosub
+  call InitHour1(micpar%n_litrsfk)
 
   call InitUptake
 
@@ -111,7 +123,7 @@ module InitEcoSIM
 
   call InitRedist
 
-  call InitRootData
+  call InitRootData(pltpar%jroots)
 
   call InitClimForcData
 
@@ -129,6 +141,12 @@ module InitEcoSIM
 
   call InitErosion
 
+  call InitEcoSimSum
+
+  call InitModules2
+    
+  call hist_ecosim%Init(bounds)
+
   end subroutine InitModules
 
 !------------------------------------------------------------------------------------------
@@ -142,7 +160,7 @@ module InitEcoSIM
   implicit none
 
 
-  if(ISALTG/=0)then
+  if(salt_model)then
     call InitTrnsfrs
   else
     call InitTrnsfr
@@ -150,4 +168,36 @@ module InitEcoSIM
 
 
   end subroutine InitModules2
+
+!------------------------------------------------------------------------------------------
+  subroutine InitPlantMorphSize()
+  use EcoSiMParDataMod, only : pltpar,micpar
+  use GridConsts
+  implicit none
+
+  pltpar%JZ1    = JZ
+  pltpar%JC1    = JC
+  pltpar%JP1    = JP
+  pltpar%JLA1   = JLA
+  pltpar%JSA1   = JSA
+  pltpar%JLI1   = JLI
+  pltpar%JNODS1 = JNODS
+  pltpar%iprotein =micpar%iprotein
+  pltpar%icarbhyro=micpar%icarbhyro
+  pltpar%icellulos=micpar%icellulos
+  pltpar%ilignin  =micpar%ilignin
+  pltpar%k_woody_litr=micpar%k_woody_litr
+  pltpar%k_fine_litr=micpar%k_fine_litr
+  !the following variable should be consistent with the soil bgc model
+  pltpar%jcplx= micpar%jcplx
+  pltpar%n_pltlitrk=micpar%n_pltlitrk
+  pltpar%jsken  = micpar%jsken
+  pltpar%Jlitgrp= 5     !number of liter groups
+  pltpar%JBR    = 10    !number of branches
+  JBR=pltpar%JBR
+  Jlitgrp=pltpar%Jlitgrp
+  JRS=pltpar%JRS
+
+
+  end subroutine InitPlantMorphSize
 end module InitEcoSIM

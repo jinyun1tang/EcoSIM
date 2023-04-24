@@ -1,6 +1,6 @@
 module SoluteMod
-  use data_kind_mod, only : r8 => SHR_KIND_R8
-  use minimathmod, only : test_aeqb,AZMAX1
+  use data_kind_mod, only : r8 => DAT_KIND_R8
+  use minimathmod, only : test_aeqb,AZMAX1,AZMIN1
   use SoluteParMod
   use SOMDataType
   use EcosimConst
@@ -48,10 +48,8 @@ module SoluteMod
   type(chem_var_type), intent(inout) :: chemvar
   type(solute_flx_type), intent(inout) :: solflx
 
-  IF(ISALTG.NE.0)THEN
-
+  IF(salt_model)THEN
     call SaltChemEquilibria(chemvar,solflx)
-
   ELSE
     call NoSaltChemEquilibria(chemvar,solflx)
   ENDIF
@@ -103,14 +101,14 @@ module SoluteMod
 !     RSNUBB=rate of banded urea fertilizer dissolution in band
 !     RSNOBB=rate of banded NO3 fertilizer dissolution in band
 !
-  ZNH4FA(L,NY,NX)=ZNH4FA(L,NY,NX)-RSN4AA-RSN4BA
-  ZNH3FA(L,NY,NX)=ZNH3FA(L,NY,NX)-RSN3AA-RSN3BA
-  ZNHUFA(L,NY,NX)=ZNHUFA(L,NY,NX)-RSNUAA-RSNUBA
-  ZNO3FA(L,NY,NX)=ZNO3FA(L,NY,NX)-RSNOAA-RSNOBA
-  ZNH4FB(L,NY,NX)=ZNH4FB(L,NY,NX)-RSN4BB
-  ZNH3FB(L,NY,NX)=ZNH3FB(L,NY,NX)-RSN3BB
-  ZNHUFB(L,NY,NX)=ZNHUFB(L,NY,NX)-RSNUBB
-  ZNO3FB(L,NY,NX)=ZNO3FB(L,NY,NX)-RSNOBB
+  FertN_soil(ifert_nh4,L,NY,NX)=FertN_soil(ifert_nh4,L,NY,NX)-RSN4AA-RSN4BA
+  FertN_soil(ifert_nh3,L,NY,NX)=FertN_soil(ifert_nh3,L,NY,NX)-RSN3AA-RSN3BA
+  FertN_soil(ifert_urea,L,NY,NX)=FertN_soil(ifert_urea,L,NY,NX)-RSNUAA-RSNUBA
+  FertN_soil(ifert_no3,L,NY,NX)=FertN_soil(ifert_no3,L,NY,NX)-RSNOAA-RSNOBA
+  FertN_band(ifert_nh4_band,L,NY,NX)=FertN_band(ifert_nh4_band,L,NY,NX)-RSN4BB
+  FertN_band(ifert_nh3_band,L,NY,NX)=FertN_band(ifert_nh3_band,L,NY,NX)-RSN3BB
+  FertN_band(ifert_urea_band,L,NY,NX)=FertN_band(ifert_urea_band,L,NY,NX)-RSNUBB
+  FertN_band(ifert_no3_band,L,NY,NX)=FertN_band(ifert_no3_band,L,NY,NX)-RSNOBB
 !
 !     ADD FERTILIZER DISSOLUTION TO ION FLUXES AND CONVERT TO MASS
 !
@@ -188,15 +186,15 @@ module SoluteMod
 !     TFNQ=temperature effect on microbial activity from nitro.f
 !     ZNHUI=current inhibition activity
 !
-  IF(ZNHUFA(L,NY,NX).GT.ZEROS(NY,NX).AND.BKVL(L,NY,NX).GT.ZEROS(NY,NX))THEN
-    CNHUA=ZNHUFA(L,NY,NX)/BKVL(L,NY,NX)
+  IF(FertN_soil(ifert_urea,L,NY,NX).GT.ZEROS(NY,NX).AND.BKVL(L,NY,NX).GT.ZEROS(NY,NX))THEN
+    CNHUA=FertN_soil(ifert_urea,L,NY,NX)/BKVL(L,NY,NX)
   ELSEIF(VOLW(L,NY,NX).GT.ZEROS2(NY,NX))THEN
-    CNHUA=ZNHUFA(L,NY,NX)/VOLW(L,NY,NX)
+    CNHUA=FertN_soil(ifert_urea,L,NY,NX)/VOLW(L,NY,NX)
   ELSE
     CNHUA=0._r8
   ENDIF
   DFNSA=CNHUA/(CNHUA+DUKD)
-  RSNUA=AMIN1(ZNHUFA(L,NY,NX),SPNHU*TOQCK(L,NY,NX)*DFNSA*TFNQ(L,NY,NX))*(1.0-ZNHUI(L,NY,NX))
+  RSNUA=AMIN1(FertN_soil(ifert_urea,L,NY,NX),SPNHU*TOQCK(L,NY,NX)*DFNSA*TFNQ(L,NY,NX))*(1.0-ZNHUI(L,NY,NX))
 !
 !     UREA CONCENTRATION AND HYDROLYSIS IN BAND
 !
@@ -207,15 +205,15 @@ module SoluteMod
 !     SPNHU=specific rate constant for urea hydrolysis
 !     TFNQ=temperature effect on microbial activity from nitro.f
 !
-  IF(ZNHUFB(L,NY,NX).GT.ZEROS(NY,NX).AND.BKVL(L,NY,NX).GT.ZEROS(NY,NX))THEN
-    CNHUB=ZNHUFB(L,NY,NX)/BKVL(L,NY,NX)
+  IF(FertN_band(ifert_urea_band,L,NY,NX).GT.ZEROS(NY,NX).AND.BKVL(L,NY,NX).GT.ZEROS(NY,NX))THEN
+    CNHUB=FertN_band(ifert_urea_band,L,NY,NX)/BKVL(L,NY,NX)
   ELSEIF(VOLW(L,NY,NX).GT.ZEROS2(NY,NX))THEN
-    CNHUB=ZNHUFB(L,NY,NX)/VOLW(L,NY,NX)
+    CNHUB=FertN_band(ifert_urea_band,L,NY,NX)/VOLW(L,NY,NX)
   ELSE
     CNHUB=0._r8
   ENDIF
   DFNSB=CNHUB/(CNHUB+DUKD)
-  RSNUB=AMIN1(ZNHUFB(L,NY,NX),SPNHU*TOQCK(L,NY,NX)*DFNSB*TFNQ(L,NY,NX))*(1.0-ZNHUI(L,NY,NX))
+  RSNUB=AMIN1(FertN_band(ifert_urea_band,L,NY,NX),SPNHU*TOQCK(L,NY,NX)*DFNSB*TFNQ(L,NY,NX))*(1.0-ZNHUI(L,NY,NX))
 
   end subroutine UreaHydrolysis
 !------------------------------------------------------------------------
@@ -330,18 +328,18 @@ module SoluteMod
 !     VLPO4,VLPOB=fractions of soil volume in H2PO4 non-band,band
 !     THETW=soil water concentration
 !
-  RSN4AA=SPNH4*ZNH4FA(L,NY,NX)*VLNH4(L,NY,NX)*THETW(L,NY,NX)
-  RSN3AA=SPNH3*ZNH3FA(L,NY,NX)*VLNH4(L,NY,NX)
-  RSNUAA=RSNUA*VLNH4(L,NY,NX)*THETW(L,NY,NX)
-  RSNOAA=SPNO3*ZNO3FA(L,NY,NX)*VLNO3(L,NY,NX)*THETW(L,NY,NX)
-  RSN4BA=SPNH4*ZNH4FA(L,NY,NX)*VLNHB(L,NY,NX)*THETW(L,NY,NX)
-  RSN3BA=SPNH3*ZNH3FA(L,NY,NX)*VLNHB(L,NY,NX)
-  RSNUBA=RSNUA*VLNHB(L,NY,NX)*THETW(L,NY,NX)
-  RSNOBA=SPNO3*ZNO3FA(L,NY,NX)*VLNOB(L,NY,NX)*THETW(L,NY,NX)
-  RSN4BB=SPNH4*ZNH4FB(L,NY,NX)*THETW(L,NY,NX)
-  RSN3BB=SPNH3*ZNH3FB(L,NY,NX)
-  RSNUBB=RSNUB*VLNHB(L,NY,NX)*THETW(L,NY,NX)
-  RSNOBB=SPNO3*ZNO3FB(L,NY,NX)*THETW(L,NY,NX)
+  RSN4AA=SPNH4*FertN_soil(ifert_nh4,L,NY,NX)*trcs_VLN(ids_NH4,L,NY,NX)*THETW(L,NY,NX)
+  RSN3AA=SPNH3*FertN_soil(ifert_nh3,L,NY,NX)*trcs_VLN(ids_NH4,L,NY,NX)
+  RSNUAA=RSNUA*trcs_VLN(ids_NH4,L,NY,NX)*THETW(L,NY,NX)
+  RSNOAA=SPNO3*FertN_soil(ifert_no3,L,NY,NX)*trcs_VLN(ids_NO3,L,NY,NX)*THETW(L,NY,NX)
+  RSN4BA=SPNH4*FertN_soil(ifert_nh4,L,NY,NX)*trcs_VLN(ids_NH4B,L,NY,NX)*THETW(L,NY,NX)
+  RSN3BA=SPNH3*FertN_soil(ifert_nh3,L,NY,NX)*trcs_VLN(ids_NH4B,L,NY,NX)
+  RSNUBA=RSNUA*trcs_VLN(ids_NH4B,L,NY,NX)*THETW(L,NY,NX)
+  RSNOBA=SPNO3*FertN_soil(ifert_no3,L,NY,NX)*trcs_VLN(ids_NO3B,L,NY,NX)*THETW(L,NY,NX)
+  RSN4BB=SPNH4*FertN_band(ifert_nh4_band,L,NY,NX)*THETW(L,NY,NX)
+  RSN3BB=SPNH3*FertN_band(ifert_nh3_band,L,NY,NX)
+  RSNUBB=RSNUB*trcs_VLN(ids_NH4B,L,NY,NX)*THETW(L,NY,NX)
+  RSNOBB=SPNO3*FertN_band(ifert_no3_band,L,NY,NX)*THETW(L,NY,NX)
 !
 !     SOLUBLE AND EXCHANGEABLE NH4 CONCENTRATIONS
 !     IN NON-BAND AND BAND SOIL ZONES
@@ -359,9 +357,9 @@ module SoluteMod
     VOLWNX=natomw*VOLWNH
     RN4X=(-TUPNH4(L,NY,NX)+XNH4S(L,NY,NX)+natomw*RSN4AA)/VOLWNX
     RN3X=(-TUPN3S(L,NY,NX)+natomw*RSNUAA)/VOLWNX
-    CN41=AZMAX1(ZNH4S(L,NY,NX)/VOLWNX+RN4X)
-    CN31=AZMAX1(ZNH3S(L,NY,NX)/VOLWNX+RN3X)
-    XN41=AZMAX1(XN4(L,NY,NX)/BKVLNH)
+    CN41=AZMAX1(trc_solml(ids_NH4,L,NY,NX)/VOLWNX+RN4X)
+    CN31=AZMAX1(trc_solml(idg_NH3,L,NY,NX)/VOLWNX+RN3X)
+    XN41=AZMAX1(trcx_solml(idx_NH4,L,NY,NX)/BKVLNH)
   ELSE
     RN4X=0._r8
     RN3X=0._r8
@@ -373,9 +371,9 @@ module SoluteMod
     VOLWNX=natomw*VOLWNB
     RNBX=(-TUPNHB(L,NY,NX)+XNH4B(L,NY,NX)+natomw*(RSN4BA+RSN4BB))/VOLWNX
     R3BX=(-TUPN3B(L,NY,NX)+natomw*(RSNUBA+RSNUBB))/VOLWNX
-    CN4B=AZMAX1(ZNH4B(L,NY,NX)/VOLWNX+RNBX)
-    CN3B=AZMAX1(ZNH3B(L,NY,NX)/VOLWNX+R3BX)
-    XN4B=AZMAX1(XNB(L,NY,NX)/BKVLNB)
+    CN4B=AZMAX1(trc_solml(ids_NH4B,L,NY,NX)/VOLWNX+RNBX)
+    CN3B=AZMAX1(trc_solml(idg_NH3B,L,NY,NX)/VOLWNX+R3BX)
+    XN4B=AZMAX1(trcx_solml(idx_NH4B,L,NY,NX)/BKVLNB)
   ELSE
     RNBX=0._r8
     R3BX=0._r8
@@ -408,18 +406,18 @@ module SoluteMod
     VOLWPX=patomw*VOLWPO
     RH1PX=(XH1PS(L,NY,NX)-TUPH1P(L,NY,NX))/VOLWPX
     RH2PX=(XH2PS(L,NY,NX)-TUPH2P(L,NY,NX))/VOLWPX
-    CH1P1=AZMAX1(H1PO4(L,NY,NX)/VOLWPX+RH1PX)
-    CH2P1=AZMAX1(H2PO4(L,NY,NX)/VOLWPX+RH2PX)
-    XOH01=AZMAX1(XOH0(L,NY,NX))/BKVLPO
-    XOH11=AZMAX1(XOH1(L,NY,NX))/BKVLPO
-    XOH21=AZMAX1(XOH2(L,NY,NX))/BKVLPO
-    XH1P1=AZMAX1(XH1P(L,NY,NX))/BKVLPO
-    XH2P1=AZMAX1(XH2P(L,NY,NX))/BKVLPO
-    PALPO1=AZMAX1(PALPO(L,NY,NX))/BKVLPO
-    PFEPO1=AZMAX1(PFEPO(L,NY,NX))/BKVLPO
-    PCAPM1=AZMAX1(PCAPM(L,NY,NX))/BKVLPO
-    PCAPD1=AZMAX1(PCAPD(L,NY,NX))/BKVLPO
-    PCAPH1=AZMAX1(PCAPH(L,NY,NX))/BKVLPO
+    CH1P1=AZMAX1(trc_solml(ids_H1PO4,L,NY,NX)/VOLWPX+RH1PX)
+    CH2P1=AZMAX1(trc_solml(ids_H2PO4,L,NY,NX)/VOLWPX+RH2PX)
+    XOH01=AZMAX1(trcx_solml(idx_OHe,L,NY,NX))/BKVLPO
+    XOH11=AZMAX1(trcx_solml(idx_OH,L,NY,NX))/BKVLPO
+    XOH21=AZMAX1(trcx_solml(idx_OHp,L,NY,NX))/BKVLPO
+    XH1P1=AZMAX1(trcx_solml(idx_HPO4,L,NY,NX))/BKVLPO
+    XH2P1=AZMAX1(trcx_solml(idx_H2PO4,L,NY,NX))/BKVLPO
+    PALPO1=AZMAX1(trcp_salml(idsp_AlPO4,L,NY,NX))/BKVLPO
+    PFEPO1=AZMAX1(trcp_salml(idsp_FePO4,L,NY,NX))/BKVLPO
+    PCAPM1=AZMAX1(trcp_salml(idsp_CaH2PO4,L,NY,NX))/BKVLPO
+    PCAPD1=AZMAX1(trcp_salml(idsp_CaHPO4,L,NY,NX))/BKVLPO
+    PCAPH1=AZMAX1(trcp_salml(idsp_HA,L,NY,NX))/BKVLPO
   ELSE
     RH1PX=0._r8
     RH2PX=0._r8
@@ -440,18 +438,18 @@ module SoluteMod
     VOLWPX=patomw*VOLWPB
     RH1BX=(XH1BS(L,NY,NX)-TUPH1B(L,NY,NX))/VOLWPX
     RH2BX=(XH2BS(L,NY,NX)-TUPH2B(L,NY,NX))/VOLWPX
-    CH1PB=AZMAX1(H1POB(L,NY,NX)/VOLWPX+RH1BX)
-    CH2PB=AZMAX1(H2POB(L,NY,NX)/VOLWPX+RH2BX)
-    XH01B=AZMAX1(XOH0B(L,NY,NX))/BKVLPB
-    XH11B=AZMAX1(XOH1B(L,NY,NX))/BKVLPB
-    XH21B=AZMAX1(XOH2B(L,NY,NX))/BKVLPB
-    X1P1B=AZMAX1(XH1PB(L,NY,NX))/BKVLPB
-    X2P1B=AZMAX1(XH2PB(L,NY,NX))/BKVLPB
-    PALPOB=AZMAX1(PALPB(L,NY,NX))/BKVLPB
-    PFEPOB=AZMAX1(PFEPB(L,NY,NX))/BKVLPB
-    PCAPMB=AZMAX1(PCPMB(L,NY,NX))/BKVLPB
-    PCAPDB=AZMAX1(PCPDB(L,NY,NX))/BKVLPB
-    PCAPHB=AZMAX1(PCPHB(L,NY,NX))/BKVLPB
+    CH1PB=AZMAX1(trc_solml(ids_H1PO4B,L,NY,NX)/VOLWPX+RH1BX)
+    CH2PB=AZMAX1(trc_solml(ids_H2PO4B,L,NY,NX)/VOLWPX+RH2BX)
+    XH01B=AZMAX1(trcx_solml(idx_OHeB,L,NY,NX))/BKVLPB
+    XH11B=AZMAX1(trcx_solml(idx_OHB,L,NY,NX))/BKVLPB
+    XH21B=AZMAX1(trcx_solml(idx_OHpB,L,NY,NX))/BKVLPB
+    X1P1B=AZMAX1(trcx_solml(idx_HPO4B,L,NY,NX))/BKVLPB
+    X2P1B=AZMAX1(trcx_solml(idx_H2PO4B,L,NY,NX))/BKVLPB
+    PALPOB=AZMAX1(trcp_salml(idsp_AlPO4B,L,NY,NX))/BKVLPB
+    PFEPOB=AZMAX1(trcp_salml(idsp_FePO4B,L,NY,NX))/BKVLPB
+    PCAPMB=AZMAX1(trcp_salml(idsp_CaH2PO4B,L,NY,NX))/BKVLPB
+    PCAPDB=AZMAX1(trcp_salml(idsp_CaHPO4B,L,NY,NX))/BKVLPB
+    PCAPHB=AZMAX1(trcp_salml(idsp_HAB,L,NY,NX))/BKVLPB
   ELSE
     RH1BX=0._r8
     RH2BX=0._r8
@@ -525,44 +523,49 @@ module SoluteMod
 !     DLYR=soil layer thickness
 !     FVLNH4=relative change in VLNH4
 !
-      XVLNH4=VLNH4(L,NY,NX)
+      XVLNH4=trcs_VLN(ids_NH4,L,NY,NX)
       IF(DLYR(3,L,NY,NX).GT.ZERO)THEN
-        VLNHB(L,NY,NX)=AZMAX1(AMIN1(0.999_r8,WDNHB(L,NY,NX) &
+        trcs_VLN(ids_NH4B,L,NY,NX)=AZMAX1(AMIN1(0.999_r8,WDNHB(L,NY,NX) &
           /ROWN(NY,NX)*DPNHB(L,NY,NX)/DLYR(3,L,NY,NX)))
       ELSE
-        VLNHB(L,NY,NX)=0._r8
+        trcs_VLN(ids_NH4B,L,NY,NX)=0._r8
       ENDIF
-      VLNH4(L,NY,NX)=1._r8-VLNHB(L,NY,NX)
-      FVLNH4=AMIN1(0.0_r8,(VLNH4(L,NY,NX)-XVLNH4)/XVLNH4)
+      trcs_VLN(ids_NH4,L,NY,NX)=1._r8-trcs_VLN(ids_NH4B,L,NY,NX)
+      trcs_VLN(idg_NH3,L,NY,NX)=trcs_VLN(ids_NH4,L,NY,NX)
+      trcs_VLN(idg_NH3B,L,NY,NX)=trcs_VLN(ids_NH4B,L,NY,NX)
+      FVLNH4=AZMIN1((trcs_VLN(ids_NH4,L,NY,NX)-XVLNH4)/XVLNH4)
 !
 !     TRANSFER NH4, NH3 FROM NON-BAND TO BAND
 !     DURING BAND GROWTH
 !
 !     DNH4S,DNH3S,DXNH4=transfer of NH4,NH3,exchangeable NH4
 !
-      DNH4S=FVLNH4*ZNH4S(L,NY,NX)/natomw
-      DNH3S=FVLNH4*ZNH3S(L,NY,NX)/natomw
-      DXNH4=FVLNH4*XN4(L,NY,NX)
+      DNH4S=FVLNH4*trc_solml(ids_NH4,L,NY,NX)/natomw
+      DNH3S=FVLNH4*trc_solml(idg_NH3,L,NY,NX)/natomw
+      DXNH4=FVLNH4*trcx_solml(idx_NH4,L,NY,NX)
       TRN4S(L,NY,NX)=TRN4S(L,NY,NX)+DNH4S
       TRN4B(L,NY,NX)=TRN4B(L,NY,NX)-DNH4S
       TRN3S(L,NY,NX)=TRN3S(L,NY,NX)+DNH3S
       TRN3B(L,NY,NX)=TRN3B(L,NY,NX)-DNH3S
-      TRXN4(L,NY,NX)=TRXN4(L,NY,NX)+DXNH4
-      TRXNB(L,NY,NX)=TRXNB(L,NY,NX)-DXNH4
+      trcx_TR(idx_NH4,L,NY,NX)=trcx_TR(idx_NH4,L,NY,NX)+DXNH4
+      trcx_TR(idx_NH4B,L,NY,NX)=trcx_TR(idx_NH4B,L,NY,NX)-DXNH4
     ELSE
 !
 !     AMALGAMATE NH4 BAND WITH NON-BAND IF BAND NO LONGER EXISTS
 !
       DPNHB(L,NY,NX)=0._r8
       WDNHB(L,NY,NX)=0._r8
-      VLNH4(L,NY,NX)=1._r8
-      VLNHB(L,NY,NX)=0._r8
-      ZNH4S(L,NY,NX)=ZNH4S(L,NY,NX)+ZNH4B(L,NY,NX)
-      ZNH3S(L,NY,NX)=ZNH3S(L,NY,NX)+ZNH3B(L,NY,NX)
-      ZNH4B(L,NY,NX)=0._r8
-      ZNH3B(L,NY,NX)=0._r8
-      XN4(L,NY,NX)=XN4(L,NY,NX)+XNB(L,NY,NX)
-      XNB(L,NY,NX)=0._r8
+      trcs_VLN(ids_NH4,L,NY,NX)=1._r8
+      trcs_VLN(ids_NH4B,L,NY,NX)=0._r8
+      trcs_VLN(idg_NH3,L,NY,NX)=trcs_VLN(ids_NH4,L,NY,NX)
+      trcs_VLN(idg_NH3B,L,NY,NX)=trcs_VLN(ids_NH4B,L,NY,NX)
+
+      trc_solml(ids_NH4,L,NY,NX)=trc_solml(ids_NH4,L,NY,NX)+trc_solml(ids_NH4B,L,NY,NX)
+      trc_solml(idg_NH3,L,NY,NX)=trc_solml(idg_NH3,L,NY,NX)+trc_solml(idg_NH3B,L,NY,NX)
+      trc_solml(ids_NH4B,L,NY,NX)=0._r8
+      trc_solml(idg_NH3B,L,NY,NX)=0._r8
+      trcx_solml(idx_NH4,L,NY,NX)=trcx_solml(idx_NH4,L,NY,NX)+trcx_solml(idx_NH4B,L,NY,NX)
+      trcx_solml(idx_NH4B,L,NY,NX)=0._r8
     ENDIF
   ENDIF
   end subroutine UpdateNH3FertilizerBandinfo
@@ -622,15 +625,18 @@ module SoluteMod
 !     DLYR=soil layer thickness
 !     FVLPO4=relative change in VLPO4
 !
-      XVLPO4=VLPO4(L,NY,NX)
+      XVLPO4=trcs_VLN(ids_H1PO4,L,NY,NX)
       IF(DLYR(3,L,NY,NX).GT.ZERO)THEN
-        VLPOB(L,NY,NX)=AZMAX1(AMIN1(0.999,WDPOB(L,NY,NX) &
+        trcs_VLN(ids_H1PO4B,L,NY,NX)=AZMAX1(AMIN1(0.999,WDPOB(L,NY,NX) &
           /ROWP(NY,NX)*DPPOB(L,NY,NX)/DLYR(3,L,NY,NX)))
       ELSE
-        VLPOB(L,NY,NX)=0._r8
+        trcs_VLN(ids_H1PO4B,L,NY,NX)=0._r8
       ENDIF
-      VLPO4(L,NY,NX)=1._r8-VLPOB(L,NY,NX)
-      FVLPO4=AMIN1(0.0_r8,(VLPO4(L,NY,NX)-XVLPO4)/XVLPO4)
+      trcs_VLN(ids_H1PO4,L,NY,NX)=1._r8-trcs_VLN(ids_H1PO4B,L,NY,NX)
+
+      trcs_VLN(ids_H2PO4B,L,NY,NX)=trcs_VLN(ids_H1PO4B,L,NY,NX)
+      trcs_VLN(ids_H2PO4,L,NY,NX)=trcs_VLN(ids_H1PO4,L,NY,NX)
+      FVLPO4=AZMIN1((trcs_VLN(ids_H1PO4,L,NY,NX)-XVLPO4)/XVLPO4)
 !
 !     TRANSFER HPO4,H2PO4 FROM NON-BAND TO BAND
 !     DURING BAND GROWTH DEPENDING ON SALT
@@ -638,98 +644,99 @@ module SoluteMod
 !
 !     DZ*,DX*,DP*=transfer of solute,adsorbed,precipitated HPO4,H2PO4
 !
-      IF(ISALTG.NE.0)THEN
-        DZH0P=FVLPO4*H0PO4(L,NY,NX)
-        DZH1P=FVLPO4*H1PO4(L,NY,NX)/patomw
-        DZH2P=FVLPO4*H2PO4(L,NY,NX)/patomw
-        DZH3P=FVLPO4*H3PO4(L,NY,NX)
-        DZF1P=FVLPO4*ZFE1P(L,NY,NX)
-        DZF2P=FVLPO4*ZFE2P(L,NY,NX)
-        DZC0P=FVLPO4*ZCA0P(L,NY,NX)
-        DZC1P=FVLPO4*ZCA1P(L,NY,NX)
-        DZC2P=FVLPO4*ZCA2P(L,NY,NX)
-        DZM1P=FVLPO4*ZMG1P(L,NY,NX)
-        DXOH0=FVLPO4*XOH0(L,NY,NX)
-        DXOH1=FVLPO4*XOH1(L,NY,NX)
-        DXOH2=FVLPO4*XOH2(L,NY,NX)
-        DXH1P=FVLPO4*XH1P(L,NY,NX)
-        DXH2P=FVLPO4*XH2P(L,NY,NX)
-        DPALP=FVLPO4*PALPO(L,NY,NX)
-        DPFEP=FVLPO4*PFEPO(L,NY,NX)
-        DPCDP=FVLPO4*PCAPD(L,NY,NX)
-        DPCHP=FVLPO4*PCAPH(L,NY,NX)
-        DPCMP=FVLPO4*PCAPM(L,NY,NX)
-        TRH0P(L,NY,NX)=TRH0P(L,NY,NX)+DZH0P
+      IF(salt_model)THEN
+        DZH0P=FVLPO4*trcsa_solml(idsa_H0PO4,L,NY,NX)
+        DZH1P=FVLPO4*trc_solml(ids_H1PO4,L,NY,NX)/patomw
+        DZH2P=FVLPO4*trc_solml(ids_H2PO4,L,NY,NX)/patomw
+        DZH3P=FVLPO4*trcsa_solml(idsa_H3PO4,L,NY,NX)
+        DZF1P=FVLPO4*trcsa_solml(idsa_FeHPO4,L,NY,NX)
+        DZF2P=FVLPO4*trcsa_solml(idsa_FeH2PO4,L,NY,NX)
+        DZC0P=FVLPO4*trcsa_solml(idsa_CaPO4,L,NY,NX)
+        DZC1P=FVLPO4*trcsa_solml(idsa_CaHPO4,L,NY,NX)
+        DZC2P=FVLPO4*trcsa_solml(idsa_CaH2PO4,L,NY,NX)
+        DZM1P=FVLPO4*trcsa_solml(idsa_MgHPO4,L,NY,NX)
+        DXOH0=FVLPO4*trcx_solml(idx_OHe,L,NY,NX)
+        DXOH1=FVLPO4*trcx_solml(idx_OH,L,NY,NX)
+        DXOH2=FVLPO4*trcx_solml(idx_OHp,L,NY,NX)
+        DXH1P=FVLPO4*trcx_solml(idx_HPO4,L,NY,NX)
+        DXH2P=FVLPO4*trcx_solml(idx_H2PO4,L,NY,NX)
+        DPALP=FVLPO4*trcp_salml(idsp_AlPO4,L,NY,NX)
+        DPFEP=FVLPO4*trcp_salml(idsp_FePO4,L,NY,NX)
+        DPCDP=FVLPO4*trcp_salml(idsp_CaHPO4,L,NY,NX)
+        DPCHP=FVLPO4*trcp_salml(idsp_HA,L,NY,NX)
+        DPCMP=FVLPO4*trcp_salml(idsp_CaH2PO4,L,NY,NX)
+
+        trcsa_TR(idsa_H0PO4,L,NY,NX)=trcsa_TR(idsa_H0PO4,L,NY,NX)+DZH0P
         TRH1P(L,NY,NX)=TRH1P(L,NY,NX)+DZH1P
         TRH2P(L,NY,NX)=TRH2P(L,NY,NX)+DZH2P
-        TRH3P(L,NY,NX)=TRH3P(L,NY,NX)+DZH3P
-        TRF1P(L,NY,NX)=TRF1P(L,NY,NX)+DZF1P
-        TRF2P(L,NY,NX)=TRF2P(L,NY,NX)+DZF2P
-        TRC0P(L,NY,NX)=TRC0P(L,NY,NX)+DZC0P
-        TRC1P(L,NY,NX)=TRC1P(L,NY,NX)+DZC1P
-        TRC2P(L,NY,NX)=TRC2P(L,NY,NX)+DZC2P
-        TRM1P(L,NY,NX)=TRM1P(L,NY,NX)+DZM1P
-        TRH0B(L,NY,NX)=TRH0B(L,NY,NX)-DZH0P
+        trcsa_TR(idsa_H3PO4,L,NY,NX)=trcsa_TR(idsa_H3PO4,L,NY,NX)+DZH3P
+        trcsa_TR(idsa_FeHPO4,L,NY,NX)=trcsa_TR(idsa_FeHPO4,L,NY,NX)+DZF1P
+        trcsa_TR(idsa_FeH2PO4,L,NY,NX)=trcsa_TR(idsa_FeH2PO4,L,NY,NX)+DZF2P
+        trcsa_TR(idsa_CaPO4,L,NY,NX)=trcsa_TR(idsa_CaPO4,L,NY,NX)+DZC0P
+        trcsa_TR(idsa_CaHPO4,L,NY,NX)=trcsa_TR(idsa_CaHPO4,L,NY,NX)+DZC1P
+        trcsa_TR(idsa_CaH2PO4,L,NY,NX)=trcsa_TR(idsa_CaH2PO4,L,NY,NX)+DZC2P
+        trcsa_TR(idsa_MgHPO4,L,NY,NX)=trcsa_TR(idsa_MgHPO4,L,NY,NX)+DZM1P
+        trcsa_TR(idsa_H0PO4B,L,NY,NX)=trcsa_TR(idsa_H0PO4B,L,NY,NX)-DZH0P
         TRH1B(L,NY,NX)=TRH1B(L,NY,NX)-DZH1P
         TRH2B(L,NY,NX)=TRH2B(L,NY,NX)-DZH2P
-        TRH3B(L,NY,NX)=TRH3B(L,NY,NX)-DZH3P
-        TRF1B(L,NY,NX)=TRF1B(L,NY,NX)-DZF1P
-        TRF2B(L,NY,NX)=TRF2B(L,NY,NX)-DZF2P
-        TRC0B(L,NY,NX)=TRC0B(L,NY,NX)-DZC0P
-        TRC1B(L,NY,NX)=TRC1B(L,NY,NX)-DZC1P
-        TRC2B(L,NY,NX)=TRC2B(L,NY,NX)-DZC2P
-        TRM1B(L,NY,NX)=TRM1B(L,NY,NX)-DZM1P
-        TRXH0(L,NY,NX)=TRXH0(L,NY,NX)+DXOH0
-        TRXH1(L,NY,NX)=TRXH1(L,NY,NX)+DXOH1
-        TRXH2(L,NY,NX)=TRXH2(L,NY,NX)+DXOH2
-        TRX1P(L,NY,NX)=TRX1P(L,NY,NX)+DXH1P
-        TRX2P(L,NY,NX)=TRX2P(L,NY,NX)+DXH2P
-        TRBH0(L,NY,NX)=TRBH0(L,NY,NX)-DXOH0
-        TRBH1(L,NY,NX)=TRBH1(L,NY,NX)-DXOH1
-        TRBH2(L,NY,NX)=TRBH2(L,NY,NX)-DXOH2
-        TRB1P(L,NY,NX)=TRB1P(L,NY,NX)-DXH1P
-        TRB2P(L,NY,NX)=TRB2P(L,NY,NX)-DXH2P
-        TRALPO(L,NY,NX)=TRALPO(L,NY,NX)+DPALP
-        TRFEPO(L,NY,NX)=TRFEPO(L,NY,NX)+DPFEP
-        TRCAPD(L,NY,NX)=TRCAPD(L,NY,NX)+DPCDP
-        TRCAPH(L,NY,NX)=TRCAPH(L,NY,NX)+DPCHP
-        TRCAPM(L,NY,NX)=TRCAPM(L,NY,NX)+DPCMP
-        TRALPB(L,NY,NX)=TRALPB(L,NY,NX)-DPALP
-        TRFEPB(L,NY,NX)=TRFEPB(L,NY,NX)-DPFEP
-        TRCPDB(L,NY,NX)=TRCPDB(L,NY,NX)-DPCDP
-        TRCPHB(L,NY,NX)=TRCPHB(L,NY,NX)-DPCHP
-        TRCPMB(L,NY,NX)=TRCPMB(L,NY,NX)-DPCMP
+        trcsa_TR(idsa_H3PO4B,L,NY,NX)=trcsa_TR(idsa_H3PO4B,L,NY,NX)-DZH3P
+        trcsa_TR(idsa_FeHPO4B,L,NY,NX)=trcsa_TR(idsa_FeHPO4B,L,NY,NX)-DZF1P
+        trcsa_TR(idsa_FeH2PO4B,L,NY,NX)=trcsa_TR(idsa_FeH2PO4B,L,NY,NX)-DZF2P
+        trcsa_TR(idsa_CaPO4B,L,NY,NX)=trcsa_TR(idsa_CaPO4B,L,NY,NX)-DZC0P
+        trcsa_TR(idsa_CaHPO4B,L,NY,NX)=trcsa_TR(idsa_CaHPO4B,L,NY,NX)-DZC1P
+        trcsa_TR(idsa_CaH2PO4B,L,NY,NX)=trcsa_TR(idsa_CaH2PO4B,L,NY,NX)-DZC2P
+        trcsa_TR(idsa_MgHPO4B,L,NY,NX)=trcsa_TR(idsa_MgHPO4B,L,NY,NX)-DZM1P
+        trcx_TR(idx_OHe,L,NY,NX)=trcx_TR(idx_OHe,L,NY,NX)+DXOH0
+        trcx_TR(idx_OH,L,NY,NX)=trcx_TR(idx_OH,L,NY,NX)+DXOH1
+        trcx_TR(idx_OHp,L,NY,NX)=trcx_TR(idx_OHp,L,NY,NX)+DXOH2
+        trcx_TR(idx_HPO4,L,NY,NX)=trcx_TR(idx_HPO4,L,NY,NX)+DXH1P
+        trcx_TR(idx_H2PO4,L,NY,NX)=trcx_TR(idx_H2PO4,L,NY,NX)+DXH2P
+        trcx_TR(idx_OHeB,L,NY,NX)=trcx_TR(idx_OHeB,L,NY,NX)-DXOH0
+        trcx_TR(idx_OHB,L,NY,NX)=trcx_TR(idx_OHB,L,NY,NX)-DXOH1
+        trcx_TR(idx_OHpB,L,NY,NX)=trcx_TR(idx_OHpB,L,NY,NX)-DXOH2
+        trcx_TR(idx_HPO4B,L,NY,NX)=trcx_TR(idx_HPO4B,L,NY,NX)-DXH1P
+        trcx_TR(idx_H2PO4B,L,NY,NX)=trcx_TR(idx_H2PO4B,L,NY,NX)-DXH2P
+        trcp_TR(idsp_AlPO4,L,NY,NX)=trcp_TR(idsp_AlPO4,L,NY,NX)+DPALP
+        trcp_TR(idsp_FePO4,L,NY,NX)=trcp_TR(idsp_FePO4,L,NY,NX)+DPFEP
+        trcp_TR(idsp_CaHPO4,L,NY,NX)=trcp_TR(idsp_CaHPO4,L,NY,NX)+DPCDP
+        trcp_TR(idsp_HA,L,NY,NX)=trcp_TR(idsp_HA,L,NY,NX)+DPCHP
+        trcp_TR(idsp_CaH2PO4,L,NY,NX)=trcp_TR(idsp_CaH2PO4,L,NY,NX)+DPCMP
+        trcp_TR(idsp_AlPO4B,L,NY,NX)=trcp_TR(idsp_AlPO4B,L,NY,NX)-DPALP
+        trcp_TR(idsp_FePO4B,L,NY,NX)=trcp_TR(idsp_FePO4B,L,NY,NX)-DPFEP
+        trcp_TR(idsp_CaHPO4B,L,NY,NX)=trcp_TR(idsp_CaHPO4B,L,NY,NX)-DPCDP
+        trcp_TR(idsp_HAB,L,NY,NX)=trcp_TR(idsp_HAB,L,NY,NX)-DPCHP
+        trcp_TR(idsp_CaH2PO4B,L,NY,NX)=trcp_TR(idsp_CaH2PO4B,L,NY,NX)-DPCMP
       ELSE
-        DZH1P=FVLPO4*H1PO4(L,NY,NX)/patomw
-        DZH2P=FVLPO4*H2PO4(L,NY,NX)/patomw
-        DXOH1=FVLPO4*XOH1(L,NY,NX)
-        DXOH2=FVLPO4*XOH2(L,NY,NX)
-        DXH2P=FVLPO4*XH2P(L,NY,NX)
-        DPALP=FVLPO4*PALPO(L,NY,NX)
-        DPFEP=FVLPO4*PFEPO(L,NY,NX)
-        DPCDP=FVLPO4*PCAPD(L,NY,NX)
-        DPCHP=FVLPO4*PCAPH(L,NY,NX)
-        DPCMP=FVLPO4*PCAPM(L,NY,NX)
+        DZH1P=FVLPO4*trc_solml(ids_H1PO4,L,NY,NX)/patomw
+        DZH2P=FVLPO4*trc_solml(ids_H2PO4,L,NY,NX)/patomw
+        DXOH1=FVLPO4*trcx_solml(idx_OH,L,NY,NX)
+        DXOH2=FVLPO4*trcx_solml(idx_OHp,L,NY,NX)
+        DXH2P=FVLPO4*trcx_solml(idx_H2PO4,L,NY,NX)
+        DPALP=FVLPO4*trcp_salml(idsp_AlPO4,L,NY,NX)
+        DPFEP=FVLPO4*trcp_salml(idsp_FePO4,L,NY,NX)
+        DPCDP=FVLPO4*trcp_salml(idsp_CaHPO4,L,NY,NX)
+        DPCHP=FVLPO4*trcp_salml(idsp_HA,L,NY,NX)
+        DPCMP=FVLPO4*trcp_salml(idsp_CaH2PO4,L,NY,NX)
         TRH1P(L,NY,NX)=TRH1P(L,NY,NX)+DZH1P
         TRH2P(L,NY,NX)=TRH2P(L,NY,NX)+DZH2P
-        TRXH1(L,NY,NX)=TRXH1(L,NY,NX)+DXOH1
-        TRXH2(L,NY,NX)=TRXH2(L,NY,NX)+DXOH2
-        TRX2P(L,NY,NX)=TRX2P(L,NY,NX)+DXH2P
+        trcx_TR(idx_OH,L,NY,NX)=trcx_TR(idx_OH,L,NY,NX)+DXOH1
+        trcx_TR(idx_OHp,L,NY,NX)=trcx_TR(idx_OHp,L,NY,NX)+DXOH2
+        trcx_TR(idx_H2PO4,L,NY,NX)=trcx_TR(idx_H2PO4,L,NY,NX)+DXH2P
         TRH1B(L,NY,NX)=TRH1B(L,NY,NX)-DZH1P
         TRH2B(L,NY,NX)=TRH2B(L,NY,NX)-DZH2P
-        TRBH1(L,NY,NX)=TRBH1(L,NY,NX)-DXOH1
-        TRBH2(L,NY,NX)=TRBH2(L,NY,NX)-DXOH2
-        TRB2P(L,NY,NX)=TRB2P(L,NY,NX)-DXH2P
-        TRALPO(L,NY,NX)=TRALPO(L,NY,NX)+DPALP
-        TRFEPO(L,NY,NX)=TRFEPO(L,NY,NX)+DPFEP
-        TRCAPD(L,NY,NX)=TRCAPD(L,NY,NX)+DPCDP
-        TRCAPH(L,NY,NX)=TRCAPH(L,NY,NX)+DPCHP
-        TRCAPM(L,NY,NX)=TRCAPM(L,NY,NX)+DPCMP
-        TRALPB(L,NY,NX)=TRALPB(L,NY,NX)-DPALP
-        TRFEPB(L,NY,NX)=TRFEPB(L,NY,NX)-DPFEP
-        TRCPDB(L,NY,NX)=TRCPDB(L,NY,NX)-DPCDP
-        TRCPHB(L,NY,NX)=TRCPHB(L,NY,NX)-DPCHP
-        TRCPMB(L,NY,NX)=TRCPMB(L,NY,NX)-DPCMP
+        trcx_TR(idx_OHB,L,NY,NX)=trcx_TR(idx_OHB,L,NY,NX)-DXOH1
+        trcx_TR(idx_OHpB,L,NY,NX)=trcx_TR(idx_OHpB,L,NY,NX)-DXOH2
+        trcx_TR(idx_H2PO4B,L,NY,NX)=trcx_TR(idx_H2PO4B,L,NY,NX)-DXH2P
+        trcp_TR(idsp_AlPO4,L,NY,NX)=trcp_TR(idsp_AlPO4,L,NY,NX)+DPALP
+        trcp_TR(idsp_FePO4,L,NY,NX)=trcp_TR(idsp_FePO4,L,NY,NX)+DPFEP
+        trcp_TR(idsp_CaHPO4,L,NY,NX)=trcp_TR(idsp_CaHPO4,L,NY,NX)+DPCDP
+        trcp_TR(idsp_HA,L,NY,NX)=trcp_TR(idsp_HA,L,NY,NX)+DPCHP
+        trcp_TR(idsp_CaH2PO4,L,NY,NX)=trcp_TR(idsp_CaH2PO4,L,NY,NX)+DPCMP
+        trcp_TR(idsp_AlPO4B,L,NY,NX)=trcp_TR(idsp_AlPO4B,L,NY,NX)-DPALP
+        trcp_TR(idsp_FePO4B,L,NY,NX)=trcp_TR(idsp_FePO4B,L,NY,NX)-DPFEP
+        trcp_TR(idsp_CaHPO4B,L,NY,NX)=trcp_TR(idsp_CaHPO4B,L,NY,NX)-DPCDP
+        trcp_TR(idsp_HAB,L,NY,NX)=trcp_TR(idsp_HAB,L,NY,NX)-DPCHP
+        trcp_TR(idsp_CaH2PO4B,L,NY,NX)=trcp_TR(idsp_CaH2PO4B,L,NY,NX)-DPCMP
       ENDIF
     ELSE
 !
@@ -737,48 +744,54 @@ module SoluteMod
 !
       DPPOB(L,NY,NX)=0._r8
       WDPOB(L,NY,NX)=0._r8
-      VLPOB(L,NY,NX)=0._r8
-      VLPO4(L,NY,NX)=1._r8
-      H0PO4(L,NY,NX)=H0PO4(L,NY,NX)+H0POB(L,NY,NX)
-      H1PO4(L,NY,NX)=H1PO4(L,NY,NX)+H1POB(L,NY,NX)
-      H2PO4(L,NY,NX)=H2PO4(L,NY,NX)+H2POB(L,NY,NX)
-      H3PO4(L,NY,NX)=H3PO4(L,NY,NX)+H3POB(L,NY,NX)
-      ZFE1P(L,NY,NX)=ZFE1P(L,NY,NX)+ZFE1PB(L,NY,NX)
-      ZFE2P(L,NY,NX)=ZFE2P(L,NY,NX)+ZFE2PB(L,NY,NX)
-      ZCA0P(L,NY,NX)=ZCA0P(L,NY,NX)+ZCA0PB(L,NY,NX)
-      ZCA1P(L,NY,NX)=ZCA1P(L,NY,NX)+ZCA1PB(L,NY,NX)
-      ZCA2P(L,NY,NX)=ZCA2P(L,NY,NX)+ZCA2PB(L,NY,NX)
-      ZMG1P(L,NY,NX)=ZMG1P(L,NY,NX)+ZMG1PB(L,NY,NX)
-      H0POB(L,NY,NX)=0._r8
-      H1POB(L,NY,NX)=0._r8
-      H2POB(L,NY,NX)=0._r8
-      H3POB(L,NY,NX)=0._r8
-      ZFE1PB(L,NY,NX)=0._r8
-      ZFE2PB(L,NY,NX)=0._r8
-      ZCA0PB(L,NY,NX)=0._r8
-      ZCA1PB(L,NY,NX)=0._r8
-      ZCA2PB(L,NY,NX)=0._r8
-      ZMG1PB(L,NY,NX)=0._r8
-      XOH0(L,NY,NX)=XOH0(L,NY,NX)+XOH0B(L,NY,NX)
-      XOH1(L,NY,NX)=XOH1(L,NY,NX)+XOH1B(L,NY,NX)
-      XOH2(L,NY,NX)=XOH2(L,NY,NX)+XOH2B(L,NY,NX)
-      XH1P(L,NY,NX)=XH1P(L,NY,NX)+XH1PB(L,NY,NX)
-      XH2P(L,NY,NX)=XH2P(L,NY,NX)+XH2PB(L,NY,NX)
-      XOH0B(L,NY,NX)=0._r8
-      XOH1B(L,NY,NX)=0._r8
-      XOH2B(L,NY,NX)=0._r8
-      XH1PB(L,NY,NX)=0._r8
-      XH2PB(L,NY,NX)=0._r8
-      PALPO(L,NY,NX)=PALPO(L,NY,NX)+PALPB(L,NY,NX)
-      PFEPO(L,NY,NX)=PFEPO(L,NY,NX)+PFEPB(L,NY,NX)
-      PCAPD(L,NY,NX)=PCAPD(L,NY,NX)+PCPDB(L,NY,NX)
-      PCAPH(L,NY,NX)=PCAPH(L,NY,NX)+PCPHB(L,NY,NX)
-      PCAPM(L,NY,NX)=PCAPM(L,NY,NX)+PCPMB(L,NY,NX)
-      PALPB(L,NY,NX)=0._r8
-      PFEPB(L,NY,NX)=0._r8
-      PCPDB(L,NY,NX)=0._r8
-      PCPHB(L,NY,NX)=0._r8
-      PCPMB(L,NY,NX)=0._r8
+      trcs_VLN(ids_H1PO4B,L,NY,NX)=0._r8
+      trcs_VLN(ids_H1PO4,L,NY,NX)=1._r8
+      trcs_VLN(ids_H2PO4B,L,NY,NX)=trcs_VLN(ids_H1PO4B,L,NY,NX)
+      trcs_VLN(ids_H2PO4,L,NY,NX)=trcs_VLN(ids_H1PO4,L,NY,NX)
+
+      trc_solml(ids_H1PO4,L,NY,NX)=trc_solml(ids_H1PO4,L,NY,NX)+trc_solml(ids_H1PO4B,L,NY,NX)
+      trc_solml(ids_H2PO4,L,NY,NX)=trc_solml(ids_H2PO4,L,NY,NX)+trc_solml(ids_H2PO4B,L,NY,NX)
+      trc_solml(ids_H1PO4B,L,NY,NX)=0._r8
+      trc_solml(ids_H2PO4B,L,NY,NX)=0._r8
+
+      trcsa_solml(idsa_H0PO4,L,NY,NX)=trcsa_solml(idsa_H0PO4,L,NY,NX)+trcsa_solml(idsa_H0PO4B,L,NY,NX)
+      trcsa_solml(idsa_H3PO4,L,NY,NX)=trcsa_solml(idsa_H3PO4,L,NY,NX)+trcsa_solml(idsa_H3PO4B,L,NY,NX)
+      trcsa_solml(idsa_FeHPO4,L,NY,NX)=trcsa_solml(idsa_FeHPO4,L,NY,NX)+trcsa_solml(idsa_FeHPO4B,L,NY,NX)
+      trcsa_solml(idsa_FeH2PO4,L,NY,NX)=trcsa_solml(idsa_FeH2PO4,L,NY,NX)+trcsa_solml(idsa_FeH2PO4B,L,NY,NX)
+      trcsa_solml(idsa_CaPO4,L,NY,NX)=trcsa_solml(idsa_CaPO4,L,NY,NX)+trcsa_solml(idsa_CaPO4B,L,NY,NX)
+      trcsa_solml(idsa_CaHPO4,L,NY,NX)=trcsa_solml(idsa_CaHPO4,L,NY,NX)+trcsa_solml(idsa_CaHPO4B,L,NY,NX)
+      trcsa_solml(idsa_CaH2PO4,L,NY,NX)=trcsa_solml(idsa_CaH2PO4,L,NY,NX)+trcsa_solml(idsa_CaH2PO4B,L,NY,NX)
+      trcsa_solml(idsa_MgHPO4,L,NY,NX)=trcsa_solml(idsa_MgHPO4,L,NY,NX)+trcsa_solml(idsa_MgHPO4B,L,NY,NX)
+      trcsa_solml(idsa_H0PO4B,L,NY,NX)=0._r8
+      trcsa_solml(idsa_H3PO4B,L,NY,NX)=0._r8
+      trcsa_solml(idsa_FeHPO4B,L,NY,NX)=0._r8
+      trcsa_solml(idsa_FeH2PO4B,L,NY,NX)=0._r8
+      trcsa_solml(idsa_CaPO4B,L,NY,NX)=0._r8
+      trcsa_solml(idsa_CaHPO4B,L,NY,NX)=0._r8
+      trcsa_solml(idsa_CaH2PO4B,L,NY,NX)=0._r8
+      trcsa_solml(idsa_MgHPO4B,L,NY,NX)=0._r8
+
+      trcx_solml(idx_OHe,L,NY,NX)=trcx_solml(idx_OHe,L,NY,NX)+trcx_solml(idx_OHeB,L,NY,NX)
+      trcx_solml(idx_OH,L,NY,NX)=trcx_solml(idx_OH,L,NY,NX)+trcx_solml(idx_OHB,L,NY,NX)
+      trcx_solml(idx_OHp,L,NY,NX)=trcx_solml(idx_OHp,L,NY,NX)+trcx_solml(idx_OHpB,L,NY,NX)
+      trcx_solml(idx_HPO4,L,NY,NX)=trcx_solml(idx_HPO4,L,NY,NX)+trcx_solml(idx_HPO4B,L,NY,NX)
+      trcx_solml(idx_H2PO4,L,NY,NX)=trcx_solml(idx_H2PO4,L,NY,NX)+trcx_solml(idx_H2PO4B,L,NY,NX)
+      trcx_solml(idx_OHeB,L,NY,NX)=0._r8
+      trcx_solml(idx_OHB,L,NY,NX)=0._r8
+      trcx_solml(idx_OHpB,L,NY,NX)=0._r8
+      trcx_solml(idx_HPO4B,L,NY,NX)=0._r8
+      trcx_solml(idx_H2PO4B,L,NY,NX)=0._r8
+
+      trcp_salml(idsp_AlPO4,L,NY,NX)=trcp_salml(idsp_AlPO4,L,NY,NX)+trcp_salml(idsp_AlPO4B,L,NY,NX)
+      trcp_salml(idsp_FePO4,L,NY,NX)=trcp_salml(idsp_FePO4,L,NY,NX)+trcp_salml(idsp_FePO4B,L,NY,NX)
+      trcp_salml(idsp_CaHPO4,L,NY,NX)=trcp_salml(idsp_CaHPO4,L,NY,NX)+trcp_salml(idsp_CaHPO4B,L,NY,NX)
+      trcp_salml(idsp_HA,L,NY,NX)=trcp_salml(idsp_HA,L,NY,NX)+trcp_salml(idsp_HAB,L,NY,NX)
+      trcp_salml(idsp_CaH2PO4,L,NY,NX)=trcp_salml(idsp_CaH2PO4,L,NY,NX)+trcp_salml(idsp_CaH2PO4B,L,NY,NX)
+      trcp_salml(idsp_AlPO4B,L,NY,NX)=0._r8
+      trcp_salml(idsp_FePO4B,L,NY,NX)=0._r8
+      trcp_salml(idsp_CaHPO4B,L,NY,NX)=0._r8
+      trcp_salml(idsp_HAB,L,NY,NX)=0._r8
+      trcp_salml(idsp_CaH2PO4B,L,NY,NX)=0._r8
     ENDIF
   ENDIF
   end subroutine UpdatePO4FertilizerBandinfo
@@ -807,7 +820,7 @@ module SoluteMod
 !     ZOSGL=NO3 diffusivity
 !     TORT=tortuosity
 !
-      DWNO3=0.5*SQRT(ZOSGL(L,NY,NX))*TORT(NPH,L,NY,NX)
+      DWNO3=0.5*SQRT(SolDifc(ids_NO3,L,NY,NX))*TORT(NPH,L,NY,NX)
       WDNOB(L,NY,NX)=AMIN1(ROWO(NY,NX),WDNOB(L,NY,NX)+DWNO3)
 !
 !     NO3 BAND DEPTH
@@ -837,23 +850,26 @@ module SoluteMod
 !     DLYR=soil layer thickness
 !     FVLNO3=relative change in VLNO3
 !
-      XVLNO3=VLNO3(L,NY,NX)
+      XVLNO3=trcs_VLN(ids_NO3,L,NY,NX)
       IF(DLYR(3,L,NY,NX).GT.ZERO)THEN
-        VLNOB(L,NY,NX)=AZMAX1(AMIN1(0.999,WDNOB(L,NY,NX) &
+        trcs_VLN(ids_NO3B,L,NY,NX)=AZMAX1(AMIN1(0.999,WDNOB(L,NY,NX) &
           /ROWO(NY,NX)*DPNOB(L,NY,NX)/DLYR(3,L,NY,NX)))
       ELSE
-        VLNOB(L,NY,NX)=0._r8
+        trcs_VLN(ids_NO3B,L,NY,NX)=0._r8
       ENDIF
-      VLNO3(L,NY,NX)=1._r8-VLNOB(L,NY,NX)
-      FVLNO3=AMIN1(0.0_r8,(VLNO3(L,NY,NX)-XVLNO3)/XVLNO3)
+      trcs_VLN(ids_NO3,L,NY,NX)=1._r8-trcs_VLN(ids_NO3B,L,NY,NX)
+
+      trcs_VLN(ids_NO2B,L,NY,NX)=trcs_VLN(ids_NO3B,L,NY,NX)
+      trcs_VLN(ids_NO2,L,NY,NX)=trcs_VLN(ids_NO3,L,NY,NX)
+      FVLNO3=AZMIN1((trcs_VLN(ids_NO3,L,NY,NX)-XVLNO3)/XVLNO3)
 !
 !     TRANSFER NO3 FROM NON-BAND TO BAND
 !     DURING BAND GROWTH
 !
 !     DNO3S,DNO2S=transfer of NO3,NO2
 !
-      DNO3S=FVLNO3*ZNO3S(L,NY,NX)/natomw
-      DNO2S=FVLNO3*ZNO2S(L,NY,NX)/natomw
+      DNO3S=FVLNO3*trc_solml(ids_NO3,L,NY,NX)/natomw
+      DNO2S=FVLNO3*trc_solml(ids_NO2,L,NY,NX)/natomw
       TRNO3(L,NY,NX)=TRNO3(L,NY,NX)+DNO3S
       TRNO2(L,NY,NX)=TRNO2(L,NY,NX)+DNO2S
       TRNOB(L,NY,NX)=TRNOB(L,NY,NX)-DNO3S
@@ -864,12 +880,15 @@ module SoluteMod
 !
       DPNOB(L,NY,NX)=0._r8
       WDNOB(L,NY,NX)=0._r8
-      VLNO3(L,NY,NX)=1._r8
-      VLNOB(L,NY,NX)=0._r8
-      ZNO3S(L,NY,NX)=ZNO3S(L,NY,NX)+ZNO3B(L,NY,NX)
-      ZNO2S(L,NY,NX)=ZNO2S(L,NY,NX)+ZNO2B(L,NY,NX)
-      ZNO3B(L,NY,NX)=0._r8
-      ZNO2B(L,NY,NX)=0._r8
+      trcs_VLN(ids_NO3,L,NY,NX)=1._r8
+      trcs_VLN(ids_NO3B,L,NY,NX)=0._r8
+      trcs_VLN(ids_NO2,L,NY,NX)=trcs_VLN(ids_NO3,L,NY,NX)
+      trcs_VLN(ids_NO2B,L,NY,NX)=trcs_VLN(ids_NO3B,L,NY,NX)
+
+      trc_solml(ids_NO3,L,NY,NX)=trc_solml(ids_NO3,L,NY,NX)+trc_solml(ids_NO3B,L,NY,NX)
+      trc_solml(ids_NO2,L,NY,NX)=trc_solml(ids_NO2,L,NY,NX)+trc_solml(ids_NO2B,L,NY,NX)
+      trc_solml(ids_NO3B,L,NY,NX)=0._r8
+      trc_solml(ids_NO2B,L,NY,NX)=0._r8
     ENDIF
   ENDIF
   end subroutine UpdateNO3FertilizerBandinfo
@@ -936,11 +955,11 @@ module SoluteMod
 !     SPNHU=specific rate constant for urea hydrolysis
 !     TFNQ=temperature effect on microbial activity from nitro.f
 !
-    IF(ZNHUFA(0,NY,NX).GT.ZEROS(NY,NX) &
+    IF(FertN_soil(ifert_urea,0,NY,NX).GT.ZEROS(NY,NX) &
       .AND.BKVL(0,NY,NX).GT.ZEROS(NY,NX))THEN
-      CNHUA=ZNHUFA(0,NY,NX)/BKVL(0,NY,NX)
+      CNHUA=FertN_soil(ifert_urea,0,NY,NX)/BKVL(0,NY,NX)
       DFNSA=CNHUA/(CNHUA+DUKD)
-      RSNUA=AMIN1(ZNHUFA(0,NY,NX),SPNHU*TOQCK(0,NY,NX)*DFNSA*TFNQ(0,NY,NX))*(1.0-ZNHUI(0,NY,NX))
+      RSNUA=AMIN1(FertN_soil(ifert_urea,0,NY,NX),SPNHU*TOQCK(0,NY,NX)*DFNSA*TFNQ(0,NY,NX))*(1.0-ZNHUI(0,NY,NX))
     ELSE
       RSNUA=0._r8
     ENDIF
@@ -961,10 +980,10 @@ module SoluteMod
     ELSE
       THETWR=1._r8
     ENDIF
-    RSN4AA=SPNH4*ZNH4FA(0,NY,NX)*THETWR
-    RSN3AA=SPNH3*ZNH3FA(0,NY,NX)
+    RSN4AA=SPNH4*FertN_soil(ifert_nh4,0,NY,NX)*THETWR
+    RSN3AA=SPNH3*FertN_soil(ifert_nh3,0,NY,NX)
     RSNUAA=RSNUA*THETWR
-    RSNOAA=SPNO3*ZNO3FA(0,NY,NX)*THETWR
+    RSNOAA=SPNO3*FertN_soil(ifert_no3,0,NY,NX)*THETWR
 !
 !     SOLUBLE AND EXCHANGEABLE NH4 CONCENTRATIONS
 !
@@ -978,10 +997,10 @@ module SoluteMod
       VOLWMX=natomw*VOLWM(NPH,0,NY,NX)
       RN4X=(XNH4S(0,NY,NX)+natomw*RSN4AA)/VOLWMX
       RN3X=natomw*RSNUAA/VOLWMX
-      CN41=AMAX1(ZERO,ZNH4S(0,NY,NX)/VOLWMX+RN4X)
-      CN31=AMAX1(ZERO,ZNH3S(0,NY,NX)/VOLWMX+RN3X)
+      CN41=AMAX1(ZERO,trc_solml(ids_NH4,0,NY,NX)/VOLWMX+RN4X)
+      CN31=AMAX1(ZERO,trc_solml(idg_NH3,0,NY,NX)/VOLWMX+RN3X)
       IF(BKVLX.GT.ZEROS(NY,NX))THEN
-        XN41=AMAX1(ZERO,XN4(0,NY,NX)/BKVLX)
+        XN41=AMAX1(ZERO,trcx_solml(idx_NH4,0,NY,NX)/BKVLX)
       ELSE
         XN41=0._r8
       ENDIF
@@ -996,8 +1015,8 @@ module SoluteMod
       VOLWMP=patomw*VOLWM(NPH,0,NY,NX)
       RH1PX=XH1PS(0,NY,NX)/VOLWMP
       RH2PX=XH2PS(0,NY,NX)/VOLWMP
-      CH1P1=AZMAX1(H1PO4(0,NY,NX)/VOLWMP+RH1PX)
-      CH2P1=AZMAX1(H2PO4(0,NY,NX)/VOLWMP+RH2PX)
+      CH1P1=AZMAX1(trc_solml(ids_H1PO4,0,NY,NX)/VOLWMP+RH1PX)
+      CH2P1=AZMAX1(trc_solml(ids_H2PO4,0,NY,NX)/VOLWMP+RH2PX)
     ELSE
       RN4X=0._r8
       RN3X=0._r8
@@ -1016,11 +1035,11 @@ module SoluteMod
 !     PCAPM1,PCAPD1,PCAPH1=concn of precip CaH2PO4,CaHPO4,apatite
 !
     IF(BKVLX.GT.ZEROS(NY,NX))THEN
-      PALPO1=AZMAX1(PALPO(0,NY,NX)/BKVLX)
-      PFEPO1=AZMAX1(PFEPO(0,NY,NX)/BKVLX)
-      PCAPM1=AZMAX1(PCAPM(0,NY,NX)/BKVLX)
-      PCAPD1=AZMAX1(PCAPD(0,NY,NX)/BKVLX)
-      PCAPH1=AZMAX1(PCAPH(0,NY,NX)/BKVLX)
+      PALPO1=AZMAX1(trcp_salml(idsp_AlPO4,0,NY,NX)/BKVLX)
+      PFEPO1=AZMAX1(trcp_salml(idsp_FePO4,0,NY,NX)/BKVLX)
+      PCAPM1=AZMAX1(trcp_salml(idsp_CaH2PO4,0,NY,NX)/BKVLX)
+      PCAPD1=AZMAX1(trcp_salml(idsp_CaHPO4,0,NY,NX)/BKVLX)
+      PCAPH1=AZMAX1(trcp_salml(idsp_HA,0,NY,NX)/BKVLX)
     ELSE
       PALPO1=0._r8
       PFEPO1=0._r8
@@ -1035,7 +1054,7 @@ module SoluteMod
     COH1=AMAX1(ZERO,DPH2O/CHY1)
     CAL1=AMAX1(ZERO,SPALO/COH1**3._r8)
     CFE1=AMAX1(ZERO,SPFEO/COH1**3_r8)
-    CCO20=AMAX1(ZERO,CCO2S(0,NY,NX)/catomw)
+    CCO20=AMAX1(ZERO,trc_solcl(idg_CO2,0,NY,NX)/catomw)
     CCO31=AMAX1(ZERO,CCO20*DPCO3/CHY1**2._r8)
     CCA1=AMAX1(ZERO,AMIN1(CCAMX,SPCAC/CCO31))
 !
@@ -1194,16 +1213,16 @@ module SoluteMod
       TRN3S(0,NY,NX)=TRN3S(0,NY,NX)+RN3S*VOLWM(NPH,0,NY,NX)
       TRH1P(0,NY,NX)=TRH1P(0,NY,NX)+RHP1*VOLWM(NPH,0,NY,NX)
       TRH2P(0,NY,NX)=TRH2P(0,NY,NX)+RHP2*VOLWM(NPH,0,NY,NX)
-      TRXN4(0,NY,NX)=TRXN4(0,NY,NX)+RXN4*VOLWM(NPH,0,NY,NX)
-      TRALPO(0,NY,NX)=TRALPO(0,NY,NX)+RPALPX*VOLWM(NPH,0,NY,NX)
-      TRFEPO(0,NY,NX)=TRFEPO(0,NY,NX)+RPFEPX*VOLWM(NPH,0,NY,NX)
-      TRCAPD(0,NY,NX)=TRCAPD(0,NY,NX)+RPCADX*VOLWM(NPH,0,NY,NX)
-      TRCAPH(0,NY,NX)=TRCAPH(0,NY,NX)+RPCAHX*VOLWM(NPH,0,NY,NX)
-      TRCAPM(0,NY,NX)=TRCAPM(0,NY,NX)+RPCAMX*VOLWM(NPH,0,NY,NX)
-      ZNH4FA(0,NY,NX)=ZNH4FA(0,NY,NX)-RSN4AA
-      ZNH3FA(0,NY,NX)=ZNH3FA(0,NY,NX)-RSN3AA
-      ZNHUFA(0,NY,NX)=ZNHUFA(0,NY,NX)-RSNUAA
-      ZNO3FA(0,NY,NX)=ZNO3FA(0,NY,NX)-RSNOAA
+      trcx_TR(idx_NH4,0,NY,NX)=trcx_TR(idx_NH4,0,NY,NX)+RXN4*VOLWM(NPH,0,NY,NX)
+      trcp_TR(idsp_AlPO4,0,NY,NX)=trcp_TR(idsp_AlPO4,0,NY,NX)+RPALPX*VOLWM(NPH,0,NY,NX)
+      trcp_TR(idsp_FePO4,0,NY,NX)=trcp_TR(idsp_FePO4,0,NY,NX)+RPFEPX*VOLWM(NPH,0,NY,NX)
+      trcp_TR(idsp_CaHPO4,0,NY,NX)=trcp_TR(idsp_CaHPO4,0,NY,NX)+RPCADX*VOLWM(NPH,0,NY,NX)
+      trcp_TR(idsp_HA,0,NY,NX)=trcp_TR(idsp_HA,0,NY,NX)+RPCAHX*VOLWM(NPH,0,NY,NX)
+      trcp_TR(idsp_CaH2PO4,0,NY,NX)=trcp_TR(idsp_CaH2PO4,0,NY,NX)+RPCAMX*VOLWM(NPH,0,NY,NX)
+      FertN_soil(ifert_nh4,0,NY,NX)=FertN_soil(ifert_nh4,0,NY,NX)-RSN4AA
+      FertN_soil(ifert_nh3,0,NY,NX)=FertN_soil(ifert_nh3,0,NY,NX)-RSN3AA
+      FertN_soil(ifert_urea,0,NY,NX)=FertN_soil(ifert_urea,0,NY,NX)-RSNUAA
+      FertN_soil(ifert_no3,0,NY,NX)=FertN_soil(ifert_no3,0,NY,NX)-RSNOAA
       TRN4S(0,NY,NX)=TRN4S(0,NY,NX)+RSN4AA
       TRN3S(0,NY,NX)=TRN3S(0,NY,NX)+RSN3AA+RSNUAA
       TRNO3(0,NY,NX)=TRNO3(0,NY,NX)+RSNOAA
@@ -1214,7 +1233,7 @@ module SoluteMod
       TRH2P(0,NY,NX)=TRH2P(0,NY,NX)*patomw
 !     WRITE(*,9989)'TRN4S',I,J,TRN4S(0,NY,NX)
 !    2,RN4S,RNH4,RXN4,RSN4AA,VOLWM(NPH,0,NY,NX)
-!    3,SPNH4,ZNH4FA(0,NY,NX),THETWR
+!    3,SPNH4,FertN_soil(ifert_nh4,0,NY,NX),THETWR
 !9989  FORMAT(A8,2I4,12E12.4)
   end subroutine UpdateSoluteinSurfaceResidue
 

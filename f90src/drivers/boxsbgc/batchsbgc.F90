@@ -4,7 +4,7 @@ program main
   use batchmod
   use abortutils, only : endrun
   use fileUtil
-  use data_kind_mod, only : r8 => SHR_KIND_R8
+  use data_kind_mod, only : r8 => DAT_KIND_R8
 implicit none
   character(len=*), parameter :: mod_filename = __FILE__
 
@@ -46,7 +46,7 @@ end program main
   subroutine RunModel(namelist_buffer)
   !DESCRIPTION
   !display something
-  use data_kind_mod       , only : r8 => SHR_KIND_R8
+  use data_kind_mod       , only : r8 => DAT_KIND_R8
   use MicFLuxTypeMod      , only : micfluxtype
   use ModelStatusType     , only : model_status_type
   use MicStateTraitTypeMod, only : micsttype
@@ -55,7 +55,9 @@ end program main
   use ecosim_log_mod      , only : errMsg => shr_log_errMsg
   use batchmod
   use ForcTypeMod         , only : forc_type,ReadForc,UpdateForc
-  use histMod
+  use abortutils          , only : endrun
+
+  use bhistMod
   use fileUtil
   use EcoSIMSolverPar
   implicit none
@@ -220,7 +222,7 @@ end program main
     call hist%hist_wrap(ystatesf, timer)
 
     if(timer%its_a_new_year())then
-      write(iulog,*)'year ',timer%get_cur_year()
+      write(iulog,*)'year ',timer%get_curr_year()
     endif
     if(timer%its_time_to_exit())exit
 

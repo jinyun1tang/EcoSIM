@@ -5,7 +5,7 @@ module ChemEquilibriaMod
 ! the solver assumes prescirbed pH, and therefore [OH(-)]
 ! Note:
 ! the model does not include H3PO4, which seems problematic, July 28, 2022
-  use data_kind_mod, only : r8 => SHR_KIND_R8
+  use data_kind_mod, only : r8 => DAT_KIND_R8
   use SoluteParMod
   use EcosimConst
   use SoluteChemDataType

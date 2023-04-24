@@ -8,10 +8,10 @@ module shr_assert_mod
 ! Assert subroutines for common debugging operations.
 
 use data_kind_mod, only: &
-     r4 => shr_kind_r4, &
-     r8 => shr_kind_r8, &
-     i4 => shr_kind_i4, &
-     i8 => shr_kind_i8
+     r4 => DAT_kind_r4, &
+     r8 => DAT_kind_r8, &
+     i4 => DAT_kind_i4, &
+     i8 => DAT_kind_i8
 
 use abortutils, only: endrun
 

@@ -1,8 +1,8 @@
 module NutUptakeMod
 
-  use data_kind_mod, only : r8 => SHR_KIND_R8
+  use data_kind_mod, only : r8 => DAT_KIND_R8
   use StomatesMod   , only : stomates
-  use minimathmod  , only : safe_adb,vapsat,test_aneb
+  use minimathmod  , only : safe_adb,vapsat,test_aneb,AZMAX1
   use EcosimConst
   use EcoSIMSolverPar
   use UptakePars
@@ -46,7 +46,7 @@ module NutUptakeMod
   real(r8) :: ZPOOLB
   integer :: NB
 
-  associate(                            &
+  associate(                        &
     TCC     =>  plt_ew%TCC        , &
     NU      =>  plt_site%NU       , &
     AREA3   =>  plt_site%AREA3    , &
@@ -54,10 +54,8 @@ module NutUptakeMod
     RNH3B   =>  plt_rbgc%RNH3B    , &
     ZEROP   =>  plt_biom%ZEROP    , &
     WTLSB   =>  plt_biom%WTLSB    , &
-    ZPOOL   =>  plt_biom%ZPOOL    , &
-    CCPOLB  =>  plt_biom%CCPOLB   , &
-    CZPOLB  =>  plt_biom%CZPOLB   , &
-    CPPOLB  =>  plt_biom%CPPOLB   , &
+    EPOOL   =>  plt_biom%EPOOL    , &
+    CEPOLB  =>  plt_biom%CEPOLB   , &
     RC      =>  plt_photo%RC      , &
     RA      =>  plt_photo%RA      , &
     ARLFB   =>  plt_morph%ARLFB   , &
@@ -80,21 +78,20 @@ module NutUptakeMod
   !     RA,RC=canopy boundary layer,stomatal resistance
   !     FRADP=fraction of radiation received by each PFT canopy
   !
-  SNH3P=SNH3X*EXP(0.513-0.0171*TCC(NZ))
-  FNH3P=1.0E-04*FDMP
-  DO 105 NB=1,NBR(NZ)
-    IF(WTLSB(NB,NZ).GT.ZEROP(NZ) &
-      .AND.ARLFB(NB,NZ).GT.ZEROP(NZ) &
+  SNH3P=SNH3X*EXP(0.513_r8-0.0171_r8*TCC(NZ))
+  FNH3P=1.0E-04_r8*FDMP
+  D105: DO NB=1,NBR(NZ)
+    IF(WTLSB(NB,NZ).GT.ZEROP(NZ).AND.ARLFB(NB,NZ).GT.ZEROP(NZ) &
       .AND.ARLFP(NZ).GT.ZEROP(NZ))THEN
-      CNH3P=AMAX1(0.0,FNH3P*CZPOLB(NB,NZ)/SNH3P)
-      ZPOOLB=AMAX1(0.0,ZPOOL(NB,NZ))
-      RNH3B(NB,NZ)=AMIN1(0.1*ZPOOLB,AMAX1((CNH3E-CNH3P)/(RA(NZ)+RC(NZ)) &
-        *FRADP(NZ)*AREA3(NU)*ARLFB(NB,NZ)/ARLFP(NZ),-0.1*ZPOOLB))
-      ELSE
+      CNH3P=AZMAX1(FNH3P*CEPOLB(ielmn,NB,NZ)/SNH3P)
+      ZPOOLB=AZMAX1(EPOOL(ielmn,NB,NZ))
+      RNH3B(NB,NZ)=AMIN1(0.1_r8*ZPOOLB,AMAX1((CNH3E-CNH3P)/(RA(NZ)+RC(NZ)) &
+        *FRADP(NZ)*AREA3(NU)*ARLFB(NB,NZ)/ARLFP(NZ),-0.1_r8*ZPOOLB))
+    ELSE
       RNH3B(NB,NZ)=0.0_r8
-      ENDIF
+    ENDIF
 
-105   CONTINUE
+  ENDDO D105
   end associate
   end subroutine CanopyNH3Flux
 
@@ -132,8 +129,8 @@ module NutUptakeMod
 
   call ZeroUptake(NZ)
 
-  DO 955 N=1,MY(NZ)
-    DO 950 L=NU,NI(NZ)
+  D955: DO N=1,MY(NZ)
+    D950: DO L=NU,NI(NZ)
       IF(VOLX(L).GT.ZEROS2.AND.RTDNP(N,L,NZ).GT.ZERO &
         .AND.RTVLW(N,L,NZ).GT.ZEROP(NZ).AND.THETW(L).GT.ZERO)THEN
         TFOXYX=0.0_r8
@@ -185,8 +182,8 @@ module NutUptakeMod
 
       call SumupNutrientUptake(N,L,NZ)
 
-950 CONTINUE
-955 CONTINUE
+    ENDDO D950
+  ENDDO D955
   end associate
   end subroutine RootMycoO2NutrientUptake
 !------------------------------------------------------------------------
@@ -200,16 +197,8 @@ module NutUptakeMod
 
   L1=plt_site%NU;L2=plt_morph%NI(NZ);NN=plt_morph%MY(NZ)
 
-  plt_rbgc%RCOFLA(1:NN,L1:L2,NZ)=0.0_r8
-  plt_rbgc%ROXFLA(1:NN,L1:L2,NZ)=0.0_r8
-  plt_rbgc%RCHFLA(1:NN,L1:L2,NZ)=0.0_r8
-  plt_rbgc%RN2FLA(1:NN,L1:L2,NZ)=0.0_r8
-  plt_rbgc%RNHFLA(1:NN,L1:L2,NZ)=0.0_r8
-  plt_rbgc%RCODFA(1:NN,L1:L2,NZ)=0.0_r8
-  plt_rbgc%ROXDFA(1:NN,L1:L2,NZ)=0.0_r8
-  plt_rbgc%RCHDFA(1:NN,L1:L2,NZ)=0.0_r8
-  plt_rbgc%RN2DFA(1:NN,L1:L2,NZ)=0.0_r8
-  plt_rbgc%RNHDFA(1:NN,L1:L2,NZ)=0.0_r8
+  plt_rbgc%trcg_RFLA(idg_beg:idg_end-1,1:NN,L1:L2,NZ)=0.0_r8
+  plt_rbgc%trcg_RDFA(idg_beg:idg_end-1,1:NN,L1:L2,NZ)=0.0_r8
   plt_rbgc%RCO2S(1:NN,L1:L2,NZ)=0.0_r8
   plt_rbgc%RUPOXS(1:NN,L1:L2,NZ)=0.0_r8
   plt_rbgc%RUPCHS(1:NN,L1:L2,NZ)=0.0_r8
@@ -217,9 +206,7 @@ module NutUptakeMod
   plt_rbgc%RUPN3S(1:NN,L1:L2,NZ)=0.0_r8
   plt_rbgc%RCO2P(1:NN,L1:L2,NZ)=0.0_r8
   plt_rbgc%RUPOXP(1:NN,L1:L2,NZ)=0.0_r8
-  plt_rbgc%RDFOMC(1:NN,0:jcplx11,L1:L2,NZ)=0.0_r8
-  plt_rbgc%RDFOMN(1:NN,0:jcplx11,L1:L2,NZ)=0.0_r8
-  plt_rbgc%RDFOMP(1:NN,0:jcplx11,L1:L2,NZ)=0.0_r8
+  plt_rbgc%RDFOME(1:npelms,1:NN,1:jcplx,L1:L2,NZ)=0.0_r8
   plt_rbgc%WFR(1:NN,L1:L2,NZ)=1.0
   plt_rbgc%RUNNHP(1:NN,L1:L2,NZ)=0.0_r8
   plt_rbgc%RUPNH4(1:NN,L1:L2,NZ)=0.0_r8
@@ -280,11 +267,11 @@ module NutUptakeMod
     RUPP1P  =>   plt_rbgc%RUPP1P     , &
     RUPP2P  =>   plt_rbgc%RUPP2P     , &
     RUPP2B  =>   plt_rbgc%RUPP2B     , &
+    SolDifc =>   plt_soilchem%SolDifc, &
     RP1BY   =>   plt_bgcr%RP1BY      , &
     RPOBY   =>   plt_bgcr%RPOBY      , &
     RP14Y   =>   plt_bgcr%RP14Y      , &
-    RPO4Y   =>   plt_bgcr%RPO4Y      , &
-    POSGL   =>   plt_soilchem%POSGL    &
+    RPO4Y   =>   plt_bgcr%RPO4Y        &
   )
   TFPO4X=0.0_r8
   TFPOBX=0.0_r8
@@ -330,7 +317,7 @@ module NutUptakeMod
     !     RRADL=root radius
     !     DIFFL=PO4 diffusion per plant
     !
-    POSGX=POSGL(L)*TORT(NPH,L)
+    POSGX=SolDifc(ids_H1PO4,L)*TORT(NPH,L)
     PATHL=AMIN1(PATH(N,L),RRADL(N,L)+SQRT(2.0*POSGX))
     DIFFL=POSGX*safe_adb(RTARR(N,L),LOG(PATHL/RRADL(N,L)))
 
@@ -377,14 +364,11 @@ module NutUptakeMod
     RUONOB  =>  plt_rbgc%RUONOB     , &
     RUPNOB  =>  plt_rbgc%RUPNOB     , &
     RUONO3  =>  plt_rbgc%RUONO3     , &
-    VLNOB   =>  plt_soilchem%VLNOB  , &
-    CNO3B   =>  plt_soilchem%CNO3B  , &
-    ZNO3S   =>  plt_soilchem%ZNO3S  , &
-    ZOSGL   =>  plt_soilchem%ZOSGL  , &
-    CNO3S   =>  plt_soilchem%CNO3S  , &
-    VOLW    =>  plt_soilchem%VOLW   , &
-    VLNO3   =>  plt_soilchem%VLNO3  , &
-    ZNO3B   =>  plt_soilchem%ZNO3B    &
+    SolDifc =>  plt_soilchem%SolDifc, &
+    trc_solml   => plt_soilchem%trc_solml  , &
+    trcs_VLN   =>  plt_soilchem%trcs_VLN  , &
+    trc_solcl  =>  plt_soilchem%trc_solcl , &
+    VOLW    =>  plt_soilchem%VOLW     &
   )
 !
 ! PARAMETERS FOR RADIAL MASS FLOW AND DIFFUSION OF NO3
@@ -396,7 +380,7 @@ module NutUptakeMod
 ! PATH=path length of water and nutrient uptake
 ! DIFFL=NO3 diffusion per plant
 !
-  ZOSGX=ZOSGL(L)*TORT(NPH,L)
+  ZOSGX=SolDifc(ids_NO3,L)*TORT(NPH,L)
   PATHL=AMIN1(PATH(N,L),RRADL(N,L)+SQRT(2.0*ZOSGX))
   DIFFL=ZOSGX*safe_adb(RTARR(N,L),LOG(PATHL/RRADL(N,L)))
   !
@@ -409,10 +393,9 @@ module NutUptakeMod
   !     RMFNO3=soil-root convective NO3 flux per plant in non-band
   !     DIFNO3=soil-root NO3 diffusion per plant in non-band
   !
-  IF(VLNO3(L).GT.ZERO.AND.CNO3S(L) &
-    .GT.UPMNZO(N,NZ))THEN
-    RMFNO3=UPWTRP*CNO3S(L)*VLNO3(L)
-    DIFNO3=DIFFL*VLNO3(L)
+  IF(trcs_VLN(ids_NO3,L).GT.ZERO.AND.trc_solcl(ids_NO3,L).GT.UPMNZO(N,NZ))THEN
+    RMFNO3=UPWTRP*trc_solcl(ids_NO3,L)*trcs_VLN(ids_NO3,L)
+    DIFNO3=DIFFL*trcs_VLN(ids_NO3,L)
     !
     !     NO3 UPTAKE DEMAND FROM ROOT UPTAKE PARAMETERS ENTERED IN 'READQ'
     !     AND FROM ROOT SURFACE AREA, C AND N CONSTRAINTS CALCULATED ABOVE
@@ -425,7 +408,7 @@ module NutUptakeMod
     !     WFR=constraint by O2 consumption on all biological processes
     !
     UPMXP=UPMXZO(N,NZ)*RTARP(N,L,NZ) &
-      *FWSRT*TFN4(L,NZ)*VLNO3(L)*AMIN1(FCUP,FZUP)
+      *FWSRT*TFN4(L,NZ)*trcs_VLN(ids_NO3,L)*AMIN1(FCUP,FZUP)
     UPMX=UPMXP*WFR(N,L,NZ)
     !
     !     SOLUTION FOR MASS FLOW + DIFFUSION OF NO3 IN AQUEOUS PHASE OF
@@ -443,7 +426,7 @@ module NutUptakeMod
     !     RUONO3=NO3 uptake in non-band unlimited by O2
     !     RUCNO3=NO3 uptake in non-band unlimited by nonstructural C
 !
-    X=(DIFNO3+RMFNO3)*CNO3S(L)
+    X=(DIFNO3+RMFNO3)*trc_solcl(ids_NO3,L)
     Y=DIFNO3*UPMNZO(N,NZ)
     B=-UPMX-DIFNO3*UPKMZO(N,NZ)-X+Y
     C=(X-Y)*UPMX
@@ -451,12 +434,11 @@ module NutUptakeMod
     BP=-UPMXP-DIFNO3*UPKMZO(N,NZ)-X+Y
     CP=(X-Y)*UPMXP
     RTKNOP=(-BP-SQRT(BP*BP-4.0*CP))/2.0
-    ZNO3M=UPMNZO(N,NZ)*VOLW(L)*VLNO3(L)
-    ZNO3X=AMAX1(0.0,FNO3X*(ZNO3S(L)-ZNO3M))
-    RUNNOP(N,L,NZ)=AMAX1(0.0,RTKNO3*PP(NZ))
+    ZNO3M=UPMNZO(N,NZ)*VOLW(L)*trcs_VLN(ids_NO3,L)
+    ZNO3X=AZMAX1(FNO3X*(trc_solml(ids_NO3,L)-ZNO3M))
+    RUNNOP(N,L,NZ)=AZMAX1(RTKNO3*PP(NZ))
     RUPNO3(N,L,NZ)=AMIN1(ZNO3X,RUNNOP(N,L,NZ))
-    RUONO3(N,L,NZ)=AMIN1(ZNO3X,AMAX1(0.0 &
-      ,RTKNOP*PP(NZ)))
+    RUONO3(N,L,NZ)=AMIN1(ZNO3X,AZMAX1(RTKNOP*PP(NZ)))
     RUCNO3(N,L,NZ)=RUPNO3(N,L,NZ)/FCUP
   ENDIF
   !
@@ -470,10 +452,9 @@ module NutUptakeMod
   !     DIFNOB=soil-root NO3 diffusion per plant in band
   !
 
-  IF(VLNOB(L).GT.ZERO.AND.CNO3B(L) &
-    .GT.UPMNZO(N,NZ))THEN
-    RMFNOB=UPWTRP*CNO3B(L)*VLNOB(L)
-    DIFNOB=DIFFL*VLNOB(L)
+  IF(trcs_VLN(ids_NO3B,L).GT.ZERO.AND.trc_solcl(ids_NO3B,L).GT.UPMNZO(N,NZ))THEN
+    RMFNOB=UPWTRP*trc_solcl(ids_NO3B,L)*trcs_VLN(ids_NO3B,L)
+    DIFNOB=DIFFL*trcs_VLN(ids_NO3B,L)
     !
     !     NO3 UPTAKE DEMAND FROM ROOT UPTAKE PARAMETERS ENTERED IN 'READQ'
     !     AND FROM ROOT SURFACE AREA, C AND N CONSTRAINTS CALCULATED ABOVE
@@ -486,7 +467,7 @@ module NutUptakeMod
     !     WFR=constraint by O2 consumption on all biological processes
     !
     UPMXP=UPMXZO(N,NZ)*RTARP(N,L,NZ) &
-      *FWSRT*TFN4(L,NZ)*VLNOB(L)*AMIN1(FCUP,FZUP)
+      *FWSRT*TFN4(L,NZ)*trcs_VLN(ids_NO3B,L)*AMIN1(FCUP,FZUP)
     UPMX=UPMXP*WFR(N,L,NZ)
     !
     !     SOLUTION FOR MASS FLOW + DIFFUSION OF NO3 IN AQUEOUS PHASE OF
@@ -504,7 +485,7 @@ module NutUptakeMod
     !     RUONOB=NO3 uptake in band unlimited by O2
     !     RUCNOB=NO3 uptake in band unlimited by nonstructural C
     !
-    X=(DIFNOB+RMFNOB)*CNO3B(L)
+    X=(DIFNOB+RMFNOB)*trc_solcl(ids_NO3B,L)
     Y=DIFNOB*UPMNZO(N,NZ)
     B=-UPMX-DIFNOB*UPKMZO(N,NZ)-X+Y
     C=(X-Y)*UPMX
@@ -512,11 +493,11 @@ module NutUptakeMod
     BP=-UPMXP-DIFNOB*UPKMZO(N,NZ)-X+Y
     CP=(X-Y)*UPMXP
     RTKNPB=(-BP-SQRT(BP*BP-4.0*CP))/2.0
-    ZNOBM=UPMNZO(N,NZ)*VOLW(L)*VLNOB(L)
-    ZNOBX=AMAX1(0.0,FNOBX*(ZNO3B(L)-ZNOBM))
-    RUNNXP(N,L,NZ)=AMAX1(0.0,RTKNOB*PP(NZ))
+    ZNOBM=UPMNZO(N,NZ)*VOLW(L)*trcs_VLN(ids_NO3B,L)
+    ZNOBX=AZMAX1(FNOBX*(trc_solml(ids_NO3B,L)-ZNOBM))
+    RUNNXP(N,L,NZ)=AZMAX1(RTKNOB*PP(NZ))
     RUPNOB(N,L,NZ)=AMIN1(ZNOBX,RUNNXP(N,L,NZ))
-    RUONOB(N,L,NZ)=AMIN1(ZNOBX,AMAX1(0.0,RTKNPB*PP(NZ)))
+    RUONOB(N,L,NZ)=AMIN1(ZNOBX,AZMAX1(RTKNPB*PP(NZ)))
     RUCNOB(N,L,NZ)=RUPNOB(N,L,NZ)/FCUP
   ENDIF
   end associate
@@ -558,14 +539,11 @@ module NutUptakeMod
     RUNNBP  =>  plt_rbgc%RUNNBP     , &
     RUPNH4  =>  plt_rbgc%RUPNH4     , &
     RTARP   =>  plt_morph%RTARP     , &
-    ZNSGL   =>  plt_soilchem%ZNSGL  , &
+    SolDifc =>  plt_soilchem%SolDifc, &
     VOLW    =>  plt_soilchem%VOLW   , &
-    VLNHB   =>  plt_soilchem%VLNHB  , &
-    ZNH4B   =>  plt_soilchem%ZNH4B  , &
-    CNH4B   =>  plt_soilchem%CNH4B  , &
-    VLNH4   =>  plt_soilchem%VLNH4  , &
-    ZNH4S   =>  plt_soilchem%ZNH4S  , &
-    CNH4S   =>  plt_soilchem%CNH4S    &
+    trcs_VLN   =>  plt_soilchem%trcs_VLN  , &
+    trc_solml  =>  plt_soilchem%trc_solml , &
+    trc_solcl   =>  plt_soilchem%trc_solcl    &
   )
 ! ZNSGL=NH4 diffusivity
 ! TORT=soil tortuosity
@@ -573,7 +551,7 @@ module NutUptakeMod
 ! RRADL=root radius
 ! DIFFL=NH4 diffusion per plant
 !
-  ZNSGX=ZNSGL(L)*TORT(NPH,L)
+  ZNSGX=SolDifc(idg_NH3,L)*TORT(NPH,L)
   PATHL=AMIN1(PATH(N,L),RRADL(N,L)+SQRT(2.0*ZNSGX))
   DIFFL=ZNSGX*safe_adb(RTARR(N,L),LOG(PATHL/RRADL(N,L)))
 !
@@ -586,9 +564,9 @@ module NutUptakeMod
 ! RMFNH4=soil-root convective NH4 flux per plant in non-band
 ! DIFNH4=soil-root NH4 diffusion per plant in non-band
 !
-  IF(VLNH4(L).GT.ZERO.AND.CNH4S(L).GT.UPMNZH(N,NZ))THEN
-    RMFNH4=UPWTRP*CNH4S(L)*VLNH4(L)
-    DIFNH4=DIFFL*VLNH4(L)
+  IF(trcs_VLN(ids_NH4,L).GT.ZERO.AND.trc_solcl(ids_NH4,L).GT.UPMNZH(N,NZ))THEN
+    RMFNH4=UPWTRP*trc_solcl(ids_NH4,L)*trcs_VLN(ids_NH4,L)
+    DIFNH4=DIFFL*trcs_VLN(ids_NH4,L)
 !
 !   NH4 UPTAKE DEMAND FROM ROOT UPTAKE PARAMETERS ENTERED IN 'READQ'
 !   AND FROM ROOT SURFACE AREA, C AND N CONSTRAINTS CALCULATED ABOVE
@@ -601,7 +579,7 @@ module NutUptakeMod
 !   WFR=constraint by O2 consumption on all biological processes
 !
     UPMXP=UPMXZH(N,NZ)*RTARP(N,L,NZ) &
-      *FWSRT*TFN4(L,NZ)*VLNH4(L)*AMIN1(FCUP,FZUP)
+      *FWSRT*TFN4(L,NZ)*trcs_VLN(ids_NH4,L)*AMIN1(FCUP,FZUP)
     UPMX=UPMXP*WFR(N,L,NZ)
 !
 !   SOLUTION FOR MASS FLOW + DIFFUSION OF NH4 IN AQUEOUS PHASE OF
@@ -619,20 +597,19 @@ module NutUptakeMod
 !   RUONH4=NH4 uptake in non-band unlimited by O2
 !   RUCNH4=NH4 uptake in non-band unlimited by nonstructural C
 !
-    X=(DIFNH4+RMFNH4)*CNH4S(L)
+    X=(DIFNH4+RMFNH4)*trc_solcl(ids_NH4,L)
     Y=DIFNH4*UPMNZH(N,NZ)
     B=-UPMX-DIFNH4*UPKMZH(N,NZ)-X+Y
     C=(X-Y)*UPMX
-    RTKNH4=(-B-SQRT(B*B-4.0*C))/2.0
+    RTKNH4=(-B-SQRT(B*B-4.0*C))/2.0_r8
     BP=-UPMXP-DIFNH4*UPKMZH(N,NZ)-X+Y
     CP=(X-Y)*UPMXP
-    RTKNHP=(-BP-SQRT(BP*BP-4.0*CP))/2.0
-    ZNH4M=UPMNZH(N,NZ)*VOLW(L)*VLNH4(L)
-    ZNH4X=AMAX1(0.0,FNH4X*(ZNH4S(L)-ZNH4M))
-    RUNNHP(N,L,NZ)=AMAX1(0.0,RTKNH4*PP(NZ))
+    RTKNHP=(-BP-SQRT(BP*BP-4.0*CP))/2.0_r8
+    ZNH4M=UPMNZH(N,NZ)*VOLW(L)*trcs_VLN(ids_NH4,L)
+    ZNH4X=AZMAX1(FNH4X*(trc_solml(ids_NH4,L)-ZNH4M))
+    RUNNHP(N,L,NZ)=AZMAX1(RTKNH4*PP(NZ))
     RUPNH4(N,L,NZ)=AMIN1(ZNH4X,RUNNHP(N,L,NZ))
-    RUONH4(N,L,NZ)=AMIN1(ZNH4X,AMAX1(0.0 &
-      ,RTKNHP*PP(NZ)))
+    RUONH4(N,L,NZ)=AMIN1(ZNH4X,AZMAX1(RTKNHP*PP(NZ)))
     RUCNH4(N,L,NZ)=RUPNH4(N,L,NZ)/FCUP
   ENDIF
 !
@@ -646,10 +623,9 @@ module NutUptakeMod
 ! DIFNHB=soil-root NH4 diffusion per plant in band
 !
 
-  IF(VLNHB(L).GT.ZERO.AND.CNH4B(L) &
-    .GT.UPMNZH(N,NZ))THEN
-    RMFNHB=UPWTRP*CNH4B(L)*VLNHB(L)
-    DIFNHB=DIFFL*VLNHB(L)
+  IF(trcs_VLN(ids_NH4B,L).GT.ZERO.AND.trc_solcl(ids_NH4B,L).GT.UPMNZH(N,NZ))THEN
+    RMFNHB=UPWTRP*trc_solcl(ids_NH4B,L)*trcs_VLN(ids_NH4B,L)
+    DIFNHB=DIFFL*trcs_VLN(ids_NH4B,L)
 !
 !   NH4 UPTAKE DEMAND FROM ROOT UPTAKE PARAMETERS ENTERED IN 'READQ'
 !   AND FROM ROOT SURFACE AREA, C AND N CONSTRAINTS CALCULATED ABOVE
@@ -662,7 +638,7 @@ module NutUptakeMod
 !   WFR=constraint by O2 consumption on all biological processes
 !
     UPMXP=UPMXZH(N,NZ)*RTARP(N,L,NZ) &
-      *FWSRT*TFN4(L,NZ)*VLNHB(L)*AMIN1(FCUP,FZUP)
+      *FWSRT*TFN4(L,NZ)*trcs_VLN(ids_NH4B,L)*AMIN1(FCUP,FZUP)
     UPMX=UPMXP*WFR(N,L,NZ)
 !
 !   SOLUTION FOR MASS FLOW + DIFFUSION OF NH4 IN AQUEOUS PHASE OF
@@ -680,20 +656,19 @@ module NutUptakeMod
 !   RUONHB=NH4 uptake in band unlimited by O2
 !   RUCNHB=NH4 uptake in band unlimited by nonstructural C
 !
-    X=(DIFNHB+RMFNHB)*CNH4B(L)
+    X=(DIFNHB+RMFNHB)*trc_solcl(ids_NH4B,L)
     Y=DIFNHB*UPMNZH(N,NZ)
     B=-UPMX-DIFNHB*UPKMZH(N,NZ)-X+Y
     C=(X-Y)*UPMX
-    RTKNHB=(-B-SQRT(B*B-4.0*C))/2.0
+    RTKNHB=(-B-SQRT(B*B-4.0*C))/2.0_r8
     BP=-UPMXP-DIFNHB*UPKMZH(N,NZ)-X+Y
     CP=(X-Y)*UPMXP
     RTKNBP=(-BP-SQRT(BP*BP-4.0*CP))/2.0
-    ZNHBM=UPMNZH(N,NZ)*VOLW(L)*VLNHB(L)
-    ZNHBX=AMAX1(0.0,FNHBX*(ZNH4B(L)-ZNHBM))
-    RUNNBP(N,L,NZ)=AMAX1(0.0,RTKNHB*PP(NZ))
+    ZNHBM=UPMNZH(N,NZ)*VOLW(L)*trcs_VLN(ids_NH4B,L)
+    ZNHBX=AZMAX1(FNHBX*(trc_solml(ids_NH4B,L)-ZNHBM))
+    RUNNBP(N,L,NZ)=AZMAX1(RTKNHB*PP(NZ))
     RUPNHB(N,L,NZ)=AMIN1(ZNHBX,RUNNBP(N,L,NZ))
-    RUONHB(N,L,NZ)=AMIN1(ZNHBX,AMAX1(0.0 &
-      ,RTKNBP*PP(NZ)))
+    RUONHB(N,L,NZ)=AMIN1(ZNHBX,AZMAX1(RTKNBP*PP(NZ)))
     RUCNHB(N,L,NZ)=RUPNHB(N,L,NZ)/FCUP
   ENDIF
   end associate
@@ -736,12 +711,10 @@ module NutUptakeMod
     RUPP1B  => plt_rbgc%RUPP1B     , &
     RTARP   => plt_morph%RTARP     , &
     VOLW    => plt_soilchem%VOLW   , &
-    VLPO4   => plt_soilchem%VLPO4  , &
-    CH1P4   => plt_soilchem%CH1P4  , &
-    H1PO4   => plt_soilchem%H1PO4  , &
-    VLPOB   => plt_soilchem%VLPOB  , &
-    CH1P4B  => plt_soilchem%CH1P4B , &
-    H1POB   => plt_soilchem%H1POB    &
+    trcs_VLN   => plt_soilchem%trcs_VLN  , &
+    trc_solcl   => plt_soilchem%trc_solcl  , &
+    trc_solml   => plt_soilchem%trc_solml    &
+
   )
   !
   !     HPO4 UPTAKE IN NON-BAND SOIL ZONE
@@ -753,10 +726,9 @@ module NutUptakeMod
   !     RMFH1P=soil-root convective HPO4 flux per plant in non-band
   !     DIFH1P=soil-root HPO4 diffusion per plant in non-band
 !
-    IF(VLPO4(L).GT.ZERO.AND.CH1P4(L) &
-      .GT.UPMNPO(N,NZ))THEN
-      RMFH1P=UPWTRP*CH1P4(L)*VLPO4(L)
-      DIFH1P=DIFFL*VLPO4(L)
+    IF(trcs_VLN(ids_H1PO4,L).GT.ZERO.AND.trc_solcl(ids_H1PO4,L).GT.UPMNPO(N,NZ))THEN
+      RMFH1P=UPWTRP*trc_solcl(ids_H1PO4,L)*trcs_VLN(ids_H1PO4,L)
+      DIFH1P=DIFFL*trcs_VLN(ids_H1PO4,L)
     !
     !     HPO4 UPTAKE DEMAND FROM ROOT UPTAKE PARAMETERS ENTERED IN 'READQ'
     !     AND FROM ROOT SURFACE AREA, C AND N CONSTRAINTS CALCULATED ABOVE
@@ -768,8 +740,8 @@ module NutUptakeMod
     !     FCUP,FPUP=limitn to active uptake respiration from CCPOLR,CPPOLR
     !     WFR=constraint by O2 consumption on all biological processes
     !
-    UPMXP=0.1*UPMXPO(N,NZ)*RTARP(N,L,NZ) &
-      *FWSRT*TFN4(L,NZ)*VLPO4(L)*AMIN1(FCUP,FPUP)
+    UPMXP=0.1_r8*UPMXPO(N,NZ)*RTARP(N,L,NZ) &
+      *FWSRT*TFN4(L,NZ)*trcs_VLN(ids_H1PO4,L)*AMIN1(FCUP,FPUP)
     UPMX=UPMXP*WFR(N,L,NZ)
     !
     !     SOLUTION FOR MASS FLOW + DIFFUSION OF HPO4 IN AQUEOUS PHASE OF
@@ -787,7 +759,7 @@ module NutUptakeMod
     !     RUOH1P=HPO4 uptake in non-band unlimited by O2
     !     RUCH1P=HPO4 uptake in non-band unlimited by nonstructural C
 !
-    X=(DIFH1P+RMFH1P)*CH1P4(L)
+    X=(DIFH1P+RMFH1P)*trc_solcl(ids_H1PO4,L)
     Y=DIFH1P*UPMNPO(N,NZ)
     B=-UPMX-DIFH1P*UPKMPO(N,NZ)-X+Y
     C=(X-Y)*UPMX
@@ -795,11 +767,11 @@ module NutUptakeMod
     BP=-UPMXP-DIFH1P*UPKMPO(N,NZ)-X+Y
     CP=(X-Y)*UPMXP
     RTKHP1=(-BP-SQRT(BP*BP-4.0*CP))/2.0
-    H1POM=UPMNPO(N,NZ)*VOLW(L)*VLPO4(L)
-    H1POX=AMAX1(0.0,FP14X*(H1PO4(L)-H1POM))
-    RUPP1P(N,L,NZ)=AMAX1(0.0,RTKH1P*PP(NZ))
+    H1POM=UPMNPO(N,NZ)*VOLW(L)*trcs_VLN(ids_H1PO4,L)
+    H1POX=AZMAX1(FP14X*(trc_solml(ids_H1PO4,L)-H1POM))
+    RUPP1P(N,L,NZ)=AZMAX1(RTKH1P*PP(NZ))
     RUPH1P(N,L,NZ)=AMIN1(H1POX,RUPP1P(N,L,NZ))
-    RUOH1P(N,L,NZ)=AMIN1(H1POX,AMAX1(0.0,RTKHP1*PP(NZ)))
+    RUOH1P(N,L,NZ)=AMIN1(H1POX,AZMAX1(RTKHP1*PP(NZ)))
     RUCH1P(N,L,NZ)=RUPH1P(N,L,NZ)/FCUP
 
   ENDIF
@@ -813,10 +785,9 @@ module NutUptakeMod
   !     RMFH1B=soil-root convective HPO4 flux per plant in band
   !     DIFH1B=soil-root HPO4 diffusion per plant in band
   !
-  IF(VLPOB(L).GT.ZERO.AND.CH1P4B(L) &
-    .GT.UPMNPO(N,NZ))THEN
-    RMFH2B=UPWTRP*CH1P4B(L)*VLPOB(L)
-    DIFH1B=DIFFL*VLPOB(L)
+  IF(trcs_VLN(ids_H1PO4B,L).GT.ZERO.AND.trc_solcl(ids_H1PO4B,L).GT.UPMNPO(N,NZ))THEN
+    RMFH2B=UPWTRP*trc_solcl(ids_H1PO4B,L)*trcs_VLN(ids_H1PO4B,L)
+    DIFH1B=DIFFL*trcs_VLN(ids_H1PO4B,L)
     !
     !     HPO4 UPTAKE DEMAND FROM ROOT UPTAKE PARAMETERS ENTERED IN 'READQ'
     !     AND FROM ROOT SURFACE AREA, C AND N CONSTRAINTS CALCULATED ABOVE
@@ -828,8 +799,8 @@ module NutUptakeMod
     !     FCUP,FPUP=limitn to active uptake respiration from CCPOLR,CPPOLR
     !     WFR=constraint by O2 consumption on all biological processes
     !
-    UPMXP=0.1*UPMXPO(N,NZ)*RTARP(N,L,NZ) &
-      *FWSRT*TFN4(L,NZ)*VLPOB(L)*AMIN1(FCUP,FPUP)
+    UPMXP=0.1_r8*UPMXPO(N,NZ)*RTARP(N,L,NZ) &
+      *FWSRT*TFN4(L,NZ)*trcs_VLN(ids_H1PO4B,L)*AMIN1(FCUP,FPUP)
     UPMX=UPMXP*WFR(N,L,NZ)
     !
     !     SOLUTION FOR MASS FLOW + DIFFUSION OF HPO4 IN AQUEOUS PHASE OF
@@ -847,7 +818,7 @@ module NutUptakeMod
     !     RUOH1B=HPO4 uptake in band unlimited by O2
     !     RUCH1B=HPO4 uptake in band unlimited by nonstructural C
 !
-    X=(DIFH1B+RMFH2B)*CH1P4B(L)
+    X=(DIFH1B+RMFH2B)*trc_solcl(ids_H1PO4B,L)
     Y=DIFH1B*UPMNPO(N,NZ)
     B=-UPMX-DIFH1B*UPKMPO(N,NZ)-X+Y
     C=(X-Y)*UPMX
@@ -855,11 +826,11 @@ module NutUptakeMod
     BP=-UPMXP-DIFH1B*UPKMPO(N,NZ)-X+Y
     CP=(X-Y)*UPMXP
     RTKHB1=(-BP-SQRT(BP*BP-4.0*CP))/2.0
-    H1PXM=UPMNPO(N,NZ)*VOLW(L)*VLPOB(L)
-    H1PXB=AMAX1(0.0,FP1BX*(H1POB(L)-H1PXM))
-    RUPP1B(N,L,NZ)=AMAX1(0.0,RTKH1B*PP(NZ))
+    H1PXM=UPMNPO(N,NZ)*VOLW(L)*trcs_VLN(ids_H1PO4B,L)
+    H1PXB=AZMAX1(FP1BX*(trc_solml(ids_H1PO4B,L)-H1PXM))
+    RUPP1B(N,L,NZ)=AZMAX1(RTKH1B*PP(NZ))
     RUPH1B(N,L,NZ)=AMIN1(H1PXB,RUPP1B(N,L,NZ))
-    RUOH1B(N,L,NZ)=AMIN1(H1PXB,AMAX1(0.0,RTKHB1*PP(NZ)))
+    RUOH1B(N,L,NZ)=AMIN1(H1PXB,AZMAX1(RTKHB1*PP(NZ)))
     RUCH1B(N,L,NZ)=RUPH1B(N,L,NZ)/FCUP
   ENDIF
   end associate
@@ -898,13 +869,10 @@ module NutUptakeMod
     RUPP2P  => plt_rbgc%RUPP2P     , &
     TFN4    => plt_pheno%TFN4      , &
     RTARP   => plt_morph%RTARP     , &
-    H2POB   => plt_soilchem%H2POB  , &
+    trc_solml   => plt_soilchem%trc_solml  , &
     VOLW    => plt_soilchem%VOLW   , &
-    H2PO4   => plt_soilchem%H2PO4  , &
-    CH2P4   => plt_soilchem%CH2P4  , &
-    VLPO4   => plt_soilchem%VLPO4  , &
-    CH2P4B  => plt_soilchem%CH2P4B , &
-    VLPOB   => plt_soilchem%VLPOB    &
+    trc_solcl   => plt_soilchem%trc_solcl  , &
+    trcs_VLN   => plt_soilchem%trcs_VLN  &
   )
   !     H2PO4 UPTAKE IN NON-BAND SOIL ZONE
   !
@@ -915,10 +883,10 @@ module NutUptakeMod
   !     RMFH2P=soil-root convective H2PO4 flux per plant in non-band
   !     DIFH2P=soil-root H2PO4 diffusion per plant in non-band
 !
-    IF(VLPO4(L).GT.ZERO.AND.CH2P4(L) &
+    IF(trcs_VLN(ids_H1PO4,L).GT.ZERO.AND.trc_solcl(ids_H2PO4,L) &
       .GT.UPMNPO(N,NZ))THEN
-      RMFH2P=UPWTRP*CH2P4(L)*VLPO4(L)
-      DIFH2P=DIFFL*VLPO4(L)
+      RMFH2P=UPWTRP*trc_solcl(ids_H2PO4,L)*trcs_VLN(ids_H1PO4,L)
+      DIFH2P=DIFFL*trcs_VLN(ids_H1PO4,L)
       !
       !     H2PO4 UPTAKE DEMAND FROM ROOT UPTAKE PARAMETERS ENTERED IN 'READQ'
       !     AND FROM ROOT SURFACE AREA, C AND P CONSTRAINTS CALCULATED ABOVE
@@ -931,7 +899,7 @@ module NutUptakeMod
       !     WFR=constraint by O2 consumption on all biological processes
 !
       UPMXP=UPMXPO(N,NZ)*RTARP(N,L,NZ) &
-        *FWSRT*TFN4(L,NZ)*VLPO4(L)*AMIN1(FCUP,FPUP)
+        *FWSRT*TFN4(L,NZ)*trcs_VLN(ids_H1PO4,L)*AMIN1(FCUP,FPUP)
       UPMX=UPMXP*WFR(N,L,NZ)
       !
       !     SOLUTION FOR MASS FLOW + DIFFUSION OF H2PO4 IN AQUEOUS PHASE OF
@@ -949,7 +917,7 @@ module NutUptakeMod
       !     RUOH2P=H2PO4 uptake in non-band unlimited by O2
       !     RUCH2P=H2PO4 uptake in non-band unlimited by nonstructural C
 !
-      X=(DIFH2P+RMFH2P)*CH2P4(L)
+      X=(DIFH2P+RMFH2P)*trc_solcl(ids_H2PO4,L)
       Y=DIFH2P*UPMNPO(N,NZ)
       B=-UPMX-DIFH2P*UPKMPO(N,NZ)-X+Y
       C=(X-Y)*UPMX
@@ -957,11 +925,11 @@ module NutUptakeMod
       BP=-UPMXP-DIFH2P*UPKMPO(N,NZ)-X+Y
       CP=(X-Y)*UPMXP
       RTKHPP=(-BP-SQRT(BP*BP-4.0*CP))/2.0
-      H2POM=UPMNPO(N,NZ)*VOLW(L)*VLPO4(L)
-      H2POX=AMAX1(0.0,FPO4X*(H2PO4(L)-H2POM))
-      RUPP2P(N,L,NZ)=AMAX1(0.0,RTKH2P*PP(NZ))
+      H2POM=UPMNPO(N,NZ)*VOLW(L)*trcs_VLN(ids_H1PO4,L)
+      H2POX=AZMAX1(FPO4X*(trc_solml(ids_H2PO4,L)-H2POM))
+      RUPP2P(N,L,NZ)=AZMAX1(RTKH2P*PP(NZ))
       RUPH2P(N,L,NZ)=AMIN1(H2POX,RUPP2P(N,L,NZ))
-      RUOH2P(N,L,NZ)=AMIN1(H2POX,AMAX1(0.0_r8,RTKHPP*PP(NZ)))
+      RUOH2P(N,L,NZ)=AMIN1(H2POX,AZMAX1(RTKHPP*PP(NZ)))
       RUCH2P(N,L,NZ)=RUPH2P(N,L,NZ)/FCUP
     ENDIF
     !
@@ -975,10 +943,9 @@ module NutUptakeMod
     !     DIFH2B=soil-root H2PO4 diffusion per plant in band
     !
 
-  IF(VLPOB(L).GT.ZERO.AND.CH2P4B(L) &
-    .GT.UPMNPO(N,NZ))THEN
-    RMFH2B=UPWTRP*CH2P4B(L)*VLPOB(L)
-    DIFH2B=DIFFL*VLPOB(L)
+  IF(trcs_VLN(ids_H1PO4B,L).GT.ZERO.AND.trc_solcl(ids_H2PO4B,L).GT.UPMNPO(N,NZ))THEN
+    RMFH2B=UPWTRP*trc_solcl(ids_H2PO4B,L)*trcs_VLN(ids_H1PO4B,L)
+    DIFH2B=DIFFL*trcs_VLN(ids_H1PO4B,L)
     !
     !     H2PO4 UPTAKE DEMAND FROM ROOT UPTAKE PARAMETERS ENTERED IN 'READQ'
     !     AND FROM ROOT SURFACE AREA, C AND N CONSTRAINTS CALCULATED ABOVE
@@ -991,7 +958,7 @@ module NutUptakeMod
     !     WFR=constraint by O2 consumption on all biological processes
     !
     UPMXP=UPMXPO(N,NZ)*RTARP(N,L,NZ) &
-      *FWSRT*TFN4(L,NZ)*VLPOB(L)*AMIN1(FCUP,FPUP)
+      *FWSRT*TFN4(L,NZ)*trcs_VLN(ids_H1PO4B,L)*AMIN1(FCUP,FPUP)
     UPMX=UPMXP*WFR(N,L,NZ)
     !
     !     SOLUTION FOR MASS FLOW + DIFFUSION OF PO4 IN AQUEOUS PHASE OF
@@ -1009,7 +976,7 @@ module NutUptakeMod
     !     RUOH2B=H2PO4 uptake in band unlimited by O2
     !     RUCH2B=H2PO4 uptake in band unlimited by nonstructural C
 !
-    X=(DIFH2B+RMFH2B)*CH2P4B(L)
+    X=(DIFH2B+RMFH2B)*trc_solcl(ids_H2PO4B,L)
     Y=DIFH2B*UPMNPO(N,NZ)
     B=-UPMX-DIFH2B*UPKMPO(N,NZ)-X+Y
     C=(X-Y)*UPMX
@@ -1017,11 +984,11 @@ module NutUptakeMod
     BP=-UPMXP-DIFH2B*UPKMPO(N,NZ)-X+Y
     CP=(X-Y)*UPMXP
     RTKHPB=(-BP-SQRT(BP*BP-4.0*CP))/2.0
-    H2PXM=UPMNPO(N,NZ)*VOLW(L)*VLPOB(L)
-    H2PXB=AMAX1(0.0,FPOBX*(H2POB(L)-H2PXM))
-    RUPP2B(N,L,NZ)=AMAX1(0.0,RTKH2B*PP(NZ))
+    H2PXM=UPMNPO(N,NZ)*VOLW(L)*trcs_VLN(ids_H1PO4B,L)
+    H2PXB=AZMAX1(FPOBX*(trc_solml(ids_H2PO4B,L)-H2PXM))
+    RUPP2B(N,L,NZ)=AZMAX1(RTKH2B*PP(NZ))
     RUPH2B(N,L,NZ)=AMIN1(H2PXB,RUPP2B(N,L,NZ))
-    RUOH2B(N,L,NZ)=AMIN1(H2PXB,AMAX1(0.0,RTKHPB*PP(NZ)))
+    RUOH2B(N,L,NZ)=AMIN1(H2PXB,AZMAX1(RTKHPB*PP(NZ)))
     RUCH2B(N,L,NZ)=RUPH2B(N,L,NZ)/FCUP
   ENDIF
   end associate
@@ -1123,10 +1090,8 @@ module NutUptakeMod
     ZEROP   => plt_biom%ZEROP   , &
     CWSRTL  => plt_biom%CWSRTL  , &
     WSRTL   => plt_biom%WSRTL   , &
-    CPPOLR  => plt_biom%CPPOLR  , &
-    CZPOLR  => plt_biom%CZPOLR  , &
-    CPOOLR  => plt_biom%CPOOLR  , &
-    CCPOLR  => plt_biom%CCPOLR  , &
+    EPOOLR  => plt_biom%EPOOLR  , &
+    CEPOLR  => plt_biom%CEPOLR  , &
     WTRTL   => plt_biom%WTRTL     &
   )
   !
@@ -1153,8 +1118,7 @@ module NutUptakeMod
   !     CPOOLR=nonstructural C content
   !
   IF(RCO2N(N,L,NZ).GT.ZEROP(NZ))THEN
-    FCUP=AMAX1(0.0,AMIN1(1.0,0.25*safe_adb(CPOOLR(N,L,NZ) &
-      ,RCO2N(N,L,NZ))))
+    FCUP=AZMAX1(AMIN1(1.0,0.25*safe_adb(EPOOLR(ielmc,N,L,NZ),RCO2N(N,L,NZ))))
   ELSE
     FCUP=0.0_r8
   ENDIF
@@ -1166,17 +1130,17 @@ module NutUptakeMod
   !     ZCKI,PCKI,ZPKI,PZKI=N,P inhibition effect on N,P uptake
   !     UPWTRH=water uptake at time step for gas flux calculations
   !
-  IF(CCPOLR(N,L,NZ).GT.ZERO)THEN
-    FZUP=AMIN1(safe_adb(CCPOLR(N,L,NZ),CCPOLR(N,L,NZ)+CZPOLR(N,L,NZ)/ZCKI) &
-      ,safe_adb(CPPOLR(N,L,NZ),CPPOLR(N,L,NZ)+CZPOLR(N,L,NZ)/ZPKI))
-    FPUP=AMIN1(safe_adb(CCPOLR(N,L,NZ),CCPOLR(N,L,NZ)+CPPOLR(N,L,NZ)/PCKI) &
-      ,safe_adb(CZPOLR(N,L,NZ),CZPOLR(N,L,NZ)+CPPOLR(N,L,NZ)/PZKI))
+  IF(CEPOLR(ielmc,N,L,NZ).GT.ZERO)THEN
+    FZUP=AMIN1(safe_adb(CEPOLR(ielmc,N,L,NZ),CEPOLR(ielmc,N,L,NZ)+CEPOLR(ielmn,N,L,NZ)/ZCKI) &
+      ,safe_adb(CEPOLR(ielmp,N,L,NZ),CEPOLR(ielmp,N,L,NZ)+CEPOLR(ielmn,N,L,NZ)/ZPKI))
+    FPUP=AMIN1(safe_adb(CEPOLR(ielmc,N,L,NZ),CEPOLR(ielmc,N,L,NZ)+CEPOLR(ielmp,N,L,NZ)/PCKI) &
+      ,safe_adb(CEPOLR(ielmn,N,L,NZ),CEPOLR(ielmn,N,L,NZ)+CEPOLR(ielmp,N,L,NZ)/PZKI))
   ELSE
     FZUP=0.0_r8
     FPUP=0.0_r8
   ENDIF
   !NN=0
-  UPWTRP=AMAX1(0.0,-UPWTR(N,L,NZ)/PP(NZ))
+  UPWTRP=AZMAX1(-UPWTR(N,L,NZ)/PP(NZ))
   UPWTRH=UPWTRP*XNPG
   !
   !     FACTORS CONSTRAINING O2 AND NUTRIENT UPTAKE AMONG
@@ -1236,17 +1200,13 @@ module NutUptakeMod
   integer :: K
   !     begin_execution
   associate(                       &
-    CPOOLR=>  plt_biom%CPOOLR    , &
-    ZPOOLR=>  plt_biom%ZPOOLR    , &
-    PPOOLR=>  plt_biom%PPOOLR    , &
+    EPOOLR=>  plt_biom%EPOOLR    , &
     ZEROP =>  plt_biom%ZEROP     , &
     ZEROS =>  plt_site%ZEROS     , &
     ZEROS2=>  plt_site%ZEROS2    , &
     VOLWM =>  plt_site%VOLWM     , &
     RTVLW =>  plt_morph%RTVLW    , &
-    RDFOMC=>  plt_rbgc%RDFOMC    , &
-    RDFOMN=>  plt_rbgc%RDFOMN    , &
-    RDFOMP=>  plt_rbgc%RDFOMP    , &
+    RDFOME=>  plt_rbgc%RDFOME    , &
     FOSRH =>  plt_soilchem%FOSRH , &
     OQN   =>  plt_soilchem%OQN   , &
     OQP   =>  plt_soilchem%OQP   , &
@@ -1270,32 +1230,30 @@ module NutUptakeMod
   !      RA=canopy boundary layer resistance
   !     OSTR=O2 stress indicator
   !
-  DO 195 K=0,jcplx11
+  D195: DO K=1,jcplx
     VOLWK=VOLWM(NPH,L)*FOSRH(K,L)
     IF(VOLWK.GT.ZEROS2.AND.RTVLW(N,L,NZ).GT.ZEROP(NZ))THEN
       VOLWT=VOLWK+RTVLW(N,L,NZ)
-      CPOOLX=AMIN1(1.25E+03*RTVLW(N,L,NZ),CPOOLR(N,L,NZ))
+      CPOOLX=AMIN1(1.25E+03_r8*RTVLW(N,L,NZ),EPOOLR(ielmc,N,L,NZ))
       XFRC=(OQC(K,L)*RTVLW(N,L,NZ)-CPOOLX*VOLWK)/VOLWT
-      RDFOMC(N,K,L,NZ)=FEXUC*XFRC
-      IF(OQC(K,L).GT.ZEROS.AND.CPOOLR(N,L,NZ).GT.ZEROP(NZ))THEN
-        CPOOLT=OQC(K,L)+CPOOLR(N,L,NZ)
-        ZPOOLX=0.1*ZPOOLR(N,L,NZ)
-        PPOOLX=0.1*PPOOLR(N,L,NZ)
-        XFRN=(OQN(K,L)*CPOOLR(N,L,NZ)-ZPOOLX*OQC(K,L))/CPOOLT
-        XFRP=(OQP(K,L)*CPOOLR(N,L,NZ)-PPOOLX*OQC(K,L))/CPOOLT
-        RDFOMN(N,K,L,NZ)=FEXUN*XFRN
-        RDFOMP(N,K,L,NZ)=FEXUP*XFRP
+      RDFOME(ielmc,N,K,L,NZ)=FEXUC*XFRC
+      IF(OQC(K,L).GT.ZEROS.AND.EPOOLR(ielmc,N,L,NZ).GT.ZEROP(NZ))THEN
+        CPOOLT=OQC(K,L)+EPOOLR(ielmc,N,L,NZ)
+        ZPOOLX=0.1_r8*EPOOLR(ielmn,N,L,NZ)
+        PPOOLX=0.1_r8*EPOOLR(ielmp,N,L,NZ)
+        XFRN=(OQN(K,L)*EPOOLR(ielmc,N,L,NZ)-ZPOOLX*OQC(K,L))/CPOOLT
+        XFRP=(OQP(K,L)*EPOOLR(ielmc,N,L,NZ)-PPOOLX*OQC(K,L))/CPOOLT
+        RDFOME(ielmn,N,K,L,NZ)=FEXUN*XFRN
+        RDFOME(ielmp,N,K,L,NZ)=FEXUP*XFRP
       ELSE
-        RDFOMN(N,K,L,NZ)=0.0_r8
-        RDFOMP(N,K,L,NZ)=0.0_r8
+        RDFOME(ielmn,N,K,L,NZ)=0.0_r8
+        RDFOME(ielmp,N,K,L,NZ)=0.0_r8
       ENDIF
     ELSE
-      RDFOMC(N,K,L,NZ)=0.0_r8
-      RDFOMN(N,K,L,NZ)=0.0_r8
-      RDFOMP(N,K,L,NZ)=0.0_r8
+      RDFOME(1:npelms,N,K,L,NZ)=0.0_r8
     ENDIF
 
-195   CONTINUE
+  ENDDO D195
   end associate
   end subroutine RootExudates
 !------------------------------------------------------------------------
@@ -1312,12 +1270,8 @@ module NutUptakeMod
     XOQCS    =>  plt_bgcr%XOQCS     , &
     XOQNS    =>  plt_bgcr%XOQNS     , &
     XOQPS    =>  plt_bgcr%XOQPS     , &
-    RDFOMC   =>  plt_rbgc%RDFOMC    , &
-    RDFOMN   =>  plt_rbgc%RDFOMN    , &
-    RDFOMP   =>  plt_rbgc%RDFOMP    , &
-    UPOMC    =>  plt_rbgc%UPOMC     , &
-    UPOMN    =>  plt_rbgc%UPOMN     , &
-    UPOMP    =>  plt_rbgc%UPOMP     , &
+    RDFOME   =>  plt_rbgc%RDFOME    , &
+    UPOME    =>  plt_rbgc%UPOME     , &
     UPH1P    =>  plt_rbgc%UPH1P     , &
     UPH2P    =>  plt_rbgc%UPH2P     , &
     UPNH4    =>  plt_rbgc%UPNH4     , &
@@ -1341,14 +1295,14 @@ module NutUptakeMod
   !     RUPH2P,RUPH2B,RUPH1P,RUPH1B=uptake from non-band,band of H2PO4,HPO4
   !     UPNH4,UPNO3,UPH2P,UPH1P=PFT uptake of NH4,NO3,H2PO4,HPO4
   !
-  DO 295 K=0,jcplx11
-    UPOMC(NZ)=UPOMC(NZ)+RDFOMC(N,K,L,NZ)
-    UPOMN(NZ)=UPOMN(NZ)+RDFOMN(N,K,L,NZ)
-    UPOMP(NZ)=UPOMP(NZ)+RDFOMP(N,K,L,NZ)
-    XOQCS(K,L)=XOQCS(K,L)-RDFOMC(N,K,L,NZ)
-    XOQNS(K,L)=XOQNS(K,L)-RDFOMN(N,K,L,NZ)
-    XOQPS(K,L)=XOQPS(K,L)-RDFOMP(N,K,L,NZ)
-295   CONTINUE
+  D295: DO K=1,jcplx
+    UPOME(ielmc,NZ)=UPOME(ielmc,NZ)+RDFOME(ielmc,N,K,L,NZ)
+    UPOME(ielmn,NZ)=UPOME(ielmn,NZ)+RDFOME(ielmn,N,K,L,NZ)
+    UPOME(ielmp,NZ)=UPOME(ielmp,NZ)+RDFOME(ielmp,N,K,L,NZ)
+    XOQCS(K,L)=XOQCS(K,L)-RDFOME(ielmc,N,K,L,NZ)
+    XOQNS(K,L)=XOQNS(K,L)-RDFOME(ielmn,N,K,L,NZ)
+    XOQPS(K,L)=XOQPS(K,L)-RDFOME(ielmp,N,K,L,NZ)
+  ENDDO D295
   UPNH4(NZ)=UPNH4(NZ)+RUPNH4(N,L,NZ)+RUPNHB(N,L,NZ)
   UPNO3(NZ)=UPNO3(NZ)+RUPNO3(N,L,NZ)+RUPNOB(N,L,NZ)
   UPH2P(NZ)=UPH2P(NZ)+RUPH2P(N,L,NZ)+RUPH2B(N,L,NZ)

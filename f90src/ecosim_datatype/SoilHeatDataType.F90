@@ -1,25 +1,25 @@
 module SoilHeatDatatype
 
 
-  use data_kind_mod, only : r8 => SHR_KIND_R8
+  use data_kind_mod, only : r8 => DAT_KIND_R8
   use GridConsts
   implicit none
 
   save
   character(len=*), private, parameter :: mod_filename = __FILE__
 
-  real(r8),allocatable ::  TKSZ(:,:,:)                        !
-  real(r8),allocatable ::  TKS(:,:,:)                         !
-  real(r8),allocatable ::  THAW(:,:,:)                        !hourly accumulated freeze-thaw flux in micropores
-  real(r8),allocatable ::  HTHAW(:,:,:)                       !hourly accumulated freeze-thaw latent heat flux
-  real(r8),allocatable ::  THAWH(:,:,:)                       !hourly accumulated freeze-thaw flux in macropores
-  real(r8),allocatable ::  XTHAWW(:,:,:)                      !hourly accumulated latent heat flux from freeze-thaw
-  real(r8),allocatable ::  TSMX(:,:,:)                        !daily maximum soil temperature [oC]
-  real(r8),allocatable ::  TSMN(:,:,:)                        !daily minimum soil temperature [oC]
-  real(r8),allocatable ::  VHCP(:,:,:)                        !soil heat capacity [MJ m-3 K-1]
-  real(r8),allocatable ::  TCS(:,:,:)                         !soil temperature [oC]
-  real(r8),allocatable ::  STC(:,:,:)                         !numerator for soil solid thermal conductivity [MJ m h-1 K-1]
-  real(r8),allocatable ::  DTC(:,:,:)                         !denominator for soil solid thermal conductivity
+  real(r8),target,allocatable ::  TKSZ(:,:,:)                        !
+  real(r8),target,allocatable ::  TKS(:,:,:)                         !
+  real(r8),target,allocatable ::  THAW(:,:,:)                        !hourly accumulated freeze-thaw flux in micropores
+  real(r8),target,allocatable ::  HTHAW(:,:,:)                       !hourly accumulated freeze-thaw latent heat flux
+  real(r8),target,allocatable ::  THAWH(:,:,:)                       !hourly accumulated freeze-thaw flux in macropores
+  real(r8),target,allocatable ::  XTHAWW(:,:,:)                      !hourly accumulated latent heat flux from freeze-thaw
+  real(r8),target,allocatable ::  TSMX(:,:,:)                        !daily maximum soil temperature [oC]
+  real(r8),target,allocatable ::  TSMN(:,:,:)                        !daily minimum soil temperature [oC]
+  real(r8),target,allocatable ::  VHCP(:,:,:)                        !soil heat capacity [MJ m-3 K-1]
+  real(r8),target,allocatable ::  TCS(:,:,:)                         !soil temperature [oC]
+  real(r8),target,allocatable ::  STC(:,:,:)                         !numerator for soil solid thermal conductivity [MJ m h-1 K-1]
+  real(r8),target,allocatable ::  DTC(:,:,:)                         !denominator for soil solid thermal conductivity
 !----------------------------------------------------------------------
 
 contains

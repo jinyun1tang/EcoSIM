@@ -1,6 +1,6 @@
 module SoilHydroParaMod
 
-  use data_kind_mod, only : r8 => SHR_KIND_R8
+  use data_kind_mod, only : r8 => DAT_KIND_R8
   use EcoSimConst
   use SoilWaterDataType
   use SoilPropertyDataType
@@ -16,6 +16,8 @@ module SoilHydroParaMod
   use EcoSIMConfig
   use WatsubPars
   use SurfLitterDataType
+  use EcoSIMCtrlMod  
+  use EcoSiMParDataMod   , only : micpar
   use minimathmod  , only : test_aeqb,AZMAX1,AZMIN1
 implicit none
   private
@@ -51,46 +53,44 @@ contains
   ! FCI,WPI=FC,WP of ice
   ! THETIX=ice concentration
 !
-  IF(BKVL(L,NY,NX).GT.ZEROS(NY,NX).AND.VOLX(L,NY,NX).GT.ZEROS(NY,NX))THEN
-    THETW1=AZMAX1(AMIN1(POROS(L,NY,NX),VOLW(L,NY,NX)/VOLY(L,NY,NX)))
-    IF(THETW1.LT.FC(L,NY,NX))THEN
-      PSISM(L,NY,NX)=AMAX1(PSIHY,-EXP(PSIMX(NY,NX) &
-        +((FCL(L,NY,NX)-LOG(THETW1)) &
-        /FCD(L,NY,NX)*PSIMD(NY,NX))))
-    ELSEIF(THETW1.LT.POROS(L,NY,NX)-DTHETW)THEN
-      PSISM(L,NY,NX)=-EXP(PSIMS(NY,NX) &
-        +(((PSL(L,NY,NX)-LOG(THETW1)) &
-        /PSD(L,NY,NX))**SRP(L,NY,NX)*PSISD(NY,NX)))
+    IF(BKVL(L,NY,NX).GT.ZEROS(NY,NX).AND.VOLX(L,NY,NX).GT.ZEROS(NY,NX))THEN
+      THETW1=AZMAX1(AMIN1(POROS(L,NY,NX),VOLW(L,NY,NX)/VOLY(L,NY,NX)),1.e-6_r8)
+      IF(THETW1.LT.FC(L,NY,NX))THEN
+        PSISM(L,NY,NX)=AMAX1(PSIHY,-EXP(PSIMX(NY,NX) &
+          +((FCL(L,NY,NX)-LOG(THETW1))/FCD(L,NY,NX)*PSIMD(NY,NX))))
+      ELSE IF(THETW1.LT.POROS(L,NY,NX)-DTHETW)THEN
+        PSISM(L,NY,NX)=-EXP(PSIMS(NY,NX)+(((PSL(L,NY,NX)-LOG(THETW1)) &
+          /PSD(L,NY,NX))**SRP(L,NY,NX)*PSISD(NY,NX)))        
+      ELSE
+        PSISM(L,NY,NX)=PSISE(L,NY,NX)
+      ENDIF
+    ELSE IF(VOLX(L,NY,NX).GT.ZEROS2(NY,NX).and.THETI(L,NY,NX)>ZEROS2(NY,NX))THEN
+      FCX=FCI*THETI(L,NY,NX)
+      WPX=WPI*THETI(L,NY,NX)
+      FCLX=LOG(FCX)
+      WPLX=LOG(WPX)
+      PSDX=PSL(L,NY,NX)-FCLX
+      FCDX=FCLX-WPLX
+      IF(THETW(L,NY,NX).LT.FCX)THEN
+        PSISM(L,NY,NX)=AMAX1(PSIHY,-EXP(PSIMX(NY,NX) &
+          +((FCLX-LOG(THETW(L,NY,NX)))/FCDX*PSIMD(NY,NX))))
+      ELSE IF(THETW(L,NY,NX).LT.POROS(L,NY,NX)-DTHETW)THEN
+        PSISM(L,NY,NX)=-EXP(PSIMS(NY,NX)+(((PSL(L,NY,NX)-LOG(THETW(L,NY,NX))) &
+          /PSDX)*PSISD(NY,NX)))
+      ELSE
+        PSISM(L,NY,NX)=PSISE(L,NY,NX)
+      ENDIF
     ELSE
       PSISM(L,NY,NX)=PSISE(L,NY,NX)
     ENDIF
-  ELSEIF(VOLX(L,NY,NX).GT.ZEROS2(NY,NX).and.THETI(L,NY,NX)>ZEROS2(NY,NX))THEN
-    FCX=FCI*THETI(L,NY,NX)
-    WPX=WPI*THETI(L,NY,NX)
-    FCLX=LOG(FCX)
-    WPLX=LOG(WPX)
-    PSDX=PSL(L,NY,NX)-FCLX
-    FCDX=FCLX-WPLX
-    IF(THETW(L,NY,NX).LT.FCX)THEN
-      PSISM(L,NY,NX)=AMAX1(PSIHY,-EXP(PSIMX(NY,NX) &
-        +((FCLX-LOG(THETW(L,NY,NX)))/FCDX*PSIMD(NY,NX))))
-    ELSEIF(THETW(L,NY,NX).LT.POROS(L,NY,NX)-DTHETW)THEN
-      PSISM(L,NY,NX)=-EXP(PSIMS(NY,NX)+(((PSL(L,NY,NX)-LOG(THETW(L,NY,NX))) &
-        /PSDX)*PSISD(NY,NX)))
-    ELSE
-      PSISM(L,NY,NX)=PSISE(L,NY,NX)
-    ENDIF
-  ELSE
-    PSISM(L,NY,NX)=PSISE(L,NY,NX)
-  ENDIF
 !
 !     SOIL OSMOTIC, GRAVIMETRIC AND MATRIC WATER POTENTIALS
 !
 !     PSISM,PSISO,PSISH,PSIST=matric,osmotic,gravimetric,total water potential
 !
-  PSISO(L,NY,NX)=-8.3143E-06_r8*TKS(L,NY,NX)*CION(L,NY,NX)
-  PSISH(L,NY,NX)=0.0098_r8*(ALT(NY,NX)-DPTH(L,NY,NX))
-  PSIST(L,NY,NX)=AZMIN1(PSISM(L,NY,NX)+PSISO(L,NY,NX)+PSISH(L,NY,NX))
+    PSISO(L,NY,NX)=-RGAS*1.E-6_r8*TKS(L,NY,NX)*CION(L,NY,NX)
+    PSISH(L,NY,NX)=0.0098_r8*(ALT(NY,NX)-DPTH(L,NY,NX))
+    PSIST(L,NY,NX)=AZMIN1(PSISM(L,NY,NX)+PSISO(L,NY,NX)+PSISH(L,NY,NX))
 
 !
 !     SOIL RESISTANCE TO ROOT PENETRATION
@@ -105,22 +105,24 @@ contains
 !     EE=3.8521+0.0963*CCLAYT
 !     RSCS(L,NY,NX)=CC*THETW(L,NY,NX)**DD*BKDS(L,NY,NX)**EE
 !     ELSE
-      RSCS(L,NY,NX)=0.0_r8
+    RSCS(L,NY,NX)=0.0_r8
 !     ENDIF
 !
 !     SOIL HYDRAULIC CONDUCTIVITIES FROM AMBIENT SOIL WATER CONTENTS
 !
 !     CNDU=soil hydraulic conductivity for root uptake
 !
-  K=MAX(1,MIN(100,INT(100.0_r8*(POROS(L,NY,NX)-THETW(L,NY,NX))/POROS(L,NY,NX))+1))
-  CNDU(L,NY,NX)=0.5_r8*(HCND(1,K,L,NY,NX)+HCND(3,K,L,NY,NX))
-  ENDDO
+    K=MAX(1,MIN(100,INT(100.0_r8*(POROS(L,NY,NX)-THETW(L,NY,NX))/POROS(L,NY,NX))+1))
+    CNDU(L,NY,NX)=0.5_r8*(HCND(1,K,L,NY,NX)+HCND(3,K,L,NY,NX))
+  END DO
   end subroutine GetSoilHydraulicVars
 
 
 !------------------------------------------------------------------------------------------
 
   subroutine SoilHydroProperty(L,NY,NX,I,J)
+  !
+  !Set up soil hydraulic property
   implicit none
   integer, intent(in) :: L,NY,NX
   integer, intent(in) :: I,J
@@ -133,14 +135,16 @@ contains
 
   IF(CORGC(L,NY,NX).GT.FORGC)THEN
     SRP(L,NY,NX)=0.25_r8
-  ELSEIF(CORGC(L,NY,NX).GT.0.5*FORGC)THEN
+  ELSE IF(CORGC(L,NY,NX).GT.0.5_r8*FORGC)THEN
     SRP(L,NY,NX)=0.33_r8
   ELSE
     SRP(L,NY,NX)=1.00_r8
   ENDIF
 
+! double check cold_run() setup
   PSL(L,NY,NX)=LOG(POROS(L,NY,NX))
-  IF((ISOIL(1,L,NY,NX).EQ.0.AND.ISOIL(2,L,NY,NX).EQ.0).OR.is_restart_run)THEN
+  IF((ISOIL(isoi_fc,L,NY,NX).EQ.0.AND.ISOIL(isoi_wp,L,NY,NX).EQ.0).OR.(.not.cold_run()))THEN
+  ! read from check point file or if soil properties are set with soil file
     FCL(L,NY,NX)=LOG(FC(L,NY,NX))
     WPL(L,NY,NX)=LOG(WP(L,NY,NX))
     PSD(L,NY,NX)=PSL(L,NY,NX)-FCL(L,NY,NX)
@@ -152,8 +156,9 @@ contains
     !
     !     THW,THI=initial soil water,ice content from soil file
     !
-    IF(.not.is_restart_run)THEN
-      IF(ISOIL(1,L,NY,NX).EQ.1.OR.ISOIL(2,L,NY,NX).EQ.1)THEN
+    IF(cold_run())THEN
+    ! restart is defined as simulation starting from a previous run
+      IF(ISOIL(isoi_fc,L,NY,NX).EQ.1.OR.ISOIL(isoi_wp,L,NY,NX).EQ.1)THEN
         !calculating FC or WP
         IF(CORGC(L,NY,NX).LT.FORGW)THEN
           FC(L,NY,NX)=0.2576_r8-0.20_r8*CSAND(L,NY,NX) &
@@ -188,9 +193,10 @@ contains
       PSD(L,NY,NX)=PSL(L,NY,NX)-FCL(L,NY,NX)
       FCD(L,NY,NX)=FCL(L,NY,NX)-WPL(L,NY,NX)
     ENDIF
-    !IBEGIN:   start date of model run
+!   IBEGIN:   start date of model run
+
     !IDATA(9): start year of model run
-    IF(I.EQ.IBEGIN.AND.J.EQ.1.AND.IYRC.EQ.IDATA(9))THEN
+    IF(I.EQ.IBEGIN.AND.J.EQ.1.AND.is_first_year)THEN
       IF(THW(L,NY,NX).GT.1.0_r8.OR.DPTH(L,NY,NX).GE.DTBLZ(NY,NX))THEN
         THETW(L,NY,NX)=POROS(L,NY,NX)
       ELSEIF(test_aeqb(THW(L,NY,NX),1._r8))THEN
@@ -209,22 +215,22 @@ contains
       ELSEIF(THI(L,NY,NX).LT.0.0_r8)THEN
         THETI(L,NY,NX)=0.0_r8
       ENDIF
-      IF(.not.is_restart_run)THEN
+      
+      IF(cold_run())THEN
         VOLW(L,NY,NX)=THETW(L,NY,NX)*VOLX(L,NY,NX)
         VOLWX(L,NY,NX)=VOLW(L,NY,NX)
         VOLWH(L,NY,NX)=THETW(L,NY,NX)*VOLAH(L,NY,NX)
         VOLI(L,NY,NX)=THETI(L,NY,NX)*VOLX(L,NY,NX)
         VOLIH(L,NY,NX)=THETI(L,NY,NX)*VOLAH(L,NY,NX)
-        VHCP(L,NY,NX)=VHCM(L,NY,NX)+4.19*(VOLW(L,NY,NX) &
-          +VOLWH(L,NY,NX))+1.9274*(VOLI(L,NY,NX)+VOLIH(L,NY,NX))
+        VHCP(L,NY,NX)=VHCM(L,NY,NX)+Cpw*(VOLW(L,NY,NX) &
+          +VOLWH(L,NY,NX))+Cpi*(VOLI(L,NY,NX)+VOLIH(L,NY,NX))
         THETWZ(L,NY,NX)=THETW(L,NY,NX)
         THETIZ(L,NY,NX)=THETI(L,NY,NX)
       ENDIF
     ENDIF
   ENDIF
-  VOLP(L,NY,NX)=AZMAX1(VOLA(L,NY,NX)-VOLW(L,NY,NX) &
-    -VOLI(L,NY,NX))+AZMAX1(VOLAH(L,NY,NX)-VOLWH(L,NY,NX) &
-    -VOLIH(L,NY,NX))
+  VOLP(L,NY,NX)=AZMAX1(VOLA(L,NY,NX)-VOLW(L,NY,NX)-VOLI(L,NY,NX)) &
+    +AZMAX1(VOLAH(L,NY,NX)-VOLWH(L,NY,NX)-VOLIH(L,NY,NX))
   IF(VOLT(L,NY,NX).GT.ZEROS2(NY,NX))THEN
     THETP(L,NY,NX)=VOLP(L,NY,NX)/VOLY(L,NY,NX)
   ELSE
@@ -331,18 +337,19 @@ contains
   integer  :: K,M
   real(r8) :: XK,YK
   real(r8) :: SUM1,SUM2
-  real(r8) :: THETK(100),PSISK(0:100)
+  integer, parameter :: n100=100
+  real(r8) :: THETK(n100),PSISK(0:n100)
 
   IF(VOLT(0,NY,NX).GT.ZEROS2(NY,NX))THEN
     BKDS(0,NY,NX)=BKVL(0,NY,NX)/VOLT(0,NY,NX)
   ELSE
-    BKDS(0,NY,NX)=BKRS(1)
+    BKDS(0,NY,NX)=BKRS(micpar%k_fine_litr)
   ENDIF
   THETY(0,NY,NX)=EXP((PSIMX(NY,NX)-LOG(-PSIHY))*FCD(0,NY,NX)/PSIMD(NY,NX)+FCL(0,NY,NX))
   SUM2=0.0_r8
-  DO  K=1,100
+  D1220: DO  K=1,n100
     XK=K-1
-    THETK(K)=POROS0(NY,NX)-(XK/100.0*POROS0(NY,NX))
+    THETK(K)=POROS0(NY,NX)-(XK/n100*POROS0(NY,NX))
     IF(THETK(K).LT.FC(0,NY,NX))THEN
       PSISK(K)=AMAX1(PSIHY,-EXP(PSIMX(NY,NX)+((FCL(0,NY,NX)-LOG(THETK(K))) &
           /FCD(0,NY,NX)*PSIMD(NY,NX))))
@@ -353,21 +360,21 @@ contains
       PSISK(K)=PSISE(0,NY,NX)
     ENDIF
     SUM2=SUM2+(2*K-1)/(PSISK(K)**2)
-  ENDDO
+  ENDDO D1220
 
-  DO  K=1,100
+  D1235: DO  K=1,n100
     SUM1=0.0_r8
     XK=K-1
-    YK=((100.0_r8-XK)/100.0_r8)**1.33_r8
-    DO M=K,100
+    YK=((n100-XK)/n100)**1.33_r8
+    D1230: DO M=K,n100
         SUM1=SUM1+(2*M+1-2*K)/(PSISK(M)**2._r8)
-    ENDDO
+    ENDDO D1230
     HCND(3,K,0,NY,NX)=SCNV(0,NY,NX)*YK*SUM1/SUM2
     HCND(1,K,0,NY,NX)=0.0_r8
     HCND(2,K,0,NY,NX)=0.0_r8
     IF(K.GT.1.AND.PSISK(K).LT.PSISA(0,NY,NX).AND.PSISK(K-1).GE.PSISA(0,NY,NX))THEN
       THETS(0,NY,NX)=THETK(K)
     ENDIF
-  ENDDO
+  ENDDO D1235
   end subroutine LitterHydroproperty
 end module SoilHydroParaMod

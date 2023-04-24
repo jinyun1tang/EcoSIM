@@ -9,4 +9,10 @@ prefix='../../examples/inputs/sample/'
 runfile='./runfile.sample'
 do_regression_test=.true.
 num_of_simdays=180
+pft_file_in='/Users/jinyuntang/work/github/ecosim2/EcoSIM/python_tools/ecosim_pft_20230113.nc'
+grid_file_in='/Users/jinyuntang/work/github/ecosim2/EcoSIM/python_tools/sample_grid_20230119.nc'
+/
+
+&bbgcforc
+
 /

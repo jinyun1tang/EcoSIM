@@ -3,10 +3,11 @@ module StartsMod
 ! Description:
 ! code to initalize soil variables
 
-  use data_kind_mod, only : r8 => SHR_KIND_R8
+  use data_kind_mod, only : r8 => DAT_KIND_R8
   use abortutils, only : padr, print_info,check_bool
-  use minimathMod, only : test_aeqb, test_aneb, AZMAX1
+  use minimathMod, only : test_aeqb, test_aneb, AZMAX1,AZMIN1
   use EcosimConst
+  use TracerIDMod
   use MicrobialDataType
   use EcoSIMSolverPar
   use SOMDataType
@@ -54,6 +55,7 @@ module StartsMod
   !
 
   public :: starts
+  public :: set_ecosim_solver
   contains
 
   SUBROUTINE starts(NHW,NHE,NVN,NVS)
@@ -113,13 +115,13 @@ module StartsMod
 !     ATKA=mean annual air temperature (K)
 !
       CCO2EI(NY,NX)=CO2EI(NY,NX)*5.36E-04_r8*Tref/ATKA(NY,NX)
-      CCO2E(NY,NX)=CO2E(NY,NX)*5.36E-04_r8*Tref/ATKA(NY,NX)
-      CCH4E(NY,NX)=CH4E(NY,NX)*5.36E-04_r8*Tref/ATKA(NY,NX)
-      COXYE(NY,NX)=OXYE(NY,NX)*1.43E-03_r8*Tref/ATKA(NY,NX)
-      CZ2GE(NY,NX)=Z2GE(NY,NX)*1.25E-03_r8*Tref/ATKA(NY,NX)
-      CZ2OE(NY,NX)=Z2OE(NY,NX)*1.25E-03_r8*Tref/ATKA(NY,NX)
-      CNH3E(NY,NX)=ZNH3E(NY,NX)*6.25E-04_r8*Tref/ATKA(NY,NX)
-      CH2GE(NY,NX)=H2GE(NY,NX)*8.92E-05_r8*Tref/ATKA(NY,NX)
+      AtmGgms(idg_CO2,NY,NX)=CO2E(NY,NX)*5.36E-04_r8*Tref/ATKA(NY,NX)
+      AtmGgms(idg_CH4,NY,NX)=CH4E(NY,NX)*5.36E-04_r8*Tref/ATKA(NY,NX)
+      AtmGgms(idg_O2,NY,NX)=OXYE(NY,NX)*1.43E-03_r8*Tref/ATKA(NY,NX)
+      AtmGgms(idg_N2,NY,NX)=Z2GE(NY,NX)*1.25E-03_r8*Tref/ATKA(NY,NX)
+      AtmGgms(idg_N2O,NY,NX)=Z2OE(NY,NX)*1.25E-03_r8*Tref/ATKA(NY,NX)
+      AtmGgms(idg_NH3,NY,NX)=ZNH3E(NY,NX)*6.25E-04_r8*Tref/ATKA(NY,NX)
+      AtmGgms(idg_H2,NY,NX)=H2GE(NY,NX)*8.92E-05_r8*Tref/ATKA(NY,NX)
 !
 !     MICROBIAL THERMAL ADAPTATION
 !
@@ -364,7 +366,7 @@ module StartsMod
     HCX=0.0_r8
   ENDIF
 
-  DO 1200 L=0,NL(NY,NX)
+  D1200: DO L=0,NL(NY,NX)
     !
     if(L==0)then
       TORGLL=0.0_r8
@@ -394,7 +396,7 @@ module StartsMod
     RCH4L(L,NY,NX)=0.0_r8
     IF(L.GT.0)THEN
       IF(BKDS(L,NY,NX).GT.ZERO)THEN
-        PTDS=1.0E-06_r8*(1.30*CORGCM+2.66_r8*(1.0E+06_r8-CORGCM))
+        PTDS=ppmc*(1.30*CORGCM+2.66_r8*(1.0E+06_r8-CORGCM))
         POROS(L,NY,NX)=1.0_r8-(BKDS(L,NY,NX)/PTDS)
       ELSE
         !for ponding water
@@ -418,7 +420,7 @@ module StartsMod
       SILT(L,NY,NX)=CSILT(L,NY,NX)*BKVL(L,NY,NX)
       CLAY(L,NY,NX)=CCLAY(L,NY,NX)*BKVL(L,NY,NX)
       IF(BKDS(L,NY,NX).GT.ZERO)THEN
-        VORGC=CORGCM*1.0E-06_r8*BKDS(L,NY,NX)/PTDS
+        VORGC=CORGCM*ppmc*BKDS(L,NY,NX)/PTDS
         VMINL=(CSILT(L,NY,NX)+CCLAY(L,NY,NX))*BKDS(L,NY,NX)/PTDS
         VSAND=CSAND(L,NY,NX)*BKDS(L,NY,NX)/PTDS
         VHCM(L,NY,NX)=((2.496*VORGC+2.385*VMINL+2.128*VSAND) &
@@ -429,7 +431,8 @@ module StartsMod
 !
       !     INITIAL SOIL WATER AND ICE CONTENTS
 !
-      IF(ISOIL(1,L,NY,NX).EQ.0.AND.ISOIL(2,L,NY,NX).EQ.0)THEN
+      IF(ISOIL(isoi_fc,L,NY,NX).EQ.0.AND.ISOIL(isoi_wp,L,NY,NX).EQ.0)THEN
+      ! field capacity and wilting point are read from input
         IF(THW(L,NY,NX).GT.1.0)THEN
           THETW(L,NY,NX)=POROS(L,NY,NX)
         ELSEIF(test_aeqb(THW(L,NY,NX),1.0_r8))THEN
@@ -473,11 +476,11 @@ module StartsMod
     !     INITIALIZE SOM VARIABLES
     call InitSOMVars(L,NY,NX,FCX)
     !
-1200  CONTINUE
-    POROSI(0,NY,NX)=1._r8  !this is added for numerical fixing
-    !
-    !  INITIALIZE FERTILIZER ARRAYS
-    call initFertArrays(NY,NX)
+  ENDDO D1200
+  POROSI(0,NY,NX)=1._r8  !this is added for numerical fixing
+  !
+  !  INITIALIZE FERTILIZER ARRAYS
+  call initFertArrays(NY,NX)
 
   end subroutine InitSoilProfile
 !------------------------------------------------------------------------------------------
@@ -490,17 +493,21 @@ module StartsMod
 
 ! begin_execution
   L2=NL(NY,NX)
-  ZNH4FA(0:L2,NY,NX)=0.0_r8
-  ZNH3FA(0:L2,NY,NX)=0.0_r8
-  ZNHUFA(0:L2,NY,NX)=0.0_r8
-  ZNO3FA(0:L2,NY,NX)=0.0_r8
+  FertN_soil(ifertn_beg:ifertn_end,0:L2,NY,NX)=0._r8
+  FertN_band(ifertnb_beg:ifertnb_end,1:L2,NY,NX)=0._r8
+  trcs_VLN(ids_NH4,0:L2,NY,NX)=1.0_r8
+  trcs_VLN(idg_NH3,0:L2,NY,NX)=trcs_VLN(ids_NH4,0:L2,NY,NX)
+  trcs_VLN(ids_NO3,0:L2,NY,NX)=1.0_r8
+  trcs_VLN(ids_NO2,0:L2,NY,NX)=trcs_VLN(ids_NO3,0:L2,NY,NX)
+  trcs_VLN(ids_H1PO4,0:L2,NY,NX)=1.0_r8
+  trcs_VLN(ids_H2PO4,0:L2,NY,NX)=trcs_VLN(ids_H1PO4,0:L2,NY,NX)
+  trcs_VLN(ids_NH4B,0:L2,NY,NX)=0.0_r8
+  trcs_VLN(idg_NH3B,0:L2,NY,NX)= trcs_VLN(ids_NH4B,0:L2,NY,NX)
+  trcs_VLN(ids_NO3B,0:L2,NY,NX)=0.0_r8
+  trcs_VLN(ids_NO2B,0:L2,NY,NX)=trcs_VLN(ids_NO3B,0:L2,NY,NX)
+  trcs_VLN(ids_H1PO4B,0:L2,NY,NX)=0.0_r8
+  trcs_VLN(ids_H2PO4B,0:L2,NY,NX)=trcs_VLN(ids_H1PO4B,0:L2,NY,NX)
 
-  VLNH4(0:L2,NY,NX)=1.0
-  VLNO3(0:L2,NY,NX)=1.0
-  VLPO4(0:L2,NY,NX)=1.0
-  VLNHB(0:L2,NY,NX)=0.0_r8
-  VLNOB(0:L2,NY,NX)=0.0_r8
-  VLPOB(0:L2,NY,NX)=0.0_r8
   ROXYX(0:L2,NY,NX)=0.0_r8
   RNH4X(0:L2,NY,NX)=0.0_r8
   RNO3X(0:L2,NY,NX)=0.0_r8
@@ -520,20 +527,16 @@ module StartsMod
   ZNFNI(0:L2,NY,NX)=0.0_r8
   ZNFN0(0:L2,NY,NX)=0.0_r8
 
-  ZNH4FB(1:L2,NY,NX)=0.0_r8
-  ZNH3FB(1:L2,NY,NX)=0.0_r8
-  ZNHUFB(1:L2,NY,NX)=0.0_r8
-  ZNO3FB(1:L2,NY,NX)=0.0_r8
   WDNHB(1:L2,NY,NX)=0.0_r8
   DPNHB(1:L2,NY,NX)=0.0_r8
   WDNOB(1:L2,NY,NX)=0.0_r8
   DPNOB(1:L2,NY,NX)=0.0_r8
   WDPOB(1:L2,NY,NX)=0.0_r8
   DPPOB(1:L2,NY,NX)=0.0_r8
-  COCU(0:jcplx1,1:L2,NY,NX)=0.0_r8
-  CONU(0:jcplx1,1:L2,NY,NX)=0.0_r8
-  COPU(0:jcplx1,1:L2,NY,NX)=0.0_r8
-  COAU(0:jcplx1,1:L2,NY,NX)=0.0_r8
+  COCU(1:jcplx,1:L2,NY,NX)=0.0_r8
+  CONU(1:jcplx,1:L2,NY,NX)=0.0_r8
+  COPU(1:jcplx,1:L2,NY,NX)=0.0_r8
+  COAU(1:jcplx,1:L2,NY,NX)=0.0_r8
 
   end subroutine initFertArrays
 !------------------------------------------------------------------------------------------
@@ -590,7 +593,7 @@ module StartsMod
     VOLSI(L,NY,NX)=DLYRSI*DH(NY,NX)*DV(NY,NX)
     CDPTHS(L,NY,NX)=CDPTHS(L-1,NY,NX)+DLYRS(L,NY,NX)
     TKW(L,NY,NX)=AMIN1(Tref,ATKA(NY,NX))
-    TCW(L,NY,NX)=AMIN1(0.0,ATCA(NY,NX))
+    TCW(L,NY,NX)=AZMIN1(ATCA(NY,NX))
     VHCPW(L,NY,NX)=cps*VOLSSL(L,NY,NX)+cpw*VOLWSL(L,NY,NX)+cpi*VOLISL(L,NY,NX)
 9580  CONTINUE
   end subroutine InitSnowLayers
@@ -615,8 +618,8 @@ module StartsMod
 ! IRCHG=runoff boundary flags:0=not possible,1=possible
 !
   ALTY=0.0
-  DO 9985 NX=NHW,NHE
-    DO 9980 NY=NVN,NVS
+  D9985: DO NX=NHW,NHE
+    D9980: DO NY=NVN,NVS
       ZEROS(NY,NX)=ZERO*DH(NY,NX)*DV(NY,NX)
       ZEROS2(NY,NX)=ZERO2*DH(NY,NX)*DV(NY,NX)
 !     compute slopes
@@ -664,10 +667,10 @@ module StartsMod
 !    compute incident sky aNGLe at ground surface
       GSIN(NY,NX)=SLOPE(0,NY,NX)
       GCOS(NY,NX)=SQRT(1.0-GSIN(NY,NX)**2)
-      DO 240 N=1,JSA
+      D240: DO N=1,JSA
         DGAZI=COS(GAZI(NY,NX)-YAZI(N))
         OMEGAG(N,NY,NX)=AZMAX1(AMIN1(1.0,GCOS(NY,NX)*YSIN(N)+GSIN(NY,NX)*YCOS(N)*DGAZI))
-240   CONTINUE
+      ENDDO D240
 !     compute ground surface elevation
       IF(NX.EQ.NHW)THEN
         IF(NY.EQ.NVN)THEN
@@ -704,14 +707,13 @@ module StartsMod
         ,SLOPE(0,NY,NX),SLOPE(1,NY,NX),SLOPE(2,NY,NX) &
         ,GSIN(NY,NX),GCOSA(NY,NX),GSINA(NY,NX)
 1111  FORMAT(A8,6I4,20E12.4)
-9980  CONTINUE
-9985  CONTINUE
+    ENDDO D9980
+  ENDDO D9985
   end subroutine InitGridElevation
 !------------------------------------------------------------------------------------------
   subroutine InitControlParms
   implicit none
   !     begin_execution
-  real(r8) :: XNPV
   !
   !     NPH=no. of cycles per hour for water, heat and solute flux calculns
   !     NPT=number of cycles per water iteration for gas flux calculations
@@ -723,26 +725,6 @@ module StartsMod
   BKRS=(/0.0333_r8,0.0167_r8,0.0167_r8/)
 
   call InitSOMConsts
-
-  NPH=NPX
-  NPT=NPY
-  NPG=NPH*NPT
-  NPR=30
-  NPS=10
-  XNPH=1.0_r8/NPH
-  XNPT=1.0_r8/NPT
-  XNPG=1.0_r8/NPG
-  XNPR=1.0_r8/NPR
-  XNPS=1.0_r8/NPS
-  XNPY=XNPH*XNPS
-  XNPZ=XNPH*XNPR
-  XNPQ=XNPZ*XNPS
-  XNPV=XNPR*XNPS
-  XNPD=600.0*XNPG
-  XNPX=AMIN1(1.0_r8,20.0_r8*XNPH)
-  XNPA=XNPX*XNPS
-  XNPB=XNPX*XNPR
-  XNPC=XNPX*XNPV
   !     NDIM=1
   !     IF(NHE.GT.NHW)NDIM=NDIM+1
   !     IF(NVS.GT.NVN)NDIM=NDIM+1
@@ -850,7 +832,7 @@ module StartsMod
   DPNH4(:,:)=0.0_r8
   DPNO3(:,:)=0.0_r8
   DPPO4(:,:)=0.0_r8
-  OXYS(0,:,:)=0.0_r8
+  trc_solml(idg_O2,0,:,:)=0.0_r8
   FRADG(:,:)=1.0_r8
   THRMG(:,:)=0.0_r8
   THRMC(:,:)=0.0_r8
@@ -870,18 +852,22 @@ module StartsMod
   PPT(:,:)=0.0_r8
   DYLN(:,:)=12.0_r8
   ALBX(:,:)=ALBS(:,:)
-  XHVSTC(:,:)=0.0_r8
-  XHVSTN(:,:)=0.0_r8
-  XHVSTP(:,:)=0.0_r8
+  XHVSTE(:,:,:)=0.0_r8
   ENGYP(:,:)=0.0_r8
   end subroutine InitAccumulators
 !------------------------------------------------------------------------------------------
   subroutine InitLayerDepths(NY,NX)
-
+  use EcoSiMParDataMod, only : micpar
   implicit none
   integer, intent(in) :: NY, NX
-  integer :: L
-
+  integer :: L,K
+  real(r8) :: VOLR0
+  associate(                              &
+    n_litrsfk    => micpar%n_litrsfk    , &
+    k_woody_litr => micpar%k_woody_litr , &
+    k_fine_litr  => micpar%k_fine_litr  , &
+    k_manure     => micpar%k_manure       &
+  )
 !     begin_execution
   DO  L=0,NL(NY,NX)
 !
@@ -903,16 +889,18 @@ module StartsMod
 ! surface residue layer
       TAREA=TAREA+AREA(3,L,NY,NX)
       CDPTHZ(L,NY,NX)=0.0_r8
-      ORGC(L,NY,NX)=(RSC(0,L,NY,NX)+RSC(1,L,NY,NX)+RSC(2,L,NY,NX))*AREA(3,L,NY,NX)
+      ORGC(L,NY,NX)=SUM(RSC(1:n_litrsfk,L,NY,NX))*AREA(3,L,NY,NX)
       ORGCX(L,NY,NX)=ORGC(L,NY,NX)
-      VOLR(NY,NX)=(RSC(0,L,NY,NX)*1.0E-06_r8/BKRS(0) &
-        +RSC(1,L,NY,NX)*1.0E-06_r8/BKRS(1)+RSC(2,L,NY,NX)*1.0E-06_r8/BKRS(2)) &
-        *AREA(3,L,NY,NX)
+      VOLR0=0._r8
+      DO K=1,n_litrsfk
+        VOLR0=VOLR0+RSC(K,L,NY,NX)/BKRS(K)
+      ENDDO
+      VOLR(NY,NX)=VOLR0*ppmc*AREA(3,L,NY,NX)
       VOLT(L,NY,NX)=VOLR(NY,NX)
       VOLX(L,NY,NX)=VOLT(L,NY,NX)
       VOLY(L,NY,NX)=VOLX(L,NY,NX)
       VOLTI(L,NY,NX)=VOLT(L,NY,NX)
-      BKVL(L,NY,NX)=1.82E-06_r8*ORGC(L,NY,NX)  !mass of soil layer, Mg/d2
+      BKVL(L,NY,NX)=MWC2Soil*ORGC(L,NY,NX)  !mass of soil layer, Mg/d2
       DLYRI(3,L,NY,NX)=VOLX(L,NY,NX)/AREA(3,L,NY,NX)
       DLYR(3,L,NY,NX)=DLYRI(3,L,NY,NX)
     ELSE
@@ -947,5 +935,42 @@ module StartsMod
   CDPTHI(NY,NX)=CDPTH(0,NY,NX)
   AREA(3,NL(NY,NX)+1:JZ,NY,NX)=DLYR(1,NL(NY,NX),NY,NX)*DLYR(2,NL(NY,NX),NY,NX)
 
+  end associate
   end subroutine InitLayerDepths
+    
+!------------------------------------------------------------------------------------------
+  
+  subroutine set_ecosim_solver(NPXS1,NPYS1)
+  
+  implicit none
+  integer, intent(in) :: NPXS1,NPYS1
+  !     begin_execution
+  real(r8) :: XNPV
+  
+  NPX=NPXS1   !number of cycles per hour for water,heat,solute flux calcns
+  NPY=NPYS1   !number of cycles per NPX for gas flux calcns
+    
+  NPH=NPX
+  NPT=NPY
+  NPG=NPH*NPT
+
+  NPR=30
+  NPS=10
+  XNPH=1.0_r8/NPH
+  XNPT=1.0_r8/NPT
+  XNPG=1.0_r8/NPG
+  XNPR=1.0_r8/NPR
+  XNPS=1.0_r8/NPS
+  XNPY=XNPH*XNPS
+  XNPZ=XNPH*XNPR
+  XNPQ=XNPZ*XNPS
+  XNPV=XNPR*XNPS
+  XNPD=600.0*XNPG
+  XNPX=AMIN1(1.0_r8,20.0_r8*XNPH)
+  XNPA=XNPX*XNPS
+  XNPB=XNPX*XNPR
+  XNPC=XNPX*XNPV
+  
+  end subroutine set_ecosim_solver
+
 end module StartsMod

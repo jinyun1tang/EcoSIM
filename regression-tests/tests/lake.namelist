@@ -9,4 +9,9 @@ prefix='../../examples/inputs/lake/'
 runfile='./runfile.lake'
 do_regression_test=.true.
 num_of_simdays=180
+pft_file_in='/Users/jinyuntang/work/github/ecosim2/EcoSIM/python_tools/ecosim_pft_20230113.nc'
+grid_file_in='/Users/jinyuntang/work/github/ecosim2/EcoSIM/python_tools/lake_grid_20230119.nc'
+/
+&bbgcforc
+
 /

@@ -4,6 +4,8 @@ set(APIDATA_SOURCES
 
 include_directories(${ECOSIM_INCLUDE_DIRS})
 include_directories(${CMAKE_BINARY_DIR}/f90src/utils/)
+include_directories(${CMAKE_BINARY_DIR}/f90src/modelconfig/)
+include_directories(${CMAKE_BINARY_DIR}/f90src/modelpars/)
 
 include(add_ecosim_library)
 add_ecosim_library(APIData ${APIDATA_SOURCES})

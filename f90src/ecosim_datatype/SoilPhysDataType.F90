@@ -1,36 +1,36 @@
 module SoilPhysDataType
-  use data_kind_mod, only : r8 => SHR_KIND_R8
+  use data_kind_mod, only : r8 => DAT_KIND_R8
   use GridConsts
 implicit none
 
   save
   character(len=*), private, parameter :: mod_filename = __FILE__
 
-  real(r8),allocatable ::  SLOPE(:,:,:)                       !slope	in three directions [o]
-  real(r8),allocatable ::  FC(:,:,:)                          !water contents at field capacity
-  real(r8),allocatable ::  WP(:,:,:)                          !water contents at wilting point
-  real(r8),allocatable ::  SCNV(:,:,:)                        !soil vertical saturated hydraulic conductivity [mm h-1]
-  real(r8),allocatable ::  SCNH(:,:,:)                        !soil horizontal saturated hydraulic conductivity, [mm h-1]
-  real(r8),allocatable ::  PSIFC(:,:)                         !water potentials at field capacity, [MPa]
-  real(r8),allocatable ::  PSIWP(:,:)                         !water potentials at wilting point [MPa]
-  real(r8),allocatable ::  THW(:,:,:)                         !initial soil water content
-  real(r8),allocatable ::  THI(:,:,:)                         !initial ice content
-  REAL(R8),allocatable ::  ALBX(:,:)                          !Surface albedo
-  real(r8),allocatable ::  PSL(:,:,:)                         !log soil porosity	-
-  real(r8),allocatable ::  FCL(:,:,:)                         !log water content at field capacity
-  real(r8),allocatable ::  WPL(:,:,:)                         !log water content at wilting point
-  real(r8),allocatable ::  PSD(:,:,:)                         !log soil porosity - log water content at field capacity
-  real(r8),allocatable ::  FCD(:,:,:)                         !log water content at field capacity
-  real(r8),allocatable ::  SRP(:,:,:)                         !shape parameter for water desorption
-  real(r8),allocatable ::  FSLOPE(:,:,:)                      !fraction of slope in 1 and 2
-  REAL(R8),allocatable ::  VOLAI(:,:,:)                       !initial total soil micropore porosity	m3 d-2
-  REAL(R8),allocatable ::  PSIMS(:,:)                         !log water potential at saturation	MPa
-  REAL(R8),allocatable ::  PSIMX(:,:)                         !log water potential at field capacity	-
-  REAL(R8),allocatable ::  PSIMN(:,:)                         !log water potential at wilting point
-  REAL(R8),allocatable ::  PSISD(:,:)                         !log water potential at field capacity 	-
-  REAL(R8),allocatable ::  PSIMD(:,:)                         !log water potential at saturation - log water potential at field capacity
-  real(r8),allocatable ::  VHCM(:,:,:)                        !soil solid heat capacity [MPa m-3 K-1]
-  real(r8),allocatable ::  DPTHA(:,:)                         !active layer depth, [n]
+  real(r8),target,allocatable ::  SLOPE(:,:,:)                       !slope	in three directions [o]
+  real(r8),target,allocatable ::  FC(:,:,:)                          !water contents at field capacity
+  real(r8),target,allocatable ::  WP(:,:,:)                          !water contents at wilting point
+  real(r8),target,allocatable ::  SCNV(:,:,:)                        !soil vertical saturated hydraulic conductivity [mm h-1]
+  real(r8),target,allocatable ::  SCNH(:,:,:)                        !soil horizontal saturated hydraulic conductivity, [mm h-1]
+  real(r8),target,allocatable ::  PSIFC(:,:)                         !water potentials at field capacity, [MPa]
+  real(r8),target,allocatable ::  PSIWP(:,:)                         !water potentials at wilting point [MPa]
+  real(r8),target,allocatable ::  THW(:,:,:)                         !initial soil water content
+  real(r8),target,allocatable ::  THI(:,:,:)                         !initial ice content
+  REAL(R8),target,allocatable ::  ALBX(:,:)                          !Surface albedo
+  real(r8),target,allocatable ::  PSL(:,:,:)                         !log soil porosity	-
+  real(r8),target,allocatable ::  FCL(:,:,:)                         !log water content at field capacity
+  real(r8),target,allocatable ::  WPL(:,:,:)                         !log water content at wilting point
+  real(r8),target,allocatable ::  PSD(:,:,:)                         !log soil porosity - log water content at field capacity
+  real(r8),target,allocatable ::  FCD(:,:,:)                         !log water content at field capacity
+  real(r8),target,allocatable ::  SRP(:,:,:)                         !shape parameter for water desorption
+  real(r8),target,allocatable ::  FSLOPE(:,:,:)                      !fraction of slope in 1 and 2
+  REAL(R8),target,allocatable ::  VOLAI(:,:,:)                       !initial total soil micropore porosity	m3 d-2
+  REAL(R8),target,allocatable ::  PSIMS(:,:)                         !log water potential at saturation	MPa
+  REAL(R8),target,allocatable ::  PSIMX(:,:)                         !log water potential at field capacity	-
+  REAL(R8),target,allocatable ::  PSIMN(:,:)                         !log water potential at wilting point
+  REAL(R8),target,allocatable ::  PSISD(:,:)                         !log water potential at field capacity 	-
+  REAL(R8),target,allocatable ::  PSIMD(:,:)                         !log water potential at saturation - log water potential at field capacity
+  real(r8),target,allocatable ::  VHCM(:,:,:)                        !soil solid heat capacity [MPa m-3 K-1]
+  real(r8),target,allocatable ::  DPTHA(:,:)                         !active layer depth, [n]
 !----------------------------------------------------------------------
 
 contains

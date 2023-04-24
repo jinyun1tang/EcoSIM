@@ -4,7 +4,7 @@ module ExtractsMod
 !     THIS SUBROUTINE AGGREGATES ALL SOIL-PLANT C,N,P EXCHANGES
 !     FROM 'UPTAKE' AMD 'GROSUB' AND SENDS RESULTS TO 'REDIST'
 !
-  use data_kind_mod, only : r8 => SHR_KIND_R8
+  use data_kind_mod, only : r8 => DAT_KIND_R8
   use EcosimConst
   use GrosubPars
   use PlantAPIData
@@ -45,24 +45,16 @@ module ExtractsMod
 
   implicit none
   integer :: NZ,L,K,M
-
+  integer :: NE
   associate(                             &
    NP0      => plt_site%NP0        , &
    WGLFT    => plt_biom%WGLFT      , &
-   WTSTGT   => plt_biom%WTSTGT     , &
-   WTSTG    => plt_biom%WTSTG      , &
-   HCSNC    => plt_bgcr%HCSNC      , &
-   HZSNC    => plt_bgcr%HZSNC      , &
-   HPSNC    => plt_bgcr%HPSNC      , &
-   ZCSNC    => plt_bgcr%ZCSNC      , &
-   ZZSNC    => plt_bgcr%ZZSNC      , &
-   ZPSNC    => plt_bgcr%ZPSNC      , &
-   CSNT     => plt_bgcr%CSNT       , &
-   ZSNT     => plt_bgcr%ZSNT       , &
-   PSNT     => plt_bgcr%PSNT       , &
-   CSNC     => plt_bgcr%CSNC       , &
-   ZSNC     => plt_bgcr%ZSNC       , &
-   PSNC     => plt_bgcr%PSNC       , &
+   WTSTGET  => plt_biom%WTSTGET   , &
+   WTSTGE   => plt_biom%WTSTGE     , &
+   HESNC    => plt_bgcr%HESNC      , &
+   ZESNC    => plt_bgcr%ZESNC      , &
+   ESNT     => plt_bgcr%ESNT       , &
+   ESNC     => plt_bgcr%ESNC       , &
    NI       => plt_morph%NI        , &
    ARSTT    => plt_morph%ARSTT     , &
    ARLFT    =>  plt_morph%ARLFT    , &
@@ -75,22 +67,23 @@ module ExtractsMod
 !
 !   ZCSNC,ZZSNC,ZPSNC=total C,N,P litterfall
 !   HCSNC,HZSNC,HPSNC=hourly PFT C,N,P litterfall from grosub.f
-!   WTSTGT=total standing dead C,N,P mass
+!   WTSTGET=total standing dead C,N,P mass
 !   WTSTG=PFT standing dead C,N,P mass
-!   CSNC,ZSNC,PSNC=cumulative PFT C,N,P litterfall from grosub.f
-!   CSNT,ZSNT,PSNT=cumulative total C,N,P litterfall
+!   ESNC,=cumulative PFT C,N,P litterfall from grosub.f
+!   ESNT,=cumulative total C,N,P litterfall
 !
-    ZCSNC=ZCSNC+HCSNC(NZ)
-    ZZSNC=ZZSNC+HZSNC(NZ)
-    ZPSNC=ZPSNC+HPSNC(NZ)
-    WTSTGT=WTSTGT+WTSTG(NZ)
+    DO NE=1,npelms
+      ZESNC(NE)=ZESNC(NE)+HESNC(NE,NZ)
+      WTSTGET(NE)=WTSTGET(NE)+WTSTGE(NE,NZ)
+    ENDDO
+    
     DO  L=0,NI(NZ)
-      DO K=0,1
-        DO  M=1,jcplx11
-          CSNT(M,K,L)=CSNT(M,K,L)+CSNC(M,K,L,NZ)
-          ZSNT(M,K,L)=ZSNT(M,K,L)+ZSNC(M,K,L,NZ)
-          PSNT(M,K,L)=PSNT(M,K,L)+PSNC(M,K,L,NZ)
-        enddo
+      DO K=1,pltpar%n_pltlitrk
+        DO NE=1,npelms
+          DO  M=1,pltpar%jsken
+            ESNT(NE,M,K,L)=ESNT(NE,M,K,L)+ESNC(NE,M,K,L,NZ)
+          enddo
+        ENDDO
       ENDDO
     ENDDO
   ENDDO
@@ -142,7 +135,7 @@ module ExtractsMod
   implicit none
   integer, intent(in) :: NZ
 
-  integer :: N,L,K
+  integer :: N,L,K,NTG,NE
 
   associate(                       &
     NU    => plt_site%NU     , &
@@ -151,20 +144,11 @@ module ExtractsMod
     RUPP1B=> plt_rbgc%RUPP1B , &
     RUPP2B=> plt_rbgc%RUPP2B , &
     RUNNXP=> plt_rbgc%RUNNXP , &
-    RCODFA=> plt_rbgc%RCODFA , &
-    RCOFLA=> plt_rbgc%RCOFLA , &
-    ROXFLA=> plt_rbgc%ROXFLA , &
-    RCHFLA=> plt_rbgc%RCHFLA , &
-    RHGDFA=> plt_rbgc%RHGDFA , &
-    ROXDFA=> plt_rbgc%ROXDFA , &
-    RCHDFA=> plt_rbgc%RCHDFA , &
-    RHGFLA=> plt_rbgc%RHGFLA , &
+    trcg_RDFA=> plt_rbgc%trcg_RDFA , &
+    trcg_RFLA=> plt_rbgc%trcg_RFLA , &
     RCO2P => plt_rbgc%RCO2P  , &
     RUPCHS=> plt_rbgc%RUPCHS , &
     RUPOXP=> plt_rbgc%RUPOXP , &
-    RNHDFA=> plt_rbgc%RNHDFA , &
-    RN2FLA=> plt_rbgc%RN2FLA , &
-    RNHFLA=> plt_rbgc%RNHFLA , &
     RUPN2S=> plt_rbgc%RUPN2S , &
     RUPN3B=> plt_rbgc%RUPN3B , &
     RUPHGS=> plt_rbgc%RUPHGS , &
@@ -179,30 +163,15 @@ module ExtractsMod
     RUPNHB=> plt_rbgc%RUPNHB , &
     RUPH2B=> plt_rbgc%RUPH2B , &
     RUPH1B=> plt_rbgc%RUPH1B , &
-    TNHFLA=> plt_rbgc%TNHFLA , &
-    TCHFLA=> plt_rbgc%TCHFLA , &
-    TLCH4P=> plt_rbgc%TLCH4P , &
-    TN2FLA=> plt_rbgc%TN2FLA , &
-    TLCO2P=> plt_rbgc%TLCO2P , &
-    TLNH3P=> plt_rbgc%TLNH3P , &
-    TLN2OP=> plt_rbgc%TLN2OP , &
-    TLOXYP=> plt_rbgc%TLOXYP , &
-    TCOFLA=> plt_rbgc%TCOFLA , &
-    TOXFLA=> plt_rbgc%TOXFLA , &
+    trcg_TFLA=> plt_rbgc%trcg_TFLA , &
+    trcg_TLP=> plt_rbgc%trcg_TLP , &
     ROXYP => plt_rbgc%ROXYP  , &
-    RDFOMC=> plt_rbgc%RDFOMC , &
+    RDFOME=> plt_rbgc%RDFOME , &
     RUNNHP=> plt_rbgc%RUNNHP , &
-    RDFOMN=> plt_rbgc%RDFOMN , &
     RUNNOP=> plt_rbgc%RUNNOP , &
-    RDFOMP=> plt_rbgc%RDFOMP , &
     RUPP2P=> plt_rbgc%RUPP2P , &
     RUNNBP=> plt_rbgc%RUNNBP , &
     RUPP1P=> plt_rbgc%RUPP1P , &
-    ZH3P  => plt_rbgc%ZH3P   , &
-    Z2OP  => plt_rbgc%Z2OP   , &
-    Z2OA  => plt_rbgc%Z2OA   , &
-    ZH3A  => plt_rbgc%ZH3A   , &
-    RN2DFA=> plt_rbgc%RN2DFA , &
     RNO3X => plt_bgcr%RNO3X  , &
     RNH4X => plt_bgcr%RNH4X  , &
     RPO4X => plt_bgcr%RPO4X  , &
@@ -210,9 +179,7 @@ module ExtractsMod
     RP14X => plt_bgcr%RP14X  , &
     RNHBX => plt_bgcr%RNHBX  , &
     ROXYX => plt_bgcr%ROXYX  , &
-    TDFOMP=> plt_bgcr%TDFOMP , &
-    TDFOMN=> plt_bgcr%TDFOMN , &
-    TDFOMC=> plt_bgcr%TDFOMC , &
+    TDFOME=> plt_bgcr%TDFOME , &
     TUPH1B=> plt_bgcr%TUPH1B , &
     TUPH2B=> plt_bgcr%TUPH2B , &
     TUPNOB=> plt_bgcr%TUPNOB , &
@@ -227,9 +194,7 @@ module ExtractsMod
     TUPOXS=> plt_bgcr%TUPOXS , &
     TUPCHS=> plt_bgcr%TUPCHS , &
     TUPN2S=> plt_bgcr%TUPN2S , &
-    THGFLA=> plt_bgcr%THGFLA , &
     TUPOXP=> plt_bgcr%TUPOXP , &
-    TLH2GP=> plt_bgcr%TLH2GP , &
     TCO2S => plt_bgcr%TCO2S  , &
     TCO2P => plt_bgcr%TCO2P  , &
     RPOBX => plt_bgcr%RPOBX  , &
@@ -238,14 +203,8 @@ module ExtractsMod
     TUPHT => plt_ew%TUPHT    , &
     TUPWTR=> plt_ew%TUPWTR   , &
     UPWTR => plt_ew%UPWTR    , &
-    H2GP  => plt_rbgc%H2GP,&
-    CH4P  => plt_rbgc%CH4P,&
-    OXYP  => plt_rbgc%OXYP,&
-    CO2P  => plt_rbgc%CO2P,&
-    H2GA  => plt_rbgc%H2GA,&
-    CH4A  => plt_rbgc%CH4A,&
-    CO2A  => plt_rbgc%CO2A,&
-    OXYA  => plt_rbgc%OXYA,&
+    trcg_rootml  => plt_rbgc%trcg_rootml,&
+    trcs_rootml => plt_rbgc%trcs_rootml, &
     RTDNP => plt_morph%RTDNP , &
     RTDNT => plt_morph%RTDNT , &
     MY    => plt_morph%MY    , &
@@ -281,30 +240,25 @@ module ExtractsMod
 !     R*FLA=root gaseous-atmosphere CO2 exchange
 !     R*DFA=root aqueous-gaseous CO2 exchange
 !
-      CO2A(N,L,NZ)=CO2A(N,L,NZ)+RCOFLA(N,L,NZ)-RCODFA(N,L,NZ)
-      OXYA(N,L,NZ)=OXYA(N,L,NZ)+ROXFLA(N,L,NZ)-ROXDFA(N,L,NZ)
-      CH4A(N,L,NZ)=CH4A(N,L,NZ)+RCHFLA(N,L,NZ)-RCHDFA(N,L,NZ)
-      Z2OA(N,L,NZ)=Z2OA(N,L,NZ)+RN2FLA(N,L,NZ)-RN2DFA(N,L,NZ)
-      ZH3A(N,L,NZ)=ZH3A(N,L,NZ)+RNHFLA(N,L,NZ)-RNHDFA(N,L,NZ)
-      H2GA(N,L,NZ)=H2GA(N,L,NZ)+RHGFLA(N,L,NZ)-RHGDFA(N,L,NZ)
-      CO2P(N,L,NZ)=CO2P(N,L,NZ)+RCODFA(N,L,NZ)+RCO2P(N,L,NZ)
-      OXYP(N,L,NZ)=OXYP(N,L,NZ)+ROXDFA(N,L,NZ)-RUPOXP(N,L,NZ)
-      CH4P(N,L,NZ)=CH4P(N,L,NZ)+RCHDFA(N,L,NZ)+RUPCHS(N,L,NZ)
-      Z2OP(N,L,NZ)=Z2OP(N,L,NZ)+RN2DFA(N,L,NZ)+RUPN2S(N,L,NZ)
-      ZH3P(N,L,NZ)=ZH3P(N,L,NZ)+RNHDFA(N,L,NZ)+RUPN3S(N,L,NZ)+RUPN3B(N,L,NZ)
-      H2GP(N,L,NZ)=H2GP(N,L,NZ)+RHGDFA(N,L,NZ)+RUPHGS(N,L,NZ)
+      DO NTG=idg_beg,idg_end-1
+        trcg_rootml(NTG,N,L,NZ)=trcg_rootml(NTG,N,L,NZ)+trcg_RFLA(NTG,N,L,NZ)-trcg_RDFA(NTG,N,L,NZ)
+      ENDDO
+
+      trcs_rootml(idg_CO2,N,L,NZ)=trcs_rootml(idg_CO2,N,L,NZ)+trcg_RDFA(idg_CO2,N,L,NZ)+RCO2P(N,L,NZ)
+      trcs_rootml(idg_O2,N,L,NZ)=trcs_rootml(idg_O2,N,L,NZ)+trcg_RDFA(idg_O2,N,L,NZ)-RUPOXP(N,L,NZ)
+      trcs_rootml(idg_CH4,N,L,NZ)=trcs_rootml(idg_CH4,N,L,NZ)+trcg_RDFA(idg_CH4,N,L,NZ)+RUPCHS(N,L,NZ)
+      trcs_rootml(idg_N2O,N,L,NZ)=trcs_rootml(idg_N2O,N,L,NZ)+trcg_RDFA(idg_N2O,N,L,NZ)+RUPN2S(N,L,NZ)
+      trcs_rootml(idg_NH3,N,L,NZ)=trcs_rootml(idg_NH3,N,L,NZ)+trcg_RDFA(idg_NH3,N,L,NZ)+RUPN3S(N,L,NZ)+RUPN3B(N,L,NZ)
+      trcs_rootml(idg_H2,N,L,NZ)=trcs_rootml(idg_H2,N,L,NZ)+trcg_RDFA(idg_H2,N,L,NZ)+RUPHGS(N,L,NZ)
 !
 !     TOTAL ROOT GAS CONTENTS
 !
 !     TL*P=total root gas content
 !     *A,*P=PFT root gaseous, aqueous gas content
 !
-      TLCO2P(L)=TLCO2P(L)+CO2P(N,L,NZ)+CO2A(N,L,NZ)
-      TLOXYP(L)=TLOXYP(L)+OXYP(N,L,NZ)+OXYA(N,L,NZ)
-      TLCH4P(L)=TLCH4P(L)+CH4P(N,L,NZ)+CH4A(N,L,NZ)
-      TLN2OP(L)=TLN2OP(L)+Z2OP(N,L,NZ)+Z2OA(N,L,NZ)
-      TLNH3P(L)=TLNH3P(L)+ZH3P(N,L,NZ)+ZH3A(N,L,NZ)
-      TLH2GP(L)=TLH2GP(L)+H2GP(N,L,NZ)+H2GA(N,L,NZ)
+    DO NTG=idg_beg,idg_end-1
+      trcg_TLP(NTG,L)=trcg_TLP(NTG,L)+trcs_rootml(NTG,N,L,NZ)+trcg_rootml(NTG,N,L,NZ)
+    ENDDO
 !
 !     TOTAL ROOT BOUNDARY GAS FLUXES
 !
@@ -317,12 +271,10 @@ module ExtractsMod
 !     solute code:NH4=NH4,NO3=NO3,H2P=H2PO4,H1P=H1PO4 in non-band
 !                :NHB=NH4,NOB=NO3,H2B=H2PO4,H1B=H1PO4 in band
 !
-      TCOFLA(L)=TCOFLA(L)+RCOFLA(N,L,NZ)
-      TOXFLA(L)=TOXFLA(L)+ROXFLA(N,L,NZ)
-      TCHFLA(L)=TCHFLA(L)+RCHFLA(N,L,NZ)
-      TN2FLA(L)=TN2FLA(L)+RN2FLA(N,L,NZ)
-      TNHFLA(L)=TNHFLA(L)+RNHFLA(N,L,NZ)
-      THGFLA(L)=THGFLA(L)+RHGFLA(N,L,NZ)
+      DO NTG=idg_beg,idg_end-1
+        trcg_TFLA(NTG,L)=trcg_TFLA(NTG,L)+trcg_RFLA(NTG,N,L,NZ)
+      ENDDO
+
       TCO2P(L)=TCO2P(L)-RCO2P(N,L,NZ)
       TUPOXP(L)=TUPOXP(L)+RUPOXP(N,L,NZ)
       TCO2S(L)=TCO2S(L)+RCO2S(N,L,NZ)
@@ -343,13 +295,13 @@ module ExtractsMod
 !
 !     TOTAL ROOT C,N,P EXUDATION
 !
-!     TDFOMC,TDFOMN,TDFOMP=total nonstructl C,N,P exchange
+!     TDFOME=total nonstructl C,N,P exchange
 !     RDFOMC,RDFOMN,RDFOMP=PFT nonstructl C,N,P exchange
 !
-      DO K=0,jcplx11
-        TDFOMC(K,L)=TDFOMC(K,L)-RDFOMC(N,K,L,NZ)
-        TDFOMN(K,L)=TDFOMN(K,L)-RDFOMN(N,K,L,NZ)
-        TDFOMP(K,L)=TDFOMP(K,L)-RDFOMP(N,K,L,NZ)
+      DO K=1,jcplx
+        DO NE=1,npelms
+          TDFOME(NE,K,L)=TDFOME(NE,K,L)-RDFOME(ielmc,N,K,L,NZ)
+        ENDDO
       ENDDO
 !
 !     TOTAL ROOT O2, NH4, NO3, PO4 UPTAKE CONTRIBUTES TO
@@ -400,41 +352,25 @@ module ExtractsMod
 
   implicit none
   integer, intent(in) :: NZ
-  integer :: L, NB
+  integer :: L, NE,NB,NTG
   real(r8) :: ENGYC
+
   associate(                       &
-    TBALC => plt_site%TBALC  , &
-    TBALN => plt_site%TBALN  , &
-    TBALP => plt_site%TBALP  , &
-    BALC  => plt_site%BALC   , &
-    BALN  => plt_site%BALN   , &
-    BALP  => plt_site%BALP   , &
+    TBALE => plt_site%TBALE  , &
+    BALE  => plt_site%BALE   , &
     TNH3C => plt_bgcr%TNH3C  , &
     RNH3C => plt_bgcr%RNH3C  , &
-    RCO2Z => plt_bgcr%RCO2Z  , &
-    ROXYZ => plt_bgcr%ROXYZ  , &
-    RCH4Z => plt_bgcr%RCH4Z  , &
-    RN2OZ => plt_bgcr%RN2OZ  , &
-    RNH3Z => plt_bgcr%RNH3Z  , &
-    RH2GZ => plt_bgcr%RH2GZ  , &
     TCCAN => plt_bgcr%TCCAN  , &
-    ZCSNC => plt_bgcr%ZCSNC  , &
-    ZZSNC => plt_bgcr%ZZSNC  , &
-    ZPSNC => plt_bgcr%ZPSNC  , &
+    ZESNC => plt_bgcr%ZESNC  , &
+    RFGas_root => plt_bgcr%RFGas_root, &
     RUPNF => plt_bgcr%RUPNF  , &
     CNET  => plt_bgcr%CNET   , &
     CTRAN => plt_ew%CTRAN    , &
     TH2GZ => plt_bgcr%TH2GZ  , &
     RNH3B => plt_rbgc%RNH3B  , &
-    HCUPTK=> plt_rbgc%HCUPTK , &
-    HZUPTK=> plt_rbgc%HZUPTK , &
-    HPUPTK=> plt_rbgc%HPUPTK , &
+    HEUPTK=> plt_rbgc%HEUPTK , &
     TUPNF => plt_rbgc%TUPNF  , &
-    TOXYZ => plt_rbgc%TOXYZ  , &
-    TCH4Z => plt_rbgc%TCH4Z  , &
-    TCO2Z => plt_rbgc%TCO2Z  , &
-    TN2OZ => plt_rbgc%TN2OZ  , &
-    TNH3Z => plt_rbgc%TNH3Z  , &
+    TRFGas_root => plt_rbgc%TRFGas_root  , &
     EP    => plt_ew%EP       , &
     FLWC  => plt_ew%FLWC     , &
     EVAPC => plt_ew%EVAPC    , &
@@ -496,8 +432,8 @@ module ExtractsMod
 !     HCUPTK,HZUPTK,HPUPTK=PFT net root-soil C,N,P exchange
 !     TBALC,TBALN,TBALP=total C,N,P balance
 !     BALC,BALN,BALP=PFT C,N,P balance
-!     TCO2Z,TOXYZ,TCH4Z,TN2OZ,TNH3Z,TH2GZ=total loss of root CO2, O2, CH4, N2O, NH3, H2
-!     RCO2Z,ROXYZ,RCH4Z,RN2OZ,RNH3Z,RH2GZ=PFT loss of root CO2, O2, CH4, N2O, NH3, H2
+!     TRFGas_root=total loss of root CO2, O2, CH4, N2O, NH3, H2
+!     RFGas_root=PFT loss of root CO2, O2, CH4, N2O, NH3, H2
 !
   TRN=TRN+RAD1(NZ)
   TLE=TLE+EFLXC(NZ)
@@ -516,18 +452,14 @@ module ExtractsMod
   THRMC=THRMC+THRM1(NZ)
   ARLFC=ARLFC+ARLFP(NZ)
   ARSTC=ARSTC+ARSTP(NZ)
-  ZCSNC=ZCSNC-HCUPTK(NZ)
-  ZZSNC=ZZSNC-HZUPTK(NZ)
-  ZPSNC=ZPSNC-HPUPTK(NZ)
-  TBALC=TBALC+BALC(NZ)
-  TBALN=TBALN+BALN(NZ)
-  TBALP=TBALP+BALP(NZ)
-  TCO2Z=TCO2Z+RCO2Z(NZ)
-  TOXYZ=TOXYZ+ROXYZ(NZ)
-  TCH4Z=TCH4Z+RCH4Z(NZ)
-  TN2OZ=TN2OZ+RN2OZ(NZ)
-  TNH3Z=TNH3Z+RNH3Z(NZ)
-  TH2GZ=TH2GZ+RH2GZ(NZ)
+  DO NE=1,npelms
+    ZESNC(NE)=ZESNC(NE)-HEUPTK(NE,NZ)
+    TBALE(NE)=TBALE(NE)+BALE(NE,NZ)
+  ENDDO
+
+  DO NTG=idg_beg,idg_end-1
+    TRFGas_root(NTG)=TRFGas_root(NTG)+RFGas_root(NTG,NZ)
+  ENDDO
 !
 !     TOTAL CANOPY NH3 EXCHANGE AND EXUDATION
 !

@@ -1,10 +1,11 @@
 module NitroDisturbMod
 
 ! USES:
-  use data_kind_mod, only : r8 => SHR_KIND_R8
+  use data_kind_mod, only : r8 => DAT_KIND_R8
   use abortutils  , only : endrun
   use minimathmod, only : safe_adb
   use MicrobialDataType
+  use EcoSiMParDataMod, only : micpar
   use NitroPars
   use SOMDataType
   use ChemTranspDataType
@@ -39,23 +40,23 @@ module NitroDisturbMod
   implicit none
   integer, intent(in) :: I,J,NY,NX
 
-  integer :: L,K,M,N,IFLGJ,NLL,NGL
+  integer :: L,K,M,N,IFLGJ,NLL,NGL,NTF
   real(r8) :: DC,DN,DP
   real(r8) :: DCORPC
   real(r8) :: FORGCX
   real(r8) :: HFLXD
   real(r8) :: OC,ON,OP,OCH,ONH,OPH,ONX
   REAL(R8) :: OPX,OCA,OAH
-  real(r8) :: ONL(4,0:jcplx1),OPL(4,0:jcplx1)
+  real(r8) :: ONL(4,1:jcplx),OPL(4,1:jcplx)
+  real(r8) :: DCORPC1
 !     begin_execution
 
-  IF(J.EQ.INT(ZNOON(NY,NX)).AND.(ITILL(I,NY,NX).EQ.21 &
-    .OR.ITILL(I,NY,NX).EQ.22))THEN
+  IF(J.EQ.INT(ZNOON(NY,NX)).AND.(ITILL(I,NY,NX).EQ.21.OR.ITILL(I,NY,NX).EQ.22))THEN
     IF(ITILL(I,NY,NX).EQ.22)THEN
       IFLGS(NY,NX)=1
       IFLGJ=0
       NLL=-1
-      DO 2945 L=0,NL(NY,NX)
+      D2945: DO L=0,NL(NY,NX)
 
         IF(L.EQ.0.OR.L.GE.NUM(NY,NX))THEN
           IF(IFLGJ.EQ.1)THEN
@@ -66,23 +67,24 @@ module NitroDisturbMod
             NLL=L
           ENDIF
         ENDIF
-2945  CONTINUE
-      ELSE
-        NLL=0
-      ENDIF
-      DO 2950 L=0,NLL
-        IF(NLL.GE.0)THEN
-          IF(ITILL(I,NY,NX).EQ.22)THEN
-            IF(L.EQ.0)THEN
-              FORGCX=0.0_r8
-            ELSE
-              FORGCX=FORGC
-            ENDIF
-            DCORPC=AMIN1(0.999,DCORP(I,NY,NX))*(CORGC(L,NY,NX)-FORGCX) &
-              /(AMAX1(CORGC(L,NY,NX),0.55E+06)-FORGCX)
+      ENDDO D2945
+    ELSE
+      NLL=0
+    ENDIF
+
+    D2950: DO L=0,NLL
+      IF(NLL.GE.0)THEN
+        IF(ITILL(I,NY,NX).EQ.22)THEN
+          IF(L.EQ.0)THEN
+            FORGCX=0.0_r8
           ELSE
-            DCORPC=AMIN1(0.999,DCORP(I,NY,NX))
+            FORGCX=FORGC
           ENDIF
+          DCORPC=AMIN1(0.999_r8,DCORP(I,NY,NX))*(CORGC(L,NY,NX)-FORGCX) &
+            /(AMAX1(CORGC(L,NY,NX),0.55E+06_r8)-FORGCX)
+        ELSE
+          DCORPC=AMIN1(0.999_r8,DCORP(I,NY,NX))
+        ENDIF
 !     VOLWOU=VOLWOU+DCORPC*VOLW(L,NY,NX)
 !     HEATOU=HEATOU+DCORPC*4.19*TKS(L,NY,NX)*VOLW(L,NY,NX)
 !     VOLW(L,NY,NX)=VOLW(L,NY,NX)-DCORPC*VOLW(L,NY,NX)
@@ -92,85 +94,85 @@ module NitroDisturbMod
         DC=0.0_r8
         DN=0.0_r8
         DP=0.0_r8
-        ONL(1:4,0:jcplx1)=0._r8
-        OPL(1:4,0:jcplx1)=0._r8
+        ONL(1:4,1:jcplx)=0._r8
+        OPL(1:4,1:jcplx)=0._r8
 
-        DO 2970 K=0,4
-          IF(L.NE.0.OR.(K.NE.3.AND.K.NE.4))THEN
+        D2970: DO K=1,jcplx
+          IF(L.NE.0.OR.(micpar%is_litter(K)))THEN
 !
 !     REMOVE MICROBIAL BIOMASS
 !
-            DO 2960 N=1,7
-              DO NGL=1,JG
-                DO M=1,3
-                  OCH=DCORPC*OMC(M,NGL,N,K,L,NY,NX)
-                  ONH=DCORPC*OMN(M,NGL,N,K,L,NY,NX)
-                  OPH=DCORPC*OMP(M,NGL,N,K,L,NY,NX)
+            D2960: DO N=1,NFGs
+              DO NGL=JGnio(N),JGnfo(N)
+                DO M=1,nlbiomcp
+                  OCH=DCORPC*OMC(M,NGL,K,L,NY,NX)
+                  ONH=DCORPC*OMN(M,NGL,K,L,NY,NX)
+                  OPH=DCORPC*OMP(M,NGL,K,L,NY,NX)
                   ONX=EFIRE(1,ITILL(I,NY,NX))*ONH
                   OPX=EFIRE(2,ITILL(I,NY,NX))*OPH
-                  IF(K.LE.2)THEN
+                  IF(micpar%is_litter(K))THEN
                     ONL(4,K)=ONL(4,K)+ONH-ONX
                     OPL(4,K)=OPL(4,K)+OPH-OPX
-                  ELSEIF(K.LE.4)THEN
+                  ELSE
                     ONL(1,K)=ONL(1,K)+ONH-ONX
                     OPL(1,K)=OPL(1,K)+OPH-OPX
                   ENDIF
-                  OMC(M,NGL,N,K,L,NY,NX)=OMC(M,NGL,N,K,L,NY,NX)-OCH
-                  OMN(M,NGL,N,K,L,NY,NX)=OMN(M,NGL,N,K,L,NY,NX)-ONH
-                  OMP(M,NGL,N,K,L,NY,NX)=OMP(M,NGL,N,K,L,NY,NX)-OPH
-                  DC=DC+OMC(M,NGL,N,K,L,NY,NX)
-                  DN=DN+OMN(M,NGL,N,K,L,NY,NX)
-                  DP=DP+OMP(M,NGL,N,K,L,NY,NX)
+                  OMC(M,NGL,K,L,NY,NX)=OMC(M,NGL,K,L,NY,NX)-OCH
+                  OMN(M,NGL,K,L,NY,NX)=OMN(M,NGL,K,L,NY,NX)-ONH
+                  OMP(M,NGL,K,L,NY,NX)=OMP(M,NGL,K,L,NY,NX)-OPH
+                  DC=DC+OMC(M,NGL,K,L,NY,NX)
+                  DN=DN+OMN(M,NGL,K,L,NY,NX)
+                  DP=DP+OMP(M,NGL,K,L,NY,NX)
                   OC=OC+OCH
                   ON=ON+ONX
                   OP=OP+OPX
                 enddo
               enddo
-2960        CONTINUE
+            ENDDO D2960
           ENDIF
-2970    CONTINUE
+        ENDDO D2970
 
 
 !          IF(L.NE.0.OR.(K.NE.3.AND.K.NE.4))THEN
 !
 !     REMOVE MICROBIAL BIOMASS
 !
-            DO  N=1,7
-              DO NGL=1,JG
-                DO M=1,3
-                  OCH=DCORPC*OMCff(M,NGL,N,L,NY,NX)
-                  ONH=DCORPC*OMNff(M,NGL,N,L,NY,NX)
-                  OPH=DCORPC*OMPff(M,NGL,N,L,NY,NX)
-                  ONX=EFIRE(1,ITILL(I,NY,NX))*ONH
-                  OPX=EFIRE(2,ITILL(I,NY,NX))*OPH
-                  ONL(4,1)=ONL(4,1)+ONH-ONX
-                  OPL(4,1)=OPL(4,1)+OPH-OPX
-                  OMCff(M,NGL,N,L,NY,NX)=OMCff(M,NGL,N,L,NY,NX)-OCH
-                  OMNff(M,NGL,N,L,NY,NX)=OMNff(M,NGL,N,L,NY,NX)-ONH
-                  OMPff(M,NGL,N,L,NY,NX)=OMPff(M,NGL,N,L,NY,NX)-OPH
-                  DC=DC+OMCff(M,NGL,N,L,NY,NX)
-                  DN=DN+OMNff(M,NGL,N,L,NY,NX)
-                  DP=DP+OMPff(M,NGL,N,L,NY,NX)
-                  OC=OC+OCH
-                  ON=ON+ONX
-                  OP=OP+OPX
-                enddo
-              enddo
-            ENDDO
+        DO  N=1,NFGs
+          DO NGL=JGniA(N),JGnfA(N)
+            DO M=1,nlbiomcp
+              OCH=DCORPC*OMCff(M,NGL,L,NY,NX)
+              ONH=DCORPC*OMNff(M,NGL,L,NY,NX)
+              OPH=DCORPC*OMPff(M,NGL,L,NY,NX)
+              ONX=EFIRE(1,ITILL(I,NY,NX))*ONH
+              OPX=EFIRE(2,ITILL(I,NY,NX))*OPH
+              ONL(4,1)=ONL(4,1)+ONH-ONX
+              OPL(4,1)=OPL(4,1)+OPH-OPX
+              OMCff(M,NGL,L,NY,NX)=OMCff(M,NGL,L,NY,NX)-OCH
+              OMNff(M,NGL,L,NY,NX)=OMNff(M,NGL,L,NY,NX)-ONH
+              OMPff(M,NGL,L,NY,NX)=OMPff(M,NGL,L,NY,NX)-OPH
+              DC=DC+OMCff(M,NGL,L,NY,NX)
+              DN=DN+OMNff(M,NGL,L,NY,NX)
+              DP=DP+OMPff(M,NGL,L,NY,NX)
+              OC=OC+OCH
+              ON=ON+ONX
+              OP=OP+OPX
+            enddo
+          enddo
+        ENDDO
 !          ENDIF
 
 !
 !     REMOVE MICROBIAL RESIDUE
 !
-        DO 2900 K=0,4
-          IF(L.NE.0.OR.(K.NE.3.AND.K.NE.4))THEN
-            DO 2940 M=1,2
+        D2900: DO K=1,jcplx
+          IF(L.NE.0.OR.(micpar%is_litter(K)))THEN
+            D2940: DO M=1,ndbiomcp
               OCH=DCORPC*ORC(M,K,L,NY,NX)
               ONH=DCORPC*ORN(M,K,L,NY,NX)
               OPH=DCORPC*ORP(M,K,L,NY,NX)
               ONX=EFIRE(1,ITILL(I,NY,NX))*ONH
               OPX=EFIRE(2,ITILL(I,NY,NX))*OPH
-              IF(K.LE.2)THEN
+              IF(micpar%is_litter(K))THEN
                 ONL(4,K)=ONL(4,K)+ONH-ONX
                 OPL(4,K)=OPL(4,K)+OPH-OPX
               ELSE
@@ -186,7 +188,7 @@ module NitroDisturbMod
               OC=OC+OCH
               ON=ON+ONX
               OP=OP+OPX
-2940        CONTINUE
+            ENDDO D2940
 !
 !     REMOVE DOC, DON, DOP
 !
@@ -196,7 +198,7 @@ module NitroDisturbMod
             OPH=DCORPC*OQP(K,L,NY,NX)
             ONX=EFIRE(1,ITILL(I,NY,NX))*ONH
             OPX=EFIRE(2,ITILL(I,NY,NX))*OPH
-            IF(K.LE.2)THEN
+            IF(micpar%is_litter(K))THEN
               ONL(4,K)=ONL(4,K)+ONH-ONX
               OPL(4,K)=OPL(4,K)+OPH-OPX
             ELSE
@@ -216,7 +218,7 @@ module NitroDisturbMod
             OAH=DCORPC*OQAH(K,L,NY,NX)
             ONX=EFIRE(1,ITILL(I,NY,NX))*ONH
             OPX=EFIRE(2,ITILL(I,NY,NX))*OPH
-            IF(K.LE.2)THEN
+            IF(micpar%is_litter(K))THEN
               ONL(4,K)=ONL(4,K)+ONH-ONX
               OPL(4,K)=OPL(4,K)+OPH-OPX
             ELSE
@@ -239,7 +241,7 @@ module NitroDisturbMod
             OAH=DCORPC*OHA(K,L,NY,NX)
             ONX=EFIRE(1,ITILL(I,NY,NX))*ONH
             OPX=EFIRE(2,ITILL(I,NY,NX))*OPH
-            IF(K.LE.2)THEN
+            IF(micpar%is_litter(K))THEN
               ONL(4,K)=ONL(4,K)+ONH-ONX
               OPL(4,K)=OPL(4,K)+OPH-OPX
             ELSE
@@ -260,7 +262,7 @@ module NitroDisturbMod
 !
 !     REMOVE RESIDUE
 !
-            DO 2930 M=1,jsken
+            D2930: DO M=1,jsken
               OCH=DCORPC*OSC(M,K,L,NY,NX)
               OCA=DCORPC*OSA(M,K,L,NY,NX)
               ONH=DCORPC*OSN(M,K,L,NY,NX)
@@ -279,50 +281,51 @@ module NitroDisturbMod
               OC=OC+OCH
               ON=ON+ONX
               OP=OP+OPX
-2930        CONTINUE
+            ENDDO D2930
           ENDIF
-2900    CONTINUE
+        ENDDO D2900
 !
 !     ADD UNBURNED N,P TO ORG N, ORG P
 !
-        DO 2905 K=0,4
+        D2905: DO K=1,jcplx
           DO  M=1,jsken
             OSN(M,K,L,NY,NX)=OSN(M,K,L,NY,NX)+ONL(M,K)
             OSP(M,K,L,NY,NX)=OSP(M,K,L,NY,NX)+OPL(M,K)
             DN=DN+ONL(M,K)
             DP=DP+OPL(M,K)
           enddo
-2905  CONTINUE
+        ENDDO D2905
 !
 !     REMOVE FERTILIZER IN RESIDUE
 !
-      IF(ITILL(I,NY,NX).EQ.21)THEN
-        ON=ON+DCORPC*(ZNH4S(L,NY,NX)+ZNH3S(L,NY,NX) &
-          +ZNO3S(L,NY,NX)+ZNO2S(L,NY,NX))
-        OP=OP+DCORPC*(H1PO4(L,NY,NX)+H2PO4(L,NY,NX))
-        ZNH4S(L,NY,NX)=(1.0-DCORPC)*ZNH4S(L,NY,NX)
-        ZNH3S(L,NY,NX)=(1.0-DCORPC)*ZNH3S(L,NY,NX)
-        ZNO3S(L,NY,NX)=(1.0-DCORPC)*ZNO3S(L,NY,NX)
-        ZNO2S(L,NY,NX)=(1.0-DCORPC)*ZNO2S(L,NY,NX)
-        H1PO4(L,NY,NX)=(1.0-DCORPC)*H1PO4(L,NY,NX)
-        H2PO4(L,NY,NX)=(1.0-DCORPC)*H2PO4(L,NY,NX)
-        XN4(L,NY,NX)=(1.0-DCORPC)*XN4(L,NY,NX)
-        PALPO(L,NY,NX)=(1.0-DCORPC)*PALPO(L,NY,NX)
-        PFEPO(L,NY,NX)=(1.0-DCORPC)*PFEPO(L,NY,NX)
-        PCAPD(L,NY,NX)=(1.0-DCORPC)*PCAPD(L,NY,NX)
-        PCAPH(L,NY,NX)=(1.0-DCORPC)*PCAPH(L,NY,NX)
-        PCAPM(L,NY,NX)=(1.0-DCORPC)*PCAPM(L,NY,NX)
-        ZNH4FA(L,NY,NX)=(1.0-DCORPC)*ZNH4FA(L,NY,NX)
-        ZNH3FA(L,NY,NX)=(1.0-DCORPC)*ZNH3FA(L,NY,NX)
-        ZNHUFA(L,NY,NX)=(1.0-DCORPC)*ZNHUFA(L,NY,NX)
-        ZNO3FA(L,NY,NX)=(1.0-DCORPC)*ZNO3FA(L,NY,NX)
-      ENDIF
-      ORGC(L,NY,NX)=DC
-      ORGN(L,NY,NX)=DN
-      IF(L.EQ.0)THEN
-        HFLXD=4.19E-06*(ORGCX(L,NY,NX)-ORGC(L,NY,NX))*TKS(L,NY,NX)
-        HEATOU=HEATOU+HFLXD
-      ENDIF
+        IF(ITILL(I,NY,NX).EQ.21)THEN
+          ON=ON+DCORPC*(trc_solml(ids_NH4,L,NY,NX)+trc_solml(idg_NH3,L,NY,NX) &
+            +trc_solml(ids_NO3,L,NY,NX)+trc_solml(ids_NO2,L,NY,NX))
+          OP=OP+DCORPC*(trc_solml(ids_H1PO4,L,NY,NX)+trc_solml(ids_H2PO4,L,NY,NX))
+          DCORPC1=1.0_r8-DCORPC
+          trc_solml(ids_NH4,L,NY,NX)=DCORPC1*trc_solml(ids_NH4,L,NY,NX)
+          trc_solml(idg_NH3,L,NY,NX)=DCORPC1*trc_solml(idg_NH3,L,NY,NX)
+          trc_solml(ids_NO3,L,NY,NX)=DCORPC1*trc_solml(ids_NO3,L,NY,NX)
+          trc_solml(ids_NO2,L,NY,NX)=DCORPC1*trc_solml(ids_NO2,L,NY,NX)
+          trc_solml(ids_H1PO4,L,NY,NX)=DCORPC1*trc_solml(ids_H1PO4,L,NY,NX)
+          trc_solml(ids_H2PO4,L,NY,NX)=DCORPC1*trc_solml(ids_H2PO4,L,NY,NX)
+          trcx_solml(idx_NH4,L,NY,NX)  =DCORPC1*trcx_solml(idx_NH4,L,NY,NX)
+          trcp_salml(idsp_AlPO4,L,NY,NX)=DCORPC1*trcp_salml(idsp_AlPO4,L,NY,NX)
+          trcp_salml(idsp_FePO4,L,NY,NX)=DCORPC1*trcp_salml(idsp_FePO4,L,NY,NX)
+          trcp_salml(idsp_CaHPO4,L,NY,NX)=DCORPC1*trcp_salml(idsp_CaHPO4,L,NY,NX)
+          trcp_salml(idsp_HA,L,NY,NX)=DCORPC1*trcp_salml(idsp_HA,L,NY,NX)
+          trcp_salml(idsp_CaH2PO4,L,NY,NX)=DCORPC1*trcp_salml(idsp_CaH2PO4,L,NY,NX)
+
+          DO NTF=ifertn_beg,ifertn_end
+            FertN_soil(NTF,L,NY,NX)=DCORPC1*FertN_soil(NTF,L,NY,NX)
+          ENDDO
+        ENDIF
+        ORGC(L,NY,NX)=DC
+        ORGN(L,NY,NX)=DN
+        IF(L.EQ.0)THEN
+          HFLXD=4.19E-06_r8*(ORGCX(L,NY,NX)-ORGC(L,NY,NX))*TKS(L,NY,NX)
+          HEATOU=HEATOU+HFLXD
+        ENDIF
 !     IF(L.EQ.0)THEN
 !     VHCP(0,NY,NX)=2.496E-06*ORGC(0,NY,NX)+4.19*VOLW(0,NY,NX)
 !    2+1.9274*VOLI(0,NY,NX)
@@ -330,30 +333,30 @@ module NitroDisturbMod
 !     VHCP(L,NY,NX)=VHCM(L,NY,NX)+4.19*(VOLW(L,NY,NX)+VOLWH(L,NY,NX))
 !    2+1.9274*(VOLI(L,NY,NX)+VOLIH(L,NY,NX))
 !     ENDIF
-      IF(ITILL(I,NY,NX).EQ.21)THEN
-        TCOU=TCOU+OC
-        TZOU=TZOU+ON
-        TPOU=TPOU+OP
-        UDOCQ(NY,NX)=UDOCQ(NY,NX)+OC
-        UDONQ(NY,NX)=UDONQ(NY,NX)+ON
-        UDOPQ(NY,NX)=UDOPQ(NY,NX)+OP
-        TNBP(NY,NX)=TNBP(NY,NX)-OC
-      ELSEIF(ITILL(I,NY,NX).EQ.22)THEN
-        CO2GIN=CO2GIN-OC
-        OXYGIN=OXYGIN+2.667*OC
-        OXYGOU=OXYGOU+2.667*OC
-        TZOU=TZOU+ON
-        TPOU=TPOU+OP
-        UCO2F(NY,NX)=UCO2F(NY,NX)-(1.0-FCH4F)*OC
-        UCH4F(NY,NX)=UCH4F(NY,NX)-FCH4F*OC
-        UOXYF(NY,NX)=UOXYF(NY,NX)+(1.0-FCH4F)*2.667*OC
-        UNH3F(NY,NX)=UNH3F(NY,NX)-ON
-        UN2OF(NY,NX)=UN2OF(NY,NX)-0.0
-        UPO4F(NY,NX)=UPO4F(NY,NX)-OP
-        TNBP(NY,NX)=TNBP(NY,NX)-OC
+        IF(ITILL(I,NY,NX).EQ.21)THEN
+          TCOU=TCOU+OC
+          TZOU=TZOU+ON
+          TPOU=TPOU+OP
+          UDOCQ(NY,NX)=UDOCQ(NY,NX)+OC
+          UDONQ(NY,NX)=UDONQ(NY,NX)+ON
+          UDOPQ(NY,NX)=UDOPQ(NY,NX)+OP
+          TNBP(NY,NX)=TNBP(NY,NX)-OC
+        ELSEIF(ITILL(I,NY,NX).EQ.22)THEN
+          CO2GIN=CO2GIN-OC
+          OXYGIN=OXYGIN+2.667_r8*OC
+          OXYGOU=OXYGOU+2.667_r8*OC
+          TZOU=TZOU+ON
+          TPOU=TPOU+OP
+          UCO2F(NY,NX)=UCO2F(NY,NX)-(1.0_r8-FCH4F)*OC
+          UCH4F(NY,NX)=UCH4F(NY,NX)-FCH4F*OC
+          UOXYF(NY,NX)=UOXYF(NY,NX)+(1.0_r8-FCH4F)*2.667_r8*OC
+          UNH3F(NY,NX)=UNH3F(NY,NX)-ON
+          UN2OF(NY,NX)=UN2OF(NY,NX)-0.0_r8
+          UPO4F(NY,NX)=UPO4F(NY,NX)-OP
+          TNBP(NY,NX)=TNBP(NY,NX)-OC
+        ENDIF
       ENDIF
-    ENDIF
-2950  CONTINUE
+    ENDDO D2950
   ENDIF
   end subroutine SOMRemovalByDisturbance
 !------------------------------------------------------------------------------------------

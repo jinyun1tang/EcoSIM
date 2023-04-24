@@ -1,10 +1,10 @@
 module MockMod
  use ecosim_log_mod    , only : errMsg => shr_log_errMsg
- use histMod           , only : hist_freq_str_len
+ use bhistMod          , only : hist_freq_str_len
  use abortutils        , only : endrun
  use fileUtil          , only : stdout
  use ModelStatusType   , only : model_status_type
- use data_kind_mod     , only : r8 => SHR_KIND_R8
+ use data_kind_mod     , only : r8 => DAT_KIND_R8
 implicit none
   character(len=*), private,parameter :: mod_filename = __FILE__
 
@@ -28,7 +28,7 @@ implicit none
 
   subroutine getvarlist(nvars, varl, varlnml, unitl, vartypes)
 
-  use histMod, only : hist_var_str_len,hist_unit_str_len, hist_var_lon_str_len
+  use bhistMod, only : hist_var_str_len,hist_unit_str_len, hist_var_lon_str_len
   use fileUtil, only :  var_flux_type, var_state_type
   implicit none
   integer, intent(in) :: nvars

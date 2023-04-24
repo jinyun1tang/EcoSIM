@@ -1,36 +1,38 @@
 module LandSurfDataType
 
-  use data_kind_mod, only : r8 => SHR_KIND_R8
+  use data_kind_mod, only : r8 => DAT_KIND_R8
   use GridConsts
+  use TracerIDMod, only : idg_beg,idg_end
   implicit none
   public
   save
   character(len=*), private, parameter :: mod_filename = __FILE__
   real(r8) :: ALTIG                             !altitude of landscape, [m]
 
-  real(r8),allocatable ::  ZS(:,:)                            !initial soil surface roughness height, [m]
-  real(r8),allocatable ::  ZD(:,:)                            !zero plane displacement height, [m]
-  real(r8),allocatable ::  ZR(:,:)                            !canopy surface roughness height, [m]
-  real(r8),allocatable ::  ZM(:,:)                            ! soil surface roughness height for calculating runoff velocity, [m]
-  real(r8),allocatable ::  Z0(:,:)                            !wind speed measurement height, [m]
-  real(r8),allocatable ::  ALT(:,:)                           !altitude of grid cell, [m]
-  real(r8),allocatable ::  RAB(:,:)                           !isothermal boundary layer resistance, [h m-1]
-  real(r8),allocatable ::  RIB(:,:)                           !Richardson number for calculating boundary layer resistance, [-]
-  real(r8),allocatable ::  ALTI(:,:)                          !altitude of landscape, [m]
-  real(r8),allocatable ::  GSIN(:,:)                          !sine of slope, [-]
-  real(r8),allocatable ::  GCOS(:,:)                          !cosine of slope, [-]
-  real(r8),allocatable ::  GAZI(:,:)                          !azimuth of slope, [-]
-  real(r8),allocatable ::  ALTZ(:,:)                          !altitude, [m]
-  real(r8),allocatable ::  SL(:,:)                            !slope, [o]
-  real(r8),allocatable ::  ASP(:,:)                           !aspect , [o]
-  real(r8),allocatable ::  XCODFS(:,:)                        !surface - atmosphere CO2 dissolution (+ve) - volatilization (-ve) , [g d-2 h-1]
-  real(r8),allocatable ::  XCHDFS(:,:)                        !surface - atmosphere CH4 dissolution (+ve) - volatilization (-ve) , [g d-2 h-1]
-  real(r8),allocatable ::  XOXDFS(:,:)                        !surface - atmosphere O2 dissolution (+ve) - volatilization (-ve) , [g d-2 h-1]
-  real(r8),allocatable ::  XNGDFS(:,:)                        !surface - atmosphere N2 dissolution (+ve) - volatilization (-ve) , [g d-2 h-1]
-  real(r8),allocatable ::  XN2DFS(:,:)                        !surface - atmosphere N2O dissolution (+ve) - volatilization (-ve) , [g d-2 h-1]
-  real(r8),allocatable ::  XN3DFS(:,:)                        !surface - atmosphere NH3 dissolution (+ve) - volatilization (-ve) non-band, [g d-2 h-1]
-  real(r8),allocatable ::  XNBDFS(:,:)                        !surface - atmosphere NH3 dissolution (+ve) - volatilization (-ve) band, [g d-2 h-1]
-  real(r8),allocatable ::  XHGDFS(:,:)                        !surface - atmosphere H2 dissolution (+ve) - volatilization (-ve) , [g d-2 h-1]
+  real(r8),target,allocatable ::  ZS(:,:)                            !initial soil surface roughness height, [m]
+  real(r8),target,allocatable ::  ZD(:,:)                            !zero plane displacement height, [m]
+  real(r8),target,allocatable ::  ZR(:,:)                            !canopy surface roughness height, [m]
+  real(r8),target,allocatable ::  ZM(:,:)                            ! soil surface roughness height for calculating runoff velocity, [m]
+  real(r8),target,allocatable ::  Z0(:,:)                            !wind speed measurement height, [m]
+  real(r8),target,allocatable ::  ALT(:,:)                           !altitude of grid cell, [m]
+  real(r8),target,allocatable ::  RAB(:,:)                           !isothermal boundary layer resistance, [h m-1]
+  real(r8),target,allocatable ::  RIB(:,:)                           !Richardson number for calculating boundary layer resistance, [-]
+  real(r8),target,allocatable ::  ALTI(:,:)                          !altitude of landscape, [m]
+  real(r8),target,allocatable ::  GSIN(:,:)                          !sine of slope, [-]
+  real(r8),target,allocatable ::  GCOS(:,:)                          !cosine of slope, [-]
+  real(r8),target,allocatable ::  GAZI(:,:)                          !azimuth of slope, [-]
+  real(r8),target,allocatable ::  ALTZ(:,:)                          !altitude, [m]
+  real(r8),target,allocatable ::  SL(:,:)                            !slope, [o]
+  real(r8),target,allocatable ::  ASP(:,:)                           !aspect , [o]
+  real(r8),target,allocatable :: GasSfAtmFlx(:,:,:)   ! surface-atmosphere gas exchange flux , [g d-2 h-1]
+  real(r8),target,allocatable ::  XCODFS(:,:)                        !surface - atmosphere CO2 dissolution (+ve) - volatilization (-ve) , [g d-2 h-1]
+  real(r8),target,allocatable ::  XCHDFS(:,:)                        !surface - atmosphere CH4 dissolution (+ve) - volatilization (-ve) , [g d-2 h-1]
+  real(r8),target,allocatable ::  XOXDFS(:,:)                        !surface - atmosphere O2 dissolution (+ve) - volatilization (-ve) , [g d-2 h-1]
+  real(r8),target,allocatable ::  XNGDFS(:,:)                        !surface - atmosphere N2 dissolution (+ve) - volatilization (-ve) , [g d-2 h-1]
+  real(r8),target,allocatable ::  XN2DFS(:,:)                        !surface - atmosphere N2O dissolution (+ve) - volatilization (-ve) , [g d-2 h-1]
+  real(r8),target,allocatable ::  XN3DFS(:,:)                        !surface - atmosphere NH3 dissolution (+ve) - volatilization (-ve) non-band, [g d-2 h-1]
+  real(r8),target,allocatable ::  XNBDFS(:,:)                        !surface - atmosphere NH3 dissolution (+ve) - volatilization (-ve) band, [g d-2 h-1]
+  real(r8),target,allocatable ::  XHGDFS(:,:)                        !surface - atmosphere H2 dissolution (+ve) - volatilization (-ve) , [g d-2 h-1]
 !----------------------------------------------------------------------
 
 contains
@@ -60,6 +62,8 @@ contains
   allocate(XN3DFS(JY,JX));      XN3DFS=0._r8
   allocate(XNBDFS(JY,JX));      XNBDFS=0._r8
   allocate(XHGDFS(JY,JX));      XHGDFS=0._r8
+
+  allocate(GasSfAtmFlx(idg_beg:idg_end,JY,JX)); GasSfAtmFlx=0._r8
   end subroutine InitLandSurfData
 
 !----------------------------------------------------------------------

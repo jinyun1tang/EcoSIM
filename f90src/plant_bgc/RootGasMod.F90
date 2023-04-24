@@ -1,11 +1,12 @@
 module RootGasMod
-  use data_kind_mod, only : r8 => SHR_KIND_R8
+  use data_kind_mod, only : r8 => DAT_KIND_R8
   use StomatesMod   , only : stomates
-  use minimathmod  , only : safe_adb,vapsat,test_aneb
+  use minimathmod  , only : safe_adb,vapsat,test_aneb,AZMAX1,AZMIN1
   use EcosimConst
   use EcoSIMSolverPar
   use UptakePars
   use PlantAPIData
+  use TracerIDMod
   implicit none
 
   private
@@ -25,39 +26,40 @@ module RootGasMod
   real(r8), intent(out):: RUPOXT
   integer :: M,MX
   real(r8) :: B,C
-  real(r8) :: CO2A1,CO2P1,CO2G1,CO2S1,CH4A1
+  real(r8) :: trcg_gmas(idg_beg:idg_end-1)
+  real(r8) :: CO2P1,CO2G1,CO2S1
   real(r8) :: CH4P1,CH4S1,CCH4S1,CCH4P1
   real(r8) :: CN2OS1,CN2OP1,CNH3S1,CNH3B1,CNH3P1,CH2GS1,CH2GP1
   real(r8) :: CGSGL1,CHSGL1,CLSGL1
-  real(r8) :: CQSGL1,CH4G1,CCO2S1,COXYS1,CCO2A1,COXYA1,CCH4A1
-  real(r8) :: CZ2OA1,CNH3A1,CH2GA1,CCO2P1,COXYP1,COXYR,CO2PX,CH4PX
+  real(r8) :: CQSGL1,CH4G1,CCO2S1,COXYS1,trcg_gcon(idg_beg:idg_end-1)
+  real(r8) :: CCO2P1,COXYP1,COXYR,CO2PX,CH4PX
   real(r8) :: DIFOP,DIFCL,DIFZL,DIFNL,DIFNB,DIFHL,DIFOX,DFGSP
   real(r8) :: DFCOA,DFOXA,DFCHA,DFN2A,DFNHA,DFHGA,DFGP,DIFOL
-  real(r8) :: H2GA1,H2GP1,H2GS1,HGSGL1,HLSGL1,H2GG1,H2GPX
-  real(r8) :: OXYA1,OXYP1,OXYG1,OXYS1,OGSGL1
+  real(r8) :: H2GP1,H2GS1,HGSGL1,HLSGL1,H2GG1,H2GPX
+  real(r8) :: OXYP1,OXYG1,OXYS1,OGSGL1
   real(r8) :: OLSGL1,OLSGLP,OXYPX,RTVLWA
   real(r8) :: RTVLWB,ROXYFX,RCO2FX,ROXYLX,ROXDFQ,RCHDFQ,RN2DFQ
-  real(r8) :: RNHDFQ,RHGDFQ,ROXDF1,RCHDF1,RN2DF1,RNHDF1,RHGDF1
+  real(r8) :: RNHDFQ,RHGDFQ
   real(r8) :: RTCR1,RTCR2,RTCRA,RTARRX,RCO2PX,RRADS,RMFCOS,RMFOXS
   real(r8) :: RMFCHS,RMFN2S,RMFN3S,RMFN3B,RMFHGS,RUPOXR,RDFOXS
   real(r8) :: RDFOXP,RUPOSX,RUPOPX,RDFCOS,RDXCOS,RCO2SX,RDFCHS
   real(r8) :: RDXCHS,RUPCSX,RDFN2S,RDXN2S,RUPZSX,RDFN3S,RDXNHS
   real(r8) :: RUPNSX,RDFN3B,RDXNHB,RUPNBX,RDFHGS,RDXHGS,RUPHGX
-  real(r8) :: RCODFQ,RUPOST,RNBDFQ,RUPNTX,RCODF1,RCOFL1,ROXFL1
-  real(r8) :: RCHFL1,RN2FL1,RNHFL1,RHGFL1,THETW1,THETM
+  real(r8) :: RCODFQ,RUPOST,RNBDFQ,RUPNTX
+  real(r8) :: trcg_RDF1(idg_beg:idg_end-1),trcg_RFL1(idg_beg:idg_end-1)
+  real(r8) :: THETW1,THETM
   real(r8) :: UPMXP
-  real(r8) :: VOLWCA,VOLWOA
-  real(r8) :: VOLWC4,VOLWZA,VOLWNA,VOLWH2,VOLWMO,VOLWMM,VOLPMM
+  real(r8) :: VOLWG(idg_beg:idg_end-1),VOLWMO,VOLWMM,VOLPMM
   real(r8) :: VOLWSP,VOLWMA,VOLWMB,VOLWSA,VOLWSB,VOLWCO,VOLWOX
   real(r8) :: VOLWCH,VOLWN2,VOLWNH,VOLWNB,VOLWHG,VOLPNH,VOLPNB
   real(r8) :: X
-  real(r8) :: Z2OA1,Z2OP1,Z2OS1,ZH3A1,ZH3P1,ZH3S1
+  real(r8) :: Z2OP1,Z2OS1,ZH3P1,ZH3S1
   real(r8) :: ZH3B1,Z2SGL1,ZHSGL1,ZVSGL1,ZNSGL1,Z2OG1,ZH3G1
   real(r8) :: ZH3PA,ZH3PB,ZH3GA,ZH3GB,Z2OPX,ZH3PX
-
+  integer  :: NTG
 !     begin_execution
-  associate(                           &
-    WTRTS  =>  plt_biom%WTRTS    , &
+  associate(                       &
+    WTRTSE =>  plt_biom%WTRTSE   , &
     ZEROP  =>  plt_biom%ZEROP    , &
     PP     =>  plt_site%PP       , &
     DPTHZ  =>  plt_site%DPTHZ    , &
@@ -83,81 +85,31 @@ module RootGasMod
     RUPOXS =>  plt_rbgc%RUPOXS   , &
     ROXSK  =>  plt_rbgc%ROXSK    , &
     RCO2P  =>  plt_rbgc%RCO2P    , &
-    RHGFLA =>  plt_rbgc%RHGFLA   , &
-    RNHDFA =>  plt_rbgc%RNHDFA   , &
+    trcg_RFLA =>  plt_rbgc%trcg_RFLA   , &
+    trcg_RDFA =>  plt_rbgc%trcg_RDFA   , &
     RUPN3B =>  plt_rbgc%RUPN3B   , &
-    RHGDFA =>  plt_rbgc%RHGDFA   , &
-    ROXFLA =>  plt_rbgc%ROXFLA   , &
-    RCHFLA =>  plt_rbgc%RCHFLA   , &
-    RN2FLA =>  plt_rbgc%RN2FLA   , &
-    RCOFLA =>  plt_rbgc%RCOFLA   , &
-    RCODFA =>  plt_rbgc%RCODFA   , &
-    RNHFLA =>  plt_rbgc%RNHFLA   , &
     RUPHGS =>  plt_rbgc%RUPHGS   , &
     RCO2S  =>  plt_rbgc%RCO2S    , &
-    ROXDFA =>  plt_rbgc%ROXDFA   , &
-    RCHDFA =>  plt_rbgc%RCHDFA   , &
-    RN2DFA =>  plt_rbgc%RN2DFA   , &
     RUPCHS =>  plt_rbgc%RUPCHS   , &
     RUPN2S =>  plt_rbgc%RUPN2S   , &
     RUPN3S =>  plt_rbgc%RUPN3S   , &
     RUPOXP =>  plt_rbgc%RUPOXP   , &
     RCO2A  =>  plt_rbgc%RCO2A    , &
-    CO2P   =>  plt_rbgc%CO2P     , &
-    CO2A   =>  plt_rbgc%CO2A     , &
-    OXYA   =>  plt_rbgc%OXYA     , &
-    OXYP   =>  plt_rbgc%OXYP     , &
-    CH4A   =>  plt_rbgc%CH4A     , &
-    CH4P   =>  plt_rbgc%CH4P     , &
-    Z2OA   =>  plt_rbgc%Z2OA     , &
-    Z2OP   =>  plt_rbgc%Z2OP     , &
-    ZH3A   =>  plt_rbgc%ZH3A     , &
-    ZH3P   =>  plt_rbgc%ZH3P     , &
-    H2GA   =>  plt_rbgc%H2GA     , &
-    H2GP   =>  plt_rbgc%H2GP     , &
+    trcg_rootml   =>  plt_rbgc%trcg_rootml     , &
+    trcs_rootml   =>  plt_rbgc%trcs_rootml     , &
     TFND   =>  plt_soilchem%TFND , &
-    CO2G   =>  plt_soilchem%CO2G , &
-    CO2S   =>  plt_soilchem%CO2S , &
-    ZNH3S  =>  plt_soilchem%ZNH3S, &
-    SN2OL  =>  plt_soilchem%SN2OL, &
-    H2GS   =>  plt_soilchem%H2GS , &
-    CZ2OS  =>  plt_soilchem%CZ2OS, &
-    CNH3G  =>  plt_soilchem%CNH3G, &
-    CH2GG  =>  plt_soilchem%CH2GG, &
-    CH2GS  =>  plt_soilchem%CH2GS, &
-    CZ2OG  =>  plt_soilchem%CZ2OG, &
-    VLNH4  =>  plt_soilchem%VLNH4, &
-    HGSGL  =>  plt_soilchem%HGSGL, &
-    SCH4L  =>  plt_soilchem%SCH4L, &
-    CCH4G  =>  plt_soilchem%CCH4G, &
-    CLSGL  =>  plt_soilchem%CLSGL, &
+    trcs_VLN  =>  plt_soilchem%trcs_VLN, &
+    trc_solml  =>  plt_soilchem%trc_solml, &
+    trc_gascl  =>  plt_soilchem%trc_gascl, &
+    GasDifc=>  plt_soilchem%GasDifc,&
+    SolDifc  =>  plt_soilchem%SolDifc, &
+    GSolbility=> plt_soilchem%GSolbility,&
+    trc_solcl  =>  plt_soilchem%trc_solcl, &
     THETY  =>  plt_soilchem%THETY, &
-    OLSGL  =>  plt_soilchem%OLSGL, &
-    SOXYL  =>  plt_soilchem%SOXYL, &
-    SNH3L  =>  plt_soilchem%SNH3L, &
-    SH2GL  =>  plt_soilchem%SH2GL, &
     VOLY   =>  plt_soilchem%VOLY , &
-    ZNSGL  =>  plt_soilchem%ZNSGL, &
-    Z2SGL  =>  plt_soilchem%Z2SGL, &
-    ZHSGL  =>  plt_soilchem%ZHSGL, &
-    ZVSGL  =>  plt_soilchem%ZVSGL, &
-    SCO2L  =>  plt_soilchem%SCO2L, &
-    HLSGL  =>  plt_soilchem%HLSGL, &
-    CQSGL  =>  plt_soilchem%CQSGL, &
-    VLNHB  =>  plt_soilchem%VLNHB, &
-    ZNH3B  =>  plt_soilchem%ZNH3B, &
-    CGSGL  =>  plt_soilchem%CGSGL, &
-    CNH3B  =>  plt_soilchem%CNH3B, &
-    CHSGL  =>  plt_soilchem%CHSGL, &
-    OGSGL  =>  plt_soilchem%OGSGL, &
-    Z2OS   =>  plt_soilchem%Z2OS , &
-    CNH3S  =>  plt_soilchem%CNH3S, &
     THETPM =>  plt_soilchem%THETPM,&
-    OXYG   =>  plt_soilchem%OXYG , &
+    trc_gasml=> plt_soilchem%trc_gasml,&
     DFGS   =>  plt_soilchem%DFGS , &
-    CCH4S  =>  plt_soilchem%CCH4S, &
-    OXYS   =>  plt_soilchem%OXYS , &
-    CH4S   =>  plt_soilchem%CH4S , &
     IDAY   =>  plt_pheno%IDAY    , &
     PORTX  =>  plt_morph%PORTX   , &
     RRAD1  =>  plt_morph%RRAD1   , &
@@ -179,12 +131,12 @@ module RootGasMod
 !     INITIALIZE VARIABLES USED IN ROOT GAS EXCHANGE
 !     (CO2, O2, CH4, N2, N2O, NH3, H2)
 !
-!     CO2A1,CO2P1,CO2G1,CO2S1=gaseous,aqueous CO2 in root,soil
-!     OXYA1,OXYP1,OXYG1,OXYS1=gaseous,aqueous O2 in root,soil
-!     CH4A1,CH4P1,CH4G1,CH4S1=gaseous,aqueous CH4 in root,soil
-!     Z2OA1,Z2OP1,Z2OG1,Z2OS1=gaseous,aqueous N2O in root,soil
-!     ZH3A1,ZH3P1,ZH3G1,ZH3S1=gaseous,aqueous NH3 in root,soil
-!     H2GA1,H2GP1,H2GG1,H2GS1=gaseous,aqueous H2 in root,soil
+!     trcg_gmas(idg_CO2),CO2P1,CO2G1,CO2S1=gaseous,aqueous CO2 in root,soil
+!     trcg_gmas(idg_O2),OXYP1,OXYG1,OXYS1=gaseous,aqueous O2 in root,soil
+!     trcg_gmas(idg_CH4),CH4P1,CH4G1,CH4S1=gaseous,aqueous CH4 in root,soil
+!     trcg_gmas(idg_N2O),Z2OP1,Z2OG1,Z2OS1=gaseous,aqueous N2O in root,soil
+!     trcg_gmas(idg_NH3),ZH3P1,ZH3G1,ZH3S1=gaseous,aqueous NH3 in root,soil
+!     trcg_gmas(idg_H2),H2GP1,H2GG1,H2GS1=gaseous,aqueous H2 in root,soil
 !     CCH4S1,CCH4P1=aqueous CH4 concentration in soil,root
 !     CN2OS1,CN2OP1=aqueous N2O concentration in soil,root
 !     CNH3S1,CNH3B1,CNH3P1=aqueous NH3 concn in soil non-band,band,root
@@ -196,38 +148,44 @@ module RootGasMod
 !     RCO2FX=net CO2 gas flux at time step of flux calculation
 !     ROXYLX=net O2 aqueous flux at time step of flux calculation
 !
-    CO2A1=AMAX1(ZEROP(NZ),CO2A(N,L,NZ))
-    CO2P1=AMAX1(ZEROP(NZ),CO2P(N,L,NZ))
-    CO2G1=AMAX1(ZEROP(NZ),CO2G(L)*FPQ(N,L,NZ))
-    CO2S1=AMAX1(ZEROP(NZ),CO2S(L)*FPQ(N,L,NZ))
-    OXYA1=AMAX1(ZEROP(NZ),OXYA(N,L,NZ))
-    OXYP1=AMAX1(ZEROP(NZ),OXYP(N,L,NZ))
-    OXYG1=AMAX1(ZEROP(NZ),OXYG(L)*FOXYX)
-    OXYS1=OXYS(L)*FOXYX
-    CH4A1=CH4A(N,L,NZ)
-    CH4P1=CH4P(N,L,NZ)
-    CH4S1=CH4S(L)*FPQ(N,L,NZ)
-    CCH4S1=CCH4S(L)
-    CCH4P1=AMAX1(0.0,CH4P1/RTVLW(N,L,NZ))
-    Z2OA1=Z2OA(N,L,NZ)
-    Z2OP1=Z2OP(N,L,NZ)
-    Z2OS1=Z2OS(L)*FPQ(N,L,NZ)
-    CN2OS1=CZ2OS(L)
-    CN2OP1=AMAX1(0.0,Z2OP1/RTVLW(N,L,NZ))
-    ZH3A1=ZH3A(N,L,NZ)
-    ZH3P1=ZH3P(N,L,NZ)
-    ZH3S1=ZNH3S(L)*FPQ(N,L,NZ)
-    ZH3B1=ZNH3B(L)*FPQ(N,L,NZ)
-    CNH3S1=CNH3S(L)
-    CNH3B1=CNH3B(L)
-    CNH3P1=AMAX1(0.0,ZH3P1/RTVLW(N,L,NZ))
-    H2GA1=H2GA(N,L,NZ)
-    H2GP1=H2GP(N,L,NZ)
-    H2GS1=H2GS(L)*FPQ(N,L,NZ)
-    CH2GS1=CH2GS(L)
-    CH2GP1=AMAX1(0.0,H2GP1/RTVLW(N,L,NZ))
-    RTVLWA=RTVLW(N,L,NZ)*VLNH4(L)
-    RTVLWB=RTVLW(N,L,NZ)*VLNHB(L)
+    trcg_gmas(idg_CO2)=AMAX1(ZEROP(NZ),trcg_rootml(idg_CO2,N,L,NZ))
+    CO2P1=AMAX1(ZEROP(NZ),trcs_rootml(idg_CO2,N,L,NZ))
+    CO2G1=AMAX1(ZEROP(NZ),trc_gasml(idg_CO2,L)*FPQ(N,L,NZ))
+    CO2S1=AMAX1(ZEROP(NZ),trc_solml(idg_CO2,L)*FPQ(N,L,NZ))
+
+    trcg_gmas(idg_O2)=AMAX1(ZEROP(NZ),trcg_rootml(idg_O2,N,L,NZ))
+    OXYP1=AMAX1(ZEROP(NZ),trcs_rootml(idg_O2,N,L,NZ))
+    OXYG1=AMAX1(ZEROP(NZ),trc_gasml(idg_O2,L)*FOXYX)
+    OXYS1=trc_solml(idg_O2,L)*FOXYX
+
+    trcg_gmas(idg_CH4)=trcg_rootml(idg_CH4,N,L,NZ)
+    CH4P1=trcs_rootml(idg_CH4,N,L,NZ)
+    CH4S1=trc_solml(idg_CH4,L)*FPQ(N,L,NZ)
+    CCH4S1=trc_solcl(idg_CH4,L)
+    CCH4P1=AZMAX1(CH4P1/RTVLW(N,L,NZ))
+
+    trcg_gmas(idg_N2O)=trcg_rootml(idg_N2O,N,L,NZ)
+    Z2OP1=trcs_rootml(idg_N2O,N,L,NZ)
+    Z2OS1=trc_solml(idg_N2O,L)*FPQ(N,L,NZ)
+    CN2OS1=trc_solcl(idg_N2O,L)
+    CN2OP1=AZMAX1(Z2OP1/RTVLW(N,L,NZ))
+
+    trcg_gmas(idg_NH3)=trcg_rootml(idg_NH3,N,L,NZ)
+    ZH3P1=trcs_rootml(idg_NH3,N,L,NZ)
+    ZH3S1=trc_solml(idg_NH3,L)*FPQ(N,L,NZ)
+    ZH3B1=trc_solml(idg_NH3B,L)*FPQ(N,L,NZ)
+    CNH3S1=trc_solcl(idg_NH3,L)
+    CNH3B1=trc_solcl(idg_NH3B,L)
+    CNH3P1=AZMAX1(ZH3P1/RTVLW(N,L,NZ))
+
+    trcg_gmas(idg_H2)=trcg_rootml(idg_H2,N,L,NZ)
+    H2GP1=trcs_rootml(idg_H2,N,L,NZ)
+    H2GS1=trc_solml(idg_H2,L)*FPQ(N,L,NZ)
+    CH2GS1=trc_solcl(idg_H2,L)
+    CH2GP1=AZMAX1(H2GP1/RTVLW(N,L,NZ))
+
+    RTVLWA=RTVLW(N,L,NZ)*trcs_VLN(ids_NH4,L)
+    RTVLWB=RTVLW(N,L,NZ)*trcs_VLN(ids_NH4B,L)
     UPMXP=ROXYP(N,L,NZ)*XNPG/PP(NZ)
     ROXYFX=ROXYF(L)*FOXYX*XNPG
     RCO2FX=RCO2F(L)*FOXYX*XNPG
@@ -240,29 +198,27 @@ module RootGasMod
 !     CG=CO2g,OG=O2g,CH=CH4g,Z2=N2Og,ZH=NH3g,HG=H2g
 !     CL=CO2s,OL=O2s,CQ=CH4s,ZV=N2Os,ZN=NH3s,HL=H2s
 !
-    CGSGL1=CGSGL(L)*XNPG*PORTX(N,NZ)
-    OGSGL1=OGSGL(L)*XNPG*PORTX(N,NZ)
-    CHSGL1=CHSGL(L)*XNPG*PORTX(N,NZ)
-    Z2SGL1=Z2SGL(L)*XNPG*PORTX(N,NZ)
-    ZHSGL1=ZHSGL(L)*XNPG*PORTX(N,NZ)
-    HGSGL1=HGSGL(L)*XNPG*PORTX(N,NZ)
-    CLSGL1=CLSGL(L)*XNPG*FOXYX
-    OLSGL1=OLSGL(L)*XNPG*FOXYX
-    CQSGL1=CQSGL(L)*XNPG*FOXYX
-    ZVSGL1=ZVSGL(L)*XNPG*FOXYX
-    ZNSGL1=ZNSGL(L)*XNPG*FOXYX
-    HLSGL1=HLSGL(L)*XNPG*FOXYX
-    OLSGLP=OLSGL(L)*XNPG
+    CGSGL1=GasDifc(idg_CO2,L)*XNPG*PORTX(N,NZ)
+    OGSGL1=GasDifc(idg_O2,L)*XNPG*PORTX(N,NZ)
+    CHSGL1=GasDifc(idg_CH4,L)*XNPG*PORTX(N,NZ)
+    Z2SGL1=GasDifc(idg_N2O,L)*XNPG*PORTX(N,NZ)
+    ZHSGL1=GasDifc(idg_NH3,L)*XNPG*PORTX(N,NZ)
+    HGSGL1=GasDifc(idg_H2,L)*XNPG*PORTX(N,NZ)
+
+    CLSGL1=SolDifc(idg_CO2,L)*XNPG*FOXYX
+    OLSGL1=SolDifc(idg_O2,L)*XNPG*FOXYX
+    CQSGL1=SolDifc(idg_CH4,L)*XNPG*FOXYX
+    ZVSGL1=SolDifc(idg_N2O,L)*XNPG*FOXYX
+    ZNSGL1=SolDifc(idg_NH3,L)*XNPG*FOXYX
+    HLSGL1=SolDifc(idg_H2,L)*XNPG*FOXYX
+    OLSGLP=SolDifc(idg_O2,L)*XNPG
+
     ROXDFQ=0.0_r8
     RCHDFQ=0.0_r8
     RN2DFQ=0.0_r8
     RNHDFQ=0.0_r8
     RHGDFQ=0.0_r8
-    ROXDF1=0.0_r8
-    RCHDF1=0.0_r8
-    RN2DF1=0.0_r8
-    RNHDF1=0.0_r8
-    RHGDF1=0.0_r8
+    trcg_RDF1(idg_beg:idg_end-1)=0.0_r8
 !
 !     ROOT CONDUCTANCE TO GAS TRANSFER
 !
@@ -275,7 +231,7 @@ module RootGasMod
 !     DPTHZ=depth of primary root from surface
 !     RTLGA=average secondary root length
 !
-    IF(WTRTS(NZ).GT.ZEROP(NZ).AND.FRTDPX(L,NZ).GT.ZERO)THEN
+    IF(WTRTSE(ielmc,NZ).GT.ZEROP(NZ).AND.FRTDPX(L,NZ).GT.ZERO)THEN
       RTCR1=AMAX1(PP(NZ),RTN1(N,L,NZ)) &
         *PICON*RRAD1(N,L,NZ)**2/DPTHZ(L)
       RTCR2=(RTNL(N,L,NZ)*PICON*RRAD2(N,L,NZ)**2 &
@@ -305,16 +261,14 @@ module RootGasMod
 !     RCO2PX=root CO2 gas flux at time step for gas flux calculations
 !     RCO2A=root CO2 flux from grosub.f
 !
-    IF(N.EQ.1.AND.IDAY(1,NB1(NZ),NZ).GT.0 &
-      .AND.RTLGP(N,L,NZ).GT.ZEROP(NZ))THEN
+    IF(N.EQ.1.AND.IDAY(1,NB1(NZ),NZ).GT.0.AND.RTLGP(N,L,NZ).GT.ZEROP(NZ))THEN
       RTARRX=RTARR(N,L)/RRADP(N,NZ)
       DIFOP=OLSGLP*RTARRX
-      VOLWCA=RTVLW(N,L,NZ)*SCO2L(L)
-      VOLWOA=RTVLW(N,L,NZ)*SOXYL(L)
-      VOLWC4=RTVLW(N,L,NZ)*SCH4L(L)
-      VOLWZA=RTVLW(N,L,NZ)*SN2OL(L)
-      VOLWNA=RTVLW(N,L,NZ)*SNH3L(L)
-      VOLWH2=RTVLW(N,L,NZ)*SH2GL(L)
+
+      DO NTG=idg_beg,idg_end-1
+        VOLWG(NTG)=RTVLW(N,L,NZ)*GSolbility(NTG,L)
+      ENDDO
+
       DFCOA=CGSGL1*RTCRA
       DFOXA=OGSGL1*RTCRA
       DFCHA=CHSGL1*RTCRA
@@ -324,12 +278,7 @@ module RootGasMod
     ELSE
       RTARRX=0.0_r8
       DIFOP=0.0_r8
-      VOLWCA=0.0_r8
-      VOLWOA=0.0_r8
-      VOLWC4=0.0_r8
-      VOLWZA=0.0_r8
-      VOLWNA=0.0_r8
-      VOLWH2=0.0_r8
+      VOLWG(idg_beg:idg_end-1)=0.0_r8
       DFCOA=0.0_r8
       DFOXA=0.0_r8
       DFCHA=0.0_r8
@@ -343,7 +292,7 @@ module RootGasMod
 !     SOLVE FOR GAS EXCHANGE IN SOIL AND ROOTS DURING ROOT UPTAKE
 !     AT SMALLER TIME STEP NPH
 !
-    DO 99 M=1,NPH
+    D99: DO M=1,NPH
 !
 !     AQUEOUS GAS DIFFUSIVITY THROUGH SOIL WATER TO ROOT
 !
@@ -368,11 +317,11 @@ module RootGasMod
       VOLWMM=VOLWM(M,L)*FPQ(N,L,NZ)
       VOLPMM=VOLPM(M,L)*FPQ(N,L,NZ)
       VOLWSP=RTVLW(N,L,NZ)+VOLWMM
-      VOLWMA=VOLWMM*VLNH4(L)
-      VOLWMB=VOLWMM*VLNHB(L)
+      VOLWMA=VOLWMM*trcs_VLN(ids_NH4,L)
+      VOLWMB=VOLWMM*trcs_VLN(ids_NH4B,L)
       VOLWSA=RTVLWA+VOLWMA
       VOLWSB=RTVLWB+VOLWMB
-      THETW1=AMAX1(0.0,VOLWM(M,L)/VOLY(L))
+      THETW1=AZMAX1(VOLWM(M,L)/VOLY(L))
       IF(THETW1.GT.THETY(L).AND.FPQ(N,L,NZ).GT.ZEROQ(NZ))THEN
         THETM=TORT(M,L)*THETW1
         RRADS=LOG((FILM(M,L)+RRADL(N,L))/RRADL(N,L))
@@ -380,22 +329,24 @@ module RootGasMod
         DIFOL=THETM*OLSGL1*RTARRX
         DIFCL=THETM*CQSGL1*RTARRX
         DIFZL=THETM*ZVSGL1*RTARRX
-        DIFNL=THETM*ZNSGL1*RTARRX*VLNH4(L)
-        DIFNB=THETM*ZNSGL1*RTARRX*VLNHB(L)
+        DIFNL=THETM*ZNSGL1*RTARRX*trcs_VLN(ids_NH4,L)
+        DIFNB=THETM*ZNSGL1*RTARRX*trcs_VLN(ids_NH4B,L)
         DIFHL=THETM*HLSGL1*RTARRX
-        CH4G1=CCH4G(L)*VOLPMM
-        Z2OG1=CZ2OG(L)*VOLPMM
-        ZH3G1=CNH3G(L)*VOLPMM
-        H2GG1=CH2GG(L)*VOLPMM
-        VOLWCO=VOLWMM*SCO2L(L)
-        VOLWOX=VOLWMM*SOXYL(L)
-        VOLWCH=VOLWMM*SCH4L(L)
-        VOLWN2=VOLWMM*SN2OL(L)
-        VOLWNH=VOLWMM*SNH3L(L)*VLNH4(L)
-        VOLWNB=VOLWMM*SNH3L(L)*VLNHB(L)
-        VOLWHG=VOLWMM*SH2GL(L)
-        VOLPNH=VOLPMM*VLNH4(L)
-        VOLPNB=VOLPMM*VLNHB(L)
+
+        CH4G1=trc_gascl(idg_CH4,L)*VOLPMM
+        Z2OG1=trc_gascl(idg_N2O,L)*VOLPMM
+        ZH3G1=trc_gascl(idg_NH3,L)*VOLPMM
+        H2GG1=trc_gascl(idg_H2,L)*VOLPMM
+
+        VOLWCO=VOLWMM*GSolbility(idg_CO2,L)
+        VOLWOX=VOLWMM*GSolbility(idg_O2,L)
+        VOLWCH=VOLWMM*GSolbility(idg_CH4,L)
+        VOLWN2=VOLWMM*GSolbility(idg_N2O,L)
+        VOLWNH=VOLWMM*GSolbility(idg_NH3,L)*trcs_VLN(ids_NH4,L)
+        VOLWNB=VOLWMM*GSolbility(idg_NH3,L)*trcs_VLN(ids_NH4B,L)
+        VOLWHG=VOLWMM*GSolbility(idg_H2,L)
+        VOLPNH=VOLPMM*trcs_VLN(ids_NH4,L)
+        VOLPNB=VOLPMM*trcs_VLN(ids_NH4B,L)
 !
 !     MASS FLOW OF GAS FROM SOIL TO ROOT AT SHORTER TIME STEP NPT
 !
@@ -410,43 +361,36 @@ module RootGasMod
 !     N2S=N2O,NHS=NH3 non-band,NHB=NH3 band,HGS=H2
 !     UPWTRH=water uptake
 !
-        DO 90 MX=1,NPT
+        D90: DO MX=1,NPT
           OXYS1=OXYS1+ROXYLX
-          CCO2S1=AMAX1(0.0,CO2S1/VOLWMM)
-          COXYS1=AMIN1(COXYE*SOXYL(L),AMAX1(0.0,OXYS1/VOLWMO))
-          CCH4S1=AMAX1(0.0,CH4S1/VOLWMM)
-          CN2OS1=AMAX1(0.0,Z2OS1/VOLWMM)
-          CNH3S1=AMAX1(0.0,ZH3S1/VOLWMM)
-          CNH3B1=AMAX1(0.0,ZH3B1/VOLWMM)
-          CH2GS1=AMAX1(0.0,H2GS1/VOLWMM)
+          CCO2S1=AZMAX1(CO2S1/VOLWMM)
+          COXYS1=AMIN1(COXYE*GSolbility(idg_O2,L),AZMAX1(OXYS1/VOLWMO))
+          CCH4S1=AZMAX1(CH4S1/VOLWMM)
+          CN2OS1=AZMAX1(Z2OS1/VOLWMM)
+          CNH3S1=AZMAX1(ZH3S1/VOLWMM)
+          CNH3B1=AZMAX1(ZH3B1/VOLWMM)
+          CH2GS1=AZMAX1(H2GS1/VOLWMM)
           IF(RTVLP(N,L,NZ).GT.ZERO)THEN
-            CCO2A1=AMAX1(0.0,CO2A1/RTVLP(N,L,NZ))
-            COXYA1=AMAX1(0.0,OXYA1/RTVLP(N,L,NZ))
-            CCH4A1=AMAX1(0.0,CH4A1/RTVLP(N,L,NZ))
-            CZ2OA1=AMAX1(0.0,Z2OA1/RTVLP(N,L,NZ))
-            CNH3A1=AMAX1(0.0,ZH3A1/RTVLP(N,L,NZ))
-            CH2GA1=AMAX1(0.0,H2GA1/RTVLP(N,L,NZ))
+            DO NTG=idg_beg,idg_end-1
+              trcg_gcon(NTG)=AZMAX1(trcg_gmas(NTG)/RTVLP(N,L,NZ))
+            ENDDO
           ELSE
-            CCO2A1=0.0_r8
-            COXYA1=0.0_r8
-            CCH4A1=0.0_r8
-            CZ2OA1=0.0_r8
-            CNH3A1=0.0_r8
-            CH2GA1=0.0_r8
+            trcg_gcon(idg_beg:idg_end-1)=0.0_r8
           ENDIF
-          CCO2P1=AMAX1(0.0,CO2P1/RTVLW(N,L,NZ))
-          COXYP1=AMIN1(COXYE*SOXYL(L),AMAX1(0.0,OXYP1/RTVLW(N,L,NZ)))
-          CCH4P1=AMAX1(0.0,CH4P1/RTVLW(N,L,NZ))
-          CN2OP1=AMAX1(0.0,Z2OP1/RTVLW(N,L,NZ))
-          CNH3P1=AMAX1(0.0,ZH3P1/RTVLW(N,L,NZ))
-          CH2GP1=AMAX1(0.0,H2GP1/RTVLW(N,L,NZ))
+          CCO2P1=AZMAX1(CO2P1/RTVLW(N,L,NZ))
+          COXYP1=AMIN1(COXYE*GSolbility(idg_O2,L),AZMAX1(OXYP1/RTVLW(N,L,NZ)))
+          CCH4P1=AZMAX1(CH4P1/RTVLW(N,L,NZ))
+          CN2OP1=AZMAX1(Z2OP1/RTVLW(N,L,NZ))
+          CNH3P1=AZMAX1(ZH3P1/RTVLW(N,L,NZ))
+          CH2GP1=AZMAX1(H2GP1/RTVLW(N,L,NZ))
+
           DIFOX=DIFOL+DIFOP
           RMFCOS=UPWTRH*CCO2S1
           RMFOXS=UPWTRH*COXYS1
           RMFCHS=UPWTRH*CCH4S1
           RMFN2S=UPWTRH*CN2OS1
-          RMFN3S=UPWTRH*CNH3S1*VLNH4(L)
-          RMFN3B=UPWTRH*CNH3B1*VLNHB(L)
+          RMFN3S=UPWTRH*CNH3S1*trcs_VLN(ids_NH4,L)
+          RMFN3B=UPWTRH*CNH3B1*trcs_VLN(ids_NH4B,L)
           RMFHGS=UPWTRH*CH2GS1
 !
 !     SOLUTION FOR MASS FLOW + DIFFUSION OF O2 IN AQUEOUS PHASES OF
@@ -511,60 +455,60 @@ module RootGasMod
           RDXCOS=(RTVLW(N,L,NZ)*AMAX1(ZEROP(NZ),CO2S1) &
             -VOLWMM*AMAX1(ZEROP(NZ),CO2P1))/VOLWSP
           IF(RDFCOS.GT.0.0)THEN
-            RCO2SX=AMIN1(AMAX1(0.0,RDXCOS),RDFCOS*PP(NZ))
+            RCO2SX=AMIN1(AZMAX1(RDXCOS),RDFCOS*PP(NZ))
           ELSE
-            RCO2SX=AMAX1(AMIN1(0.0,RDXCOS),RDFCOS*PP(NZ))
+            RCO2SX=AMAX1(AZMIN1(RDXCOS),RDFCOS*PP(NZ))
           ENDIF
           IF(N.EQ.1)THEN
             RDFCHS=RMFCHS+DIFCL*(CCH4S1-CCH4P1)
             RDXCHS=(RTVLW(N,L,NZ)*AMAX1(ZEROP(NZ),CH4S1) &
               -VOLWMM*AMAX1(ZEROP(NZ),CH4P1))/VOLWSP
             IF(RDFCHS.GT.0.0)THEN
-              RUPCSX=AMIN1(AMAX1(0.0,RDXCHS),RDFCHS*PP(NZ))
+              RUPCSX=AMIN1(AZMAX1(RDXCHS),RDFCHS*PP(NZ))
             ELSE
-              RUPCSX=AMAX1(AMIN1(0.0,RDXCHS),RDFCHS*PP(NZ))
+              RUPCSX=AMAX1(AZMIN1(RDXCHS),RDFCHS*PP(NZ))
             ENDIF
             RDFN2S=RMFN2S+DIFZL*(CN2OS1-CN2OP1)
             RDXN2S=(RTVLW(N,L,NZ)*AMAX1(ZEROP(NZ),Z2OS1) &
               -VOLWMM*AMAX1(ZEROP(NZ),Z2OP1))/VOLWSP
             IF(RDFN2S.GT.0.0)THEN
-              RUPZSX=AMIN1(AMAX1(0.0,RDXN2S),RDFN2S*PP(NZ))
+              RUPZSX=AMIN1(AZMAX1(RDXN2S),RDFN2S*PP(NZ))
             ELSE
-              RUPZSX=AMAX1(AMIN1(0.0,RDXN2S),RDFN2S*PP(NZ))
+              RUPZSX=AMAX1(AZMIN1(RDXN2S),RDFN2S*PP(NZ))
             ENDIF
             RDFN3S=RMFN3S+DIFNL*(CNH3S1-CNH3P1)
             IF(VOLWSA.GT.ZEROP(NZ))THEN
-              ZH3PA=ZH3P1*VLNH4(L)
+              ZH3PA=ZH3P1*trcs_VLN(ids_NH4,L)
               RDXNHS=(RTVLWA*AMAX1(ZEROP(NZ),ZH3S1) &
                 -VOLWMA*AMAX1(ZEROP(NZ),ZH3PA))/VOLWSA
             ELSE
               RDXNHS=0.0_r8
             ENDIF
             IF(RDFN3S.GT.0.0)THEN
-              RUPNSX=AMIN1(AMAX1(0.0,RDXNHS),RDFN3S*PP(NZ))
+              RUPNSX=AMIN1(AZMAX1(RDXNHS),RDFN3S*PP(NZ))
             ELSE
-              RUPNSX=AMAX1(AMIN1(0.0,RDXNHS),RDFN3S*PP(NZ))
+              RUPNSX=AMAX1(AZMIN1(RDXNHS),RDFN3S*PP(NZ))
             ENDIF
             RDFN3B=RMFN3B+DIFNB*(CNH3B1-CNH3P1)
             IF(VOLWSB.GT.ZEROP(NZ))THEN
-              ZH3PB=ZH3P1*VLNHB(L)
+              ZH3PB=ZH3P1*trcs_VLN(ids_NH4B,L)
               RDXNHB=(RTVLWB*AMAX1(ZEROP(NZ),ZH3B1) &
                 -VOLWMB*AMAX1(ZEROP(NZ),ZH3PB))/VOLWSB
             ELSE
               RDXNHB=0.0_r8
             ENDIF
             IF(RDFN3B.GT.0.0)THEN
-              RUPNBX=AMIN1(AMAX1(0.0,RDXNHB),RDFN3B*PP(NZ))
+              RUPNBX=AMIN1(AZMAX1(RDXNHB),RDFN3B*PP(NZ))
             ELSE
-              RUPNBX=AMAX1(AMIN1(0.0,RDXNHB),RDFN3B*PP(NZ))
+              RUPNBX=AMAX1(AZMIN1(RDXNHB),RDFN3B*PP(NZ))
             ENDIF
             RDFHGS=RMFHGS+DIFHL*(CH2GS1-CH2GP1)
             RDXHGS=(RTVLW(N,L,NZ)*AMAX1(ZEROP(NZ),H2GS1) &
               -VOLWMM*AMAX1(ZEROP(NZ),H2GP1))/VOLWSP
             IF(RDFHGS.GT.0.0)THEN
-              RUPHGX=AMIN1(AMAX1(0.0,RDXHGS),RDFHGS*PP(NZ))
+              RUPHGX=AMIN1(AZMAX1(RDXHGS),RDFHGS*PP(NZ))
             ELSE
-              RUPHGX=AMAX1(AMIN1(0.0,RDXHGS),RDFHGS*PP(NZ))
+              RUPHGX=AMAX1(AZMIN1(RDXHGS),RDFHGS*PP(NZ))
             ENDIF
           ELSE
             RUPCSX=0.0_r8
@@ -612,7 +556,7 @@ module RootGasMod
               RN2DFQ=DFGSP*(AMAX1(ZEROP(NZ),Z2OG1)*VOLWN2 &
                 -(AMAX1(ZEROS,Z2OS1)-RUPZSX)*VOLPMM)/(VOLWN2+VOLPMM)
               IF(VOLWNH+VOLPNH.GT.ZEROP(NZ))THEN
-                ZH3GA=ZH3G1*VLNH4(L)
+                ZH3GA=ZH3G1*trcs_VLN(ids_NH4,L)
                 RNHDFQ=AMIN1(RUPNSX,AMAX1(-RUPNSX &
                   ,DFGSP*(AMAX1(ZEROP(NZ),ZH3GA)*VOLWNH &
                   -(AMAX1(ZEROS,ZH3S1)-RUPNSX)*VOLPNH)/(VOLWNH+VOLPNH)))
@@ -620,7 +564,7 @@ module RootGasMod
                 RNHDFQ=0.0_r8
               ENDIF
               IF(VOLWNB+VOLPNB.GT.ZEROP(NZ))THEN
-                ZH3GB=ZH3G1*VLNHB(L)
+                ZH3GB=ZH3G1*trcs_VLN(ids_NH4B,L)
                 RNBDFQ=AMIN1(RUPNSX,AMAX1(-RUPNSX &
                   ,DFGSP*(AMAX1(ZEROP(NZ),ZH3GB)*VOLWNB &
                   -(AMAX1(ZEROS,ZH3B1)-RUPNBX)*VOLPNB)/(VOLWNB+VOLPNB)))
@@ -671,71 +615,60 @@ module RootGasMod
 !     R*DF1=root gas exchange between gaseous-aqueous phases
 !     R*FL1=root gas exchange with atmosphere
 !     gas code:CO=CO2,OX=O2,CH=CH4,N2=N2O,NH=NH3,H2=H2
-!     CO2A1,CO2P1=gaseous,aqueous CO2 in root
-!     OXYA1,OXYP1=gaseous,aqueous O2 in root
-!     CH4A1,CH4P1=gaseous,aqueous CH4 in root
-!     Z2OA1,Z2OP1=gaseous,aqueous N2O in root
-!     ZH3A1,ZH3P1=gaseous,aqueous NH3 in root
-!     H2GA1,H2GP1=gaseous,aqueous H2 in root
+!     trcg_gmas(idg_CO2),CO2P1=gaseous,aqueous CO2 in root
+!     trcg_gmas(idg_O2),OXYP1=gaseous,aqueous O2 in root
+!     trcg_gmas(idg_CH4),CH4P1=gaseous,aqueous CH4 in root
+!     trcg_gmas(idg_N2O),Z2OP1=gaseous,aqueous N2O in root
+!     trcg_gmas(idg_NH3),ZH3P1=gaseous,aqueous NH3 in root
+!     trcg_gmas(idg_H2),H2GP1=gaseous,aqueous H2 in root
 !     RTVLW,RTVLP=root aqueous,gaseous volume
 !     VOLW*=RTVLW*gas solubility
 !     C*E,C*A1=atmosphere,root gas concentration
 !     DF*A=root-atmosphere gas conductance
 !
             CO2PX=CO2P1+RCO2PX
-            RCODF1=AMAX1(-CO2PX,DFGP*(AMAX1(ZEROP(NZ),CO2A1)*VOLWCA &
-              -CO2PX*RTVLP(N,L,NZ))/(VOLWCA+RTVLP(N,L,NZ)))
+            trcg_RDF1(idg_CO2)=AMAX1(-CO2PX,DFGP*(AMAX1(ZEROP(NZ),trcg_gmas(idg_CO2))*VOLWG(idg_CO2) &
+              -CO2PX*RTVLP(N,L,NZ))/(VOLWG(idg_CO2)+RTVLP(N,L,NZ)))
             OXYPX=OXYP1-RUPOPX
-            ROXDF1=AMAX1(-OXYPX,DFGP*(AMAX1(ZEROP(NZ),OXYA1)*VOLWOA &
-              -OXYPX*RTVLP(N,L,NZ))/(VOLWOA+RTVLP(N,L,NZ)))
+            trcg_RDF1(idg_O2)=AMAX1(-OXYPX,DFGP*(AMAX1(ZEROP(NZ),trcg_gmas(idg_O2))*VOLWG(idg_O2) &
+              -OXYPX*RTVLP(N,L,NZ))/(VOLWG(idg_O2)+RTVLP(N,L,NZ)))
             CH4PX=CH4P1+RUPCSX
-            RCHDF1=AMAX1(-CH4PX,DFGP*(AMAX1(ZEROP(NZ),CH4A1)*VOLWC4 &
-              -CH4PX*RTVLP(N,L,NZ))/(VOLWC4+RTVLP(N,L,NZ)))
+            trcg_RDF1(idg_CH4)=AMAX1(-CH4PX,DFGP*(AMAX1(ZEROP(NZ),trcg_gmas(idg_CH4))*VOLWG(idg_CH4) &
+              -CH4PX*RTVLP(N,L,NZ))/(VOLWG(idg_CH4)+RTVLP(N,L,NZ)))
             Z2OPX=Z2OP1+RUPZSX
-            RN2DF1=AMAX1(-Z2OPX,DFGP*(AMAX1(ZEROP(NZ),Z2OA1)*VOLWZA &
-              -Z2OPX*RTVLP(N,L,NZ))/(VOLWZA+RTVLP(N,L,NZ)))
+            trcg_RDF1(idg_N2O)=AMAX1(-Z2OPX,DFGP*(AMAX1(ZEROP(NZ),trcg_gmas(idg_N2O))*VOLWG(idg_N2O) &
+              -Z2OPX*RTVLP(N,L,NZ))/(VOLWG(idg_N2O)+RTVLP(N,L,NZ)))
             ZH3PX=ZH3P1+RUPNTX
-            RNHDF1=AMAX1(-ZH3PX,DFGP*(AMAX1(ZEROP(NZ),ZH3A1)*VOLWNA &
-              -ZH3PX*RTVLP(N,L,NZ))/(VOLWNA+RTVLP(N,L,NZ)))
+            trcg_RDF1(idg_NH3)=AMAX1(-ZH3PX,DFGP*(AMAX1(ZEROP(NZ),trcg_gmas(idg_NH3))*VOLWG(idg_NH3) &
+              -ZH3PX*RTVLP(N,L,NZ))/(VOLWG(idg_NH3)+RTVLP(N,L,NZ)))
             H2GPX=H2GP1+RUPHGX
-            RHGDF1=AMAX1(-H2GPX,DFGP*(AMAX1(ZEROP(NZ),H2GA1)*VOLWH2 &
-              -H2GPX*RTVLP(N,L,NZ))/(VOLWH2+RTVLP(N,L,NZ)))
-            RCOFL1=AMIN1(DFCOA,RTVLP(N,L,NZ))*(CCO2E-CCO2A1)
-            ROXFL1=AMIN1(DFOXA,RTVLP(N,L,NZ))*(COXYE-COXYA1)
-            RCHFL1=AMIN1(DFCHA,RTVLP(N,L,NZ))*(CCH4E-CCH4A1)
-            RN2FL1=AMIN1(DFN2A,RTVLP(N,L,NZ))*(CZ2OE-CZ2OA1)
-            RNHFL1=AMIN1(DFNHA,RTVLP(N,L,NZ))*(CNH3E-CNH3A1)
-            RHGFL1=AMIN1(DFHGA,RTVLP(N,L,NZ))*(CH2GE-CH2GA1)
+            trcg_RDF1(idg_H2)=AMAX1(-H2GPX,DFGP*(AMAX1(ZEROP(NZ),trcg_gmas(idg_H2))*VOLWG(idg_H2) &
+              -H2GPX*RTVLP(N,L,NZ))/(VOLWG(idg_H2)+RTVLP(N,L,NZ)))
+
+            trcg_RFL1(idg_CO2)=AMIN1(DFCOA,RTVLP(N,L,NZ))*(CCO2E-trcg_gcon(idg_CO2))
+            trcg_RFL1(idg_O2)=AMIN1(DFOXA,RTVLP(N,L,NZ))*(COXYE-trcg_gcon(idg_O2))
+            trcg_RFL1(idg_CH4)=AMIN1(DFCHA,RTVLP(N,L,NZ))*(CCH4E-trcg_gcon(idg_CH4))
+            trcg_RFL1(idg_N2O)=AMIN1(DFN2A,RTVLP(N,L,NZ))*(CZ2OE-trcg_gcon(idg_N2O))
+            trcg_RFL1(idg_NH3)=AMIN1(DFNHA,RTVLP(N,L,NZ))*(CNH3E-trcg_gcon(idg_NH3))
+            trcg_RFL1(idg_H2)=AMIN1(DFHGA,RTVLP(N,L,NZ))*(CH2GE-trcg_gcon(idg_H2))
           ELSE
-            RCODF1=0.0_r8
-            ROXDF1=0.0_r8
-            RCHDF1=0.0_r8
-            RN2DF1=0.0_r8
-            RNHDF1=0.0_r8
-            RHGDF1=0.0_r8
-            RCOFL1=0.0_r8
-            ROXFL1=0.0_r8
-            RCHFL1=0.0_r8
-            RN2FL1=0.0_r8
-            RNHFL1=0.0_r8
-            RHGFL1=0.0_r8
+            trcg_RDF1(idg_beg:idg_end-1)=0.0_r8
+            trcg_RFL1(idg_beg:idg_end-1)=0.0_r8
           ENDIF
 !
 !     UPDATE ROOT AQUEOUS, GASEOUS GAS CONTENTS AND CONCENTRATIONS
 !     FOR ROOT AQUEOUS-GASEOUS, GASEOUS-ATMOSPHERE EXCHANGES
 !
-          CO2A1=CO2A1-RCODF1+RCOFL1
-          OXYA1=OXYA1-ROXDF1+ROXFL1
-          CH4A1=CH4A1-RCHDF1+RCHFL1
-          Z2OA1=Z2OA1-RN2DF1+RN2FL1
-          ZH3A1=ZH3A1-RNHDF1+RNHFL1
-          H2GA1=H2GA1-RHGDF1+RHGFL1
-          CO2P1=CO2P1+RCODF1+RCO2SX+RCO2PX
-          OXYP1=OXYP1+ROXDF1-RUPOPX
-          CH4P1=CH4P1+RCHDF1+RUPCSX
-          Z2OP1=Z2OP1+RN2DF1+RUPZSX
-          ZH3P1=ZH3P1+RNHDF1+RUPNSX+RUPNBX
-          H2GP1=H2GP1+RHGDF1+RUPHGX
+          DO NTG=idg_beg,idg_end-1
+            trcg_gmas(NTG)=trcg_gmas(NTG)-trcg_RDF1(NTG)+trcg_RFL1(NTG)
+          ENDDO
+
+          CO2P1=CO2P1+trcg_RDF1(idg_CO2)+RCO2SX+RCO2PX
+          OXYP1=OXYP1+trcg_RDF1(idg_O2)-RUPOPX
+          CH4P1=CH4P1+trcg_RDF1(idg_CH4)+RUPCSX
+          Z2OP1=Z2OP1+trcg_RDF1(idg_N2O)+RUPZSX
+          ZH3P1=ZH3P1+trcg_RDF1(idg_NH3)+RUPNSX+RUPNBX
+          H2GP1=H2GP1+trcg_RDF1(idg_H2)+RUPHGX
 !
 !     ACCUMULATE SOIL-ROOT GAS EXCHANGE TO HOURLY TIME SCALE
 !
@@ -761,18 +694,10 @@ module RootGasMod
 !     R*FLA=root gaseous-atmosphere CO2 exchange
 !     gas code:CO=CO2,OX=O2,CH=CH4,N2=N2O,NH=NH3,H2=H2
 !
-          RCODFA(N,L,NZ)=RCODFA(N,L,NZ)+RCODF1
-          ROXDFA(N,L,NZ)=ROXDFA(N,L,NZ)+ROXDF1
-          RCHDFA(N,L,NZ)=RCHDFA(N,L,NZ)+RCHDF1
-          RN2DFA(N,L,NZ)=RN2DFA(N,L,NZ)+RN2DF1
-          RNHDFA(N,L,NZ)=RNHDFA(N,L,NZ)+RNHDF1
-          RHGDFA(N,L,NZ)=RHGDFA(N,L,NZ)+RHGDF1
-          RCOFLA(N,L,NZ)=RCOFLA(N,L,NZ)+RCOFL1
-          ROXFLA(N,L,NZ)=ROXFLA(N,L,NZ)+ROXFL1
-          RCHFLA(N,L,NZ)=RCHFLA(N,L,NZ)+RCHFL1
-          RN2FLA(N,L,NZ)=RN2FLA(N,L,NZ)+RN2FL1
-          RNHFLA(N,L,NZ)=RNHFLA(N,L,NZ)+RNHFL1
-          RHGFLA(N,L,NZ)=RHGFLA(N,L,NZ)+RHGFL1
+          DO NTG=idg_beg,idg_end-1
+            trcg_RDFA(NTG,N,L,NZ)=trcg_RDFA(NTG,N,L,NZ)+trcg_RDF1(NTG)
+            trcg_RFLA(NTG,N,L,NZ)=trcg_RFLA(NTG,N,L,NZ)+trcg_RFL1(NTG)
+          ENDDO
 !
 !     ACCUMULATE SOIL-ROOT GAS EXCHANGE TO HOURLY TIME SCALE
 !
@@ -784,9 +709,9 @@ module RootGasMod
           RUPOXP(N,L,NZ)=RUPOXP(N,L,NZ)+RUPOPX
           ROXSK(M,L)=ROXSK(M,L)+RUPOSX
 
-90      CONTINUE
+        ENDDO D90
       ENDIF
-99  CONTINUE
+    ENDDO D99
 !
 !     O2 CONSTRAINTS TO ROOT RESPIRATION DEPENDS UPON RATIO
 !     OF ROOT O2 UPTAKE 'RUPOXT' TO ROOT O2 DEMAND 'ROXYP'

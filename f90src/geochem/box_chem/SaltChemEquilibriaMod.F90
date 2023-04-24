@@ -1,6 +1,6 @@
 module SaltChemEquilibriaMod
 
-  use data_kind_mod, only : r8 => SHR_KIND_R8
+  use data_kind_mod, only : r8 => DAT_KIND_R8
   use minimathmod, only : test_aeqb
   use SoluteChemDataType, only : chem_var_type, solute_flx_type
   use SoluteParMod

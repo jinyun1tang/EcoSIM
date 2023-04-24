@@ -13,8 +13,8 @@ module ecosim_log_mod
 
 ! !USES:
 
-  use data_kind_mod, only : SHR_KIND_IN
-  use data_kind_mod, only : SHR_KIND_CX
+  use data_kind_mod, only : DAT_KIND_IN
+  use data_kind_mod, only : DAT_KIND_CX
 
   implicit none
 
@@ -39,8 +39,8 @@ module ecosim_log_mod
 !EOP
 
   ! low-level shared variables for logging, these may not be parameters
-  integer(SHR_KIND_IN) :: shr_log_Level = 1
-  integer(SHR_KIND_IN) :: shr_log_Unit  = 6
+  integer(DAT_KIND_IN) :: shr_log_Level = 1
+  integer(DAT_KIND_IN) :: shr_log_Unit  = 6
 
 contains
 
@@ -65,7 +65,7 @@ function shr_log_errMsg(file, line)
 
 ! !INPUT/OUTPUT PARAMETERS:
 
-  character(len=SHR_KIND_CX)   :: shr_log_errMsg
+  character(len=DAT_KIND_CX)   :: shr_log_errMsg
   character(len=*), intent(in) :: file
   integer         , intent(in) :: line
 

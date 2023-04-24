@@ -1,5 +1,5 @@
 module ErosionMod
-  use data_kind_mod, only : r8 => SHR_KIND_R8
+  use data_kind_mod, only : r8 => DAT_KIND_R8
   use minimathmod, only : test_aeqb,AZMAX1
   use MicrobialDataType
   use SOMDataType
@@ -19,6 +19,7 @@ module ErosionMod
   use GridDataType
   use EcoSIMConfig, only : nlbiomcp => nlbiomcpc, ndbiomcp=> ndbiomcpc
   use EcoSIMConfig, only : jcplx1=> jcplx1c, NFGs => NFGsc,jcplx=>jcplxc
+  use EcoSIMConfig, only : column_mode
   implicit none
 
   private
@@ -79,7 +80,7 @@ module ErosionMod
 !
 !     EXTERNAL BOUNDARY SEDIMENT FLUXES
 !
-  call ExternalSedimentFluxes(NHW,NHE,NVN,NVS)
+  if(.not.column_mode)call ExternalSedimentFluxes(NHW,NHE,NVN,NVS)
 
   END subroutine erosion
 !---------------------------------------------------------------------------------------------------
@@ -279,7 +280,7 @@ module ErosionMod
           ENDIF
         ENDIF
 !
-        call XBoundSedTransp(M,NY,NX,NHW,NHE,NVN,NVS,N1,N2)
+        if(.not. column_mode)call XBoundSedTransp(M,NY,NX,NHW,NHE,NVN,NVS,N1,N2)
 
       ENDIF
     ENDDO
@@ -306,8 +307,8 @@ module ErosionMod
   integer :: M1,M2,M4,M5
   real(r8) :: RCHQF,FERM,XN
 
-  DO  N=1,2
-    DO  NN=1,2
+  D9580: DO  N=1,2
+    D9575: DO  NN=1,2
       IF(N.EQ.1)THEN
         N4=NX+1
         N5=NY
@@ -319,7 +320,7 @@ module ErosionMod
             M2=NY
             M4=NX+1
             M5=NY
-            XN=-1.0
+            XN=-1.0_r8
             RCHQF=RCHQE(M2,M1)
           ELSE
             cycle
@@ -330,7 +331,7 @@ module ErosionMod
             M2=NY
             M4=NX
             M5=NY
-            XN=1.0
+            XN=1.0_r8
             RCHQF=RCHQW(M5,M4)
           ELSE
             cycle
@@ -347,7 +348,7 @@ module ErosionMod
             M2=NY
             M4=NX
             M5=NY+1
-            XN=-1.0
+            XN=-1.0_r8
             RCHQF=RCHQS(M2,M1)
           ELSE
             cycle
@@ -358,7 +359,7 @@ module ErosionMod
             M2=NY
             M4=NX
             M5=NY
-            XN=1.0
+            XN=1.0_r8
             RCHQF=RCHQN(M5,M4)
           ELSE
             cycle
@@ -388,11 +389,11 @@ module ErosionMod
           ENDIF
         ENDIF
       ENDIF
-    ENDDO
+    ENDDO D9575
 !
 !     TOTAL SEDIMENT FLUXES
 !
-    DO  NN=1,2
+    D1202: DO  NN=1,2
       TERSED(N2,N1)=TERSED(N2,N1)+RERSED(N,NN,N2,N1)
       IF(IFLBM(M,N,NN,N5,N4).EQ.0)THEN
         TERSED(N2,N1)=TERSED(N2,N1)-RERSED(N,NN,N5,N4)
@@ -400,8 +401,8 @@ module ErosionMod
       IF(N4B.GT.0.AND.N5B.GT.0.AND.NN.EQ.1)THEN
         TERSED(N2,N1)=TERSED(N2,N1)-RERSED(N,NN,N5B,N4B)
       ENDIF
-    ENDDO
-  ENDDO
+    ENDDO D1202
+  ENDDO D9580
   end subroutine XBoundSedTransp
 !------------------------------------------------------------------------------------------
 
@@ -409,7 +410,7 @@ module ErosionMod
   implicit none
   integer, intent(in) :: NHW,NHE,NVN,NVS
 
-  integer :: NGL
+  integer :: NGL,NTX,NTP
   integer :: K,NN,N,NO,M,NY,NX
   integer :: N1,N2,N4,N5,N4B,N5B
   real(r8) :: FSEDER
@@ -456,8 +457,6 @@ module ErosionMod
               XSANER(N,2,N5,N4)=FSEDER*SAND(NU(N2,N1),N2,N1)
               XSILER(N,2,N5,N4)=FSEDER*SILT(NU(N2,N1),N2,N1)
               XCLAER(N,2,N5,N4)=FSEDER*CLAY(NU(N2,N1),N2,N1)
-              XCECER(N,2,N5,N4)=FSEDER*XCEC(NU(N2,N1),N2,N1)
-              XAECER(N,2,N5,N4)=FSEDER*XAEC(NU(N2,N1),N2,N1)
 !
 !     FERTILIZER POOLS
 !
@@ -465,14 +464,15 @@ module ErosionMod
 !     sediment code:NH4,NH3,NHU,NO3=NH4,NH3,urea,NO3 in non-band
 !                  :NH4B,NH3B,NHUB,NO3B=NH4,NH3,urea,NO3 in band
 !
-              XNH4ER(N,2,N5,N4)=FSEDER*ZNH4FA(NU(N2,N1),N2,N1)
-              XNH3ER(N,2,N5,N4)=FSEDER*ZNH3FA(NU(N2,N1),N2,N1)
-              XNHUER(N,2,N5,N4)=FSEDER*ZNHUFA(NU(N2,N1),N2,N1)
-              XNO3ER(N,2,N5,N4)=FSEDER*ZNO3FA(NU(N2,N1),N2,N1)
-              XNH4EB(N,2,N5,N4)=FSEDER*ZNH4FB(NU(N2,N1),N2,N1)
-              XNH3EB(N,2,N5,N4)=FSEDER*ZNH3FB(NU(N2,N1),N2,N1)
-              XNHUEB(N,2,N5,N4)=FSEDER*ZNHUFB(NU(N2,N1),N2,N1)
-              XNO3EB(N,2,N5,N4)=FSEDER*ZNO3FB(NU(N2,N1),N2,N1)
+              XNH4ER(N,2,N5,N4)=FSEDER*FertN_soil(ifert_nh4,NU(N2,N1),N2,N1)
+              XNH3ER(N,2,N5,N4)=FSEDER*FertN_soil(ifert_nh3,NU(N2,N1),N2,N1)
+              XNHUER(N,2,N5,N4)=FSEDER*FertN_soil(ifert_urea,NU(N2,N1),N2,N1)
+              XNO3ER(N,2,N5,N4)=FSEDER*FertN_soil(ifert_no3,NU(N2,N1),N2,N1)
+
+              XNH4EB(N,2,N5,N4)=FSEDER*FertN_band(ifert_nh4_band,NU(N2,N1),N2,N1)
+              XNH3EB(N,2,N5,N4)=FSEDER*FertN_band(ifert_nh3_band,NU(N2,N1),N2,N1)
+              XNHUEB(N,2,N5,N4)=FSEDER*FertN_band(ifert_urea_band,NU(N2,N1),N2,N1)
+              XNO3EB(N,2,N5,N4)=FSEDER*FertN_band(ifert_no3_band,NU(N2,N1),N2,N1)
 !
 !     EXCHANGEABLE CATIONS AND ANIONS
 !
@@ -485,28 +485,9 @@ module ErosionMod
 !       :XH1P,XH2P=adsorbed HPO4,H2PO4 in non-band
 !       :XH1PB,XP2PB=adsorbed HPO4,H2PO4 in band
 !
-              XN4ER(N,2,N5,N4)=FSEDER*XN4(NU(N2,N1),N2,N1)
-              XNBER(N,2,N5,N4)=FSEDER*XNB(NU(N2,N1),N2,N1)
-              XHYER(N,2,N5,N4)=FSEDER*XHY(NU(N2,N1),N2,N1)
-              XALER(N,2,N5,N4)=FSEDER*XAL(NU(N2,N1),N2,N1)
-              XFEER(N,2,N5,N4)=FSEDER*XFE(NU(N2,N1),N2,N1)
-              XCAER(N,2,N5,N4)=FSEDER*XCA(NU(N2,N1),N2,N1)
-              XMGER(N,2,N5,N4)=FSEDER*XMG(NU(N2,N1),N2,N1)
-              XNAER(N,2,N5,N4)=FSEDER*XNA(NU(N2,N1),N2,N1)
-              XKAER(N,2,N5,N4)=FSEDER*XKA(NU(N2,N1),N2,N1)
-              XHCER(N,2,N5,N4)=FSEDER*XHC(NU(N2,N1),N2,N1)
-              XAL2ER(N,2,N5,N4)=FSEDER*XALO2(NU(N2,N1),N2,N1)
-              XFE2ER(N,2,N5,N4)=FSEDER*XFEO2(NU(N2,N1),N2,N1)
-              XOH0ER(N,2,N5,N4)=FSEDER*XOH0(NU(N2,N1),N2,N1)
-              XOH1ER(N,2,N5,N4)=FSEDER*XOH1(NU(N2,N1),N2,N1)
-              XOH2ER(N,2,N5,N4)=FSEDER*XOH2(NU(N2,N1),N2,N1)
-              XH1PER(N,2,N5,N4)=FSEDER*XH1P(NU(N2,N1),N2,N1)
-              XH2PER(N,2,N5,N4)=FSEDER*XH2P(NU(N2,N1),N2,N1)
-              XOH0EB(N,2,N5,N4)=FSEDER*XOH0B(NU(N2,N1),N2,N1)
-              XOH1EB(N,2,N5,N4)=FSEDER*XOH1B(NU(N2,N1),N2,N1)
-              XOH2EB(N,2,N5,N4)=FSEDER*XOH2B(NU(N2,N1),N2,N1)
-              XH1PEB(N,2,N5,N4)=FSEDER*XH1PB(NU(N2,N1),N2,N1)
-              XH2PEB(N,2,N5,N4)=FSEDER*XH2PB(NU(N2,N1),N2,N1)
+              DO NTX=idx_beg,idx_end
+                trcx_XER(NTX,N,2,N5,N4)=FSEDER*trcx_solml(NTX,NU(N2,N1),N2,N1)
+              ENDDO
 !
 !     PRECIPITATES
 !
@@ -518,52 +499,35 @@ module ErosionMod
 !       :PCPM,PCPD,PCPH=precip CaH2PO4,CaHPO4,apatite in non-band
 !       :PCPMB,PCPDB,PCPHB=precip CaH2PO4,CaHPO4,apatite in band
 !
-              PALOER(N,2,N5,N4)=FSEDER*PALOH(NU(N2,N1),N2,N1)
-              PFEOER(N,2,N5,N4)=FSEDER*PFEOH(NU(N2,N1),N2,N1)
-              PCACER(N,2,N5,N4)=FSEDER*PCACO(NU(N2,N1),N2,N1)
-              PCASER(N,2,N5,N4)=FSEDER*PCASO(NU(N2,N1),N2,N1)
-              PALPER(N,2,N5,N4)=FSEDER*PALPO(NU(N2,N1),N2,N1)
-              PFEPER(N,2,N5,N4)=FSEDER*PFEPO(NU(N2,N1),N2,N1)
-              PCPDER(N,2,N5,N4)=FSEDER*PCAPD(NU(N2,N1),N2,N1)
-              PCPHER(N,2,N5,N4)=FSEDER*PCAPH(NU(N2,N1),N2,N1)
-              PCPMER(N,2,N5,N4)=FSEDER*PCAPM(NU(N2,N1),N2,N1)
-              PALPEB(N,2,N5,N4)=FSEDER*PALPB(NU(N2,N1),N2,N1)
-              PFEPEB(N,2,N5,N4)=FSEDER*PFEPB(NU(N2,N1),N2,N1)
-              PCPDEB(N,2,N5,N4)=FSEDER*PCPDB(NU(N2,N1),N2,N1)
-              PCPHEB(N,2,N5,N4)=FSEDER*PCPHB(NU(N2,N1),N2,N1)
-              PCPMEB(N,2,N5,N4)=FSEDER*PCPMB(NU(N2,N1),N2,N1)
+              DO NTP=idsp_beg,idsp_end
+                trcp_ER(NTP,N,2,N5,N4)   =FSEDER*trcp_salml(NTP,NU(N2,N1),N2,N1)
+              ENDDO
 !
 !     ORGANIC MATTER
 !
-              DO  K=0,jcplx1
+              DO  K=1,jcplx
                 DO NO=1,NFGs
-                  DO NGL=1,JG
+                  DO NGL=JGnio(NO),JGnfo(NO)
                     DO M=1,nlbiomcp
-                      OMCER(M+(NGL-1)*nlbiomcp,NO,K,N,2,N5,N4)= &
-                        FSEDER*OMC(M,NGL,NO,K,NU(N2,N1),N2,N1)
-                      OMNER(M+(NGL-1)*nlbiomcp,NO,K,N,2,N5,N4)= &
-                        FSEDER*OMN(M,NGL,NO,K,NU(N2,N1),N2,N1)
-                      OMPER(M+(NGL-1)*nlbiomcp,NO,K,N,2,N5,N4)= &
-                        FSEDER*OMP(M,NGL,NO,K,NU(N2,N1),N2,N1)
+                      OMCER(M+(NGL-1)*nlbiomcp,K,N,2,N5,N4)=FSEDER*OMC(M,NGL,K,NU(N2,N1),N2,N1)
+                      OMNER(M+(NGL-1)*nlbiomcp,K,N,2,N5,N4)=FSEDER*OMN(M,NGL,K,NU(N2,N1),N2,N1)
+                      OMPER(M+(NGL-1)*nlbiomcp,K,N,2,N5,N4)=FSEDER*OMP(M,NGL,K,NU(N2,N1),N2,N1)
                     ENDDO
                   ENDDO
                 ENDDO
               ENDDO
 
               DO NO=1,NFGs
-                DO NGL=1,JG
+                DO NGL=JGniA(NO),JGnfA(NO)
                   DO M=1,nlbiomcp
-                    OMCERff(M+(NGL-1)*nlbiomcp,NO,N,2,N5,N4)= &
-                      FSEDER*OMCff(M,NGL,NO,NU(N2,N1),N2,N1)
-                    OMNERff(M+(NGL-1)*nlbiomcp,NO,N,2,N5,N4)= &
-                      FSEDER*OMNff(M,NGL,NO,NU(N2,N1),N2,N1)
-                    OMPERff(M+(NGL-1)*nlbiomcp,NO,N,2,N5,N4)= &
-                      FSEDER*OMPff(M,NGL,NO,NU(N2,N1),N2,N1)
+                    OMCERff(M+(NGL-1)*nlbiomcp,N,2,N5,N4)=FSEDER*OMCff(M,NGL,NU(N2,N1),N2,N1)
+                    OMNERff(M+(NGL-1)*nlbiomcp,N,2,N5,N4)=FSEDER*OMNff(M,NGL,NU(N2,N1),N2,N1)
+                    OMPERff(M+(NGL-1)*nlbiomcp,N,2,N5,N4)=FSEDER*OMPff(M,NGL,NU(N2,N1),N2,N1)
                   ENDDO
                 ENDDO
               ENDDO
 
-              DO  K=0,jcplx1
+              DO  K=1,jcplx
                 DO  M=1,ndbiomcp
                   ORCER(M,K,N,2,N5,N4)=FSEDER*ORC(M,K,NU(N2,N1),N2,N1)
                   ORNER(M,K,N,2,N5,N4)=FSEDER*ORN(M,K,NU(N2,N1),N2,N1)
@@ -584,8 +548,6 @@ module ErosionMod
               XSANER(N,2,N5,N4)=0._r8
               XSILER(N,2,N5,N4)=0._r8
               XCLAER(N,2,N5,N4)=0._r8
-              XCECER(N,2,N5,N4)=0._r8
-              XAECER(N,2,N5,N4)=0._r8
 !
 !     FERTILIZER POOLS
 !
@@ -600,71 +562,37 @@ module ErosionMod
 !
 !     EXCHANGEABLE CATIONS AND ANIONS
 !
-              XN4ER(N,2,N5,N4)=0._r8
-              XNBER(N,2,N5,N4)=0._r8
-              XHYER(N,2,N5,N4)=0._r8
-              XALER(N,2,N5,N4)=0._r8
-              XFEER(N,2,N5,N4)=0._r8
-              XCAER(N,2,N5,N4)=0._r8
-              XMGER(N,2,N5,N4)=0._r8
-              XNAER(N,2,N5,N4)=0._r8
-              XKAER(N,2,N5,N4)=0._r8
-              XHCER(N,2,N5,N4)=0._r8
-              XAL2ER(N,2,N5,N4)=0._r8
-              XFE2ER(N,2,N5,N4)=0._r8
-              XOH0ER(N,2,N5,N4)=0._r8
-              XOH1ER(N,2,N5,N4)=0._r8
-              XOH2ER(N,2,N5,N4)=0._r8
-              XH1PER(N,2,N5,N4)=0._r8
-              XH2PER(N,2,N5,N4)=0._r8
-              XOH0EB(N,2,N5,N4)=0._r8
-              XOH1EB(N,2,N5,N4)=0._r8
-              XOH2EB(N,2,N5,N4)=0._r8
-              XH1PEB(N,2,N5,N4)=0._r8
-              XH2PEB(N,2,N5,N4)=0._r8
+              trcx_XER(idx_beg:idx_end,N,2,N5,N4)=0._r8
 !
 !     PRECIPITATES
 !
-              PALOER(N,2,N5,N4)=0._r8
-              PFEOER(N,2,N5,N4)=0._r8
-              PCACER(N,2,N5,N4)=0._r8
-              PCASER(N,2,N5,N4)=0._r8
-              PALPER(N,2,N5,N4)=0._r8
-              PFEPER(N,2,N5,N4)=0._r8
-              PCPDER(N,2,N5,N4)=0._r8
-              PCPHER(N,2,N5,N4)=0._r8
-              PCPMER(N,2,N5,N4)=0._r8
-              PALPEB(N,2,N5,N4)=0._r8
-              PFEPEB(N,2,N5,N4)=0._r8
-              PCPDEB(N,2,N5,N4)=0._r8
-              PCPHEB(N,2,N5,N4)=0._r8
-              PCPMEB(N,2,N5,N4)=0._r8
+              trcp_ER(idsp_beg:idsp_end,N,2,N5,N4)=0._r8
 !
 !     ORGANIC MATTER
 !
-              DO  K=0,jcplx1
+              DO  K=1,jcplx
                 DO  NO=1,NFGs
-                  DO NGL=1,JG
+                  DO NGL=JGnio(NO),JGnfo(NO)
                     DO  M=1,nlbiomcp
-                      OMCER(M+(NGL-1)*nlbiomcp,NO,K,N,2,N5,N4)=0._r8
-                      OMNER(M+(NGL-1)*nlbiomcp,NO,K,N,2,N5,N4)=0._r8
-                      OMPER(M+(NGL-1)*nlbiomcp,NO,K,N,2,N5,N4)=0._r8
+                      OMCER(M+(NGL-1)*nlbiomcp,K,N,2,N5,N4)=0._r8
+                      OMNER(M+(NGL-1)*nlbiomcp,K,N,2,N5,N4)=0._r8
+                      OMPER(M+(NGL-1)*nlbiomcp,K,N,2,N5,N4)=0._r8
                     enddo
                   ENDDO
                 enddo
               ENDDO
 
               DO  NO=1,NFGs
-                DO NGL=1,JG
+                DO NGL=JGniA(NO),JGnfA(NO)
                   DO  M=1,nlbiomcp
-                    OMCERff(M+(NGL-1)*nlbiomcp,NO,N,2,N5,N4)=0._r8
-                    OMNERff(M+(NGL-1)*nlbiomcp,NO,N,2,N5,N4)=0._r8
-                    OMPERff(M+(NGL-1)*nlbiomcp,NO,N,2,N5,N4)=0._r8
+                    OMCERff(M+(NGL-1)*nlbiomcp,N,2,N5,N4)=0._r8
+                    OMNERff(M+(NGL-1)*nlbiomcp,N,2,N5,N4)=0._r8
+                    OMPERff(M+(NGL-1)*nlbiomcp,N,2,N5,N4)=0._r8
                   enddo
                 ENDDO
               enddo
 
-              DO  K=0,jcplx1
+              DO  K=1,jcplx
                 DO  M=1,ndbiomcp
                   ORCER(M,K,N,2,N5,N4)=0._r8
                   ORNER(M,K,N,2,N5,N4)=0._r8
@@ -688,8 +616,6 @@ module ErosionMod
                 XSANER(N,1,N5B,N4B)=FSEDER*SAND(NU(N2,N1),N2,N1)
                 XSILER(N,1,N5B,N4B)=FSEDER*SILT(NU(N2,N1),N2,N1)
                 XCLAER(N,1,N5B,N4B)=FSEDER*CLAY(NU(N2,N1),N2,N1)
-                XCECER(N,1,N5B,N4B)=FSEDER*XCEC(NU(N2,N1),N2,N1)
-                XAECER(N,1,N5B,N4B)=FSEDER*XAEC(NU(N2,N1),N2,N1)
 !
 !     FERTILIZER POOLS
 !
@@ -697,14 +623,14 @@ module ErosionMod
 !     sediment code:NH4,NH3,NHU,NO3=NH4,NH3,urea,NO3 in non-band
 !                  :NH4B,NH3B,NHUB,NO3B=NH4,NH3,urea,NO3 in band
 !
-                XNH4ER(N,1,N5B,N4B)=FSEDER*ZNH4FA(NU(N2,N1),N2,N1)
-                XNH3ER(N,1,N5B,N4B)=FSEDER*ZNH3FA(NU(N2,N1),N2,N1)
-                XNHUER(N,1,N5B,N4B)=FSEDER*ZNHUFA(NU(N2,N1),N2,N1)
-                XNO3ER(N,1,N5B,N4B)=FSEDER*ZNO3FA(NU(N2,N1),N2,N1)
-                XNH4EB(N,1,N5B,N4B)=FSEDER*ZNH4FB(NU(N2,N1),N2,N1)
-                XNH3EB(N,1,N5B,N4B)=FSEDER*ZNH3FB(NU(N2,N1),N2,N1)
-                XNHUEB(N,1,N5B,N4B)=FSEDER*ZNHUFB(NU(N2,N1),N2,N1)
-                XNO3EB(N,1,N5B,N4B)=FSEDER*ZNO3FB(NU(N2,N1),N2,N1)
+                XNH4ER(N,1,N5B,N4B)=FSEDER*FertN_soil(ifert_nh4,NU(N2,N1),N2,N1)
+                XNH3ER(N,1,N5B,N4B)=FSEDER*FertN_soil(ifert_nh3,NU(N2,N1),N2,N1)
+                XNHUER(N,1,N5B,N4B)=FSEDER*FertN_soil(ifert_urea,NU(N2,N1),N2,N1)
+                XNO3ER(N,1,N5B,N4B)=FSEDER*FertN_soil(ifert_no3,NU(N2,N1),N2,N1)
+                XNH4EB(N,1,N5B,N4B)=FSEDER*FertN_band(ifert_nh4_band,NU(N2,N1),N2,N1)
+                XNH3EB(N,1,N5B,N4B)=FSEDER*FertN_band(ifert_nh3_band,NU(N2,N1),N2,N1)
+                XNHUEB(N,1,N5B,N4B)=FSEDER*FertN_band(ifert_urea_band,NU(N2,N1),N2,N1)
+                XNO3EB(N,1,N5B,N4B)=FSEDER*FertN_band(ifert_no3_band,NU(N2,N1),N2,N1)
 !
 !     EXCHANGEABLE CATIONS AND ANIONS
 !
@@ -717,28 +643,9 @@ module ErosionMod
 !       :XH1P,XH2P=adsorbed HPO4,H2PO4 in non-band
 !       :XH1PB,XP2PB=adsorbed HPO4,H2PO4 in band
 !
-                XN4ER(N,1,N5B,N4B)=FSEDER*XN4(NU(N2,N1),N2,N1)
-                XNBER(N,1,N5B,N4B)=FSEDER*XNB(NU(N2,N1),N2,N1)
-                XHYER(N,1,N5B,N4B)=FSEDER*XHY(NU(N2,N1),N2,N1)
-                XALER(N,1,N5B,N4B)=FSEDER*XAL(NU(N2,N1),N2,N1)
-                XFEER(N,1,N5B,N4B)=FSEDER*XFE(NU(N2,N1),N2,N1)
-                XCAER(N,1,N5B,N4B)=FSEDER*XCA(NU(N2,N1),N2,N1)
-                XMGER(N,1,N5B,N4B)=FSEDER*XMG(NU(N2,N1),N2,N1)
-                XNAER(N,1,N5B,N4B)=FSEDER*XNA(NU(N2,N1),N2,N1)
-                XKAER(N,1,N5B,N4B)=FSEDER*XKA(NU(N2,N1),N2,N1)
-                XHCER(N,1,N5B,N4B)=FSEDER*XHC(NU(N2,N1),N2,N1)
-                XAL2ER(N,1,N5B,N4B)=FSEDER*XALO2(NU(N2,N1),N2,N1)
-                XFE2ER(N,1,N5B,N4B)=FSEDER*XFEO2(NU(N2,N1),N2,N1)
-                XOH0ER(N,1,N5B,N4B)=FSEDER*XOH0(NU(N2,N1),N2,N1)
-                XOH1ER(N,1,N5B,N4B)=FSEDER*XOH1(NU(N2,N1),N2,N1)
-                XOH2ER(N,1,N5B,N4B)=FSEDER*XOH2(NU(N2,N1),N2,N1)
-                XH1PER(N,1,N5B,N4B)=FSEDER*XH1P(NU(N2,N1),N2,N1)
-                XH2PER(N,1,N5B,N4B)=FSEDER*XH2P(NU(N2,N1),N2,N1)
-                XOH0EB(N,1,N5B,N4B)=FSEDER*XOH0B(NU(N2,N1),N2,N1)
-                XOH1EB(N,1,N5B,N4B)=FSEDER*XOH1B(NU(N2,N1),N2,N1)
-                XOH2EB(N,1,N5B,N4B)=FSEDER*XOH2B(NU(N2,N1),N2,N1)
-                XH1PEB(N,1,N5B,N4B)=FSEDER*XH1PB(NU(N2,N1),N2,N1)
-                XH2PEB(N,1,N5B,N4B)=FSEDER*XH2PB(NU(N2,N1),N2,N1)
+                DO NTX=idx_beg,idx_end
+                  trcx_XER(NTX,N,1,N5B,N4B)=FSEDER*trcx_solml(NTX,NU(N2,N1),N2,N1)
+                ENDDO
 !
 !     PRECIPITATES
 !
@@ -750,51 +657,34 @@ module ErosionMod
 !       :PCPM,PCPD,PCPH=precip CaH2PO4,CaHPO4,apatite in non-band
 !       :PCPMB,PCPDB,PCPHB=precip CaH2PO4,CaHPO4,apatite in band
 !
-                PALOER(N,1,N5B,N4B)=FSEDER*PALOH(NU(N2,N1),N2,N1)
-                PFEOER(N,1,N5B,N4B)=FSEDER*PFEOH(NU(N2,N1),N2,N1)
-                PCACER(N,1,N5B,N4B)=FSEDER*PCACO(NU(N2,N1),N2,N1)
-                PCASER(N,1,N5B,N4B)=FSEDER*PCASO(NU(N2,N1),N2,N1)
-                PALPER(N,1,N5B,N4B)=FSEDER*PALPO(NU(N2,N1),N2,N1)
-                PFEPER(N,1,N5B,N4B)=FSEDER*PFEPO(NU(N2,N1),N2,N1)
-                PCPDER(N,1,N5B,N4B)=FSEDER*PCAPD(NU(N2,N1),N2,N1)
-                PCPHER(N,1,N5B,N4B)=FSEDER*PCAPH(NU(N2,N1),N2,N1)
-                PCPMER(N,1,N5B,N4B)=FSEDER*PCAPM(NU(N2,N1),N2,N1)
-                PALPEB(N,1,N5B,N4B)=FSEDER*PALPB(NU(N2,N1),N2,N1)
-                PFEPEB(N,1,N5B,N4B)=FSEDER*PFEPB(NU(N2,N1),N2,N1)
-                PCPDEB(N,1,N5B,N4B)=FSEDER*PCPDB(NU(N2,N1),N2,N1)
-                PCPHEB(N,1,N5B,N4B)=FSEDER*PCPHB(NU(N2,N1),N2,N1)
-                PCPMEB(N,1,N5B,N4B)=FSEDER*PCPMB(NU(N2,N1),N2,N1)
+                DO NTP=idsp_beg,idsp_end
+                  trcp_ER(NTP,N,1,N5B,N4B)=FSEDER*trcp_salml(NTP,NU(N2,N1),N2,N1)
+                ENDDO
 !
 !     ORGANIC MATTER
 !
-                DO  K=0,jcplx1
+                DO  K=1,jcplx
                   DO  NO=1,NFGs
-                    DO NGL=1,JG
+                    DO NGL=JGnio(NO),JGnfo(NO)
                       DO  M=1,nlbiomcp
-                        OMCER(M+(NGL-1)*nlbiomcp,NO,K,N,1,N5B,N4B)=&
-                          FSEDER*OMC(M,NGL,NO,K,NU(N2,N1),N2,N1)
-                        OMNER(M+(NGL-1)*nlbiomcp,NO,K,N,1,N5B,N4B)=&
-                          FSEDER*OMN(M,NGL,NO,K,NU(N2,N1),N2,N1)
-                        OMPER(M+(NGL-1)*nlbiomcp,NO,K,N,1,N5B,N4B)=&
-                          FSEDER*OMP(M,NGL,NO,K,NU(N2,N1),N2,N1)
+                        OMCER(M+(NGL-1)*nlbiomcp,K,N,1,N5B,N4B)=FSEDER*OMC(M,NGL,K,NU(N2,N1),N2,N1)
+                        OMNER(M+(NGL-1)*nlbiomcp,K,N,1,N5B,N4B)=FSEDER*OMN(M,NGL,K,NU(N2,N1),N2,N1)
+                        OMPER(M+(NGL-1)*nlbiomcp,K,N,1,N5B,N4B)=FSEDER*OMP(M,NGL,K,NU(N2,N1),N2,N1)
                       enddo
                     enddo
                   ENDDO
                 ENDDO
                 DO  NO=1,NFGs
-                  DO NGL=1,JG
+                  DO NGL=JGniA(NO),JGnfA(NO)
                     DO  M=1,nlbiomcp
-                      OMCERff(M+(NGL-1)*nlbiomcp,NO,N,1,N5B,N4B)=&
-                        FSEDER*OMCff(M,NGL,NO,NU(N2,N1),N2,N1)
-                      OMNERff(M+(NGL-1)*nlbiomcp,NO,N,1,N5B,N4B)=&
-                        FSEDER*OMNff(M,NGL,NO,NU(N2,N1),N2,N1)
-                      OMPERff(M+(NGL-1)*nlbiomcp,NO,N,1,N5B,N4B)=&
-                        FSEDER*OMPff(M,NGL,NO,NU(N2,N1),N2,N1)
+                      OMCERff(M+(NGL-1)*nlbiomcp,N,1,N5B,N4B)=FSEDER*OMCff(M,NGL,NU(N2,N1),N2,N1)
+                      OMNERff(M+(NGL-1)*nlbiomcp,N,1,N5B,N4B)=FSEDER*OMNff(M,NGL,NU(N2,N1),N2,N1)
+                      OMPERff(M+(NGL-1)*nlbiomcp,N,1,N5B,N4B)=FSEDER*OMPff(M,NGL,NU(N2,N1),N2,N1)
                     enddo
                   enddo
                 ENDDO
 
-                DO  K=0,jcplx1
+                DO  K=1,jcplx
                   DO  M=1,ndbiomcp
                     ORCER(M,K,N,1,N5B,N4B)=FSEDER*ORC(M,K,NU(N2,N1),N2,N1)
                     ORNER(M,K,N,1,N5B,N4B)=FSEDER*ORN(M,K,NU(N2,N1),N2,N1)
@@ -815,8 +705,6 @@ module ErosionMod
                 XSANER(N,1,N5B,N4B)=0._r8
                 XSILER(N,1,N5B,N4B)=0._r8
                 XCLAER(N,1,N5B,N4B)=0._r8
-                XCECER(N,1,N5B,N4B)=0._r8
-                XAECER(N,1,N5B,N4B)=0._r8
 !
 !     FERTILIZER POOLS
 !
@@ -831,71 +719,37 @@ module ErosionMod
 !
 !     EXCHANGEABLE CATIONS AND ANIONS
 !
-                XN4ER(N,1,N5B,N4B)=0._r8
-                XNBER(N,1,N5B,N4B)=0._r8
-                XHYER(N,1,N5B,N4B)=0._r8
-                XALER(N,1,N5B,N4B)=0._r8
-                XFEER(N,1,N5B,N4B)=0._r8
-                XCAER(N,1,N5B,N4B)=0._r8
-                XMGER(N,1,N5B,N4B)=0._r8
-                XNAER(N,1,N5B,N4B)=0._r8
-                XKAER(N,1,N5B,N4B)=0._r8
-                XHCER(N,1,N5B,N4B)=0._r8
-                XAL2ER(N,1,N5B,N4B)=0._r8
-                XFE2ER(N,1,N5B,N4B)=0._r8
-                XOH0ER(N,1,N5B,N4B)=0._r8
-                XOH1ER(N,1,N5B,N4B)=0._r8
-                XOH2ER(N,1,N5B,N4B)=0._r8
-                XH1PER(N,1,N5B,N4B)=0._r8
-                XH2PER(N,1,N5B,N4B)=0._r8
-                XOH0EB(N,1,N5B,N4B)=0._r8
-                XOH1EB(N,1,N5B,N4B)=0._r8
-                XOH2EB(N,1,N5B,N4B)=0._r8
-                XH1PEB(N,1,N5B,N4B)=0._r8
-                XH2PEB(N,1,N5B,N4B)=0._r8
+                trcx_XER(idx_beg:idx_end,N,1,N5B,N4B)=0._r8
 !
 !     PRECIPITATES
 !
-                PALOER(N,1,N5B,N4B)=0._r8
-                PFEOER(N,1,N5B,N4B)=0._r8
-                PCACER(N,1,N5B,N4B)=0._r8
-                PCASER(N,1,N5B,N4B)=0._r8
-                PALPER(N,1,N5B,N4B)=0._r8
-                PFEPER(N,1,N5B,N4B)=0._r8
-                PCPDER(N,1,N5B,N4B)=0._r8
-                PCPHER(N,1,N5B,N4B)=0._r8
-                PCPMER(N,1,N5B,N4B)=0._r8
-                PALPEB(N,1,N5B,N4B)=0._r8
-                PFEPEB(N,1,N5B,N4B)=0._r8
-                PCPDEB(N,1,N5B,N4B)=0._r8
-                PCPHEB(N,1,N5B,N4B)=0._r8
-                PCPMEB(N,1,N5B,N4B)=0._r8
+                trcp_ER(idsp_beg:idsp_end,N,1,N5B,N4B)=0._r8
 !
 !     ORGANIC MATTER
 !
-                DO  K=0,jcplx1
+                DO  K=1,jcplx
                   DO  NO=1,NFGs
-                    DO NGL=1,JG
+                    DO NGL=JGnio(NO),JGnfo(NO)
                       DO  M=1,nlbiomcp
-                        OMCER(M+(NGL-1)*nlbiomcp,NO,K,N,1,N5B,N4B)=0._r8
-                        OMNER(M+(NGL-1)*nlbiomcp,NO,K,N,1,N5B,N4B)=0._r8
-                        OMPER(M+(NGL-1)*nlbiomcp,NO,K,N,1,N5B,N4B)=0._r8
+                        OMCER(M+(NGL-1)*nlbiomcp,K,N,1,N5B,N4B)=0._r8
+                        OMNER(M+(NGL-1)*nlbiomcp,K,N,1,N5B,N4B)=0._r8
+                        OMPER(M+(NGL-1)*nlbiomcp,K,N,1,N5B,N4B)=0._r8
                       enddo
                     ENDDO
                   enddo
                 ENDDO
 
                 DO  NO=1,NFGs
-                  DO NGL=1,JG
+                  DO NGL=JGniA(NO),JGnfA(NO)
                     DO  M=1,nlbiomcp
-                      OMCERff(M+(NGL-1)*nlbiomcp,NO,N,1,N5B,N4B)=0._r8
-                      OMNERff(M+(NGL-1)*nlbiomcp,NO,N,1,N5B,N4B)=0._r8
-                      OMPERff(M+(NGL-1)*nlbiomcp,NO,N,1,N5B,N4B)=0._r8
+                      OMCERff(M+(NGL-1)*nlbiomcp,N,1,N5B,N4B)=0._r8
+                      OMNERff(M+(NGL-1)*nlbiomcp,N,1,N5B,N4B)=0._r8
+                      OMPERff(M+(NGL-1)*nlbiomcp,N,1,N5B,N4B)=0._r8
                     enddo
                   ENDDO
                 enddo
 
-                DO  K=0,jcplx1
+                DO  K=1,jcplx
                   DO  M=1,ndbiomcp
                     ORCER(M,K,N,1,N5B,N4B)=0._r8
                     ORNER(M,K,N,1,N5B,N4B)=0._r8
@@ -930,7 +784,7 @@ module ErosionMod
   real(r8) :: RCHQF,FSEDER
   integer :: NGL
   integer :: NY,NX
-  integer :: N,NN,K,NO,M
+  integer :: N,NN,K,NO,M,NTX,NTP
   integer :: N1,N2,N4,N5
   integer :: M1,M2,M4,M5
   real(r8) :: XN
@@ -940,8 +794,8 @@ module ErosionMod
       IF((IERSNG.EQ.1.OR.IERSNG.EQ.3).AND.BKDS(NU(NY,NX),NY,NX).GT.ZERO)THEN
         N1=NX
         N2=NY
-        DO  N=1,2
-          DO  NN=1,2
+        D8980: DO  N=1,2
+          D8975: DO  NN=1,2
             IF(N.EQ.1)THEN
               N4=NX+1
               N5=NY
@@ -951,7 +805,7 @@ module ErosionMod
                   M2=NY
                   M4=NX+1
                   M5=NY
-                  XN=-1.0
+                  XN=-1.0_r8
                   RCHQF=RCHQE(M2,M1)
                 ELSE
                   cycle
@@ -962,7 +816,7 @@ module ErosionMod
                   M2=NY
                   M4=NX
                   M5=NY
-                  XN=1.0
+                  XN=1.0_r8
                   RCHQF=RCHQW(M5,M4)
                 ELSE
                   cycle
@@ -977,7 +831,7 @@ module ErosionMod
                   M2=NY
                   M4=NX
                   M5=NY+1
-                  XN=-1.0
+                  XN=-1.0_r8
                   RCHQF=RCHQS(M2,M1)
                 ELSE
                   cycle
@@ -988,7 +842,7 @@ module ErosionMod
                   M2=NY
                   M4=NX
                   M5=NY
-                  XN=1.0
+                  XN=1.0_r8
                   RCHQF=RCHQN(M5,M4)
                 ELSE
                   cycle
@@ -1000,8 +854,6 @@ module ErosionMod
               XSANER(N,NN,M5,M4)=0._r8
               XSILER(N,NN,M5,M4)=0._r8
               XCLAER(N,NN,M5,M4)=0._r8
-              XCECER(N,NN,M5,M4)=0._r8
-              XAECER(N,NN,M5,M4)=0._r8
 !
 !     FERTILIZER POOLS
 !
@@ -1016,69 +868,35 @@ module ErosionMod
 !
 !     EXCHANGEABLE CATIONS AND ANIONS
 !
-              XN4ER(N,NN,M5,M4)=0._r8
-              XNBER(N,NN,M5,M4)=0._r8
-              XHYER(N,NN,M5,M4)=0._r8
-              XALER(N,NN,M5,M4)=0._r8
-              XFEER(N,NN,M5,M4)=0._r8
-              XCAER(N,NN,M5,M4)=0._r8
-              XMGER(N,NN,M5,M4)=0._r8
-              XNAER(N,NN,M5,M4)=0._r8
-              XKAER(N,NN,M5,M4)=0._r8
-              XHCER(N,NN,M5,M4)=0._r8
-              XAL2ER(N,NN,M5,M4)=0._r8
-              XFE2ER(N,NN,M5,M4)=0._r8
-              XOH0ER(N,NN,M5,M4)=0._r8
-              XOH1ER(N,NN,M5,M4)=0._r8
-              XOH2ER(N,NN,M5,M4)=0._r8
-              XH1PER(N,NN,M5,M4)=0._r8
-              XH2PER(N,NN,M5,M4)=0._r8
-              XOH0EB(N,NN,M5,M4)=0._r8
-              XOH1EB(N,NN,M5,M4)=0._r8
-              XOH2EB(N,NN,M5,M4)=0._r8
-              XH1PEB(N,NN,M5,M4)=0._r8
-              XH2PEB(N,NN,M5,M4)=0._r8
+              trcx_XER(idx_beg:idx_end,N,NN,M5,M4)=0._r8
 !
 !     PRECIPITATES
 !
-              PALOER(N,NN,M5,M4)=0._r8
-              PFEOER(N,NN,M5,M4)=0._r8
-              PCACER(N,NN,M5,M4)=0._r8
-              PCASER(N,NN,M5,M4)=0._r8
-              PALPER(N,NN,M5,M4)=0._r8
-              PFEPER(N,NN,M5,M4)=0._r8
-              PCPDER(N,NN,M5,M4)=0._r8
-              PCPHER(N,NN,M5,M4)=0._r8
-              PCPMER(N,NN,M5,M4)=0._r8
-              PALPEB(N,NN,M5,M4)=0._r8
-              PFEPEB(N,NN,M5,M4)=0._r8
-              PCPDEB(N,NN,M5,M4)=0._r8
-              PCPHEB(N,NN,M5,M4)=0._r8
-              PCPMEB(N,NN,M5,M4)=0._r8
+              trcp_ER(idsp_beg:idsp_end,N,NN,M5,M4)=0._r8
 !
 !     ORGANIC MATTER
 !
-              DO  K=0,jcplx1
+              DO  K=1,jcplx
                 DO  NO=1,NFGs
-                  DO NGL=1,JG
+                  DO NGL=JGnio(NO),JGnfo(NO)
                     DO  M=1,nlbiomcp
-                      OMCER(M+(NGL-1)*nlbiomcp,NO,K,N,NN,M5,M4)=0._r8
-                      OMNER(M+(NGL-1)*nlbiomcp,NO,K,N,NN,M5,M4)=0._r8
-                      OMPER(M+(NGL-1)*nlbiomcp,NO,K,N,NN,M5,M4)=0._r8
+                      OMCER(M+(NGL-1)*nlbiomcp,K,N,NN,M5,M4)=0._r8
+                      OMNER(M+(NGL-1)*nlbiomcp,K,N,NN,M5,M4)=0._r8
+                      OMPER(M+(NGL-1)*nlbiomcp,K,N,NN,M5,M4)=0._r8
                     enddo
                   ENDDO
                 enddo
               enddo
               DO  NO=1,NFGs
-                DO NGL=1,JG
+                DO NGL=JGniA(NO),JGnfA(NO)
                   DO  M=1,nlbiomcp
-                    OMCERff(M+(NGL-1)*nlbiomcp,NO,N,NN,M5,M4)=0._r8
-                    OMNERff(M+(NGL-1)*nlbiomcp,NO,N,NN,M5,M4)=0._r8
-                    OMPERff(M+(NGL-1)*nlbiomcp,NO,N,NN,M5,M4)=0._r8
+                    OMCERff(M+(NGL-1)*nlbiomcp,N,NN,M5,M4)=0._r8
+                    OMNERff(M+(NGL-1)*nlbiomcp,N,NN,M5,M4)=0._r8
+                    OMPERff(M+(NGL-1)*nlbiomcp,N,NN,M5,M4)=0._r8
                   enddo
                 ENDDO
               enddo
-              DO  K=0,jcplx1
+              DO  K=1,jcplx
                 DO  M=1,ndbiomcp
                   ORCER(M,K,N,NN,M5,M4)=0._r8
                   ORNER(M,K,N,NN,M5,M4)=0._r8
@@ -1106,92 +924,54 @@ module ErosionMod
               XSANER(N,NN,M5,M4)=FSEDER*SAND(NU(N2,N1),N2,N1)
               XSILER(N,NN,M5,M4)=FSEDER*SILT(NU(N2,N1),N2,N1)
               XCLAER(N,NN,M5,M4)=FSEDER*CLAY(NU(N2,N1),N2,N1)
-              XCECER(N,NN,M5,M4)=FSEDER*XCEC(NU(N2,N1),N2,N1)
-              XAECER(N,NN,M5,M4)=FSEDER*XAEC(NU(N2,N1),N2,N1)
 !
 !     FERTILIZER POOLS
 !
-              XNH4ER(N,NN,M5,M4)=FSEDER*ZNH4FA(NU(N2,N1),N2,N1)
-              XNH3ER(N,NN,M5,M4)=FSEDER*ZNH3FA(NU(N2,N1),N2,N1)
-              XNHUER(N,NN,M5,M4)=FSEDER*ZNHUFA(NU(N2,N1),N2,N1)
-              XNO3ER(N,NN,M5,M4)=FSEDER*ZNO3FA(NU(N2,N1),N2,N1)
-              XNH4EB(N,NN,M5,M4)=FSEDER*ZNH4FB(NU(N2,N1),N2,N1)
-              XNH3EB(N,NN,M5,M4)=FSEDER*ZNH3FB(NU(N2,N1),N2,N1)
-              XNHUEB(N,NN,M5,M4)=FSEDER*ZNHUFB(NU(N2,N1),N2,N1)
-              XNO3EB(N,NN,M5,M4)=FSEDER*ZNO3FB(NU(N2,N1),N2,N1)
+              XNH4ER(N,NN,M5,M4)=FSEDER*FertN_soil(ifert_nh4,NU(N2,N1),N2,N1)
+              XNH3ER(N,NN,M5,M4)=FSEDER*FertN_soil(ifert_nh3,NU(N2,N1),N2,N1)
+              XNHUER(N,NN,M5,M4)=FSEDER*FertN_soil(ifert_urea,NU(N2,N1),N2,N1)
+              XNO3ER(N,NN,M5,M4)=FSEDER*FertN_soil(ifert_no3,NU(N2,N1),N2,N1)
+              XNH4EB(N,NN,M5,M4)=FSEDER*FertN_band(ifert_nh4_band,NU(N2,N1),N2,N1)
+              XNH3EB(N,NN,M5,M4)=FSEDER*FertN_band(ifert_nh3_band,NU(N2,N1),N2,N1)
+              XNHUEB(N,NN,M5,M4)=FSEDER*FertN_band(ifert_urea_band,NU(N2,N1),N2,N1)
+              XNO3EB(N,NN,M5,M4)=FSEDER*FertN_band(ifert_no3_band,NU(N2,N1),N2,N1)
 !
 !     EXCHANGEABLE CATIONS AND ANIONS
 !
-              XN4ER(N,NN,M5,M4)=FSEDER*XN4(NU(N2,N1),N2,N1)
-              XNBER(N,NN,M5,M4)=FSEDER*XNB(NU(N2,N1),N2,N1)
-              XHYER(N,NN,M5,M4)=FSEDER*XHY(NU(N2,N1),N2,N1)
-              XALER(N,NN,M5,M4)=FSEDER*XAL(NU(N2,N1),N2,N1)
-              XFEER(N,NN,M5,M4)=FSEDER*XFE(NU(N2,N1),N2,N1)
-              XCAER(N,NN,M5,M4)=FSEDER*XCA(NU(N2,N1),N2,N1)
-              XMGER(N,NN,M5,M4)=FSEDER*XMG(NU(N2,N1),N2,N1)
-              XNAER(N,NN,M5,M4)=FSEDER*XNA(NU(N2,N1),N2,N1)
-              XKAER(N,NN,M5,M4)=FSEDER*XKA(NU(N2,N1),N2,N1)
-              XHCER(N,NN,M5,M4)=FSEDER*XHC(NU(N2,N1),N2,N1)
-              XAL2ER(N,NN,M5,M4)=FSEDER*XALO2(NU(N2,N1),N2,N1)
-              XFE2ER(N,NN,M5,M4)=FSEDER*XFEO2(NU(N2,N1),N2,N1)
-              XOH0ER(N,NN,M5,M4)=FSEDER*XOH0(NU(N2,N1),N2,N1)
-              XOH1ER(N,NN,M5,M4)=FSEDER*XOH1(NU(N2,N1),N2,N1)
-              XOH2ER(N,NN,M5,M4)=FSEDER*XOH2(NU(N2,N1),N2,N1)
-              XH1PER(N,NN,M5,M4)=FSEDER*XH1P(NU(N2,N1),N2,N1)
-              XH2PER(N,NN,M5,M4)=FSEDER*XH2P(NU(N2,N1),N2,N1)
-              XOH0EB(N,NN,M5,M4)=FSEDER*XOH0B(NU(N2,N1),N2,N1)
-              XOH1EB(N,NN,M5,M4)=FSEDER*XOH1B(NU(N2,N1),N2,N1)
-              XOH2EB(N,NN,M5,M4)=FSEDER*XOH2B(NU(N2,N1),N2,N1)
-              XH1PEB(N,NN,M5,M4)=FSEDER*XH1PB(NU(N2,N1),N2,N1)
-              XH2PEB(N,NN,M5,M4)=FSEDER*XH2PB(NU(N2,N1),N2,N1)
+              DO NTX=idx_beg,idx_end
+                trcx_XER(NTX,N,NN,M5,M4)=FSEDER*trcx_solml(NTX,NU(N2,N1),N2,N1)
+              ENDDO
 !
 !     PRECIPITATES
 !
-              PALOER(N,NN,M5,M4)=FSEDER*PALOH(NU(N2,N1),N2,N1)
-              PFEOER(N,NN,M5,M4)=FSEDER*PFEOH(NU(N2,N1),N2,N1)
-              PCACER(N,NN,M5,M4)=FSEDER*PCACO(NU(N2,N1),N2,N1)
-              PCASER(N,NN,M5,M4)=FSEDER*PCASO(NU(N2,N1),N2,N1)
-              PALPER(N,NN,M5,M4)=FSEDER*PALPO(NU(N2,N1),N2,N1)
-              PFEPER(N,NN,M5,M4)=FSEDER*PFEPO(NU(N2,N1),N2,N1)
-              PCPDER(N,NN,M5,M4)=FSEDER*PCAPD(NU(N2,N1),N2,N1)
-              PCPHER(N,NN,M5,M4)=FSEDER*PCAPH(NU(N2,N1),N2,N1)
-              PCPMER(N,NN,M5,M4)=FSEDER*PCAPM(NU(N2,N1),N2,N1)
-              PALPEB(N,NN,M5,M4)=FSEDER*PALPB(NU(N2,N1),N2,N1)
-              PFEPEB(N,NN,M5,M4)=FSEDER*PFEPB(NU(N2,N1),N2,N1)
-              PCPDEB(N,NN,M5,M4)=FSEDER*PCPDB(NU(N2,N1),N2,N1)
-              PCPHEB(N,NN,M5,M4)=FSEDER*PCPHB(NU(N2,N1),N2,N1)
-              PCPMEB(N,NN,M5,M4)=FSEDER*PCPMB(NU(N2,N1),N2,N1)
+              DO NTP=idsp_beg,idsp_end
+                trcp_ER(NTP,N,NN,M5,M4)=FSEDER*trcp_salml(NTP,NU(N2,N1),N2,N1)
+              ENDDO
 !
 !     ORGANIC MATTER
 !
-              DO  K=0,jcplx1
+              DO  K=1,jcplx
                 DO NO=1,NFGs
-                  DO NGL=1,JG
+                  DO NGL=JGnio(NO),JGnfo(NO)
                     DO M=1,nlbiomcp
-                      OMCER(M+(NGL-1)*nlbiomcp,NO,K,N,NN,M5,M4)=&
-                        FSEDER*OMC(M,NGL,NO,K,NU(N2,N1),N2,N1)
-                      OMNER(M+(NGL-1)*nlbiomcp,NO,K,N,NN,M5,M4)=&
-                        FSEDER*OMN(M,NGL,NO,K,NU(N2,N1),N2,N1)
-                      OMPER(M+(NGL-1)*nlbiomcp,NO,K,N,NN,M5,M4)=&
-                        FSEDER*OMP(M,NGL,NO,K,NU(N2,N1),N2,N1)
+                      OMCER(M+(NGL-1)*nlbiomcp,K,N,NN,M5,M4)=FSEDER*OMC(M,NGL,K,NU(N2,N1),N2,N1)
+                      OMNER(M+(NGL-1)*nlbiomcp,K,N,NN,M5,M4)=FSEDER*OMN(M,NGL,K,NU(N2,N1),N2,N1)
+                      OMPER(M+(NGL-1)*nlbiomcp,K,N,NN,M5,M4)=FSEDER*OMP(M,NGL,K,NU(N2,N1),N2,N1)
                     ENDDO
                   ENDDO
                 ENDDO
               ENDDO
               DO NO=1,NFGs
-                DO NGL=1,JG
+                DO NGL=JGniA(NO),JGnfo(NO)
                   DO M=1,nlbiomcp
-                    OMCERff(M+(NGL-1)*nlbiomcp,NO,N,NN,M5,M4)=&
-                      FSEDER*OMCff(M,NGL,NO,NU(N2,N1),N2,N1)
-                    OMNERff(M+(NGL-1)*nlbiomcp,NO,N,NN,M5,M4)=&
-                      FSEDER*OMNff(M,NGL,NO,NU(N2,N1),N2,N1)
-                    OMPERff(M+(NGL-1)*nlbiomcp,NO,N,NN,M5,M4)=&
-                      FSEDER*OMPff(M,NGL,NO,NU(N2,N1),N2,N1)
+                    OMCERff(M+(NGL-1)*nlbiomcp,N,NN,M5,M4)=FSEDER*OMCff(M,NGL,NU(N2,N1),N2,N1)
+                    OMNERff(M+(NGL-1)*nlbiomcp,N,NN,M5,M4)=FSEDER*OMNff(M,NGL,NU(N2,N1),N2,N1)
+                    OMPERff(M+(NGL-1)*nlbiomcp,N,NN,M5,M4)=FSEDER*OMPff(M,NGL,NU(N2,N1),N2,N1)
                   ENDDO
                 ENDDO
               ENDDO
 
-              DO  K=0,jcplx1
+              DO  K=1,jcplx
                 DO  M=1,ndbiomcp
                   ORCER(M,K,N,NN,M5,M4)=FSEDER*ORC(M,K,NU(N2,N1),N2,N1)
                   ORNER(M,K,N,NN,M5,M4)=FSEDER*ORN(M,K,NU(N2,N1),N2,N1)
@@ -1209,8 +989,8 @@ module ErosionMod
                 ENDDO
               ENDDO
             ENDIF
-          ENDDO
-        ENDDO
+          ENDDO D8975
+        ENDDO D8980
       ENDIF
     ENDDO
   ENDDO

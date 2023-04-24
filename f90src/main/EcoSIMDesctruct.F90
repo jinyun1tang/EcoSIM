@@ -7,7 +7,7 @@ module EcoSIMDesctruct
   contains
 
   subroutine DestructEcoSIM
-
+  use EcoSimSumDataType   , only : DestructEcoSimSum
   use FlagDataType        , only : DestructFlagData,ISALTG
   use WatsubDataMod       , only : DestructWatSubData
   use TrnsfrsMod          , only : DestructTrnsfrs
@@ -21,6 +21,8 @@ module EcoSIMDesctruct
   use PlantTraitDataType  , only : DestructPlantTraits
   use LandSurfDataType    , only : DestructLandSurfData
   use EcoSIMCtrlDataType  , only : DestructEcoSIMCtrlData
+  use EcoSIMCtrlMod       , only : pft_nfid,salt_model
+  use ncdio_pio           , only : ncd_pio_closefile
   use EcosimBGCFluxType   , only : DestructEcosimBGCFluxData
   use EcoSIMHistMod       , only : DestructEcoSIMHistData
   use CanopyDataType      , only : DestructCanopyData
@@ -75,7 +77,7 @@ module EcoSIMDesctruct
 
   call DestructFlagData
 
-  if(ISALTG/=0)then
+  if(salt_model)then
     call DestructTrnsfrs
   else
     call DestructTrnsfr
@@ -107,6 +109,13 @@ module EcoSIMDesctruct
   call DestructErosion
 
   call DestructWatSubData
+
+  call DestructEcoSimSum
+
+  call ncd_pio_closefile(pft_nfid)
+  
+
+
   end subroutine DestructEcoSIM
 
 end module EcoSIMDesctruct

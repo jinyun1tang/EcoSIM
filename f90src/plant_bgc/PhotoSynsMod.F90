@@ -1,7 +1,8 @@
 module PhotoSynsMod
-  use data_kind_mod, only : r8 => SHR_KIND_R8
+  use data_kind_mod, only : r8 => DAT_KIND_R8
   use EcosimConst
   use GrosubPars
+  use minimathmod, only : AZMAX1
   use PlantAPIData
 implicit none
   private
@@ -60,13 +61,13 @@ implicit none
 
 ! FOR EACH CANOPY LAYER
 !
-  DO 210 L=JC1,1,-1
+  D210: DO L=JC1,1,-1
     IF(ARLFL(L,K,NB,NZ).GT.ZEROP(NZ))THEN
 !
 !     FOR EACH LEAF AZIMUTH AND INCLINATION
 !
-      DO 215 N=1,JLI1
-        DO 220 M=1,JSA1
+      D215: DO N=1,JLI1
+        D220: DO M=1,JSA1
 !
 !         CO2 FIXATION BY SUNLIT LEAVES
 !
@@ -138,24 +139,24 @@ implicit none
 !               GSL=leaf stomatal conductance (mol m-2 s-1)
 !
                 CO2X=CO2I(NZ)
-                DO 225 NN=1,100
+                D225: DO NN=1,100
                   CO2C=CO2X*SCO2(NZ)
-                  CO2Y=AMAX1(0.0,CO2C-COMPL(K,NB,NZ))
-                  CBXNX=CO2Y/(ELEC3*CO2C+10.5*COMPL(K,NB,NZ))
+                  CO2Y=AZMAX1(CO2C-COMPL(K,NB,NZ))
+                  CBXNX=CO2Y/(ELEC3*CO2C+10.5_r8*COMPL(K,NB,NZ))
                   VGROX=VCGRO(K,NB,NZ)*CO2Y/(CO2C+XKCO2O(NZ))
                   EGROX=ETLF*CBXNX
                   VL=AMIN1(VGROX,EGROX)*WFNB*FDBK(NB,NZ)
                   VG=(CO2Q(NZ)-CO2X)*GSL
                   IF(VL+VG.GT.ZERO)THEN
                     DIFF=(VL-VG)/(VL+VG)
-                    IF(ABS(DIFF).LT.0.005)exit
-                    VA=0.95*VG+0.05*VL
+                    IF(ABS(DIFF).LT.0.005_r8)exit
+                    VA=0.95_r8*VG+0.05_r8*VL
                     CO2X=CO2Q(NZ)-VA/GSL
                   ELSE
                     VL=0._r8
                     exit
                   ENDIF
-225             CONTINUE
+                ENDDO D225
 !
 !               ACCUMULATE C3 FIXATION PRODUCT IN MESOPHYLL
 !
@@ -163,8 +164,7 @@ implicit none
 !               SURFX=unself-shaded leaf surface area
 !               TAUS=fraction of direct radiation transmitted from layer above
 !
-                CH2O3(K)=CH2O3(K)+VL*SURFX(N,L,K,NB,NZ) &
-                  *TAUS(L+1)
+                CH2O3(K)=CH2O3(K)+VL*SURFX(N,L,K,NB,NZ)*TAUS(L+1)
 !               ICO2I=MAX(1,MIN(400,INT(CO2X)))
 !               VCO2(ICO2I,I,NZ)=VCO2(ICO2I,I,NZ)
 !              2+(VL*SURFX(N,L,K,NB,NZ)*TAUS(L+1))*0.0432
@@ -174,7 +174,7 @@ implicit none
 !
 !           CO2 FIXATION IN MESOPHYLL BY SHADED LEAVES
 !
-            IF(PARDIF(N,M,L,NZ).GT.0.0)THEN
+            IF(PARDIF(N,M,L,NZ).GT.0.0_r8)THEN
 !
 !             C3 CARBOXYLATION REACTIONS USING VARIABLES FROM 'STOMATE'
 !
@@ -239,9 +239,9 @@ implicit none
 !               GSL=leaf stomatal conductance (mol m-2 s-1)
 !
                 CO2X=CO2I(NZ)
-                DO 235 NN=1,100
+                D235: DO NN=1,100
                   CO2C=CO2X*SCO2(NZ)
-                  CO2Y=AMAX1(0.0,CO2C-COMPL(K,NB,NZ))
+                  CO2Y=AZMAX1(CO2C-COMPL(K,NB,NZ))
                   CBXNX=CO2Y/(ELEC3*CO2C+10.5*COMPL(K,NB,NZ))
                   VGROX=VCGRO(K,NB,NZ)*CO2Y/(CO2C+XKCO2O(NZ))
                   EGROX=ETLF*CBXNX
@@ -249,14 +249,14 @@ implicit none
                   VG=(CO2Q(NZ)-CO2X)*GSL
                   IF(VL+VG.GT.ZERO)THEN
                     DIFF=(VL-VG)/(VL+VG)
-                    IF(ABS(DIFF).LT.0.005)exit
-                    VA=0.95*VG+0.05*VL
+                    IF(ABS(DIFF).LT.0.005_r8)exit
+                    VA=0.95_r8*VG+0.05_r8*VL
                     CO2X=CO2Q(NZ)-VA/GSL
                   ELSE
                     VL=0._r8
                     exit
                   ENDIF
-235             CONTINUE
+                ENDDO D235
 !
 !               ACCUMULATE C3 FIXATION PRODUCT IN MESOPHYLL
 !
@@ -264,18 +264,17 @@ implicit none
 !               SURFX=unself-shaded leaf surface area
 !               TAU0=fraction of diffuse radiation transmitted from layer above
 !
-                CH2O3(K)=CH2O3(K)+VL*SURFX(N,L,K,NB,NZ) &
-                  *TAU0(L+1)
+                CH2O3(K)=CH2O3(K)+VL*SURFX(N,L,K,NB,NZ)*TAU0(L+1)
 !               ICO2I=MAX(1,MIN(400,INT(CO2X)))
 !               VCO2(ICO2I,I,NZ)=VCO2(ICO2I,I,NZ)
 !              2+(VL*SURFX(N,L,K,NB,NZ)*TAU0(L+1))*0.0432
               ENDIF
             ENDIF
           ENDIF
-220     CONTINUE
-215   CONTINUE
+        ENDDO D220
+      ENDDO D215
     ENDIF
-210   CONTINUE
+  ENDDO D210
   CO2F=CO2F+CH2O3(K)
   CH2O=CH2O+CH2O3(K)
   end associate
@@ -335,13 +334,13 @@ implicit none
   )
 ! FOR EACH CANOPY LAYER
 !
-  DO 110 L=JC1,1,-1
+  D110: DO L=JC1,1,-1
     IF(ARLFL(L,K,NB,NZ).GT.ZEROP(NZ))THEN
 !
 !     FOR EACH LEAF AZIMUTH AND INCLINATION
 !
-      DO 115 N =1,JLI1
-        DO 120 M =1,JSA1
+      D115: DO N =1,JLI1
+        D120: DO M =1,JSA1
 !
 !         CO2 FIXATION IN MESOPHYLL BY SUNLIT LEAVES
 !
@@ -415,24 +414,24 @@ implicit none
 !               GSL=leaf stomatal conductance (mol m-2 s-1)
 !
                 CO2X=CO2I(NZ)
-                DO 125 NN=1,100
+                D125: DO NN=1,100
                   CO2C=CO2X*SCO2(NZ)
-                  CO2Y=AMAX1(0.0,CO2C-COMP4)
-                  CBXNX=CO2Y/(ELEC4*CO2C+10.5*COMP4)
+                  CO2Y=AZMAX1(CO2C-COMP4)
+                  CBXNX=CO2Y/(ELEC4*CO2C+10.5_r8*COMP4)
                   VGROX=VCGR4(K,NB,NZ)*CO2Y/(CO2C+XKCO24(NZ))
                   EGROX=ETLF4*CBXNX
                   VL=AMIN1(VGROX,EGROX)*WFN4*FDBK4(K,NB,NZ)
                   VG=(CO2Q(NZ)-CO2X)*GSL
                   IF(VL+VG.GT.ZERO)THEN
                     DIFF=(VL-VG)/(VL+VG)
-                    IF(ABS(DIFF).LT.0.005)exit
-                    VA=0.95*VG+0.05*VL
+                    IF(ABS(DIFF).LT.0.005_r8)exit
+                    VA=0.95_r8*VG+0.05_r8*VL
                     CO2X=CO2Q(NZ)-VA/GSL
                   ELSE
                     VL=0._r8
                     exit
                   ENDIF
-125             CONTINUE
+                ENDDO D125
 !
 !               ACCUMULATE C4 FIXATION PRODUCT IN MESOPHYLL
 !
@@ -517,7 +516,7 @@ implicit none
 !               WFN4,WFNB=non-stomatal effects of water stress on C4,C3 CO2 fixation
 !
                 IF(IGTYP(NZ).NE.0)THEN
-                  WFN4=(RS/RSL)**1.00
+                  WFN4=(RS/RSL)**1.00_r8
                   WFNB=SQRT(RS/RSL)
                 ELSE
                   WFN4=WFNG
@@ -542,24 +541,24 @@ implicit none
 !               GSL=leaf stomatal conductance (mol m-2 s-1)
 !
                 CO2X=CO2I(NZ)
-                DO 135 NN=1,100
+                D135: DO NN=1,100
                   CO2C=CO2X*SCO2(NZ)
-                  CO2Y=AMAX1(0.0,CO2C-COMP4)
-                  CBXNX=CO2Y/(ELEC4*CO2C+10.5*COMP4)
+                  CO2Y=AZMAX1(CO2C-COMP4)
+                  CBXNX=CO2Y/(ELEC4*CO2C+10.5_r8*COMP4)
                   VGROX=VCGR4(K,NB,NZ)*CO2Y/(CO2C+XKCO24(NZ))
                   EGROX=ETLF4*CBXNX
                   VL=AMIN1(VGROX,EGROX)*WFN4*FDBK4(K,NB,NZ)
                   VG=(CO2Q(NZ)-CO2X)*GSL
                   IF(VL+VG.GT.ZERO)THEN
                     DIFF=(VL-VG)/(VL+VG)
-                    IF(ABS(DIFF).LT.0.005)exit
-                    VA=0.95*VG+0.05*VL
+                    IF(ABS(DIFF).LT.0.005_r8)exit
+                    VA=0.95_r8*VG+0.05_r8*VL
                     CO2X=CO2Q(NZ)-VA/GSL
                   ELSE
                     VL=0._r8
                     exit
                   ENDIF
-135             CONTINUE
+                ENDDO D135
 !
 !               ACCUMULATE C4 FIXATION PRODUCT IN MESOPHYLL
 !
@@ -567,8 +566,7 @@ implicit none
 !               SURFX=unself-shaded leaf surface area
 !               TAU0=fraction of diffuse radiation transmitted from layer above
 !
-                CH2O4(K)=CH2O4(K)+VL*SURFX(N,L,K,NB,NZ) &
-                  *TAU0(L+1)
+                CH2O4(K)=CH2O4(K)+VL*SURFX(N,L,K,NB,NZ)*TAU0(L+1)
 !               ICO2I=MAX(1,MIN(400,INT(CO2X)))
 !               VCO2(ICO2I,I,NZ)=VCO2(ICO2I,I,NZ)
 !              2+(VL*SURFX(N,L,K,NB,NZ)*TAU0(L+1))*0.0432
@@ -595,15 +593,14 @@ implicit none
 !               SURFX=unself-shaded leaf surface area
 !               TAU0=fraction of diffuse radiation transmitted from layer above
 !
-                CH2O3(K)=CH2O3(K)+VL*SURFX(N,L,K,NB,NZ) &
-                  *TAU0(L+1)
+                CH2O3(K)=CH2O3(K)+VL*SURFX(N,L,K,NB,NZ)*TAU0(L+1)
               ENDIF
             ENDIF
           ENDIF
-120     CONTINUE
-115   CONTINUE
+        ENDDO D120
+      ENDDO D115
     ENDIF
-110   CONTINUE
+  ENDDO D110
   CO2F=CO2F+CH2O4(K)
   CH2O=CH2O+CH2O3(K)
   end associate
@@ -612,14 +609,14 @@ implicit none
 
 !------------------------------------------------------------------------------------------
 
-  subroutine ComputeGPP(NB,NZ,WFNG,WFNC,CH2O3,CH2O4,CH2O)
+  subroutine ComputeGPP(NB,NZ,WFNG,WFNC,CH2O3,CH2O4,CH2O,CO2F)
   implicit none
   integer, intent(in) :: NB,NZ
   real(r8), intent(in) :: WFNG
   real(r8), intent(in) :: WFNC
   real(r8), intent(out) :: CH2O3(JNODS1),CH2O4(JNODS1)
-  real(r8), intent(out) :: CH2O
-  real(r8) :: CO2F,ZADDB,PADDB
+  real(r8), intent(out) :: CO2F,CH2O
+  real(r8) :: ZADDB,PADDB
 
   integer :: K
 
@@ -645,7 +642,7 @@ implicit none
 !
 !         FOR EACH NODE
 !
-        DO 100 K=1,JNODS1
+        D100: DO K=1,JNODS1
           CH2O3(K)=0._r8
           CH2O4(K)=0._r8
           IF(ARLF1(K,NB,NZ).GT.ZEROP(NZ))THEN
@@ -656,18 +653,18 @@ implicit none
 !             ICTYP=photosynthesis type:3=C3,4=C4 from PFT file
 !             VCGR4=PEP carboxylation rate unlimited by CO2
 !
-            IF(ICTYP(NZ).EQ.4.AND.VCGR4(K,NB,NZ).GT.0.0)THEN
+            IF(ICTYP(NZ).EQ.ic4_photo.AND.VCGR4(K,NB,NZ).GT.0.0_r8)THEN
 !
               CALL ComputeGPP_C4(K,NB,NZ,WFNG,WFNC,CH2O3,CH2O4,CO2F,CH2O)
 !
 !               C3 PHOTOSYNTHESIS
 !
-            ELSEIF(ICTYP(NZ).NE.4.AND.VCGRO(K,NB,NZ).GT.0.0)THEN
+            ELSEIF(ICTYP(NZ).NE.ic4_photo.AND.VCGRO(K,NB,NZ).GT.0.0_r8)THEN
               call ComputeGPP_C3(K,NB,NZ,WFNG,WFNC,CH2O3,CO2F,CH2O)
 
             ENDIF
           ENDIF
-100     CONTINUE
+        ENDDO D100
 !
 !         CO2F,CH2O=total CO2 fixation,CH2O production
 !
@@ -676,38 +673,39 @@ implicit none
 !
 !         CONVERT UMOL M-2 S-1 TO G C M-2 H-1
 !
-        DO 150 K=1,JNODS1
-          CH2O3(K)=CH2O3(K)*0.0432
-          CH2O4(K)=CH2O4(K)*0.0432
-150     CONTINUE
+        D150: DO K=1,JNODS1
+          CH2O3(K)=CH2O3(K)*0.0432_r8
+          CH2O4(K)=CH2O4(K)*0.0432_r8
+        ENDDO D150
       ELSE
         CO2F=0._r8
         CH2O=0._r8
-        IF(ICTYP(NZ).EQ.4)THEN
-          DO 155 K=1,JNODS1
+        IF(ICTYP(NZ).EQ.ic4_photo)THEN
+          D155: DO K=1,JNODS1
             CH2O3(K)=0._r8
             CH2O4(K)=0._r8
-155       CONTINUE
+          ENDDO D155
         ENDIF
       ENDIF
     ELSE
       CO2F=0._r8
       CH2O=0._r8
-      IF(ICTYP(NZ).EQ.4)THEN
-        DO 160 K=1,JNODS1
+      !C4
+      IF(ICTYP(NZ).EQ.ic4_photo)THEN
+        D160: DO K=1,JNODS1
           CH2O3(K)=0._r8
           CH2O4(K)=0._r8
-160     CONTINUE
+        ENDDO D160
       ENDIF
     ENDIF
   ELSE
     CO2F=0._r8
     CH2O=0._r8
-    IF(ICTYP(NZ).EQ.4)THEN
-      DO 165 K=1,JNODS1
+    IF(ICTYP(NZ).EQ.ic4_photo)THEN
+      D165: DO K=1,JNODS1
         CH2O3(K)=0._r8
         CH2O4(K)=0._r8
-165   CONTINUE
+      ENDDO D165
     ENDIF
   ENDIF
   end associate

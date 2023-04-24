@@ -6,7 +6,7 @@ module abortutils
   ! !DESCRIPTION:
   ! Abort the model for abnormal termination
   !-----------------------------------------------------------------------
-  use data_kind_mod, only : r8 => SHR_KIND_R8
+  use data_kind_mod, only : r8 => DAT_KIND_R8
 
   implicit none
   private
@@ -40,6 +40,27 @@ module abortutils
     module procedure destroy_2d_char
     module procedure destroy_3d_char
     module procedure destroy_4d_char
+
+    module procedure destroy_1d_rpt
+    module procedure destroy_2d_rpt
+    module procedure destroy_3d_rpt
+    module procedure destroy_4d_rpt
+    module procedure destroy_5d_rpt
+    module procedure destroy_6d_rpt
+    module procedure destroy_7d_rpt
+    module procedure destroy_1d_ipt
+    module procedure destroy_2d_ipt
+    module procedure destroy_3d_ipt
+    module procedure destroy_4d_ipt
+    module procedure destroy_5d_ipt
+    module procedure destroy_6d_ipt
+    module procedure destroy_7d_ipt
+    module procedure destroy_1d_lpt
+    module procedure destroy_1d_charpt
+    module procedure destroy_2d_charpt
+    module procedure destroy_3d_charpt
+    module procedure destroy_4d_charpt
+
 
   end interface destroy
   public :: padl, padr
@@ -414,4 +435,163 @@ CONTAINS
   if(allocated(arr))deallocate(arr)
 
   end subroutine destroy_4d_char
+
+
+  !-----------------------------------------------------------------------
+  subroutine destroy_1d_rpt(arr)
+  implicit none
+  real(r8), pointer :: arr(:)
+
+  deallocate(arr)
+
+  end subroutine destroy_1d_rpt
+  !-----------------------------------------------------------------------
+  subroutine destroy_2d_rpt(arr)
+  implicit none
+  real(r8), pointer :: arr(:,:)
+
+  deallocate(arr)
+
+  end subroutine destroy_2d_rpt
+  !-----------------------------------------------------------------------
+  subroutine destroy_3d_rpt(arr)
+  implicit none
+  real(r8), pointer :: arr(:,:,:)
+
+  deallocate(arr)
+
+  end subroutine destroy_3d_rpt
+  !-----------------------------------------------------------------------
+  subroutine destroy_4d_rpt(arr)
+  implicit none
+  real(r8), pointer :: arr(:,:,:,:)
+
+  deallocate(arr)
+
+  end subroutine destroy_4d_rpt
+  !-----------------------------------------------------------------------
+  subroutine destroy_5d_rpt(arr)
+  implicit none
+  real(r8), pointer :: arr(:,:,:,:,:)
+
+  deallocate(arr)
+
+  end subroutine destroy_5d_rpt
+  !-----------------------------------------------------------------------
+  subroutine destroy_6d_rpt(arr)
+  implicit none
+  real(r8), pointer :: arr(:,:,:,:,:,:)
+
+  deallocate(arr)
+
+  end subroutine destroy_6d_rpt
+  !-----------------------------------------------------------------------
+  subroutine destroy_7d_rpt(arr)
+  implicit none
+  real(r8), pointer :: arr(:,:,:,:,:,:,:)
+
+  deallocate(arr)
+
+  end subroutine destroy_7d_rpt
+  !-----------------------------------------------------------------------
+  subroutine destroy_1d_ipt(arr)
+  implicit none
+  integer, pointer :: arr(:)
+
+  deallocate(arr)
+
+  end subroutine destroy_1d_ipt
+  !-----------------------------------------------------------------------
+  subroutine destroy_2d_ipt(arr)
+  implicit none
+  integer, pointer :: arr(:,:)
+
+  deallocate(arr)
+
+  end subroutine destroy_2d_ipt
+  !-----------------------------------------------------------------------
+  subroutine destroy_3d_ipt(arr)
+  implicit none
+  integer, pointer :: arr(:,:,:)
+
+  deallocate(arr)
+
+  end subroutine destroy_3d_ipt
+  !-----------------------------------------------------------------------
+  subroutine destroy_4d_ipt(arr)
+  implicit none
+  integer, pointer :: arr(:,:,:,:)
+
+  deallocate(arr)
+
+  end subroutine destroy_4d_ipt
+  !-----------------------------------------------------------------------
+  subroutine destroy_5d_ipt(arr)
+  implicit none
+  integer, pointer :: arr(:,:,:,:,:)
+
+  deallocate(arr)
+
+  end subroutine destroy_5d_ipt
+  !-----------------------------------------------------------------------
+  subroutine destroy_6d_ipt(arr)
+  implicit none
+  integer, pointer :: arr(:,:,:,:,:,:)
+
+  deallocate(arr)
+
+  end subroutine destroy_6d_ipt
+  !-----------------------------------------------------------------------
+  subroutine destroy_7d_ipt(arr)
+  implicit none
+  integer, pointer :: arr(:,:,:,:,:,:,:)
+
+  deallocate(arr)
+
+  end subroutine destroy_7d_ipt
+  !-----------------------------------------------------------------------
+  subroutine destroy_1d_lpt(arr)
+  implicit none
+  logical, pointer :: arr(:)
+
+  deallocate(arr)
+
+  end subroutine destroy_1d_Lpt
+
+
+  !-----------------------------------------------------------------------
+  subroutine destroy_1d_charpt(arr)
+  implicit none
+  character(len=*), pointer :: arr(:)
+
+  deallocate(arr)
+
+  end subroutine destroy_1d_charpt
+
+  !-----------------------------------------------------------------------
+  subroutine destroy_2d_charpt(arr)
+  implicit none
+  character(len=*), pointer :: arr(:,:)
+
+  deallocate(arr)
+
+  end subroutine destroy_2d_charpt
+  !-----------------------------------------------------------------------
+  subroutine destroy_3d_charpt(arr)
+  implicit none
+  character(len=*), pointer :: arr(:,:,:)
+
+  deallocate(arr)
+
+  end subroutine destroy_3d_charpt
+
+  !-----------------------------------------------------------------------
+  subroutine destroy_4d_charpt(arr)
+  implicit none
+  character(len=*), pointer :: arr(:,:,:,:)
+
+  deallocate(arr)
+
+  end subroutine destroy_4d_charpt
+
 end module abortutils

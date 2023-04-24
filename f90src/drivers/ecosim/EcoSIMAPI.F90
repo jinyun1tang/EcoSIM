@@ -9,6 +9,7 @@ module EcoSIMAPI
   use MicBGCAPI    , only : MicrobeModel, MicAPI_Init, MicAPI_cleanup
   use TrnsfrMod    , only : trnsfr
   use TrnsfrsMod   , only : trnsfrs
+  use EcoSIMCtrlMod, only : lverb
   use WatsubMod    , only : watsub
 implicit none
 
@@ -58,7 +59,6 @@ contains
   !   CALCULATE GAS AND SOLUTE FLUXES IN 'TRNSFR'
   !
   if(lverb)WRITE(*,334)'TRN'
-  !    if(I>=170)print*,TKS(0,NVN,NHW)
   call start_timer(t1)
   CALL TRNSFR(I,J,NHW,NHE,NVN,NVS)
   call end_timer('TRN',t1)
@@ -93,33 +93,5 @@ contains
   end subroutine Run_EcoSIM_one_step
 
 
-!------------------------------------------------------------------------
 
-  subroutine SetMesh(NHW,NVN,NHE,NVS)
-
-  use GridConsts, only : JX,JY,JZ,JH,JV,JD
-!  set up the landscape rectangular mesh
-!  beginning(NHW,NVN)
-!  o--------------------------x
-!  |                          |
-!  |                          |
-!  |                          |
-!  |                          |
-!  x--------------------------o
-!                             end (NHE,NVS)
-
-  implicit none
-  integer, intent(in) :: NHW   !upper corner x index
-  integer, intent(in) :: NVN   !upper corner y index
-  integer, intent(in) :: NHE   !lower corner x index
-  integer, intent(in) :: NVS   !lower corner y index
-  JX=(NHE-NHW)+2
-  JY=(NVS-NVN)+2
-  JZ=20
-  JH=JX+1
-  JV=JY+1
-  JD=JZ+1
-  print*,'grid size'
-  print*,'JX=',JX,'JY=',JY
-  end subroutine SetMesh
 end module EcoSIMAPI

@@ -46,8 +46,8 @@ module shr_infnan_mod
 !---------------------------------------------------------------------
 
 use data_kind_mod, only: &
-     r4 => SHR_KIND_R4, &
-     r8 => SHR_KIND_R8
+     r4 => DAT_KIND_R4, &
+     r8 => DAT_KIND_R8
 
 #ifdef HAVE_IEEE_ARITHMETIC
 
@@ -58,7 +58,7 @@ use, intrinsic :: ieee_arithmetic, only: &
 #else
 
 ! Integers of correct size for bit patterns below.
-use data_kind_mod, only: i4 => shr_kind_i4, i8 => shr_kind_i8
+use data_kind_mod, only: i4 => DAT_Kind_i4, i8 => DAT_Kind_i8
 
 #endif
 

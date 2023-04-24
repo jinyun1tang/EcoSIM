@@ -1,89 +1,129 @@
- subroutine readnamelist(nmlfile,runfile, case_name, &
-  prefix,do_rgres,LYRG,lverb,nmicbguilds)
+ subroutine readnamelist(nmlfile, case_name, prefix,LYRG,nmicbguilds)
 !!
 ! Description:
 ! read control namelist
-  use abortutils, only : endrun
-
-  use ForcWriterMod, only : bgc_forc_conf,do_bgcforc_write
+  use abortutils     , only : endrun
+  use EcoSIMConfig   , only : transport_on,column_mode, do_instequil
+  use EcoSIMConfig   , only : finidat,nrevsn,brnch_retain_casename
+  use ForcWriterMod  , only : bgc_forc_conf,do_bgcforc_write
+  use fileUtil       , only : iulog
+  use EcoSIMHistMod  , only : DATAC
+  use EcoSIMCtrlMod
+  use HistFileMod
+  use RestartMod     , only : rest_frq,rest_opt
   implicit none
-      character(len=*), intent(in) :: nmlfile
-      character(len=80), intent(out) :: runfile
-      character(len=36)    , intent(out) :: case_name
-      character(len=80)    , intent(out) :: prefix
-      logical              , intent(out) :: do_rgres
-      integer              , intent(out) :: LYRG
-      logical              , intent(out) :: lverb
-      integer              , intent(out) :: nmicbguilds
   character(len=*), parameter :: mod_filename = __FILE__
-      integer, parameter :: stdout = 6
+  character(len=*), intent(in) :: nmlfile
+  character(len=36)    , intent(out) :: case_name
+  character(len=80)    , intent(out) :: prefix
+  integer              , intent(out) :: LYRG
+  integer              , intent(out) :: nmicbguilds
 
-      logical :: do_regression_test
-      integer :: num_of_simdays
-      logical :: lverbose
-      integer :: num_microbial_guilds
-      integer :: do_doy,do_year,do_layer
-      character(len=64) :: bgc_fname
-      namelist /ecosys/case_name, prefix, runfile, do_regression_test, &
-      num_of_simdays,lverbose,num_microbial_guilds
+  logical :: do_regression_test
+  integer :: num_of_simdays
+  logical :: lverbose
+  integer :: num_microbial_guilds
+  integer :: do_doy,do_year,do_layer
+  character(len=64) :: bgc_fname
 
-      logical :: laddband
-      namelist /bbgcforc/do_bgcforc_write,do_year,do_doy,laddband,do_layer,&
-        bgc_fname
+  namelist /ecosim/case_name, prefix, do_regression_test, &
+    num_of_simdays,lverbose,num_microbial_guilds,transport_on,column_mode,&
+    do_instequil,salt_model, pft_file_in,grid_file_in,pft_mgmt_in, clm_factor_in,&
+    clm_file_in,soil_mgmt_in,hist_config,sim_yyyymmdd,forc_periods,&
+    NPXS,NPYS,JOUTS,IOUTS,KOUTS,continue_run,visual_out,restart_out,&
+    finidat,nrevsn,brnch_retain_casename
+  
+  namelist /ecosim/hist_nhtfrq,hist_mfilt,hist_fincl1,hist_fincl2,hist_yrclose, &
+    do_budgets,rest_frq,rest_opt,diag_frq,diag_opt
 
-      !local variables
-      character(len=256) :: ioerror_msg
-      integer :: rc, fu
-      integer :: nml_error
+  logical :: laddband
+  namelist /bbgcforc/do_bgcforc_write,do_year,do_doy,laddband,do_layer,&
+    bgc_fname
 
-      num_of_simdays=-1
-      do_year=-1
-      do_doy=0
-      do_layer=1
-      laddband=.false.
-      do_regression_test=.false.
-      lverbose=.false.
-      num_microbial_guilds=1
-      do_bgcforc_write=.false.
-      bgc_fname='bbforc.nc'
-      inquire (file=nmlfile, iostat=rc)
-      if (rc /= 0) then
-        write (stdout, '(3a)') 'Error: input file ', trim(nmlfile), &
-      ' does not exist.'
-        call endrun('stopped in readnml', 25)
-      end if
+  !local variables
+  character(len=256) :: ioerror_msg
+  integer :: rc, fu
+  integer :: nml_error
 
-      open (action='read', file=nmlfile, iostat=rc, newunit=fu)
-      if (rc /= 0) then
-        write (stdout, '(2a)') 'Error openning input file "', &
-      trim(nmlfile)
-        call endrun('stopped in readnml', 32)
-      end if
+  continue_run=.false.
+  NPXS=30   !number of cycles per hour for water,heat,solute flux calcns
+  NPYS=20   !number of cycles per NPX for gas flux calcns
+  JOUTS=1   !frequency on hourly scale
+  IOUTS=1   !frequency on daily scale
+  KOUTS=500 !frequency on restart file writing
 
-      read(unit=fu, nml=ecosys, iostat=nml_error, iomsg=ioerror_msg)
-      if (nml_error /= 0) then
-         write(stdout,'(a)')"ERROR reading ecosys namelist "
-         call endrun('stopped in readnml', 38)
-      end if
+  visual_out =.false.
+  restart_out=.false.  
+  do_budgets =.false.
+  finidat=' '
+  nrevsn = ' '
 
-      read(unit=fu, nml=bbgcforc, iostat=nml_error, iomsg=ioerror_msg)
-      if (nml_error /= 0) then
-         write(stdout,'(a)')"ERROR reading bbgcforc namelist "
-         call endrun('stopped in readnml', 38)
-      end if
+  brnch_retain_casename=.false.
+  hist_config='NO'
+  hist_yrclose=.false.
+  sim_yyyymmdd='18000101'
+  forc_periods=(/1980,1980,1,1981,1988,2,1989,2008,1/)
+
+  num_of_simdays=-1
+  do_year=-1
+  do_doy=0
+  do_layer=1
+  salt_model=.false.
+  laddband=.false.
+  do_regression_test=.false.
+  lverbose=.false.
+  num_microbial_guilds=1
+  do_bgcforc_write=.false.
+  bgc_fname='bbforc.nc'
+  do_instequil=.false.
+
+  clm_factor_in=''
+  pft_file_in=''
+  grid_file_in=''
+  pft_mgmt_in=''
+  clm_file_in=''
+  soil_mgmt_in=''
+
+  inquire (file=nmlfile, iostat=rc)
+  if (rc /= 0) then
+    write (iulog, '(3a)') 'Error: input file ', trim(nmlfile), &
+  ' does not exist.'
+    call endrun('stopped in '//trim(mod_filename), __LINE__)
+  end if
+
+  open (action='read', file=nmlfile, iostat=rc, newunit=fu)
+  if (rc /= 0) then
+    write (iulog, '(2a)') 'Error openning input file "', &
+  trim(nmlfile)
+    call endrun('stopped in '//trim(mod_filename), __LINE__)
+  end if
+
+  read(unit=fu, nml=ecosim, iostat=nml_error, iomsg=ioerror_msg)
+  if (nml_error /= 0) then
+     write(iulog,'(a)')"ERROR reading ecosim namelist "
+     call endrun('stopped in '//trim(mod_filename), __LINE__)
+  end if
+
+  read(unit=fu, nml=bbgcforc, iostat=nml_error, iomsg=ioerror_msg)
+  if (nml_error /= 0) then
+     write(iulog,'(a)')"ERROR reading bbgcforc namelist "
+     call endrun('stopped in '//trim(mod_filename), __LINE__)
+  end if
 
   close(fu)
   if (.true.) then
-    write(stdout, *)
-    write(stdout, *) '--------------------'
-    write(stdout,ecosys)
-    write(stdout, *)
-    write(stdout, *) '--------------------'
-    write(stdout,bbgcforc)
-    write(stdout, *)
-    write(stdout, *) '--------------------'
+    write(iulog, *)
+    write(iulog, *) '--------------------'
+    write(iulog,ecosim)
+    write(iulog, *)
+    write(iulog, *) '--------------------'
+    write(iulog,bbgcforc)
+    write(iulog, *)
+    write(iulog, *) '--------------------'
 
   endif
+  call etimer%config_restart(rest_frq,rest_opt)
+  call etimer%config_diag(diag_frq,diag_opt)
   if(do_bgcforc_write)then
     bgc_forc_conf%doy =do_doy
     bgc_forc_conf%year=do_year
@@ -96,5 +136,7 @@
   lverb=lverbose
   nmicbguilds=num_microbial_guilds
 
+  !below is a temporary setup
 
+  DATAC(21:30,1,1)=hist_config
 end subroutine readnamelist
