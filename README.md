@@ -2,6 +2,10 @@
 
 A biogeochemical modeling library spins off the ecosys model.
 
+## Download
+
+git clone --recursive https://github.com/jinyun1tang/EcoSIM
+
 ## Building
 
 make config CC=icc CXX=icpc FC=ifort F90=1
