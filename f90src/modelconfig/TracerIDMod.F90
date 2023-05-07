@@ -144,6 +144,8 @@ implicit none
    integer :: nptracers    !number of precipitate tracers
    integer :: nxtracers    !number of exchangeable tracers
    integer :: nutracers    !number of nutrient tracers
+   integer :: nfertN
+   integer :: nfertNb
   end type trc_def_type
 
   type(trc_def_type), public :: trc_confs
@@ -342,7 +344,8 @@ implicit none
   trc_confs%nptracers=idsp_end-idsp_beg+1
   trc_confs%nxtracers=idx_end-idx_beg+1
   trc_confs%nutracers=ids_nuts_end-ids_nut_beg+1
-
+  trc_confs%nfertN    = ifertn_end-ifertn_beg+1
+  trc_confs%nfertNb   = ifertnb_end-ifertnb_beg+1
   end subroutine InitTracerIDs
 end module TracerIDMod
 

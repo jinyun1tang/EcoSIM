@@ -759,7 +759,8 @@ module ncdio_pio
 
     call check_var(ncid, trim(varname), vardesc, readvar)
 
-    call check_ret( nf90_put_var(ncid%fh, vardesc%varid, data),'ncd_putvar_real_sp_all_2d')
+    call check_ret( nf90_put_var(ncid%fh, vardesc%varid, data),&
+      trim(mod_filename)//'::ncd_putvar_real_sp_all_2d::'//trim(varname))
 
     end subroutine ncd_putvar_real_sp_all_2d
 !*****************************************************************
@@ -929,7 +930,8 @@ module ncdio_pio
 
     call check_var(ncid, trim(varname), vardesc, readvar)
 
-    call check_ret( nf90_put_var(ncid%fh, vardesc%varid, data),'ncd_putvar_real_sp_all_5d')
+    call check_ret( nf90_put_var(ncid%fh, vardesc%varid, data), &
+      trim(mod_filename)//'::ncd_putvar_real_sp_all_5d::'//trim(varname))
   end subroutine ncd_putvar_real_sp_all_5d  
 !----------------------------------------------------------------------
   subroutine ncd_putvar_real_sp_3d(ncid, varname, rec, data)

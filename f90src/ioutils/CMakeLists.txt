@@ -9,10 +9,8 @@ set(IOUTILS_SOURCES
     restUtilMod.F90
     RestartMod.F90
 	readimod.F90
-	readqmod.F90
 	readsmod.F90
 	routp.F90
-	routqMod.F90
 	routs.F90
 	split.F90
 	splitc.F90

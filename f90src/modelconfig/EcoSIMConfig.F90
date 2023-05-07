@@ -11,7 +11,7 @@ implicit none
   integer :: IFLGW                 !flag for raising Z0G with vegn
 
   character(len=256), public :: rpntdir = '.'
-  character(len=256), public :: rpntfil = 'rpointer.lnd'
+  character(len=256), public :: rpntfil = 'rpointer.esim'
   character(len=16) , public :: inst_suffix=''
 
   integer, parameter :: ndbiomcpc = 2 !# of microbial residue components

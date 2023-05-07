@@ -202,7 +202,8 @@ module readiMod
 ! RCHGDG=lower boundary conditions for water flow
 ! DHI=width of each W-E landscape column
 ! DVI=width of each N-S landscape row
-!
+
+! assuming only one grid, at the moment
   loc=1
   call ncd_getvar(grid_nfid,'ALATG',loc,ALATG)
   call ncd_getvar(grid_nfid,'ALTIG',loc,ALTIG)

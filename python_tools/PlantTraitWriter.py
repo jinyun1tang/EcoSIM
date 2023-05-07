@@ -282,7 +282,7 @@ varname_dict={
 'VRNXI':'hour requirement for autumn leafoff:h:f4',
 'WDLF':'leaf length vs width ratio:none:f4',
 'PB':'nonstructural C concentration needed for branching:gC gC-1:f4',
-'GROUPX':'initial plant maturity group:none:f4',
+'GROUPX':'initial plant maturity group, aka minimum number of vegetative nodes initiated before floral:none:f4',
 'XTLI':'node number in seed at planting:none:f4',
 'XDL':'critical daylength for phenological progress:h:f4',
 'XPPD':'photoperiod sensitivity, i.e. difference between current and critical daylengths used to calculate  phenological progress:node h-1:f4',

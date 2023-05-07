@@ -853,7 +853,7 @@ module restUtilMod
 
       call ncd_defvar(ncid=ncid, varname=trim(varname), xtype=lxtype, &
          dim1name=trim(dim1name), dim2name=trim(dim2name), dim3name=trim(dim3name), &
-         dim4name=trim(dim4name), dim5name=trim(dim4name),long_name=trim(long_name), units=units)
+         dim4name=trim(dim4name), dim5name=trim(dim5name),long_name=trim(long_name), units=units)
 
       status = nf90_inq_varid(ncid%fh,trim(varname),varid)
 
@@ -1104,19 +1104,23 @@ module restUtilMod
 
   if (flag=='read')then
     if(present(iflgt))then
-      IF(IFLGT(NY,NX)>0)THEN
-        DO NZ=1,NP(NY,NX)
-          if(present(IFLGC))then      
-            IF(IFLGC(NZ,NY,NX)/=0)THEN
-              ip=get_pft(NZ,NY,NX)
-              dat_arp(NZ,NY,NX)=datip_1d(ip)            
-            endif
-          else
-            ip=get_pft(NZ,NY,NX)
-            dat_arp(NZ,NY,NX)=datip_1d(ip)            
+      DO NX=NHW,NHE
+        DO NY=NVN,NVS    
+          IF(IFLGT(NY,NX)>0)THEN
+            DO NZ=1,NP(NY,NX)
+              if(present(IFLGC))then      
+                IF(IFLGC(NZ,NY,NX)/=0)THEN
+                  ip=get_pft(NZ,NY,NX)
+                  dat_arp(NZ,NY,NX)=datip_1d(ip)            
+                endif
+              else
+                ip=get_pft(NZ,NY,NX)
+                dat_arp(NZ,NY,NX)=datip_1d(ip)            
+              endif
+            ENDDO 
           endif
-        ENDDO 
-      endif
+        enddo
+      enddo    
     else
       DO NX=NHW,NHE
         DO NY=NVN,NVS
@@ -1130,26 +1134,30 @@ module restUtilMod
   else if(flag=='write') then
     datip_1d=ispval
     if(present(iflgt))then
-      IF(IFLGT(NY,NX)>0)THEN
-        DO NZ=1,NP(NY,NX)
-          if(present(IFLGC))then      
-            IF(IFLGC(NZ,NY,NX)/=0)THEN
-              ip=get_pft(NZ,NY,NX)
-              datip_1d(ip)=dat_arp(NZ,NY,NX)
-            endif
-          else
-            ip=get_pft(NZ,NY,NX)
-            datip_1d(ip)=dat_arp(NZ,NY,NX)
+      DO NX=NHW,NHE
+        DO NY=NVN,NVS    
+          IF(IFLGT(NY,NX)>0)THEN
+            DO NZ=1,NP(NY,NX)
+              if(present(IFLGC))then      
+                IF(IFLGC(NZ,NY,NX)/=0)THEN
+                  ip=get_pft(NZ,NY,NX)
+                  datip_1d(ip)=dat_arp(NZ,NY,NX)
+                endif
+              else
+                ip=get_pft(NZ,NY,NX)
+                datip_1d(ip)=dat_arp(NZ,NY,NX)
+              endif
+            ENDDO 
           endif
-        ENDDO 
-      endif
+        enddo
+      enddo  
     else
       DO NX=NHW,NHE
          DO NY=NVN,NVS
-         DO NZ=1,NP(NY,NX)
-            ip=get_pft(NZ,NY,NX)
-            datip_1d(ip)=dat_arp(NZ,NY,NX)
-         ENDDO
+           DO NZ=1,NP(NY,NX)
+             ip=get_pft(NZ,NY,NX)
+             datip_1d(ip)=dat_arp(NZ,NY,NX)
+           ENDDO
          ENDDO
       ENDDO
     endif
@@ -1170,23 +1178,27 @@ module restUtilMod
 
   if (flag=='read')then
     if(present(iflgt))then
-      IF(IFLGT(NY,NX)>0)THEN
-        DO NZ=1,NP(NY,NX)
-          if(present(IFLGC))then      
-            IF(IFLGC(NZ,NY,NX)/=0)THEN
-              ip=get_pft(NZ,NY,NX)
-              DO NN=1,SIZE(dat_arp,1)
-                dat_arp(NN,NZ,NY,NX)=datip_2d(ip,NN)            
-              enddo
-            endif
-          else
-            ip=get_pft(NZ,NY,NX)
-            DO NN=1,SIZE(dat_arp,1)
-              dat_arp(NN,NZ,NY,NX)=datip_2d(ip,NN)            
-            ENDDO
+      DO NX=NHW,NHE
+        DO NY=NVN,NVS    
+          IF(IFLGT(NY,NX)>0)THEN
+            DO NZ=1,NP(NY,NX)
+              if(present(IFLGC))then      
+                IF(IFLGC(NZ,NY,NX)/=0)THEN
+                  ip=get_pft(NZ,NY,NX)
+                  DO NN=1,SIZE(dat_arp,1)
+                    dat_arp(NN,NZ,NY,NX)=datip_2d(ip,NN)            
+                  enddo
+                endif
+              else
+                ip=get_pft(NZ,NY,NX)
+                DO NN=1,SIZE(dat_arp,1)
+                  dat_arp(NN,NZ,NY,NX)=datip_2d(ip,NN)            
+                ENDDO
+              endif
+            ENDDO 
           endif
-        ENDDO 
-      endif
+        enddo
+      enddo    
     else
       DO NX=NHW,NHE
         DO NY=NVN,NVS
@@ -1202,23 +1214,28 @@ module restUtilMod
   else if(flag=='write') then
     datip_2d=ispval
     if(present(iflgt))then
-      IF(IFLGT(NY,NX)>0)THEN
-        DO NZ=1,NP(NY,NX)
-          if(present(IFLGC))then      
-            IF(IFLGC(NZ,NY,NX)/=0)THEN
-              ip=get_pft(NZ,NY,NX)
-              DO NN=1,SIZE(dat_arp,1)              
-                datip_2d(ip,NN)=dat_arp(NN,NZ,NY,NX)
-              enddo
-            endif
-          else
-            ip=get_pft(NZ,NY,NX)
-            DO NN=1,SIZE(dat_arp,1)
-              datip_2d(ip,NN)=dat_arp(NN,NZ,NY,NX)
-            enddo
+      DO NX=NHW,NHE
+        DO NY=NVN,NVS
+
+          IF(IFLGT(NY,NX)>0)THEN      
+            DO NZ=1,NP(NY,NX)
+              if(present(IFLGC))then      
+                IF(IFLGC(NZ,NY,NX)/=0)THEN
+                  ip=get_pft(NZ,NY,NX)
+                  DO NN=1,SIZE(dat_arp,1)              
+                    datip_2d(ip,NN)=dat_arp(NN,NZ,NY,NX)
+                  enddo
+                endif
+              else
+                ip=get_pft(NZ,NY,NX)
+                DO NN=1,SIZE(dat_arp,1)
+                  datip_2d(ip,NN)=dat_arp(NN,NZ,NY,NX)
+                enddo
+              endif
+            ENDDO 
           endif
-        ENDDO 
-      endif
+        enddo
+      enddo  
     else
       DO NX=NHW,NHE
          DO NY=NVN,NVS
@@ -1248,27 +1265,31 @@ module restUtilMod
 
   if (flag=='read')then
     if(present(iflgt))then
-      IF(IFLGT(NY,NX)>0)THEN
-        DO NZ=1,NP(NY,NX)
-          if(present(IFLGC))then      
-            IF(IFLGC(NZ,NY,NX)/=0)THEN
-              ip=get_pft(NZ,NY,NX)
-              DO N2=1,SIZE(dat_arp,2)
-                DO N1=1,SIZE(dat_arp,1)
-                  dat_arp(N1,N2,NZ,NY,NX)=datip_3d(ip,N1,N2)            
+      DO NX=NHW,NHE
+        DO NY=NVN,NVS    
+          IF(IFLGT(NY,NX)>0)THEN
+            DO NZ=1,NP(NY,NX)
+              if(present(IFLGC))then      
+                IF(IFLGC(NZ,NY,NX)/=0)THEN
+                  ip=get_pft(NZ,NY,NX)
+                  DO N2=1,SIZE(dat_arp,2)
+                    DO N1=1,SIZE(dat_arp,1)
+                      dat_arp(N1,N2,NZ,NY,NX)=datip_3d(ip,N1,N2)            
+                    ENDDO
+                  enddo
+                endif
+              else
+                ip=get_pft(NZ,NY,NX)
+                DO N2=1,SIZE(dat_arp,2)
+                  DO N1=1,SIZE(dat_arp,1)
+                    dat_arp(N1,N2,NZ,NY,NX)=datip_3d(ip,N1,N2)            
+                  ENDDO  
                 ENDDO
-              enddo
-            endif
-          else
-            ip=get_pft(NZ,NY,NX)
-            DO N2=1,SIZE(dat_arp,2)
-              DO N1=1,SIZE(dat_arp,1)
-                dat_arp(N1,N2,NZ,NY,NX)=datip_3d(ip,N1,N2)            
-              ENDDO  
-            ENDDO
+              endif
+            ENDDO 
           endif
-        ENDDO 
-      endif
+        enddo
+      enddo    
     else
       DO NX=NHW,NHE
         DO NY=NVN,NVS
@@ -1286,27 +1307,31 @@ module restUtilMod
   else if(flag=='write') then
     datip_3d=ispval
     if(present(iflgt))then
-      IF(IFLGT(NY,NX)>0)THEN
-        DO NZ=1,NP(NY,NX)
-          if(present(IFLGC))then      
-            IF(IFLGC(NZ,NY,NX)/=0)THEN
-              ip=get_pft(NZ,NY,NX)
-              DO N2=1,SIZE(dat_arp,2)
-                DO N1=1,SIZE(dat_arp,1)
-                  datip_3d(ip,N1,N2)=dat_arp(N1,N2,NZ,NY,NX)
-                ENDDO  
-              enddo
-            endif
-          else
-            ip=get_pft(NZ,NY,NX)
-            DO N2=1,SIZE(dat_arp,2)
-              DO N1=1,SIZE(dat_arp,1)
-                datip_3d(ip,N1,N2)=dat_arp(N1,N2,NZ,NY,NX)
-              ENDDO  
-            enddo
+      DO NX=NHW,NHE
+        DO NY=NVN,NVS    
+          IF(IFLGT(NY,NX)>0)THEN
+            DO NZ=1,NP(NY,NX)
+              if(present(IFLGC))then      
+                IF(IFLGC(NZ,NY,NX)/=0)THEN
+                  ip=get_pft(NZ,NY,NX)
+                  DO N2=1,SIZE(dat_arp,2)
+                    DO N1=1,SIZE(dat_arp,1)
+                      datip_3d(ip,N1,N2)=dat_arp(N1,N2,NZ,NY,NX)
+                    ENDDO  
+                  enddo
+                endif
+              else
+                ip=get_pft(NZ,NY,NX)
+                DO N2=1,SIZE(dat_arp,2)
+                  DO N1=1,SIZE(dat_arp,1)
+                    datip_3d(ip,N1,N2)=dat_arp(N1,N2,NZ,NY,NX)
+                  ENDDO  
+                enddo
+              endif
+            ENDDO 
           endif
-        ENDDO 
-      endif
+        enddo
+      enddo    
     else
       DO NX=NHW,NHE
          DO NY=NVN,NVS
@@ -1338,19 +1363,23 @@ module restUtilMod
 
   if (flag=='read')then
     if(present(iflgt))then
-      IF(IFLGT(NY,NX)>0)THEN
-        DO NZ=1,NP(NY,NX)
-          if(present(IFLGC))then      
-            IF(IFLGC(NZ,NY,NX)/=0)THEN
-              ip=get_pft(NZ,NY,NX)
-              dat_arp(NZ,NY,NX)=datrp_1d(ip)            
-            endif
-          else
-            ip=get_pft(NZ,NY,NX)
-            dat_arp(NZ,NY,NX)=datrp_1d(ip)            
+      DO NX=NHW,NHE
+        DO NY=NVN,NVS    
+          IF(IFLGT(NY,NX)>0)THEN
+            DO NZ=1,NP(NY,NX)
+              if(present(IFLGC))then      
+                IF(IFLGC(NZ,NY,NX)/=0)THEN
+                  ip=get_pft(NZ,NY,NX)
+                  dat_arp(NZ,NY,NX)=datrp_1d(ip)            
+                endif
+              else
+                ip=get_pft(NZ,NY,NX)
+                dat_arp(NZ,NY,NX)=datrp_1d(ip)            
+              endif
+            ENDDO 
           endif
-        ENDDO 
-      endif
+        enddo
+      enddo    
     else
       DO NX=NHW,NHE
         DO NY=NVN,NVS
@@ -1362,21 +1391,25 @@ module restUtilMod
       ENDDO
     endif
   else if(flag=='write') then
-    datrp_1d=spval
+    datrp_1d=spval    
     if(present(iflgt))then
-      IF(IFLGT(NY,NX)>0)THEN
-        DO NZ=1,NP(NY,NX)
-          if(present(IFLGC))then      
-            IF(IFLGC(NZ,NY,NX)/=0)THEN
-              ip=get_pft(NZ,NY,NX)
-              datrp_1d(ip)=dat_arp(NZ,NY,NX)
-            endif
-          else
-            ip=get_pft(NZ,NY,NX)
-            datrp_1d(ip)=dat_arp(NZ,NY,NX)
+      DO NX=NHW,NHE
+        DO NY=NVN,NVS
+          IF(IFLGT(NY,NX)>0)THEN
+            DO NZ=1,NP(NY,NX)
+              if(present(IFLGC))then      
+                IF(IFLGC(NZ,NY,NX)/=0)THEN
+                  ip=get_pft(NZ,NY,NX)
+                  datrp_1d(ip)=dat_arp(NZ,NY,NX)
+                endif
+              else
+                ip=get_pft(NZ,NY,NX)
+                datrp_1d(ip)=dat_arp(NZ,NY,NX)
+              endif
+            ENDDO 
           endif
-        ENDDO 
-      endif
+        enddo
+      enddo    
     else
       DO NX=NHW,NHE
          DO NY=NVN,NVS
@@ -1404,23 +1437,27 @@ module restUtilMod
 
   if (flag=='read')then
     if(present(iflgt))then
-      IF(IFLGT(NY,NX)>0)THEN
-        DO NZ=1,NP(NY,NX)
-          if(present(IFLGC))then      
-            IF(IFLGC(NZ,NY,NX)/=0)THEN
-              ip=get_pft(NZ,NY,NX)              
-              DO NN=1,SIZE(dat_arp,1)
-                dat_arp(NN,NZ,NY,NX)=datrp_2d(ip,NN)            
-              enddo                
-            endif
-          else
-            ip=get_pft(NZ,NY,NX)
-            DO NN=1,SIZE(dat_arp,1)
-              dat_arp(NN,NZ,NY,NX)=datrp_2d(ip,NN)            
-            enddo                
+      DO NX=NHW,NHE
+        DO NY=NVN,NVS
+          IF(IFLGT(NY,NX)>0)THEN
+            DO NZ=1,NP(NY,NX)
+              if(present(IFLGC))then      
+                IF(IFLGC(NZ,NY,NX)/=0)THEN
+                  ip=get_pft(NZ,NY,NX)              
+                  DO NN=1,SIZE(dat_arp,1)
+                    dat_arp(NN,NZ,NY,NX)=datrp_2d(ip,NN)            
+                  enddo                
+                endif
+              else
+                ip=get_pft(NZ,NY,NX)
+                DO NN=1,SIZE(dat_arp,1)
+                  dat_arp(NN,NZ,NY,NX)=datrp_2d(ip,NN)            
+                enddo                
+              endif
+            ENDDO 
           endif
-        ENDDO 
-      endif
+        enddo
+      enddo    
     else
       DO NX=NHW,NHE
         DO NY=NVN,NVS
@@ -1436,30 +1473,34 @@ module restUtilMod
   else if(flag=='write') then
     datrp_2d=spval
     if(present(iflgt))then
-      IF(IFLGT(NY,NX)>0)THEN
-        DO NZ=1,NP(NY,NX)
-          if(present(IFLGC))then      
-            IF(IFLGC(NZ,NY,NX)/=0)THEN
-              ip=get_pft(NZ,NY,NX)
-              DO NN=1,SIZE(dat_arp,1)
-                dat_arp(NN,NZ,NY,NX)=datrp_2d(ip,NN)            
-              enddo                
-            endif
-          else
-            ip=get_pft(NZ,NY,NX)
-            DO NN=1,SIZE(dat_arp,1)
-              dat_arp(NN,NZ,NY,NX)=datrp_2d(ip,NN)            
-            enddo                
+      DO NX=NHW,NHE
+        DO NY=NVN,NVS
+          IF(IFLGT(NY,NX)>0)THEN
+            DO NZ=1,NP(NY,NX)
+              if(present(IFLGC))then      
+                IF(IFLGC(NZ,NY,NX)/=0)THEN
+                  ip=get_pft(NZ,NY,NX)
+                  DO NN=1,SIZE(dat_arp,1)
+                    datrp_2d(ip,NN)=dat_arp(NN,NZ,NY,NX)            
+                  enddo                
+                endif
+              else
+                ip=get_pft(NZ,NY,NX)
+                DO NN=1,SIZE(dat_arp,1)
+                  datrp_2d(ip,NN)=dat_arp(NN,NZ,NY,NX)            
+                enddo                
+              endif
+            ENDDO 
           endif
-        ENDDO 
-      endif
+        enddo
+      enddo    
     else
       DO NX=NHW,NHE
          DO NY=NVN,NVS
            DO NZ=1,NP(NY,NX)
              ip=get_pft(NZ,NY,NX)
              DO NN=1,SIZE(dat_arp,1)
-               dat_arp(NN,NZ,NY,NX)=datrp_2d(ip,NN)            
+               datrp_2d(ip,NN)=dat_arp(NN,NZ,NY,NX)            
              enddo                
            ENDDO
          ENDDO
@@ -1482,27 +1523,31 @@ module restUtilMod
 
   if (flag=='read')then
     if(present(iflgt))then
-      IF(IFLGT(NY,NX)>0)THEN
-        DO NZ=1,NP(NY,NX)
-          if(present(IFLGC))then      
-            IF(IFLGC(NZ,NY,NX)/=0)THEN
-              ip=get_pft(NZ,NY,NX)              
-             DO N2=1,SIZE(dat_arp,2)
-               DO N1=1,SIZE(dat_arp,1)
-                 dat_arp(N1,N2,NZ,NY,NX)=datrp_3d(ip,N1,N2)            
-               enddo  
-             enddo                
-            endif
-          else
-            ip=get_pft(NZ,NY,NX)
-             DO N2=1,SIZE(dat_arp,2)
-               DO N1=1,SIZE(dat_arp,1)
-                 dat_arp(N1,N2,NZ,NY,NX)=datrp_3d(ip,N1,N2)            
-               enddo  
-             enddo                
+      DO NX=NHW,NHE
+        DO NY=NVN,NVS    
+          IF(IFLGT(NY,NX)>0)THEN
+            DO NZ=1,NP(NY,NX)
+              if(present(IFLGC))then      
+                IF(IFLGC(NZ,NY,NX)/=0)THEN
+                  ip=get_pft(NZ,NY,NX)              
+                DO N2=1,SIZE(dat_arp,2)
+                  DO N1=1,SIZE(dat_arp,1)
+                    dat_arp(N1,N2,NZ,NY,NX)=datrp_3d(ip,N1,N2)            
+                  enddo  
+                enddo                
+                endif
+              else
+                ip=get_pft(NZ,NY,NX)
+                DO N2=1,SIZE(dat_arp,2)
+                  DO N1=1,SIZE(dat_arp,1)
+                    dat_arp(N1,N2,NZ,NY,NX)=datrp_3d(ip,N1,N2)            
+                  enddo  
+                enddo                
+              endif
+            ENDDO 
           endif
-        ENDDO 
-      endif
+        enddo
+      enddo    
     else
       DO NX=NHW,NHE
         DO NY=NVN,NVS
@@ -1520,27 +1565,31 @@ module restUtilMod
   else if(flag=='write') then
     datrp_3d=spval
     if(present(iflgt))then
-      IF(IFLGT(NY,NX)>0)THEN
-        DO NZ=1,NP(NY,NX)
-          if(present(IFLGC))then      
-            IF(IFLGC(NZ,NY,NX)/=0)THEN
-              ip=get_pft(NZ,NY,NX)
-             DO N2=1,SIZE(dat_arp,2)
-               DO N1=1,SIZE(dat_arp,1)
-                 dat_arp(N1,N2,NZ,NY,NX)=datrp_3d(ip,N1,N2)            
-               enddo  
-             enddo                
-            endif
-          else
-            ip=get_pft(NZ,NY,NX)
-             DO N2=1,SIZE(dat_arp,2)
-               DO N1=1,SIZE(dat_arp,1)
-                 dat_arp(N1,N2,NZ,NY,NX)=datrp_3d(ip,N1,N2)            
-               enddo  
-             enddo                
+      DO NX=NHW,NHE
+        DO NY=NVN,NVS    
+          IF(IFLGT(NY,NX)>0)THEN
+            DO NZ=1,NP(NY,NX)
+              if(present(IFLGC))then      
+                IF(IFLGC(NZ,NY,NX)/=0)THEN
+                  ip=get_pft(NZ,NY,NX)
+                  DO N2=1,SIZE(dat_arp,2)
+                    DO N1=1,SIZE(dat_arp,1)
+                      datrp_3d(ip,N1,N2)=dat_arp(N1,N2,NZ,NY,NX)           
+                    enddo  
+                  enddo                
+                endif
+              else
+                ip=get_pft(NZ,NY,NX)
+                DO N2=1,SIZE(dat_arp,2)
+                  DO N1=1,SIZE(dat_arp,1)
+                    datrp_3d(ip,N1,N2)=dat_arp(N1,N2,NZ,NY,NX)            
+                  enddo  
+                enddo                
+              endif
+            ENDDO 
           endif
-        ENDDO 
-      endif
+        enddo
+      enddo    
     else
       DO NX=NHW,NHE
          DO NY=NVN,NVS
@@ -1548,7 +1597,7 @@ module restUtilMod
              ip=get_pft(NZ,NY,NX)
              DO N2=1,SIZE(dat_arp,2)
                DO N1=1,SIZE(dat_arp,1)
-                 dat_arp(N1,N2,NZ,NY,NX)=datrp_3d(ip,N1,N2)            
+                 datrp_3d(ip,N1,N2)=dat_arp(N1,N2,NZ,NY,NX)            
                enddo  
              enddo                
            ENDDO
@@ -1571,31 +1620,35 @@ module restUtilMod
 
   if (flag=='read')then
     if(present(iflgt))then
-      IF(IFLGT(NY,NX)>0)THEN
-        DO NZ=1,NP(NY,NX)
-          if(present(IFLGC))then      
-            IF(IFLGC(NZ,NY,NX)/=0)THEN
-              ip=get_pft(NZ,NY,NX)              
-              DO N3=1,SIZE(dat_arp,3)
-                DO N2=1,SIZE(dat_arp,2)
-                  DO N1=1,SIZE(dat_arp,1)
-                    dat_arp(N1,N2,N3,NZ,NY,NX)=datrp_4d(ip,N1,N2,N3)            
-                  enddo  
-               enddo                
-             enddo
-            endif
-          else
-            ip=get_pft(NZ,NY,NX)
-             DO N3=1,SIZE(dat_arp,3)
-               DO N2=1,SIZE(dat_arp,2)
-                 DO N1=1,SIZE(dat_arp,1)
-                   dat_arp(N1,N2,N3,NZ,NY,NX)=datrp_4d(ip,N1,N2,N3)            
-                 enddo  
-               enddo                
-             enddo
+      DO NX=NHW,NHE
+        DO NY=NVN,NVS    
+          IF(IFLGT(NY,NX)>0)THEN
+            DO NZ=1,NP(NY,NX)
+              if(present(IFLGC))then      
+                IF(IFLGC(NZ,NY,NX)/=0)THEN
+                  ip=get_pft(NZ,NY,NX)              
+                  DO N3=1,SIZE(dat_arp,3)
+                    DO N2=1,SIZE(dat_arp,2)
+                      DO N1=1,SIZE(dat_arp,1)
+                        dat_arp(N1,N2,N3,NZ,NY,NX)=datrp_4d(ip,N1,N2,N3)            
+                      enddo  
+                  enddo                
+                enddo
+                endif
+              else
+                ip=get_pft(NZ,NY,NX)
+                DO N3=1,SIZE(dat_arp,3)
+                  DO N2=1,SIZE(dat_arp,2)
+                    DO N1=1,SIZE(dat_arp,1)
+                      dat_arp(N1,N2,N3,NZ,NY,NX)=datrp_4d(ip,N1,N2,N3)            
+                    enddo  
+                  enddo                
+                enddo
+              endif
+            ENDDO 
           endif
-        ENDDO 
-      endif
+        enddo
+      enddo    
     else
       DO NX=NHW,NHE
         DO NY=NVN,NVS
@@ -1615,31 +1668,35 @@ module restUtilMod
   else if(flag=='write') then
     datrp_4d=spval
     if(present(iflgt))then
-      IF(IFLGT(NY,NX)>0)THEN
-        DO NZ=1,NP(NY,NX)
-          if(present(IFLGC))then      
-            IF(IFLGC(NZ,NY,NX)/=0)THEN
-              ip=get_pft(NZ,NY,NX)
-              DO N3=1,SIZE(dat_arp,3)
-                DO N2=1,SIZE(dat_arp,2)
-                  DO N1=1,SIZE(dat_arp,1)
-                    dat_arp(N1,N2,N3,NZ,NY,NX)=datrp_4d(ip,N1,N2,N3)            
-                  enddo  
+      DO NX=NHW,NHE
+        DO NY=NVN,NVS    
+          IF(IFLGT(NY,NX)>0)THEN
+            DO NZ=1,NP(NY,NX)
+              if(present(IFLGC))then      
+                IF(IFLGC(NZ,NY,NX)/=0)THEN
+                  ip=get_pft(NZ,NY,NX)
+                  DO N3=1,SIZE(dat_arp,3)
+                    DO N2=1,SIZE(dat_arp,2)
+                      DO N1=1,SIZE(dat_arp,1)
+                        datrp_4d(ip,N1,N2,N3)=dat_arp(N1,N2,N3,NZ,NY,NX)            
+                      enddo  
+                    enddo                
+                  enddo
+                endif
+              else
+                ip=get_pft(NZ,NY,NX)
+                DO N3=1,SIZE(dat_arp,3)
+                  DO N2=1,SIZE(dat_arp,2)
+                    DO N1=1,SIZE(dat_arp,1)
+                      datrp_4d(ip,N1,N2,N3)=dat_arp(N1,N2,N3,NZ,NY,NX)            
+                    enddo  
+                  enddo 
                 enddo                
-              enddo
-            endif
-          else
-            ip=get_pft(NZ,NY,NX)
-            DO N3=1,SIZE(dat_arp,3)
-              DO N2=1,SIZE(dat_arp,2)
-                DO N1=1,SIZE(dat_arp,1)
-                  dat_arp(N1,N2,N3,NZ,NY,NX)=datrp_4d(ip,N1,N2,N3)            
-                enddo  
-              enddo 
-            enddo                
+              endif
+            ENDDO 
           endif
-        ENDDO 
-      endif
+        enddo
+      enddo    
     else
       DO NX=NHW,NHE
          DO NY=NVN,NVS
@@ -1648,7 +1705,7 @@ module restUtilMod
              DO N3=1,SIZE(dat_arp,3)
                DO N2=1,SIZE(dat_arp,2)
                   DO N1=1,SIZE(dat_arp,1)
-                    dat_arp(N1,N2,N3,NZ,NY,NX)=datrp_4d(ip,N1,N2,N3)            
+                    datrp_4d(ip,N1,N2,N3)=dat_arp(N1,N2,N3,NZ,NY,NX)            
                   enddo  
                enddo                
              enddo
@@ -1672,35 +1729,39 @@ module restUtilMod
 
   if (flag=='read')then
     if(present(iflgt))then
-      IF(IFLGT(NY,NX)>0)THEN
-        DO NZ=1,NP(NY,NX)
-          if(present(IFLGC))then      
-            IF(IFLGC(NZ,NY,NX)/=0)THEN
-              ip=get_pft(NZ,NY,NX)              
-              DO N4=1,SIZE(dat_arp,4)
-                DO N3=1,SIZE(dat_arp,3)
-                  DO N2=1,SIZE(dat_arp,2)
-                    DO N1=1,SIZE(dat_arp,1)
-                      dat_arp(N1,N2,N3,N4,NZ,NY,NX)=datrp_5d(ip,N1,N2,N3,N4)
-                    enddo  
-                  enddo  
-                enddo                
-              enddo
-            endif
-          else
-            ip=get_pft(NZ,NY,NX)
-             DO N4=1,SIZE(dat_arp,4)
-               DO N3=1,SIZE(dat_arp,3)
-                  DO N2=1,SIZE(dat_arp,2)
-                    DO N1=1,SIZE(dat_arp,1)
-                      dat_arp(N1,N2,N3,N4,NZ,NY,NX)=datrp_5d(ip,N1,N2,N3,N4)            
-                    enddo  
-                  enddo  
-               enddo                
-             enddo
+      DO NX=NHW,NHE
+        DO NY=NVN,NVS    
+          IF(IFLGT(NY,NX)>0)THEN
+            DO NZ=1,NP(NY,NX)
+              if(present(IFLGC))then      
+                IF(IFLGC(NZ,NY,NX)/=0)THEN
+                  ip=get_pft(NZ,NY,NX)              
+                  DO N4=1,SIZE(dat_arp,4)
+                    DO N3=1,SIZE(dat_arp,3)
+                      DO N2=1,SIZE(dat_arp,2)
+                        DO N1=1,SIZE(dat_arp,1)
+                          dat_arp(N1,N2,N3,N4,NZ,NY,NX)=datrp_5d(ip,N1,N2,N3,N4)
+                        enddo  
+                      enddo  
+                    enddo                
+                  enddo
+                endif
+              else
+                ip=get_pft(NZ,NY,NX)
+                DO N4=1,SIZE(dat_arp,4)
+                  DO N3=1,SIZE(dat_arp,3)
+                      DO N2=1,SIZE(dat_arp,2)
+                        DO N1=1,SIZE(dat_arp,1)
+                          dat_arp(N1,N2,N3,N4,NZ,NY,NX)=datrp_5d(ip,N1,N2,N3,N4)            
+                        enddo  
+                      enddo  
+                  enddo                
+                enddo
+              endif
+            ENDDO 
           endif
-        ENDDO 
-      endif
+        enddo
+      enddo    
     else
       DO NX=NHW,NHE
         DO NY=NVN,NVS
@@ -1722,35 +1783,39 @@ module restUtilMod
   else if(flag=='write') then
     datrp_5d=spval
     if(present(iflgt))then
-      IF(IFLGT(NY,NX)>0)THEN
-        DO NZ=1,NP(NY,NX)
-          if(present(IFLGC))then      
-            IF(IFLGC(NZ,NY,NX)/=0)THEN
-              ip=get_pft(NZ,NY,NX)
-              DO N4=1,SIZE(dat_arp,4)
-                DO N3=1,SIZE(dat_arp,3)
-                  DO N2=1,SIZE(dat_arp,2)
-                    DO N1=1,SIZE(dat_arp,1)
-                      dat_arp(N1,N2,N3,N4,NZ,NY,NX)=datrp_5d(ip,N1,N2,N3,N4)            
-                    enddo  
-                  enddo  
-                enddo                
-              enddo
-            endif
-          else
-            ip=get_pft(NZ,NY,NX)
-             DO N4=1,SIZE(dat_arp,4)
-               DO N3=1,SIZE(dat_arp,3)
-                  DO N2=1,SIZE(dat_arp,2)
-                    DO N1=1,SIZE(dat_arp,1)
-                      dat_arp(N1,N2,N3,N4,NZ,NY,NX)=datrp_5d(ip,N1,N2,N3,N4)            
-                    enddo  
-                  enddo  
-               enddo                
-             enddo
+      DO NX=NHW,NHE
+        DO NY=NVN,NVS    
+          IF(IFLGT(NY,NX)>0)THEN
+            DO NZ=1,NP(NY,NX)
+              if(present(IFLGC))then      
+                IF(IFLGC(NZ,NY,NX)/=0)THEN
+                  ip=get_pft(NZ,NY,NX)
+                  DO N4=1,SIZE(dat_arp,4)
+                    DO N3=1,SIZE(dat_arp,3)
+                      DO N2=1,SIZE(dat_arp,2)
+                        DO N1=1,SIZE(dat_arp,1)
+                          datrp_5d(ip,N1,N2,N3,N4)=dat_arp(N1,N2,N3,N4,NZ,NY,NX)            
+                        enddo  
+                      enddo  
+                    enddo                
+                  enddo
+                endif
+              else
+                ip=get_pft(NZ,NY,NX)
+                DO N4=1,SIZE(dat_arp,4)
+                  DO N3=1,SIZE(dat_arp,3)
+                      DO N2=1,SIZE(dat_arp,2)
+                        DO N1=1,SIZE(dat_arp,1)
+                          datrp_5d(ip,N1,N2,N3,N4)=dat_arp(N1,N2,N3,N4,NZ,NY,NX)            
+                        enddo  
+                      enddo  
+                  enddo                
+                enddo
+              endif
+            ENDDO 
           endif
-        ENDDO 
-      endif
+        enddo
+      enddo    
     else
       DO NX=NHW,NHE
          DO NY=NVN,NVS
@@ -1760,7 +1825,7 @@ module restUtilMod
                DO N3=1,SIZE(dat_arp,3)
                   DO N2=1,SIZE(dat_arp,2)
                     DO N1=1,SIZE(dat_arp,1)
-                      dat_arp(N1,N2,N3,N4,NZ,NY,NX)=datrp_5d(ip,N1,N2,N3,N4)
+                      datrp_5d(ip,N1,N2,N3,N4)=dat_arp(N1,N2,N3,N4,NZ,NY,NX)
                     enddo  
                   enddo  
                enddo                
