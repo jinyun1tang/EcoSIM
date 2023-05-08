@@ -17,6 +17,10 @@ verbose    = not-set
 prefix     = not-set
 sanitize   = not-set
 travis     = not-set
+F90        = not-set
+netcdfsys  = not-set
+ATS        = not-set
+# This proxies everything to the builddir cmake.
 
 # This proxies everything to the builddir cmake.
 
@@ -147,6 +151,11 @@ endif
 
 CONFIG_FLAGS += -DTPL_NETCDF_INCLUDE_DIRS="$(NETCDF_FFLAGS)"
 CONFIG_FLAGS += -DTPL_NETCDF_LIBRARIES="$(NETCDF_FLIBS)"
+
+ifeq ($(ATS), 1)
+	CONFIG_FLAGS += -DTPL_NETCDF_INCLUDE_DIRS="$(TPL_INSTALL_PREFIX)/include"
+	CONFIG_FLAGS += -DTPL_NETCDF_LIBRARIES="$(TPL_INSTALL_PREFIX)/lib"
+endif
 
 define run-config
 @mkdir -p $(BUILDDIR)
