@@ -1,11 +1,12 @@
 # Makefile -- Use this to build on *NIX systems.
 
-ifndef ATS
+ifeq ($(ATS), 0)
 	CC         = not-set
 	CXX        = not-set
 	FC         = not-set
 	F90        = not-set
 	netcdfsys  = not-set
+	ATS        = not-set
 endif
 
 # Options set on command line.
@@ -17,10 +18,6 @@ verbose    = not-set
 prefix     = not-set
 sanitize   = not-set
 travis     = not-set
-F90        = not-set
-netcdfsys  = not-set
-ATS        = not-set
-# This proxies everything to the builddir cmake.
 
 # This proxies everything to the builddir cmake.
 
@@ -51,7 +48,7 @@ endif
 
 # MPI
 ifeq ($(ATS), not-set)
-	ifeq ($(mpi), 1)
+  ifeq ($(mpi), 1)
 	  BUILDDIR := ${BUILDDIR}-mpi
 	  CC = mpicc
 	  CXX = mpicxx
@@ -76,6 +73,7 @@ ifeq ($(ATS), not-set)
 	  compiler=gnu
 	endif
 endif
+
 # Shared libs?
 ifeq ($(shared), 1)
   BUILDDIR := ${BUILDDIR}-shared
@@ -135,9 +133,12 @@ ifeq ($(sanitize), 1)
   CONFIG_FLAGS += -DADDRESS_SANITIZER=1
 endif
 
-ifeq ($(ATS), 1)
-  NETCDF_FFLAGS += $(TPL_INSTALL_PREFIX)/include
-  NETCDF_FLIBS += -L$(TPL_INSTALL_PREFIX)/lib -lnetcdff -lnetcdf -lnetcdf
+ifeq ($(netcdfsys), not-set)
+  NETCDF_FFLAGS =""
+  NETCDF_FLIBS =""
+else ifeq($(ATS), 1)
+	NETCDF_FFLAGS = $(shell ./nc_config --prefix --$(TPL_INSTALL_PREFIX))/include/
+	NETCDF_FLIBS = $(shell ./nc_config --flibs --$(TPL_INSTALL_PREFIX))
 else
   ifeq ($(netcdfsys), not-set)
     NETCDF_FFLAGS =""
@@ -151,10 +152,10 @@ endif
 CONFIG_FLAGS += -DTPL_NETCDF_INCLUDE_DIRS="$(NETCDF_FFLAGS)"
 CONFIG_FLAGS += -DTPL_NETCDF_LIBRARIES="$(NETCDF_FLIBS)"
 
-ifeq ($(ATS), 1)
-	CONFIG_FLAGS += -DTPL_NETCDF_INCLUDE_DIRS="$(TPL_INSTALL_PREFIX)/include"
-	CONFIG_FLAGS += -DTPL_NETCDF_LIBRARIES="$(TPL_INSTALL_PREFIX)/lib"
-endif
+#ifeq ($(ATS), 1)
+#	CONFIG_FLAGS += -DTPL_NETCDF_INCLUDE_DIRS="$(TPL_INSTALL_PREFIX)/include"
+#	CONFIG_FLAGS += -DTPL_NETCDF_LIBRARIES="$(TPL_INSTALL_PREFIX)/lib"
+#endif
 
 define run-config
 @mkdir -p $(BUILDDIR)
