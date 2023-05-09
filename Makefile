@@ -50,7 +50,7 @@ ifeq ($(verbose), 1)
 endif
 
 # MPI
-ifndef ATS
+ifeq ($(ATS), not-set)
 	ifeq ($(mpi), 1)
 	  BUILDDIR := ${BUILDDIR}-mpi
 	  CC = mpicc
@@ -76,7 +76,6 @@ ifndef ATS
 	  compiler=gnu
 	endif
 endif
-
 # Shared libs?
 ifeq ($(shared), 1)
   BUILDDIR := ${BUILDDIR}-shared
