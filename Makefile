@@ -44,29 +44,31 @@ ifeq ($(verbose), 1)
 endif
 
 # MPI
-ifeq ($(mpi), 1)
-  BUILDDIR := ${BUILDDIR}-mpi
-  CC = mpicc
-  CXX = mpicxx
-  FC = mpif90
-  CONFIG_FLAGS += -DHAVE_MPI=1
-else
-  ifeq ($(CC), not-set)
-    CC  = icc
-  endif
-  ifeq ($(CXX), not-set)
-    CXX = icpc
-  endif
-  ifeq ($(FC), not-set)
-    FC = ifort
-  endif
-  CONFIG_FLAGS += -DHAVE_MPI=0
-endif
+ifeq ($(ATS), not-set)
+	ifeq ($(mpi), 1)
+	  BUILDDIR := ${BUILDDIR}-mpi
+	  CC = mpicc
+	  CXX = mpicxx
+	  FC = mpif90
+	  CONFIG_FLAGS += -DHAVE_MPI=1
+	else
+	  ifeq ($(CC), not-set)
+	    CC  = icc
+	  endif
+	  ifeq ($(CXX), not-set)
+	    CXX = icpc
+	  endif
+	  ifeq ($(FC), not-set)
+	    FC = ifort
+	  endif
+	  CONFIG_FLAGS += -DHAVE_MPI=0
+	endif
 
-ifeq ($(FC),ifort)
-  compiler=intel
-else
-  compiler=gnu
+	ifeq ($(FC),ifort)
+	  compiler=intel
+	else
+	  compiler=gnu
+	endif
 endif
 # Shared libs?
 ifeq ($(shared), 1)
