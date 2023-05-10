@@ -2,7 +2,7 @@ module ReadManagementMod
 
   use data_kind_mod, only : r8 => DAT_KIND_R8
   use abortutils , only : endrun
-  use fileUtil   , only : open_safe
+  use fileUtil   , only : open_safe,int2str
   use minimathmod, only : isLeap
   use GridConsts
   use FlagDataType
@@ -385,10 +385,10 @@ implicit none
 
 !------------------------------------------------------------------------------------------
 
-  subroutine ReadManagementFiles(iyear)
+  subroutine ReadManagementFiles(yeari)
   use EcoSIMCtrlMod, only : soil_mgmt_in,Lirri_auto
   implicit none
-  integer, intent(in) :: iyear
+  integer, intent(in) :: yeari
 
   integer :: NH1,NV1,NH2,NV2
   type(file_desc_t) :: soilmgmt_nfid
@@ -399,13 +399,20 @@ implicit none
   character(len=10) :: fertf
   character(len=10) :: tillf
   character(len=10) :: irrigf
-
+  integer :: iyear,year
 !
 !   NH1,NV1,NH2,NV2=N,W and S,E corners of landscape unit
 !   DATA1(8),DATA1(5),DATA1(6)=disturbance,fertilizer,irrigation files
 !   PREFIX=path for files in current or higher level directory
 
   call ncd_pio_openfile(soilmgmt_nfid, soil_mgmt_in, ncd_nowrite)
+
+  iyear=1
+  DO while(.true.)
+    call ncd_getvar(soilmgmt_nfid,'year',iyear,year)  
+    if(year==yeari)exit
+    iyear=iyear+1
+  ENDDO
 
   ntopou=get_dim_len(soilmgmt_nfid, 'ntopou')
   if(ntopou==0)return
@@ -427,7 +434,7 @@ implicit none
 
     call check_ret(nf90_get_var(soilmgmt_nfid%fh, vardesc%varid, fertf, &
       start = (/1,ntopou,iyear/),count = (/len(fertf),1/)), &
-      trim(mod_filename))
+      trim(mod_filename)//'::at line '//trim(int2str(__LINE__)))
 !!!!
     call check_var(soilmgmt_nfid, 'tillf', vardesc, readvar)
     if(.not. readvar)then
@@ -436,7 +443,7 @@ implicit none
 
     call check_ret(nf90_get_var(soilmgmt_nfid%fh, vardesc%varid, tillf, &
       start = (/1,ntopou,iyear/),count = (/len(tillf),1/)), &
-      trim(mod_filename))
+      trim(mod_filename)//'::at line '//trim(int2str(__LINE__)))
 !!!!
     call check_var(soilmgmt_nfid, 'irrigf', vardesc, readvar)
     if(.not. readvar)then
@@ -445,7 +452,7 @@ implicit none
 
     call check_ret(nf90_get_var(soilmgmt_nfid%fh, vardesc%varid, irrigf, &
       start = (/1,ntopou,iyear/),count = (/len(irrigf),1/)), &
-      trim(mod_filename))
+      trim(mod_filename)//'::at line '//trim(int2str(__LINE__)))
 !
 !   READ TILLAGE INPUT FILE
 !

@@ -3,7 +3,7 @@ module PlantInfoMod
 ! DESCRIPTION
 ! code to read plant information
   use data_kind_mod, only : r8 => DAT_KIND_R8
-  use fileUtil, only : open_safe, check_read
+  use fileUtil, only : open_safe, check_read,int2str
   use minimathmod, only : isLeap
   use GridConsts
   use FlagDataType
@@ -104,7 +104,7 @@ implicit none
   type(Var_desc_t) :: vardesc
   logical :: readvar
   integer :: pft_dflag
-  integer :: iyear,nyears
+  integer :: iyear,nyears,year
   integer :: NTOPO,ntopou
   integer :: M,NN,N,nn1
   real(r8) :: DY,ECUT11,ECUT12,ECUT13,ECUT14,ECUT21,ECUT22,ECUT23
@@ -117,7 +117,7 @@ implicit none
   if (len_trim(pft_mgmt_in)==0)then
     return
   else
-    print*,'ReadPlantManagementNC'
+  !  print*,'ReadPlantManagementNC'
   ! initialize the disturbance arrays
     DO NX=NHW,NHE
       DO NY=NVN,NVS
@@ -146,14 +146,19 @@ implicit none
     call check_var(pftinfo_nfid, 'pft_dflag', vardesc, readvar)
 
     call check_ret(nf90_get_var(pftinfo_nfid%fh, vardesc%varid, pft_dflag), &
-      'in '//trim(mod_filename))
+      trim(mod_filename)//'::at line '//trim(int2str(__LINE__)))
 
     if(pft_dflag==0)then
       ! constant pft data
       iyear=1
       if(IGO>0)return
     else
-      iyear=yeari
+      iyear=1
+      DO while(.true.)
+        call ncd_getvar(pftinfo_nfid,'year',iyear,year)  
+        if(year==yeari)exit
+        iyear=iyear+1
+      ENDDO
     endif
     PRINT*,'IYEAR',IYEAR
     !obtain the number of topographic units
@@ -173,7 +178,8 @@ implicit none
       endif
 
       call check_ret(nf90_get_var(pftinfo_nfid%fh, vardesc%varid, pft_pltinfo, &
-        start = (/1,1,ntopou,iyear/),count = (/len(pft_pltinfo(1)),JP,1,1/)),trim(mod_filename))
+        start = (/1,1,ntopou,iyear/),count = (/len(pft_pltinfo(1)),JP,1,1/)),&
+        trim(mod_filename)//':: at line '//trim(int2str(__LINE__)))
 
       call check_var(pftinfo_nfid, 'nmgnts', vardesc, readvar)
       if(.not. readvar)then
@@ -181,7 +187,8 @@ implicit none
       endif
 
       call check_ret(nf90_get_var(pftinfo_nfid%fh, vardesc%varid, pft_nmgnt, &
-        start = (/1,ntopou,iyear/),count = (/JP,1,1/)),trim(mod_filename))
+        start = (/1,ntopou,iyear/),count = (/JP,1,1/)),trim(mod_filename)// &
+        '::at line '//trim(int2str(__LINE__)))
 
       if(any(pft_nmgnt(1:NS)>0))then
         call check_var(pftinfo_nfid, 'pft_mgmt', vardesc, readvar)
@@ -191,7 +198,7 @@ implicit none
 
         call check_ret(nf90_get_var(pftinfo_nfid%fh, vardesc%varid, pft_mgmtinfo, &
           start = (/1,1,1,ntopou,iyear/),count = (/len(pft_mgmtinfo(1,1)),24,JP,1,1/)),&
-          trim(mod_filename))
+          trim(mod_filename)//'::at line '//trim(int2str(__LINE__)))
       endif
 
       DO NX=NH1,NH2
@@ -224,7 +231,8 @@ implicit none
               DO nn1=1,pft_nmgnt(NZ)
                 tstr=trim(pft_mgmtinfo(NN1,NZ))
                 read(tstr,'(I2,I2,I4)')IDX,IMO,IYR
-                READ(TSTR,*)DY,ICUT,JCUT,HCUT,PCUT,ECUT11,ECUT12,ECUT13,ECUT14,ECUT21,ECUT22,ECUT23,ECUT24
+                READ(TSTR,*)DY,ICUT,JCUT,HCUT,PCUT,ECUT11,ECUT12,ECUT13,&
+                   ECUT14,ECUT21,ECUT22,ECUT23,ECUT24
 
                 if(isLeap(iyr) .and. IMO.GT.2)LPY=1
                 !obtain the ordinal day
@@ -819,7 +827,6 @@ implicit none
   write(*,*)'PC ratio in plant nodule: CPND',CPND(NZ,NY,NX)
   end subroutine plant_biomstoich_trait_disp
 
-
 !------------------------------------------------------------------------------------------
 
   subroutine plant_optic_trait_disp(NZ,NY,NX)
@@ -832,6 +839,7 @@ implicit none
   write(*,*)'leaf SW transmission: TAUR',TAUR(NZ,NY,NX)
   write(*,*)'leaf PAR transmission: TAUP',TAUP(NZ,NY,NX)
   end subroutine plant_optic_trait_disp
+!------------------------------------------------------------------------------------------
 
   SUBROUTINE routq(yearc,yeari,NE,NEX,NHW,NHE,NVN,NVS)
 !
@@ -910,7 +918,7 @@ implicit none
   type(Var_desc_t) :: vardesc
   logical :: readvar
   integer :: pft_dflag
-  integer :: iyear
+  integer :: iyear,year
   integer :: ret
   character(len=10) :: pft_gtype(JP)
 
@@ -936,7 +944,7 @@ implicit none
     endif
 
     call check_ret(nf90_get_var(pftinfo_nfid%fh, vardesc%varid, pft_dflag), &
-      'in '//trim(mod_filename))
+      trim(mod_filename)//':: at line '//trim(int2str(__LINE__)))
 
     if (pft_dflag==-1)then
       !no pft data
@@ -954,7 +962,12 @@ implicit none
         ! constant pft data
         iyear=1
       else
-        iyear=yeari
+        iyear=1
+        DO while(.true.)
+          call ncd_getvar(pftinfo_nfid,'year',iyear,year)  
+          if(year==yeari)exit
+          iyear=iyear+1
+        ENDDO
       endif
       !obtain the number of topographic units
       ntopou=get_dim_len(pftinfo_nfid, 'ntopou')
@@ -982,12 +995,10 @@ implicit none
           if(.not. readvar)then
             call endrun('fail to find pft_type in '//trim(mod_filename), __LINE__)
           endif
-
           call check_ret(nf90_get_var(pftinfo_nfid%fh, vardesc%varid, pft_gtype, &
             start = (/1,1,ntopou,iyear/),count = (/len(pft_gtype(1)),JP,1,1/)), &
-            trim(mod_filename))
+            trim(mod_filename)//':: at line '//trim(int2str(__LINE__)))
 
-          print*,NH1,NH2,NV1,NV2
           D4975: DO NX=NH1,NH2
             D4970: DO NY=NV1,NV2
               D4965: DO NZ=1,NS
@@ -1004,7 +1015,6 @@ implicit none
           ENDDO D4975
         ENDIF
         
-        print*,'is_restart_run',is_restart_run,NS
         IF(.not. is_restart_run)THEN
     ! there was no chechk point file read in, so update pft info
     ! from input file

@@ -277,7 +277,7 @@ module readsmod
 ! AND FERTILIZER FILES
 !
   IF(trim(soil_mgmt_in).NE.'NO')THEN
-    call ReadManagementFiles(igo)
+    call ReadManagementFiles(yeari)
   ENDIF
   IMNG=1
   RETURN
