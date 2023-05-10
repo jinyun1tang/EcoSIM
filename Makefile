@@ -150,10 +150,10 @@ endif
 CONFIG_FLAGS += -DTPL_NETCDF_INCLUDE_DIRS="$(NETCDF_FFLAGS)"
 CONFIG_FLAGS += -DTPL_NETCDF_LIBRARIES="$(NETCDF_FLIBS)"
 
-#ifeq ($(ATS), 1)
-#	CONFIG_FLAGS += -DTPL_NETCDF_INCLUDE_DIRS="$(TPL_INSTALL_PREFIX)/include"
-#	CONFIG_FLAGS += -DTPL_NETCDF_LIBRARIES="$(TPL_INSTALL_PREFIX)/lib"
-#endif
+$(info netcdfsys: $(netcdfsys))
+$(info netcdf flags: $(NETCDF_FFLAGS))
+$(info netcdf libs: $(NETCDF_FLIBS))
+$(info tpl install: $(TPL_INSTALL_PREFIX))
 
 define run-config
 @mkdir -p $(BUILDDIR)
