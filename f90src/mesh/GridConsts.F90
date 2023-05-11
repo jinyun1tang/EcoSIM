@@ -7,6 +7,7 @@ implicit none
 
   integer :: JX=6
   integer :: JY=4
+  integer :: JX0,JY0
   integer :: JZ=20
   integer :: JH
   integer :: JV

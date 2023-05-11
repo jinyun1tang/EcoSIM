@@ -401,7 +401,7 @@ with open(topofnm,"r") as topf:
     ASPX=float(arr[4])
     SL0=float(arr[5])
     DPTHSX=float(arr[7])
-
+    print('NH1=%d,NH2=%d,NV1=%d,NV2=%d'%(NH1,NH2,NV1,NV2))
     mesoi=topf.readline()
     nc_fid.variables['topo_grid'][k]=1
     nc_fid.variables['NH1'][k]=NH1

@@ -17,7 +17,7 @@ contains
   use netcdf
   USE fileUtil, ONLY : iulog
   use abortutils, only : endrun
-  use GridConsts, only : JX,JY,JZ,JH,JV,JD,bounds,JP
+  use GridConsts, only : JX,JY,JZ,JH,JV,JD,bounds,JP,JX0,JY0
 !  set up the landscape rectangular mesh
 !  beginning(NHW,NVN)
 !  o--------------------------x
@@ -79,8 +79,8 @@ contains
   bounds%begg=1;bounds%endg=bounds%ngrid
   bounds%begt=1;bounds%endt=bounds%ntopou
   nextra_grid=1
-  JX=(NHE-NHW)+1
-  JY=(NVS-NVN)+1
+  JX=(NHE-NHW)+1;JX0=JX
+  JY=(NVS-NVN)+1;JY0=JY
 
   bounds%ncols=JX*JY
   bounds%npfts=bounds%ncols*JP
@@ -111,25 +111,25 @@ contains
   JV=JY+nextra_grid
   JD=JZ+1
   write(iulog,*)'grid size'
-  write(iulog,*)'JX=',JX,'JY=',JY,'JZ=',JZ
+  write(iulog,*)'JX0=',JX0,'JY0=',JY0,'JZ=',JZ
   end subroutine SetMesh
 !------------------------------------------------------------------------
   integer function get_col(NY,NX)
 
-  use GridConsts, only : JX,JY
+  use GridConsts, only : JX0,JY0
   implicit none
   integer, intent(in) :: NY,NX
   
-  get_col=(NX-1)*JY+NY
+  get_col=(NX-1)*JY0+NY
   end function get_col
 !------------------------------------------------------------------------
   integer function get_pft(NZ,NY,NX)
 
-  use GridConsts, only : JX,JY,JP
+  use GridConsts, only : JX0,JY0,JP
   implicit none
   integer, intent(in) :: NZ,NY,NX
   
-  get_pft=(NX-1)*(JP*JY)+(NY-1)*JP+NZ
+  get_pft=(NX-1)*(JP*JY0)+(NY-1)*JP+NZ
 
   end function get_pft
 

@@ -1429,11 +1429,13 @@ implicit none
     FertN_soil(NTF,L0,NY,NX)=FertN_soil(NTF,L0,NY,NX)-FXZN
   ENDDO
 
-  DO NTF=ifertnb_beg,ifertnb_end
-    FXZN=AMIN1(FX*FertN_band(NTF,L,NY,NX),FertN_band(NTF,L0,NY,NX))
-    FertN_band(NTF,L1,NY,NX)=FertN_band(NTF,L1,NY,NX)+FXZN
-    FertN_band(NTF,L0,NY,NX)=FertN_band(NTF,L0,NY,NX)-FXZN
-  ENDDO
+  IF (L0>0) then
+    DO NTF=ifertnb_beg,ifertnb_end
+      FXZN=AMIN1(FX*FertN_band(NTF,L,NY,NX),FertN_band(NTF,L0,NY,NX))
+      FertN_band(NTF,L1,NY,NX)=FertN_band(NTF,L1,NY,NX)+FXZN
+      FertN_band(NTF,L0,NY,NX)=FertN_band(NTF,L0,NY,NX)-FXZN
+    ENDDO
+  endif
 !
 !     SOIL N,P SOLUTES IN BAND, NON-BAND
 !

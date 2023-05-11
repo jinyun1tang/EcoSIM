@@ -423,7 +423,7 @@ implicit none
     call ncd_getvar(soilmgmt_nfid,'NV2',ntopo,NV2)
 
     if(any((/NH1,NH2,NV1,NV2/)<0))THEN
-      call endrun('something wrong in NHx or NHy indices on file '//trim(soil_mgmt_in)&
+      call endrun('something wrong in NHX or NHX indices on file '//trim(soil_mgmt_in)&
         //' in '//trim(mod_filename), __LINE__)
     endif
 

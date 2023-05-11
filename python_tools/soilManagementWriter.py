@@ -52,7 +52,7 @@ config_dry_dict={
 }
 
 
-config_dict=config_dry_dict
+config_dict=config_lake_dict
 
 print('generate soil managment data for '+config_dict['case'])
 
@@ -227,10 +227,10 @@ elif case=='sample':
     nc_fid.variables['tillf'][jj,0,0:2]=['N','O']
     nc_fid.variables['irrigf'][jj,0,0:2]=['N','O']
 elif case=='lake':
-  nc_fid.variables['NH1'][:]=1
-  nc_fid.variables['NV1'][:]=1
-  nc_fid.variables['NH2'][:]=1
-  nc_fid.variables['NV2'][:]=1
+  nc_fid.variables['NH1'][:]=[1,2]
+  nc_fid.variables['NV1'][:]=[1,1]
+  nc_fid.variables['NH2'][:]=[1,2]
+  nc_fid.variables['NV2'][:]=[1,1]
   nc_fid.variables['year'][:]=range(2001,2009)
   for jj in range(2009-2001):
     nc_fid.variables['fertf'][jj,:,:]=' '*10
