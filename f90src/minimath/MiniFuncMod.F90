@@ -33,8 +33,13 @@ implicit none
   real(r8), intent(in) :: TK !temperature, [Kelvin]
   real(r8) :: ans
 
-  ans =(TK/298.15_r8)**6._r8
-
+! In general, TK should never be less than zero, however, the 
+! following avoids segmentatio fault
+  if(TK>0._r8)then
+    ans =(TK/298.15_r8)**6._r8
+  else
+    ans=1._r8
+  endif
   end function TEFAQUDIF
 !------------------------------------------------------------------------------------------
 
@@ -46,7 +51,13 @@ implicit none
   real(r8), intent(in) :: TK !temperature, [Kelvin]
   real(r8) :: ans
 
-  ans =(TK/298.15_r8)**1.75_r8
+! in general, TK should never be less than zero, however, the 
+! following avoids segmentatio fault
+  if(TK>0._r8)then
+    ans =(TK/298.15_r8)**1.75_r8
+  else
+    ans=1._r8
+  endif
 
   end function TEFGASDIF
 !------------------------------------------------------------------------------------------

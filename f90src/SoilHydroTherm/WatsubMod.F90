@@ -2815,6 +2815,7 @@ module WatsubMod
   !     N3,N2,N1=L,NY,NX of source grid cell
   !     N6,N5,N4=L,NY,NX of destination grid cell
   !
+  
   IFLGH=0
   D4400: DO L=1,NL(NY,NX)
     N1=NX
@@ -3117,7 +3118,7 @@ module WatsubMod
           IF(CND1.GT.ZERO.AND.CNDL.GT.ZERO)THEN
             AVCNDL=2.0*CND1*CNDL/(CND1*DLYR(N,N6,N5,N4)+CNDL*DLYR(N,N3,N2,N1))
           ELSE
-            AVCNDL=0.0
+            AVCNDL=0.0_r8
           ENDIF
           !
           !     WATER FLUX FROM WATER POTENTIALS, HYDRAULIC CONDUCTIVITY
@@ -3202,7 +3203,7 @@ module WatsubMod
                 FLWHL(N,N6,N5,N4)=AZMIN1(AMAX1(AMAX1(-VOLWH1(N6,N5,N4) &
                   ,-VOLPH1(N3,N2,N1))*XNPX,FLWHX))
               ELSE
-                FLWHL(N,N6,N5,N4)=0.0
+                FLWHL(N,N6,N5,N4)=0.0_r8
               ENDIF
             ELSE
               FLWHL(N,N6,N5,N4)=AZMAX1(AMIN1(AMIN1(VOLWH1(N3,N2,N1)*XNPX &
@@ -3213,8 +3214,8 @@ module WatsubMod
             ENDIF
             FLWHM(M,N,N6,N5,N4)=FLWHL(N,N6,N5,N4)
           ELSE
-            FLWHL(N,N6,N5,N4)=0.0
-            FLWHM(M,N,N6,N5,N4)=0.0
+            FLWHL(N,N6,N5,N4)=0.0_r8
+            FLWHM(M,N,N6,N5,N4)=0.0_r8
             IF(VOLPH1(N6,N5,N4).LE.0.0_r8)IFLGH=1
           ENDIF
           IF(FLWHL(N,N6,N5,N4).GT.0.0_r8)THEN
@@ -3271,8 +3272,8 @@ module WatsubMod
               HWFLVL=(cpw*TK1(N6,N5,N4)+VAP)*FLVL
             ENDIF
           ELSE
-            FLVL=0.0
-            HWFLVL=0.0
+            FLVL=0.0_r8
+            HWFLVL=0.0_r8
           ENDIF
           !
           !     FLWL=total water+vapor flux to destination
@@ -3374,7 +3375,12 @@ module WatsubMod
           ELSE
             TKLX=TK1(N6,N5,N4)
           ENDIF
-          TKY=(VHCP1(N3,N2,N1)*TK1X+VHCP1(N6,N5,N4)*TKLX)/(VHCP1(N3,N2,N1)+VHCP1(N6,N5,N4))
+          
+          if(VHCP1(N3,N2,N1)+VHCP1(N6,N5,N4)>0._r8)then
+            TKY=(VHCP1(N3,N2,N1)*TK1X+VHCP1(N6,N5,N4)*TKLX)/(VHCP1(N3,N2,N1)+VHCP1(N6,N5,N4))
+          ELSE
+            TKY=(TK1X+TKLX)/2._r8
+          endif 
           HFLWX=(TK1X-TKY)*VHCP1(N3,N2,N1)*XNPX
           HFLWC=ATCNDL*(TK1X-TKLX)*AREA(N,N3,N2,N1)*XNPH
           IF(HFLWC.GE.0.0_r8)THEN
@@ -3403,32 +3409,33 @@ module WatsubMod
             FILM(M,N6,N5,N4)=FilmThickness(PSISA1(N6,N5,N4))
           ENDIF
         ELSEIF(N.NE.3)THEN
-          FLWL(N,N6,N5,N4)=0.0
-          FLWLX(N,N6,N5,N4)=0.0
-          FLWHL(N,N6,N5,N4)=0.0
-          HFLWL(N,N6,N5,N4)=0.0
-          FLWM(M,N,N6,N5,N4)=0.0
-          FLWHM(M,N,N6,N5,N4)=0.0
+          FLWL(N,N6,N5,N4)=0.0_r8
+          FLWLX(N,N6,N5,N4)=0.0_r8
+          FLWHL(N,N6,N5,N4)=0.0_r8
+          HFLWL(N,N6,N5,N4)=0.0_r8
+          FLWM(M,N,N6,N5,N4)=0.0_r8
+          FLWHM(M,N,N6,N5,N4)=0.0_r8
         ENDIF
       ELSE
         IF(N.EQ.3)THEN
-          FLWL(N,N3,N2,N1)=0.0
-          FLWLX(N,N3,N2,N1)=0.0
-          FLWHL(N,N3,N2,N1)=0.0
-          HFLWL(N,N3,N2,N1)=0.0
-          FLWHM(M,N,N3,N2,N1)=0.0
-          FLWHM(M,N,N3,N2,N1)=0.0
+          FLWL(N,N3,N2,N1)=0.0_r8
+          FLWLX(N,N3,N2,N1)=0.0_r8
+          FLWHL(N,N3,N2,N1)=0.0_r8
+          HFLWL(N,N3,N2,N1)=0.0_r8
+          FLWHM(M,N,N3,N2,N1)=0.0_r8
+          FLWHM(M,N,N3,N2,N1)=0.0_r8
         ELSE
-          FLWL(N,N6,N5,N4)=0.0
-          FLWLX(N,N6,N5,N4)=0.0
-          FLWHL(N,N6,N5,N4)=0.0
-          HFLWL(N,N6,N5,N4)=0.0
-          FLWM(M,N,N6,N5,N4)=0.0
-          FLWHM(M,N,N6,N5,N4)=0.0
+          FLWL(N,N6,N5,N4)=0.0_r8
+          FLWLX(N,N6,N5,N4)=0.0_r8
+          FLWHL(N,N6,N5,N4)=0.0_r8
+          HFLWL(N,N6,N5,N4)=0.0_r8
+          FLWM(M,N,N6,N5,N4)=0.0_r8
+          FLWHM(M,N,N6,N5,N4)=0.0_r8
         ENDIF
       ENDIF
     ENDDO D4320
   ENDDO D4400
+  
   end subroutine Subsurface3DFlow
 !------------------------------------------------------------------------------------------
 
@@ -3586,8 +3593,8 @@ module WatsubMod
 
               IF(IRCHG(NN,N,N2,N1).EQ.0.OR.test_aeqb(RCHQF,0._r8) &
                 .OR.ABS(QRM(M,N2,N1)).LT.ZEROS(N2,N1))THEN
-                QR1(N,NN,M5,M4)=0.0
-                HQR1(N,NN,M5,M4)=0.0
+                QR1(N,NN,M5,M4)=0.0_r8
+                HQR1(N,NN,M5,M4)=0.0_r8
               ELSE
                 !
                 ! SURFACE BOUNDARY WATER FLUX
@@ -3952,12 +3959,12 @@ module WatsubMod
               FLWHM(M,N,M6,M5,M4)=FLWHL(N,M6,M5,M4)
             ENDIF
           ELSE
-            FLWL(N,M6,M5,M4)=0.0
-            FLWLX(N,M6,M5,M4)=0.0
-            FLWHL(N,M6,M5,M4)=0.0
-            HFLWL(N,M6,M5,M4)=0.0
-            FLWM(M,N,M6,M5,M4)=0.0
-            FLWHM(M,N,M6,M5,M4)=0.0
+            FLWL(N,M6,M5,M4)=0.0_r8
+            FLWLX(N,M6,M5,M4)=0.0_r8
+            FLWHL(N,M6,M5,M4)=0.0_r8
+            HFLWL(N,M6,M5,M4)=0.0_r8
+            FLWM(M,N,M6,M5,M4)=0.0_r8
+            FLWHM(M,N,M6,M5,M4)=0.0_r8
           ENDIF
         ENDDO D9575
     !
@@ -4443,11 +4450,11 @@ module WatsubMod
             TK1(L,NY,NX)=TK1(L-1,NY,NX)
           ENDIF
         ELSE
-          VOLWM(M+1,L,NY,NX)=0.0
-          VOLWHM(M+1,L,NY,NX)=0.0
-          VOLPM(M+1,L,NY,NX)=0.0
+          VOLWM(M+1,L,NY,NX)=0.0_r8
+          VOLWHM(M+1,L,NY,NX)=0.0_r8
+          VOLPM(M+1,L,NY,NX)=0.0_r8
           FLPM(M,L,NY,NX)=VOLPM(M,L,NY,NX)
-          THETPM(M+1,L,NY,NX)=0.0
+          THETPM(M+1,L,NY,NX)=0.0_r8
         ENDIF
 
       ENDDO D9785

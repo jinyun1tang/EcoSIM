@@ -28,7 +28,6 @@ NPYS=10,10,10   !number of cycles per NPX for gas flux calcns
 JOUTS=1,3,3       !frequency on hourly scale, DATA(18)
 rest_opt='nyears'
 rest_frq=1
-hist_mfilt=12
 diag_opt='nsteps'
 diag_frq=1
 /

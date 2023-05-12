@@ -124,19 +124,12 @@ SUBROUTINE soil(NE,NEX,NHW,NHE,NVN,NVS)
       call start_timer(t1)
       CALL WTHR(I,J,NHW,NHE,NVN,NVS)
       call end_timer('WTHR',t1)
-
+      
       if(lverb)WRITE(*,333)'Run_EcoSIM_one_step'
       call Run_EcoSIM_one_step(I,J,NHW,NHE,NVN,NVS)
   !
   !   WRITE HOURLY SOIL AND PLANT OUTPUT IN 'OUTSH' AND 'OUTPH'
   !
-!      IF((J/JOUT)*JOUT.EQ.J)THEN
-!        if(lverb)WRITE(*,333)'OUTSH'
-!        CALL OUTSH(I,J,NE,NEX,NHW,NHE,NVN,NVS)
-
-!        if(lverb)WRITE(*,333)'OUTPH'
-!        CALL OUTPH(I,J,NE,NEX,NHW,NHE,NVN,NVS)
-!      ENDIF
 
   !   WRITE OUTPUT FOR DYNAMIC VISUALIZATION
   !
@@ -146,20 +139,24 @@ SUBROUTINE soil(NE,NEX,NHW,NHE,NVN,NVS)
           CALL VISUAL(I,J,NHW,NHE,NVN,NVS)
         ENDIF
       ENDIF
-    
+          
       call end_timer_loop()
+      
       call hist_ecosim%hist_update(bounds)
+      
       call hist_update_hbuf(bounds)      
       call etimer%update_time_stamp()      
 
       nlend=etimer%its_time_to_exit()
       rstwr=etimer%its_time_to_write_restart()
       lnyr=etimer%its_a_new_year().and.hist_yrclose
+      
       call hist_htapes_wrapup( rstwr, nlend, bounds, lnyr )      
       if(rstwr)then
         write(*,*)'write restart file'
         call restFile(flag='write')
       endif
+      
     END DO
     
 !
