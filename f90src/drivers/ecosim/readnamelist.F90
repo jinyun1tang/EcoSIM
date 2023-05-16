@@ -31,7 +31,8 @@
     do_instequil,salt_model, pft_file_in,grid_file_in,pft_mgmt_in, clm_factor_in,&
     clm_file_in,soil_mgmt_in,sim_yyyymmdd,forc_periods,&
     NPXS,NPYS,JOUTS,continue_run,visual_out,restart_out,&
-    finidat,nrevsn,brnch_retain_casename
+    finidat,nrevsn,brnch_retain_casename,plant_model,micb_model,&
+    soichem_model
   
   namelist /ecosim/hist_nhtfrq,hist_mfilt,hist_fincl1,hist_fincl2,hist_yrclose, &
     do_budgets,rest_frq,rest_opt,diag_frq,diag_opt
@@ -53,6 +54,10 @@
   visual_out =.false.
   restart_out=.false.  
   do_budgets =.false.
+  plant_model=.true.
+  soichem_model=.true.
+  micb_model=.true.
+
   finidat=' '
   nrevsn = ' '
 
@@ -132,5 +137,7 @@
   LYRG=num_of_simdays
   lverb=lverbose
   nmicbguilds=num_microbial_guilds
-
+  if(.not. soichem_model)then
+    salt_model=.false.
+  endif
 end subroutine readnamelist

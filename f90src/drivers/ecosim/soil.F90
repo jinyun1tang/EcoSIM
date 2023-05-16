@@ -14,7 +14,6 @@ SUBROUTINE soil(NE,NEX,NHW,NHE,NVN,NVS)
   use RestartMod   , only : restart,restFile
   use PlantInfoMod , only : ReadPlantInfo
   use readsmod     , only : reads
-  use Hist1Mod     , only : fouts,foutp,outpd,outph,outsd,outsh
   use timings      , only : init_timer, start_timer, end_timer,end_timer_loop
   use InitEcoSIM   , only : InitModules2
   use EcoSIMCtrlMod
@@ -56,9 +55,6 @@ SUBROUTINE soil(NE,NEX,NHW,NHE,NVN,NVS)
   !temporary set up for setting mass balance check
   IBEGIN=1;ISTART=1;ILAST=0
   
-!  if(lverb)WRITE(*,333)'FOUTS'
-!  CALL FOUTS(NE,NEX,NHW,NHE,NVN,NVS)
-
   call etimer%get_ymdhs(ymdhs)
   
   IF(ymdhs(1:4)==frectyp%ymdhs0(1:4))THEN
@@ -76,15 +72,14 @@ SUBROUTINE soil(NE,NEX,NHW,NHE,NVN,NVS)
     ENDIF
   ENDIF
 !
-  if(lverb)WRITE(*,333)'ReadPlantInfo'
-  call ReadPlantInfo(frectyp%yearcur,frectyp%yearclm,NE,NEX,NHW,NHE,NVN,NVS)
-
-  if(lverb)WRITE(*,333)'FOUTP'
-  CALL FOUTP(NE,NEX,NHW,NHE,NVN,NVS)
+  if(plant_model)then
+    if(lverb)WRITE(*,333)'ReadPlantInfo'  
+    call ReadPlantInfo(frectyp%yearcur,frectyp%yearclm,NE,NEX,NHW,NHE,NVN,NVS)
+  endif
 
 ! INITIALIZE ALL PLANT VARIABLES IN 'STARTQ'
 !
-  IF(ymdhs(1:4)==frectyp%ymdhs0(1:4))THEN
+  IF(ymdhs(1:4)==frectyp%ymdhs0(1:4) .and. plant_model)THEN
     if(lverb)WRITE(*,333)'STARTQ'
     CALL STARTQ(NHW,NHE,NVN,NVS,1,JP)
 !
@@ -97,10 +92,12 @@ SUBROUTINE soil(NE,NEX,NHW,NHE,NVN,NVS)
     ENDIF
   ENDIF
 
+  if(soichem_model)then
 ! INITIALIZE ALL SOIL CHEMISTRY VARIABLES IN 'STARTE'
 !
-  if(lverb)WRITE(*,333)'STARTE'
-  CALL STARTE(NHW,NHE,NVN,NVS)
+    if(lverb)WRITE(*,333)'STARTE'
+    CALL STARTE(NHW,NHE,NVN,NVS)
+  endif
 
   iyear_cur=frectyp%yearcur
   LYRC=etimer%get_days_cur_year()
@@ -128,9 +125,6 @@ SUBROUTINE soil(NE,NEX,NHW,NHE,NVN,NVS)
       if(lverb)WRITE(*,333)'Run_EcoSIM_one_step'
       call Run_EcoSIM_one_step(I,J,NHW,NHE,NVN,NVS)
   !
-  !   WRITE HOURLY SOIL AND PLANT OUTPUT IN 'OUTSH' AND 'OUTPH'
-  !
-
   !   WRITE OUTPUT FOR DYNAMIC VISUALIZATION
   !
       IF(visual_out)THEN
@@ -155,11 +149,9 @@ SUBROUTINE soil(NE,NEX,NHW,NHE,NVN,NVS)
       if(rstwr)then
         write(*,*)'write restart file'
         call restFile(flag='write')
-      endif
-      
+      endif      
     END DO
     
-!
 !
 ! PERFORM MASS AND ENERGY BALANCE CHECKS IN 'EXEC'
 !

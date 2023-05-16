@@ -3,7 +3,6 @@ module StartqMod
   use EcosimConst
   use GridConsts
   use FlagDataType
-  use EcoSIMConfig, only : jsken=>jskenc
   use EcosimConst
   use TracerIDMod
   use EcoSIMCtrlDataType
@@ -88,7 +87,7 @@ module StartqMod
         WTSTGE(1:npelms,NZ,NY,NX)=0._r8
         D6401: DO L=1,NL(NY,NX)
           DO  K=1,pltpar%n_pltlitrk
-            DO  M=1,jsken
+            DO  M=1,jskenc
               ESNC(1:npelms,M,K,L,NZ,NY,NX)=0._r8
             enddo
           enddo
@@ -316,11 +315,11 @@ module StartqMod
   D110: DO N=0,Jlitgrp
     CNOPCT=0.0_r8
     CPOPCT=0.0_r8
-    D100: DO M=1,jsken
+    D100: DO M=1,jskenc
       CNOPCT=CNOPCT+CFOPE(ielmc,N,M,NZ,NY,NX)*CNOPC(M)
       CPOPCT=CPOPCT+CFOPE(ielmc,N,M,NZ,NY,NX)*CPOPC(M)
     ENDDO D100
-    D105: DO M=1,jsken
+    D105: DO M=1,jskenc
       CFOPE(ielmn,N,M,NZ,NY,NX)=CFOPE(ielmc,N,M,NZ,NY,NX)*CNOPC(M)/CNOPCT
       CFOPE(ielmp,N,M,NZ,NY,NX)=CFOPE(ielmc,N,M,NZ,NY,NX)*CPOPC(M)/CPOPCT
     ENDDO D105
@@ -643,7 +642,7 @@ module StartqMod
     CTRAN(NZ,NY,NX)=0._r8
     WTSTGE(1:npelms,NZ,NY,NX)=0._r8
     WTSTDX=WTSTDI(NZ,NY,NX)*AREA(3,NU(NY,NX),NY,NX)
-    D155: DO M=1,jsken
+    D155: DO M=1,jskenc
       WTSTDE(ielmc,M,NZ,NY,NX)=WTSTDX*CFOPE(ielmc,icwood,M,NZ,NY,NX)
       WTSTDE(ielmn,M,NZ,NY,NX)=WTSTDX*CNSTK(NZ,NY,NX)*CFOPE(ielmn,icwood,M,NZ,NY,NX)
       WTSTDE(ielmp,M,NZ,NY,NX)=WTSTDX*CPSTK(NZ,NY,NX)*CFOPE(ielmp,icwood,M,NZ,NY,NX)
@@ -771,7 +770,7 @@ module StartqMod
       ENDDO D30
       IF(N.EQ.1)THEN
         D6400: DO K=1,pltpar%n_pltlitrk
-          DO  M=1,jsken
+          DO  M=1,jskenc
             ESNC(1:npelms,M,K,L,NZ,NY,NX)=0._r8
           enddo
         ENDDO D6400

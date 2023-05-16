@@ -539,7 +539,7 @@ implicit none
   case (0)
     write(*,*)'shallow root profile, like bryophytes'
   case (1)
-    write(8,*)'intermediate root profile, like herbs'
+    write(*,*)'intermediate root profile, like herbs'
   case (2)
     write(*,*)'deep root profile, like trees'
   case default
