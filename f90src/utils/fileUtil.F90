@@ -11,6 +11,7 @@ module fileUtil
   public :: remove_filename_extension
   public :: file_exists
   public :: getfil,getavu
+  public :: int2str
   public :: strip_null,print_ichar,strip_space
   public :: namelist_to_buffer
   public :: opnfil,relavu
@@ -505,4 +506,13 @@ END SUBROUTINE file_freeUnit
   enddo
   instr=tstr
   end subroutine strip_space
+
+  !------------------------------------------------------------------------
+  function int2str(num)
+  implicit none
+  integer, intent(in) :: num
+  character(len=256) :: int2str
+
+  write(int2str,'(I0)')num
+  end function int2str
 end module fileUtil

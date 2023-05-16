@@ -3,8 +3,11 @@ module EcoSIMCtrlMod
   use ecosim_Time_Mod, only : ecosim_time_type
 implicit none
   save
-  logical :: salt_model=.false.
+  logical :: salt_model   =.false.    !toggle for salt model
   logical :: erosion_model=.false.
+  logical :: plant_model  =.true.
+  logical :: micb_model   =.true.
+  logical :: soichem_model=.true.
   character(len=300) :: pft_file_in
   character(len=300) :: pft_mgmt_in
   character(len=300) :: grid_file_in

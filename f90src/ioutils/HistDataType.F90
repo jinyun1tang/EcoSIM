@@ -1425,8 +1425,8 @@ implicit none
   type(bounds_type), intent(in) :: bounds
   integer :: ncol,nptc
   integer :: L,NZ,NY,NX,KN,NB
-
-  DO NX=bounds%NHW,bounds%NHE
+  
+  DO NX=bounds%NHW,bounds%NHE   
     DO NY=bounds%NVN,bounds%NVS
       ncol=get_col(NY,NX)
       this%histr_1D_tFIRE_CO2_col(ncol) =  UCO2F(NY,NX)/AREA(3,NU(NY,NX),NY,NX)

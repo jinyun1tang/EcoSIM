@@ -731,7 +731,7 @@ module HfuncsMod
   real(r8) :: RNI
 
 ! begin_execution
-  associate(                            &
+  associate(                        &
     IYR0    =>  plt_distb%IYR0    , &
     IDAY0   =>  plt_distb%IDAY0   , &
     DPTHS   =>  plt_ew%DPTHS      , &

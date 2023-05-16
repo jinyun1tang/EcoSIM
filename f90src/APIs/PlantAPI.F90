@@ -1,18 +1,19 @@
 module PlantAPI
-
-  use data_kind_mod, only : r8 => DAT_KIND_R8
-  use ExtractsMod   , only : extracts
-  use grosubsMod    , only : grosubs
-  use HfuncsMod    , only : hfuncs
-  use EcoSIMSolverPar
-  use UptakesMod    , only : uptakes
+!
+! interface to integrate the plant model
+  use data_kind_mod   , only : r8 => DAT_KIND_R8
+  use ExtractsMod     , only : extracts
+  use grosubsMod      , only : grosubs
+  use HfuncsMod       , only : hfuncs
+  use UptakesMod      , only : uptakes
   use EcoSiMParDataMod, only : micpar, pltpar
-  use PlantDisturbMod, only : PrepLandscapeGrazing
-  use timings      , only : start_timer, end_timer
+  use PlantDisturbMod , only : PrepLandscapeGrazing
+  use timings         , only : start_timer, end_timer
+  use SoilPhysDataType, only : ALBX  
+  use EcoSIMSolverPar  
   use EcoSIMHistMod
   use SnowDataType
   use TracerIDMod
-  use SoilPhysDataType, only : ALBX
   use SurfLitterDataType
   use LandSurfDataType
   use SoilPropertyDataType

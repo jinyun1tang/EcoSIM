@@ -81,6 +81,7 @@ config_dry_dict={
 'case':'dryland',
 'mdir':'/Users/jinyuntang/work/github/ecosim2/EcoSIM/examples/inputs/dryland_maize/',
 'pftf':'me01p:me02p:me03p:me04p:me05p:me06p',
+'year':'2001:2002:2003:2004:2005:2006',
 'topf':'metopo',
 'ntopu':'1',
 'ncol':'1',
@@ -107,14 +108,13 @@ config_sample_dict={
 'nrow':'1'
 }
 
-config_dict=config_lake_dict
+config_dict=config_dry_dict
 
 print('generate pft data for '+config_dict['case'])
 
 mdir=config_dict['mdir']
 case=config_dict['case']
 pfts=split_var(config_dict['pftf'])
-
 ntopu=int(config_dict['ntopu'])
 ncol=int(config_dict['ncol'])
 nrow=int(config_dict['nrow'])
@@ -179,11 +179,16 @@ w_nc_var.long_name='string containing plant management information'
 pflag = nc_fid.createVariable('pft_dflag', 'i4', ())
 
 k=0
+years=[]
 pft_dflag=-1  #no pft data
 if len(pfts)==2:
   pft_dflag=0  #constant pft managment data, only plantation
 elif len(pfts)>2:
   pft_dflag=1  #transient pft managment data, including multiple
+if pft_dflag==1:
+  years=split_var(config_dict['year'])
+  w_nc_var = nc_fid.createVariable('year', 'i4', ('year'))
+
 pflag[:]=pft_dflag
 pflag.setncattr('long_name','Flag for plant management data')
 pflag.setncattr('flags','-1 no pft data, 0 only plantation information, 1 transient pft data')
@@ -199,10 +204,13 @@ pflag.setncattr('flags','-1 no pft data, 0 only plantation information, 1 transi
 #  print(long_name)
 #  print(units)
 
+
 k1=0
 for pf in pfts:
   pftnm=mdir+pf
   k=0
+  if pft_dflag==1:
+    nc_fid.variables['year'][k1]=int(years[k1])
   with open(pftnm,"r") as pftf:
     while 1:
       line=pftf.readline()

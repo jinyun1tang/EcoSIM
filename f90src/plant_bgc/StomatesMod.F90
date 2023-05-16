@@ -218,7 +218,8 @@
       IF(SURFX(N,L,K,NB,NZ).GT.ZEROP(NZ))THEN
 !
 !     SUNLIT LEAVES
-!
+!     
+
         IF(PAR(N,M,L,NZ).GT.0.0_r8)THEN
           call C3SunlitLeaves(K,N,M,L,NB,NZ,CH2O)
         ENDIF

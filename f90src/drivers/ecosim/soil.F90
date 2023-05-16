@@ -14,7 +14,6 @@ SUBROUTINE soil(NE,NEX,NHW,NHE,NVN,NVS)
   use RestartMod   , only : restart,restFile
   use PlantInfoMod , only : ReadPlantInfo
   use readsmod     , only : reads
-  use Hist1Mod     , only : fouts,foutp,outpd,outph,outsd,outsh
   use timings      , only : init_timer, start_timer, end_timer,end_timer_loop
   use InitEcoSIM   , only : InitModules2
   use EcoSIMCtrlMod
@@ -56,9 +55,6 @@ SUBROUTINE soil(NE,NEX,NHW,NHE,NVN,NVS)
   !temporary set up for setting mass balance check
   IBEGIN=1;ISTART=1;ILAST=0
   
-!  if(lverb)WRITE(*,333)'FOUTS'
-!  CALL FOUTS(NE,NEX,NHW,NHE,NVN,NVS)
-
   call etimer%get_ymdhs(ymdhs)
   
   IF(ymdhs(1:4)==frectyp%ymdhs0(1:4))THEN
@@ -76,15 +72,14 @@ SUBROUTINE soil(NE,NEX,NHW,NHE,NVN,NVS)
     ENDIF
   ENDIF
 !
-  if(lverb)WRITE(*,333)'ReadPlantInfo'
-  call ReadPlantInfo(frectyp%yearcur,frectyp%yearclm,NE,NEX,NHW,NHE,NVN,NVS)
-
-  if(lverb)WRITE(*,333)'FOUTP'
-  CALL FOUTP(NE,NEX,NHW,NHE,NVN,NVS)
+  if(plant_model)then
+    if(lverb)WRITE(*,333)'ReadPlantInfo'  
+    call ReadPlantInfo(frectyp%yearcur,frectyp%yearclm,NE,NEX,NHW,NHE,NVN,NVS)
+  endif
 
 ! INITIALIZE ALL PLANT VARIABLES IN 'STARTQ'
 !
-  IF(ymdhs(1:4)==frectyp%ymdhs0(1:4))THEN
+  IF(ymdhs(1:4)==frectyp%ymdhs0(1:4) .and. plant_model)THEN
     if(lverb)WRITE(*,333)'STARTQ'
     CALL STARTQ(NHW,NHE,NVN,NVS,1,JP)
 !
@@ -97,10 +92,12 @@ SUBROUTINE soil(NE,NEX,NHW,NHE,NVN,NVS)
     ENDIF
   ENDIF
 
+  if(soichem_model)then
 ! INITIALIZE ALL SOIL CHEMISTRY VARIABLES IN 'STARTE'
 !
-  if(lverb)WRITE(*,333)'STARTE'
-  CALL STARTE(NHW,NHE,NVN,NVS)
+    if(lverb)WRITE(*,333)'STARTE'
+    CALL STARTE(NHW,NHE,NVN,NVS)
+  endif
 
   iyear_cur=frectyp%yearcur
   LYRC=etimer%get_days_cur_year()
@@ -124,20 +121,10 @@ SUBROUTINE soil(NE,NEX,NHW,NHE,NVN,NVS)
       call start_timer(t1)
       CALL WTHR(I,J,NHW,NHE,NVN,NVS)
       call end_timer('WTHR',t1)
-
+      
       if(lverb)WRITE(*,333)'Run_EcoSIM_one_step'
       call Run_EcoSIM_one_step(I,J,NHW,NHE,NVN,NVS)
   !
-  !   WRITE HOURLY SOIL AND PLANT OUTPUT IN 'OUTSH' AND 'OUTPH'
-  !
-!      IF((J/JOUT)*JOUT.EQ.J)THEN
-!        if(lverb)WRITE(*,333)'OUTSH'
-!        CALL OUTSH(I,J,NE,NEX,NHW,NHE,NVN,NVS)
-
-!        if(lverb)WRITE(*,333)'OUTPH'
-!        CALL OUTPH(I,J,NE,NEX,NHW,NHE,NVN,NVS)
-!      ENDIF
-
   !   WRITE OUTPUT FOR DYNAMIC VISUALIZATION
   !
       IF(visual_out)THEN
@@ -146,71 +133,36 @@ SUBROUTINE soil(NE,NEX,NHW,NHE,NVN,NVS)
           CALL VISUAL(I,J,NHW,NHE,NVN,NVS)
         ENDIF
       ENDIF
-    
+          
       call end_timer_loop()
+      
       call hist_ecosim%hist_update(bounds)
+      
       call hist_update_hbuf(bounds)      
       call etimer%update_time_stamp()      
 
       nlend=etimer%its_time_to_exit()
       rstwr=etimer%its_time_to_write_restart()
       lnyr=etimer%its_a_new_year().and.hist_yrclose
+      
       call hist_htapes_wrapup( rstwr, nlend, bounds, lnyr )      
       if(rstwr)then
         write(*,*)'write restart file'
         call restFile(flag='write')
-      endif
+      endif      
     END DO
     
-    IF(restart_out.AND.KOUT.GT.0)THEN
-!
-!   WRITE ALL SOIL AND PLANT STATE VARIABLES AND OTHER INFORMATION
-!   NEEDED TO RE-INITIALIZE THE MODEL TO CHECKPOINT FILES
-!   IN 'WOUTS', 'WOUTP' AND 'WOUTQ'
-!
-      IF((I/KOUT)*KOUT.EQ.I.OR.I.EQ.IFIN)THEN
-        call restart(I,NHW,NHE,NVN,NVS)
-      ENDIF
-    ENDIF
-!
-!   WRITE DAILY SOIL AND PLANT OUTPUT IN 'OUTSD' AND 'OUTPD'
-!
-!    IF((I/IOUT)*IOUT.EQ.I)THEN
-!      if(lverb)WRITE(*,333)'OUTSD'
-!      CALL OUTSD(I,NE,NEX,NHW,NHE,NVN,NVS)
-!      if(lverb)WRITE(*,333)'OUTPD'
-!      CALL OUTPD(I,NE,NEX,NHW,NHE,NVN,NVS)
-!    ENDIF
 !
 ! PERFORM MASS AND ENERGY BALANCE CHECKS IN 'EXEC'
 !
     if(lverb)WRITE(*,333)'EXEC'
     CALL EXEC(I)
 !
-! RE-INITIALIZE MODEL FROM CHECKPOINT FILES IF NEEDED
-!
-!    IF(NYR.NE.1.AND.IDAYR.NE.IOLD)THEN
-!   reinitialize the model from checkfiles
-!      if(lverb)WRITE(*,333)'ROUTS'
-!      CALL ROUTS(NHW,NHE,NVN,NVS)
-!      if(lverb)WRITE(*,333)'ROUTP'
-!      CALL ROUTP(NHW,NHE,NVN,NVS)
-!    ENDIF
-
     if(do_bgcforc_write)then
       call WriteBBGCForc(I,IYRR)
     endif
 
   END DO
-!
-! WRITE OUTPUT FILES FOR EACH GRID CELL IN 'SPLIT'
-!
-!ifdef _WIN_
-!  CALL SPLIT(NE,NEX,NHW,NHE,NVN,NVS)
-!else
-! CALL SPLITC(NT,NE,NTX,NEX,NHW,NHE,NVN,NVS)
-!endif
-! WRITE(*,333)'SPLIT'
 
   RETURN
 END subroutine soil

@@ -43,7 +43,6 @@ module Hist1Mod
   integer, intent(in) :: NE,NEX
   integer, intent(in) :: NHW,NHE,NVN,NVS
 
-
   integer, SAVE :: LUN
 
   CHARACTER(len=8):: CDOY,DATE,HOUR
@@ -408,7 +407,6 @@ module Hist1Mod
   CHARACTER(len=16):: HEAD(50)
   integer :: IDY1,IDY2,IDY,LPY,LUN,L,M,NX,NY,N,k
   real(r8):: dy
-
 
 !     begin_execution
 

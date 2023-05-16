@@ -38,7 +38,7 @@ module WatsubMod
   private
 
   character(len=*), parameter :: mod_filename = __FILE__
-
+  real(r8), parameter :: tiny_val=1.e-6_r8
 
   real(r8) :: ALFZ,ALBW,ATCNVW,ATCNDW,ATCNVS,ATCNDS,ATCNVR,ATCNDR
   real(r8) :: ALBG,ALBL,AVCNDR,ALT1,ALT2,ALTB,ALTS1,ALTS2,AVCNDL
@@ -257,9 +257,9 @@ module WatsubMod
       +THETPI*(VOLI1(L,NY,NX)+VOLIH1(L,NY,NX))
     VOLTX=VOLY(L,NY,NX)+VOLAH1(L,NY,NX)
     IF(VOLTX.GT.ZEROS2(NY,NX))THEN
-      THETWX(L,NY,NX)=AZMAX1((VOLW1(L,NY,NX)+VOLWH1(L,NY,NX))/VOLTX)
-      THETIX(L,NY,NX)=AZMAX1((VOLI1(L,NY,NX)+VOLIH1(L,NY,NX))/VOLTX)
-      THETPX(L,NY,NX)=AZMAX1((VOLP1(L,NY,NX)+VOLPH1(L,NY,NX))/VOLTX)
+      THETWX(L,NY,NX)=AZMAX1((VOLW1(L,NY,NX)+VOLWH1(L,NY,NX))/VOLTX,tiny_val)
+      THETIX(L,NY,NX)=AZMAX1((VOLI1(L,NY,NX)+VOLIH1(L,NY,NX))/VOLTX,tiny_val)
+      THETPX(L,NY,NX)=AZMAX1((VOLP1(L,NY,NX)+VOLPH1(L,NY,NX))/VOLTX,tiny_val)
     ELSE
       THETWX(L,NY,NX)=POROS(L,NY,NX)
       THETIX(L,NY,NX)=0.0_r8
@@ -361,10 +361,10 @@ module WatsubMod
   XVOLWM(1,NY,NX)=XVOLW(NY,NX)
   XVOLIM(1,NY,NX)=XVOLI(NY,NX)
   IF(VOLR(NY,NX).GT.ZEROS2(NY,NX))THEN
-    THETWX(0,NY,NX)=AZMAX1(VOLW1(0,NY,NX)/VOLR(NY,NX))
-    THETIX(0,NY,NX)=AZMAX1(VOLI1(0,NY,NX)/VOLR(NY,NX))
-    THETPX(0,NY,NX)=AZMAX1(VOLP1(0,NY,NX)/VOLR(NY,NX)) &
-      *AZMAX1((1.0_r8-XVOLT(NY,NX)/VOLWD(NY,NX)))
+    THETWX(0,NY,NX)=AZMAX1(VOLW1(0,NY,NX)/VOLR(NY,NX),tiny_val)
+    THETIX(0,NY,NX)=AZMAX1(VOLI1(0,NY,NX)/VOLR(NY,NX),tiny_val)
+    THETPX(0,NY,NX)=AZMAX1(VOLP1(0,NY,NX)/VOLR(NY,NX),tiny_val) &
+      *AZMAX1((1.0_r8-XVOLT(NY,NX)/VOLWD(NY,NX)),tiny_val)
   ELSE
     THETWX(0,NY,NX)=0.0_r8
     THETIX(0,NY,NX)=0.0_r8
@@ -2815,6 +2815,7 @@ module WatsubMod
   !     N3,N2,N1=L,NY,NX of source grid cell
   !     N6,N5,N4=L,NY,NX of destination grid cell
   !
+  
   IFLGH=0
   D4400: DO L=1,NL(NY,NX)
     N1=NX
@@ -3117,7 +3118,7 @@ module WatsubMod
           IF(CND1.GT.ZERO.AND.CNDL.GT.ZERO)THEN
             AVCNDL=2.0*CND1*CNDL/(CND1*DLYR(N,N6,N5,N4)+CNDL*DLYR(N,N3,N2,N1))
           ELSE
-            AVCNDL=0.0
+            AVCNDL=0.0_r8
           ENDIF
           !
           !     WATER FLUX FROM WATER POTENTIALS, HYDRAULIC CONDUCTIVITY
@@ -3202,7 +3203,7 @@ module WatsubMod
                 FLWHL(N,N6,N5,N4)=AZMIN1(AMAX1(AMAX1(-VOLWH1(N6,N5,N4) &
                   ,-VOLPH1(N3,N2,N1))*XNPX,FLWHX))
               ELSE
-                FLWHL(N,N6,N5,N4)=0.0
+                FLWHL(N,N6,N5,N4)=0.0_r8
               ENDIF
             ELSE
               FLWHL(N,N6,N5,N4)=AZMAX1(AMIN1(AMIN1(VOLWH1(N3,N2,N1)*XNPX &
@@ -3213,8 +3214,8 @@ module WatsubMod
             ENDIF
             FLWHM(M,N,N6,N5,N4)=FLWHL(N,N6,N5,N4)
           ELSE
-            FLWHL(N,N6,N5,N4)=0.0
-            FLWHM(M,N,N6,N5,N4)=0.0
+            FLWHL(N,N6,N5,N4)=0.0_r8
+            FLWHM(M,N,N6,N5,N4)=0.0_r8
             IF(VOLPH1(N6,N5,N4).LE.0.0_r8)IFLGH=1
           ENDIF
           IF(FLWHL(N,N6,N5,N4).GT.0.0_r8)THEN
@@ -3271,8 +3272,8 @@ module WatsubMod
               HWFLVL=(cpw*TK1(N6,N5,N4)+VAP)*FLVL
             ENDIF
           ELSE
-            FLVL=0.0
-            HWFLVL=0.0
+            FLVL=0.0_r8
+            HWFLVL=0.0_r8
           ENDIF
           !
           !     FLWL=total water+vapor flux to destination
@@ -3300,21 +3301,20 @@ module WatsubMod
             RYLXA1=DTKX*DTHA1
             RYLNW1=AMIN1(1.0E+04_r8,RYLXW*RYLXW1)
             RYLNA1=AMIN1(1.0E+04_r8,RYLXA*RYLXA1)
-            XNUSW1=AMAX1(1.0_r8,0.68+0.67*RYLNW1**0.25/DNUSW)
-            XNUSA1=AMAX1(1.0_r8,0.68+0.67*RYLNA1**0.25/DNUSA)
-            TCNDW1=2.067E-03*XNUSW1
-            TCNDA1=9.050E-05*XNUSA1
-            WTHET1=1.467-0.467*THETPY(N3,N2,N1)
+            XNUSW1=AMAX1(1.0_r8,0.68_r8+0.67_r8*RYLNW1**0.25_r8/DNUSW)
+            XNUSA1=AMAX1(1.0_r8,0.68_r8+0.67_r8*RYLNA1**0.25_r8/DNUSA)
+            TCNDW1=2.067E-03_r8*XNUSW1
+            TCNDA1=9.050E-05_r8*XNUSA1
+            WTHET1=1.467_r8-0.467_r8*THETPY(N3,N2,N1)
             TCND1=(STC(N3,N2,N1)+THETWX(N3,N2,N1)*TCNDW1 &
-              +0.611*THETIX(N3,N2,N1)*7.844E-03 &
+              +0.611_r8*THETIX(N3,N2,N1)*7.844E-03_r8 &
               +WTHET1*THETPX(N3,N2,N1)*TCNDA1) &
               /(DTC(N3,N2,N1)+THETWX(N3,N2,N1)+0.611*THETIX(N3,N2,N1) &
               +WTHET1*THETPX(N3,N2,N1))
           ELSE
             TCND1=0.0_r8
           ENDIF
-          IF(BKDS(N6,N5,N4).GT.ZERO.OR.THETWX(N6,N5,N4) &
-            +THETIX(N6,N5,N4).GT.ZERO)THEN
+          IF(BKDS(N6,N5,N4).GT.ZERO.OR.THETWX(N6,N5,N4)+THETIX(N6,N5,N4).GT.ZERO)THEN
             DTHW2=AZMAX1(THETWX(N6,N5,N4)-TRBW)**3._r8
             DTHA2=AZMAX1(THETPX(N6,N5,N4)-TRBA)**3._r8
             RYLXW2=DTKX*DTHW2
@@ -3327,7 +3327,7 @@ module WatsubMod
             TCNDA2=9.050E-05_r8*XNUSA2
             WTHET2=1.467_r8-0.467_r8*THETPY(N6,N5,N4)
             TCND2=(STC(N6,N5,N4)+THETWX(N6,N5,N4)*TCNDW2 &
-              +0.611*THETIX(N6,N5,N4)*7.844E-03 &
+              +0.611_r8*THETIX(N6,N5,N4)*7.844E-03 &
               +WTHET2*THETPX(N6,N5,N4)*TCNDA2) &
               /(DTC(N6,N5,N4)+THETWX(N6,N5,N4)+0.611*THETIX(N6,N5,N4) &
               +WTHET2*THETPX(N6,N5,N4))
@@ -3375,7 +3375,12 @@ module WatsubMod
           ELSE
             TKLX=TK1(N6,N5,N4)
           ENDIF
-          TKY=(VHCP1(N3,N2,N1)*TK1X+VHCP1(N6,N5,N4)*TKLX)/(VHCP1(N3,N2,N1)+VHCP1(N6,N5,N4))
+          
+          if(VHCP1(N3,N2,N1)+VHCP1(N6,N5,N4)>0._r8)then
+            TKY=(VHCP1(N3,N2,N1)*TK1X+VHCP1(N6,N5,N4)*TKLX)/(VHCP1(N3,N2,N1)+VHCP1(N6,N5,N4))
+          ELSE
+            TKY=(TK1X+TKLX)/2._r8
+          endif 
           HFLWX=(TK1X-TKY)*VHCP1(N3,N2,N1)*XNPX
           HFLWC=ATCNDL*(TK1X-TKLX)*AREA(N,N3,N2,N1)*XNPH
           IF(HFLWC.GE.0.0_r8)THEN
@@ -3404,32 +3409,33 @@ module WatsubMod
             FILM(M,N6,N5,N4)=FilmThickness(PSISA1(N6,N5,N4))
           ENDIF
         ELSEIF(N.NE.3)THEN
-          FLWL(N,N6,N5,N4)=0.0
-          FLWLX(N,N6,N5,N4)=0.0
-          FLWHL(N,N6,N5,N4)=0.0
-          HFLWL(N,N6,N5,N4)=0.0
-          FLWM(M,N,N6,N5,N4)=0.0
-          FLWHM(M,N,N6,N5,N4)=0.0
+          FLWL(N,N6,N5,N4)=0.0_r8
+          FLWLX(N,N6,N5,N4)=0.0_r8
+          FLWHL(N,N6,N5,N4)=0.0_r8
+          HFLWL(N,N6,N5,N4)=0.0_r8
+          FLWM(M,N,N6,N5,N4)=0.0_r8
+          FLWHM(M,N,N6,N5,N4)=0.0_r8
         ENDIF
       ELSE
         IF(N.EQ.3)THEN
-          FLWL(N,N3,N2,N1)=0.0
-          FLWLX(N,N3,N2,N1)=0.0
-          FLWHL(N,N3,N2,N1)=0.0
-          HFLWL(N,N3,N2,N1)=0.0
-          FLWHM(M,N,N3,N2,N1)=0.0
-          FLWHM(M,N,N3,N2,N1)=0.0
+          FLWL(N,N3,N2,N1)=0.0_r8
+          FLWLX(N,N3,N2,N1)=0.0_r8
+          FLWHL(N,N3,N2,N1)=0.0_r8
+          HFLWL(N,N3,N2,N1)=0.0_r8
+          FLWHM(M,N,N3,N2,N1)=0.0_r8
+          FLWHM(M,N,N3,N2,N1)=0.0_r8
         ELSE
-          FLWL(N,N6,N5,N4)=0.0
-          FLWLX(N,N6,N5,N4)=0.0
-          FLWHL(N,N6,N5,N4)=0.0
-          HFLWL(N,N6,N5,N4)=0.0
-          FLWM(M,N,N6,N5,N4)=0.0
-          FLWHM(M,N,N6,N5,N4)=0.0
+          FLWL(N,N6,N5,N4)=0.0_r8
+          FLWLX(N,N6,N5,N4)=0.0_r8
+          FLWHL(N,N6,N5,N4)=0.0_r8
+          HFLWL(N,N6,N5,N4)=0.0_r8
+          FLWM(M,N,N6,N5,N4)=0.0_r8
+          FLWHM(M,N,N6,N5,N4)=0.0_r8
         ENDIF
       ENDIF
     ENDDO D4320
   ENDDO D4400
+  
   end subroutine Subsurface3DFlow
 !------------------------------------------------------------------------------------------
 
@@ -3587,8 +3593,8 @@ module WatsubMod
 
               IF(IRCHG(NN,N,N2,N1).EQ.0.OR.test_aeqb(RCHQF,0._r8) &
                 .OR.ABS(QRM(M,N2,N1)).LT.ZEROS(N2,N1))THEN
-                QR1(N,NN,M5,M4)=0.0
-                HQR1(N,NN,M5,M4)=0.0
+                QR1(N,NN,M5,M4)=0.0_r8
+                HQR1(N,NN,M5,M4)=0.0_r8
               ELSE
                 !
                 ! SURFACE BOUNDARY WATER FLUX
@@ -3953,12 +3959,12 @@ module WatsubMod
               FLWHM(M,N,M6,M5,M4)=FLWHL(N,M6,M5,M4)
             ENDIF
           ELSE
-            FLWL(N,M6,M5,M4)=0.0
-            FLWLX(N,M6,M5,M4)=0.0
-            FLWHL(N,M6,M5,M4)=0.0
-            HFLWL(N,M6,M5,M4)=0.0
-            FLWM(M,N,M6,M5,M4)=0.0
-            FLWHM(M,N,M6,M5,M4)=0.0
+            FLWL(N,M6,M5,M4)=0.0_r8
+            FLWLX(N,M6,M5,M4)=0.0_r8
+            FLWHL(N,M6,M5,M4)=0.0_r8
+            HFLWL(N,M6,M5,M4)=0.0_r8
+            FLWM(M,N,M6,M5,M4)=0.0_r8
+            FLWHM(M,N,M6,M5,M4)=0.0_r8
           ENDIF
         ENDDO D9575
     !
@@ -4289,10 +4295,10 @@ module WatsubMod
       XVOLWM(M+1,NY,NX)=XVOLW(NY,NX)
       XVOLIM(M+1,NY,NX)=XVOLI(NY,NX)
       IF(VOLR(NY,NX).GT.ZEROS2(NY,NX))THEN
-        THETWX(0,NY,NX)=AZMAX1(VOLW1(0,NY,NX)/VOLR(NY,NX))
-        THETIX(0,NY,NX)=AZMAX1(VOLI1(0,NY,NX)/VOLR(NY,NX))
-        THETPX(0,NY,NX)=AZMAX1(VOLP1(0,NY,NX)/VOLR(NY,NX)) &
-          *AZMAX1((1.0_r8-XVOLT(NY,NX)/VOLWD(NY,NX)))
+        THETWX(0,NY,NX)=AZMAX1(VOLW1(0,NY,NX)/VOLR(NY,NX),tiny_val)
+        THETIX(0,NY,NX)=AZMAX1(VOLI1(0,NY,NX)/VOLR(NY,NX),tiny_val)
+        THETPX(0,NY,NX)=AZMAX1(VOLP1(0,NY,NX)/VOLR(NY,NX),tiny_val) &
+          *AZMAX1((1.0_r8-XVOLT(NY,NX)/VOLWD(NY,NX)),tiny_val)
       ELSE
         THETWX(0,NY,NX)=0.0_r8
         THETIX(0,NY,NX)=0.0_r8
@@ -4379,9 +4385,9 @@ module WatsubMod
           VOLPM(M+1,L,NY,NX)=VOLP1(L,NY,NX)+VOLPH1(L,NY,NX)+THETPI*(VOLI1(L,NY,NX)+VOLIH1(L,NY,NX))
           FLPM(M,L,NY,NX)=VOLPM(M,L,NY,NX)-VOLPM(M+1,L,NY,NX)
           VOLTX=VOLY(L,NY,NX)+VOLAH1(L,NY,NX)
-          THETWX(L,NY,NX)=AZMAX1((VOLW1(L,NY,NX)+VOLWH1(L,NY,NX))/VOLTX)
-          THETIX(L,NY,NX)=AZMAX1((VOLI1(L,NY,NX)+VOLIH1(L,NY,NX))/VOLTX)
-          THETPX(L,NY,NX)=AZMAX1((VOLP1(L,NY,NX)+VOLPH1(L,NY,NX))/VOLTX)
+          THETWX(L,NY,NX)=AZMAX1((VOLW1(L,NY,NX)+VOLWH1(L,NY,NX))/VOLTX,tiny_val)
+          THETIX(L,NY,NX)=AZMAX1((VOLI1(L,NY,NX)+VOLIH1(L,NY,NX))/VOLTX,tiny_val)
+          THETPX(L,NY,NX)=AZMAX1((VOLP1(L,NY,NX)+VOLPH1(L,NY,NX))/VOLTX,tiny_val)
           THETPM(M+1,L,NY,NX)=THETPX(L,NY,NX)
           IF(VOLA1(L,NY,NX)+VOLAH1(L,NY,NX).GT.ZEROS2(NY,NX))THEN
             THETPY(L,NY,NX)=AZMAX1((VOLP1(L,NY,NX)+VOLPH1(L,NY,NX)) &
@@ -4444,11 +4450,11 @@ module WatsubMod
             TK1(L,NY,NX)=TK1(L-1,NY,NX)
           ENDIF
         ELSE
-          VOLWM(M+1,L,NY,NX)=0.0
-          VOLWHM(M+1,L,NY,NX)=0.0
-          VOLPM(M+1,L,NY,NX)=0.0
+          VOLWM(M+1,L,NY,NX)=0.0_r8
+          VOLWHM(M+1,L,NY,NX)=0.0_r8
+          VOLPM(M+1,L,NY,NX)=0.0_r8
           FLPM(M,L,NY,NX)=VOLPM(M,L,NY,NX)
-          THETPM(M+1,L,NY,NX)=0.0
+          THETPM(M+1,L,NY,NX)=0.0_r8
         ENDIF
 
       ENDDO D9785

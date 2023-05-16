@@ -759,7 +759,8 @@ module ncdio_pio
 
     call check_var(ncid, trim(varname), vardesc, readvar)
 
-    call check_ret( nf90_put_var(ncid%fh, vardesc%varid, data),'ncd_putvar_real_sp_all_2d')
+    call check_ret( nf90_put_var(ncid%fh, vardesc%varid, data),&
+      trim(mod_filename)//'::ncd_putvar_real_sp_all_2d::'//trim(varname))
 
     end subroutine ncd_putvar_real_sp_all_2d
 !*****************************************************************
@@ -929,7 +930,8 @@ module ncdio_pio
 
     call check_var(ncid, trim(varname), vardesc, readvar)
 
-    call check_ret( nf90_put_var(ncid%fh, vardesc%varid, data),'ncd_putvar_real_sp_all_5d')
+    call check_ret( nf90_put_var(ncid%fh, vardesc%varid, data), &
+      trim(mod_filename)//'::ncd_putvar_real_sp_all_5d::'//trim(varname))
   end subroutine ncd_putvar_real_sp_all_5d  
 !----------------------------------------------------------------------
   subroutine ncd_putvar_real_sp_3d(ncid, varname, rec, data)
@@ -1048,7 +1050,7 @@ module ncdio_pio
   call check_var(ncid, trim(varname), vardesc, readvar)
 
   call check_ret( nf90_get_var(ncid%fh, vardesc%varid, data, &
-    start = (/rec/)),'ncd_getvar_int '//trim(varname))
+    start = (/rec/)),trim(mod_filename)//'::ncd_getvar_int::'//trim(varname))
 
   end subroutine ncd_getvar_int
   !----------------------------------------------------------------------
@@ -1275,7 +1277,7 @@ module ncdio_pio
   call check_var(ncid, trim(varname), vardesc, readvar)
 
   call check_ret( nf90_get_var(ncid%fh, vardesc%varid, data,  &
-     start = (/1,rec/)),'ncd_getvar_int_1d')
+     start = (/1,rec/)),trim(mod_filename)//'::ncd_getvar_int_1d::'//trim(varname))
 
   end subroutine ncd_getvar_int_1d
 !----------------------------------------------------------------------
@@ -1296,7 +1298,8 @@ module ncdio_pio
 
   call check_var(ncid, trim(varname), vardesc, readvar)
 
-  call check_ret( nf90_get_var(ncid%fh, vardesc%varid, data),'ncd_getvar_int_all_1d')
+  call check_ret( nf90_get_var(ncid%fh, vardesc%varid, data),&
+    trim(mod_filename)//'::ncd_getvar_int_all_1d::'//trim(varname))
 
   end subroutine ncd_getvar_int_all_1d  
 !----------------------------------------------------------------------
@@ -1346,7 +1349,7 @@ module ncdio_pio
   call check_var(ncid, trim(varname), vardesc, readvar)
 
   call check_ret( nf90_get_var(ncid%fh, vardesc%varid, data,  &
-      start = (/1,1,rec/)),'ncd_getvar_int_2d')
+      start = (/1,1,rec/)),trim(mod_filename)//'::ncd_getvar_int_2d::'//trim(varname))
 
   end subroutine ncd_getvar_int_2d
 !----------------------------------------------------------------------
@@ -1368,7 +1371,8 @@ module ncdio_pio
 
   call check_var(ncid, trim(varname), vardesc, readvar)
 
-  call check_ret( nf90_get_var(ncid%fh, vardesc%varid, data),'ncd_getvar_int_all_2d')
+  call check_ret( nf90_get_var(ncid%fh, vardesc%varid, data),&
+    trim(mod_filename)//'::ncd_getvar_int_all_2d::'//trim(varname))
 
   end subroutine ncd_getvar_int_all_2d
 
@@ -1393,7 +1397,7 @@ module ncdio_pio
   call check_var(ncid, trim(varname), vardesc, readvar)
 
   call check_ret( nf90_get_var(ncid%fh, vardesc%varid, data,  &
-    start = (/1,1,rec/)),trim(varname)//' in ncd_getvar_real_sp_2d')
+    start = (/1,1,rec/)),trim(mod_filename)//'::ncd_getvar_real_sp_2d::'//trim(varname))
 
   end subroutine ncd_getvar_real_sp_2d
 !----------------------------------------------------------------------
@@ -1416,7 +1420,7 @@ module ncdio_pio
   call check_var(ncid, trim(varname), vardesc, readvar)
 
   call check_ret( nf90_get_var(ncid%fh, vardesc%varid, data,  &
-     start = (/1,1,1,rec/)),'ncd_getvar_int_3d')
+     start = (/1,1,1,rec/)),trim(mod_filename)//'::ncd_getvar_int_3d::'//trim(varname))
 
   end subroutine ncd_getvar_int_3d
 !----------------------------------------------------------------------
@@ -1437,7 +1441,8 @@ module ncdio_pio
 
   call check_var(ncid, trim(varname), vardesc, readvar)
 
-  call check_ret( nf90_get_var(ncid%fh, vardesc%varid, data),'ncd_getvar_int_all_3d')
+  call check_ret( nf90_get_var(ncid%fh, vardesc%varid, data),&
+    trim(mod_filename)//'::ncd_getvar_int_all_3d::'//trim(varname))
 
   end subroutine ncd_getvar_int_all_3d
 

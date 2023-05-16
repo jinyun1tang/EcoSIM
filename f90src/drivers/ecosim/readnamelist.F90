@@ -29,9 +29,10 @@
   namelist /ecosim/case_name, prefix, do_regression_test, &
     num_of_simdays,lverbose,num_microbial_guilds,transport_on,column_mode,&
     do_instequil,salt_model, pft_file_in,grid_file_in,pft_mgmt_in, clm_factor_in,&
-    clm_file_in,soil_mgmt_in,hist_config,sim_yyyymmdd,forc_periods,&
-    NPXS,NPYS,JOUTS,IOUTS,KOUTS,continue_run,visual_out,restart_out,&
-    finidat,nrevsn,brnch_retain_casename
+    clm_file_in,soil_mgmt_in,sim_yyyymmdd,forc_periods,&
+    NPXS,NPYS,JOUTS,continue_run,visual_out,restart_out,&
+    finidat,nrevsn,brnch_retain_casename,plant_model,micb_model,&
+    soichem_model
   
   namelist /ecosim/hist_nhtfrq,hist_mfilt,hist_fincl1,hist_fincl2,hist_yrclose, &
     do_budgets,rest_frq,rest_opt,diag_frq,diag_opt
@@ -49,17 +50,18 @@
   NPXS=30   !number of cycles per hour for water,heat,solute flux calcns
   NPYS=20   !number of cycles per NPX for gas flux calcns
   JOUTS=1   !frequency on hourly scale
-  IOUTS=1   !frequency on daily scale
-  KOUTS=500 !frequency on restart file writing
 
   visual_out =.false.
   restart_out=.false.  
   do_budgets =.false.
+  plant_model=.true.
+  soichem_model=.true.
+  micb_model=.true.
+
   finidat=' '
   nrevsn = ' '
 
   brnch_retain_casename=.false.
-  hist_config='NO'
   hist_yrclose=.false.
   sim_yyyymmdd='18000101'
   forc_periods=(/1980,1980,1,1981,1988,2,1989,2008,1/)
@@ -94,13 +96,13 @@
   open (action='read', file=nmlfile, iostat=rc, newunit=fu)
   if (rc /= 0) then
     write (iulog, '(2a)') 'Error openning input file "', &
-  trim(nmlfile)
+    trim(nmlfile)
     call endrun('stopped in '//trim(mod_filename), __LINE__)
   end if
 
   read(unit=fu, nml=ecosim, iostat=nml_error, iomsg=ioerror_msg)
   if (nml_error /= 0) then
-     write(iulog,'(a)')"ERROR reading ecosim namelist "
+     write(iulog,'(a)')"ERROR reading ecosim namelist ",nml_error,ioerror_msg
      call endrun('stopped in '//trim(mod_filename), __LINE__)
   end if
 
@@ -135,8 +137,7 @@
   LYRG=num_of_simdays
   lverb=lverbose
   nmicbguilds=num_microbial_guilds
-
-  !below is a temporary setup
-
-  DATAC(21:30,1,1)=hist_config
+  if(.not. soichem_model)then
+    salt_model=.false.
+  endif
 end subroutine readnamelist
