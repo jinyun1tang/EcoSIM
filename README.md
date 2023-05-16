@@ -4,7 +4,7 @@ A biogeochemical modeling library spins off the ecosys model.
 
 ## Download
 
-git clone --recursive https://github.com/jinyun1tang/EcoSIM
+git clone --recursive git@github.com:jinyun1tang/EcoSIM.git
 
 ## Building
 
