@@ -10,7 +10,7 @@ module readiMod
   use MiniFuncMod  , only : GetDayLength
   use EcoSIMConfig, only : column_mode
   use EcoSIMCtrlMod, only : grid_file_in,lverb,an2_ppm,ao2_ppm
-  use EcoSIMCtrlMod, only : aco2_ppm,an2o_ppm,anh3_ppm,ach4_ppm 
+  use EcoSIMCtrlMod, only : aco2_ppm,an2o_ppm,anh3_ppm,ach4_ppm
   use EcoSiMParDataMod, only : micpar
   use SOMDataType
   use CanopyRadDataType
@@ -542,7 +542,7 @@ module readiMod
 !
 !     CDPTH=depth to bottom (m) > 0
 !     SoiBulkDensityt0=initial bulk density (Mg m-3,0=water), it refers to solid matter
-!     
+!
 !
         IF (NX/=NH1 .OR. NY/=NV1) THEN
           DO L=NU(NY,NX),NM(NY,NX)
@@ -726,12 +726,12 @@ module readiMod
           CORGR(L,NY,NX)=CORGR(L,NY,NX)*1.0E+03_r8   !convert from Kg to g C
           CORGCI(L,NY,NX)=CORGC(L,NY,NX)
           SoilFracAsMacPt0(L,NY,NX)=SoilFracAsMacP(L,NY,NX)
-  !       
+  !
           CSAND(L,NY,NX)=CSAND(L,NY,NX)*1.0E-03_r8*AZMAX1((1.0_r8-CORGC(L,NY,NX)/orgcden))
           CSILT(L,NY,NX)=CSILT(L,NY,NX)*1.0E-03_r8*AZMAX1((1.0_r8-CORGC(L,NY,NX)/orgcden))
           CCLAY(L,NY,NX)=CCLAY(L,NY,NX)*1.0E-03_r8*AZMAX1((1.0_r8-CORGC(L,NY,NX)/orgcden))
           CEC(L,NY,NX)=CEC(L,NY,NX)*10.0_r8   !convert from meq/100g to cmol/kg
-          AEC(L,NY,NX)=AEC(L,NY,NX)*10.0_r8   !convert from meq/100g to cmol/kg 
+          AEC(L,NY,NX)=AEC(L,NY,NX)*10.0_r8   !convert from meq/100g to cmol/kg
           CNH4(L,NY,NX)=CNH4(L,NY,NX)/natomw
           CNO3(L,NY,NX)=CNO3(L,NY,NX)/natomw
           CPO4(L,NY,NX)=CPO4(L,NY,NX)/patomw
