@@ -212,9 +212,9 @@ module readiMod
 
   call ncd_getvar(grid_nfid,'OXYEG',loc,OXYEG)
   call ncd_getvar(grid_nfid,'Z2GEG',loc,Z2GEG)
-  call ncd_getvar(grid_nfid,'CO2EIG',loc,CO2EIG)
-  call ncd_getvar(grid_nfid,'CH4EG',loc,CH4EG)
-  call ncd_getvar(grid_nfid,'Z2OEG',loc,Z2OEG)
+!  call ncd_getvar(grid_nfid,'CO2EIG',loc,CO2EIG)
+!  call ncd_getvar(grid_nfid,'CH4EG',loc,CH4EG)
+!  call ncd_getvar(grid_nfid,'Z2OEG',loc,Z2OEG)
   call ncd_getvar(grid_nfid,'ZNH3EG',loc,ZNH3EG)
 
   call ncd_getvar(grid_nfid,'IETYPG',loc,IETYPG)
@@ -251,9 +251,9 @@ module readiMod
     write(*,'(40A)')('-',ll=1,40)
     write(*,*)'atmospheric O2 (ppm): OXYEG',OXYEG
     write(*,*)'atmospheric N2 (ppm): Z2GEG',Z2GEG
-    write(*,*)'atmospheric CO2 (ppm): CO2EIG',CO2EIG
-    write(*,*)'atmospheric CH4 (ppm): CH4EG',CH4EG
-    write(*,*)'atmospheric N2O (ppm): Z2OEG',Z2OEG
+!    write(*,*)'atmospheric CO2 (ppm): CO2EIG',CO2EIG
+!    write(*,*)'atmospheric CH4 (ppm): CH4EG',CH4EG
+!    write(*,*)'atmospheric N2O (ppm): Z2OEG',Z2OEG
     write(*,*)'atmospheric NH3 (ppm): ZNH3EG',ZNH3EG
     write(*,'(40A)')('-',ll=1,40)
     write(*,*)'Koppen climate zone: IETYPG',IETYPG
@@ -289,6 +289,7 @@ module readiMod
   D9895: DO NX=NHW,NHE
     D9890: DO NY=NVN,NVS
       ALAT(NY,NX)=ALATG
+      PBOT(NY,NX)=PBOT(NY,NX)*exp(-ALT(NY,NX)/hpresc)
       ALTI(NY,NX)=ALTIG
       ATCAI(NY,NX)=ATCAG
       IDTBL(NY,NX)=IDTBLG
@@ -440,6 +441,7 @@ module readiMod
     call ncd_getvar(grid_nfid, 'ROCK',ntp,ROCK(1:JZ,NV1,NH1))
 
     call ncd_getvar(grid_nfid, 'PH',ntp,PH(1:JZ,NV1,NH1))
+    !meq/100g means 1.e-3 mol/100 g =1 cmol/kg , cmol ~ 1.e-2 mol
     call ncd_getvar(grid_nfid, 'CEC',ntp,CEC(1:JZ,NV1,NH1))
     call ncd_getvar(grid_nfid, 'AEC',ntp,AEC(1:JZ,NV1,NH1))
 
@@ -535,8 +537,9 @@ module readiMod
 !
 !     PHYSICAL PROPERTIES
 !
-!     CDPTH=depth to bottom (m)
-!     BKDSI=initial bulk density (Mg m-3,0=water)
+!     CDPTH=depth to bottom (m) > 0
+!     BKDSI=initial bulk density (Mg m-3,0=water), it refers to solid matter
+!     
 !
         IF (NX/=NH1 .OR. NY/=NV1) THEN
           DO L=NU(NY,NX),NM(NY,NX)
@@ -646,7 +649,7 @@ module readiMod
 !
 !     FILL OUT SOIL BOUNDARY LAYERS ABOVE ROOTING ZONE (NOT USED)
 !     below is for soil repacking, whence NU>1
-!     root zone from NU to NM,
+!     root zone from NU to NM, why use 0.025?
 !
         IF(NU(NY,NX).GT.1)THEN
           DO  L=NU(NY,NX)-1,0,-1
@@ -669,10 +672,10 @@ module readiMod
               PH(L,NY,NX)=PH(L+1,NY,NX)
               CEC(L,NY,NX)=CEC(L+1,NY,NX)
               AEC(L,NY,NX)=AEC(L+1,NY,NX)
-              CORGC(L,NY,NX)=1.00_r8*CORGC(L+1,NY,NX)
-              CORGR(L,NY,NX)=1.00_r8*CORGR(L+1,NY,NX)
-              CORGN(L,NY,NX)=1.00_r8*CORGN(L+1,NY,NX)
-              CORGP(L,NY,NX)=1.00_r8*CORGP(L+1,NY,NX)
+              CORGC(L,NY,NX)=1.0_r8*CORGC(L+1,NY,NX)
+              CORGR(L,NY,NX)=1.0_r8*CORGR(L+1,NY,NX)
+              CORGN(L,NY,NX)=1.0_r8*CORGN(L+1,NY,NX)
+              CORGP(L,NY,NX)=1.0_r8*CORGP(L+1,NY,NX)
               CNH4(L,NY,NX)=CNH4(L+1,NY,NX)
               CNO3(L,NY,NX)=CNO3(L+1,NY,NX)
               CPO4(L,NY,NX)=CPO4(L+1,NY,NX)
@@ -795,11 +798,11 @@ module readiMod
 !   BKDSI: initial bulk density
 
         DO  L=1,NL(NY,NX)
-  !   FHOL: micropore fraction
+  !   FHOL: macropore fraction
   !     BKDSI(L,NY,NX)=BKDSI(L,NY,NX)/(1.0_r8-FHOL(L,NY,NX))
           BKDS(L,NY,NX)=BKDSI(L,NY,NX)
           IF(test_aeqb(BKDS(L,NY,NX),0.0_r8))FHOL(L,NY,NX)=0.0_r8
-  !     fraction of soil has micropore
+  !     fraction of soil as micropore
           FMPR(L,NY,NX)=(1.0_r8-ROCK(L,NY,NX))*(1.0_r8-FHOL(L,NY,NX))
   !     FC(L,NY,NX)=FC(L,NY,NX)/(1.0-FHOL(L,NY,NX))
   !     WP(L,NY,NX)=WP(L,NY,NX)/(1.0-FHOL(L,NY,NX))
@@ -807,16 +810,16 @@ module readiMod
           SCNV(L,NY,NX)=0.098_r8*SCNV(L,NY,NX)*FMPR(L,NY,NX)
           SCNH(L,NY,NX)=0.098_r8*SCNH(L,NY,NX)*FMPR(L,NY,NX)
           CCLAY(L,NY,NX)=AZMAX1(1.0E+03_r8-(CSAND(L,NY,NX)+CSILT(L,NY,NX)))
-          CORGC(L,NY,NX)=CORGC(L,NY,NX)*1.0E+03_r8   !convert to g C
-          CORGR(L,NY,NX)=CORGR(L,NY,NX)*1.0E+03_r8   !convert to g C
+          CORGC(L,NY,NX)=CORGC(L,NY,NX)*1.0E+03_r8   !convert from Kg to g C
+          CORGR(L,NY,NX)=CORGR(L,NY,NX)*1.0E+03_r8   !convert from Kg to g C
           CORGCI(L,NY,NX)=CORGC(L,NY,NX)
           FHOLI(L,NY,NX)=FHOL(L,NY,NX)
-  !
-          CSAND(L,NY,NX)=CSAND(L,NY,NX)*1.0E-03_r8*AZMAX1((1.0_r8-CORGC(L,NY,NX)/0.55E+06_r8))
-          CSILT(L,NY,NX)=CSILT(L,NY,NX)*1.0E-03_r8*AZMAX1((1.0_r8-CORGC(L,NY,NX)/0.55E+06_r8))
-          CCLAY(L,NY,NX)=CCLAY(L,NY,NX)*1.0E-03_r8*AZMAX1((1.0_r8-CORGC(L,NY,NX)/0.55E+06_r8))
-          CEC(L,NY,NX)=CEC(L,NY,NX)*10.0_r8
-          AEC(L,NY,NX)=AEC(L,NY,NX)*10.0_r8
+  !       
+          CSAND(L,NY,NX)=CSAND(L,NY,NX)*1.0E-03_r8*AZMAX1((1.0_r8-CORGC(L,NY,NX)/orgcden))
+          CSILT(L,NY,NX)=CSILT(L,NY,NX)*1.0E-03_r8*AZMAX1((1.0_r8-CORGC(L,NY,NX)/orgcden))
+          CCLAY(L,NY,NX)=CCLAY(L,NY,NX)*1.0E-03_r8*AZMAX1((1.0_r8-CORGC(L,NY,NX)/orgcden))
+          CEC(L,NY,NX)=CEC(L,NY,NX)*10.0_r8   !convert from meq/100g to cmol/kg
+          AEC(L,NY,NX)=AEC(L,NY,NX)*10.0_r8   !convert from meq/100g to cmol/kg 
           CNH4(L,NY,NX)=CNH4(L,NY,NX)/natomw
           CNO3(L,NY,NX)=CNO3(L,NY,NX)/natomw
           CPO4(L,NY,NX)=CPO4(L,NY,NX)/patomw
@@ -828,10 +831,10 @@ module readiMod
           CKA(L,NY,NX)=CKA(L,NY,NX)/39.1_r8
           CSO4(L,NY,NX)=CSO4(L,NY,NX)/32.0_r8
           CCL(L,NY,NX)=CCL(L,NY,NX)/35.5_r8
-          CALPO(L,NY,NX)=CALPO(L,NY,NX)/31.0_r8
-          CFEPO(L,NY,NX)=CFEPO(L,NY,NX)/31.0_r8
-          CCAPD(L,NY,NX)=CCAPD(L,NY,NX)/31.0_r8
-          CCAPH(L,NY,NX)=CCAPH(L,NY,NX)/(31.0_r8*3.0_r8)
+          CALPO(L,NY,NX)=CALPO(L,NY,NX)/patomw
+          CFEPO(L,NY,NX)=CFEPO(L,NY,NX)/patomw
+          CCAPD(L,NY,NX)=CCAPD(L,NY,NX)/patomw
+          CCAPH(L,NY,NX)=CCAPH(L,NY,NX)/(patomw*3.0_r8)
           CALOH(L,NY,NX)=CALOH(L,NY,NX)/27.0_r8
           CFEOH(L,NY,NX)=CFEOH(L,NY,NX)/56.0_r8
           CCACO(L,NY,NX)=CCACO(L,NY,NX)/40.0_r8
@@ -850,12 +853,13 @@ module readiMod
               ,1.2E+02_r8*(CORGC(L,NY,NX)/1.0E+04_r8)**0.52_r8)
           ENDIF
           IF(CEC(L,NY,NX).LT.0.0_r8)THEN
+            !estimate from input data
             CEC(L,NY,NX)=10.0_r8*(200.0_r8*2.0_r8*CORGC(L,NY,NX)/1.0E+06_r8 &
               +80.0_r8*CCLAY(L,NY,NX)+20.0_r8*CSILT(L,NY,NX) &
               +5.0_r8*CSAND(L,NY,NX))
           ENDIF
         ENDDO
-        CORGC(0,NY,NX)=0.55E+06_r8
+        CORGC(0,NY,NX)=orgcden
         FMPR(0,NY,NX)=1.0_r8
       ENDDO
     ENDDO

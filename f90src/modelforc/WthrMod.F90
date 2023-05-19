@@ -493,7 +493,7 @@ module WthrMod
       PRECWI(NY,NX)=PRECWI(NY,NX)*TDPRC(N,NY,NX)
       PRECII(NY,NX)=PRECII(NY,NX)*TDIRI(N,NY,NX)
       PRECUI(NY,NX)=PRECUI(NY,NX)*TDIRI(N,NY,NX)
-      CO2E(NY,NX)=CO2EI(NY,NX)*TDCO2(N,NY,NX)   !used in photosynthesis, soil CO2 transport
+      CO2E(NY,NX)=CO2EI(NY,NX)   !used in photosynthesis, soil CO2 transport
       CN4R(NY,NX)=CN4RI(NY,NX)*TDCN4(N,NY,NX)
       CNOR(NY,NX)=CNORI(NY,NX)*TDCNO(N,NY,NX)
     ENDDO D9920

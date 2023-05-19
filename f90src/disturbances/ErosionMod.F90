@@ -97,9 +97,10 @@ module ErosionMod
   real(r8) :: DEPI,DETI,DETR,STPR
   integer :: NY,NX
 
-  DO  NX=NHW,NHE
-    DO  NY=NVN,NVS
-      IF(IERSNG.EQ.1.OR.IERSNG.EQ.3)THEN
+  IF(IERSNG.EQ.1.OR.IERSNG.EQ.3)THEN
+    DO  NX=NHW,NHE
+      DO  NY=NVN,NVS
+      
         TERSED(NY,NX)=0._r8
         RDTSED(NY,NX)=0._r8
         FVOLIM(NY,NX)=AMIN1(1.0_r8,AZMAX1(XVOLIM(M,NY,NX)/VOLWG(NY,NX)))
@@ -166,10 +167,10 @@ module ErosionMod
 !     CONCENTRATION TIMES OVERLAND WATER FLUX FROM 'WATSUB'
 !
         call OverLandFlowSedTransp(M,NY,NX,NHW,NHE,NVN,NVS)
-
-      ENDIF
+      ENDDO
     ENDDO
-  ENDDO
+  ENDIF
+
   end subroutine SedimentDetachment
 !------------------------------------------------------------------------------------------
   subroutine OverLandFlowSedTransp(M,NY,NX,NHW,NHE,NVN,NVS)

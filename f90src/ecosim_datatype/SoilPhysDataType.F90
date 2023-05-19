@@ -6,7 +6,7 @@ implicit none
   save
   character(len=*), private, parameter :: mod_filename = __FILE__
 
-  real(r8),target,allocatable ::  SLOPE(:,:,:)                       !slope	in three directions [o]
+  real(r8),target,allocatable ::  SLOPE(:,:,:)                       !slope	in four directions [o]
   real(r8),target,allocatable ::  FC(:,:,:)                          !water contents at field capacity
   real(r8),target,allocatable ::  WP(:,:,:)                          !water contents at wilting point
   real(r8),target,allocatable ::  SCNV(:,:,:)                        !soil vertical saturated hydraulic conductivity [mm h-1]
