@@ -12,7 +12,11 @@ pft_mgmt_in='../../..//python_tools/lake_pft_20230131.nc'
 soil_mgmt_in='../../../python_tools/lake_soilmgmt_20230510.nc'
 clm_file_in='../../../examples/inputs/lake/lake_clim_20230203.nc'
 clm_factor_in='../../../examples/inputs/lake/lake_clmfactor_20230223.nc'
+atm_ghg_in='../../../input_data/fatm_hist_GHGs_1750-2022.nc'
 lverbose=.false.
+plant_model=.false.
+micb_model=.false.
+soichem_model=.false.
 
 !set up output variable lists
 !set up the first year of simulation

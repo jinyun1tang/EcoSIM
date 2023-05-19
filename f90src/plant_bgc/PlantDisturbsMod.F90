@@ -2353,7 +2353,7 @@ module PlantDisturbsMod
                 FFIRE(1:npelms)=0._r8
               ELSE
                 XHVST(ielmc)=1.0_r8-DCORP*EHVST(1,ipld_woody,NZ) &
-                  *AMIN1(1.0_r8,(CORGC(L)-FORGC)/(0.55E+06-FORGC))
+                  *AMIN1(1.0_r8,(CORGC(L)-FORGC)/(orgcden-FORGC))
                 XHVST(ielmn)=XHVST(ielmc)
                 XHVST(ielmp)=XHVST(ielmc)
                 FFIRE(ielmc)=EHVST(2,ipld_woody,NZ)

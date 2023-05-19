@@ -280,6 +280,9 @@ module readsmod
     call ReadManagementFiles(yeari)
   ENDIF
   IMNG=1
+  
+  call getGHGts(yearc,NHW,NHE,NVN,NVS)
+
   RETURN
   END subroutine reads
 !------------------------------------------------------------------------------------------

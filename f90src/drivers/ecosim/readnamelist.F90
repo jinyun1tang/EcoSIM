@@ -32,7 +32,7 @@
     clm_file_in,soil_mgmt_in,sim_yyyymmdd,forc_periods,&
     NPXS,NPYS,JOUTS,continue_run,visual_out,restart_out,&
     finidat,nrevsn,brnch_retain_casename,plant_model,micb_model,&
-    soichem_model
+    soichem_model,atm_ghg_in
   
   namelist /ecosim/hist_nhtfrq,hist_mfilt,hist_fincl1,hist_fincl2,hist_yrclose, &
     do_budgets,rest_frq,rest_opt,diag_frq,diag_opt
@@ -85,7 +85,7 @@
   pft_mgmt_in=''
   clm_file_in=''
   soil_mgmt_in=''
-
+  atm_ghg_in=''
   inquire (file=nmlfile, iostat=rc)
   if (rc /= 0) then
     write (iulog, '(3a)') 'Error: input file ', trim(nmlfile), &

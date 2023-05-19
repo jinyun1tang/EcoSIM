@@ -682,7 +682,7 @@ module InitSOMBGCMOD
 
   IF(L.GT.0)THEN
     IF(BKDS(L,NY,NX).GT.ZERO)THEN
-      CORGCM=AMIN1(0.55E+06_r8,(CORGCX(1)+CORGCX(2)+CORGCX(3)+CORGCX(k_humus)))/0.55_r8
+      CORGCM=AMIN1(orgcden,(CORGCX(1)+CORGCX(2)+CORGCX(3)+CORGCX(k_humus)))/0.55_r8
     else
       CORGCM=0._r8
     endif

@@ -61,6 +61,7 @@ implicit none
   real(r8),target,allocatable ::  UA(:,:)                            !wind speed, [m h-1]
   real(r8),target,allocatable ::  VPA(:,:)                           !vapor concentration, [m3 m-3]
   real(r8),target,allocatable ::  VPK(:,:)                           !vapor pressure, [kPa]
+  real(r8),target,allocatable ::  Pbot(:,:)                          !atmospheric pressure [kPa]
   real(r8),target,allocatable ::  DYLN(:,:)                          !daylength, [h]
   real(r8),target,allocatable ::  DYLX(:,:)                          !daylength of previous day, [h]
   real(r8),target,allocatable ::  DYLM(:,:)                          !maximum daylength, [h]
@@ -78,7 +79,7 @@ implicit none
   real(r8),target,allocatable ::  PRECD(:,:)                         !precipitation at ground surface used to calculate soil erosion, [m h-1]
   real(r8),target,allocatable ::  PRECB(:,:)                         !precipitation at ground surface used to calculate soil erosion, [m h-1]
   real(r8),target,allocatable ::  CO2EI(:,:)                         !initial atmospheric CO2 concentration, [umol mol-1]
-  real(r8),target,allocatable ::  CCO2EI(:,:)                        !initial atmospheric CO2 concentration, [g m-3]
+  real(r8),target,allocatable ::  CCO2EI(:,:)                        !initial atmospheric CO2 concentration, [gC m-3]
 
   real(r8),target,allocatable ::  AtmGgms(:,:,:)                     !atmospheric gas concentration in g m-3
   real(r8),target,allocatable ::  AtmGmms(:,:,:)                     !atmospheric gas concentration in umol mol-1
@@ -190,6 +191,7 @@ implicit none
   allocate(UA(JY,JX));          UA=0._r8
   allocate(VPA(JY,JX));         VPA=0._r8
   allocate(VPK(JY,JX));         VPK=0._r8
+  allocate(Pbot(JY,JX));        PBOT=1.01325E+02_r8
   allocate(DYLN(JY,JX));        DYLN=0._r8
   allocate(DYLX(JY,JX));        DYLX=0._r8
   allocate(DYLM(JY,JX));        DYLM=0._r8
@@ -320,6 +322,7 @@ implicit none
   call destroy(UA)
   call destroy(VPA)
   call destroy(VPK)
+  call destroy(PBOT)
   call destroy(DYLN)
   call destroy(DYLX)
   call destroy(DYLM)

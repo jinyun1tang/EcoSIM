@@ -32,7 +32,8 @@ implicit none
   real(r8) :: XVOLWP,WDPOBDL,WDNOBD1,WDPOBD0,WDPOBD1
   real(r8) :: WDNHBDL,WDNHBD0,WDNHBD1,WDNOBDL,WDNOBD0
   real(r8), PARAMETER :: ZEROC=0.1E-03_r8
-
+  integer, private, parameter :: ist_water=0
+  integer, private, parameter :: ist_soil=1
   public :: RelayerSoilProfile
   contains
 
@@ -59,13 +60,14 @@ implicit none
   !     begin_execution
   !     SOIL SUBSIDENCE
   !
-  IF(IERSNG.GE.0)THEN
-!  soil erosion flag is active
+  IF(IERSNG < 0)return
+  !soil relayering can occur due to freeze-thaw, soc change, and erosion
+  !  
     IF(BKDS(NU(NY,NX),NY,NX).LE.ZERO)THEN
-      ICHKLX=0
+      ICHKLX=ist_water      !surface is water layer
     ELSE
       !it is a soil column
-      ICHKLX=1
+      ICHKLX=ist_soil
     ENDIF
 
     call SoilSubsidence(ICHKLX,NY,NX,DORGC,DVOLI,UDLYXF,UDVOLI,CDPTHX,CDPTHY,IFLGL)
@@ -150,8 +152,6 @@ implicit none
         ENDIF
       ENDDO D230
     ENDDO D245
-  ENDIF
-
   end subroutine RelayerSoilProfile
 !------------------------------------------------------------------------------------------
   subroutine SoilSubsidence(ICHKLX,NY,NX,DORGC,DVOLI,UDLYXF,UDVOLI,&
@@ -159,7 +159,8 @@ implicit none
 !
 ! IFLGL: c1, ponding water, c2, pond disappear, c3, pond reappare, c4: freeze-thaw, c5: erosion, c6: som change
   implicit none
-  integer, intent(in) :: ICHKLX,NY,NX
+  integer, intent(in) :: ICHKLX   !surface layer type: 0 water, 1 soil
+  integer, intent(in) :: NY,NX
   REAL(R8),INTENT(IN) :: DVOLI(JZ,JY,JX)
   real(r8),intent(in) :: DORGC(JZ,JY,JX)
   real(r8), intent(inout) :: UDLYXF,UDVOLI
@@ -172,118 +173,125 @@ implicit none
   real(r8) :: DDLYXC,DDLYXE
   real(r8) :: DDLYXF
   real(r8) :: DENSJ,DPTWI,DDLYXP
-
+  integer, parameter :: ich_watlev =1
+  integer, parameter :: ich_frzthaw=4  
+  integer, parameter :: ich_erosion=5
+  integer, parameter :: ich_socloss=6
 ! begin_execution
+
 ! starting from bottom up
-  DO  LX=NL(NY,NX),NU(NY,NX),-1
+  D225: DO LX=NL(NY,NX),NU(NY,NX),-1
     !make a copy of the depth, bottom of the layer
     CDPTHX(LX,NY,NX)=CDPTH(LX,NY,NX)
     CDPTHY(LX,NY,NX)=CDPTH(LX,NY,NX)
     !
     !     POND, from water to soil
     !
-! compute the change
+    ! compute the change
     IF(BKDS(LX,NY,NX).LE.ZERO)THEN
-      ! current layer is water
-      IF(BKDS(LX+1,NY,NX).GT.ZERO.OR.ICHKLX.EQ.1)THEN
-        !next layer is soil,
+      ! current layer is water, lower layer is soil, or surface is soil
+      IF(BKDS(LX+1,NY,NX).GT.ZERO.OR.ICHKLX.EQ.ist_soil)THEN
+        !layer below is soil, layer above is also soil
         DDLYXP=DLYR(3,LX,NY,NX)-(VOLW(LX,NY,NX)+VOLI(LX,NY,NX))/AREA(3,LX,NY,NX)
-        DDLYX(LX,1)=DDLYXP+DDLYX(LX+1,1)
-        DDLYR(LX,1)=DDLYX(LX+1,1)
-        IFLGL(LX,1)=2
+        DDLYX(LX,ich_watlev)=DDLYXP+DDLYX(LX+1,ich_watlev)
+        DDLYR(LX,ich_watlev)=DDLYX(LX+1,ich_watlev)
+        IFLGL(LX,ich_watlev)=2
       ELSE
-        !next layer is not soil
+        !next layer, current and top are all water
         !DDLYXP: soil equivalent depth
         !DLYRI: initial soil layer thickness, [m]
         DDLYXP=DLYRI(3,LX,NY,NX)-(VOLW(LX,NY,NX)+VOLI(LX,NY,NX))/AREA(3,LX,NY,NX)
-        !DPTWI: water+ice total thickness
+
+        !DPTWI: water+ice total thickness layer below
         DPTWI=(VOLW(LX+1,NY,NX)+VOLI(LX+1,NY,NX))/AREA(3,LX,NY,NX)
         !there is expansion in layer LX, or next layer has
         IF(DDLYXP.LT.-ZERO.OR.DPTWI.GT.ZERO)THEN
-          DDLYX(LX,1)=DDLYXP+DDLYX(LX+1,1)
-          DDLYR(LX,1)=AMIN1(DDLYX(LX+1,1),DPTWI)
+          DDLYX(LX,ich_watlev)=DDLYXP+DDLYX(LX+1,ich_watlev)
+          DDLYR(LX,ich_watlev)=AMIN1(DDLYX(LX+1,ich_watlev),DPTWI)
           IF(DPTWI.GT.ZERO)THEN
 ! already has solid thickness
-            IFLGL(LX,1)=1
+            IFLGL(LX,ich_watlev)=1
           ELSE
 ! has no solid thickness
-            IFLGL(LX,1)=2
+            IFLGL(LX,ich_watlev)=2
           ENDIF
         ELSE
+          !shrink
           DDLYXP=DLYR(3,LX,NY,NX)-(VOLW(LX,NY,NX)+VOLI(LX,NY,NX))/AREA(3,LX,NY,NX)
-          DDLYX(LX,1)=DDLYXP+DDLYX(LX+1,1)
-          DDLYR(LX,1)=DDLYX(LX+1,1)
-          IFLGL(LX,1)=2
+          DDLYX(LX,ich_watlev)=DDLYXP+DDLYX(LX+1,ich_watlev)
+          DDLYR(LX,ich_watlev)=DDLYX(LX+1,ich_watlev)
+          IFLGL(LX,ich_watlev)=2
         ENDIF
       ENDIF
+
       !surface layer or layer above is still soil
       IF(LX.EQ.NU(NY,NX).OR.BKDS(LX-1,NY,NX).GT.ZERO)THEN
-        DDLYX(LX-1,1)=DDLYX(LX,1)
-        DDLYR(LX-1,1)=DDLYX(LX,1)
-        IFLGL(LX-1,1)=1
+        DDLYX(LX-1,ich_watlev)=DDLYX(LX,ich_watlev)
+        DDLYR(LX-1,ich_watlev)=DDLYX(LX,ich_watlev)
+        IFLGL(LX-1,ich_watlev)=1
       ENDIF
-      DDLYX(LX,4)=0.0_r8
-      DDLYR(LX,4)=0.0_r8
-      IFLGL(LX,4)=0
-      DDLYX(LX,5)=0.0_r8
-      DDLYR(LX,5)=0.0_r8
-      IFLGL(LX,5)=0
-      DDLYX(LX,6)=0.0_r8
-      DDLYR(LX,6)=0.0_r8
-      IFLGL(LX,6)=0
+      DDLYX(LX,ich_frzthaw)=0.0_r8
+      DDLYR(LX,ich_frzthaw)=0.0_r8
+      IFLGL(LX,ich_frzthaw)=0
+      DDLYX(LX,ich_erosion)=0.0_r8
+      DDLYR(LX,ich_erosion)=0.0_r8
+      IFLGL(LX,ich_erosion)=0
+      DDLYX(LX,ich_socloss)=0.0_r8
+      DDLYR(LX,ich_socloss)=0.0_r8
+      IFLGL(LX,ich_socloss)=0
       !
       !     SOIL
       !
     ELSE
-      !
+      !current layer is soil
       !     FREEZE-THAW
       !DVOLI: change in ice volume, initial-final
       !DENSI: mass density of ice, g/cm3
       !DENSJ: volume added per unit addition of ice (with respect to ice)
       !the change is put to layer thickness
       !DDLYXF: added thickness change
-! 4: due to freeze-thaw
+      ! 4: due to freeze-thaw
       IF(ABS(DVOLI(LX,NY,NX)).GT.ZEROS(NY,NX))THEN
         DENSJ=1._r8-DENSI
         DDLYXF=DVOLI(LX,NY,NX)*DENSJ/AREA(3,LX,NY,NX)
         !bottom layer
         IF(LX.EQ.NL(NY,NX))THEN
-          DDLYX(LX,4)=DDLYXF
-          DDLYR(LX,4)=0.0_r8
-          IFLGL(LX,4)=0
-        !layer not at the bottom
+          DDLYX(LX,ich_frzthaw)=DDLYXF
+          DDLYR(LX,ich_frzthaw)=0.0_r8
+          IFLGL(LX,ich_frzthaw)=0
+         !layer not at the bottom
         ELSE
-          DDLYX(LX,4)=DDLYXF+DDLYX(LX+1,4)
-          DDLYR(LX,4)=DDLYX(LX+1,4)
+          DDLYX(LX,ich_frzthaw)=DDLYXF+DDLYX(LX+1,ich_frzthaw)
+          DDLYR(LX,ich_frzthaw)=DDLYX(LX+1,ich_frzthaw)
           !    2+DLYRI(3,LX,NY,NX)-DLYR(3,LX,NY,NX)
-          IFLGL(LX,4)=0
+          IFLGL(LX,ich_frzthaw)=0
           !top soil layer or water layer
           IF(LX.EQ.NU(NY,NX).OR.BKDS(LX-1,NY,NX).LE.ZERO)THEN
-            DDLYX(LX-1,4)=DDLYX(LX,4)
-            DDLYR(LX-1,4)=DDLYX(LX,4)
+            DDLYX(LX-1,ich_frzthaw)=DDLYX(LX,ich_frzthaw)
+            DDLYR(LX-1,ich_frzthaw)=DDLYX(LX,ich_frzthaw)
             !    2+DLYRI(3,LX,NY,NX)-DLYR(3,LX,NY,NX)
-            IFLGL(LX-1,4)=0
+            IFLGL(LX-1,ich_frzthaw)=0
           ENDIF
         ENDIF
-! no change in ice volume
       ELSE
-
+        ! no change in ice volume
         DDLYXF=0.0_r8
         IF(LX.EQ.NL(NY,NX))THEN
-          DDLYX(LX,4)=0.0_r8
-          DDLYR(LX,4)=0.0_r8
-          IFLGL(LX,4)=0
+          DDLYX(LX,ich_frzthaw)=0.0_r8
+          DDLYR(LX,ich_frzthaw)=0.0_r8
+          IFLGL(LX,ich_frzthaw)=0
         ELSE
-          DDLYX(LX,4)=DDLYX(LX+1,4)
-          DDLYR(LX,4)=DDLYX(LX+1,4)
-          IFLGL(LX,4)=0
+          DDLYX(LX,ich_frzthaw)=DDLYX(LX+1,ich_frzthaw)
+          DDLYR(LX,ich_frzthaw)=DDLYX(LX+1,ich_frzthaw)
+          IFLGL(LX,ich_frzthaw)=0
           IF(LX.EQ.NU(NY,NX))THEN
-            DDLYX(LX-1,4)=DDLYX(LX,4)
-            DDLYR(LX-1,4)=DDLYX(LX,4)
-            IFLGL(LX-1,4)=0
+            DDLYX(LX-1,ich_frzthaw)=DDLYX(LX,ich_frzthaw)
+            DDLYR(LX-1,ich_frzthaw)=DDLYX(LX,ich_frzthaw)
+            IFLGL(LX-1,ich_frzthaw)=0
           ENDIF
         ENDIF
       ENDIF
+
       !total change in ice volume
       TDVOLI=TDVOLI+DVOLI(LX,NY,NX)
       TDLYXF=TDLYXF+DDLYXF
@@ -297,107 +305,107 @@ implicit none
 !  5: due to sediment erosion
 !         total soil layer reduction due to erosion
           DDLYXE=-TSEDER(NY,NX)/(BKVLNU(NY,NX)/VOLX(NU(NY,NX),NY,NX))
-          DDLYX(LX,5)=DDLYXE
-          DDLYR(LX,5)=DDLYXE
-          IFLGL(LX,5)=1
+          DDLYX(LX,ich_erosion)=DDLYXE
+          DDLYR(LX,ich_erosion)=DDLYXE
+          IFLGL(LX,ich_erosion)=1
         ELSE
-          DDLYX(LX,5)=0.0_r8
-          DDLYR(LX,5)=0.0_r8
-          IFLGL(LX,5)=0
+          DDLYX(LX,ich_erosion)=0.0_r8
+          DDLYR(LX,ich_erosion)=0.0_r8
+          IFLGL(LX,ich_erosion)=0
         ENDIF
       ELSE
-          DDLYX(LX,5)=0.0_r8
-          DDLYR(LX,5)=0.0_r8
-          IFLGL(LX,5)=0
+          DDLYX(LX,ich_erosion)=0.0_r8
+          DDLYR(LX,ich_erosion)=0.0_r8
+          IFLGL(LX,ich_erosion)=0
       ENDIF
 
       !
-      !     SOC GAIN OR LOSS
+      ! SOC GAIN OR LOSS
       ! FHOL: macropore fraction
       ! DDLYXC: soil thickness added due to change in organic matter,
       ! keeping macropore fraction
       ! BKDSI: initial bulk density,
       IF((IERSNG.EQ.2.OR.IERSNG.EQ.3).AND.ABS(DORGC(LX,NY,NX)).GT.ZEROS(NY,NX))THEN
-        DDLYXC=MWC2Soil*DORGC(LX,NY,NX) &
-          /((1.0_r8-FHOL(LX,NY,NX))*BKDSI(LX,NY,NX))/AREA(3,LX,NY,NX)
-! obtain diagnostics only for NX==1
+        DDLYXC=MWC2Soil*DORGC(LX,NY,NX)/((1.0_r8-FHOL(LX,NY,NX))*BKDSI(LX,NY,NX))/AREA(3,LX,NY,NX)
+        ! obtain diagnostics only for NX==1
         IF(NX.EQ.1)THEN
           TDORGC=TDORGC+DORGC(LX,NY,NX)
           TDYLXC=TDYLXC+DDLYXC
         ENDIF
-! bottom layer
+        ! bottom layer
         IF(LX.EQ.NL(NY,NX).OR.BKDS(LX+1,NY,NX).LE.ZERO)THEN
-          DDLYX(LX,6)=DDLYXC
-          DDLYR(LX,6)=0.0_r8
-          IFLGL(LX,6)=1
+          DDLYX(LX,ich_socloss)=DDLYXC
+          DDLYR(LX,ich_socloss)=0.0_r8
+          IFLGL(LX,ich_socloss)=1
         ELSE
-          DDLYX(LX,6)=DDLYXC+DDLYX(LX+1,6)
-          DDLYR(LX,6)=DDLYX(LX+1,6)+DLYRI(3,LX,NY,NX)-DLYR(3,LX,NY,NX)
-          IFLGL(LX,6)=1
-! top layer
+          DDLYX(LX,ich_socloss)=DDLYXC+DDLYX(LX+1,ich_socloss)
+          DDLYR(LX,ich_socloss)=DDLYX(LX+1,ich_socloss)+DLYRI(3,LX,NY,NX)-DLYR(3,LX,NY,NX)
+          IFLGL(LX,ich_socloss)=1
+          ! top layer
           IF(LX.EQ.NU(NY,NX).OR.BKDS(LX-1,NY,NX).LE.ZERO)THEN
-            DDLYX(LX-1,6)=DDLYX(LX,6)
-            DDLYR(LX-1,6)=DDLYX(LX,6)
+            DDLYX(LX-1,ich_socloss)=DDLYX(LX,ich_socloss)
+            DDLYR(LX-1,ich_socloss)=DDLYX(LX,ich_socloss)
             !    2+DLYRI(3,LX,NY,NX)-DLYR(3,LX,NY,NX)
-            IFLGL(LX-1,6)=1
+            IFLGL(LX-1,ich_socloss)=1
           ENDIF
         ENDIF
       ELSE
-! bottom layer
+        ! bottom layer
         IF(LX.EQ.NL(NY,NX))THEN
-          DDLYX(LX,6)=0.0_r8
-          DDLYR(LX,6)=0.0_r8
-          IFLGL(LX,6)=0
+          DDLYX(LX,ich_socloss)=0.0_r8
+          DDLYR(LX,ich_socloss)=0.0_r8
+          IFLGL(LX,ich_socloss)=0
         ELSE
-          DDLYX(LX,6)=DDLYX(LX+1,6)
-          DDLYR(LX,6)=DDLYX(LX+1,6)
-          IFLGL(LX,6)=0
+          DDLYX(LX,ich_socloss)=DDLYX(LX+1,ich_socloss)
+          DDLYR(LX,ich_socloss)=DDLYX(LX+1,ich_socloss)
+          IFLGL(LX,ich_socloss)=0
         ENDIF
       ENDIF
-      DDLYX(LX,1)=0.0_r8
-      DDLYR(LX,1)=0.0_r8
-      IFLGL(LX,1)=0
+      DDLYX(LX,ich_watlev)=0.0_r8
+      DDLYR(LX,ich_watlev)=0.0_r8
+      IFLGL(LX,ich_watlev)=0
 
     ENDIF
-! apply the change
+
+    ! apply the change
       !
       !     RESET SOIL LAYER DEPTHS
       !
-    DO  NN=1,6
+    D200: DO NN=1,6
       !     IF(ABS(DDLYX(LX,NN)).GT.ZERO)IFLGS(NY,NX)=1
 !     c2, and c3 are not implemented
       IF(NN.NE.2.AND.NN.NE.3)THEN
         !
         !     POND
         !
-        IF(BKDS(LX,NY,NX).LE.ZERO)THEN
-! there are some changes
+        IF(BKDS(LX,NY,NX).LE.ZERO)THEN          
+          ! there are some changes
           IF(IFLGL(LX,NN).NE.0)THEN
             CDPTH(LX,NY,NX)=CDPTH(LX,NY,NX)+DDLYR(LX,NN)
             CDPTHY(LX,NY,NX)=CDPTHY(LX,NY,NX)+DDLYR(LX,NN)
-!           not top layer
-            IF(LX.NE.NU(NY,NX).AND.IFLGL(LX,1).EQ.2)THEN
+            !  not top layer
+            IF(LX.NE.NU(NY,NX).AND.IFLGL(LX,ich_watlev).EQ.2)THEN
               DO  LL=LX-1,0,-1
                 CDPTH(LL,NY,NX)=CDPTH(LL,NY,NX)+DDLYX(LX,NN)
                 CDPTHY(LL,NY,NX)=CDPTHY(LL,NY,NX)+DDLYX(LX,NN)
               ENDDO
               DDLYX(LX,NN)=0.0_r8
             ENDIF
-!           top layer
+            !  top layer
             IF(LX.EQ.NU(NY,NX))THEN
               CDPTH(LX-1,NY,NX)=CDPTH(LX,NY,NX)-(VOLW(LX,NY,NX)+VOLI(LX,NY,NX))/AREA(3,LX,NY,NX)
               CDPTHY(LX-1,NY,NX)=CDPTHY(LX,NY,NX)-(VOLW(LX,NY,NX)+VOLI(LX,NY,NX))/AREA(3,LX,NY,NX)
             ENDIF
           ENDIF
-            !
-            !     SOIL
-            !
+          !
+          !  SOIL
+          !
         ELSE
-            !     IF(DDLYR(L,NN).NE.0.OR.DDLYR(LX,NN).NE.0)THEN
-            !
-            !     FREEZE-THAW
-            !
-          IF(NN.EQ.4)THEN
+          !     IF(DDLYR(L,NN).NE.0.OR.DDLYR(LX,NN).NE.0)THEN
+          !
+          !     FREEZE-THAW
+          !
+          IF(NN.EQ.ich_frzthaw)THEN
             CDPTH(LX,NY,NX)=CDPTH(LX,NY,NX)+DDLYR(LX,NN)
             !     CDPTHY(LX,NY,NX)=CDPTHY(LX,NY,NX)+DDLYR(LX,NN)
 ! top layer
@@ -408,9 +416,9 @@ implicit none
             ENDIF
           ENDIF
             !
-            !     SET SURFACE ELEVATION FOR SOIL EROSION
+            ! SET SURFACE ELEVATION FOR SOIL EROSION
             !
-          IF(NN.EQ.5.AND.IFLGL(LX,NN).EQ.1)THEN
+          IF(NN.EQ.ich_erosion.AND.IFLGL(LX,NN).EQ.1)THEN
             CDPTH(LX,NY,NX)=CDPTH(LX,NY,NX)+DDLYR(LX,NN)
             CDPTHY(LX,NY,NX)=CDPTHY(LX,NY,NX)+DDLYR(LX,NN)
 
@@ -420,9 +428,9 @@ implicit none
             ENDIF
           ENDIF
           !
-          !     SET SOIL LAYER DEPTHS FOR CHANGES IN SOC
+          ! SET SOIL LAYER DEPTHS FOR CHANGES IN SOC
           !
-          IF(NN.EQ.6.AND.IFLGL(LX,NN).EQ.1)THEN
+          IF(NN.EQ.ich_socloss.AND.IFLGL(LX,NN).EQ.1)THEN
             CDPTH(LX,NY,NX)=CDPTH(LX,NY,NX)+DDLYR(LX,NN)
             CDPTHY(LX,NY,NX)=CDPTHY(LX,NY,NX)+DDLYR(LX,NN)
 
@@ -435,7 +443,6 @@ implicit none
                   IF(BKDS(LY+1,NY,NX).LE.ZERO)THEN
                     CDPTH(LY,NY,NX)=CDPTH(LY,NY,NX)+DDLYR(LX-1,NN)
                     CDPTHY(LY,NY,NX)=CDPTHY(LY,NY,NX)+DDLYR(LX-1,NN)
-
                   ENDIF
                 ENDDO
               ENDIF
@@ -443,9 +450,9 @@ implicit none
           ENDIF
         ENDIF
       ENDIF
-    ENDDO
+    ENDDO D200
     VOLY(LX,NY,NX)=VOLX(LX,NY,NX)
-  ENDDO
+  ENDDO D225
   VOLY(0,NY,NX)=VOLW(0,NY,NX)+VOLI(0,NY,NX)
   end subroutine SoilSubsidence
 

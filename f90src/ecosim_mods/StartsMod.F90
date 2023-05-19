@@ -69,6 +69,7 @@ module StartsMod
   integer :: NY,NX,L,NGL
   REAL(R8) :: ALTY
   real(r8) :: ALTZG
+  real(r8) :: tPBOT
   real(r8) :: CDPTHG
   real(r8) :: YSIN(JSA),YCOS(JSA),YAZI(JSA)
 ! begin_execution
@@ -114,14 +115,15 @@ module StartsMod
 !     CO2=CO2,CH4=CH4,OXY=O2,Z2G=N2,Z2O=N2O,NH3=NH3,H2G=H2
 !     ATKA=mean annual air temperature (K)
 !
-      CCO2EI(NY,NX)=CO2EI(NY,NX)*5.36E-04_r8*Tref/ATKA(NY,NX)
-      AtmGgms(idg_CO2,NY,NX)=CO2E(NY,NX)*5.36E-04_r8*Tref/ATKA(NY,NX)
-      AtmGgms(idg_CH4,NY,NX)=CH4E(NY,NX)*5.36E-04_r8*Tref/ATKA(NY,NX)
-      AtmGgms(idg_O2,NY,NX)=OXYE(NY,NX)*1.43E-03_r8*Tref/ATKA(NY,NX)
-      AtmGgms(idg_N2,NY,NX)=Z2GE(NY,NX)*1.25E-03_r8*Tref/ATKA(NY,NX)
-      AtmGgms(idg_N2O,NY,NX)=Z2OE(NY,NX)*1.25E-03_r8*Tref/ATKA(NY,NX)
-      AtmGgms(idg_NH3,NY,NX)=ZNH3E(NY,NX)*6.25E-04_r8*Tref/ATKA(NY,NX)
-      AtmGgms(idg_H2,NY,NX)=H2GE(NY,NX)*8.92E-05_r8*Tref/ATKA(NY,NX)
+      tPBOT=PBOT(NY,NX)/1.01325E+02_r8
+      CCO2EI(NY,NX)=CO2EI(NY,NX)*5.36E-04_r8*Tref/ATKA(NY,NX)*tPBOT
+      AtmGgms(idg_CO2,NY,NX)=CO2E(NY,NX)*5.36E-04_r8*Tref/ATKA(NY,NX)*tPBOT
+      AtmGgms(idg_CH4,NY,NX)=CH4E(NY,NX)*5.36E-04_r8*Tref/ATKA(NY,NX)*tPBOT
+      AtmGgms(idg_O2,NY,NX)=OXYE(NY,NX)*1.43E-03_r8*Tref/ATKA(NY,NX)*tPBOT
+      AtmGgms(idg_N2,NY,NX)=Z2GE(NY,NX)*1.25E-03_r8*Tref/ATKA(NY,NX)*tPBOT
+      AtmGgms(idg_N2O,NY,NX)=Z2OE(NY,NX)*1.25E-03_r8*Tref/ATKA(NY,NX)*tPBOT
+      AtmGgms(idg_NH3,NY,NX)=ZNH3E(NY,NX)*6.25E-04_r8*Tref/ATKA(NY,NX)*tPBOT
+      AtmGgms(idg_H2,NY,NX)=H2GE(NY,NX)*8.92E-05_r8*Tref/ATKA(NY,NX)*tPBOT
 !
 !     MICROBIAL THERMAL ADAPTATION
 !

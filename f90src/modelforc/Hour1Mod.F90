@@ -94,7 +94,7 @@ module Hour1Mod
   real(r8) :: FVOLR
   real(r8) :: VOLWCX
   real(r8) :: VOLWRX0,VOLR0
-  real(r8) :: XJ
+  real(r8) :: XJ,tPBOT
   integer :: NZ,NR,K
 !     execution begins here
 
@@ -120,6 +120,16 @@ module Hour1Mod
 !
   DO  NX=NHW,NHE
     DO  NY=NVN,NVS
+      tPBOT=PBOT(NY,NX)/1.01325E+02_r8
+      CCO2EI(NY,NX)=CO2EI(NY,NX)*5.36E-04_r8*Tref/ATKA(NY,NX)*tPBOT
+      AtmGgms(idg_CO2,NY,NX)=CO2E(NY,NX)*5.36E-04_r8*Tref/ATKA(NY,NX)*tPBOT
+      AtmGgms(idg_CH4,NY,NX)=CH4E(NY,NX)*5.36E-04_r8*Tref/ATKA(NY,NX)*tPBOT
+      AtmGgms(idg_O2,NY,NX)=OXYE(NY,NX)*1.43E-03_r8*Tref/ATKA(NY,NX)*tPBOT
+      AtmGgms(idg_N2,NY,NX)=Z2GE(NY,NX)*1.25E-03_r8*Tref/ATKA(NY,NX)*tPBOT
+      AtmGgms(idg_N2O,NY,NX)=Z2OE(NY,NX)*1.25E-03_r8*Tref/ATKA(NY,NX)*tPBOT
+      AtmGgms(idg_NH3,NY,NX)=ZNH3E(NY,NX)*6.25E-04_r8*Tref/ATKA(NY,NX)*tPBOT
+      AtmGgms(idg_H2,NY,NX)=H2GE(NY,NX)*8.92E-05_r8*Tref/ATKA(NY,NX)*tPBOT
+
       IF(J.EQ.1)THEN
         IFLGT(NY,NX)=0
         DO  NZ=1,NP(NY,NX)
@@ -443,7 +453,6 @@ module Hour1Mod
         XNO3EB(1:2,1:2,NY,NX)=0.0_r8
 
         trcx_XER(idx_beg:idx_end,1:2,1:2,NY,NX)=0.0_r8
-
         trcp_ER(idsp_beg:idsp_end,1:2,1:2,NY,NX)=0.0_r8
 
         OMCER(:,:,1:2,1:2,NY,NX)=0.0_r8
@@ -551,7 +560,7 @@ module Hour1Mod
     BKVL(L,NY,NX)=BKDS(L,NY,NX)*VOLX(L,NY,NX)
 
     IF(BKVL(L,NY,NX).GT.ZEROS(NY,NX))THEN
-      CORGC(L,NY,NX)=AMIN1(0.55E+06,ORGC(L,NY,NX)/BKVL(L,NY,NX))
+      CORGC(L,NY,NX)=AMIN1(orgcden,ORGC(L,NY,NX)/BKVL(L,NY,NX))
       CSAND(L,NY,NX)=SAND(L,NY,NX)/BKVL(L,NY,NX)
       CSILT(L,NY,NX)=SILT(L,NY,NX)/BKVL(L,NY,NX)
       CCLAY(L,NY,NX)=CLAY(L,NY,NX)/BKVL(L,NY,NX)
@@ -631,7 +640,7 @@ module Hour1Mod
 !     FCR=litter water content at -0.01 MPa
 !     THETY=litter hygroscopic water content
 !
-  CORGC(0,NY,NX)=0.55E+06_r8
+  CORGC(0,NY,NX)=orgcden
 !
 !     SOIL SURFACE WATER STORAGE CAPACITY
 !
@@ -649,6 +658,7 @@ module Hour1Mod
   ELSEIF(IDTBL(NY,NX).EQ.2.OR.IDTBL(NY,NX).EQ.4)THEN
     DTBLX(NY,NX)=DTBLZ(NY,NX)+CDPTH(NU(NY,NX)-1,NY,NX)
   ENDIF
+
   IF(IDTBL(NY,NX).EQ.3.OR.IDTBL(NY,NX).EQ.4)THEN
     DTBLY(NY,NX)=DTBLD(NY,NX)
   ENDIF
@@ -658,10 +668,10 @@ module Hour1Mod
   ELSE
     ZS(NY,NX)=ZW
   ENDIF
-  VOLWD(NY,NX)=AMAX1(0.001_r8,0.112_r8*ZS(NY,NX)+3.10_r8*ZS(NY,NX)**2_r8 &
+  VOLWD(NY,NX)=AMAX1(0.001_r8,0.112_r8*ZS(NY,NX)+3.10_r8*ZS(NY,NX)**2._r8 &
     -0.012_r8*ZS(NY,NX)*SLOPE(0,NY,NX))*AREA(3,NU(NY,NX),NY,NX)
-  VOLWG(NY,NX)=AMAX1(VOLWD(NY,NX) &
-    ,-(DTBLX(NY,NX)-CDPTH(NU(NY,NX)-1,NY,NX))*AREA(3,NU(NY,NX),NY,NX))
+  VOLWG(NY,NX)=AMAX1(VOLWD(NY,NX),-(DTBLX(NY,NX)-CDPTH(NU(NY,NX)-1,NY,NX)) &
+    *AREA(3,NU(NY,NX),NY,NX))
 
   DPTH(NU(NY,NX),NY,NX)=CDPTH(NU(NY,NX),NY,NX)-0.5_r8*DLYR(3,NU(NY,NX),NY,NX)
   IF(BKVL(NU(NY,NX),NY,NX).GT.ZEROS(NY,NX))THEN
@@ -766,7 +776,7 @@ module Hour1Mod
   TENGYC(NY,NX)=0.0_r8
 
   TRFGas_root(idg_beg:idg_end-1,NY,NX)=0.0_r8
-  ZESNC(NY,NX,:)=0.0_r8
+  ZESNC(:,NY,NX)=0.0_r8
   WTSTGET(1:npelms,NY,NX)=0.0_r8
   PPT(NY,NX)=0.0_r8
 ! zero arrays in the snow layers
@@ -873,8 +883,8 @@ module Hour1Mod
               THETW1=AMIN1(THETWM,EXP((PSIMS(NY,NX)-LOG(-PSIS1)) &
                 *PSD(L,NY,NX)/PSISD(NY,NX)+PSL(L,NY,NX)))
               IF(THETWM.GT.THETW1)THEN
-                THETPX=AMIN1(1.0,AZMAX1((THETWM-THETW(L,NY,NX))/(THETWM-THETW1)))
-                DPTHT(NY,NX)=CDPTH(L,NY,NX)-DLYR(3,L,NY,NX)*(1.0-THETPX)
+                THETPX=AMIN1(1.0_r8,AZMAX1((THETWM-THETW(L,NY,NX))/(THETWM-THETW1)))
+                DPTHT(NY,NX)=CDPTH(L,NY,NX)-DLYR(3,L,NY,NX)*(1.0_r8-THETPX)
               ELSE
                 DPTHT(NY,NX)=CDPTH(L,NY,NX)-DLYR(3,L,NY,NX)
               ENDIF
@@ -884,8 +894,8 @@ module Hour1Mod
               THETW1=AMIN1(THETWM,EXP((PSIMS(NY,NX)-LOG(-PSIS1)) &
                 *PSD(L-1,NY,NX)/PSISD(NY,NX)+PSL(L-1,NY,NX)))
               IF(THETWM.GT.THETW1)THEN
-                THETPX=AMIN1(1.0,AZMAX1((THETWM-THETW(L-1,NY,NX))/(THETWM-THETW1)))
-                DPTHT(NY,NX)=CDPTH(L-1,NY,NX)-DLYR(3,L-1,NY,NX)*(1.0-THETPX)
+                THETPX=AMIN1(1.0_r8,AZMAX1((THETWM-THETW(L-1,NY,NX))/(THETWM-THETW1)))
+                DPTHT(NY,NX)=CDPTH(L-1,NY,NX)-DLYR(3,L-1,NY,NX)*(1.0_r8-THETPX)
               ELSE
                 DPTHT(NY,NX)=CDPTH(L-1,NY,NX)-DLYR(3,L-1,NY,NX)
               ENDIF
@@ -925,7 +935,7 @@ module Hour1Mod
     +CLAY(NU(NY,NX),NY,NX)+1.82E-06*ORGC(NU(NY,NX),NY,NX)
   IF(BKVLNX.GT.ZEROS(NY,NX))THEN
     CORGM=MWC2Soil*ORGC(NU(NY,NX),NY,NX)/BKVLNX
-    CORGC(NU(NY,NX),NY,NX)=0.55E+06_r8*CORGM
+    CORGC(NU(NY,NX),NY,NX)=orgcden*CORGM
     CSAND(NU(NY,NX),NY,NX)=SAND(NU(NY,NX),NY,NX)/BKVLNX
     CSILT(NU(NY,NX),NY,NX)=SILT(NU(NY,NX),NY,NX)/BKVLNX
     CCLAY(NU(NY,NX),NY,NX)=CLAY(NU(NY,NX),NY,NX)/BKVLNX
@@ -1754,7 +1764,7 @@ module Hour1Mod
       IF(BKVL(LFDPTH,NY,NX).GT.ZEROS(NY,NX))THEN
         CORGCX=OSCI/BKVL(LFDPTH,NY,NX)
       ELSE
-        CORGCX=0.55E+06_r8
+        CORGCX=orgcden
       ENDIF
       OSCX=0.0_r8
       OSNX=0.0_r8
@@ -2269,7 +2279,7 @@ module Hour1Mod
 !     CORGC=SOC concentration
 !
     IF(BKVL(L,NY,NX).GT.ZEROS(NY,NX))THEN
-      CORGC(L,NY,NX)=AMIN1(0.55E+06_r8,ORGC(L,NY,NX)/BKVL(L,NY,NX))
+      CORGC(L,NY,NX)=AMIN1(orgcden,ORGC(L,NY,NX)/BKVL(L,NY,NX))
     ELSE
       CORGC(L,NY,NX)=0.0_r8
     ENDIF

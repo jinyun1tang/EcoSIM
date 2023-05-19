@@ -3305,7 +3305,7 @@ module MicBGCMod
 !     FNH4X,FNB4X=fractions of biological NH4 demand in non-band, band
 !     RINH4,RINB4=substrate-limited NH4 mineraln-immobiln in non-band, band
 !     TRINH4=total NH4 net mineraln (-ve) or immobiln (+ve)
-!
+! update may be needed, May 17th, 2023, jyt.
   FNH4S=VLNH4
   FNHBS=VLNHB
   RINHP=(OMC(3,NGL,K)*CNOMC(3,NGL,K)-OMN(3,NGL,K))

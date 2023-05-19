@@ -81,7 +81,7 @@ module NitroDisturbMod
             FORGCX=FORGC
           ENDIF
           DCORPC=AMIN1(0.999_r8,DCORP(I,NY,NX))*(CORGC(L,NY,NX)-FORGCX) &
-            /(AMAX1(CORGC(L,NY,NX),0.55E+06_r8)-FORGCX)
+            /(AMAX1(CORGC(L,NY,NX),orgcden)-FORGCX)
         ELSE
           DCORPC=AMIN1(0.999_r8,DCORP(I,NY,NX))
         ENDIF

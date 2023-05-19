@@ -11,9 +11,10 @@ implicit none
   character(len=300) :: pft_file_in
   character(len=300) :: pft_mgmt_in
   character(len=300) :: grid_file_in
-  character(len=300) :: clm_file_in
-  character(len=300) :: soil_mgmt_in
-  character(len=300) :: clm_factor_in          !file for climate change factors
+  character(len=300) :: clm_file_in      !file for climate forcing
+  character(len=300) :: soil_mgmt_in     !file for soil management information
+  character(len=300) :: clm_factor_in    !file for climate change factors
+  character(len=300) :: atm_ghg_in       !file for atmospheric GHG concentrations
   logical :: do_budgets   = .false.
   type(file_desc_t)  :: pft_nfid 
   type(ecosim_time_type) :: etimer

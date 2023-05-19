@@ -1,6 +1,7 @@
 module ClimReadMod
   use data_kind_mod, only : r8 => DAT_KIND_R8
   use abortutils , only : endrun
+  use ncdio_pio  
   use fileUtil   , only : open_safe
   use minimathmod, only : isLeap,AZMAX1,vapsat0
   use ClimForcDataType
@@ -40,6 +41,7 @@ implicit none
   end type atm_forc_type
   public :: ReadClim
   public :: ReadClimNC
+  public :: getGHGts
   contains
 
 !------------------------------------------------------------------------------------------
@@ -646,7 +648,9 @@ implicit none
 !----------------------------------------------------------------------
 
   subroutine ReadClimNC(yearc,yeari,L,atmf)
-  use ncdio_pio
+  !
+  !DESCRIPTION
+  !read climate data from netcdf files
   use EcoSIMCtrlMod, only : clm_file_in
   use fileUtil, only : file_exists
   use abortutils, only : endrun
@@ -765,5 +769,49 @@ implicit none
     ENDDO
   ENDDO
   end subroutine reshape2
+
+!----------------------------------------------------------------------
+
+  subroutine getGHGts(yeari,NHW,NHE,NVN,NVS)
+  !
+  !DESCRIPTION
+  !read in atmospheric concentrations for CO2, CH4, and N2O
+  !for year yeari
+  implicit none
+  integer, intent(in) :: yeari
+  integer, intent(in) :: NHW,NHE,NVN,NVS
+  real(r8) :: atm_co2   !ppm 
+  real(r8) :: atm_ch4   !ppb
+  real(r8) :: atm_n2o   !ppb
+  type(file_desc_t) :: atm_ghg_nfid
+  integer :: iyear,year
+  INTEGER :: NY,NX
+
+  call ncd_pio_openfile(atm_ghg_nfid, atm_ghg_in, ncd_nowrite)
+
+  iyear=1
+  DO while(.true.)
+    call ncd_getvar(atm_ghg_nfid,'year',iyear,year)      
+    if(year==yeari)exit
+    iyear=iyear+1
+  ENDDO
+
+  call ncd_getvar(atm_ghg_nfid,'CO2',iyear,atm_co2)
+  call ncd_getvar(atm_ghg_nfid,'CH4',iyear,atm_ch4)
+  call ncd_getvar(atm_ghg_nfid,'N2O',iyear,atm_n2o)
+
+  call ncd_pio_closefile(atm_ghg_nfid)
+
+  DO NX=NHW,NHE
+    DO NY=NVN,NVS
+      CO2EI(NY,NX)=atm_co2
+      CO2E(NY,NX) =CO2EI(NY,NX)
+      CH4E(NY,NX) =atm_ch4*1.e-3_r8  !ppb to ppm
+      Z2OE(NY,NX) =atm_n2o*1.e-3_r8  !ppb to ppm
+    ENDDO
+  ENDDO  
+  end subroutine getGHGts
+
+
 
 end module ClimReadMod
