@@ -213,12 +213,12 @@ module readiMod
   call ncd_getvar(grid_nfid,'ATCAG',loc,ATCAG)
   call ncd_getvar(grid_nfid,'IDTBLG',loc,IDWaterTableG)
 
-!  call ncd_getvar(grid_nfid,'OXYEG',loc,OXYEG)
-!  call ncd_getvar(grid_nfid,'Z2GEG',loc,Z2GEG)
+  call ncd_getvar(grid_nfid,'OXYEG',loc,OXYEG)
+  call ncd_getvar(grid_nfid,'Z2GEG',loc,Z2GEG)
 !  call ncd_getvar(grid_nfid,'CO2EIG',loc,CO2EIG)
 !  call ncd_getvar(grid_nfid,'CH4EG',loc,CH4EG)
 !  call ncd_getvar(grid_nfid,'Z2OEG',loc,Z2OEG)
-!  call ncd_getvar(grid_nfid,'ZNH3EG',loc,ZNH3EG)
+  call ncd_getvar(grid_nfid,'ZNH3EG',loc,ZNH3EG)
 
   call ncd_getvar(grid_nfid,'IETYPG',loc,IETYPG)
   call ncd_getvar(grid_nfid,'IERSNG',loc,IERSNG)
