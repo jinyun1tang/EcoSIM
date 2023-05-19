@@ -103,10 +103,10 @@ implicit none
         call RunoffXBoundaryFluxes(L,N,NY,NX,N1,N2,N4,N5,NN,XN,CXR,ZXR,PXR,ZGR)
     !
         call SubsurfaceBoundaryFluxes(I,J,N,NY,NX,N1,N2,N3,N4,N5,N6,XN)
-      ENDDO D9975
 !
     !     WATER, HEAT, SOLUTES IN SNOW DRIFT
-      call WaterHeatSoluteBySnowDrift(N,N4,N5,L,NY,NX,CXR,ZXR,PXR,ZGR,XN)
+        call WaterHeatSoluteBySnowDrift(N,N4,N5,L,NY,NX,CXR,ZXR,PXR,ZGR,XN)
+      ENDDO D9975
     ENDDO D9980
   ENDDO D9985
   end subroutine RunoffBal
