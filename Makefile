@@ -143,30 +143,10 @@ else
     NETCDF_FFLAGS = $(shell ./nc_config --prefix --$(CC))/include/
     NETCDF_FLIBS = $(shell ./nc_config --flibs --$(CC))
   endif
-#else ifeq ($(ATS), 1)
-#  $(info this code is being run)
-#  NETCDF_FFLAGS = $(shell ./nc_config --prefix --$(TPL_INSTALL_PREFIX))/include
-#  NETCDF_FLIBS = $(shell ./nc_config --flibs --$(TPL_INSTALL_PREFIX))
-#else
-#  $(info this is also running)`
-#  NETCDF_FFLAGS = $(shell ./nc_config --prefix --$(CC))/include
-#  NETCDF_FLIBS = $(shell ./nc_config --flibs --$(CC))
-endif
-
-ifeq ($(ATS), 1)
-  $(info running second if)
-  NETCDF_FFLAGS += $(TPL_INSTALL_PREFIX)/include
-  NETCDF_FLIBS += -L$(TPL_INSTALL_PREFIX)/lib -lnetcdff -lnetcdf -lnetcdf
->>>>>>> e1a76ad (some changes to make file again)
 endif
 
 CONFIG_FLAGS += -DTPL_NETCDF_INCLUDE_DIRS="$(NETCDF_FFLAGS)"
 CONFIG_FLAGS += -DTPL_NETCDF_LIBRARIES="$(NETCDF_FLIBS)"
-
-$(info netcdfsys: $(netcdfsys))
-$(info netcdf flags: $(NETCDF_FFLAGS))
-$(info netcdf libs: $(NETCDF_FLIBS))
-$(info tpl install: $(TPL_INSTALL_PREFIX))
 
 define run-config
 @mkdir -p $(BUILDDIR)
