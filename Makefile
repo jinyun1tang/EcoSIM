@@ -1,12 +1,11 @@
 # Makefile -- Use this to build on *NIX systems.
 
-ifeq ($(ATS), 0)
+ifndef ATS
 	CC         = not-set
 	CXX        = not-set
 	FC         = not-set
 	F90        = not-set
 	netcdfsys  = not-set
-	ATS        = not-set
 endif
 
 # Options set on command line.
@@ -47,8 +46,8 @@ ifeq ($(verbose), 1)
 endif
 
 # MPI
-ifeq ($(ATS), not-set)
-  ifeq ($(mpi), 1)
+ifndef ATS
+	ifeq ($(mpi), 1)
 	  BUILDDIR := ${BUILDDIR}-mpi
 	  CC = mpicc
 	  CXX = mpicxx
@@ -136,29 +135,15 @@ endif
 ifeq ($(netcdfsys), not-set)
   NETCDF_FFLAGS =""
   NETCDF_FLIBS =""
-#else ifeq ($(ATS), 1)
-#  $(info this code is being run)
-#  NETCDF_FFLAGS = $(shell ./nc_config --prefix --$(TPL_INSTALL_PREFIX))/include
-#  NETCDF_FLIBS = $(shell ./nc_config --flibs --$(TPL_INSTALL_PREFIX))
-#else
-#  $(info this is also running)`
-#  NETCDF_FFLAGS = $(shell ./nc_config --prefix --$(CC))/include
-#  NETCDF_FLIBS = $(shell ./nc_config --flibs --$(CC))
 endif
 
 ifeq ($(ATS), 1)
-  $(info running second if)
   NETCDF_FFLAGS += $(TPL_INSTALL_PREFIX)/include
   NETCDF_FLIBS += -L$(TPL_INSTALL_PREFIX)/lib -lnetcdff -lnetcdf -lnetcdf
 endif
 
 CONFIG_FLAGS += -DTPL_NETCDF_INCLUDE_DIRS="$(NETCDF_FFLAGS)"
 CONFIG_FLAGS += -DTPL_NETCDF_LIBRARIES="$(NETCDF_FLIBS)"
-
-$(info netcdfsys: $(netcdfsys))
-$(info netcdf flags: $(NETCDF_FFLAGS))
-$(info netcdf libs: $(NETCDF_FLIBS))
-$(info tpl install: $(TPL_INSTALL_PREFIX))
 
 define run-config
 @mkdir -p $(BUILDDIR)
