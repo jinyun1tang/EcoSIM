@@ -766,7 +766,7 @@ module Hour1Mod
   TENGYC(NY,NX)=0.0_r8
 
   TRFGas_root(idg_beg:idg_end-1,NY,NX)=0.0_r8
-  ZESNC(NY,NX,:)=0.0_r8
+  ZESNC(:,NY,NX)=0.0_r8
   WTSTGET(1:npelms,NY,NX)=0.0_r8
   PPT(NY,NX)=0.0_r8
 ! zero arrays in the snow layers
