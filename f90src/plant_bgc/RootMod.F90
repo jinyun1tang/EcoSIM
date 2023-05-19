@@ -74,7 +74,7 @@ implicit none
   ENDIF
 !
 !     ROOT N2 FIXATION (RHIZOBIA)
-  call RootNoduleBiomchemistry(I,J,NZ,TFN6,WFNGR)  
+  call RootNoduleBiomchemistry(I,J,NZ,TFN6,WFNGR)
 
   call NonstructlBiomTransfer(I,J,NZ,PTRT,RLNT,RTSK1,RTSK2,RTNT,IFLGZ)
   end associate
@@ -1050,7 +1050,7 @@ implicit none
 !
             TotPrimRootLen=TotPrimRootLen+PrimRootLen(N,L,NR,NZ)
             WTRTZ=WTRTZ+WTRT1E(ielmc,N,L,NR,NZ)
-            NINR(NR,NZ)=MIN(NINR(NR,NZ),NJ)            
+            NINR(NR,NZ)=MIN(NINR(NR,NZ),NJ)
             IF(L.EQ.NINR(NR,NZ))NRX(N,NR)=1
           ENDIF
         ENDIF
@@ -1173,15 +1173,15 @@ implicit none
 !     FWOOD,FWOODN,FWOODP=C,N,P woody fraction in root:0=woody,1=non-woody
 !
   D6355: DO M=1,jsken
-    DO NE=1,npelms    
+    DO NE=1,npelms
       ESNC(NE,M,k_woody_litr,L,NZ)=ESNC(NE,M,k_woody_litr,L,NZ)+CFOPE(NE,icwood,M,NZ) &
         *FSNC1*(RTWT1E(NE,N,NR,NZ)-RCER(NE))*FWODRE(NE,k_woody_litr)
 
       ESNC(NE,M,k_fine_litr,L,NZ)=ESNC(NE,M,k_fine_litr,L,NZ)+CFOPE(NE,iroot,M,NZ) &
         *FSNC1*(RTWT1E(NE,N,NR,NZ)-RCER(NE))*FWODRE(NE,k_fine_litr)
-    ENDDO    
+    ENDDO
   ENDDO D6355
-  
+
   end associate
   end subroutine PrimRootRemobilization
 
