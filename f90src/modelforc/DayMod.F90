@@ -158,7 +158,7 @@
         TNPP(NY,NX)=0._r8
         TRAU(NY,NX)=0._r8
         TCAN(NY,NX)=0._r8
-        XHVSTE(NY,NX,:)=0._r8
+        XHVSTE(:,NY,NX)=0._r8
         TRINH4(NY,NX)=0._r8
         TRIPO4(NY,NX)=0._r8
         D960: DO NZ=1,NP0(NY,NX)
@@ -169,7 +169,7 @@
           RSETE(ielmp,NZ,NY,NX)=RSETE(ielmp,NZ,NY,NX)+TEUPTK(ielmp,NZ,NY,NX) &
             -TESNC(ielmp,NZ,NY,NX)-VPO4F(NZ,NY,NX)
           CARBN(NZ,NY,NX)=0._r8
-          TEUPTK(NZ,NY,NX,:)=0._r8
+          TEUPTK(:,NZ,NY,NX)=0._r8
           TCO2T(NZ,NY,NX)=0._r8
           TCO2A(NZ,NY,NX)=0._r8
           CTRAN(NZ,NY,NX)=0._r8
@@ -184,9 +184,9 @@
           THVSTE(ielmc,NZ,NY,NX)=THVSTE(ielmc,NZ,NY,NX)+HVSTE(ielmc,NZ,NY,NX)
           THVSTE(ielmn,NZ,NY,NX)=THVSTE(ielmn,NZ,NY,NX)+HVSTE(ielmn,NZ,NY,NX)
           THVSTE(ielmp,NZ,NY,NX)=THVSTE(ielmp,NZ,NY,NX)+HVSTE(ielmp,NZ,NY,NX)
-          HVSTE(NZ,NY,NX,:)=0._r8
-          TESN0(NZ,NY,NX,:)=0._r8
-          TESNC(NZ,NY,NX,:)=0._r8
+          HVSTE(:,NZ,NY,NX)=0._r8
+          TESN0(:,NZ,NY,NX)=0._r8
+          TESNC(:,NZ,NY,NX)=0._r8
         ENDDO D960
         IF(IERSNG.EQ.1.OR.IERSNG.EQ.3)THEN
           TSED(NY,NX)=0._r8
