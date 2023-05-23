@@ -1,5 +1,6 @@
 module EcoSIMCtrlMod
   use ncdio_pio, only : file_desc_t
+  use data_kind_mod, only : r8 => DAT_KIND_R8
   use ecosim_Time_Mod, only : ecosim_time_type
 implicit none
   save
@@ -8,6 +9,12 @@ implicit none
   logical :: plant_model  =.true.
   logical :: micb_model   =.true.
   logical :: soichem_model=.true.
+  real(r8) :: aco2_ppm  = 280._r8
+  real(r8) :: ach4_ppm  = 1.144_r8
+  real(r8) :: an2o_ppm  = 0.270_r8
+  real(r8) :: ao2_ppm   = 0.209e6_r8
+  real(r8) :: an2_ppm   = 0.78e6_r8
+  real(r8) :: anh3_ppm  = 5.e-3_r8
   character(len=300) :: pft_file_in
   character(len=300) :: pft_mgmt_in
   character(len=300) :: grid_file_in
