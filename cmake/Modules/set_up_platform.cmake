@@ -61,6 +61,21 @@ endif()
     set(NEED_LAPACK FALSE)
   endif()
 
+# check if we are building within ATS and if so change the TPL dirs
+  if (ATS)
+    set(Z_LIBRARY "${TPL_INSTALL_PREFIX}/lib/libz.a")
+    set(Z_INCLUDE_DIR "${TPL_INSTALL_PREFIX}/include")
+    get_filename_component(Z_LIBRARY_DIR ${Z_LIBRARY} DIRECTORY)
+
+    set(HDF5_LIB_NAME hdf5)
+    set(HDF5_HL_LIB_NAME hdf5_hl)
+    set(HDF5_LIBRARY "${TPL_INSTALL_PREFIX}/lib/lib${HDF5_LIB_NAME}${LIB_SUFFIX}")
+    set(HDF5_HL_LIBRARY "${TPL_INSTALL_PREFIX}/lib/lib${HDF5_HL_LIB_NAME}${LIB_SUFFIX}")
+    set(HDF5_LIBRARIES ${HDF5_HL_LIB_NAME};${HDF5_LIB_NAME})
+    set(HDF5_INCLUDE_DIR "${TPL_INSTALL_PREFIX}/include")
+    get_filename_component(HDF5_LIBRARY_DIR ${Z_LIBRARY} DIRECTORY)
+  endif()
+
   # Certain tools (e.g. patch) require TMPDIR to be defined. If it is not,
   # we do so here.
   set(TMPDIR_VAR $ENV{TMPDIR})

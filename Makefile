@@ -1,5 +1,13 @@
 # Makefile -- Use this to build on *NIX systems.
 
+ifndef ATS
+	CC         = not-set
+	CXX        = not-set
+	FC         = not-set
+	F90        = not-set
+	netcdfsys  = not-set
+endif
+
 # Options set on command line.
 debug      = not-set
 mpi        = not-set
@@ -8,14 +16,9 @@ precision  = not-set
 verbose    = not-set
 prefix     = not-set
 sanitize   = not-set
-CC         = not-set
-CXX        = not-set
-FC         = not-set
 travis     = not-set
-F90        = not-set
-netcdfsys  = not-set
-# This proxies everything to the builddir cmake.
 
+# This proxies everything to the builddir cmake.
 
 cputype = $(shell uname -m | sed "s/\\ /_/g")
 systype = $(shell uname -s)
@@ -43,30 +46,33 @@ ifeq ($(verbose), 1)
 endif
 
 # MPI
-ifeq ($(mpi), 1)
-  BUILDDIR := ${BUILDDIR}-mpi
-  CC = mpicc
-  CXX = mpicxx
-  FC = mpif90
-  CONFIG_FLAGS += -DHAVE_MPI=1
-else
-  ifeq ($(CC), not-set)
-    CC  = icc
-  endif
-  ifeq ($(CXX), not-set)
-    CXX = icpc
-  endif
-  ifeq ($(FC), not-set)
-    FC = ifort
-  endif
-  CONFIG_FLAGS += -DHAVE_MPI=0
+ifndef ATS
+	ifeq ($(mpi), 1)
+	  BUILDDIR := ${BUILDDIR}-mpi
+	  CC = mpicc
+	  CXX = mpicxx
+	  FC = mpif90
+	  CONFIG_FLAGS += -DHAVE_MPI=1
+	else
+	  ifeq ($(CC), not-set)
+	    CC  = icc
+	  endif
+	  ifeq ($(CXX), not-set)
+	    CXX = icpc
+	  endif
+	  ifeq ($(FC), not-set)
+	    FC = ifort
+	  endif
+	  CONFIG_FLAGS += -DHAVE_MPI=0
+	endif
+
+	ifeq ($(FC),ifort)
+	  compiler=intel
+	else
+	  compiler=gnu
+	endif
 endif
 
-ifeq ($(FC),ifort)
-  compiler=intel
-else
-  compiler=gnu
-endif
 # Shared libs?
 ifeq ($(shared), 1)
   BUILDDIR := ${BUILDDIR}-shared
@@ -129,14 +135,15 @@ endif
 ifeq ($(netcdfsys), not-set)
   NETCDF_FFLAGS =""
   NETCDF_FLIBS =""
-else
-  NETCDF_FFLAGS = $(shell ./nc_config --prefix --$(CC))/include/
-  NETCDF_FLIBS = $(shell ./nc_config --flibs --$(CC))
+endif
+
+ifeq ($(ATS), 1)
+  NETCDF_FFLAGS += $(TPL_INSTALL_PREFIX)/include
+  NETCDF_FLIBS += -L$(TPL_INSTALL_PREFIX)/lib -lnetcdff -lnetcdf -lnetcdf
 endif
 
 CONFIG_FLAGS += -DTPL_NETCDF_INCLUDE_DIRS="$(NETCDF_FFLAGS)"
 CONFIG_FLAGS += -DTPL_NETCDF_LIBRARIES="$(NETCDF_FLIBS)"
-
 
 define run-config
 @mkdir -p $(BUILDDIR)
