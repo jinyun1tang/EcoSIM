@@ -2,11 +2,11 @@ module ATSCPLMod
   use data_kind_mod, only : r8 => DAT_KIND_R8
   use SharedDataMod
   use ATSEcoSIMInitMod
+  use BGCContainers_module
   implicit none
 
   public
-  character(len=*), private, parameter :: &
-    mod_filename=__FILE__
+  character(len=*), private, parameter :: mod_filename=__FILE__
   integer :: JZSOI   !number of soil layers
   integer :: JSNO    !number of snow layers
 
