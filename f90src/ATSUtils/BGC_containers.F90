@@ -85,6 +85,7 @@ module BGCContainers_module
      type (c_ptr) :: data
   end type BGCVectorInt
 
+<<<<<<< HEAD
   type, public, bind(c) :: BGCMatrixDouble
     integer (c_int) :: rows
     integer (c_int) :: cols
@@ -109,12 +110,15 @@ module BGCContainers_module
     type (c_ptr) :: data
   end type BGCMatrixString
 
+=======
+>>>>>>> d038c8f (Initial reworking, addition of water variables, and alquimia data funcs)
   type, public, bind(c) :: BGCVectorString
      integer (c_int) :: size
      integer (c_int) :: capacity
      type (c_ptr) :: data
   end type BGCVectorString
 
+<<<<<<< HEAD
   type, public, bind(c) :: BGCMatrixDouble
     integer (c_int) :: rows
     integer (c_int) :: cols
@@ -163,10 +167,24 @@ module BGCContainers_module
      integer (c_int) :: ncells_per_col_
      integer (c_int) :: num_components
      integer (c_int) :: num_procs
+=======
+  type, public, bind(c) :: BGCSizes
+     integer (c_int) :: num_primary
+     integer (c_int) :: num_sorbed
+     integer (c_int) :: num_minerals
+     integer (c_int) :: num_aqueous_complexes
+     integer (c_int) :: num_aqueous_kinetics
+     integer (c_int) :: num_surface_sites
+     integer (c_int) :: num_ion_exchange_sites
+     integer (c_int) :: num_isotherm_species
+     integer (c_int) :: num_aux_integers
+     integer (c_int) :: num_aux_doubles
+>>>>>>> d038c8f (Initial reworking, addition of water variables, and alquimia data funcs)
   end type BGCSizes
 
   type, public, bind(c) :: BGCState
      ! I think I have to write the data as vector doubles
+<<<<<<< HEAD
      type (BGCMatrixDouble) :: liquid_density
      type (BGCMatrixDouble) :: gas_density
      type (BGCMatrixDouble) :: ice_density
@@ -206,6 +224,26 @@ module BGCContainers_module
      real (c_double) :: atm_n2o
      real (c_double) :: atm_h2
      real (c_double) :: atm_nh3
+=======
+     type (BGCVectorDouble) :: liquid_density
+     type (BGCVectorDouble) :: gas_density
+     type (BGCVectorDouble) :: ice_density
+     type (BGCVectorDouble) :: porosity
+     type (BGCVectorDouble) :: water_content
+     type (BGCVectorDouble) :: temperature
+     type (BGCVectorDouble) :: total_mobile
+     type (BGCVectorDouble) :: hydraulic_conductivity
+  end type BGCState
+
+  type, public, bind(c) :: BGCProperties
+     type (BGCVectorDouble) :: liquid_saturation
+     type (BGCVectorDouble) :: gas_saturation
+     type (BGCVectorDouble) :: ice_saturation
+     type (BGCVectorDouble) :: elevation
+     type (BGCVectorDouble) :: relative_permeability
+     type (BGCVectorDouble) :: thermal_conductivity
+     type (BGCVectorDouble) :: volume
+>>>>>>> d038c8f (Initial reworking, addition of water variables, and alquimia data funcs)
   end type BGCProperties
 
   type, public, bind(c) :: BGCAuxiliaryData
