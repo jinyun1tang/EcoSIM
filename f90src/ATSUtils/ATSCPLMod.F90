@@ -18,7 +18,7 @@ module ATSCPLMod
   real(r8), allocatable :: p_vap(:)
   real(r8), allocatable :: wind_speed(:)
   real(r8), allocatable :: precipitation_rain(:)
-  
+
 
   real(r8), allocatable :: csand(:,:)
   real(r8), allocatable :: CSILT(:,:)
