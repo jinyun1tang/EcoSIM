@@ -175,53 +175,7 @@ contains
   !character(len=*), parameter :: subname=trim(mod_filename)//'::EcoSIM2ATSData'
 
   type (BGCState), intent(in) :: state
-<<<<<<< HEAD
   type (BGCSizes), intent(out) :: sizes
-=======
-  type (BGCProperties), intent(in) :: props
-  type (BGCSizes), intent(out) :: sizes
-
-  ! Ecosim variables
-  real(r8), pointer :: data(:)
-  integer :: ncol, nvar, size_col
-  integer :: j1,j2,j3
-
-  write(*,*) "In the driver...."
-
-  write(*,*) "Setting sizes"
-  call SetBGCSizes(sizes)
-
-  write(*,*) "computing column size"
-
-  size_col = props%volume%size
-
-  write(*,*) "Column size is: ", size_col
-
-  write(*,*) "looping over datasets starting with porosity"
-  !seems like we call the pointer as normal,
-  !then just reverse the data
-  call c_f_pointer(state%porosity%data, data, (/size_col/))
-  data(:) = PORO
-
-  write(*,*) "Porosity finished, continuing"
-  call c_f_pointer(state%liquid_density%data, data, (/size_col/))
-  data(:) = L_DENS
-
-  call c_f_pointer(state%water_content%data, data, (/size_col/))
-  WC = data(:)
-
-  call c_f_pointer(props%liquid_saturation%data, data, (/size_col/))
-  data(:) = L_SAT
-
-  call c_f_pointer(props%relative_permeability%data, data, (/size_col/))
-  data(:) = REL_PERM
-
-  call c_f_pointer(state%hydraulic_conductivity%data, data, (/size_col/))
-  data(:) = H_COND
-
-  call c_f_pointer(state%temperature%data, data, (/size_col/))
-  data(:) = TEMP
->>>>>>> 280233a (added copy back to driver)
 
   ! Ecosim variables
   real(r8), pointer :: data(:)
