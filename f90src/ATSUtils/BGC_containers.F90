@@ -85,30 +85,6 @@ module BGCContainers_module
      type (c_ptr) :: data
   end type BGCVectorInt
 
-  type, public, bind(c) :: BGCMatrixDouble
-    integer (c_int) :: rows
-    integer (c_int) :: cols
-    integer (c_int) :: cap_rows
-    integer (c_int) :: cap_cols
-    type (c_ptr) :: data
-  end type BGCMatrixDouble
-
-  type, public, bind(c) :: BGCMatrixInt
-    integer (c_int) :: rows
-    integer (c_int) :: cols
-    integer (c_int) :: cap_rows
-    integer (c_int) :: cap_cols
-    type (c_ptr) :: data
-  end type BGCMatrixInt
-
-  type, public, bind(c) :: BGCMatrixString
-    integer (c_int) :: rows
-    integer (c_int) :: cols
-    integer (c_int) :: cap_rows
-    integer (c_int) :: cap_cols
-    type (c_ptr) :: data
-  end type BGCMatrixString
-
   type, public, bind(c) :: BGCVectorString
      integer (c_int) :: size
      integer (c_int) :: capacity
@@ -116,8 +92,16 @@ module BGCContainers_module
   end type BGCVectorString
 
   type, public, bind(c) :: BGCSizes
-     integer (c_int) :: ncells_per_col_
-     integer (c_int) :: num_components
+     integer (c_int) :: num_primary
+     integer (c_int) :: num_sorbed
+     integer (c_int) :: num_minerals
+     integer (c_int) :: num_aqueous_complexes
+     integer (c_int) :: num_aqueous_kinetics
+     integer (c_int) :: num_surface_sites
+     integer (c_int) :: num_ion_exchange_sites
+     integer (c_int) :: num_isotherm_species
+     integer (c_int) :: num_aux_integers
+     integer (c_int) :: num_aux_doubles
   end type BGCSizes
 
   type, public, bind(c) :: BGCState
@@ -128,35 +112,18 @@ module BGCContainers_module
      type (BGCVectorDouble) :: porosity
      type (BGCVectorDouble) :: water_content
      type (BGCVectorDouble) :: temperature
+     type (BGCVectorDouble) :: total_mobile
      type (BGCVectorDouble) :: hydraulic_conductivity
-     type (BGCVectorDouble) :: bulk_density
-     type (BGCMatrixDouble) :: total_component_concentration
   end type BGCState
 
   type, public, bind(c) :: BGCProperties
      type (BGCVectorDouble) :: liquid_saturation
      type (BGCVectorDouble) :: gas_saturation
      type (BGCVectorDouble) :: ice_saturation
+     type (BGCVectorDouble) :: elevation
      type (BGCVectorDouble) :: relative_permeability
      type (BGCVectorDouble) :: thermal_conductivity
      type (BGCVectorDouble) :: volume
-     type (BGCVectorDouble) :: depth
-     type (BGCVectorDouble) :: dz
-     real (c_double) :: shortwave_radiation
-     real (c_double) :: longwave_radiation
-     real (c_double) :: air_temperature
-     real (c_double) :: vapor_pressure_air
-     real (c_double) :: wind_speed
-     real (c_double) :: precipitation
-     real (c_double) :: plant_wilting_factor
-     real (c_double) :: elevation
-     real (c_double) :: atm_n2
-     real (c_double) :: atm_o2
-     real (c_double) :: atm_co2
-     real (c_double) :: atm_ch4
-     real (c_double) :: atm_n2o
-     real (c_double) :: atm_h2
-     real (c_double) :: atm_nh3
   end type BGCProperties
 
   type, public, bind(c) :: BGCAuxiliaryData
