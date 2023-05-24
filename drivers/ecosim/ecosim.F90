@@ -17,10 +17,10 @@ PROGRAM main
   use StartsMod         , only : set_ecosim_solver
   use RestartMod        , only : get_restart_date
   use MicBGCAPI         , only : MicAPI_Init, MicAPI_cleanup
-  use EcoSIMCtrlMod  
+  use EcoSIMCtrlMod
   use EcoSIMCtrlDataType
   use EcoSIMHistMod
-  use EcoSIMAPI         , only : soil,readnamelist,regressiontest     
+  use EcoSIMAPI         , only : soil,readnamelist,regressiontest
   use EcosimConst
   implicit none
 
@@ -34,7 +34,7 @@ PROGRAM main
   CHARACTER(len=640):: BUF
   character(len=36):: nmlfile
   character(len=14) :: ymdhs
-  character(len=14) :: ymdhs0 
+  character(len=14) :: ymdhs0
   logical :: is_dos,nlend
   character(len=datestrlen) :: curr_date
   integer :: nmicbguilds
@@ -76,7 +76,7 @@ PROGRAM main
   endif
   call system('mkdir -p '//trim(outdir))
 
-  read(start_date,'(I4)')year_ini  
+  read(start_date,'(I4)')year_ini
 
 ! NUMBER OF COLUMNS AND ROWS for the whole land scape
 !
@@ -99,16 +99,16 @@ PROGRAM main
     print*,'read restart/checkpoint info file: ecosim_rst'
     call get_restart_date(curr_date)
     frectyp%ymdhs0=curr_date    !the actual simulation beginning year
-  else  
+  else
     frectyp%ymdhs0=start_date   !the actual simulation beginning year
   endif
-  
+
   call hist_htapes_build()
 
   IGO=0
   yeari=year_ini
   print*,frectyp%ymdhs0,yeari
-  
+
   DO nn1=1,3
     call set_ecosim_solver(NPXS(NN1),NPYS(NN1),NCYC_LITR,NCYC_SNOW)
 
@@ -116,11 +116,11 @@ PROGRAM main
     JOUT=JOUTS(NN1)   !frequency on hourly scale
 
     call MicAPI_Init
-    
+
     do nn2=1,forc_periods(nn1*3)
       nn3=(nn1-1)*3
       do nyr1=forc_periods(nn3+1),forc_periods(nn3+2)
-        
+
         frectyp%yearclm=nyr1
         frectyp%yearcur=etimer%get_curr_yearAD()
         nlend=.false.
@@ -129,15 +129,15 @@ PROGRAM main
         endif
         if(nlend)exit
         frectyp%yearacc=frectyp%yearacc+1
-        call etimer%get_ymdhs(ymdhs)        
+        call etimer%get_ymdhs(ymdhs)
         if(.not.frectyp%lskip_loop)print*,frectyp%yearcur,nyr1,ymdhs
         yeari=yeari+1
-      end do  
+      end do
       if(nlend)exit
     end do
     call MicAPI_cleanup
     if(nlend)exit
-  end do  
+  end do
 
   if(do_rgres)then
     call regressiontest(trim(nmlfile),trim(case_name),NHW,NVN)
@@ -145,4 +145,3 @@ PROGRAM main
   call DestructEcoSIM
 close(111)  
 END program main
-
