@@ -16,7 +16,7 @@ module ecosim_Time_Mod
   integer , parameter :: daz(12)=(/31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31/)  
   integer , parameter :: cdaz(12)=(/31,59,90,120,151,181,212,243,273,304,334,365/)
   integer , parameter :: cal_str_len=18   !YYYY-MM-DD-HHMMSS
-
+  integer , parameter :: optstrlen=8
   type, public :: ecosim_time_dat_type
     integer :: year0   !year0 of the simulation
     integer :: nstep   !number of steps has passed
@@ -26,12 +26,12 @@ module ecosim_Time_Mod
   type, public:: ecosim_time_type
      ! NOTE(bja, 201603) all real variables have units of seconds!
      real(r8) :: delta_time
-     real(r8) :: stop_time
      real(r8) :: curr_time       !time in seconds
      real(r8) :: time0
      real(r8) :: cur_timef
      real(r8) :: toy                 !time of year
-     real(r8) :: restart_dtime
+     integer  :: curr_stop_count
+     integer  :: stop_count
      integer  :: tstep               !number of time steps
      integer  :: nelapstep
      integer  :: dow, dom, doy       !day of week, day month, day of year
@@ -47,9 +47,9 @@ module ecosim_Time_Mod
      integer  :: rest_n
      integer  :: rest_frq
      integer  :: diag_n
-     character(len=8)  :: diag_opt
+     character(len=optstrlen)  :: diag_opt
      integer  :: diag_frq
-     character(len=8) :: rest_opt
+     character(len=optstrlen) :: rest_opt
    contains
      procedure, public :: Init
      procedure, public :: its_time_to_write_restart
@@ -151,7 +151,6 @@ contains
     this%toy   = 0._r8
     this%cyears = 0
     this%year0 = 0
-    if(present(year0))this%year0=year0
     this%cdays  = 0
     this%dow    = 1
     this%dom    = 1
@@ -159,9 +158,10 @@ contains
     this%moy    = 1
     this%hist_freq=-1
     this%nelapstep=0
-    this%stop_opt=3
+    this%stop_opt=3    !stop by year
     this%leap_yr=0
-    
+    this%curr_stop_count=0
+    this%stop_count=0
     if(present(namelist_buffer))then
       if(present(masterproc))then
         call this%ReadNamelist(namelist_buffer, masterproc)
@@ -170,21 +170,10 @@ contains
       endif
     else 
       if(present(nyears))then
-        this%stop_time= nyears * 365._r8
-        if(this%year0 > 0)then
-          do n=0,nyears-1
-            if(isLeap(this%year0+n))this%stop_time=this%stop_time+1._r8
-          enddo
-          if(isLeap(this%year0))this%leap_yr=1
-        endif
-        this%stop_time=this%stop_time * 86400._r8      
-        
-      else
-        if(this%year0 > 0)this%leap_yr=isLeapi(this%year0)
-        !set to maximum number of years
-        this%stop_time=10000._r8*365._r8*86400._r8
+        this%stop_count=nyears        
       endif   
     endif
+    if(present(year0))this%year0=year0    
   end subroutine Init
 
   ! ----------------------------------------------------------------------
@@ -208,6 +197,7 @@ contains
 
   this%rest_frq=rest_frq
   this%rest_opt=rest_opt
+
   end subroutine config_restart  
   ! ----------------------------------------------------------------------
 
@@ -228,20 +218,22 @@ contains
     !
     ! !LOCAL VARIABLES:
     integer :: nml_error
-    character(len=*), parameter :: subname = 'ecosim_time%ReadNamelist'
+    character(len=*), parameter :: subname = trim(mod_filename)//'::ReadNamelist'
     character(len=ecosim_string_length_long) :: ioerror_msg
     real(r8) :: delta_time         !model time step
-    real(r8) :: stop_time          !when to stop
     integer  :: stop_n
     integer  :: year0
-    integer  :: hist_freq
-    character(len=8)  :: stop_option        !1: step, 2:day, 3:year
-    real(r8) :: restart_dtime      !when to write restart file
+    integer  :: rest_frq
+    integer :: diag_frq
+    character(len=optstrlen)  :: rest_opt
+    character(len=optstrlen)  :: diag_opt
+    character(len=optstrlen)  :: stop_option        !1: step, 2:day, 3:year
     logical :: masterproc_loc
     integer :: jj
     !-----------------------------------------------------------------------
 
-    namelist / ecosim_time / delta_time, stop_n, stop_option, restart_dtime, hist_freq, year0
+    namelist / ecosim_time / delta_time, stop_n, stop_option,  &
+      rest_frq, rest_opt, diag_frq, diag_opt
 
     ! FIXME(bja, 201603) Only reading time variables in seconds!
     ! Should enable other values with unit coversions.
@@ -251,11 +243,11 @@ contains
     masterproc_loc=.true.
     if(present(masterproc))masterproc_loc=masterproc
     delta_time = 1800._r8                !half hourly time step
-    stop_n=2       !by default 2 cycle
-    stop_option='nyears'  !by default years
+    stop_n=2                             !by default 2 cycle
+    stop_option='nyears'                 !by default years
     this%stop_opt=3
-    hist_freq=-1   !write every time step
-    restart_dtime = -1._r8
+    rest_opt='never'
+    this%hist_freq=-1                    !not used
     year0=0
     ! ----------------------------------------------------------------------
     ! Read namelist from standard input.
@@ -281,36 +273,30 @@ contains
        write(stdout, *)
        write(stdout, *) '--------------------'
     endif
-    this%hist_freq = hist_freq
+    this%diag_frq=diag_frq
+    this%diag_opt=diag_opt
     this%delta_time = delta_time
-    this%stop_time = delta_time*stop_n
-    if(year0>0)this%year0=year0
+    this%year0=year0
+    this%rest_opt=rest_opt
+    this%rest_frq=rest_frq
+    this%stop_count=stop_n
+    this%curr_stop_count=0
+
     select case (trim(stop_option))
     case ('nsteps')
-      this%stop_time = stop_n * this%delta_time
       this%stop_opt=1
     case ('ndays')
       !day
-      this%stop_time= stop_n * 86400._r8
       this%stop_opt=2
+    case ('nmonths')  
+      this%stop_opt=3
     case ('nyears')
       !year
-      this%stop_time= stop_n * 365._r8
-      this%stop_opt=3
-      if(this%year0>0)then
-        do jj = 1, stop_n
-          if(isLeap(jj+this%year0-1))this%stop_time=this%stop_time+1._r8          
-        enddo
-      endif
-      this%stop_time=this%stop_time*86400._r8
+      this%stop_opt=4
     case default
       call endrun(msg="ERROR setting up stop_option "//errmsg(mod_filename, __LINE__))
     end select
-    if(restart_dtime < 0._r8)then
-      this%restart_dtime  = this%stop_time
-    else
-      this%restart_dtime = restart_dtime
-    endif
+
   end subroutine ReadNamelist
 
   !-------------------------------------------------------------------------------
@@ -329,8 +315,7 @@ contains
      ans=.false.      
      select case (this%rest_opt)
      case ('nsteps')
-       this%rest_n=this%rest_n+1
-       this%rest_n=mod(this%rest_n,this%rest_frq)
+       this%rest_n=mod(this%rest_n+1,this%rest_frq)
        ans=(this%rest_n==0)
      case ('nhours')
        if(this%its_a_new_hour())then
@@ -357,6 +342,8 @@ contains
          this%rest_n=mod(this%rest_n+1,this%rest_frq)
          ans=(this%rest_n==0)
        endif           
+     case default
+       ans=.false.  
      end select
 
      end function its_time_to_write_restart
@@ -420,7 +407,7 @@ contains
 
     character(len=80) :: subname = 'its_time_to_exit'
 
-    ans = (this%curr_time >= this%stop_time)
+    ans = (this%curr_stop_count >= this%stop_count)
 
   end function its_time_to_exit
 
@@ -464,6 +451,9 @@ contains
       if(this%dow==0)this%dow=7
       this%doy = this%doy + 1
       this%cdays= this%cdays + 1
+      if(this%stop_opt==2)then
+        this%curr_stop_count=this%curr_stop_count+1
+      endif
     endif
 
     if(this%its_a_new_month())then
@@ -474,15 +464,26 @@ contains
         if(this%doy==0)this%doy=1
       endif
       this%dom=1
+      if(this%stop_opt==3)then
+        this%curr_stop_count=this%curr_stop_count+1
+      endif
     endif
+
     if(this%its_a_new_year())then
       this%cyears=this%cyears+1
       if(this%year0>0 .and. isLeap(this%cyears+this%year0))then
         this%leap_yr=1
       else
         this%leap_yr=0
-      endif        
+      endif   
+      if(this%stop_opt==4)then
+        this%curr_stop_count=this%curr_stop_count+1
+      endif
     endif  
+    if(this%stop_opt==1)then
+      this%curr_stop_count=this%curr_stop_count+1
+    endif
+
     call this%proc_nextstep()
   end subroutine update_time_stamp
 
@@ -819,6 +820,10 @@ contains
       write(iulog,*)'day', this%get_curr_day()
     end if
   case (3)
+    if (this%its_a_new_day()) then
+      write(iulog,*)'month', this%get_curr_mon()
+    end if
+  case (4)
     if (this%its_a_new_year()) then
       write(iulog,*)'year', this%get_curr_year()
     end if

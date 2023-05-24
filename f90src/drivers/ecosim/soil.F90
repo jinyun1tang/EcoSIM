@@ -1,4 +1,4 @@
-SUBROUTINE soil(NE,NEX,NHW,NHE,NVN,NVS)
+subroutine soil(NE,NEX,NHW,NHE,NVN,NVS,nlend)
 !!
 ! Description:
 ! THIS IS THE MAIN SUBROUTINE FROM WHICH ALL OTHERS ARE CALLED
@@ -31,13 +31,13 @@ SUBROUTINE soil(NE,NEX,NHW,NHE,NVN,NVS)
   implicit none
   integer :: yearc, yeari
   integer, intent(in) :: NE,NEX,NHW,NHE,NVN,NVS
-
+  logical, intent(out) :: nlend
   character(len=*), parameter :: mod_filename = __FILE__
   real(r8) :: t1
   integer :: I,J
   integer :: idaz
   character(len=14) :: ymdhs
-  logical :: nlend, rstwr, lnyr
+  logical :: rstwr, lnyr
 ! begin_execution
 !
 ! READ INPUT DATA FOR SITE, SOILS AND MANAGEMENT IN 'READS'
@@ -64,12 +64,7 @@ SUBROUTINE soil(NE,NEX,NHW,NHE,NVN,NVS)
 !
 !   RECOVER VALUES OF ALL SOIL STATE VARIABLES FROM EARLIER RUN
 !   IN 'ROUTS' IF NEEDED
-!
-    IF(continue_run)THEN
-!IRUN: start date of current scenario
-      if(lverb)WRITE(*,333)'ROUTS'
-      CALL ROUTS(NHW,NHE,NVN,NVS)
-    ENDIF
+
   ENDIF
 !
   if(plant_model)then
@@ -149,7 +144,8 @@ SUBROUTINE soil(NE,NEX,NHW,NHE,NVN,NVS)
       if(rstwr)then
         write(*,*)'write restart file'
         call restFile(flag='write')
-      endif      
+      endif
+      if(nlend)exit      
     END DO
     
 !
@@ -158,10 +154,11 @@ SUBROUTINE soil(NE,NEX,NHW,NHE,NVN,NVS)
     if(lverb)WRITE(*,333)'EXEC'
     CALL EXEC(I)
 !
+
     if(do_bgcforc_write)then
       call WriteBBGCForc(I,IYRR)
     endif
-
+    if(nlend)exit
   END DO
 
   RETURN

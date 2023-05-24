@@ -1652,7 +1652,7 @@ implicit none
     character(len=256) :: str             ! global attribute string
     logical :: if_stop                    ! true => last time step of run
     logical, save :: do_3Dtconst = .true. ! true => write out 3D time-constant data
-    character(len=*),parameter :: subname = 'hist_htapes_wrapup'
+    character(len=*),parameter :: subname = trim(mod_filename)//'::hist_htapes_wrapup'
     !-----------------------------------------------------------------------
 
     ! get current step

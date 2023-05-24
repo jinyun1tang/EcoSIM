@@ -64,6 +64,7 @@ module ncdio_pio
     module procedure ncd_putvar_int_all_1d
     module procedure ncd_putvar_real_sp_1d
     module procedure ncd_putvar_real_sp_all_1d
+    module procedure ncd_putvar_string
 
     module procedure ncd_putvar_int_2d
     module procedure ncd_putvar_int_all_2d
@@ -716,6 +717,24 @@ module ncdio_pio
      start = (/1,rec/)),trim(subname)//'::'//trim(varname))
 
   end subroutine ncd_putvar_real_sp_1d
+
+!----------------------------------------------------------------------
+  subroutine ncd_putvar_string(ncid,varname,data)
+  !write string to file
+  implicit none
+    class(file_desc_t), intent(in) :: ncid  
+    character(len=*), intent(in) :: data
+    character(len=*), intent(in) :: varname
+    character(len=*), parameter :: sub=trim(mod_filename)//'::ncd_putvar_string'
+    integer :: varid
+    logical :: readvar
+    type(Var_desc_t)  :: vardesc
+
+    call check_var(ncid, trim(varname), vardesc, readvar)
+
+    call check_ret( nf90_put_var(ncid%fh, vardesc%varid, data),trim(sub))
+
+  end subroutine ncd_putvar_string
 
   !----------------------------------------------------------------------
     subroutine ncd_putvar_real_sp_all_1d(ncid, varname,  data)

@@ -7,7 +7,7 @@ module RestartMod
   use data_const_mod    , only : spval => DAT_CONST_SPVAL, ispval => DAT_CONST_ISPVAL  
   use EcoSIMConfig      , only : jcplx=> jcplxc, NFGs=> NFGsc,nlbiomcp=>nlbiomcpc
   use EcoSIMConfig      , only : ndbiomcp=>ndbiomcpc,jsken=>jskenc, cold_run
-  use EcoSIMConfig      , only : inst_suffix,ref_date,start_date, ctitle
+  use EcoSIMConfig      , only : inst_suffix,ref_date,start_date, ctitle,datestrlen
   use EcoSIMConfig      , only : case_name,hostname,version,source,username
   use EcoSIMCtrlDataType, only : iyear_cur
   use EcoSiMParDataMod  , only : micpar,pltpar
@@ -15,7 +15,7 @@ module RestartMod
   use EcoSIMCtrlMod     , only : etimer,do_budgets
   use restUtilMod  
   use abortutils        , only : endrun,destroy
-  use HistFileMod       , only : hist_restart_ncd
+  use HistFileMod       , only : hist_restart_ncd  
   use ncdio_pio
   use MicrobialDataType
   use SOMDataType
@@ -8069,9 +8069,10 @@ implicit none
     character(len=*), parameter :: sub = trim(mod_filename)//'::'//'timemgr_restart_io'
     integer :: rc                  ! return code
     logical :: readvar             ! determine if variable is on initial file
-    character(len=18) :: curr_date   ! date of data in restart file, YYYYMMDDHHMMSS
+    character(len=datestrlen) :: curr_date   ! date of data in restart file, YYYYMMDDHHMMSS
     integer :: rst_caltype         ! calendar type
     integer :: isecspday
+    integer :: varid
     integer, parameter :: noleap = 1
     integer, parameter :: gregorian = 2
     
@@ -8087,12 +8088,30 @@ implicit none
     if (flag == 'write') then
        rst_step_sec  = etimer%get_step_size()
        curr_date =etimer%get_calendar()
-       read(start_date,'(I8)')rst_start_ymd       
-       read(ref_date,'(I8)')rst_ref_ymd   
-       read(curr_date,'(I8)')rst_curr_ymd
+       read(start_date,'(I8)')rst_start_ymd       !the start time info of the simulation
+       read(ref_date,'(I8)')rst_ref_ymd           !the referene time info of the simulation
+       read(curr_date,'(I8)')rst_curr_ymd         !current date info 
        rst_start_tod=get_tod(start_date(9:14))
        rst_ref_tod  =get_tod(ref_date(9:14))
        rst_curr_tod =get_tod(curr_date(9:14))
+
+       call ncd_putvar(ncid,'ref_date',ref_date)
+       call ncd_putvar(ncid,'curr_date',curr_date)
+       call ncd_putvar(ncid,'start_date',start_date)
+
+    elseif(flag=='define')then
+
+      call ncd_defvar(ncid,varname='ref_date',xtype=ncd_char, &
+        dim1name='datestrlen', long_name='reference date of the simulation')
+        
+      call ncd_defvar(ncid,varname='start_date',xtype=ncd_char, &
+        dim1name='datestrlen', long_name='starting date of the simulation')
+        
+      call ncd_defvar(ncid,varname='curr_date',xtype=ncd_char, &
+        dim1name='datestrlen', long_name='current date of the simulation')
+
+    elseif(flag=='read')then
+
     end if
     
     isecspday=secspday
@@ -8176,7 +8195,7 @@ implicit none
   call ncd_defdim(ncid , namet      , numt           ,  dimid)
   call ncd_defdim(ncid , namec      , numc           ,  dimid)
   call ncd_defdim(ncid , namep      , nump           ,  dimid)
-
+  call ncd_defdim(ncid,'datestrlen',datestrlen,dimid)
   ! "level" dimensions
   call ncd_defdim(ncid,'rootaxs',JRS,dimid)
   call ncd_defdim(ncid,'nodes',JNODS,dimid)
@@ -8254,6 +8273,8 @@ implicit none
 !------------------------------------------------------------------------------------------
 
   integer function get_tod(hhmmss)
+  !return the current time of day by seconds
+
   implicit none
   character(len=6) :: hhmmss
   integer :: hh,mm,ss

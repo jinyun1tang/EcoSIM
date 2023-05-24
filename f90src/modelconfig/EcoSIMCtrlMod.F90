@@ -2,6 +2,7 @@ module EcoSIMCtrlMod
   use ncdio_pio, only : file_desc_t
   use data_kind_mod, only : r8 => DAT_KIND_R8
   use ecosim_Time_Mod, only : ecosim_time_type
+  use fileUtil, only :   datestrlen  
 implicit none
   save
   logical :: salt_model   =.false.    !toggle for salt model
@@ -36,7 +37,7 @@ implicit none
   character(len=16) :: hist_config(10)
   character(len=8)  :: sim_yyyymmdd
   integer :: forc_periods(9)
-  integer :: NPXS(3),NPYS(3),JOUTS(3),IOUTS(3),KOUTS(3)
+  integer :: NPXS(3),NPYS(3),JOUTS(3),IOUTS(3)
   logical :: lverb           !logical switch for verbose output
   logical :: do_rgres        !logical switch for regression tests
 
@@ -47,7 +48,7 @@ implicit none
   integer :: yearcur      !current year 
   integer :: yearpre      !previous year
   logical :: lskip_loop   !logical switch to skip a loop
-  character(len=14) :: ymdhs0  !the beginning yyyymmddhhmmss
+  character(len=datestrlen) :: ymdhs0  !the beginning yyyymmddhhmmss
   contains
   procedure, public :: Init  => init_frectyp
   end type forc_data_rec_type
