@@ -3,6 +3,8 @@ set(ATSUTILS_MOD_SOURCES
   ATSUtilsMod.F90
   ATSCPLMod.F90
   ATSEcoSIMInitMod.F90
+  BGC_containers.F90
+  c_f_interface_module.F90
 )
 include(add_ecosim_library)
 add_ecosim_library(ATSUtils_mods ${ATSUTILS_MOD_SOURCES})
