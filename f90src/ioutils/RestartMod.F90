@@ -59,10 +59,26 @@ implicit none
   character(len=16), parameter :: namec  = 'column'       ! name of columns
   character(len=16), parameter :: namep  = 'pft'          ! name of patches
 
+  public :: restart
   public :: restFile
   public :: get_restart_date
   contains
 
+  subroutine restart(I,NHW,NHE,NVN,NVS)
+  use EcoSIMCtrlMod, only : lverb
+  implicit none
+  integer, intent (in) :: I,NHW,NHE,NVN,NVS
+
+  if(lverb)WRITE(*,334)'WOUTS'
+!  CALL WOUTS(I,NHW,NHE,NVN,NVS)
+  if(lverb)WRITE(*,334)'WOUTP'
+!  CALL WOUTP(I,NHW,NHE,NVN,NVS)
+  if(lverb)WRITE(*,334)'WOUTQ'
+!  CALL WOUTQ(I,NHW,NHE,NVN,NVS)
+
+334   FORMAT(A8)
+
+  end subroutine restart
 !------------------------------------------------------------------------------------------
   subroutine restartnc(ncid,flag)
   implicit none
@@ -74,7 +90,7 @@ implicit none
   CALL WOUTP(ncid,flag)
   end subroutine restartnc
 !------------------------------------------------------------------------------------------
-  subroutine restFile(flag)
+  subroutine restFile(flag,fnamer)
   implicit none
   character(len=*), intent(in) :: flag
   character(len=256) :: fnamer       ! name of netcdf restart file
@@ -84,7 +100,6 @@ implicit none
   integer :: yr,mon,day,tod
 
   if (flag=='read')then
-    call restFile_getfile(fnamer,path)
     call restFile_read( bounds, fnamer)
   else if(flag=='write')then  
     call etimer%get_curr_date(yr,mon,day,tod)
@@ -2282,7 +2297,7 @@ implicit none
   endif  
 
   if(flag=='read')then
-    datpr4 => datrp_4d(1:npfts,1:npelms,1:JNODS+1,1:JBR)
+    datpr4 => datrp_4d(1:npfts,1:npelms,1:JNODS,1:JBR)
     call restartvar(ncid, flag, varname='WGLFE', dim1name='pft',dim2name='elmnts',&
      dim3name='nodes1',dim4name='nbranches',long_name='leaf element', units='g d-2', &
      interpinic_flag='skip', data=datpr4, missing_value=spval, fill_value=spval)  
@@ -7885,16 +7900,14 @@ implicit none
   type(file_desc_t) :: ncid         ! netcdf id
   integer           :: nc
   integer :: i
-
   ! Open file
-  print*,trim(file)
+
   call restFile_open( flag='read', file=file, ncid=ncid )
-  print*,'restFile_open Successfully'
+
   ! Read file
 
   call restFile_dimcheck( ncid )
 
-  print*,'hist_restart_ncd'
   call hist_restart_ncd (bounds, ncid, flag='read')
 
   ! Do error checking on file
@@ -7921,9 +7934,7 @@ implicit none
   ! !ARGUMENTS:
   type(bounds_type), intent(in)    :: bounds  ! bounds
   type(file_desc_t), intent(inout) :: ncid    ! netcdf id
-  character(len=*), parameter :: subname=trim(mod_filename)//'::restFile_check_consistency'
 
-  print*,subname
   end subroutine restFile_check_consistency
 
   !-----------------------------------------------------------------------
@@ -8348,6 +8359,7 @@ implicit none
   read(nio,*) fnamer
   read(nio,*)curr_date
   call relavu( nio )
+
 
   end subroutine get_restart_date
 end module restartMod

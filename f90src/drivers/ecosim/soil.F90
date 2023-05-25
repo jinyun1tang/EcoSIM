@@ -11,7 +11,7 @@ subroutine soil(NE,NEX,NHW,NHE,NVN,NVS,nlend)
   use StartsMod    , only : starts
   use VisualMod    , only : visual
   use WthrMod      , only : wthr
-  use RestartMod   , only : restFile
+  use RestartMod   , only : restart,restFile
   use PlantInfoMod , only : ReadPlantInfo
   use readsmod     , only : reads
   use timings      , only : init_timer, start_timer, end_timer,end_timer_loop
@@ -68,10 +68,7 @@ subroutine soil(NE,NEX,NHW,NHE,NVN,NVS,nlend)
   ENDIF
 !
   if(plant_model)then
-    !plant information is read in every year, but the active flags
-    !are set using the checkpoint file.
     if(lverb)WRITE(*,333)'ReadPlantInfo'  
-    WRITE(*,333)'ReadPlantInfo'  
     call ReadPlantInfo(frectyp%yearcur,frectyp%yearclm,NE,NEX,NHW,NHE,NVN,NVS)
   endif
 
@@ -81,12 +78,20 @@ subroutine soil(NE,NEX,NHW,NHE,NVN,NVS,nlend)
     !initialize by year
     if(lverb)WRITE(*,333)'STARTQ'
     CALL STARTQ(NHW,NHE,NVN,NVS,1,JP)
-
+!
+!   RECOVER VALUES OF ALL PLANT STATE VARIABLES FROM EARLIER RUN
+!   IN 'ROUTP' IF NEEDED
+!
+    IF(is_restart())THEN
+    !set restart info for plant variables
+      if(lverb)WRITE(*,333)'ROUTP'
+      CALL ROUTP(NHW,NHE,NVN,NVS)
+    ENDIF
   ENDIF
 
   if(soichem_model)then
 ! INITIALIZE ALL SOIL CHEMISTRY VARIABLES IN 'STARTE' 
-! This is done done every year, because tracer concentrations
+! this is done done every year, because tracer concentrations
 ! in rainfall vary every year. In a more reasonable way, e.g., 
 ! when coupled to atmospheric chemistry code, it should be done by 
 ! hour
@@ -106,17 +111,8 @@ subroutine soil(NE,NEX,NHW,NHE,NVN,NVS,nlend)
 
     DO J=1,24
       call etimer%get_ymdhs(ymdhs)
-      
-      if(ymdhs==frectyp%ymdhs0)then
-        frectyp%lskip_loop=.false. 
-        if(is_restart())then          
-          call restFile(flag='read')
-        endif
-      endif        
-      if(frectyp%lskip_loop)then
-        call etimer%update_time_stamp()      
-        cycle
-      endif
+      if(ymdhs==frectyp%ymdhs0)frectyp%lskip_loop=.false.       
+      if(frectyp%lskip_loop)cycle      
 
     !
     !   UPDATE HOURLY VARIABLES IN 'HOUR1'
@@ -151,6 +147,7 @@ subroutine soil(NE,NEX,NHW,NHE,NVN,NVS,nlend)
       
       call hist_htapes_wrapup( rstwr, nlend, bounds, lnyr )      
       if(rstwr)then
+        write(*,*)'write restart file'
         call restFile(flag='write')
       endif
       if(nlend)exit      
