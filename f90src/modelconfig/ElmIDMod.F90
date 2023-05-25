@@ -11,12 +11,12 @@ implicit none
   integer, parameter :: isoi_fc=1
   integer, parameter :: isoi_wp=2
   integer, parameter :: isoi_scnv=3
-  integer, parameter :: isoi_scnh=4  
+  integer, parameter :: isoi_scnh=4
 ! plant harvest
   integer, parameter :: ipld_leaf=1 !leaf
   integer, parameter :: ipld_nofoliar=2 !leaf
   integer, parameter :: ipld_woody=3 !leaf
-  integer, parameter :: ipld_stdead=4 !leaf     
+  integer, parameter :: ipld_stdead=4 !leaf
 ! photosynthesis
   integer, parameter :: ic4_photo=4
   integer, parameter :: ic3_photo=3

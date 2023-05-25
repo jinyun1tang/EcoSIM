@@ -250,7 +250,7 @@ module PlantDisturbsMod
   IF(IHVST(NZ).NE.4.AND.IHVST(NZ).NE.6)THEN
     IF(IHVST(NZ).NE.5)THEN
       D6375: DO M=1,jsken
-        DO NE=1,npelms        
+        DO NE=1,npelms
           ESNC(NE,M,k_fine_litr,0,NZ)=ESNC(NE,M,k_fine_litr,0,NZ) &
             +CFOPE(NE,instruct,M,NZ)*(WTHER0(NE)+WTHTX0E(NE)) &
             +CFOPE(NE,ifoliar,M,NZ)*(WTHTR1E(NE)+WTHTX1E(NE)) &
@@ -805,7 +805,7 @@ module PlantDisturbsMod
           IF(IDTHB(NB,NZ).EQ.ibralive)THEN
             IF(pftPlantPopulation(NZ).LE.0.0)then
               IDTHB(NB,NZ)=ibrdead
-            endif  
+            endif
 !
 !     LITTERFALL FROM BRANCHES DURING TILLAGE
 !
@@ -848,7 +848,7 @@ module PlantDisturbsMod
                   +   WTHSKBE(NE,NB,NZ)+WTEARBE(NE,NB,NZ)))
               ENDDO
             ENDDO D6380
-            
+
             DO M=1,jsken
               DO NE=1,npelms
                 ESNC(NE,M,k_woody_litr,0,NZ)=ESNC(NE,M,k_woody_litr,0,NZ)+XHVST1 &
@@ -2310,10 +2310,10 @@ module PlantDisturbsMod
 !
         IF(JHVST(NZ).NE.ihv_noaction)then
           IDTHB(NB,NZ)=ibrdead
-        endif  
+        endif
         IF(pftPlantPopulation(NZ).LE.0.0)then
           IDTHB(NB,NZ)=ibrdead
-        endif  
+        endif
       ENDDO D9835
       CanPLeafShethC(NZ)=0._r8
       WTSTKE(ielmc,NZ)=0._r8

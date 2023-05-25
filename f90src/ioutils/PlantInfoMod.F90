@@ -17,7 +17,7 @@ module PlantInfoMod
   use EcoSIMHistMod
   use CanopyRadDataType
   use GridDataType
-  use EcoSIMCtrlMod  
+  use EcoSIMCtrlMod
   use EcoSIMConfig
 
 implicit none
@@ -32,7 +32,7 @@ implicit none
   subroutine ReadPlantInfo(yearc,yeari,NE,NEX,NHW,NHE,NVN,NVS)
 !
 ! DESCRIPTION
-! 
+!
 
   implicit none
   integer, intent(in) :: yearc, yeari
@@ -154,7 +154,7 @@ implicit none
     else
       iyear=1
       DO while(.true.)
-        call ncd_getvar(pftinfo_nfid,'year',iyear,year)  
+        call ncd_getvar(pftinfo_nfid,'year',iyear,year)
         if(year==yeari)exit
         iyear=iyear+1
       ENDDO
@@ -942,7 +942,7 @@ implicit none
       else
         iyear=1
         DO while(.true.)
-          call ncd_getvar(pftinfo_nfid,'year',iyear,year)  
+          call ncd_getvar(pftinfo_nfid,'year',iyear,year)
           if(year==yeari)exit
           iyear=iyear+1
         ENDDO
@@ -990,7 +990,7 @@ implicit none
             ENDDO D4970
           ENDDO D4975
         ENDIF
-        
+
 !        IF(.not. is_restart())THEN
     ! there was no chechk point file read in, so update pft info
     ! from input file
@@ -999,7 +999,7 @@ implicit none
               NP(NY,NX)=NS
     !DATAP(NZ,NY,NX) and DATAM(NZ,NY,NX) are to be read in readqmod.F90
               D100: DO NZ=1,NP(NY,NX)
-                DATAP(NZ,NY,NX)=DATAX(NZ)                
+                DATAP(NZ,NY,NX)=DATAX(NZ)
               ENDDO D100
 
               D101: DO NZ=NP(NY,NX)+1,JP

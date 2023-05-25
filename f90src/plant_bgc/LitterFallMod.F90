@@ -99,19 +99,19 @@ implicit none
 !
       IF(WTRVE(ielmc,NZ).LT.1.0E-04_r8*WTRTE(ielmc,NZ).AND.ISTYP(NZ).NE.iplt_annual)then
         IDTHR(NZ)=ibrdead
-      endif  
+      endif
       IF(ISTYP(NZ).EQ.iplt_annual)then
         IDTHR(NZ)=ibrdead
-      endif  
+      endif
       IF(JHVST(NZ).NE.ihv_noaction)then
         IDTHR(NZ)=ibrdead
-      endif  
+      endif
       IF(pftPlantPopulation(NZ).LE.0.0)then
         IDTHR(NZ)=ibrdead
-      endif  
+      endif
       IF(IDTHR(NZ).EQ.ibrdead)then
         IDTHP(NZ)=ibrdead
-      endif  
+      endif
     ENDIF
 !
 !     DEAD ROOTS
@@ -128,7 +128,7 @@ implicit none
 !------------------------------------------------------------------------------------------
 
   subroutine LiterfallFromRootShootStorage(I,J,NZ,CPOOLK)
-  
+
   use EcoSIMCtrlDataType, only : iyear_cur
   implicit none
   integer, intent(in) :: I,J,NZ
@@ -439,13 +439,13 @@ implicit none
 !
         IF(INTYP(NZ).NE.0.AND.N.EQ.1)THEN
           D6420: DO M=1,jsken
-            DO NE=1,npelms            
+            DO NE=1,npelms
               ESNC(NE,M,k_fine_litr,L,NZ)=ESNC(NE,M,k_fine_litr,L,NZ)+CFOPE(NE,iroot,M,NZ) &
                 *WTNDLE(NE,L,NZ)+CFOPE(NE,instruct,M,NZ)*EPOOLN(NE,L,NZ)
-            ENDDO    
+            ENDDO
           ENDDO D6420
           WTNDLE(1:npelms,L,NZ)=0._r8
-          EPOOLN(1:npelms,L,NZ)=0._r8          
+          EPOOLN(1:npelms,L,NZ)=0._r8
         ENDIF
       ENDDO D8895
     ENDDO D8900
@@ -589,7 +589,7 @@ implicit none
 !     IGTYP=growth type:0=bryophyte,1=graminoid,2=shrub,tree
 !
       D6405: DO M=1,jsken
-        DO NE=1,npelms        
+        DO NE=1,npelms
           ESNC(NE,M,k_fine_litr,0,NZ)=ESNC(NE,M,k_fine_litr,0,NZ) &
             +CFOPE(NE,instruct,M,NZ)*EPOLNB(NE,NB,NZ) &
             +CFOPE(NE,ifoliar,M,NZ)*(WTLFBE(NE,NB,NZ)*FWODLE(NE,k_fine_litr) &
@@ -613,9 +613,9 @@ implicit none
           ELSE
             WTSTDE(NE,M,NZ)=WTSTDE(NE,M,NZ)+CFOPE(NE,icwood,M,NZ)*WTSTKBE(NE,NB,NZ)
           ENDIF
-        ENDDO  
+        ENDDO
       ENDDO D6405
-      
+
 !
 !     RECOVER NON-STRUCTURAL C,N,P FROM BRANCH TO
 !     SEASONAL STORAGE RESERVES

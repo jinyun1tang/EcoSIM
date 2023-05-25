@@ -314,7 +314,7 @@ module RedistMod
 !------------------------------------------------------------------------------------------
 
   subroutine HandleSurfaceBoundary(I,NY,NX)
-  
+
   use ElmIDMod
   implicit none
   integer, intent(in) :: I,NY,NX
