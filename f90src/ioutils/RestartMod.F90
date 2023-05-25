@@ -8349,5 +8349,9 @@ implicit none
   read(nio,*)curr_date
   call relavu( nio )
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> 6236f76 (changed plant flag assignments)
   end subroutine get_restart_date
 end module restartMod
