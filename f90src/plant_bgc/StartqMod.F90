@@ -620,7 +620,7 @@ module StartqMod
 !
 !     INITIALIZE MASS BALANCE CHECKS
 !
-  IF(.not.is_restart_run.AND.is_first_year)THEN
+  IF(.not.is_restart().AND.is_first_year)THEN
     CARBN(NZ,NY,NX)=0._r8
     TESN0(1:npelms,NZ,NY,NX)=0._r8
     TCO2T(NZ,NY,NX)=0._r8

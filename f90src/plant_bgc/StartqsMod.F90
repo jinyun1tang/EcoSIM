@@ -652,7 +652,7 @@ module StartqsMod
     FLG4(NB,NZ)=0
     FLGZ(NB,NZ)=0
     NBTB(NB,NZ)=0
-    plt_pheno%IDTHB(NB,NZ)=idead
+    plt_pheno%IDTHB(NB,NZ)=ibrdead
     D15: DO M=1,pltpar%jpstgs
       IDAY(M,NB,NZ)=0
     ENDDO D15
@@ -786,7 +786,7 @@ module StartqsMod
 !
 !     INITIALIZE MASS BALANCE CHECKS
 !
-  IF(.not.is_restart_run.AND.is_first_year)THEN
+  IF(.not.is_restart().AND.is_first_year)THEN
     CARBN(NZ)=0._r8
     TESN0(1:npelms,NZ)=0._r8
     TCO2T(NZ)=0._r8

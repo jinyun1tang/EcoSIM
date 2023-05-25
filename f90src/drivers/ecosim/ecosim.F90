@@ -10,16 +10,17 @@ PROGRAM main
   use InitEcoSIM        , only : InitModules
   use EcoSIMDesctruct   , only : DestructEcoSIM
   use GridMod           , only : SetMesh
-  use EcoSIMCtrlMod  
-  use EcoSIMCtrlDataType
   use readiMod          , only : readi
   USE fileUtil          , ONLY : iulog,ecosim_namelist_buffer_size,namelist_to_buffer
   use HistFileMod       , only : hist_htapes_build
-  use EcoSIMConfig      , only : case_name,set_sim_type,nsrContinue,start_date
+  use EcoSIMConfig      , only : case_name,set_sim_type,start_date,is_restart,datestrlen
+  use StartsMod         , only : set_ecosim_solver
+  use RestartMod        , only : get_restart_date
+  use MicBGCAPI         , only : MicAPI_Init, MicAPI_cleanup
+  use EcoSIMCtrlMod  
+  use EcoSIMCtrlDataType
   use EcoSIMHistMod
   use EcosimConst
-  use StartsMod         , only : set_ecosim_solver
-  use MicBGCAPI         , only : MicAPI_Init, MicAPI_cleanup
   implicit none
 
   character(len=*), parameter :: mod_filename = __FILE__
@@ -34,6 +35,7 @@ PROGRAM main
   character(len=14) :: ymdhs
   character(len=14) :: ymdhs0 
   logical :: is_dos,nlend
+  character(len=datestrlen) :: curr_date
   integer :: nmicbguilds
   character(len=ecosim_namelist_buffer_size) :: nml_buffer
 
@@ -87,20 +89,25 @@ PROGRAM main
   NE=1;NEX=1
 
   call set_sim_type()
+
   nstopyr=get_sim_len(forc_periods)
 
-  if(continue_run)then
-    print*,'read restart/checkpoint info file: ecosim_rst'
-  else  
-    call hist_htapes_build()
-  endif
-  
   call frectyp%Init()
 
-  frectyp%ymdhs0=start_date
+  if(is_restart())then
+    print*,'read restart/checkpoint info file: ecosim_rst'
+    call get_restart_date(curr_date)
+    frectyp%ymdhs0=curr_date    
+  else  
+    frectyp%ymdhs0=start_date    
+    call hist_htapes_build()
+  endif
+
 
   IGO=0
   yeari=year_ini
+  print*,frectyp%ymdhs0,yeari
+  
   DO nn1=1,3
     call set_ecosim_solver(NPXS(NN1),NPYS(NN1))
 

@@ -1,5 +1,6 @@
 module restUtilMod
    use EcoSIMConfig
+   use ElmIDMod
    use ncdio_pio
    use netcdf
    use data_kind_mod, only : r8 => DAT_Kind_r8
@@ -1109,7 +1110,7 @@ module restUtilMod
           IF(IFLGT(NY,NX)>0)THEN
             DO NZ=1,NP(NY,NX)
               if(present(IFLGC))then      
-                IF(IFLGC(NZ,NY,NX)/=0)THEN
+                IF(IFLGC(NZ,NY,NX)==ipltactv)THEN
                   ip=get_pft(NZ,NY,NX)
                   dat_arp(NZ,NY,NX)=datip_1d(ip)            
                 endif
@@ -1139,7 +1140,7 @@ module restUtilMod
           IF(IFLGT(NY,NX)>0)THEN
             DO NZ=1,NP(NY,NX)
               if(present(IFLGC))then      
-                IF(IFLGC(NZ,NY,NX)/=0)THEN
+                IF(IFLGC(NZ,NY,NX)==ipltactv)THEN
                   ip=get_pft(NZ,NY,NX)
                   datip_1d(ip)=dat_arp(NZ,NY,NX)
                 endif
@@ -1183,7 +1184,7 @@ module restUtilMod
           IF(IFLGT(NY,NX)>0)THEN
             DO NZ=1,NP(NY,NX)
               if(present(IFLGC))then      
-                IF(IFLGC(NZ,NY,NX)/=0)THEN
+                IF(IFLGC(NZ,NY,NX)==ipltactv)THEN
                   ip=get_pft(NZ,NY,NX)
                   DO NN=1,SIZE(dat_arp,1)
                     dat_arp(NN,NZ,NY,NX)=datip_2d(ip,NN)            
@@ -1220,7 +1221,7 @@ module restUtilMod
           IF(IFLGT(NY,NX)>0)THEN      
             DO NZ=1,NP(NY,NX)
               if(present(IFLGC))then      
-                IF(IFLGC(NZ,NY,NX)/=0)THEN
+                IF(IFLGC(NZ,NY,NX)==ipltactv)THEN
                   ip=get_pft(NZ,NY,NX)
                   DO NN=1,SIZE(dat_arp,1)              
                     datip_2d(ip,NN)=dat_arp(NN,NZ,NY,NX)
@@ -1270,7 +1271,7 @@ module restUtilMod
           IF(IFLGT(NY,NX)>0)THEN
             DO NZ=1,NP(NY,NX)
               if(present(IFLGC))then      
-                IF(IFLGC(NZ,NY,NX)/=0)THEN
+                IF(IFLGC(NZ,NY,NX)==ipltactv)THEN
                   ip=get_pft(NZ,NY,NX)
                   DO N2=1,SIZE(dat_arp,2)
                     DO N1=1,SIZE(dat_arp,1)
@@ -1312,7 +1313,7 @@ module restUtilMod
           IF(IFLGT(NY,NX)>0)THEN
             DO NZ=1,NP(NY,NX)
               if(present(IFLGC))then      
-                IF(IFLGC(NZ,NY,NX)/=0)THEN
+                IF(IFLGC(NZ,NY,NX)==ipltactv)THEN
                   ip=get_pft(NZ,NY,NX)
                   DO N2=1,SIZE(dat_arp,2)
                     DO N1=1,SIZE(dat_arp,1)
@@ -1368,7 +1369,7 @@ module restUtilMod
           IF(IFLGT(NY,NX)>0)THEN
             DO NZ=1,NP(NY,NX)
               if(present(IFLGC))then      
-                IF(IFLGC(NZ,NY,NX)/=0)THEN
+                IF(IFLGC(NZ,NY,NX)==ipltactv)THEN
                   ip=get_pft(NZ,NY,NX)
                   dat_arp(NZ,NY,NX)=datrp_1d(ip)            
                 endif
@@ -1398,7 +1399,7 @@ module restUtilMod
           IF(IFLGT(NY,NX)>0)THEN
             DO NZ=1,NP(NY,NX)
               if(present(IFLGC))then      
-                IF(IFLGC(NZ,NY,NX)/=0)THEN
+                IF(IFLGC(NZ,NY,NX)==ipltactv)THEN
                   ip=get_pft(NZ,NY,NX)
                   datrp_1d(ip)=dat_arp(NZ,NY,NX)
                 endif
@@ -1442,7 +1443,7 @@ module restUtilMod
           IF(IFLGT(NY,NX)>0)THEN
             DO NZ=1,NP(NY,NX)
               if(present(IFLGC))then      
-                IF(IFLGC(NZ,NY,NX)/=0)THEN
+                IF(IFLGC(NZ,NY,NX)==ipltactv)THEN
                   ip=get_pft(NZ,NY,NX)              
                   DO NN=1,SIZE(dat_arp,1)
                     dat_arp(NN,NZ,NY,NX)=datrp_2d(ip,NN)            
@@ -1478,7 +1479,7 @@ module restUtilMod
           IF(IFLGT(NY,NX)>0)THEN
             DO NZ=1,NP(NY,NX)
               if(present(IFLGC))then      
-                IF(IFLGC(NZ,NY,NX)/=0)THEN
+                IF(IFLGC(NZ,NY,NX)==ipltactv)THEN
                   ip=get_pft(NZ,NY,NX)
                   DO NN=1,SIZE(dat_arp,1)
                     datrp_2d(ip,NN)=dat_arp(NN,NZ,NY,NX)            
@@ -1528,7 +1529,7 @@ module restUtilMod
           IF(IFLGT(NY,NX)>0)THEN
             DO NZ=1,NP(NY,NX)
               if(present(IFLGC))then      
-                IF(IFLGC(NZ,NY,NX)/=0)THEN
+                IF(IFLGC(NZ,NY,NX)==ipltactv)THEN
                   ip=get_pft(NZ,NY,NX)              
                 DO N2=1,SIZE(dat_arp,2)
                   DO N1=1,SIZE(dat_arp,1)
@@ -1570,7 +1571,7 @@ module restUtilMod
           IF(IFLGT(NY,NX)>0)THEN
             DO NZ=1,NP(NY,NX)
               if(present(IFLGC))then      
-                IF(IFLGC(NZ,NY,NX)/=0)THEN
+                IF(IFLGC(NZ,NY,NX)==ipltactv)THEN
                   ip=get_pft(NZ,NY,NX)
                   DO N2=1,SIZE(dat_arp,2)
                     DO N1=1,SIZE(dat_arp,1)
@@ -1625,7 +1626,7 @@ module restUtilMod
           IF(IFLGT(NY,NX)>0)THEN
             DO NZ=1,NP(NY,NX)
               if(present(IFLGC))then      
-                IF(IFLGC(NZ,NY,NX)/=0)THEN
+                IF(IFLGC(NZ,NY,NX)==ipltactv)THEN
                   ip=get_pft(NZ,NY,NX)              
                   DO N3=1,SIZE(dat_arp,3)
                     DO N2=1,SIZE(dat_arp,2)
@@ -1673,7 +1674,7 @@ module restUtilMod
           IF(IFLGT(NY,NX)>0)THEN
             DO NZ=1,NP(NY,NX)
               if(present(IFLGC))then      
-                IF(IFLGC(NZ,NY,NX)/=0)THEN
+                IF(IFLGC(NZ,NY,NX)==ipltactv)THEN
                   ip=get_pft(NZ,NY,NX)
                   DO N3=1,SIZE(dat_arp,3)
                     DO N2=1,SIZE(dat_arp,2)
@@ -1734,7 +1735,7 @@ module restUtilMod
           IF(IFLGT(NY,NX)>0)THEN
             DO NZ=1,NP(NY,NX)
               if(present(IFLGC))then      
-                IF(IFLGC(NZ,NY,NX)/=0)THEN
+                IF(IFLGC(NZ,NY,NX)==ipltactv)THEN
                   ip=get_pft(NZ,NY,NX)              
                   DO N4=1,SIZE(dat_arp,4)
                     DO N3=1,SIZE(dat_arp,3)
@@ -1788,7 +1789,7 @@ module restUtilMod
           IF(IFLGT(NY,NX)>0)THEN
             DO NZ=1,NP(NY,NX)
               if(present(IFLGC))then      
-                IF(IFLGC(NZ,NY,NX)/=0)THEN
+                IF(IFLGC(NZ,NY,NX)==ipltactv)THEN
                   ip=get_pft(NZ,NY,NX)
                   DO N4=1,SIZE(dat_arp,4)
                     DO N3=1,SIZE(dat_arp,3)

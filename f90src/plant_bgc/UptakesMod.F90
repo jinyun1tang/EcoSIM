@@ -99,7 +99,7 @@ module UptakesMod
   DO NZ=1,NP
     OSTRN=0.0_r8
     OSTRD=0.0_r8
-    IF(IFLGC(NZ).EQ.1.AND.PP(NZ).GT.0.0)THEN
+    IF(IFLGC(NZ).EQ.ipltactv.AND.PP(NZ).GT.0.0)THEN
 
       call UpdateCanopyProperty(NZ)
 
@@ -294,7 +294,7 @@ module UptakesMod
     WTRTG(L)=0.0_r8
     DO 9005 NZ=1,NP
       DO  N=1,MY(NZ)
-!     IF(IFLGC(NZ).EQ.1.AND.PP(NZ).GT.0.0)THEN
+!     IF(IFLGC(NZ).EQ.ipltactv.AND.PP(NZ).GT.0.0)THEN
       WTRTG(L)=WTRTG(L)+AZMAX1(WTRTD(N,L,NZ))
 !     ENDIF
       enddo

@@ -386,6 +386,10 @@ implicit none
 !------------------------------------------------------------------------------------------
 
   subroutine ReadManagementFiles(yeari)
+  !
+  !DESCRIPTION
+  !read in management information for soil: tillage
+  !fertilizer and irrigation
   use EcoSIMCtrlMod, only : soil_mgmt_in,Lirri_auto
   implicit none
   integer, intent(in) :: yeari

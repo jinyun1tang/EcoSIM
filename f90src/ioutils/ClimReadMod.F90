@@ -95,7 +95,7 @@ implicit none
 
   subroutine readhourweather(IYEAR,I,J,L,IH,go60,NN,NI,TTYPE)
 
-!     read hourly weather data
+!     read hourly weather data, from ascii file
 !
 !     DERIVE DAY I AND HOUR J FROM TIME VARIABLES IVAR
 !

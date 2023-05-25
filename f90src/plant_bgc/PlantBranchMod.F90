@@ -171,7 +171,7 @@ module PlantBranchMod
   )
   WTLSB(NB,NZ)=AZMAX1(WTLFBE(ielmc,NB,NZ)+WTSHEBE(ielmc,NB,NZ))
 
-  IF(IDTHB(NB,NZ).EQ.ialive)THEN
+  IF(IDTHB(NB,NZ).EQ.ibralive)THEN
     call CalcPartitionCoeff(I,J,NB,NZ,PART,PTRT,IFLGY,IFLGZ)
 !
 !   SHOOT COEFFICIENTS FOR GROWTH RESPIRATION AND N,P CONTENTS
@@ -828,7 +828,9 @@ module PlantBranchMod
 !   ZPLFM=min N:C,P:C in leaves relative to max values from PFT file
 !   CNLFB,CPLFB=N:C,P:C ratios in leaf
 !
-    IF(IBTYP(NZ).NE.0.AND.IGTYP(NZ).GT.1.AND.IDTHB(NB1(NZ),NZ).EQ.1)IDTHB(NB,NZ)=idead
+    IF(IBTYP(NZ).NE.0.AND.IGTYP(NZ).GT.1.AND.IDTHB(NB1(NZ),NZ).EQ.1)then
+      IDTHB(NB,NZ)=ibrdead
+    endif  
 !
 !     REMOBILIZE EXCESS LEAF STRUCTURAL N,P
 !
@@ -1863,7 +1865,7 @@ module PlantBranchMod
       WTRVE(ielmc,NZ)=WTRVE(ielmc,NZ)-SNCR
       SNCR=0._r8
     ELSEIF(ISTYP(NZ).NE.iplt_annual)THEN
-      IDTHB(NB,NZ)=idead
+      IDTHB(NB,NZ)=ibrdead
     ENDIF
 565 CONTINUE
   ENDDO D575

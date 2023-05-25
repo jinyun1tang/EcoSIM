@@ -67,9 +67,10 @@ implicit none
   RTVLP(ipltroot,NG(NZ),NZ)=PORT(ipltroot,NZ)*RTVL
   RTVLW(ipltroot,NG(NZ),NZ)=(1.0_r8-PORT(ipltroot,NZ))*RTVL
   RTARP(ipltroot,NG(NZ),NZ)=RTARP(ipltroot,NG(NZ),NZ)+SDAR(NZ)
+
   IF(IDTHRN.EQ.NRT(NZ).OR.(WTRVE(ielmc,NZ).LE.ZEROL(NZ).AND.ISTYP(NZ).NE.iplt_annual))THEN
-    IDTHR(NZ)=idead
-    IDTHP(NZ)=idead
+    IDTHR(NZ)=ibrdead
+    IDTHP(NZ)=ibrdead
   ENDIF
 !
 !     ROOT N2 FIXATION (RHIZOBIA)
@@ -1572,7 +1573,7 @@ implicit none
     ZPOOLT=0._r8
     PPOOLT=0._r8
     D300: DO NB=1,NBR(NZ)
-      IF(IDTHB(NB,NZ).EQ.ialive)THEN
+      IF(IDTHB(NB,NZ).EQ.ibralive)THEN
         IF(ATRP(NB,NZ).GT.ATRPX(ISTYP(NZ)))THEN
           WTLSBZ(NB)=AZMAX1(WTLSB(NB,NZ))
           CPOOLZ(NB)=AZMAX1(EPOOL(ielmc,NB,NZ))
@@ -1586,7 +1587,7 @@ implicit none
       ENDIF
     ENDDO D300
     D305: DO NB=1,NBR(NZ)
-      IF(IDTHB(NB,NZ).EQ.ialive)THEN
+      IF(IDTHB(NB,NZ).EQ.ibralive)THEN
         IF(ATRP(NB,NZ).GT.ATRPX(ISTYP(NZ)))THEN
           IF(WTPLTT.GT.ZEROP(NZ).AND.CPOOLT.GT.ZEROP(NZ))THEN
             CPOOLD=CPOOLT*WTLSBZ(NB)-CPOOLZ(NB)*WTPLTT
@@ -1618,7 +1619,7 @@ implicit none
     WTRSNT=0._r8
     WTRSPT=0._r8
     D330: DO NB=1,NBR(NZ)
-      IF(IDTHB(NB,NZ).EQ.ialive)THEN
+      IF(IDTHB(NB,NZ).EQ.ibralive)THEN
         IF(IDAY(7,NB,NZ).NE.0)THEN
           WTSTKT=WTSTKT+WVSTKB(NB,NZ)
           WTRSVT=WTRSVT+WTRSVBE(ielmc,NB,NZ)
@@ -1629,7 +1630,7 @@ implicit none
     ENDDO D330
     IF(WTSTKT.GT.ZEROP(NZ).AND.WTRSVT.GT.ZEROP(NZ))THEN
       D335: DO NB=1,NBR(NZ)
-        IF(IDTHB(NB,NZ).EQ.ialive)THEN
+        IF(IDTHB(NB,NZ).EQ.ibralive)THEN
           IF(IDAY(7,NB,NZ).NE.0)THEN
             WTRSVD=WTRSVT*WVSTKB(NB,NZ)-WTRSVBE(ielmc,NB,NZ)*WTSTKT
             XFRE(ielmc)=0.1_r8*WTRSVD/WTSTKT
@@ -1799,7 +1800,7 @@ implicit none
 !     CPOOLR,ZPOOLR,PPOOLR=non-structural C,N,P mass in root
 !
   D310: DO NB=1,NBR(NZ)
-    IF(IDTHB(NB,NZ).EQ.ialive)THEN
+    IF(IDTHB(NB,NZ).EQ.ibralive)THEN
       IF(WTLS(NZ).GT.ZEROP(NZ))THEN
         FWTB(NB)=AZMAX1(WTLSB(NB,NZ)/WTLS(NZ))
       ELSE

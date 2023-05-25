@@ -95,7 +95,7 @@ module HfuncsMod
 !
 !         INITIALIZE VARIABLES IN ACTIVE PFT
 !
-      IF(IFLGC(NZ).EQ.1)THEN
+      IF(IFLGC(NZ).EQ.ipltactv)THEN
 
         call stage_phenology_vars(I,J,NZ)
 
@@ -192,34 +192,38 @@ module HfuncsMod
     IF(IDAY0(NZ).LE.IDAYH(NZ).OR.IYR0(NZ).LT.IYRH(NZ))THEN
       IF(I.GE.IDAY0(NZ).OR.iyear_cur.GT.IYR0(NZ))THEN
         IF(I.GT.IDAYH(NZ).AND.IYRC.GE.IYRH(NZ).AND.IDTH(NZ).EQ.1)THEN
-          IFLGC(NZ)=0
+          IFLGC(NZ)=ipltdorm
         ELSE
           IF(I.EQ.IDAY0(NZ).AND.iyear_cur.EQ.IYR0(NZ))THEN
-            IFLGC(NZ)=0
+            IFLGC(NZ)=ipltdorm
             IDTH(NZ)=0
             CALL STARTQs(NZ,NZ)
             TNBP=TNBP+WTRVX(NZ)
           ENDIF
 
-          IF(DATAP(NZ).NE.'NO'.AND.IDTH(NZ).EQ.0)IFLGC(NZ)=1
+          IF(DATAP(NZ).NE.'NO'.AND.IDTH(NZ).EQ.0)then
+            IFLGC(NZ)=ipltactv
+          endif  
         ENDIF
       ELSE
-        IFLGC(NZ)=0
+        IFLGC(NZ)=ipltdorm
       ENDIF
     ELSE
       IF((I.LT.IDAY0(NZ).AND.I.GT.IDAYH(NZ) &
         .AND.IYRC.GE.IYRH(NZ).AND.IDTH(NZ).EQ.1) &
         .OR.(I.LT.IDAY0(NZ).AND.IYR0(NZ) &
         .GT.IYRH(NZ)))THEN
-        IFLGC(NZ)=0
+        IFLGC(NZ)=ipltdorm
       ELSE
         IF(I.EQ.IDAY0(NZ).AND.iyear_cur.EQ.IYR0(NZ))THEN
-          IFLGC(NZ)=0
+          IFLGC(NZ)=ipltdorm
           IDTH(NZ)=0
           CALL STARTQs(NZ,NZ)
           TNBP=TNBP+WTRVX(NZ)
         ENDIF
-        IF(DATAP(NZ).NE.'NO'.AND.IDTH(NZ).EQ.0)IFLGC(NZ)=1
+        IF(DATAP(NZ).NE.'NO'.AND.IDTH(NZ).EQ.0)then
+          IFLGC(NZ)=ipltactv
+        endif  
       ENDIF
     ENDIF
     IFLGT=IFLGT+IFLGC(NZ)
@@ -290,14 +294,14 @@ module HfuncsMod
           IF((NBR(NZ).EQ.0.AND.WTRVE(ielmc,NZ).GT.0.0_r8) &
             .OR.(CEPOLP(ielmc,NZ).GT.PB(NZ).AND.PB(NZ).GT.0.0_r8))THEN
             D120: DO NB=1,JC1
-              IF(IDTHB(NB,NZ).EQ.idead)THEN
+              IF(IDTHB(NB,NZ).EQ.ibrdead)THEN
                 IF(NB.EQ.NB1(NZ).OR.PSTG(NB1(NZ),NZ).GT.NBT(NZ) &
                   +NNOD(NZ)/FNOD(NZ)+XTLI(NZ))THEN
                   NBT(NZ)=NBT(NZ)+1
                   NBR(NZ)=MIN(NBX(IBTYP(NZ)),MAX(NB,NBR(NZ)))
                   NBTB(NB,NZ)=NBT(NZ)-1
-                  IDTHP(NZ)=ialive
-                  IDTHB(NB,NZ)=ialive
+                  IDTHP(NZ)=ibralive
+                  IDTHB(NB,NZ)=ibralive
                   VRNS(NB,NZ)=0.0_r8
                   IF(ISTYP(NZ).EQ.iplt_annual)THEN
                     GROUP(NB,NZ)=AZMAX1(GROUPI(NZ)-NBTB(NB,NZ))
@@ -393,7 +397,7 @@ module HfuncsMod
 !
   DO NE=1,npelms
     D140: DO NB=1,NBR(NZ)
-      IF(IDTHB(NB,NZ).EQ.ialive)THEN
+      IF(IDTHB(NB,NZ).EQ.ibralive)THEN
         EPOOLP(NE,NZ)=EPOOLP(NE,NZ)+EPOOL(NE,NB,NZ)
         EPOLNP(NE,NZ)=EPOLNP(NE,NZ)+EPOLNB(NE,NB,NZ)
       ENDIF
@@ -401,7 +405,7 @@ module HfuncsMod
   ENDDO
 
   DO NB=1,NBR(NZ)
-    IF(IDTHB(NB,NZ).EQ.ialive)THEN
+    IF(IDTHB(NB,NZ).EQ.ibralive)THEN
       IF(NBTB(NB,NZ).LT.NBTX)THEN
         NB1(NZ)=NB
         NBTX=NBTB(NB,NZ)

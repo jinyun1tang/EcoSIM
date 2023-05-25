@@ -722,7 +722,7 @@
 !     ARLF,WGLF,WSLF=leaf area,C mass,protein mass
 !     WSDN=leaf protein surficial density
 !
-  IF(IDTHB(NB,NZ).EQ.ialive)THEN
+  IF(IDTHB(NB,NZ).EQ.ibralive)THEN
     call LivingBranch(NB,NZ,CH2O,TFN1,TFN2,TFNE,XKO2L)
   ENDIF
   end associate

@@ -61,6 +61,7 @@ implicit none
 
   public :: restart
   public :: restFile
+  public :: get_restart_date
   contains
 
   subroutine restart(I,NHW,NHE,NVN,NVS)
@@ -7826,14 +7827,16 @@ implicit none
     integer :: m                    ! index
     integer :: nio                  ! restart pointer file
     character(len=256) :: filename  ! local file name
+    character(len=datestrlen) :: curr_date
     !-----------------------------------------------------------------------
 
 !    if (masterproc) then
        nio = getavu()
        filename= trim(rpntdir) //'/'// trim(rpntfil)//trim(inst_suffix)
        call opnfil( filename, nio, 'f' )
-
+       curr_date =etimer%get_calendar()
        write(nio,'(a)') fnamer
+       write(nio,'(a)')curr_date
        call relavu( nio )
        write(iulog,*)'Successfully wrote local restart pointer file'
 !    end if
@@ -8297,4 +8300,26 @@ implicit none
 
   end subroutine restFile_enddef
 
+  !-----------------------------------------------------------------------
+  subroutine get_restart_date(curr_date)
+  !
+  ! DESCRIPTION
+  ! read the simulation date of restart file
+  use EcoSIMConfig, only : rpntdir, rpntfil
+  use fileutil , only : relavu
+  use fileutil , only : getavu, opnfil
+  implicit none
+  character(len=datestrlen), intent(out) :: curr_date
+  character(len=256) :: filename  ! local file name
+  character(len=256) :: fnamer    ! restart file name
+  integer :: nio
+  nio = getavu()
+  filename= trim(rpntdir) //'/'// trim(rpntfil)//trim(inst_suffix)
+  call opnfil( filename, nio, 'f' )  
+  read(nio,*) fnamer
+  read(nio,*)curr_date
+  call relavu( nio )
+
+
+  end subroutine get_restart_date
 end module restartMod

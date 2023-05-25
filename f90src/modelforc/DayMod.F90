@@ -94,20 +94,17 @@
 
 !  real(r8) :: AZI
 !  REAL(R8) :: DEC
+  integer :: NE
 
   D955: DO NX=NHW,NHE
     D950: DO NY=NVN,NVS
       TRAD(NY,NX)=0._r8
-      TAMX(NY,NX)=-100.0
-      TAMN(NY,NX)=100.0
+      TAMX(NY,NX)=-100.0_r8
+      TAMN(NY,NX)=100.0_r8
       HUDX(NY,NX)=0._r8
-      HUDN(NY,NX)=100.0
+      HUDN(NY,NX)=100.0_r8
       TWIND(NY,NX)=0._r8
       TRAI(NY,NX)=0._r8
-      D945: DO L=0,JZ
-        TSMX(L,NY,NX)=-9999
-        TSMN(L,NY,NX)=9999
-      ENDDO D945
 !
 !     RESET ANNUAL FLUX ACCUMULATORS AT START OF ANNUAL CYCLE
 !     ALAT=latitude +ve=N,-ve=S
@@ -161,13 +158,18 @@
         XHVSTE(:,NY,NX)=0._r8
         TRINH4(NY,NX)=0._r8
         TRIPO4(NY,NX)=0._r8
+
         D960: DO NZ=1,NP0(NY,NX)
-          RSETE(ielmc,NZ,NY,NX)=RSETE(ielmc,NZ,NY,NX)+CARBN(NZ,NY,NX)+TEUPTK(ielmc,NZ,NY,NX) &
-            -TESNC(ielmc,NZ,NY,NX)+TCO2T(NZ,NY,NX)-VCO2F(NZ,NY,NX)-VCH4F(NZ,NY,NX)
-          RSETE(ielmn,NZ,NY,NX)=RSETE(ielmn,NZ,NY,NX)+TEUPTK(ielmn,NZ,NY,NX)+TNH3C(NZ,NY,NX) &
-            -TESNC(ielmn,NZ,NY,NX)-VNH3F(NZ,NY,NX)-VN2OF(NZ,NY,NX)+TZUPFX(NZ,NY,NX)
-          RSETE(ielmp,NZ,NY,NX)=RSETE(ielmp,NZ,NY,NX)+TEUPTK(ielmp,NZ,NY,NX) &
-            -TESNC(ielmp,NZ,NY,NX)-VPO4F(NZ,NY,NX)
+        !RSETE: effect of canopy element status on seed set
+          DO NE=1,npelms
+            RSETE(NE,NZ,NY,NX)=RSETE(NE,NZ,NY,NX)+TEUPTK(NE,NZ,NY,NX)-TESNC(NE,NZ,NY,NX)
+            THVSTE(NE,NZ,NY,NX)=THVSTE(NE,NZ,NY,NX)+HVSTE(NE,NZ,NY,NX)
+          enddo
+          RSETE(ielmc,NZ,NY,NX)=RSETE(ielmc,NZ,NY,NX)+CARBN(NZ,NY,NX)+TCO2T(NZ,NY,NX)-VCO2F(NZ,NY,NX)-VCH4F(NZ,NY,NX)
+          RSETE(ielmn,NZ,NY,NX)=RSETE(ielmn,NZ,NY,NX)+TNH3C(NZ,NY,NX)+TZUPFX(NZ,NY,NX)-VNH3F(NZ,NY,NX)-VN2OF(NZ,NY,NX)
+          RSETE(ielmp,NZ,NY,NX)=RSETE(ielmp,NZ,NY,NX)-VPO4F(NZ,NY,NX)
+
+! the following variables are accumulated daily
           CARBN(NZ,NY,NX)=0._r8
           TEUPTK(:,NZ,NY,NX)=0._r8
           TCO2T(NZ,NY,NX)=0._r8
@@ -181,9 +183,7 @@
           VNH3F(NZ,NY,NX)=0._r8
           VN2OF(NZ,NY,NX)=0._r8
           VPO4F(NZ,NY,NX)=0._r8
-          THVSTE(ielmc,NZ,NY,NX)=THVSTE(ielmc,NZ,NY,NX)+HVSTE(ielmc,NZ,NY,NX)
-          THVSTE(ielmn,NZ,NY,NX)=THVSTE(ielmn,NZ,NY,NX)+HVSTE(ielmn,NZ,NY,NX)
-          THVSTE(ielmp,NZ,NY,NX)=THVSTE(ielmp,NZ,NY,NX)+HVSTE(ielmp,NZ,NY,NX)
+
           HVSTE(:,NZ,NY,NX)=0._r8
           TESN0(:,NZ,NY,NX)=0._r8
           TESNC(:,NZ,NY,NX)=0._r8
@@ -208,11 +208,15 @@
 !     TIME STEP OF WEARHER DATA
 !     ITYPE 1=daily,2=hourly
 !
-      IF(is_first_year.OR.I.LE.ILAST)THEN
+      IF(is_first_year)THEN
+      !weather input is in daily format
         ITYPE=IWTHR(1)
       ELSE
+      !weather input is in hourly format
         ITYPE=IWTHR(2)
       ENDIF
+
+      print*,'ITYPE=',ITYPE,ILAST
 !
 !     PARAMETERS FOR CALCULATING HOURLY RADIATION, TEMPERATURE
 !     AND VAPOR PRESSURE FROM DAILY VALUES
@@ -316,15 +320,18 @@
 !     ATTRIBUTE MIXING COEFFICIENTS AND SURFACE ROUGHNESS PARAMETERS
 !     TO TILLAGE EVENTS FROM SOIL MANAGEMENT FILE IN 'READS'
 !
-!     ITILL=soil disturbance type 1-20:tillage,21=litter removal,22=fire,23-24=drainage
+!     ITILL=soil disturbance type, 1-20:tillage,21=litter removal,22=fire,23-24=drainage
 !     CORP=soil mixing fraction used in redist.f
 !
       IF(ITILL(I,NY,NX).LE.10)THEN
-        CORP=AMIN1(1.0,AZMAX1(ITILL(I,NY,NX)/10.0))
+      ! type-1 tillage
+        CORP=AMIN1(1.0_r8,AZMAX1(ITILL(I,NY,NX)/10.0_r8))
       ELSEIF(ITILL(I,NY,NX).LE.20)THEN
-        CORP=AMIN1(1.0,AZMAX1((ITILL(I,NY,NX)-10.0)/10.0))
+      ! type-2 tillage
+        CORP=AMIN1(1.0_r8,AZMAX1((ITILL(I,NY,NX)-10.0_r8)/10.0_r8))
       ENDIF
-      XCORP(NY,NX)=1.0-CORP
+
+      XCORP(NY,NX)=1.0_r8-CORP
 !     WRITE(*,2227)'TILL',I,ITILL(I,NY,NX),CORP,XCORP(NY,NX)
 !2227  FORMAT(A8,2I4,12E12.4)
 !
@@ -346,25 +353,28 @@
 !     RRIG=hourly irrigation amount applied in wthr.f
 !
       IF(Lirri_auto)THEN
+      !automated irrigation
         IF(I.GE.IIRRA(1,NY,NX).AND.I.LE.IIRRA(2,NY,NX))THEN
           TFZ=0._r8
           TWP=0._r8
           TVW=0._r8
           DIRRA1=DIRRA(1,NY,NX)+CDPTH(NU(NY,NX)-1,NY,NX)
           DIRRA2=DIRRA(2,NY,NX)+CDPTH(NU(NY,NX)-1,NY,NX)
+
           D165: DO L=NU(NY,NX),NL(NY,NX)
             IF(CDPTH(L-1,NY,NX).LT.DIRRA1)THEN
-              FW=AMIN1(1.0,(DIRRA1-CDPTH(L-1,NY,NX))/(CDPTH(L,NY,NX)-CDPTH(L-1,NY,NX)))
+              FW=AMIN1(1.0_r8,(DIRRA1-CDPTH(L-1,NY,NX))/(CDPTH(L,NY,NX)-CDPTH(L-1,NY,NX)))
               FZ=AMIN1(POROS(L,NY,NX),WP(L,NY,NX)+CIRRA(NY,NX)*(FC(L,NY,NX)-WP(L,NY,NX)))
               TFZ=TFZ+FW*FZ*VOLX(L,NY,NX)
               TWP=TWP+FW*WP(L,NY,NX)*VOLX(L,NY,NX)
               TVW=TVW+FW*(VOLW(L,NY,NX)+VOLI(L,NY,NX))
             ENDIF
           ENDDO D165
-          IF((IFLGV(NY,NX).EQ.0.AND.TVW.LT.TWP+FIRRA(NY,NX)*(TFZ-TWP)) &
+
+          IF((IFLGV(NY,NX).EQ.0 .AND. TVW.LT.TWP+FIRRA(NY,NX)*(TFZ-TWP)) &
             .OR.(IFLGV(NY,NX).EQ.1.AND.PSILZ(1,NY,NX).LT.FIRRA(NY,NX)))THEN
             RR=AZMAX1(TFZ-TVW)
-            IF(RR.GT.0.0)THEN
+            IF(RR.GT.0.0_r8)THEN
               D170: DO J=IIRRA(3,NY,NX),IIRRA(4,NY,NX)
                 RRIG(J,I,NY,NX)=RR/(IIRRA(4,NY,NX)-IIRRA(3,NY,NX)+1)
               ENDDO D170
