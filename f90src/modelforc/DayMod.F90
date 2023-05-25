@@ -183,9 +183,7 @@
           VNH3F(NZ,NY,NX)=0._r8
           VN2OF(NZ,NY,NX)=0._r8
           VPO4F(NZ,NY,NX)=0._r8
-          THVSTE(ielmc,NZ,NY,NX)=THVSTE(ielmc,NZ,NY,NX)+HVSTE(ielmc,NZ,NY,NX)
-          THVSTE(ielmn,NZ,NY,NX)=THVSTE(ielmn,NZ,NY,NX)+HVSTE(ielmn,NZ,NY,NX)
-          THVSTE(ielmp,NZ,NY,NX)=THVSTE(ielmp,NZ,NY,NX)+HVSTE(ielmp,NZ,NY,NX)
+
           HVSTE(:,NZ,NY,NX)=0._r8
           TESN0(:,NZ,NY,NX)=0._r8
           TESNC(:,NZ,NY,NX)=0._r8
@@ -218,6 +216,7 @@
         ITYPE=IWTHR(2)
       ENDIF
 
+      print*,'ITYPE=',ITYPE,ILAST
 !
 !     PARAMETERS FOR CALCULATING HOURLY RADIATION, TEMPERATURE
 !     AND VAPOR PRESSURE FROM DAILY VALUES

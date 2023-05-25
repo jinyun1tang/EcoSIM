@@ -8349,5 +8349,6 @@ implicit none
   read(nio,*)curr_date
   call relavu( nio )
 
+
   end subroutine get_restart_date
 end module restartMod
