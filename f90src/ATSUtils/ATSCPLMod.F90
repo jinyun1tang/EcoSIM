@@ -32,17 +32,18 @@ module ATSCPLMod
 contains
 !------------------------------------------------------------------------------------------
 
-  subroutine ATS2EcoSIMData(ncol, state, aux_data, prop)
+  subroutine ATS2EcoSIMData(ncol, state, aux_data, props)
   !send data from ATS to ecosim
   implicit none
 
   ! BGC coupler variables
   type (BGCState), intent(in) :: state
   type (BGCAuxiliaryData), intent(in) :: aux_data
-  type (BGCProperties), intent(in) :: prop
+  type (BGCProperties), intent(in) :: props
 
 
   ! Ecosim variables
+  real(r8), pointer :: data(:)
   integer, intent(in) :: filter_col(:)
   real(r8), optional, intent(in) :: data_1d(:)              !1:nvar
   character(len=*), optional, intent(in) :: var_1d(:)       !1:nvar
@@ -53,6 +54,7 @@ contains
   character(len=*), parameter :: subname=trim(mod_filename)//'::ATS2EcoSIMData'
   integer :: ncol,nvar
   integer :: j1,j2,j3
+
 
   !ncol=size(filter_col)
 
