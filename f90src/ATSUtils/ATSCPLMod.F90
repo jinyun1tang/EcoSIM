@@ -57,61 +57,61 @@ contains
 
   !ncol=size(filter_col)
 
-  if (ncol .EQ. 0)then
+  !if (ncol .EQ. 0)then
   !domain specific scalar
   !Variables with only a single value over the domain
   !loops over j1 (number of vars)
   !Only do this on the first column (if ncol=0)
   !I think we basically have to hardcode this with foreknowledge of what is
   !going to be in the Alquimia-like dictionary
-    nvar=size(var_1d)
-    do j1=1,nvar
-      select case(var_1d(j1))
-      case ('ATM_N2')  !ppmv
-        atm_N2=data_1d(j1)
-      case ('ATM_O2')  !ppmv
-        atm_o2=data_1d(j1)
-      case ('ATM_CO2') !ppmv
-        atm_co2=data_1d(j1)
-      case ('ATM_CH4') !ppmv
-        atm_ch4=data_1d(j1)
-      case ('ATM_N2O') !ppmv
-        atm_n2o=data_1d(j1)
-      case ('ATM_H2')  !ppmv
-        atm_h2=data_1d(j1)
-      case ('ATM_NH3') !ppmv
-        atm_NH3=data_1d(j1)
-      end select
-    enddo
-  endif
+  !  nvar=size(var_1d)
+  !  do j1=1,nvar
+  !    select case(var_1d(j1))
+  !    case ('ATM_N2')  !ppmv
+  !      atm_N2=data_1d(j1)
+  !    case ('ATM_O2')  !ppmv
+  !      atm_o2=data_1d(j1)
+  !    case ('ATM_CO2') !ppmv
+  !      atm_co2=data_1d(j1)
+  !    case ('ATM_CH4') !ppmv
+  !      atm_ch4=data_1d(j1)
+  !    case ('ATM_N2O') !ppmv
+  !      atm_n2o=data_1d(j1)
+  !    case ('ATM_H2')  !ppmv
+  !      atm_h2=data_1d(j1)
+  !    case ('ATM_NH3') !ppmv
+  !      atm_NH3=data_1d(j1)
+  !    end select
+  !  enddo
+  !endif
 
 
   !columun specific scalar
   !Variables that are single valued along a column
   !j1 - number of variables
   ! changed the loop over j2 because we call this column by column
-  nvar=size(var_2d)
-  do j1=1,nvar
-    select case(var_2d(j1))
-    case ('TAIRC')     !air temperature, oC
-      tairc(ncol)=data_2d(j1,ncol)
-    case ('PREC')      !precipitation, mm H2O/hr
-      prec(ncol)=data_2d(j1,ncol)
-    case ('WINDH')     !horizontal wind speed,   m/s
-      uwind(ncol)=data_2d(j1,ncol)
-    case ('DWPTH')     !atmospheric vapor pressure, kPa
-      vpa(ncol)=data_2d(j1,ncol)
-    case ('SRADH')     !Incident solar radiation, W/m2
-      srad(ncol)=data_2d(j1,ncol)
-    end select
-  enddo
+  !nvar=size(var_2d)
+  !do j1=1,nvar
+  !  select case(var_2d(j1))
+  !  case ('TAIRC')     !air temperature, oC
+  !    tairc(ncol)=data_2d(j1,ncol)
+  !  case ('PREC')      !precipitation, mm H2O/hr
+  !    prec(ncol)=data_2d(j1,ncol)
+  !  case ('WINDH')     !horizontal wind speed,   m/s
+  !    uwind(ncol)=data_2d(j1,ncol)
+  !  case ('DWPTH')     !atmospheric vapor pressure, kPa
+  !    vpa(ncol)=data_2d(j1,ncol)
+  !  case ('SRADH')     !Incident solar radiation, W/m2
+  !    srad(ncol)=data_2d(j1,ncol)
+  !  end select
+  !enddo
 
   !1D vertical vector,
   !variables that take on a different value in each cell
   !Bulk of data will go here
   nvar=size(var_2d)
   do j1=1,nvar
-    select case (var_2d(j1))
+    !select case (var_2d(j1))
     !case ('CSAND')  !g/kg soil
     !  csand(1:JZSOI,ncol)=data_3d(1:JZSOI,j1)
     !case ('CSILT')
