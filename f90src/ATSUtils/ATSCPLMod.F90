@@ -110,54 +110,41 @@ contains
   !1D vertical vector,
   !variables that take on a different value in each cell
   !Bulk of data will go here
-  nvar=size(var_2d)
-  do j1=1,nvar
-    !select case (var_2d(j1))
-    !case ('CSAND')  !g/kg soil
-    !  csand(1:JZSOI,ncol)=data_3d(1:JZSOI,j1)
-    !case ('CSILT')
-    !  CSILT(1:JZSOI,ncol)=data_3d(1:JZSOI,j1)
-    !Variables related to flow:
-    case ('PORO')
-      call c_f_pointer(state%porosity%data, data, (/size_col/))
-      do j3 = 1, size_col
-        PORO(1:JZSOI,ncol)=data
-      enddo
-    case('L_DENS')
-      call c_f_pointer(state%liquid_density%data, data, (/size_col/))
-      do j3 = 1,size_col
-        L_DENS(1:JZSOI,ncol)=data
-      enddo
-    case('WC')
-      call c_f_pointer(state%water_content%data, data, (/size_col/))
-      do j3 = 1,size_col
-        WC(1:JZSOI,ncol)=data
-      enddo
-    case('L_SAT')
-      call c_f_pointer(props%liquid_saturation%data, data, (/size_col/))
-      do j3 = 1,size_col
-        L_SAT(1:JZSOI,ncol)=data
-      enddo
-    case('REL_PERM')
-      call c_f_pointer(props%relative_permeability%data, data, (/size_col/))
-      do j3 = 1,size_col
-        REL_PERM(1:JZSOI,ncol)=data
-      enddo
-    case('H_COND')
-      call c_f_pointer(state%hydraulic_conductivity%data, data, (/size_col/))
-      do j3 = 1,size_col
-        H_COND(1:JZSOI,ncol)=data
-      enddo
-    case('TEMP')
-      call c_f_pointer(state%temperature%data, data, (/size_col/))
-      do j3 = 1,size_col
-        TEMP(1:JZSOI,ncol)=data
-      enddo
-
-    end select
-  enddo
-
-  write(*,*) "Data Transfer Finished"
+  !nvar=size(var_2d)
+  !do j1=1,nvar
+  !case ('CSAND')  !g/kg soil
+  !  csand(1:JZSOI,ncol)=data_3d(1:JZSOI,j1)
+  !case ('CSILT')
+  !  CSILT(1:JZSOI,ncol)=data_3d(1:JZSOI,j1)
+  !Variables related to flow:
+    call c_f_pointer(state%porosity%data, data, (/size_col/))
+    do j3 = 1, size_col
+      PORO(1:JZSOI,ncol)=data
+    enddo
+    call c_f_pointer(state%liquid_density%data, data, (/size_col/))
+    do j3 = 1,size_col
+      L_DENS(1:JZSOI,ncol)=data
+    enddo
+    call c_f_pointer(state%water_content%data, data, (/size_col/))
+    do j3 = 1,size_col
+      WC(1:JZSOI,ncol)=data
+    enddo
+    call c_f_pointer(props%liquid_saturation%data, data, (/size_col/))
+    do j3 = 1,size_col
+      L_SAT(1:JZSOI,ncol)=data
+    enddo
+    call c_f_pointer(props%relative_permeability%data, data, (/size_col/))
+    do j3 = 1,size_col
+      REL_PERM(1:JZSOI,ncol)=data
+    enddo
+    call c_f_pointer(state%hydraulic_conductivity%data, data, (/size_col/))
+    do j3 = 1,size_col
+      H_COND(1:JZSOI,ncol)=data
+    enddo
+    call c_f_pointer(state%temperature%data, data, (/size_col/))
+    do j3 = 1,size_col
+      TEMP(1:JZSOI,ncol)=data
+    enddo
   end subroutine ATS2EcoSIMData
 !------------------------------------------------------------------------------------------
 
