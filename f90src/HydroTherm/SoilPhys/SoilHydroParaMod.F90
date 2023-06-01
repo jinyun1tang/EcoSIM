@@ -15,15 +15,15 @@ module SoilHydroParaMod
   use EcoSIMHistMod
   use EcoSIMConfig
   use SurfLitterDataType
-  use EcoSIMCtrlMod  
-  use PhysPars  
+  use EcoSIMCtrlMod
+  use PhysPars
   use EcoSiMParDataMod   , only : micpar
   use minimathmod  , only : isclose,AZMAX1,AZMIN1
 implicit none
   private
   character(len=*), parameter :: mod_filename = __FILE__
   real(r8), parameter :: FORGW=0.25E+06_r8 !threshold for  C concentration in organic soil 	g Mg-1
-  real(r8), parameter :: mGravAccelerat=1.e-3_r8*GravAcceleration  !gravitational constant devided by 1000.  
+  real(r8), parameter :: mGravAccelerat=1.e-3_r8*GravAcceleration  !gravitational constant devided by 1000.
 
   public :: GetSoilHydraulicVars
   public :: SoilHydroProperty
@@ -36,7 +36,7 @@ contains
   !
   !DESCRIPTIONS
   !compute hydraulic properties
-  !called in hour1.F90 before doing hydrology 
+  !called in hour1.F90 before doing hydrology
   implicit none
   integer, intent(in) :: NY,NX
   REAL(R8) :: FCX,FCLX
@@ -66,7 +66,7 @@ contains
           +((LOGFldCapacity(L,NY,NX)-LOG(THETW1))/FCD(L,NY,NX)*LOGPSIMND(NY,NX))))
       ELSE IF(THETW1.LT.POROS(L,NY,NX)-DTHETW)THEN
         PSISoilMatricP(L,NY,NX)=-EXP(LOGPSIAtSat(NY,NX)+(((LOGPOROS(L,NY,NX)-LOG(THETW1)) &
-          /PSD(L,NY,NX))**SRP(L,NY,NX)*LOGPSIMXD(NY,NX)))        
+          /PSD(L,NY,NX))**SRP(L,NY,NX)*LOGPSIMXD(NY,NX)))
       ELSE
         PSISoilMatricP(L,NY,NX)=PSISE(L,NY,NX)
       ENDIF
@@ -204,7 +204,7 @@ contains
     !IDATA(9): start year of model run
     IF(I.EQ.IBEGIN.AND.J.EQ.1.AND.is_first_year)THEN
       !first time step at the beginning year
-      !THW=initial soil water content 
+      !THW=initial soil water content
       !DPTH=depth to middle of soil layer [m]
       !ExtWaterTablet0=external water table depth, [m]
       IF(THW(L,NY,NX).GT.1.0_r8.OR.SoiDepthMidLay(L,NY,NX).GE.ExtWaterTablet0(NY,NX))THEN
@@ -230,9 +230,9 @@ contains
       ELSEIF(THI(L,NY,NX).LT.0.0_r8)THEN
         THETI(L,NY,NX)=0.0_r8
       ENDIF
-      
+
       IF(cold_run())THEN
-      !in a cold run, set it 
+      !in a cold run, set it
         VLWatMicP(L,NY,NX)=THETW(L,NY,NX)*VLSoilPoreMicP(L,NY,NX)
         VLWatMicPX(L,NY,NX)=VLWatMicP(L,NY,NX)
         VLWatMacP(L,NY,NX)=THETW(L,NY,NX)*VLMacP(L,NY,NX)
