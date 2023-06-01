@@ -31,8 +31,11 @@ module WthrMod
   !     PDIR,PDIF=PAR:SW ratio (umol s-1/(MJ h-1))
   !     TSNOW=temperature below which precipitation is snow (oC)
   !
-  real(r8), PARAMETER :: CDIR=0.42,CDIF=0.58,PDIR=1269.4,PDIF=1269.4
-  real(r8), PARAMETER :: TSNOW=-0.25
+  real(r8), PARAMETER :: CDIR=0.42_r8
+  real(r8), parameter :: CDIF=0.58_r8
+  real(r8), parameter :: PDIR=1269.4_r8
+  real(r8), parameter :: PDIF=1269.4_r8
+  real(r8), PARAMETER :: TSNOW=-0.25_r8  !oC, threshold temperature for snowfall
 
   public :: wthr
   contains
@@ -218,6 +221,7 @@ module WthrMod
       VPS(NY,NX)=vapsat0(TKA(ny,nx))*EXP(-ALTI(NY,NX)/7272.0_r8)
       VPK(NY,NX)=AMIN1(DWPTH(J,I),VPS(NY,NX))
       UA(NY,NX)=AMAX1(3600.0_r8,WINDH(J,I))
+      !snowfall is determined by air tempeature
       IF(TCA(NY,NX).GT.TSNOW)THEN
         PRECRI(NY,NX)=RAINH(J,I)
         PRECWI(NY,NX)=0.0_r8

@@ -1,0 +1,10 @@
+
+&ecosim_time 
+delta_time=3600.
+stop_n=3
+stop_option='nsteps'
+rest_frq=1
+rest_opt='nsteps'
+diag_frq=1
+diag_opt='nyears'
+/

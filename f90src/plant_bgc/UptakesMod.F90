@@ -99,7 +99,8 @@ module UptakesMod
   DO NZ=1,NP
     OSTRN=0.0_r8
     OSTRD=0.0_r8
-    IF(IFLGC(NZ).EQ.ipltactv.AND.PP(NZ).GT.0.0)THEN
+
+    IF(IFLGC(NZ).EQ.ipltactv.AND.PP(NZ).GT.0.0_r8)THEN
 
       call UpdateCanopyProperty(NZ)
 
@@ -115,6 +116,7 @@ module UptakesMod
 !     (AG: - originally this line had a N0B1 here )
       IF((IDAY(1,NB1(NZ),NZ).NE.0).AND.(ARLFS(NZ).GT.ZEROL(NZ) &
         .AND.FRADP(NZ).GT.0.0_r8).AND.(RTDP1(1,1,NZ).GT.SDPTH(NZ)+CDPTHZ(0)))THEN
+        !leaf area > 0, absorped par, and rooting depth > seeding depth
 !
         call CalcResistance(NZ,PATH,RRADL,RTARR,RSRT,RSRG,RSR1,RSR2,RSSX,RSRS,CNDT,PSILH,ILYR)
 !
@@ -134,17 +136,17 @@ module UptakesMod
 !     VHCPX=canopy heat capacity
 !     VOLWP,VOLWC=water volume in canopy,on canopy surfaces
 !
-        PSILT(NZ)=AMIN1(-ppmc,0.667*PSILT(NZ))
+        PSILT(NZ)=AMIN1(-ppmc,0.667_r8*PSILT(NZ))
         EP(NZ)=0.0_r8
         EVAPC(NZ)=0.0_r8
         HFLWC1=FLWC(NZ)*cpw*TKA
 
         IF(ARLSS.GT.ZEROS)THEN
-          FPC=ARLFS(NZ)/ARLSS*AMIN1(1.0,0.5*ARLFC/AREA3(NU))
+          FPC=ARLFS(NZ)/ARLSS*AMIN1(1.0_r8,0.5_r8*ARLFC/AREA3(NU))
         ELSEIF(PPT.GT.ZEROS)THEN
           FPC=PP(NZ)/PPT
         ELSE
-          FPC=1.0/NP
+          FPC=1.0_r8/NP
         ENDIF
 
         TKCX=TKC(NZ)
@@ -154,8 +156,8 @@ module UptakesMod
 !     CONVERGENCE SOLUTION
 !
         NN=CanopyEnergyH2OIteration(I,J,NZ,FPC,WVPLT,&
-          PSIST1,PARHC,DIFF,UPRT,VFLXC,FDMP,RSRS,FPQ,VOLPU,VOLWU,TKCX,CNDT,VHCPX,&
-          HFLWC1,PSILH,ILYR)
+          PSIST1,PARHC,DIFF,UPRT,VFLXC,FDMP,RSRS,FPQ,VOLPU,&
+          VOLWU,TKCX,CNDT,VHCPX,HFLWC1,PSILH,ILYR)
 !
 !     FINAL CANOPY TEMPERATURE, DIFFERENCE WITH AIR TEMPERATURE
 !
@@ -565,19 +567,19 @@ module UptakesMod
       plt_ew%EP(NZ)=0.0_r8
       TKC(NZ)=TKA+DTKC(NZ)
       TCC(NZ)=TKC(NZ)-TC2K
-      FTHRM=EMMC*2.04E-10*FRADP(NZ)*AREA3(NU)
-      THRM1(NZ)=FTHRM*TKC(NZ)**4
+      FTHRM=EMMC*2.04E-10_r8*FRADP(NZ)*AREA3(NU)
+      THRM1(NZ)=FTHRM*TKC(NZ)**4._r8
       PSILT(NZ)=PSIST1(NG(NZ))
       APSILT=ABS(PSILT(NZ))
-      FDMP=0.16+0.10*APSILT/(0.05*APSILT+2.0)
+      FDMP=0.16_r8+0.10_r8*APSILT/(0.05_r8*APSILT+2.0_r8)
       CCPOLT=CEPOLP(ielmc,NZ)+CEPOLP(ielmn,NZ)+CEPOLP(ielmp,NZ)
-      OSWT=36.0+840.0*AZMAX1(CCPOLT)
+      OSWT=36.0_r8+840.0_r8*AZMAX1(CCPOLT)
       PSILO(NZ)=FDMP/0.16*OSMO(NZ)-RGAS*TKC(NZ)*FDMP*CCPOLT/OSWT
       PSILG(NZ)=AZMAX1(PSILT(NZ)-PSILO(NZ))
       WFNC=EXP(RCS(NZ)*PSILG(NZ))
       RC(NZ)=RSMN(NZ)+(RSMH(NZ)-RSMN(NZ))*WFNC
       RA(NZ)=RAZ(NZ)
-      VHCPC(NZ)=cpw*(WTSHTE(ielmc,NZ)*10.0E-06)
+      VHCPC(NZ)=cpw*(WTSHTE(ielmc,NZ)*10.0E-06_r8)
       DTKC(NZ)=0.0_r8
       D4290: DO N=1,MY(NZ)
         DO  L=NU,NI(NZ)
@@ -697,8 +699,8 @@ module UptakesMod
 !     RAD1=net SW+LW absorbed by canopy
 !
     TKC1=TKCZ(NZ)
-    THRM1(NZ)=FTHRM*TKC1**4
-    DTHS1=FDTHS-THRM1(NZ)*2.0
+    THRM1(NZ)=FTHRM*TKC1**4._r8   !long wave radiation
+    DTHS1=FDTHS-THRM1(NZ)*2.0_r8  !upper and down
     RAD1(NZ)=RADC(NZ)+DTHS1
 !
 !     BOUNDARY LAYER RESISTANCE FROM RICHARDSON NUMBER
@@ -722,9 +724,9 @@ module UptakesMod
 !     PSILO,PSILG=canopy osmotic,turgor water potential
 !
     APSILT=ABS(PSILT(NZ))
-    FDMP=0.16+0.10*APSILT/(0.05*APSILT+2.0)
-    PSILO(NZ)=FDMP/0.16*OSMO(NZ)-RGAS*TKC1*FDMP*CCPOLT/OSWT
-    PSILG(NZ)=AZMAX1(PSILT(NZ)-PSILO(NZ))
+    FDMP=0.16_r8+0.10_r8*APSILT/(0.05_r8*APSILT+2.0_r8)
+    PSILO(NZ)=FDMP/0.16_r8*OSMO(NZ)-RGAS*TKC1*FDMP*CCPOLT/OSWT
+    PSILG(NZ)=AZMAX1(PSILT(NZ)-PSILO(NZ))  !turgor pressure
 !
 !     CANOPY STOMATAL RESISTANCE
 !
@@ -750,21 +752,24 @@ module UptakesMod
 !     EFLXC=canopy latent heat flux
 !     VFLXC=convective heat flux from EFLXC
 !     VAP=latent heat of evaporation
-!
-      !VPC=2.173E-03/TKC1 &
-      !*0.61*EXP(5360.0*(3.661E-03-1.0/TKC1)) &
-    vpc=vapsat(tkc1)*EXP(18.0*PSILT(NZ)/(RGAS*TKC1))
-    EX=PAREC*(VPA-VPC)
-    IF(EX.GT.0.0)THEN
+!     PAREC=aerodynamic conductance
+
+    VPC=vapsat(tkc1)*EXP(18.0_r8*PSILT(NZ)/(RGAS*TKC1))
+    EX=PAREC*(VPA-VPC)   !evaporation demand
+    IF(EX.GT.0.0_r8)THEN
+      !condensation  > 0._r8, to canopy
       EVAPC(NZ)=EX*RA(NZ)/(RA(NZ)+RZ)
       EX=0.0_r8
-    ELSEIF(EX.LE.0.0.AND.VOLWC(NZ).GT.0.0)THEN
+    ELSEIF(EX.LE.0.0_r8.AND.VOLWC(NZ).GT.0.0_r8)THEN
+      !evaporation, and there is water stored in canopy
+      !<0._r8, off canopy
       EVAPC(NZ)=AMAX1(EX*RA(NZ)/(RA(NZ)+RZ),-VOLWC(NZ))
       EX=EX-EVAPC(NZ)
     ENDIF
+
     EP(NZ)=EX*RA(NZ)/(RA(NZ)+RC(NZ))
-    EFLXC(NZ)=(EP(NZ)+EVAPC(NZ))*VAP
-    VFLXC=EVAPC(NZ)*cpw*TKC1
+    EFLXC(NZ)=(EP(NZ)+EVAPC(NZ))*VAP   !latent heat flux
+    VFLXC=EVAPC(NZ)*cpw*TKC1           !enthalpy of evaporated water
 !
 !     SENSIBLE + STORAGE HEAT FROM RN, LE AND CONVECTIVE HEAT FLUXES
 !
@@ -778,18 +783,20 @@ module UptakesMod
 !     VHCPC=canopy heat capacity
 !     TKCY=equilibrium canopy temperature for HFLXS
 !
+!   VHCPX= canopy heat capacity
     VHCPC(NZ)=VHCPX+cpw*(EVAPC(NZ)+FLWC(NZ))
     TKCY=(TKCX*VHCPX+TKA*PARHC+HFLXS)/(VHCPC(NZ)+PARHC)
-    TKCY=AMIN1(TKA+10.0,AMAX1(TKA-10.0,TKCY))
+    TKCY=AMIN1(TKA+10.0_r8,AMAX1(TKA-10.0_r8,TKCY))
 !
 !     RESET CANOPY TEMPERATURE FOR NEXT ITERATION
 !
 !     XC,IC=magnitude,direction of change in canopy temp for next cycle
 !
     IF((IC.EQ.0.AND.TKCY.GT.TKC1).OR.(IC.EQ.1.AND.TKCY.LT.TKC1))THEN
-      XC=0.5*XC
+      XC=0.5_r8*XC
     ENDIF
-    TKCZ(NZ)=TKC1+0.1*(TKCY-TKC1)
+
+    TKCZ(NZ)=TKC1+0.1_r8*(TKCY-TKC1)
     IF(TKCY.GT.TKC1)THEN
       IC=1
     ELSE
@@ -823,7 +830,7 @@ module UptakesMod
           IF(ILYR(N,L).EQ.1)THEN
             UPWTR(N,L,NZ)=AMAX1(AZMIN1(-VOLWU(L)*FPQ(N,L,NZ)) &
               ,AMIN1((PSILC-PSIST1(L))/RSRS(N,L),VOLPU(L)*FPQ(N,L,NZ)))
-            IF(UPWTR(N,L,NZ).GT.0.0)THEN
+            IF(UPWTR(N,L,NZ).GT.0.0_r8)THEN
               UPWTR(N,L,NZ)=0.1*UPWTR(N,L,NZ)
             ENDIF
             UPRT=UPRT+UPWTR(N,L,NZ)
@@ -1132,7 +1139,7 @@ module UptakesMod
   ENDIF
   TCC(NZ)=TKC(NZ)-TC2K
   FTHRM=EMMC*2.04E-10_r8*FRADP(NZ)*AREA3(NU)
-  THRM1(NZ)=FTHRM*TKC(NZ)**4
+  THRM1(NZ)=FTHRM*TKC(NZ)**4._r8
   PSILT(NZ)=PSIST1(NG(NZ))
   APSILT=ABS(PSILT(NZ))
   FDMP=0.16_r8+0.10_r8*APSILT/(0.05_r8*APSILT+2.0_r8)

@@ -392,8 +392,8 @@ module readiMod
 !
 !     CONVERT ASPECT from geographic format TO GEOMETRIC FORMAT
 !
-!     what is geometric format mean? 0 is north, 90 east, 180 south,
-!     geometric format 0/360 is east,
+!     what is geometric format mean? geographic format 0 is north, 90 east, 180 south,
+!     geometric format 0/360 is east, counting as counterclock wise
         ASP(NY,NX)=450.0_r8-ASP(NY,NX)
         IF(ASP(NY,NX).GE.360.0_r8)ASP(NY,NX)=ASP(NY,NX)-360.0_r8
       ENDDO

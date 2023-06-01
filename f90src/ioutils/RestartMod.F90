@@ -59,26 +59,10 @@ implicit none
   character(len=16), parameter :: namec  = 'column'       ! name of columns
   character(len=16), parameter :: namep  = 'pft'          ! name of patches
 
-  public :: restart
   public :: restFile
   public :: get_restart_date
   contains
 
-  subroutine restart(I,NHW,NHE,NVN,NVS)
-  use EcoSIMCtrlMod, only : lverb
-  implicit none
-  integer, intent (in) :: I,NHW,NHE,NVN,NVS
-
-  if(lverb)WRITE(*,334)'WOUTS'
-!  CALL WOUTS(I,NHW,NHE,NVN,NVS)
-  if(lverb)WRITE(*,334)'WOUTP'
-!  CALL WOUTP(I,NHW,NHE,NVN,NVS)
-  if(lverb)WRITE(*,334)'WOUTQ'
-!  CALL WOUTQ(I,NHW,NHE,NVN,NVS)
-
-334   FORMAT(A8)
-
-  end subroutine restart
 !------------------------------------------------------------------------------------------
   subroutine restartnc(ncid,flag)
   implicit none
@@ -90,15 +74,17 @@ implicit none
   CALL WOUTP(ncid,flag)
   end subroutine restartnc
 !------------------------------------------------------------------------------------------
-  subroutine restFile(flag,fnamer)
+  subroutine restFile(flag)
   implicit none
   character(len=*), intent(in) :: flag
-  character(len=*), intent(in), optional :: fnamer       ! name of netcdf restart file
-  character(len=256)   :: filer                   ! restart file name
+  character(len=256) :: fnamer       ! name of netcdf restart file
+  character(len=256) :: filer                   ! restart file name
+  character(len=256) :: path       ! name of netcdf restart file  
   character(len=18) :: rdate
   integer :: yr,mon,day,tod
 
   if (flag=='read')then
+    call restFile_getfile(fnamer,path)
     call restFile_read( bounds, fnamer)
   else if(flag=='write')then  
     call etimer%get_curr_date(yr,mon,day,tod)
@@ -2296,17 +2282,17 @@ implicit none
   endif  
 
   if(flag=='read')then
-    datpr4 => datrp_4d(1:npfts,1:npelms,1:JNODS,1:JBR)
+    datpr4 => datrp_4d(1:npfts,1:npelms,1:JNODS+1,1:JBR)
     call restartvar(ncid, flag, varname='WGLFE', dim1name='pft',dim2name='elmnts',&
-     dim3name='nodes',dim4name='nbranches',long_name='leaf area', units='g d-2', &
+     dim3name='nodes1',dim4name='nbranches',long_name='leaf element', units='g d-2', &
      interpinic_flag='skip', data=datpr4, missing_value=spval, fill_value=spval)  
     call cppft(flag,NHW,NHE,NVN,NVS,NP,WGLFE,datrp_4d,iflgt=iflgt,iflgc=iflgc) 
   else
     !print*,'WGLFE'
     if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,WGLFE,datrp_4d,iflgt=iflgt,iflgc=iflgc)   
-    datpr4 => datrp_4d(1:npfts,1:npelms,1:JNODS,1:JBR)
-    call restartvar(ncid, flag, varname='leaf element', dim1name='pft',dim2name='elmnts',&
-     dim3name='nodes',dim4name='nbranches',long_name='leaf area', units='g d-2', &
+    datpr4 => datrp_4d(1:npfts,1:npelms,1:JNODS+1,1:JBR)
+    call restartvar(ncid, flag, varname='WGLFE', dim1name='pft',dim2name='elmnts',&
+     dim3name='nodes1',dim4name='nbranches',long_name='leaf element', units='g d-2', &
      interpinic_flag='skip', data=datpr4, missing_value=spval, fill_value=spval) 
   endif  
 
@@ -7899,21 +7885,26 @@ implicit none
   type(file_desc_t) :: ncid         ! netcdf id
   integer           :: nc
   integer :: i
+
   ! Open file
-
+  print*,trim(file)
   call restFile_open( flag='read', file=file, ncid=ncid )
-
+  print*,'restFile_open Successfully'
   ! Read file
 
   call restFile_dimcheck( ncid )
 
+  print*,'hist_restart_ncd'
   call hist_restart_ncd (bounds, ncid, flag='read')
 
   ! Do error checking on file
   
   call restFile_check_consistency(bounds, ncid)
-
-
+  
+  call timemgr_restart_io( ncid, flag='read')
+  
+  call restartnc(ncid,flag='read')
+  
   ! Close file 
   call restFile_close( ncid )
 !    if (masterproc) then
@@ -7930,7 +7921,9 @@ implicit none
   ! !ARGUMENTS:
   type(bounds_type), intent(in)    :: bounds  ! bounds
   type(file_desc_t), intent(inout) :: ncid    ! netcdf id
+  character(len=*), parameter :: subname=trim(mod_filename)//'::restFile_check_consistency'
 
+  print*,subname
   end subroutine restFile_check_consistency
 
   !-----------------------------------------------------------------------
@@ -7955,6 +7948,40 @@ implicit none
 !  call check_dim(ncid, 'levurb'  , nlevurb)
 !  call check_dim(ncid, 'levlak'  , nlevlak) 
 
+  call check_dim(ncid,'datestrlen',datestrlen)  
+  call check_dim(ncid,'rootaxs',JRS)
+  call check_dim(ncid,'nodes',JNODS)
+  call check_dim(ncid,'cansecz',JLI)
+  call check_dim(ncid,'fertN',trc_confs%nfertN)
+  call check_dim(ncid,'fertNb',trc_confs%nfertNb)
+  call check_dim(ncid,'automicb',NMICBSA)
+  call check_dim(ncid,'nlbiomcp',nlbiomcp)
+  call check_dim(ncid, 'levsoi', JZ)
+  call check_dim(ncid, 'levsoi1', JZ+1)
+  call check_dim(ncid, 'levsno',  JS)
+  call check_dim(ncid, 'levcan',JC)
+  call check_dim(ncid, 'levcan1',JC+1)
+  call check_dim(ncid, 'npfts',  JP)
+  call check_dim(ncid, 'nbranches',JBR)
+  call check_dim(ncid, 'ngrstages',jpstgs)
+  call check_dim(ncid, 'elmnts',npelms)
+  call check_dim(ncid, 'nkinecmp',jsken)
+  call check_dim(ncid, 'nomcomplx',jcplx)
+  call check_dim(ncid, 'sdim',3)   !grid dimension
+  call check_dim(ncid,'hetrmicb',NMICBSO)
+  call check_dim(ncid,'rootyps'  , pltpar%jroots)
+  call check_dim(ncid,'xtracers' , trc_confs%nxtracers)
+
+  if(salt_model)then
+    call check_dim(ncid,'satracers', trc_confs%nsatracers)
+  endif  
+  call check_dim(ncid,'ptracers' , trc_confs%nptracers)
+  call check_dim(ncid,'nutracers', trc_confs%nutracers)
+  call check_dim(ncid,'gastrcs'  , trc_confs%ngtracers)
+  call check_dim(ncid,'soltrcs'  , trc_confs%nstracers)
+
+  call check_dim(ncid , 'string_length', 64        )
+  call check_dim(ncid , 'month'   , 12        )
   end subroutine restFile_dimcheck
   !-----------------------------------------------------------------------
   character(len=256) function restFile_filename( rdate )
@@ -8198,10 +8225,12 @@ implicit none
   call ncd_defdim(ncid , namet      , numt           ,  dimid)
   call ncd_defdim(ncid , namec      , numc           ,  dimid)
   call ncd_defdim(ncid , namep      , nump           ,  dimid)
-  call ncd_defdim(ncid,'datestrlen',datestrlen,dimid)
+
   ! "level" dimensions
+  call ncd_defdim(ncid,'datestrlen',datestrlen,dimid)  
   call ncd_defdim(ncid,'rootaxs',JRS,dimid)
   call ncd_defdim(ncid,'nodes',JNODS,dimid)
+  call ncd_defdim(ncid,'nodes1',JNODS+1,dimid)  
   call ncd_defdim(ncid,'cansecz',JLI,dimid)
   call ncd_defdim(ncid,'fertN',trc_confs%nfertN, dimid)
   call ncd_defdim(ncid,'fertNb',trc_confs%nfertNb, dimid)
@@ -8319,7 +8348,6 @@ implicit none
   read(nio,*) fnamer
   read(nio,*)curr_date
   call relavu( nio )
-
 
   end subroutine get_restart_date
 end module restartMod

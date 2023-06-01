@@ -97,12 +97,12 @@ PROGRAM main
   if(is_restart())then
     print*,'read restart/checkpoint info file: ecosim_rst'
     call get_restart_date(curr_date)
-    frectyp%ymdhs0=curr_date    
+    frectyp%ymdhs0=curr_date    !the actual simulation beginning year
   else  
-    frectyp%ymdhs0=start_date    
-    call hist_htapes_build()
+    frectyp%ymdhs0=start_date   !the actual simulation beginning year
   endif
-
+  
+  call hist_htapes_build()
 
   IGO=0
   yeari=year_ini

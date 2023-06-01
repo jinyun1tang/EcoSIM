@@ -443,7 +443,9 @@ module WatsubMod
 !     HFLWQA,HFLWQB=convective heat flux to soil,litter surfaces
 !     FLWQAS,FLWQAH=precip to soil micropores,macropores
 !     TFLWC=canopy intercepted precipitation
+!     FSNW=fraction of snow cover
       IF(PRECA(NY,NX).GT.0.0_r8.OR.PRECW(NY,NX).GT.0.0_r8)THEN
+      ! there is precipitation
         FLWQW=(PRECA(NY,NX)-TFLWC(NY,NX))*FSNW(NY,NX)
         FLWSW=PRECW(NY,NX)                                !snowfall
         HFLWSW=cps*TKA(NY,NX)*FLWSW+cpw*TKA(NY,NX)*FLWQW  !incoming heat flux from precipitations to snow-covered surface
@@ -455,6 +457,7 @@ module WatsubMod
         FLWQAS=FLWQAX*FGRD(NUM(NY,NX),NY,NX)              !water flux to micropore
         FLWQAH=FLWQAX*FMAC(NUM(NY,NX),NY,NX)              !water flux to macropore
       ELSE
+      ! no precipitation
         FLWQW=-TFLWC(NY,NX)*FSNW(NY,NX)                   !
         FLWSW=0.0_r8
         HFLWSW=cpw*TKA(NY,NX)*FLWQW
@@ -475,8 +478,9 @@ module WatsubMod
 !     FLQRQ,FLQRI=water flux to surface litter from rain,irrigation
 !     FLQGQ,FLQGI=water flux to snowpack from rain,irrigation
 !
-      IF(PRECW(NY,NX).GT.0.0.OR.(PRECR(NY,NX).GT.0.0 &
+      IF(PRECW(NY,NX).GT.0.0_r8.OR.(PRECR(NY,NX).GT.0.0_r8 &
         .AND.VHCPW(1,NY,NX).GT.VHCPWX(NY,NX)))THEN
+        !there is precipitation
         FLQRQ(NY,NX)=0.0_r8
         FLQRI(NY,NX)=0.0_r8
         FLQGQ(NY,NX)=PRECQ(NY,NX)
@@ -1236,7 +1240,7 @@ module WatsubMod
                 ATCNDR=0.0_r8
               ENDIF
               IF(TCNDR.GT.ZERO.AND.TCNDS.GT.ZERO)THEN
-                ATCNDS=2.0*TCNDR*TCNDS/(TCNDR*DLYR(3,NUM(NY,NX),NY,NX)+TCNDS*DLYRR(NY,NX))
+                ATCNDS=2.0_r8*TCNDR*TCNDS/(TCNDR*DLYR(3,NUM(NY,NX),NY,NX)+TCNDS*DLYRR(NY,NX))
               ELSE
                 ATCNDS=0.0_r8
               ENDIF
@@ -2826,7 +2830,9 @@ module WatsubMod
     !
     D4320: DO N=NCN(N2,N1),3
       IF(N.EQ.1)THEN
+        !west-east direction
         IF(NX.EQ.NHE)THEN
+          !east boundary
           cycle
         ELSE
           N4=NX+1
@@ -2840,7 +2846,9 @@ module WatsubMod
           !     ENDIF
         ENDIF
       ELSEIF(N.EQ.2)THEN
+        !north-south direction
         IF(NY.EQ.NVS)THEN
+          !south boundary
           cycle
         ELSE
           N4=NX
@@ -2857,6 +2865,7 @@ module WatsubMod
           !
         ENDIF
       ELSEIF(N.EQ.3)THEN
+        !vertical direction
         IF(L.EQ.NL(NY,NX))THEN
           cycle
         ELSE
@@ -2867,7 +2876,7 @@ module WatsubMod
       ENDIF
 !
 !     SKIP NON-EXISTENT DESTINATION SOIL LAYERS
-!
+!     identified by soil volume
       D1100: DO LL=N6,NL(NY,NX)
         IF(VOLX(LL,N5,N4).GT.ZEROS2(N5,N4))THEN
           N6=LL
@@ -2888,8 +2897,10 @@ module WatsubMod
       IF(VOLX(N3,N2,N1).GT.ZEROS2(N2,N1))THEN
         IF(N3.GE.NUM(N2,N1).AND.N6.GE.NUM(N5,N4) &
           .AND.N3.LE.NL(N2,N1).AND.N6.LE.NL(N5,N4))THEN
+          !source
           THETA1=AMAX1(THETY(N3,N2,N1),AMIN1(POROS(N3,N2,N1) &
             ,safe_adb(VOLW1(N3,N2,N1),VOLY(N3,N2,N1))))
+          !dest
           THETAL=AMAX1(THETY(N6,N5,N4),AMIN1(POROS(N6,N5,N4) &
             ,safe_adb(VOLW1(N6,N5,N4),VOLY(N6,N5,N4))))
           !
@@ -2904,9 +2915,13 @@ module WatsubMod
           !     PSISD=PSIMX-PSIMS
           !     SRP=parameter for deviation from linear log-log water retention
           !     PSISO=osmotic potential
-          !
+          !     DTHETW=minimum water content for numerical purpose
+          ! soil matric potential upper layer
           IF(BKVL(N3,N2,N1).GT.ZEROS(NY,NX))THEN
+            !source layer is active soil
             IF(THETA1.LT.FC(N3,N2,N1))THEN
+              !water less than field capacity
+              !PSIHY is the minimum water potential allowed
               PSISA1(N3,N2,N1)=AMAX1(PSIHY,-EXP(PSIMX(N2,N1) &
                 +((FCL(N3,N2,N1)-LOG(THETA1)) &
                 /FCD(N3,N2,N1)*PSIMD(N2,N1))))
@@ -2941,6 +2956,7 @@ module WatsubMod
                 +(((PSL(N3,N2,N1)-LOG(THETWX(N3,N2,N1))) &
                 /PSDX)*PSISD(N2,N1)))
             ELSE
+              !saturated
               PSISA1(N3,N2,N1)=PSISE(N3,N2,N1)
             ENDIF
           ELSE
@@ -3005,14 +3021,11 @@ module WatsubMod
           !     DARCY FLOW IF BOTH CELLS ARE SATURATED
           !     (CURRENT WATER POTENTIAL > AIR ENTRY WATER POTENTIAL)
           !
-          IF(PSISA1(N3,N2,N1).GT.PSISA(N3,N2,N1) &
-            .AND.PSISA1(N6,N5,N4).GT.PSISA(N6,N5,N4))THEN
+          IF(PSISA1(N3,N2,N1).GT.PSISA(N3,N2,N1).AND.PSISA1(N6,N5,N4).GT.PSISA(N6,N5,N4))THEN
             THETW1=THETA1
             THETWL=THETAL
-            K1=MAX(1,MIN(100,INT(100.0_r8*(POROS(N3,N2,N1) &
-              -THETW1)/POROS(N3,N2,N1))+1))
-            KL=MAX(1,MIN(100,INT(100.0_r8*(POROS(N6,N5,N4) &
-              -THETWL)/POROS(N6,N5,N4))+1))
+            K1=MAX(1,MIN(100,INT(100.0_r8*(POROS(N3,N2,N1)-THETW1)/POROS(N3,N2,N1))+1))
+            KL=MAX(1,MIN(100,INT(100.0_r8*(POROS(N6,N5,N4)-THETWL)/POROS(N6,N5,N4))+1))
             PSISM1(N3,N2,N1)=PSISA1(N3,N2,N1)
             PSISM1(N6,N5,N4)=PSISA1(N6,N5,N4)
             !
@@ -3020,16 +3033,15 @@ module WatsubMod
             !     (CURRENT WATER POTENTIAL < AIR ENTRY WATER POENTIAL)
             !
             !     GREEN-AMPT FLOW IF SOURCE CELL SATURATED
-            !
+            !THETS=micropore soil water content
           ELSEIF(PSISA1(N3,N2,N1).GT.PSISA(N3,N2,N1))THEN
             THETW1=THETA1
             THETWL=AMAX1(THETY(N6,N5,N4),AMIN1(POROS(N6,N5,N4) &
               ,safe_adb(VOLWX1(N6,N5,N4),VOLY(N6,N5,N4))))
-            K1=MAX(1,MIN(100,INT(100.0*(POROS(N3,N2,N1) &
-              -THETW1)/POROS(N3,N2,N1))+1))
-            KL=MAX(1,MIN(100,INT(100.0*(POROS(N6,N5,N4) &
-              -AMIN1(THETS(N6,N5,N4),THETWL))/POROS(N6,N5,N4))+1))
+            K1=MAX(1,MIN(100,INT(100.0_r8*(POROS(N3,N2,N1)-THETW1)/POROS(N3,N2,N1))+1))
+            KL=MAX(1,MIN(100,INT(100.0_r8*(POROS(N6,N5,N4)-AMIN1(THETS(N6,N5,N4),THETWL))/POROS(N6,N5,N4))+1))
             PSISM1(N3,N2,N1)=PSISA1(N3,N2,N1)
+            
             IF(BKVL(N6,N5,N4).GT.ZEROS(NY,NX))THEN
               IF(THETWL.LT.FC(N6,N5,N4))THEN
                 PSISM1(N6,N5,N4)=AMAX1(PSIHY,-EXP(PSIMX(N5,N4) &
@@ -3402,6 +3414,7 @@ module WatsubMod
           FLWH(N,N6,N5,N4)=FLWH(N,N6,N5,N4)+FLWHL(N,N6,N5,N4)
           HFLW(N,N6,N5,N4)=HFLW(N,N6,N5,N4)+HFLWL(N,N6,N5,N4)
           FLWM(M,N,N6,N5,N4)=FLWL(N,N6,N5,N4)
+
           IF(N.EQ.3)THEN
             !
             !     WATER FILM THICKNESS FOR CALCULATING GAS EXCHANGE IN TRNSFR.F

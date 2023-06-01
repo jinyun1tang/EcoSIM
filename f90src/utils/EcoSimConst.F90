@@ -21,7 +21,7 @@ module EcosimConst
   real(r8), parameter :: PICON2h=PICON*0.5_r8
   real(r8), parameter :: PICON2s=PICON*2._r8
   real(r8), PARAMETER :: PSIPS=-0.5E-03_r8
-  real(r8), parameter :: RDN=57.29577951_r8
+  real(r8), parameter :: RDN=57.29577951_r8    !180/pi
   real(r8), parameter :: VAP=2465.0_r8         !latent heat of vaporization of water, kJ/kg
   real(r8), parameter :: VAPS=2834.0_r8        !sublimation of water, kJ/kg
   real(r8), parameter :: TCNDG=8.1E-03_r8      !assumed thermal conductivity below lower soil boundary,[MJ m-1 h-1 K-1]

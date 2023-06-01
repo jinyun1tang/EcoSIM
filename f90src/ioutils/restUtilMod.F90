@@ -184,8 +184,9 @@ module restUtilMod
     end if
 
     if (flag == 'read') then
+       
        if (.not. readvar .and. is_restart()) &
-         call endrun('Reading restart file failed in '//trim(sub),__LINE__)
+         call endrun('Reading '//trim(varname)//' from restart file failed in '//trim(sub),__LINE__)
     end if
 
   end subroutine restartvar_real_sp
@@ -276,7 +277,7 @@ module restUtilMod
 
     if (flag == 'read') then
        if (.not. readvar .and. is_restart()) &
-         call endrun('Reading restart file failed in '//trim(sub),__LINE__)
+         call endrun('Reading '//trim(varname)//' from restart file failed in '//trim(sub),__LINE__)
     end if
 
   end subroutine restartvar_int_1d
@@ -368,7 +369,7 @@ module restUtilMod
 
     if (flag == 'read') then
        if (.not. readvar .and. is_restart()) &
-         call endrun('Reading restart file failed in '//trim(sub),__LINE__)
+         call endrun('Reading '//trim(varname)//' from restart file failed in '//trim(sub),__LINE__)
     end if
 
   end subroutine restartvar_int_2d  
@@ -461,7 +462,7 @@ module restUtilMod
 
     if (flag == 'read') then
        if (.not. readvar .and. is_restart()) &
-         call endrun('Reading restart file failed in '//trim(sub),__LINE__)
+         call endrun('Reading '//trim(varname)//' from restart file failed in '//trim(sub),__LINE__)
     end if
 
   end subroutine restartvar_int_3d  
@@ -712,14 +713,14 @@ module restUtilMod
 
 
     else if (flag == 'read' .or. flag == 'write') then
-
+      
       call ncd_io(varname=trim(varname), data=data, &
-        dim1name=trim(dim1name), ncid=ncid, flag=flag, readvar=readvar)
+        dim1name=trim(dim1name),  flag=flag, ncid=ncid, readvar=readvar)
     end if
 
     if (flag == 'read') then
        if (.not. readvar .and. is_restart()) &
-         call endrun('Reading restart file failed in '//trim(sub),__LINE__)
+         call endrun('Reading '//trim(varname)//' from restart file failed in '//trim(sub),__LINE__)
     end if
 
   end subroutine restartvar_real_sp_3d  
@@ -800,7 +801,7 @@ module restUtilMod
 
 
     else if (flag == 'read' .or. flag == 'write') then
-
+      
       call ncd_io(varname=trim(varname), data=data, &
         dim1name=trim(dim1name), ncid=ncid, flag=flag, readvar=readvar)
     end if

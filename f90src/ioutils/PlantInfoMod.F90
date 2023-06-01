@@ -996,7 +996,7 @@ implicit none
           ENDDO D4975
         ENDIF
         
-        IF(.not. is_restart())THEN
+!        IF(.not. is_restart())THEN
     ! there was no chechk point file read in, so update pft info
     ! from input file
           D8995: DO NX=NH1,NH2
@@ -1014,10 +1014,10 @@ implicit none
               ENDDO D101
             ENDDO D8990
           ENDDO D8995
-        ELSE
+!        ELSE
 !read from chck point file, i.e. datap and datam
-          call read_checkpt(NS,NH1,NH2,NV1,NV2,NHW,NHE,NVN,NVS)
-        ENDIF
+!          call read_checkpt(NS,NH1,NH2,NV1,NV2,NHW,NHE,NVN,NVS)
+!        ENDIF
       ENDDO
     ENDIF
     call ncd_pio_closefile(pftinfo_nfid)

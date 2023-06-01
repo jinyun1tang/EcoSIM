@@ -106,7 +106,8 @@ module StartsMod
       ELSE
         ALTZG=MIN(ALTZG,ALT(NY,NX))
       ENDIF
-      CDPTHG=AMAX1(CDPTHG,CDPTH(NU(NY,NX),NY,NX))
+      !
+      CDPTHG=AMAX1(CDPTHG,CDPTH(NU(NY,NX),NY,NX)) !topsoil layer depth
 !
 !     INITIALIZE ATMOSPHERE VARIABLES
 !
@@ -220,12 +221,12 @@ module StartsMod
 !     INITIALIZE GRID CELL DIMENSIONS
 ! altz: topographic altitude
 ! ALT: grid altitude
-! DTBLI: external water table depth
+! DTBLI: external water table depth, before applying the altitude correction
 ! DTBLG: slope of water table relative to surface slope
 ! DTBLZ: external water table depth
 ! DTBLDI: depth of artificial water table
 ! DPTHT: internal water table depth
-!
+! DTBLD: artifical water table depth, before applying the altitude correction
   DO  NX=NHW,NHE
     DO  NY=NVN,NVS
       ALTZ(NY,NX)=ALTZG
@@ -283,9 +284,9 @@ module StartsMod
         ENDDO
 
         IF(L.EQ.NU(NY,NX))THEN
-          DIST(3,N3,N2,N1)=0.5*DLYR(3,N3,N2,N1)
+          DIST(3,N3,N2,N1)=0.5_r8*DLYR(3,N3,N2,N1)
           XDPTH(3,N3,N2,N1)=AREA(3,N3,N2,N1)/DIST(3,N3,N2,N1)
-          DISP(3,N3,N2,N1)=0.20*DIST(3,N3,N2,N1)**1.07_r8
+          DISP(3,N3,N2,N1)=0.20_r8*DIST(3,N3,N2,N1)**1.07_r8
         ENDIF
       ENDDO
     ENDDO
@@ -336,7 +337,7 @@ module StartsMod
 !     CORGC,CORGR,CORGN,CORGP=SOC,POC,SON,SOP (g Mg-1)
 !
   TORGC=0.0_r8
-  DO 1190 L=NU(NY,NX),NL(NY,NX)
+  D1190: DO L=NU(NY,NX),NL(NY,NX)
     !     CORGCZ=CORGC(L,NY,NX)
     !     CORGRZ=CORGR(L,NY,NX)
     !     CORGNZ=CORGN(L,NY,NX)
@@ -353,7 +354,7 @@ module StartsMod
     CORGL=AZMAX1(CORGC(L,NY,NX)-CORGR(L,NY,NX))
     TORGL(L)=TORGC+CORGL*BKVL(L,NY,NX)/AREA(3,L,NY,NX)*0.5
     TORGC=TORGC+CORGL*BKVL(L,NY,NX)/AREA(3,L,NY,NX)
-1190  CONTINUE
+  ENDDO D1190
 !
 !     PARAMETERS TO ALLOCATE HUMUS TO LESS OR MORE RECALCITRANT FRACTIONS
 !
@@ -361,9 +362,9 @@ module StartsMod
 !     TORGM=TORGL used to calculate allocation (g m-2)
 !     HCX=shape parameter for depth effect on allocation
 !
-  TORGM=AMAX1(2.0E+03,AMIN1(5.0E+03,0.25*TORGL(NJ(NY,NX))))
+  TORGM=AMAX1(2.0E+03_r8,AMIN1(5.0E+03_r8,0.25_r8*TORGL(NJ(NY,NX))))
   IF(TORGM.GT.ZERO)THEN
-    HCX=LOG(0.5)/TORGM
+    HCX=LOG(0.5_r8)/TORGM
   ELSE
     HCX=0.0_r8
   ENDIF
@@ -398,7 +399,7 @@ module StartsMod
     RCH4L(L,NY,NX)=0.0_r8
     IF(L.GT.0)THEN
       IF(BKDS(L,NY,NX).GT.ZERO)THEN
-        PTDS=ppmc*(1.30*CORGCM+2.66_r8*(1.0E+06_r8-CORGCM))
+        PTDS=ppmc*(1.30_r8*CORGCM+2.66_r8*(1.0E+06_r8-CORGCM))
         POROS(L,NY,NX)=1.0_r8-(BKDS(L,NY,NX)/PTDS)
       ELSE
         !for ponding water
@@ -422,11 +423,13 @@ module StartsMod
       SILT(L,NY,NX)=CSILT(L,NY,NX)*BKVL(L,NY,NX)
       CLAY(L,NY,NX)=CCLAY(L,NY,NX)*BKVL(L,NY,NX)
       IF(BKDS(L,NY,NX).GT.ZERO)THEN
+        ! PTDS=particle density (Mg m-3)
+        ! soil volumetric heat capacity
         VORGC=CORGCM*ppmc*BKDS(L,NY,NX)/PTDS
         VMINL=(CSILT(L,NY,NX)+CCLAY(L,NY,NX))*BKDS(L,NY,NX)/PTDS
         VSAND=CSAND(L,NY,NX)*BKDS(L,NY,NX)/PTDS
-        VHCM(L,NY,NX)=((2.496*VORGC+2.385*VMINL+2.128*VSAND) &
-          *FMPR(L,NY,NX)+2.128*ROCK(L,NY,NX))*VOLT(L,NY,NX)
+        VHCM(L,NY,NX)=((2.496_r8*VORGC+2.385_r8*VMINL+2.128_r8*VSAND) &
+          *FMPR(L,NY,NX)+2.128_r8*ROCK(L,NY,NX))*VOLT(L,NY,NX)
       ELSE
         VHCM(L,NY,NX)=0.0_r8
       ENDIF
@@ -550,30 +553,36 @@ module StartsMod
   real(r8) :: DLYRSI
   real(r8) :: VOLSWI
   real(r8), parameter :: CDPTHSI(JS)=(/0.05_r8,0.15_r8,0.30_r8,0.60_r8,1.00_r8/)
+  !the maximum snow layer is 1.0 m.
   integer :: L
 ! begin_execution
 !
 ! CDPTHS=depth to bottom
+! DENSI=ice density, 0.92 Mg m-3
 ! DENS0=snow density (Mg m-3)
 ! VOLSS,VOLWS,VOLIS,VOLS=snow,water,ice,total snowpack volume(m3)
 ! DPTHA=active layer depth (m)
-! CDPTHSI=depth to bottom of snowpack layers
+! CDPTHSI=depth to bottom of snowpack layers (m), i.e. from current layere to surface
 ! DLYRS=snowpack layer thickness (m)
-! VOLSSL,VOLWSL,VOLISL,VOLSL=snow,water,ice,total layer volume(m3)
+! VOLSSL,VOLWSL,VOLISL,VOLSL=snow,water,ice,total layer volume(m3), water equivalent snow 
 ! DENSS=layer density (Mg m-3)
 ! TKW,TCW=later temperature K,oC
 ! VHCPW=layer volumetric heat capacity (MJ m-3 K-1)
-!
+! DPTHS=total snow height in the column
+
   CDPTHS(0,NY,NX)=0.0_r8
-  DENS0(NY,NX)=0.10
+  DENS0(NY,NX)=0.10_r8
   VOLSS(NY,NX)=DPTHS(NY,NX)*DENS0(NY,NX)*DH(NY,NX)*DV(NY,NX)
   VOLWS(NY,NX)=0.0_r8
   VOLIS(NY,NX)=0.0_r8
   VOLS(NY,NX)=VOLSS(NY,NX)/DENS0(NY,NX)+VOLWS(NY,NX)+VOLIS(NY,NX)
-  DPTHA(NY,NX)=9999.0
-  VOLSWI=0.0_r8
-  DO 9580 L=1,JS
+  DPTHA(NY,NX)=9999.0_r8
+!  VOLSWI=0.0_r8
+
+  !build the snow profile, topdown
+  D9580: DO L=1,JS
     IF(L.EQ.1)THEN
+      !bottom snow layer
       DLYRSI=CDPTHSI(L)
       DLYRS(L,NY,NX)=AMIN1(DLYRSI,DPTHS(NY,NX))
     ELSE
@@ -583,21 +592,23 @@ module StartsMod
     VOLSSL(L,NY,NX)=DLYRS(L,NY,NX)*DENS0(NY,NX)*DH(NY,NX)*DV(NY,NX)
     VOLWSL(L,NY,NX)=0.0_r8
     VOLISL(L,NY,NX)=0.0_r8
-    IF(L.EQ.1)THEN
-      VOLSWI=VOLSWI+0.5*(VOLSSL(L,NY,NX)+VOLWSL(L,NY,NX)+VOLISL(L,NY,NX)*DENSI)
-    ELSE
-      VOLSWI=VOLSWI+0.5*(VOLSSL(L-1,NY,NX)+VOLWSL(L-1,NY,NX) &
-        +VOLISL(L-1,NY,NX)*DENSI+VOLSSL(L,NY,NX)+VOLWSL(L,NY,NX) &
-        +VOLISL(L,NY,NX)*DENSI)
-    ENDIF
+
+!    IF(L.EQ.1)THEN
+!      VOLSWI=VOLSWI+0.5_r8*(VOLSSL(L,NY,NX)+VOLWSL(L,NY,NX)+VOLISL(L,NY,NX)*DENSI)
+!    ELSE
+!      VOLSWI=VOLSWI+0.5_r8*(VOLSSL(L-1,NY,NX)+VOLWSL(L-1,NY,NX) &
+!        +VOLISL(L-1,NY,NX)*DENSI+VOLSSL(L,NY,NX)+VOLWSL(L,NY,NX) &
+!        +VOLISL(L,NY,NX)*DENSI)
+!    ENDIF
+
     DENSS(L,NY,NX)=DENS0(NY,NX)
     VOLSL(L,NY,NX)=VOLSSL(L,NY,NX)/DENSS(L,NY,NX)+VOLWSL(L,NY,NX)+VOLISL(L,NY,NX)
-    VOLSI(L,NY,NX)=DLYRSI*DH(NY,NX)*DV(NY,NX)
+    VOLSI(L,NY,NX)=DLYRSI*DH(NY,NX)*DV(NY,NX)      !it is a non-zero number, potential/maximum volume
     CDPTHS(L,NY,NX)=CDPTHS(L-1,NY,NX)+DLYRS(L,NY,NX)
     TKW(L,NY,NX)=AMIN1(Tref,ATKA(NY,NX))
     TCW(L,NY,NX)=AZMIN1(ATCA(NY,NX))
     VHCPW(L,NY,NX)=cps*VOLSSL(L,NY,NX)+cpw*VOLWSL(L,NY,NX)+cpi*VOLISL(L,NY,NX)
-9580  CONTINUE
+  ENDDO D9580
   end subroutine InitSnowLayers
 
 !------------------------------------------------------------------------------------------
@@ -608,98 +619,111 @@ module StartsMod
   REAL(R8),INTENT(OUT):: ALTY
   integer :: NY,NX,N,NN
   REAL(R8) :: DGAZI
-  real(r8) :: GSINA(JY,JX),GCOSA(JY,JX)
+  real(r8) :: GSINA(JY,JX),GCOSA(JY,JX)  !diagnostic
 
 ! begin_execution
-! GAZI=ground surface azimuth
+! GAZI=ground surface azimuth, aspect in radians
 ! GSIN,GCOS=sine,cosine of ground surface
-! OMEGAG=incident sky aNGLe at ground surface
+! OMEGAG=incident sky angle at ground surface
 ! SLOPE=sine of ground surface slope in (0)aspect, (1)EW,(2)NS directions
 ! ALT=ground surface elevation
 ! ALTY=maximum surface elevation in landscape
 ! IRCHG=runoff boundary flags:0=not possible,1=possible
-!
-  ALTY=0.0
+! ASP=aspect angle in degree
+  ALTY=0.0_r8
   D9985: DO NX=NHW,NHE
     D9980: DO NY=NVN,NVS
       ZEROS(NY,NX)=ZERO*DH(NY,NX)*DV(NY,NX)
       ZEROS2(NY,NX)=ZERO2*DH(NY,NX)*DV(NY,NX)
 !     compute slopes
-      GAZI(NY,NX)=ASP(NY,NX)/RDN
+      GAZI(NY,NX)=ASP(NY,NX)/RDN   !radian
       GSINA(NY,NX)=ABS(SIN(GAZI(NY,NX)))
       GCOSA(NY,NX)=ABS(COS(GAZI(NY,NX)))
-      SLOPE(0,NY,NX)=AMAX1(1.745E-04,SIN(SL(NY,NX)/RDN))
-      IF(ASP(NY,NX).GE.0.0.AND.ASP(NY,NX).LT.90.0)THEN
-        SLOPE(1,NY,NX)=-SLOPE(0,NY,NX)*COS(ASP(NY,NX)/RDN)
-        SLOPE(2,NY,NX)=SLOPE(0,NY,NX)*SIN(ASP(NY,NX)/RDN)
-        IRCHG(1,1,NY,NX)=1
+      SLOPE(0,NY,NX)=AMAX1(1.745E-04_r8,SIN(SL(NY,NX)/RDN))  !small slope approximation
+
+      IF(ASP(NY,NX).GE.0.0_r8.AND.ASP(NY,NX).LT.90.0_r8)THEN
+      ! along the northeast
+        SLOPE(1,NY,NX)=-SLOPE(0,NY,NX)*COS(ASP(NY,NX)/RDN)    !to east
+        SLOPE(2,NY,NX)=SLOPE(0,NY,NX)*SIN(ASP(NY,NX)/RDN)     !to north
+        IRCHG(1,1,NY,NX)=1    !east
         IRCHG(2,1,NY,NX)=0
         IRCHG(1,2,NY,NX)=0
-        IRCHG(2,2,NY,NX)=1
-      ELSEIF(ASP(NY,NX).GE.90.0.AND.ASP(NY,NX).LT.180.0)THEN
-        SLOPE(1,NY,NX)=SLOPE(0,NY,NX)*SIN((ASP(NY,NX)-90.0)/RDN)
-        SLOPE(2,NY,NX)=SLOPE(0,NY,NX)*COS((ASP(NY,NX)-90.0)/RDN)
+        IRCHG(2,2,NY,NX)=1    !north
+      ELSEIF(ASP(NY,NX).GE.90.0_r8.AND.ASP(NY,NX).LT.180.0_r8)THEN
+      ! along the northwest
+        SLOPE(1,NY,NX)=SLOPE(0,NY,NX)*SIN((ASP(NY,NX)-90.0_r8)/RDN)   !to west
+        SLOPE(2,NY,NX)=SLOPE(0,NY,NX)*COS((ASP(NY,NX)-90.0_r8)/RDN)   !to north
         IRCHG(1,1,NY,NX)=0
-        IRCHG(2,1,NY,NX)=1
+        IRCHG(2,1,NY,NX)=1   !west
         IRCHG(1,2,NY,NX)=0
-        IRCHG(2,2,NY,NX)=1
-      ELSEIF(ASP(NY,NX).GE.180.0.AND.ASP(NY,NX).LT.270.0)THEN
-        SLOPE(1,NY,NX)=SLOPE(0,NY,NX)*COS((ASP(NY,NX)-180.0)/RDN)
-        SLOPE(2,NY,NX)=-SLOPE(0,NY,NX)*SIN((ASP(NY,NX)-180.0)/RDN)
+        IRCHG(2,2,NY,NX)=1   !north
+      ELSEIF(ASP(NY,NX).GE.180.0_r8.AND.ASP(NY,NX).LT.270.0_r8)THEN
+      !along the southwest
+        SLOPE(1,NY,NX)=SLOPE(0,NY,NX)*COS((ASP(NY,NX)-180.0_r8)/RDN)    !to west
+        SLOPE(2,NY,NX)=-SLOPE(0,NY,NX)*SIN((ASP(NY,NX)-180.0_r8)/RDN)   !to south
         IRCHG(1,1,NY,NX)=0
-        IRCHG(2,1,NY,NX)=1
-        IRCHG(1,2,NY,NX)=1
+        IRCHG(2,1,NY,NX)=1  !west
+        IRCHG(1,2,NY,NX)=1  !south
         IRCHG(2,2,NY,NX)=0
-      ELSEIF(ASP(NY,NX).GE.270.0.AND.ASP(NY,NX).LE.360.0)THEN
-        SLOPE(1,NY,NX)=-SLOPE(0,NY,NX)*SIN((ASP(NY,NX)-270.0)/RDN)
-        SLOPE(2,NY,NX)=-SLOPE(0,NY,NX)*COS((ASP(NY,NX)-270.0)/RDN)
-        IRCHG(1,1,NY,NX)=1
+      ELSEIF(ASP(NY,NX).GE.270.0_r8.AND.ASP(NY,NX).LE.360.0_r8)THEN
+      ! along the southeast
+        SLOPE(1,NY,NX)=-SLOPE(0,NY,NX)*SIN((ASP(NY,NX)-270.0_r8)/RDN)   !to east
+        SLOPE(2,NY,NX)=-SLOPE(0,NY,NX)*COS((ASP(NY,NX)-270.0_r8)/RDN)   !to south
+        IRCHG(1,1,NY,NX)=1  !east
         IRCHG(2,1,NY,NX)=0
-        IRCHG(1,2,NY,NX)=1
+        IRCHG(1,2,NY,NX)=1  !south
         IRCHG(2,2,NY,NX)=0
       ENDIF
-      SLOPE(3,NY,NX)=-1.0
+      SLOPE(3,NY,NX)=-1.0_r8
+
       IF(test_aneb(SLOPE(1,NY,NX),0.0_r8).OR.test_aneb(SLOPE(2,NY,NX),0.0_r8))THEN
-        FSLOPE(1,NY,NX)=ABS(SLOPE(1,NY,NX))/(ABS(SLOPE(1,NY,NX))+ABS(SLOPE(2,NY,NX)))
+        FSLOPE(1,NY,NX)=ABS(SLOPE(1,NY,NX))/(ABS(SLOPE(1,NY,NX))+ABS(SLOPE(2,NY,NX)))  !
         FSLOPE(2,NY,NX)=ABS(SLOPE(2,NY,NX))/(ABS(SLOPE(1,NY,NX))+ABS(SLOPE(2,NY,NX)))
       ELSE
-        FSLOPE(1,NY,NX)=0.5
-        FSLOPE(2,NY,NX)=0.5
+        FSLOPE(1,NY,NX)=0.5_r8
+        FSLOPE(2,NY,NX)=0.5_r8
       ENDIF
-!    compute incident sky aNGLe at ground surface
-      GSIN(NY,NX)=SLOPE(0,NY,NX)
-      GCOS(NY,NX)=SQRT(1.0-GSIN(NY,NX)**2)
+
+!    compute incident sky angle at ground surface
+      GSIN(NY,NX)=SLOPE(0,NY,NX)    !this is exact
+      GCOS(NY,NX)=SQRT(1.0_r8-GSIN(NY,NX)**2._r8)
       D240: DO N=1,JSA
         DGAZI=COS(GAZI(NY,NX)-YAZI(N))
-        OMEGAG(N,NY,NX)=AZMAX1(AMIN1(1.0,GCOS(NY,NX)*YSIN(N)+GSIN(NY,NX)*YCOS(N)*DGAZI))
+        OMEGAG(N,NY,NX)=AZMAX1(AMIN1(1.0_r8,GCOS(NY,NX)*YSIN(N)+GSIN(NY,NX)*YCOS(N)*DGAZI))
       ENDDO D240
 !     compute ground surface elevation
+!     DH, length in e-w direction
       IF(NX.EQ.NHW)THEN
         IF(NY.EQ.NVN)THEN
-          ALT(NY,NX)=0.5*DH(NY,NX)*SLOPE(1,NY,NX)+0.5*DV(NY,NX)*SLOPE(2,NY,NX)
+          !(west, north) corner
+          ALT(NY,NX)=0.5_r8*DH(NY,NX)*SLOPE(1,NY,NX)+0.5_r8*DV(NY,NX)*SLOPE(2,NY,NX)
         ELSE
+          !west boundary
           ALT(NY,NX)=ALT(NY-1,NX) &
-            +1.0*DH(NY,NX)*SLOPE(1,NY,NX) &
-            +0.5*DV(NY-1,NX)*(SLOPE(2,NY-1,NX)) &
-            +0.5*DV(NY,NX)*SLOPE(2,NY,NX)
+            +1.0_r8*DH(NY,NX)*SLOPE(1,NY,NX) &
+            +0.5_r8*DV(NY-1,NX)*(SLOPE(2,NY-1,NX)) &
+            +0.5_r8*DV(NY,NX)*SLOPE(2,NY,NX)
         ENDIF
       ELSE
         IF(NY.EQ.NVN)THEN
+          !north boundary
           ALT(NY,NX)=ALT(NY,NX-1) &
-            +0.5*DH(NY,NX-1)*SLOPE(1,NY,NX-1) &
-            +0.5*DH(NY,NX)*SLOPE(1,NY,NX) &
-            +0.5*DV(NY,NX-1)*SLOPE(2,NY,NX-1) &
-            +0.5*DV(NY,NX)*SLOPE(2,NY,NX)
+            +0.5_r8*DH(NY,NX-1)*SLOPE(1,NY,NX-1) &
+            +0.5_r8*DH(NY,NX)*SLOPE(1,NY,NX) &
+            +0.5_r8*DV(NY,NX-1)*SLOPE(2,NY,NX-1) &
+            +0.5_r8*DV(NY,NX)*SLOPE(2,NY,NX)
         ELSE
           ALT(NY,NX)=(ALT(NY,NX-1) &
-            +0.5*DH(NY,NX-1)*SLOPE(1,NY,NX-1) &
-            +0.5*DH(NY,NX)*SLOPE(1,NY,NX) &
+            +0.5_r8*DH(NY,NX-1)*SLOPE(1,NY,NX-1) &
+            +0.5_r8*DH(NY,NX)*SLOPE(1,NY,NX) &
             +ALT(NY-1,NX) &
-            +0.5*DV(NY-1,NX)*SLOPE(2,NY-1,NX) &
-            +0.5*DV(NY,N)*SLOPE(2,NY,NX))/2.0
+            +0.5_r8*DV(NY-1,NX)*SLOPE(2,NY-1,NX) &
+            +0.5_r8*DV(NY,N)*SLOPE(2,NY,NX))/2.0
         ENDIF
       ENDIF
+
       IF(NX.EQ.NHW.AND.NY.EQ.NVN)THEN
+        !(west,north) corner
         ALTY=ALT(NY,NX)
       ELSE
         ALTY=MAX(ALTY,ALT(NY,NX))
@@ -723,7 +747,8 @@ module StartsMod
   !     NPR,NPS=number of cycles NPH-1 for litter, snowpack flux calculns
   !     THETX=minimum air-filled porosity for gas flux calculations
   !     THETPI,DENSI=ice porosity,density
-  !
+  !     BKRS=surface litter bulk density, Mg m-3
+
   BKRS=(/0.0333_r8,0.0167_r8,0.0167_r8/)
 
   call InitSOMConsts
@@ -967,7 +992,7 @@ module StartsMod
   XNPZ=XNPH*XNPR
   XNPQ=XNPZ*XNPS
   XNPV=XNPR*XNPS
-  XNPD=600.0*XNPG
+  XNPD=600.0_r8*XNPG
   XNPX=AMIN1(1.0_r8,20.0_r8*XNPH)
   XNPA=XNPX*XNPS
   XNPB=XNPX*XNPR
