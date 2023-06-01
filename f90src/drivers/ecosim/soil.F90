@@ -54,9 +54,9 @@ subroutine soil(NE,NEX,NHW,NHE,NVN,NVS,nlend)
 
   !temporary set up for setting mass balance check
   IBEGIN=1;ISTART=1;ILAST=0
-  
+
   call etimer%get_ymdhs(ymdhs)
-  
+
   IF(ymdhs(1:4)==frectyp%ymdhs0(1:4))THEN
 !   the first simulation year
     if(lverb)WRITE(*,333)'STARTS'
@@ -70,8 +70,8 @@ subroutine soil(NE,NEX,NHW,NHE,NVN,NVS,nlend)
   if(plant_model)then
     !plant information is read in every year, but the active flags
     !are set using the checkpoint file.
-    if(lverb)WRITE(*,333)'ReadPlantInfo'  
-    WRITE(*,333)'ReadPlantInfo'  
+    if(lverb)WRITE(*,333)'ReadPlantInfo'
+    WRITE(*,333)'ReadPlantInfo'
     call ReadPlantInfo(frectyp%yearcur,frectyp%yearclm,NE,NEX,NHW,NHE,NVN,NVS)
   endif
 
@@ -81,30 +81,14 @@ subroutine soil(NE,NEX,NHW,NHE,NVN,NVS,nlend)
     !initialize by year
     if(lverb)WRITE(*,333)'STARTQ'
     CALL STARTQ(NHW,NHE,NVN,NVS,1,JP)
-<<<<<<< HEAD
 
-=======
-!
-!   RECOVER VALUES OF ALL PLANT STATE VARIABLES FROM EARLIER RUN
-!   IN 'ROUTP' IF NEEDED
-!
-    IF(is_restart())THEN
-    !set restart info for plant variables
-      if(lverb)WRITE(*,333)'ROUTP'
-      CALL ROUTP(NHW,NHE,NVN,NVS)
-    ENDIF
->>>>>>> 6236f76 (changed plant flag assignments)
   ENDIF
 
   if(soichem_model)then
-! INITIALIZE ALL SOIL CHEMISTRY VARIABLES IN 'STARTE' 
-<<<<<<< HEAD
+! INITIALIZE ALL SOIL CHEMISTRY VARIABLES IN 'STARTE'
 ! This is done done every year, because tracer concentrations
-=======
-! this is done done every year, because tracer concentrations
->>>>>>> 6236f76 (changed plant flag assignments)
-! in rainfall vary every year. In a more reasonable way, e.g., 
-! when coupled to atmospheric chemistry code, it should be done by 
+! in rainfall vary every year. In a more reasonable way, e.g.,
+! when coupled to atmospheric chemistry code, it should be done by
 ! hour
     if(lverb)WRITE(*,333)'STARTE'
     CALL STARTE(NHW,NHE,NVN,NVS)
@@ -112,7 +96,7 @@ subroutine soil(NE,NEX,NHW,NHE,NVN,NVS,nlend)
 
   iyear_cur=frectyp%yearcur
   LYRC=etimer%get_days_cur_year()
-  
+
   DO I=1,LYRC
     IF(do_rgres .and. I.eq.LYRG)RETURN
     !   UPDATE DAILY VARIABLES SUCH AS MANAGEMENT INPUTS
@@ -122,15 +106,15 @@ subroutine soil(NE,NEX,NHW,NHE,NVN,NVS,nlend)
 
     DO J=1,24
       call etimer%get_ymdhs(ymdhs)
-      
+
       if(ymdhs==frectyp%ymdhs0)then
-        frectyp%lskip_loop=.false. 
-        if(is_restart())then          
+        frectyp%lskip_loop=.false.
+        if(is_restart())then
           call restFile(flag='read')
         endif
-      endif        
+      endif
       if(frectyp%lskip_loop)then
-        call etimer%update_time_stamp()      
+        call etimer%update_time_stamp()
         cycle
       endif
 
@@ -141,7 +125,7 @@ subroutine soil(NE,NEX,NHW,NHE,NVN,NVS,nlend)
       call start_timer(t1)
       CALL WTHR(I,J,NHW,NHE,NVN,NVS)
       call end_timer('WTHR',t1)
-      
+
       if(lverb)WRITE(*,333)'Run_EcoSIM_one_step'
       call Run_EcoSIM_one_step(I,J,NHW,NHE,NVN,NVS)
   !
@@ -153,25 +137,25 @@ subroutine soil(NE,NEX,NHW,NHE,NVN,NVS,nlend)
           CALL VISUAL(I,J,NHW,NHE,NVN,NVS)
         ENDIF
       ENDIF
-          
+
       call end_timer_loop()
-      
+
       call hist_ecosim%hist_update(bounds)
-      
-      call hist_update_hbuf(bounds)      
-      call etimer%update_time_stamp()      
+
+      call hist_update_hbuf(bounds)
+      call etimer%update_time_stamp()
 
       nlend=etimer%its_time_to_exit()
       rstwr=etimer%its_time_to_write_restart()
       lnyr=etimer%its_a_new_year().and.hist_yrclose
-      
-      call hist_htapes_wrapup( rstwr, nlend, bounds, lnyr )      
+
+      call hist_htapes_wrapup( rstwr, nlend, bounds, lnyr )
       if(rstwr)then
         call restFile(flag='write')
       endif
-      if(nlend)exit      
+      if(nlend)exit
     END DO
-    
+
 !
 ! PERFORM MASS AND ENERGY BALANCE CHECKS IN 'EXEC'
 !

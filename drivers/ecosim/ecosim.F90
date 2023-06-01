@@ -17,11 +17,7 @@ PROGRAM main
   use StartsMod         , only : set_ecosim_solver
   use RestartMod        , only : get_restart_date
   use MicBGCAPI         , only : MicAPI_Init, MicAPI_cleanup
-<<<<<<< HEAD
   use EcoSIMCtrlMod
-=======
-  use EcoSIMCtrlMod  
->>>>>>> 6236f76 (changed plant flag assignments)
   use EcoSIMCtrlDataType
   use EcoSIMHistMod
   use EcoSIMAPI         , only : soil,readnamelist,regressiontest
@@ -102,30 +98,17 @@ PROGRAM main
   if(is_restart())then
     print*,'read restart/checkpoint info file: ecosim_rst'
     call get_restart_date(curr_date)
-<<<<<<< HEAD
     frectyp%ymdhs0=curr_date    !the actual simulation beginning year
   else
     frectyp%ymdhs0=start_date   !the actual simulation beginning year
   endif
 
   call hist_htapes_build()
-=======
-    frectyp%ymdhs0=curr_date    
-  else  
-    frectyp%ymdhs0=start_date    
-    call hist_htapes_build()
-  endif
-
->>>>>>> 6236f76 (changed plant flag assignments)
 
   IGO=0
   yeari=year_ini
   print*,frectyp%ymdhs0,yeari
-<<<<<<< HEAD
 
-=======
-  
->>>>>>> 6236f76 (changed plant flag assignments)
   DO nn1=1,3
     call set_ecosim_solver(NPXS(NN1),NPYS(NN1),NCYC_LITR,NCYC_SNOW)
 

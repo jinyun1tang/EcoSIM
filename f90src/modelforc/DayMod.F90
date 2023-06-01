@@ -216,10 +216,6 @@
         ITYPE=IWTHR(2)
       ENDIF
 
-<<<<<<< HEAD
-=======
-      print*,'ITYPE=',ITYPE,ILAST
->>>>>>> 6236f76 (changed plant flag assignments)
 !
 !     PARAMETERS FOR CALCULATING HOURLY RADIATION, TEMPERATURE
 !     AND VAPOR PRESSURE FROM DAILY VALUES
