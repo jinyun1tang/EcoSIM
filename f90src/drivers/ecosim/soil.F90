@@ -81,20 +81,12 @@ subroutine soil(NE,NEX,NHW,NHE,NVN,NVS,nlend)
     !initialize by year
     if(lverb)WRITE(*,333)'STARTQ'
     CALL STARTQ(NHW,NHE,NVN,NVS,1,JP)
-!
-!   RECOVER VALUES OF ALL PLANT STATE VARIABLES FROM EARLIER RUN
-!   IN 'ROUTP' IF NEEDED
-!
-    IF(is_restart())THEN
-    !set restart info for plant variables
-      if(lverb)WRITE(*,333)'ROUTP'
-      CALL ROUTP(NHW,NHE,NVN,NVS)
-    ENDIF
+
   ENDIF
 
   if(soichem_model)then
 ! INITIALIZE ALL SOIL CHEMISTRY VARIABLES IN 'STARTE' 
-! this is done done every year, because tracer concentrations
+! This is done done every year, because tracer concentrations
 ! in rainfall vary every year. In a more reasonable way, e.g., 
 ! when coupled to atmospheric chemistry code, it should be done by 
 ! hour

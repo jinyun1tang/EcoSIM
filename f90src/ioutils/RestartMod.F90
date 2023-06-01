@@ -8225,7 +8225,7 @@ implicit none
   call ncd_defdim(ncid , namet      , numt           ,  dimid)
   call ncd_defdim(ncid , namec      , numc           ,  dimid)
   call ncd_defdim(ncid , namep      , nump           ,  dimid)
-  call ncd_defdim(ncid,'datestrlen',datestrlen,dimid)
+
   ! "level" dimensions
   call ncd_defdim(ncid,'datestrlen',datestrlen,dimid)  
   call ncd_defdim(ncid,'rootaxs',JRS,dimid)
@@ -8348,7 +8348,6 @@ implicit none
   read(nio,*) fnamer
   read(nio,*)curr_date
   call relavu( nio )
-
 
   end subroutine get_restart_date
 end module restartMod
