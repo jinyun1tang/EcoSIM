@@ -5,7 +5,8 @@ module ATSCPLMod
   implicit none
 
   public
-  character(len=*), private, parameter :: mod_filename=__FILE__
+  character(len=*), private, parameter :: &
+    mod_filename=__FILE__
   integer :: JZSOI   !number of soil layers
   integer :: JSNO    !number of snow layers
 
@@ -58,7 +59,7 @@ contains
   !character(len=*), optional,intent(in) :: var_2d(:)        !1:nvar
   !real(r8), optional, intent(in) :: data_3d(:,:,:)          !1:jz, 1:nvar,1:ncol, 1D vector column specific
   !character(len=*), optional, intent(in) :: var_3d(:)       !
-  character(len=*), parameter :: subname=trim(mod_filename)//'::ATS2EcoSIMData'
+  !character(len=*), parameter :: subname=trim(mod_filename)//'::ATS2EcoSIMData'
   integer :: ncol, nvar, size_col
   integer :: j1,j2,j3
 
