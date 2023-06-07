@@ -5,7 +5,8 @@ module ATSCPLMod
   implicit none
 
   public
-  character(len=*), private, parameter :: mod_filename=__FILE__
+  character(len=*), private, parameter :: &
+    mod_filename=__FILE__
   integer :: JZSOI   !number of soil layers
   integer :: JSNO    !number of snow layers
 
@@ -51,7 +52,7 @@ contains
   !character(len=*), optional,intent(in) :: var_2d(:)        !1:nvar
   !real(r8), optional, intent(in) :: data_3d(:,:,:)          !1:jz, 1:nvar,1:ncol, 1D vector column specific
   !character(len=*), optional, intent(in) :: var_3d(:)       !
-  character(len=*), parameter :: subname=trim(mod_filename)//'::ATS2EcoSIMData'
+  !character(len=*), parameter :: subname=trim(mod_filename)//'::ATS2EcoSIMData'
   integer :: ncol, nvar, size_col
   integer :: j1,j2,j3
 
@@ -152,51 +153,6 @@ contains
   !!grab data from ecosim and return it to ATS
   implicit none
   !character(len=*), parameter :: subname=trim(mod_filename)//'::EcoSIM2ATSData'
-
-  type (BGCState), intent(in) :: state
-  type (BGCProperties), intent(in) :: props
-  type (BGCSizes), intent(out) :: sizes
-
-  ! Ecosim variables
-  real(r8), pointer :: data(:)
-  integer :: ncol, nvar, size_col
-  integer :: j1,j2,j3
-
-  write(*,*) "In the driver...."
-
-  write(*,*) "Setting sizes"
-  call SetBGCSizes(sizes)
-
-  write(*,*) "computing column size"
-
-  size_col = props%volume%size
-
-  write(*,*) "Column size is: ", size_col
-
-  write(*,*) "looping over datasets starting with porosity"
-  !seems like we call the pointer as normal,
-  !then just reverse the data
-  call c_f_pointer(state%porosity%data, data, (/size_col/))
-  data(:) = PORO
-
-  write(*,*) "Porosity finished, continuing"
-  call c_f_pointer(state%liquid_density%data, data, (/size_col/))
-  data(:) = L_DENS
-
-  call c_f_pointer(state%water_content%data, data, (/size_col/))
-  WC = data(:)
-
-  call c_f_pointer(props%liquid_saturation%data, data, (/size_col/))
-  data(:) = L_SAT
-
-  call c_f_pointer(props%relative_permeability%data, data, (/size_col/))
-  data(:) = REL_PERM
-
-  call c_f_pointer(state%hydraulic_conductivity%data, data, (/size_col/))
-  data(:) = H_COND
-
-  call c_f_pointer(state%temperature%data, data, (/size_col/))
-  data(:) = TEMP
 
 
   end subroutine EcoSIM2ATSData
