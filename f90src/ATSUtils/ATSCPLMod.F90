@@ -5,7 +5,8 @@ module ATSCPLMod
   implicit none
 
   public
-  character(len=*), private, parameter :: mod_filename=__FILE__
+  character(len=*), private, parameter :: &
+    mod_filename=__FILE__
   integer :: JZSOI   !number of soil layers
   integer :: JSNO    !number of snow layers
 
@@ -50,7 +51,7 @@ contains
   !character(len=*), optional,intent(in) :: var_2d(:)        !1:nvar
   !real(r8), optional, intent(in) :: data_3d(:,:,:)          !1:jz, 1:nvar,1:ncol, 1D vector column specific
   !character(len=*), optional, intent(in) :: var_3d(:)       !
-  character(len=*), parameter :: subname=trim(mod_filename)//'::ATS2EcoSIMData'
+  !character(len=*), parameter :: subname=trim(mod_filename)//'::ATS2EcoSIMData'
   integer :: ncol, nvar, size_col
   integer :: j1,j2,j3
 
@@ -150,7 +151,7 @@ contains
   subroutine EcoSIM2ATSData()
   !!grab data from ecosim and return it to ATS
   implicit none
-  character(len=*), parameter :: subname=trim(mod_filename)//'::EcoSIM2ATSData'
+  !character(len=*), parameter :: subname=trim(mod_filename)//'::EcoSIM2ATSData'
 
 
   end subroutine EcoSIM2ATSData
@@ -160,7 +161,7 @@ contains
   subroutine Run_EcoSIM_one_step()
   !advance ecosim one time step
   implicit none
-  character(len=*), parameter :: subname=trim(mod_filename)//'::Run_EcoSIM_one_step'
+  !character(len=*), parameter :: subname=trim(mod_filename)//'::Run_EcoSIM_one_step'
 
 
   !copy data from compuler to EcoSIM
@@ -175,7 +176,7 @@ contains
   subroutine Init_EcoSIM(jz,js,ncol)
   !initialize ecosim
   implicit none
-  character(len=*), parameter :: subname=trim(mod_filename)//'::Init_EcoSIM'
+  !character(len=*), parameter :: subname=trim(mod_filename)//'::Init_EcoSIM'
   integer, intent(in) :: jz   !number of soil layers
   integer, intent(in) :: js   !number of snow layers
   integer, intent(in) :: ncol !number of column
