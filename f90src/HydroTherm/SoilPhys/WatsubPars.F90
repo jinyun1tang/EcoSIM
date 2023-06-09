@@ -10,7 +10,7 @@ module WatsubPars
 !
 ! EMMS,EMMW,EMMR=emissivities of surface soil, snow and litter
 ! RACX,RARX=minimum boundary layer resistances of canopy,litter (h m-1)
-! RZ=minimum resistance to evaporation of surface water (h m-1)
+
 ! RAM=minimum boundary layer resistance (h m-1)
 ! DPTHSX=minimum snowpack depth for full cover (m)
 ! Z1S,Z2SW,Z2SD,Z3SX=parameters for air-water gas transfers in soil
@@ -66,7 +66,7 @@ module WatsubPars
   EMMR=0.97_r8
   RACX=0.0139_r8
   RARX=0.0139_r8
-  RZ=0.0139_r8
+
   RAM=1.39E-03_r8   !this value differs from that in Hour1Mod.F90
   DPTHSX=0.075_r8
   VISCW=ppmc

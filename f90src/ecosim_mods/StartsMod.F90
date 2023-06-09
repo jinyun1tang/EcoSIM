@@ -8,11 +8,13 @@ module StartsMod
   use minimathMod, only : test_aeqb, test_aneb, AZMAX1,AZMIN1
   use EcosimConst
   use TracerIDMod
+  use SnowDataType  
   use MicrobialDataType
   use EcoSIMSolverPar
   use SOMDataType
   use ChemTranspDataType
   use FertilizerDataType
+  use SnowPhysMod, only : InitSnowLayers
   use InitSOMBGCMod, only : InitSOMConsts,InitSOMProfile,InitSOMVars
   use CanopyRadDataType
   use GridConsts
@@ -23,7 +25,7 @@ module StartsMod
   use EcoSIMCtrlDataType
   use ClimForcDataType
   use LandSurfDataType
-  use SnowDataType
+
   use PlantTraitDataType
   use PlantDataRateType
   use SurfLitterDataType
@@ -150,22 +152,25 @@ module StartsMod
 !     BIOLOGICAL ACTIVITY
 !
       call InitLayerDepths(NY,NX)
+    ! DPTHA=active layer depth (m)
+      DPTHA(NY,NX)=9999.0_r8
 !
 !     INITIALIZE SNOWPACK LAYERS
       call InitSnowLayers(NY,NX)
+
+!     VHCPRX,VHCPNX=minimum heat capacities for solving
+!      surface litter,soil layer water and heat fluxes
+      VHCPRX(NY,NX)=VHCPRMin*AREA(3,NU(NY,NX),NY,NX)
+      VHCPNX(NY,NX)=VHCPNMin*AREA(3,NU(NY,NX),NY,NX)
+
 !
 !     SURFACE WATER STORAGE AND LOWER HEAT SINK
-!
-!     VHCPWX,VHCPRX,VHCPNX=minimum heat capacities for solving
-!      snowpack,surface litter,soil layer water and heat fluxes
+
 !      DPTHSK=depth at which soil heat sink-source calculated
 !     TCNDG=assumed thermal conductivity below lower soil boundary
 !     (MJ m-1 K-1 h-1)
 !     TKSD=deep source/sink temperature from geothermal flux(K)
-!
-      VHCPWX(NY,NX)=VHCPWMin*AREA(3,NU(NY,NX),NY,NX)
-      VHCPRX(NY,NX)=VHCPRMin*AREA(3,NU(NY,NX),NY,NX)
-      VHCPNX(NY,NX)=VHCPNMin*AREA(3,NU(NY,NX),NY,NX)
+      
       DPTHSK(NY,NX)=AMAX1(10.0_r8,CDPTH(NL(NY,NX),NY,NX)+1.0_r8)
       TCS(0,NY,NX)=ATCS(NY,NX)
       TKS(0,NY,NX)=ATKS(NY,NX)
@@ -544,72 +549,6 @@ module StartsMod
   COAU(1:jcplx,1:L2,NY,NX)=0.0_r8
 
   end subroutine initFertArrays
-!------------------------------------------------------------------------------------------
-  subroutine InitSnowLayers(NY,NX)
-
-  implicit none
-  integer, intent(in) :: NY,NX
-
-  real(r8) :: DLYRSI
-  real(r8) :: VOLSWI
-  real(r8), parameter :: CDPTHSI(JS)=(/0.05_r8,0.15_r8,0.30_r8,0.60_r8,1.00_r8/)
-  !the maximum snow layer is 1.0 m.
-  integer :: L
-! begin_execution
-!
-! CDPTHS=depth to bottom
-! DENSI=ice density, 0.92 Mg m-3
-! DENS0=snow density (Mg m-3)
-! VOLSS,VOLWS,VOLIS,VOLS=snow,water,ice,total snowpack volume(m3)
-! DPTHA=active layer depth (m)
-! CDPTHSI=depth to bottom of snowpack layers (m), i.e. from current layere to surface
-! DLYRS=snowpack layer thickness (m)
-! VOLSSL,VOLWSL,VOLISL,VOLSL=snow,water,ice,total layer volume(m3), water equivalent snow 
-! DENSS=layer density (Mg m-3)
-! TKW,TCW=later temperature K,oC
-! VHCPW=layer volumetric heat capacity (MJ m-3 K-1)
-! DPTHS=total snow height in the column
-
-  CDPTHS(0,NY,NX)=0.0_r8
-  DENS0(NY,NX)=0.10_r8
-  VOLSS(NY,NX)=DPTHS(NY,NX)*DENS0(NY,NX)*DH(NY,NX)*DV(NY,NX)
-  VOLWS(NY,NX)=0.0_r8
-  VOLIS(NY,NX)=0.0_r8
-  VOLS(NY,NX)=VOLSS(NY,NX)/DENS0(NY,NX)+VOLWS(NY,NX)+VOLIS(NY,NX)
-  DPTHA(NY,NX)=9999.0_r8
-!  VOLSWI=0.0_r8
-
-  !build the snow profile, topdown
-  D9580: DO L=1,JS
-    IF(L.EQ.1)THEN
-      !bottom snow layer
-      DLYRSI=CDPTHSI(L)
-      DLYRS(L,NY,NX)=AMIN1(DLYRSI,DPTHS(NY,NX))
-    ELSE
-      DLYRSI=CDPTHSI(L)-CDPTHSI(L-1)
-      DLYRS(L,NY,NX)=AMIN1(DLYRSI,AZMAX1(DPTHS(NY,NX)-CDPTHSI(L-1)))
-    ENDIF
-    VOLSSL(L,NY,NX)=DLYRS(L,NY,NX)*DENS0(NY,NX)*DH(NY,NX)*DV(NY,NX)
-    VOLWSL(L,NY,NX)=0.0_r8
-    VOLISL(L,NY,NX)=0.0_r8
-
-!    IF(L.EQ.1)THEN
-!      VOLSWI=VOLSWI+0.5_r8*(VOLSSL(L,NY,NX)+VOLWSL(L,NY,NX)+VOLISL(L,NY,NX)*DENSI)
-!    ELSE
-!      VOLSWI=VOLSWI+0.5_r8*(VOLSSL(L-1,NY,NX)+VOLWSL(L-1,NY,NX) &
-!        +VOLISL(L-1,NY,NX)*DENSI+VOLSSL(L,NY,NX)+VOLWSL(L,NY,NX) &
-!        +VOLISL(L,NY,NX)*DENSI)
-!    ENDIF
-
-    DENSS(L,NY,NX)=DENS0(NY,NX)
-    VOLSL(L,NY,NX)=VOLSSL(L,NY,NX)/DENSS(L,NY,NX)+VOLWSL(L,NY,NX)+VOLISL(L,NY,NX)
-    VOLSI(L,NY,NX)=DLYRSI*DH(NY,NX)*DV(NY,NX)      !it is a non-zero number, potential/maximum volume
-    CDPTHS(L,NY,NX)=CDPTHS(L-1,NY,NX)+DLYRS(L,NY,NX)
-    TKW(L,NY,NX)=AMIN1(Tref,ATKA(NY,NX))
-    TCW(L,NY,NX)=AZMIN1(ATCA(NY,NX))
-    VHCPW(L,NY,NX)=cps*VOLSSL(L,NY,NX)+cpw*VOLWSL(L,NY,NX)+cpi*VOLISL(L,NY,NX)
-  ENDDO D9580
-  end subroutine InitSnowLayers
 
 !------------------------------------------------------------------------------------------
   subroutine InitGridElevation(NHW,NHE,NVN,NVS,YSIN,YCOS,YAZI,ALTY)
