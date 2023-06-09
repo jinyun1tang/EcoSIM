@@ -2,6 +2,9 @@ set(SNOWPHYS_SOURCES
  SnowPhysData.F90
  SnowPhysMod.F90
  SnowBalanceMod.F90
+set(SNOWPHYS_SOURCES
+ SnowPhysData.F90
+ SnowPhysMod.F90
 )
 include(add_ecosim_library)
 add_ecosim_library(SnowPhys ${SNOWPHYS_SOURCES})
@@ -25,4 +28,7 @@ if (NOT CMAKE_INSTALL_PREFIX STREQUAL "INSTALL_DISABLED")
   install(TARGETS SnowPhys DESTINATION lib)
   file(GLOB HEADERS *.h)
   install(FILES ${HEADERS} DESTINATION include/)
+  install(TARGETS SnowPhys DESTINATION ${CMAKE_BINARY_DIR}/lib)
+  file(GLOB HEADERS *.h)
+  install(FILES ${HEADERS} DESTINATION include/ecosim/geochem/SnowPhys)
 endif()
