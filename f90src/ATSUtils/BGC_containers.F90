@@ -85,6 +85,30 @@ module BGCContainers_module
      type (c_ptr) :: data
   end type BGCVectorInt
 
+  type, public, bind(c) :: BGCMatrixDouble
+    integer (c_int) :: rows
+    integer (c_int) :: cols
+    integer (c_int) :: cap_rows
+    integer (c_int) :: cap_cols
+    type (c_ptr) :: data
+  end type BGCMatrixDouble
+
+  type, public, bind(c) :: BGCMatrixInt
+    integer (c_int) :: rows
+    integer (c_int) :: cols
+    integer (c_int) :: cap_rows
+    integer (c_int) :: cap_cols
+    type (c_ptr) :: data
+  end type BGCMatrixInt
+
+  type, public, bind(c) :: BGCMatrixString
+    integer (c_int) :: rows
+    integer (c_int) :: cols
+    integer (c_int) :: cap_rows
+    integer (c_int) :: cap_cols
+    type (c_ptr) :: data
+  end type BGCMatrixString
+
   type, public, bind(c) :: BGCVectorString
      integer (c_int) :: size
      integer (c_int) :: capacity
@@ -92,16 +116,8 @@ module BGCContainers_module
   end type BGCVectorString
 
   type, public, bind(c) :: BGCSizes
-     integer (c_int) :: num_primary
-     integer (c_int) :: num_sorbed
-     integer (c_int) :: num_minerals
-     integer (c_int) :: num_aqueous_complexes
-     integer (c_int) :: num_aqueous_kinetics
-     integer (c_int) :: num_surface_sites
-     integer (c_int) :: num_ion_exchange_sites
-     integer (c_int) :: num_isotherm_species
-     integer (c_int) :: num_aux_integers
-     integer (c_int) :: num_aux_doubles
+     integer (c_int) :: ncells_per_col_
+     integer (c_int) :: num_components
   end type BGCSizes
 
   type, public, bind(c) :: BGCState
@@ -114,6 +130,7 @@ module BGCContainers_module
      type (BGCVectorDouble) :: temperature
      type (BGCVectorDouble) :: total_mobile
      type (BGCVectorDouble) :: hydraulic_conductivity
+     type (BGCMatrixDouble) :: total_component_concentration
   end type BGCState
 
   type, public, bind(c) :: BGCProperties
