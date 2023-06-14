@@ -40,7 +40,7 @@ module ATSCPLMod
 contains
 !------------------------------------------------------------------------------------------
 
-  subroutine ATS2EcoSIMData(ncol, state, aux_data, prop)
+  subroutine ATS2EcoSIMData(ncol, state, aux_data, props, sizes)
   !send data from ATS to ecosim
   implicit none
 
@@ -52,16 +52,10 @@ contains
 
   ! Ecosim variables
   real(r8), pointer :: data(:)
-  !integer, intent(in) :: filter_col(:)
-  !real(r8), optional, intent(in) :: data_1d(:)              !1:nvar
-  !character(len=*), optional, intent(in) :: var_1d(:)       !1:nvar
-  !real(r8), optional,intent(in) :: data_2d(:,:)             !1:nvar,1:ncol, column specific scalar
-  !character(len=*), optional,intent(in) :: var_2d(:)        !1:nvar
-  !real(r8), optional, intent(in) :: data_3d(:,:,:)          !1:jz, 1:nvar,1:ncol, 1D vector column specific
-  !character(len=*), optional, intent(in) :: var_3d(:)       !
-  !character(len=*), parameter :: subname=trim(mod_filename)//'::ATS2EcoSIMData'
   integer :: ncol, nvar, size_col
   integer :: j1,j2,j3
+
+  write(*,*) "In the driver...."
 
   !ncol=size(filter_col)
 
@@ -118,40 +112,52 @@ contains
   !variables that take on a different value in each cell
   !Bulk of data will go here
   !nvar=size(var_2d)
+
   !do j1=1,nvar
   !case ('CSAND')  !g/kg soil
   !  csand(1:JZSOI,ncol)=data_3d(1:JZSOI,j1)
   !case ('CSILT')
   !  CSILT(1:JZSOI,ncol)=data_3d(1:JZSOI,j1)
   !Variables related to flow:
-    call c_f_pointer(state%porosity%data, data, (/size_col/))
-    do j3 = 1, size_col
-      PORO(1:JZSOI,ncol)=data
-    enddo
-    call c_f_pointer(state%liquid_density%data, data, (/size_col/))
-    do j3 = 1,size_col
-      L_DENS(1:JZSOI,ncol)=data
-    enddo
-    call c_f_pointer(state%water_content%data, data, (/size_col/))
-    do j3 = 1,size_col
-      WC(1:JZSOI,ncol)=data
-    enddo
-    call c_f_pointer(props%liquid_saturation%data, data, (/size_col/))
-    do j3 = 1,size_col
-      L_SAT(1:JZSOI,ncol)=data
-    enddo
-    call c_f_pointer(props%relative_permeability%data, data, (/size_col/))
-    do j3 = 1,size_col
-      REL_PERM(1:JZSOI,ncol)=data
-    enddo
-    call c_f_pointer(state%hydraulic_conductivity%data, data, (/size_col/))
-    do j3 = 1,size_col
-      H_COND(1:JZSOI,ncol)=data
-    enddo
-    call c_f_pointer(state%temperature%data, data, (/size_col/))
-    do j3 = 1,size_col
-      TEMP(1:JZSOI,ncol)=data
-    enddo
+  write(*,*) "computing column size"
+
+  size_col = props%volume%size
+
+  write(*,*) "Column size is: ", size_col
+
+  write(*,*) "looping over datasets starting with porosity"
+  call c_f_pointer(state%porosity%data, data, (/size_col/))
+  do j3 = 1, size_col
+    PORO(1:JZSOI,ncol)=data
+  enddo
+
+  write(*,*) "Porosity finished, continuing"
+  call c_f_pointer(state%liquid_density%data, data, (/size_col/))
+  do j3 = 1,size_col
+    L_DENS(1:JZSOI,ncol)=data
+  enddo
+  call c_f_pointer(state%water_content%data, data, (/size_col/))
+  do j3 = 1,size_col
+    WC(1:JZSOI,ncol)=data
+  enddo
+  call c_f_pointer(props%liquid_saturation%data, data, (/size_col/))
+  do j3 = 1,size_col
+    L_SAT(1:JZSOI,ncol)=data
+  enddo
+  call c_f_pointer(props%relative_permeability%data, data, (/size_col/))
+  do j3 = 1,size_col
+    REL_PERM(1:JZSOI,ncol)=data
+  enddo
+  call c_f_pointer(state%hydraulic_conductivity%data, data, (/size_col/))
+  do j3 = 1,size_col
+    H_COND(1:JZSOI,ncol)=data
+  enddo
+  call c_f_pointer(state%temperature%data, data, (/size_col/))
+  do j3 = 1,size_col
+    TEMP(1:JZSOI,ncol)=data
+  enddo
+
+  write(*,*) "Data Transfer Finished"
   end subroutine ATS2EcoSIMData
 !------------------------------------------------------------------------------------------
 
