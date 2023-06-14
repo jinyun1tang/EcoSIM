@@ -47,7 +47,8 @@ contains
   ! BGC coupler variables
   type (BGCState), intent(in) :: state
   type (BGCAuxiliaryData), intent(in) :: aux_data
-  type (BGCProperties), intent(in) :: prop
+  type (BGCProperties), intent(in) :: props
+  type (BGCSizes), intent(out) :; sizes
 
 
   ! Ecosim variables
@@ -57,6 +58,9 @@ contains
 
   write(*,*) "In the driver...."
 
+
+  write(*,*) "Setting sizes"
+  call SetBGCSizes(sizes)
   !ncol=size(filter_col)
 
   !if (ncol .EQ. 0)then
