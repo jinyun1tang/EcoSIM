@@ -22,7 +22,7 @@ module ATSCPLMod
   real(r8), allocatable :: vpa(:)
 
   !ATS variables
-  real(r8), allocatable :: PORO(:,:) !porosity
+  real(r8), allocatable :: PORO(:) !porosity
   real(r8), allocatable :: L_DENS(:,:) !liquid density
   real(r8), allocatable :: WC(:,:) !Soil water content
   real(r8), allocatable :: L_SAT(:,:) !liquid saturation
@@ -123,12 +123,17 @@ contains
 
   write(*,*) "looping over datasets starting with porosity"
   call c_f_pointer(state%porosity%data, data, (/size_col/))
+
+  PORO = data(:)
+
+  write(*,*) "finished copying poro"
   do j3 = 1, size_col
-    PORO(1:JZSOI,ncol)=data
+    PORO(1:JZSOI)=data(j3)
   enddo
 
   write(*,*) "Porosity finished, continuing"
   call c_f_pointer(state%liquid_density%data, data, (/size_col/))
+
   do j3 = 1,size_col
     L_DENS(1:JZSOI,ncol)=data
   enddo
