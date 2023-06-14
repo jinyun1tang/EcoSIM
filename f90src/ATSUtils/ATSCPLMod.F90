@@ -40,7 +40,7 @@ module ATSCPLMod
 contains
 !------------------------------------------------------------------------------------------
 
-  subroutine ATS2EcoSIMData(ncol, state, aux_data, props, sizes)
+  subroutine ATS2EcoSIMData(ncol, state, props, sizes)
   !send data from ATS to ecosim
   implicit none
 
