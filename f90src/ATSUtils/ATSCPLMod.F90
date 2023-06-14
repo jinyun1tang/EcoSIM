@@ -40,6 +40,7 @@ contains
   type (BGCState), intent(in) :: state
   type (BGCAuxiliaryData), intent(in) :: aux_data
   type (BGCProperties), intent(in) :: props
+  type (BGCSizes), intent(out) :; sizes
 
 
   ! Ecosim variables
@@ -49,6 +50,9 @@ contains
 
   write(*,*) "In the driver...."
 
+
+  write(*,*) "Setting sizes"
+  call SetBGCSizes(sizes)
   !ncol=size(filter_col)
 
   !if (ncol .EQ. 0)then
@@ -199,6 +203,18 @@ contains
 
   end subroutine SurfaceEBalance
 
+  subroutine SetBGCSizes(sizes)
 
+    use BGCContainers_module, only : BGCSizes
 
+    implicit none
+
+    type (BGCSizes), intent(out) :: sizes
+
+    sizes%num_components = 1
+    sizes%ncells_per_col_ = 100
+
+  end subroutine SetBGCSizes
+
+!-----------------------------------------------------------------------------------------
 end module ATSCPLMod
