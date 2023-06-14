@@ -37,7 +37,7 @@ implicit none
   public :: ZeroSnowFlux  
   public :: PrepIterSnowLayer
   public :: InitSnowAccums
-  public :: InitSnowStates
+  public :: CopySnowStates
   public :: SolveSnowpack
   public :: SumSnowRoffDrift
   public :: UpdateSnoIntmed
@@ -1343,7 +1343,7 @@ contains
   end subroutine SnowSurfaceResidualIteration
 
 !------------------------------------------------------------------------------------------
-  subroutine InitSnowStates(NY,NX)
+  subroutine CopySnowStates(NY,NX)
   implicit none
   integer, intent(in) :: NY,NX
 
@@ -1365,5 +1365,5 @@ contains
     VHCPWM(1,L,NY,NX)=VHCPW(L,NY,NX)
     TK0(L,NY,NX)=TKW(L,NY,NX)
   ENDDO D60  
-  end subroutine InitSnowStates
+  end subroutine CopySnowStates
 end module SnowPhysMod

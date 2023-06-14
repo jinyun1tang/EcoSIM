@@ -98,7 +98,9 @@ module TillageMixMod
   integer  :: NTX,NTP,NTG,NTSA,NTN
 !     begin_execution
 !
-  IF(J.EQ.INT(ZNOON(NY,NX)).AND.XCORP(NY,NX).LT.1.0.AND.DCORP(I,NY,NX).GT.0.0)THEN
+  !DCORP=soil mixing fraction with tillage
+  !XCORP=factor for surface litter incorporation and soil mixing
+  IF(J.EQ.INT(ZNOON(NY,NX)).AND.XCORP(NY,NX).LT.1.0.AND.DCORP(I,NY,NX).GT.0.0_r8)THEN
 !
 !     EXTENT OF MIXING
 !

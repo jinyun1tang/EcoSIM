@@ -307,8 +307,7 @@ module StartsMod
       !
       !     SURFACE LITTER HEAT CAPACITY
       !
-      BKVLNM(NY,NX)=AZMAX1(SAND(NU(NY,NX),NY,NX) &
-        +SILT(NU(NY,NX),NY,NX)+CLAY(NU(NY,NX),NY,NX))
+      BKVLNM(NY,NX)=AZMAX1(SAND(NU(NY,NX),NY,NX)+SILT(NU(NY,NX),NY,NX)+CLAY(NU(NY,NX),NY,NX))
       VHCP(0,NY,NX)=cpo*ORGC(0,NY,NX)+cpw*VOLW(0,NY,NX)+cpi*VOLI(0,NY,NX)
       VHCM(0,NY,NX)=0.0_r8
       VOLAI(0,NY,NX)=0.0_r8
@@ -402,8 +401,11 @@ module StartsMod
     ROXYL(L,NY,NX)=0.0_r8
     RCH4F(L,NY,NX)=0.0_r8
     RCH4L(L,NY,NX)=0.0_r8
+
     IF(L.GT.0)THEN
       IF(BKDS(L,NY,NX).GT.ZERO)THEN
+        !it is a soil layer
+        !compute particle density
         PTDS=ppmc*(1.30_r8*CORGCM+2.66_r8*(1.0E+06_r8-CORGCM))
         POROS(L,NY,NX)=1.0_r8-(BKDS(L,NY,NX)/PTDS)
       ELSE
@@ -454,13 +456,13 @@ module StartsMod
         ELSE
           THETW(L,NY,NX)=THW(L,NY,NX)
         ENDIF
-        IF(THI(L,NY,NX).GT.1.0)THEN
+        IF(THI(L,NY,NX).GT.1.0_r8)THEN
           THETI(L,NY,NX)=AZMAX1(AMIN1(POROS(L,NY,NX),POROS(L,NY,NX)-THW(L,NY,NX)))
         ELSEIF(test_aeqb(THI(L,NY,NX),1.0_r8))THEN
           THETI(L,NY,NX)=AZMAX1(AMIN1(FC(L,NY,NX),POROS(L,NY,NX)-THW(L,NY,NX)))
         ELSEIF(test_aeqb(THI(L,NY,NX),0.0_r8))THEN
           THETI(L,NY,NX)=AZMAX1(AMIN1(WP(L,NY,NX),POROS(L,NY,NX)-THW(L,NY,NX)))
-        ELSEIF(THI(L,NY,NX).LT.0.0)THEN
+        ELSEIF(THI(L,NY,NX).LT.0.0_r8)THEN
           THETI(L,NY,NX)=0.0_r8
         ELSE
           THETI(L,NY,NX)=THI(L,NY,NX)
@@ -852,7 +854,7 @@ module StartsMod
     DLYR(2,L,NY,NX)=DLYRI(2,L,NY,NX)
     AREA(3,L,NY,NX)=DLYR(1,L,NY,NX)*DLYR(2,L,NY,NX)
     IF(L.EQ.0)THEN
-! surface residue layer
+      ! surface litter residue layer
       TAREA=TAREA+AREA(3,L,NY,NX)
       CDPTHZ(L,NY,NX)=0.0_r8
       ORGC(L,NY,NX)=SUM(RSC(1:n_litrsfk,L,NY,NX))*AREA(3,L,NY,NX)
@@ -890,7 +892,8 @@ module StartsMod
       VOLX(L,NY,NX)=VOLT(L,NY,NX)*FMPR(L,NY,NX)
       VOLY(L,NY,NX)=VOLX(L,NY,NX)
       VOLTI(L,NY,NX)=VOLT(L,NY,NX)
-!     bulk density evaluated as micropore volume
+!     bulk density is defined only for soil with micropores      
+!     bulk soil mass evaluated as micropore volume
       BKVL(L,NY,NX)=BKDS(L,NY,NX)*VOLX(L,NY,NX)
       RTDNT(L,NY,NX)=0.0_r8
     ENDIF

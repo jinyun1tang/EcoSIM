@@ -4,7 +4,7 @@ module EcosimConst
   character(len=*),private, parameter :: mod_filename = __FILE__
   real(r8), parameter :: secspday=86400._r8
   real(r8), parameter :: secspyear=86400._r8*365._r8   !seconds in a normal year
-  real(r8), parameter :: Cpw=4.19_r8           !heat capacity for water
+  real(r8), parameter :: Cpw=4.19_r8           !heat capacity for water, J/g/K
   real(r8), parameter :: cpi=1.9274_r8         !heat capacity for ice
   real(r8), parameter :: cpo=2.496E-06_r8      !heat capacity for organic matter
   real(r8), parameter :: cps=2.095_r8          !heat capacity for fresh snow
