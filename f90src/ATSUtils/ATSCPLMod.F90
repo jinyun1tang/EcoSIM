@@ -57,6 +57,10 @@ contains
   call SetBGCSizes(sizes)
   !ncol=size(filter_col)
 
+  write(*,*) "Setting sizes"
+  call SetBGCSizes(sizes)
+  !ncol=size(filter_col)
+
   !1D vertical vector,
   !variables that take on a different value in each cell
   !Bulk of data will go here
@@ -238,7 +242,6 @@ contains
 
     sizes%num_components = 1
     sizes%ncells_per_col_ = 100
-    sizes%num_procs = 1
 
   end subroutine SetBGCSizes
 
