@@ -33,7 +33,7 @@ implicit none
   real(r8), intent(in) :: TK !temperature, [Kelvin]
   real(r8) :: ans
 
-! In general, TK should never be less than zero, however, the 
+! In general, TK should never be less than zero, however, the
 ! following avoids segmentatio fault
   if(TK>0._r8)then
     ans =(TK/298.15_r8)**6._r8
@@ -51,7 +51,7 @@ implicit none
   real(r8), intent(in) :: TK !temperature, [Kelvin]
   real(r8) :: ans
 
-! in general, TK should never be less than zero, however, the 
+! in general, TK should never be less than zero, however, the
 ! following avoids segmentatio fault
   if(TK>0._r8)then
     ans =(TK/298.15_r8)**1.75_r8
