@@ -22,12 +22,12 @@ module ATSCPLMod
 
   !ATS variables
   real(r8), allocatable :: PORO(:) !porosity
-  real(r8), allocatable :: L_DENS(:,:) !liquid density
-  real(r8), allocatable :: WC(:,:) !Soil water content
-  real(r8), allocatable :: L_SAT(:,:) !liquid saturation
-  real(r8), allocatable :: REL_PERM(:,:) !relative_permeability
-  real(r8), allocatable :: H_COND(:,:) !hydraulic conductivity
-  real(r8), allocatable :: TEMP(:,:) !temperature
+  real(r8), allocatable :: L_DENS(:) !liquid density
+  real(r8), allocatable :: WC(:) !Soil water content
+  real(r8), allocatable :: L_SAT(:) !liquid saturation
+  real(r8), allocatable :: REL_PERM(:) !relative_permeability
+  real(r8), allocatable :: H_COND(:) !hydraulic conductivity
+  real(r8), allocatable :: TEMP(:) !temperature
 
 contains
 !------------------------------------------------------------------------------------------
@@ -122,40 +122,31 @@ contains
 
   write(*,*) "looping over datasets starting with porosity"
   call c_f_pointer(state%porosity%data, data, (/size_col/))
-
   PORO = data(:)
 
   write(*,*) "finished copying poro"
-  do j3 = 1, size_col
-    PORO(1:JZSOI)=data(j3)
-  enddo
+  !do j3 = 1, size_col
+  !  PORO(1:JZSOI)=data(j3)
+  !enddo
 
   write(*,*) "Porosity finished, continuing"
   call c_f_pointer(state%liquid_density%data, data, (/size_col/))
+  L_DENS=data(:)
 
-  do j3 = 1,size_col
-    L_DENS(1:JZSOI,ncol)=data
-  enddo
   call c_f_pointer(state%water_content%data, data, (/size_col/))
-  do j3 = 1,size_col
-    WC(1:JZSOI,ncol)=data
-  enddo
+  WC=data(:)
+
   call c_f_pointer(props%liquid_saturation%data, data, (/size_col/))
-  do j3 = 1,size_col
-    L_SAT(1:JZSOI,ncol)=data
-  enddo
+  L_SAT=data(:)
+
   call c_f_pointer(props%relative_permeability%data, data, (/size_col/))
-  do j3 = 1,size_col
-    REL_PERM(1:JZSOI,ncol)=data
-  enddo
+  REL_PERM=data(:)
+
   call c_f_pointer(state%hydraulic_conductivity%data, data, (/size_col/))
-  do j3 = 1,size_col
-    H_COND(1:JZSOI,ncol)=data
-  enddo
+  H_COND=data(:)
+
   call c_f_pointer(state%temperature%data, data, (/size_col/))
-  do j3 = 1,size_col
-    TEMP(1:JZSOI,ncol)=data
-  enddo
+  TEMP=data(:)
 
   write(*,*) "Data Transfer Finished"
   end subroutine ATS2EcoSIMData
