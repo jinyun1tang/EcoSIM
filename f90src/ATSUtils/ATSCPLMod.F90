@@ -46,9 +46,8 @@ contains
 
   ! BGC coupler variables
   type (BGCState), intent(in) :: state
-  type (BGCAuxiliaryData), intent(in) :: aux_data
   type (BGCProperties), intent(in) :: props
-  type (BGCSizes), intent(out) :; sizes
+  type (BGCSizes), intent(out) :: sizes
 
 
   ! Ecosim variables
