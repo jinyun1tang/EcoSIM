@@ -29,7 +29,7 @@ module ATSCPLMod
   real(r8), allocatable :: vpa(:)
 
   !ATS variables
-  real(r8), allocatable :: PORO(:,:) !porosity
+  real(r8), allocatable :: PORO(:) !porosity
   real(r8), allocatable :: L_DENS(:,:) !liquid density
   real(r8), allocatable :: WC(:,:) !Soil water content
   real(r8), allocatable :: WC_OLD(:,:) !saving the wc for testing
