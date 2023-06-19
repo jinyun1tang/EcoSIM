@@ -22,15 +22,11 @@ module SnowPhysMod
   use SoilPhysDataType
   use ChemTranspDataType
   use LandSurfDataType
+  use PhysPars  
 implicit none
   private
   character(len=*), parameter :: mod_filename=__FILE__
-
-! RZ=minimum resistance to evaporation of surface water (h m-1)
-  real(r8), parameter :: DPTHSX=0.075_r8 !minimum snowpack depth for full cover (m)
-  real(r8), parameter :: RAM=1.39E-03_r8 
-  real(r8), parameter :: RZ=0.0139_r8
-  real(r8), parameter :: DTHETW=1.0E-06_r8
+  
   public :: InitSnowLayers
   public :: SnowRedistrub
   public :: SnowBNDResistance
@@ -950,11 +946,11 @@ contains
     ENGY0=VHCPWM(M,L,NY,NX)*TK0(L,NY,NX)
     VHCPWM(M+1,L,NY,NX)=cps*VOLS0(L,NY,NX)+cpw*VOLW0(L,NY,NX)+cpi*VOLI0(L,NY,NX)
     IF(VHCPWM(M+1,L,NY,NX).GT.VHCPWX(NY,NX))THEN
-        TK0(L,NY,NX)=(ENGY0+THFLWW(L,NY,NX)+TFLX0(L,NY,NX))/VHCPWM(M+1,L,NY,NX)
+      TK0(L,NY,NX)=(ENGY0+THFLWW(L,NY,NX)+TFLX0(L,NY,NX))/VHCPWM(M+1,L,NY,NX)
     ELSEIF(L.EQ.1)THEN
-        TK0(L,NY,NX)=TKA(NY,NX)
+      TK0(L,NY,NX)=TKA(NY,NX)
     ELSE
-        TK0(L,NY,NX)=TK0(L-1,NY,NX)
+      TK0(L,NY,NX)=TK0(L-1,NY,NX)
     ENDIF
   ENDDO D9780
     !      if(curday>=176)then

@@ -44,6 +44,14 @@ implicit none
   real(r8),allocatable ::  QW1(:,:,:)                         !
   real(r8),allocatable ::  QI1(:,:,:)                         !  
   real(r8),allocatable ::  HQS1(:,:,:)                        !  
+  real(r8),allocatable ::  HFLWL(:,:,:,:)                     !  
+  real(r8),allocatable ::  FLWL(:,:,:,:)                      !  
+  real(r8),allocatable ::  FLWHL(:,:,:,:)                     !  
+  real(r8),allocatable ::  FLWLX(:,:,:,:)                     !  
+  real(r8),allocatable ::  VOLW2(:,:,:)                       !
+  real(r8),allocatable ::  VOLP1Z(:,:,:)                      !
+  real(r8),allocatable ::  VOLWX1(:,:,:)                      !
+
   public :: InitHydroThermData
   public :: DestructHydroThermData
   contains
@@ -94,6 +102,13 @@ implicit none
   allocate(QW1(2,JV,JH));       QW1=0._r8
   allocate(QI1(2,JV,JH));       QI1=0._r8  
   allocate(HQS1(2,JV,JH));      HQS1=0._r8
+  allocate(HFLWL(3,JD,JV,JH));  HFLWL=0._r8
+  allocate(FLWL(3,JD,JV,JH));   FLWL=0._r8  
+  allocate(FLWHL(3,JD,JV,JH));  FLWHL=0._r8
+  allocate(FLWLX(3,JD,JV,JH));  FLWLX=0._r8
+  allocate(VOLW2(JZ,JY,JX));    VOLW2=0._r8
+  allocate(VOLP1Z(JZ,JY,JX));   VOLP1Z=0._r8
+  allocate(VOLWX1(JZ,JY,JX));   VOLWX1=0._r8
 
   end subroutine InitHydroThermData
 
@@ -143,5 +158,13 @@ implicit none
   call destroy(QW1)
   call destroy(QI1)
   call destroy(HQS1)    
+  call destroy(HFLWL)  
+  call destroy(FLWL)  
+  call destroy(FLWHL)
+  call destroy(FLWLX)
+  call destroy(VOLW2)
+  call destroy(VOLP1Z)
+  call destroy(VOLWX1)
+
   end subroutine DestructHydroThermData
 end module HydroThermData

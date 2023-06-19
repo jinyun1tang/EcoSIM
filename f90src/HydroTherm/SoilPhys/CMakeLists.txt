@@ -1,5 +1,4 @@
 set(SOILPHYS_SOURCES
-  WatsubPars.F90
   SoilHydroParaMod.F90
   WatsubDataMod.F90
   WatsubMod.F90
@@ -13,6 +12,7 @@ include_directories(${CMAKE_BINARY_DIR}/f90src/ecosim_datatype/)
 include_directories(${CMAKE_BINARY_DIR}/f90src/ioutils/)
 include_directories(${CMAKE_BINARY_DIR}/f90src/HydroTherm/PhysData/)
 include_directories(${CMAKE_BINARY_DIR}/f90src/HydroTherm/SnowPhys/)
+include_directories(${CMAKE_BINARY_DIR}/f90src/HydroTherm/SurfPhys/)
 include(add_ecosim_library)
 add_ecosim_library(SoilPhys ${SOILPHYS_SOURCES})
 

@@ -14,9 +14,9 @@ module SoilHydroParaMod
   use LandSurfDataType
   use EcoSIMHistMod
   use EcoSIMConfig
-  use WatsubPars
   use SurfLitterDataType
   use EcoSIMCtrlMod  
+  use PhysPars  
   use EcoSiMParDataMod   , only : micpar
   use minimathmod  , only : test_aeqb,AZMAX1,AZMIN1
 implicit none
