@@ -51,11 +51,6 @@ contains
 
   write(*,*) "In the driver...."
 
-
-  write(*,*) "Setting sizes"
-  call SetBGCSizes(sizes)
-  !ncol=size(filter_col)
-
   write(*,*) "Setting sizes"
   call SetBGCSizes(sizes)
   !ncol=size(filter_col)
@@ -96,6 +91,15 @@ contains
 
   call c_f_pointer(props%precipitation%data, data, (/size_procs/))
   precipitation_rain = data(:)
+
+  write(*,*) "writing atm abundances"
+  atm_n2 = props%atm_n2
+  atm_o2 = props%atm_o2
+  atm_co2 = props%atm_co2
+  atm_ch4 = props%atm_ch4
+  atm_n2o = props%atm_n2o
+  atm_h2 = props%atm_h2
+  atm_nh3 = props%atm_nh3
 
   write(*,*) "writing atm abundances"
   atm_n2 = props%atm_n2
