@@ -12,14 +12,6 @@ module ATSCPLMod
 
 ! temporary data holder in ecosim
   real(r8) :: atm_n2, atm_o2,atm_co2,atm_ch4,atm_n2o,atm_h2,atm_nh3
-  real(r8), allocatable :: sw_rad(:)
-  real(r8), allocatable :: lw_rad(:)
-  real(r8), allocatable :: air_temp(:)
-  real(r8), allocatable :: p_vap(:)
-  real(r8), allocatable :: wind_speed(:)
-  real(r8), allocatable :: precipitation_rain(:)
-  
-
   real(r8), allocatable :: csand(:,:)
   real(r8), allocatable :: CSILT(:,:)
   real(r8), allocatable :: tairc(:)
@@ -89,8 +81,6 @@ contains
   !    end select
   !  enddo
   !endif
-
-
   !columun specific scalar
   !Variables that are single valued along a column
   !j1 - number of variables
@@ -127,6 +117,15 @@ contains
   size_col = props%volume%size
 
   write(*,*) "Column size is: ", size_col
+
+  write(*,*) "writing atm abundances"
+  atm_n2 = props%atm_n2
+  atm_o2 = props%atm_o2
+  atm_co2 = props%atm_co2
+  atm_ch4 = props%atm_ch4
+  atm_n2o = props%atm_n2o
+  atm_h2 = props%atm_h2
+  atm_nh3 = props%atm_nh3
 
   write(*,*) "looping over datasets starting with porosity"
   call c_f_pointer(state%porosity%data, data, (/size_col/))
