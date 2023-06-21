@@ -141,6 +141,13 @@ module BGCContainers_module
      type (BGCVectorDouble) :: relative_permeability
      type (BGCVectorDouble) :: thermal_conductivity
      type (BGCVectorDouble) :: volume
+     real (c_double) :: atm_n2
+     real (c_double) :: atm_o2
+     real (c_double) :: atm_co2
+     real (c_double) :: atm_ch42
+     real (c_double) :: atm_n2o
+     real (c_double) :: atm_h2
+     real (c_double) :: atm_nh3
   end type BGCProperties
 
   type, public, bind(c) :: BGCAuxiliaryData
