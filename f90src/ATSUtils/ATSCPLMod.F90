@@ -12,6 +12,7 @@ module ATSCPLMod
 
 ! temporary data holder in ecosim
   real(r8) :: atm_n2, atm_o2,atm_co2,atm_ch4,atm_n2o,atm_h2,atm_nh3
+  real(r8) :: sw_rad, lw_rad, air_temp, p_vap, wind_speed, p_rain
   real(r8), allocatable :: csand(:,:)
   real(r8), allocatable :: CSILT(:,:)
   real(r8), allocatable :: tairc(:)
@@ -117,6 +118,14 @@ contains
   size_col = props%volume%size
 
   write(*,*) "Column size is: ", size_col
+  write(*,*) "surface properties"
+
+  sw_rad = props%shortwave_radiation
+  lw_rad = props%longwave_radiation
+  air_temp = props%air_temperature
+  p_vap = props%vapor_pressure_air
+  wind_speed = props%wind_speed
+  p_rain = props%precipitation
 
   write(*,*) "writing atm abundances"
   atm_n2 = props%atm_n2
