@@ -141,6 +141,12 @@ module BGCContainers_module
      type (BGCVectorDouble) :: relative_permeability
      type (BGCVectorDouble) :: thermal_conductivity
      type (BGCVectorDouble) :: volume
+     real (c_double) :: shortwave_radiation
+     real (c_double) :: longwave_radiation
+     real (c_double) :: air_temperature
+     real (c_double) :: vapor_pressure_air
+     real (c_double) :: wind_speed
+     real (c_double) :: precipitation
      real (c_double) :: atm_n2
      real (c_double) :: atm_o2
      real (c_double) :: atm_co2
