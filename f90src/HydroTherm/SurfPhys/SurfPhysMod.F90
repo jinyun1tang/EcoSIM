@@ -32,7 +32,8 @@ implicit none
   character(len=*), parameter :: mod_filename=__FILE__
   public :: CopySurfStateVars
   public :: SurfaceRunoff
-  public :: UpdateSurfaceVars
+  public :: UpdateSurfaceAtM
+  public :: CalcThermConduc
   public :: InitSurfModel, SurfacePhysModel,SummaryAfterEnergyBalance
 
 ! HCNDRR=saturated hydraulic conductivity of surface litter
@@ -321,7 +322,7 @@ contains
   end subroutine SurfaceResistances
 !------------------------------------------------------------------------------------------
 
-  subroutine SurfResidueIteration(M,NY,NX,VOLWR2,ATCNDR,ATCNVR,PSISV1,RFLX0)
+  subroutine SurfLitterIterate(M,NY,NX,VOLWR2,ATCNDR,ATCNVR,PSISV1,RFLX0)
 
   implicit none
   integer, intent(in) :: M,NY,NX
@@ -374,6 +375,7 @@ contains
       ELSE
         THETWR=POROS0(NY,NX)
       ENDIF
+
       IF(VOLR(NY,NX).GT.ZEROS(NY,NX).AND.VOLW1(0,NY,NX).GT.ZEROS2(NY,NX))THEN
         THETWR=AMIN1(VOLWRX(NY,NX),VOLW1(0,NY,NX))/VOLR(NY,NX)
         IF(THETWR.LT.FC(0,NY,NX))THEN
@@ -546,20 +548,20 @@ contains
     TKS1=TKS1+(HWFLV2+HFLCR2)/VHCP12
 
   ENDDO D5000
-  end subroutine SurfResidueIteration
+  end subroutine SurfLitterIterate
 !------------------------------------------------------------------------------------------
-  subroutine SoilSurfaceEnergyBalance(M,NY,NX,PSISV1)
+  subroutine SoilSufLitterEnergyBal(M,NY,NX,PSISV1)
 !!
 ! Description:
   implicit none
   integer, intent(in) :: M,NY,NX
   real(r8), intent(in) :: PSISV1
   real(r8) :: VOLWR2,ATCNDR,ATCNVR,RFLX0
-  real(r8) :: WTHET0,WTHET1,CNV1,CNVR,TCNDW1,TCNDA1
-  real(r8) :: THETRR,TCNDR,XNUSW1,XNUSW0,XNUSA0,XNUSA1
-  real(r8) :: TCNDA0,RYLXW0,RYLNW1,RYLXA1,RYLNW0
-  real(r8) :: TCNDW0,RYLXW1, TCND1,RYLXA0,RYLNA1
-  real(r8) :: RYLNA0,DTKX,DTHW1,DTHW0,DTHA1,DTHA0
+  real(r8) :: WTHET0,CNVR,CNV1
+  real(r8) :: THETRR,TCNDR,XNUSW0,XNUSA0
+  real(r8) :: TCNDA0,RYLXW0,RYLNW0
+  real(r8) :: TCNDW0,TCND1,RYLXA0
+  real(r8) :: RYLNA0,DTKX,DTHW0,DTHA0
   real(r8) :: ALBL  
 ! begin_execution
 ! PARAMETERS FOR CALCULATING LATENT AND SENSIBLE HEAT FLUXES
@@ -636,50 +638,35 @@ contains
     ATCNVR=0.0_r8
   ENDIF
   !THETRR=litter in relative volume
+  !THETPY=relative volume as air  
   THETRR=AZMAX1(1.0_r8-THETPX(0,NY,NX)-THETWX(0,NY,NX)-THETIX(0,NY,NX))
+
   DTKX=ABS(TK1(0,NY,NX)-TK1(NUM(NY,NX),NY,NX))*ppmc
+
   DTHW0=AZMAX1(THETWX(0,NY,NX)-TRBW)**3
   DTHA0=AZMAX1(THETPX(0,NY,NX)-TRBA)**3
-  DTHW1=AZMAX1(THETWX(NUM(NY,NX),NY,NX)-TRBW)**3
-  DTHA1=AZMAX1(THETPX(NUM(NY,NX),NY,NX)-TRBA)**3
   RYLXW0=DTKX*DTHW0
   RYLXA0=DTKX*DTHA0
-  RYLXW1=DTKX*DTHW1
-  RYLXA1=DTKX*DTHA1
   RYLNW0=AMIN1(1.0E+04_r8,RYLXW*RYLXW0)
   RYLNA0=AMIN1(1.0E+04_r8,RYLXA*RYLXA0)
-  RYLNW1=AMIN1(1.0E+04_r8,RYLXW*RYLXW1)
-  RYLNA1=AMIN1(1.0E+04_r8,RYLXA*RYLXA1)
   XNUSW0=AMAX1(1.0_r8,0.68_r8+0.67_r8*RYLNW0**0.25_r8/DNUSW)
   XNUSA0=AMAX1(1.0_r8,0.68_r8+0.67_r8*RYLNA0**0.25_r8/DNUSA)
-  XNUSW1=AMAX1(1.0_r8,0.68_r8+0.67_r8*RYLNW1**0.25_r8/DNUSW)
-  XNUSA1=AMAX1(1.0_r8,0.68_r8+0.67_r8*RYLNA1**0.25_r8/DNUSA)
   TCNDW0=2.067E-03_r8*XNUSW0
-  TCNDA0=9.050E-05_r8*XNUSA0
-  TCNDW1=2.067E-03_r8*XNUSW1
-  TCNDA1=9.050E-05_r8*XNUSA1
-
-  !THETPY=relative volume as air
+  TCNDA0=9.050E-05_r8*XNUSA0  
   WTHET0=1.467_r8-0.467_r8*THETPY(0,NY,NX)
-  WTHET1=1.467_r8-0.467_r8*THETPY(NUM(NY,NX),NY,NX)
-
   TCNDR=(0.779_r8*THETRR*9.050E-04_r8+0.622_r8*THETWX(0,NY,NX)*TCNDW0 &
     +0.380_r8*THETIX(0,NY,NX)*7.844E-03_r8+WTHET0*THETPX(0,NY,NX)*TCNDA0) &
     /(0.779_r8*THETRR+0.622_r8*THETWX(0,NY,NX)+0.380_r8*THETIX(0,NY,NX)+WTHET0*THETPX(0,NY,NX))
 
-  TCND1=(STC(NUM(NY,NX),NY,NX)+THETWX(NUM(NY,NX),NY,NX)*TCNDW1 &
-    +0.611_r8*THETIX(NUM(NY,NX),NY,NX)*7.844E-03_r8 &
-    +WTHET1*THETPX(NUM(NY,NX),NY,NX)*TCNDA1) &
-    /(DTC(NUM(NY,NX),NY,NX)+THETWX(NUM(NY,NX),NY,NX) &
-    +0.611_r8*THETIX(NUM(NY,NX),NY,NX)+WTHET1*THETPX(NUM(NY,NX),NY,NX))
+  call CalcThermConduc(NX,NY,NUM(NY,NX),DTKX,TCND1)
 
   ATCNDR=2.0_r8*TCNDR*TCND1/(TCNDR*DLYR(3,NUM(NY,NX),NY,NX)+TCND1*DLYRR(NY,NX))
 !
 ! SMALLER TIME STEP FOR SOLVING SURFACE RESIDUE ENERGY EXCHANGE
 !
-  call SurfResidueIteration(M,NY,NX,VOLWR2,ATCNDR,ATCNVR,PSISV1,RFLX0)
+  call SurfLitterIterate(M,NY,NX,VOLWR2,ATCNDR,ATCNVR,PSISV1,RFLX0)
 
-  end subroutine SoilSurfaceEnergyBalance
+  end subroutine SoilSufLitterEnergyBal
 
   !------------------------------------------------------------------------------------------
 
@@ -897,14 +884,13 @@ contains
   call PrepSoilSurfaceEnerbyBalance(M,NY,NX,PSISV1,THRMA,RAR1)
 !
   IF(VHCP1(0,NY,NX).GT.VHCPRX(NY,NX))THEN
-! ENERGY BALANCE AT RESIDUE SURFACE
-
-    call SoilSurfaceEnergyBalance(M,NY,NX,PSISV1)
+    ! ENERGY BALANCE AT RESIDUE SURFACE
+    call SoilSufLitterEnergyBal(M,NY,NX,PSISV1)
 !
-!   IF NO SURFACE RESIDUE
 !
   ELSE
-    call NoSurfResidueForEnergyBalance(NY,NX)
+    ! IF NO SURFACE RESIDUE  
+    call BareSoilSufEnergyBal(NY,NX)
   ENDIF
 !  write(*,*)'SummaryAfterEnergyBalance'
   call SummaryAfterEnergyBalance(NY,NX,THRMA)
@@ -928,9 +914,8 @@ contains
 !
 ! ENERGY EXCHANGE AT SOIL SURFACE IF EXPOSED UNDER SNOWPACK
 ! FSNW,FSNX=fractions of snow,snow-free cover
-  IF(FSNX(NY,NX).GT.0.0_r8.AND.(BKDS(NUM(NY,NX),NY,NX).GT.ZERO &
-    .OR.VHCP1(NUM(NY,NX),NY,NX).GT.VHCPNX(NY,NX)))THEN
-!
+  IF(FSNX(NY,NX).GT.0.0_r8.AND.(BKDS(NUM(NY,NX),NY,NX).GT.ZERO.OR.VHCP1(NUM(NY,NX),NY,NX).GT.VHCPNX(NY,NX)))THEN
+   !
     call ExposedSoilFlux(M,NY,NX,RAR1)
 !
   ELSE
@@ -984,7 +969,7 @@ contains
   end subroutine SnowCoveredTopSoilFlux  
 !------------------------------------------------------------------------------------------
 
-  subroutine NoSurfResidueForEnergyBalance(NY,NX)
+  subroutine BareSoilSufEnergyBal(NY,NX)
   implicit none
   integer, intent(in) :: NY,NX
 ! begin_execution
@@ -1004,7 +989,7 @@ contains
   HWFLV1=0.0_r8
   HFLCR1=0.0_r8
   THRMZ=0.0_r8
-  end subroutine NoSurfResidueForEnergyBalance
+  end subroutine BareSoilSufEnergyBal
 !------------------------------------------------------------------------------------------
 
   subroutine SurfSoilResidueWaterCapillExch(M,NY,NX,FKSAT)
@@ -1401,7 +1386,7 @@ contains
   subroutine InitSurfModel(M,NY,NX,RAR1,FKSAT)
   implicit none
   integer, intent(in) :: M,NY,NX
-  real(r8),intent(in) :: RAR1
+  real(r8),intent(inout) :: RAR1
   real(r8),intent(out):: FKSAT
   integer :: L  
   real(r8) :: scalar,THETWT,HFLQR1,FLQRS
@@ -1745,11 +1730,29 @@ contains
   end subroutine PartitionPrecip
 !------------------------------------------------------------------------------------------  
 
-  subroutine UpdateSurfaceVars(M,NY,NX)
+  subroutine UpdateSurfaceAtM(M,NY,NX)
   implicit none
   integer, intent(in) :: M,NY,NX
   real(r8) :: VOLIRZ,ENGYR,VHCPXX
   real(r8) :: TK0XX,tk1pres,TVOLWI,VOLWRZ
+
+  !update snow
+  call UpdateSnowAtM(M,NY,NX)
+
+  ! SURFACE RESIDUE WATER AND TEMPERATURE
+  !
+  ! XVOLT,XVOLW=free water+ice,water in litter layer
+  ! VOLWM,VOLPM=surface water,air content for use in trnsfr.f
+  ! VOLWRX=maximum water retention by litter
+  ! VHCP1=volumetric heat capacity of litter
+  ! VOLA1,VOLW1,VOLI1,VOLP1=pore,water,ice,air volumes of litter
+  ! VOLWRX=maximum water retention by litter
+  ! TFLXR,WFLXR=litter water,latent heat flux from freeze-thaw
+  ! VOLR=dry litter volume
+  ! THETWX,THETIX,THETPX=water,ice,air concentrations
+  ! VHCP1=volumetric heat capacity of litter
+  ! TK1=litter temperature
+  ! HFLWRL,TFLXR,THQR1=litter total cond+conv,latent,runoff heat flux
 
   VOLW1(0,NY,NX)=AZMAX1(VOLW1(0,NY,NX)+FLWRL(NY,NX)+WFLXR(NY,NX)+TQR1(NY,NX))
   VOLI1(0,NY,NX)=AZMAX1(VOLI1(0,NY,NX)-WFLXR(NY,NX)/DENSI)
@@ -1798,7 +1801,7 @@ contains
   ELSE
     TK1(0,NY,NX)=TK1(NUM(NY,NX),NY,NX)
   ENDIF
-  end subroutine UpdateSurfaceVars
+  end subroutine UpdateSurfaceAtM
 !------------------------------------------------------------------------------------------
 
   subroutine SummaryAfterEnergyBalance(NY,NX,THRMA)
@@ -1853,14 +1856,18 @@ contains
   THRMG(NY,NX)=THRMG(NY,NX)+THRMA+THRMZ
   end subroutine SummaryAfterEnergyBalance
 !------------------------------------------------------------------------------------------
-  subroutine SurfacePhysModel(M,NX,NY,NHE,NHW,NVS,NVN,RAR1,FKSAT)
+  subroutine SurfacePhysModel(M,NX,NY,NHE,NHW,NVS,NVN,RAR1,FKSAT,HFLXG1)
   implicit none
   integer, intent(in) :: M,NX,NY,NHE,NHW,NVS,NVN
   real(r8), intent(inout) :: RAR1
-  REAL(R8),INTENT(IN) :: FKSAT
+  REAL(R8),INTENT(OUT) :: FKSAT,HFLXG1
   integer :: N1,N2
+
+  call InitSurfModel(M,NY,NX,RAR1,FKSAT)
+
 ! updates RAR1
   call AtmLandSurfExchange(M,NY,NX,RAR1)
+  HFLXG1=HFLXG
 !
 ! CAPILLARY EXCHANGE OF WATER BETWEEN SOIL SURFACE AND RESIDUE
   call SurfSoilResidueWaterCapillExch(M,NY,NX,FKSAT)
@@ -1872,4 +1879,38 @@ contains
   call AccumWaterVaporHeatFluxes(M,NY,NX)
 
   end subroutine SurfacePhysModel          
+
+!------------------------------------------------------------------------------------------
+  subroutine CalcThermConduc(N1,N2,N3,DTKX,TCND1)
+  implicit none
+  integer , intent(in) :: N1,N2,N3
+  real(r8), intent(in) :: DTKX
+  real(r8), intent(out):: TCND1
+
+  real(r8) :: DTHW1,DTHA1,RYLXW1,RYLXA1,RYLNW1,RYLNA1
+  REAL(R8) :: XNUSW1,XNUSA1,TCNDW1,TCNDA1,WTHET1
+
+  IF(BKDS(N3,N2,N1).GT.ZERO.OR.THETWX(N3,N2,N1)+THETIX(N3,N2,N1).GT.ZERO)THEN
+    !it is a soil layer or pure water layer
+    DTHW1=AZMAX1(THETWX(N3,N2,N1)-TRBW)**3._r8
+    DTHA1=AZMAX1(THETPX(N3,N2,N1)-TRBA)**3._r8
+    RYLXW1=DTKX*DTHW1
+    RYLXA1=DTKX*DTHA1
+    RYLNW1=AMIN1(1.0E+04_r8,RYLXW*RYLXW1)
+    RYLNA1=AMIN1(1.0E+04_r8,RYLXA*RYLXA1)
+    XNUSW1=AMAX1(1.0_r8,0.68_r8+0.67_r8*RYLNW1**0.25_r8/DNUSW)
+    XNUSA1=AMAX1(1.0_r8,0.68_r8+0.67_r8*RYLNA1**0.25_r8/DNUSA)
+    TCNDW1=2.067E-03_r8*XNUSW1
+    TCNDA1=9.050E-05_r8*XNUSA1
+    WTHET1=1.467_r8-0.467_r8*THETPY(N3,N2,N1)
+    TCND1=(STC(N3,N2,N1)+THETWX(N3,N2,N1)*TCNDW1 &
+      +0.611_r8*THETIX(N3,N2,N1)*7.844E-03_r8 &
+      +WTHET1*THETPX(N3,N2,N1)*TCNDA1) &
+      /(DTC(N3,N2,N1)+THETWX(N3,N2,N1)+0.611*THETIX(N3,N2,N1) &
+      +WTHET1*THETPX(N3,N2,N1))
+  ELSE
+    TCND1=0.0_r8
+  ENDIF
+  end subroutine CalcThermConduc  
+
 end module SurfPhysMod

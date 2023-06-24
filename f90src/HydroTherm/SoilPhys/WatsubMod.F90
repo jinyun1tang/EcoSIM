@@ -1,11 +1,14 @@
 module WatsubMod
 !!
 ! Description:
-! code to do water and enerby balance calculation
+! Do water and enerby balance calculation.
+! The module diagnoses the mass and energy fluxes associated
+! with soil/snow water (vapor, liquid and ice) and energy, and update
+! them in redistmod.F90
 
   use data_kind_mod, only : r8 => DAT_KIND_R8
   use abortutils   , only : endrun, print_info
-  use minimathmod  , only : test_aeqb, test_aneb,safe_adb,vapsat,AZMAX1,AZMIN1
+  use minimathmod  , only : test_aeqb, test_aneb,safe_adb,vapsat,AZMAX1,AZMIN1,AZMAX1t
   use EcosimConst
   use MiniFuncMod
   use EcoSIMSolverPar
@@ -43,32 +46,10 @@ module WatsubMod
   private
 
   character(len=*), parameter :: mod_filename = __FILE__
-  real(r8), parameter :: tiny_val=1.e-6_r8
   integer, parameter :: iewstdir=1   !east-west direction
   integer, parameter :: insthdir=2   !north-south direction
   integer, parameter :: ivertdir=3   !vertical direction
-
-  real(r8) :: ATCNVL,ATCNDL,CNDL,CNVL
-  real(r8) :: D,DTHW2,DTHA2,DTBLXX,DPTHH
-  real(r8) :: FLQL,FLWHX,FLVL,FLWT
-  real(r8) :: FLWTH,FLWTHL,FLWU,FLWUL,FLWUX,FLWUH,FLWUHL,FINHX
-  real(r8) :: HWFLQL,HWFLHL,HWFLVL,HWFLWL,HFLWSX,HFLWS
-  real(r8) :: PSISTL
-  real(r8) :: PSISVL,PSISH1,PSISHL,PSISWD,PSISWT,PSISWTH,PSISUT
-  real(r8) :: PSISUTH,PSISMX,Q
-  real(r8) :: R,RYLXW2,RYLXA2,RYLNW2,RYLNA2
-  real(r8) :: THETWH
-  real(r8) :: TCNDW2,TCNDA2
-  real(r8) :: TCND2,TKLX,THETAX,TFLXH1,TKXX
-  real(r8) :: VPL,VOLP2,VOLPX2,VOLPH2,VOLP1X,VOLWH1X,VOLPH1X
-  real(r8) :: VHCP1AX,VHCP1BX,VHXX
-
-  real(r8) :: XNUSW2,XNUSA2,XN,Z3S
-
-  integer :: IFLGU,IFLGUH,IFLGD
-
-  REAL(r8) :: THETA1,THETAL,THETWL &
-    ,TKW1,TK11,TK12
+  real(r8), parameter :: GRAVm=1.e-3_r8*GRAV  !gravitational constant devided by 1000.
   integer :: curday,curhour
 
   public :: watsub,InitWatsub
@@ -104,7 +85,7 @@ module WatsubMod
   integer :: K0,K1
   integer :: KL,L,L2,LL,M,MM,M1,M2,M3,M4,M5,M6,NX,NY
   integer :: N,N1,N2,N3,N4,N5,N6,NN,N4B,N5B,NUX
-  real(r8):: RAR1
+  real(r8):: RAR1,HFLXG
   REAL(R8):: FKSATS(JY,JX)
 ! begin_execution
 !
@@ -119,31 +100,27 @@ module WatsubMod
       D9890: DO  NY=NVN,NVS
 
 ! set up top boundary condition, uses RAR1
+        !VOLW2 will be updated in soil surface model
+        DO L=NUM(NY,NX),NL(NY,NX)        
+          VOLW2(L,NY,NX)=VOLW1(L,NY,NX)
+        ENDDO  
 
-        call InitSurfModel(M,NY,NX,RAR1,FKSATS(NY,NX))
-
-        call InitSoilAccums(M,NY,NX)
-
-        call SurfacePhysModel(M,NX,NY,NHE,NHW,NVS,NVN,RAR1,FKSATS(NY,NX))
+        call SurfacePhysModel(M,NX,NY,NHE,NHW,NVS,NVN,RAR1,FKSATS(NY,NX),HFLXG)
 
 ! do 3D water flow
-        call Subsurface3DFlow(M,NY,NX,NHE,NVS,FKSATS(NY,NX))
+        call Subsurface3DFlow(M,NY,NX,NHE,NVS,FKSATS(NY,NX),HFLXG)
+
       ENDDO D9890
     ENDDO D9895
 
-!
-!      if(curday>=41)call print_info('BOUNDARY WATER AND HEAT FLUXES',__LINE__)
-!
-!     XVOLT,XVOLW=excess water+ice,water in source grid cell
-!     VOLP2,VOLPH2=air-filled porosity in micropores,macropores
-      call WaterHeatExchThruBoundaryFlow(M,NHW,NHE,NVN,NVS,FKSATS)
+    call LateralWaterHeatExch(M,NHW,NHE,NVN,NVS,FKSATS)
 !
     IF(M.NE.NPH)THEN
 !     intermediate iteration
-      call UpdateStateSolutionNotNPH(M,NHW,NHE,NVN,NVS)
+      call UpdateStateFluxAtM(M,NHW,NHE,NVN,NVS)
     ELSE
 !     last iteration
-      call UpdateFLuxAtNPH(NHW,NHE,NVN,NVS)
+      call UpdateFluxAtExit(NHW,NHE,NVN,NVS)
     ENDIF
   ENDDO D3320
 
@@ -218,9 +195,9 @@ module WatsubMod
         VOLPM(1,L,NY,NX)=VOLP1(L,NY,NX)+VOLPH1(L,NY,NX)+THETPI*(VOLI1(L,NY,NX)+VOLIH1(L,NY,NX))
         VOLTX=VOLY(L,NY,NX)+VOLAH1(L,NY,NX)
         IF(VOLTX.GT.ZEROS2(NY,NX))THEN
-          THETWX(L,NY,NX)=AZMAX1((VOLW1(L,NY,NX)+VOLWH1(L,NY,NX))/VOLTX,tiny_val)
-          THETIX(L,NY,NX)=AZMAX1((VOLI1(L,NY,NX)+VOLIH1(L,NY,NX))/VOLTX,tiny_val)
-          THETPX(L,NY,NX)=AZMAX1((VOLP1(L,NY,NX)+VOLPH1(L,NY,NX))/VOLTX,tiny_val)
+          THETWX(L,NY,NX)=AZMAX1t((VOLW1(L,NY,NX)+VOLWH1(L,NY,NX))/VOLTX)
+          THETIX(L,NY,NX)=AZMAX1t((VOLI1(L,NY,NX)+VOLIH1(L,NY,NX))/VOLTX)
+          THETPX(L,NY,NX)=AZMAX1t((VOLP1(L,NY,NX)+VOLPH1(L,NY,NX))/VOLTX)
         ELSE
           THETWX(L,NY,NX)=POROS(L,NY,NX)
           THETIX(L,NY,NX)=0.0_r8
@@ -235,9 +212,9 @@ module WatsubMod
         !VHCP1=total heat capacity
         !VHCP1A=heat capcity without macropore water/ice
         !VHCP1B=heat capacity for macropore water/ice
-        VHCP1(L,NY,NX)=VHCM(L,NY,NX)+cpw*(VOLW1(L,NY,NX)+VOLWH1(L,NY,NX))+cpi*(VOLI1(L,NY,NX)+VOLIH1(L,NY,NX))
         VHCP1A(L,NY,NX)=VHCM(L,NY,NX)+cpw*VOLW1(L,NY,NX)+cpi*VOLI1(L,NY,NX)    
         VHCP1B(L,NY,NX)=cpw*VOLWH1(L,NY,NX)+cpi*VOLIH1(L,NY,NX)      
+        VHCP1(L,NY,NX)=VHCP1A(L,NY,NX)+VHCP1B(L,NY,NX)
     !
     !   MACROPOROSITY
     !
@@ -273,8 +250,7 @@ module WatsubMod
           HWFLU1(L,NY,NX)=0.0_r8
         ENDIF
         IF(CDPTH(L,NY,NX).GE.DTBLX(NY,NX))THEN
-          AREAU(L,NY,NX)=AMIN1(1.0_r8,AZMAX1(safe_adb(CDPTH(L,NY,NX)-DTBLX(NY,NX) &
-            ,DLYR(3,L,NY,NX))))
+          AREAU(L,NY,NX)=AMIN1(1.0_r8,AZMAX1(safe_adb(CDPTH(L,NY,NX)-DTBLX(NY,NX),DLYR(3,L,NY,NX))))
         ELSE
           AREAU(L,NY,NX)=0.0_r8
         ENDIF
@@ -392,21 +368,22 @@ module WatsubMod
 
 !------------------------------------------------------------------------------------------
 
-  subroutine Subsurface3DFlow(M,NY,NX,NHE,NVS,FKSAT)
+  subroutine Subsurface3DFlow(M,NY,NX,NHE,NVS,FKSAT,HFLXG)
   implicit none
-  integer, intent(in) :: M,NY,NX,NHE,NVS
-  real(r8), intent(in):: FKSAT
-
+  integer, intent(in)  :: M,NY,NX,NHE,NVS
+  real(r8), intent(in) :: FKSAT
+  real(r8), intent(in) :: HFLXG
   integer :: N,N1,N2,N3,N4,N5,N6,L,LL,K1,KL
-  real(r8) :: TK1X,FLVC,VP1,FLVX
-  real(r8) :: HFLWC,HFLWX,DTKX
-  real(r8) :: WTHET1,FCDX,FCLX,FCX,RYLNA1
-  real(r8) :: PSISV1,TKY,VPY,PSDX,THETW1,TCNDW1
-  real(r8) :: WPLX,WPX,WTHET2,CNV1,XNUSW1,XNUSA1
-  real(r8) :: TCNDA1,RYLXW1, TCND1,RYLNW1,RYLXA1
-  real(r8) :: DTHW1,DTHA1,HFLXG,PSIST1,FLQZ,FLQX
-  real(r8) :: FLQ2,CND1
-  real(r8) :: AVCNDL  
+  real(r8) :: DTKX
+  real(r8) :: WTHET1,FCDX,FCLX,FCX
+  real(r8) :: PSISV1,TKY,PSDX
+  real(r8) :: WPLX,WPX,WTHET2
+  real(r8) :: TCND2,TCND1
+
+  real(r8) :: AVCNDL,ATCNDL,CNDL  
+  real(r8) :: FLVL,HWFLVL,PSISVL
+  real(r8) :: TKLX
+  real(r8) :: HWFLHL,HWFLWL,HFLWS,THETA1,THETAL  
   integer  :: IFLGH
   !     begin_execution
   !
@@ -415,7 +392,8 @@ module WatsubMod
   !     N3,N2,N1=L,NY,NX of source grid cell
   !     N6,N5,N4=L,NY,NX of destination grid cell
   !
-  
+  call InitSoil3DModel(M,NY,NX)
+
   IFLGH=0
   D4400: DO L=1,NL(NY,NX)
     N1=NX
@@ -438,7 +416,7 @@ module WatsubMod
           !     ARTIFICIAL SOIL WARMING PREVENT LATERAL FLOW
           !
           !     IF(N2.EQ.2.AND.(N1.EQ.2.OR.N1.EQ.3).AND.L.LE.15)THEN
-          !     GO TO 4320
+          !     CYCLE
           !     ENDIF
         ENDIF
       ELSEIF(N.EQ.insthdir)THEN
@@ -454,7 +432,7 @@ module WatsubMod
           !     ARTIFICIAL SOIL WARMING PREVENT LATERAL FLOW
           !
           !     IF(N1.EQ.3.AND.(N2.EQ.1.OR.N2.EQ.2).AND.L.LE.15)THEN
-          !     GO TO 4320
+          !     CYCLE
           !     ENDIF
           !
           !     END ARTIFICIAL SOIL WARMING PREVENT LATERAL FLOW
@@ -492,113 +470,16 @@ module WatsubMod
       !
       IF(VOLX(N3,N2,N1).GT.ZEROS2(N2,N1))THEN
         IF(N3.GE.NUM(N2,N1).AND.N6.GE.NUM(N5,N4).AND.N3.LE.NL(N2,N1).AND.N6.LE.NL(N5,N4))THEN
-          !source
-          THETA1=AMAX1(THETY(N3,N2,N1),AMIN1(POROS(N3,N2,N1),safe_adb(VOLW1(N3,N2,N1),VOLY(N3,N2,N1))))
+
+          ! source layer
+          call CalcSoilWaterPotential(NY,NX,N1,N2,N3,THETA1)
           !dest
-          THETAL=AMAX1(THETY(N6,N5,N4),AMIN1(POROS(N6,N5,N4),safe_adb(VOLW1(N6,N5,N4),VOLY(N6,N5,N4))))
-          !
-          !     WATER POTENTIAL OF UPPER LAYER
-          !
-          !     BKVL=soil mass
-          !     FC,WP=water contents at field capacity,wilting point
-          !     FCL,WPL=log FC,WP
-          !     FCD,PSD=FCL-WPL,log(POROS)-FCL
-          !     PSISA1,PSIHY,PSISE=soil matric,hygroscopic,air entry potential
-          !     PSIMX,PSIMD,PSIMS=log water potential at FC,WP,saturation
-          !     PSISD=PSIMX-PSIMS
-          !     SRP=parameter for deviation from linear log-log water retention
-          !     PSISO=osmotic potential
-          !     DTHETW=minimum water content for numerical purpose
-          ! soil matric potential upper layer
-          IF(BKVL(N3,N2,N1).GT.ZEROS(NY,NX))THEN
-            !source layer is active soil
-            IF(THETA1.LT.FC(N3,N2,N1))THEN
-              !water less than field capacity
-              !PSIHY is the minimum water potential allowed
-              PSISA1(N3,N2,N1)=AMAX1(PSIHY,-EXP(PSIMX(N2,N1) &
-                +((FCL(N3,N2,N1)-LOG(THETA1))/FCD(N3,N2,N1)*PSIMD(N2,N1))))
-            ELSEIF(THETA1.LT.POROS(N3,N2,N1)-DTHETW)THEN
-              PSISA1(N3,N2,N1)=-EXP(PSIMS(N2,N1) &
-                +(((PSL(N3,N2,N1)-LOG(THETA1))/PSD(N3,N2,N1))**SRP(N3,N2,N1)*PSISD(N2,N1)))
-            ELSE
-              PSISA1(N3,N2,N1)=PSISE(N3,N2,N1)
-            ENDIF
-            !
-            !     SUBSURFCE UPPER WATER LAYER
-            !
-            !     THETIX,THETWX=ice,water concentration
-            !     FCI,WPI=ice field capacity,wilting point
-            !     PSISA1=matric water potential
-            !
-          ELSEIF(VOLX(N3,N2,N1).GT.ZEROS2(N2,N1).and.THETIX(N3,N2,N1)>ZEROS2(N2,N1))THEN
-            FCX=FCI*THETIX(N3,N2,N1)
-            WPX=WPI*THETIX(N3,N2,N1)
-            FCLX=LOG(FCX)
-            WPLX=LOG(WPX)
-            PSDX=PSL(N3,N2,N1)-FCLX
-            FCDX=FCLX-WPLX
-            IF(THETWX(N3,N2,N1).LT.FCX)THEN
-              PSISA1(N3,N2,N1)=AMAX1(PSIHY,-EXP(PSIMX(N2,N1) &
-                +((FCLX-LOG(THETWX(N3,N2,N1)))/FCDX*PSIMD(NY,NX))))
-            ELSEIF(THETWX(N3,N2,N1).LT.POROS(N3,N2,N1)-DTHETW)THEN
-              PSISA1(N3,N2,N1)=-EXP(PSIMS(N2,N1) &
-                +(((PSL(N3,N2,N1)-LOG(THETWX(N3,N2,N1)))/PSDX)*PSISD(N2,N1)))
-            ELSE
-              !saturated
-              PSISA1(N3,N2,N1)=PSISE(N3,N2,N1)
-            ENDIF
-          ELSE
-            PSISA1(N3,N2,N1)=PSISE(N3,N2,N1)
-          ENDIF
-          !     IF(N1.EQ.4.AND.N2.EQ.1.AND.N3.EQ.11)THEN
-          !     WRITE(*,1119)'PSISA1',I,J,M,N,N1,N2,N3,PSISA1(N3,N2,N1)
-          !    2,THETWX(N3,N2,N1),THETIX(N3,N2,N1),FCX,WPX
-          !    3,BKVL(N3,N2,N1),VOLX(N3,N2,N1)
-          !     ENDIF
-          !
-          !     WATER POTENTIAL OF LOWER LAYER
-!
-          IF(BKVL(N6,N5,N4).GT.ZEROS(NY,NX))THEN
-            IF(THETAL.LT.FC(N6,N5,N4))THEN
-              PSISA1(N6,N5,N4)=AMAX1(PSIHY,-EXP(PSIMX(N5,N4) &
-                +((FCL(N6,N5,N4)-LOG(THETAL))/FCD(N6,N5,N4)*PSIMD(N5,N4))))
-            ELSEIF(THETAL.LT.POROS(N6,N5,N4)-DTHETW)THEN
-              PSISA1(N6,N5,N4)=-EXP(PSIMS(N5,N4) &
-                +(((PSL(N6,N5,N4)-LOG(THETAL))/PSD(N6,N5,N4))**SRP(N6,N5,N4)*PSISD(N5,N4)))
-            ELSE
-              PSISA1(N6,N5,N4)=PSISE(N6,N5,N4)
-            ENDIF
-            !
-            !     SUBSURFCE LOWER WATER LAYER
-            !
-          ELSEIF(VOLX(N6,N5,N4).GT.ZEROS2(N5,N4).and.&
-            THETIX(N6,N5,N4)>ZEROS2(N5,N4))THEN
-            FCX=FCI*THETIX(N6,N5,N4)
-            WPX=WPI*THETIX(N6,N5,N4)
-            FCLX=LOG(FCX)
-            WPLX=LOG(WPX)
-            PSDX=PSL(N6,N5,N4)-FCLX
-            FCDX=FCLX-WPLX
-            IF(THETWX(N6,N5,N4).LT.FCX)THEN
-              PSISA1(N6,N5,N4)=AMAX1(PSIHY,-EXP(PSIMX(N5,N4) &
-                +((FCLX-LOG(THETWX(N6,N5,N4))) &
-                /FCDX*PSIMD(NY,NX))))
-            ELSEIF(THETWX(N6,N5,N4).LT.POROS(N6,N5,N4)-DTHETW)THEN
-              PSISA1(N6,N5,N4)=-EXP(PSIMS(NY,NX) &
-                +(((PSL(N6,N5,N4)-LOG(THETWX(N6,N5,N4))) &
-                /PSDX)*PSISD(NY,NX)))
-            ELSE
-              PSISA1(N6,N5,N4)=PSISE(N6,N5,N4)
-            ENDIF
-          ELSE
-            PSISA1(N6,N5,N4)=PSISE(N6,N5,N4)
-          ENDIF
+          call CalcSoilWaterPotential(NY,NX,N4,N5,N6,THETAL)
           !
           !     ACCOUNT FOR WETTING FRONTS WHEN CALCULATING WATER CONTENTS,
           !     MATRIC WATER POTENTIALS AND HYDRAULIC CONDUCTIVITIES USED
           !     IN WATER FLUX CALCULATIONS
           !
-          !     THETW1,THETWL=water concentrations in source,destination cells
           !     CND1,CNDL=hydraulic conductivities in source,destination cells
           !     FKSAT=reduction in soil surface Ksat from rainfall energy impact
           !     PSISM1=soil matric potential
@@ -607,278 +488,25 @@ module WatsubMod
           !     DARCY FLOW IF BOTH CELLS ARE SATURATED
           !     (CURRENT WATER POTENTIAL > AIR ENTRY WATER POTENTIAL)
           !
-          IF(PSISA1(N3,N2,N1).GT.PSISA(N3,N2,N1).AND.PSISA1(N6,N5,N4).GT.PSISA(N6,N5,N4))THEN
-            THETW1=THETA1
-            THETWL=THETAL
-            K1=MAX(1,MIN(100,INT(100.0_r8*(POROS(N3,N2,N1)-THETW1)/POROS(N3,N2,N1))+1))
-            KL=MAX(1,MIN(100,INT(100.0_r8*(POROS(N6,N5,N4)-THETWL)/POROS(N6,N5,N4))+1))
-            PSISM1(N3,N2,N1)=PSISA1(N3,N2,N1)
-            PSISM1(N6,N5,N4)=PSISA1(N6,N5,N4)
-            !
-            !     GREEN-AMPT FLOW IF ONE LAYER IS SATURATED
-            !     (CURRENT WATER POTENTIAL < AIR ENTRY WATER POENTIAL)
-            !
-            !     GREEN-AMPT FLOW IF SOURCE CELL SATURATED
-            !THETS=micropore soil water content
-          ELSEIF(PSISA1(N3,N2,N1).GT.PSISA(N3,N2,N1))THEN
-            THETW1=THETA1
-            THETWL=AMAX1(THETY(N6,N5,N4),AMIN1(POROS(N6,N5,N4),safe_adb(VOLWX1(N6,N5,N4),VOLY(N6,N5,N4))))
-            K1=MAX(1,MIN(100,INT(100.0_r8*(POROS(N3,N2,N1)-THETW1)/POROS(N3,N2,N1))+1))
-            KL=MAX(1,MIN(100,INT(100.0_r8*(POROS(N6,N5,N4)-AMIN1(THETS(N6,N5,N4),THETWL))/POROS(N6,N5,N4))+1))
-            PSISM1(N3,N2,N1)=PSISA1(N3,N2,N1)
-            
-            IF(BKVL(N6,N5,N4).GT.ZEROS(NY,NX))THEN
-              IF(THETWL.LT.FC(N6,N5,N4))THEN
-                PSISM1(N6,N5,N4)=AMAX1(PSIHY,-EXP(PSIMX(N5,N4) &
-                  +((FCL(N6,N5,N4)-LOG(THETWL)) &
-                  /FCD(N6,N5,N4)*PSIMD(N5,N4))))
-              ELSEIF(THETWL.LT.POROS(N6,N5,N4)-DTHETW)THEN
-                PSISM1(N6,N5,N4)=-EXP(PSIMS(N5,N4) &
-                  +(((PSL(N6,N5,N4)-LOG(THETWL)) &
-                  /PSD(N6,N5,N4))**SRP(N6,N5,N4)*PSISD(N5,N4)))
-              ELSE
-                THETWL=POROS(N6,N5,N4)
-                PSISM1(N6,N5,N4)=PSISE(N6,N5,N4)
-              ENDIF
-            ELSE
-              THETWL=POROS(N6,N5,N4)
-              PSISM1(N6,N5,N4)=PSISE(N6,N5,N4)
-            ENDIF
-            !
-            !     GREEN-AMPT FLOW IF ADJACENT CELL SATURATED
-!
-          ELSEIF(PSISA1(N6,N5,N4).GT.PSISA(N6,N5,N4))THEN
-            THETW1=AMAX1(THETY(N3,N2,N1),AMIN1(POROS(N3,N2,N1) &
-              ,safe_adb(VOLWX1(N3,N2,N1),VOLY(N3,N2,N1))))
-            THETWL=THETAL
-            K1=MAX(1,MIN(100,INT(100.0*(POROS(N3,N2,N1) &
-              -AMIN1(THETS(N3,N2,N1),THETW1))/POROS(N3,N2,N1))+1))
-            KL=MAX(1,MIN(100,INT(100.0*(POROS(N6,N5,N4) &
-              -THETWL)/POROS(N6,N5,N4))+1))
-            IF(BKVL(N3,N2,N1).GT.ZEROS(NY,NX))THEN
-              IF(THETW1.LT.FC(N3,N2,N1))THEN
-                PSISM1(N3,N2,N1)=AMAX1(PSIHY,-EXP(PSIMX(N2,N1) &
-                  +((FCL(N3,N2,N1)-LOG(THETW1))/FCD(N3,N2,N1)*PSIMD(N2,N1))))
-              ELSEIF(THETW1.LT.POROS(N3,N2,N1)-DTHETW)THEN
-                PSISM1(N3,N2,N1)=-EXP(PSIMS(N2,N1)+(((PSL(N3,N2,N1)-LOG(THETW1)) &
-                  /PSD(N3,N2,N1))**SRP(N3,N2,N1)*PSISD(N2,N1)))
-              ELSE
-                THETW1=POROS(N3,N2,N1)
-                PSISM1(N3,N2,N1)=PSISE(N3,N2,N1)
-              ENDIF
-            ELSE
-              THETW1=POROS(N3,N2,N1)
-              PSISM1(N3,N2,N1)=PSISE(N3,N2,N1)
-            ENDIF
-            !
-            !     RICHARDS FLOW IF NEITHER CELL IS SATURATED
-            !     (CURRENT WATER POTENTIAL < AIR ENTRY WATER POTENTIAL)
-            !
-          ELSE
-            THETW1=THETA1
-            THETWL=THETAL
-            K1=MAX(1,MIN(100,INT(100.0*(POROS(N3,N2,N1)-THETW1)/POROS(N3,N2,N1))+1))
-            KL=MAX(1,MIN(100,INT(100.0*(POROS(N6,N5,N4)-THETWL)/POROS(N6,N5,N4))+1))
-            PSISM1(N3,N2,N1)=PSISA1(N3,N2,N1)
-            PSISM1(N6,N5,N4)=PSISA1(N6,N5,N4)
-          ENDIF
-          !
-          !     HYDRAULIC CONUCTIVITY
-          !
-          !     CND1,CNDL=hydraulic conductivity of source,destination layer
-          !     HCND=lateral(1,2),vertical(3) micropore hydraulic conductivity
-          !
-          IF(N3.EQ.NUM(NY,NX))THEN
-            CND1=HCND(N,K1,N3,N2,N1)*FKSAT
-          ELSE
-            CND1=HCND(N,K1,N3,N2,N1)
-          ENDIF
-          CNDL=HCND(N,KL,N6,N5,N4)
-          !
-          !     TOTAL SOIL WATER POTENTIAL = MATRIC, GRAVIMETRIC + OSMOTIC
-          !
-          !     PSISM1,PSISH,PSISO=soil matric,gravitational,osmotic potentials
-    !
-          PSIST1=PSISM1(N3,N2,N1)+PSISH(N3,N2,N1)+PSISO(N3,N2,N1)
-          PSISTL=PSISM1(N6,N5,N4)+PSISH(N6,N5,N4)+PSISO(N6,N5,N4)
-          PSISV1=PSISM1(N3,N2,N1)+PSISO(N3,N2,N1)
-          PSISVL=PSISM1(N6,N5,N4)+PSISO(N6,N5,N4)
-          !
-          !     HYDRAULIC CONDUCTIVITY FROM CURRENT WATER CONTENT
-          !     AND LOOKUP ARRAY GENERATED IN 'HOUR1'
-          !
-          !     CND1,CNDL=hydraulic conductivities in source,destination cells
-          !     FKSAT=reduction in soil surface Ksat from rainfall energy impact
-          !     AVCNDL=source-destination hydraulic conductance
-          !     DLYR=layer thickness
-          !
-          IF(CND1.GT.ZERO.AND.CNDL.GT.ZERO)THEN
-            AVCNDL=2.0*CND1*CNDL/(CND1*DLYR(N,N6,N5,N4)+CNDL*DLYR(N,N3,N2,N1))
-          ELSE
-            AVCNDL=0.0_r8
-          ENDIF
-          !
-          !     WATER FLUX FROM WATER POTENTIALS, HYDRAULIC CONDUCTIVITY
-          !     CONSTRAINED BY WATER POTENTIAL GRADIENT, COUPLED WITH
-          !     CONVECTIVE HEAT FLUX FROM WATER FLUX
-          !
-          !     FLQX,FLQL=micropore water flux unlimited,limited by source water
-          !     XNPH=time step of flux calculations
-          !     VOLW2,VOLP1=water,air contents of source,destination micropores
-          !     HWFLWL=convective heat flux from micropore water flux
-          !     VOLP1Z=excess water+ice relative to porosity
-          !
-          FLQX=AVCNDL*(PSIST1-PSISTL)*AREA(N,N3,N2,N1)*XNPH
-          IF(FLQX.GE.0.0_r8)THEN
-            IF(THETW1.GT.THETS(N3,N2,N1))THEN
-              FLQZ=FLQX+AMIN1((THETW1-THETS(N3,N2,N1)) &
-                *VOLY(N3,N2,N1),AZMAX1((THETS(N6,N5,N4)-THETWL) &
-                *VOLY(N6,N5,N4)))*XNPX
-            ELSE
-              FLQZ=FLQX
-            ENDIF
-            FLQL=AZMAX1(AMIN1(FLQZ,VOLW2(N3,N2,N1)*XNPX,VOLP1(N6,N5,N4)*XNPX))
-            FLQ2=AZMAX1(AMIN1(FLQX,VOLW2(N3,N2,N1)*XNPX,VOLP1(N6,N5,N4)*XNPX))
-            !     FLQL1=(THETW1-THETS(N3,N2,N1))*VOLY(N3,N2,N1)
-            !     FLQL2=(THETS(N6,N5,N4)-THETWL)*VOLY(N6,N5,N4)
-            !     FLQL3=FLQX+AMIN1(FLQL1,AZMAX1(FLQL2))*XNPX
-            !     FLQL4=AZMAX1(AMIN1(FLQL3,VOLP1(N6,N5,N4)*XNPX))
-          ELSE
-            IF(THETWL.GT.THETS(N6,N5,N4))THEN
-              FLQZ=FLQX+AMAX1((THETS(N6,N5,N4)-THETWL) &
-                *VOLY(N6,N5,N4),AZMIN1((THETW1-THETS(N3,N2,N1)) &
-                *VOLY(N3,N2,N1)))*XNPX
-            ELSE
-              FLQZ=FLQX
-            ENDIF
-            FLQL=AZMIN1(AMAX1(FLQZ,-VOLW2(N6,N5,N4)*XNPX,-VOLP1(N3,N2,N1)*XNPX))
-            FLQ2=AZMIN1(AMAX1(FLQX,-VOLW2(N6,N5,N4)*XNPX,-VOLP1(N3,N2,N1)*XNPX))
-            !     FLQL1=(THETS(N6,N5,N4)-THETWL)*VOLY(N6,N5,N4)
-            !     FLQL2=(THETW1-THETS(N3,N2,N1))*VOLY(N3,N2,N1)
-            !     FLQL3=FLQX+AMAX1(FLQL1,AZMIN1(FLQL2))*XNPX
-            !     FLQL4=AZMIN1(AMAX1(FLQL3,-VOLP1(N3,N2,N1)*XNPX))
-          ENDIF
-          IF(N.EQ.ivertdir.AND.VOLP1Z(N6,N5,N4).LT.0.0_r8)THEN
-            FLQL=FLQL+AZMIN1(AMAX1(-VOLW2(N6,N5,N4)*XNPX,VOLP1Z(N6,N5,N4)))
-            FLQ2=FLQ2+AZMIN1(AMAX1(-VOLW2(N6,N5,N4)*XNPX,VOLP1Z(N6,N5,N4)))
-          ENDIF
-          IF(FLQL.GT.0.0_r8)THEN
-            HWFLQL=cpw*TK1(N3,N2,N1)*FLQL
-          ELSE
-            HWFLQL=cpw*TK1(N6,N5,N4)*FLQL
-          ENDIF
-          VOLW2(N3,N2,N1)=VOLW2(N3,N2,N1)-FLQL
-          VOLW2(N6,N5,N4)=VOLW2(N6,N5,N4)+FLQL
+          call MicporeDarcyFlow(NY,NX,N,N1,N2,N3,N4,N5,N6,THETA1,THETAL,FKSAT,HWFLWL,PSISV1,PSISVL)          
+
 !
           !     MACROPORE FLOW FROM POISEUILLE FLOW IF MACROPORES PRESENT
           !
-          !     PSISH1,PSISHL=macropore total water potl in source,destination
-          !     DLYR=layer thickness
-          !     VOLWH1,VOLPH1=macropore water,air content
-    !
-          IF(VOLAH1(N3,N2,N1).GT.ZEROS2(N2,N1) &
-            .AND.VOLAH1(N6,N5,N4).GT.ZEROS2(N5,N4).AND.IFLGH.EQ.0)THEN
-            PSISH1=PSISH(N3,N2,N1)+0.0098_r8*DLYR(3,N3,N2,N1) &
-              *(AMIN1(1.0_r8,AZMAX1(VOLWH1(N3,N2,N1)/VOLAH1(N3,N2,N1)))-0.5)
-            PSISHL=PSISH(N6,N5,N4)+0.0098_r8*DLYR(3,N6,N5,N4) &
-              *(AMIN1(1.0_r8,AZMAX1(VOLWH1(N6,N5,N4)/VOLAH1(N6,N5,N4)))-0.5)
-            !
-            !     MACROPORE FLOW IF GRAVITATIONAL GRADIENT IS POSITIVE
-            !     AND MACROPORE POROSITY EXISTS IN ADJACENT CELL
-            !
-            !     FLWHX,FLWHL=macropore water flux unltd,ltd by source water
-            !     XNPH=time step of flux calculations
-            !     VOLW2,VOLP1=water,air contents of source,destination micropores
-            !     HWFLHL=convective heat flux from micropore water flux
-            !
-            FLWHX=AVCNHL(N,N6,N5,N4)*(PSISH1-PSISHL)*AREA(N,N3,N2,N1)*XNPH
-            IF(N.NE.ivertdir)THEN
-              IF(PSISH1.GT.PSISHL)THEN
-                FLWHL(N,N6,N5,N4)=AZMAX1(AMIN1(AMIN1(VOLWH1(N3,N2,N1) &
-                  ,VOLPH1(N6,N5,N4))*XNPX,FLWHX))
-              ELSEIF(PSISH1.LT.PSISHL)THEN
-                FLWHL(N,N6,N5,N4)=AZMIN1(AMAX1(AMAX1(-VOLWH1(N6,N5,N4) &
-                  ,-VOLPH1(N3,N2,N1))*XNPX,FLWHX))
-              ELSE
-                FLWHL(N,N6,N5,N4)=0.0_r8
-              ENDIF
-            ELSE
-              FLWHL(N,N6,N5,N4)=AZMAX1(AMIN1(AMIN1(VOLWH1(N3,N2,N1)*XNPX &
-                +FLWHL(N,N3,N2,N1),VOLPH1(N6,N5,N4)*XNPX),FLWHX))
-            ENDIF
-            IF(N.EQ.ivertdir)THEN
-              FLWHL(N,N6,N5,N4)=FLWHL(N,N6,N5,N4)+AZMIN1(VOLPH1Z(N6,N5,N4))
-            ENDIF
-            FLWHM(M,N,N6,N5,N4)=FLWHL(N,N6,N5,N4)
-          ELSE
-            FLWHL(N,N6,N5,N4)=0.0_r8
-            FLWHM(M,N,N6,N5,N4)=0.0_r8
-            IF(VOLPH1(N6,N5,N4).LE.0.0_r8)IFLGH=1
-          ENDIF
-          IF(FLWHL(N,N6,N5,N4).GT.0.0_r8)THEN
-            HWFLHL=cpw*TK1(N3,N2,N1)*FLWHL(N,N6,N5,N4)
-          ELSE
-            HWFLHL=cpw*TK1(N6,N5,N4)*FLWHL(N,N6,N5,N4)
-          ENDIF
-!
-          !     VAPOR PRESSURE AND DIFFUSIVITY IN EACH GRID CELL
-          !
-          !     THETPM,THETX=current, minimum air-filled porosity
-          !     TK11,TK12=interim soil temperature in source,destination
-          !     VP1,VPL=vapor concentration in source,destination
-          !     PSISV1,PSISVL=matric+osmotic water potl in source,destination
-          !     CNV1,CNV2=vapor conductivities of source, destination
-          !     POROS,POROQ=porosity, tortuosity
-          !     WGSGL=vapor diffusivity
-          !     ATCNVL=source,destination vapor conductance
-          !     DLYR=soil layer depth
-          !     FLVC,FLVX=vapor flux unlimited,limited by vapor
-          !     VPY=equilibrium vapor concentration
-          !     XNPX=time step for flux calculations
-          !     FLVL,HWFLVL=vapor flux and its convective heat flux
-!
-          IF(THETPM(M,N3,N2,N1).GT.THETX &
-            .AND.THETPM(M,N6,N5,N4).GT.THETX)THEN
-            TK11=TK1(N3,N2,N1)
-            TK12=TK1(N6,N5,N4)
+          call MacporeFLow(NY,NX,M,N,N1,N2,N3,N4,N5,N6,HWFLHL,IFLGH)
 
-            VP1=vapsat(TK11)*EXP(18.0*PSISV1/(RGAS*TK11))
-            !VPL=2.173E-03/TK12 &
-            !*0.61*EXP(5360.0*(3.661E-03-1.0/TK12)) &
-            VPL=vapsat(TK12)*EXP(18.0*PSISVL/(RGAS*TK12))
-            CNV1=WGSGL(N3,N2,N1)*THETPM(M,N3,N2,N1)*POROQ &
-              *THETPM(M,N3,N2,N1)/POROS(N3,N2,N1)
-            CNVL=WGSGL(N6,N5,N4)*THETPM(M,N6,N5,N4)*POROQ &
-              *THETPM(M,N6,N5,N4)/POROS(N6,N5,N4)
-            ATCNVL=2.0*CNV1*CNVL &
-              /(CNV1*DLYR(N,N6,N5,N4)+CNVL*DLYR(N,N3,N2,N1))
-            !
-            !     VAPOR FLUX FROM VAPOR PRESSURE AND DIFFUSIVITY,
-            !     AND CONVECTIVE HEAT FLUX FROM VAPOR FLUX
-        !
-            FLVC=ATCNVL*(VP1-VPL)*AREA(N,N3,N2,N1)*XNPH
-            VPY=(VP1*VOLPM(M,N3,N2,N1)+VPL*VOLPM(M,N6,N5,N4)) &
-              /(VOLPM(M,N3,N2,N1)+VOLPM(M,N6,N5,N4))
-            FLVX=(VP1-VPY)*VOLPM(M,N3,N2,N1)*XNPX
-            IF(FLVC.GE.0.0_r8)THEN
-              FLVL=AZMAX1(AMIN1(FLVC,FLVX))
-              HWFLVL=(cpw*TK1(N3,N2,N1)+VAP)*FLVL
-            ELSE
-              FLVL=AZMIN1(AMAX1(FLVC,FLVX))
-              HWFLVL=(cpw*TK1(N6,N5,N4)+VAP)*FLVL
-            ENDIF
-          ELSE
-            FLVL=0.0_r8
-            HWFLVL=0.0_r8
-          ENDIF
+!
+          call WaterVaporFlow(M,N,N1,N2,N3,N4,N5,N6,PSISV1,PSISVL,FLVL,HWFLVL)
+
           !
           !     FLWL=total water+vapor flux to destination
           !     FLWLX=total unsaturated water+vapor flux to destination
           !     HWFLWL=total convective heat flux from water+vapor flux
           !
-          FLWL(N,N6,N5,N4)=FLQL+FLVL
-          FLWLX(N,N6,N5,N4)=FLQ2+FLVL
-          HWFLWL=HWFLQL+HWFLVL
+          FLWL(N,N6,N5,N4)=FLWL(N,N6,N5,N4)+FLVL
+          FLWLX(N,N6,N5,N4)=FLWLX(N,N6,N5,N4)+FLVL
+          HWFLWL=HWFLWL+HWFLVL
+          HFLWL(N,N6,N5,N4)=HWFLWL+HWFLHL
           !
           !     THERMAL CONDUCTIVITY IN EACH GRID CELL
           !
@@ -888,103 +516,16 @@ module WatsubMod
           !     TCND1,TCNDL=soil thermal conductivity in source,destination
           !     WTHET*=multiplier for air concn in thermal conductivity
           !     ATCNDL=source-destination thermal conductance
-      !
+          !
           DTKX=ABS(TK1(N3,N2,N1)-TK1(N6,N5,N4))*ppmc
-          IF(BKDS(N3,N2,N1).GT.ZERO.OR.THETWX(N3,N2,N1)+THETIX(N3,N2,N1).GT.ZERO)THEN
-            DTHW1=AZMAX1(THETWX(N3,N2,N1)-TRBW)**3
-            DTHA1=AZMAX1(THETPX(N3,N2,N1)-TRBA)**3
-            RYLXW1=DTKX*DTHW1
-            RYLXA1=DTKX*DTHA1
-            RYLNW1=AMIN1(1.0E+04_r8,RYLXW*RYLXW1)
-            RYLNA1=AMIN1(1.0E+04_r8,RYLXA*RYLXA1)
-            XNUSW1=AMAX1(1.0_r8,0.68_r8+0.67_r8*RYLNW1**0.25_r8/DNUSW)
-            XNUSA1=AMAX1(1.0_r8,0.68_r8+0.67_r8*RYLNA1**0.25_r8/DNUSA)
-            TCNDW1=2.067E-03_r8*XNUSW1
-            TCNDA1=9.050E-05_r8*XNUSA1
-            WTHET1=1.467_r8-0.467_r8*THETPY(N3,N2,N1)
-            TCND1=(STC(N3,N2,N1)+THETWX(N3,N2,N1)*TCNDW1 &
-              +0.611_r8*THETIX(N3,N2,N1)*7.844E-03_r8 &
-              +WTHET1*THETPX(N3,N2,N1)*TCNDA1) &
-              /(DTC(N3,N2,N1)+THETWX(N3,N2,N1)+0.611*THETIX(N3,N2,N1) &
-              +WTHET1*THETPX(N3,N2,N1))
-          ELSE
-            TCND1=0.0_r8
-          ENDIF
-          IF(BKDS(N6,N5,N4).GT.ZERO.OR.THETWX(N6,N5,N4)+THETIX(N6,N5,N4).GT.ZERO)THEN
-            DTHW2=AZMAX1(THETWX(N6,N5,N4)-TRBW)**3._r8
-            DTHA2=AZMAX1(THETPX(N6,N5,N4)-TRBA)**3._r8
-            RYLXW2=DTKX*DTHW2
-            RYLXA2=DTKX*DTHA2
-            RYLNW2=AMIN1(1.0E+04_r8,RYLXW*RYLXW2)
-            RYLNA2=AMIN1(1.0E+04_r8,RYLXA*RYLXA2)
-            XNUSW2=AMAX1(1.0_r8,0.68_r8+0.67_r8*RYLNW2**0.25_r8/DNUSW)
-            XNUSA2=AMAX1(1.0_r8,0.68_r8+0.67_r8*RYLNA2**0.25_r8/DNUSA)
-            TCNDW2=2.067E-03_r8*XNUSW2
-            TCNDA2=9.050E-05_r8*XNUSA2
-            WTHET2=1.467_r8-0.467_r8*THETPY(N6,N5,N4)
-            TCND2=(STC(N6,N5,N4)+THETWX(N6,N5,N4)*TCNDW2 &
-              +0.611_r8*THETIX(N6,N5,N4)*7.844E-03 &
-              +WTHET2*THETPX(N6,N5,N4)*TCNDA2) &
-              /(DTC(N6,N5,N4)+THETWX(N6,N5,N4)+0.611*THETIX(N6,N5,N4) &
-              +WTHET2*THETPX(N6,N5,N4))
-          ELSE
-            TCND2=0.0_r8
-          ENDIF
-          ATCNDL=(2.0_r8*TCND1*TCND2)/(TCND1*DLYR(N,N6,N5,N4)+TCND2*DLYR(N,N3,N2,N1))
-          !
-          !     HEAT FLOW FROM THERMAL CONDUCTIVITY AND TEMPERATURE GRADIENT
-          !
-          !     VHCP1,VHCPW=volumetric heat capacity of soil,snowpack
-          !     TK1X,TKLX=interim temperatures of source,destination
-          !     HWFLVL,HFLXG=convective heat from soil vapor flux
-          !     HFLXG=storage heat flux from snowpack
-          !     TKY=equilibrium source-destination temperature
-          !     HFLWC,HFLWX=source-destination heat flux unltd,ltd by heat
-          !     ATCNDL=source-destination thermal conductance
-          !     HFLWSX=source-destination conductive heat flux
-          !     HFLWL=total conductive+convective source-destination heat flux
-          !
-          IF(VHCP1(N3,N2,N1).GT.VHCPNX(NY,NX))THEN
-            IF(N3.EQ.NUM(NY,NX).AND.VHCPW(1,N2,N1).LE.VHCPWX(N2,N1))THEN
-              TK1X=TK1(N3,N2,N1)-(HWFLVL-HFLXG)/VHCP1(N3,N2,N1)
-              if(abs(TK1X)>1.e5_r8)then
-                write(*,*)'TK1(N3,N2,N1)-HWFLVL/VHCP1(N3,N2,N1)',&
-                  TK1(N3,N2,N1),HWFLVL,HFLXG,VHCP1(N3,N2,N1)
-                write(*,*)'N1,n2,n3',N1,N2,N3
-                call endrun(trim(mod_filename)//' at line',__LINE__)
-              endif
-            ELSE
-              TK1X=TK1(N3,N2,N1)-HWFLVL/VHCP1(N3,N2,N1)
-              if(abs(TK1X)>1.e5_r8)then
-                write(*,*)'TK1(N3,N2,N1)-HWFLVL/VHCP1(N3,N2,N1)',&
-                  TK1(N3,N2,N1),HWFLVL,VHCP1(N3,N2,N1)
-                write(*,*)'N1,n2,n3',N1,N2,N3
-                call endrun(trim(mod_filename)//' at line',__LINE__)
-              endif
-            ENDIF
-          ELSE
-            TK1X=TK1(N3,N2,N1)
-          ENDIF
 
-          IF(VHCP1(N6,N5,N4).GT.ZEROS(NY,NX))THEN
-            TKLX=TK1(N6,N5,N4)+HWFLVL/VHCP1(N6,N5,N4)
-          ELSE
-            TKLX=TK1(N6,N5,N4)
-          ENDIF
-          
-          if(VHCP1(N3,N2,N1)+VHCP1(N6,N5,N4)>0._r8)then
-            TKY=(VHCP1(N3,N2,N1)*TK1X+VHCP1(N6,N5,N4)*TKLX)/(VHCP1(N3,N2,N1)+VHCP1(N6,N5,N4))
-          ELSE
-            TKY=(TK1X+TKLX)/2._r8
-          endif 
-          HFLWX=(TK1X-TKY)*VHCP1(N3,N2,N1)*XNPX
-          HFLWC=ATCNDL*(TK1X-TKLX)*AREA(N,N3,N2,N1)*XNPH
-          IF(HFLWC.GE.0.0_r8)THEN
-            HFLWSX=AZMAX1(AMIN1(HFLWX,HFLWC))
-          ELSE
-            HFLWSX=AZMIN1(AMAX1(HFLWX,HFLWC))
-          ENDIF
-          HFLWL(N,N6,N5,N4)=HWFLWL+HWFLHL+HFLWSX
+          call CalcThermConduc(N1,N2,N3,DTKX,TCND1)
+
+          call CalcThermConduc(N4,N5,N6,DTKX,TCND2)
+
+          ATCNDL=(2.0_r8*TCND1*TCND2)/(TCND1*DLYR(N,N6,N5,N4)+TCND2*DLYR(N,N3,N2,N1))
+
+          call Solve4Heat(N,NY,NX,N1,N2,N3,N4,N5,N6,ATCNDL,HWFLVL,HFLXG)
 
           !
           !     TOTAL WATER, VAPOR AND HEAT FLUXES
@@ -1013,6 +554,7 @@ module WatsubMod
           FLWM(M,N,N6,N5,N4)=0.0_r8
           FLWHM(M,N,N6,N5,N4)=0.0_r8
         ENDIF
+
       ELSE
         IF(N.EQ.ivertdir)THEN
           FLWL(N,N3,N2,N1)=0.0_r8
@@ -1036,7 +578,7 @@ module WatsubMod
   end subroutine Subsurface3DFlow
 !------------------------------------------------------------------------------------------
 
-  subroutine WaterHeatExchThruBoundaryFlow(M,NHW,NHE,NVN,NVS,FKSATS)
+  subroutine LateralWaterHeatExch(M,NHW,NHE,NVN,NVS,FKSATS)
 !     boundary flow involes exchange with external water table, and through
 !     tile drainage
   implicit none
@@ -1046,13 +588,18 @@ module WatsubMod
   integer :: L,LL
   integer :: N,NN,N1,N2,N3,N4,N5,N4B,N5B,N6
   integer :: M1,M2,M3,M4,M5,M6,K1,KL
-  integer :: IFLGDH
-  real(r8) :: TK1X,TFLX1,VHCP1X
-  real(r8) :: ENGY1,CND1,VOLW1X
-  real(r8) :: TFREEZ,TFLX,TFLXH
+  integer :: IFLGDH,IFLGU,IFLGUH,IFLGD
+  real(r8) :: CND1,VOLW1X
+  real(r8) :: FLWT
   real(r8) :: RCHQF,RCHGFU,RCHGFT
-!     begin_execution
+  real(r8) :: DPTHH,CNDL
+  real(r8) :: FINHX,THETAX  
+  real(r8) :: VOLP2,VOLPX2,VOLPH2
+  real(r8) :: XN,THETA1
+  real(r8) :: VOLP1X,VOLWH1X,VOLPH1X
 
+!     begin_execution
+!     VOLP2,VOLPH2=air-filled porosity in micropores,macropores
   D9595: DO  NX=NHW,NHE
     D9590: DO  NY=NVN,NVS
       D9585: DO L=NUM(NY,NX),NL(NY,NX)
@@ -1060,12 +607,11 @@ module WatsubMod
         VOLPX2=VOLP2
         VOLPH2=VOLAH1(L,NY,NX)-VOLWH1(L,NY,NX)-VOLIH1(L,NY,NX)
 !
-        call Config4WaterTableDrain(L,NY,NX,IFLGU,DPTHH)
+        call Config4WaterTableDrain(L,NY,NX,IFLGU,IFLGUH,DPTHH)
 
 !
 !     IDENTIFY CONDITIONS FOR MICROPRE DISCHARGE TO TILE DRAIN
         call Config4TileDrainage(L,NY,NX,IFLGD,IFLGDH,DPTHH)
-
 !
 !     LOCATE ALL EXTERNAL BOUNDARIES AND SET BOUNDARY CONDITIONS
 !     ENTERED IN 'READS'
@@ -1196,8 +742,7 @@ module WatsubMod
             IF(L.EQ.NUM(N2,N1).AND.N.NE.ivertdir.AND.(CDPTH(NU(N2,N1)-1,N2,N1).LE.CDPTHI(N2,N1) &
               .OR.BKDS(NUI(N2,N1),N2,N1).GT.ZERO))THEN
 !not in vertical direction
-              IF(IRCHG(NN,N,N2,N1).EQ.0.OR.test_aeqb(RCHQF,0._r8) &
-                .OR.ABS(QRM(M,N2,N1)).LT.ZEROS(N2,N1))THEN
+              IF(IRCHG(NN,N,N2,N1).EQ.0.OR.test_aeqb(RCHQF,0._r8).OR.ABS(QRM(M,N2,N1)).LT.ZEROS(N2,N1))THEN
                 !no runoff
                 QR1(N,NN,M5,M4)=0.0_r8
                 HQR1(N,NN,M5,M4)=0.0_r8
@@ -1231,7 +776,8 @@ module WatsubMod
           ! ON LEVEL OF WATER TABLE
 !
             IF(VOLX(N3,N2,N1).GT.ZEROS2(NY,NX))THEN
-              IF(NCN(N2,N1).NE.3.OR.N.EQ.ivertdir)THEN
+              IF(NCN(N2,N1).NE.ivertdir.OR.N.EQ.ivertdir)THEN
+              !including lateral connection or woking on vertical direction
 !
               ! IF NO WATER TABLE
               !
@@ -1248,10 +794,8 @@ module WatsubMod
               ! RCHG*=boundary flags
 !
               IF(IDTBL(N2,N1).EQ.0.OR.N.EQ.ivertdir)THEN
-                THETA1=AMAX1(THETY(N3,N2,N1),AMIN1(POROS(N3,N2,N1) &
-                  ,safe_adb(VOLW1(N3,N2,N1),VOLY(N3,N2,N1))))
-                THETAX=AMAX1(THETY(N3,N2,N1),AMIN1(POROS(N3,N2,N1) &
-                  ,safe_adb(VOLWX1(N3,N2,N1),VOLY(N3,N2,N1))))
+                THETA1=AMAX1(THETY(N3,N2,N1),AMIN1(POROS(N3,N2,N1),safe_adb(VOLW1(N3,N2,N1),VOLY(N3,N2,N1))))
+                THETAX=AMAX1(THETY(N3,N2,N1),AMIN1(POROS(N3,N2,N1),safe_adb(VOLWX1(N3,N2,N1),VOLY(N3,N2,N1))))
                 K1=MAX(1,MIN(100,INT(100.0_r8*(POROS(N3,N2,N1)-THETA1)/POROS(N3,N2,N1))+1))
                 KL=MAX(1,MIN(100,INT(100.0*(POROS(N3,N2,N1)-THETAX)/POROS(N3,N2,N1))+1))
                 IF(N3.EQ.NUM(NY,NX))THEN
@@ -1259,10 +803,11 @@ module WatsubMod
                 ELSE
                   CND1=HCND(N,K1,N3,N2,N1)
                 ENDIF
-                CNDL=HCND(N,KL,N3,N2,N1)
+                
                 FLWL(N,M6,M5,M4)=AMIN1(VOLW1(N3,N2,N1)*XNPX &
-                  ,XN*0.0098_r8*(-ABS(SLOPE(N,N2,N1)))*CND1*AREA(3,N3,N2,N1)) &
+                  ,XN*GRAVm*(-ABS(SLOPE(N,N2,N1)))*CND1*AREA(3,N3,N2,N1)) &
                   *RCHGFU*RCHGFT*XNPH
+
                 if(abs(FLWL(N,M6,M5,M4))>1.e20)then
                   write(*,*)'VOLW1(N3,N2,N1)*XNPX=',VOLW1(N3,N2,N1),XNPX
                   write(*,*)'XN=',XN,CND1
@@ -1272,221 +817,17 @@ module WatsubMod
                 endif
                 FLWLX(N,M6,M5,M4)=FLWL(N,M6,M5,M4)
                 FLWHL(N,M6,M5,M4)=AMIN1(VOLWH1(L,NY,NX)*XNPX &
-                 ,XN*0.0098_r8*(-ABS(SLOPE(N,N2,N1)))*CNDH1(L,NY,NX)*AREA(3,N3,N2,N1)) &
+                 ,XN*GRAVm*(-ABS(SLOPE(N,N2,N1)))*CNDH1(L,NY,NX)*AREA(3,N3,N2,N1)) &
                  *RCHGFU*RCHGFT*XNPH
                 HFLWL(N,M6,M5,M4)=cpw*TK1(N3,N2,N1)*(FLWL(N,M6,M5,M4)+FLWHL(N,M6,M5,M4))
               ELSE
 !
-          !     MICROPORE DISCHARGE ABOVE WATER TABLE
-          !
-          !     IFLGU=micropore discharge flag to natural water table
-          !     PSISWD=water potential from water table slope
-          !     XN,RCHG*=direction indicator,boundary flag
-          !     SLOPE=sin(lateral slope)
-          !     DLYR=layer width
-          !     DTBLG=water table slope
-          !     PSISWT=water potential driving micropore discharge
-          !     PSISA1,PSISO=matric,osmotic water potential
-          !     DPTH,DTBLX=depth to layer midpoint,natural water table
-          !     DPTHT=depth to internal water table
-          !     FLWL=micropore discharge to natural water table
-          !     HFLWL=convective heat from discharge to natural water table
-          !     HCND=saturated hydraulic conductivity
-          !     AREAU=fraction of layer below natural water table
-!
-                IF(IFLGU.EQ.0.AND.test_aneb(RCHGFT,0._r8))THEN
-                  PSISWD=XN*0.005_r8*SLOPE(N,N2,N1)*DLYR(N,N3,N2,N1)*(1.0_r8-DTBLG(N2,N1))
-                  PSISWT=AZMIN1(-PSISA1(N3,N2,N1)-0.03*PSISO(N3,N2,N1) &
-                    +0.0098_r8*(DPTH(N3,N2,N1)-DTBLX(N2,N1)) &
-                    -0.0098_r8*AZMAX1(DPTH(N3,N2,N1)-DPTHT(N2,N1)))
-                  IF(PSISWT.LT.0.0_r8)PSISWT=PSISWT-PSISWD
-                  FLWT=PSISWT*HCND(N,1,N3,N2,N1)*AREA(N,N3,N2,N1) &
-                    *(1.0_r8-AREAU(N3,N2,N1))/(RCHGFU+1.0)*RCHGFT*XNPH
-                  FLWL(N,M6,M5,M4)=XN*FLWT
-                  FLWLX(N,M6,M5,M4)=XN*FLWT
-                  HFLWL(N,M6,M5,M4)=cpw*TK1(N3,N2,N1)*XN*FLWT
-                ELSE
-                  FLWL(N,M6,M5,M4)=0.0_r8
-                  FLWLX(N,M6,M5,M4)=0.0_r8
-                  HFLWL(N,M6,M5,M4)=0.0_r8
-                ENDIF
-!
-          !     MACROPORE DISCHARGE ABOVE WATER TABLE
-          !
-        !     IFLGUH=macropore discharge flag to natural water table
-        !     PSISWD=water potential from water table slope
-        !     XN,RCHG*=direction indicator,boundary flag
-        !     SLOPE=sin(lateral slope)
-        !     DLYR=layer width
-        !     DTBLG=water table slope
-        !     PSISWTH=water potential driving macropore discharge
-        !     PSISO=osmotic water potential
-        !     DPTHH,DTBLX=depth to layer macropore water,natural water table
-        !     DPTHT=depth to internal water table
-        !     FLWTH,FLWTHL=macropore discharge unltd,ltd by macropore water
-        !     CNDH1=macropore hydraulic conductivity
-        !     FLWHL=macropore discharge to natural water table
-        !     HFLWL=convective heat from discharge to natural water table
-        !     HCND=saturated hydraulic conductivity
-          !     AREAU=fraction of layer below natural water table
-!
-                IF(IFLGUH.EQ.0.AND.test_aneb(RCHGFT,0._r8).AND.VOLAH1(N3,N2,N1).GT.ZEROS2(N2,N1))THEN
-                  PSISWD=XN*0.005*SLOPE(N,N2,N1)*DLYR(N,N3,N2,N1)*(1.0_r8-DTBLG(N2,N1))
-                  PSISWTH=-0.03*PSISO(N3,N2,N1) &
-                    +0.0098_r8*(DPTHH-DTBLX(N2,N1)) &
-                    -0.0098_r8*AZMAX1(DPTHH-DPTHT(N2,N1))
-                  IF(PSISWTH.LT.0.0_r8)PSISWTH=PSISWTH-PSISWD
-                  FLWTH=PSISWTH*CNDH1(N3,N2,N1)*AREA(N,N3,N2,N1) &
-                    *(1.0_r8-AREAU(N3,N2,N1))/(RCHGFU+1.0)*RCHGFT*XNPH
-                  FLWTHL=AMAX1(FLWTH,AZMIN1(-(VOLWH1(N3,N2,N1)*XNPX &
-                    +FLWHL(3,N3,N2,N1)-FLWHL(3,N3+1,N2,N1))))
-                  FLWHL(N,M6,M5,M4)=XN*FLWTHL
-                  HFLWL(N,M6,M5,M4)=HFLWL(N,M6,M5,M4)+cpw*TK1(N3,N2,N1)*XN*FLWTHL
-                ELSE
-                  FLWHL(N,M6,M5,M4)=0.0_r8
-                ENDIF
-!
-                !     MICROPORE DISCHARGE ABOVE TILE DRAIN
-                !
-                !     IFLGD=micropore discharge flag to artificial water table
-                !     PSISWD=water potential from water table slope
-                !     XN,RCHG*=direction indicator,boundary flag
-                !     SLOPE=sin(lateral slope)
-                !     DLYR=layer width
-                !     DTBLG=water table slope
-                !     PSISWT=water potential driving micropore discharge
-                !     PSISA1,PSISO=matric,osmotic water potential
-                !     DPTH,DTBLY=depth to layer midpoint,artificial water table
-                !     DPTHT=depth to internal water table
-                !     FLWL=micropore discharge to natural+artificial water table
-                !     HFLWL=convective heat from dischg to natural+artifl water table
-                !     HCND=saturated hydraulic conductivity
-                !     AREAUD=fraction of layer below artificial water table
-!
-                IF(IFLGD.EQ.0.AND.test_aneb(RCHGFT,0._r8))THEN
-                  PSISWD=XN*0.005*SLOPE(N,N2,N1)*DLYR(N,N3,N2,N1)*(1.0_r8-DTBLG(N2,N1))
-                  PSISWT=AZMIN1(-PSISA1(N3,N2,N1)-0.03*PSISO(N3,N2,N1) &
-                    +0.0098_r8*(DPTH(N3,N2,N1)-DTBLY(N2,N1)) &
-                    -0.0098_r8*AZMAX1(DPTH(N3,N2,N1)-DPTHT(N2,N1)))
-                  IF(PSISWT.LT.0.0_r8)PSISWT=PSISWT-PSISWD
-                  FLWT=PSISWT*HCND(N,1,N3,N2,N1)*AREA(N,N3,N2,N1) &
-                    *(1.0_r8-AREAUD(N3,N2,N1))/(RCHGFU+1.0)*RCHGFT*XNPH
-                  FLWL(N,M6,M5,M4)=FLWL(N,M6,M5,M4)+XN*FLWT
-                  FLWLX(N,M6,M5,M4)=FLWLX(N,M6,M5,M4)+XN*FLWT
-                  HFLWL(N,M6,M5,M4)=HFLWL(N,M6,M5,M4)+cpw*TK1(N3,N2,N1)*XN*FLWT
-                ENDIF
-            !
-            !     MACROPORE DISCHARGE ABOVE TILE DRAIN
-            !
-            !     IFLGDH=macropore discharge flag to artificial water table
-            !     PSISWD=water potential from water table slope
-            !     XN,RCHG*=direction indicator,boundary flag
-            !     SLOPE=sin(lateral slope)
-            !     DLYR=layer width
-            !     DTBLG=water table slope
-            !     PSISWTH=water potential driving macropore discharge
-            !     PSISO=osmotic water potential
-            !     DPTHH,DTBLY=depth to layer macropore water,artificl water table
-            !     DPTHT=depth to internal water table
-            !     FLWTH,FLWTHL=macropore discharge unltd,ltd by macropore water
-            !     CNDH1=macropore hydraulic conductivity
-            !     FLWHL=macropore discharge to artificial water table
-            !     HFLWL=convective heat from discharge to artificial water table
-            !     HCND=saturated hydraulic conductivity
-            !     AREAUD=fraction of layer below artificial water table
-!
-                IF(IFLGDH.EQ.0.AND.test_aneb(RCHGFT,0._r8).AND.VOLAH1(N3,N2,N1).GT.ZEROS2(N2,N1))THEN
-                  PSISWD=XN*0.005_r8*SLOPE(N,N2,N1)*DLYR(N,N3,N2,N1)*(1.0_r8-DTBLG(N2,N1))
-                  PSISWTH=-0.03_r8*PSISO(N3,N2,N1) &
-                    +0.0098_r8*(DPTHH-DTBLY(N2,N1)) &
-                    -0.0098_r8*AZMAX1(DPTHH-DPTHT(N2,N1))
-                  IF(PSISWTH.LT.0.0_r8)PSISWTH=PSISWTH-PSISWD
-                  FLWTH=PSISWTH*CNDH1(N3,N2,N1)*AREA(N,N3,N2,N1) &
-                    *(1.0_r8-AREAUD(N3,N2,N1))/(RCHGFU+1.0_r8)*RCHGFT*XNPH
-                  FLWTHL=AMAX1(FLWTH,AMIN1(0.0_r8 &
-                    ,-(VOLWH1(N3,N2,N1)*XNPX+FLWHL(3,N3,N2,N1)-FLWHL(3,N3+1,N2,N1))))
-                  FLWHL(N,M6,M5,M4)=FLWHL(N,M6,M5,M4)+XN*FLWTHL
-                  HFLWL(N,M6,M5,M4)=HFLWL(N,M6,M5,M4)+cpw*TK1(N3,N2,N1)*XN*FLWTHL
-                ENDIF
-!
-            !     MICROPORE RECHARGE BELOW WATER TABLE
-            !
-            !     DPTH,DTBLX=depth to layer midpoint,natural water table
-            !     DPTHA=active layer depth
-            !     VOLP2=air volume
-            !     PSISWD=water potential from water table slope
-            !     XN,RCHG*=direction indicator,boundary flag
-            !     SLOPE=sin(lateral slope)
-            !     DLYR=layer width
-            !     DTBLG=water table slope
-            !     PSISUT=water potential driving micropore recharge
-            !     PSISA1,PSISO=matric,osmotic water potential
-            !     DPTH,DTBLX=depth to layer midpoint,natural water table
-            !     FLWU,FLWUL=micropore recharge unltd,ltd by micropore air volume
-            !     FLWL=micropore recharge from natural water table
-            !     HFLWL=convective heat from recharge from natural water table
-            !     HCND=saturated hydraulic conductivity
-            !     AREAU=fraction of layer below natural water table
-            !     VOLP1Z=air filled 
-                IF(DPTH(N3,N2,N1).GE.DTBLX(N2,N1) &
-                  .AND.DPTHA(N2,N1).GT.DTBLX(N2,N1) &
-                  .AND.DPTH(N3,N2,N1).LT.DPTHA(N2,N1) &
-                  .AND.(VOLP2.GT.ZEROS2(N2,N1).OR.BKDS(N3,N2,N1).LE.ZERO) &
-                  .AND.VOLP1Z(N3,N2,N1).GT.0.0_r8 &
-                  .AND.test_aneb(RCHGFT,0._r8))THEN
-                  PSISWD=XN*0.005_r8*SLOPE(N,N2,N1)*DLYR(N,N3,N2,N1)*(1.0_r8-DTBLG(N2,N1))
-                  PSISUT=AZMAX1(-PSISA1(N3,N2,N1)-0.03*PSISO(N3,N2,N1) &
-                    +0.0098_r8*(DPTH(N3,N2,N1)-DTBLX(N2,N1)))
-                  IF(PSISUT.GT.0.0_r8)PSISUT=PSISUT+PSISWD
-                  FLWU=PSISUT*HCND(N,1,N3,N2,N1)*AREA(N,N3,N2,N1) &
-                    *AREAU(N3,N2,N1)/(RCHGFU+1.0)*RCHGFT*XNPH
-                  IF(BKDS(N3,N2,N1).GT.ZERO)THEN
-                    FLWUL=AMIN1(FLWU,VOLP2)
-                    FLWUX=AMIN1(FLWU,VOLPX2)
-                  ELSE
-                    FLWUL=FLWU
-                    FLWUX=FLWU
-                  ENDIF
-                  FLWL(N,M6,M5,M4)=FLWL(N,M6,M5,M4)+XN*FLWUL
-                  FLWLX(N,M6,M5,M4)=FLWLX(N,M6,M5,M4)+XN*FLWUX
-                  HFLWL(N,M6,M5,M4)=HFLWL(N,M6,M5,M4)+cpw*TK1(N3,N2,N1)*XN*FLWUL
-                  VOLP2=VOLP2-XN*FLWL(N,M6,M5,M4)
-                  VOLPX2=VOLPX2-XN*FLWLX(N,M6,M5,M4)
-                ENDIF
-!
-                !     MACROPORE RECHARGE BELOW WATER TABLE
-                !
-                !     PSISWD=water potential from water table slope
-                !     XN,RCHG*=direction indicator,boundary flag
-                !     SLOPE=sin(lateral slope)
-                !     DLYR=layer width
-                !     DTBLG=water table slope
-                !     PSISUTH=water potential driving macropore recharge
-                !     PSISO=osmotic water potential
-                !     DPTHH,DTBLX=depth to layer macropore water,natural water table
-                !     DPTHT=depth to internal water table
-                !     CNDH1=macropore hydraulic conductivity
-                !     FLWUH,FLWUHL=macropore recharge unltd,ltd by macropore air volume
-                !     FLWHL=macropore discharge to natural water table
-                !     HFLWL=convective heat from discharge to natural water table
-                !     HCND=saturated hydraulic conductivity
-                !     AREAU=fraction of layer below natural water table
-!
-                IF(DPTHH.GT.DTBLX(N2,N1) &
-                  .AND.DPTHA(N2,N1).GT.DTBLX(N2,N1) &
-                  .AND.DPTH(N3,N2,N1).LT.DPTHA(N2,N1) &
-                  .AND.VOLPH2.GT.ZEROS2(NY,NX) &
-                  .AND.test_aneb(RCHGFT,0.0_r8))THEN
-                  PSISWD=XN*0.005*SLOPE(N,N2,N1)*DLYR(N,N3,N2,N1)*(1.0_r8-DTBLG(N2,N1))
-                  PSISUTH=-0.03_r8*PSISO(N3,N2,N1)+0.0098_r8*(DPTHH-DTBLX(N2,N1))
-                  IF(PSISUTH.GT.0.0_r8)PSISUTH=PSISUTH+PSISWD
-                  FLWUH=PSISUTH*CNDH1(N3,N2,N1)*AREA(N,N3,N2,N1) &
-                    *AREAU(N3,N2,N1)/(RCHGFU+1.0)*RCHGFT*XNPH
-                  FLWUHL=AMIN1(FLWUH,VOLPH2*XNPX)
-                  FLWHL(N,M6,M5,M4)=FLWHL(N,M6,M5,M4)+XN*FLWUHL
-                  HFLWL(N,M6,M5,M4)=HFLWL(N,M6,M5,M4)+cpw*TK1(N3,N2,N1)*XN*FLWUHL
-                  VOLPH2=VOLPH2-XN*FLWHL(N,M6,M5,M4)
-                ENDIF
+                CALL WaterTBLDrain(N,N1,N2,N3,M4,M5,M6,IFLGU,IFLGUH,RCHGFU,RCHGFT,DPTHH,XN)
+
+                call TileDrain(N,N1,N2,N3,M4,M5,M6,IFLGD,IFLGDH,RCHGFT,RCHGFU,DPTHH,XN)
+
+                call SubSufRecharge(NY,NX,N,N1,N2,N3,M4,M5,M6,DPTHH,RCHGFU,RCHGFT,XN,VOLP2,VOLPX2,VOLPH2)
+
               ENDIF
 !
         !     SUBSURFACE HEAT SOURCE/SINK
@@ -1496,7 +837,7 @@ module WatsubMod
         !     TKSD=deep source/sink temperature from geothermal flux
         !     TCNDG=thermal conductivity below lower boundary
         !     DPTHSK,CDPTH=depth of thermal sink/source, lower boundary
-        !
+        !     IETYP=Koppen climate zone
               IF(N.EQ.ivertdir.AND.IETYP(N2,N1).NE.-2)THEN
                 HFLWL(N,M6,M5,M4)=HFLWL(N,M6,M5,M4)+(TK1(N3,N2,N1) &
                   -TKSD(N2,N1))*TCNDG/(DPTHSK(N2,N1)-CDPTH(N3,N2,N1)) &
@@ -1527,7 +868,8 @@ module WatsubMod
     !     QS1,QW1,QI1=snow,water,ice transfer
     !     HQS1=convective heat transfer from snow,water,ice transfer
 !
-        IF(L.EQ.NUM(N2,N1).AND.N.NE.ivertdir)THEN        
+        IF(L.EQ.NUM(N2,N1).AND.N.NE.ivertdir)THEN
+          !top layer snow redistribution
           call SumSnowRoffDrift(M,N,N1,N2,N4,N5,N4B,N5B)
         ENDIF
 !
@@ -1588,92 +930,11 @@ module WatsubMod
         FINHM(M,N3,N2,N1)=FINHL(N3,N2,N1)
         FINH(N3,N2,N1)=FINH(N3,N2,N1)+FINHL(N3,N2,N1)
       ELSE
-        FINHL(N3,N2,N1)=0.0
-        FINHM(M,N3,N2,N1)=0.0
+        FINHL(N3,N2,N1)=0.0_r8
+        FINHM(M,N3,N2,N1)=0.0_r8
       ENDIF
-!
-!     FREEZE-THAW IN SOIL LAYER MICROPORE FROM NET CHANGE IN SOIL
-!     LAYER HEAT STORAGE
-!
-!     TFREEZ=micropore freezing temperature
-!     PSISA1,PSISO=micropore matric,osmotic potential
-!     VOLW1*,VOLI1=micropore water,ice volume
-!     VOLWH1*,VOLIH1=macropore water,ice volume
-!     VHCP1X,VHCP1AX,VHCP1BX=total soil,micropore,macropore heat capacity
-!     VHCM=soil solid volumetric heat capacity
-!     TK1*=soil temperature
-!     THFLWL=total soil conductive, convective heat flux
-!     HWFLU1=subsurface convective heat flux
-!     TFLX1,TFLX=latent heat from micro freeze-thaw unltd,ltd by water,ice
-!     WFLXL=soil water flux from micropore freeze-thaw
-!     TFLXH1,TFLXL=latent heat from macro freeze-thaw unltd,ltd by water,ice
-!     WFLXLH=soil water flux from macropore freeze-thaw
-!
-      PSISMX=PSISA1(N3,N2,N1)+PSISO(N3,N2,N1)
-      TFREEZ=-9.0959E+04/(PSISMX-333.0)
-      VOLW1X=VOLW1(N3,N2,N1)+TFLWL(N3,N2,N1)+FINHL(N3,N2,N1)+FLU1(N3,N2,N1)
-      VOLWH1X=VOLWH1(N3,N2,N1)+TFLWHL(N3,N2,N1)-FINHL(N3,N2,N1)
-      ENGY1=VHCP1(N3,N2,N1)*TK1(N3,N2,N1)
-      VHCP1X=VHCM(N3,N2,N1)+cpw*(VOLW1X+VOLWH1X) &
-        +cpi*(VOLI1(N3,N2,N1)+VOLIH1(N3,N2,N1))
-      IF(VHCP1X.GT.ZEROS(NY,NX))THEN
-        TK1X=(ENGY1+THFLWL(N3,N2,N1)+HWFLU1(N3,N2,N1))/VHCP1X
-        IF((TK1X.LT.TFREEZ &
-          .AND.VOLW1(N3,N2,N1).GT.ZERO*VOLT(N3,N2,N1)) &
-          .OR.(TK1X.GT.TFREEZ &
-          .AND.VOLI1(N3,N2,N1).GT.ZERO*VOLT(N3,N2,N1)))THEN
-          VHCP1AX=VHCM(N3,N2,N1)+cpw*VOLW1X+cpi*VOLI1(N3,N2,N1)
-          TFLX1=VHCP1AX*(TFREEZ-TK1X)/((1.0+6.2913E-03*TFREEZ) &
-            *(1.0_r8-0.10*PSISMX))*XNPX
-          IF(TFLX1.LT.0.0_r8)THEN
-            TFLX=AMAX1(-333.0*DENSI*VOLI1(N3,N2,N1)*XNPX,TFLX1)
-          ELSE
-            TFLX=AMIN1(333.0*VOLW1X*XNPX,TFLX1)
-          ENDIF
-            WFLXL(N3,N2,N1)=-TFLX/333.0_r8
-          ELSE
-            TFLX=0.0_r8
-            WFLXL(N3,N2,N1)=0.0_r8
-          ENDIF
-        ELSE
-          TFLX=0.0_r8
-          WFLXL(N3,N2,N1)=0.0_r8
-        ENDIF
-!
-!     FREEZE-THAW IN SOIL LAYER MACROPORE FROM NET CHANGE IN SOIL
-!     LAYER HEAT STORAGE
-!
-        IF((TK1X.LT.TFice.AND.VOLWH1(N3,N2,N1) &
-          .GT.ZERO*VOLT(N3,N2,N1)).OR.(TK1X.GT.TFice &
-          .AND.VOLIH1(N3,N2,N1).GT.ZERO*VOLT(N3,N2,N1)))THEN
-          VHCP1BX=cpw*VOLWH1X+cpi*VOLIH1(L,NY,NX)
-          TFLXH1=VHCP1BX*(TFREEZ-TK1X)/((1.0_r8+6.2913E-03_r8*TFREEZ) &
-            *(1.0_r8-0.10_r8*PSISMX))*XNPX
-          IF(TFLXH1.LT.0.0_r8)THEN
-            TFLXH=AMAX1(-333.0_r8*DENSI*VOLIH1(N3,N2,N1)*XNPX,TFLXH1)
-          ELSE
-            TFLXH=AMIN1(333.0_r8*VOLWH1X*XNPX,TFLXH1)
-          ENDIF
-          WFLXLH(N3,N2,N1)=-TFLXH/333.0_r8
-        ELSE
-          TFLXH=0.0_r8
-          WFLXLH(N3,N2,N1)=0.0_r8
-        ENDIF
-        TFLXL(N3,N2,N1)=TFLX+TFLXH
-          !
-          !     TOTAL AND HOURLY ACCUMULATED FREEZE-THAW FLUXES
-        !
-        !     THAW,THAWH=hourly accumulated freeze-thaw flux in micropores,macropores
-        !     HTHAW=hourly accumulated freeze-thaw latent heat flux
-        !     TWFLXL,TWFLXH=total accumulated freeze-thaw in micropores,macropores
-          !     TTFLXL=total latent heat flux
-!
-        THAW(N3,N2,N1)=THAW(N3,N2,N1)+WFLXL(N3,N2,N1)
-        THAWH(N3,N2,N1)=THAWH(N3,N2,N1)+WFLXLH(N3,N2,N1)
-        HTHAW(N3,N2,N1)=HTHAW(N3,N2,N1)+TFLXL(N3,N2,N1)
-        TWFLXL(N3,N2,N1)=TWFLXL(N3,N2,N1)+WFLXL(N3,N2,N1)
-        TWFLXH(N3,N2,N1)=TWFLXH(N3,N2,N1)+WFLXLH(N3,N2,N1)
-        TTFLXL(N3,N2,N1)=TTFLXL(N3,N2,N1)+TFLXL(N3,N2,N1)
+
+      call FreezeThaw(NY,NX,L,N1,N2,N3)
 !
 !     DISSIPATE WETTING FRONT
 !
@@ -1685,10 +946,10 @@ module WatsubMod
     ENDDO D9590
   ENDDO D9595
 
-  end subroutine WaterHeatExchThruBoundaryFlow
+  end subroutine LateralWaterHeatExch
 !------------------------------------------------------------------------------------------
 
-  subroutine UpdateStateSolutionNotNPH(M,NHW,NHE,NVN,NVS)
+  subroutine UpdateStateFluxAtM(M,NHW,NHE,NVN,NVS)
   !
   !Description
   ! Early exit of the watsub solver
@@ -1698,39 +959,14 @@ module WatsubMod
   integer :: L,NUX,LL,Ls
 
   real(r8) :: tk1pres,tk1l
-  real(r8) :: ENGY1,VOLTX
+  real(r8) :: ENGY1,VOLTX,VHXX
+  real(r8) :: TKXX
+  
 ! begin_execution
   D9795: DO NX=NHW,NHE
     D9790: DO NY=NVN,NVS
 
-      call UpdateSnoIntmed(M,NY,NX)
-
-!      if(curday>=176)then
-!        write(*,*)'line',__LINE__,'tk1',TK1(8,ny,nx),TK1(9,ny,nx),NUM(NY,NX),NL(NY,NX)
-!      endif
-      !
-      ! SURFACE RESIDUE WATER AND TEMPERATURE
-      !
-      ! XVOLT,XVOLW=free water+ice,water in litter layer
-      ! VOLWM,VOLPM=surface water,air content for use in trnsfr.f
-      ! VOLWRX=maximum water retention by litter
-      ! VHCP1=volumetric heat capacity of litter
-      ! VOLA1,VOLW1,VOLI1,VOLP1=pore,water,ice,air volumes of litter
-      ! VOLWRX=maximum water retention by litter
-      ! TFLXR,WFLXR=litter water,latent heat flux from freeze-thaw
-      ! VOLR=dry litter volume
-      ! THETWX,THETIX,THETPX=water,ice,air concentrations
-      ! VHCP1=volumetric heat capacity of litter
-      ! TK1=litter temperature
-      ! HFLWRL,TFLXR,THQR1=litter total cond+conv,latent,runoff heat flux
-      !
-      ! if(curday>=41)then
-      !   write(*,*)'VOLW1(0,NY,NX)=',VOLW1(0,NY,NX),FLWRL(NY,NX),WFLXR(NY,NX),TQR1(NY,NX)
-      !   write(*,*)'VOLI1(0,NY,NX)=',VOLI1(0,NY,NX),WFLXR(NY,NX)
-      !   write(*,*)'at line',__LINE__
-      ! endif
-      call UpdateSurfaceVars(M,NY,NX)
-
+      call UpdateSurfaceAtM(M,NY,NX)
 
       !
       ! SOIL LAYER WATER, ICE AND TEMPERATURE
@@ -1782,21 +1018,24 @@ module WatsubMod
             VOLAH1(L,NY,NX)=AZMAX1(VOLAH(L,NY,NX)-FVOLAH*CCLAY(L,NY,NX) &
               *(safe_adb(VOLW1(L,NY,NX),VOLY(L,NY,NX))-WP(L,NY,NX))*VOLT(L,NY,NX))
           ELSE
-            VOLP1Z(L,NY,NX)=0.0
-            VOLP1(L,NY,NX)=0.0
-            VOLPH1Z(L,NY,NX)=0.0
-            VOLPH1(L,NY,NX)=0.0
+            VOLP1Z(L,NY,NX)=0.0_r8
+            VOLP1(L,NY,NX)=0.0_r8
+            VOLPH1Z(L,NY,NX)=0.0_r8
+            VOLPH1(L,NY,NX)=0.0_r8
             VOLA1(L,NY,NX)=VOLW1(L,NY,NX)+VOLI1(L,NY,NX)
-            VOLAH1(L,NY,NX)=0.0
+            VOLAH1(L,NY,NX)=0.0_r8
           ENDIF
+
+          !record intermediate variables for bgc calculation
           VOLWM(M+1,L,NY,NX)=VOLW1(L,NY,NX)
           VOLWHM(M+1,L,NY,NX)=VOLWH1(L,NY,NX)
           VOLPM(M+1,L,NY,NX)=VOLP1(L,NY,NX)+VOLPH1(L,NY,NX)+THETPI*(VOLI1(L,NY,NX)+VOLIH1(L,NY,NX))
+          !change in soil air volume
           FLPM(M,L,NY,NX)=VOLPM(M,L,NY,NX)-VOLPM(M+1,L,NY,NX)
           VOLTX=VOLY(L,NY,NX)+VOLAH1(L,NY,NX)
-          THETWX(L,NY,NX)=AZMAX1((VOLW1(L,NY,NX)+VOLWH1(L,NY,NX))/VOLTX,tiny_val)
-          THETIX(L,NY,NX)=AZMAX1((VOLI1(L,NY,NX)+VOLIH1(L,NY,NX))/VOLTX,tiny_val)
-          THETPX(L,NY,NX)=AZMAX1((VOLP1(L,NY,NX)+VOLPH1(L,NY,NX))/VOLTX,tiny_val)
+          THETWX(L,NY,NX)=AZMAX1t((VOLW1(L,NY,NX)+VOLWH1(L,NY,NX))/VOLTX)
+          THETIX(L,NY,NX)=AZMAX1t((VOLI1(L,NY,NX)+VOLIH1(L,NY,NX))/VOLTX)
+          THETPX(L,NY,NX)=AZMAX1t((VOLP1(L,NY,NX)+VOLPH1(L,NY,NX))/VOLTX)
           THETPM(M+1,L,NY,NX)=THETPX(L,NY,NX)
           IF(VOLA1(L,NY,NX)+VOLAH1(L,NY,NX).GT.ZEROS2(NY,NX))THEN
             THETPY(L,NY,NX)=AZMAX1((VOLP1(L,NY,NX)+VOLPH1(L,NY,NX)) &
@@ -1825,10 +1064,9 @@ module WatsubMod
             write(*,*)'VHCP1(L,NY,NX),TK1(L,NY,NX)',L,VHCP1(L,NY,NX),TK1(L,NY,NX)
             call endrun(trim(mod_filename)//' at line',__LINE__)
           endif
-          VHCP1(L,NY,NX)=VHCM(L,NY,NX)+cpw*(VOLW1(L,NY,NX)&
-            +VOLWH1(L,NY,NX))+cpi*(VOLI1(L,NY,NX)+VOLIH1(L,NY,NX))
           VHCP1A(L,NY,NX)=VHCM(L,NY,NX)+cpw*VOLW1(L,NY,NX)+cpi*VOLI1(L,NY,NX)
           VHCP1B(L,NY,NX)=cpw*VOLWH1(L,NY,NX)+cpi*VOLIH1(L,NY,NX)
+          VHCP1(L,NY,NX)=VHCP1A(L,NY,NX)+VHCP1B(L,NY,NX)
           !
           !         BEGIN ARTIFICIAL SOIL WARMING
           !
@@ -1873,8 +1111,7 @@ module WatsubMod
       !       NUM=new surface layer number after complete lake evaporation
       !       FLWNU,FLWHNU,HFLWNU=lake surface water flux, heat flux if lake surface disappears
 !
-      IF(BKDS(NUM(NY,NX),NY,NX).LE.ZERO.AND.&
-        VHCP1(NUM(NY,NX),NY,NX).LE.VHCPNX(NY,NX))THEN
+      IF(BKDS(NUM(NY,NX),NY,NX).LE.ZERO.AND.VHCP1(NUM(NY,NX),NY,NX).LE.VHCPNX(NY,NX))THEN
         NUX=NUM(NY,NX)
         DO  LL=NUX+1,NL(NY,NX)
           IF(VOLX(LL,NY,NX).GT.ZEROS2(NY,NX))THEN
@@ -1890,12 +1127,12 @@ module WatsubMod
     ENDDO D9790
   ENDDO D9795
 
-  end subroutine UpdateStateSolutionNotNPH
+  end subroutine UpdateStateFluxAtM
 
 
 !------------------------------------------------------------------------------------------
 
-  subroutine UpdateFLuxAtNPH(NHW,NHE,NVN,NVS)
+  subroutine UpdateFluxAtExit(NHW,NHE,NVN,NVS)
   implicit none
   integer, intent(in) :: NHW,NHE,NVN,NVS
 
@@ -1916,7 +1153,7 @@ module WatsubMod
       ENDIF
     ENDDO D9690
   ENDDO D9695
-  end subroutine UpdateFLuxAtNPH
+  end subroutine UpdateFluxAtExit
 
 !--------------------------------------------------------------------------
 
@@ -1937,13 +1174,13 @@ module WatsubMod
 !     IFLGD=micropore discharge flag to artificial water table
 !
   IF(IDTBL(NY,NX).GE.3.AND.DPTH(L,NY,NX).LT.DTBLY(NY,NX))THEN
-    IF(PSISM1(L,NY,NX).GT.0.0098_r8*(DPTH(L,NY,NX)-DTBLY(NY,NX)))THEN
+    IF(PSISM1(L,NY,NX).GT.GRAVm*(DPTH(L,NY,NX)-DTBLY(NY,NX)))THEN
       IFLGD=0
       IF(L.LT.NL(NY,NX))THEN
         D9568: DO  LL=L+1,NL(NY,NX)
-          DTBLYX=DTBLY(NY,NX)+PSISE(LL,NY,NX)/0.0098_r8
+          DTBLYX=DTBLY(NY,NX)+PSISE(LL,NY,NX)/GRAVm
           IF(DPTH(LL,NY,NX).LT.DTBLYX)THEN
-            IF((PSISM1(LL,NY,NX).LE.0.0098_r8*(DPTH(LL,NY,NX)-DTBLYX) &
+            IF((PSISM1(LL,NY,NX).LE.GRAVm*(DPTH(LL,NY,NX)-DTBLYX) &
               .AND.L.NE.NL(NY,NX)).OR.DPTH(LL,NY,NX).GT.DPTHA(NY,NX))THEN
               IFLGD=1
             ENDIF
@@ -1990,31 +1227,35 @@ module WatsubMod
   end subroutine Config4TileDrainage
 !------------------------------------------------------------------
 
-  subroutine Config4WaterTableDrain(L,NY,NX,IFLGU,DPTHH)
+  subroutine Config4WaterTableDrain(L,NY,NX,IFLGU,IFLGUH,DPTHH)
 
   implicit none
   integer , intent(in) :: L,NY,NX
-  integer , intent(out):: IFLGU
+  integer , intent(out):: IFLGU,IFLGUH
   real(r8), intent(out):: DPTHH
 
   real(r8) :: DTBLXX
   integer :: LL
+
 !     IDENTIFY CONDITIONS FOR MICROPRE DISCHARGE TO WATER TABLE
 !
 !     IDTBL=water table flag
 !     DPTH,DTBLX=depth to layer midpoint,natural water table
-!     PSISM1,PSISE=matric,air entry water potential
+!     PSISM1(<0),PSISE(<0)=matric,air entry water potential [MPa], from water height to MPa, 1.e-6*9.8*1.e3*H
 !     DTBLXX=equilibrium water potential with natural water table
 !     DPTHA=active layer depth
 !     IFLGU=micropore discharge flag to natural water table
-!
+!  total water potential psi+rho*grav*h
+
   IF(IDTBL(NY,NX).NE.0.AND.DPTH(L,NY,NX).LT.DTBLX(NY,NX))THEN
-    IF(PSISM1(L,NY,NX).GT.0.0098_r8*(DPTH(L,NY,NX)-DTBLX(NY,NX)))THEN
+    !the layer mid-depth is lower than water table
+    IF(PSISM1(L,NY,NX).GT.GRAVm*(DPTH(L,NY,NX)-DTBLX(NY,NX)))THEN
       IFLGU=0
       D9565: DO LL=MIN(L+1,NL(NY,NX)),NL(NY,NX)
-        DTBLXX=DTBLX(NY,NX)+PSISE(LL,NY,NX)/0.0098_r8
+        !water level difference
+        DTBLXX=DTBLX(NY,NX)+PSISE(LL,NY,NX)/GRAVm  
         IF(DPTH(LL,NY,NX).LT.DTBLXX)THEN
-          IF((PSISM1(LL,NY,NX).LE.0.0098_r8*(DPTH(LL,NY,NX)-DTBLXX) &
+          IF((PSISM1(LL,NY,NX).LE.GRAVm*(DPTH(LL,NY,NX)-DTBLXX) &
             .AND.L.NE.NL(NY,NX)).OR.DPTH(LL,NY,NX).GT.DPTHA(NY,NX))THEN
             IFLGU=1
           ENDIF
@@ -2041,7 +1282,7 @@ module WatsubMod
     DPTHH=CDPTH(L,NY,NX)
   ENDIF
   IF(IDTBL(NY,NX).NE.0.AND.DPTHH.LT.DTBLX(NY,NX).AND.VOLWH1(L,NY,NX).GT.ZEROS2(NY,NX))THEN
-!active water table
+    !active water table
     IFLGUH=0
 !     DO 9566 LL=MIN(L+1,NL(NY,NX)),NL(NY,NX)
 !     IF(DPTH(LL,NY,NX).LT.DTBLX(NY,NX))THEN
@@ -2057,13 +1298,14 @@ module WatsubMod
 
 !------------------------------------------------------------------------------------------
 
-  subroutine InitSoilAccums(M,NY,NX)
+  subroutine InitSoil3DModel(M,NY,NX)
 
   implicit none
   integer, intent(in) :: NY,NX,M
   integer :: L
   real(r8) :: THETWT,TFND1,THETWA
   real(r8) :: VOLAT,VOLWT,scalar
+  real(r8) :: THETWH,Z3S
 
   D9885: DO L=NUM(NY,NX),NL(NY,NX)
     TWFLXL(L,NY,NX)=0.0_r8
@@ -2073,7 +1315,9 @@ module WatsubMod
     TFLWLX(L,NY,NX)=0.0_r8
     TFLWHL(L,NY,NX)=0.0_r8
     THFLWL(L,NY,NX)=0.0_r8
-    VOLW2(L,NY,NX)=VOLW1(L,NY,NX)
+
+    !VOLW2 will be updated in soil surface model
+    !VOLW2(L,NY,NX)=VOLW1(L,NY,NX)
 !
 !   GAS EXCHANGE COEFFICIENTS SOIL LAYERS
 !
@@ -2111,6 +1355,719 @@ module WatsubMod
       TORTH(M,L,NY,NX)=0.0_r8
     ENDIF
   ENDDO D9885
-  end subroutine InitSoilAccums
+  end subroutine InitSoil3DModel
+
+!------------------------------------------------------------------------------------------
+  subroutine CalcSoilWaterPotential(NY,NX,N1,N2,N3,THETA1)
+  implicit none
+  integer, intent(in) :: NY,NX,N1,N2,N3
+  real(r8), intent(out) :: THETA1
+  real(r8) :: FCDX,FCX,FCLX,WPLX,PSDX,WPX
+  !     BKVL=soil mass
+  !     FC,WP=water contents at field capacity,wilting point
+  !     FCL,WPL=log FC,WP
+  !     FCD,PSD=FCL-WPL,log(POROS)-FCL
+  !     PSISA1,PSIHY,PSISE=soil matric,hygroscopic,air entry potential
+  !     PSIMX,PSIMD,PSIMS=log water potential at FC,WP,saturation
+  !     PSISD=PSIMX-PSIMS
+  !     SRP=parameter for deviation from linear log-log water retention
+  !     PSISO=osmotic potential
+  !     DTHETW=minimum water content for numerical purpose
+  ! soil matric potential upper layer
+  
+  THETA1=AMAX1(THETY(N3,N2,N1),AMIN1(POROS(N3,N2,N1),safe_adb(VOLW1(N3,N2,N1),VOLY(N3,N2,N1))))
+
+  IF(BKVL(N3,N2,N1).GT.ZEROS(NY,NX))THEN
+    !source layer is active soil
+    IF(THETA1.LT.FC(N3,N2,N1))THEN
+      !water less than field capacity
+      !PSIHY is the minimum water potential allowed
+      PSISA1(N3,N2,N1)=AMAX1(PSIHY,-EXP(PSIMX(N2,N1)+((FCL(N3,N2,N1)-LOG(THETA1))/FCD(N3,N2,N1)*PSIMD(N2,N1))))
+    ELSEIF(THETA1.LT.POROS(N3,N2,N1)-DTHETW)THEN
+      PSISA1(N3,N2,N1)=-EXP(PSIMS(N2,N1)+(((PSL(N3,N2,N1)-LOG(THETA1))/PSD(N3,N2,N1))**SRP(N3,N2,N1)*PSISD(N2,N1)))
+    ELSE
+      PSISA1(N3,N2,N1)=PSISE(N3,N2,N1)
+    ENDIF
+    !
+    !     SUBSURFCE UPPER WATER LAYER
+    !
+    !     THETIX,THETWX=ice,water concentration
+    !     FCI,WPI=ice field capacity,wilting point
+    !     PSISA1=matric water potential
+    !
+  ELSEIF(VOLX(N3,N2,N1).GT.ZEROS2(N2,N1).and.THETIX(N3,N2,N1)>ZEROS2(N2,N1))THEN
+    FCX=FCI*THETIX(N3,N2,N1)
+    WPX=WPI*THETIX(N3,N2,N1)
+    FCLX=LOG(FCX)
+    WPLX=LOG(WPX)
+    PSDX=PSL(N3,N2,N1)-FCLX
+    FCDX=FCLX-WPLX
+    IF(THETWX(N3,N2,N1).LT.FCX)THEN
+      PSISA1(N3,N2,N1)=AMAX1(PSIHY,-EXP(PSIMX(N2,N1) &
+        +((FCLX-LOG(THETWX(N3,N2,N1)))/FCDX*PSIMD(NY,NX))))
+    ELSEIF(THETWX(N3,N2,N1).LT.POROS(N3,N2,N1)-DTHETW)THEN
+      PSISA1(N3,N2,N1)=-EXP(PSIMS(N2,N1) &
+        +(((PSL(N3,N2,N1)-LOG(THETWX(N3,N2,N1)))/PSDX)*PSISD(N2,N1)))
+    ELSE
+      !saturated
+      PSISA1(N3,N2,N1)=PSISE(N3,N2,N1)
+    ENDIF
+  ELSE
+    PSISA1(N3,N2,N1)=PSISE(N3,N2,N1)
+  ENDIF
+  end subroutine CalcSoilWaterPotential
+!------------------------------------------------------------------------------------------
+  subroutine MicporeDarcyFlow(NY,NX,N,N1,N2,N3,N4,N5,N6,THETA1,THETAL,FKSAT,HWFLWL,PSISV1,PSISVL)          
+  implicit none
+  integer, intent(in)  :: NY,NX,N,N1,N2,N3,N4,N5,N6
+  real(r8), intent(in) :: THETA1,THETAL,FKSAT
+  real(r8), intent(out):: HWFLWL,PSISV1,PSISVL
+  real(r8) :: AVCNDL,CND1,CNDL,FLQ2,PSISTL,PSIST1,THETW1
+  real(r8) :: FLQL,HWFLQL,FLQX,FLQZ,PSISTMP,THETWL
+  integer :: K1,KL
+
+
+  !     THETW1,THETWL=water concentrations in source,destination cells
+
+  IF(PSISA1(N3,N2,N1).GT.PSISA(N3,N2,N1).AND.PSISA1(N6,N5,N4).GT.PSISA(N6,N5,N4))THEN
+    THETW1=THETA1
+    THETWL=THETAL
+    K1=MAX(1,MIN(100,INT(100.0_r8*(POROS(N3,N2,N1)-THETW1)/POROS(N3,N2,N1))+1))
+    KL=MAX(1,MIN(100,INT(100.0_r8*(POROS(N6,N5,N4)-THETWL)/POROS(N6,N5,N4))+1))
+    PSISM1(N3,N2,N1)=PSISA1(N3,N2,N1)
+    PSISM1(N6,N5,N4)=PSISA1(N6,N5,N4)
+    !
+    !     GREEN-AMPT FLOW IF ONE LAYER IS SATURATED
+    !     (CURRENT WATER POTENTIAL < AIR ENTRY WATER POENTIAL)
+    !
+    !     GREEN-AMPT FLOW IF SOURCE CELL SATURATED
+    !THETS=micropore soil water content
+  ELSEIF(PSISA1(N3,N2,N1).GT.PSISA(N3,N2,N1))THEN
+    THETW1=THETA1
+    THETWL=AMAX1(THETY(N6,N5,N4),AMIN1(POROS(N6,N5,N4),safe_adb(VOLWX1(N6,N5,N4),VOLY(N6,N5,N4))))
+    K1=MAX(1,MIN(100,INT(100.0_r8*(POROS(N3,N2,N1)-THETW1)/POROS(N3,N2,N1))+1))
+    KL=MAX(1,MIN(100,INT(100.0_r8*(POROS(N6,N5,N4)-AMIN1(THETS(N6,N5,N4),THETWL))/POROS(N6,N5,N4))+1))
+    PSISM1(N3,N2,N1)=PSISA1(N3,N2,N1)
+    
+    IF(BKVL(N6,N5,N4).GT.ZEROS(NY,NX))THEN
+      IF(THETWL.LT.FC(N6,N5,N4))THEN
+        PSISM1(N6,N5,N4)=AMAX1(PSIHY,-EXP(PSIMX(N5,N4)+((FCL(N6,N5,N4)-LOG(THETWL)) &
+          /FCD(N6,N5,N4)*PSIMD(N5,N4))))
+      ELSEIF(THETWL.LT.POROS(N6,N5,N4)-DTHETW)THEN
+        PSISM1(N6,N5,N4)=-EXP(PSIMS(N5,N4)+(((PSL(N6,N5,N4)-LOG(THETWL)) &
+          /PSD(N6,N5,N4))**SRP(N6,N5,N4)*PSISD(N5,N4)))
+      ELSE
+        THETWL=POROS(N6,N5,N4)
+        PSISM1(N6,N5,N4)=PSISE(N6,N5,N4)
+      ENDIF
+    ELSE
+      THETWL=POROS(N6,N5,N4)
+      PSISM1(N6,N5,N4)=PSISE(N6,N5,N4)
+    ENDIF
+    !
+    !     GREEN-AMPT FLOW IF ADJACENT CELL SATURATED
+!
+  ELSEIF(PSISA1(N6,N5,N4).GT.PSISA(N6,N5,N4))THEN
+    THETW1=AMAX1(THETY(N3,N2,N1),AMIN1(POROS(N3,N2,N1),safe_adb(VOLWX1(N3,N2,N1),VOLY(N3,N2,N1))))
+    THETWL=THETAL
+    K1=MAX(1,MIN(100,INT(100.0*(POROS(N3,N2,N1)-AMIN1(THETS(N3,N2,N1),THETW1))/POROS(N3,N2,N1))+1))
+    KL=MAX(1,MIN(100,INT(100.0*(POROS(N6,N5,N4)-THETWL)/POROS(N6,N5,N4))+1))
+    IF(BKVL(N3,N2,N1).GT.ZEROS(NY,NX))THEN
+      IF(THETW1.LT.FC(N3,N2,N1))THEN
+        PSISTMP=-EXP(PSIMX(N2,N1)+(FCL(N3,N2,N1)-LOG(THETW1))/FCD(N3,N2,N1)*PSIMD(N2,N1))
+        PSISM1(N3,N2,N1)=AMAX1(PSIHY,PSISTMP)
+      ELSEIF(THETW1.LT.POROS(N3,N2,N1)-DTHETW)THEN
+        PSISM1(N3,N2,N1)=-EXP(PSIMS(N2,N1)+(((PSL(N3,N2,N1)-LOG(THETW1)) &
+          /PSD(N3,N2,N1))**SRP(N3,N2,N1)*PSISD(N2,N1)))
+      ELSE
+        THETW1=POROS(N3,N2,N1)
+        PSISM1(N3,N2,N1)=PSISE(N3,N2,N1)
+      ENDIF
+    ELSE
+      THETW1=POROS(N3,N2,N1)
+      PSISM1(N3,N2,N1)=PSISE(N3,N2,N1)
+    ENDIF
+    !
+    !     RICHARDS FLOW IF NEITHER CELL IS SATURATED
+    !     (CURRENT WATER POTENTIAL < AIR ENTRY WATER POTENTIAL)
+    !
+  ELSE
+    THETW1=THETA1
+    THETWL=THETAL
+    K1=MAX(1,MIN(100,INT(100.0*(POROS(N3,N2,N1)-THETW1)/POROS(N3,N2,N1))+1))
+    KL=MAX(1,MIN(100,INT(100.0*(POROS(N6,N5,N4)-THETWL)/POROS(N6,N5,N4))+1))
+    PSISM1(N3,N2,N1)=PSISA1(N3,N2,N1)
+    PSISM1(N6,N5,N4)=PSISA1(N6,N5,N4)
+  ENDIF
+
+  !
+  !     HYDRAULIC CONUCTIVITY
+  !
+  !     CND1,CNDL=hydraulic conductivity of source,destination layer
+  !     HCND=lateral(1,2),vertical(3) micropore hydraulic conductivity
+  !
+  IF(N3.EQ.NUM(NY,NX))THEN
+    CND1=HCND(N,K1,N3,N2,N1)*FKSAT
+  ELSE
+    CND1=HCND(N,K1,N3,N2,N1)
+  ENDIF
+  CNDL=HCND(N,KL,N6,N5,N4)
+  !
+  !     TOTAL SOIL WATER POTENTIAL = MATRIC, GRAVIMETRIC + OSMOTIC
+  !
+  !     PSISM1,PSISH,PSISO=soil matric,gravitational,osmotic potentials
+!
+  PSIST1=PSISM1(N3,N2,N1)+PSISH(N3,N2,N1)+PSISO(N3,N2,N1)
+  PSISTL=PSISM1(N6,N5,N4)+PSISH(N6,N5,N4)+PSISO(N6,N5,N4)
+  PSISV1=PSISM1(N3,N2,N1)+PSISO(N3,N2,N1)
+  PSISVL=PSISM1(N6,N5,N4)+PSISO(N6,N5,N4)
+  !
+  !     HYDRAULIC CONDUCTIVITY FROM CURRENT WATER CONTENT
+  !     AND LOOKUP ARRAY GENERATED IN 'HOUR1'
+  !
+  !     CND1,CNDL=hydraulic conductivities in source,destination cells
+  !     FKSAT=reduction in soil surface Ksat from rainfall energy impact
+  !     AVCNDL=source-destination hydraulic conductance
+  !     DLYR=layer thickness
+  !
+  IF(CND1.GT.ZERO.AND.CNDL.GT.ZERO)THEN
+    AVCNDL=2.0*CND1*CNDL/(CND1*DLYR(N,N6,N5,N4)+CNDL*DLYR(N,N3,N2,N1))
+  ELSE
+    AVCNDL=0.0_r8
+  ENDIF
+  !
+  !     WATER FLUX FROM WATER POTENTIALS, HYDRAULIC CONDUCTIVITY
+  !     CONSTRAINED BY WATER POTENTIAL GRADIENT, COUPLED WITH
+  !     CONVECTIVE HEAT FLUX FROM WATER FLUX
+  !
+  !     FLQX,FLQL=micropore water flux unlimited,limited by source water
+  !     XNPH=time step of flux calculations
+  !     VOLW2,VOLP1=water,air contents of source,destination micropores
+  !     HWFLWL=convective heat flux from micropore water flux
+  !     VOLP1Z=excess water+ice relative to porosity
+  !
+  FLQX=AVCNDL*(PSIST1-PSISTL)*AREA(N,N3,N2,N1)*XNPH
+  IF(FLQX.GE.0.0_r8)THEN
+    IF(THETW1.GT.THETS(N3,N2,N1))THEN
+      FLQZ=FLQX+AMIN1((THETW1-THETS(N3,N2,N1))*VOLY(N3,N2,N1),AZMAX1((THETS(N6,N5,N4)-THETWL) &
+        *VOLY(N6,N5,N4)))*XNPX
+    ELSE
+      FLQZ=FLQX
+    ENDIF
+    FLQL=AZMAX1(AMIN1(FLQZ,VOLW2(N3,N2,N1)*XNPX,VOLP1(N6,N5,N4)*XNPX))
+    FLQ2=AZMAX1(AMIN1(FLQX,VOLW2(N3,N2,N1)*XNPX,VOLP1(N6,N5,N4)*XNPX))
+    !     FLQL1=(THETW1-THETS(N3,N2,N1))*VOLY(N3,N2,N1)
+    !     FLQL2=(THETS(N6,N5,N4)-THETWL)*VOLY(N6,N5,N4)
+    !     FLQL3=FLQX+AMIN1(FLQL1,AZMAX1(FLQL2))*XNPX
+    !     FLQL4=AZMAX1(AMIN1(FLQL3,VOLP1(N6,N5,N4)*XNPX))
+  ELSE
+    IF(THETWL.GT.THETS(N6,N5,N4))THEN
+      FLQZ=FLQX+AMAX1((THETS(N6,N5,N4)-THETWL)*VOLY(N6,N5,N4),AZMIN1((THETW1-THETS(N3,N2,N1))*VOLY(N3,N2,N1)))*XNPX
+    ELSE
+      FLQZ=FLQX
+    ENDIF
+    FLQL=AZMIN1(AMAX1(FLQZ,-VOLW2(N6,N5,N4)*XNPX,-VOLP1(N3,N2,N1)*XNPX))
+    FLQ2=AZMIN1(AMAX1(FLQX,-VOLW2(N6,N5,N4)*XNPX,-VOLP1(N3,N2,N1)*XNPX))
+    !     FLQL1=(THETS(N6,N5,N4)-THETWL)*VOLY(N6,N5,N4)
+    !     FLQL2=(THETW1-THETS(N3,N2,N1))*VOLY(N3,N2,N1)
+    !     FLQL3=FLQX+AMAX1(FLQL1,AZMIN1(FLQL2))*XNPX
+    !     FLQL4=AZMIN1(AMAX1(FLQL3,-VOLP1(N3,N2,N1)*XNPX))
+  ENDIF
+  IF(N.EQ.ivertdir.AND.VOLP1Z(N6,N5,N4).LT.0.0_r8)THEN
+    FLQL=FLQL+AZMIN1(AMAX1(-VOLW2(N6,N5,N4)*XNPX,VOLP1Z(N6,N5,N4)))
+    FLQ2=FLQ2+AZMIN1(AMAX1(-VOLW2(N6,N5,N4)*XNPX,VOLP1Z(N6,N5,N4)))
+  ENDIF
+  IF(FLQL.GT.0.0_r8)THEN
+    HWFLQL=cpw*TK1(N3,N2,N1)*FLQL
+  ELSE
+    HWFLQL=cpw*TK1(N6,N5,N4)*FLQL
+  ENDIF
+
+  VOLW2(N3,N2,N1)=VOLW2(N3,N2,N1)-FLQL
+  VOLW2(N6,N5,N4)=VOLW2(N6,N5,N4)+FLQL
+
+  FLWL(N,N6,N5,N4)=FLQL
+  FLWLX(N,N6,N5,N4)=FLQ2
+
+  HWFLWL=HWFLQL
+  end subroutine MicporeDarcyFlow
+!------------------------------------------------------------------------------------------
+  subroutine MacporeFLow(NY,NX,M,N,N1,N2,N3,N4,N5,N6,HWFLHL,IFLGH)
+  implicit none
+  integer, intent(in) :: NY,NX,M,N,N1,N2,N3,N4,N5,N6
+  real(r8), intent(out) :: HWFLHL
+  integer, intent(inout) :: IFLGH
+  real(r8) :: FLWHX,PSISH1,PSISHL
+  !     PSISH1,PSISHL=macropore total water potl in source,destination
+  !     DLYR=layer thickness
+  !     VOLWH1,VOLPH1=macropore water,air content
+
+  IF(VOLAH1(N3,N2,N1).GT.ZEROS2(N2,N1).AND.VOLAH1(N6,N5,N4).GT.ZEROS2(N5,N4).AND.IFLGH.EQ.0)THEN
+    PSISH1=PSISH(N3,N2,N1)+GRAVm*DLYR(3,N3,N2,N1)*(AMIN1(1.0_r8,AZMAX1(VOLWH1(N3,N2,N1)/VOLAH1(N3,N2,N1)))-0.5_r8)
+    PSISHL=PSISH(N6,N5,N4)+GRAVm*DLYR(3,N6,N5,N4)*(AMIN1(1.0_r8,AZMAX1(VOLWH1(N6,N5,N4)/VOLAH1(N6,N5,N4)))-0.5_r8)
+    !
+    !     MACROPORE FLOW IF GRAVITATIONAL GRADIENT IS POSITIVE
+    !     AND MACROPORE POROSITY EXISTS IN ADJACENT CELL
+    !
+    !     FLWHX,FLWHL=macropore water flux unltd,ltd by source water
+    !     XNPH=time step of flux calculations
+    !     VOLW2,VOLP1=water,air contents of source,destination micropores
+    !     HWFLHL=convective heat flux from micropore water flux
+    !
+    FLWHX=AVCNHL(N,N6,N5,N4)*(PSISH1-PSISHL)*AREA(N,N3,N2,N1)*XNPH
+    IF(N.NE.ivertdir)THEN
+      IF(PSISH1.GT.PSISHL)THEN
+        FLWHL(N,N6,N5,N4)=AZMAX1(AMIN1(AMIN1(VOLWH1(N3,N2,N1),VOLPH1(N6,N5,N4))*XNPX,FLWHX))
+      ELSEIF(PSISH1.LT.PSISHL)THEN
+        FLWHL(N,N6,N5,N4)=AZMIN1(AMAX1(AMAX1(-VOLWH1(N6,N5,N4),-VOLPH1(N3,N2,N1))*XNPX,FLWHX))
+      ELSE
+        FLWHL(N,N6,N5,N4)=0.0_r8
+      ENDIF
+    ELSE
+      FLWHL(N,N6,N5,N4)=AZMAX1(AMIN1(AMIN1(VOLWH1(N3,N2,N1)*XNPX &
+        +FLWHL(N,N3,N2,N1),VOLPH1(N6,N5,N4)*XNPX),FLWHX))
+    ENDIF
+    IF(N.EQ.ivertdir)THEN
+      FLWHL(N,N6,N5,N4)=FLWHL(N,N6,N5,N4)+AZMIN1(VOLPH1Z(N6,N5,N4))
+    ENDIF
+    FLWHM(M,N,N6,N5,N4)=FLWHL(N,N6,N5,N4)
+  ELSE
+    FLWHL(N,N6,N5,N4)=0.0_r8
+    FLWHM(M,N,N6,N5,N4)=0.0_r8
+    IF(VOLPH1(N6,N5,N4).LE.0.0_r8)IFLGH=1
+  ENDIF
+  IF(FLWHL(N,N6,N5,N4).GT.0.0_r8)THEN
+    HWFLHL=cpw*TK1(N3,N2,N1)*FLWHL(N,N6,N5,N4)
+  ELSE
+    HWFLHL=cpw*TK1(N6,N5,N4)*FLWHL(N,N6,N5,N4)
+  ENDIF
+  end subroutine MacporeFLow  
+!------------------------------------------------------------------------------------------
+
+  subroutine WaterVaporFlow(M,N,N1,N2,N3,N4,N5,N6,PSISV1,PSISVL,FLVL,HWFLVL)
+  implicit none
+  integer, intent(in) :: M,N,N1,N2,N3,N4,N5,N6
+  REAL(R8), intent(in) :: PSISV1,PSISVL
+  real(r8), intent(out) :: FLVL,HWFLVL
+  real(r8) :: TK11,TK12,VP1,VPL,VPY,CNV1,CNVL
+  REAL(R8) :: ATCNVL,FLVC,FLVX
+  !     VAPOR PRESSURE AND DIFFUSIVITY IN EACH GRID CELL
+  !
+  
+  !     THETPM,THETX=current, minimum air-filled porosity
+  !     TK11,TK12=interim soil temperature in source,destination
+  !     VP1,VPL=vapor concentration in source,destination
+  !     PSISV1,PSISVL=matric+osmotic water potl in source,destination
+  !     CNV1,CNVL=vapor conductivities of source, destination
+  !     POROS,POROQ=porosity, tortuosity
+  !     WGSGL=vapor diffusivity
+  !     ATCNVL=source,destination vapor conductance
+  !     DLYR=soil layer depth
+  !     FLVC,FLVX=vapor flux unlimited,limited by vapor
+  !     VPY=equilibrium vapor concentration
+  !     XNPX=time step for flux calculations
+  !     FLVL,HWFLVL=vapor flux and its convective heat flux
+!
+  IF(THETPM(M,N3,N2,N1).GT.THETX.AND.THETPM(M,N6,N5,N4).GT.THETX)THEN
+    TK11=TK1(N3,N2,N1)
+    TK12=TK1(N6,N5,N4)
+
+    VP1=vapsat(TK11)*EXP(18.0*PSISV1/(RGAS*TK11))
+    VPL=vapsat(TK12)*EXP(18.0*PSISVL/(RGAS*TK12))
+    CNV1=WGSGL(N3,N2,N1)*THETPM(M,N3,N2,N1)*POROQ*THETPM(M,N3,N2,N1)/POROS(N3,N2,N1)
+    CNVL=WGSGL(N6,N5,N4)*THETPM(M,N6,N5,N4)*POROQ*THETPM(M,N6,N5,N4)/POROS(N6,N5,N4)
+    ATCNVL=2.0*CNV1*CNVL/(CNV1*DLYR(N,N6,N5,N4)+CNVL*DLYR(N,N3,N2,N1))
+    !
+    !     VAPOR FLUX FROM VAPOR PRESSURE AND DIFFUSIVITY,
+    !     AND CONVECTIVE HEAT FLUX FROM VAPOR FLUX
+!
+    FLVC=ATCNVL*(VP1-VPL)*AREA(N,N3,N2,N1)*XNPH
+    VPY=(VP1*VOLPM(M,N3,N2,N1)+VPL*VOLPM(M,N6,N5,N4))/(VOLPM(M,N3,N2,N1)+VOLPM(M,N6,N5,N4))
+    FLVX=(VP1-VPY)*VOLPM(M,N3,N2,N1)*XNPX
+    IF(FLVC.GE.0.0_r8)THEN
+      FLVL=AZMAX1(AMIN1(FLVC,FLVX))
+      HWFLVL=(cpw*TK1(N3,N2,N1)+VAP)*FLVL
+    ELSE
+      FLVL=AZMIN1(AMAX1(FLVC,FLVX))
+      HWFLVL=(cpw*TK1(N6,N5,N4)+VAP)*FLVL
+    ENDIF
+  ELSE
+    FLVL=0.0_r8
+    HWFLVL=0.0_r8
+  ENDIF
+  end subroutine WaterVaporFlow  
+!------------------------------------------------------------------------------------------
+
+  subroutine Solve4Heat(N,NY,NX,N1,N2,N3,N4,N5,N6,ATCNDL,HWFLVL,HFLXG)
+  implicit none
+  integer , intent(in) :: N,NY,NX,N1,N2,N3,N4,N5,N6
+  real(r8), intent(in) :: ATCNDL,HWFLVL,HFLXG
+  real(r8) :: TK1X,TKLX,TKY,HFLWC,HFLWX,HFLWSX
+  !
+  !     HEAT FLOW FROM THERMAL CONDUCTIVITY AND TEMPERATURE GRADIENT
+  !
+  !     VHCP1,VHCPW=volumetric heat capacity of soil,snowpack
+  !     TK1X,TKLX=interim temperatures of source,destination
+  !     HWFLVL,HFLXG=convective heat from soil vapor flux
+  !     HFLXG=storage heat flux from snowpack
+  !     TKY=equilibrium source-destination temperature
+  !     HFLWC,HFLWX=source-destination heat flux unltd,ltd by heat
+  !     ATCNDL=source-destination thermal conductance
+  !     HFLWSX=source-destination conductive heat flux
+  !     HFLWL=total conductive+convective source-destination heat flux
+  !
+  IF(VHCP1(N3,N2,N1).GT.VHCPNX(NY,NX))THEN
+    IF(N3.EQ.NUM(NY,NX).AND.VHCPW(1,N2,N1).LE.VHCPWX(N2,N1))THEN
+      TK1X=TK1(N3,N2,N1)-(HWFLVL-HFLXG)/VHCP1(N3,N2,N1)
+      if(abs(TK1X)>1.e5_r8)then
+        write(*,*)'TK1(N3,N2,N1)-HWFLVL/VHCP1(N3,N2,N1)',&
+          TK1(N3,N2,N1),HWFLVL,HFLXG,VHCP1(N3,N2,N1)
+        write(*,*)'N1,n2,n3',N1,N2,N3
+        call endrun(trim(mod_filename)//' at line',__LINE__)
+      endif
+    ELSE
+      TK1X=TK1(N3,N2,N1)-HWFLVL/VHCP1(N3,N2,N1)
+      if(abs(TK1X)>1.e5_r8)then
+        write(*,*)'TK1(N3,N2,N1)-HWFLVL/VHCP1(N3,N2,N1)',&
+          TK1(N3,N2,N1),HWFLVL,VHCP1(N3,N2,N1)
+        write(*,*)'N1,n2,n3',N1,N2,N3
+        call endrun(trim(mod_filename)//' at line',__LINE__)
+      endif
+    ENDIF
+  ELSE
+    TK1X=TK1(N3,N2,N1)
+  ENDIF
+
+  IF(VHCP1(N6,N5,N4).GT.ZEROS(NY,NX))THEN
+    TKLX=TK1(N6,N5,N4)+HWFLVL/VHCP1(N6,N5,N4)
+  ELSE
+    TKLX=TK1(N6,N5,N4)
+  ENDIF
+  
+  if(VHCP1(N3,N2,N1)+VHCP1(N6,N5,N4)>0._r8)then
+    TKY=(VHCP1(N3,N2,N1)*TK1X+VHCP1(N6,N5,N4)*TKLX)/(VHCP1(N3,N2,N1)+VHCP1(N6,N5,N4))
+  ELSE
+    TKY=(TK1X+TKLX)/2._r8
+  endif 
+          !
+  HFLWX=(TK1X-TKY)*VHCP1(N3,N2,N1)*XNPX
+  HFLWC=ATCNDL*(TK1X-TKLX)*AREA(N,N3,N2,N1)*XNPH
+  IF(HFLWC.GE.0.0_r8)THEN
+    HFLWSX=AZMAX1(AMIN1(HFLWX,HFLWC))
+  ELSE
+    HFLWSX=AZMIN1(AMAX1(HFLWX,HFLWC))
+  ENDIF
+  HFLWL(N,N6,N5,N4)=HFLWL(N,N6,N5,N4)+HFLWSX
+  end subroutine Solve4Heat  
+!------------------------------------------------------------------------------------------
+  subroutine WaterTBLDrain(N,N1,N2,N3,M4,M5,M6,IFLGU,IFLGUH,RCHGFU,RCHGFT,DPTHH,XN)
+  implicit none
+  integer, intent(in) :: N,N1,N2,N3,M4,M5,M6,IFLGU,IFLGUH
+  real(r8), intent(in):: RCHGFU,RCHGFT,DPTHH,XN
+  real(r8) :: FLWT,FLWTHL,FLWTH,PSISWD,PSISWT,PSISWTH
+!     MICROPORE DISCHARGE ABOVE WATER TABLE
+!
+!     IFLGU=micropore discharge flag to natural water table
+!     PSISWD=water potential from water table slope
+!     XN,RCHG*=direction indicator,boundary flag
+!     SLOPE=sin(lateral slope)
+!     DLYR=layer width
+!     DTBLG=water table slope
+!     PSISWT=water potential driving micropore discharge
+!     PSISA1,PSISO=matric,osmotic water potential
+!     DPTH,DTBLX=depth to layer midpoint,natural water table
+!     DPTHT=depth to internal water table
+!     FLWL=micropore discharge to natural water table
+!     HFLWL=convective heat from discharge to natural water table
+!     HCND=saturated hydraulic conductivity
+!     AREAU=fraction of layer below natural water table
+!
+  IF(IFLGU.EQ.0.AND.test_aneb(RCHGFT,0._r8))THEN
+    PSISWD=XN*0.005_r8*SLOPE(N,N2,N1)*DLYR(N,N3,N2,N1)*(1.0_r8-DTBLG(N2,N1))
+    PSISWT=AZMIN1(-PSISA1(N3,N2,N1)-0.03_r8*PSISO(N3,N2,N1) &
+      +GRAVm*(DPTH(N3,N2,N1)-DTBLX(N2,N1)) &
+      -GRAVm*AZMAX1(DPTH(N3,N2,N1)-DPTHT(N2,N1)))
+    IF(PSISWT.LT.0.0_r8)PSISWT=PSISWT-PSISWD
+    FLWT=PSISWT*HCND(N,1,N3,N2,N1)*AREA(N,N3,N2,N1)*(1.0_r8-AREAU(N3,N2,N1))/(RCHGFU+1.0)*RCHGFT*XNPH
+    FLWL(N,M6,M5,M4)=XN*FLWT
+    FLWLX(N,M6,M5,M4)=XN*FLWT
+    HFLWL(N,M6,M5,M4)=cpw*TK1(N3,N2,N1)*XN*FLWT
+  ELSE
+    FLWL(N,M6,M5,M4)=0.0_r8
+    FLWLX(N,M6,M5,M4)=0.0_r8
+    HFLWL(N,M6,M5,M4)=0.0_r8
+  ENDIF
+!
+!     MACROPORE DISCHARGE ABOVE WATER TABLE
+!
+!     IFLGUH=macropore discharge flag to natural water table
+!     PSISWD=water potential from water table slope
+!     XN,RCHG*=direction indicator,boundary flag
+!     SLOPE=sin(lateral slope)
+!     DLYR=layer width
+!     DTBLG=water table slope
+!     PSISWTH=water potential driving macropore discharge
+!     PSISO=osmotic water potential
+!     DPTHH,DTBLX=depth to layer macropore water,natural water table
+!     DPTHT=depth to internal water table
+!     FLWTH,FLWTHL=macropore discharge unltd,ltd by macropore water
+!     CNDH1=macropore hydraulic conductivity
+!     FLWHL=macropore discharge to natural water table
+!     HFLWL=convective heat from discharge to natural water table
+!     HCND=saturated hydraulic conductivity
+  !     AREAU=fraction of layer below natural water table
+!
+  IF(IFLGUH.EQ.0.AND.test_aneb(RCHGFT,0._r8).AND.VOLAH1(N3,N2,N1).GT.ZEROS2(N2,N1))THEN
+    PSISWD=XN*0.005*SLOPE(N,N2,N1)*DLYR(N,N3,N2,N1)*(1.0_r8-DTBLG(N2,N1))
+    PSISWTH=-0.03*PSISO(N3,N2,N1)+GRAVm*(DPTHH-DTBLX(N2,N1)) &
+      -GRAVm*AZMAX1(DPTHH-DPTHT(N2,N1))
+    IF(PSISWTH.LT.0.0_r8)PSISWTH=PSISWTH-PSISWD
+    FLWTH=PSISWTH*CNDH1(N3,N2,N1)*AREA(N,N3,N2,N1) &
+      *(1.0_r8-AREAU(N3,N2,N1))/(RCHGFU+1.0)*RCHGFT*XNPH
+    FLWTHL=AMAX1(FLWTH,AZMIN1(-(VOLWH1(N3,N2,N1)*XNPX &
+      +FLWHL(3,N3,N2,N1)-FLWHL(3,N3+1,N2,N1))))
+    FLWHL(N,M6,M5,M4)=XN*FLWTHL
+    HFLWL(N,M6,M5,M4)=HFLWL(N,M6,M5,M4)+cpw*TK1(N3,N2,N1)*XN*FLWTHL
+  ELSE
+    FLWHL(N,M6,M5,M4)=0.0_r8
+  ENDIF
+  end subroutine WaterTBLDrain  
+!------------------------------------------------------------------------------------------
+  subroutine TileDrain(N,N1,N2,N3,M4,M5,M6,IFLGD,IFLGDH,RCHGFT,RCHGFU,DPTHH,XN)
+  implicit none
+  integer, intent(in) :: N,N1,N2,N3,M4,M5,M6,IFLGD,IFLGDH
+  real(r8),intent(in) :: RCHGFT,RCHGFU,DPTHH,XN
+  real(r8) :: FLWT,FLWTH,FLWTHL,PSISWD,PSISWT,PSISWTH
+!
+  !     MICROPORE DISCHARGE ABOVE TILE DRAIN
+  !
+  !     IFLGD=micropore discharge flag to artificial water table
+  !     PSISWD=water potential from water table slope
+  !     XN,RCHG*=direction indicator,boundary flag
+  !     SLOPE=sin(lateral slope)
+  !     DLYR=layer width
+  !     DTBLG=water table slope
+  !     PSISWT=water potential driving micropore discharge
+  !     PSISA1,PSISO=matric,osmotic water potential
+  !     DPTH,DTBLY=depth to layer midpoint,artificial water table
+  !     DPTHT=depth to internal water table
+  !     FLWL=micropore discharge to natural+artificial water table
+  !     HFLWL=convective heat from dischg to natural+artifl water table
+  !     HCND=saturated hydraulic conductivity
+  !     AREAUD=fraction of layer below artificial water table
+!
+  IF(IFLGD.EQ.0.AND.test_aneb(RCHGFT,0._r8))THEN
+    PSISWD=XN*0.005_r8*SLOPE(N,N2,N1)*DLYR(N,N3,N2,N1)*(1.0_r8-DTBLG(N2,N1))
+    PSISWT=AZMIN1(-PSISA1(N3,N2,N1)-0.03_r8*PSISO(N3,N2,N1) &
+      +GRAVm*(DPTH(N3,N2,N1)-DTBLY(N2,N1))-GRAVm*AZMAX1(DPTH(N3,N2,N1)-DPTHT(N2,N1)))
+    IF(PSISWT.LT.0.0_r8)PSISWT=PSISWT-PSISWD
+    FLWT=PSISWT*HCND(N,1,N3,N2,N1)*AREA(N,N3,N2,N1)*(1.0_r8-AREAUD(N3,N2,N1))/(RCHGFU+1.0)*RCHGFT*XNPH
+    FLWL(N,M6,M5,M4)=FLWL(N,M6,M5,M4)+XN*FLWT
+    FLWLX(N,M6,M5,M4)=FLWLX(N,M6,M5,M4)+XN*FLWT
+    HFLWL(N,M6,M5,M4)=HFLWL(N,M6,M5,M4)+cpw*TK1(N3,N2,N1)*XN*FLWT
+  ENDIF
+!
+!     MACROPORE DISCHARGE ABOVE TILE DRAIN
+!
+!     IFLGDH=macropore discharge flag to artificial water table
+!     PSISWD=water potential from water table slope
+!     XN,RCHG*=direction indicator,boundary flag
+!     SLOPE=sin(lateral slope)
+!     DLYR=layer width
+!     DTBLG=water table slope
+!     PSISWTH=water potential driving macropore discharge
+!     PSISO=osmotic water potential
+!     DPTHH,DTBLY=depth to layer macropore water,artificl water table
+!     DPTHT=depth to internal water table
+!     FLWTH,FLWTHL=macropore discharge unltd,ltd by macropore water
+!     CNDH1=macropore hydraulic conductivity
+!     FLWHL=macropore discharge to artificial water table
+!     HFLWL=convective heat from discharge to artificial water table
+!     HCND=saturated hydraulic conductivity
+!     AREAUD=fraction of layer below artificial water table
+!
+  IF(IFLGDH.EQ.0.AND.test_aneb(RCHGFT,0._r8).AND.VOLAH1(N3,N2,N1).GT.ZEROS2(N2,N1))THEN
+    PSISWD=XN*0.005_r8*SLOPE(N,N2,N1)*DLYR(N,N3,N2,N1)*(1.0_r8-DTBLG(N2,N1))
+    PSISWTH=-0.03_r8*PSISO(N3,N2,N1)+GRAVm*(DPTHH-DTBLY(N2,N1))-GRAVm*AZMAX1(DPTHH-DPTHT(N2,N1))
+    IF(PSISWTH.LT.0.0_r8)PSISWTH=PSISWTH-PSISWD
+    FLWTH=PSISWTH*CNDH1(N3,N2,N1)*AREA(N,N3,N2,N1)*(1.0_r8-AREAUD(N3,N2,N1))/(RCHGFU+1.0_r8)*RCHGFT*XNPH
+    FLWTHL=AMAX1(FLWTH,AZMIN1(-(VOLWH1(N3,N2,N1)*XNPX+FLWHL(3,N3,N2,N1)-FLWHL(3,N3+1,N2,N1))))
+    FLWHL(N,M6,M5,M4)=FLWHL(N,M6,M5,M4)+XN*FLWTHL
+    HFLWL(N,M6,M5,M4)=HFLWL(N,M6,M5,M4)+cpw*TK1(N3,N2,N1)*XN*FLWTHL
+  ENDIF
+  end subroutine TileDrain
+!------------------------------------------------------------------------------------------
+
+  SUBROUTINE SubSufRecharge(NY,NX,N,N1,N2,N3,M4,M5,M6,DPTHH,RCHGFU,RCHGFT,XN,VOLP2,VOLPX2,VOLPH2)
+  implicit none
+  integer, intent(in) :: NY,NX,N,N1,N2,N3,M4,M5,M6
+  real(r8),intent(in) :: RCHGFT,XN,DPTHH,RCHGFU
+  real(r8),intent(inout):: VOLP2,VOLPX2,VOLPH2
+  real(r8) :: FLWU,FLWUL,FLWUX,FLWUH,FLWUHL  
+  real(r8) :: PSISUT,PSISUTH,PSISWD
+
+  !     MICROPORE RECHARGE BELOW WATER TABLE
+  !
+  !     DPTHA=active layer depth
+  !     VOLP2=air volume
+  !     PSISWD=water potential from water table slope
+  !     XN,RCHG*=direction indicator,boundary flag
+  !     SLOPE=sin(lateral slope)
+  !     DLYR=layer width
+  !     DTBLG=water table slope
+  !     PSISUT=water potential driving micropore recharge
+  !     PSISA1,PSISO=matric,osmotic water potential
+  !     DPTH,DTBLX=depth to layer midpoint,natural water table
+  !     FLWU,FLWUL=micropore recharge unltd,ltd by micropore air volume
+  !     FLWL=micropore recharge from natural water table
+  !     HFLWL=convective heat from recharge from natural water table
+  !     HCND=saturated hydraulic conductivity
+  !     AREAU=fraction of layer below natural water table
+  !     VOLP1Z=air filled 
+      IF(DPTH(N3,N2,N1).GE.DTBLX(N2,N1)     &
+        .AND.DPTHA(N2,N1).GT.DTBLX(N2,N1)   &
+        .AND.DPTH(N3,N2,N1).LT.DPTHA(N2,N1) &
+        .AND.(VOLP2.GT.ZEROS2(N2,N1).OR.BKDS(N3,N2,N1).LE.ZERO) &
+        .AND.VOLP1Z(N3,N2,N1).GT.0.0_r8 &
+        .AND.test_aneb(RCHGFT,0._r8))THEN
+        PSISWD=XN*0.005_r8*SLOPE(N,N2,N1)*DLYR(N,N3,N2,N1)*(1.0_r8-DTBLG(N2,N1))
+        PSISUT=AZMAX1(-PSISA1(N3,N2,N1)-0.03_r8*PSISO(N3,N2,N1)+GRAVm*(DPTH(N3,N2,N1)-DTBLX(N2,N1)))
+        IF(PSISUT.GT.0.0_r8)PSISUT=PSISUT+PSISWD
+        FLWU=PSISUT*HCND(N,1,N3,N2,N1)*AREA(N,N3,N2,N1)*AREAU(N3,N2,N1)/(RCHGFU+1.0)*RCHGFT*XNPH
+        IF(BKDS(N3,N2,N1).GT.ZERO)THEN
+          FLWUL=AMIN1(FLWU,VOLP2)
+          FLWUX=AMIN1(FLWU,VOLPX2)
+        ELSE
+          FLWUL=FLWU
+          FLWUX=FLWU
+        ENDIF
+        FLWL(N,M6,M5,M4)=FLWL(N,M6,M5,M4)+XN*FLWUL
+        FLWLX(N,M6,M5,M4)=FLWLX(N,M6,M5,M4)+XN*FLWUX
+        HFLWL(N,M6,M5,M4)=HFLWL(N,M6,M5,M4)+cpw*TK1(N3,N2,N1)*XN*FLWUL
+        VOLP2=VOLP2-XN*FLWL(N,M6,M5,M4)
+        VOLPX2=VOLPX2-XN*FLWLX(N,M6,M5,M4)
+      ENDIF
+!
+      !     MACROPORE RECHARGE BELOW WATER TABLE
+      !
+      !     PSISWD=water potential from water table slope
+      !     XN,RCHG*=direction indicator,boundary flag
+      !     SLOPE=sin(lateral slope)
+      !     DLYR=layer width
+      !     DTBLG=water table slope
+      !     PSISUTH=water potential driving macropore recharge
+      !     PSISO=osmotic water potential
+      !     DPTHH,DTBLX=depth to layer macropore water,natural water table
+      !     DPTHT=depth to internal water table
+      !     CNDH1=macropore hydraulic conductivity
+      !     FLWUH,FLWUHL=macropore recharge unltd,ltd by macropore air volume
+      !     FLWHL=macropore discharge to natural water table
+      !     HFLWL=convective heat from discharge to natural water table
+      !     HCND=saturated hydraulic conductivity
+      !     AREAU=fraction of layer below natural water table
+!
+      IF(DPTHH.GT.DTBLX(N2,N1)                & !deeper than water table
+        .AND.DPTHA(N2,N1).GT.DTBLX(N2,N1)     & !active layer below water table
+        .AND.DPTH(N3,N2,N1).LT.DPTHA(N2,N1)   & !midlayer depth above active water layer
+        .AND.VOLPH2.GT.ZEROS2(NY,NX)          & !macropore has air-filled fraction
+        .AND.test_aneb(RCHGFT,0.0_r8))THEN      !recharge is on
+        PSISWD=XN*0.005*SLOPE(N,N2,N1)*DLYR(N,N3,N2,N1)*(1.0_r8-DTBLG(N2,N1))
+        PSISUTH=-0.03_r8*PSISO(N3,N2,N1)+GRAVm*(DPTHH-DTBLX(N2,N1))
+        IF(PSISUTH.GT.0.0_r8)PSISUTH=PSISUTH+PSISWD
+        FLWUH=PSISUTH*CNDH1(N3,N2,N1)*AREA(N,N3,N2,N1)*AREAU(N3,N2,N1)/(RCHGFU+1.0_r8)*RCHGFT*XNPH
+        FLWUHL=AMIN1(FLWUH,VOLPH2*XNPX)
+        FLWHL(N,M6,M5,M4)=FLWHL(N,M6,M5,M4)+XN*FLWUHL
+        HFLWL(N,M6,M5,M4)=HFLWL(N,M6,M5,M4)+cpw*TK1(N3,N2,N1)*XN*FLWUHL
+        VOLPH2=VOLPH2-XN*FLWHL(N,M6,M5,M4)
+      ENDIF
+    
+  end SUBROUTINE SubSufRecharge              
+!------------------------------------------------------------------------------------------
+
+  subroutine FreezeThaw(NY,NX,L,N1,N2,N3)
+  implicit none
+  integer, intent(in) :: NY,NX,L,N1,N2,N3
+  real(r8) :: VHCP1BX,PSISMX,TFREEZ,VOLW1X
+  real(r8) :: VOLWH1X,VHCP1AX,TK1X,TFLXH1,TFLXH
+  real(r8) :: ENGY1,TFLX,TFLX1,VHCP1X
+!
+!     FREEZE-THAW IN SOIL LAYER MICROPORE FROM NET CHANGE IN SOIL
+!     LAYER HEAT STORAGE
+!
+!     TFREEZ=micropore freezing temperature
+!     PSISA1,PSISO=micropore matric,osmotic potential
+!     VOLW1*,VOLI1=micropore water,ice volume
+!     VOLWH1*,VOLIH1=macropore water,ice volume
+!     VHCP1X,VHCP1AX,VHCP1BX=total soil,micropore,macropore heat capacity
+!     VHCM=soil solid volumetric heat capacity
+!     TK1*=soil temperature
+!     THFLWL=total soil conductive, convective heat flux
+!     HWFLU1=subsurface convective heat flux
+!     TFLX1,TFLX=latent heat from micro freeze-thaw unltd,ltd by water,ice
+!     WFLXL=soil water flux from micropore freeze-thaw
+!     TFLXH1,TFLXL=latent heat from macro freeze-thaw unltd,ltd by water,ice
+!     WFLXLH=soil water flux from macropore freeze-thaw
+!
+  PSISMX=PSISA1(N3,N2,N1)+PSISO(N3,N2,N1)
+  TFREEZ=-9.0959E+04_r8/(PSISMX-333.0_r8)
+  VOLW1X=VOLW1(N3,N2,N1)+TFLWL(N3,N2,N1)+FINHL(N3,N2,N1)+FLU1(N3,N2,N1)
+  VOLWH1X=VOLWH1(N3,N2,N1)+TFLWHL(N3,N2,N1)-FINHL(N3,N2,N1)
+  ENGY1=VHCP1(N3,N2,N1)*TK1(N3,N2,N1)
+  VHCP1X=VHCM(N3,N2,N1)+cpw*(VOLW1X+VOLWH1X)+cpi*(VOLI1(N3,N2,N1)+VOLIH1(N3,N2,N1))
+  IF(VHCP1X.GT.ZEROS(NY,NX))THEN
+    TK1X=(ENGY1+THFLWL(N3,N2,N1)+HWFLU1(N3,N2,N1))/VHCP1X
+    IF((TK1X.LT.TFREEZ.AND.VOLW1(N3,N2,N1).GT.ZERO*VOLT(N3,N2,N1)) &
+      .OR.(TK1X.GT.TFREEZ.AND.VOLI1(N3,N2,N1).GT.ZERO*VOLT(N3,N2,N1)))THEN
+      VHCP1AX=VHCM(N3,N2,N1)+cpw*VOLW1X+cpi*VOLI1(N3,N2,N1)
+      TFLX1=VHCP1AX*(TFREEZ-TK1X)/((1.0_r8+6.2913E-03_r8*TFREEZ)*(1.0_r8-0.10_r8*PSISMX))*XNPX
+      IF(TFLX1.LT.0.0_r8)THEN
+        TFLX=AMAX1(-333.0_r8*DENSI*VOLI1(N3,N2,N1)*XNPX,TFLX1)
+      ELSE
+        TFLX=AMIN1(333.0_r8*VOLW1X*XNPX,TFLX1)
+      ENDIF
+        WFLXL(N3,N2,N1)=-TFLX/333.0_r8
+      ELSE
+        TFLX=0.0_r8
+        WFLXL(N3,N2,N1)=0.0_r8
+      ENDIF
+    ELSE
+      TFLX=0.0_r8
+      WFLXL(N3,N2,N1)=0.0_r8
+    ENDIF
+!
+!     FREEZE-THAW IN SOIL LAYER MACROPORE FROM NET CHANGE IN SOIL
+!     LAYER HEAT STORAGE
+!  TFice=frozen temperature
+    IF((TK1X.LT.TFice.AND.VOLWH1(N3,N2,N1).GT.ZERO*VOLT(N3,N2,N1)) &
+      .OR.(TK1X.GT.TFice.AND.VOLIH1(N3,N2,N1).GT.ZERO*VOLT(N3,N2,N1)))THEN
+      !there is freeze-thaw 
+      VHCP1BX=cpw*VOLWH1X+cpi*VOLIH1(L,NY,NX)
+      TFLXH1=VHCP1BX*(TFREEZ-TK1X)/((1.0_r8+6.2913E-03_r8*TFREEZ)*(1.0_r8-0.10_r8*PSISMX))*XNPX
+      IF(TFLXH1.LT.0.0_r8)THEN
+        TFLXH=AMAX1(-333.0_r8*DENSI*VOLIH1(N3,N2,N1)*XNPX,TFLXH1)
+      ELSE
+        TFLXH=AMIN1(333.0_r8*VOLWH1X*XNPX,TFLXH1)
+      ENDIF
+      WFLXLH(N3,N2,N1)=-TFLXH/333.0_r8
+    ELSE
+      TFLXH=0.0_r8
+      WFLXLH(N3,N2,N1)=0.0_r8
+    ENDIF
+    TFLXL(N3,N2,N1)=TFLX+TFLXH
+      !
+      !     TOTAL AND HOURLY ACCUMULATED FREEZE-THAW FLUXES
+    !
+    !     THAW,THAWH=hourly accumulated freeze-thaw flux in micropores,macropores
+    !     HTHAW=hourly accumulated freeze-thaw latent heat flux
+    !     TWFLXL,TWFLXH=total accumulated freeze-thaw in micropores,macropores
+      !     TTFLXL=total latent heat flux
+!
+    THAW(N3,N2,N1)=THAW(N3,N2,N1)+WFLXL(N3,N2,N1)
+    THAWH(N3,N2,N1)=THAWH(N3,N2,N1)+WFLXLH(N3,N2,N1)
+    HTHAW(N3,N2,N1)=HTHAW(N3,N2,N1)+TFLXL(N3,N2,N1)
+    TWFLXL(N3,N2,N1)=TWFLXL(N3,N2,N1)+WFLXL(N3,N2,N1)
+    TWFLXH(N3,N2,N1)=TWFLXH(N3,N2,N1)+WFLXLH(N3,N2,N1)
+    TTFLXL(N3,N2,N1)=TTFLXL(N3,N2,N1)+TFLXL(N3,N2,N1)
+  end subroutine FreezeThaw        
 
 end module WatsubMod

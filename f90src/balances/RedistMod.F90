@@ -272,7 +272,7 @@ module RedistMod
 !     HVOLO=hourly water loss through lateral and lower boundaries
 !
   IF(J.EQ.INT(ZNOON(NY,NX)).AND.ITILL(I,NY,NX).EQ.23)THEN
-! drainage is on
+    ! drainage is on
     DCORPW=DCORP(I,NY,NX)+CDPTH(NU(NY,NX)-1,NY,NX)
     DTBLI(NY,NX)=DCORPW
     DTBLZ(NY,NX)=DTBLI(NY,NX)-(ALTZ(NY,NX)-ALT(NY,NX))*(1.0_r8-DTBLG(NY,NX))
@@ -280,7 +280,7 @@ module RedistMod
   ENDIF
 
   IF(J.EQ.INT(ZNOON(NY,NX)).AND.ITILL(I,NY,NX).EQ.24)THEN
-! drainage in on
+    ! drainage in on
     DCORPW=DCORP(I,NY,NX)+CDPTH(NU(NY,NX)-1,NY,NX)
     IF(IDTBL(NY,NX).EQ.1)THEN
       IDTBL(NY,NX)=3
