@@ -11,6 +11,7 @@ module InitEcoSIM
   contains
 
   subroutine InitModules(nmicbguilds)
+
   use EcoSiMParDataMod    , only : micpar,pltpar
   use EcoSimSumDataType   , only : InitEcoSimSum
   use SnowDataType        , only : InitSnowData
@@ -55,6 +56,8 @@ module InitEcoSIM
   use HistDataType        , only : hist_ecosim
   use EcoSIMConfig        , only : jcplx1 => jcplx1c
   use TracerIDMod         , only : InitTracerIDs
+  use SnowPhysData        , only : InitSnowPhysData
+  use HydroThermData      , only : InitHydroThermData
   implicit  none
   
   integer                 , intent(in) :: nmicbguilds   !number of microbial guilds per group
@@ -137,8 +140,12 @@ module InitEcoSIM
 
   call InitSurfSoilData
 
-  call InitSoilPhysData
+  call InitHydroThermData
 
+  call InitSnowPhysData
+  
+  call InitSoilPhysData
+  
   call InitErosion
 
   call InitEcoSimSum

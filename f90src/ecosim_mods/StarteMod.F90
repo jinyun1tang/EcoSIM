@@ -38,8 +38,12 @@ module StarteMod
 
   SUBROUTINE starte(NHW,NHE,NVN,NVS)
 !
+! DESCRIPTION:
 !     THIS SUBROUTINE INITIALIZES ALL SOIL CHEMISTRY VARIABLES
-!
+! The top layer are initialized every year to accomadate changes in 
+! boundary conditions (irrigation, rainfall, manure application) every year
+! other layers are done only in the first year.
+
   implicit none
   integer, intent(in) :: NHW,NHE,NVN,NVS
   type(solutedtype)  :: solutevar
@@ -83,7 +87,7 @@ module StarteMod
             ELSE
               IF(I.EQ.1)then
                 IF(K.EQ.micpar%k_fine_litr.AND.L.EQ.1)THEN
-!     INITIALIZE RAINFALL
+!     INITIALIZE RAINFALL, top layer
                   solutevar%CHY1=10.0_r8**(-(PHR(NY,NX)-3.0_r8))
                   solutevar%COH1=DPH2O/solutevar%CHY1
                   solutevar%CN4Z=CN4R(NY,NX)
@@ -97,7 +101,7 @@ module StarteMod
                   solutevar%CKAZ=CKAR(NY,NX)
                   solutevar%CSOZ=CSOR(NY,NX)
                   solutevar%CCLZ=CCLR(NY,NX)
-!               ELSEIF(K.EQ.micpar%k_POM.AND.(.not.is_restart_run).AND.is_first_year)THEN
+!               ELSEIF(K.EQ.micpar%k_POM.AND.(.not.is_restart()).AND.is_first_year)THEN
 !
 !     INITIALIZE SOIL WATER
 
@@ -187,6 +191,7 @@ module StarteMod
     k_manure  => micpar%k_manure   &
   )
   IF(K.EQ.micpar%k_fine_litr.AND.L.EQ.1.AND.I.EQ.1)THEN
+  !litter pool, top soil layer
     CCOR(NY,NX)=solutevar%CCO21
     CCHR(NY,NX)=solutevar%CCH41
     COXR(NY,NX)=solutevar%COXY1
@@ -242,6 +247,7 @@ module StarteMod
 !     SOLUTE CONCENTRATIONS IN IRRIGATION
 !
   ELSEIF(K.EQ.micpar%k_manure.AND.L.EQ.1)THEN
+  ! manure, top layer
     CCOQ(NY,NX)=solutevar%CCO21
     CCHQ(NY,NX)=solutevar%CCH41
     COXQ(NY,NX)=solutevar%COXY1
@@ -297,7 +303,7 @@ module StarteMod
 !     SOLUTE CONCENTRATIONS IN SOIL
 ! for the POM complex, on the first day in the first year
 ! U means surface irrigation
-  ELSEIF(K.EQ.micpar%k_POM.AND.I.EQ.1.AND.(.not.is_restart_run).AND.is_first_year)THEN
+  ELSEIF(K.EQ.micpar%k_POM.AND.I.EQ.1.AND.(.not.is_restart()).AND.is_first_year)THEN
     CCOU=solutevar%CCO21
     CCHU=solutevar%CCH41
     COXU=0._r8
@@ -528,7 +534,7 @@ module StarteMod
 !
 !     INITIAL STATE VARIABLES FOR MINERALS IN SURFACE RESIDUE
 !
-  IF(.not.is_restart_run.AND.is_first_year)THEN
+  IF(.not.is_restart().AND.is_first_year)THEN
     trc_solml(ids_nuts_beg:ids_nuts_end,0,NY,NX)=0._r8
 
     trcx_solml(idx_NH4,0,NY,NX)=0._r8

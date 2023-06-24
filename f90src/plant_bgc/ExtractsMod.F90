@@ -27,7 +27,7 @@ module ExtractsMod
   call TotalLitterfall()
 
   DO NZ=1,plt_site%NP
-    IF(plt_pheno%IFLGC(NZ).EQ.1)THEN
+    IF(plt_pheno%IFLGC(NZ).EQ.ipltactv)THEN
 
       call TotalLeafArea(NZ)
 
@@ -222,9 +222,9 @@ module ExtractsMod
 !     UPWTR=PFT root water uptake
 !     TUPHT=total convective heat in root water uptake
 !     TKS=soil temperature
-!     PP=PFT population
+!     PP=PFT population, this is dynamic, and can goes to zero
 !
-      IF(N.EQ.1)THEN
+      IF(N.EQ.ipltroot)THEN
         RTDNT(L)=RTDNT(L)+RTDNP(N,L,NZ)*PP(NZ)/AREA3(L)
       ENDIF
 !
@@ -253,12 +253,12 @@ module ExtractsMod
 !
 !     TOTAL ROOT GAS CONTENTS
 !
-!     TL*P=total root gas content
+!     TL*P=total root gas content, dissolved + gaseous phase
 !     *A,*P=PFT root gaseous, aqueous gas content
 !
-    DO NTG=idg_beg,idg_end-1
-      trcg_TLP(NTG,L)=trcg_TLP(NTG,L)+trcs_rootml(NTG,N,L,NZ)+trcg_rootml(NTG,N,L,NZ)
-    ENDDO
+      DO NTG=idg_beg,idg_end-1
+        trcg_TLP(NTG,L)=trcg_TLP(NTG,L)+trcs_rootml(NTG,N,L,NZ)+trcg_rootml(NTG,N,L,NZ)
+      ENDDO
 !
 !     TOTAL ROOT BOUNDARY GAS FLUXES
 !

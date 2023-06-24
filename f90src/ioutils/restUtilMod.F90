@@ -1,5 +1,6 @@
 module restUtilMod
    use EcoSIMConfig
+   use ElmIDMod
    use ncdio_pio
    use netcdf
    use data_kind_mod, only : r8 => DAT_Kind_r8
@@ -183,8 +184,9 @@ module restUtilMod
     end if
 
     if (flag == 'read') then
+       
        if (.not. readvar .and. is_restart()) &
-         call endrun('Reading restart file failed in '//trim(sub),__LINE__)
+         call endrun('Reading '//trim(varname)//' from restart file failed in '//trim(sub),__LINE__)
     end if
 
   end subroutine restartvar_real_sp
@@ -275,7 +277,7 @@ module restUtilMod
 
     if (flag == 'read') then
        if (.not. readvar .and. is_restart()) &
-         call endrun('Reading restart file failed in '//trim(sub),__LINE__)
+         call endrun('Reading '//trim(varname)//' from restart file failed in '//trim(sub),__LINE__)
     end if
 
   end subroutine restartvar_int_1d
@@ -367,7 +369,7 @@ module restUtilMod
 
     if (flag == 'read') then
        if (.not. readvar .and. is_restart()) &
-         call endrun('Reading restart file failed in '//trim(sub),__LINE__)
+         call endrun('Reading '//trim(varname)//' from restart file failed in '//trim(sub),__LINE__)
     end if
 
   end subroutine restartvar_int_2d  
@@ -460,7 +462,7 @@ module restUtilMod
 
     if (flag == 'read') then
        if (.not. readvar .and. is_restart()) &
-         call endrun('Reading restart file failed in '//trim(sub),__LINE__)
+         call endrun('Reading '//trim(varname)//' from restart file failed in '//trim(sub),__LINE__)
     end if
 
   end subroutine restartvar_int_3d  
@@ -711,14 +713,14 @@ module restUtilMod
 
 
     else if (flag == 'read' .or. flag == 'write') then
-
+      
       call ncd_io(varname=trim(varname), data=data, &
-        dim1name=trim(dim1name), ncid=ncid, flag=flag, readvar=readvar)
+        dim1name=trim(dim1name),  flag=flag, ncid=ncid, readvar=readvar)
     end if
 
     if (flag == 'read') then
        if (.not. readvar .and. is_restart()) &
-         call endrun('Reading restart file failed in '//trim(sub),__LINE__)
+         call endrun('Reading '//trim(varname)//' from restart file failed in '//trim(sub),__LINE__)
     end if
 
   end subroutine restartvar_real_sp_3d  
@@ -799,7 +801,7 @@ module restUtilMod
 
 
     else if (flag == 'read' .or. flag == 'write') then
-
+      
       call ncd_io(varname=trim(varname), data=data, &
         dim1name=trim(dim1name), ncid=ncid, flag=flag, readvar=readvar)
     end if
@@ -1109,7 +1111,7 @@ module restUtilMod
           IF(IFLGT(NY,NX)>0)THEN
             DO NZ=1,NP(NY,NX)
               if(present(IFLGC))then      
-                IF(IFLGC(NZ,NY,NX)/=0)THEN
+                IF(IFLGC(NZ,NY,NX)==ipltactv)THEN
                   ip=get_pft(NZ,NY,NX)
                   dat_arp(NZ,NY,NX)=datip_1d(ip)            
                 endif
@@ -1139,7 +1141,7 @@ module restUtilMod
           IF(IFLGT(NY,NX)>0)THEN
             DO NZ=1,NP(NY,NX)
               if(present(IFLGC))then      
-                IF(IFLGC(NZ,NY,NX)/=0)THEN
+                IF(IFLGC(NZ,NY,NX)==ipltactv)THEN
                   ip=get_pft(NZ,NY,NX)
                   datip_1d(ip)=dat_arp(NZ,NY,NX)
                 endif
@@ -1183,7 +1185,7 @@ module restUtilMod
           IF(IFLGT(NY,NX)>0)THEN
             DO NZ=1,NP(NY,NX)
               if(present(IFLGC))then      
-                IF(IFLGC(NZ,NY,NX)/=0)THEN
+                IF(IFLGC(NZ,NY,NX)==ipltactv)THEN
                   ip=get_pft(NZ,NY,NX)
                   DO NN=1,SIZE(dat_arp,1)
                     dat_arp(NN,NZ,NY,NX)=datip_2d(ip,NN)            
@@ -1220,7 +1222,7 @@ module restUtilMod
           IF(IFLGT(NY,NX)>0)THEN      
             DO NZ=1,NP(NY,NX)
               if(present(IFLGC))then      
-                IF(IFLGC(NZ,NY,NX)/=0)THEN
+                IF(IFLGC(NZ,NY,NX)==ipltactv)THEN
                   ip=get_pft(NZ,NY,NX)
                   DO NN=1,SIZE(dat_arp,1)              
                     datip_2d(ip,NN)=dat_arp(NN,NZ,NY,NX)
@@ -1270,7 +1272,7 @@ module restUtilMod
           IF(IFLGT(NY,NX)>0)THEN
             DO NZ=1,NP(NY,NX)
               if(present(IFLGC))then      
-                IF(IFLGC(NZ,NY,NX)/=0)THEN
+                IF(IFLGC(NZ,NY,NX)==ipltactv)THEN
                   ip=get_pft(NZ,NY,NX)
                   DO N2=1,SIZE(dat_arp,2)
                     DO N1=1,SIZE(dat_arp,1)
@@ -1312,7 +1314,7 @@ module restUtilMod
           IF(IFLGT(NY,NX)>0)THEN
             DO NZ=1,NP(NY,NX)
               if(present(IFLGC))then      
-                IF(IFLGC(NZ,NY,NX)/=0)THEN
+                IF(IFLGC(NZ,NY,NX)==ipltactv)THEN
                   ip=get_pft(NZ,NY,NX)
                   DO N2=1,SIZE(dat_arp,2)
                     DO N1=1,SIZE(dat_arp,1)
@@ -1368,7 +1370,7 @@ module restUtilMod
           IF(IFLGT(NY,NX)>0)THEN
             DO NZ=1,NP(NY,NX)
               if(present(IFLGC))then      
-                IF(IFLGC(NZ,NY,NX)/=0)THEN
+                IF(IFLGC(NZ,NY,NX)==ipltactv)THEN
                   ip=get_pft(NZ,NY,NX)
                   dat_arp(NZ,NY,NX)=datrp_1d(ip)            
                 endif
@@ -1398,7 +1400,7 @@ module restUtilMod
           IF(IFLGT(NY,NX)>0)THEN
             DO NZ=1,NP(NY,NX)
               if(present(IFLGC))then      
-                IF(IFLGC(NZ,NY,NX)/=0)THEN
+                IF(IFLGC(NZ,NY,NX)==ipltactv)THEN
                   ip=get_pft(NZ,NY,NX)
                   datrp_1d(ip)=dat_arp(NZ,NY,NX)
                 endif
@@ -1442,7 +1444,7 @@ module restUtilMod
           IF(IFLGT(NY,NX)>0)THEN
             DO NZ=1,NP(NY,NX)
               if(present(IFLGC))then      
-                IF(IFLGC(NZ,NY,NX)/=0)THEN
+                IF(IFLGC(NZ,NY,NX)==ipltactv)THEN
                   ip=get_pft(NZ,NY,NX)              
                   DO NN=1,SIZE(dat_arp,1)
                     dat_arp(NN,NZ,NY,NX)=datrp_2d(ip,NN)            
@@ -1478,7 +1480,7 @@ module restUtilMod
           IF(IFLGT(NY,NX)>0)THEN
             DO NZ=1,NP(NY,NX)
               if(present(IFLGC))then      
-                IF(IFLGC(NZ,NY,NX)/=0)THEN
+                IF(IFLGC(NZ,NY,NX)==ipltactv)THEN
                   ip=get_pft(NZ,NY,NX)
                   DO NN=1,SIZE(dat_arp,1)
                     datrp_2d(ip,NN)=dat_arp(NN,NZ,NY,NX)            
@@ -1528,7 +1530,7 @@ module restUtilMod
           IF(IFLGT(NY,NX)>0)THEN
             DO NZ=1,NP(NY,NX)
               if(present(IFLGC))then      
-                IF(IFLGC(NZ,NY,NX)/=0)THEN
+                IF(IFLGC(NZ,NY,NX)==ipltactv)THEN
                   ip=get_pft(NZ,NY,NX)              
                 DO N2=1,SIZE(dat_arp,2)
                   DO N1=1,SIZE(dat_arp,1)
@@ -1570,7 +1572,7 @@ module restUtilMod
           IF(IFLGT(NY,NX)>0)THEN
             DO NZ=1,NP(NY,NX)
               if(present(IFLGC))then      
-                IF(IFLGC(NZ,NY,NX)/=0)THEN
+                IF(IFLGC(NZ,NY,NX)==ipltactv)THEN
                   ip=get_pft(NZ,NY,NX)
                   DO N2=1,SIZE(dat_arp,2)
                     DO N1=1,SIZE(dat_arp,1)
@@ -1625,7 +1627,7 @@ module restUtilMod
           IF(IFLGT(NY,NX)>0)THEN
             DO NZ=1,NP(NY,NX)
               if(present(IFLGC))then      
-                IF(IFLGC(NZ,NY,NX)/=0)THEN
+                IF(IFLGC(NZ,NY,NX)==ipltactv)THEN
                   ip=get_pft(NZ,NY,NX)              
                   DO N3=1,SIZE(dat_arp,3)
                     DO N2=1,SIZE(dat_arp,2)
@@ -1673,7 +1675,7 @@ module restUtilMod
           IF(IFLGT(NY,NX)>0)THEN
             DO NZ=1,NP(NY,NX)
               if(present(IFLGC))then      
-                IF(IFLGC(NZ,NY,NX)/=0)THEN
+                IF(IFLGC(NZ,NY,NX)==ipltactv)THEN
                   ip=get_pft(NZ,NY,NX)
                   DO N3=1,SIZE(dat_arp,3)
                     DO N2=1,SIZE(dat_arp,2)
@@ -1734,7 +1736,7 @@ module restUtilMod
           IF(IFLGT(NY,NX)>0)THEN
             DO NZ=1,NP(NY,NX)
               if(present(IFLGC))then      
-                IF(IFLGC(NZ,NY,NX)/=0)THEN
+                IF(IFLGC(NZ,NY,NX)==ipltactv)THEN
                   ip=get_pft(NZ,NY,NX)              
                   DO N4=1,SIZE(dat_arp,4)
                     DO N3=1,SIZE(dat_arp,3)
@@ -1788,7 +1790,7 @@ module restUtilMod
           IF(IFLGT(NY,NX)>0)THEN
             DO NZ=1,NP(NY,NX)
               if(present(IFLGC))then      
-                IF(IFLGC(NZ,NY,NX)/=0)THEN
+                IF(IFLGC(NZ,NY,NX)==ipltactv)THEN
                   ip=get_pft(NZ,NY,NX)
                   DO N4=1,SIZE(dat_arp,4)
                     DO N3=1,SIZE(dat_arp,3)

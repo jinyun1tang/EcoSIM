@@ -62,16 +62,16 @@ implicit none
   end function TEFGASDIF
 !------------------------------------------------------------------------------------------
 
-  function TortMicporew(THETWT)result(ans)
+  function TortMicporeW(THETWT)result(ans)
 !
 ! aqueous tortuosity in micropore
   implicit none
   real(r8), intent(in) :: THETWT     !relative saturation of micropore
   real(r8) :: ans
   ans =0.7_r8*THETWT**2._r8
-  end function TortMicporew
+  end function TortMicporeW
 !------------------------------------------------------------------------------------------
-  function TortMacporew(THETWH)result(ans)
+  function TortMacporeW(THETWH)result(ans)
   implicit none
   real(r8), intent(in) :: THETWH   !realative saturation of macropore
 
@@ -79,7 +79,7 @@ implicit none
 
   ans=AMIN1(1.0_r8,2.8_r8*THETWH**3_r8)
 
-  end function TortMacporew
+  end function TortMacporeW
 
 !------------------------------------------------------------------------------------------
   function fDFGS(scalar,THETWA,Z3SR,is_litter)result(ans)

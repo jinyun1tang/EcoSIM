@@ -44,7 +44,8 @@ module EcoSIMDesctruct
   use PlantMngmtDataType  , only : DestructPlantMngmtData
   use InitSOMBGCMOD       , only : DestructSOMBGC
   use TrnsfrMod           , only : DestructTrnsfr
-
+  use SnowPhysData        , only : DestructSnowPhysData
+  use HydroThermData      , only : DestructHydroThermData
   implicit none
 
   call DestructMicrobialData
@@ -108,8 +109,12 @@ module EcoSIMDesctruct
 
   call DestructErosion
 
+  call DestructSnowPhysData
+  
   call DestructWatSubData
 
+  call DestructHydroThermData
+  
   call DestructEcoSimSum
 
   call ncd_pio_closefile(pft_nfid)

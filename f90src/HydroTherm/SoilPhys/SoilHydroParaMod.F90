@@ -14,9 +14,9 @@ module SoilHydroParaMod
   use LandSurfDataType
   use EcoSIMHistMod
   use EcoSIMConfig
-  use WatsubPars
   use SurfLitterDataType
   use EcoSIMCtrlMod  
+  use PhysPars  
   use EcoSiMParDataMod   , only : micpar
   use minimathmod  , only : test_aeqb,AZMAX1,AZMIN1
 implicit none
@@ -31,6 +31,10 @@ contains
 !------------------------------------------------------------------------------------------
 
   subroutine GetSoilHydraulicVars(NY,NX)
+  !
+  !DESCRIPTIONS
+  !compute hydraulic properties
+  !called in hour1.F90 before doing hydrology 
   implicit none
   integer, intent(in) :: NY,NX
   REAL(R8) :: FCX,FCLX
@@ -197,15 +201,24 @@ contains
 
     !IDATA(9): start year of model run
     IF(I.EQ.IBEGIN.AND.J.EQ.1.AND.is_first_year)THEN
+      !first time step at the beginning year
+      !THW=initial soil water content 
+      !DPTH=depth to middle of soil layer [m]
+      !DTBLZ=external water table depth, [m]
       IF(THW(L,NY,NX).GT.1.0_r8.OR.DPTH(L,NY,NX).GE.DTBLZ(NY,NX))THEN
+        !below the water table, thus it is saturated
         THETW(L,NY,NX)=POROS(L,NY,NX)
       ELSEIF(test_aeqb(THW(L,NY,NX),1._r8))THEN
+        !at field capacity
         THETW(L,NY,NX)=FC(L,NY,NX)
       ELSEIF(test_aeqb(THW(L,NY,NX),0._r8))THEN
+        !at wilting point
         THETW(L,NY,NX)=WP(L,NY,NX)
-      ELSEIF(THW(L,NY,NX).LT.0.0)THEN
+      ELSEIF(THW(L,NY,NX).LT.0.0_r8)THEN
+        !completely dry
         THETW(L,NY,NX)=0.0_r8
       ENDIF
+
       IF(THI(L,NY,NX).GT.1.0_r8.OR.DPTH(L,NY,NX).GE.DTBLZ(NY,NX))THEN
         THETI(L,NY,NX)=AZMAX1(AMIN1(POROS(L,NY,NX),POROS(L,NY,NX)-THW(L,NY,NX)))
       ELSEIF(test_aeqb(THI(L,NY,NX),1._r8))THEN
@@ -217,6 +230,7 @@ contains
       ENDIF
       
       IF(cold_run())THEN
+      !in a cold run, set it 
         VOLW(L,NY,NX)=THETW(L,NY,NX)*VOLX(L,NY,NX)
         VOLWX(L,NY,NX)=VOLW(L,NY,NX)
         VOLWH(L,NY,NX)=THETW(L,NY,NX)*VOLAH(L,NY,NX)
@@ -246,8 +260,8 @@ contains
       !     -0.033 MPA (MINERAL SOILS) IF NOT ENTERED IN SOIL FILE IN 'READS'
       !
       !     SCNV,SCNH=vertical,lateral saturated hydraulic conductivity
-!
-  IF(ISOIL(3,L,NY,NX).EQ.1)THEN
+  !
+  IF(ISOIL(isoi_scnv,L,NY,NX).EQ.1)THEN
     !computing vertical saturated hydraulic conductivity
     IF(CORGC(L,NY,NX).LT.FORGW)THEN
       THETF=AMIN1(POROS(L,NY,NX),EXP((PSIMS(NY,NX)-LOG(0.033_r8)) &
@@ -258,12 +272,13 @@ contains
       SCNV(L,NY,NX)=SCNV(L,NY,NX)*FMPR(L,NY,NX)
     ENDIF
   ENDIF
-  IF(ISOIL(4,L,NY,NX).EQ.1)THEN
+
+  IF(ISOIL(isoi_scnh,L,NY,NX).EQ.1)THEN
     !computing horizontal saturated hydraulic conductivity
     IF(CORGC(L,NY,NX).LT.FORGW)THEN
       THETF=AMIN1(POROS(L,NY,NX),EXP((PSIMS(NY,NX)-LOG(0.033_r8)) &
         *(PSL(L,NY,NX)-FCL(L,NY,NX))/PSISD(NY,NX)+PSL(L,NY,NX)))
-      SCNH(L,NY,NX)=1.54_r8*((POROS(L,NY,NX)-THETF)/THETF)**2
+      SCNH(L,NY,NX)=1.54_r8*((POROS(L,NY,NX)-THETF)/THETF)**2._r8
     ELSE
       SCNH(L,NY,NX)=0.10_r8+75.0_r8*1.0E-15_r8**BKDS(L,NY,NX)
       SCNH(L,NY,NX)=SCNH(L,NY,NX)*FMPR(L,NY,NX)
@@ -292,6 +307,7 @@ contains
     ENDIF
     SUM2=SUM2+(2*K-1)/(PSISK(K)**2_r8)
   ENDDO
+
   DO  K=1,100
     SUM1=0.0_r8
     XK=K-1
@@ -301,15 +317,18 @@ contains
     ENDDO
     DO  N=1,3
       IF(N.EQ.3)THEN
+        !vertical
         HCND(N,K,L,NY,NX)=SCNV(L,NY,NX)*YK*SUM1/SUM2
         IF(K.GT.1.AND.PSISK(K).LT.PSISA(L,NY,NX).AND.PSISK(K-1).GE.PSISA(L,NY,NX))THEN
           THETS(L,NY,NX)=THETK(K)
         ENDIF
       ELSE
+        !horizontal
         HCND(N,K,L,NY,NX)=SCNH(L,NY,NX)*YK*SUM1/SUM2
       ENDIF
     ENDDO
   ENDDO
+
 !     SOIL MACROPORE DIMENSIONS AND CONDUCTIVITY FROM MACROPORE FRACTION
 !     ENTERED IN 'READS'
 !
@@ -318,6 +337,7 @@ contains
 !
   HRAD(L,NY,NX)=0.5E-03_r8
   NHOL(L,NY,NX)=INT(VOLAH(L,NY,NX)/(PICON*HRAD(L,NY,NX)**2._r8*VOLTI(L,NY,NX)))
+
   IF(NHOL(L,NY,NX).GT.0.0_r8)THEN
     PHOL(L,NY,NX)=1.0_r8/(SQRT(PICON*NHOL(L,NY,NX)))
   ELSE
@@ -326,7 +346,6 @@ contains
   VISCWL=VISCW*EXP(0.533_r8-0.0267_r8*TCS(L,NY,NX))
   CNDH(L,NY,NX)=3.6E+03_r8*PICON*NHOL(L,NY,NX)*HRAD(L,NY,NX)**4._r8/(8.0_r8*VISCWL)
   end subroutine SoilHydroProperty
-
 
 !------------------------------------------------------------------------------------------
 
@@ -377,4 +396,5 @@ contains
     ENDIF
   ENDDO D1235
   end subroutine LitterHydroproperty
+
 end module SoilHydroParaMod

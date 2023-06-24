@@ -7,7 +7,7 @@ module RestartMod
   use data_const_mod    , only : spval => DAT_CONST_SPVAL, ispval => DAT_CONST_ISPVAL  
   use EcoSIMConfig      , only : jcplx=> jcplxc, NFGs=> NFGsc,nlbiomcp=>nlbiomcpc
   use EcoSIMConfig      , only : ndbiomcp=>ndbiomcpc,jsken=>jskenc, cold_run
-  use EcoSIMConfig      , only : inst_suffix,ref_date,start_date, ctitle
+  use EcoSIMConfig      , only : inst_suffix,ref_date,start_date, ctitle,datestrlen
   use EcoSIMConfig      , only : case_name,hostname,version,source,username
   use EcoSIMCtrlDataType, only : iyear_cur
   use EcoSiMParDataMod  , only : micpar,pltpar
@@ -15,7 +15,7 @@ module RestartMod
   use EcoSIMCtrlMod     , only : etimer,do_budgets
   use restUtilMod  
   use abortutils        , only : endrun,destroy
-  use HistFileMod       , only : hist_restart_ncd
+  use HistFileMod       , only : hist_restart_ncd  
   use ncdio_pio
   use MicrobialDataType
   use SOMDataType
@@ -59,25 +59,10 @@ implicit none
   character(len=16), parameter :: namec  = 'column'       ! name of columns
   character(len=16), parameter :: namep  = 'pft'          ! name of patches
 
-  public :: restart
   public :: restFile
+  public :: get_restart_date
   contains
 
-  subroutine restart(I,NHW,NHE,NVN,NVS)
-  use EcoSIMCtrlMod, only : lverb
-  implicit none
-  integer, intent (in) :: I,NHW,NHE,NVN,NVS
-
-  if(lverb)WRITE(*,334)'WOUTS'
-!  CALL WOUTS(I,NHW,NHE,NVN,NVS)
-  if(lverb)WRITE(*,334)'WOUTP'
-!  CALL WOUTP(I,NHW,NHE,NVN,NVS)
-  if(lverb)WRITE(*,334)'WOUTQ'
-!  CALL WOUTQ(I,NHW,NHE,NVN,NVS)
-
-334   FORMAT(A8)
-
-  end subroutine restart
 !------------------------------------------------------------------------------------------
   subroutine restartnc(ncid,flag)
   implicit none
@@ -89,15 +74,17 @@ implicit none
   CALL WOUTP(ncid,flag)
   end subroutine restartnc
 !------------------------------------------------------------------------------------------
-  subroutine restFile(flag,fnamer)
+  subroutine restFile(flag)
   implicit none
   character(len=*), intent(in) :: flag
-  character(len=*), intent(in), optional :: fnamer       ! name of netcdf restart file
-  character(len=256)   :: filer                   ! restart file name
+  character(len=256) :: fnamer       ! name of netcdf restart file
+  character(len=256) :: filer                   ! restart file name
+  character(len=256) :: path       ! name of netcdf restart file  
   character(len=18) :: rdate
   integer :: yr,mon,day,tod
 
   if (flag=='read')then
+    call restFile_getfile(fnamer,path)
     call restFile_read( bounds, fnamer)
   else if(flag=='write')then  
     call etimer%get_curr_date(yr,mon,day,tod)
@@ -2295,17 +2282,17 @@ implicit none
   endif  
 
   if(flag=='read')then
-    datpr4 => datrp_4d(1:npfts,1:npelms,1:JNODS,1:JBR)
+    datpr4 => datrp_4d(1:npfts,1:npelms,1:JNODS+1,1:JBR)
     call restartvar(ncid, flag, varname='WGLFE', dim1name='pft',dim2name='elmnts',&
-     dim3name='nodes',dim4name='nbranches',long_name='leaf area', units='g d-2', &
+     dim3name='nodes1',dim4name='nbranches',long_name='leaf element', units='g d-2', &
      interpinic_flag='skip', data=datpr4, missing_value=spval, fill_value=spval)  
     call cppft(flag,NHW,NHE,NVN,NVS,NP,WGLFE,datrp_4d,iflgt=iflgt,iflgc=iflgc) 
   else
     !print*,'WGLFE'
     if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,WGLFE,datrp_4d,iflgt=iflgt,iflgc=iflgc)   
-    datpr4 => datrp_4d(1:npfts,1:npelms,1:JNODS,1:JBR)
-    call restartvar(ncid, flag, varname='leaf element', dim1name='pft',dim2name='elmnts',&
-     dim3name='nodes',dim4name='nbranches',long_name='leaf area', units='g d-2', &
+    datpr4 => datrp_4d(1:npfts,1:npelms,1:JNODS+1,1:JBR)
+    call restartvar(ncid, flag, varname='WGLFE', dim1name='pft',dim2name='elmnts',&
+     dim3name='nodes1',dim4name='nbranches',long_name='leaf element', units='g d-2', &
      interpinic_flag='skip', data=datpr4, missing_value=spval, fill_value=spval) 
   endif  
 
@@ -7826,14 +7813,16 @@ implicit none
     integer :: m                    ! index
     integer :: nio                  ! restart pointer file
     character(len=256) :: filename  ! local file name
+    character(len=datestrlen) :: curr_date
     !-----------------------------------------------------------------------
 
 !    if (masterproc) then
        nio = getavu()
        filename= trim(rpntdir) //'/'// trim(rpntfil)//trim(inst_suffix)
        call opnfil( filename, nio, 'f' )
-
+       curr_date =etimer%get_calendar()
        write(nio,'(a)') fnamer
+       write(nio,'(a)')curr_date
        call relavu( nio )
        write(iulog,*)'Successfully wrote local restart pointer file'
 !    end if
@@ -7896,21 +7885,26 @@ implicit none
   type(file_desc_t) :: ncid         ! netcdf id
   integer           :: nc
   integer :: i
+
   ! Open file
-
+  print*,trim(file)
   call restFile_open( flag='read', file=file, ncid=ncid )
-
+  print*,'restFile_open Successfully'
   ! Read file
 
   call restFile_dimcheck( ncid )
 
+  print*,'hist_restart_ncd'
   call hist_restart_ncd (bounds, ncid, flag='read')
 
   ! Do error checking on file
   
   call restFile_check_consistency(bounds, ncid)
-
-
+  
+  call timemgr_restart_io( ncid, flag='read')
+  
+  call restartnc(ncid,flag='read')
+  
   ! Close file 
   call restFile_close( ncid )
 !    if (masterproc) then
@@ -7927,7 +7921,9 @@ implicit none
   ! !ARGUMENTS:
   type(bounds_type), intent(in)    :: bounds  ! bounds
   type(file_desc_t), intent(inout) :: ncid    ! netcdf id
+  character(len=*), parameter :: subname=trim(mod_filename)//'::restFile_check_consistency'
 
+  print*,subname
   end subroutine restFile_check_consistency
 
   !-----------------------------------------------------------------------
@@ -7952,6 +7948,40 @@ implicit none
 !  call check_dim(ncid, 'levurb'  , nlevurb)
 !  call check_dim(ncid, 'levlak'  , nlevlak) 
 
+  call check_dim(ncid,'datestrlen',datestrlen)  
+  call check_dim(ncid,'rootaxs',JRS)
+  call check_dim(ncid,'nodes',JNODS)
+  call check_dim(ncid,'cansecz',JLI)
+  call check_dim(ncid,'fertN',trc_confs%nfertN)
+  call check_dim(ncid,'fertNb',trc_confs%nfertNb)
+  call check_dim(ncid,'automicb',NMICBSA)
+  call check_dim(ncid,'nlbiomcp',nlbiomcp)
+  call check_dim(ncid, 'levsoi', JZ)
+  call check_dim(ncid, 'levsoi1', JZ+1)
+  call check_dim(ncid, 'levsno',  JS)
+  call check_dim(ncid, 'levcan',JC)
+  call check_dim(ncid, 'levcan1',JC+1)
+  call check_dim(ncid, 'npfts',  JP)
+  call check_dim(ncid, 'nbranches',JBR)
+  call check_dim(ncid, 'ngrstages',jpstgs)
+  call check_dim(ncid, 'elmnts',npelms)
+  call check_dim(ncid, 'nkinecmp',jsken)
+  call check_dim(ncid, 'nomcomplx',jcplx)
+  call check_dim(ncid, 'sdim',3)   !grid dimension
+  call check_dim(ncid,'hetrmicb',NMICBSO)
+  call check_dim(ncid,'rootyps'  , pltpar%jroots)
+  call check_dim(ncid,'xtracers' , trc_confs%nxtracers)
+
+  if(salt_model)then
+    call check_dim(ncid,'satracers', trc_confs%nsatracers)
+  endif  
+  call check_dim(ncid,'ptracers' , trc_confs%nptracers)
+  call check_dim(ncid,'nutracers', trc_confs%nutracers)
+  call check_dim(ncid,'gastrcs'  , trc_confs%ngtracers)
+  call check_dim(ncid,'soltrcs'  , trc_confs%nstracers)
+
+  call check_dim(ncid , 'string_length', 64        )
+  call check_dim(ncid , 'month'   , 12        )
   end subroutine restFile_dimcheck
   !-----------------------------------------------------------------------
   character(len=256) function restFile_filename( rdate )
@@ -8069,9 +8099,10 @@ implicit none
     character(len=*), parameter :: sub = trim(mod_filename)//'::'//'timemgr_restart_io'
     integer :: rc                  ! return code
     logical :: readvar             ! determine if variable is on initial file
-    character(len=18) :: curr_date   ! date of data in restart file, YYYYMMDDHHMMSS
+    character(len=datestrlen) :: curr_date   ! date of data in restart file, YYYYMMDDHHMMSS
     integer :: rst_caltype         ! calendar type
     integer :: isecspday
+    integer :: varid
     integer, parameter :: noleap = 1
     integer, parameter :: gregorian = 2
     
@@ -8087,12 +8118,30 @@ implicit none
     if (flag == 'write') then
        rst_step_sec  = etimer%get_step_size()
        curr_date =etimer%get_calendar()
-       read(start_date,'(I8)')rst_start_ymd       
-       read(ref_date,'(I8)')rst_ref_ymd   
-       read(curr_date,'(I8)')rst_curr_ymd
+       read(start_date,'(I8)')rst_start_ymd       !the start time info of the simulation
+       read(ref_date,'(I8)')rst_ref_ymd           !the referene time info of the simulation
+       read(curr_date,'(I8)')rst_curr_ymd         !current date info 
        rst_start_tod=get_tod(start_date(9:14))
        rst_ref_tod  =get_tod(ref_date(9:14))
        rst_curr_tod =get_tod(curr_date(9:14))
+
+       call ncd_putvar(ncid,'ref_date',ref_date)
+       call ncd_putvar(ncid,'curr_date',curr_date)
+       call ncd_putvar(ncid,'start_date',start_date)
+
+    elseif(flag=='define')then
+
+      call ncd_defvar(ncid,varname='ref_date',xtype=ncd_char, &
+        dim1name='datestrlen', long_name='reference date of the simulation')
+        
+      call ncd_defvar(ncid,varname='start_date',xtype=ncd_char, &
+        dim1name='datestrlen', long_name='starting date of the simulation')
+        
+      call ncd_defvar(ncid,varname='curr_date',xtype=ncd_char, &
+        dim1name='datestrlen', long_name='current date of the simulation')
+
+    elseif(flag=='read')then
+
     end if
     
     isecspday=secspday
@@ -8178,8 +8227,10 @@ implicit none
   call ncd_defdim(ncid , namep      , nump           ,  dimid)
 
   ! "level" dimensions
+  call ncd_defdim(ncid,'datestrlen',datestrlen,dimid)  
   call ncd_defdim(ncid,'rootaxs',JRS,dimid)
   call ncd_defdim(ncid,'nodes',JNODS,dimid)
+  call ncd_defdim(ncid,'nodes1',JNODS+1,dimid)  
   call ncd_defdim(ncid,'cansecz',JLI,dimid)
   call ncd_defdim(ncid,'fertN',trc_confs%nfertN, dimid)
   call ncd_defdim(ncid,'fertNb',trc_confs%nfertNb, dimid)
@@ -8254,6 +8305,8 @@ implicit none
 !------------------------------------------------------------------------------------------
 
   integer function get_tod(hhmmss)
+  !return the current time of day by seconds
+
   implicit none
   character(len=6) :: hhmmss
   integer :: hh,mm,ss
@@ -8276,4 +8329,25 @@ implicit none
 
   end subroutine restFile_enddef
 
+  !-----------------------------------------------------------------------
+  subroutine get_restart_date(curr_date)
+  !
+  ! DESCRIPTION
+  ! read the simulation date of restart file
+  use EcoSIMConfig, only : rpntdir, rpntfil
+  use fileutil , only : relavu
+  use fileutil , only : getavu, opnfil
+  implicit none
+  character(len=datestrlen), intent(out) :: curr_date
+  character(len=256) :: filename  ! local file name
+  character(len=256) :: fnamer    ! restart file name
+  integer :: nio
+  nio = getavu()
+  filename= trim(rpntdir) //'/'// trim(rpntfil)//trim(inst_suffix)
+  call opnfil( filename, nio, 'f' )  
+  read(nio,*) fnamer
+  read(nio,*)curr_date
+  call relavu( nio )
+
+  end subroutine get_restart_date
 end module restartMod

@@ -14,8 +14,6 @@ module SoilHeatDatatype
   real(r8),target,allocatable ::  HTHAW(:,:,:)                       !hourly accumulated freeze-thaw latent heat flux
   real(r8),target,allocatable ::  THAWH(:,:,:)                       !hourly accumulated freeze-thaw flux in macropores
   real(r8),target,allocatable ::  XTHAWW(:,:,:)                      !hourly accumulated latent heat flux from freeze-thaw
-  real(r8),target,allocatable ::  TSMX(:,:,:)                        !daily maximum soil temperature [oC]
-  real(r8),target,allocatable ::  TSMN(:,:,:)                        !daily minimum soil temperature [oC]
   real(r8),target,allocatable ::  VHCP(:,:,:)                        !soil heat capacity [MJ m-3 K-1]
   real(r8),target,allocatable ::  TCS(:,:,:)                         !soil temperature [oC]
   real(r8),target,allocatable ::  STC(:,:,:)                         !numerator for soil solid thermal conductivity [MJ m h-1 K-1]
@@ -32,8 +30,6 @@ contains
   allocate(HTHAW(JZ,JY,JX));    HTHAW=0._r8
   allocate(THAWH(JZ,JY,JX));    THAWH=0._r8
   allocate(XTHAWW(JS,JY,JX));   XTHAWW=0._r8
-  allocate(TSMX(0:JZ,JY,JX));   TSMX=0._r8
-  allocate(TSMN(0:JZ,JY,JX));   TSMN=0._r8
   allocate(VHCP(0:JZ,JY,JX));   VHCP=0._r8
   allocate(TCS(0:JZ,JY,JX));    TCS=0._r8
   allocate(STC(JZ,JY,JX));      STC=0._r8
@@ -50,8 +46,6 @@ contains
   call destroy(HTHAW)
   call destroy(THAWH)
   call destroy(XTHAWW)
-  call destroy(TSMX)
-  call destroy(TSMN)
   call destroy(VHCP)
   call destroy(TCS)
   call destroy(STC)

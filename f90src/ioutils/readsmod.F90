@@ -116,9 +116,6 @@ module readsmod
     write(*,*)'number of cycles per hour for water, heat, and '// &
       'solute flux calcns: NPX ',NPX
     write(*,*)'number of cycles per NPX for gas flux calcns: NPY',NPY
-    write(*,*)'output frequency for hourly data: JOUT ',JOUT
-    write(*,*)'output frequency for daily data: IOUT ',IOUT
-    write(*,*)'output frequency for checkpoint data: KOUT ',KOUT
     write(*,*)'changes to weather data (0=none,1=step,'// &
       '2=transient): ICLM ',ICLM
   endif

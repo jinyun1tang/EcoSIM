@@ -150,7 +150,7 @@ module VisualMod
 !
 !     HOURLY AGGREGATION
 !
-!     IF(IFLGC(NZ,NY,NX).EQ.1)THEN
+!     IF(IFLGC(NZ,NY,NX).EQ.ipltactv)THEN
 !     IF(I.EQ.IDAY0(NZ,NY,NX))THEN
 !     ND=0
 !     TCCTX=0.0

@@ -1,8 +1,7 @@
 module EcoSIMConfig
-  
+  use fileUtil, only :   datestrlen
 implicit none
   character(len=*),private, parameter :: mod_filename = __FILE__
-  logical :: is_restart_run=.false.
   logical :: is_first_year=.false.
   logical :: transport_on=.true.
   logical :: column_mode=.false.
@@ -20,8 +19,9 @@ implicit none
   integer, parameter :: jcplxc    = 5 !# of microbe-substrate complexes
   integer, parameter :: jcplx1c   = jcplxc-1
   integer, parameter :: NFGsc     = 7 !# of microbial functional groups in each complex
-  character(len=18)  :: ref_date  = '18000101000000'
-  character(len=18)  :: start_date= '18000101000000'
+
+  character(len=datestrlen)  :: ref_date  = '18000101000000'
+  character(len=datestrlen)  :: start_date= '18000101000000'
   character(len=36)  :: case_name
   character(len=256) :: finidat =' '
   character(len=256) :: ctitle  = ' '

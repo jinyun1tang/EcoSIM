@@ -91,9 +91,7 @@ module Hour1Mod
   integer :: L,NX,NY
   real(r8) :: THETPZ(JZ,JY,JX)
   real(r8) :: DPTH0(JY,JX)
-  real(r8) :: FVOLR
   real(r8) :: VOLWCX
-  real(r8) :: VOLWRX0,VOLR0
   real(r8) :: XJ,tPBOT
   integer :: NZ,NR,K
 !     execution begins here
@@ -138,35 +136,9 @@ module Hour1Mod
       ENDIF
 !
 !     HYDROLOGICAL PRPOERTIES OR SURFACE LITTER
-!
-!     VOLWRX=liter water holding capacity
-!     VOLR=dry litter volume
-!     POROS0,FC,WP=litter porosity,field capacity,wilting point
-!
-      VOLWRX0=0._r8
-      VOLR0=0._r8
-      DO K=1,micpar%n_litrsfk
-        VOLWRX0=VOLWRX0+THETRX(K)*RC0(K,NY,NX)
-        VOLR0=VOLR0+RC0(K,NY,NX)/BKRS(K)
-      ENDDO
+      call UpdateLiterPropertz(NY,NX)
 
-      VOLWRX(NY,NX)=AZMAX1(VOLWRX0)
-      VOLR(NY,NX)=AZMAX1(VOLR0*ppmc)
 
-      IF(VOLR(NY,NX).GT.ZEROS(NY,NX))THEN
-        FVOLR=VOLWRX(NY,NX)/VOLR(NY,NX)
-      ELSE
-        FVOLR=THETRX(micpar%k_fine_litr)/BKRS(micpar%k_fine_litr)
-      ENDIF
-      POROS0(NY,NX)=FVOLR
-      FC(0,NY,NX)=0.500_r8*FVOLR
-      WP(0,NY,NX)=0.125_r8*FVOLR
-      PSL(0,NY,NX)=LOG(POROS0(NY,NX))
-      FCL(0,NY,NX)=LOG(FC(0,NY,NX))
-      WPL(0,NY,NX)=LOG(WP(0,NY,NX))
-      PSD(0,NY,NX)=PSL(0,NY,NX)-FCL(0,NY,NX)
-      FCD(0,NY,NX)=FCL(0,NY,NX)-WPL(0,NY,NX)
-      SRP(0,NY,NX)=1.00_r8
 !
 !     RESET SURFACE LITTER PHYSICAL PROPERTIES (DENSITY, TEXTURE)
 !     AFTER DISTURBANCES (E.G. TILLAGE, EROSION)
@@ -876,12 +848,15 @@ module Hour1Mod
               ENDIF
             END DO D5705
           ENDIF
+          !THETPW=saturation criterion for water table identification
           IF(IFLGY.EQ.1)THEN
             IF(THETPZ(L,NY,NX).GE.THETPW.AND.L.NE.NL(NY,NX))THEN
-              PSIS1=PSISM(L+1,NY,NX)-0.0098*(DPTH(L+1,NY,NX)-DPTH(L,NY,NX))
+              !not bottom layer, saturated
+              PSIS1=PSISM(L+1,NY,NX)-0.0098_r8*(DPTH(L+1,NY,NX)-DPTH(L,NY,NX))
               THETWM=THETWP*POROS(L,NY,NX)
               THETW1=AMIN1(THETWM,EXP((PSIMS(NY,NX)-LOG(-PSIS1)) &
                 *PSD(L,NY,NX)/PSISD(NY,NX)+PSL(L,NY,NX)))
+
               IF(THETWM.GT.THETW1)THEN
                 THETPX=AMIN1(1.0_r8,AZMAX1((THETWM-THETW(L,NY,NX))/(THETWM-THETW1)))
                 DPTHT(NY,NX)=CDPTH(L,NY,NX)-DLYR(3,L,NY,NX)*(1.0_r8-THETPX)
@@ -889,6 +864,7 @@ module Hour1Mod
                 DPTHT(NY,NX)=CDPTH(L,NY,NX)-DLYR(3,L,NY,NX)
               ENDIF
             ELSE IF(L.GT.NU(NY,NX))THEN
+              !bottom layer, or not saturated, but is not topsoil layer
               PSIS1=PSISM(L,NY,NX)-0.0098_r8*(DPTH(L,NY,NX)-DPTH(L-1,NY,NX))
               THETWM=THETWP*POROS(L-1,NY,NX)
               THETW1=AMIN1(THETWM,EXP((PSIMS(NY,NX)-LOG(-PSIS1)) &
@@ -2387,4 +2363,41 @@ module Hour1Mod
     ENDDO
   ENDDO
   end subroutine CalGasSolubility
+!------------------------------------------------------------------------------------------
+  subroutine UpdateLiterPropertz(NY,NX)
+  implicit none
+  real(r8) :: FVOLR  
+  integer, intent(in) :: NY,NX
+!
+!     VOLWRX=liter water holding capacity
+!     VOLR=dry litter volume
+!     POROS0,FC,WP=litter porosity,field capacity,wilting point
+!
+  real(r8) :: VOLWRX0,VOLR0
+  integer  :: K
+  VOLWRX0=0._r8
+  VOLR0=0._r8
+  DO K=1,micpar%n_litrsfk
+    VOLWRX0=VOLWRX0+THETRX(K)*RC0(K,NY,NX)
+    VOLR0=VOLR0+RC0(K,NY,NX)/BKRS(K)
+  ENDDO
+
+  VOLWRX(NY,NX)=AZMAX1(VOLWRX0)
+  VOLR(NY,NX)=AZMAX1(VOLR0*ppmc)
+
+  IF(VOLR(NY,NX).GT.ZEROS(NY,NX))THEN
+    FVOLR=VOLWRX(NY,NX)/VOLR(NY,NX)
+  ELSE
+    FVOLR=THETRX(micpar%k_fine_litr)/BKRS(micpar%k_fine_litr)
+  ENDIF
+  POROS0(NY,NX)=FVOLR
+  FC(0,NY,NX)=0.500_r8*FVOLR
+  WP(0,NY,NX)=0.125_r8*FVOLR
+  PSL(0,NY,NX)=LOG(POROS0(NY,NX))
+  FCL(0,NY,NX)=LOG(FC(0,NY,NX))
+  WPL(0,NY,NX)=LOG(WP(0,NY,NX))
+  PSD(0,NY,NX)=PSL(0,NY,NX)-FCL(0,NY,NX)
+  FCD(0,NY,NX)=FCL(0,NY,NX)-WPL(0,NY,NX)
+  SRP(0,NY,NX)=1.00_r8
+  end subroutine UpdateLiterPropertz  
 end module Hour1Mod

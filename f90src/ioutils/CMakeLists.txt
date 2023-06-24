@@ -10,7 +10,6 @@ set(IOUTILS_SOURCES
 	readimod.F90
 	readsmod.F90
 	routp.F90
-	routs.F90
 	split.F90
 	splitc.F90
 	splitp.c

@@ -33,7 +33,7 @@ subroutine regressiontest(nmfile,case_name, NX, NY)
     call regression%OpenOutput()
 
     do NZ=1,NP(NY,NX)
-      IF(IFLGC(NZ,NY,NX).EQ.1)THEN
+      IF(IFLGC(NZ,NY,NX).EQ.ipltactv)THEN
 
         category = 'flux'
         name = 'NH4_UPTK (g m^-3 h^-1)'

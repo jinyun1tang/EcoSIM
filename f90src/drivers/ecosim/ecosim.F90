@@ -10,16 +10,17 @@ PROGRAM main
   use InitEcoSIM        , only : InitModules
   use EcoSIMDesctruct   , only : DestructEcoSIM
   use GridMod           , only : SetMesh
+  use readiMod          , only : readi
+  USE fileUtil          , ONLY : iulog,ecosim_namelist_buffer_size,namelist_to_buffer
+  use HistFileMod       , only : hist_htapes_build
+  use EcoSIMConfig      , only : case_name,set_sim_type,start_date,is_restart,datestrlen
+  use StartsMod         , only : set_ecosim_solver
+  use RestartMod        , only : get_restart_date
+  use MicBGCAPI         , only : MicAPI_Init, MicAPI_cleanup
   use EcoSIMCtrlMod  
   use EcoSIMCtrlDataType
-  use readiMod          , only : readi
-  USE fileUtil          , ONLY : iulog
-  use HistFileMod       , only : hist_htapes_build
-  use EcoSIMConfig      , only : case_name,set_sim_type,nsrContinue
   use EcoSIMHistMod
   use EcosimConst
-  use StartsMod         , only : set_ecosim_solver
-  use MicBGCAPI         , only : MicAPI_Init, MicAPI_cleanup
   implicit none
 
   character(len=*), parameter :: mod_filename = __FILE__
@@ -28,14 +29,16 @@ PROGRAM main
   integer :: NAX,NDX,NEX,NAY,NDY,NE,N,NTX,NT
   integer :: NHW,NVN,NHE,NVS
   integer :: nn1,nn2,nn3
-  integer :: year_beg,year_ini,nyr1,yeari,nstopyr
+  integer :: year_ini,nyr1,yeari,nstopyr
   CHARACTER(len=640):: BUF
   character(len=36):: nmlfile
   character(len=14) :: ymdhs
   character(len=14) :: ymdhs0 
-  logical :: is_dos
+  logical :: is_dos,nlend
+  character(len=datestrlen) :: curr_date
   integer :: nmicbguilds
- 
+  character(len=ecosim_namelist_buffer_size) :: nml_buffer
+
 !!
 ! begin_execution
 
@@ -60,8 +63,10 @@ PROGRAM main
 !
   CALL GETARG(1,nmlfile)
 
+  call namelist_to_buffer(nmlfile,nml_buffer)
+
   write(iulog,*)'read namelist'
-  call readnamelist(trim(nmlfile), case_name, prefix, LYRG, nmicbguilds)
+  call readnamelist(nml_buffer, case_name, prefix, LYRG, nmicbguilds)
 
   if(is_dos)then
     outdir=trim(buf)//'\\'//trim(case_name)//'_outputs\\'
@@ -70,7 +75,7 @@ PROGRAM main
   endif
   call system('mkdir -p '//trim(outdir))
 
-  read(sim_yyyymmdd,'(I4)')year_ini  
+  read(start_date,'(I4)')year_ini  
 
 ! NUMBER OF COLUMNS AND ROWS for the whole land scape
 !
@@ -84,36 +89,30 @@ PROGRAM main
   NE=1;NEX=1
 
   call set_sim_type()
+
   nstopyr=get_sim_len(forc_periods)
 
-  if(continue_run)then
-    print*,'read restart/checkpoint info file: ecosim_rst'
-    ymdhs0='18820114000000'
-    read(ymdhs0,'(I4)')year_beg
-    call etimer%Init(year0=year_beg,nyears=nstopyr)   
-  else  
-    ymdhs0='00000000000000'
-    year_beg=year_ini
-    ymdhs0(1:8)=sim_yyyymmdd
-    call etimer%Init(year0=year_beg,nyears=nstopyr)
-    call hist_htapes_build()
-  endif
-  
   call frectyp%Init()
 
-  frectyp%ymdhs0=ymdhs0
-
-  call etimer%setClock(dtime=3600._r8,nelapstep=0)
+  if(is_restart())then
+    print*,'read restart/checkpoint info file: ecosim_rst'
+    call get_restart_date(curr_date)
+    frectyp%ymdhs0=curr_date    !the actual simulation beginning year
+  else  
+    frectyp%ymdhs0=start_date   !the actual simulation beginning year
+  endif
+  
+  call hist_htapes_build()
 
   IGO=0
   yeari=year_ini
+  print*,frectyp%ymdhs0,yeari
+  
   DO nn1=1,3
     call set_ecosim_solver(NPXS(NN1),NPYS(NN1))
 
    !set up output frequency
     JOUT=JOUTS(NN1)   !frequency on hourly scale
-    IOUT=IOUTS(NN1)   !frequency on daily scale
-    KOUT=KOUTS(NN1) !frequency on restart file writing, >365 means 1 time per year
 
     call MicAPI_Init
     
@@ -123,16 +122,20 @@ PROGRAM main
         
         frectyp%yearclm=nyr1
         frectyp%yearcur=etimer%get_curr_yearAD()
+        nlend=.false.
         if(frectyp%yearcur==yeari)then
-          call soil(NE,NEX,NHW,NHE,NVN,NVS)
+          call soil(NE,NEX,NHW,NHE,NVN,NVS,nlend)
         endif
+        if(nlend)exit
         frectyp%yearacc=frectyp%yearacc+1
         call etimer%get_ymdhs(ymdhs)        
         if(.not.frectyp%lskip_loop)print*,frectyp%yearcur,nyr1,ymdhs
         yeari=yeari+1
       end do  
+      if(nlend)exit
     end do
     call MicAPI_cleanup
+    if(nlend)exit
   end do  
 
   if(do_rgres)then

@@ -105,7 +105,7 @@ module grosubsMod
   D9985: DO NZ=1,NP
 
 ! IFLGC= flag for living pft
-    IF(IFLGC(NZ).EQ.1)THEN
+    IF(IFLGC(NZ).EQ.ipltactv)THEN
       call GrowPlant(I,J,NZ,ZCX,CPOOLK)
     ENDIF
 
@@ -232,6 +232,7 @@ module grosubsMod
     DO NE=1,npelms
       WTSTGE(NE,NZ)=sum(WTSTDE(NE,1:jsken,NZ))
     ENDDO
+
 !
 !     PLANT C BALANCE = TOTAL C STATE VARIABLES + TOTAL
 !     AUTOTROPHIC RESPIRATION + TOTAL LITTERFALL - TOTAL EXUDATION
@@ -248,7 +249,9 @@ module grosubsMod
 !     VCO2F,VCH4F=CO2,CH4 emission from disturbance
 !
     ZNPP(NZ)=CARBN(NZ)+TCO2T(NZ)
-    IF(IFLGC(NZ).EQ.1)THEN
+
+    IF(IFLGC(NZ).EQ.ipltactv)THEN
+    !check for living plant
       DO NE=1,npelms
         BALE(NE,NZ)=WTSHTE(NE,NZ)+WTRTE(NE,NZ)+WTNDE(NE,NZ) &
           +WTRVE(NE,NZ)+TESNC(NE,NZ)-TEUPTK(NE,NZ) &
@@ -326,7 +329,7 @@ module grosubsMod
     NBR    => plt_morph%NBR         , &
     NRT    => plt_morph%NRT           &
   )
-  IF(IDTHP(NZ).EQ.0.OR.IDTHR(NZ).EQ.ialive)THEN
+  IF(IDTHP(NZ).EQ.0.OR.IDTHR(NZ).EQ.ibralive)THEN
     UPNFC(NZ)=0._r8
     IFLGZ = 0
     call StagePlantForGrowth(I,J,NZ,ICHK1,NRX,TFN6,CNLFW,CPLFW,&

@@ -1,4 +1,4 @@
-SUBROUTINE soil(NE,NEX,NHW,NHE,NVN,NVS)
+subroutine soil(NE,NEX,NHW,NHE,NVN,NVS,nlend)
 !!
 ! Description:
 ! THIS IS THE MAIN SUBROUTINE FROM WHICH ALL OTHERS ARE CALLED
@@ -11,7 +11,7 @@ SUBROUTINE soil(NE,NEX,NHW,NHE,NVN,NVS)
   use StartsMod    , only : starts
   use VisualMod    , only : visual
   use WthrMod      , only : wthr
-  use RestartMod   , only : restart,restFile
+  use RestartMod   , only : restFile
   use PlantInfoMod , only : ReadPlantInfo
   use readsmod     , only : reads
   use timings      , only : init_timer, start_timer, end_timer,end_timer_loop
@@ -31,13 +31,13 @@ SUBROUTINE soil(NE,NEX,NHW,NHE,NVN,NVS)
   implicit none
   integer :: yearc, yeari
   integer, intent(in) :: NE,NEX,NHW,NHE,NVN,NVS
-
+  logical, intent(out) :: nlend
   character(len=*), parameter :: mod_filename = __FILE__
   real(r8) :: t1
   integer :: I,J
   integer :: idaz
   character(len=14) :: ymdhs
-  logical :: nlend, rstwr, lnyr
+  logical :: rstwr, lnyr
 ! begin_execution
 !
 ! READ INPUT DATA FOR SITE, SOILS AND MANAGEMENT IN 'READS'
@@ -64,37 +64,32 @@ SUBROUTINE soil(NE,NEX,NHW,NHE,NVN,NVS)
 !
 !   RECOVER VALUES OF ALL SOIL STATE VARIABLES FROM EARLIER RUN
 !   IN 'ROUTS' IF NEEDED
-!
-    IF(continue_run)THEN
-!IRUN: start date of current scenario
-      if(lverb)WRITE(*,333)'ROUTS'
-      CALL ROUTS(NHW,NHE,NVN,NVS)
-    ENDIF
+
   ENDIF
 !
   if(plant_model)then
+    !plant information is read in every year, but the active flags
+    !are set using the checkpoint file.
     if(lverb)WRITE(*,333)'ReadPlantInfo'  
+    WRITE(*,333)'ReadPlantInfo'  
     call ReadPlantInfo(frectyp%yearcur,frectyp%yearclm,NE,NEX,NHW,NHE,NVN,NVS)
   endif
 
 ! INITIALIZE ALL PLANT VARIABLES IN 'STARTQ'
 !
   IF(ymdhs(1:4)==frectyp%ymdhs0(1:4) .and. plant_model)THEN
+    !initialize by year
     if(lverb)WRITE(*,333)'STARTQ'
     CALL STARTQ(NHW,NHE,NVN,NVS,1,JP)
-!
-!   RECOVER VALUES OF ALL PLANT STATE VARIABLES FROM EARLIER RUN
-!   IN 'ROUTP' IF NEEDED
-!
-    IF(continue_run)THEN
-      if(lverb)WRITE(*,333)'ROUTP'
-      CALL ROUTP(NHW,NHE,NVN,NVS)
-    ENDIF
+
   ENDIF
 
   if(soichem_model)then
-! INITIALIZE ALL SOIL CHEMISTRY VARIABLES IN 'STARTE'
-!
+! INITIALIZE ALL SOIL CHEMISTRY VARIABLES IN 'STARTE' 
+! This is done done every year, because tracer concentrations
+! in rainfall vary every year. In a more reasonable way, e.g., 
+! when coupled to atmospheric chemistry code, it should be done by 
+! hour
     if(lverb)WRITE(*,333)'STARTE'
     CALL STARTE(NHW,NHE,NVN,NVS)
   endif
@@ -111,8 +106,17 @@ SUBROUTINE soil(NE,NEX,NHW,NHE,NVN,NVS)
 
     DO J=1,24
       call etimer%get_ymdhs(ymdhs)
-      if(ymdhs==frectyp%ymdhs0)frectyp%lskip_loop=.false.       
-      if(frectyp%lskip_loop)cycle      
+      
+      if(ymdhs==frectyp%ymdhs0)then
+        frectyp%lskip_loop=.false. 
+        if(is_restart())then          
+          call restFile(flag='read')
+        endif
+      endif        
+      if(frectyp%lskip_loop)then
+        call etimer%update_time_stamp()      
+        cycle
+      endif
 
     !
     !   UPDATE HOURLY VARIABLES IN 'HOUR1'
@@ -147,9 +151,9 @@ SUBROUTINE soil(NE,NEX,NHW,NHE,NVN,NVS)
       
       call hist_htapes_wrapup( rstwr, nlend, bounds, lnyr )      
       if(rstwr)then
-        write(*,*)'write restart file'
         call restFile(flag='write')
-      endif      
+      endif
+      if(nlend)exit      
     END DO
     
 !
@@ -158,10 +162,11 @@ SUBROUTINE soil(NE,NEX,NHW,NHE,NVN,NVS)
     if(lverb)WRITE(*,333)'EXEC'
     CALL EXEC(I)
 !
+
     if(do_bgcforc_write)then
       call WriteBBGCForc(I,IYRR)
     endif
-
+    if(nlend)exit
   END DO
 
   RETURN

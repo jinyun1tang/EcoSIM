@@ -24,8 +24,6 @@ module EcoSIMCtrlDataType
   integer :: ITERM           !end date for reading weather data
   integer :: IFIN            !end date for reading weather data
   integer :: JOUT            !frequency of hourly ouput
-  integer :: IOUT            !frequency of daily ouput
-  integer :: KOUT            !frequency of storage ouput
   integer :: IOLD            !last day of previous scenario
   integer :: ILAST           !last day of previous scenario
   integer :: IRUN            !start date of current scenario

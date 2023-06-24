@@ -24,7 +24,7 @@ module fileUtil
   integer, public, parameter :: var_state_type=2
   integer, public, parameter :: ecosim_namelist_buffer_size = 4096
   logical, public, save :: continue_run = .false.
-
+  integer, public, parameter :: datestrlen=14
   integer(DAT_KIND_IN) :: s_loglev = 0
   integer(DAT_KIND_IN),parameter :: file_maxUnit = 99 
   integer(DAT_KIND_IN),parameter :: file_minUnit = 10  

@@ -2,6 +2,7 @@ module HistFileMod
 
   use data_kind_mod, only : r8 => DAT_KIND_R8
   use ncdio_pio
+  use netcdf
   use fileUtil          , only : iulog,strip_null
   use abortutils        , only : endrun
   use TestMod           , only : errMsg
@@ -1652,7 +1653,7 @@ implicit none
     character(len=256) :: str             ! global attribute string
     logical :: if_stop                    ! true => last time step of run
     logical, save :: do_3Dtconst = .true. ! true => write out 3D time-constant data
-    character(len=*),parameter :: subname = 'hist_htapes_wrapup'
+    character(len=*),parameter :: subname = trim(mod_filename)//'::hist_htapes_wrapup'
     !-----------------------------------------------------------------------
 
     ! get current step
@@ -2062,29 +2063,29 @@ implicit none
 
 !-----------------------------------------------------------------------
   subroutine hist_restart_ncd (bounds, ncid, flag, rdate)
-    !
-    ! !DESCRIPTION:
-    ! Read/write history file restart data.
-    ! If the current history file(s) are not full, file(s) are opened
-    ! so that subsequent time samples are added until the file is full.
-    ! A new history file is used on a branch run.
-    !
-    ! !USES:
-    use EcoSIMConfig     , only : nsrest, nsrStartup, nsrBranch, is_restart
-    use fileutil         , only : getfil
-    !
-    ! !ARGUMENTS:
-    type(bounds_type), intent(in)    :: bounds  
-    type(file_desc_t), intent(inout) :: ncid     ! netcdf file
-    character(len=*) , intent(in)    :: flag     !'read' or 'write'
-    character(len=*) , intent(in), optional :: rdate    ! restart file time stamp for name
-    !
-    ! !LOCAL VARIABLES:
-    integer :: max_nflds                     ! Max number of fields
-    integer :: num1d,beg1d,end1d             ! 1d size, beginning and ending indices
-    integer :: num1d_out,beg1d_out,end1d_out ! 1d size, beginning and ending indices
-    integer :: num2d                         ! 2d size (e.g. number of vertical levels)
-    integer :: numg                 ! total number of gridcells across all processors
+   !
+   ! !DESCRIPTION:
+   ! Read/write history file restart data.
+   ! If the current history file(s) are not full, file(s) are opened
+   ! so that subsequent time samples are added until the file is full.
+   ! A new history file is used on a branch run.
+   !
+   ! !USES:
+   use EcoSIMConfig     , only : nsrest, nsrStartup, nsrBranch, is_restart
+   use fileutil         , only : getfil
+   !
+   ! !ARGUMENTS:
+   type(bounds_type), intent(in)    :: bounds  
+   type(file_desc_t), intent(inout) :: ncid     ! netcdf file
+   character(len=*) , intent(in)    :: flag     !'read' or 'write'
+   character(len=*) , intent(in), optional :: rdate    ! restart file time stamp for name
+   !
+   ! !LOCAL VARIABLES:
+   integer :: max_nflds                     ! Max number of fields
+   integer :: num1d,beg1d,end1d             ! 1d size, beginning and ending indices
+   integer :: num1d_out,beg1d_out,end1d_out ! 1d size, beginning and ending indices
+   integer :: num2d                         ! 2d size (e.g. number of vertical levels)
+   integer :: numg                 ! total number of gridcells across all processors
     integer :: numt                 ! total number of topounits across all processors
     integer :: numc                 ! total number of columns across all processors
     integer :: nump                 ! total number of pfts across all processors
@@ -2131,6 +2132,7 @@ implicit none
     integer , pointer :: nacs(:,:)               ! accumulation counter
     integer , pointer :: nacs1d(:)               ! 1d accumulation counter
     integer           :: ier                     ! error code
+    logical           :: readvar
     type(Var_desc_t)  :: vardesc                 ! netCDF variable description
     character(len=*),parameter :: subname = 'hist_restart_ncd'
     character(len=1) :: inst_suffix=' '
@@ -2138,10 +2140,10 @@ implicit none
 
   numg=bounds%ngrid;numt=bounds%ntopou;numc=bounds%ncols;nump=bounds%npfts
 
-    ! If branch run, initialize file times and return
+  ! If branch run, initialize file times and return
 
-   if (flag == 'read') then
-      if (nsrest == nsrBranch) then
+  if (flag == 'read') then
+     if (nsrest == nsrBranch) then
          do t = 1,ntapes
             tape(t)%ntimes = 0
          end do
@@ -2304,10 +2306,10 @@ implicit none
           call ncd_defvar(ncid=ncid_hist(t), varname='ntimes', xtype=ncd_int, &
                long_name="Number of time steps on file", units="time-step",     &
                dim1name='scalar')
-          print*,'is_endhist'     
+          
           call ncd_defvar(ncid=ncid_hist(t), varname='is_endhist', xtype=ncd_log, &
                long_name="End of history file", dim1name='scalar')
-          print*,'begtime'
+          
           call ncd_defvar(ncid=ncid_hist(t), varname='begtime', xtype=ncd_double, &
                long_name="Beginning time", units="time units",     &
                dim1name='scalar')
@@ -2357,8 +2359,8 @@ implicit none
 
        ! Add history filenames to master restart file
        do t = 1,ntapes
-          call ncd_io('locfnh',  locfnh(t),  'write', ncid, nt=t)
-          call ncd_io('locfnhr', locfnhr(t), 'write', ncid, nt=t)
+          call ncd_putvar(ncid,'locfnh', t, locfnh(t))
+          call ncd_putvar(ncid,'locfnhr', t, locfnhr(t))
        end do
        
        fincl(:,1) = hist_fincl1(:)
@@ -2439,6 +2441,7 @@ implicit none
     !================================================
 
        call ncd_inqdlen(ncid,dimid,ntapes_onfile, name='ntapes')
+
        if ( is_restart() .and. ntapes_onfile /= ntapes )then
           write(iulog,*) 'ntapes = ', ntapes, ' ntapes_onfile = ', ntapes_onfile
           call endrun(msg=' ERROR: number of ntapes different than on restart file!,'// &
@@ -2446,11 +2449,11 @@ implicit none
                errMsg(__FILE__, __LINE__))
        end if
        if ( is_restart() .and. ntapes > 0 )then
-          call ncd_io('locfnh',  locfnh(1:ntapes),  'read', ncid )
-          call ncd_io('locfnhr', locrest(1:ntapes), 'read', ncid )
           do t = 1,ntapes
-             call strip_null(locrest(t))
-             call strip_null(locfnh(t))
+            call ncd_getvar(ncid,'locfnh', t, locfnh(t))
+            call ncd_getvar(ncid,'locfnhr', t, locrest(t))
+            call strip_null(locrest(t))
+            call strip_null(locfnh(t))
           end do
        end if
 
@@ -2462,6 +2465,7 @@ implicit none
           do t = 1,ntapes
 
              call getfil( locrest(t), locfnhr(t), 0 )
+
              call ncd_pio_openfile (ncid_hist(t), trim(locfnhr(t)), ncd_nowrite)
 
              if ( t == 1 )then
@@ -2484,6 +2488,7 @@ implicit none
              call ncd_io(varname='fexcl', data=fexcl(:,t), ncid=ncid_hist(t), flag='read')
 
              call ncd_io('nflds',   nflds_onfile, 'read', ncid_hist(t) )
+             
              if ( nflds_onfile /= tape(t)%nflds )then
                 write(iulog,*) 'nflds = ', tape(t)%nflds, ' nflds_onfile = ', nflds_onfile
                 call endrun(msg=' ERROR: number of fields different than on restart file!,'// &
@@ -2606,7 +2611,7 @@ implicit none
              end if
 
           end do  ! end of tapes loop
-
+          print*,'end of tapes loop'
           hist_fincl1(:) = fincl(:,1)
           hist_fincl2(:) = fincl(:,2)
           hist_fincl3(:) = fincl(:,3)

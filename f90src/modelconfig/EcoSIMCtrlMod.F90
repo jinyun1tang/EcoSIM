@@ -1,6 +1,8 @@
 module EcoSIMCtrlMod
   use ncdio_pio, only : file_desc_t
+  use data_kind_mod, only : r8 => DAT_KIND_R8
   use ecosim_Time_Mod, only : ecosim_time_type
+  use fileUtil, only :   datestrlen  
 implicit none
   save
   logical :: salt_model   =.false.    !toggle for salt model
@@ -8,6 +10,12 @@ implicit none
   logical :: plant_model  =.true.
   logical :: micb_model   =.true.
   logical :: soichem_model=.true.
+  real(r8) :: aco2_ppm  = 280._r8
+  real(r8) :: ach4_ppm  = 1.144_r8
+  real(r8) :: an2o_ppm  = 0.270_r8
+  real(r8) :: ao2_ppm   = 0.209e6_r8
+  real(r8) :: an2_ppm   = 0.78e6_r8
+  real(r8) :: anh3_ppm  = 5.e-3_r8
   character(len=300) :: pft_file_in
   character(len=300) :: pft_mgmt_in
   character(len=300) :: grid_file_in
@@ -29,7 +37,7 @@ implicit none
   character(len=16) :: hist_config(10)
   character(len=8)  :: sim_yyyymmdd
   integer :: forc_periods(9)
-  integer :: NPXS(3),NPYS(3),JOUTS(3),IOUTS(3),KOUTS(3)
+  integer :: NPXS(3),NPYS(3),JOUTS(3),IOUTS(3)
   logical :: lverb           !logical switch for verbose output
   logical :: do_rgres        !logical switch for regression tests
 
@@ -40,7 +48,7 @@ implicit none
   integer :: yearcur      !current year 
   integer :: yearpre      !previous year
   logical :: lskip_loop   !logical switch to skip a loop
-  character(len=14) :: ymdhs0  !the beginning yyyymmddhhmmss
+  character(len=datestrlen) :: ymdhs0  !the beginning yyyymmddhhmmss
   contains
   procedure, public :: Init  => init_frectyp
   end type forc_data_rec_type

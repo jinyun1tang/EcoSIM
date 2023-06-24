@@ -185,12 +185,11 @@ implicit none
 !
 !   RESET SNOW SURFACE DENSITY FOR SNOWFALL
 !
-    IF(XFLWS(L,NY,NX).GT.0.0)THEN
+    IF(XFLWS(L,NY,NX).GT.0.0_r8)THEN
       DENSX=DENSS(L,NY,NX)
-      TCASF=AMAX1(-15.0,AMIN1(2.0,TCA(NY,NX)))
-      DENSF=0.05+1.7E-03*(TCASF+15.0)**1.5
-      VOLSF=XFLWS(L,NY,NX)/DENSF &
-        +(VOLSSL(L,NY,NX)-XFLWS(L,NY,NX))/DENSS(L,NY,NX)
+      TCASF=AMAX1(-15.0_r8,AMIN1(2.0_r8,TCA(NY,NX)))
+      DENSF=0.05_r8+1.7E-03_r8*(TCASF+15.0_r8)**1.5_r8
+      VOLSF=XFLWS(L,NY,NX)/DENSF+(VOLSSL(L,NY,NX)-XFLWS(L,NY,NX))/DENSS(L,NY,NX)
       DENSS(L,NY,NX)=VOLSSL(L,NY,NX)/VOLSF
       if(DENSS(L,NY,NX)<0._r8)write(*,*)'VOLSSL=',VOLSSL(L,NY,NX),VOLSF
     ENDIF
@@ -350,25 +349,28 @@ implicit none
   integer :: IFLGLS,NTN,NTG,NTU,NTSA
 
 !     begin_execution
-!
+! from surface to bottom, and modify the bottom layer
   IF(VHCPW(1,NY,NX).GT.VHCPWX(NY,NX))THEN
     D325: DO L=1,JS-1
 !      VOLSLX=VOLSL(L,NY,NX)
       IF(VOLSL(L,NY,NX).GT.ZEROS2(NY,NX))THEN
+        !compute the difference in thickness compared to the initial
         DDLYXS=(VOLSI(L,NY,NX)-VOLSSL(L,NY,NX)/DENSS(L,NY,NX) &
           -VOLWSL(L,NY,NX)-VOLISL(L,NY,NX))/AREA(3,L,NY,NX)
 !        DDLYXX=DDLYXS
         IF(DDLYXS.LT.-ZERO.OR.DLYRS(L+1,NY,NX).GT.ZERO)THEN
+        ! volume is greater than allowed, or next layer exists
           DDLYRS=AMIN1(DDLYXS,DLYRS(L+1,NY,NX))
-          IFLGLS=1
+          IFLGLS=1         !expand
         ELSE
+          !volume less than allowed, and no next layer
           DDLYXS=(VOLSL(L,NY,NX)-VOLSSL(L,NY,NX)/DENSS(L,NY,NX) &
             -VOLWSL(L,NY,NX)-VOLISL(L,NY,NX))/AREA(3,L,NY,NX)
           DDLYRS=DDLYXS
-          IFLGLS=2
+          IFLGLS=2         !shrink
         ENDIF
       ELSE
-        DDLYRS=0.0_r8
+        DDLYRS=0.0_r8      !no change
         IFLGLS=0
       ENDIF
       !
@@ -380,13 +382,13 @@ implicit none
       !     TRANSFER STATE VARIABLES BETWEEN LAYERS
       !
       IF(ABS(DDLYRS).GT.ZERO)THEN
-        IF(DDLYRS.GT.0.0)THEN
+        IF(DDLYRS.GT.0.0_r8)THEN
           L1=L
           L0=L+1
           IF(DDLYRS.LT.DDLYXS)THEN
-            FX=1.0
+            FX=1.0_r8
           ELSE
-            FX=AMIN1(1.0,DDLYRS*AREA(3,L0,NY,NX)/VOLSL(L0,NY,NX))
+            FX=AMIN1(1.0_r8,DDLYRS*AREA(3,L0,NY,NX)/VOLSL(L0,NY,NX))
           ENDIF
         ELSE
           L1=L+1
@@ -394,11 +396,11 @@ implicit none
           IF(VOLSL(L0,NY,NX).LT.VOLSI(L0,NY,NX))THEN
             FX=0.0_r8
           ELSE
-            FX=AMIN1(1.0,-DDLYRS*AREA(3,L0,NY,NX)/VOLSL(L0,NY,NX))
+            FX=AMIN1(1.0_r8,-DDLYRS*AREA(3,L0,NY,NX)/VOLSL(L0,NY,NX))
           ENDIF
         ENDIF
-        IF(FX.GT.0.0)THEN
-          FY=1.0-FX
+        IF(FX.GT.0.0_r8)THEN
+          FY=1.0_r8-FX
 
 !
 !     TARGET SNOW LAYER
@@ -406,26 +408,28 @@ implicit none
           VOLSSL(L1,NY,NX)=VOLSSL(L1,NY,NX)+FX*VOLSSL(L0,NY,NX)
           VOLWSL(L1,NY,NX)=VOLWSL(L1,NY,NX)+FX*VOLWSL(L0,NY,NX)
           VOLISL(L1,NY,NX)=VOLISL(L1,NY,NX)+FX*VOLISL(L0,NY,NX)
-          VOLSL(L1,NY,NX)=VOLSSL(L1,NY,NX)/DENSS(L1,NY,NX) &
-            +VOLWSL(L1,NY,NX)+VOLISL(L1,NY,NX)
+          VOLSL(L1,NY,NX)=VOLSSL(L1,NY,NX)/DENSS(L1,NY,NX)+VOLWSL(L1,NY,NX)+VOLISL(L1,NY,NX)
           ENGY1X=VHCPW(L1,NY,NX)*TKW(L1,NY,NX)
           ENGY0X=VHCPW(L0,NY,NX)*TKW(L0,NY,NX)
           ENGY1=ENGY1X+FX*ENGY0X
-          VHCPW(L1,NY,NX)=cps*VOLSSL(L1,NY,NX)+cpw*VOLWSL(L1,NY,NX) &
-            +cpi*VOLISL(L1,NY,NX)
+          VHCPW(L1,NY,NX)=cps*VOLSSL(L1,NY,NX)+cpw*VOLWSL(L1,NY,NX)+cpi*VOLISL(L1,NY,NX)
           IF(VHCPW(L1,NY,NX).GT.ZEROS(NY,NX))THEN
             TKW(L1,NY,NX)=ENGY1/VHCPW(L1,NY,NX)
           ELSE
             TKW(L1,NY,NX)=TKW(L0,NY,NX)
           ENDIF
           TCW(L1,NY,NX)=TKW(L1,NY,NX)-TC2K
+
+          !gas
           DO NTG=idg_beg,idg_end-1
             trcg_solsml(NTG,L1,NY,NX)=trcg_solsml(NTG,L1,NY,NX)+FX*trcg_solsml(NTG,L0,NY,NX)
           ENDDO
 
+          !nutrients
           DO NTN=ids_nut_beg,ids_nuts_end
             trcn_solsml(NTN,L1,NY,NX)=trcn_solsml(NTN,L1,NY,NX)+FX*trcn_solsml(NTN,L0,NY,NX)
           ENDDO
+          !salt
           IF(salt_model)THEN
             DO NTSA=idsa_beg,idsa_end
               trcs_solsml(NTSA,L1,NY,NX)=trcs_solsml(NTSA,L1,NY,NX)+FX*trcs_solsml(NTSA,L0,NY,NX)
@@ -437,11 +441,9 @@ implicit none
           VOLSSL(L0,NY,NX)=FY*VOLSSL(L0,NY,NX)
           VOLWSL(L0,NY,NX)=FY*VOLWSL(L0,NY,NX)
           VOLISL(L0,NY,NX)=FY*VOLISL(L0,NY,NX)
-          VOLSL(L0,NY,NX)=VOLSSL(L0,NY,NX)/DENSS(L0,NY,NX) &
-            +VOLWSL(L0,NY,NX)+VOLISL(L0,NY,NX)
+          VOLSL(L0,NY,NX)=VOLSSL(L0,NY,NX)/DENSS(L0,NY,NX)+VOLWSL(L0,NY,NX)+VOLISL(L0,NY,NX)
           ENGY0=FY*ENGY0X
-          VHCPW(L0,NY,NX)=cps*VOLSSL(L0,NY,NX)+cpw*VOLWSL(L0,NY,NX) &
-            +cpi*VOLISL(L0,NY,NX)
+          VHCPW(L0,NY,NX)=cps*VOLSSL(L0,NY,NX)+cpw*VOLWSL(L0,NY,NX)+cpi*VOLISL(L0,NY,NX)
           IF(VHCPW(L0,NY,NX).GT.ZEROS(NY,NX))THEN
             TKW(L0,NY,NX)=ENGY0/VHCPW(L0,NY,NX)
           ELSE

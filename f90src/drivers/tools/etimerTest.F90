@@ -3,14 +3,16 @@ PROGRAM main
   use data_kind_mod     , only : r8 => DAT_KIND_R8
   use EcoSIMCtrlMod     , only : etimer
   use ecosim_time_mod   , only : getdow,ecosim_time_dat_type,get_steps_from_ymdhs
+  USE fileUtil          , ONLY : iulog,ecosim_namelist_buffer_size,namelist_to_buffer
   implicit none
 
   character(len=*), parameter :: mod_filename = __FILE__
 
   type(ecosim_time_dat_type)  :: etime_dat
+  character(len=ecosim_namelist_buffer_size) :: nml_buffer
 
   real(r8) :: a(3)
-
+  character(len=36):: nmlfile
   integer :: nyr, J,mon
   character(len=16) :: ymdhs
 
@@ -19,21 +21,19 @@ PROGRAM main
   print*,'1699,14 ',getdow(1699,14)
   print*,'2099,14 ',getdow(2099,14)
 
-  call etimer%Init(year0=1804,nyears=12)
+!
+  CALL GETARG(1,nmlfile)
 
-  call etimer%setClock(dtime=3600._r8,nelapstep=0)
+  call namelist_to_buffer(nmlfile,nml_buffer)
 
-  DO while(.true.)
-    do while(.true.)
-      call etimer%get_ymdhs(ymdhs)
-      
-      DO J=1,24
-        call etimer%update_time_stamp()
-      ENDDO
+  call etimer%Init(nml_buffer,year0=1984)
 
-      if(etimer%its_a_new_month())print*,ymdhs,etimer%get_curr_day()
-      if(etimer%its_a_new_year())exit
-    enddo
+  DO while(.true.)    
+    call etimer%get_ymdhs(ymdhs)            
+    call etimer%update_time_stamp()     
+    print*,ymdhs,etimer%get_curr_day()
+    if(etimer%its_a_new_month())print*,ymdhs,etimer%get_curr_day()
+    if(etimer%its_time_to_write_restart())print*,'write restart ',ymdhs
     if(etimer%its_time_to_exit())exit
   enddo
 

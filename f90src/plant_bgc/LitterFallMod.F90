@@ -76,7 +76,7 @@ implicit none
     call LiterfallFromDeadBranches(I,J,NZ,IDTHY,CPOOLK)
 
     IF(IDTHY.EQ.NBR(NZ))THEN
-      IDTHP(NZ)=idead
+      IDTHP(NZ)=ibrdead
       NBT(NZ)=0
       WSTR(NZ)=0._r8
       IF(IFLGI(NZ).EQ.1)THEN
@@ -97,12 +97,21 @@ implicit none
 !     PP=PFT population
 !     IDTHP,IDTHR=PFT shoot,root living flag: 0=alive,1=dead
 !
-      IF(WTRVE(ielmc,NZ).LT.1.0E-04_r8*WTRTE(ielmc,NZ)&
-        .AND.ISTYP(NZ).NE.iplt_annual)IDTHR(NZ)=idead
-      IF(ISTYP(NZ).EQ.iplt_annual)IDTHR(NZ)=idead
-      IF(JHVST(NZ).NE.ihv_noaction)IDTHR(NZ)=idead
-      IF(PP(NZ).LE.0.0)IDTHR(NZ)=idead
-      IF(IDTHR(NZ).EQ.idead)IDTHP(NZ)=idead
+      IF(WTRVE(ielmc,NZ).LT.1.0E-04_r8*WTRTE(ielmc,NZ).AND.ISTYP(NZ).NE.iplt_annual)then
+        IDTHR(NZ)=ibrdead
+      endif  
+      IF(ISTYP(NZ).EQ.iplt_annual)then
+        IDTHR(NZ)=ibrdead
+      endif  
+      IF(JHVST(NZ).NE.ihv_noaction)then
+        IDTHR(NZ)=ibrdead
+      endif  
+      IF(PP(NZ).LE.0.0)then
+        IDTHR(NZ)=ibrdead
+      endif  
+      IF(IDTHR(NZ).EQ.ibrdead)then
+        IDTHP(NZ)=ibrdead
+      endif  
     ENDIF
 !
 !     DEAD ROOTS
@@ -529,7 +538,7 @@ implicit none
     FDBKX     =>  plt_photo%FDBKX       &
   )
   D8845: DO NB=1,NBR(NZ)
-    IF(IDTHB(NB,NZ).EQ.idead)THEN
+    IF(IDTHB(NB,NZ).EQ.ibrdead)THEN
       GROUP(NB,NZ)=GROUPI(NZ)
       PSTG(NB,NZ)=XTLI(NZ)
       PSTGI(NB,NZ)=PSTG(NB,NZ)

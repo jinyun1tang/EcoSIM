@@ -13,7 +13,7 @@ module minimathmod
   public :: test_aneb     !a not equals b test
   public :: vapsat, vapsat0
   public :: isLeap
-  public :: AZMAX1,AZMIN1
+  public :: AZMAX1,AZMIN1,AZMAX1t
 
   interface AZMAX1
     module procedure AZMAX1_s
@@ -124,6 +124,17 @@ module minimathmod
   end function isLeap
 !------------------------------------------------------------------------------------------
 
+  function AZMAX1t(val)result(ans)
+  implicit none
+  real(r8), intent(in) :: val
+
+  real(r8) :: ans
+
+  ans=AMAX1(val,tiny_val)
+
+  end function AZMAX1t
+!------------------------------------------------------------------------------------------
+
   function AZMAX1_s(val)result(ans)
   implicit none
   real(r8), intent(in) :: val
@@ -132,7 +143,7 @@ module minimathmod
 
   ans=AMAX1(0.0_r8,val)
 
-  end function AZMAX1_s
+  end function AZMAX1_s  
 !------------------------------------------------------------------------------------------
 
   function AZMAX1_d(val1,val2)result(ans)

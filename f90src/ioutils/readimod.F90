@@ -9,7 +9,8 @@ module readiMod
   use minimathmod  , only : test_aeqb, AZMAX1
   use MiniFuncMod  , only : GetDayLength
   use EcoSIMConfig, only : column_mode
-  use EcoSIMCtrlMod, only : grid_file_in,lverb
+  use EcoSIMCtrlMod, only : grid_file_in,lverb,an2_ppm,ao2_ppm
+  use EcoSIMCtrlMod, only : aco2_ppm,an2o_ppm,anh3_ppm,ach4_ppm 
   use EcoSiMParDataMod, only : micpar
   use SOMDataType
   use CanopyRadDataType
@@ -210,12 +211,12 @@ module readiMod
   call ncd_getvar(grid_nfid,'ATCAG',loc,ATCAG)
   call ncd_getvar(grid_nfid,'IDTBLG',loc,IDTBLG)
 
-  call ncd_getvar(grid_nfid,'OXYEG',loc,OXYEG)
-  call ncd_getvar(grid_nfid,'Z2GEG',loc,Z2GEG)
+!  call ncd_getvar(grid_nfid,'OXYEG',loc,OXYEG)
+!  call ncd_getvar(grid_nfid,'Z2GEG',loc,Z2GEG)
 !  call ncd_getvar(grid_nfid,'CO2EIG',loc,CO2EIG)
 !  call ncd_getvar(grid_nfid,'CH4EG',loc,CH4EG)
 !  call ncd_getvar(grid_nfid,'Z2OEG',loc,Z2OEG)
-  call ncd_getvar(grid_nfid,'ZNH3EG',loc,ZNH3EG)
+!  call ncd_getvar(grid_nfid,'ZNH3EG',loc,ZNH3EG)
 
   call ncd_getvar(grid_nfid,'IETYPG',loc,IETYPG)
   call ncd_getvar(grid_nfid,'IERSNG',loc,IERSNG)
@@ -293,11 +294,11 @@ module readiMod
       ALTI(NY,NX)=ALTIG
       ATCAI(NY,NX)=ATCAG
       IDTBL(NY,NX)=IDTBLG
-      OXYE(NY,NX)=OXYEG
-      Z2GE(NY,NX)=Z2GEG
-      CO2EI(NY,NX)=CO2EIG
-      CH4E(NY,NX)=CH4EG
-      Z2OE(NY,NX)=Z2OEG
+      OXYE(NY,NX)=ao2_ppm
+      Z2GE(NY,NX)=an2_ppm
+      CO2EI(NY,NX)=aco2_ppm
+      CH4E(NY,NX)=ach4_ppm
+      Z2OE(NY,NX)=an2o_ppm
       ZNH3E(NY,NX)=ZNH3EG
       IETYP(NY,NX)=IETYPG
       NCN(NY,NX)=NCNG
@@ -391,8 +392,8 @@ module readiMod
 !
 !     CONVERT ASPECT from geographic format TO GEOMETRIC FORMAT
 !
-!     what is geometric format mean? 0 is north, 90 east, 180 south,
-!     geometric format 0/360 is east,
+!     what is geometric format mean? geographic format 0 is north, 90 east, 180 south,
+!     geometric format 0/360 is east, counting as counterclock wise
         ASP(NY,NX)=450.0_r8-ASP(NY,NX)
         IF(ASP(NY,NX).GE.360.0_r8)ASP(NY,NX)=ASP(NY,NX)-360.0_r8
       ENDDO

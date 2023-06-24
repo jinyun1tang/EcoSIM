@@ -871,25 +871,6 @@ implicit none
       enddo
     ENDDO D9999
 
-    IF(is_restart_run)THEN
-      IDATE=IDATA(9)         !read from the past year
-    ELSE
-      IDATE=yearc         !it is the current year
-    ENDIF
-    
-!   open checkpoint files for i/o
-    WRITE(CHARY,'(I4)')IDATE
-    OUTX='P'//case_name(1:2)//CHARY(1:4)
-    OUTC='C'//case_name(1:2)//CHARY(1:4)
-    OUTM='M'//case_name(1:2)//CHARY(1:4)
-    OUTR='R'//case_name(1:2)//CHARY(1:4)
-    OUTQ='Q'//case_name(1:2)//CHARY(1:4)
-    print*,outx,outc,outm,outr,outq
-    call OPEN_safe(26,outdir,outx,'UNKNOWN',mod_filename,__LINE__)
-    call OPEN_safe(27,outdir,outc,'UNKNOWN',mod_filename,__LINE__)
-    call OPEN_safe(28,outdir,outm,'UNKNOWN',mod_filename,__LINE__)
-    call OPEN_safe(29,outdir,outr,'UNKNOWN',mod_filename,__LINE__)
-    call OPEN_safe(30,outdir,outq,'UNKNOWN',mod_filename,__LINE__)
   ENDIF
   if(lverb)write(*,*)'ReadPlantInfoNC'
   call ReadPlantInfoNC(yeari,NE,NEX,NHW,NHE,NVN,NVS)
@@ -1015,7 +996,7 @@ implicit none
           ENDDO D4975
         ENDIF
         
-        IF(.not. is_restart_run)THEN
+!        IF(.not. is_restart())THEN
     ! there was no chechk point file read in, so update pft info
     ! from input file
           D8995: DO NX=NH1,NH2
@@ -1024,6 +1005,7 @@ implicit none
     !DATAP(NZ,NY,NX) and DATAM(NZ,NY,NX) are to be read in readqmod.F90
               D100: DO NZ=1,NP(NY,NX)
                 DATAP(NZ,NY,NX)=DATAX(NZ)
+                
                 print*,'DATAP(NZ,NY,NX) ',DATAX(NZ),NP(NY,NX)
               ENDDO D100
 
@@ -1032,10 +1014,10 @@ implicit none
               ENDDO D101
             ENDDO D8990
           ENDDO D8995
-        ELSE
-!read from chck point file
-          call read_checkpt(NS,NH1,NH2,NV1,NV2,NHW,NHE,NVN,NVS)
-        ENDIF
+!        ELSE
+!read from chck point file, i.e. datap and datam
+!          call read_checkpt(NS,NH1,NH2,NV1,NV2,NHW,NHE,NVN,NVS)
+!        ENDIF
       ENDDO
     ENDIF
     call ncd_pio_closefile(pftinfo_nfid)
@@ -1096,7 +1078,7 @@ implicit none
 ! the check point file has non-zero pft
           D200: DO NN=1,NPP(NY,NX)
             D205: DO NZ=1,NS
-              IF(DATAZ(NN,NY,NX).EQ.DATAX(NZ).AND.IFLGC(NN,NY,NX).EQ.1)THEN
+              IF(DATAZ(NN,NY,NX).EQ.DATAX(NZ).AND.IFLGC(NN,NY,NX).EQ.ipltactv)THEN
                 DATAP(NN,NY,NX)=DATAX(NZ)
                 DATAM(NN,NY,NX)=DATAY(NZ)
                 DATAA(NZ,NY,NX)='NO'

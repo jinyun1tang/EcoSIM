@@ -98,7 +98,9 @@ module TillageMixMod
   integer  :: NTX,NTP,NTG,NTSA,NTN
 !     begin_execution
 !
-  IF(J.EQ.INT(ZNOON(NY,NX)).AND.XCORP(NY,NX).LT.1.0.AND.DCORP(I,NY,NX).GT.0.0)THEN
+  !DCORP=soil mixing fraction with tillage
+  !XCORP=factor for surface litter incorporation and soil mixing
+  IF(J.EQ.INT(ZNOON(NY,NX)).AND.XCORP(NY,NX).LT.1.0.AND.DCORP(I,NY,NX).GT.0.0_r8)THEN
 !
 !     EXTENT OF MIXING
 !
@@ -473,6 +475,7 @@ module TillageMixMod
         GKCM(L,NY,NX)=TI*(GKCM(L,NY,NX)+CORP*(TGKCM-GKCM(L,NY,NX)))+TX*GKCM(L,NY,NX)
         GKCN(L,NY,NX)=TI*(GKCN(L,NY,NX)+CORP*(TGKCN-GKCN(L,NY,NX)))+TX*GKCN(L,NY,NX)
         GKCK(L,NY,NX)=TI*(GKCK(L,NY,NX)+CORP*(TGKCK-GKCK(L,NY,NX)))+TX*GKCK(L,NY,NX)
+        
         ENGYM=VHCM(L,NY,NX)*TKS(L,NY,NX)
         ENGYV=(cpw*(VOLW(L,NY,NX)+VOLWH(L,NY,NX))+cpi*(VOLI(L,NY,NX)+VOLIH(L,NY,NX)))*TKS(L,NY,NX)
         VOLW(L,NY,NX)=TI*VOLW(L,NY,NX)+CORP*(FI*TVOLW-TI*VOLW(L,NY,NX))+TX*VOLW(L,NY,NX)+FI*TVOLWR

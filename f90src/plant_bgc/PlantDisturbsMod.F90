@@ -801,8 +801,10 @@ module PlantDisturbsMod
 !     PP=PFT population
 !
         D8975: DO NB=1,NBR(NZ)
-          IF(IDTHB(NB,NZ).EQ.ialive)THEN
-            IF(PP(NZ).LE.0.0)IDTHB(NB,NZ)=idead
+          IF(IDTHB(NB,NZ).EQ.ibralive)THEN
+            IF(PP(NZ).LE.0.0)then
+              IDTHB(NB,NZ)=ibrdead
+            endif  
 !
 !     LITTERFALL FROM BRANCHES DURING TILLAGE
 !
@@ -946,9 +948,9 @@ module PlantDisturbsMod
 !     IYRC=current year
 !
         IF(PP(NZ).LE.0.0)THEN
-          IDTHR(NZ)=idead
-          IDTHP(NZ)=idead
-          IDTH(NZ)=idead
+          IDTHR(NZ)=ibrdead
+          IDTHP(NZ)=ibrdead
+          IDTH(NZ)=ibrdead
           JHVST(NZ)=ihv_terminate
           IDAYH(NZ)=I
           IYRH(NZ)=IYRC
@@ -2298,8 +2300,12 @@ module PlantDisturbsMod
 !     WVSTK=total PFT sapwood C mass
 !     ARSTK=total PFT stalk surface area
 !
-        IF(JHVST(NZ).NE.ihv_noaction)IDTHB(NB,NZ)=idead
-        IF(PP(NZ).LE.0.0)IDTHB(NB,NZ)=idead
+        IF(JHVST(NZ).NE.ihv_noaction)then
+          IDTHB(NB,NZ)=ibrdead
+        endif  
+        IF(PP(NZ).LE.0.0)then
+          IDTHB(NB,NZ)=ibrdead
+        endif  
       ENDDO D9835
       WTLS(NZ)=0._r8
       WTSTKE(ielmc,NZ)=0._r8
