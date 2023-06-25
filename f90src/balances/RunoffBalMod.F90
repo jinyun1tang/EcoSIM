@@ -33,7 +33,7 @@ implicit none
   real(r8) :: CXR,ZXR,PXR
   real(r8) :: ZGR
 
-  SG=0._r8
+  SG=0._r8;CXR=0._r8;ZXR=0._r8;PXR=0._r8
   D9985: DO L=NU(NY,NX),NL(NY,NX)
 !
 !     LOCATE EXTERNAL BOUNDARIES
