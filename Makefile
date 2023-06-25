@@ -132,6 +132,10 @@ ifeq ($(sanitize), 1)
   CONFIG_FLAGS += -DADDRESS_SANITIZER=1
 endif
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> ae71df8 (update Makefile for netcdf when ATS is not on)
 ifeq ($(ATS), 1)
   NETCDF_FFLAGS += $(TPL_INSTALL_PREFIX)/include
   NETCDF_FLIBS += -L$(TPL_INSTALL_PREFIX)/lib -lnetcdff -lnetcdf -lnetcdf
@@ -141,8 +145,14 @@ else
     NETCDF_FLIBS =""
   else
     NETCDF_FFLAGS = $(shell ./nc_config --prefix --$(CC))/include/
+<<<<<<< HEAD
     NETCDF_FLIBS = $(shell ./nc_config --flibs --$(CC))
   endif
+=======
+    NETCDF_FLIBS = $(shell ./nc_config --flibs --$(CC))		
+  endif
+
+>>>>>>> ae71df8 (update Makefile for netcdf when ATS is not on)
 endif
 
 CONFIG_FLAGS += -DTPL_NETCDF_INCLUDE_DIRS="$(NETCDF_FFLAGS)"
