@@ -25,6 +25,7 @@ module ATSCPLMod
   real(r8), allocatable :: PORO(:) !porosity
   real(r8), allocatable :: L_DENS(:) !liquid density
   real(r8), allocatable :: WC(:) !Soil water content
+  real(r8), allocatable :: WC_OLD(:) !saving the wc for testing
   real(r8), allocatable :: L_SAT(:) !liquid saturation
   real(r8), allocatable :: REL_PERM(:) !relative_permeability
   real(r8), allocatable :: H_COND(:) !hydraulic conductivity
@@ -185,8 +186,14 @@ contains
   write(*,*) "Copying back"
   call SetBGCSizes(sizes)
 
-  size_col = state%porosity%size
+  size_col = sizes%ncells_per_col_
 
+  WC_OLD = WC
+
+  do j3 = 1, size_col
+    WC(j3) = 2.0*WC(j3)
+    write(*,*) "Old value: ", WC_OLD(j3), " New value: ", WC(j3)
+  enddo
 
   !seems like we call the pointer as normal,
   !then just reverse the data
@@ -197,7 +204,7 @@ contains
   data(:) = L_DENS
 
   call c_f_pointer(state%water_content%data, data, (/size_col/))
-  WC = data(:)
+  data(:) = WC
 
   call c_f_pointer(state%hydraulic_conductivity%data, data, (/size_col/))
   data(:) = H_COND
