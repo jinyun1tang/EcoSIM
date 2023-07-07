@@ -38,6 +38,7 @@ implicit none
   real(r8),allocatable ::  FLY1(:,:)                          !
   real(r8),allocatable ::  BAREW(:,:)                         !
   real(r8),allocatable ::  HCNDR(:,:)                         !
+
   public :: InitSurfPhysData,DestructSurfPhysData
 
   contains

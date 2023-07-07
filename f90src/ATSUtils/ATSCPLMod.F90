@@ -1,21 +1,12 @@
 module ATSCPLMod
   use data_kind_mod, only : r8 => DAT_KIND_R8
+  use SharedDataMod
   implicit none
 
   public 
   character(len=*), private, parameter :: mod_filename=__FILE__
-  integer :: JZSOI   !number of soil layers
-  integer :: JSNO    !number of snow layers
 
-! temporary data holder in ecosim
-  real(r8) :: atm_n2, atm_o2,atm_co2,atm_ch4,atm_N2o,atm_H2,atm_NH3
-  real(r8), allocatable :: csand(:,:)
-  real(r8), allocatable :: CSILT(:,:)
-  real(r8), allocatable :: tairc(:)
-  real(r8), allocatable :: uwind(:)
-  real(r8), allocatable :: prec(:)
-  real(r8), allocatable :: srad(:)
-  real(r8), allocatable :: vpa(:)
+
 contains
 !------------------------------------------------------------------------------------------
 
@@ -86,9 +77,9 @@ contains
       do j2=1,nvar
         select case (var_2d(j2))
         case ('CSAND')  !g/kg soil
-          csand(1:JZSOI,j3)=data_3d(1:JZSOI,j2,j3)
+          a_csand(1:JZSOI,j3)=data_3d(1:JZSOI,j2,j3)
         case ('CSILT')
-          CSILT(1:JZSOI,j3)=data_3d(1:JZSOI,j2,j3)
+          a_CSILT(1:JZSOI,j3)=data_3d(1:JZSOI,j2,j3)
         end select
       enddo
     enddo
@@ -122,16 +113,9 @@ contains
   integer, intent(in) :: jz   !number of soil layers
   integer, intent(in) :: js   !number of snow layers
   integer, intent(in) :: ncol !number of column
-  JZSOI=JZ
-  JSNO=js
-  allocate(csand(1:JZSOI,1:ncol))
-  allocate(CSILT(1:JZSOI,1:ncol))
 
-  allocate(tairc(1:ncol))
-  allocate(uwind(1:ncol))
-  allocate(prec(1:ncol))
-  allocate(srad(1:ncol))
-  allocate(vpa(1:ncol))
+
+  call InitSharedData(JZ,NCOL)
   end subroutine Init_EcoSIM
 !------------------------------------------------------------------------------------------
 

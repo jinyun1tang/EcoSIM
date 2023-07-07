@@ -27,14 +27,20 @@ module SurfPhysMod
   use SnowPhysData
   use PhysPars
   use EcoSIMSolverPar
+  use SoilPhysParaMod
 implicit none
   private
   character(len=*), parameter :: mod_filename=__FILE__
-  public :: CopySurfStateVars
+
+  !surface model
+  public :: StageSurfStateVars
+  public :: SurfacePhysModel
+  public :: SurfaceEnergyModel
+  !
   public :: SurfaceRunoff
   public :: UpdateSurfaceAtM
   public :: CalcThermConduc
-  public :: InitSurfModel, SurfacePhysModel,SummaryAfterEnergyBalance
+
 
 ! HCNDRR=saturated hydraulic conductivity of surface litter
 ! FENGYP=rate constant for restoring surface Ksat
@@ -64,13 +70,13 @@ implicit none
 contains
 
 
-  subroutine CopySurfStateVars(I,J,NHW,NHE,NVN,NVS,RAR1)
+  subroutine StageSurfStateVars(I,J,NHW,NHE,NVN,NVS,RAR1)
 
   use SnowPhysMod, only : CopySnowStates
   implicit none
   integer, intent(in) :: I,J,NHW,NHE,NVN,NVS
   real(r8),intent(OUT) :: RAR1
-  character(len=*), parameter :: subn=trim(mod_filename)//'::CopySurfStateVars'
+  character(len=*), parameter :: subn=trim(mod_filename)//'::StageSurfStateVars'
   integer :: NY,NX
 
   D9995: DO NX=NHW,NHE
@@ -105,12 +111,13 @@ contains
       !TSHX=total sensible heat flux x boundary layer resistance, [MJ m-1]
       !VPQ=vapor pressure in canopy air
       !TKQ=temperature in canopy air
+      !1.25E-3 is sensible heat conductance, which should be updated
       VPQ(NY,NX)=VPA(NY,NX)-TLEX(NY,NX)/(VAP*AREA(3,NUM(NY,NX),NY,NX))
       TKQ(NY,NX)=TKA(NY,NX)-TSHX(NY,NX)/(1.25E-03_r8*AREA(3,NUM(NY,NX),NY,NX))
 
     ENDDO D9990
   ENDDO D9995
-  end subroutine CopySurfStateVars
+  end subroutine StageSurfStateVars
 
 !------------------------------------------------------------------------------------------  
 
@@ -363,12 +370,12 @@ contains
 !     NET RADIATION AT RESIDUE SURFACE
 !
 !     THRMZ2=longwave radiation emitted by litter
-!     RFLXR2=litter net radiation
+!     RFLXR2=litter net radiation,after taking out outgoing radiation from litter 
 !     THETWR=litter water content
 !     VOLWRX=maximum water retention by litter
 !     PSISM1=litter matric water potential
 !
-      THRMZ2=THRMR(NY,NX)*TKR1**4
+      THRMZ2=THRMR(NY,NX)*TKR1**4._r8
       RFLXR2=RFLX0-THRMZ2
       IF(VOLWRX(NY,NX).GT.ZEROS2(NY,NX))THEN
         THETWR=AMIN1(VOLWRX(NY,NX),VOLWR2)/VOLR(NY,NX)
@@ -468,18 +475,6 @@ contains
       TKY=(TKXR*VHCPR2+TK1X*VHCP12)/(VHCPR2+VHCP12)   !equilibrium temperature
       HFLWX=(TKXR-TKY)*VHCPR2*XNPB    !sensible heat flux
       HFLWC=ATCNDR*(TKXR-TK1X)*AREA(3,NUM(NY,NX),NY,NX)*FSNX(NY,NX)*CVRD(NY,NX)*XNPZ
-      ! if(curday>=377)then
-      !   write(*,*)'------'
-      !   write(*,*)'curhour=',curhour
-      !   write(*,*)'HFLWC =',HFLWC
-      !   write(*,*)'TKXR  =',TKXR
-      !   write(*,*)'TK1X  =',TK1X,NUM(NY,NX)
-      !   write(*,*)'TKR1  =',TKR1,TK1(0,NY,NX)
-      !   write(*,*)'HWFLV2=',HWFLV2
-      !   write(*,*)'VHCPR2=',VHCPR2
-      !   write(*,*)'TKS1  =',TKS1
-      !   write(*,*)'VHCP12=',VHCP12
-      ! endif
       IF(HFLWC.GE.0.0_r8)THEN
         HFLCR2=AZMAX1(AMIN1(HFLWX,HFLWC))
       ELSE
@@ -494,14 +489,6 @@ contains
       SFLXR2=PARS*(TKQ(NY,NX)-TKR1)    !sensible heat flux between canopy air and litter surface
       HFLX02=RFLXR2+EFLXR2+SFLXR2      !
       HFLXR2=HFLX02+VFLXR2
-!      if(curday>=377)then
-!        write(*,*)'HFLXR2=',HFLXR2
-!        write(*,*)'HFLX02=',HFLX02
-!        write(*,*)'VFLXR2=',VFLXR2
-!        write(*,*)'RFLXR2=',RFLXR2
-!        write(*,*)'EFLXR2=',EFLXR2
-!        write(*,*)'SFLXR2=',SFLXR2
-!      endif
 !
 !     AGGREGATE WATER AND ENERGY FLUXES FROM TIME STEP FOR LITTER
 !     CALCULATIONS TO THAT FOR SOIL PROFILE
@@ -522,6 +509,7 @@ contains
       HFLCR1=HFLCR1+HFLCR2
       THRMZ=THRMZ+THRMZ2
     ELSE
+      !not significant litter layer heat capacity
       EVAPR2=0.0_r8
       RFLXR2=0.0_r8
       EFLXR2=0.0_r8
@@ -533,10 +521,12 @@ contains
       HFLCR2=0.0_r8
       THRMZ2=0.0_r8
     ENDIF
+    !VOLWR2,VOLW12=water in litter, topsoil layer 
     VOLWR2=VOLWR2+FLYM2+EVAPR2-FLV2
     VOLW12=VOLW12+FLV2
     ENGYR=VHCPR2*TKR1
     VHCPRXX=VHCPR2
+    
     ! VHCPR2: heat capacity, kJ/kg/Kelvin
     VHCPR2=cpo*ORGC(0,NY,NX)+cpw*VOLWR2+cpi*VOLI1(0,NY,NX)
     VHCP12=VHCP12+cpw*FLV2
@@ -550,7 +540,7 @@ contains
   ENDDO D5000
   end subroutine SurfLitterIterate
 !------------------------------------------------------------------------------------------
-  subroutine SoilSufLitterEnergyBal(M,NY,NX,PSISV1)
+  subroutine SRFLitterEnergyBalance(M,NY,NX,PSISV1)
 !!
 ! Description:
   implicit none
@@ -566,6 +556,7 @@ contains
 ! begin_execution
 ! PARAMETERS FOR CALCULATING LATENT AND SENSIBLE HEAT FLUXES
 !
+
   EVAPR(NY,NX)=0.0_r8
   RFLXR=0.0_r8
   EFLXR=0.0_r8
@@ -576,6 +567,10 @@ contains
   HWFLV1=0.0_r8
   HFLCR1=0.0_r8
   THRMZ=0.0_r8
+  IF(VHCP1(0,NY,NX).LE.VHCPRX(NY,NX))THEN
+    TK1(0,NY,NX)=TK1(NUM(NY,NX),NY,NX)
+    RETURN
+  ENDIF  
 !
 ! NET RADIATION AT RESIDUE SURFACE
 !
@@ -643,8 +638,8 @@ contains
 
   DTKX=ABS(TK1(0,NY,NX)-TK1(NUM(NY,NX),NY,NX))*ppmc
 
-  DTHW0=AZMAX1(THETWX(0,NY,NX)-TRBW)**3
-  DTHA0=AZMAX1(THETPX(0,NY,NX)-TRBA)**3
+  DTHW0=AZMAX1(THETWX(0,NY,NX)-TRBW)**3._r8
+  DTHA0=AZMAX1(THETPX(0,NY,NX)-TRBA)**3._r8
   RYLXW0=DTKX*DTHW0
   RYLXA0=DTKX*DTHA0
   RYLNW0=AMIN1(1.0E+04_r8,RYLXW*RYLXW0)
@@ -666,16 +661,16 @@ contains
 !
   call SurfLitterIterate(M,NY,NX,VOLWR2,ATCNDR,ATCNVR,PSISV1,RFLX0)
 
-  end subroutine SoilSufLitterEnergyBal
+  end subroutine SRFLitterEnergyBalance
 
   !------------------------------------------------------------------------------------------
 
-  subroutine PrepSoilSurfaceEnerbyBalance(M,NY,NX,PSISV1,THRMA,RAR1)
+  subroutine SoilSRFEnerbyBalance(M,NY,NX,PSISV1,THRMA,RAR1)
   implicit none
   integer, intent(in) :: M,NY,NX
   real(r8), intent(out):: PSISV1,THRMA,RAR1
   real(r8) :: RAa,VP1,PARE,PARS,RAGX,RFLX0,RI,WPLX,WPX,THETPX0
-  real(r8) :: VOLWXG,VOLIXG,FCDX,FCLX,FCX,PSDX,THETW1,DFVR
+  real(r8) :: VOLWXG,VOLIXG,DFVR
   real(r8) :: TKX1
   real(r8) :: HFLX0,ALBG
 ! begin_execution
@@ -684,7 +679,7 @@ contains
 ! AIR AND WATER-FILLED POROSITY, AND WATER POTENTIAL USED IN
 ! FLUX CALCULATIONS
 !
-! THETW1,THETY=current,hygroscopic water concentration
+! THETY=current,hygroscopic water concentration
 ! POROS=porosity
 ! VOLW1,VOLXI=volume of micropore water
 ! VOLXI=soil volume less macropore,rock
@@ -698,58 +693,8 @@ contains
 ! function from hour1.f
 ! PSISO=osmotic potential
 ! BKVL=bulk soil mass for a given layer 
-! topsoil is soil
-  IF(BKVL(NUM(NY,NX),NY,NX).GT.ZEROS(NY,NX))THEN
-    THETW1=AMAX1(THETY(NUM(NY,NX),NY,NX),AMIN1(POROS(NUM(NY,NX),NY,NX) &
-      ,safe_adb(VOLW1(NUM(NY,NX),NY,NX),VOLY(NUM(NY,NX),NY,NX))))
-    IF(THETW1.LT.FC(NUM(NY,NX),NY,NX))THEN
-      PSISM1(NUM(NY,NX),NY,NX)=AMAX1(PSIHY,-EXP(PSIMX(NY,NX) &
-        +((FCL(NUM(NY,NX),NY,NX)-LOG(THETW1)) &
-        /FCD(NUM(NY,NX),NY,NX)*PSIMD(NY,NX))))
-    ELSEIF(THETW1.LT.POROS(NUM(NY,NX),NY,NX)-DTHETW)THEN
-      PSISM1(NUM(NY,NX),NY,NX)=-EXP(PSIMS(NY,NX) &
-        +(((PSL(NUM(NY,NX),NY,NX)-LOG(THETW1)) &
-        /PSD(NUM(NY,NX),NY,NX))**SRP(NUM(NY,NX),NY,NX)*PSISD(NY,NX)))
-    ELSE
-      THETW1=POROS(NUM(NY,NX),NY,NX)
-      PSISM1(NUM(NY,NX),NY,NX)=PSISE(NUM(NY,NX),NY,NX)
-    ENDIF
-!
-!   SURFACE WATER LAYER
-!
-!   THETIX,THETWX=ice,water concentration
-!   FCI,WPI=ice field capacity,wilting point
-!   PSISM1=matric water potential
-!
-  ELSEIF(VOLX(NUM(NY,NX),NY,NX).GT.ZEROS2(NY,NX).and.THETIX(NUM(NY,NX),NY,NX).GT.ZEROS2(NY,NX))THEN
-    !it is an active layer, but bulk mass is zero
-    FCX=FCI*THETIX(NUM(NY,NX),NY,NX)
-    WPX=WPI*THETIX(NUM(NY,NX),NY,NX)
-    FCLX=LOG(FCX)
-    WPLX=LOG(WPX)
-    PSDX=PSL(NU(NY,NX),NY,NX)-FCLX
-    FCDX=FCLX-WPLX
-    IF(THETWX(NUM(NY,NX),NY,NX).LT.FCX)THEN
-      PSISM1(NUM(NY,NX),NY,NX)=AMAX1(PSIHY,-EXP(PSIMX(NY,NX) &
-        +((FCLX-LOG(THETWX(NUM(NY,NX),NY,NX)))/FCDX*PSIMD(NY,NX))))
-    ELSEIF(THETWX(NUM(NY,NX),NY,NX).LT.POROS(NUM(NY,NX),NY,NX)-DTHETW)THEN
-      PSISM1(NUM(NY,NX),NY,NX)=-EXP(PSIMS(NY,NX) &
-        +(((PSL(NUM(NY,NX),NY,NX)-LOG(THETWX(NUM(NY,NX),NY,NX))) &
-        /PSDX)*PSISD(NY,NX)))
-    ELSE
-      THETW1=POROS(NUM(NY,NX),NY,NX)
-      PSISM1(NUM(NY,NX),NY,NX)=PSISE(NUM(NY,NX),NY,NX)
-    ENDIF
-!
-!   WRITE(*,1119)'PSISMG',I,J,M,N,NX,NY,NUM(NY,NX)
-!    2,PSISM(NUM(NY,NX),NY,NX)
-!    2,THETW(NUM(NY,NX),NY,NX),THETI(NUM(NY,NX),NY,NX)
-!    3,FCX,WPX,POROS(NUM(NY,NX),NY,NX)
-  ELSE
-    !topsoil is saturated
-    THETW1=POROS(NUM(NY,NX),NY,NX)
-    PSISM1(NUM(NY,NX),NY,NX)=PSISE(NUM(NY,NX),NY,NX)
-  ENDIF
+
+  call CalcSoilWaterPotential(NY,NX,NX,NY,NUM(NY,NX),PSISM1(NUM(NY,NX),NY,NX))
 
   PSISV1=PSISM1(NUM(NY,NX),NY,NX)+PSISO(NUM(NY,NX),NY,NX)
 !
@@ -786,10 +731,10 @@ contains
     ALBG=ALBS(NY,NX)
   ENDIF
   !absorbed radiation
+  !RFLXG=net radiation, after taking out outgoing surface layer radiation  
+  !THRMA=emitted longwave radiation  
   RFLX0=(1.0_r8-ALBG)*RADXG(NY,NX)+THRYG(NY,NX)
-  !emitted longwave radiation
-  THRMA=THRMS(NY,NX)*TK1(NUM(NY,NX),NY,NX)**4
-  !net radiation
+  THRMA=THRMS(NY,NX)*TK1(NUM(NY,NX),NY,NX)**4._r8
   RFLXG=RFLX0-THRMA
 !
 ! AERODYNAMIC RESISTANCE ABOVE SOIL SURFACE INCLUDING
@@ -868,7 +813,7 @@ contains
   !total heat plus convective heat 
   HFLXG=HFLX0+VFLXG
 
-  end subroutine PrepSoilSurfaceEnerbyBalance
+  end subroutine SoilSRFEnerbyBalance
 
 !------------------------------------------------------------------------------------------
 
@@ -881,19 +826,11 @@ contains
 
 ! begin_execution
 ! Watch out for L, is its value defined?
-  call PrepSoilSurfaceEnerbyBalance(M,NY,NX,PSISV1,THRMA,RAR1)
+  call SoilSRFEnerbyBalance(M,NY,NX,PSISV1,THRMA,RAR1)
 !
-  IF(VHCP1(0,NY,NX).GT.VHCPRX(NY,NX))THEN
-    ! ENERGY BALANCE AT RESIDUE SURFACE
-    call SoilSufLitterEnergyBal(M,NY,NX,PSISV1)
+  call SRFLitterEnergyBalance(M,NY,NX,PSISV1)
 !
-!
-  ELSE
-    ! IF NO SURFACE RESIDUE  
-    call BareSoilSufEnergyBal(NY,NX)
-  ENDIF
-!  write(*,*)'SummaryAfterEnergyBalance'
-  call SummaryAfterEnergyBalance(NY,NX,THRMA)
+  call SumAftEnergyBalance(NY,NX,THRMA)
 
   end subroutine ExposedSoilFlux
 
@@ -919,7 +856,7 @@ contains
     call ExposedSoilFlux(M,NY,NX,RAR1)
 !
   ELSE
-!
+!   ground is fully snow covered, thus no flux from soil & litter
     call SnowCoveredTopSoilFlux(NY,NX)
   ENDIF
 !
@@ -948,48 +885,25 @@ contains
   integer, intent(in) :: NY,NX
 
 ! begin_execution
-  RFLXG=0.0_r8
-  EFLXG=0.0_r8
-  VFLXG=0.0_r8
-  SFLXG=0.0_r8
-  HFLXG=0.0_r8
-  RFLXR=0.0_r8
-  EFLXR=0.0_r8
-  VFLXR=0.0_r8
-  SFLXR=0.0_r8
-  HFLXR=0.0_r8
-  FLWLG=0.0_r8
+  RFLXG=0.0_r8   !net radiation into soil
+  EFLXG=0.0_r8   !latent heat flux from air and topsoil
+  VFLXG=0.0_r8   !convective heat flux from air and topsoil
+  SFLXG=0.0_r8   !sensible heat flux from air to topsoil
+  HFLXG=0.0_r8   !net heat flux into from air into topsoil
+  RFLXR=0.0_r8   !net radiation flux into litter
+  EFLXR=0.0_r8   !latent heat flux from air and litter
+  VFLXR=0.0_r8   !convective heat flux from air to litter
+  SFLXR=0.0_r8   !sensible heat flux from air to litter
+  HFLXR=0.0_r8   !net heat flux from air to litter
+  FLWLG=0.0_r8   !total water flux from air into soil
   FLWLXG=0.0_r8
-  FLWHLG=0.0_r8
-  HFLWLG=0.0_r8
-  FLWRLG=0.0_r8
-  HFLWRLG=0.0_r8
-  EVAPG(NY,NX)=0.0_r8
-  EVAPR(NY,NX)=0.0_r8
+  FLWHLG=0.0_r8        !total water flux from air into macropore
+  HFLWLG=0.0_r8        !total water associated heat flux from air into soil
+  FLWRLG=0.0_r8        !total water flux from air to litter
+  HFLWRLG=0.0_r8       !total water associated heat flux from air to litter
+  EVAPG(NY,NX)=0.0_r8  !evaporative flux from air into soil
+  EVAPR(NY,NX)=0.0_r8  !evaporative flux from air into litter
   end subroutine SnowCoveredTopSoilFlux  
-!------------------------------------------------------------------------------------------
-
-  subroutine BareSoilSufEnergyBal(NY,NX)
-  implicit none
-  integer, intent(in) :: NY,NX
-! begin_execution
-
-  TK1(0,NY,NX)=TK1(NUM(NY,NX),NY,NX)
-!  if(curday>=377)then
-!    write(*,*)'TK1(0,NY,NX)=',TK1(0,NY,NX)
-!    write(*,*)'NoSurfResidueForEnergyBalanc'
-!  endif
-  EVAPR(NY,NX)=0.0_r8
-  RFLXR=0.0_r8
-  EFLXR=0.0_r8
-  VFLXR=0.0_r8
-  SFLXR=0.0_r8
-  HFLXR=0.0_r8
-  FLV1=0.0_r8
-  HWFLV1=0.0_r8
-  HFLCR1=0.0_r8
-  THRMZ=0.0_r8
-  end subroutine BareSoilSufEnergyBal
 !------------------------------------------------------------------------------------------
 
   subroutine SurfSoilResidueWaterCapillExch(M,NY,NX,FKSAT)
@@ -1034,22 +948,22 @@ contains
     ENDIF
     THETW1=AMAX1(THETY(NUM(NY,NX),NY,NX),AMIN1(POROS(NUM(NY,NX),NY,NX) &
       ,safe_adb(VOLW1(NUM(NY,NX),NY,NX),VOLY(NUM(NY,NX),NY,NX))))
-    K0=MAX(1,MIN(100,INT(100.0*(AZMAX1(POROS0(NY,NX) &
-      -THETWR))/POROS0(NY,NX))+1))
-    K1=MAX(1,MIN(100,INT(100.0*(AZMAX1(POROS(NUM(NY,NX),NY,NX) &
-      -THETW1))/POROS(NUM(NY,NX),NY,NX))+1))
+    !litter layer  
+    K0=MAX(1,MIN(100,INT(100.0*(AZMAX1(POROS0(NY,NX)-THETWR))/POROS0(NY,NX))+1))
+    !topsoil layer
+    K1=MAX(1,MIN(100,INT(100.0*(AZMAX1(POROS(NUM(NY,NX),NY,NX)-THETW1))/POROS(NUM(NY,NX),NY,NX))+1))
     CNDR=HCND(3,K0,0,NY,NX)
     CND1=HCND(3,K1,NUM(NY,NX),NY,NX)*FKSAT
     AVCNDR=2.0_r8*CNDR*CND1/(CNDR*DLYR(3,NUM(NY,NX),NY,NX)+CND1*DLYRR(NY,NX))
     PSIST0=PSISM1(0,NY,NX)+PSISH(0,NY,NX)+PSISO(0,NY,NX)
     PSIST1=PSISM1(NUM(NY,NX),NY,NX)+PSISH(NUM(NY,NX),NY,NX)+PSISO(NUM(NY,NX),NY,NX)
+    !FLQX=water flux from litter layer into the topsoil
     FLQX=AVCNDR*(PSIST0-PSIST1)*AREA(3,NUM(NY,NX),NY,NX)*CVRDW(NY,NX)*XNPH
 
     IF(FLQX.GE.0.0_r8)THEN
       IF(THETWR.GT.THETS(0,NY,NX))THEN
-        FLQZ=FLQX+AMIN1((THETWR-THETS(0,NY,NX)) &
-          *VOLR(NY,NX),AZMAX1((THETS(NUM(NY,NX),NY,NX)-THETW1) &
-          *VOLY(NUM(NY,NX),NY,NX)))*XNPX
+        FLQZ=FLQX+AMIN1((THETWR-THETS(0,NY,NX))*VOLR(NY,NX),&
+          AZMAX1((THETS(NUM(NY,NX),NY,NX)-THETW1)*VOLY(NUM(NY,NX),NY,NX)))*XNPX
       ELSE
         FLQZ=FLQX
       ENDIF
@@ -1057,9 +971,8 @@ contains
       FLQ2=AZMAX1(AMIN1(FLQX,VOLW1(0,NY,NX)*XNPX,VOLP1(NUM(NY,NX),NY,NX)))
     ELSE
       IF(THETW1.GT.THETS(NUM(NY,NX),NY,NX))THEN
-        FLQZ=FLQX+AMAX1((THETS(NUM(NY,NX),NY,NX)-THETW1) &
-          *VOLY(NUM(NY,NX),NY,NX),AZMIN1((THETWR-THETS(0,NY,NX)) &
-          *VOLR(NY,NX)))*XNPX
+        FLQZ=FLQX+AMAX1((THETS(NUM(NY,NX),NY,NX)-THETW1)*VOLY(NUM(NY,NX),NY,NX),&
+          AZMIN1((THETWR-THETS(0,NY,NX))*VOLR(NY,NX)))*XNPX
       ELSE
         FLQZ=FLQX
       ENDIF
@@ -1086,12 +999,6 @@ contains
     HFLWL(3,NUM(NY,NX),NY,NX)=HFLWL(3,NUM(NY,NX),NY,NX)+HFLQR
     FLWRL(NY,NX)=FLWRL(NY,NX)-FLQR
     HFLWRL(NY,NX)=HFLWRL(NY,NX)-HFLQR
-!    if(curday>=41)then
-    !  write(*,*)'curhour=======',curday,curhour
-    !  write(*,*)'HFLWRL(NY,NX)-HFLQR=',HFLWRL(NY,NX),HFLQR
-    !  write(*,*)'tk1[0,1],FLQR',TK1(0,NY,NX),TK1(NUM(NY,NX),NY,NX),FLQR
-    !  write(*,*)'at line',__LINE__
-!    endif
     FLWRM(M,NY,NX)=FLQR
 
   ELSE
@@ -1114,7 +1021,7 @@ contains
   end subroutine SurfSoilResidueWaterCapillExch
 !------------------------------------------------------------------------------------------
 
-  subroutine InfiltrationRunoffPartition(M,NY,NX,N1,N2)
+  subroutine InfilSRFRoffPartition(M,NY,NX,N1,N2)
   implicit none
   integer, intent(in) :: M,NY,NX
   integer, intent(out):: N1,N2
@@ -1221,7 +1128,7 @@ contains
     QRM(M,N2,N1)=0.0_r8
     QRV(M,N2,N1)=0.0_r8
   ENDIF
-  end subroutine InfiltrationRunoffPartition
+  end subroutine InfilSRFRoffPartition
 !------------------------------------------------------------------------------------------
 
   subroutine LateralHydroExchange(M,NY,NX,NHE,NHW,NVS,NVN,N1,N2)
@@ -1230,13 +1137,14 @@ contains
   integer, intent(in) :: N1,N2
   integer :: N,NN,N4,N5,N4B,N5B
   real(r8) :: ALT1,ALT2,ALTB,QRQ1
-
+  integer, parameter :: idirew=1
+  integer, parameter :: idirns=2
 !     begin_execution
 !     LOCATE INTERNAL BOUNDARIES BETWEEN ADJACENT GRID CELLS
 !
   DO  N=1,2
     DO  NN=1,2
-      IF(N.EQ.1)THEN
+      IF(N.EQ.idirew)THEN
         !east-west
         IF(NX.EQ.NHE.AND.NN.EQ.1.OR.NX.EQ.NHW.AND.NN.EQ.2)THEN
           !at the boundary
@@ -1247,7 +1155,7 @@ contains
           N4B=NX-1
           N5B=NY
         ENDIF
-      ELSEIF(N.EQ.2)THEN
+      ELSEIF(N.EQ.idirns)THEN
         !south-north
         IF(NY.EQ.NVS.AND.NN.EQ.1.OR.NY.EQ.NVN.AND.NN.EQ.2)THEN
           !at the boundary
@@ -1270,11 +1178,13 @@ contains
 !     QRM=runoff water flux
       IF(QRM(M,N2,N1).GT.ZEROS(N2,N1))THEN
         ! there is runoff
+        ! source grid elevation
         ALT1=ALTG(N2,N1)+XVOLT(N2,N1)/AREA(3,NUM(N2,N1),N2,N1)
 !
 !     EAST OR SOUTH RUNOFF
 !
         IF(NN.EQ.1)THEN
+          !destination grid elevation
           ALT2=ALTG(N5,N4)+XVOLT(N5,N4)/AREA(3,NU(N5,N4),N5,N4)
           IF(ALT1.GT.ALT2)THEN
             QRQ1=AZMAX1(((ALT1-ALT2)*AREA(3,NUM(N2,N1),N2,N1) &
@@ -1287,7 +1197,6 @@ contains
             HQR(N,2,N5,N4)=HQR(N,2,N5,N4)+HQR1(N,2,N5,N4)
             QRMN(M,N,2,N5,N4)=QR1(N,2,N5,N4)
             IFLBM(M,N,2,N5,N4)=0
-
           ELSE
             QR1(N,2,N5,N4)=0.0_r8
             HQR1(N,2,N5,N4)=0.0_r8
@@ -1376,7 +1285,11 @@ contains
   HEATV(NY,NX)=HEATV(NY,NX)+VFLXG+VFLXR+VFLXW
   HEATH(NY,NX)=HEATH(NY,NX)+RFLXG+RFLXR+RFLXW &
     +SFLXG+SFLXR+SFLXW+EFLXG+EFLXR+EFLXW+VFLXG+VFLXR+VFLXW
-  TEVAPG(NY,NX)=TEVAPG(NY,NX)+EVAPG(NY,NX)+EVAPR(NY,NX)+EVAPS(NY,NX)+EVAPW(NY,NX)
+
+  !EVAPG=evaporation from ground/top soil layer
+  !EVAPR=evaporation from litter layer   
+  !EVAPSN=evaporation from snow, sublimation+evaporation
+  TEVAPG(NY,NX)=TEVAPG(NY,NX)+EVAPG(NY,NX)+EVAPR(NY,NX)+EVAPSN(NY,NX)
   FLWM(M,3,NUM(NY,NX),NY,NX)=FLWL(3,NUM(NY,NX),NY,NX)
   FLWHM(M,3,NUM(NY,NX),NY,NX)=FLWHL(3,NUM(NY,NX),NY,NX)
   end subroutine AccumWaterVaporHeatFluxes
@@ -1501,14 +1414,15 @@ contains
   ELSE
     ENGYB=0.0_r8
   ENDIF
+
   IF(ENGYD+ENGYB.GT.ZERO)THEN
-    HV=1.0E+03_r8*AZMAX1(XVOLT(NY,NX)-VOLWG(NY,NX))/AREA(3,NU(NY,NX),NY,NX)
+    HV=1.0E+03_r8*AZMAX1(XVOLT(NY,NX)-VOLWG(NY,NX))/AREA(3,NUM(NY,NX),NY,NX)
     ENGYPM(M,NY,NX)=(ENGYD*PRECD(NY,NX)+ENGYB*PRECB(NY,NX))*EXP(-2.0_r8*HV)*BARE(NY,NX)*XNPH
     ENGYP(NY,NX)=ENGYP(NY,NX)+ENGYPM(M,NY,NX)
   ELSE
     ENGYPM(M,NY,NX)=0.0_r8
   ENDIF
-  FKSAT=EXP(-2.0E-03_r8*(CSILT(NU(NY,NX),NY,NX)+CCLAY(NU(NY,NX),NY,NX))*ENGYP(NY,NX))
+  FKSAT=EXP(-2.0E-03_r8*(CSILT(NUM(NY,NX),NY,NX)+CCLAY(NUM(NY,NX),NY,NX))*ENGYP(NY,NX))
 
 !
 !  SNOWPACK FLUX ACCUMULATORS
@@ -1547,8 +1461,8 @@ contains
 ! EVAPS,EVAPW=evaporation from soil,snowpack surfaces
 ! FLQRM,FLQSM,FLQHM=water into litter,soil micropores,micropores for use in trnsfr.f
 !
-  EVAPS(NY,NX)=0.0_r8
-  EVAPW(NY,NX)=0.0_r8
+  EVAPSN(NY,NX)=0._r8;EVAPS(NY,NX)=0.0_r8;EVAPW(NY,NX)=0.0_r8
+
   FLQRM(M,NY,NX)=0.0_r8
   FLQSM(M,NY,NX)=0.0_r8
   FLQHM(M,NY,NX)=0.0_r8
@@ -1788,11 +1702,8 @@ contains
   ENGYR=VHCP1(0,NY,NX)*TK1(0,NY,NX)  !initial energy content
   VHCP1(0,NY,NX)=cpo*ORGC(0,NY,NX)+cpw*VOLW1(0,NY,NX)+cpi*VOLI1(0,NY,NX)  !update heat capacity
   IF(VHCP1(0,NY,NX).GT.VHCPRX(NY,NX))THEN
-!        if(curday>=176)write(*,*)trim(mod_filename)//'at line',__LINE__,'tk',TK1(NUM(NY,NX),NY,NX)
     tk1pres=TK1(0,NY,NX)
     TK1(0,NY,NX)=(ENGYR+HFLWRL(NY,NX)+TFLXR(NY,NX)+THQR1(NY,NX))/VHCP1(0,NY,NX)
-!    Ls=NUM(NY,NX)
-
     IF(ABS(VHCP1(0,NY,NX)/VHCPXX-1._r8)>0.025_r8.or. &
       abs(TK1(0,NY,NX)/tk1pres-1._r8)>0.025_r8)THEN
       TK1(0,NY,NX)=TK1(NUM(NY,NX),NY,NX)
@@ -1804,7 +1715,7 @@ contains
   end subroutine UpdateSurfaceAtM
 !------------------------------------------------------------------------------------------
 
-  subroutine SummaryAfterEnergyBalance(NY,NX,THRMA)
+  subroutine SumAftEnergyBalance(NY,NX,THRMA)
   implicit none
   integer, intent(in) :: NY,NX
   real(r8), intent(in):: THRMA
@@ -1853,12 +1764,34 @@ contains
 !    5,VHCP1(0,NY,NX)*TK1(0,NY,NX),HEATH(NY,NX),RFLXG,RFLXR,RFLXW
 !    2,SFLXG,SFLXR,SFLXW,EFLXG,EFLXR,EFLXW,VFLXG,VFLXR,VFLXW
   ENDIF
+  !THRMG=longwave emission from litter and surface soil
   THRMG(NY,NX)=THRMG(NY,NX)+THRMA+THRMZ
-  end subroutine SummaryAfterEnergyBalance
+  end subroutine SumAftEnergyBalance
 !------------------------------------------------------------------------------------------
   subroutine SurfacePhysModel(M,NX,NY,NHE,NHW,NVS,NVN,RAR1,FKSAT,HFLXG1)
   implicit none
   integer, intent(in) :: M,NX,NY,NHE,NHW,NVS,NVN
+  real(r8), intent(inout) :: RAR1
+  REAL(R8),INTENT(OUT) :: FKSAT,HFLXG1
+  integer :: N1,N2
+
+  call SurfaceEnergyModel(M,NX,NY,RAR1,FKSAT,HFLXG1)
+  
+! CAPILLARY EXCHANGE OF WATER BETWEEN SOIL SURFACE AND RESIDUE
+  call SurfSoilResidueWaterCapillExch(M,NY,NX,FKSAT)
+
+  call InfilSRFRoffPartition(M,NY,NX,N1,N2)
+!
+  call LateralHydroExchange(M,NY,NX,NHE,NHW,NVS,NVN,N1,N2)
+!
+  call AccumWaterVaporHeatFluxes(M,NY,NX)
+
+  end subroutine SurfacePhysModel          
+
+!------------------------------------------------------------------------------------------
+  subroutine SurfaceEnergyModel(M,NX,NY,RAR1,FKSAT,HFLXG1)
+  implicit none
+  integer, intent(in) :: M,NX,NY
   real(r8), intent(inout) :: RAR1
   REAL(R8),INTENT(OUT) :: FKSAT,HFLXG1
   integer :: N1,N2
@@ -1868,17 +1801,8 @@ contains
 ! updates RAR1
   call AtmLandSurfExchange(M,NY,NX,RAR1)
   HFLXG1=HFLXG
-!
-! CAPILLARY EXCHANGE OF WATER BETWEEN SOIL SURFACE AND RESIDUE
-  call SurfSoilResidueWaterCapillExch(M,NY,NX,FKSAT)
 
-  call InfiltrationRunoffPartition(M,NY,NX,N1,N2)
-!
-  call LateralHydroExchange(M,NY,NX,NHE,NHW,NVS,NVN,N1,N2)
-!
-  call AccumWaterVaporHeatFluxes(M,NY,NX)
-
-  end subroutine SurfacePhysModel          
+  end subroutine SurfaceEnergyModel
 
 !------------------------------------------------------------------------------------------
   subroutine CalcThermConduc(N1,N2,N3,DTKX,TCND1)
@@ -1906,7 +1830,7 @@ contains
     TCND1=(STC(N3,N2,N1)+THETWX(N3,N2,N1)*TCNDW1 &
       +0.611_r8*THETIX(N3,N2,N1)*7.844E-03_r8 &
       +WTHET1*THETPX(N3,N2,N1)*TCNDA1) &
-      /(DTC(N3,N2,N1)+THETWX(N3,N2,N1)+0.611*THETIX(N3,N2,N1) &
+      /(DTC(N3,N2,N1)+THETWX(N3,N2,N1)+0.611_r8*THETIX(N3,N2,N1) &
       +WTHET1*THETPX(N3,N2,N1))
   ELSE
     TCND1=0.0_r8

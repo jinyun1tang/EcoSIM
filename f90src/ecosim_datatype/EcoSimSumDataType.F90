@@ -53,14 +53,14 @@ module EcoSimSumDataType
   private :: InitAllocate
   contains
 
-
+!----------------------------------------------------------------------
   subroutine InitEcoSimSum
   implicit none
 
   call InitAllocate
 
   end subroutine InitEcoSimSum
-
+!----------------------------------------------------------------------
   subroutine InitAllocate
   implicit none
 

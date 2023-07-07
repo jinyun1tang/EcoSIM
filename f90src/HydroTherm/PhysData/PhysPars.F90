@@ -23,6 +23,8 @@ implicit none
 ! FVOLAH=parameter for clay effect on macropore volume
 ! DTHETW=difference between saturation and effective saturation
 
+  real(r8), parameter :: FCI=0.05_r8                      !field capacity of ice
+  real(r8), parameter :: WPI=0.025_r8                     !wilting point of ice
   real(r8), parameter :: DPTHSX=0.075_r8
   real(r8), parameter :: RAM=1.39E-03_r8   
   real(r8), parameter :: RZ=0.0139_r8  

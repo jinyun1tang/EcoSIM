@@ -1,7 +1,6 @@
 set(SURFPHYS_SOURCES
   SurfPhysData.F90
   SurfPhysMod.F90
-  SurfPhysAPI.F90
 )
 include_directories(${CMAKE_BINARY_DIR}/f90src/utils/)
 include_directories(${CMAKE_BINARY_DIR}/f90src/minimath/)

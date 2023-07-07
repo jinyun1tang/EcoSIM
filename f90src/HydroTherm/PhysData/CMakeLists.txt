@@ -1,6 +1,7 @@
 set(PHYSDATA_SOURCES
  PhysPars.F90
  HydroThermData.F90 
+ SoilPhysParaMod.F90
 )
 include_directories(${CMAKE_BINARY_DIR}/f90src/utils/)
 include_directories(${CMAKE_BINARY_DIR}/f90src/minimath/)

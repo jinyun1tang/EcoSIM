@@ -303,7 +303,9 @@ implicit none
   !     HQS=convective heat transfer from snow,water,ice transfer from watsub.f
   !
   D1202: DO NN=1,2
+    !water flux
     TQR(N2,N1)=TQR(N2,N1)+QR(N,NN,N2,N1)
+    !heat flux
     THQR(N2,N1)=THQR(N2,N1)+HQR(N,NN,N2,N1)
     D8590: DO K=1,micpar%n_litrsfk
       TOCQRS(K,N2,N1)=TOCQRS(K,N2,N1)+XOCQRS(K,N,NN,N2,N1)
@@ -311,16 +313,21 @@ implicit none
       TOPQRS(K,N2,N1)=TOPQRS(K,N2,N1)+XOPQRS(K,N,NN,N2,N1)
       TOAQRS(K,N2,N1)=TOAQRS(K,N2,N1)+XOAQRS(K,N,NN,N2,N1)
     ENDDO D8590
+
+    !gaseous tracers
     DO NTG=idg_beg,idg_end-1
       trcg_TQR(NTG,N2,N1)=trcg_TQR(NTG,N2,N1)+trcg_XRS(NTG,N,NN,N2,N1)
     ENDDO
-
+    !nutrient tracres
     DO NTN=ids_nut_beg,ids_nuts_end
       trcn_TQR(NTN,N2,N1)=trcn_TQR(NTN,N2,N1)+trcn_XRS(NTN,N,NN,N2,N1)
     ENDDO
 
     IF(IFLBH(N,NN,N5,N4).EQ.0)THEN
+      !there is lateral runoff
+      !water flux
       TQR(N2,N1)=TQR(N2,N1)-QR(N,NN,N5,N4)
+      !heat flux
       THQR(N2,N1)=THQR(N2,N1)-HQR(N,NN,N5,N4)
       D8591: DO K=1,micpar%n_litrsfk
         TOCQRS(K,N2,N1)=TOCQRS(K,N2,N1)-XOCQRS(K,N,NN,N5,N4)

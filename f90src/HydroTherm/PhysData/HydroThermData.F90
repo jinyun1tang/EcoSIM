@@ -18,6 +18,7 @@ implicit none
   real(r8),allocatable ::  VOLPH1(:,:,:)                      !  
   real(r8),allocatable ::  EVAPW(:,:)                         !  
   real(r8),allocatable ::  EVAPS(:,:)                         !  
+  real(r8),allocatable ::  EVAPSN(:,:)
   real(r8),allocatable ::  FMAC(:,:,:)                        !  
   real(r8),allocatable ::  HWFLQ0(:,:)                        !  
   real(r8),allocatable ::  VPQ(:,:)                           !  
@@ -73,8 +74,9 @@ implicit none
   allocate(VOLI1(0:JZ,JY,JX));  VOLI1=0._r8
   allocate(FLQ0S(JY,JX));       FLQ0S=0._r8
   allocate(FLQ0W(JY,JX));       FLQ0W=0._r8
-  allocate(VOLPH1(JZ,JY,JX));   VOLPH1=0._r8    
-  allocate(EVAPW(JY,JX));       EVAPW=0._r8  
+  allocate(VOLPH1(JZ,JY,JX));   VOLPH1=0._r8 
+  allocate(EVAPSN(JY,JX));      EVAPSN=0._r8  
+  allocate(EVAPW(JY,JX));       EVAPW=0._r8    
   allocate(EVAPS(JY,JX));       EVAPS=0._r8  
   allocate(FMAC(JZ,JY,JX));     FMAC=0._r8  
   allocate(HWFLQ0(JY,JX));      HWFLQ0=0._r8  
@@ -133,6 +135,7 @@ implicit none
   call destroy(VOLPH1)    
   call destroy(EVAPW)  
   call destroy(EVAPS)  
+  call destroy(EVAPSN)  
   call destroy(FMAC)  
   call destroy(HWFLQ0)
   call destroy(VPQ)    
