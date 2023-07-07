@@ -75,13 +75,9 @@ Module SharedDataMod
 
 !------------------------------------------------------------------------------------------
 
-  subroutine DestroySharedData(JZ,ncol)
+  subroutine DestroySharedData()
   implicit none
-  integer, intent(in) :: JZ    !number of vertical layers
-  integer, intent(in) :: NCOL  !NUMBER of cols
-  !set # of soil layers
-  JZSOI=JZ
-  NYS=ncol
+
   call destroy(a_csand)  
   call destroy(a_CSILT)
   call destroy(a_BKDSI)

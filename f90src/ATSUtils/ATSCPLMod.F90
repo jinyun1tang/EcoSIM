@@ -116,6 +116,8 @@ contains
 
 
   call InitSharedData(JZ,NCOL)
+
+  call Init_EcoSIM_Soil()
   end subroutine Init_EcoSIM
 !------------------------------------------------------------------------------------------
 
