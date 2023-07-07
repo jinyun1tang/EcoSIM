@@ -221,7 +221,7 @@ implicit none
           +trcsa_XQR(idsa_SO4,N,NN,N5,N4) &
           +trcsa_XQR(idsa_Cl,N,NN,N5,N4)+trcsa_XQR(idsa_CO3,N,NN,N5,N4) &
           +trcsa_XQR(idsa_H0PO4,N,NN,N5,N4))
-        SS2=XN*2.0*(trcsa_XQR(idsa_HCO3,N,NN,N5,N4)+trcsa_XQR(idsa_AlOH,N,NN,N5,N4) &
+        SS2=XN*2.0_r8*(trcsa_XQR(idsa_HCO3,N,NN,N5,N4)+trcsa_XQR(idsa_AlOH,N,NN,N5,N4) &
           +trcsa_XQR(idsa_AlSO4,N,NN,N5,N4)+trcsa_XQR(idsa_FeOH,N,NN,N5,N4) &
           +trcsa_XQR(idsa_FeSO4,N,NN,N5,N4) &
           +trcsa_XQR(idsa_CaOH2,N,NN,N5,N4)+trcsa_XQR(idsa_CaCO3,N,NN,N5,N4) &
@@ -230,12 +230,12 @@ implicit none
           +trcsa_XQR(idsa_MgSO4,N,NN,N5,N4) &
           +trcsa_XQR(idsa_NaCO3,N,NN,N5,N4)+trcsa_XQR(idsa_NaSO4,N,NN,N5,N4) &
           +trcsa_XQR(idsa_KSO4,N,NN,N5,N4)+trcsa_XQR(idsa_CaPO4,N,NN,N5,N4))
-        SS3=XN*3.0*(trcsa_XQR(idsa_AlOH2,N,NN,N5,N4)+trcsa_XQR(idsa_FeOH2,N,NN,N5,N4) &
+        SS3=XN*3.0_r8*(trcsa_XQR(idsa_AlOH2,N,NN,N5,N4)+trcsa_XQR(idsa_FeOH2,N,NN,N5,N4) &
           +trcsa_XQR(idsa_CaHCO3,N,NN,N5,N4)+trcsa_XQR(idsa_MgHCO3,N,NN,N5,N4)+trcsa_XQR(idsa_FeHPO4,N,NN,N5,N4) &
           +trcsa_XQR(idsa_CaHPO4,N,NN,N5,N4)+trcsa_XQR(idsa_MgHPO4,N,NN,N5,N4))
-        SS4=XN*4.0*(trcsa_XQR(idsa_AlOH3,N,NN,N5,N4)+trcsa_XQR(idsa_FeOH3,N,NN,N5,N4) &
+        SS4=XN*4.0_r8*(trcsa_XQR(idsa_AlOH3,N,NN,N5,N4)+trcsa_XQR(idsa_FeOH3,N,NN,N5,N4) &
           +trcsa_XQR(idsa_H3PO4,N,NN,N5,N4)+trcsa_XQR(idsa_FeH2PO4,N,NN,N5,N4)+trcsa_XQR(idsa_CaH2PO4,N,NN,N5,N4)) &
-          +XN*5.0*(trcsa_XQR(idsa_AlOH4,N,NN,N5,N4)+trcsa_XQR(idsa_FeOH4,N,NN,N5,N4))
+          +XN*5.0_r8*(trcsa_XQR(idsa_AlOH4,N,NN,N5,N4)+trcsa_XQR(idsa_FeOH4,N,NN,N5,N4))
         PSS=PSS+XN*patomw*trcsa_XQS(idsa_H0PO4,N,N5,N4)
         TPOU=TPOU-PSS
         SSR=SS1+SS2+SS3+SS4
@@ -249,24 +249,23 @@ implicit none
 !       QR=surface runoff from watsub.f
 !       XQR*=solute in runoff from trnsfrs.f
 !       ECNDQ=electrical conductivity of runoff
-!
+!       where are those coefficients from?
         WX=QR(N,NN,N5,N4)
         IF(ABS(WX).GT.ZEROS(N5,N4))THEN
-          ECHY=0.337*AZMAX1(trcsa_XQR(idsa_Hp,N,NN,N5,N4)/WX)
-          ECOH=0.192*AZMAX1(trcsa_XQR(idsa_OH,N,NN,N5,N4)/WX)
-          ECAL=0.056*AZMAX1(trcsa_XQR(idsa_Al,N,NN,N5,N4)*3.0/WX)
-          ECFE=0.051*AZMAX1(trcsa_XQR(idsa_Fe,N,NN,N5,N4)*3.0/WX)
-          ECCA=0.060*AZMAX1(trcsa_XQR(idsa_Ca,N,NN,N5,N4)*2.0/WX)
-          ECMG=0.053*AZMAX1(trcsa_XQR(idsa_Mg,N,NN,N5,N4)*2.0/WX)
-          ECNA=0.050*AZMAX1(trcsa_XQR(idsa_Na,N,NN,N5,N4)/WX)
-          ECKA=0.070*AZMAX1(trcsa_XQR(idsa_K,N,NN,N5,N4)/WX)
-          ECCO=0.072*AZMAX1(trcsa_XQR(idsa_CO3,N,NN,N5,N4)*2.0/WX)
-          ECHC=0.044*AZMAX1(trcsa_XQR(idsa_HCO3,N,NN,N5,N4)/WX)
-          ECSO=0.080*AZMAX1(trcsa_XQR(idsa_SO4,N,NN,N5,N4)*2.0/WX)
-          ECCL=0.076*AZMAX1(trcsa_XQR(idsa_Cl,N,NN,N5,N4)/WX)
-          ECNO=0.071*AZMAX1(trcn_XRS(ids_NO3,N,NN,N5,N4)/(WX*natomw))
-          ECNDQ=ECHY+ECOH+ECAL+ECFE+ECCA+ECMG+ECNA+ECKA &
-            +ECCO+ECHC+ECSO+ECCL+ECNO
+          ECHY=0.337_r8*AZMAX1(trcsa_XQR(idsa_Hp,N,NN,N5,N4)/WX)
+          ECOH=0.192_r8*AZMAX1(trcsa_XQR(idsa_OH,N,NN,N5,N4)/WX)
+          ECAL=0.056_r8*AZMAX1(trcsa_XQR(idsa_Al,N,NN,N5,N4)*3.0_r8/WX)
+          ECFE=0.051_r8*AZMAX1(trcsa_XQR(idsa_Fe,N,NN,N5,N4)*3.0_r8/WX)
+          ECCA=0.060_r8*AZMAX1(trcsa_XQR(idsa_Ca,N,NN,N5,N4)*2.0_r8/WX)
+          ECMG=0.053_r8*AZMAX1(trcsa_XQR(idsa_Mg,N,NN,N5,N4)*2.0_r8/WX)
+          ECNA=0.050_r8*AZMAX1(trcsa_XQR(idsa_Na,N,NN,N5,N4)/WX)
+          ECKA=0.070_r8*AZMAX1(trcsa_XQR(idsa_K,N,NN,N5,N4)/WX)
+          ECCO=0.072_r8*AZMAX1(trcsa_XQR(idsa_CO3,N,NN,N5,N4)*2.0_r8/WX)
+          ECHC=0.044_r8*AZMAX1(trcsa_XQR(idsa_HCO3,N,NN,N5,N4)/WX)
+          ECSO=0.080_r8*AZMAX1(trcsa_XQR(idsa_SO4,N,NN,N5,N4)*2.0_r8/WX)
+          ECCL=0.076_r8*AZMAX1(trcsa_XQR(idsa_Cl,N,NN,N5,N4)/WX)
+          ECNO=0.071_r8*AZMAX1(trcn_XRS(ids_NO3,N,NN,N5,N4)/(WX*natomw))
+          ECNDQ=ECHY+ECOH+ECAL+ECFE+ECCA+ECMG+ECNA+ECKA+ECCO+ECHC+ECSO+ECCL+ECNO
 !     WRITE(*,9991)'ECNDQ',IYRC,I,J,N4,N5,N,NN,WX,ECNDQ
 !9991  FORMAT(A8,7I4,2E12.4)
         ELSE

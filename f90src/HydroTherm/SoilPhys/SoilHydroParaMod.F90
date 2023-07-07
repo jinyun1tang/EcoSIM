@@ -27,6 +27,7 @@ implicit none
   public :: GetSoilHydraulicVars
   public :: SoilHydroProperty
   public :: LitterHydroproperty
+  PUBLIC :: ComputeSoilHydroPars
 contains
 !------------------------------------------------------------------------------------------
 
@@ -396,5 +397,42 @@ contains
     ENDIF
   ENDDO D1235
   end subroutine LitterHydroproperty
+
+!------------------------------------------------------------------------------------------
+
+  subroutine ComputeSoilHydroPars(NY,NX,NU,NM)
+  implicit none
+  integer, intent(in) :: NY,NX,NU,NM
+  integer :: L
+  DO  L=NU,NM
+    IF(FC(L,NY,NX).LT.0.0_r8)THEN
+      !computing field capacity
+      ISOIL(isoi_fc,L,NY,NX)=1
+      PSIFC(NY,NX)=-0.033_r8
+    ELSE
+      ISOIL(isoi_fc,L,NY,NX)=0
+    ENDIF
+    IF(WP(L,NY,NX).LT.0.0_r8)THEN
+      !computing wilting point
+      ISOIL(isoi_wp,L,NY,NX)=1
+      PSIWP(NY,NX)=-1.5_r8
+    ELSE
+      ISOIL(isoi_wp,L,NY,NX)=0
+    ENDIF
+    IF(SCNV(L,NY,NX).LT.0.0_r8)THEN
+      !soil vertical saturated hydraulic conductivity
+      ISOIL(isoi_scnv,L,NY,NX)=1
+    ELSE
+      ISOIL(isoi_scnv,L,NY,NX)=0
+    ENDIF
+    IF(SCNH(L,NY,NX).LT.0.0_r8)THEN
+      !soil horizontal saturated hydraulic conductivity
+      ISOIL(isoi_scnh,L,NY,NX)=1
+    ELSE
+      ISOIL(isoi_scnh,L,NY,NX)=0
+    ENDIF
+  ENDDO
+  END subroutine ComputeSoilHydroPars
+
 
 end module SoilHydroParaMod

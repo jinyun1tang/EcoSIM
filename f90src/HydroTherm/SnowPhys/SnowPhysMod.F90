@@ -4,31 +4,6 @@ module SnowPhysMod
 ! the snow model
 ! required input
 !
-! AREA(3,NUM(NY,NX),NY,NX)        
-! VOLP1(NUM(NY,NX),NY,NX)
-! FGRD(NUM(NY,NX),NY,NX)    !fraction as macropore
-! VOLPH1(NUM(NY,NX),NY,NX)
-! FMAC(NUM(NY,NX),NY,NX)    !fraction as micropore
-! THETY(NUM(NY,NX),NY,NX)
-! POROS(NUM(NY,NX),NY,NX)
-! VOLW1(NUM(NY,NX),NY,NX)
-! VOLY(NUM(NY,NX),NY,NX)
-! BKVL(NUM(NY,NX),NY,NX)
-! FC(NUM(NY,NX),NY,NX)
-! PSISM1(NUM(NY,NX),NY,NX)  updated 
-! PSISO
-! FCL(NUM(NY,NX),NY,NX)
-! FCD(NUM(NY,NX),NY,NX)
-! PSL(NUM(NY,NX),NY,NX)
-! PSD(NUM(NY,NX),NY,NX)
-! PSISE(NUM(NY,NX),NY,NX)
-! VOLX(NUM(NY,NX),NY,NX)
-! THETIX(NUM(NY,NX),NY,NX)
-! THETWX(NUM(NY,NX),NY,NX)
-! VOLW1(NUM(NY,NX),NY,NX)
-! VOLI1(NUM(NY,NX),NY,NX)
-! VHCP1(NUM(NY,NX),NY,NX)
-! TK1(NUM(NY,NX),NY,NX)
 
 ! codes for snow physics
   use data_kind_mod, only : r8 => DAT_KIND_R8
@@ -539,6 +514,7 @@ contains
     HFLXW=HFLXW+HFLXW2
     EVAPS(NY,NX)=EVAPS(NY,NX)+EVAPS2
     EVAPW(NY,NX)=EVAPW(NY,NX)+EVAPW2
+    EVAPSN(NY,NX)=EVAPSN(NY,NX)+EVAPS2+EVAPW2
     FLQ0S2=FLQ0S(NY,NX)*XNPS
     FLQ0W2=FLQ0W(NY,NX)*XNPS
     FLQ0I2=FLQ0I(NY,NX)*XNPS
@@ -871,6 +847,8 @@ contains
   integer :: N,NN,N4,N5,N4B,N5B
   real(r8) :: ALTS1,ALTS2
   real(r8) :: QSX,SS
+  integer, parameter :: idirew=1
+  integer, parameter :: idirns=2
 !
 !     SNOW REDISTRIBUTION FROM SNOWPACK
 !
@@ -889,7 +867,7 @@ contains
 
   DO  N=1,2
     DO  NN=1,2
-      IF(N.EQ.1)THEN
+      IF(N.EQ.idirew)THEN
         !east-west
         IF(NX.EQ.NHE.AND.NN.EQ.1.OR.NX.EQ.NHW.AND.NN.EQ.2)THEN
           !at the boundary
@@ -900,7 +878,7 @@ contains
           N4B=NX-1
           N5B=NY
         ENDIF
-      ELSEIF(N.EQ.2)THEN
+      ELSEIF(N.EQ.idirns)THEN
         !south-north
         IF(NY.EQ.NVS.AND.NN.EQ.1.OR.NY.EQ.NVN.AND.NN.EQ.2)THEN
           !at the boundary
@@ -940,7 +918,6 @@ contains
         QI(N,N5,N4)=QI(N,N5,N4)+QI1(N,N5,N4)
         HQS(N,N5,N4)=HQS(N,N5,N4)+HQS1(N,N5,N4)
         QSM(M,N,N5,N4)=QS1(N,N5,N4)
-
       ENDIF
       !add west and south
       IF(NN.EQ.2)THEN
@@ -961,6 +938,7 @@ contains
     TQR1(N2,N1)=TQR1(N2,N1)+QR1(N,NN,N2,N1)
     THQR1(N2,N1)=THQR1(N2,N1)+HQR1(N,NN,N2,N1)
     IF(IFLBM(M,N,NN,N5,N4).EQ.0)THEN
+    !there is runoff
       TQR1(N2,N1)=TQR1(N2,N1)-QR1(N,NN,N5,N4)
       THQR1(N2,N1)=THQR1(N2,N1)-HQR1(N,NN,N5,N4)
     ENDIF

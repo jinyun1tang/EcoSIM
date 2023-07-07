@@ -28,8 +28,6 @@ module EcosimConst
   real(r8), parameter :: RGAS=8.3143_r8        !universal gas constant, J/mole.oK
   real(r8), parameter :: orgcden=0.55E+06_r8   !density of organic carbon, gC/m3
   real(r8), parameter :: hpresc=8.4334E+03_r8  !elapsing height for atmospheric pressure, m
-  real(r8), parameter :: FCI=0.05_r8                      !field capacity of ice
-  real(r8), parameter :: WPI=0.025_r8                     !wilting point of ice
   real(r8), parameter :: POROQ=0.66_r8                    !soil porosity ^ 2/3
   real(r8), parameter :: FORGC=0.1E+06_r8                 !minimum SOC for combustion 	[g Mg-1]
   real(r8), parameter :: FVLWB=1.0_r8                     !maximum soil water content for combustion	[m3 m-3]

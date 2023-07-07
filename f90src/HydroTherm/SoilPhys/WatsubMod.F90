@@ -39,7 +39,7 @@ module WatsubMod
   use SnowPhysMod
   use HydroThermData
   use SurfPhysMod
-  use SnowPhysData, only : THQR1,TQR1
+  use SoilPhysParaMod
   use SurfPhysData, only : InitSurfPhysData,DestructSurfPhysData  
   implicit none
 
@@ -195,8 +195,11 @@ module WatsubMod
         VOLPM(1,L,NY,NX)=VOLP1(L,NY,NX)+VOLPH1(L,NY,NX)+THETPI*(VOLI1(L,NY,NX)+VOLIH1(L,NY,NX))
         VOLTX=VOLY(L,NY,NX)+VOLAH1(L,NY,NX)
         IF(VOLTX.GT.ZEROS2(NY,NX))THEN
+          !fraction as water
           THETWX(L,NY,NX)=AZMAX1t((VOLW1(L,NY,NX)+VOLWH1(L,NY,NX))/VOLTX)
+          !fraction as ice
           THETIX(L,NY,NX)=AZMAX1t((VOLI1(L,NY,NX)+VOLIH1(L,NY,NX))/VOLTX)
+          !fraction as air
           THETPX(L,NY,NX)=AZMAX1t((VOLP1(L,NY,NX)+VOLPH1(L,NY,NX))/VOLTX)
         ELSE
           THETWX(L,NY,NX)=POROS(L,NY,NX)
@@ -284,7 +287,7 @@ module WatsubMod
     ENDDO D9990
   ENDDO D9995
 
-  call CopySurfStateVars(I,J,NHW,NHE,NVN,NVS,RAR1)
+  call StageSurfStateVars(I,J,NHW,NHE,NVN,NVS,RAR1)
 
   call LocalCopySoilVars(I,NHW,NHE,NVN,NVS)
 
@@ -472,9 +475,9 @@ module WatsubMod
         IF(N3.GE.NUM(N2,N1).AND.N6.GE.NUM(N5,N4).AND.N3.LE.NL(N2,N1).AND.N6.LE.NL(N5,N4))THEN
 
           ! source layer
-          call CalcSoilWaterPotential(NY,NX,N1,N2,N3,THETA1)
+          call CalcSoilWaterPotential(NY,NX,N1,N2,N3,PSISA1(N3,N2,N1),THETA1)
           !dest
-          call CalcSoilWaterPotential(NY,NX,N4,N5,N6,THETAL)
+          call CalcSoilWaterPotential(NY,NX,N4,N5,N6,PSISA1(N6,N5,N4),THETAL)
           !
           !     ACCOUNT FOR WETTING FRONTS WHEN CALCULATING WATER CONTENTS,
           !     MATRIC WATER POTENTIALS AND HYDRAULIC CONDUCTIVITIES USED
@@ -1038,12 +1041,7 @@ module WatsubMod
           THETPX(L,NY,NX)=AZMAX1t((VOLP1(L,NY,NX)+VOLPH1(L,NY,NX))/VOLTX)
           THETPM(M+1,L,NY,NX)=THETPX(L,NY,NX)
           IF(VOLA1(L,NY,NX)+VOLAH1(L,NY,NX).GT.ZEROS2(NY,NX))THEN
-            THETPY(L,NY,NX)=AZMAX1((VOLP1(L,NY,NX)+VOLPH1(L,NY,NX)) &
-              /(VOLA1(L,NY,NX)+VOLAH1(L,NY,NX)))
-!              if(curday>=41)then
-!                write(*,*)'aTHETPY=',THETPY(L,NY,NX),L,VOLA1(L,NY,NX)+VOLAH1(L,NY,NX)
-!                write(*,*)'VOLP1 =',VOLP1(L,NY,NX),VOLPH1(L,NY,NX)
-!              endif
+            THETPY(L,NY,NX)=AZMAX1((VOLP1(L,NY,NX)+VOLPH1(L,NY,NX))/(VOLA1(L,NY,NX)+VOLAH1(L,NY,NX)))
           ELSE
             THETPY(L,NY,NX)=0.0_r8
           ENDIF
@@ -1128,7 +1126,6 @@ module WatsubMod
   ENDDO D9795
 
   end subroutine UpdateStateFluxAtM
-
 
 !------------------------------------------------------------------------------------------
 
@@ -1357,65 +1354,7 @@ module WatsubMod
   ENDDO D9885
   end subroutine InitSoil3DModel
 
-!------------------------------------------------------------------------------------------
-  subroutine CalcSoilWaterPotential(NY,NX,N1,N2,N3,THETA1)
-  implicit none
-  integer, intent(in) :: NY,NX,N1,N2,N3
-  real(r8), intent(out) :: THETA1
-  real(r8) :: FCDX,FCX,FCLX,WPLX,PSDX,WPX
-  !     BKVL=soil mass
-  !     FC,WP=water contents at field capacity,wilting point
-  !     FCL,WPL=log FC,WP
-  !     FCD,PSD=FCL-WPL,log(POROS)-FCL
-  !     PSISA1,PSIHY,PSISE=soil matric,hygroscopic,air entry potential
-  !     PSIMX,PSIMD,PSIMS=log water potential at FC,WP,saturation
-  !     PSISD=PSIMX-PSIMS
-  !     SRP=parameter for deviation from linear log-log water retention
-  !     PSISO=osmotic potential
-  !     DTHETW=minimum water content for numerical purpose
-  ! soil matric potential upper layer
-  
-  THETA1=AMAX1(THETY(N3,N2,N1),AMIN1(POROS(N3,N2,N1),safe_adb(VOLW1(N3,N2,N1),VOLY(N3,N2,N1))))
 
-  IF(BKVL(N3,N2,N1).GT.ZEROS(NY,NX))THEN
-    !source layer is active soil
-    IF(THETA1.LT.FC(N3,N2,N1))THEN
-      !water less than field capacity
-      !PSIHY is the minimum water potential allowed
-      PSISA1(N3,N2,N1)=AMAX1(PSIHY,-EXP(PSIMX(N2,N1)+((FCL(N3,N2,N1)-LOG(THETA1))/FCD(N3,N2,N1)*PSIMD(N2,N1))))
-    ELSEIF(THETA1.LT.POROS(N3,N2,N1)-DTHETW)THEN
-      PSISA1(N3,N2,N1)=-EXP(PSIMS(N2,N1)+(((PSL(N3,N2,N1)-LOG(THETA1))/PSD(N3,N2,N1))**SRP(N3,N2,N1)*PSISD(N2,N1)))
-    ELSE
-      PSISA1(N3,N2,N1)=PSISE(N3,N2,N1)
-    ENDIF
-    !
-    !     SUBSURFCE UPPER WATER LAYER
-    !
-    !     THETIX,THETWX=ice,water concentration
-    !     FCI,WPI=ice field capacity,wilting point
-    !     PSISA1=matric water potential
-    !
-  ELSEIF(VOLX(N3,N2,N1).GT.ZEROS2(N2,N1).and.THETIX(N3,N2,N1)>ZEROS2(N2,N1))THEN
-    FCX=FCI*THETIX(N3,N2,N1)
-    WPX=WPI*THETIX(N3,N2,N1)
-    FCLX=LOG(FCX)
-    WPLX=LOG(WPX)
-    PSDX=PSL(N3,N2,N1)-FCLX
-    FCDX=FCLX-WPLX
-    IF(THETWX(N3,N2,N1).LT.FCX)THEN
-      PSISA1(N3,N2,N1)=AMAX1(PSIHY,-EXP(PSIMX(N2,N1) &
-        +((FCLX-LOG(THETWX(N3,N2,N1)))/FCDX*PSIMD(NY,NX))))
-    ELSEIF(THETWX(N3,N2,N1).LT.POROS(N3,N2,N1)-DTHETW)THEN
-      PSISA1(N3,N2,N1)=-EXP(PSIMS(N2,N1) &
-        +(((PSL(N3,N2,N1)-LOG(THETWX(N3,N2,N1)))/PSDX)*PSISD(N2,N1)))
-    ELSE
-      !saturated
-      PSISA1(N3,N2,N1)=PSISE(N3,N2,N1)
-    ENDIF
-  ELSE
-    PSISA1(N3,N2,N1)=PSISE(N3,N2,N1)
-  ENDIF
-  end subroutine CalcSoilWaterPotential
 !------------------------------------------------------------------------------------------
   subroutine MicporeDarcyFlow(NY,NX,N,N1,N2,N3,N4,N5,N6,THETA1,THETAL,FKSAT,HWFLWL,PSISV1,PSISVL)          
   implicit none

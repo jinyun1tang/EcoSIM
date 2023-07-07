@@ -2,6 +2,7 @@ set(APIS_SOURCES
 	PlantAPI.F90
   MicBGCAPI.F90
   GeochemAPI.F90
+  SurfPhysAPI.F90  
 )
 
 include_directories(${ECOSIM_INCLUDE_DIRS})

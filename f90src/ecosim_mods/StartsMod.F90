@@ -25,7 +25,7 @@ module StartsMod
   use EcoSIMCtrlDataType
   use ClimForcDataType
   use LandSurfDataType
-
+  use InitVegBGC, only : InitIrradianceGeometry
   use PlantTraitDataType
   use PlantDataRateType
   use SurfLitterDataType
@@ -58,13 +58,13 @@ module StartsMod
 
   public :: starts
   public :: set_ecosim_solver
+  public :: startsim
   contains
 
   SUBROUTINE starts(NHW,NHE,NVN,NVS)
   !
   !     THIS SUBROUTINE INITIALIZES ALL SOIL VARIABLES
 
-  use InitVegBGC, only : InitIrradianceGeometry
   implicit none
   integer, intent(in) :: NHW,NHE,NVN,NVS
 
@@ -80,9 +80,9 @@ module StartsMod
   !  Initialize controlling parameters
   call InitControlParms
   !
-  !     IRRADIANCE INTERCEPTION GEOMETRY
+  !  IRRADIANCE INTERCEPTION GEOMETRY, plant model
   call InitIrradianceGeometry(YSIN,YCOS,YAZI)
-  !     CALCULATE ELEVATION OF EACH GRID CELL
+  !  CALCULATE ELEVATION OF EACH GRID CELL
   !
   call InitGridElevation(NHW,NHE,NVN,NVS,YSIN,YCOS,YAZI,ALTY)
   !
@@ -91,8 +91,10 @@ module StartsMod
   !
   call InitAccumulators()
 
+! this assumes the whole landscape is a grid
   ALTZG=0.0_r8
   CDPTHG=0.0_r8
+
   DO  NX=NHW,NHE
     DO  NY=NVN,NVS
 
@@ -151,6 +153,8 @@ module StartsMod
 !     DISTRIBUTION OF OM AMONG FRACTIONS OF DIFFERING
 !     BIOLOGICAL ACTIVITY
 !
+      call InitHGrid(NY,NX)
+
       call InitLayerDepths(NY,NX)
     ! DPTHA=active layer depth (m)
       DPTHA(NY,NX)=9999.0_r8
@@ -356,7 +360,7 @@ module StartsMod
     !     CORGPX(3)=AMIN1(CPRH(3)*CORGCX(3),CORGPZ)
     !     CORGPX(4)=AZMAX1(CORGPZ-CORGPX(3))
     CORGL=AZMAX1(CORGC(L,NY,NX)-CORGR(L,NY,NX))
-    TORGL(L)=TORGC+CORGL*BKVL(L,NY,NX)/AREA(3,L,NY,NX)*0.5
+    TORGL(L)=TORGC+CORGL*BKVL(L,NY,NX)/AREA(3,L,NY,NX)*0.5_r8
     TORGC=TORGC+CORGL*BKVL(L,NY,NX)/AREA(3,L,NY,NX)
   ENDDO D1190
 !
@@ -699,7 +703,7 @@ module StartsMod
   !     XDIM=1.0/NDIM
   ZERO=1.0E-15_r8
   ZERO2=1.0E-08_r8
-  TAREA=0.0_r8
+  TAREA=0.0_r8  !land scape area
   !
   !     INITIALIZE MASS BALANCE CHECKS
   !
@@ -823,6 +827,21 @@ module StartsMod
   XHVSTE(:,:,:)=0.0_r8
   ENGYP(:,:)=0.0_r8
   end subroutine InitAccumulators
+
+!------------------------------------------------------------------------------------------
+  subroutine InitHGrid(NY,NX)
+  implicit none
+  integer, intent(in) :: NY,NX
+  integer :: L
+
+  DO  L=0,NL(NY,NX)
+    DLYRI(1,L,NY,NX)=DH(NY,NX)
+    DLYRI(2,L,NY,NX)=DV(NY,NX)
+    DLYR(1,L,NY,NX)=DLYRI(1,L,NY,NX)
+    DLYR(2,L,NY,NX)=DLYRI(2,L,NY,NX)
+    AREA(3,L,NY,NX)=DLYR(1,L,NY,NX)*DLYR(2,L,NY,NX)
+  ENDDO
+  end subroutine InitHGrid
 !------------------------------------------------------------------------------------------
   subroutine InitLayerDepths(NY,NX)
   use EcoSiMParDataMod, only : micpar
@@ -836,6 +855,7 @@ module StartsMod
     k_fine_litr  => micpar%k_fine_litr  , &
     k_manure     => micpar%k_manure       &
   )
+  
 !     begin_execution
   DO  L=0,NL(NY,NX)
 !
@@ -848,11 +868,6 @@ module StartsMod
 ! BKVL=mass
 ! CDPTH,DPTH=depth to bottom,midpoint
 !
-    DLYRI(1,L,NY,NX)=DH(NY,NX)
-    DLYRI(2,L,NY,NX)=DV(NY,NX)
-    DLYR(1,L,NY,NX)=DLYRI(1,L,NY,NX)
-    DLYR(2,L,NY,NX)=DLYRI(2,L,NY,NX)
-    AREA(3,L,NY,NX)=DLYR(1,L,NY,NX)*DLYR(2,L,NY,NX)
     IF(L.EQ.0)THEN
       ! surface litter residue layer
       TAREA=TAREA+AREA(3,L,NY,NX)
@@ -873,22 +888,22 @@ module StartsMod
       DLYR(3,L,NY,NX)=DLYRI(3,L,NY,NX)
     ELSE
 !     if it is a standing water, no macropore fraction
+!     DPTH=depth of layer middle
+!     CDPTHZ=soil thickness from surface to bottom of layer L, [m]
+!     FMPR=micropore fraction
+!     DPTHZ=depth to middle of soil layer from  surface of grid cell [m]
+!     VOLT=total volume
+!     VOLX=total micropore volume
       IF(BKDSI(L,NY,NX).LE.ZERO)FHOL(L,NY,NX)=0.0
 !     thickness:=bottom depth-upper depth
       DLYRI(3,L,NY,NX)=(CDPTH(L,NY,NX)-CDPTH(L-1,NY,NX))
       call check_bool(DLYRI(3,L,NY,NX)<0._r8,'negative soil layer thickness',&
         __LINE__,mod_filename)
-      !FMPR: micropore fraction
       DLYR(3,L,NY,NX)=DLYRI(3,L,NY,NX)
-!     DPTH: depth of layer middle
       DPTH(L,NY,NX)=0.5_r8*(CDPTH(L,NY,NX)+CDPTH(L-1,NY,NX))
-!     CDPTHZ: soil thickness from surface to bottom of layer L, [m]
       CDPTHZ(L,NY,NX)=CDPTH(L,NY,NX)-CDPTH(NU(NY,NX),NY,NX)+DLYR(3,NU(NY,NX),NY,NX)
-!     DPTHZ: depth to middle of soil layer from  surface of grid cell [m]
       DPTHZ(L,NY,NX)=0.5_r8*(CDPTHZ(L,NY,NX)+CDPTHZ(L-1,NY,NX))
-!     VOLT: total volume
       VOLT(L,NY,NX)=amax1(AREA(3,L,NY,NX)*DLYR(3,L,NY,NX),1.e-8_r8)
-!     VOLX: total micropore volume
       VOLX(L,NY,NX)=VOLT(L,NY,NX)*FMPR(L,NY,NX)
       VOLY(L,NY,NX)=VOLX(L,NY,NX)
       VOLTI(L,NY,NX)=VOLT(L,NY,NX)
@@ -941,5 +956,142 @@ module StartsMod
   XNPC=XNPX*XNPV
   
   end subroutine set_ecosim_solver
+
+!------------------------------------------------------------------------------------------
+
+  
+  subroutine startsim(NHW,NHE,NVN,NVS)
+  use SoilHydroParaMod, only : ComputeSoilHydroPars
+  use SoilPhysParaMod, only : SetDeepSoil  
+  implicit none
+  integer,intent(in) :: NHW,NHE,NVN,NVS
+  REAL(R8) :: ALTY
+  real(r8) :: ALTZG
+  real(r8) :: tPBOT
+  integer :: NY,NX,NM
+  real(r8) :: CDPTHG
+  real(r8) :: YSIN(JSA),YCOS(JSA),YAZI(JSA)
+
+  DO  NX=NHW,NHE
+    DO  NY=NVN,NVS
+      NM=NJ(NY,NX)+1
+      call ComputeSoilHydroPars(NY,NX,NU(NY,NX),NM)
+      call SetDeepSoil(NY,NX,NM,JZ)
+    enddo
+  enddo
+  !  Initialize controlling parameters
+  call InitControlParms
+
+  !  IRRADIANCE INTERCEPTION GEOMETRY, plant model
+  call InitIrradianceGeometry(YSIN,YCOS,YAZI)
+  !  CALCULATE ELEVATION OF EACH GRID CELL
+  !
+  call InitGridElevation(NHW,NHE,NVN,NVS,YSIN,YCOS,YAZI,ALTY)
+
+
+  call InitAccumulators()
+
+  ALTZG=0.0_r8
+  CDPTHG=0.0_r8   !pay attention to how it is set for many-grid simulations
+
+  DO  NX=NHW,NHE
+    DO  NY=NVN,NVS
+      !
+      !     MINIMUM SURFACE ELEVATION IN LANDSCAPE
+      !
+      !     ALT=surface elevation relative to maximum
+      !     ALTZG=minimum surface elevation in landscape
+      !CDPTH: depth to bottom of soil layer
+      ALT(NY,NX)=ALT(NY,NX)-ALTY
+      IF(NX.EQ.NHW.AND.NY.EQ.NVN)THEN
+        ALTZG=ALT(NY,NX)
+      ELSE
+        ALTZG=MIN(ALTZG,ALT(NY,NX))
+      ENDIF
+      !
+      CDPTHG=AMAX1(CDPTHG,CDPTH(NU(NY,NX),NY,NX)) !topsoil layer depth
+!
+!     INITIALIZE ATMOSPHERE VARIABLES
+!
+!     C*E=atmospheric concentration (g m-3)
+!     *E=atmospheric concentration from readi.f (umol mol-1)
+!     CO2=CO2,CH4=CH4,OXY=O2,Z2G=N2,Z2O=N2O,NH3=NH3,H2G=H2
+!     ATKA=mean annual air temperature (K)
+!
+      tPBOT=1._r8
+      CCO2EI(NY,NX)=CO2EI(NY,NX)*5.36E-04_r8*Tref/ATKA(NY,NX)*tPBOT
+      AtmGgms(idg_CO2,NY,NX)=CO2E(NY,NX)*5.36E-04_r8*Tref/ATKA(NY,NX)*tPBOT
+      AtmGgms(idg_CH4,NY,NX)=CH4E(NY,NX)*5.36E-04_r8*Tref/ATKA(NY,NX)*tPBOT
+      AtmGgms(idg_O2,NY,NX)=OXYE(NY,NX)*1.43E-03_r8*Tref/ATKA(NY,NX)*tPBOT
+      AtmGgms(idg_N2,NY,NX)=Z2GE(NY,NX)*1.25E-03_r8*Tref/ATKA(NY,NX)*tPBOT
+      AtmGgms(idg_N2O,NY,NX)=Z2OE(NY,NX)*1.25E-03_r8*Tref/ATKA(NY,NX)*tPBOT
+      AtmGgms(idg_NH3,NY,NX)=ZNH3E(NY,NX)*6.25E-04_r8*Tref/ATKA(NY,NX)*tPBOT
+      AtmGgms(idg_H2,NY,NX)=H2GE(NY,NX)*8.92E-05_r8*Tref/ATKA(NY,NX)*tPBOT
+!
+!     MICROBIAL THERMAL ADAPTATION
+!
+!     OFFSET=shift in Arrhenius curve used in nitro.f (oC)
+!     ATCS=mean annual soil temperature (OC)
+!
+      OFFSET(NY,NX)=fOFFSET(ATCS(NY,NX))
+
+!
+!     INITIALIZE WATER POTENTIAL VARIABLES FOR SOIL LAYERS
+!
+!     PSIMX,PSIMN,PSIMS=log water potential at FC,WP,POROS
+!     PSISD,PSIMD=PSIMX-PSIMS,PSIMN-PSIMX
+!
+      PSIMS(NY,NX)=LOG(-PSIPS)
+      PSIMX(NY,NX)=LOG(-PSIFC(NY,NX))
+      PSIMN(NY,NX)=LOG(-PSIWP(NY,NX))
+      PSISD(NY,NX)=PSIMX(NY,NX)-PSIMS(NY,NX)
+      PSIMD(NY,NX)=PSIMN(NY,NX)-PSIMX(NY,NX)
+!     BKVL(0,NY,NX)=0.0_r8
+!
+!     DISTRIBUTION OF OM AMONG FRACTIONS OF DIFFERING
+!     BIOLOGICAL ACTIVITY
+!
+
+      call InitLayerDepths(NY,NX)
+    ! DPTHA=active layer depth (m)
+      DPTHA(NY,NX)=9999.0_r8
+!
+!     INITIALIZE SNOWPACK LAYERS
+      call InitSnowLayers(NY,NX)
+
+!     VHCPRX,VHCPNX=minimum heat capacities for solving
+!      surface litter,soil layer water and heat fluxes
+      VHCPRX(NY,NX)=VHCPRMin*AREA(3,NU(NY,NX),NY,NX)
+      VHCPNX(NY,NX)=VHCPNMin*AREA(3,NU(NY,NX),NY,NX)
+
+!
+!     SURFACE WATER STORAGE AND LOWER HEAT SINK
+
+!      DPTHSK=depth at which soil heat sink-source calculated
+!     TCNDG=assumed thermal conductivity below lower soil boundary
+!     (MJ m-1 K-1 h-1)
+!     TKSD=deep source/sink temperature from geothermal flux(K)
+      
+      DPTHSK(NY,NX)=AMAX1(10.0_r8,CDPTH(NL(NY,NX),NY,NX)+1.0_r8)
+      TCS(0,NY,NX)=ATCS(NY,NX)
+      TKS(0,NY,NX)=ATKS(NY,NX)
+      TKSD(NY,NX)=ATKS(NY,NX)+2.052E-04_r8*DPTHSK(NY,NX)/TCNDG
+!
+
+    ENDDO
+  ENDDO
+
+!
+!     INITIALIZE COMMUNITY CANOPY
+!
+  ZT(:,:)=0.0_r8
+  ZL(0:JC,:,:)=0.0_r8
+  ARLFT(1:JC,:,:)=0.0_r8
+  ARSTT(1:JC,:,:)=0.0_r8
+  WGLFT(1:JC,:,:)=0.0_r8
+
+!
+  call InitSoilVars(NHW,NHE,NVN,NVS,ALTZG,CDPTHG)
+  end subroutine startsim
 
 end module StartsMod

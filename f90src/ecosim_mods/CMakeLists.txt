@@ -1,8 +1,10 @@
 set(ECOSIM_MOD_SOURCES
+    InitAllocMod.F90
 	ExecMod.F90
 	StarteMod.F90
 	StartsMod.F90
 	VisualMod.F90
+
 )
 include_directories(${CMAKE_BINARY_DIR}/f90src/utils/)
 include_directories(${CMAKE_BINARY_DIR}/f90src/minimath/)
@@ -13,6 +15,8 @@ include_directories(${CMAKE_BINARY_DIR}/f90src/ecosim_datatype/)
 include_directories(${CMAKE_BINARY_DIR}/f90src/ioutils/)
 include_directories(${CMAKE_BINARY_DIR}/f90src/HydroTherm/SnowPhys)
 include_directories(${CMAKE_BINARY_DIR}/f90src/HydroTherm/SoilPhys)
+include_directories(${CMAKE_BINARY_DIR}/f90src/HydroTherm/PhysData)
+include_directories(${CMAKE_BINARY_DIR}/f90src/APIData/)
 include_directories(${CMAKE_BINARY_DIR}/f90src/APIs/)
 include_directories(${CMAKE_BINARY_DIR}/f90src/plant_bgc/)
 include_directories(${CMAKE_BINARY_DIR}/f90src/geochem/box_chem)

@@ -30,6 +30,8 @@ module readiMod
   use SoilBGCDataType
   use AqueChemDatatype
   use GridDataType
+  use SoilHydroParaMod, only : ComputeSoilHydroPars
+  use SoilPhysParaMod, only : SetDeepSoil
   implicit none
   private
 
@@ -611,42 +613,16 @@ module readiMod
           CALL Disp_topo_charc(NY,NX,NU(NY,NX),NM(NY,NX))
         endif
         RSC(k_fine_litr,0,NY,NX)=AMAX1(ppmc,RSC(k_fine_litr,0,NY,NX))
-        RSN(k_fine_litr,0,NY,NX)=AMAX1(0.04E-06,RSN(k_fine_litr,0,NY,NX))
-        RSP(k_fine_litr,0,NY,NX)=AMAX1(0.004E-06,RSP(k_fine_litr,0,NY,NX))
+        RSN(k_fine_litr,0,NY,NX)=AMAX1(0.04E-06_r8,RSN(k_fine_litr,0,NY,NX))
+        RSP(k_fine_litr,0,NY,NX)=AMAX1(0.004E-06_r8,RSP(k_fine_litr,0,NY,NX))
         SCNV(0,NY,NX)=10.0_r8*0.098_r8
 !
 !     SET FLAGS FOR ESTIMATING FC,WP,SCNV,SCNH IF UNKNOWN
 !
 !     ISOIL=flag for calculating FC(1),WP(2),SCNV(3),SCNH(4)
 !
-        DO  L=NU(NY,NX),NM(NY,NX)
-          IF(FC(L,NY,NX).LT.0.0_r8)THEN
-            !computing field capacity
-            ISOIL(isoi_fc,L,NY,NX)=1
-            PSIFC(NY,NX)=-0.033_r8
-          ELSE
-            ISOIL(isoi_fc,L,NY,NX)=0
-          ENDIF
-          IF(WP(L,NY,NX).LT.0.0_r8)THEN
-            !computing wilting point
-            ISOIL(isoi_wp,L,NY,NX)=1
-            PSIWP(NY,NX)=-1.5_r8
-          ELSE
-            ISOIL(isoi_wp,L,NY,NX)=0
-          ENDIF
-          IF(SCNV(L,NY,NX).LT.0.0_r8)THEN
-            !soil vertical saturated hydraulic conductivity
-            ISOIL(isoi_scnv,L,NY,NX)=1
-          ELSE
-            ISOIL(isoi_scnv,L,NY,NX)=0
-          ENDIF
-          IF(SCNH(L,NY,NX).LT.0.0_r8)THEN
-            !soil horizontal saturated hydraulic conductivity
-            ISOIL(isoi_scnh,L,NY,NX)=1
-          ELSE
-            ISOIL(isoi_scnh,L,NY,NX)=0
-          ENDIF
-        ENDDO
+        call ComputeSoilHydroPars(NY,NX,NU(NY,NX),NM(NY,NX))
+
 !
 !     FILL OUT SOIL BOUNDARY LAYERS ABOVE ROOTING ZONE (NOT USED)
 !     below is for soil repacking, whence NU>1
@@ -720,73 +696,8 @@ module readiMod
 !
 !     ADD SOIL BOUNDARY LAYERS BELOW SOIL ZONE
 !     depth of layer (L-1) is at the middle between that of layer L-2 and L
-        DO L=NM(NY,NX)+1,JZ
-          CDPTH(L,NY,NX)=2.0_r8*CDPTH(L-1,NY,NX)-1.0_r8*CDPTH(L-2,NY,NX)
-          BKDSI(L,NY,NX)=BKDSI(L-1,NY,NX)
-          FC(L,NY,NX)=FC(L-1,NY,NX)
-          WP(L,NY,NX)=WP(L-1,NY,NX)
-          SCNV(L,NY,NX)=SCNV(L-1,NY,NX)
-          SCNH(L,NY,NX)=SCNH(L-1,NY,NX)
-          CSAND(L,NY,NX)=CSAND(L-1,NY,NX)
-          CSILT(L,NY,NX)=CSILT(L-1,NY,NX)
-          CCLAY(L,NY,NX)=CCLAY(L-1,NY,NX)
-          FHOL(L,NY,NX)=FHOL(L-1,NY,NX)
-          ROCK(L,NY,NX)=ROCK(L-1,NY,NX)
-          PH(L,NY,NX)=PH(L-1,NY,NX)
-          CEC(L,NY,NX)=CEC(L-1,NY,NX)
-          AEC(L,NY,NX)=AEC(L-1,NY,NX)
+        call SetDeepSoil(NY,NX,NM(NY,NX),JZ)
 
-  !     IF(IDTBL(NY,NX).EQ.0)THEN
-  !       0.25_r8 is the geometric decreasing ratio (tunable)
-  !  or different scheme can be used
-          CORGC(L,NY,NX)=0.25_r8*CORGC(L-1,NY,NX)
-          CORGR(L,NY,NX)=0.25_r8*CORGR(L-1,NY,NX)
-          CORGN(L,NY,NX)=0.25_r8*CORGN(L-1,NY,NX)
-          CORGP(L,NY,NX)=0.25_r8*CORGP(L-1,NY,NX)
-  !     ELSE
-  !       CORGC(L,NY,NX)=CORGC(L-1,NY,NX)
-  !       CORGR(L,NY,NX)=CORGR(L-1,NY,NX)
-  !       CORGN(L,NY,NX)=CORGN(L-1,NY,NX)
-  !       CORGP(L,NY,NX)=CORGP(L-1,NY,NX)
-  !     ENDIF
-          CNH4(L,NY,NX)=CNH4(L-1,NY,NX)
-          CNO3(L,NY,NX)=CNO3(L-1,NY,NX)
-          CPO4(L,NY,NX)=CPO4(L-1,NY,NX)
-          CAL(L,NY,NX)=CAL(L-1,NY,NX)
-          CFE(L,NY,NX)=CFE(L-1,NY,NX)
-          CCA(L,NY,NX)=CCA(L-1,NY,NX)
-          CMG(L,NY,NX)=CMG(L-1,NY,NX)
-          CNA(L,NY,NX)=CNA(L-1,NY,NX)
-          CKA(L,NY,NX)=CKA(L-1,NY,NX)
-          CSO4(L,NY,NX)=CSO4(L-1,NY,NX)
-          CCL(L,NY,NX)=CCL(L-1,NY,NX)
-          CALOH(L,NY,NX)=CALOH(L-1,NY,NX)
-          CFEOH(L,NY,NX)=CFEOH(L-1,NY,NX)
-          CCACO(L,NY,NX)=CCACO(L-1,NY,NX)
-          CCASO(L,NY,NX)=CCASO(L-1,NY,NX)
-          CALPO(L,NY,NX)=CALPO(L-1,NY,NX)
-          CFEPO(L,NY,NX)=CFEPO(L-1,NY,NX)
-          CCAPD(L,NY,NX)=CCAPD(L-1,NY,NX)
-          CCAPH(L,NY,NX)=CCAPH(L-1,NY,NX)
-          GKC4(L,NY,NX)=GKC4(L-1,NY,NX)
-          GKCH(L,NY,NX)=GKCH(L-1,NY,NX)
-          GKCA(L,NY,NX)=GKCA(L-1,NY,NX)
-          GKCM(L,NY,NX)=GKCM(L-1,NY,NX)
-          GKCN(L,NY,NX)=GKCN(L-1,NY,NX)
-          GKCK(L,NY,NX)=GKCK(L-1,NY,NX)
-          THW(L,NY,NX)=THW(L-1,NY,NX)
-          THI(L,NY,NX)=THI(L-1,NY,NX)
-          ISOIL(1:4,L,NY,NX)=ISOIL(1:4,L-1,NY,NX)
-          RSC(k_fine_litr,L,NY,NX)=0.0_r8
-          RSN(k_fine_litr,L,NY,NX)=0.0_r8
-          RSP(k_fine_litr,L,NY,NX)=0.0_r8
-          RSC(k_woody_litr,L,NY,NX)=0.0_r8
-          RSN(k_woody_litr,L,NY,NX)=0.0_r8
-          RSP(k_woody_litr,L,NY,NX)=0.0_r8
-          RSC(k_manure,L,NY,NX)=0.0_r8
-          RSN(k_manure,L,NY,NX)=0.0_r8
-          RSP(k_manure,L,NY,NX)=0.0_r8
-        ENDDO
 !
 !   CALCULATE DERIVED SOIL PROPERTIES FROM INPUT SOIL PROPERTIES
 !
@@ -846,12 +757,10 @@ module readiMod
   !
           IF(CORGN(L,NY,NX).LT.0.0_r8)THEN
   !  default ORGN parameterization
-            CORGN(L,NY,NX)=AMIN1(0.125_r8*CORGC(L,NY,NX) &
-              ,8.9E+02_r8*(CORGC(L,NY,NX)/1.0E+04_r8)**0.80_r8)
+            CORGN(L,NY,NX)=AMIN1(0.125_r8*CORGC(L,NY,NX),8.9E+02_r8*(CORGC(L,NY,NX)/1.0E+04_r8)**0.80_r8)
           ENDIF
           IF(CORGP(L,NY,NX).LT.0.0_r8)THEN
-            CORGP(L,NY,NX)=AMIN1(0.0125_r8*CORGC(L,NY,NX) &
-              ,1.2E+02_r8*(CORGC(L,NY,NX)/1.0E+04_r8)**0.52_r8)
+            CORGP(L,NY,NX)=AMIN1(0.0125_r8*CORGC(L,NY,NX),1.2E+02_r8*(CORGC(L,NY,NX)/1.0E+04_r8)**0.52_r8)
           ENDIF
           IF(CEC(L,NY,NX).LT.0.0_r8)THEN
             !estimate from input data
@@ -887,7 +796,7 @@ module readiMod
   write(*,'(40A)')('-',ll=1,40)
   write(*,*)'NY, NX =',NY,NX
   write(*,*)'Aspect (o): ASPX',ASP(NY,NX)
-  write(*,*)'Aspect (o): SL0',SL(NY,NX)
+  write(*,*)'Slope (o): SL0',SL(NY,NX)
   write(*,*)'Initial snowpack depth: DPTHSX',DPTHS(NY,NX)
   write(*,'(100A)')('=',ll=1,100)
 
