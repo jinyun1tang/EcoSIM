@@ -127,6 +127,7 @@ module BGCContainers_module
      type (BGCVectorDouble) :: ice_density
      type (BGCVectorDouble) :: porosity
      type (BGCVectorDouble) :: water_content
+     type (BGCVectorDouble) :: suction_head
      type (BGCVectorDouble) :: temperature
      type (BGCVectorDouble) :: total_mobile
      type (BGCVectorDouble) :: hydraulic_conductivity
@@ -147,6 +148,10 @@ module BGCContainers_module
      real (c_double) :: vapor_pressure_air
      real (c_double) :: wind_speed
      real (c_double) :: precipitation
+     real (c_double) :: plant_wilting_factor
+     real (c_double) :: elevation
+     real (c_double) :: aspect
+     real (c_double) :: slope
      real (c_double) :: atm_n2
      real (c_double) :: atm_o2
      real (c_double) :: atm_co2
