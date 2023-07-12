@@ -13,7 +13,7 @@ Module SharedDataMod
   real(r8), allocatable :: a_csand(:,:)   !sand mass fraction
   real(r8), allocatable :: a_CSILT(:,:)   !silt mass fraction
   real(r8), allocatable :: a_BKDSI(:,:)   !bulk density
-  real(r8), allocatable :: a_CDPTH(:,:)   !dpeth (from surfce to bottom)
+  real(r8), allocatable :: a_CumDepth2LayerBottom(:,:)   !dpeth (from surfce to bottom)
   real(r8), allocatable :: a_FC(:,:)      !field capacity
   real(r8), allocatable :: a_WP(:,:)      !wilting point
   real(r8), allocatable :: a_FHOL(:,:)    !macropore fraction
@@ -51,7 +51,7 @@ Module SharedDataMod
   allocate(a_csand(JZSOI,ncol))  
   allocate(a_CSILT(jzsoi,ncol))   !silt mass fraction
   allocate(a_BKDSI(jzsoi,ncol))   !bulk density
-  allocate(a_CDPTH(jzsoi,ncol))   !dpeth (from surfce to bottom)
+  allocate(a_CumDepth2LayerBottom(jzsoi,ncol))   !dpeth (from surfce to bottom)
   allocate(a_FC(jzsoi,ncol))      !field capacity
   allocate(a_WP(jzsoi,ncol))      !wilting point
   allocate(a_FHOL(jzsoi,ncol))    !macropore fraction
@@ -81,7 +81,7 @@ Module SharedDataMod
   call destroy(a_csand)  
   call destroy(a_CSILT)
   call destroy(a_BKDSI)
-  call destroy(a_CDPTH)
+  call destroy(a_CumDepth2LayerBottom)
   call destroy(a_FC)
   call destroy(a_WP)
   call destroy(a_FHOL)

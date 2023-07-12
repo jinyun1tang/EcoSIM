@@ -89,9 +89,11 @@ module WatsubMod
   REAL(R8):: FKSATS(JY,JX)
 ! begin_execution
 !
-  curday=i
-  curhour=j
+  curday=i;curhour=j
   call PrepWaterEnergyBalance(I,J,NHW,NHE,NVN,NVS,RAR1)
+
+  call InitSoilHydrauics(NHW,NHE,NVN,NVS)
+
 !
 ! DYNAMIC LOOP FOR FLUX CALCULATIONS
 ! iterate for NPH times
@@ -143,7 +145,7 @@ module WatsubMod
 
       !identify the layer where irrigation is applied
       D65: DO L=NUM(NY,NX),NL(NY,NX)
-        IF(CDPTH(L,NY,NX).GE.WDPTH(I,NY,NX))THEN
+        IF(CumDepth2LayerBottom(L,NY,NX).GE.WDPTH(I,NY,NX))THEN
           LWDPTH=L
           exit
         ENDIF
@@ -252,15 +254,15 @@ module WatsubMod
           FLU1(L,NY,NX)=0.0_r8
           HWFLU1(L,NY,NX)=0.0_r8
         ENDIF
-        IF(CDPTH(L,NY,NX).GE.DTBLX(NY,NX))THEN
-          AREAU(L,NY,NX)=AMIN1(1.0_r8,AZMAX1(safe_adb(CDPTH(L,NY,NX)-DTBLX(NY,NX),DLYR(3,L,NY,NX))))
+        IF(CumDepth2LayerBottom(L,NY,NX).GE.DTBLX(NY,NX))THEN
+          AREAU(L,NY,NX)=AMIN1(1.0_r8,AZMAX1(safe_adb(CumDepth2LayerBottom(L,NY,NX)-DTBLX(NY,NX),DLYR(3,L,NY,NX))))
         ELSE
           AREAU(L,NY,NX)=0.0_r8
         ENDIF
-        IF(CDPTH(L,NY,NX).GE.DTBLY(NY,NX))THEN
-          AREAUD(L,NY,NX)=AMIN1(1.0_r8,AZMAX1(safe_adb(CDPTH(L,NY,NX)-DTBLY(NY,NX),DLYR(3,L,NY,NX))))
+        IF(CumDepth2LayerBottom(L,NY,NX).GE.DTBLY(NY,NX))THEN
+          AreaUnderWaterTable(L,NY,NX)=AMIN1(1.0_r8,AZMAX1(safe_adb(CumDepth2LayerBottom(L,NY,NX)-DTBLY(NY,NX),DLYR(3,L,NY,NX))))
         ELSE
-          AREAUD(L,NY,NX)=0.0_r8
+          AreaUnderWaterTable(L,NY,NX)=0.0_r8
         ENDIF
       ENDDO D30
     ENDDO DX990
@@ -290,8 +292,6 @@ module WatsubMod
   call StageSurfStateVars(I,J,NHW,NHE,NVN,NVS,RAR1)
 
   call LocalCopySoilVars(I,NHW,NHE,NVN,NVS)
-
-  call InitSoilHydrauics(NHW,NHE,NVN,NVS)
 
   end subroutine PrepWaterEnergyBalance
 !------------------------------------------------------------------------------------------
@@ -742,7 +742,7 @@ module WatsubMod
 !     BKDS=bulk density
 !     IRCHG,RCHQ*=runoff boundary flags
 !           top soil layer
-            IF(L.EQ.NUM(N2,N1).AND.N.NE.ivertdir.AND.(CDPTH(NU(N2,N1)-1,N2,N1).LE.CDPTHI(N2,N1) &
+            IF(L.EQ.NUM(N2,N1).AND.N.NE.ivertdir.AND.(CumDepth2LayerBottom(NU(N2,N1)-1,N2,N1).LE.CDPTHI(N2,N1) &
               .OR.BKDS(NUI(N2,N1),N2,N1).GT.ZERO))THEN
 !not in vertical direction
               IF(IRCHG(NN,N,N2,N1).EQ.0.OR.isclose(RCHQF,0._r8).OR.ABS(QRM(M,N2,N1)).LT.ZEROS(N2,N1))THEN
@@ -843,7 +843,7 @@ module WatsubMod
         !     IETYP=Koppen climate zone
               IF(N.EQ.ivertdir.AND.IETYP(N2,N1).NE.-2)THEN
                 HFLWL(N,M6,M5,M4)=HFLWL(N,M6,M5,M4)+(TK1(N3,N2,N1) &
-                  -TKSD(N2,N1))*TCNDG/(DPTHSK(N2,N1)-CDPTH(N3,N2,N1)) &
+                  -TKSD(N2,N1))*TCNDG/(DPTHSK(N2,N1)-CumDepth2LayerBottom(N3,N2,N1)) &
                   *AREA(N,N3,N2,N1)*XNPH
               ENDIF
               FLW(N,M6,M5,M4)=FLW(N,M6,M5,M4)+FLWL(N,M6,M5,M4)
@@ -1199,9 +1199,9 @@ module WatsubMod
 !     IFLGDH=macropore discharge flag to artificial water table
 !
   IF(VOLAH1(L,NY,NX).GT.ZEROS2(NY,NX))THEN
-    DPTHH=CDPTH(L,NY,NX)-(VOLWH1(L,NY,NX)+VOLIH1(L,NY,NX))/VOLAH1(L,NY,NX)*DLYR(3,L,NY,NX)
+    DPTHH=CumDepth2LayerBottom(L,NY,NX)-(VOLWH1(L,NY,NX)+VOLIH1(L,NY,NX))/VOLAH1(L,NY,NX)*DLYR(3,L,NY,NX)
   ELSE
-    DPTHH=CDPTH(L,NY,NX)
+    DPTHH=CumDepth2LayerBottom(L,NY,NX)
   ENDIF
 
   IF(IDTBL(NY,NX).GE.3.AND.DPTHH.LT.DTBLY(NY,NX).AND.VOLWH1(L,NY,NX).GT.ZEROS2(NY,NX))THEN
@@ -1274,9 +1274,9 @@ module WatsubMod
 !     IFLGUH=macropore discharge flag to natural water table
 !
   IF(VOLAH1(L,NY,NX).GT.ZEROS2(NY,NX))THEN
-    DPTHH=CDPTH(L,NY,NX)-(VOLWH1(L,NY,NX)+VOLIH1(L,NY,NX))/VOLAH1(L,NY,NX)*DLYR(3,L,NY,NX)
+    DPTHH=CumDepth2LayerBottom(L,NY,NX)-(VOLWH1(L,NY,NX)+VOLIH1(L,NY,NX))/VOLAH1(L,NY,NX)*DLYR(3,L,NY,NX)
   ELSE
-    DPTHH=CDPTH(L,NY,NX)
+    DPTHH=CumDepth2LayerBottom(L,NY,NX)
   ENDIF
   IF(IDTBL(NY,NX).NE.0.AND.DPTHH.LT.DTBLX(NY,NX).AND.VOLWH1(L,NY,NX).GT.ZEROS2(NY,NX))THEN
     !active water table
@@ -1793,14 +1793,14 @@ module WatsubMod
   !     FLWL=micropore discharge to natural+artificial water table
   !     HFLWL=convective heat from dischg to natural+artifl water table
   !     HCND=saturated hydraulic conductivity
-  !     AREAUD=fraction of layer below artificial water table
+  !     AreaUnderWaterTable=fraction of layer below artificial water table
 !
   IF(IFLGD.EQ.0.AND.(.not.isclose(RCHGFT,0._r8)))THEN
     PSISWD=XN*0.005_r8*SLOPE(N,N2,N1)*DLYR(N,N3,N2,N1)*(1.0_r8-DTBLG(N2,N1))
     PSISWT=AZMIN1(-PSISA1(N3,N2,N1)-0.03_r8*PSISO(N3,N2,N1) &
       +GRAVm*(DPTH(N3,N2,N1)-DTBLY(N2,N1))-GRAVm*AZMAX1(DPTH(N3,N2,N1)-DPTHT(N2,N1)))
     IF(PSISWT.LT.0.0_r8)PSISWT=PSISWT-PSISWD
-    FLWT=PSISWT*HCND(N,1,N3,N2,N1)*AREA(N,N3,N2,N1)*(1.0_r8-AREAUD(N3,N2,N1))/(RCHGFU+1.0)*RCHGFT*XNPH
+    FLWT=PSISWT*HCND(N,1,N3,N2,N1)*AREA(N,N3,N2,N1)*(1.0_r8-AreaUnderWaterTable(N3,N2,N1))/(RCHGFU+1.0)*RCHGFT*XNPH
     FLWL(N,M6,M5,M4)=FLWL(N,M6,M5,M4)+XN*FLWT
     FLWLX(N,M6,M5,M4)=FLWLX(N,M6,M5,M4)+XN*FLWT
     HFLWL(N,M6,M5,M4)=HFLWL(N,M6,M5,M4)+cpw*TK1(N3,N2,N1)*XN*FLWT
@@ -1823,13 +1823,13 @@ module WatsubMod
 !     FLWHL=macropore discharge to artificial water table
 !     HFLWL=convective heat from discharge to artificial water table
 !     HCND=saturated hydraulic conductivity
-!     AREAUD=fraction of layer below artificial water table
+!     AreaUnderWaterTable=fraction of layer below artificial water table
 !
   IF(IFLGDH.EQ.0.AND.(.not.isclose(RCHGFT,0._r8)).AND.VOLAH1(N3,N2,N1).GT.ZEROS2(N2,N1))THEN
     PSISWD=XN*0.005_r8*SLOPE(N,N2,N1)*DLYR(N,N3,N2,N1)*(1.0_r8-DTBLG(N2,N1))
     PSISWTH=-0.03_r8*PSISO(N3,N2,N1)+GRAVm*(DPTHH-DTBLY(N2,N1))-GRAVm*AZMAX1(DPTHH-DPTHT(N2,N1))
     IF(PSISWTH.LT.0.0_r8)PSISWTH=PSISWTH-PSISWD
-    FLWTH=PSISWTH*CNDH1(N3,N2,N1)*AREA(N,N3,N2,N1)*(1.0_r8-AREAUD(N3,N2,N1))/(RCHGFU+1.0_r8)*RCHGFT*XNPH
+    FLWTH=PSISWTH*CNDH1(N3,N2,N1)*AREA(N,N3,N2,N1)*(1.0_r8-AreaUnderWaterTable(N3,N2,N1))/(RCHGFU+1.0_r8)*RCHGFT*XNPH
     FLWTHL=AMAX1(FLWTH,AZMIN1(-(VOLWH1(N3,N2,N1)*XNPX+FLWHL(3,N3,N2,N1)-FLWHL(3,N3+1,N2,N1))))
     FLWHL(N,M6,M5,M4)=FLWHL(N,M6,M5,M4)+XN*FLWTHL
     HFLWL(N,M6,M5,M4)=HFLWL(N,M6,M5,M4)+cpw*TK1(N3,N2,N1)*XN*FLWTHL

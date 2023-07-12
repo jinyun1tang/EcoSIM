@@ -625,7 +625,7 @@ module InitSOMBGCMOD
       !     CORGCX,CORGNX,CORGPX=C,N,P concentations in humus
 !
       IF(CORGC(L,NY,NX).LE.FORGC.OR.DPTH(L,NY,NX).LE.DTBLZ(NY,NX) &
-        +CDPTH(NU(NY,NX),NY,NX)-CDPTHG)THEN
+        +CumDepth2LayerBottom(NU(NY,NX),NY,NX)-CDPTHG)THEN
         FCY=0.60_r8
         IF(CORGCX(k_humus).GT.1.0E-32_r8)THEN
           FC0=FCY*EXP(-5.0_r8*(AMIN1(CORGNX(k_humus), &

@@ -11,7 +11,7 @@ module InitEcoSIM
   public :: InitModules2
   contains
 
-  subroutine InitModules(nmicbguilds)
+  subroutine InitModules(NOMicrobeGuilds)
   use PlantDisturbsMod     , only : InitPlantDisturbance
   use UptakesMod           , only : InitUptake  
   use WatsubMod           , only : initWatsub  
@@ -24,10 +24,10 @@ module InitEcoSIM
   use GridConsts  
   implicit  none
   
-  integer                 , intent(in) :: nmicbguilds   !number of microbial guilds per group
+  integer                 , intent(in) :: NOMicrobeGuilds   !number of microbial guilds per group
 
 
-  call InitAlloc(nmicbguilds)
+  call InitAlloc(NOMicrobeGuilds)
 
   call InitPlantDisturbance
 

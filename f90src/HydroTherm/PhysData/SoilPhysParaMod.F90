@@ -97,7 +97,7 @@ implicit none
   )
 
   DO L=NM+1,JZ
-    CDPTH(L,NY,NX)=2.0_r8*CDPTH(L-1,NY,NX)-1.0_r8*CDPTH(L-2,NY,NX)
+    CumDepth2LayerBottom(L,NY,NX)=2.0_r8*CumDepth2LayerBottom(L-1,NY,NX)-1.0_r8*CumDepth2LayerBottom(L-2,NY,NX)
     BKDSI(L,NY,NX)=BKDSI(L-1,NY,NX)
     FC(L,NY,NX)=FC(L-1,NY,NX)
     WP(L,NY,NX)=WP(L-1,NY,NX)

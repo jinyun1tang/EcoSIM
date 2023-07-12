@@ -103,6 +103,13 @@ contains
   implicit none
   character(len=*), parameter :: subname=trim(mod_filename)//'::Run_EcoSIM_one_step'
 
+
+  !copy data from compuler to EcoSIM
+
+  !run surface energy balance
+  call SurfaceEBalance()
+
+  !copy data back to coupler
   end subroutine Run_EcoSIM_one_step
 !------------------------------------------------------------------------------------------
 
@@ -120,5 +127,13 @@ contains
   call Init_EcoSIM_Soil()
   end subroutine Init_EcoSIM
 !------------------------------------------------------------------------------------------
+
+  subroutine SurfaceEBalance()
+
+  implicit none
+
+  end subroutine SurfaceEBalance
+  
+
 
 end module ATSCPLMod

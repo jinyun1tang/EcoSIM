@@ -87,18 +87,16 @@ contains
 !     AND SOC
 !
 !     ALTG,ALT=current,initial elevation of ground surface
-!     CDPTH(NUM(NY,NX)-1,=depth of ground surface
+!     CumDepth2LayerBottom(NUM(NY,NX)-1,=depth of ground surface
 !     ENGYP=cumulative rainfall energy impact on soil surface
 !
-      ALTG(NY,NX)=ALT(NY,NX)-CDPTH(NUM(NY,NX)-1,NY,NX)
+      ALTG(NY,NX)=ALT(NY,NX)-CumDepth2LayerBottom(NUM(NY,NX)-1,NY,NX)
       ENGYP(NY,NX)=ENGYP(NY,NX)*(1.0_r8-FENGYP)
 
       call CopySnowStates(NY,NX)
 
       call CopySurfaceVars(NY,NX)
 !
-!     SNOW AND RESIDUE COVERAGE OF SOIL SURFACE
-
       call PartionSurfaceFraction(NY,NX)
 
       call PartitionPrecip(NY,NX)
@@ -107,13 +105,7 @@ contains
 
       call SurfaceResistances(NY,NX,RAR1)
 
-      !TLEX=total latent heat flux x boundary layer resistance, [MJ m-1]
-      !TSHX=total sensible heat flux x boundary layer resistance, [MJ m-1]
-      !VPQ=vapor pressure in canopy air
-      !TKQ=temperature in canopy air
-      !1.25E-3 is sensible heat conductance, which should be updated
-      VPQ(NY,NX)=VPA(NY,NX)-TLEX(NY,NX)/(VAP*AREA(3,NUM(NY,NX),NY,NX))
-      TKQ(NY,NX)=TKA(NY,NX)-TSHX(NY,NX)/(1.25E-03_r8*AREA(3,NUM(NY,NX),NY,NX))
+      call SetCanopyProperty(NY,NX)
 
     ENDDO D9990
   ENDDO D9995
@@ -190,6 +182,7 @@ contains
   implicit none
   integer, intent(in) :: NY,NX
 
+!     SNOW AND RESIDUE COVERAGE OF SOIL SURFACE
 !     FSNW,FSNX=fractions of snow,snow-free cover
 !     DPTHS=snowpack depth
 !     DPTHSX=minimum snowpack depth for full cover
@@ -206,6 +199,22 @@ contains
   CVRD(NY,NX)=1.0_r8-BARE(NY,NX)
   end subroutine PartionSurfaceFraction
 
+!------------------------------------------------------------------------------------------
+  subroutine SetCanopyProperty(NY,NX)      
+  
+  implicit none
+  integer, intent(in) :: NY,NX
+
+  real(r8), parameter :: SensHeatCondctance=1.25E-03_r8
+
+  !TLEX=total latent heat flux x boundary layer resistance, [MJ m-1]
+  !TSHX=total sensible heat flux x boundary layer resistance, [MJ m-1]
+  !VPQ=vapor pressure in canopy air, 
+  !TKQ=temperature in canopy air, Kelvin
+
+  VPQ(NY,NX)=VPA(NY,NX)-TLEX(NY,NX)/(VAP*AREA(3,NUM(NY,NX),NY,NX))
+  TKQ(NY,NX)=TKA(NY,NX)-TSHX(NY,NX)/(SensHeatCondctance*AREA(3,NUM(NY,NX),NY,NX))
+  end subroutine SetCanopyProperty
 !------------------------------------------------------------------------------------------
 
   subroutine SurfaceRadiation(NY,NX)
@@ -1497,7 +1506,7 @@ contains
   DPTHW2=VOLWG(N2,N1)/AREA(3,NUM(N2,N1),N2,N1)
   ALT1=ALTG(N2,N1)+DPTHW1
   ALT2=ALTG(N2,N1)+DPTHW2-XN*SLOPE(N,N2,N1)*DLYR(N,NUM(N2,N1),N2,N1)
-  IF(ALT1.GT.ALT2.AND.CDPTH(NU(N2,N1)-1,N2,N1)-DPTHW1.LT.DTBLX(N2,N1))THEN
+  IF(ALT1.GT.ALT2.AND.CumDepth2LayerBottom(NU(N2,N1)-1,N2,N1)-DPTHW1.LT.DTBLX(N2,N1))THEN
     QR1(N,NN,M5,M4)=-XN*QRM(M,N2,N1)*FSLOPE(N,N2,N1)*RCHQF
     HQR1(N,NN,M5,M4)=cpw*TK1(0,N2,N1)*QR1(N,NN,M5,M4)
     QR(N,NN,M5,M4)=QR(N,NN,M5,M4)+QR1(N,NN,M5,M4)
@@ -1505,8 +1514,8 @@ contains
 !
 ! RUNON
 !
-  ELSEIF(CDPTH(NU(N2,N1)-1,N2,N1)-DPTHW1.GT.DTBLX(N2,N1))THEN
-    VX=AZMIN1((DTBLX(N2,N1)-CDPTH(NU(N2,N1)-1,N2,N1)+DPTHW1)*AREA(3,NUM(N2,N1),N2,N1))
+  ELSEIF(CumDepth2LayerBottom(NU(N2,N1)-1,N2,N1)-DPTHW1.GT.DTBLX(N2,N1))THEN
+    VX=AZMIN1((DTBLX(N2,N1)-CumDepth2LayerBottom(NU(N2,N1)-1,N2,N1)+DPTHW1)*AREA(3,NUM(N2,N1),N2,N1))
     QRM(M,N2,N1)=VX*XNPX
     QRV(M,N2,N1)=0.0_r8
     QR1(N,NN,M5,M4)=-XN*QRM(M,N2,N1)*FSLOPE(N,N2,N1)*RCHQF

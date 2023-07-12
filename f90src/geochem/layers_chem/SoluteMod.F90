@@ -484,7 +484,7 @@ module SoluteMod
 !     DPNH4=NH4 fertilizer band depth
 !
   IF(IFNHB(NY,NX).EQ.1.AND.ROWN(NY,NX).GT.0.0)THEN
-    IF(L.EQ.NU(NY,NX).OR.CDPTH(L-1,NY,NX).LT.DPNH4(NY,NX))THEN
+    IF(L.EQ.NU(NY,NX).OR.CumDepth2LayerBottom(L-1,NY,NX).LT.DPNH4(NY,NX))THEN
 !
 !     NH4 BAND WIDTH
 !
@@ -501,7 +501,7 @@ module SoluteMod
 !     DPFLW=change in NH4 fertilizer band depth
 !     DPNH4,DPNHB=total,layer NH4 fertilizer band depth
 !
-      IF(CDPTH(L,NY,NX).GE.DPNH4(NY,NX))THEN
+      IF(CumDepth2LayerBottom(L,NY,NX).GE.DPNH4(NY,NX))THEN
         DPFLW=FLWD+DWNH4
         DPNH4(NY,NX)=DPNH4(NY,NX)+DPFLW
         DPNHB(L,NY,NX)=DPNHB(L,NY,NX)+DPFLW
@@ -587,7 +587,7 @@ module SoluteMod
 !     DPPO4=H2PO4 fertilizer band depth
 !
   IF(IFPOB(NY,NX).EQ.1.AND.ROWP(NY,NX).GT.0.0)THEN
-    IF(L.EQ.NU(NY,NX).OR.CDPTH(L-1,NY,NX).LT.DPPO4(NY,NX))THEN
+    IF(L.EQ.NU(NY,NX).OR.CumDepth2LayerBottom(L-1,NY,NX).LT.DPPO4(NY,NX))THEN
 !
 !     PO4 BAND WIDTH
 !     DWPO4=change in H2PO4 fertilizer band width
@@ -603,7 +603,7 @@ module SoluteMod
 !     DPFLW=change in H2PO4 fertilizer band depth
 !     DPPO4,DPPOB=total,layer H2PO4 fertilizer band depth
 !
-      IF(CDPTH(L,NY,NX).GE.DPPO4(NY,NX))THEN
+      IF(CumDepth2LayerBottom(L,NY,NX).GE.DPPO4(NY,NX))THEN
         DPFLW=FLWD+DWPO4
         DPPO4(NY,NX)=DPPO4(NY,NX)+DPFLW
         DPPOB(L,NY,NX)=DPPOB(L,NY,NX)+DPFLW
@@ -811,7 +811,7 @@ module SoluteMod
 !
   IF(IFNOB(NY,NX).EQ.1.AND.ROWO(NY,NX).GT.0.0)THEN
 
-    IF(L.EQ.NU(NY,NX).OR.CDPTH(L-1,NY,NX).LT.DPNO3(NY,NX))THEN
+    IF(L.EQ.NU(NY,NX).OR.CumDepth2LayerBottom(L-1,NY,NX).LT.DPNO3(NY,NX))THEN
 !
 !     NO3 BAND WIDTH
 !
@@ -828,7 +828,7 @@ module SoluteMod
 !     DPFLW=change in NO3 fertilizer band depth
 !     DPNO3,DPNOB=total,layer NO3 fertilizer band depth
 !
-      IF(CDPTH(L,NY,NX).GE.DPNO3(NY,NX))THEN
+      IF(CumDepth2LayerBottom(L,NY,NX).GE.DPNO3(NY,NX))THEN
         DPFLW=FLWD+DWNO3
         DPNO3(NY,NX)=DPNO3(NY,NX)+DPFLW
         DPNOB(L,NY,NX)=DPNOB(L,NY,NX)+DPFLW

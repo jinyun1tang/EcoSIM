@@ -26,7 +26,7 @@ implicit none
 
   call SetMesh(NHW,NVN,NHE,NVS)
 
-  call  InitAlloc(nmicbguilds=1)
+  call  InitAlloc(NOMicrobeGuilds=1)
 
   NX=1
 
@@ -48,15 +48,13 @@ implicit none
     DO L=NU(NY,NX),NL(NY,NX)
       FC(L,NY,NX)=a_FC(L,ny)
       WP(L,NY,NX)=a_WP(L,NY)
-      CDPTH(L,NY,NX)=a_CDPTH(L,NY)
+      CumDepth2LayerBottom(L,NY,NX)=a_CumDepth2LayerBottom(L,NY)
       BKDSI(L,NY,NX)=a_BKDSI(L,NY)
       CORGC(L,NY,NX)=a_CORGC(L,NY)
       CORGN(L,NY,NX)=a_CORGN(L,NY)
       CORGP(L,NY,NX)=a_CORGP(L,NY)      
     ENDDO        
   ENDDO
-
-
 
   call startsim(NHW,NHE,NVN,NVS)
 

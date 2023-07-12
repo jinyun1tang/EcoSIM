@@ -261,7 +261,7 @@ module RedistMod
 !     ZNOON=hour of solar noon from weather file
 !     ITILL=soil disturbance type 1-20:tillage,21=litter removal,22=fire,23-24=drainage
 !     DCORP=mixing intensity (fire) or depth (tillage,drainage) of disturbance
-!     CDPTH(NU=soil surface elevation
+!     CumDepth2LayerBottom(NU=soil surface elevation
 !     DTBLI,DTBLDI=depth of natural,artificial water table from readi.f
 !     DTBLX,DTBLZ=current,initial natural water table depth
 !     DTBLY,DTBLD=current,initial artificial water table depth
@@ -273,15 +273,15 @@ module RedistMod
 !
   IF(J.EQ.INT(ZNOON(NY,NX)).AND.ITILL(I,NY,NX).EQ.23)THEN
     ! drainage is on
-    DCORPW=DCORP(I,NY,NX)+CDPTH(NU(NY,NX)-1,NY,NX)
+    DCORPW=DCORP(I,NY,NX)+CumDepth2LayerBottom(NU(NY,NX)-1,NY,NX)
     DTBLI(NY,NX)=DCORPW
     DTBLZ(NY,NX)=DTBLI(NY,NX)-(ALTZ(NY,NX)-ALT(NY,NX))*(1.0_r8-DTBLG(NY,NX))
-    DTBLX(NY,NX)=DTBLZ(NY,NX)+CDPTH(NU(NY,NX)-1,NY,NX)
+    DTBLX(NY,NX)=DTBLZ(NY,NX)+CumDepth2LayerBottom(NU(NY,NX)-1,NY,NX)
   ENDIF
 
   IF(J.EQ.INT(ZNOON(NY,NX)).AND.ITILL(I,NY,NX).EQ.24)THEN
     ! drainage in on
-    DCORPW=DCORP(I,NY,NX)+CDPTH(NU(NY,NX)-1,NY,NX)
+    DCORPW=DCORP(I,NY,NX)+CumDepth2LayerBottom(NU(NY,NX)-1,NY,NX)
     IF(IDTBL(NY,NX).EQ.1)THEN
       IDTBL(NY,NX)=3
     ELSEIF(IDTBL(NY,NX).EQ.2)THEN
@@ -298,8 +298,8 @@ module RedistMod
 ! 4 is mobile tile drainge.
   IF(IDTBL(NY,NX).EQ.2.OR.IDTBL(NY,NX).EQ.4)THEN
     DTBLX(NY,NX)=DTBLX(NY,NX)-HVOLO(NY,NX)/AREA(3,NU(NY,NX),NY,NX) &
-      -0.00167_r8*(DTBLX(NY,NX)-DTBLZ(NY,NX)-CDPTH(NU(NY,NX)-1,NY,NX))
-    DTBLX(NY,NX)=DTBLZ(NY,NX)+CDPTH(NU(NY,NX)-1,NY,NX)
+      -0.00167_r8*(DTBLX(NY,NX)-DTBLZ(NY,NX)-CumDepth2LayerBottom(NU(NY,NX)-1,NY,NX))
+    DTBLX(NY,NX)=DTBLZ(NY,NX)+CumDepth2LayerBottom(NU(NY,NX)-1,NY,NX)
   ENDIF
   IF(IDTBL(NY,NX).EQ.4)THEN
     DTBLY(NY,NX)=DTBLY(NY,NX)-HVOLO(NY,NX)/AREA(3,NU(NY,NX),NY,NX) &

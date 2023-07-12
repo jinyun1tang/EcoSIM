@@ -7,7 +7,7 @@ implicit none
   character(len=*), private, parameter :: mod_filename = __FILE__
 
   real(r8) :: TAREA               !total area of landscape	[m2]
-  real(r8),target,allocatable ::  CDPTH(:,:,:)                       !depth to bottom of soil layer [m]
+  real(r8),target,allocatable ::  CumDepth2LayerBottom(:,:,:)                       !depth to bottom of soil layer [m]
   real(r8),target,allocatable ::  DLYR(:,:,:,:)                      !thickness of soil layer [m]
   real(r8),target,allocatable ::  DLYRI(:,:,:,:)                     !thickness of soil layer [m]
   real(r8),target,allocatable ::  XDPTH(:,:,:,:)                     !cross-sectional area / distance between adjacent grid cells [m]
@@ -38,7 +38,7 @@ contains
   subroutine InitGridData
 
   implicit none
-  allocate(CDPTH(0:JZ,JY,JX));  CDPTH=0._r8
+  allocate(CumDepth2LayerBottom(0:JZ,JY,JX));  CumDepth2LayerBottom=0._r8
   allocate(DLYR(3,0:JZ,JY,JX)); DLYR=0._r8
   allocate(DLYRI(3,0:JZ,JY,JX));DLYRI=0._r8
   allocate(XDPTH(3,JZ,JY,JX));  XDPTH=0._r8
@@ -69,7 +69,7 @@ contains
   use abortutils, only : destroy
   implicit none
 
-  call destroy(CDPTH)
+  call destroy(CumDepth2LayerBottom)
   call destroy(DLYR)
   call destroy(DLYRI)
   call destroy(XDPTH)

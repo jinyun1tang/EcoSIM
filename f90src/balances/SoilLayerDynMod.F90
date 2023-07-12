@@ -126,7 +126,7 @@ implicit none
               IF(NN.EQ.1)THEN
                 IF(BKDS(L0,NY,NX).LE.ZERO.AND.BKDS(L1,NY,NX).LE.ZERO &
                   .AND.VOLW(L0,NY,NX)+VOLI(L0,NY,NX).LE.ZEROS(NY,NX))THEN
-                  CDPTH(L1,NY,NX)=CDPTH(L0,NY,NX)
+                  CumDepth2LayerBottom(L1,NY,NX)=CumDepth2LayerBottom(L0,NY,NX)
                   CDPTHY(L1,NY,NX)=CDPTHY(L0,NY,NX)
                 ENDIF
               ENDIF
@@ -139,10 +139,10 @@ implicit none
               IF(L.EQ.NL(NY,NX).AND.DLYR(3,L,NY,NX).GT.DLYRI(3,L,NY,NX))THEN
                 NL(NY,NX)=MIN(NLI(NY,NX),NL(NY,NX)+1)
               ENDIF
-              IF(L.EQ.NL(NY,NX)-1.AND.CDPTH(NL(NY,NX),NY,NX)-CDPTH(L,NY,NX).LE.ZEROC)THEN
-                CDPTH(L,NY,NX)=CDPTH(L,NY,NX)+DLYR(3,NL(NY,NX),NY,NX)
+              IF(L.EQ.NL(NY,NX)-1.AND.CumDepth2LayerBottom(NL(NY,NX),NY,NX)-CumDepth2LayerBottom(L,NY,NX).LE.ZEROC)THEN
+                CumDepth2LayerBottom(L,NY,NX)=CumDepth2LayerBottom(L,NY,NX)+DLYR(3,NL(NY,NX),NY,NX)
                 CDPTHY(L,NY,NX)=CDPTHY(L,NY,NX)+DLYR(3,NL(NY,NX),NY,NX)
-                CDPTH(NL(NY,NX),NY,NX)=CDPTH(L,NY,NX)
+                CumDepth2LayerBottom(NL(NY,NX),NY,NX)=CumDepth2LayerBottom(L,NY,NX)
                 CDPTHY(NL(NY,NX),NY,NX)=CDPTHY(L,NY,NX)
                 DLYR(3,NL(NY,NX),NY,NX)=0.0_r8
                 NL(NY,NX)=L
@@ -182,8 +182,8 @@ implicit none
 ! starting from bottom up
   D225: DO LX=NL(NY,NX),NU(NY,NX),-1
     !make a copy of the depth, bottom of the layer
-    CDPTHX(LX,NY,NX)=CDPTH(LX,NY,NX)
-    CDPTHY(LX,NY,NX)=CDPTH(LX,NY,NX)
+    CDPTHX(LX,NY,NX)=CumDepth2LayerBottom(LX,NY,NX)
+    CDPTHY(LX,NY,NX)=CumDepth2LayerBottom(LX,NY,NX)
     !
     !     POND, from water to soil
     !
@@ -381,19 +381,19 @@ implicit none
         IF(BKDS(LX,NY,NX).LE.ZERO)THEN          
           ! there are some changes
           IF(IFLGL(LX,NN).NE.0)THEN
-            CDPTH(LX,NY,NX)=CDPTH(LX,NY,NX)+DDLYR(LX,NN)
+            CumDepth2LayerBottom(LX,NY,NX)=CumDepth2LayerBottom(LX,NY,NX)+DDLYR(LX,NN)
             CDPTHY(LX,NY,NX)=CDPTHY(LX,NY,NX)+DDLYR(LX,NN)
             !  not top layer
             IF(LX.NE.NU(NY,NX).AND.IFLGL(LX,ich_watlev).EQ.2)THEN
               DO  LL=LX-1,0,-1
-                CDPTH(LL,NY,NX)=CDPTH(LL,NY,NX)+DDLYX(LX,NN)
+                CumDepth2LayerBottom(LL,NY,NX)=CumDepth2LayerBottom(LL,NY,NX)+DDLYX(LX,NN)
                 CDPTHY(LL,NY,NX)=CDPTHY(LL,NY,NX)+DDLYX(LX,NN)
               ENDDO
               DDLYX(LX,NN)=0.0_r8
             ENDIF
             !  top layer
             IF(LX.EQ.NU(NY,NX))THEN
-              CDPTH(LX-1,NY,NX)=CDPTH(LX,NY,NX)-(VOLW(LX,NY,NX)+VOLI(LX,NY,NX))/AREA(3,LX,NY,NX)
+              CumDepth2LayerBottom(LX-1,NY,NX)=CumDepth2LayerBottom(LX,NY,NX)-(VOLW(LX,NY,NX)+VOLI(LX,NY,NX))/AREA(3,LX,NY,NX)
               CDPTHY(LX-1,NY,NX)=CDPTHY(LX,NY,NX)-(VOLW(LX,NY,NX)+VOLI(LX,NY,NX))/AREA(3,LX,NY,NX)
             ENDIF
           ENDIF
@@ -406,11 +406,11 @@ implicit none
           !     FREEZE-THAW
           !
           IF(NN.EQ.ich_frzthaw)THEN
-            CDPTH(LX,NY,NX)=CDPTH(LX,NY,NX)+DDLYR(LX,NN)
+            CumDepth2LayerBottom(LX,NY,NX)=CumDepth2LayerBottom(LX,NY,NX)+DDLYR(LX,NN)
             !     CDPTHY(LX,NY,NX)=CDPTHY(LX,NY,NX)+DDLYR(LX,NN)
 ! top layer
             IF(LX.EQ.NU(NY,NX))THEN
-              CDPTH(LX-1,NY,NX)=CDPTH(LX-1,NY,NX)+DDLYR(LX-1,NN)
+              CumDepth2LayerBottom(LX-1,NY,NX)=CumDepth2LayerBottom(LX-1,NY,NX)+DDLYR(LX-1,NN)
               !     CDPTHY(LX-1,NY,NX)=CDPTHY(LX-1,NY,NX)+DDLYR(LX-1,NN)
 
             ENDIF
@@ -419,11 +419,11 @@ implicit none
             ! SET SURFACE ELEVATION FOR SOIL EROSION
             !
           IF(NN.EQ.ich_erosion.AND.IFLGL(LX,NN).EQ.1)THEN
-            CDPTH(LX,NY,NX)=CDPTH(LX,NY,NX)+DDLYR(LX,NN)
+            CumDepth2LayerBottom(LX,NY,NX)=CumDepth2LayerBottom(LX,NY,NX)+DDLYR(LX,NN)
             CDPTHY(LX,NY,NX)=CDPTHY(LX,NY,NX)+DDLYR(LX,NN)
 
             IF(LX.EQ.NU(NY,NX))THEN
-              CDPTH(LX-1,NY,NX)=CDPTH(LX-1,NY,NX)+DDLYR(LX,NN)
+              CumDepth2LayerBottom(LX-1,NY,NX)=CumDepth2LayerBottom(LX-1,NY,NX)+DDLYR(LX,NN)
               CDPTHY(LX-1,NY,NX)=CDPTHY(LX-1,NY,NX)+DDLYR(LX,NN)
             ENDIF
           ENDIF
@@ -431,17 +431,17 @@ implicit none
           ! SET SOIL LAYER DEPTHS FOR CHANGES IN SOC
           !
           IF(NN.EQ.ich_socloss.AND.IFLGL(LX,NN).EQ.1)THEN
-            CDPTH(LX,NY,NX)=CDPTH(LX,NY,NX)+DDLYR(LX,NN)
+            CumDepth2LayerBottom(LX,NY,NX)=CumDepth2LayerBottom(LX,NY,NX)+DDLYR(LX,NN)
             CDPTHY(LX,NY,NX)=CDPTHY(LX,NY,NX)+DDLYR(LX,NN)
 
             IF(LX.EQ.NU(NY,NX).OR.BKDS(LX-1,NY,NX).LE.ZERO)THEN
-              CDPTH(LX-1,NY,NX)=CDPTH(LX-1,NY,NX)+DDLYR(LX-1,NN)
+              CumDepth2LayerBottom(LX-1,NY,NX)=CumDepth2LayerBottom(LX-1,NY,NX)+DDLYR(LX-1,NN)
               CDPTHY(LX-1,NY,NX)=CDPTHY(LX-1,NY,NX)+DDLYR(LX-1,NN)
 
               IF(BKDS(LX-1,NY,NX).LE.ZERO)THEN
                 DO  LY=LX-2,0,-1
                   IF(BKDS(LY+1,NY,NX).LE.ZERO)THEN
-                    CDPTH(LY,NY,NX)=CDPTH(LY,NY,NX)+DDLYR(LX-1,NN)
+                    CumDepth2LayerBottom(LY,NY,NX)=CumDepth2LayerBottom(LY,NY,NX)+DDLYR(LX-1,NN)
                     CDPTHY(LY,NY,NX)=CDPTHY(LY,NY,NX)+DDLYR(LX-1,NN)
                   ENDIF
                 ENDDO
@@ -554,7 +554,7 @@ implicit none
 
 ! begin_execution
   IF(NN.EQ.1)THEN
-    DLYR(3,L,NY,NX)=CDPTH(L,NY,NX)-CDPTH(L-1,NY,NX)
+    DLYR(3,L,NY,NX)=CumDepth2LayerBottom(L,NY,NX)-CumDepth2LayerBottom(L-1,NY,NX)
     DLYRXX=DLYR(3,L,NY,NX)
     IF(IFLGL(L,1).EQ.0.AND.IFLGL(L+1,1).NE.0)THEN
       DDLYRX(NN)=0.0_r8
@@ -582,15 +582,15 @@ implicit none
         DDLYRY(L)=DDLYRY(L-1)
       ENDIF
     ENDIF
-    CDPTH(L,NY,NX)=CDPTH(L,NY,NX)+DDLYRY(L)
+    CumDepth2LayerBottom(L,NY,NX)=CumDepth2LayerBottom(L,NY,NX)+DDLYRY(L)
   !     CDPTHY(L,NY,NX)=CDPTHY(L,NY,NX)+DDLYRY(L)
     DLYR(3,L,NY,NX)=DLYR(3,L,NY,NX)+DDLYRY(L)
-    DPTH(L,NY,NX)=0.5_r8*(CDPTH(L,NY,NX)+CDPTH(L-1,NY,NX))
-    CDPTHZ(L,NY,NX)=CDPTH(L,NY,NX)-CDPTH(NU(NY,NX)-1,NY,NX)
+    DPTH(L,NY,NX)=0.5_r8*(CumDepth2LayerBottom(L,NY,NX)+CumDepth2LayerBottom(L-1,NY,NX))
+    CDPTHZ(L,NY,NX)=CumDepth2LayerBottom(L,NY,NX)-CumDepth2LayerBottom(NU(NY,NX)-1,NY,NX)
     IF(L.EQ.NL(NY,NX)-1)THEN
-      DLYR(3,L+1,NY,NX)=CDPTH(L+1,NY,NX)-CDPTH(L,NY,NX)
-      DPTH(L+1,NY,NX)=0.5_r8*(CDPTH(L+1,NY,NX)+CDPTH(L,NY,NX))
-      CDPTHZ(L+1,NY,NX)=CDPTH(L+1,NY,NX)-CDPTH(NU(NY,NX)-1,NY,NX)
+      DLYR(3,L+1,NY,NX)=CumDepth2LayerBottom(L+1,NY,NX)-CumDepth2LayerBottom(L,NY,NX)
+      DPTH(L+1,NY,NX)=0.5_r8*(CumDepth2LayerBottom(L+1,NY,NX)+CumDepth2LayerBottom(L,NY,NX))
+      CDPTHZ(L+1,NY,NX)=CumDepth2LayerBottom(L+1,NY,NX)-CumDepth2LayerBottom(NU(NY,NX)-1,NY,NX)
     ENDIF
     IF(L.EQ.NU(NY,NX))THEN
       DPTHZ(L,NY,NX)=0.5_r8*CDPTHZ(L,NY,NX)
@@ -599,7 +599,7 @@ implicit none
       DPTHZ(L,NY,NX)=0.5_r8*(CDPTHZ(L,NY,NX)+CDPTHZ(L-1,NY,NX))
     ENDIF
     IF(BKDS(L,NY,NX).GT.ZERO)THEN
-    !     DDLYRX(NN)=CDPTH(L,NY,NX)-CDPTHX(L,NY,NX)
+    !     DDLYRX(NN)=CumDepth2LayerBottom(L,NY,NX)-CDPTHX(L,NY,NX)
       DDLYRX(NN)=CDPTHY(L,NY,NX)-CDPTHX(L,NY,NX)
     ENDIF
 !
@@ -633,7 +633,7 @@ implicit none
 !
   ELSEIF(NN.EQ.3)THEN
     XVOLWP=AZMAX1(VOLW(0,NY,NX)-VOLWD(NY,NX))
-    IF(L.EQ.NU(NY,NX).AND.CDPTH(0,NY,NX).GT.CDPTHI(NY,NX) &
+    IF(L.EQ.NU(NY,NX).AND.CumDepth2LayerBottom(0,NY,NX).GT.CDPTHI(NY,NX) &
       .AND.XVOLWP.GT.VOLWD(NY,NX)+VHCPNX(NY,NX)/cpw)THEN
           !     IF((BKDS(L,NY,NX).GT.ZERO.AND.NU(NY,NX).GT.NUI(NY,NX))
           !    2.OR.(BKDS(L,NY,NX).LE.ZERO))THEN
@@ -648,13 +648,13 @@ implicit none
         DLYR(3,NU(NY,NX),NY,NX)=DLYR(3,NU(NY,NX),NY,NX)-DDLYRX(NN)
         IF(L.GT.2)THEN
           DO LL=L-2,NU(NY,NX),-1
-            CDPTH(LL,NY,NX)=CDPTH(L-1,NY,NX)
+            CumDepth2LayerBottom(LL,NY,NX)=CumDepth2LayerBottom(L-1,NY,NX)
             CDPTHY(LL,NY,NX)=CDPTHY(L-1,NY,NX)
           ENDDO
         ENDIF
-        CDPTH(0,NY,NX)=CDPTH(NU(NY,NX),NY,NX)-DLYR(3,NU(NY,NX),NY,NX)
+        CumDepth2LayerBottom(0,NY,NX)=CumDepth2LayerBottom(NU(NY,NX),NY,NX)-DLYR(3,NU(NY,NX),NY,NX)
         CDPTHY(0,NY,NX)=CDPTHY(NU(NY,NX),NY,NX)-DLYR(3,NU(NY,NX),NY,NX)
-        DPTH(NU(NY,NX),NY,NX)=0.5_r8*(CDPTH(NU(NY,NX),NY,NX)+CDPTH(0,NY,NX))
+        DPTH(NU(NY,NX),NY,NX)=0.5_r8*(CumDepth2LayerBottom(NU(NY,NX),NY,NX)+CumDepth2LayerBottom(0,NY,NX))
         CDPTHZ(NU(NY,NX),NY,NX)=DLYR(3,NU(NY,NX),NY,NX)
         DPTHZ(NU(NY,NX),NY,NX)=0.5_r8*CDPTHZ(NU(NY,NX),NY,NX)
       ELSE
@@ -1042,7 +1042,7 @@ implicit none
   IF(NN.EQ.1)THEN
     IF(BKDS(L0,NY,NX).LE.ZERO.AND.BKDS(L1,NY,NX).LE.ZERO &
       .AND.VOLW(L0,NY,NX)+VOLI(L0,NY,NX).LE.ZEROS(NY,NX))THEN
-      CDPTH(L1,NY,NX)=CDPTH(L0,NY,NX)
+      CumDepth2LayerBottom(L1,NY,NX)=CumDepth2LayerBottom(L0,NY,NX)
       CDPTHY(L1,NY,NX)=CDPTHY(L0,NY,NX)
     ENDIF
   ENDIF
@@ -1483,7 +1483,7 @@ implicit none
 !     SOIL FERTILIZER BANDS
 !
     IF(IFNHB(NY,NX).EQ.1.AND.ROWN(NY,NX).GT.0.0)THEN
-      IF(L.EQ.NU(NY,NX).OR.CDPTH(L-1,NY,NX).LT.DPNH4(NY,NX))THEN
+      IF(L.EQ.NU(NY,NX).OR.CumDepth2LayerBottom(L-1,NY,NX).LT.DPNH4(NY,NX))THEN
         WDNHBDL=WDNHB(L,NY,NX)*DLYR(3,L,NY,NX)
         WDNHBD0=WDNHB(L0,NY,NX)*DLYR(3,L0,NY,NX)
         WDNHBD1=WDNHB(L1,NY,NX)*DLYR(3,L1,NY,NX)
@@ -1492,7 +1492,7 @@ implicit none
         WDNHBD0=WDNHBD0-FXWDNHB
         WDNHB(L1,NY,NX)=WDNHBD1/DLYR(3,L1,NY,NX)
         WDNHB(L0,NY,NX)=WDNHBD0/DLYR(3,L0,NY,NX)
-        IF(CDPTH(L,NY,NX).GE.DPNH4(NY,NX))THEN
+        IF(CumDepth2LayerBottom(L,NY,NX).GE.DPNH4(NY,NX))THEN
           FXDPNHB=AMIN1(FX*DPNHB(L,NY,NX),DPNHB(L0,NY,NX))
           DPNHB(L1,NY,NX)=DPNHB(L1,NY,NX)+FXDPNHB
           DPNHB(L0,NY,NX)=DPNHB(L0,NY,NX)-FXDPNHB
@@ -1511,7 +1511,7 @@ implicit none
       ENDIF
     ENDIF
     IF(IFNOB(NY,NX).EQ.1.AND.ROWO(NY,NX).GT.0.0)THEN
-      IF(L.EQ.NU(NY,NX).OR.CDPTH(L-1,NY,NX).LT.DPNO3(NY,NX))THEN
+      IF(L.EQ.NU(NY,NX).OR.CumDepth2LayerBottom(L-1,NY,NX).LT.DPNO3(NY,NX))THEN
         WDNOBDL=WDNOB(L,NY,NX)*DLYR(3,L,NY,NX)
         WDNOBD0=WDNOB(L0,NY,NX)*DLYR(3,L0,NY,NX)
         WDNOBD1=WDNOB(L1,NY,NX)*DLYR(3,L1,NY,NX)
@@ -1520,7 +1520,7 @@ implicit none
         WDNOBD0=WDNOBD0-FXWDNOB
         WDNOB(L1,NY,NX)=WDNOBD1/DLYR(3,L1,NY,NX)
         WDNOB(L0,NY,NX)=WDNOBD0/DLYR(3,L0,NY,NX)
-        IF(CDPTH(L,NY,NX).GE.DPNO3(NY,NX))THEN
+        IF(CumDepth2LayerBottom(L,NY,NX).GE.DPNO3(NY,NX))THEN
           FXDPNOB=AMIN1(FX*DPNOB(L,NY,NX),DPNOB(L0,NY,NX))
           DPNOB(L1,NY,NX)=DPNOB(L1,NY,NX)+FXDPNOB
           DPNOB(L0,NY,NX)=DPNOB(L0,NY,NX)-FXDPNOB
@@ -1539,7 +1539,7 @@ implicit none
       ENDIF
     ENDIF
     IF(IFPOB(NY,NX).EQ.1.AND.ROWP(NY,NX).GT.0.0)THEN
-      IF(L.EQ.NU(NY,NX).OR.CDPTH(L-1,NY,NX).LT.DPPO4(NY,NX))THEN
+      IF(L.EQ.NU(NY,NX).OR.CumDepth2LayerBottom(L-1,NY,NX).LT.DPPO4(NY,NX))THEN
         WDPOBDL=WDPOB(L,NY,NX)*DLYR(3,L,NY,NX)
         WDPOBD0=WDPOB(L0,NY,NX)*DLYR(3,L0,NY,NX)
         WDPOBD1=WDPOB(L1,NY,NX)*DLYR(3,L1,NY,NX)
@@ -1548,7 +1548,7 @@ implicit none
         WDPOBD0=WDPOBD0-FXWDPOB
         WDPOB(L1,NY,NX)=WDPOBD1/DLYR(3,L1,NY,NX)
         WDPOB(L0,NY,NX)=WDPOBD0/DLYR(3,L0,NY,NX)
-        IF(CDPTH(L,NY,NX).GE.DPPO4(NY,NX))THEN
+        IF(CumDepth2LayerBottom(L,NY,NX).GE.DPPO4(NY,NX))THEN
           FXDPPOB=AMIN1(FX*DPPOB(L,NY,NX),DPPOB(L0,NY,NX))
           DPPOB(L1,NY,NX)=DPPOB(L1,NY,NX)+FXDPPOB
           DPPOB(L0,NY,NX)=DPPOB(L0,NY,NX)-FXDPPOB

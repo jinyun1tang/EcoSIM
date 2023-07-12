@@ -430,7 +430,7 @@ module readiMod
     NLI(NV1,NH1)=NM(NV1,NH1)+NL2
     NL(NV1,NH1)=NLI(NV1,NH1)
 
-    call ncd_getvar(grid_nfid, 'CDPTH',ntp,CDPTH(1:JZ,NV1,NH1))
+    call ncd_getvar(grid_nfid, 'CDPTH',ntp,CumDepth2LayerBottom(1:JZ,NV1,NH1))
     call ncd_getvar(grid_nfid, 'BKDSI',ntp,BKDSI(1:JZ,NV1,NH1))
 
     call ncd_getvar(grid_nfid, 'FC', ntp,FC(1:JZ,NV1,NH1))
@@ -546,7 +546,7 @@ module readiMod
 !
         IF (NX/=NH1 .OR. NY/=NV1) THEN
           DO L=NU(NY,NX),NM(NY,NX)
-            CDPTH(L,NY,NX)=CDPTH(L,NV1,NH1)
+            CumDepth2LayerBottom(L,NY,NX)=CumDepth2LayerBottom(L,NV1,NH1)
             BKDSI(L,NY,NX)=BKDSI(L,NV1,NH1)
             FC(L,NY,NX)=FC(L,NV1,NH1)
             WP(L,NY,NX)=WP(L,NV1,NH1)
@@ -631,9 +631,9 @@ module readiMod
         IF(NU(NY,NX).GT.1)THEN
           DO  L=NU(NY,NX)-1,0,-1
             IF(BKDSI(L+1,NY,NX).GT.0.025_r8)THEN
-              CDPTH(L,NY,NX)=CDPTH(L+1,NY,NX)-0.01_r8
+              CumDepth2LayerBottom(L,NY,NX)=CumDepth2LayerBottom(L+1,NY,NX)-0.01_r8
             ELSE
-              CDPTH(L,NY,NX)=CDPTH(L+1,NY,NX)-0.02_r8
+              CumDepth2LayerBottom(L,NY,NX)=CumDepth2LayerBottom(L+1,NY,NX)-0.02_r8
             ENDIF
             IF(L.GT.0)THEN
               BKDSI(L,NY,NX)=BKDSI(L+1,NY,NX)
@@ -825,7 +825,7 @@ module readiMod
   write(*,'(A,I2,A,I2)')'read data for layers from layer NU ',NU,' to layer NM ',NM
 
   write(*,*)'Depth to bottom of soil layer (m): CDPTH'
-  write(*,*)(CDPTH(L,NY,NX),L=NU,NM)
+  write(*,*)(CumDepth2LayerBottom(L,NY,NX),L=NU,NM)
   write(*,*)'Initial bulk density (Mg m-3, 0=water): BKDSI'
   write(*,*)(BKDSI(L,NY,NX),L=NU,NM)
 !

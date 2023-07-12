@@ -111,7 +111,7 @@ module StartsMod
         ALTZG=MIN(ALTZG,ALT(NY,NX))
       ENDIF
       !
-      CDPTHG=AMAX1(CDPTHG,CDPTH(NU(NY,NX),NY,NX)) !topsoil layer depth
+      CDPTHG=AMAX1(CDPTHG,CumDepth2LayerBottom(NU(NY,NX),NY,NX)) !topsoil layer depth
 !
 !     INITIALIZE ATMOSPHERE VARIABLES
 !
@@ -175,7 +175,7 @@ module StartsMod
 !     (MJ m-1 K-1 h-1)
 !     TKSD=deep source/sink temperature from geothermal flux(K)
       
-      DPTHSK(NY,NX)=AMAX1(10.0_r8,CDPTH(NL(NY,NX),NY,NX)+1.0_r8)
+      DPTHSK(NY,NX)=AMAX1(10.0_r8,CumDepth2LayerBottom(NL(NY,NX),NY,NX)+1.0_r8)
       TCS(0,NY,NX)=ATCS(NY,NX)
       TKS(0,NY,NX)=ATKS(NY,NX)
       TKSD(NY,NX)=ATKS(NY,NX)+2.052E-04_r8*DPTHSK(NY,NX)/TCNDG
@@ -896,12 +896,12 @@ module StartsMod
 !     VOLX=total micropore volume
       IF(BKDSI(L,NY,NX).LE.ZERO)FHOL(L,NY,NX)=0.0
 !     thickness:=bottom depth-upper depth
-      DLYRI(3,L,NY,NX)=(CDPTH(L,NY,NX)-CDPTH(L-1,NY,NX))
+      DLYRI(3,L,NY,NX)=(CumDepth2LayerBottom(L,NY,NX)-CumDepth2LayerBottom(L-1,NY,NX))
       call check_bool(DLYRI(3,L,NY,NX)<0._r8,'negative soil layer thickness',&
         __LINE__,mod_filename)
       DLYR(3,L,NY,NX)=DLYRI(3,L,NY,NX)
-      DPTH(L,NY,NX)=0.5_r8*(CDPTH(L,NY,NX)+CDPTH(L-1,NY,NX))
-      CDPTHZ(L,NY,NX)=CDPTH(L,NY,NX)-CDPTH(NU(NY,NX),NY,NX)+DLYR(3,NU(NY,NX),NY,NX)
+      DPTH(L,NY,NX)=0.5_r8*(CumDepth2LayerBottom(L,NY,NX)+CumDepth2LayerBottom(L-1,NY,NX))
+      CDPTHZ(L,NY,NX)=CumDepth2LayerBottom(L,NY,NX)-CumDepth2LayerBottom(NU(NY,NX),NY,NX)+DLYR(3,NU(NY,NX),NY,NX)
       DPTHZ(L,NY,NX)=0.5_r8*(CDPTHZ(L,NY,NX)+CDPTHZ(L-1,NY,NX))
       VOLT(L,NY,NX)=amax1(AREA(3,L,NY,NX)*DLYR(3,L,NY,NX),1.e-8_r8)
       VOLX(L,NY,NX)=VOLT(L,NY,NX)*FMPR(L,NY,NX)
@@ -915,8 +915,8 @@ module StartsMod
     AREA(1,L,NY,NX)=DLYR(3,L,NY,NX)*DLYR(2,L,NY,NX)
     AREA(2,L,NY,NX)=DLYR(3,L,NY,NX)*DLYR(1,L,NY,NX)
   ENDDO
-  CDPTH(0,NY,NX)=CDPTH(NU(NY,NX),NY,NX)-DLYR(3,NU(NY,NX),NY,NX)
-  CDPTHI(NY,NX)=CDPTH(0,NY,NX)
+  CumDepth2LayerBottom(0,NY,NX)=CumDepth2LayerBottom(NU(NY,NX),NY,NX)-DLYR(3,NU(NY,NX),NY,NX)
+  CDPTHI(NY,NX)=CumDepth2LayerBottom(0,NY,NX)
   AREA(3,NL(NY,NX)+1:JZ,NY,NX)=DLYR(1,NL(NY,NX),NY,NX)*DLYR(2,NL(NY,NX),NY,NX)
 
   end associate
@@ -1009,7 +1009,7 @@ module StartsMod
         ALTZG=MIN(ALTZG,ALT(NY,NX))
       ENDIF
       !
-      CDPTHG=AMAX1(CDPTHG,CDPTH(NU(NY,NX),NY,NX)) !topsoil layer depth
+      CDPTHG=AMAX1(CDPTHG,CumDepth2LayerBottom(NU(NY,NX),NY,NX)) !topsoil layer depth
 !
 !     INITIALIZE ATMOSPHERE VARIABLES
 !
@@ -1072,7 +1072,7 @@ module StartsMod
 !     (MJ m-1 K-1 h-1)
 !     TKSD=deep source/sink temperature from geothermal flux(K)
       
-      DPTHSK(NY,NX)=AMAX1(10.0_r8,CDPTH(NL(NY,NX),NY,NX)+1.0_r8)
+      DPTHSK(NY,NX)=AMAX1(10.0_r8,CumDepth2LayerBottom(NL(NY,NX),NY,NX)+1.0_r8)
       TCS(0,NY,NX)=ATCS(NY,NX)
       TKS(0,NY,NX)=ATKS(NY,NX)
       TKSD(NY,NX)=ATKS(NY,NX)+2.052E-04_r8*DPTHSK(NY,NX)/TCNDG
