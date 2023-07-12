@@ -1,7 +1,7 @@
 module UptakesMod
   use data_kind_mod, only : r8 => DAT_KIND_R8
   use StomatesMod   , only : stomates
-  use minimathmod  , only : safe_adb,vapsat,test_aneb,AZMAX1,AZMIN1
+  use minimathmod  , only : safe_adb,vapsat,isclose,AZMAX1,AZMIN1
   use EcosimConst
   use EcoSIMSolverPar
   use UptakePars
@@ -853,7 +853,7 @@ module UptakesMod
       VOLWPZ=ppmc*WVPLT/FDMP
       DIFFZ=VOLWPZ-VOLWP(NZ)
       DIFFU=EP(NZ)-UPRT
-      IF(test_aneb(UPRT,0.0_r8))THEN
+      IF(.not.isclose(UPRT,0.0_r8))THEN
         DIFF=ABS((DIFFU-DIFFZ)/UPRT)
       ELSE
         DIFF=ABS((DIFFU-DIFFZ)/VOLWPZ)

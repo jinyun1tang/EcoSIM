@@ -1,6 +1,6 @@
 module InitSoluteMod
   use data_kind_mod, only : r8 => DAT_KIND_R8
-  use minimathmod, only : test_aeqb,AZMAX1
+  use minimathmod, only : isclose,AZMAX1
   use SoluteChemDataType, only : solutedtype
   use ChemTracerParsMod
   use SoluteParMod
@@ -717,35 +717,35 @@ module InitSoluteMod
 !
   IF(K.EQ.micpar%k_POM)THEN
     PX=AMAX1(AAL1,AALO1,AALO2,AALO3,AALO4)
-    IF(test_aeqb(PX,AAL1))THEN
+    IF(isclose(PX,AAL1))THEN
       R1=AHY1
       P1=AAL1
       P2=AOH1
       NR1=3
       NP2=0
       SP=SHALO
-    ELSEIF(test_aeqb(PX,AALO1))THEN
+    ELSEIF(isclose(PX,AALO1))THEN
       R1=AHY1
       P1=AALO1
       P2=AOH1
       NR1=2
       NP2=0
       SP=SHAL1
-    ELSEIF(test_aeqb(PX,AALO2))THEN
+    ELSEIF(isclose(PX,AALO2))THEN
       R1=AHY1
       P1=AALO2
       P2=AOH1
       NR1=1
       NP2=0
       SP=SHAL2
-    ELSEIF(test_aeqb(PX,AALO3))THEN
+    ELSEIF(isclose(PX,AALO3))THEN
       R1=AHY1
       P1=AALO3
       P2=AOH1
       NR1=0
       NP2=0
       SP=SPAL3
-    ELSEIF(test_aeqb(PX,AALO4))THEN
+    ELSEIF(isclose(PX,AALO4))THEN
       R1=AOH1
       P1=AALO4
       P2=AHY1
@@ -763,50 +763,50 @@ module InitSoluteMod
     P2=AMAX1(ZERO,P2)
     SPX=SP*R1**NR1/P2**NP2
     RPALOX=AMAX1(-PALOH1,TPD*(P1-SPX))
-    IF(test_aeqb(PX,AAL1))THEN
+    IF(isclose(PX,AAL1))THEN
       RHAL1=RPALOX
-    ELSEIF(test_aeqb(PX,AALO1))THEN
+    ELSEIF(isclose(PX,AALO1))THEN
       RHALO1=RPALOX
-    ELSEIF(test_aeqb(PX,AALO2))THEN
+    ELSEIF(isclose(PX,AALO2))THEN
       RHALO2=RPALOX
-    ELSEIF(test_aeqb(PX,AALO3))THEN
+    ELSEIF(isclose(PX,AALO3))THEN
       RHALO3=RPALOX
-    ELSEIF(test_aeqb(PX,AALO4))THEN
+    ELSEIF(isclose(PX,AALO4))THEN
       RHALO4=RPALOX
     ENDIF
 !
 !     IRON HYDROXIDE
 !
     PX=AMAX1(AFE1,AFEO1,AFEO2,AFEO3,AFEO4)
-    IF(test_aeqb(PX,AFE1))THEN
+    IF(isclose(PX,AFE1))THEN
       R1=AHY1
       P1=AFE1
       P2=AOH1
       NR1=3
       NP2=0
       SP=SHFEO
-    ELSEIF(test_aeqb(PX,AFEO1))THEN
+    ELSEIF(isclose(PX,AFEO1))THEN
       R1=AHY1
       P1=AFEO1
       P2=AOH1
       NR1=2
       NP2=0
       SP=SHFE1
-    ELSEIF(test_aeqb(PX,AFEO2))THEN
+    ELSEIF(isclose(PX,AFEO2))THEN
       R1=AHY1
       P1=AFEO2
       P2=AOH1
       NR1=1
       NP2=0
       SP=SHFE2
-    ELSEIF(test_aeqb(PX,AFEO3))THEN
+    ELSEIF(isclose(PX,AFEO3))THEN
       R1=AHY1
       P1=AFEO3
       P2=AOH1
       NR1=0
       NP2=0
       SP=SPFE3
-    ELSEIF(test_aeqb(PX,AFEO4))THEN
+    ELSEIF(isclose(PX,AFEO4))THEN
       R1=AOH1
       P1=AFEO4
       P2=AHY1
@@ -824,15 +824,15 @@ module InitSoluteMod
     P2=AMAX1(ZERO,P2)
     SPX=SP*R1**NR1/P2**NP2
     RPFEOX=AMAX1(-PFEOH1,TPD*(P1-SPX))
-    IF(test_aeqb(PX,AFE1))THEN
+    IF(isclose(PX,AFE1))THEN
       RHFE1=RPFEOX
-    ELSEIF(test_aeqb(PX,AFEO1))THEN
+    ELSEIF(isclose(PX,AFEO1))THEN
       RHFEO1=RPFEOX
-    ELSEIF(test_aeqb(PX,AFEO2))THEN
+    ELSEIF(isclose(PX,AFEO2))THEN
       RHFEO2=RPFEOX
-    ELSEIF(test_aeqb(PX,AFEO3))THEN
+    ELSEIF(isclose(PX,AFEO3))THEN
       RHFEO3=RPFEOX
-    ELSEIF(test_aeqb(PX,AFEO4))THEN
+    ELSEIF(isclose(PX,AFEO4))THEN
       RHFEO4=RPFEOX
     ENDIF
 !
@@ -841,15 +841,15 @@ module InitSoluteMod
     PX=AMAX1(ACO31,AHCO31,ACO21)
     R1=AHY1
     P1=ACA1
-    IF(test_aeqb(PX,ACO31))THEN
+    IF(isclose(PX,ACO31))THEN
       P2=ACO31
       NR1=0
       SP=SPCAC
-    ELSEIF(test_aeqb(PX,AHCO31))THEN
+    ELSEIF(isclose(PX,AHCO31))THEN
       P2=AHCO31
       NR1=1
       SP=SHCAC1
-    ELSEIF(test_aeqb(PX,ACO21))THEN
+    ELSEIF(isclose(PX,ACO21))THEN
       P2=ACO21
       NR1=2
       SP=SHCAC2
@@ -862,13 +862,13 @@ module InitSoluteMod
     P2=AMAX1(ZERO,P2)
     SPX=SP*R1**NR1
     S0=P1+P2
-    S1=AZMAX1(S0**2-4.0*(P1*P2-SPX))
+    S1=AZMAX1(S0**2_r8-4.0_r8*(P1*P2-SPX))
     RPCACX=AMAX1(-PCACO1,TPD*(S0-SQRT(S1)))
-    IF(test_aeqb(PX,ACO31))THEN
+    IF(isclose(PX,ACO31))THEN
       RHCAC3=RPCACX
-    ELSEIF(test_aeqb(PX,AHCO31))THEN
+    ELSEIF(isclose(PX,AHCO31))THEN
       RHCACH=RPCACX
-    ELSEIF(test_aeqb(PX,ACO21))THEN
+    ELSEIF(isclose(PX,ACO21))THEN
       RHCACO=RPCACX
     ENDIF
 !
@@ -892,29 +892,29 @@ module InitSoluteMod
     PY=AMAX1(AH1P1,AH2P1)
     R1=AHY1
     P3=AHY1
-    IF(test_aeqb(PY,AH1P1))THEN
+    IF(isclose(PY,AH1P1))THEN
       P2=AH1P1
-      IF(test_aeqb(PX,AAL1))THEN
+      IF(isclose(PX,AAL1))THEN
         P1=AAL1
         NR1=1
         NP3=0
         SP=SHA0P1
-      ELSEIF(test_aeqb(PX,AALO1))THEN
+      ELSEIF(isclose(PX,AALO1))THEN
         P1=AALO1
         NR1=0
         NP3=0
         SP=SPA1P1
-      ELSEIF(test_aeqb(PX,AALO2))THEN
+      ELSEIF(isclose(PX,AALO2))THEN
         P1=AALO2
         NR1=0
         NP3=1
         SP=SHA2P1
-      ELSEIF(test_aeqb(PX,AALO3))THEN
+      ELSEIF(isclose(PX,AALO3))THEN
         P1=AALO3
         NR1=0
         NP3=2
         SP=SHA3P1
-      ELSEIF(test_aeqb(PX,AALO4))THEN
+      ELSEIF(isclose(PX,AALO4))THEN
         P1=AALO4
         NR1=0
         NP3=3
@@ -922,27 +922,27 @@ module InitSoluteMod
       ENDIF
     ELSE
       P2=AH2P1
-      IF(test_aeqb(PX,AAL1))THEN
+      IF(isclose(PX,AAL1))THEN
         P1=AAL1
         NR1=2
         NP3=0
         SP=SHA0P2
-      ELSEIF(test_aeqb(PX,AALO1))THEN
+      ELSEIF(isclose(PX,AALO1))THEN
         P1=AALO1
         NR1=1
         NP3=0
         SP=SHA1P2
-      ELSEIF(test_aeqb(PX,AALO2))THEN
+      ELSEIF(isclose(PX,AALO2))THEN
         P1=AALO2
         NR1=0
         NP3=0
         SP=SPA2P2
-      ELSEIF(test_aeqb(PX,AALO3))THEN
+      ELSEIF(isclose(PX,AALO3))THEN
         P1=AALO3
         NR1=0
         NP3=1
         SP=SHA3P2
-      ELSEIF(test_aeqb(PX,AALO4))THEN
+      ELSEIF(isclose(PX,AALO4))THEN
         P1=AALO4
         NR1=0
         NP3=2
@@ -967,28 +967,28 @@ module InitSoluteMod
     S0=P1+P2
     S1=AZMAX1(S0**2-4.0*(P1*P2-SPX))
     RPALPX=AMAX1(-PALPO1,TPD*(S0-SQRT(S1)))
-    IF(test_aeqb(PY,AH1P1))THEN
-      IF(test_aeqb(PX,AAL1))THEN
+    IF(isclose(PY,AH1P1))THEN
+      IF(isclose(PX,AAL1))THEN
         RHA0P1=RPALPX
-      ELSEIF(test_aeqb(PX,AALO1))THEN
+      ELSEIF(isclose(PX,AALO1))THEN
         RHA1P1=RPALPX
-      ELSEIF(test_aeqb(PX,AALO2))THEN
+      ELSEIF(isclose(PX,AALO2))THEN
         RHA2P1=RPALPX
-      ELSEIF(test_aeqb(PX,AALO3))THEN
+      ELSEIF(isclose(PX,AALO3))THEN
         RHA3P1=RPALPX
-      ELSEIF(test_aeqb(PX,AALO4))THEN
+      ELSEIF(isclose(PX,AALO4))THEN
         RHA4P1=RPALPX
       ENDIF
     ELSE
-      IF(test_aeqb(PX,AAL1))THEN
+      IF(isclose(PX,AAL1))THEN
         RHA0P2=RPALPX
-      ELSEIF(test_aeqb(PX,AALO1))THEN
+      ELSEIF(isclose(PX,AALO1))THEN
         RHA1P2=RPALPX
-      ELSEIF(test_aeqb(PX,AALO2))THEN
+      ELSEIF(isclose(PX,AALO2))THEN
         RHA2P2=RPALPX
-      ELSEIF(test_aeqb(PX,AALO3))THEN
+      ELSEIF(isclose(PX,AALO3))THEN
         RHA3P2=RPALPX
-      ELSEIF(test_aeqb(PX,AALO4))THEN
+      ELSEIF(isclose(PX,AALO4))THEN
         RHA4P2=RPALPX
       ENDIF
     ENDIF
@@ -999,29 +999,29 @@ module InitSoluteMod
     PY=AMAX1(AH1P1,AH2P1)
     R1=AHY1
     P3=AHY1
-    IF(test_aeqb(PY,AH1P1))THEN
+    IF(isclose(PY,AH1P1))THEN
       P2=AH1P1
-      IF(test_aeqb(PX,AFE1))THEN
+      IF(isclose(PX,AFE1))THEN
         P1=AFE1
         NR1=1
         NP3=0
         SP=SHF0P1
-      ELSEIF(test_aeqb(PX,AFEO1))THEN
+      ELSEIF(isclose(PX,AFEO1))THEN
         P1=AFEO1
         NR1=0
         NP3=0
         SP=SPF1P1
-      ELSEIF(test_aeqb(PX,AFEO2))THEN
+      ELSEIF(isclose(PX,AFEO2))THEN
         P1=AFEO2
         NR1=0
         NP3=1
         SP=SHF2P1
-      ELSEIF(test_aeqb(PX,AFEO3))THEN
+      ELSEIF(isclose(PX,AFEO3))THEN
         P1=AFEO3
         NR1=0
         NP3=2
         SP=SHF3P1
-      ELSEIF(test_aeqb(PX,AFEO4))THEN
+      ELSEIF(isclose(PX,AFEO4))THEN
         P1=AFEO4
         NR1=0
         NP3=3
@@ -1029,27 +1029,27 @@ module InitSoluteMod
       ENDIF
     ELSE
       P2=AH2P1
-      IF(test_aeqb(PX,AFE1))THEN
+      IF(isclose(PX,AFE1))THEN
         P1=AFE1
         NR1=2
         NP3=0
         SP=SHF0P2
-      ELSEIF(test_aeqb(PX,AFEO1))THEN
+      ELSEIF(isclose(PX,AFEO1))THEN
         P1=AFEO1
         NR1=1
         NP3=0
         SP=SHF1P2
-      ELSEIF(test_aeqb(PX,AFEO2))THEN
+      ELSEIF(isclose(PX,AFEO2))THEN
         P1=AFEO2
         NR1=0
         NP3=0
         SP=SPF2P2
-      ELSEIF(test_aeqb(PX,AFEO3))THEN
+      ELSEIF(isclose(PX,AFEO3))THEN
         P1=AFEO3
         NR1=0
         NP3=1
         SP=SHF3P2
-      ELSEIF(test_aeqb(PX,AFEO4))THEN
+      ELSEIF(isclose(PX,AFEO4))THEN
         P1=AFEO4
         NR1=0
         NP3=2
@@ -1072,30 +1072,30 @@ module InitSoluteMod
     P3=AMAX1(ZERO,P3)
     SPX=SP*R1**NR1/P3**NP3
     S0=P1+P2
-    S1=AZMAX1(S0**2-4.0*(P1*P2-SPX))
+    S1=AZMAX1(S0**2_r8-4.0_r8*(P1*P2-SPX))
     RPFEPX=AMAX1(-PFEPO1,TPD*(S0-SQRT(S1)))
-    IF(test_aeqb(PY,AH1P1))THEN
-      IF(test_aeqb(PX,AFE1))THEN
+    IF(isclose(PY,AH1P1))THEN
+      IF(isclose(PX,AFE1))THEN
         RHF0P1=RPFEPX
-      ELSEIF(test_aeqb(PX,AFEO1))THEN
+      ELSEIF(isclose(PX,AFEO1))THEN
         RHF1P1=RPFEPX
-      ELSEIF(test_aeqb(PX,AFEO2))THEN
+      ELSEIF(isclose(PX,AFEO2))THEN
         RHF2P1=RPFEPX
-      ELSEIF(test_aeqb(PX,AFEO3))THEN
+      ELSEIF(isclose(PX,AFEO3))THEN
         RHF3P1=RPFEPX
-      ELSEIF(test_aeqb(PX,AFEO4))THEN
+      ELSEIF(isclose(PX,AFEO4))THEN
         RHF4P1=RPFEPX
       ENDIF
     ELSE
-      IF(test_aeqb(PX,AFE1))THEN
+      IF(isclose(PX,AFE1))THEN
         RHF0P2=RPFEPX
-      ELSEIF(test_aeqb(PX,AFEO1))THEN
+      ELSEIF(isclose(PX,AFEO1))THEN
         RHF1P2=RPFEPX
-      ELSEIF(test_aeqb(PX,AFEO2))THEN
+      ELSEIF(isclose(PX,AFEO2))THEN
         RHF2P2=RPFEPX
-      ELSEIF(test_aeqb(PX,AFEO3))THEN
+      ELSEIF(isclose(PX,AFEO3))THEN
         RHF3P2=RPFEPX
-      ELSEIF(test_aeqb(PX,AFEO4))THEN
+      ELSEIF(isclose(PX,AFEO4))THEN
         RHF4P2=RPFEPX
       ENDIF
     ENDIF
@@ -1105,11 +1105,11 @@ module InitSoluteMod
     PX=AMAX1(AH1P1,AH2P1)
     R1=AHY1
     P1=ACA1
-    IF(test_aeqb(PX,AH1P1))THEN
+    IF(isclose(PX,AH1P1))THEN
       P2=AH1P1
       NR1=0
       SP=SPCAD
-    ELSEIF(test_aeqb(PX,AH2P1))THEN
+    ELSEIF(isclose(PX,AH2P1))THEN
       P2=AH2P1
       NR1=1
       SP=SHCAD2
@@ -1121,11 +1121,11 @@ module InitSoluteMod
     P2=AMAX1(ZERO,P2)
     SPX=SP*R1**NR1
     S0=P1+P2
-    S1=AZMAX1(S0**2-4.0*(P1*P2-SPX))
+    S1=AZMAX1(S0**2_r8-4.0_r8*(P1*P2-SPX))
     RPCADX=AMAX1(-PCAPD1,TPD*(S0-SQRT(S1)))
-    IF(test_aeqb(PX,AH1P1))THEN
+    IF(isclose(PX,AH1P1))THEN
       RPCAD1=RPCADX
-    ELSEIF(test_aeqb(PX,AH2P1))THEN
+    ELSEIF(isclose(PX,AH2P1))THEN
       RHCAD2=RPCADX
     ENDIF
 !
@@ -1134,11 +1134,11 @@ module InitSoluteMod
     PX=AMAX1(AH1P1,AH2P1)
     R1=AHY1
     P1=ACA1
-    IF(test_aeqb(PX,AH1P1))THEN
+    IF(isclose(PX,AH1P1))THEN
       P2=AH1P1
       NR1=4
       SP=SHCAH1
-    ELSEIF(test_aeqb(PX,AH2P1))THEN
+    ELSEIF(isclose(PX,AH2P1))THEN
       P2=AH2P1
       NR1=7
       SP=SHCAH2
@@ -1148,11 +1148,11 @@ module InitSoluteMod
     R1=AMAX1(ZERO,R1)
     P1=AMAX1(ZERO,P1)
     P2=AMAX1(ZERO,P2)
-    SPX=(SP*R1**NR1/P1**5)**0.333
+    SPX=(SP*R1**NR1/P1**5_r8)**0.333_r8
     RPCAHX=AMAX1(-PCAPH1,TPD*(P2-SPX))
-    IF(test_aeqb(PX,AH1P1))THEN
+    IF(isclose(PX,AH1P1))THEN
       RHCAH1=RPCAHX
-    ELSEIF(test_aeqb(PX,AH2P1))THEN
+    ELSEIF(isclose(PX,AH2P1))THEN
       RHCAH2=RPCAHX
     ENDIF
     PALOH1=PALOH1+RPALOX
@@ -1167,9 +1167,9 @@ module InitSoluteMod
 !     ANION EXCHANGE EQILIBRIA
 !
     IF(VOLW.GT.ZEROS)THEN
-      VOLWBK=AMIN1(1.0,BKVLX/VOLW)
+      VOLWBK=AMIN1(1.0_r8,BKVLX/VOLW)
     ELSE
-      VOLWBK=1.0
+      VOLWBK=1.0_r8
     ENDIF
     IF(XAEC.GT.ZEROS)THEN
       RXOH2=TAD*(XOH11*AHY1-SXOH2*XOH21)/(XOH11+SPOH2)*VOLWBK
@@ -1198,14 +1198,14 @@ module InitSoluteMod
 !     CATION EXCHANGE
 !
     IF(XCEC.GT.ZEROS)THEN
-      AALX=AAL1**0.333
-      AFEX=AFE1**0.333
-      ACAX=ACA1**0.500
-      AMGX=AMG1**0.500
+      AALX=AAL1**0.333_r8
+      AFEX=AFE1**0.333_r8
+      ACAX=ACA1**0.500_r8
+      AMGX=AMG1**0.500_r8
       XCAX=CCEC/(1.0_r8+GKC4*AN41/ACAX &
-      +GKCH*AHY1/ACAX+GKCA*AALX/ACAX &
-      +GKCA*AFEX/ACAX+GKCM*AMGX/ACAX &
-      +GKCN*ANA1/ACAX+GKCK*AKA1/ACAX)
+       +GKCH*AHY1/ACAX+GKCA*AALX/ACAX &
+       +GKCA*AFEX/ACAX+GKCM*AMGX/ACAX &
+       +GKCN*ANA1/ACAX+GKCK*AKA1/ACAX)
       XN4Q=XCAX*AN41*GKC4
       XHYQ=XCAX*AHY1*GKCH
       XALQ=XCAX*AALX*GKCA
@@ -1222,10 +1222,10 @@ module InitSoluteMod
       ENDIF
       XN4Q=FX*XN4Q
       XHYQ=FX*XHYQ
-      XALQ=FX*XALQ/3.0
-      XFEQ=FX*XFEQ/3.0
-      XCAQ=FX*XCAQ/2.0
-      XMGQ=FX*XMGQ/2.0
+      XALQ=FX*XALQ/3.0_r8
+      XFEQ=FX*XFEQ/3.0_r8
+      XCAQ=FX*XCAQ/2.0_r8
+      XMGQ=FX*XMGQ/2.0_r8
       XNAQ=FX*XNAQ
       XKAQ=FX*XKAQ
       RXN4=TAD*AMIN1((XN4Q-XN41)*AN41/XN4Q,CN41)
@@ -1322,13 +1322,13 @@ module InitSoluteMod
 !     ION SPECIATION
 !
   S0=AHY1+AN31+DPN4
-  S1=S0**2-4.0*(AHY1*AN31-DPN4*AN41)
+  S1=S0**2_r8-4.0_r8*(AHY1*AN31-DPN4*AN41)
   RNH4=TSL*(S0-SQRT(S1))
   S0=AAL1+AOH1+DPAL1
-  S1=S0**2-4.0*(AAL1*AOH1-DPAL1*AALO1)
+  S1=S0**2_r8-4.0_r8*(AAL1*AOH1-DPAL1*AALO1)
   RALO1=TSL*(S0-SQRT(S1))
   S0=AALO1+AOH1+DPAL2
-  S1=S0**2-4.0*(AALO1*AOH1-DPAL2*AALO2)
+  S1=S0**2_r8-4.0_r8*(AALO1*AOH1-DPAL2*AALO2)
   RALO2=TSL*(S0-SQRT(S1))
   S0=CALO2+COH1+DPAL3
   S1=S0**2-4.0*(AALO2*AOH1-DPAL3*AALO3)

@@ -5,7 +5,7 @@ module StartsMod
 
   use data_kind_mod, only : r8 => DAT_KIND_R8
   use abortutils, only : padr, print_info,check_bool
-  use minimathMod, only : test_aeqb, test_aneb, AZMAX1,AZMIN1
+  use minimathMod, only : isclose, AZMAX1,AZMIN1
   use EcosimConst
   use TracerIDMod
   use SnowDataType  
@@ -451,9 +451,9 @@ module StartsMod
       ! field capacity and wilting point are read from input
         IF(THW(L,NY,NX).GT.1.0)THEN
           THETW(L,NY,NX)=POROS(L,NY,NX)
-        ELSEIF(test_aeqb(THW(L,NY,NX),1.0_r8))THEN
+        ELSEIF(isclose(THW(L,NY,NX),1.0_r8))THEN
           THETW(L,NY,NX)=FC(L,NY,NX)
-        ELSEIF(test_aeqb(THW(L,NY,NX),0.0_r8))THEN
+        ELSEIF(isclose(THW(L,NY,NX),0.0_r8))THEN
           THETW(L,NY,NX)=WP(L,NY,NX)
         ELSEIF(THW(L,NY,NX).LT.0.0)THEN
           THETW(L,NY,NX)=0.0_r8
@@ -462,9 +462,9 @@ module StartsMod
         ENDIF
         IF(THI(L,NY,NX).GT.1.0_r8)THEN
           THETI(L,NY,NX)=AZMAX1(AMIN1(POROS(L,NY,NX),POROS(L,NY,NX)-THW(L,NY,NX)))
-        ELSEIF(test_aeqb(THI(L,NY,NX),1.0_r8))THEN
+        ELSEIF(isclose(THI(L,NY,NX),1.0_r8))THEN
           THETI(L,NY,NX)=AZMAX1(AMIN1(FC(L,NY,NX),POROS(L,NY,NX)-THW(L,NY,NX)))
-        ELSEIF(test_aeqb(THI(L,NY,NX),0.0_r8))THEN
+        ELSEIF(isclose(THI(L,NY,NX),0.0_r8))THEN
           THETI(L,NY,NX)=AZMAX1(AMIN1(WP(L,NY,NX),POROS(L,NY,NX)-THW(L,NY,NX)))
         ELSEIF(THI(L,NY,NX).LT.0.0_r8)THEN
           THETI(L,NY,NX)=0.0_r8
@@ -621,7 +621,7 @@ module StartsMod
       ENDIF
       SLOPE(3,NY,NX)=-1.0_r8
 
-      IF(test_aneb(SLOPE(1,NY,NX),0.0_r8).OR.test_aneb(SLOPE(2,NY,NX),0.0_r8))THEN
+      IF(.not.isclose(SLOPE(1,NY,NX),0.0_r8).OR.(.not.isclose(SLOPE(2,NY,NX),0.0_r8)))THEN
         FSLOPE(1,NY,NX)=ABS(SLOPE(1,NY,NX))/(ABS(SLOPE(1,NY,NX))+ABS(SLOPE(2,NY,NX)))  !
         FSLOPE(2,NY,NX)=ABS(SLOPE(2,NY,NX))/(ABS(SLOPE(1,NY,NX))+ABS(SLOPE(2,NY,NX)))
       ELSE

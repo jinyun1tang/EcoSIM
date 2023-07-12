@@ -1,6 +1,6 @@
 module Hour1Mod
   use data_kind_mod, only : r8 => DAT_KIND_R8
-  use minimathmod  , only : test_aeqb,AZMAX1,AZMIN1
+  use minimathmod  , only : isclose,AZMAX1,AZMIN1
   use abortutils   , only : endrun, print_info
   use ATSUtilsMod
   use TracerPropMod
@@ -1940,7 +1940,7 @@ module Hour1Mod
 !
   IF(Z4A+Z3A+ZUA+ZOA+Z4B+Z3B+ZUB+ZOB+PMA+PMB+PHA+CAC+CAS.GT.0.0_r8)THEN
     FDPTHF=FDPTH(I,NY,NX)+CDPTH(NU(NY,NX)-1,NY,NX)
-    IF(FDPTHF.LE.0.0_r8.AND.test_aeqb(Z4B+Z3B+ZUB+ZOB+PMB,0._r8))THEN
+    IF(FDPTHF.LE.0.0_r8.AND.isclose(Z4B+Z3B+ZUB+ZOB+PMB,0._r8))THEN
       LFDPTH=0
       CVRDF=1.0_r8-EXP(-0.8E-02_r8*(ORGC(0,NY,NX)/AREA(3,0,NY,NX)))
     ELSE

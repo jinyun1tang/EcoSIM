@@ -1,6 +1,6 @@
 module BoundaryTranspMod
   use data_kind_mod, only : r8 => DAT_KIND_R8
-  use minimathmod, only : test_aeqb,AZMAX1
+  use minimathmod, only : isclose,AZMAX1
   use GridConsts
   USE SoilPropertyDataType
   use TransfrDataMod
@@ -202,7 +202,7 @@ module BoundaryTranspMod
   real(r8) :: FQRM
   integer :: K,NTG,NTN,NTS
 
-  IF(IRCHG(NN,N,N2,N1).EQ.0.OR.test_aeqb(RCHQF,0.0_r8).OR.QRM(M,N2,N1).LE.ZEROS(N2,N1))THEN
+  IF(IRCHG(NN,N,N2,N1).EQ.0.OR.isclose(RCHQF,0.0_r8).OR.QRM(M,N2,N1).LE.ZEROS(N2,N1))THEN
     DO  K=1,jcplx
       RQROC(K,N,NN,M5,M4)=0.0_r8
       RQRON(K,N,NN,M5,M4)=0.0_r8

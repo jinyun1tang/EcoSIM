@@ -8,7 +8,7 @@ module WatsubMod
 
   use data_kind_mod, only : r8 => DAT_KIND_R8
   use abortutils   , only : endrun, print_info
-  use minimathmod  , only : test_aeqb, test_aneb,safe_adb,vapsat,AZMAX1,AZMIN1,AZMAX1t
+  use minimathmod  , only : isclose, isclose,safe_adb,vapsat,AZMAX1,AZMIN1,AZMAX1t
   use EcosimConst
   use MiniFuncMod
   use EcoSIMSolverPar
@@ -745,7 +745,7 @@ module WatsubMod
             IF(L.EQ.NUM(N2,N1).AND.N.NE.ivertdir.AND.(CDPTH(NU(N2,N1)-1,N2,N1).LE.CDPTHI(N2,N1) &
               .OR.BKDS(NUI(N2,N1),N2,N1).GT.ZERO))THEN
 !not in vertical direction
-              IF(IRCHG(NN,N,N2,N1).EQ.0.OR.test_aeqb(RCHQF,0._r8).OR.ABS(QRM(M,N2,N1)).LT.ZEROS(N2,N1))THEN
+              IF(IRCHG(NN,N,N2,N1).EQ.0.OR.isclose(RCHQF,0._r8).OR.ABS(QRM(M,N2,N1)).LT.ZEROS(N2,N1))THEN
                 !no runoff
                 QR1(N,NN,M5,M4)=0.0_r8
                 HQR1(N,NN,M5,M4)=0.0_r8
@@ -1721,7 +1721,7 @@ module WatsubMod
 !     HCND=saturated hydraulic conductivity
 !     AREAU=fraction of layer below natural water table
 !
-  IF(IFLGU.EQ.0.AND.test_aneb(RCHGFT,0._r8))THEN
+  IF(IFLGU.EQ.0.AND.(.not.isclose(RCHGFT,0._r8)))THEN
     PSISWD=XN*0.005_r8*SLOPE(N,N2,N1)*DLYR(N,N3,N2,N1)*(1.0_r8-DTBLG(N2,N1))
     PSISWT=AZMIN1(-PSISA1(N3,N2,N1)-0.03_r8*PSISO(N3,N2,N1) &
       +GRAVm*(DPTH(N3,N2,N1)-DTBLX(N2,N1)) &
@@ -1756,7 +1756,7 @@ module WatsubMod
 !     HCND=saturated hydraulic conductivity
   !     AREAU=fraction of layer below natural water table
 !
-  IF(IFLGUH.EQ.0.AND.test_aneb(RCHGFT,0._r8).AND.VOLAH1(N3,N2,N1).GT.ZEROS2(N2,N1))THEN
+  IF(IFLGUH.EQ.0.AND.(.not.isclose(RCHGFT,0._r8)).AND.VOLAH1(N3,N2,N1).GT.ZEROS2(N2,N1))THEN
     PSISWD=XN*0.005*SLOPE(N,N2,N1)*DLYR(N,N3,N2,N1)*(1.0_r8-DTBLG(N2,N1))
     PSISWTH=-0.03*PSISO(N3,N2,N1)+GRAVm*(DPTHH-DTBLX(N2,N1)) &
       -GRAVm*AZMAX1(DPTHH-DPTHT(N2,N1))
@@ -1795,7 +1795,7 @@ module WatsubMod
   !     HCND=saturated hydraulic conductivity
   !     AREAUD=fraction of layer below artificial water table
 !
-  IF(IFLGD.EQ.0.AND.test_aneb(RCHGFT,0._r8))THEN
+  IF(IFLGD.EQ.0.AND.(.not.isclose(RCHGFT,0._r8)))THEN
     PSISWD=XN*0.005_r8*SLOPE(N,N2,N1)*DLYR(N,N3,N2,N1)*(1.0_r8-DTBLG(N2,N1))
     PSISWT=AZMIN1(-PSISA1(N3,N2,N1)-0.03_r8*PSISO(N3,N2,N1) &
       +GRAVm*(DPTH(N3,N2,N1)-DTBLY(N2,N1))-GRAVm*AZMAX1(DPTH(N3,N2,N1)-DPTHT(N2,N1)))
@@ -1825,7 +1825,7 @@ module WatsubMod
 !     HCND=saturated hydraulic conductivity
 !     AREAUD=fraction of layer below artificial water table
 !
-  IF(IFLGDH.EQ.0.AND.test_aneb(RCHGFT,0._r8).AND.VOLAH1(N3,N2,N1).GT.ZEROS2(N2,N1))THEN
+  IF(IFLGDH.EQ.0.AND.(.not.isclose(RCHGFT,0._r8)).AND.VOLAH1(N3,N2,N1).GT.ZEROS2(N2,N1))THEN
     PSISWD=XN*0.005_r8*SLOPE(N,N2,N1)*DLYR(N,N3,N2,N1)*(1.0_r8-DTBLG(N2,N1))
     PSISWTH=-0.03_r8*PSISO(N3,N2,N1)+GRAVm*(DPTHH-DTBLY(N2,N1))-GRAVm*AZMAX1(DPTHH-DPTHT(N2,N1))
     IF(PSISWTH.LT.0.0_r8)PSISWTH=PSISWTH-PSISWD
@@ -1868,7 +1868,7 @@ module WatsubMod
         .AND.DPTH(N3,N2,N1).LT.DPTHA(N2,N1) &
         .AND.(VOLP2.GT.ZEROS2(N2,N1).OR.BKDS(N3,N2,N1).LE.ZERO) &
         .AND.VOLP1Z(N3,N2,N1).GT.0.0_r8 &
-        .AND.test_aneb(RCHGFT,0._r8))THEN
+        .AND.(.not.isclose(RCHGFT,0._r8)))THEN
         PSISWD=XN*0.005_r8*SLOPE(N,N2,N1)*DLYR(N,N3,N2,N1)*(1.0_r8-DTBLG(N2,N1))
         PSISUT=AZMAX1(-PSISA1(N3,N2,N1)-0.03_r8*PSISO(N3,N2,N1)+GRAVm*(DPTH(N3,N2,N1)-DTBLX(N2,N1)))
         IF(PSISUT.GT.0.0_r8)PSISUT=PSISUT+PSISWD
@@ -1909,7 +1909,7 @@ module WatsubMod
         .AND.DPTHA(N2,N1).GT.DTBLX(N2,N1)     & !active layer below water table
         .AND.DPTH(N3,N2,N1).LT.DPTHA(N2,N1)   & !midlayer depth above active water layer
         .AND.VOLPH2.GT.ZEROS2(NY,NX)          & !macropore has air-filled fraction
-        .AND.test_aneb(RCHGFT,0.0_r8))THEN      !recharge is on
+        .AND.(.not.isclose(RCHGFT,0.0_r8)))THEN      !recharge is on
         PSISWD=XN*0.005*SLOPE(N,N2,N1)*DLYR(N,N3,N2,N1)*(1.0_r8-DTBLG(N2,N1))
         PSISUTH=-0.03_r8*PSISO(N3,N2,N1)+GRAVm*(DPTHH-DTBLX(N2,N1))
         IF(PSISUTH.GT.0.0_r8)PSISUTH=PSISUTH+PSISWD

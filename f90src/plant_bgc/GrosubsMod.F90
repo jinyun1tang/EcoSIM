@@ -2,7 +2,7 @@ module grosubsMod
 !!
 ! Description:
 ! module for plant biological transformations
-  use minimathmod, only : test_aeqb,safe_adb,AZMAX1
+  use minimathmod, only : safe_adb,AZMAX1
   use data_kind_mod, only : r8 => DAT_KIND_R8
   use EcosimConst
   use EcoSiMParDataMod, only : pltpar

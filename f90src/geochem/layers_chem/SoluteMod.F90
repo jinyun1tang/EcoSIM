@@ -1,6 +1,6 @@
 module SoluteMod
   use data_kind_mod, only : r8 => DAT_KIND_R8
-  use minimathmod, only : test_aeqb,AZMAX1,AZMIN1
+  use minimathmod  , only : AZMAX1,AZMIN1
   use SoluteParMod
   use SOMDataType
   use EcosimConst

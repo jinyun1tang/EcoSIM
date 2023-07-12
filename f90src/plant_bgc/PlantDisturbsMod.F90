@@ -3,7 +3,7 @@ module PlantDisturbsMod
 !! Description:
 ! code to apply distance to plants
   use data_kind_mod, only : r8 => DAT_KIND_R8
-  use minimathmod, only : test_aeqb,AZMAX1
+  use minimathmod, only : isclose,AZMAX1
   use EcosimConst
   use PlantAPIData
   use GrosubPars
@@ -118,7 +118,7 @@ module PlantDisturbsMod
 !
   IF(IHVST(NZ).GE.0)THEN
     IF(J.EQ.INT(ZNOON).AND.IHVST(NZ).NE.4.AND.IHVST(NZ).NE.6)THEN
-      IF(test_aeqb(THIN(NZ),0._r8))THEN
+      IF(isclose(THIN(NZ),0._r8))THEN
         FHVSE(ielmc)=AZMAX1(1._r8-EHVST(1,4,NZ))
         FHVSH=FHVSE(ielmc)
       ELSE
@@ -1542,7 +1542,7 @@ module PlantDisturbsMod
         ELSE
           FHGT=0._r8
         ENDIF
-        IF(test_aeqb(THIN(NZ),0._r8))THEN
+        IF(isclose(THIN(NZ),0._r8))THEN
           FHVSE(ielmc)=AZMAX1(1._r8-(1._r8-FHGT)*EHVST(1,ipld_leaf,NZ))
           FHVSH=FHVSE(ielmc)
         ELSE
@@ -1675,7 +1675,7 @@ module PlantDisturbsMod
               /WGLFE(ielmc,K,NB,NZ))*EHVST(1,ipld_nofoliar,NZ)/EHVST(1,ipld_leaf,NZ))))
             FHVSHK(K)=FHVSETK(K)
         ELSE
-          IF(test_aeqb(THIN(NZ),0._r8))THEN
+          IF(isclose(THIN(NZ),0._r8))THEN
             FHVSETK(K)=1.0_r8-EHVST(1,ipld_nofoliar,NZ)
             FHVSHK(K)=FHVSETK(K)
           ELSE
@@ -1796,7 +1796,7 @@ module PlantDisturbsMod
 !     IF(IHVST(NZ).NE.4.AND.IHVST(NZ).NE.6)THEN
 !     IF(HTNODE(K,NB,NZ).GT.HVST(NZ)
 !    2.OR.IHVST(NZ).EQ.3)THEN
-!     IF(test_aeqb(FHVSETK(K),0._r8).AND.K.GT.0)THEN
+!     IF(isclose(FHVSETK(K),0._r8).AND.K.GT.0)THEN
 !     IF(IBTYP(NZ).EQ.0.OR.IGTYP(NZ).LE.1)THEN
 !     VSTG(NB,NZ)=AZMAX1(VSTG(NB,NZ)-1.0)
 !     ELSE
@@ -1967,7 +1967,7 @@ module PlantDisturbsMod
             ELSE
               FHGT=0._r8
             ENDIF
-            IF(test_aeqb(THIN(NZ),0._r8))THEN
+            IF(isclose(THIN(NZ),0._r8))THEN
               FHVSE(ielmc)=AZMAX1(1._r8-(1._r8-FHGT)*EHVST(1,ipld_woody,NZ))
               FHVSH=FHVSE(ielmc)
             ELSE
@@ -2033,7 +2033,7 @@ module PlantDisturbsMod
               ELSE
                 FHGTK=0._r8
               ENDIF
-              IF(test_aeqb(THIN(NZ),0._r8))THEN
+              IF(isclose(THIN(NZ),0._r8))THEN
                 FHVSETS=AZMAX1(1._r8-FHGTK*EHVST(1,ipld_woody,NZ))
               ELSE
                 FHVSETS=AZMAX1(1._r8-THIN(NZ))
@@ -2051,7 +2051,7 @@ module PlantDisturbsMod
           DO NE=1,npelms
             WGNODE(NE,K,NB,NZ)=FHVSETS*WGNODE(NE,K,NB,NZ)
           ENDDO
-          IF(IHVST(NZ).LE.2.AND.test_aeqb(THIN(NZ),0._r8))THEN
+          IF(IHVST(NZ).LE.2.AND.isclose(THIN(NZ),0._r8))THEN
             HTNODX(K,NB,NZ)=FHVSETS*HTNODX(K,NB,NZ)
             HTNODE(K,NB,NZ)=AMIN1(HTNODE(K,NB,NZ),HVST(NZ))
           ENDIF
@@ -2116,7 +2116,7 @@ module PlantDisturbsMod
 !
         IF(IHVST(NZ).NE.4.AND.IHVST(NZ).NE.6)THEN
           IF(HVST(NZ).LT.HTSTKX.OR.IHVST(NZ).EQ.1.OR.IHVST(NZ).EQ.3)THEN
-            IF(test_aeqb(THIN(NZ),0._r8))THEN
+            IF(isclose(THIN(NZ),0._r8))THEN
               FHVSETG=1.0_r8-EHVST(1,ipld_nofoliar,NZ)
               FHVSHG=FHVSETG
             ELSE

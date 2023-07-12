@@ -3,7 +3,7 @@ module TrnsfrsMod
 ! Description:
 !
   use data_kind_mod, only : r8 => DAT_KIND_R8
-  use minimathmod, only : test_aeqb,AZMAX1
+  use minimathmod, only : isclose,AZMAX1
   use SOMDataType
   use GridConsts
   use FlagDataType
@@ -1145,7 +1145,7 @@ module TrnsfrsMod
 !          :*1=non-band,*B=band
 !
             IF(L.EQ.NUM(M2,M1).AND.N.NE.3)THEN
-              IF(IRCHG(NN,N,N2,N1).EQ.0.OR.test_aeqb(RCHQF,0.0_r8) &
+              IF(IRCHG(NN,N,N2,N1).EQ.0.OR.isclose(RCHQF,0.0_r8) &
                 .OR.QRM(M,N2,N1).LE.ZEROS(N2,N1))THEN
                 call ZeroSoluteFluxFromRecharge(N,NN,M5,M4)
               ELSE

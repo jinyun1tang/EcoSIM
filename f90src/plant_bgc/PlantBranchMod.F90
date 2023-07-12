@@ -2,7 +2,7 @@ module PlantBranchMod
 
 ! Description:
 ! module for plant biological transformations
-  use minimathmod, only : test_aeqb,safe_adb,AZMAX1
+  use minimathmod, only : isclose,safe_adb,AZMAX1
   use data_kind_mod, only : r8 => DAT_KIND_R8
   use EcosimConst
   use GrosubPars
@@ -767,7 +767,7 @@ module PlantBranchMod
     !     XFRE(ielmc),XFRE(ielmn),XFRE(ielmc)=nonstructural C,N,P transfer
     !
           IF(IBTYP(NZ).NE.0.AND.IGTYP(NZ).GT.1 &
-            .AND.NB.EQ.NB1(NZ).AND.test_aeqb(SNCF,0._r8))THEN
+            .AND.NB.EQ.NB1(NZ).AND.isclose(SNCF,0._r8))THEN
             NBY=0
           D584: DO NBL=1,NBR(NZ)
             NBZ(NBL)=0
@@ -1115,7 +1115,7 @@ module PlantBranchMod
 !     CHECK PARTITIONING COEFFICIENTS
 !
   D1000: DO N=1,JPRT
-    IF(N.EQ.3.AND.test_aeqb(SNL1(NZ),0._r8))THEN
+    IF(N.EQ.3.AND.isclose(SNL1(NZ),0._r8))THEN
       PART(N)=0._r8
     ELSE
       PART(N)=AZMAX1(PART(N))
@@ -2071,7 +2071,7 @@ module PlantBranchMod
     IF(K1.EQ.0.AND.KVSTG(NB,NZ).NE.0)K1=JNODS1
     K2=MOD(KVSTG(NB,NZ)-1,JNODS1)
     IF(K2.EQ.0.AND.KVSTG(NB,NZ)-1.NE.0)K2=JNODS1
-    IF(test_aeqb(HTNODE(K1,NB,NZ),0._r8))THEN
+    IF(isclose(HTNODE(K1,NB,NZ),0._r8))THEN
       HTNODE(K1,NB,NZ)=HTNODE(K2,NB,NZ)
     ENDIF
     HTLFB=HTBR+AZMAX1(HTNODE(K1,NB,NZ))

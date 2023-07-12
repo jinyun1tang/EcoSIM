@@ -1,6 +1,6 @@
 module RootMod
   use data_kind_mod, only : r8 => DAT_KIND_R8
-  use minimathmod  , only : test_aeqb,safe_adb,AZMAX1,AZMIN1
+  use minimathmod  , only : safe_adb,AZMAX1,AZMIN1
   use EcosimConst
   use GrosubPars
   use PlantAPIData

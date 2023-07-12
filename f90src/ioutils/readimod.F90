@@ -6,7 +6,7 @@ module readiMod
   use abortutils   , only : endrun
   use ncdio_pio
   use fileUtil     , only : open_safe, check_read
-  use minimathmod  , only : test_aeqb, AZMAX1
+  use minimathmod  , only : isclose, AZMAX1
   use MiniFuncMod  , only : GetDayLength
   use EcoSIMConfig, only : column_mode
   use EcoSIMCtrlMod, only : grid_file_in,lverb,an2_ppm,ao2_ppm
@@ -713,7 +713,7 @@ module readiMod
   !   FHOL: macropore fraction
   !     BKDSI(L,NY,NX)=BKDSI(L,NY,NX)/(1.0_r8-FHOL(L,NY,NX))
           BKDS(L,NY,NX)=BKDSI(L,NY,NX)
-          IF(test_aeqb(BKDS(L,NY,NX),0.0_r8))FHOL(L,NY,NX)=0.0_r8
+          IF(isclose(BKDS(L,NY,NX),0.0_r8))FHOL(L,NY,NX)=0.0_r8
   !     fraction of soil as micropore
           FMPR(L,NY,NX)=(1.0_r8-ROCK(L,NY,NX))*(1.0_r8-FHOL(L,NY,NX))
   !     FC(L,NY,NX)=FC(L,NY,NX)/(1.0-FHOL(L,NY,NX))

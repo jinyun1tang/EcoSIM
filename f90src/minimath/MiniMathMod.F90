@@ -9,8 +9,7 @@ module minimathmod
   private
   public :: safe_adb
   public :: p_adb
-  public :: test_aeqb     !a equals b test, with precision tiny_val
-  public :: test_aneb     !a not equals b test
+  public :: isclose         !test if two values a and b are close in magnitude
   public :: vapsat, vapsat0
   public :: isLeap
   public :: AZMAX1,AZMIN1,AZMAX1t
@@ -54,33 +53,6 @@ module minimathmod
    ans=AMAX1(0._r8,a/b)
    return
    end function p_adb
-!------------------------------------------------------------------------------------------
-   function test_aeqb(a,b)result(ans)
-   !!
-   ! Description:
-   ! a and b are equal within difference tiny_val
-   ! ans = abs(a-b)<tiny_val
-   implicit none
-   real(r8), intent(in) :: a,b
-   logical :: ans
-
-   ans = abs(a-b)<tiny_val
-   return
-   end function test_aeqb
-
-!------------------------------------------------------------------------------------------
-   function test_aneb(a,b)result(ans)
-   !!
-   ! Description:
-   ! a and b are not equal within difference tiny_val
-   ! ans = abs(a-b)>=tiny_val
-   implicit none
-   real(r8), intent(in) :: a,b
-   logical :: ans
-
-   ans = abs(a-b)>=tiny_val
-   return
-   end function test_aneb
 
 
 !------------------------------------------------------------------------------------------
@@ -196,4 +168,25 @@ module minimathmod
   ans=itemp
   end function addone
 
+
+! ----------------------------------------------------------------------
+  function isclose(a,b)result(ans)
+  !DESCRIPTION
+  !determine if a is close to b in magnitude by relative magnitude tiny_val
+
+  implicit none
+  real(r8), intent(in) :: a,b
+  real(r8) :: c,ac,bc
+  logical :: ans
+  
+  c=max(abs(a),(b))  
+  if (c==0._r8) then
+    ans=.True.
+    return 
+  endif
+
+  ac=a/c;bc=b/c  
+  ans=abs((ac-bc)/(ac+bc))<tiny_val
+  end function isclose
+ 
 end module minimathmod

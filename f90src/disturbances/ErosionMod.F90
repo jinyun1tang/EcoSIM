@@ -1,6 +1,6 @@
 module ErosionMod
   use data_kind_mod, only : r8 => DAT_KIND_R8
-  use minimathmod, only : test_aeqb,AZMAX1
+  use minimathmod, only : isclose,AZMAX1
   use MicrobialDataType
   use SOMDataType
   use EcoSIMSolverPar
@@ -372,7 +372,7 @@ module ErosionMod
 !     IN 'WATSUB' TIMES BOUNDARY SEDIMENT CONCENTRATION IN
 !     SURFACE WATER
 !
-      IF(IRCHG(NN,N,N2,N1).EQ.0.OR.test_aeqb(RCHQF,0._r8) &
+      IF(IRCHG(NN,N,N2,N1).EQ.0.OR.isclose(RCHQF,0._r8) &
         .OR.RERSED0(N2,N1).LE.ZEROS(N2,N1))THEN
         RERSED(N,NN,M5,M4)=0._r8
       ELSE
@@ -850,7 +850,7 @@ module ErosionMod
                 ENDIF
               ENDIF
             ENDIF
-            IF(IRCHG(NN,N,N2,N1).EQ.0.OR.test_aeqb(RCHQF,0._r8) &
+            IF(IRCHG(NN,N,N2,N1).EQ.0.OR.isclose(RCHQF,0._r8) &
               .OR.ABS(XSEDER(N,NN,M5,M4)).LE.ZEROS(N2,N1))THEN
               XSANER(N,NN,M5,M4)=0._r8
               XSILER(N,NN,M5,M4)=0._r8
