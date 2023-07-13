@@ -85,35 +85,31 @@ module WatsubMod
   integer :: K0,K1
   integer :: KL,L,L2,LL,M,MM,M1,M2,M3,M4,M5,M6,NX,NY
   integer :: N,N1,N2,N3,N4,N5,N6,NN,N4B,N5B,NUX
-  real(r8):: RAR1,HFLXG
+  real(r8):: RAR1(JY,JX),HeatFlux2Ground(JY,JX)
   REAL(R8):: FKSATS(JY,JX)
+
+  REAL(R8) :: TopLayerWaterVolume(JY,JX)
 ! begin_execution
 !
   curday=i;curhour=j
+
   call PrepWaterEnergyBalance(I,J,NHW,NHE,NVN,NVS,RAR1)
 
   call InitSoilHydrauics(NHW,NHE,NVN,NVS)
 
-!
 ! DYNAMIC LOOP FOR FLUX CALCULATIONS
-! iterate for NPH times
+  ! iterate for NPH times
   D3320: DO M=1,NPH
-    D9895: DO  NX=NHW,NHE
-      D9890: DO  NY=NVN,NVS
 
-! set up top boundary condition, uses RAR1
-        !VOLW2 will be updated in soil surface model
-        DO L=NUM(NY,NX),NL(NY,NX)        
-          VOLW2(L,NY,NX)=VOLW1(L,NY,NX)
-        ENDDO  
+    call ForwardCopyTopLayerWaterVolume(NHW,NHE,NVN,NVS,TopLayerWaterVolume)
 
-        call SurfacePhysModel(M,NX,NY,NHE,NHW,NVS,NVN,RAR1,FKSATS(NY,NX),HFLXG)
+    ! run surface energy balance model, uses RAR1
+    call SurfacePhysModel(M,NHE,NHW,NVS,NVN,RAR1,FKSATS,HeatFlux2Ground,TopLayerWaterVolume)
 
-! do 3D water flow
-        call Subsurface3DFlow(M,NY,NX,NHE,NVS,FKSATS(NY,NX),HFLXG)
-
-      ENDDO D9890
-    ENDDO D9895
+    call CopySoilWaterVolume(NHW,NHE,NVN,NVS,TopLayerWaterVolume)
+        
+    ! do 3D water flow
+    call Subsurface3DFlow(M,NHW,NHE,NVN,NVS,FKSATS,HeatFlux2Ground)
 
     call LateralWaterHeatExch(M,NHW,NHE,NVN,NVS,FKSATS)
 !
@@ -127,6 +123,44 @@ module WatsubMod
   ENDDO D3320
 
   END subroutine watsub
+!------------------------------------------------------------------------------------------  
+
+  subroutine ForwardCopyTopLayerWaterVolume(NHW,NHE,NVN,NVS,TopLayerWaterVolume)
+  !
+  !make a copy of toplayer water content
+  implicit none
+  integer, intent(in) :: NHW,NHE,NVN,NVS
+  real(r8), dimension(:,:),intent(out) :: TopLayerWaterVolume(JY,JX)
+  integer :: NY,NX
+
+  DO NX=NHW,NHE
+    DO  NY=NVN,NVS
+      TopLayerWaterVolume(NY,NX)= VOLW2(NUM(NY,NX),NY,NX)
+    ENDDO
+  ENDDO
+  end subroutine ForwardCopyTopLayerWaterVolume
+
+!------------------------------------------------------------------------------------------  
+
+  subroutine CopySoilWaterVolume(NHW,NHE,NVN,NVS,TopLayerWaterVolume)
+
+  implicit none
+  integer, intent(in) :: NHW,NHE,NVN,NVS
+  real(r8), dimension(:,:),intent(in) :: TopLayerWaterVolume
+  integer :: L,NY,NX
+  
+  !VOLW2 will be updated in soil surface model
+
+  DO NX=NHW,NHE
+    DO  NY=NVN,NVS  
+      DO L=NUM(NY,NX)+1,NL(NY,NX)        
+        VOLW2(L,NY,NX)=VOLW1(L,NY,NX)
+      ENDDO  
+      VOLW2(NUM(NY,NX),NY,NX)=TopLayerWaterVolume(NY,NX)
+    ENDDO
+  ENDDO
+  end subroutine CopySoilWaterVolume
+
 
 !------------------------------------------------------------------------------------------  
   subroutine LocalCopySoilVars(I,NHW,NHE,NVN,NVS)
@@ -277,7 +311,7 @@ module WatsubMod
   implicit none
   integer :: I,J
   integer, intent(in) :: NHW,NHE,NVN,NVS
-  real(r8),intent(out):: RAR1
+  real(r8),dimension(:,:),intent(out):: RAR1
   integer :: NY,NX
 
 ! begin_execution
@@ -371,12 +405,12 @@ module WatsubMod
 
 !------------------------------------------------------------------------------------------
 
-  subroutine Subsurface3DFlow(M,NY,NX,NHE,NVS,FKSAT,HFLXG)
+  subroutine Subsurface3DFlow(M,NHW,NHE,NVN,NVS,FKSAT,HeatFlux2Ground)
   implicit none
-  integer, intent(in)  :: M,NY,NX,NHE,NVS
-  real(r8), intent(in) :: FKSAT
-  real(r8), intent(in) :: HFLXG
-  integer :: N,N1,N2,N3,N4,N5,N6,L,LL,K1,KL
+  integer, intent(in)  :: M,NHW,NHE,NVN,NVS
+  real(r8), dimension(:,:),intent(in) :: FKSAT(:,:)
+  real(r8), dimension(:,:),intent(in) :: HeatFlux2Ground(:,:)
+  integer :: N,N1,N2,N3,N4,N5,N6,L,LL,K1,KL,NY,NX
   real(r8) :: DTKX
   real(r8) :: WTHET1,FCDX,FCLX,FCX
   real(r8) :: PSISV1,TKY,PSDX
@@ -395,6 +429,10 @@ module WatsubMod
   !     N3,N2,N1=L,NY,NX of source grid cell
   !     N6,N5,N4=L,NY,NX of destination grid cell
   !
+
+  DO NX=NHW,NHE
+    DO  NY=NVN,NVS
+
   call InitSoil3DModel(M,NY,NX)
 
   IFLGH=0
@@ -491,7 +529,7 @@ module WatsubMod
           !     DARCY FLOW IF BOTH CELLS ARE SATURATED
           !     (CURRENT WATER POTENTIAL > AIR ENTRY WATER POTENTIAL)
           !
-          call MicporeDarcyFlow(NY,NX,N,N1,N2,N3,N4,N5,N6,THETA1,THETAL,FKSAT,HWFLWL,PSISV1,PSISVL)          
+          call MicporeDarcyFlow(NY,NX,N,N1,N2,N3,N4,N5,N6,THETA1,THETAL,FKSAT(NY,NX),HWFLWL,PSISV1,PSISVL)          
 
 !
           !     MACROPORE FLOW FROM POISEUILLE FLOW IF MACROPORES PRESENT
@@ -528,7 +566,7 @@ module WatsubMod
 
           ATCNDL=(2.0_r8*TCND1*TCND2)/(TCND1*DLYR(N,N6,N5,N4)+TCND2*DLYR(N,N3,N2,N1))
 
-          call Solve4Heat(N,NY,NX,N1,N2,N3,N4,N5,N6,ATCNDL,HWFLVL,HFLXG)
+          call Solve4Heat(N,NY,NX,N1,N2,N3,N4,N5,N6,ATCNDL,HWFLVL,HeatFlux2Ground(NY,NX))
 
           !
           !     TOTAL WATER, VAPOR AND HEAT FLUXES
@@ -577,7 +615,8 @@ module WatsubMod
       ENDIF
     ENDDO D4320
   ENDDO D4400
-  
+  ENDDO
+  ENDDO  
   end subroutine Subsurface3DFlow
 !------------------------------------------------------------------------------------------
 
@@ -1637,18 +1676,18 @@ module WatsubMod
   end subroutine WaterVaporFlow  
 !------------------------------------------------------------------------------------------
 
-  subroutine Solve4Heat(N,NY,NX,N1,N2,N3,N4,N5,N6,ATCNDL,HWFLVL,HFLXG)
+  subroutine Solve4Heat(N,NY,NX,N1,N2,N3,N4,N5,N6,ATCNDL,HWFLVL,HeatFlux2Ground)
   implicit none
   integer , intent(in) :: N,NY,NX,N1,N2,N3,N4,N5,N6
-  real(r8), intent(in) :: ATCNDL,HWFLVL,HFLXG
+  real(r8), intent(in) :: ATCNDL,HWFLVL,HeatFlux2Ground
   real(r8) :: TK1X,TKLX,TKY,HFLWC,HFLWX,HFLWSX
   !
   !     HEAT FLOW FROM THERMAL CONDUCTIVITY AND TEMPERATURE GRADIENT
   !
   !     VHCP1,VHCPW=volumetric heat capacity of soil,snowpack
   !     TK1X,TKLX=interim temperatures of source,destination
-  !     HWFLVL,HFLXG=convective heat from soil vapor flux
-  !     HFLXG=storage heat flux from snowpack
+  !     HWFLVL,HeatFlux2Ground=convective heat from soil vapor flux
+  !     HeatFlux2Ground=storage heat flux from snowpack
   !     TKY=equilibrium source-destination temperature
   !     HFLWC,HFLWX=source-destination heat flux unltd,ltd by heat
   !     ATCNDL=source-destination thermal conductance
@@ -1657,10 +1696,10 @@ module WatsubMod
   !
   IF(VHCP1(N3,N2,N1).GT.VHCPNX(NY,NX))THEN
     IF(N3.EQ.NUM(NY,NX).AND.VHCPW(1,N2,N1).LE.VHCPWX(N2,N1))THEN
-      TK1X=TK1(N3,N2,N1)-(HWFLVL-HFLXG)/VHCP1(N3,N2,N1)
+      TK1X=TK1(N3,N2,N1)-(HWFLVL-HeatFlux2Ground)/VHCP1(N3,N2,N1)
       if(abs(TK1X)>1.e5_r8)then
         write(*,*)'TK1(N3,N2,N1)-HWFLVL/VHCP1(N3,N2,N1)',&
-          TK1(N3,N2,N1),HWFLVL,HFLXG,VHCP1(N3,N2,N1)
+          TK1(N3,N2,N1),HWFLVL,HeatFlux2Ground,VHCP1(N3,N2,N1)
         write(*,*)'N1,n2,n3',N1,N2,N3
         call endrun(trim(mod_filename)//' at line',__LINE__)
       endif
