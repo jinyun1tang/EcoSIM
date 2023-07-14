@@ -769,7 +769,7 @@ implicit none
 
     plt_soilchem%GSolbility(idg_beg:idg_end-1,L) =GSolbility(idg_beg:idg_end-1,L,NY,NX)
 
-    plt_ew%PSIST(L)       =PSIST(L,NY,NX)
+    plt_ew%TotalSoilH2OPSIMPa(L)       =TotalSoilH2OPSIMPa(L,NY,NX)
     plt_bgcr%RPO4Y(L)     =RPO4Y(L,NY,NX)
     plt_bgcr%RPOBY(L)     =RPOBY(L,NY,NX)
     plt_bgcr%RP14Y(L)     =RP14Y(L,NY,NX)

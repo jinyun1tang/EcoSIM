@@ -18,6 +18,7 @@ module StartqMod
   use GridDataType
   use EcoSIMConfig
   use GrosubPars
+  use UnitMod, only : units
   use EcoSiMParDataMod, only : pltpar
   implicit none
 
@@ -671,9 +672,9 @@ module StartqMod
   ENGYX(NZ,NY,NX)=0._r8
   DTKC(NZ,NY,NX)=0._r8
   TCC(NZ,NY,NX)=ATCA(NY,NX)
-  TKC(NZ,NY,NX)=TCC(NZ,NY,NX)+TC2K
+  TKC(NZ,NY,NX)=units%Celcius2Kelvin(TCC(NZ,NY,NX))
   TCG(NZ,NY,NX)=TCC(NZ,NY,NX)
-  TKG(NZ,NY,NX)=TCG(NZ,NY,NX)+TC2K
+  TKG(NZ,NY,NX)=units%Celcius2Kelvin(TCG(NZ,NY,NX))
   TFN3(NZ,NY,NX)=1.0
   PSILT(NZ,NY,NX)=-1.0E-03
   PSILO(NZ,NY,NX)=OSMO(NZ,NY,NX)+PSILT(NZ,NY,NX)

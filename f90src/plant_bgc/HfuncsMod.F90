@@ -95,7 +95,7 @@ module HfuncsMod
 !
 !         INITIALIZE VARIABLES IN ACTIVE PFT
 !
-      IF(IFLGC(NZ).EQ.ipltactv)THEN
+      IF(IFLGC(NZ).EQ.PlantIsActive)THEN
 
         call stage_phenology_vars(I,J,NZ)
 
@@ -202,7 +202,7 @@ module HfuncsMod
           ENDIF
 
           IF(DATAP(NZ).NE.'NO'.AND.IDTH(NZ).EQ.0)then
-            IFLGC(NZ)=ipltactv
+            IFLGC(NZ)=PlantIsActive
           endif  
         ENDIF
       ELSE
@@ -222,7 +222,7 @@ module HfuncsMod
           TNBP=TNBP+WTRVX(NZ)
         ENDIF
         IF(DATAP(NZ).NE.'NO'.AND.IDTH(NZ).EQ.0)then
-          IFLGC(NZ)=ipltactv
+          IFLGC(NZ)=PlantIsActive
         endif  
       ENDIF
     ENDIF

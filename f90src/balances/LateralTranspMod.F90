@@ -21,6 +21,7 @@ module LateralTranspMod
   use minimathmod , only : AZMAX1
   use EcoSIMConfig, only : jcplx => jcplxc,NFGs=>NFGsc
   use EcoSIMConfig, only : nlbiomcp=>nlbiomcpc
+  use SnowBalMod
 implicit none
   private
   character(len=*), parameter :: mod_filename = __FILE__
@@ -115,9 +116,8 @@ implicit none
         IF(N.NE.3)THEN
 
           call FluxesFromRunoff(N,N1,N2,N4,N5,N4B,N5B)
-          !
-          !     NET SALT FLUXES FROM RUNOFF AND SNOWPACK
-          call SaltThruFluxRunoffAndSnowpack(N,N1,N2,N4,N5,N4B,N5B)
+
+          call FluxFromSnowRunoff(N,N1,N2,N4,N5,N4B,N5B)
           !
     !
         ELSEIF(N.EQ.3)THEN
@@ -156,10 +156,6 @@ implicit none
 !
   TQR(NY,NX)=0.0_r8
   THQR(NY,NX)=0.0_r8
-  TQS(NY,NX)=0.0_r8
-  TQW(NY,NX)=0.0_r8
-  TQI(NY,NX)=0.0_r8
-  THQS(NY,NX)=0.0_r8
 !
 !     INITIALIZE NET SOLUTE AND GAS FLUXES FOR RUNOFF
 !
@@ -170,26 +166,8 @@ implicit none
     TOAQRS(K,NY,NX)=0.0_r8
   ENDDO D9960
 
-  trcg_TQR(idg_beg:idg_end-1,NY,NX)=0.0_r8
-  trcn_TQR(ids_nut_beg:ids_nuts_end,NY,NX)=0.0_r8
-  trcg_QSS(idg_beg:idg_end-1,NY,NX)=0.0_r8
-  trcn_QSS(ids_nut_beg:ids_nuts_end,NY,NX)=0.0_r8
-  DO  L=1,JS
-    trcg_TBLS(idg_beg:idg_end-1,L,NY,NX)=0.0_r8
-    trcn_TBLS(ids_nut_beg:ids_nuts_end,L,NY,NX)=0.0_r8
-  ENDDO
+  call ZeroSnowArrays(NY,NX)
 
-  IF(salt_model)THEN
-    trcsa_TQR(idsa_beg:idsa_end,NY,NX)=0.0_r8
-
-    trcsa_TQS(idsa_beg:idsa_end,NY,NX)=0.0_r8
-!
-!     INITIALIZE NET SOLUTE AND GAS FLUXES FROM SNOWPACK DRIFT
-!
-    DO  L=1,JS
-      trcsa_TBLS(idsa_beg:idsa_end,L,NY,NX)=0.0_r8
-    ENDDO
-  ENDIF
 !
 !     INITIALIZE NET SEDIMENT FLUXES FROM EROSION
 !
@@ -233,13 +211,8 @@ implicit none
 !
 !     INITIALIZE NET SNOWPACK FLUXES WITHIN SNOWPACK
 !
-  DO  L=1,JS
-    TFLWS(L,NY,NX)=0.0_r8
-    TFLWW(L,NY,NX)=0.0_r8
-    TFLWI(L,NY,NX)=0.0_r8
-    THFLWW(L,NY,NX)=0.0_r8
-  ENDDO
   end subroutine ZeroFluxArrays
+
 !------------------------------------------------------------------------------------------
 
   subroutine ZeroFluxAccumulators(NY,NX)
@@ -302,6 +275,7 @@ implicit none
   !     QS,QW,QI=snow,water,ice transfer from watsub.f
   !     HQS=convective heat transfer from snow,water,ice transfer from watsub.f
   !
+
   D1202: DO NN=1,2
     !water flux
     TQR(N2,N1)=TQR(N2,N1)+QR(N,NN,N2,N1)
@@ -314,14 +288,7 @@ implicit none
       TOAQRS(K,N2,N1)=TOAQRS(K,N2,N1)+XOAQRS(K,N,NN,N2,N1)
     ENDDO D8590
 
-    !gaseous tracers
-    DO NTG=idg_beg,idg_end-1
-      trcg_TQR(NTG,N2,N1)=trcg_TQR(NTG,N2,N1)+trcg_XRS(NTG,N,NN,N2,N1)
-    ENDDO
-    !nutrient tracres
-    DO NTN=ids_nut_beg,ids_nuts_end
-      trcn_TQR(NTN,N2,N1)=trcn_TQR(NTN,N2,N1)+trcn_XRS(NTN,N,NN,N2,N1)
-    ENDDO
+
 
     IF(IFLBH(N,NN,N5,N4).EQ.0)THEN
       !there is lateral runoff
@@ -336,13 +303,6 @@ implicit none
         TOAQRS(K,N2,N1)=TOAQRS(K,N2,N1)-XOAQRS(K,N,NN,N5,N4)
       ENDDO D8591
 
-      DO NTG=idg_beg,idg_end-1
-        trcg_TQR(NTG,N2,N1)=trcg_TQR(NTG,N2,N1)-trcg_XRS(NTG,N,NN,N5,N4)
-      ENDDO
-
-      DO NTN=ids_nut_beg,ids_nuts_end
-        trcn_TQR(NTN,N2,N1)=trcn_TQR(NTN,N2,N1)-trcn_XRS(NTN,N,NN,N5,N4)
-      ENDDO
     ENDIF
 
     IF(N4B.GT.0.AND.N5B.GT.0.AND.NN.EQ.1)THEN
@@ -355,244 +315,15 @@ implicit none
         TOAQRS(K,N2,N1)=TOAQRS(K,N2,N1)-XOAQRS(K,N,NN,N5B,N4B)
       ENDDO D8592
 
-      DO NTG=idg_beg,idg_end-1
-        trcg_TQR(NTG,N2,N1)=trcg_TQR(NTG,N2,N1)-trcg_XRS(NTG,N,NN,N5B,N4B)
-      ENDDO
-
-      DO NTN=ids_nut_beg,ids_nuts_end
-        trcn_TQR(NTN,N2,N1)=trcn_TQR(NTN,N2,N1)-trcn_XRS(NTN,N,NN,N5B,N4B)
-      ENDDO
       !     WRITE(*,6631)'TQRB',I,J,N1,N2,N4B,N5B,N,NN
       !    2,IFLBH(N,NN,N5B,N4B)
       !    2,TQR(N2,N1),QR(N,NN,N5B,N4B)
 !6631  FORMAT(A8,9I4,12E12.4)
     ENDIF
   ENDDO D1202
-  TQS(N2,N1)=TQS(N2,N1)+QS(N,N2,N1)-QS(N,N5,N4)
-  TQW(N2,N1)=TQW(N2,N1)+QW(N,N2,N1)-QW(N,N5,N4)
-  TQI(N2,N1)=TQI(N2,N1)+QI(N,N2,N1)-QI(N,N5,N4)
-  THQS(N2,N1)=THQS(N2,N1)+HQS(N,N2,N1)-HQS(N,N5,N4)
-  !
-  !     NET GAS AND SOLUTE FLUXES FROM RUNOFF AND SNOWPACK
-  !
-  !     T*QRS=net overland solute flux from runoff
-  !     X*QRS=solute in runoff from trnsfr.f
-  !     T*QSS=net overland solute flux from snowpack
-  !     X*QSS=solute in snowpack flux from trnsfr.f
-  !     solute code:CO=CO2,CH=CH4,OX=O2,NG=N2,N2=N2O,HG=H2
-  !             :OC=DOC,ON=DON,OP=DOP,OA=acetate
-  !             :NH4=NH4,NH3=NH3,NO3=NO3,NO2=NO2,P14=HPO4,PO4=H2PO4 in non-band
-  !             :N4B=NH4,N3B=NH3,NOB=NO3,N2B=NO2,P1B=HPO4,POB=H2PO4 in band
-  !
-  trcg_QSS(idg_CO2,N2,N1)=trcg_QSS(idg_CO2,N2,N1)+XCOQSS(N,N2,N1)-XCOQSS(N,N5,N4)
-  trcg_QSS(idg_CH4,N2,N1)=trcg_QSS(idg_CH4,N2,N1)+XCHQSS(N,N2,N1)-XCHQSS(N,N5,N4)
-  trcg_QSS(idg_O2,N2,N1)=trcg_QSS(idg_O2,N2,N1)+XOXQSS(N,N2,N1)-XOXQSS(N,N5,N4)
-  trcg_QSS(idg_N2,N2,N1)=trcg_QSS(idg_N2,N2,N1)+XNGQSS(N,N2,N1)-XNGQSS(N,N5,N4)
-  trcg_QSS(idg_N2O,N2,N1)=trcg_QSS(idg_N2O,N2,N1)+XN2QSS(N,N2,N1)-XN2QSS(N,N5,N4)
-  trcg_QSS(idg_NH3,N2,N1)=trcg_QSS(idg_NH3,N2,N1)+XN3QSS(N,N2,N1)-XN3QSS(N,N5,N4)
+  
 
-  trcn_QSS(ids_NH4,N2,N1)=trcn_QSS(ids_NH4,N2,N1)+XN4QSS(N,N2,N1)-XN4QSS(N,N5,N4)
-  trcn_QSS(ids_NO3,N2,N1)=trcn_QSS(ids_NO3,N2,N1)+XNOQSS(N,N2,N1)-XNOQSS(N,N5,N4)
-  trcn_QSS(ids_H1PO4,N2,N1)=trcn_QSS(ids_H1PO4,N2,N1)+XP1QSS(N,N2,N1)-XP1QSS(N,N5,N4)
-  trcn_QSS(ids_H2PO4,N2,N1)=trcn_QSS(ids_H2PO4,N2,N1)+XP4QSS(N,N2,N1)-XP4QSS(N,N5,N4)
   end subroutine FluxesFromRunoff
-!------------------------------------------------------------------------------------------
-
-  subroutine SaltThruFluxRunoffAndSnowpack(N,N1,N2,N4,N5,N4B,N5B)
-  implicit none
-  integer, intent(in) :: N,N1,N2,N4,N5,N4B,N5B
-
-  integer :: NN,NTSA
-!     begin_execution
-!
-!     TQR*=net overland solute flux in runoff
-!     XQR*=solute in runoff from trnsfrs.f
-!     TQS*=net overland solute flux in snow drift
-!     XQS*=solute in snow drift from trnsfrs.f
-!     salt code: *HY*=H+,*OH*=OH-,*AL*=Al3+,*FE*=Fe3+,*CA*=Ca2+,*MG*=Mg2+
-!          :*NA*=Na+,*KA*=K+,*SO4*=SO42-,*CL*=Cl-,*CO3*=CO32-,*HCO3*=HCO3-
-!          :*CO2*=CO2,*ALO1*=AlOH2-,*ALOH2=AlOH2-,*ALOH3*=AlOH3
-!          :*ALOH4*=AlOH4+,*ALS*=AlSO4+,*FEO1*=FeOH2-,*FEOH2=F3OH2-
-!          :*FEOH3*=FeOH3,*FEOH4*=FeOH4+,*FES*=FeSO4+,*CAO*=CaOH
-!          :*CAC*=CaCO3,*CAH*=CaHCO3-,*CAS*=CaSO4,*MGO*=MgOH,*MGC*=MgCO3
-!          :*MHG*=MgHCO3-,*MGS*=MgSO4,*NAC*=NaCO3-,*NAS*=NaSO4-,*KAS*=KSO4-
-!     phosphorus code: *H0P*=PO43-,*H3P*=H3PO4,*F1P*=FeHPO42-,*F2P*=F1H2PO4-
-!          :*C0P*=CaPO4-,*C1P*=CaHPO4,*C2P*=CaH2PO4+,*M1P*=MgHPO4,*COO*=COOH-
-!          :*1=non-band,*B=band
-!
-  IF(salt_model)THEN
-    D1203: DO NN=1,2
-
-      DO NTSA=idsa_beg,idsa_end
-        trcsa_TQR(NTSA,N2,N1)=trcsa_TQR(NTSA,N2,N1)+trcsa_XQR(NTSA,N,NN,N2,N1)
-      ENDDO
-
-      IF(IFLBH(N,NN,N5,N4).EQ.0)THEN
-! runoff direction
-        DO NTSA=idsa_beg,idsa_end
-          trcsa_TQR(NTSA,N2,N1)=trcsa_TQR(NTSA,N2,N1)-trcsa_XQR(NTSA,N,NN,N5,N4)
-        ENDDO
-      ENDIF
-
-      IF(N4B.GT.0.AND.N5B.GT.0.AND.NN.EQ.1)THEN
-        DO NTSA=idsa_beg,idsa_end
-          trcsa_TQR(NTSA,N2,N1)=trcsa_TQR(NTSA,N2,N1)-trcsa_XQR(NTSA,N,NN,N5B,N4B)
-        ENDDO
-      ENDIF
-    ENDDO D1203
-
-    DO NTSA=idsa_beg,idsa_end
-      trcsa_TQS(NTSA,N2,N1)=trcsa_TQS(NTSA,N2,N1)+trcsa_XQS(NTSA,N,N2,N1)-trcsa_XQS(NTSA,N,N5,N4)
-    ENDDO
-  ENDIF
-  end subroutine SaltThruFluxRunoffAndSnowpack
-!------------------------------------------------------------------------------------------
-
-  subroutine SaltFromRunoffSnowpack(N1,N2,NY,NX)
-  implicit none
-  integer, intent(in) :: N1,N2,NY,NX
-  integer :: LS, LS2
-  integer :: NTG,NTN,NTSA,NTS
-!     begin_execution
-!     NET WATER AND HEAT FLUXES THROUGH SNOWPACK
-!
-!     VHCPW,VHCPWX=current, minimum snowpack heat capacities
-!     TFLWS,TFLWW,TFLWI=net fluxes of snow,water,ice in snowpack
-!     THFLWW=convective heat fluxes of snow,water,ice in snowpack
-!     XFLWS,XFLWW,XFLWI=snow,water,ice transfer from watsub.f
-!     XHFLWW=convective heat flux from snow,water,ice transfer from watsub.f
-!     FLSW,FLSWH,FLSWR=water flux from lowest snow layer to soil macropore,micropore,litter
-!     HFLSW,HFLSWR=heat flux from lowest snow layer to soil,litter
-
-  D1205: DO LS=1,JS
-    IF(VHCPW(LS,NY,NX).GT.VHCPWX(NY,NX))THEN
-      LS2=MIN(JS,LS+1)
-!
-!     IF LOWER LAYER IS IN THE SNOWPACK
-!
-      IF(LS.LT.JS.AND.VHCPW(LS2,N2,N1).GT.VHCPWX(N2,N1))THEN
-        TFLWS(LS,N2,N1)=TFLWS(LS,N2,N1)+XFLWS(LS,N2,N1)-XFLWS(LS2,N2,N1)
-        TFLWW(LS,N2,N1)=TFLWW(LS,N2,N1)+XFLWW(LS,N2,N1)-XFLWW(LS2,N2,N1) &
-          -FLSWR(LS,N2,N1)-FLSW(LS,N2,N1)-FLSWH(LS,N2,N1)
-        TFLWI(LS,N2,N1)=TFLWI(LS,N2,N1)+XFLWI(LS,N2,N1)-XFLWI(LS2,N2,N1)
-        THFLWW(LS,N2,N1)=THFLWW(LS,N2,N1)+XHFLWW(LS,N2,N1) &
-          -XHFLWW(LS2,N2,N1)-HFLSWR(LS,N2,N1)-HFLSW(LS,N2,N1)
-
-!     NET SOLUTE FLUXES THROUGH SNOWPACK
-!
-!     T*BLS=net solute flux in snowpack
-!     X*BLS=solute flux in snowpack from trnsfr.f
-!     solute code:CO=CO2,CH=CH4,OX=O2,NG=N2,N2=N2O,HG=H2
-!             :OC=DOC,ON=DON,OP=DOP,OA=acetate
-!             :NH4=NH4,NH3=NH3,NO3=NO3,NO2=NO2,P14=HPO4,PO4=H2PO4 in non-band
-!             :N4B=NH4,N3B=NH3,NOB=NO3,N2B=NO2,P1B=HPO4,POB=H2PO4 in band
-!
-        DO NTG=idg_beg,idg_end-1
-          trcg_TBLS(NTG,LS,N2,N1)=trcg_TBLS(NTG,LS,N2,N1)+trcg_XBLS(NTG,LS,N2,N1) &
-            -trcg_XBLS(NTG,LS2,N2,N1)
-        ENDDO
-
-        DO NTN=ids_nut_beg,ids_nuts_end
-          trcn_TBLS(NTN,LS,N2,N1)=trcn_TBLS(NTN,LS,N2,N1)+trcn_XBLS(NTN,LS,N2,N1) &
-            -trcn_XBLS(NTN,LS2,N2,N1)
-        ENDDO
-!
-!     NET SALT FLUXES THROUGH SNOWPACK
-!
-!     T*BLS=net solute flux in snowpack
-!     X*BLS=solute flux in snowpack from trnsfrs.f
-!     salt code: *HY*=H+,*OH*=OH-,*AL*=Al3+,*FE*=Fe3+,*CA*=Ca2+,*MG*=Mg2+
-!          :*NA*=Na+,*KA*=K+,*SO4*=SO42-,*CL*=Cl-,*CO3*=CO32-,*HCO3*=HCO3-
-!          :*CO2*=CO2,*ALO1*=AlOH2-,*ALOH2=AlOH2-,*ALOH3*=AlOH3
-!          :*ALOH4*=AlOH4+,*ALS*=AlSO4+,*FEO1*=FeOH2-,*FEOH2=F3OH2-
-!          :*FEOH3*=FeOH3,*FEOH4*=FeOH4+,*FES*=FeSO4+,*CAO*=CaOH
-!          :*CAC*=CaCO3,*CAH*=CaHCO3-,*CAS*=CaSO4,*MGO*=MgOH,*MGC*=MgCO3
-!          :*MHG*=MgHCO3-,*MGS*=MgSO4,*NAC*=NaCO3-,*NAS*=NaSO4-,*KAS*=KSO4-
-!     phosphorus code: *H0P*=PO43-,*H3P*=H3PO4,*F1P*=FeHPO42-,*F2P*=F1H2PO4-
-!          :*C0P*=CaPO4-,*C1P*=CaHPO4,*C2P*=CaH2PO4+,*M1P*=MgHPO4,*COO*=COOH-
-!          :*1=non-band,*B=band
-!
-        IF(salt_model)THEN
-          DO NTSA=idsa_beg,idsa_end
-            trcsa_TBLS(NTSA,LS,N2,N1)=trcsa_TBLS(NTSA,LS,N2,N1)+trcsa_XBLS(NTSA,LS,N2,N1) &
-            -trcsa_XBLS(NTSA,LS2,N2,N1)
-          ENDDO
-        ENDIF
-!
-!     IF LOWER LAYER IS THE LITTER AND SOIL SURFACE
-!
-      ELSE
-        TFLWS(LS,N2,N1)=TFLWS(LS,N2,N1)+XFLWS(LS,N2,N1)
-        TFLWW(LS,N2,N1)=TFLWW(LS,N2,N1)+XFLWW(LS,N2,N1) &
-          -FLSWR(LS,N2,N1)-FLSW(LS,N2,N1)-FLSWH(LS,N2,N1)
-        TFLWI(LS,N2,N1)=TFLWI(LS,N2,N1)+XFLWI(LS,N2,N1)
-        THFLWW(LS,N2,N1)=THFLWW(LS,N2,N1)+XHFLWW(LS,N2,N1) &
-          -HFLSWR(LS,N2,N1)-HFLSW(LS,N2,N1)
-! and NH3B
-        DO NTG=idg_beg,idg_end-1
-          trcg_TBLS(NTG,LS,N2,N1)=trcg_TBLS(NTG,LS,N2,N1)+trcg_XBLS(NTG,LS,N2,N1) &
-            -trcs_XFLS(NTG,3,0,N2,N1)-trcs_XFLS(NTG,3,NUM(N2,N1),N2,N1) &
-            -trcs_XFHS(NTG,3,NUM(N2,N1),N2,N1)
-        ENDDO
-
-        DO NTN=ids_nut_beg,ids_nuts_end
-          trcn_TBLS(NTN,LS,N2,N1)=trcn_TBLS(NTN,LS,N2,N1)+trcn_XBLS(NTN,LS,N2,N1) &
-            -trcs_XFLS(NTN,3,0,N2,N1)-trcs_XFLS(NTN,3,NUM(N2,N1),N2,N1) &
-            -trcs_XFHS(NTN,3,NUM(N2,N1),N2,N1)
-        ENDDO
-
-!add band flux
-        trcg_TBLS(idg_NH3,LS,N2,N1)=trcg_TBLS(idg_NH3,LS,N2,N1) &
-          -trcs_XFLS(idg_NH3B,3,NUM(N2,N1),N2,N1)-trcs_XFHS(idg_NH3B,3,NUM(N2,N1),N2,N1)
-
-        DO NTS=0,ids_nuts
-          trcn_TBLS(ids_NH4+NTS,LS,N2,N1)=trcn_TBLS(ids_NH4+NTS,LS,N2,N1) &
-            -trcs_XFLS(ids_NH4B+NTS,3,NUM(N2,N1),N2,N1)-trcs_XFHS(ids_NH4B+NTS,3,NUM(N2,N1),N2,N1)
-        ENDDO
-
-        IF(salt_model)THEN
-          DO NTSA=idsa_beg,idsa_end
-            trcsa_TBLS(NTSA,LS,NY,NX)=trcsa_TBLS(NTSA,LS,NY,NX)+trcsa_XBLS(NTSA,LS,NY,NX) &
-              -trcsa_XFLS(NTSA,3,0,N2,N1)-trcsa_XFLS(NTSA,3,NUM(N2,N1),N2,N1) &
-              -trcsa_XFHS(NTSA,3,NUM(N2,N1),N2,N1)
-          ENDDO
-
-!add band flux
-          DO NTSA=0,idsa_nuts
-            trcsa_TBLS(idsa_H0PO4+NTSA,LS,NY,NX)=trcsa_TBLS(idsa_H0PO4+NTSA,LS,NY,NX) &
-              -trcsa_XFLS(idsa_H0PO4B+NTSA,3,NUM(N2,N1),N2,N1) &
-              -trcsa_XFHS(idsa_H0PO4B+NTSA,3,NUM(N2,N1),N2,N1)
-          ENDDO
-        ENDIF
-      ENDIF
-!
-!     WATER,GAS,SOLUTE,SALT FLUXES INTO SNOWPACK SURFACE
-!
-    ELSEIF(LS.EQ.1)THEN
-      IF(abs(XFLWS(LS,N2,N1))>0._r8)THEN
-        TFLWS(LS,N2,N1)=TFLWS(LS,N2,N1)+XFLWS(LS,N2,N1)
-        TFLWW(LS,N2,N1)=TFLWW(LS,N2,N1)+XFLWW(LS,N2,N1)
-        TFLWI(LS,N2,N1)=TFLWI(LS,N2,N1)+XFLWI(LS,N2,N1)
-        THFLWW(LS,N2,N1)=THFLWW(LS,N2,N1)+XHFLWW(LS,N2,N1)
-
-        DO NTG=idg_beg,idg_end-1
-          trcg_TBLS(NTG,LS,N2,N1)=trcg_TBLS(NTG,LS,N2,N1)+trcg_XBLS(NTG,LS,N2,N1)
-        ENDDO
-
-        DO NTN=ids_nut_beg,ids_nuts_end
-          trcn_TBLS(NTN,LS,N2,N1)=trcn_TBLS(NTN,LS,N2,N1)+trcn_XBLS(NTN,LS,N2,N1)
-        ENDDO
-
-        IF(salt_model)THEN
-          DO NTSA=idsa_beg,idsa_end
-            trcsa_TBLS(NTSA,LS,N2,N1)=trcsa_TBLS(NTSA,LS,N2,N1)+trcsa_XBLS(NTSA,LS,N2,N1)
-          ENDDO
-
-        ENDIF
-      ENDIF
-    ENDIF
-  ENDDO D1205
-  end subroutine SaltFromRunoffSnowpack
 !------------------------------------------------------------------------------------------
 
   subroutine TotalFluxFromSedmentTransp(N,N1,N2,N4 &

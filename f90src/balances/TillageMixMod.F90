@@ -19,6 +19,7 @@ module TillageMixMod
   use EcoSIMCtrlDataType
   USE EcoSimSumDataType
   use EcoSIMConfig , only : ndbiomcp => ndbiomcpc
+  use UnitMod, only : units
   implicit none
   character(len=*),private, parameter :: mod_filename = __FILE__
   public :: ApplyTillageMixing
@@ -492,7 +493,7 @@ module TillageMixMod
         VHCP(L,NY,NX)=VHCM(L,NY,NX)+cpw*(VOLW(L,NY,NX)+VOLWH(L,NY,NX)) &
           +cpi*(VOLI(L,NY,NX)+VOLIH(L,NY,NX))
         TKS(L,NY,NX)=(ENGYM+ENGYL)/VHCP(L,NY,NX)
-        TCS(L,NY,NX)=TKS(L,NY,NX)-TC2K
+        TCS(L,NY,NX)=units%Kelvin2Celcius(TKS(L,NY,NX))
         DO NTN=ifertn_beg,ifertn_end
           FertN_soil(NTN,L,NY,NX)=TI*FertN_soil(NTN,L,NY,NX) &
             +CORP*(FI*TfertN_soil(NTN)-TI*FertN_soil(NTN,L,NY,NX))&

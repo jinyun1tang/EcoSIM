@@ -36,6 +36,7 @@ implicit none
     procedure, public :: Celcius2Fahrenheit
   end type unit_type
 
+  type(unit_type), public, target :: units
 contains
 
   subroutine Init(this)
@@ -64,9 +65,9 @@ contains
   end subroutine Init
 
 !------------------------------------------------------------------------
-  function Celcius2Kelvin(this,TC)result(TK)
+  elemental function Celcius2Kelvin(this,TC)result(TK)
   implicit none
-  class(unit_type) :: this
+  class(unit_type), intent(in) :: this
   real(r8), intent(in) :: TC
   real(r8) :: TK
 
@@ -74,33 +75,37 @@ contains
 
   end function Celcius2Kelvin
 !------------------------------------------------------------------------
-  function Kelvin2Celcius(this,TK)result(TC)
+  elemental function Kelvin2Celcius(this,TK)result(TC)
   implicit none
-  class(unit_type) :: this
+  class(unit_type), intent(in) :: this
   real(r8), intent(in) :: TK
   real(r8) :: TC
+
   TC=TK-Tref
   
   end function Kelvin2Celcius
 !------------------------------------------------------------------------
 
-  function Fahrenheit2Celcius(this,F)result(C)
+  elemental function Fahrenheit2Celcius(this,F)result(C)
   implicit none
-  class(unit_type) :: this
+  class(unit_type), intent(in) :: this
   real(r8), intent(in) :: f
   real(r8) :: C
+  real(r8), parameter :: offset=32._r8
 
-  C = 5._r8/9._r8*(F - 32._r8)
+  C = 5._r8/9._r8*(F - offset)
 
   end  function Fahrenheit2Celcius
 !------------------------------------------------------------------------
 
-  function Celcius2Fahrenheit(this,C)result(F)
+  elemental function Celcius2Fahrenheit(this,C)result(F)
   implicit none
-  class(unit_type) :: this
+  class(unit_type), intent(in) :: this
   real(r8), intent(in) :: C
   real(r8) :: f
+  real(r8), parameter :: offset=32._r8
 
-  F = 9._r8/5._r8*C+32._r8
+  F = 9._r8/5._r8*C+offset
+
   end  function Celcius2Fahrenheit
 end module UnitMod  

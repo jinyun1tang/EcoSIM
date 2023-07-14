@@ -21,6 +21,7 @@ module InitEcoSIM
   use Hour1Mod             , only : InitHour1
   use HistDataType         , only : hist_ecosim  
   use InitAllocMod         , only : InitAlloc
+  use UnitMod              , only : units  
   use GridConsts  
   implicit  none
   
@@ -28,6 +29,8 @@ module InitEcoSIM
 
 
   call InitAlloc(NOMicrobeGuilds)
+
+  call units%Initailize()
 
   call InitPlantDisturbance
 

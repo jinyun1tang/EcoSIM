@@ -2,7 +2,6 @@ set(BALANCES_MOD_SOURCES
   TFlxTypeMod.F90
   LateralTranspMod.F90
   SoilLayerDynMod.F90
-  SnowBalMod.F90
   RunoffBalMod.F90
   ErosionBalMod.F90
 	RedistMod.F90
@@ -15,7 +14,7 @@ include_directories(${CMAKE_BINARY_DIR}/f90src/mesh/)
 include_directories(${CMAKE_BINARY_DIR}/f90src/modelpars/)
 include_directories(${CMAKE_BINARY_DIR}/f90src/ecosim_datatype/)
 include_directories(${CMAKE_BINARY_DIR}/f90src/ioutils/)
-include_directories(${CMAKE_BINARY_DIR}/f90src/SoilHydroTherm/)
+include_directories(${CMAKE_BINARY_DIR}/f90src/HydroTherm/SnowPhys/)
 include_directories(${CMAKE_BINARY_DIR}/f90src/plant_bgc/)
 include_directories(${CMAKE_BINARY_DIR}/f90src/microbial_bgc/box_model)
 include_directories(${CMAKE_BINARY_DIR}/f90src/microbial_bgc/layers_model)

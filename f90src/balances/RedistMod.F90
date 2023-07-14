@@ -34,6 +34,7 @@ module RedistMod
   USE SedimentDataType
   USE EcoSimSumDataType
   USE LateralTranspMod
+  use UnitMod, only : units
   use SnowBalMod
   implicit none
 
@@ -172,7 +173,7 @@ module RedistMod
     DO L=NUI(NY,NX),NU(NY,NX)-1
       IF(VOLX(L,NY,NX).LE.ZEROS2(NY,NX))THEN
         TKS(L,NY,NX)=TKS(NU(NY,NX),NY,NX)
-        TCS(L,NY,NX)=TKS(L,NY,NX)-TC2K
+        TCS(L,NY,NX)=units%Kelvin2Celcius(TKS(L,NY,NX))
       ENDIF
     ENDDO
   ENDIF
@@ -363,7 +364,7 @@ module RedistMod
   ENGYR=VHCP(0,NY,NX)*TKS(0,NY,NX)
   HEATSO=HEATSO+ENGYR
   HEATIN=HEATIN+HTHAWR(NY,NX)
-  TCS(0,NY,NX)=TKS(0,NY,NX)-TC2K
+  TCS(0,NY,NX)=units%Kelvin2Celcius(TKS(0,NY,NX))
   !     UVOLW(NY,NX)=UVOLW(NY,NX)-VOLW(0,NY,NX)-VOLI(0,NY,NX)*DENSI
   !
   !     SURFACE BOUNDARY WATER FLUXES
@@ -640,7 +641,7 @@ module RedistMod
   implicit none
   integer, intent(in) :: NY,NX
 
-  integer :: K,NTSA,NTG,NTU
+  integer :: K,NTG
   !     begin_execution
   !
   IF(ABS(TQR(NY,NX)).GT.ZEROS(NY,NX))THEN
@@ -652,24 +653,10 @@ module RedistMod
       OQN(K,0,NY,NX)=OQN(K,0,NY,NX)+TONQRS(K,NY,NX)
       OQP(K,0,NY,NX)=OQP(K,0,NY,NX)+TOPQRS(K,NY,NX)
       OQA(K,0,NY,NX)=OQA(K,0,NY,NX)+TOAQRS(K,NY,NX)
-
     ENDDO D8570
 !
-    !    SOLUTES
-!  exclude NH3B
-    DO NTG=idg_beg,idg_end-1
-      trc_solml(NTG,0,NY,NX)=trc_solml(NTG,0,NY,NX)+trcg_TQR(NTG,NY,NX)
-    ENDDO
+    call OverlandSnowFlow(NY,NX)
 
-    DO NTU=ids_nut_beg,ids_nuts_end
-      trc_solml(NTU,0,NY,NX)=trc_solml(NTU,0,NY,NX)+trcn_TQR(NTU,NY,NX)
-    ENDDO
-
-    IF(salt_model)THEN
-      DO NTSA=idsa_beg,idsa_end
-        trcsa_solml(NTSA,0,NY,NX)=trcsa_solml(NTSA,0,NY,NX)+trcsa_TQR(NTSA,NY,NX)
-      ENDDO
-    ENDIF
   ENDIF
   end subroutine OverlandFlow
 !------------------------------------------------------------------------------------------
@@ -773,31 +760,7 @@ module RedistMod
     ENDDO D9275
   ENDIF
   end subroutine SoilErosion
-!------------------------------------------------------------------------------------------
 
-  subroutine ChemicalBySnowRedistribution(NY,NX)
-  implicit none
-  integer, intent(in) :: NY,NX
-
-  integer :: NTA,NTG,NTS
-!     begin_execution
-!     OVERLAND SNOW REDISTRIBUTION
-!
-  IF(abs(TQS(NY,NX))>0._r8)THEN
-    DO NTG=idg_beg,idg_end-1
-      trcg_solsml(NTG,1,NY,NX)=trcg_solsml(NTG,1,NY,NX)+trcg_QSS(NTG,NY,NX)
-    ENDDO
-
-    DO NTS=ids_nut_beg,ids_nuts_end
-      trcn_solsml(NTS,1,NY,NX)=trcn_solsml(NTS,1,NY,NX)+trcn_QSS(NTS,NY,NX)
-    ENDDO
-    IF(salt_model)THEN
-      DO NTA=idsa_beg,idsa_end
-        trcs_solsml(NTA,1,NY,NX)=trcs_solsml(NTA,1,NY,NX)+trcsa_TQS(NTA,NY,NX)
-      ENDDO
-    ENDIF
-  ENDIF
-  end subroutine ChemicalBySnowRedistribution
 !------------------------------------------------------------------------------------------
 
   subroutine CalcLitterLayerChemicalMass(NY,NX)
@@ -1086,7 +1049,7 @@ module RedistMod
     ELSE
       TKS(L,NY,NX)=TKS(NUM(NY,NX),NY,NX)
     ENDIF
-    TCS(L,NY,NX)=TKS(L,NY,NX)-TC2K
+    TCS(L,NY,NX)=units%Kelvin2Celcius(TKS(L,NY,NX))
     UN2GS(NY,NX)=UN2GS(NY,NX)+XN2GS(L,NY,NX)
 
     !

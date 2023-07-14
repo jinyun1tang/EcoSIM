@@ -576,7 +576,7 @@ implicit none
   real(r8), pointer :: VOLWC(:)     => null()  !canopy surface water content, [m3 d-2]
   real(r8), pointer :: VOLWP(:)     => null()  !canopy water content, [m3 d-2]
   real(r8), pointer :: VHCPC(:)     => null()  !canopy heat capacity, [MJ d-2 K-1]
-  real(r8), pointer :: PSIST(:)     => null()  !soil micropore total water potential [MPa]
+  real(r8), pointer :: TotalSoilH2OPSIMPa(:)     => null()  !soil micropore total water potential [MPa]
   real(r8), pointer :: CTRAN(:)     =>  null()  !total transpiration, [m H2O d-2]
   contains
     procedure, public :: Init => plt_ew_init
@@ -1192,7 +1192,7 @@ implicit none
   class(plant_ew_type) :: this
 
   allocate(this%CTRAN(JP1))
-  allocate(this%PSIST(0:JZ1))
+  allocate(this%TotalSoilH2OPSIMPa(0:JZ1))
   allocate(this%TUPHT(0:JZ1))
   allocate(this%TKCZ(JP1))
   allocate(this%SFLXC(JP1))

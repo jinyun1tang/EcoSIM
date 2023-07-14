@@ -19,6 +19,7 @@ module SoilLayerDynMod
   use SurfSoilDataType
   use SurfLitterDataType
   use EcosimConst
+  use UnitMod     , only : units
   use EcoSIMConfig, only : ndbiomcp => ndbiomcpc
   USE TFlxTypeMod , ONLY : TSEDER,TDLYXF,TDYLXC,TDVOLI,TDORGC
 implicit none
@@ -712,7 +713,7 @@ implicit none
   ELSE
     TKS(L1,NY,NX)=TKS(L0,NY,NX)
   ENDIF
-  TCS(L1,NY,NX)=TKS(L1,NY,NX)-TC2K
+  TCS(L1,NY,NX)=units%Kelvin2Celcius(TKS(L1,NY,NX))
 
   DO NTF=ifertn_beg,ifertn_end
     FertN_soil(NTF,L1,NY,NX)=FertN_soil(NTF,L1,NY,NX)+FX*FertN_soil(NTF,L0,NY,NX)
@@ -895,7 +896,7 @@ implicit none
   ELSE
     TKS(L0,NY,NX)=TKS(L1,NY,NX)
   ENDIF
-  TCS(L0,NY,NX)=TKS(L0,NY,NX)-TC2K
+  TCS(L0,NY,NX)=units%Kelvin2Celcius(TKS(L0,NY,NX))
 
   DO NTF=ifertn_beg,ifertn_end
     FertN_soil(NTF,L0,NY,NX)=FY*FertN_soil(NTF,L0,NY,NX)
@@ -1670,13 +1671,13 @@ implicit none
   ELSE
     TKS(L1,NY,NX)=TKS(L,NY,NX)
   ENDIF
-  TCS(L1,NY,NX)=TKS(L1,NY,NX)-TC2K
+  TCS(L1,NY,NX)=units%Kelvin2Celcius(TKS(L1,NY,NX))
   IF(VHCP(L0,NY,NX).GT.ZEROS(NY,NX))THEN
     TKS(L0,NY,NX)=ENGY0/VHCP(L0,NY,NX)
   ELSE
     TKS(L0,NY,NX)=TKS(L,NY,NX)
   ENDIF
-  TCS(L0,NY,NX)=TKS(L0,NY,NX)-TC2K
+  TCS(L0,NY,NX)=units%Kelvin2Celcius(TKS(L0,NY,NX))
   end subroutine MoveHeatWat
 
 end module SoilLayerDynMod

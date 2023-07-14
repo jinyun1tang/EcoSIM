@@ -41,6 +41,7 @@ module StartsMod
   use SedimentDataType
   use GridDataType
   use MiniFuncMod
+  use UnitMod, only : units
   implicit none
 
   private
@@ -758,8 +759,8 @@ module StartsMod
   IFLGT(:,:)=0
   ATCA(:,:)=ATCAI(:,:)
   ATCS(:,:)=ATCAI(:,:)
-  ATKA(:,:)=ATCA(:,:)+TC2K
-  ATKS(:,:)=ATCS(:,:)+TC2K
+  ATKA(:,:)=units%Celcius2Kelvin(ATCA)
+  ATKS(:,:)=units%Celcius2Kelvin(ATCS)
   URAIN(:,:)=0.0_r8
   UCO2G(:,:)=0.0_r8
   UCH4G(:,:)=0.0_r8

@@ -6,6 +6,7 @@ module StartqsMod
   use PlantAPIData
   use TracerIDMod
   use EcoSiMParDataMod, only : pltpar
+  use UnitMod, only : units
   implicit none
 
   private
@@ -856,9 +857,9 @@ module StartqsMod
   ENGYX(NZ)=0._r8
   DTKC(NZ)=0._r8
   TCC(NZ)=ATCA
-  TKC(NZ)=TCC(NZ)+TC2K
+  TKC(NZ)=units%Celcius2Kelvin(TCC(NZ))
   TCG(NZ)=TCC(NZ)
-  TKG(NZ)=TCG(NZ)+TC2K
+  TKG(NZ)=units%Celcius2Kelvin(TCG(NZ))
   TFN3(NZ)=1.0
   PSILT(NZ)=-1.0E-03
   PSILO(NZ)=OSMO(NZ)+PSILT(NZ)

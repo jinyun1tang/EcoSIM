@@ -105,7 +105,7 @@ module grosubsMod
   D9985: DO NZ=1,NP
 
 ! IFLGC= flag for living pft
-    IF(IFLGC(NZ).EQ.ipltactv)THEN
+    IF(IFLGC(NZ).EQ.PlantIsActive)THEN
       call GrowPlant(I,J,NZ,ZCX,CPOOLK)
     ENDIF
 
@@ -250,7 +250,7 @@ module grosubsMod
 !
     ZNPP(NZ)=CARBN(NZ)+TCO2T(NZ)
 
-    IF(IFLGC(NZ).EQ.ipltactv)THEN
+    IF(IFLGC(NZ).EQ.PlantIsActive)THEN
     !check for living plant
       DO NE=1,npelms
         BALE(NE,NZ)=WTSHTE(NE,NZ)+WTRTE(NE,NZ)+WTNDE(NE,NZ) &

@@ -60,7 +60,7 @@ implicit none
   integer, parameter :: ibralive=0  !branch alive
   integer, parameter :: ibrdead =1  !branch dead
 
-  integer, parameter :: ipltactv=1  !plant active
+  integer, parameter :: PlantIsActive=1  !plant active
   integer, parameter :: ipltdorm =0  !plant dormant/dead
 
   integer, parameter :: ihv_noaction=0
