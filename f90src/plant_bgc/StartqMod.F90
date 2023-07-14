@@ -74,9 +74,9 @@ module StartqMod
 
           call InitSeedMorphoBio(NZ,NY,NX)
         ENDIF
-        ZEROP(NZ,NY,NX)=ZERO*PP(NZ,NY,NX)
-        ZEROQ(NZ,NY,NX)=ZERO*PP(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-        ZEROL(NZ,NY,NX)=ZERO*PP(NZ,NY,NX)*1.0E+06
+        ZEROP(NZ,NY,NX)=ZERO*pftPlantPopulation(NZ,NY,NX)
+        ZEROQ(NZ,NY,NX)=ZERO*pftPlantPopulation(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+        ZEROL(NZ,NY,NX)=ZERO*pftPlantPopulation(NZ,NY,NX)*1.0E+06
       ENDDO D9985
 !
 !     FILL OUT UNUSED ARRAYS
@@ -472,14 +472,14 @@ module StartqMod
 !
 !     PP=population (grid cell-1)
 !
-  PP(NZ,NY,NX)=PPX(NZ,NY,NX)*AREA(3,NU(NY,NX),NY,NX)
+  pftPlantPopulation(NZ,NY,NX)=PPX(NZ,NY,NX)*AREA(3,NU(NY,NX),NY,NX)
   IFLGI(NZ,NY,NX)=0
   IDTHP(NZ,NY,NX)=0
   IDTHR(NZ,NY,NX)=0
   NBT(NZ,NY,NX)=0
   NBR(NZ,NY,NX)=0
   HTCTL(NZ,NY,NX)=0._r8
-  ZC(NZ,NY,NX)=0._r8
+  CanopyHeight(NZ,NY,NX)=0._r8
   D10: DO NB=1,JBR
     IFLGA(NB,NZ,NY,NX)=0
     IFLGE(NB,NZ,NY,NX)=0
@@ -706,7 +706,7 @@ module StartqMod
   UPNF(NZ,NY,NX)=0._r8
   D40: DO N=1,2
     D20: DO L=1,NL(NY,NX)
-      UPWTR(N,L,NZ,NY,NX)=0._r8
+      PopPlantRootH2OUptake_vr(N,L,NZ,NY,NX)=0._r8
       PSIRT(N,L,NZ,NY,NX)=-0.01
       PSIRO(N,L,NZ,NY,NX)=OSMO(NZ,NY,NX)+PSIRT(N,L,NZ,NY,NX)
       PSIRG(N,L,NZ,NY,NX)=AZMAX1(PSIRT(N,L,NZ,NY,NX)-PSIRO(N,L,NZ,NY,NX))
@@ -809,7 +809,7 @@ module StartqMod
 !     WSRTL=total root protein C mass (g)
 !     CPOOLR,ZPOOLR,PPOOLR=C,N,P in root,myco nonstructural pools (g)
 !
-  WTRVX(NZ,NY,NX)=GRDM(NZ,NY,NX)*PP(NZ,NY,NX)
+  WTRVX(NZ,NY,NX)=GRDM(NZ,NY,NX)*pftPlantPopulation(NZ,NY,NX)
   WTRVE(ielmc,NZ,NY,NX)=WTRVX(NZ,NY,NX)
   WTRVE(ielmn,NZ,NY,NX)=CNGR(NZ,NY,NX)*WTRVE(ielmc,NZ,NY,NX)
   WTRVE(ielmp,NZ,NY,NX)=CPGR(NZ,NY,NX)*WTRVE(ielmc,NZ,NY,NX)

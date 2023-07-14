@@ -14,13 +14,13 @@ module InitEcoSIM
   subroutine InitModules(NOMicrobeGuilds)
   use PlantDisturbsMod     , only : InitPlantDisturbance
   use UptakesMod           , only : InitUptake  
-  use WatsubMod           , only : initWatsub  
+  use WatsubMod            , only : initWatsub  
   use NitrosMod            , only : InitNitro
-  use RedistMod           , only : InitRedist
-  use ErosionMod          , only : InitErosion
+  use RedistMod            , only : InitRedist
+  use ErosionMod           , only : InitErosion
   use Hour1Mod             , only : InitHour1
-  use HistDataType        , only : hist_ecosim  
-  use InitAllocMod        , only : InitAlloc
+  use HistDataType         , only : hist_ecosim  
+  use InitAllocMod         , only : InitAlloc
   use GridConsts  
   implicit  none
   

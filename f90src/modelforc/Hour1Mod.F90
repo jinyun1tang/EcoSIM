@@ -1,5 +1,6 @@
 module Hour1Mod
   use data_kind_mod, only : r8 => DAT_KIND_R8
+  use data_const_mod, only : GravAcceleration=>DAT_CONST_G
   use minimathmod  , only : isclose,AZMAX1,AZMIN1
   use abortutils   , only : endrun, print_info
   use ATSUtilsMod
@@ -49,17 +50,19 @@ module Hour1Mod
 
   CHARACTER(LEN=*), PARAMETER :: MOD_FILENAME=__FILE__
 
+  public :: hour1
+  public :: InitHour1
+
   real(r8) :: BKDSX  !     BKDSX=maximm soil bulk density
   real(r8) :: THETPW !     THETPW=minimum air-filled porosity for saturation (m3 m-3)
   real(r8) :: THETWP
   real(r8) :: XVOLWC(0:3)
   real(r8), pointer :: THETRX(:)
+  real(r8), parameter :: mGravAcceleration=1.e-3_r8*GravAcceleration  !gravitational constant devided by 1000.  
 !
 !     XVOLWC=foliar water retention capacity (m3 m-2)
 !     THETRX=litter water retention capacity (m3 g C-1)
 
-  public :: hour1
-  public :: InitHour1
   contains
 
   subroutine InitHour1(n_litrsfk)
@@ -802,7 +805,7 @@ module Hour1Mod
 
   trcp_TR(idsp_psoi_beg:idsp_psoi_end,0:NL(NY,NX),NY,NX)=0.0_r8
 
-  TUPWTR(0:NL(NY,NX),NY,NX)=0.0_r8
+  GridPlantRootH2OUptake_vr(0:NL(NY,NX),NY,NX)=0.0_r8
   TUPHT(0:NL(NY,NX),NY,NX)=0.0_r8
 
   GasDisFlx(idg_beg:idg_end,0:NL(NY,NX),NY,NX)=0.0_r8
@@ -852,7 +855,7 @@ module Hour1Mod
           IF(IFLGY.EQ.1)THEN
             IF(THETPZ(L,NY,NX).GE.THETPW.AND.L.NE.NL(NY,NX))THEN
               !not bottom layer, saturated
-              PSIS1=PSISM(L+1,NY,NX)-0.0098_r8*(DPTH(L+1,NY,NX)-DPTH(L,NY,NX))
+              PSIS1=PSISM(L+1,NY,NX)-mGravAcceleration*(DPTH(L+1,NY,NX)-DPTH(L,NY,NX))
               THETWM=THETWP*POROS(L,NY,NX)
               THETW1=AMIN1(THETWM,EXP((PSIMS(NY,NX)-LOG(-PSIS1)) &
                 *PSD(L,NY,NX)/PSISD(NY,NX)+PSL(L,NY,NX)))
@@ -865,7 +868,7 @@ module Hour1Mod
               ENDIF
             ELSE IF(L.GT.NU(NY,NX))THEN
               !bottom layer, or not saturated, but is not topsoil layer
-              PSIS1=PSISM(L,NY,NX)-0.0098_r8*(DPTH(L,NY,NX)-DPTH(L-1,NY,NX))
+              PSIS1=PSISM(L,NY,NX)-mGravAcceleration*(DPTH(L,NY,NX)-DPTH(L-1,NY,NX))
               THETWM=THETWP*POROS(L-1,NY,NX)
               THETW1=AMIN1(THETWM,EXP((PSIMS(NY,NX)-LOG(-PSIS1)) &
                 *PSD(L-1,NY,NX)/PSISD(NY,NX)+PSL(L-1,NY,NX)))
@@ -1459,7 +1462,7 @@ module Hour1Mod
         PSISM(0,NY,NX)=PSISE(0,NY,NX)
       ENDIF
       PSISO(0,NY,NX)=0.0_r8
-      PSISH(0,NY,NX)=0.0098_r8*(ALT(NY,NX)-CumDepth2LayerBottom(NU(NY,NX)-1,NY,NX) &
+      PSISH(0,NY,NX)=mGravAcceleration*(ALT(NY,NX)-CumDepth2LayerBottom(NU(NY,NX)-1,NY,NX) &
         +0.5_r8*DLYR(3,0,NY,NX))
       PSIST(0,NY,NX)=AZMIN1(PSISM(0,NY,NX)+PSISO(0,NY,NX)+PSISH(0,NY,NX))
 !

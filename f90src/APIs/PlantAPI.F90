@@ -177,7 +177,7 @@ implicit none
     RNH4X(L,NY,NX) =plt_bgcr%RNH4X(L)
     ROXYX(L,NY,NX) =plt_bgcr%ROXYX(L)
     TUPHT(L,NY,NX) =plt_ew%TUPHT(L)
-    TUPWTR(L,NY,NX)=plt_ew%TUPWTR(L)
+    GridPlantRootH2OUptake_vr(L,NY,NX)=plt_ew%GridPlantRootH2OUptake_vr(L)
     DO  K=1,micpar%n_pltlitrk
       DO NE=1,npelms
         DO  M=1,jsken
@@ -290,9 +290,9 @@ implicit none
     O2L(NZ,NY,NX)   =plt_photo%O2L(NZ)
     O2I(NZ,NY,NX)   =plt_photo%O2I(NZ)
     OFFST(NZ,NY,NX) =plt_pheno%OFFST(NZ)
-    OSTR(NZ,NY,NX)  =plt_pheno%OSTR(NZ)
+    PlantO2Stress(NZ,NY,NX)  =plt_pheno%PlantO2Stress(NZ)
     PPX(NZ,NY,NX)   =plt_site%PPX(NZ)
-    PP(NZ,NY,NX)    =plt_site%PP(NZ)
+    pftPlantPopulation(NZ,NY,NX)    =plt_site%pftPlantPopulation(NZ)
     PPI(NZ,NY,NX)   =plt_site%PPI(NZ)
     PSILT(NZ,NY,NX) =plt_ew%PSILT(NZ)
     PSILO(NZ,NY,NX) =plt_ew%PSILO(NZ)
@@ -351,7 +351,7 @@ implicit none
     WTRTA(NZ,NY,NX)  =plt_biom%WTRTA(NZ)
     XKCO2L(NZ,NY,NX) =plt_photo%XKCO2L(NZ)
     XKCO2O(NZ,NY,NX) =plt_photo%XKCO2O(NZ)
-    ZC(NZ,NY,NX)     =plt_morph%ZC(NZ)
+    CanopyHeight(NZ,NY,NX)     =plt_morph%CanopyHeight(NZ)
     ZNPP(NZ,NY,NX)   =plt_bgcr%ZNPP(NZ)
     ZEROP(NZ,NY,NX)  =plt_biom%ZEROP(NZ)
     ZEROQ(NZ,NY,NX)  =plt_rbgc%ZEROQ(NZ)
@@ -588,7 +588,7 @@ implicit none
         RUOH1B(N,L,NZ,NY,NX)=plt_rbgc%RUOH1B(N,L,NZ)
         RUCH1B(N,L,NZ,NY,NX)=plt_rbgc%RUCH1B(N,L,NZ)
         ROXYP(N,L,NZ,NY,NX) =plt_rbgc%ROXYP(N,L,NZ)
-        UPWTR(N,L,NZ,NY,NX) =plt_ew%UPWTR(N,L,NZ)
+        PopPlantRootH2OUptake_vr(N,L,NZ,NY,NX) =plt_ew%PopPlantRootH2OUptake_vr(N,L,NZ)
         WTRTL(N,L,NZ,NY,NX) =plt_biom%WTRTL(N,L,NZ)
         WTRTD(N,L,NZ,NY,NX) =plt_biom%WTRTD(N,L,NZ)
         WSRTL(N,L,NZ,NY,NX) =plt_biom%WSRTL(N,L,NZ)
@@ -721,7 +721,7 @@ implicit none
   plt_site%ZEROS2=ZEROS2(NY,NX)
   plt_site%ZEROS =ZEROS(NY,NX)
   plt_ew%ZR=ZR(NY,NX)
-  plt_morph%ZT=ZT(NY,NX)
+  plt_morph%GridMaxCanopyHeight=GridMaxCanopyHeight(NY,NX)
   plt_ew%ZD=ZD(NY,NX)
   plt_site%IDATA(:)=IDATA(:)
   plt_distb%DCORP=DCORP(I,NY,NX)
@@ -1014,7 +1014,7 @@ implicit none
     plt_bgcr%RNH4X(L)=RNH4X(L,NY,NX)
     plt_bgcr%ROXYX(L)=ROXYX(L,NY,NX)
     plt_ew%TUPHT(L)  =TUPHT(L,NY,NX)
-    plt_ew%TUPWTR(L) =TUPWTR(L,NY,NX)
+    plt_ew%GridPlantRootH2OUptake_vr(L) =GridPlantRootH2OUptake_vr(L,NY,NX)
     DO  K=1,micpar%n_pltlitrk
       DO NE=1,npelms
         DO  M=1,jsken
@@ -1173,8 +1173,8 @@ implicit none
     plt_ew%EVAPC(NZ)   =EVAPC(NZ,NY,NX)
     plt_photo%RSMN(NZ) =RSMN(NZ,NY,NX)
     plt_pheno%OFFST(NZ)=OFFST(NZ,NY,NX)
-    plt_pheno%OSTR(NZ)=OSTR(NZ,NY,NX)
-    plt_site%PP(NZ)=PP(NZ,NY,NX)
+    plt_pheno%PlantO2Stress(NZ)=PlantO2Stress(NZ,NY,NX)
+    plt_site%pftPlantPopulation(NZ)=pftPlantPopulation(NZ,NY,NX)
     plt_ew%PSILT(NZ)=PSILT(NZ,NY,NX)
     plt_ew%PSILG(NZ)=PSILG(NZ,NY,NX)
     plt_photo%RCMX(NZ)=RCMX(NZ,NY,NX)
@@ -1216,7 +1216,7 @@ implicit none
 
     plt_biom%ZEROL(NZ) =ZEROL(NZ,NY,NX)
     plt_biom%ZEROP(NZ) =ZEROP(NZ,NY,NX)
-    plt_morph%ZC(NZ)   =ZC(NZ,NY,NX)
+    plt_morph%CanopyHeight(NZ)   =CanopyHeight(NZ,NY,NX)
     plt_bgcr%ZNPP(NZ)  =ZNPP(NZ,NY,NX)
 
 
@@ -1415,7 +1415,7 @@ implicit none
         plt_rbgc%RUPP2B(N,L,NZ)=RUPP2B(N,L,NZ,NY,NX)
         plt_rbgc%RUPP1P(N,L,NZ)=RUPP1P(N,L,NZ,NY,NX)
         plt_rbgc%RUPP1B(N,L,NZ)=RUPP1B(N,L,NZ,NY,NX)
-        plt_ew%UPWTR(N,L,NZ)   =UPWTR(N,L,NZ,NY,NX)
+        plt_ew%PopPlantRootH2OUptake_vr(N,L,NZ)   =PopPlantRootH2OUptake_vr(N,L,NZ,NY,NX)
         plt_rbgc%WFR(N,L,NZ)   =WFR(N,L,NZ,NY,NX)
         plt_biom%WTRTL(N,L,NZ) =WTRTL(N,L,NZ,NY,NX)
         plt_biom%WTRTD(N,L,NZ) =WTRTD(N,L,NZ,NY,NX)
@@ -1505,7 +1505,7 @@ implicit none
   plt_site%ZERO  =ZERO
   plt_ew%DPTHS   =DPTHS(NY,NX)
   plt_ew%TKA     =TKA(NY,NX)
-  plt_morph%ZT   =ZT(NY,NX)
+  plt_morph%GridMaxCanopyHeight   =GridMaxCanopyHeight(NY,NX)
   plt_site%Z0=Z0(NY,NX)
   plt_ew%ZD=ZD(NY,NX)
   plt_site%UA=UA(NY,NX)
@@ -1547,7 +1547,7 @@ implicit none
   plt_site%POROS1=POROS(NU(NY,NX),NY,NX)
   DO NZ=1,NP(NY,NX)
     plt_morph%ARLFP(NZ)=ARLFP(NZ,NY,NX)
-    plt_morph%ZC(NZ)=ZC(NZ,NY,NX)
+    plt_morph%CanopyHeight(NZ)=CanopyHeight(NZ,NY,NX)
     plt_morph%CFX(NZ)=CFX(NZ,NY,NX)
     plt_rad%ABSR(NZ)=ABSR(NZ,NY,NX)
     plt_rad%ABSP(NZ)=ABSP(NZ,NY,NX)
@@ -1612,7 +1612,7 @@ implicit none
   ZR(NY,NX)=plt_ew%ZR
   RAB(NY,NX)=plt_ew%RAB
   RIB(NY,NX)=plt_ew%RIB
-  ZT(NY,NX)=plt_morph%ZT
+  GridMaxCanopyHeight(NY,NX)=plt_morph%GridMaxCanopyHeight
   RADS(NY,NX)=plt_rad%RADS
   RADY(NY,NX)=plt_rad%RADY
   RAPS(NY,NX)=plt_rad%RAPS

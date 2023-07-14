@@ -23,6 +23,7 @@ implicit none
   private
   character(len=*), parameter :: mod_filename = __FILE__
   real(r8), parameter :: FORGW=0.25E+06_r8 !threshold for  C concentration in organic soil 	g Mg-1
+  real(r8), parameter :: mGravAcceleration=1.e-3_r8*GravAcceleration  !gravitational constant devided by 1000.  
 
   public :: GetSoilHydraulicVars
   public :: SoilHydroProperty
@@ -94,7 +95,7 @@ contains
 !     PSISM,PSISO,PSISH,PSIST=matric,osmotic,gravimetric,total water potential
 !
     PSISO(L,NY,NX)=-RGAS*1.E-6_r8*TKS(L,NY,NX)*CION(L,NY,NX)
-    PSISH(L,NY,NX)=0.0098_r8*(ALT(NY,NX)-DPTH(L,NY,NX))
+    PSISH(L,NY,NX)=mGravAcceleration*(ALT(NY,NX)-DPTH(L,NY,NX))
     PSIST(L,NY,NX)=AZMIN1(PSISM(L,NY,NX)+PSISO(L,NY,NX)+PSISH(L,NY,NX))
 
 !

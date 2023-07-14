@@ -189,7 +189,7 @@ implicit none
   real(r8),pointer   :: histr_1D_FIREp_CO2_FLX_ptc(:)     !VCO2F(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX), plant CO2 from fire
   real(r8),pointer   :: histr_1D_FIREp_CH4_FLX_ptc(:)     !VCH4F(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: histr_1D_NPP_ptc(:)           !ZNPP(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: histr_1D_CAN_HT_ptc(:)        !ZC(NZ,NY,NX), canopy height, m
+  real(r8),pointer   :: histr_1D_CAN_HT_ptc(:)        !CanopyHeight(NZ,NY,NX), canopy height, m
   real(r8),pointer   :: histr_1D_POPN_ptc(:)          !PP(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX), plant population
   real(r8),pointer   :: histr_1D_tTRANSPN_ptc(:)      !-CTRAN(NZ,NY,NX)*1000.0/AREA(3,NU(NY,NX),NY,NX), total transpiration
   real(r8),pointer   :: histr_1D_WTR_STRESS_ptc(:)    !WSTR(NZ,NY,NX)
@@ -438,7 +438,7 @@ implicit none
   allocate(this%histr_1D_FIREp_CO2_FLX_ptc(beg_ptc:end_ptc))     !VCO2F(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX), plant CO2 from fire
   allocate(this%histr_1D_FIREp_CH4_FLX_ptc(beg_ptc:end_ptc))     !VCH4F(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   allocate(this%histr_1D_NPP_ptc(beg_ptc:end_ptc))           !ZNPP(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-  allocate(this%histr_1D_CAN_HT_ptc(beg_ptc:end_ptc))        !ZC(NZ,NY,NX), canopy height, m
+  allocate(this%histr_1D_CAN_HT_ptc(beg_ptc:end_ptc))        !CanopyHeight(NZ,NY,NX), canopy height, m
   allocate(this%histr_1D_POPN_ptc(beg_ptc:end_ptc))          !PP(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX), plant population
   allocate(this%histr_1D_tTRANSPN_ptc(beg_ptc:end_ptc))      !-CTRAN(NZ,NY,NX)*1000.0/AREA(3,NU(NY,NX),NY,NX), total transpiration
   allocate(this%histr_1D_WTR_STRESS_ptc(beg_ptc:end_ptc))    !WSTR(NZ,NY,NX)
@@ -1578,7 +1578,7 @@ implicit none
         this%histr_1D_STOM_RSC_H2O_ptc(nptc) = RC(NZ,NY,NX)*3600.0_r8
         this%histr_1D_BLYR_RSC_H2O_ptc(nptc) = RA(NZ,NY,NX)*3600.0_r8
         this%histr_1D_TRANSPN_ptc(nptc)      = EP(NZ,NY,NX)*1000.0_r8/AREA(3,NU(NY,NX),NY,NX)
-        this%histr_1D_O2_STRESS_ptc(nptc)    = OSTR(NZ,NY,NX)
+        this%histr_1D_O2_STRESS_ptc(nptc)    = PlantO2Stress(NZ,NY,NX)
         this%histr_1D_NH4_UPTK_FLX_ptc(nptc)     = UPNH4(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%histr_1D_NO3_UPTK_FLX_ptc(nptc)     = UPNO3(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%histr_1D_N2_FIXN_FLX_ptc(nptc)      = UPNF(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
@@ -1611,11 +1611,11 @@ implicit none
         this%histr_1D_FIREp_CO2_FLX_ptc(nptc)    = VCO2F(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%histr_1D_FIREp_CH4_FLX_ptc(nptc)    = VCH4F(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%histr_1D_NPP_ptc(nptc)          = ZNPP(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-        this%histr_1D_CAN_HT_ptc(nptc)       = ZC(NZ,NY,NX)
-        this%histr_1D_POPN_ptc(nptc)         = PP(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+        this%histr_1D_CAN_HT_ptc(nptc)       = CanopyHeight(NZ,NY,NX)
+        this%histr_1D_POPN_ptc(nptc)         = pftPlantPopulation(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%histr_1D_tTRANSPN_ptc(nptc)     =-CTRAN(NZ,NY,NX)*1000.0/AREA(3,NU(NY,NX),NY,NX)
         this%histr_1D_WTR_STRESS_ptc(nptc)   = WSTR(NZ,NY,NX)
-        this%histr_1D_OXY_STRESS_ptc(nptc)   = OSTR(NZ,NY,NX)
+        this%histr_1D_OXY_STRESS_ptc(nptc)   = PlantO2Stress(NZ,NY,NX)
         this%histr_1D_SHOOT_N_ptc(nptc)      = WTSHTE(ielmn,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%histr_1D_LEAF_N_ptc(nptc)       = WTLFE(ielmn,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         this%histr_1D_SHTH_N_ptc(nptc)       = WTSHEE(ielmn,NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
@@ -1670,7 +1670,7 @@ implicit none
           this%histr_2D_prtUP_NH4_vr_ptc(nptc,L)  = (sum(RUPNH4(:,L,NZ,NY,NX))+sum(RUPNHB(:,L,NZ,NY,NX)))/AREA(3,L,NY,NX)
           this%histr_2D_prtUP_NO3_vr_ptc(nptc,L)  = (sum(RUPNO3(:,L,NZ,NY,NX))+sum(RUPNOB(:,L,NZ,NY,NX)))/AREA(3,L,NY,NX)
           this%histr_2D_prtUP_PO4_vr_ptc(nptc,L)  = (sum(RUPH2P(:,L,NZ,NY,NX))+sum(RUPH2B(:,L,NZ,NY,NX)))/AREA(3,L,NY,NX)
-          this%histr_2D_DNS_RT_vr_ptc(nptc,L)  = RTDNP(ipltroot,L,NZ,NY,NX)*PP(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
+          this%histr_2D_DNS_RT_vr_ptc(nptc,L)  = RTDNP(ipltroot,L,NZ,NY,NX)*pftPlantPopulation(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
         ENDDO
       ENDDO 
     ENDDO 

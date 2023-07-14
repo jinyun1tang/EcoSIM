@@ -187,7 +187,7 @@ module StartsMod
 !
 !     INITIALIZE COMMUNITY CANOPY
 !
-  ZT(:,:)=0.0_r8
+  GridMaxCanopyHeight(:,:)=0.0_r8
   ZL(0:JC,:,:)=0.0_r8
   ARLFT(1:JC,:,:)=0.0_r8
   ARSTT(1:JC,:,:)=0.0_r8
@@ -1084,7 +1084,7 @@ module StartsMod
 !
 !     INITIALIZE COMMUNITY CANOPY
 !
-  ZT(:,:)=0.0_r8
+  GridMaxCanopyHeight(:,:)=0.0_r8
   ZL(0:JC,:,:)=0.0_r8
   ARLFT(1:JC,:,:)=0.0_r8
   ARSTT(1:JC,:,:)=0.0_r8

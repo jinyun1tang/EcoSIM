@@ -140,7 +140,7 @@ module ExtractsMod
   associate(                       &
     NU    => plt_site%NU     , &
     AREA3 => plt_site%AREA3  , &
-    PP    => plt_site%PP     , &
+    pftPlantPopulation    => plt_site%pftPlantPopulation     , &
     RUPP1B=> plt_rbgc%RUPP1B , &
     RUPP2B=> plt_rbgc%RUPP2B , &
     RUNNXP=> plt_rbgc%RUNNXP , &
@@ -201,8 +201,8 @@ module ExtractsMod
     RP1BX => plt_bgcr%RP1BX  , &
     TKS   => plt_ew%TKS      , &
     TUPHT => plt_ew%TUPHT    , &
-    TUPWTR=> plt_ew%TUPWTR   , &
-    UPWTR => plt_ew%UPWTR    , &
+    GridPlantRootH2OUptake_vr=> plt_ew%GridPlantRootH2OUptake_vr   , &
+    PopPlantRootH2OUptake_vr => plt_ew%PopPlantRootH2OUptake_vr    , &
     trcg_rootml  => plt_rbgc%trcg_rootml,&
     trcs_rootml => plt_rbgc%trcs_rootml, &
     RTDNP => plt_morph%RTDNP , &
@@ -218,20 +218,20 @@ module ExtractsMod
 !
 !     RTDNT=total root length density
 !     RTDNP=PFT root length density per plant
-!     UPWTR=total water uptake
-!     UPWTR=PFT root water uptake
+!     PopPlantRootH2OUptake_vr=total water uptake
+!     PopPlantRootH2OUptake_vr=PFT root water uptake
 !     TUPHT=total convective heat in root water uptake
 !     TKS=soil temperature
 !     PP=PFT population, this is dynamic, and can goes to zero
 !
       IF(N.EQ.ipltroot)THEN
-        RTDNT(L)=RTDNT(L)+RTDNP(N,L,NZ)*PP(NZ)/AREA3(L)
+        RTDNT(L)=RTDNT(L)+RTDNP(N,L,NZ)*pftPlantPopulation(NZ)/AREA3(L)
       ENDIF
 !
 !     TOTAL WATER UPTAKE
 !
-      TUPWTR(L)=TUPWTR(L)+UPWTR(N,L,NZ)
-      TUPHT(L)=TUPHT(L)+UPWTR(N,L,NZ)*cpw*TKS(L)
+      GridPlantRootH2OUptake_vr(L)=GridPlantRootH2OUptake_vr(L)+PopPlantRootH2OUptake_vr(N,L,NZ)
+      TUPHT(L)=TUPHT(L)+PopPlantRootH2OUptake_vr(N,L,NZ)*cpw*TKS(L)
 !
 !     ROOT GAS CONTENTS FROM FLUXES IN 'UPTAKE'
 !

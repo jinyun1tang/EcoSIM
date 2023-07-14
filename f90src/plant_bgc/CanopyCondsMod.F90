@@ -61,7 +61,7 @@ module CanopyCondsMod
     VHCPWX  => plt_ew%VHCPWX    , &
     DPTHS   => plt_ew%DPTHS     , &
     VHCPW1  => plt_ew%VHCPW1    , &
-    ZT      => plt_morph%ZT     , &
+    GridMaxCanopyHeight      => plt_morph%GridMaxCanopyHeight     , &
     IRTYP   => plt_morph%IRTYP  , &
     ARSTC   => plt_morph%ARSTC  , &
     ARLFC   => plt_morph%ARLFC    &
@@ -74,18 +74,18 @@ module CanopyCondsMod
 !     ZZ=reference height for wind speed
 !
   ARLSC=ARLFC+ARSTC
-  IF(ARLSC.GT.ZEROS.AND.ZT.GE.DPTHS-ZERO.AND.ZT.GE.DPTH0-ZERO)THEN
+  IF(ARLSC.GT.ZEROS.AND.GridMaxCanopyHeight.GE.DPTHS-ZERO.AND.GridMaxCanopyHeight.GE.DPTH0-ZERO)THEN
     ARLSG=ARLSC/AREA3(NU)
     ZX=EXP(-0.5_r8*ARLSG)
     ZY=1.0_r8-ZX
-    ZD=ZT*AZMAX1(1.0_r8-2.0_r8/ARLSG*ZY)
-    ZE=ZT*AMAX1(0.05_r8,ZX*ZY)
+    ZD=GridMaxCanopyHeight*AZMAX1(1.0_r8-2.0_r8/ARLSG*ZY)
+    ZE=GridMaxCanopyHeight*AMAX1(0.05_r8,ZX*ZY)
   ELSE
     ZD=0.0_r8
     ZE=0.0_r8
   ENDIF
   IF(IFLGW.EQ.1)THEN
-    ZZ=Z0+ZT
+    ZZ=Z0+GridMaxCanopyHeight
   ELSE
     ZZ=AMAX1(Z0,ZD+2.0_r8)
   ENDIF
@@ -125,9 +125,9 @@ module CanopyCondsMod
   associate(                      &
     NP      => plt_site%NP      , &
     ZEROS   => plt_site%ZEROS   , &
-    ZT      => plt_morph%ZT     , &
+    GridMaxCanopyHeight      => plt_morph%GridMaxCanopyHeight     , &
     ZL      => plt_morph%ZL     , &
-    ZC      => plt_morph%ZC     , &
+    CanopyHeight      => plt_morph%CanopyHeight     , &
     ARSTT   => plt_morph%ARSTT  , &
     ARLFT   => plt_morph%ARLFT  , &
     ARSTC   => plt_morph%ARSTC  , &
@@ -141,11 +141,11 @@ module CanopyCondsMod
   !     ARLFC,ARSTC=leaf,stalk area of combined canopy
   !     ARLFT,ARSTT=leaf,stalk area of combined canopy layer
   !
-  ZT=0.0
-  DO 9685 NZ=1,NP
-    ZT=AMAX1(ZT,ZC(NZ))
-9685  CONTINUE
-  ZL(JC1)=ZT+0.01
+  GridMaxCanopyHeight=0.0
+  D9685: DO NZ=1,NP
+    GridMaxCanopyHeight=AMAX1(GridMaxCanopyHeight,CanopyHeight(NZ))
+  ENDDO D9685  
+  ZL(JC1)=GridMaxCanopyHeight+0.01_r8
   ZL1(JC1)=ZL(JC1)
   ZL1(0)=0.0
   ART=(ARLFC+ARSTC)/JC1

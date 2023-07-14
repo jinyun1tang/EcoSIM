@@ -6,7 +6,8 @@ module WatsubMod
 ! with soil/snow water (vapor, liquid and ice) and energy, and update
 ! them in redistmod.F90
 
-  use data_kind_mod, only : r8 => DAT_KIND_R8
+  use data_kind_mod , only : r8 => DAT_KIND_R8
+  use data_const_mod, only : GravAcceleration=>DAT_CONST_G
   use abortutils   , only : endrun, print_info
   use minimathmod  , only : isclose, isclose,safe_adb,vapsat,AZMAX1,AZMIN1,AZMAX1t
   use EcosimConst
@@ -49,7 +50,7 @@ module WatsubMod
   integer, parameter :: iewstdir=1   !east-west direction
   integer, parameter :: insthdir=2   !north-south direction
   integer, parameter :: ivertdir=3   !vertical direction
-  real(r8), parameter :: GRAVm=1.e-3_r8*GRAV  !gravitational constant devided by 1000.
+  real(r8), parameter :: mGravAcceleration=1.e-3_r8*GravAcceleration  !gravitational constant devided by 1000.
   integer :: curday,curhour
 
   public :: watsub,InitWatsub
@@ -847,7 +848,7 @@ module WatsubMod
                 ENDIF
                 
                 FLWL(N,M6,M5,M4)=AMIN1(VOLW1(N3,N2,N1)*XNPX &
-                  ,XN*GRAVm*(-ABS(SLOPE(N,N2,N1)))*CND1*AREA(3,N3,N2,N1)) &
+                  ,XN*mGravAcceleration*(-ABS(SLOPE(N,N2,N1)))*CND1*AREA(3,N3,N2,N1)) &
                   *RCHGFU*RCHGFT*XNPH
 
                 if(abs(FLWL(N,M6,M5,M4))>1.e20)then
@@ -859,7 +860,7 @@ module WatsubMod
                 endif
                 FLWLX(N,M6,M5,M4)=FLWL(N,M6,M5,M4)
                 FLWHL(N,M6,M5,M4)=AMIN1(VOLWH1(L,NY,NX)*XNPX &
-                 ,XN*GRAVm*(-ABS(SLOPE(N,N2,N1)))*CNDH1(L,NY,NX)*AREA(3,N3,N2,N1)) &
+                 ,XN*mGravAcceleration*(-ABS(SLOPE(N,N2,N1)))*CNDH1(L,NY,NX)*AREA(3,N3,N2,N1)) &
                  *RCHGFU*RCHGFT*XNPH
                 HFLWL(N,M6,M5,M4)=cpw*TK1(N3,N2,N1)*(FLWL(N,M6,M5,M4)+FLWHL(N,M6,M5,M4))
               ELSE
@@ -1210,13 +1211,13 @@ module WatsubMod
 !     IFLGD=micropore discharge flag to artificial water table
 !
   IF(IDTBL(NY,NX).GE.3.AND.DPTH(L,NY,NX).LT.DTBLY(NY,NX))THEN
-    IF(PSISM1(L,NY,NX).GT.GRAVm*(DPTH(L,NY,NX)-DTBLY(NY,NX)))THEN
+    IF(PSISM1(L,NY,NX).GT.mGravAcceleration*(DPTH(L,NY,NX)-DTBLY(NY,NX)))THEN
       IFLGD=0
       IF(L.LT.NL(NY,NX))THEN
         D9568: DO  LL=L+1,NL(NY,NX)
-          DTBLYX=DTBLY(NY,NX)+PSISE(LL,NY,NX)/GRAVm
+          DTBLYX=DTBLY(NY,NX)+PSISE(LL,NY,NX)/mGravAcceleration
           IF(DPTH(LL,NY,NX).LT.DTBLYX)THEN
-            IF((PSISM1(LL,NY,NX).LE.GRAVm*(DPTH(LL,NY,NX)-DTBLYX) &
+            IF((PSISM1(LL,NY,NX).LE.mGravAcceleration*(DPTH(LL,NY,NX)-DTBLYX) &
               .AND.L.NE.NL(NY,NX)).OR.DPTH(LL,NY,NX).GT.DPTHA(NY,NX))THEN
               IFLGD=1
             ENDIF
@@ -1285,13 +1286,13 @@ module WatsubMod
 
   IF(IDTBL(NY,NX).NE.0.AND.DPTH(L,NY,NX).LT.DTBLX(NY,NX))THEN
     !the layer mid-depth is lower than water table
-    IF(PSISM1(L,NY,NX).GT.GRAVm*(DPTH(L,NY,NX)-DTBLX(NY,NX)))THEN
+    IF(PSISM1(L,NY,NX).GT.mGravAcceleration*(DPTH(L,NY,NX)-DTBLX(NY,NX)))THEN
       IFLGU=0
       D9565: DO LL=MIN(L+1,NL(NY,NX)),NL(NY,NX)
         !water level difference
-        DTBLXX=DTBLX(NY,NX)+PSISE(LL,NY,NX)/GRAVm  
+        DTBLXX=DTBLX(NY,NX)+PSISE(LL,NY,NX)/mGravAcceleration  
         IF(DPTH(LL,NY,NX).LT.DTBLXX)THEN
-          IF((PSISM1(LL,NY,NX).LE.GRAVm*(DPTH(LL,NY,NX)-DTBLXX) &
+          IF((PSISM1(LL,NY,NX).LE.mGravAcceleration*(DPTH(LL,NY,NX)-DTBLXX) &
             .AND.L.NE.NL(NY,NX)).OR.DPTH(LL,NY,NX).GT.DPTHA(NY,NX))THEN
             IFLGU=1
           ENDIF
@@ -1581,8 +1582,8 @@ module WatsubMod
   !     VOLWH1,VOLPH1=macropore water,air content
 
   IF(VOLAH1(N3,N2,N1).GT.ZEROS2(N2,N1).AND.VOLAH1(N6,N5,N4).GT.ZEROS2(N5,N4).AND.IFLGH.EQ.0)THEN
-    PSISH1=PSISH(N3,N2,N1)+GRAVm*DLYR(3,N3,N2,N1)*(AMIN1(1.0_r8,AZMAX1(VOLWH1(N3,N2,N1)/VOLAH1(N3,N2,N1)))-0.5_r8)
-    PSISHL=PSISH(N6,N5,N4)+GRAVm*DLYR(3,N6,N5,N4)*(AMIN1(1.0_r8,AZMAX1(VOLWH1(N6,N5,N4)/VOLAH1(N6,N5,N4)))-0.5_r8)
+    PSISH1=PSISH(N3,N2,N1)+mGravAcceleration*DLYR(3,N3,N2,N1)*(AMIN1(1.0_r8,AZMAX1(VOLWH1(N3,N2,N1)/VOLAH1(N3,N2,N1)))-0.5_r8)
+    PSISHL=PSISH(N6,N5,N4)+mGravAcceleration*DLYR(3,N6,N5,N4)*(AMIN1(1.0_r8,AZMAX1(VOLWH1(N6,N5,N4)/VOLAH1(N6,N5,N4)))-0.5_r8)
     !
     !     MACROPORE FLOW IF GRAVITATIONAL GRADIENT IS POSITIVE
     !     AND MACROPORE POROSITY EXISTS IN ADJACENT CELL
@@ -1763,8 +1764,8 @@ module WatsubMod
   IF(IFLGU.EQ.0.AND.(.not.isclose(RCHGFT,0._r8)))THEN
     PSISWD=XN*0.005_r8*SLOPE(N,N2,N1)*DLYR(N,N3,N2,N1)*(1.0_r8-DTBLG(N2,N1))
     PSISWT=AZMIN1(-PSISA1(N3,N2,N1)-0.03_r8*PSISO(N3,N2,N1) &
-      +GRAVm*(DPTH(N3,N2,N1)-DTBLX(N2,N1)) &
-      -GRAVm*AZMAX1(DPTH(N3,N2,N1)-DPTHT(N2,N1)))
+      +mGravAcceleration*(DPTH(N3,N2,N1)-DTBLX(N2,N1)) &
+      -mGravAcceleration*AZMAX1(DPTH(N3,N2,N1)-DPTHT(N2,N1)))
     IF(PSISWT.LT.0.0_r8)PSISWT=PSISWT-PSISWD
     FLWT=PSISWT*HCND(N,1,N3,N2,N1)*AREA(N,N3,N2,N1)*(1.0_r8-AREAU(N3,N2,N1))/(RCHGFU+1.0)*RCHGFT*XNPH
     FLWL(N,M6,M5,M4)=XN*FLWT
@@ -1797,8 +1798,8 @@ module WatsubMod
 !
   IF(IFLGUH.EQ.0.AND.(.not.isclose(RCHGFT,0._r8)).AND.VOLAH1(N3,N2,N1).GT.ZEROS2(N2,N1))THEN
     PSISWD=XN*0.005*SLOPE(N,N2,N1)*DLYR(N,N3,N2,N1)*(1.0_r8-DTBLG(N2,N1))
-    PSISWTH=-0.03*PSISO(N3,N2,N1)+GRAVm*(DPTHH-DTBLX(N2,N1)) &
-      -GRAVm*AZMAX1(DPTHH-DPTHT(N2,N1))
+    PSISWTH=-0.03*PSISO(N3,N2,N1)+mGravAcceleration*(DPTHH-DTBLX(N2,N1)) &
+      -mGravAcceleration*AZMAX1(DPTHH-DPTHT(N2,N1))
     IF(PSISWTH.LT.0.0_r8)PSISWTH=PSISWTH-PSISWD
     FLWTH=PSISWTH*CNDH1(N3,N2,N1)*AREA(N,N3,N2,N1) &
       *(1.0_r8-AREAU(N3,N2,N1))/(RCHGFU+1.0)*RCHGFT*XNPH
@@ -1837,7 +1838,7 @@ module WatsubMod
   IF(IFLGD.EQ.0.AND.(.not.isclose(RCHGFT,0._r8)))THEN
     PSISWD=XN*0.005_r8*SLOPE(N,N2,N1)*DLYR(N,N3,N2,N1)*(1.0_r8-DTBLG(N2,N1))
     PSISWT=AZMIN1(-PSISA1(N3,N2,N1)-0.03_r8*PSISO(N3,N2,N1) &
-      +GRAVm*(DPTH(N3,N2,N1)-DTBLY(N2,N1))-GRAVm*AZMAX1(DPTH(N3,N2,N1)-DPTHT(N2,N1)))
+      +mGravAcceleration*(DPTH(N3,N2,N1)-DTBLY(N2,N1))-mGravAcceleration*AZMAX1(DPTH(N3,N2,N1)-DPTHT(N2,N1)))
     IF(PSISWT.LT.0.0_r8)PSISWT=PSISWT-PSISWD
     FLWT=PSISWT*HCND(N,1,N3,N2,N1)*AREA(N,N3,N2,N1)*(1.0_r8-AreaUnderWaterTable(N3,N2,N1))/(RCHGFU+1.0)*RCHGFT*XNPH
     FLWL(N,M6,M5,M4)=FLWL(N,M6,M5,M4)+XN*FLWT
@@ -1866,7 +1867,7 @@ module WatsubMod
 !
   IF(IFLGDH.EQ.0.AND.(.not.isclose(RCHGFT,0._r8)).AND.VOLAH1(N3,N2,N1).GT.ZEROS2(N2,N1))THEN
     PSISWD=XN*0.005_r8*SLOPE(N,N2,N1)*DLYR(N,N3,N2,N1)*(1.0_r8-DTBLG(N2,N1))
-    PSISWTH=-0.03_r8*PSISO(N3,N2,N1)+GRAVm*(DPTHH-DTBLY(N2,N1))-GRAVm*AZMAX1(DPTHH-DPTHT(N2,N1))
+    PSISWTH=-0.03_r8*PSISO(N3,N2,N1)+mGravAcceleration*(DPTHH-DTBLY(N2,N1))-mGravAcceleration*AZMAX1(DPTHH-DPTHT(N2,N1))
     IF(PSISWTH.LT.0.0_r8)PSISWTH=PSISWTH-PSISWD
     FLWTH=PSISWTH*CNDH1(N3,N2,N1)*AREA(N,N3,N2,N1)*(1.0_r8-AreaUnderWaterTable(N3,N2,N1))/(RCHGFU+1.0_r8)*RCHGFT*XNPH
     FLWTHL=AMAX1(FLWTH,AZMIN1(-(VOLWH1(N3,N2,N1)*XNPX+FLWHL(3,N3,N2,N1)-FLWHL(3,N3+1,N2,N1))))
@@ -1909,7 +1910,7 @@ module WatsubMod
         .AND.VOLP1Z(N3,N2,N1).GT.0.0_r8 &
         .AND.(.not.isclose(RCHGFT,0._r8)))THEN
         PSISWD=XN*0.005_r8*SLOPE(N,N2,N1)*DLYR(N,N3,N2,N1)*(1.0_r8-DTBLG(N2,N1))
-        PSISUT=AZMAX1(-PSISA1(N3,N2,N1)-0.03_r8*PSISO(N3,N2,N1)+GRAVm*(DPTH(N3,N2,N1)-DTBLX(N2,N1)))
+        PSISUT=AZMAX1(-PSISA1(N3,N2,N1)-0.03_r8*PSISO(N3,N2,N1)+mGravAcceleration*(DPTH(N3,N2,N1)-DTBLX(N2,N1)))
         IF(PSISUT.GT.0.0_r8)PSISUT=PSISUT+PSISWD
         FLWU=PSISUT*HCND(N,1,N3,N2,N1)*AREA(N,N3,N2,N1)*AREAU(N3,N2,N1)/(RCHGFU+1.0)*RCHGFT*XNPH
         IF(BKDS(N3,N2,N1).GT.ZERO)THEN
@@ -1950,7 +1951,7 @@ module WatsubMod
         .AND.VOLPH2.GT.ZEROS2(NY,NX)          & !macropore has air-filled fraction
         .AND.(.not.isclose(RCHGFT,0.0_r8)))THEN      !recharge is on
         PSISWD=XN*0.005*SLOPE(N,N2,N1)*DLYR(N,N3,N2,N1)*(1.0_r8-DTBLG(N2,N1))
-        PSISUTH=-0.03_r8*PSISO(N3,N2,N1)+GRAVm*(DPTHH-DTBLX(N2,N1))
+        PSISUTH=-0.03_r8*PSISO(N3,N2,N1)+mGravAcceleration*(DPTHH-DTBLX(N2,N1))
         IF(PSISUTH.GT.0.0_r8)PSISUTH=PSISUTH+PSISWD
         FLWUH=PSISUTH*CNDH1(N3,N2,N1)*AREA(N,N3,N2,N1)*AREAU(N3,N2,N1)/(RCHGFU+1.0_r8)*RCHGFT*XNPH
         FLWUHL=AMIN1(FLWUH,VOLPH2*XNPX)

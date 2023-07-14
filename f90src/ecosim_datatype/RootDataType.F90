@@ -62,7 +62,7 @@ module RootDataType
   real(r8),target,allocatable ::  RRAD2(:,:,:,:,:)                   !root layer diameter secondary axes, [m ]
   real(r8),target,allocatable ::  RTLG1X(:,:,:,:)                    !specific root length primary axes, [m g-1]
   real(r8),target,allocatable ::  RTLG2X(:,:,:,:)                    !specific root length secondary axes, [m g-1]
-  real(r8),target,allocatable ::  UPWTR(:,:,:,:,:)                   !root water uptake, [m2 d-2 h-1]
+  real(r8),target,allocatable ::  PopPlantRootH2OUptake_vr(:,:,:,:,:)                   !root water uptake, [m2 d-2 h-1]
   real(r8),target,allocatable ::  PSIRT(:,:,:,:,:)                   !root total water potential , [Mpa]
   real(r8),target,allocatable ::  PSIRO(:,:,:,:,:)                   !root osmotic water potential , [Mpa]
   real(r8),target,allocatable ::  PSIRG(:,:,:,:,:)                   !root turgor water potential , [Mpa]
@@ -144,7 +144,7 @@ contains
   allocate(RRAD2(jroots,JZ,JP,JY,JX));RRAD2=0._r8
   allocate(RTLG1X(jroots,JP,JY,JX)); RTLG1X=0._r8
   allocate(RTLG2X(jroots,JP,JY,JX)); RTLG2X=0._r8
-  allocate(UPWTR(jroots,JZ,JP,JY,JX));UPWTR=0._r8
+  allocate(PopPlantRootH2OUptake_vr(jroots,JZ,JP,JY,JX));PopPlantRootH2OUptake_vr=0._r8
   allocate(PSIRT(jroots,JZ,JP,JY,JX));PSIRT=0._r8
   allocate(PSIRO(jroots,JZ,JP,JY,JX));PSIRO=0._r8
   allocate(PSIRG(jroots,JZ,JP,JY,JX));PSIRG=0._r8
@@ -224,7 +224,7 @@ contains
   call destroy(RRAD2)
   call destroy(RTLG1X)
   call destroy(RTLG2X)
-  call destroy(UPWTR)
+  call destroy(PopPlantRootH2OUptake_vr)
   call destroy(PSIRT)
   call destroy(PSIRO)
   call destroy(PSIRG)

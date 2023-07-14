@@ -13,26 +13,28 @@ module NutUptakeMod
   private
 
   character(len=*), private, parameter :: mod_filename = __FILE__
-  public :: NutO2Uptake
+  public :: PopPlantNutientO2Uptake
   contains
 
 !------------------------------------------------------------------------
 
-  subroutine NutO2Uptake(NZ,FDMP,OSTRN,OSTRD,PATH,RRADL,FPQ,FPP,FRTDPX,RTARR)
+  subroutine PopPlantNutientO2Uptake(NZ,FDMP,PopPlantO2Uptake,PopPlantO2Demand,PATH,RRADL,FPQ,FPP,FRTDPX,RTARR)
+  !
+  !DESCRIPTION
+  !doing plant population level nutrient, and O2 uptake
   implicit none
   integer, intent(in) :: NZ
   real(r8), intent(in):: FDMP
   real(r8), intent(in) :: PATH(2,JZ1),RRADL(2,JZ1),FPQ(2,JZ1,JP1),FPP(2,JZ1,JP1)
   real(r8), intent(in) :: FRTDPX(JZ1,JP1),RTARR(2,JZ1)
-  real(r8), intent(inout) :: OSTRN,OSTRD
+  real(r8), intent(inout) :: PopPlantO2Uptake,PopPlantO2Demand
 
   call CanopyNH3Flux(NZ,FDMP)
 !
 !     ROOT(N=1) AD MYCORRHIZAL(N=2) O2 AND NUTRIENT UPTAKE
 !
-  call RootMycoO2NutrientUptake(NZ,OSTRN,OSTRD,PATH,RRADL,&
-    FPQ,FPP,FRTDPX,RTARR)
-  end subroutine NutO2Uptake
+  call RootMycoO2NutrientUptake(NZ,PopPlantO2Uptake,PopPlantO2Demand,PATH,RRADL,FPQ,FPP,FRTDPX,RTARR)
+  end subroutine PopPlantNutientO2Uptake
 !------------------------------------------------------------------------
 
   subroutine CanopyNH3Flux(NZ,FDMP)
@@ -97,16 +99,16 @@ module NutUptakeMod
 
 !------------------------------------------------------------------------------------------
 
-  subroutine RootMycoO2NutrientUptake(NZ,OSTRN,OSTRD,PATH,RRADL,&
+  subroutine RootMycoO2NutrientUptake(NZ,PopPlantO2Uptake,PopPlantO2Demand,PATH,RRADL,&
     FPQ,FPP,FRTDPX,RTARR)
 
   implicit none
   integer, intent(in) :: NZ
   real(r8), intent(in) :: PATH(2,JZ1),RRADL(2,JZ1),FPQ(2,JZ1,JP1),FPP(2,JZ1,JP1)
   real(r8), intent(in) :: FRTDPX(JZ1,JP1),RTARR(2,JZ1)
-  real(r8), intent(inout) :: OSTRN,OSTRD
+  real(r8), intent(inout) :: PopPlantO2Uptake,PopPlantO2Demand
   real(r8) :: TFOXYX
-  real(r8) :: FCUP,FZUP,FPUP,FWSRT,UPWTRP,UPWTRH,FOXYX,RUPOXT
+  real(r8) :: FCUP,FZUP,FPUP,FWSRT,UPWTRP,UPWTRH,FOXYX,PopPlantO2Uptake_vr
   integer :: N,L
 !     begin_execution
   associate(                             &
@@ -141,7 +143,7 @@ module NutUptakeMod
 !
 !     ROOT O2 DEMAND CALCULATED FROM O2 NON-LIMITED RESPIRATION RATE
 !
-!     ROXYP=O2 demand
+!     ROXYP=O2 demand, g O2
 !     RCO2M=respiration unlimited by O2
 !     RTVLW=root or myco aqueous volume
 !     FOXYX=fraction of total O2 demand from previous hour
@@ -149,10 +151,10 @@ module NutUptakeMod
         ROXYP(N,L,NZ)=2.667*RCO2M(N,L,NZ)
 
         call RootSoilGasExchange(N,L,NZ,RRADL,FPQ,FRTDPX,RTARR,UPWTRH,&
-          FOXYX,RUPOXT)
+          FOXYX,PopPlantO2Uptake_vr)
 
-        OSTRD=OSTRD+ROXYP(N,L,NZ)
-        OSTRN=OSTRN+RUPOXT
+        PopPlantO2Demand=PopPlantO2Demand+ROXYP(N,L,NZ)
+        PopPlantO2Uptake=PopPlantO2Uptake+PopPlantO2Uptake_vr
 
         call RootExudates(N,L,NZ)
 !
@@ -347,7 +349,7 @@ module NutUptakeMod
   real(r8) :: ZOSGX,ZNO3M,ZNO3X,ZNOBM,ZNOBX
 ! begin_execution
   associate(                              &
-    PP      =>  plt_site%PP         , &
+    pftPlantPopulation      =>  plt_site%pftPlantPopulation         , &
     TORT    =>  plt_site%TORT       , &
     ZERO    =>  plt_site%ZERO       , &
     RTARP   =>  plt_morph%RTARP     , &
@@ -436,9 +438,9 @@ module NutUptakeMod
     RTKNOP=(-BP-SQRT(BP*BP-4.0*CP))/2.0
     ZNO3M=UPMNZO(N,NZ)*VOLW(L)*trcs_VLN(ids_NO3,L)
     ZNO3X=AZMAX1(FNO3X*(trc_solml(ids_NO3,L)-ZNO3M))
-    RUNNOP(N,L,NZ)=AZMAX1(RTKNO3*PP(NZ))
+    RUNNOP(N,L,NZ)=AZMAX1(RTKNO3*pftPlantPopulation(NZ))
     RUPNO3(N,L,NZ)=AMIN1(ZNO3X,RUNNOP(N,L,NZ))
-    RUONO3(N,L,NZ)=AMIN1(ZNO3X,AZMAX1(RTKNOP*PP(NZ)))
+    RUONO3(N,L,NZ)=AMIN1(ZNO3X,AZMAX1(RTKNOP*pftPlantPopulation(NZ)))
     RUCNO3(N,L,NZ)=RUPNO3(N,L,NZ)/FCUP
   ENDIF
   !
@@ -495,9 +497,9 @@ module NutUptakeMod
     RTKNPB=(-BP-SQRT(BP*BP-4.0*CP))/2.0
     ZNOBM=UPMNZO(N,NZ)*VOLW(L)*trcs_VLN(ids_NO3B,L)
     ZNOBX=AZMAX1(FNOBX*(trc_solml(ids_NO3B,L)-ZNOBM))
-    RUNNXP(N,L,NZ)=AZMAX1(RTKNOB*PP(NZ))
+    RUNNXP(N,L,NZ)=AZMAX1(RTKNOB*pftPlantPopulation(NZ))
     RUPNOB(N,L,NZ)=AMIN1(ZNOBX,RUNNXP(N,L,NZ))
-    RUONOB(N,L,NZ)=AMIN1(ZNOBX,AZMAX1(RTKNPB*PP(NZ)))
+    RUONOB(N,L,NZ)=AMIN1(ZNOBX,AZMAX1(RTKNPB*pftPlantPopulation(NZ)))
     RUCNOB(N,L,NZ)=RUPNOB(N,L,NZ)/FCUP
   ENDIF
   end associate
@@ -522,7 +524,7 @@ module NutUptakeMod
   real(r8) :: ZNHBX,ZNSGX,ZNH4M,ZNH4X,ZNHBM
 ! begin_execution
   associate(                              &
-    PP      =>  plt_site%PP         , &
+    pftPlantPopulation      =>  plt_site%pftPlantPopulation         , &
     ZERO    =>  plt_site%ZERO       , &
     TORT    =>  plt_site%TORT       , &
     TFN4    =>  plt_pheno%TFN4      , &
@@ -607,9 +609,9 @@ module NutUptakeMod
     RTKNHP=(-BP-SQRT(BP*BP-4.0*CP))/2.0_r8
     ZNH4M=UPMNZH(N,NZ)*VOLW(L)*trcs_VLN(ids_NH4,L)
     ZNH4X=AZMAX1(FNH4X*(trc_solml(ids_NH4,L)-ZNH4M))
-    RUNNHP(N,L,NZ)=AZMAX1(RTKNH4*PP(NZ))
+    RUNNHP(N,L,NZ)=AZMAX1(RTKNH4*pftPlantPopulation(NZ))
     RUPNH4(N,L,NZ)=AMIN1(ZNH4X,RUNNHP(N,L,NZ))
-    RUONH4(N,L,NZ)=AMIN1(ZNH4X,AZMAX1(RTKNHP*PP(NZ)))
+    RUONH4(N,L,NZ)=AMIN1(ZNH4X,AZMAX1(RTKNHP*pftPlantPopulation(NZ)))
     RUCNH4(N,L,NZ)=RUPNH4(N,L,NZ)/FCUP
   ENDIF
 !
@@ -666,9 +668,9 @@ module NutUptakeMod
     RTKNBP=(-BP-SQRT(BP*BP-4.0*CP))/2.0
     ZNHBM=UPMNZH(N,NZ)*VOLW(L)*trcs_VLN(ids_NH4B,L)
     ZNHBX=AZMAX1(FNHBX*(trc_solml(ids_NH4B,L)-ZNHBM))
-    RUNNBP(N,L,NZ)=AZMAX1(RTKNHB*PP(NZ))
+    RUNNBP(N,L,NZ)=AZMAX1(RTKNHB*pftPlantPopulation(NZ))
     RUPNHB(N,L,NZ)=AMIN1(ZNHBX,RUNNBP(N,L,NZ))
-    RUONHB(N,L,NZ)=AMIN1(ZNHBX,AZMAX1(RTKNBP*PP(NZ)))
+    RUONHB(N,L,NZ)=AMIN1(ZNHBX,AZMAX1(RTKNBP*pftPlantPopulation(NZ)))
     RUCNHB(N,L,NZ)=RUPNHB(N,L,NZ)/FCUP
   ENDIF
   end associate
@@ -694,7 +696,7 @@ module NutUptakeMod
   real(r8) :: X,Y
   !     begin_execution
   associate(                             &
-    PP      => plt_site%PP         , &
+    pftPlantPopulation      => plt_site%pftPlantPopulation         , &
     ZERO    => plt_site%ZERO       , &
     TFN4    => plt_pheno%TFN4      , &
     WFR     => plt_rbgc%WFR        , &
@@ -769,9 +771,9 @@ module NutUptakeMod
     RTKHP1=(-BP-SQRT(BP*BP-4.0*CP))/2.0
     H1POM=UPMNPO(N,NZ)*VOLW(L)*trcs_VLN(ids_H1PO4,L)
     H1POX=AZMAX1(FP14X*(trc_solml(ids_H1PO4,L)-H1POM))
-    RUPP1P(N,L,NZ)=AZMAX1(RTKH1P*PP(NZ))
+    RUPP1P(N,L,NZ)=AZMAX1(RTKH1P*pftPlantPopulation(NZ))
     RUPH1P(N,L,NZ)=AMIN1(H1POX,RUPP1P(N,L,NZ))
-    RUOH1P(N,L,NZ)=AMIN1(H1POX,AZMAX1(RTKHP1*PP(NZ)))
+    RUOH1P(N,L,NZ)=AMIN1(H1POX,AZMAX1(RTKHP1*pftPlantPopulation(NZ)))
     RUCH1P(N,L,NZ)=RUPH1P(N,L,NZ)/FCUP
 
   ENDIF
@@ -828,9 +830,9 @@ module NutUptakeMod
     RTKHB1=(-BP-SQRT(BP*BP-4.0*CP))/2.0
     H1PXM=UPMNPO(N,NZ)*VOLW(L)*trcs_VLN(ids_H1PO4B,L)
     H1PXB=AZMAX1(FP1BX*(trc_solml(ids_H1PO4B,L)-H1PXM))
-    RUPP1B(N,L,NZ)=AZMAX1(RTKH1B*PP(NZ))
+    RUPP1B(N,L,NZ)=AZMAX1(RTKH1B*pftPlantPopulation(NZ))
     RUPH1B(N,L,NZ)=AMIN1(H1PXB,RUPP1B(N,L,NZ))
-    RUOH1B(N,L,NZ)=AMIN1(H1PXB,AZMAX1(RTKHB1*PP(NZ)))
+    RUOH1B(N,L,NZ)=AMIN1(H1PXB,AZMAX1(RTKHB1*pftPlantPopulation(NZ)))
     RUCH1B(N,L,NZ)=RUPH1B(N,L,NZ)/FCUP
   ENDIF
   end associate
@@ -853,7 +855,7 @@ module NutUptakeMod
   real(r8) :: UPMX,UPMXP,X,Y
   !
   associate(                             &
-    PP      => plt_site%PP         , &
+    pftPlantPopulation      => plt_site%pftPlantPopulation         , &
     ZERO    => plt_site%ZERO       , &
     WFR     => plt_rbgc%WFR        , &
     UPKMPO  => plt_rbgc%UPKMPO     , &
@@ -927,9 +929,9 @@ module NutUptakeMod
       RTKHPP=(-BP-SQRT(BP*BP-4.0*CP))/2.0
       H2POM=UPMNPO(N,NZ)*VOLW(L)*trcs_VLN(ids_H1PO4,L)
       H2POX=AZMAX1(FPO4X*(trc_solml(ids_H2PO4,L)-H2POM))
-      RUPP2P(N,L,NZ)=AZMAX1(RTKH2P*PP(NZ))
+      RUPP2P(N,L,NZ)=AZMAX1(RTKH2P*pftPlantPopulation(NZ))
       RUPH2P(N,L,NZ)=AMIN1(H2POX,RUPP2P(N,L,NZ))
-      RUOH2P(N,L,NZ)=AMIN1(H2POX,AZMAX1(RTKHPP*PP(NZ)))
+      RUOH2P(N,L,NZ)=AMIN1(H2POX,AZMAX1(RTKHPP*pftPlantPopulation(NZ)))
       RUCH2P(N,L,NZ)=RUPH2P(N,L,NZ)/FCUP
     ENDIF
     !
@@ -986,9 +988,9 @@ module NutUptakeMod
     RTKHPB=(-BP-SQRT(BP*BP-4.0*CP))/2.0
     H2PXM=UPMNPO(N,NZ)*VOLW(L)*trcs_VLN(ids_H1PO4B,L)
     H2PXB=AZMAX1(FPOBX*(trc_solml(ids_H2PO4B,L)-H2PXM))
-    RUPP2B(N,L,NZ)=AZMAX1(RTKH2B*PP(NZ))
+    RUPP2B(N,L,NZ)=AZMAX1(RTKH2B*pftPlantPopulation(NZ))
     RUPH2B(N,L,NZ)=AMIN1(H2PXB,RUPP2B(N,L,NZ))
-    RUOH2B(N,L,NZ)=AMIN1(H2PXB,AZMAX1(RTKHPB*PP(NZ)))
+    RUOH2B(N,L,NZ)=AMIN1(H2PXB,AZMAX1(RTKHPB*pftPlantPopulation(NZ)))
     RUCH2B(N,L,NZ)=RUPH2B(N,L,NZ)/FCUP
   ENDIF
   end associate
@@ -1082,10 +1084,10 @@ module NutUptakeMod
     ROXYY   => plt_bgcr%ROXYY   , &
     RCO2N   => plt_rbgc%RCO2N   , &
     ROXYP   => plt_rbgc%ROXYP   , &
-    PP      => plt_site%PP      , &
+    pftPlantPopulation      => plt_site%pftPlantPopulation      , &
     ZEROS   => plt_site%ZEROS   , &
     ZERO    => plt_site%ZERO    , &
-    UPWTR   => plt_ew%UPWTR     , &
+    PopPlantRootH2OUptake_vr   => plt_ew%PopPlantRootH2OUptake_vr     , &
     CWSRT   => plt_allom%CWSRT  , &
     ZEROP   => plt_biom%ZEROP   , &
     CWSRTL  => plt_biom%CWSRTL  , &
@@ -1105,10 +1107,10 @@ module NutUptakeMod
   !
   IF(WTRTL(N,L,NZ).GT.ZEROP(NZ))THEN
     CWSRTL(N,L,NZ)=AMIN1(CWSRT(NZ),WSRTL(N,L,NZ)/WTRTL(N,L,NZ))
-    FWSRT=CWSRTL(N,L,NZ)/0.05
+    FWSRT=CWSRTL(N,L,NZ)/0.05_r8
   ELSE
     CWSRTL(N,L,NZ)=CWSRT(NZ)
-    FWSRT=1.0
+    FWSRT=1.0_r8
   ENDIF
   !
   !     RESPIRATION CONSTRAINT ON UPTAKE FROM NON-STRUCTURAL C
@@ -1118,7 +1120,7 @@ module NutUptakeMod
   !     CPOOLR=nonstructural C content
   !
   IF(RCO2N(N,L,NZ).GT.ZEROP(NZ))THEN
-    FCUP=AZMAX1(AMIN1(1.0,0.25*safe_adb(EPOOLR(ielmc,N,L,NZ),RCO2N(N,L,NZ))))
+    FCUP=AZMAX1(AMIN1(1.0_r8,0.25_r8*safe_adb(EPOOLR(ielmc,N,L,NZ),RCO2N(N,L,NZ))))
   ELSE
     FCUP=0.0_r8
   ENDIF
@@ -1140,7 +1142,7 @@ module NutUptakeMod
     FPUP=0.0_r8
   ENDIF
   !NN=0
-  UPWTRP=AZMAX1(-UPWTR(N,L,NZ)/PP(NZ))
+  UPWTRP=AZMAX1(-PopPlantRootH2OUptake_vr(N,L,NZ)/pftPlantPopulation(NZ))
   UPWTRH=UPWTRP*XNPG
   !
   !     FACTORS CONSTRAINING O2 AND NUTRIENT UPTAKE AMONG

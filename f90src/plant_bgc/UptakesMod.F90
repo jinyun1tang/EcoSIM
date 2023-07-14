@@ -1,5 +1,6 @@
 module UptakesMod
-  use data_kind_mod, only : r8 => DAT_KIND_R8
+  use data_kind_mod , only : r8 => DAT_KIND_R8
+  use data_const_mod, only : GravAcceleration=>DAT_CONST_G
   use StomatesMod   , only : stomates
   use minimathmod  , only : safe_adb,vapsat,isclose,AZMAX1,AZMIN1
   use EcosimConst
@@ -15,6 +16,8 @@ module UptakesMod
 
   public :: uptakes
   public :: InitUptake
+
+  real(r8), parameter :: mGravAcceleration=1.e-3_r8*GravAcceleration  !gravitational constant devided by 1000.  
   contains
 
   subroutine InitUptake
@@ -36,7 +39,7 @@ module UptakesMod
 
   integer :: NN,N,NZ,K,L
   real(r8) :: FPC
-  real(r8) :: OSTRN,OSTRD,PARHC
+  real(r8) :: PopPlantO2Uptake,PopPlantO2Demand,PARHC
   real(r8) :: WVPLT
   real(r8) :: PSIST1(JZ1),PATH(2,JZ1)
   real(r8) :: RRADL(2,JZ1),RSRT(2,JZ1)
@@ -71,7 +74,7 @@ module UptakesMod
     CDPTHZ => plt_site%CDPTHZ  , &
     PPT    => plt_site%PPT     , &
     NP     => plt_site%NP      , &
-    PP     => plt_site%PP      , &
+    pftPlantPopulation     => plt_site%pftPlantPopulation      , &
     NU     => plt_site%NU      , &
     AREA3  => plt_site%AREA3   , &
     ZEROS  => plt_site%ZEROS   , &
@@ -81,7 +84,7 @@ module UptakesMod
     WTLS   => plt_biom%WTLS    , &
     WVSTK  => plt_biom%WVSTK   , &
     IDAY   => plt_pheno%IDAY   , &
-    OSTR   => plt_pheno%OSTR   , &
+    PlantO2Stress   => plt_pheno%PlantO2Stress   , &
     IFLGC  => plt_pheno%IFLGC  , &
     ARLFC  => plt_morph%ARLFC  , &
     RTDP1  => plt_morph%RTDP1  , &
@@ -92,15 +95,15 @@ module UptakesMod
     FRADP  => plt_rad%FRADP      &
   )
 
-  call PrepUptake(PSIST1,WTRTG,VOLPU,VOLWU)
+  call PrepH2ONutrientUptake(PSIST1,WTRTG,VOLPU,VOLWU)
 !
 !     IF PLANT SPECIES EXISTS
 !
   DO NZ=1,NP
-    OSTRN=0.0_r8
-    OSTRD=0.0_r8
+    PopPlantO2Uptake=0.0_r8
+    PopPlantO2Demand=0.0_r8
 
-    IF(IFLGC(NZ).EQ.ipltactv.AND.PP(NZ).GT.0.0_r8)THEN
+    IF(IFLGC(NZ).EQ.ipltactv.AND.pftPlantPopulation(NZ).GT.0.0_r8)THEN
 
       call UpdateCanopyProperty(NZ)
 
@@ -144,7 +147,7 @@ module UptakesMod
         IF(ARLSS.GT.ZEROS)THEN
           FPC=ARLFS(NZ)/ARLSS*AMIN1(1.0_r8,0.5_r8*ARLFC/AREA3(NU))
         ELSEIF(PPT.GT.ZEROS)THEN
-          FPC=PP(NZ)/PPT
+          FPC=pftPlantPopulation(NZ)/PPT
         ELSE
           FPC=1.0_r8/NP
         ENDIF
@@ -184,16 +187,14 @@ module UptakesMod
 
       call SetCanopyGrowthFuncs(NZ)
 
-
-      call NutO2Uptake(NZ,FDMP,OSTRN,OSTRD,PATH,RRADL,&
-        FPQ,FPP,FRTDPX,RTARR)
+      call PopPlantNutientO2Uptake(NZ,FDMP,PopPlantO2Uptake,PopPlantO2Demand,PATH,RRADL,FPQ,FPP,FRTDPX,RTARR)
 
       TLEC=TLEC+EFLXC(NZ)*RA(NZ)
       TSHC=TSHC+SFLXC(NZ)*RA(NZ)
-      IF(OSTRD.GT.ZEROP(NZ))THEN
-        OSTR(NZ)=OSTRN/OSTRD
+      IF(PopPlantO2Demand.GT.ZEROP(NZ))THEN
+        PlantO2Stress(NZ)=PopPlantO2Uptake/PopPlantO2Demand
       ELSE
-        OSTR(NZ)=0.0_r8
+        PlantO2Stress(NZ)=0.0_r8
       ENDIF
     ENDIF
   ENDDO
@@ -202,7 +203,7 @@ module UptakesMod
   END subroutine uptakes
 !------------------------------------------------------------------------
 
-  subroutine PrepUptake(PSIST1,WTRTG,VOLPU,VOLWU)
+  subroutine PrepH2ONutrientUptake(PSIST1,WTRTG,VOLPU,VOLWU)
 !
 !     prepare for uptake calculation
   implicit none
@@ -261,7 +262,7 @@ module UptakesMod
 !
     DO  L=NU,NJ
       DO  N=1,MY(NZ)
-        plt_ew%UPWTR(N,L,NZ)=0.0_r8
+        plt_ew%PopPlantRootH2OUptake_vr(N,L,NZ)=0.0_r8
         plt_rbgc%RCO2P(N,L,NZ)=0.0_r8
         plt_rbgc%RUPOXP(N,L,NZ)=0.0_r8
         plt_rbgc%RCO2S(N,L,NZ)=0.0_r8
@@ -284,8 +285,8 @@ module UptakesMod
 !     VOLPU=air volume
 !     WTRTG=total biome root mass
 !
-  DO 9000 L=NU,NJ
-    PSIST1(L)=PSIST(L)-0.0098_r8*ALT
+  D9000: DO L=NU,NJ
+    PSIST1(L)=PSIST(L)-mGravAcceleration*ALT
     IF(BKDS(L).GT.ZERO)THEN
       VOLWU(L)=VOLWM(NPH,L)-THETY(L)*VOLY(L)
       VOLPU(L)=AZMAX1(VOLA(L)-VOLW(L)-VOLI(L))
@@ -294,16 +295,16 @@ module UptakesMod
       VOLPU(L)=0.0_r8
     ENDIF
     WTRTG(L)=0.0_r8
-    DO 9005 NZ=1,NP
+    D9005: DO NZ=1,NP
       DO  N=1,MY(NZ)
-!     IF(IFLGC(NZ).EQ.ipltactv.AND.PP(NZ).GT.0.0)THEN
+!     IF(IFLGC(NZ).EQ.ipltactv.AND.pftPlantPopulation(NZ).GT.0.0)THEN
       WTRTG(L)=WTRTG(L)+AZMAX1(WTRTD(N,L,NZ))
 !     ENDIF
       enddo
-9005  CONTINUE
-9000  CONTINUE
+    ENDDO D9005
+  ENDDO D9000  
   end associate
-  end subroutine PrepUptake
+  end subroutine PrepH2ONutrientUptake
 !------------------------------------------------------------------------
   subroutine UpdateCanopyProperty(NZ)
 !
@@ -331,20 +332,20 @@ module UptakesMod
     SURFX  =>  plt_photo%SURFX  , &
     ARLF1  =>  plt_morph%ARLF1  , &
     KLEAFX =>  plt_morph%KLEAFX , &
-    ZC     =>  plt_morph%ZC     , &
+    CanopyHeight     =>  plt_morph%CanopyHeight     , &
     CFX    =>  plt_morph%CFX    , &
     ARLFS  =>  plt_morph%ARLFS  , &
     NBR    =>  plt_morph%NBR    , &
     SURF   =>  plt_morph%SURF   , &
-    ZT     =>  plt_morph%ZT       &
+    GridMaxCanopyHeight     =>  plt_morph%GridMaxCanopyHeight       &
   )
 !
 !     APPLY CLUMPING FACTOR TO LEAF SURFACE AREA DEFINED BY
 !     INCLINATION N, LAYER L, NODE K, BRANCH NB, SPECIES NZ,
 !     N-S POSITION NY, E-W POSITION NX(AZIMUTH M ASSUMED UNIFORM)
 !
-  DO 500 NB=1,NBR(NZ)
-    DO 550 K=1,JNODS1
+  D500: DO NB=1,NBR(NZ)
+    D550: DO K=1,JNODS1
 !
 !     NUMBER OF MINIMUM LEAFED NODE USED IN GROWTH ALLOCATION
 !
@@ -353,17 +354,16 @@ module UptakesMod
 !     SURFX,SURF=unself-shaded,total leaf surface area
 !     CFX=clumping factor from PFT file
 !
-      IF(ARLF1(K,NB,NZ).GT.ZEROP(NZ) &
-        .AND.WSLF(K,NB,NZ).GT.ZEROP(NZ))THEN
+      IF(ARLF1(K,NB,NZ).GT.ZEROP(NZ).AND.WSLF(K,NB,NZ).GT.ZEROP(NZ))THEN
         KLEAFX(NB,NZ)=K
       ENDIF
-      DO 600 L=JC1,1,-1
-        DO 650 N=1,JLI1
+      D600: DO L=JC1,1,-1
+        D650: DO N=1,JLI1
           SURFX(N,L,K,NB,NZ)=SURF(N,L,K,NB,NZ)*CFX(NZ)
-650     CONTINUE
-600   CONTINUE
-550 CONTINUE
-500 CONTINUE
+        ENDDO D650
+      ENDDO D600
+    ENDDO D550 
+  ENDDO D500 
 !
 !     CANOPY HEIGHT FROM HEIGHT OF MAXIMUM LEAF LAYER
 !
@@ -381,16 +381,16 @@ module UptakesMod
   IF(ARLFS(NZ).GT.0.0_r8)THEN
     IF(IETYP.GE.0)THEN
       TFRADP=0.0_r8
-      DO 700 NZZ=1,NP
-        IF(ZC(NZZ).GT.ZC(NZ)+ZR)THEN
+      D700: DO NZZ=1,NP
+        IF(CanopyHeight(NZZ).GT.CanopyHeight(NZ)+ZR)THEN
           TFRADP=TFRADP+FRADP(NZZ)
         ENDIF
-700   CONTINUE
+      ENDDO D700
       ALFZ=2.0_r8*TFRADP
-      IF(RAB.GT.ZERO.AND.ZT.GT.ZERO.AND.ALFZ.GT.ZERO)THEN
-        RACZ(NZ)=AMIN1(RACX,AZMAX1(ZT*EXP(ALFZ) &
-          /(ALFZ/RAB)*(EXP(-ALFZ*ZC(NZ)/ZT) &
-          -EXP(-ALFZ*(ZD+ZR)/ZT))))
+      IF(RAB.GT.ZERO.AND.GridMaxCanopyHeight.GT.ZERO.AND.ALFZ.GT.ZERO)THEN
+        RACZ(NZ)=AMIN1(RACX,AZMAX1(GridMaxCanopyHeight*EXP(ALFZ) &
+          /(ALFZ/RAB)*(EXP(-ALFZ*CanopyHeight(NZ)/GridMaxCanopyHeight) &
+          -EXP(-ALFZ*(ZD+ZR)/GridMaxCanopyHeight))))
       ELSE
         RACZ(NZ)=0.0_r8
       ENDIF
@@ -435,7 +435,7 @@ module UptakesMod
     DLYR3  =>  plt_site%DLYR3    , &
     ZEROS  =>  plt_site%ZEROS    , &
     ZERO   =>  plt_site%ZERO     , &
-    PP     =>  plt_site%PP       , &
+    pftPlantPopulation     =>  plt_site%pftPlantPopulation       , &
     NU     =>  plt_site%NU       , &
     NRT    =>  plt_morph%NRT     , &
     MY     =>  plt_morph%MY      , &
@@ -494,7 +494,7 @@ module UptakesMod
       FPP(N,L,NZ)=FMN*FPQ(N,L,NZ)
       IF(RTDNP(N,L,NZ).GT.ZERO.AND.FRTDPX(L,NZ).GT.ZERO)THEN
         RRADL(N,L)=AMAX1(RRAD2X(N,NZ),SQRT((RTVLW(N,L,NZ) &
-          /(1.0_r8-PORT(N,NZ)))/(PICON*PP(NZ)*RTLGP(N,L,NZ))))
+          /(1.0_r8-PORT(N,NZ)))/(PICON*pftPlantPopulation(NZ)*RTLGP(N,L,NZ))))
         PATH(N,L)=AMAX1(1.001_r8*RRADL(N,L),1.0_r8/(SQRT(PICON*(RTDNP(N,L,NZ)/FRTDPX(L,NZ))/FMPR(L))))
         RTARR(N,L)=PICON2s*RTLGP(N,L,NZ)/FRTDPX(L,NZ)
       ELSE
@@ -532,7 +532,7 @@ module UptakesMod
    TKS     => plt_ew%TKS       , &
    PSIRO   => plt_ew%PSIRO     , &
    TCC     => plt_ew%TCC       , &
-   UPWTR   => plt_ew%UPWTR     , &
+   PopPlantRootH2OUptake_vr   => plt_ew%PopPlantRootH2OUptake_vr     , &
    PSIRG   => plt_ew%PSIRG     , &
    PSILG   => plt_ew%PSILG     , &
    PSIRT   => plt_ew%PSIRT     , &
@@ -590,7 +590,7 @@ module UptakesMod
           OSWT=36.0_r8+840.0_r8*AZMAX1(CCPOLT)
           PSIRO(N,L,NZ)=FDMR/0.16_r8*OSMO(NZ)-RGAS*TKS(L)*FDMR*CCPOLT/OSWT
           PSIRG(N,L,NZ)=AZMAX1(PSIRT(N,L,NZ)-PSIRO(N,L,NZ))
-          UPWTR(N,L,NZ)=0.0_r8
+          PopPlantRootH2OUptake_vr(N,L,NZ)=0.0_r8
       enddo
       ENDDO D4290
     ENDIF
@@ -645,7 +645,7 @@ module UptakesMod
     EP      => plt_ew%EP        , &
     PSILT   => plt_ew%PSILT     , &
     VOLWP   => plt_ew%VOLWP     , &
-    UPWTR   => plt_ew%UPWTR     , &
+    PopPlantRootH2OUptake_vr   => plt_ew%PopPlantRootH2OUptake_vr     , &
     TKCZ    => plt_ew%TKCZ      , &
     EVAPC   => plt_ew%EVAPC     , &
     VHCPC   => plt_ew%VHCPC     , &
@@ -817,7 +817,7 @@ module UptakesMod
 !     SOIL + ROOT HYDRAULIC RESISTANCES
 !
 !     ILYR=rooted layer flag
-!     UPWTR=root water uptake from soil layer
+!     PopPlantRootH2OUptake_vr=root water uptake from soil layer
 !     VOLWU,VOLPU=water volume available for uptake,air volume
 !     FPQ=PFT fraction of biome root mass
 !     PSILC=canopy water potential adjusted for canopy height
@@ -828,14 +828,14 @@ module UptakesMod
       DO N=1,MY(NZ)
         DO  L=NU,NI(NZ)
           IF(ILYR(N,L).EQ.1)THEN
-            UPWTR(N,L,NZ)=AMAX1(AZMIN1(-VOLWU(L)*FPQ(N,L,NZ)) &
+            PopPlantRootH2OUptake_vr(N,L,NZ)=AMAX1(AZMIN1(-VOLWU(L)*FPQ(N,L,NZ)) &
               ,AMIN1((PSILC-PSIST1(L))/RSRS(N,L),VOLPU(L)*FPQ(N,L,NZ)))
-            IF(UPWTR(N,L,NZ).GT.0.0_r8)THEN
-              UPWTR(N,L,NZ)=0.1*UPWTR(N,L,NZ)
+            IF(PopPlantRootH2OUptake_vr(N,L,NZ).GT.0.0_r8)THEN
+              PopPlantRootH2OUptake_vr(N,L,NZ)=0.1*PopPlantRootH2OUptake_vr(N,L,NZ)
             ENDIF
-            UPRT=UPRT+UPWTR(N,L,NZ)
+            UPRT=UPRT+PopPlantRootH2OUptake_vr(N,L,NZ)
           ELSE
-            UPWTR(N,L,NZ)=0.0_r8
+            PopPlantRootH2OUptake_vr(N,L,NZ)=0.0_r8
           ENDIF
         enddo
       ENDDO
@@ -943,7 +943,7 @@ module UptakesMod
   integer :: N, L
   associate(                          &
     DPTHZ  => plt_site%DPTHZ    , &
-    PP     => plt_site%PP       , &
+    pftPlantPopulation     => plt_site%pftPlantPopulation       , &
     VOLWM  => plt_site%VOLWM    , &
     ZERO   => plt_site%ZERO     , &
     ZEROS2 => plt_site%ZEROS2   , &
@@ -966,7 +966,7 @@ module UptakesMod
     RRAD1  => plt_morph%RRAD1   , &
     MY     => plt_morph%MY      , &
     RSRR   => plt_morph%RSRR    , &
-    ZC     => plt_morph%ZC      , &
+    CanopyHeight     => plt_morph%CanopyHeight      , &
     NG     => plt_morph%NG      , &
     NI     => plt_morph%NI        &
   )
@@ -980,9 +980,9 @@ module UptakesMod
   !     EMODW=wood modulus of elasticity (MPa)
 !
   CNDT=0.0_r8
-  HTSTZ(NZ)=0.80*ZC(NZ)
-  PSILH=-0.0098*HTSTZ(NZ)
-  FRADW=1.0E+04*(AMAX1(0.5,1.0+PSILT(NZ)/EMODW))**4
+  HTSTZ(NZ)=0.80*CanopyHeight(NZ)
+  PSILH=-mGravAcceleration*HTSTZ(NZ)
+  FRADW=1.0E+04_r8*(AMAX1(0.5_r8,1.0_r8+PSILT(NZ)/EMODW))**4._r8
 !
   !     SOIL AND ROOT HYDRAULIC RESISTANCES TO ROOT WATER UPTAKE
   !
@@ -1012,7 +1012,7 @@ module UptakesMod
         !     PATH=path length of water and nutrient uptake
         !     RRADL,RTARR=root radius,surface/radius area
         !
-        RSSL=(LOG(PATH(N,L)/RRADL(N,L))/RTARR(N,L))/PP(NZ)
+        RSSL=(LOG(PATH(N,L)/RRADL(N,L))/RTARR(N,L))/pftPlantPopulation(NZ)
         RSSX(N,L)=RSSL/CNDU(L)
         !
         !     RADIAL ROOT RESISTANCE FROM ROOT AREA AND RADIAL RESISTIVITY
@@ -1024,7 +1024,7 @@ module UptakesMod
         !     RSRR=radial resistivity from PFT file
         !     VOLA,VOLWM=soil micropore,water volume
         !
-        RTAR2=PICON2s*RRAD2(N,L,NZ)*RTLGP(N,L,NZ)*PP(NZ)
+        RTAR2=PICON2s*RRAD2(N,L,NZ)*RTLGP(N,L,NZ)*pftPlantPopulation(NZ)
         RSRG(N,L)=RSRR(N,NZ)/RTAR2*VOLA(L)/VOLWM(NPH,L)
 !
         !     ROOT AXIAL RESISTANCE FROM RADII AND LENGTHS OF PRIMARY AND
@@ -1097,7 +1097,7 @@ module UptakesMod
     VHCPC  =>  plt_ew%VHCPC     , &
     PSILO  =>  plt_ew%PSILO     , &
     PSIRG  =>  plt_ew%PSIRG     , &
-    UPWTR  =>  plt_ew%UPWTR     , &
+    PopPlantRootH2OUptake_vr  =>  plt_ew%PopPlantRootH2OUptake_vr     , &
     PSILG  =>  plt_ew%PSILG     , &
     PSILT  =>  plt_ew%PSILT     , &
     PSIRO  =>  plt_ew%PSIRO     , &
@@ -1114,7 +1114,7 @@ module UptakesMod
     CEPOLR =>  plt_biom%CEPOLR  , &
     WTSHTE =>  plt_biom%WTSHTE  , &
     NI     =>  plt_morph%NI     , &
-    ZC     =>  plt_morph%ZC     , &
+    CanopyHeight     =>  plt_morph%CanopyHeight     , &
     NG     =>  plt_morph%NG     , &
     MY     =>  plt_morph%MY     , &
     RCS    =>  plt_photo%RCS    , &
@@ -1132,7 +1132,7 @@ module UptakesMod
   HFLXC(NZ)=0.0_r8
   EVAPC(NZ)=0.0_r8
   EP(NZ)=0.0_r8
-  IF(ZC(NZ).GE.DPTHS-ZERO)THEN
+  IF(CanopyHeight(NZ).GE.DPTHS-ZERO)THEN
     TKC(NZ)=TKA
   ELSE
     TKC(NZ)=TKW
@@ -1161,7 +1161,7 @@ module UptakesMod
       OSWT=36.0_r8+840.0_r8*AZMAX1(CCPOLT)
       PSIRO(N,L,NZ)=FDMR/0.16_r8*OSMO(NZ)-RGAS*TKS(L)*FDMR*CCPOLT/OSWT
       PSIRG(N,L,NZ)=AZMAX1(PSIRT(N,L,NZ)-PSIRO(N,L,NZ))
-      UPWTR(N,L,NZ)=0.0_r8
+      PopPlantRootH2OUptake_vr(N,L,NZ)=0.0_r8
     enddo
   ENDDO
   end associate
@@ -1327,9 +1327,9 @@ module UptakesMod
   !     CHILL=accumulated chilling hours used to limit CO2 fixn in stomate.f
   !
   IF(TCC(NZ).LT.CTC(NZ))THEN
-    CHILL(NZ)=AMIN1(24.0,CHILL(NZ)+1.0)
+    CHILL(NZ)=AMIN1(24.0_r8,CHILL(NZ)+1.0_r8)
   ELSE
-    CHILL(NZ)=AZMAX1(CHILL(NZ)-1.0)
+    CHILL(NZ)=AZMAX1(CHILL(NZ)-1.0_r8)
   ENDIF
   end associate
   end subroutine SetCanopyGrowthFuncs

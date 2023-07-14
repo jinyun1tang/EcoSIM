@@ -283,10 +283,10 @@ contains
 !     AREA=surface area of grid cell
 !
   ALFZ=2.0_r8*(1.0_r8-FRADG(NY,NX))
-  IF(RAB(NY,NX).GT.ZERO.AND.ZT(NY,NX).GT.ZS(NY,NX).AND.ALFZ.GT.ZERO)THEN
-    RAC(NY,NX)=AMIN1(RACX,AZMAX1(ZT(NY,NX)*EXP(ALFZ) &
-      /(ALFZ/RAB(NY,NX))*AZMAX1(EXP(-ALFZ*ZS(NY,NX)/ZT(NY,NX)) &
-      -EXP(-ALFZ*(ZD(NY,NX)+ZR(NY,NX))/ZT(NY,NX)))))
+  IF(RAB(NY,NX).GT.ZERO.AND.GridMaxCanopyHeight(NY,NX).GT.ZS(NY,NX).AND.ALFZ.GT.ZERO)THEN
+    RAC(NY,NX)=AMIN1(RACX,AZMAX1(GridMaxCanopyHeight(NY,NX)*EXP(ALFZ) &
+      /(ALFZ/RAB(NY,NX))*AZMAX1(EXP(-ALFZ*ZS(NY,NX)/GridMaxCanopyHeight(NY,NX)) &
+      -EXP(-ALFZ*(ZD(NY,NX)+ZR(NY,NX))/GridMaxCanopyHeight(NY,NX)))))
     UAG=UA(NY,NX)*EXP(-ALFZ)
   ELSE
     RAC(NY,NX)=0.0_r8
@@ -1423,7 +1423,7 @@ contains
     ENGYD=0.0_r8
   ENDIF
   IF(PRECB(NY,NX).GT.ZERO)THEN
-    ENGYB=AZMAX1(15.8_r8*SQRT(AMIN1(2.5_r8,ZT(NY,NX)))-5.87_r8)
+    ENGYB=AZMAX1(15.8_r8*SQRT(AMIN1(2.5_r8,GridMaxCanopyHeight(NY,NX)))-5.87_r8)
   ELSE
     ENGYB=0.0_r8
   ENDIF

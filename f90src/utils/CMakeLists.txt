@@ -5,6 +5,7 @@ set(ECOSIM_UTIL_SOURCES
   shr_infnan_mod.F90
   ncdio_pio.F90
   abortutils.F90
+  UnitMod.F90
   TestMod.F90
   clock.c
   getfilename.c

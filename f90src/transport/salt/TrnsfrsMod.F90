@@ -452,7 +452,7 @@ module TrnsfrsMod
 !     VLNH4,VLNO3,VLPO4=non-band NH4,NO3,PO4 volume fraction
 !     VLNHB,VLNOB,VLPOB=band NH4,NO3,PO4 volume fraction
 !
-    FLWU(L,NY,NX)=TUPWTR(L,NY,NX)*XNPH
+    FLWU(L,NY,NX)=GridPlantRootH2OUptake_vr(L,NY,NX)*XNPH
     trcsa_RFLU(idsa_Al,L,NY,NX)=FLU(L,NY,NX)*CALQ(I,NY,NX)
     trcsa_RFLU(idsa_Fe,L,NY,NX)=FLU(L,NY,NX)*CFEQ(I,NY,NX)
     trcsa_RFLU(idsa_Hp,L,NY,NX)=FLU(L,NY,NX)*CHYQ(I,NY,NX)

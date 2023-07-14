@@ -147,7 +147,7 @@ module PlantBranchMod
     ISTYP      =>  plt_pheno%ISTYP    , &
     CTC        =>  plt_pheno%CTC      , &
     SSINN      =>  plt_rad%SSINN      , &
-    PP         =>  plt_site%PP        , &
+    pftPlantPopulation         =>  plt_site%pftPlantPopulation        , &
     ZERO       =>  plt_site%ZERO      , &
     PSILT      =>  plt_ew%PSILT       , &
     NB1        =>  plt_morph%NB1      , &
@@ -377,7 +377,7 @@ module PlantBranchMod
 !         ARLFB,ARLF=branch,node leaf area
 !
           SLA=ETOL*SLA1(NZ)*(AMAX1(ZEROL(NZ) &
-            ,WGLFE(ielmc,K,NB,NZ))/(PP(NZ)*GSLA))**SLA2*WFNS
+            ,WGLFE(ielmc,K,NB,NZ))/(pftPlantPopulation(NZ)*GSLA))**SLA2*WFNS
           GROA=GROE(ielmc)*SLA
           ARLFB(NB,NZ)=ARLFB(NB,NZ)+GROA
           ARLF1(K,NB,NZ)=ARLF1(K,NB,NZ)+GROA
@@ -437,8 +437,8 @@ module PlantBranchMod
 !
             IF(WGLFE(ielmc,K,NB,NZ).GT.0.0_r8)THEN
               SSL=ETOL*SSL1(NZ)*(AMAX1(ZEROL(NZ) &
-                ,WGSHE(ielmc,K,NB,NZ))/(PP(NZ)*GSSL))**SSL2*WFNS
-              GROS=GROE(ielmc)/PP(NZ)*SSL
+                ,WGSHE(ielmc,K,NB,NZ))/(pftPlantPopulation(NZ)*GSSL))**SSL2*WFNS
+              GROS=GROE(ielmc)/pftPlantPopulation(NZ)*SSL
               HTSHE(K,NB,NZ)=HTSHE(K,NB,NZ)+GROS*ANGSH(NZ)
             ENDIF
           ENDDO D505
@@ -478,8 +478,8 @@ module PlantBranchMod
     !     PP=PFT population
     !     GROH,GRO=stalk length,mass growth
 !
-          SNL=ETOL*SNL1(NZ)*(WTSTKBE(ielmc,NB,NZ)/PP(NZ))**SNL2
-          GROH=GROE(ielmc)/PP(NZ)*SNL
+          SNL=ETOL*SNL1(NZ)*(WTSTKBE(ielmc,NB,NZ)/pftPlantPopulation(NZ))**SNL2
+          GROH=GROE(ielmc)/pftPlantPopulation(NZ)*SNL
           KX=MOD(MNNOD-1,JNODS1)
           IF(KX.EQ.0.AND.MNNOD-1.NE.0)KX=25
 !
@@ -1338,7 +1338,7 @@ module PlantBranchMod
     ZEROP      =>  plt_biom%ZEROP      , &
     ZEROL      =>  plt_biom%ZEROL      , &
     EPOOL      =>  plt_biom%EPOOL      , &
-    PP         =>   plt_site%PP        , &
+    pftPlantPopulation         =>   plt_site%pftPlantPopulation        , &
     CPOOL3     =>  plt_photo%CPOOL3    , &
     CPOOL4     =>  plt_photo%CPOOL4    , &
     FWOODE     =>  plt_allom%FWOODE    , &
@@ -1916,12 +1916,12 @@ module PlantBranchMod
     NBTB     => plt_morph%NBTB    , &
     HTNODE   => plt_morph%HTNODE  , &
     ZL       => plt_morph%ZL      , &
-    ZC       => plt_morph%ZC      , &
+    CanopyHeight       => plt_morph%CanopyHeight      , &
     HTCTL    => plt_morph%HTCTL   , &
     CLASS    => plt_morph%CLASS   , &
     ARLF1    => plt_morph%ARLF1   , &
     ARLFV    => plt_morph%ARLFV   , &
-    PP       => plt_site%PP       , &
+    pftPlantPopulation       => plt_site%pftPlantPopulation       , &
     ZERO     => plt_site%ZERO     , &
     ZSIN     => plt_rad%ZSIN        &
   )
@@ -1935,7 +1935,7 @@ module PlantBranchMod
   KVSTGN(NB,NZ)=0
   IF(HTCTL(NZ).LE.SDPTH(NZ) &
     .AND.ARLF1(0,NB1(NZ),NZ).GT.0.0)THEN
-    XLGLF=SQRT(1.0E+02*ARLF1(0,NB1(NZ),NZ)/PP(NZ))
+    XLGLF=SQRT(1.0E+02*ARLF1(0,NB1(NZ),NZ)/pftPlantPopulation(NZ))
     HTCTL(NZ)=XLGLF+HTSHE(0,NB1(NZ),NZ)+HTNODE(0,NB1(NZ),NZ)
   ENDIF
 !
@@ -1999,7 +1999,7 @@ module PlantBranchMod
       HTSTK=HTBR+HTNODE(K,NB,NZ)
       HTLF=HTSTK+HTSHE(K,NB,NZ)
       XLGLF=AZMAX1(SQRT(WDLF(NZ)*AMAX1(0.0 &
-        ,ARLF1(K,NB,NZ))/(PP(NZ)*FNOD(NZ))))
+        ,ARLF1(K,NB,NZ))/(pftPlantPopulation(NZ)*FNOD(NZ))))
       TLGLF=0._r8
       !
       !   ALLOCATE FRACTIONS OF LEAF IN EACH INCLINATION CLASS
@@ -2060,7 +2060,7 @@ module PlantBranchMod
           WGLFV(L,NZ)=WGLFV(L,NZ)+YWGLFE(ielmc)
         ENDDO D570
         TLGLF=TLGLF+YLGLF
-        ZC(NZ)=AMAX1(ZC(NZ),HTLFU)
+        CanopyHeight(NZ)=AMAX1(CanopyHeight(NZ),HTLFU)
       ENDDO D555
       IF(WSSHE(K,NB,NZ).GT.0.0)THEN
         IF(KVSTGN(NB,NZ).EQ.0)KVSTGN(NB,NZ)=MIN(KK,KVSTG(NB,NZ))
@@ -2108,18 +2108,18 @@ module PlantBranchMod
           LL=1
         ENDIF
       ENDDO D545
-      RSTK=SQRT(VSTK*(AZMAX1(WTSTKBE(ielmc,NB,NZ))/PP(NZ))/(PICON*HTNODE(K1,NB,NZ)))
-      ARSTKB=PICON*HTNODE(K1,NB,NZ)*PP(NZ)*RSTK
+      RSTK=SQRT(VSTK*(AZMAX1(WTSTKBE(ielmc,NB,NZ))/pftPlantPopulation(NZ))/(PICON*HTNODE(K1,NB,NZ)))
+      ARSTKB=PICON*HTNODE(K1,NB,NZ)*pftPlantPopulation(NZ)*RSTK
       IF(ISTYP(NZ).EQ.iplt_annual)THEN
         WVSTKB(NB,NZ)=WTSTKBE(ielmc,NB,NZ)
       ELSE
         ZSTK=AMIN1(ZSTX,FSTK*RSTK)
         ASTV=PICON*(2.0_r8*RSTK*ZSTK-ZSTK**2)
-        WVSTKB(NB,NZ)=ASTV/VSTK*HTNODE(K1,NB,NZ)*PP(NZ)
+        WVSTKB(NB,NZ)=ASTV/VSTK*HTNODE(K1,NB,NZ)*pftPlantPopulation(NZ)
       ENDIF
     !     IF(NZ.EQ.1)THEN
         !     WRITE(*,6677)'WVSTK',I,J,NX,NY,NZ,NB,K1,WVSTKB(NB,NZ)
-        !    2,ASTV,VSTK,HTNODE(K1,NB,NZ),PP(NZ)
+        !    2,ASTV,VSTK,HTNODE(K1,NB,NZ),pftPlantPopulation(NZ)
         !6677  FORMAT(A8,7I4,12E12.4)
         !     ENDIF
       D445: DO L=LHTBRL,LHTBRU
@@ -2251,7 +2251,7 @@ module PlantBranchMod
     DGSTGF   =>  plt_pheno%DGSTGF   , &
     IDAY     =>  plt_pheno%IDAY     , &
     CTC      =>  plt_pheno%CTC      , &
-    PP       =>  plt_site%PP        , &
+    pftPlantPopulation       =>  plt_site%pftPlantPopulation        , &
     SDMX     =>  plt_morph%SDMX     , &
     GRMX     =>  plt_morph%GRMX     , &
     STMX     =>  plt_morph%STMX     , &
@@ -2432,7 +2432,7 @@ module PlantBranchMod
 !   IDAY(10,=date of physiological maturity
 !
   IF(IDAY(8,NB,NZ).NE.0)THEN
-    IF(XLOCE(ielmc).LE.1.0E-09*PP(NZ))THEN
+    IF(XLOCE(ielmc).LE.1.0E-09*pftPlantPopulation(NZ))THEN
       FLG4(NB,NZ)=FLG4(NB,NZ)+1.0
     ELSE
       FLG4(NB,NZ)=0._r8
