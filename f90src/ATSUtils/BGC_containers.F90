@@ -142,6 +142,10 @@ module BGCContainers_module
      type (BGCVectorDouble) :: relative_permeability
      type (BGCVectorDouble) :: thermal_conductivity
      type (BGCVectorDouble) :: volume
+     type (BGCVectorDouble) :: depth
+     type (BGCVectorDouble) :: dz
+     type (BGCVectorDouble) :: plant_wilting_factor
+     type (BGCVectorDouble) :: rooting_depth_fraction
      real (c_double) :: shortwave_radiation
      real (c_double) :: longwave_radiation
      real (c_double) :: air_temperature
