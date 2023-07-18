@@ -1,4 +1,4 @@
-program main
+program managementReader
   use ReadManagementMod
   use EcoSIMCtrlMod, only : soil_mgmt_in, lverb
   use abortutils, only : endrun
@@ -27,4 +27,4 @@ implicit none
 
   call ReadManagementFiles(iyear)
 
-end program main
+end program managementReader

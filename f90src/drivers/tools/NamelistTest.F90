@@ -1,4 +1,4 @@
-PROGRAM main
+PROGRAM NamelistTest
 
   use data_kind_mod     , only : r8 => DAT_KIND_R8
   use EcoSIMCtrlMod     , only : etimer
@@ -133,4 +133,4 @@ PROGRAM main
     if(.not.lskip_loop)print*,year,nyr,ymdhs
   enddo  
   print*,lskip_loop
-end program main
+end program NamelistTest

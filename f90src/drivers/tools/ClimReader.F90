@@ -1,4 +1,4 @@
-program main
+program ClimReader
   use ClimReadMod
   use abortutils, only : endrun
   USE EcoSIMCtrlMod, ONLY : LVERB
@@ -29,4 +29,4 @@ implicit none
   call ReadClimNC(iyear,irec,L,atmf)
 
   print*,atmf
-end program main
+end program ClimReader

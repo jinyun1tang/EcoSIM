@@ -1,4 +1,4 @@
-program main
+program restartTest
   use HistFileMod
   use RestartMod
   use abortutils        , only : endrun
@@ -73,4 +73,4 @@ implicit none
   call etimer%setClock(dtime=3600._r8,nelapstep=0)
 
   call restFile(flag='write')
-end program main
+end program restartTest

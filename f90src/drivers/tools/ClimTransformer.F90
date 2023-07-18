@@ -1,4 +1,4 @@
-program main
+program ClimTransformer
   use ClimReadMod
   use data_kind_mod  , only : r8 => DAT_KIND_R8
   use ClimForcDataType
@@ -188,4 +188,4 @@ contains
     ENDDO
   ENDDO
   end subroutine reshape1
-end program main
+end program ClimTransformer
