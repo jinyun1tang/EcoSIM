@@ -35,7 +35,7 @@ module RedistMod
   USE EcoSimSumDataType
   USE LateralTranspMod
   use UnitMod, only : units
-  use SnowBalMod
+  use SnowBalanceMod
   implicit none
 
   private
@@ -109,7 +109,7 @@ module RedistMod
 
       call LateralTranspt(I,J,NY,NX,LG)
 
-      call SnowDynUpdate(NY,NX)
+      call SnowMassUpdate(NY,NX)
 
       call HandleSurfaceBoundary(I,NY,NX)
 !

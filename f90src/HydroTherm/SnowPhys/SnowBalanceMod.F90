@@ -1,4 +1,4 @@
-module SnowBalMod
+module SnowBalanceMod
   use data_kind_mod, only : r8 => DAT_KIND_R8
   use abortutils, only : endrun
   use minimathmod, only : AZMAX1
@@ -25,7 +25,7 @@ implicit none
 
   character(len=*), parameter :: mod_filename = __FILE__
 
-  public :: SnowDynUpdate
+  public :: SnowMassUpdate
   public :: SnowpackLayering
   public :: ZeroSnowArrays
   public :: SaltFromRunoffSnowpack
@@ -34,7 +34,7 @@ implicit none
   public :: FluxFromSnowRunoff
   contains
 
-  subroutine SnowDynUpdate(NY,NX)
+  subroutine SnowMassUpdate(NY,NX)
 
   implicit none
   integer, intent(in) :: NY,NX
@@ -50,6 +50,7 @@ implicit none
   VOLS(NY,NX)=0.0_r8
   DPTHS(NY,NX)=0.0_r8
   VOLSWI=0.0_r8
+
   D9780: DO L=1,JS
     call UpdateSnowLayers(L,NY,NX,VOLSWI)
 
@@ -72,7 +73,7 @@ implicit none
 ! IF SNOWPACK DISAPPEARS
   call SnowpackDisapper(NY,NX)
 
-  end subroutine SnowDynUpdate
+  end subroutine SnowMassUpdate
 
 !------------------------------------------------------------------------------------------
 
@@ -98,6 +99,7 @@ implicit none
     VOLWSL(1,NY,NX)=0.0_r8
     VOLISL(1,NY,NX)=0.0_r8
     VHCPW(1,NY,NX)=0.0_r8
+
     VOLSS(NY,NX)=0.0_r8
     VOLWS(NY,NX)=0.0_r8
     VOLIS(NY,NX)=0.0_r8
@@ -122,12 +124,7 @@ implicit none
       TKS(NUM(NY,NX),NY,NX)=TKA(NY,NX)
     ENDIF
     ENGY2=VHCP(NUM(NY,NX),NY,NX)*TKS(NUM(NY,NX),NY,NX)
-!     WRITE(*,2222)'SNW',I,J,IYRC,NX,NY,HEATIN
-!    2,(cps-cpi)*FLWS/DENSI*TKSX,HFLWS,ENGY
-!    3,VHCP(NUM(NY,NX),NY,NX)*TKS(NUM(NY,NX),NY,NX),TKSX
-!    3,TKS(NUM(NY,NX),NY,NX),FLWS,DENSI,TKW(1,NY,NX),VHCPWZ(1,NY,NX)
-!    4,ENGY2,ENGYS,ENGY1
-!    5,VOLW(NUM(NY,NX),NY,NX),VOLI(NUM(NY,NX),NY,NX)
+
   ENDIF
   end subroutine SnowpackDisapper
 
@@ -231,17 +228,17 @@ implicit none
     DDENS1=0.0_r8
   ENDIF
   CVISC=0.25_r8*EXP(-0.08_r8*TCW(L,NY,NX)+23.0_r8*DENSS(L,NY,NX))
+
   !if(curday>=83)write(*,*)'CVISC=',CVISC,TCW(L,NY,NX),DENSS(L,NY,NX)
   DDENS2=DENSS(L,NY,NX)*VOLSWI/(AREA(3,NU(NY,NX),NY,NX)*CVISC)
+  
   if(DDENS2<0._r8)write(*,*)'DDENS2=',DENSS(L,NY,NX),VOLSWI,CVISC
   DENSS(L,NY,NX)=DENSS(L,NY,NX)+DDENS1+DDENS2
   if(DENSS(L,NY,NX)<0._r8)write(*,*)'DDENS1=',DENSS(L,NY,NX),DDENS1,DDENS2
-  IF(VOLSSL(L,NY,NX)+VOLWSL(L,NY,NX)+VOLISL(L,NY,NX) &
-    .GT.ZEROS2(NY,NX))THEN
-    VOLSL(L,NY,NX)=VOLSSL(L,NY,NX)/DENSS(L,NY,NX) &
-      +VOLWSL(L,NY,NX)+VOLISL(L,NY,NX)
-    DLYRS(L,NY,NX)=AZMAX1(VOLSL(L,NY,NX)) &
-      /AREA(3,NU(NY,NX),NY,NX)
+
+  IF(VOLSSL(L,NY,NX)+VOLWSL(L,NY,NX)+VOLISL(L,NY,NX).GT.ZEROS2(NY,NX))THEN
+    VOLSL(L,NY,NX)=VOLSSL(L,NY,NX)/DENSS(L,NY,NX)+VOLWSL(L,NY,NX)+VOLISL(L,NY,NX)
+    DLYRS(L,NY,NX)=AZMAX1(VOLSL(L,NY,NX))/AREA(3,NU(NY,NX),NY,NX)
     CDPTHS(L,NY,NX)=CDPTHS(L-1,NY,NX)+DLYRS(L,NY,NX)
     VHCPWZ(L,NY,NX)=VHCPW(L,NY,NX)
     TKWX=TKW(L,NY,NX)
@@ -528,8 +525,7 @@ implicit none
 !
         IF(salt_model)THEN
           DO NTSA=idsa_beg,idsa_end
-            trcsa_TBLS(NTSA,LS,N2,N1)=trcsa_TBLS(NTSA,LS,N2,N1)+trcsa_XBLS(NTSA,LS,N2,N1) &
-            -trcsa_XBLS(NTSA,LS2,N2,N1)
+            trcsa_TBLS(NTSA,LS,N2,N1)=trcsa_TBLS(NTSA,LS,N2,N1)+trcsa_XBLS(NTSA,LS,N2,N1)-trcsa_XBLS(NTSA,LS2,N2,N1)
           ENDDO
         ENDIF
 !
@@ -630,16 +626,13 @@ implicit none
     TFLWW(L,NY,NX)=0.0_r8
     TFLWI(L,NY,NX)=0.0_r8
     THFLWW(L,NY,NX)=0.0_r8
-
   ENDDO
-  IF(salt_model)THEN
 
+  IF(salt_model)THEN
 !     INITIALIZE NET SOLUTE AND GAS FLUXES FROM SNOWPACK DRIFT
 !
     trcsa_TQR(idsa_beg:idsa_end,NY,NX)=0.0_r8
-
     trcsa_TQS(idsa_beg:idsa_end,NY,NX)=0.0_r8
-
     DO  L=1,JS
       trcsa_TBLS(idsa_beg:idsa_end,L,NY,NX)=0.0_r8
     ENDDO
@@ -816,4 +809,4 @@ implicit none
     ENDDO
   ENDIF
   end subroutine OverlandSnowFlow    
-end module SnowBalMod
+end module SnowBalanceMod

@@ -1,7 +1,7 @@
 set(SNOWPHYS_SOURCES
  SnowPhysData.F90
  SnowPhysMod.F90
- SnowBalMod.F90
+ SnowBalanceMod.F90
 )
 include_directories(${CMAKE_BINARY_DIR}/f90src/utils/)
 include_directories(${CMAKE_BINARY_DIR}/f90src/minimath/)

@@ -10,7 +10,7 @@ module ATSEcoSIMInitMod
   use SoilPropertyDataType
 implicit none
   character(len=*), private, parameter :: mod_filename=__FILE__
-
+  public :: Init_EcoSIM_Soil
   contains
 
   subroutine Init_EcoSIM_Soil()

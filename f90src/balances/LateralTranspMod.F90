@@ -21,7 +21,8 @@ module LateralTranspMod
   use minimathmod , only : AZMAX1
   use EcoSIMConfig, only : jcplx => jcplxc,NFGs=>NFGsc
   use EcoSIMConfig, only : nlbiomcp=>nlbiomcpc
-  use SnowBalMod
+  use ErosionBalMod
+  use SnowBalanceMod
 implicit none
   private
   character(len=*), parameter :: mod_filename = __FILE__
@@ -146,11 +147,10 @@ implicit none
 
 !------------------------------------------------------------------------------------------
 
-  subroutine ZeroFluxArrays(NY,NX)
+  subroutine ZeroRunoffArray(NY,NX)
   implicit none
   integer, intent(in) :: NY,NX
-  integer :: L,K,M,NO,NGL
-!     begin_execution
+  integer :: L,K
 !
 !     INITIALIZE NET WATER AND HEAT FLUXES FOR RUNOFF
 !
@@ -165,52 +165,27 @@ implicit none
     TOPQRS(K,NY,NX)=0.0_r8
     TOAQRS(K,NY,NX)=0.0_r8
   ENDDO D9960
+  end subroutine ZeroRunoffArray
+
+!------------------------------------------------------------------------------------------
+
+  subroutine ZeroFluxArrays(NY,NX)
+  implicit none
+  integer, intent(in) :: NY,NX
+  integer :: M,NO,NGL
+!     begin_execution
+
+  call ZeroRunoffArray(NY,NX)
+
+!     INITIALIZE NET SNOWPACK FLUXES WITHIN SNOWPACK
 
   call ZeroSnowArrays(NY,NX)
 
 !
 !     INITIALIZE NET SEDIMENT FLUXES FROM EROSION
 !
-  IF(IERSNG.EQ.1.OR.IERSNG.EQ.3)THEN
-    TSEDER(NY,NX)=0.0_r8
-    TSANER(NY,NX)=0.0_r8
-    TSILER(NY,NX)=0.0_r8
-    TCLAER(NY,NX)=0.0_r8
-    TNH4ER(NY,NX)=0.0_r8
-    TNH3ER(NY,NX)=0.0_r8
-    TNHUER(NY,NX)=0.0_r8
-    TNO3ER(NY,NX)=0.0_r8
-    TNH4EB(NY,NX)=0.0_r8
-    TNH3EB(NY,NX)=0.0_r8
-    TNHUEB(NY,NX)=0.0_r8
-    TNO3EB(NY,NX)=0.0_r8
+  call ZeroErosionArray(NY,NX)
 
-    trcx_TER(idx_beg:idx_end,NY,NX)=0.0_r8
-    trcp_TER(idsp_beg:idsp_end,NY,NX)=0.0_r8
-
-    TOMCER(1:nlbiomcp,1:NMICBSO,1:jcplx,NY,NX)=0.0_r8
-    TOMNER(1:nlbiomcp,1:NMICBSO,1:jcplx,NY,NX)=0.0_r8
-    TOMPER(1:nlbiomcp,1:NMICBSO,1:jcplx,NY,NX)=0.0_r8
-
-    TOMCERff(1:nlbiomcp,1:NMICBSA,NY,NX)=0.0_r8
-    TOMNERff(1:nlbiomcp,1:NMICBSA,NY,NX)=0.0_r8
-    TOMPERff(1:nlbiomcp,1:NMICBSA,NY,NX)=0.0_r8
-
-    TORCER(1:ndbiomcp,1:jcplx,NY,NX)=0.0_r8
-    TORNER(1:ndbiomcp,1:jcplx,NY,NX)=0.0_r8
-    TORPER(1:ndbiomcp,1:jcplx,NY,NX)=0.0_r8
-    TOHCER(1:jcplx,NY,NX)=0.0_r8
-    TOHNER(1:jcplx,NY,NX)=0.0_r8
-    TOHPER(1:jcplx,NY,NX)=0.0_r8
-    TOHAER(1:jcplx,NY,NX)=0.0_r8
-    TOSCER(1:jsken,1:jcplx,NY,NX)=0.0_r8
-    TOSAER(1:jsken,1:jcplx,NY,NX)=0.0_r8
-    TOSNER(1:jsken,1:jcplx,NY,NX)=0.0_r8
-    TOSPER(1:jsken,1:jcplx,NY,NX)=0.0_r8
-  ENDIF
-!
-!     INITIALIZE NET SNOWPACK FLUXES WITHIN SNOWPACK
-!
   end subroutine ZeroFluxArrays
 
 !------------------------------------------------------------------------------------------
@@ -287,8 +262,6 @@ implicit none
       TOPQRS(K,N2,N1)=TOPQRS(K,N2,N1)+XOPQRS(K,N,NN,N2,N1)
       TOAQRS(K,N2,N1)=TOAQRS(K,N2,N1)+XOAQRS(K,N,NN,N2,N1)
     ENDDO D8590
-
-
 
     IF(IFLBH(N,NN,N5,N4).EQ.0)THEN
       !there is lateral runoff
