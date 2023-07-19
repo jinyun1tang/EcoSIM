@@ -23,9 +23,9 @@ option(TPL_NETCDF_INCLUDE_DIRS "List of absolute paths to netcdf include directo
 
 
 # For now, we disable shared libs on Macs.
-if (APPLE)
-  set(BUILD_SHARED_LIBS OFF)
-endif()
+#if (APPLE)
+#  set(BUILD_SHARED_LIBS OFF)
+#endif()
 
 if (BUILD_SHARED_LIBS)
 	message("-- EcoSIM will be built as a shared library.")

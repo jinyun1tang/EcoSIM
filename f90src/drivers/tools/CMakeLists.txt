@@ -17,10 +17,7 @@ include_directories(${CMAKE_BINARY_DIR}/f90src/ecosim_datatype/)
 include_directories(${CMAKE_BINARY_DIR}/f90src/ioutils/)
 
 include(add_ecosim_library)
-add_ecosim_library(tools ${TOOLS_SOURCES})
 
-set(ECOSIM_LIBRARIES tools;${ECOSIM_LIBRARIES} PARENT_SCOPE)
-set(ECOSIM_LIBRARIES tools;${ECOSIM_LIBRARIES})
 
 link_libraries(${ECOSIM_LIBRARIES};${ECOSIM_TPLS})
 include(add_ecosim_executable)
