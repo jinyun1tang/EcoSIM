@@ -85,6 +85,12 @@ module BGCContainers_module
      type (c_ptr) :: data
   end type BGCVectorInt
 
+  type, public, bind(c) :: BGCVectorString
+     integer (c_int) :: size
+     integer (c_int) :: capacity
+     type (c_ptr) :: data
+  end type BGCVectorString
+
   type, public, bind(c) :: BGCMatrixDouble
     integer (c_int) :: rows
     integer (c_int) :: cols
@@ -109,52 +115,67 @@ module BGCContainers_module
     type (c_ptr) :: data
   end type BGCMatrixString
 
-  type, public, bind(c) :: BGCVectorString
-     integer (c_int) :: size
-     integer (c_int) :: capacity
-     type (c_ptr) :: data
-  end type BGCVectorString
+  type, public, bind(c) :: BGCTensorDouble
+    integer (c_int) :: rows
+    integer (c_int) :: cols
+    integer (c_int) :: procs
+    integer (c_int) :: cap_rows
+    integer (c_int) :: cap_cols
+    integer (c_int) :: cap_procs
+    type (c_ptr) :: data
+  end type BGCMatrixDouble
+
+  type, public, bind(c) :: BGCTensorInt
+    integer (c_int) :: rows
+    integer (c_int) :: cols
+    integer (c_int) :: procs
+    integer (c_int) :: cap_rows
+    integer (c_int) :: cap_cols
+    integer (c_int) :: cap_procs
+    type (c_ptr) :: data
+  end type BGCMatrixInt
 
   type, public, bind(c) :: BGCSizes
      integer (c_int) :: ncells_per_col_
      integer (c_int) :: num_components
+     integer (c_int) :: num_procs
   end type BGCSizes
 
   type, public, bind(c) :: BGCState
      ! I think I have to write the data as vector doubles
-     type (BGCVectorDouble) :: liquid_density
-     type (BGCVectorDouble) :: gas_density
-     type (BGCVectorDouble) :: ice_density
-     type (BGCVectorDouble) :: porosity
-     type (BGCVectorDouble) :: water_content
-     type (BGCVectorDouble) :: suction_head
-     type (BGCVectorDouble) :: temperature
-     type (BGCVectorDouble) :: hydraulic_conductivity
-     type (BGCVectorDouble) :: bulk_density
-     type (BGCMatrixDouble) :: total_component_concentration
+     type (BGCMatrixDouble) :: liquid_density
+     type (BGCMatrixDouble) :: gas_density
+     type (BGCMatrixDouble) :: ice_density
+     type (BGCMatrixDouble) :: porosity
+     type (BGCMatrixDouble) :: water_content
+     type (BGCMatrixDouble) :: suction_head
+     type (BGCMatrixDouble) :: temperature
+     type (BGCMatrixDouble) :: hydraulic_conductivity
+     type (BGCMatrixDouble) :: bulk_density
+     type (BGCTensorDouble) :: total_component_concentration
   end type BGCState
 
   type, public, bind(c) :: BGCProperties
-     type (BGCVectorDouble) :: liquid_saturation
-     type (BGCVectorDouble) :: gas_saturation
-     type (BGCVectorDouble) :: ice_saturation
-     type (BGCVectorDouble) :: relative_permeability
-     type (BGCVectorDouble) :: thermal_conductivity
-     type (BGCVectorDouble) :: volume
-     type (BGCVectorDouble) :: depth
-     type (BGCVectorDouble) :: dz
+     type (BGCMatrixDouble) :: liquid_saturation
+     type (BGCMatrixDouble) :: gas_saturation
+     type (BGCMatrixDouble) :: ice_saturation
+     type (BGCMatrixDouble) :: relative_permeability
+     type (BGCMatrixDouble) :: thermal_conductivity
+     type (BGCMatrixDouble) :: volume
+     type (BGCMatrixDouble) :: depth
+     type (BGCMatrixDouble) :: dz
+     type (BGCMatrixDouble) :: plant_wilting_factor
+     type (BGCMatrixDouble) :: rooting_depth_fraction
+     type (BGCVectorDouble)  :: shortwave_radiation
+     type (BGCVectorDouble) :: longwave_radiation
+     type (BGCVectorDouble) :: air_temperature
+     type (BGCVectorDouble) :: vapor_pressure_air
+     type (BGCVectorDouble) :: wind_speed
+     type (BGCVectorDouble) :: precipitation
      type (BGCVectorDouble) :: plant_wilting_factor
-     type (BGCVectorDouble) :: rooting_depth_fraction
-     real (c_double) :: shortwave_radiation
-     real (c_double) :: longwave_radiation
-     real (c_double) :: air_temperature
-     real (c_double) :: vapor_pressure_air
-     real (c_double) :: wind_speed
-     real (c_double) :: precipitation
-     real (c_double) :: plant_wilting_factor
-     real (c_double) :: elevation
-     real (c_double) :: aspect
-     real (c_double) :: slope
+     type (BGCVectorDouble) :: elevation
+     type (BGCVectorDouble) :: aspect
+     type (BGCVectorDouble) :: slope
      real (c_double) :: atm_n2
      real (c_double) :: atm_o2
      real (c_double) :: atm_co2
