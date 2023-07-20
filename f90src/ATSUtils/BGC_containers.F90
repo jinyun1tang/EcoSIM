@@ -85,6 +85,12 @@ module BGCContainers_module
      type (c_ptr) :: data
   end type BGCVectorInt
 
+  type, public, bind(c) :: BGCVectorString
+     integer (c_int) :: size
+     integer (c_int) :: capacity
+     type (c_ptr) :: data
+  end type BGCVectorString
+
   type, public, bind(c) :: BGCMatrixDouble
     integer (c_int) :: rows
     integer (c_int) :: cols
@@ -109,11 +115,25 @@ module BGCContainers_module
     type (c_ptr) :: data
   end type BGCMatrixString
 
-  type, public, bind(c) :: BGCVectorString
-     integer (c_int) :: size
-     integer (c_int) :: capacity
-     type (c_ptr) :: data
-  end type BGCVectorString
+  type, public, bind(c) :: BGCTensorDouble
+    integer (c_int) :: rows
+    integer (c_int) :: cols
+    integer (c_int) :: procs
+    integer (c_int) :: cap_rows
+    integer (c_int) :: cap_cols
+    integer (c_int) :: cap_procs
+    type (c_ptr) :: data
+  end type BGCMatrixDouble
+
+  type, public, bind(c) :: BGCTensorInt
+    integer (c_int) :: rows
+    integer (c_int) :: cols
+    integer (c_int) :: procs
+    integer (c_int) :: cap_rows
+    integer (c_int) :: cap_cols
+    integer (c_int) :: cap_procs
+    type (c_ptr) :: data
+  end type BGCMatrixInt
 
   type, public, bind(c) :: BGCMatrixDouble
     integer (c_int) :: rows
@@ -163,6 +183,7 @@ module BGCContainers_module
      integer (c_int) :: ncells_per_col_
      integer (c_int) :: num_components
      integer (c_int) :: num_procs
+  end type BGCSizes
 
   type, public, bind(c) :: BGCState
      ! I think I have to write the data as vector doubles
