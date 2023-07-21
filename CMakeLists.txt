@@ -34,7 +34,7 @@ else()
 endif()
 
 if (NOT CMAKE_INSTALL_PREFIX)
-  set(CMAKE_INSTALL_PREFIX /usr/local)
+  set(CMAKE_INSTALL_PREFIX local)
 endif()
 
 
@@ -104,6 +104,7 @@ endif()
 if (ECOSIM)
   set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -DECOSIM")
 endif()
+
 # Figure out the system type.
 set(ECOSIM_HAVE_BOOL 1) # All reasonable C99 compilers have this now.
 if (APPLE EQUAL 1)
@@ -129,8 +130,9 @@ set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
 set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
 # Basic libraries to be linked in.
-set(ECOSIM_LIBRARIES m)
-
+# added the standard mathematical library for C and C++
+set(ECOSIM_LIBRARIES "")
+set(ECOSIM_TPLS m)
 if (${NEED_LAPACK})
   # NEED_LAPACK is set by set_up_platform()
   include(FindBLAS)
@@ -221,4 +223,11 @@ configure_file(
 )
 
 # Install miscellaneous build/test files.
-install(FILES ${CMAKE_CURRENT_BINARY_DIR}/ecosim.cmake DESTINATION share/ecosim)
+#install(FILES ${CMAKE_CURRENT_BINARY_DIR}/ecosim.cmake DESTINATION share/ecosim)
+
+#if (NOT CMAKE_INSTALL_PREFIX STREQUAL "INSTALL_DISABLED")
+#target_link_libraries(ecosiml PUBLIC ${ECOSIM_TPLS})
+# message("CMAKE_INSTALL_PREFIX: ${CMAKE_INSTALL_PREFIX}")
+# Set the installation path for the library
+#install(TARGETS ecosiml DESTINATION lib/)
+#endif()

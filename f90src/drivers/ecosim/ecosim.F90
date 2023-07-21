@@ -20,6 +20,7 @@ PROGRAM main
   use EcoSIMCtrlMod  
   use EcoSIMCtrlDataType
   use EcoSIMHistMod
+  use EcoSIMAPI         , only : soil,readnamelist,regressiontest     
   use EcosimConst
   implicit none
 

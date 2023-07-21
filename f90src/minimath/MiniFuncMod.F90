@@ -8,7 +8,7 @@ implicit none
   contains
 !------------------------------------------------------------------------------------------
 
-  function FilmThickness(PSISM, is_top_layer)result(ans)
+  pure function FilmThickness(PSISM, is_top_layer)result(ans)
 
   implicit none
   real(r8), intent(in) :: PSISM
@@ -26,7 +26,7 @@ implicit none
 !------------------------------------------------------------------------------------------
 
 
-  function TEFAQUDIF(TK)result(ans)
+  pure function TEFAQUDIF(TK)result(ans)
 !
 ! temperautre effect on aqueous diffusivity
   implicit none
@@ -44,7 +44,7 @@ implicit none
 !------------------------------------------------------------------------------------------
 
 
-  function TEFGASDIF(TK)result(ans)
+  pure function TEFGASDIF(TK)result(ans)
 !
 ! temperautre effect on gaseous diffusivity
   implicit none
@@ -62,7 +62,7 @@ implicit none
   end function TEFGASDIF
 !------------------------------------------------------------------------------------------
 
-  function TortMicporeW(THETWT)result(ans)
+  pure function TortMicporeW(THETWT)result(ans)
 !
 ! aqueous tortuosity in micropore
   implicit none
@@ -71,7 +71,7 @@ implicit none
   ans =0.7_r8*THETWT**2._r8
   end function TortMicporeW
 !------------------------------------------------------------------------------------------
-  function TortMacporeW(THETWH)result(ans)
+  pure function TortMacporeW(THETWH)result(ans)
   implicit none
   real(r8), intent(in) :: THETWH   !realative saturation of macropore
 
@@ -82,7 +82,7 @@ implicit none
   end function TortMacporeW
 
 !------------------------------------------------------------------------------------------
-  function fDFGS(scalar,THETWA,Z3SR,is_litter)result(ans)
+  pure function fDFGS(scalar,THETWA,Z3SR,is_litter)result(ans)
 !
 ! compute coefficient for air-water gas transfer
   implicit none
@@ -121,7 +121,7 @@ implicit none
   endif
   end function fDFGS
 !------------------------------------------------------------------------------------------
-  function fOFFSET(atcs)result(ans)
+  pure function fOFFSET(atcs)result(ans)
   implicit none
   real(r8), intent(in) :: atcs   !mean annual soil temperature, [oC]
   real(r8) :: ans

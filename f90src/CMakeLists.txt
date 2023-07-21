@@ -12,11 +12,18 @@ add_subdirectory(plant_bgc)
 add_subdirectory(geochem)
 add_subdirectory(APIs)
 add_subdirectory(HydroTherm)
+add_subdirectory(ioutils)
 add_subdirectory(ecosim_mods)
 add_subdirectory(ATSUtils)
 add_subdirectory(modelforc)
 add_subdirectory(transport)
 add_subdirectory(balances)
-add_subdirectory(ioutils)
 add_subdirectory(main)
 add_subdirectory(drivers)
+
+#message("ECOSIM_LIBRARIES ${ECOSIM_LIBRARIES}")
+# Collect all the intermediate libraries
+#set(LIBRARY_LIST subdir1_lib subdir2_lib subdir3_lib)
+
+# Combine the intermediate libraries into a single dynamic library
+#add_library(ecosimff SHARED)

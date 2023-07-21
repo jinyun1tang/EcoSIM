@@ -28,7 +28,7 @@ module minimathmod
   real(r8), parameter :: tiny_val=1.e-20_r8
   contains
 
-   function safe_adb(a,b)result(ans)
+   pure function safe_adb(a,b)result(ans)
    !!
    ! Description:
    ! damp division by zero to zero
@@ -42,7 +42,7 @@ module minimathmod
    end function safe_adb
 !------------------------------------------------------------------------------------------
 
-   function p_adb(a,b)result(ans)
+   pure function p_adb(a,b)result(ans)
    !!
    ! Description:
    ! ans=max(0.,a/b)
@@ -57,7 +57,7 @@ module minimathmod
 
 !------------------------------------------------------------------------------------------
 
-  function vapsat(tempK)result(ans)
+  pure function vapsat(tempK)result(ans)
   !
   ! Description
   ! compute saturated vapor pressure, based on temperature tempK (in K)
@@ -70,7 +70,7 @@ module minimathmod
 
 !------------------------------------------------------------------------------------------
 
-  function vapsat0(tempK)result(ans)
+  pure function vapsat0(tempK)result(ans)
   !
   ! Description
   ! compute saturated vapor pressure, based on temperature tempK (in K)
@@ -83,7 +83,7 @@ module minimathmod
 
 !------------------------------------------------------------------------------------------
 
-  function isLeap(year)result(ans)
+  pure function isLeap(year)result(ans)
 !
 ! Description
 ! Determine if it is a leap year
@@ -96,7 +96,7 @@ module minimathmod
   end function isLeap
 !------------------------------------------------------------------------------------------
 
-  function AZMAX1t(val)result(ans)
+  pure function AZMAX1t(val)result(ans)
   implicit none
   real(r8), intent(in) :: val
 
@@ -107,7 +107,7 @@ module minimathmod
   end function AZMAX1t
 !------------------------------------------------------------------------------------------
 
-  function AZMAX1_s(val)result(ans)
+  pure function AZMAX1_s(val)result(ans)
   implicit none
   real(r8), intent(in) :: val
 
@@ -118,7 +118,7 @@ module minimathmod
   end function AZMAX1_s  
 !------------------------------------------------------------------------------------------
 
-  function AZMAX1_d(val1,val2)result(ans)
+  pure function AZMAX1_d(val1,val2)result(ans)
   implicit none
   real(r8), intent(in) :: val1,val2
 
@@ -130,7 +130,7 @@ module minimathmod
 
 !------------------------------------------------------------------------------------------
 
-  function AZMIN1_s(val)result(ans)
+  pure function AZMIN1_s(val)result(ans)
   implicit none
   real(r8), intent(in) :: val
 
@@ -143,7 +143,7 @@ module minimathmod
 
 !------------------------------------------------------------------------------------------
 
-  function AZMIN1_d(val1,val2)result(ans)
+  pure function AZMIN1_d(val1,val2)result(ans)
   implicit none
   real(r8), intent(in) :: val1,val2
 
@@ -170,7 +170,7 @@ module minimathmod
 
 
 ! ----------------------------------------------------------------------
-  function isclose(a,b)result(ans)
+  pure function isclose(a,b)result(ans)
   !DESCRIPTION
   !determine if a is close to b in magnitude by relative magnitude tiny_val
 

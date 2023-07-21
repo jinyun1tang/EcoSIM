@@ -200,7 +200,7 @@ implicit none
   integer :: fid_TRCPDB   !total precipitated CaHPO4 transformation band, [mol d-2 h-1]
   integer :: fid_TRCPHB   !total precipitated CaH2PO4 transformation band, [mol d-2 h-1]
   integer :: fid_TRCPMB   !total precipitated apatite transformation band, [mol d-2 h-1]
-
+  public :: getvarlist_nosalt
   contains
 
 !------------------------------------------------------------------
@@ -387,8 +387,5 @@ implicit none
   unitl(fid_TRAL) = 'mol d-2 h-1';vartypes(fid_TRAL)=var_flux_type
 
   end subroutine getvarlist_nosalt
-
-
-
 
 end module ChemIDMod
