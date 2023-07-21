@@ -9,11 +9,6 @@ set(IOUTILS_SOURCES
     RestartMod.F90
 	readimod.F90
 	readsmod.F90
-	routp.F90
-	split.F90
-	splitc.F90
-	splitp.c
-	splits.c
     bhistMod.F90
 )
 include_directories(${CMAKE_BINARY_DIR}/f90src/utils/)
@@ -32,7 +27,7 @@ add_ecosim_library(ioutils ${IOUTILS_SOURCES})
 set(ECOSIM_LIBRARIES ioutils;${ECOSIM_LIBRARIES} PARENT_SCOPE)
 
 if (NOT CMAKE_INSTALL_PREFIX STREQUAL "INSTALL_DISABLED")
-  install(TARGETS ioutils DESTINATION lib)
+#  install(TARGETS ioutils DESTINATION lib)
   file(GLOB HEADERS *.h)
-  install(FILES ${HEADERS} DESTINATION include/ecosim/ioutils)
+  install(FILES ${HEADERS} DESTINATION include/)
 endif()

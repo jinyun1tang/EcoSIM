@@ -3,7 +3,7 @@ module PlantDisturbsMod
 !! Description:
 ! code to apply distance to plants
   use data_kind_mod, only : r8 => DAT_KIND_R8
-  use minimathmod, only : test_aeqb,AZMAX1
+  use minimathmod, only : isclose,AZMAX1
   use EcosimConst
   use PlantAPIData
   use GrosubPars
@@ -74,7 +74,7 @@ module PlantDisturbsMod
     HVST     =>  plt_distb%HVST   , &
     IHVST    =>  plt_distb%IHVST  , &
     THIN     =>  plt_distb%THIN   , &
-    PP       =>  plt_site%PP      , &
+    pftPlantPopulation       =>  plt_site%pftPlantPopulation      , &
     NU       =>  plt_site%NU      , &
     ZERO     =>  plt_site%ZERO    , &
     ZNOON    =>  plt_site%ZNOON   , &
@@ -118,7 +118,7 @@ module PlantDisturbsMod
 !
   IF(IHVST(NZ).GE.0)THEN
     IF(J.EQ.INT(ZNOON).AND.IHVST(NZ).NE.4.AND.IHVST(NZ).NE.6)THEN
-      IF(test_aeqb(THIN(NZ),0._r8))THEN
+      IF(isclose(THIN(NZ),0._r8))THEN
         FHVSE(ielmc)=AZMAX1(1._r8-EHVST(1,4,NZ))
         FHVSH=FHVSE(ielmc)
       ELSE
@@ -156,9 +156,9 @@ module PlantDisturbsMod
 !
     call PlantDisturbance(I,J,NZ)
 
-    ZEROP(NZ)=ZERO*PP(NZ)
-    ZEROQ(NZ)=ZERO*PP(NZ)/AREA3(NU)
-    ZEROL(NZ)=ZERO*PP(NZ)*1.0E+06_r8
+    ZEROP(NZ)=ZERO*pftPlantPopulation(NZ)
+    ZEROQ(NZ)=ZERO*pftPlantPopulation(NZ)/AREA3(NU)
+    ZEROL(NZ)=ZERO*pftPlantPopulation(NZ)*1.0E+06_r8
   ENDIF
   end associate
   end subroutine RemoveBiomassByDisturbance
@@ -731,7 +731,7 @@ module PlantDisturbsMod
     CPOOL3   =>  plt_photo%CPOOL3    , &
     CPOOL4   =>  plt_photo%CPOOL4    , &
     NJ       =>  plt_site%NJ         , &
-    PP       =>  plt_site%PP         , &
+    pftPlantPopulation       =>  plt_site%pftPlantPopulation         , &
     IYRC     =>  plt_site%IYRC       , &
     ZNOON    =>  plt_site%ZNOON      , &
     VOLWOU   =>  plt_site%VOLWOU     , &
@@ -789,7 +789,7 @@ module PlantDisturbsMod
       IF(I.GT.IDAY0(NZ).OR.IYRC.GT.IYR0(NZ))THEN
         XHVST=XCORP
         PPX(NZ)=PPX(NZ)*XHVST
-        PP(NZ)=PP(NZ)*XHVST
+        pftPlantPopulation(NZ)=pftPlantPopulation(NZ)*XHVST
         FRADP(NZ)=FRADP(NZ)*XHVST
         VHCPC(NZ)=VHCPC(NZ)*XHVST
         WTLS(NZ)=0._r8
@@ -802,7 +802,7 @@ module PlantDisturbsMod
 !
         D8975: DO NB=1,NBR(NZ)
           IF(IDTHB(NB,NZ).EQ.ibralive)THEN
-            IF(PP(NZ).LE.0.0)then
+            IF(pftPlantPopulation(NZ).LE.0.0)then
               IDTHB(NB,NZ)=ibrdead
             endif  
 !
@@ -947,7 +947,7 @@ module PlantDisturbsMod
 !     IDAYH,IYRH=day,year of harvesting
 !     IYRC=current year
 !
-        IF(PP(NZ).LE.0.0)THEN
+        IF(pftPlantPopulation(NZ).LE.0.0)THEN
           IDTHR(NZ)=ibrdead
           IDTHP(NZ)=ibrdead
           IDTH(NZ)=ibrdead
@@ -1163,7 +1163,7 @@ module PlantDisturbsMod
     CO2B     =>  plt_photo%CO2B    , &
     CPOOL3   =>  plt_photo%CPOOL3  , &
     CPOOL4   =>  plt_photo%CPOOL4  , &
-    PP       =>  plt_site%PP       , &
+    pftPlantPopulation       =>  plt_site%pftPlantPopulation       , &
     PPI      =>  plt_site%PPI      , &
     PPX      =>  plt_site%PPX      , &
     NU       =>  plt_site%NU       , &
@@ -1268,7 +1268,7 @@ module PlantDisturbsMod
     RTVLP    =>  plt_morph%RTVLP   , &
     NG       =>  plt_morph%NG      , &
     MY       =>  plt_morph%MY      , &
-    ZC       =>  plt_morph%ZC      , &
+    CanopyHeight       =>  plt_morph%CanopyHeight      , &
     RTVLW    =>  plt_morph%RTVLW   , &
     RTDNP    =>  plt_morph%RTDNP   , &
     INTYP    =>  plt_morph%INTYP   , &
@@ -1326,11 +1326,11 @@ module PlantDisturbsMod
       IF(JHVST(NZ).NE.ihv_tmareseed)THEN
         !terminate and reseed
         PPX(NZ)=PPX(NZ)*(1._r8-THIN(NZ))
-        PP(NZ)=PP(NZ)*(1._r8-THIN(NZ))
+        pftPlantPopulation(NZ)=pftPlantPopulation(NZ)*(1._r8-THIN(NZ))
       ELSE
 !     PPI(NZ)=AMAX1(1.0_r8,0.5_r8*(PPI(NZ)+GRNO(NZ)/AREA3(NU)))
         PPX(NZ)=PPI(NZ)
-        PP(NZ)=PPX(NZ)*AREA3(NU)
+        pftPlantPopulation(NZ)=PPX(NZ)*AREA3(NU)
       ENDIF
       IF(IHVST(NZ).EQ.3)THEN
         CF(NZ)=CF(NZ)*HVST(NZ)
@@ -1542,7 +1542,7 @@ module PlantDisturbsMod
         ELSE
           FHGT=0._r8
         ENDIF
-        IF(test_aeqb(THIN(NZ),0._r8))THEN
+        IF(isclose(THIN(NZ),0._r8))THEN
           FHVSE(ielmc)=AZMAX1(1._r8-(1._r8-FHGT)*EHVST(1,ipld_leaf,NZ))
           FHVSH=FHVSE(ielmc)
         ELSE
@@ -1675,7 +1675,7 @@ module PlantDisturbsMod
               /WGLFE(ielmc,K,NB,NZ))*EHVST(1,ipld_nofoliar,NZ)/EHVST(1,ipld_leaf,NZ))))
             FHVSHK(K)=FHVSETK(K)
         ELSE
-          IF(test_aeqb(THIN(NZ),0._r8))THEN
+          IF(isclose(THIN(NZ),0._r8))THEN
             FHVSETK(K)=1.0_r8-EHVST(1,ipld_nofoliar,NZ)
             FHVSHK(K)=FHVSETK(K)
           ELSE
@@ -1796,7 +1796,7 @@ module PlantDisturbsMod
 !     IF(IHVST(NZ).NE.4.AND.IHVST(NZ).NE.6)THEN
 !     IF(HTNODE(K,NB,NZ).GT.HVST(NZ)
 !    2.OR.IHVST(NZ).EQ.3)THEN
-!     IF(test_aeqb(FHVSETK(K),0._r8).AND.K.GT.0)THEN
+!     IF(isclose(FHVSETK(K),0._r8).AND.K.GT.0)THEN
 !     IF(IBTYP(NZ).EQ.0.OR.IGTYP(NZ).LE.1)THEN
 !     VSTG(NB,NZ)=AZMAX1(VSTG(NB,NZ)-1.0)
 !     ELSE
@@ -1967,7 +1967,7 @@ module PlantDisturbsMod
             ELSE
               FHGT=0._r8
             ENDIF
-            IF(test_aeqb(THIN(NZ),0._r8))THEN
+            IF(isclose(THIN(NZ),0._r8))THEN
               FHVSE(ielmc)=AZMAX1(1._r8-(1._r8-FHGT)*EHVST(1,ipld_woody,NZ))
               FHVSH=FHVSE(ielmc)
             ELSE
@@ -2033,7 +2033,7 @@ module PlantDisturbsMod
               ELSE
                 FHGTK=0._r8
               ENDIF
-              IF(test_aeqb(THIN(NZ),0._r8))THEN
+              IF(isclose(THIN(NZ),0._r8))THEN
                 FHVSETS=AZMAX1(1._r8-FHGTK*EHVST(1,ipld_woody,NZ))
               ELSE
                 FHVSETS=AZMAX1(1._r8-THIN(NZ))
@@ -2051,7 +2051,7 @@ module PlantDisturbsMod
           DO NE=1,npelms
             WGNODE(NE,K,NB,NZ)=FHVSETS*WGNODE(NE,K,NB,NZ)
           ENDDO
-          IF(IHVST(NZ).LE.2.AND.test_aeqb(THIN(NZ),0._r8))THEN
+          IF(IHVST(NZ).LE.2.AND.isclose(THIN(NZ),0._r8))THEN
             HTNODX(K,NB,NZ)=FHVSETS*HTNODX(K,NB,NZ)
             HTNODE(K,NB,NZ)=AMIN1(HTNODE(K,NB,NZ),HVST(NZ))
           ENDIF
@@ -2116,7 +2116,7 @@ module PlantDisturbsMod
 !
         IF(IHVST(NZ).NE.4.AND.IHVST(NZ).NE.6)THEN
           IF(HVST(NZ).LT.HTSTKX.OR.IHVST(NZ).EQ.1.OR.IHVST(NZ).EQ.3)THEN
-            IF(test_aeqb(THIN(NZ),0._r8))THEN
+            IF(isclose(THIN(NZ),0._r8))THEN
               FHVSETG=1.0_r8-EHVST(1,ipld_nofoliar,NZ)
               FHVSHG=FHVSETG
             ELSE
@@ -2253,7 +2253,7 @@ module PlantDisturbsMod
 !
         IF((IBTYP(NZ).EQ.0.OR.IGTYP(NZ).LE.1) &
           .AND.(IHVST(NZ).NE.4.AND.IHVST(NZ).NE.6) &
-          .AND.ZC(NZ).GT.HVST(NZ))THEN
+          .AND.CanopyHeight(NZ).GT.HVST(NZ))THEN
           IF((IWTYP(NZ).NE.0.AND.VRNF(NB,NZ) &
             .LE.FVRN(IWTYP(NZ))*VRNX(NB,NZ)) &
             .OR.(IWTYP(NZ).EQ.0.AND.IDAY(1,NB,NZ).NE.0))THEN
@@ -2303,7 +2303,7 @@ module PlantDisturbsMod
         IF(JHVST(NZ).NE.ihv_noaction)then
           IDTHB(NB,NZ)=ibrdead
         endif  
-        IF(PP(NZ).LE.0.0)then
+        IF(pftPlantPopulation(NZ).LE.0.0)then
           IDTHB(NB,NZ)=ibrdead
         endif  
       ENDDO D9835

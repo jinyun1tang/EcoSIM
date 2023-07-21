@@ -357,12 +357,12 @@
           TFZ=0._r8
           TWP=0._r8
           TVW=0._r8
-          DIRRA1=DIRRA(1,NY,NX)+CDPTH(NU(NY,NX)-1,NY,NX)
-          DIRRA2=DIRRA(2,NY,NX)+CDPTH(NU(NY,NX)-1,NY,NX)
+          DIRRA1=DIRRA(1,NY,NX)+CumDepth2LayerBottom(NU(NY,NX)-1,NY,NX)
+          DIRRA2=DIRRA(2,NY,NX)+CumDepth2LayerBottom(NU(NY,NX)-1,NY,NX)
 
           D165: DO L=NU(NY,NX),NL(NY,NX)
-            IF(CDPTH(L-1,NY,NX).LT.DIRRA1)THEN
-              FW=AMIN1(1.0_r8,(DIRRA1-CDPTH(L-1,NY,NX))/(CDPTH(L,NY,NX)-CDPTH(L-1,NY,NX)))
+            IF(CumDepth2LayerBottom(L-1,NY,NX).LT.DIRRA1)THEN
+              FW=AMIN1(1.0_r8,(DIRRA1-CumDepth2LayerBottom(L-1,NY,NX))/(CumDepth2LayerBottom(L,NY,NX)-CumDepth2LayerBottom(L-1,NY,NX)))
               FZ=AMIN1(POROS(L,NY,NX),WP(L,NY,NX)+CIRRA(NY,NX)*(FC(L,NY,NX)-WP(L,NY,NX)))
               TFZ=TFZ+FW*FZ*VOLX(L,NY,NX)
               TWP=TWP+FW*WP(L,NY,NX)*VOLX(L,NY,NX)

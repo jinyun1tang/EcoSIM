@@ -9,11 +9,15 @@ module ErosionBalMod
   use SedimentDataType
   use GridDataType
   USE AqueChemDatatype
+  use FlagDataType
   use FertilizerDataType
+  use EcoSIMConfig, only : nlbiomcp=>nlbiomcpc
+  use TFlxTypeMod
 implicit none
   private
   character(len=*), parameter :: mod_filename = __FILE__
   public :: SinkChemicals
+  public :: ZeroErosionArray
   contains
 
 !------------------------------------------------------------------------------------------
@@ -210,5 +214,49 @@ implicit none
     ENDIF
   ENDDO D9885
   end subroutine SinkChemicals
+!------------------------------------------------------------------------------------------
+
+  subroutine ZeroErosionArray(NY,NX)
+  implicit none
+  integer, intent(in) :: NY,NX
+
+  IF(IERSNG.EQ.1.OR.IERSNG.EQ.3)THEN
+    TSEDER(NY,NX)=0.0_r8
+    TSANER(NY,NX)=0.0_r8
+    TSILER(NY,NX)=0.0_r8
+    TCLAER(NY,NX)=0.0_r8
+    TNH4ER(NY,NX)=0.0_r8
+    TNH3ER(NY,NX)=0.0_r8
+    TNHUER(NY,NX)=0.0_r8
+    TNO3ER(NY,NX)=0.0_r8
+    TNH4EB(NY,NX)=0.0_r8
+    TNH3EB(NY,NX)=0.0_r8
+    TNHUEB(NY,NX)=0.0_r8
+    TNO3EB(NY,NX)=0.0_r8
+
+    trcx_TER(idx_beg:idx_end,NY,NX)=0.0_r8
+    trcp_TER(idsp_beg:idsp_end,NY,NX)=0.0_r8
+
+    TOMCER(1:nlbiomcp,1:NMICBSO,1:jcplx,NY,NX)=0.0_r8
+    TOMNER(1:nlbiomcp,1:NMICBSO,1:jcplx,NY,NX)=0.0_r8
+    TOMPER(1:nlbiomcp,1:NMICBSO,1:jcplx,NY,NX)=0.0_r8
+
+    TOMCERff(1:nlbiomcp,1:NMICBSA,NY,NX)=0.0_r8
+    TOMNERff(1:nlbiomcp,1:NMICBSA,NY,NX)=0.0_r8
+    TOMPERff(1:nlbiomcp,1:NMICBSA,NY,NX)=0.0_r8
+
+    TORCER(1:ndbiomcp,1:jcplx,NY,NX)=0.0_r8
+    TORNER(1:ndbiomcp,1:jcplx,NY,NX)=0.0_r8
+    TORPER(1:ndbiomcp,1:jcplx,NY,NX)=0.0_r8
+    TOHCER(1:jcplx,NY,NX)=0.0_r8
+    TOHNER(1:jcplx,NY,NX)=0.0_r8
+    TOHPER(1:jcplx,NY,NX)=0.0_r8
+    TOHAER(1:jcplx,NY,NX)=0.0_r8
+    TOSCER(1:jsken,1:jcplx,NY,NX)=0.0_r8
+    TOSAER(1:jsken,1:jcplx,NY,NX)=0.0_r8
+    TOSNER(1:jsken,1:jcplx,NY,NX)=0.0_r8
+    TOSPER(1:jsken,1:jcplx,NY,NX)=0.0_r8
+  ENDIF
+  end subroutine ZeroErosionArray  
 
 end module ErosionBalMod

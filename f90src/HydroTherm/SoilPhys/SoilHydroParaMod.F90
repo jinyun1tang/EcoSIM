@@ -18,11 +18,12 @@ module SoilHydroParaMod
   use EcoSIMCtrlMod  
   use PhysPars  
   use EcoSiMParDataMod   , only : micpar
-  use minimathmod  , only : test_aeqb,AZMAX1,AZMIN1
+  use minimathmod  , only : isclose,AZMAX1,AZMIN1
 implicit none
   private
   character(len=*), parameter :: mod_filename = __FILE__
   real(r8), parameter :: FORGW=0.25E+06_r8 !threshold for  C concentration in organic soil 	g Mg-1
+  real(r8), parameter :: mGravAcceleration=1.e-3_r8*GravAcceleration  !gravitational constant devided by 1000.  
 
   public :: GetSoilHydraulicVars
   public :: SoilHydroProperty
@@ -94,8 +95,8 @@ contains
 !     PSISM,PSISO,PSISH,PSIST=matric,osmotic,gravimetric,total water potential
 !
     PSISO(L,NY,NX)=-RGAS*1.E-6_r8*TKS(L,NY,NX)*CION(L,NY,NX)
-    PSISH(L,NY,NX)=0.0098_r8*(ALT(NY,NX)-DPTH(L,NY,NX))
-    PSIST(L,NY,NX)=AZMIN1(PSISM(L,NY,NX)+PSISO(L,NY,NX)+PSISH(L,NY,NX))
+    PSISH(L,NY,NX)=mGravAcceleration*(ALT(NY,NX)-DPTH(L,NY,NX))
+    TotalSoilH2OPSIMPa(L,NY,NX)=AZMIN1(PSISM(L,NY,NX)+PSISO(L,NY,NX)+PSISH(L,NY,NX))
 
 !
 !     SOIL RESISTANCE TO ROOT PENETRATION
@@ -209,10 +210,10 @@ contains
       IF(THW(L,NY,NX).GT.1.0_r8.OR.DPTH(L,NY,NX).GE.DTBLZ(NY,NX))THEN
         !below the water table, thus it is saturated
         THETW(L,NY,NX)=POROS(L,NY,NX)
-      ELSEIF(test_aeqb(THW(L,NY,NX),1._r8))THEN
+      ELSEIF(isclose(THW(L,NY,NX),1._r8))THEN
         !at field capacity
         THETW(L,NY,NX)=FC(L,NY,NX)
-      ELSEIF(test_aeqb(THW(L,NY,NX),0._r8))THEN
+      ELSEIF(isclose(THW(L,NY,NX),0._r8))THEN
         !at wilting point
         THETW(L,NY,NX)=WP(L,NY,NX)
       ELSEIF(THW(L,NY,NX).LT.0.0_r8)THEN
@@ -222,9 +223,9 @@ contains
 
       IF(THI(L,NY,NX).GT.1.0_r8.OR.DPTH(L,NY,NX).GE.DTBLZ(NY,NX))THEN
         THETI(L,NY,NX)=AZMAX1(AMIN1(POROS(L,NY,NX),POROS(L,NY,NX)-THW(L,NY,NX)))
-      ELSEIF(test_aeqb(THI(L,NY,NX),1._r8))THEN
+      ELSEIF(isclose(THI(L,NY,NX),1._r8))THEN
         THETI(L,NY,NX)=AZMAX1(AMIN1(FC(L,NY,NX),POROS(L,NY,NX)-THW(L,NY,NX)))
-      ELSEIF(test_aeqb(THI(L,NY,NX),0._r8))THEN
+      ELSEIF(isclose(THI(L,NY,NX),0._r8))THEN
         THETI(L,NY,NX)=AZMAX1(AMIN1(WP(L,NY,NX),POROS(L,NY,NX)-THW(L,NY,NX)))
       ELSEIF(THI(L,NY,NX).LT.0.0_r8)THEN
         THETI(L,NY,NX)=0.0_r8

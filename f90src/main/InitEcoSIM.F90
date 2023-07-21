@@ -11,23 +11,26 @@ module InitEcoSIM
   public :: InitModules2
   contains
 
-  subroutine InitModules(nmicbguilds)
+  subroutine InitModules(NOMicrobeGuilds)
   use PlantDisturbsMod     , only : InitPlantDisturbance
   use UptakesMod           , only : InitUptake  
-  use WatsubMod           , only : initWatsub  
+  use WatsubMod            , only : initWatsub  
   use NitrosMod            , only : InitNitro
-  use RedistMod           , only : InitRedist
-  use ErosionMod          , only : InitErosion
+  use RedistMod            , only : InitRedist
+  use ErosionMod           , only : InitErosion
   use Hour1Mod             , only : InitHour1
-  use HistDataType        , only : hist_ecosim  
-  use InitAllocMod        , only : InitAlloc
+  use HistDataType         , only : hist_ecosim  
+  use InitAllocMod         , only : InitAlloc
+  use UnitMod              , only : units  
   use GridConsts  
   implicit  none
   
-  integer                 , intent(in) :: nmicbguilds   !number of microbial guilds per group
+  integer                 , intent(in) :: NOMicrobeGuilds   !number of microbial guilds per group
 
 
-  call InitAlloc(nmicbguilds)
+  call InitAlloc(NOMicrobeGuilds)
+
+  call units%Initailize()
 
   call InitPlantDisturbance
 

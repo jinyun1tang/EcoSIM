@@ -12,8 +12,7 @@ module batchmod
   use minimathmod    , only : AZMAX1,AZMIN1
   use EcoSIMSolverPar
   use MicIDMod
-  use ChemIDMod
-  use ChemIDMod  , only : getchemvarlist => getvarlist_nosalt
+  use ChemIDMod  
   use ForcTypeMod         , only : forc_type
 
 implicit none
@@ -695,7 +694,9 @@ contains
     ndbiomcp  => micpar%ndbiomcp    &
   )
 
-  call getchemvarlist(nvars, varl, varlnml, unitl, vartypes)
+  !configure variables
+!  call getchemvarlist(nvars, varl, varlnml, unitl, vartypes)
+  call getvarlist_nosalt(nvars, varl, varlnml, unitl, vartypes)
 
   varl(cid_ZMG) ='ZMG';varlnml(cid_ZMG)='soil aqueous Mg content micropore'
   unitl(cid_ZMG)='mol d-2';vartypes(cid_ZMG)=var_state_type
@@ -772,7 +773,6 @@ contains
 
   varl(cid_CZ2GG)='CZ2GG';varlnml(cid_CZ2GG)='soil micropore gaseous N2 concentration'
   unitl(cid_CZ2GG)='g m-3';vartypes(cid_CZ2GG)=var_state_type
-
 
   varl(cid_Z2GS)='Z2GS';varlnml(cid_Z2GS)='soil micropore aqueous N2 mass'
   unitl(cid_Z2GS)='gN d-2';vartypes(cid_Z2GS)=var_state_type

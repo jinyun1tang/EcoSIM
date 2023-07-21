@@ -6,9 +6,10 @@ module WatsubMod
 ! with soil/snow water (vapor, liquid and ice) and energy, and update
 ! them in redistmod.F90
 
-  use data_kind_mod, only : r8 => DAT_KIND_R8
+  use data_kind_mod , only : r8 => DAT_KIND_R8
+  use data_const_mod, only : GravAcceleration=>DAT_CONST_G
   use abortutils   , only : endrun, print_info
-  use minimathmod  , only : test_aeqb, test_aneb,safe_adb,vapsat,AZMAX1,AZMIN1,AZMAX1t
+  use minimathmod  , only : isclose, isclose,safe_adb,vapsat,AZMAX1,AZMIN1,AZMAX1t
   use EcosimConst
   use MiniFuncMod
   use EcoSIMSolverPar
@@ -49,7 +50,7 @@ module WatsubMod
   integer, parameter :: iewstdir=1   !east-west direction
   integer, parameter :: insthdir=2   !north-south direction
   integer, parameter :: ivertdir=3   !vertical direction
-  real(r8), parameter :: GRAVm=1.e-3_r8*GRAV  !gravitational constant devided by 1000.
+  real(r8), parameter :: mGravAcceleration=1.e-3_r8*GravAcceleration  !gravitational constant devided by 1000.
   integer :: curday,curhour
 
   public :: watsub,InitWatsub
@@ -85,33 +86,31 @@ module WatsubMod
   integer :: K0,K1
   integer :: KL,L,L2,LL,M,MM,M1,M2,M3,M4,M5,M6,NX,NY
   integer :: N,N1,N2,N3,N4,N5,N6,NN,N4B,N5B,NUX
-  real(r8):: RAR1,HFLXG
+  real(r8):: RAR1(JY,JX),HeatFlux2Ground(JY,JX)
   REAL(R8):: FKSATS(JY,JX)
+
+  REAL(R8) :: TopLayerWaterVolume(JY,JX)
 ! begin_execution
 !
-  curday=i
-  curhour=j
+  curday=i;curhour=j
+
   call PrepWaterEnergyBalance(I,J,NHW,NHE,NVN,NVS,RAR1)
-!
+
+  call InitSoilHydrauics(NHW,NHE,NVN,NVS)
+
 ! DYNAMIC LOOP FOR FLUX CALCULATIONS
-! iterate for NPH times
+  ! iterate for NPH times
   D3320: DO M=1,NPH
-    D9895: DO  NX=NHW,NHE
-      D9890: DO  NY=NVN,NVS
 
-! set up top boundary condition, uses RAR1
-        !VOLW2 will be updated in soil surface model
-        DO L=NUM(NY,NX),NL(NY,NX)        
-          VOLW2(L,NY,NX)=VOLW1(L,NY,NX)
-        ENDDO  
+    call ForwardCopyTopLayerWaterVolume(NHW,NHE,NVN,NVS,TopLayerWaterVolume)
 
-        call SurfacePhysModel(M,NX,NY,NHE,NHW,NVS,NVN,RAR1,FKSATS(NY,NX),HFLXG)
+    ! run surface energy balance model, uses RAR1
+    call SurfacePhysModel(M,NHE,NHW,NVS,NVN,RAR1,FKSATS,HeatFlux2Ground,TopLayerWaterVolume)
 
-! do 3D water flow
-        call Subsurface3DFlow(M,NY,NX,NHE,NVS,FKSATS(NY,NX),HFLXG)
-
-      ENDDO D9890
-    ENDDO D9895
+    call CopySoilWaterVolume(NHW,NHE,NVN,NVS,TopLayerWaterVolume)
+        
+    ! do 3D water flow
+    call Subsurface3DFlow(M,NHW,NHE,NVN,NVS,FKSATS,HeatFlux2Ground)
 
     call LateralWaterHeatExch(M,NHW,NHE,NVN,NVS,FKSATS)
 !
@@ -125,6 +124,44 @@ module WatsubMod
   ENDDO D3320
 
   END subroutine watsub
+!------------------------------------------------------------------------------------------  
+
+  subroutine ForwardCopyTopLayerWaterVolume(NHW,NHE,NVN,NVS,TopLayerWaterVolume)
+  !
+  !make a copy of toplayer water content
+  implicit none
+  integer, intent(in) :: NHW,NHE,NVN,NVS
+  real(r8), dimension(:,:),intent(out) :: TopLayerWaterVolume(JY,JX)
+  integer :: NY,NX
+
+  DO NX=NHW,NHE
+    DO  NY=NVN,NVS
+      TopLayerWaterVolume(NY,NX)= VOLW2(NUM(NY,NX),NY,NX)
+    ENDDO
+  ENDDO
+  end subroutine ForwardCopyTopLayerWaterVolume
+
+!------------------------------------------------------------------------------------------  
+
+  subroutine CopySoilWaterVolume(NHW,NHE,NVN,NVS,TopLayerWaterVolume)
+
+  implicit none
+  integer, intent(in) :: NHW,NHE,NVN,NVS
+  real(r8), dimension(:,:),intent(in) :: TopLayerWaterVolume
+  integer :: L,NY,NX
+  
+  !VOLW2 will be updated in soil surface model
+
+  DO NX=NHW,NHE
+    DO  NY=NVN,NVS  
+      DO L=NUM(NY,NX)+1,NL(NY,NX)        
+        VOLW2(L,NY,NX)=VOLW1(L,NY,NX)
+      ENDDO  
+      VOLW2(NUM(NY,NX),NY,NX)=TopLayerWaterVolume(NY,NX)
+    ENDDO
+  ENDDO
+  end subroutine CopySoilWaterVolume
+
 
 !------------------------------------------------------------------------------------------  
   subroutine LocalCopySoilVars(I,NHW,NHE,NVN,NVS)
@@ -143,7 +180,7 @@ module WatsubMod
 
       !identify the layer where irrigation is applied
       D65: DO L=NUM(NY,NX),NL(NY,NX)
-        IF(CDPTH(L,NY,NX).GE.WDPTH(I,NY,NX))THEN
+        IF(CumDepth2LayerBottom(L,NY,NX).GE.WDPTH(I,NY,NX))THEN
           LWDPTH=L
           exit
         ENDIF
@@ -252,15 +289,15 @@ module WatsubMod
           FLU1(L,NY,NX)=0.0_r8
           HWFLU1(L,NY,NX)=0.0_r8
         ENDIF
-        IF(CDPTH(L,NY,NX).GE.DTBLX(NY,NX))THEN
-          AREAU(L,NY,NX)=AMIN1(1.0_r8,AZMAX1(safe_adb(CDPTH(L,NY,NX)-DTBLX(NY,NX),DLYR(3,L,NY,NX))))
+        IF(CumDepth2LayerBottom(L,NY,NX).GE.DTBLX(NY,NX))THEN
+          AREAU(L,NY,NX)=AMIN1(1.0_r8,AZMAX1(safe_adb(CumDepth2LayerBottom(L,NY,NX)-DTBLX(NY,NX),DLYR(3,L,NY,NX))))
         ELSE
           AREAU(L,NY,NX)=0.0_r8
         ENDIF
-        IF(CDPTH(L,NY,NX).GE.DTBLY(NY,NX))THEN
-          AREAUD(L,NY,NX)=AMIN1(1.0_r8,AZMAX1(safe_adb(CDPTH(L,NY,NX)-DTBLY(NY,NX),DLYR(3,L,NY,NX))))
+        IF(CumDepth2LayerBottom(L,NY,NX).GE.DTBLY(NY,NX))THEN
+          AreaUnderWaterTable(L,NY,NX)=AMIN1(1.0_r8,AZMAX1(safe_adb(CumDepth2LayerBottom(L,NY,NX)-DTBLY(NY,NX),DLYR(3,L,NY,NX))))
         ELSE
-          AREAUD(L,NY,NX)=0.0_r8
+          AreaUnderWaterTable(L,NY,NX)=0.0_r8
         ENDIF
       ENDDO D30
     ENDDO DX990
@@ -275,7 +312,7 @@ module WatsubMod
   implicit none
   integer :: I,J
   integer, intent(in) :: NHW,NHE,NVN,NVS
-  real(r8),intent(out):: RAR1
+  real(r8),dimension(:,:),intent(out):: RAR1
   integer :: NY,NX
 
 ! begin_execution
@@ -290,8 +327,6 @@ module WatsubMod
   call StageSurfStateVars(I,J,NHW,NHE,NVN,NVS,RAR1)
 
   call LocalCopySoilVars(I,NHW,NHE,NVN,NVS)
-
-  call InitSoilHydrauics(NHW,NHE,NVN,NVS)
 
   end subroutine PrepWaterEnergyBalance
 !------------------------------------------------------------------------------------------
@@ -371,12 +406,12 @@ module WatsubMod
 
 !------------------------------------------------------------------------------------------
 
-  subroutine Subsurface3DFlow(M,NY,NX,NHE,NVS,FKSAT,HFLXG)
+  subroutine Subsurface3DFlow(M,NHW,NHE,NVN,NVS,FKSAT,HeatFlux2Ground)
   implicit none
-  integer, intent(in)  :: M,NY,NX,NHE,NVS
-  real(r8), intent(in) :: FKSAT
-  real(r8), intent(in) :: HFLXG
-  integer :: N,N1,N2,N3,N4,N5,N6,L,LL,K1,KL
+  integer, intent(in)  :: M,NHW,NHE,NVN,NVS
+  real(r8), dimension(:,:),intent(in) :: FKSAT(:,:)
+  real(r8), dimension(:,:),intent(in) :: HeatFlux2Ground(:,:)
+  integer :: N,N1,N2,N3,N4,N5,N6,L,LL,K1,KL,NY,NX
   real(r8) :: DTKX
   real(r8) :: WTHET1,FCDX,FCLX,FCX
   real(r8) :: PSISV1,TKY,PSDX
@@ -395,6 +430,10 @@ module WatsubMod
   !     N3,N2,N1=L,NY,NX of source grid cell
   !     N6,N5,N4=L,NY,NX of destination grid cell
   !
+
+  DO NX=NHW,NHE
+    DO  NY=NVN,NVS
+
   call InitSoil3DModel(M,NY,NX)
 
   IFLGH=0
@@ -491,7 +530,7 @@ module WatsubMod
           !     DARCY FLOW IF BOTH CELLS ARE SATURATED
           !     (CURRENT WATER POTENTIAL > AIR ENTRY WATER POTENTIAL)
           !
-          call MicporeDarcyFlow(NY,NX,N,N1,N2,N3,N4,N5,N6,THETA1,THETAL,FKSAT,HWFLWL,PSISV1,PSISVL)          
+          call MicporeDarcyFlow(NY,NX,N,N1,N2,N3,N4,N5,N6,THETA1,THETAL,FKSAT(NY,NX),HWFLWL,PSISV1,PSISVL)          
 
 !
           !     MACROPORE FLOW FROM POISEUILLE FLOW IF MACROPORES PRESENT
@@ -528,7 +567,7 @@ module WatsubMod
 
           ATCNDL=(2.0_r8*TCND1*TCND2)/(TCND1*DLYR(N,N6,N5,N4)+TCND2*DLYR(N,N3,N2,N1))
 
-          call Solve4Heat(N,NY,NX,N1,N2,N3,N4,N5,N6,ATCNDL,HWFLVL,HFLXG)
+          call Solve4Heat(N,NY,NX,N1,N2,N3,N4,N5,N6,ATCNDL,HWFLVL,HeatFlux2Ground(NY,NX))
 
           !
           !     TOTAL WATER, VAPOR AND HEAT FLUXES
@@ -577,7 +616,8 @@ module WatsubMod
       ENDIF
     ENDDO D4320
   ENDDO D4400
-  
+  ENDDO
+  ENDDO  
   end subroutine Subsurface3DFlow
 !------------------------------------------------------------------------------------------
 
@@ -742,10 +782,10 @@ module WatsubMod
 !     BKDS=bulk density
 !     IRCHG,RCHQ*=runoff boundary flags
 !           top soil layer
-            IF(L.EQ.NUM(N2,N1).AND.N.NE.ivertdir.AND.(CDPTH(NU(N2,N1)-1,N2,N1).LE.CDPTHI(N2,N1) &
+            IF(L.EQ.NUM(N2,N1).AND.N.NE.ivertdir.AND.(CumDepth2LayerBottom(NU(N2,N1)-1,N2,N1).LE.CDPTHI(N2,N1) &
               .OR.BKDS(NUI(N2,N1),N2,N1).GT.ZERO))THEN
 !not in vertical direction
-              IF(IRCHG(NN,N,N2,N1).EQ.0.OR.test_aeqb(RCHQF,0._r8).OR.ABS(QRM(M,N2,N1)).LT.ZEROS(N2,N1))THEN
+              IF(IRCHG(NN,N,N2,N1).EQ.0.OR.isclose(RCHQF,0._r8).OR.ABS(QRM(M,N2,N1)).LT.ZEROS(N2,N1))THEN
                 !no runoff
                 QR1(N,NN,M5,M4)=0.0_r8
                 HQR1(N,NN,M5,M4)=0.0_r8
@@ -808,7 +848,7 @@ module WatsubMod
                 ENDIF
                 
                 FLWL(N,M6,M5,M4)=AMIN1(VOLW1(N3,N2,N1)*XNPX &
-                  ,XN*GRAVm*(-ABS(SLOPE(N,N2,N1)))*CND1*AREA(3,N3,N2,N1)) &
+                  ,XN*mGravAcceleration*(-ABS(SLOPE(N,N2,N1)))*CND1*AREA(3,N3,N2,N1)) &
                   *RCHGFU*RCHGFT*XNPH
 
                 if(abs(FLWL(N,M6,M5,M4))>1.e20)then
@@ -820,7 +860,7 @@ module WatsubMod
                 endif
                 FLWLX(N,M6,M5,M4)=FLWL(N,M6,M5,M4)
                 FLWHL(N,M6,M5,M4)=AMIN1(VOLWH1(L,NY,NX)*XNPX &
-                 ,XN*GRAVm*(-ABS(SLOPE(N,N2,N1)))*CNDH1(L,NY,NX)*AREA(3,N3,N2,N1)) &
+                 ,XN*mGravAcceleration*(-ABS(SLOPE(N,N2,N1)))*CNDH1(L,NY,NX)*AREA(3,N3,N2,N1)) &
                  *RCHGFU*RCHGFT*XNPH
                 HFLWL(N,M6,M5,M4)=cpw*TK1(N3,N2,N1)*(FLWL(N,M6,M5,M4)+FLWHL(N,M6,M5,M4))
               ELSE
@@ -843,7 +883,7 @@ module WatsubMod
         !     IETYP=Koppen climate zone
               IF(N.EQ.ivertdir.AND.IETYP(N2,N1).NE.-2)THEN
                 HFLWL(N,M6,M5,M4)=HFLWL(N,M6,M5,M4)+(TK1(N3,N2,N1) &
-                  -TKSD(N2,N1))*TCNDG/(DPTHSK(N2,N1)-CDPTH(N3,N2,N1)) &
+                  -TKSD(N2,N1))*TCNDG/(DPTHSK(N2,N1)-CumDepth2LayerBottom(N3,N2,N1)) &
                   *AREA(N,N3,N2,N1)*XNPH
               ENDIF
               FLW(N,M6,M5,M4)=FLW(N,M6,M5,M4)+FLWL(N,M6,M5,M4)
@@ -1171,13 +1211,13 @@ module WatsubMod
 !     IFLGD=micropore discharge flag to artificial water table
 !
   IF(IDTBL(NY,NX).GE.3.AND.DPTH(L,NY,NX).LT.DTBLY(NY,NX))THEN
-    IF(PSISM1(L,NY,NX).GT.GRAVm*(DPTH(L,NY,NX)-DTBLY(NY,NX)))THEN
+    IF(PSISM1(L,NY,NX).GT.mGravAcceleration*(DPTH(L,NY,NX)-DTBLY(NY,NX)))THEN
       IFLGD=0
       IF(L.LT.NL(NY,NX))THEN
         D9568: DO  LL=L+1,NL(NY,NX)
-          DTBLYX=DTBLY(NY,NX)+PSISE(LL,NY,NX)/GRAVm
+          DTBLYX=DTBLY(NY,NX)+PSISE(LL,NY,NX)/mGravAcceleration
           IF(DPTH(LL,NY,NX).LT.DTBLYX)THEN
-            IF((PSISM1(LL,NY,NX).LE.GRAVm*(DPTH(LL,NY,NX)-DTBLYX) &
+            IF((PSISM1(LL,NY,NX).LE.mGravAcceleration*(DPTH(LL,NY,NX)-DTBLYX) &
               .AND.L.NE.NL(NY,NX)).OR.DPTH(LL,NY,NX).GT.DPTHA(NY,NX))THEN
               IFLGD=1
             ENDIF
@@ -1199,9 +1239,9 @@ module WatsubMod
 !     IFLGDH=macropore discharge flag to artificial water table
 !
   IF(VOLAH1(L,NY,NX).GT.ZEROS2(NY,NX))THEN
-    DPTHH=CDPTH(L,NY,NX)-(VOLWH1(L,NY,NX)+VOLIH1(L,NY,NX))/VOLAH1(L,NY,NX)*DLYR(3,L,NY,NX)
+    DPTHH=CumDepth2LayerBottom(L,NY,NX)-(VOLWH1(L,NY,NX)+VOLIH1(L,NY,NX))/VOLAH1(L,NY,NX)*DLYR(3,L,NY,NX)
   ELSE
-    DPTHH=CDPTH(L,NY,NX)
+    DPTHH=CumDepth2LayerBottom(L,NY,NX)
   ENDIF
 
   IF(IDTBL(NY,NX).GE.3.AND.DPTHH.LT.DTBLY(NY,NX).AND.VOLWH1(L,NY,NX).GT.ZEROS2(NY,NX))THEN
@@ -1246,13 +1286,13 @@ module WatsubMod
 
   IF(IDTBL(NY,NX).NE.0.AND.DPTH(L,NY,NX).LT.DTBLX(NY,NX))THEN
     !the layer mid-depth is lower than water table
-    IF(PSISM1(L,NY,NX).GT.GRAVm*(DPTH(L,NY,NX)-DTBLX(NY,NX)))THEN
+    IF(PSISM1(L,NY,NX).GT.mGravAcceleration*(DPTH(L,NY,NX)-DTBLX(NY,NX)))THEN
       IFLGU=0
       D9565: DO LL=MIN(L+1,NL(NY,NX)),NL(NY,NX)
         !water level difference
-        DTBLXX=DTBLX(NY,NX)+PSISE(LL,NY,NX)/GRAVm  
+        DTBLXX=DTBLX(NY,NX)+PSISE(LL,NY,NX)/mGravAcceleration  
         IF(DPTH(LL,NY,NX).LT.DTBLXX)THEN
-          IF((PSISM1(LL,NY,NX).LE.GRAVm*(DPTH(LL,NY,NX)-DTBLXX) &
+          IF((PSISM1(LL,NY,NX).LE.mGravAcceleration*(DPTH(LL,NY,NX)-DTBLXX) &
             .AND.L.NE.NL(NY,NX)).OR.DPTH(LL,NY,NX).GT.DPTHA(NY,NX))THEN
             IFLGU=1
           ENDIF
@@ -1274,9 +1314,9 @@ module WatsubMod
 !     IFLGUH=macropore discharge flag to natural water table
 !
   IF(VOLAH1(L,NY,NX).GT.ZEROS2(NY,NX))THEN
-    DPTHH=CDPTH(L,NY,NX)-(VOLWH1(L,NY,NX)+VOLIH1(L,NY,NX))/VOLAH1(L,NY,NX)*DLYR(3,L,NY,NX)
+    DPTHH=CumDepth2LayerBottom(L,NY,NX)-(VOLWH1(L,NY,NX)+VOLIH1(L,NY,NX))/VOLAH1(L,NY,NX)*DLYR(3,L,NY,NX)
   ELSE
-    DPTHH=CDPTH(L,NY,NX)
+    DPTHH=CumDepth2LayerBottom(L,NY,NX)
   ENDIF
   IF(IDTBL(NY,NX).NE.0.AND.DPTHH.LT.DTBLX(NY,NX).AND.VOLWH1(L,NY,NX).GT.ZEROS2(NY,NX))THEN
     !active water table
@@ -1542,8 +1582,8 @@ module WatsubMod
   !     VOLWH1,VOLPH1=macropore water,air content
 
   IF(VOLAH1(N3,N2,N1).GT.ZEROS2(N2,N1).AND.VOLAH1(N6,N5,N4).GT.ZEROS2(N5,N4).AND.IFLGH.EQ.0)THEN
-    PSISH1=PSISH(N3,N2,N1)+GRAVm*DLYR(3,N3,N2,N1)*(AMIN1(1.0_r8,AZMAX1(VOLWH1(N3,N2,N1)/VOLAH1(N3,N2,N1)))-0.5_r8)
-    PSISHL=PSISH(N6,N5,N4)+GRAVm*DLYR(3,N6,N5,N4)*(AMIN1(1.0_r8,AZMAX1(VOLWH1(N6,N5,N4)/VOLAH1(N6,N5,N4)))-0.5_r8)
+    PSISH1=PSISH(N3,N2,N1)+mGravAcceleration*DLYR(3,N3,N2,N1)*(AMIN1(1.0_r8,AZMAX1(VOLWH1(N3,N2,N1)/VOLAH1(N3,N2,N1)))-0.5_r8)
+    PSISHL=PSISH(N6,N5,N4)+mGravAcceleration*DLYR(3,N6,N5,N4)*(AMIN1(1.0_r8,AZMAX1(VOLWH1(N6,N5,N4)/VOLAH1(N6,N5,N4)))-0.5_r8)
     !
     !     MACROPORE FLOW IF GRAVITATIONAL GRADIENT IS POSITIVE
     !     AND MACROPORE POROSITY EXISTS IN ADJACENT CELL
@@ -1637,18 +1677,18 @@ module WatsubMod
   end subroutine WaterVaporFlow  
 !------------------------------------------------------------------------------------------
 
-  subroutine Solve4Heat(N,NY,NX,N1,N2,N3,N4,N5,N6,ATCNDL,HWFLVL,HFLXG)
+  subroutine Solve4Heat(N,NY,NX,N1,N2,N3,N4,N5,N6,ATCNDL,HWFLVL,HeatFlux2Ground)
   implicit none
   integer , intent(in) :: N,NY,NX,N1,N2,N3,N4,N5,N6
-  real(r8), intent(in) :: ATCNDL,HWFLVL,HFLXG
+  real(r8), intent(in) :: ATCNDL,HWFLVL,HeatFlux2Ground
   real(r8) :: TK1X,TKLX,TKY,HFLWC,HFLWX,HFLWSX
   !
   !     HEAT FLOW FROM THERMAL CONDUCTIVITY AND TEMPERATURE GRADIENT
   !
   !     VHCP1,VHCPW=volumetric heat capacity of soil,snowpack
   !     TK1X,TKLX=interim temperatures of source,destination
-  !     HWFLVL,HFLXG=convective heat from soil vapor flux
-  !     HFLXG=storage heat flux from snowpack
+  !     HWFLVL,HeatFlux2Ground=convective heat from soil vapor flux
+  !     HeatFlux2Ground=storage heat flux from snowpack
   !     TKY=equilibrium source-destination temperature
   !     HFLWC,HFLWX=source-destination heat flux unltd,ltd by heat
   !     ATCNDL=source-destination thermal conductance
@@ -1657,10 +1697,10 @@ module WatsubMod
   !
   IF(VHCP1(N3,N2,N1).GT.VHCPNX(NY,NX))THEN
     IF(N3.EQ.NUM(NY,NX).AND.VHCPW(1,N2,N1).LE.VHCPWX(N2,N1))THEN
-      TK1X=TK1(N3,N2,N1)-(HWFLVL-HFLXG)/VHCP1(N3,N2,N1)
+      TK1X=TK1(N3,N2,N1)-(HWFLVL-HeatFlux2Ground)/VHCP1(N3,N2,N1)
       if(abs(TK1X)>1.e5_r8)then
         write(*,*)'TK1(N3,N2,N1)-HWFLVL/VHCP1(N3,N2,N1)',&
-          TK1(N3,N2,N1),HWFLVL,HFLXG,VHCP1(N3,N2,N1)
+          TK1(N3,N2,N1),HWFLVL,HeatFlux2Ground,VHCP1(N3,N2,N1)
         write(*,*)'N1,n2,n3',N1,N2,N3
         call endrun(trim(mod_filename)//' at line',__LINE__)
       endif
@@ -1721,11 +1761,11 @@ module WatsubMod
 !     HCND=saturated hydraulic conductivity
 !     AREAU=fraction of layer below natural water table
 !
-  IF(IFLGU.EQ.0.AND.test_aneb(RCHGFT,0._r8))THEN
+  IF(IFLGU.EQ.0.AND.(.not.isclose(RCHGFT,0._r8)))THEN
     PSISWD=XN*0.005_r8*SLOPE(N,N2,N1)*DLYR(N,N3,N2,N1)*(1.0_r8-DTBLG(N2,N1))
     PSISWT=AZMIN1(-PSISA1(N3,N2,N1)-0.03_r8*PSISO(N3,N2,N1) &
-      +GRAVm*(DPTH(N3,N2,N1)-DTBLX(N2,N1)) &
-      -GRAVm*AZMAX1(DPTH(N3,N2,N1)-DPTHT(N2,N1)))
+      +mGravAcceleration*(DPTH(N3,N2,N1)-DTBLX(N2,N1)) &
+      -mGravAcceleration*AZMAX1(DPTH(N3,N2,N1)-DPTHT(N2,N1)))
     IF(PSISWT.LT.0.0_r8)PSISWT=PSISWT-PSISWD
     FLWT=PSISWT*HCND(N,1,N3,N2,N1)*AREA(N,N3,N2,N1)*(1.0_r8-AREAU(N3,N2,N1))/(RCHGFU+1.0)*RCHGFT*XNPH
     FLWL(N,M6,M5,M4)=XN*FLWT
@@ -1756,10 +1796,10 @@ module WatsubMod
 !     HCND=saturated hydraulic conductivity
   !     AREAU=fraction of layer below natural water table
 !
-  IF(IFLGUH.EQ.0.AND.test_aneb(RCHGFT,0._r8).AND.VOLAH1(N3,N2,N1).GT.ZEROS2(N2,N1))THEN
+  IF(IFLGUH.EQ.0.AND.(.not.isclose(RCHGFT,0._r8)).AND.VOLAH1(N3,N2,N1).GT.ZEROS2(N2,N1))THEN
     PSISWD=XN*0.005*SLOPE(N,N2,N1)*DLYR(N,N3,N2,N1)*(1.0_r8-DTBLG(N2,N1))
-    PSISWTH=-0.03*PSISO(N3,N2,N1)+GRAVm*(DPTHH-DTBLX(N2,N1)) &
-      -GRAVm*AZMAX1(DPTHH-DPTHT(N2,N1))
+    PSISWTH=-0.03*PSISO(N3,N2,N1)+mGravAcceleration*(DPTHH-DTBLX(N2,N1)) &
+      -mGravAcceleration*AZMAX1(DPTHH-DPTHT(N2,N1))
     IF(PSISWTH.LT.0.0_r8)PSISWTH=PSISWTH-PSISWD
     FLWTH=PSISWTH*CNDH1(N3,N2,N1)*AREA(N,N3,N2,N1) &
       *(1.0_r8-AREAU(N3,N2,N1))/(RCHGFU+1.0)*RCHGFT*XNPH
@@ -1793,14 +1833,14 @@ module WatsubMod
   !     FLWL=micropore discharge to natural+artificial water table
   !     HFLWL=convective heat from dischg to natural+artifl water table
   !     HCND=saturated hydraulic conductivity
-  !     AREAUD=fraction of layer below artificial water table
+  !     AreaUnderWaterTable=fraction of layer below artificial water table
 !
-  IF(IFLGD.EQ.0.AND.test_aneb(RCHGFT,0._r8))THEN
+  IF(IFLGD.EQ.0.AND.(.not.isclose(RCHGFT,0._r8)))THEN
     PSISWD=XN*0.005_r8*SLOPE(N,N2,N1)*DLYR(N,N3,N2,N1)*(1.0_r8-DTBLG(N2,N1))
     PSISWT=AZMIN1(-PSISA1(N3,N2,N1)-0.03_r8*PSISO(N3,N2,N1) &
-      +GRAVm*(DPTH(N3,N2,N1)-DTBLY(N2,N1))-GRAVm*AZMAX1(DPTH(N3,N2,N1)-DPTHT(N2,N1)))
+      +mGravAcceleration*(DPTH(N3,N2,N1)-DTBLY(N2,N1))-mGravAcceleration*AZMAX1(DPTH(N3,N2,N1)-DPTHT(N2,N1)))
     IF(PSISWT.LT.0.0_r8)PSISWT=PSISWT-PSISWD
-    FLWT=PSISWT*HCND(N,1,N3,N2,N1)*AREA(N,N3,N2,N1)*(1.0_r8-AREAUD(N3,N2,N1))/(RCHGFU+1.0)*RCHGFT*XNPH
+    FLWT=PSISWT*HCND(N,1,N3,N2,N1)*AREA(N,N3,N2,N1)*(1.0_r8-AreaUnderWaterTable(N3,N2,N1))/(RCHGFU+1.0)*RCHGFT*XNPH
     FLWL(N,M6,M5,M4)=FLWL(N,M6,M5,M4)+XN*FLWT
     FLWLX(N,M6,M5,M4)=FLWLX(N,M6,M5,M4)+XN*FLWT
     HFLWL(N,M6,M5,M4)=HFLWL(N,M6,M5,M4)+cpw*TK1(N3,N2,N1)*XN*FLWT
@@ -1823,13 +1863,13 @@ module WatsubMod
 !     FLWHL=macropore discharge to artificial water table
 !     HFLWL=convective heat from discharge to artificial water table
 !     HCND=saturated hydraulic conductivity
-!     AREAUD=fraction of layer below artificial water table
+!     AreaUnderWaterTable=fraction of layer below artificial water table
 !
-  IF(IFLGDH.EQ.0.AND.test_aneb(RCHGFT,0._r8).AND.VOLAH1(N3,N2,N1).GT.ZEROS2(N2,N1))THEN
+  IF(IFLGDH.EQ.0.AND.(.not.isclose(RCHGFT,0._r8)).AND.VOLAH1(N3,N2,N1).GT.ZEROS2(N2,N1))THEN
     PSISWD=XN*0.005_r8*SLOPE(N,N2,N1)*DLYR(N,N3,N2,N1)*(1.0_r8-DTBLG(N2,N1))
-    PSISWTH=-0.03_r8*PSISO(N3,N2,N1)+GRAVm*(DPTHH-DTBLY(N2,N1))-GRAVm*AZMAX1(DPTHH-DPTHT(N2,N1))
+    PSISWTH=-0.03_r8*PSISO(N3,N2,N1)+mGravAcceleration*(DPTHH-DTBLY(N2,N1))-mGravAcceleration*AZMAX1(DPTHH-DPTHT(N2,N1))
     IF(PSISWTH.LT.0.0_r8)PSISWTH=PSISWTH-PSISWD
-    FLWTH=PSISWTH*CNDH1(N3,N2,N1)*AREA(N,N3,N2,N1)*(1.0_r8-AREAUD(N3,N2,N1))/(RCHGFU+1.0_r8)*RCHGFT*XNPH
+    FLWTH=PSISWTH*CNDH1(N3,N2,N1)*AREA(N,N3,N2,N1)*(1.0_r8-AreaUnderWaterTable(N3,N2,N1))/(RCHGFU+1.0_r8)*RCHGFT*XNPH
     FLWTHL=AMAX1(FLWTH,AZMIN1(-(VOLWH1(N3,N2,N1)*XNPX+FLWHL(3,N3,N2,N1)-FLWHL(3,N3+1,N2,N1))))
     FLWHL(N,M6,M5,M4)=FLWHL(N,M6,M5,M4)+XN*FLWTHL
     HFLWL(N,M6,M5,M4)=HFLWL(N,M6,M5,M4)+cpw*TK1(N3,N2,N1)*XN*FLWTHL
@@ -1868,9 +1908,9 @@ module WatsubMod
         .AND.DPTH(N3,N2,N1).LT.DPTHA(N2,N1) &
         .AND.(VOLP2.GT.ZEROS2(N2,N1).OR.BKDS(N3,N2,N1).LE.ZERO) &
         .AND.VOLP1Z(N3,N2,N1).GT.0.0_r8 &
-        .AND.test_aneb(RCHGFT,0._r8))THEN
+        .AND.(.not.isclose(RCHGFT,0._r8)))THEN
         PSISWD=XN*0.005_r8*SLOPE(N,N2,N1)*DLYR(N,N3,N2,N1)*(1.0_r8-DTBLG(N2,N1))
-        PSISUT=AZMAX1(-PSISA1(N3,N2,N1)-0.03_r8*PSISO(N3,N2,N1)+GRAVm*(DPTH(N3,N2,N1)-DTBLX(N2,N1)))
+        PSISUT=AZMAX1(-PSISA1(N3,N2,N1)-0.03_r8*PSISO(N3,N2,N1)+mGravAcceleration*(DPTH(N3,N2,N1)-DTBLX(N2,N1)))
         IF(PSISUT.GT.0.0_r8)PSISUT=PSISUT+PSISWD
         FLWU=PSISUT*HCND(N,1,N3,N2,N1)*AREA(N,N3,N2,N1)*AREAU(N3,N2,N1)/(RCHGFU+1.0)*RCHGFT*XNPH
         IF(BKDS(N3,N2,N1).GT.ZERO)THEN
@@ -1909,9 +1949,9 @@ module WatsubMod
         .AND.DPTHA(N2,N1).GT.DTBLX(N2,N1)     & !active layer below water table
         .AND.DPTH(N3,N2,N1).LT.DPTHA(N2,N1)   & !midlayer depth above active water layer
         .AND.VOLPH2.GT.ZEROS2(NY,NX)          & !macropore has air-filled fraction
-        .AND.test_aneb(RCHGFT,0.0_r8))THEN      !recharge is on
+        .AND.(.not.isclose(RCHGFT,0.0_r8)))THEN      !recharge is on
         PSISWD=XN*0.005*SLOPE(N,N2,N1)*DLYR(N,N3,N2,N1)*(1.0_r8-DTBLG(N2,N1))
-        PSISUTH=-0.03_r8*PSISO(N3,N2,N1)+GRAVm*(DPTHH-DTBLX(N2,N1))
+        PSISUTH=-0.03_r8*PSISO(N3,N2,N1)+mGravAcceleration*(DPTHH-DTBLX(N2,N1))
         IF(PSISUTH.GT.0.0_r8)PSISUTH=PSISUTH+PSISWD
         FLWUH=PSISUTH*CNDH1(N3,N2,N1)*AREA(N,N3,N2,N1)*AREAU(N3,N2,N1)/(RCHGFU+1.0_r8)*RCHGFT*XNPH
         FLWUHL=AMIN1(FLWUH,VOLPH2*XNPX)

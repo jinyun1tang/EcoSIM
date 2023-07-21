@@ -17,7 +17,7 @@ module SoilWaterDataType
   real(r8),target,allocatable ::  VOLI(:,:,:)                       !soil micropore ice content   [m3 d-2]
   real(r8),target,allocatable ::  VOLWH(:,:,:)                      !soil macropore water content [m3 d-2]
   real(r8),target,allocatable ::  PSISM(:,:,:)                      !soil micropore matric water potential [MPa]
-  real(r8),target,allocatable ::  PSIST(:,:,:)                      !soil micropore total water potential [MPa]
+  real(r8),target,allocatable ::  TotalSoilH2OPSIMPa(:,:,:)                      !soil micropore total water potential [MPa]
   real(r8),target,allocatable ::  VOLWX(:,:,:)                      !soil micropore water content before wetting front [m3 d-2]
   real(r8),target,allocatable ::  FINH(:,:,:)                       !soil macropore - micropore water transfer [m3 d-2 h-1]
   real(r8),target,allocatable ::  VOLIH(:,:,:)                      !soil macropore ice content [m3 d-2]
@@ -111,7 +111,7 @@ module SoilWaterDataType
   allocate(VOLI(0:JZ,JY,JX));   VOLI=0._r8
   allocate(VOLWH(JZ,JY,JX));    VOLWH=0._r8
   allocate(PSISM(0:JZ,JY,JX));  PSISM=0._r8
-  allocate(PSIST(0:JZ,JY,JX));  PSIST=0._r8
+  allocate(TotalSoilH2OPSIMPa(0:JZ,JY,JX));  TotalSoilH2OPSIMPa=0._r8
   allocate(VOLWX(0:JZ,JY,JX));  VOLWX=0._r8
   allocate(FINH(JZ,JY,JX));     FINH=0._r8
   allocate(VOLIH(JZ,JY,JX));    VOLIH=0._r8
@@ -195,7 +195,7 @@ module SoilWaterDataType
   if (allocated(VOLI))     deallocate(VOLI)
   if (allocated(VOLWH))    deallocate(VOLWH)
   if (allocated(PSISM))    deallocate(PSISM)
-  if (allocated(PSIST))    deallocate(PSIST)
+  if (allocated(TotalSoilH2OPSIMPa))    deallocate(TotalSoilH2OPSIMPa)
   if (allocated(VOLWX))    deallocate(VOLWX)
   if (allocated(FINH))     deallocate(FINH)
   if (allocated(VOLIH))    deallocate(VOLIH)

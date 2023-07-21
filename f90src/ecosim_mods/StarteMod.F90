@@ -1,6 +1,5 @@
 module StarteMod
   use data_kind_mod, only : r8 => DAT_KIND_R8
-  use minimathmod, only : test_aeqb
   use SOMDataType
   use TracerPropMod
   use TracerIDMod
@@ -380,7 +379,7 @@ module StarteMod
     trc_gasml(idg_H2,L,NY,NX)=AtmGgms(idg_H2,NY,NX)*VOLP(L,NY,NX)
 
 !   DTBLZ: external water table depth
-    IF(CDPTH(L-1,NY,NX).LT.DTBLZ(NY,NX))THEN
+    IF(CumDepth2LayerBottom(L-1,NY,NX).LT.DTBLZ(NY,NX))THEN
 ! above water table
       trc_solml(idg_O2,L,NY,NX)=AtmGgms(idg_O2,NY,NX)*gas_solubility(idg_O2, ATCA(NY,NX)) &
         /(EXP(ACTCG(idg_O2)*solutevar%CSTR1))*solutevar%FH2O*VOLW(L,NY,NX)

@@ -2,7 +2,7 @@ module grosubsMod
 !!
 ! Description:
 ! module for plant biological transformations
-  use minimathmod, only : test_aeqb,safe_adb,AZMAX1
+  use minimathmod, only : safe_adb,AZMAX1
   use data_kind_mod, only : r8 => DAT_KIND_R8
   use EcosimConst
   use EcoSiMParDataMod, only : pltpar
@@ -76,7 +76,7 @@ module grosubsMod
     CNET     => plt_bgcr%CNET     , &
     HESNC    => plt_bgcr%HESNC    , &
     ESNC     => plt_bgcr%ESNC     , &
-    ZC       => plt_morph%ZC        &
+    CanopyHeight       => plt_morph%CanopyHeight        &
   )
 !     TOTAL AGB FOR GRAZING IN LANDSCAPE SECTION
 !
@@ -96,8 +96,8 @@ module grosubsMod
     ENDDO D1
     HESNC(1:npelms,NZ)=0._r8
     CNET(NZ)=0._r8
-    ZCX(NZ)=ZC(NZ)
-    ZC(NZ)=0._r8
+    ZCX(NZ)=CanopyHeight(NZ)
+    CanopyHeight(NZ)=0._r8
   ENDDO D9980
 !
 !     TRANSFORMATIONS IN LIVING PLANT POPULATIONS
@@ -105,7 +105,7 @@ module grosubsMod
   D9985: DO NZ=1,NP
 
 ! IFLGC= flag for living pft
-    IF(IFLGC(NZ).EQ.ipltactv)THEN
+    IF(IFLGC(NZ).EQ.PlantIsActive)THEN
       call GrowPlant(I,J,NZ,ZCX,CPOOLK)
     ENDIF
 
@@ -250,7 +250,7 @@ module grosubsMod
 !
     ZNPP(NZ)=CARBN(NZ)+TCO2T(NZ)
 
-    IF(IFLGC(NZ).EQ.ipltactv)THEN
+    IF(IFLGC(NZ).EQ.PlantIsActive)THEN
     !check for living plant
       DO NE=1,npelms
         BALE(NE,NZ)=WTSHTE(NE,NZ)+WTRTE(NE,NZ)+WTNDE(NE,NZ) &
@@ -381,7 +381,7 @@ module grosubsMod
     TKS    =>  plt_ew%TKS         , &
     PSILT  =>  plt_ew%PSILT       , &
     PSILG  =>  plt_ew%PSILG       , &
-    PP     =>  plt_site%PP        , &
+    pftPlantPopulation     =>  plt_site%pftPlantPopulation        , &
     NU     =>  plt_site%NU        , &
     NJ     =>  plt_site%NJ        , &
     OFFST  =>  plt_pheno%OFFST    , &
@@ -527,8 +527,8 @@ module grosubsMod
 !     WTRT,PP=root mass,PFT population
 !     XRTN1=multiplier for number of primary root axes
 !
-  WTRTA(NZ)=AMAX1(0.999992087_r8*WTRTA(NZ),WTRTE(ielmc,NZ)/PP(NZ))
-  XRTN1=AMAX1(1.0_r8,WTRTA(NZ)**0.667_r8)*PP(NZ)
+  WTRTA(NZ)=AMAX1(0.999992087_r8*WTRTA(NZ),WTRTE(ielmc,NZ)/pftPlantPopulation(NZ))
+  XRTN1=AMAX1(1.0_r8,WTRTA(NZ)**0.667_r8)*pftPlantPopulation(NZ)
 !
 !     WATER STRESS FUNCTIONS FOR EXPANSION AND GROWTH RESPIRATION
 !     FROM CANOPY TURGOR

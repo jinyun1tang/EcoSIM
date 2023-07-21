@@ -1,4 +1,4 @@
-file(GLOB BOXGEOCHEM_SOURCES "*.F90")
+file(GLOB BOXSHARED_SOURCES "*.F90")
 #set(BOXGEOCHEM_SOURCES
 #  SoluteChemDataType.F90
 #  SaltChemEquilibriaMod.F90
@@ -17,9 +17,9 @@ include_directories(${CMAKE_BINARY_DIR}/f90src/plant_bgc/)
 include_directories(${CMAKE_BINARY_DIR}/f90src/microbial_bgc/)
 
 include(add_ecosim_library)
-add_ecosim_library(box_chem ${BOXGEOCHEM_SOURCES})
+add_ecosim_library(boxshared ${BOXSHARED_SOURCES})
 
-set(ECOSIM_LIBRARIES box_chem;${ECOSIM_LIBRARIES} PARENT_SCOPE)
+set(ECOSIM_LIBRARIES boxshared;${ECOSIM_LIBRARIES} PARENT_SCOPE)
 
 if (NOT CMAKE_INSTALL_PREFIX STREQUAL "INSTALL_DISABLED")
 #  install(TARGETS box_chem DESTINATION ${CMAKE_BINARY_DIR}/lib)

@@ -12,6 +12,7 @@ module ClimReadMod
   use EcoSIMCtrlDataType
   use EcoSIMCtrlMod
   use EcoSIMConfig
+  use UnitMod, only : units
 implicit none
   private
 
@@ -204,7 +205,7 @@ implicit none
         TMPH(J,I)=((DAT(K)+DATK(K))/IH-32.0_r8)*0.556_r8
       ELSEIF(TYP(K).EQ.'K')THEN
 ! Temperature given as kelvin
-        TMPH(J,I)=(DAT(K)+DATK(K))/IH-TC2K
+        TMPH(J,I)=units%Kelvin2Celcius((DAT(K)+DATK(K))/IH)
       ELSE
         TMPH(J,I)=(DAT(K)+DATK(K))/IH
       ENDIF
@@ -251,29 +252,29 @@ implicit none
 !
       IF(TYP(K).EQ.'D')THEN
 ! given as celcius degree
-        tempK=TC2K+(DAT(K)+DATK(K))/IH
+        tempK=units%Celcius2Kelvin((DAT(K)+DATK(K))/IH)
         DWPTH(J,I)=vapsat0(tempK)
       ELSEIF(TYP(K).EQ.'F')THEN
 ! given as Fahrenheit
         DAT(K)=(DAT(K)-32.0_r8)*0.556_r8
-        tempK=TC2K+(DAT(K)+DATK(K))/IH
+        tempK=units%Celcius2Kelvin((DAT(K)+DATK(K))/IH)
         DWPTH(J,I)=vapsat0(tempK)
       ELSEIF(TYP(K).EQ.'H')THEN
 ! given as relative humidity, [0, 1], return value kPa
-        tempK=TC2K+TMPH(J,I)
+        tempK=units%Celcius2Kelvin(TMPH(J,I))
         DWPTH(J,I)=vapsat0(tempK)*AZMAX1(AMIN1(1.0_r8,(DAT(K)+DATK(K))/IH))
       ELSEIF(TYP(K).EQ.'R')THEN
 ! given as relative humidity [0, 100],return value kPa
-        tempK=TC2K+TMPH(J,I)
+        tempK=units%Celcius2Kelvin(TMPH(J,I))
         DWPTH(J,I)=vapsat0(tempK)*AZMAX1(AMIN1(1._r8,0.01_r8*(DAT(K)+DATK(K))/IH))
       ELSEIF(TYP(K).EQ.'S')THEN
 ! molar mixing ratio? [0,100]
         DWPTH(J,I)=AZMAX1((DAT(K)+DATK(K))/IH)*0.0289_r8/18.0_r8*101.325_r8 &
-          *EXP(-ALTIG/7272.0_r8)*288.15_r8/(TC2K+TMPH(J,I))
+          *EXP(-ALTIG/7272.0_r8)*288.15_r8/units%Celcius2Kelvin(TMPH(J,I))
       ELSEIF(TYP(K).EQ.'G')THEN
 ! molar mixing ratio [0, 1] ALTIG is doing altitude correction,
         DWPTH(J,I)=AZMAX1((DAT(K)+DATK(K))/IH)*28.9_r8/18.0_r8*101.325_r8 &
-          *EXP(-ALTIG/7272.0_r8)*288.15_r8/(TC2K+TMPH(J,I))
+          *EXP(-ALTIG/7272.0_r8)*288.15_r8/units%Celcius2Kelvin(TMPH(J,I))
       ELSEIF(TYP(K).EQ.'M')THEN
 ! given as hPa
         DWPTH(J,I)=AZMAX1((DAT(K)+DATK(K))/IH*0.1_r8)
@@ -455,30 +456,30 @@ implicit none
 !
     ELSEIF(VAR(K).EQ.'H')THEN
       IF(TYP(K).EQ.'D')THEN
-        DWPT(1,I)=0.61_r8*EXP(5360.0_r8*(3.661E-03_r8-1.0_r8/(TC2K+DAT(K))))
-        DWPT(2,I)=0.61_r8*EXP(5360.0_r8*(3.661E-03_r8-1.0_r8/(TC2K+DAT(K))))
+        DWPT(1,I)=0.61_r8*EXP(5360.0_r8*(3.661E-03_r8-1.0_r8/units%Celcius2Kelvin(DAT(K))))
+        DWPT(2,I)=0.61_r8*EXP(5360.0_r8*(3.661E-03_r8-1.0_r8/units%Celcius2Kelvin(DAT(K))))
       ELSEIF(TYP(K).EQ.'F')THEN
         DAT(K)=(DAT(K)-32.0_r8)*0.556_r8
-        DWPT(1,I)=0.61_r8*EXP(5360.0_r8*(3.661E-03_r8-1.0_r8/(TC2K+DAT(K))))
-        DWPT(2,I)=0.61_r8*EXP(5360.0_r8*(3.661E-03_r8-1.0_r8/(TC2K+DAT(K))))
+        DWPT(1,I)=0.61_r8*EXP(5360.0_r8*(3.661E-03_r8-1.0_r8/units%Celcius2Kelvin(DAT(K))))
+        DWPT(2,I)=0.61_r8*EXP(5360.0_r8*(3.661E-03_r8-1.0_r8/units%Celcius2Kelvin(DAT(K))))
       ELSEIF(TYP(K).EQ.'H')THEN
         DAT(K)=AZMAX1(AMIN1(1.0_r8,DAT(K)))
-        DWPT(1,I)=0.61_r8*EXP(5360.0_r8*(3.661E-03_r8-1.0_r8/(TC2K+(TMPN(I)+TMPX(I))/2)))*DAT(K)
-        DWPT(2,I)=0.61_r8*EXP(5360.0_r8*(3.661E-03_r8-1.0_r8/(TC2K+TMPN(I))))
+        DWPT(1,I)=0.61_r8*EXP(5360.0_r8*(3.661E-03_r8-1.0_r8/units%Celcius2Kelvin((TMPN(I)+TMPX(I))/2._r8)))*DAT(K)
+        DWPT(2,I)=0.61_r8*EXP(5360.0_r8*(3.661E-03_r8-1.0_r8/units%Celcius2Kelvin(TMPN(I))))
       ELSEIF(TYP(K).EQ.'R')THEN
         DAT(K)=AZMAX1(AMIN1(100.0_r8,DAT(K)))
-        DWPT(1,I)=0.61_r8*EXP(5360.0_r8*(3.661E-03_r8-1.0_r8/(TC2K+(TMPN(I)+TMPX(I))/2)))*DAT(K)*0.01_r8
-        DWPT(2,I)=0.61_r8*EXP(5360.0_r8*(3.661E-03_r8-1.0_r8/(TC2K+TMPN(I))))
+        DWPT(1,I)=0.61_r8*EXP(5360.0_r8*(3.661E-03_r8-1.0_r8/units%Celcius2Kelvin((TMPN(I)+TMPX(I))/2._r8)))*DAT(K)*0.01_r8
+        DWPT(2,I)=0.61_r8*EXP(5360.0_r8*(3.661E-03_r8-1.0_r8/units%Celcius2Kelvin(TMPN(I))))
       ELSEIF(TYP(K).EQ.'S')THEN
         DWPT(1,I)=AZMAX1(DAT(K))*0.0289_r8/18.0_r8*101.325_r8 &
-          *EXP(-ALTIG/7272.0_r8)*288.15_r8/(TC2K+(TMPN(I)+TMPX(I))/2)
+          *EXP(-ALTIG/7272.0_r8)*288.15_r8/units%Celcius2Kelvin((TMPN(I)+TMPX(I))/2._r8)
         DWPT(2,I)=AZMAX1(DAT(K))*0.0289_r8/18.0_r8*101.325_r8 &
-          *EXP(-ALTIG/7272.0_r8)*288.15_r8/(TC2K+TMPN(I))
+          *EXP(-ALTIG/7272.0_r8)*288.15_r8/units%Celcius2Kelvin(TMPN(I))
       ELSEIF(TYP(K).EQ.'G')THEN
         DWPT(1,I)=AZMAX1(DAT(K))*28.9_r8/18.0_r8*101.325_r8 &
-          *EXP(-ALTIG/7272.0_r8)*288.15_r8/(TC2K+(TMPN(I)+TMPX(I))/2._r8)
+          *EXP(-ALTIG/7272.0_r8)*288.15_r8/units%Celcius2Kelvin((TMPN(I)+TMPX(I))/2._r8)
         DWPT(2,I)=AZMAX1(DAT(K))*28.9_r8/18.0_r8*101.325_r8 &
-          *EXP(-ALTIG/7272.0_r8)*288.15_r8/(TC2K+TMPN(I))
+          *EXP(-ALTIG/7272.0_r8)*288.15_r8/units%Celcius2Kelvin(TMPN(I))
       ELSEIF(TYP(K).EQ.'M')THEN
         DWPT(1,I)=AZMAX1(DAT(K)*0.1_r8)
         DWPT(2,I)=AZMAX1(DAT(K)*0.1_r8)

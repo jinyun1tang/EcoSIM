@@ -1,6 +1,6 @@
 module RootMod
   use data_kind_mod, only : r8 => DAT_KIND_R8
-  use minimathmod  , only : test_aeqb,safe_adb,AZMAX1,AZMIN1
+  use minimathmod  , only : safe_adb,AZMAX1,AZMIN1
   use EcosimConst
   use GrosubPars
   use PlantAPIData
@@ -32,7 +32,7 @@ implicit none
     WTRVE    =>   plt_biom%WTRVE      , &
     ZEROL    =>   plt_biom%ZEROL      , &
     DLYR3    =>   plt_site%DLYR3      , &
-    PP       =>   plt_site%PP         , &
+    pftPlantPopulation       =>   plt_site%pftPlantPopulation         , &
     ZERO     =>   plt_site%ZERO       , &
     ISTYP    =>   plt_pheno%ISTYP     , &
     IDTHR    =>   plt_pheno%IDTHR     , &
@@ -63,7 +63,7 @@ implicit none
   ELSE
     RTDNP(ipltroot,NG(NZ),NZ)=0._r8
   ENDIF
-  RTVL=RTVLP(ipltroot,NG(NZ),NZ)+RTVLW(ipltroot,NG(NZ),NZ)+SDVL(NZ)*PP(NZ)
+  RTVL=RTVLP(ipltroot,NG(NZ),NZ)+RTVLW(ipltroot,NG(NZ),NZ)+SDVL(NZ)*pftPlantPopulation(NZ)
   RTVLP(ipltroot,NG(NZ),NZ)=PORT(ipltroot,NZ)*RTVL
   RTVLW(ipltroot,NG(NZ),NZ)=(1.0_r8-PORT(ipltroot,NZ))*RTVL
   RTARP(ipltroot,NG(NZ),NZ)=RTARP(ipltroot,NG(NZ),NZ)+SDAR(NZ)
@@ -134,7 +134,7 @@ implicit none
     VOLX     =>   plt_soilchem%VOLX   , &
     NU       =>   plt_site%NU         , &
     ZERO     =>   plt_site%ZERO       , &
-    PP       =>   plt_site%PP         , &
+    pftPlantPopulation       =>   plt_site%pftPlantPopulation         , &
     ZEROS2   =>   plt_site%ZEROS2     , &
     DLYR3    =>   plt_site%DLYR3      , &
     NL       =>   plt_site%NL         , &
@@ -261,11 +261,11 @@ implicit none
           RTLGZ=RTLGZ*FWODRE(ielmc,k_fine_litr)
           RTLGL=RTLGL*FWODRE(ielmc,k_fine_litr)
         ENDIF
-        RTLGX=RTLGZ*PP(NZ)
+        RTLGX=RTLGZ*pftPlantPopulation(NZ)
         RTLGT=RTLGL+RTLGX
         WTRTT=WTRTX+WTRTZ
-        IF(RTLGT.GT.ZEROP(NZ).AND.WTRTT.GT.ZEROP(NZ).AND.PP(NZ).GT.ZEROP(NZ))THEN
-          RTLGP(N,L,NZ)=RTLGT/PP(NZ)
+        IF(RTLGT.GT.ZEROP(NZ).AND.WTRTT.GT.ZEROP(NZ).AND.pftPlantPopulation(NZ).GT.ZEROP(NZ))THEN
+          RTLGP(N,L,NZ)=RTLGT/pftPlantPopulation(NZ)
           IF(DLYR3(L).GT.ZERO)THEN
             RTDNP(N,L,NZ)=RTLGP(N,L,NZ)/DLYR3(L)
           ELSE
@@ -285,7 +285,7 @@ implicit none
           ELSE
             RTLGA(N,L,NZ)=RTLGAX
           ENDIF
-          RTARP(N,L,NZ)=RTAR/PP(NZ)
+          RTARP(N,L,NZ)=RTAR/pftPlantPopulation(NZ)
 !     IF(N.EQ.1)THEN
 !     RTARP(N,L,NZ)=RTARP(N,L,NZ)*RTLGAX/RTLGA(N,L,NZ)
 !     ENDIF
@@ -1207,7 +1207,7 @@ implicit none
     CDPTHZ    =>  plt_site%CDPTHZ      , &
     DLYR3     =>  plt_site%DLYR3       , &
     NJ        =>  plt_site%NJ          , &
-    PP        =>  plt_site%PP          , &
+    pftPlantPopulation        =>  plt_site%pftPlantPopulation          , &
     PSIRG     =>  plt_ew%PSIRG         , &
     PSIRO     =>  plt_ew%PSIRO         , &
     PSIRT     =>  plt_ew%PSIRT         , &
@@ -1239,10 +1239,10 @@ implicit none
 !     DLYR=soil layer thickness
 !
   IF(GRTWTLE(ielmc).LT.0.0.AND.RTWT1E(ielmc,N,NR,NZ).GT.ZEROP(NZ))THEN
-    GRTLGL=GRTWTG*RTLG1X(N,NZ)/PP(NZ)*WFNR*FWODRE(ielmc,k_fine_litr) &
+    GRTLGL=GRTWTG*RTLG1X(N,NZ)/pftPlantPopulation(NZ)*WFNR*FWODRE(ielmc,k_fine_litr) &
       +GRTWTLE(ielmc)*(RTDP1(N,NR,NZ)-SDPTH(NZ))/RTWT1E(ielmc,N,NR,NZ)
   ELSE
-    GRTLGL=GRTWTG*RTLG1X(N,NZ)/PP(NZ)*WFNR*FWODRE(ielmc,k_fine_litr)
+    GRTLGL=GRTWTG*RTLG1X(N,NZ)/pftPlantPopulation(NZ)*WFNR*FWODRE(ielmc,k_fine_litr)
   ENDIF
   IF(L.LT.NJ)THEN
     GRTLGL=AMIN1(DLYR3(L1),GRTLGL)

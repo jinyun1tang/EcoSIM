@@ -3,7 +3,7 @@ module WthrMod
   ! Description:
   ! code to process the weather forcing
   use data_kind_mod, only : r8 => DAT_KIND_R8
-  use MiniMathMod, only : safe_adb,vapsat0,test_aneb,test_aeqb
+  use MiniMathMod  , only : safe_adb,vapsat0,isclose
   use EcosimConst
   use CanopyRadDataType
   use GridConsts
@@ -19,6 +19,7 @@ module WthrMod
   use EcoSIMConfig
   use EcosimConst, only : TWILGT
   use MiniMathMod, only : AZMAX1
+  use UnitMod    , only : units
   implicit none
 
   private
@@ -148,7 +149,7 @@ module WthrMod
         TCA(NY,NX)=TAVG2+AMP2*SIN(((J-(ZNOON(NY,NX) &
           -DYLN(NY,NX)/2.0_r8))*PICON/(3.0_r8+DYLN(NY,NX)/2.0_r8))-PICON2h)
       ENDIF
-      TKA(NY,NX)=TCA(NY,NX)+TC2K
+      TKA(NY,NX)=units%Celcius2Kelvin(TCA(NY,NX))
       !
       !     VPK,VPS=ambient,saturated vapor pressure
       !     VAVG*,VAMP*=daily averages, amplitudes from day.f
@@ -217,7 +218,7 @@ module WthrMod
       RADN(NY,NX)=SRADH(J,I)
       TCA(NY,NX)=TMPH(J,I)
 
-      TKA(NY,NX)=TCA(NY,NX)+TC2K
+      TKA(NY,NX)=units%Celcius2Kelvin(TCA(NY,NX))
       VPS(NY,NX)=vapsat0(TKA(ny,nx))*EXP(-ALTI(NY,NX)/7272.0_r8)
       VPK(NY,NX)=AMIN1(DWPTH(J,I),VPS(NY,NX))
       UA(NY,NX)=AMAX1(3600.0_r8,WINDH(J,I))
@@ -350,8 +351,8 @@ module WthrMod
       !     PRECII,PRECUI=surface,subsurface irrigation
       !     RRIG=irrigation from soil management file in reads.f
       !
-      WDPTHD=WDPTH(I,NY,NX)+CDPTH(NU(NY,NX)-1,NY,NX)
-!     IF(WDPTHD.LE.CDPTH(NU(NY,NX),NY,NX))THEN
+      WDPTHD=WDPTH(I,NY,NX)+CumDepth2LayerBottom(NU(NY,NX)-1,NY,NX)
+!     IF(WDPTHD.LE.CumDepth2LayerBottom(NU(NY,NX),NY,NX))THEN
       PRECII(NY,NX)=RRIG(J,I,NY,NX)
       PRECUI(NY,NX)=0.0_r8
 !     ELSE
@@ -429,12 +430,12 @@ module WthrMod
       !     DTA,AMP,DHR=change in daily average,amplitude of air temperature
       !     DHR=diurnal effect on AMP
       !
-      IF(test_aneb(TDTPX(N,NY,NX),0.0_r8).OR.test_aneb(TDTPN(N,NY,NX),0.0_r8))THEN
+      IF(.not.isclose(TDTPX(N,NY,NX),0.0_r8).OR.(.not.isclose(TDTPN(N,NY,NX),0.0_r8)))THEN
         DTA=0.5_r8*(TDTPX(N,NY,NX)+TDTPN(N,NY,NX))
         AMP=0.5_r8*(TDTPX(N,NY,NX)-TDTPN(N,NY,NX))
         DHR=SIN(0.2618_r8*(J-(ZNOON(NY,NX)+3.0_r8))+PICON2h)
         TCA(NY,NX)=TCA(NY,NX)+DTA+AMP*DHR
-        TKA(NY,NX)=TCA(NY,NX)+TC2K
+        TKA(NY,NX)=units%Celcius2Kelvin(TCA(NY,NX))
 !
         !     ACCLIMATION TO GRADUAL CLIMATE CHANGE
         !
@@ -472,7 +473,7 @@ module WthrMod
 !
         !     ADJUST VAPOR PRESSURE FOR TEMPERATURE CHANGE
 !
-        IF(test_aeqb(DHUM(N),1.0_r8))THEN
+        IF(isclose(DHUM(N),1.0_r8))THEN
           VPX=VPS(NY,NX)
           !VPS(NY,NX)=0.61*EXP(5360.0*(3.661E-03-1.0/TKA(NY,NX))) &
           vps(ny,ny)=vapsat0(tka(ny,nx))*EXP(-ALTI(NY,NX)/7272.0)

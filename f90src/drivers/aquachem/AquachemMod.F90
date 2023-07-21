@@ -104,6 +104,7 @@ contains
 
   use bhistMod, only : hist_var_str_len,hist_unit_str_len,hist_var_lon_str_len
   use fileUtil, only :  var_flux_type, var_state_type
+  use ChemIDMod
   implicit none
   integer, intent(in) :: nvars
   character(len=hist_var_str_len), intent(out) :: varl(:)     !variable name

@@ -767,15 +767,15 @@ implicit none
 
   if(flag=='read')then
     datpr1 => datrp_1d
-    call restartvar(ncid, flag, varname='PP', dim1name='pft',&
+    call restartvar(ncid, flag, varname='pftPlantPopulation', dim1name='pft',&
      long_name='plant population', units='# d-2', &
      interpinic_flag='skip', data=datpr1, missing_value=spval, fill_value=spval)        
-    call cppft(flag,NHW,NHE,NVN,NVS,NP,PP,datrp_1d,iflgt=iflgt,iflgc=iflgc)  
+    call cppft(flag,NHW,NHE,NVN,NVS,NP,pftPlantPopulation,datrp_1d,iflgt=iflgt,iflgc=iflgc)  
   else
     !print*,'PP'
-    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,PP,datrp_1d,iflgt=iflgt,iflgc=iflgc)    
+    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,pftPlantPopulation,datrp_1d,iflgt=iflgt,iflgc=iflgc)    
     datpr1 => datrp_1d
-    call restartvar(ncid, flag, varname='PP', dim1name='pft',&
+    call restartvar(ncid, flag, varname='pftPlantPopulation', dim1name='pft',&
      long_name='plant population', units='# d-2', &
      interpinic_flag='skip', data=datpr1, missing_value=spval, fill_value=spval)        
 
@@ -922,15 +922,15 @@ implicit none
 
   if(flag=='read')then
     datpr1 => datrp_1d
-    call restartvar(ncid, flag, varname='ZC', dim1name='pft',&
+    call restartvar(ncid, flag, varname='CanopyHeight', dim1name='pft',&
      long_name='canopy height', units='m', &
      interpinic_flag='skip', data=datpr1, missing_value=spval, fill_value=spval)       
-    call cppft(flag,NHW,NHE,NVN,NVS,NP,ZC,datrp_1d,iflgt=iflgt,iflgc=iflgc)  
+    call cppft(flag,NHW,NHE,NVN,NVS,NP,CanopyHeight,datrp_1d,iflgt=iflgt,iflgc=iflgc)  
   else
-    !print*,'ZC'
-    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,ZC,datrp_1d,iflgt=iflgt,iflgc=iflgc)  
+    !print*,'CanopyHeight'
+    if(flag=='write')call cppft(flag,NHW,NHE,NVN,NVS,NP,CanopyHeight,datrp_1d,iflgt=iflgt,iflgc=iflgc)  
     datpr1 => datrp_1d
-    call restartvar(ncid, flag, varname='ZC', dim1name='pft',&
+    call restartvar(ncid, flag, varname='CanopyHeight', dim1name='pft',&
      long_name='canopy height', units='m', &
      interpinic_flag='skip', data=datpr1, missing_value=spval, fill_value=spval)       
   endif
@@ -3351,16 +3351,16 @@ implicit none
 
   if(flag=='read')then
     datpr1 => datrc_1d
-    call restartvar(ncid, flag, varname='ZT', dim1name='column',&
+    call restartvar(ncid, flag, varname='GridMaxCanopyHeight', dim1name='column',&
        long_name='canopy height', units='m', &
        interpinic_flag='skip', data=datpr1, missing_value=spval, &
        fill_value=spval)
-    call cpcol(flag,NHW,NHE,NVN,NVS,ZT,datrc_1d)
+    call cpcol(flag,NHW,NHE,NVN,NVS,GridMaxCanopyHeight,datrc_1d)
   else
-    !print*,'ZT'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,ZT,datrc_1d)  
+    !print*,'GridMaxCanopyHeight'
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,GridMaxCanopyHeight,datrc_1d)  
     datpr1 => datrc_1d
-    call restartvar(ncid, flag, varname='ZT', dim1name='column',&
+    call restartvar(ncid, flag, varname='GridMaxCanopyHeight', dim1name='column',&
        long_name='canopy height', units='m', &
        interpinic_flag='skip', data=datpr1, missing_value=spval, &
        fill_value=spval)
@@ -5071,16 +5071,16 @@ implicit none
 
   if(flag=='read')then
     datpr2 => datrc_2d(1:ncols,1:JZ+1)    
-    call restartvar(ncid, flag, varname='CDPTH', dim1name='column',dim2name='levsoi1',&
+    call restartvar(ncid, flag, varname='CumDepth2LayerBottom', dim1name='column',dim2name='levsoi1',&
        long_name='depth to bottom of soil layer', units='m', &
        interpinic_flag='skip', data=datpr2, missing_value=spval, &
        fill_value=spval)    
-    call cpcol(flag,NHW,NHE,NVN,NVS,CDPTH,datrc_2d) 
+    call cpcol(flag,NHW,NHE,NVN,NVS,CumDepth2LayerBottom,datrc_2d) 
   else
-    !print*,'CDPTH'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,CDPTH,datrc_2d)   
+    !print*,'CumDepth2LayerBottom'
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,CumDepth2LayerBottom,datrc_2d)   
     datpr2 => datrc_2d(1:ncols,1:JZ+1)        
-    call restartvar(ncid, flag, varname='CDPTH', dim1name='column',dim2name='levsoi1',&
+    call restartvar(ncid, flag, varname='CumDepth2LayerBottom', dim1name='column',dim2name='levsoi1',&
        long_name='depth to bottom of soil layer', units='m', &
        interpinic_flag='skip', data=datpr2, missing_value=spval, &
        fill_value=spval)    

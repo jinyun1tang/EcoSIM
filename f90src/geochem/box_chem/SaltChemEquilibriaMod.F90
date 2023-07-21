@@ -1,7 +1,7 @@
 module SaltChemEquilibriaMod
 
   use data_kind_mod, only : r8 => DAT_KIND_R8
-  use minimathmod, only : test_aeqb
+  use minimathmod, only : isclose
   use SoluteChemDataType, only : chem_var_type, solute_flx_type
   use SoluteParMod
   use EcosimConst
@@ -750,35 +750,35 @@ module SaltChemEquilibriaMod
 !     ALUMINUM HYDROXIDE (GIBBSITE)
 !
     PX=AMAX1(AAL1,AALO1,AALO2,AALO3,AALO4)
-    IF(test_aeqb(PX,AAL1))THEN
+    IF(isclose(PX,AAL1))THEN
       R1=AHY1
       P1=AAL1
       P2=AOH1
       NR1=3
       NP2=0
       SP=SHALO
-    ELSEIF(test_aeqb(PX,AALO1))THEN
+    ELSEIF(isclose(PX,AALO1))THEN
       R1=AHY1
       P1=AALO1
       P2=AOH1
       NR1=2
       NP2=0
       SP=SHAL1
-    ELSEIF(test_aeqb(PX,AALO2))THEN
+    ELSEIF(isclose(PX,AALO2))THEN
       R1=AHY1
       P1=AALO2
       P2=AOH1
       NR1=1
       NP2=0
       SP=SHAL2
-    ELSEIF(test_aeqb(PX,AALO3))THEN
+    ELSEIF(isclose(PX,AALO3))THEN
       R1=AHY1
       P1=AALO3
       P2=AOH1
       NR1=0
       NP2=0
       SP=SPAL3
-    ELSEIF(test_aeqb(PX,AALO4))THEN
+    ELSEIF(isclose(PX,AALO4))THEN
       R1=AOH1
       P1=AALO4
       P2=AHY1
@@ -796,50 +796,50 @@ module SaltChemEquilibriaMod
 !     P2=AMAX1(ZERO,P2)
     SPX=SP*R1**NR1/P2**NP2
     RPALOX=AMAX1(-PALOH1,TPDX*(P1-SPX))
-    IF(test_aeqb(PX,AAL1))THEN
+    IF(isclose(PX,AAL1))THEN
       RHAL1=RPALOX
-    ELSEIF(test_aeqb(PX,AALO1))THEN
+    ELSEIF(isclose(PX,AALO1))THEN
       RHALO1=RPALOX
-    ELSEIF(test_aeqb(PX,AALO2))THEN
+    ELSEIF(isclose(PX,AALO2))THEN
       RHALO2=RPALOX
-    ELSEIF(test_aeqb(PX,AALO3))THEN
+    ELSEIF(isclose(PX,AALO3))THEN
       RHALO3=RPALOX
-    ELSEIF(test_aeqb(PX,AALO4))THEN
+    ELSEIF(isclose(PX,AALO4))THEN
       RHALO4=RPALOX
     ENDIF
 !
 !     IRON HYDROXIDE
 !
     PX=AMAX1(AFE1,AFEO1,AFEO2,AFEO3,AFEO4)
-    IF(test_aeqb(PX,AFE1))THEN
+    IF(isclose(PX,AFE1))THEN
       R1=AHY1
       P1=AFE1
       P2=AOH1
       NR1=3
       NP2=0
       SP=SHFEO
-    ELSEIF(test_aeqb(PX,AFEO1))THEN
+    ELSEIF(isclose(PX,AFEO1))THEN
       R1=AHY1
       P1=AFEO1
       P2=AOH1
       NR1=2
       NP2=0
       SP=SHFE1
-    ELSEIF(test_aeqb(PX,AFEO2))THEN
+    ELSEIF(isclose(PX,AFEO2))THEN
       R1=AHY1
       P1=AFEO2
       P2=AOH1
       NR1=1
       NP2=0
       SP=SHFE2
-    ELSEIF(test_aeqb(PX,AFEO3))THEN
+    ELSEIF(isclose(PX,AFEO3))THEN
       R1=AHY1
       P1=AFEO3
       P2=AOH1
       NR1=0
       NP2=0
       SP=SPFE3
-    ELSEIF(test_aeqb(PX,AFEO4))THEN
+    ELSEIF(isclose(PX,AFEO4))THEN
       R1=AOH1
       P1=AFEO4
       P2=AHY1
@@ -857,15 +857,15 @@ module SaltChemEquilibriaMod
     P2=AMAX1(ZERO,P2)
     SPX=SP*R1**NR1/P2**NP2
     RPFEOX=AMAX1(-PFEOH1,TPDX*(P1-SPX))
-    IF(test_aeqb(PX,AFE1))THEN
+    IF(isclose(PX,AFE1))THEN
       RHFE1=RPFEOX
-    ELSEIF(test_aeqb(PX,AFEO1))THEN
+    ELSEIF(isclose(PX,AFEO1))THEN
       RHFEO1=RPFEOX
-    ELSEIF(test_aeqb(PX,AFEO2))THEN
+    ELSEIF(isclose(PX,AFEO2))THEN
       RHFEO2=RPFEOX
-    ELSEIF(test_aeqb(PX,AFEO3))THEN
+    ELSEIF(isclose(PX,AFEO3))THEN
       RHFEO3=RPFEOX
-    ELSEIF(test_aeqb(PX,AFEO4))THEN
+    ELSEIF(isclose(PX,AFEO4))THEN
       RHFEO4=RPFEOX
     ENDIF
 !     IF(I.EQ.180.AND.J.EQ.12)THEN
@@ -879,15 +879,15 @@ module SaltChemEquilibriaMod
     PX=AMAX1(ACO31,AHCO31,ACO21)
     R1=AHY1
     P1=ACA1
-    IF(test_aeqb(PX,ACO31))THEN
+    IF(isclose(PX,ACO31))THEN
       P2=ACO31
       NR1=0
       SP=SPCAC
-    ELSEIF(test_aeqb(PX,AHCO31))THEN
+    ELSEIF(isclose(PX,AHCO31))THEN
       P2=AHCO31
       NR1=1
       SP=SHCAC1
-    ELSEIF(test_aeqb(PX,ACO21))THEN
+    ELSEIF(isclose(PX,ACO21))THEN
       P2=ACO21
       NR1=2
       SP=SHCAC2
@@ -900,13 +900,13 @@ module SaltChemEquilibriaMod
     P2=AMAX1(ZERO,P2)
     SPX=SP*R1**NR1
     S0=P1+P2
-    S1=AMAX1(0._r8,S0**2-4.0*(P1*P2-SPX))
+    S1=AMAX1(0._r8,S0**2._r8-4.0_r8*(P1*P2-SPX))
     RPCACX=AMAX1(-PCACO1,TPDX*(S0-SQRT(S1)))
-    IF(test_aeqb(PX,ACO31))THEN
+    IF(isclose(PX,ACO31))THEN
       RHCAC3=RPCACX
-    ELSEIF(test_aeqb(PX,AHCO31))THEN
+    ELSEIF(isclose(PX,AHCO31))THEN
       RHCACH=RPCACX
-    ELSEIF(test_aeqb(PX,ACO21))THEN
+    ELSEIF(isclose(PX,ACO21))THEN
       RHCACO=RPCACX
     ENDIF
 !
@@ -995,29 +995,29 @@ module SaltChemEquilibriaMod
     PY=AMAX1(AH1P1,AH2P1)
     R1=AHY1
     P3=AHY1
-    IF(test_aeqb(PY,AH1P1))THEN
+    IF(isclose(PY,AH1P1))THEN
       P2=AH1P1
-      IF(test_aeqb(PX,AAL1))THEN
+      IF(isclose(PX,AAL1))THEN
         P1=AAL1
         NR1=1
         NP3=0
         SP=SHA0P1
-      ELSEIF(test_aeqb(PX,AALO1))THEN
+      ELSEIF(isclose(PX,AALO1))THEN
         P1=AALO1
         NR1=0
         NP3=0
         SP=SPA1P1
-      ELSEIF(test_aeqb(PX,AALO2))THEN
+      ELSEIF(isclose(PX,AALO2))THEN
         P1=AALO2
         NR1=0
         NP3=1
         SP=SHA2P1
-      ELSEIF(test_aeqb(PX,AALO3))THEN
+      ELSEIF(isclose(PX,AALO3))THEN
         P1=AALO3
         NR1=0
         NP3=2
         SP=SHA3P1
-      ELSEIF(test_aeqb(PX,AALO4))THEN
+      ELSEIF(isclose(PX,AALO4))THEN
         P1=AALO4
         NR1=0
         NP3=3
@@ -1025,27 +1025,27 @@ module SaltChemEquilibriaMod
       ENDIF
     ELSE
       P2=AH2P1
-      IF(test_aeqb(PX,AAL1))THEN
+      IF(isclose(PX,AAL1))THEN
         P1=AAL1
         NR1=2
         NP3=0
         SP=SHA0P2
-      ELSEIF(test_aeqb(PX,AALO1))THEN
+      ELSEIF(isclose(PX,AALO1))THEN
         P1=AALO1
         NR1=1
         NP3=0
         SP=SHA1P2
-      ELSEIF(test_aeqb(PX,AALO2))THEN
+      ELSEIF(isclose(PX,AALO2))THEN
         P1=AALO2
         NR1=0
         NP3=0
         SP=SPA2P2
-      ELSEIF(test_aeqb(PX,AALO3))THEN
+      ELSEIF(isclose(PX,AALO3))THEN
         P1=AALO3
         NR1=0
         NP3=1
         SP=SHA3P2
-      ELSEIF(test_aeqb(PX,AALO4))THEN
+      ELSEIF(isclose(PX,AALO4))THEN
         P1=AALO4
         NR1=0
         NP3=2
@@ -1070,28 +1070,28 @@ module SaltChemEquilibriaMod
     S0=P1+P2
     S1=AMAX1(0._r8,S0**2-4.0*(P1*P2-SPX))
     RPALPX=AMAX1(-PALPO1,TPDX*(S0-SQRT(S1)))
-    IF(test_aeqb(PY,AH1P1))THEN
-      IF(test_aeqb(PX,AAL1))THEN
+    IF(isclose(PY,AH1P1))THEN
+      IF(isclose(PX,AAL1))THEN
         RHA0P1=RPALPX
-      ELSEIF(test_aeqb(PX,AALO1))THEN
+      ELSEIF(isclose(PX,AALO1))THEN
         RHA1P1=RPALPX
-      ELSEIF(test_aeqb(PX,AALO2))THEN
+      ELSEIF(isclose(PX,AALO2))THEN
         RHA2P1=RPALPX
-      ELSEIF(test_aeqb(PX,AALO3))THEN
+      ELSEIF(isclose(PX,AALO3))THEN
         RHA3P1=RPALPX
-      ELSEIF(test_aeqb(PX,AALO4))THEN
+      ELSEIF(isclose(PX,AALO4))THEN
         RHA4P1=RPALPX
       ENDIF
     ELSE
-      IF(test_aeqb(PX,AAL1))THEN
+      IF(isclose(PX,AAL1))THEN
         RHA0P2=RPALPX
-      ELSEIF(test_aeqb(PX,AALO1))THEN
+      ELSEIF(isclose(PX,AALO1))THEN
         RHA1P2=RPALPX
-      ELSEIF(test_aeqb(PX,AALO2))THEN
+      ELSEIF(isclose(PX,AALO2))THEN
         RHA2P2=RPALPX
-      ELSEIF(test_aeqb(PX,AALO3))THEN
+      ELSEIF(isclose(PX,AALO3))THEN
         RHA3P2=RPALPX
-      ELSEIF(test_aeqb(PX,AALO4))THEN
+      ELSEIF(isclose(PX,AALO4))THEN
         RHA4P2=RPALPX
       ENDIF
     ENDIF
@@ -1110,29 +1110,29 @@ module SaltChemEquilibriaMod
     PY=AMAX1(AH1P1,AH2P1)
     R1=AHY1
     P3=AHY1
-    IF(test_aeqb(PY,AH1P1))THEN
+    IF(isclose(PY,AH1P1))THEN
       P2=AH1P1
-      IF(test_aeqb(PX,AFE1))THEN
+      IF(isclose(PX,AFE1))THEN
         P1=AFE1
         NR1=1
         NP3=0
         SP=SHF0P1
-      ELSEIF(test_aeqb(PX,AFEO1))THEN
+      ELSEIF(isclose(PX,AFEO1))THEN
         P1=AFEO1
         NR1=0
         NP3=0
         SP=SPF1P1
-      ELSEIF(test_aeqb(PX,AFEO2))THEN
+      ELSEIF(isclose(PX,AFEO2))THEN
         P1=AFEO2
         NR1=0
         NP3=1
         SP=SHF2P1
-      ELSEIF(test_aeqb(PX,AFEO3))THEN
+      ELSEIF(isclose(PX,AFEO3))THEN
         P1=AFEO3
         NR1=0
         NP3=2
         SP=SHF3P1
-      ELSEIF(test_aeqb(PX,AFEO4))THEN
+      ELSEIF(isclose(PX,AFEO4))THEN
         P1=AFEO4
         NR1=0
         NP3=3
@@ -1140,27 +1140,27 @@ module SaltChemEquilibriaMod
       ENDIF
     ELSE
       P2=AH2P1
-      IF(test_aeqb(PX,AFE1))THEN
+      IF(isclose(PX,AFE1))THEN
         P1=AFE1
         NR1=2
         NP3=0
         SP=SHF0P2
-      ELSEIF(test_aeqb(PX,AFEO1))THEN
+      ELSEIF(isclose(PX,AFEO1))THEN
         P1=AFEO1
         NR1=1
         NP3=0
         SP=SHF1P2
-      ELSEIF(test_aeqb(PX,AFEO2))THEN
+      ELSEIF(isclose(PX,AFEO2))THEN
         P1=AFEO2
         NR1=0
         NP3=0
         SP=SPF2P2
-      ELSEIF(test_aeqb(PX,AFEO3))THEN
+      ELSEIF(isclose(PX,AFEO3))THEN
         P1=AFEO3
         NR1=0
         NP3=1
         SP=SHF3P2
-      ELSEIF(test_aeqb(PX,AFEO4))THEN
+      ELSEIF(isclose(PX,AFEO4))THEN
         P1=AFEO4
         NR1=0
         NP3=2
@@ -1185,28 +1185,28 @@ module SaltChemEquilibriaMod
     S0=P1+P2
     S1=AMAX1(0._r8,S0**2-4.0*(P1*P2-SPX))
     RPFEPX=AMAX1(-PFEPO1,TPDX*(S0-SQRT(S1)))
-    IF(test_aeqb(PY,AH1P1))THEN
-      IF(test_aeqb(PX,AFE1))THEN
+    IF(isclose(PY,AH1P1))THEN
+      IF(isclose(PX,AFE1))THEN
         RHF0P1=RPFEPX
-      ELSEIF(test_aeqb(PX,AFEO1))THEN
+      ELSEIF(isclose(PX,AFEO1))THEN
         RHF1P1=RPFEPX
-      ELSEIF(test_aeqb(PX,AFEO2))THEN
+      ELSEIF(isclose(PX,AFEO2))THEN
         RHF2P1=RPFEPX
-      ELSEIF(test_aeqb(PX,AFEO3))THEN
+      ELSEIF(isclose(PX,AFEO3))THEN
         RHF3P1=RPFEPX
-      ELSEIF(test_aeqb(PX,AFEO4))THEN
+      ELSEIF(isclose(PX,AFEO4))THEN
         RHF4P1=RPFEPX
       ENDIF
     ELSE
-      IF(test_aeqb(PX,AFE1))THEN
+      IF(isclose(PX,AFE1))THEN
         RHF0P2=RPFEPX
-      ELSEIF(test_aeqb(PX,AFEO1))THEN
+      ELSEIF(isclose(PX,AFEO1))THEN
         RHF1P2=RPFEPX
-      ELSEIF(test_aeqb(PX,AFEO2))THEN
+      ELSEIF(isclose(PX,AFEO2))THEN
         RHF2P2=RPFEPX
-      ELSEIF(test_aeqb(PX,AFEO3))THEN
+      ELSEIF(isclose(PX,AFEO3))THEN
         RHF3P2=RPFEPX
-      ELSEIF(test_aeqb(PX,AFEO4))THEN
+      ELSEIF(isclose(PX,AFEO4))THEN
         RHF4P2=RPFEPX
       ENDIF
     ENDIF
@@ -1222,11 +1222,11 @@ module SaltChemEquilibriaMod
     PX=AMAX1(AH1P1,AH2P1)
     R1=AHY1
     P1=ACA1
-    IF(test_aeqb(PX,AH1P1))THEN
+    IF(isclose(PX,AH1P1))THEN
       P2=AH1P1
       NR1=0
       SP=SPCAD
-    ELSEIF(test_aeqb(PX,AH2P1))THEN
+    ELSEIF(isclose(PX,AH2P1))THEN
       P2=AH2P1
       NR1=1
       SP=SHCAD2
@@ -1240,9 +1240,9 @@ module SaltChemEquilibriaMod
     S0=P1+P2
     S1=AMAX1(0._r8,S0**2-4.0*(P1*P2-SPX))
     RPCADX=AMAX1(-PCAPD1,TPDX*(S0-SQRT(S1)))
-    IF(test_aeqb(PX,AH1P1))THEN
+    IF(isclose(PX,AH1P1))THEN
       RPCAD1=RPCADX
-    ELSEIF(test_aeqb(PX,AH2P1))THEN
+    ELSEIF(isclose(PX,AH2P1))THEN
       RHCAD2=RPCADX
     ENDIF
 !     IF((M/10)*10.EQ.M)THEN
@@ -1256,11 +1256,11 @@ module SaltChemEquilibriaMod
     PX=AMAX1(AH1P1,AH2P1)
     R1=AHY1
     P1=ACA1
-    IF(test_aeqb(PX,AH1P1))THEN
+    IF(isclose(PX,AH1P1))THEN
       P2=AH1P1
       NR1=4
       SP=SHCAH1
-    ELSEIF(test_aeqb(PX,AH2P1))THEN
+    ELSEIF(isclose(PX,AH2P1))THEN
       P2=AH2P1
       NR1=7
       SP=SHCAH2
@@ -1272,9 +1272,9 @@ module SaltChemEquilibriaMod
     P2=AMAX1(ZERO,P2)
     SPX=(SP*R1**NR1/P1**5)**0.333
     RPCAHX=AMAX1(-PCAPH1,TPDX*(P2-SPX))
-    IF(test_aeqb(PX,AH1P1))THEN
+    IF(isclose(PX,AH1P1))THEN
       RHCAH1=RPCAHX
-    ELSEIF(test_aeqb(PX,AH2P1))THEN
+    ELSEIF(isclose(PX,AH2P1))THEN
       RHCAH2=RPCAHX
     ENDIF
 !     IF((I/10)*10.EQ.I.AND.J.EQ.12)THEN
@@ -1661,29 +1661,29 @@ module SaltChemEquilibriaMod
     PY=AMAX1(AH1PB,AH2PB)
     R1=AHY1
     P3=AHY1
-    IF(test_aeqb(PY,AH1PB))THEN
+    IF(isclose(PY,AH1PB))THEN
       P2=AH1PB
-      IF(test_aeqb(PX,AAL1))THEN
+      IF(isclose(PX,AAL1))THEN
         P1=AAL1
         NR1=1
         NP3=0
         SP=SHA0P1
-      ELSEIF(test_aeqb(PX,AALO1))THEN
+      ELSEIF(isclose(PX,AALO1))THEN
         P1=AALO1
         NR1=0
         NP3=0
         SP=SPA1P1
-      ELSEIF(test_aeqb(PX,AALO2))THEN
+      ELSEIF(isclose(PX,AALO2))THEN
         P1=AALO2
         NR1=0
         NP3=1
         SP=SHA2P1
-      ELSEIF(test_aeqb(PX,AALO3))THEN
+      ELSEIF(isclose(PX,AALO3))THEN
         P1=AALO3
         NR1=0
         NP3=2
         SP=SHA3P1
-      ELSEIF(test_aeqb(PX,AALO4))THEN
+      ELSEIF(isclose(PX,AALO4))THEN
         P1=AALO4
         NR1=0
         NP3=3
@@ -1691,27 +1691,27 @@ module SaltChemEquilibriaMod
       ENDIF
     ELSE
       P2=AH2PB
-      IF(test_aeqb(PX,AAL1))THEN
+      IF(isclose(PX,AAL1))THEN
         P1=AAL1
         NR1=2
         NP3=0
         SP=SHA0P2
-      ELSEIF(test_aeqb(PX,AALO1))THEN
+      ELSEIF(isclose(PX,AALO1))THEN
         P1=AALO1
         NR1=1
         NP3=0
         SP=SHA1P2
-      ELSEIF(test_aeqb(PX,AALO2))THEN
+      ELSEIF(isclose(PX,AALO2))THEN
         P1=AALO2
         NR1=0
         NP3=0
         SP=SPA2P2
-      ELSEIF(test_aeqb(PX,AALO3))THEN
+      ELSEIF(isclose(PX,AALO3))THEN
         P1=AALO3
         NR1=0
         NP3=1
         SP=SHA3P2
-      ELSEIF(test_aeqb(PX,AALO4))THEN
+      ELSEIF(isclose(PX,AALO4))THEN
         P1=AALO4
         NR1=0
         NP3=2
@@ -1736,28 +1736,28 @@ module SaltChemEquilibriaMod
     S0=P1+P2
     S1=AMAX1(0._r8,S0**2-4.0*(P1*P2-SPX))
     RPALBX=AMAX1(-PALPOB,TPDX*(S0-SQRT(S1)))
-    IF(test_aeqb(PY,AH1PB))THEN
-      IF(test_aeqb(PX,AAL1))THEN
+    IF(isclose(PY,AH1PB))THEN
+      IF(isclose(PX,AAL1))THEN
         RHA0B1=RPALBX
-      ELSEIF(test_aeqb(PX,AALO1))THEN
+      ELSEIF(isclose(PX,AALO1))THEN
         RHA1B1=RPALBX
-      ELSEIF(test_aeqb(PX,AALO2))THEN
+      ELSEIF(isclose(PX,AALO2))THEN
         RHA2B1=RPALBX
-      ELSEIF(test_aeqb(PX,AALO3))THEN
+      ELSEIF(isclose(PX,AALO3))THEN
         RHA3B1=RPALBX
-      ELSEIF(test_aeqb(PX,AALO4))THEN
+      ELSEIF(isclose(PX,AALO4))THEN
         RHA4B1=RPALBX
       ENDIF
     ELSE
-      IF(test_aeqb(PX,AAL1))THEN
+      IF(isclose(PX,AAL1))THEN
         RHA0B2=RPALBX
-      ELSEIF(test_aeqb(PX,AALO1))THEN
+      ELSEIF(isclose(PX,AALO1))THEN
         RHA1B2=RPALBX
-      ELSEIF(test_aeqb(PX,AALO2))THEN
+      ELSEIF(isclose(PX,AALO2))THEN
         RHA2B2=RPALBX
-      ELSEIF(test_aeqb(PX,AALO3))THEN
+      ELSEIF(isclose(PX,AALO3))THEN
         RHA3B2=RPALBX
-      ELSEIF(test_aeqb(PX,AALO4))THEN
+      ELSEIF(isclose(PX,AALO4))THEN
         RHA4B2=RPALBX
       ENDIF
     ENDIF
@@ -1768,29 +1768,29 @@ module SaltChemEquilibriaMod
     PY=AMAX1(AH1PB,AH2PB)
     R1=AHY1
     P3=AHY1
-    IF(test_aeqb(PY,AH1PB))THEN
+    IF(isclose(PY,AH1PB))THEN
       P2=AH1PB
-      IF(test_aeqb(PX,AFE1))THEN
+      IF(isclose(PX,AFE1))THEN
         P1=AFE1
         NR1=1
         NP3=0
         SP=SHF0P1
-      ELSEIF(test_aeqb(PX,AFEO1))THEN
+      ELSEIF(isclose(PX,AFEO1))THEN
         P1=AFEO1
         NR1=0
         NP3=0
         SP=SPF1P1
-      ELSEIF(test_aeqb(PX,AFEO2))THEN
+      ELSEIF(isclose(PX,AFEO2))THEN
         P1=AFEO2
         NR1=0
         NP3=1
         SP=SHF2P1
-      ELSEIF(test_aeqb(PX,AFEO3))THEN
+      ELSEIF(isclose(PX,AFEO3))THEN
         P1=AFEO3
         NR1=0
         NP3=2
         SP=SHF3P1
-      ELSEIF(test_aeqb(PX,AFEO4))THEN
+      ELSEIF(isclose(PX,AFEO4))THEN
         P1=AFEO4
         NR1=0
         NP3=3
@@ -1798,27 +1798,27 @@ module SaltChemEquilibriaMod
       ENDIF
     ELSE
       P2=AH2PB
-      IF(test_aeqb(PX,AFE1))THEN
+      IF(isclose(PX,AFE1))THEN
         P1=AFE1
         NR1=2
         NP3=0
         SP=SHF0P2
-      ELSEIF(test_aeqb(PX,AFEO1))THEN
+      ELSEIF(isclose(PX,AFEO1))THEN
         P1=AFEO1
         NR1=1
         NP3=0
         SP=SHF1P2
-      ELSEIF(test_aeqb(PX,AFEO2))THEN
+      ELSEIF(isclose(PX,AFEO2))THEN
         P1=AFEO2
         NR1=0
         NP3=0
         SP=SPF2P2
-      ELSEIF(test_aeqb(PX,AFEO3))THEN
+      ELSEIF(isclose(PX,AFEO3))THEN
         P1=AFEO3
         NR1=0
         NP3=1
         SP=SHF3P2
-      ELSEIF(test_aeqb(PX,AFEO4))THEN
+      ELSEIF(isclose(PX,AFEO4))THEN
         P1=AFEO4
         NR1=0
         NP3=2
@@ -1841,30 +1841,30 @@ module SaltChemEquilibriaMod
     P3=AMAX1(ZERO,P3)
     SPX=SP*R1**NR1/P3**NP3
     S0=P1+P2
-    S1=AMAX1(0._r8,S0**2-4.0*(P1*P2-SPX))
+    S1=AMAX1(0._r8,S0**2._r8-4.0_r8*(P1*P2-SPX))
     RPFEBX=AMAX1(-PFEPOB,TPDX*(S0-SQRT(S1)))
-    IF(test_aeqb(PY,AH1PB))THEN
-      IF(test_aeqb(PX,AFE1))THEN
+    IF(isclose(PY,AH1PB))THEN
+      IF(isclose(PX,AFE1))THEN
         RHF0B1=RPFEBX
-      ELSEIF(test_aeqb(PX,AFEO1))THEN
+      ELSEIF(isclose(PX,AFEO1))THEN
         RHF1B1=RPFEBX
-      ELSEIF(test_aeqb(PX,AFEO2))THEN
+      ELSEIF(isclose(PX,AFEO2))THEN
         RHF2B1=RPFEBX
-      ELSEIF(test_aeqb(PX,AFEO3))THEN
+      ELSEIF(isclose(PX,AFEO3))THEN
         RHF3B1=RPFEBX
-      ELSEIF(test_aeqb(PX,AFEO4))THEN
+      ELSEIF(isclose(PX,AFEO4))THEN
         RHF4B1=RPFEBX
       ENDIF
     ELSE
-      IF(test_aeqb(PX,AFE1))THEN
+      IF(isclose(PX,AFE1))THEN
         RHF0B2=RPFEBX
-      ELSEIF(test_aeqb(PX,AFEO1))THEN
+      ELSEIF(isclose(PX,AFEO1))THEN
         RHF1B2=RPFEBX
-      ELSEIF(test_aeqb(PX,AFEO2))THEN
+      ELSEIF(isclose(PX,AFEO2))THEN
         RHF2B2=RPFEBX
-      ELSEIF(test_aeqb(PX,AFEO3))THEN
+      ELSEIF(isclose(PX,AFEO3))THEN
         RHF3B2=RPFEBX
-      ELSEIF(test_aeqb(PX,AFEO4))THEN
+      ELSEIF(isclose(PX,AFEO4))THEN
         RHF4B2=RPFEBX
       ENDIF
     ENDIF
@@ -1874,11 +1874,11 @@ module SaltChemEquilibriaMod
     PX=AMAX1(AH1PB,AH2PB)
     R1=AHY1
     P1=ACA1
-    IF(test_aeqb(PX,AH1PB))THEN
+    IF(isclose(PX,AH1PB))THEN
       P2=AH1PB
       NR1=0
       SP=SPCAD
-    ELSEIF(test_aeqb(PX,AH2PB))THEN
+    ELSEIF(isclose(PX,AH2PB))THEN
       P2=AH2PB
       NR1=1
       SP=SHCAD2
@@ -1890,11 +1890,11 @@ module SaltChemEquilibriaMod
     P2=AMAX1(ZERO,P2)
     SPX=SP*R1**NR1
     S0=P1+P2
-    S1=AMAX1(0._r8,S0**2-4.0*(P1*P2-SPX))
+    S1=AMAX1(0._r8,S0**2._r8-4.0_r8*(P1*P2-SPX))
     RPCDBX=AMAX1(-PCAPDB,TPDX*(S0-SQRT(S1)))
-    IF(test_aeqb(PX,AH1PB))THEN
+    IF(isclose(PX,AH1PB))THEN
       RPCDB1=RPCDBX
-    ELSEIF(test_aeqb(PX,AH2PB))THEN
+    ELSEIF(isclose(PX,AH2PB))THEN
       RHCDB2=RPCDBX
     ENDIF
 !
@@ -1903,11 +1903,11 @@ module SaltChemEquilibriaMod
     PX=AMAX1(AH1PB,AH2PB)
     R1=AHY1
     P1=ACA1
-    IF(test_aeqb(PX,AH1PB))THEN
+    IF(isclose(PX,AH1PB))THEN
       P2=AH1PB
       NR1=4
       SP=SHCAH1
-    ELSEIF(test_aeqb(PX,AH2PB))THEN
+    ELSEIF(isclose(PX,AH2PB))THEN
       P2=AH2PB
       NR1=7
       SP=SHCAH2
@@ -1917,11 +1917,11 @@ module SaltChemEquilibriaMod
     R1=AMAX1(ZERO,R1)
     P1=AMAX1(ZERO,P1)
     P2=AMAX1(ZERO,P2)
-    SPX=(SP*R1**NR1/P1**5)**0.333
+    SPX=(SP*R1**NR1/P1**5._r8)**0.333_r8
     RPCHBX=AMAX1(-PCAPHB,TPDX*(P2-SPX))
-    IF(test_aeqb(PX,AH1PB))THEN
+    IF(isclose(PX,AH1PB))THEN
       RHCHB1=RPCHBX
-    ELSEIF(test_aeqb(PX,AH2PB))THEN
+    ELSEIF(isclose(PX,AH2PB))THEN
       RHCHB2=RPCHBX
     ENDIF
 !
@@ -1933,7 +1933,7 @@ module SaltChemEquilibriaMod
     P2=AMAX1(ZERO,P2)
     SPX=SPCAM
     S0=P1+P2
-    S1=AMAX1(0._r8,S0**2-4.0*(P1*P2-SPX))
+    S1=AMAX1(0._r8,S0**2._r8-4.0_r8*(P1*P2-SPX))
     RPCMBX=AMAX1(-PCAPMB,TPDX*(S0-SQRT(S1)))
   ELSE
     RPALBX=0._r8
@@ -2095,10 +2095,10 @@ module SaltChemEquilibriaMod
 !     X*Q=equilibrium exchangeable concentrations
 !     XTLQ=total equilibrium exchangeable concentration
 !
-    AALX=AAL1**0.333
-    AFEX=AFE1**0.333
-    ACAX=ACA1**0.500
-    AMGX=AMG1**0.500
+    AALX=AAL1**0.333_r8
+    AFEX=AFE1**0.333_r8
+    ACAX=ACA1**0.500_r8
+    AMGX=AMG1**0.500_r8
     XCAX=CCEC/(1.0+GKC4*AN41/ACAX*VLNH4 &
       +GKC4*AN4B/ACAX*VLNHB &
       +GKCH*AHY1/ACAX+GKCA*AALX/ACAX &
@@ -2113,8 +2113,7 @@ module SaltChemEquilibriaMod
     XMGQ=XCAX*AMGX*GKCM
     XNAQ=XCAX*ANA1*GKCN
     XKAQ=XCAX*AKA1*GKCK
-    XTLQ=XN4Q*VLNH4+XNBQ*VLNHB &
-      +XHYQ+XALQ+XFEQ+XCAQ+XMGQ+XNAQ+XKAQ
+    XTLQ=XN4Q*VLNH4+XNBQ*VLNHB+XHYQ+XALQ+XFEQ+XCAQ+XMGQ+XNAQ+XKAQ
     IF(XTLQ.GT.ZERO)THEN
       FX=CCEC/XTLQ
     ELSE
@@ -2123,10 +2122,10 @@ module SaltChemEquilibriaMod
     XN4Q=FX*XN4Q
     XNBQ=FX*XNBQ
     XHYQ=FX*XHYQ
-    XALQ=FX*XALQ/3.0
-    XFEQ=FX*XFEQ/3.0
-    XCAQ=FX*XCAQ/2.0
-    XMGQ=FX*XMGQ/2.0
+    XALQ=FX*XALQ/3.0_r8
+    XFEQ=FX*XFEQ/3.0_r8
+    XCAQ=FX*XCAQ/2.0_r8
+    XMGQ=FX*XMGQ/2.0_r8
     XNAQ=FX*XNAQ
     XKAQ=FX*XKAQ
 !
@@ -2182,13 +2181,13 @@ module SaltChemEquilibriaMod
 !     RXALO2,RXFLO2=Al(OH2)2+,FeOH2+ adsorption
 ! COOH <-> COO(-) + H(+)
   S0=AHY1+XCOO+DPCOH
-  S1=AMAX1(0._r8,S0**2-4.0*(AHY1*XCOO-DPCOH*XHC1))
+  S1=AMAX1(0._r8,S0**2-4.0_r8*(AHY1*XCOO-DPCOH*XHC1))
   RXHC=TADCX*(S0-SQRT(S1))
   S0=AALO2+XCOO+DPALO
-  S1=AMAX1(0._r8,S0**2-4.0*(AALO2*XCOO-DPALO*XALO21))
+  S1=AMAX1(0._r8,S0**2-4.0_r8*(AALO2*XCOO-DPALO*XALO21))
   RXALO2=TADAX*(S0-SQRT(S1))
   S0=AFEO2+XCOO+DPFEO
-  S1=AMAX1(0._r8,S0**2-4.0*(AFEO2*XCOO-DPFEO*XFEO21))
+  S1=AMAX1(0._r8,S0**2-4.0_r8*(AFEO2*XCOO-DPFEO*XFEO21))
   RXFEO2=TADAX*(S0-SQRT(S1))
 !
 !     RNH4,RNHB-NH4-NH3+H dissociation in non-band,band
@@ -2209,13 +2208,13 @@ module SaltChemEquilibriaMod
 ! H2CO3 <-> HCO3(-) + H(+)
 
   S0=AHY1+AHCO31+DPCO2
-  S1=AMAX1(0._r8,S0**2-4.0*(AHY1*AHCO31-DPCO2*ACO21))
+  S1=AMAX1(0._r8,S0**2-4.0_r8*(AHY1*AHCO31-DPCO2*ACO21))
   RCO2Q=TSLX*(S0-SQRT(S1))
 !
 !     RHCO3=HCO3-CO3+H dissociation
 ! HCO3(-) <-> CO3(--)+H(+)
   S0=AHY1+ACO31+DPHCO
-  S1=AMAX1(0._r8,S0**2-4.0*(AHY1*ACO31-DPHCO*AHCO31))
+  S1=AMAX1(0._r8,S0**2_r8-4.0_r8*(AHY1*ACO31-DPHCO*AHCO31))
   RHCO3=TSLX*(S0-SQRT(S1))
 !
 !     RALO1=ALOH(++) <-> AL(+++)+OH(-) dissociation
@@ -2315,13 +2314,13 @@ module SaltChemEquilibriaMod
 !     RNAS=NASO4<->NA+SO4 dissociation
 ! NaSO4(-) <-> Na(+)+SO4(--)
   S0=ANA1+ASO41+DPNAS
-  S1=AMAX1(0._r8,S0**2-4.0*(ANA1*ASO41-DPNAS*ANAS1))
+  S1=AMAX1(0._r8,S0**2_r8-4.0_r8*(ANA1*ASO41-DPNAS*ANAS1))
   RNAS=TSLX*(S0-SQRT(S1))
 !
 !     RKAS=KSO4<->K+SO4 dissociation
 ! KSO4(-) <-> K(+)+SO4(--)
   S0=AKA1+ASO41+DPKAS
-  S1=AMAX1(0._r8,S0**2-4.0*(AKA1*ASO41-DPKAS*AKAS1))
+  S1=AMAX1(0._r8,S0**2_r8-4.0_r8*(AKA1*ASO41-DPKAS*AKAS1))
   RKAS=TSLX*(S0-SQRT(S1))
 !
 !     PHOSPHORUS IN NON-BAND SOIL ZONE
@@ -2343,38 +2342,38 @@ module SaltChemEquilibriaMod
 !     RF1P=FEHPO4 <-> FE+HPO4 dissociation in non-band
 ! FeHPO4(+) <-> Fe(+++)+HPO4(--)
     S0=AFE1+AH1P1+DPF1P
-    S1=AMAX1(0._r8,S0**2-4.0*(AFE1*AH1P1-DPF1P*AF1P1))
+    S1=AMAX1(0._r8,S0**2_r8-4.0_r8*(AFE1*AH1P1-DPF1P*AF1P1))
     RF1P=TSLX*(S0-SQRT(S1))
 !
 !     RF2P=FEH2PO4 <-> FE+H2PO4 dissociation in non-band
 ! FeH2PO4(++) <-> Fe(+++)+H2PO4(-)
     S0=AFE1+AH2P1+DPF2P
-    S1=AMAX1(0._r8,S0**2-4.0*(AFE1*AH2P1-DPF2P*AF2P1))
+    S1=AMAX1(0._r8,S0**2_r8-4.0_r8*(AFE1*AH2P1-DPF2P*AF2P1))
     RF2P=TSLX*(S0-SQRT(S1))
 !
 !     RC0P=CAPO4 <-> CA+PO4 dissociation in non-band
 ! CaPO4(-) <-> Ca(++)+PO4(---)
     S0=ACA1+AH0P1+DPC0P
-    S1=AMAX1(0._r8,S0**2-4.0*(ACA1*AH0P1-DPC0P*AC0P1))
+    S1=AMAX1(0._r8,S0**2_r8-4.0_r8*(ACA1*AH0P1-DPC0P*AC0P1))
     RC0P=TSLX*(S0-SQRT(S1))
 !
 !     RC1P=CAHPO4-CA+HPO4 dissociation in non-band
 ! CaHPO4 <-> Ca(++)+HPO4(--)
 
     S0=ACA1+AH1P1+DPC1P
-    S1=AMAX1(0._r8,S0**2-4.0*(ACA1*AH1P1-DPC1P*AC1P1))
+    S1=AMAX1(0._r8,S0**2_r8-4.0_r8*(ACA1*AH1P1-DPC1P*AC1P1))
     RC1P=TSLX*(S0-SQRT(S1))
 !
 !     RC2P=CAH2PO4-CA+H2PO4 dissociation in non-band
 ! CaH2PO4(+) <-> Ca(++)+H2PO4(-)
     S0=ACA1+AH2P1+DPC2P
-    S1=AMAX1(0._r8,S0**2-4.0*(ACA1*AH2P1-DPC2P*AC2P1))
+    S1=AMAX1(0._r8,S0**2_r8-4.0_r8*(ACA1*AH2P1-DPC2P*AC2P1))
     RC2P=TSLX*(S0-SQRT(S1))
 !
 !     RM1P=MGHPO4-MG+HPO4 dissociation in non-band
 ! MgHPO4 <-> Mg(++)+HPO4(--)
     S0=AMG1+AH1P1+DPM1P
-    S1=AMAX1(0._r8,S0**2-4.0*(AMG1*AH1P1-DPM1P*AM1P1))
+    S1=AMAX1(0._r8,S0**2_r8-4.0_r8*(AMG1*AH1P1-DPM1P*AM1P1))
     RM1P=TSLX*(S0-SQRT(S1))
   ELSE
     RH1P=0._r8
@@ -2407,13 +2406,13 @@ module SaltChemEquilibriaMod
 !     RF1B=FEHPO4-FE+HPO4 dissociation in band
 ! FeHPO4(+) <-> Fe(+++)+HPO4(--)
     S0=AFE1+AH1PB+DPF1P
-    S1=AMAX1(0._r8,S0**2-4.0*(AFE1*AH1PB-DPF1P*AF1PB))
+    S1=AMAX1(0._r8,S0**2_r8-4.0_r8*(AFE1*AH1PB-DPF1P*AF1PB))
     RF1B=TSLX*(S0-SQRT(S1))
 !
 !     RF2B=FEH2PO4-FE+H2PO4 dissociation in band
 ! FeH2PO4(+) <-> Fe(+++)+H2PO4(-)
     S0=AFE1+AH2PB+DPF2P
-    S1=AMAX1(0._r8,S0**2-4.0*(AFE1*AH2PB-DPF2P*AF2PB))
+    S1=AMAX1(0._r8,S0**2_r8-4.0_r8*(AFE1*AH2PB-DPF2P*AF2PB))
     RF2B=TSLX*(S0-SQRT(S1))
 !
 !     RC0B=CAPO4-CA+PO4 dissociation in band

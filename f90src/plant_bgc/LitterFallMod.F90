@@ -32,7 +32,7 @@ implicit none
     IFLGI      =>   plt_pheno%IFLGI    , &
     WSTR       =>   plt_pheno%WSTR     , &
     IDAY       =>   plt_pheno%IDAY     , &
-    PP         =>   plt_site%PP        , &
+    pftPlantPopulation         =>   plt_site%pftPlantPopulation        , &
     IYRC       =>   plt_site%IYRC      , &
     VOLWOU     =>   plt_site%VOLWOU    , &
     ZNOON      =>   plt_site%ZNOON     , &
@@ -106,7 +106,7 @@ implicit none
       IF(JHVST(NZ).NE.ihv_noaction)then
         IDTHR(NZ)=ibrdead
       endif  
-      IF(PP(NZ).LE.0.0)then
+      IF(pftPlantPopulation(NZ).LE.0.0)then
         IDTHR(NZ)=ibrdead
       endif  
       IF(IDTHR(NZ).EQ.ibrdead)then

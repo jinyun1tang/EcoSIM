@@ -1,4 +1,4 @@
-program MAIN
+program HFileTest
   use HistFileMod
   use data_kind_mod , only : r8 => DAT_KIND_R8
   use data_const_mod, only : pi=> DAT_CONST_PI
@@ -119,4 +119,4 @@ program MAIN
     if(nlend)exit
   enddo
    
-end program main
+end program HFileTest

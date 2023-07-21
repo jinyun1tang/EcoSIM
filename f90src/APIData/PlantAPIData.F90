@@ -76,7 +76,7 @@ implicit none
   real(r8), pointer :: PPI(:)     => null()    !initial plant population, [m-2]
   real(r8), pointer :: PPZ(:)     => null()    !plant population at seeding, [m-2]
   real(r8), pointer :: PPX(:)     => null()    !plant population, [m-2]
-  real(r8), pointer :: PP(:)      => null()    !plant population, [d-2]
+  real(r8), pointer :: pftPlantPopulation(:)      => null()    !plant population, [d-2]
   real(r8), pointer :: DPTHZ(:)   => null()    !depth to middle of soil layer from  surface of grid cell [m]
   real(r8), pointer :: FMPR(:)    => null()    !micropore fraction
   real(r8), pointer :: DLYR3(:)   => null()    !vertical thickness of soil layer [m]
@@ -195,7 +195,7 @@ implicit none
   real(r8) :: ARLSS                     !stalk area of combined, each PFT canopy
   real(r8) :: ARLFC                     !total canopy leaf area, [m2 d-2]
   real(r8) :: ARSTC                     !total canopy stem area, [m2 d-2]
-  real(r8) :: ZT                        !canopy height , [m]
+  real(r8) :: GridMaxCanopyHeight                        !canopy height , [m]
   real(r8), pointer :: DMVL(:,:)       => null() !root volume:mass ratio, [m3 g-1]
   real(r8), pointer :: PORT(:,:)       => null() !root porosity, [m3 m-3]
   real(r8), pointer :: RTAR2X(:,:)     => null() !root  cross-sectional area  secondary axes, [m2]
@@ -267,7 +267,7 @@ implicit none
   real(r8), pointer :: ARSTK(:,:,:)    => null() !stem layer area, [m2 d-2]
   real(r8), pointer :: CF(:)           => null() !clumping factor for self-shading in canopy layer, [-]
   real(r8), pointer :: XTLI(:)         => null() !number of nodes in seed, [-]
-  real(r8), pointer :: ZC(:)           => null() !canopy height, [m]
+  real(r8), pointer :: CanopyHeight(:)           => null() !canopy height, [m]
   integer,  pointer :: NG(:)           => null() !soil layer at planting depth, [-]
   integer,  pointer :: KLEAF(:,:)      => null() !leaf number, [-]
   real(r8), pointer :: VSTG(:,:)       => null() !leaf number, [-]
@@ -300,7 +300,7 @@ implicit none
   real(r8), pointer :: PTSHT(:)    => null()     !shoot-root rate constant for nonstructural C exchange, [h-1]
   real(r8), pointer :: GFILL(:)    => null()     !maximum rate of fill per grain, [g h-1]
   real(r8), pointer :: OFFST(:)    => null()     !adjustment of Arhhenius curves for plant thermal acclimation, [oC]
-  real(r8), pointer :: OSTR(:)     => null()     !plant O2 stress indicator, []
+  real(r8), pointer :: PlantO2Stress(:)     => null()     !plant O2 stress indicator, []
   real(r8), pointer :: PB(:)       => null()     !branch nonstructural C content required for new branch, [gC gC-1]
   real(r8), pointer :: PR(:)       => null()     !threshold root nonstructural C content for initiating new root axis, [gC gC-1]
   real(r8), pointer :: RCELX(:,:,:) => null()    !element translocated from leaf during senescence, [g d-2 h-1]
@@ -570,13 +570,13 @@ implicit none
   real(r8), pointer :: PSIRT(:,:,:) => null() !root total water potential , [Mpa]
   real(r8), pointer :: PSIRO(:,:,:) => null() !root osmotic water potential , [Mpa]
   real(r8), pointer :: PSIRG(:,:,:) => null() !root turgor water potential , [Mpa]
-  real(r8), pointer :: UPWTR(:,:,:) => null() !root water uptake, [m2 d-2 h-1]
+  real(r8), pointer :: PopPlantRootH2OUptake_vr(:,:,:) => null() !root water uptake, [m2 d-2 h-1]
   real(r8), pointer :: TUPHT(:)     => null()   !total root heat uptake, [MJ d-2]
-  real(r8), pointer :: TUPWTR(:)    => null()   !total root water uptake, [m3 d-2]
+  real(r8), pointer :: GridPlantRootH2OUptake_vr(:)    => null()   !total root water uptake, [m3 d-2]
   real(r8), pointer :: VOLWC(:)     => null()  !canopy surface water content, [m3 d-2]
   real(r8), pointer :: VOLWP(:)     => null()  !canopy water content, [m3 d-2]
   real(r8), pointer :: VHCPC(:)     => null()  !canopy heat capacity, [MJ d-2 K-1]
-  real(r8), pointer :: PSIST(:)     => null()  !soil micropore total water potential [MPa]
+  real(r8), pointer :: TotalSoilH2OPSIMPa(:)     => null()  !soil micropore total water potential [MPa]
   real(r8), pointer :: CTRAN(:)     =>  null()  !total transpiration, [m H2O d-2]
   contains
     procedure, public :: Init => plt_ew_init
@@ -1006,7 +1006,7 @@ implicit none
   allocate(this%PPI(JP1))
   allocate(this%PPZ(JP1))
   allocate(this%PPX(JP1))
-  allocate(this%PP(JP1))
+  allocate(this%pftPlantPopulation(JP1))
   allocate(this%VOLWM(60,0:JZ1))
   allocate(this%VOLPM(60,0:JZ1))
   allocate(this%TORT(60,0:JZ1))
@@ -1192,7 +1192,7 @@ implicit none
   class(plant_ew_type) :: this
 
   allocate(this%CTRAN(JP1))
-  allocate(this%PSIST(0:JZ1))
+  allocate(this%TotalSoilH2OPSIMPa(0:JZ1))
   allocate(this%TUPHT(0:JZ1))
   allocate(this%TKCZ(JP1))
   allocate(this%SFLXC(JP1))
@@ -1208,8 +1208,8 @@ implicit none
   allocate(this%PSIRT(jroots,JZ1,JP1))
   allocate(this%PSIRO(jroots,JZ1,JP1))
   allocate(this%PSIRG(jroots,JZ1,JP1))
-  allocate(this%UPWTR(jroots,JZ1,JP1))
-  allocate(this%TUPWTR(0:JZ1))
+  allocate(this%PopPlantRootH2OUptake_vr(jroots,JZ1,JP1))
+  allocate(this%GridPlantRootH2OUptake_vr(0:JZ1))
   allocate(this%EP(JP1))
   allocate(this%PSILO(JP1))
   allocate(this%TKS(0:JZ1))
@@ -1245,8 +1245,8 @@ implicit none
 !  if(allocated(PSIRT))deallocate(PSIRT)
 !  if(allocated(PSIRO))deallocate(PSIRO)
 !  if(allocated(PSIRG))deallocate(PSIRG)
-!  if(allocated(UPWTR))deallocate(UPWTR)
-!  if(allocated(TUPWTR))deallocate(TUPWTR)
+!  if(allocated(PopPlantRootH2OUptake_vr))deallocate(PopPlantRootH2OUptake_vr)
+!  if(allocated(TPopPlantRootH2OUptake_vr))deallocate(TPopPlantRootH2OUptake_vr)
 !  if(allocated(EP))deallocate(EP)
 !  if(allocated(PSILO))deallocate(PSILO)
 !  if(allocated(TKS))deallocate(TKS)
@@ -1869,7 +1869,7 @@ implicit none
   allocate(this%CTC(JP1))
   allocate(this%OFFST(JP1))
   allocate(this%GROUPI(JP1))
-  allocate(this%OSTR(JP1))
+  allocate(this%PlantO2Stress(JP1))
   allocate(this%PB(JP1))
   allocate(this%PR(JP1))
   allocate(this%TFN3(JP1))
@@ -1944,7 +1944,7 @@ implicit none
 !  if(allocated(CTC))deallocate(CTC)
 !  if(allocated(OFFST))deallocate(OFFST)
 !  if(allocated(GROUPI))deallocate(GROUPI)
-!  if(allocated(OSTR))deallocate(OSTR)
+!  if(allocated(PlantO2Stress))deallocate(PlantO2Stress)
 !  if(allocated(PB))deallocate(PB)
 !  if(allocated(PR))deallocate(PR)
 !  if(allocated(TFN3))deallocate(TFN3)
@@ -2054,7 +2054,7 @@ implicit none
   allocate(this%KLEAF(JBR,JP1))
   allocate(this%VSTG(JBR,JP1))
   allocate(this%NG(JP1))
-  allocate(this%ZC(JP1))
+  allocate(this%CanopyHeight(JP1))
   allocate(this%XTLI(JP1))
   allocate(this%ZL(0:JC1))
   allocate(this%ARSTP(JP1))

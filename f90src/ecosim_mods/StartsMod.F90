@@ -5,7 +5,7 @@ module StartsMod
 
   use data_kind_mod, only : r8 => DAT_KIND_R8
   use abortutils, only : padr, print_info,check_bool
-  use minimathMod, only : test_aeqb, test_aneb, AZMAX1,AZMIN1
+  use minimathMod, only : isclose, AZMAX1,AZMIN1
   use EcosimConst
   use TracerIDMod
   use SnowDataType  
@@ -41,6 +41,7 @@ module StartsMod
   use SedimentDataType
   use GridDataType
   use MiniFuncMod
+  use UnitMod, only : units
   implicit none
 
   private
@@ -111,7 +112,7 @@ module StartsMod
         ALTZG=MIN(ALTZG,ALT(NY,NX))
       ENDIF
       !
-      CDPTHG=AMAX1(CDPTHG,CDPTH(NU(NY,NX),NY,NX)) !topsoil layer depth
+      CDPTHG=AMAX1(CDPTHG,CumDepth2LayerBottom(NU(NY,NX),NY,NX)) !topsoil layer depth
 !
 !     INITIALIZE ATMOSPHERE VARIABLES
 !
@@ -175,7 +176,7 @@ module StartsMod
 !     (MJ m-1 K-1 h-1)
 !     TKSD=deep source/sink temperature from geothermal flux(K)
       
-      DPTHSK(NY,NX)=AMAX1(10.0_r8,CDPTH(NL(NY,NX),NY,NX)+1.0_r8)
+      DPTHSK(NY,NX)=AMAX1(10.0_r8,CumDepth2LayerBottom(NL(NY,NX),NY,NX)+1.0_r8)
       TCS(0,NY,NX)=ATCS(NY,NX)
       TKS(0,NY,NX)=ATKS(NY,NX)
       TKSD(NY,NX)=ATKS(NY,NX)+2.052E-04_r8*DPTHSK(NY,NX)/TCNDG
@@ -187,7 +188,7 @@ module StartsMod
 !
 !     INITIALIZE COMMUNITY CANOPY
 !
-  ZT(:,:)=0.0_r8
+  GridMaxCanopyHeight(:,:)=0.0_r8
   ZL(0:JC,:,:)=0.0_r8
   ARLFT(1:JC,:,:)=0.0_r8
   ARSTT(1:JC,:,:)=0.0_r8
@@ -451,9 +452,9 @@ module StartsMod
       ! field capacity and wilting point are read from input
         IF(THW(L,NY,NX).GT.1.0)THEN
           THETW(L,NY,NX)=POROS(L,NY,NX)
-        ELSEIF(test_aeqb(THW(L,NY,NX),1.0_r8))THEN
+        ELSEIF(isclose(THW(L,NY,NX),1.0_r8))THEN
           THETW(L,NY,NX)=FC(L,NY,NX)
-        ELSEIF(test_aeqb(THW(L,NY,NX),0.0_r8))THEN
+        ELSEIF(isclose(THW(L,NY,NX),0.0_r8))THEN
           THETW(L,NY,NX)=WP(L,NY,NX)
         ELSEIF(THW(L,NY,NX).LT.0.0)THEN
           THETW(L,NY,NX)=0.0_r8
@@ -462,9 +463,9 @@ module StartsMod
         ENDIF
         IF(THI(L,NY,NX).GT.1.0_r8)THEN
           THETI(L,NY,NX)=AZMAX1(AMIN1(POROS(L,NY,NX),POROS(L,NY,NX)-THW(L,NY,NX)))
-        ELSEIF(test_aeqb(THI(L,NY,NX),1.0_r8))THEN
+        ELSEIF(isclose(THI(L,NY,NX),1.0_r8))THEN
           THETI(L,NY,NX)=AZMAX1(AMIN1(FC(L,NY,NX),POROS(L,NY,NX)-THW(L,NY,NX)))
-        ELSEIF(test_aeqb(THI(L,NY,NX),0.0_r8))THEN
+        ELSEIF(isclose(THI(L,NY,NX),0.0_r8))THEN
           THETI(L,NY,NX)=AZMAX1(AMIN1(WP(L,NY,NX),POROS(L,NY,NX)-THW(L,NY,NX)))
         ELSEIF(THI(L,NY,NX).LT.0.0_r8)THEN
           THETI(L,NY,NX)=0.0_r8
@@ -621,7 +622,7 @@ module StartsMod
       ENDIF
       SLOPE(3,NY,NX)=-1.0_r8
 
-      IF(test_aneb(SLOPE(1,NY,NX),0.0_r8).OR.test_aneb(SLOPE(2,NY,NX),0.0_r8))THEN
+      IF(.not.isclose(SLOPE(1,NY,NX),0.0_r8).OR.(.not.isclose(SLOPE(2,NY,NX),0.0_r8)))THEN
         FSLOPE(1,NY,NX)=ABS(SLOPE(1,NY,NX))/(ABS(SLOPE(1,NY,NX))+ABS(SLOPE(2,NY,NX)))  !
         FSLOPE(2,NY,NX)=ABS(SLOPE(2,NY,NX))/(ABS(SLOPE(1,NY,NX))+ABS(SLOPE(2,NY,NX)))
       ELSE
@@ -758,8 +759,8 @@ module StartsMod
   IFLGT(:,:)=0
   ATCA(:,:)=ATCAI(:,:)
   ATCS(:,:)=ATCAI(:,:)
-  ATKA(:,:)=ATCA(:,:)+TC2K
-  ATKS(:,:)=ATCS(:,:)+TC2K
+  ATKA(:,:)=units%Celcius2Kelvin(ATCA)
+  ATKS(:,:)=units%Celcius2Kelvin(ATCS)
   URAIN(:,:)=0.0_r8
   UCO2G(:,:)=0.0_r8
   UCH4G(:,:)=0.0_r8
@@ -896,12 +897,12 @@ module StartsMod
 !     VOLX=total micropore volume
       IF(BKDSI(L,NY,NX).LE.ZERO)FHOL(L,NY,NX)=0.0
 !     thickness:=bottom depth-upper depth
-      DLYRI(3,L,NY,NX)=(CDPTH(L,NY,NX)-CDPTH(L-1,NY,NX))
+      DLYRI(3,L,NY,NX)=(CumDepth2LayerBottom(L,NY,NX)-CumDepth2LayerBottom(L-1,NY,NX))
       call check_bool(DLYRI(3,L,NY,NX)<0._r8,'negative soil layer thickness',&
         __LINE__,mod_filename)
       DLYR(3,L,NY,NX)=DLYRI(3,L,NY,NX)
-      DPTH(L,NY,NX)=0.5_r8*(CDPTH(L,NY,NX)+CDPTH(L-1,NY,NX))
-      CDPTHZ(L,NY,NX)=CDPTH(L,NY,NX)-CDPTH(NU(NY,NX),NY,NX)+DLYR(3,NU(NY,NX),NY,NX)
+      DPTH(L,NY,NX)=0.5_r8*(CumDepth2LayerBottom(L,NY,NX)+CumDepth2LayerBottom(L-1,NY,NX))
+      CDPTHZ(L,NY,NX)=CumDepth2LayerBottom(L,NY,NX)-CumDepth2LayerBottom(NU(NY,NX),NY,NX)+DLYR(3,NU(NY,NX),NY,NX)
       DPTHZ(L,NY,NX)=0.5_r8*(CDPTHZ(L,NY,NX)+CDPTHZ(L-1,NY,NX))
       VOLT(L,NY,NX)=amax1(AREA(3,L,NY,NX)*DLYR(3,L,NY,NX),1.e-8_r8)
       VOLX(L,NY,NX)=VOLT(L,NY,NX)*FMPR(L,NY,NX)
@@ -915,8 +916,8 @@ module StartsMod
     AREA(1,L,NY,NX)=DLYR(3,L,NY,NX)*DLYR(2,L,NY,NX)
     AREA(2,L,NY,NX)=DLYR(3,L,NY,NX)*DLYR(1,L,NY,NX)
   ENDDO
-  CDPTH(0,NY,NX)=CDPTH(NU(NY,NX),NY,NX)-DLYR(3,NU(NY,NX),NY,NX)
-  CDPTHI(NY,NX)=CDPTH(0,NY,NX)
+  CumDepth2LayerBottom(0,NY,NX)=CumDepth2LayerBottom(NU(NY,NX),NY,NX)-DLYR(3,NU(NY,NX),NY,NX)
+  CDPTHI(NY,NX)=CumDepth2LayerBottom(0,NY,NX)
   AREA(3,NL(NY,NX)+1:JZ,NY,NX)=DLYR(1,NL(NY,NX),NY,NX)*DLYR(2,NL(NY,NX),NY,NX)
 
   end associate
@@ -1009,7 +1010,7 @@ module StartsMod
         ALTZG=MIN(ALTZG,ALT(NY,NX))
       ENDIF
       !
-      CDPTHG=AMAX1(CDPTHG,CDPTH(NU(NY,NX),NY,NX)) !topsoil layer depth
+      CDPTHG=AMAX1(CDPTHG,CumDepth2LayerBottom(NU(NY,NX),NY,NX)) !topsoil layer depth
 !
 !     INITIALIZE ATMOSPHERE VARIABLES
 !
@@ -1072,7 +1073,7 @@ module StartsMod
 !     (MJ m-1 K-1 h-1)
 !     TKSD=deep source/sink temperature from geothermal flux(K)
       
-      DPTHSK(NY,NX)=AMAX1(10.0_r8,CDPTH(NL(NY,NX),NY,NX)+1.0_r8)
+      DPTHSK(NY,NX)=AMAX1(10.0_r8,CumDepth2LayerBottom(NL(NY,NX),NY,NX)+1.0_r8)
       TCS(0,NY,NX)=ATCS(NY,NX)
       TKS(0,NY,NX)=ATKS(NY,NX)
       TKSD(NY,NX)=ATKS(NY,NX)+2.052E-04_r8*DPTHSK(NY,NX)/TCNDG
@@ -1084,7 +1085,7 @@ module StartsMod
 !
 !     INITIALIZE COMMUNITY CANOPY
 !
-  ZT(:,:)=0.0_r8
+  GridMaxCanopyHeight(:,:)=0.0_r8
   ZL(0:JC,:,:)=0.0_r8
   ARLFT(1:JC,:,:)=0.0_r8
   ARSTT(1:JC,:,:)=0.0_r8

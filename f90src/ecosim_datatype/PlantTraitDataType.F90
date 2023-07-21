@@ -22,7 +22,7 @@ module PlantTraitDataType
   real(r8),target,allocatable ::  ARLFS(:,:,:)                       !plant leaf area, [m2 d-2]
   real(r8),target,allocatable ::  ARLFX(:,:)                         !total canopy leaf area, [m2 d-2]
   real(r8),target,allocatable ::  ARSTP(:,:,:)                       !plant stem area, [m2 d-2]
-  real(r8),target,allocatable ::  ZC(:,:,:)                          !canopy height, [m]
+  real(r8),target,allocatable ::  CanopyHeight(:,:,:)                          !canopy height, [m]
   real(r8),target,allocatable ::  ARSTX(:,:)                         !total canopy stem area, [m2 d-2]
   real(r8),target,allocatable ::  ARLFT(:,:,:)                       !total leaf area, [m2 d-2]
   real(r8),target,allocatable ::  ARSTT(:,:,:)                       !total stem area, [m2 d-2]
@@ -36,7 +36,7 @@ module PlantTraitDataType
   real(r8),target,allocatable ::  SDLG(:,:,:)                        !seed length, [m]
   real(r8),target,allocatable ::  SDAR(:,:,:)                        !seed surface area, [m2]
   real(r8),target,allocatable ::  HTCTL(:,:,:)                       !cotyledon height, [m]
-  real(r8),target,allocatable ::  ZT(:,:)                            !canopy height , [m]
+  real(r8),target,allocatable ::  GridMaxCanopyHeight(:,:)                            !canopy height , [m]
   real(r8),target,allocatable ::  ZL(:,:,:)                          !canopy layer height , [m]
   real(r8),target,allocatable ::  ANGBR(:,:,:)                       !branching angle, [degree from horizontal]
   real(r8),target,allocatable ::  ANGSH(:,:,:)                       !sheath angle, [degree from horizontal]
@@ -51,7 +51,7 @@ module PlantTraitDataType
   real(r8),target,allocatable ::  GRNOB(:,:,:,:)                     !branch grain number, [d-2]
   real(r8),target,allocatable ::  GRNXB(:,:,:,:)                     !branch potential grain number, [d-2]
   real(r8),target,allocatable ::  GRNO(:,:,:)                        !canopy grain number, [d-2]
-  real(r8),target,allocatable ::  PP(:,:,:)                          !plant population, [d-2]
+  real(r8),target,allocatable ::  pftPlantPopulation(:,:,:)             !plant population, [d-2]
   real(r8),target,allocatable ::  HTNODX(:,:,:,:,:)                  !internode height, [m]
   real(r8),target,allocatable ::  CNLF(:,:,:)                        !maximum leaf N:C ratio, [g g-1]
   real(r8),target,allocatable ::  CPLF(:,:,:)                        !maximum leaf P:C ratio, [g g-1]
@@ -85,7 +85,7 @@ module PlantTraitDataType
   real(r8),target,allocatable ::  PPT(:,:)                           !total plant population, [d-2]
   real(r8),target,allocatable ::  PPZ(:,:,:)                         !plant population at seeding, [m-2]
   real(r8),target,allocatable ::  WSTR(:,:,:)                        !canopy plant water stress indicator, number of hours PSILT < PSILY, []
-  real(r8),target,allocatable ::  OSTR(:,:,:)                        !plant O2 stress indicator, []
+  real(r8),target,allocatable ::  PlantO2Stress(:,:,:)                        !plant O2 stress indicator, []
   real(r8),target,allocatable ::  TFN3(:,:,:)                        !canopy temperature growth function, [-]
   real(r8),target,allocatable ::  TCG(:,:,:)                         !canopy growth temperature, [oC]
   real(r8),target,allocatable ::  TKG(:,:,:)                         !canopy growth temperature, [K]
@@ -179,7 +179,7 @@ contains
   allocate(ARLFS(JP,JY,JX));    ARLFS=0._r8
   allocate(ARLFX(JY,JX));       ARLFX=0._r8
   allocate(ARSTP(JP,JY,JX));    ARSTP=0._r8
-  allocate(ZC(JP,JY,JX));       ZC=0._r8
+  allocate(CanopyHeight(JP,JY,JX));       CanopyHeight=0._r8
   allocate(ARSTX(JY,JX));       ARSTX=0._r8
   allocate(ARLFT(JC,JY,JX));    ARLFT=0._r8
   allocate(ARSTT(JC,JY,JX));    ARSTT=0._r8
@@ -193,7 +193,7 @@ contains
   allocate(SDLG(JP,JY,JX));     SDLG=0._r8
   allocate(SDAR(JP,JY,JX));     SDAR=0._r8
   allocate(HTCTL(JP,JY,JX));    HTCTL=0._r8
-  allocate(ZT(JY,JX));          ZT=0._r8
+  allocate(GridMaxCanopyHeight(JY,JX));          GridMaxCanopyHeight=0._r8
   allocate(ZL(0:JC,JY,JX));     ZL=0._r8
   allocate(ANGBR(JP,JY,JX));    ANGBR=0._r8
   allocate(ANGSH(JP,JY,JX));    ANGSH=0._r8
@@ -208,7 +208,7 @@ contains
   allocate(GRNOB(JBR,JP,JY,JX)); GRNOB=0._r8
   allocate(GRNXB(JBR,JP,JY,JX)); GRNXB=0._r8
   allocate(GRNO(JP,JY,JX));     GRNO=0._r8
-  allocate(PP(JP,JY,JX));       PP=0._r8
+  allocate(pftPlantPopulation(JP,JY,JX));       pftPlantPopulation=0._r8
   allocate(HTNODX(0:JNODS,JBR,JP,JY,JX));HTNODX=0._r8
   allocate(CNLF(JP,JY,JX));     CNLF=0._r8
   allocate(CPLF(JP,JY,JX));     CPLF=0._r8
@@ -242,7 +242,7 @@ contains
   allocate(PPT(JY,JX));         PPT=0._r8
   allocate(PPZ(JP,JY,JX));      PPZ=0._r8
   allocate(WSTR(JP,JY,JX));     WSTR=0._r8
-  allocate(OSTR(JP,JY,JX));     OSTR=0._r8
+  allocate(PlantO2Stress(JP,JY,JX));     PlantO2Stress=0._r8
   allocate(TFN3(JP,JY,JX));     TFN3=0._r8
   allocate(TCG(JP,JY,JX));      TCG=0._r8
   allocate(TKG(JP,JY,JX));      TKG=0._r8
@@ -333,7 +333,7 @@ contains
   call destroy(ARLFS)
   call destroy(ARLFX)
   call destroy(ARSTP)
-  call destroy(ZC)
+  call destroy(CanopyHeight)
   call destroy(ARSTX)
   call destroy(ARLFT)
   call destroy(ARSTT)
@@ -347,7 +347,7 @@ contains
   call destroy(SDLG)
   call destroy(SDAR)
   call destroy(HTCTL)
-  call destroy(ZT)
+  call destroy(GridMaxCanopyHeight)
   call destroy(ZL)
   call destroy(ANGBR)
   call destroy(ANGSH)
@@ -362,7 +362,7 @@ contains
   call destroy(GRNOB)
   call destroy(GRNXB)
   call destroy(GRNO)
-  call destroy(PP)
+  call destroy(pftPlantPopulation)
   call destroy(HTNODX)
   call destroy(CNLF)
   call destroy(CPLF)
@@ -396,7 +396,7 @@ contains
   call destroy(PPT)
   call destroy(PPZ)
   call destroy(WSTR)
-  call destroy(OSTR)
+  call destroy(PlantO2Stress)
   call destroy(TFN3)
   call destroy(TCG)
   call destroy(TKG)

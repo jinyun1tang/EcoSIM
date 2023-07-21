@@ -1,6 +1,7 @@
 module Hour1Mod
   use data_kind_mod, only : r8 => DAT_KIND_R8
-  use minimathmod  , only : test_aeqb,AZMAX1,AZMIN1
+  use data_const_mod, only : GravAcceleration=>DAT_CONST_G
+  use minimathmod  , only : isclose,AZMAX1,AZMIN1
   use abortutils   , only : endrun, print_info
   use ATSUtilsMod
   use TracerPropMod
@@ -49,17 +50,19 @@ module Hour1Mod
 
   CHARACTER(LEN=*), PARAMETER :: MOD_FILENAME=__FILE__
 
+  public :: hour1
+  public :: InitHour1
+
   real(r8) :: BKDSX  !     BKDSX=maximm soil bulk density
   real(r8) :: THETPW !     THETPW=minimum air-filled porosity for saturation (m3 m-3)
   real(r8) :: THETWP
   real(r8) :: XVOLWC(0:3)
   real(r8), pointer :: THETRX(:)
+  real(r8), parameter :: mGravAcceleration=1.e-3_r8*GravAcceleration  !gravitational constant devided by 1000.  
 !
 !     XVOLWC=foliar water retention capacity (m3 m-2)
 !     THETRX=litter water retention capacity (m3 g C-1)
 
-  public :: hour1
-  public :: InitHour1
   contains
 
   subroutine InitHour1(n_litrsfk)
@@ -628,7 +631,7 @@ module Hour1Mod
   IF(IDTBL(NY,NX).LE.1.OR.IDTBL(NY,NX).EQ.3)THEN
     DTBLX(NY,NX)=DTBLZ(NY,NX)
   ELSEIF(IDTBL(NY,NX).EQ.2.OR.IDTBL(NY,NX).EQ.4)THEN
-    DTBLX(NY,NX)=DTBLZ(NY,NX)+CDPTH(NU(NY,NX)-1,NY,NX)
+    DTBLX(NY,NX)=DTBLZ(NY,NX)+CumDepth2LayerBottom(NU(NY,NX)-1,NY,NX)
   ENDIF
 
   IF(IDTBL(NY,NX).EQ.3.OR.IDTBL(NY,NX).EQ.4)THEN
@@ -642,10 +645,10 @@ module Hour1Mod
   ENDIF
   VOLWD(NY,NX)=AMAX1(0.001_r8,0.112_r8*ZS(NY,NX)+3.10_r8*ZS(NY,NX)**2._r8 &
     -0.012_r8*ZS(NY,NX)*SLOPE(0,NY,NX))*AREA(3,NU(NY,NX),NY,NX)
-  VOLWG(NY,NX)=AMAX1(VOLWD(NY,NX),-(DTBLX(NY,NX)-CDPTH(NU(NY,NX)-1,NY,NX)) &
+  VOLWG(NY,NX)=AMAX1(VOLWD(NY,NX),-(DTBLX(NY,NX)-CumDepth2LayerBottom(NU(NY,NX)-1,NY,NX)) &
     *AREA(3,NU(NY,NX),NY,NX))
 
-  DPTH(NU(NY,NX),NY,NX)=CDPTH(NU(NY,NX),NY,NX)-0.5_r8*DLYR(3,NU(NY,NX),NY,NX)
+  DPTH(NU(NY,NX),NY,NX)=CumDepth2LayerBottom(NU(NY,NX),NY,NX)-0.5_r8*DLYR(3,NU(NY,NX),NY,NX)
   IF(BKVL(NU(NY,NX),NY,NX).GT.ZEROS(NY,NX))THEN
     CCLAY(NU(NY,NX),NY,NX)=CLAY(NU(NY,NX),NY,NX)/BKVL(NU(NY,NX),NY,NX)
     CSILT(NU(NY,NX),NY,NX)=SILT(NU(NY,NX),NY,NX)/BKVL(NU(NY,NX),NY,NX)
@@ -802,7 +805,7 @@ module Hour1Mod
 
   trcp_TR(idsp_psoi_beg:idsp_psoi_end,0:NL(NY,NX),NY,NX)=0.0_r8
 
-  TUPWTR(0:NL(NY,NX),NY,NX)=0.0_r8
+  GridPlantRootH2OUptake_vr(0:NL(NY,NX),NY,NX)=0.0_r8
   TUPHT(0:NL(NY,NX),NY,NX)=0.0_r8
 
   GasDisFlx(idg_beg:idg_end,0:NL(NY,NX),NY,NX)=0.0_r8
@@ -852,31 +855,31 @@ module Hour1Mod
           IF(IFLGY.EQ.1)THEN
             IF(THETPZ(L,NY,NX).GE.THETPW.AND.L.NE.NL(NY,NX))THEN
               !not bottom layer, saturated
-              PSIS1=PSISM(L+1,NY,NX)-0.0098_r8*(DPTH(L+1,NY,NX)-DPTH(L,NY,NX))
+              PSIS1=PSISM(L+1,NY,NX)-mGravAcceleration*(DPTH(L+1,NY,NX)-DPTH(L,NY,NX))
               THETWM=THETWP*POROS(L,NY,NX)
               THETW1=AMIN1(THETWM,EXP((PSIMS(NY,NX)-LOG(-PSIS1)) &
                 *PSD(L,NY,NX)/PSISD(NY,NX)+PSL(L,NY,NX)))
 
               IF(THETWM.GT.THETW1)THEN
                 THETPX=AMIN1(1.0_r8,AZMAX1((THETWM-THETW(L,NY,NX))/(THETWM-THETW1)))
-                DPTHT(NY,NX)=CDPTH(L,NY,NX)-DLYR(3,L,NY,NX)*(1.0_r8-THETPX)
+                DPTHT(NY,NX)=CumDepth2LayerBottom(L,NY,NX)-DLYR(3,L,NY,NX)*(1.0_r8-THETPX)
               ELSE
-                DPTHT(NY,NX)=CDPTH(L,NY,NX)-DLYR(3,L,NY,NX)
+                DPTHT(NY,NX)=CumDepth2LayerBottom(L,NY,NX)-DLYR(3,L,NY,NX)
               ENDIF
             ELSE IF(L.GT.NU(NY,NX))THEN
               !bottom layer, or not saturated, but is not topsoil layer
-              PSIS1=PSISM(L,NY,NX)-0.0098_r8*(DPTH(L,NY,NX)-DPTH(L-1,NY,NX))
+              PSIS1=PSISM(L,NY,NX)-mGravAcceleration*(DPTH(L,NY,NX)-DPTH(L-1,NY,NX))
               THETWM=THETWP*POROS(L-1,NY,NX)
               THETW1=AMIN1(THETWM,EXP((PSIMS(NY,NX)-LOG(-PSIS1)) &
                 *PSD(L-1,NY,NX)/PSISD(NY,NX)+PSL(L-1,NY,NX)))
               IF(THETWM.GT.THETW1)THEN
                 THETPX=AMIN1(1.0_r8,AZMAX1((THETWM-THETW(L-1,NY,NX))/(THETWM-THETW1)))
-                DPTHT(NY,NX)=CDPTH(L-1,NY,NX)-DLYR(3,L-1,NY,NX)*(1.0_r8-THETPX)
+                DPTHT(NY,NX)=CumDepth2LayerBottom(L-1,NY,NX)-DLYR(3,L-1,NY,NX)*(1.0_r8-THETPX)
               ELSE
-                DPTHT(NY,NX)=CDPTH(L-1,NY,NX)-DLYR(3,L-1,NY,NX)
+                DPTHT(NY,NX)=CumDepth2LayerBottom(L-1,NY,NX)-DLYR(3,L-1,NY,NX)
               ENDIF
             ELSE
-              DPTHT(NY,NX)=CDPTH(L,NY,NX)-DLYR(3,L,NY,NX)
+              DPTHT(NY,NX)=CumDepth2LayerBottom(L,NY,NX)-DLYR(3,L,NY,NX)
             ENDIF
           ENDIF
         ENDIF
@@ -1013,9 +1016,9 @@ module Hour1Mod
       ENDDO D5700
       if(.not. goto5701)then
         IF(VOLAT.GT.ZEROS2(NY,NX))THEN
-          DPTHA(NY,NX)=CDPTH(L,NY,NX)-DLYR(3,L,NY,NX)*AMIN1(1.0_r8,VOLIT/VOLAT)
+          DPTHA(NY,NX)=CumDepth2LayerBottom(L,NY,NX)-DLYR(3,L,NY,NX)*AMIN1(1.0_r8,VOLIT/VOLAT)
         ELSE
-          DPTHA(NY,NX)=CDPTH(L,NY,NX)-DLYR(3,L,NY,NX)
+          DPTHA(NY,NX)=CumDepth2LayerBottom(L,NY,NX)-DLYR(3,L,NY,NX)
         ENDIF
         ICHKA=1
       else
@@ -1459,9 +1462,9 @@ module Hour1Mod
         PSISM(0,NY,NX)=PSISE(0,NY,NX)
       ENDIF
       PSISO(0,NY,NX)=0.0_r8
-      PSISH(0,NY,NX)=0.0098_r8*(ALT(NY,NX)-CDPTH(NU(NY,NX)-1,NY,NX) &
+      PSISH(0,NY,NX)=mGravAcceleration*(ALT(NY,NX)-CumDepth2LayerBottom(NU(NY,NX)-1,NY,NX) &
         +0.5_r8*DLYR(3,0,NY,NX))
-      PSIST(0,NY,NX)=AZMIN1(PSISM(0,NY,NX)+PSISO(0,NY,NX)+PSISH(0,NY,NX))
+      TotalSoilH2OPSIMPa(0,NY,NX)=AZMIN1(PSISM(0,NY,NX)+PSISO(0,NY,NX)+PSISH(0,NY,NX))
 !
 !     LITTER NH4,NH3,NO3,NO2,HPO4,H2PO4 CONCENTRATIONS
 !
@@ -1605,11 +1608,11 @@ module Hour1Mod
 !
   IF(OFC(1)+OFC(2).GT.0.0_r8)THEN
     DO  L=0,JZ
-      FDPTHM=FDPTH(I,NY,NX)+CDPTH(NU(NY,NX)-1,NY,NX)
+      FDPTHM=FDPTH(I,NY,NX)+CumDepth2LayerBottom(NU(NY,NX)-1,NY,NX)
       IF(FDPTHM.LE.0.0_r8)THEN
         LFDPTH=0
         exit
-      ELSEIF(CDPTH(L,NY,NX).GE.FDPTHM)THEN
+      ELSEIF(CumDepth2LayerBottom(L,NY,NX).GE.FDPTHM)THEN
         LFDPTH=L
         exit
       ENDIF
@@ -1939,13 +1942,13 @@ module Hour1Mod
 !     CVRDF=fraction of fertilizer applied to surface litter
 !
   IF(Z4A+Z3A+ZUA+ZOA+Z4B+Z3B+ZUB+ZOB+PMA+PMB+PHA+CAC+CAS.GT.0.0_r8)THEN
-    FDPTHF=FDPTH(I,NY,NX)+CDPTH(NU(NY,NX)-1,NY,NX)
-    IF(FDPTHF.LE.0.0_r8.AND.test_aeqb(Z4B+Z3B+ZUB+ZOB+PMB,0._r8))THEN
+    FDPTHF=FDPTH(I,NY,NX)+CumDepth2LayerBottom(NU(NY,NX)-1,NY,NX)
+    IF(FDPTHF.LE.0.0_r8.AND.isclose(Z4B+Z3B+ZUB+ZOB+PMB,0._r8))THEN
       LFDPTH=0
       CVRDF=1.0_r8-EXP(-0.8E-02_r8*(ORGC(0,NY,NX)/AREA(3,0,NY,NX)))
     ELSE
       D65: DO L=NUI(NY,NX),JZ
-        IF(CDPTH(L,NY,NX).GE.FDPTHF)THEN
+        IF(CumDepth2LayerBottom(L,NY,NX).GE.FDPTHF)THEN
           LFDPTH=L
           CVRDF=1.0_r8
           exit
@@ -1970,7 +1973,7 @@ module Hour1Mod
           DPNHB(L,NY,NX)=DLYR(3,L,NY,NX)
           WDNHB(L,NY,NX)=0.0_r8
         ELSEIF(L.EQ.LFDPTH)THEN
-          DPNHB(L,NY,NX)=AMAX1(0.025_r8,FDPTHF-CDPTH(L-1,NY,NX))
+          DPNHB(L,NY,NX)=AMAX1(0.025_r8,FDPTHF-CumDepth2LayerBottom(L-1,NY,NX))
           WDNHB(L,NY,NX)=AMIN1(0.025_r8,ROWN(NY,NX))
         ELSE
           DPNHB(L,NY,NX)=0.0_r8
@@ -1995,7 +1998,7 @@ module Hour1Mod
         trcx_solml(idx_NH4,L,NY,NX)=XN4T*trcs_VLN(ids_NH4,L,NY,NX)
         trcx_solml(idx_NH4B,L,NY,NX)=XN4T*trcs_VLN(ids_NH4B,L,NY,NX)
       ENDDO D50
-      DPNH4(NY,NX)=DPNHB(LFDPTH,NY,NX)+CDPTH(LFDPTH-1,NY,NX)
+      DPNH4(NY,NX)=DPNHB(LFDPTH,NY,NX)+CumDepth2LayerBottom(LFDPTH-1,NY,NX)
     ENDIF
 !
 !     RESET WIDTH AND DEPTH OF NO3 FERTILIZER BAND IF NEW BAND
@@ -2014,7 +2017,7 @@ module Hour1Mod
           DPNOB(L,NY,NX)=DLYR(3,L,NY,NX)
           WDNOB(L,NY,NX)=0.0_r8
         ELSEIF(L.EQ.LFDPTH)THEN
-          DPNOB(L,NY,NX)=AMAX1(0.01_r8,FDPTHF-CDPTH(L-1,NY,NX))
+          DPNOB(L,NY,NX)=AMAX1(0.01_r8,FDPTHF-CumDepth2LayerBottom(L-1,NY,NX))
           WDNOB(L,NY,NX)=AMIN1(0.01_r8,ROWO(NY,NX))
         ELSE
           DPNOB(L,NY,NX)=0.0_r8
@@ -2038,7 +2041,7 @@ module Hour1Mod
         trc_solml(ids_NO3B,L,NY,NX)=ZNO3T*trcs_VLN(ids_NO3B,L,NY,NX)
         trc_solml(ids_NO2B,L,NY,NX)=ZNO2T*trcs_VLN(ids_NO2B,L,NY,NX)
       ENDDO D45
-      DPNO3(NY,NX)=DPNOB(LFDPTH,NY,NX)+CDPTH(LFDPTH-1,NY,NX)
+      DPNO3(NY,NX)=DPNOB(LFDPTH,NY,NX)+CumDepth2LayerBottom(LFDPTH-1,NY,NX)
     ENDIF
 !
 !     RESET WIDTH AND DEPTH OF PO4 FERTILIZER BAND IF NEW BAND
@@ -2056,7 +2059,7 @@ module Hour1Mod
           DPPOB(L,NY,NX)=DLYR(3,L,NY,NX)
           WDPOB(L,NY,NX)=AMIN1(0.01,ROWP(NY,NX))
         ELSEIF(L.EQ.LFDPTH)THEN
-          DPPOB(L,NY,NX)=AMAX1(0.01,FDPTHF-CDPTH(L-1,NY,NX))
+          DPPOB(L,NY,NX)=AMAX1(0.01,FDPTHF-CumDepth2LayerBottom(L-1,NY,NX))
           WDPOB(L,NY,NX)=AMIN1(0.01,ROWP(NY,NX))
         ELSE
           DPPOB(L,NY,NX)=0.0_r8
@@ -2136,7 +2139,7 @@ module Hour1Mod
         trcp_salml(idsp_HAB,L,NY,NX)=PCAPHT*trcs_VLN(ids_H1PO4B,L,NY,NX)
         trcp_salml(idsp_CaH2PO4B,L,NY,NX)=PCAPMT*trcs_VLN(ids_H1PO4B,L,NY,NX)
       ENDDO
-      DPPO4(NY,NX)=DPPOB(LFDPTH,NY,NX)+CDPTH(LFDPTH-1,NY,NX)
+      DPPO4(NY,NX)=DPPOB(LFDPTH,NY,NX)+CumDepth2LayerBottom(LFDPTH-1,NY,NX)
     ENDIF
 !
 !     UPDATE STATE VARIABLES FOR BROADCAST AND BANDED FERTILIZER

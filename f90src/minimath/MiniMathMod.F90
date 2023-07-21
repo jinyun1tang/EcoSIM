@@ -9,8 +9,7 @@ module minimathmod
   private
   public :: safe_adb
   public :: p_adb
-  public :: test_aeqb     !a equals b test, with precision tiny_val
-  public :: test_aneb     !a not equals b test
+  public :: isclose         !test if two values a and b are close in magnitude
   public :: vapsat, vapsat0
   public :: isLeap
   public :: AZMAX1,AZMIN1,AZMAX1t
@@ -29,7 +28,7 @@ module minimathmod
   real(r8), parameter :: tiny_val=1.e-20_r8
   contains
 
-   function safe_adb(a,b)result(ans)
+   pure function safe_adb(a,b)result(ans)
    !!
    ! Description:
    ! damp division by zero to zero
@@ -43,7 +42,7 @@ module minimathmod
    end function safe_adb
 !------------------------------------------------------------------------------------------
 
-   function p_adb(a,b)result(ans)
+   pure function p_adb(a,b)result(ans)
    !!
    ! Description:
    ! ans=max(0.,a/b)
@@ -54,38 +53,11 @@ module minimathmod
    ans=AMAX1(0._r8,a/b)
    return
    end function p_adb
-!------------------------------------------------------------------------------------------
-   function test_aeqb(a,b)result(ans)
-   !!
-   ! Description:
-   ! a and b are equal within difference tiny_val
-   ! ans = abs(a-b)<tiny_val
-   implicit none
-   real(r8), intent(in) :: a,b
-   logical :: ans
-
-   ans = abs(a-b)<tiny_val
-   return
-   end function test_aeqb
-
-!------------------------------------------------------------------------------------------
-   function test_aneb(a,b)result(ans)
-   !!
-   ! Description:
-   ! a and b are not equal within difference tiny_val
-   ! ans = abs(a-b)>=tiny_val
-   implicit none
-   real(r8), intent(in) :: a,b
-   logical :: ans
-
-   ans = abs(a-b)>=tiny_val
-   return
-   end function test_aneb
 
 
 !------------------------------------------------------------------------------------------
 
-  function vapsat(tempK)result(ans)
+  pure function vapsat(tempK)result(ans)
   !
   ! Description
   ! compute saturated vapor pressure, based on temperature tempK (in K)
@@ -98,7 +70,7 @@ module minimathmod
 
 !------------------------------------------------------------------------------------------
 
-  function vapsat0(tempK)result(ans)
+  pure function vapsat0(tempK)result(ans)
   !
   ! Description
   ! compute saturated vapor pressure, based on temperature tempK (in K)
@@ -111,7 +83,7 @@ module minimathmod
 
 !------------------------------------------------------------------------------------------
 
-  function isLeap(year)result(ans)
+  pure function isLeap(year)result(ans)
 !
 ! Description
 ! Determine if it is a leap year
@@ -124,7 +96,7 @@ module minimathmod
   end function isLeap
 !------------------------------------------------------------------------------------------
 
-  function AZMAX1t(val)result(ans)
+  pure function AZMAX1t(val)result(ans)
   implicit none
   real(r8), intent(in) :: val
 
@@ -135,7 +107,7 @@ module minimathmod
   end function AZMAX1t
 !------------------------------------------------------------------------------------------
 
-  function AZMAX1_s(val)result(ans)
+  pure function AZMAX1_s(val)result(ans)
   implicit none
   real(r8), intent(in) :: val
 
@@ -146,7 +118,7 @@ module minimathmod
   end function AZMAX1_s  
 !------------------------------------------------------------------------------------------
 
-  function AZMAX1_d(val1,val2)result(ans)
+  pure function AZMAX1_d(val1,val2)result(ans)
   implicit none
   real(r8), intent(in) :: val1,val2
 
@@ -158,7 +130,7 @@ module minimathmod
 
 !------------------------------------------------------------------------------------------
 
-  function AZMIN1_s(val)result(ans)
+  pure function AZMIN1_s(val)result(ans)
   implicit none
   real(r8), intent(in) :: val
 
@@ -171,7 +143,7 @@ module minimathmod
 
 !------------------------------------------------------------------------------------------
 
-  function AZMIN1_d(val1,val2)result(ans)
+  pure function AZMIN1_d(val1,val2)result(ans)
   implicit none
   real(r8), intent(in) :: val1,val2
 
@@ -196,4 +168,25 @@ module minimathmod
   ans=itemp
   end function addone
 
+
+! ----------------------------------------------------------------------
+  pure function isclose(a,b)result(ans)
+  !DESCRIPTION
+  !determine if a is close to b in magnitude by relative magnitude tiny_val
+
+  implicit none
+  real(r8), intent(in) :: a,b
+  real(r8) :: c,ac,bc
+  logical :: ans
+  
+  c=max(abs(a),(b))  
+  if (c==0._r8) then
+    ans=.True.
+    return 
+  endif
+
+  ac=a/c;bc=b/c  
+  ans=abs((ac-bc)/(ac+bc))<tiny_val
+  end function isclose
+ 
 end module minimathmod

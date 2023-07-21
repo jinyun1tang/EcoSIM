@@ -7,7 +7,11 @@ implicit none
 
   public :: InitAlloc
   contains
-  subroutine InitAlloc(nmicbguilds)
+  subroutine InitAlloc(NOMicrobeGuilds)
+  !
+  !DESCRIPTION
+  !allocate memeory for ecosim data
+
   use EcoSiMParDataMod    , only : micpar,pltpar
   use EcoSimSumDataType   , only : InitEcoSimSum
   use SnowDataType        , only : InitSnowData
@@ -51,10 +55,10 @@ implicit none
   use GridConsts  
 
   implicit none
-  integer                 , intent(in) :: nmicbguilds   !number of microbial guilds per group
+  integer                 , intent(in) :: NOMicrobeGuilds   !number of microbial guilds per group
 ! begin_execution
 
-  call InitSOMBGC(nmicbguilds)
+  call InitSOMBGC(NOMicrobeGuilds)
 
   call InitPlantMorphSize()
 
@@ -127,7 +131,6 @@ implicit none
   call InitSoilPhysData
 
   end subroutine InitAlloc
-!------------------------------------------------------------------------------------------
 !------------------------------------------------------------------------------------------
   subroutine InitPlantMorphSize()
   use EcoSiMParDataMod, only : pltpar,micpar

@@ -34,7 +34,8 @@ module RedistMod
   USE SedimentDataType
   USE EcoSimSumDataType
   USE LateralTranspMod
-  use SnowBalMod
+  use UnitMod, only : units
+  use SnowBalanceMod
   implicit none
 
   private
@@ -108,7 +109,7 @@ module RedistMod
 
       call LateralTranspt(I,J,NY,NX,LG)
 
-      call SnowDynUpdate(NY,NX)
+      call SnowMassUpdate(NY,NX)
 
       call HandleSurfaceBoundary(I,NY,NX)
 !
@@ -172,7 +173,7 @@ module RedistMod
     DO L=NUI(NY,NX),NU(NY,NX)-1
       IF(VOLX(L,NY,NX).LE.ZEROS2(NY,NX))THEN
         TKS(L,NY,NX)=TKS(NU(NY,NX),NY,NX)
-        TCS(L,NY,NX)=TKS(L,NY,NX)-TC2K
+        TCS(L,NY,NX)=units%Kelvin2Celcius(TKS(L,NY,NX))
       ENDIF
     ENDDO
   ENDIF
@@ -261,7 +262,7 @@ module RedistMod
 !     ZNOON=hour of solar noon from weather file
 !     ITILL=soil disturbance type 1-20:tillage,21=litter removal,22=fire,23-24=drainage
 !     DCORP=mixing intensity (fire) or depth (tillage,drainage) of disturbance
-!     CDPTH(NU=soil surface elevation
+!     CumDepth2LayerBottom(NU=soil surface elevation
 !     DTBLI,DTBLDI=depth of natural,artificial water table from readi.f
 !     DTBLX,DTBLZ=current,initial natural water table depth
 !     DTBLY,DTBLD=current,initial artificial water table depth
@@ -273,15 +274,15 @@ module RedistMod
 !
   IF(J.EQ.INT(ZNOON(NY,NX)).AND.ITILL(I,NY,NX).EQ.23)THEN
     ! drainage is on
-    DCORPW=DCORP(I,NY,NX)+CDPTH(NU(NY,NX)-1,NY,NX)
+    DCORPW=DCORP(I,NY,NX)+CumDepth2LayerBottom(NU(NY,NX)-1,NY,NX)
     DTBLI(NY,NX)=DCORPW
     DTBLZ(NY,NX)=DTBLI(NY,NX)-(ALTZ(NY,NX)-ALT(NY,NX))*(1.0_r8-DTBLG(NY,NX))
-    DTBLX(NY,NX)=DTBLZ(NY,NX)+CDPTH(NU(NY,NX)-1,NY,NX)
+    DTBLX(NY,NX)=DTBLZ(NY,NX)+CumDepth2LayerBottom(NU(NY,NX)-1,NY,NX)
   ENDIF
 
   IF(J.EQ.INT(ZNOON(NY,NX)).AND.ITILL(I,NY,NX).EQ.24)THEN
     ! drainage in on
-    DCORPW=DCORP(I,NY,NX)+CDPTH(NU(NY,NX)-1,NY,NX)
+    DCORPW=DCORP(I,NY,NX)+CumDepth2LayerBottom(NU(NY,NX)-1,NY,NX)
     IF(IDTBL(NY,NX).EQ.1)THEN
       IDTBL(NY,NX)=3
     ELSEIF(IDTBL(NY,NX).EQ.2)THEN
@@ -298,8 +299,8 @@ module RedistMod
 ! 4 is mobile tile drainge.
   IF(IDTBL(NY,NX).EQ.2.OR.IDTBL(NY,NX).EQ.4)THEN
     DTBLX(NY,NX)=DTBLX(NY,NX)-HVOLO(NY,NX)/AREA(3,NU(NY,NX),NY,NX) &
-      -0.00167_r8*(DTBLX(NY,NX)-DTBLZ(NY,NX)-CDPTH(NU(NY,NX)-1,NY,NX))
-    DTBLX(NY,NX)=DTBLZ(NY,NX)+CDPTH(NU(NY,NX)-1,NY,NX)
+      -0.00167_r8*(DTBLX(NY,NX)-DTBLZ(NY,NX)-CumDepth2LayerBottom(NU(NY,NX)-1,NY,NX))
+    DTBLX(NY,NX)=DTBLZ(NY,NX)+CumDepth2LayerBottom(NU(NY,NX)-1,NY,NX)
   ENDIF
   IF(IDTBL(NY,NX).EQ.4)THEN
     DTBLY(NY,NX)=DTBLY(NY,NX)-HVOLO(NY,NX)/AREA(3,NU(NY,NX),NY,NX) &
@@ -363,7 +364,7 @@ module RedistMod
   ENGYR=VHCP(0,NY,NX)*TKS(0,NY,NX)
   HEATSO=HEATSO+ENGYR
   HEATIN=HEATIN+HTHAWR(NY,NX)
-  TCS(0,NY,NX)=TKS(0,NY,NX)-TC2K
+  TCS(0,NY,NX)=units%Kelvin2Celcius(TKS(0,NY,NX))
   !     UVOLW(NY,NX)=UVOLW(NY,NX)-VOLW(0,NY,NX)-VOLI(0,NY,NX)*DENSI
   !
   !     SURFACE BOUNDARY WATER FLUXES
@@ -640,7 +641,7 @@ module RedistMod
   implicit none
   integer, intent(in) :: NY,NX
 
-  integer :: K,NTSA,NTG,NTU
+  integer :: K,NTG
   !     begin_execution
   !
   IF(ABS(TQR(NY,NX)).GT.ZEROS(NY,NX))THEN
@@ -652,24 +653,10 @@ module RedistMod
       OQN(K,0,NY,NX)=OQN(K,0,NY,NX)+TONQRS(K,NY,NX)
       OQP(K,0,NY,NX)=OQP(K,0,NY,NX)+TOPQRS(K,NY,NX)
       OQA(K,0,NY,NX)=OQA(K,0,NY,NX)+TOAQRS(K,NY,NX)
-
     ENDDO D8570
 !
-    !    SOLUTES
-!  exclude NH3B
-    DO NTG=idg_beg,idg_end-1
-      trc_solml(NTG,0,NY,NX)=trc_solml(NTG,0,NY,NX)+trcg_TQR(NTG,NY,NX)
-    ENDDO
+    call OverlandSnowFlow(NY,NX)
 
-    DO NTU=ids_nut_beg,ids_nuts_end
-      trc_solml(NTU,0,NY,NX)=trc_solml(NTU,0,NY,NX)+trcn_TQR(NTU,NY,NX)
-    ENDDO
-
-    IF(salt_model)THEN
-      DO NTSA=idsa_beg,idsa_end
-        trcsa_solml(NTSA,0,NY,NX)=trcsa_solml(NTSA,0,NY,NX)+trcsa_TQR(NTSA,NY,NX)
-      ENDDO
-    ENDIF
   ENDIF
   end subroutine OverlandFlow
 !------------------------------------------------------------------------------------------
@@ -773,31 +760,7 @@ module RedistMod
     ENDDO D9275
   ENDIF
   end subroutine SoilErosion
-!------------------------------------------------------------------------------------------
 
-  subroutine ChemicalBySnowRedistribution(NY,NX)
-  implicit none
-  integer, intent(in) :: NY,NX
-
-  integer :: NTA,NTG,NTS
-!     begin_execution
-!     OVERLAND SNOW REDISTRIBUTION
-!
-  IF(abs(TQS(NY,NX))>0._r8)THEN
-    DO NTG=idg_beg,idg_end-1
-      trcg_solsml(NTG,1,NY,NX)=trcg_solsml(NTG,1,NY,NX)+trcg_QSS(NTG,NY,NX)
-    ENDDO
-
-    DO NTS=ids_nut_beg,ids_nuts_end
-      trcn_solsml(NTS,1,NY,NX)=trcn_solsml(NTS,1,NY,NX)+trcn_QSS(NTS,NY,NX)
-    ENDDO
-    IF(salt_model)THEN
-      DO NTA=idsa_beg,idsa_end
-        trcs_solsml(NTA,1,NY,NX)=trcs_solsml(NTA,1,NY,NX)+trcsa_TQS(NTA,NY,NX)
-      ENDDO
-    ENDIF
-  ENDIF
-  end subroutine ChemicalBySnowRedistribution
 !------------------------------------------------------------------------------------------
 
   subroutine CalcLitterLayerChemicalMass(NY,NX)
@@ -1030,9 +993,9 @@ module RedistMod
     VOLIXX=VOLI(L,NY,NX)
 
     VOLW(L,NY,NX)=VOLW(L,NY,NX)+TFLW(L,NY,NX)+FINH(L,NY,NX) &
-      +TTHAW(L,NY,NX)+TUPWTR(L,NY,NX)+FLU(L,NY,NX)
+      +TTHAW(L,NY,NX)+GridPlantRootH2OUptake_vr(L,NY,NX)+FLU(L,NY,NX)
     VOLWX(L,NY,NX)=VOLWX(L,NY,NX)+TFLWX(L,NY,NX)+FINH(L,NY,NX) &
-      +TTHAW(L,NY,NX)+TUPWTR(L,NY,NX)+FLU(L,NY,NX)
+      +TTHAW(L,NY,NX)+GridPlantRootH2OUptake_vr(L,NY,NX)+FLU(L,NY,NX)
 
     VOLWX(L,NY,NX)=AMIN1(VOLW(L,NY,NX),VOLWX(L,NY,NX)+0.01_r8*(VOLW(L,NY,NX)-VOLWX(L,NY,NX)))
 
@@ -1086,7 +1049,7 @@ module RedistMod
     ELSE
       TKS(L,NY,NX)=TKS(NUM(NY,NX),NY,NX)
     ENDIF
-    TCS(L,NY,NX)=TKS(L,NY,NX)-TC2K
+    TCS(L,NY,NX)=units%Kelvin2Celcius(TKS(L,NY,NX))
     UN2GS(NY,NX)=UN2GS(NY,NX)+XN2GS(L,NY,NX)
 
     !

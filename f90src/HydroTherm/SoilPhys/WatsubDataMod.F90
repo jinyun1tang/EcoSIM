@@ -9,7 +9,7 @@ implicit none
   real(r8),allocatable ::  TWFLXH(:,:,:)                      !
 
   real(r8),allocatable ::  AREAU(:,:,:)                       !
-  real(r8),allocatable ::  AREAUD(:,:,:)                      !
+  real(r8),allocatable ::  AreaUnderWaterTable(:,:,:)                      !
 
   real(r8),allocatable ::  VOLPH1Z(:,:,:)                     !
   real(r8),allocatable ::  TTFLXL(:,:,:)                      !
@@ -56,7 +56,7 @@ contains
   allocate(TWFLXH(JZ,JY,JX));   TWFLXH=0._r8
 
   allocate(AREAU(JZ,JY,JX));    AREAU=0._r8
-  allocate(AREAUD(JZ,JY,JX));   AREAUD=0._r8
+  allocate(AreaUnderWaterTable(JZ,JY,JX));   AreaUnderWaterTable=0._r8
 
 
   allocate(VOLPH1Z(JZ,JY,JX));  VOLPH1Z=0._r8
@@ -103,7 +103,7 @@ contains
   call destroy(TWFLXH)
 
   call destroy(AREAU)
-  call destroy(AREAUD)
+  call destroy(AreaUnderWaterTable)
 
   call destroy(VOLPH1Z)
   call destroy(TTFLXL)

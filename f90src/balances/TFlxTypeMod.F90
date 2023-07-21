@@ -11,28 +11,17 @@ implicit none
   character(len=*), private, parameter :: mod_filename = __FILE__
 
   public
-  real(r8),allocatable ::  trcg_TBLS(:,:,:,:)
-  real(r8),allocatable ::  trcn_TBLS(:,:,:,:)
-  real(r8),allocatable ::  trcsa_TBLS(:,:,:,:)                      !
+
   real(r8),allocatable ::  trcs_TFLS(:,:,:,:)                      !
   real(r8),allocatable ::  trcs_TFHS(:,:,:,:)                      !
   real(r8),allocatable ::  TQR(:,:)                           !
   real(r8),allocatable ::  THQR(:,:)                          !
-  real(r8),allocatable ::  TQS(:,:)                           !
-  real(r8),allocatable ::  TQW(:,:)                           !
-  real(r8),allocatable ::  TQI(:,:)                           !
-  real(r8),allocatable ::  THQS(:,:)                          !
+
   real(r8),allocatable ::  TFLWS(:,:,:)                       !
   real(r8),allocatable ::  TFLWW(:,:,:)                       !
   real(r8),allocatable ::  TFLWI(:,:,:)                       !
   real(r8),allocatable ::  THFLWW(:,:,:)                      !
-  real(r8),allocatable ::  trcg_TQR(:,:,:)                        !
-  real(r8),allocatable ::  trcn_TQR(:,:,:)                        !
 
-  real(r8),allocatable ::  trcsa_TQR(:,:,:)                         !
-                    !
-  real(r8),allocatable ::  trcg_QSS(:,:,:)
-  real(r8),allocatable ::  trcn_QSS(:,:,:)
   real(r8),allocatable ::  TCOQSS(:,:)                        !
   real(r8),allocatable ::  TCHQSS(:,:)                        !
   real(r8),allocatable ::  TOXQSS(:,:)                        !
@@ -80,7 +69,7 @@ implicit none
   real(r8),allocatable :: TOMNER(:,:,:,:,:)
   real(r8),allocatable :: TOMPER(:,:,:,:,:)
 
-  real(r8),allocatable :: trcsa_TQS(:,:,:)
+
   real(r8),allocatable :: TOMCERff(:,:,:,:)
   real(r8),allocatable :: TOMNERff(:,:,:,:)
   real(r8),allocatable :: TOMPERff(:,:,:,:)
@@ -122,28 +111,16 @@ implicit none
 
   implicit none
 
-  allocate(trcg_TBLS(idg_beg:idg_end-1,JS,JY,JX)); trcg_TBLS=0._r8
-  allocate(trcn_TBLS(ids_nut_beg:ids_nuts_end,JS,JY,JX)); trcn_TBLS=0._r8
-  allocate(trcsa_TBLS(idsa_beg:idsa_end,JS,JY,JX));   trcsa_TBLS=0._r8
   allocate(trcs_TFHS(ids_beg:ids_end,JZ,JY,JX));   trcs_TFHS=0._r8
   allocate(RTGasADFlx(idg_beg:idg_end-1,JZ,JY,JX));   RTGasADFlx=0._r8
 
   allocate(TQR(JY,JX));         TQR=0._r8
   allocate(THQR(JY,JX));        THQR=0._r8
-  allocate(TQS(JY,JX));         TQS=0._r8
-  allocate(TQW(JY,JX));         TQW=0._r8
-  allocate(TQI(JY,JX));         TQI=0._r8
-  allocate(THQS(JY,JX));        THQS=0._r8
+
   allocate(TFLWS(JS,JY,JX));    TFLWS=0._r8
   allocate(TFLWW(JS,JY,JX));    TFLWW=0._r8
   allocate(TFLWI(JS,JY,JX));    TFLWI=0._r8
   allocate(THFLWW(JS,JY,JX));   THFLWW=0._r8
-
-  allocate(trcg_TQR(idg_beg:idg_end-1,JY,JX));      trcg_TQR=0._r8
-  allocate(trcsa_TQR(idsa_beg:idsa_end,JY,JX));       trcsa_TQR=0._r8
-  allocate(trcn_TQR(ids_nut_beg:ids_nuts_end,JY,JX));      trcn_TQR=0._r8
-  allocate(trcg_QSS(idg_beg:idg_end-1,JY,JX));trcg_QSS=0._r8
-  allocate(trcn_QSS(ids_nut_beg:ids_nuts_end,JY,JX));trcn_QSS=0._r8
 
   allocate(TCOQSS(JY,JX));      TCOQSS=0._r8
   allocate(TCHQSS(JY,JX));      TCHQSS=0._r8
@@ -218,7 +195,7 @@ implicit none
   allocate(TOSAER(jsken,1:jcplx,JY,JX));TOSAER=0._r8
   allocate(TOSNER(jsken,1:jcplx,JY,JX));TOSNER=0._r8
   allocate(TOSPER(jsken,1:jcplx,JY,JX));TOSPER=0._r8
-  allocate(trcsa_TQS(idsa_beg:idsa_end,JY,JX));trcsa_TQS=0._r8
+
   end subroutine InitTflxType
 
 
@@ -261,26 +238,16 @@ implicit none
   call destroy(TOSPER)
   call destroy(trcsa_TFLS)
   call destroy(trcs_TFLS)
-  call destroy(trcsa_TQS)
-  call destroy(trcg_TBLS)
-  call destroy(trcn_TBLS)
-
-  call destroy(trcsa_TQR)
   call destroy(trcsa_TFHS)
   call destroy(TQR)
   call destroy(THQR)
-  call destroy(TQS)
-  call destroy(TQW)
-  call destroy(TQI)
-  call destroy(THQS)
   call destroy(TFLWS)
   call destroy(TFLWW)
   call destroy(TFLWI)
   call destroy(THFLWW)
 
   call destroy(trcs_TFHS)
-  call destroy(trcg_QSS)
-  call destroy(trcn_QSS)
+
   call destroy(TCOQSS)
   call destroy(TCHQSS)
   call destroy(TOXQSS)
@@ -318,7 +285,6 @@ implicit none
 
   call destroy(trcp_TER)
   call destroy(RTGasADFlx)
-  call destroy(trcg_TQR)
-  call destroy(trcn_TQR)
+
   end subroutine DestructTflxType
 end module TFlxTypeMod

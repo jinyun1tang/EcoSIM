@@ -30,8 +30,10 @@ add_ecosim_library(APIs ${APIS_SOURCES})
 
 set(ECOSIM_LIBRARIES APIs;${ECOSIM_LIBRARIES} PARENT_SCOPE)
 
+#add_ecosim_library(APIs ${APIS_SOURCES})
+
 if (NOT CMAKE_INSTALL_PREFIX STREQUAL "INSTALL_DISABLED")
-  install(TARGETS APIs DESTINATION lib)
+#  install(TARGETS APIs DESTINATION lib)
   file(GLOB HEADERS *.h)
-  install(FILES ${HEADERS} DESTINATION include/ecosim/APIs)
+  install(FILES ${HEADERS} DESTINATION include/)
 endif()

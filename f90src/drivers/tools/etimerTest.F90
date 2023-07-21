@@ -1,4 +1,4 @@
-PROGRAM main
+PROGRAM etimerTest
 
   use data_kind_mod     , only : r8 => DAT_KIND_R8
   use EcoSIMCtrlMod     , only : etimer
@@ -42,4 +42,4 @@ PROGRAM main
   a=(/1.,2.,3./)
   print*,'18810315060000 ',sum(a(1:0))
   print*,etime_dat
-end program main
+end program etimerTest

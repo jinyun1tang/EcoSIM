@@ -66,7 +66,7 @@ module HfuncsMod
     PPT     =>  plt_site%PPT     , &
     DYLX    =>  plt_site%DYLX    , &
     NP      =>  plt_site%NP      , &
-    PP      =>  plt_site%PP      , &
+    pftPlantPopulation      =>  plt_site%pftPlantPopulation      , &
     KLEAF   =>  plt_morph%KLEAF  , &
     VSTG    =>  plt_morph%VSTG   , &
     NBR     =>  plt_morph%NBR    , &
@@ -78,7 +78,7 @@ module HfuncsMod
 !
 !         PPT=total biome population
 !
-      PPT=PPT+PP(NZ)
+      PPT=PPT+pftPlantPopulation(NZ)
 !
 !         SET CROP FLAG ACCORDING TO PLANTING, HARVEST DATES, DEATH,
 !         1 = ALIVE, 0 = NOT ALIVE
@@ -95,7 +95,7 @@ module HfuncsMod
 !
 !         INITIALIZE VARIABLES IN ACTIVE PFT
 !
-      IF(IFLGC(NZ).EQ.ipltactv)THEN
+      IF(IFLGC(NZ).EQ.PlantIsActive)THEN
 
         call stage_phenology_vars(I,J,NZ)
 
@@ -202,7 +202,7 @@ module HfuncsMod
           ENDIF
 
           IF(DATAP(NZ).NE.'NO'.AND.IDTH(NZ).EQ.0)then
-            IFLGC(NZ)=ipltactv
+            IFLGC(NZ)=PlantIsActive
           endif  
         ENDIF
       ELSE
@@ -222,7 +222,7 @@ module HfuncsMod
           TNBP=TNBP+WTRVX(NZ)
         ENDIF
         IF(DATAP(NZ).NE.'NO'.AND.IDTH(NZ).EQ.0)then
-          IFLGC(NZ)=ipltactv
+          IFLGC(NZ)=PlantIsActive
         endif  
       ENDIF
     ENDIF
@@ -252,7 +252,7 @@ module HfuncsMod
     PR      =>   plt_pheno%PR     , &
     GROUPI  =>   plt_pheno%GROUPI , &
     PB      =>   plt_pheno%PB     , &
-    PP      =>   plt_site%PP      , &
+    pftPlantPopulation      =>   plt_site%pftPlantPopulation      , &
     VRNS    =>   plt_pheno%VRNS   , &
     PSIRG   =>   plt_ew%PSIRG     , &
     FNOD    =>   plt_allom%FNOD   , &
@@ -288,7 +288,7 @@ module HfuncsMod
 
 
   IF(IFLGI(NZ).EQ.0)THEN
-    IF(J.EQ.1.AND.PP(NZ).GT.0.0_r8)THEN
+    IF(J.EQ.1.AND.pftPlantPopulation(NZ).GT.0.0_r8)THEN
       IF(PSIRG(1,NG(NZ),NZ).GT.PSILM)THEN
         IF(ISTYP(NZ).NE.iplt_annual.OR.IDAY(2,NB1(NZ),NZ).EQ.0)THEN
           IF((NBR(NZ).EQ.0.AND.WTRVE(ielmc,NZ).GT.0.0_r8) &
@@ -768,12 +768,12 @@ module HfuncsMod
     IPTYP   =>  plt_pheno%IPTYP   , &
     IFLGA   =>  plt_pheno%IFLGA   , &
     GROUPI  =>  plt_pheno%GROUPI  , &
-    OSTR    =>  plt_pheno%OSTR    , &
+    PlantO2Stress    =>  plt_pheno%PlantO2Stress    , &
     VRNS    =>  plt_pheno%VRNS    , &
     VRNF    =>  plt_pheno%VRNF    , &
     VRNX    =>  plt_pheno%VRNX    , &
     XRNI    =>  plt_pheno%XRNI    , &
-    ZC      =>  plt_morph%ZC      , &
+    CanopyHeight      =>  plt_morph%CanopyHeight      , &
     PSTG    =>   plt_morph%PSTG   , &
     PSTGI   =>   plt_morph%PSTGI  , &
     PSTGF   =>   plt_morph%PSTGF  , &
@@ -821,7 +821,7 @@ module HfuncsMod
         RLA=RLA*WFNG
       ENDIF
       IF(IDAY(2,NB,NZ).EQ.0)THEN
-        OFNG=SQRT(OSTR(NZ))
+        OFNG=SQRT(PlantO2Stress(NZ))
         RNI=RNI*OFNG
         RLA=RLA*OFNG
       ENDIF
@@ -885,7 +885,7 @@ module HfuncsMod
       .OR.(((ISTYP(NZ).EQ.iplt_preanu.AND.(IWTYP(NZ).EQ.1 &
       .OR.IWTYP(NZ).EQ.3)) &
       .OR.(ISTYP(NZ).EQ.iplt_annual.AND.IWTYP(NZ).EQ.0)) &
-      .AND.ZC(NZ).GE.DPTHS-ZERO &
+      .AND.CanopyHeight(NZ).GE.DPTHS-ZERO &
       .AND.DYLN.LT.DYLX))THEN
 !
 !     FINAL VEGETATIVE NODE NUMBER DEPENDS ON PHOTOPERIOD FROM 'DAY'
@@ -911,7 +911,7 @@ module HfuncsMod
         .OR.(((ISTYP(NZ).EQ.iplt_preanu.AND.(IWTYP(NZ).EQ.1 &
         .OR.IWTYP(NZ).EQ.3)) &
         .OR.(ISTYP(NZ).EQ.iplt_annual.AND.IWTYP(NZ).EQ.0)) &
-        .AND.ZC(NZ).GE.DPTHS-ZERO &
+        .AND.CanopyHeight(NZ).GE.DPTHS-ZERO &
         .AND.DYLN.LT.DYLX))THEN
         IDAY(2,NB,NZ)=I
         PSTGI(NB,NZ)=PSTG(NB,NZ)

@@ -6,6 +6,7 @@ module StartqsMod
   use PlantAPIData
   use TracerIDMod
   use EcoSiMParDataMod, only : pltpar
+  use UnitMod, only : units
   implicit none
 
   private
@@ -24,7 +25,7 @@ module StartqsMod
 !     begin_execution
 
   associate(                            &
-    PP      => plt_site%PP        , &
+    pftPlantPopulation      => plt_site%pftPlantPopulation        , &
     NU      => plt_site%NU        , &
     NP      => plt_site%NP        , &
     NL      => plt_site%NL        , &
@@ -72,9 +73,9 @@ module StartqsMod
 
           call InitSeedMorphoBio(NZ)
         ENDIF
-        ZEROP(NZ)=ZERO*PP(NZ)
-        ZEROQ(NZ)=ZERO*PP(NZ)/AREA3(NU)
-        ZEROL(NZ)=ZERO*PP(NZ)*1.0E+06_r8
+        ZEROP(NZ)=ZERO*pftPlantPopulation(NZ)
+        ZEROQ(NZ)=ZERO*pftPlantPopulation(NZ)/AREA3(NU)
+        ZEROL(NZ)=ZERO*pftPlantPopulation(NZ)*1.0E+06_r8
       ENDDO D9985
 !
 !     FILL OUT UNUSED ARRAYS
@@ -550,7 +551,7 @@ module StartqsMod
   associate(                           &
     NU      =>  plt_site%NU      , &
     PPX     =>  plt_site%PPX     , &
-    PP      =>  plt_site%PP      , &
+    pftPlantPopulation      =>  plt_site%pftPlantPopulation      , &
     ALAT    =>  plt_site%ALAT    , &
     AREA3   =>  plt_site%AREA3   , &
     IGTYP   =>  plt_pheno%IGTYP  , &
@@ -582,7 +583,7 @@ module StartqsMod
     HCOB    =>  plt_photo%HCOB   , &
     CO2B    =>  plt_photo%CO2B   , &
     VSTG    =>  plt_morph%VSTG   , &
-    ZC      =>  plt_morph%ZC     , &
+    CanopyHeight      =>  plt_morph%CanopyHeight     , &
     KLEAF   =>  plt_morph%KLEAF  , &
     XTLI    =>  plt_morph%XTLI   , &
     NBT     =>  plt_morph%NBT    , &
@@ -614,14 +615,14 @@ module StartqsMod
 !
 !     PP=population (grid cell-1)
 !
-  PP(NZ)=PPX(NZ)*AREA3(NU)
+  pftPlantPopulation(NZ)=PPX(NZ)*AREA3(NU)
   plt_pheno%IFLGI(NZ)=0
   plt_pheno%IDTHP(NZ)=0
   plt_pheno%IDTHR(NZ)=0
   NBT(NZ)=0
   NBR(NZ)=0
   HTCTL(NZ)=0._r8
-  ZC(NZ)=0._r8
+  CanopyHeight(NZ)=0._r8
   D10: DO NB=1,JBR
     plt_pheno%IFLGA(NB,NZ)=0
     plt_pheno%IFLGE(NB,NZ)=0
@@ -856,9 +857,9 @@ module StartqsMod
   ENGYX(NZ)=0._r8
   DTKC(NZ)=0._r8
   TCC(NZ)=ATCA
-  TKC(NZ)=TCC(NZ)+TC2K
+  TKC(NZ)=units%Celcius2Kelvin(TCC(NZ))
   TCG(NZ)=TCC(NZ)
-  TKG(NZ)=TCG(NZ)+TC2K
+  TKG(NZ)=units%Celcius2Kelvin(TCG(NZ))
   TFN3(NZ)=1.0
   PSILT(NZ)=-1.0E-03
   PSILO(NZ)=OSMO(NZ)+PSILT(NZ)
@@ -919,7 +920,7 @@ module StartqsMod
   plt_rbgc%UPNF(NZ)=0._r8
   D40: DO N=1,2
     D20: DO L=1,NL
-      plt_ew%UPWTR(N,L,NZ)=0._r8
+      plt_ew%PopPlantRootH2OUptake_vr(N,L,NZ)=0._r8
       PSIRT(N,L,NZ)=-0.01
       PSIRO(N,L,NZ)=OSMO(NZ)+PSIRT(N,L,NZ)
       PSIRG(N,L,NZ)=AZMAX1(PSIRT(N,L,NZ)-PSIRO(N,L,NZ))
@@ -1007,7 +1008,7 @@ module StartqsMod
   REAL(R8) :: FDM
 
   associate(                             &
-    PP       =>   plt_site%PP      , &
+    pftPlantPopulation       =>   plt_site%pftPlantPopulation      , &
     PSILT    =>   plt_ew%PSILT     , &
     VOLWC    =>   plt_ew%VOLWC     , &
     VOLWP    =>   plt_ew%VOLWP     , &
@@ -1046,7 +1047,7 @@ module StartqsMod
 !     WSRTL=total root protein C mass (g)
 !     CPOOLR,ZPOOLR,PPOOLR=C,N,P in root,myco nonstructural pools (g)
 !
-  WTRVX(NZ)=GRDM(NZ)*PP(NZ)
+  WTRVX(NZ)=GRDM(NZ)*pftPlantPopulation(NZ)
   WTRVE(ielmc,NZ)=WTRVX(NZ)
   WTRVE(ielmn,NZ)=CNGR(NZ)*WTRVE(ielmc,NZ)
   WTRVE(ielmp,NZ)=CPGR(NZ)*WTRVE(ielmc,NZ)
