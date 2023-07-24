@@ -123,7 +123,7 @@ module BGCContainers_module
     integer (c_int) :: cap_cols
     integer (c_int) :: cap_procs
     type (c_ptr) :: data
-  end type BGCMatrixDouble
+  end type BGCTensorDouble
 
   type, public, bind(c) :: BGCTensorInt
     integer (c_int) :: rows
@@ -133,7 +133,7 @@ module BGCContainers_module
     integer (c_int) :: cap_cols
     integer (c_int) :: cap_procs
     type (c_ptr) :: data
-  end type BGCMatrixInt
+  end type BGCTensorInt
 
   type, public, bind(c) :: BGCSizes
      integer (c_int) :: ncells_per_col_
