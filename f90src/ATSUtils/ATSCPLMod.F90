@@ -20,7 +20,6 @@ module ATSCPLMod
   real(r8), allocatable :: wind_speed(:)
   real(r8), allocatable :: precipitation_rain(:)
 
-
   real(r8), allocatable :: csand(:,:)
   real(r8), allocatable :: CSILT(:,:)
   real(r8), allocatable :: tairc(:)
@@ -102,41 +101,6 @@ contains
   call c_f_pointer(props%precipitation%data, data, (/size_procs/))
   precipitation_rain = data(:)
 
-  write(*,*) "writing atm abundances"
-  atm_n2 = props%atm_n2
-  atm_o2 = props%atm_o2
-  atm_co2 = props%atm_co2
-  atm_ch4 = props%atm_ch4
-  atm_n2o = props%atm_n2o
-  atm_h2 = props%atm_h2
-  atm_nh3 = props%atm_nh3
-
-  write(*,*) "writing atm abundances"
-  atm_n2 = props%atm_n2
-  atm_o2 = props%atm_o2
-  atm_co2 = props%atm_co2
-  atm_ch4 = props%atm_ch4
-  atm_n2o = props%atm_n2o
-  atm_h2 = props%atm_h2
-  atm_nh3 = props%atm_nh3
-
-  write(*,*) "writing atm abundances"
-  atm_n2 = props%atm_n2
-  atm_o2 = props%atm_o2
-  atm_co2 = props%atm_co2
-  atm_ch4 = props%atm_ch4
-  atm_n2o = props%atm_n2o
-  atm_h2 = props%atm_h2
-  atm_nh3 = props%atm_nh3
-
-  write(*,*) "writing atm abundances"
-  atm_n2 = props%atm_n2
-  atm_o2 = props%atm_o2
-  atm_co2 = props%atm_co2
-  atm_ch4 = props%atm_ch4
-  atm_n2o = props%atm_n2o
-  atm_h2 = props%atm_h2
-  atm_nh3 = props%atm_nh3
 
   write(*,*) "writing atm abundances"
   atm_n2 = props%atm_n2
