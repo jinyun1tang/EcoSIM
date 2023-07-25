@@ -22,14 +22,14 @@ module ATSCPLMod
   real(r8), allocatable :: vpa(:)
 
   !ATS variables
-  real(r8), allocatable :: PORO(:) !porosity
-  real(r8), allocatable :: L_DENS(:) !liquid density
-  real(r8), allocatable :: WC(:) !Soil water content
-  real(r8), allocatable :: WC_OLD(:) !saving the wc for testing
-  real(r8), allocatable :: L_SAT(:) !liquid saturation
-  real(r8), allocatable :: REL_PERM(:) !relative_permeability
-  real(r8), allocatable :: H_COND(:) !hydraulic conductivity
-  real(r8), allocatable :: TEMP(:) !temperature
+  real(r8), allocatable :: PORO(:,:) !porosity
+  real(r8), allocatable :: L_DENS(:,:) !liquid density
+  real(r8), allocatable :: WC(:,:) !Soil water content
+  real(r8), allocatable :: WC_OLD(:,:) !saving the wc for testing
+  real(r8), allocatable :: L_SAT(:,:) !liquid saturation
+  real(r8), allocatable :: REL_PERM(:,:) !relative_permeability
+  real(r8), allocatable :: H_COND(:,:) !hydraulic conductivity
+  real(r8), allocatable :: TEMP(:,:) !temperature
 
 contains
 !------------------------------------------------------------------------------------------
@@ -104,8 +104,8 @@ contains
   atm_nh3 = props%atm_nh3
 
   write(*,*) "looping over datasets starting with porosity"
-  call c_f_pointer(state%porosity%data, data, (/size_col/))
-  PORO = data(:)
+  call c_f_pointer(state%porosity%data, data2D, [(/size_col/),(/size_procs/)])
+  PORO=data(:,:)
 
   write(*,*) "finished copying poro"
   !do j3 = 1, size_col
@@ -113,23 +113,23 @@ contains
   !enddo
 
   write(*,*) "Porosity finished, continuing"
-  call c_f_pointer(state%liquid_density%data, data, [(/size_col/),(/size_procs/)])
-  data(:,:)=L_DENS
+  call c_f_pointer(state%liquid_density%data, data2D, [(/size_col/),(/size_procs/)])
+  L_DENS=data2D(:,:)
 
-  call c_f_pointer(state%water_content%data, data, [(/size_col/),(/size_procs/)])
-  data(:,:)=WC
+  call c_f_pointer(state%water_content%data, data2D, [(/size_col/),(/size_procs/)])
+  WC=data2D(:,:)
 
-  call c_f_pointer(props%liquid_saturation%data, data, [(/size_col/),(/size_procs/)])
-  data(:,:)=L_SAT
+  call c_f_pointer(props%liquid_saturation%data, data2D, [(/size_col/),(/size_procs/)])
+  L_SAT=data2D(:,:)
 
-  call c_f_pointer(props%relative_permeability%data, data, [(/size_col/),(/size_procs/)])
-  data(:,:)=REL_PERM
+  call c_f_pointer(props%relative_permeability%data, data2D, [(/size_col/),(/size_procs/)])
+  REL_PERM=data2D(:,:)
 
-  call c_f_pointer(state%hydraulic_conductivity%data, data, [(/size_col/),(/size_procs/)])
-  data(:,:)=H_COND
+  call c_f_pointer(state%hydraulic_conductivity%data, data2D, [(/size_col/),(/size_procs/)])
+  H_COND=data2D(:,:)
 
-  call c_f_pointer(state%temperature%data, data, [(/size_col/),(/size_procs/)])
-  data(:,:)=TEMP
+  call c_f_pointer(state%temperature%data, data2D, [(/size_col/),(/size_procs/)])
+  TEMP=data2D(:,:)
 
   write(*,*) "Data Transfer Finished"
   end subroutine ATS2EcoSIMData
