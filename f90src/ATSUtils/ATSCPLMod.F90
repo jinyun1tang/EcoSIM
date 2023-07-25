@@ -12,7 +12,7 @@ module ATSCPLMod
 
 ! temporary data holder in ecosim
   real(r8) :: atm_n2, atm_o2,atm_co2,atm_ch4,atm_n2o,atm_h2,atm_nh3
-  real(r8) :: sw_rad, lw_rad, air_temp, p_vap, wind_speed, p_rain
+  real(r8) :: sw_rad, lw_rad, air_temp, p_vap, wind_speed, precipitation_rain
   real(r8), allocatable :: csand(:,:)
   real(r8), allocatable :: CSILT(:,:)
   real(r8), allocatable :: tairc(:)
@@ -56,53 +56,6 @@ contains
   call SetBGCSizes(sizes)
   !ncol=size(filter_col)
 
-  !if (ncol .EQ. 0)then
-  !domain specific scalar
-  !Variables with only a single value over the domain
-  !loops over j1 (number of vars)
-  !Only do this on the first column (if ncol=0)
-  !I think we basically have to hardcode this with foreknowledge of what is
-  !going to be in the Alquimia-like dictionary
-  !  nvar=size(var_1d)
-  !  do j1=1,nvar
-  !    select case(var_1d(j1))
-  !    case ('ATM_N2')  !ppmv
-  !      atm_N2=data_1d(j1)
-  !    case ('ATM_O2')  !ppmv
-  !      atm_o2=data_1d(j1)
-  !    case ('ATM_CO2') !ppmv
-  !      atm_co2=data_1d(j1)
-  !    case ('ATM_CH4') !ppmv
-  !      atm_ch4=data_1d(j1)
-  !    case ('ATM_N2O') !ppmv
-  !      atm_n2o=data_1d(j1)
-  !    case ('ATM_H2')  !ppmv
-  !      atm_h2=data_1d(j1)
-  !    case ('ATM_NH3') !ppmv
-  !      atm_NH3=data_1d(j1)
-  !    end select
-  !  enddo
-  !endif
-  !columun specific scalar
-  !Variables that are single valued along a column
-  !j1 - number of variables
-  ! changed the loop over j2 because we call this column by column
-  !nvar=size(var_2d)
-  !do j1=1,nvar
-  !  select case(var_2d(j1))
-  !  case ('TAIRC')     !air temperature, oC
-  !    tairc(ncol)=data_2d(j1,ncol)
-  !  case ('PREC')      !precipitation, mm H2O/hr
-  !    prec(ncol)=data_2d(j1,ncol)
-  !  case ('WINDH')     !horizontal wind speed,   m/s
-  !    uwind(ncol)=data_2d(j1,ncol)
-  !  case ('DWPTH')     !atmospheric vapor pressure, kPa
-  !    vpa(ncol)=data_2d(j1,ncol)
-  !  case ('SRADH')     !Incident solar radiation, W/m2
-  !    srad(ncol)=data_2d(j1,ncol)
-  !  end select
-  !enddo
-
   !1D vertical vector,
   !variables that take on a different value in each cell
   !Bulk of data will go here
@@ -116,17 +69,29 @@ contains
   !Variables related to flow:
   write(*,*) "computing column size"
 
-  size_col = props%volume%size
+  size_col = sizes%ncells_per_col_
+  size_procs = props%shortwave_radiation%size
 
   write(*,*) "Column size is: ", size_col
   write(*,*) "surface properties"
 
-  sw_rad = props%shortwave_radiation
-  lw_rad = props%longwave_radiation
-  air_temp = props%air_temperature
-  p_vap = props%vapor_pressure_air
-  wind_speed = props%wind_speed
-  p_rain = props%precipitation
+  call c_f_pointer(props%shortwave_radiation%data, data, (/size_procs/))
+  sw_rad = data(:)
+
+  call c_f_pointer(props%longwave_radiation%data, data, (/size_procs/))
+  lw_rad = data(:)
+
+  call c_f_pointer(props%air_temperature%data, data, (/size_procs/))
+  air_temp = data(:)
+
+  call c_f_pointer(props%vapor_pressure_air%data, data, (/size_procs/))
+  p_vap = data(:)
+
+  call c_f_pointer(props%wind_speed%data, data, (/size_procs/))
+  wind_speed = data(:)
+
+  call c_f_pointer(props%precipitation%data, data, (/size_procs/))
+  precipitation_rain = data(:)
 
   write(*,*) "writing atm abundances"
   atm_n2 = props%atm_n2
@@ -147,22 +112,22 @@ contains
   !enddo
 
   write(*,*) "Porosity finished, continuing"
-  call c_f_pointer(state%liquid_density%data, data, (/size_col/))
+  call c_f_pointer(state%liquid_density%data, data, [(/size_col/),(/size_procs/)])
   L_DENS=data(:)
 
-  call c_f_pointer(state%water_content%data, data, (/size_col/))
+  call c_f_pointer(state%water_content%data, data, [(/size_col/),(/size_procs/)])
   WC=data(:)
 
-  call c_f_pointer(props%liquid_saturation%data, data, (/size_col/))
+  call c_f_pointer(props%liquid_saturation%data, data, [(/size_col/),(/size_procs/)])
   L_SAT=data(:)
 
-  call c_f_pointer(props%relative_permeability%data, data, (/size_col/))
+  call c_f_pointer(props%relative_permeability%data, data, [(/size_col/),(/size_procs/)])
   REL_PERM=data(:)
 
-  call c_f_pointer(state%hydraulic_conductivity%data, data, (/size_col/))
+  call c_f_pointer(state%hydraulic_conductivity%data, data, [(/size_col/),(/size_procs/)])
   H_COND=data(:)
 
-  call c_f_pointer(state%temperature%data, data, (/size_col/))
+  call c_f_pointer(state%temperature%data, data, [(/size_col/),(/size_procs/)])
   TEMP=data(:)
 
   write(*,*) "Data Transfer Finished"
@@ -187,30 +152,34 @@ contains
   call SetBGCSizes(sizes)
 
   size_col = sizes%ncells_per_col_
+  size_procs = props%shortwave_radiation%size
 
   WC_OLD = WC
 
   do j3 = 1, size_col
     WC(j3) = 2.0*WC(j3)
-    write(*,*) "Old value: ", WC_OLD(j3), " New value: ", WC(j3)
+    !write(*,*) "Old value: ", WC_OLD(j3), " New value: ", WC(j3)
   enddo
 
   !seems like we call the pointer as normal,
   !then just reverse the data
-  call c_f_pointer(state%porosity%data, data, (/size_col/))
-  data(:) = PORO
+  call c_f_pointer(state%liquid_density%data, data, [(/size_col/),(/size_procs/)])
+  data(:)=L_DENS
 
-  call c_f_pointer(state%liquid_density%data, data, (/size_col/))
-  data(:) = L_DENS
+  call c_f_pointer(state%water_content%data, data, [(/size_col/),(/size_procs/)])
+  data(:)=WC
 
-  call c_f_pointer(state%water_content%data, data, (/size_col/))
-  data(:) = WC
+  call c_f_pointer(props%liquid_saturation%data, data, [(/size_col/),(/size_procs/)])
+  data(:)=L_SAT
 
-  call c_f_pointer(state%hydraulic_conductivity%data, data, (/size_col/))
-  data(:) = H_COND
+  call c_f_pointer(props%relative_permeability%data, data, [(/size_col/),(/size_procs/)])
+  data(:)=REL_PERM
 
-  call c_f_pointer(state%temperature%data, data, (/size_col/))
-  data(:) = TEMP
+  call c_f_pointer(state%hydraulic_conductivity%data, data, [(/size_col/),(/size_procs/)])
+  data(:)=H_COND
+
+  call c_f_pointer(state%temperature%data, data, [(/size_col/),(/size_procs/)])
+  data(:)=TEMP
 
   write(*,*) "finished copying back in driver"
   end subroutine EcoSIM2ATSData
