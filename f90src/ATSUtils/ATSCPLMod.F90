@@ -46,7 +46,7 @@ contains
 
   ! Ecosim variables
   real(r8), pointer :: data(:)
-  integer :: ncol, nvar, size_col
+  integer :: ncol, nvar, size_col, size_procs
   integer :: j1,j2,j3
 
   write(*,*) "In the driver...."
@@ -154,6 +154,7 @@ contains
 
   ! Ecosim variables
   real(r8), pointer :: data(:)
+  real(r8), pointer :: data3D(:,:)
   integer :: ncol, nvar, size_col, size_procs
   integer :: j1,j2,j3
 
@@ -161,7 +162,9 @@ contains
   call SetBGCSizes(sizes)
 
   size_col = sizes%ncells_per_col_
-  size_procs = props%shortwave_radiation%size
+  size_procs = state%porosity%cols
+
+  write(*,*) "column size: ", size_col, " columns on this process: ", size_procs
 
   WC_OLD = WC
 
@@ -172,16 +175,16 @@ contains
 
   !seems like we call the pointer as normal,
   !then just reverse the data
-  call c_f_pointer(state%liquid_density%data, data, [(/size_col/),(/size_procs/)])
+  call c_f_pointer(c_loc(state%liquid_density%data), data3D, [(/size_col/),(/size_procs/)])
   data(:)=L_DENS
 
-  call c_f_pointer(state%water_content%data, data, [(/size_col/),(/size_procs/)])
+  call c_f_pointer(c_loc(state%water_content%data), data3D, [(/size_col/),(/size_procs/)])
   data(:)=WC
 
-  call c_f_pointer(state%hydraulic_conductivity%data, data, [(/size_col/),(/size_procs/)])
+  call c_f_pointer(c_loc(state%hydraulic_conductivity%data), data3D, [(/size_col/),(/size_procs/)])
   data(:)=H_COND
 
-  call c_f_pointer(state%temperature%data, data, [(/size_col/),(/size_procs/)])
+  call c_f_pointer(c_loc(state%temperature%data), data3D, [(/size_col/),(/size_procs/)])
   data(:)=TEMP
 
   write(*,*) "finished copying back in driver"
