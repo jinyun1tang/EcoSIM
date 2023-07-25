@@ -172,7 +172,6 @@ module BGCContainers_module
      type (BGCVectorDouble) :: vapor_pressure_air
      type (BGCVectorDouble) :: wind_speed
      type (BGCVectorDouble) :: precipitation
-     type (BGCVectorDouble) :: plant_wilting_factor
      type (BGCVectorDouble) :: elevation
      type (BGCVectorDouble) :: aspect
      type (BGCVectorDouble) :: slope
