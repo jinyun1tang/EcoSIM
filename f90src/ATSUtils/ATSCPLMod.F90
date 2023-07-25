@@ -46,6 +46,7 @@ contains
 
   ! Ecosim variables
   real(r8), pointer :: data(:)
+  real(r8), pointer :: data2D(:,:)
   integer :: ncol, nvar, size_col, size_procs
   integer :: j1,j2,j3
 
@@ -113,22 +114,22 @@ contains
 
   write(*,*) "Porosity finished, continuing"
   call c_f_pointer(state%liquid_density%data, data, [(/size_col/),(/size_procs/)])
-  L_DENS=data(:)
+  data(:,:)=L_DENS
 
   call c_f_pointer(state%water_content%data, data, [(/size_col/),(/size_procs/)])
-  WC=data(:)
+  data(:,:)=WC
 
   call c_f_pointer(props%liquid_saturation%data, data, [(/size_col/),(/size_procs/)])
-  L_SAT=data(:)
+  data(:,:)=L_SAT
 
   call c_f_pointer(props%relative_permeability%data, data, [(/size_col/),(/size_procs/)])
-  REL_PERM=data(:)
+  data(:,:)=REL_PERM
 
   call c_f_pointer(state%hydraulic_conductivity%data, data, [(/size_col/),(/size_procs/)])
-  H_COND=data(:)
+  data(:,:)=H_COND
 
   call c_f_pointer(state%temperature%data, data, [(/size_col/),(/size_procs/)])
-  TEMP=data(:)
+  data(:,:)=TEMP
 
   write(*,*) "Data Transfer Finished"
   end subroutine ATS2EcoSIMData
@@ -140,12 +141,11 @@ contains
   !character(len=*), parameter :: subname=trim(mod_filename)//'::EcoSIM2ATSData'
 
   type (BGCState), intent(in) :: state
-  type (BGCProperties), intent(in) :: props
   type (BGCSizes), intent(out) :: sizes
 
   ! Ecosim variables
   real(r8), pointer :: data(:)
-  real(r8), pointer :: data3D(:,:)
+  real(r8), pointer :: data2D(:,:)
   integer :: ncol, nvar, size_col, size_procs
   integer :: j1,j2,j3
 
@@ -166,17 +166,17 @@ contains
 
   !seems like we call the pointer as normal,
   !then just reverse the data
-  call c_f_pointer(c_loc(state%liquid_density%data), data3D, [(/size_col/),(/size_procs/)])
-  data(:)=L_DENS
+  call c_f_pointer(state%liquid_density%data, data2D, [(/size_col/),(/size_procs/)])
+  data(:,:)=L_DENS
 
-  call c_f_pointer(c_loc(state%water_content%data), data3D, [(/size_col/),(/size_procs/)])
-  data(:)=WC
+  call c_f_pointer(state%water_content%data, data2D, [(/size_col/),(/size_procs/)])
+  data(:,:)=WC
 
-  call c_f_pointer(c_loc(state%hydraulic_conductivity%data), data3D, [(/size_col/),(/size_procs/)])
-  data(:)=H_COND
+  call c_f_pointer(state%hydraulic_conductivity%data, data2D, [(/size_col/),(/size_procs/)])
+  data(:,:)=H_COND
 
-  call c_f_pointer(c_loc(state%temperature%data), data3D, [(/size_col/),(/size_procs/)])
-  data(:)=TEMP
+  call c_f_pointer(state%temperature%data, data2D, [(/size_col/),(/size_procs/)])
+  data(:,:)=TEMP
 
   write(*,*) "finished copying back in driver"
   end subroutine EcoSIM2ATSData
