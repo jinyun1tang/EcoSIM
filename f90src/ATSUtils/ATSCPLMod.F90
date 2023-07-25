@@ -149,12 +149,12 @@ contains
   !character(len=*), parameter :: subname=trim(mod_filename)//'::EcoSIM2ATSData'
 
   type (BGCState), intent(in) :: state
-  !type (BGCProperties), intent(in) :: props
+  type (BGCProperties), intent(in) :: props
   type (BGCSizes), intent(out) :: sizes
 
   ! Ecosim variables
   real(r8), pointer :: data(:)
-  integer :: ncol, nvar, size_col
+  integer :: ncol, nvar, size_col, size_procs
   integer :: j1,j2,j3
 
   write(*,*) "Copying back"
@@ -177,12 +177,6 @@ contains
 
   call c_f_pointer(state%water_content%data, data, [(/size_col/),(/size_procs/)])
   data(:)=WC
-
-  call c_f_pointer(props%liquid_saturation%data, data, [(/size_col/),(/size_procs/)])
-  data(:)=L_SAT
-
-  call c_f_pointer(props%relative_permeability%data, data, [(/size_col/),(/size_procs/)])
-  data(:)=REL_PERM
 
   call c_f_pointer(state%hydraulic_conductivity%data, data, [(/size_col/),(/size_procs/)])
   data(:)=H_COND
