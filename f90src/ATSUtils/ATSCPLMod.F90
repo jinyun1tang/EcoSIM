@@ -12,7 +12,14 @@ module ATSCPLMod
 
 ! temporary data holder in ecosim
   real(r8) :: atm_n2, atm_o2,atm_co2,atm_ch4,atm_n2o,atm_h2,atm_nh3
-  real(r8) :: sw_rad, lw_rad, air_temp, p_vap, wind_speed, precipitation_rain
+  real(r8), allocatable :: sw_rad(:)
+  real(r8), allocatable :: lw_rad(:)
+  real(r8), allocatable :: air_temp(:)
+  real(r8), allocatable :: p_vap(:)
+  real(r8), allocatable :: wind_speed(:)
+  real(r8), allocatable :: precipitation_rain(:)
+  
+
   real(r8), allocatable :: csand(:,:)
   real(r8), allocatable :: CSILT(:,:)
   real(r8), allocatable :: tairc(:)
@@ -103,7 +110,7 @@ contains
 
   write(*,*) "looping over datasets starting with porosity"
   call c_f_pointer(state%porosity%data, data2D, [(/size_col/),(/size_procs/)])
-  PORO=data(:,:)
+  PORO=data2D(:,:)
 
   write(*,*) "finished copying poro"
   !do j3 = 1, size_col
@@ -155,26 +162,26 @@ contains
 
   write(*,*) "column size: ", size_col, " columns on this process: ", size_procs
 
-  WC_OLD = WC
+  !WC_OLD = WC
 
-  do j3 = 1, size_col
-    WC(j3) = 2.0*WC(j3)
-    !write(*,*) "Old value: ", WC_OLD(j3), " New value: ", WC(j3)
-  enddo
+  !do j3 = 1, size_col
+  !  WC(j3) = 2.0*WC(j3)
+  !  !write(*,*) "Old value: ", WC_OLD(j3), " New value: ", WC(j3)
+  !enddo
 
   !seems like we call the pointer as normal,
   !then just reverse the data
   call c_f_pointer(state%liquid_density%data, data2D, [(/size_col/),(/size_procs/)])
-  data(:,:)=L_DENS
+  data2D(:,:)=L_DENS
 
   call c_f_pointer(state%water_content%data, data2D, [(/size_col/),(/size_procs/)])
-  data(:,:)=WC
+  data2D(:,:)=WC
 
   call c_f_pointer(state%hydraulic_conductivity%data, data2D, [(/size_col/),(/size_procs/)])
-  data(:,:)=H_COND
+  data2D(:,:)=H_COND
 
   call c_f_pointer(state%temperature%data, data2D, [(/size_col/),(/size_procs/)])
-  data(:,:)=TEMP
+  data2D(:,:)=TEMP
 
   write(*,*) "finished copying back in driver"
   end subroutine EcoSIM2ATSData
