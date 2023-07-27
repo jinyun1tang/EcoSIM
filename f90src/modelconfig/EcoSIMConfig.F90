@@ -25,7 +25,7 @@ implicit none
   character(len=36)  :: case_name
   character(len=256) :: finidat =' '
   character(len=256) :: ctitle  = ' '
-  character(len=256) :: nrevsn 
+  character(len=256) :: restartFileFullPath 
   character(len=256), public :: hostname = ' '
   character(len=256), public :: username = ' '          ! Current user
   ! description of this source

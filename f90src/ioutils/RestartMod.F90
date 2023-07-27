@@ -7666,7 +7666,7 @@ implicit none
     ! Determine and obtain netcdf restart file
     !
     ! !USES:
-    use EcoSIMConfig     , only : nrevsn, nsrest, nsrStartup, nsrBranch 
+    use EcoSIMConfig     , only : restartFileFullPath, nsrest, nsrStartup, nsrBranch 
     use EcoSIMConfig     , only : nsrContinue, case_name,  brnch_retain_casename
     use fileutil         , only : getfil
     use ecosim_log_mod   , only : errMsg => shr_log_errMsg
@@ -7691,16 +7691,16 @@ implicit none
     end if
 
     ! Branch run: 
-    ! Restart file pathname is obtained from namelist "nrevsn"
+    ! Restart file pathname is obtained from namelist "restartFileFullPath"
     ! Check case name consistency (case name must be different for branch run, 
     ! unless namelist specification states otherwise)
 
     if (nsrest==nsrBranch) then
-       length = len_trim(nrevsn)
-       if (nrevsn(length-2:length) == '.nc') then
-          path = trim(nrevsn) 
+       length = len_trim(restartFileFullPath)
+       if (restartFileFullPath(length-2:length) == '.nc') then
+          path = trim(restartFileFullPath) 
        else
-          path = trim(nrevsn) // '.nc'
+          path = trim(restartFileFullPath) // '.nc'
        end if
        call getfil( path, file, 0 )
 
@@ -7853,7 +7853,7 @@ implicit none
     ! Obtain the restart file from the restart pointer file. 
     ! For restart runs, the restart pointer file contains the full pathname 
     ! of the restart file. For branch runs, the namelist variable 
-    ! [nrevsn] contains the full pathname of the restart file. 
+    ! [restartFileFullPath] contains the full pathname of the restart file. 
     ! New history files are always created for branch runs.
 
 !    if (masterproc) then

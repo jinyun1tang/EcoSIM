@@ -108,13 +108,12 @@ contains
 ! read control namelist
   use abortutils     , only : endrun
   use EcoSIMConfig   , only : transport_on,column_mode, do_instequil,ref_date
-  use EcoSIMConfig   , only : finidat,nrevsn,brnch_retain_casename,start_date
+  use EcoSIMConfig   , only : finidat,restartFileFullPath,brnch_retain_casename,start_date
   use ForcWriterMod  , only : bgc_forc_conf,do_bgcforc_write
   use fileUtil       , only : iulog,ecosim_namelist_buffer_size
   use EcoSIMHistMod  , only : DATAC
   use EcoSIMCtrlMod
   use HistFileMod
-  use RestartMod     , only : rest_frq,rest_opt
   implicit none
   character(len=*), parameter :: mod_filename = __FILE__
   character(len=ecosim_namelist_buffer_size), intent(in) :: nml_buffer
@@ -135,7 +134,7 @@ contains
     do_instequil,salt_model, pft_file_in,grid_file_in,pft_mgmt_in, clm_factor_in,&
     clm_file_in,soil_mgmt_in,forc_periods,&
     NPXS,NPYS,JOUTS,continue_run,visual_out,restart_out,&
-    finidat,nrevsn,brnch_retain_casename,plant_model,micb_model,&
+    finidat,restartFileFullPath,brnch_retain_casename,plant_model,micb_model,&
     soichem_model,atm_ghg_in,aco2_ppm,ao2_ppm,an2_ppm,an2_ppm,ach4_ppm,anh3_ppm
   
   namelist /ecosim/hist_nhtfrq,hist_mfilt,hist_fincl1,hist_fincl2,hist_yrclose, &
@@ -165,7 +164,7 @@ contains
   ref_date  = '18000101000000'   !place holder for future
   start_date= '18000101000000'   !start date of the simulation, differ from the forcing date
   finidat=' '
-  nrevsn = ' '
+  restartFileFullPath = ' '                   !contains the full pathname of the restart file
 
   brnch_retain_casename=.false.
   hist_yrclose=.false.
