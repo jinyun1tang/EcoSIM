@@ -536,7 +536,7 @@ implicit none
   real(r8) :: THFLXC    !total canopy heat flux, [MJ  d-2]
   real(r8) :: UVOLO     !total subsurface water flux, [m3 d-2]
   real(r8) :: VPA       !vapor concentration, [m3 m-3]
-  real(r8) :: TKA       !air temperature, [K]
+  real(r8) :: TairK       !air temperature, [K]
   real(r8) :: TVOLWP    !total canopy water content, [m3 d-2]
   real(r8) :: TLE       !ecosystem latent heat flux, [MJ d-2 h-1]
   real(r8) :: TLEC      !total latent heat flux x boundary layer resistance, [MJ m-1]

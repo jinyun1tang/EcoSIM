@@ -712,7 +712,7 @@ implicit none
   plt_rad%SSINN=SSINN(NY,NX)
   plt_rad%SSIN=SSIN(NY,NX)
   plt_ew%TKW=TKW(1,NY,NX)
-  plt_ew%TKA=TKA(NY,NX)
+  plt_ew%TairK=TairK(NY,NX)
   plt_rad%THRMGX=THRMGX(NY,NX)
   plt_rad%THS=THS(NY,NX)
   plt_ew%VPA=VPA(NY,NX)
@@ -1504,7 +1504,7 @@ implicit none
   plt_site%ZEROS =ZEROS(NY,NX)
   plt_site%ZERO  =ZERO
   plt_ew%DPTHS   =DPTHS(NY,NX)
-  plt_ew%TKA     =TKA(NY,NX)
+  plt_ew%TairK     =TairK(NY,NX)
   plt_morph%GridMaxCanopyHeight   =GridMaxCanopyHeight(NY,NX)
   plt_site%Z0=Z0(NY,NX)
   plt_ew%ZD=ZD(NY,NX)

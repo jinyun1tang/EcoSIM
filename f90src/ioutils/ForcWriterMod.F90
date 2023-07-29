@@ -257,7 +257,7 @@ implicit none
     call ncd_putvar(ncf,'BKVL',BKVL(L,NY,NX))
     call ncd_putvar(ncf,'POROS',POROS(L,NY,NX))
     call ncd_putvar(ncf,'FC',FC(L,NY,NX))
-    call ncd_putvar(ncf,'ATKA',ATKA(NY,NX))
+    call ncd_putvar(ncf,'ATKA',TairKClimMean(NY,NX))
     call ncd_putvar(ncf,'WP',WP(L,NY,NX))
     call ncd_putvar(ncf,'SRP',SRP(L,NY,NX))
     call ncd_putvar(ncf,'EHUM',EHUM(L,NY,NX))

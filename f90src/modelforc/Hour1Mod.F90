@@ -122,14 +122,14 @@ module Hour1Mod
   DO  NX=NHW,NHE
     DO  NY=NVN,NVS
       tPBOT=PBOT(NY,NX)/1.01325E+02_r8
-      CCO2EI(NY,NX)=CO2EI(NY,NX)*5.36E-04_r8*Tref/ATKA(NY,NX)*tPBOT
-      AtmGgms(idg_CO2,NY,NX)=CO2E(NY,NX)*5.36E-04_r8*Tref/ATKA(NY,NX)*tPBOT
-      AtmGgms(idg_CH4,NY,NX)=CH4E(NY,NX)*5.36E-04_r8*Tref/ATKA(NY,NX)*tPBOT
-      AtmGgms(idg_O2,NY,NX)=OXYE(NY,NX)*1.43E-03_r8*Tref/ATKA(NY,NX)*tPBOT
-      AtmGgms(idg_N2,NY,NX)=Z2GE(NY,NX)*1.25E-03_r8*Tref/ATKA(NY,NX)*tPBOT
-      AtmGgms(idg_N2O,NY,NX)=Z2OE(NY,NX)*1.25E-03_r8*Tref/ATKA(NY,NX)*tPBOT
-      AtmGgms(idg_NH3,NY,NX)=ZNH3E(NY,NX)*6.25E-04_r8*Tref/ATKA(NY,NX)*tPBOT
-      AtmGgms(idg_H2,NY,NX)=H2GE(NY,NX)*8.92E-05_r8*Tref/ATKA(NY,NX)*tPBOT
+      CCO2EI(NY,NX)=CO2EI(NY,NX)*5.36E-04_r8*Tref/TairKClimMean(NY,NX)*tPBOT
+      AtmGgms(idg_CO2,NY,NX)=CO2E(NY,NX)*5.36E-04_r8*Tref/TairKClimMean(NY,NX)*tPBOT
+      AtmGgms(idg_CH4,NY,NX)=CH4E(NY,NX)*5.36E-04_r8*Tref/TairKClimMean(NY,NX)*tPBOT
+      AtmGgms(idg_O2,NY,NX)=OXYE(NY,NX)*1.43E-03_r8*Tref/TairKClimMean(NY,NX)*tPBOT
+      AtmGgms(idg_N2,NY,NX)=Z2GE(NY,NX)*1.25E-03_r8*Tref/TairKClimMean(NY,NX)*tPBOT
+      AtmGgms(idg_N2O,NY,NX)=Z2OE(NY,NX)*1.25E-03_r8*Tref/TairKClimMean(NY,NX)*tPBOT
+      AtmGgms(idg_NH3,NY,NX)=ZNH3E(NY,NX)*6.25E-04_r8*Tref/TairKClimMean(NY,NX)*tPBOT
+      AtmGgms(idg_H2,NY,NX)=H2GE(NY,NX)*8.92E-05_r8*Tref/TairKClimMean(NY,NX)*tPBOT
 
       IF(J.EQ.1)THEN
         IFLGT(NY,NX)=0
@@ -294,14 +294,14 @@ module Hour1Mod
   DO NX=NHW,NHE
     DO NY=NVN,NVS
 
-      AtmGgms(idg_CO2,NY,NX)=CO2E(NY,NX)*5.36E-04_r8*TREF/TKA(NY,NX)  !gC/m3
-      AtmGgms(idg_CH4,NY,NX)=CH4E(NY,NX)*5.36E-04_r8*TREF/TKA(NY,NX)  !gC/m3
-      AtmGgms(idg_O2 ,NY,NX)=OXYE(NY,NX)*1.43E-03_r8*TREF/TKA(NY,NX)  !gO/m3
-      AtmGgms(idg_N2 ,NY,NX)=Z2GE(NY,NX)*1.25E-03_r8*TREF/TKA(NY,NX)  !gN/m3
-      AtmGgms(idg_N2O,NY,NX)=Z2OE(NY,NX)*1.25E-03_r8*TREF/TKA(NY,NX)  !gN/m3
-      AtmGgms(idg_NH3,NY,NX)=ZNH3E(NY,NX)*6.25E-04_r8*TREF/TKA(NY,NX) !gN/m3
-      AtmGgms(idg_H2 ,NY,NX)=H2GE(NY,NX)*8.92E-05_r8*TREF/TKA(NY,NX)  !gH/m3
-      AtmGgms(idg_NH3B,NY,NX)=ZNH3E(NY,NX)*6.25E-04_r8*TREF/TKA(NY,NX) !gN/m3
+      AtmGgms(idg_CO2,NY,NX)=CO2E(NY,NX)*5.36E-04_r8*TREF/TairK(NY,NX)  !gC/m3
+      AtmGgms(idg_CH4,NY,NX)=CH4E(NY,NX)*5.36E-04_r8*TREF/TairK(NY,NX)  !gC/m3
+      AtmGgms(idg_O2 ,NY,NX)=OXYE(NY,NX)*1.43E-03_r8*TREF/TairK(NY,NX)  !gO/m3
+      AtmGgms(idg_N2 ,NY,NX)=Z2GE(NY,NX)*1.25E-03_r8*TREF/TairK(NY,NX)  !gN/m3
+      AtmGgms(idg_N2O,NY,NX)=Z2OE(NY,NX)*1.25E-03_r8*TREF/TairK(NY,NX)  !gN/m3
+      AtmGgms(idg_NH3,NY,NX)=ZNH3E(NY,NX)*6.25E-04_r8*TREF/TairK(NY,NX) !gN/m3
+      AtmGgms(idg_H2 ,NY,NX)=H2GE(NY,NX)*8.92E-05_r8*TREF/TairK(NY,NX)  !gH/m3
+      AtmGgms(idg_NH3B,NY,NX)=ZNH3E(NY,NX)*6.25E-04_r8*TREF/TairK(NY,NX) !gN/m3
 
       CCOR(NY,NX)=AtmGgms(idg_CO2,NY,NX)*gas_solubility(idg_CO2,TCA(NY,NX)) &
          /(EXP(ACTCG(idg_CO2)*CSTRR(NY,NX)))
@@ -1125,7 +1125,7 @@ module Hour1Mod
 !
 !     WGSGA,WGSGR,WGSGW=vapor diffusivity in air,litter,snowpack
 !
-  TFACA=TEFGASDIF(TKA(NY,NX))
+  TFACA=TEFGASDIF(TairK(NY,NX))
   WGSGA(NY,NX)=WGSG*TFACA
   TFACR=TEFGASDIF(TKS(0,NY,NX))
   WGSGR(NY,NX)=WGSG*TFACR

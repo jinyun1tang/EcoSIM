@@ -67,7 +67,7 @@ implicit none
   IF(VHCPW(1,NY,NX).GT.VHCPWX(NY,NX))THEN
     TKW(1,NY,NX)=(ENGYW+THQS(NY,NX))/VHCPW(1,NY,NX)
   ELSE
-    TKW(1,NY,NX)=TKA(NY,NX)
+    TKW(1,NY,NX)=TairK(NY,NX)
   ENDIF
 !
 ! IF SNOWPACK DISAPPEARS
@@ -88,7 +88,7 @@ implicit none
 !     begin_execution
 !
   IF(VHCPW(1,NY,NX).GT.0.0_r8.AND.VHCPW(1,NY,NX).LE.VHCPWX(NY,NX) &
-    .AND.TKA(NY,NX).GT.TFICE)THEN
+    .AND.TairK(NY,NX).GT.TFICE)THEN
     ENGYS=TKW(1,NY,NX)*VHCPW(1,NY,NX)
     ENGY1=TKS(NUM(NY,NX),NY,NX)*VHCP(NUM(NY,NX),NY,NX)
     FLWS=VOLSSL(1,NY,NX)
@@ -121,7 +121,7 @@ implicit none
         TKS(NUM(NY,NX),NY,NX)=TKSX
       endif
     ELSE
-      TKS(NUM(NY,NX),NY,NX)=TKA(NY,NX)
+      TKS(NUM(NY,NX),NY,NX)=TairK(NY,NX)
     ENDIF
     ENGY2=VHCP(NUM(NY,NX),NY,NX)*TKS(NUM(NY,NX),NY,NX)
 
@@ -248,7 +248,7 @@ implicit none
       TKW(L,NY,NX)=(ENGYW+THFLWW(L,NY,NX)+XTHAWW(L,NY,NX))/VHCPW(L,NY,NX)
     ELSE
       IF(L.EQ.1)THEN
-        TKW(L,NY,NX)=TKA(NY,NX)
+        TKW(L,NY,NX)=TairK(NY,NX)
       ELSE
         TKW(L,NY,NX)=TKW(L-1,NY,NX)
       ENDIF
@@ -270,7 +270,7 @@ implicit none
     CDPTHS(L,NY,NX)=CDPTHS(L-1,NY,NX)
     VHCPW(L,NY,NX)=0.0_r8
     IF(L.EQ.1)THEN
-      TKW(L,NY,NX)=TKA(NY,NX)
+      TKW(L,NY,NX)=TairK(NY,NX)
     ELSE
       TKW(L,NY,NX)=TKW(L-1,NY,NX)
     ENDIF

@@ -57,7 +57,7 @@ implicit none
   real(r8),target,allocatable ::  TDCN4(:,:,:)                       !accumulated change  for NH4 in precipitation, [-]
   real(r8),target,allocatable ::  TDCNO(:,:,:)                       !accumulated change  for NO3 in precipitation, [-]
   real(r8),target,allocatable ::  TCA(:,:)                           !air temperature, [oC]
-  real(r8),target,allocatable ::  TKA(:,:)                           !air temperature, [K]
+  real(r8),target,allocatable ::  TairK(:,:)                           !air temperature, [K]
   real(r8),target,allocatable ::  UA(:,:)                            !wind speed, [m h-1]
   real(r8),target,allocatable ::  VPA(:,:)                           !vapor concentration, [m3 m-3]
   real(r8),target,allocatable ::  VPK(:,:)                           !vapor pressure, [kPa]
@@ -109,7 +109,7 @@ implicit none
   real(r8),target,allocatable ::  RAP(:,:)                           !PAR radiation in solar beam, [umol m-2 s-1]
   real(r8),target,allocatable ::  ATCA(:,:)                          !mean annual air temperature, [oC]
   real(r8),target,allocatable ::  ATCS(:,:)                          !mean annual soil temperature, [oC]
-  real(r8),target,allocatable ::  ATKA(:,:)                          !mean annual air temperature, [K]
+  real(r8),target,allocatable ::  TairKClimMean(:,:)                 !mean annual air temperature, [K]
   real(r8),target,allocatable ::  ATKS(:,:)                          !mean annual soil temperature, [K]
   real(r8),target,allocatable ::  PRECR(:,:)                         !rainfall, [m3 d-2 h-1]
   real(r8),target,allocatable ::  PRECW(:,:)                         !snowfall, [m3 d-2 h-1]
@@ -187,7 +187,7 @@ implicit none
   allocate(TDCN4(12,JY,JX));    TDCN4=0._r8
   allocate(TDCNO(12,JY,JX));    TDCNO=0._r8
   allocate(TCA(JY,JX));         TCA=0._r8
-  allocate(TKA(JY,JX));         TKA=0._r8
+  allocate(TairK(JY,JX));         TairK=0._r8
   allocate(UA(JY,JX));          UA=0._r8
   allocate(VPA(JY,JX));         VPA=0._r8
   allocate(VPK(JY,JX));         VPK=0._r8
@@ -240,7 +240,7 @@ implicit none
   allocate(RAP(JY,JX));         RAP=0._r8
   allocate(ATCA(JY,JX));        ATCA=0._r8
   allocate(ATCS(JY,JX));        ATCS=0._r8
-  allocate(ATKA(JY,JX));        ATKA=0._r8
+  allocate(TairKClimMean(JY,JX));        TairKClimMean=0._r8
   allocate(ATKS(JY,JX));        ATKS=0._r8
   allocate(PRECR(JY,JX));       PRECR=0._r8
   allocate(PRECW(JY,JX));       PRECW=0._r8
@@ -318,7 +318,7 @@ implicit none
   call destroy(TDCN4)
   call destroy(TDCNO)
   call destroy(TCA)
-  call destroy(TKA)
+  call destroy(TairK)
   call destroy(UA)
   call destroy(VPA)
   call destroy(VPK)
@@ -371,7 +371,7 @@ implicit none
   call destroy(RAP)
   call destroy(ATCA)
   call destroy(ATCS)
-  call destroy(ATKA)
+  call destroy(TairKClimMean)
   call destroy(ATKS)
   call destroy(PRECR)
   call destroy(PRECW)

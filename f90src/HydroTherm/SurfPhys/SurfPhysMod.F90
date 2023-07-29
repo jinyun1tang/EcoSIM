@@ -213,7 +213,7 @@ contains
   !TKQ=temperature in canopy air, Kelvin
 
   VPQ(NY,NX)=VPA(NY,NX)-TLEX(NY,NX)/(VAP*AREA(3,NUM(NY,NX),NY,NX))
-  TKQ(NY,NX)=TKA(NY,NX)-TSHX(NY,NX)/(SensHeatCondctance*AREA(3,NUM(NY,NX),NY,NX))
+  TKQ(NY,NX)=TairK(NY,NX)-TSHX(NY,NX)/(SensHeatCondctance*AREA(3,NUM(NY,NX),NY,NX))
   end subroutine SetCanopyProperty
 !------------------------------------------------------------------------------------------
 
@@ -276,7 +276,7 @@ contains
 !     ZT,ZS=canopy, surface roughness heights
 !     UA,UAG=windspeeds above,below canopy
 !     VPQ,VPA=vapor pressure within,above canopy
-!     TKQ,TKA=temperature within,above canopy
+!     TKQ,TairK=temperature within,above canopy
 !     TLEX,TSHX=net latent,sensible heat fluxes x blrs from prev hour
 !     VAP=latent heat of evaporation
 !     1.25E-03=heat capacity of air
@@ -508,7 +508,7 @@ contains
       VFLXR=VFLXR+VFLXR2
       SFLXR=SFLXR+SFLXR2
       HFLXR=HFLXR+HFLXR2
-      ! write(*,*)'.........HFLXR',HFLXR,HFLXR2,TKQ(NY,NX),TKA(NY,NX),TKR1
+      ! write(*,*)'.........HFLXR',HFLXR,HFLXR2,TKQ(NY,NX),TairK(NY,NX),TKR1
       ! write(*,*)'HFLX02+VFLXR2,NN',HFLX02,VFLXR2,NN
       ! write(*,*)'RFLXR2+EFLXR2+SFLXR2',RFLXR2,EFLXR2,SFLXR2
       ! write(*,*)'PARS*(TKQ(NY,NX)-TKR1)',PARS,TKQ(NY,NX),TKR1
@@ -856,6 +856,7 @@ contains
 ! begin_execution
 
   !solve if there is significant snow layer 
+  
   IF(VHCPWM(M,1,NY,NX).GT.VHCPWX(NY,NX))THEN
 !   VHCPW,VHCPWX=current, minimum snowpack heat capacities
     call SolveSnowpack(M,NY,NX,EFLXW,RFLXW,VFLXW,SFLXW,HFLXW,&
@@ -1357,7 +1358,7 @@ contains
   IF(BKDS(NUM(NY,NX),NY,NX).GT.ZERO)THEN
     FLQRS=AZMAX1(FLQ1(NY,NX)-VOLP1(NUM(NY,NX),NY,NX))
     FLQRH=AZMAX1(FLH1(NY,NX)-VOLPH1(NUM(NY,NX),NY,NX))
-    HFLQR1=cpw*TKA(NY,NX)*(FLQRS+FLQRH)
+    HFLQR1=cpw*TairK(NY,NX)*(FLQRS+FLQRH)
     FLYM=FLY1(NY,NX)+FLQRS+FLQRH
     HWFLYM=HWFLY1(NY,NX)+HFLQR1
     FLQM=FLQ1(NY,NX)-FLQRS
@@ -1580,24 +1581,24 @@ contains
   ! there is precipitation
     FLWQW=(PRECA(NY,NX)-TFLWC(NY,NX))*FSNW(NY,NX)
     FLWSW=PRECW(NY,NX)                                !snowfall
-    HFLWSW=cps*TKA(NY,NX)*FLWSW+cpw*TKA(NY,NX)*FLWQW  !incoming heat flux from precipitations to snow-covered surface
+    HFLWSW=cps*TairK(NY,NX)*FLWSW+cpw*TairK(NY,NX)*FLWQW  !incoming heat flux from precipitations to snow-covered surface
     FLWQB=(PRECA(NY,NX)-TFLWC(NY,NX))*FSNX(NY,NX)     !incoming precipitation to snow-free surface
     FLWQBX=FLWQB*CVRD(NY,NX)                          !water flux to snow-free coverd by litter
-    HFLWQB=cpw*TKA(NY,NX)*FLWQBX                      !heat flux to snow-free surface covered by litter
+    HFLWQB=cpw*TairK(NY,NX)*FLWQBX                      !heat flux to snow-free surface covered by litter
     FLWQAX=FLWQB*BARE(NY,NX)                          !heat flux to snow-free surface not covered by litter
-    HFLWQA=cpw*TKA(NY,NX)*FLWQAX
+    HFLWQA=cpw*TairK(NY,NX)*FLWQAX
     FLWQAS=FLWQAX*FGRD(NUM(NY,NX),NY,NX)              !water flux to micropore
     FLWQAH=FLWQAX*FMAC(NUM(NY,NX),NY,NX)              !water flux to macropore
   ELSE
   ! no precipitation
     FLWQW=-TFLWC(NY,NX)*FSNW(NY,NX)                   !
     FLWSW=0.0_r8
-    HFLWSW=cpw*TKA(NY,NX)*FLWQW
+    HFLWSW=cpw*TairK(NY,NX)*FLWQW
     FLWQB=-TFLWC(NY,NX)*FSNX(NY,NX)
     FLWQBX=FLWQB*CVRD(NY,NX)
-    HFLWQB=cpw*TKA(NY,NX)*FLWQBX
+    HFLWQB=cpw*TairK(NY,NX)*FLWQBX
     FLWQAX=FLWQB*BARE(NY,NX)
-    HFLWQA=cpw*TKA(NY,NX)*FLWQAX
+    HFLWQA=cpw*TairK(NY,NX)*FLWQAX
     FLWQAS=FLWQAX*FGRD(NUM(NY,NX),NY,NX)
     FLWQAH=FLWQAX*FMAC(NUM(NY,NX),NY,NX)
   ENDIF
@@ -1792,7 +1793,6 @@ contains
 
   D9895: DO  NX=NHW,NHE
     D9890: DO  NY=NVN,NVS
-
       call SurfaceEnergyModel(M,NX,NY,RAR1,FKSAT(NY,NX),HeatFlux2Ground(NY,NX),TopLayerWaterVolume)
       
     ! CAPILLARY EXCHANGE OF WATER BETWEEN SOIL SURFACE AND RESIDUE

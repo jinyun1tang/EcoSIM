@@ -36,7 +36,7 @@ implicit none
     AREA(3,0,NY,NX)=a_AREA3(NY)
     AREA(3,NU(NY,NX),NY,NX)=a_AREA3(NY)
     ASP(NY,NX)=a_ASP(NY)
-    ATKA(NY,NX)=a_ATKA(NY)
+    TairKClimMean(NY,NX)=a_ATKA(NY)
     CO2E(NY,NX)=atm_co2 
     CH4E(NY,NX)=atm_ch4
     OXYE(NY,NX)=atm_o2

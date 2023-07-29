@@ -280,7 +280,7 @@ module WatsubMod
         !LWDPTH=layer number where irrigation is applied
         IF(L.EQ.LWDPTH)THEN
           FLU(L,NY,NX)=PRECU(NY,NX)
-          HWFLU(L,NY,NX)=cpw*TKA(NY,NX)*PRECU(NY,NX)
+          HWFLU(L,NY,NX)=cpw*TairK(NY,NX)*PRECU(NY,NX)
           FLU1(L,NY,NX)=FLU(L,NY,NX)*XNPH
           HWFLU1(L,NY,NX)=HWFLU(L,NY,NX)*XNPH
         ELSE
@@ -1129,7 +1129,7 @@ module WatsubMod
               TK1(L,NY,NX)=tk1l
             endif
           ELSEIF(L.EQ.1)THEN
-            TK1(L,NY,NX)=TKA(NY,NX)
+            TK1(L,NY,NX)=TairK(NY,NX)
           ELSE
             TK1(L,NY,NX)=TK1(L-1,NY,NX)
           ENDIF

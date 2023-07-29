@@ -337,7 +337,7 @@ module RedistMod
   VHCPZ=VHCP(0,NY,NX)             !old heat capacity
   VHCPY=cpw*VOLW(0,NY,NX)+cpi*VOLI(0,NY,NX)+cpo*ORGC(0,NY,NX) !new heat capacity
   VHCPO=VHCPY-VHCPZ               !change in heat capacity
-  HFLXO=VHCPO*TKA(NY,NX)          !tka: air temperature in kelvin, hflxo represents incoming heat
+  HFLXO=VHCPO*TairK(NY,NX)          !TairK: air temperature in kelvin, hflxo represents incoming heat
   !update water and ice content in residue
   VOLW(0,NY,NX)=max(VOLW(0,NY,NX)+FLWR(NY,NX)+THAWR(NY,NX)+TQR(NY,NX),0._r8)
   VOLI(0,NY,NX)=max(VOLI(0,NY,NX)-THAWR(NY,NX)/DENSI,0._r8)
@@ -382,12 +382,12 @@ module RedistMod
   !
   !     SURFACE BOUNDARY HEAT FLUXES
   !
-  HEATIN=HEATIN+cpw*TKA(NY,NX)*PRECA(NY,NX)+cps*TKA(NY,NX)*PRECW(NY,NX)
+  HEATIN=HEATIN+cpw*TairK(NY,NX)*PRECA(NY,NX)+cps*TairK(NY,NX)*PRECW(NY,NX)
   HEATIN=HEATIN+HEATH(NY,NX)+THFLXC(NY,NX)
   D5150: DO L=1,JS
     HEATIN=HEATIN+XTHAWW(L,NY,NX)
   ENDDO D5150
-  HEATOU=HEATOU-cpw*TKA(NY,NX)*PRECU(NY,NX)
+  HEATOU=HEATOU-cpw*TairK(NY,NX)*PRECU(NY,NX)
 !
 ! SURFACE BOUNDARY CO2, CH4 AND DOC FLUXES
 ! XCODFS: surface - atmosphere CO2 dissolution (+ve) - volatilization (-ve)
@@ -1697,7 +1697,7 @@ module RedistMod
       OSP(M,K,0,NY,NX)=OSP(M,K,0,NY,NX)+ESNT(ielmp,M,K,0,NY,NX)
       ORGC(0,NY,NX)=ORGC(0,NY,NX)+ESNT(ielmc,M,K,0,NY,NX)
       RAINR=ESNT(ielmc,M,K,0,NY,NX)*THETCX(K)
-      HRAINR=RAINR*cpw*TKA(NY,NX)
+      HRAINR=RAINR*cpw*TairK(NY,NX)
       FLWR(NY,NX)=FLWR(NY,NX)+RAINR
       HFLWR(NY,NX)=HFLWR(NY,NX)+HRAINR
 

@@ -389,7 +389,7 @@ module ExtractsMod
     TEVAPP=> plt_ew%TEVAPP   , &
     THFLXC=> plt_ew%THFLXC   , &
     THRMC => plt_ew%THRMC    , &
-    TKA   => plt_ew%TKA      , &
+    TairK   => plt_ew%TairK      , &
     HFLXC => plt_ew%HFLXC    , &
     TLE   => plt_ew%TLE      , &
     TVOLWC=> plt_ew%TVOLWC   , &
@@ -447,7 +447,7 @@ module ExtractsMod
   TEVAPC=TEVAPC+EVAPC(NZ)
   ENGYC=cpw*(VOLWC(NZ)+FLWC(NZ)+EVAPC(NZ))*TKC(NZ)
   TENGYC=TENGYC+ENGYC
-  THFLXC=THFLXC+ENGYC-ENGYX(NZ)-(FLWC(NZ)*cpw*TKA)
+  THFLXC=THFLXC+ENGYC-ENGYX(NZ)-(FLWC(NZ)*cpw*TairK)
   ENGYX(NZ)=ENGYC
   THRMC=THRMC+THRM1(NZ)
   ARLFC=ARLFC+ARLFP(NZ)

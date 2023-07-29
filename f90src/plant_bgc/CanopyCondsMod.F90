@@ -57,7 +57,7 @@ module CanopyCondsMod
     ZD      => plt_ew%ZD        , &
     ZR      => plt_ew%ZR        , &
     RIB     => plt_ew%RIB       , &
-    TKA     => plt_ew%TKA       , &
+    TairK     => plt_ew%TairK       , &
     VHCPWX  => plt_ew%VHCPWX    , &
     DPTHS   => plt_ew%DPTHS     , &
     VHCPW1  => plt_ew%VHCPW1    , &
@@ -103,7 +103,7 @@ module CanopyCondsMod
 !     RIB=canopy isothermal Richardson number
 !
     RAB=AMAX1(RAM,(LOG((ZZ-ZD)/ZR))**2._r8/(0.168_r8*UA))
-    RIB=1.27E+08_r8*(ZZ-ZR)/(UA**2*TKA)
+    RIB=1.27E+08_r8*(ZZ-ZR)/(UA**2*TairK)
   ELSE
     RAB=RAM
     RIB=0.0_r8
