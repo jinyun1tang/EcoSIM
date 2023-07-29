@@ -879,11 +879,11 @@ module WatsubMod
         !     TK1=lower boundary soil temperature
         !     TKSD=deep source/sink temperature from geothermal flux
         !     TCNDG=thermal conductivity below lower boundary
-        !     DPTHSK,CDPTH=depth of thermal sink/source, lower boundary
+        !     SoilHeatSrcDepth,CDPTH=depth of thermal sink/source, lower boundary
         !     IETYP=Koppen climate zone
               IF(N.EQ.ivertdir.AND.IETYP(N2,N1).NE.-2)THEN
                 HFLWL(N,M6,M5,M4)=HFLWL(N,M6,M5,M4)+(TK1(N3,N2,N1) &
-                  -TKSD(N2,N1))*TCNDG/(DPTHSK(N2,N1)-CumDepth2LayerBottom(N3,N2,N1)) &
+                  -TKSD(N2,N1))*TCNDG/(SoilHeatSrcDepth(N2,N1)-CumDepth2LayerBottom(N3,N2,N1)) &
                   *AREA(N,N3,N2,N1)*XNPH
               ENDIF
               FLW(N,M6,M5,M4)=FLW(N,M6,M5,M4)+FLWL(N,M6,M5,M4)

@@ -50,27 +50,27 @@ contains
 
   real(r8) :: DLYRSI
   real(r8) :: VOLSWI
-  real(r8), parameter :: CDPTHSI(JS)=(/0.05_r8,0.15_r8,0.30_r8,0.60_r8,1.00_r8/)
+  real(r8), parameter :: cumSnowDepthI(JS)=(/0.05_r8,0.15_r8,0.30_r8,0.60_r8,1.00_r8/)
   !the maximum snow layer is 1.0 m.
   integer :: L
 ! begin_execution
 !
-! CDPTHS=depth to bottom
+! cumSnowDepth=depth to bottom
 ! DENSI=ice density, 0.92 Mg m-3
 ! DENS0=snow density (Mg m-3)
 ! VOLSS,VOLWS,VOLIS,VOLS=snow,water,ice,total snowpack volume(m3)
 
-! CDPTHSI=depth to bottom of snowpack layers (m), i.e. from current layere to surface
+! cumSnowDepthI=depth to bottom of snowpack layers (m), i.e. from current layere to surface
 ! DLYRS=snowpack layer thickness (m)
 ! VOLSSL,VOLWSL,VOLISL,VOLSL=snow,water,ice,total layer volume(m3), water equivalent snow 
 ! DENSS=layer density (Mg m-3)
 ! TKW,TCW=later temperature K,oC
 ! VHCPW=layer volumetric heat capacity (MJ m-3 K-1)
-! DPTHS=total snow height in the column
+! SnowDepth=total snow height in the column
 
-  CDPTHS(0,NY,NX)=0.0_r8
+  cumSnowDepth(0,NY,NX)=0.0_r8
   DENS0(NY,NX)=0.10_r8
-  VOLSS(NY,NX)=DPTHS(NY,NX)*DENS0(NY,NX)*DH(NY,NX)*DV(NY,NX)
+  VOLSS(NY,NX)=SnowDepth(NY,NX)*DENS0(NY,NX)*DH(NY,NX)*DV(NY,NX)
   VOLWS(NY,NX)=0.0_r8
   VOLIS(NY,NX)=0.0_r8
   VOLS(NY,NX)=VOLSS(NY,NX)/DENS0(NY,NX)+VOLWS(NY,NX)+VOLIS(NY,NX)
@@ -81,11 +81,11 @@ contains
   D9580: DO L=1,JS
     IF(L.EQ.1)THEN
       !bottom snow layer
-      DLYRSI=CDPTHSI(L)
-      DLYRS(L,NY,NX)=AMIN1(DLYRSI,DPTHS(NY,NX))
+      DLYRSI=cumSnowDepthI(L)
+      DLYRS(L,NY,NX)=AMIN1(DLYRSI,SnowDepth(NY,NX))
     ELSE
-      DLYRSI=CDPTHSI(L)-CDPTHSI(L-1)
-      DLYRS(L,NY,NX)=AMIN1(DLYRSI,AZMAX1(DPTHS(NY,NX)-CDPTHSI(L-1)))
+      DLYRSI=cumSnowDepthI(L)-cumSnowDepthI(L-1)
+      DLYRS(L,NY,NX)=AMIN1(DLYRSI,AZMAX1(SnowDepth(NY,NX)-cumSnowDepthI(L-1)))
     ENDIF
     VOLSSL(L,NY,NX)=DLYRS(L,NY,NX)*DENS0(NY,NX)*DH(NY,NX)*DV(NY,NX)
     VOLWSL(L,NY,NX)=0.0_r8
@@ -102,7 +102,7 @@ contains
     DENSS(L,NY,NX)=DENS0(NY,NX)
     VOLSL(L,NY,NX)=VOLSSL(L,NY,NX)/DENSS(L,NY,NX)+VOLWSL(L,NY,NX)+VOLISL(L,NY,NX)
     VOLSI(L,NY,NX)=DLYRSI*DH(NY,NX)*DV(NY,NX)      !it is a non-zero number, potential/maximum volume
-    CDPTHS(L,NY,NX)=CDPTHS(L-1,NY,NX)+DLYRS(L,NY,NX)
+    cumSnowDepth(L,NY,NX)=cumSnowDepth(L-1,NY,NX)+DLYRS(L,NY,NX)
     TKW(L,NY,NX)=AMIN1(Tref,TairKClimMean(NY,NX))
     TCW(L,NY,NX)=AZMIN1(ATCA(NY,NX))
     VHCPW(L,NY,NX)=cps*VOLSSL(L,NY,NX)+cpw*VOLWSL(L,NY,NX)+cpi*VOLISL(L,NY,NX)
@@ -832,7 +832,7 @@ contains
 !     QS1,QW1,QI1=snow,water,ice transfer
 !     HQS1=convective heat transfer from snow,water,ice transfer
 !     VOLS0,VOLW0,VOLI0=snow,water,ice volume
-!     DPTHSX=minimum snowpack depth for full cover
+!     MinSnowDepth=minimum snowpack depth for full cover
 !     QS,QW,QI=hourly-accumulated snow,water,ice transfer
 !     HQS=hourly-accumd convective heat from snow,water,ice transfer
 !     QSM=snow transfer for solute flux calculation
@@ -865,16 +865,16 @@ contains
 
       IF(NN.EQ.1)THEN
         !east or south
-        ALTS1=ALTG(N2,N1)+DPTHS(N2,N1)
-        ALTS2=ALTG(N5,N4)+DPTHS(N5,N4)
+        ALTS1=ALTG(N2,N1)+SnowDepth(N2,N1)
+        ALTS2=ALTG(N5,N4)+SnowDepth(N5,N4)
         SS=(ALTS1-ALTS2)/DIST(N,NU(N5,N4),N5,N4)
         QSX=SS/AMAX1(1.0_r8,DIST(N,NU(N5,N4),N5,N4))*XNPH
-        IF(SS.GT.0.0_r8.AND.DPTHS(N2,N1).GT.DPTHSX)THEN
+        IF(SS.GT.0.0_r8.AND.SnowDepth(N2,N1).GT.MinSnowDepth)THEN
           QS1(N,N5,N4)=QSX*VOLS0(1,N2,N1)
           QW1(N,N5,N4)=QSX*VOLW0(1,N2,N1)
           QI1(N,N5,N4)=QSX*VOLI0(1,N2,N1)
           HQS1(N,N5,N4)=TK0(1,N2,N1)*(cps*QS1(N,N5,N4)+cpw*QW1(N,N5,N4)+cpi*QI1(N,N5,N4))
-        ELSEIF(SS.LT.0.0_r8.AND.DPTHS(N5,N4).GT.DPTHSX)THEN
+        ELSEIF(SS.LT.0.0_r8.AND.SnowDepth(N5,N4).GT.MinSnowDepth)THEN
           QS1(N,N5,N4)=QSX*VOLS0(1,N5,N4)
           QW1(N,N5,N4)=QSX*VOLW0(1,N5,N4)
           QI1(N,N5,N4)=QSX*VOLI0(1,N5,N4)

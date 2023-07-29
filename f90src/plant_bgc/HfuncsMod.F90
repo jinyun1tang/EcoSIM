@@ -382,7 +382,7 @@ module HfuncsMod
     ARSTP  =>  plt_morph%ARSTP   , &
     NI     =>  plt_morph%NI        &
   )
-  plt_bgcr%RFGas_root(idg_beg:idg_end-1,NZ)=0.0_r8
+  plt_bgcr%RootGasLoss_disturb(idg_beg:idg_end-1,NZ)=0.0_r8
   EPOOLP(1:npelms,NZ)=0.0_r8
   NI(NZ)=NIX(NZ)
   NG(NZ)=MIN(NI(NZ),MAX(NG(NZ),NU))
@@ -738,7 +738,7 @@ module HfuncsMod
   associate(                        &
     IYR0    =>  plt_distb%IYR0    , &
     IDAY0   =>  plt_distb%IDAY0   , &
-    DPTHS   =>  plt_ew%DPTHS      , &
+    SnowDepth   =>  plt_ew%SnowDepth      , &
     PSILT   =>  plt_ew%PSILT      , &
     ZERO    =>  plt_site%ZERO     , &
     DYLN    =>  plt_site%DYLN     , &
@@ -875,7 +875,7 @@ module HfuncsMod
 ! DYLX,DLYN=daylength of previous,current day
 ! ISTYP=growth habit from PFT file
 ! IWTYP=phenology type from PFT file
-! ZC,DPTHS=canopy height,snowpack depth
+! ZC,SnowDepth=canopy height,snowpack depth
 !
   IF(IDAY(2,NB,NZ).EQ.0)THEN
     IF(PSTG(NB,NZ).GT.GROUP(NB,NZ)+PSTGI(NB,NZ) &
@@ -885,7 +885,7 @@ module HfuncsMod
       .OR.(((ISTYP(NZ).EQ.iplt_preanu.AND.(IWTYP(NZ).EQ.1 &
       .OR.IWTYP(NZ).EQ.3)) &
       .OR.(ISTYP(NZ).EQ.iplt_annual.AND.IWTYP(NZ).EQ.0)) &
-      .AND.CanopyHeight(NZ).GE.DPTHS-ZERO &
+      .AND.CanopyHeight(NZ).GE.SnowDepth-ZERO &
       .AND.DYLN.LT.DYLX))THEN
 !
 !     FINAL VEGETATIVE NODE NUMBER DEPENDS ON PHOTOPERIOD FROM 'DAY'
@@ -911,7 +911,7 @@ module HfuncsMod
         .OR.(((ISTYP(NZ).EQ.iplt_preanu.AND.(IWTYP(NZ).EQ.1 &
         .OR.IWTYP(NZ).EQ.3)) &
         .OR.(ISTYP(NZ).EQ.iplt_annual.AND.IWTYP(NZ).EQ.0)) &
-        .AND.CanopyHeight(NZ).GE.DPTHS-ZERO &
+        .AND.CanopyHeight(NZ).GE.SnowDepth-ZERO &
         .AND.DYLN.LT.DYLX))THEN
         IDAY(2,NB,NZ)=I
         PSTGI(NB,NZ)=PSTG(NB,NZ)

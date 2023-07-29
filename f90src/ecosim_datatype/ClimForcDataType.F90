@@ -102,7 +102,7 @@ implicit none
   real(r8),target,allocatable ::  TSHX(:,:)                          !total sensible heat flux x boundary layer resistance, [MJ m-1]
   real(r8),target,allocatable ::  TLEC(:,:)                          !total latent heat flux x boundary layer resistance, [MJ m-1]
   real(r8),target,allocatable ::  TSHC(:,:)                          !total sensible heat flux x boundary layer resistance, [MJ m-1]
-  real(r8),target,allocatable ::  DPTHSK(:,:)                        !depth of soil heat sink/source, [m]
+  real(r8),target,allocatable ::  SoilHeatSrcDepth(:,:)                        !depth of soil heat sink/source, [m]
   real(r8),target,allocatable ::  TKSD(:,:)                          !temperature of soil heat sink/source, [oC]
   real(r8),target,allocatable ::  ATCAI(:,:)                         !initial mean annual air temperature, [oC]
   real(r8),target,allocatable ::  RAD(:,:)                           !shortwave radiation in solar beam, [MJ m-2 h-1]
@@ -233,7 +233,7 @@ implicit none
   allocate(TSHX(JY,JX));        TSHX=0._r8
   allocate(TLEC(JY,JX));        TLEC=0._r8
   allocate(TSHC(JY,JX));        TSHC=0._r8
-  allocate(DPTHSK(JY,JX));      DPTHSK=0._r8
+  allocate(SoilHeatSrcDepth(JY,JX));      SoilHeatSrcDepth=0._r8
   allocate(TKSD(JY,JX));        TKSD=0._r8
   allocate(ATCAI(JY,JX));       ATCAI=0._r8
   allocate(RAD(JY,JX));         RAD=0._r8
@@ -364,7 +364,7 @@ implicit none
   call destroy(TSHX)
   call destroy(TLEC)
   call destroy(TSHC)
-  call destroy(DPTHSK)
+  call destroy(SoilHeatSrcDepth)
   call destroy(TKSD)
   call destroy(ATCAI)
   call destroy(RAD)

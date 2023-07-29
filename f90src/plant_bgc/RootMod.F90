@@ -127,7 +127,7 @@ implicit none
     IGTYP    =>   plt_pheno%IGTYP     , &
     PSIRT    =>   plt_ew%PSIRT        , &
     PSIRG    =>   plt_ew%PSIRG        , &
-    RFGas_root    =>   plt_bgcr%RFGas_root    , &
+    RootGasLoss_disturb    =>   plt_bgcr%RootGasLoss_disturb    , &
     trcg_rootml     =>   plt_rbgc%trcg_rootml       , &
     trcs_rootml  => plt_rbgc%trcs_rootml, &
     RSCS     =>   plt_soilchem%RSCS   , &
@@ -299,7 +299,7 @@ implicit none
           RTARP(N,L,NZ)=0._r8
           RTLGA(N,L,NZ)=RTLGAX
           DO NTG=idg_beg,idg_end-1
-            RFGas_root(NTG,NZ)=RFGas_root(NTG,NZ)-(trcg_rootml(NTG,N,L,NZ)+trcs_rootml(NTG,N,L,NZ))
+            RootGasLoss_disturb(NTG,NZ)=RootGasLoss_disturb(NTG,NZ)-(trcg_rootml(NTG,N,L,NZ)+trcs_rootml(NTG,N,L,NZ))
           ENDDO
           trcg_rootml(idg_beg:idg_end-1,N,L,NZ)=0._r8
           trcs_rootml(idg_beg:idg_end-1,N,L,NZ)=0._r8
@@ -1349,7 +1349,7 @@ implicit none
     WTNDLE   =>  plt_biom%WTNDLE   , &
     ZEROP    =>  plt_biom%ZEROP    , &
     EPOOLN   =>  plt_biom%EPOOLN   , &
-    RFGas_root    =>  plt_bgcr%RFGas_root    , &
+    RootGasLoss_disturb    =>  plt_bgcr%RootGasLoss_disturb    , &
     CDPTHZ   =>  plt_site%CDPTHZ   , &
     ZEROS2   =>  plt_site%ZEROS2   , &
     DLYR3    =>  plt_site%DLYR3    , &
@@ -1426,7 +1426,7 @@ implicit none
 !     FRTN=fraction of primary root sink strength in axis
 !
         DO NTG=idg_beg,idg_end-1
-          RFGas_root(NTG,NZ)=RFGas_root(NTG,NZ)-FRTN &
+          RootGasLoss_disturb(NTG,NZ)=RootGasLoss_disturb(NTG,NZ)-FRTN &
             *(trcg_rootml(idg_CO2,NN,LL,NZ)+trcs_rootml(idg_CO2,NN,LL,NZ))
           trcg_rootml(NTG,NN,LL,NZ)=(1.0_r8-FRTN)*trcg_rootml(NTG,NN,LL,NZ)
           trcs_rootml(NTG,NN,LL,NZ)=(1.0_r8-FRTN)*trcs_rootml(NTG,NN,LL,NZ)

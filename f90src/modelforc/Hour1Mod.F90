@@ -750,7 +750,7 @@ module Hour1Mod
   THFLXC(NY,NX)=0.0_r8
   TENGYC(NY,NX)=0.0_r8
 
-  TRFGas_root(idg_beg:idg_end-1,NY,NX)=0.0_r8
+  TRootGasLoss_disturb(idg_beg:idg_end-1,NY,NX)=0.0_r8
   ZESNC(:,NY,NX)=0.0_r8
   WTSTGET(1:npelms,NY,NX)=0.0_r8
   PPT(NY,NX)=0.0_r8

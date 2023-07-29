@@ -1094,7 +1094,7 @@ module UptakesMod
     TKC    =>  plt_ew%TKC       , &
     TKS    =>  plt_ew%TKS       , &
     TairK    =>  plt_ew%TairK       , &
-    DPTHS  =>  plt_ew%DPTHS     , &
+    SnowDepth  =>  plt_ew%SnowDepth     , &
     DTKC   =>  plt_ew%DTKC      , &
     RAZ    =>  plt_ew%RAZ       , &
     VHCPC  =>  plt_ew%VHCPC     , &
@@ -1135,7 +1135,7 @@ module UptakesMod
   HFLXC(NZ)=0.0_r8
   EVAPC(NZ)=0.0_r8
   EP(NZ)=0.0_r8
-  IF(CanopyHeight(NZ).GE.DPTHS-ZERO)THEN
+  IF(CanopyHeight(NZ).GE.SnowDepth-ZERO)THEN
     TKC(NZ)=TairK
   ELSE
     TKC(NZ)=TKW

@@ -523,7 +523,7 @@ implicit none
   end type plant_biom_type
 
   type, public :: plant_ew_type
-  real(r8) :: DPTHS     !snowpack depth, [m]
+  real(r8) :: SnowDepth     !snowpack depth, [m]
   real(r8) :: VOLWS     !water volume in snowpack, [m3 d-2]
   real(r8) :: VOLSS     !snow volume in snowpack (water equivalent), [m3 d-2]
   real(r8) :: TSHC      !total sensible heat flux x boundary layer resistance, [MJ m-1]
@@ -678,7 +678,7 @@ implicit none
   real(r8), pointer :: CNET(:)       => null()  !canopy net CO2 exchange, [gC d-2 h-1]
   real(r8), pointer :: CARBN(:)      => null()  !total gross CO2 fixation, [gC d-2 ]
   real(r8), pointer :: HESNC(:,:)    => null()  !plant element litterfall, [g d-2 h-1]
-  real(r8), pointer :: RFGas_root(:,:)=> null() !gaseous flux fron root disturbance, [g d-2 h-1]
+  real(r8), pointer :: RootGasLoss_disturb(:,:)=> null() !gaseous flux fron root disturbance, [g d-2 h-1]
   real(r8), pointer :: TESN0(:,:)    => null()  !total surface litterfall element, [g d-2]
   real(r8), pointer :: TESNC(:,:)    => null()  !total plant element litterfall , [g d-2 ]
   real(r8), pointer :: TCO2T(:)      => null()  !total plant respiration, [gC d-2 ]
@@ -692,7 +692,7 @@ implicit none
   end type plant_bgcrate_type
 
   type, public :: plant_rootbgc_type
-  real(r8), pointer :: TRFGas_root(:)   => null()  !total root gas content [g d-2]
+  real(r8), pointer :: TRootGasLoss_disturb(:)   => null()  !total root gas content [g d-2]
   real(r8), pointer :: UPOME(:,:)       => null()  !total root uptake (+ve) - exudation (-ve) of dissolved element, [g d-2 h-1]
   real(r8), pointer :: UPNF(:)          => null()  !total root N2 fixation, [g d-2 h-1]
   real(r8), pointer :: UPNO3(:)         => null()  !total root uptake of NO3, [g d-2 h-1]
@@ -795,7 +795,7 @@ implicit none
 
   allocate(this%trcg_rootml(idg_beg:idg_end-1,2,JZ1,JP1));this%trcg_rootml=0._r8
   allocate(this%trcs_rootml(idg_beg:idg_end-1,2,JZ1,JP1));this%trcs_rootml=0._r8
-  allocate(this%TRFGas_root(idg_beg:idg_end-1));this%TRFGas_root=0._r8
+  allocate(this%TRootGasLoss_disturb(idg_beg:idg_end-1));this%TRootGasLoss_disturb=0._r8
   allocate(this%TUPNF(JZ1))
   allocate(this%ROXSK(60,0:JZ1))
   allocate(this%RDFOME(npelms,2,1:jcplx,0:JZ1,JP1))
@@ -1087,7 +1087,7 @@ implicit none
   allocate(this%XOQNS(1:jcplx,0:JZ1))
   allocate(this%XOQPS(1:jcplx,0:JZ1))
   allocate(this%CNET(JP1))
-  allocate(this%RFGas_root(idg_beg:idg_end-1,JP1))
+  allocate(this%RootGasLoss_disturb(idg_beg:idg_end-1,JP1))
   allocate(this%TCO2T(JP1))
   allocate(this%TZUPFX(JP1))
   allocate(this%TNH3C(JP1))

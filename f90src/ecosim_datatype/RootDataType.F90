@@ -68,7 +68,7 @@ module RootDataType
   real(r8),target,allocatable ::  PSIRG(:,:,:,:,:)                   !root turgor water potential , [Mpa]
   real(r8),target,allocatable ::  trcg_rootml(:,:,:,:,:,:)           !root gaseous tracer content [g d-2]
   real(r8),target,allocatable ::  trcs_rootml(:,:,:,:,:,:)           !root dissolved gaseous tracer content [g d-2]
-  real(r8),target,allocatable ::  TRFGas_root(:,:,:)                 !total root gas content, [g d-2]
+  real(r8),target,allocatable ::  TRootGasLoss_disturb(:,:,:)                 !total root gas content, [g d-2]
   real(r8),target,allocatable ::  WTRTA(:,:,:)                       !root C per plant, [g p-1]
   real(r8),target,allocatable ::  WTRTE(:,:,:,:)                     !plant root element, [g d-2]
   real(r8),target,allocatable ::  WTRTSE(:,:,:,:)                    !plant root structural element, [g d-2]
@@ -150,7 +150,7 @@ contains
   allocate(PSIRG(jroots,JZ,JP,JY,JX));PSIRG=0._r8
   allocate(trcg_rootml(idg_beg:idg_end-1,2,JZ,JP,JY,JX)); trcg_rootml =0._r8
   allocate(trcs_rootml(idg_beg:idg_end-1,2,JZ,JP,JY,JX)); trcs_rootml =0._r8
-  allocate(TRFGas_root(idg_beg:idg_end-1,JY,JX));TRFGas_root=0._r8
+  allocate(TRootGasLoss_disturb(idg_beg:idg_end-1,JY,JX));TRootGasLoss_disturb=0._r8
   allocate(WTRTA(JP,JY,JX));    WTRTA=0._r8
   allocate(WTRTE(npelms,JP,JY,JX)); WTRTE=0._r8
   allocate(WTRTSE(npelms,JP,JY,JX));   WTRTSE=0._r8
@@ -230,7 +230,7 @@ contains
   call destroy(PSIRG)
   call destroy(trcg_rootml)
   call destroy(trcs_rootml)
-  call destroy(TRFGas_root)
+  call destroy(TRootGasLoss_disturb)
   call destroy(WTRTA)
   call destroy(WTRTE)
   call destroy(WTRTSE)

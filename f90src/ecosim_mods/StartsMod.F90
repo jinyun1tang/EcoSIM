@@ -170,15 +170,15 @@ module StartsMod
 !
 !     SURFACE WATER STORAGE AND LOWER HEAT SINK
 
-!      DPTHSK=depth at which soil heat sink-source calculated
+!      SoilHeatSrcDepth=depth at which soil heat sink-source calculated
 !     TCNDG=assumed thermal conductivity below lower soil boundary
 !     (MJ m-1 K-1 h-1)
 !     TKSD=deep source/sink temperature from geothermal flux(K)
       
-      DPTHSK(NY,NX)=AMAX1(10.0_r8,CumDepth2LayerBottom(NL(NY,NX),NY,NX)+1.0_r8)
+      SoilHeatSrcDepth(NY,NX)=AMAX1(10.0_r8,CumDepth2LayerBottom(NL(NY,NX),NY,NX)+1.0_r8)
       TCS(0,NY,NX)=ATCS(NY,NX)
       TKS(0,NY,NX)=ATKS(NY,NX)
-      TKSD(NY,NX)=ATKS(NY,NX)+2.052E-04_r8*DPTHSK(NY,NX)/TCNDG
+      TKSD(NY,NX)=ATKS(NY,NX)+2.052E-04_r8*SoilHeatSrcDepth(NY,NX)/TCNDG
 !
 
     ENDDO
@@ -1067,15 +1067,15 @@ module StartsMod
 !
 !     SURFACE WATER STORAGE AND LOWER HEAT SINK
 
-!      DPTHSK=depth at which soil heat sink-source calculated
+!      SoilHeatSrcDepth=depth at which soil heat sink-source calculated
 !     TCNDG=assumed thermal conductivity below lower soil boundary
 !     (MJ m-1 K-1 h-1)
 !     TKSD=deep source/sink temperature from geothermal flux(K)
       
-      DPTHSK(NY,NX)=AMAX1(10.0_r8,CumDepth2LayerBottom(NL(NY,NX),NY,NX)+1.0_r8)
+      SoilHeatSrcDepth(NY,NX)=AMAX1(10.0_r8,CumDepth2LayerBottom(NL(NY,NX),NY,NX)+1.0_r8)
       TCS(0,NY,NX)=ATCS(NY,NX)
       TKS(0,NY,NX)=ATKS(NY,NX)
-      TKSD(NY,NX)=ATKS(NY,NX)+2.052E-04_r8*DPTHSK(NY,NX)/TCNDG
+      TKSD(NY,NX)=ATKS(NY,NX)+2.052E-04_r8*SoilHeatSrcDepth(NY,NX)/TCNDG
 !
 
     ENDDO

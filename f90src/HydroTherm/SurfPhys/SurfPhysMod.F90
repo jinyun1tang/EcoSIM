@@ -184,10 +184,10 @@ contains
 
 !     SNOW AND RESIDUE COVERAGE OF SOIL SURFACE
 !     FSNW,FSNX=fractions of snow,snow-free cover
-!     DPTHS=snowpack depth
-!     DPTHSX=minimum snowpack depth for full cover
+!     SnowDepth=snowpack depth
+!     MinSnowDepth=minimum snowpack depth for full cover
 !     BARE,CVRD=fractions of soil,litter cover
-  FSNW(NY,NX)=AMIN1(1.0_r8,SQRT((DPTHS(NY,NX)/DPTHSX)))
+  FSNW(NY,NX)=AMIN1(1.0_r8,SQRT((SnowDepth(NY,NX)/MinSnowDepth)))
   FSNX(NY,NX)=1.0_r8-FSNW(NY,NX)
   !if there is heat-wise significant litter layer
   IF(VHCP1(0,NY,NX).GT.VHCPRX(NY,NX))THEN

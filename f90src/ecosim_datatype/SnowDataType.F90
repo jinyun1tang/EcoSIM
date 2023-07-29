@@ -28,9 +28,9 @@ module SnowDataType
   real(r8),target, allocatable ::  XHFLWW(:,:,:)                      !hourly convective heat flux from water transfer
   real(r8),target, allocatable ::  XWFLXS(:,:,:)                      !hourly convective heat flux from snow transfer
   real(r8),target, allocatable ::  XWFLXI(:,:,:)                      !hourly convective heat flux from ice transfer
-  real(r8),target, allocatable ::  CDPTHS(:,:,:)                      !cumulative depth to bottom of snowpack layer
+  real(r8),target, allocatable ::  cumSnowDepth(:,:,:)                      !cumulative depth to bottom of snowpack layer
   real(r8),target, allocatable ::  VOLSI(:,:,:)                       !Initial snowpack volume, [m3 d-2]
-  real(r8),target, allocatable ::  DPTHS(:,:)                         !snowpack depth, [m]
+  real(r8),target, allocatable ::  SnowDepth(:,:)                         !snowpack depth, [m]
   real(r8),target, allocatable ::  VOLSS(:,:)                         !snow volume in snowpack (water equivalent), [m3 d-2]
   real(r8),target, allocatable ::  VOLWS(:,:)                         !water volume in snowpack, [m3 d-2]
   real(r8),target, allocatable ::  VOLIS(:,:)                         !ice volume in snowpack, [m3 d-2]
@@ -88,9 +88,9 @@ contains
   allocate(XHFLWW(JS,JY,JX));   XHFLWW=0._r8
   allocate(XWFLXS(JS,JY,JX));   XWFLXS=0._r8
   allocate(XWFLXI(JS,JY,JX));   XWFLXI=0._r8
-  allocate(CDPTHS(0:JS,JY,JX)); CDPTHS=0._r8
+  allocate(cumSnowDepth(0:JS,JY,JX)); cumSnowDepth=0._r8
   allocate(VOLSI(JS,JY,JX));    VOLSI=0._r8
-  allocate(DPTHS(JY,JX));       DPTHS=0._r8
+  allocate(SnowDepth(JY,JX));       SnowDepth=0._r8
   allocate(VOLSS(JY,JX));       VOLSS=0._r8
   allocate(VOLWS(JY,JX));       VOLWS=0._r8
   allocate(VOLIS(JY,JX));       VOLIS=0._r8
@@ -154,9 +154,9 @@ contains
   call destroy(XHFLWW)
   call destroy(XWFLXS)
   call destroy(XWFLXI)
-  call destroy(CDPTHS)
+  call destroy(cumSnowDepth)
   call destroy(VOLSI)
-  call destroy(DPTHS)
+  call destroy(SnowDepth)
   call destroy(VOLSS)
   call destroy(VOLWS)
   call destroy(VOLIS)

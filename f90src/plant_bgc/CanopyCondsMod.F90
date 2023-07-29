@@ -4,7 +4,7 @@ module CanopyCondsMod
   use EcoSimConst
   use EcoSIMConfig
   use PlantAPIData
-  use minimathmod, only : AZMAX1
+  use minimathmod, only : AZMAX1,isnan
   implicit none
   private
   CHARACTER(LEN=*), PARAMETER :: MOD_FILENAME=__FILE__
@@ -59,7 +59,7 @@ module CanopyCondsMod
     RIB     => plt_ew%RIB       , &
     TairK     => plt_ew%TairK       , &
     VHCPWX  => plt_ew%VHCPWX    , &
-    DPTHS   => plt_ew%DPTHS     , &
+    SnowDepth   => plt_ew%SnowDepth     , &
     VHCPW1  => plt_ew%VHCPW1    , &
     GridMaxCanopyHeight      => plt_morph%GridMaxCanopyHeight     , &
     IRTYP   => plt_morph%IRTYP  , &
@@ -69,12 +69,12 @@ module CanopyCondsMod
 !     CANOPY ZERO PLANE AND ROUGHNESS HEIGHTS
 !
 !     ARLFC,ARSTC=leaf,stalk area of combined canopy
-!     DPTHS,DPTH0=snowpack,surface water depths
+!     SnowDepth,DPTH0=snowpack,surface water depths
 !     ZT,ZD,ZR=canopy,zero plane displacement,roughness height
 !     ZZ=reference height for wind speed
 !
   ARLSC=ARLFC+ARSTC
-  IF(ARLSC.GT.ZEROS.AND.GridMaxCanopyHeight.GE.DPTHS-ZERO.AND.GridMaxCanopyHeight.GE.DPTH0-ZERO)THEN
+  IF(ARLSC.GT.ZEROS.AND.GridMaxCanopyHeight.GE.SnowDepth-ZERO.AND.GridMaxCanopyHeight.GE.DPTH0-ZERO)THEN
     ARLSG=ARLSC/AREA3(NU)
     ZX=EXP(-0.5_r8*ARLSG)
     ZY=1.0_r8-ZX
@@ -243,7 +243,7 @@ module CanopyCondsMod
   !
   !     ARLFS,ARLSS=leaf+stalk area of combined,each PFT canopy
   !     ZL=height to bottom of canopy layer
-  !     DPTHS,DPTH0=snowpack,surface water depths
+  !     SnowDepth,DPTH0=snowpack,surface water depths
   !     ARLFL,ARSTK=leaf,stalk areas of PFT
   !     RAD,RAP=vertical direct+diffuse SW,PAR
   !     RADS,RADY,RAPS,RAPY=solar beam direct,diffuse SW,PAR
@@ -257,7 +257,7 @@ module CanopyCondsMod
     VOLSS   => plt_ew%VOLSS  , &
     VOLWS   => plt_ew%VOLWS  , &
     VHCPWX  => plt_ew%VHCPWX , &
-    DPTHS   => plt_ew%DPTHS  , &
+    SnowDepth   => plt_ew%SnowDepth  , &
     ALBR    => plt_rad%ALBR  , &
     ALBS    => plt_rad%ALBS  , &
     ALBX    => plt_rad%ALBX  , &
@@ -317,24 +317,22 @@ module CanopyCondsMod
     ARLSS   => plt_morph%ARLSS    &
   )
   ARLSS=0.0
-  DO 1135 NZ=1,NP
+  D1135: DO NZ=1,NP
     ARLFS(NZ)=0.0
     DO  NB=1,NBR(NZ)
       DO  L=1,JC1
-        if(ZL(L-1)/=ZL(L-1))&
-        print*,L,ZL(L),ZL(L-1)
-        IF(ZL(L-1).GE.DPTHS-ZERO &
-          .AND.ZL(L-1).GE.DPTH0-ZERO)THEN
-          DO 1130 K=1,JNODS1
+        if(isnan(ZL(L-1)))print*,L,ZL(L),ZL(L-1)
+        IF(ZL(L-1).GE.SnowDepth-ZERO.AND.ZL(L-1).GE.DPTH0-ZERO)THEN
+          D1130: DO K=1,JNODS1
             ARLFS(NZ)=ARLFS(NZ)+ARLFL(L,K,NB,NZ)
             ARLSS=ARLSS+ARLFL(L,K,NB,NZ)
-1130      CONTINUE
+          ENDDO D1130
           ARLFS(NZ)=ARLFS(NZ)+ARSTK(L,NB,NZ)
           ARLSS=ARLSS+ARSTK(L,NB,NZ)
         ENDIF
       enddo
     enddo
-1135  CONTINUE
+  ENDDO D1135
   IF(SSIN.GT.ZERO)THEN
     RAD0=RADS*SSIN+RADY*TYSIN
     RAP0=RAPS*SSIN+RAPY*TYSIN
@@ -458,7 +456,7 @@ module CanopyCondsMod
       DO 1200 NZ=1,NP
         DO  NB=1,NBR(NZ)
           DO  L=1,JC1
-            IF(ZL(L-1).GT.DPTHS-ZERO.AND.ZL(L-1).GT.DPTH0-ZERO)THEN
+            IF(ZL(L-1).GT.SnowDepth-ZERO.AND.ZL(L-1).GT.DPTH0-ZERO)THEN
               DO 1205 N=1,JLI1
                 DO 1210 K=1,JNODS1
                   TSURF(N,L,NZ)=TSURF(N,L,NZ)+SURF(N,L,K,NB,NZ)
@@ -480,7 +478,7 @@ module CanopyCondsMod
       !     STOPY,STOPSZ,STOPYZ=fraction of direct,diffuse radiation intercepted
       !
       DO 1800 L=JC1,1,-1
-        IF(ZL(L-1).GE.DPTHS-ZERO &
+        IF(ZL(L-1).GE.SnowDepth-ZERO &
           .AND.ZL(L-1).GE.DPTH0-ZERO)THEN
           RADYL=RADYL*TAUY(L+1)+RAFSL(L+1)
           RAPYL=RAPYL*TAUY(L+1)+RAFPL(L+1)
@@ -761,7 +759,7 @@ module CanopyCondsMod
       IF(VHCPW1.GT.VHCPWX)THEN
         ALBW=(0.80_r8*VOLSS+0.30_r8*VOLIS+0.06_r8*VOLWS) &
           /(VOLSS+VOLIS+VOLWS)
-        FSNOW=AMIN1((DPTHS/0.07)**2,1.0_r8)
+        FSNOW=AMIN1((SnowDepth/0.07)**2,1.0_r8)
         ALBG=FSNOW*ALBW+(1.0_r8-FSNOW)*ALBS
       ELSE
         IF(VOLX(NU).GT.ZEROS2)THEN
@@ -790,7 +788,7 @@ module CanopyCondsMod
       RAFSL(0)=0.0
       RAFPL(0)=0.0
       DO 2800 L=1,JC1
-        IF(ZL(L-1).GE.DPTHS-ZERO &
+        IF(ZL(L-1).GE.SnowDepth-ZERO &
          .AND.ZL(L-1).GE.DPTH0-ZERO)THEN
           RADYL=RADYL*TAUY(L-1)+RAFSL(L-1)+RABSL(L-1)
           RAPYL=RAPYL*TAUY(L-1)+RAFPL(L-1)+RABPL(L-1)

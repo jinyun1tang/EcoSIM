@@ -48,7 +48,7 @@ implicit none
   VOLWS(NY,NX)=0.0_r8
   VOLIS(NY,NX)=0.0_r8
   VOLS(NY,NX)=0.0_r8
-  DPTHS(NY,NX)=0.0_r8
+  SnowDepth(NY,NX)=0.0_r8
   VOLSWI=0.0_r8
 
   D9780: DO L=1,JS
@@ -104,7 +104,7 @@ implicit none
     VOLWS(NY,NX)=0.0_r8
     VOLIS(NY,NX)=0.0_r8
     VOLS(NY,NX)=0.0_r8
-    DPTHS(NY,NX)=0.0_r8
+    SnowDepth(NY,NX)=0.0_r8
     D9770: DO L=1,JS
       DENSS(L,NY,NX)=DENS0(NY,NX)
     ENDDO D9770
@@ -213,14 +213,14 @@ implicit none
 ! VOLSSL,VOLWSL,VOLISL=snow water equivalent,water,ice volume in snowpack layer
 ! VOLSL=snowpack layer volume
 ! DLYRS=snowpack layer depth
-! CDPTHS=cumulative depth to bottom of snowpack layer
+! cumSnowDepth=cumulative depth to bottom of snowpack layer
 ! VHCPW=snowpack layer heat capacity
 ! TKW,TCW=snowpack layer temperature K,oC
 ! THFLWW=convective heat fluxes of snow,water,ice in snowpack
 ! XTHAWW=latent heat flux from freeze-thaw from watsub.f
 ! HEATIN=cumulative net surface heat transfer
 ! VOLSS,VOLWS,VOLIS=total snow water equivalent, water, ice content of snowpack
-! VOLS,DPTHS=total snowpack volume, depth
+! VOLS,SnowDepth=total snowpack volume, depth
 !
   IF(DENSS(L,NY,NX).LT.0.25_r8)THEN
     DDENS1=DENSS(L,NY,NX)*1.0E-05_r8*EXP(0.04_r8*TCW(L,NY,NX))
@@ -239,7 +239,7 @@ implicit none
   IF(VOLSSL(L,NY,NX)+VOLWSL(L,NY,NX)+VOLISL(L,NY,NX).GT.ZEROS2(NY,NX))THEN
     VOLSL(L,NY,NX)=VOLSSL(L,NY,NX)/DENSS(L,NY,NX)+VOLWSL(L,NY,NX)+VOLISL(L,NY,NX)
     DLYRS(L,NY,NX)=AZMAX1(VOLSL(L,NY,NX))/AREA(3,NU(NY,NX),NY,NX)
-    CDPTHS(L,NY,NX)=CDPTHS(L-1,NY,NX)+DLYRS(L,NY,NX)
+    cumSnowDepth(L,NY,NX)=cumSnowDepth(L-1,NY,NX)+DLYRS(L,NY,NX)
     VHCPWZ(L,NY,NX)=VHCPW(L,NY,NX)
     TKWX=TKW(L,NY,NX)
     ENGYW=VHCPW(L,NY,NX)*TKW(L,NY,NX)
@@ -260,14 +260,14 @@ implicit none
     VOLWS(NY,NX)=VOLWS(NY,NX)+VOLWSL(L,NY,NX)
     VOLIS(NY,NX)=VOLIS(NY,NX)+VOLISL(L,NY,NX)
     VOLS(NY,NX)=VOLS(NY,NX)+VOLSL(L,NY,NX)
-    DPTHS(NY,NX)=DPTHS(NY,NX)+DLYRS(L,NY,NX)
+    SnowDepth(NY,NX)=SnowDepth(NY,NX)+DLYRS(L,NY,NX)
   ELSE
     VOLSSL(L,NY,NX)=0.0_r8
     VOLWSL(L,NY,NX)=0.0_r8
     VOLISL(L,NY,NX)=0.0_r8
     VOLSL(L,NY,NX)=0.0_r8
     DLYRS(L,NY,NX)=0.0_r8
-    CDPTHS(L,NY,NX)=CDPTHS(L-1,NY,NX)
+    cumSnowDepth(L,NY,NX)=cumSnowDepth(L-1,NY,NX)
     VHCPW(L,NY,NX)=0.0_r8
     IF(L.EQ.1)THEN
       TKW(L,NY,NX)=TairK(NY,NX)
@@ -359,8 +359,8 @@ implicit none
       !
       !     RESET SNOW LAYER DEPTHS
       !
-      CDPTHS(L,NY,NX)=CDPTHS(L,NY,NX)+DDLYRS
-      DLYRS(L,NY,NX)=CDPTHS(L,NY,NX)-CDPTHS(L-1,NY,NX)
+      cumSnowDepth(L,NY,NX)=cumSnowDepth(L,NY,NX)+DDLYRS
+      DLYRS(L,NY,NX)=cumSnowDepth(L,NY,NX)-cumSnowDepth(L-1,NY,NX)
 !
       !     TRANSFER STATE VARIABLES BETWEEN LAYERS
       !
@@ -449,7 +449,7 @@ implicit none
           ENDIF
 !     IF(VOLWSL(L0,NY,NX)+VOLISL(L0,NY,NX)
 !    2+VOLSSL(L0,NY,NX).LE.ZEROS(NY,NX))THEN
-!     CDPTHS(L1,NY,NX)=CDPTHS(L0,NY,NX)
+!     cumSnowDepth(L1,NY,NX)=cumSnowDepth(L0,NY,NX)
 !     ENDIF
         ENDIF
       ENDIF
