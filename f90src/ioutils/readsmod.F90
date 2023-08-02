@@ -54,7 +54,8 @@ module readsmod
   integer :: LPY,IX
   type(atm_forc_type) :: atmf
 
-  call readCLMfactors(yeari)
+  ICLM=0
+  call ReadClimateCorrections(yeari)
 
 ! begin_execution
 
@@ -283,7 +284,7 @@ module readsmod
   RETURN
   END subroutine reads
 !------------------------------------------------------------------------------------------
-  subroutine readCLMfactors(yeari)
+  subroutine ReadClimateCorrections(yeari)
   !
   !DESCRIPTION
   !read climate change factors
@@ -299,6 +300,7 @@ module readsmod
 !  logical :: readvar
   INTEGER :: N
 
+  if(clm_factor_in=='NO')return
   if(.not.file_exists(clm_factor_in))then
     call endrun("Do not find clm_factor_in file "//trim(clm_factor_in)//" in "//mod_filename, __LINE__)
   endif
@@ -337,5 +339,5 @@ module readsmod
     DCNOR(N)=DCNOR(1)
   ENDDO
 
-  end subroutine readCLMfactors
+  end subroutine ReadClimateCorrections
 end module readsmod

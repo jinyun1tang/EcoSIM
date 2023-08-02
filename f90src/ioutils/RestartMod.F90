@@ -5924,16 +5924,16 @@ implicit none
 
   if(flag=='read')then
     datpr2 => datrc_2d(1:ncols,1:JC+1)                    
-    call restartvar(ncid, flag, varname='ZL', dim1name='column',dim2name='levcan1',&
+    call restartvar(ncid, flag, varname='CanopyHeightz', dim1name='column',dim2name='levcan1',&
        long_name='canopy layer height', units='m m-3', &
        interpinic_flag='skip', data=datpr2, missing_value=spval, &
        fill_value=spval)         
-    call cpcol(flag,NHW,NHE,NVN,NVS,ZL,datrc_2d)      
+    call cpcol(flag,NHW,NHE,NVN,NVS,CanopyHeightz,datrc_2d)      
   else
     !print*,'ZL'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,ZL,datrc_2d)        
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,CanopyHeightz,datrc_2d)        
     datpr2 => datrc_2d(1:ncols,1:JC+1)                        
-    call restartvar(ncid, flag, varname='ZL', dim1name='column',dim2name='levcan1',&
+    call restartvar(ncid, flag, varname='CanopyHeightz', dim1name='column',dim2name='levcan1',&
        long_name='canopy layer height', units='m', &
        interpinic_flag='skip', data=datpr2, missing_value=spval, &
        fill_value=spval)         

@@ -94,8 +94,7 @@ module WthrMod
 !
 
   IF(ICLM.EQ.1.OR.ICLM.EQ.2)THEN
-    call ApplyClimateCorrection(I,J,NHW,NHE,NVN,NVS,PRECUI,&
-      PRECRI,PRECII,PRECWI,VPS)
+    call CorrectClimate(I,J,NHW,NHE,NVN,NVS,PRECUI,PRECRI,PRECII,PRECWI,VPS)
   ENDIF
 !
 
@@ -367,8 +366,7 @@ module WthrMod
   end subroutine CalcRadiation
 !------------------------------------------------------------------------------------------
 
-  subroutine ApplyClimateCorrection(I,J,NHW,NHE,NVN,NVS,PRECUI,&
-    PRECRI,PRECII,PRECWI,VPS)
+  subroutine CorrectClimate(I,J,NHW,NHE,NVN,NVS,PRECUI,PRECRI,PRECII,PRECWI,VPS)
   !
   !     DESCRIPTION:
   !     IMPLEMENT CLIMATE CHANGES READ IN 'READS' TO HOURLY TEMPERATURE,
@@ -506,7 +504,7 @@ module WthrMod
       CNOR(NY,NX)=CNORI(NY,NX)*TDCNO(N,NY,NX)
     ENDDO D9920
   ENDDO D9925
-  end subroutine ApplyClimateCorrection
+  end subroutine CorrectClimate
 !------------------------------------------------------------------------------------------
 
   subroutine SummaryForOutput(NHW,NHE,NVN,NVS,PRECUI,PRECRI,PRECII,PRECWI)

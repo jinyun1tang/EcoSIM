@@ -727,9 +727,9 @@ implicit none
   plt_distb%DCORP=DCORP(I,NY,NX)
   plt_distb%ITILL=ITILL(I,NY,NX)
 
-  plt_morph%ZL(0)=ZL(0,NY,NX)
+  plt_morph%CanopyHeightz(0)=CanopyHeightz(0,NY,NX)
   DO  L=1,JC
-    plt_morph%ZL(L)=ZL(L,NY,NX)
+    plt_morph%CanopyHeightz(L)=CanopyHeightz(L,NY,NX)
     plt_rad%TAUS(L)=TAUS(L,NY,NX)
     plt_rad%TAU0(L)=TAU0(L,NY,NX)
   ENDDO
@@ -1511,11 +1511,11 @@ implicit none
   plt_site%UA=UA(NY,NX)
   plt_ew%VHCPWX=VHCPWX(NY,NX)
   plt_ew%VHCPW1=VHCPW(1,NY,NX)
-  plt_morph%ZL(0)=ZL(0,NY,NX)
+  plt_morph%CanopyHeightz(0)=CanopyHeightz(0,NY,NX)
   DO L=1,JC
     plt_morph%ARSTT(L)=ARSTT(L,NY,NX)
     plt_morph%ARLFT(L)=ARLFT(L,NY,NX)
-    plt_morph%ZL(L)=ZL(L,NY,NX)
+    plt_morph%CanopyHeightz(L)=CanopyHeightz(L,NY,NX)
     plt_rad%TAUS(L)=TAUS(L,NY,NX)
   ENDDO
   plt_rad%TAUS(JC+1)=TAUS(JC+1,NY,NX)
@@ -1622,7 +1622,7 @@ implicit none
   RAD(NY,NX)=plt_rad%RAD0
   RAP(NY,NX)=plt_rad%RAP0
   DO L=0,JC
-    ZL(L,NY,NX)=plt_morph%ZL(L)
+    CanopyHeightz(L,NY,NX)=plt_morph%CanopyHeightz(L)
   ENDDO
   DO L=1,JC
     TAUS(L,NY,NX)=plt_rad%TAUS(L)

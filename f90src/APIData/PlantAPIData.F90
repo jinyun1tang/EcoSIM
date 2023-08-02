@@ -219,7 +219,7 @@ implicit none
   integer,  pointer :: INTYP(:)        => null() !N2 fixation type
   integer,  pointer :: MY(:)           => null() !mycorrhizal type (no or yes)
   real(r8), pointer :: HTSTZ(:)        => null() !canopy height, [m]
-  real(r8), pointer :: ZL(:)           => null() !canopy layer height , [m]
+  real(r8), pointer :: CanopyHeightz(:)           => null() !canopy layer height , [m]
   real(r8), pointer :: ARSTP(:)        => null() !plant stem area, [m2 d-2]
   real(r8), pointer :: ARLFP(:)        => null() !plant leaf area, [m2 d-2]
   integer,  pointer :: NB1(:)          => null() !number of main branch
@@ -2056,7 +2056,7 @@ implicit none
   allocate(this%NG(JP1))
   allocate(this%CanopyHeight(JP1))
   allocate(this%XTLI(JP1))
-  allocate(this%ZL(0:JC1))
+  allocate(this%CanopyHeightz(0:JC1))
   allocate(this%ARSTP(JP1))
   allocate(this%ARLFP(JP1))
   allocate(this%NB1(JP1))

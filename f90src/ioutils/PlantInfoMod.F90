@@ -78,7 +78,6 @@ implicit none
 !       each column has its own management
 !       PREFIX=path for files in current or higher level directory
 !       DATAP=PFT file name
-        print*,DATAP(NZ,NY,NX)
         call ReadPlantProperties(NZ,NY,NX)
 
       ENDDO D9985
@@ -160,7 +159,6 @@ implicit none
         iyear=iyear+1
       ENDDO
     endif
-    PRINT*,'IYEAR',IYEAR
     !obtain the number of topographic units
     ntopou=get_dim_len(pftinfo_nfid, 'ntopou')
     nyears=get_dim_len(pftinfo_nfid, 'year')
@@ -178,7 +176,7 @@ implicit none
       endif
 
       call check_ret(nf90_get_var(pftinfo_nfid%fh, vardesc%varid, pft_pltinfo, &
-        start = (/1,1,ntopou,iyear/),count = (/len(pft_pltinfo(1)),JP,1,1/)),&
+        start = (/1,1,NTOPO,iyear/),count = (/len(pft_pltinfo(1)),JP,1,1/)),&
         trim(mod_filename)//':: at line '//trim(int2str(__LINE__)))
 
       call check_var(pftinfo_nfid, 'nmgnts', vardesc, readvar)
@@ -187,7 +185,7 @@ implicit none
       endif
 
       call check_ret(nf90_get_var(pftinfo_nfid%fh, vardesc%varid, pft_nmgnt, &
-        start = (/1,ntopou,iyear/),count = (/JP,1,1/)),trim(mod_filename)// &
+        start = (/1,NTOPO,iyear/),count = (/JP,1,1/)),trim(mod_filename)// &
         '::at line '//trim(int2str(__LINE__)))
 
       if(any(pft_nmgnt(1:NS)>0))then
@@ -197,7 +195,7 @@ implicit none
         endif
 
         call check_ret(nf90_get_var(pftinfo_nfid%fh, vardesc%varid, pft_mgmtinfo, &
-          start = (/1,1,1,ntopou,iyear/),count = (/len(pft_mgmtinfo(1,1)),24,JP,1,1/)),&
+          start = (/1,1,1,NTOPO,iyear/),count = (/len(pft_mgmtinfo(1,1)),24,JP,1,1/)),&
           trim(mod_filename)//'::at line '//trim(int2str(__LINE__)))
       endif
 
@@ -977,18 +975,16 @@ implicit none
             call endrun('fail to find pft_type in '//trim(mod_filename), __LINE__)
           endif
           call check_ret(nf90_get_var(pftinfo_nfid%fh, vardesc%varid, pft_gtype, &
-            start = (/1,1,ntopou,iyear/),count = (/len(pft_gtype(1)),JP,1,1/)), &
+            start = (/1,1,NTOPO,iyear/),count = (/len(pft_gtype(1)),JP,1,1/)), &
             trim(mod_filename)//':: at line '//trim(int2str(__LINE__)))
 
           D4975: DO NX=NH1,NH2
             D4970: DO NY=NV1,NV2
               D4965: DO NZ=1,NS
-                print*,'IETYP(NY,NX) ',IETYP(NY,NX)
                 IF(IETYP(NY,NX).GT.0)THEN
                   WRITE(CLIMATE,'(I2)')IETYP(NY,NX)
                   !the type of pft is specified by genra+Koppen climate zone
                   DATAX(NZ)=pft_gtype(NZ)(1:4)//CLIMATE
-                  print*,pft_gtype(NZ)(1:4),CLIMATE
                 ENDIF
 
               ENDDO D4965
@@ -1004,9 +1000,7 @@ implicit none
               NP(NY,NX)=NS
     !DATAP(NZ,NY,NX) and DATAM(NZ,NY,NX) are to be read in readqmod.F90
               D100: DO NZ=1,NP(NY,NX)
-                DATAP(NZ,NY,NX)=DATAX(NZ)
-                
-                print*,'DATAP(NZ,NY,NX) ',DATAX(NZ),NP(NY,NX)
+                DATAP(NZ,NY,NX)=DATAX(NZ)                
               ENDDO D100
 
               D101: DO NZ=NP(NY,NX)+1,JP

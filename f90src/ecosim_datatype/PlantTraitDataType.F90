@@ -37,7 +37,7 @@ module PlantTraitDataType
   real(r8),target,allocatable ::  SDAR(:,:,:)                        !seed surface area, [m2]
   real(r8),target,allocatable ::  HTCTL(:,:,:)                       !cotyledon height, [m]
   real(r8),target,allocatable ::  GridMaxCanopyHeight(:,:)                            !canopy height , [m]
-  real(r8),target,allocatable ::  ZL(:,:,:)                          !canopy layer height , [m]
+  real(r8),target,allocatable ::  CanopyHeightz(:,:,:)                          !canopy layer height , [m]
   real(r8),target,allocatable ::  ANGBR(:,:,:)                       !branching angle, [degree from horizontal]
   real(r8),target,allocatable ::  ANGSH(:,:,:)                       !sheath angle, [degree from horizontal]
   real(r8),target,allocatable ::  RAZ(:,:,:)                         !canopy roughness height, [m]
@@ -194,7 +194,7 @@ contains
   allocate(SDAR(JP,JY,JX));     SDAR=0._r8
   allocate(HTCTL(JP,JY,JX));    HTCTL=0._r8
   allocate(GridMaxCanopyHeight(JY,JX));          GridMaxCanopyHeight=0._r8
-  allocate(ZL(0:JC,JY,JX));     ZL=0._r8
+  allocate(CanopyHeightz(0:JC,JY,JX));     CanopyHeightz=0._r8
   allocate(ANGBR(JP,JY,JX));    ANGBR=0._r8
   allocate(ANGSH(JP,JY,JX));    ANGSH=0._r8
   allocate(RAZ(JP,JY,JX));      RAZ=0._r8
@@ -348,7 +348,7 @@ contains
   call destroy(SDAR)
   call destroy(HTCTL)
   call destroy(GridMaxCanopyHeight)
-  call destroy(ZL)
+  call destroy(CanopyHeightz)
   call destroy(ANGBR)
   call destroy(ANGSH)
   call destroy(RAZ)

@@ -693,6 +693,7 @@ implicit none
   allocate(fdatav(ngrid))
   I=365
   if(isleap(yeari))I=366
+  print*,size(fdatam,1),size(fdatam,2),size(fdatam,3),irec
   call ncd_getvar(clm_nfid,'TMPH',irec,fdatam); call reshape2(TMPH,fdatam)
   call ncd_getvar(clm_nfid,'WINDH',irec,fdatam); call reshape2(WINDH,fdatam)
   call ncd_getvar(clm_nfid,'DWPTH',irec,fdatam); call reshape2(DWPTH,fdatam)

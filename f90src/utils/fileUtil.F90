@@ -177,7 +177,7 @@ module fileUtil
   character(len=*), intent(in) :: s2
   character(len=*), intent(out) :: s3
 
-  integer :: k,k1,l3
+  integer :: k,k1,l3,l2
   
   l3=len(s3)
   k=1
@@ -193,8 +193,8 @@ module fileUtil
     call endrun("Not sufficient memory allocated for string s3 in " &
       //trim(mod_filename),__LINE__)
   endif
-  k1=1
-  do while(.true.)
+  k1=1;l2=len(s2)
+  do while(k1<=l2)
     if(s2(k1:k1)/=' '.and. ichar(s2(k1:k1))/=0 .and. k<=l3)then
        s3(k:k)=s2(k1:k1)
     else

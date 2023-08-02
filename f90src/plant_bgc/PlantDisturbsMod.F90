@@ -1274,7 +1274,7 @@ module PlantDisturbsMod
     RTDNP    =>  plt_morph%RTDNP   , &
     INTYP    =>  plt_morph%INTYP   , &
     ARLFT    =>  plt_morph%ARLFT   , &
-    ZL       =>  plt_morph%ZL      , &
+    CanopyHeightz       =>  plt_morph%CanopyHeightz      , &
     ARLFB    =>  plt_morph%ARLFB   , &
     NBR      =>  plt_morph%NBR     , &
     ARSTP    =>  plt_morph%ARSTP   , &
@@ -1340,9 +1340,9 @@ module PlantDisturbsMod
         ARLFY=(1._r8-ABS(HVST(NZ)))*ARLFC
         ARLFR=0._r8
         D9875: DO L=1,JC1
-          IF(ZL(L).GT.ZL(L-1).AND.ARLFT(L).GT.ZEROS.AND.ARLFR.LT.ARLFY)THEN
+          IF(CanopyHeightz(L).GT.CanopyHeightz(L-1).AND.ARLFT(L).GT.ZEROS.AND.ARLFR.LT.ARLFY)THEN
             IF(ARLFR+ARLFT(L).GT.ARLFY)THEN
-              HVST(NZ)=ZL(L-1)+((ARLFY-ARLFR)/ARLFT(L))*(ZL(L)-ZL(L-1))
+              HVST(NZ)=CanopyHeightz(L-1)+((ARLFY-ARLFR)/ARLFT(L))*(CanopyHeightz(L)-CanopyHeightz(L-1))
             ENDIF
           ELSE
             HVST(NZ)=0._r8
@@ -1535,8 +1535,8 @@ module PlantDisturbsMod
     D9865: DO L=JC1,1,-1
       IF(IHVST(NZ).NE.4.AND.IHVST(NZ).NE.6)THEN
         IF(IHVST(NZ).NE.3)THEN
-          IF(ZL(L).GT.ZL(L-1))THEN
-            FHGT=AZMAX1(AMIN1(1.0_r8,1._r8-((ZL(L))-HVST(NZ))/(ZL(L)-ZL(L-1))))
+          IF(CanopyHeightz(L).GT.CanopyHeightz(L-1))THEN
+            FHGT=AZMAX1(AMIN1(1.0_r8,1._r8-((CanopyHeightz(L))-HVST(NZ))/(CanopyHeightz(L)-CanopyHeightz(L-1))))
           ELSE
             FHGT=1.0_r8
           ENDIF
