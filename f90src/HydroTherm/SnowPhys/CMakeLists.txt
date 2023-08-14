@@ -2,6 +2,7 @@ set(SNOWPHYS_SOURCES
  SnowPhysData.F90
  SnowPhysMod.F90
  SnowBalanceMod.F90
+)
 set(SNOWPHYS_SOURCES
  SnowPhysData.F90
  SnowPhysMod.F90
