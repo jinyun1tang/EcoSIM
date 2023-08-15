@@ -12,7 +12,7 @@ module ATSCPLMod
 !  integer :: JSNO  !number of snow layers
 
 ! temporary data holder in ecosim
-  real(r8) :: atm_o2,atm_co2,atm_ch4,atm_n2o,atm_h2,atm_nh3
+!  real(r8) :: atm_n2,tm_o2,atm_co2,atm_ch4,atm_n2o,atm_h2,atm_nh3
   real(r8), allocatable :: sw_rad(:)
   real(r8), allocatable :: lw_rad(:)
   real(r8), allocatable :: air_temp(:)
