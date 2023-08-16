@@ -24,7 +24,8 @@ module VisualMod
 
   private
 
-  character(len=*), parameter :: mod_filename = __FILE__
+  character(len=*), parameter :: mod_filename = &
+  __FILE__
   real(r8) :: TCSNX,TTRN,TTLE,TTSH,TTGH,TTCO,TTCH
 
   integer :: L,NX,NY,N

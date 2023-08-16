@@ -31,7 +31,8 @@ module SurfPhysMod
   use SoilPhysParaMod
 implicit none
   private
-  character(len=*), parameter :: mod_filename=__FILE__
+  character(len=*), parameter :: mod_filename=&
+  __FILE__
 
   !surface model
   public :: StageSurfStateVars

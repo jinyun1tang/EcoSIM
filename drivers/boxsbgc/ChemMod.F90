@@ -4,7 +4,8 @@ module ChemMod
   use MicForcTypeMod      , only : micforctype
 implicit none
 
-  character(len=*),private, parameter :: mod_filename = __FILE__
+  character(len=*),private, parameter :: mod_filename = &
+  __FILE__
   public :: RunModel_nosalt
   contains
 ! ----------------------------------------------------------------------

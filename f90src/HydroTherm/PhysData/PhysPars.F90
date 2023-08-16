@@ -5,7 +5,8 @@ module PhysPars
 
 implicit none
 
-  character(len=*), private, parameter :: mod_filename=__FILE__
+  character(len=*), private, parameter :: mod_filename=&
+  __FILE__
 
 
 ! RAM=minimum boundary layer resistance (h m-1)

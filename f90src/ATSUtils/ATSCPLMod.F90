@@ -6,8 +6,8 @@ module ATSCPLMod
   implicit none
 
   public
-  character(len=*), private, parameter :: &
-    mod_filename=__FILE__
+  character(len=*), private, parameter :: mod_filename=&
+  __FILE__
 !  integer :: JZSOI !number of soil layers
 !  integer :: JSNO  !number of snow layers
 

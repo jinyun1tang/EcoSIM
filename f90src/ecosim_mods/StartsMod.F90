@@ -45,7 +45,8 @@ module StartsMod
   implicit none
 
   private
-  character(len=*),private, parameter :: mod_filename = __FILE__
+  character(len=*),private, parameter :: mod_filename = &
+  __FILE__
   !
   !
   !     BulkDensLitR=dry bulk density of woody(0),fine(1),manure(2) litter

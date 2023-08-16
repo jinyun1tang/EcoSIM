@@ -12,12 +12,13 @@ module batchmod
   use minimathmod    , only : AZMAX1,AZMIN1
   use EcoSIMSolverPar
   use MicIDMod
-  use ChemIDMod  
+  use ChemIDMod
   use ForcTypeMod         , only : forc_type
 
 implicit none
   private
-  character(len=*),private, parameter :: mod_filename = __FILE__
+  character(len=*),private, parameter :: mod_filename = &
+  __FILE__
   logical :: Litlayer
 
 

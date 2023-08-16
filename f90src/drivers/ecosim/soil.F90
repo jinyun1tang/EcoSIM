@@ -32,7 +32,8 @@ subroutine soil(NE,NEX,NHW,NHE,NVN,NVS,nlend)
   integer :: yearc, yeari
   integer, intent(in) :: NE,NEX,NHW,NHE,NVN,NVS
   logical, intent(out) :: nlend
-  character(len=*), parameter :: mod_filename = __FILE__
+  character(len=*), parameter :: mod_filename = &
+  __FILE__
   real(r8) :: t1
   integer :: I,J
   integer :: idaz

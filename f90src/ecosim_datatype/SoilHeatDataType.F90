@@ -6,7 +6,8 @@ module SoilHeatDatatype
   implicit none
 
   save
-  character(len=*), private, parameter :: mod_filename = __FILE__
+  character(len=*), private, parameter :: mod_filename = &
+  __FILE__
 
   real(r8),target,allocatable ::  TKSZ(:,:,:)                        !
   real(r8),target,allocatable ::  TKS(:,:,:)                         !

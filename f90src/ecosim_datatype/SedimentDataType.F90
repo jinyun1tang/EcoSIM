@@ -6,7 +6,8 @@ module SedimentDataType
 implicit none
 
   save
-  character(len=*), private, parameter :: mod_filename = __FILE__
+  character(len=*), private, parameter :: mod_filename = &
+  __FILE__
 
   real(r8),target,allocatable ::  TSED(:,:)                         !erosion rate [Mg d-2 t-1]
   real(r8),target,allocatable ::  DETS(:,:)                         !soil detachment, [-]

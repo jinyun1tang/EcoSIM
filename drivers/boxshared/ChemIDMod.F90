@@ -3,7 +3,8 @@ module ChemIDMod
 implicit none
 
   save
-  character(len=*), private, parameter :: mod_filename = __FILE__
+  character(len=*), private, parameter :: mod_filename = &
+  __FILE__
 
   integer :: cid_CO2S     !aqueous CO2  micropore	[g d-2]
   integer :: cid_CH1P1    !soil aqueous HPO4 content micropore non-band, [mol m-3]

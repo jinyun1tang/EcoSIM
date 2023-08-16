@@ -4,7 +4,8 @@ module SoilPhysDataType
 implicit none
 
   save
-  character(len=*), private, parameter :: mod_filename = __FILE__
+  character(len=*), private, parameter :: mod_filename = &
+  __FILE__
 
   real(r8),target,allocatable ::  SLOPE(:,:,:)                       !slope	in four directions [o]
   real(r8),target,allocatable ::  FieldCapacity(:,:,:)                          !water contents at field capacity

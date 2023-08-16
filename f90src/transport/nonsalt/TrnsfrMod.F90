@@ -32,7 +32,8 @@ module TrnsfrMod
   implicit none
 
   private
-  CHARACTER(LEN=*), PARAMETER :: MOD_FILENAME=__FILE__
+  CHARACTER(LEN=*), PARAMETER :: MOD_FILENAME=&
+  __FILE__
 
   real(r8), allocatable :: CHY0(:,:,:)
   real(r8), allocatable :: RFLZ_sol(:,:,:,:)

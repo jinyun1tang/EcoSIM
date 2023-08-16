@@ -25,7 +25,8 @@ module LateralTranspMod
   use SnowBalanceMod
 implicit none
   private
-  character(len=*), parameter :: mod_filename = __FILE__
+  character(len=*), parameter :: mod_filename = &
+  __FILE__
 
   public :: LateralTranspt
   contains
@@ -300,7 +301,7 @@ implicit none
 !6631  FORMAT(A8,9I4,12E12.4)
     ENDIF
   ENDDO D1202
-  
+
 
   end subroutine OMH2OFluxesFromRunoff
 !------------------------------------------------------------------------------------------

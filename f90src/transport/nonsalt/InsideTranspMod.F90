@@ -24,7 +24,8 @@ module InsideTranspMod
   implicit none
 
   private
-  CHARACTER(LEN=*), PARAMETER :: MOD_FILENAME=__FILE__
+  CHARACTER(LEN=*), PARAMETER :: MOD_FILENAME=&
+  __FILE__
 
   real(r8),allocatable :: RFHOC(:)
   real(r8),allocatable :: RFHON(:)

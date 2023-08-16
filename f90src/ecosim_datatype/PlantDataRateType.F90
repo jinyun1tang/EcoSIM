@@ -6,7 +6,8 @@ module PlantDataRateType
   use TracerIDMod
   use EcoSIMConfig, only : jcplx => jcplxc,jsken=>jskenc
   implicit none
-  character(len=*), private, parameter :: mod_filename = __FILE__
+  character(len=*), private, parameter :: mod_filename = &
+  __FILE__
 
   real(r8),target,allocatable ::  TCNET(:,:)                         !total canopy net CO2 exchange, [g d-2 h-1]
   real(r8),target,allocatable ::  RNH3C(:,:,:)                       !canopy NH3 flux, [g d-2 h-1]

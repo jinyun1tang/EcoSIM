@@ -6,7 +6,8 @@ module LandSurfDataType
   implicit none
   public
   save
-  character(len=*), private, parameter :: mod_filename = __FILE__
+  character(len=*), private, parameter :: mod_filename = &
+  __FILE__
   real(r8) :: ALTIG                             !altitude of landscape, [m]
 
   real(r8),target,allocatable ::  SoiSurfRoughnesst0(:,:)                            !initial soil surface roughness height, [m]

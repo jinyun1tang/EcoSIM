@@ -21,7 +21,8 @@ module ReadManagementMod
   use netcdf
 implicit none
   private
-  character(len=*), parameter :: mod_filename = __FILE__
+  character(len=*), parameter :: mod_filename = &
+  __FILE__
 
   public :: ReadManagementFiles
   contains
@@ -413,7 +414,7 @@ implicit none
 
   iyear=1
   DO while(.true.)
-    call ncd_getvar(soilmgmt_nfid,'year',iyear,year)  
+    call ncd_getvar(soilmgmt_nfid,'year',iyear,year)
     if(year==yeari)exit
     iyear=iyear+1
   ENDDO

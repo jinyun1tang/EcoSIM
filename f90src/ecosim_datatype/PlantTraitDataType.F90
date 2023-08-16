@@ -8,7 +8,8 @@ module PlantTraitDataType
   use GridConsts
   use ElmIDMod
   implicit none
-  character(len=*), private, parameter :: mod_filename = __FILE__
+  character(len=*), private, parameter :: mod_filename = &
+  __FILE__
 
 
 !allocation parameter

@@ -6,7 +6,8 @@ program main
   use fileUtil
   use data_kind_mod, only : r8 => DAT_KIND_R8
 implicit none
-  character(len=*), parameter :: mod_filename = __FILE__
+  character(len=*), parameter :: mod_filename = &
+  __FILE__
 
   integer :: arg_count
   character(len=ecosim_filename_length)      :: namelist_filename
@@ -105,7 +106,8 @@ end program main
   namelist /driver_nml/model_name,case_id,hist_freq,salton,forc_file,&
     CO2E,OXYE,Z2OE,Z2GE,ZNH3E,CH4E,H2GE,forctype,disvolonly
 
-  character(len=*), parameter :: mod_filename=__FILE__
+  character(len=*), parameter :: mod_filename=&
+  __FILE__
 
   hist_freq='day'
   model_name='boxsbgc'

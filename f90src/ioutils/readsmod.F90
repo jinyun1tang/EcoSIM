@@ -21,7 +21,8 @@ module readsmod
   implicit none
   private
 
-  character(len=*), parameter :: mod_filename = __FILE__
+  character(len=*), parameter :: mod_filename = &
+  __FILE__
   integer, SAVE :: N1,N2,N1X,N2X
 
   real(r8) :: CN4RIG,CNORIG,CN4RG,CNORG,CPORG,CALRG
@@ -215,7 +216,7 @@ module readsmod
 
   ICHECK=0
   IF(TTYPE.EQ.'H'.AND.J.NE.24)ICHECK=1
-  
+
   IEND=IX-ICHECK
   IFIN=MIN(IFIN,IEND)
   IDAYR=MIN(ISTART-1,ILAST) !day of recovery from earlier run
@@ -278,7 +279,7 @@ module readsmod
     call ReadManagementFiles(yeari)
   ENDIF
   IMNG=1
-  
+
   call getGHGts(yearc,NHW,NHE,NVN,NVS)
 
   RETURN
@@ -305,10 +306,10 @@ module readsmod
     call endrun("Do not find clm_factor_in file "//trim(clm_factor_in)//" in "//mod_filename, __LINE__)
   endif
   call ncd_pio_openfile(clm_factor_nfid, clm_factor_in, ncd_nowrite)
-  
+
   iyear=1
   DO while(.true.)
-    call ncd_getvar(clm_factor_nfid,'year',iyear,year)  
+    call ncd_getvar(clm_factor_nfid,'year',iyear,year)
     if(year==yeari)exit
     iyear=iyear+1
   ENDDO

@@ -7,7 +7,7 @@ module SoilPhysParaMod
   use HydroThermData
   use MiniMathMod, only : safe_adb
   use PhysPars
-  use EcoSiMParDataMod, only : micpar  
+  use EcoSiMParDataMod, only : micpar
   use EcoSimConst
   use FlagDataType
   USE AqueChemDatatype
@@ -18,8 +18,9 @@ module SoilPhysParaMod
   USE GridDataType
 implicit none
   private
-  character(len=*), parameter :: mod_filename=__FILE__
-  PUBLIC :: CalcSoilWatPotential
+  character(len=*), parameter :: mod_filename=&
+  __FILE__
+  PUBLIC :: CalcSoilWaterPotential
   public :: SetDeepSoil
   public :: CalcSoilThermConductivity
 
@@ -42,11 +43,11 @@ implicit none
   !     PSISO=osmotic potential
   !     DTHETW=minimum water content for numerical purpose
   ! soil matric potential upper layer
-  
+
   THETA1=AMAX1(THETY(N3,N2,N1),AMIN1(POROS(N3,N2,N1),safe_adb(VLWatMicP1(N3,N2,N1),VLSoilMicP(N3,N2,N1))))
 
   IF(SoilMicPMassLayer(N3,N2,N1).GT.ZEROS(NY,NX))THEN
-    !source layer is active soil  
+    !source layer is active soil
     IF(THETA1.LT.FieldCapacity(N3,N2,N1))THEN
       !water less than field capacity
       !PSIHY is the minimum water potential allowed, where hygroscopic water is < 0
@@ -55,7 +56,7 @@ implicit none
     ELSEIF(THETA1.LT.POROS(N3,N2,N1)-DTHETW)THEN
       PSISoilMatric=-EXP(LOGPSIAtSat(N2,N1)+(((LOGPOROS(N3,N2,N1)-LOG(THETA1))/PSD(N3,N2,N1))**SRP(N3,N2,N1)*LOGPSIMXD(N2,N1)))
     ELSE
-      THETA1=POROS(N3,N2,N1)    
+      THETA1=POROS(N3,N2,N1)
       PSISoilMatric=PSISE(N3,N2,N1)
     ENDIF
     !

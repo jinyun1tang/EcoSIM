@@ -1,7 +1,7 @@
 module ClimReadMod
   use data_kind_mod, only : r8 => DAT_KIND_R8
   use abortutils , only : endrun
-  use ncdio_pio  
+  use ncdio_pio
   use fileUtil   , only : open_safe
   use minimathmod, only : isLeap,AZMAX1,vapsat0
   use ClimForcDataType
@@ -16,7 +16,8 @@ module ClimReadMod
 implicit none
   private
 
-  character(len=*), parameter :: mod_filename = __FILE__
+  character(len=*), parameter :: mod_filename = &
+  __FILE__
   CHARACTER(len=1) :: IVAR(20),VAR(50),TYP(50),CTYPE
   real(r8) :: DAT(50),DATK(50),OUT(50)
   real(r8) :: datav(40)
@@ -781,7 +782,7 @@ implicit none
   implicit none
   integer, intent(in) :: yeari
   integer, intent(in) :: NHW,NHE,NVN,NVS
-  real(r8) :: atm_co2   !ppm 
+  real(r8) :: atm_co2   !ppm
   real(r8) :: atm_ch4   !ppb
   real(r8) :: atm_n2o   !ppb
   type(file_desc_t) :: atm_ghg_nfid
@@ -792,7 +793,7 @@ implicit none
 
   iyear=1
   DO while(.true.)
-    call ncd_getvar(atm_ghg_nfid,'year',iyear,year)      
+    call ncd_getvar(atm_ghg_nfid,'year',iyear,year)
     if(year==yeari)exit
     iyear=iyear+1
   ENDDO
@@ -810,7 +811,7 @@ implicit none
       CH4E(NY,NX) =atm_ch4*1.e-3_r8  !ppb to ppm
       Z2OE(NY,NX) =atm_n2o*1.e-3_r8  !ppb to ppm
     ENDDO
-  ENDDO  
+  ENDDO
   end subroutine getGHGts
 
 

@@ -24,7 +24,8 @@ PROGRAM main
   use EcosimConst
   implicit none
 
-  character(len=*), parameter :: mod_filename = __FILE__
+  character(len=*), parameter :: mod_filename = &
+  __FILE__
 
   integer :: NA(250),ND(250)
   integer :: NAX,NDX,NEX,NAY,NDY,NE,N,NTX,NT

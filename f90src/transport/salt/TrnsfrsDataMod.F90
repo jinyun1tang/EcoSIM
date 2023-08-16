@@ -6,7 +6,8 @@ module TrnsfrsDataMod
   use AqueChemDatatype
 implicit none
   public
-  CHARACTER(LEN=*),private,PARAMETER :: MOD_FILENAME=__FILE__
+  CHARACTER(LEN=*),private,PARAMETER :: MOD_FILENAME=&
+  __FILE__
 
   real(r8), PARAMETER :: VFLWX=0.5_r8
   real(r8),allocatable ::  ALSGL2(:,:,:)                      !

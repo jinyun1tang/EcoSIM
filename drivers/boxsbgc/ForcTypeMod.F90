@@ -9,7 +9,8 @@ module ForcTypeMod
   use minimathmod, only : AZMAX1
 implicit none
 
-  character(len=*),private, parameter :: mod_filename = __FILE__
+  character(len=*),private, parameter :: mod_filename = &
+  __FILE__
   logical :: first
 
   type, public :: forc_type

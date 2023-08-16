@@ -7,7 +7,8 @@ module AqueChemDatatype
   implicit none
   public
   save
-  character(len=*), private, parameter :: mod_filename = __FILE__
+  character(len=*), private, parameter :: mod_filename = &
+  __FILE__
 
   real(r8),target,allocatable ::  CAL(:,:,:)                         !soil Al content, [mg kg-1]
   real(r8),target,allocatable ::  CFE(:,:,:)                         !soil Fe content, [mg kg-1]

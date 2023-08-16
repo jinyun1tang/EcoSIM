@@ -9,11 +9,12 @@ module ecosim_Time_Mod
   use EcosimConst    , only : secspday,secspyear
   implicit none
   private
-  character(len=*), private, parameter :: mod_filename = __FILE__
+  character(len=*), private, parameter :: mod_filename = &
+  __FILE__
 
 
   real(r8), parameter :: uninit_r8  = -999999999.0
-  integer , parameter :: daz(12)=(/31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31/)  
+  integer , parameter :: daz(12)=(/31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31/)
   integer , parameter :: cdaz(12)=(/31,59,90,120,151,181,212,243,273,304,334,365/)
   integer , parameter :: cal_str_len=18   !YYYY-MM-DD-HHMMSS
   integer , parameter :: optstrlen=8
@@ -43,7 +44,7 @@ module ecosim_Time_Mod
      real(r8) :: tod     !time of day in seconds
      integer  :: hist_freq   !negative number, steps, positive number, 1: day, 30:mon, 365:year
      integer  :: stop_opt
-     integer  :: leap_yr     
+     integer  :: leap_yr
      integer  :: rest_n
      integer  :: rest_frq
      integer  :: diag_n
@@ -65,10 +66,10 @@ module ecosim_Time_Mod
      procedure, public :: get_days_per_year
      procedure, public :: get_step_size
      procedure, public :: get_prev_time
-     procedure, public :: get_curr_time   
-     procedure, public :: getdatetime       
+     procedure, public :: get_curr_time
+     procedure, public :: getdatetime
      procedure, public :: get_curr_timeful  !current time + offset
-     procedure, public :: get_days_cur_year     
+     procedure, public :: get_days_cur_year
      procedure, public :: proc_initstep
      procedure, public :: print_curr_time
      procedure, public :: its_time_to_histflush
@@ -83,7 +84,7 @@ module ecosim_Time_Mod
      procedure, public :: get_curr_year
      procedure, public :: get_curr_yearAD
      procedure, public :: get_curr_day
-     procedure, public :: get_curr_mon     
+     procedure, public :: get_curr_mon
      procedure, public :: is_first_step
      procedure, public :: config_restart
      procedure, public :: config_diag
@@ -110,7 +111,7 @@ contains
       this%leap_yr=1
     else
       this%leap_yr=0
-    endif  
+    endif
   endif
   end subroutine setClock
   !-------------------------------------------------------------------------------
@@ -136,7 +137,7 @@ contains
 
     implicit none
 
-    class(ecosim_time_type), intent(inout) :: this    
+    class(ecosim_time_type), intent(inout) :: this
     character(len=*), optional, intent(in) :: namelist_buffer
     logical, optional, intent(in) :: masterproc
     integer, optional, intent(in) :: year0    !beginning year, used to record in the AD format
@@ -168,12 +169,12 @@ contains
       else
         call this%ReadNamelist(namelist_buffer)
       endif
-    else 
+    else
       if(present(nyears))then
-        this%stop_count=nyears        
-      endif   
+        this%stop_count=nyears
+      endif
     endif
-    if(present(year0))this%year0=year0    
+    if(present(year0))this%year0=year0
   end subroutine Init
 
   ! ----------------------------------------------------------------------
@@ -198,7 +199,7 @@ contains
   this%rest_frq=rest_frq
   this%rest_opt=rest_opt
 
-  end subroutine config_restart  
+  end subroutine config_restart
   ! ----------------------------------------------------------------------
 
   subroutine ReadNamelist(this, namelist_buffer, masterproc)
@@ -288,7 +289,7 @@ contains
     case ('ndays')
       !day
       this%stop_opt=2
-    case ('nmonths')  
+    case ('nmonths')
       this%stop_opt=3
     case ('nyears')
       !year
@@ -312,7 +313,7 @@ contains
 
      character(len=80) :: subname = trim(mod_filename)//'::its_time_to_write_restart'
 
-     ans=.false.      
+     ans=.false.
      select case (this%rest_opt)
      case ('nsteps')
        this%rest_n=mod(this%rest_n+1,this%rest_frq)
@@ -326,24 +327,24 @@ contains
        if(this%its_a_new_day())then
          this%rest_n=mod(this%rest_n+1,this%rest_frq)
          ans=(this%rest_n==0)
-       endif       
+       endif
      case ('nweeks')
        if(this%its_a_new_week())then
          this%rest_n=mod(this%rest_n+1,this%rest_frq)
          ans=(this%rest_n==0)
-       endif  
+       endif
      case ('nmonths')
        if(this%its_a_new_month())then
          this%rest_n=mod(this%rest_n+1,this%rest_frq)
          ans=(this%rest_n==0)
-       endif   
+       endif
      case ('nyears')
-       if(this%its_a_new_year())then 
+       if(this%its_a_new_year())then
          this%rest_n=mod(this%rest_n+1,this%rest_frq)
          ans=(this%rest_n==0)
-       endif           
+       endif
      case default
-       ans=.false.  
+       ans=.false.
      end select
 
      end function its_time_to_write_restart
@@ -360,7 +361,7 @@ contains
 
      character(len=80) :: subname = trim(mod_filename)//'::its_time_to_diag'
 
-     ans=.false.     
+     ans=.false.
      select case (this%diag_opt)
      case ('nsteps')
        this%diag_n=this%diag_n+1
@@ -380,17 +381,17 @@ contains
        if(this%its_a_new_week())then
          this%diag_n=mod(this%diag_n+1,this%diag_frq)
          ans=(this%diag_n==0)
-       endif  
+       endif
      case ('nmonths')
        if(this%its_a_new_month())then
          this%diag_n=mod(this%diag_n+1,this%diag_frq)
-         ans=(this%diag_n==0)         
-       endif   
+         ans=(this%diag_n==0)
+       endif
      case ('nyears')
-       if(this%its_a_new_year())then 
+       if(this%its_a_new_year())then
          this%diag_n=mod(this%diag_n+1,this%diag_frq)
-         ans=(this%diag_n==0)         
-       endif            
+         ans=(this%diag_n==0)
+       endif
      end select
 
      end function its_time_to_diag
@@ -475,11 +476,11 @@ contains
         this%leap_yr=1
       else
         this%leap_yr=0
-      endif   
+      endif
       if(this%stop_opt==4)then
         this%curr_stop_count=this%curr_stop_count+1
       endif
-    endif  
+    endif
     if(this%stop_opt==1)then
       this%curr_stop_count=this%curr_stop_count+1
     endif
@@ -563,7 +564,7 @@ contains
     this%cdays=int(cdtime/secspday)
 
     if(cdtime>0._r8)then
-      if(this%year0>0)then        
+      if(this%year0>0)then
         if(this%cdays>365)then
           nn=0
           do while(.true.)
@@ -592,7 +593,7 @@ contains
         endif
       else
         this%cyears=int(cdtime/secspyear)
-        
+
         this%doy=mod(this%cdays,365)
         this%dow=mod(this%cdays,7)
         do nn=1,12
@@ -601,7 +602,7 @@ contains
             exit
           endif
         enddo
-        this%tod=mod(cdtime,secspday)        
+        this%tod=mod(cdtime,secspday)
         this%toy=mod(cdtime,secspyear)
       endif
     endif
@@ -784,10 +785,10 @@ contains
   class(ecosim_time_type), intent(in) :: this
   integer :: ans
 
-  ans = this%moy  
+  ans = this%moy
   return
   end function get_curr_mon
-  
+
   !-------------------------------------------------------------------------------
   function get_curr_day(this)result(ans)
   implicit none
@@ -843,7 +844,7 @@ contains
   logical :: ans
 
   ans =(mod(year,400)== 0) .or. (mod(year,4)==0 .and. mod(year,100)/=0)
-  end function isLeap  
+  end function isLeap
 !------------------------------------------------------------------------------------------
   function isLeapi(year)result(ans)
   implicit none
@@ -867,7 +868,7 @@ contains
   integer :: ans,nd,nn
 
   nd=0
-  if (year<1900)then  
+  if (year<1900)then
     do nn=1900,year,-1
       if(isLeap(nn))then
         nd=mod(-366+nd,7)
@@ -881,7 +882,7 @@ contains
   elseif (year==1900)then
     ans=mod(doy,7)
     if(ans==0)ans=7
-  else  
+  else
     do nn=1900,year-1
       if(isLeap(nn))then
         nd=mod(366+nd,7)
@@ -895,7 +896,7 @@ contains
   end function getdow
 
 !------------------------------------------------------------------------------------------
-  subroutine get_steps_from_ymdhs(ymdhs,dtime_sec,etime_dat,year0) 
+  subroutine get_steps_from_ymdhs(ymdhs,dtime_sec,etime_dat,year0)
 
   implicit none
   character(len=*), intent(in) :: ymdhs
@@ -913,22 +914,22 @@ contains
 
   cdays2=cdays1
   if (present(year0))then
-    etime_dat%year0=year0    
+    etime_dat%year0=year0
     do nn=year0,year-1
       cdays1=cdays1+365+isLeapi(nn)
     enddo
-  else 
+  else
     etime_dat%year0=year
   endif
 
-  etime_dat%nstep=int((cdays1*secspday+hh*3600._r8+ss)/dtime_sec)  
-  etime_dat%tstep=int((cdays2*secspday+hh*3600._r8+ss)/dtime_sec)  
+  etime_dat%nstep=int((cdays1*secspday+hh*3600._r8+ss)/dtime_sec)
+  etime_dat%tstep=int((cdays2*secspday+hh*3600._r8+ss)/dtime_sec)
 
   end subroutine get_steps_from_ymdhs
   !-------------------------------------------------------------------------------
   subroutine get_prev_time(this,days, seconds)
   implicit none
-  class(ecosim_time_type), intent(inout) :: this    
+  class(ecosim_time_type), intent(inout) :: this
   integer, intent(out) ::&
         days,   &! number of whole days in time interval
         seconds  ! remaining seconds in time interval
@@ -941,12 +942,12 @@ contains
   else
     days=int(diff_time/86400._r8)
     seconds=diff_time-days*86400
-  endif    
+  endif
   end subroutine get_prev_time
   !-------------------------------------------------------------------------------
   subroutine get_prev_date(this,yr, mon, day, tod)
   implicit none
-  class(ecosim_time_type), intent(inout) :: this    
+  class(ecosim_time_type), intent(inout) :: this
   integer, intent(out) ::&
         yr,    &! year
         mon,   &! month
@@ -958,7 +959,7 @@ contains
   mon = this%moy_prev
   yr  = this%year_prev+this%year0
 
-  end subroutine get_prev_date    
+  end subroutine get_prev_date
   !-------------------------------------------------------------------------------
   subroutine get_curr_date(this,yr,mon,day,tod)
   implicit none
@@ -1001,11 +1002,11 @@ contains
 
   prev_loc=.false.
   if(present(prev))prev_loc=prev
-  if(prev_loc)then    
+  if(prev_loc)then
     call this%get_prev_date(year, mon, day, tod)
   else
     call this%get_curr_date(year, mon, day, tod)
-  endif  
+  endif
   hh=tod/3600
   ss=mod(tod,60)
   mm=(tod-hh*3600-ss)/60

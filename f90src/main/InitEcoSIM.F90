@@ -6,7 +6,8 @@ module InitEcoSIM
   use EcoSiMParDataMod    , only : micpar,pltpar
   implicit none
   private
-  character(len=*),private, parameter :: mod_filename = __FILE__
+  character(len=*),private, parameter :: mod_filename = &
+  __FILE__
   public :: InitModules
   public :: InitModules2
   contains

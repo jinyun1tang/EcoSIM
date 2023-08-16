@@ -15,7 +15,8 @@ subroutine regressiontest(nmfile,case_name, NX, NY)
   use GridDataType
   implicit none
 
-  character(len=*), parameter :: mod_filename = __FILE__
+  character(len=*), parameter :: mod_filename = &
+  __FILE__
   character(len=*), intent(in) :: nmfile
   character(len=*), intent(in) :: case_name
   integer, intent(in) :: NX

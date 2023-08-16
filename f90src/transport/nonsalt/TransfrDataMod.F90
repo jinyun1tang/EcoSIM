@@ -4,7 +4,8 @@ module TransfrDataMod
   use TracerIDMod
   use EcoSIMConfig, only : jcplx => jcplxc
 implicit none
-  CHARACTER(LEN=*), Private,PARAMETER :: MOD_FILENAME=__FILE__
+  CHARACTER(LEN=*), Private,PARAMETER :: MOD_FILENAME=&
+  __FILE__
   real(r8), parameter :: XFRS=0.05_r8
   real(r8), Parameter :: VFLWX=0.5
 

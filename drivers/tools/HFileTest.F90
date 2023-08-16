@@ -3,12 +3,13 @@ program HFileTest
   use data_kind_mod , only : r8 => DAT_KIND_R8
   use data_const_mod, only : pi=> DAT_CONST_PI
   use GridConsts    , only : bounds,JP
-  use fileUtil      , only : iulog  
+  use fileUtil      , only : iulog
   use abortutils        , only : endrun
   use EcoSIMCtrlMod     , only : etimer
   use EcoSIMConfig
   implicit none
-  character(len=*), parameter :: prognm=__FILE__
+  character(len=*), parameter :: prognm=&
+  __FILE__
   real(r8), pointer :: ptr_1d(:)
   real(r8), pointer :: TSOI(:)
   real(r8), pointer :: VSM(:)
@@ -118,5 +119,5 @@ program HFileTest
     enddo
     if(nlend)exit
   enddo
-   
+
 end program HFileTest

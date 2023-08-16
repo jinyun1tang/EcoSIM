@@ -4,12 +4,13 @@ module bhistMod
   use data_kind_mod  , only : r8 => DAT_Kind_r8, i4 => DAT_Kind_i4
   use ecosim_log_mod , only : errMsg => shr_log_errMsg
   use ncdio_pio      , only : file_desc_t
-  use data_const_mod , only : spval => DAT_CONST_SPVAL  
+  use data_const_mod , only : spval => DAT_CONST_SPVAL
   use fileUtil       , only : var_flux_type, var_state_type
 implicit none
  private
 
-  character(len=*), parameter :: mod_filename=__FILE__
+  character(len=*), parameter :: mod_filename=&
+  __FILE__
   integer, parameter :: nclocks=5
   integer, parameter :: clock_hour =1
   integer, parameter :: clock_day  =2

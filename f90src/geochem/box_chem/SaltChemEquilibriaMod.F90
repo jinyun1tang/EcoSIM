@@ -8,7 +8,8 @@ module SaltChemEquilibriaMod
   use EcoSIMSolverPar
   implicit none
   private
-  CHARACTER(LEN=*), PARAMETER :: MOD_FILENAME=__FILE__
+  CHARACTER(LEN=*), PARAMETER :: MOD_FILENAME=&
+  __FILE__
 
   real(r8), parameter :: ZERO=1.0E-15_r8
   real(r8), parameter :: ZEROS = 1.0E-015_r8

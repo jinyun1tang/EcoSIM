@@ -21,7 +21,8 @@ module SoilHydroParaMod
   use minimathmod  , only : isclose,AZMAX1,AZMIN1
 implicit none
   private
-  character(len=*), parameter :: mod_filename = __FILE__
+  character(len=*), parameter :: mod_filename = &
+  __FILE__
   real(r8), parameter :: FORGW=0.25E+06_r8 !threshold for  C concentration in organic soil 	g Mg-1
   real(r8), parameter :: mGravAccelerat=1.e-3_r8*GravAcceleration  !gravitational constant devided by 1000.
 

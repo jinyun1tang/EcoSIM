@@ -4,7 +4,8 @@ module GridDataType
 implicit none
   public
   save
-  character(len=*), private, parameter :: mod_filename = __FILE__
+  character(len=*), private, parameter :: mod_filename = &
+  __FILE__
 
   real(r8) :: TAREA               !total area of landscape	[m2]
   real(r8),target,allocatable ::  CumDepth2LayerBottom(:,:,:)                       !depth to bottom of soil layer [m]

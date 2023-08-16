@@ -40,7 +40,8 @@ module RedistMod
 
   private
 
-  character(len=*), parameter :: mod_filename = __FILE__
+  character(len=*), parameter :: mod_filename = &
+  __FILE__
 
   real(r8), pointer :: THETCX(:)
 

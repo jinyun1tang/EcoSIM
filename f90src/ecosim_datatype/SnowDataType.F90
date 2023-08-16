@@ -6,7 +6,8 @@ module SnowDataType
   implicit none
   public
   save
-  character(len=*), private, parameter :: mod_filename = __FILE__
+  character(len=*), private, parameter :: mod_filename = &
+  __FILE__
 
   real(r8),target, allocatable ::  VLSnowHeatCapM(:,:,:,:)            !volumetric heat capacity of snowpack
   real(r8),target, allocatable ::  WatFlowInSnowM(:,:,:,:)            !snowpack water flux

@@ -13,7 +13,8 @@ module PlantBranchMod
   use LitterFallMod
   implicit none
   private
-  character(len=*),private, parameter :: mod_filename = __FILE__
+  character(len=*),private, parameter :: mod_filename = &
+  __FILE__
   public :: GrowOneBranch
   contains
 !------------------------------------------------------------------------------------------
@@ -830,7 +831,7 @@ module PlantBranchMod
 !
     IF(IBTYP(NZ).NE.0.AND.IGTYP(NZ).GT.1.AND.IDTHB(NB1(NZ),NZ).EQ.1)then
       IDTHB(NB,NZ)=ibrdead
-    endif  
+    endif
 !
 !     REMOBILIZE EXCESS LEAF STRUCTURAL N,P
 !
@@ -2657,26 +2658,26 @@ module PlantBranchMod
     !     START OF SEASON
     !
         IF((IFLGE(NB,NZ).EQ.0.AND.ISTYP(NZ).NE.iplt_annual).AND.VRNS(NB,NZ).GE.VRNL(NB,NZ))THEN
-          
+
           D6245: DO M=1,jsken
             DO NE=1,npelms
               ESNC(NE,M,k_fine_litr,0,NZ)=ESNC(NE,M,k_fine_litr,0,NZ)+CFOPE(NE,infoliar,M,NZ) &
                 *(WTHSKBE(NE,NB,NZ)+WTEARBE(NE,NB,NZ)+WTGRBE(NE,NB,NZ))
-            ENDDO    
+            ENDDO
           ENDDO D6245
-            
+
           WTHSKBE(1:npelms,NB,NZ)=0._r8
           WTEARBE(1:npelms,NB,NZ)=0._r8
           WTGRBE(1:npelms,NB,NZ)=0._r8
-          
+
           GRNXB(NB,NZ)=0._r8
           GRNOB(NB,NZ)=0._r8
           GRWTB(NB,NZ)=0._r8
-          IF(IBTYP(NZ).EQ.0.OR.IGTYP(NZ).LE.1)THEN            
+          IF(IBTYP(NZ).EQ.0.OR.IGTYP(NZ).LE.1)THEN
             D6345: DO M=1,jsken
               DO NE=1,npelms
                 ESNC(NE,M,k_fine_litr,0,NZ)=ESNC(NE,M,k_fine_litr,0,NZ)+CFOPE(NE,istalk,M,NZ)*WTSTKBE(NE,NB,NZ)
-              ENDDO  
+              ENDDO
             ENDDO D6345
             WTSTKBE(1:npelms,NB,NZ)=0._r8
             WTSTXBE(1:npelms,NB,NZ)=0._r8
@@ -2719,7 +2720,7 @@ module PlantBranchMod
       IFLGQ(NB,NZ)=0
     ENDIF
     FSNR1=1.0_r8-FSNR
-    
+
     D6330: DO M=1,jsken
       DO NE=1,npelms
         ESNC(NE,M,k_fine_litr,0,NZ)=ESNC(NE,M,k_fine_litr,0,NZ)+FSNR*CFOPE(NE,infoliar,M,NZ) &
@@ -2729,10 +2730,10 @@ module PlantBranchMod
         ELSE
           ESNC(NE,M,k_fine_litr,0,NZ)=ESNC(NE,M,k_fine_litr,0,NZ)+FSNR*CFOPE(NE,infoliar,M,NZ)*WTGRBE(NE,NB,NZ)
         ENDIF
-      ENDDO  
+      ENDDO
     ENDDO D6330
 
-    DO NE=1,npelms  
+    DO NE=1,npelms
       WTHSKBE(NE,NB,NZ)=FSNR1*WTHSKBE(NE,NB,NZ)
       WTEARBE(NE,NB,NZ)=FSNR1*WTEARBE(NE,NB,NZ)
       WTGRBE(NE,NB,NZ)=FSNR1*WTGRBE(NE,NB,NZ)
@@ -2744,16 +2745,16 @@ module PlantBranchMod
 !     STALKS BECOME LITTERFALL IN GRASSES AT END OF SEASON
 !
     IF((IBTYP(NZ).EQ.0.OR.IGTYP(NZ).LE.1).AND.ISTYP(NZ).NE.iplt_annual)THEN
-      
+
       D6335: DO M=1,jsken
         DO NE=1,npelms
           ESNC(NE,M,k_fine_litr,0,NZ)=ESNC(NE,M,k_fine_litr,0,NZ)+FSNR*CFOPE(NE,istalk,M,NZ)*WTSTKBE(NE,NB,NZ)
-        ENDDO  
+        ENDDO
       ENDDO D6335
-      DO NE=1,npelms  
+      DO NE=1,npelms
         WTSTKBE(NE,NB,NZ)=FSNR1*WTSTKBE(NE,NB,NZ)
         WTSTXBE(NE,NB,NZ)=FSNR1*WTSTXBE(NE,NB,NZ)
-      ENDDO  
+      ENDDO
       DO K=0,JNODS1
         DO NE=1,npelms
           WGNODE(NE,K,NB,NZ)=FSNR1*WGNODE(NE,K,NB,NZ)

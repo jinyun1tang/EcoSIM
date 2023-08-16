@@ -48,7 +48,8 @@ module Hour1Mod
 
   private
 
-  CHARACTER(LEN=*), PARAMETER :: MOD_FILENAME=__FILE__
+  CHARACTER(LEN=*), PARAMETER :: MOD_FILENAME=&
+  __FILE__
 
   public :: hour1
   public :: InitHour1

@@ -2,7 +2,8 @@ module GridMod
 
 implicit none
   private
-  character(len=*), parameter :: mod_filename = __FILE__
+  character(len=*), parameter :: mod_filename = &
+  __FILE__
   public :: SetMesh
   public :: get_col, get_pft
 contains
@@ -89,7 +90,7 @@ contains
 
   allocate(bounds%icol(JY,JX))
   allocate(bounds%ipft(JP,JY,JX))
-  
+
   if(column_mode)nextra_grid=0
   JX=JX+nextra_grid
   JY=JY+nextra_grid
@@ -105,7 +106,7 @@ contains
       ENDDO
     ENDDO
   ENDDO
-  !read JZ from input data? 
+  !read JZ from input data?
   JZ=14
   JH=JX+nextra_grid
   JV=JY+nextra_grid
@@ -119,7 +120,7 @@ contains
   use GridConsts, only : JX0,JY0
   implicit none
   integer, intent(in) :: NY,NX
-  
+
   get_col=(NX-1)*JY0+NY
   end function get_col
 !------------------------------------------------------------------------
@@ -128,7 +129,7 @@ contains
   use GridConsts, only : JX0,JY0,JP
   implicit none
   integer, intent(in) :: NZ,NY,NX
-  
+
   get_pft=(NX-1)*(JP*JY0)+(NY-1)*JP+NZ
 
   end function get_pft

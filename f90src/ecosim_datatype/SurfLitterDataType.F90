@@ -5,7 +5,8 @@ module SurfLitterDataType
   implicit none
   public
   save
-  character(len=*), private, parameter :: mod_filename = __FILE__
+  character(len=*), private, parameter :: mod_filename = &
+  __FILE__
 
   real(r8) ,target,allocatable ::   BulkDensLitR(:)                          !surface litter bulk density	[Mg m-3]
   real(r8) ,target,allocatable ::   PARR(:,:)                        !surface litter boundary layer conductance, [m t-1]

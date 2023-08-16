@@ -5,7 +5,8 @@ module MicrobialDataType
 implicit none
   public
   save
-  character(len=*), private, parameter :: mod_filename = __FILE__
+  character(len=*), private, parameter :: mod_filename = &
+  __FILE__
 
   real(r8),target,allocatable :: OMC(:,:,:,:,:,:)    !microbial biomass C	[g d-2]
   real(r8),target,allocatable :: OMN(:,:,:,:,:,:)    !microbial biomass N	[g d-2]

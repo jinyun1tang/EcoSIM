@@ -9,15 +9,15 @@ module ATSEcoSIMInitMod
   use ClimForcDataType
   use SoilPropertyDataType
 implicit none
-  character(len=*), private, parameter :: mod_filename= 
-  &__FILE__
+  character(len=*), private, parameter :: mod_filename=&
+  __FILE__
   public :: Init_EcoSIM_Soil
   contains
 
   subroutine Init_EcoSIM_Soil()
   use EcoSimConst
-  use GridMod           , only : SetMesh  
-  use InitAllocMod        
+  use GridMod           , only : SetMesh
+  use InitAllocMod
   use StartsMod, only : startsim
   implicit none
   integer :: NY,NX,L,NHW,NHE,NVN,NVS
@@ -38,7 +38,7 @@ implicit none
     AREA(3,NU(NY,NX),NY,NX)=a_AREA3(NY)
     ASP(NY,NX)=a_ASP(NY)
     TairKClimMean(NY,NX)=a_ATKA(NY)
-    CO2E(NY,NX)=atm_co2 
+    CO2E(NY,NX)=atm_co2
     CH4E(NY,NX)=atm_ch4
     OXYE(NY,NX)=atm_o2
     Z2GE(NY,NX)=atm_n2
@@ -53,8 +53,8 @@ implicit none
       SoiBulkDensityt0(L,NY,NX)=a_BKDSI(L,NY)
       CORGC(L,NY,NX)=a_CORGC(L,NY)
       CORGN(L,NY,NX)=a_CORGN(L,NY)
-      CORGP(L,NY,NX)=a_CORGP(L,NY)      
-    ENDDO        
+      CORGP(L,NY,NX)=a_CORGP(L,NY)
+    ENDDO
   ENDDO
 
   call startsim(NHW,NHE,NVN,NVS)

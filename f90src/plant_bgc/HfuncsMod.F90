@@ -13,7 +13,8 @@ module HfuncsMod
   private
 
 
-  character(len=*), parameter :: mod_filename = __FILE__
+  character(len=*), parameter :: mod_filename = &
+  __FILE__
 
   real(r8) :: RLA,STK,TKCO,TFNP
   real(r8) :: WFNG

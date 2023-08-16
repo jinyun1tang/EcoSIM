@@ -5,7 +5,8 @@ module AquaSaltChemMod
   use ChemIDMod
 implicit none
   private
-  character(len=*), parameter :: mod_filename = __FILE__
+  character(len=*), parameter :: mod_filename = &
+  __FILE__
 
 
   public :: Init_geochem_salt

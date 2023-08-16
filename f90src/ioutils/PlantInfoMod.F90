@@ -23,7 +23,8 @@ module PlantInfoMod
 implicit none
 
   save
-  character(len=*),private, parameter :: mod_filename = __FILE__
+  character(len=*),private, parameter :: mod_filename = &
+  __FILE__
   integer :: IDX,IMO,IYR,IDY,ICUT,IDYE,IDYG,IDYS,JCUT,LPY
 
   public :: ReadPlantInfo

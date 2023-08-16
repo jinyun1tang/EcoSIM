@@ -21,7 +21,8 @@ module MicBGCMod
   private
 
   save
-  character(len=*), parameter :: mod_filename = __FILE__
+  character(len=*), parameter :: mod_filename = &
+  __FILE__
 
   integer :: jcplx,NFGs,jsken,ndbiomcp,nlbiomcp
   integer, pointer :: JGniA(:)

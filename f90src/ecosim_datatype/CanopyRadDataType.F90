@@ -4,7 +4,8 @@ module CanopyRadDataType
   use GridConsts
   implicit none
   public
-  character(len=*),private, parameter :: mod_filename = __FILE__
+  character(len=*),private, parameter :: mod_filename = &
+  __FILE__
   real(r8),target,allocatable :: ZSIN(:)                        !sine of leaf angle	-
   real(r8),target,allocatable :: ZCOS(:)                        !cosine of leaf angle	-
   real(r8),target,allocatable :: OMEGA(:,:,:)                   !sine of indirect sky radiation on leaf surface
@@ -52,7 +53,7 @@ module CanopyRadDataType
   !JLS: number of leaf sectors divide the whole horizontal circle
   integer :: ncols
   ncols = bounds%ncols
-  
+
   allocate(ZSIN(JLI))
   allocate(ZCOS(JLI))
   allocate(OMEGA(JSA,JLI,JLA))

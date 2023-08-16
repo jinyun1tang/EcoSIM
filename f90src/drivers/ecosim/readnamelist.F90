@@ -12,7 +12,8 @@
   use HistFileMod
   use RestartMod     , only : rest_frq,rest_opt
   implicit none
-  character(len=*), parameter :: mod_filename = __FILE__
+  character(len=*), parameter :: mod_filename = &
+  __FILE__
   character(len=ecosim_namelist_buffer_size), intent(in) :: nml_buffer
   character(len=36)    , intent(out) :: case_name
   character(len=80)    , intent(out) :: prefix

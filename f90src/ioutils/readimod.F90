@@ -35,7 +35,8 @@ module readiMod
   implicit none
   private
 
-  character(len=*), parameter :: mod_filename = __FILE__
+  character(len=*), parameter :: mod_filename = &
+  __FILE__
   real(r8) :: datav(40)
   CHARACTER(len=16) :: OUTW,OUTI,OUTT,OUTN,OUTF
   CHARACTER(len=4) :: CHARY

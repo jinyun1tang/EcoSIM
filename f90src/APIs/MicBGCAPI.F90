@@ -29,7 +29,8 @@ module MicBGCAPI
 implicit none
   save
   private
-  character(len=*), private, parameter :: mod_filename = __FILE__
+  character(len=*), private, parameter :: mod_filename = &
+  __FILE__
 
   type(micforctype) :: micfor
   type(micsttype) :: micstt

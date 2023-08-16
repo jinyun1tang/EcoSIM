@@ -3,7 +3,8 @@ module GridConsts
 implicit none
   public
   save
-  character(len=*), private, parameter :: mod_filename = __FILE__
+  character(len=*), private, parameter :: mod_filename = &
+  __FILE__
 
   integer :: JX=6
   integer :: JY=4
@@ -29,7 +30,7 @@ implicit none
   integer, pointer :: JGnfA(:)   !guid indices for autotrophic-microbial complex
   integer  :: NMICBSA             !total number of microbial guilds in the autotrophic complex
   integer  :: NMICBSO             !total number of microbial guilds in one organic-microbial complex
-   
+
   type, public :: bounds_type
    integer :: NHW
    integer :: NVN

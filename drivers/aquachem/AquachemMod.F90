@@ -8,7 +8,8 @@ module AquachemMod
 implicit none
   private
   save
-  character(len=*), parameter :: mod_filename = __FILE__
+  character(len=*), parameter :: mod_filename = &
+  __FILE__
 
   public :: getvarlist
   public :: initmodel

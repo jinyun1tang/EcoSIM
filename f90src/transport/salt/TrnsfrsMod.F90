@@ -30,7 +30,8 @@ module TrnsfrsMod
   implicit none
 
   private
-  CHARACTER(LEN=*), PARAMETER :: MOD_FILENAME=__FILE__
+  CHARACTER(LEN=*), PARAMETER :: MOD_FILENAME=&
+  __FILE__
 
   real(r8) :: RCHQF,RCHGFU,RCHGFT
   real(r8) :: XN
@@ -84,7 +85,7 @@ module TrnsfrsMod
 
   integer :: NX,NY,L,M
 !     execution begins here
-  
+
 !
 !     TIME STEPS FOR SOLUTE FLUX CALCULATIONS
 !

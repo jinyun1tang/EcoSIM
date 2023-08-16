@@ -5,7 +5,8 @@ module UptakePars
   implicit none
   public
   save
-  character(len=*),private, parameter :: mod_filename = __FILE__
+  character(len=*),private, parameter :: mod_filename = &
+  __FILE__
 !
 !     MaxIterNum=max number of cycles in convergence soln for water uptake
 !     DIFFX,DIFFY=acceptance criteria in convergence soln

@@ -15,7 +15,8 @@ module UptakesMod
 
   private
 
-  character(len=*), private, parameter :: mod_filename = __FILE__
+  character(len=*), private, parameter :: mod_filename = &
+  __FILE__
 
   public :: uptakes
   public :: InitUptake

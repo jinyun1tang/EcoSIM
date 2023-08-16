@@ -12,7 +12,8 @@ program ClimTransformer
   use netcdf
   use EcoSIMConfig, only : IFLGW
 implicit none
-  character(len=*), parameter :: mod_filename = __FILE__
+  character(len=*), parameter :: mod_filename = &
+  __FILE__
 
   type(atm_forc_type) :: atmf
   integer :: I,IX,II,JJ

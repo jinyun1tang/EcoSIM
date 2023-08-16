@@ -50,7 +50,8 @@ module RestartMod
 implicit none
   private
   save
-  character(len=*),private, parameter :: mod_filename = __FILE__
+  character(len=*),private, parameter :: mod_filename = &
+  __FILE__
   character(len=8),public :: rest_opt='year'
   integer         ,public :: rest_frq=-999999999
   integer,  parameter :: uninit_int = -999999999

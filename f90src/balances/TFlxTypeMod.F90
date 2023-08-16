@@ -8,7 +8,8 @@ module TFlxTypeMod
   use EcoSIMConfig, only : nlbiomcp=>nlbiomcpc,ndbiomcp=>ndbiomcpc
 implicit none
 
-  character(len=*), private, parameter :: mod_filename = __FILE__
+  character(len=*), private, parameter :: mod_filename = &
+  __FILE__
 
   public
 

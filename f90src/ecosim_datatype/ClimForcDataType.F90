@@ -2,7 +2,8 @@ module ClimForcDataType
   use data_kind_mod, only : r8 => DAT_KIND_R8
   use GridConsts
 implicit none
-  character(len=*), private, parameter :: mod_filename = __FILE__
+  character(len=*), private, parameter :: mod_filename = &
+  __FILE__
 
   real(r8) :: DECLIN
   real(r8) :: RMAX       !maximum hourly radiation,	[MJ m-2 h-1]

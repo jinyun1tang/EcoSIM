@@ -6,7 +6,8 @@ PROGRAM etimerTest
   USE fileUtil          , ONLY : iulog,ecosim_namelist_buffer_size,namelist_to_buffer
   implicit none
 
-  character(len=*), parameter :: mod_filename = __FILE__
+  character(len=*), parameter :: mod_filename = &
+  __FILE__
 
   type(ecosim_time_dat_type)  :: etime_dat
   character(len=ecosim_namelist_buffer_size) :: nml_buffer
@@ -28,16 +29,16 @@ PROGRAM etimerTest
 
   call etimer%Init(nml_buffer,year0=1984)
 
-  DO while(.true.)    
-    call etimer%get_ymdhs(ymdhs)            
-    call etimer%update_time_stamp()     
+  DO while(.true.)
+    call etimer%get_ymdhs(ymdhs)
+    call etimer%update_time_stamp()
     print*,ymdhs,etimer%get_curr_day()
     if(etimer%its_a_new_month())print*,ymdhs,etimer%get_curr_day()
     if(etimer%its_time_to_write_restart())print*,'write restart ',ymdhs
     if(etimer%its_time_to_exit())exit
   enddo
 
-  call get_steps_from_ymdhs('18810315060000',3600,etime_dat,1880) 
+  call get_steps_from_ymdhs('18810315060000',3600,etime_dat,1880)
 
   a=(/1.,2.,3./)
   print*,'18810315060000 ',sum(a(1:0))

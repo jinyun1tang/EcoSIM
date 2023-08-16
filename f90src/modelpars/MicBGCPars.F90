@@ -7,7 +7,8 @@ module MicBGCPars
 implicit none
   private
   save
-  character(len=*), private, parameter :: mod_filename = __FILE__
+  character(len=*), private, parameter :: mod_filename = &
+  __FILE__
 
   type, public :: MicParType
   integer :: jcplx   !# of microbe-substrate complexes

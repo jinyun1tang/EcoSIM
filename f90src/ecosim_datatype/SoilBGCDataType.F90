@@ -8,7 +8,8 @@ module SoilBGCDataType
   use TracerIDMod
   use EcoSIMConfig, only : jcplx => jcplxc,jsken => jskenc
 implicit none
-  character(len=*), private, parameter :: mod_filename = __FILE__
+  character(len=*), private, parameter :: mod_filename = &
+  __FILE__
 
   real(r8),target,allocatable ::  CNH4(:,:,:)                       !soil NH4 content, [mg kg-1]
   real(r8),target,allocatable ::  CNO3(:,:,:)                       !soil NO3 content, [mg kg-1]
