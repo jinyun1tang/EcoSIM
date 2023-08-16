@@ -549,24 +549,32 @@ module ncdio_pio
     call check_ret(ncd_putatt(ncid,varid,'flag_values',flag_values),subname)
     if ( .not. present(flag_meanings)) then
       write(iulog,*) 'Error in defining variable = ', trim(varname)
-      call endrun(" ERROR:: flag_values set -- but not flag_meanings"//errMsg(__FILE__, __LINE__))
+      call endrun(" ERROR:: flag_values set -- but not flag_meanings"//errMsg(&
+      __FILE__,&
+      __LINE__))
     end if
   end if
 
   if (present(flag_meanings)) then
       if ( .not. present(flag_values)) then
         write(iulog,*) 'Error in defining variable = ', trim(varname)
-        call endrun(" ERROR:: flag_meanings set -- but not flag_values"//errMsg(__FILE__, __LINE__) )
+        call endrun(" ERROR:: flag_meanings set -- but not flag_values"//errMsg(&
+        __FILE__, &
+        __LINE__) )
       end if
       if ( size(flag_values) /= size(flag_meanings) ) then
         write(iulog,*) 'Error in defining variable = ', trim(varname)
-        call endrun(" ERROR:: flag_meanings and flag_values dimension different"//errMsg(__FILE__, __LINE__))
+        call endrun(" ERROR:: flag_meanings and flag_values dimension different"//errMsg(&
+        __FILE__, &
+        __LINE__))
       end if
       str = flag_meanings(1)
       do n = 1, size(flag_meanings)
         if ( index(flag_meanings(n), ' ') /= 0 )then
             write(iulog,*) 'Error in defining variable = ', trim(varname)
-            call endrun(" ERROR:: flag_meanings has an invalid space in it"//errMsg(__FILE__, __LINE__) )
+            call endrun(" ERROR:: flag_meanings has an invalid space in it"//errMsg(&
+            __FILE__, &
+            __LINE__) )
         end if
         if ( n > 1 ) str = trim(str)//" "//flag_meanings(n)
       end do
