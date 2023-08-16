@@ -5,7 +5,7 @@ implicit none
 
   save
   character(len=*), private, parameter :: mod_filename = &
-  __FILE__
+  "SoilPropertyDataType.F90"
 
    real(r8) ,target,allocatable ::  CORGCI(:,:,:)                    !soil organic C content   [g kg-1]
    real(r8) ,target,allocatable ::  POROSI(:,:,:)                    !soil porosity            [m3 m-3]
