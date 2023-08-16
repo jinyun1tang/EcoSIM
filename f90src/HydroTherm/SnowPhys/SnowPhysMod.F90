@@ -338,7 +338,7 @@ contains
           ! HFLVSR,HFLWSR=snowpack-litter convective,conductive heat fluxes
           ! FLVS1=snowpack-soil vapor flux
           ! HFLVS1,HFLWS1=snowpack-soil convective,conductive heat fluxes
-          ! VHCP1,VHCPRX=current,minimum litter heat capacities
+          ! VolHeatCapacity,VHCPRX=current,minimum litter heat capacities
           ! TK0X,TKXR,TK1X=snowpack,litter,soil temperatures
           ! CNVR,CNV1,CNV2=litter,snowpack,soil vapor conductivity
           ! THETP*,THETWX,THETIX=litter air,water,ice concentration
@@ -359,7 +359,7 @@ contains
           HFLWR1=0.0_r8
 
           !surface litter layer is active
-          IF(VHCP1(0,NY,NX).GT.VHCPRX(NY,NX))THEN
+          IF(VolHeatCapacity(0,NY,NX).GT.VHCPRX(NY,NX))THEN
             call SnowSurLitterExch(M,L,NY,NX,CNV1,CNV2,TCND1W,VOLP01,PSISV1,TCNDS,&
               FLVSR,HFLVSR,HFLWSR,FLVR1,HFLVR1,HFLWR1)
           ENDIF
@@ -772,7 +772,7 @@ contains
     !
     !     IF SNOWPACK DISAPPEARS ALL MATERIAL,HEAT TRANSFERRED TO SOIL SURFACE
     !
-    !     VHCP1,VHCP1A,VHCP1P=total soil,soil+micropore,macropore heat capacity
+    !     VolHeatCapacity,VolHeatCapacityA,VolHeatCapacityP=total soil,soil+micropore,macropore heat capacity
     !     TK1=soil surface temperature, why not to litter layer
     !
   IF(VHCPW(1,NY,NX).LE.VHCPWX(NY,NX).AND.TairK(NY,NX).GT.TFice)THEN
@@ -788,17 +788,17 @@ contains
     VOLW1(NUM(NY,NX),NY,NX)=VOLW1(NUM(NY,NX),NY,NX)+FLWW
     VOLI1(NUM(NY,NX),NY,NX)=VOLI1(NUM(NY,NX),NY,NX)+FLWI+FLWS/DENSI
     
-    ENGY1=VHCP1(NUM(NY,NX),NY,NX)*TK1(NUM(NY,NX),NY,NX)
-    VHCP1A(NUM(NY,NX),NY,NX)=VHCM(NUM(NY,NX),NY,NX) &
+    ENGY1=VolHeatCapacity(NUM(NY,NX),NY,NX)*TK1(NUM(NY,NX),NY,NX)
+    VolHeatCapacityA(NUM(NY,NX),NY,NX)=VHCM(NUM(NY,NX),NY,NX) &
       +cpw*VOLW1(NUM(NY,NX),NY,NX)+cpi*VOLI1(NUM(NY,NX),NY,NX)
-    VHCP1B(NUM(NY,NX),NY,NX)=cpw*VOLWH1(NUM(NY,NX),NY,NX) &
+    VolHeatCapacityB(NUM(NY,NX),NY,NX)=cpw*VOLWH1(NUM(NY,NX),NY,NX) &
       +cpi*VOLIH1(NUM(NY,NX),NY,NX)
-    VHCP1(NUM(NY,NX),NY,NX)=VHCP1A(NUM(NY,NX),NY,NX)+VHCP1B(NUM(NY,NX),NY,NX)
+    VolHeatCapacity(NUM(NY,NX),NY,NX)=VolHeatCapacityA(NUM(NY,NX),NY,NX)+VolHeatCapacityB(NUM(NY,NX),NY,NX)
 
-    IF(VHCP1(NUM(NY,NX),NY,NX).GT.ZEROS(NY,NX))THEN
+    IF(VolHeatCapacity(NUM(NY,NX),NY,NX).GT.ZEROS(NY,NX))THEN
     ! topsoil layer is there
       tk1pres=TK1(NUM(NY,NX),NY,NX)
-      TK1(NUM(NY,NX),NY,NX)=(ENGY1+HFLWS)/VHCP1(NUM(NY,NX),NY,NX)
+      TK1(NUM(NY,NX),NY,NX)=(ENGY1+HFLWS)/VolHeatCapacity(NUM(NY,NX),NY,NX)
       if(abs(tk1pres/TK1(NUM(NY,NX),NY,NX)-1._r8)>0.025_r8)then
         TK1(NUM(NY,NX),NY,NX)=TairK(NY,NX)
       endif
@@ -1045,7 +1045,7 @@ contains
     ! HFLWC,HFLWX=snow-litter heat flux unltd,ltd by heat
     ! HFLWSRX=snow-litter heat flux
     ! VHCPWMM= volumetric heat capacity in snow layer
-    TKY=(TK0X*VHCPWMM(L,NY,NX)+TKXR*VHCP1(0,NY,NX))/(VHCPWMM(L,NY,NX)+VHCP1(0,NY,NX))
+    TKY=(TK0X*VHCPWMM(L,NY,NX)+TKXR*VolHeatCapacity(0,NY,NX))/(VHCPWMM(L,NY,NX)+VolHeatCapacity(0,NY,NX))
     HFLWX=(TK0X-TKY)*VHCPWMM(L,NY,NX)*XNPC
     HFLWC=ATCNDR*(TK0X-TKXR)*AREA(3,NUM(NY,NX),NY,NX)*FSNW(NY,NX)*CVRD(NY,NX)*XNPQ
     IF(HFLWC.GE.0.0_r8)THEN
@@ -1101,9 +1101,9 @@ contains
       HFLVR1X=0.0_r8
     ENDIF
     !update litter layer temperature
-    TKXR=TKXR-HFLVR1X/VHCP1(0,NY,NX)   
+    TKXR=TKXR-HFLVR1X/VolHeatCapacity(0,NY,NX)   
     !update top soil layer temperature
-    TK1X=TK1X+HFLVR1X/VHCP1(NUM(NY,NX),NY,NX)
+    TK1X=TK1X+HFLVR1X/VolHeatCapacity(NUM(NY,NX),NY,NX)
 !
 !     HEAT FLUX BETWEEN SURFACE RESIDUE AND SOIL SURFACE
 !
@@ -1111,8 +1111,8 @@ contains
 !     HFLWC,HFLWX=litter-soil heat flux unltd,ltg by heat
 !     HFLWR1X=litter-soil heat flux
 !
-    TKY=(TKXR*VHCP1(0,NY,NX)+TK1X*VHCP1(NUM(NY,NX),NY,NX))/(VHCP1(0,NY,NX)+VHCP1(NUM(NY,NX),NY,NX))
-    HFLWX=(TKXR-TKY)*VHCP1(0,NY,NX)*XNPC
+    TKY=(TKXR*VolHeatCapacity(0,NY,NX)+TK1X*VolHeatCapacity(NUM(NY,NX),NY,NX))/(VolHeatCapacity(0,NY,NX)+VolHeatCapacity(NUM(NY,NX),NY,NX))
+    HFLWX=(TKXR-TKY)*VolHeatCapacity(0,NY,NX)*XNPC
     HFLWC=ATCNDS*(TKXR-TK1X)*AREA(3,NUM(NY,NX),NY,NX)*FSNW(NY,NX)*CVRD(NY,NX)*XNPQ
     IF(HFLWC.GE.0.0_r8)THEN
       HFLWR1X=AZMAX1(AMIN1(HFLWX,HFLWC))
@@ -1135,8 +1135,8 @@ contains
     HFLVR1=HFLVR1+HFLVR1X
     HFLWR1=HFLWR1+HFLWR1X
     TK0X=TK0X-HFLVSRX/VHCPWMM(L,NY,NX)
-    TKXR=TKXR+(HFLVSRX-HFLWR1X)/VHCP1(0,NY,NX)
-    TK1X=TK1X+HFLWR1X/VHCP1(NUM(NY,NX),NY,NX)
+    TKXR=TKXR+(HFLVSRX-HFLWR1X)/VolHeatCapacity(0,NY,NX)
+    TK1X=TK1X+HFLWR1X/VolHeatCapacity(NUM(NY,NX),NY,NX)
 
   ENDDO D4000
   
@@ -1376,8 +1376,8 @@ contains
     ATCNDS=0.0_r8
   ENDIF
 
-  TKWX1=TK1(NUM(NY,NX),NY,NX)+HFLVS1/VHCP1(NUM(NY,NX),NY,NX)
-  TKY=(TempK_snowpack(L,NY,NX)*VHCPWMM(L,NY,NX)+TKWX1*VHCP1(NUM(NY,NX),NY,NX))/(VHCPWMM(L,NY,NX)+VHCP1(NUM(NY,NX),NY,NX))
+  TKWX1=TK1(NUM(NY,NX),NY,NX)+HFLVS1/VolHeatCapacity(NUM(NY,NX),NY,NX)
+  TKY=(TempK_snowpack(L,NY,NX)*VHCPWMM(L,NY,NX)+TKWX1*VolHeatCapacity(NUM(NY,NX),NY,NX))/(VHCPWMM(L,NY,NX)+VolHeatCapacity(NUM(NY,NX),NY,NX))
   HFLWX=(TempK_snowpack(L,NY,NX)-TKY)*VHCPWMM(L,NY,NX)*XNPA
   HFLWC=ATCNDS*(TempK_snowpack(L,NY,NX)-TKWX1)*AREA(3,NUM(NY,NX),NY,NX)*FSNW(NY,NX)*BARE(NY,NX)*XNPY
   IF(HFLWC.GE.0.0_r8)THEN

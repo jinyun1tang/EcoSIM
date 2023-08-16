@@ -56,7 +56,7 @@ implicit none
   real(r8), parameter :: EMMR=0.97_r8    !surfce litter emissivity
   real(r8), parameter :: RACX=0.0139_r8    !total canopy boundary later resistance h/m  
 
-  real(r8) :: VOLW12,VHCPR2,VHCP12,VFLXR
+  real(r8) :: VOLW12,VHCPR2,VolHeatCapacity2,VFLXR
   real(r8) :: FLV1,TKS1,TKR1,THRMZ,SFLXR
   real(r8) :: HFLXR,HWFLM2,RFLXR,FLYM2  
   real(r8) :: EFLXR,HWFLV1,HFLCR1,VFLXG
@@ -130,7 +130,7 @@ contains
 !     FOR USE AT INTERNAL TIME STEP IN SURFACE LITTER
 !
 !     THRMG=longwave emission from litter surface
-!     VHCP1=volumetric heat capacity of litter
+!     VolHeatCapacity=volumetric heat capacity of litter
 !     VOLA*,VOLW*,VOLI*,VOLP*=pore,water,ice,air volumes of litter
 !     VOLWRX=maximum water retention by litter
 !     XVOLT,XVOLW=free surface water+ice,water
@@ -140,7 +140,7 @@ contains
 !     PSISM*=litter matric water potential
 !
   THRMG(NY,NX)=0.0_r8
-  VHCP1(0,NY,NX)=cpo*ORGC(0,NY,NX)+cpw*VOLW(0,NY,NX)+cpi*VOLI(0,NY,NX)
+  VolHeatCapacity(0,NY,NX)=cpo*ORGC(0,NY,NX)+cpw*VOLW(0,NY,NX)+cpi*VOLI(0,NY,NX)
   VOLA10(NY,NX)=VOLA(0,NY,NX)
   VOLW1(0,NY,NX)=AZMAX1(VOLW(0,NY,NX))
   VOLI1(0,NY,NX)=AZMAX1(VOLI(0,NY,NX))
@@ -190,7 +190,7 @@ contains
   FSNW(NY,NX)=AMIN1(1.0_r8,SQRT((SnowDepth(NY,NX)/MinSnowDepth)))
   FSNX(NY,NX)=1.0_r8-FSNW(NY,NX)
   !if there is heat-wise significant litter layer
-  IF(VHCP1(0,NY,NX).GT.VHCPRX(NY,NX))THEN
+  IF(VolHeatCapacity(0,NY,NX).GT.VHCPRX(NY,NX))THEN
     BARE(NY,NX)=AMIN1(1.0_r8,AZMAX1(EXP(-0.8E-02_r8*(ORGC(0,NY,NX)/AREA(3,0,NY,NX)))))
   ELSE
     BARE(NY,NX)=1.0_r8
@@ -480,8 +480,8 @@ contains
         HWFLV2=0.0_r8
       ENDIF
       TKXR=TKR1-HWFLV2/VHCPR2         !update litter layer temperature
-      TK1X=TKS1+HWFLV2/VHCP12         !update soil layer temperature
-      TKY=(TKXR*VHCPR2+TK1X*VHCP12)/(VHCPR2+VHCP12)   !equilibrium temperature
+      TK1X=TKS1+HWFLV2/VolHeatCapacity2         !update soil layer temperature
+      TKY=(TKXR*VHCPR2+TK1X*VolHeatCapacity2)/(VHCPR2+VolHeatCapacity2)   !equilibrium temperature
       HFLWX=(TKXR-TKY)*VHCPR2*XNPB    !sensible heat flux
       HFLWC=ATCNDR*(TKXR-TK1X)*AREA(3,NUM(NY,NX),NY,NX)*FSNX(NY,NX)*CVRD(NY,NX)*XNPZ
       IF(HFLWC.GE.0.0_r8)THEN
@@ -538,13 +538,13 @@ contains
     
     ! VHCPR2: heat capacity, kJ/kg/Kelvin
     VHCPR2=cpo*ORGC(0,NY,NX)+cpw*VOLWR2+cpi*VOLI1(0,NY,NX)
-    VHCP12=VHCP12+cpw*FLV2
+    VolHeatCapacity2=VolHeatCapacity2+cpw*FLV2
     tk1pre=TKR1
     TKR1=(ENGYR+HFLXR2+HWFLM2-HWFLV2-HFLCR2)/VHCPR2
     IF(ABS(VHCPRXX/VHCPR2-1._r8)>0.025_r8.or.abs(TKR1/tk1pre-1._r8)>0.025_r8)then
       TKR1=TK1(0,NY,NX)
     endif
-    TKS1=TKS1+(HWFLV2+HFLCR2)/VHCP12
+    TKS1=TKS1+(HWFLV2+HFLCR2)/VolHeatCapacity2
 
   ENDDO D5000
   end subroutine SurfLitterIterate
@@ -576,7 +576,7 @@ contains
   HWFLV1=0.0_r8
   HFLCR1=0.0_r8
   THRMZ=0.0_r8
-  IF(VHCP1(0,NY,NX).LE.VHCPRX(NY,NX))THEN
+  IF(VolHeatCapacity(0,NY,NX).LE.VHCPRX(NY,NX))THEN
     TK1(0,NY,NX)=TK1(NUM(NY,NX),NY,NX)
     RETURN
   ENDIF  
@@ -589,7 +589,7 @@ contains
 ! RADXR,THRYR=incoming shortwave,longwave radiation
 ! TKR1,TKS1=litter,soil temperature
 ! VOLWR2,VOLW12=litter,soil water volume
-! VHCPR2,VHCP12=litter,soil heat capacity
+! VHCPR2,VolHeatCapacity2=litter,soil heat capacity
 !
 ! litter layer
 ! albedo
@@ -603,12 +603,12 @@ contains
   !volumetric water content
   VOLWR2=VOLW1(0,NY,NX)                          
   !heat capacity, initialized with residual layer
-  VHCPR2=VHCP1(0,NY,NX)                          
+  VHCPR2=VolHeatCapacity(0,NY,NX)                          
 
 ! top soil layer
   TKS1=TK1(NUM(NY,NX),NY,NX)
   VOLW12=VOLW1(NUM(NY,NX),NY,NX)
-  VHCP12=VHCP1(NUM(NY,NX),NY,NX)
+  VolHeatCapacity2=VolHeatCapacity(NUM(NY,NX),NY,NX)
   !
   ! THERMAL CONDUCTIVITY BETWEEN SURFACE RESIDUE AND SOIL SURFACE
   !
@@ -865,7 +865,7 @@ contains
 !
 ! ENERGY EXCHANGE AT SOIL SURFACE IF EXPOSED UNDER SNOWPACK
 ! FSNW,FSNX=fractions of snow,snow-free cover
-  IF(FSNX(NY,NX).GT.0.0_r8.AND.(BKDS(NUM(NY,NX),NY,NX).GT.ZERO.OR.VHCP1(NUM(NY,NX),NY,NX).GT.VHCPNX(NY,NX)))THEN
+  IF(FSNX(NY,NX).GT.0.0_r8.AND.(BKDS(NUM(NY,NX),NY,NX).GT.ZERO.OR.VolHeatCapacity(NUM(NY,NX),NY,NX).GT.VHCPNX(NY,NX)))THEN
    !
     call ExposedSoilFlux(M,NY,NX,RAR1,TopLayerWaterVolume)
 !
@@ -1039,7 +1039,7 @@ contains
   implicit none
   integer, intent(in) :: M,NY,NX
   integer, intent(out):: N1,N2
-  real(r8) :: TFLX1,TK1X,ENGYR,VOLW1X,VHCP1X
+  real(r8) :: TFLX1,TK1X,ENGYR,VOLW1X,VolHeatCapacityX
   real(r8) :: TFREEZ,TFLX,VX
   real(r8) :: HFLQHR,FLQHR  
   real(r8) :: D,Q,R,V
@@ -1069,7 +1069,7 @@ contains
 !     TFREEZ=litter freezing temperature
 !     PSISM1=litter water potential
 !     VOLW1*,VOLI1=litter water,ice volume
-!     VHCP1*=litter volumetric heat capacity
+!     VolHeatCapacity*=litter volumetric heat capacity
 !     TK1*=litter temperature
 !     ORGC=litter organic C
 !     HFLWRL=total litter conductive, convective heat flux
@@ -1078,16 +1078,16 @@ contains
 !
   TFREEZ=-9.0959E+04_r8/(PSISM1(0,NY,NX)-333.0_r8)
   VOLW1X=AZMAX1(VOLW1(0,NY,NX)+FLWRL(NY,NX))
-  ENGYR=VHCP1(0,NY,NX)*TK1(0,NY,NX)
-  VHCP1X=cpo*ORGC(0,NY,NX)+cpw*VOLW1X+cpi*VOLI1(0,NY,NX)
-  IF(VHCP1X.GT.ZEROS(NY,NX))THEN
-    TK1X=(ENGYR+HFLWRL(NY,NX))/VHCP1X
+  ENGYR=VolHeatCapacity(0,NY,NX)*TK1(0,NY,NX)
+  VolHeatCapacityX=cpo*ORGC(0,NY,NX)+cpw*VOLW1X+cpi*VOLI1(0,NY,NX)
+  IF(VolHeatCapacityX.GT.ZEROS(NY,NX))THEN
+    TK1X=(ENGYR+HFLWRL(NY,NX))/VolHeatCapacityX
   ELSE
     TK1X=TK1(0,NY,NX)
   ENDIF
   IF((TK1X.LT.TFREEZ.AND.VOLW1(0,NY,NX).GT.ZERO*VOLT(0,NY,NX)) &
     .OR.(TK1X.GT.TFREEZ.AND.VOLI1(0,NY,NX).GT.ZERO*VOLT(0,NY,NX)))THEN
-    TFLX1=VHCP1(0,NY,NX)*(TFREEZ-TK1X) &
+    TFLX1=VolHeatCapacity(0,NY,NX)*(TFREEZ-TK1X) &
       /((1.0_r8+TFREEZ*6.2913E-03_r8)*(1.0_r8-0.10_r8*PSISM1(0,NY,NX)))*XNPX
     IF(TFLX1.LT.0.0_r8)THEN
       TFLX=AMAX1(-333.0_r8*DENSI*VOLI1(0,NY,NX)*XNPX,TFLX1)
@@ -1104,7 +1104,7 @@ contains
 !     THICKNESS OF WATER FILMS IN LITTER AND SOIL SURFACE
 !     FROM WATER POTENTIALS FOR GAS EXCHANGE IN TRNSFR.F
 !
-  IF(VHCP1(0,NY,NX).GT.VHCPRX(NY,NX))THEN
+  IF(VolHeatCapacity(0,NY,NX).GT.VHCPRX(NY,NX))THEN
     FILM(M,0,NY,NX)=FilmThickness(PSISM1(0,NY,NX), is_top_layer=.true.)
   ELSE
     FILM(M,0,NY,NX)=1.0E-03_r8
@@ -1332,7 +1332,7 @@ contains
 !
   call ZeroSnowFlux(NY,NX)
 
-  IF(VHCP1(0,NY,NX).GT.VHCPRX(NY,NX))THEN
+  IF(VolHeatCapacity(0,NY,NX).GT.VHCPRX(NY,NX))THEN
     BAREW(NY,NX)=AZMAX1(BARE(NY,NX)-AMIN1(1.0_r8,AZMAX1(XVOLT(NY,NX)/VOLWD(NY,NX))))
   ELSE
     BAREW(NY,NX)=1.0_r8
@@ -1672,13 +1672,13 @@ contains
   ! XVOLT,XVOLW=free water+ice,water in litter layer
   ! VOLWM,VOLPM=surface water,air content for use in trnsfr.f
   ! VOLWRX=maximum water retention by litter
-  ! VHCP1=volumetric heat capacity of litter
+  ! VolHeatCapacity=volumetric heat capacity of litter
   ! VOLA1,VOLW1,VOLI1,VOLP1=pore,water,ice,air volumes of litter
   ! VOLWRX=maximum water retention by litter
   ! TFLXR,WFLXR=litter water,latent heat flux from freeze-thaw
   ! VOLR=dry litter volume
   ! THETWX,THETIX,THETPX=water,ice,air concentrations
-  ! VHCP1=volumetric heat capacity of litter
+  ! VolHeatCapacity=volumetric heat capacity of litter
   ! TK1=litter temperature
   ! HFLWRL,TFLXR,THQR1=litter total cond+conv,latent,runoff heat flux
 
@@ -1711,14 +1711,14 @@ contains
     THETPX(0,NY,NX)=1.0_r8
   ENDIF
   THETPM(M+1,0,NY,NX)=THETPX(0,NY,NX)
-  VHCPXX=VHCP1(0,NY,NX)              !heat capacity
+  VHCPXX=VolHeatCapacity(0,NY,NX)              !heat capacity
   TK0XX=TK1(0,NY,NX)                 !residual temperature
-  ENGYR=VHCP1(0,NY,NX)*TK1(0,NY,NX)  !initial energy content
-  VHCP1(0,NY,NX)=cpo*ORGC(0,NY,NX)+cpw*VOLW1(0,NY,NX)+cpi*VOLI1(0,NY,NX)  !update heat capacity
-  IF(VHCP1(0,NY,NX).GT.VHCPRX(NY,NX))THEN
+  ENGYR=VolHeatCapacity(0,NY,NX)*TK1(0,NY,NX)  !initial energy content
+  VolHeatCapacity(0,NY,NX)=cpo*ORGC(0,NY,NX)+cpw*VOLW1(0,NY,NX)+cpi*VOLI1(0,NY,NX)  !update heat capacity
+  IF(VolHeatCapacity(0,NY,NX).GT.VHCPRX(NY,NX))THEN
     tk1pres=TK1(0,NY,NX)
-    TK1(0,NY,NX)=(ENGYR+HFLWRL(NY,NX)+TFLXR(NY,NX)+THQR1(NY,NX))/VHCP1(0,NY,NX)
-    IF(ABS(VHCP1(0,NY,NX)/VHCPXX-1._r8)>0.025_r8.or. &
+    TK1(0,NY,NX)=(ENGYR+HFLWRL(NY,NX)+TFLXR(NY,NX)+THQR1(NY,NX))/VolHeatCapacity(0,NY,NX)
+    IF(ABS(VolHeatCapacity(0,NY,NX)/VHCPXX-1._r8)>0.025_r8.or. &
       abs(TK1(0,NY,NX)/tk1pres-1._r8)>0.025_r8)THEN
       TK1(0,NY,NX)=TK1(NUM(NY,NX),NY,NX)
     ENDIF
@@ -1773,9 +1773,9 @@ contains
 !     WRITE(*,4422)'INIT',I,J,FLQ0S(NY,NX),FLQ0W(NY,NX)
 !    3,FLQ0I(NY,NX),HWFLQ0(NY,NX),XFLWS(1,NY,NX),XFLWW(1,NY,NX)
 !    2,XFLWI(1,NY,NX),XHFLWW(1,NY,NX),HFLWL(3,NUM(NY,NX),NY,NX)
-!    3,HFLW(3,NUM(NY,NX),NY,NX),FSNX(NY,NX),VHCP1(NUM(NY,NX),NY,NX)
+!    3,HFLW(3,NUM(NY,NX),NY,NX),FSNX(NY,NX),VolHeatCapacity(NUM(NY,NX),NY,NX)
 !    4*TK1(NUM(NY,NX),NY,NX),HFLWRL(NY,NX),HFLWR(NY,NX)
-!    5,VHCP1(0,NY,NX)*TK1(0,NY,NX),HEATH(NY,NX),RFLXG,RFLXR,RFLXW
+!    5,VolHeatCapacity(0,NY,NX)*TK1(0,NY,NX),HEATH(NY,NX),RFLXG,RFLXR,RFLXW
 !    2,SFLXG,SFLXR,SFLXW,EFLXG,EFLXR,EFLXW,VFLXG,VFLXR,VFLXW
   ENDIF
   !THRMG=longwave emission from litter and surface soil
