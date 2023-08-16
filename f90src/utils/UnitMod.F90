@@ -6,7 +6,8 @@ module UnitMod
   use data_const_mod, only : Tref => DAT_CONST_TKFRZ
 implicit none
   private
-  character(len=*), private, parameter :: mod_filename = __FILE__
+  character(len=*), private, parameter :: mod_filename = &
+  __FILE__
 
   type, public :: unit_type    
     real(r8) :: ppmv    

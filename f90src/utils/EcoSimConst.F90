@@ -1,7 +1,8 @@
 module EcosimConst
   use data_kind_mod, only : r8 => DAT_KIND_R8
   implicit none
-  character(len=*),private, parameter :: mod_filename = __FILE__
+  character(len=*),private, parameter :: mod_filename = &
+  __FILE__
   real(r8), parameter :: secspday=86400._r8
   real(r8), parameter :: secspyear=86400._r8*365._r8   !seconds in a normal year
   real(r8), parameter :: Cpw=4.19_r8           !heat capacity for water, J/g/K

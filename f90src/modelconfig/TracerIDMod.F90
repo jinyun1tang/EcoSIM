@@ -5,7 +5,8 @@ module TracerIDMod
   use ElmIDMod
 implicit none
   save
-  CHARACTER(LEN=*), private, PARAMETER :: MOD_FILENAME=__FILE__
+  CHARACTER(LEN=*), private, PARAMETER :: MOD_FILENAME=&
+  __FILE__
 
   integer, parameter :: idg_CO2=1
   integer, parameter :: idg_CH4=2

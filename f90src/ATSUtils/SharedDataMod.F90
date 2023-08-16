@@ -3,13 +3,12 @@ Module SharedDataMod
   use data_kind_mod, only : r8 => DAT_KIND_R8
   use abortutils, only : destroy
   implicit none
-  character(len=*), private, parameter :: mod_filename=__FILE__
-  public
-  save
-  !figure out the grid for ATS
+  character(len=*), private, parameter :: mod_filename= &
+  __FILE__
+!figure out the grid for ATS
   integer :: JZSOI   !number of soil layers
   integer :: JSNO    !number of snow layers
-  
+
 ! temporary data holder in ecosim
   real(r8) :: atm_n2, atm_o2,atm_co2,atm_ch4,atm_N2o,atm_H2,atm_NH3
   real(r8), allocatable :: a_csand(:,:)   !sand mass fraction
@@ -34,7 +33,7 @@ Module SharedDataMod
   real(r8), allocatable :: prec(:)   !precipitation, mm H2O/hr
   real(r8), allocatable :: sunrad(:)   !solar radiation,
   real(r8), allocatable :: vpair(:)    !vapor pressure deficit
-  real(r8), allocatable :: a_AREA3(:)  
+  real(r8), allocatable :: a_AREA3(:)
   integer,  allocatable :: a_NU(:)
   integer,  allocatable :: a_NL(:)
   integer,  allocatable :: a_NJ(:)
@@ -48,9 +47,9 @@ Module SharedDataMod
   integer, intent(in) :: NCOL  !NUMBER of cols
   !set # of soil layers
   JZSOI=JZs
-  
+
   JX=1;JY=ncol;jz=jzs
-  allocate(a_csand(JZSOI,ncol))  
+  allocate(a_csand(JZSOI,ncol))
   allocate(a_CSILT(jzsoi,ncol))   !silt mass fraction
   allocate(a_BKDSI(jzsoi,ncol))   !bulk density
   allocate(a_CumDepth2LayerBottom(jzsoi,ncol))   !dpeth (from surfce to bottom)
@@ -71,7 +70,7 @@ Module SharedDataMod
   allocate(uwind(1:ncol))
   allocate(prec(1:ncol))
   allocate(sunrad(1:ncol))
-  allocate(vpair(1:ncol))  
+  allocate(vpair(1:ncol))
   allocate(a_ATKA(1:ncol))
   end subroutine InitSharedData
 
@@ -80,7 +79,7 @@ Module SharedDataMod
   subroutine DestroySharedData()
   implicit none
 
-  call destroy(a_csand)  
+  call destroy(a_csand)
   call destroy(a_CSILT)
   call destroy(a_BKDSI)
   call destroy(a_CumDepth2LayerBottom)
@@ -99,7 +98,7 @@ Module SharedDataMod
   call destroy(uwind)
   call destroy(prec)
   call destroy(sunrad)
-  call destroy(vpair)  
+  call destroy(vpair)
   call destroy(a_ATKA)
   end subroutine DestroySharedData
 

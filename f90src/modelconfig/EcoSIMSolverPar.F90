@@ -3,7 +3,8 @@ module EcoSIMSolverPar
 ! USES:
   use data_kind_mod, only : r8 => DAT_KIND_R8
   implicit none
-  character(len=*), private, parameter :: mod_filename = __FILE__
+  character(len=*), private, parameter :: mod_filename = &
+  __FILE__
   public
 
   real(r8) :: dts_wat        !1/hour, time step for water transport calculation
