@@ -50,7 +50,6 @@ contains
   type (BGCProperties), intent(in) :: props
   type (BGCSizes), intent(out) :: sizes
 
-
   ! Ecosim variables
   real(r8), pointer :: data(:)
   real(r8), pointer :: data2D(:,:)
@@ -59,9 +58,19 @@ contains
 
   write(*,*) "In the driver...."
 
+  write(*,*) "Printing Sizes: "
+  write(*,*) "ncells_per_col: ", sizes%ncells_per_col_
+  write(*,*) "num_columns: ", sizes%num_columns
+  write(*,*) "num_components", sizes%num_components
 
   write(*,*) "Setting sizes"
   call SetBGCSizes(sizes)
+
+  write(*,*) "Printing Sizes (Again): "
+  write(*,*) "ncells_per_col: ", sizes%ncells_per_col_
+  write(*,*) "num_columns: ", sizes%num_columns
+  write(*,*) "num_components", sizes%num_components
+
   !ncol=size(filter_col)
 
   !1D vertical vector,
@@ -237,6 +246,7 @@ contains
 
     sizes%num_components = 1
     sizes%ncells_per_col_ = 100
+    sizes%num_columns = 25
 
   end subroutine SetBGCSizes
 

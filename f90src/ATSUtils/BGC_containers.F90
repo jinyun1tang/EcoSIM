@@ -138,7 +138,7 @@ module BGCContainers_module
   type, public, bind(c) :: BGCSizes
      integer (c_int) :: ncells_per_col_
      integer (c_int) :: num_components
-     integer (c_int) :: num_procs
+     integer (c_int) :: num_columns
   end type BGCSizes
 
   type, public, bind(c) :: BGCState
