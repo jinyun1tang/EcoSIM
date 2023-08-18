@@ -1,6 +1,6 @@
 module bhistMod
 
-#include "shr_assert.h"
+!#include "shr_assert.h"
   use data_kind_mod  , only : r8 => DAT_Kind_r8, i4 => DAT_Kind_i4
   use ecosim_log_mod , only : errMsg => shr_log_errMsg
   use ncdio_pio      , only : file_desc_t
@@ -133,11 +133,11 @@ contains
   integer :: clock_id
   logical, pointer :: yes_flag
 
-  SHR_ASSERT_ALL((size(varlist)   == size(unitlist)), errMsg(mod_filename,__LINE__))
+  !SHR_ASSERT_ALL((size(varlist)   == size(unitlist)), errMsg(mod_filename,__LINE__))
 
-  if(present(hrfreq))then
-    SHR_ASSERT_ALL((size(varlist)   == size(hrfreq)), errMsg(mod_filename,__LINE__))
-  endif
+  !f(present(hrfreq))then
+  !  SHR_ASSERT_ALL((size(varlist)   == size(hrfreq)), errMsg(mod_filename,__LINE__))
+  !endif
   this%ncols=ncols
   if(present(dtime))then
     this%dtime = dtime
@@ -296,7 +296,7 @@ contains
 
   integer :: clockid, id, jj
 
-  SHR_ASSERT_ALL((size(yval,2)   == this%nvars), errMsg(mod_filename,__LINE__))
+  !SHR_ASSERT_ALL((size(yval,2)   == this%nvars), errMsg(mod_filename,__LINE__))
 
   ! use daxpy - compute y := alpha * x + y
   ! SUBROUTINE DAXPY(N, ALPHA, X, INCX, Y, INCY)

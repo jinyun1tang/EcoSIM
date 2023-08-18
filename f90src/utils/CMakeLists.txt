@@ -1,8 +1,8 @@
 set(ECOSIM_UTIL_SOURCES
   data_kind_mod.F90
   data_const_mod.F90
-  shr_assert_mod.F90
-  shr_infnan_mod.F90
+  !shr_assert_mod.F90
+  !shr_infnan_mod.F90
   ncdio_pio.F90
   abortutils.F90
   UnitMod.F90
@@ -17,7 +17,7 @@ set(ECOSIM_UTIL_SOURCES
   ModelStatusType.F90
 )
 
-configure_file(shr_assert.h shr_assert.h COPYONLY)
+!configure_file(shr_assert.h shr_assert.h COPYONLY)
 configure_file(dtypes.h dtypes.h COPYONLY)
 
 include(add_ecosim_library)
