@@ -100,6 +100,11 @@ endif()
 
     # We are cared for mathematically.
     set(NEED_LAPACK FALSE)
+  elseif (HOSTNAME MATCHES "biomes")
+    set(CMAKE_C_COMPILER $ENV{CC})
+    set(CMAKE_CXX_COMPILER $ENV{CXX})
+    set(CMAKE_Fortran_COMPILER $ENV{FC})
+    
   elseif (HOSTNAME MATCHES "scs") # NERSC Cori phase1
     set(CMAKE_C_COMPILER $ENV{CC})
     set(CMAKE_CXX_COMPILER $ENV{CXX})
