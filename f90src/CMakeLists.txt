@@ -1,4 +1,4 @@
-include_directories(${ECOSIM_INCLUDE_DIRS})
+#include_directories(${ECOSIM_INCLUDE_DIRS})
 add_subdirectory(utils)
 add_subdirectory(minimath)
 add_subdirectory(modelconfig)
@@ -24,6 +24,8 @@ add_subdirectory(drivers)
 #message("ECOSIM_LIBRARIES ${ECOSIM_LIBRARIES}")
 # Collect all the intermediate libraries
 #set(LIBRARY_LIST subdir1_lib subdir2_lib subdir3_lib)
+
+set(ECOSIM_LIBRARIES ${ECOSIM_LIBRARIES} PARENT_SCOPE)
 
 # Combine the intermediate libraries into a single dynamic library
 #add_library(ecosimff SHARED)

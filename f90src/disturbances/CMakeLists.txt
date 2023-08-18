@@ -13,10 +13,11 @@ include_directories(${CMAKE_BINARY_DIR}/f90src/ioutils/)
 include(add_ecosim_library)
 add_ecosim_library(disturb_mods ${DISTURB_MOD_SOURCES})
 
-set(ECOSIM_LIBRARIES disturb_mods;${ECOSIM_LIBRARIES} PARENT_SCOPE)
+set(ECOSIM_LIBRARIES ${ECOSIM_LIBRARIES};disturb_mods PARENT_SCOPE)
+set(ECOSIM_LIBRARIES ${ECOSIM_LIBRARIES};disturb_mods)
 
 if (NOT CMAKE_INSTALL_PREFIX STREQUAL "INSTALL_DISABLED")
-#  install(TARGETS disturb_mods DESTINATION lib)
+  install(TARGETS disturb_mods DESTINATION lib)
   file(GLOB HEADERS *.h)
   install(FILES ${HEADERS} DESTINATION include/)
 endif()

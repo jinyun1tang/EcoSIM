@@ -25,10 +25,11 @@ include_directories(${CMAKE_BINARY_DIR}/f90src/microbial_bgc/layers_model)
 include(add_ecosim_library)
 add_ecosim_library(ecosim_mods ${ECOSIM_MOD_SOURCES})
 
-set(ECOSIM_LIBRARIES ecosim_mods;${ECOSIM_LIBRARIES} PARENT_SCOPE)
+set(ECOSIM_LIBRARIES ${ECOSIM_LIBRARIES};ecosim_mods PARENT_SCOPE)
+set(ECOSIM_LIBRARIES ${ECOSIM_LIBRARIES};ecosim_mods)
 
 if (NOT CMAKE_INSTALL_PREFIX STREQUAL "INSTALL_DISABLED")
-#  install(TARGETS ecosim_mods DESTINATION lib)
+  install(TARGETS ecosim_mods DESTINATION lib)
   file(GLOB HEADERS *.h)
   install(FILES ${HEADERS} DESTINATION include/)
 endif()

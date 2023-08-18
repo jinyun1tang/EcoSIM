@@ -16,10 +16,11 @@ include_directories(${CMAKE_BINARY_DIR}/f90src/HydroTherm/SurfPhys/)
 include(add_ecosim_library)
 add_ecosim_library(SoilPhys ${SOILPHYS_SOURCES})
 
-set(ECOSIM_LIBRARIES SoilPhys;${ECOSIM_LIBRARIES} PARENT_SCOPE)
+set(ECOSIM_LIBRARIES ${ECOSIM_LIBRARIES};SoilPhys PARENT_SCOPE)
+set(ECOSIM_LIBRARIES ${ECOSIM_LIBRARIES};SoilPhys)
 
 if (NOT CMAKE_INSTALL_PREFIX STREQUAL "INSTALL_DISABLED")
-#  install(TARGETS SoilPhys DESTINATION ${CMAKE_BINARY_DIR}/lib)
+  install(TARGETS SoilPhys DESTINATION ${CMAKE_BINARY_DIR}/lib)
   file(GLOB HEADERS *.h)
   install(FILES ${HEADERS} DESTINATION include/)
 endif()

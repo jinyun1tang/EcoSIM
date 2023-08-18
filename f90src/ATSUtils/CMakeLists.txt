@@ -1,7 +1,7 @@
 set(ATSUTILS_MOD_SOURCES
+  SharedDataMod.F90
   ATSUtilsMod.F90
   ATSCPLMod.F90
-  SharedDataMod.F90
   ATSEcoSIMInitMod.F90
 )
 include_directories(${CMAKE_BINARY_DIR}/f90src/utils/)
@@ -16,10 +16,11 @@ include_directories(${CMAKE_BINARY_DIR}/f90src/ecosim_mods/)
 include(add_ecosim_library)
 add_ecosim_library(ATSUtils_mods ${ATSUTILS_MOD_SOURCES})
 
-set(ECOSIM_LIBRARIES ATSUtils_mods;${ECOSIM_LIBRARIES} PARENT_SCOPE)
+set(ECOSIM_LIBRARIES ${ECOSIM_LIBRARIES};ATSUtils_mods PARENT_SCOPE)
+set(ECOSIM_LIBRARIES ${ECOSIM_LIBRARIES};ATSUtils_mods)
 
 if (NOT CMAKE_INSTALL_PREFIX STREQUAL "INSTALL_DISABLED")
-#  install(TARGETS ATSUtils_mods DESTINATION lib)
+  install(TARGETS ATSUtils_mods DESTINATION lib)
   file(GLOB HEADERS *.h)
   install(FILES ${HEADERS} DESTINATION include/)
 endif()

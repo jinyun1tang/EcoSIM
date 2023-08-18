@@ -4,7 +4,9 @@ Module SharedDataMod
   use abortutils, only : destroy
   implicit none
   character(len=*), private, parameter :: mod_filename=__FILE__
-!figure out the grid for ATS
+  public
+  save
+  !figure out the grid for ATS
   integer :: JZSOI   !number of soil layers
   integer :: JSNO    !number of snow layers
   
@@ -30,8 +32,8 @@ Module SharedDataMod
   real(r8), allocatable :: tairc(:)  !air temperature oC
   real(r8), allocatable :: uwind(:)  !wind speed, m/s
   real(r8), allocatable :: prec(:)   !precipitation, mm H2O/hr
-  real(r8), allocatable :: srad(:)   !solar radiation,
-  real(r8), allocatable :: vpa(:)    !vapor pressure deficit
+  real(r8), allocatable :: sunrad(:)   !solar radiation,
+  real(r8), allocatable :: vpair(:)    !vapor pressure deficit
   real(r8), allocatable :: a_AREA3(:)  
   integer,  allocatable :: a_NU(:)
   integer,  allocatable :: a_NL(:)
@@ -68,8 +70,8 @@ Module SharedDataMod
   allocate(tairc(1:ncol))
   allocate(uwind(1:ncol))
   allocate(prec(1:ncol))
-  allocate(srad(1:ncol))
-  allocate(vpa(1:ncol))  
+  allocate(sunrad(1:ncol))
+  allocate(vpair(1:ncol))  
   allocate(a_ATKA(1:ncol))
   end subroutine InitSharedData
 
@@ -96,8 +98,8 @@ Module SharedDataMod
   call destroy(tairc)
   call destroy(uwind)
   call destroy(prec)
-  call destroy(srad)
-  call destroy(vpa)  
+  call destroy(sunrad)
+  call destroy(vpair)  
   call destroy(a_ATKA)
   end subroutine DestroySharedData
 

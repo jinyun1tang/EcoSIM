@@ -17,7 +17,6 @@ module WthrMod
   use IrrigationDataType
   use GridDataType
   use EcoSIMConfig
-  use EcosimConst, only : TWILGT
   use MiniMathMod, only : AZMAX1
   use UnitMod    , only : units
   implicit none

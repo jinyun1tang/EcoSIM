@@ -7,7 +7,6 @@ module SnowPhysMod
 
 ! codes for snow physics
   use data_kind_mod, only : r8 => DAT_KIND_R8
-  use minimathmod, only : safe_adb,AZMAX1  
   use abortutils   , only : endrun   
   use SnowDataType
   use GridDataType

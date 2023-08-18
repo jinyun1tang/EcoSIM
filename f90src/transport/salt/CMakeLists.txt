@@ -17,10 +17,11 @@ include_directories(${CMAKE_BINARY_DIR}/f90src/microbial_bgc/layers_model)
 include(add_ecosim_library)
 add_ecosim_library(salt ${SALT_MOD_SOURCES})
 
-set(ECOSIM_LIBRARIES salt;${ECOSIM_LIBRARIES} PARENT_SCOPE)
+set(ECOSIM_LIBRARIES ${ECOSIM_LIBRARIES};salt PARENT_SCOPE)
+set(ECOSIM_LIBRARIES ${ECOSIM_LIBRARIES};salt)
 
 if (NOT CMAKE_INSTALL_PREFIX STREQUAL "INSTALL_DISABLED")
-#  install(TARGETS salt DESTINATION lib)
+  install(TARGETS salt DESTINATION lib)
   file(GLOB HEADERS *.h)
   install(FILES ${HEADERS} DESTINATION include/)
 endif()

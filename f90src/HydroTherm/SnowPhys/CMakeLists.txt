@@ -14,10 +14,11 @@ include_directories(${CMAKE_BINARY_DIR}/f90src/HydroTherm/PhysData/)
 include(add_ecosim_library)
 add_ecosim_library(SnowPhys ${SNOWPHYS_SOURCES})
 
-set(ECOSIM_LIBRARIES SnowPhys;${ECOSIM_LIBRARIES} PARENT_SCOPE)
+set(ECOSIM_LIBRARIES ${ECOSIM_LIBRARIES};SnowPhys PARENT_SCOPE)
+set(ECOSIM_LIBRARIES ${ECOSIM_LIBRARIES};SnowPhys)
 
 if (NOT CMAKE_INSTALL_PREFIX STREQUAL "INSTALL_DISABLED")
-#install(TARGETS SnowPhys DESTINATION ${CMAKE_BINARY_DIR}/lib)
+install(TARGETS SnowPhys DESTINATION ${CMAKE_BINARY_DIR}/lib)
   file(GLOB HEADERS *.h)
   install(FILES ${HEADERS} DESTINATION include/)
 endif()

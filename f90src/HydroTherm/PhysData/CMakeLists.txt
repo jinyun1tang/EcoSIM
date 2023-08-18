@@ -12,10 +12,11 @@ include_directories(${CMAKE_BINARY_DIR}/f90src/ecosim_datatype/)
 include(add_ecosim_library)
 add_ecosim_library(PhysData ${PHYSDATA_SOURCES})
 
-set(ECOSIM_LIBRARIES PhysData;${ECOSIM_LIBRARIES} PARENT_SCOPE)
+set(ECOSIM_LIBRARIES ${ECOSIM_LIBRARIES};PhysData PARENT_SCOPE)
+set(ECOSIM_LIBRARIES ${ECOSIM_LIBRARIES};PhysData)
 
 if (NOT CMAKE_INSTALL_PREFIX STREQUAL "INSTALL_DISABLED")
-#  install(TARGETS PhysData DESTINATION ${CMAKE_BINARY_DIR}/lib)
+  install(TARGETS PhysData DESTINATION ${CMAKE_BINARY_DIR}/lib)
   file(GLOB HEADERS *.h)
   install(FILES ${HEADERS} DESTINATION include/)
 endif()

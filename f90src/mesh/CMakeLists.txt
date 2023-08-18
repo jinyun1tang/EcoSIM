@@ -9,10 +9,11 @@ include_directories(${CMAKE_BINARY_DIR}/f90src/modelconfig/)
 include(add_ecosim_library)
 add_ecosim_library(mesh ${ECOSIM_MESH_SOURCES})
 
-set(ECOSIM_LIBRARIES mesh;${ECOSIM_LIBRARIES} PARENT_SCOPE)
+set(ECOSIM_LIBRARIES ${ECOSIM_LIBRARIES};mesh PARENT_SCOPE)
+set(ECOSIM_LIBRARIES ${ECOSIM_LIBRARIES};mesh)
 
 if (NOT CMAKE_INSTALL_PREFIX STREQUAL "INSTALL_DISABLED")
-#  install(TARGETS mesh DESTINATION lib)
+  install(TARGETS mesh DESTINATION lib)
   file(GLOB HEADERS *.h)
   install(FILES ${HEADERS} DESTINATION include/)
 endif()

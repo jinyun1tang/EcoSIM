@@ -20,10 +20,11 @@ include_directories(${CMAKE_BINARY_DIR}/f90src/microbial_bgc/layers_model)
 include(add_ecosim_library)
 add_ecosim_library(modelforc ${MODELFORC_MOD_SOURCES})
 
-set(ECOSIM_LIBRARIES modelforc;${ECOSIM_LIBRARIES} PARENT_SCOPE)
+set(ECOSIM_LIBRARIES ${ECOSIM_LIBRARIES};modelforc PARENT_SCOPE)
+set(ECOSIM_LIBRARIES ${ECOSIM_LIBRARIES};modelforc)
 
 if (NOT CMAKE_INSTALL_PREFIX STREQUAL "INSTALL_DISABLED")
-#  install(TARGETS modelforc DESTINATION lib)
+  install(TARGETS modelforc DESTINATION lib)
   file(GLOB HEADERS *.h)
   install(FILES ${HEADERS} DESTINATION include/)
 endif()

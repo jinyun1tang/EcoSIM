@@ -20,9 +20,10 @@ include(add_ecosim_library)
 add_ecosim_library(boxshared ${BOXSHARED_SOURCES})
 
 set(ECOSIM_LIBRARIES boxshared;${ECOSIM_LIBRARIES} PARENT_SCOPE)
+set(ECOSIM_LIBRARIES boxshared;${ECOSIM_LIBRARIES})
 
 if (NOT CMAKE_INSTALL_PREFIX STREQUAL "INSTALL_DISABLED")
-#  install(TARGETS box_chem DESTINATION ${CMAKE_BINARY_DIR}/lib)
+  install(TARGETS box_chem DESTINATION ${CMAKE_BINARY_DIR}/lib)
   file(GLOB HEADERS *.h)
   install(FILES ${HEADERS} DESTINATION include/)
 endif()

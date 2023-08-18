@@ -63,9 +63,9 @@ contains
         case ('WINDH')     !horizontal wind speed,   m/s
           uwind(j2)=data_2d(j1,j2)
         case ('DWPTH')     !atmospheric vapor pressure, kPa
-          vpa(j2)=data_2d(j1,j2)
+          vpair(j2)=data_2d(j1,j2)
         case ('SRADH')     !Incident solar radiation, W/m2 
-          srad(j2)=data_2d(j1,j2) 
+          sunrad(j2)=data_2d(j1,j2) 
         end select
       enddo
     enddo

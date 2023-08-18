@@ -1,5 +1,5 @@
 # Minimum CMake version, determined by hdf5.
-cmake_minimum_required (VERSION 3.1)
+cmake_minimum_required (VERSION 3.4)
 
 # Version numbers.
 set (ECOSIM_MAJOR_VERSION 0)
@@ -150,7 +150,7 @@ endif()
 
 set(ECOSIM_NEED_PFUNIT 0)
 set(ECOSIM_NEED_PETSC 0)
-
+set(ECOSIM_INCLUDE_DIRS "" CACHE LIST "Include directory of EcoSIM")
 #if (XSDK_WITH_NETCDF AND MACHINE MATCHES "supported")
 
   if ((TPL_NETCDF_LIBRARIES MATCHES "lib") AND (TPL_NETCDF_INCLUDE_DIRS MATCHES "include"))
@@ -195,11 +195,15 @@ add_subdirectory(3rd-partylibs)
 
 # Include the binary directory in the header file search path,
 # since it's where we place the third-party libraries.
-include_directories("${PROJECT_BINARY_DIR}")
+
 include_directories("${PROJECT_BINARY_DIR}/include")
 link_directories("${PROJECT_BINARY_DIR}/lib")
-include_directories(${ECOSIM_INCDIRS})
+list(APPEND ECOSIM_INCLUDE_DIRS "${PROJECT_BINARY_DIR}/include")
+include_directories(${ECOSIM_INCLUDE_DIRS})
 
+message("ECOSIM_INCLUDE_DIRS ${ECOSIM_INCLUDE_DIRS}")
+message("${PROJECT_BINARY_DIR}/include")
+message("${PROJECT_BINARY_DIR}/lib")
 # Unit testing.
 enable_testing()
 
@@ -213,6 +217,7 @@ add_subdirectory(f90src)
 
 # Benchmarks.
 #X#add_subdirectory(benchmarks)
+
 
 # Now that we have gathered all our libraries, generate an ecosim.cmake
 # file that contains all the vital information.

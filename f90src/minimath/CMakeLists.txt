@@ -9,10 +9,11 @@ include(add_ecosim_library)
 add_ecosim_library(minimath ${MINIMATH_SOURCES})
 
 
-set(ECOSIM_LIBRARIES minimath;${ECOSIM_LIBRARIES} PARENT_SCOPE)
+set(ECOSIM_LIBRARIES ${ECOSIM_LIBRARIES};minimath PARENT_SCOPE)
+set(ECOSIM_LIBRARIES ${ECOSIM_LIBRARIES};minimath)
 
 if (NOT CMAKE_INSTALL_PREFIX STREQUAL "INSTALL_DISABLED")
-#  install(TARGETS minimath DESTINATION lib)
+  install(TARGETS minimath DESTINATION lib)
   file(GLOB HEADERS *.h)
   install(FILES ${HEADERS} DESTINATION include/)
 endif()

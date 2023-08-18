@@ -28,12 +28,13 @@ include_directories(${CMAKE_BINARY_DIR}/f90src/geochem/layers_chem)
 include(add_ecosim_library)
 add_ecosim_library(APIs ${APIS_SOURCES})
 
-set(ECOSIM_LIBRARIES APIs;${ECOSIM_LIBRARIES} PARENT_SCOPE)
+set(ECOSIM_LIBRARIES ${ECOSIM_LIBRARIES};APIs PARENT_SCOPE)
+set(ECOSIM_LIBRARIES ${ECOSIM_LIBRARIES};APIs)
 
 #add_ecosim_library(APIs ${APIS_SOURCES})
 
 if (NOT CMAKE_INSTALL_PREFIX STREQUAL "INSTALL_DISABLED")
-#  install(TARGETS APIs DESTINATION lib)
+  install(TARGETS APIs DESTINATION lib)
   file(GLOB HEADERS *.h)
   install(FILES ${HEADERS} DESTINATION include/)
 endif()

@@ -19,10 +19,11 @@ include_directories(${CMAKE_BINARY_DIR}/f90src/microbial_bgc/)
 include(add_ecosim_library)
 add_ecosim_library(box_chem ${BOXGEOCHEM_SOURCES})
 
-set(ECOSIM_LIBRARIES box_chem;${ECOSIM_LIBRARIES} PARENT_SCOPE)
+set(ECOSIM_LIBRARIES ${ECOSIM_LIBRARIES};box_chem PARENT_SCOPE)
+set(ECOSIM_LIBRARIES ${ECOSIM_LIBRARIES};box_chem)
 
 if (NOT CMAKE_INSTALL_PREFIX STREQUAL "INSTALL_DISABLED")
-#  install(TARGETS box_chem DESTINATION ${CMAKE_BINARY_DIR}/lib)
+  install(TARGETS box_chem DESTINATION ${CMAKE_BINARY_DIR}/lib)
   file(GLOB HEADERS *.h)
   install(FILES ${HEADERS} DESTINATION include/)
 endif()

@@ -12,10 +12,11 @@ include(add_ecosim_library)
 add_ecosim_library(modelconfig ${ECOSIM_CONFG_SOURCES})
 
 
-set(ECOSIM_LIBRARIES modelconfig;${ECOSIM_LIBRARIES} PARENT_SCOPE)
+set(ECOSIM_LIBRARIES ${ECOSIM_LIBRARIES};modelconfig PARENT_SCOPE)
+set(ECOSIM_LIBRARIES ${ECOSIM_LIBRARIES};modelconfig)
 
 if (NOT CMAKE_INSTALL_PREFIX STREQUAL "INSTALL_DISABLED")
-#  install(TARGETS modelconfig DESTINATION lib)
+  install(TARGETS modelconfig DESTINATION lib)
   file(GLOB HEADERS *.h)
   install(FILES ${HEADERS} DESTINATION include/)
 endif()

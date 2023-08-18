@@ -29,10 +29,11 @@ include_directories(${CMAKE_BINARY_DIR}/f90src/ioutils/)
 include(add_ecosim_library)
 add_ecosim_library(plant_bgc ${PLANT_BGC_SOURCES})
 
-set(ECOSIM_LIBRARIES plant_bgc;${ECOSIM_LIBRARIES} PARENT_SCOPE)
+set(ECOSIM_LIBRARIES ${ECOSIM_LIBRARIES};plant_bgc PARENT_SCOPE)
+set(ECOSIM_LIBRARIES ${ECOSIM_LIBRARIES};plant_bgc)
 
 if (NOT CMAKE_INSTALL_PREFIX STREQUAL "INSTALL_DISABLED")
-#  install(TARGETS plant_bgc DESTINATION lib)
+  install(TARGETS plant_bgc DESTINATION lib)
   file(GLOB HEADERS *.h)
   install(FILES ${HEADERS} DESTINATION include/)
 endif()

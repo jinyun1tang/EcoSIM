@@ -24,10 +24,11 @@ include_directories(${CMAKE_BINARY_DIR}/f90src/ecosim_mods/)
 include(add_ecosim_library)
 add_ecosim_library(ioutils ${IOUTILS_SOURCES})
 
-set(ECOSIM_LIBRARIES ioutils;${ECOSIM_LIBRARIES} PARENT_SCOPE)
+set(ECOSIM_LIBRARIES ${ECOSIM_LIBRARIES};ioutils PARENT_SCOPE)
+set(ECOSIM_LIBRARIES ${ECOSIM_LIBRARIES};ioutils)
 
 if (NOT CMAKE_INSTALL_PREFIX STREQUAL "INSTALL_DISABLED")
-#  install(TARGETS ioutils DESTINATION lib)
+  install(TARGETS ioutils DESTINATION lib)
   file(GLOB HEADERS *.h)
   install(FILES ${HEADERS} DESTINATION include/)
 endif()
