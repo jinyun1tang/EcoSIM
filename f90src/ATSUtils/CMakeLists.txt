@@ -4,21 +4,25 @@ set(ATSUTILS_MOD_SOURCES
   ATSCPLMod.F90
   ATSEcoSIMInitMod.F90
 )
-include_directories(${CMAKE_BINARY_DIR}/f90src/utils/)
-include_directories(${CMAKE_BINARY_DIR}/f90src/minimath/)
-include_directories(${CMAKE_BINARY_DIR}/f90src/modelconfig/)
-include_directories(${CMAKE_BINARY_DIR}/f90src/mesh/)
-include_directories(${CMAKE_BINARY_DIR}/f90src/modelpars/)
-include_directories(${CMAKE_BINARY_DIR}/f90src/ecosim_datatype/)
-include_directories(${CMAKE_BINARY_DIR}/f90src/HydroTherm/SoilPhys/)
-include_directories(${CMAKE_BINARY_DIR}/f90src/HydroTherm/SurPhys/)
-include_directories(${CMAKE_BINARY_DIR}/f90src/ecosim_mods/)
 include(add_ecosim_library)
 add_ecosim_library(ATSUtils_mods ${ATSUTILS_MOD_SOURCES})
+
+target_include_directories(ATSUtils_mods  PRIVATE
+   ${CMAKE_BINARY_DIR}/f90src/utils/
+   ${CMAKE_BINARY_DIR}/f90src/minimath/
+   ${CMAKE_BINARY_DIR}/f90src/modelconfig/
+   ${CMAKE_BINARY_DIR}/f90src/mesh/
+   ${CMAKE_BINARY_DIR}/f90src/modelpars/
+   ${CMAKE_BINARY_DIR}/f90src/ecosim_datatype/
+   ${CMAKE_BINARY_DIR}/f90src/HydroTherm/SoilPhys/
+   ${CMAKE_BINARY_DIR}/f90src/HydroTherm/SurPhys/
+   ${CMAKE_BINARY_DIR}/f90src/ecosim_mods/)
+
 
 set(ECOSIM_LIBRARIES ${ECOSIM_LIBRARIES};ATSUtils_mods PARENT_SCOPE)
 set(ECOSIM_LIBRARIES ${ECOSIM_LIBRARIES};ATSUtils_mods)
 
+install(TARGETS ATSUtils_mods DESTINATION ${CMAKE_BINARY_DIR}/lib)
 if (NOT CMAKE_INSTALL_PREFIX STREQUAL "INSTALL_DISABLED")
   install(TARGETS ATSUtils_mods DESTINATION lib)
   file(GLOB HEADERS *.h)

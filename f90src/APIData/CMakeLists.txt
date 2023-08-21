@@ -2,16 +2,22 @@ set(APIDATA_SOURCES
   PlantAPIData.F90
 )
 
-include_directories(${ECOSIM_INCLUDE_DIRS})
-include_directories(${CMAKE_BINARY_DIR}/f90src/utils/)
-include_directories(${CMAKE_BINARY_DIR}/f90src/modelconfig/)
-include_directories(${CMAKE_BINARY_DIR}/f90src/modelpars/)
-
+#include_directories(${CMAKE_BINARY_DIR}/f90src/utils/)
+#include_directories(${CMAKE_BINARY_DIR}/f90src/modelconfig/)
+#include_directories(${CMAKE_BINARY_DIR}/f90src/modelpars/)
 include(add_ecosim_library)
 add_ecosim_library(APIData ${APIDATA_SOURCES})
 
+target_include_directories(APIData PRIVATE 
+  ${CMAKE_BINARY_DIR}/f90src/utils/
+  ${CMAKE_BINARY_DIR}/f90src/modelconfig/
+  ${CMAKE_BINARY_DIR}/f90src/modelpars/
+  ${CMAKE_BINARY_DIR})
+
+
 set(ECOSIM_LIBRARIES ${ECOSIM_LIBRARIES};APIData PARENT_SCOPE)
 set(ECOSIM_LIBRARIES ${ECOSIM_LIBRARIES};APIData)
+install(TARGETS APIData DESTINATION ${CMAKE_BINARY_DIR}/lib)
 
 if (NOT CMAKE_INSTALL_PREFIX STREQUAL "INSTALL_DISABLED")
   install(TARGETS APIData DESTINATION lib)

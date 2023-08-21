@@ -141,8 +141,8 @@ else
     NETCDF_FFLAGS =""
     NETCDF_FLIBS =""
   else
-    NETCDF_FFLAGS = $(shell ./nc_config --prefix --$(CC))/include/
-    NETCDF_FLIBS = $(shell ./nc_config --flibs --$(CC))		
+    NETCDF_FFLAGS = $(shell ./nc_config --prefix)/include/
+    NETCDF_FLIBS = $(shell ./nc_config --flibs)		
   endif
 
 endif

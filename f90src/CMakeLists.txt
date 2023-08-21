@@ -1,4 +1,3 @@
-#include_directories(${ECOSIM_INCLUDE_DIRS})
 add_subdirectory(utils)
 add_subdirectory(minimath)
 add_subdirectory(modelconfig)
@@ -19,7 +18,6 @@ add_subdirectory(modelforc)
 add_subdirectory(transport)
 add_subdirectory(balances)
 add_subdirectory(main)
-add_subdirectory(drivers)
 
 #message("ECOSIM_LIBRARIES ${ECOSIM_LIBRARIES}")
 # Collect all the intermediate libraries

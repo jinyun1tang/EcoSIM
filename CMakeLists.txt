@@ -126,12 +126,13 @@ endif ()
 
 # Here we make sure CMake-installed binaries use the correct runpath, and
 # that the path is not stripped during installation.
-set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
+set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib;${CMAKE_BINARY_DIR}/lib")
 set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
 # Basic libraries to be linked in.
 # added the standard mathematical library for C and C++
 set(ECOSIM_LIBRARIES "")
+
 set(ECOSIM_TPLS m)
 if (${NEED_LAPACK})
   # NEED_LAPACK is set by set_up_platform()
@@ -193,11 +194,17 @@ set(ECOSIM_INCLUDE_DIRS "" CACHE LIST "Include directory of EcoSIM")
 # Other third-party libraries.
 add_subdirectory(3rd-partylibs)
 
+if (NOT ECOSIM_HAVE_NETCDF)
+  message(("TPL_NETCDF_LIBRARIES: ${TPL_NETCDF_LIBRARIES}"))
+  list(APPEND ECOSIM_TPLS ${TPL_NETCDF_LIBRARIES})
+  list(APPEND ECOSIM_INCLUDE_DIRS ${TPL_NETCDF_INCLUDE_DIRS})
+endif()
 # Include the binary directory in the header file search path,
 # since it's where we place the third-party libraries.
 
 include_directories("${PROJECT_BINARY_DIR}/include")
 link_directories("${PROJECT_BINARY_DIR}/lib")
+
 list(APPEND ECOSIM_INCLUDE_DIRS "${PROJECT_BINARY_DIR}/include")
 include_directories(${ECOSIM_INCLUDE_DIRS})
 
@@ -211,6 +218,7 @@ enable_testing()
 include_directories("${PROJECT_SOURCE_DIR}")
 
 add_subdirectory(f90src)
+add_subdirectory(drivers)
 
 # Drivers for benchmarks.
 #X#add_subdirectory(drivers)

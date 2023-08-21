@@ -11,18 +11,22 @@ set(IOUTILS_SOURCES
 	readsmod.F90
     bhistMod.F90
 )
-include_directories(${CMAKE_BINARY_DIR}/f90src/utils/)
-include_directories(${CMAKE_BINARY_DIR}/f90src/minimath/)
-include_directories(${CMAKE_BINARY_DIR}/f90src/modelconfig/)
-include_directories(${CMAKE_BINARY_DIR}/f90src/mesh/)
-include_directories(${CMAKE_BINARY_DIR}/f90src/modelpars/)
-include_directories(${CMAKE_BINARY_DIR}/f90src/ecosim_datatype/)
-include_directories(${CMAKE_BINARY_DIR}/f90src/plant_bgc/)
-include_directories(${CMAKE_BINARY_DIR}/f90src/HydroTherm/SoilPhys/)
-include_directories(${CMAKE_BINARY_DIR}/f90src/HydroTherm/PhysData/)
-include_directories(${CMAKE_BINARY_DIR}/f90src/ecosim_mods/)
 include(add_ecosim_library)
-add_ecosim_library(ioutils ${IOUTILS_SOURCES})
+#add_ecosim_library(ioutils ${IOUTILS_SOURCES})
+add_library(ioutils OBJECT ${IOUTILS_SOURCES})
+install(TARGETS ioutils OBJECTS DESTINATION lib)
+
+target_include_directories(ioutils  PRIVATE
+  ${CMAKE_BINARY_DIR}/f90src/utils/
+  ${CMAKE_BINARY_DIR}/f90src/minimath/
+  ${CMAKE_BINARY_DIR}/f90src/modelconfig/
+  ${CMAKE_BINARY_DIR}/f90src/mesh/
+  ${CMAKE_BINARY_DIR}/f90src/modelpars/
+  ${CMAKE_BINARY_DIR}/f90src/ecosim_datatype/
+  ${CMAKE_BINARY_DIR}/f90src/plant_bgc/
+  ${CMAKE_BINARY_DIR}/f90src/HydroTherm/SoilPhys/
+  ${CMAKE_BINARY_DIR}/f90src/HydroTherm/PhysData/
+  ${CMAKE_BINARY_DIR}/f90src/ecosim_mods/)
 
 set(ECOSIM_LIBRARIES ${ECOSIM_LIBRARIES};ioutils PARENT_SCOPE)
 set(ECOSIM_LIBRARIES ${ECOSIM_LIBRARIES};ioutils)

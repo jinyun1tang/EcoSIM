@@ -3,14 +3,18 @@ set(MINIMATH_SOURCES
   MiniMathMod.F90
   MiniFuncMod.F90
 )
-include_directories(${CMAKE_BINARY_DIR}/f90src/utils/)
 
 include(add_ecosim_library)
 add_ecosim_library(minimath ${MINIMATH_SOURCES})
 
+target_include_directories(minimath  PRIVATE
+  ${CMAKE_BINARY_DIR}/f90src/utils/)
+
+
 
 set(ECOSIM_LIBRARIES ${ECOSIM_LIBRARIES};minimath PARENT_SCOPE)
 set(ECOSIM_LIBRARIES ${ECOSIM_LIBRARIES};minimath)
+install(TARGETS minimath DESTINATION ${CMAKE_BINARY_DIR}/lib)  
 
 if (NOT CMAKE_INSTALL_PREFIX STREQUAL "INSTALL_DISABLED")
   install(TARGETS minimath DESTINATION lib)

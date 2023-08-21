@@ -5,12 +5,16 @@ set(ECOSIM_CONFG_SOURCES
   ElmIDMod.F90
   TracerIDMod.F90
 )
-
-include_directories(${CMAKE_BINARY_DIR}/f90src/utils/)
-include_directories(${CMAKE_BINARY_DIR}/f90src/minimath/)
 include(add_ecosim_library)
-add_ecosim_library(modelconfig ${ECOSIM_CONFG_SOURCES})
+#add_ecosim_library(modelconfig ${ECOSIM_CONFG_SOURCES})
+add_library(modelconfig OBJECT ${ECOSIM_CONFG_SOURCES})
+install(TARGETS modelconfig OBJECTS DESTINATION lib)  
 
+target_include_directories(modelconfig  PRIVATE
+  ${CMAKE_BINARY_DIR}/f90src/utils/
+  ${CMAKE_BINARY_DIR}/f90src/minimath/
+  PUBLIC
+  ${CMAKE_BINARY_DIR}/f90src/modelconfig/)
 
 set(ECOSIM_LIBRARIES ${ECOSIM_LIBRARIES};modelconfig PARENT_SCOPE)
 set(ECOSIM_LIBRARIES ${ECOSIM_LIBRARIES};modelconfig)
