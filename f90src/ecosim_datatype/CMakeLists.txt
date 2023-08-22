@@ -30,16 +30,27 @@ set(ECOSIM_DATATYPE_SOURCES
   SedimentDataType.F90
 )
 
-include_directories(${CMAKE_BINARY_DIR}/f90src/utils/)
-include_directories(${CMAKE_BINARY_DIR}/f90src/modelconfig/)
-include_directories(${CMAKE_BINARY_DIR}/f90src/mesh/)
+#include_directories(${CMAKE_BINARY_DIR}/f90src/utils/)
+#include_directories(${CMAKE_BINARY_DIR}/f90src/modelconfig/)
+#include_directories(${CMAKE_BINARY_DIR}/f90src/mesh/)
 include(add_ecosim_library)
-add_ecosim_library(ecosim_datatype ${ECOSIM_DATATYPE_SOURCES})
+#add_ecosim_library(ecosim_datatype ${ECOSIM_DATATYPE_SOURCES})
+add_library(ecosim_datatype OBJECT ${ECOSIM_DATATYPE_SOURCES})
+install(TARGETS ecosim_datatype OBJECTS DESTINATION lib) 
 
-set(ECOSIM_LIBRARIES ecosim_datatype;${ECOSIM_LIBRARIES} PARENT_SCOPE)
+target_include_directories(ecosim_datatype PRIVATE 
+  ${CMAKE_BINARY_DIR}/f90src/utils/
+  ${CMAKE_BINARY_DIR}/f90src/modelconfig/
+  ${CMAKE_BINARY_DIR}/f90src/mesh/)
 
-if (NOT CMAKE_INSTALL_PREFIX STREQUAL "INSTALL_DISABLED")
-#  install(TARGETS ecosim_datatype DESTINATION lib)
+target_include_directories(ecosim_datatype PUBLIC ${CMAKE_BINARY_DIR}/f90src/ecosim_datatype)
+
+set(ECOSIM_LIBRARIES ${ECOSIM_LIBRARIES};ecosim_datatype PARENT_SCOPE)
+set(ECOSIM_LIBRARIES ${ECOSIM_LIBRARIES};ecosim_datatype)
+
+install(TARGETS ecosim_datatype DESTINATION ${CMAKE_BINARY_DIR}/lib)
+if (NOT CMAKE_INSTALL_PREFIX STREQUAL "INSTALL_DISABLED")  
+  install(TARGETS ecosim_datatype DESTINATION lib)
   file(GLOB HEADERS *.h)
   install(FILES ${HEADERS} DESTINATION include/)
 endif()

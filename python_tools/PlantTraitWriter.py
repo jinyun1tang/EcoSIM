@@ -4,36 +4,20 @@ import os,time,sys,argparse
 from datetime import datetime
 from array import array
 import warnings
+import stringTools as strtool
 warnings.filterwarnings("ignore")
 
-def split_var(var_info):
-      x=var_info.split(':')
-      return x
-
-def string2arr(string,len1=0):
-      """
-      conver a string into array of chars
-      """
-      if len1 == 0:
-            to_array = []
-            for x in string:
-                  to_array.extend(x)
-      else:
-            to_array=np.array([' '] * len1, dtype='S1')
-            ll=0
-            for x in string:
-                  to_array[ll]=x
-                  ll=ll+1
-
-      return to_array
 
 JLI=4
 #pft files are named as pft+koppen_climate_zone
 #Bdlf:broadleaf tree (deciduous or evergreen, depending on climate zone)
-pft_name={'bdlf':'broadleaf tree (deciduous or evergreen)',
+pft_name={'alfa':'alfalfa','barl':'barley',
+      'bdlf':'broadleaf tree (deciduous or evergreen)',
       'bdln': 'broadleaf tree with N2 fixation',
       'bdlw': 'broadleaf tree adapted to wetland',
-      'bspr': 'black spruce',
+      'brom': 'brome',
+      'bspr': 'black spruce (needle leaf)',
+      'fmos': 'feather moss (with jack pine)',
       'ndlf': 'needleleaf tree (evergreen)',
       'ndld': 'needleleaf tree (deciduous)',
       'gr3s': 'C3 grass perennial',
@@ -44,14 +28,20 @@ pft_name={'bdlf':'broadleaf tree (deciduous or evergreen)',
       'bush': 'bush',
       'dfir': 'douglas fir',
       'busn': 'bush with N2 fixation',
+      'lpin': 'loblolly pine',
       'maiz': 'maize',
+      'oats': 'oats',
+      'shru': 'shrub',
       'soyb': 'soybean',
       'swhe': 'spring wheat',
       'lich': 'lichen',
       'jpin': 'jackpine',
       'moss': 'moss (sphagnum)',
-      'mosf': 'moss (feathermoss)',
-      'sedg': 'sedge'}
+      'mosf': 'moss (feathermoss)',      
+      'smos': 'moss (sphagnum near sedge)',
+      'sedg': 'sedge',
+      'tasp': 'aspen',
+      'woak': 'oak (upland)'}
 
 koppenDict_no = {
       "Af":"11",
@@ -121,15 +111,17 @@ koppenDict_clim = {
       "EF": "Ice cap climate"
 }
 
-pft_names=['bdlf11','bdlf31','bdlf32','bdlf43',
-'bdlf61','bdlf62','bdln32','bdln43','bdlw62',
-'bspr43','bush11','bush26','bush31','bush32','bush43',
-'busn31','busn32','busn43','clva35',
-'clvs35','dfir32','gr3a35','gr3s26','gr3s35','gr3s61',
-'gr3s62','gr4s26','jpin43','lich61','lich62','maiz31',
-'maiz33','mosf43','moss43','moss61','moss62',
-'ndlf31','ndlf32','ndlf43','ndlf61','ndlf62',
-'sedg61','sedg62','soyb31','soyb33','swhe33']
+pft_names=['alfa43','barl43','bdlf11','bdlf31','bdlf32','bdlf43',
+'bdlf61','bdlf62','bdln32','bdln43','bdlw62','brom43',
+'bspr43','bspr62','bush11','bush26','bush31','bush32','bush43',
+'busn26','busn31','busn32','busn43','clva35',
+'clvs35','dfir32','fmos43','gr3a35','gr3s26','gr3s32','gr3s33',
+'gr3s35','gr3s61','gr3s62','gr4s26','jpin43','lich32','lich33',
+'lich61','lich62','maiz31','lpin31',
+'maiz33','mosf43','moss43','moss32','moss33','moss61','moss62',
+'ndlf31','ndlf32','ndlf33','ndlf35','ndlf43','ndlf61','ndlf62','oats43',
+'sedg61','sedg62','shru35','smos61','soyb31','soyb33','swhe33','swhe43',
+'tasp43','woak31']
 
 npfts=len(pft_names)
 
@@ -612,7 +604,7 @@ nc_fid.createDimension('nchars6',nchars6)
 
 nc_fid.createDimension('npft',len(pft_name))
 for v in varname_dict:
-      ss=split_var(varname_dict[v])
+      ss=strtool.split_var(varname_dict[v])
       if len(ss)==4:
             long_name,flags,units,dtype=ss
       else:
@@ -629,15 +621,16 @@ for v in varname_dict:
 w_nc_var = nc_fid.createVariable('pfts', 'S1', ('npfts','nchars1'))
 
 for ll in range(npfts):
-      w_nc_var[ll,:]=string2arr(pft_names[ll])
+      w_nc_var[ll,:]=strtool.string2arr(pft_names[ll])
+      print('pft[%d]=%s'%(ll,pft_names[ll]))
 
 w_nc_var = nc_fid.createVariable('pfts_short', 'S1', ('npft','nchars2'))
 w_nc_var1 = nc_fid.createVariable('pfts_long', 'S1', ('npft','nchars3'))
 
 ll=0
 for v in pft_name:
-      w_nc_var[ll,:]=string2arr(v)
-      w_nc_var1[ll,:]=string2arr(pft_name[v],nchars3)
+      w_nc_var[ll,:]=strtool.string2arr(v)
+      w_nc_var1[ll,:]=strtool.string2arr(pft_name[v],nchars3)
       ll=ll+1
 w_nc_var = nc_fid.createVariable('koppen_clim_no', 'S1', ('nkopenclms','nchars4'))
 w_nc_var1 = nc_fid.createVariable('koppen_clim_short', 'S1', ('nkopenclms','nchars5'))
@@ -645,9 +638,9 @@ w_nc_var2 = nc_fid.createVariable('koppen_clim_long', 'S1', ('nkopenclms','nchar
 
 ll=0
 for v in koppenDict_no:
-      w_nc_var1[ll,:]=string2arr(v,nchars5)
-      w_nc_var[ll,:]=string2arr(koppenDict_no[v],nchars4)
-      w_nc_var2[ll,:]=string2arr(koppenDict_clim[v],nchars6)
+      w_nc_var1[ll,:]=strtool.string2arr(v,nchars5)
+      w_nc_var[ll,:]=strtool.string2arr(koppenDict_no[v],nchars4)
+      w_nc_var2[ll,:]=strtool.string2arr(koppenDict_clim[v],nchars6)
       ll=ll+1
 
 nc_fid.variables['ICTYP'][:]=ICTYP

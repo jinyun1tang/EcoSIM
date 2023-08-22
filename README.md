@@ -8,9 +8,9 @@ git clone --recursive git@github.com:jinyun1tang/EcoSIM.git
 
 ## Building
 
-make config CC=icc CXX=icpc FC=ifort F90=1
+make config CC=icc CXX=icpc FC=ifort 
 
-make install CC=icc CXX=icpc FC=ifort F90=1
+make install CC=icc CXX=icpc FC=ifort
 
 Find the executable under ./local/bin/ecosim.f90.x
 
@@ -19,6 +19,25 @@ make test CC=icc CXX=icpc FC=ifort F90=1
 will check if the code is downloaded properly.  (Hower, because compiler difference, tests may fail.)
 
 For gnu compilers, change icc, icpc and ifort into gcc, g++ and gfortran, respectively.
+
+## netcdf library
+
+It is recommended you have the netcdf library installed on your system for C, C++ and fortran. 
+For mac, this can be done through either macport of homebrew.
+
+If a system provided netcdf libraray is provided. Use the following 
+
+make config CC=icc CXX=icpc FC=ifort netcdfsys=1
+
+to config, and use
+
+make install CC=icc CXX=icpc FC=ifort netcdfsys=1
+
+to build.
+
+## more about build
+
+read the Makefile.
 
 ## Examples
 Examples can be found in examples/run_dir.

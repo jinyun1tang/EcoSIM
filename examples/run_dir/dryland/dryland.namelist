@@ -6,12 +6,12 @@
 case_name='dryland_maize'
 prefix='../../inputs/dryland_maize/'
 do_regression_test=.false.
-pft_file_in='../../..//python_tools/ecosim_pft_20230113.nc'
+pft_file_in='../../..//python_tools/ecosim_pft_20230731.nc'
 grid_file_in='../../..//python_tools/dryland_grid_20230221.nc'
 pft_mgmt_in='../../..//python_tools/dryland_pft_20230509.nc'
 soil_mgmt_in='../../..//python_tools/dryland_soilmgmt_20230210.nc'
 clm_file_in='../../..//examples/inputs/dryland_maize/dryland_clm_20230203.nc'
-clm_factor_in='../../..//examples/inputs/dryland_maize/dryland_maize_clmfactor_20230223.nc'
+clm_factor_in='NO'
 atm_ghg_in='../../../input_data/fatm_hist_GHGs_1750-2022.nc'
 
 lverbose=.false.
@@ -29,8 +29,8 @@ NPXS=30,30,30   !number of cycles per hour for water,heat,solute flux calcns
 NPYS=10,10,10   !number of cycles per NPX for gas flux calcns
 !set up output frequency
 JOUTS=1,3,3       !frequency on hourly scale, DATA(18)
-hist_mfilt=365*24
-!hist_nhtfrq=-1
+hist_mfilt=8760
+hist_nhtfrq=-24
 /
 &bbgcforc
 /

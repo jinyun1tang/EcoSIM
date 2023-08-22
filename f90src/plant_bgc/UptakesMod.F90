@@ -69,7 +69,7 @@ module UptakesMod
     TSHC   => plt_ew%TSHC      , &
     DTKC   => plt_ew%DTKC      , &
     EVAPC  => plt_ew%EVAPC     , &
-    TKA    => plt_ew%TKA       , &
+    TairK    => plt_ew%TairK       , &
     TLEC   => plt_ew%TLEC      , &
     EP     => plt_ew%EP        , &
     VOLWC  => plt_ew%VOLWC     , &
@@ -145,7 +145,7 @@ module UptakesMod
         PSILT(NZ)=AMIN1(-ppmc,0.667_r8*PSILT(NZ))
         EP(NZ)=0.0_r8
         EVAPC(NZ)=0.0_r8
-        HFLWC1=FLWC(NZ)*cpw*TKA
+        HFLWC1=FLWC(NZ)*cpw*TairK
 
         IF(ARLSS.GT.ZEROS)THEN
           FPC=ARLFS(NZ)/ARLSS*AMIN1(1.0_r8,0.5_r8*ARLFC/AREA3(NU))
@@ -168,12 +168,12 @@ module UptakesMod
 !     FINAL CANOPY TEMPERATURE, DIFFERENCE WITH AIR TEMPERATURE
 !
 !     TKC=final estimate of canopy temperature TKCZ
-!     TKA=current air temperature
-!     DTKC=TKC-TKA for next hour
+!     TairK=current air temperature
+!     DTKC=TKC-TairK for next hour
 !
         TKC(NZ)=TKCZ(NZ)
         TCC(NZ)=units%Kelvin2Celcius(TKC(NZ))
-        DTKC(NZ)=TKC(NZ)-TKA
+        DTKC(NZ)=TKC(NZ)-TairK
 !
 !     IF CONVERGENCE NOT ACHIEVED (RARE), SET DEFAULT
 !     TEMPERATURES, ENERGY FLUXES, WATER POTENTIALS, RESISTANCES
@@ -244,7 +244,7 @@ module UptakesMod
 
   ARLSC=0.0_r8
   D9984: DO NZ=1,NP0
-!     TKC(NZ)=TKA+DTKC(NZ)
+!     TKC(NZ)=TairK+DTKC(NZ)
 !     TCC(NZ)=TKC(NZ)-TC2K
     ARLSC=ARLSC+ARLFP(NZ)+ARSTP(NZ)
     RAD1(NZ)=0.0_r8
@@ -323,7 +323,7 @@ module UptakesMod
     NP     =>  plt_site%NP      , &
     IETYP  =>  plt_site%IETYP   , &
     RAB    =>  plt_ew%RAB       , &
-    TKA    =>  plt_ew%TKA       , &
+    TairK    =>  plt_ew%TairK       , &
     DTKC   =>  plt_ew%DTKC      , &
     ZD     =>  plt_ew%ZD        , &
     ZR     =>  plt_ew%ZR        , &
@@ -411,10 +411,10 @@ module UptakesMod
 !     FOR SUBSEQUENT USE IN ENERGY EXCHANGE CALCULATIONS
 !
 !     TKCZ=initial estimate of canopy temperature TKC
-!     TKA=current air temperature
-!     DTKC=TKC-TKA from previous hour
+!     TairK=current air temperature
+!     DTKC=TKC-TairK from previous hour
 !
-  TKCZ(NZ)=TKA+DTKC(NZ)
+  TKCZ(NZ)=TairK+DTKC(NZ)
   end associate
   end subroutine UpdateCanopyProperty
 !------------------------------------------------------------------------
@@ -531,7 +531,7 @@ module UptakesMod
    OSMO    => plt_ew%OSMO      , &
    PSILO   => plt_ew%PSILO     , &
    TKC     => plt_ew%TKC       , &
-   TKA     => plt_ew%TKA       , &
+   TairK     => plt_ew%TairK       , &
    TKS     => plt_ew%TKS       , &
    PSIRO   => plt_ew%PSIRO     , &
    TCC     => plt_ew%TCC       , &
@@ -568,7 +568,7 @@ module UptakesMod
       plt_ew%HFLXC(NZ)=0.0_r8
       plt_ew%EVAPC(NZ)=0.0_r8
       plt_ew%EP(NZ)=0.0_r8
-      TKC(NZ)=TKA+DTKC(NZ)
+      TKC(NZ)=TairK+DTKC(NZ)
       TCC(NZ)=units%Kelvin2Celcius(TKC(NZ))
       FTHRM=EMMC*2.04E-10_r8*FRADP(NZ)*AREA3(NU)
       THRM1(NZ)=FTHRM*TKC(NZ)**4._r8
@@ -643,7 +643,7 @@ module UptakesMod
     OSMO    => plt_ew%OSMO      , &
     RAZ     => plt_ew%RAZ       , &
     VPA     => plt_ew%VPA       , &
-    TKA     => plt_ew%TKA       , &
+    TairK     => plt_ew%TairK       , &
     RIB     => plt_ew%RIB       , &
     EP      => plt_ew%EP        , &
     PSILT   => plt_ew%PSILT     , &
@@ -712,7 +712,7 @@ module UptakesMod
 !     RA=canopy boundary layer resistance
 !     PAREC,PARHC=canopy latent,sensible heat conductance
 !
-    RI=AMAX1(-0.3_r8,AMIN1(0.075_r8,RIB*(TKA-TKC1)))
+    RI=AMAX1(-0.3_r8,AMIN1(0.075_r8,RIB*(TairK-TKC1)))
 
     RA(NZ)=AMAX1(RACM,0.9_r8*RA1,AMIN1(1.1_r8*RA1,RAZ(NZ)/(1.0_r8-10.0_r8*RI)))
     RA1=RA(NZ)
@@ -788,8 +788,8 @@ module UptakesMod
 !
 !   VHCPX= canopy heat capacity
     VHCPC(NZ)=VHCPX+cpw*(EVAPC(NZ)+FLWC(NZ))
-    TKCY=(TKCX*VHCPX+TKA*PARHC+HFLXS)/(VHCPC(NZ)+PARHC)
-    TKCY=AMIN1(TKA+10.0_r8,AMAX1(TKA-10.0_r8,TKCY))
+    TKCY=(TKCX*VHCPX+TairK*PARHC+HFLXS)/(VHCPC(NZ)+PARHC)
+    TKCY=AMIN1(TairK+10.0_r8,AMAX1(TairK-10.0_r8,TKCY))
 !
 !     RESET CANOPY TEMPERATURE FOR NEXT ITERATION
 !
@@ -1093,8 +1093,8 @@ module UptakesMod
     TKW    =>  plt_ew%TKW       , &
     TKC    =>  plt_ew%TKC       , &
     TKS    =>  plt_ew%TKS       , &
-    TKA    =>  plt_ew%TKA       , &
-    DPTHS  =>  plt_ew%DPTHS     , &
+    TairK    =>  plt_ew%TairK       , &
+    SnowDepth  =>  plt_ew%SnowDepth     , &
     DTKC   =>  plt_ew%DTKC      , &
     RAZ    =>  plt_ew%RAZ       , &
     VHCPC  =>  plt_ew%VHCPC     , &
@@ -1135,8 +1135,8 @@ module UptakesMod
   HFLXC(NZ)=0.0_r8
   EVAPC(NZ)=0.0_r8
   EP(NZ)=0.0_r8
-  IF(CanopyHeight(NZ).GE.DPTHS-ZERO)THEN
-    TKC(NZ)=TKA
+  IF(CanopyHeight(NZ).GE.SnowDepth-ZERO)THEN
+    TKC(NZ)=TairK
   ELSE
     TKC(NZ)=TKW
   ENDIF
@@ -1188,7 +1188,7 @@ module UptakesMod
   associate(                           &
     NU       => plt_site%NU      , &
     OSMO     => plt_ew%OSMO      , &
-    TKA      => plt_ew%TKA       , &
+    TairK      => plt_ew%TairK       , &
     TKC      => plt_ew%TKC       , &
     PSILZ    => plt_ew%PSILZ     , &
     TKS      => plt_ew%TKS       , &
@@ -1222,7 +1222,7 @@ module UptakesMod
 !
   VOLWP(NZ)=VOLWP(NZ)+EP(NZ)-UPRT
   VOLWC(NZ)=VOLWC(NZ)+FLWC(NZ)+EVAPC(NZ)
-  SFLXC(NZ)=PARHC*(TKA-TKCZ(NZ))
+  SFLXC(NZ)=PARHC*(TairK-TKCZ(NZ))
   HFLXC(NZ)=TKCX*VHCPX-TKCZ(NZ)*VHCPC(NZ)+VFLXC+HFLWC1
   !
   !     ROOT TOTAL, OSMOTIC AND TURGOR WATER POTENTIALS

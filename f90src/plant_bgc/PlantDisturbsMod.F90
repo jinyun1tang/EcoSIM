@@ -744,7 +744,7 @@ module PlantDisturbsMod
     iroot    =>  pltpar%iroot        , &
     infoliar =>  pltpar%infoliar     , &
     icwood   =>  pltpar%icwood       , &
-    RFGas_root    =>   plt_bgcr%RFGas_root    , &
+    RootGasLoss_disturb    =>   plt_bgcr%RootGasLoss_disturb    , &
     ESNC     =>  plt_bgcr%ESNC       , &
     RCO2A    =>  plt_rbgc%RCO2A      , &
     RCO2M    =>  plt_rbgc%RCO2M      , &
@@ -965,8 +965,9 @@ module PlantDisturbsMod
 !     WTRT1,WTRT1N,WTRT1P=primary root C,N,P mass in soil layer
 !     WTRT2,WTRT2N,WTRT2P=secondary root C,N,P mass in soil layer
 !
-        D8985: DO N=1,MY(NZ)
-          D8980: DO L=NU,NJ
+        D8980: DO L=NU,NJ
+          D8985: DO N=1,MY(NZ)
+
             D6385: DO M=1,jsken
                 DO NE=1,npelms
                   ESNC(NE,M,k_fine_litr,L,NZ)=ESNC(NE,M,k_fine_litr,L,NZ)+XHVST1 &
@@ -994,7 +995,7 @@ module PlantDisturbsMod
 !
 
             DO NTG=idg_beg,idg_end-1
-              RFGas_root(NTG,NZ)=RFGas_root(NTG,NZ)-XHVST1 &
+              RootGasLoss_disturb(NTG,NZ)=RootGasLoss_disturb(NTG,NZ)-XHVST1 &
                 *(trcg_rootml(NTG,N,L,NZ)+trcs_rootml(NTG,N,L,NZ))
               trcg_rootml(NTG,N,L,NZ)=XHVST*trcg_rootml(NTG,N,L,NZ)
               trcs_rootml(NTG,N,L,NZ)=XHVST*trcs_rootml(NTG,N,L,NZ)
@@ -1062,8 +1063,8 @@ module PlantDisturbsMod
                 EPOOLN(NE,L,NZ)=EPOOLN(NE,L,NZ)*XHVST
               ENDDO
             ENDIF
-          ENDDO D8980
-        ENDDO D8985
+          ENDDO D8985
+        ENDDO D8980
 !
 !     LITTERFALL AND STATE VARIABLES FOR SEASONAL STORAGE RESERVES
 !     DURING TILLAGE
@@ -1254,7 +1255,7 @@ module PlantDisturbsMod
     icwood   =>  pltpar%icwood    , &
     trcg_rootml     =>  plt_rbgc%trcg_rootml , &
     trcs_rootml     =>  plt_rbgc%trcs_rootml , &
-    RFGas_root    =>   plt_bgcr%RFGas_root    , &
+    RootGasLoss_disturb    =>   plt_bgcr%RootGasLoss_disturb    , &
     ESNC     =>  plt_bgcr%ESNC     , &
     TNBP     =>  plt_bgcr%TNBP     , &
     CNET     =>  plt_bgcr%CNET     , &
@@ -1273,7 +1274,7 @@ module PlantDisturbsMod
     RTDNP    =>  plt_morph%RTDNP   , &
     INTYP    =>  plt_morph%INTYP   , &
     ARLFT    =>  plt_morph%ARLFT   , &
-    ZL       =>  plt_morph%ZL      , &
+    CanopyHeightz       =>  plt_morph%CanopyHeightz      , &
     ARLFB    =>  plt_morph%ARLFB   , &
     NBR      =>  plt_morph%NBR     , &
     ARSTP    =>  plt_morph%ARSTP   , &
@@ -1339,9 +1340,9 @@ module PlantDisturbsMod
         ARLFY=(1._r8-ABS(HVST(NZ)))*ARLFC
         ARLFR=0._r8
         D9875: DO L=1,JC1
-          IF(ZL(L).GT.ZL(L-1).AND.ARLFT(L).GT.ZEROS.AND.ARLFR.LT.ARLFY)THEN
+          IF(CanopyHeightz(L).GT.CanopyHeightz(L-1).AND.ARLFT(L).GT.ZEROS.AND.ARLFR.LT.ARLFY)THEN
             IF(ARLFR+ARLFT(L).GT.ARLFY)THEN
-              HVST(NZ)=ZL(L-1)+((ARLFY-ARLFR)/ARLFT(L))*(ZL(L)-ZL(L-1))
+              HVST(NZ)=CanopyHeightz(L-1)+((ARLFY-ARLFR)/ARLFT(L))*(CanopyHeightz(L)-CanopyHeightz(L-1))
             ENDIF
           ELSE
             HVST(NZ)=0._r8
@@ -1534,8 +1535,8 @@ module PlantDisturbsMod
     D9865: DO L=JC1,1,-1
       IF(IHVST(NZ).NE.4.AND.IHVST(NZ).NE.6)THEN
         IF(IHVST(NZ).NE.3)THEN
-          IF(ZL(L).GT.ZL(L-1))THEN
-            FHGT=AZMAX1(AMIN1(1.0_r8,1._r8-((ZL(L))-HVST(NZ))/(ZL(L)-ZL(L-1))))
+          IF(CanopyHeightz(L).GT.CanopyHeightz(L-1))THEN
+            FHGT=AZMAX1(AMIN1(1.0_r8,1._r8-((CanopyHeightz(L))-HVST(NZ))/(CanopyHeightz(L)-CanopyHeightz(L-1))))
           ELSE
             FHGT=1.0_r8
           ENDIF
@@ -2420,7 +2421,7 @@ module PlantDisturbsMod
 !     RCO2Z,ROXYZ,RCH4Z,RN2OZ,RNH3Z,RH2GZ=root gaseous CO2,O2,CH4,N2O,NH3,H2 loss from disturbance
 !
             DO NTG=idg_beg,idg_end-1
-              RFGas_root(NTG,NZ)=RFGas_root(NTG,NZ)-XHVST1(ielmc) &
+              RootGasLoss_disturb(NTG,NZ)=RootGasLoss_disturb(NTG,NZ)-XHVST1(ielmc) &
                 *(trcg_rootml(idg_CO2,N,L,NZ)+trcs_rootml(idg_CO2,N,L,NZ))
               trcg_rootml(NTG,N,L,NZ)=XHVST(ielmc)*trcg_rootml(NTG,N,L,NZ)
               trcs_rootml(NTG,N,L,NZ)=XHVST(ielmc)*trcs_rootml(NTG,N,L,NZ)

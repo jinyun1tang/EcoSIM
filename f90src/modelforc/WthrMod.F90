@@ -17,7 +17,6 @@ module WthrMod
   use IrrigationDataType
   use GridDataType
   use EcoSIMConfig
-  use EcosimConst, only : TWILGT
   use MiniMathMod, only : AZMAX1
   use UnitMod    , only : units
   implicit none
@@ -94,8 +93,7 @@ module WthrMod
 !
 
   IF(ICLM.EQ.1.OR.ICLM.EQ.2)THEN
-    call ApplyClimateCorrection(I,J,NHW,NHE,NVN,NVS,PRECUI,&
-      PRECRI,PRECII,PRECWI,VPS)
+    call CorrectClimate(I,J,NHW,NHE,NVN,NVS,PRECUI,PRECRI,PRECII,PRECWI,VPS)
   ENDIF
 !
 
@@ -136,7 +134,7 @@ module WthrMod
         RADN(NY,NX)=RMAX/24.0_r8
       ENDIF
       !
-      !     TCA,TKA=air temperature (oC,K)
+      !     TCA,TairK=air temperature (oC,K)
       !     TAVG*,AMP*=daily averages, amplitudes from day.f
       !
       IF(J.LT.(ZNOON(NY,NX)-DYLN(NY,NX)/2))THEN
@@ -149,7 +147,10 @@ module WthrMod
         TCA(NY,NX)=TAVG2+AMP2*SIN(((J-(ZNOON(NY,NX) &
           -DYLN(NY,NX)/2.0_r8))*PICON/(3.0_r8+DYLN(NY,NX)/2.0_r8))-PICON2h)
       ENDIF
-      TKA(NY,NX)=units%Celcius2Kelvin(TCA(NY,NX))
+      TairK(NY,NX)=units%Celcius2Kelvin(TCA(NY,NX))
+      if(abs(TairK(NY,NX))>400._r8)then
+        print*,'air temperature problematic',TairK(NY,NX),TCA(NY,NX)
+      endif
       !
       !     VPK,VPS=ambient,saturated vapor pressure
       !     VAVG*,VAMP*=daily averages, amplitudes from day.f
@@ -165,8 +166,8 @@ module WthrMod
         VPK(NY,NX)=VAVG2+VMP2*SIN(((J-(ZNOON(NY,NX) &
           -DYLN(NY,NX)/2.0_r8))*PICON /(3.0_r8+DYLN(NY,NX)/2.0_r8))-PICON2h)
       ENDIF
-      !VPS(NY,NX)=0.61_r8*EXP(5360.0_r8*(3.661E-03_r8-1.0_r8/TKA(NY,NX))) &
-      VPS(NY,NX)=vapsat0(tka(ny,nx))*EXP(-ALTI(NY,NX)/7272.0_r8)
+      !VPS(NY,NX)=0.61_r8*EXP(5360.0_r8*(3.661E-03_r8-1.0_r8/TairK(NY,NX))) &
+      VPS(NY,NX)=vapsat0(TairK(ny,nx))*EXP(-ALTI(NY,NX)/7272.0_r8)
       VPK(NY,NX)=AMIN1(VPS(NY,NX),VPK(NY,NX))
 !
       !     UA=wind speed
@@ -209,7 +210,7 @@ module WthrMod
     DO NY=NVN,NVS
  !
       !     RADN=SW radiation at horizontal surface
-      !     TCA,TKA=air temperature (oC,K)
+      !     TCA,TairK=air temperature (oC,K)
       !     VPK,VPS=ambient,saturated vapor pressure
       !     UA=wind speed
       !     TSNOW=temperature below which precipitation is snow (oC)
@@ -218,8 +219,8 @@ module WthrMod
       RADN(NY,NX)=SRADH(J,I)
       TCA(NY,NX)=TMPH(J,I)
 
-      TKA(NY,NX)=units%Celcius2Kelvin(TCA(NY,NX))
-      VPS(NY,NX)=vapsat0(TKA(ny,nx))*EXP(-ALTI(NY,NX)/7272.0_r8)
+      TairK(NY,NX)=units%Celcius2Kelvin(TCA(NY,NX))
+      VPS(NY,NX)=vapsat0(TairK(ny,nx))*EXP(-ALTI(NY,NX)/7272.0_r8)
       VPK(NY,NX)=AMIN1(DWPTH(J,I),VPS(NY,NX))
       UA(NY,NX)=AMAX1(3600.0_r8,WINDH(J,I))
       !snowfall is determined by air tempeature
@@ -291,14 +292,14 @@ module WthrMod
         !
         !     CLD=cloudiness factor for EMM
         !     EMM=sky emissivity
-        !     VPK,TKA=vapor pressure,temperature
+        !     VPK,TairK=vapor pressure,temperature
         !
         IF(RADX.GT.ZERO)THEN
           CLD=AMIN1(1.0_r8,AMAX1(0.2_r8,2.33_r8-3.33_r8*RADN(NY,NX)/RADX))
         ELSE
           CLD=0.2_r8
         ENDIF
-        EMM=0.625_r8*AMAX1(1.0_r8,(1.0E+03_r8*VPK(NY,NX)/TKA(NY,NX))**0.131_r8)
+        EMM=0.625_r8*AMAX1(1.0_r8,(1.0E+03_r8*VPK(NY,NX)/TairK(NY,NX))**0.131_r8)
         EMM=EMM*(1.0_r8+0.242_r8*CLD**0.583_r8)
         !
         !     IF PHYTOTRON
@@ -321,11 +322,11 @@ module WthrMod
       !     atmospheric properties
 !
       IF(XRADH(J,I).GT.0.0_r8)THEN
-        !     THSX(NY,NX)=EMM*(2.04E-10*TKA(NY,NX)**4)
+        !     THSX(NY,NX)=EMM*(2.04E-10*TairK(NY,NX)**4)
         !     THSX(NY,NX)=THSX(NY,NX)+XRADH(J,I)
         THSX(NY,NX)=XRADH(J,I)
       ELSE
-        THSX(NY,NX)=EMM*(2.04E-10_r8*TKA(NY,NX)**4._r8)
+        THSX(NY,NX)=EMM*(2.04E-10_r8*TairK(NY,NX)**4._r8)
       ENDIF
 !
       !     INSERT CESM WEATHER HERE
@@ -337,7 +338,7 @@ module WthrMod
       !     RAPY=INDIRECT PAR (UMOL M-2 S-1)
       !     THSX=LW RADIATION (MJ M-2 H-1)
       !     TCA=AIR TEMPERATURE (C)
-      !     TKA=AIR TEMPERATURE (K)
+      !     TairK=AIR TEMPERATURE (K)
       !     VPK=VAPOR PRESSURE (KPA)
       !     UA=WINDSPEED (M H-1)
       !     PRECRI(NY,NX)=RAIN (M H-1)
@@ -364,8 +365,7 @@ module WthrMod
   end subroutine CalcRadiation
 !------------------------------------------------------------------------------------------
 
-  subroutine ApplyClimateCorrection(I,J,NHW,NHE,NVN,NVS,PRECUI,&
-    PRECRI,PRECII,PRECWI,VPS)
+  subroutine CorrectClimate(I,J,NHW,NHE,NVN,NVS,PRECUI,PRECRI,PRECII,PRECWI,VPS)
   !
   !     DESCRIPTION:
   !     IMPLEMENT CLIMATE CHANGES READ IN 'READS' TO HOURLY TEMPERATURE,
@@ -435,7 +435,7 @@ module WthrMod
         AMP=0.5_r8*(TDTPX(N,NY,NX)-TDTPN(N,NY,NX))
         DHR=SIN(0.2618_r8*(J-(ZNOON(NY,NX)+3.0_r8))+PICON2h)
         TCA(NY,NX)=TCA(NY,NX)+DTA+AMP*DHR
-        TKA(NY,NX)=units%Celcius2Kelvin(TCA(NY,NX))
+        TairK(NY,NX)=units%Celcius2Kelvin(TCA(NY,NX))
 !
         !     ACCLIMATION TO GRADUAL CLIMATE CHANGE
         !
@@ -475,8 +475,8 @@ module WthrMod
 !
         IF(isclose(DHUM(N),1.0_r8))THEN
           VPX=VPS(NY,NX)
-          !VPS(NY,NX)=0.61*EXP(5360.0*(3.661E-03-1.0/TKA(NY,NX))) &
-          vps(ny,ny)=vapsat0(tka(ny,nx))*EXP(-ALTI(NY,NX)/7272.0)
+          !VPS(NY,NX)=0.61*EXP(5360.0*(3.661E-03-1.0/TairK(NY,NX))) &
+          vps(ny,ny)=vapsat0(TairK(ny,nx))*EXP(-ALTI(NY,NX)/7272.0)
           VPK(NY,NX)=VPK(NY,NX)*VPS(NY,NX)/VPX
         ENDIF
       ENDIF
@@ -503,7 +503,7 @@ module WthrMod
       CNOR(NY,NX)=CNORI(NY,NX)*TDCNO(N,NY,NX)
     ENDDO D9920
   ENDDO D9925
-  end subroutine ApplyClimateCorrection
+  end subroutine CorrectClimate
 !------------------------------------------------------------------------------------------
 
   subroutine SummaryForOutput(NHW,NHE,NVN,NVS,PRECUI,PRECRI,PRECII,PRECWI)
@@ -528,7 +528,7 @@ module WthrMod
       HUDX(NY,NX)=AMAX1(HUDX(NY,NX),VPK(NY,NX))
       HUDN(NY,NX)=AMIN1(HUDN(NY,NX),VPK(NY,NX))
       TWIND(NY,NX)=TWIND(NY,NX)+UA(NY,NX)
-      VPA(NY,NX)=VPK(NY,NX)*2.173E-03_r8/TKA(NY,NX)
+      VPA(NY,NX)=VPK(NY,NX)*2.173E-03_r8/TairK(NY,NX)
       TRAI(NY,NX)=TRAI(NY,NX)+(PRECRI(NY,NX)+PRECWI(NY,NX) &
         +PRECII(NY,NX)+PRECUI(NY,NX))*1000.0_r8
 !

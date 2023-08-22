@@ -139,7 +139,7 @@ implicit none
   THFLXC(NY,NX)=plt_ew%THFLXC
   TVOLWP(NY,NX)=plt_ew%TVOLWP
   TENGYC(NY,NX)=plt_ew%TENGYC
-  TRFGas_root(idg_beg:idg_end-1,NY,NX) =plt_rbgc%TRFGas_root(idg_beg:idg_end-1)
+  TRootGasLoss_disturb(idg_beg:idg_end-1,NY,NX) =plt_rbgc%TRootGasLoss_disturb(idg_beg:idg_end-1)
   TCCAN(NY,NX)=plt_bgcr%TCCAN
 
   FERT(17:19,I1,NY,NX)=plt_distb%FERT(17:19)
@@ -299,7 +299,7 @@ implicit none
     PSILG(NZ,NY,NX) =plt_ew%PSILG(NZ)
     PSILZ(NZ,NY,NX) =plt_ew%PSILZ(NZ)
 
-    RFGas_root(idg_beg:idg_end-1,NZ,NY,NX) =plt_bgcr%RFGas_root(idg_beg:idg_end-1,NZ)
+    RootGasLoss_disturb(idg_beg:idg_end-1,NZ,NY,NX) =plt_bgcr%RootGasLoss_disturb(idg_beg:idg_end-1,NZ)
     RSMN(NZ,NY,NX)  =plt_photo%RSMN(NZ)
     RSMH(NZ,NY,NX)  =plt_photo%RSMH(NZ)
     RCMX(NZ,NY,NX)  =plt_photo%RCMX(NZ)
@@ -697,7 +697,7 @@ implicit none
   plt_site%CNH3E=AtmGgms(idg_NH3,NY,NX)
   plt_site%DYLX=DYLX(NY,NX)
   plt_site%DYLN=DYLN(NY,NX)
-  plt_ew%DPTHS=DPTHS(NY,NX)
+  plt_ew%SnowDepth=SnowDepth(NY,NX)
   plt_site%DYLM=DYLM(NY,NX)
   plt_site%IETYP=IETYP(NY,NX)
   plt_site%IYRC=IYRC
@@ -712,7 +712,7 @@ implicit none
   plt_rad%SSINN=SSINN(NY,NX)
   plt_rad%SSIN=SSIN(NY,NX)
   plt_ew%TKW=TKW(1,NY,NX)
-  plt_ew%TKA=TKA(NY,NX)
+  plt_ew%TairK=TairK(NY,NX)
   plt_rad%THRMGX=THRMGX(NY,NX)
   plt_rad%THS=THS(NY,NX)
   plt_ew%VPA=VPA(NY,NX)
@@ -727,9 +727,9 @@ implicit none
   plt_distb%DCORP=DCORP(I,NY,NX)
   plt_distb%ITILL=ITILL(I,NY,NX)
 
-  plt_morph%ZL(0)=ZL(0,NY,NX)
+  plt_morph%CanopyHeightz(0)=CanopyHeightz(0,NY,NX)
   DO  L=1,JC
-    plt_morph%ZL(L)=ZL(L,NY,NX)
+    plt_morph%CanopyHeightz(L)=CanopyHeightz(L,NY,NX)
     plt_rad%TAUS(L)=TAUS(L,NY,NX)
     plt_rad%TAU0(L)=TAU0(L,NY,NX)
   ENDDO
@@ -974,7 +974,7 @@ implicit none
   plt_rad%TRN     =TRN(NY,NX)
   plt_ew%TEVAPC=TEVAPC(NY,NX)
   plt_ew%TLE=TLE(NY,NX)
-  plt_rbgc%TRFGas_root(idg_beg:idg_end-1)=TRFGas_root(idg_beg:idg_end-1,NY,NX)
+  plt_rbgc%TRootGasLoss_disturb(idg_beg:idg_end-1)=TRootGasLoss_disturb(idg_beg:idg_end-1,NY,NX)
   plt_ew%TGH    =TGH(NY,NX)
   plt_ew%TEVAPP =TEVAPP(NY,NX)
   plt_ew%THFLXC =THFLXC(NY,NX)
@@ -1178,7 +1178,7 @@ implicit none
     plt_ew%PSILT(NZ)=PSILT(NZ,NY,NX)
     plt_ew%PSILG(NZ)=PSILG(NZ,NY,NX)
     plt_photo%RCMX(NZ)=RCMX(NZ,NY,NX)
-    plt_bgcr%RFGas_root(idg_beg:idg_end-1,NZ)=RFGas_root(idg_beg:idg_end-1,NZ,NY,NX)
+    plt_bgcr%RootGasLoss_disturb(idg_beg:idg_end-1,NZ)=RootGasLoss_disturb(idg_beg:idg_end-1,NZ,NY,NX)
     plt_ew%RAZ(NZ)=RAZ(NZ,NY,NX)
     plt_photo%SCO2(NZ)=SCO2(NZ,NY,NX)
     plt_morph%SDPTH(NZ)=SDPTH(NZ,NY,NX)
@@ -1503,19 +1503,19 @@ implicit none
   plt_morph%ARLFC=ARLFC(NY,NX)
   plt_site%ZEROS =ZEROS(NY,NX)
   plt_site%ZERO  =ZERO
-  plt_ew%DPTHS   =DPTHS(NY,NX)
-  plt_ew%TKA     =TKA(NY,NX)
+  plt_ew%SnowDepth   =SnowDepth(NY,NX)
+  plt_ew%TairK     =TairK(NY,NX)
   plt_morph%GridMaxCanopyHeight   =GridMaxCanopyHeight(NY,NX)
   plt_site%Z0=Z0(NY,NX)
   plt_ew%ZD=ZD(NY,NX)
   plt_site%UA=UA(NY,NX)
   plt_ew%VHCPWX=VHCPWX(NY,NX)
   plt_ew%VHCPW1=VHCPW(1,NY,NX)
-  plt_morph%ZL(0)=ZL(0,NY,NX)
+  plt_morph%CanopyHeightz(0)=CanopyHeightz(0,NY,NX)
   DO L=1,JC
     plt_morph%ARSTT(L)=ARSTT(L,NY,NX)
     plt_morph%ARLFT(L)=ARLFT(L,NY,NX)
-    plt_morph%ZL(L)=ZL(L,NY,NX)
+    plt_morph%CanopyHeightz(L)=CanopyHeightz(L,NY,NX)
     plt_rad%TAUS(L)=TAUS(L,NY,NX)
   ENDDO
   plt_rad%TAUS(JC+1)=TAUS(JC+1,NY,NX)
@@ -1622,7 +1622,7 @@ implicit none
   RAD(NY,NX)=plt_rad%RAD0
   RAP(NY,NX)=plt_rad%RAP0
   DO L=0,JC
-    ZL(L,NY,NX)=plt_morph%ZL(L)
+    CanopyHeightz(L,NY,NX)=plt_morph%CanopyHeightz(L)
   ENDDO
   DO L=1,JC
     TAUS(L,NY,NX)=plt_rad%TAUS(L)

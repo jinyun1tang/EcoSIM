@@ -21,13 +21,17 @@ configure_file(shr_assert.h shr_assert.h COPYONLY)
 configure_file(dtypes.h dtypes.h COPYONLY)
 
 include(add_ecosim_library)
-add_ecosim_library(util ${ECOSIM_UTIL_SOURCES})
+#add_ecosim_library(util OBJECTS ${ECOSIM_UTIL_SOURCES})
+add_library(util OBJECT ${ECOSIM_UTIL_SOURCES})    
+install(TARGETS util OBJECTS DESTINATION lib)
 
+target_include_directories(util PUBLIC ${CMAKE_BINARY_DIR}/f90src/utils)
 
-set(ECOSIM_LIBRARIES util;${ECOSIM_LIBRARIES} PARENT_SCOPE)
+set(ECOSIM_LIBRARIES ${ECOSIM_LIBRARIES};util PARENT_SCOPE)
+set(ECOSIM_LIBRARIES ${ECOSIM_LIBRARIES};util)
 
 if (NOT CMAKE_INSTALL_PREFIX STREQUAL "INSTALL_DISABLED")
-#  install(TARGETS util DESTINATION lib)
+  install(TARGETS util DESTINATION lib)
   file(GLOB HEADERS *.h)
   install(FILES ${HEADERS} DESTINATION include/)
 endif()

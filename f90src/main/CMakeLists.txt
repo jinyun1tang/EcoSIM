@@ -2,33 +2,37 @@ set(ECOSIM_MAIN_SOURCES
   InitEcoSIM.F90
   EcoSIMDesctruct.F90
 )
-include_directories(${CMAKE_BINARY_DIR}/f90src/utils/)
-include_directories(${CMAKE_BINARY_DIR}/f90src/modelconfig/)
-include_directories(${CMAKE_BINARY_DIR}/f90src/mesh/)
-include_directories(${CMAKE_BINARY_DIR}/f90src/ecosim_datatype/)
-include_directories(${CMAKE_BINARY_DIR}/f90src/ioutils/)
-include_directories(${CMAKE_BINARY_DIR}/f90src/modelpars/)
-include_directories(${CMAKE_BINARY_DIR}/f90src/APIData/)
-include_directories(${CMAKE_BINARY_DIR}/f90src/plant_bgc/)
-include_directories(${CMAKE_BINARY_DIR}/f90src/disturbances/)
-include_directories(${CMAKE_BINARY_DIR}/f90src/HydroTherm/PhysData)
-include_directories(${CMAKE_BINARY_DIR}/f90src/HydroTherm/SnowPhys)
-include_directories(${CMAKE_BINARY_DIR}/f90src/HydroTherm/SoilPhys)
-include_directories(${CMAKE_BINARY_DIR}/f90src/microbial_bgc/box_model)
-include_directories(${CMAKE_BINARY_DIR}/f90src/microbial_bgc/layers_model)
-include_directories(${CMAKE_BINARY_DIR}/f90src/modelforc/)
-include_directories(${CMAKE_BINARY_DIR}/f90src/ecosim_mods/)
-include_directories(${CMAKE_BINARY_DIR}/f90src/balances/)
-include_directories(${CMAKE_BINARY_DIR}/f90src/transport/nonsalt)
-include_directories(${CMAKE_BINARY_DIR}/f90src/transport/salt)
-include_directories(${CMAKE_BINARY_DIR}/f90src/APIs/)
 include(add_ecosim_library)
 add_ecosim_library(ecosim_main ${ECOSIM_MAIN_SOURCES})
 
-set(ECOSIM_LIBRARIES ecosim_main;${ECOSIM_LIBRARIES} PARENT_SCOPE)
+target_include_directories(ecosim_main  PRIVATE
+  ${CMAKE_BINARY_DIR}/f90src/utils/
+  ${CMAKE_BINARY_DIR}/f90src/modelconfig/
+  ${CMAKE_BINARY_DIR}/f90src/mesh/
+  ${CMAKE_BINARY_DIR}/f90src/ecosim_datatype/
+  ${CMAKE_BINARY_DIR}/f90src/ioutils/
+  ${CMAKE_BINARY_DIR}/f90src/modelpars/
+  ${CMAKE_BINARY_DIR}/f90src/APIData/
+  ${CMAKE_BINARY_DIR}/f90src/plant_bgc/
+  ${CMAKE_BINARY_DIR}/f90src/disturbances/
+  ${CMAKE_BINARY_DIR}/f90src/HydroTherm/PhysData
+  ${CMAKE_BINARY_DIR}/f90src/HydroTherm/SnowPhys
+  ${CMAKE_BINARY_DIR}/f90src/HydroTherm/SoilPhys
+  ${CMAKE_BINARY_DIR}/f90src/microbial_bgc/box_model
+  ${CMAKE_BINARY_DIR}/f90src/microbial_bgc/layers_model
+  ${CMAKE_BINARY_DIR}/f90src/modelforc/
+  ${CMAKE_BINARY_DIR}/f90src/ecosim_mods/
+  ${CMAKE_BINARY_DIR}/f90src/balances/
+  ${CMAKE_BINARY_DIR}/f90src/transport/nonsalt
+  ${CMAKE_BINARY_DIR}/f90src/transport/salt
+  ${CMAKE_BINARY_DIR}/f90src/APIs/)
+
+set(ECOSIM_LIBRARIES ${ECOSIM_LIBRARIES};ecosim_main PARENT_SCOPE)
+set(ECOSIM_LIBRARIES ${ECOSIM_LIBRARIES};ecosim_main)
+install(TARGETS ecosim_main DESTINATION ${CMAKE_BINARY_DIR}/lib)  
 
 if (NOT CMAKE_INSTALL_PREFIX STREQUAL "INSTALL_DISABLED")
-#  install(TARGETS ecosim_main DESTINATION lib)
+  install(TARGETS ecosim_main DESTINATION lib)
   file(GLOB HEADERS *.h)
   install(FILES ${HEADERS} DESTINATION include/)
 endif()

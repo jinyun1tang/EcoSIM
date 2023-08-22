@@ -656,8 +656,8 @@ implicit none
   use fileUtil, only : file_exists
   use abortutils, only : endrun
   implicit none
-  integer, intent(in) :: yearc  ! current year
-  integer, intent(in) :: yeari  !
+  integer, intent(in) :: yearc  ! current year of simulation
+  integer, intent(in) :: yeari  ! current year of forcing data
   integer, intent(in) :: L
   type(atm_forc_type), intent(out) :: atmf
 
@@ -691,8 +691,9 @@ implicit none
   allocate(fdatam(ngrid,24,366))
   allocate(idatav(ngrid))
   allocate(fdatav(ngrid))
-
+  I=365
   if(isleap(yeari))I=366
+  print*,size(fdatam,1),size(fdatam,2),size(fdatam,3),irec
   call ncd_getvar(clm_nfid,'TMPH',irec,fdatam); call reshape2(TMPH,fdatam)
   call ncd_getvar(clm_nfid,'WINDH',irec,fdatam); call reshape2(WINDH,fdatam)
   call ncd_getvar(clm_nfid,'DWPTH',irec,fdatam); call reshape2(DWPTH,fdatam)
@@ -721,7 +722,6 @@ implicit none
   else
     XRADH=0._r8
   endif
-
 
   if (I==365 .and. isLeap(yearc))then
     DO J=1,24

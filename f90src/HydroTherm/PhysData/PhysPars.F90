@@ -9,7 +9,7 @@ implicit none
 
 
 ! RAM=minimum boundary layer resistance (h m-1)
-! DPTHSX=minimum snowpack depth for full cover (m)
+! MinSnowDepth=minimum snowpack depth for full cover (m)
 ! RZ=minimum resistance to evaporation of surface water (h m-1)
 ! TRBA=threshold air-filled porosity for convective effects on heat transfer	m3 m-3  
 ! TRBW=threshold water-filled porosity for convective effects on heat transfer	m3 m-3
@@ -27,7 +27,7 @@ implicit none
 
   real(r8), parameter :: FCI=0.05_r8                      !field capacity of ice
   real(r8), parameter :: WPI=0.025_r8                     !wilting point of ice
-  real(r8), parameter :: DPTHSX=0.075_r8
+  real(r8), parameter :: MinSnowDepth=0.075_r8
   real(r8), parameter :: RAM=1.39E-03_r8   
   real(r8), parameter :: RZ=0.0139_r8  
   real(r8), parameter :: TRBA=0.000_r8

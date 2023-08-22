@@ -83,7 +83,7 @@ if (NOT EXISTS ${Z_LIBRARY})
 
   message("Configuring zlib...")
 
-  execute_process(COMMAND env CC=${CMAKE_C_COMPILER} CFLAGS=${CMAKE_C_FLAGS} ./configure ${ZLIB_CONFIG_OPTS}
+  execute_process(COMMAND env CC=${CMAKE_C_COMPILER} env CFLAGS=${CMAKE_C_FLAGS} ./configure ${ZLIB_CONFIG_OPTS}
                   WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/zlib
                   OUTPUT_VARIABLE zlib_config_log ERROR_VARIABLE zlib_config_err
                   RESULT_VARIABLE stat)
@@ -135,7 +135,7 @@ if (EXISTS ${CURL_LIBRARY})
   message("Configuring curl library...")
   execute_process(COMMAND autoreconf -if WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/curl)
 
-  execute_process(COMMAND env CC=${CMAKE_C_COMPILER} CFLAGS=${CMAKE_C_FLAGS} ./configure --prefix ${PROJECT_BINARY_DIR} --without-ssl --without-zlib
+  execute_process(COMMAND env CC=${CMAKE_C_COMPILER} env CFLAGS=${CMAKE_C_FLAGS} ./configure --prefix ${PROJECT_BINARY_DIR} --without-ssl --without-zlib
                   WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/curl
                   OUTPUT_VARIABLE curl_config_log ERROR_VARIABLE curl_config_err
                   RESULT_VARIABLE stat)
@@ -248,7 +248,7 @@ if (NOT EXISTS ${CMAKE_CURRENT_BINARY_DIR}/hdf5)
 
   execute_process(COMMAND autoreconf -if WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/hdf5)
 
-  execute_process(COMMAND env CC=${CMAKE_C_COMPILER} CFLAGS=${CMAKE_C_FLAGS} env FC=${CMAKE_Fortran_COMPILER} env CXX=${CMAKE_CXX_COMPILER}  ./configure ${HDF5_CONFIG_OPTS}
+  execute_process(COMMAND env CC=${CMAKE_C_COMPILER} env CFLAGS=${CMAKE_C_FLAGS} env FC=${CMAKE_Fortran_COMPILER} env CXX=${CMAKE_CXX_COMPILER}  ./configure ${HDF5_CONFIG_OPTS}
                   WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/hdf5
                   OUTPUT_VARIABLE hdf5_config_log ERROR_VARIABLE hdf5_config_err
                   RESULT_VARIABLE stat)
@@ -306,9 +306,6 @@ if (HDF5_LIBRARY STREQUAL "${PROJECT_BINARY_DIR}/lib/lib${HDF5_LIB_NAME}${LIB_SU
   set(ECOSIM_HDF5_HL_LIBRARY "${PROJECT_BINARY_DIR}/lib/lib${HDF5_HL_LIB_NAME}${LIB_SUFFIX}")
   set(ECOSIM_HDF5_INCLUDE_DIR "${CMAKE_INSTALL_PREFIX}/include" PARENT_SCOPE)
   set(ECOSIM_HDF5_INCLUDE_DIR "${PROJECT_BINARY_DIR}/include")
-  message(STATUS "set1 ${ECOSIM_HDF5_LIBRARY}")
-  message(STATUS "set2 ${ECOSIM_HDF5_HL_LIBRARY}")
-  message(STATUS "set3 ${ECOSIM_HDF5_INCLUDE_DIR}")
 else()
   message(STATUS "set ECOSIM_hdf5_library from system")
   set(ECOSIM_HDF5_LIBRARY ${HDF5_LIBRARY} PARENT_SCOPE)
@@ -354,11 +351,14 @@ if (NOT EXISTS ${NETCDF_LIBRARY})
   set(NETCDF_C_CONFIG_OPTS ${NETCDF_C_CONFIG_OPTS}  --disable-dap)
   set(NETCDF_C_CONFIG_OPTS ${NETCDF_C_CONFIG_OPTS}  --disable-parallel4)
   set(NETCDF_C_CONFIG_OPTS ${NETCDF_C_CONFIG_OPTS}  --enable-hdf5)
-  set(NETCDF_C_CONFIG_OPTS ${NETCDF_C_CONFIG_OPTS} --enable-shared=yes)
-
+  if(BUILD_SHARED_LIBS)
+    set(NETCDF_C_CONFIG_OPTS ${NETCDF_C_CONFIG_OPTS} --enable-shared=yes)
+  else()
+    set(NETCDF_C_CONFIG_OPTS ${NETCDF_C_CONFIG_OPTS} --enable-shared=no)
+  endif()
   execute_process(COMMAND env CC=${CMAKE_C_COMPILER} env FC=${CMAKE_Fortran_COMPILER}
-    env CXX=${CMAKE_CXX_COMPILER} CXXFLAGS=${CMAKE_CXX_FLAGS} CPPFLAGS=-I${PROJECT_BINARY_DIR}/include
-    CFLAGS=${CMAKE_C_FLAGS} LDFLAGS=-L${PROJECT_BINARY_DIR}/lib
+    env CXX=${CMAKE_CXX_COMPILER} env CXXFLAGS=${CMAKE_CXX_FLAGS} env CPPFLAGS=-I${PROJECT_BINARY_DIR}/include
+    env CFLAGS=${CMAKE_C_FLAGS} env LDFLAGS=-L${PROJECT_BINARY_DIR}/lib
     ./configure ${NETCDF_C_CONFIG_OPTS}
     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/netcdf-c
     OUTPUT_VARIABLE netcdf_c_config_log ERROR_VARIABLE netcdf_c_config_err
@@ -427,15 +427,40 @@ if (NOT EXISTS ${NETCDF_LIBRARY})
     message(FATAL_ERROR "Copying library source failed.")
   endif()
 
+  
   message("Configuring netcdf-fortran library...")
 
   execute_process(COMMAND autoreconf -if WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/netcdf-fortran)
 
+  set(NETCDF_F_CONFIG_OPTS --prefix=${PROJECT_BINARY_DIR})
+  if(BUILD_SHARED_LIBS)
+    set(NETCDF_F_CONFIG_OPTS ${NETCDF_F_CONFIG_OPTS} --enable-shared=yes)
+  else()
+    set(NETCDF_F_CONFIG_OPTS ${NETCDF_F_CONFIG_OPTS} --enable-shared=no)
+  endif()
+
   set(NETCDF_CPPFLAGS -I${PROJECT_BINARY_DIR}/include/)
-  set(NETCDF_LIBFLAGS -L${PROJECT_BINARY_DIR}/lib/)
-  execute_process(COMMAND env CC=${CMAKE_C_COMPILER} CFLAGS=${CMAKE_C_FLAGS}
+
+  set(NETCDF_LIBFLAGS "")
+  set(RESULT_VAR 0)
+  execute_process(
+    COMMAND ${PROJECT_BINARY_DIR}/bin/nc-config --libs
+    OUTPUT_VARIABLE NETCDF_LIBFLAGS
+    RESULT_VARIABLE RESULT_VAR
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+)
+
+if (RESULT_VAR EQUAL 0)
+    message("NETCDF_LIBFLAGS: ${NETCDF_LIBFLAGS}")
+else ()
+    message("Command failed with result: ${RESULT_VAR}")
+endif ()
+
+#  set(NETCDF_LIBFLAGS -L${PROJECT_BINARY_DIR}/lib/)
+
+  execute_process(COMMAND env CC=${CMAKE_C_COMPILER} env CFLAGS=${CMAKE_C_FLAGS}
      env CPPFLAGS=${NETCDF_CPPFLAGS} env LDFLAGS=${NETCDF_LIBFLAGS} env FC=${CMAKE_Fortran_COMPILER}
-     env LD_LIBRARY_PATH=${PROJECT_BINARY_DIR}/lib/ ./configure  --prefix=${PROJECT_BINARY_DIR}
+     env LD_LIBRARY_PATH=${PROJECT_BINARY_DIR}/lib/ ./configure  ${NETCDF_F_CONFIG_OPTS}
                   WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/netcdf-fortran
                   OUTPUT_VARIABLE netcdf_fortran_config_log ERROR_VARIABLE netcdf_fortran_config_err
                   RESULT_VARIABLE stat)
@@ -503,5 +528,26 @@ set(ECOSIM_TP_LIBS netcdff;${ECOSIM_TP_LIBS})
 # Add all the libraries to the build system at large.
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${ECOSIM_TP_C_FLAGS}" PARENT_SCOPE)
 set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} ${ECOSIM_TP_Fortran_FLAGS}" PARENT_SCOPE)
-set(ECOSIM_LIBRARIES ${ECOSIM_TP_LIBS};${ECOSIM_LIBRARIES} PARENT_SCOPE)
-set(ECOSIM_INCDIRS ${ECOSIM_INCDIRS};${ECOSIM_TP_INCDIRS} PARENT_SCOPE)
+#set(ECOSIM_LIBRARIES ${ECOSIM_LIBRARIES};${ECOSIM_TP_LIBS} PARENT_SCOPE)
+#set(ECOSIM_INCLUDE_DIRS ${ECOSIM_INCLUDE_DIRS};${ECOSIM_TP_INCDIRS} PARENT_SCOPE)
+
+set(NETCDF_LIBFLAGS "")
+set(RESULT_VAR 0)
+execute_process(
+  COMMAND ${PROJECT_BINARY_DIR}/bin/nc-config --prefix
+  OUTPUT_VARIABLE TPL_NETCDF_INCLUDE_DIRS
+  RESULT_VARIABLE RESULT_VAR
+  OUTPUT_STRIP_TRAILING_WHITESPACE
+)
+
+set(TPL_NETCDF_LIBRARIES "")
+set(RESULT_VAR 0)
+execute_process(
+  COMMAND ${PROJECT_BINARY_DIR}/bin/nf-config --flibs
+  OUTPUT_VARIABLE TPL_NETCDF_LIBRARIES
+  RESULT_VARIABLE RESULT_VAR
+  OUTPUT_STRIP_TRAILING_WHITESPACE
+)
+
+set(TPL_NETCDF_LIBRARIES ${TPL_NETCDF_LIBRARIES} PARENT_SCOPE)
+set(TPL_NETCDF_INCLUDE_DIRS "${TPL_NETCDF_INCLUDE_DIRS}/include" PARENT_SCOPE)

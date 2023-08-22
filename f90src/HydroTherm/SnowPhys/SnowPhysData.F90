@@ -27,7 +27,7 @@ module SnowPhysData
   real(r8),allocatable ::  TQW1(:,:)                          !
   real(r8),allocatable ::  TQI1(:,:)                          !
   real(r8),allocatable ::  THQS1(:,:)                         !
-  real(r8),allocatable ::  TK0M(:,:,:)                        !
+  real(r8),allocatable ::  TempK_snowpack(:,:,:)                        !
   real(r8),allocatable ::  VHCPWMM(:,:,:)                     !  
   real(r8),allocatable ::  VOLI0M(:,:,:)                      !
   real(r8),allocatable ::  VOLW0M(:,:,:)                      !
@@ -70,7 +70,7 @@ module SnowPhysData
   allocate(TQW(JY,JX));         TQW=0._r8
   allocate(TQS(JY,JX));         TQS=0._r8
   allocate(THQS(JY,JX));        THQS=0._r8
-  allocate(TK0M(JS,JY,JX));     TK0M=0._r8
+  allocate(TempK_snowpack(JS,JY,JX));     TempK_snowpack=0._r8
   allocate(THQR1(JY,JX));       THQR1=0._r8
   allocate(THQS1(JY,JX));       THQS1=0._r8
   allocate(TQR1(JY,JX));        TQR1=0._r8
@@ -120,7 +120,7 @@ module SnowPhysData
   call destroy(TQI)  
   call destroy(THQS)  
   call destroy(THQS1)
-  call destroy(TK0M)  
+  call destroy(TempK_snowpack)  
   call destroy(VHCPWMM)
   call destroy(VOLI0M)
   call destroy(VOLW0M)

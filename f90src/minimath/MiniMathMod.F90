@@ -12,6 +12,7 @@ module minimathmod
   public :: isclose         !test if two values a and b are close in magnitude
   public :: vapsat, vapsat0
   public :: isLeap
+  public :: isnan
   public :: AZMAX1,AZMIN1,AZMAX1t
 
   interface AZMAX1
@@ -27,6 +28,17 @@ module minimathmod
   public :: addone
   real(r8), parameter :: tiny_val=1.e-20_r8
   contains
+
+
+   pure function isnan(a)result(ans)
+   implicit none
+   real(r8), intent(in) :: a
+   logical :: ans
+
+   ans=(a/=a)
+   return
+   end function isnan
+!------------------------------------------------------------------------------------------
 
    pure function safe_adb(a,b)result(ans)
    !!

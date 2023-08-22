@@ -8,7 +8,7 @@ implicit none
   logical :: salt_model   =.false.    !toggle for salt model
   logical :: erosion_model=.false.
   logical :: plant_model  =.true.
-  logical :: micb_model   =.true.
+  logical :: microbial_model   =.true.
   logical :: soichem_model=.true.
   real(r8) :: aco2_ppm  = 280._r8
   real(r8) :: ach4_ppm  = 1.144_r8

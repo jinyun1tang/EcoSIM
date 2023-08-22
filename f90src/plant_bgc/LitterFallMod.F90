@@ -321,7 +321,7 @@ implicit none
     trcs_rootml => plt_rbgc%trcs_rootml, &
     NJ        =>   plt_site%NJ        , &
     NU        =>   plt_site%NU        , &
-    RFGas_root     =>   plt_bgcr%RFGas_root     , &
+    RootGasLoss_disturb     =>   plt_bgcr%RootGasLoss_disturb     , &
     ESNC      =>   plt_bgcr%ESNC      , &
     icwood    =>   pltpar%icwood      , &
     iroot     =>   pltpar%iroot       , &
@@ -385,7 +385,7 @@ implicit none
 !     RELEASE GAS CONTENTS OF DEAD ROOTS
 !
         DO NTG=idg_beg,idg_end-1
-          RFGas_root(NTG,NZ)=RFGas_root(NTG,NZ)-trcg_rootml(NTG,N,L,NZ)-trcs_rootml(NTG,N,L,NZ)
+          RootGasLoss_disturb(NTG,NZ)=RootGasLoss_disturb(NTG,NZ)-trcg_rootml(NTG,N,L,NZ)-trcs_rootml(NTG,N,L,NZ)
         ENDDO
         trcg_rootml(idg_beg:idg_end-1,N,L,NZ)=0._r8
         trcs_rootml(idg_beg:idg_end-1,N,L,NZ)=0._r8

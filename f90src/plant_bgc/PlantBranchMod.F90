@@ -1915,7 +1915,7 @@ module PlantBranchMod
     ARSTK    => plt_morph%ARSTK   , &
     NBTB     => plt_morph%NBTB    , &
     HTNODE   => plt_morph%HTNODE  , &
-    ZL       => plt_morph%ZL      , &
+    CanopyHeightz       => plt_morph%CanopyHeightz      , &
     CanopyHeight       => plt_morph%CanopyHeight      , &
     HTCTL    => plt_morph%HTCTL   , &
     CLASS    => plt_morph%CLASS   , &
@@ -2022,11 +2022,11 @@ module PlantBranchMod
         LL=0
         D550: DO L=JC1,1,-1
           IF(LU.EQ.1.AND.LL.EQ.1)exit
-          IF((HTLFU.GT.ZL(L-1).OR.ZL(L-1).LE.ZERO).AND.LU.EQ.0)THEN
+          IF((HTLFU.GT.CanopyHeightz(L-1).OR.CanopyHeightz(L-1).LE.ZERO).AND.LU.EQ.0)THEN
             LHTLFU=MAX(1,L)
             LU=1
           ENDIF
-          IF((HTLFL.GT.ZL(L-1).OR.ZL(L-1).LE.ZERO).AND.LL.EQ.0)THEN
+          IF((HTLFL.GT.CanopyHeightz(L-1).OR.CanopyHeightz(L-1).LE.ZERO).AND.LL.EQ.0)THEN
             LHTLFL=MAX(1,L)
             LL=1
           ENDIF
@@ -2034,9 +2034,9 @@ module PlantBranchMod
         D570: DO L=LHTLFL,LHTLFU
           IF(LHTLFU.EQ.LHTLFL)THEN
             FRACL=CLASS(N,NZ)
-          ELSEIF(HTLFU.GT.HTLFL.AND.ZL(L).GT.HTLFL)THEN
-            FRACL=CLASS(N,NZ)*(AMIN1(HTLFU,ZL(L)) &
-              -AMAX1(HTLFL,ZL(L-1)))/(HTLFU-HTLFL)
+          ELSEIF(HTLFU.GT.HTLFL.AND.CanopyHeightz(L).GT.HTLFL)THEN
+            FRACL=CLASS(N,NZ)*(AMIN1(HTLFU,CanopyHeightz(L)) &
+              -AMAX1(HTLFL,CanopyHeightz(L-1)))/(HTLFU-HTLFL)
           ELSE
             FRACL=CLASS(N,NZ)
           ENDIF
@@ -2099,11 +2099,11 @@ module PlantBranchMod
       LL=0
       D545: DO L=JC1,1,-1
         IF(LU.EQ.1.AND.LL.EQ.1)exit
-        IF((HTLFB.GT.ZL(L-1).OR.ZL(L-1).LE.ZERO).AND.LU.EQ.0)THEN
+        IF((HTLFB.GT.CanopyHeightz(L-1).OR.CanopyHeightz(L-1).LE.ZERO).AND.LU.EQ.0)THEN
           LHTBRU=MAX(1,L)
           LU=1
         ENDIF
-        IF((HTBR.GT.ZL(L-1).OR.ZL(L-1).LE.ZERO).AND.LL.EQ.0)THEN
+        IF((HTBR.GT.CanopyHeightz(L-1).OR.CanopyHeightz(L-1).LE.ZERO).AND.LL.EQ.0)THEN
           LHTBRL=MAX(1,L)
           LL=1
         ENDIF
@@ -2124,9 +2124,9 @@ module PlantBranchMod
         !     ENDIF
       D445: DO L=LHTBRL,LHTBRU
         IF(HTLFB.GT.HTBR)THEN
-          IF(HTLFB.GT.ZL(L-1))THEN
-            FRACL=(AMIN1(HTLFB,ZL(L))-AMAX1(HTBR &
-              ,ZL(L-1)))/(HTLFB-HTBR)
+          IF(HTLFB.GT.CanopyHeightz(L-1))THEN
+            FRACL=(AMIN1(HTLFB,CanopyHeightz(L))-AMAX1(HTBR &
+              ,CanopyHeightz(L-1)))/(HTLFB-HTBR)
           ELSE
             FRACL=0._r8
           ENDIF

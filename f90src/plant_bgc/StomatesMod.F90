@@ -44,7 +44,7 @@
   associate(                            &
     RIB      =>  plt_ew%RIB       , &
     RAZ      =>  plt_ew%RAZ       , &
-    TKA      =>  plt_ew%TKA       , &
+    TairK      =>  plt_ew%TairK       , &
     TKCZ     =>  plt_ew%TKCZ      , &
     CO2E     =>  plt_site%CO2E    , &
     CO2Q     =>  plt_photo%CO2Q   , &
@@ -65,12 +65,12 @@
 !
 !     RI=Richardson's number
 !     RIB=canopy isothermal Richardson�s number
-!     TKA,TKCZ=air,canopy temperature
+!     TairK,TKCZ=air,canopy temperature
 !     RAZ=canopy isothermal boundary later resistance
 !     RACL=canopy boundary layer resistance to CO2
 !     FMOL=number of moles of air per m3
 !
-  RI=AMAX1(-0.3,AMIN1(0.075,RIB*(TKA-TKCZ(NZ))))
+  RI=AMAX1(-0.3,AMIN1(0.075,RIB*(TairK-TKCZ(NZ))))
   RACL=1.34*AMAX1(5.56E-03,RAZ(NZ)/(1.0-10.0*RI))
   FMOL(NZ)=1.2194E+04/TKCZ(NZ)
 !

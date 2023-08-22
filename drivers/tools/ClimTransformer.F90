@@ -48,6 +48,7 @@ implicit none
       //mod_filename,line=__LINE__)
   endif
   prefix='./'
+  print*,'open_safe',flistnm
   call OPEN_safe(4,prefix,trim(flistnm),'OLD',mod_filename,__LINE__)
 
   call ncd_pio_createfile(ncf,trim(ncfilenm))

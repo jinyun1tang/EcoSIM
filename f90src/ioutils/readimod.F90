@@ -45,7 +45,7 @@ module readiMod
   integer :: ll
   real(r8) :: DAT(50),DATK(50)
   real(r8) :: ALATG,ATCAG,AZI,ASPX,CO2EIG,CH4EG,DTBLIG,DTBLDIG
-  real(r8) :: DTBLGG,DEC,DPTHSX,OXYEG,RCHQNG,RCHQEG
+  real(r8) :: DTBLGG,DEC,initSnowDepth,OXYEG,RCHQNG,RCHQEG
   real(r8) :: RCHQSG,RCHQWG,RCHGNUG,RCHGEUG,RCHGSUG,RCHGWUG
   real(r8) :: RCHGNTG,RCHGETG,RCHGSTG,RCHGWTG,RCHGDG
   real(r8) :: SL0,Z2GEG,Z2OEG,ZNH3EG,SLX,SL1,SL2
@@ -377,7 +377,7 @@ module readiMod
     call ncd_getvar(grid_nfid, 'NV2', ntp, NV2)
     call ncd_getvar(grid_nfid, 'ASPX', ntp,ASPX)
     call ncd_getvar(grid_nfid, 'SL0', ntp,SL0)
-    call ncd_getvar(grid_nfid, 'DPTHSX', ntp,DPTHSX)
+    call ncd_getvar(grid_nfid, 'DPTHSX', ntp,initSnowDepth)
 
 !
 ! OPEN AND READ SOIL FILE
@@ -390,7 +390,7 @@ module readiMod
 !
         ASP(NY,NX)=ASPX
         SL(NY,NX)=SL0
-        DPTHS(NY,NX)=DPTHSX
+        SnowDepth(NY,NX)=initSnowDepth
 !
 !     CONVERT ASPECT from geographic format TO GEOMETRIC FORMAT
 !
@@ -797,7 +797,7 @@ module readiMod
   write(*,*)'NY, NX =',NY,NX
   write(*,*)'Aspect (o): ASPX',ASP(NY,NX)
   write(*,*)'Slope (o): SL0',SL(NY,NX)
-  write(*,*)'Initial snowpack depth: DPTHSX',DPTHS(NY,NX)
+  write(*,*)'Initial snowpack depth: initSnowDepth',SnowDepth(NY,NX)
   write(*,'(100A)')('=',ll=1,100)
 
   write(*,*)''

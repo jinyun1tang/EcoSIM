@@ -9,7 +9,7 @@ implicit none
   real(r8),allocatable ::  DLYRR(:,:)                         !  
   real(r8),allocatable ::  THETIX(:,:,:)                      !  
   real(r8),allocatable ::  THETPX(:,:,:)                      !  
-  real(r8),allocatable ::  VHCP1(:,:,:)                       !
+  real(r8),allocatable ::  VolHeatCapacity(:,:,:)                       !
   real(r8),allocatable ::  THETPY(:,:,:)                      !
   real(r8),allocatable ::  VOLW1(:,:,:)                       !    
   real(r8),allocatable ::  VOLI1(:,:,:)                       !  
@@ -32,8 +32,8 @@ implicit none
   real(r8),allocatable ::  TK0(:,:,:)                         !  
   real(r8),allocatable ::  VOLWH1(:,:,:)                      !
   real(r8),allocatable ::  FGRD(:,:,:)                        !
-  real(r8),allocatable ::  VHCP1A(:,:,:)                      !
-  real(r8),allocatable ::  VHCP1B(:,:,:)                      !
+  real(r8),allocatable ::  VolHeatCapacityA(:,:,:)                      !
+  real(r8),allocatable ::  VolHeatCapacityB(:,:,:)                      !
   real(r8),allocatable ::  RAG(:,:)                           !
   real(r8),allocatable ::  PAREW(:,:)                         ! 
   real(r8),allocatable ::  ALTG(:,:)                          ! 
@@ -68,7 +68,7 @@ implicit none
   allocate(DLYRR(JY,JX));       DLYRR=0._r8  
   allocate(THETIX(0:JZ,JY,JX)); THETIX=0._r8 
   allocate(THETPX(0:JZ,JY,JX)); THETPX=0._r8   
-  allocate(VHCP1(0:JZ,JY,JX));  VHCP1=0._r8  
+  allocate(VolHeatCapacity(0:JZ,JY,JX));  VolHeatCapacity=0._r8  
   allocate(THETPY(0:JZ,JY,JX)); THETPY=0._r8  
   allocate(VOLW1(0:JZ,JY,JX));  VOLW1=0._r8  
   allocate(VOLI1(0:JZ,JY,JX));  VOLI1=0._r8
@@ -91,8 +91,8 @@ implicit none
   allocate(TK0(JS,JY,JX));      TK0=0._r8  
   allocate(VOLWH1(JZ,JY,JX));   VOLWH1=0._r8
   allocate(FGRD(JZ,JY,JX));     FGRD=0._r8
-  allocate(VHCP1A(JZ,JY,JX));   VHCP1A=0._r8
-  allocate(VHCP1B(JZ,JY,JX));   VHCP1B=0._r8  
+  allocate(VolHeatCapacityA(JZ,JY,JX));   VolHeatCapacityA=0._r8
+  allocate(VolHeatCapacityB(JZ,JY,JX));   VolHeatCapacityB=0._r8  
   allocate(RAG(JY,JX));         RAG=0._r8
   allocate(PAREW(JY,JX));       PAREW=0._r8
   allocate(ALTG(JY,JX));        ALTG=0._r8  
@@ -126,7 +126,7 @@ implicit none
   call destroy(DLYRR)  
   call destroy(THETIX)  
   call destroy(THETPX)  
-  call destroy(VHCP1)  
+  call destroy(VolHeatCapacity)  
   call destroy(THETPY)  
   call destroy(VOLW1)  
   call destroy(VOLI1)
@@ -149,8 +149,8 @@ implicit none
   call destroy(TK0)  
   call destroy(VOLWH1)
   call destroy(FGRD)
-  call destroy(VHCP1A)
-  call destroy(VHCP1B)  
+  call destroy(VolHeatCapacityA)
+  call destroy(VolHeatCapacityB)  
   call destroy(RAG)
   call destroy(PAREW)
   call destroy(ALTG)

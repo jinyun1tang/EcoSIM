@@ -362,7 +362,7 @@ module ExtractsMod
     RNH3C => plt_bgcr%RNH3C  , &
     TCCAN => plt_bgcr%TCCAN  , &
     ZESNC => plt_bgcr%ZESNC  , &
-    RFGas_root => plt_bgcr%RFGas_root, &
+    RootGasLoss_disturb => plt_bgcr%RootGasLoss_disturb, &
     RUPNF => plt_bgcr%RUPNF  , &
     CNET  => plt_bgcr%CNET   , &
     CTRAN => plt_ew%CTRAN    , &
@@ -370,7 +370,7 @@ module ExtractsMod
     RNH3B => plt_rbgc%RNH3B  , &
     HEUPTK=> plt_rbgc%HEUPTK , &
     TUPNF => plt_rbgc%TUPNF  , &
-    TRFGas_root => plt_rbgc%TRFGas_root  , &
+    TRootGasLoss_disturb => plt_rbgc%TRootGasLoss_disturb  , &
     EP    => plt_ew%EP       , &
     FLWC  => plt_ew%FLWC     , &
     EVAPC => plt_ew%EVAPC    , &
@@ -389,7 +389,7 @@ module ExtractsMod
     TEVAPP=> plt_ew%TEVAPP   , &
     THFLXC=> plt_ew%THFLXC   , &
     THRMC => plt_ew%THRMC    , &
-    TKA   => plt_ew%TKA      , &
+    TairK   => plt_ew%TairK      , &
     HFLXC => plt_ew%HFLXC    , &
     TLE   => plt_ew%TLE      , &
     TVOLWC=> plt_ew%TVOLWC   , &
@@ -432,8 +432,8 @@ module ExtractsMod
 !     HCUPTK,HZUPTK,HPUPTK=PFT net root-soil C,N,P exchange
 !     TBALC,TBALN,TBALP=total C,N,P balance
 !     BALC,BALN,BALP=PFT C,N,P balance
-!     TRFGas_root=total loss of root CO2, O2, CH4, N2O, NH3, H2
-!     RFGas_root=PFT loss of root CO2, O2, CH4, N2O, NH3, H2
+!     TRootGasLoss_disturb=total loss of root CO2, O2, CH4, N2O, NH3, H2
+!     RootGasLoss_disturb=PFT loss of root CO2, O2, CH4, N2O, NH3, H2
 !
   TRN=TRN+RAD1(NZ)
   TLE=TLE+EFLXC(NZ)
@@ -447,7 +447,7 @@ module ExtractsMod
   TEVAPC=TEVAPC+EVAPC(NZ)
   ENGYC=cpw*(VOLWC(NZ)+FLWC(NZ)+EVAPC(NZ))*TKC(NZ)
   TENGYC=TENGYC+ENGYC
-  THFLXC=THFLXC+ENGYC-ENGYX(NZ)-(FLWC(NZ)*cpw*TKA)
+  THFLXC=THFLXC+ENGYC-ENGYX(NZ)-(FLWC(NZ)*cpw*TairK)
   ENGYX(NZ)=ENGYC
   THRMC=THRMC+THRM1(NZ)
   ARLFC=ARLFC+ARLFP(NZ)
@@ -458,7 +458,7 @@ module ExtractsMod
   ENDDO
 
   DO NTG=idg_beg,idg_end-1
-    TRFGas_root(NTG)=TRFGas_root(NTG)+RFGas_root(NTG,NZ)
+    TRootGasLoss_disturb(NTG)=TRootGasLoss_disturb(NTG)+RootGasLoss_disturb(NTG,NZ)
   ENDDO
 !
 !     TOTAL CANOPY NH3 EXCHANGE AND EXUDATION
