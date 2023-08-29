@@ -4,7 +4,7 @@ module SurfPhysAPI
 implicit none
   private
   character(len=*), parameter :: mod_filename=&
-  _FILE__
+  __FILE__
 
 
 contains

@@ -7,7 +7,7 @@ module NitroDiagTypes
   save
   private
   character(len=*), parameter :: mod_filename = &
-  __FILE__
+  "NitroDiagTypes.F90"
 
 ! accumulative flux diagnostics
 type, public :: NitroAQMFluxDiagType
