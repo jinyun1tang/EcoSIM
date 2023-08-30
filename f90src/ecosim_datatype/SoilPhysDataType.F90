@@ -29,7 +29,7 @@ implicit none
   REAL(R8),target,allocatable ::  PSIMN(:,:)                         !log water potential at wilting point
   REAL(R8),target,allocatable ::  PSISD(:,:)                         !log water potential at field capacity 	-
   REAL(R8),target,allocatable ::  PSIMD(:,:)                         !log water potential at saturation - log water potential at field capacity
-  real(r8),target,allocatable ::  VHCM(:,:,:)                        !soil solid heat capacity [MPa m-3 K-1]
+  real(r8),target,allocatable ::  VHeatCapacitySoilM(:,:,:)                        !soil solid heat capacity [MPa m-3 K-1]
   real(r8),target,allocatable ::  DPTHA(:,:)                         !active layer depth, [n]
 !----------------------------------------------------------------------
 
@@ -60,7 +60,7 @@ contains
   allocate(PSIMN(JY,JX));       PSIMN=0._r8
   allocate(PSISD(JY,JX));       PSISD=0._r8
   allocate(PSIMD(JY,JX));       PSIMD=0._r8
-  allocate(VHCM(0:JZ,JY,JX));   VHCM=0._r8
+  allocate(VHeatCapacitySoilM(0:JZ,JY,JX));   VHeatCapacitySoilM=0._r8
   allocate(DPTHA(JY,JX));       DPTHA=0._r8
   end subroutine InitSoilPhysData
 
@@ -91,7 +91,7 @@ contains
   call destroy(PSIMN)
   call destroy(PSISD)
   call destroy(PSIMD)
-  call destroy(VHCM)
+  call destroy(VHeatCapacitySoilM)
   call destroy(DPTHA)
   end subroutine DestructSoilPhysData
 

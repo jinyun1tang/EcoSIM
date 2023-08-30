@@ -301,9 +301,9 @@ module CanopyCondsMod
     ZEROS2  => plt_site%ZEROS2  , &
     POROS1  => plt_site%POROS1  , &
     ZNOON   => plt_site%ZNOON   , &
-    VOLX    => plt_soilchem%VOLX, &
+    VSoilPoreMicP    => plt_soilchem%VSoilPoreMicP, &
     VOLY    => plt_soilchem%VOLY, &
-    VOLW    => plt_soilchem%VOLW, &
+    VWatMicP    => plt_soilchem%VWatMicP, &
     CFX     => plt_morph%CFX    , &
     CanopyHeightz      => plt_morph%CanopyHeightz     , &
     NBR     => plt_morph%NBR    , &
@@ -760,8 +760,8 @@ module CanopyCondsMod
         FSNOW=AMIN1((SnowDepth/0.07_r8)**2._r8,1.0_r8)
         ALBG=FSNOW*ALBW+(1.0_r8-FSNOW)*ALBS
       ELSE
-        IF(VOLX(NU).GT.ZEROS2)THEN
-          THETW1=AMIN1(POROS1,VOLW(NU)/VOLY(NU))
+        IF(VSoilPoreMicP(NU).GT.ZEROS2)THEN
+          THETW1=AMIN1(POROS1,VWatMicP(NU)/VOLY(NU))
         ELSE
           THETW1=0.0_r8
         ENDIF

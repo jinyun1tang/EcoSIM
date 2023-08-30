@@ -129,7 +129,7 @@ module SoluteChemDataType
     real(r8) :: GKCN
     real(r8) :: GKCM
     real(r8) :: ZEROS
-    real(r8) :: VOLW
+    real(r8) :: VWatMicP
   end type solutedtype
 
   type, public :: solute_flx_type
@@ -253,15 +253,15 @@ module SoluteChemDataType
   real(r8) :: PFEPO1
   real(r8) :: PFEPOB
   real(r8) :: BKVLX
-  real(r8) :: VOLWNB
-  real(r8) :: VOLWNH
-  real(r8) :: VOLWPB
-  real(r8) :: VOLWPO
+  real(r8) :: VWatMicPNB
+  real(r8) :: VWatMicPNH
+  real(r8) :: VWatMicPPB
+  real(r8) :: VWatMicPPO
   real(r8) :: XCEC
   real(r8) :: PH
   real(r8) :: CAL
   real(r8) :: CFE
-  real(r8) :: VOLWM
+  real(r8) :: VWatMicPM
   real(r8) :: ZMG
   real(r8) :: ZNA
   real(r8) :: ZKA
@@ -358,8 +358,8 @@ module SoluteChemDataType
   real(r8) :: XOH21
   real(r8) :: XH01B
   real(r8) :: XOH01
-  real(r8) :: VOLWNZ
-  real(r8) :: VOLWNO
+  real(r8) :: VWatMicPNZ
+  real(r8) :: VWatMicPNO
   real(r8) :: BKVLNH
   real(r8) :: BKVLNB
   real(r8) :: BKVLPO

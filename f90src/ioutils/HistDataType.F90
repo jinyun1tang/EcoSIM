@@ -125,7 +125,7 @@ implicit none
   real(r8),pointer   :: histr_1D_EVAPN_col(:)          !TEVAPG(NY,NX)*1000.0/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: histr_1D_RUNOFF_FLX_col(:)         !-WQRH(NY,NX)*1000.0/TAREA, 
   real(r8),pointer   :: histr_1D_SEDIMENT_FLX_col(:)       !USEDOU(NY,NX)*1000.0/TAREA, soil mass 
-  real(r8),pointer   :: histr_1D_tSWC_col(:)        !UVOLW(NY,NX)*1000.0/AREA(3,NU(NY,NX),NY,NX), volumetric soil water content
+  real(r8),pointer   :: histr_1D_tSWC_col(:)        !UVWatMicP(NY,NX)*1000.0/AREA(3,NU(NY,NX),NY,NX), volumetric soil water content
   real(r8),pointer   :: histr_1D_DISCHG_FLX_col(:)         !HVOLO(NY,NX)*1000.0/TAREA
   real(r8),pointer   :: histr_1D_SNOWPACK_col(:)       !AZMAX1((VOLSS(NY,NX)+VOLIS(NY,NX)*DENSI+VOLWS(NY,NX))*1000.0/AREA(3,NU(NY,NX),NY,NX))
   real(r8),pointer   :: histr_1D_SURF_WTR_col(:)       !THETWZ(0,NY,NX)
@@ -249,7 +249,7 @@ implicit none
                                                                   !+14.0*(trcx_solml(idx_NH4,1:JZ,NY,NX)+trcx_solml(idx_NH4B,1:JZ,NY,NX)))/BKVL(1:JZ,NY,NX)
   real(r8),pointer   :: histr_2D_cNO3t_vr_col(:,:)       !(trc_solml(ids_NO3,1:JZ,NY,NX)+trc_solml(ids_NO3B,1:JZ,NY,NX) &
                                                                   !+trc_solml(ids_NO2,1,NY,NX)+trc_solml(ids_NO2B,1,NY,NX))/BKVL(1,NY,NX)
-  real(r8),pointer   :: histr_2D_cPO4_vr_col(:,:)        !(trc_solml(ids_H1PO4,1:JZ,NY,NX)+trc_solml(ids_H1PO4B,1,NY,NX)+trc_solml(ids_H2PO4,1,NY,NX)+trc_solml(ids_H2PO4B,1,NY,NX))/VOLW(1,NY,NX)
+  real(r8),pointer   :: histr_2D_cPO4_vr_col(:,:)        !(trc_solml(ids_H1PO4,1:JZ,NY,NX)+trc_solml(ids_H1PO4B,1,NY,NX)+trc_solml(ids_H2PO4,1,NY,NX)+trc_solml(ids_H2PO4B,1,NY,NX))/VWatMicP(1,NY,NX)
   real(r8),pointer   :: histr_2D_cEXCH_P_vr_col(:,:)     !31.0*(trcx_solml(idx_HPO4,1,NY,NX)+trcx_solml(idx_H2PO4,1,NY,NX)+trcx_solml(idx_HPO4B,1,NY,NX)+trcx_solml(idx_H2PO4B,1,NY,NX))/BKVL(1,NY,NX)
   real(r8),pointer   :: histr_2D_ECND_vr_col(:,:)         !ECND(1:JZ,NY,NX)
 
@@ -375,7 +375,7 @@ implicit none
   allocate(this%histr_1D_CO2_LITR_col(beg_col:end_col))      !trc_solcl(idg_CO2,0,NY,NX)
   allocate(this%histr_1D_EVAPN_col(beg_col:end_col))         !TEVAPG(NY,NX)*1000.0/AREA(3,NU(NY,NX),NY,NX), mm H2O/h/m2
 
-  allocate(this%histr_1D_tSWC_col(beg_col:end_col))       !UVOLW(NY,NX)*1000.0/AREA(3,NU(NY,NX),NY,NX), volumetric soil water content
+  allocate(this%histr_1D_tSWC_col(beg_col:end_col))       !UVWatMicP(NY,NX)*1000.0/AREA(3,NU(NY,NX),NY,NX), volumetric soil water content
   allocate(this%histr_1D_SNOWPACK_col(beg_col:end_col))      !AZMAX1((VOLSS(NY,NX)+VOLIS(NY,NX)*DENSI+VOLWS(NY,NX))*1000.0/AREA(3,NU(NY,NX),NY,NX))
   allocate(this%histr_1D_SURF_WTR_col(beg_col:end_col))      !THETWZ(0,NY,NX)
   allocate(this%histr_1D_SURF_ICE_col(beg_col:end_col))      !THETIZ(0,NY,NX)
@@ -499,7 +499,7 @@ implicit none
                                                                !+14.0*(trcx_solml(idx_NH4,1:JZ,NY,NX)+trcx_solml(idx_NH4B,1:JZ,NY,NX)))/BKVL(1:JZ,NY,NX)
   allocate(this%histr_2D_cNO3t_vr_col(beg_col:end_col,1:JZ))        !(trc_solml(ids_NO3,1:JZ,NY,NX)+trc_solml(ids_NO3B,1:JZ,NY,NX) &
                                                                !+trc_solml(ids_NO2,1,NY,NX)+trc_solml(ids_NO2B,1,NY,NX))/BKVL(1,NY,NX)
-  allocate(this%histr_2D_cPO4_vr_col(beg_col:end_col,1:JZ))         !(trc_solml(ids_H1PO4,1:JZ,NY,NX)+trc_solml(ids_H1PO4B,1,NY,NX)+trc_solml(ids_H2PO4,1,NY,NX)+trc_solml(ids_H2PO4B,1,NY,NX))/VOLW(1,NY,NX)
+  allocate(this%histr_2D_cPO4_vr_col(beg_col:end_col,1:JZ))         !(trc_solml(ids_H1PO4,1:JZ,NY,NX)+trc_solml(ids_H1PO4B,1,NY,NX)+trc_solml(ids_H2PO4,1,NY,NX)+trc_solml(ids_H2PO4B,1,NY,NX))/VWatMicP(1,NY,NX)
   allocate(this%histr_2D_cEXCH_P_vr_col(beg_col:end_col,1:JZ))      !31.0*(trcx_solml(idx_HPO4,1:JZ,NY,NX)+trcx_solml(idx_H2PO4,1:JZ,NY,NX)+trcx_solml(idx_HPO4B,1:JZ,NY,NX)+trcx_solml(idx_H2PO4B,1,NY,NX))/BKVL(1,NY,NX)
   allocate(this%histr_2D_ECND_vr_col(beg_col:end_col,1:JZ))         !ECND(1:JZ,NY,NX)
   allocate(this%histr_2D_PSI_RT_vr_ptc(beg_ptc:end_ptc,1:JZ))       !PSIRT(1,1:JZ,NZ,NY,NX), root total water potential , MPa
@@ -1519,7 +1519,7 @@ implicit none
       this%histr_1D_EVAPN_col(ncol)       = TEVAPG(NY,NX)*1000.0_r8/AREA(3,NU(NY,NX),NY,NX)
       this%histr_1D_RUNOFF_FLX_col(ncol)      = -WQRH(NY,NX)*1000.0_r8/TAREA 
       this%histr_1D_SEDIMENT_FLX_col(ncol)    = USEDOU(NY,NX)*1000.0_r8/TAREA
-      this%histr_1D_tSWC_col(ncol)     = UVOLW(NY,NX)*1000.0_r8/AREA(3,NU(NY,NX),NY,NX)
+      this%histr_1D_tSWC_col(ncol)     = UVWatMicP(NY,NX)*1000.0_r8/AREA(3,NU(NY,NX),NY,NX)
       this%histr_1D_DISCHG_FLX_col(ncol)      = HVOLO(NY,NX)*1000.0_r8/TAREA
       this%histr_1D_SNOWPACK_col(ncol)    = AZMAX1((VOLSS(NY,NX)+VOLIS(NY,NX)*DENSI+VOLWS(NY,NX))*1000.0_r8/AREA(3,NU(NY,NX),NY,NX))
       this%histr_1D_SURF_WTR_col(ncol)    = THETWZ(0,NY,NX)
@@ -1546,7 +1546,7 @@ implicit none
         this%histr_2D_cNO3t_vr_col(ncol,L)= safe_adb(trc_solml(ids_NO3,L,NY,NX)+trc_solml(ids_NO3B,L,NY,NX) &
                                                +trc_solml(ids_NO2,L,NY,NX)+trc_solml(ids_NO2B,L,NY,NX),BKVL(L,NY,NX))
         this%histr_2D_cPO4_vr_col(ncol,L) = safe_adb(trc_solml(ids_H1PO4,L,NY,NX)+trc_solml(ids_H1PO4B,L,NY,NX) &
-                                               +trc_solml(ids_H2PO4,L,NY,NX)+trc_solml(ids_H2PO4B,L,NY,NX),VOLW(L,NY,NX))
+                                               +trc_solml(ids_H2PO4,L,NY,NX)+trc_solml(ids_H2PO4B,L,NY,NX),VWatMicP(L,NY,NX))
         this%histr_2D_cEXCH_P_vr_col(ncol,L)= patomw*safe_adb(trcx_solml(idx_HPO4,L,NY,NX)+trcx_solml(idx_H2PO4,L,NY,NX) &
                                                +trcx_solml(idx_HPO4B,L,NY,NX)+trcx_solml(idx_H2PO4B,L,NY,NX),BKVL(L,NY,NX))
         this%histr_2D_ECND_vr_col(ncol,L)     = ECND(L,NY,NX)

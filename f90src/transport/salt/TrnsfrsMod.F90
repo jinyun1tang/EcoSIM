@@ -779,9 +779,9 @@ module TrnsfrsMod
   integer :: NTSA
 !     begin_execution
 
-  IF(VOLWM(M,M3,M2,M1).GT.ZEROS2(M2,M1))THEN
+  IF(VWatMicPM(M,M3,M2,M1).GT.ZEROS2(M2,M1))THEN
     VFLW=AMAX1(-VFLWX,AMIN1(VFLWX,FLWM(M,N,M6,M5,M4) &
-      /VOLWM(M,M3,M2,M1)))
+      /VWatMicPM(M,M3,M2,M1)))
   ELSE
     VFLW=0.0_r8
   ENDIF
@@ -810,8 +810,8 @@ module TrnsfrsMod
   integer :: NTSA
 !     begin_execution
 
-  IF(VOLWHM(M,M3,M2,M1).GT.ZEROS2(M2,M1))THEN
-    VFLW=AMAX1(-VFLWX,AMIN1(VFLWX,FLWHM(M,N,M6,M5,M4)/VOLWHM(M,M3,M2,M1)))
+  IF(VWatMacPM(M,M3,M2,M1).GT.ZEROS2(M2,M1))THEN
+    VFLW=AMAX1(-VFLWX,AMIN1(VFLWX,WaterFlowMacPi(M,N,M6,M5,M4)/VWatMacPM(M,M3,M2,M1)))
   ELSE
     VFLW=0.0
   ENDIF
@@ -979,13 +979,13 @@ module TrnsfrsMod
 
   IF(NCN(N2,N1).NE.3.OR.N.EQ.3)THEN
     D1200: DO LL=N6,NL(NY,NX)
-      IF(VOLX(LL,N2,N1).GT.ZEROS2(N2,N1))THEN
+      IF(VSoilPoreMicP(LL,N2,N1).GT.ZEROS2(N2,N1))THEN
         N6=LL
         exit
       ENDIF
     ENDDO D1200
 
-    IF(VOLX(N3,N2,N1).GT.ZEROS2(N2,N1))THEN
+    IF(VSoilPoreMicP(N3,N2,N1).GT.ZEROS2(N2,N1))THEN
       DO NTSA=idsa_beg,idsab_end
         trcsa_TFLS(NTSA,N3,N2,N1)=trcsa_TFLS(NTSA,N3,N2,N1) &
           +trcsa_RFLS(NTSA,N,N3,N2,N1)-trcsa_RFLS(NTSA,N,N6,N5,N4)
@@ -1178,7 +1178,7 @@ module TrnsfrsMod
 !     SOLUTE LOSS WITH SUBSURFACE MICROPORE WATER LOSS
 !
 !     FLWM=water flux through soil micropore from watsub.f
-!     VOLWM=micropore water-filled porosity from watsub.f
+!     VWatMicPM=micropore water-filled porosity from watsub.f
 !     R*FLS=convective solute flux through micropores
 !     R*FLW,R*FLB=convective solute flux through micropores in non-band,band
 !     salt code: *HY*=H+,*OH*=OH-,*AL*=Al3+,*FE*=Fe3+,*CA*=Ca2+,*MG*=Mg2+
@@ -1192,7 +1192,7 @@ module TrnsfrsMod
 !          :*C0P*=CaPO4-,*C1P*=CaHPO4,*C2P*=CaH2PO4+,*M1P*=MgHPO4,*COO*=COOH-
 !          :*1=non-band,*B=band
 !
-            IF(VOLX(N3,N2,N1).GT.ZEROS(NY,NX))THEN
+            IF(VSoilPoreMicP(N3,N2,N1).GT.ZEROS(NY,NX))THEN
 
               IF(NCN(M2,M1).NE.3.OR.N.EQ.3)THEN
                 IF(NN.EQ.1.AND.FLWM(M,N,M6,M5,M4).GT.0.0 &
@@ -1208,8 +1208,8 @@ module TrnsfrsMod
 !
 !     SOLUTE LOSS WITH SUBSURFACE MACROPORE WATER LOSS
 !
-!     FLWHM=water flux through soil macropore from watsub.f
-!     VOLWHM=macropore water-filled porosity from watsub.f
+!     WaterFlowMacPi=water flux through soil macropore from watsub.f
+!     VWatMacPM=macropore water-filled porosity from watsub.f
 !     RFH*S=solute diffusive flux through macropore
 !     salt code: *HY*=H+,*OH*=OH-,*AL*=Al3+,*FE*=Fe3+,*CA*=Ca2+,*MG*=Mg2+
 !          :*NA*=Na+,*KA*=K+,*SO4*=SO42-,*CL*=Cl-,*CO3*=CO32-,*HCO3*=HCO3-
@@ -1222,8 +1222,8 @@ module TrnsfrsMod
 !          :*C0P*=CaPO4-,*C1P*=CaHPO4,*C2P*=CaH2PO4+,*M1P*=MgHPO4,*COO*=COOH-
 !          :*1=non-band,*B=band
 !
-                IF(NN.EQ.1.AND.FLWHM(M,N,M6,M5,M4).GT.0.0 &
-                  .OR.NN.EQ.2.AND.FLWHM(M,N,M6,M5,M4).LT.0.0)THEN
+                IF(NN.EQ.1.AND.WaterFlowMacPi(M,N,M6,M5,M4).GT.0.0 &
+                  .OR.NN.EQ.2.AND.WaterFlowMacPi(M,N,M6,M5,M4).LT.0.0)THEN
 
                   call SoluteLossSubsurfMacropore(M,N,M1,M2,M3,M4,M5,M6)
 
@@ -1363,7 +1363,7 @@ module TrnsfrsMod
 !     R*FLZ,R*FBZ=subsurface solute flux in non-band,band
 !
   D9685: DO L=NU(NY,NX),NL(NY,NX)
-    IF(VOLX(L,NY,NX).GT.ZEROS2(NY,NX))THEN
+    IF(VSoilPoreMicP(L,NY,NX).GT.ZEROS2(NY,NX))THEN
       DO NTSA=idsa_beg,idsab_end
         trcsa_solml2(NTSA,L,NY,NX)=trcsa_solml2(NTSA,L,NY,NX) &
           +trcsa_TFLS(NTSA,L,NY,NX)+trcsa_RFXS(NTSA,L,NY,NX) &

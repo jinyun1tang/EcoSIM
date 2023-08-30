@@ -50,28 +50,28 @@ contains
   real(r8) :: trcs_cl2(ids_beg:ids_end)
   real(r8) :: RFLs_adv(ids_beg:ids_end)
   real(r8) :: SDifFlx(ids_beg:ids_end)
-!     VOLWM,VOLWHM,VOLPM,FLPM=micropore,macropore water volume, air volume and change in air volume
-!     FLWM,FLWHM=water flux into soil micropore,macropore from watsub.f
+!     VWatMicPM,VWatMacPM,VsoiPM,FLPM=micropore,macropore water volume, air volume and change in air volume
+!     FLWM,WaterFlowMacPi=water flux into soil micropore,macropore from watsub.f
 !     VLNH4,VLNO3,VLPO4=non-band NH4,NO3,PO4 volume fraction
 !     VLNHB,VLNOB,VLPOB=band NH4,NO3,PO4 volume fraction
 !     FLVM,FLM=air,water flux in gas flux calculations
 !     XNPT=1/number of cycles NPH-1 for gas flux calculations
 !
-  VOLWMA(NU(NY,NX),NY,NX)=VOLWM(M,NU(NY,NX),NY,NX)*trcs_VLN(ids_NH4,NU(NY,NX),NY,NX)
-  VOLWMB(NU(NY,NX),NY,NX)=VOLWM(M,NU(NY,NX),NY,NX)*trcs_VLN(ids_NH4B,NU(NY,NX),NY,NX)
-  VOLWXA(NU(NY,NX),NY,NX)=natomw*VOLWMA(NU(NY,NX),NY,NX)
-  VOLWXB(NU(NY,NX),NY,NX)=natomw*VOLWMB(NU(NY,NX),NY,NX)
-  VOLPMA(NU(NY,NX),NY,NX)=VOLPM(M,NU(NY,NX),NY,NX)*trcs_VLN(ids_NH4,NU(NY,NX),NY,NX)
-  VOLPMB(NU(NY,NX),NY,NX)=VOLPM(M,NU(NY,NX),NY,NX)*trcs_VLN(ids_NH4B,NU(NY,NX),NY,NX)
+  VWatMicPMA(NU(NY,NX),NY,NX)=VWatMicPM(M,NU(NY,NX),NY,NX)*trcs_VLN(ids_NH4,NU(NY,NX),NY,NX)
+  VWatMicPMB(NU(NY,NX),NY,NX)=VWatMicPM(M,NU(NY,NX),NY,NX)*trcs_VLN(ids_NH4B,NU(NY,NX),NY,NX)
+  VWatMicPXA(NU(NY,NX),NY,NX)=natomw*VWatMicPMA(NU(NY,NX),NY,NX)
+  VWatMicPXB(NU(NY,NX),NY,NX)=natomw*VWatMicPMB(NU(NY,NX),NY,NX)
+  VsoiPMA(NU(NY,NX),NY,NX)=VsoiPM(M,NU(NY,NX),NY,NX)*trcs_VLN(ids_NH4,NU(NY,NX),NY,NX)
+  VsoiPMB(NU(NY,NX),NY,NX)=VsoiPM(M,NU(NY,NX),NY,NX)*trcs_VLN(ids_NH4B,NU(NY,NX),NY,NX)
   FLVM(NU(NY,NX),NY,NX)=FLPM(M,NU(NY,NX),NY,NX)*XNPT
-  FLQM(3,NU(NY,NX),NY,NX)=(FLWM(M,3,NU(NY,NX),NY,NX)+FLWHM(M,3,NU(NY,NX),NY,NX))*XNPT
+  FLQM(3,NU(NY,NX),NY,NX)=(FLWM(M,3,NU(NY,NX),NY,NX)+WaterFlowMacPi(M,3,NU(NY,NX),NY,NX))*XNPT
 !
 !     SURFACE EXCHANGE OF AQUEOUS CO2, CH4, O2, N2, NH3
 !     THROUGH VOLATILIZATION-DISSOLUTION FROM AQUEOUS
 !     DIFFUSIVITIES IN SURFACE RESIDUE
 !
 !     VOLT,DLYR,AREA=litter volume, thickness, area
-!     VOLWM=micropore water-filled porosity from watsub.f
+!     VWatMicPM=micropore water-filled porosity from watsub.f
 !     TORT=tortuosity from hour1.f
 !     *SGL*=solute diffusivity
 !     solute code:CO=CO2,CH=CH4,OX=O2,NG=N2,N2=N2O,HG=H2
@@ -141,7 +141,7 @@ contains
 !     OF WATER FLUX AND MICROPORE GAS OR SOLUTE CONCENTRATIONS
 !     IN RESIDUE
 !
-!     VOLWM=litter water volume
+!     VWatMicPM=litter water volume
 !     RFL*=soil-litter convective solute flux
 !     *S2=litter solute content
 !     solute code:CO=CO2,CH=CH4,OX=O2,NG=N2,N2=N2O,HG=H2
@@ -152,8 +152,8 @@ contains
 !     VLNHB,VLNOB,VLPOB=band NH4,NO3,PO4 volume fraction
 !
   IF(FLWRM1.GT.0.0_r8)THEN
-    IF(VOLWM(M,0,NY,NX).GT.ZEROS2(NY,NX))THEN
-      VFLW=AZMAX1(AMIN1(VFLWX,FLWRM1/VOLWM(M,0,NY,NX)))
+    IF(VWatMicPM(M,0,NY,NX).GT.ZEROS2(NY,NX))THEN
+      VFLW=AZMAX1(AMIN1(VFLWX,FLWRM1/VWatMicPM(M,0,NY,NX)))
     ELSE
       VFLW=VFLWX
     ENDIF
@@ -173,7 +173,7 @@ contains
 !     OF WATER FLUX AND MICROPORE GAS OR SOLUTE CONCENTRATIONS
 !     IN SOIL SURFACE
 !
-!     VOLWM=micropore water-filled porosity from watsub.f
+!     VWatMicPM=micropore water-filled porosity from watsub.f
 !     RFL*=soil-litter convective solute flux
 !     *S2=soil solute content
 !     solute code:CO=CO2,CH=CH4,OX=O2,NG=N2,N2=N2O,HG=H2
@@ -184,8 +184,8 @@ contains
 !     VLNHB,VLNOB,VLPOB=band NH4,NO3,PO4 volume fraction
 !
   ELSE
-    IF(VOLWM(M,NU(NY,NX),NY,NX).GT.ZEROS2(NY,NX))THEN
-      VFLW=AZMIN1(AMAX1(-VFLWX,FLWRM1/VOLWM(M,NU(NY,NX),NY,NX)))
+    IF(VWatMicPM(M,NU(NY,NX),NY,NX).GT.ZEROS2(NY,NX))THEN
+      VFLW=AZMIN1(AMAX1(-VFLWX,FLWRM1/VWatMicPM(M,NU(NY,NX),NY,NX)))
     ELSE
       VFLW=-VFLWX
     ENDIF
@@ -223,10 +223,10 @@ contains
   integer  :: K,NTS,NTG,NTN
 !
 !     VOLT,DLYR,AREA=soil surface volume, thickness, area
-!     VOLWM=micropore water-filled porosity from watsub.f
+!     VWatMicPM=micropore water-filled porosity from watsub.f
 !
-  IF((VOLT(0,NY,NX).GT.ZEROS2(NY,NX).AND.VOLWM(M,0,NY,NX).GT.ZEROS2(NY,NX)) &
-    .AND.(VOLWM(M,NU(NY,NX),NY,NX).GT.ZEROS2(NY,NX)))THEN
+  IF((VOLT(0,NY,NX).GT.ZEROS2(NY,NX).AND.VWatMicPM(M,0,NY,NX).GT.ZEROS2(NY,NX)) &
+    .AND.(VWatMicPM(M,NU(NY,NX),NY,NX).GT.ZEROS2(NY,NX)))THEN
 !
 !     DIFFUSIVITIES IN RESIDUE AND SOIL SURFACE
 !
@@ -425,12 +425,12 @@ contains
   integer, intent(in) :: M, NY, NX
   integer :: K,NTS
   real(r8) :: VFLW
-  real(r8) :: VOLWHS,VOLWT
+  real(r8) :: VWatMacPS,VOLWT
   real(r8) :: SDifFlx(ids_beg:ids_end)
   real(r8) :: SAdvFlx(ids_beg:ids_end)
 !
 !     FINHM=macro-micropore water transfer from watsub.f
-!     VOLWM,VOLWHM=micropore,macropore water volume
+!     VWatMicPM,VWatMacPM=micropore,macropore water volume
 !     RFL*=convective macropore-micropore solute transfer
 !     VLNH4,VLNO3,VLPO4=non-band NH4,NO3,PO4 volume fraction
 !     VLNHB,VLNOB,VLPOB=band NH4,NO3,PO4 volume fraction
@@ -443,9 +443,9 @@ contains
 !     MACROPORE TO MICROPORE TRANSFER
 !
   IF(FINHM(M,NU(NY,NX),NY,NX).GT.0.0_r8)THEN
-    IF(VOLWHM(M,NU(NY,NX),NY,NX).GT.ZEROS2(NY,NX))THEN
+    IF(VWatMacPM(M,NU(NY,NX),NY,NX).GT.ZEROS2(NY,NX))THEN
       VFLW=AZMAX1(AMIN1(VFLWX,FINHM(M,NU(NY,NX),NY,NX) &
-      /VOLWHM(M,NU(NY,NX),NY,NX)))
+      /VWatMacPM(M,NU(NY,NX),NY,NX)))
     ELSE
       VFLW=VFLWX
     ENDIF
@@ -477,8 +477,8 @@ contains
 !     MICROPORE TO MACROPORE TRANSFER
 !
   ELSEIF(FINHM(M,NU(NY,NX),NY,NX).LT.0.0_r8)THEN
-    IF(VOLWM(M,NU(NY,NX),NY,NX).GT.ZEROS2(NY,NX))THEN
-      VFLW=AZMIN1(AMAX1(-VFLWX,FINHM(M,NU(NY,NX),NY,NX)/VOLWM(M,NU(NY,NX),NY,NX)))
+    IF(VWatMicPM(M,NU(NY,NX),NY,NX).GT.ZEROS2(NY,NX))THEN
+      VFLW=AZMIN1(AMAX1(-VFLWX,FINHM(M,NU(NY,NX),NY,NX)/VWatMicPM(M,NU(NY,NX),NY,NX)))
     ELSE
       VFLW=-VFLWX
     ENDIF
@@ -523,7 +523,7 @@ contains
 !     DIFFUSIVE FLUXES OF SOLUTES BETWEEN MICROPORES AND
 !     MACROPORES FROM AQUEOUS DIFFUSIVITIES AND CONCENTRATION DIFFERENCES
 !
-!     VOLWM,VOLWHM=micropore,macropore water volume
+!     VWatMicPM,VWatMacPM=micropore,macropore water volume
 !     XFRS*VOLT=maximum macropore volume for solute transfer
 !     DFV*=diffusive macropore-micropore solute transfer
 !     solute code:CO=CO2,CH=CH4,OX=O2,NG=N2,N2=N2O,HG=H2
@@ -535,67 +535,67 @@ contains
 !     XNPH=1/no. of cycles h-1 for water, heat and solute flux calculations
 !     *H2,*2=macropore,micropore solute content
 !
-  IF(VOLWHM(M,NU(NY,NX),NY,NX).GT.ZEROS2(NY,NX))THEN
-    VOLWHS=AMIN1(XFRS*VOLT(NU(NY,NX),NY,NX),VOLWHM(M,NU(NY,NX),NY,NX))
-    VOLWT=VOLWM(M,NU(NY,NX),NY,NX)+VOLWHS
+  IF(VWatMacPM(M,NU(NY,NX),NY,NX).GT.ZEROS2(NY,NX))THEN
+    VWatMacPS=AMIN1(XFRS*VOLT(NU(NY,NX),NY,NX),VWatMacPM(M,NU(NY,NX),NY,NX))
+    VOLWT=VWatMicPM(M,NU(NY,NX),NY,NX)+VWatMacPS
     DO  K=1,jcplx
-      DFVOC(K)=XNPH*(AZMAX1(OQCH2(K,NU(NY,NX),NY,NX))*VOLWM(M,NU(NY,NX),NY,NX) &
-        -AZMAX1(OQC2(K,NU(NY,NX),NY,NX))*VOLWHS)/VOLWT
-      DFVON(K)=XNPH*(AZMAX1(OQNH2(K,NU(NY,NX),NY,NX))*VOLWM(M,NU(NY,NX),NY,NX) &
-        -AZMAX1(OQN2(K,NU(NY,NX),NY,NX))*VOLWHS)/VOLWT
-      DFVOP(K)=XNPH*(AZMAX1(OQPH2(K,NU(NY,NX),NY,NX))*VOLWM(M,NU(NY,NX),NY,NX) &
-        -AZMAX1(OQP2(K,NU(NY,NX),NY,NX))*VOLWHS)/VOLWT
-      DFVOA(K)=XNPH*(AZMAX1(OQAH2(K,NU(NY,NX),NY,NX))*VOLWM(M,NU(NY,NX),NY,NX) &
-        -AZMAX1(OQA2(K,NU(NY,NX),NY,NX))*VOLWHS)/VOLWT
+      DFVOC(K)=XNPH*(AZMAX1(OQCH2(K,NU(NY,NX),NY,NX))*VWatMicPM(M,NU(NY,NX),NY,NX) &
+        -AZMAX1(OQC2(K,NU(NY,NX),NY,NX))*VWatMacPS)/VOLWT
+      DFVON(K)=XNPH*(AZMAX1(OQNH2(K,NU(NY,NX),NY,NX))*VWatMicPM(M,NU(NY,NX),NY,NX) &
+        -AZMAX1(OQN2(K,NU(NY,NX),NY,NX))*VWatMacPS)/VOLWT
+      DFVOP(K)=XNPH*(AZMAX1(OQPH2(K,NU(NY,NX),NY,NX))*VWatMicPM(M,NU(NY,NX),NY,NX) &
+        -AZMAX1(OQP2(K,NU(NY,NX),NY,NX))*VWatMacPS)/VOLWT
+      DFVOA(K)=XNPH*(AZMAX1(OQAH2(K,NU(NY,NX),NY,NX))*VWatMicPM(M,NU(NY,NX),NY,NX) &
+        -AZMAX1(OQA2(K,NU(NY,NX),NY,NX))*VWatMacPS)/VOLWT
     ENDDO
 
     SDifFlx(idg_CO2)=XNPH*(AZMAX1(trc_soHml2(idg_CO2,NU(NY,NX),NY,NX)) &
-      *VOLWM(M,NU(NY,NX),NY,NX)-AZMAX1(trc_solml2(idg_CO2,NU(NY,NX),NY,NX))*VOLWHS)/VOLWT
+      *VWatMicPM(M,NU(NY,NX),NY,NX)-AZMAX1(trc_solml2(idg_CO2,NU(NY,NX),NY,NX))*VWatMacPS)/VOLWT
     SDifFlx(idg_CH4)=XNPH*(AZMAX1(trc_soHml2(idg_CH4,NU(NY,NX),NY,NX)) &
-      *VOLWM(M,NU(NY,NX),NY,NX)-AZMAX1(trc_solml2(idg_CH4,NU(NY,NX),NY,NX))*VOLWHS)/VOLWT
+      *VWatMicPM(M,NU(NY,NX),NY,NX)-AZMAX1(trc_solml2(idg_CH4,NU(NY,NX),NY,NX))*VWatMacPS)/VOLWT
     SDifFlx(idg_O2)=XNPH*(AZMAX1(trc_soHml2(idg_O2,NU(NY,NX),NY,NX)) &
-      *VOLWM(M,NU(NY,NX),NY,NX)-AZMAX1(trc_solml2(idg_O2,NU(NY,NX),NY,NX))*VOLWHS)/VOLWT
+      *VWatMicPM(M,NU(NY,NX),NY,NX)-AZMAX1(trc_solml2(idg_O2,NU(NY,NX),NY,NX))*VWatMacPS)/VOLWT
     SDifFlx(idg_N2)=XNPH*(AZMAX1(trc_soHml2(idg_N2,NU(NY,NX),NY,NX)) &
-      *VOLWM(M,NU(NY,NX),NY,NX)-AZMAX1(trc_solml2(idg_N2,NU(NY,NX),NY,NX))*VOLWHS)/VOLWT
+      *VWatMicPM(M,NU(NY,NX),NY,NX)-AZMAX1(trc_solml2(idg_N2,NU(NY,NX),NY,NX))*VWatMacPS)/VOLWT
     SDifFlx(idg_N2O)=XNPH*(AZMAX1(trc_soHml2(idg_N2O,NU(NY,NX),NY,NX)) &
-      *VOLWM(M,NU(NY,NX),NY,NX)-AZMAX1(trc_solml2(idg_N2O,NU(NY,NX),NY,NX))*VOLWHS)/VOLWT
+      *VWatMicPM(M,NU(NY,NX),NY,NX)-AZMAX1(trc_solml2(idg_N2O,NU(NY,NX),NY,NX))*VWatMacPS)/VOLWT
     SDifFlx(idg_H2)=XNPH*(AZMAX1(trc_soHml2(idg_H2,NU(NY,NX),NY,NX)) &
-      *VOLWM(M,NU(NY,NX),NY,NX)-AZMAX1(trc_solml2(idg_H2,NU(NY,NX),NY,NX))*VOLWHS)/VOLWT
+      *VWatMicPM(M,NU(NY,NX),NY,NX)-AZMAX1(trc_solml2(idg_H2,NU(NY,NX),NY,NX))*VWatMacPS)/VOLWT
     SDifFlx(ids_NH4)=XNPH*(AZMAX1(trc_soHml2(ids_NH4,NU(NY,NX),NY,NX)) &
-      *VOLWM(M,NU(NY,NX),NY,NX)-AZMAX1(trc_solml2(ids_NH4,NU(NY,NX),NY,NX))*VOLWHS)/VOLWT &
+      *VWatMicPM(M,NU(NY,NX),NY,NX)-AZMAX1(trc_solml2(ids_NH4,NU(NY,NX),NY,NX))*VWatMacPS)/VOLWT &
       *trcs_VLN(ids_NH4,NU(NY,NX),NY,NX)
     SDifFlx(idg_NH3)=XNPH*(AZMAX1(trc_soHml2(idg_NH3,NU(NY,NX),NY,NX)) &
-      *VOLWM(M,NU(NY,NX),NY,NX)-AZMAX1(trc_solml2(idg_NH3,NU(NY,NX),NY,NX))*VOLWHS)/VOLWT &
+      *VWatMicPM(M,NU(NY,NX),NY,NX)-AZMAX1(trc_solml2(idg_NH3,NU(NY,NX),NY,NX))*VWatMacPS)/VOLWT &
       *trcs_VLN(ids_NH4,NU(NY,NX),NY,NX)
     SDifFlx(ids_NO3)=XNPH*(AZMAX1(trc_soHml2(ids_NO3,NU(NY,NX),NY,NX)) &
-      *VOLWM(M,NU(NY,NX),NY,NX)-AZMAX1(trc_solml2(ids_NO3,NU(NY,NX),NY,NX))*VOLWHS)/VOLWT &
+      *VWatMicPM(M,NU(NY,NX),NY,NX)-AZMAX1(trc_solml2(ids_NO3,NU(NY,NX),NY,NX))*VWatMacPS)/VOLWT &
       *trcs_VLN(ids_NO3,NU(NY,NX),NY,NX)
     SDifFlx(ids_NO2)=XNPH*(AZMAX1(trc_soHml2(ids_NO2,NU(NY,NX),NY,NX)) &
-      *VOLWM(M,NU(NY,NX),NY,NX)-AZMAX1(trc_solml2(ids_NO2,NU(NY,NX),NY,NX))*VOLWHS)/VOLWT &
+      *VWatMicPM(M,NU(NY,NX),NY,NX)-AZMAX1(trc_solml2(ids_NO2,NU(NY,NX),NY,NX))*VWatMacPS)/VOLWT &
       *trcs_VLN(ids_NO3,NU(NY,NX),NY,NX)
     SDifFlx(ids_H1PO4)=XNPH*(AZMAX1(trc_soHml2(ids_H1PO4,NU(NY,NX),NY,NX)) &
-      *VOLWM(M,NU(NY,NX),NY,NX)-AZMAX1(trc_solml2(ids_H1PO4,NU(NY,NX),NY,NX))*VOLWHS)/VOLWT &
+      *VWatMicPM(M,NU(NY,NX),NY,NX)-AZMAX1(trc_solml2(ids_H1PO4,NU(NY,NX),NY,NX))*VWatMacPS)/VOLWT &
       *trcs_VLN(ids_H1PO4,NU(NY,NX),NY,NX)
     SDifFlx(ids_H2PO4)=XNPH*(AZMAX1(trc_soHml2(ids_H2PO4,NU(NY,NX),NY,NX)) &
-      *VOLWM(M,NU(NY,NX),NY,NX)-AZMAX1(trc_solml2(ids_H2PO4,NU(NY,NX),NY,NX))*VOLWHS)/VOLWT &
+      *VWatMicPM(M,NU(NY,NX),NY,NX)-AZMAX1(trc_solml2(ids_H2PO4,NU(NY,NX),NY,NX))*VWatMacPS)/VOLWT &
       *trcs_VLN(ids_H1PO4,NU(NY,NX),NY,NX)
     SDifFlx(ids_NH4B)=XNPH*(AZMAX1(trc_soHml2(ids_NH4B,NU(NY,NX),NY,NX)) &
-      *VOLWM(M,NU(NY,NX),NY,NX)-AZMAX1(trc_solml2(ids_NH4B,NU(NY,NX),NY,NX))*VOLWHS)/VOLWT &
+      *VWatMicPM(M,NU(NY,NX),NY,NX)-AZMAX1(trc_solml2(ids_NH4B,NU(NY,NX),NY,NX))*VWatMacPS)/VOLWT &
       *trcs_VLN(ids_NH4B,NU(NY,NX),NY,NX)
     SDifFlx(idg_NH3B)=XNPH*(AZMAX1(trc_soHml2(idg_NH3B,NU(NY,NX),NY,NX)) &
-      *VOLWM(M,NU(NY,NX),NY,NX)-AZMAX1(trc_solml2(idg_NH3B,NU(NY,NX),NY,NX))*VOLWHS)/VOLWT &
+      *VWatMicPM(M,NU(NY,NX),NY,NX)-AZMAX1(trc_solml2(idg_NH3B,NU(NY,NX),NY,NX))*VWatMacPS)/VOLWT &
       *trcs_VLN(ids_NH4B,NU(NY,NX),NY,NX)
     SDifFlx(ids_NO3B)=XNPH*(AZMAX1(trc_soHml2(ids_NO3B,NU(NY,NX),NY,NX)) &
-      *VOLWM(M,NU(NY,NX),NY,NX)-AZMAX1(trc_solml2(ids_NO3B,NU(NY,NX),NY,NX))*VOLWHS)/VOLWT &
+      *VWatMicPM(M,NU(NY,NX),NY,NX)-AZMAX1(trc_solml2(ids_NO3B,NU(NY,NX),NY,NX))*VWatMacPS)/VOLWT &
       *trcs_VLN(ids_NO3B,NU(NY,NX),NY,NX)
     SDifFlx(ids_NO2B)=XNPH*(AZMAX1(trc_soHml2(ids_NO2B,NU(NY,NX),NY,NX)) &
-      *VOLWM(M,NU(NY,NX),NY,NX)-AZMAX1(trc_solml2(ids_NO2B,NU(NY,NX),NY,NX))*VOLWHS)/VOLWT &
+      *VWatMicPM(M,NU(NY,NX),NY,NX)-AZMAX1(trc_solml2(ids_NO2B,NU(NY,NX),NY,NX))*VWatMacPS)/VOLWT &
       *trcs_VLN(ids_NO3B,NU(NY,NX),NY,NX)
     SDifFlx(ids_H1PO4B)=XNPH*(AZMAX1(trc_soHml2(ids_H1PO4B,NU(NY,NX),NY,NX)) &
-      *VOLWM(M,NU(NY,NX),NY,NX)-AZMAX1(trc_solml2(ids_H1PO4B,NU(NY,NX),NY,NX))*VOLWHS)/VOLWT &
+      *VWatMicPM(M,NU(NY,NX),NY,NX)-AZMAX1(trc_solml2(ids_H1PO4B,NU(NY,NX),NY,NX))*VWatMacPS)/VOLWT &
       *trcs_VLN(ids_H1PO4B,NU(NY,NX),NY,NX)
     SDifFlx(ids_H2PO4B)=XNPH*(AZMAX1(trc_soHml2(ids_H2PO4B,NU(NY,NX),NY,NX)) &
-      *VOLWM(M,NU(NY,NX),NY,NX)-AZMAX1(trc_solml2(ids_H2PO4B,NU(NY,NX),NY,NX))*VOLWHS)/VOLWT &
+      *VWatMicPM(M,NU(NY,NX),NY,NX)-AZMAX1(trc_solml2(ids_H2PO4B,NU(NY,NX),NY,NX))*VWatMacPS)/VOLWT &
       *trcs_VLN(ids_H1PO4B,NU(NY,NX),NY,NX)
   ELSE
     DO  K=1,jcplx
@@ -665,7 +665,7 @@ contains
 !             :OC=DOC,ON=DON,OP=DOP,OA=acetate
 !             :NH4=NH4,NH3=NH3,NO3=NO3,NO2=NO2,P14=HPO4,PO4=H2PO4 in non-band
 !             :N4B=NH4,N3B=NH3,NOB=NO3,N2B=NO2,P1B=HPO4,POB=H2PO4 in band
-!     VOLWM=litter water volume from watsub.f
+!     VWatMicPM=litter water volume from watsub.f
 !     *S2=litter solute content
 !     N2,N1=NY,NX of source grid cell
 !     N5,N4=NY,NX of destination grid cell
@@ -674,8 +674,8 @@ contains
   N1=NX
   N2=NY
   IF(QRM(M,N2,N1).GT.ZEROS(N2,N1))THEN
-    IF(VOLWM(M,0,N2,N1).GT.ZEROS2(N2,N1))THEN
-      VFLW=AMIN1(VFLWX,QRM(M,N2,N1)/VOLWM(M,0,N2,N1))
+    IF(VWatMicPM(M,0,N2,N1).GT.ZEROS2(N2,N1))THEN
+      VFLW=AMIN1(VFLWX,QRM(M,N2,N1)/VWatMicPM(M,0,N2,N1))
     ELSE
       VFLW=VFLWX
     ENDIF
@@ -734,7 +734,7 @@ contains
 !             :OC=DOC,ON=DON,OP=DOP,OA=acetate
 !             :NH4=NH4,NH3=NH3,NO3=NO3,NO2=NO2,P14=HPO4,PO4=H2PO4 in non-band
 !             :N4B=NH4,N3B=NH3,NOB=NO3,N2B=NO2,P1B=HPO4,POB=H2PO4 in band
-!     VOLWM=litter water volume from watsub.f
+!     VWatMicPM=litter water volume from watsub.f
 !     *S2=litter solute content
 !
 !     IF OVERLAND FLOW IS FROM CURRENT TO ADJACENT GRID CELL
@@ -945,8 +945,8 @@ contains
   integer  :: NTG
 !
 !     VOLT=litter volume from hour1.f
-!     VOLWM,VOLPM=micropore water volume, air volume from watsub.f
-!     VOLW*=equivalent aqueous volume for gas
+!     VWatMicPM,VsoiPM=micropore water volume, air volume from watsub.f
+!     VWatMicP*=equivalent aqueous volume for gas
 !     S*L=solubility of gas in water from hour1.f
 !     C*G=gas concentration
 !     gas code:*CO2*=CO2,*OXY*=O2,*CH4*=CH4,*Z2G*=N2,*Z2O*=N2O
@@ -961,44 +961,44 @@ contains
 !     R*DXR=gas exchange between atmosphere and surface litter water for gas flux calculations
 !
   IF(VOLT(0,NY,NX).GT.ZEROS2(NY,NX) &
-    .AND.VOLPM(M,0,NY,NX).GT.ZEROS2(NY,NX) &
-    .AND.VOLWM(M,0,NY,NX).GT.ZEROS2(NY,NX))THEN
+    .AND.VsoiPM(M,0,NY,NX).GT.ZEROS2(NY,NX) &
+    .AND.VWatMicPM(M,0,NY,NX).GT.ZEROS2(NY,NX))THEN
 
-    VOLWCO(0,NY,NX)=VOLWM(M,0,NY,NX)*GSolbility(idg_CO2,0,NY,NX)
-    VOLWCH(0,NY,NX)=VOLWM(M,0,NY,NX)*GSolbility(idg_CH4,0,NY,NX)
-    VOLWOX(0,NY,NX)=VOLWM(M,0,NY,NX)*GSolbility(idg_O2,0,NY,NX)
-    VOLWNG(0,NY,NX)=VOLWM(M,0,NY,NX)*GSolbility(idg_N2,0,NY,NX)
-    VOLWN2(0,NY,NX)=VOLWM(M,0,NY,NX)*GSolbility(idg_N2O,0,NY,NX)
-    VOLWN3(0,NY,NX)=VOLWM(M,0,NY,NX)*GSolbility(idg_NH3,0,NY,NX)
-    VOLWHG(0,NY,NX)=VOLWM(M,0,NY,NX)*GSolbility(idg_H2,0,NY,NX)
+    VWatMicPCO(0,NY,NX)=VWatMicPM(M,0,NY,NX)*GSolbility(idg_CO2,0,NY,NX)
+    VWatMicPCH(0,NY,NX)=VWatMicPM(M,0,NY,NX)*GSolbility(idg_CH4,0,NY,NX)
+    VWatMicPOX(0,NY,NX)=VWatMicPM(M,0,NY,NX)*GSolbility(idg_O2,0,NY,NX)
+    VWatMicPNG(0,NY,NX)=VWatMicPM(M,0,NY,NX)*GSolbility(idg_N2,0,NY,NX)
+    VWatMicPN2(0,NY,NX)=VWatMicPM(M,0,NY,NX)*GSolbility(idg_N2O,0,NY,NX)
+    VWatMicPN3(0,NY,NX)=VWatMicPM(M,0,NY,NX)*GSolbility(idg_NH3,0,NY,NX)
+    VWatMicPHG(0,NY,NX)=VWatMicPM(M,0,NY,NX)*GSolbility(idg_H2,0,NY,NX)
 
-    VOLWXA(0,NY,NX)=natomw*VOLWM(M,0,NY,NX)
+    VWatMicPXA(0,NY,NX)=natomw*VWatMicPM(M,0,NY,NX)
     DO NTG=idg_beg,idg_end-1
-      trc_gascl0(NTG)=trc_gascl(NTG,0,NY,NX)*VOLPM(M,0,NY,NX)
+      trc_gascl0(NTG)=trc_gascl(NTG,0,NY,NX)*VsoiPM(M,0,NY,NX)
     ENDDO
 
-    VOLGas(idg_CO2)=VOLWCO(0,NY,NX)+VOLPM(M,0,NY,NX)
-    VOLGas(idg_CH4)=VOLWCH(0,NY,NX)+VOLPM(M,0,NY,NX)
-    VOLGas(idg_O2)=VOLWOX(0,NY,NX)+VOLPM(M,0,NY,NX)
-    VOLGas(idg_N2)=VOLWNG(0,NY,NX)+VOLPM(M,0,NY,NX)
-    VOLGas(idg_N2O)=VOLWN2(0,NY,NX)+VOLPM(M,0,NY,NX)
-    VOLGas(idg_NH3)=VOLWN3(0,NY,NX)+VOLPM(M,0,NY,NX)
-    VOLGas(idg_H2)=VOLWHG(0,NY,NX)+VOLPM(M,0,NY,NX)
+    VOLGas(idg_CO2)=VWatMicPCO(0,NY,NX)+VsoiPM(M,0,NY,NX)
+    VOLGas(idg_CH4)=VWatMicPCH(0,NY,NX)+VsoiPM(M,0,NY,NX)
+    VOLGas(idg_O2)=VWatMicPOX(0,NY,NX)+VsoiPM(M,0,NY,NX)
+    VOLGas(idg_N2)=VWatMicPNG(0,NY,NX)+VsoiPM(M,0,NY,NX)
+    VOLGas(idg_N2O)=VWatMicPN2(0,NY,NX)+VsoiPM(M,0,NY,NX)
+    VOLGas(idg_NH3)=VWatMicPN3(0,NY,NX)+VsoiPM(M,0,NY,NX)
+    VOLGas(idg_H2)=VWatMicPHG(0,NY,NX)+VsoiPM(M,0,NY,NX)
 
-    RGasDSFlx(idg_CO2,0,NY,NX)=DFGS(M,0,NY,NX)*(AMAX1(ZEROS(NY,NX),trc_gascl0(idg_CO2))*VOLWCO(0,NY,NX) &
-      -AMAX1(ZEROS(NY,NX),trc_solml2(idg_CO2,0,NY,NX)+RCODXR)*VOLPM(M,0,NY,NX))/VOLGas(idg_CO2)
-    RGasDSFlx(idg_CH4,0,NY,NX)=DFGS(M,0,NY,NX)*(AMAX1(ZEROS(NY,NX),trc_gascl0(idg_CH4))*VOLWCH(0,NY,NX) &
-      -AMAX1(ZEROS(NY,NX),trc_solml2(idg_CH4,0,NY,NX)+RCHDXR)*VOLPM(M,0,NY,NX))/VOLGas(idg_CH4)
-    RGasDSFlx(idg_O2,0,NY,NX)=DFGS(M,0,NY,NX)*(AMAX1(ZEROS(NY,NX),trc_gascl0(idg_O2))*VOLWOX(0,NY,NX) &
-      -AMAX1(ZEROS(NY,NX),trc_solml2(idg_O2,0,NY,NX)+ROXDXR)*VOLPM(M,0,NY,NX))/VOLGas(idg_O2)
-    RGasDSFlx(idg_N2,0,NY,NX)=DFGS(M,0,NY,NX)*(AMAX1(ZEROS(NY,NX),trc_gascl0(idg_N2))*VOLWNG(0,NY,NX) &
-      -AMAX1(ZEROS(NY,NX),trc_solml2(idg_N2,0,NY,NX)+RNGDXR)*VOLPM(M,0,NY,NX))/VOLGas(idg_N2)
-    RGasDSFlx(idg_N2O,0,NY,NX)=DFGS(M,0,NY,NX)*(AMAX1(ZEROS(NY,NX),trc_gascl0(idg_N2O))*VOLWN2(0,NY,NX) &
-      -AMAX1(ZEROS(NY,NX),trc_solml2(idg_N2O,0,NY,NX)+RN2DXR)*VOLPM(M,0,NY,NX))/VOLGas(idg_N2O)
-    RGasDSFlx(idg_NH3,0,NY,NX)=DFGS(M,0,NY,NX)*(AMAX1(ZEROS(NY,NX),trc_gascl0(idg_NH3))*VOLWN3(0,NY,NX) &
-      -AMAX1(ZEROS(NY,NX),trc_solml2(idg_NH3,0,NY,NX)+RN3DXR)*VOLPM(M,0,NY,NX))/VOLGas(idg_NH3)
-    RGasDSFlx(idg_H2,0,NY,NX)=DFGS(M,0,NY,NX)*(AMAX1(ZEROS(NY,NX),trc_gascl0(idg_H2))*VOLWHG(0,NY,NX) &
-      -AMAX1(ZEROS(NY,NX),trc_solml2(idg_H2,0,NY,NX)+RHGDXR)*VOLPM(M,0,NY,NX))/VOLGas(idg_H2)
+    RGasDSFlx(idg_CO2,0,NY,NX)=DFGS(M,0,NY,NX)*(AMAX1(ZEROS(NY,NX),trc_gascl0(idg_CO2))*VWatMicPCO(0,NY,NX) &
+      -AMAX1(ZEROS(NY,NX),trc_solml2(idg_CO2,0,NY,NX)+RCODXR)*VsoiPM(M,0,NY,NX))/VOLGas(idg_CO2)
+    RGasDSFlx(idg_CH4,0,NY,NX)=DFGS(M,0,NY,NX)*(AMAX1(ZEROS(NY,NX),trc_gascl0(idg_CH4))*VWatMicPCH(0,NY,NX) &
+      -AMAX1(ZEROS(NY,NX),trc_solml2(idg_CH4,0,NY,NX)+RCHDXR)*VsoiPM(M,0,NY,NX))/VOLGas(idg_CH4)
+    RGasDSFlx(idg_O2,0,NY,NX)=DFGS(M,0,NY,NX)*(AMAX1(ZEROS(NY,NX),trc_gascl0(idg_O2))*VWatMicPOX(0,NY,NX) &
+      -AMAX1(ZEROS(NY,NX),trc_solml2(idg_O2,0,NY,NX)+ROXDXR)*VsoiPM(M,0,NY,NX))/VOLGas(idg_O2)
+    RGasDSFlx(idg_N2,0,NY,NX)=DFGS(M,0,NY,NX)*(AMAX1(ZEROS(NY,NX),trc_gascl0(idg_N2))*VWatMicPNG(0,NY,NX) &
+      -AMAX1(ZEROS(NY,NX),trc_solml2(idg_N2,0,NY,NX)+RNGDXR)*VsoiPM(M,0,NY,NX))/VOLGas(idg_N2)
+    RGasDSFlx(idg_N2O,0,NY,NX)=DFGS(M,0,NY,NX)*(AMAX1(ZEROS(NY,NX),trc_gascl0(idg_N2O))*VWatMicPN2(0,NY,NX) &
+      -AMAX1(ZEROS(NY,NX),trc_solml2(idg_N2O,0,NY,NX)+RN2DXR)*VsoiPM(M,0,NY,NX))/VOLGas(idg_N2O)
+    RGasDSFlx(idg_NH3,0,NY,NX)=DFGS(M,0,NY,NX)*(AMAX1(ZEROS(NY,NX),trc_gascl0(idg_NH3))*VWatMicPN3(0,NY,NX) &
+      -AMAX1(ZEROS(NY,NX),trc_solml2(idg_NH3,0,NY,NX)+RN3DXR)*VsoiPM(M,0,NY,NX))/VOLGas(idg_NH3)
+    RGasDSFlx(idg_H2,0,NY,NX)=DFGS(M,0,NY,NX)*(AMAX1(ZEROS(NY,NX),trc_gascl0(idg_H2))*VWatMicPHG(0,NY,NX) &
+      -AMAX1(ZEROS(NY,NX),trc_solml2(idg_H2,0,NY,NX)+RHGDXR)*VsoiPM(M,0,NY,NX))/VOLGas(idg_H2)
 
 !
 !     ACCUMULATE HOURLY FLUXES FOR USE IN REDIST.F
@@ -1054,7 +1054,7 @@ contains
         +R3GasADFlx(NTG,3,NU(NY,NX),NY,NX)
     ENDDO
 
-    IF(VOLWM(M,NU(NY,NX),NY,NX).GT.ZEROS2(NY,NX))THEN
+    IF(VWatMicPM(M,NU(NY,NX),NY,NX).GT.ZEROS2(NY,NX))THEN
       call SurfSoilFluxDisolVapor(M,NY,NX,RDXS_gas)
 !
 !     ACCUMULATE HOURLY FLUXES FOR USE IN REDIST.F
@@ -1086,7 +1086,7 @@ contains
   real(r8) :: DFGcc(idg_beg:idg_end-1)
   real(r8) :: DLYR0,TORT0
 
-  IF(VOLT(0,NY,NX).GT.ZEROS2(NY,NX).AND.VOLWM(M,0,NY,NX).GT.ZEROS2(NY,NX))THEN
+  IF(VOLT(0,NY,NX).GT.ZEROS2(NY,NX).AND.VWatMicPM(M,0,NY,NX).GT.ZEROS2(NY,NX))THEN
     DLYR0=AMAX1(ZERO2,DLYR(3,0,NY,NX)) !vertical layer thickness
     TORT0=TORT(M,0,NY,NX)*AREA(3,NU(NY,NX),NY,NX)/(0.5_r8*DLYR0)*CVRD(NY,NX)
 
@@ -1095,15 +1095,15 @@ contains
     ENDDO
 
     DO  K=1,jcplx
-      COQC1(K)=AZMAX1(OQC2(K,0,NY,NX)/VOLWM(M,0,NY,NX))
-      COQN1(K)=AZMAX1(OQN2(K,0,NY,NX)/VOLWM(M,0,NY,NX))
-      COQP1(K)=AZMAX1(OQP2(K,0,NY,NX)/VOLWM(M,0,NY,NX))
-      COQA1(K)=AZMAX1(OQA2(K,0,NY,NX)/VOLWM(M,0,NY,NX))
+      COQC1(K)=AZMAX1(OQC2(K,0,NY,NX)/VWatMicPM(M,0,NY,NX))
+      COQN1(K)=AZMAX1(OQN2(K,0,NY,NX)/VWatMicPM(M,0,NY,NX))
+      COQP1(K)=AZMAX1(OQP2(K,0,NY,NX)/VWatMicPM(M,0,NY,NX))
+      COQA1(K)=AZMAX1(OQA2(K,0,NY,NX)/VWatMicPM(M,0,NY,NX))
     ENDDO
 
 
     DO NTS=ids_beg,ids_end
-      trcs_cl1(NTS)=AZMAX1(trc_solml2(NTS,0,NY,NX)/VOLWM(M,0,NY,NX))
+      trcs_cl1(NTS)=AZMAX1(trc_solml2(NTS,0,NY,NX)/VWatMicPM(M,0,NY,NX))
     ENDDO
 !
 !     EQUILIBRIUM CONCENTRATIONS AT RESIDUE SURFACE AT WHICH
@@ -1132,12 +1132,12 @@ contains
 !     gas code: *CO*=CO2,*CH*=CH4,*OX*=O2,*NG*=N2,*N2*=N2O,*N3*=NH3,*HG*=H2
 !     C*E=atmospheric gas concentration from hour1.f
 !     C*Q=equilibrium gas concentration at litter surface
-!     VOLWM=litter water volume
+!     VWatMicPM=litter water volume
 !     DFGS*=effective solute diffusivity
 !     XNPT=1/number of cycles NPH-1 for gas flux calculations
 !     R*DXR=R*DFR for gas flux calculations
 !
-      RDFR_gas(NTG,NY,NX)=(trc_gasq(NTG)-trcs_cl1(NTG))*AMIN1(VOLWM(M,0,NY,NX),DFGcc(NTG))
+      RDFR_gas(NTG,NY,NX)=(trc_gasq(NTG)-trcs_cl1(NTG))*AMIN1(VWatMicPM(M,0,NY,NX),DFGcc(NTG))
     ENDDO
 !
 !     ACCUMULATE HOURLY FLUXES FOR USE IN REDIST.F
@@ -1165,7 +1165,7 @@ contains
   integer, intent(in) :: M,NY,NX
   real(r8), intent(out) :: trcs_cl2(ids_beg:ids_end)
   real(r8), intent(out) :: RDXS_gas(idg_beg:idg_end)
-  real(r8) :: DLYR1,TORT1,VOLWOA,VOLWOB,VOLWPA,VOLWPB
+  real(r8) :: DLYR1,TORT1,VWatMicPOA,VWatMicPOB,VWatMicPPA,VWatMicPPB
   real(r8) :: DFGS
   real(r8) :: trc_gsolc,trc_gsolc2
   integer  :: K,NTG
@@ -1174,7 +1174,7 @@ contains
 !     THROUGH VOLATILIZATION-DISSOLUTION FROM AQUEOUS
 !     DIFFUSIVITIES IN SURFACE SOIL LAYER
 !
-!     VOLWM=micropore water-filled porosity from watsub.f
+!     VWatMicPM=micropore water-filled porosity from watsub.f
 !     TORT=tortuosity from hour1.f
 !     *SGL*=solute diffusivity
 !     solute code:CO=CO2,CH=CH4,OX=O2,NG=N2,N2=N2O,HG=H2
@@ -1188,66 +1188,66 @@ contains
 !     ZNH4S,ZNH3S,ZNO3S,ZNO2S,H1PO4,H2PO4=aqueous NH4,NH3,NO3,NO2,HPO4,H2PO4 in non-band micropores
 !     ZNH4B,ZNH3B,ZNO3B,ZNO2B,H1POB,H2POB=aqueous NH4,NH3,NO3,NO2,HPO4,H2PO4 in band micropores
 !
-  IF(VOLWM(M,NU(NY,NX),NY,NX).GT.ZEROS2(NY,NX))THEN
-    VOLWOA=VOLWM(M,NU(NY,NX),NY,NX)*trcs_VLN(ids_NO3,NU(NY,NX),NY,NX)
-    VOLWOB=VOLWM(M,NU(NY,NX),NY,NX)*trcs_VLN(ids_NO3B,NU(NY,NX),NY,NX)
-    VOLWPA=VOLWM(M,NU(NY,NX),NY,NX)*trcs_VLN(ids_H1PO4,NU(NY,NX),NY,NX)
-    VOLWPB=VOLWM(M,NU(NY,NX),NY,NX)*trcs_VLN(ids_H1PO4B,NU(NY,NX),NY,NX)
+  IF(VWatMicPM(M,NU(NY,NX),NY,NX).GT.ZEROS2(NY,NX))THEN
+    VWatMicPOA=VWatMicPM(M,NU(NY,NX),NY,NX)*trcs_VLN(ids_NO3,NU(NY,NX),NY,NX)
+    VWatMicPOB=VWatMicPM(M,NU(NY,NX),NY,NX)*trcs_VLN(ids_NO3B,NU(NY,NX),NY,NX)
+    VWatMicPPA=VWatMicPM(M,NU(NY,NX),NY,NX)*trcs_VLN(ids_H1PO4,NU(NY,NX),NY,NX)
+    VWatMicPPB=VWatMicPM(M,NU(NY,NX),NY,NX)*trcs_VLN(ids_H1PO4B,NU(NY,NX),NY,NX)
     DLYR1=AMAX1(ZERO2,DLYR(3,NU(NY,NX),NY,NX))
     TORT1=TORT(M,NU(NY,NX),NY,NX)*AREA(3,NU(NY,NX),NY,NX)/(0.5_r8*DLYR1)
 
     D8910: DO  K=1,jcplx
-      COQC2(K)=AZMAX1(OQC2(K,NU(NY,NX),NY,NX)/VOLWM(M,NU(NY,NX),NY,NX))
-      COQN2(K)=AZMAX1(OQN2(K,NU(NY,NX),NY,NX)/VOLWM(M,NU(NY,NX),NY,NX))
-      COQP2(K)=AZMAX1(OQP2(K,NU(NY,NX),NY,NX)/VOLWM(M,NU(NY,NX),NY,NX))
-      COQA2(K)=AZMAX1(OQA2(K,NU(NY,NX),NY,NX)/VOLWM(M,NU(NY,NX),NY,NX))
+      COQC2(K)=AZMAX1(OQC2(K,NU(NY,NX),NY,NX)/VWatMicPM(M,NU(NY,NX),NY,NX))
+      COQN2(K)=AZMAX1(OQN2(K,NU(NY,NX),NY,NX)/VWatMicPM(M,NU(NY,NX),NY,NX))
+      COQP2(K)=AZMAX1(OQP2(K,NU(NY,NX),NY,NX)/VWatMicPM(M,NU(NY,NX),NY,NX))
+      COQA2(K)=AZMAX1(OQA2(K,NU(NY,NX),NY,NX)/VWatMicPM(M,NU(NY,NX),NY,NX))
     ENDDO D8910
 
 !not include NH3 and NH3B
     DO NTG=idg_beg,idg_end-2
-      trcs_cl2(NTG)=AZMAX1(trc_solml2(NTG,NU(NY,NX),NY,NX)/VOLWM(M,NU(NY,NX),NY,NX))
+      trcs_cl2(NTG)=AZMAX1(trc_solml2(NTG,NU(NY,NX),NY,NX)/VWatMicPM(M,NU(NY,NX),NY,NX))
     ENDDO
 
-    IF(VOLWMA(NU(NY,NX),NY,NX).GT.ZEROS2(NY,NX))THEN
-      trcs_cl2(idg_NH3)=AZMAX1(trc_solml2(idg_NH3,NU(NY,NX),NY,NX)/VOLWMA(NU(NY,NX),NY,NX))
-      trcs_cl2(ids_NH4)=AZMAX1(trc_solml2(ids_NH4,NU(NY,NX),NY,NX)/VOLWMA(NU(NY,NX),NY,NX))
+    IF(VWatMicPMA(NU(NY,NX),NY,NX).GT.ZEROS2(NY,NX))THEN
+      trcs_cl2(idg_NH3)=AZMAX1(trc_solml2(idg_NH3,NU(NY,NX),NY,NX)/VWatMicPMA(NU(NY,NX),NY,NX))
+      trcs_cl2(ids_NH4)=AZMAX1(trc_solml2(ids_NH4,NU(NY,NX),NY,NX)/VWatMicPMA(NU(NY,NX),NY,NX))
     ELSE
       trcs_cl2(idg_NH3)=0.0_r8
       trcs_cl2(ids_NH4)=0.0_r8
     ENDIF
 
-    IF(VOLWOA.GT.ZEROS2(NY,NX))THEN
-      trcs_cl2(ids_NO3)=AZMAX1(trc_solml2(ids_NO3,NU(NY,NX),NY,NX)/VOLWOA)
-      trcs_cl2(ids_NO2)=AZMAX1(trc_solml2(ids_NO2,NU(NY,NX),NY,NX)/VOLWOA)
+    IF(VWatMicPOA.GT.ZEROS2(NY,NX))THEN
+      trcs_cl2(ids_NO3)=AZMAX1(trc_solml2(ids_NO3,NU(NY,NX),NY,NX)/VWatMicPOA)
+      trcs_cl2(ids_NO2)=AZMAX1(trc_solml2(ids_NO2,NU(NY,NX),NY,NX)/VWatMicPOA)
     ELSE
       trcs_cl2(ids_NO3)=0.0_r8
       trcs_cl2(ids_NO2)=0.0_r8
     ENDIF
-    IF(VOLWPA.GT.ZEROS2(NY,NX))THEN
-      trcs_cl2(ids_H1PO4)=AZMAX1(trc_solml2(ids_H1PO4,NU(NY,NX),NY,NX)/VOLWPA)
-      trcs_cl2(ids_H2PO4)=AZMAX1(trc_solml2(ids_H2PO4,NU(NY,NX),NY,NX)/VOLWPA)
+    IF(VWatMicPPA.GT.ZEROS2(NY,NX))THEN
+      trcs_cl2(ids_H1PO4)=AZMAX1(trc_solml2(ids_H1PO4,NU(NY,NX),NY,NX)/VWatMicPPA)
+      trcs_cl2(ids_H2PO4)=AZMAX1(trc_solml2(ids_H2PO4,NU(NY,NX),NY,NX)/VWatMicPPA)
     ELSE
       trcs_cl2(ids_H1PO4)=0.0_r8
       trcs_cl2(ids_H2PO4)=0.0_r8
     ENDIF
-    IF(VOLWMB(NU(NY,NX),NY,NX).GT.ZEROS2(NY,NX))THEN
-      trcs_cl2(idg_NH3B)=AZMAX1(trc_solml2(idg_NH3B,NU(NY,NX),NY,NX)/VOLWMB(NU(NY,NX),NY,NX))
-      trcs_cl2(ids_NH4B)=AZMAX1(trc_solml2(ids_NH4B,NU(NY,NX),NY,NX)/VOLWMB(NU(NY,NX),NY,NX))
+    IF(VWatMicPMB(NU(NY,NX),NY,NX).GT.ZEROS2(NY,NX))THEN
+      trcs_cl2(idg_NH3B)=AZMAX1(trc_solml2(idg_NH3B,NU(NY,NX),NY,NX)/VWatMicPMB(NU(NY,NX),NY,NX))
+      trcs_cl2(ids_NH4B)=AZMAX1(trc_solml2(ids_NH4B,NU(NY,NX),NY,NX)/VWatMicPMB(NU(NY,NX),NY,NX))
     ELSE
       trcs_cl2(idg_NH3B)=trcs_cl2(idg_NH3)
       trcs_cl2(ids_NH4B)=trcs_cl2(ids_NH4)
     ENDIF
 
-    IF(VOLWOB.GT.ZEROS2(NY,NX))THEN
-      trcs_cl2(ids_NO3B)=AZMAX1(trc_solml2(ids_NO3B,NU(NY,NX),NY,NX)/VOLWOB)
-      trcs_cl2(ids_NO2)=AZMAX1(trc_solml2(ids_NO2B,NU(NY,NX),NY,NX)/VOLWOB)
+    IF(VWatMicPOB.GT.ZEROS2(NY,NX))THEN
+      trcs_cl2(ids_NO3B)=AZMAX1(trc_solml2(ids_NO3B,NU(NY,NX),NY,NX)/VWatMicPOB)
+      trcs_cl2(ids_NO2)=AZMAX1(trc_solml2(ids_NO2B,NU(NY,NX),NY,NX)/VWatMicPOB)
     ELSE
       trcs_cl2(ids_NO3B)=trcs_cl2(ids_NO3)
       trcs_cl2(ids_NO2)=trcs_cl2(ids_NO2)
     ENDIF
-    IF(VOLWPB.GT.ZEROS2(NY,NX))THEN
-      trcs_cl2(ids_H1PO4B)=AZMAX1(trc_solml2(ids_H1PO4B,NU(NY,NX),NY,NX)/VOLWPB)
-      trcs_cl2(ids_H2PO4B)=AZMAX1(trc_solml2(ids_H2PO4B,NU(NY,NX),NY,NX)/VOLWPB)
+    IF(VWatMicPPB.GT.ZEROS2(NY,NX))THEN
+      trcs_cl2(ids_H1PO4B)=AZMAX1(trc_solml2(ids_H1PO4B,NU(NY,NX),NY,NX)/VWatMicPPB)
+      trcs_cl2(ids_H2PO4B)=AZMAX1(trc_solml2(ids_H2PO4B,NU(NY,NX),NY,NX)/VWatMicPPB)
     ELSE
       trcs_cl2(ids_H1PO4B)=trcs_cl2(ids_H1PO4)
       trcs_cl2(ids_H2PO4B)=trcs_cl2(ids_H2PO4)
@@ -1269,7 +1269,7 @@ contains
 !include NH3B
     DO NTG=idg_beg,idg_end
       DFGS=SolDifcc(NTG,NU(NY,NX),NY,NX)*TORT1
-      trc_gsolc2=AZMAX1(trc_solml2(NTG,NU(NY,NX),NY,NX)/VOLWM(M,NU(NY,NX),NY,NX))
+      trc_gsolc2=AZMAX1(trc_solml2(NTG,NU(NY,NX),NY,NX)/VWatMicPM(M,NU(NY,NX),NY,NX))
       trc_gsolc=(PARG(M,NY,NX)*AtmGgms(NTG,NY,NX)*GSolbility(NTG,NU(NY,NX),NY,NX) &
         +DFGS*trc_gsolc2)/(DFGS+PARG(M,NY,NX))
 !
@@ -1281,14 +1281,14 @@ contains
 !     gas code:*CO*=CO2,*CH*=CH4,*OX*=O2,*NG*=N2,*N2*=N2O,*N3*=NH3,*HG*=H2
 !     C*E=atmospheric gas concentration from hour1.f
 !     C*Q=equilibrium gas concentration at soil surface
-!     VOLWM=litter water volume
+!     VWatMicPM=litter water volume
 !     DFGS*=effective solute diffusivity
 !     XNPT=1/number of cycles NPH-1 for gas flux calculations
 !     R*DXS=R*DFS for gas flux calculations
 !  include NH3B
 
       RGasSSVol(NTG,NY,NX)=(trc_gsolc-trcs_cl2(NTG))&
-        *AMIN1(VOLWM(M,NU(NY,NX),NY,NX)*trcs_VLN(NTG,NU(NY,NX),NY,NX),DFGS)
+        *AMIN1(VWatMicPM(M,NU(NY,NX),NY,NX)*trcs_VLN(NTG,NU(NY,NX),NY,NX),DFGS)
 !
 !     ACCUMULATE HOURLY FLUXES FOR USE IN REDIST.F
 !   seven gas species plus aqueous NH3 in band
@@ -1437,7 +1437,7 @@ contains
   integer :: NTG
 
 !     FLQM=total water flux into soil micropore+macropore from watsub.f
-!     VOLPM=air-filled porosity
+!     VsoiPM=air-filled porosity
 !     RFL*G=convective gas flux
 !     gas code:*CO2*=CO2,*OXY*=O2,*CH4*=CH4,*Z2G*=N2,*Z2O*=N2O
 !             :*ZN3*=NH3,*H2G*=H2
@@ -1446,8 +1446,8 @@ contains
 !
 
   IF(FLQM(3,NU(NY,NX),NY,NX).GT.0.0_r8)THEN
-    IF(VOLPM(M,NU(NY,NX),NY,NX).GT.ZEROS2(NY,NX))THEN
-      VFLW=-AZMAX1(AMIN1(VFLWX,FLQM(3,NU(NY,NX),NY,NX)/VOLPM(M,NU(NY,NX),NY,NX)))
+    IF(VsoiPM(M,NU(NY,NX),NY,NX).GT.ZEROS2(NY,NX))THEN
+      VFLW=-AZMAX1(AMIN1(VFLWX,FLQM(3,NU(NY,NX),NY,NX)/VsoiPM(M,NU(NY,NX),NY,NX)))
     ELSE
       VFLW=-VFLWX
     ENDIF
@@ -1504,9 +1504,9 @@ contains
 !     *G2=gaseous content
 !     gas code:*CO2*=CO2,*OXY*=O2,*CH4*=CH4,*Z2G*=N2,*Z2O*=N2O
 !             :*ZN3*=NH3,*H2G*=H2
-!     VOLPM=air-filled porosity
+!     VsoiPM=air-filled porosity
 !
-    trcg_cl2=AZMAX1(trc_gasml2(NTG,NU(NY,NX),NY,NX)/VOLPM(M,NU(NY,NX),NY,NX))
+    trcg_cl2=AZMAX1(trc_gasml2(NTG,NU(NY,NX),NY,NX)/VsoiPM(M,NU(NY,NX),NY,NX))
 !
 !     EQUILIBRIUM CONCENTRATIONS AT SOIL SURFACE AT WHICH
 !     GASEOUS DIFFUSION THROUGH SOIL SURFACE LAYER = GASEOUS
@@ -1548,85 +1548,85 @@ contains
   real(r8) :: VOLCOT(JY,JX),VOLCHT(JY,JX)
   real(r8) :: VOLOXT(JY,JX),VOLNGT(JY,JX)
 
-!     VOLWM=micropore water-filled porosity from watsub.f
-!     VOLW*=equivalent aqueous volume for gas
+!     VWatMicPM=micropore water-filled porosity from watsub.f
+!     VWatMicP*=equivalent aqueous volume for gas
 !     gas code:*CO2*=CO2,*OXY*=O2,*CH4*=CH4,*Z2G*=N2,*Z2O*=N2O
 !             :*ZN3*=NH3,*H2G*=H2
 !     S*L=solubility of gas in water from hour1.f
-!     VOLPM=air-filled porosity
+!     VsoiPM=air-filled porosity
 !     R*DFG=water-air gas flux
 !     DFGS=rate constant for air-water gas exchange from watsub.f
 !     *G2,*S2=gaseous,aqueous gas content
 !     R*DXS=gas exchange between atmosphere and soil surface water
 !
 
-  VOLWCO(NU(NY,NX),NY,NX)=VOLWM(M,NU(NY,NX),NY,NX)*GSolbility(idg_CO2,NU(NY,NX),NY,NX)
-  VOLWCH(NU(NY,NX),NY,NX)=VOLWM(M,NU(NY,NX),NY,NX)*GSolbility(idg_CH4,NU(NY,NX),NY,NX)
-  VOLWOX(NU(NY,NX),NY,NX)=VOLWM(M,NU(NY,NX),NY,NX)*GSolbility(idg_O2,NU(NY,NX),NY,NX)
-  VOLWNG(NU(NY,NX),NY,NX)=VOLWM(M,NU(NY,NX),NY,NX)*GSolbility(idg_N2,NU(NY,NX),NY,NX)
-  VOLWN2(NU(NY,NX),NY,NX)=VOLWM(M,NU(NY,NX),NY,NX)*GSolbility(idg_N2O,NU(NY,NX),NY,NX)
-  VOLWN3(NU(NY,NX),NY,NX)=VOLWMA(NU(NY,NX),NY,NX)*GSolbility(idg_NH3,NU(NY,NX),NY,NX)
-  VOLWNB(NU(NY,NX),NY,NX)=VOLWMB(NU(NY,NX),NY,NX)*GSolbility(idg_NH3,NU(NY,NX),NY,NX)
-  VOLWHG(NU(NY,NX),NY,NX)=VOLWM(M,NU(NY,NX),NY,NX)*GSolbility(idg_H2,NU(NY,NX),NY,NX)
+  VWatMicPCO(NU(NY,NX),NY,NX)=VWatMicPM(M,NU(NY,NX),NY,NX)*GSolbility(idg_CO2,NU(NY,NX),NY,NX)
+  VWatMicPCH(NU(NY,NX),NY,NX)=VWatMicPM(M,NU(NY,NX),NY,NX)*GSolbility(idg_CH4,NU(NY,NX),NY,NX)
+  VWatMicPOX(NU(NY,NX),NY,NX)=VWatMicPM(M,NU(NY,NX),NY,NX)*GSolbility(idg_O2,NU(NY,NX),NY,NX)
+  VWatMicPNG(NU(NY,NX),NY,NX)=VWatMicPM(M,NU(NY,NX),NY,NX)*GSolbility(idg_N2,NU(NY,NX),NY,NX)
+  VWatMicPN2(NU(NY,NX),NY,NX)=VWatMicPM(M,NU(NY,NX),NY,NX)*GSolbility(idg_N2O,NU(NY,NX),NY,NX)
+  VWatMicPN3(NU(NY,NX),NY,NX)=VWatMicPMA(NU(NY,NX),NY,NX)*GSolbility(idg_NH3,NU(NY,NX),NY,NX)
+  VWatMicPNB(NU(NY,NX),NY,NX)=VWatMicPMB(NU(NY,NX),NY,NX)*GSolbility(idg_NH3,NU(NY,NX),NY,NX)
+  VWatMicPHG(NU(NY,NX),NY,NX)=VWatMicPM(M,NU(NY,NX),NY,NX)*GSolbility(idg_H2,NU(NY,NX),NY,NX)
 
-  VOLCOT(NY,NX)=VOLWCO(NU(NY,NX),NY,NX)+VOLPM(M,NU(NY,NX),NY,NX)
-  VOLCHT(NY,NX)=VOLWCH(NU(NY,NX),NY,NX)+VOLPM(M,NU(NY,NX),NY,NX)
-  VOLOXT(NY,NX)=VOLWOX(NU(NY,NX),NY,NX)+VOLPM(M,NU(NY,NX),NY,NX)
-  VOLNGT(NY,NX)=VOLWNG(NU(NY,NX),NY,NX)+VOLPM(M,NU(NY,NX),NY,NX)
-  VOLN2T(NY,NX)=VOLWN2(NU(NY,NX),NY,NX)+VOLPM(M,NU(NY,NX),NY,NX)
-  VOLN3T(NY,NX)=VOLWN3(NU(NY,NX),NY,NX)+VOLPMA(NU(NY,NX),NY,NX)
-  VOLNBT(NY,NX)=VOLWNB(NU(NY,NX),NY,NX)+VOLPMB(NU(NY,NX),NY,NX)
-  VOLHGT(NY,NX)=VOLWHG(NU(NY,NX),NY,NX)+VOLPM(M,NU(NY,NX),NY,NX)
+  VOLCOT(NY,NX)=VWatMicPCO(NU(NY,NX),NY,NX)+VsoiPM(M,NU(NY,NX),NY,NX)
+  VOLCHT(NY,NX)=VWatMicPCH(NU(NY,NX),NY,NX)+VsoiPM(M,NU(NY,NX),NY,NX)
+  VOLOXT(NY,NX)=VWatMicPOX(NU(NY,NX),NY,NX)+VsoiPM(M,NU(NY,NX),NY,NX)
+  VOLNGT(NY,NX)=VWatMicPNG(NU(NY,NX),NY,NX)+VsoiPM(M,NU(NY,NX),NY,NX)
+  VOLN2T(NY,NX)=VWatMicPN2(NU(NY,NX),NY,NX)+VsoiPM(M,NU(NY,NX),NY,NX)
+  VOLN3T(NY,NX)=VWatMicPN3(NU(NY,NX),NY,NX)+VsoiPMA(NU(NY,NX),NY,NX)
+  VOLNBT(NY,NX)=VWatMicPNB(NU(NY,NX),NY,NX)+VsoiPMB(NU(NY,NX),NY,NX)
+  VOLHGT(NY,NX)=VWatMicPHG(NU(NY,NX),NY,NX)+VsoiPM(M,NU(NY,NX),NY,NX)
 
   RGasDSFlx(idg_CO2,NU(NY,NX),NY,NX)=DFGS(M,NU(NY,NX),NY,NX) &
     *(AMAX1(ZEROS(NY,NX),trc_gasml2(idg_CO2,NU(NY,NX),NY,NX)) &
-    *VOLWCO(NU(NY,NX),NY,NX)-AMAX1(ZEROS(NY,NX) &
+    *VWatMicPCO(NU(NY,NX),NY,NX)-AMAX1(ZEROS(NY,NX) &
     ,trc_solml2(idg_CO2,NU(NY,NX),NY,NX)+RDXS_gas(idg_CO2)) &
-    *VOLPM(M,NU(NY,NX),NY,NX))/VOLCOT(NY,NX)
+    *VsoiPM(M,NU(NY,NX),NY,NX))/VOLCOT(NY,NX)
   RGasDSFlx(idg_CH4,NU(NY,NX),NY,NX)=DFGS(M,NU(NY,NX),NY,NX) &
     *(AMAX1(ZEROS(NY,NX),trc_gasml2(idg_CH4,NU(NY,NX),NY,NX)) &
-    *VOLWCH(NU(NY,NX),NY,NX)-AMAX1(ZEROS(NY,NX) &
+    *VWatMicPCH(NU(NY,NX),NY,NX)-AMAX1(ZEROS(NY,NX) &
     ,trc_solml2(idg_CH4,NU(NY,NX),NY,NX)+RDXS_gas(idg_CH4)) &
-    *VOLPM(M,NU(NY,NX),NY,NX))/VOLCHT(NY,NX)
+    *VsoiPM(M,NU(NY,NX),NY,NX))/VOLCHT(NY,NX)
   RGasDSFlx(idg_O2,NU(NY,NX),NY,NX)=DFGS(M,NU(NY,NX),NY,NX) &
     *(AMAX1(ZEROS(NY,NX),trc_gasml2(idg_O2,NU(NY,NX),NY,NX)) &
-    *VOLWOX(NU(NY,NX),NY,NX)-AMAX1(ZEROS(NY,NX) &
+    *VWatMicPOX(NU(NY,NX),NY,NX)-AMAX1(ZEROS(NY,NX) &
     ,trc_solml2(idg_O2,NU(NY,NX),NY,NX)+RDXS_gas(idg_O2)) &
-    *VOLPM(M,NU(NY,NX),NY,NX))/VOLOXT(NY,NX)
+    *VsoiPM(M,NU(NY,NX),NY,NX))/VOLOXT(NY,NX)
   RGasDSFlx(idg_N2,NU(NY,NX),NY,NX)=DFGS(M,NU(NY,NX),NY,NX) &
     *(AMAX1(ZEROS(NY,NX),trc_gasml2(idg_N2,NU(NY,NX),NY,NX)) &
-    *VOLWNG(NU(NY,NX),NY,NX)-AMAX1(ZEROS(NY,NX) &
+    *VWatMicPNG(NU(NY,NX),NY,NX)-AMAX1(ZEROS(NY,NX) &
     ,trc_solml2(idg_N2,NU(NY,NX),NY,NX)+RDXS_gas(idg_N2)) &
-  *VOLPM(M,NU(NY,NX),NY,NX))/VOLNGT(NY,NX)
+  *VsoiPM(M,NU(NY,NX),NY,NX))/VOLNGT(NY,NX)
   RGasDSFlx(idg_N2O,NU(NY,NX),NY,NX)=DFGS(M,NU(NY,NX),NY,NX) &
     *(AMAX1(ZEROS(NY,NX),trc_gasml2(idg_N2O,NU(NY,NX),NY,NX)) &
-    *VOLWN2(NU(NY,NX),NY,NX)-AMAX1(ZEROS(NY,NX) &
+    *VWatMicPN2(NU(NY,NX),NY,NX)-AMAX1(ZEROS(NY,NX) &
     ,trc_solml2(idg_N2O,NU(NY,NX),NY,NX)+RDXS_gas(idg_N2O)) &
-    *VOLPM(M,NU(NY,NX),NY,NX))/VOLN2T(NY,NX)
+    *VsoiPM(M,NU(NY,NX),NY,NX))/VOLN2T(NY,NX)
   RGasDSFlx(idg_H2,NU(NY,NX),NY,NX)=DFGS(M,NU(NY,NX),NY,NX) &
     *(AMAX1(ZEROS(NY,NX),trc_gasml2(idg_H2,NU(NY,NX),NY,NX)) &
-    *VOLWHG(NU(NY,NX),NY,NX)-AMAX1(ZEROS(NY,NX) &
+    *VWatMicPHG(NU(NY,NX),NY,NX)-AMAX1(ZEROS(NY,NX) &
     ,trc_solml2(idg_H2,NU(NY,NX),NY,NX)+RDXS_gas(idg_H2)) &
-    *VOLPM(M,NU(NY,NX),NY,NX))/VOLHGT(NY,NX)
+    *VsoiPM(M,NU(NY,NX),NY,NX))/VOLHGT(NY,NX)
 
-  IF(VOLN3T(NY,NX).GT.ZEROS2(NY,NX).AND.VOLWXA(NU(NY,NX),NY,NX).GT.ZEROS2(NY,NX))THEN
+  IF(VOLN3T(NY,NX).GT.ZEROS2(NY,NX).AND.VWatMicPXA(NU(NY,NX),NY,NX).GT.ZEROS2(NY,NX))THEN
     RGasDSFlx(idg_NH3,NU(NY,NX),NY,NX)=DFGS(M,NU(NY,NX),NY,NX) &
       *(AMAX1(ZEROS(NY,NX),trc_gasml2(idg_NH3,NU(NY,NX),NY,NX)) &
-      *VOLWN3(NU(NY,NX),NY,NX)-AMAX1(ZEROS(NY,NX) &
+      *VWatMicPN3(NU(NY,NX),NY,NX)-AMAX1(ZEROS(NY,NX) &
       ,trc_solml2(idg_NH3,NU(NY,NX),NY,NX)+RDXS_gas(idg_NH3)) &
-      *VOLPMA(NU(NY,NX),NY,NX))/VOLN3T(NY,NX)
+      *VsoiPMA(NU(NY,NX),NY,NX))/VOLN3T(NY,NX)
   ELSE
     RGasDSFlx(idg_NH3,NU(NY,NX),NY,NX)=0.0_r8
   ENDIF
-  IF(VOLNBT(NY,NX).GT.ZEROS2(NY,NX).AND.VOLWXB(NU(NY,NX),NY,NX).GT.ZEROS2(NY,NX))THEN
+  IF(VOLNBT(NY,NX).GT.ZEROS2(NY,NX).AND.VWatMicPXB(NU(NY,NX),NY,NX).GT.ZEROS2(NY,NX))THEN
     RGasDSFlx(idg_NH3B,NU(NY,NX),NY,NX)=DFGS(M,NU(NY,NX),NY,NX) &
       *(AMAX1(ZEROS(NY,NX),trc_gasml2(idg_NH3,NU(NY,NX),NY,NX)) &
-      *VOLWNB(NU(NY,NX),NY,NX)-AMAX1(ZEROS(NY,NX) &
+      *VWatMicPNB(NU(NY,NX),NY,NX)-AMAX1(ZEROS(NY,NX) &
       ,trc_solml2(idg_NH3B,NU(NY,NX),NY,NX)+RDXS_gas(idg_NH3B)) &
-      *VOLPMB(NU(NY,NX),NY,NX))/VOLNBT(NY,NX)
+      *VsoiPMB(NU(NY,NX),NY,NX))/VOLNBT(NY,NX)
     CNH3B0=AZMAX1((trc_solml2(idg_NH3B,NU(NY,NX),NY,NX) &
-      +RGasDSFlx(idg_NH3B,NU(NY,NX),NY,NX))/VOLWXB(NU(NY,NX),NY,NX))
-    CNH4B0=AZMAX1(trc_solml2(ids_NH4B,NU(NY,NX),NY,NX))/VOLWXB(NU(NY,NX),NY,NX)
+      +RGasDSFlx(idg_NH3B,NU(NY,NX),NY,NX))/VWatMicPXB(NU(NY,NX),NY,NX))
+    CNH4B0=AZMAX1(trc_solml2(ids_NH4B,NU(NY,NX),NY,NX))/VWatMicPXB(NU(NY,NX),NY,NX)
   ELSE
     RGasDSFlx(idg_NH3B,NU(NY,NX),NY,NX)=0.0_r8
   ENDIF

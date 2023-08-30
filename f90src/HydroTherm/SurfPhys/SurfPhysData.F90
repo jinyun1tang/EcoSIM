@@ -6,8 +6,8 @@ implicit none
   character(len=*), private, parameter :: mod_filename=__FILE__
 
   real(r8),allocatable ::  XVOLT(:,:)                         !
-  real(r8),allocatable ::  XVOLW(:,:)                         !
-  real(r8),allocatable ::  XVOLI(:,:)                         !
+  real(r8),allocatable ::  XVWatMicP(:,:)                         !
+  real(r8),allocatable ::  XViceMicP(:,:)                         !
   real(r8),allocatable ::  THRMR(:,:)                         !
   real(r8),allocatable ::  VOLA10(:,:)                        !
   real(r8),allocatable ::  THRYR(:,:)                         !
@@ -48,8 +48,8 @@ implicit none
   implicit none
 
   allocate(XVOLT(JY,JX));       XVOLT=0._r8
-  allocate(XVOLW(JY,JX));       XVOLW=0._r8
-  allocate(XVOLI(JY,JX));       XVOLI=0._r8
+  allocate(XVWatMicP(JY,JX));       XVWatMicP=0._r8
+  allocate(XViceMicP(JY,JX));       XViceMicP=0._r8
   allocate(THRMR(JY,JX));       THRMR=0._r8
   allocate(VOLA10(JY,JX));      VOLA10=0._r8
   allocate(THRYR(JY,JX));       THRYR=0._r8
@@ -88,8 +88,8 @@ implicit none
   implicit none
 
   call destroy(XVOLT)
-  call destroy(XVOLW)
-  call destroy(XVOLI)
+  call destroy(XVWatMicP)
+  call destroy(XViceMicP)
   call destroy(THRMR)
   call destroy(VOLA10)
   call destroy(THRYR)

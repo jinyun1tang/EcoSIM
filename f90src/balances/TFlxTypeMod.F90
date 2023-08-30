@@ -50,20 +50,20 @@ implicit none
   real(r8),allocatable ::  trcx_TER(:,:,:)                         !
   real(r8),allocatable ::  trcp_TER(:,:,:)                        !
   real(r8),allocatable ::  TSEDER(:,:)                        !
-  real(r8),allocatable ::  TFLW(:,:,:)                        !
+  real(r8),allocatable ::  TWatFlowCellMicP(:,:,:)                        !
   real(r8),allocatable ::  TFLWX(:,:,:)                       !
-  real(r8),allocatable ::  THFLW(:,:,:)                       !
-  real(r8),allocatable ::  TFLWH(:,:,:)                       !
+  real(r8),allocatable ::  THeatFlowSoiCell(:,:,:)                       !
+  real(r8),allocatable ::  TWaterFlowMacP(:,:,:)                       !
 
   real(r8),allocatable ::  RTGasADFlx(:,:,:,:)                      !
 
-  real(r8),allocatable ::  TTHAW(:,:,:)                       !
-  real(r8),allocatable ::  THTHAW(:,:,:)                      !
-  real(r8),allocatable ::  TTHAWH(:,:,:)                      !
-  real(r8),allocatable ::  VOLW1(:,:,:)                       !
-  real(r8),allocatable ::  VOLI1(:,:,:)                       !
-  real(r8),allocatable ::  VOLWH1(:,:,:)                      !
-  real(r8),allocatable ::  VOLIH1(:,:,:)                      !
+  real(r8),allocatable ::  WatFreezeThawMicP(:,:,:)                       !
+  real(r8),allocatable ::  THeatFrezThaw(:,:,:)                      !
+  real(r8),allocatable ::  WatFreezeThawMacP(:,:,:)                      !
+  real(r8),allocatable ::  VWatMicP1(:,:,:)                       !
+  real(r8),allocatable ::  ViceMicP1(:,:,:)                       !
+  real(r8),allocatable ::  VWatMacP1(:,:,:)                      !
+  real(r8),allocatable ::  ViceMacP1(:,:,:)                      !
 
   real(r8),allocatable :: TOMCER(:,:,:,:,:)
   real(r8),allocatable :: TOMNER(:,:,:,:,:)
@@ -153,17 +153,17 @@ implicit none
   allocate(trcs_TFLS(ids_beg:ids_end,JZ,JY,JX));   trcs_TFLS=0._r8
 
   allocate(TSEDER(JY,JX));      TSEDER=0._r8
-  allocate(TFLW(JZ,JY,JX));     TFLW=0._r8
+  allocate(TWatFlowCellMicP(JZ,JY,JX));     TWatFlowCellMicP=0._r8
   allocate(TFLWX(JZ,JY,JX));    TFLWX=0._r8
-  allocate(THFLW(JZ,JY,JX));    THFLW=0._r8
-  allocate(TFLWH(JZ,JY,JX));    TFLWH=0._r8
-  allocate(TTHAW(JZ,JY,JX));    TTHAW=0._r8
-  allocate(THTHAW(JZ,JY,JX));   THTHAW=0._r8
-  allocate(TTHAWH(JZ,JY,JX));   TTHAWH=0._r8
-  allocate(VOLW1(JZ,JY,JX));    VOLW1=0._r8
-  allocate(VOLI1(JZ,JY,JX));    VOLI1=0._r8
-  allocate(VOLWH1(JZ,JY,JX));   VOLWH1=0._r8
-  allocate(VOLIH1(JZ,JY,JX));   VOLIH1=0._r8
+  allocate(THeatFlowSoiCell(JZ,JY,JX));    THeatFlowSoiCell=0._r8
+  allocate(TWaterFlowMacP(JZ,JY,JX));    TWaterFlowMacP=0._r8
+  allocate(WatFreezeThawMicP(JZ,JY,JX));    WatFreezeThawMicP=0._r8
+  allocate(THeatFrezThaw(JZ,JY,JX));   THeatFrezThaw=0._r8
+  allocate(WatFreezeThawMacP(JZ,JY,JX));   WatFreezeThawMacP=0._r8
+  allocate(VWatMicP1(JZ,JY,JX));    VWatMicP1=0._r8
+  allocate(ViceMicP1(JZ,JY,JX));    ViceMicP1=0._r8
+  allocate(VWatMacP1(JZ,JY,JX));   VWatMacP1=0._r8
+  allocate(ViceMacP1(JZ,JY,JX));   ViceMacP1=0._r8
   allocate(TOMCER(nlbiomcp,NMICBSO,1:jcplx,JY,JX)); TOMCER=0._r8
   allocate(TOMNER(nlbiomcp,NMICBSO,1:jcplx,JY,JX)); TOMNER=0._r8
   allocate(TOMPER(nlbiomcp,NMICBSO,1:jcplx,JY,JX)); TOMPER=0._r8
@@ -271,17 +271,17 @@ implicit none
   call destroy(TNHUEB)
   call destroy(TNO3EB)
   call destroy(TSEDER)
-  call destroy(TFLW)
+  call destroy(TWatFlowCellMicP)
   call destroy(TFLWX)
-  call destroy(THFLW)
-  call destroy(TFLWH)
-  call destroy(TTHAW)
-  call destroy(THTHAW)
-  call destroy(TTHAWH)
-  call destroy(VOLW1)
-  call destroy(VOLI1)
-  call destroy(VOLWH1)
-  call destroy(VOLIH1)
+  call destroy(THeatFlowSoiCell)
+  call destroy(TWaterFlowMacP)
+  call destroy(WatFreezeThawMicP)
+  call destroy(THeatFrezThaw)
+  call destroy(WatFreezeThawMacP)
+  call destroy(VWatMicP1)
+  call destroy(ViceMicP1)
+  call destroy(VWatMacP1)
+  call destroy(ViceMacP1)
 
   call destroy(trcp_TER)
   call destroy(RTGasADFlx)

@@ -218,17 +218,17 @@ module UptakesMod
     ZERO   => plt_site%ZERO     , &
     NP     => plt_site%NP       , &
     NJ     => plt_site%NJ       , &
-    VOLWM  => plt_site%VOLWM    , &
+    VWatMicPM  => plt_site%VWatMicPM    , &
     ALT    => plt_site%ALT      , &
     NU     => plt_site%NU       , &
     NP0    => plt_site%NP0      , &
     TotalSoilH2OPSIMPa  => plt_ew%TotalSoilH2OPSIMPa      , &
     WTRTD  => plt_biom%WTRTD    , &
-    VOLA   => plt_soilchem%VOLA , &
-    VOLI   => plt_soilchem%VOLI , &
+    VMicP   => plt_soilchem%VMicP , &
+    ViceMicP   => plt_soilchem%ViceMicP , &
     THETY  => plt_soilchem%THETY, &
     BKDS   => plt_soilchem%BKDS , &
-    VOLW   => plt_soilchem%VOLW , &
+    VWatMicP   => plt_soilchem%VWatMicP , &
     VOLY   => plt_soilchem%VOLY , &
     ARSTP  => plt_morph%ARSTP   , &
     MY     => plt_morph%MY      , &
@@ -283,18 +283,18 @@ module UptakesMod
 !
 !     adjTotalSoilH2OPSIMPa=total soil water potential PSIST adjusted for surf elevn
 !     ALT=surface elevation
-!     VOLWU,VOLWM=water volume available for uptake,total water volume
-!     THETY,VOLX=hygroscopic SWC,soil volume
+!     VOLWU,VWatMicPM=water volume available for uptake,total water volume
+!     THETY,VSoilPoreMicP=hygroscopic SWC,soil volume
 !     VOLPU=air volume
 !     WTRTG=total biome root mass
 !
   D9000: DO L=NU,NJ
     adjTotalSoilH2OPSIMPa(L)=TotalSoilH2OPSIMPa(L)-mGravAcceleration*ALT
     IF(BKDS(L).GT.ZERO)THEN
-      VOLWU(L)=VOLWM(NPH,L)-THETY(L)*VOLY(L)
-      VOLPU(L)=AZMAX1(VOLA(L)-VOLW(L)-VOLI(L))
+      VOLWU(L)=VWatMicPM(NPH,L)-THETY(L)*VOLY(L)
+      VOLPU(L)=AZMAX1(VMicP(L)-VWatMicP(L)-ViceMicP(L))
     ELSE
-      VOLWU(L)=VOLWM(NPH,L)
+      VOLWU(L)=VWatMicPM(NPH,L)
       VOLPU(L)=0.0_r8
     ENDIF
     WTRTG(L)=0.0_r8
@@ -947,16 +947,16 @@ module UptakesMod
   associate(                          &
     DPTHZ  => plt_site%DPTHZ    , &
     pftPlantPopulation     => plt_site%pftPlantPopulation       , &
-    VOLWM  => plt_site%VOLWM    , &
+    VWatMicPM  => plt_site%VWatMicPM    , &
     ZERO   => plt_site%ZERO     , &
     ZEROS2 => plt_site%ZEROS2   , &
     NU     => plt_site%NU       , &
     PSILT  => plt_ew%PSILT      , &
     ZEROP  => plt_biom%ZEROP    , &
     THETW  => plt_soilchem%THETW, &
-    VOLA   => plt_soilchem%VOLA , &
+    VMicP   => plt_soilchem%VMicP , &
     CNDU   => plt_soilchem%CNDU , &
-    VOLX   => plt_soilchem%VOLX , &
+    VSoilPoreMicP   => plt_soilchem%VSoilPoreMicP , &
     RTNL   => plt_morph%RTNL    , &
     RTN1   => plt_morph%RTN1    , &
     RRAD2M => plt_morph%RRAD2M  , &
@@ -989,7 +989,7 @@ module UptakesMod
 !
   !     SOIL AND ROOT HYDRAULIC RESISTANCES TO ROOT WATER UPTAKE
   !
-  !      VOLX,VOLWM,THETW=soil,water volume,content
+  !      VSoilPoreMicP,VWatMicPM,THETW=soil,water volume,content
   !     RTDNP,RTLGP=root length density,root length per plant
   !     CNDU=soil hydraulic conductivity for root uptake
   !     RTN1,RTNL=number of root,myco primary,secondary axes
@@ -998,8 +998,8 @@ module UptakesMod
 !
   DO 3880 N=1,MY(NZ)
     DO  L=NU,NI(NZ)
-      IF(VOLX(L).GT.ZEROS2 &
-        .AND.VOLWM(NPH,L).GT.ZEROS2 &
+      IF(VSoilPoreMicP(L).GT.ZEROS2 &
+        .AND.VWatMicPM(NPH,L).GT.ZEROS2 &
         .AND.RTDNP(N,L,NZ).GT.ZERO &
         .AND.CNDU(L).GT.ZERO &
         .AND.RTN1(ipltroot,L,NZ).GT.ZEROP(NZ) &
@@ -1025,10 +1025,10 @@ module UptakesMod
         !     RTLGP=root length per plant
         !     RSRG=radial resistance
         !     RSRR=radial resistivity from PFT file
-        !     VOLA,VOLWM=soil micropore,water volume
+        !     VMicP,VWatMicPM=soil micropore,water volume
         !
         RTAR2=PICON2s*RRAD2(N,L,NZ)*RTLGP(N,L,NZ)*pftPlantPopulation(NZ)
-        RSRG(N,L)=RSRR(N,NZ)/RTAR2*VOLA(L)/VOLWM(NPH,L)
+        RSRG(N,L)=RSRR(N,NZ)/RTAR2*VMicP(L)/VWatMicPM(NPH,L)
 !
         !     ROOT AXIAL RESISTANCE FROM RADII AND LENGTHS OF PRIMARY AND
         !     SECONDARY ROOTS AND FROM AXIAL RESISTIVITY ENTERED IN 'READQ'

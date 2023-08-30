@@ -31,7 +31,7 @@ module ErosionMod
   real(r8), allocatable :: TERSED(:,:)
   real(r8), allocatable :: RDTSED(:,:)
   real(r8), allocatable :: FVOLIM(:,:)
-  real(r8), allocatable :: FVOLWM(:,:)
+  real(r8), allocatable :: FVWatMicPM(:,:)
   real(r8), allocatable :: FERSNM(:,:)
   real(r8), allocatable :: RERSED0(:,:)
 
@@ -48,7 +48,7 @@ module ErosionMod
   allocate(TERSED(JY,JX))
   allocate(RDTSED(JY,JX))
   allocate(FVOLIM(JY,JX))
-  allocate(FVOLWM(JY,JX))
+  allocate(FVWatMicPM(JY,JX))
   allocate(FERSNM(JY,JX))
   allocate(RERSED0(JY,JX))
 
@@ -103,20 +103,20 @@ module ErosionMod
       
         TERSED(NY,NX)=0._r8
         RDTSED(NY,NX)=0._r8
-        FVOLIM(NY,NX)=AMIN1(1.0_r8,AZMAX1(XVOLIM(M,NY,NX)/VOLWG(NY,NX)))
-        FVOLWM(NY,NX)=AMIN1(1.0_r8,AZMAX1(XVOLWM(M,NY,NX)/VOLWG(NY,NX)))
-        FERSNM(NY,NX)=(1.0_r8-FVOLIM(NY,NX))*FVOLWM(NY,NX)
+        FVOLIM(NY,NX)=AMIN1(1.0_r8,AZMAX1(XViceMicPM(M,NY,NX)/VOLWG(NY,NX)))
+        FVWatMicPM(NY,NX)=AMIN1(1.0_r8,AZMAX1(XVWatMicPM(M,NY,NX)/VOLWG(NY,NX)))
+        FERSNM(NY,NX)=(1.0_r8-FVOLIM(NY,NX))*FVWatMicPM(NY,NX)
 !
 !     DETACHMENT BY RAINFALL WHEN SURFACE WATER IS PRESENT
 !
         IF(BKDS(NU(NY,NX),NY,NX).GT.ZERO.AND.ENGYPM(M,NY,NX).GT.0.0_r8 &
-          .AND.XVOLWM(M,NY,NX).GT.ZEROS(NY,NX))THEN
+          .AND.XVWatMicPM(M,NY,NX).GT.ZEROS(NY,NX))THEN
 !
 !     DETACHMENT OF SEDIMENT FROM SURFACE SOIL DEPENDS ON RAINFALL
 !     KINETIC ENERGY AND FROM DETACHMENT COEFFICIENT IN 'HOUR1'
 !     ATTENUATED BY DEPTH OF SURFACE WATER
 !
-          DETW=DETS(NY,NX)*(1.0+2.0*VOLWM(M,NU(NY,NX),NY,NX)/VOLA(NU(NY,NX),NY,NX))
+          DETW=DETS(NY,NX)*(1.0+2.0*VWatMicPM(M,NU(NY,NX),NY,NX)/VMicP(NU(NY,NX),NY,NX))
           DETR=AMIN1(BKVL(NU(NY,NX),NY,NX)*XNPX &
             ,DETW*ENGYPM(M,NY,NX)*AREA(3,NU(NY,NX),NY,NX) &
             *FMPR(NU(NY,NX),NY,NX)*FSNX(NY,NX)*(1.0-FVOLIM(NY,NX)))
@@ -129,7 +129,7 @@ module ErosionMod
         IF(BKDS(NU(NY,NX),NY,NX).GT.ZERO.AND.SEDX.GT.ZEROS(NY,NX) &
           .AND.XVOLTM(M,NY,NX).LE.VOLWG(NY,NX) &
           .AND.FERSNM(NY,NX).GT.ZERO)THEN
-          CSEDD=AZMAX1(SEDX/XVOLWM(M,NY,NX))
+          CSEDD=AZMAX1(SEDX/XVWatMicPM(M,NY,NX))
           DEPI=AMAX1(-SEDX,VLS(NY,NX)*(0.0-CSEDD)*AREA(3,NU(NY,NX),NY,NX) &
             *FERSNM(NY,NX)*FMPR(NU(NY,NX),NY,NX)*XNPH)
           RDTSED(NY,NX)=RDTSED(NY,NX)+DEPI
@@ -147,7 +147,7 @@ module ErosionMod
           .AND.FERSNM(NY,NX).GT.ZERO)THEN
           STPR=1.0E+02*QRV(M,NY,NX)*ABS(SLOPE(0,NY,NX))
           CSEDX=PTDSNU(NY,NX)*CER(NY,NX)*AZMAX1(STPR-0.4)**XER(NY,NX)
-          CSEDD=AZMAX1(SEDX/XVOLWM(M,NY,NX))
+          CSEDD=AZMAX1(SEDX/XVWatMicPM(M,NY,NX))
           IF(CSEDX.GT.CSEDD)THEN
             DETI=AMIN1(BKVL(NU(NY,NX),NY,NX)*XNPX &
               ,DETE(NY,NX)*(CSEDX-CSEDD)*AREA(3,NU(NY,NX),NY,NX) &
@@ -186,9 +186,9 @@ module ErosionMod
   IF(QRM(M,N2,N1).LE.0.0.OR.BKDS(NU(N2,N1),N2,N1).LE.ZERO)THEN
     RERSED0(N2,N1)=0._r8
   ELSE
-    IF(XVOLWM(M,N2,N1).GT.ZEROS2(N2,N1))THEN
+    IF(XVWatMicPM(M,N2,N1).GT.ZEROS2(N2,N1))THEN
       SEDX=SED(N2,N1)+RDTSED(N2,N1)
-      CSEDE=AZMAX1(SEDX/XVOLWM(M,N2,N1))
+      CSEDE=AZMAX1(SEDX/XVWatMicPM(M,N2,N1))
        RERSED0(N2,N1)=AMIN1(SEDX,CSEDE*QRM(M,N2,N1)*(1.0-FVOLIM(N2,N1)))
     ELSE
       RERSED0(N2,N1)=0._r8
@@ -272,9 +272,9 @@ module ErosionMod
         IF(QRM(M,N2,N1).LE.0.0.OR.BKDS(NU(N2,N1),N2,N1).LE.ZERO)THEN
           RERSED0(N2,N1)=0._r8
         ELSE
-          IF(XVOLWM(M,N2,N1).GT.ZEROS2(N2,N1))THEN
+          IF(XVWatMicPM(M,N2,N1).GT.ZEROS2(N2,N1))THEN
             SEDX=SED(NY,NX)+RDTSED(NY,NX)
-            CSEDE=AZMAX1(SEDX/XVOLWM(M,N2,N1))
+            CSEDE=AZMAX1(SEDX/XVWatMicPM(M,N2,N1))
             RERSED0(N2,N1)=AMIN1(SEDX,CSEDE*QRM(M,N2,N1))
           ELSE
             RERSED0(N2,N1)=0._r8
@@ -1008,7 +1008,7 @@ module ErosionMod
   call destroy(TERSED)
   call destroy(RDTSED)
   call destroy(FVOLIM)
-  call destroy(FVOLWM)
+  call destroy(FVWatMicPM)
   call destroy(FERSNM)
   call destroy(RERSED0)
 

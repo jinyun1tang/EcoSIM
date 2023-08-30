@@ -385,7 +385,7 @@ module TrnsfrMod
 !
   D9685: DO L=NU(NY,NX),NL(NY,NX)
     IF(M.NE.MX)THEN
-      IF(VOLX(L,NY,NX).GT.ZEROS2(NY,NX))THEN
+      IF(VSoilPoreMicP(L,NY,NX).GT.ZEROS2(NY,NX))THEN
 
         DO NTS=ids_beg,ids_end
           trc_solml2(NTS,L,NY,NX)=trc_solml2(NTS,L,NY,NX)+RFLZ_sol(NTS,L,NY,NX)
@@ -429,7 +429,7 @@ module TrnsfrMod
 !     gas code:*CO2*=CO2,*OXY*=O2,*CH4*=CH4,*Z2G*=N2,*Z2O*=N2O
 !             :*ZN3*=NH3,*H2G*=H2
 !
-    IF(VOLX(L,NY,NX).GT.ZEROS2(NY,NX))THEN
+    IF(VSoilPoreMicP(L,NY,NX).GT.ZEROS2(NY,NX))THEN
       DO NTG=idg_beg,idg_end
         trc_solml2(NTG,L,NY,NX)=trc_solml2(NTG,L,NY,NX)+RGasDSFlx(NTG,L,NY,NX)
       ENDDO

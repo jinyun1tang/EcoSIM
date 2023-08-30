@@ -22,10 +22,10 @@ module SurfSoilDataType
   real(r8),target,allocatable ::  PARG(:,:,:)                        !soil surface boundary layer conductance, [m t-1]
   real(r8),target,allocatable ::  FLQGQ(:,:)                         !precipitation flux into soil surface , [m3 d-2 h-1]
   real(r8),target,allocatable ::  FLQGI(:,:)                         !irrifation flux into soil surface , [m3 d-2 h-1]
-  real(r8),target,allocatable ::  FLWNU(:,:)                         !lake surface water flux
+  real(r8),target,allocatable ::  LakeSurfFlow(:,:)                         !lake surface water flux
   real(r8),target,allocatable ::  FLWXNU(:,:)                        !lake surface water flux
   real(r8),target,allocatable ::  FLWHNU(:,:)                        !lake surface water flux
-  real(r8),target,allocatable ::  HFLWNU(:,:)                        !lake surface heat flux
+  real(r8),target,allocatable ::  LakeSurfHeatFlux(:,:)              !lake surface heat flux, outgoing positive
 !----------------------------------------------------------------------
 
 contains
@@ -48,10 +48,10 @@ contains
   allocate(PARG(60,JY,JX));     PARG=0._r8
   allocate(FLQGQ(JY,JX));       FLQGQ=0._r8
   allocate(FLQGI(JY,JX));       FLQGI=0._r8
-  allocate(FLWNU(JY,JX));       FLWNU=0._r8
+  allocate(LakeSurfFlow(JY,JX));       LakeSurfFlow=0._r8
   allocate(FLWXNU(JY,JX));      FLWXNU=0._r8
   allocate(FLWHNU(JY,JX));      FLWHNU=0._r8
-  allocate(HFLWNU(JY,JX));      HFLWNU=0._r8
+  allocate(LakeSurfHeatFlux(JY,JX));      LakeSurfHeatFlux=0._r8
   end subroutine InitSurfSoilData
 
 !----------------------------------------------------------------------
@@ -74,10 +74,10 @@ contains
   call destroy(PARG)
   call destroy(FLQGQ)
   call destroy(FLQGI)
-  call destroy(FLWNU)
+  call destroy(LakeSurfFlow)
   call destroy(FLWXNU)
   call destroy(FLWHNU)
-  call destroy(HFLWNU)
+  call destroy(LakeSurfHeatFlux)
   end subroutine DestructSurfSoilData
 
 end module SurfSoilDataType

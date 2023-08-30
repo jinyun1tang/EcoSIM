@@ -17,21 +17,21 @@ implicit none
   real(r8),allocatable ::  FINHL(:,:,:)                       !
 
   real(r8),allocatable ::  TFLWL(:,:,:)                       !
-  real(r8),allocatable ::  TFLWHL(:,:,:)                      !
-  real(r8),allocatable ::  THFLWL(:,:,:)                      !
+  real(r8),allocatable ::  TConvectWaterFlowMacP(:,:,:)                      !
+  real(r8),allocatable ::  THeatFlowi(:,:,:)                      !
   real(r8),allocatable ::  WFLXL(:,:,:)                       !
   real(r8),allocatable ::  TFLXL(:,:,:)                       !
   real(r8),allocatable ::  AVCNHL(:,:,:,:)                    !
 
-  real(r8),allocatable ::  TFLWLX(:,:,:)                      !
+  real(r8),allocatable ::  TWatXChange2WatTableX(:,:,:)                      !
   real(r8),allocatable ::  FLU1(:,:,:)                        !
-  real(r8),allocatable ::  HWFLU1(:,:,:)                      !
+  real(r8),allocatable ::  HeatIrrigation1(:,:,:)                      !
 
   real(r8),allocatable ::  WFLXLH(:,:,:)                      !
 
   real(r8),allocatable ::  CNDH1(:,:,:)                       !
-  real(r8),allocatable ::  VOLA1(:,:,:)                       !
-  real(r8),allocatable ::  VOLAH1(:,:,:)                      !
+  real(r8),allocatable ::  VMicP1(:,:,:)                       !
+  real(r8),allocatable ::  VAirMacP1(:,:,:)                      !
 
   real(r8),allocatable ::  FLWNX(:,:)                         !
   real(r8),allocatable ::  FLWXNX(:,:)                        !
@@ -65,22 +65,22 @@ contains
   allocate(FINHL(JZ,JY,JX));    FINHL=0._r8
 
   allocate(TFLWL(JZ,JY,JX));    TFLWL=0._r8
-  allocate(TFLWHL(JZ,JY,JX));   TFLWHL=0._r8
-  allocate(THFLWL(JZ,JY,JX));   THFLWL=0._r8
+  allocate(TConvectWaterFlowMacP(JZ,JY,JX));   TConvectWaterFlowMacP=0._r8
+  allocate(THeatFlowi(JZ,JY,JX));   THeatFlowi=0._r8
   allocate(WFLXL(JZ,JY,JX));    WFLXL=0._r8
   allocate(TFLXL(JZ,JY,JX));    TFLXL=0._r8
   allocate(AVCNHL(3,JD,JV,JH)); AVCNHL=0._r8
 
-  allocate(TFLWLX(JZ,JY,JX));   TFLWLX=0._r8
+  allocate(TWatXChange2WatTableX(JZ,JY,JX));   TWatXChange2WatTableX=0._r8
   allocate(FLU1(JZ,JY,JX));     FLU1=0._r8
-  allocate(HWFLU1(JZ,JY,JX));   HWFLU1=0._r8
+  allocate(HeatIrrigation1(JZ,JY,JX));   HeatIrrigation1=0._r8
 
   allocate(WFLXLH(JZ,JY,JX));   WFLXLH=0._r8
 
   allocate(CNDH1(JZ,JY,JX));    CNDH1=0._r8
-  allocate(VOLA1(0:JZ,JY,JX));  VOLA1=0._r8
+  allocate(VMicP1(0:JZ,JY,JX));  VMicP1=0._r8
 
-  allocate(VOLAH1(JZ,JY,JX));   VOLAH1=0._r8
+  allocate(VAirMacP1(JZ,JY,JX));   VAirMacP1=0._r8
 
 
   allocate(FLWNX(JY,JX));       FLWNX=0._r8
@@ -111,22 +111,22 @@ contains
   call destroy(FINHL)
 
   call destroy(TFLWL)
-  call destroy(TFLWHL)
-  call destroy(THFLWL)
+  call destroy(TConvectWaterFlowMacP)
+  call destroy(THeatFlowi)
   call destroy(WFLXL)
   call destroy(TFLXL)
   call destroy(AVCNHL)
 
-  call destroy(TFLWLX)
+  call destroy(TWatXChange2WatTableX)
   call destroy(FLU1)
-  call destroy(HWFLU1)
+  call destroy(HeatIrrigation1)
 
   call destroy(WFLXLH)
 
   call destroy(CNDH1)
-  call destroy(VOLA1)
+  call destroy(VMicP1)
 
-  call destroy(VOLAH1)
+  call destroy(VAirMacP1)
 
   call destroy(FLWNX)
   call destroy(FLWXNX)

@@ -131,7 +131,7 @@ implicit none
     trcg_rootml     =>   plt_rbgc%trcg_rootml       , &
     trcs_rootml  => plt_rbgc%trcs_rootml, &
     RSCS     =>   plt_soilchem%RSCS   , &
-    VOLX     =>   plt_soilchem%VOLX   , &
+    VSoilPoreMicP     =>   plt_soilchem%VSoilPoreMicP   , &
     NU       =>   plt_site%NU         , &
     ZERO     =>   plt_site%ZERO       , &
     pftPlantPopulation       =>   plt_site%pftPlantPopulation         , &
@@ -175,11 +175,11 @@ implicit none
 !
 !     IDENTIFY NEXT LOWER ROOT LAYER
 !
-!     VOLX=soil layer volume excluding macropore, rocks
+!     VSoilPoreMicP=soil layer volume excluding macropore, rocks
 !
-      IF(VOLX(L).GT.ZEROS2)THEN
+      IF(VSoilPoreMicP(L).GT.ZEROS2)THEN
         D5003: DO LZ=L+1,NL
-          IF(VOLX(LZ).GT.ZEROS2.OR.LZ.EQ.NL)THEN
+          IF(VSoilPoreMicP(LZ).GT.ZEROS2.OR.LZ.EQ.NL)THEN
             L1=LZ
             EXIT
           ENDIF
@@ -1355,7 +1355,7 @@ implicit none
     DLYR3    =>  plt_site%DLYR3    , &
     trcg_rootml     =>  plt_rbgc%trcg_rootml , &
     trcs_rootml => plt_rbgc%trcs_rootml, &
-    VOLX     =>  plt_soilchem%VOLX , &
+    VSoilPoreMicP     =>  plt_soilchem%VSoilPoreMicP , &
     RTN1     =>  plt_morph%RTN1    , &
     RTNL     =>  plt_morph%RTNL    , &
     RTLG1    =>  plt_morph%RTLG1   , &
@@ -1373,7 +1373,7 @@ implicit none
 !     IN THE CURRENT SOIL LAYER HAVE BEEN LOST
 !
 !     NINR=deepest root layer
-!     VOLX=soil layer volume excluding macropore, rocks
+!     VSoilPoreMicP=soil layer volume excluding macropore, rocks
 !     RTDP1X=primary root depth from soil surface
 !     CDPTHZ=depth from soil surface to layer bottom
 !     SDPTH=seeding depth
@@ -1386,7 +1386,7 @@ implicit none
 !     CPOOLR,ZPOOLR,PPOOLR=non-structural C,N,P mass in root
 
   D5115: DO LL=L,NG(NZ)+1,-1
-    IF(VOLX(LL-1).GT.ZEROS2.AND.(RTDP1X.LT.CDPTHZ(LL-1).OR.RTDP1X.LT.SDPTH(NZ)))THEN
+    IF(VSoilPoreMicP(LL-1).GT.ZEROS2.AND.(RTDP1X.LT.CDPTHZ(LL-1).OR.RTDP1X.LT.SDPTH(NZ)))THEN
       IF(RLNT(N,LL).GT.ZEROP(NZ))THEN
         FRTN=(RTSK1(N,LL,NR)+RTSK2(N,LL,NR))/RLNT(N,LL)
       ELSE
@@ -1867,7 +1867,7 @@ implicit none
     EPOOLR     =>   plt_biom%EPOOLR    , &
     ZEROP      =>   plt_biom%ZEROP     , &
     IGTYP      =>   plt_pheno%IGTYP    , &
-    VOLX       =>   plt_soilchem%VOLX  , &
+    VSoilPoreMicP       =>   plt_soilchem%VSoilPoreMicP  , &
     ZEROS2     =>   plt_site%ZEROS2    , &
     NU         =>   plt_site%NU        , &
     CDPTHZ     =>   plt_site%CDPTHZ    , &
@@ -1926,7 +1926,7 @@ implicit none
 !     RESPIRATION FROM NUTRIENT UPTAKE CALCULATED IN 'UPTAKE':
 !     ACTUAL, O2-UNLIMITED AND C-UNLIMITED
 !
-!     VOLX=soil layer volume excluding macropore, rocks
+!     VSoilPoreMicP=soil layer volume excluding macropore, rocks
 !     CUPRL=C respiration for nutrient uptake
 !     CUPRO,CUPRC=CUPRL unlimited by O2,root nonstructural C
 !     RUPNH4,RUPNHB,RUPN03,RUPNOB=uptake from non-band,band of NH4,NO3
@@ -1936,7 +1936,7 @@ implicit none
 !     RUCNH4,RUCNHB,RUCN03,RUCNOB=uptake from non-band,band of NH4,NO3 unlimited by nonstructural C
 !     RUCH2P,RUCH2B,RUCH1P,RUCH1B=uptake from non-band,band of H2PO4,HPO4 unlimited by nonstructural C
 !
-      IF(VOLX(L).GT.ZEROS2)THEN
+      IF(VSoilPoreMicP(L).GT.ZEROS2)THEN
         CUPRL=0.86_r8*(RUPNH4(N,L,NZ)+RUPNHB(N,L,NZ) &
           +RUPNO3(N,L,NZ)+RUPNOB(N,L,NZ)+RUPH2P(N,L,NZ) &
           +RUPH2B(N,L,NZ)+RUPH1P(N,L,NZ)+RUPH1B(N,L,NZ))

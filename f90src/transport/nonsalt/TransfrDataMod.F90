@@ -130,14 +130,14 @@ implicit none
   real(r8), allocatable ::  DZ2GG(:,:,:,:)                     !
   real(r8), allocatable ::  DZ2OG(:,:,:,:)                     !
   real(r8), allocatable ::  DNH3G(:,:,:,:)                     !
-  real(r8), allocatable ::  VOLWCO(:,:,:)                      !
-  real(r8), allocatable ::  VOLWCH(:,:,:)                      !
-  real(r8), allocatable ::  VOLWOX(:,:,:)                      !
-  real(r8), allocatable ::  VOLWNG(:,:,:)                      !
-  real(r8), allocatable ::  VOLWN2(:,:,:)                      !
-  real(r8), allocatable ::  VOLWN3(:,:,:)                      !
-  real(r8), allocatable ::  VOLWNB(:,:,:)                      !
-  real(r8), allocatable ::  VOLWHG(:,:,:)                      !
+  real(r8), allocatable ::  VWatMicPCO(:,:,:)                      !
+  real(r8), allocatable ::  VWatMicPCH(:,:,:)                      !
+  real(r8), allocatable ::  VWatMicPOX(:,:,:)                      !
+  real(r8), allocatable ::  VWatMicPNG(:,:,:)                      !
+  real(r8), allocatable ::  VWatMicPN2(:,:,:)                      !
+  real(r8), allocatable ::  VWatMicPN3(:,:,:)                      !
+  real(r8), allocatable ::  VWatMicPNB(:,:,:)                      !
+  real(r8), allocatable ::  VWatMicPHG(:,:,:)                      !
   real(r8), allocatable ::  HGSGL2(:,:,:)                      !
   real(r8), allocatable ::  DH2GG(:,:,:,:)                     !
   real(r8), allocatable ::  RHGFXS(:,:,:)                      !
@@ -145,12 +145,12 @@ implicit none
   real(r8), allocatable ::  FLVM(:,:,:)                        !
   real(r8), allocatable ::  THETH2(:,:,:)                      !
   real(r8), allocatable ::  THETHL(:,:,:)                      !
-  real(r8), allocatable ::  VOLPMA(:,:,:)                      !
-  real(r8), allocatable ::  VOLPMB(:,:,:)                      !
-  real(r8), allocatable ::  VOLWMA(:,:,:)                      !
-  real(r8), allocatable ::  VOLWMB(:,:,:)                      !
-  real(r8), allocatable ::  VOLWXA(:,:,:)                      !
-  real(r8), allocatable ::  VOLWXB(:,:,:)                      !
+  real(r8), allocatable ::  VsoiPMA(:,:,:)                      !
+  real(r8), allocatable ::  VsoiPMB(:,:,:)                      !
+  real(r8), allocatable ::  VWatMicPMA(:,:,:)                      !
+  real(r8), allocatable ::  VWatMicPMB(:,:,:)                      !
+  real(r8), allocatable ::  VWatMicPXA(:,:,:)                      !
+  real(r8), allocatable ::  VWatMicPXB(:,:,:)                      !
   real(r8), allocatable ::  PARG_cef(:,:,:)                        !
 
   real(r8), allocatable ::  RCOSK2(:,:,:)                      !
@@ -405,14 +405,14 @@ contains
   allocate(DZ2GG(3,JZ,JY,JX));  DZ2GG=0._r8
   allocate(DZ2OG(3,JZ,JY,JX));  DZ2OG=0._r8
   allocate(DNH3G(3,JZ,JY,JX));  DNH3G=0._r8
-  allocate(VOLWCO(0:JZ,JY,JX)); VOLWCO=0._r8
-  allocate(VOLWCH(0:JZ,JY,JX)); VOLWCH=0._r8
-  allocate(VOLWOX(0:JZ,JY,JX)); VOLWOX=0._r8
-  allocate(VOLWNG(0:JZ,JY,JX)); VOLWNG=0._r8
-  allocate(VOLWN2(0:JZ,JY,JX)); VOLWN2=0._r8
-  allocate(VOLWN3(0:JZ,JY,JX)); VOLWN3=0._r8
-  allocate(VOLWNB(0:JZ,JY,JX)); VOLWNB=0._r8
-  allocate(VOLWHG(0:JZ,JY,JX)); VOLWHG=0._r8
+  allocate(VWatMicPCO(0:JZ,JY,JX)); VWatMicPCO=0._r8
+  allocate(VWatMicPCH(0:JZ,JY,JX)); VWatMicPCH=0._r8
+  allocate(VWatMicPOX(0:JZ,JY,JX)); VWatMicPOX=0._r8
+  allocate(VWatMicPNG(0:JZ,JY,JX)); VWatMicPNG=0._r8
+  allocate(VWatMicPN2(0:JZ,JY,JX)); VWatMicPN2=0._r8
+  allocate(VWatMicPN3(0:JZ,JY,JX)); VWatMicPN3=0._r8
+  allocate(VWatMicPNB(0:JZ,JY,JX)); VWatMicPNB=0._r8
+  allocate(VWatMicPHG(0:JZ,JY,JX)); VWatMicPHG=0._r8
   allocate(HGSGL2(JZ,JY,JX));   HGSGL2=0._r8
   allocate(DH2GG(3,JZ,JY,JX));  DH2GG=0._r8
   allocate(RHGFXS(JZ,JY,JX));   RHGFXS=0._r8
@@ -420,12 +420,12 @@ contains
   allocate(FLVM(JZ,JY,JX));     FLVM=0._r8
   allocate(THETH2(JZ,JY,JX));   THETH2=0._r8
   allocate(THETHL(JZ,JY,JX));   THETHL=0._r8
-  allocate(VOLPMA(JZ,JY,JX));   VOLPMA=0._r8
-  allocate(VOLPMB(JZ,JY,JX));   VOLPMB=0._r8
-  allocate(VOLWMA(JZ,JY,JX));   VOLWMA=0._r8
-  allocate(VOLWMB(JZ,JY,JX));   VOLWMB=0._r8
-  allocate(VOLWXA(0:JZ,JY,JX)); VOLWXA=0._r8
-  allocate(VOLWXB(JZ,JY,JX));   VOLWXB=0._r8
+  allocate(VsoiPMA(JZ,JY,JX));   VsoiPMA=0._r8
+  allocate(VsoiPMB(JZ,JY,JX));   VsoiPMB=0._r8
+  allocate(VWatMicPMA(JZ,JY,JX));   VWatMicPMA=0._r8
+  allocate(VWatMicPMB(JZ,JY,JX));   VWatMicPMB=0._r8
+  allocate(VWatMicPXA(0:JZ,JY,JX)); VWatMicPXA=0._r8
+  allocate(VWatMicPXB(JZ,JY,JX));   VWatMicPXB=0._r8
   allocate(PARG_cef(idg_beg:idg_end-1,JY,JX));      PARG_cef=0._r8
 
   allocate(RBGCSinkG(idg_beg:idg_end,0:JZ,JY,JX));RBGCSinkG=0._r8
@@ -679,14 +679,14 @@ contains
   call destroy(DZ2GG)
   call destroy(DZ2OG)
   call destroy(DNH3G)
-  call destroy(VOLWCO)
-  call destroy(VOLWCH)
-  call destroy(VOLWOX)
-  call destroy(VOLWNG)
-  call destroy(VOLWN2)
-  call destroy(VOLWN3)
-  call destroy(VOLWNB)
-  call destroy(VOLWHG)
+  call destroy(VWatMicPCO)
+  call destroy(VWatMicPCH)
+  call destroy(VWatMicPOX)
+  call destroy(VWatMicPNG)
+  call destroy(VWatMicPN2)
+  call destroy(VWatMicPN3)
+  call destroy(VWatMicPNB)
+  call destroy(VWatMicPHG)
   call destroy(HGSGL2)
   call destroy(DH2GG)
   call destroy(RHGFXS)
@@ -694,12 +694,12 @@ contains
   call destroy(FLVM)
   call destroy(THETH2)
   call destroy(THETHL)
-  call destroy(VOLPMA)
-  call destroy(VOLPMB)
-  call destroy(VOLWMA)
-  call destroy(VOLWMB)
-  call destroy(VOLWXA)
-  call destroy(VOLWXB)
+  call destroy(VsoiPMA)
+  call destroy(VsoiPMB)
+  call destroy(VWatMicPMA)
+  call destroy(VWatMicPMB)
+  call destroy(VWatMicPXA)
+  call destroy(VWatMicPXB)
   call destroy(PARG_cef)
   call destroy(RCOSK2)
   call destroy(ROXSK2)

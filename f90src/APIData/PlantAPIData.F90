@@ -80,8 +80,8 @@ implicit none
   real(r8), pointer :: DPTHZ(:)   => null()    !depth to middle of soil layer from  surface of grid cell [m]
   real(r8), pointer :: FMPR(:)    => null()    !micropore fraction
   real(r8), pointer :: DLYR3(:)   => null()    !vertical thickness of soil layer [m]
-  real(r8), pointer :: VOLWM(:,:) => null()    !soil micropore water content, [m3 d-2]
-  real(r8), pointer :: VOLPM(:,:) => null()    !soil air content, [m3 d-2]
+  real(r8), pointer :: VWatMicPM(:,:) => null()    !soil micropore water content, [m3 d-2]
+  real(r8), pointer :: VsoiPM(:,:) => null()    !soil air content, [m3 d-2]
   real(r8), pointer :: TORT(:,:)  => null()    !soil tortuosity, []
   real(r8), pointer :: FILM(:,:)  => null()    !soil water film thickness , [m]
   contains
@@ -390,13 +390,13 @@ implicit none
 
   real(r8), pointer :: THETW(:)    => null()  !volumetric water content [m3 m-3]
   real(r8), pointer :: THETY(:)    => null()  !air-dry water content, [m3 m-3]
-  real(r8), pointer :: VOLX(:)     => null()  !volume of soil layer	m3 d-2
+  real(r8), pointer :: VSoilPoreMicP(:)     => null()  !volume of soil layer	m3 d-2
   real(r8), pointer :: trcs_VLN(:,:)=> null()
 
   real(r8), pointer :: VOLY(:)     => null()  !total micropore volume [m3 d-2]
-  real(r8), pointer :: VOLI(:)     => null()  !soil micropore ice content   [m3 d-2]
-  real(r8), pointer :: VOLW(:)     => null()  !soil micropore water content [m3 d-2]
-  real(r8), pointer :: VOLA(:)     => null()  !total volume in micropores [m3 d-2]
+  real(r8), pointer :: ViceMicP(:)     => null()  !soil micropore ice content   [m3 d-2]
+  real(r8), pointer :: VWatMicP(:)     => null()  !soil micropore water content [m3 d-2]
+  real(r8), pointer :: VMicP(:)     => null()  !total volume in micropores [m3 d-2]
 
   real(r8), pointer :: OQC(:,:)    => null()  !dissolved organic C micropore	[gC d-2]
   real(r8), pointer :: OQN(:,:)    => null()  !dissolved organic N micropore	[gN d-2]
@@ -571,7 +571,7 @@ implicit none
   real(r8), pointer :: PSIRO(:,:,:) => null() !root osmotic water potential , [Mpa]
   real(r8), pointer :: PSIRG(:,:,:) => null() !root turgor water potential , [Mpa]
   real(r8), pointer :: PopPlantRootH2OUptake_vr(:,:,:) => null() !root water uptake, [m2 d-2 h-1]
-  real(r8), pointer :: TUPHT(:)     => null()   !total root heat uptake, [MJ d-2]
+  real(r8), pointer :: THeatRootUptake(:)     => null()   !total root heat uptake, [MJ d-2]
   real(r8), pointer :: GridPlantRootH2OUptake_vr(:)    => null()   !total root water uptake, [m3 d-2]
   real(r8), pointer :: VOLWC(:)     => null()  !canopy surface water content, [m3 d-2]
   real(r8), pointer :: VOLWP(:)     => null()  !canopy water content, [m3 d-2]
@@ -1007,8 +1007,8 @@ implicit none
   allocate(this%PPZ(JP1))
   allocate(this%PPX(JP1))
   allocate(this%pftPlantPopulation(JP1))
-  allocate(this%VOLWM(60,0:JZ1))
-  allocate(this%VOLPM(60,0:JZ1))
+  allocate(this%VWatMicPM(60,0:JZ1))
+  allocate(this%VsoiPM(60,0:JZ1))
   allocate(this%TORT(60,0:JZ1))
   allocate(this%FILM(60,0:JZ1))
 
@@ -1039,8 +1039,8 @@ implicit none
 !  if(allocated(PPZ)) deallocate(PPZ)
 !  if(allocated(PPX)) deallocate(PPX)
 !  if(allocated(PP))deallocate(PP)
-!  if(allocated(VOLWM))deallocate(VOLWM)
-!  if(allocated(VOLPM))deallocate(VOLPM)
+!  if(allocated(VWatMicPM))deallocate(VWatMicPM)
+!  if(allocated(VsoiPM))deallocate(VsoiPM)
 
   end subroutine plt_site_destroy
 !----------------------------------------------------------------------
@@ -1193,7 +1193,7 @@ implicit none
 
   allocate(this%CTRAN(JP1))
   allocate(this%TotalSoilH2OPSIMPa(0:JZ1))
-  allocate(this%TUPHT(0:JZ1))
+  allocate(this%THeatRootUptake(0:JZ1))
   allocate(this%TKCZ(JP1))
   allocate(this%SFLXC(JP1))
   allocate(this%FLWC(JP1))
@@ -1230,7 +1230,7 @@ implicit none
 
 !  if(allocated(CTRAN))deallocate(CTRAN)
 !  if(allocated(PSIST))deallocate(PSIST)
-!  if(allocated(TUPHT))deallocate(TUPHT)
+!  if(allocated(THeatRootUptake))deallocate(THeatRootUptake)
 !  if(allocated(TKCZ))deallocate(TKCZ)
 !  if(allocated(SFLXC))deallocate(SFLXC)
 !  if(allocated(FLWC))deallocate(FLWC)
@@ -1513,9 +1513,9 @@ implicit none
   allocate(this%THETPM(60,0:JZ1))
   allocate(this%DFGS(60,0:JZ1))
   allocate(this%VOLY(0:JZ1))
-  allocate(this%VOLI(0:JZ1))
-  allocate(this%VOLW(0:JZ1))
-  allocate(this%VOLA(0:JZ1))
+  allocate(this%ViceMicP(0:JZ1))
+  allocate(this%VWatMicP(0:JZ1))
+  allocate(this%VMicP(0:JZ1))
 
   allocate(this%trcs_VLN(ids_nuts_beg:ids_nuts_end,0:JZ1))
   allocate(this%OQC(1:jcplx,0:JZ1))
@@ -1530,7 +1530,7 @@ implicit none
 
   allocate(this%trc_solcl(ids_beg:ids_end,0:jZ1))
 
-  allocate(this%VOLX(0:JZ1))
+  allocate(this%VSoilPoreMicP(0:JZ1))
   allocate(this%THETW(0:JZ1))
   allocate(this%THETY(0:JZ1))
 
@@ -1567,7 +1567,7 @@ implicit none
 !   call destroy(this%GSolbility)
 !  if(allocated(THETW))deallocate(THETW)
 !  if(allocated(THETY))deallocate(THETY)
-!  if(allocated(VOLX))deallocate(VOLX)
+!  if(allocated(VSoilPoreMicP))deallocate(VSoilPoreMicP)
 !  if(allocated(CCH4G))deallocate(CCH4G)
 !  if(allocated(CZ2OG))deallocate(CZ2OG)
 !  if(allocated(CNH3G))deallocate(CNH3G)
@@ -1582,7 +1582,7 @@ implicit none
 !  if(allocated(VOLY))deallocate(VOLY)
 !  if(allocated(VOLI))deallocate(VOLI)
 !  if(allocated(VOLW))deallocate(VOLW)
-!  if(allocated(VOLA))deallocate(VOLA)
+!  if(allocated(VMicP))deallocate(VMicP)
 !  if(allocated(ZOSGL))deallocate(ZOSGL)
 
 !  if(allocated(OQC))deallocate(OQC)

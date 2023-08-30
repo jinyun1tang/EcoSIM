@@ -200,7 +200,7 @@ module ExtractsMod
     RPOBX => plt_bgcr%RPOBX  , &
     RP1BX => plt_bgcr%RP1BX  , &
     TKS   => plt_ew%TKS      , &
-    TUPHT => plt_ew%TUPHT    , &
+    THeatRootUptake => plt_ew%THeatRootUptake    , &
     GridPlantRootH2OUptake_vr=> plt_ew%GridPlantRootH2OUptake_vr   , &
     PopPlantRootH2OUptake_vr => plt_ew%PopPlantRootH2OUptake_vr    , &
     trcg_rootml  => plt_rbgc%trcg_rootml,&
@@ -220,7 +220,7 @@ module ExtractsMod
 !     RTDNP=PFT root length density per plant
 !     PopPlantRootH2OUptake_vr=total water uptake
 !     PopPlantRootH2OUptake_vr=PFT root water uptake
-!     TUPHT=total convective heat in root water uptake
+!     THeatRootUptake=total convective heat in root water uptake
 !     TKS=soil temperature
 !     PP=PFT population, this is dynamic, and can goes to zero
 !
@@ -231,7 +231,7 @@ module ExtractsMod
 !     TOTAL WATER UPTAKE
 !
       GridPlantRootH2OUptake_vr(L)=GridPlantRootH2OUptake_vr(L)+PopPlantRootH2OUptake_vr(N,L,NZ)
-      TUPHT(L)=TUPHT(L)+PopPlantRootH2OUptake_vr(N,L,NZ)*cpw*TKS(L)
+      THeatRootUptake(L)=THeatRootUptake(L)+PopPlantRootH2OUptake_vr(N,L,NZ)*cpw*TKS(L)
 !
 !     ROOT GAS CONTENTS FROM FLUXES IN 'UPTAKE'
 !

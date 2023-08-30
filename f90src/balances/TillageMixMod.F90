@@ -297,7 +297,7 @@ module TillageMixMod
     ENDDO
 
     TZNFNG=ZNFNI(0,NY,NX)*CORP0
-    TVOLWR=VOLW(0,NY,NX)*CORP0
+    TVOLWR=VWatMicP(0,NY,NX)*CORP0
     HFLXD=cpo*ORGC(0,NY,NX)*CORP0*TKS(0,NY,NX)
     HEATIN=HEATIN-HFLXD
     HEATSO=HEATSO-HFLXD
@@ -330,9 +330,9 @@ module TillageMixMod
       FertN_soil(NTN,0,NY,NX)=FertN_soil(NTN,0,NY,NX)*XCORP0
     ENDDO
 
-    VOLW(0,NY,NX)=VOLW(0,NY,NX)*XCORP0
-    VHCP(0,NY,NX)=cpo*ORGC(0,NY,NX)+cpw*VOLW(0,NY,NX)+cpi*VOLI(0,NY,NX)
-    VOLR(NY,NX)=VOLR(NY,NX)*XCORP0
+    VWatMicP(0,NY,NX)=VWatMicP(0,NY,NX)*XCORP0
+    VHeatCapacity(0,NY,NX)=cpo*ORGC(0,NY,NX)+cpw*VWatMicP(0,NY,NX)+cpi*ViceMicP(0,NY,NX)
+    VLitR(NY,NX)=VLitR(NY,NX)*XCORP0
     VOLT(0,NY,NX)=VOLT(0,NY,NX)*XCORP0
     ZNHUX0=AMAX1(ZNHUX0,ZNHU0(0,NY,NX))
     ZNHUXI=AMAX1(ZNHUXI,ZNHUI(0,NY,NX))
@@ -363,12 +363,12 @@ module TillageMixMod
         TGKCM=TGKCM+FI*GKCM(L,NY,NX)
         TGKCN=TGKCN+FI*GKCN(L,NY,NX)
         TGKCK=TGKCK+FI*GKCK(L,NY,NX)
-        TVOLW=TVOLW+TI*VOLW(L,NY,NX)
-        TVOLI=TVOLI+TI*VOLI(L,NY,NX)
-!     TVOLP=TVOLP+TI*VOLP(L,NY,NX)
-!     TVOLA=TVOLA+TI*VOLA(L,NY,NX)
-        TENGY=TENGY+TI*(cpw*(VOLW(L,NY,NX)+VOLWH(L,NY,NX)) &
-          +cpi*(VOLI(L,NY,NX)+VOLIH(L,NY,NX)))*TKS(L,NY,NX)
+        TVOLW=TVOLW+TI*VWatMicP(L,NY,NX)
+        TVOLI=TVOLI+TI*ViceMicP(L,NY,NX)
+!     TVOLP=TVOLP+TI*VsoiP(L,NY,NX)
+!     TVOLA=TVOLA+TI*VMicP(L,NY,NX)
+        TENGY=TENGY+TI*(cpw*(VWatMicP(L,NY,NX)+VWatMacP(L,NY,NX)) &
+          +cpi*(ViceMicP(L,NY,NX)+ViceMacP(L,NY,NX)))*TKS(L,NY,NX)
         DO NTN=ifertn_beg,ifertn_end
           TfertN_soil(NTN)=TfertN_soil(NTN)+TI*FertN_soil(NTN,L,NY,NX)
         ENDDO
@@ -477,22 +477,22 @@ module TillageMixMod
         GKCN(L,NY,NX)=TI*(GKCN(L,NY,NX)+CORP*(TGKCN-GKCN(L,NY,NX)))+TX*GKCN(L,NY,NX)
         GKCK(L,NY,NX)=TI*(GKCK(L,NY,NX)+CORP*(TGKCK-GKCK(L,NY,NX)))+TX*GKCK(L,NY,NX)
         
-        ENGYM=VHCM(L,NY,NX)*TKS(L,NY,NX)
-        ENGYV=(cpw*(VOLW(L,NY,NX)+VOLWH(L,NY,NX))+cpi*(VOLI(L,NY,NX)+VOLIH(L,NY,NX)))*TKS(L,NY,NX)
-        VOLW(L,NY,NX)=TI*VOLW(L,NY,NX)+CORP*(FI*TVOLW-TI*VOLW(L,NY,NX))+TX*VOLW(L,NY,NX)+FI*TVOLWR
-        VOLI(L,NY,NX)=TI*VOLI(L,NY,NX)+CORP*(FI*TVOLI-TI*VOLI(L,NY,NX))+TX*VOLI(L,NY,NX)
-      VOLWX(L,NY,NX)=VOLW(L,NY,NX)
-!     VOLW(L,NY,NX)=VOLW(L,NY,NX)+CORP*VOLWH(L,NY,NX)
-!     VOLI(L,NY,NX)=VOLI(L,NY,NX)+CORP*VOLIH(L,NY,NX)
-!     VOLA(L,NY,NX)=VOLA(L,NY,NX)+CORP*VOLAH(L,NY,NX)
-!     VOLWH(L,NY,NX)=XCORP(NY,NX)*VOLWH(L,NY,NX)
-!     VOLIH(L,NY,NX)=XCORP(NY,NX)*VOLIH(L,NY,NX)
-!     VOLAH(L,NY,NX)=XCORP(NY,NX)*VOLAH(L,NY,NX)
+        ENGYM=VHeatCapacitySoilM(L,NY,NX)*TKS(L,NY,NX)
+        ENGYV=(cpw*(VWatMicP(L,NY,NX)+VWatMacP(L,NY,NX))+cpi*(ViceMicP(L,NY,NX)+ViceMacP(L,NY,NX)))*TKS(L,NY,NX)
+        VWatMicP(L,NY,NX)=TI*VWatMicP(L,NY,NX)+CORP*(FI*TVOLW-TI*VWatMicP(L,NY,NX))+TX*VWatMicP(L,NY,NX)+FI*TVOLWR
+        ViceMicP(L,NY,NX)=TI*ViceMicP(L,NY,NX)+CORP*(FI*TVOLI-TI*ViceMicP(L,NY,NX))+TX*ViceMicP(L,NY,NX)
+      VWatMicPX(L,NY,NX)=VWatMicP(L,NY,NX)
+!     VWatMicP(L,NY,NX)=VWatMicP(L,NY,NX)+CORP*VWatMacP(L,NY,NX)
+!     ViceMicP(L,NY,NX)=ViceMicP(L,NY,NX)+CORP*ViceMacP(L,NY,NX)
+!     VMicP(L,NY,NX)=VMicP(L,NY,NX)+CORP*VAirMacP(L,NY,NX)
+!     VWatMacP(L,NY,NX)=XCORP(NY,NX)*VWatMacP(L,NY,NX)
+!     ViceMacP(L,NY,NX)=XCORP(NY,NX)*ViceMacP(L,NY,NX)
+!     VAirMacP(L,NY,NX)=XCORP(NY,NX)*VAirMacP(L,NY,NX)
 !     FHOL(L,NY,NX)=XCORP(NY,NX)*FHOL(L,NY,NX)
         ENGYL=TI*ENGYV+CORP*(FI*TENGY-TI*ENGYV)+TX*ENGYV+FI*TENGYR
-        VHCP(L,NY,NX)=VHCM(L,NY,NX)+cpw*(VOLW(L,NY,NX)+VOLWH(L,NY,NX)) &
-          +cpi*(VOLI(L,NY,NX)+VOLIH(L,NY,NX))
-        TKS(L,NY,NX)=(ENGYM+ENGYL)/VHCP(L,NY,NX)
+        VHeatCapacity(L,NY,NX)=VHeatCapacitySoilM(L,NY,NX)+cpw*(VWatMicP(L,NY,NX)+VWatMacP(L,NY,NX)) &
+          +cpi*(ViceMicP(L,NY,NX)+ViceMacP(L,NY,NX))
+        TKS(L,NY,NX)=(ENGYM+ENGYL)/VHeatCapacity(L,NY,NX)
         TCS(L,NY,NX)=units%Kelvin2Celcius(TKS(L,NY,NX))
         DO NTN=ifertn_beg,ifertn_end
           FertN_soil(NTN,L,NY,NX)=TI*FertN_soil(NTN,L,NY,NX) &

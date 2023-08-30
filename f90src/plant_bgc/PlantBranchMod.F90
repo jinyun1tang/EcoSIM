@@ -2867,7 +2867,7 @@ module PlantBranchMod
     ZEROP  =>  plt_biom%ZEROP   , &
     WTRSVBE=>  plt_biom%WTRSVBE , &
     WVSTKB =>  plt_biom%WVSTKB  , &
-    VOLX   =>  plt_soilchem%VOLX, &
+    VSoilPoreMicP   =>  plt_soilchem%VSoilPoreMicP, &
     IDAY   =>  plt_pheno%IDAY   , &
     TFN3   =>  plt_pheno%TFN3   , &
     VRNX   =>  plt_pheno%VRNX   , &
@@ -3183,7 +3183,7 @@ module PlantBranchMod
 
     IF(ISTYP(NZ).EQ.iplt_annual.AND.IDAY(8,NB,NZ).NE.0)THEN
       D2050: DO L=NU,NI(NZ)
-        IF(VOLX(L).GT.ZEROS2)THEN
+        IF(VSoilPoreMicP(L).GT.ZEROS2)THEN
           WTRTRX=AMAX1(ZEROP(NZ),WTRTL(ipltroot,L,NZ)*FWODRE(ielmc,1))
           WTPLTX=WTRTRX+WVSTKB(NB,NZ)
           IF(WTPLTX.GT.ZEROP(NZ))THEN

@@ -51,12 +51,12 @@ module ChemEquilibriaMod
   real(r8) :: XN4Q,XTLQ,XNAQ,XNBQ
   real(r8) :: RH2P,RNH4,RPALPX,RPCADX
   real(r8) :: RPCAHX,RPCAMX,RPFEPX,RXN4
-  real(r8) :: VOLWBK
+  real(r8) :: VWatMicPBK
   real(r8), parameter :: ZEROS = 1.0E-015_r8
   real(r8), parameter :: ZEROS2= 1.0E-008_r8
 
   real(r8), pointer :: BKVLX
-  real(r8), pointer :: VOLWM
+  real(r8), pointer :: VWatMicPM
   real(r8), pointer :: BKVL
   real(r8), pointer :: GKCA
   real(r8), pointer :: GKCH
@@ -64,10 +64,10 @@ module ChemEquilibriaMod
   real(r8), pointer :: GKCK
   real(r8), pointer :: GKCN
   real(r8), pointer :: GKC4
-  real(r8), pointer :: VOLWNB
-  real(r8), pointer :: VOLWNH
-  real(r8), pointer :: VOLWPB
-  real(r8), pointer :: VOLWPO
+  real(r8), pointer :: VWatMicPNB
+  real(r8), pointer :: VWatMicPNH
+  real(r8), pointer :: VWatMicPPB
+  real(r8), pointer :: VWatMicPPO
   real(r8), pointer :: VLNH4
   real(r8), pointer :: VLNHB
 
@@ -145,10 +145,10 @@ module ChemEquilibriaMod
 !     begin_execution
   call solflx%SetZero()
 
-  VOLWNB => chemvar%VOLWNB
-  VOLWNH => chemvar%VOLWNH
-  VOLWPB => chemvar%VOLWPB
-  VOLWPO => chemvar%VOLWPO
+  VWatMicPNB => chemvar%VWatMicPNB
+  VWatMicPNH => chemvar%VWatMicPNH
+  VWatMicPPB => chemvar%VWatMicPPB
+  VWatMicPPO => chemvar%VWatMicPPO
   XOH11 => chemvar%XOH11
   XN41  => chemvar%XN41
   XN4B  => chemvar%XN4B
@@ -182,7 +182,7 @@ module ChemEquilibriaMod
   PH    =>  chemvar%PH
   CAL   =>  chemvar%CAL
   CFE   =>  chemvar%CFE
-  VOLWM =>  chemvar%VOLWM
+  VWatMicPM =>  chemvar%VWatMicPM
   ZMG   =>  chemvar%ZMG
   ZNA   =>  chemvar%ZNA
   ZKA   =>  chemvar%ZKA
@@ -247,24 +247,24 @@ module ChemEquilibriaMod
   ELSE
     CCEC=ZERO
   ENDIF
-  IF(VOLWM.GT.ZEROS2)THEN
+  IF(VWatMicPM.GT.ZEROS2)THEN
   ! aqueous Mg(2+)
-    CMG1=AMAX1(ZERO,ZMG/VOLWM)
+    CMG1=AMAX1(ZERO,ZMG/VWatMicPM)
   ! aqueous Na(+)
-    CNA1=AMAX1(ZERO,ZNA/VOLWM)
+    CNA1=AMAX1(ZERO,ZNA/VWatMicPM)
   ! aqueous K(-)
-    CKA1=AMAX1(ZERO,ZKA/VOLWM)
+    CKA1=AMAX1(ZERO,ZKA/VWatMicPM)
 
 ! aqueous CO2 (H2CO3), mol/m3
-    CCO21=AMAX1(ZERO,CO2S/(Catomw*VOLWM))
+    CCO21=AMAX1(ZERO,CO2S/(Catomw*VWatMicPM))
 
-    VOLWBK=AMIN1(1.0,BKVL/VOLWM)
+    VWatMicPBK=AMIN1(1.0,BKVL/VWatMicPM)
   ELSE
     CMG1=0._r8
     CNA1=0._r8
     CKA1=0._r8
     CCO21=0._r8
-    VOLWBK=1._r8
+    VWatMicPBK=1._r8
   ENDIF
 
 
@@ -298,7 +298,7 @@ module ChemEquilibriaMod
 !
 !     PHOSPHORUS TRANSFORMATIONS IN NON-BAND SOIL ZONE
 !
-  IF(VOLWPO.GT.ZEROS2)THEN
+  IF(VWatMicPPO.GT.ZEROS2)THEN
 !
 !     ALUMINUM PHOSPHATE (VARISCITE, AlPO4)
 !
@@ -377,8 +377,8 @@ module ChemEquilibriaMod
 !     X-H2PO4+H2O   <-> X-OH2(+)+H2PO4(-)
 !     X-H2PO4+OH(-) <-> X-OH+H2PO4(-)
       SPH2P=SXH2P*DPH2O
-      RXH2P=TADA*(XOH21*CH2P1-SPH2P*XH2P1)/(XOH21+SPH2P)*VOLWBK
-      RYH2P=TADA*(XOH11*CH2P1-SXH2P*COH1*XH2P1)/(XOH11+SXH2P)*VOLWBK
+      RXH2P=TADA*(XOH21*CH2P1-SPH2P*XH2P1)/(XOH21+SPH2P)*VWatMicPBK
+      RYH2P=TADA*(XOH11*CH2P1-SXH2P*COH1*XH2P1)/(XOH11+SXH2P)*VWatMicPBK
 !
 !     HPO4 EXCHANGE IN NON-BAND SOIL ZONE FROM CONVERGENCE
 !     SOLUTION FOR EQUILIBRIUM AMONG HPO4--, H+, OH-, X-OH
@@ -388,7 +388,7 @@ module ChemEquilibriaMod
 !     RXH1P=HPO4 exchange with R-OH in non-band
 !     X-HPO4(-)+ OH(-)<-> X-OH+HPO4(2-)
       SPH1P=SXH1P*DPH2O/DPH2P
-      RXH1P=TADA*(XOH11*CH1P1-SPH1P*XH1P1)/(XOH11+SPH1P)*VOLWBK
+      RXH1P=TADA*(XOH11*CH1P1-SPH1P*XH1P1)/(XOH11+SPH1P)*VWatMicPBK
     ELSE
       RXH2P=0._r8
       RYH2P=0._r8
@@ -424,7 +424,7 @@ module ChemEquilibriaMod
 !
 !     PHOSPHORUS PRECIPITATION-DISSOLUTION IN BAND SOIL ZONE
 !
-  IF(VOLWPB.GT.ZEROS2)THEN
+  IF(VWatMicPPB.GT.ZEROS2)THEN
 !
 !     ALUMINUM PHOSPHATE (VARISCITE)
 !
@@ -495,8 +495,8 @@ module ChemEquilibriaMod
 !   X2P1B: R-H2PO4
 !   XH21B: R-OH2
       SPH2P=SXH2P*DPH2O
-      RXH2B=TADA*(XH21B*CH2PB-SPH2P*X2P1B)/(XH21B+SPH2P)*VOLWBK
-      RYH2B=TADA*(XH11B*CH2PB-SXH2P*X2P1B*COH1)/(XH11B+SXH2P)*VOLWBK
+      RXH2B=TADA*(XH21B*CH2PB-SPH2P*X2P1B)/(XH21B+SPH2P)*VWatMicPBK
+      RYH2B=TADA*(XH11B*CH2PB-SXH2P*X2P1B*COH1)/(XH11B+SXH2P)*VWatMicPBK
 !
 !     HPO4 EXCHANGE IN BAND SOIL ZONE FROM CONVERGENCE
 !     SOLUTION FOR EQUILIBRIUM AMONG HPO4--, H+, OH-, X-OH
@@ -506,7 +506,7 @@ module ChemEquilibriaMod
 !     RXH1B=HPO4 exchange with R-OH in band
 !
       SPH1P=SXH1P*DPH2O/DPH2P
-      RXH1B=TADA*(XH11B*CH1PB-SPH1P*X1P1B)/(XH11B+SPH1P)*VOLWBK
+      RXH1B=TADA*(XH11B*CH1PB-SPH1P*X1P1B)/(XH11B+SPH1P)*VWatMicPBK
     ELSE
       RXH2B=0._r8
       RYH2B=0._r8
@@ -642,12 +642,12 @@ module ChemEquilibriaMod
 ! CN41: NH4(+)
 ! DPN4: K
 ! RNH4: if RNH4 > 0., then the equilibrium should move to association, and NH4(+) will be increased
-  IF(VOLWNH.GT.ZEROS2)THEN
+  IF(VWatMicPNH.GT.ZEROS2)THEN
     RNH4=(CHY1*CN31-DPN4*CN41)/(DPN4+CHY1)
   ELSE
     RNH4=0._r8
   ENDIF
-  IF(VOLWNB.GT.ZEROS2)THEN
+  IF(VWatMicPNB.GT.ZEROS2)THEN
     RNHB=(CHY1*CN3B-DPN4*CN4B)/(DPN4+CHY1)
   ELSE
     RNHB=0._r8
@@ -697,34 +697,34 @@ module ChemEquilibriaMod
 !     TRALPB,TRFEPB,TRCPDB,TRCPHB,TRCPMB
 !     =total AlPO4,FePO4,CaHPO4,apatite,Ca(H2PO4)2 precipitation in band
 !
-  TRN4S=TRN4S+RN4S*VOLWNH
-  TRN3S=TRN3S+RN3S*VOLWNH
-  TRXN4=TRXN4+RXN4*VOLWNH
-  TRN4B=TRN4B+RN4B*VOLWNB
-  TRN3B=TRN3B+RN3B*VOLWNB
-  TRXNB=TRXNB+RXNB*VOLWNB
-  TRH1P=TRH1P+RHP1*VOLWPO
-  TRH2P=TRH2P+RHP2*VOLWPO
-  TRXH1=TRXH1+RXH1*VOLWPO
-  TRXH2=TRXH2+RXH2*VOLWPO
-  TRX1P=TRX1P+RX1P*VOLWPO
-  TRX2P=TRX2P+RX2P*VOLWPO
-  TRALPO=TRALPO+RPALPX*VOLWPO
-  TRFEPO=TRFEPO+RPFEPX*VOLWPO
-  TRCAPD=TRCAPD+RPCADX*VOLWPO
-  TRCAPH=TRCAPH+RPCAHX*VOLWPO
-  TRCAPM=TRCAPM+RPCAMX*VOLWPO
-  TRH1B=TRH1B+RHB1*VOLWPB
-  TRH2B=TRH2B+RHB2*VOLWPB
-  TRBH1=TRBH1+RBH1*VOLWPB
-  TRBH2=TRBH2+RBH2*VOLWPB
-  TRB1P=TRB1P+RB1P*VOLWPB
-  TRB2P=TRB2P+RB2P*VOLWPB
-  TRALPB=TRALPB+RPALBX*VOLWPB
-  TRFEPB=TRFEPB+RPFEBX*VOLWPB
-  TRCPDB=TRCPDB+RPCDBX*VOLWPB
-  TRCPHB=TRCPHB+RPCHBX*VOLWPB
-  TRCPMB=TRCPMB+RPCMBX*VOLWPB
+  TRN4S=TRN4S+RN4S*VWatMicPNH
+  TRN3S=TRN3S+RN3S*VWatMicPNH
+  TRXN4=TRXN4+RXN4*VWatMicPNH
+  TRN4B=TRN4B+RN4B*VWatMicPNB
+  TRN3B=TRN3B+RN3B*VWatMicPNB
+  TRXNB=TRXNB+RXNB*VWatMicPNB
+  TRH1P=TRH1P+RHP1*VWatMicPPO
+  TRH2P=TRH2P+RHP2*VWatMicPPO
+  TRXH1=TRXH1+RXH1*VWatMicPPO
+  TRXH2=TRXH2+RXH2*VWatMicPPO
+  TRX1P=TRX1P+RX1P*VWatMicPPO
+  TRX2P=TRX2P+RX2P*VWatMicPPO
+  TRALPO=TRALPO+RPALPX*VWatMicPPO
+  TRFEPO=TRFEPO+RPFEPX*VWatMicPPO
+  TRCAPD=TRCAPD+RPCADX*VWatMicPPO
+  TRCAPH=TRCAPH+RPCAHX*VWatMicPPO
+  TRCAPM=TRCAPM+RPCAMX*VWatMicPPO
+  TRH1B=TRH1B+RHB1*VWatMicPPB
+  TRH2B=TRH2B+RHB2*VWatMicPPB
+  TRBH1=TRBH1+RBH1*VWatMicPPB
+  TRBH2=TRBH2+RBH2*VWatMicPPB
+  TRB1P=TRB1P+RB1P*VWatMicPPB
+  TRB2P=TRB2P+RB2P*VWatMicPPB
+  TRALPB=TRALPB+RPALBX*VWatMicPPB
+  TRFEPB=TRFEPB+RPFEBX*VWatMicPPB
+  TRCPDB=TRCPDB+RPCDBX*VWatMicPPB
+  TRCPHB=TRCPHB+RPCHBX*VWatMicPPB
+  TRCPMB=TRCPMB+RPCMBX*VWatMicPPB
 
   end subroutine NoSaltChemEquilibria
 
@@ -736,11 +736,11 @@ module ChemEquilibriaMod
   write(*,*)'XCEC'  ,chemvar%XCEC
   write(*,*)'BKVLX' ,chemvar%BKVLX
   write(*,*)'BKVL'  ,chemvar%BKVL
-  write(*,*)'VOLWM' ,chemvar%VOLWM
-  write(*,*)'VOLWPO',chemvar%VOLWPO
-  write(*,*)'VOLWPB',chemvar%VOLWPB
-  write(*,*)'VOLWNH',chemvar%VOLWNH
-  write(*,*)'VOLWNB',chemvar%VOLWNB
+  write(*,*)'VWatMicPM' ,chemvar%VWatMicPM
+  write(*,*)'VWatMicPPO',chemvar%VWatMicPPO
+  write(*,*)'VWatMicPPB',chemvar%VWatMicPPB
+  write(*,*)'VWatMicPNH',chemvar%VWatMicPNH
+  write(*,*)'VWatMicPNB',chemvar%VWatMicPNB
   write(*,*)'VLNH4' ,chemvar%VLNH4
   write(*,*)'VLNHB' ,chemvar%VLNHB
   write(*,*)'ZMG'   ,chemvar%ZMG
@@ -782,8 +782,8 @@ module ChemEquilibriaMod
   write(*,*)'CN4B'  ,chemvar%CN4B
   write(*,*)'XN41'  ,chemvar%XN41
   write(*,*)'XN4B'  ,chemvar%XN4B
-  IF(chemvar%VOLWNH>0. .AND. chemvar%VOLWNB>0. &
-    .AND. chemvar%VOLWPO>0. .AND. chemvar%VOLWPB>0.)PAUSE
+  IF(chemvar%VWatMicPNH>0. .AND. chemvar%VWatMicPNB>0. &
+    .AND. chemvar%VWatMicPPO>0. .AND. chemvar%VWatMicPPB>0.)PAUSE
   end subroutine PrintChemVar
 
 end module ChemEquilibriaMod

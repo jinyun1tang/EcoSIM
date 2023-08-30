@@ -312,7 +312,7 @@ contains
         ! FCI,WPI=FC,WP of ice
         ! THETIX=ice concentration
         ! BKVL=bulk density x volume of soil layer
-        ! VOLR=surface litter volume
+        ! VLitR=surface litter volume
         ! THETWX=relative pore fraciton filled by water
       ELSE
         !dealing with residual snow
@@ -784,14 +784,14 @@ contains
     VOLI0(1,NY,NX)=VOLI0(1,NY,NX)-FLWI
 
     !add to litter layer?
-    VOLW1(NUM(NY,NX),NY,NX)=VOLW1(NUM(NY,NX),NY,NX)+FLWW
-    VOLI1(NUM(NY,NX),NY,NX)=VOLI1(NUM(NY,NX),NY,NX)+FLWI+FLWS/DENSI
+    VWatMicP1(NUM(NY,NX),NY,NX)=VWatMicP1(NUM(NY,NX),NY,NX)+FLWW
+    ViceMicP1(NUM(NY,NX),NY,NX)=ViceMicP1(NUM(NY,NX),NY,NX)+FLWI+FLWS/DENSI
     
     ENGY1=VolHeatCapacity(NUM(NY,NX),NY,NX)*TK1(NUM(NY,NX),NY,NX)
-    VolHeatCapacityA(NUM(NY,NX),NY,NX)=VHCM(NUM(NY,NX),NY,NX) &
-      +cpw*VOLW1(NUM(NY,NX),NY,NX)+cpi*VOLI1(NUM(NY,NX),NY,NX)
-    VolHeatCapacityB(NUM(NY,NX),NY,NX)=cpw*VOLWH1(NUM(NY,NX),NY,NX) &
-      +cpi*VOLIH1(NUM(NY,NX),NY,NX)
+    VolHeatCapacityA(NUM(NY,NX),NY,NX)=VHeatCapacitySoilM(NUM(NY,NX),NY,NX) &
+      +cpw*VWatMicP1(NUM(NY,NX),NY,NX)+cpi*ViceMicP1(NUM(NY,NX),NY,NX)
+    VolHeatCapacityB(NUM(NY,NX),NY,NX)=cpw*VWatMacP1(NUM(NY,NX),NY,NX) &
+      +cpi*ViceMacP1(NUM(NY,NX),NY,NX)
     VolHeatCapacity(NUM(NY,NX),NY,NX)=VolHeatCapacityA(NUM(NY,NX),NY,NX)+VolHeatCapacityB(NUM(NY,NX),NY,NX)
 
     IF(VolHeatCapacity(NUM(NY,NX),NY,NX).GT.ZEROS(NY,NX))THEN
@@ -1021,7 +1021,7 @@ contains
       !snow <-> residue vapor flux
       FLVC=ATCNVR*(VP0-VPR)*AREA(3,NUM(NY,NX),NY,NX)*FSNW(NY,NX)*CVRD(NY,NX)*XNPQ 
       !volume weighted vapor pressure
-      VPY=(VP0*VOLP01+VPR*VOLPM(M,0,NY,NX))/(VOLP01+VOLPM(M,0,NY,NX))             
+      VPY=(VP0*VOLP01+VPR*VsoiPM(M,0,NY,NX))/(VOLP01+VsoiPM(M,0,NY,NX))             
       FLVX=(VP0-VPY)*VOLP01*XNPC
 
       IF(FLVC.GE.0.0_r8)THEN
@@ -1055,7 +1055,7 @@ contains
 !
 !     VAPOR FLUX BETWEEN SURFACE RESIDUE AND SOIL SURFACE
 !
-!     THETPM,VOLPM=air-filled porosity,volume
+!     THETPM,VsoiPM=air-filled porosity,volume
 !     VP1,VPY=soil,litter-soil equilibrium vapor concentration
 !     TK1X=soil temperature
 !     PSISV1=soil matric+osmotic water potentials
@@ -1065,7 +1065,7 @@ contains
 !     TKXR,TK1X=interim calculation of litter,soil temperatures
 !
     !both litter layer and topsoil are not-saturated
-    IF(VOLPM(M,0,NY,NX).GT.ZEROS(NY,NX).AND.VOLPM(M,NUM(NY,NX),NY,NX).GT.ZEROS(NY,NX))THEN
+    IF(VsoiPM(M,0,NY,NX).GT.ZEROS(NY,NX).AND.VsoiPM(M,NUM(NY,NX),NY,NX).GT.ZEROS(NY,NX))THEN
       VP1=vapsat(TK1X)*EXP(18.0_r8*PSISV1/(RGAS*TK1X))
       FLVC=ATCNVS*(VPR-VP1)*AREA(3,NUM(NY,NX),NY,NX)*FSNW(NY,NX)*CVRD(NY,NX)*XNPQ
 
@@ -1075,9 +1075,9 @@ contains
         write(*,*)'at line',__LINE__
         call endrun(trim(mod_filename)//'at line',__LINE__)
       endif
-      VPY=(VPR*VOLPM(M,0,NY,NX)+VP1*VOLPM(M,NUM(NY,NX),NY,NX)) &
-        /(VOLPM(M,0,NY,NX)+VOLPM(M,NUM(NY,NX),NY,NX))
-      FLVX=(VPR-VPY)*VOLPM(M,0,NY,NX)*XNPC
+      VPY=(VPR*VsoiPM(M,0,NY,NX)+VP1*VsoiPM(M,NUM(NY,NX),NY,NX)) &
+        /(VsoiPM(M,0,NY,NX)+VsoiPM(M,NUM(NY,NX),NY,NX))
+      FLVX=(VPR-VPY)*VsoiPM(M,0,NY,NX)*XNPC
       IF(FLVC.GE.0.0_r8)THEN
         FLVR1X=AZMAX1(AMIN1(FLVC,FLVX,VOLW0M(L,NY,NX)*XNPB))
         if(abs(FLVR1X)>1.0e20_r8)then
@@ -1174,7 +1174,7 @@ contains
   real(r8) :: FCLX,WPLX,PSDX,FCDX
 
   THETW1=AMAX1(THETY(NUM(NY,NX),NY,NX),AMIN1(POROS(NUM(NY,NX),NY,NX) &
-    ,safe_adb(VOLW1(NUM(NY,NX),NY,NX),VOLY(NUM(NY,NX),NY,NX))))
+    ,safe_adb(VWatMicP1(NUM(NY,NX),NY,NX),VOLY(NUM(NY,NX),NY,NX))))
   IF(BKVL(NUM(NY,NX),NY,NX).GT.ZEROS(NY,NX))THEN
     IF(THETW1.LT.FC(NUM(NY,NX),NY,NX))THEN
       PSISM1(NUM(NY,NX),NY,NX)=AMAX1(PSIHY,-EXP(PSIMX(NY,NX) &
@@ -1188,7 +1188,7 @@ contains
       THETW1=POROS(NUM(NY,NX),NY,NX)
       PSISM1(NUM(NY,NX),NY,NX)=PSISE(NUM(NY,NX),NY,NX)
     ENDIF
-  ELSEIF(VOLX(NUM(NY,NX),NY,NX).GT.ZEROS2(NY,NX))THEN
+  ELSEIF(VSoilPoreMicP(NUM(NY,NX),NY,NX).GT.ZEROS2(NY,NX))THEN
     FCX=FCI*THETIX(NUM(NY,NX),NY,NX)
     WPX=WPI*THETIX(NUM(NY,NX),NY,NX)
     FCLX=LOG(FCX)
@@ -1223,11 +1223,11 @@ contains
   real(r8) :: THETWR
 
   ! THETWR,THETW1=litter, soil water concentration
-  ! VOLWRX=litter water retention capacity
+  ! VWatLitrX=litter water retention capacity
   ! PSISM1(0,PSISM1(NUM=litter,soil water potentials
 
-  IF(VOLR(NY,NX).GT.ZEROS(NY,NX).AND.VOLW1(0,NY,NX).GT.ZEROS2(NY,NX))THEN
-    THETWR=AMIN1(VOLWRX(NY,NX),VOLW1(0,NY,NX))/VOLR(NY,NX)
+  IF(VLitR(NY,NX).GT.ZEROS(NY,NX).AND.VWatMicP1(0,NY,NX).GT.ZEROS2(NY,NX))THEN
+    THETWR=AMIN1(VWatLitrX(NY,NX),VWatMicP1(0,NY,NX))/VLitR(NY,NX)
     IF(THETWR.LT.FC(0,NY,NX))THEN
       PSISM1(0,NY,NX)=AMAX1(PSIHY,-EXP(PSIMX(NY,NX)+((FCL(0,NY,NX)-LOG(THETWR))/FCD(0,NY,NX)*PSIMD(NY,NX))))
     ELSEIF(THETWR.LT.POROS0(NY,NX))THEN
@@ -1326,7 +1326,7 @@ contains
     VP2=vapsat(TK1(NUM(NY,NX),NY,NX))*EXP(18.0_r8*PSISV1/(RGAS*TK1(NUM(NY,NX),NY,NX)))
     ATCNVS=2.0_r8*CNV1*CNV2/(CNV1*DLYR(3,NUM(NY,NX),NY,NX)+CNV2*DLYRS0(L,NY,NX))
     FLVC=ATCNVS*(VP1-VP2)*AREA(3,NUM(NY,NX),NY,NX)*FSNW(NY,NX)*BARE(NY,NX)*XNPY
-    VPY=(VP1*VOLP01+VP2*VOLPM(M,NUM(NY,NX),NY,NX))/(VOLP01+VOLPM(M,NUM(NY,NX),NY,NX))
+    VPY=(VP1*VOLP01+VP2*VsoiPM(M,NUM(NY,NX),NY,NX))/(VOLP01+VsoiPM(M,NUM(NY,NX),NY,NX))
     FLVX=(VP1-VPY)*VOLP01*XNPA
 
     IF(FLVC.GE.0.0_r8)THEN

@@ -90,7 +90,7 @@ implicit none
   IF(VHCPW(1,NY,NX).GT.0.0_r8.AND.VHCPW(1,NY,NX).LE.VHCPWX(NY,NX) &
     .AND.TairK(NY,NX).GT.TFICE)THEN
     ENGYS=TKW(1,NY,NX)*VHCPW(1,NY,NX)
-    ENGY1=TKS(NUM(NY,NX),NY,NX)*VHCP(NUM(NY,NX),NY,NX)
+    ENGY1=TKS(NUM(NY,NX),NY,NX)*VHeatCapacity(NUM(NY,NX),NY,NX)
     FLWS=VOLSSL(1,NY,NX)
     FLWW=VOLWSL(1,NY,NX)
     FLWI=VOLISL(1,NY,NX)
@@ -108,22 +108,22 @@ implicit none
     D9770: DO L=1,JS
       DENSS(L,NY,NX)=DENS0(NY,NX)
     ENDDO D9770
-    VOLW(0,NY,NX)=VOLW(0,NY,NX)+FLWW
-    VOLI(0,NY,NX)=VOLI(0,NY,NX)+FLWI+FLWS/DENSI
-    ENGY=VHCP(NUM(NY,NX),NY,NX)*TKS(NUM(NY,NX),NY,NX)
-    VHCP(NUM(NY,NX),NY,NX)=VHCM(NUM(NY,NX),NY,NX) &
-      +cpw*(VOLW(NUM(NY,NX),NY,NX)+VOLWH(NUM(NY,NX),NY,NX)) &
-      +cpi*(VOLI(NUM(NY,NX),NY,NX)+VOLIH(NUM(NY,NX),NY,NX))
-    IF(VHCP(NUM(NY,NX),NY,NX).GT.ZEROS(NY,NX))THEN
+    VWatMicP(0,NY,NX)=VWatMicP(0,NY,NX)+FLWW
+    ViceMicP(0,NY,NX)=ViceMicP(0,NY,NX)+FLWI+FLWS/DENSI
+    ENGY=VHeatCapacity(NUM(NY,NX),NY,NX)*TKS(NUM(NY,NX),NY,NX)
+    VHeatCapacity(NUM(NY,NX),NY,NX)=VHeatCapacitySoilM(NUM(NY,NX),NY,NX) &
+      +cpw*(VWatMicP(NUM(NY,NX),NY,NX)+VWatMacP(NUM(NY,NX),NY,NX)) &
+      +cpi*(ViceMicP(NUM(NY,NX),NY,NX)+ViceMacP(NUM(NY,NX),NY,NX))
+    IF(VHeatCapacity(NUM(NY,NX),NY,NX).GT.ZEROS(NY,NX))THEN
       TKSX=TKS(NUM(NY,NX),NY,NX)
-      TKS(NUM(NY,NX),NY,NX)=(ENGY+HFLWS)/VHCP(NUM(NY,NX),NY,NX)
+      TKS(NUM(NY,NX),NY,NX)=(ENGY+HFLWS)/VHeatCapacity(NUM(NY,NX),NY,NX)
       if(abs(TKS(NUM(NY,NX),NY,NX)/tksx-1._r8)>0.025_r8)then
         TKS(NUM(NY,NX),NY,NX)=TKSX
       endif
     ELSE
       TKS(NUM(NY,NX),NY,NX)=TairK(NY,NX)
     ENDIF
-    ENGY2=VHCP(NUM(NY,NX),NY,NX)*TKS(NUM(NY,NX),NY,NX)
+    ENGY2=VHeatCapacity(NUM(NY,NX),NY,NX)*TKS(NUM(NY,NX),NY,NX)
 
   ENDIF
   end subroutine SnowpackDisapper
@@ -154,7 +154,7 @@ implicit none
     if(L>1)then
       VOLWSL(L-1,NY,NX)=VOLWSL(L-1,NY,NX)+VOLWSL(L,NY,NX)
     elseif(L==1)then
-      VOLW(0,NY,NX)=VOLW(0,NY,NX)+VOLWSL(L,NY,NX)
+      VWatMicP(0,NY,NX)=VWatMicP(0,NY,NX)+VOLWSL(L,NY,NX)
     endif
     VOLWSL(L,NY,NX)=0._r8
   endif
@@ -163,7 +163,7 @@ implicit none
     if(L>1)then
       VOLISL(L-1,NY,NX)=VOLISL(L-1,NY,NX)+VOLISL(L,NY,NX)
     elseif(L==1)then
-      VOLI(0,NY,NX)=VOLI(0,NY,NX)+VOLISL(L,NY,NX)
+      ViceMicP(0,NY,NX)=ViceMicP(0,NY,NX)+VOLISL(L,NY,NX)
     endif
     VOLISL(L,NY,NX)=0._r8
   endif

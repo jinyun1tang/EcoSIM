@@ -21,7 +21,7 @@ implicit none
    real(r8) ,target,allocatable ::  BKDS(:,:,:)                      !soil bulk density, [Mg m-3]
    integer  ,target,allocatable ::  NHOL(:,:,:)                      !number of macropores
    real(r8) ,target,allocatable ::  POROS(:,:,:)                     !soil porosity
-   real(r8) ,target,allocatable ::  VOLX(:,:,:)                      !volume of soil layer	m3 d-2
+   real(r8) ,target,allocatable ::  VSoilPoreMicP(:,:,:)                      !volume of soil layer	m3 d-2
    real(r8) ,target,allocatable ::  VOLY(:,:,:)                      !micropore volume
    real(r8) ,target,allocatable ::  BKVL(:,:,:)                      !mass of soil layer	Mg d-2
    real(r8) ,target,allocatable ::  BKVLNM(:,:)                      !minimum soil layer mass
@@ -29,8 +29,8 @@ implicit none
    real(r8) ,target,allocatable ::  SAND(:,:,:)                      !soil sand content	Mg d-2
    real(r8) ,target,allocatable ::  SILT(:,:,:)                      !soil silt content	Mg d-2
    real(r8) ,target,allocatable ::  CLAY(:,:,:)                      !soil clay content	Mg d-2
-   real(r8) ,target,allocatable ::  VOLA(:,:,:)                      !total volume in micropores
-   real(r8) ,target,allocatable ::  VOLAH(:,:,:)                     !total volume in macropores
+   real(r8) ,target,allocatable ::  VMicP(:,:,:)                      !total volume in micropores
+   real(r8) ,target,allocatable ::  VAirMacP(:,:,:)                     !total volume in macropores
    real(r8) ,target,allocatable ::  VOLT(:,:,:)                      !soil volume including  macropores+rock [m3 d-2]
    real(r8) ,target,allocatable ::  VOLTI(:,:,:)                     !initial soil volume including  macropores+rock [m3 d-2]
   private :: InitAllocate
@@ -66,7 +66,7 @@ contains
   allocate(BKDS(0:JZ,JY,JX));    BKDS=0._r8
   allocate(NHOL(JZ,JY,JX));      NHOL=0
   allocate(POROS(0:JZ,JY,JX));   POROS=0._r8
-  allocate(VOLX(0:JZ,JY,JX));    VOLX=0._r8
+  allocate(VSoilPoreMicP(0:JZ,JY,JX));    VSoilPoreMicP=0._r8
   allocate(VOLY(0:JZ,JY,JX));    VOLY=0._r8
   allocate(BKVL(0:JZ,JY,JX));    BKVL=0._r8
   allocate(BKVLNM(JY,JX));       BKVLNM=0._r8
@@ -74,41 +74,44 @@ contains
   allocate(SAND(JZ,JY,JX));      SAND=0._r8
   allocate(SILT(JZ,JY,JX));      SILT=0._r8
   allocate(CLAY(JZ,JY,JX));      CLAY=0._r8
-  allocate(VOLA(0:JZ,JY,JX));    VOLA=0._r8
-  allocate(VOLAH(JZ,JY,JX));     VOLAH=0._r8
+  allocate(VMicP(0:JZ,JY,JX));    VMicP=0._r8
+  allocate(VAirMacP(JZ,JY,JX));     VAirMacP=0._r8
   allocate(VOLT(0:JZ,JY,JX));    VOLT=0._r8
   allocate(VOLTI(0:JZ,JY,JX));   VOLTI=0._r8
   end subroutine InitAllocate
 
 !----------------------------------------------------------------------
   subroutine DestructSoilProperty
-  if (allocated(CORGCI))   deallocate(CORGCI)
-  if (allocated(POROSI))   deallocate(POROSI)
-  if (allocated(FHOLI))    deallocate(FHOLI)
-  if (allocated(CSAND))    deallocate(CSAND)
-  if (allocated(CSILT))    deallocate(CSILT)
-  if (allocated(CCLAY))    deallocate(CCLAY)
-  if (allocated(ROCK))     deallocate(ROCK)
-  if (allocated(BKDSI))    deallocate(BKDSI)
-  if (allocated(FMPR))     deallocate(FMPR)
-  if (allocated(FHOL))     deallocate(FHOL)
-  if (allocated(PHOL))     deallocate(PHOL)
-  if (allocated(HRAD))     deallocate(HRAD)
-  if (allocated(BKDS))     deallocate(BKDS)
-  if (allocated(NHOL))     deallocate(NHOL)
-  if (allocated(POROS))    deallocate(POROS)
-  if (allocated(VOLX))     deallocate(VOLX)
-  if (allocated(VOLY))     deallocate(VOLY)
-  if (allocated(BKVL))     deallocate(BKVL)
-  if (allocated(BKVLNM))   deallocate(BKVLNM)
-  if (allocated(BKVLNU))   deallocate(BKVLNU)
-  if (allocated(SAND))     deallocate(SAND)
-  if (allocated(SILT))     deallocate(SILT)
-  if (allocated(CLAY))     deallocate(CLAY)
-  if (allocated(VOLA))     deallocate(VOLA)
-  if (allocated(VOLAH))    deallocate(VOLAH)
-  if (allocated(VOLT))     deallocate(VOLT)
-  if (allocated(VOLTI))    deallocate(VOLTI)
+
+  use abortutils, only : destroy
+  implicit none
+  call destroy(CORGCI)
+  call destroy(POROSI)
+  call destroy(FHOLI)
+  call destroy(CSAND)
+  call destroy(CSILT)
+  call destroy(CCLAY)
+  call destroy(ROCK)
+  call destroy(BKDSI)
+  call destroy(FMPR)
+  call destroy(FHOL)
+  call destroy(PHOL)
+  call destroy(HRAD)
+  call destroy(BKDS)
+  call destroy(NHOL)
+  call destroy(POROS)
+  call destroy(VSoilPoreMicP)
+  call destroy(VOLY)
+  call destroy(BKVL)
+  call destroy(BKVLNM)
+  call destroy(BKVLNU)
+  call destroy(SAND)
+  call destroy(SILT)
+  call destroy(CLAY)
+  call destroy(VMicP)
+  call destroy(VAirMacP)
+  call destroy(VOLT)
+  call destroy(VOLTI)
   end subroutine DestructSoilProperty
 
 end module SoilPropertyDataType

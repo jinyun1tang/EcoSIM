@@ -85,9 +85,9 @@ module NitroDisturbMod
         ELSE
           DCORPC=AMIN1(0.999_r8,DCORP(I,NY,NX))
         ENDIF
-!     VOLWOU=VOLWOU+DCORPC*VOLW(L,NY,NX)
-!     HEATOU=HEATOU+DCORPC*4.19*TKS(L,NY,NX)*VOLW(L,NY,NX)
-!     VOLW(L,NY,NX)=VOLW(L,NY,NX)-DCORPC*VOLW(L,NY,NX)
+!     VOLWOU=VOLWOU+DCORPC*VWatMicP(L,NY,NX)
+!     HEATOU=HEATOU+DCORPC*4.19*TKS(L,NY,NX)*VWatMicP(L,NY,NX)
+!     VWatMicP(L,NY,NX)=VWatMicP(L,NY,NX)-DCORPC*VWatMicP(L,NY,NX)
         OC=0.0_r8
         ON=0.0_r8
         OP=0.0_r8
@@ -327,11 +327,11 @@ module NitroDisturbMod
           HEATOU=HEATOU+HFLXD
         ENDIF
 !     IF(L.EQ.0)THEN
-!     VHCP(0,NY,NX)=2.496E-06*ORGC(0,NY,NX)+4.19*VOLW(0,NY,NX)
-!    2+1.9274*VOLI(0,NY,NX)
+!     VHeatCapacity(0,NY,NX)=2.496E-06*ORGC(0,NY,NX)+4.19*VWatMicP(0,NY,NX)
+!    2+1.9274*ViceMicP(0,NY,NX)
 !     ELSE
-!     VHCP(L,NY,NX)=VHCM(L,NY,NX)+4.19*(VOLW(L,NY,NX)+VOLWH(L,NY,NX))
-!    2+1.9274*(VOLI(L,NY,NX)+VOLIH(L,NY,NX))
+!     VHeatCapacity(L,NY,NX)=VHeatCapacitySoilM(L,NY,NX)+4.19*(VWatMicP(L,NY,NX)+VWatMacP(L,NY,NX))
+!    2+1.9274*(ViceMicP(L,NY,NX)+ViceMacP(L,NY,NX))
 !     ENDIF
         IF(ITILL(I,NY,NX).EQ.21)THEN
           TCOU=TCOU+OC

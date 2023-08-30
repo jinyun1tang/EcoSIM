@@ -44,7 +44,7 @@ implicit none
 
   DO L =0,NL(NY,NX)
     DO NTG=idg_beg,idg_end-1
-      call PhasePartition(VOLP(L,NY,NX),VOLW(L,NY,NX),GSolbility(NTG,L,NY,NX),&
+      call PhasePartition(VsoiP(L,NY,NX),VWatMicP(L,NY,NX),GSolbility(NTG,L,NY,NX),&
         trc_solcl(NTG,L,NY,NX),trc_gascl(NTG,L,NY,NX))
     ENDDO
   ENDDO

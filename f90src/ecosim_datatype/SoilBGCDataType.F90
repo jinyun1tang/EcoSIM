@@ -119,9 +119,9 @@ implicit none
   real(r8),target,allocatable ::  trcg_XDFR(:,:,:)                   !soil surface gas dissolution (+ve) - volatilization (-ve), [g d-2 h-1]
   real(r8),target,allocatable ::  trcg_XBLL(:,:,:,:)                      !CO2 bubbling, [g d-2 h-1]
   real(r8),target,allocatable ::  XZHYS(:,:,:)                       !total H+ production
-  real(r8),target,allocatable ::  FLW(:,:,:,:)                       !water flux micropore, [m3 d-2 h-1]
-  real(r8),target,allocatable ::  FLWH(:,:,:,:)                      !water flux macropore, [m3 d-2 h-1]
-  real(r8),target,allocatable ::  HFLW(:,:,:,:)                      !convective heat flux micropore, [MJ d-2 h-1]
+  real(r8),target,allocatable ::  WaterFlowSoiMicP(:,:,:,:)                       !water flux micropore, [m3 d-2 h-1]
+  real(r8),target,allocatable ::  WaterFlowMacP(:,:,:,:)                      !water flux macropore, [m3 d-2 h-1]
+  real(r8),target,allocatable ::  HeatFlow(:,:,:,:)                      !convective heat flux micropore, [MJ d-2 h-1]
 
   real(r8),target,allocatable ::  trcs_XFLS(:,:,:,:,:)
   real(r8),target,allocatable ::  XOCFLS(:,:,:,:,:)                  !DOC flux micropore, [g d-2 h-1]
@@ -261,9 +261,9 @@ implicit none
   allocate(trcg_XDFR(idg_beg:idg_end-1,JY,JX));      trcg_XDFR=0._r8
   allocate(trcg_XBLL(idg_beg:idg_end,JZ,JY,JX));  trcg_XBLL=0._r8
   allocate(XZHYS(0:JZ,JY,JX));  XZHYS=0._r8
-  allocate(FLW(3,JD,JV,JH));    FLW=0._r8
-  allocate(FLWH(3,JD,JV,JH));   FLWH=0._r8
-  allocate(HFLW(3,JD,JV,JH));   HFLW=0._r8
+  allocate(WaterFlowSoiMicP(3,JD,JV,JH));    WaterFlowSoiMicP=0._r8
+  allocate(WaterFlowMacP(3,JD,JV,JH));   WaterFlowMacP=0._r8
+  allocate(HeatFlow(3,JD,JV,JH));   HeatFlow=0._r8
 
   allocate(trcs_XFLS(ids_beg:ids_end,3,0:JD,JV,JH));trcs_XFLS=0._r8
   allocate(XOCFLS(1:jcplx,3,0:JD,JV,JH));XOCFLS=0._r8
@@ -393,9 +393,9 @@ implicit none
   call destroy(RVMXC)
   call destroy(RVMBC)
   call destroy(XZHYS)
-  call destroy(FLW)
-  call destroy(FLWH)
-  call destroy(HFLW)
+  call destroy(WaterFlowSoiMicP)
+  call destroy(WaterFlowMacP)
+  call destroy(HeatFlow)
   call destroy(XOCFLS)
   call destroy(XONFLS)
 

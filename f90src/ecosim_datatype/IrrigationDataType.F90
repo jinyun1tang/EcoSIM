@@ -126,7 +126,7 @@ module IrrigationDataType
   real(r8),target,allocatable ::  CM1PU(:,:,:)                      !subsurface irrigation  MgHPO4 concentration, [g m-3]
   real(r8),target,allocatable ::  COPU(:,:,:,:)                     !subsurface irrigation  DOP concentration, [g m-3]
   real(r8),target,allocatable ::  FLU(:,:,:)                        !underground irrigation, [m3 d-2 h-1]
-  real(r8),target,allocatable ::  HWFLU(:,:,:)                      !convective heat of underground irrigation, [MJ d-2 h-1]
+  real(r8),target,allocatable ::  HeatIrrigation(:,:,:)                      !convective heat of underground irrigation, [MJ d-2 h-1]
   real(r8),target,allocatable ::  trcs_RFLU(:,:,:,:)                     !aqueous non-salt solutes in underground irrigation, [g d-2 h-1]
   real(r8),target,allocatable ::  trcsa_RFLU(:,:,:,:)                     !aqueous PO4 in underground irrigation non-band, [g d-2 h-1]
   private :: InitAllocate
@@ -257,7 +257,7 @@ module IrrigationDataType
   allocate(CM1PU(JZ,JY,JX));    CM1PU=0._r8
   allocate(COPU(1:jcplx,JZ,JY,JX)); COPU=0._r8
   allocate(FLU(JZ,JY,JX));      FLU=0._r8
-  allocate(HWFLU(JZ,JY,JX));    HWFLU=0._r8
+  allocate(HeatIrrigation(JZ,JY,JX));    HeatIrrigation=0._r8
   allocate(trcs_RFLU(ids_beg:ids_end,JZ,JY,JX));   trcs_RFLU=0._r8
   allocate(trcsa_RFLU(idsa_beg:idsab_end,JZ,JY,JX));   trcsa_RFLU=0._r8
   end subroutine InitAllocate
@@ -379,7 +379,7 @@ module IrrigationDataType
   call destroy(CM1PU)
   call destroy(COPU)
   call destroy(FLU)
-  call destroy(HWFLU)
+  call destroy(HeatIrrigation)
 
   end subroutine DestructIrrigation
 

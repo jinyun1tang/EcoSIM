@@ -97,7 +97,7 @@ module PlantDataRateType
   real(r8),target,allocatable ::  HEUPTK(:,:,:,:)                    !net root element uptake (+ve) - exudation (-ve), [g d-2 h-1]
   real(r8),target,allocatable ::  TEUPTK(:,:,:,:)                    !total net root element uptake (+ve) - exudation (-ve), [g d-2 ]
   real(r8),target,allocatable ::  GridPlantRootH2OUptake_vr(:,:,:)                      !total root water uptake, [m3 d-2]
-  real(r8),target,allocatable ::  TUPHT(:,:,:)                       !total root heat uptake, [MJ d-2]
+  real(r8),target,allocatable ::  THeatRootUptake(:,:,:)                       !total root heat uptake, [MJ d-2]
   real(r8),target,allocatable ::  trcg_TFLA(:,:,:,:)                 !total internal root gas flux , [g d-2 h-1]
   real(r8),target,allocatable ::  trcg_TLP(:,:,:,:)                  !total root internal gas flux, [g d-2 h-1]
   real(r8),target,allocatable ::  TCO2S(:,:,:)                       !total root-soil CO2 flux, [g d-2 h-1]
@@ -250,7 +250,7 @@ module PlantDataRateType
   allocate(HEUPTK(npelms,JP,JY,JX));   HEUPTK=0._r8
   allocate(TEUPTK(npelms,JP,JY,JX));   TEUPTK=0._r8
   allocate(GridPlantRootH2OUptake_vr(0:JZ,JY,JX)); GridPlantRootH2OUptake_vr=0._r8
-  allocate(TUPHT(0:JZ,JY,JX));  TUPHT=0._r8
+  allocate(THeatRootUptake(0:JZ,JY,JX));  THeatRootUptake=0._r8
   allocate(trcg_TFLA(idg_beg:idg_end-1,JZ,JY,JX));   trcg_TFLA=0._r8
   allocate(trcg_TLP(idg_beg:idg_end-1,JZ,JY,JX));   trcg_TLP=0._r8
   allocate(TCO2S(JZ,JY,JX));    TCO2S=0._r8
@@ -388,7 +388,7 @@ module PlantDataRateType
   call destroy(HEUPTK)
   call destroy(TEUPTK)
   call destroy(GridPlantRootH2OUptake_vr)
-  call destroy(TUPHT)
+  call destroy(THeatRootUptake)
   call destroy(TCO2S)
   call destroy(TUPOXS)
   call destroy(TUPCHS)

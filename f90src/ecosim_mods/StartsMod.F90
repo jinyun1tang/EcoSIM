@@ -312,8 +312,8 @@ module StartsMod
       !     SURFACE LITTER HEAT CAPACITY
       !
       BKVLNM(NY,NX)=AZMAX1(SAND(NU(NY,NX),NY,NX)+SILT(NU(NY,NX),NY,NX)+CLAY(NU(NY,NX),NY,NX))
-      VHCP(0,NY,NX)=cpo*ORGC(0,NY,NX)+cpw*VOLW(0,NY,NX)+cpi*VOLI(0,NY,NX)
-      VHCM(0,NY,NX)=0.0_r8
+      VHeatCapacity(0,NY,NX)=cpo*ORGC(0,NY,NX)+cpw*VWatMicP(0,NY,NX)+cpi*ViceMicP(0,NY,NX)
+      VHeatCapacitySoilM(0,NY,NX)=0.0_r8
       VOLAI(0,NY,NX)=0.0_r8
     ENDDO
   ENDDO
@@ -418,9 +418,9 @@ module StartsMod
         POROS(L,NY,NX)=1.0_r8
       ENDIF
       POROSI(L,NY,NX)=POROS(L,NY,NX)*FMPR(L,NY,NX)
-      VOLA(L,NY,NX)=POROS(L,NY,NX)*VOLX(L,NY,NX)
-      VOLAI(L,NY,NX)=VOLA(L,NY,NX)
-      VOLAH(L,NY,NX)=FHOL(L,NY,NX)*VOLTI(L,NY,NX)
+      VMicP(L,NY,NX)=POROS(L,NY,NX)*VSoilPoreMicP(L,NY,NX)
+      VOLAI(L,NY,NX)=VMicP(L,NY,NX)
+      VAirMacP(L,NY,NX)=FHOL(L,NY,NX)*VOLTI(L,NY,NX)
       !
       !     LAYER HEAT CONTENTS
       !
@@ -439,10 +439,10 @@ module StartsMod
         VORGC=CORGCM*ppmc*BKDS(L,NY,NX)/PTDS
         VMINL=(CSILT(L,NY,NX)+CCLAY(L,NY,NX))*BKDS(L,NY,NX)/PTDS
         VSAND=CSAND(L,NY,NX)*BKDS(L,NY,NX)/PTDS
-        VHCM(L,NY,NX)=((2.496_r8*VORGC+2.385_r8*VMINL+2.128_r8*VSAND) &
+        VHeatCapacitySoilM(L,NY,NX)=((2.496_r8*VORGC+2.385_r8*VMINL+2.128_r8*VSAND) &
           *FMPR(L,NY,NX)+2.128_r8*ROCK(L,NY,NX))*VOLT(L,NY,NX)
       ELSE
-        VHCM(L,NY,NX)=0.0_r8
+        VHeatCapacitySoilM(L,NY,NX)=0.0_r8
       ENDIF
 !
       !     INITIAL SOIL WATER AND ICE CONTENTS
@@ -471,17 +471,16 @@ module StartsMod
         ELSE
           THETI(L,NY,NX)=THI(L,NY,NX)
         ENDIF
-        VOLW(L,NY,NX)=THETW(L,NY,NX)*VOLX(L,NY,NX)
-        VOLWX(L,NY,NX)=VOLW(L,NY,NX)
-        VOLWH(L,NY,NX)=THETW(L,NY,NX)*VOLAH(L,NY,NX)
-        VOLI(L,NY,NX)=THETI(L,NY,NX)*VOLX(L,NY,NX)
-        VOLIH(L,NY,NX)=THETI(L,NY,NX)*VOLAH(L,NY,NX)
-!       VOLP: total air-filled porosity, micropores + macropores
-        VOLP(L,NY,NX)=AZMAX1(VOLA(L,NY,NX)-VOLW(L,NY,NX) &
-          -VOLI(L,NY,NX))+AZMAX1(VOLAH(L,NY,NX)-VOLWH(L,NY,NX) &
-          -VOLIH(L,NY,NX))
-        VHCP(L,NY,NX)=VHCM(L,NY,NX)+cpw*(VOLW(L,NY,NX) &
-          +VOLWH(L,NY,NX))+cpi*(VOLI(L,NY,NX)+VOLIH(L,NY,NX))
+        VWatMicP(L,NY,NX)=THETW(L,NY,NX)*VSoilPoreMicP(L,NY,NX)
+        VWatMicPX(L,NY,NX)=VWatMicP(L,NY,NX)
+        VWatMacP(L,NY,NX)=THETW(L,NY,NX)*VAirMacP(L,NY,NX)
+        ViceMicP(L,NY,NX)=THETI(L,NY,NX)*VSoilPoreMicP(L,NY,NX)
+        ViceMacP(L,NY,NX)=THETI(L,NY,NX)*VAirMacP(L,NY,NX)
+!       total air-filled porosity, micropores + macropores
+        VsoiP(L,NY,NX)=AZMAX1(VMicP(L,NY,NX)-VWatMicP(L,NY,NX)-ViceMicP(L,NY,NX)) & 
+          +AZMAX1(VAirMacP(L,NY,NX)-VWatMacP(L,NY,NX)-ViceMacP(L,NY,NX))
+        VHeatCapacity(L,NY,NX)=VHeatCapacitySoilM(L,NY,NX)+cpw*(VWatMicP(L,NY,NX) &
+          +VWatMacP(L,NY,NX))+cpi*(ViceMicP(L,NY,NX)+ViceMacP(L,NY,NX))
         THETWZ(L,NY,NX)=THETW(L,NY,NX)
         THETIZ(L,NY,NX)=THETI(L,NY,NX)
       ENDIF
@@ -848,7 +847,7 @@ module StartsMod
   implicit none
   integer, intent(in) :: NY, NX
   integer :: L,K
-  real(r8) :: VOLR0
+  real(r8) :: VLitR0
   associate(                              &
     n_litrsfk    => micpar%n_litrsfk    , &
     k_woody_litr => micpar%k_woody_litr , &
@@ -874,17 +873,17 @@ module StartsMod
       CDPTHZ(L,NY,NX)=0.0_r8
       ORGC(L,NY,NX)=SUM(RSC(1:n_litrsfk,L,NY,NX))*AREA(3,L,NY,NX)
       ORGCX(L,NY,NX)=ORGC(L,NY,NX)
-      VOLR0=0._r8
+      VLitR0=0._r8
       DO K=1,n_litrsfk
-        VOLR0=VOLR0+RSC(K,L,NY,NX)/BKRS(K)
+        VLitR0=VLitR0+RSC(K,L,NY,NX)/BKRS(K)
       ENDDO
-      VOLR(NY,NX)=VOLR0*ppmc*AREA(3,L,NY,NX)
-      VOLT(L,NY,NX)=VOLR(NY,NX)
-      VOLX(L,NY,NX)=VOLT(L,NY,NX)
-      VOLY(L,NY,NX)=VOLX(L,NY,NX)
+      VLitR(NY,NX)=VLitR0*ppmc*AREA(3,L,NY,NX)
+      VOLT(L,NY,NX)=VLitR(NY,NX)
+      VSoilPoreMicP(L,NY,NX)=VOLT(L,NY,NX)
+      VOLY(L,NY,NX)=VSoilPoreMicP(L,NY,NX)
       VOLTI(L,NY,NX)=VOLT(L,NY,NX)
       BKVL(L,NY,NX)=MWC2Soil*ORGC(L,NY,NX)  !mass of soil layer, Mg/d2
-      DLYRI(3,L,NY,NX)=VOLX(L,NY,NX)/AREA(3,L,NY,NX)
+      DLYRI(3,L,NY,NX)=VSoilPoreMicP(L,NY,NX)/AREA(3,L,NY,NX)
       DLYR(3,L,NY,NX)=DLYRI(3,L,NY,NX)
     ELSE
 !     if it is a standing water, no macropore fraction
@@ -904,12 +903,12 @@ module StartsMod
       CDPTHZ(L,NY,NX)=CumDepth2LayerBottom(L,NY,NX)-CumDepth2LayerBottom(NU(NY,NX),NY,NX)+DLYR(3,NU(NY,NX),NY,NX)
       DPTHZ(L,NY,NX)=0.5_r8*(CDPTHZ(L,NY,NX)+CDPTHZ(L-1,NY,NX))
       VOLT(L,NY,NX)=amax1(AREA(3,L,NY,NX)*DLYR(3,L,NY,NX),1.e-8_r8)
-      VOLX(L,NY,NX)=VOLT(L,NY,NX)*FMPR(L,NY,NX)
-      VOLY(L,NY,NX)=VOLX(L,NY,NX)
+      VSoilPoreMicP(L,NY,NX)=VOLT(L,NY,NX)*FMPR(L,NY,NX)
+      VOLY(L,NY,NX)=VSoilPoreMicP(L,NY,NX)
       VOLTI(L,NY,NX)=VOLT(L,NY,NX)
 !     bulk density is defined only for soil with micropores      
 !     bulk soil mass evaluated as micropore volume
-      BKVL(L,NY,NX)=BKDS(L,NY,NX)*VOLX(L,NY,NX)
+      BKVL(L,NY,NX)=BKDS(L,NY,NX)*VSoilPoreMicP(L,NY,NX)
       RTDNT(L,NY,NX)=0.0_r8
     ENDIF
     AREA(1,L,NY,NX)=DLYR(3,L,NY,NX)*DLYR(2,L,NY,NX)

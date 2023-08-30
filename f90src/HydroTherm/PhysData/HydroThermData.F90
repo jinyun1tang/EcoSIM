@@ -11,8 +11,8 @@ implicit none
   real(r8),allocatable ::  THETPX(:,:,:)                      !  
   real(r8),allocatable ::  VolHeatCapacity(:,:,:)                       !
   real(r8),allocatable ::  THETPY(:,:,:)                      !
-  real(r8),allocatable ::  VOLW1(:,:,:)                       !    
-  real(r8),allocatable ::  VOLI1(:,:,:)                       !  
+  real(r8),allocatable ::  VWatMicP1(:,:,:)                       !    
+  real(r8),allocatable ::  ViceMicP1(:,:,:)                       !  
   real(r8),allocatable ::  FLQ0S(:,:)                         !  
   real(r8),allocatable ::  FLQ0W(:,:)                         !  
   real(r8),allocatable ::  VOLPH1(:,:,:)                      !  
@@ -30,14 +30,14 @@ implicit none
   real(r8),allocatable ::  THRYW(:,:)                         !  
   real(r8),allocatable ::  VOLP1(:,:,:)                       !  
   real(r8),allocatable ::  TK0(:,:,:)                         !  
-  real(r8),allocatable ::  VOLWH1(:,:,:)                      !
+  real(r8),allocatable ::  VWatMacP1(:,:,:)                      !
   real(r8),allocatable ::  FGRD(:,:,:)                        !
   real(r8),allocatable ::  VolHeatCapacityA(:,:,:)                      !
   real(r8),allocatable ::  VolHeatCapacityB(:,:,:)                      !
   real(r8),allocatable ::  RAG(:,:)                           !
   real(r8),allocatable ::  PAREW(:,:)                         ! 
   real(r8),allocatable ::  ALTG(:,:)                          ! 
-  real(r8),allocatable ::  VOLIH1(:,:,:)                      !
+  real(r8),allocatable ::  ViceMacP1(:,:,:)                      !
   real(r8),allocatable ::  RADXW(:,:)                         !  
   real(r8),allocatable ::  QR1(:,:,:,:)                       !  
   real(r8),allocatable ::  HQR1(:,:,:,:)                      !  
@@ -45,10 +45,10 @@ implicit none
   real(r8),allocatable ::  QW1(:,:,:)                         !
   real(r8),allocatable ::  QI1(:,:,:)                         !  
   real(r8),allocatable ::  HQS1(:,:,:)                        !  
-  real(r8),allocatable ::  HFLWL(:,:,:,:)                     !  
-  real(r8),allocatable ::  FLWL(:,:,:,:)                      !  
-  real(r8),allocatable ::  FLWHL(:,:,:,:)                     !  
-  real(r8),allocatable ::  FLWLX(:,:,:,:)                     !  
+  real(r8),allocatable ::  HeatFlowi(:,:,:,:)                     !  
+  real(r8),allocatable ::  WatXChange2WatTable(:,:,:,:)                      !  
+  real(r8),allocatable ::  ConvectWaterFlowMacP(:,:,:,:)                     !  
+  real(r8),allocatable ::  WatXChange2WatTableX(:,:,:,:)                     !  
   real(r8),allocatable ::  VOLW2(:,:,:)                       !
   real(r8),allocatable ::  VOLP1Z(:,:,:)                      !
   real(r8),allocatable ::  VOLWX1(:,:,:)                      !
@@ -70,8 +70,8 @@ implicit none
   allocate(THETPX(0:JZ,JY,JX)); THETPX=0._r8   
   allocate(VolHeatCapacity(0:JZ,JY,JX));  VolHeatCapacity=0._r8  
   allocate(THETPY(0:JZ,JY,JX)); THETPY=0._r8  
-  allocate(VOLW1(0:JZ,JY,JX));  VOLW1=0._r8  
-  allocate(VOLI1(0:JZ,JY,JX));  VOLI1=0._r8
+  allocate(VWatMicP1(0:JZ,JY,JX));  VWatMicP1=0._r8  
+  allocate(ViceMicP1(0:JZ,JY,JX));  ViceMicP1=0._r8
   allocate(FLQ0S(JY,JX));       FLQ0S=0._r8
   allocate(FLQ0W(JY,JX));       FLQ0W=0._r8
   allocate(VOLPH1(JZ,JY,JX));   VOLPH1=0._r8 
@@ -89,14 +89,14 @@ implicit none
   allocate(THRYW(JY,JX));       THRYW=0._r8  
   allocate(VOLP1(0:JZ,JY,JX));  VOLP1=0._r8  
   allocate(TK0(JS,JY,JX));      TK0=0._r8  
-  allocate(VOLWH1(JZ,JY,JX));   VOLWH1=0._r8
+  allocate(VWatMacP1(JZ,JY,JX));   VWatMacP1=0._r8
   allocate(FGRD(JZ,JY,JX));     FGRD=0._r8
   allocate(VolHeatCapacityA(JZ,JY,JX));   VolHeatCapacityA=0._r8
   allocate(VolHeatCapacityB(JZ,JY,JX));   VolHeatCapacityB=0._r8  
   allocate(RAG(JY,JX));         RAG=0._r8
   allocate(PAREW(JY,JX));       PAREW=0._r8
   allocate(ALTG(JY,JX));        ALTG=0._r8  
-  allocate(VOLIH1(JZ,JY,JX));   VOLIH1=0._r8  
+  allocate(ViceMacP1(JZ,JY,JX));   ViceMacP1=0._r8  
   allocate(RADXW(JY,JX));       RADXW=0._r8  
   allocate(QR1(2,2,JV,JH));     QR1=0._r8  
   allocate(HQR1(2,2,JV,JH));    HQR1=0._r8
@@ -104,10 +104,10 @@ implicit none
   allocate(QW1(2,JV,JH));       QW1=0._r8
   allocate(QI1(2,JV,JH));       QI1=0._r8  
   allocate(HQS1(2,JV,JH));      HQS1=0._r8
-  allocate(HFLWL(3,JD,JV,JH));  HFLWL=0._r8
-  allocate(FLWL(3,JD,JV,JH));   FLWL=0._r8  
-  allocate(FLWHL(3,JD,JV,JH));  FLWHL=0._r8
-  allocate(FLWLX(3,JD,JV,JH));  FLWLX=0._r8
+  allocate(HeatFlowi(3,JD,JV,JH));  HeatFlowi=0._r8
+  allocate(WatXChange2WatTable(3,JD,JV,JH));   WatXChange2WatTable=0._r8  
+  allocate(ConvectWaterFlowMacP(3,JD,JV,JH));  ConvectWaterFlowMacP=0._r8
+  allocate(WatXChange2WatTableX(3,JD,JV,JH));  WatXChange2WatTableX=0._r8
   allocate(VOLW2(JZ,JY,JX));    VOLW2=0._r8
   allocate(VOLP1Z(JZ,JY,JX));   VOLP1Z=0._r8
   allocate(VOLWX1(JZ,JY,JX));   VOLWX1=0._r8
@@ -128,8 +128,8 @@ implicit none
   call destroy(THETPX)  
   call destroy(VolHeatCapacity)  
   call destroy(THETPY)  
-  call destroy(VOLW1)  
-  call destroy(VOLI1)
+  call destroy(VWatMicP1)  
+  call destroy(ViceMicP1)
   call destroy(FLQ0S)
   call destroy(FLQ0W)
   call destroy(VOLPH1)    
@@ -147,24 +147,24 @@ implicit none
   call destroy(THRYW)
   call destroy(VOLP1)
   call destroy(TK0)  
-  call destroy(VOLWH1)
+  call destroy(VWatMacP1)
   call destroy(FGRD)
   call destroy(VolHeatCapacityA)
   call destroy(VolHeatCapacityB)  
   call destroy(RAG)
   call destroy(PAREW)
   call destroy(ALTG)
-  call destroy(VOLIH1)
+  call destroy(ViceMacP1)
   call destroy(RADXW)
   call destroy(HQR1)    
   call destroy(QS1)  
   call destroy(QW1)
   call destroy(QI1)
   call destroy(HQS1)    
-  call destroy(HFLWL)  
-  call destroy(FLWL)  
-  call destroy(FLWHL)
-  call destroy(FLWLX)
+  call destroy(HeatFlowi)  
+  call destroy(WatXChange2WatTable)  
+  call destroy(ConvectWaterFlowMacP)
+  call destroy(WatXChange2WatTableX)
   call destroy(VOLW2)
   call destroy(VOLP1Z)
   call destroy(VOLWX1)

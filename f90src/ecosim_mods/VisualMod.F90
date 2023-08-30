@@ -135,14 +135,14 @@ module VisualMod
         TTCH=TTCH+HCH4G(NY,NX)
         IF(J.EQ.24)THEN
           IF(NU(NY,NX).EQ.7)THEN
-            SWC(NY,NX)=(VOLW(8,NY,NX)+AMIN1(VOLAH(8,NY,NX) &
-              ,VOLWH(8,NY,NX)))/VOLT(8,NY,NX)
+            SWC(NY,NX)=(VWatMicP(8,NY,NX)+AMIN1(VAirMacP(8,NY,NX) &
+              ,VWatMacP(8,NY,NX)))/VOLT(8,NY,NX)
           ELSEIF(NU(NY,NX).EQ.4)THEN
-            SWC(NY,NX)=(VOLW(5,NY,NX)+AMIN1(VOLAH(5,NY,NX) &
-              ,VOLWH(5,NY,NX)))/VOLT(5,NY,NX)
+            SWC(NY,NX)=(VWatMicP(5,NY,NX)+AMIN1(VAirMacP(5,NY,NX) &
+              ,VWatMacP(5,NY,NX)))/VOLT(5,NY,NX)
           ELSE
-            SWC(NY,NX)=(VOLW(2,NY,NX)+AMIN1(VOLAH(2,NY,NX) &
-              ,VOLWH(2,NY,NX)))/VOLT(2,NY,NX)
+            SWC(NY,NX)=(VWatMicP(2,NY,NX)+AMIN1(VAirMacP(2,NY,NX) &
+              ,VWatMacP(2,NY,NX)))/VOLT(2,NY,NX)
           ENDIF
         ENDIF
 !     GO TO 9990
@@ -220,7 +220,7 @@ module VisualMod
           OUT(16)=-TSH(NY,NX)*277.8/AREA(3,NU(NY,NX),NY,NX)
           L=1
           D60: DO N=17,27
-            OUT(N)=(VOLW(L,NY,NX)+AMIN1(VOLAH(L,NY,NX),VOLWH(L,NY,NX)))/VOLT(L,NY,NX)
+            OUT(N)=(VWatMicP(L,NY,NX)+AMIN1(VAirMacP(L,NY,NX),VWatMacP(L,NY,NX)))/VOLT(L,NY,NX)
             L=L+1
           ENDDO D60
 

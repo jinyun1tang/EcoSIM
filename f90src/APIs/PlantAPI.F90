@@ -176,7 +176,7 @@ implicit none
     RNO3X(L,NY,NX) =plt_bgcr%RNO3X(L)
     RNH4X(L,NY,NX) =plt_bgcr%RNH4X(L)
     ROXYX(L,NY,NX) =plt_bgcr%ROXYX(L)
-    TUPHT(L,NY,NX) =plt_ew%TUPHT(L)
+    THeatRootUptake(L,NY,NX) =plt_ew%THeatRootUptake(L)
     GridPlantRootH2OUptake_vr(L,NY,NX)=plt_ew%GridPlantRootH2OUptake_vr(L)
     DO  K=1,micpar%n_pltlitrk
       DO NE=1,npelms
@@ -788,14 +788,14 @@ implicit none
     plt_soilchem%THETW(L) =THETW(L,NY,NX)
     plt_soilchem%THETY(L) =THETY(L,NY,NX)
     plt_soilchem%TFND(L)  =TFND(L,NY,NX)
-    plt_soilchem%VOLX(L)  =VOLX(L,NY,NX)
+    plt_soilchem%VSoilPoreMicP(L)  =VSoilPoreMicP(L,NY,NX)
     plt_soilchem%trcs_VLN(ids_H1PO4B,L) =trcs_VLN(ids_H1PO4B,L,NY,NX)
     plt_soilchem%trcs_VLN(ids_NO3,L) =trcs_VLN(ids_NO3,L,NY,NX)
     plt_soilchem%trcs_VLN(ids_H1PO4,L) =trcs_VLN(ids_H1PO4,L,NY,NX)
     plt_soilchem%VOLY(L)  =VOLY(L,NY,NX)
-    plt_soilchem%VOLI(L)  =VOLI(L,NY,NX)
-    plt_soilchem%VOLW(L)  =VOLW(L,NY,NX)
-    plt_soilchem%VOLA(L)  =VOLA(L,NY,NX)
+    plt_soilchem%ViceMicP(L)  =ViceMicP(L,NY,NX)
+    plt_soilchem%VWatMicP(L)  =VWatMicP(L,NY,NX)
+    plt_soilchem%VMicP(L)  =VMicP(L,NY,NX)
     plt_soilchem%trcs_VLN(ids_NO3B,L) =trcs_VLN(ids_NO3B,L,NY,NX)
     plt_soilchem%trcs_VLN(ids_NH4,L) =trcs_VLN(ids_NH4,L,NY,NX)
     plt_soilchem%trcs_VLN(ids_NH4B,L) =trcs_VLN(ids_NH4B,L,NY,NX)
@@ -946,8 +946,8 @@ implicit none
 
   DO L=1,NL(NY,NX)
     DO M=1,NPH
-      plt_site%VOLWM(M,L)=VOLWM(M,L,NY,NX)
-      plt_site%VOLPM(M,L)=VOLPM(M,L,NY,NX)
+      plt_site%VWatMicPM(M,L)=VWatMicPM(M,L,NY,NX)
+      plt_site%VsoiPM(M,L)=VsoiPM(M,L,NY,NX)
       plt_site%TORT(M,L)=TORT(M,L,NY,NX)
       plt_site%FILM(M,L)=FILM(M,L,NY,NX)
       plt_soilchem%DFGS(M,L)=DFGS(M,L,NY,NX)
@@ -1013,7 +1013,7 @@ implicit none
     plt_bgcr%RNO3X(L)=RNO3X(L,NY,NX)
     plt_bgcr%RNH4X(L)=RNH4X(L,NY,NX)
     plt_bgcr%ROXYX(L)=ROXYX(L,NY,NX)
-    plt_ew%TUPHT(L)  =TUPHT(L,NY,NX)
+    plt_ew%THeatRootUptake(L)  =THeatRootUptake(L,NY,NX)
     plt_ew%GridPlantRootH2OUptake_vr(L) =GridPlantRootH2OUptake_vr(L,NY,NX)
     DO  K=1,micpar%n_pltlitrk
       DO NE=1,npelms
@@ -1522,9 +1522,9 @@ implicit none
 
   DO L=0,NL(NY,NX)
     plt_site%AREA3(L)=AREA(3,L,NY,NX)
-    plt_soilchem%VOLX(L)=VOLX(L,NY,NX)
+    plt_soilchem%VSoilPoreMicP(L)=VSoilPoreMicP(L,NY,NX)
     plt_soilchem%VOLY(L)=VOLY(L,NY,NX)
-    plt_soilchem%VOLW(L)=VOLW(L,NY,NX)
+    plt_soilchem%VWatMicP(L)=VWatMicP(L,NY,NX)
   ENDDO
   plt_rad%SSIN=SSIN(NY,NX)
   plt_site%ZNOON=ZNOON(NY,NX)

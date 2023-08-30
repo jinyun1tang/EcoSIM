@@ -39,15 +39,15 @@ implicit none
   contains
 
 
-  subroutine RelayerSoilProfile(NY,NX,DORGC,DVOLI,UDVOLI,UDLYXF)
+  subroutine RelayerSoilProfile(NY,NX,DORGC,DViceMicP,UDViceMicP,UDLYXF)
   !
   !Description:
   !relayer the soil profiles
   implicit none
   integer, intent(in) :: NY,NX
   real(r8),intent(in) :: DORGC(JZ,JY,JX)  !change in organic matter, initial-final
-  REAL(R8),INTENT(IN) :: DVOLI(JZ,JY,JX)  !change in ice volume, initial-final
-  real(r8),intent(inout):: UDVOLI,UDLYXF
+  REAL(R8),INTENT(IN) :: DViceMicP(JZ,JY,JX)  !change in ice volume, initial-final
+  real(r8),intent(inout):: UDViceMicP,UDLYXF
 
   real(r8) :: CDPTHY(0:JZ,JY,JX),CDPTHX(JZ,JY,JX)
   integer :: IFLGL(0:JZ,6)  !flag for soil thickness change
@@ -71,7 +71,7 @@ implicit none
       ICHKLX=ist_soil
     ENDIF
 
-    call SoilSubsidence(ICHKLX,NY,NX,DORGC,DVOLI,UDLYXF,UDVOLI,CDPTHX,CDPTHY,IFLGL)
+    call SoilSubsidence(ICHKLX,NY,NX,DORGC,DViceMicP,UDLYXF,UDViceMicP,CDPTHX,CDPTHY,IFLGL)
 
     !
     !     RECALCULATE SOIL LAYER THICKNESS
@@ -126,7 +126,7 @@ implicit none
 
               IF(NN.EQ.1)THEN
                 IF(BKDS(L0,NY,NX).LE.ZERO.AND.BKDS(L1,NY,NX).LE.ZERO &
-                  .AND.VOLW(L0,NY,NX)+VOLI(L0,NY,NX).LE.ZEROS(NY,NX))THEN
+                  .AND.VWatMicP(L0,NY,NX)+ViceMicP(L0,NY,NX).LE.ZEROS(NY,NX))THEN
                   CumDepth2LayerBottom(L1,NY,NX)=CumDepth2LayerBottom(L0,NY,NX)
                   CDPTHY(L1,NY,NX)=CDPTHY(L0,NY,NX)
                 ENDIF
@@ -155,16 +155,16 @@ implicit none
     ENDDO D245
   end subroutine RelayerSoilProfile
 !------------------------------------------------------------------------------------------
-  subroutine SoilSubsidence(ICHKLX,NY,NX,DORGC,DVOLI,UDLYXF,UDVOLI,&
+  subroutine SoilSubsidence(ICHKLX,NY,NX,DORGC,DViceMicP,UDLYXF,UDViceMicP,&
     CDPTHX,CDPTHY,IFLGL)
 !
 ! IFLGL: c1, ponding water, c2, pond disappear, c3, pond reappare, c4: freeze-thaw, c5: erosion, c6: som change
   implicit none
   integer, intent(in) :: ICHKLX   !surface layer type: 0 water, 1 soil
   integer, intent(in) :: NY,NX
-  REAL(R8),INTENT(IN) :: DVOLI(JZ,JY,JX)
+  REAL(R8),INTENT(IN) :: DViceMicP(JZ,JY,JX)
   real(r8),intent(in) :: DORGC(JZ,JY,JX)
-  real(r8), intent(inout) :: UDLYXF,UDVOLI
+  real(r8), intent(inout) :: UDLYXF,UDViceMicP
   real(r8), intent(out) :: CDPTHX(JZ,JY,JX)
   real(r8), intent(inout) :: CDPTHY(0:JZ,JY,JX)
   integer, intent(inout) :: IFLGL(0:JZ,6)
@@ -193,7 +193,7 @@ implicit none
       ! current layer is water, lower layer is soil, or surface is soil
       IF(BKDS(LX+1,NY,NX).GT.ZERO.OR.ICHKLX.EQ.ist_soil)THEN
         !layer below is soil, layer above is also soil
-        DDLYXP=DLYR(3,LX,NY,NX)-(VOLW(LX,NY,NX)+VOLI(LX,NY,NX))/AREA(3,LX,NY,NX)
+        DDLYXP=DLYR(3,LX,NY,NX)-(VWatMicP(LX,NY,NX)+ViceMicP(LX,NY,NX))/AREA(3,LX,NY,NX)
         DDLYX(LX,ich_watlev)=DDLYXP+DDLYX(LX+1,ich_watlev)
         DDLYR(LX,ich_watlev)=DDLYX(LX+1,ich_watlev)
         IFLGL(LX,ich_watlev)=2
@@ -201,10 +201,10 @@ implicit none
         !next layer, current and top are all water
         !DDLYXP: soil equivalent depth
         !DLYRI: initial soil layer thickness, [m]
-        DDLYXP=DLYRI(3,LX,NY,NX)-(VOLW(LX,NY,NX)+VOLI(LX,NY,NX))/AREA(3,LX,NY,NX)
+        DDLYXP=DLYRI(3,LX,NY,NX)-(VWatMicP(LX,NY,NX)+ViceMicP(LX,NY,NX))/AREA(3,LX,NY,NX)
 
         !DPTWI: water+ice total thickness layer below
-        DPTWI=(VOLW(LX+1,NY,NX)+VOLI(LX+1,NY,NX))/AREA(3,LX,NY,NX)
+        DPTWI=(VWatMicP(LX+1,NY,NX)+ViceMicP(LX+1,NY,NX))/AREA(3,LX,NY,NX)
         !there is expansion in layer LX, or next layer has
         IF(DDLYXP.LT.-ZERO.OR.DPTWI.GT.ZERO)THEN
           DDLYX(LX,ich_watlev)=DDLYXP+DDLYX(LX+1,ich_watlev)
@@ -218,7 +218,7 @@ implicit none
           ENDIF
         ELSE
           !shrink
-          DDLYXP=DLYR(3,LX,NY,NX)-(VOLW(LX,NY,NX)+VOLI(LX,NY,NX))/AREA(3,LX,NY,NX)
+          DDLYXP=DLYR(3,LX,NY,NX)-(VWatMicP(LX,NY,NX)+ViceMicP(LX,NY,NX))/AREA(3,LX,NY,NX)
           DDLYX(LX,ich_watlev)=DDLYXP+DDLYX(LX+1,ich_watlev)
           DDLYR(LX,ich_watlev)=DDLYX(LX+1,ich_watlev)
           IFLGL(LX,ich_watlev)=2
@@ -246,15 +246,15 @@ implicit none
     ELSE
       !current layer is soil
       !     FREEZE-THAW
-      !DVOLI: change in ice volume, initial-final
+      !DViceMicP: change in ice volume, initial-final
       !DENSI: mass density of ice, g/cm3
       !DENSJ: volume added per unit addition of ice (with respect to ice)
       !the change is put to layer thickness
       !DDLYXF: added thickness change
       ! 4: due to freeze-thaw
-      IF(ABS(DVOLI(LX,NY,NX)).GT.ZEROS(NY,NX))THEN
+      IF(ABS(DViceMicP(LX,NY,NX)).GT.ZEROS(NY,NX))THEN
         DENSJ=1._r8-DENSI
-        DDLYXF=DVOLI(LX,NY,NX)*DENSJ/AREA(3,LX,NY,NX)
+        DDLYXF=DViceMicP(LX,NY,NX)*DENSJ/AREA(3,LX,NY,NX)
         !bottom layer
         IF(LX.EQ.NL(NY,NX))THEN
           DDLYX(LX,ich_frzthaw)=DDLYXF
@@ -294,9 +294,9 @@ implicit none
       ENDIF
 
       !total change in ice volume
-      TDVOLI=TDVOLI+DVOLI(LX,NY,NX)
+      TDVOLI=TDVOLI+DViceMicP(LX,NY,NX)
       TDLYXF=TDLYXF+DDLYXF
-      UDVOLI=UDVOLI+DVOLI(LX,NY,NX)
+      UDViceMicP=UDViceMicP+DViceMicP(LX,NY,NX)
       UDLYXF=UDLYXF+DDLYXF
       !
       !     EROSION
@@ -305,7 +305,7 @@ implicit none
         IF(LX.EQ.NL(NY,NX))THEN
 !  5: due to sediment erosion
 !         total soil layer reduction due to erosion
-          DDLYXE=-TSEDER(NY,NX)/(BKVLNU(NY,NX)/VOLX(NU(NY,NX),NY,NX))
+          DDLYXE=-TSEDER(NY,NX)/(BKVLNU(NY,NX)/VSoilPoreMicP(NU(NY,NX),NY,NX))
           DDLYX(LX,ich_erosion)=DDLYXE
           DDLYR(LX,ich_erosion)=DDLYXE
           IFLGL(LX,ich_erosion)=1
@@ -394,8 +394,8 @@ implicit none
             ENDIF
             !  top layer
             IF(LX.EQ.NU(NY,NX))THEN
-              CumDepth2LayerBottom(LX-1,NY,NX)=CumDepth2LayerBottom(LX,NY,NX)-(VOLW(LX,NY,NX)+VOLI(LX,NY,NX))/AREA(3,LX,NY,NX)
-              CDPTHY(LX-1,NY,NX)=CDPTHY(LX,NY,NX)-(VOLW(LX,NY,NX)+VOLI(LX,NY,NX))/AREA(3,LX,NY,NX)
+              CumDepth2LayerBottom(LX-1,NY,NX)=CumDepth2LayerBottom(LX,NY,NX)-(VWatMicP(LX,NY,NX)+ViceMicP(LX,NY,NX))/AREA(3,LX,NY,NX)
+              CDPTHY(LX-1,NY,NX)=CDPTHY(LX,NY,NX)-(VWatMicP(LX,NY,NX)+ViceMicP(LX,NY,NX))/AREA(3,LX,NY,NX)
             ENDIF
           ENDIF
           !
@@ -452,9 +452,9 @@ implicit none
         ENDIF
       ENDIF
     ENDDO D200
-    VOLY(LX,NY,NX)=VOLX(LX,NY,NX)
+    VOLY(LX,NY,NX)=VSoilPoreMicP(LX,NY,NX)
   ENDDO D225
-  VOLY(0,NY,NX)=VOLW(0,NY,NX)+VOLI(0,NY,NX)
+  VOLY(0,NY,NX)=VWatMicP(0,NY,NX)+ViceMicP(0,NY,NX)
   end subroutine SoilSubsidence
 
 !------------------------------------------------------------------------------------------
@@ -489,7 +489,7 @@ implicit none
       FO=1.0_r8
     ELSE
       IF(BKDS(L0,NY,NX).LE.ZERO)THEN
-        DPTWI=(VOLW(L0,NY,NX)+VOLI(L0,NY,NX))/AREA(3,L0,NY,NX)
+        DPTWI=(VWatMicP(L0,NY,NX)+ViceMicP(L0,NY,NX))/AREA(3,L0,NY,NX)
         IF(DPTWI.GT.ZERO)THEN
           FX=AMIN1(1.0_r8,DDLYRX(NN)/DPTWI)
           FO=FX
@@ -519,7 +519,7 @@ implicit none
       L0=0
     ENDIF
     IF(BKDS(L0,NY,NX).LE.ZERO)THEN
-      DPTWI=(VOLW(L0,NY,NX)+VOLI(L0,NY,NX))/AREA(3,L0,NY,NX)
+      DPTWI=(VWatMicP(L0,NY,NX)+ViceMicP(L0,NY,NX))/AREA(3,L0,NY,NX)
       IF(DPTWI.GT.ZERO)THEN
         FX=AMIN1(1.0,-DDLYRX(NN)/DPTWI)
         FO=FX
@@ -608,18 +608,18 @@ implicit none
       !
   ELSEIF(NN.EQ.2)THEN
     IF((L.EQ.NU(NY,NX).AND.BKDS(NU(NY,NX),NY,NX).LE.ZERO) &
-      .AND.(VHCP(NU(NY,NX),NY,NX).LE.VHCPNX(NY,NX) &
+      .AND.(VHeatCapacity(NU(NY,NX),NY,NX).LE.VHCPNX(NY,NX) &
       .OR.NUM(NY,NX).GT.NU(NY,NX)))THEN
       NUX=NU(NY,NX)
       DO LL=NUX+1,NL(NY,NX)
-        IF(VOLX(LL,NY,NX).GT.ZEROS2(NY,NX))THEN
+        IF(VSoilPoreMicP(LL,NY,NX).GT.ZEROS2(NY,NX))THEN
           NU(NY,NX)=LL
           DDLYRX(NN)=DLYR(3,NUX,NY,NX)
           IFLGL(L,NN)=1
           DLYR(3,NUX,NY,NX)=0.0_r8
           IF(BKDS(NUX,NY,NX).LE.ZERO)THEN
             VOLT(NUX,NY,NX)=AREA(3,NUX,NY,NX)*DLYR(3,NUX,NY,NX)
-            VOLX(NUX,NY,NX)=VOLT(NUX,NY,NX)*FMPR(NUX,NY,NX)
+            VSoilPoreMicP(NUX,NY,NX)=VOLT(NUX,NY,NX)*FMPR(NUX,NY,NX)
           ENDIF
           exit
         ENDIF
@@ -633,7 +633,7 @@ implicit none
 !     RESET POND SURFACE LAYER NUMBER IF GAIN FROM PRECIPITATION
 !
   ELSEIF(NN.EQ.3)THEN
-    XVOLWP=AZMAX1(VOLW(0,NY,NX)-VOLWD(NY,NX))
+    XVOLWP=AZMAX1(VWatMicP(0,NY,NX)-VOLWD(NY,NX))
     IF(L.EQ.NU(NY,NX).AND.CumDepth2LayerBottom(0,NY,NX).GT.CDPTHI(NY,NX) &
       .AND.XVOLWP.GT.VOLWD(NY,NX)+VHCPNX(NY,NX)/cpw)THEN
           !     IF((BKDS(L,NY,NX).GT.ZERO.AND.NU(NY,NX).GT.NUI(NY,NX))
@@ -643,8 +643,8 @@ implicit none
         NUM(NY,NX)=NUI(NY,NX)
         DDLYRX(NN)=(VOLWD(NY,NX)-XVOLWP)/AREA(3,0,NY,NX)
         IFLGL(L,NN)=1
-        DLYR0=(AZMAX1(VOLW(0,NY,NX)+VOLI(0,NY,NX)-VOLWRX(NY,NX)) &
-          +VOLR(NY,NX))/AREA(3,0,NY,NX)
+        DLYR0=(AZMAX1(VWatMicP(0,NY,NX)+ViceMicP(0,NY,NX)-VWatLitrX(NY,NX)) &
+          +VLitR(NY,NX))/AREA(3,0,NY,NX)
         DLYR(3,0,NY,NX)=DLYR0+DDLYRX(NN)
         DLYR(3,NU(NY,NX),NY,NX)=DLYR(3,NU(NY,NX),NY,NX)-DDLYRX(NN)
         IF(L.GT.2)THEN
@@ -694,22 +694,22 @@ implicit none
       +FX*trcx_solml(idx_AEC,L0,NY,NX)
   ENDIF
 
-  VOLW(L1,NY,NX)=VOLW(L1,NY,NX)+FX*VOLW(L0,NY,NX)
-  VOLI(L1,NY,NX)=VOLI(L1,NY,NX)+FX*VOLI(L0,NY,NX)
-  VOLP(L1,NY,NX)=VOLP(L1,NY,NX)+FX*VOLP(L0,NY,NX)
-  VOLA(L1,NY,NX)=VOLA(L1,NY,NX)+FX*VOLA(L0,NY,NX)
+  VWatMicP(L1,NY,NX)=VWatMicP(L1,NY,NX)+FX*VWatMicP(L0,NY,NX)
+  ViceMicP(L1,NY,NX)=ViceMicP(L1,NY,NX)+FX*ViceMicP(L0,NY,NX)
+  VsoiP(L1,NY,NX)=VsoiP(L1,NY,NX)+FX*VsoiP(L0,NY,NX)
+  VMicP(L1,NY,NX)=VMicP(L1,NY,NX)+FX*VMicP(L0,NY,NX)
   VOLY(L1,NY,NX)=VOLY(L1,NY,NX)+FX*VOLY(L0,NY,NX)
-  VOLWX(L1,NY,NX)=VOLW(L1,NY,NX)
-  ENGY1=VHCP(L1,NY,NX)*TKS(L1,NY,NX)
-  ENGY0=VHCP(L0,NY,NX)*TKS(L0,NY,NX)
+  VWatMicPX(L1,NY,NX)=VWatMicP(L1,NY,NX)
+  ENGY1=VHeatCapacity(L1,NY,NX)*TKS(L1,NY,NX)
+  ENGY0=VHeatCapacity(L0,NY,NX)*TKS(L0,NY,NX)
   ENGY1=ENGY1+FX*ENGY0
-  VHCM(L1,NY,NX)=VHCM(L1,NY,NX)+FX*VHCM(L0,NY,NX)
-  VHCP(L1,NY,NX)=VHCM(L1,NY,NX) &
-    +cpw*(VOLW(L1,NY,NX)+VOLWH(L1,NY,NX)) &
-    +cpi*(VOLI(L1,NY,NX)+VOLIH(L1,NY,NX))
+  VHeatCapacitySoilM(L1,NY,NX)=VHeatCapacitySoilM(L1,NY,NX)+FX*VHeatCapacitySoilM(L0,NY,NX)
+  VHeatCapacity(L1,NY,NX)=VHeatCapacitySoilM(L1,NY,NX) &
+    +cpw*(VWatMicP(L1,NY,NX)+VWatMacP(L1,NY,NX)) &
+    +cpi*(ViceMicP(L1,NY,NX)+ViceMacP(L1,NY,NX))
 
-  IF(VHCP(L1,NY,NX).GT.ZEROS(NY,NX))THEN
-    TKS(L1,NY,NX)=ENGY1/VHCP(L1,NY,NX)
+  IF(VHeatCapacity(L1,NY,NX).GT.ZEROS(NY,NX))THEN
+    TKS(L1,NY,NX)=ENGY1/VHeatCapacity(L1,NY,NX)
   ELSE
     TKS(L1,NY,NX)=TKS(L0,NY,NX)
   ENDIF
@@ -874,25 +874,25 @@ implicit none
   ENDIF
 !     IF(BKDS(L0,NY,NX).LE.ZERO)THEN
 !     VOLT(L0,NY,NX)=FY*VOLT(L0,NY,NX)
-!     VOLX(L0,NY,NX)=FY*VOLX(L0,NY,NX)
+!     VSoilPoreMicP(L0,NY,NX)=FY*VSoilPoreMicP(L0,NY,NX)
 !     ENDIF
-  VOLW(L0,NY,NX)=FY*VOLW(L0,NY,NX)
-  VOLI(L0,NY,NX)=FY*VOLI(L0,NY,NX)
-  VOLP(L0,NY,NX)=FY*VOLP(L0,NY,NX)
-  VOLA(L0,NY,NX)=FY*VOLA(L0,NY,NX)
+  VWatMicP(L0,NY,NX)=FY*VWatMicP(L0,NY,NX)
+  ViceMicP(L0,NY,NX)=FY*ViceMicP(L0,NY,NX)
+  VsoiP(L0,NY,NX)=FY*VsoiP(L0,NY,NX)
+  VMicP(L0,NY,NX)=FY*VMicP(L0,NY,NX)
   VOLY(L0,NY,NX)=FY*VOLY(L0,NY,NX)
-  VOLWX(L0,NY,NX)=VOLW(L0,NY,NX)
+  VWatMicPX(L0,NY,NX)=VWatMicP(L0,NY,NX)
   ENGY0=FY*ENGY0
-  VHCM(L0,NY,NX)=FY*VHCM(L0,NY,NX)
+  VHeatCapacitySoilM(L0,NY,NX)=FY*VHeatCapacitySoilM(L0,NY,NX)
   IF(L0.NE.0)THEN
-    VHCP(L0,NY,NX)=VHCM(L0,NY,NX) &
-      +cpw*(VOLW(L0,NY,NX)+VOLWH(L0,NY,NX)) &
-      +cpi*(VOLI(L0,NY,NX)+VOLIH(L0,NY,NX))
+    VHeatCapacity(L0,NY,NX)=VHeatCapacitySoilM(L0,NY,NX) &
+      +cpw*(VWatMicP(L0,NY,NX)+VWatMacP(L0,NY,NX)) &
+      +cpi*(ViceMicP(L0,NY,NX)+ViceMacP(L0,NY,NX))
   ELSE
-    VHCP(L0,NY,NX)=VHCM(L0,NY,NX)+cpw*VOLW(L0,NY,NX)+cpi*VOLI(L0,NY,NX)
+    VHeatCapacity(L0,NY,NX)=VHeatCapacitySoilM(L0,NY,NX)+cpw*VWatMicP(L0,NY,NX)+cpi*ViceMicP(L0,NY,NX)
   ENDIF
-  IF(VHCP(L0,NY,NX).GT.ZEROS(NY,NX))THEN
-    TKS(L0,NY,NX)=ENGY0/VHCP(L0,NY,NX)
+  IF(VHeatCapacity(L0,NY,NX).GT.ZEROS(NY,NX))THEN
+    TKS(L0,NY,NX)=ENGY0/VHeatCapacity(L0,NY,NX)
   ELSE
     TKS(L0,NY,NX)=TKS(L1,NY,NX)
   ENDIF
@@ -1042,7 +1042,7 @@ implicit none
   ENDIF
   IF(NN.EQ.1)THEN
     IF(BKDS(L0,NY,NX).LE.ZERO.AND.BKDS(L1,NY,NX).LE.ZERO &
-      .AND.VOLW(L0,NY,NX)+VOLI(L0,NY,NX).LE.ZEROS(NY,NX))THEN
+      .AND.VWatMicP(L0,NY,NX)+ViceMicP(L0,NY,NX).LE.ZEROS(NY,NX))THEN
       CumDepth2LayerBottom(L1,NY,NX)=CumDepth2LayerBottom(L0,NY,NX)
       CDPTHY(L1,NY,NX)=CDPTHY(L0,NY,NX)
     ENDIF
@@ -1073,8 +1073,8 @@ implicit none
   real(r8) :: FXGA,FXGP
 ! begin_execution
   IF(IFLGL(L,3).EQ.0.AND.L0.NE.0 &
-    .AND.VOLX(L0,NY,NX).GT.ZEROS(NY,NX) &
-    .AND.VOLX(L1,NY,NX).GT.ZEROS(NY,NX))THEN
+    .AND.VSoilPoreMicP(L0,NY,NX).GT.ZEROS(NY,NX) &
+    .AND.VSoilPoreMicP(L1,NY,NX).GT.ZEROS(NY,NX))THEN
     IF(L0.EQ.L.OR.CORGCI(L0,NY,NX).LE.ZERO)THEN
       FXO=FO
     ELSE
@@ -1600,15 +1600,15 @@ implicit none
       FHO=AMIN1(0.5_r8,FO*FHOLI(L1,NY,NX)/FHOLI(L0,NY,NX))
     ENDIF
     FHOL(L1,NY,NX)=(1.0_r8-FO)*FHOL(L1,NY,NX)+FO*FHOL(L0,NY,NX)
-    FXVOLWH=FHO*VOLWH(L0,NY,NX)
-    VOLWH(L1,NY,NX)=VOLWH(L1,NY,NX)+FXVOLWH
-    VOLWH(L0,NY,NX)=VOLWH(L0,NY,NX)-FXVOLWH
-    FXVOLIH=FHO*VOLIH(L0,NY,NX)
-    VOLIH(L1,NY,NX)=VOLIH(L1,NY,NX)+FXVOLIH
-    VOLIH(L0,NY,NX)=VOLIH(L0,NY,NX)-FXVOLIH
-    FXVOLAH=FHO*VOLAH(L0,NY,NX)
-    VOLAH(L1,NY,NX)=VOLAH(L1,NY,NX)+FXVOLAH
-    VOLAH(L0,NY,NX)=VOLAH(L0,NY,NX)-FXVOLAH
+    FXVOLWH=FHO*VWatMacP(L0,NY,NX)
+    VWatMacP(L1,NY,NX)=VWatMacP(L1,NY,NX)+FXVOLWH
+    VWatMacP(L0,NY,NX)=VWatMacP(L0,NY,NX)-FXVOLWH
+    FXVOLIH=FHO*ViceMacP(L0,NY,NX)
+    ViceMacP(L1,NY,NX)=ViceMacP(L1,NY,NX)+FXVOLIH
+    ViceMacP(L0,NY,NX)=ViceMacP(L0,NY,NX)-FXVOLIH
+    FXVOLAH=FHO*VAirMacP(L0,NY,NX)
+    VAirMacP(L1,NY,NX)=VAirMacP(L1,NY,NX)+FXVOLAH
+    VAirMacP(L0,NY,NX)=VAirMacP(L0,NY,NX)-FXVOLAH
   ENDIF
   end subroutine MoveFertMinerals
 
@@ -1636,44 +1636,44 @@ implicit none
   IF(L0.EQ.0)THEN
     FXVOLW=FX*AZMAX1(XVOLWP-VOLWD(NY,NX))
   ELSE
-    FXVOLW=FWO*VOLW(L0,NY,NX)
+    FXVOLW=FWO*VWatMicP(L0,NY,NX)
   ENDIF
-  VOLW(L1,NY,NX)=VOLW(L1,NY,NX)+FXVOLW
-  VOLW(L0,NY,NX)=VOLW(L0,NY,NX)-FXVOLW
-!     IF(VOLI(L1,NY,NX).GT.ZEROS(NY,NX))THEN
-  FXVOLI=FWO*VOLI(L0,NY,NX)
-  VOLI(L1,NY,NX)=VOLI(L1,NY,NX)+FXVOLI
-  VOLI(L0,NY,NX)=VOLI(L0,NY,NX)-FXVOLI
+  VWatMicP(L1,NY,NX)=VWatMicP(L1,NY,NX)+FXVOLW
+  VWatMicP(L0,NY,NX)=VWatMicP(L0,NY,NX)-FXVOLW
+!     IF(ViceMicP(L1,NY,NX).GT.ZEROS(NY,NX))THEN
+  FXVOLI=FWO*ViceMicP(L0,NY,NX)
+  ViceMicP(L1,NY,NX)=ViceMicP(L1,NY,NX)+FXVOLI
+  ViceMicP(L0,NY,NX)=ViceMicP(L0,NY,NX)-FXVOLI
 !     ENDIF
-!     FXVOLA=FWO*VOLA(L0,NY,NX)
+!     FXVOLA=FWO*VMicP(L0,NY,NX)
 !     IF(L1.NE.NU(NY,NX))THEN
-!     VOLA(L1,NY,NX)=VOLA(L1,NY,NX)+FXVOLA
+!     VMicP(L1,NY,NX)=VMicP(L1,NY,NX)+FXVOLA
 !     ENDIF
 !     IF(L0.NE.NU(NY,NX))THEN
-!     VOLA(L0,NY,NX)=VOLA(L0,NY,NX)-FXVOLA
+!     VMicP(L0,NY,NX)=VMicP(L0,NY,NX)-FXVOLA
 !     ENDIF
   FXVOLY=FWO*VOLY(L0,NY,NX)
   VOLY(L1,NY,NX)=VOLY(L1,NY,NX)+FXVOLY
   VOLY(L0,NY,NX)=VOLY(L0,NY,NX)-FXVOLY
-  FXVOLWX=FWO*VOLWX(L0,NY,NX)
-  VOLWX(L1,NY,NX)=VOLWX(L1,NY,NX)+FXVOLWX
-  VOLWX(L0,NY,NX)=VOLWX(L0,NY,NX)-FXVOLWX
-  FXVHCM=FWO*VHCM(L0,NY,NX)
-  VHCM(L1,NY,NX)=VHCM(L1,NY,NX)+FXVHCM
-  VHCM(L0,NY,NX)=VHCM(L0,NY,NX)-FXVHCM
+  FXVOLWX=FWO*VWatMicPX(L0,NY,NX)
+  VWatMicPX(L1,NY,NX)=VWatMicPX(L1,NY,NX)+FXVOLWX
+  VWatMicPX(L0,NY,NX)=VWatMicPX(L0,NY,NX)-FXVOLWX
+  FXVHCM=FWO*VHeatCapacitySoilM(L0,NY,NX)
+  VHeatCapacitySoilM(L1,NY,NX)=VHeatCapacitySoilM(L1,NY,NX)+FXVHCM
+  VHeatCapacitySoilM(L0,NY,NX)=VHeatCapacitySoilM(L0,NY,NX)-FXVHCM
   FXENGY=TKS(L0,NY,NX)*(FXVHCM+cpw*FXVOLW+cpi*FXVOLI)
-  ENGY1=VHCP(L1,NY,NX)*TKS(L1,NY,NX)+FXENGY
-  ENGY0=VHCP(L0,NY,NX)*TKS(L0,NY,NX)-FXENGY
-  VHCP(L1,NY,NX)=VHCP(L1,NY,NX)+FXVHCM+cpw*FXVOLW+cpi*FXVOLI
-  VHCP(L0,NY,NX)=VHCP(L0,NY,NX)-FXVHCM-cpw*FXVOLW-cpi*FXVOLI
-  IF(VHCP(L1,NY,NX).GT.ZEROS(NY,NX))THEN
-    TKS(L1,NY,NX)=ENGY1/VHCP(L1,NY,NX)
+  ENGY1=VHeatCapacity(L1,NY,NX)*TKS(L1,NY,NX)+FXENGY
+  ENGY0=VHeatCapacity(L0,NY,NX)*TKS(L0,NY,NX)-FXENGY
+  VHeatCapacity(L1,NY,NX)=VHeatCapacity(L1,NY,NX)+FXVHCM+cpw*FXVOLW+cpi*FXVOLI
+  VHeatCapacity(L0,NY,NX)=VHeatCapacity(L0,NY,NX)-FXVHCM-cpw*FXVOLW-cpi*FXVOLI
+  IF(VHeatCapacity(L1,NY,NX).GT.ZEROS(NY,NX))THEN
+    TKS(L1,NY,NX)=ENGY1/VHeatCapacity(L1,NY,NX)
   ELSE
     TKS(L1,NY,NX)=TKS(L,NY,NX)
   ENDIF
   TCS(L1,NY,NX)=units%Kelvin2Celcius(TKS(L1,NY,NX))
-  IF(VHCP(L0,NY,NX).GT.ZEROS(NY,NX))THEN
-    TKS(L0,NY,NX)=ENGY0/VHCP(L0,NY,NX)
+  IF(VHeatCapacity(L0,NY,NX).GT.ZEROS(NY,NX))THEN
+    TKS(L0,NY,NX)=ENGY0/VHeatCapacity(L0,NY,NX)
   ELSE
     TKS(L0,NY,NX)=TKS(L,NY,NX)
   ENDIF

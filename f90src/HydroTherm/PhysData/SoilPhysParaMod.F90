@@ -39,7 +39,7 @@ implicit none
   !     DTHETW=minimum water content for numerical purpose
   ! soil matric potential upper layer
   
-  THETA1=AMAX1(THETY(N3,N2,N1),AMIN1(POROS(N3,N2,N1),safe_adb(VOLW1(N3,N2,N1),VOLY(N3,N2,N1))))
+  THETA1=AMAX1(THETY(N3,N2,N1),AMIN1(POROS(N3,N2,N1),safe_adb(VWatMicP1(N3,N2,N1),VOLY(N3,N2,N1))))
   IF(BKVL(N3,N2,N1).GT.ZEROS(NY,NX))THEN
     !source layer is active soil  
     IF(THETA1.LT.FC(N3,N2,N1))THEN
@@ -59,7 +59,7 @@ implicit none
     !     FCI,WPI=ice field capacity,wilting point
     !     PSISA1=matric water potential
     !
-  ELSEIF(VOLX(N3,N2,N1).GT.ZEROS2(N2,N1).and.THETIX(N3,N2,N1)>ZEROS2(N2,N1))THEN
+  ELSEIF(VSoilPoreMicP(N3,N2,N1).GT.ZEROS2(N2,N1).and.THETIX(N3,N2,N1)>ZEROS2(N2,N1))THEN
     FCX=FCI*THETIX(N3,N2,N1)
     WPX=WPI*THETIX(N3,N2,N1)
     FCLX=LOG(FCX)

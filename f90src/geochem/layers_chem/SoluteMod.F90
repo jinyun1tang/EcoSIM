@@ -73,7 +73,7 @@ module SoluteMod
 !     FLWD=net vertical flow relative to area
 !
 !     IF(ROWI(I,NY,NX).GT.0.0)THEN
-  FLWD=0.5*(FLW(3,L,NY,NX)+FLW(3,L+1,NY,NX))/AREA(3,L,NY,NX)
+  FLWD=0.5_r8*(WaterFlowSoiMicP(3,L,NY,NX)+WaterFlowSoiMicP(3,L+1,NY,NX))/AREA(3,L,NY,NX)
 !
 !     NH4 FERTILIZER BAND
 !
@@ -188,8 +188,8 @@ module SoluteMod
 !
   IF(FertN_soil(ifert_urea,L,NY,NX).GT.ZEROS(NY,NX).AND.BKVL(L,NY,NX).GT.ZEROS(NY,NX))THEN
     CNHUA=FertN_soil(ifert_urea,L,NY,NX)/BKVL(L,NY,NX)
-  ELSEIF(VOLW(L,NY,NX).GT.ZEROS2(NY,NX))THEN
-    CNHUA=FertN_soil(ifert_urea,L,NY,NX)/VOLW(L,NY,NX)
+  ELSEIF(VWatMicP(L,NY,NX).GT.ZEROS2(NY,NX))THEN
+    CNHUA=FertN_soil(ifert_urea,L,NY,NX)/VWatMicP(L,NY,NX)
   ELSE
     CNHUA=0._r8
   ENDIF
@@ -207,8 +207,8 @@ module SoluteMod
 !
   IF(FertN_band(ifert_urea_band,L,NY,NX).GT.ZEROS(NY,NX).AND.BKVL(L,NY,NX).GT.ZEROS(NY,NX))THEN
     CNHUB=FertN_band(ifert_urea_band,L,NY,NX)/BKVL(L,NY,NX)
-  ELSEIF(VOLW(L,NY,NX).GT.ZEROS2(NY,NX))THEN
-    CNHUB=FertN_band(ifert_urea_band,L,NY,NX)/VOLW(L,NY,NX)
+  ELSEIF(VWatMicP(L,NY,NX).GT.ZEROS2(NY,NX))THEN
+    CNHUB=FertN_band(ifert_urea_band,L,NY,NX)/VWatMicP(L,NY,NX)
   ELSE
     CNHUB=0._r8
   ENDIF
@@ -224,15 +224,15 @@ module SoluteMod
   integer, intent(in) :: L,NY,NX
   type(chem_var_type), target, intent(inout) :: chemvar
   real(r8) :: RH2BX,RNBX,R3BX,RH1BX
-  real(r8) :: VOLWPX,VOLWNX
+  real(r8) :: VWatMicPPX,VWatMicPNX
   real(r8) :: RH2PX,RH1PX,RN3X,RN4X
-  real(r8), pointer :: VOLWNH
+  real(r8), pointer :: VWatMicPNH
   real(r8), pointer :: BKVLNH
   real(r8), pointer :: BKVLNB
   real(r8), pointer :: BKVLPO
   real(r8), pointer :: BKVLPB
-  real(r8), pointer :: VOLWNB
-  real(r8), pointer :: VOLWPO
+  real(r8), pointer :: VWatMicPNB
+  real(r8), pointer :: VWatMicPPO
   real(r8), pointer :: CH1P1
   real(r8), pointer :: CH1PB
   real(r8), pointer :: CH2P1
@@ -263,7 +263,7 @@ module SoluteMod
   real(r8), pointer :: XOH21
   real(r8), pointer :: XH01B
   real(r8), pointer :: XOH01
-  real(r8), pointer :: VOLWPB
+  real(r8), pointer :: VWatMicPPB
 
   XOH01  =>  chemvar%XOH01
   XH01B  =>  chemvar%XH01B
@@ -295,14 +295,14 @@ module SoluteMod
   CH1PB  =>  chemvar%CH1PB
   CH1P1  =>  chemvar%CH1P1
   XH2P1  =>  chemvar%XH2P1
-  VOLWNH =>  chemvar%VOLWNH
+  VWatMicPNH =>  chemvar%VWatMicPNH
   BKVLNH =>  chemvar%BKVLNH
   BKVLNB =>  chemvar%BKVLNB
   BKVLPO =>  chemvar%BKVLPO
   BKVLPB =>  chemvar%BKVLPB
-  VOLWNB =>  chemvar%VOLWNB
-  VOLWPB =>  chemvar%VOLWPB
-  VOLWPO =>  chemvar%VOLWPO
+  VWatMicPNB =>  chemvar%VWatMicPNB
+  VWatMicPPB =>  chemvar%VWatMicPPB
+  VWatMicPPO =>  chemvar%VWatMicPPO
 !     begin_execution
 
   call UreaHydrolysis(L,NY,NX)
@@ -344,7 +344,7 @@ module SoluteMod
 !     SOLUBLE AND EXCHANGEABLE NH4 CONCENTRATIONS
 !     IN NON-BAND AND BAND SOIL ZONES
 !
-!     VOLWNH,VOLWNB=water volume in NH4 non-band,band
+!     VWatMicPNH,VWatMicPNB=water volume in NH4 non-band,band
 !     RN4X,RN3X=NH4,NH3 input from uptake, mineraln, dissoln in non-band
 !     RNBX,R3BX=NH4,NH3 input from uptake, mineraln, dissoln in band
 !     TUPNH4,TUPNH3=soil-root exchange of NH4,NH3 in non-band from uptake.f
@@ -353,12 +353,12 @@ module SoluteMod
 !     CN41,CN31,CN4B,CN3B=total NH4,NH3 concentration in non-band,band
 !     XN41,XN4B=adsorbed NH4 concentration in non-band,band
 !
-  IF(VOLWNH.GT.ZEROS2(NY,NX))THEN
-    VOLWNX=natomw*VOLWNH
-    RN4X=(-TUPNH4(L,NY,NX)+XNH4S(L,NY,NX)+natomw*RSN4AA)/VOLWNX
-    RN3X=(-TUPN3S(L,NY,NX)+natomw*RSNUAA)/VOLWNX
-    CN41=AZMAX1(trc_solml(ids_NH4,L,NY,NX)/VOLWNX+RN4X)
-    CN31=AZMAX1(trc_solml(idg_NH3,L,NY,NX)/VOLWNX+RN3X)
+  IF(VWatMicPNH.GT.ZEROS2(NY,NX))THEN
+    VWatMicPNX=natomw*VWatMicPNH
+    RN4X=(-TUPNH4(L,NY,NX)+XNH4S(L,NY,NX)+natomw*RSN4AA)/VWatMicPNX
+    RN3X=(-TUPN3S(L,NY,NX)+natomw*RSNUAA)/VWatMicPNX
+    CN41=AZMAX1(trc_solml(ids_NH4,L,NY,NX)/VWatMicPNX+RN4X)
+    CN31=AZMAX1(trc_solml(idg_NH3,L,NY,NX)/VWatMicPNX+RN3X)
     XN41=AZMAX1(trcx_solml(idx_NH4,L,NY,NX)/BKVLNH)
   ELSE
     RN4X=0._r8
@@ -367,12 +367,12 @@ module SoluteMod
     CN31=0._r8
     XN41=0._r8
   ENDIF
-  IF(VOLWNB.GT.ZEROS2(NY,NX))THEN
-    VOLWNX=natomw*VOLWNB
-    RNBX=(-TUPNHB(L,NY,NX)+XNH4B(L,NY,NX)+natomw*(RSN4BA+RSN4BB))/VOLWNX
-    R3BX=(-TUPN3B(L,NY,NX)+natomw*(RSNUBA+RSNUBB))/VOLWNX
-    CN4B=AZMAX1(trc_solml(ids_NH4B,L,NY,NX)/VOLWNX+RNBX)
-    CN3B=AZMAX1(trc_solml(idg_NH3B,L,NY,NX)/VOLWNX+R3BX)
+  IF(VWatMicPNB.GT.ZEROS2(NY,NX))THEN
+    VWatMicPNX=natomw*VWatMicPNB
+    RNBX=(-TUPNHB(L,NY,NX)+XNH4B(L,NY,NX)+natomw*(RSN4BA+RSN4BB))/VWatMicPNX
+    R3BX=(-TUPN3B(L,NY,NX)+natomw*(RSNUBA+RSNUBB))/VWatMicPNX
+    CN4B=AZMAX1(trc_solml(ids_NH4B,L,NY,NX)/VWatMicPNX+RNBX)
+    CN3B=AZMAX1(trc_solml(idg_NH3B,L,NY,NX)/VWatMicPNX+R3BX)
     XN4B=AZMAX1(trcx_solml(idx_NH4B,L,NY,NX)/BKVLNB)
   ELSE
     RNBX=0._r8
@@ -385,7 +385,7 @@ module SoluteMod
 !     SOLUBLE, EXCHANGEABLE AND PRECIPITATED PO4 CONCENTRATIONS IN
 !     NON-BAND AND BAND SOIL ZONES
 !
-!     VOLWPO,VOLWPB=water volume in H2PO4 non-band,band
+!     VWatMicPPO,VWatMicPPB=water volume in H2PO4 non-band,band
 !     RH1PX,RH2PX=HPO4,H2PO4 inputs from mineraln, uptake in non-band
 !     RH1BX,RH2BX=HPO4,H2PO4 inputs from mineraln, uptake in band
 !     XH1PS,XH1BS=net change in HPO4 in band,non-band from nitro.f
@@ -402,12 +402,12 @@ module SoluteMod
 !     PCAPM1,PCAPD1,PCAPH1=concn of precip CaH2PO4,CaHPO4,apatite in non-band
 !     PCAPMB,PCAPDB,PCAPHB=concn of precip CaH2PO4,CaHPO4,apatite in band
 !
-  IF(VOLWPO.GT.ZEROS2(NY,NX))THEN
-    VOLWPX=patomw*VOLWPO
-    RH1PX=(XH1PS(L,NY,NX)-TUPH1P(L,NY,NX))/VOLWPX
-    RH2PX=(XH2PS(L,NY,NX)-TUPH2P(L,NY,NX))/VOLWPX
-    CH1P1=AZMAX1(trc_solml(ids_H1PO4,L,NY,NX)/VOLWPX+RH1PX)
-    CH2P1=AZMAX1(trc_solml(ids_H2PO4,L,NY,NX)/VOLWPX+RH2PX)
+  IF(VWatMicPPO.GT.ZEROS2(NY,NX))THEN
+    VWatMicPPX=patomw*VWatMicPPO
+    RH1PX=(XH1PS(L,NY,NX)-TUPH1P(L,NY,NX))/VWatMicPPX
+    RH2PX=(XH2PS(L,NY,NX)-TUPH2P(L,NY,NX))/VWatMicPPX
+    CH1P1=AZMAX1(trc_solml(ids_H1PO4,L,NY,NX)/VWatMicPPX+RH1PX)
+    CH2P1=AZMAX1(trc_solml(ids_H2PO4,L,NY,NX)/VWatMicPPX+RH2PX)
     XOH01=AZMAX1(trcx_solml(idx_OHe,L,NY,NX))/BKVLPO
     XOH11=AZMAX1(trcx_solml(idx_OH,L,NY,NX))/BKVLPO
     XOH21=AZMAX1(trcx_solml(idx_OHp,L,NY,NX))/BKVLPO
@@ -434,12 +434,12 @@ module SoluteMod
     PCAPD1=0._r8
     PCAPH1=0._r8
   ENDIF
-  IF(VOLWPB.GT.ZEROS2(NY,NX))THEN
-    VOLWPX=patomw*VOLWPB
-    RH1BX=(XH1BS(L,NY,NX)-TUPH1B(L,NY,NX))/VOLWPX
-    RH2BX=(XH2BS(L,NY,NX)-TUPH2B(L,NY,NX))/VOLWPX
-    CH1PB=AZMAX1(trc_solml(ids_H1PO4B,L,NY,NX)/VOLWPX+RH1BX)
-    CH2PB=AZMAX1(trc_solml(ids_H2PO4B,L,NY,NX)/VOLWPX+RH2BX)
+  IF(VWatMicPPB.GT.ZEROS2(NY,NX))THEN
+    VWatMicPPX=patomw*VWatMicPPB
+    RH1BX=(XH1BS(L,NY,NX)-TUPH1B(L,NY,NX))/VWatMicPPX
+    RH2BX=(XH2BS(L,NY,NX)-TUPH2B(L,NY,NX))/VWatMicPPX
+    CH1PB=AZMAX1(trc_solml(ids_H1PO4B,L,NY,NX)/VWatMicPPX+RH1BX)
+    CH2PB=AZMAX1(trc_solml(ids_H2PO4B,L,NY,NX)/VWatMicPPX+RH2BX)
     XH01B=AZMAX1(trcx_solml(idx_OHeB,L,NY,NX))/BKVLPB
     XH11B=AZMAX1(trcx_solml(idx_OHB,L,NY,NX))/BKVLPB
     XH21B=AZMAX1(trcx_solml(idx_OHpB,L,NY,NX))/BKVLPB
@@ -904,7 +904,7 @@ module SoluteMod
   real(r8) :: CHY1,COH1,DP
   real(r8) :: FX,S0,S1,XALQ,XCAQ,XCAX
   real(r8) :: XFEQ,XHYQ,XN4Q,XTLQ
-  real(r8) :: VOLWMX,VOLWMP,BKVLX
+  real(r8) :: VWatMicPMX,VWatMicPMP,BKVLX
   real(r8) :: THETWR,COMA
   real(r8) :: CNHUA
   real(r8) :: CCO20
@@ -916,7 +916,7 @@ module SoluteMod
 !     begin_execution
 !     BKVL=litter mass
 !
-  IF(VOLWM(NPH,0,NY,NX).GT.ZEROS2(NY,NX))THEN
+  IF(VWatMicPM(NPH,0,NY,NX).GT.ZEROS2(NY,NX))THEN
     BKVLX=BKVL(0,NY,NX)
 !
 !     UREA HYDROLYSIS IN SURFACE RESIDUE
@@ -975,8 +975,8 @@ module SoluteMod
 !     RSNUAA=rate of broadcast urea fertr dissoln
 !     RSNOAA=rate of broadcast NO3 fertilizer dissoln
 !
-    IF(VOLWRX(NY,NX).GT.ZEROS(NY,NX))THEN
-      THETWR=AMIN1(1.0,VOLW(0,NY,NX)/VOLWRX(NY,NX))
+    IF(VWatLitrX(NY,NX).GT.ZEROS(NY,NX))THEN
+      THETWR=AMIN1(1.0,VWatMicP(0,NY,NX)/VWatLitrX(NY,NX))
     ELSE
       THETWR=1._r8
     ENDIF
@@ -987,18 +987,18 @@ module SoluteMod
 !
 !     SOLUBLE AND EXCHANGEABLE NH4 CONCENTRATIONS
 !
-!     VOLWNH=water volume
+!     VWatMicPNH=water volume
 !     RN4X,RN3X=NH4,NH3 input from uptake, mineraln, dissoln
 !     XNH4S=net change in NH4 from nitro.f
 !     CN41,CN31=total NH4,NH3 concentration
 !     XN41=adsorbed NH4 concentration
 !
-    IF(VOLWM(NPH,0,NY,NX).GT.ZEROS2(NY,NX))THEN
-      VOLWMX=natomw*VOLWM(NPH,0,NY,NX)
-      RN4X=(XNH4S(0,NY,NX)+natomw*RSN4AA)/VOLWMX
-      RN3X=natomw*RSNUAA/VOLWMX
-      CN41=AMAX1(ZERO,trc_solml(ids_NH4,0,NY,NX)/VOLWMX+RN4X)
-      CN31=AMAX1(ZERO,trc_solml(idg_NH3,0,NY,NX)/VOLWMX+RN3X)
+    IF(VWatMicPM(NPH,0,NY,NX).GT.ZEROS2(NY,NX))THEN
+      VWatMicPMX=natomw*VWatMicPM(NPH,0,NY,NX)
+      RN4X=(XNH4S(0,NY,NX)+natomw*RSN4AA)/VWatMicPMX
+      RN3X=natomw*RSNUAA/VWatMicPMX
+      CN41=AMAX1(ZERO,trc_solml(ids_NH4,0,NY,NX)/VWatMicPMX+RN4X)
+      CN31=AMAX1(ZERO,trc_solml(idg_NH3,0,NY,NX)/VWatMicPMX+RN3X)
       IF(BKVLX.GT.ZEROS(NY,NX))THEN
         XN41=AMAX1(ZERO,trcx_solml(idx_NH4,0,NY,NX)/BKVLX)
       ELSE
@@ -1007,16 +1007,16 @@ module SoluteMod
 !
 !     SOLUBLE, EXCHANGEABLE AND PRECIPITATED PO4 CONCENTRATIONS
 !
-!     VOLWMP=water volume
+!     VWatMicPMP=water volume
 !     RH1PX,RH2PX=HPO4,H2PO4 inputs from mineraln, uptake
 !     XH1PS=net change in HPO4 from nitro.f
 !     CH1P1,CH2P1=HPO4,H2PO4 concentrations
 !
-      VOLWMP=patomw*VOLWM(NPH,0,NY,NX)
-      RH1PX=XH1PS(0,NY,NX)/VOLWMP
-      RH2PX=XH2PS(0,NY,NX)/VOLWMP
-      CH1P1=AZMAX1(trc_solml(ids_H1PO4,0,NY,NX)/VOLWMP+RH1PX)
-      CH2P1=AZMAX1(trc_solml(ids_H2PO4,0,NY,NX)/VOLWMP+RH2PX)
+      VWatMicPMP=patomw*VWatMicPM(NPH,0,NY,NX)
+      RH1PX=XH1PS(0,NY,NX)/VWatMicPMP
+      RH2PX=XH2PS(0,NY,NX)/VWatMicPMP
+      CH1P1=AZMAX1(trc_solml(ids_H1PO4,0,NY,NX)/VWatMicPMP+RH1PX)
+      CH2P1=AZMAX1(trc_solml(ids_H2PO4,0,NY,NX)/VWatMicPMP+RH2PX)
     ELSE
       RN4X=0._r8
       RN3X=0._r8
@@ -1209,16 +1209,16 @@ module SoluteMod
 !     TRALPO,TRFEPO,TRCAPD,TRCAPH,TRCAPM
 !     =total AlPO4,FePO4,CaHPO4,apatite,Ca(H2PO4)2 precipitation
 !
-      TRN4S(0,NY,NX)=TRN4S(0,NY,NX)+RN4S*VOLWM(NPH,0,NY,NX)
-      TRN3S(0,NY,NX)=TRN3S(0,NY,NX)+RN3S*VOLWM(NPH,0,NY,NX)
-      TRH1P(0,NY,NX)=TRH1P(0,NY,NX)+RHP1*VOLWM(NPH,0,NY,NX)
-      TRH2P(0,NY,NX)=TRH2P(0,NY,NX)+RHP2*VOLWM(NPH,0,NY,NX)
-      trcx_TR(idx_NH4,0,NY,NX)=trcx_TR(idx_NH4,0,NY,NX)+RXN4*VOLWM(NPH,0,NY,NX)
-      trcp_TR(idsp_AlPO4,0,NY,NX)=trcp_TR(idsp_AlPO4,0,NY,NX)+RPALPX*VOLWM(NPH,0,NY,NX)
-      trcp_TR(idsp_FePO4,0,NY,NX)=trcp_TR(idsp_FePO4,0,NY,NX)+RPFEPX*VOLWM(NPH,0,NY,NX)
-      trcp_TR(idsp_CaHPO4,0,NY,NX)=trcp_TR(idsp_CaHPO4,0,NY,NX)+RPCADX*VOLWM(NPH,0,NY,NX)
-      trcp_TR(idsp_HA,0,NY,NX)=trcp_TR(idsp_HA,0,NY,NX)+RPCAHX*VOLWM(NPH,0,NY,NX)
-      trcp_TR(idsp_CaH2PO4,0,NY,NX)=trcp_TR(idsp_CaH2PO4,0,NY,NX)+RPCAMX*VOLWM(NPH,0,NY,NX)
+      TRN4S(0,NY,NX)=TRN4S(0,NY,NX)+RN4S*VWatMicPM(NPH,0,NY,NX)
+      TRN3S(0,NY,NX)=TRN3S(0,NY,NX)+RN3S*VWatMicPM(NPH,0,NY,NX)
+      TRH1P(0,NY,NX)=TRH1P(0,NY,NX)+RHP1*VWatMicPM(NPH,0,NY,NX)
+      TRH2P(0,NY,NX)=TRH2P(0,NY,NX)+RHP2*VWatMicPM(NPH,0,NY,NX)
+      trcx_TR(idx_NH4,0,NY,NX)=trcx_TR(idx_NH4,0,NY,NX)+RXN4*VWatMicPM(NPH,0,NY,NX)
+      trcp_TR(idsp_AlPO4,0,NY,NX)=trcp_TR(idsp_AlPO4,0,NY,NX)+RPALPX*VWatMicPM(NPH,0,NY,NX)
+      trcp_TR(idsp_FePO4,0,NY,NX)=trcp_TR(idsp_FePO4,0,NY,NX)+RPFEPX*VWatMicPM(NPH,0,NY,NX)
+      trcp_TR(idsp_CaHPO4,0,NY,NX)=trcp_TR(idsp_CaHPO4,0,NY,NX)+RPCADX*VWatMicPM(NPH,0,NY,NX)
+      trcp_TR(idsp_HA,0,NY,NX)=trcp_TR(idsp_HA,0,NY,NX)+RPCAHX*VWatMicPM(NPH,0,NY,NX)
+      trcp_TR(idsp_CaH2PO4,0,NY,NX)=trcp_TR(idsp_CaH2PO4,0,NY,NX)+RPCAMX*VWatMicPM(NPH,0,NY,NX)
       FertN_soil(ifert_nh4,0,NY,NX)=FertN_soil(ifert_nh4,0,NY,NX)-RSN4AA
       FertN_soil(ifert_nh3,0,NY,NX)=FertN_soil(ifert_nh3,0,NY,NX)-RSN3AA
       FertN_soil(ifert_urea,0,NY,NX)=FertN_soil(ifert_urea,0,NY,NX)-RSNUAA
@@ -1232,7 +1232,7 @@ module SoluteMod
       TRH1P(0,NY,NX)=TRH1P(0,NY,NX)*patomw
       TRH2P(0,NY,NX)=TRH2P(0,NY,NX)*patomw
 !     WRITE(*,9989)'TRN4S',I,J,TRN4S(0,NY,NX)
-!    2,RN4S,RNH4,RXN4,RSN4AA,VOLWM(NPH,0,NY,NX)
+!    2,RN4S,RNH4,RXN4,RSN4AA,VWatMicPM(NPH,0,NY,NX)
 !    3,SPNH4,FertN_soil(ifert_nh4,0,NY,NX),THETWR
 !9989  FORMAT(A8,2I4,12E12.4)
   end subroutine UpdateSoluteinSurfaceResidue

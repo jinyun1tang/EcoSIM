@@ -323,7 +323,7 @@ module InsideTranspMod
   real(r8), intent(inout) :: FLQM(3,JD,JV,JH)
   real(r8) :: VFLW
   real(r8) :: VOLH2A,VOLH2B
-  real(r8) :: VOLWHS,VOLWT
+  real(r8) :: VWatMacPS,VOLWT
 
   integer :: IFLGB,N,L,K,LL
   integer :: N1,N2,N3,N4,N5,N6
@@ -367,7 +367,7 @@ module InsideTranspMod
         ENDIF
       ENDIF
       DO LL=N6,NL(NY,NX)
-        IF(VOLX(LL,N5,N4).GT.ZEROS2(N5,N4))THEN
+        IF(VSoilPoreMicP(LL,N5,N4).GT.ZEROS2(N5,N4))THEN
           N6=LL
           exit
         ENDIF
@@ -376,37 +376,37 @@ module InsideTranspMod
 !     SOLUTE FLUXES BETWEEN ADJACENT GRID CELLS FROM
 !     WATER CONTENTS AND WATER FLUXES 'FLQM' FROM 'WATSUB'
 !
-!     VOLX,VOLY=soil volume excluding rock, macropore
+!     VSoilPoreMicP,VOLY=soil volume excluding rock, macropore
 !     VLNH4,VLNO3,VLPO4=non-band NH4,NO3,PO4 volume fraction
 !     VLNHB,VLNOB,VLPOB=band NH4,NO3,PO4 volume fraction
-!     VOLWM,VOLWHM=micropore,macropore water-filled porosity from watsub.f
+!     VWatMicPM,VWatMacPM=micropore,macropore water-filled porosity from watsub.f
 !     THETW=volumetric water content
 !     FLPM=change in air volume
 !     XNPT=1/number of cycles NPH-1 for gas flux calculations
 !
-      IF(VOLX(N3,N2,N1).GT.ZEROS2(N2,N1))THEN
+      IF(VSoilPoreMicP(N3,N2,N1).GT.ZEROS2(N2,N1))THEN
         IF(N3.GE.NUM(N2,N1).AND.N6.GE.NUM(N5,N4) &
           .AND.N3.LE.NL(N2,N1).AND.N6.LE.NL(N5,N4))THEN
           IF(M.NE.MX)THEN
-            VOLWMA(N6,N5,N4)=VOLWM(M,N6,N5,N4)*trcs_VLN(ids_NH4,N6,N5,N4)
-            VOLWMB(N6,N5,N4)=VOLWM(M,N6,N5,N4)*trcs_VLN(ids_NH4B,N6,N5,N4)
-            VOLWXA(N6,N5,N4)=natomw*VOLWMA(N6,N5,N4)
-            VOLWXB(N6,N5,N4)=natomw*VOLWMB(N6,N5,N4)
+            VWatMicPMA(N6,N5,N4)=VWatMicPM(M,N6,N5,N4)*trcs_VLN(ids_NH4,N6,N5,N4)
+            VWatMicPMB(N6,N5,N4)=VWatMicPM(M,N6,N5,N4)*trcs_VLN(ids_NH4B,N6,N5,N4)
+            VWatMicPXA(N6,N5,N4)=natomw*VWatMicPMA(N6,N5,N4)
+            VWatMicPXB(N6,N5,N4)=natomw*VWatMicPMB(N6,N5,N4)
 
-            VOLPMA(N6,N5,N4)=VOLPM(M,N6,N5,N4)*trcs_VLN(ids_NH4,N6,N5,N4)
-            VOLPMB(N6,N5,N4)=VOLPM(M,N6,N5,N4)*trcs_VLN(ids_NH4B,N6,N5,N4)
+            VsoiPMA(N6,N5,N4)=VsoiPM(M,N6,N5,N4)*trcs_VLN(ids_NH4,N6,N5,N4)
+            VsoiPMB(N6,N5,N4)=VsoiPM(M,N6,N5,N4)*trcs_VLN(ids_NH4B,N6,N5,N4)
             FLVM(N6,N5,N4)=FLPM(M,N6,N5,N4)*XNPT
 !
 !     GASEOUS SOLUBILITIES
 !
-!     VOLWM=micropore water-filled porosity from watsub.f
-!     VOLW*=equivalent aqueous volume for gas
+!     VWatMicPM=micropore water-filled porosity from watsub.f
+!     VWatMicP*=equivalent aqueous volume for gas
 !     gas code:*CO2*=CO2,*OXY*=O2,*CH4*=CH4,*Z2G*=N2,*Z2O*=N2O
 !             :*ZN3*=NH3,*H2G*=H2
 !     S*L=solubility of gas in water from hour1.f
 !     FLQM=total water flux into soil micropore+macropore from watsub.f
 !
-            FLQM(N,N6,N5,N4)=(FLWM(M,N,N6,N5,N4)+FLWHM(M,N,N6,N5,N4))*XNPT
+            FLQM(N,N6,N5,N4)=(FLWM(M,N,N6,N5,N4)+WaterFlowMacPi(M,N,N6,N5,N4))*XNPT
 !
             call SoluteAdvDifTransport(M,N,N1,N2,N3,N4,N5,N6)
 
@@ -456,7 +456,7 @@ module InsideTranspMod
 !     IN CURRENT GRID CELL
 !
 !     FLWM=water flux through soil micropore from watsub.f
-!     VOLWM=micropore water-filled porosity from watsub.f
+!     VWatMicPM=micropore water-filled porosity from watsub.f
 !     RFL*S=solute diffusive flux through micropore
 !     solute code:CO=CO2,CH=CH4,OX=O2,NG=N2,N2=N2O,HG=H2
 !             :OC=DOC,ON=DON,OP=DOP,OA=acetate
@@ -465,8 +465,8 @@ module InsideTranspMod
 !     *S2,*B2=micropore solute content in non-band,band
 !
   IF(FLWM(M,N,N6,N5,N4).GT.0.0_r8)THEN
-    IF(VOLWM(M,N3,N2,N1).GT.ZEROS2(N2,N1))THEN
-      VFLW=AZMAX1(AMIN1(VFLWX,FLWM(M,N,N6,N5,N4)/VOLWM(M,N3,N2,N1)))
+    IF(VWatMicPM(M,N3,N2,N1).GT.ZEROS2(N2,N1))THEN
+      VFLW=AZMAX1(AMIN1(VFLWX,FLWM(M,N,N6,N5,N4)/VWatMicPM(M,N3,N2,N1)))
     ELSE
       VFLW=VFLWX
     ENDIF
@@ -487,8 +487,8 @@ module InsideTranspMod
 !     IN ADJACENT GRID CELL
 !
   ELSE
-    IF(VOLWM(M,N6,N5,N4).GT.ZEROS2(N5,N4))THEN
-      VFLW=AZMIN1(AMAX1(-VFLWX,FLWM(M,N,N6,N5,N4)/VOLWM(M,N6,N5,N4)))
+    IF(VWatMicPM(M,N6,N5,N4).GT.ZEROS2(N5,N4))THEN
+      VFLW=AZMIN1(AMAX1(-VFLWX,FLWM(M,N,N6,N5,N4)/VWatMicPM(M,N6,N5,N4)))
     ELSE
       VFLW=-VFLWX
     ENDIF
@@ -514,8 +514,8 @@ module InsideTranspMod
   implicit none
   integer , intent(in) :: M,N,N1,N2,N3,N4,N5,N6
   real(r8), intent(in) :: THETW1(JZ,JY,JX)
-  real(r8) :: VOLWOA,VOLWOB,VOLWPA,VOLWPB
-  real(r8) :: VOLW2A,VOLW2B,VOLW3A,VOLW3B,VOLW4A,VOLW4B
+  real(r8) :: VWatMicPOA,VWatMicPOB,VWatMicPPA,VWatMicPPB
+  real(r8) :: VWatMicP2A,VWatMicP2B,VWatMicP3A,VWatMicP3B,VWatMicP4A,VWatMicP4B
   real(r8) :: trcsolc1(ids_beg:ids_end)
   real(r8) :: trcsolc2(ids_beg:ids_end)
 
@@ -525,22 +525,22 @@ module InsideTranspMod
   integer  :: K,NTS,NTG
 
   IF(THETW1(N3,N2,N1).GT.THETY(N3,N2,N1).AND.THETW1(N6,N5,N4).GT.THETY(N6,N5,N4) &
-    .AND.VOLWM(M,N3,N2,N1).GT.ZEROS2(N2,N1).AND.VOLWM(M,N6,N5,N4).GT.ZEROS2(N5,N4))THEN
+    .AND.VWatMicPM(M,N3,N2,N1).GT.ZEROS2(N2,N1).AND.VWatMicPM(M,N6,N5,N4).GT.ZEROS2(N5,N4))THEN
 
-      VOLW2A=VOLWM(M,N3,N2,N1)*trcs_VLN(ids_H1PO4,N3,N2,N1)
-      VOLW2B=VOLWM(M,N3,N2,N1)*trcs_VLN(ids_H1PO4B,N3,N2,N1)
-      VOLW3A=VOLWM(M,N3,N2,N1)*trcs_VLN(ids_NO3,N3,N2,N1)
-      VOLW3B=VOLWM(M,N3,N2,N1)*trcs_VLN(ids_NO3B,N3,N2,N1)
-      VOLW4A=VOLWM(M,N3,N2,N1)*trcs_VLN(ids_NH4,N3,N2,N1)
-      VOLW4B=VOLWM(M,N3,N2,N1)*trcs_VLN(ids_NH4B,N3,N2,N1)
+      VWatMicP2A=VWatMicPM(M,N3,N2,N1)*trcs_VLN(ids_H1PO4,N3,N2,N1)
+      VWatMicP2B=VWatMicPM(M,N3,N2,N1)*trcs_VLN(ids_H1PO4B,N3,N2,N1)
+      VWatMicP3A=VWatMicPM(M,N3,N2,N1)*trcs_VLN(ids_NO3,N3,N2,N1)
+      VWatMicP3B=VWatMicPM(M,N3,N2,N1)*trcs_VLN(ids_NO3B,N3,N2,N1)
+      VWatMicP4A=VWatMicPM(M,N3,N2,N1)*trcs_VLN(ids_NH4,N3,N2,N1)
+      VWatMicP4B=VWatMicPM(M,N3,N2,N1)*trcs_VLN(ids_NH4B,N3,N2,N1)
 
-      VOLWPA=VOLWM(M,N6,N5,N4)*trcs_VLN(ids_H1PO4,N6,N5,N4)
-      VOLWPB=VOLWM(M,N6,N5,N4)*trcs_VLN(ids_H1PO4B,N6,N5,N4)
-      VOLWOA=VOLWM(M,N6,N5,N4)*trcs_VLN(ids_NO3,N6,N5,N4)
-      VOLWOB=VOLWM(M,N6,N5,N4)*trcs_VLN(ids_NO3B,N6,N5,N4)
+      VWatMicPPA=VWatMicPM(M,N6,N5,N4)*trcs_VLN(ids_H1PO4,N6,N5,N4)
+      VWatMicPPB=VWatMicPM(M,N6,N5,N4)*trcs_VLN(ids_H1PO4B,N6,N5,N4)
+      VWatMicPOA=VWatMicPM(M,N6,N5,N4)*trcs_VLN(ids_NO3,N6,N5,N4)
+      VWatMicPOB=VWatMicPM(M,N6,N5,N4)*trcs_VLN(ids_NO3B,N6,N5,N4)
 
 !
-!     VOLWM=micropore water-filled porosity from watsub.f
+!     VWatMicPM=micropore water-filled porosity from watsub.f
 !     THETW=volumetric water content
 !
 !     MICROPORE CONCENTRATIONS FROM WATER-FILLED POROSITY
@@ -556,107 +556,107 @@ module InsideTranspMod
 !     *S2,*B2=soil solute content in non-band,band
 !
     D9810: DO K=1,jcplx
-      COQC1(K)=AZMAX1(OQC2(K,N3,N2,N1)/VOLWM(M,N3,N2,N1))
-      COQN1(K)=AZMAX1(OQN2(K,N3,N2,N1)/VOLWM(M,N3,N2,N1))
-      COQP1(K)=AZMAX1(OQP2(K,N3,N2,N1)/VOLWM(M,N3,N2,N1))
-      COQA1(K)=AZMAX1(OQA2(K,N3,N2,N1)/VOLWM(M,N3,N2,N1))
+      COQC1(K)=AZMAX1(OQC2(K,N3,N2,N1)/VWatMicPM(M,N3,N2,N1))
+      COQN1(K)=AZMAX1(OQN2(K,N3,N2,N1)/VWatMicPM(M,N3,N2,N1))
+      COQP1(K)=AZMAX1(OQP2(K,N3,N2,N1)/VWatMicPM(M,N3,N2,N1))
+      COQA1(K)=AZMAX1(OQA2(K,N3,N2,N1)/VWatMicPM(M,N3,N2,N1))
 
-      COQC2(K)=AZMAX1(OQC2(K,N6,N5,N4)/VOLWM(M,N6,N5,N4))
-      COQN2(K)=AZMAX1(OQN2(K,N6,N5,N4)/VOLWM(M,N6,N5,N4))
-      COQP2(K)=AZMAX1(OQP2(K,N6,N5,N4)/VOLWM(M,N6,N5,N4))
-      COQA2(K)=AZMAX1(OQA2(K,N6,N5,N4)/VOLWM(M,N6,N5,N4))
+      COQC2(K)=AZMAX1(OQC2(K,N6,N5,N4)/VWatMicPM(M,N6,N5,N4))
+      COQN2(K)=AZMAX1(OQN2(K,N6,N5,N4)/VWatMicPM(M,N6,N5,N4))
+      COQP2(K)=AZMAX1(OQP2(K,N6,N5,N4)/VWatMicPM(M,N6,N5,N4))
+      COQA2(K)=AZMAX1(OQA2(K,N6,N5,N4)/VWatMicPM(M,N6,N5,N4))
     ENDDO D9810
 
     DO NTG=idg_beg,idg_end-2
-      trcsolc1(NTG)=AZMAX1(trc_solml2(NTG,N3,N2,N1)/VOLWM(M,N3,N2,N1))
+      trcsolc1(NTG)=AZMAX1(trc_solml2(NTG,N3,N2,N1)/VWatMicPM(M,N3,N2,N1))
     ENDDO
 
-    IF(VOLW4A.GT.ZEROS2(N2,N1))THEN
-      trcsolc1(ids_NH4)=AZMAX1(trc_solml2(ids_NH4,N3,N2,N1)/VOLW4A)
-      trcsolc1(idg_NH3)=AZMAX1(trc_solml2(idg_NH3,N3,N2,N1)/VOLW4A)
+    IF(VWatMicP4A.GT.ZEROS2(N2,N1))THEN
+      trcsolc1(ids_NH4)=AZMAX1(trc_solml2(ids_NH4,N3,N2,N1)/VWatMicP4A)
+      trcsolc1(idg_NH3)=AZMAX1(trc_solml2(idg_NH3,N3,N2,N1)/VWatMicP4A)
     ELSE
       trcsolc1(ids_NH4)=0.0_r8
       trcsolc1(idg_NH3)=0.0_r8
     ENDIF
-    IF(VOLW3A.GT.ZEROS2(N2,N1))THEN
-      trcsolc1(ids_NO3)=AZMAX1(trc_solml2(ids_NO3,N3,N2,N1)/VOLW3A)
-      trcsolc1(ids_NO2)=AZMAX1(trc_solml2(ids_NO2,N3,N2,N1)/VOLW3A)
+    IF(VWatMicP3A.GT.ZEROS2(N2,N1))THEN
+      trcsolc1(ids_NO3)=AZMAX1(trc_solml2(ids_NO3,N3,N2,N1)/VWatMicP3A)
+      trcsolc1(ids_NO2)=AZMAX1(trc_solml2(ids_NO2,N3,N2,N1)/VWatMicP3A)
     ELSE
       trcsolc1(ids_NO3)=0.0_r8
       trcsolc1(ids_NO2)=0.0_r8
     ENDIF
-    IF(VOLW2A.GT.ZEROS2(N2,N1))THEN
-      trcsolc1(ids_H1PO4)=AZMAX1(trc_solml2(ids_H1PO4,N3,N2,N1)/VOLW2A)
-      trcsolc1(ids_H2PO4)=AZMAX1(trc_solml2(ids_H2PO4,N3,N2,N1)/VOLW2A)
+    IF(VWatMicP2A.GT.ZEROS2(N2,N1))THEN
+      trcsolc1(ids_H1PO4)=AZMAX1(trc_solml2(ids_H1PO4,N3,N2,N1)/VWatMicP2A)
+      trcsolc1(ids_H2PO4)=AZMAX1(trc_solml2(ids_H2PO4,N3,N2,N1)/VWatMicP2A)
     ELSE
       trcsolc1(ids_H1PO4)=0.0_r8
       trcsolc1(ids_H2PO4)=0.0_r8
     ENDIF
-    IF(VOLW4B.GT.ZEROS2(N2,N1))THEN
-      trcsolc1(ids_NH4B)=AZMAX1(trc_solml2(ids_NH4B,N3,N2,N1)/VOLW4B)
-      trcsolc1(idg_NH3B)=AZMAX1(trc_solml2(idg_NH3B,N3,N2,N1)/VOLW4B)
+    IF(VWatMicP4B.GT.ZEROS2(N2,N1))THEN
+      trcsolc1(ids_NH4B)=AZMAX1(trc_solml2(ids_NH4B,N3,N2,N1)/VWatMicP4B)
+      trcsolc1(idg_NH3B)=AZMAX1(trc_solml2(idg_NH3B,N3,N2,N1)/VWatMicP4B)
     ELSE
       trcsolc1(ids_NH4B)=0.0_r8
       trcsolc1(idg_NH3B)=0.0_r8
     ENDIF
-    IF(VOLW3B.GT.ZEROS2(N2,N1))THEN
-      trcsolc1(ids_NO3B)=AZMAX1(trc_solml2(ids_NO3B,N3,N2,N1)/VOLW3B)
-      trcsolc1(ids_NO2B)=AZMAX1(trc_solml2(ids_NO2B,N3,N2,N1)/VOLW3B)
+    IF(VWatMicP3B.GT.ZEROS2(N2,N1))THEN
+      trcsolc1(ids_NO3B)=AZMAX1(trc_solml2(ids_NO3B,N3,N2,N1)/VWatMicP3B)
+      trcsolc1(ids_NO2B)=AZMAX1(trc_solml2(ids_NO2B,N3,N2,N1)/VWatMicP3B)
     ELSE
       trcsolc1(ids_NO3B)=trcsolc1(ids_NO3)
       trcsolc1(ids_NO2B)=trcsolc1(ids_NO2)
     ENDIF
-    IF(VOLW2B.GT.ZEROS2(N2,N1))THEN
-      trcsolc1(ids_H1PO4B)=AZMAX1(trc_solml2(ids_H1PO4B,N3,N2,N1)/VOLW2B)
-      trcsolc1(ids_H2PO4B)=AZMAX1(trc_solml2(ids_H2PO4B,N3,N2,N1)/VOLW2B)
+    IF(VWatMicP2B.GT.ZEROS2(N2,N1))THEN
+      trcsolc1(ids_H1PO4B)=AZMAX1(trc_solml2(ids_H1PO4B,N3,N2,N1)/VWatMicP2B)
+      trcsolc1(ids_H2PO4B)=AZMAX1(trc_solml2(ids_H2PO4B,N3,N2,N1)/VWatMicP2B)
     ELSE
       trcsolc1(ids_H1PO4B)=trcsolc1(ids_H1PO4)
       trcsolc1(ids_H2PO4B)=trcsolc1(ids_H2PO4)
     ENDIF
 
     DO NTG=idg_beg,idg_end-2
-      trcsolc2(NTG)=AZMAX1(trc_solml2(NTG,N6,N5,N4)/VOLWM(M,N6,N5,N4))
+      trcsolc2(NTG)=AZMAX1(trc_solml2(NTG,N6,N5,N4)/VWatMicPM(M,N6,N5,N4))
     ENDDO
 
 
-    IF(VOLWMA(N6,N5,N4).GT.ZEROS2(N5,N4))THEN
-      trcsolc2(idg_NH3)=AZMAX1(trc_solml2(idg_NH3,N6,N5,N4)/VOLWMA(N6,N5,N4))
-      trcsolc2(ids_NH4)=AZMAX1(trc_solml2(ids_NH4,N6,N5,N4)/VOLWMA(N6,N5,N4))
+    IF(VWatMicPMA(N6,N5,N4).GT.ZEROS2(N5,N4))THEN
+      trcsolc2(idg_NH3)=AZMAX1(trc_solml2(idg_NH3,N6,N5,N4)/VWatMicPMA(N6,N5,N4))
+      trcsolc2(ids_NH4)=AZMAX1(trc_solml2(ids_NH4,N6,N5,N4)/VWatMicPMA(N6,N5,N4))
     ELSE
       trcsolc2(idg_NH3)=0.0_r8
       trcsolc2(ids_NH4)=0.0_r8
     ENDIF
-    IF(VOLWOA.GT.ZEROS2(N5,N4))THEN
-      trcsolc2(ids_NO3)=AZMAX1(trc_solml2(ids_NO3,N6,N5,N4)/VOLWOA)
-      trcsolc2(ids_NO2)=AZMAX1(trc_solml2(ids_NO2,N6,N5,N4)/VOLWOA)
+    IF(VWatMicPOA.GT.ZEROS2(N5,N4))THEN
+      trcsolc2(ids_NO3)=AZMAX1(trc_solml2(ids_NO3,N6,N5,N4)/VWatMicPOA)
+      trcsolc2(ids_NO2)=AZMAX1(trc_solml2(ids_NO2,N6,N5,N4)/VWatMicPOA)
     ELSE
       trcsolc2(ids_NO3)=0.0_r8
       trcsolc2(ids_NO2)=0.0_r8
     ENDIF
-    IF(VOLWPA.GT.ZEROS2(N5,N4))THEN
-      trcsolc2(ids_H1PO4)=AZMAX1(trc_solml2(ids_H1PO4,N6,N5,N4)/VOLWPA)
-      trcsolc2(ids_H2PO4)=AZMAX1(trc_solml2(ids_H2PO4,N6,N5,N4)/VOLWPA)
+    IF(VWatMicPPA.GT.ZEROS2(N5,N4))THEN
+      trcsolc2(ids_H1PO4)=AZMAX1(trc_solml2(ids_H1PO4,N6,N5,N4)/VWatMicPPA)
+      trcsolc2(ids_H2PO4)=AZMAX1(trc_solml2(ids_H2PO4,N6,N5,N4)/VWatMicPPA)
     ELSE
       trcsolc2(ids_H1PO4)=0.0_r8
       trcsolc2(ids_H2PO4)=0.0_r8
     ENDIF
-    IF(VOLWMB(N6,N5,N4).GT.ZEROS2(N5,N4))THEN
-      trcsolc2(idg_NH3B)=AZMAX1(trc_solml2(idg_NH3B,N6,N5,N4)/VOLWMB(N6,N5,N4))
-      trcsolc2(ids_NH4B)=AZMAX1(trc_solml2(ids_NH4B,N6,N5,N4)/VOLWMB(N6,N5,N4))
+    IF(VWatMicPMB(N6,N5,N4).GT.ZEROS2(N5,N4))THEN
+      trcsolc2(idg_NH3B)=AZMAX1(trc_solml2(idg_NH3B,N6,N5,N4)/VWatMicPMB(N6,N5,N4))
+      trcsolc2(ids_NH4B)=AZMAX1(trc_solml2(ids_NH4B,N6,N5,N4)/VWatMicPMB(N6,N5,N4))
     ELSE
       trcsolc2(idg_NH3B)=trcsolc2(idg_NH3)
       trcsolc2(ids_NH4B)=trcsolc2(ids_NH4)
     ENDIF
-    IF(VOLWOB.GT.ZEROS2(N5,N4))THEN
-      trcsolc2(ids_NO3B)=AZMAX1(trc_solml2(ids_NO3B,N6,N5,N4)/VOLWOB)
-      trcsolc2(ids_NO2B)=AZMAX1(trc_solml2(ids_NO2B,N6,N5,N4)/VOLWOB)
+    IF(VWatMicPOB.GT.ZEROS2(N5,N4))THEN
+      trcsolc2(ids_NO3B)=AZMAX1(trc_solml2(ids_NO3B,N6,N5,N4)/VWatMicPOB)
+      trcsolc2(ids_NO2B)=AZMAX1(trc_solml2(ids_NO2B,N6,N5,N4)/VWatMicPOB)
     ELSE
       trcsolc2(ids_NO3B)=trcsolc2(ids_NO3)
       trcsolc2(ids_NO2B)=trcsolc2(ids_NO2)
     ENDIF
-    IF(VOLWPB.GT.ZEROS2(N5,N4))THEN
-      trcsolc2(ids_H1PO4B)=AZMAX1(trc_solml2(ids_H1PO4B,N6,N5,N4)/VOLWPB)
-      trcsolc2(ids_H2PO4B)=AZMAX1(trc_solml2(ids_H2PO4B,N6,N5,N4)/VOLWPB)
+    IF(VWatMicPPB.GT.ZEROS2(N5,N4))THEN
+      trcsolc2(ids_H1PO4B)=AZMAX1(trc_solml2(ids_H1PO4B,N6,N5,N4)/VWatMicPPB)
+      trcsolc2(ids_H2PO4B)=AZMAX1(trc_solml2(ids_H2PO4B,N6,N5,N4)/VWatMicPPB)
     ELSE
       trcsolc2(ids_H1PO4B)=trcsolc2(ids_H1PO4)
       trcsolc2(ids_H2PO4B)=trcsolc2(ids_H2PO4)
@@ -736,18 +736,18 @@ module InsideTranspMod
   real(r8) :: trcs_RFH(ids_beg:ids_end)
   integer  :: K,NTG,NTS
   real(r8) :: VFLW
-!     FLWHM=water flux through soil macropore from watsub.f
+!     WaterFlowMacPi=water flux through soil macropore from watsub.f
 !
 
-  IF(FLWHM(M,N,N6,N5,N4).GT.0.0_r8)THEN
+  IF(WaterFlowMacPi(M,N,N6,N5,N4).GT.0.0_r8)THEN
 !
 !     IF MACROPORE WATER FLUX FROM 'WATSUB' IS FROM CURRENT TO
 !     ADJACENT GRID CELL THEN CONVECTIVE TRANSPORT IS THE PRODUCT
 !     OF WATER FLUX AND MACROPORE SOLUTE CONCENTRATIONS IN CURRENT
 !     GRID CELL
 !
-!     VOLWHM=macropore water-filled porosity from watsub.f
-!     VOLWAH=macropore porosity
+!     VWatMacPM=macropore water-filled porosity from watsub.f
+!     VWatMicPAH=macropore porosity
 !     RFH*=solute diffusive flux through macropore
 !     solute code:CO=CO2,CH=CH4,OX=O2,NG=N2,N2=N2O,HG=H2
 !             :OC=DOC,ON=DON,OP=DOP,OA=acetate
@@ -758,15 +758,15 @@ module InsideTranspMod
 !     VLNH4,VLNO3,VLPO4=non-band NH4,NO3,PO4 volume fraction
 !     VLNHB,VLNOB,VLPOB=band NH4,NO3,PO4 volume fraction
 !
-    IF(VOLWHM(M,N3,N2,N1).GT.ZEROS2(N2,N1))THEN
-      VFLW=AZMAX1(AMIN1(VFLWX,FLWHM(M,N,N6,N5,N4)/VOLWHM(M,N3,N2,N1)))
+    IF(VWatMacPM(M,N3,N2,N1).GT.ZEROS2(N2,N1))THEN
+      VFLW=AZMAX1(AMIN1(VFLWX,WaterFlowMacPi(M,N,N6,N5,N4)/VWatMacPM(M,N3,N2,N1)))
     ELSE
       VFLW=VFLWX
     ENDIF
 !
 !     ACCOUNT FOR MACROPORE-MICROPORE EXCHANGE
 !
-    IF(N.EQ.3.AND.VOLAH(N6,N5,N4).GT.VOLWHM(M,N6,N5,N4))THEN
+    IF(N.EQ.3.AND.VAirMacP(N6,N5,N4).GT.VWatMacPM(M,N6,N5,N4))THEN
       D9800: DO K=1,jcplx
         RFHOC(K)=VFLW*AZMAX1((OQCH2(K,N3,N2,N1)-AZMIN1(ROCFXS(K,NU(N2,N1),N2,N1))))
         RFHON(K)=VFLW*AZMAX1((OQNH2(K,N3,N2,N1)-AZMIN1(RONFXS(K,NU(N2,N1),N2,N1))))
@@ -809,9 +809,9 @@ module InsideTranspMod
 !     OF WATER FLUX AND MACROPORE SOLUTE CONCENTRATIONS IN ADJACENT
 !     GRID CELL
 !
-  ELSEIF(FLWHM(M,N,N6,N5,N4).LT.0.0_r8)THEN
-    IF(VOLWHM(M,N6,N5,N4).GT.ZEROS2(N5,N4))THEN
-      VFLW=AZMIN1(AMAX1(-VFLWX,FLWHM(M,N,N6,N5,N4)/VOLWHM(M,N6,N5,N4)))
+  ELSEIF(WaterFlowMacPi(M,N,N6,N5,N4).LT.0.0_r8)THEN
+    IF(VWatMacPM(M,N6,N5,N4).GT.ZEROS2(N5,N4))THEN
+      VFLW=AZMIN1(AMAX1(-VFLWX,WaterFlowMacPi(M,N,N6,N5,N4)/VWatMacPM(M,N6,N5,N4)))
     ELSE
       VFLW=-VFLWX
     ENDIF
@@ -866,18 +866,18 @@ module InsideTranspMod
 !     ADJACENT GRID CELL MACROPORES FROM AQUEOUS DIFFUSIVITIES
 !     AND CONCENTRATION DIFFERENCES
 !
-!     VOLWHM=macropore water-filled porosity from watsub.f
+!     VWatMacPM=macropore water-filled porosity from watsub.f
 !     THETY=hygroscopic water content
 !     VOLAH=total macropore volume
 !
-  IF(VOLWHM(M,N3,N2,N1).GT.THETY(N3,N2,N1)*VOLAH(N3,N2,N1) &
-    .AND.VOLWHM(M,N6,N5,N4).GT.THETY(N6,N5,N4)*VOLAH(N6,N5,N4))THEN
+  IF(VWatMacPM(M,N3,N2,N1).GT.THETY(N3,N2,N1)*VAirMacP(N3,N2,N1) &
+    .AND.VWatMacPM(M,N6,N5,N4).GT.THETY(N6,N5,N4)*VAirMacP(N6,N5,N4))THEN
 !
 !     MACROPORE CONCENTRATIONS IN CURRENT AND ADJACENT GRID CELLS
 !
 !     C*H1,C*H2=macropore solute concentration in source,destination layer
 !     *H2=macropore solute content
-!     VOLWHM=macropore water content
+!     VWatMacPM=macropore water content
 !     gas code:*CO2*=CO2,*OXY*=O2,*CH4*=CH4,*Z2G*=N2,*Z2O*=N2O
 !             :*ZN3*=NH3,*H2G*=H2
 !     solute code:CO=CO2,CH=CH4,OX=O2,NG=N2,N2=N2O,HG=H2
@@ -885,31 +885,31 @@ module InsideTranspMod
 !             :NH4=NH4,NH3=NH3,NO3=NO3,NO2=NO2,P14=HPO4,PO4=H2PO4 in non-band
 !             :N4B=NH4,N3B=NH3,NOB=NO3,N2B=NO2,P1B=HPO4,POB=H2PO4 in band
 !
-    VOLH4A=VOLWHM(M,N3,N2,N1)*trcs_VLN(ids_NH4,N3,N2,N1)
-    VOLH4B=VOLWHM(M,N3,N2,N1)*trcs_VLN(ids_NH4B,N3,N2,N1)
-    VOLH3A=VOLWHM(M,N3,N2,N1)*trcs_VLN(ids_NO3,N3,N2,N1)
-    VOLH3B=VOLWHM(M,N3,N2,N1)*trcs_VLN(ids_NO3B,N3,N2,N1)
-    VOLH2A=VOLWHM(M,N3,N2,N1)*trcs_VLN(ids_H1PO4,N3,N2,N1)
-    VOLH2B=VOLWHM(M,N3,N2,N1)*trcs_VLN(ids_H1PO4B,N3,N2,N1)
+    VOLH4A=VWatMacPM(M,N3,N2,N1)*trcs_VLN(ids_NH4,N3,N2,N1)
+    VOLH4B=VWatMacPM(M,N3,N2,N1)*trcs_VLN(ids_NH4B,N3,N2,N1)
+    VOLH3A=VWatMacPM(M,N3,N2,N1)*trcs_VLN(ids_NO3,N3,N2,N1)
+    VOLH3B=VWatMacPM(M,N3,N2,N1)*trcs_VLN(ids_NO3B,N3,N2,N1)
+    VOLH2A=VWatMacPM(M,N3,N2,N1)*trcs_VLN(ids_H1PO4,N3,N2,N1)
+    VOLH2B=VWatMacPM(M,N3,N2,N1)*trcs_VLN(ids_H1PO4B,N3,N2,N1)
 
-    VOLHOA=VOLWHM(M,N6,N5,N4)*trcs_VLN(ids_NO3,N6,N5,N4)
-    VOLHOB=VOLWHM(M,N6,N5,N4)*trcs_VLN(ids_NO3B,N6,N5,N4)
-    VOLHPA=VOLWHM(M,N6,N5,N4)*trcs_VLN(ids_H1PO4,N6,N5,N4)
-    VOLHPB=VOLWHM(M,N6,N5,N4)*trcs_VLN(ids_H1PO4B,N6,N5,N4)
+    VOLHOA=VWatMacPM(M,N6,N5,N4)*trcs_VLN(ids_NO3,N6,N5,N4)
+    VOLHOB=VWatMacPM(M,N6,N5,N4)*trcs_VLN(ids_NO3B,N6,N5,N4)
+    VOLHPA=VWatMacPM(M,N6,N5,N4)*trcs_VLN(ids_H1PO4,N6,N5,N4)
+    VOLHPB=VWatMacPM(M,N6,N5,N4)*trcs_VLN(ids_H1PO4B,N6,N5,N4)
 
     D9790: DO K=1,jcplx
-      COQCH1(K)=AZMAX1(OQCH2(K,N3,N2,N1)/VOLWHM(M,N3,N2,N1))
-      COQNH1(K)=AZMAX1(OQNH2(K,N3,N2,N1)/VOLWHM(M,N3,N2,N1))
-      COQPH1(K)=AZMAX1(OQPH2(K,N3,N2,N1)/VOLWHM(M,N3,N2,N1))
-      COQAH1(K)=AZMAX1(OQAH2(K,N3,N2,N1)/VOLWHM(M,N3,N2,N1))
-      COQCH2(K)=AZMAX1(OQCH2(K,N6,N5,N4)/VOLWHM(M,N6,N5,N4))
-      COQNH2(K)=AZMAX1(OQNH2(K,N6,N5,N4)/VOLWHM(M,N6,N5,N4))
-      COQPH2(K)=AZMAX1(OQPH2(K,N6,N5,N4)/VOLWHM(M,N6,N5,N4))
-      COQAH2(K)=AZMAX1(OQAH2(K,N6,N5,N4)/VOLWHM(M,N6,N5,N4))
+      COQCH1(K)=AZMAX1(OQCH2(K,N3,N2,N1)/VWatMacPM(M,N3,N2,N1))
+      COQNH1(K)=AZMAX1(OQNH2(K,N3,N2,N1)/VWatMacPM(M,N3,N2,N1))
+      COQPH1(K)=AZMAX1(OQPH2(K,N3,N2,N1)/VWatMacPM(M,N3,N2,N1))
+      COQAH1(K)=AZMAX1(OQAH2(K,N3,N2,N1)/VWatMacPM(M,N3,N2,N1))
+      COQCH2(K)=AZMAX1(OQCH2(K,N6,N5,N4)/VWatMacPM(M,N6,N5,N4))
+      COQNH2(K)=AZMAX1(OQNH2(K,N6,N5,N4)/VWatMacPM(M,N6,N5,N4))
+      COQPH2(K)=AZMAX1(OQPH2(K,N6,N5,N4)/VWatMacPM(M,N6,N5,N4))
+      COQAH2(K)=AZMAX1(OQAH2(K,N6,N5,N4)/VWatMacPM(M,N6,N5,N4))
     ENDDO D9790
 !exclude NH3 and NH3B
     DO NTG=idg_beg,idg_end-2
-      trcs_coH1(NTG)=AZMAX1(trc_soHml2(NTG,N3,N2,N1)/VOLWHM(M,N3,N2,N1))
+      trcs_coH1(NTG)=AZMAX1(trc_soHml2(NTG,N3,N2,N1)/VWatMacPM(M,N3,N2,N1))
     ENDDO
 
     IF(VOLH4A.GT.ZEROS2(N2,N1))THEN
@@ -956,10 +956,10 @@ module InsideTranspMod
     ENDIF
 !excldue NH3 and NH3B
     DO NTG=idg_beg,idg_end-2
-      trcs_coH2(NTG)=AZMAX1(trc_soHml2(NTG,N6,N5,N4)/VOLWHM(M,N6,N5,N4))
+      trcs_coH2(NTG)=AZMAX1(trc_soHml2(NTG,N6,N5,N4)/VWatMacPM(M,N6,N5,N4))
     ENDDO
 
-    VOLHMA=VOLWHM(M,N6,N5,N4)*trcs_VLN(ids_NH4,N6,N5,N4)
+    VOLHMA=VWatMacPM(M,N6,N5,N4)*trcs_VLN(ids_NH4,N6,N5,N4)
     IF(VOLHMA.GT.ZEROS2(N5,N4))THEN
       trcs_coH2(ids_NH4)=AZMAX1(trc_soHml2(ids_NH4,N6,N5,N4)/VOLHMA)
       trcs_coH2(idg_NH3)=AZMAX1(trc_soHml2(idg_NH3,N6,N5,N4)/VOLHMA)
@@ -967,7 +967,7 @@ module InsideTranspMod
       trcs_coH2(ids_NH4)=0.0_r8
       trcs_coH2(idg_NH3)=0.0_r8
     ENDIF
-    VOLHOA=VOLWHM(M,N6,N5,N4)*trcs_VLN(ids_NO3,N6,N5,N4)
+    VOLHOA=VWatMacPM(M,N6,N5,N4)*trcs_VLN(ids_NO3,N6,N5,N4)
     IF(VOLHOA.GT.ZEROS2(N5,N4))THEN
       trcs_coH2(ids_NO3)=AZMAX1(trc_soHml2(ids_NO3,N6,N5,N4)/VOLHOA)
       trcs_coH2(ids_NO2)=AZMAX1(trc_soHml2(ids_NO2,N6,N5,N4)/VOLHOA)
@@ -975,7 +975,7 @@ module InsideTranspMod
       trcs_coH2(ids_NO3)=0.0_r8
       trcs_coH2(ids_NO2)=0.0_r8
     ENDIF
-    VOLHPA=VOLWHM(M,N6,N5,N4)*trcs_VLN(ids_H1PO4,N6,N5,N4)
+    VOLHPA=VWatMacPM(M,N6,N5,N4)*trcs_VLN(ids_H1PO4,N6,N5,N4)
     IF(VOLHPA.GT.ZEROS2(N5,N4))THEN
       trcs_coH2(ids_H1PO4)=AZMAX1(trc_soHml2(ids_H1PO4,N6,N5,N4)/VOLHPA)
       trcs_coH2(ids_H2PO4)=AZMAX1(trc_soHml2(ids_H2PO4,N6,N5,N4)/VOLHPA)
@@ -983,7 +983,7 @@ module InsideTranspMod
       trcs_coH2(ids_H1PO4)=0.0_r8
       trcs_coH2(ids_H2PO4)=0.0_r8
     ENDIF
-    VOLHMB=VOLWHM(M,N6,N5,N4)*trcs_VLN(ids_NH4B,N6,N5,N4)
+    VOLHMB=VWatMacPM(M,N6,N5,N4)*trcs_VLN(ids_NH4B,N6,N5,N4)
     IF(VOLHMB.GT.ZEROS2(N5,N4))THEN
       trcs_coH2(ids_NH4B)=AZMAX1(trc_soHml2(ids_NH4B,N6,N5,N4)/VOLHMB)
       trcs_coH2(idg_NH3B)=AZMAX1(trc_soHml2(idg_NH3B,N6,N5,N4)/VOLHMB)
@@ -991,7 +991,7 @@ module InsideTranspMod
       trcs_coH2(ids_NH4B)=trcs_coH2(ids_NH4)
       trcs_coH2(idg_NH3B)=trcs_coH2(idg_NH3)
     ENDIF
-    VOLHOB=VOLWHM(M,N6,N5,N4)*trcs_VLN(ids_NO3B,N6,N5,N4)
+    VOLHOB=VWatMacPM(M,N6,N5,N4)*trcs_VLN(ids_NO3B,N6,N5,N4)
     IF(VOLHOB.GT.ZEROS2(N5,N4))THEN
       trcs_coH2(ids_NO3B)=AZMAX1(trc_soHml2(ids_NO3B,N6,N5,N4)/VOLHOB)
       trcs_coH2(ids_NO2B)=AZMAX1(trc_soHml2(ids_NO2B,N6,N5,N4)/VOLHOB)
@@ -999,7 +999,7 @@ module InsideTranspMod
       trcs_coH2(ids_NO3B)=trcs_coH2(ids_NO3)
       trcs_coH2(ids_NO2B)=trcs_coH2(ids_NO2)
     ENDIF
-    VOLHPB=VOLWHM(M,N6,N5,N4)*trcs_VLN(ids_H1PO4B,N6,N5,N4)
+    VOLHPB=VWatMacPM(M,N6,N5,N4)*trcs_VLN(ids_H1PO4B,N6,N5,N4)
     IF(VOLHPB.GT.ZEROS2(N5,N4))THEN
       trcs_coH2(ids_H1PO4B)=AZMAX1(trc_soHml2(ids_H1PO4B,N6,N5,N4)/VOLHPB)
       trcs_coH2(ids_H2PO4B)=AZMAX1(trc_soHml2(ids_H2PO4B,N6,N5,N4)/VOLHPB)
@@ -1013,7 +1013,7 @@ module InsideTranspMod
 !     DLYR=soil layer thickness
 !     TORTH=macropore tortuosity from hour1.f
 !     DISP=dispersivity parameter
-!     FLWHM=water flux through soil macropore from watsub.f
+!     WaterFlowMacPi=water flux through soil macropore from watsub.f
 !     DIF*=aqueous diffusivity-dispersivity through macropore
 !     *SGL2=solute diffusivity from hour1.f
 !     solute code:CO=CO2,CH=CH4,OX=O2,NG=N2,N2=N2O,HG=H2
@@ -1029,7 +1029,7 @@ module InsideTranspMod
     DLYR1=AMAX1(ZERO2,DLYR(N,N3,N2,N1))
     DLYR2=AMAX1(ZERO2,DLYR(N,N6,N5,N4))
     TORTL=(TORTH(M,N3,N2,N1)*DLYR1+TORTH(M,N6,N5,N4)*DLYR2)/(DLYR1+DLYR2)
-    DISPN=DISP(N,N6,N5,N4)*AMIN1(VFLWX,ABS(FLWHM(M,N,N6,N5,N4)/AREA(N,N6,N5,N4)))
+    DISPN=DISP(N,N6,N5,N4)*AMIN1(VFLWX,ABS(WaterFlowMacPi(M,N,N6,N5,N4)/AREA(N,N6,N5,N4)))
 
     DIFOC=(OCSGL2(N6,N5,N4)*TORTL+DISPN)*XDPTH(N,N6,N5,N4)
     DIFON=(ONSGL2(N6,N5,N4)*TORTL+DISPN)*XDPTH(N,N6,N5,N4)
@@ -1081,8 +1081,8 @@ module InsideTranspMod
   real(r8) :: THETW1(JZ,JY,JX)
   integer :: K,NTS
 
-  THETW1(N3,N2,N1)=AZMAX1(safe_adb(VOLWM(M,N3,N2,N1),VOLY(N3,N2,N1)))
-  THETW1(N6,N5,N4)=AZMAX1(safe_adb(VOLWM(M,N6,N5,N4),VOLY(N6,N5,N4)))
+  THETW1(N3,N2,N1)=AZMAX1(safe_adb(VWatMicPM(M,N3,N2,N1),VOLY(N3,N2,N1)))
+  THETW1(N6,N5,N4)=AZMAX1(safe_adb(VWatMicPM(M,N6,N5,N4),VOLY(N6,N5,N4)))
 
 !     SOLUTE TRANSPORT IN MICROPORES
 !
@@ -1164,15 +1164,15 @@ module InsideTranspMod
 
   integer :: K,NTS
 
-  VOLWCO(N6,N5,N4)=VOLWM(M,N6,N5,N4)*GSolbility(idg_CO2,N6,N5,N4)
-  VOLWCH(N6,N5,N4)=VOLWM(M,N6,N5,N4)*GSolbility(idg_CH4,N6,N5,N4)
-  VOLWOX(N6,N5,N4)=VOLWM(M,N6,N5,N4)*GSolbility(idg_O2,N6,N5,N4)
-  VOLWNG(N6,N5,N4)=VOLWM(M,N6,N5,N4)*GSolbility(idg_N2,N6,N5,N4)
-  VOLWN2(N6,N5,N4)=VOLWM(M,N6,N5,N4)*GSolbility(idg_N2O,N6,N5,N4)
-  VOLWN3(N6,N5,N4)=VOLWMA(N6,N5,N4)*GSolbility(idg_NH3,N6,N5,N4)
-  VOLWHG(N6,N5,N4)=VOLWM(M,N6,N5,N4)*GSolbility(idg_H2,N6,N5,N4)
+  VWatMicPCO(N6,N5,N4)=VWatMicPM(M,N6,N5,N4)*GSolbility(idg_CO2,N6,N5,N4)
+  VWatMicPCH(N6,N5,N4)=VWatMicPM(M,N6,N5,N4)*GSolbility(idg_CH4,N6,N5,N4)
+  VWatMicPOX(N6,N5,N4)=VWatMicPM(M,N6,N5,N4)*GSolbility(idg_O2,N6,N5,N4)
+  VWatMicPNG(N6,N5,N4)=VWatMicPM(M,N6,N5,N4)*GSolbility(idg_N2,N6,N5,N4)
+  VWatMicPN2(N6,N5,N4)=VWatMicPM(M,N6,N5,N4)*GSolbility(idg_N2O,N6,N5,N4)
+  VWatMicPN3(N6,N5,N4)=VWatMicPMA(N6,N5,N4)*GSolbility(idg_NH3,N6,N5,N4)
+  VWatMicPHG(N6,N5,N4)=VWatMicPM(M,N6,N5,N4)*GSolbility(idg_H2,N6,N5,N4)
 
-  VOLWNB(N6,N5,N4)=VOLWMB(N6,N5,N4)*GSolbility(idg_NH3,N6,N5,N4)
+  VWatMicPNB(N6,N5,N4)=VWatMicPMB(N6,N5,N4)*GSolbility(idg_NH3,N6,N5,N4)
 !
 !     MACROPORE-MICROPORE CONVECTIVE SOLUTE EXCHANGE IN SOIL
 !     LAYER FROM WATER EXCHANGE IN 'WATSUB' AND
@@ -1215,7 +1215,7 @@ module InsideTranspMod
 !     FROM MACROPORE OR MICROPORE SOLUTE CONCENTRATIONS
 !
 !     FINHM=macro-micropore water transfer from watsub.f
-!     VOLWM,VOLWHM=micropore,macropore water volume
+!     VWatMicPM,VWatMacPM=micropore,macropore water volume
 !     RFL*=convective macropore-micropore solute transfer
 !     VLNH4,VLNO3,VLPO4=non-band NH4,NO3,PO4 volume fraction
 !     VLNHB,VLNOB,VLPOB=band NH4,NO3,PO4 volume fraction
@@ -1228,8 +1228,8 @@ module InsideTranspMod
 !     MACROPORE TO MICROPORE TRANSFER
 !
   IF(FINHM(M,N6,N5,N4).GT.0.0_r8)THEN
-    IF(VOLWHM(M,N6,N5,N4).GT.ZEROS2(N5,N4))THEN
-      VFLW=AZMAX1(AMIN1(VFLWX,FINHM(M,N6,N5,N4)/VOLWHM(M,N6,N5,N4)))
+    IF(VWatMacPM(M,N6,N5,N4).GT.ZEROS2(N5,N4))THEN
+      VFLW=AZMAX1(AMIN1(VFLWX,FINHM(M,N6,N5,N4)/VWatMacPM(M,N6,N5,N4)))
     ELSE
       VFLW=VFLWX
     ENDIF
@@ -1251,8 +1251,8 @@ module InsideTranspMod
 !     MICROPORE TO MACROPORE TRANSFER
 !
   ELSEIF(FINHM(M,N6,N5,N4).LT.0.0_r8)THEN
-    IF(VOLWM(M,N6,N5,N4).GT.ZEROS2(N5,N4))THEN
-      VFLW=AZMIN1(AMAX1(-VFLWX,FINHM(M,N6,N5,N4)/VOLWM(M,N6,N5,N4)))
+    IF(VWatMicPM(M,N6,N5,N4).GT.ZEROS2(N5,N4))THEN
+      VFLW=AZMIN1(AMAX1(-VFLWX,FINHM(M,N6,N5,N4)/VWatMicPM(M,N6,N5,N4)))
     ELSE
       VFLW=-VFLWX
     ENDIF
@@ -1315,10 +1315,10 @@ module InsideTranspMod
   integer, intent(in) :: M,N,N1,N2,N3,N4,N5,N6
 
   real(r8) :: trcs_DFV(ids_beg:ids_end)
-  real(r8) :: VOLWHS,VOLWT
+  real(r8) :: VWatMacPS,VOLWT
   integer  :: K,NTS,NTG
 !
-!     VOLWM,VOLWHM=micropore,macropore water-filled porosity from watsub.f
+!     VWatMicPM,VWatMacPM=micropore,macropore water-filled porosity from watsub.f
 !     DFV*S,DFV*B=diffusive solute flux between macro- and micropore in non-band,band
 !     XNPH=1/no. of cycles h-1 for water, heat and solute flux calculations
 !     solute code:CO=CO2,CH=CH4,OX=O2,NG=N2,N2=N2O,HG=H2
@@ -1327,29 +1327,29 @@ module InsideTranspMod
 !             :N4B=NH4,N3B=NH3,NOB=NO3,N2B=NO2,P1B=HPO4,POB=H2PO4 in band
 !     *2,*H2=solute content of micropores,macropores
 !
-  IF(VOLWHM(M,N6,N5,N4).GT.ZEROS2(N5,N4))THEN
-    VOLWHS=AMIN1(XFRS*VOLT(N6,N5,N4),VOLWHM(M,N6,N5,N4))
-    VOLWT=VOLWM(M,N6,N5,N4)+VOLWHS
+  IF(VWatMacPM(M,N6,N5,N4).GT.ZEROS2(N5,N4))THEN
+    VWatMacPS=AMIN1(XFRS*VOLT(N6,N5,N4),VWatMacPM(M,N6,N5,N4))
+    VOLWT=VWatMicPM(M,N6,N5,N4)+VWatMacPS
 
     D9955: DO K=1,jcplx
-      DFVOC(K)=XNPH*(AZMAX1(OQCH2(K,N6,N5,N4))*VOLWM(M,N6,N5,N4) &
-        -AZMAX1(OQC2(K,N6,N5,N4))*VOLWHS)/VOLWT
-      DFVON(K)=XNPH*(AZMAX1(OQNH2(K,N6,N5,N4))*VOLWM(M,N6,N5,N4) &
-        -AZMAX1(OQN2(K,N6,N5,N4))*VOLWHS)/VOLWT
-      DFVOP(K)=XNPH*(AZMAX1(OQPH2(K,N6,N5,N4))*VOLWM(M,N6,N5,N4) &
-        -AZMAX1(OQP2(K,N6,N5,N4))*VOLWHS)/VOLWT
-      DFVOA(K)=XNPH*(AZMAX1(OQAH2(K,N6,N5,N4))*VOLWM(M,N6,N5,N4) &
-        -AZMAX1(OQA2(K,N6,N5,N4))*VOLWHS)/VOLWT
+      DFVOC(K)=XNPH*(AZMAX1(OQCH2(K,N6,N5,N4))*VWatMicPM(M,N6,N5,N4) &
+        -AZMAX1(OQC2(K,N6,N5,N4))*VWatMacPS)/VOLWT
+      DFVON(K)=XNPH*(AZMAX1(OQNH2(K,N6,N5,N4))*VWatMicPM(M,N6,N5,N4) &
+        -AZMAX1(OQN2(K,N6,N5,N4))*VWatMacPS)/VOLWT
+      DFVOP(K)=XNPH*(AZMAX1(OQPH2(K,N6,N5,N4))*VWatMicPM(M,N6,N5,N4) &
+        -AZMAX1(OQP2(K,N6,N5,N4))*VWatMacPS)/VOLWT
+      DFVOA(K)=XNPH*(AZMAX1(OQAH2(K,N6,N5,N4))*VWatMicPM(M,N6,N5,N4) &
+        -AZMAX1(OQA2(K,N6,N5,N4))*VWatMacPS)/VOLWT
     ENDDO D9955
 
     DO NTG=idg_beg,idg_end-2
-      trcs_DFV(NTG)=XNPH*(AZMAX1(trc_soHml2(NTG,N6,N5,N4))*VOLWM(M,N6,N5,N4) &
-        -AZMAX1(trc_solml2(NTG,N6,N5,N4))*VOLWHS)/VOLWT
+      trcs_DFV(NTG)=XNPH*(AZMAX1(trc_soHml2(NTG,N6,N5,N4))*VWatMicPM(M,N6,N5,N4) &
+        -AZMAX1(trc_solml2(NTG,N6,N5,N4))*VWatMacPS)/VOLWT
     ENDDO
 
     DO NTS=ids_nuts_beg,ids_nuts_end
-      trcs_DFV(NTS)=XNPH*(AZMAX1(trc_soHml2(NTS,N6,N5,N4))*VOLWM(M,N6,N5,N4) &
-        -AZMAX1(trc_solml2(NTS,N6,N5,N4))*VOLWHS)/VOLWT &
+      trcs_DFV(NTS)=XNPH*(AZMAX1(trc_soHml2(NTS,N6,N5,N4))*VWatMicPM(M,N6,N5,N4) &
+        -AZMAX1(trc_solml2(NTS,N6,N5,N4))*VWatMacPS)/VOLWT &
         *trcs_VLN(NTS,N6,N5,N4)
     ENDDO
 
@@ -1398,13 +1398,13 @@ module InsideTranspMod
   integer  :: NTG
   real(r8) :: VTATM,VTGAS,DVTGAS
 !
-!     VOLWM=micropore water-filled porosity from watsub.f
+!     VWatMicPM=micropore water-filled porosity from watsub.f
 !     VOLY=micropore volume
 !     IFLGB=bubbling flag:0=enabled,1=disabled
 !     S*L=solubility of gas in water from hour1.f
 !
   IF(N3.GE.NUM(N2,N1).AND.M.NE.MX)THEN
-    THETW1=AZMAX1(safe_adb(VOLWM(M,N3,N2,N1),VOLY(N3,N2,N1)))
+    THETW1=AZMAX1(safe_adb(VWatMicPM(M,N3,N2,N1),VOLY(N3,N2,N1)))
     IF(THETW1.GT.THETY(N3,N2,N1).AND.IFLGB.EQ.0)THEN
 
       trcg_SLX(idg_CO2) =catomw*GSolbility(idg_CO2,N3,N2,N1)  !conver into carbon g C/mol
@@ -1438,7 +1438,7 @@ module InsideTranspMod
 !     VTATM=molar gas concentration at atmospheric pressure
 !     VTGAS=total molar gas concentration
 !
-      VTATM=AZMAX1(1.2194E+04_r8*VOLWM(M,N3,N2,N1)/TKS(N3,N2,N1))
+      VTATM=AZMAX1(1.2194E+04_r8*VWatMicPM(M,N3,N2,N1)/TKS(N3,N2,N1))
 
       VTGAS=sum(trcg_VOLG(idg_beg:idg_end))
 !
@@ -1524,7 +1524,7 @@ module InsideTranspMod
 !     *G2=gaseous content
 !     gas code:*CO2*=CO2,*OXY*=O2,*CH4*=CH4,*Z2G*=N2,*Z2O*=N2O
 !             :*ZN3*=NH3,*H2G*=H2
-!     VOLPM=air-filled porosity
+!     VsoiPM=air-filled porosity
 !
 !
 !     DIFFUSIVE GAS TRANSFER DRIVEN BY GAS CONCENTRATIONS IN
@@ -1535,8 +1535,8 @@ module InsideTranspMod
 !
 ! does not include band NH3
   DO NTG=idg_beg,idg_end-1
-    trc_gasc1(NTG)=AZMAX1(trc_gasml2(NTG,N3,N2,N1)/VOLPM(M,N3,N2,N1))
-    trc_gasc2(NTG)=AZMAX1(trc_gasml2(NTG,N6,N5,N4)/VOLPM(M,N6,N5,N4))
+    trc_gasc1(NTG)=AZMAX1(trc_gasml2(NTG,N3,N2,N1)/VsoiPM(M,N3,N2,N1))
+    trc_gasc2(NTG)=AZMAX1(trc_gasml2(NTG,N6,N5,N4)/VsoiPM(M,N6,N5,N4))
     DFVGG(NTG)=DifuscG(NTG,N,N6,N5,N4)*(trc_gasc1(NTG)-trc_gasc2(NTG))
     R3GasADFlx(NTG,N,N6,N5,N4)=DFVGG(NTG)
   ENDDO
@@ -1559,15 +1559,15 @@ module InsideTranspMod
 !
 !     by assuming volume conservation, gases and water flow in opposite direction
 !     FLQM=total water flux into soil micropore+macropore from watsub.f
-!     VOLPM=air-filled porosity
+!     VsoiPM=air-filled porosity
 !     RFL*G=convective gas flux
 !     gas code:*CO*=CO2,*OX*=O2,*CH*=CH4,*NG*=N2,*N2*=N2O,*NH*=NH3,*HG*=H2
 !     *G2=gaseous content
 !
   FLQW=FLQM(N,N6,N5,N4)
   IF(FLQW.GT.0.0_r8)THEN
-    IF(VOLPM(M,N6,N5,N4).GT.ZEROS2(N5,N4))THEN
-      VFLW=-AZMAX1(AMIN1(VFLWX,FLQW/VOLPM(M,N6,N5,N4)))
+    IF(VsoiPM(M,N6,N5,N4).GT.ZEROS2(N5,N4))THEN
+      VFLW=-AZMAX1(AMIN1(VFLWX,FLQW/VsoiPM(M,N6,N5,N4)))
     ELSE
       VFLW=-VFLWX
     ENDIF
@@ -1576,8 +1576,8 @@ module InsideTranspMod
       R3GasADFlx(NTG,N,N6,N5,N4)=R3GasADFlx(NTG,N,N6,N5,N4)+RGasAdv
     ENDDO
   ELSE
-    IF(VOLPM(M,N3,N2,N1).GT.ZEROS2(N2,N1))THEN
-      VFLW=-AZMIN1(AMAX1(-VFLWX,FLQW/VOLPM(M,N3,N2,N1)))
+    IF(VsoiPM(M,N3,N2,N1).GT.ZEROS2(N2,N1))THEN
+      VFLW=-AZMIN1(AMAX1(-VFLWX,FLQW/VsoiPM(M,N3,N2,N1)))
     ELSE
       VFLW=VFLWX
     ENDIF
@@ -1597,11 +1597,11 @@ module InsideTranspMod
   real(r8), intent(in) :: FLQM(3,JD,JV,JH)
   integer :: NTG
 
-!     THETPM,VOLPM=air-filled porosity,volume from watsub.f
+!     THETPM,VsoiPM=air-filled porosity,volume from watsub.f
 
   IF(THETPM(M,N3,N2,N1).GT.THETX.AND.THETPM(M,N6,N5,N4).GT.THETX &
-    .AND.VOLPM(M,N3,N2,N1).GT.ZEROS2(N2,N1) &
-    .AND.VOLPM(M,N6,N5,N4).GT.ZEROS2(N5,N4))THEN
+    .AND.VsoiPM(M,N3,N2,N1).GT.ZEROS2(N2,N1) &
+    .AND.VsoiPM(M,N6,N5,N4).GT.ZEROS2(N5,N4))THEN
 
 !     TOTAL SOIL GAS FLUX FROM DIFFUSIVE
     call GasDifTransport(M,N,N1,N2,N3,N4,N5,N6)
@@ -1637,63 +1637,63 @@ module InsideTranspMod
 !     EQUIVALENTS DEPENDING ON SOLUBILITY FROM 'HOUR1'
 !     AND TRANSFER COEFFICIENT 'DFGS' FROM 'WATSUB'
 !
-!     THETPM,VOLWPM=air-filled porosity,volume
+!     THETPM,VWatMicPPM=air-filled porosity,volume
 !     R*DFG=water-air gas flux
 !     gas code:*CO2*=CO2,*OXY*=O2,*CH4*=CH4,*Z2G*=N2,*Z2O*=N2O
 !             :*ZN3*=NH3,*H2G*=H2
 !     DFGS=rate constant for air-water gas exchange from watsub.f
 !     *G2,*S2=gaseous,aqueous gas content
-!     VOLW*=equivalent aqueous volume for gas
+!     VWatMicP*=equivalent aqueous volume for gas
 !
   IF(N.EQ.3)THEN
     IF(THETPM(M,N6,N5,N4).GT.THETX)THEN
       RGasDSFlx(idg_CO2,N6,N5,N4)=DFGS(M,N6,N5,N4)*(AMAX1(ZEROS(N5,N4) &
-        ,trc_gasml2(idg_CO2,N6,N5,N4))*VOLWCO(N6,N5,N4) &
-        -trc_solml2(idg_CO2,N6,N5,N4)*VOLPM(M,N6,N5,N4)) &
-        /(VOLWCO(N6,N5,N4)+VOLPM(M,N6,N5,N4))
+        ,trc_gasml2(idg_CO2,N6,N5,N4))*VWatMicPCO(N6,N5,N4) &
+        -trc_solml2(idg_CO2,N6,N5,N4)*VsoiPM(M,N6,N5,N4)) &
+        /(VWatMicPCO(N6,N5,N4)+VsoiPM(M,N6,N5,N4))
       RGasDSFlx(idg_CH4,N6,N5,N4)=DFGS(M,N6,N5,N4)*(AMAX1(ZEROS(N5,N4) &
-        ,trc_gasml2(idg_CH4,N6,N5,N4))*VOLWCH(N6,N5,N4) &
-        -trc_solml2(idg_CH4,N6,N5,N4)*VOLPM(M,N6,N5,N4)) &
-        /(VOLWCH(N6,N5,N4)+VOLPM(M,N6,N5,N4))
+        ,trc_gasml2(idg_CH4,N6,N5,N4))*VWatMicPCH(N6,N5,N4) &
+        -trc_solml2(idg_CH4,N6,N5,N4)*VsoiPM(M,N6,N5,N4)) &
+        /(VWatMicPCH(N6,N5,N4)+VsoiPM(M,N6,N5,N4))
       RGasDSFlx(idg_O2,N6,N5,N4)=DFGS(M,N6,N5,N4)*(AMAX1(ZEROS(N5,N4) &
-        ,trc_gasml2(idg_O2,N6,N5,N4))*VOLWOX(N6,N5,N4) &
-        -trc_solml2(idg_O2,N6,N5,N4)*VOLPM(M,N6,N5,N4)) &
-        /(VOLWOX(N6,N5,N4)+VOLPM(M,N6,N5,N4))
+        ,trc_gasml2(idg_O2,N6,N5,N4))*VWatMicPOX(N6,N5,N4) &
+        -trc_solml2(idg_O2,N6,N5,N4)*VsoiPM(M,N6,N5,N4)) &
+        /(VWatMicPOX(N6,N5,N4)+VsoiPM(M,N6,N5,N4))
       RGasDSFlx(idg_N2,N6,N5,N4)=DFGS(M,N6,N5,N4)*(AMAX1(ZEROS(N5,N4) &
-        ,trc_gasml2(idg_N2,N6,N5,N4))*VOLWNG(N6,N5,N4) &
-        -trc_solml2(idg_N2,N6,N5,N4)*VOLPM(M,N6,N5,N4)) &
-        /(VOLWNG(N6,N5,N4)+VOLPM(M,N6,N5,N4))
+        ,trc_gasml2(idg_N2,N6,N5,N4))*VWatMicPNG(N6,N5,N4) &
+        -trc_solml2(idg_N2,N6,N5,N4)*VsoiPM(M,N6,N5,N4)) &
+        /(VWatMicPNG(N6,N5,N4)+VsoiPM(M,N6,N5,N4))
       RGasDSFlx(idg_N2O,N6,N5,N4)=DFGS(M,N6,N5,N4)*(AMAX1(ZEROS(N5,N4) &
-        ,trc_gasml2(idg_N2O,N6,N5,N4))*VOLWN2(N6,N5,N4) &
-        -trc_solml2(idg_N2O,N6,N5,N4)*VOLPM(M,N6,N5,N4)) &
-        /(VOLWN2(N6,N5,N4)+VOLPM(M,N6,N5,N4))
+        ,trc_gasml2(idg_N2O,N6,N5,N4))*VWatMicPN2(N6,N5,N4) &
+        -trc_solml2(idg_N2O,N6,N5,N4)*VsoiPM(M,N6,N5,N4)) &
+        /(VWatMicPN2(N6,N5,N4)+VsoiPM(M,N6,N5,N4))
 
-      IF(VOLPMA(N6,N5,N4).GT.ZEROS2(N5,N4).AND.VOLWXA(N6,N5,N4).GT.ZEROS2(N5,N4))THEN
+      IF(VsoiPMA(N6,N5,N4).GT.ZEROS2(N5,N4).AND.VWatMicPXA(N6,N5,N4).GT.ZEROS2(N5,N4))THEN
         RGasDSFlx(idg_NH3,N6,N5,N4)=DFGS(M,N6,N5,N4)*(AMAX1(ZEROS(N5,N4) &
-          ,trc_gasml2(idg_NH3,N6,N5,N4))*VOLWN3(N6,N5,N4) &
-          -trc_solml2(idg_NH3,N6,N5,N4)*VOLPMA(N6,N5,N4)) &
-          /(VOLWN3(N6,N5,N4)+VOLPMA(N6,N5,N4))
+          ,trc_gasml2(idg_NH3,N6,N5,N4))*VWatMicPN3(N6,N5,N4) &
+          -trc_solml2(idg_NH3,N6,N5,N4)*VsoiPMA(N6,N5,N4)) &
+          /(VWatMicPN3(N6,N5,N4)+VsoiPMA(N6,N5,N4))
         CNH3S0=AZMAX1((trc_solml2(idg_NH3,N6,N5,N4) &
-          +RGasDSFlx(idg_NH3,N6,N5,N4))/VOLWXA(N6,N5,N4))
-        CNH4S0=AZMAX1(trc_solml2(ids_NH4,N6,N5,N4))/VOLWXA(N6,N5,N4)
+          +RGasDSFlx(idg_NH3,N6,N5,N4))/VWatMicPXA(N6,N5,N4))
+        CNH4S0=AZMAX1(trc_solml2(ids_NH4,N6,N5,N4))/VWatMicPXA(N6,N5,N4)
       ELSE
         RGasDSFlx(idg_NH3,N6,N5,N4)=0.0_r8
       ENDIF
 
       RGasDSFlx(idg_H2,N6,N5,N4)=DFGS(M,N6,N5,N4)*(AMAX1(ZEROS(N5,N4) &
-        ,trc_gasml2(idg_H2,N6,N5,N4))*VOLWHG(N6,N5,N4) &
-        -trc_solml2(idg_H2,N6,N5,N4)*VOLPM(M,N6,N5,N4)) &
-        /(VOLWHG(N6,N5,N4)+VOLPM(M,N6,N5,N4))
+        ,trc_gasml2(idg_H2,N6,N5,N4))*VWatMicPHG(N6,N5,N4) &
+        -trc_solml2(idg_H2,N6,N5,N4)*VsoiPM(M,N6,N5,N4)) &
+        /(VWatMicPHG(N6,N5,N4)+VsoiPM(M,N6,N5,N4))
 
 
-      IF(VOLPMB(N6,N5,N4).GT.ZEROS2(N5,N4).AND.VOLWXB(N6,N5,N4).GT.ZEROS2(N5,N4))THEN
+      IF(VsoiPMB(N6,N5,N4).GT.ZEROS2(N5,N4).AND.VWatMicPXB(N6,N5,N4).GT.ZEROS2(N5,N4))THEN
         RGasDSFlx(idg_NH3B,N6,N5,N4)=DFGS(M,N6,N5,N4)*(AMAX1(ZEROS(N5,N4) &
-          ,trc_gasml2(idg_NH3,N6,N5,N4))*VOLWNB(N6,N5,N4) &
-          -trc_solml2(idg_NH3B,N6,N5,N4)*VOLPMB(N6,N5,N4)) &
-          /(VOLWNB(N6,N5,N4)+VOLPMB(N6,N5,N4))
+          ,trc_gasml2(idg_NH3,N6,N5,N4))*VWatMicPNB(N6,N5,N4) &
+          -trc_solml2(idg_NH3B,N6,N5,N4)*VsoiPMB(N6,N5,N4)) &
+          /(VWatMicPNB(N6,N5,N4)+VsoiPMB(N6,N5,N4))
         CNH3B0=AZMAX1((trc_solml2(idg_NH3B,N6,N5,N4) &
-          +RGasDSFlx(idg_NH3B,N6,N5,N4))/VOLWXB(N6,N5,N4))
-        CNH4B0=AZMAX1(trc_solml2(ids_NH4B,N6,N5,N4))/VOLWXB(N6,N5,N4)
+          +RGasDSFlx(idg_NH3B,N6,N5,N4))/VWatMicPXB(N6,N5,N4))
+        CNH4B0=AZMAX1(trc_solml2(ids_NH4B,N6,N5,N4))/VWatMicPXB(N6,N5,N4)
       ELSE
         RGasDSFlx(idg_NH3B,N6,N5,N4)=0.0_r8
       ENDIF

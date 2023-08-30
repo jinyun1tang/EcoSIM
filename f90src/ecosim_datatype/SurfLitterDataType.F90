@@ -15,9 +15,9 @@ module SurfLitterDataType
   real(r8) ,target,allocatable ::   FLQRM(:,:,:)                     !meltwater flux into surface litter, [m3 d-2 h-1]
   real(r8) ,target,allocatable ::   CVRD(:,:)                        !fraction of soil surface covered by surface litter, [-]
   real(r8) ,target,allocatable ::   HFLWR(:,:)                       !net heat transfer to surface litter, [MJ d-2 t-1]
-  real(r8) ,target,allocatable ::   VOLR(:,:)                        !surface litter volume, [m3 d-2]
+  real(r8) ,target,allocatable ::   VLitR(:,:)                        !surface litter volume, [m3 d-2]
   real(r8) ,target,allocatable ::   VHCPRX(:,:)                      !surface litter heat capacity from previous time step, [MJ d-2 K-1]
-  real(r8) ,target,allocatable ::   VOLWRX(:,:)                      !surface litter water holding capacity, [m3 d-2]
+  real(r8) ,target,allocatable ::   VWatLitrX(:,:)                      !surface litter water holding capacity, [m3 d-2]
   real(r8) ,target,allocatable ::   FLWR(:,:)                        !net water transfer to surface litter, [MJ d-2 t-1]
   real(r8) ,target,allocatable ::   THAWR(:,:)                       !freeze (-ve) - thaw (+ve) in surface litter, [m3 d-2 h-1]
   real(r8) ,target,allocatable ::   HTHAWR(:,:)                      !latent heat of freeze (-ve) - thaw (+ve) in surface litter, [MJ d-2 h-1]
@@ -53,9 +53,9 @@ module SurfLitterDataType
   allocate(FLQRM(60,JY,JX));     FLQRM=0._r8
   allocate(CVRD(JY,JX));         CVRD=0._r8
   allocate(HFLWR(JY,JX));        HFLWR=0._r8
-  allocate(VOLR(JY,JX));         VOLR=0._r8
+  allocate(VLitR(JY,JX));         VLitR=0._r8
   allocate(VHCPRX(JY,JX));       VHCPRX=0._r8
-  allocate(VOLWRX(JY,JX));       VOLWRX=0._r8
+  allocate(VWatLitrX(JY,JX));       VWatLitrX=0._r8
   allocate(FLWR(JY,JX));         FLWR=0._r8
   allocate(THAWR(JY,JX));        THAWR=0._r8
   allocate(HTHAWR(JY,JX));       HTHAWR=0._r8
@@ -79,9 +79,9 @@ module SurfLitterDataType
   call destroy(FLQRM)
   call destroy(CVRD)
   call destroy(HFLWR)
-  call destroy(VOLR)
+  call destroy(VLitR)
   call destroy(VHCPRX)
-  call destroy(VOLWRX)
+  call destroy(VWatLitrX)
   call destroy(FLWR)
   call destroy(THAWR)
   call destroy(HTHAWR)

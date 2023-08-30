@@ -222,11 +222,11 @@ module MicBGCMod
     n_anero_faculb  => micpar%n_anero_faculb, &
     nf_amonia_oxi => micpar%nf_amonia_oxi, &
     litrm    => micfor%litrm  , &
-    VOLWRX  => micfor%VOLWRX , &
-    VOLW   => micfor%VOLW, &
+    VWatLitrX  => micfor%VWatLitrX , &
+    VWatMicP   => micfor%VWatMicP, &
     VOLW0   => micfor%VOLW0, &
     THETY  => micfor%THETY, &
-    VOLR   => micfor%VOLR , &
+    VLitR   => micfor%VLitR , &
     VOLY   => micfor%VOLY , &
     POROS  => micfor%POROS, &
     ZEROS => micfor%ZEROS, &
@@ -234,7 +234,7 @@ module MicBGCMod
     THETW   => micfor%THETW , &
     TKS    => micfor%TKS, &
     OFFSET  => micfor%OFFSET, &
-    VOLWM  => micfor%VOLWM  , &
+    VWatMicPM  => micfor%VWatMicPM  , &
     ZEROS2  => micfor%ZEROS2 , &
     ZERO   => micfor%ZERO    , &
     CCO2S   => micstt%CCO2S, &
@@ -274,10 +274,10 @@ module MicBGCMod
   IF(litrm)THEN
     ! surface litter layer
     KL=micpar%n_litrsfk
-    IF(VOLWRX.GT.ZEROS2)THEN
-      THETR=VOLW0/VOLR
+    IF(VWatLitrX.GT.ZEROS2)THEN
+      THETR=VOLW0/VLitR
       THETZ=AZMAX1(THETR-THETY)
-      VOLWZ=THETZ*VOLR
+      VOLWZ=THETZ*VLitR
     ELSE
       VOLWZ=0.0_r8
     ENDIF
@@ -495,16 +495,16 @@ module MicBGCMod
     !     DOC CONCENTRATIONS
     !
     !     COQC,COQA=aqueous DOC,acetate concentrations
-    !     VOLWM=soil water content, FOSRH=fraction of total SOC
+    !     VWatMicPM=soil water content, FOSRH=fraction of total SOC
     !     occupied by each substrate complex K
     !
-    IF(VOLWM(NPH).GT.ZEROS2)THEN
+    IF(VWatMicPM(NPH).GT.ZEROS2)THEN
       IF(FOSRH(K).GT.ZERO)THEN
-        COQC(K)=AZMAX1(OQC(K)/(VOLWM(NPH)*FOSRH(K)))
-        COQA(K)=AZMAX1(OQA(K)/(VOLWM(NPH)*FOSRH(K)))
+        COQC(K)=AZMAX1(OQC(K)/(VWatMicPM(NPH)*FOSRH(K)))
+        COQA(K)=AZMAX1(OQA(K)/(VWatMicPM(NPH)*FOSRH(K)))
       ELSE
-        COQC(K)=AZMAX1(OQC(K)/VOLWM(NPH))
-        COQA(K)=AZMAX1(OQA(K)/VOLWM(NPH))
+        COQC(K)=AZMAX1(OQC(K)/VWatMicPM(NPH))
+        COQA(K)=AZMAX1(OQA(K)/VWatMicPM(NPH))
       ENDIF
     ELSE
       COQC(K)=0.0_r8
@@ -720,7 +720,7 @@ module MicBGCMod
     litrm => micfor%litrm, &
     ORGC=> micfor%ORGC, &
     ZEROS => micfor%ZEROS, &
-    VOLX => micfor%VOLX, &
+    VSoilPoreMicP => micfor%VSoilPoreMicP, &
     RNO2Y  => micfor%RNO2Y    &
 
   )
@@ -860,7 +860,7 @@ module MicBGCMod
 !  write(*,*)'HETEROTROPHIC DENITRIFICATION'
 !
   IF(N.EQ.micpar%n_anero_faculb.AND.ROXYM(NGL,K).GT.0.0_r8 &
-    .AND.(.not.litrm.OR.VOLX.GT.ZEROS))THEN
+    .AND.(.not.litrm.OR.VSoilPoreMicP.GT.ZEROS))THEN
 
     call HeteroDenitrificCatabolism(NGL,N,K,FOQC,RGOCP,&
       VOLWZ,micfor,micstt,naqfdiag,nmicf,nmics,ncplxs,micflx)
@@ -916,7 +916,7 @@ module MicBGCMod
     RNO2Y  =>  micfor%RNO2Y  , &
     RN2BY  =>  micfor%RN2BY ,  &
     ph => micfor%pH, &
-    VOLWM => micfor%VOLWM, &
+    VWatMicPM => micfor%VWatMicPM, &
     ZEROS => micfor%ZEROS, &
     ZERO  => micfor%ZERO, &
     VLNOB => micfor%VLNOB, &
@@ -932,7 +932,7 @@ module MicBGCMod
 !     FNO2,FNB2=fraction of total NO2 demand in non-band,band
 !     VMXC4S,VMXC4B=substrate-unlimited NO2 reduction in non-band,band
 !     CHNO2,CHNOB=nitrous acid concentration in non-band,band
-!     VOLWM=soil water content
+!     VWatMicPM=soil water content
 !     FNO3S,FNO3B=fractions of NO2 in non-band,band
 !     TFNX=temperature stress function
 !     RCNO2,RCNOB=substrate-limited nitrous acid reduction in non-band,band
@@ -959,8 +959,8 @@ module MicBGCMod
   naqfdiag%TFNO2B=naqfdiag%TFNO2B+FNB2
   FNO3S=VLNO3
   FNO3B=VLNOB
-  VMXC4S=7.5E-02_r8*CHNO2*VOLWM(NPH)*FNO3S*TFNX
-  VMXC4B=7.5E-02_r8*CHNOB*VOLWM(NPH)*FNO3B*TFNX
+  VMXC4S=7.5E-02_r8*CHNO2*VWatMicPM(NPH)*FNO3S*TFNX
+  VMXC4B=7.5E-02_r8*CHNOB*VWatMicPM(NPH)*FNO3B*TFNX
   RCNO2=AZMAX1(AMIN1(ZNO2S*FNO2,VMXC4S))
   RCNOB=AZMAX1(AMIN1(ZNO2B*FNB2,VMXC4B))
   RCN2O=0.10_r8*RCNO2
@@ -1136,8 +1136,8 @@ module MicBGCMod
   real(r8) :: OQCX
   real(r8) :: OQNX,OQPX,OQAX
   real(r8) :: OHCX,OHNX,OHPX,OHAX
-  real(r8) :: VOLXX
-  real(r8) :: VOLXW,VOLCX,VOLCW,VOLAX,VOLAW
+  real(r8) :: VSoilPoreMicPX
+  real(r8) :: VSoilPoreMicPW,VOLCX,VOLCW,VOLAX,VOLAW
 !     begin_execution
   associate(                   &
     CGOMN  => nmicf%CGOMN,     &
@@ -1160,7 +1160,7 @@ module MicBGCMod
     ZEROS2 => micfor%ZEROS2, &
     ZEROS => micfor%ZEROS, &
     litrm => micfor%litrm, &
-    VOLWM => micfor%VOLWM, &
+    VWatMicPM => micfor%VWatMicPM, &
     FOSRH => micstt%FOSRH, &
     OQC => micstt%OQC, &
     OQN => micstt%OQN, &
@@ -1172,7 +1172,7 @@ module MicBGCMod
     OHA => micstt%OHA, &
     AEC => micfor%AEC  &
   )
-!     VOLWM=soil water content, FOSRH=fraction of total SOC
+!     VWatMicPM=soil water content, FOSRH=fraction of total SOC
 !     AEC,AECX=anion exchange capacity
 !     OQC,OQN,OQP,OQA=DOC,DON,DOP,acetate in micropores
 !     TCGOQC,TCGOMN,TCGOMP,TCGOAC=total uptake of DOC,DON,DOP,acetate
@@ -1181,7 +1181,7 @@ module MicBGCMod
 !     FOCA,FOAA=fractions of DOC and acetate vs. DOC+acetate
 !     CSORP,CSORPA,ZSORP,PSORP=sorption(ad=+ve,de=-ve) of OQC,acetate,DON,DOP
 !
-  IF(VOLWM(NPH).GT.ZEROS2.AND.FOSRH(K).GT.ZERO)THEN
+  IF(VWatMicPM(NPH).GT.ZEROS2.AND.FOSRH(K).GT.ZERO)THEN
     IF(litrm)THEN
       AECX=0.5E+03_r8
     ELSE
@@ -1195,24 +1195,24 @@ module MicBGCMod
     OHNX=AMAX1(ZEROS,OHN(K))
     OHPX=AMAX1(ZEROS,OHP(K))
     OHAX=AMAX1(ZEROS,OHA(K))
-    VOLXX=BKVL*AECX*HSORP*FOSRH(K)
-    VOLXW=VOLWM(NPH)*FOSRH(K)
+    VSoilPoreMicPX=BKVL*AECX*HSORP*FOSRH(K)
+    VSoilPoreMicPW=VWatMicPM(NPH)*FOSRH(K)
     IF(FOCA(K).GT.ZERO)THEN
-      VOLCX=FOCA(K)*VOLXX
-      VOLCW=FOCA(K)*VOLXW
+      VOLCX=FOCA(K)*VSoilPoreMicPX
+      VOLCW=FOCA(K)*VSoilPoreMicPW
       CSORP(K)=TSORP*(OQCX*VOLCX-OHCX*VOLCW)/(VOLCX+VOLCW)
     ELSE
-      CSORP(K)=TSORP*(OQCX*VOLXX-OHCX*VOLXW)/(VOLXX+VOLXW)
+      CSORP(K)=TSORP*(OQCX*VSoilPoreMicPX-OHCX*VSoilPoreMicPW)/(VSoilPoreMicPX+VSoilPoreMicPW)
     ENDIF
     IF(FOAA(K).GT.ZERO)THEN
-      VOLAX=FOAA(K)*VOLXX
-      VOLAW=FOAA(K)*VOLXW
+      VOLAX=FOAA(K)*VSoilPoreMicPX
+      VOLAW=FOAA(K)*VSoilPoreMicPW
       CSORPA(K)=TSORP*(OQAX*VOLAX-OHAX*VOLAW)/(VOLAX+VOLAW)
     ELSE
-      CSORPA(K)=TSORP*(OQAX*VOLXX-OHAX*VOLXW)/(VOLXX+VOLXW)
+      CSORPA(K)=TSORP*(OQAX*VSoilPoreMicPX-OHAX*VSoilPoreMicPW)/(VSoilPoreMicPX+VSoilPoreMicPW)
     ENDIF
-    ZSORP(K)=TSORP*(OQNX*VOLXX-OHNX*VOLXW)/(VOLXX+VOLXW)
-    PSORP(K)=TSORP*(OQPX*VOLXX-OHPX*VOLXW)/(VOLXX+VOLXW)
+    ZSORP(K)=TSORP*(OQNX*VSoilPoreMicPX-OHNX*VSoilPoreMicPW)/(VSoilPoreMicPX+VSoilPoreMicPW)
+    PSORP(K)=TSORP*(OQPX*VSoilPoreMicPX-OHPX*VSoilPoreMicPW)/(VSoilPoreMicPX+VSoilPoreMicPW)
   ELSE
     CSORP(K)=0.0_r8
     CSORPA(K)=0.0_r8
@@ -1310,7 +1310,7 @@ module MicBGCMod
 !     DCKI=inhibition of decomposition by microbial concentration
 !     OSRH=total SOC
 !     COSC=concentration of total SOC
-!     BKVL,VOLX=mass, volume of soil layer
+!     BKVL,VSoilPoreMicP=mass, volume of soil layer
 !     DFNS=effect of microbial concentration on decomposition
 !     OQCI=DOC product inhibition for decomposition
 !     OQKI=DOC product inhibition constant for decomposition
@@ -3047,13 +3047,13 @@ module MicBGCMod
     FLQRQ => micfor%FLQRQ , &
     litrm => micfor%litrm , &
     OLSGL  => micfor%OLSGL, &
-    VOLX => micfor%VOLX, &
+    VSoilPoreMicP => micfor%VSoilPoreMicP, &
     VOLY  => micfor%VOLY, &
     ZERO => micfor%ZERO, &
     ZEROS  => micfor%ZEROS, &
-    VOLPM => micfor%VOLPM, &
-    VOLW  => micfor%VOLW, &
-    VOLWM => micfor%VOLWM, &
+    VsoiPM => micfor%VsoiPM, &
+    VWatMicP  => micfor%VWatMicP , &
+    VWatMicPM => micfor%VWatMicPM, &
     THETPM => micfor%THETPM, &
     DFGS => micfor%DFGS, &
     FILM => micfor%FILM, &
@@ -3070,7 +3070,7 @@ module MicBGCMod
     ROXSK => micflx%ROXSK &
   )
   IF(ROXYP(NGL,K).GT.ZEROS.AND.FOXYX.GT.ZERO)THEN
-    IF(.not.litrm.OR.VOLX.GT.ZEROS)THEN
+    IF(.not.litrm.OR.VSoilPoreMicP.GT.ZEROS)THEN
       !
       !write(*,*)'MAXIMUM O2 UPAKE FROM POTENTIAL RESPIRATION OF EACH AEROBIC'
       !     POPULATION
@@ -3082,7 +3082,7 @@ module MicBGCMod
         OXYG1=OXYG*FOXYX
         ROXYLX=ROXYL*XNPG*FOXYX
       ELSE
-        OXYG1=COXYG*VOLPM(1)*FOXYX
+        OXYG1=COXYG*VsoiPM(1)*FOXYX
         ROXYLX=(ROXYL+FLQRQ*COXR+FLQRI*COXQ)*XNPG*FOXYX
       ENDIF
       OXYS1=OXYS*FOXYX
@@ -3098,7 +3098,7 @@ module MicBGCMod
         !     OF AQUEOUS O2 FROM DISSOLUTION RATE CONSTANT 'DFGS'
         !     CALCULATED IN 'WATSUB'
         !
-        !     VOLWM,VOLPM,VOLX=water, air and total volumes
+        !     VWatMicPM,VsoiPM,VSoilPoreMicP=water, air and total volumes
         !     ORAD=microbial radius,FILM=water film thickness
         !     DIFOX=aqueous O2 diffusion, TORT=tortuosity
         !     BIOS=microbial number, OMA=active biomass
@@ -3108,16 +3108,16 @@ module MicBGCMod
         !     RMPOX,ROXSK=O2 uptake
         !
         !write(*,*)'VOLY=',VOLY
-        THETW1=AZMAX1(safe_adb(VOLWM(M),VOLY))
+        THETW1=AZMAX1(safe_adb(VWatMicPM(M),VOLY))
         RRADO=ORAD*(FILM(M)+ORAD)/FILM(M)
         DIFOX=TORT(M)*OLSGL1*12.57_r8*BIOS*OMA(NGL,K)*RRADO
-        VOLWOX=VOLWM(M)*SOXYL
-        VOLPOX=VOLPM(M)
+        VOLWOX=VWatMicPM(M)*SOXYL
+        VOLPOX=VsoiPM(M)
         VOLWPM=VOLWOX+VOLPOX
         D425: DO MX=1,NPT
           OXYG1=OXYG1+ROXYFX
           OXYS1=OXYS1+ROXYLX
-          COXYS1=AMIN1(COXYE*SOXYL,AZMAX1(safe_adb(OXYS1,(VOLWM(M)*FOXYX))))
+          COXYS1=AMIN1(COXYE*SOXYL,AZMAX1(safe_adb(OXYS1,(VWatMicPM(M)*FOXYX))))
           X=DIFOX*COXYS1
           IF(X.GT.ZEROS.AND.OXYS1.GT.ZEROS)THEN
             B=-RUPMX-DIFOX*OXKX-X
@@ -3237,7 +3237,7 @@ module MicBGCMod
    VLNO3  => micfor%VLNO3, &
    VLNOB  => micfor%VLNOB, &
    VLPOB => micfor%VLPOB , &
-   VOLW  => micfor%VOLW , &
+   VWatMicP  => micfor%VWatMicP , &
    VOLWU => micfor%VOLWU, &
    VLPO4  => micfor%VLPO4 , &
    ZNH4B  => micstt%ZNH4B, &
@@ -3395,8 +3395,8 @@ module MicBGCMod
     RIPOX=AMIN1(RIPOP,BIOA*OMA(NGL,K)*TFNG(NGL,K)*HPMX)
     RIPOO(NGL,K)=FH2PS*RIPOX*CH2PX/(CH2PX+HPKU)
     RIPBO(NGL,K)=FH2PB*RIPOX*CH2PY/(CH2PY+HPKU)
-    H2POM=HPMN*VOLW*FH2PS
-    H2PBM=HPMN*VOLW*FH2PB
+    H2POM=HPMN*VWatMicP*FH2PS
+    H2PBM=HPMN*VWatMicP*FH2PB
     RIPO4(NGL,K)=AMIN1(FPO4X*AZMAX1((H2PO4-H2POM)),RIPOO(NGL,K))
     RIPOB(NGL,K)=AMIN1(FPOBX*AZMAX1((H2POB-H2PBM)),RIPBO(NGL,K))
   ELSE
@@ -3434,8 +3434,8 @@ module MicBGCMod
     RIP1X=AMIN1(RIP1P,BIOA*OMA(NGL,K)*TFNG(NGL,K)*HPMX)
     RIPO1(NGL,K)=FH1PS*RIP1X*CH1PX/(CH1PX+HPKU)
     RIPB1(NGL,K)=FH1PB*RIP1X*CH1PY/(CH1PY+HPKU)
-    H1POM=HPMN*VOLW*FH1PS
-    H1PBM=HPMN*VOLW*FH1PB
+    H1POM=HPMN*VWatMicP*FH1PS
+    H1PBM=HPMN*VWatMicP*FH1PB
     RIP14(NGL,K)=AMIN1(FP14X*AZMAX1((H1PO4-H1POM)),RIPO1(NGL,K))
     RIP1B(NGL,K)=AMIN1(FP1BX*AZMAX1((H1POB-H1PBM)),RIPB1(NGL,K))
   ELSE
@@ -3472,7 +3472,7 @@ module MicBGCMod
       CNH4Y=AZMAX1(CNH4BU-Z4MN)
       RINHOR(NGL,K)=AMIN1(RINHPR,BIOA*OMA(NGL,K)*TFNG(NGL,K)*Z4MX) &
         *(FNH4S*CNH4X/(CNH4X+Z4KU)+FNHBS*CNH4Y/(CNH4Y+Z4KU))
-      ZNH4M=Z4MN*VOLW
+      ZNH4M=Z4MN*VWatMicP
       RINH4R(NGL,K)=AMIN1(FNH4XR(NGL,K)*AZMAX1((ZNH4TU-ZNH4M)),RINHOR(NGL,K))
     ELSE
       RINHOR(NGL,K)=0.0_r8
@@ -3506,7 +3506,7 @@ module MicBGCMod
       CNO3Y=AZMAX1(CNO3BU-ZOMN)
       RINOOR(NGL,K)=AMAX1(RINOPR,BIOA*OMA(NGL,K)*TFNG(NGL,K)*ZOMX) &
         *(FNO3S*CNO3X/(CNO3X+ZOKU)+FNO3B*CNO3Y/(CNO3Y+ZOKU))
-      ZNO3M=ZOMN*VOLW
+      ZNO3M=ZOMN*VWatMicP
       RINO3R(NGL,K)=AMIN1(FNO3XR(NGL,K)*AZMAX1((ZNO3TU-ZNO3M)),RINOOR(NGL,K))
     ELSE
       RINOOR(NGL,K)=0.0_r8

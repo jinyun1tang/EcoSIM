@@ -59,8 +59,8 @@ contains
   ! FCI,WPI=FC,WP of ice
   ! THETIX=ice concentration
 !
-    IF(BKVL(L,NY,NX).GT.ZEROS(NY,NX).AND.VOLX(L,NY,NX).GT.ZEROS(NY,NX))THEN
-      THETW1=AZMAX1(AMIN1(POROS(L,NY,NX),VOLW(L,NY,NX)/VOLY(L,NY,NX)),1.e-6_r8)
+    IF(BKVL(L,NY,NX).GT.ZEROS(NY,NX).AND.VSoilPoreMicP(L,NY,NX).GT.ZEROS(NY,NX))THEN
+      THETW1=AZMAX1(AMIN1(POROS(L,NY,NX),VWatMicP(L,NY,NX)/VOLY(L,NY,NX)),1.e-6_r8)
       IF(THETW1.LT.FC(L,NY,NX))THEN
         PSISM(L,NY,NX)=AMAX1(PSIHY,-EXP(PSIMX(NY,NX) &
           +((FCL(L,NY,NX)-LOG(THETW1))/FCD(L,NY,NX)*PSIMD(NY,NX))))
@@ -70,7 +70,7 @@ contains
       ELSE
         PSISM(L,NY,NX)=PSISE(L,NY,NX)
       ENDIF
-    ELSE IF(VOLX(L,NY,NX).GT.ZEROS2(NY,NX).and.THETI(L,NY,NX)>ZEROS2(NY,NX))THEN
+    ELSE IF(VSoilPoreMicP(L,NY,NX).GT.ZEROS2(NY,NX).and.THETI(L,NY,NX)>ZEROS2(NY,NX))THEN
       FCX=FCI*THETI(L,NY,NX)
       WPX=WPI*THETI(L,NY,NX)
       FCLX=LOG(FCX)
@@ -233,22 +233,22 @@ contains
       
       IF(cold_run())THEN
       !in a cold run, set it 
-        VOLW(L,NY,NX)=THETW(L,NY,NX)*VOLX(L,NY,NX)
-        VOLWX(L,NY,NX)=VOLW(L,NY,NX)
-        VOLWH(L,NY,NX)=THETW(L,NY,NX)*VOLAH(L,NY,NX)
-        VOLI(L,NY,NX)=THETI(L,NY,NX)*VOLX(L,NY,NX)
-        VOLIH(L,NY,NX)=THETI(L,NY,NX)*VOLAH(L,NY,NX)
-        VHCP(L,NY,NX)=VHCM(L,NY,NX)+Cpw*(VOLW(L,NY,NX) &
-          +VOLWH(L,NY,NX))+Cpi*(VOLI(L,NY,NX)+VOLIH(L,NY,NX))
+        VWatMicP(L,NY,NX)=THETW(L,NY,NX)*VSoilPoreMicP(L,NY,NX)
+        VWatMicPX(L,NY,NX)=VWatMicP(L,NY,NX)
+        VWatMacP(L,NY,NX)=THETW(L,NY,NX)*VAirMacP(L,NY,NX)
+        ViceMicP(L,NY,NX)=THETI(L,NY,NX)*VSoilPoreMicP(L,NY,NX)
+        ViceMacP(L,NY,NX)=THETI(L,NY,NX)*VAirMacP(L,NY,NX)
+        VHeatCapacity(L,NY,NX)=VHeatCapacitySoilM(L,NY,NX)+Cpw*(VWatMicP(L,NY,NX) &
+          +VWatMacP(L,NY,NX))+Cpi*(ViceMicP(L,NY,NX)+ViceMacP(L,NY,NX))
         THETWZ(L,NY,NX)=THETW(L,NY,NX)
         THETIZ(L,NY,NX)=THETI(L,NY,NX)
       ENDIF
     ENDIF
   ENDIF
-  VOLP(L,NY,NX)=AZMAX1(VOLA(L,NY,NX)-VOLW(L,NY,NX)-VOLI(L,NY,NX)) &
-    +AZMAX1(VOLAH(L,NY,NX)-VOLWH(L,NY,NX)-VOLIH(L,NY,NX))
+  VsoiP(L,NY,NX)=AZMAX1(VMicP(L,NY,NX)-VWatMicP(L,NY,NX)-ViceMicP(L,NY,NX)) &
+    +AZMAX1(VAirMacP(L,NY,NX)-VWatMacP(L,NY,NX)-ViceMacP(L,NY,NX))
   IF(VOLT(L,NY,NX).GT.ZEROS2(NY,NX))THEN
-    THETP(L,NY,NX)=VOLP(L,NY,NX)/VOLY(L,NY,NX)
+    THETP(L,NY,NX)=VsoiP(L,NY,NX)/VOLY(L,NY,NX)
   ELSE
     THETP(L,NY,NX)=0.0_r8
   ENDIF
@@ -338,7 +338,7 @@ contains
 !     CNDH=macropore hydraulic conductivity
 !
   HRAD(L,NY,NX)=0.5E-03_r8
-  NHOL(L,NY,NX)=INT(VOLAH(L,NY,NX)/(PICON*HRAD(L,NY,NX)**2._r8*VOLTI(L,NY,NX)))
+  NHOL(L,NY,NX)=INT(VAirMacP(L,NY,NX)/(PICON*HRAD(L,NY,NX)**2._r8*VOLTI(L,NY,NX)))
 
   IF(NHOL(L,NY,NX).GT.0.0_r8)THEN
     PHOL(L,NY,NX)=1.0_r8/(SQRT(PICON*NHOL(L,NY,NX)))

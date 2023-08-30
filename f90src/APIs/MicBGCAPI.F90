@@ -83,7 +83,7 @@ implicit none
 !       concentrations that drive microbial density effects on
 !       decomposition
       D998: DO L=0,NL(NY,NX)
-        IF(VOLX(L,NY,NX).GT.ZEROS2(NY,NX))THEN
+        IF(VSoilPoreMicP(L,NY,NX).GT.ZEROS2(NY,NX))THEN
           IF(L.EQ.0.OR.L.GE.NU(NY,NX))THEN
              call MicBGC1Layer(I,J,L,NY,NX)
           ELSE
@@ -182,8 +182,8 @@ implicit none
   micfor%FLQRI =FLQRI(NY,NX)
   micfor%FLQRQ =FLQRQ(NY,NX)
   micfor%OFFSET=OFFSET(NY,NX)
-  micfor%VOLR  =VOLR(NY,NX)
-  micfor%VOLWRX=VOLWRX(NY,NX)
+  micfor%VLitR  =VLitR(NY,NX)
+  micfor%VWatLitrX=VWatLitrX(NY,NX)
   micfor%ZEROS2=ZEROS2(NY,NX)
   micfor%ZEROS =ZEROS(NY,NX)
   micfor%VOLY  =VOLY(L,NY,NX)
@@ -194,7 +194,7 @@ implicit none
   micfor%THETW =THETW(L,NY,NX)
   micfor%PH    =PH(L,NY,NX)
   micfor%BKVL  =BKVL(L,NY,NX)
-  micfor%VOLX  =VOLX(L,NY,NX)
+  micfor%VSoilPoreMicP  =VSoilPoreMicP(L,NY,NX)
   micfor%TFND  =TFND(L,NY,NX)
   micfor%VLNOB =trcs_VLN(ids_NO3B,L,NY,NX)
   micfor%VLNO3 =trcs_VLN(ids_NO3,L,NY,NX)
@@ -246,7 +246,7 @@ implicit none
     micfor%RNO3YU =RNO3Y(NU(NY,NX),NY,NX)
     micfor%RPO4YU =RPO4Y(NU(NY,NX),NY,NX)
     micfor%RP14YU =RP14Y(NU(NY,NX),NY,NX)
-    micfor%VOLWU =VOLW(NU(NY,NX),NY,NX)
+    micfor%VOLWU =VWatMicP(NU(NY,NX),NY,NX)
     micfor%CFOMCU=CFOMC(1:2,NU(NY,NX),NY,NX)
   else
     micfor%CFOMC =CFOMC(1:2,L,NY,NX)
@@ -263,7 +263,7 @@ implicit none
   micfor%RNO3Y =RNO3Y(L,NY,NX)
   micfor%RPO4Y =RPO4Y(L,NY,NX)
   micfor%RP14Y =RP14Y(L,NY,NX)
-  micfor%VOLW  =VOLW(L,NY,NX)
+  micfor%VWatMicP  =VWatMicP(L,NY,NX)
 
   if(micfor%Lsurf)then
     micfor%BKVL0=BKVL(0,NY,NX)
@@ -271,10 +271,10 @@ implicit none
   micfor%DFGS(1:NPH)=DFGS(1:NPH,L,NY,NX)
   micfor%FILM(1:NPH)=FILM(1:NPH,L,NY,NX)
   micfor%THETPM(1:NPH)=THETPM(1:NPH,L,NY,NX)
-  micfor%VOLWM(1:NPH)=VOLWM(1:NPH,L,NY,NX)
+  micfor%VWatMicPM(1:NPH)=VWatMicPM(1:NPH,L,NY,NX)
   micfor%TORT(1:NPH)=TORT(1:NPH,L,NY,NX)
-  micfor%VOLPM(1:NPH)=VOLPM(1:NPH,L,NY,NX)
-  micfor%VOLP=VOLP(L,NY,NX)
+  micfor%VsoiPM(1:NPH)=VsoiPM(1:NPH,L,NY,NX)
+  micfor%VsoiP=VsoiP(L,NY,NX)
   micstt%EPOC=EPOC(L,NY,NX)
   micstt%EHUM=EHUM(L,NY,NX)
   micstt%ZNH4B=trc_solml(ids_NH4B,L,NY,NX)

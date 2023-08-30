@@ -57,7 +57,7 @@ implicit none
 
     call ncd_defvar(ncf, 'pH', ncd_float, long_name='soil pH',  &
             units='none', missing_value=spval, fill_value=spval)
-    call ncd_defvar(ncf, 'VOLX', ncd_float, long_name='volume of soil layer',  &
+    call ncd_defvar(ncf, 'VSoilPoreMicP', ncd_float, long_name='volume of soil layer',  &
             units='m3 d-2', missing_value=spval, fill_value=spval)
     call ncd_defvar(ncf, 'ORGC', ncd_float, long_name='total soil organic C',  &
             units='gC d-2', missing_value=spval, fill_value=spval)
@@ -250,7 +250,7 @@ implicit none
     call ncd_enddef(ncf)
 
     call ncd_putvar(ncf,'pH',PH(L,NY,NX))
-    call ncd_putvar(ncf,'VOLX',VOLX(L,NY,NX))
+    call ncd_putvar(ncf,'VSoilPoreMicP',VSoilPoreMicP(L,NY,NX))
     call ncd_putvar(ncf,'ORGC',ORGC(L,NY,NX))
     call ncd_putvar(ncf,'CFOMC',CFOMC(:,L,NY,NX))
     call ncd_putvar(ncf,'VOLY',VOLY(L,NY,NX))

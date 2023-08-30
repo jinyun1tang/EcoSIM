@@ -18,12 +18,12 @@ module MicForcTypeMod
   real(r8) :: FLQRI
   real(r8) :: FLQRQ
   real(r8) :: offset
-  real(r8) :: VOLR
-  real(r8) :: VOLWRX
+  real(r8) :: VLitR
+  real(r8) :: VWatLitrX
   real(r8) :: ZEROS2
   real(r8) :: ZEROS
-  real(r8) :: VOLW
-  real(r8) :: VOLP
+  real(r8) :: VWatMicP
+  real(r8) :: VsoiP
   real(r8) :: VOLW0
   real(r8) :: VOLY
   real(r8) :: THETY
@@ -34,7 +34,7 @@ module MicForcTypeMod
   real(r8) :: pH
   real(r8) :: ZERO
   real(r8) :: BKVL
-  real(r8) :: VOLX
+  real(r8) :: VSoilPoreMicP
   real(r8) :: TFND
   real(r8) :: VLNOB
   real(r8) :: VLNO3
@@ -77,9 +77,9 @@ module MicForcTypeMod
   real(r8), allocatable :: DFGS(:)  !rate constant for air-water gas exchange
   real(r8), allocatable :: FILM(:)
   real(r8), allocatable :: THETPM(:)
-  real(r8), allocatable :: VOLWM(:)
+  real(r8), allocatable :: VWatMicPM(:)
   real(r8), allocatable :: TORT(:)
-  real(r8), allocatable :: VOLPM(:)
+  real(r8), allocatable :: VsoiPM(:)
   contains
    procedure, public :: Init
    procedure, public :: destroy=>Destruct
@@ -98,11 +98,11 @@ module MicForcTypeMod
   allocate(this%CFOMCU(1:micpar%ndbiomcp))
   allocate(this%ROQCY(1:jcplx))
   allocate(this%ROQAY(1:jcplx))
-  allocate(this%VOLWM(NPH))
+  allocate(this%VWatMicPM(NPH))
   allocate(this%THETPM(NPH))
   allocate(this%FILM(NPH))
   allocate(this%TORT(NPH))
-  allocate(this%VOLPM(NPH))
+  allocate(this%VsoiPM(NPH))
   allocate(this%DFGS(NPH))
   end subroutine Init
 !------------------------------------------------------------------------------------------
@@ -113,11 +113,11 @@ module MicForcTypeMod
   implicit none
   class(micforctype) :: this
 
-  call destroy(this%VOLWM)
+  call destroy(this%VWatMicPM)
   call destroy(this%THETPM)
   call destroy(this%FILM)
   call destroy(this%TORT)
-  call destroy(this%VOLPM)
+  call destroy(this%VsoiPM)
   call destroy(this%DFGS)
   call destroy(this%ROQCY)
   call destroy(this%ROQAY)

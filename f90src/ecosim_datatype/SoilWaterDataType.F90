@@ -8,22 +8,22 @@ module SoilWaterDataType
   character(len=*), private, parameter :: mod_filename = __FILE__
 
   real(r8),target,allocatable ::  THETP(:,:,:)                      !air concentration [m3 m-3]
-  real(r8),target,allocatable ::  VOLP(:,:,:)                       !soil air content [m3 d-2]
+  real(r8),target,allocatable ::  VsoiP(:,:,:)                       !soil air content [m3 d-2]
   real(r8),target,allocatable ::  THETW(:,:,:)                      !volumetric water content [m3 m-3]
   real(r8),target,allocatable ::  THETI(:,:,:)                      !volumetric ice content [m3 m-3]
   real(r8),target,allocatable ::  THETWZ(:,:,:)                     !volumetric moblize water [m3 m-3]
   real(r8),target,allocatable ::  THETIZ(:,:,:)                     !volumetric mobile ice [m3 m-3]
-  real(r8),target,allocatable ::  VOLW(:,:,:)                       !soil micropore water content [m3 d-2]
-  real(r8),target,allocatable ::  VOLI(:,:,:)                       !soil micropore ice content   [m3 d-2]
-  real(r8),target,allocatable ::  VOLWH(:,:,:)                      !soil macropore water content [m3 d-2]
+  real(r8),target,allocatable ::  VWatMicP(:,:,:)                       !soil micropore water content [m3 d-2]
+  real(r8),target,allocatable ::  ViceMicP(:,:,:)                       !soil micropore ice content   [m3 d-2]
+  real(r8),target,allocatable ::  VWatMacP(:,:,:)                      !soil macropore water content [m3 d-2]
   real(r8),target,allocatable ::  PSISM(:,:,:)                      !soil micropore matric water potential [MPa]
   real(r8),target,allocatable ::  TotalSoilH2OPSIMPa(:,:,:)                      !soil micropore total water potential [MPa]
-  real(r8),target,allocatable ::  VOLWX(:,:,:)                      !soil micropore water content before wetting front [m3 d-2]
+  real(r8),target,allocatable ::  VWatMicPX(:,:,:)                      !soil micropore water content before wetting front [m3 d-2]
   real(r8),target,allocatable ::  FINH(:,:,:)                       !soil macropore - micropore water transfer [m3 d-2 h-1]
-  real(r8),target,allocatable ::  VOLIH(:,:,:)                      !soil macropore ice content [m3 d-2]
-  real(r8),target,allocatable ::  VOLWM(:,:,:,:)                    !soil micropore water content, [m3 d-2]
-  real(r8),target,allocatable ::  VOLWHM(:,:,:,:)                   !soil macropore water content, [m3 d-2]
-  real(r8),target,allocatable ::  VOLPM(:,:,:,:)                    !soil air content, [m3 d-2]
+  real(r8),target,allocatable ::  ViceMacP(:,:,:)                      !soil macropore ice content [m3 d-2]
+  real(r8),target,allocatable ::  VWatMicPM(:,:,:,:)                    !soil micropore water content, [m3 d-2]
+  real(r8),target,allocatable ::  VWatMacPM(:,:,:,:)                   !soil macropore water content, [m3 d-2]
+  real(r8),target,allocatable ::  VsoiPM(:,:,:,:)                    !soil air content, [m3 d-2]
   real(r8),target,allocatable ::  FILM(:,:,:,:)                     !soil water film thickness , [m]
   real(r8),target,allocatable ::  DTBLG(:,:)                        !slope of water table relative to surface slope, [-]
   real(r8),target,allocatable ::  DTBLDI(:,:)                       !depth of artificial water table
@@ -35,8 +35,8 @@ module SoilWaterDataType
   real(r8),target,allocatable ::  DTBLI(:,:)                        !external water table depth, [m]
   real(r8),target,allocatable ::  ENGYPM(:,:,:)                     !total energy impact for erosion
   real(r8),target,allocatable ::  XVOLTM(:,:,:)                     !excess water+ice
-  real(r8),target,allocatable ::  XVOLWM(:,:,:)                     !excess water
-  real(r8),target,allocatable ::  XVOLIM(:,:,:)                     !excess ice
+  real(r8),target,allocatable ::  XVWatMicPM(:,:,:)                     !excess water
+  real(r8),target,allocatable ::  XViceMicPM(:,:,:)                     !excess ice
   real(r8),target,allocatable ::  HCND(:,:,:,:,:)                   !saturated hydraulic conductivity
   real(r8),target,allocatable ::  CNDH(:,:,:)                       !macropore hydraulic conductivity, [m MPa-1 h-1]
   real(r8),target,allocatable ::  CNDU(:,:,:)                       !soil micropore hydraulic conductivity for root water uptake [m MPa-1 h-1]
@@ -59,7 +59,7 @@ module SoilWaterDataType
   real(r8),target,allocatable ::  RCHQW(:,:)                        !western surface boundary water flux , [-]
   real(r8),target,allocatable ::  RCHGD(:,:)                        !lower subsurface boundary water flux , [-]
   real(r8),target,allocatable ::  FLWM(:,:,:,:,:)                   !micropore water flux, [m3 d-2 t-1]
-  real(r8),target,allocatable ::  FLWHM(:,:,:,:,:)                  !macropore water flux, [m3 d-2 t-1]
+  real(r8),target,allocatable ::  WaterFlowMacPi(:,:,:,:,:)                  !macropore water flux, [m3 d-2 t-1]
   real(r8),target,allocatable ::  FLPM(:,:,:,:)                     !soil air flux, [g d-2 t-1]
   real(r8),target,allocatable ::  FINHM(:,:,:,:)                    !soil macropore - micropore water transfer, [g d-2 t-1]
   real(r8),target,allocatable ::  FLQSM(:,:,:)                      !meltwater flux into soil micropores
@@ -79,7 +79,7 @@ module SoilWaterDataType
   real(r8),target,allocatable ::  UEVAP(:,:)                        !total evaporation, [m3 d-2]
   real(r8),target,allocatable ::  URAIN(:,:)                        !total precipitation, [m3 d-2]
   real(r8),target,allocatable ::  URUN(:,:)                         !total surface runoff, [m3 d-2]
-  real(r8),target,allocatable ::  UVOLW(:,:)                        !total soil water content, [m3 d-2]
+  real(r8),target,allocatable ::  UVWatMicP(:,:)                        !total soil water content, [m3 d-2]
   real(r8),target,allocatable ::  UVOLO(:,:)                        !total subsurface water flux, [m3 d-2]
   real(r8),target,allocatable ::  UDRAIN(:,:)                       !total water drainage below root zone, [m3 d-2]
   real(r8),target,allocatable ::  QR(:,:,:,:)                       !soil surface runoff water, [m3 d-2 h-1]
@@ -102,22 +102,22 @@ module SoilWaterDataType
 
   implicit none
   allocate(THETP(0:JZ,JY,JX));  THETP=0._r8
-  allocate(VOLP(0:JZ,JY,JX));   VOLP=0._r8
+  allocate(VsoiP(0:JZ,JY,JX));   VsoiP=0._r8
   allocate(THETW(0:JZ,JY,JX));  THETW=0._r8
   allocate(THETI(0:JZ,JY,JX));  THETI=0._r8
   allocate(THETWZ(0:JZ,JY,JX)); THETWZ=0._r8
   allocate(THETIZ(0:JZ,JY,JX)); THETIZ=0._r8
-  allocate(VOLW(0:JZ,JY,JX));   VOLW=0._r8
-  allocate(VOLI(0:JZ,JY,JX));   VOLI=0._r8
-  allocate(VOLWH(JZ,JY,JX));    VOLWH=0._r8
+  allocate(VWatMicP(0:JZ,JY,JX));   VWatMicP=0._r8
+  allocate(ViceMicP(0:JZ,JY,JX));   ViceMicP=0._r8
+  allocate(VWatMacP(JZ,JY,JX));    VWatMacP=0._r8
   allocate(PSISM(0:JZ,JY,JX));  PSISM=0._r8
   allocate(TotalSoilH2OPSIMPa(0:JZ,JY,JX));  TotalSoilH2OPSIMPa=0._r8
-  allocate(VOLWX(0:JZ,JY,JX));  VOLWX=0._r8
+  allocate(VWatMicPX(0:JZ,JY,JX));  VWatMicPX=0._r8
   allocate(FINH(JZ,JY,JX));     FINH=0._r8
-  allocate(VOLIH(JZ,JY,JX));    VOLIH=0._r8
-  allocate(VOLWM(60,0:JZ,JY,JX));VOLWM=0._r8
-  allocate(VOLWHM(60,JZ,JY,JX));VOLWHM=0._r8
-  allocate(VOLPM(60,0:JZ,JY,JX));VOLPM=0._r8
+  allocate(ViceMacP(JZ,JY,JX));    ViceMacP=0._r8
+  allocate(VWatMicPM(60,0:JZ,JY,JX));VWatMicPM=0._r8
+  allocate(VWatMacPM(60,JZ,JY,JX));VWatMacPM=0._r8
+  allocate(VsoiPM(60,0:JZ,JY,JX));VsoiPM=0._r8
   allocate(FILM(60,0:JZ,JY,JX));FILM=0._r8
   allocate(DTBLG(JY,JX));       DTBLG=0._r8
   allocate(DTBLDI(JY,JX));      DTBLDI=0._r8
@@ -129,8 +129,8 @@ module SoilWaterDataType
   allocate(DTBLI(JY,JX));       DTBLI=0._r8
   allocate(ENGYPM(60,JY,JX));   ENGYPM=0._r8
   allocate(XVOLTM(60,JY,JX));   XVOLTM=0._r8
-  allocate(XVOLWM(60,JY,JX));   XVOLWM=0._r8
-  allocate(XVOLIM(60,JY,JX));   XVOLIM=0._r8
+  allocate(XVWatMicPM(60,JY,JX));   XVWatMicPM=0._r8
+  allocate(XViceMicPM(60,JY,JX));   XViceMicPM=0._r8
   allocate(HCND(3,100,0:JZ,JY,JX));HCND=0._r8
   allocate(CNDH(JZ,JY,JX));     CNDH=0._r8
   allocate(CNDU(JZ,JY,JX));     CNDU=0._r8
@@ -153,7 +153,7 @@ module SoilWaterDataType
   allocate(RCHQW(JY,JX));       RCHQW=0._r8
   allocate(RCHGD(JY,JX));       RCHGD=0._r8
   allocate(FLWM(60,3,JD,JV,JH));FLWM=0._r8
-  allocate(FLWHM(60,3,JD,JV,JH));FLWHM=0._r8
+  allocate(WaterFlowMacPi(60,3,JD,JV,JH));WaterFlowMacPi=0._r8
   allocate(FLPM(60,JZ,JY,JX));  FLPM=0._r8
   allocate(FINHM(60,JZ,JY,JX)); FINHM=0._r8
   allocate(FLQSM(60,JY,JX));    FLQSM=0._r8
@@ -173,7 +173,7 @@ module SoilWaterDataType
   allocate(UEVAP(JY,JX));       UEVAP=0._r8
   allocate(URAIN(JY,JX));       URAIN=0._r8
   allocate(URUN(JY,JX));        URUN=0._r8
-  allocate(UVOLW(JY,JX));       UVOLW=0._r8
+  allocate(UVWatMicP(JY,JX));       UVWatMicP=0._r8
   allocate(UVOLO(JY,JX));       UVOLO=0._r8
   allocate(UDRAIN(JY,JX));      UDRAIN=0._r8
   allocate(QR(2,2,JV,JH));      QR=0._r8
@@ -185,86 +185,88 @@ module SoilWaterDataType
 
 !----------------------------------------------------------------------
   subroutine DestructSoilWater
-  if (allocated(THETP))    deallocate(THETP)
-  if (allocated(VOLP))     deallocate(VOLP)
-  if (allocated(THETW))    deallocate(THETW)
-  if (allocated(THETI))    deallocate(THETI)
-  if (allocated(THETWZ))   deallocate(THETWZ)
-  if (allocated(THETIZ))   deallocate(THETIZ)
-  if (allocated(VOLW))     deallocate(VOLW)
-  if (allocated(VOLI))     deallocate(VOLI)
-  if (allocated(VOLWH))    deallocate(VOLWH)
-  if (allocated(PSISM))    deallocate(PSISM)
-  if (allocated(TotalSoilH2OPSIMPa))    deallocate(TotalSoilH2OPSIMPa)
-  if (allocated(VOLWX))    deallocate(VOLWX)
-  if (allocated(FINH))     deallocate(FINH)
-  if (allocated(VOLIH))    deallocate(VOLIH)
-  if (allocated(VOLWM))    deallocate(VOLWM)
-  if (allocated(VOLWHM))   deallocate(VOLWHM)
-  if (allocated(VOLPM))    deallocate(VOLPM)
-  if (allocated(FILM))     deallocate(FILM)
-  if (allocated(DTBLG))    deallocate(DTBLG)
-  if (allocated(DTBLDI))   deallocate(DTBLDI)
-  if (allocated(DTBLY))    deallocate(DTBLY)
-  if (allocated(DTBLD))    deallocate(DTBLD)
-  if (allocated(DPTHT))    deallocate(DPTHT)
-  if (allocated(DTBLZ))    deallocate(DTBLZ)
-  if (allocated(DTBLX))    deallocate(DTBLX)
-  if (allocated(DTBLI))    deallocate(DTBLI)
-  if (allocated(ENGYPM))   deallocate(ENGYPM)
-  if (allocated(XVOLTM))   deallocate(XVOLTM)
-  if (allocated(XVOLWM))   deallocate(XVOLWM)
-  if (allocated(XVOLIM))   deallocate(XVOLIM)
-  if (allocated(HCND))     deallocate(HCND)
-  if (allocated(CNDH))     deallocate(CNDH)
-  if (allocated(CNDU))     deallocate(CNDU)
-  if (allocated(QRM))      deallocate(QRM)
-  if (allocated(QRV))      deallocate(QRV)
-  if (allocated(IFLBM))    deallocate(IFLBM)
-  if (allocated(IRCHG))    deallocate(IRCHG)
-  if (allocated(IFLBH))    deallocate(IFLBH)
-  if (allocated(RCHGNU))   deallocate(RCHGNU)
-  if (allocated(RCHGEU))   deallocate(RCHGEU)
-  if (allocated(RCHGSU))   deallocate(RCHGSU)
-  if (allocated(RCHGWU))   deallocate(RCHGWU)
-  if (allocated(RCHGNT))   deallocate(RCHGNT)
-  if (allocated(RCHGET))   deallocate(RCHGET)
-  if (allocated(RCHGST))   deallocate(RCHGST)
-  if (allocated(RCHGWT))   deallocate(RCHGWT)
-  if (allocated(RCHQN))    deallocate(RCHQN)
-  if (allocated(RCHQE))    deallocate(RCHQE)
-  if (allocated(RCHQS))    deallocate(RCHQS)
-  if (allocated(RCHQW))    deallocate(RCHQW)
-  if (allocated(RCHGD))    deallocate(RCHGD)
-  if (allocated(FLWM))     deallocate(FLWM)
-  if (allocated(FLWHM))    deallocate(FLWHM)
-  if (allocated(FLPM))     deallocate(FLPM)
-  if (allocated(FINHM))    deallocate(FINHM)
-  if (allocated(FLQSM))    deallocate(FLQSM)
-  if (allocated(FLQHM))    deallocate(FLQHM)
-  if (allocated(THETPM))   deallocate(THETPM)
-  if (allocated(TORT))     deallocate(TORT)
-  if (allocated(TORTH))    deallocate(TORTH)
-  if (allocated(DFGS))     deallocate(DFGS)
-  if (allocated(RSCS))     deallocate(RSCS)
-  if (allocated(PSISE))    deallocate(PSISE)
-  if (allocated(PSISA))    deallocate(PSISA)
-  if (allocated(PSISO))    deallocate(PSISO)
-  if (allocated(PSISH))    deallocate(PSISH)
-  if (allocated(THETY))    deallocate(THETY)
-  if (allocated(THETS))    deallocate(THETS)
-  if (allocated(FLWX))     deallocate(FLWX)
-  if (allocated(UEVAP))    deallocate(UEVAP)
-  if (allocated(URAIN))    deallocate(URAIN)
-  if (allocated(URUN))     deallocate(URUN)
-  if (allocated(UVOLW))    deallocate(UVOLW)
-  if (allocated(UVOLO))    deallocate(UVOLO)
-  if (allocated(UDRAIN))   deallocate(UDRAIN)
-  if (allocated(QR))       deallocate(QR)
-  if (allocated(HQR))      deallocate(HQR)
-  if (allocated(WQRH))     deallocate(WQRH)
-  if (allocated(HVOLO))    deallocate(HVOLO)
-  if (allocated(QRMN))     deallocate(QRMN)
+  use abortutils, only : destroy
+  implicit none
+  call destroy(THETP)
+  call destroy(VsoiP)
+  call destroy(THETW)
+  call destroy(THETI)
+  call destroy(THETWZ)
+  call destroy(THETIZ)
+  call destroy(VWatMicP)
+  call destroy(ViceMicP)
+  call destroy(VWatMacP)
+  call destroy(PSISM)
+  call destroy(TotalSoilH2OPSIMPa)
+  call destroy(VWatMicPX)
+  call destroy(FINH)
+  call destroy(ViceMacP)
+  call destroy(VWatMicPM)
+  call destroy(VWatMacPM)
+  call destroy(VsoiPM)
+  call destroy(FILM)
+  call destroy(DTBLG)
+  call destroy(DTBLDI)
+  call destroy(DTBLY)
+  call destroy(DTBLD)
+  call destroy(DPTHT)
+  call destroy(DTBLZ)
+  call destroy(DTBLX)
+  call destroy(DTBLI)
+  call destroy(ENGYPM)
+  call destroy(XVOLTM)
+  call destroy(XVWatMicPM)
+  call destroy(XViceMicPM)
+  call destroy(HCND)
+  call destroy(CNDH)
+  call destroy(CNDU)
+  call destroy(QRM)
+  call destroy(QRV)
+  call destroy(IFLBM)
+  call destroy(IRCHG)
+  call destroy(IFLBH)
+  call destroy(RCHGNU)
+  call destroy(RCHGEU)
+  call destroy(RCHGSU)
+  call destroy(RCHGWU)
+  call destroy(RCHGNT)
+  call destroy(RCHGET)
+  call destroy(RCHGST)
+  call destroy(RCHGWT)
+  call destroy(RCHQN)
+  call destroy(RCHQE)
+  call destroy(RCHQS)
+  call destroy(RCHQW)
+  call destroy(RCHGD)
+  call destroy(FLWM)
+  call destroy(WaterFlowMacPi)
+  call destroy(FLPM)
+  call destroy(FINHM)
+  call destroy(FLQSM)
+  call destroy(FLQHM)
+  call destroy(THETPM)
+  call destroy(TORT)
+  call destroy(TORTH)
+  call destroy(DFGS)
+  call destroy(RSCS)
+  call destroy(PSISE)
+  call destroy(PSISA)
+  call destroy(PSISO)
+  call destroy(PSISH)
+  call destroy(THETY)
+  call destroy(THETS)
+  call destroy(FLWX)
+  call destroy(UEVAP)
+  call destroy(URAIN)
+  call destroy(URUN)
+  call destroy(UVWatMicP)
+  call destroy(UVOLO)
+  call destroy(UDRAIN)
+  call destroy(QR)
+  call destroy(HQR)
+  call destroy(WQRH)
+  call destroy(HVOLO)
+  call destroy(QRMN)
   end subroutine DestructSoilWater
 
 end module SoilWaterDataType
