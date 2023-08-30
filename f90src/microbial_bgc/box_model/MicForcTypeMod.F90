@@ -8,7 +8,7 @@ module MicForcTypeMod
 
   private
   character(len=*), parameter :: mod_filename = &
-  "MicForcTypeMod.F90"
+  __FILE__
 
   type, public :: micforctype
 

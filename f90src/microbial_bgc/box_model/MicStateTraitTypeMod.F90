@@ -6,7 +6,7 @@ module MicStateTraitTypeMod
 implicit none
   private
   character(len=*), parameter :: mod_filename = &
-  "MicStateTraitTypeMod.F90"
+  __FILE__
 
   type, public :: micsttype
   real(r8) :: EPOC

@@ -7,7 +7,8 @@ module CanopyCondsMod
   use minimathmod, only : AZMAX1,isnan
   implicit none
   private
-  CHARACTER(LEN=*), PARAMETER :: MOD_FILENAME=__FILE__
+  CHARACTER(LEN=*), PARAMETER :: MOD_FILENAME=&
+  __FILE__
 
   public :: CanopyConditionModel
 

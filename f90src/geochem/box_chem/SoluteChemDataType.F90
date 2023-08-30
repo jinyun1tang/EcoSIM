@@ -4,7 +4,7 @@ module SoluteChemDataType
   implicit none
   public
   CHARACTER(LEN=*), private, PARAMETER :: MOD_FILENAME = &
-  "SoluteChemDataType.F90"
+  __FILE__
 
   type, public :: solutedtype
     real(r8) :: CCO21

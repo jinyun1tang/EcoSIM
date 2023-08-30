@@ -8,8 +8,8 @@ implicit none
 
   private
   character(len=*), parameter :: mod_filename = &
-  "MicFluxTypeMod.F90"
-
+  __FILE__
+  
   type, public :: micfluxtype
 
   real(r8) :: RCO2O

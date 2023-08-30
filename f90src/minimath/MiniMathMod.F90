@@ -7,7 +7,7 @@ module minimathmod
   use EcoSimConst
   implicit none
   character(len=*),private, parameter :: mod_filename = &
-  "MiniMathMod.F90"
+  __FILE__
   private
   public :: safe_adb
   public :: p_adb
