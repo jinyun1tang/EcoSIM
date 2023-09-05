@@ -43,7 +43,7 @@ Module SharedDataMod
   subroutine InitSharedData(JZs,ncol)
   use GridConsts, only : JX,JY,JZ
   implicit none
-  integer, intent(in) :: JZs    !number of vertical layers
+  integer, intent(in) :: JZs   !number of vertical layers
   integer, intent(in) :: NCOL  !NUMBER of cols
   !set # of soil layers
   JZSOI=JZs

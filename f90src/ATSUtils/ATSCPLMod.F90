@@ -12,21 +12,12 @@ module ATSCPLMod
 !  integer :: JSNO  !number of snow layers
 
 ! temporary data holder in ecosim
-!  real(r8) :: atm_n2,atm_o2,atm_co2,atm_ch4,atm_n2o,atm_h2,atm_nh3
   real(r8), allocatable :: sw_rad(:)
   real(r8), allocatable :: lw_rad(:)
   real(r8), allocatable :: air_temp(:)
   real(r8), allocatable :: p_vap(:)
   real(r8), allocatable :: wind_speed(:)
   real(r8), allocatable :: precipitation_rain(:)
-
-!  real(r8), allocatable :: csand(:,:)
-!  real(r8), allocatable :: CSILT(:,:)
-!  real(r8), allocatable :: tairc(:)
-!  real(r8), allocatable :: uwind(:)
-!  real(r8), allocatable :: prec(:)
-!  real(r8), allocatable :: srad(:)
-!  real(r8), allocatable :: vpa(:)
 
   !ATS variables
   real(r8), allocatable :: PORO(:,:) !porosity
@@ -224,7 +215,7 @@ contains
   integer, intent(in) :: ncol !number of column
 
 
-  call InitSharedData(JZ,NCOL)
+  call InitSharedData(jz,ncol)
 
   call Init_EcoSIM_Soil()
   end subroutine Init_EcoSIM

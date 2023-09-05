@@ -27,7 +27,7 @@ implicit none
 
   call SetMesh(NHW,NVN,NHE,NVS)
 
-  call  InitAlloc(NOMicrobeGuilds=1)
+  call InitAlloc(NOMicrobeGuilds=1)
 
   NX=1
 
