@@ -25,11 +25,18 @@ implicit none
 
   NHW=1;NHE=1;NVN=1;NVS=NYS
 
+  write(*,*) "In Init_EcoSIM_Soil"
+  write(*,*) "Setting Mesh..."
+
   call SetMesh(NHW,NVN,NHE,NVS)
+
+  write(*,*) "Finished mesh, Allocating ..."
 
   call InitAlloc(NOMicrobeGuilds=1)
 
   NX=1
+
+  write(*,*) "Finished Allocate, beginning loop"
 
   do NY=1,NYS
     NU(NY,NX)=a_NU(NY)
@@ -57,8 +64,10 @@ implicit none
     ENDDO
   ENDDO
 
+  write(*,*) "Finished loop, starting simulation..."
   call startsim(NHW,NHE,NVN,NVS)
 
+  write(*,*) "Finished Subroutine"
   end subroutine Init_EcoSIM_Soil
 
 

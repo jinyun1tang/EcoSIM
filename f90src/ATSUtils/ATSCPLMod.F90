@@ -49,18 +49,8 @@ contains
 
   write(*,*) "In the driver...."
 
-  write(*,*) "Printing Sizes: "
-  write(*,*) "ncells_per_col: ", sizes%ncells_per_col_
-  write(*,*) "num_columns: ", sizes%num_columns
-  write(*,*) "num_components", sizes%num_components
-
   write(*,*) "Setting sizes"
   call SetBGCSizes(sizes)
-
-  write(*,*) "Printing Sizes (Again): "
-  write(*,*) "ncells_per_col: ", sizes%ncells_per_col_
-  write(*,*) "num_columns: ", sizes%num_columns
-  write(*,*) "num_components", sizes%num_components
 
   !ncol=size(filter_col)
 
@@ -80,9 +70,6 @@ contains
   size_col = sizes%ncells_per_col_
   size_procs = props%shortwave_radiation%size
 
-  write(*,*) "Column size is: ", size_col
-  write(*,*) "surface properties"
-
   call c_f_pointer(props%shortwave_radiation%data, data, (/size_procs/))
   sw_rad = data(:)
 
@@ -101,8 +88,6 @@ contains
   call c_f_pointer(props%precipitation%data, data, (/size_procs/))
   precipitation_rain = data(:)
 
-
-  write(*,*) "writing atm abundances"
   atm_n2 = props%atm_n2
   atm_o2 = props%atm_o2
   atm_co2 = props%atm_co2
@@ -111,16 +96,9 @@ contains
   atm_h2 = props%atm_h2
   atm_nh3 = props%atm_nh3
 
-  write(*,*) "looping over datasets starting with porosity"
   call c_f_pointer(state%porosity%data, data2D, [(/size_col/),(/size_procs/)])
   PORO=data2D(:,:)
 
-  write(*,*) "finished copying poro"
-  !do j3 = 1, size_col
-  !  PORO(1:JZSOI)=data(j3)
-  !enddo
-
-  write(*,*) "Porosity finished, continuing"
   call c_f_pointer(state%liquid_density%data, data2D, [(/size_col/),(/size_procs/)])
   L_DENS=data2D(:,:)
 
