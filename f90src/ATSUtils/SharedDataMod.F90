@@ -6,8 +6,8 @@ Module SharedDataMod
   character(len=*), private, parameter :: mod_filename= &
   __FILE__
 !figure out the grid for ATS
-  integer :: JZSOI   !number of soil layers
-  integer :: JSNO    !number of snow layers
+!  integer, intent(in) :: jzsoi   !number of soil layers
+!  integer, intent(in) :: js    !number of snow layers
 
 ! temporary data holder in ecosim
   real(r8) :: atm_n2, atm_o2,atm_co2,atm_ch4,atm_N2o,atm_H2,atm_NH3
@@ -40,27 +40,27 @@ Module SharedDataMod
   integer :: NYS                     !total number of columns
   contains
 
-  subroutine InitSharedData(JZs,ncol)
+  subroutine InitSharedData(ncells_per_col_,ncol)
   use GridConsts, only : JX,JY,JZ
   implicit none
-  integer, intent(in) :: JZs   !number of vertical layers
-  integer, intent(in) :: NCOL  !NUMBER of cols
+  integer, intent(in) :: ncells_per_col_   !number of vertical layers
+  integer, intent(in) :: ncol  !NUMBER of cols
   !set # of soil layers
-  JZSOI=JZs
+  !JZSOI=JZs
+  !JX=1;JY=ncol;jz=jzs
 
-  JX=1;JY=ncol;jz=jzs
-  allocate(a_csand(JZSOI,ncol))
-  allocate(a_CSILT(jzsoi,ncol))   !silt mass fraction
-  allocate(a_BKDSI(jzsoi,ncol))   !bulk density
-  allocate(a_CumDepth2LayerBottom(jzsoi,ncol))   !dpeth (from surfce to bottom)
-  allocate(a_FC(jzsoi,ncol))      !field capacity
-  allocate(a_WP(jzsoi,ncol))      !wilting point
-  allocate(a_FHOL(jzsoi,ncol))    !macropore fraction
-  allocate(a_ROCK(jzsoi,ncol))    !mass fraction as rock
-  allocate(a_CORGC(jzsoi,ncol))   !organic carbon content
-  allocate(a_CORGN(jzsoi,ncol))   !organic nitrogen content
-  allocate(a_CORGP(jzsoi,ncol))   !organic phosphorus content
-  allocate(a_poros(jzsoi,ncol))
+  allocate(a_csand(ncells_per_col_,ncol))
+  allocate(a_CSILT(ncells_per_col_,ncol))   !silt mass fraction
+  allocate(a_BKDSI(ncells_per_col_,ncol))   !bulk density
+  allocate(a_CumDepth2LayerBottom(ncells_per_col_,ncol))   !dpeth (from surfce to bottom)
+  allocate(a_FC(ncells_per_col_,ncol))      !field capacity
+  allocate(a_WP(ncells_per_col_,ncol))      !wilting point
+  allocate(a_FHOL(ncells_per_col_,ncol))    !macropore fraction
+  allocate(a_ROCK(ncells_per_col_,ncol))    !mass fraction as rock
+  allocate(a_CORGC(ncells_per_col_,ncol))   !organic carbon content
+  allocate(a_CORGN(ncells_per_col_,ncol))   !organic nitrogen content
+  allocate(a_CORGP(ncells_per_col_,ncol))   !organic phosphorus content
+  allocate(a_poros(ncells_per_col_,ncol))
   allocate(a_AREA3(ncol))
   allocate(a_NU(ncol))
   allocate(a_NL(ncol))

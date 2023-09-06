@@ -184,16 +184,18 @@ contains
   end subroutine Run_EcoSIM_one_step
 !------------------------------------------------------------------------------------------
 
-  subroutine Init_EcoSIM(jz,js,ncol)
+  subroutine Init_EcoSIM(ncol,ncells_per_col_)
   !initialize ecosim
   implicit none
   !character(len=*), parameter :: subname=trim(mod_filename)//'::Init_EcoSIM'
-  integer, intent(in) :: jz   !number of soil layers
-  integer, intent(in) :: js   !number of snow layers
+  integer, intent(in) :: ncells_per_col_   !number of soil layers
   integer, intent(in) :: ncol !number of column
 
+  write(*,*) "In Init_EcoSIM"
+  write(*,*) "ncol: ", ncol
+  write(*,*) "ncells: ", ncells_per_col_
 
-  call InitSharedData(jz,ncol)
+  call InitSharedData(ncells_per_col_,ncol)
 
   call Init_EcoSIM_Soil()
   end subroutine Init_EcoSIM
