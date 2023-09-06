@@ -70,6 +70,10 @@ contains
   size_col = sizes%ncells_per_col_
   size_procs = props%shortwave_radiation%size
 
+  write(*,*) "Testing shared data..."
+  call InitSharedData(size_col,size_procs)
+  write(*,*) "Finished shared data"
+
   call c_f_pointer(props%shortwave_radiation%data, data, (/size_procs/))
   sw_rad = data(:)
 
@@ -165,6 +169,7 @@ contains
   data2D(:,:)=TEMP
 
   write(*,*) "finished copying back in driver"
+  
   end subroutine EcoSIM2ATSData
 
 !------------------------------------------------------------------------------------------
@@ -191,11 +196,11 @@ contains
   integer, intent(in) :: ncells_per_col_   !number of soil layers
   integer, intent(in) :: ncol !number of column
 
-  write(*,*) "In Init_EcoSIM"
-  write(*,*) "ncol: ", ncol
-  write(*,*) "ncells: ", ncells_per_col_
+  !write(*,*) "In Init_EcoSIM"
+  !write(*,*) "ncol: ", ncol
+  !write(*,*) "ncells: ", ncells_per_col_
 
-  call InitSharedData(ncells_per_col_,ncol)
+  !call InitSharedData(ncells_per_col_,ncol)
 
   call Init_EcoSIM_Soil()
   end subroutine Init_EcoSIM
