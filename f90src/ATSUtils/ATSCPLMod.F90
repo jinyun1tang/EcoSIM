@@ -44,7 +44,7 @@ contains
   ! Ecosim variables
   real(r8), pointer :: data(:)
   real(r8), pointer :: data2D(:,:)
-  integer :: ncol, nvar, size_col, size_procs
+  integer :: ncol, nvar, size_col, num_cols
   integer :: j1,j2,j3
 
   write(*,*) "In the driver...."
@@ -68,11 +68,11 @@ contains
   write(*,*) "computing column size"
 
   size_col = sizes%ncells_per_col_
-  size_procs = props%shortwave_radiation%size
+  num_cols = props%shortwave_radiation%size
 
-  write(*,*) "Testing shared data..."
-  call InitSharedData(size_col,size_procs)
-  write(*,*) "Finished shared data"
+  !write(*,*) "Testing shared data..."
+  !call InitSharedData(size_col,num_cols)
+  !write(*,*) "Finished shared data"
 
   call c_f_pointer(props%shortwave_radiation%data, data, (/size_procs/))
   sw_rad = data(:)
@@ -147,13 +147,6 @@ contains
 
   write(*,*) "column size: ", size_col, " columns on this process: ", size_procs
 
-  !WC_OLD = WC
-
-  !do j3 = 1, size_col
-  !  WC(j3) = 2.0*WC(j3)
-  !  !write(*,*) "Old value: ", WC_OLD(j3), " New value: ", WC(j3)
-  !enddo
-
   !seems like we call the pointer as normal,
   !then just reverse the data
   call c_f_pointer(state%liquid_density%data, data2D, [(/size_col/),(/size_procs/)])
@@ -169,7 +162,7 @@ contains
   data2D(:,:)=TEMP
 
   write(*,*) "finished copying back in driver"
-  
+
   end subroutine EcoSIM2ATSData
 
 !------------------------------------------------------------------------------------------
@@ -189,20 +182,18 @@ contains
   end subroutine Run_EcoSIM_one_step
 !------------------------------------------------------------------------------------------
 
-  subroutine Init_EcoSIM(ncol,ncells_per_col_)
+  subroutine Init_EcoSIM(sizes)
   !initialize ecosim
   implicit none
   !character(len=*), parameter :: subname=trim(mod_filename)//'::Init_EcoSIM'
-  integer, intent(in) :: ncells_per_col_   !number of soil layers
-  integer, intent(in) :: ncol !number of column
+  type (BGCSizes), intent(in) :: sizes
 
-  !write(*,*) "In Init_EcoSIM"
-  !write(*,*) "ncol: ", ncol
-  !write(*,*) "ncells: ", ncells_per_col_
+  size_col = sizes%ncells_per_col_
+  num_cols = state%porosity%cols
 
-  !call InitSharedData(ncells_per_col_,ncol)
+  call InitSharedData(size_col,num_cols)
 
-  call Init_EcoSIM_Soil()
+  !call Init_EcoSIM_Soil()
   end subroutine Init_EcoSIM
 !------------------------------------------------------------------------------------------
 
