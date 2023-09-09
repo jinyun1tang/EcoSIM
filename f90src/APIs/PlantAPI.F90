@@ -754,7 +754,7 @@ implicit none
 
   DO L=0,NL(NY,NX)
     plt_site%AREA3(L)     =AREA(3,L,NY,NX)
-    plt_soilchem%BKDS(L)  =BKDS(L,NY,NX)
+    plt_soilchem%SoiBulkDensity(L)  =SoiBulkDensity(L,NY,NX)
 
     plt_soilchem%trc_solcl(ids_beg:ids_end,L) =trc_solcl(ids_beg:ids_end,L,NY,NX)
 
@@ -788,14 +788,14 @@ implicit none
     plt_soilchem%THETW(L) =THETW(L,NY,NX)
     plt_soilchem%THETY(L) =THETY(L,NY,NX)
     plt_soilchem%TFND(L)  =TFND(L,NY,NX)
-    plt_soilchem%VSoilPoreMicP(L)  =VSoilPoreMicP(L,NY,NX)
+    plt_soilchem%VLSoilPoreMicP(L)  =VLSoilPoreMicP(L,NY,NX)
     plt_soilchem%trcs_VLN(ids_H1PO4B,L) =trcs_VLN(ids_H1PO4B,L,NY,NX)
     plt_soilchem%trcs_VLN(ids_NO3,L) =trcs_VLN(ids_NO3,L,NY,NX)
     plt_soilchem%trcs_VLN(ids_H1PO4,L) =trcs_VLN(ids_H1PO4,L,NY,NX)
-    plt_soilchem%VOLY(L)  =VOLY(L,NY,NX)
-    plt_soilchem%ViceMicP(L)  =ViceMicP(L,NY,NX)
-    plt_soilchem%VWatMicP(L)  =VWatMicP(L,NY,NX)
-    plt_soilchem%VMicP(L)  =VMicP(L,NY,NX)
+    plt_soilchem%VLSoilMicP(L)  =VLSoilMicP(L,NY,NX)
+    plt_soilchem%VLiceMicP(L)  =VLiceMicP(L,NY,NX)
+    plt_soilchem%VLWatMicP(L)  =VLWatMicP(L,NY,NX)
+    plt_soilchem%VLMicP(L)  =VLMicP(L,NY,NX)
     plt_soilchem%trcs_VLN(ids_NO3B,L) =trcs_VLN(ids_NO3B,L,NY,NX)
     plt_soilchem%trcs_VLN(ids_NH4,L) =trcs_VLN(ids_NH4,L,NY,NX)
     plt_soilchem%trcs_VLN(ids_NH4B,L) =trcs_VLN(ids_NH4B,L,NY,NX)
@@ -946,8 +946,8 @@ implicit none
 
   DO L=1,NL(NY,NX)
     DO M=1,NPH
-      plt_site%VWatMicPM(M,L)=VWatMicPM(M,L,NY,NX)
-      plt_site%VsoiPM(M,L)=VsoiPM(M,L,NY,NX)
+      plt_site%VLWatMicPM(M,L)=VLWatMicPM(M,L,NY,NX)
+      plt_site%VLsoiAirPM(M,L)=VLsoiAirPM(M,L,NY,NX)
       plt_site%TORT(M,L)=TORT(M,L,NY,NX)
       plt_site%FILM(M,L)=FILM(M,L,NY,NX)
       plt_soilchem%DFGS(M,L)=DFGS(M,L,NY,NX)
@@ -1522,9 +1522,9 @@ implicit none
 
   DO L=0,NL(NY,NX)
     plt_site%AREA3(L)=AREA(3,L,NY,NX)
-    plt_soilchem%VSoilPoreMicP(L)=VSoilPoreMicP(L,NY,NX)
-    plt_soilchem%VOLY(L)=VOLY(L,NY,NX)
-    plt_soilchem%VWatMicP(L)=VWatMicP(L,NY,NX)
+    plt_soilchem%VLSoilPoreMicP(L)=VLSoilPoreMicP(L,NY,NX)
+    plt_soilchem%VLSoilMicP(L)=VLSoilMicP(L,NY,NX)
+    plt_soilchem%VLWatMicP(L)=VLWatMicP(L,NY,NX)
   ENDDO
   plt_rad%SSIN=SSIN(NY,NX)
   plt_site%ZNOON=ZNOON(NY,NX)

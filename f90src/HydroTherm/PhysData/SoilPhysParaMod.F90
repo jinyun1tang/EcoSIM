@@ -21,63 +21,63 @@ implicit none
   public :: SetDeepSoil
   contains
 !------------------------------------------------------------------------------------------
-  subroutine CalcSoilWaterPotential(NY,NX,N1,N2,N3,PSISA1,THETA1S)
+  subroutine CalcSoilWaterPotential(NY,NX,N1,N2,N3,PSISoilMatric,THETA1S)
   implicit none
   integer, intent(in) :: NY,NX,N1,N2,N3
-  real(r8), intent(out) :: PSISA1
+  real(r8), intent(out) :: PSISoilMatric
   real(r8), optional, intent(out) :: THETA1S
   real(r8) :: FCDX,FCX,FCLX,WPLX,PSDX,WPX,THETA1
   !     BKVL=soil mass
   !     FC,WP=water contents at field capacity,wilting point
   !     FCL,WPL=log FC,WP
   !     FCD,PSD=FCL-WPL,log(POROS)-FCL
-  !     PSISA1,PSIHY,PSISE=soil matric,hygroscopic,air entry potential
-  !     PSIMX,PSIMD,PSIMS=log water potential at FC,WP,saturation
-  !     PSISD=PSIMX-PSIMS
+  !     PSISoilMatric,PSIHY,PSISE=soil matric,hygroscopic,air entry potential
+  !     PSIMX,PSIMD,LOGPSIAtSat=log water potential at FC,WP,saturation
+  !     PSISD=PSIMX-LOGPSIAtSat
   !     SRP=parameter for deviation from linear log-log water retention
   !     PSISO=osmotic potential
   !     DTHETW=minimum water content for numerical purpose
   ! soil matric potential upper layer
   
-  THETA1=AMAX1(THETY(N3,N2,N1),AMIN1(POROS(N3,N2,N1),safe_adb(VWatMicP1(N3,N2,N1),VOLY(N3,N2,N1))))
-  IF(BKVL(N3,N2,N1).GT.ZEROS(NY,NX))THEN
+  THETA1=AMAX1(THETY(N3,N2,N1),AMIN1(POROS(N3,N2,N1),safe_adb(VLWatMicP1(N3,N2,N1),VLSoilMicP(N3,N2,N1))))
+  IF(SoilMicPMassLayer(N3,N2,N1).GT.ZEROS(NY,NX))THEN
     !source layer is active soil  
-    IF(THETA1.LT.FC(N3,N2,N1))THEN
+    IF(THETA1.LT.FieldCapacity(N3,N2,N1))THEN
       !water less than field capacity
       !PSIHY is the minimum water potential allowed
-      PSISA1=AMAX1(PSIHY,-EXP(PSIMX(N2,N1)+((FCL(N3,N2,N1)-LOG(THETA1))/FCD(N3,N2,N1)*PSIMD(N2,N1))))
+      PSISoilMatric=AMAX1(PSIHY,-EXP(LOGPSIMX(N2,N1)+((LOGFldCapacity(N3,N2,N1)-LOG(THETA1))/FCD(N3,N2,N1)*LOGPSIMND(N2,N1))))
     ELSEIF(THETA1.LT.POROS(N3,N2,N1)-DTHETW)THEN
-      PSISA1=-EXP(PSIMS(N2,N1)+(((PSL(N3,N2,N1)-LOG(THETA1))/PSD(N3,N2,N1))**SRP(N3,N2,N1)*PSISD(N2,N1)))
+      PSISoilMatric=-EXP(LOGPSIAtSat(N2,N1)+(((LOGPOROS(N3,N2,N1)-LOG(THETA1))/PSD(N3,N2,N1))**SRP(N3,N2,N1)*LOGPSIMXD(N2,N1)))
     ELSE
       THETA1=POROS(N3,N2,N1)    
-      PSISA1=PSISE(N3,N2,N1)
+      PSISoilMatric=PSISE(N3,N2,N1)
     ENDIF
     !
     !     SUBSURFCE UPPER WATER LAYER
     !
-    !     THETIX,THETWX=ice,water concentration
+    !     FracSoiPAsIce,FracSoiPAsWat=ice,water concentration
     !     FCI,WPI=ice field capacity,wilting point
-    !     PSISA1=matric water potential
+    !     PSISoilMatric=matric water potential
     !
-  ELSEIF(VSoilPoreMicP(N3,N2,N1).GT.ZEROS2(N2,N1).and.THETIX(N3,N2,N1)>ZEROS2(N2,N1))THEN
-    FCX=FCI*THETIX(N3,N2,N1)
-    WPX=WPI*THETIX(N3,N2,N1)
+  ELSEIF(VLSoilPoreMicP(N3,N2,N1).GT.ZEROS2(N2,N1).and.FracSoiPAsIce(N3,N2,N1)>ZEROS2(N2,N1))THEN
+    FCX=FCI*FracSoiPAsIce(N3,N2,N1)
+    WPX=WPI*FracSoiPAsIce(N3,N2,N1)
     FCLX=LOG(FCX)
     WPLX=LOG(WPX)
-    PSDX=PSL(N3,N2,N1)-FCLX
+    PSDX=LOGPOROS(N3,N2,N1)-FCLX
     FCDX=FCLX-WPLX
-    IF(THETWX(N3,N2,N1).LT.FCX)THEN
-      PSISA1=AMAX1(PSIHY,-EXP(PSIMX(N2,N1)+((FCLX-LOG(THETWX(N3,N2,N1)))/FCDX*PSIMD(NY,NX))))
-    ELSEIF(THETWX(N3,N2,N1).LT.POROS(N3,N2,N1)-DTHETW)THEN
-      PSISA1=-EXP(PSIMS(N2,N1)+(((PSL(N3,N2,N1)-LOG(THETWX(N3,N2,N1)))/PSDX)*PSISD(N2,N1)))
+    IF(FracSoiPAsWat(N3,N2,N1).LT.FCX)THEN
+      PSISoilMatric=AMAX1(PSIHY,-EXP(LOGPSIMX(N2,N1)+((FCLX-LOG(FracSoiPAsWat(N3,N2,N1)))/FCDX*LOGPSIMND(NY,NX))))
+    ELSEIF(FracSoiPAsWat(N3,N2,N1).LT.POROS(N3,N2,N1)-DTHETW)THEN
+      PSISoilMatric=-EXP(LOGPSIAtSat(N2,N1)+(((LOGPOROS(N3,N2,N1)-LOG(FracSoiPAsWat(N3,N2,N1)))/PSDX)*LOGPSIMXD(N2,N1)))
     ELSE
       !saturated
       THETA1=POROS(N3,N2,N1)
-      PSISA1=PSISE(N3,N2,N1)
+      PSISoilMatric=PSISE(N3,N2,N1)
     ENDIF
   ELSE
     THETA1=POROS(N3,N2,N1)
-    PSISA1=PSISE(N3,N2,N1)
+    PSISoilMatric=PSISE(N3,N2,N1)
   ENDIF
 
   if(present(THETA1S))THETA1S=THETA1
@@ -98,15 +98,15 @@ implicit none
 
   DO L=NM+1,JZ
     CumDepth2LayerBottom(L,NY,NX)=2.0_r8*CumDepth2LayerBottom(L-1,NY,NX)-1.0_r8*CumDepth2LayerBottom(L-2,NY,NX)
-    BKDSI(L,NY,NX)=BKDSI(L-1,NY,NX)
-    FC(L,NY,NX)=FC(L-1,NY,NX)
-    WP(L,NY,NX)=WP(L-1,NY,NX)
-    SCNV(L,NY,NX)=SCNV(L-1,NY,NX)
-    SCNH(L,NY,NX)=SCNH(L-1,NY,NX)
+    SoiBulkDensityt0(L,NY,NX)=SoiBulkDensityt0(L-1,NY,NX)
+    FieldCapacity(L,NY,NX)=FieldCapacity(L-1,NY,NX)
+    WiltPoint(L,NY,NX)=WiltPoint(L-1,NY,NX)
+    SatHydroCondVert(L,NY,NX)=SatHydroCondVert(L-1,NY,NX)
+    SatHydroCondHrzn(L,NY,NX)=SatHydroCondHrzn(L-1,NY,NX)
     CSAND(L,NY,NX)=CSAND(L-1,NY,NX)
     CSILT(L,NY,NX)=CSILT(L-1,NY,NX)
     CCLAY(L,NY,NX)=CCLAY(L-1,NY,NX)
-    FHOL(L,NY,NX)=FHOL(L-1,NY,NX)
+    SoilFracAsMacP(L,NY,NX)=SoilFracAsMacP(L-1,NY,NX)
     ROCK(L,NY,NX)=ROCK(L-1,NY,NX)
     PH(L,NY,NX)=PH(L-1,NY,NX)
     CEC(L,NY,NX)=CEC(L-1,NY,NX)

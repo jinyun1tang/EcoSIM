@@ -108,12 +108,12 @@ implicit none
     D9770: DO L=1,JS
       DENSS(L,NY,NX)=DENS0(NY,NX)
     ENDDO D9770
-    VWatMicP(0,NY,NX)=VWatMicP(0,NY,NX)+FLWW
-    ViceMicP(0,NY,NX)=ViceMicP(0,NY,NX)+FLWI+FLWS/DENSI
+    VLWatMicP(0,NY,NX)=VLWatMicP(0,NY,NX)+FLWW
+    VLiceMicP(0,NY,NX)=VLiceMicP(0,NY,NX)+FLWI+FLWS/DENSICE
     ENGY=VHeatCapacity(NUM(NY,NX),NY,NX)*TKS(NUM(NY,NX),NY,NX)
     VHeatCapacity(NUM(NY,NX),NY,NX)=VHeatCapacitySoilM(NUM(NY,NX),NY,NX) &
-      +cpw*(VWatMicP(NUM(NY,NX),NY,NX)+VWatMacP(NUM(NY,NX),NY,NX)) &
-      +cpi*(ViceMicP(NUM(NY,NX),NY,NX)+ViceMacP(NUM(NY,NX),NY,NX))
+      +cpw*(VLWatMicP(NUM(NY,NX),NY,NX)+VLWatMacP(NUM(NY,NX),NY,NX)) &
+      +cpi*(VLiceMicP(NUM(NY,NX),NY,NX)+VLiceMacP(NUM(NY,NX),NY,NX))
     IF(VHeatCapacity(NUM(NY,NX),NY,NX).GT.ZEROS(NY,NX))THEN
       TKSX=TKS(NUM(NY,NX),NY,NX)
       TKS(NUM(NY,NX),NY,NX)=(ENGY+HFLWS)/VHeatCapacity(NUM(NY,NX),NY,NX)
@@ -154,16 +154,16 @@ implicit none
     if(L>1)then
       VOLWSL(L-1,NY,NX)=VOLWSL(L-1,NY,NX)+VOLWSL(L,NY,NX)
     elseif(L==1)then
-      VWatMicP(0,NY,NX)=VWatMicP(0,NY,NX)+VOLWSL(L,NY,NX)
+      VLWatMicP(0,NY,NX)=VLWatMicP(0,NY,NX)+VOLWSL(L,NY,NX)
     endif
     VOLWSL(L,NY,NX)=0._r8
   endif
-  VOLISL(L,NY,NX)=VOLISL(L,NY,NX)+TFLWI(L,NY,NX)-XWFLXI(L,NY,NX)/DENSI
+  VOLISL(L,NY,NX)=VOLISL(L,NY,NX)+TFLWI(L,NY,NX)-XWFLXI(L,NY,NX)/DENSICE
   if(VOLWSL(L,NY,NX)<0._r8)then
     if(L>1)then
       VOLISL(L-1,NY,NX)=VOLISL(L-1,NY,NX)+VOLISL(L,NY,NX)
     elseif(L==1)then
-      ViceMicP(0,NY,NX)=ViceMicP(0,NY,NX)+VOLISL(L,NY,NX)
+      VLiceMicP(0,NY,NX)=VLiceMicP(0,NY,NX)+VOLISL(L,NY,NX)
     endif
     VOLISL(L,NY,NX)=0._r8
   endif
@@ -177,10 +177,10 @@ implicit none
 !
   IF(L.EQ.1)THEN
     VOLSWI=VOLSWI+0.5_r8*(VOLSSL(L,NY,NX)+VOLWSL(L,NY,NX) &
-      +VOLISL(L,NY,NX)*DENSI)
+      +VOLISL(L,NY,NX)*DENSICE)
     if(VOLSWI<0._r8)then
       write(*,*)'VOLSWI=',VOLSWI,VOLSSL(L,NY,NX),VOLWSL(L,NY,NX), &
-        VOLISL(L,NY,NX)*DENSI
+        VOLISL(L,NY,NX)*DENSICE
       call endrun(trim(mod_filename)//' at line',__LINE__)
     endif
 !
@@ -196,12 +196,12 @@ implicit none
     ENDIF
   ELSE
     VOLSWI=VOLSWI+0.5_r8*(VOLSSL(L-1,NY,NX)+VOLWSL(L-1,NY,NX) &
-      +VOLISL(L-1,NY,NX)*DENSI+VOLSSL(L,NY,NX)+VOLWSL(L,NY,NX) &
-      +VOLISL(L,NY,NX)*DENSI)
+      +VOLISL(L-1,NY,NX)*DENSICE+VOLSSL(L,NY,NX)+VOLWSL(L,NY,NX) &
+      +VOLISL(L,NY,NX)*DENSICE)
     if(VOLSWI<0._r8)then
       write(*,*)'iVOLSWI=',VOLSWI,VOLSSL(L-1,NY,NX)+VOLWSL(L-1,NY,NX) &
-        +VOLISL(L-1,NY,NX)*DENSI,VOLSSL(L,NY,NX)+VOLWSL(L,NY,NX) &
-        +VOLISL(L,NY,NX)*DENSI
+        +VOLISL(L-1,NY,NX)*DENSICE,VOLSSL(L,NY,NX)+VOLWSL(L,NY,NX) &
+        +VOLISL(L,NY,NX)*DENSICE
       call endrun(trim(mod_filename)//' at line',__LINE__)
     endif
   ENDIF

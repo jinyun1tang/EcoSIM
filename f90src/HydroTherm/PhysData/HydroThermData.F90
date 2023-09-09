@@ -3,19 +3,19 @@ module HydroThermData
   use GridConsts
 implicit none
   character(len=*), private, parameter :: mod_filename = __FILE__
-  real(r8),allocatable ::  THETWX(:,:,:)                      !
+  real(r8),allocatable ::  FracSoiPAsWat(:,:,:)                      !
   real(r8),allocatable ::  PSISM1(:,:,:)                      !  
   real(r8),allocatable ::  TK1(:,:,:)                         !  
   real(r8),allocatable ::  DLYRR(:,:)                         !  
-  real(r8),allocatable ::  THETIX(:,:,:)                      !  
-  real(r8),allocatable ::  THETPX(:,:,:)                      !  
-  real(r8),allocatable ::  VolHeatCapacity(:,:,:)                       !
-  real(r8),allocatable ::  THETPY(:,:,:)                      !
-  real(r8),allocatable ::  VWatMicP1(:,:,:)                       !    
-  real(r8),allocatable ::  ViceMicP1(:,:,:)                       !  
+  real(r8),allocatable ::  FracSoiPAsIce(:,:,:)               !  
+  real(r8),allocatable ::  FracSoiPAsAir(:,:,:)               !  
+  real(r8),allocatable ::  VolHeatCapacity(:,:,:)             !
+  real(r8),allocatable ::  FracSoilAsAirt(:,:,:)              !fraction of soil volume as air, normalized using current pore volume
+  real(r8),allocatable ::  VLWatMicP1(:,:,:)                  !    
+  real(r8),allocatable ::  VLiceMicP1(:,:,:)                  !  
   real(r8),allocatable ::  FLQ0S(:,:)                         !  
   real(r8),allocatable ::  FLQ0W(:,:)                         !  
-  real(r8),allocatable ::  VOLPH1(:,:,:)                      !  
+  real(r8),allocatable ::  VLairMacPc(:,:,:)                  !  positively corrected macropore volume
   real(r8),allocatable ::  EVAPW(:,:)                         !  
   real(r8),allocatable ::  EVAPS(:,:)                         !  
   real(r8),allocatable ::  EVAPSN(:,:)
@@ -28,16 +28,16 @@ implicit none
   real(r8),allocatable ::  THRMW(:,:)                         !  
   real(r8),allocatable ::  RAGW(:,:)                          !  
   real(r8),allocatable ::  THRYW(:,:)                         !  
-  real(r8),allocatable ::  VOLP1(:,:,:)                       !  
+  real(r8),allocatable ::  VLairMicPc(:,:,:)                       ! corrected air-filled micropore volume 
   real(r8),allocatable ::  TK0(:,:,:)                         !  
-  real(r8),allocatable ::  VWatMacP1(:,:,:)                      !
+  real(r8),allocatable ::  VLWatMacP1(:,:,:)                      !
   real(r8),allocatable ::  FGRD(:,:,:)                        !
   real(r8),allocatable ::  VolHeatCapacityA(:,:,:)                      !
   real(r8),allocatable ::  VolHeatCapacityB(:,:,:)                      !
   real(r8),allocatable ::  RAG(:,:)                           !
   real(r8),allocatable ::  PAREW(:,:)                         ! 
   real(r8),allocatable ::  ALTG(:,:)                          ! 
-  real(r8),allocatable ::  ViceMacP1(:,:,:)                      !
+  real(r8),allocatable ::  VLiceMacP1(:,:,:)                      !
   real(r8),allocatable ::  RADXW(:,:)                         !  
   real(r8),allocatable ::  QR1(:,:,:,:)                       !  
   real(r8),allocatable ::  HQR1(:,:,:,:)                      !  
@@ -50,8 +50,8 @@ implicit none
   real(r8),allocatable ::  ConvectWaterFlowMacP(:,:,:,:)                     !  
   real(r8),allocatable ::  WatXChange2WatTableX(:,:,:,:)                     !  
   real(r8),allocatable ::  VOLW2(:,:,:)                       !
-  real(r8),allocatable ::  VOLP1Z(:,:,:)                      !
-  real(r8),allocatable ::  VOLWX1(:,:,:)                      !
+  real(r8),allocatable ::  VLairMicP(:,:,:)                      !
+  real(r8),allocatable ::  VLWatMicPX1(:,:,:)               !micropore water volume behind wetting front
 
   public :: InitHydroThermData
   public :: DestructHydroThermData
@@ -62,19 +62,19 @@ implicit none
   implicit none
 
 
-  allocate(THETWX(0:JZ,JY,JX)); THETWX=0._r8
+  allocate(FracSoiPAsWat(0:JZ,JY,JX)); FracSoiPAsWat=0._r8
   allocate(PSISM1(0:JZ,JY,JX)); PSISM1=0._r8
   allocate(TK1(0:JZ,JY,JX));    TK1=0._r8    
   allocate(DLYRR(JY,JX));       DLYRR=0._r8  
-  allocate(THETIX(0:JZ,JY,JX)); THETIX=0._r8 
-  allocate(THETPX(0:JZ,JY,JX)); THETPX=0._r8   
+  allocate(FracSoiPAsIce(0:JZ,JY,JX)); FracSoiPAsIce=0._r8 
+  allocate(FracSoiPAsAir(0:JZ,JY,JX)); FracSoiPAsAir=0._r8   
   allocate(VolHeatCapacity(0:JZ,JY,JX));  VolHeatCapacity=0._r8  
-  allocate(THETPY(0:JZ,JY,JX)); THETPY=0._r8  
-  allocate(VWatMicP1(0:JZ,JY,JX));  VWatMicP1=0._r8  
-  allocate(ViceMicP1(0:JZ,JY,JX));  ViceMicP1=0._r8
+  allocate(FracSoilAsAirt(0:JZ,JY,JX)); FracSoilAsAirt=0._r8  
+  allocate(VLWatMicP1(0:JZ,JY,JX));  VLWatMicP1=0._r8  
+  allocate(VLiceMicP1(0:JZ,JY,JX));  VLiceMicP1=0._r8
   allocate(FLQ0S(JY,JX));       FLQ0S=0._r8
   allocate(FLQ0W(JY,JX));       FLQ0W=0._r8
-  allocate(VOLPH1(JZ,JY,JX));   VOLPH1=0._r8 
+  allocate(VLairMacPc(JZ,JY,JX));   VLairMacPc=0._r8 
   allocate(EVAPSN(JY,JX));      EVAPSN=0._r8  
   allocate(EVAPW(JY,JX));       EVAPW=0._r8    
   allocate(EVAPS(JY,JX));       EVAPS=0._r8  
@@ -87,16 +87,16 @@ implicit none
   allocate(THRMW(JY,JX));       THRMW=0._r8  
   allocate(RAGW(JY,JX));        RAGW=0._r8  
   allocate(THRYW(JY,JX));       THRYW=0._r8  
-  allocate(VOLP1(0:JZ,JY,JX));  VOLP1=0._r8  
+  allocate(VLairMicPc(0:JZ,JY,JX));  VLairMicPc=0._r8  
   allocate(TK0(JS,JY,JX));      TK0=0._r8  
-  allocate(VWatMacP1(JZ,JY,JX));   VWatMacP1=0._r8
+  allocate(VLWatMacP1(JZ,JY,JX));   VLWatMacP1=0._r8
   allocate(FGRD(JZ,JY,JX));     FGRD=0._r8
   allocate(VolHeatCapacityA(JZ,JY,JX));   VolHeatCapacityA=0._r8
   allocate(VolHeatCapacityB(JZ,JY,JX));   VolHeatCapacityB=0._r8  
   allocate(RAG(JY,JX));         RAG=0._r8
   allocate(PAREW(JY,JX));       PAREW=0._r8
   allocate(ALTG(JY,JX));        ALTG=0._r8  
-  allocate(ViceMacP1(JZ,JY,JX));   ViceMacP1=0._r8  
+  allocate(VLiceMacP1(JZ,JY,JX));   VLiceMacP1=0._r8  
   allocate(RADXW(JY,JX));       RADXW=0._r8  
   allocate(QR1(2,2,JV,JH));     QR1=0._r8  
   allocate(HQR1(2,2,JV,JH));    HQR1=0._r8
@@ -109,8 +109,8 @@ implicit none
   allocate(ConvectWaterFlowMacP(3,JD,JV,JH));  ConvectWaterFlowMacP=0._r8
   allocate(WatXChange2WatTableX(3,JD,JV,JH));  WatXChange2WatTableX=0._r8
   allocate(VOLW2(JZ,JY,JX));    VOLW2=0._r8
-  allocate(VOLP1Z(JZ,JY,JX));   VOLP1Z=0._r8
-  allocate(VOLWX1(JZ,JY,JX));   VOLWX1=0._r8
+  allocate(VLairMicP(JZ,JY,JX));   VLairMicP=0._r8
+  allocate(VLWatMicPX1(JZ,JY,JX));   VLWatMicPX1=0._r8
 
   end subroutine InitHydroThermData
 
@@ -120,19 +120,19 @@ implicit none
   implicit none
 
   call destroy(QR1)
-  call destroy(THETWX)
+  call destroy(FracSoiPAsWat)
   call destroy(PSISM1)  
   call destroy(TK1)  
   call destroy(DLYRR)  
-  call destroy(THETIX)  
-  call destroy(THETPX)  
+  call destroy(FracSoiPAsIce)  
+  call destroy(FracSoiPAsAir)  
   call destroy(VolHeatCapacity)  
-  call destroy(THETPY)  
-  call destroy(VWatMicP1)  
-  call destroy(ViceMicP1)
+  call destroy(FracSoilAsAirt)  
+  call destroy(VLWatMicP1)  
+  call destroy(VLiceMicP1)
   call destroy(FLQ0S)
   call destroy(FLQ0W)
-  call destroy(VOLPH1)    
+  call destroy(VLairMacPc)    
   call destroy(EVAPW)  
   call destroy(EVAPS)  
   call destroy(EVAPSN)  
@@ -145,16 +145,16 @@ implicit none
   call destroy(THRMW)
   call destroy(RAGW) 
   call destroy(THRYW)
-  call destroy(VOLP1)
+  call destroy(VLairMicPc)
   call destroy(TK0)  
-  call destroy(VWatMacP1)
+  call destroy(VLWatMacP1)
   call destroy(FGRD)
   call destroy(VolHeatCapacityA)
   call destroy(VolHeatCapacityB)  
   call destroy(RAG)
   call destroy(PAREW)
   call destroy(ALTG)
-  call destroy(ViceMacP1)
+  call destroy(VLiceMacP1)
   call destroy(RADXW)
   call destroy(HQR1)    
   call destroy(QS1)  
@@ -166,8 +166,8 @@ implicit none
   call destroy(ConvectWaterFlowMacP)
   call destroy(WatXChange2WatTableX)
   call destroy(VOLW2)
-  call destroy(VOLP1Z)
-  call destroy(VOLWX1)
+  call destroy(VLairMicP)
+  call destroy(VLWatMicPX1)
 
   end subroutine DestructHydroThermData
 end module HydroThermData

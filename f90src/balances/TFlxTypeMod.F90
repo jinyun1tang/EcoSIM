@@ -60,10 +60,10 @@ implicit none
   real(r8),allocatable ::  WatFreezeThawMicP(:,:,:)                       !
   real(r8),allocatable ::  THeatFrezThaw(:,:,:)                      !
   real(r8),allocatable ::  WatFreezeThawMacP(:,:,:)                      !
-  real(r8),allocatable ::  VWatMicP1(:,:,:)                       !
-  real(r8),allocatable ::  ViceMicP1(:,:,:)                       !
-  real(r8),allocatable ::  VWatMacP1(:,:,:)                      !
-  real(r8),allocatable ::  ViceMacP1(:,:,:)                      !
+  real(r8),allocatable ::  VLWatMicP1(:,:,:)                       !
+  real(r8),allocatable ::  VLiceMicP1(:,:,:)                       !
+  real(r8),allocatable ::  VLWatMacP1(:,:,:)                      !
+  real(r8),allocatable ::  VLiceMacP1(:,:,:)                      !
 
   real(r8),allocatable :: TOMCER(:,:,:,:,:)
   real(r8),allocatable :: TOMNER(:,:,:,:,:)
@@ -160,10 +160,10 @@ implicit none
   allocate(WatFreezeThawMicP(JZ,JY,JX));    WatFreezeThawMicP=0._r8
   allocate(THeatFrezThaw(JZ,JY,JX));   THeatFrezThaw=0._r8
   allocate(WatFreezeThawMacP(JZ,JY,JX));   WatFreezeThawMacP=0._r8
-  allocate(VWatMicP1(JZ,JY,JX));    VWatMicP1=0._r8
-  allocate(ViceMicP1(JZ,JY,JX));    ViceMicP1=0._r8
-  allocate(VWatMacP1(JZ,JY,JX));   VWatMacP1=0._r8
-  allocate(ViceMacP1(JZ,JY,JX));   ViceMacP1=0._r8
+  allocate(VLWatMicP1(JZ,JY,JX));    VLWatMicP1=0._r8
+  allocate(VLiceMicP1(JZ,JY,JX));    VLiceMicP1=0._r8
+  allocate(VLWatMacP1(JZ,JY,JX));   VLWatMacP1=0._r8
+  allocate(VLiceMacP1(JZ,JY,JX));   VLiceMacP1=0._r8
   allocate(TOMCER(nlbiomcp,NMICBSO,1:jcplx,JY,JX)); TOMCER=0._r8
   allocate(TOMNER(nlbiomcp,NMICBSO,1:jcplx,JY,JX)); TOMNER=0._r8
   allocate(TOMPER(nlbiomcp,NMICBSO,1:jcplx,JY,JX)); TOMPER=0._r8
@@ -278,10 +278,10 @@ implicit none
   call destroy(WatFreezeThawMicP)
   call destroy(THeatFrezThaw)
   call destroy(WatFreezeThawMacP)
-  call destroy(VWatMicP1)
-  call destroy(ViceMicP1)
-  call destroy(VWatMacP1)
-  call destroy(ViceMacP1)
+  call destroy(VLWatMicP1)
+  call destroy(VLiceMicP1)
+  call destroy(VLWatMacP1)
+  call destroy(VLiceMacP1)
 
   call destroy(trcp_TER)
   call destroy(RTGasADFlx)

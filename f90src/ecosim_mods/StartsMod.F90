@@ -140,15 +140,15 @@ module StartsMod
 !
 !     INITIALIZE WATER POTENTIAL VARIABLES FOR SOIL LAYERS
 !
-!     PSIMX,PSIMN,PSIMS=log water potential at FC,WP,POROS
-!     PSISD,PSIMD=PSIMX-PSIMS,PSIMN-PSIMX
+!     LOGPSIMX,LOGPSIMN,LOGPSIAtSat=log water potential at FC,WP,POROS
+!     LOGPSIMXD,LOGPSIMND=LOGPSIMX-LOGPSIAtSat,LOGPSIMN-LOGPSIMX
 !
-      PSIMS(NY,NX)=LOG(-PSIPS)
-      PSIMX(NY,NX)=LOG(-PSIFC(NY,NX))
-      PSIMN(NY,NX)=LOG(-PSIWP(NY,NX))
-      PSISD(NY,NX)=PSIMX(NY,NX)-PSIMS(NY,NX)
-      PSIMD(NY,NX)=PSIMN(NY,NX)-PSIMX(NY,NX)
-!     BKVL(0,NY,NX)=0.0_r8
+      LOGPSIAtSat(NY,NX)=LOG(-PSIPS)
+      LOGPSIMX(NY,NX)=LOG(-PSIAtFldCapacity(NY,NX))
+      LOGPSIMN(NY,NX)=LOG(-PSIAtWiltPoint(NY,NX))
+      LOGPSIMXD(NY,NX)=LOGPSIMX(NY,NX)-LOGPSIAtSat(NY,NX)
+      LOGPSIMND(NY,NX)=LOGPSIMN(NY,NX)-LOGPSIMX(NY,NX)
+!     SoilMicPMassLayer(0,NY,NX)=0.0_r8
 !
 !     DISTRIBUTION OF OM AMONG FRACTIONS OF DIFFERING
 !     BIOLOGICAL ACTIVITY
@@ -239,7 +239,7 @@ module StartsMod
   DO  NX=NHW,NHE
     DO  NY=NVN,NVS
       ALTZ(NY,NX)=ALTZG
-      IF(BKDS(NU(NY,NX),NY,NX).GT.0.0_r8)THEN
+      IF(SoiBulkDensity(NU(NY,NX),NY,NX).GT.0.0_r8)THEN
         DTBLZ(NY,NX)=DTBLI(NY,NX)-(ALTZ(NY,NX)-ALT(NY,NX))*(1.0_r8-DTBLG(NY,NX))
         DTBLD(NY,NX)=AZMAX1(DTBLDI(NY,NX)-(ALTZ(NY,NX)-ALT(NY,NX))*(1.0_r8-DTBLG(NY,NX)))
       ELSE
@@ -311,10 +311,10 @@ module StartsMod
       !
       !     SURFACE LITTER HEAT CAPACITY
       !
-      BKVLNM(NY,NX)=AZMAX1(SAND(NU(NY,NX),NY,NX)+SILT(NU(NY,NX),NY,NX)+CLAY(NU(NY,NX),NY,NX))
-      VHeatCapacity(0,NY,NX)=cpo*ORGC(0,NY,NX)+cpw*VWatMicP(0,NY,NX)+cpi*ViceMicP(0,NY,NX)
+      SoilMicPMassLayerMn(NY,NX)=AZMAX1(SAND(NU(NY,NX),NY,NX)+SILT(NU(NY,NX),NY,NX)+CLAY(NU(NY,NX),NY,NX))
+      VHeatCapacity(0,NY,NX)=cpo*ORGC(0,NY,NX)+cpw*VLWatMicP(0,NY,NX)+cpi*VLiceMicP(0,NY,NX)
       VHeatCapacitySoilM(0,NY,NX)=0.0_r8
-      VOLAI(0,NY,NX)=0.0_r8
+      VLMicPt0(0,NY,NX)=0.0_r8
     ENDDO
   ENDDO
   end subroutine InitSoilVars
@@ -360,8 +360,8 @@ module StartsMod
     !     CORGPX(3)=AMIN1(CPRH(3)*CORGCX(3),CORGPZ)
     !     CORGPX(4)=AZMAX1(CORGPZ-CORGPX(3))
     CORGL=AZMAX1(CORGC(L,NY,NX)-CORGR(L,NY,NX))
-    TORGL(L)=TORGC+CORGL*BKVL(L,NY,NX)/AREA(3,L,NY,NX)*0.5_r8
-    TORGC=TORGC+CORGL*BKVL(L,NY,NX)/AREA(3,L,NY,NX)
+    TORGL(L)=TORGC+CORGL*SoilMicPMassLayer(L,NY,NX)/AREA(3,L,NY,NX)*0.5_r8
+    TORGC=TORGC+CORGL*SoilMicPMassLayer(L,NY,NX)/AREA(3,L,NY,NX)
   ENDDO D1190
 !
 !     PARAMETERS TO ALLOCATE HUMUS TO LESS OR MORE RECALCITRANT FRACTIONS
@@ -399,7 +399,7 @@ module StartsMod
     !     VOLP=total air volume (m3)
     !
     PSISE(L,NY,NX)=PSIPS
-    PSISA(L,NY,NX)=-1.5E-03_r8
+    PSISoilAirEntry(L,NY,NX)=-1.5E-03_r8
     ROXYF(L,NY,NX)=0.0_r8
     RCO2F(L,NY,NX)=0.0_r8
     ROXYL(L,NY,NX)=0.0_r8
@@ -407,20 +407,20 @@ module StartsMod
     RCH4L(L,NY,NX)=0.0_r8
 
     IF(L.GT.0)THEN
-      IF(BKDS(L,NY,NX).GT.ZERO)THEN
+      IF(SoiBulkDensity(L,NY,NX).GT.ZERO)THEN
         !it is a soil layer
         !compute particle density
         PTDS=ppmc*(1.30_r8*CORGCM+2.66_r8*(1.0E+06_r8-CORGCM))
-        POROS(L,NY,NX)=1.0_r8-(BKDS(L,NY,NX)/PTDS)
+        POROS(L,NY,NX)=1.0_r8-(SoiBulkDensity(L,NY,NX)/PTDS)
       ELSE
         !for ponding water
         PTDS=0.0_r8
         POROS(L,NY,NX)=1.0_r8
       ENDIF
       POROSI(L,NY,NX)=POROS(L,NY,NX)*FMPR(L,NY,NX)
-      VMicP(L,NY,NX)=POROS(L,NY,NX)*VSoilPoreMicP(L,NY,NX)
-      VOLAI(L,NY,NX)=VMicP(L,NY,NX)
-      VAirMacP(L,NY,NX)=FHOL(L,NY,NX)*VOLTI(L,NY,NX)
+      VLMicP(L,NY,NX)=POROS(L,NY,NX)*VLSoilPoreMicP(L,NY,NX)
+      VLMicPt0(L,NY,NX)=VLMicP(L,NY,NX)
+      VLMacP(L,NY,NX)=SoilFracAsMacP(L,NY,NX)*VGeomLayert0(L,NY,NX)
       !
       !     LAYER HEAT CONTENTS
       !
@@ -430,17 +430,17 @@ module StartsMod
       !     TKS,TCS=soil temperature (oC,K)
       !     THETW,THETI,THETP=micropore water,ice,air concentration (m3 m-3)
 !
-      SAND(L,NY,NX)=CSAND(L,NY,NX)*BKVL(L,NY,NX)
-      SILT(L,NY,NX)=CSILT(L,NY,NX)*BKVL(L,NY,NX)
-      CLAY(L,NY,NX)=CCLAY(L,NY,NX)*BKVL(L,NY,NX)
-      IF(BKDS(L,NY,NX).GT.ZERO)THEN
+      SAND(L,NY,NX)=CSAND(L,NY,NX)*SoilMicPMassLayer(L,NY,NX)
+      SILT(L,NY,NX)=CSILT(L,NY,NX)*SoilMicPMassLayer(L,NY,NX)
+      CLAY(L,NY,NX)=CCLAY(L,NY,NX)*SoilMicPMassLayer(L,NY,NX)
+      IF(SoiBulkDensity(L,NY,NX).GT.ZERO)THEN
         ! PTDS=particle density (Mg m-3)
         ! soil volumetric heat capacity
-        VORGC=CORGCM*ppmc*BKDS(L,NY,NX)/PTDS
-        VMINL=(CSILT(L,NY,NX)+CCLAY(L,NY,NX))*BKDS(L,NY,NX)/PTDS
-        VSAND=CSAND(L,NY,NX)*BKDS(L,NY,NX)/PTDS
+        VORGC=CORGCM*ppmc*SoiBulkDensity(L,NY,NX)/PTDS
+        VMINL=(CSILT(L,NY,NX)+CCLAY(L,NY,NX))*SoiBulkDensity(L,NY,NX)/PTDS
+        VSAND=CSAND(L,NY,NX)*SoiBulkDensity(L,NY,NX)/PTDS
         VHeatCapacitySoilM(L,NY,NX)=((2.496_r8*VORGC+2.385_r8*VMINL+2.128_r8*VSAND) &
-          *FMPR(L,NY,NX)+2.128_r8*ROCK(L,NY,NX))*VOLT(L,NY,NX)
+          *FMPR(L,NY,NX)+2.128_r8*ROCK(L,NY,NX))*VGeomLayer(L,NY,NX)
       ELSE
         VHeatCapacitySoilM(L,NY,NX)=0.0_r8
       ENDIF
@@ -449,12 +449,12 @@ module StartsMod
 !
       IF(ISOIL(isoi_fc,L,NY,NX).EQ.0.AND.ISOIL(isoi_wp,L,NY,NX).EQ.0)THEN
       ! field capacity and wilting point are read from input
-        IF(THW(L,NY,NX).GT.1.0)THEN
+        IF(THW(L,NY,NX).GT.1.0_r8)THEN
           THETW(L,NY,NX)=POROS(L,NY,NX)
         ELSEIF(isclose(THW(L,NY,NX),1.0_r8))THEN
-          THETW(L,NY,NX)=FC(L,NY,NX)
+          THETW(L,NY,NX)=FieldCapacity(L,NY,NX)
         ELSEIF(isclose(THW(L,NY,NX),0.0_r8))THEN
-          THETW(L,NY,NX)=WP(L,NY,NX)
+          THETW(L,NY,NX)=WiltPoint(L,NY,NX)
         ELSEIF(THW(L,NY,NX).LT.0.0)THEN
           THETW(L,NY,NX)=0.0_r8
         ELSE
@@ -463,26 +463,29 @@ module StartsMod
         IF(THI(L,NY,NX).GT.1.0_r8)THEN
           THETI(L,NY,NX)=AZMAX1(AMIN1(POROS(L,NY,NX),POROS(L,NY,NX)-THW(L,NY,NX)))
         ELSEIF(isclose(THI(L,NY,NX),1.0_r8))THEN
-          THETI(L,NY,NX)=AZMAX1(AMIN1(FC(L,NY,NX),POROS(L,NY,NX)-THW(L,NY,NX)))
+          THETI(L,NY,NX)=AZMAX1(AMIN1(FieldCapacity(L,NY,NX),POROS(L,NY,NX)-THW(L,NY,NX)))
         ELSEIF(isclose(THI(L,NY,NX),0.0_r8))THEN
-          THETI(L,NY,NX)=AZMAX1(AMIN1(WP(L,NY,NX),POROS(L,NY,NX)-THW(L,NY,NX)))
+          THETI(L,NY,NX)=AZMAX1(AMIN1(WiltPoint(L,NY,NX),POROS(L,NY,NX)-THW(L,NY,NX)))
         ELSEIF(THI(L,NY,NX).LT.0.0_r8)THEN
           THETI(L,NY,NX)=0.0_r8
         ELSE
           THETI(L,NY,NX)=THI(L,NY,NX)
         ENDIF
-        VWatMicP(L,NY,NX)=THETW(L,NY,NX)*VSoilPoreMicP(L,NY,NX)
-        VWatMicPX(L,NY,NX)=VWatMicP(L,NY,NX)
-        VWatMacP(L,NY,NX)=THETW(L,NY,NX)*VAirMacP(L,NY,NX)
-        ViceMicP(L,NY,NX)=THETI(L,NY,NX)*VSoilPoreMicP(L,NY,NX)
-        ViceMacP(L,NY,NX)=THETI(L,NY,NX)*VAirMacP(L,NY,NX)
+        VLWatMicP(L,NY,NX)=THETW(L,NY,NX)*VLSoilPoreMicP(L,NY,NX)
+        VLWatMicPX(L,NY,NX)=VLWatMicP(L,NY,NX)
+        VLWatMacP(L,NY,NX)=THETW(L,NY,NX)*VLMacP(L,NY,NX)
+        VLiceMicP(L,NY,NX)=THETI(L,NY,NX)*VLSoilPoreMicP(L,NY,NX)
+        VLiceMacP(L,NY,NX)=THETI(L,NY,NX)*VLMacP(L,NY,NX)
 !       total air-filled porosity, micropores + macropores
-        VsoiP(L,NY,NX)=AZMAX1(VMicP(L,NY,NX)-VWatMicP(L,NY,NX)-ViceMicP(L,NY,NX)) & 
-          +AZMAX1(VAirMacP(L,NY,NX)-VWatMacP(L,NY,NX)-ViceMacP(L,NY,NX))
-        VHeatCapacity(L,NY,NX)=VHeatCapacitySoilM(L,NY,NX)+cpw*(VWatMicP(L,NY,NX) &
-          +VWatMacP(L,NY,NX))+cpi*(ViceMicP(L,NY,NX)+ViceMacP(L,NY,NX))
+        VLsoiAirP(L,NY,NX)=AZMAX1(VLMicP(L,NY,NX)-VLWatMicP(L,NY,NX)-VLiceMicP(L,NY,NX)) & 
+          +AZMAX1(VLMacP(L,NY,NX)-VLWatMacP(L,NY,NX)-VLiceMacP(L,NY,NX))
+        VHeatCapacity(L,NY,NX)=VHeatCapacitySoilM(L,NY,NX)+cpw*(VLWatMicP(L,NY,NX) &
+          +VLWatMacP(L,NY,NX))+cpi*(VLiceMicP(L,NY,NX)+VLiceMacP(L,NY,NX))
         THETWZ(L,NY,NX)=THETW(L,NY,NX)
         THETIZ(L,NY,NX)=THETI(L,NY,NX)
+        write(111,*)'heatcap starts',L,NY,NX,VHeatCapacitySoilM(L,NY,NX),&
+          cpw*(VLWatMicP(L,NY,NX)+VLWatMacP(L,NY,NX)), &
+          cpi*(VLiceMicP(L,NY,NX)+VLiceMacP(L,NY,NX))  
       ENDIF
     ENDIF
     TKS(L,NY,NX)=ATKS(NY,NX)
@@ -690,7 +693,7 @@ module StartsMod
   !     NPG=number of cycles per hour for gas flux calculations
   !     NPR,NPS=number of cycles NPH-1 for litter, snowpack flux calculns
   !     THETX=minimum air-filled porosity for gas flux calculations
-  !     THETPI,DENSI=ice porosity,density
+  !     THETPI,DENSICE=ice porosity,density
   !     BKRS=surface litter bulk density, Mg m-3
 
   BKRS=(/0.0333_r8,0.0167_r8,0.0167_r8/)
@@ -878,12 +881,12 @@ module StartsMod
         VLitR0=VLitR0+RSC(K,L,NY,NX)/BKRS(K)
       ENDDO
       VLitR(NY,NX)=VLitR0*ppmc*AREA(3,L,NY,NX)
-      VOLT(L,NY,NX)=VLitR(NY,NX)
-      VSoilPoreMicP(L,NY,NX)=VOLT(L,NY,NX)
-      VOLY(L,NY,NX)=VSoilPoreMicP(L,NY,NX)
-      VOLTI(L,NY,NX)=VOLT(L,NY,NX)
-      BKVL(L,NY,NX)=MWC2Soil*ORGC(L,NY,NX)  !mass of soil layer, Mg/d2
-      DLYRI(3,L,NY,NX)=VSoilPoreMicP(L,NY,NX)/AREA(3,L,NY,NX)
+      VGeomLayer(L,NY,NX)=VLitR(NY,NX)
+      VLSoilPoreMicP(L,NY,NX)=VGeomLayer(L,NY,NX)
+      VLSoilMicP(L,NY,NX)=VLSoilPoreMicP(L,NY,NX)
+      VGeomLayert0(L,NY,NX)=VGeomLayer(L,NY,NX)
+      SoilMicPMassLayer(L,NY,NX)=MWC2Soil*ORGC(L,NY,NX)  !mass of soil layer, Mg/d2
+      DLYRI(3,L,NY,NX)=VLSoilPoreMicP(L,NY,NX)/AREA(3,L,NY,NX)
       DLYR(3,L,NY,NX)=DLYRI(3,L,NY,NX)
     ELSE
 !     if it is a standing water, no macropore fraction
@@ -893,7 +896,7 @@ module StartsMod
 !     DPTHZ=depth to middle of soil layer from  surface of grid cell [m]
 !     VOLT=total volume
 !     VOLX=total micropore volume
-      IF(BKDSI(L,NY,NX).LE.ZERO)FHOL(L,NY,NX)=0.0
+      IF(SoiBulkDensityt0(L,NY,NX).LE.ZERO)SoilFracAsMacP(L,NY,NX)=0.0_r8
 !     thickness:=bottom depth-upper depth
       DLYRI(3,L,NY,NX)=(CumDepth2LayerBottom(L,NY,NX)-CumDepth2LayerBottom(L-1,NY,NX))
       call check_bool(DLYRI(3,L,NY,NX)<0._r8,'negative soil layer thickness',&
@@ -902,20 +905,20 @@ module StartsMod
       DPTH(L,NY,NX)=0.5_r8*(CumDepth2LayerBottom(L,NY,NX)+CumDepth2LayerBottom(L-1,NY,NX))
       CDPTHZ(L,NY,NX)=CumDepth2LayerBottom(L,NY,NX)-CumDepth2LayerBottom(NU(NY,NX),NY,NX)+DLYR(3,NU(NY,NX),NY,NX)
       DPTHZ(L,NY,NX)=0.5_r8*(CDPTHZ(L,NY,NX)+CDPTHZ(L-1,NY,NX))
-      VOLT(L,NY,NX)=amax1(AREA(3,L,NY,NX)*DLYR(3,L,NY,NX),1.e-8_r8)
-      VSoilPoreMicP(L,NY,NX)=VOLT(L,NY,NX)*FMPR(L,NY,NX)
-      VOLY(L,NY,NX)=VSoilPoreMicP(L,NY,NX)
-      VOLTI(L,NY,NX)=VOLT(L,NY,NX)
+      VGeomLayer(L,NY,NX)=amax1(AREA(3,L,NY,NX)*DLYR(3,L,NY,NX),1.e-8_r8)
+      VLSoilPoreMicP(L,NY,NX)=VGeomLayer(L,NY,NX)*FMPR(L,NY,NX)
+      VLSoilMicP(L,NY,NX)=VLSoilPoreMicP(L,NY,NX)
+      VGeomLayert0(L,NY,NX)=VGeomLayer(L,NY,NX)
 !     bulk density is defined only for soil with micropores      
 !     bulk soil mass evaluated as micropore volume
-      BKVL(L,NY,NX)=BKDS(L,NY,NX)*VSoilPoreMicP(L,NY,NX)
+      SoilMicPMassLayer(L,NY,NX)=SoiBulkDensity(L,NY,NX)*VLSoilPoreMicP(L,NY,NX)
       RTDNT(L,NY,NX)=0.0_r8
     ENDIF
     AREA(1,L,NY,NX)=DLYR(3,L,NY,NX)*DLYR(2,L,NY,NX)
     AREA(2,L,NY,NX)=DLYR(3,L,NY,NX)*DLYR(1,L,NY,NX)
   ENDDO
   CumDepth2LayerBottom(0,NY,NX)=CumDepth2LayerBottom(NU(NY,NX),NY,NX)-DLYR(3,NU(NY,NX),NY,NX)
-  CDPTHI(NY,NX)=CumDepth2LayerBottom(0,NY,NX)
+  CumSoilDeptht0(NY,NX)=CumDepth2LayerBottom(0,NY,NX)
   AREA(3,NL(NY,NX)+1:JZ,NY,NX)=DLYR(1,NL(NY,NX),NY,NX)*DLYR(2,NL(NY,NX),NY,NX)
 
   end associate
@@ -1037,15 +1040,15 @@ module StartsMod
 !
 !     INITIALIZE WATER POTENTIAL VARIABLES FOR SOIL LAYERS
 !
-!     PSIMX,PSIMN,PSIMS=log water potential at FC,WP,POROS
-!     PSISD,PSIMD=PSIMX-PSIMS,PSIMN-PSIMX
+!     LOGPSIMX,PSIMN,LOGPSIAtSat=log water potential at FC,WP,POROS
+!     LOGPSIMXD,LOGPSIMND=LOGPSIMX-LOGPSIAtSat,PSIMN-LOGPSIMX
 !
-      PSIMS(NY,NX)=LOG(-PSIPS)
-      PSIMX(NY,NX)=LOG(-PSIFC(NY,NX))
-      PSIMN(NY,NX)=LOG(-PSIWP(NY,NX))
-      PSISD(NY,NX)=PSIMX(NY,NX)-PSIMS(NY,NX)
-      PSIMD(NY,NX)=PSIMN(NY,NX)-PSIMX(NY,NX)
-!     BKVL(0,NY,NX)=0.0_r8
+      LOGPSIAtSat(NY,NX)=LOG(-PSIPS)
+      LOGPSIMX(NY,NX)=LOG(-PSIAtFldCapacity(NY,NX))
+      LOGPSIMN(NY,NX)=LOG(-PSIAtWiltPoint(NY,NX))
+      LOGPSIMXD(NY,NX)=LOGPSIMX(NY,NX)-LOGPSIAtSat(NY,NX)
+      LOGPSIMND(NY,NX)=LOGPSIMN(NY,NX)-LOGPSIMX(NY,NX)
+!     SoilMicPMassLayer(0,NY,NX)=0.0_r8
 !
 !     DISTRIBUTION OF OM AMONG FRACTIONS OF DIFFERING
 !     BIOLOGICAL ACTIVITY

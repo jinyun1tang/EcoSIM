@@ -5,9 +5,9 @@ implicit none
   save
   character(len=*), private, parameter :: mod_filename=__FILE__
 
-  real(r8),allocatable ::  XVOLT(:,:)                         !
-  real(r8),allocatable ::  XVWatMicP(:,:)                         !
-  real(r8),allocatable ::  XViceMicP(:,:)                         !
+  real(r8),allocatable ::  XVGeomLayer(:,:)                         !
+  real(r8),allocatable ::  XVLWatMicP(:,:)                         !
+  real(r8),allocatable ::  XVLiceMicP(:,:)                         !
   real(r8),allocatable ::  THRMR(:,:)                         !
   real(r8),allocatable ::  VOLA10(:,:)                        !
   real(r8),allocatable ::  THRYR(:,:)                         !
@@ -47,9 +47,9 @@ implicit none
   subroutine InitSurfPhysData  
   implicit none
 
-  allocate(XVOLT(JY,JX));       XVOLT=0._r8
-  allocate(XVWatMicP(JY,JX));       XVWatMicP=0._r8
-  allocate(XViceMicP(JY,JX));       XViceMicP=0._r8
+  allocate(XVGeomLayer(JY,JX));       XVGeomLayer=0._r8
+  allocate(XVLWatMicP(JY,JX));       XVLWatMicP=0._r8
+  allocate(XVLiceMicP(JY,JX));       XVLiceMicP=0._r8
   allocate(THRMR(JY,JX));       THRMR=0._r8
   allocate(VOLA10(JY,JX));      VOLA10=0._r8
   allocate(THRYR(JY,JX));       THRYR=0._r8
@@ -87,9 +87,9 @@ implicit none
   use abortutils, only : destroy
   implicit none
 
-  call destroy(XVOLT)
-  call destroy(XVWatMicP)
-  call destroy(XViceMicP)
+  call destroy(XVGeomLayer)
+  call destroy(XVLWatMicP)
+  call destroy(XVLiceMicP)
   call destroy(THRMR)
   call destroy(VOLA10)
   call destroy(THRYR)

@@ -104,10 +104,10 @@ module StarteMod
 !
 !     INITIALIZE SOIL WATER
 
-                  IF(BKVL(L,NY,NX).GT.ZEROS(NY,NX))THEN
-                    BKVLX=BKVL(L,NY,NX)
+                  IF(SoilMicPMassLayer(L,NY,NX).GT.ZEROS(NY,NX))THEN
+                    BKVLX=SoilMicPMassLayer(L,NY,NX)
                   ELSE
-                    BKVLX=VMicP(L,NY,NX)
+                    BKVLX=VLMicP(L,NY,NX)
                   ENDIF
                   trcx_solml(idx_CEC,L,NY,NX)=AMAX1(CNH4(L,NY,NX),CEC(L,NY,NX))*BKVLX
                   trcx_solml(idx_AEC,L,NY,NX)=AMAX1(CPO4(L,NY,NX),AEC(L,NY,NX))*BKVLX
@@ -160,7 +160,7 @@ module StarteMod
             solutevar%GKCK  = GKCK(L,NY,NX)
             solutevar%GKCN  = GKCN(L,NY,NX)
             solutevar%GKCM  = GKCM(L,NY,NX)
-            solutevar%VWatMicP = VWatMicP(L,NY,NX)
+            solutevar%VLWatMicP = VLWatMicP(L,NY,NX)
 
             call InitSoluteModel(K,BKVLX,ISALTG,solutevar)
 
@@ -370,103 +370,103 @@ module StarteMod
 !   use between CO2 and other gas tracers can be avoided.
 !   Comment by Jinyun Tang, Nov 11, 2022
 !
-    trc_gasml(idg_CO2,L,NY,NX)=CCO2EI(NY,NX)*VsoiP(L,NY,NX)
-    trc_gasml(idg_CH4,L,NY,NX)=AtmGgms(idg_CH4,NY,NX)*VsoiP(L,NY,NX)
-    trc_gasml(idg_O2,L,NY,NX)=AtmGgms(idg_O2,NY,NX)*VsoiP(L,NY,NX)
-    trc_gasml(idg_N2,L,NY,NX)=AtmGgms(idg_N2,NY,NX)*VsoiP(L,NY,NX)
-    trc_gasml(idg_N2O,L,NY,NX)=AtmGgms(idg_N2O,NY,NX)*VsoiP(L,NY,NX)
-    trc_gasml(idg_NH3,L,NY,NX)=AtmGgms(idg_NH3,NY,NX)*VsoiP(L,NY,NX)
-    trc_gasml(idg_H2,L,NY,NX)=AtmGgms(idg_H2,NY,NX)*VsoiP(L,NY,NX)
+    trc_gasml(idg_CO2,L,NY,NX)=CCO2EI(NY,NX)*VLsoiAirP(L,NY,NX)
+    trc_gasml(idg_CH4,L,NY,NX)=AtmGgms(idg_CH4,NY,NX)*VLsoiAirP(L,NY,NX)
+    trc_gasml(idg_O2,L,NY,NX)=AtmGgms(idg_O2,NY,NX)*VLsoiAirP(L,NY,NX)
+    trc_gasml(idg_N2,L,NY,NX)=AtmGgms(idg_N2,NY,NX)*VLsoiAirP(L,NY,NX)
+    trc_gasml(idg_N2O,L,NY,NX)=AtmGgms(idg_N2O,NY,NX)*VLsoiAirP(L,NY,NX)
+    trc_gasml(idg_NH3,L,NY,NX)=AtmGgms(idg_NH3,NY,NX)*VLsoiAirP(L,NY,NX)
+    trc_gasml(idg_H2,L,NY,NX)=AtmGgms(idg_H2,NY,NX)*VLsoiAirP(L,NY,NX)
 
 !   DTBLZ: external water table depth
     IF(CumDepth2LayerBottom(L-1,NY,NX).LT.DTBLZ(NY,NX))THEN
 ! above water table
       trc_solml(idg_O2,L,NY,NX)=AtmGgms(idg_O2,NY,NX)*gas_solubility(idg_O2, ATCA(NY,NX)) &
-        /(EXP(ACTCG(idg_O2)*solutevar%CSTR1))*solutevar%FH2O*VWatMicP(L,NY,NX)
+        /(EXP(ACTCG(idg_O2)*solutevar%CSTR1))*solutevar%FH2O*VLWatMicP(L,NY,NX)
     ELSE
 !below water table
       trc_solml(idg_O2,L,NY,NX)=0._r8
     ENDIF
 
     trc_solml(idg_CO2,L,NY,NX)=CCO2EI(NY,NX)*gas_solubility(idg_CO2, ATCA(NY,NX)) &
-      /(EXP(ACTCG(idg_CO2)*solutevar%CSTR1))*solutevar%FH2O*VWatMicP(L,NY,NX)
+      /(EXP(ACTCG(idg_CO2)*solutevar%CSTR1))*solutevar%FH2O*VLWatMicP(L,NY,NX)
     trc_solml(idg_CH4,L,NY,NX)=AtmGgms(idg_CH4,NY,NX)*gas_solubility(idg_CH4, ATCA(NY,NX)) &
-      /(EXP(ACTCG(idg_CH4)*solutevar%CSTR1))*solutevar%FH2O*VWatMicP(L,NY,NX)
+      /(EXP(ACTCG(idg_CH4)*solutevar%CSTR1))*solutevar%FH2O*VLWatMicP(L,NY,NX)
     trc_solml(idg_N2,L,NY,NX)=AtmGgms(idg_N2,NY,NX)*gas_solubility(idg_N2, ATCA(NY,NX)) &
-      /(EXP(ACTCG(idg_N2)*solutevar%CSTR1))*solutevar%FH2O*VWatMicP(L,NY,NX)
+      /(EXP(ACTCG(idg_N2)*solutevar%CSTR1))*solutevar%FH2O*VLWatMicP(L,NY,NX)
     trc_solml(idg_N2O,L,NY,NX)=AtmGgms(idg_N2O,NY,NX)*gas_solubility(idg_N2O, ATCA(NY,NX)) &
-      /(EXP(ACTCG(idg_N2O)*solutevar%CSTR1))*solutevar%FH2O*VWatMicP(L,NY,NX)
+      /(EXP(ACTCG(idg_N2O)*solutevar%CSTR1))*solutevar%FH2O*VLWatMicP(L,NY,NX)
     trc_solml(idg_H2,L,NY,NX)=AtmGgms(idg_H2,NY,NX)*gas_solubility(idg_H2, ATCA(NY,NX)) &
-      /(EXP(ACTCG(idg_H2)*solutevar%CSTR1))*solutevar%FH2O*VWatMicP(L,NY,NX)
+      /(EXP(ACTCG(idg_H2)*solutevar%CSTR1))*solutevar%FH2O*VLWatMicP(L,NY,NX)
 !
 !     INITIAL STATE VARIABLES FOR MINERAL N AND P IN SOIL
 !
-    trc_solml(ids_NH4,L,NY,NX)=trcn_irrig(ids_NH4,L,NY,NX)*VWatMicP(L,NY,NX)*trcs_VLN(ids_NH4,L,NY,NX)*natomw
-    trc_solml(ids_NH4B,L,NY,NX)=trcn_irrig(ids_NH4B,L,NY,NX)*VWatMicP(L,NY,NX)*trcs_VLN(ids_NH4B,L,NY,NX)*natomw
-    trc_solml(idg_NH3,L,NY,NX)=trcn_irrig(idg_NH3,L,NY,NX)*VWatMicP(L,NY,NX)*trcs_VLN(ids_NH4,L,NY,NX)*natomw
-    trc_solml(idg_NH3B,L,NY,NX)=trcn_irrig(idg_NH3B,L,NY,NX)*VWatMicP(L,NY,NX)*trcs_VLN(ids_NH4B,L,NY,NX)*natomw
-    trc_solml(ids_NO3,L,NY,NX)=trcn_irrig(ids_NO3,L,NY,NX)*VWatMicP(L,NY,NX)*trcs_VLN(ids_NO3,L,NY,NX)*natomw
-    trc_solml(ids_NO3B,L,NY,NX)=trcn_irrig(ids_NO3B,L,NY,NX)*VWatMicP(L,NY,NX)*trcs_VLN(ids_NO3B,L,NY,NX)*natomw
+    trc_solml(ids_NH4,L,NY,NX)=trcn_irrig(ids_NH4,L,NY,NX)*VLWatMicP(L,NY,NX)*trcs_VLN(ids_NH4,L,NY,NX)*natomw
+    trc_solml(ids_NH4B,L,NY,NX)=trcn_irrig(ids_NH4B,L,NY,NX)*VLWatMicP(L,NY,NX)*trcs_VLN(ids_NH4B,L,NY,NX)*natomw
+    trc_solml(idg_NH3,L,NY,NX)=trcn_irrig(idg_NH3,L,NY,NX)*VLWatMicP(L,NY,NX)*trcs_VLN(ids_NH4,L,NY,NX)*natomw
+    trc_solml(idg_NH3B,L,NY,NX)=trcn_irrig(idg_NH3B,L,NY,NX)*VLWatMicP(L,NY,NX)*trcs_VLN(ids_NH4B,L,NY,NX)*natomw
+    trc_solml(ids_NO3,L,NY,NX)=trcn_irrig(ids_NO3,L,NY,NX)*VLWatMicP(L,NY,NX)*trcs_VLN(ids_NO3,L,NY,NX)*natomw
+    trc_solml(ids_NO3B,L,NY,NX)=trcn_irrig(ids_NO3B,L,NY,NX)*VLWatMicP(L,NY,NX)*trcs_VLN(ids_NO3B,L,NY,NX)*natomw
 
-    trc_solml(ids_H2PO4,L,NY,NX)=trcn_irrig(ids_H2PO4,L,NY,NX)*VWatMicP(L,NY,NX)*trcs_VLN(ids_H1PO4,L,NY,NX)*patomw
-    trc_solml(ids_H2PO4B,L,NY,NX)=trcn_irrig(ids_H2PO4B,L,NY,NX)*VWatMicP(L,NY,NX)*trcs_VLN(ids_H1PO4B,L,NY,NX)*patomw
-    trc_solml(ids_H1PO4,L,NY,NX)=trcn_irrig(ids_H1PO4,L,NY,NX)*VWatMicP(L,NY,NX)*trcs_VLN(ids_H1PO4,L,NY,NX)*patomw
-    trc_solml(ids_H1PO4B,L,NY,NX)=trcn_irrig(ids_H1PO4B,L,NY,NX)*VWatMicP(L,NY,NX)*trcs_VLN(ids_H1PO4B,L,NY,NX)*patomw
+    trc_solml(ids_H2PO4,L,NY,NX)=trcn_irrig(ids_H2PO4,L,NY,NX)*VLWatMicP(L,NY,NX)*trcs_VLN(ids_H1PO4,L,NY,NX)*patomw
+    trc_solml(ids_H2PO4B,L,NY,NX)=trcn_irrig(ids_H2PO4B,L,NY,NX)*VLWatMicP(L,NY,NX)*trcs_VLN(ids_H1PO4B,L,NY,NX)*patomw
+    trc_solml(ids_H1PO4,L,NY,NX)=trcn_irrig(ids_H1PO4,L,NY,NX)*VLWatMicP(L,NY,NX)*trcs_VLN(ids_H1PO4,L,NY,NX)*patomw
+    trc_solml(ids_H1PO4B,L,NY,NX)=trcn_irrig(ids_H1PO4B,L,NY,NX)*VLWatMicP(L,NY,NX)*trcs_VLN(ids_H1PO4B,L,NY,NX)*patomw
 
     trc_solml(ids_NO2,L,NY,NX)=0._r8
     trc_solml(ids_NO2B,L,NY,NX)=0._r8
 !
 !     INITIAL STATE VARIABLES FOR CATIONS, ANIONS AND ION PAIRS IN SOIL
 !
-    trcsa_solml(idsa_Al,L,NY,NX)=CALU(L,NY,NX)*VWatMicP(L,NY,NX)
-    trcsa_solml(idsa_Fe,L,NY,NX)=CFEU(L,NY,NX)*VWatMicP(L,NY,NX)
-    trcsa_solml(idsa_Hp,L,NY,NX)=CHYU(L,NY,NX)*VWatMicP(L,NY,NX)
-    trcsa_solml(idsa_Ca,L,NY,NX)=CCAU(L,NY,NX)*VWatMicP(L,NY,NX)
-    trcsa_solml(idsa_Mg,L,NY,NX)=CMGU(L,NY,NX)*VWatMicP(L,NY,NX)
-    trcsa_solml(idsa_Na,L,NY,NX)=CNAU(L,NY,NX)*VWatMicP(L,NY,NX)
-    trcsa_solml(idsa_K,L,NY,NX)=CKAU(L,NY,NX)*VWatMicP(L,NY,NX)
-    trcsa_solml(idsa_OH,L,NY,NX)=COHU(L,NY,NX)*VWatMicP(L,NY,NX)
-    trcsa_solml(idsa_SO4,L,NY,NX)=CSOU(L,NY,NX)*VWatMicP(L,NY,NX)
-    trcsa_solml(idsa_Cl,L,NY,NX)=CCLU(L,NY,NX)*VWatMicP(L,NY,NX)
-    trcsa_solml(idsa_CO3,L,NY,NX)=CC3U(L,NY,NX)*VWatMicP(L,NY,NX)
-    trcsa_solml(idsa_HCO3,L,NY,NX)=CHCU(L,NY,NX)*VWatMicP(L,NY,NX)
-    trcsa_solml(idsa_AlOH,L,NY,NX)=CAL1U(L,NY,NX)*VWatMicP(L,NY,NX)
-    trcsa_solml(idsa_AlOH2,L,NY,NX)=CAL2U(L,NY,NX)*VWatMicP(L,NY,NX)
-    trcsa_solml(idsa_AlOH3,L,NY,NX)=CAL3U(L,NY,NX)*VWatMicP(L,NY,NX)
-    trcsa_solml(idsa_AlOH4,L,NY,NX)=CAL4U(L,NY,NX)*VWatMicP(L,NY,NX)
-    trcsa_solml(idsa_AlSO4,L,NY,NX)=CALSU(L,NY,NX)*VWatMicP(L,NY,NX)
-    trcsa_solml(idsa_FeOH,L,NY,NX)=CFE1U(L,NY,NX)*VWatMicP(L,NY,NX)
-    trcsa_solml(idsa_FeOH2,L,NY,NX)=CFE2U(L,NY,NX)*VWatMicP(L,NY,NX)
-    trcsa_solml(idsa_FeOH3,L,NY,NX)=CFE3U(L,NY,NX)*VWatMicP(L,NY,NX)
-    trcsa_solml(idsa_FeOH4,L,NY,NX)=CFE4U(L,NY,NX)*VWatMicP(L,NY,NX)
-    trcsa_solml(idsa_FeSO4,L,NY,NX)=CFESU(L,NY,NX)*VWatMicP(L,NY,NX)
-    trcsa_solml(idsa_CaOH2,L,NY,NX)=CCAOU(L,NY,NX)*VWatMicP(L,NY,NX)
-    trcsa_solml(idsa_CaCO3,L,NY,NX)=CCACU(L,NY,NX)*VWatMicP(L,NY,NX)
-    trcsa_solml(idsa_CaHCO3,L,NY,NX)=CCAHU(L,NY,NX)*VWatMicP(L,NY,NX)
-    trcsa_solml(idsa_CaSO4,L,NY,NX)=CCASU(L,NY,NX)*VWatMicP(L,NY,NX)
-    trcsa_solml(idsa_MgOH2,L,NY,NX)=CMGOU(L,NY,NX)*VWatMicP(L,NY,NX)
-    trcsa_solml(idsa_MgCO3,L,NY,NX)=CMGCU(L,NY,NX)*VWatMicP(L,NY,NX)
-    trcsa_solml(idsa_MgHCO3,L,NY,NX)=CMGHU(L,NY,NX)*VWatMicP(L,NY,NX)
-    trcsa_solml(idsa_MgSO4,L,NY,NX)=CMGSU(L,NY,NX)*VWatMicP(L,NY,NX)
-    trcsa_solml(idsa_NaCO3,L,NY,NX)=CNACU(L,NY,NX)*VWatMicP(L,NY,NX)
-    trcsa_solml(idsa_NaSO4,L,NY,NX)=CNASU(L,NY,NX)*VWatMicP(L,NY,NX)
-    trcsa_solml(idsa_KSO4,L,NY,NX)=CKASU(L,NY,NX)*VWatMicP(L,NY,NX)
-    trcsa_solml(idsa_H0PO4,L,NY,NX)=CH0PU(L,NY,NX)*VWatMicP(L,NY,NX)*trcs_VLN(ids_H1PO4,L,NY,NX)
-    trcsa_solml(idsa_H3PO4,L,NY,NX)=CH3PU(L,NY,NX)*VWatMicP(L,NY,NX)*trcs_VLN(ids_H1PO4,L,NY,NX)
-    trcsa_solml(idsa_FeHPO4,L,NY,NX)=CF1PU(L,NY,NX)*VWatMicP(L,NY,NX)*trcs_VLN(ids_H1PO4,L,NY,NX)
-    trcsa_solml(idsa_FeH2PO4,L,NY,NX)=CF2PU(L,NY,NX)*VWatMicP(L,NY,NX)*trcs_VLN(ids_H1PO4,L,NY,NX)
-    trcsa_solml(idsa_CaPO4,L,NY,NX)=CC0PU(L,NY,NX)*VWatMicP(L,NY,NX)*trcs_VLN(ids_H1PO4,L,NY,NX)
-    trcsa_solml(idsa_CaHPO4,L,NY,NX)=CC1PU(L,NY,NX)*VWatMicP(L,NY,NX)*trcs_VLN(ids_H1PO4,L,NY,NX)
-    trcsa_solml(idsa_CaH2PO4,L,NY,NX)=CC2PU(L,NY,NX)*VWatMicP(L,NY,NX)*trcs_VLN(ids_H1PO4,L,NY,NX)
-    trcsa_solml(idsa_MgHPO4,L,NY,NX)=CM1PU(L,NY,NX)*VWatMicP(L,NY,NX)*trcs_VLN(ids_H1PO4,L,NY,NX)
-    trcsa_solml(idsa_H0PO4B,L,NY,NX)=CH0PU(L,NY,NX)*VWatMicP(L,NY,NX)*trcs_VLN(ids_H1PO4B,L,NY,NX)
-    trcsa_solml(idsa_H3PO4B,L,NY,NX)=CH3PU(L,NY,NX)*VWatMicP(L,NY,NX)*trcs_VLN(ids_H1PO4B,L,NY,NX)
-    trcsa_solml(idsa_FeHPO4B,L,NY,NX)=CF1PU(L,NY,NX)*VWatMicP(L,NY,NX)*trcs_VLN(ids_H1PO4B,L,NY,NX)
-    trcsa_solml(idsa_FeH2PO4B,L,NY,NX)=CF2PU(L,NY,NX)*VWatMicP(L,NY,NX)*trcs_VLN(ids_H1PO4B,L,NY,NX)
-    trcsa_solml(idsa_CaPO4B,L,NY,NX)=CC0PU(L,NY,NX)*VWatMicP(L,NY,NX)*trcs_VLN(ids_H1PO4B,L,NY,NX)
-    trcsa_solml(idsa_CaHPO4B,L,NY,NX)=CC1PU(L,NY,NX)*VWatMicP(L,NY,NX)*trcs_VLN(ids_H1PO4B,L,NY,NX)
-    trcsa_solml(idsa_CaH2PO4B,L,NY,NX)=CC2PU(L,NY,NX)*VWatMicP(L,NY,NX)*trcs_VLN(ids_H1PO4B,L,NY,NX)
-    trcsa_solml(idsa_MgHPO4B,L,NY,NX)=CM1PU(L,NY,NX)*VWatMicP(L,NY,NX)*trcs_VLN(ids_H1PO4B,L,NY,NX)
+    trcsa_solml(idsa_Al,L,NY,NX)=CALU(L,NY,NX)*VLWatMicP(L,NY,NX)
+    trcsa_solml(idsa_Fe,L,NY,NX)=CFEU(L,NY,NX)*VLWatMicP(L,NY,NX)
+    trcsa_solml(idsa_Hp,L,NY,NX)=CHYU(L,NY,NX)*VLWatMicP(L,NY,NX)
+    trcsa_solml(idsa_Ca,L,NY,NX)=CCAU(L,NY,NX)*VLWatMicP(L,NY,NX)
+    trcsa_solml(idsa_Mg,L,NY,NX)=CMGU(L,NY,NX)*VLWatMicP(L,NY,NX)
+    trcsa_solml(idsa_Na,L,NY,NX)=CNAU(L,NY,NX)*VLWatMicP(L,NY,NX)
+    trcsa_solml(idsa_K,L,NY,NX)=CKAU(L,NY,NX)*VLWatMicP(L,NY,NX)
+    trcsa_solml(idsa_OH,L,NY,NX)=COHU(L,NY,NX)*VLWatMicP(L,NY,NX)
+    trcsa_solml(idsa_SO4,L,NY,NX)=CSOU(L,NY,NX)*VLWatMicP(L,NY,NX)
+    trcsa_solml(idsa_Cl,L,NY,NX)=CCLU(L,NY,NX)*VLWatMicP(L,NY,NX)
+    trcsa_solml(idsa_CO3,L,NY,NX)=CC3U(L,NY,NX)*VLWatMicP(L,NY,NX)
+    trcsa_solml(idsa_HCO3,L,NY,NX)=CHCU(L,NY,NX)*VLWatMicP(L,NY,NX)
+    trcsa_solml(idsa_AlOH,L,NY,NX)=CAL1U(L,NY,NX)*VLWatMicP(L,NY,NX)
+    trcsa_solml(idsa_AlOH2,L,NY,NX)=CAL2U(L,NY,NX)*VLWatMicP(L,NY,NX)
+    trcsa_solml(idsa_AlOH3,L,NY,NX)=CAL3U(L,NY,NX)*VLWatMicP(L,NY,NX)
+    trcsa_solml(idsa_AlOH4,L,NY,NX)=CAL4U(L,NY,NX)*VLWatMicP(L,NY,NX)
+    trcsa_solml(idsa_AlSO4,L,NY,NX)=CALSU(L,NY,NX)*VLWatMicP(L,NY,NX)
+    trcsa_solml(idsa_FeOH,L,NY,NX)=CFE1U(L,NY,NX)*VLWatMicP(L,NY,NX)
+    trcsa_solml(idsa_FeOH2,L,NY,NX)=CFE2U(L,NY,NX)*VLWatMicP(L,NY,NX)
+    trcsa_solml(idsa_FeOH3,L,NY,NX)=CFE3U(L,NY,NX)*VLWatMicP(L,NY,NX)
+    trcsa_solml(idsa_FeOH4,L,NY,NX)=CFE4U(L,NY,NX)*VLWatMicP(L,NY,NX)
+    trcsa_solml(idsa_FeSO4,L,NY,NX)=CFESU(L,NY,NX)*VLWatMicP(L,NY,NX)
+    trcsa_solml(idsa_CaOH2,L,NY,NX)=CCAOU(L,NY,NX)*VLWatMicP(L,NY,NX)
+    trcsa_solml(idsa_CaCO3,L,NY,NX)=CCACU(L,NY,NX)*VLWatMicP(L,NY,NX)
+    trcsa_solml(idsa_CaHCO3,L,NY,NX)=CCAHU(L,NY,NX)*VLWatMicP(L,NY,NX)
+    trcsa_solml(idsa_CaSO4,L,NY,NX)=CCASU(L,NY,NX)*VLWatMicP(L,NY,NX)
+    trcsa_solml(idsa_MgOH2,L,NY,NX)=CMGOU(L,NY,NX)*VLWatMicP(L,NY,NX)
+    trcsa_solml(idsa_MgCO3,L,NY,NX)=CMGCU(L,NY,NX)*VLWatMicP(L,NY,NX)
+    trcsa_solml(idsa_MgHCO3,L,NY,NX)=CMGHU(L,NY,NX)*VLWatMicP(L,NY,NX)
+    trcsa_solml(idsa_MgSO4,L,NY,NX)=CMGSU(L,NY,NX)*VLWatMicP(L,NY,NX)
+    trcsa_solml(idsa_NaCO3,L,NY,NX)=CNACU(L,NY,NX)*VLWatMicP(L,NY,NX)
+    trcsa_solml(idsa_NaSO4,L,NY,NX)=CNASU(L,NY,NX)*VLWatMicP(L,NY,NX)
+    trcsa_solml(idsa_KSO4,L,NY,NX)=CKASU(L,NY,NX)*VLWatMicP(L,NY,NX)
+    trcsa_solml(idsa_H0PO4,L,NY,NX)=CH0PU(L,NY,NX)*VLWatMicP(L,NY,NX)*trcs_VLN(ids_H1PO4,L,NY,NX)
+    trcsa_solml(idsa_H3PO4,L,NY,NX)=CH3PU(L,NY,NX)*VLWatMicP(L,NY,NX)*trcs_VLN(ids_H1PO4,L,NY,NX)
+    trcsa_solml(idsa_FeHPO4,L,NY,NX)=CF1PU(L,NY,NX)*VLWatMicP(L,NY,NX)*trcs_VLN(ids_H1PO4,L,NY,NX)
+    trcsa_solml(idsa_FeH2PO4,L,NY,NX)=CF2PU(L,NY,NX)*VLWatMicP(L,NY,NX)*trcs_VLN(ids_H1PO4,L,NY,NX)
+    trcsa_solml(idsa_CaPO4,L,NY,NX)=CC0PU(L,NY,NX)*VLWatMicP(L,NY,NX)*trcs_VLN(ids_H1PO4,L,NY,NX)
+    trcsa_solml(idsa_CaHPO4,L,NY,NX)=CC1PU(L,NY,NX)*VLWatMicP(L,NY,NX)*trcs_VLN(ids_H1PO4,L,NY,NX)
+    trcsa_solml(idsa_CaH2PO4,L,NY,NX)=CC2PU(L,NY,NX)*VLWatMicP(L,NY,NX)*trcs_VLN(ids_H1PO4,L,NY,NX)
+    trcsa_solml(idsa_MgHPO4,L,NY,NX)=CM1PU(L,NY,NX)*VLWatMicP(L,NY,NX)*trcs_VLN(ids_H1PO4,L,NY,NX)
+    trcsa_solml(idsa_H0PO4B,L,NY,NX)=CH0PU(L,NY,NX)*VLWatMicP(L,NY,NX)*trcs_VLN(ids_H1PO4B,L,NY,NX)
+    trcsa_solml(idsa_H3PO4B,L,NY,NX)=CH3PU(L,NY,NX)*VLWatMicP(L,NY,NX)*trcs_VLN(ids_H1PO4B,L,NY,NX)
+    trcsa_solml(idsa_FeHPO4B,L,NY,NX)=CF1PU(L,NY,NX)*VLWatMicP(L,NY,NX)*trcs_VLN(ids_H1PO4B,L,NY,NX)
+    trcsa_solml(idsa_FeH2PO4B,L,NY,NX)=CF2PU(L,NY,NX)*VLWatMicP(L,NY,NX)*trcs_VLN(ids_H1PO4B,L,NY,NX)
+    trcsa_solml(idsa_CaPO4B,L,NY,NX)=CC0PU(L,NY,NX)*VLWatMicP(L,NY,NX)*trcs_VLN(ids_H1PO4B,L,NY,NX)
+    trcsa_solml(idsa_CaHPO4B,L,NY,NX)=CC1PU(L,NY,NX)*VLWatMicP(L,NY,NX)*trcs_VLN(ids_H1PO4B,L,NY,NX)
+    trcsa_solml(idsa_CaH2PO4B,L,NY,NX)=CC2PU(L,NY,NX)*VLWatMicP(L,NY,NX)*trcs_VLN(ids_H1PO4B,L,NY,NX)
+    trcsa_solml(idsa_MgHPO4B,L,NY,NX)=CM1PU(L,NY,NX)*VLWatMicP(L,NY,NX)*trcs_VLN(ids_H1PO4B,L,NY,NX)
 !
 !     INITIAL STATE VARIABLES FOR ALL MATERIAL IN SOIL MACROPORES
 !
@@ -475,44 +475,44 @@ module StarteMod
 !
 !     INITIAL STATE VARIABLES FOR EXCHANGEABLE CATIONS AND ANIONS
 !
-    trcx_solml(idx_NH4,L,NY,NX)=solutevar%XN41*BKVL(L,NY,NX)*trcs_VLN(ids_NH4,L,NY,NX)
-    trcx_solml(idx_NH4B,L,NY,NX)=solutevar%XN41*BKVL(L,NY,NX)*trcs_VLN(ids_NH4B,L,NY,NX)
-    trcx_solml(idx_Hp,L,NY,NX)=solutevar%XHY1*BKVL(L,NY,NX)
-    trcx_solml(idx_Al,L,NY,NX)=solutevar%XAL1*BKVL(L,NY,NX)
-    trcx_solml(idx_Fe,L,NY,NX)=solutevar%XFE1*BKVL(L,NY,NX)
-    trcx_solml(idx_Ca,L,NY,NX)=solutevar%XCA1*BKVL(L,NY,NX)
-    trcx_solml(idx_Mg,L,NY,NX)=solutevar%XMG1*BKVL(L,NY,NX)
-    trcx_solml(idx_Na,L,NY,NX)=solutevar%XNA1*BKVL(L,NY,NX)
-    trcx_solml(idx_K,L,NY,NX)=solutevar%XKA1*BKVL(L,NY,NX)
-    trcx_solml(idx_COOH,L,NY,NX)=solutevar%XHC1*BKVL(L,NY,NX)
-    trcx_solml(idx_AlOH2,L,NY,NX)=solutevar%XALO21*BKVL(L,NY,NX)
-    trcx_solml(idx_FeOH2,L,NY,NX)=solutevar%XFEO21*BKVL(L,NY,NX)
-    trcx_solml(idx_OHe,L,NY,NX)=solutevar%XOH01*BKVL(L,NY,NX)*trcs_VLN(ids_H1PO4,L,NY,NX)
-    trcx_solml(idx_OH,L,NY,NX)=solutevar%XOH11*BKVL(L,NY,NX)*trcs_VLN(ids_H1PO4,L,NY,NX)
-    trcx_solml(idx_OHp,L,NY,NX)=solutevar%XOH21*BKVL(L,NY,NX)*trcs_VLN(ids_H1PO4,L,NY,NX)
-    trcx_solml(idx_HPO4,L,NY,NX)=solutevar%XH1P1*BKVL(L,NY,NX)*trcs_VLN(ids_H1PO4,L,NY,NX)
-    trcx_solml(idx_H2PO4,L,NY,NX)=solutevar%XH2P1*BKVL(L,NY,NX)*trcs_VLN(ids_H1PO4,L,NY,NX)
-    trcx_solml(idx_OHeB,L,NY,NX)=solutevar%XOH01*BKVL(L,NY,NX)*trcs_VLN(ids_H1PO4B,L,NY,NX)
-    trcx_solml(idx_OHB,L,NY,NX)=solutevar%XOH11*BKVL(L,NY,NX)*trcs_VLN(ids_H1PO4B,L,NY,NX)
-    trcx_solml(idx_OHpB,L,NY,NX)=solutevar%XOH21*BKVL(L,NY,NX)*trcs_VLN(ids_H1PO4B,L,NY,NX)
-    trcx_solml(idx_HPO4B,L,NY,NX)=solutevar%XH1P1*BKVL(L,NY,NX)*trcs_VLN(ids_H1PO4B,L,NY,NX)
-    trcx_solml(idx_H2PO4B,L,NY,NX)=solutevar%XH2P1*BKVL(L,NY,NX)*trcs_VLN(ids_H1PO4B,L,NY,NX)
+    trcx_solml(idx_NH4,L,NY,NX)=solutevar%XN41*SoilMicPMassLayer(L,NY,NX)*trcs_VLN(ids_NH4,L,NY,NX)
+    trcx_solml(idx_NH4B,L,NY,NX)=solutevar%XN41*SoilMicPMassLayer(L,NY,NX)*trcs_VLN(ids_NH4B,L,NY,NX)
+    trcx_solml(idx_Hp,L,NY,NX)=solutevar%XHY1*SoilMicPMassLayer(L,NY,NX)
+    trcx_solml(idx_Al,L,NY,NX)=solutevar%XAL1*SoilMicPMassLayer(L,NY,NX)
+    trcx_solml(idx_Fe,L,NY,NX)=solutevar%XFE1*SoilMicPMassLayer(L,NY,NX)
+    trcx_solml(idx_Ca,L,NY,NX)=solutevar%XCA1*SoilMicPMassLayer(L,NY,NX)
+    trcx_solml(idx_Mg,L,NY,NX)=solutevar%XMG1*SoilMicPMassLayer(L,NY,NX)
+    trcx_solml(idx_Na,L,NY,NX)=solutevar%XNA1*SoilMicPMassLayer(L,NY,NX)
+    trcx_solml(idx_K,L,NY,NX)=solutevar%XKA1*SoilMicPMassLayer(L,NY,NX)
+    trcx_solml(idx_COOH,L,NY,NX)=solutevar%XHC1*SoilMicPMassLayer(L,NY,NX)
+    trcx_solml(idx_AlOH2,L,NY,NX)=solutevar%XALO21*SoilMicPMassLayer(L,NY,NX)
+    trcx_solml(idx_FeOH2,L,NY,NX)=solutevar%XFEO21*SoilMicPMassLayer(L,NY,NX)
+    trcx_solml(idx_OHe,L,NY,NX)=solutevar%XOH01*SoilMicPMassLayer(L,NY,NX)*trcs_VLN(ids_H1PO4,L,NY,NX)
+    trcx_solml(idx_OH,L,NY,NX)=solutevar%XOH11*SoilMicPMassLayer(L,NY,NX)*trcs_VLN(ids_H1PO4,L,NY,NX)
+    trcx_solml(idx_OHp,L,NY,NX)=solutevar%XOH21*SoilMicPMassLayer(L,NY,NX)*trcs_VLN(ids_H1PO4,L,NY,NX)
+    trcx_solml(idx_HPO4,L,NY,NX)=solutevar%XH1P1*SoilMicPMassLayer(L,NY,NX)*trcs_VLN(ids_H1PO4,L,NY,NX)
+    trcx_solml(idx_H2PO4,L,NY,NX)=solutevar%XH2P1*SoilMicPMassLayer(L,NY,NX)*trcs_VLN(ids_H1PO4,L,NY,NX)
+    trcx_solml(idx_OHeB,L,NY,NX)=solutevar%XOH01*SoilMicPMassLayer(L,NY,NX)*trcs_VLN(ids_H1PO4B,L,NY,NX)
+    trcx_solml(idx_OHB,L,NY,NX)=solutevar%XOH11*SoilMicPMassLayer(L,NY,NX)*trcs_VLN(ids_H1PO4B,L,NY,NX)
+    trcx_solml(idx_OHpB,L,NY,NX)=solutevar%XOH21*SoilMicPMassLayer(L,NY,NX)*trcs_VLN(ids_H1PO4B,L,NY,NX)
+    trcx_solml(idx_HPO4B,L,NY,NX)=solutevar%XH1P1*SoilMicPMassLayer(L,NY,NX)*trcs_VLN(ids_H1PO4B,L,NY,NX)
+    trcx_solml(idx_H2PO4B,L,NY,NX)=solutevar%XH2P1*SoilMicPMassLayer(L,NY,NX)*trcs_VLN(ids_H1PO4B,L,NY,NX)
 !
 !     INITIAL STATE VARIABLES FOR PRECIPITATES
 !
-    trcp_salml(idsp_AlOH3,L,NY,NX)=solutevar%PALOH1*BKVL(L,NY,NX)
-    trcp_salml(idsp_FeOH3,L,NY,NX)=solutevar%PFEOH1*BKVL(L,NY,NX)
-    trcp_salml(idsp_CaCO3,L,NY,NX)=solutevar%PCACO1*BKVL(L,NY,NX)
-    trcp_salml(idsp_CaSO4,L,NY,NX)=solutevar%PCASO1*BKVL(L,NY,NX)
-    trcp_salml(idsp_AlPO4,L,NY,NX)=solutevar%PALPO1*BKVL(L,NY,NX)*trcs_VLN(ids_H1PO4,L,NY,NX)
-    trcp_salml(idsp_FePO4,L,NY,NX)=solutevar%PFEPO1*BKVL(L,NY,NX)*trcs_VLN(ids_H1PO4,L,NY,NX)
-    trcp_salml(idsp_CaHPO4,L,NY,NX)=solutevar%PCAPD1*BKVL(L,NY,NX)*trcs_VLN(ids_H1PO4,L,NY,NX)
-    trcp_salml(idsp_HA,L,NY,NX)=solutevar%PCAPH1*BKVL(L,NY,NX)*trcs_VLN(ids_H1PO4,L,NY,NX)
+    trcp_salml(idsp_AlOH3,L,NY,NX)=solutevar%PALOH1*SoilMicPMassLayer(L,NY,NX)
+    trcp_salml(idsp_FeOH3,L,NY,NX)=solutevar%PFEOH1*SoilMicPMassLayer(L,NY,NX)
+    trcp_salml(idsp_CaCO3,L,NY,NX)=solutevar%PCACO1*SoilMicPMassLayer(L,NY,NX)
+    trcp_salml(idsp_CaSO4,L,NY,NX)=solutevar%PCASO1*SoilMicPMassLayer(L,NY,NX)
+    trcp_salml(idsp_AlPO4,L,NY,NX)=solutevar%PALPO1*SoilMicPMassLayer(L,NY,NX)*trcs_VLN(ids_H1PO4,L,NY,NX)
+    trcp_salml(idsp_FePO4,L,NY,NX)=solutevar%PFEPO1*SoilMicPMassLayer(L,NY,NX)*trcs_VLN(ids_H1PO4,L,NY,NX)
+    trcp_salml(idsp_CaHPO4,L,NY,NX)=solutevar%PCAPD1*SoilMicPMassLayer(L,NY,NX)*trcs_VLN(ids_H1PO4,L,NY,NX)
+    trcp_salml(idsp_HA,L,NY,NX)=solutevar%PCAPH1*SoilMicPMassLayer(L,NY,NX)*trcs_VLN(ids_H1PO4,L,NY,NX)
     trcp_salml(idsp_CaH2PO4,L,NY,NX)=0._r8
-    trcp_salml(idsp_AlPO4B,L,NY,NX)=solutevar%PALPO1*BKVL(L,NY,NX)*trcs_VLN(ids_H1PO4B,L,NY,NX)
-    trcp_salml(idsp_FePO4B,L,NY,NX)=solutevar%PFEPO1*BKVL(L,NY,NX)*trcs_VLN(ids_H1PO4B,L,NY,NX)
-    trcp_salml(idsp_CaHPO4B,L,NY,NX)=solutevar%PCAPD1*BKVL(L,NY,NX)*trcs_VLN(ids_H1PO4B,L,NY,NX)
-    trcp_salml(idsp_HAB,L,NY,NX)=solutevar%PCAPH1*BKVL(L,NY,NX)*trcs_VLN(ids_H1PO4B,L,NY,NX)
+    trcp_salml(idsp_AlPO4B,L,NY,NX)=solutevar%PALPO1*SoilMicPMassLayer(L,NY,NX)*trcs_VLN(ids_H1PO4B,L,NY,NX)
+    trcp_salml(idsp_FePO4B,L,NY,NX)=solutevar%PFEPO1*SoilMicPMassLayer(L,NY,NX)*trcs_VLN(ids_H1PO4B,L,NY,NX)
+    trcp_salml(idsp_CaHPO4B,L,NY,NX)=solutevar%PCAPD1*SoilMicPMassLayer(L,NY,NX)*trcs_VLN(ids_H1PO4B,L,NY,NX)
+    trcp_salml(idsp_HAB,L,NY,NX)=solutevar%PCAPH1*SoilMicPMassLayer(L,NY,NX)*trcs_VLN(ids_H1PO4B,L,NY,NX)
     trcp_salml(idsp_CaH2PO4B,L,NY,NX)=0._r8
     ECND(L,NY,NX)=0._r8
     CSTR(L,NY,NX)=0._r8
@@ -565,7 +565,7 @@ module StarteMod
 !
     D9985: DO L=1,JS
       IF(VHCPW(L,NY,NX).GT.VHCPWX(NY,NX))THEN
-        VOLWW=VOLWSL(L,NY,NX)+VOLSSL(L,NY,NX)+VOLISL(L,NY,NX)*DENSI
+        VOLWW=VOLWSL(L,NY,NX)+VOLSSL(L,NY,NX)+VOLISL(L,NY,NX)*DENSICE
         trcg_solsml(idg_CO2,L,NY,NX)=VOLWW*CCOR(NY,NX)
         trcg_solsml(idg_CH4,L,NY,NX)=VOLWW*CCHR(NY,NX)
         trcg_solsml(idg_O2,L,NY,NX)=VOLWW*COXR(NY,NX)

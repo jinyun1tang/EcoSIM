@@ -74,16 +74,16 @@ module RedistMod
   integer, intent(in) :: NHW,NHE,NVN,NVS
 
   integer :: NY,NX,L,LG
-  real(r8) :: DORGC(JZ,JY,JX),DViceMicP(JZ,JY,JX)
+  real(r8) :: DORGC(JZ,JY,JX),DVLiceMicP(JZ,JY,JX)
   real(r8) :: TXCO2(JY,JX),DORGE(JY,JX)
-  real(r8) :: UDViceMicP,UDLYXF
+  real(r8) :: UDVLiceMicP,UDLYXF
   real(r8) :: VOLISO,VOLPT,VOLTT
   real(r8) :: TFLWT
 !     execution begins here
   curday=I
   curhour=J
   VOLISO=0.0_r8
-  UDViceMicP=0.0_r8
+  UDVLiceMicP=0.0_r8
   UDLYXF=0.0_r8
   TFLWT=0.0_r8
   VOLPT=0.0_r8
@@ -127,12 +127,12 @@ module RedistMod
 !
       call CalcLitterLayerChemicalMass(NY,NX)
 !
-      call UpdateChemInSoilLayers(NY,NX,LG,VOLISO,DORGC,DViceMicP,TXCO2,DORGE)
+      call UpdateChemInSoilLayers(NY,NX,LG,VOLISO,DORGC,DVLiceMicP,TXCO2,DORGE)
 !
 !     SNOWPACK LAYERING
       call SnowpackLayering(NY,NX)
 
-      call RelayerSoilProfile(NY,NX,DORGC,DViceMicP,UDViceMicP,UDLYXF)
+      call RelayerSoilProfile(NY,NX,DORGC,DVLiceMicP,UDVLiceMicP,UDLYXF)
 
       call UpdateOutputVars(I,J,NY,NX,TXCO2)
 !
@@ -158,7 +158,7 @@ module RedistMod
   implicit none
   integer, intent(in) :: I,J,NY,NX
   real(r8), intent(in) :: TXCO2(JY,JX)
-  real(r8) :: VSoilPoreMicPX,VOLTX
+  real(r8) :: VLSoilPoreMicPX,VOLTX
   integer  :: L
   TRN(NY,NX)=TRN(NY,NX)+HEATI(NY,NX)
   TLE(NY,NX)=TLE(NY,NX)+HEATE(NY,NX)
@@ -174,7 +174,7 @@ module RedistMod
     -UDOCQ(NY,NX)-UDICQ(NY,NX)-UDOCD(NY,NX)-UDICD(NY,NX)+TXCO2(NY,NX)
   IF(NU(NY,NX).GT.NUI(NY,NX))THEN  !the surface is lowered
     DO L=NUI(NY,NX),NU(NY,NX)-1
-      IF(VSoilPoreMicP(L,NY,NX).LE.ZEROS2(NY,NX))THEN
+      IF(VLSoilPoreMicP(L,NY,NX).LE.ZEROS2(NY,NX))THEN
         TKS(L,NY,NX)=TKS(NU(NY,NX),NY,NX)
         TCS(L,NY,NX)=units%Kelvin2Celcius(TKS(L,NY,NX))
       ENDIF
@@ -190,17 +190,17 @@ module RedistMod
   !
   !     OUTPUT FOR SOIL WATER, ICE CONTENTS
   !
-  THETWZ(0,NY,NX)=AZMAX1((VWatMicP(0,NY,NX)-VWatLitrX(NY,NX))/AREA(3,0,NY,NX))
-  THETIZ(0,NY,NX)=AZMAX1((ViceMicP(0,NY,NX)-VWatLitrX(NY,NX))/AREA(3,0,NY,NX))
-  !THETWZ(0,NY,NX)=AZMAX1(AMIN1(1.0,VWatMicP(0,NY,NX)/VLitR(NY,NX)))
-  !THETIZ(0,NY,NX)=AZMAX1(AMIN1(1.0,ViceMicP(0,NY,NX)/VLitR(NY,NX)))
+  THETWZ(0,NY,NX)=AZMAX1((VLWatMicP(0,NY,NX)-VWatLitrX(NY,NX))/AREA(3,0,NY,NX))
+  THETIZ(0,NY,NX)=AZMAX1((VLiceMicP(0,NY,NX)-VWatLitrX(NY,NX))/AREA(3,0,NY,NX))
+  !THETWZ(0,NY,NX)=AZMAX1(AMIN1(1.0,VLWatMicP(0,NY,NX)/VLitR(NY,NX)))
+  !THETIZ(0,NY,NX)=AZMAX1(AMIN1(1.0,VLiceMicP(0,NY,NX)/VLitR(NY,NX)))
   D9945: DO L=NUI(NY,NX),NL(NY,NX)
-    VSoilPoreMicPX=AREA(3,L,NY,NX)*DLYR(3,L,NY,NX)*FMPR(L,NY,NX)
-    VOLTX=VSoilPoreMicPX+VAirMacP(L,NY,NX)
-    THETWZ(L,NY,NX)=safe_adb(VWatMicP(L,NY,NX)+AMIN1(VAirMacP(L,NY,NX),&
-      VWatMacP(L,NY,NX)),VOLTX)
-    THETIZ(L,NY,NX)=safe_adb(ViceMicP(L,NY,NX)+AMIN1(VAirMacP(L,NY,NX) &
-        ,ViceMacP(L,NY,NX)),VOLTX)
+    VLSoilPoreMicPX=AREA(3,L,NY,NX)*DLYR(3,L,NY,NX)*FMPR(L,NY,NX)
+    VOLTX=VLSoilPoreMicPX+VLMacP(L,NY,NX)
+    THETWZ(L,NY,NX)=safe_adb(VLWatMicP(L,NY,NX)+AMIN1(VLMacP(L,NY,NX),&
+      VLWatMacP(L,NY,NX)),VOLTX)
+    THETIZ(L,NY,NX)=safe_adb(VLiceMicP(L,NY,NX)+AMIN1(VLMacP(L,NY,NX) &
+        ,VLiceMacP(L,NY,NX)),VOLTX)
   ENDDO D9945
   end subroutine UpdateOutputVars
 
@@ -221,10 +221,10 @@ module RedistMod
   !     CUMULATIVE SUMS OF ALL ADDITIONS AND REMOVALS
   !
   DO  L=1,JS
-    WS=VOLSSL(L,NY,NX)+VOLWSL(L,NY,NX)+VOLISL(L,NY,NX)*DENSI
+    WS=VOLSSL(L,NY,NX)+VOLWSL(L,NY,NX)+VOLISL(L,NY,NX)*DENSICE
 
     VOLWSO=VOLWSO+WS
-    UVWatMicP(NY,NX)=UVWatMicP(NY,NX)+WS
+    UVLWatMicP(NY,NX)=UVLWatMicP(NY,NX)+WS
     ENGYW=VHCPW(L,NY,NX)*TKW(L,NY,NX)
     HEATSO=HEATSO+ENGYW
     TLCO2G=TLCO2G+trcg_solsml(idg_CO2,L,NY,NX)+trcg_solsml(idg_CH4,L,NY,NX)
@@ -327,7 +327,7 @@ module RedistMod
   real(r8) :: PI,PXB
   real(r8) :: SIN,SGN,SIP,SNB
   real(r8) :: SPB,SNM0,SPM0,SIR,SII,SBU
-  real(r8) :: VHCPZ,VHCPY,VHCPO,VHCPXX
+  real(r8) :: VHeatCapacityLitrX,VHCPY,VHCPO
   real(r8) :: WI,WO
   real(r8) :: ZSI,ZXB,ZGI
   real(r8) :: ZNGGIN,ZN2OIN,ZNH3IN
@@ -337,17 +337,17 @@ module RedistMod
   ! CALCULATE SURFACE RESIDUE TEMPERATURE FROM ITS CHANGE
   ! IN HEAT STORAGE
   !
-  VHCPZ=VHeatCapacity(0,NY,NX)             !old heat capacity
-  VHCPY=cpw*VWatMicP(0,NY,NX)+cpi*ViceMicP(0,NY,NX)+cpo*ORGC(0,NY,NX) !new heat capacity
-  VHCPO=VHCPY-VHCPZ               !change in heat capacity
-  HFLXO=VHCPO*TairK(NY,NX)          !TairK: air temperature in kelvin, hflxo represents incoming heat
-  !update water and ice content in residue
-  VWatMicP(0,NY,NX)=max(VWatMicP(0,NY,NX)+FLWR(NY,NX)+THAWR(NY,NX)+TQR(NY,NX),0._r8)
-  ViceMicP(0,NY,NX)=max(ViceMicP(0,NY,NX)-THAWR(NY,NX)/DENSI,0._r8)
-  ENGYZ=VHCPZ*TKS(0,NY,NX)
-  !update heat caapcity
-  VHCPXX=VHeatCapacity(0,NY,NX)
-  VHeatCapacity(0,NY,NX)=cpo*ORGC(0,NY,NX)+cpw*VWatMicP(0,NY,NX)+cpi*ViceMicP(0,NY,NX)
+  VHeatCapacityLitrX=VHeatCapacity(0,NY,NX)             !old heat capacity
+  VHCPY=cpw*VLWatMicP(0,NY,NX)+cpi*VLiceMicP(0,NY,NX)+cpo*ORGC(0,NY,NX) !current heat capacity
+  VHCPO=VHCPY-VHeatCapacityLitrX                        !change in heat capacity
+  HFLXO=VHCPO*TairK(NY,NX)                              !TairK: air temperature in kelvin, hflxo represents incoming heat
+  ENGYZ=VHeatCapacityLitrX*TKS(0,NY,NX)
+
+  !update water, ice content and heat capacity of residue
+  VLWatMicP(0,NY,NX)=AZMAX1(VLWatMicP(0,NY,NX)+FLWR(NY,NX)+THAWR(NY,NX)+TQR(NY,NX))
+  VLiceMicP(0,NY,NX)=AZMAX1(VLiceMicP(0,NY,NX)-THAWR(NY,NX)/DENSICE)
+  VHeatCapacity(0,NY,NX)=cpo*ORGC(0,NY,NX)+cpw*VLWatMicP(0,NY,NX)+cpi*VLiceMicP(0,NY,NX)
+
   IF(VHeatCapacity(0,NY,NX).GT.VHCPRX(NY,NX))THEN
     !when there are still significant heat capacity of the residual layer
     tkspre=TKS(0,NY,NX)
@@ -356,7 +356,7 @@ module RedistMod
     HEATIN=HEATIN+HFLXO
     Ls=NUM(NY,NX)
     !if(curday>=175)write(*,*)'at line',__LINE__,TKS(0,NY,NX),tks(Ls,ny,nx),tkspre
-    if(abs(VHeatCapacity(0,NY,NX)/VHCPXX-1._r8)>0.025_r8.or. &
+    if(abs(VHeatCapacity(0,NY,NX)/VHeatCapacityLitrX-1._r8)>0.025_r8.or. &
       abs(TKS(0,NY,NX)/tkspre-1._r8)>0.025_r8)then
       TKS(0,NY,NX)=TKS(NUM(NY,NX),NY,NX)
     endif
@@ -364,11 +364,12 @@ module RedistMod
     HEATIN=HEATIN+HFLXO+(TKS(NUM(NY,NX),NY,NX)-TKS(0,NY,NX))*VHeatCapacity(0,NY,NX)
     TKS(0,NY,NX)=TKS(NUM(NY,NX),NY,NX)
   ENDIF
+  
   ENGYR=VHeatCapacity(0,NY,NX)*TKS(0,NY,NX)
   HEATSO=HEATSO+ENGYR
   HEATIN=HEATIN+HTHAWR(NY,NX)
   TCS(0,NY,NX)=units%Kelvin2Celcius(TKS(0,NY,NX))
-  !     UVWatMicP(NY,NX)=UVWatMicP(NY,NX)-VWatMicP(0,NY,NX)-ViceMicP(0,NY,NX)*DENSI
+  !     UVLWatMicP(NY,NX)=UVLWatMicP(NY,NX)-VLWatMicP(0,NY,NX)-VLiceMicP(0,NY,NX)*DENSICE
   !
   !     SURFACE BOUNDARY WATER FLUXES
   !
@@ -869,9 +870,9 @@ module RedistMod
   URSDN(NY,NX)=URSDN(NY,NX)+DN
   TLRSDP=TLRSDP+DP
   URSDP(NY,NX)=URSDP(NY,NX)+DP
-  WS=TVOLWC(NY,NX)+TVOLWP(NY,NX)+VWatMicP(0,NY,NX)+ViceMicP(0,NY,NX)*DENSI
+  WS=TVOLWC(NY,NX)+TVOLWP(NY,NX)+VLWatMicP(0,NY,NX)+VLiceMicP(0,NY,NX)*DENSICE
   VOLWSO=VOLWSO+WS
-  UVWatMicP(NY,NX)=UVWatMicP(NY,NX)+WS
+  UVLWatMicP(NY,NX)=UVLWatMicP(NY,NX)+WS
   HEATSO=HEATSO+TENGYC(NY,NX)
   CS=trc_solml(idg_CO2,0,NY,NX)+trc_solml(idg_CH4,0,NY,NX)
   TLCO2G=TLCO2G+CS
@@ -950,19 +951,19 @@ module RedistMod
   UION(NY,NX)=UION(NY,NX)+SSS
   end subroutine UpdateSurfaceLayerSalt
 !------------------------------------------------------------------------------------------
-  subroutine update_physVar_Profile(NY,NX,VOLISO,DViceMicP)    
+  subroutine update_physVar_Profile(NY,NX,VOLISO,DVLiceMicP)    
   !     WATER, ICE, HEAT, TEMPERATUR
   !
   implicit none
   integer, intent(in) :: NY,NX
   real(r8), intent(inout) :: VOLISO  
-  REAL(R8),INTENT(OUT) :: DViceMicP(JZ,JY,JX)  !change in ice volume
+  REAL(R8),INTENT(OUT) :: DVLiceMicP(JZ,JY,JX)  !change in ice volume
   real(r8) :: TKS00,TKSX
   real(r8) :: ENGY
   real(r8) :: TVHeatCapacity
   real(r8) :: TVHeatCapacitySoilM,TVOLW,TVOLWH,TVOLI,TVOLIH,TENGY
-  real(r8) :: VOLWXX,VOLIXX,VHCPX,WS
-  real(r8) :: DVWatMicP(JZ,JY,JX)   !change in water volume
+  real(r8) :: VOLWXX,VOLIXX,VHeatCapacityX,WS
+  real(r8) :: DVLWatMicP(JZ,JY,JX)   !change in water volume
   integer :: L
 
   TVHeatCapacity=0.0_r8
@@ -975,47 +976,47 @@ module RedistMod
   DO L=NU(NY,NX),NL(NY,NX)
 
     TKSX=TKS(L,NY,NX)
-    VHCPX=VHeatCapacity(L,NY,NX)
-    VOLWXX=VWatMicP(L,NY,NX)
-    VOLIXX=ViceMicP(L,NY,NX)
+    VHeatCapacityX=VHeatCapacity(L,NY,NX)
+    VOLWXX=VLWatMicP(L,NY,NX)
+    VOLIXX=VLiceMicP(L,NY,NX)
     !micropore
-    VWatMicP(L,NY,NX)=VWatMicP(L,NY,NX)+TWatFlowCellMicP(L,NY,NX)+FINH(L,NY,NX) &
-      +WatFreezeThawMicP(L,NY,NX)+GridPlantRootH2OUptake_vr(L,NY,NX)+FLU(L,NY,NX)
-    VWatMicPX(L,NY,NX)=VWatMicPX(L,NY,NX)+TFLWX(L,NY,NX)+FINH(L,NY,NX) &
-      +WatFreezeThawMicP(L,NY,NX)+GridPlantRootH2OUptake_vr(L,NY,NX)+FLU(L,NY,NX)
+    VLWatMicP(L,NY,NX)=VLWatMicP(L,NY,NX)+TWatFlowCellMicP(L,NY,NX)+FINH(L,NY,NX) &
+      +WatFreezeThawMicP(L,NY,NX)+GridPlantRootH2OUptake_vr(L,NY,NX)+FWatIrrigate2MicP(L,NY,NX)
+    VLWatMicPX(L,NY,NX)=VLWatMicPX(L,NY,NX)+TFLWX(L,NY,NX)+FINH(L,NY,NX) &
+      +WatFreezeThawMicP(L,NY,NX)+GridPlantRootH2OUptake_vr(L,NY,NX)+FWatIrrigate2MicP(L,NY,NX)
 
     !do a numerical correction
-    VWatMicPX(L,NY,NX)=AMIN1(VWatMicP(L,NY,NX),VWatMicPX(L,NY,NX)+0.01_r8*(VWatMicP(L,NY,NX)-VWatMicPX(L,NY,NX)))
-    ViceMicP(L,NY,NX)=ViceMicP(L,NY,NX)-WatFreezeThawMicP(L,NY,NX)/DENSI
+    VLWatMicPX(L,NY,NX)=AMIN1(VLWatMicP(L,NY,NX),VLWatMicPX(L,NY,NX)+0.01_r8*(VLWatMicP(L,NY,NX)-VLWatMicPX(L,NY,NX)))
+    VLiceMicP(L,NY,NX)=VLiceMicP(L,NY,NX)-WatFreezeThawMicP(L,NY,NX)/DENSICE
 
     !micropore
-    VWatMacP(L,NY,NX)=VWatMacP(L,NY,NX)+TWaterFlowMacP(L,NY,NX)-FINH(L,NY,NX)+WatFreezeThawMacP(L,NY,NX)
-    ViceMacP(L,NY,NX)=ViceMacP(L,NY,NX)-WatFreezeThawMacP(L,NY,NX)/DENSI
+    VLWatMacP(L,NY,NX)=VLWatMacP(L,NY,NX)+TWaterFlowMacP(L,NY,NX)-FINH(L,NY,NX)+WatFreezeThawMacP(L,NY,NX)
+    VLiceMacP(L,NY,NX)=VLiceMacP(L,NY,NX)-WatFreezeThawMacP(L,NY,NX)/DENSICE
 
     !volume change
-    DVWatMicP(L,NY,NX)=VWatMicP1(L,NY,NX)+VWatMacP1(L,NY,NX)-VWatMicP(L,NY,NX)-VWatMacP(L,NY,NX)
-    DViceMicP(L,NY,NX)=ViceMicP1(L,NY,NX)+ViceMacP1(L,NY,NX)-ViceMicP(L,NY,NX)-ViceMacP(L,NY,NX)
+    DVLWatMicP(L,NY,NX)=VLWatMicP1(L,NY,NX)+VLWatMacP1(L,NY,NX)-VLWatMicP(L,NY,NX)-VLWatMacP(L,NY,NX)
+    DVLiceMicP(L,NY,NX)=VLiceMicP1(L,NY,NX)+VLiceMacP1(L,NY,NX)-VLiceMicP(L,NY,NX)-VLiceMacP(L,NY,NX)
 
     !update water/ice-unfilled pores
-    IF(BKDS(L,NY,NX).GT.ZERO)THEN
-      VsoiP(L,NY,NX)=AZMAX1(VMicP(L,NY,NX)-VWatMicP(L,NY,NX)-ViceMicP(L,NY,NX) &
-        +VAirMacP(L,NY,NX)-VWatMacP(L,NY,NX)-ViceMacP(L,NY,NX))
+    IF(SoiBulkDensity(L,NY,NX).GT.ZERO)THEN
+      VLsoiAirP(L,NY,NX)=AZMAX1(VLMicP(L,NY,NX)-VLWatMicP(L,NY,NX)-VLiceMicP(L,NY,NX) &
+        +VLMacP(L,NY,NX)-VLWatMacP(L,NY,NX)-VLiceMacP(L,NY,NX))
     ELSE
-      VsoiP(L,NY,NX)=0.0_r8
-!     VMicP(L,NY,NX)=VWatMicP(L,NY,NX)+ViceMicP(L,NY,NX)
-!    2+DVWatMicP(L,NY,NX)+DViceMicP(L,NY,NX)
-!     VSoilPoreMicP(L,NY,NX)=VMicP(L,NY,NX)
-!     VOLT(L,NY,NX)=VMicP(L,NY,NX)
+      VLsoiAirP(L,NY,NX)=0.0_r8
+!     VLMicP(L,NY,NX)=VLWatMicP(L,NY,NX)+VLiceMicP(L,NY,NX)
+!    2+DVLWatMicP(L,NY,NX)+DVLiceMicP(L,NY,NX)
+!     VLSoilPoreMicP(L,NY,NX)=VLMicP(L,NY,NX)
+!     VGeomLayer(L,NY,NX)=VLMicP(L,NY,NX)
     ENDIF
-    ENGY=VHCPX*TKSX
-    VHeatCapacity(L,NY,NX)=VHeatCapacitySoilM(L,NY,NX)+cpw*(VWatMicP(L,NY,NX)+VWatMacP(L,NY,NX)) &
-      +cpi*(ViceMicP(L,NY,NX)+ViceMacP(L,NY,NX))
+    ENGY=VHeatCapacityX*TKSX
+    VHeatCapacity(L,NY,NX)=VHeatCapacitySoilM(L,NY,NX)+cpw*(VLWatMicP(L,NY,NX)+VLWatMacP(L,NY,NX)) &
+      +cpi*(VLiceMicP(L,NY,NX)+VLiceMacP(L,NY,NX))
     TVHeatCapacity=TVHeatCapacity+VHeatCapacity(L,NY,NX)
     TVHeatCapacitySoilM=TVHeatCapacitySoilM+VHeatCapacitySoilM(L,NY,NX)
-    TVOLW=TVOLW+VWatMicP(L,NY,NX)
-    TVOLWH=TVOLWH+VWatMacP(L,NY,NX)
-    TVOLI=TVOLI+ViceMicP(L,NY,NX)
-    TVOLIH=TVOLIH+ViceMacP(L,NY,NX)
+    TVOLW=TVOLW+VLWatMicP(L,NY,NX)
+    TVOLWH=TVOLWH+VLWatMacP(L,NY,NX)
+    TVOLI=TVOLI+VLiceMicP(L,NY,NX)
+    TVOLIH=TVOLIH+VLiceMacP(L,NY,NX)
     TENGY=TENGY+ENGY
     !
     !     ARTIFICIAL SOIL WARMING
@@ -1046,9 +1047,10 @@ module RedistMod
           HeatIrrigation(L,NY,NX)/VHeatCapacity(L,NY,NX),VHeatCapacity(L,NY,NX)
         write(111,*)ENGY,THeatFlowSoiCell(L,NY,NX),THeatFrezThaw(L,NY,NX), &
           THeatRootUptake(L,NY,NX),HeatIrrigation(L,NY,NX)
-        write(111,*)'heatcap comp',VHeatCapacitySoilM(L,NY,NX),cpw*(VWatMicP(L,NY,NX)+VWatMacP(L,NY,NX)), &
-          cpi*(ViceMicP(L,NY,NX)+ViceMacP(L,NY,NX))  
-        write(111,*)'dwatv dicev',DVWatMicP(L,NY,NX),DViceMicP(L,NY,NX)  
+        write(111,*)'heatcap comp',VHeatCapacityX,VHeatCapacitySoilM(L,NY,NX),&
+          cpw*(VLWatMicP(L,NY,NX)+VLWatMacP(L,NY,NX)), &
+          cpi*(VLiceMicP(L,NY,NX)+VLiceMacP(L,NY,NX))  
+        write(111,*)'dwatv dicev',DVLWatMicP(L,NY,NX),DVLiceMicP(L,NY,NX)  
       endif
       if(L==1.and.abs(TKS(L,NY,NX)/TKS00-1._r8)>0.025_r8)then
         TKS(L,NY,NX)=TKS00
@@ -1059,23 +1061,23 @@ module RedistMod
     if(L==2 .and. TKS(L,NY,NX)>400.)&
       print*,'update_physVar_Profile',NY,NX,TKSX,TKS(L,NY,NX),VHeatCapacity(L,NY,NX)
     TCS(L,NY,NX)=units%Kelvin2Celcius(TKS(L,NY,NX))
-    WS=VWatMicP(L,NY,NX)+VWatMacP(L,NY,NX)+(ViceMicP(L,NY,NX)+ViceMacP(L,NY,NX))*DENSI
+    WS=VLWatMicP(L,NY,NX)+VLWatMacP(L,NY,NX)+(VLiceMicP(L,NY,NX)+VLiceMacP(L,NY,NX))*DENSICE
     VOLWSO=VOLWSO+WS
-    VOLISO=VOLISO+ViceMicP(L,NY,NX)+ViceMacP(L,NY,NX)
-    UVWatMicP(NY,NX)=UVWatMicP(NY,NX)+WS
-!    2-WP(L,NY,NX)*VSoilPoreMicP(L,NY,NX)
+    VOLISO=VOLISO+VLiceMicP(L,NY,NX)+VLiceMacP(L,NY,NX)
+    UVLWatMicP(NY,NX)=UVLWatMicP(NY,NX)+WS
+!    2-WiltPoint(L,NY,NX)*VLSoilPoreMicP(L,NY,NX)
     HEATSO=HEATSO+VHeatCapacity(L,NY,NX)*TKS(L,NY,NX)
   ENDDO
   end subroutine update_physVar_Profile
 !------------------------------------------------------------------------------------------
-  subroutine UpdateChemInSoilLayers(NY,NX,LG,VOLISO,DORGC,DViceMicP,TXCO2,DORGE)
+  subroutine UpdateChemInSoilLayers(NY,NX,LG,VOLISO,DORGC,DVLiceMicP,TXCO2,DORGE)
   !
   use ElmIDMod
   implicit none
   integer, intent(in) :: NY,NX,LG
   real(r8), intent(inout) :: VOLISO
   real(r8),intent(out) :: DORGC(JZ,JY,JX)
-  REAL(R8),INTENT(OUT) :: DViceMicP(JZ,JY,JX)
+  REAL(R8),INTENT(OUT) :: DVLiceMicP(JZ,JY,JX)
   real(r8), intent(inout) :: TXCO2(JY,JX)
   real(r8), intent(in) :: DORGE(JY,JX)
   integer  :: L,K,M,N,LL,NGL,NTX,NTP,NTG,NTS
@@ -1091,7 +1093,7 @@ module RedistMod
   !     begin_execution
   !     UPDATE SOIL LAYER VARIABLES WITH TOTAL FLUXES
   !
-  call update_physVar_Profile(NY,NX,VOLISO,DViceMicP)    
+  call update_physVar_Profile(NY,NX,VOLISO,DVLiceMicP)    
 
   D125: DO L=NU(NY,NX),NL(NY,NX)
     !
@@ -1555,20 +1557,20 @@ module RedistMod
 !
 !     SOIL ELECTRICAL CONDUCTIVITY
 !
-  IF(VWatMicP(L,NY,NX).GT.ZEROS2(NY,NX))THEN
-    ECHY=0.337_r8*AZMAX1(trcsa_solml(idsa_Hp,L,NY,NX)/VWatMicP(L,NY,NX))
-    ECOH=0.192_r8*AZMAX1(trcsa_solml(idsa_OH,L,NY,NX)/VWatMicP(L,NY,NX))
-    ECAL=0.056_r8*AZMAX1(trcsa_solml(idsa_Al,L,NY,NX)*3.0_r8/VWatMicP(L,NY,NX))
-    ECFE=0.051_r8*AZMAX1(trcsa_solml(idsa_Fe,L,NY,NX)*3.0_r8/VWatMicP(L,NY,NX))
-    ECCA=0.060_r8*AZMAX1(trcsa_solml(idsa_Ca,L,NY,NX)*2.0_r8/VWatMicP(L,NY,NX))
-    ECMG=0.053_r8*AZMAX1(trcsa_solml(idsa_Mg,L,NY,NX)*2.0_r8/VWatMicP(L,NY,NX))
-    ECNA=0.050_r8*AZMAX1(trcsa_solml(idsa_Na,L,NY,NX)/VWatMicP(L,NY,NX))
-    ECKA=0.070_r8*AZMAX1(trcsa_solml(idsa_K,L,NY,NX)/VWatMicP(L,NY,NX))
-    ECCO=0.072_r8*AZMAX1(trcsa_solml(idsa_CO3,L,NY,NX)*2.0_r8/VWatMicP(L,NY,NX))
-    ECHC=0.044_r8*AZMAX1(trcsa_solml(idsa_HCO3,L,NY,NX)/VWatMicP(L,NY,NX))
-    ECSO=0.080_r8*AZMAX1(trcsa_solml(idsa_SO4,L,NY,NX)*2.0_r8/VWatMicP(L,NY,NX))
-    ECCL=0.076_r8*AZMAX1(trcsa_solml(idsa_Cl,L,NY,NX)/VWatMicP(L,NY,NX))
-    ECNO=0.071_r8*AZMAX1(trc_solml(ids_NO3,L,NY,NX)/(VWatMicP(L,NY,NX)*natomw))
+  IF(VLWatMicP(L,NY,NX).GT.ZEROS2(NY,NX))THEN
+    ECHY=0.337_r8*AZMAX1(trcsa_solml(idsa_Hp,L,NY,NX)/VLWatMicP(L,NY,NX))
+    ECOH=0.192_r8*AZMAX1(trcsa_solml(idsa_OH,L,NY,NX)/VLWatMicP(L,NY,NX))
+    ECAL=0.056_r8*AZMAX1(trcsa_solml(idsa_Al,L,NY,NX)*3.0_r8/VLWatMicP(L,NY,NX))
+    ECFE=0.051_r8*AZMAX1(trcsa_solml(idsa_Fe,L,NY,NX)*3.0_r8/VLWatMicP(L,NY,NX))
+    ECCA=0.060_r8*AZMAX1(trcsa_solml(idsa_Ca,L,NY,NX)*2.0_r8/VLWatMicP(L,NY,NX))
+    ECMG=0.053_r8*AZMAX1(trcsa_solml(idsa_Mg,L,NY,NX)*2.0_r8/VLWatMicP(L,NY,NX))
+    ECNA=0.050_r8*AZMAX1(trcsa_solml(idsa_Na,L,NY,NX)/VLWatMicP(L,NY,NX))
+    ECKA=0.070_r8*AZMAX1(trcsa_solml(idsa_K,L,NY,NX)/VLWatMicP(L,NY,NX))
+    ECCO=0.072_r8*AZMAX1(trcsa_solml(idsa_CO3,L,NY,NX)*2.0_r8/VLWatMicP(L,NY,NX))
+    ECHC=0.044_r8*AZMAX1(trcsa_solml(idsa_HCO3,L,NY,NX)/VLWatMicP(L,NY,NX))
+    ECSO=0.080_r8*AZMAX1(trcsa_solml(idsa_SO4,L,NY,NX)*2.0_r8/VLWatMicP(L,NY,NX))
+    ECCL=0.076_r8*AZMAX1(trcsa_solml(idsa_Cl,L,NY,NX)/VLWatMicP(L,NY,NX))
+    ECNO=0.071_r8*AZMAX1(trc_solml(ids_NO3,L,NY,NX)/(VLWatMicP(L,NY,NX)*natomw))
     ECND(L,NY,NX)=ECHY+ECOH+ECAL+ECFE+ECCA+ECMG+ECNA+ECKA &
       +ECCO+ECHC+ECSO+ECCL+ECNO
 

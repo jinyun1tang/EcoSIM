@@ -69,7 +69,7 @@ implicit none
     trcg_VOLG(idg_NH3)=trc_gasml(idg_NH3,L,NY,NX)/natomw
     trcg_VOLG(idg_H2)=trc_gasml(idg_H2,L,NY,NX)/2.0_r8
 
-    VTATM=AZMAX1(1.2194E+04_r8*VsoiP(L,NY,NX)/TKS(L,NY,NX))
+    VTATM=AZMAX1(1.2194E+04_r8*VLsoiAirP(L,NY,NX)/TKS(L,NY,NX))
 !   NH3B does not have explicit gas species, so there is an inconsistency
 !   with respect to the actual ebullition calculation, which involves
 !   NH3B
@@ -79,10 +79,10 @@ implicit none
     IF(THETP(L,NY,NX).LT.THETX.OR.VTGAS.GT.VTATM)LX=1
     IF(THETP(L,NY,NX).GE.THETX.AND.LX.EQ.0)LG=L
 
-    VWatMicP1(L,NY,NX)=VWatMicP(L,NY,NX)
-    ViceMicP1(L,NY,NX)=ViceMicP(L,NY,NX)
-    VWatMacP1(L,NY,NX)=VWatMacP(L,NY,NX)
-    ViceMacP1(L,NY,NX)=ViceMacP(L,NY,NX)
+    VLWatMicP1(L,NY,NX)=VLWatMicP(L,NY,NX)
+    VLiceMicP1(L,NY,NX)=VLiceMicP(L,NY,NX)
+    VLWatMacP1(L,NY,NX)=VLWatMacP(L,NY,NX)
+    VLiceMacP1(L,NY,NX)=VLiceMacP(L,NY,NX)
 
 !
   !     NET WATER, HEAT, GAS, SOLUTE, SEDIMENT FLUX
@@ -568,13 +568,13 @@ implicit none
   IF(NCN(N2,N1).NE.3.OR.N.EQ.3)THEN
     D1200: DO LL=N6,NL(N5,N4)
       !modify the dest grid vertical location if needed
-      IF(VSoilPoreMicP(LL,N2,N1).GT.ZEROS2(N2,N1))THEN
+      IF(VLSoilPoreMicP(LL,N2,N1).GT.ZEROS2(N2,N1))THEN
         N6=LL
         exit
       ENDIF
     ENDDO D1200
 
-    IF(VSoilPoreMicP(N3,N2,N1).GT.ZEROS2(N2,N1))THEN
+    IF(VLSoilPoreMicP(N3,N2,N1).GT.ZEROS2(N2,N1))THEN
       IF(N3.EQ.NU(N2,N1).AND.N.EQ.3)THEN
         !vertical direction, source is at soil surface
         TWatFlowCellMicP(N3,N2,N1)=TWatFlowCellMicP(N3,N2,N1)+WaterFlowSoiMicP(N,N3,N2,N1)-LakeSurfFlow(N5,N4)
@@ -603,7 +603,7 @@ implicit none
       !     WRITE(*,6632)'TFLW',I,J,N,N1,N2,N3,N4,N5,N6,NU(N2,N1)
       !    2,TWatFlowCellMicP(N3,N2,N1),WaterFlowSoiMicP(N,N3,N2,N1),WaterFlowSoiMicP(N,N6,N5,N4),LakeSurfFlow(N5,N4)
       !    3,THeatFlowSoiCell(N3,N2,N1),HeatFlow(N,N3,N2,N1),HeatFlow(N,N6,N5,N4)
-      !    2,LakeSurfHeatFlux(N5,N4),VWatMicP(N3,N2,N1)
+      !    2,LakeSurfHeatFlux(N5,N4),VLWatMicP(N3,N2,N1)
 !6632  FORMAT(A8,10I4,12E16.8)
       !     ENDIF
       !

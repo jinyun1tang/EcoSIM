@@ -170,14 +170,14 @@ module InitSOMBGCMOD
       !humus complex
       KK=micpar%k_humus
     ENDIF
-    IF(BKVL(L,NY,NX).GT.ZEROS(NY,NX))THEN
-      OSCI(K)=CORGCX(K)*BKVL(L,NY,NX)
-      OSNI(K)=CORGNX(K)*BKVL(L,NY,NX)
-      OSPI(K)=CORGPX(K)*BKVL(L,NY,NX)
+    IF(SoilMicPMassLayer(L,NY,NX).GT.ZEROS(NY,NX))THEN
+      OSCI(K)=CORGCX(K)*SoilMicPMassLayer(L,NY,NX)
+      OSNI(K)=CORGNX(K)*SoilMicPMassLayer(L,NY,NX)
+      OSPI(K)=CORGPX(K)*SoilMicPMassLayer(L,NY,NX)
     ELSE
-      OSCI(K)=CORGCX(K)*VOLT(L,NY,NX)
-      OSNI(K)=CORGNX(K)*VOLT(L,NY,NX)
-      OSPI(K)=CORGPX(K)*VOLT(L,NY,NX)
+      OSCI(K)=CORGCX(K)*VGeomLayer(L,NY,NX)
+      OSNI(K)=CORGNX(K)*VGeomLayer(L,NY,NX)
+      OSPI(K)=CORGPX(K)*VGeomLayer(L,NY,NX)
     ENDIF
     TOSCK(K)=OMCK(K)+ORCK(K)+OQCK(K)+OHCK(K)
     TOSNK(K)=ORCK(K)*CNRH(K)+OQCK(K)*CNOSCT(KK)+OHCK(K)*CNOSCT(KK)
@@ -197,24 +197,24 @@ module InitSOMBGCMOD
 
   D8995: DO K=1,jcplx
     IF(L.EQ.0)THEN
-      OSCM(K)=DCKR*CORGCX(K)*BKVL(L,NY,NX)
+      OSCM(K)=DCKR*CORGCX(K)*SoilMicPMassLayer(L,NY,NX)
       X=0.0_r8
       KK=K
       FOSCI=1.0
       FOSNI=1.0
       FOSPI=1.0
     ELSE
-      IF(BKVL(L,NY,NX).GT.ZEROS(NY,NX))THEN
+      IF(SoilMicPMassLayer(L,NY,NX).GT.ZEROS(NY,NX))THEN
         IF(K.LE.micpar%n_litrsfk)THEN
-          OSCM(K)=DCKR*CORGCX(K)*BKVL(L,NY,NX)
+          OSCM(K)=DCKR*CORGCX(K)*SoilMicPMassLayer(L,NY,NX)
         ELSE
-          OSCM(K)=FCX*CORGCX(K)*BKVL(L,NY,NX)*DCKM/(CORGCX(k_humus)+DCKM)
+          OSCM(K)=FCX*CORGCX(K)*SoilMicPMassLayer(L,NY,NX)*DCKM/(CORGCX(k_humus)+DCKM)
         ENDIF
       ELSE
         IF(K.LE.micpar%n_litrsfk)THEN
-          OSCM(K)=DCKR*CORGCX(K)*VOLT(L,NY,NX)
+          OSCM(K)=DCKR*CORGCX(K)*VGeomLayer(L,NY,NX)
         ELSE
-          OSCM(K)=FCX*CORGCX(K)*VOLT(L,NY,NX)*DCKM/(CORGCX(k_humus)+DCKM)
+          OSCM(K)=FCX*CORGCX(K)*VGeomLayer(L,NY,NX)*DCKM/(CORGCX(k_humus)+DCKM)
         ENDIF
       ENDIF
       X=1.0_r8
@@ -681,7 +681,7 @@ module InitSOMBGCMOD
   ENDIF
 
   IF(L.GT.0)THEN
-    IF(BKDS(L,NY,NX).GT.ZERO)THEN
+    IF(SoiBulkDensity(L,NY,NX).GT.ZERO)THEN
       CORGCM=AMIN1(orgcden,(CORGCX(1)+CORGCX(2)+CORGCX(3)+CORGCX(k_humus)))/0.55_r8
     else
       CORGCM=0._r8
@@ -732,13 +732,13 @@ module InitSOMBGCMOD
     CNRH    => micpar%CNRH     , &
     CPRH    => micpar%CPRH       &
   )
-  IF(BKVL(L,NY,NX).GT.ZEROS(NY,NX))THEN
-    scal=AREA(3,L,NY,NX)/BKVL(L,NY,NX)
+  IF(SoilMicPMassLayer(L,NY,NX).GT.ZEROS(NY,NX))THEN
+    scal=AREA(3,L,NY,NX)/SoilMicPMassLayer(L,NY,NX)
     CORGCX(1:n_litrsfk)=RSC(1:n_litrsfk,L,NY,NX)*scal
     CORGNX(1:n_litrsfk)=RSN(1:n_litrsfk,L,NY,NX)*scal
     CORGPX(1:n_litrsfk)=RSP(1:n_litrsfk,L,NY,NX)*scal
   ELSE
-    scal=AREA(3,L,NY,NX)/VOLT(L,NY,NX)
+    scal=AREA(3,L,NY,NX)/VGeomLayer(L,NY,NX)
     CORGCX(1:n_litrsfk)=RSC(1:n_litrsfk,L,NY,NX)*scal
     CORGNX(1:n_litrsfk)=RSN(1:n_litrsfk,L,NY,NX)*scal
     CORGPX(1:n_litrsfk)=RSP(1:n_litrsfk,L,NY,NX)*scal

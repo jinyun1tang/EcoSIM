@@ -113,7 +113,7 @@ module NutUptakeMod
 !     begin_execution
   associate(                             &
     THETW =>  plt_soilchem%THETW   , &
-    VSoilPoreMicP  =>  plt_soilchem%VSoilPoreMicP    , &
+    VLSoilPoreMicP  =>  plt_soilchem%VLSoilPoreMicP    , &
     ZEROS2=>  plt_site%ZEROS2      , &
     NU    =>  plt_site%NU          , &
     ZERO  =>  plt_site%ZERO        , &
@@ -133,7 +133,7 @@ module NutUptakeMod
 
   D955: DO N=1,MY(NZ)
     D950: DO L=NU,NI(NZ)
-      IF(VSoilPoreMicP(L).GT.ZEROS2.AND.RTDNP(N,L,NZ).GT.ZERO &
+      IF(VLSoilPoreMicP(L).GT.ZEROS2.AND.RTDNP(N,L,NZ).GT.ZERO &
         .AND.RTVLW(N,L,NZ).GT.ZEROP(NZ).AND.THETW(L).GT.ZERO)THEN
         TFOXYX=0.0_r8
         call GetUptakeCapcity(N,L,NZ,FPQ,FPP,FCUP,FZUP,FPUP,&
@@ -370,7 +370,7 @@ module NutUptakeMod
     trc_solml   => plt_soilchem%trc_solml  , &
     trcs_VLN   =>  plt_soilchem%trcs_VLN  , &
     trc_solcl  =>  plt_soilchem%trc_solcl , &
-    VWatMicP    =>  plt_soilchem%VWatMicP     &
+    VLWatMicP    =>  plt_soilchem%VLWatMicP     &
   )
 !
 ! PARAMETERS FOR RADIAL MASS FLOW AND DIFFUSION OF NO3
@@ -436,7 +436,7 @@ module NutUptakeMod
     BP=-UPMXP-DIFNO3*UPKMZO(N,NZ)-X+Y
     CP=(X-Y)*UPMXP
     RTKNOP=(-BP-SQRT(BP*BP-4.0*CP))/2.0
-    ZNO3M=UPMNZO(N,NZ)*VWatMicP(L)*trcs_VLN(ids_NO3,L)
+    ZNO3M=UPMNZO(N,NZ)*VLWatMicP(L)*trcs_VLN(ids_NO3,L)
     ZNO3X=AZMAX1(FNO3X*(trc_solml(ids_NO3,L)-ZNO3M))
     RUNNOP(N,L,NZ)=AZMAX1(RTKNO3*pftPlantPopulation(NZ))
     RUPNO3(N,L,NZ)=AMIN1(ZNO3X,RUNNOP(N,L,NZ))
@@ -495,7 +495,7 @@ module NutUptakeMod
     BP=-UPMXP-DIFNOB*UPKMZO(N,NZ)-X+Y
     CP=(X-Y)*UPMXP
     RTKNPB=(-BP-SQRT(BP*BP-4.0*CP))/2.0
-    ZNOBM=UPMNZO(N,NZ)*VWatMicP(L)*trcs_VLN(ids_NO3B,L)
+    ZNOBM=UPMNZO(N,NZ)*VLWatMicP(L)*trcs_VLN(ids_NO3B,L)
     ZNOBX=AZMAX1(FNOBX*(trc_solml(ids_NO3B,L)-ZNOBM))
     RUNNXP(N,L,NZ)=AZMAX1(RTKNOB*pftPlantPopulation(NZ))
     RUPNOB(N,L,NZ)=AMIN1(ZNOBX,RUNNXP(N,L,NZ))
@@ -542,7 +542,7 @@ module NutUptakeMod
     RUPNH4  =>  plt_rbgc%RUPNH4     , &
     RTARP   =>  plt_morph%RTARP     , &
     SolDifc =>  plt_soilchem%SolDifc, &
-    VWatMicP    =>  plt_soilchem%VWatMicP   , &
+    VLWatMicP    =>  plt_soilchem%VLWatMicP   , &
     trcs_VLN   =>  plt_soilchem%trcs_VLN  , &
     trc_solml  =>  plt_soilchem%trc_solml , &
     trc_solcl   =>  plt_soilchem%trc_solcl    &
@@ -607,7 +607,7 @@ module NutUptakeMod
     BP=-UPMXP-DIFNH4*UPKMZH(N,NZ)-X+Y
     CP=(X-Y)*UPMXP
     RTKNHP=(-BP-SQRT(BP*BP-4.0*CP))/2.0_r8
-    ZNH4M=UPMNZH(N,NZ)*VWatMicP(L)*trcs_VLN(ids_NH4,L)
+    ZNH4M=UPMNZH(N,NZ)*VLWatMicP(L)*trcs_VLN(ids_NH4,L)
     ZNH4X=AZMAX1(FNH4X*(trc_solml(ids_NH4,L)-ZNH4M))
     RUNNHP(N,L,NZ)=AZMAX1(RTKNH4*pftPlantPopulation(NZ))
     RUPNH4(N,L,NZ)=AMIN1(ZNH4X,RUNNHP(N,L,NZ))
@@ -666,7 +666,7 @@ module NutUptakeMod
     BP=-UPMXP-DIFNHB*UPKMZH(N,NZ)-X+Y
     CP=(X-Y)*UPMXP
     RTKNBP=(-BP-SQRT(BP*BP-4.0*CP))/2.0
-    ZNHBM=UPMNZH(N,NZ)*VWatMicP(L)*trcs_VLN(ids_NH4B,L)
+    ZNHBM=UPMNZH(N,NZ)*VLWatMicP(L)*trcs_VLN(ids_NH4B,L)
     ZNHBX=AZMAX1(FNHBX*(trc_solml(ids_NH4B,L)-ZNHBM))
     RUNNBP(N,L,NZ)=AZMAX1(RTKNHB*pftPlantPopulation(NZ))
     RUPNHB(N,L,NZ)=AMIN1(ZNHBX,RUNNBP(N,L,NZ))
@@ -712,7 +712,7 @@ module NutUptakeMod
     RUOH1B  => plt_rbgc%RUOH1B     , &
     RUPP1B  => plt_rbgc%RUPP1B     , &
     RTARP   => plt_morph%RTARP     , &
-    VWatMicP    => plt_soilchem%VWatMicP   , &
+    VLWatMicP    => plt_soilchem%VLWatMicP   , &
     trcs_VLN   => plt_soilchem%trcs_VLN  , &
     trc_solcl   => plt_soilchem%trc_solcl  , &
     trc_solml   => plt_soilchem%trc_solml    &
@@ -769,7 +769,7 @@ module NutUptakeMod
     BP=-UPMXP-DIFH1P*UPKMPO(N,NZ)-X+Y
     CP=(X-Y)*UPMXP
     RTKHP1=(-BP-SQRT(BP*BP-4.0*CP))/2.0
-    H1POM=UPMNPO(N,NZ)*VWatMicP(L)*trcs_VLN(ids_H1PO4,L)
+    H1POM=UPMNPO(N,NZ)*VLWatMicP(L)*trcs_VLN(ids_H1PO4,L)
     H1POX=AZMAX1(FP14X*(trc_solml(ids_H1PO4,L)-H1POM))
     RUPP1P(N,L,NZ)=AZMAX1(RTKH1P*pftPlantPopulation(NZ))
     RUPH1P(N,L,NZ)=AMIN1(H1POX,RUPP1P(N,L,NZ))
@@ -828,7 +828,7 @@ module NutUptakeMod
     BP=-UPMXP-DIFH1B*UPKMPO(N,NZ)-X+Y
     CP=(X-Y)*UPMXP
     RTKHB1=(-BP-SQRT(BP*BP-4.0*CP))/2.0
-    H1PXM=UPMNPO(N,NZ)*VWatMicP(L)*trcs_VLN(ids_H1PO4B,L)
+    H1PXM=UPMNPO(N,NZ)*VLWatMicP(L)*trcs_VLN(ids_H1PO4B,L)
     H1PXB=AZMAX1(FP1BX*(trc_solml(ids_H1PO4B,L)-H1PXM))
     RUPP1B(N,L,NZ)=AZMAX1(RTKH1B*pftPlantPopulation(NZ))
     RUPH1B(N,L,NZ)=AMIN1(H1PXB,RUPP1B(N,L,NZ))
@@ -872,7 +872,7 @@ module NutUptakeMod
     TFN4    => plt_pheno%TFN4      , &
     RTARP   => plt_morph%RTARP     , &
     trc_solml   => plt_soilchem%trc_solml  , &
-    VWatMicP    => plt_soilchem%VWatMicP   , &
+    VLWatMicP    => plt_soilchem%VLWatMicP   , &
     trc_solcl   => plt_soilchem%trc_solcl  , &
     trcs_VLN   => plt_soilchem%trcs_VLN  &
   )
@@ -927,7 +927,7 @@ module NutUptakeMod
       BP=-UPMXP-DIFH2P*UPKMPO(N,NZ)-X+Y
       CP=(X-Y)*UPMXP
       RTKHPP=(-BP-SQRT(BP*BP-4.0*CP))/2.0
-      H2POM=UPMNPO(N,NZ)*VWatMicP(L)*trcs_VLN(ids_H1PO4,L)
+      H2POM=UPMNPO(N,NZ)*VLWatMicP(L)*trcs_VLN(ids_H1PO4,L)
       H2POX=AZMAX1(FPO4X*(trc_solml(ids_H2PO4,L)-H2POM))
       RUPP2P(N,L,NZ)=AZMAX1(RTKH2P*pftPlantPopulation(NZ))
       RUPH2P(N,L,NZ)=AMIN1(H2POX,RUPP2P(N,L,NZ))
@@ -986,7 +986,7 @@ module NutUptakeMod
     BP=-UPMXP-DIFH2B*UPKMPO(N,NZ)-X+Y
     CP=(X-Y)*UPMXP
     RTKHPB=(-BP-SQRT(BP*BP-4.0*CP))/2.0
-    H2PXM=UPMNPO(N,NZ)*VWatMicP(L)*trcs_VLN(ids_H1PO4B,L)
+    H2PXM=UPMNPO(N,NZ)*VLWatMicP(L)*trcs_VLN(ids_H1PO4B,L)
     H2PXB=AZMAX1(FPOBX*(trc_solml(ids_H2PO4B,L)-H2PXM))
     RUPP2B(N,L,NZ)=AZMAX1(RTKH2B*pftPlantPopulation(NZ))
     RUPH2B(N,L,NZ)=AMIN1(H2PXB,RUPP2B(N,L,NZ))
@@ -1197,7 +1197,7 @@ module NutUptakeMod
 
   real(r8) :: CPOOLX,CPOOLT
   real(r8) :: PPOOLX,ZPOOLX
-  real(r8) :: VWatMicPK,VWatMicPT
+  real(r8) :: VLWatMicPK,VLWatMicPT
   real(r8) :: XFRC,XFRN,XFRP
   integer :: K
   !     begin_execution
@@ -1206,7 +1206,7 @@ module NutUptakeMod
     ZEROP =>  plt_biom%ZEROP     , &
     ZEROS =>  plt_site%ZEROS     , &
     ZEROS2=>  plt_site%ZEROS2    , &
-    VWatMicPM =>  plt_site%VWatMicPM     , &
+    VLWatMicPM =>  plt_site%VLWatMicPM     , &
     RTVLW =>  plt_morph%RTVLW    , &
     RDFOME=>  plt_rbgc%RDFOME    , &
     FOSRH =>  plt_soilchem%FOSRH , &
@@ -1218,7 +1218,7 @@ module NutUptakeMod
   !     ROOT EXUDATION OF C, N AND P DEPENDS ON CONCN DIFFERENCES
   !     BETWEEN ROOT NON-STRUCTURAL POOLS AND SOIL DISSOLVED POOLS
   !
-  !     VWatMicPMM=soil micropore water volume
+  !     VLWatMicPMM=soil micropore water volume
   !     FOSRH=fraction of total SOC in each substrate K from nitro.f
   !     RTVLW=root aqueous volume
   !     CPOOLR,ZPOOLR,PPOOLR=non-structural C,N,P in root,myco
@@ -1233,11 +1233,11 @@ module NutUptakeMod
   !     OSTR=O2 stress indicator
   !
   D195: DO K=1,jcplx
-    VWatMicPK=VWatMicPM(NPH,L)*FOSRH(K,L)
-    IF(VWatMicPK.GT.ZEROS2.AND.RTVLW(N,L,NZ).GT.ZEROP(NZ))THEN
-      VWatMicPT=VWatMicPK+RTVLW(N,L,NZ)
+    VLWatMicPK=VLWatMicPM(NPH,L)*FOSRH(K,L)
+    IF(VLWatMicPK.GT.ZEROS2.AND.RTVLW(N,L,NZ).GT.ZEROP(NZ))THEN
+      VLWatMicPT=VLWatMicPK+RTVLW(N,L,NZ)
       CPOOLX=AMIN1(1.25E+03_r8*RTVLW(N,L,NZ),EPOOLR(ielmc,N,L,NZ))
-      XFRC=(OQC(K,L)*RTVLW(N,L,NZ)-CPOOLX*VWatMicPK)/VWatMicPT
+      XFRC=(OQC(K,L)*RTVLW(N,L,NZ)-CPOOLX*VLWatMicPK)/VLWatMicPT
       RDFOME(ielmc,N,K,L,NZ)=FEXUC*XFRC
       IF(OQC(K,L).GT.ZEROS.AND.EPOOLR(ielmc,N,L,NZ).GT.ZEROP(NZ))THEN
         CPOOLT=OQC(K,L)+EPOOLR(ielmc,N,L,NZ)

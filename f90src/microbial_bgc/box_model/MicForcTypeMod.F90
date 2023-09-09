@@ -22,19 +22,19 @@ module MicForcTypeMod
   real(r8) :: VWatLitrX
   real(r8) :: ZEROS2
   real(r8) :: ZEROS
-  real(r8) :: VWatMicP
-  real(r8) :: VsoiP
+  real(r8) :: VLWatMicP
+  real(r8) :: VLsoiAirP
   real(r8) :: VOLW0
-  real(r8) :: VOLY
+  real(r8) :: VLSoilMicP
   real(r8) :: THETY
   real(r8) :: POROS
   real(r8) :: TKS
-  real(r8) :: FC
+  real(r8) :: FieldCapacity
   real(r8) :: THETW
   real(r8) :: pH
   real(r8) :: ZERO
-  real(r8) :: BKVL
-  real(r8) :: VSoilPoreMicP
+  real(r8) :: SoilMicPMassLayer
+  real(r8) :: VLSoilPoreMicP
   real(r8) :: TFND
   real(r8) :: VLNOB
   real(r8) :: VLNO3
@@ -43,7 +43,7 @@ module MicForcTypeMod
   real(r8) :: VLPO4
   real(r8) :: VLPOB
   real(r8) :: AEC
-  real(r8) :: PSISM
+  real(r8) :: PSISoilMatricP
   real(r8) :: OLSGL
   real(r8) :: ORGC
   real(r8) :: RNO2Y
@@ -61,7 +61,7 @@ module MicForcTypeMod
   real(r8) :: RPOBY
   real(r8) :: RP14Y
   real(r8) :: RP1BY
-  real(r8) :: BKVL0
+  real(r8) :: SoilMicPMassLayer0
   logical  :: LitrM
   logical  :: Lsurf
   real(r8) :: RNH4YU
@@ -77,9 +77,9 @@ module MicForcTypeMod
   real(r8), allocatable :: DFGS(:)  !rate constant for air-water gas exchange
   real(r8), allocatable :: FILM(:)
   real(r8), allocatable :: THETPM(:)
-  real(r8), allocatable :: VWatMicPM(:)
+  real(r8), allocatable :: VLWatMicPM(:)
   real(r8), allocatable :: TORT(:)
-  real(r8), allocatable :: VsoiPM(:)
+  real(r8), allocatable :: VLsoiAirPM(:)
   contains
    procedure, public :: Init
    procedure, public :: destroy=>Destruct
@@ -98,11 +98,11 @@ module MicForcTypeMod
   allocate(this%CFOMCU(1:micpar%ndbiomcp))
   allocate(this%ROQCY(1:jcplx))
   allocate(this%ROQAY(1:jcplx))
-  allocate(this%VWatMicPM(NPH))
+  allocate(this%VLWatMicPM(NPH))
   allocate(this%THETPM(NPH))
   allocate(this%FILM(NPH))
   allocate(this%TORT(NPH))
-  allocate(this%VsoiPM(NPH))
+  allocate(this%VLsoiAirPM(NPH))
   allocate(this%DFGS(NPH))
   end subroutine Init
 !------------------------------------------------------------------------------------------
@@ -113,11 +113,11 @@ module MicForcTypeMod
   implicit none
   class(micforctype) :: this
 
-  call destroy(this%VWatMicPM)
+  call destroy(this%VLWatMicPM)
   call destroy(this%THETPM)
   call destroy(this%FILM)
   call destroy(this%TORT)
-  call destroy(this%VsoiPM)
+  call destroy(this%VLsoiAirPM)
   call destroy(this%DFGS)
   call destroy(this%ROQCY)
   call destroy(this%ROQAY)

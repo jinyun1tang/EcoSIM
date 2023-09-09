@@ -312,8 +312,8 @@ module BoundaryTranspMod
 
   IF(NN.EQ.1.AND.FLWM(M,N,M6,M5,M4).GT.0.0_r8 &
     .OR.NN.EQ.2.AND.FLWM(M,N,M6,M5,M4).LT.0.0_r8)THEN
-    IF(VWatMicPM(M,M3,M2,M1).GT.ZEROS2(M2,M1))THEN
-      VFLW=AMAX1(-VFLWX,AMIN1(VFLWX,FLWM(M,N,M6,M5,M4)/VWatMicPM(M,M3,M2,M1)))
+    IF(VLWatMicPM(M,M3,M2,M1).GT.ZEROS2(M2,M1))THEN
+      VFLW=AMAX1(-VFLWX,AMIN1(VFLWX,FLWM(M,N,M6,M5,M4)/VLWatMicPM(M,M3,M2,M1)))
     ELSE
       VFLW=0.0_r8
     ENDIF
@@ -354,7 +354,7 @@ module BoundaryTranspMod
 !     SOLUTE LOSS WITH SUBSURFACE MACROPORE WATER LOSS
 !
 !     WaterFlowMacPi=water flux through soil macropore from watsub.f
-!     VWatMacPM=macropore water-filled porosity from watsub.f
+!     VLWatMacPM=macropore water-filled porosity from watsub.f
 !     RFH*S=solute diffusive flux through macropore
 !     solute code:CO=CO2,CH=CH4,OX=O2,NG=N2,N2=N2O,HG=H2
 !             :OC=DOC,ON=DON,OP=DOP,OA=acetate
@@ -363,8 +363,8 @@ module BoundaryTranspMod
 !
   IF(NN.EQ.1.AND.WaterFlowMacPi(M,N,M6,M5,M4).GT.0.0 &
     .OR.NN.EQ.2.AND.WaterFlowMacPi(M,N,M6,M5,M4).LT.0.0)THEN
-    IF(VWatMacPM(M,M3,M2,M1).GT.ZEROS2(M2,M1))THEN
-      VFLW=AMAX1(-VFLWX,AMIN1(VFLWX,WaterFlowMacPi(M,N,M6,M5,M4)/VWatMacPM(M,M3,M2,M1)))
+    IF(VLWatMacPM(M,M3,M2,M1).GT.ZEROS2(M2,M1))THEN
+      VFLW=AMAX1(-VFLWX,AMIN1(VFLWX,WaterFlowMacPi(M,N,M6,M5,M4)/VLWatMacPM(M,M3,M2,M1)))
     ELSE
       VFLW=0.0_r8
     ENDIF
@@ -445,7 +445,7 @@ module BoundaryTranspMod
     ENDIF
 
 !     FLWM=water flux through soil micropore from watsub.f
-!     VWatMicPM=micropore water-filled porosity from watsub.f
+!     VLWatMicPM=micropore water-filled porosity from watsub.f
 !     R*FLS=convective solute flux through micropores
 !     R*FLW,R*FLB=convective solute flux through micropores in non-band,band
 !     solute code:CO=CO2,CH=CH4,OX=O2,NG=N2,N2=N2O,HG=H2
@@ -453,7 +453,7 @@ module BoundaryTranspMod
 !             :NH4=NH4,NH3=NH3,NO3=NO3,NO2=NO2,P14=HPO4,PO4=H2PO4 in non-band
 !             :N4B=NH4,N3B=NH3,NOB=NO3,N2B=NO2,P1B=HPO4,POB=H2PO4 in band
 !
-    IF(VSoilPoreMicP(N3,N2,N1).GT.ZEROS2(N2,N1))THEN
+    IF(VLSoilPoreMicP(N3,N2,N1).GT.ZEROS2(N2,N1))THEN
       IF(NCN(M2,M1).NE.3.OR.N.EQ.3)THEN
 
         call BoundaryRunoffandSnowZ(M,N,NN,M1,M2,M3,M4,M5,M6)
@@ -464,7 +464,7 @@ module BoundaryTranspMod
 !
 !     FLWM,WaterFlowMacPi=micropore,macropore water flux from watsub.f
 !     XNPT=1/number of cycles NPH-1 for gas flux calculations
-!     VsoiPM=air-filled porosity
+!     VLsoiAirPM=air-filled porosity
 !     R*FLG=convective gas flux
 !     X*FLG=convective gas flux
 !     gas code:*CO2*=CO2,*OXY*=O2,*CH4*=CH4,*Z2G*=N2,*Z2O*=N2O
@@ -472,8 +472,8 @@ module BoundaryTranspMod
 !
     FLGM=(FLWM(M,N,M6,M5,M4)+WaterFlowMacPi(M,N,M6,M5,M4))*XNPT
     IF(NN.EQ.1.AND.FLGM.LT.0.0.OR.NN.EQ.2.AND.FLGM.GT.0.0)THEN
-      IF(VsoiPM(M,M3,M2,M1).GT.ZEROS2(M2,M1))THEN
-        VFLW=-AMAX1(-VFLWX,AMIN1(VFLWX,FLGM/VsoiPM(M,M3,M2,M1)))
+      IF(VLsoiAirPM(M,M3,M2,M1).GT.ZEROS2(M2,M1))THEN
+        VFLW=-AMAX1(-VFLWX,AMIN1(VFLWX,FLGM/VLsoiAirPM(M,M3,M2,M1)))
       ELSE
         VFLW=0.0_r8
       ENDIF
@@ -670,14 +670,14 @@ module BoundaryTranspMod
   integer :: K,LL,NTS,NTG
 
   DO LL=N6,NL(NY,NX)
-    IF(VSoilPoreMicP(LL,N2,N1).GT.ZEROS2(N2,N1))THEN
+    IF(VLSoilPoreMicP(LL,N2,N1).GT.ZEROS2(N2,N1))THEN
       N6=LL
       exit
     ENDIF
   ENDDO
 
   IF(M.NE.MX)THEN
-    IF(VSoilPoreMicP(N3,N2,N1).GT.ZEROS2(N2,N1))THEN
+    IF(VLSoilPoreMicP(N3,N2,N1).GT.ZEROS2(N2,N1))THEN
       DO  K=1,jcplx
         TOCFLS(K,N3,N2,N1)=TOCFLS(K,N3,N2,N1)+ROCFLS(K,N,N3,N2,N1)-ROCFLS(K,N,N6,N5,N4)
         TONFLS(K,N3,N2,N1)=TONFLS(K,N3,N2,N1)+RONFLS(K,N,N3,N2,N1)-RONFLS(K,N,N6,N5,N4)
@@ -718,7 +718,7 @@ module BoundaryTranspMod
 !     R*FLG=convective+diffusive gas flux
 !     gas code:*CO*=CO2,*OX*=O2,*CH*=CH4,*NG*=N2,*N2*=N2O,*NH*=NH3,*HG*=H2
 !
-  IF(VSoilPoreMicP(N3,N2,N1).GT.ZEROS2(N2,N1))THEN
+  IF(VLSoilPoreMicP(N3,N2,N1).GT.ZEROS2(N2,N1))THEN
     DO NTG=idg_beg,idg_end-1
       RTGasADFlx(NTG,N3,N2,N1)=RTGasADFlx(NTG,N3,N2,N1) &
         +R3GasADFlx(NTG,N,N3,N2,N1)-R3GasADFlx(NTG,N,N6,N5,N4)

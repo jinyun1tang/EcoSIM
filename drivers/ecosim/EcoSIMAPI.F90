@@ -20,7 +20,7 @@ implicit none
 contains
 
   subroutine Run_EcoSIM_one_step(I,J,NHW,NHE,NVN,NVS)
-
+  USE SoilHeatDataType, ONLY : TKS
   implicit none
   integer, intent(in) :: I,J,NHW,NHE,NVN,NVS
   real(r8) :: t1
@@ -52,6 +52,7 @@ contains
   if(plant_model)then
     call PlantModel(I,J,NHW,NHE,NVN,NVS)
   endif
+  if(TKS(2,1,1)>400.)PRINT*,'plantTKS',TKS(2,1,1)
   !
   !
   !   CALCULATE SOLUTE EQUILIBRIA IN 'SOLUTE'
@@ -80,6 +81,7 @@ contains
     CALL TRNSFRS(I,J,NHW,NHE,NVN,NVS)
     call end_timer('TRNSFRS',t1)
   endif
+  
   !
   !   CALCULATE SOIL SEDIMENT TRANSPORT IN 'EROSION'
   !
@@ -92,12 +94,14 @@ contains
   !   UPDATE ALL SOIL STATE VARIABLES FOR WATER, HEAT, GAS, SOLUTE
   !   AND SEDIMENT FLUXES IN 'REDIST'
   !
+  if(TKS(2,1,1)>400.)PRINT*,'bfTKS',TKS(2,1,1)
   if(lverb)WRITE(*,334)'RED'
+    
   !    if(I>=170)print*,TKS(0,NVN,NHW)
   call start_timer(t1)
   CALL REDIST(I,J,NHW,NHE,NVN,NVS)
   call end_timer('RED',t1)
-
+  if(TKS(2,1,1)>400.)PRINT*,'rediTKS',TKS(2,1,1)
 334   FORMAT(A8)
 
   end subroutine Run_EcoSIM_one_step
@@ -346,6 +350,7 @@ subroutine soil(NE,NEX,NHW,NHE,NVN,NVS,nlend)
     CALL DAY(I,NHW,NHE,NVN,NVS)
 
     DO J=1,24
+      print*,'iiijjj',i,j
       call etimer%get_ymdhs(ymdhs)
       
       if(ymdhs==frectyp%ymdhs0)then
@@ -367,6 +372,7 @@ subroutine soil(NE,NEX,NHW,NHE,NVN,NVS,nlend)
       CALL WTHR(I,J,NHW,NHE,NVN,NVS)
       call end_timer('WTHR',t1)
       
+      print*,'redis',I,J
       if(lverb)WRITE(*,333)'Run_EcoSIM_one_step'
       call Run_EcoSIM_one_step(I,J,NHW,NHE,NVN,NVS)
   !

@@ -44,7 +44,7 @@ PROGRAM main
 ! begin_execution
 
   is_dos=.false.
-
+  open(111,file='fort11',status='unknown')
   write(iulog,*)'obtain working directory'
   CALL GETCWD(BUF)
 !
@@ -143,5 +143,6 @@ PROGRAM main
     call regressiontest(trim(nmlfile),trim(case_name),NHW,NVN)
   endif
   call DestructEcoSIM
+close(111)  
 END program main
 

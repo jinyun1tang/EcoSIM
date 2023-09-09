@@ -401,8 +401,8 @@ module readiMod
       ENDDO
     ENDDO
 
-    call ncd_getvar(grid_nfid, 'PSIFC', ntp,PSIFC(NV1,NH1))
-    call ncd_getvar(grid_nfid, 'PSIWP', ntp,PSIWP(NV1,NH1))
+    call ncd_getvar(grid_nfid, 'PSIFC', ntp,PSIAtFldCapacity(NV1,NH1))
+    call ncd_getvar(grid_nfid, 'PSIWP', ntp,PSIAtWiltPoint(NV1,NH1))
     call ncd_getvar(grid_nfid, 'ALBS',  ntp,ALBS(NV1,NH1))
     call ncd_getvar(grid_nfid, 'PH0',   ntp,PH(0,NV1,NH1))
     call ncd_getvar(grid_nfid, 'RSCf',  ntp,RSC(k_fine_litr,0,NV1,NH1))
@@ -431,16 +431,16 @@ module readiMod
     NL(NV1,NH1)=NLI(NV1,NH1)
 
     call ncd_getvar(grid_nfid, 'CDPTH',ntp,CumDepth2LayerBottom(1:JZ,NV1,NH1))
-    call ncd_getvar(grid_nfid, 'BKDSI',ntp,BKDSI(1:JZ,NV1,NH1))
+    call ncd_getvar(grid_nfid, 'BKDSI',ntp,SoiBulkDensityt0(1:JZ,NV1,NH1))
 
-    call ncd_getvar(grid_nfid, 'FC', ntp,FC(1:JZ,NV1,NH1))
-    call ncd_getvar(grid_nfid, 'WP', ntp,WP(1:JZ,NV1,NH1))
-    call ncd_getvar(grid_nfid, 'SCNV', ntp,SCNV(1:JZ,NV1,NH1))
-    call ncd_getvar(grid_nfid, 'SCNH', ntp,SCNH(1:JZ,NV1,NH1))
+    call ncd_getvar(grid_nfid, 'FC', ntp,FieldCapacity(1:JZ,NV1,NH1))
+    call ncd_getvar(grid_nfid, 'WP', ntp,WiltPoint(1:JZ,NV1,NH1))
+    call ncd_getvar(grid_nfid, 'SCNV', ntp,SatHydroCondVert(1:JZ,NV1,NH1))
+    call ncd_getvar(grid_nfid, 'SCNH', ntp,SatHydroCondHrzn(1:JZ,NV1,NH1))
 
     call ncd_getvar(grid_nfid, 'CSAND',ntp,CSAND(1:JZ,NV1,NH1))
     call ncd_getvar(grid_nfid, 'CSILT',ntp,CSILT(1:JZ,NV1,NH1))
-    call ncd_getvar(grid_nfid, 'FHOL',ntp,FHOL(1:JZ,NV1,NH1))
+    call ncd_getvar(grid_nfid, 'FHOL',ntp,SoilFracAsMacP(1:JZ,NV1,NH1))
     call ncd_getvar(grid_nfid, 'ROCK',ntp,ROCK(1:JZ,NV1,NH1))
 
     call ncd_getvar(grid_nfid, 'PH',ntp,PH(1:JZ,NV1,NH1))
@@ -502,7 +502,7 @@ module readiMod
 !
 !     SURFACE PROPERTIES
 !
-!     PSIFC,PSIWP=water potentials at field capacity,wilting point (MPa)
+!     PSIAtFldCapacity,PSIAtWiltPoint=water potentials at field capacity,wilting point (MPa)
 !     ALBS=wet soil albedo
 !     PH=litter pH
 !     RSC,RSC,RSP=C,N,P in fine(1,0),woody(0,0),manure(2,0) surface litter (g m-2)
@@ -511,8 +511,8 @@ module readiMod
 !     NL1,NL2=number of additional layers below NJ with,without data in file
 !     ISOILR=natural(0),reconstructed(1) soil profile
 !
-          PSIFC(NY,NX)=PSIFC(NV1,NH1)
-          PSIWP(NY,NX)=PSIWP(NV1,NH1)
+          PSIAtFldCapacity(NY,NX)=PSIAtFldCapacity(NV1,NH1)
+          PSIAtWiltPoint(NY,NX)=PSIAtWiltPoint(NV1,NH1)
           ALBS(NY,NX) =ALBS(NV1,NH1)
           PH(0,NY,NX) =PH(0,NV1,NH1)
           RSC(k_fine_litr,0,NY,NX) =RSC(k_fine_litr,0,NV1,NH1)
@@ -541,20 +541,20 @@ module readiMod
 !     PHYSICAL PROPERTIES
 !
 !     CDPTH=depth to bottom (m) > 0
-!     BKDSI=initial bulk density (Mg m-3,0=water), it refers to solid matter
+!     SoiBulkDensityt0=initial bulk density (Mg m-3,0=water), it refers to solid matter
 !     
 !
         IF (NX/=NH1 .OR. NY/=NV1) THEN
           DO L=NU(NY,NX),NM(NY,NX)
             CumDepth2LayerBottom(L,NY,NX)=CumDepth2LayerBottom(L,NV1,NH1)
-            BKDSI(L,NY,NX)=BKDSI(L,NV1,NH1)
-            FC(L,NY,NX)=FC(L,NV1,NH1)
-            WP(L,NY,NX)=WP(L,NV1,NH1)
-            SCNV(L,NY,NX)=SCNV(L,NV1,NH1)
-            SCNH(L,NY,NX)=SCNH(L,NV1,NH1)
+            SoiBulkDensityt0(L,NY,NX)=SoiBulkDensityt0(L,NV1,NH1)
+            FieldCapacity(L,NY,NX)=FieldCapacity(L,NV1,NH1)
+            WiltPoint(L,NY,NX)=WiltPoint(L,NV1,NH1)
+            SatHydroCondVert(L,NY,NX)=SatHydroCondVert(L,NV1,NH1)
+            SatHydroCondHrzn(L,NY,NX)=SatHydroCondHrzn(L,NV1,NH1)
             CSAND(L,NY,NX)=CSAND(L,NV1,NH1)
             CSILT(L,NY,NX)=CSILT(L,NV1,NH1)
-            FHOL(L,NY,NX)=FHOL(L,NV1,NH1)
+            SoilFracAsMacP(L,NY,NX)=SoilFracAsMacP(L,NV1,NH1)
             ROCK(L,NY,NX)=ROCK(L,NV1,NH1)
             PH(L,NY,NX)=PH(L,NV1,NH1)
             CEC(L,NY,NX)=CEC(L,NV1,NH1)
@@ -615,11 +615,11 @@ module readiMod
         RSC(k_fine_litr,0,NY,NX)=AMAX1(ppmc,RSC(k_fine_litr,0,NY,NX))
         RSN(k_fine_litr,0,NY,NX)=AMAX1(0.04E-06_r8,RSN(k_fine_litr,0,NY,NX))
         RSP(k_fine_litr,0,NY,NX)=AMAX1(0.004E-06_r8,RSP(k_fine_litr,0,NY,NX))
-        SCNV(0,NY,NX)=10.0_r8*0.098_r8
+        SatHydroCondVert(0,NY,NX)=10.0_r8*0.098_r8
 !
 !     SET FLAGS FOR ESTIMATING FC,WP,SCNV,SCNH IF UNKNOWN
 !
-!     ISOIL=flag for calculating FC(1),WP(2),SCNV(3),SCNH(4)
+!     ISOIL=flag for calculating FC(1),WiltPoint(2),SatHydroCondVert(3),SatHydroCondHrzn(4)
 !
         call ComputeSoilHydroPars(NY,NX,NU(NY,NX),NM(NY,NX))
 
@@ -630,21 +630,21 @@ module readiMod
 !
         IF(NU(NY,NX).GT.1)THEN
           DO  L=NU(NY,NX)-1,0,-1
-            IF(BKDSI(L+1,NY,NX).GT.0.025_r8)THEN
+            IF(SoiBulkDensityt0(L+1,NY,NX).GT.0.025_r8)THEN
               CumDepth2LayerBottom(L,NY,NX)=CumDepth2LayerBottom(L+1,NY,NX)-0.01_r8
             ELSE
               CumDepth2LayerBottom(L,NY,NX)=CumDepth2LayerBottom(L+1,NY,NX)-0.02_r8
             ENDIF
             IF(L.GT.0)THEN
-              BKDSI(L,NY,NX)=BKDSI(L+1,NY,NX)
-              FC(L,NY,NX)=FC(L+1,NY,NX)
-              WP(L,NY,NX)=WP(L+1,NY,NX)
-              SCNV(L,NY,NX)=SCNV(L+1,NY,NX)
-              SCNH(L,NY,NX)=SCNH(L+1,NY,NX)
+              SoiBulkDensityt0(L,NY,NX)=SoiBulkDensityt0(L+1,NY,NX)
+              FieldCapacity(L,NY,NX)=FieldCapacity(L+1,NY,NX)
+              WiltPoint(L,NY,NX)=WiltPoint(L+1,NY,NX)
+              SatHydroCondVert(L,NY,NX)=SatHydroCondVert(L+1,NY,NX)
+              SatHydroCondHrzn(L,NY,NX)=SatHydroCondHrzn(L+1,NY,NX)
               CSAND(L,NY,NX)=CSAND(L+1,NY,NX)
               CSILT(L,NY,NX)=CSILT(L+1,NY,NX)
               CCLAY(L,NY,NX)=CCLAY(L+1,NY,NX)
-              FHOL(L,NY,NX)=FHOL(L+1,NY,NX)
+              SoilFracAsMacP(L,NY,NX)=SoilFracAsMacP(L+1,NY,NX)
               ROCK(L,NY,NX)=ROCK(L+1,NY,NX)
               PH(L,NY,NX)=PH(L+1,NY,NX)
               CEC(L,NY,NX)=CEC(L+1,NY,NX)
@@ -707,25 +707,25 @@ module readiMod
 !   CORGC,CORGR=SOC,POC converted to g Mg-1
 !   CEC,AEC=cation,anion exchange capacity converted to mol Mg-1
 !   CNH4...=solute concentrations converted to mol Mg-1
-!   BKDSI: initial bulk density
+!   SoiBulkDensityt0: initial bulk density
 
         DO  L=1,NL(NY,NX)
-  !   FHOL: macropore fraction
-  !     BKDSI(L,NY,NX)=BKDSI(L,NY,NX)/(1.0_r8-FHOL(L,NY,NX))
-          BKDS(L,NY,NX)=BKDSI(L,NY,NX)
-          IF(isclose(BKDS(L,NY,NX),0.0_r8))FHOL(L,NY,NX)=0.0_r8
+  !   SoilFracAsMacP: macropore fraction
+  !     SoiBulkDensityt0(L,NY,NX)=SoiBulkDensityt0(L,NY,NX)/(1.0_r8-SoilFracAsMacP(L,NY,NX))
+          SoiBulkDensity(L,NY,NX)=SoiBulkDensityt0(L,NY,NX)
+          IF(isclose(SoiBulkDensity(L,NY,NX),0.0_r8))SoilFracAsMacP(L,NY,NX)=0.0_r8
   !     fraction of soil as micropore
-          FMPR(L,NY,NX)=(1.0_r8-ROCK(L,NY,NX))*(1.0_r8-FHOL(L,NY,NX))
-  !     FC(L,NY,NX)=FC(L,NY,NX)/(1.0-FHOL(L,NY,NX))
-  !     WP(L,NY,NX)=WP(L,NY,NX)/(1.0-FHOL(L,NY,NX))
+          FMPR(L,NY,NX)=(1.0_r8-ROCK(L,NY,NX))*(1.0_r8-SoilFracAsMacP(L,NY,NX))
+  !     FieldCapacity(L,NY,NX)=FieldCapacity(L,NY,NX)/(1.0-SoilFracAsMacP(L,NY,NX))
+  !     WiltPoint(L,NY,NX)=WiltPoint(L,NY,NX)/(1.0-SoilFracAsMacP(L,NY,NX))
   !
-          SCNV(L,NY,NX)=0.098_r8*SCNV(L,NY,NX)*FMPR(L,NY,NX)
-          SCNH(L,NY,NX)=0.098_r8*SCNH(L,NY,NX)*FMPR(L,NY,NX)
+          SatHydroCondVert(L,NY,NX)=0.098_r8*SatHydroCondVert(L,NY,NX)*FMPR(L,NY,NX)
+          SatHydroCondHrzn(L,NY,NX)=0.098_r8*SatHydroCondHrzn(L,NY,NX)*FMPR(L,NY,NX)
           CCLAY(L,NY,NX)=AZMAX1(1.0E+03_r8-(CSAND(L,NY,NX)+CSILT(L,NY,NX)))
           CORGC(L,NY,NX)=CORGC(L,NY,NX)*1.0E+03_r8   !convert from Kg to g C
           CORGR(L,NY,NX)=CORGR(L,NY,NX)*1.0E+03_r8   !convert from Kg to g C
           CORGCI(L,NY,NX)=CORGC(L,NY,NX)
-          FHOLI(L,NY,NX)=FHOL(L,NY,NX)
+          SoilFracAsMacPt0(L,NY,NX)=SoilFracAsMacP(L,NY,NX)
   !       
           CSAND(L,NY,NX)=CSAND(L,NY,NX)*1.0E-03_r8*AZMAX1((1.0_r8-CORGC(L,NY,NX)/orgcden))
           CSILT(L,NY,NX)=CSILT(L,NY,NX)*1.0E-03_r8*AZMAX1((1.0_r8-CORGC(L,NY,NX)/orgcden))
@@ -802,8 +802,8 @@ module readiMod
 
   write(*,*)''
   write(*,*)'NY,NX=',NY,NX
-  write(*,*)'Water potential at field capacity (MPa)',PSIFC(NY,NX)
-  write(*,*)'Water potential at wilting point (MPa)',PSIWP(NY,NX)
+  write(*,*)'Water potential at field capacity (MPa)',PSIAtFldCapacity(NY,NX)
+  write(*,*)'Water potential at wilting point (MPa)',PSIAtWiltPoint(NY,NX)
   write(*,*)'Wet soil albedo',ALBS(NY,NX)
 
   write(*,*)'Litter pH',PH(0,NY,NX)
@@ -826,8 +826,8 @@ module readiMod
 
   write(*,*)'Depth to bottom of soil layer (m): CDPTH'
   write(*,*)(CumDepth2LayerBottom(L,NY,NX),L=NU,NM)
-  write(*,*)'Initial bulk density (Mg m-3, 0=water): BKDSI'
-  write(*,*)(BKDSI(L,NY,NX),L=NU,NM)
+  write(*,*)'Initial bulk density (Mg m-3, 0=water): SoiBulkDensityt0'
+  write(*,*)(SoiBulkDensityt0(L,NY,NX),L=NU,NM)
 !
 !     HYDROLOGIC PROPERTIES
 !
@@ -839,18 +839,18 @@ module readiMod
   write(*,*)'NY,NX=',NY,NX
   write(*,*)'L=',NU,NM
   write(*,*)'Field capacity (m3 m-3): FC'
-  write(*,*)(FC(L,NY,NX),L=NU,NM)
+  write(*,*)(FieldCapacity(L,NY,NX),L=NU,NM)
   write(*,*)'Wilting point (m3 m-3): WP'
-  write(*,*)(WP(L,NY,NX),L=NU,NM)
+  write(*,*)(WiltPoint(L,NY,NX),L=NU,NM)
   write(*,*)'Vertical Ksat (mm h-1): SCNV'
-  write(*,*)(SCNV(L,NY,NX),L=NU,NM)
+  write(*,*)(SatHydroCondVert(L,NY,NX),L=NU,NM)
   write(*,*)'Lateral Ksat (mm h-1): SCNH'
-  write(*,*)(SCNH(L,NY,NX),L=NU,NM)
+  write(*,*)(SatHydroCondHrzn(L,NY,NX),L=NU,NM)
 !
 !     PHYSICAL PROPERTIES
 !
 !     CSAND,CSILT=sand,silt contents (kg Mg-1)
-!     FHOL,ROCK=macropore,rock fraction
+!     SoilFracAsMacP,ROCK=macropore,rock fraction
 !
 
   write(*,*)''
@@ -859,7 +859,7 @@ module readiMod
   write(*,*)'Silt (kg Mg-1): CSILT'
   write(*,*)(CSILT(L,NY,NX),L=NU,NM)
   write(*,*)'Macropore fraction (0-1): FOHL'
-  write(*,*)(FHOL(L,NY,NX),L=NU,NM)
+  write(*,*)(SoilFracAsMacP(L,NY,NX),L=NU,NM)
   write(*,*)'Rock fraction (0-1): ROCK'
   write(*,*)(ROCK(L,NY,NX),L=NU,NM)
 !

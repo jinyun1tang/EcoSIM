@@ -57,14 +57,14 @@ implicit none
 
     call ncd_defvar(ncf, 'pH', ncd_float, long_name='soil pH',  &
             units='none', missing_value=spval, fill_value=spval)
-    call ncd_defvar(ncf, 'VSoilPoreMicP', ncd_float, long_name='volume of soil layer',  &
+    call ncd_defvar(ncf, 'VLSoilPoreMicP', ncd_float, long_name='volume of soil layer',  &
             units='m3 d-2', missing_value=spval, fill_value=spval)
     call ncd_defvar(ncf, 'ORGC', ncd_float, long_name='total soil organic C',  &
             units='gC d-2', missing_value=spval, fill_value=spval)
     call ncd_defvar(ncf, 'CFOMC', ncd_float, dim1name='ndbiomcp', &
             long_name='allocation coefficient to humus fractions',  &
             units='none', missing_value=spval, fill_value=spval)
-    call ncd_defvar(ncf, 'VOLY', ncd_float, long_name='micropore volume',  &
+    call ncd_defvar(ncf, 'VLSoilMicP', ncd_float, long_name='micropore volume',  &
             units='m3 d-2', missing_value=spval, fill_value=spval)
     call ncd_defvar(ncf, 'BKVL', ncd_float, long_name='mass of soil layer',  &
             units='Mg d-2', missing_value=spval, fill_value=spval)
@@ -250,23 +250,23 @@ implicit none
     call ncd_enddef(ncf)
 
     call ncd_putvar(ncf,'pH',PH(L,NY,NX))
-    call ncd_putvar(ncf,'VSoilPoreMicP',VSoilPoreMicP(L,NY,NX))
+    call ncd_putvar(ncf,'VLSoilPoreMicP',VLSoilPoreMicP(L,NY,NX))
     call ncd_putvar(ncf,'ORGC',ORGC(L,NY,NX))
     call ncd_putvar(ncf,'CFOMC',CFOMC(:,L,NY,NX))
-    call ncd_putvar(ncf,'VOLY',VOLY(L,NY,NX))
-    call ncd_putvar(ncf,'BKVL',BKVL(L,NY,NX))
+    call ncd_putvar(ncf,'VLSoilMicP',VLSoilMicP(L,NY,NX))
+    call ncd_putvar(ncf,'BKVL',SoilMicPMassLayer(L,NY,NX))
     call ncd_putvar(ncf,'POROS',POROS(L,NY,NX))
-    call ncd_putvar(ncf,'FC',FC(L,NY,NX))
+    call ncd_putvar(ncf,'FC',FieldCapacity(L,NY,NX))
     call ncd_putvar(ncf,'ATKA',TairKClimMean(NY,NX))
-    call ncd_putvar(ncf,'WP',WP(L,NY,NX))
+    call ncd_putvar(ncf,'WP',WiltPoint(L,NY,NX))
     call ncd_putvar(ncf,'SRP',SRP(L,NY,NX))
     call ncd_putvar(ncf,'EHUM',EHUM(L,NY,NX))
     call ncd_putvar(ncf,'EPOC',EPOC(L,NY,NX))
     call ncd_putvar(ncf,'THETY',THETY(L,NY,NX))
-    call ncd_putvar(ncf,'PSIMX',PSIMX(NY,NX))
-    call ncd_putvar(ncf,'PSIMD',PSIMD(NY,NX))
-    call ncd_putvar(ncf,'PSIMS',PSIMS(NY,NX))
-    call ncd_putvar(ncf,'PSISD',PSISD(NY,NX))
+    call ncd_putvar(ncf,'PSIMX',LOGPSIMX(NY,NX))
+    call ncd_putvar(ncf,'PSIMD',LOGPSIMND(NY,NX))
+    call ncd_putvar(ncf,'PSIMS',LOGPSIAtSat(NY,NX))
+    call ncd_putvar(ncf,'PSISD',LOGPSIMXD(NY,NX))
     call ncd_putvar(ncf,'PSISE',PSISE(L,NY,NX))
     call ncd_putvar(ncf,'DLYR3',DLYR(3,L,NY,NX))
     call ncd_putvar(ncf,'CEC',CEC(L,NY,NX))
@@ -292,7 +292,7 @@ implicit none
     call ncd_putvar(ncf,'CFEOH',CFEOH(L,NY,NX))
     call ncd_putvar(ncf,'CCACO',CCACO(L,NY,NX))
     call ncd_putvar(ncf,'CCASO',CCASO(L,NY,NX))
-    call ncd_putvar(ncf,'BKDS',BKDS(L,NY,NX))
+    call ncd_putvar(ncf,'BKDS',SoiBulkDensity(L,NY,NX))
 
     call ncd_putvar(ncf,'FOSRH',FOSRH(:,L,NY,NX))
     call ncd_putvar(ncf,'OQC',OQC(:,L,NY,NX))

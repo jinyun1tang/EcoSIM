@@ -385,7 +385,7 @@ module TrnsfrMod
 !
   D9685: DO L=NU(NY,NX),NL(NY,NX)
     IF(M.NE.MX)THEN
-      IF(VSoilPoreMicP(L,NY,NX).GT.ZEROS2(NY,NX))THEN
+      IF(VLSoilPoreMicP(L,NY,NX).GT.ZEROS2(NY,NX))THEN
 
         DO NTS=ids_beg,ids_end
           trc_solml2(NTS,L,NY,NX)=trc_solml2(NTS,L,NY,NX)+RFLZ_sol(NTS,L,NY,NX)
@@ -429,7 +429,7 @@ module TrnsfrMod
 !     gas code:*CO2*=CO2,*OXY*=O2,*CH4*=CH4,*Z2G*=N2,*Z2O*=N2O
 !             :*ZN3*=NH3,*H2G*=H2
 !
-    IF(VSoilPoreMicP(L,NY,NX).GT.ZEROS2(NY,NX))THEN
+    IF(VLSoilPoreMicP(L,NY,NX).GT.ZEROS2(NY,NX))THEN
       DO NTG=idg_beg,idg_end
         trc_solml2(NTG,L,NY,NX)=trc_solml2(NTG,L,NY,NX)+RGasDSFlx(NTG,L,NY,NX)
       ENDDO
@@ -768,23 +768,23 @@ module TrnsfrMod
 !     VLNH4,VLNO3,VLPO4=non-band NH4,NO3,PO4 volume fraction
 !     VLNHB,VLNOB,VLPOB=band NH4,NO3,PO4 volume fraction
 !
-    trcs_RFLU(idg_CO2,L,NY,NX)=FLU(L,NY,NX)*CCOQ(NY,NX)
-    trcs_RFLU(idg_CH4,L,NY,NX)=FLU(L,NY,NX)*CCHQ(NY,NX)
-    trcs_RFLU(idg_O2,L,NY,NX)=FLU(L,NY,NX)*COXQ(NY,NX)
-    trcs_RFLU(idg_N2,L,NY,NX)=FLU(L,NY,NX)*CNNQ(NY,NX)
-    trcs_RFLU(idg_N2O,L,NY,NX)=FLU(L,NY,NX)*CN2Q(NY,NX)
+    trcs_RFLU(idg_CO2,L,NY,NX)=FWatIrrigate2MicP(L,NY,NX)*CCOQ(NY,NX)
+    trcs_RFLU(idg_CH4,L,NY,NX)=FWatIrrigate2MicP(L,NY,NX)*CCHQ(NY,NX)
+    trcs_RFLU(idg_O2,L,NY,NX)=FWatIrrigate2MicP(L,NY,NX)*COXQ(NY,NX)
+    trcs_RFLU(idg_N2,L,NY,NX)=FWatIrrigate2MicP(L,NY,NX)*CNNQ(NY,NX)
+    trcs_RFLU(idg_N2O,L,NY,NX)=FWatIrrigate2MicP(L,NY,NX)*CN2Q(NY,NX)
     trcs_RFLU(idg_H2,L,NY,NX)=0.0_r8
 
-    trcs_RFLU(ids_NH4,L,NY,NX)=FLU(L,NY,NX)*CN4Q(I,NY,NX)*trcs_VLN(ids_NH4,L,NY,NX)*natomw
-    trcs_RFLU(idg_NH3,L,NY,NX)=FLU(L,NY,NX)*CN3Q(I,NY,NX)*trcs_VLN(ids_NH4,L,NY,NX)*natomw
-    trcs_RFLU(ids_NO3,L,NY,NX)=FLU(L,NY,NX)*CNOQ(I,NY,NX)*trcs_VLN(ids_NO3,L,NY,NX)*natomw
-    trcs_RFLU(ids_H1PO4,L,NY,NX)=FLU(L,NY,NX)*CH1PQ(I,NY,NX)*trcs_VLN(ids_H1PO4,L,NY,NX)*patomw
-    trcs_RFLU(ids_H2PO4,L,NY,NX)=FLU(L,NY,NX)*CPOQ(I,NY,NX)*trcs_VLN(ids_H1PO4,L,NY,NX)*patomw
-    trcs_RFLU(ids_NH4B,L,NY,NX)=FLU(L,NY,NX)*CN4Q(I,NY,NX)*trcs_VLN(ids_NH4B,L,NY,NX)*natomw
-    trcs_RFLU(idg_NH3B,L,NY,NX)=FLU(L,NY,NX)*CN3Q(I,NY,NX)*trcs_VLN(ids_NH4B,L,NY,NX)*natomw
-    trcs_RFLU(ids_NO3B,L,NY,NX)=FLU(L,NY,NX)*CNOQ(I,NY,NX)*trcs_VLN(ids_NO3B,L,NY,NX)*natomw
-    trcs_RFLU(ids_H1PO4B,L,NY,NX)=FLU(L,NY,NX)*CH1PQ(I,NY,NX)*trcs_VLN(ids_H1PO4B,L,NY,NX)*patomw
-    trcs_RFLU(ids_H2PO4B,L,NY,NX)=FLU(L,NY,NX)*CPOQ(I,NY,NX)*trcs_VLN(ids_H1PO4B,L,NY,NX)*patomw
+    trcs_RFLU(ids_NH4,L,NY,NX)=FWatIrrigate2MicP(L,NY,NX)*CN4Q(I,NY,NX)*trcs_VLN(ids_NH4,L,NY,NX)*natomw
+    trcs_RFLU(idg_NH3,L,NY,NX)=FWatIrrigate2MicP(L,NY,NX)*CN3Q(I,NY,NX)*trcs_VLN(ids_NH4,L,NY,NX)*natomw
+    trcs_RFLU(ids_NO3,L,NY,NX)=FWatIrrigate2MicP(L,NY,NX)*CNOQ(I,NY,NX)*trcs_VLN(ids_NO3,L,NY,NX)*natomw
+    trcs_RFLU(ids_H1PO4,L,NY,NX)=FWatIrrigate2MicP(L,NY,NX)*CH1PQ(I,NY,NX)*trcs_VLN(ids_H1PO4,L,NY,NX)*patomw
+    trcs_RFLU(ids_H2PO4,L,NY,NX)=FWatIrrigate2MicP(L,NY,NX)*CPOQ(I,NY,NX)*trcs_VLN(ids_H1PO4,L,NY,NX)*patomw
+    trcs_RFLU(ids_NH4B,L,NY,NX)=FWatIrrigate2MicP(L,NY,NX)*CN4Q(I,NY,NX)*trcs_VLN(ids_NH4B,L,NY,NX)*natomw
+    trcs_RFLU(idg_NH3B,L,NY,NX)=FWatIrrigate2MicP(L,NY,NX)*CN3Q(I,NY,NX)*trcs_VLN(ids_NH4B,L,NY,NX)*natomw
+    trcs_RFLU(ids_NO3B,L,NY,NX)=FWatIrrigate2MicP(L,NY,NX)*CNOQ(I,NY,NX)*trcs_VLN(ids_NO3B,L,NY,NX)*natomw
+    trcs_RFLU(ids_H1PO4B,L,NY,NX)=FWatIrrigate2MicP(L,NY,NX)*CH1PQ(I,NY,NX)*trcs_VLN(ids_H1PO4B,L,NY,NX)*patomw
+    trcs_RFLU(ids_H2PO4B,L,NY,NX)=FWatIrrigate2MicP(L,NY,NX)*CPOQ(I,NY,NX)*trcs_VLN(ids_H1PO4B,L,NY,NX)*patomw
 !
 !     SUB-HOURLY SOLUTE FLUXES FROM SUBSURFACE IRRIGATION
 !

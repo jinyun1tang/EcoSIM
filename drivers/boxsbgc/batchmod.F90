@@ -144,18 +144,18 @@ contains
   micfor%FLQRI =0._r8      !irrigation flux into surface litter
   micfor%FLQRQ =0._r8      !precipitation flux into surface litter
   micfor%OFFSET=forc%OFFSET
-  micfor%VOLR  =forc%VOLR
-  micfor%VOLWRX=forc%VOLWRX
-  micfor%VOLW  =forc%VOLW
-  micfor%VOLY  =forc%VOLY
+  micfor%VLitR  =forc%VLitR
+  micfor%VWatLitrX=forc%VWatLitrX
+  micfor%VLWatMicP  =forc%VLWatMicP
+  micfor%VLSoilMicP  =forc%VLSoilMicP
   micfor%THETY =forc%THETY
   micfor%POROS =forc%POROS
-  micfor%FC    =forc%FC
+  micfor%FieldCapacity    =forc%FieldCapacity
   micfor%TKS   =forc%TKS
   micfor%THETW =forc%THETW
   micfor%PH    =forc%PH
-  micfor%BKVL  =forc%BKVL
-  micfor%VOLX  =forc%VOLX
+  micfor%SoilMicPMassLayer  =forc%SoilMicPMassLayer
+  micfor%VLSoilPoreMicP  =forc%VLSoilPoreMicP
   micfor%TFND  =forc%TFND
   micfor%VLNOB =forc%VLNOB
   micfor%VLNO3 =forc%VLNO3
@@ -163,7 +163,7 @@ contains
   micfor%VLNHB =forc%VLNHB
   micfor%VLPO4 =forc%VLPO4
   micfor%VLPOB =forc%VLPOB
-  micfor%PSISM =forc%PSISM
+  micfor%PSISoilMatricP =forc%PSISoilMatricP
   micfor%OLSGL =forc%OLSGL
   micfor%ORGC  =forc%ORGC
   micfor%RNO2Y =ystates0l(fid_RNO2Y)
@@ -210,36 +210,36 @@ contains
     micfor%RNO3YU=ystates0l(fid_RNO3Y)
     micfor%RPO4YU=ystates0l(fid_RPO4Y)
     micfor%RP14YU=ystates0l(fid_RP14Y)
-    micfor%VOLWU =forc%VOLW
+    micfor%VOLWU =forc%VLWatMicP
     micfor%CFOMCU=forc%CFOMC(1:ndbiomcp)
   else
     micfor%AEC=forc%AEC
-    micstt%OXYG=ystates0l(cid_COXYG)*forc%VOLP
+    micstt%OXYG=ystates0l(cid_COXYG)*forc%VLsoiAirP
   endif
   micstt%CNH4B =forc%CNH4B
   micstt%CNO3B =forc%CNO3B
   micstt%CH2P4B=forc%CH2P4B
 
-  micstt%CNH4S =ystates0l(cid_ZNH4S)/(forc%VOLW*forc%VLNH4)
-  micstt%CNO3S =ystates0l(cid_ZNO3S)/(forc%VOLW*forc%VLNO3)
-  micstt%CH2P4 =ystates0l(cid_H2PO4)/(forc%VOLW*forc%VLPO4)
-  micstt%CH1P4 =ystates0l(cid_H1PO4)/(forc%VOLW*forc%VLPO4)
+  micstt%CNH4S =ystates0l(cid_ZNH4S)/(forc%VLWatMicP*forc%VLNH4)
+  micstt%CNO3S =ystates0l(cid_ZNO3S)/(forc%VLWatMicP*forc%VLNO3)
+  micstt%CH2P4 =ystates0l(cid_H2PO4)/(forc%VLWatMicP*forc%VLPO4)
+  micstt%CH1P4 =ystates0l(cid_H1PO4)/(forc%VLWatMicP*forc%VLPO4)
   micstt%CH1P4B=forc%CH1P4B
   micfor%RNH4Y =ystates0l(fid_RNH4Y)
   micfor%RNO3Y =ystates0l(fid_RNO3Y)
   micfor%RPO4Y =ystates0l(fid_RPO4Y)
   micfor%RP14Y =ystates0l(fid_RP14Y)
-  micfor%VOLW  =forc%VOLW
-  micfor%VOLP  =forc%VOLP
+  micfor%VLWatMicP  =forc%VLWatMicP
+  micfor%VLsoiAirP  =forc%VLsoiAirP
   if(micfor%Lsurf)then
-    micfor%BKVL0=forc%BKVL
+    micfor%SoilMicPMassLayer0=forc%SoilMicPMassLayer
   endif
   micfor%DFGS(1:NPH)  =forc%DFGS
   micfor%FILM(1:NPH)  =forc%FILM
   micfor%THETPM(1:NPH)=forc%THETPM
-  micfor%VOLWM(1:NPH) =forc%VOLW
+  micfor%VLWatMicPM(1:NPH) =forc%VLWatMicP
   micfor%TORT(1:NPH)  =forc%TORT
-  micfor%VOLPM(1:NPH) =forc%VOLP
+  micfor%VLsoiAirPM(1:NPH) =forc%VLsoiAirP
 
   micstt%EPOC=forc%EPOC
   micstt%EHUM=forc%EHUM
@@ -253,12 +253,12 @@ contains
   micstt%ZNO2S=ystates0l(cid_ZNO2S)
   micstt%H2POB=forc%H2POB
   micstt%H2PO4=ystates0l(cid_H2PO4)
-  micstt%CCO2S=ystates0l(cid_CO2S)/forc%VOLW
-  micstt%CNO2S=ystates0l(cid_ZNO2S)/(forc%VOLW*forc%VLNO3)
+  micstt%CCO2S=ystates0l(cid_CO2S)/forc%VLWatMicP
+  micstt%CNO2S=ystates0l(cid_ZNO2S)/(forc%VLWatMicP*forc%VLNO3)
   micstt%CNO2B=forc%CNO2B
-  micstt%CZ2OS=ystates0l(cid_Z2OS)/forc%VOLW
+  micstt%CZ2OS=ystates0l(cid_Z2OS)/forc%VLWatMicP
   micstt%Z2OS=ystates0l(cid_Z2OS)
-  micstt%COXYS=ystates0l(cid_OXYS)/forc%VOLW
+  micstt%COXYS=ystates0l(cid_OXYS)/forc%VLWatMicP
   micstt%OXYS =ystates0l(cid_OXYS)
   micstt%SOXYL=forc%SOXYL
   micstt%COXYG=ystates0l(cid_COXYG)
@@ -539,7 +539,7 @@ contains
     is_litter => micpar%is_litter  , &
     NMICBSO   => micpar%NMICBSO    , &
     NMICBSA   => micpar%NMICBSA    , &
-    VOLW      => micfor%VOLW         &
+    VLWatMicP  => micfor%VLWatMicP         &
   )
 !atmospheric gaseous CO2,CH4,O2,NH3,N2,N2O,H2
 !
@@ -584,16 +584,16 @@ contains
   ystatesfl(cid_H2GG)=ystates0l(cid_H2GG)-ystatesfl(fid_XHGDFG)+ystatesfl(fid_XHGFLG)
   ystatesfl(fid_ROXYF)=ystatesfl(fid_XOXDFG)
 
-  ystatesfl(cid_CNO2S)=ystatesfl(cid_ZNO2S)/(VOLW*micfor%VLNO3)
-  if(micfor%VLNOB>0._r8)ystatesfl(cid_CNO2B)=ystatesfl(cid_ZNO2B)/(VOLW*micfor%VLNOB)
-  ystatesfl(cid_CCO2S)=ystatesfl(cid_CO2S)/micfor%VOLW
-  ystatesfl(cid_CZ2OS)=ystatesfl(cid_Z2OS)/micfor%VOLW
-  ystatesfl(cid_CH2GS)=ystatesfl(cid_H2GS)/micfor%VOLW
-  ystatesfl(cid_COXYS)=ystatesfl(cid_OXYS)/micfor%VOLW
-  ystatesfl(cid_CZ2GS)=ystatesfl(cid_Z2GS)/micfor%VOLW
-  ystatesfl(cid_CZ2GG)=ystatesfl(cid_Z2GG)/micfor%VOLP
-  ystatesfl(cid_COXYG)=ystatesfl(cid_OXYG)/micfor%VOLP
-  ystatesfl(cid_CCH4G)=ystatesfl(cidg_CH4)/micfor%VOLP
+  ystatesfl(cid_CNO2S)=ystatesfl(cid_ZNO2S)/(VLWatMicP*micfor%VLNO3)
+  if(micfor%VLNOB>0._r8)ystatesfl(cid_CNO2B)=ystatesfl(cid_ZNO2B)/(VLWatMicP*micfor%VLNOB)
+  ystatesfl(cid_CCO2S)=ystatesfl(cid_CO2S)/micfor%VLWatMicP
+  ystatesfl(cid_CZ2OS)=ystatesfl(cid_Z2OS)/micfor%VLWatMicP
+  ystatesfl(cid_CH2GS)=ystatesfl(cid_H2GS)/micfor%VLWatMicP
+  ystatesfl(cid_COXYS)=ystatesfl(cid_OXYS)/micfor%VLWatMicP
+  ystatesfl(cid_CZ2GS)=ystatesfl(cid_Z2GS)/micfor%VLWatMicP
+  ystatesfl(cid_CZ2GG)=ystatesfl(cid_Z2GG)/micfor%VLsoiAirP
+  ystatesfl(cid_COXYG)=ystatesfl(cid_OXYG)/micfor%VLsoiAirP
+  ystatesfl(cid_CCH4G)=ystatesfl(cidg_CH4)/micfor%VLsoiAirP
 
 ! the following variables are updated in the microbial model
   ystatesfl(cid_oqc_b:cid_oqc_e)=micstt%OQC(1:jcplx)
@@ -1309,17 +1309,17 @@ contains
 
   real(r8) :: DFVCOG,DFVCHG,DFVOXG,DFVNGG
   real(r8) :: DFVN2G,DFVN3G,DFVHGG
-  real(r8) :: VOLWCO,VOLWCH,VOLWOX
-  real(r8) :: VOLWNG,VOLWN2,VOLWN3
-  real(r8) :: VOLWNB,VOLWHG,VOLCOT
+  real(r8) :: VLWatMicPMCO,VLWatMicPMCH,VLWatMicPMOX
+  real(r8) :: VLWatMicPMNG,VLWatMicPMN2,VLWatMicPMN3
+  real(r8) :: VLWatMicPMNB,VLWatMicPMHG,VOLCOT
   real(r8) :: VOLCHT,VOLOXT,VOLNGT
   real(r8) :: VOLN2T,VOLN3T,VOLNBT
   real(r8) :: VOLHGT
-  real(r8) :: VOLPMA,VOLPMB
+  real(r8) :: VLsoiAirPMA,VLsoiAirPMB
   real(r8) :: CCO2G2,CCH4G2,COXYG2
   real(r8) :: CZ2GG2,CZ2OG2,CNH3G2
   real(r8) :: CH2GG2
-  real(r8) :: VOLWMA,VOLWMB
+  real(r8) :: VLWatMicPMA,VLWatMicPMB
   real(r8) :: DLYR1,TORT1
   real(r8) :: DFGSCO,DFGSCH
   real(r8) :: DFGSOX,DFGSNG
@@ -1354,7 +1354,7 @@ contains
   real(r8) :: RCHDFG,RCODFG,RHGDFG
   real(r8) :: RN2DFG,RN3DFG,RNBDFG
   real(r8) :: RNGDFG,ROXDFG
-  real(r8) :: VOLWXA,VOLWXB
+  real(r8) :: VLWatMicPMXA,VLWatMicPMXB
   real(r8) :: XCODFS,XCHDFS
   real(r8) :: XOXDFS,XNGDFS
   real(r8) :: XN2DFS,XN3DFS
@@ -1374,8 +1374,8 @@ contains
   associate(                   &
     ZEROS2 =>  micfor%ZEROS2 , &
     ZEROS  =>  micfor%ZEROS  , &
-    VOLWM  =>  forc%VOLW     , &
-    VOLPM  =>  forc%VOLP     , &
+    VLWatMicP  =>  forc%VLWatMicP     , &
+    VLsoiAirP  =>  forc%VLsoiAirP     , &
     PARG   =>  forc%PARG       &
   )
 
@@ -1404,7 +1404,7 @@ contains
   XN2FLG=0._r8
   XN3FLG=0._r8
   XHGFLG=0._r8
-  if(VOLPM>ZEROS2)then
+  if(VLsoiAirP>ZEROS2)then
       !gaseous flux between atmosphere and soil
 
     CO2G2=AZMAX1(ystates0l(cidg_CO2))
@@ -1416,7 +1416,7 @@ contains
     ZN3G2=AZMAX1(ystates0l(cid_ZNH3G))
   endif
 
-  if(VOLWM > micfor%ZEROS2)then
+  if(VLWatMicP > micfor%ZEROS2)then
     CO2S2=AZMAX1(ystates0l(cid_CO2S))
     CH4S2=AZMAX1(ystates0l(cid_CH4S))
     OXYS2=AZMAX1(ystates0l(cid_OXYS))
@@ -1440,16 +1440,16 @@ contains
   DO MM=1,NPG
     M=MIN(NPH,INT((MM-1)*XNPT)+1)
 
-    if(VOLPM>ZEROS2)then
+    if(VLsoiAirP>ZEROS2)then
       !gaseous flux between atmosphere and soil
 
-      CCO2G2=AZMAX1(CO2G2/VOLPM)
-      CCH4G2=AZMAX1(CH4G2/VOLPM)
-      COXYG2=AZMAX1(OXYG2/VOLPM)
-      CZ2GG2=AZMAX1(Z2GG2/VOLPM)
-      CZ2OG2=AZMAX1(Z2OG2/VOLPM)
-      CNH3G2=AZMAX1(ZN3G2/VOLPM)
-      CH2GG2=AZMAX1(H2GG2/VOLPM)
+      CCO2G2=AZMAX1(CO2G2/VLsoiAirP)
+      CCH4G2=AZMAX1(CH4G2/VLsoiAirP)
+      COXYG2=AZMAX1(OXYG2/VLsoiAirP)
+      CZ2GG2=AZMAX1(Z2GG2/VLsoiAirP)
+      CZ2OG2=AZMAX1(Z2OG2/VLsoiAirP)
+      CNH3G2=AZMAX1(ZN3G2/VLsoiAirP)
+      CH2GG2=AZMAX1(H2GG2/VLsoiAirP)
 
       DFVCOG=forc%DCO2GQ*(forc%CCO2E-CCO2G2)
       DFVCHG=forc%DCH4GQ*(forc%CCH4E-CCH4G2)
@@ -1467,29 +1467,29 @@ contains
       XHGFLG=XHGFLG+DFVHGG
     endif
 
-    if(VOLWM > micfor%ZEROS2)then
+    if(VLWatMicP > micfor%ZEROS2)then
   ! dissolution/volatilization is computed as the difference between current dissolved concentration and
   ! the atmospheric equilibrium concentration, with some dissolution rate
     !dissolution between atmosphere and soil
-      VOLWMA=VOLWM*forc%VLNH4
-      VOLWMB=VOLWM*forc%VLNHB
+      VLWatMicPMA=VLWatMicP*forc%VLNH4
+      VLWatMicPMB=VLWatMicP*forc%VLNHB
 
-      CCO2S2=AZMAX1(CO2S2/VOLWM)
-      CCH4S2=AZMAX1(CH4S2/VOLWM)
-      COXYS2=AZMAX1(OXYS2/VOLWM)
-      CZ2GS2=AZMAX1(Z2GS2/VOLWM)
-      CZ2OS2=AZMAX1(Z2OS2/VOLWM)
-      CH2GS2=AZMAX1(H2GS2/VOLWM)
-      IF(VOLWMA.GT.ZEROS2)THEN
-        CNH3S2=AZMAX1(ZNH3S2/VOLWMA)
-        CNH4S2=AZMAX1(ZNH4S2/VOLWMA)
+      CCO2S2=AZMAX1(CO2S2/VLWatMicP)
+      CCH4S2=AZMAX1(CH4S2/VLWatMicP)
+      COXYS2=AZMAX1(OXYS2/VLWatMicP)
+      CZ2GS2=AZMAX1(Z2GS2/VLWatMicP)
+      CZ2OS2=AZMAX1(Z2OS2/VLWatMicP)
+      CH2GS2=AZMAX1(H2GS2/VLWatMicP)
+      IF(VLWatMicPMA.GT.ZEROS2)THEN
+        CNH3S2=AZMAX1(ZNH3S2/VLWatMicPMA)
+        CNH4S2=AZMAX1(ZNH4S2/VLWatMicPMA)
       ELSE
         CNH3S2=0.0_r8
         CNH4S2=0.0_r8
       ENDIF
-      IF(VOLWMB.GT.ZEROS2)THEN
-        CNH3B2=AZMAX1(ZNH3B2/VOLWMB)
-        CNH4B2=AZMAX1(ZNH4B2/VOLWMB)
+      IF(VLWatMicPMB.GT.ZEROS2)THEN
+        CNH3B2=AZMAX1(ZNH3B2/VLWatMicPMB)
+        CNH4B2=AZMAX1(ZNH4B2/VLWatMicPMB)
       ELSE
         CNH3B2=CNH3S2
         CNH4B2=CNH4S2
@@ -1515,14 +1515,14 @@ contains
       CZN3BQ=(PARG*forc%CNH3E*forc%SNH3L+DFGSN3*CNH3B2)/(DFGSN3+PARG)
       CH2GGQ=(PARG*forc%CH2GE*forc%SH2GL+DFGSHL*CH2GS2)/(DFGSHL+PARG)
 
-      RCODFS=(CCO2GQ-CCO2S2)*AMIN1(VOLWM,DFGSCO)
-      RCHDFS=(CCH4GQ-CCH4S2)*AMIN1(VOLWM,DFGSCH)
-      ROXDFS=(COXYGQ-COXYS2)*AMIN1(VOLWM,DFGSOX)
-      RNGDFS=(CZ2GGQ-CZ2GS2)*AMIN1(VOLWM,DFGSNG)
-      RN2DFS=(CZ2OGQ-CZ2OS2)*AMIN1(VOLWM,DFGSN2)
-      RN3DFS=(CZN3GQ-CNH3S2)*AMIN1(VOLWM*forc%VLNH4,DFGSN3)
-      RNBDFS=(CZN3BQ-CNH3B2)*AMIN1(VOLWM*forc%VLNHB,DFGSN3)
-      RHGDFS=(CH2GGQ-CH2GS2)*AMIN1(VOLWM,DFGSHL)
+      RCODFS=(CCO2GQ-CCO2S2)*AMIN1(VLWatMicP,DFGSCO)
+      RCHDFS=(CCH4GQ-CCH4S2)*AMIN1(VLWatMicP,DFGSCH)
+      ROXDFS=(COXYGQ-COXYS2)*AMIN1(VLWatMicP,DFGSOX)
+      RNGDFS=(CZ2GGQ-CZ2GS2)*AMIN1(VLWatMicP,DFGSNG)
+      RN2DFS=(CZ2OGQ-CZ2OS2)*AMIN1(VLWatMicP,DFGSN2)
+      RN3DFS=(CZN3GQ-CNH3S2)*AMIN1(VLWatMicP*forc%VLNH4,DFGSN3)
+      RNBDFS=(CZN3BQ-CNH3B2)*AMIN1(VLWatMicP*forc%VLNHB,DFGSN3)
+      RHGDFS=(CH2GGQ-CH2GS2)*AMIN1(VLWatMicP,DFGSHL)
 
 !     accumulate atmospheric dissolution/volatilization
       XCODFS=XCODFS+RCODFS
@@ -1544,33 +1544,33 @@ contains
       RHGDXS=RHGDFS*XNPT
 
   ! dissolution between gaseous and aqueous phases in soil
-      VOLWXA=natomw*VOLWMA
-      VOLWXB=natomw*VOLWMB
-      VOLPMA=VOLPM*forc%VLNH4
-      VOLPMB=VOLPM*forc%VLNHB
-      VOLWCO=VOLWM*forc%SCO2L
-      VOLWCH=VOLWM*forc%SCH4L
-      VOLWOX=VOLWM*forc%SOXYL
-      VOLWNG=VOLWM*forc%SN2GL
-      VOLWN2=VOLWM*forc%SN2OL
-      VOLWN3=VOLWMA*forc%SNH3L
-      VOLWNB=VOLWMB*forc%SNH3L
-      VOLWHG=VOLWM*forc%SH2GL
-      VOLCOT=VOLWCO+VOLPM
-      VOLCHT=VOLWCH+VOLPM
-      VOLOXT=VOLWOX+VOLPM
-      VOLNGT=VOLWNG+VOLPM
-      VOLN2T=VOLWN2+VOLPM
-      VOLN3T=VOLWN3+VOLPMA
-      VOLNBT=VOLWNB+VOLPMB
-      VOLHGT=VOLWHG+VOLPM
+      VLWatMicPMXA=natomw*VLWatMicPMA
+      VLWatMicPMXB=natomw*VLWatMicPMB
+      VLsoiAirPMA=VLsoiAirP*forc%VLNH4
+      VLsoiAirPMB=VLsoiAirP*forc%VLNHB
+      VLWatMicPMCO=VLWatMicP*forc%SCO2L
+      VLWatMicPMCH=VLWatMicP*forc%SCH4L
+      VLWatMicPMOX=VLWatMicP*forc%SOXYL
+      VLWatMicPMNG=VLWatMicP*forc%SN2GL
+      VLWatMicPMN2=VLWatMicP*forc%SN2OL
+      VLWatMicPMN3=VLWatMicPMA*forc%SNH3L
+      VLWatMicPMNB=VLWatMicPMB*forc%SNH3L
+      VLWatMicPMHG=VLWatMicP*forc%SH2GL
+      VOLCOT=VLWatMicPMCO+VLsoiAirP
+      VOLCHT=VLWatMicPMCH+VLsoiAirP
+      VOLOXT=VLWatMicPMOX+VLsoiAirP
+      VOLNGT=VLWatMicPMNG+VLsoiAirP
+      VOLN2T=VLWatMicPMN2+VLsoiAirP
+      VOLN3T=VLWatMicPMN3+VLsoiAirPMA
+      VOLNBT=VLWatMicPMNB+VLsoiAirPMB
+      VOLHGT=VLWatMicPMHG+VLsoiAirP
 
-      RCODFG=forc%DFGS*(AMAX1(ZEROS,CO2G2)*VOLWCO-AMAX1(ZEROS,CO2S2+RCODXS)*VOLPM)/VOLCOT
-      RCHDFG=forc%DFGS*(AMAX1(ZEROS,CH4G2)*VOLWCH-AMAX1(ZEROS,CH4S2+RCHDXS)*VOLPM)/VOLCHT
-      ROXDFG=forc%DFGS*(AMAX1(ZEROS,OXYG2)*VOLWOX-AMAX1(ZEROS,OXYS2+ROXDXS)*VOLPM)/VOLOXT
-      RNGDFG=forc%DFGS*(AMAX1(ZEROS,Z2GG2)*VOLWNG-AMAX1(ZEROS,Z2GS2+RNGDXS)*VOLPM)/VOLNGT
-      RN2DFG=forc%DFGS*(AMAX1(ZEROS,Z2OG2)*VOLWN2-AMAX1(ZEROS,Z2OS2+RN2DXS)*VOLPM)/VOLN2T
-      RHGDFG=forc%DFGS*(AMAX1(ZEROS,H2GG2)*VOLWHG-AMAX1(ZEROS,H2GS2+RHGDXS)*VOLPM)/VOLHGT
+      RCODFG=forc%DFGS*(AMAX1(ZEROS,CO2G2)*VLWatMicPMCO-AMAX1(ZEROS,CO2S2+RCODXS)*VLsoiAirP)/VOLCOT
+      RCHDFG=forc%DFGS*(AMAX1(ZEROS,CH4G2)*VLWatMicPMCH-AMAX1(ZEROS,CH4S2+RCHDXS)*VLsoiAirP)/VOLCHT
+      ROXDFG=forc%DFGS*(AMAX1(ZEROS,OXYG2)*VLWatMicPMOX-AMAX1(ZEROS,OXYS2+ROXDXS)*VLsoiAirP)/VOLOXT
+      RNGDFG=forc%DFGS*(AMAX1(ZEROS,Z2GG2)*VLWatMicPMNG-AMAX1(ZEROS,Z2GS2+RNGDXS)*VLsoiAirP)/VOLNGT
+      RN2DFG=forc%DFGS*(AMAX1(ZEROS,Z2OG2)*VLWatMicPMN2-AMAX1(ZEROS,Z2OS2+RN2DXS)*VLsoiAirP)/VOLN2T
+      RHGDFG=forc%DFGS*(AMAX1(ZEROS,H2GG2)*VLWatMicPMHG-AMAX1(ZEROS,H2GS2+RHGDXS)*VLsoiAirP)/VOLHGT
       XCODFG=XCODFG+RCODFG
       XCHDFG=XCHDFG+RCHDFG
       XOXDFG=XOXDFG+ROXDFG
@@ -1580,17 +1580,17 @@ contains
       XNBDFG=XNBDFG+RNBDFG
       XHGDFG=XHGDFG+RHGDFG
 
-      IF(VOLN3T.GT.ZEROS2.AND.VOLWXA.GT.ZEROS2)THEN
-        RN3DFG=forc%DFGS*(AMAX1(ZEROS,ZN3G2)*VOLWN3-AMAX1(ZEROS,ZNH3S2+RN3DXS)*VOLPMA)/VOLN3T
-        CNH3S0=AZMAX1((ZNH3S2+RN3DFG)/VOLWXA)
-        CNH4S0=AZMAX1(ZNH4S2)/VOLWXA
+      IF(VOLN3T.GT.ZEROS2.AND.VLWatMicPMXA.GT.ZEROS2)THEN
+        RN3DFG=forc%DFGS*(AMAX1(ZEROS,ZN3G2)*VLWatMicPMN3-AMAX1(ZEROS,ZNH3S2+RN3DXS)*VLsoiAirPMA)/VOLN3T
+        CNH3S0=AZMAX1((ZNH3S2+RN3DFG)/VLWatMicPMXA)
+        CNH4S0=AZMAX1(ZNH4S2)/VLWatMicPMXA
       ELSE
         RN3DFG=0.0_r8
       ENDIF
-      IF(VOLNBT.GT.ZEROS2.AND.VOLWXB.GT.ZEROS2)THEN
-        RNBDFG=forc%DFGS*(AMAX1(ZEROS,ZN3G2)*VOLWNB-AMAX1(ZEROS,ZNH3B2+RNBDXS)*VOLPMB)/VOLNBT
-        CNH3B0=AZMAX1((ZNH3B2+RNBDFG)/VOLWXB)
-        CNH4B0=AZMAX1(ZNH4B2)/VOLWXB
+      IF(VOLNBT.GT.ZEROS2.AND.VLWatMicPMXB.GT.ZEROS2)THEN
+        RNBDFG=forc%DFGS*(AMAX1(ZEROS,ZN3G2)*VLWatMicPMNB-AMAX1(ZEROS,ZNH3B2+RNBDXS)*VLsoiAirPMB)/VOLNBT
+        CNH3B0=AZMAX1((ZNH3B2+RNBDFG)/VLWatMicPMXB)
+        CNH4B0=AZMAX1(ZNH4B2)/VLWatMicPMXB
       ELSE
         RNBDFG=0.0_r8
       ENDIF
