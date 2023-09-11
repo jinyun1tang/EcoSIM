@@ -14,13 +14,14 @@ implicit none
   public :: Init_EcoSIM_Soil
   contains
 
-  subroutine Init_EcoSIM_Soil()
+  subroutine Init_EcoSIM_Soil(NYS)
   use EcoSimConst
   use GridMod           , only : SetMesh
   use InitAllocMod
   use StartsMod, only : startsim
   implicit none
   integer :: NY,NX,L,NHW,NHE,NVN,NVS
+  integer, intent(in) :: NYS
   real(r8) :: YSIN(JSA),YCOS(JSA),YAZI(JSA)
 
   NHW=1;NHE=1;NVN=1;NVS=NYS

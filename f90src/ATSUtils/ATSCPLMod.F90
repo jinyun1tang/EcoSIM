@@ -74,22 +74,22 @@ contains
   !call InitSharedData(size_col,num_cols)
   !write(*,*) "Finished shared data"
 
-  call c_f_pointer(props%shortwave_radiation%data, data, (/size_procs/))
+  call c_f_pointer(props%shortwave_radiation%data, data, (/num_cols/))
   sw_rad = data(:)
 
-  call c_f_pointer(props%longwave_radiation%data, data, (/size_procs/))
+  call c_f_pointer(props%longwave_radiation%data, data, (/num_cols/))
   lw_rad = data(:)
 
-  call c_f_pointer(props%air_temperature%data, data, (/size_procs/))
+  call c_f_pointer(props%air_temperature%data, data, (/num_cols/))
   air_temp = data(:)
 
-  call c_f_pointer(props%vapor_pressure_air%data, data, (/size_procs/))
+  call c_f_pointer(props%vapor_pressure_air%data, data, (/num_cols/))
   p_vap = data(:)
 
-  call c_f_pointer(props%wind_speed%data, data, (/size_procs/))
+  call c_f_pointer(props%wind_speed%data, data, (/num_cols/))
   wind_speed = data(:)
 
-  call c_f_pointer(props%precipitation%data, data, (/size_procs/))
+  call c_f_pointer(props%precipitation%data, data, (/num_cols/))
   precipitation_rain = data(:)
 
   atm_n2 = props%atm_n2
@@ -100,25 +100,25 @@ contains
   atm_h2 = props%atm_h2
   atm_nh3 = props%atm_nh3
 
-  call c_f_pointer(state%porosity%data, data2D, [(/size_col/),(/size_procs/)])
+  call c_f_pointer(state%porosity%data, data2D, [(/size_col/),(/num_cols/)])
   PORO=data2D(:,:)
 
-  call c_f_pointer(state%liquid_density%data, data2D, [(/size_col/),(/size_procs/)])
+  call c_f_pointer(state%liquid_density%data, data2D, [(/size_col/),(/num_cols/)])
   L_DENS=data2D(:,:)
 
-  call c_f_pointer(state%water_content%data, data2D, [(/size_col/),(/size_procs/)])
+  call c_f_pointer(state%water_content%data, data2D, [(/size_col/),(/num_cols/)])
   WC=data2D(:,:)
 
-  call c_f_pointer(props%liquid_saturation%data, data2D, [(/size_col/),(/size_procs/)])
+  call c_f_pointer(props%liquid_saturation%data, data2D, [(/size_col/),(/num_cols/)])
   L_SAT=data2D(:,:)
 
-  call c_f_pointer(props%relative_permeability%data, data2D, [(/size_col/),(/size_procs/)])
+  call c_f_pointer(props%relative_permeability%data, data2D, [(/size_col/),(/num_cols/)])
   REL_PERM=data2D(:,:)
 
-  call c_f_pointer(state%hydraulic_conductivity%data, data2D, [(/size_col/),(/size_procs/)])
+  call c_f_pointer(state%hydraulic_conductivity%data, data2D, [(/size_col/),(/num_cols/)])
   H_COND=data2D(:,:)
 
-  call c_f_pointer(state%temperature%data, data2D, [(/size_col/),(/size_procs/)])
+  call c_f_pointer(state%temperature%data, data2D, [(/size_col/),(/num_cols/)])
   TEMP=data2D(:,:)
 
   write(*,*) "Data Transfer Finished"
@@ -187,13 +187,14 @@ contains
   implicit none
   !character(len=*), parameter :: subname=trim(mod_filename)//'::Init_EcoSIM'
   type (BGCSizes), intent(in) :: sizes
+  integer :: size_col, num_cols
 
   size_col = sizes%ncells_per_col_
-  num_cols = state%porosity%cols
+  num_cols = sizes%num_columns
 
   call InitSharedData(size_col,num_cols)
 
-  !call Init_EcoSIM_Soil()
+  call Init_EcoSIM_Soil(size_col)
   end subroutine Init_EcoSIM
 !------------------------------------------------------------------------------------------
 
