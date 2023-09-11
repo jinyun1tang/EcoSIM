@@ -22,11 +22,17 @@ Module SharedDataMod
   real(r8), allocatable :: a_CORGC(:,:)   !organic carbon content
   real(r8), allocatable :: a_CORGN(:,:)   !organic nitrogen content
   real(r8), allocatable :: a_CORGP(:,:)   !organic phosphorus content
-  real(r8), allocatable :: a_poros(:,:)
+  real(r8), allocatable :: a_PORO(:,:)
 !  real(r8), allocatable ::a_CORGR(:,:)  !organic nitrogen  content
   real(r8), allocatable :: a_ASP(:)
   real(r8), allocatable :: a_ALT(:)
   real(r8), allocatable :: a_ATKA(:)
+  real(r8), allocatable :: a_WC(:,:) !Soil water content
+  real(r8), allocatable :: a_LSAT(:,:) !liquid saturation
+  real(r8), allocatable :: a_RELPERM(:,:) !relative_permeability
+  real(r8), allocatable :: a_HCOND(:,:) !hydraulic conductivity
+  real(r8), allocatable :: a_TEMP(:,:) !temperature
+  real(r8), allocatable :: a_BKDSI(:,:) !bulk density
 
   real(r8), allocatable :: tairc(:)  !air temperature oC
   real(r8), allocatable :: uwind(:)  !wind speed, m/s

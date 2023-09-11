@@ -20,14 +20,18 @@ module ATSCPLMod
   real(r8), allocatable :: precipitation_rain(:)
 
   !ATS variables
-  real(r8), allocatable :: PORO(:,:) !porosity
-  real(r8), allocatable :: L_DENS(:,:) !liquid density
-  real(r8), allocatable :: WC(:,:) !Soil water content
-  real(r8), allocatable :: WC_OLD(:,:) !saving the wc for testing
-  real(r8), allocatable :: L_SAT(:,:) !liquid saturation
-  real(r8), allocatable :: REL_PERM(:,:) !relative_permeability
-  real(r8), allocatable :: H_COND(:,:) !hydraulic conductivity
-  real(r8), allocatable :: TEMP(:,:) !temperature
+  !Should not need as they are defined in SharedDataMod, but leaving in
+  !Just in case
+  !real(r8), allocatable :: PORO(:,:) !porosity
+  !real(r8), allocatable :: L_DENS(:,:) !liquid density
+  !real(r8), allocatable :: WC(:,:) !Soil water content
+  !real(r8), allocatable :: WC_OLD(:,:) !saving the wc for testing
+  !real(r8), allocatable :: L_SAT(:,:) !liquid saturation
+  !real(r8), allocatable :: REL_PERM(:,:) !relative_permeability
+  !real(r8), allocatable :: H_COND(:,:) !hydraulic conductivity
+  !real(r8), allocatable :: TEMP(:,:) !temperature
+  !real(r8), allocatable :: FIELD_CAPACITY(:,:)
+  !real(r8), allocatable :: WILTING_POINT(:,:)
 
 contains
 !------------------------------------------------------------------------------------------
@@ -55,24 +59,10 @@ contains
   !ncol=size(filter_col)
 
   !1D vertical vector,
-  !variables that take on a different value in each cell
-  !Bulk of data will go here
-  !nvar=size(var_2d)
-
-  !do j1=1,nvar
-  !case ('CSAND')  !g/kg soil
-  !  csand(1:JZSOI,ncol)=data_3d(1:JZSOI,j1)
-  !case ('CSILT')
-  !  CSILT(1:JZSOI,ncol)=data_3d(1:JZSOI,j1)
-  !Variables related to flow:
   write(*,*) "computing column size"
 
   size_col = sizes%ncells_per_col_
   num_cols = props%shortwave_radiation%size
-
-  !write(*,*) "Testing shared data..."
-  !call InitSharedData(size_col,num_cols)
-  !write(*,*) "Finished shared data"
 
   call c_f_pointer(props%shortwave_radiation%data, data, (/num_cols/))
   sw_rad = data(:)
@@ -101,25 +91,22 @@ contains
   atm_nh3 = props%atm_nh3
 
   call c_f_pointer(state%porosity%data, data2D, [(/size_col/),(/num_cols/)])
-  PORO=data2D(:,:)
-
-  call c_f_pointer(state%liquid_density%data, data2D, [(/size_col/),(/num_cols/)])
-  L_DENS=data2D(:,:)
+  a_PORO=data2D(:,:)
 
   call c_f_pointer(state%water_content%data, data2D, [(/size_col/),(/num_cols/)])
-  WC=data2D(:,:)
+  a_WC=data2D(:,:)
 
   call c_f_pointer(props%liquid_saturation%data, data2D, [(/size_col/),(/num_cols/)])
-  L_SAT=data2D(:,:)
+  a_LSAT=data2D(:,:)
 
   call c_f_pointer(props%relative_permeability%data, data2D, [(/size_col/),(/num_cols/)])
-  REL_PERM=data2D(:,:)
+  a_RELPERM=data2D(:,:)
 
   call c_f_pointer(state%hydraulic_conductivity%data, data2D, [(/size_col/),(/num_cols/)])
-  H_COND=data2D(:,:)
+  a_HCOND=data2D(:,:)
 
   call c_f_pointer(state%temperature%data, data2D, [(/size_col/),(/num_cols/)])
-  TEMP=data2D(:,:)
+  a_TEMP=data2D(:,:)
 
   write(*,*) "Data Transfer Finished"
   end subroutine ATS2EcoSIMData
@@ -149,17 +136,14 @@ contains
 
   !seems like we call the pointer as normal,
   !then just reverse the data
-  call c_f_pointer(state%liquid_density%data, data2D, [(/size_col/),(/size_procs/)])
-  data2D(:,:)=L_DENS
-
   call c_f_pointer(state%water_content%data, data2D, [(/size_col/),(/size_procs/)])
-  data2D(:,:)=WC
+  data2D(:,:)=a_WC
 
   call c_f_pointer(state%hydraulic_conductivity%data, data2D, [(/size_col/),(/size_procs/)])
-  data2D(:,:)=H_COND
+  data2D(:,:)=a_HCOND
 
   call c_f_pointer(state%temperature%data, data2D, [(/size_col/),(/size_procs/)])
-  data2D(:,:)=TEMP
+  data2D(:,:)=a_TEMP
 
   write(*,*) "finished copying back in driver"
 
