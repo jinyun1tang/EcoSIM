@@ -40,6 +40,12 @@ implicit none
   write(*,*) "Finished Allocate, beginning loop"
 
   do NY=1,NYS
+  
+    write(*,*) "For loop ", NY, " out of ", NYS
+    write(*,*) "NU value: ", NU(NY,NX)
+    write(*,*) "AREA value: ", AREA(3,NU(NY,NX),NY,NX)
+    write(*,*) "a_NU value: ", a_NU(NY)
+
     NU(NY,NX)=a_NU(NY)
     NL(NY,NX)=a_NL(NY)
     AREA(3,0,NY,NX)=a_AREA3(NY)
