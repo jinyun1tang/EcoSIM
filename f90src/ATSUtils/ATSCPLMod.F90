@@ -20,6 +20,7 @@ module ATSCPLMod
   real(r8), allocatable :: precipitation_rain(:)
 
   !ATS variables
+
   real(r8), allocatable :: PORO(:,:) !porosity
   real(r8), allocatable :: L_DENS(:,:) !liquid density
   real(r8), allocatable :: WC(:,:) !Soil water content
@@ -30,6 +31,12 @@ module ATSCPLMod
   real(r8), allocatable :: TEMP(:,:) !temperature
   real(r8), allocatable :: FIELD_CAPACITY(:,:)
   real(r8), allocatable :: WILTING_POINT(:,:)
+
+  !current vars needed by coupling:
+  real(r8), allocatable :: a_FC(:,:)
+  real(r8), allocatable :: a_WP(:,:)
+  real(r8), allocatable :: a_BKDSI(:,:)
+
 
 contains
 !------------------------------------------------------------------------------------------
@@ -80,6 +87,8 @@ contains
   call c_f_pointer(props%precipitation%data, data, (/num_cols/))
   precipitation_rain = data(:)
 
+!!** Currently used by coupler **!!
+
   atm_n2 = props%atm_n2
   atm_o2 = props%atm_o2
   atm_co2 = props%atm_co2
@@ -87,6 +96,17 @@ contains
   atm_n2o = props%atm_n2o
   atm_h2 = props%atm_h2
   atm_nh3 = props%atm_nh3
+
+  call c_f_pointer(state%plant_wilting_factor%data, data2D, [(/size_col/),(/num_cols/)])
+  a_WP=data2D(:,:)
+
+  call c_f_pointer(state%rooting_depth_fraction%data, data2D, [(/size_col/),(/num_cols/)])
+  a_FC=data2D(:,:)
+
+  call c_f_pointer(state%bulk_density%data, data2D, [(/size_col/),(/num_cols/)])
+  a_BKDSI=data2D(:,:)
+
+!!***********************************!!
 
   call c_f_pointer(state%porosity%data, data2D, [(/size_col/),(/num_cols/)])
   PORO=data2D(:,:)
