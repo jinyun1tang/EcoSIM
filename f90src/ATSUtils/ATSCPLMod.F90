@@ -8,35 +8,6 @@ module ATSCPLMod
   public
   character(len=*), private, parameter :: mod_filename=&
   __FILE__
-!  integer :: JZSOI !number of soil layers
-!  integer :: JSNO  !number of snow layers
-
-! temporary data holder in ecosim
-  real(r8), allocatable :: sw_rad(:)
-  real(r8), allocatable :: lw_rad(:)
-  real(r8), allocatable :: air_temp(:)
-  real(r8), allocatable :: p_vap(:)
-  real(r8), allocatable :: wind_speed(:)
-  real(r8), allocatable :: precipitation_rain(:)
-
-  !ATS variables
-
-  real(r8), allocatable :: PORO(:,:) !porosity
-  real(r8), allocatable :: L_DENS(:,:) !liquid density
-  real(r8), allocatable :: WC(:,:) !Soil water content
-  real(r8), allocatable :: WC_OLD(:,:) !saving the wc for testing
-  real(r8), allocatable :: LSAT(:,:) !liquid saturation
-  real(r8), allocatable :: RELPERM(:,:) !relative_permeability
-  real(r8), allocatable :: HCOND(:,:) !hydraulic conductivity
-  real(r8), allocatable :: TEMP(:,:) !temperature
-  real(r8), allocatable :: FIELD_CAPACITY(:,:)
-  real(r8), allocatable :: WILTING_POINT(:,:)
-
-  !current vars needed by coupling:
-  real(r8), allocatable :: a_FC(:,:)
-  real(r8), allocatable :: a_WP(:,:)
-  real(r8), allocatable :: a_BKDSI(:,:)
-
 
 contains
 !------------------------------------------------------------------------------------------
@@ -70,22 +41,22 @@ contains
   num_cols = props%shortwave_radiation%size
 
   call c_f_pointer(props%shortwave_radiation%data, data, (/num_cols/))
-  sw_rad = data(:)
+  srad = data(:)
 
   call c_f_pointer(props%longwave_radiation%data, data, (/num_cols/))
-  lw_rad = data(:)
+  lrad = data(:)
 
   call c_f_pointer(props%air_temperature%data, data, (/num_cols/))
-  air_temp = data(:)
+  tairc = data(:)
 
   call c_f_pointer(props%vapor_pressure_air%data, data, (/num_cols/))
-  p_vap = data(:)
+  vpa = data(:)
 
   call c_f_pointer(props%wind_speed%data, data, (/num_cols/))
-  wind_speed = data(:)
+  uwind = data(:)
 
   call c_f_pointer(props%precipitation%data, data, (/num_cols/))
-  precipitation_rain = data(:)
+  prec = data(:)
 
 !!** Currently used by coupler **!!
 
@@ -109,22 +80,22 @@ contains
 !!***********************************!!
 
   call c_f_pointer(state%porosity%data, data2D, [(/size_col/),(/num_cols/)])
-  PORO=data2D(:,:)
+  a_PORO=data2D(:,:)
 
   call c_f_pointer(state%water_content%data, data2D, [(/size_col/),(/num_cols/)])
-  WC=data2D(:,:)
+  a_WC=data2D(:,:)
 
   call c_f_pointer(props%liquid_saturation%data, data2D, [(/size_col/),(/num_cols/)])
-  LSAT=data2D(:,:)
+  a_LSAT=data2D(:,:)
 
   call c_f_pointer(props%relative_permeability%data, data2D, [(/size_col/),(/num_cols/)])
-  RELPERM=data2D(:,:)
+  a_RELPERM=data2D(:,:)
 
   call c_f_pointer(state%hydraulic_conductivity%data, data2D, [(/size_col/),(/num_cols/)])
-  HCOND=data2D(:,:)
+  a_HCOND=data2D(:,:)
 
   call c_f_pointer(state%temperature%data, data2D, [(/size_col/),(/num_cols/)])
-  TEMP=data2D(:,:)
+  a_TEMP=data2D(:,:)
 
   write(*,*) "Data Transfer Finished"
   end subroutine ATS2EcoSIMData
@@ -154,14 +125,24 @@ contains
 
   !seems like we call the pointer as normal,
   !then just reverse the data
+
+  call c_f_pointer(state%bulk_density%data, data2D, [(/size_col/),(/size_procs/)])
+  data2D(:,:)=a_BKDSI
+
+  call c_f_pointer(state%plant_wilting_factor%data, data2D, [(/size_col/),(/size_procs/)])
+  data2D(:,:)=a_WP
+
+  call c_f_pointer(state%rooting_depth_fraction%data, data2D, [(/size_col/),(/size_procs/)])
+  data2D(:,:)=a_FC
+
   call c_f_pointer(state%water_content%data, data2D, [(/size_col/),(/size_procs/)])
-  data2D(:,:)=WC
+  data2D(:,:)=a_WC
 
   call c_f_pointer(state%hydraulic_conductivity%data, data2D, [(/size_col/),(/size_procs/)])
-  data2D(:,:)=HCOND
+  data2D(:,:)=a_HCOND
 
   call c_f_pointer(state%temperature%data, data2D, [(/size_col/),(/size_procs/)])
-  data2D(:,:)=TEMP
+  data2D(:,:)=a_TEMP
 
   write(*,*) "finished copying back in driver"
 

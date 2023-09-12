@@ -17,9 +17,9 @@ include_directories(${CMAKE_BINARY_DIR}/f90src/minimath/)
 include_directories(${CMAKE_BINARY_DIR}/f90src/ecosim_datatype/)
 include_directories(${CMAKE_BINARY_DIR}/f90src/ioutils/)
 include_directories(${CMAKE_BINARY_DIR}/f90src/)
+include_directories(${CMAKE_BINARY_DIR}/f90src/ATSUtils/)
 
 include(add_ecosim_library)
-
 
 link_libraries(${ECOSIM_LIBRARIES};${ECOSIM_TPLS})
 include(add_ecosim_executable)
