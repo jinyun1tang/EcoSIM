@@ -32,7 +32,6 @@ Module SharedDataMod
   real(r8), allocatable :: a_RELPERM(:,:) !relative_permeability
   real(r8), allocatable :: a_HCOND(:,:) !hydraulic conductivity
   real(r8), allocatable :: a_TEMP(:,:) !temperature
-  real(r8), allocatable :: a_BKDSI(:,:) !bulk density
 
   real(r8), allocatable :: tairc(:)  !air temperature oC
   real(r8), allocatable :: uwind(:)  !wind speed, m/s
@@ -66,7 +65,7 @@ Module SharedDataMod
   allocate(a_CORGC(ncells_per_col_,ncol))   !organic carbon content
   allocate(a_CORGN(ncells_per_col_,ncol))   !organic nitrogen content
   allocate(a_CORGP(ncells_per_col_,ncol))   !organic phosphorus content
-  allocate(a_poros(ncells_per_col_,ncol))
+  allocate(a_PORO(ncells_per_col_,ncol))
   allocate(a_AREA3(ncol))
   allocate(a_NU(ncol))
   allocate(a_NL(ncol))
@@ -96,7 +95,7 @@ Module SharedDataMod
   call destroy(a_CORGC)
   call destroy(a_CORGN)
   call destroy(a_CORGP)
-  call destroy(a_poros)
+  call destroy(a_PORO)
   call destroy(a_AREA3)
   call destroy(a_ASP)
   call destroy(a_ALT)

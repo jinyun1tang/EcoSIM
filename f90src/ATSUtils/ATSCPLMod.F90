@@ -20,18 +20,16 @@ module ATSCPLMod
   real(r8), allocatable :: precipitation_rain(:)
 
   !ATS variables
-  !Should not need as they are defined in SharedDataMod, but leaving in
-  !Just in case
-  !real(r8), allocatable :: PORO(:,:) !porosity
-  !real(r8), allocatable :: L_DENS(:,:) !liquid density
-  !real(r8), allocatable :: WC(:,:) !Soil water content
-  !real(r8), allocatable :: WC_OLD(:,:) !saving the wc for testing
-  !real(r8), allocatable :: L_SAT(:,:) !liquid saturation
-  !real(r8), allocatable :: REL_PERM(:,:) !relative_permeability
-  !real(r8), allocatable :: H_COND(:,:) !hydraulic conductivity
-  !real(r8), allocatable :: TEMP(:,:) !temperature
-  !real(r8), allocatable :: FIELD_CAPACITY(:,:)
-  !real(r8), allocatable :: WILTING_POINT(:,:)
+  real(r8), allocatable :: PORO(:,:) !porosity
+  real(r8), allocatable :: L_DENS(:,:) !liquid density
+  real(r8), allocatable :: WC(:,:) !Soil water content
+  real(r8), allocatable :: WC_OLD(:,:) !saving the wc for testing
+  real(r8), allocatable :: LSAT(:,:) !liquid saturation
+  real(r8), allocatable :: RELPERM(:,:) !relative_permeability
+  real(r8), allocatable :: HCOND(:,:) !hydraulic conductivity
+  real(r8), allocatable :: TEMP(:,:) !temperature
+  real(r8), allocatable :: FIELD_CAPACITY(:,:)
+  real(r8), allocatable :: WILTING_POINT(:,:)
 
 contains
 !------------------------------------------------------------------------------------------
@@ -91,22 +89,22 @@ contains
   atm_nh3 = props%atm_nh3
 
   call c_f_pointer(state%porosity%data, data2D, [(/size_col/),(/num_cols/)])
-  a_PORO=data2D(:,:)
+  PORO=data2D(:,:)
 
   call c_f_pointer(state%water_content%data, data2D, [(/size_col/),(/num_cols/)])
-  a_WC=data2D(:,:)
+  WC=data2D(:,:)
 
   call c_f_pointer(props%liquid_saturation%data, data2D, [(/size_col/),(/num_cols/)])
-  a_LSAT=data2D(:,:)
+  LSAT=data2D(:,:)
 
   call c_f_pointer(props%relative_permeability%data, data2D, [(/size_col/),(/num_cols/)])
-  a_RELPERM=data2D(:,:)
+  RELPERM=data2D(:,:)
 
   call c_f_pointer(state%hydraulic_conductivity%data, data2D, [(/size_col/),(/num_cols/)])
-  a_HCOND=data2D(:,:)
+  HCOND=data2D(:,:)
 
   call c_f_pointer(state%temperature%data, data2D, [(/size_col/),(/num_cols/)])
-  a_TEMP=data2D(:,:)
+  TEMP=data2D(:,:)
 
   write(*,*) "Data Transfer Finished"
   end subroutine ATS2EcoSIMData
@@ -137,13 +135,13 @@ contains
   !seems like we call the pointer as normal,
   !then just reverse the data
   call c_f_pointer(state%water_content%data, data2D, [(/size_col/),(/size_procs/)])
-  data2D(:,:)=a_WC
+  data2D(:,:)=WC
 
   call c_f_pointer(state%hydraulic_conductivity%data, data2D, [(/size_col/),(/size_procs/)])
-  data2D(:,:)=a_HCOND
+  data2D(:,:)=HCOND
 
   call c_f_pointer(state%temperature%data, data2D, [(/size_col/),(/size_procs/)])
-  data2D(:,:)=a_TEMP
+  data2D(:,:)=TEMP
 
   write(*,*) "finished copying back in driver"
 
