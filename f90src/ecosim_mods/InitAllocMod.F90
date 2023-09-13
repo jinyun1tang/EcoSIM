@@ -63,25 +63,25 @@ implicit none
 
   call InitPlantMorphSize()
 
-  call InitGrosub(jpstgs,JRS)
+  !call InitGrosub(jpstgs,JRS)
 
   call InitGridData
 
-  call InitTracerIDs(salt_model)
+  !call InitTracerIDs(salt_model)
 
   call InitLandSurfData
 
   call InitEcoSIMCtrlData
 
-  call InitCanopyData
+  !call InitCanopyData
 
-  call InitCanopyRad
+  !call InitCanopyRad
 
-  call InitAquaChem
+  !call InitAquaChem
 
-  call InitPlantMngmtData
+  !call InitPlantMngmtData
 
-  call InitPlantRates(micpar%n_pltlitrk,pltpar%jroots)
+  !call InitPlantRates(micpar%n_pltlitrk,pltpar%jroots)
 
   call InitSoilProperty
 
@@ -93,11 +93,11 @@ implicit none
 
   call InitIrrigation
 
-  call InitPlantAPIData()
+  !call InitPlantAPIData()
 
-  call InitMicrobialData
+  !call InitMicrobialData
 
-  call InitChemTranspData
+  !call InitChemTranspData
 
   call InitSoilBGCData(pltpar%n_pltlitrk)
 
@@ -105,17 +105,17 @@ implicit none
 
   call InitFertilizerData
 
-  call InitPlantTraits(pltpar%n_pltlitrk)
+  !call InitPlantTraits(pltpar%n_pltlitrk)
 
   call InitFlagData
 
   call InitEcoSimSum
 
-  call InitRootData(pltpar%jroots)
+  !call InitRootData(pltpar%jroots)
 
   call InitClimForcData
 
-  call InitEcosimBGCFluxData
+  !call InitEcosimBGCFluxData
 
   call InitSnowData
 

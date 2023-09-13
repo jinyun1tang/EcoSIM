@@ -68,10 +68,10 @@ contains
   atm_h2 = props%atm_h2
   atm_nh3 = props%atm_nh3
 
-  call c_f_pointer(state%plant_wilting_factor%data, data2D, [(/size_col/),(/num_cols/)])
+  call c_f_pointer(props%plant_wilting_factor%data, data2D, [(/size_col/),(/num_cols/)])
   a_WP=data2D(:,:)
 
-  call c_f_pointer(state%rooting_depth_fraction%data, data2D, [(/size_col/),(/num_cols/)])
+  call c_f_pointer(props%rooting_depth_fraction%data, data2D, [(/size_col/),(/num_cols/)])
   a_FC=data2D(:,:)
 
   call c_f_pointer(state%bulk_density%data, data2D, [(/size_col/),(/num_cols/)])
@@ -128,12 +128,6 @@ contains
 
   call c_f_pointer(state%bulk_density%data, data2D, [(/size_col/),(/size_procs/)])
   data2D(:,:)=a_BKDSI
-
-  call c_f_pointer(state%plant_wilting_factor%data, data2D, [(/size_col/),(/size_procs/)])
-  data2D(:,:)=a_WP
-
-  call c_f_pointer(state%rooting_depth_fraction%data, data2D, [(/size_col/),(/size_procs/)])
-  data2D(:,:)=a_FC
 
   call c_f_pointer(state%water_content%data, data2D, [(/size_col/),(/size_procs/)])
   data2D(:,:)=a_WC

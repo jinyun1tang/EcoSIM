@@ -56,16 +56,16 @@ Module SharedDataMod
 
   allocate(a_csand(ncells_per_col_,ncol))
   allocate(a_CSILT(ncells_per_col_,ncol))   !silt mass fraction
-  allocate(a_BKDSI(ncells_per_col_,ncol))   !bulk density
+  !allocate(a_BKDSI(ncells_per_col_,ncol))   !bulk density
   allocate(a_CumDepth2LayerBottom(ncells_per_col_,ncol))   !dpeth (from surfce to bottom)
-  allocate(a_FC(ncells_per_col_,ncol))      !field capacity
-  allocate(a_WP(ncells_per_col_,ncol))      !wilting point
+  !allocate(a_FC(ncells_per_col_,ncol))      !field capacity
+  !allocate(a_WP(ncells_per_col_,ncol))      !wilting point
   allocate(a_FHOL(ncells_per_col_,ncol))    !macropore fraction
   allocate(a_ROCK(ncells_per_col_,ncol))    !mass fraction as rock
   allocate(a_CORGC(ncells_per_col_,ncol))   !organic carbon content
   allocate(a_CORGN(ncells_per_col_,ncol))   !organic nitrogen content
   allocate(a_CORGP(ncells_per_col_,ncol))   !organic phosphorus content
-  allocate(a_PORO(ncells_per_col_,ncol))
+  !allocate(a_PORO(ncells_per_col_,ncol))
   allocate(a_AREA3(ncol))
   allocate(a_NU(ncol))
   allocate(a_NL(ncol))

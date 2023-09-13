@@ -40,37 +40,37 @@ contains
   type(Var_desc_t) :: vardesc
   logical :: readvar
 
-  call ncd_pio_openfile(grid_nfid, grid_file_in, ncd_nowrite)
-
-  bounds%ngrid=get_dim_len(grid_nfid, 'ngrid')
-
-  bounds%ntopou=get_dim_len(grid_nfid, 'ntopou')
-
-  call check_var(grid_nfid, 'NHW', vardesc, readvar)
-  if(.not. readvar)then
-    call endrun('fail to find NHW in '//trim(mod_filename), __LINE__)
-  endif
-  call check_ret(nf90_get_var(grid_nfid%fh, vardesc%varid, NHW), 'in '//trim(mod_filename))
-
-  call check_var(grid_nfid, 'NHE', vardesc, readvar)
-  if(.not. readvar)then
-    call endrun('fail to find NHE in '//trim(mod_filename), __LINE__)
-  endif
-  call check_ret(nf90_get_var(grid_nfid%fh, vardesc%varid, NHE), 'in '//trim(mod_filename))
-
-  call check_var(grid_nfid, 'NVN', vardesc, readvar)
-  if(.not. readvar)then
-    call endrun('fail to find NVN in '//trim(mod_filename), __LINE__)
-  endif
-  call check_ret(nf90_get_var(grid_nfid%fh, vardesc%varid, NVN), 'in '//trim(mod_filename))
-
-  call check_var(grid_nfid, 'NVS', vardesc, readvar)
-  if(.not. readvar)then
-    call endrun('fail to find NVS in '//trim(mod_filename), __LINE__)
-  endif
-  call check_ret(nf90_get_var(grid_nfid%fh, vardesc%varid, NVS), 'in '//trim(mod_filename))
-
-  call ncd_pio_closefile(grid_nfid)
+  !call ncd_pio_openfile(grid_nfid, grid_file_in, ncd_nowrite)
+  !
+  !bounds%ngrid=get_dim_len(grid_nfid, 'ngrid')
+  !
+  !bounds%ntopou=get_dim_len(grid_nfid, 'ntopou')
+  !
+!  call check_var(grid_nfid, 'NHW', vardesc, readvar)
+!  if(.not. readvar)then
+!    call endrun('fail to find NHW in '//trim(mod_filename), __LINE__)
+!  endif
+!  call check_ret(nf90_get_var(grid_nfid%fh, vardesc%varid, NHW), 'in '//trim(mod_filename))
+!
+!  call check_var(grid_nfid, 'NHE', vardesc, readvar)
+!  if(.not. readvar)then
+!    call endrun('fail to find NHE in '//trim(mod_filename), __LINE__)
+!  endif
+!  call check_ret(nf90_get_var(grid_nfid%fh, vardesc%varid, NHE), 'in '//trim(mod_filename))
+!
+!  call check_var(grid_nfid, 'NVN', vardesc, readvar)
+!  if(.not. readvar)then
+!    call endrun('fail to find NVN in '//trim(mod_filename), __LINE__)
+!  endif
+!  call check_ret(nf90_get_var(grid_nfid%fh, vardesc%varid, NVN), 'in '//trim(mod_filename))
+!
+!  call check_var(grid_nfid, 'NVS', vardesc, readvar)
+!  if(.not. readvar)then
+!    call endrun('fail to find NVS in '//trim(mod_filename), __LINE__)
+!  endif
+!  call check_ret(nf90_get_var(grid_nfid%fh, vardesc%varid, NVS), 'in '//trim(mod_filename))
+!
+!  call ncd_pio_closefile(grid_nfid)
 
   bounds%NHW =NHW
   bounds%NVN =NVN
