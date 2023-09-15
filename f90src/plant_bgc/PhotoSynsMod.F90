@@ -52,7 +52,7 @@ implicit none
   FMOL       => plt_photo%FMOL  , &
   DCO2       => plt_photo%DCO2  , &
   ZEROP      => plt_biom%ZEROP  , &
-  ARLFL      => plt_morph%ARLFL , &
+  CanPLNBLA      => plt_morph%CanPLNBLA , &
   PARDIF     => plt_rad%PARDIF  , &
   PAR        => plt_rad%PAR     , &
   TAU0       => plt_rad%TAU0    , &
@@ -62,7 +62,7 @@ implicit none
 ! FOR EACH CANOPY LAYER
 !
   D210: DO L=JC1,1,-1
-    IF(ARLFL(L,K,NB,NZ).GT.ZEROP(NZ))THEN
+    IF(CanPLNBLA(L,K,NB,NZ).GT.ZEROP(NZ))THEN
 !
 !     FOR EACH LEAF AZIMUTH AND INCLINATION
 !
@@ -325,7 +325,7 @@ implicit none
   CO2I       => plt_photo%CO2I  , &
   CBXN       => plt_photo%CBXN  , &
   VCGR4      => plt_photo%VCGR4 , &
-  ARLFL      => plt_morph%ARLFL , &
+  CanPLNBLA      => plt_morph%CanPLNBLA , &
   ZERO       => plt_site%ZERO   , &
   PARDIF     => plt_rad%PARDIF  , &
   PAR        => plt_rad%PAR     , &
@@ -335,7 +335,7 @@ implicit none
 ! FOR EACH CANOPY LAYER
 !
   D110: DO L=JC1,1,-1
-    IF(ARLFL(L,K,NB,NZ).GT.ZEROP(NZ))THEN
+    IF(CanPLNBLA(L,K,NB,NZ).GT.ZEROP(NZ))THEN
 !
 !     FOR EACH LEAF AZIMUTH AND INCLINATION
 !
@@ -628,14 +628,14 @@ implicit none
     VCGRO   =>  plt_photo%VCGRO  , &
     IGTYP   =>  plt_pheno%IGTYP  , &
     SSIN    =>  plt_rad%SSIN     , &
-    RADP    =>  plt_rad%RADP     , &
+    PARByCanP    =>  plt_rad%PARByCanP     , &
     ZEROP   =>  plt_biom%ZEROP   , &
     ARLF1   =>  plt_morph%ARLF1  , &
     FDBK    =>  plt_photo%FDBK     &
   )
 
   IF(abs(FDBK(NB,NZ)).GT.0._r8)THEN
-    IF(SSIN.GT.0.0_r8.AND.RADP(NZ).GT.0.0_r8.AND.CO2Q(NZ).GT.0.0_r8)THEN
+    IF(SSIN.GT.0.0_r8.AND.PARByCanP(NZ).GT.0.0_r8.AND.CO2Q(NZ).GT.0.0_r8)THEN
       CO2F=0._r8
       CH2O=0._r8
       IF(IGTYP(NZ).NE.0.OR.WFNC.GT.0.0_r8)THEN
@@ -649,7 +649,7 @@ implicit none
 !
 !             C4 PHOTOSYNTHESIS
 !
-!             ARLF,ARLFL=leaf area
+!             ARLF,CanPLNBLA=leaf area
 !             ICTYP=photosynthesis type:3=C3,4=C4 from PFT file
 !             VCGR4=PEP carboxylation rate unlimited by CO2
 !

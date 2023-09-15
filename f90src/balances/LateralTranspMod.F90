@@ -41,6 +41,7 @@ implicit none
   integer :: N4B,N5B
   real(r8) :: VTATM,VTGAS
   real(r8) :: trcg_VOLG(idg_beg:idg_end)
+  
 ! begin_execution
   call ZeroFluxArrays(NY,NX)
   call ZeroFluxAccumulators(NY,NX)
@@ -137,14 +138,14 @@ implicit none
 !
 !     NET FREEZE-THAW
 !
-!     WatFreezeThawMicP,WatFreezeThawMacP=net freeze-thaw flux in micropores,macropores
-!     THeatFrezThaw=net freeze-thaw latent heat flux
-!     THAW,THAWH=freeze-thaw flux in micropores,macropores from watsub.f
-!     HTHAW=freeze-thaw latent heat flux from watsub.f
+!     WatIceThawMicP,WatIceThawMacP=net freeze-thaw flux in micropores,macropores
+!     THeatSoiThaw=net freeze-thaw latent heat flux
+!     THAW,TLIceThawMacP=freeze-thaw flux in micropores,macropores from watsub.f
+!     TLSoiPIceHeatFlxFrez=freeze-thaw latent heat flux from watsub.f
   !
-    WatFreezeThawMicP(N3,N2,N1)=WatFreezeThawMicP(N3,N2,N1)+THAW(N3,N2,N1)
-    WatFreezeThawMacP(N3,N2,N1)=WatFreezeThawMacP(N3,N2,N1)+THAWH(N3,N2,N1)
-    THeatFrezThaw(N3,N2,N1)=THeatFrezThaw(N3,N2,N1)+HTHAW(N3,N2,N1)
+    WatIceThawMicP(N3,N2,N1)=WatIceThawMicP(N3,N2,N1)+TLIceThawMicP(N3,N2,N1)
+    WatIceThawMacP(N3,N2,N1)=WatIceThawMacP(N3,N2,N1)+TLIceThawMacP(N3,N2,N1)
+    THeatSoiThaw(N3,N2,N1)=THeatSoiThaw(N3,N2,N1)+TLSoiPIceHeatFlxFrez(N3,N2,N1)
   ENDDO D8575
   end subroutine LateralTranspt
 
@@ -207,9 +208,9 @@ implicit none
     TFLWX(L,NY,NX)=0.0_r8
     TWaterFlowMacP(L,NY,NX)=0.0_r8
     THeatFlowSoiCell(L,NY,NX)=0.0_r8
-    WatFreezeThawMicP(L,NY,NX)=0.0_r8
-    WatFreezeThawMacP(L,NY,NX)=0.0_r8
-    THeatFrezThaw(L,NY,NX)=0.0_r8
+    WatIceThawMicP(L,NY,NX)=0.0_r8
+    WatIceThawMacP(L,NY,NX)=0.0_r8
+    THeatSoiThaw(L,NY,NX)=0.0_r8
 !
 !     INITIALIZE GAS AND SOLUTE NET FLUX ACCUMULATORS WITHIN SOIL
 !
@@ -672,9 +673,9 @@ implicit none
       TFLWX(N3,N2,N1)=0.0_r8
       TWaterFlowMacP(N3,N2,N1)=0.0_r8
       THeatFlowSoiCell(N3,N2,N1)=0.0_r8
-      WatFreezeThawMicP(N3,N2,N1)=0.0_r8
-      WatFreezeThawMacP(N3,N2,N1)=0.0_r8
-      THeatFrezThaw(N3,N2,N1)=0.0_r8
+      WatIceThawMicP(N3,N2,N1)=0.0_r8
+      WatIceThawMacP(N3,N2,N1)=0.0_r8
+      THeatSoiThaw(N3,N2,N1)=0.0_r8
       D8596: DO K=1,jcplx
         TOCFLS(K,N3,N2,N1)=0.0_r8
         TONFLS(K,N3,N2,N1)=0.0_r8

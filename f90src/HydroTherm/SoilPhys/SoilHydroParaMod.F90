@@ -62,7 +62,7 @@ contains
     IF(SoilMicPMassLayer(L,NY,NX).GT.ZEROS(NY,NX).AND.VLSoilPoreMicP(L,NY,NX).GT.ZEROS(NY,NX))THEN
       THETW1=AZMAX1(AMIN1(POROS(L,NY,NX),VLWatMicP(L,NY,NX)/VLSoilMicP(L,NY,NX)),1.e-6_r8)
       IF(THETW1.LT.FieldCapacity(L,NY,NX))THEN
-        PSISoilMatricP(L,NY,NX)=AMAX1(PSIHY,-EXP(LOGPSIMX(NY,NX) &
+        PSISoilMatricP(L,NY,NX)=AMAX1(PSIHY,-EXP(LOGPSIFLD(NY,NX) &
           +((LOGFldCapacity(L,NY,NX)-LOG(THETW1))/FCD(L,NY,NX)*LOGPSIMND(NY,NX))))
       ELSE IF(THETW1.LT.POROS(L,NY,NX)-DTHETW)THEN
         PSISoilMatricP(L,NY,NX)=-EXP(LOGPSIAtSat(NY,NX)+(((LOGPOROS(L,NY,NX)-LOG(THETW1)) &
@@ -78,7 +78,7 @@ contains
       PSDX=LOGPOROS(L,NY,NX)-FCLX
       FCDX=FCLX-WPLX
       IF(THETW(L,NY,NX).LT.FCX)THEN
-        PSISoilMatricP(L,NY,NX)=AMAX1(PSIHY,-EXP(LOGPSIMX(NY,NX) &
+        PSISoilMatricP(L,NY,NX)=AMAX1(PSIHY,-EXP(LOGPSIFLD(NY,NX) &
           +((FCLX-LOG(THETW(L,NY,NX)))/FCDX*LOGPSIMND(NY,NX))))
       ELSE IF(THETW(L,NY,NX).LT.POROS(L,NY,NX)-DTHETW)THEN
         PSISoilMatricP(L,NY,NX)=-EXP(LOGPSIAtSat(NY,NX)+(((LOGPOROS(L,NY,NX)-LOG(THETW(L,NY,NX))) &
@@ -119,7 +119,7 @@ contains
 !     CNDU=soil hydraulic conductivity for root uptake
 !
     K=MAX(1,MIN(100,INT(100.0_r8*(POROS(L,NY,NX)-THETW(L,NY,NX))/POROS(L,NY,NX))+1))
-    CNDU(L,NY,NX)=0.5_r8*(SatHydroCond3D(1,K,L,NY,NX)+SatHydroCond3D(3,K,L,NY,NX))
+    CNDU(L,NY,NX)=0.5_r8*(HydroCond3D(1,K,L,NY,NX)+HydroCond3D(3,K,L,NY,NX))
   END DO
   end subroutine GetSoilHydraulicVars
 
@@ -133,7 +133,7 @@ contains
   integer, intent(in) :: L,NY,NX
   integer, intent(in) :: I,J
   real(r8) :: THETF
-  real(r8) :: THETK(100),PSISK(0:100)
+  real(r8) :: H2OSOIatK(100),PSISK(0:100)
 
   integer :: K,M,N
   real(r8) :: XK,YK,SUM1,SUM2
@@ -247,13 +247,16 @@ contains
   ENDIF
   VLsoiAirP(L,NY,NX)=AZMAX1(VLMicP(L,NY,NX)-VLWatMicP(L,NY,NX)-VLiceMicP(L,NY,NX)) &
     +AZMAX1(VLMacP(L,NY,NX)-VLWatMacP(L,NY,NX)-VLiceMacP(L,NY,NX))
+
   IF(VGeomLayer(L,NY,NX).GT.ZEROS2(NY,NX))THEN
+    !ratio of total air-filled pore to micropore
     THETP(L,NY,NX)=VLsoiAirP(L,NY,NX)/VLSoilMicP(L,NY,NX)
   ELSE
     THETP(L,NY,NX)=0.0_r8
   ENDIF
+
   IF(SoiBulkDensity(L,NY,NX).GT.ZERO)THEN
-    THETY(L,NY,NX)=EXP((LOGPSIMX(NY,NX)-LOG(-PSIHY))*FCD(L,NY,NX)/LOGPSIMND(NY,NX)+LOGFldCapacity(L,NY,NX))
+    THETY(L,NY,NX)=EXP((LOGPSIFLD(NY,NX)-LOG(-PSIHY))*FCD(L,NY,NX)/LOGPSIMND(NY,NX)+LOGFldCapacity(L,NY,NX))
   ELSE
     THETY(L,NY,NX)=ZERO2
   ENDIF
@@ -271,7 +274,7 @@ contains
       SatHydroCondVert(L,NY,NX)=1.54_r8*((POROS(L,NY,NX)-THETF)/THETF)**2
     ELSE
       SatHydroCondVert(L,NY,NX)=0.10_r8+75.0_r8*1.0E-15_r8**SoiBulkDensity(L,NY,NX)
-      SatHydroCondVert(L,NY,NX)=SatHydroCondVert(L,NY,NX)*FMPR(L,NY,NX)
+      SatHydroCondVert(L,NY,NX)=SatHydroCondVert(L,NY,NX)*FracSoiAsMicP(L,NY,NX)
     ENDIF
   ENDIF
 
@@ -283,7 +286,7 @@ contains
       SatHydroCondHrzn(L,NY,NX)=1.54_r8*((POROS(L,NY,NX)-THETF)/THETF)**2._r8
     ELSE
       SatHydroCondHrzn(L,NY,NX)=0.10_r8+75.0_r8*1.0E-15_r8**SoiBulkDensity(L,NY,NX)
-      SatHydroCondHrzn(L,NY,NX)=SatHydroCondHrzn(L,NY,NX)*FMPR(L,NY,NX)
+      SatHydroCondHrzn(L,NY,NX)=SatHydroCondHrzn(L,NY,NX)*FracSoiAsMicP(L,NY,NX)
     ENDIF
   ENDIF
 
@@ -297,14 +300,16 @@ contains
   SUM2=0.0_r8
   DO  K=1,100
     XK=K-1
-    THETK(K)=POROS(L,NY,NX)-(XK/100.0_r8*POROS(L,NY,NX))
-    IF(THETK(K).LT.FieldCapacity(L,NY,NX))THEN
-      PSISK(K)=AMAX1(PSIHY,-EXP(LOGPSIMX(NY,NX)+((LOGFldCapacity(L,NY,NX)-LOG(THETK(K))) &
+    H2OSOIatK(K)=POROS(L,NY,NX)-(XK/100.0_r8*POROS(L,NY,NX))
+    IF(H2OSOIatK(K).LT.FieldCapacity(L,NY,NX))THEN
+      PSISK(K)=AMAX1(PSIHY,-EXP(LOGPSIFLD(NY,NX)+((LOGFldCapacity(L,NY,NX)-LOG(H2OSOIatK(K))) &
         /FCD(L,NY,NX)*LOGPSIMND(NY,NX))))
-    ELSEIF(THETK(K).LT.POROS(L,NY,NX)-DTHETW)THEN
-      PSISK(K)=-EXP(LOGPSIAtSat(NY,NX)+(((LOGPOROS(L,NY,NX)-LOG(THETK(K))) &
+    ELSEIF(H2OSOIatK(K).LT.POROS(L,NY,NX)-DTHETW)THEN
+      !almost saturated
+      PSISK(K)=-EXP(LOGPSIAtSat(NY,NX)+(((LOGPOROS(L,NY,NX)-LOG(H2OSOIatK(K))) &
         /PSD(L,NY,NX))**SRP(L,NY,NX)*LOGPSIMXD(NY,NX)))
     ELSE
+      !fully saturated
       PSISK(K)=PSISE(L,NY,NX)
     ENDIF
     SUM2=SUM2+(2*K-1)/(PSISK(K)**2_r8)
@@ -320,13 +325,13 @@ contains
     DO  N=1,3
       IF(N.EQ.3)THEN
         !vertical
-        SatHydroCond3D(N,K,L,NY,NX)=SatHydroCondVert(L,NY,NX)*YK*SUM1/SUM2
+        HydroCond3D(N,K,L,NY,NX)=SatHydroCondVert(L,NY,NX)*YK*SUM1/SUM2
         IF(K.GT.1.AND.PSISK(K).LT.PSISoilAirEntry(L,NY,NX).AND.PSISK(K-1).GE.PSISoilAirEntry(L,NY,NX))THEN
-          THETS(L,NY,NX)=THETK(K)
+          THETS(L,NY,NX)=H2OSOIatK(K)
         ENDIF
       ELSE
         !horizontal
-        SatHydroCond3D(N,K,L,NY,NX)=SatHydroCondHrzn(L,NY,NX)*YK*SUM1/SUM2
+        HydroCond3D(N,K,L,NY,NX)=SatHydroCondHrzn(L,NY,NX)*YK*SUM1/SUM2
       ENDIF
     ENDDO
   ENDDO
@@ -359,23 +364,23 @@ contains
   real(r8) :: XK,YK
   real(r8) :: SUM1,SUM2
   integer, parameter :: n100=100
-  real(r8) :: THETK(n100),PSISK(0:n100)
+  real(r8) :: H2OSOIatK(n100),PSISK(0:n100)
 
   IF(VGeomLayer(0,NY,NX).GT.ZEROS2(NY,NX))THEN
     SoiBulkDensity(0,NY,NX)=SoilMicPMassLayer(0,NY,NX)/VGeomLayer(0,NY,NX)
   ELSE
     SoiBulkDensity(0,NY,NX)=BKRS(micpar%k_fine_litr)
   ENDIF
-  THETY(0,NY,NX)=EXP((LOGPSIMX(NY,NX)-LOG(-PSIHY))*FCD(0,NY,NX)/LOGPSIMND(NY,NX)+LOGFldCapacity(0,NY,NX))
+  THETY(0,NY,NX)=EXP((LOGPSIFLD(NY,NX)-LOG(-PSIHY))*FCD(0,NY,NX)/LOGPSIMND(NY,NX)+LOGFldCapacity(0,NY,NX))
   SUM2=0.0_r8
   D1220: DO  K=1,n100
     XK=K-1
-    THETK(K)=POROS0(NY,NX)-(XK/n100*POROS0(NY,NX))
-    IF(THETK(K).LT.FieldCapacity(0,NY,NX))THEN
-      PSISK(K)=AMAX1(PSIHY,-EXP(LOGPSIMX(NY,NX)+((LOGFldCapacity(0,NY,NX)-LOG(THETK(K))) &
+    H2OSOIatK(K)=POROS0(NY,NX)-(XK/n100*POROS0(NY,NX))
+    IF(H2OSOIatK(K).LT.FieldCapacity(0,NY,NX))THEN
+      PSISK(K)=AMAX1(PSIHY,-EXP(LOGPSIFLD(NY,NX)+((LOGFldCapacity(0,NY,NX)-LOG(H2OSOIatK(K))) &
           /FCD(0,NY,NX)*LOGPSIMND(NY,NX))))
-    ELSEIF(THETK(K).LT.POROS0(NY,NX))THEN
-      PSISK(K)=-EXP(LOGPSIAtSat(NY,NX)+(((LOGPOROS(0,NY,NX)-LOG(THETK(K))) &
+    ELSEIF(H2OSOIatK(K).LT.POROS0(NY,NX))THEN
+      PSISK(K)=-EXP(LOGPSIAtSat(NY,NX)+(((LOGPOROS(0,NY,NX)-LOG(H2OSOIatK(K))) &
           /PSD(0,NY,NX))**SRP(0,NY,NX)*LOGPSIMXD(NY,NX)))
     ELSE
       PSISK(K)=PSISE(0,NY,NX)
@@ -390,11 +395,11 @@ contains
     D1230: DO M=K,n100
         SUM1=SUM1+(2*M+1-2*K)/(PSISK(M)**2._r8)
     ENDDO D1230
-    SatHydroCond3D(3,K,0,NY,NX)=SatHydroCondVert(0,NY,NX)*YK*SUM1/SUM2
-    SatHydroCond3D(1,K,0,NY,NX)=0.0_r8
-    SatHydroCond3D(2,K,0,NY,NX)=0.0_r8
+    HydroCond3D(3,K,0,NY,NX)=SatHydroCondVert(0,NY,NX)*YK*SUM1/SUM2
+    HydroCond3D(1,K,0,NY,NX)=0.0_r8
+    HydroCond3D(2,K,0,NY,NX)=0.0_r8
     IF(K.GT.1.AND.PSISK(K).LT.PSISoilAirEntry(0,NY,NX).AND.PSISK(K-1).GE.PSISoilAirEntry(0,NY,NX))THEN
-      THETS(0,NY,NX)=THETK(K)
+      THETS(0,NY,NX)=H2OSOIatK(K)
     ENDIF
   ENDDO D1235
   end subroutine LitterHydroproperty

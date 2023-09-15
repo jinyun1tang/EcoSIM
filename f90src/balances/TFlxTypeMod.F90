@@ -57,9 +57,9 @@ implicit none
 
   real(r8),allocatable ::  RTGasADFlx(:,:,:,:)                      !
 
-  real(r8),allocatable ::  WatFreezeThawMicP(:,:,:)                       !
-  real(r8),allocatable ::  THeatFrezThaw(:,:,:)                      !
-  real(r8),allocatable ::  WatFreezeThawMacP(:,:,:)                      !
+  real(r8),allocatable ::  WatIceThawMicP(:,:,:)                       !
+  real(r8),allocatable ::  THeatSoiThaw(:,:,:)                      !
+  real(r8),allocatable ::  WatIceThawMacP(:,:,:)                      !
   real(r8),allocatable ::  VLWatMicP1(:,:,:)                       !
   real(r8),allocatable ::  VLiceMicP1(:,:,:)                       !
   real(r8),allocatable ::  VLWatMacP1(:,:,:)                      !
@@ -157,9 +157,9 @@ implicit none
   allocate(TFLWX(JZ,JY,JX));    TFLWX=0._r8
   allocate(THeatFlowSoiCell(JZ,JY,JX));    THeatFlowSoiCell=0._r8
   allocate(TWaterFlowMacP(JZ,JY,JX));    TWaterFlowMacP=0._r8
-  allocate(WatFreezeThawMicP(JZ,JY,JX));    WatFreezeThawMicP=0._r8
-  allocate(THeatFrezThaw(JZ,JY,JX));   THeatFrezThaw=0._r8
-  allocate(WatFreezeThawMacP(JZ,JY,JX));   WatFreezeThawMacP=0._r8
+  allocate(WatIceThawMicP(JZ,JY,JX));    WatIceThawMicP=0._r8
+  allocate(THeatSoiThaw(JZ,JY,JX));   THeatSoiThaw=0._r8
+  allocate(WatIceThawMacP(JZ,JY,JX));   WatIceThawMacP=0._r8
   allocate(VLWatMicP1(JZ,JY,JX));    VLWatMicP1=0._r8
   allocate(VLiceMicP1(JZ,JY,JX));    VLiceMicP1=0._r8
   allocate(VLWatMacP1(JZ,JY,JX));   VLWatMacP1=0._r8
@@ -275,9 +275,9 @@ implicit none
   call destroy(TFLWX)
   call destroy(THeatFlowSoiCell)
   call destroy(TWaterFlowMacP)
-  call destroy(WatFreezeThawMicP)
-  call destroy(THeatFrezThaw)
-  call destroy(WatFreezeThawMacP)
+  call destroy(WatIceThawMicP)
+  call destroy(THeatSoiThaw)
+  call destroy(WatIceThawMacP)
   call destroy(VLWatMicP1)
   call destroy(VLiceMicP1)
   call destroy(VLWatMacP1)

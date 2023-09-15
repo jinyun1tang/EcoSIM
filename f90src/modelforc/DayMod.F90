@@ -371,7 +371,7 @@
           ENDDO D165
 
           IF((IFLGV(NY,NX).EQ.0 .AND. TVW.LT.TWP+FIRRA(NY,NX)*(TFZ-TWP)) &
-            .OR.(IFLGV(NY,NX).EQ.1.AND.PSILZ(1,NY,NX).LT.FIRRA(NY,NX)))THEN
+            .OR.(IFLGV(NY,NX).EQ.1.AND.PSICanPDailyMin(1,NY,NX).LT.FIRRA(NY,NX)))THEN
             RR=AZMAX1(TFZ-TVW)
             IF(RR.GT.0.0_r8)THEN
               D170: DO J=IIRRA(3,NY,NX),IIRRA(4,NY,NX)
@@ -379,7 +379,7 @@
               ENDDO D170
               WDPTH(I,NY,NX)=DIRRA(2,NY,NX)
               WRITE(*,2222)'auto',IYRC,I,IIRRA(3,NY,NX),IIRRA(4,NY,NX) &
-                ,IFLGV(NY,NX),RR,TFZ,TVW,TWP,FIRRA(NY,NX),PSILZ(1,NY,NX) &
+                ,IFLGV(NY,NX),RR,TFZ,TVW,TWP,FIRRA(NY,NX),PSICanPDailyMin(1,NY,NX) &
                 ,CIRRA(NY,NX),DIRRA1,WDPTH(I,NY,NX)
 
 2222  FORMAT(A8,5I6,40E12.4)

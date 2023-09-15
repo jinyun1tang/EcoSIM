@@ -491,9 +491,9 @@ module SoluteMod
 !     DWNH4=change in NH4 fertilizer band width
 !     WDNHB=layer NH4 fertilizer band width
 !     ZNSGL=NH4 diffusivity
-!     TORT=tortuosity
+!     TortMicPM=tortuosity
 !
-      DWNH4=0.5*SQRT(ZNSGL(L,NY,NX))*TORT(NPH,L,NY,NX)
+      DWNH4=0.5*SQRT(ZNSGL(L,NY,NX))*TortMicPM(NPH,L,NY,NX)
       WDNHB(L,NY,NX)=AMIN1(ROWN(NY,NX),AMAX1(0.025,WDNHB(L,NY,NX))+DWNH4)
 !
 !     NH4 BAND DEPTH
@@ -593,9 +593,9 @@ module SoluteMod
 !     DWPO4=change in H2PO4 fertilizer band width
 !     WDPO4=layer H2PO4 fertilizer band width
 !     POSGL=H2PO4 diffusivity
-!     TORT=tortuosity
+!     TortMicPM=tortuosity
 !
-      DWPO4=0.5*SQRT(POSGL(L,NY,NX))*TORT(NPH,L,NY,NX)
+      DWPO4=0.5*SQRT(POSGL(L,NY,NX))*TortMicPM(NPH,L,NY,NX)
       WDPOB(L,NY,NX)=AMIN1(ROWP(NY,NX),WDPOB(L,NY,NX)+DWPO4)
 !
 !     PO4 BAND DEPTH
@@ -818,9 +818,9 @@ module SoluteMod
 !     DWNO3=change in NO3 fertilizer band width
 !     WDNOB=layer NO3 fertilizer band width
 !     ZOSGL=NO3 diffusivity
-!     TORT=tortuosity
+!     TortMicPM=tortuosity
 !
-      DWNO3=0.5*SQRT(SolDifc(ids_NO3,L,NY,NX))*TORT(NPH,L,NY,NX)
+      DWNO3=0.5_r8*SQRT(SolDifc(ids_NO3,L,NY,NX))*TortMicPM(NPH,L,NY,NX)
       WDNOB(L,NY,NX)=AMIN1(ROWO(NY,NX),WDNOB(L,NY,NX)+DWNO3)
 !
 !     NO3 BAND DEPTH

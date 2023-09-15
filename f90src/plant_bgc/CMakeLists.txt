@@ -1,4 +1,5 @@
 set(PLANT_BGC_SOURCES
+  PlantMathFuncMod.F90
   InitVegBGC.F90
   RootGasMod.F90
   NutUptakeMod.F90

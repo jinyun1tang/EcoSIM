@@ -46,5 +46,6 @@ implicit none
   real(r8), parameter :: DNUSA=(1.0_r8+(0.492_r8/PRNTA)**0.5625_r8)**0.4444_r8
   real(r8), parameter :: FVOLAH=0.0_r8
   real(r8), parameter :: DTHETW=ppmc
+  real(r8), parameter :: LtHeatIceMelt=333.0_r8   !J/g, latent heat of ice melting
 
 end module PhysPars

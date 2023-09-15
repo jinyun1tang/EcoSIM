@@ -58,8 +58,8 @@ module ExtractsMod
    NI       => plt_morph%NI        , &
    ARSTT    => plt_morph%ARSTT     , &
    ARLFT    =>  plt_morph%ARLFT    , &
-   ARSTC    =>  plt_morph%ARSTC    , &
-   ARLFC    =>  plt_morph%ARLFC      &
+   StemAreag    =>  plt_morph%StemAreag    , &
+   CanGLA    =>  plt_morph%CanGLA      &
   )
   DO NZ=1,NP0
 !
@@ -87,8 +87,8 @@ module ExtractsMod
       ENDDO
     ENDDO
   ENDDO
-  ARLFC=0._r8
-  ARSTC=0._r8
+  CanGLA=0._r8
+  StemAreag=0._r8
   DO  L=1,JC1
     ARLFT(L)=0._r8
     WGLFT(L)=0._r8
@@ -103,7 +103,7 @@ module ExtractsMod
 !     TOTAL LEAF AREA OF ALL PLANT SPECIES
 !
 !     ARLFT,ARSTT=total leaf,stalk area of combined canopy layer
-!     ARLFV,ARSTV=PFT leaf,stalk area in canopy layer
+!     ARLFV,CanPLSA=PFT leaf,stalk area in canopy layer
 !     WGLFT=total leaf C of combined canopy layer
 !     WGLFV=PFT leaf C in canopy layer
 !
@@ -114,14 +114,14 @@ module ExtractsMod
     WGLFV    => plt_biom%WGLFV      , &
     WGLFT    => plt_biom%WGLFT      , &
     ARLFT    =>  plt_morph%ARLFT    , &
-    ARSTV    =>  plt_morph%ARSTV    , &
+    CanPLSA    =>  plt_morph%CanPLSA    , &
     ARSTT    => plt_morph%ARSTT     , &
     ARLFV    => plt_morph%ARLFV       &
   )
   DO L=1,JC1
     ARLFT(L)=ARLFT(L)+ARLFV(L,NZ)
     WGLFT(L)=WGLFT(L)+WGLFV(L,NZ)
-    ARSTT(L)=ARSTT(L)+ARSTV(L,NZ)
+    ARSTT(L)=ARSTT(L)+CanPLSA(L,NZ)
   ENDDO
   end associate
   end subroutine TotalLeafArea
@@ -205,7 +205,7 @@ module ExtractsMod
     PopPlantRootH2OUptake_vr => plt_ew%PopPlantRootH2OUptake_vr    , &
     trcg_rootml  => plt_rbgc%trcg_rootml,&
     trcs_rootml => plt_rbgc%trcs_rootml, &
-    RTDNP => plt_morph%RTDNP , &
+    RootLenDensNLP => plt_morph%RootLenDensNLP , &
     RTDNT => plt_morph%RTDNT , &
     MY    => plt_morph%MY    , &
     NI    => plt_morph%NI      &
@@ -217,7 +217,7 @@ module ExtractsMod
 !     TOTAL ROOT DENSITY
 !
 !     RTDNT=total root length density
-!     RTDNP=PFT root length density per plant
+!     RootLenDensNLP=PFT root length density per plant
 !     PopPlantRootH2OUptake_vr=total water uptake
 !     PopPlantRootH2OUptake_vr=PFT root water uptake
 !     THeatRootUptake=total convective heat in root water uptake
@@ -225,7 +225,7 @@ module ExtractsMod
 !     PP=PFT population, this is dynamic, and can goes to zero
 !
       IF(N.EQ.ipltroot)THEN
-        RTDNT(L)=RTDNT(L)+RTDNP(N,L,NZ)*pftPlantPopulation(NZ)/AREA3(L)
+        RTDNT(L)=RTDNT(L)+RootLenDensNLP(N,L,NZ)*pftPlantPopulation(NZ)/AREA3(L)
       ENDIF
 !
 !     TOTAL WATER UPTAKE
@@ -371,37 +371,37 @@ module ExtractsMod
     HEUPTK=> plt_rbgc%HEUPTK , &
     TUPNF => plt_rbgc%TUPNF  , &
     TRootGasLoss_disturb => plt_rbgc%TRootGasLoss_disturb  , &
-    EP    => plt_ew%EP       , &
-    FLWC  => plt_ew%FLWC     , &
-    EVAPC => plt_ew%EVAPC    , &
-    VOLWC => plt_ew%VOLWC    , &
-    VOLWP => plt_ew%VOLWP    , &
+    PTrans    => plt_ew%PTrans       , &
+    PrecIntcptByCanP  => plt_ew%PrecIntcptByCanP     , &
+    VapXAir2PCan => plt_ew%VapXAir2PCan    , &
+    WatByPCan => plt_ew%WatByPCan    , &
+    CanWatP => plt_ew%CanWatP    , &
     TGH   => plt_ew%TGH      , &
-    SFLXC => plt_ew%SFLXC    , &
-    EFLXC => plt_ew%EFLXC    , &
-    TVOLWP=> plt_ew%TVOLWP   , &
+    HeatXAir2PCan => plt_ew%HeatXAir2PCan    , &
+    EvapTransHeatP => plt_ew%EvapTransHeatP    , &
+    CanWatg=> plt_ew%CanWatg   , &
     TKC   => plt_ew%TKC      , &
     TKS   => plt_ew%TKS      , &
     ENGYX => plt_ew%ENGYX    , &
     TSH   => plt_ew%TSH      , &
-    TEVAPC=> plt_ew%TEVAPC   , &
+    VapXAir2CanG=> plt_ew%VapXAir2CanG   , &
     TENGYC=> plt_ew%TENGYC   , &
     TEVAPP=> plt_ew%TEVAPP   , &
     THFLXC=> plt_ew%THFLXC   , &
-    THRMC => plt_ew%THRMC    , &
+    LWRadCanG => plt_ew%LWRadCanG    , &
     TairK   => plt_ew%TairK      , &
-    HFLXC => plt_ew%HFLXC    , &
+    HeatStorCanP => plt_ew%HeatStorCanP    , &
     TLE   => plt_ew%TLE      , &
-    TVOLWC=> plt_ew%TVOLWC   , &
+    CanH2OHeldVg=> plt_ew%CanH2OHeldVg   , &
     NU    => plt_site%NU     , &
-    ARSTC => plt_morph%ARSTC , &
-    ARLFC => plt_morph%ARLFC , &
+    StemAreag => plt_morph%StemAreag , &
+    CanGLA => plt_morph%CanGLA , &
     NI    => plt_morph%NI    , &
     NBR   => plt_morph%NBR   , &
-    ARSTP => plt_morph%ARSTP , &
-    ARLFP => plt_morph%ARLFP , &
-    RAD1  => plt_rad%RAD1    , &
-    THRM1 => plt_rad%THRM1   , &
+    CanPSA => plt_morph%CanPSA , &
+    CanPLA => plt_morph%CanPLA , &
+    RadNet2CanP  => plt_rad%RadNet2CanP    , &
+    LWRadCanP => plt_rad%LWRadCanP   , &
     TRN   => plt_rad%TRN       &
   )
   DO L=NU,NI(NZ)
@@ -411,23 +411,23 @@ module ExtractsMod
 !     TOTAL ENERGY, WATER, CO2 FLUXES
 !
 !     TRN=total net SW+LW absorbed by canopy
-!     RAD1=PFT net SW+LW absorbed by canopy
+!     RadNet2CanP=PFT net SW+LW absorbed by canopy
 !     TLE=total canopy latent heat flux
-!     EFLXC=PFT canopy latent heat flux
+!     EvapTransHeatP=PFT canopy latent heat flux
 !     TSH=total canopy sensible heat flux
-!     SFLXC=PFT canopy sensible heat flux
+!     HeatXAir2PCan=PFT canopy sensible heat flux
 !     TGH=total canopy storage heat flux
-!     HFLXC=PFT canopy storage heat flux
+!     HeatStorCanP=PFT canopy storage heat flux
 !     TCCAN=total net CO2 fixation
 !     CNET=PFT net CO2 fixation
-!     TVOLWP,TVOLWC=total water volume in canopy,on canopy surfaces
-!     VOLWP,VOLWC=PFT water volume in canopy,on canopy surfaces
-!     TEVAPP,TEVAPC=total water flux to,from canopy,canopy surfaces
-!     EVAPC,EP=water flux to,from canopy surfaces, inside canopy
+!     CanWatg,CanH2OHeldVg=total water volume in canopy,on canopy surfaces
+!     CanWatP,WatByPCan=PFT water volume in canopy,on canopy surfaces
+!     TEVAPP,VapXAir2CanG=total water flux to,from canopy,canopy surfaces
+!     VapXAir2PCan,PTrans=water flux to,from canopy surfaces, inside canopy
 !     TENGYC=total canopy water heat content
 !     ENGYC=PFT canopy water heat content
-!     ARLFC,ARSTC=total leaf,stalk area
-!     ARLFP,ARSTP=PFT leaf,stalk area
+!     CanGLA,StemAreag=total leaf,stalk area
+!     CanPLA,CanPSA=PFT leaf,stalk area
 !     ZCSNC,ZZSNC,ZPSNC=total net root-soil C,N,P exchange
 !     HCUPTK,HZUPTK,HPUPTK=PFT net root-soil C,N,P exchange
 !     TBALC,TBALN,TBALP=total C,N,P balance
@@ -435,23 +435,23 @@ module ExtractsMod
 !     TRootGasLoss_disturb=total loss of root CO2, O2, CH4, N2O, NH3, H2
 !     RootGasLoss_disturb=PFT loss of root CO2, O2, CH4, N2O, NH3, H2
 !
-  TRN=TRN+RAD1(NZ)
-  TLE=TLE+EFLXC(NZ)
-  TSH=TSH+SFLXC(NZ)
-  TGH=TGH+HFLXC(NZ)
+  TRN=TRN+RadNet2CanP(NZ)
+  TLE=TLE+EvapTransHeatP(NZ)
+  TSH=TSH+HeatXAir2PCan(NZ)
+  TGH=TGH+HeatStorCanP(NZ)
   TCCAN=TCCAN+CNET(NZ)
-  CTRAN(NZ)=CTRAN(NZ)+EP(NZ)+EVAPC(NZ)
-  TVOLWP=TVOLWP+VOLWP(NZ)
-  TVOLWC=TVOLWC+VOLWC(NZ)
-  TEVAPP=TEVAPP+EP(NZ)+EVAPC(NZ)
-  TEVAPC=TEVAPC+EVAPC(NZ)
-  ENGYC=cpw*(VOLWC(NZ)+FLWC(NZ)+EVAPC(NZ))*TKC(NZ)
+  CTRAN(NZ)=CTRAN(NZ)+PTrans(NZ)+VapXAir2PCan(NZ)
+  CanWatg=CanWatg+CanWatP(NZ)
+  CanH2OHeldVg=CanH2OHeldVg+WatByPCan(NZ)
+  TEVAPP=TEVAPP+PTrans(NZ)+VapXAir2PCan(NZ)
+  VapXAir2CanG=VapXAir2CanG+VapXAir2PCan(NZ)
+  ENGYC=cpw*(WatByPCan(NZ)+PrecIntcptByCanP(NZ)+VapXAir2PCan(NZ))*TKC(NZ)
   TENGYC=TENGYC+ENGYC
-  THFLXC=THFLXC+ENGYC-ENGYX(NZ)-(FLWC(NZ)*cpw*TairK)
+  THFLXC=THFLXC+ENGYC-ENGYX(NZ)-(PrecIntcptByCanP(NZ)*cpw*TairK)
   ENGYX(NZ)=ENGYC
-  THRMC=THRMC+THRM1(NZ)
-  ARLFC=ARLFC+ARLFP(NZ)
-  ARSTC=ARSTC+ARSTP(NZ)
+  LWRadCanG=LWRadCanG+LWRadCanP(NZ)
+  CanGLA=CanGLA+CanPLA(NZ)
+  StemAreag=StemAreag+CanPSA(NZ)
   DO NE=1,npelms
     ZESNC(NE)=ZESNC(NE)-HEUPTK(NE,NZ)
     TBALE(NE)=TBALE(NE)+BALE(NE,NZ)

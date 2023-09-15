@@ -596,7 +596,7 @@ module BoundaryTranspMod
 !
 !     NET SOLUTE FLUX IN SNOWPACK
 !
-!     VHCPWM,VHCPWX=current,minimum volumetric heat capacity of snowpack
+!     VHCPWM,VLHeatCapSnowMN=current,minimum volumetric heat capacity of snowpack
 !     T*BLS=net solute flux in snowpack
 !     R*BLS=solute flux in snowpack
 !
@@ -617,12 +617,12 @@ module BoundaryTranspMod
   integer :: NTG,NTN
 
   DO  LS=1,JS
-    IF(VHCPWM(M,LS,NY,NX).GT.VHCPWX(NY,NX))THEN
+    IF(VHCPWM(M,LS,NY,NX).GT.VLHeatCapSnowMN(NY,NX))THEN
       LS2=MIN(JS,LS+1)
 !
 !     IF LOWER LAYER IS IN THE SNOWPACK
 !
-      IF(LS.LT.JS.AND.VHCPWM(M,LS2,N2,N1).GT.VHCPWX(N2,N1))THEN
+      IF(LS.LT.JS.AND.VHCPWM(M,LS2,N2,N1).GT.VLHeatCapSnowMN(N2,N1))THEN
         DO NTG=idg_beg,idg_end-1
           trcg_TBLS(NTG,LS,N2,N1)=trcg_TBLS(NTG,LS,N2,N1) &
             +trcg_RBLS(NTG,LS,N2,N1)-trcg_RBLS(NTG,LS2,N2,N1)

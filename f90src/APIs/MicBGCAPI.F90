@@ -272,7 +272,7 @@ implicit none
   micfor%FILM(1:NPH)=FILM(1:NPH,L,NY,NX)
   micfor%THETPM(1:NPH)=THETPM(1:NPH,L,NY,NX)
   micfor%VLWatMicPM(1:NPH)=VLWatMicPM(1:NPH,L,NY,NX)
-  micfor%TORT(1:NPH)=TORT(1:NPH,L,NY,NX)
+  micfor%TortMicPM(1:NPH)=TortMicPM(1:NPH,L,NY,NX)
   micfor%VLsoiAirPM(1:NPH)=VLsoiAirPM(1:NPH,L,NY,NX)
   micfor%VLsoiAirP=VLsoiAirP(L,NY,NX)
   micstt%EPOC=EPOC(L,NY,NX)

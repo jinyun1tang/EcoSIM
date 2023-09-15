@@ -144,10 +144,10 @@ module StartsMod
 !     LOGPSIMXD,LOGPSIMND=LOGPSIMX-LOGPSIAtSat,LOGPSIMN-LOGPSIMX
 !
       LOGPSIAtSat(NY,NX)=LOG(-PSIPS)
-      LOGPSIMX(NY,NX)=LOG(-PSIAtFldCapacity(NY,NX))
+      LOGPSIFLD(NY,NX)=LOG(-PSIAtFldCapacity(NY,NX))
       LOGPSIMN(NY,NX)=LOG(-PSIAtWiltPoint(NY,NX))
-      LOGPSIMXD(NY,NX)=LOGPSIMX(NY,NX)-LOGPSIAtSat(NY,NX)
-      LOGPSIMND(NY,NX)=LOGPSIMN(NY,NX)-LOGPSIMX(NY,NX)
+      LOGPSIMXD(NY,NX)=LOGPSIFLD(NY,NX)-LOGPSIAtSat(NY,NX)
+      LOGPSIMND(NY,NX)=LOGPSIMN(NY,NX)-LOGPSIFLD(NY,NX)
 !     SoilMicPMassLayer(0,NY,NX)=0.0_r8
 !
 !     DISTRIBUTION OF OM AMONG FRACTIONS OF DIFFERING
@@ -164,8 +164,8 @@ module StartsMod
 
 !     VHCPRX,VHCPNX=minimum heat capacities for solving
 !      surface litter,soil layer water and heat fluxes
-      VHCPRX(NY,NX)=VHCPRMin*AREA(3,NU(NY,NX),NY,NX)
-      VHCPNX(NY,NX)=VHCPNMin*AREA(3,NU(NY,NX),NY,NX)
+      VHCPRX(NY,NX)=VLHeatCapLitRMin*AREA(3,NU(NY,NX),NY,NX)
+      VHCPNX(NY,NX)=VLHeatCapSoiMin*AREA(3,NU(NY,NX),NY,NX)
 
 !
 !     SURFACE WATER STORAGE AND LOWER HEAT SINK
@@ -417,7 +417,7 @@ module StartsMod
         PTDS=0.0_r8
         POROS(L,NY,NX)=1.0_r8
       ENDIF
-      POROSI(L,NY,NX)=POROS(L,NY,NX)*FMPR(L,NY,NX)
+      POROSI(L,NY,NX)=POROS(L,NY,NX)*FracSoiAsMicP(L,NY,NX)
       VLMicP(L,NY,NX)=POROS(L,NY,NX)*VLSoilPoreMicP(L,NY,NX)
       VLMicPt0(L,NY,NX)=VLMicP(L,NY,NX)
       VLMacP(L,NY,NX)=SoilFracAsMacP(L,NY,NX)*VGeomLayert0(L,NY,NX)
@@ -440,7 +440,7 @@ module StartsMod
         VMINL=(CSILT(L,NY,NX)+CCLAY(L,NY,NX))*SoiBulkDensity(L,NY,NX)/PTDS
         VSAND=CSAND(L,NY,NX)*SoiBulkDensity(L,NY,NX)/PTDS
         VHeatCapacitySoilM(L,NY,NX)=((2.496_r8*VORGC+2.385_r8*VMINL+2.128_r8*VSAND) &
-          *FMPR(L,NY,NX)+2.128_r8*ROCK(L,NY,NX))*VGeomLayer(L,NY,NX)
+          *FracSoiAsMicP(L,NY,NX)+2.128_r8*ROCK(L,NY,NX))*VGeomLayer(L,NY,NX)
       ELSE
         VHeatCapacitySoilM(L,NY,NX)=0.0_r8
       ENDIF
@@ -809,7 +809,7 @@ module StartsMod
   trc_solml(idg_O2,0,:,:)=0.0_r8
   FRADG(:,:)=1.0_r8
   THRMG(:,:)=0.0_r8
-  THRMC(:,:)=0.0_r8
+  LWRadCanG(:,:)=0.0_r8
   TRN(:,:)=0.0_r8
   TLE(:,:)=0.0_r8
   TSH(:,:)=0.0_r8
@@ -819,10 +819,10 @@ module StartsMod
   TLEX(:,:)=0.0_r8
   TSHX(:,:)=0.0_r8
   TCNET(:,:)=0.0_r8
-  TVOLWC(:,:)=0.0_r8
-  ARLFC(:,:)=0.0_r8
-  ARSTC(:,:)=0.0_r8
-  TFLWC(:,:)=0.0_r8
+  CanH2OHeldVg(:,:)=0.0_r8
+  CanGLA(:,:)=0.0_r8
+  StemAreag(:,:)=0.0_r8
+  PrecIntcptByCanG(:,:)=0.0_r8
   PPT(:,:)=0.0_r8
   DYLN(:,:)=12.0_r8
   ALBX(:,:)=ALBS(:,:)
@@ -892,7 +892,7 @@ module StartsMod
 !     if it is a standing water, no macropore fraction
 !     DPTH=depth of layer middle
 !     CDPTHZ=soil thickness from surface to bottom of layer L, [m]
-!     FMPR=micropore fraction
+!     FracSoiAsMicP=micropore fraction
 !     DPTHZ=depth to middle of soil layer from  surface of grid cell [m]
 !     VOLT=total volume
 !     VOLX=total micropore volume
@@ -906,7 +906,7 @@ module StartsMod
       CDPTHZ(L,NY,NX)=CumDepth2LayerBottom(L,NY,NX)-CumDepth2LayerBottom(NU(NY,NX),NY,NX)+DLYR(3,NU(NY,NX),NY,NX)
       DPTHZ(L,NY,NX)=0.5_r8*(CDPTHZ(L,NY,NX)+CDPTHZ(L-1,NY,NX))
       VGeomLayer(L,NY,NX)=amax1(AREA(3,L,NY,NX)*DLYR(3,L,NY,NX),1.e-8_r8)
-      VLSoilPoreMicP(L,NY,NX)=VGeomLayer(L,NY,NX)*FMPR(L,NY,NX)
+      VLSoilPoreMicP(L,NY,NX)=VGeomLayer(L,NY,NX)*FracSoiAsMicP(L,NY,NX)
       VLSoilMicP(L,NY,NX)=VLSoilPoreMicP(L,NY,NX)
       VGeomLayert0(L,NY,NX)=VGeomLayer(L,NY,NX)
 !     bulk density is defined only for soil with micropores      
@@ -940,22 +940,22 @@ module StartsMod
   NPT=NPY
   NPG=NPH*NPT
 
-  NPR=30
-  NPS=10
-  XNPH=1.0_r8/NPH
+  NPR=30    !sub-cycles of litter
+  NPS=10    !sub-cycles of snow iteration
+  dts_HeatWatTP=1.0_r8/NPH
   XNPT=1.0_r8/NPT
-  XNPG=1.0_r8/NPG
+  dts_gas=1.0_r8/NPG
   XNPR=1.0_r8/NPR
   XNPS=1.0_r8/NPS
-  XNPY=XNPH*XNPS
-  XNPZ=XNPH*XNPR
-  XNPQ=XNPZ*XNPS
+  dts_snohttp=dts_HeatWatTP*XNPS
+  dts_litrhtwtp=dts_HeatWatTP*XNPR
+  dts_litrvapht=dts_litrhtwtp*XNPS
   XNPV=XNPR*XNPS
-  XNPD=600.0_r8*XNPG
-  XNPX=AMIN1(1.0_r8,20.0_r8*XNPH)
-  XNPA=XNPX*XNPS
-  XNPB=XNPX*XNPR
-  XNPC=XNPX*XNPV
+  XNPD=600.0_r8*dts_gas
+  dts_wat=AMIN1(1.0_r8,20.0_r8*dts_HeatWatTP)  !adjust/recompute the time step for water/heat update
+  dts_sno=dts_wat*XNPS
+  XNPB=dts_wat*XNPR
+  dt_watvap=dts_wat*XNPV
   
   end subroutine set_ecosim_solver
 
@@ -1044,10 +1044,10 @@ module StartsMod
 !     LOGPSIMXD,LOGPSIMND=LOGPSIMX-LOGPSIAtSat,PSIMN-LOGPSIMX
 !
       LOGPSIAtSat(NY,NX)=LOG(-PSIPS)
-      LOGPSIMX(NY,NX)=LOG(-PSIAtFldCapacity(NY,NX))
+      LOGPSIFLD(NY,NX)=LOG(-PSIAtFldCapacity(NY,NX))
       LOGPSIMN(NY,NX)=LOG(-PSIAtWiltPoint(NY,NX))
-      LOGPSIMXD(NY,NX)=LOGPSIMX(NY,NX)-LOGPSIAtSat(NY,NX)
-      LOGPSIMND(NY,NX)=LOGPSIMN(NY,NX)-LOGPSIMX(NY,NX)
+      LOGPSIMXD(NY,NX)=LOGPSIFLD(NY,NX)-LOGPSIAtSat(NY,NX)
+      LOGPSIMND(NY,NX)=LOGPSIMN(NY,NX)-LOGPSIFLD(NY,NX)
 !     SoilMicPMassLayer(0,NY,NX)=0.0_r8
 !
 !     DISTRIBUTION OF OM AMONG FRACTIONS OF DIFFERING
@@ -1063,8 +1063,8 @@ module StartsMod
 
 !     VHCPRX,VHCPNX=minimum heat capacities for solving
 !      surface litter,soil layer water and heat fluxes
-      VHCPRX(NY,NX)=VHCPRMin*AREA(3,NU(NY,NX),NY,NX)
-      VHCPNX(NY,NX)=VHCPNMin*AREA(3,NU(NY,NX),NY,NX)
+      VHCPRX(NY,NX)=VLHeatCapLitRMin*AREA(3,NU(NY,NX),NY,NX)
+      VHCPNX(NY,NX)=VLHeatCapSoiMin*AREA(3,NU(NY,NX),NY,NX)
 
 !
 !     SURFACE WATER STORAGE AND LOWER HEAT SINK

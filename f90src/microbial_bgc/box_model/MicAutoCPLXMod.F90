@@ -180,7 +180,7 @@ module MicAutoCPLXMod
 ! RUPOX, ROXYP=O2-limited, O2-unlimited rates of O2 uptake
 ! RUPMX=O2-unlimited rate of O2 uptake
 ! FOXYX=fraction of O2 uptake by N,K relative to total
-! XNPG=1/(NPH*NPT)
+! dts_gas=1/(NPH*NPT)
 ! ROXYF,ROXYL=net O2 gaseous, aqueous fluxes from previous hour
 ! OLSGL=aqueous O2 diffusivity
 ! OXYG,OXYS=gaseous, aqueous O2 amounts
@@ -724,7 +724,7 @@ module MicAutoCPLXMod
     VLWatMicPM  => micfor%VLWatMicPM , &
     FILM  => micfor%FILM , &
     THETPM => micfor%THETPM ,&
-    TORT => micfor%TORT , &
+    TortMicPM => micfor%TortMicPM , &
     ZERO => micfor%ZERO , &
     ZEROS => micfor%ZEROS , &
     DFGS => micfor%DFGS , &
@@ -745,16 +745,16 @@ module MicAutoCPLXMod
       !write(*,*)'MAXIMUM O2 UPAKE FROM POTENTIAL RESPIRATION OF EACH AEROBIC'
       !     POPULATION
       !
-      RUPMX=ROXYPff(NGL)*XNPG
-      ROXYFX=ROXYF*XNPG*FOXYX
-      OLSGL1=OLSGL*XNPG
+      RUPMX=ROXYPff(NGL)*dts_gas
+      ROXYFX=ROXYF*dts_gas*FOXYX
+      OLSGL1=OLSGL*dts_gas
       IF(.not.litrm)THEN
         OXYG1=OXYG*FOXYX
-        ROXYLX=ROXYL*XNPG*FOXYX
+        ROXYLX=ROXYL*dts_gas*FOXYX
       ELSE
         OXYG1=COXYG*VLsoiAirPM(1)*FOXYX
         ROXYLX=(ROXYL+FLQRQ*COXR &
-          +FLQRI*COXQ)*XNPG*FOXYX
+          +FLQRI*COXQ)*dts_gas*FOXYX
       ENDIF
       OXYS1=OXYS*FOXYX
 !
@@ -771,7 +771,7 @@ module MicAutoCPLXMod
         !
         !     VLWatMicPM,VLsoiAirPM,VLSoilPoreMicP=water, air and total volumes
         !     ORAD=microbial radius,FILM=water film thickness
-        !     DIFOX=aqueous O2 diffusion, TORT=tortuosity
+        !     DIFOX=aqueous O2 diffusion, TortMicPM=tortuosity
         !     BIOS=microbial number, OMA=active biomass
         !     SOXYL=O2 solubility, OXKX=Km for O2 uptake
         !     OXYS,COXYS=aqueous O2 amount, concentration
@@ -780,7 +780,7 @@ module MicAutoCPLXMod
         !
         THETW1=AZMAX1(safe_adb(VLWatMicPM(M),VLSoilMicP))
         RRADO=ORAD*(FILM(M)+ORAD)/FILM(M)
-        DIFOX=TORT(M)*OLSGL1*12.57_r8*BIOS*OMAff(NGL)*RRADO
+        DIFOX=TortMicPM(M)*OLSGL1*12.57_r8*BIOS*OMAff(NGL)*RRADO
         VOLWOX=VLWatMicPM(M)*SOXYL
         VOLPOX=VLsoiAirPM(M)
         VOLWPM=VOLWOX+VOLPOX
@@ -1348,7 +1348,7 @@ module MicAutoCPLXMod
 !     RCH4L=total aqueous CH4 exchange from previous hour
 !     RCH4F=total gaseous CH4 exchange from previous hour
 !     TCH4H+TCH4A=total CH4 generated from methanogenesis
-!     XNPG=1.0/(NPH*NPT)
+!     dts_gas=1.0/(NPH*NPT)
 !     CH4G1,CH4S1=CH4 gaseous, aqueous amounts
 !     CCH4E,CCH4G=CH4 gas concentration in atmosphere, soil
 !     VLsoiAirPM,VLWatMicPM=air,water-filled porosity
@@ -1361,16 +1361,16 @@ module MicAutoCPLXMod
 !
   ECHZ=EH4X
   VMXA=TFNGff(NGL)*FCNPff(NGL)*OMAff(NGL)*VMX4
-  RCH4L1=RCH4L*XNPG
-  RCH4F1=RCH4F*XNPG
-  RCH4S1=(naqfdiag%TCH4H+naqfdiag%TCH4A)*XNPG
+  RCH4L1=RCH4L*dts_gas
+  RCH4F1=RCH4F*dts_gas
+  RCH4S1=(naqfdiag%TCH4H+naqfdiag%TCH4A)*dts_gas
   IF(litrm)THEN
     CH4G1=CCH4E*VLsoiAirPM(1)
   ELSE
     CH4G1=CCH4G*VLsoiAirPM(1)
   ENDIF
   CH4S1=CH4S
-  VMXA1=VMXA*XNPG
+  VMXA1=VMXA*dts_gas
   RVOXP=0.0_r8
   RGOMP=0.0_r8
 !

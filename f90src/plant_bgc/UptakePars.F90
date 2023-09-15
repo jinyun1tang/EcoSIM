@@ -7,7 +7,7 @@ module UptakePars
   save
   character(len=*),private, parameter :: mod_filename = __FILE__
 !
-!     MXN=max number of cycles in convergence soln for water uptake
+!     MaxIterNum=max number of cycles in convergence soln for water uptake
 !     DIFFX,DIFFY=acceptance criteria in convergence soln
 !     FMN=min PFT:total population ratio
 !     RACM,RACX=min,max canopy boundary layer resistance (h m-1)
@@ -20,7 +20,7 @@ module UptakePars
 !     FEXUC,FEXUN,FEXUP=rate constant for root C,N,P exudation (h-1)
 !
 
-  integer :: MXN
+  integer :: MaxIterNum
   real(r8) :: DIFFX
   real(r8) :: DIFFY
   real(r8) :: FMN
@@ -44,7 +44,7 @@ module UptakePars
   subroutine InitUptakePars
   implicit none
 
-  MXN=200
+  MaxIterNum=200
   DIFFX=1.0E-09_r8
   DIFFY=0.5E-02_r8
   FMN=ppmc

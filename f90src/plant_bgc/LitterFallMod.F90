@@ -23,7 +23,7 @@ implicit none
     JHVST      =>   plt_distb%JHVST    , &
     IDAYH      =>   plt_distb%IDAYH    , &
     UVOLO      =>   plt_ew%UVOLO       , &
-    VOLWP      =>   plt_ew%VOLWP       , &
+    CanWatP      =>   plt_ew%CanWatP       , &
     WTRTE      =>   plt_biom%WTRTE     , &
     WTRVE      =>   plt_biom%WTRVE     , &
     ISTYP      =>   plt_pheno%ISTYP    , &
@@ -36,7 +36,7 @@ implicit none
     IYRC       =>   plt_site%IYRC      , &
     VOLWOU     =>   plt_site%VOLWOU    , &
     ZNOON      =>   plt_site%ZNOON     , &
-    HTCTL      =>   plt_morph%HTCTL    , &
+    HypoctoylHeight      =>   plt_morph%HypoctoylHeight    , &
     NBR        =>   plt_morph%NBR      , &
     NB1        =>   plt_morph%NB1      , &
     NBT        =>   plt_morph%NBT        &
@@ -84,10 +84,10 @@ implicit none
       ELSE
         NBR(NZ)=0
       ENDIF
-      HTCTL(NZ)=0._r8
-      VOLWOU=VOLWOU+VOLWP(NZ)
-      UVOLO=UVOLO+VOLWP(NZ)
-      VOLWP(NZ)=0._r8
+      HypoctoylHeight(NZ)=0._r8
+      VOLWOU=VOLWOU+CanWatP(NZ)
+      UVOLO=UVOLO+CanWatP(NZ)
+      CanWatP(NZ)=0._r8
 !
 !     RESET LIVING FLAGS
 !
@@ -180,7 +180,7 @@ implicit none
     IDATA      =>   plt_site%IDATA    , &
     CFOPE      =>   plt_soilchem%CFOPE, &
     MY         =>   plt_morph%MY      , &
-    NG         =>   plt_morph%NG      , &
+    NGTopRootLayer         =>   plt_morph%NGTopRootLayer      , &
     NBR        =>   plt_morph%NBR     , &
     NRT        =>   plt_morph%NRT       &
   )
@@ -267,10 +267,10 @@ implicit none
               ENDDO
             ENDDO
           ENDDO D6415
-          ESNC(NE,M,k_woody_litr,NG(NZ),NZ)=ESNC(NE,M,k_woody_litr,NG(NZ),NZ) &
+          ESNC(NE,M,k_woody_litr,NGTopRootLayer(NZ),NZ)=ESNC(NE,M,k_woody_litr,NGTopRootLayer(NZ),NZ) &
             +CFOPE(NE,instruct,M,NZ)*WTRVE(NE,NZ)*FWOODE(NE,k_woody_litr)
 
-          ESNC(NE,M,k_fine_litr,NG(NZ),NZ)=ESNC(NE,M,k_fine_litr,NG(NZ),NZ) &
+          ESNC(NE,M,k_fine_litr,NGTopRootLayer(NZ),NZ)=ESNC(NE,M,k_fine_litr,NGTopRootLayer(NZ),NZ) &
             +CFOPE(NE,instruct,M,NZ)*WTRVE(NE,NZ)*FWOODE(NE,k_fine_litr)
         ENDDO
       ENDDO D6425
@@ -309,7 +309,7 @@ implicit none
     RTWT1E    =>   plt_biom%RTWT1E    , &
     WTRT1E    =>   plt_biom%WTRT1E    , &
     EPOOLR    =>   plt_biom%EPOOLR    , &
-    WTRTD     =>   plt_biom%WTRTD     , &
+    RootCPZR    =>   plt_biom%RootCPZR    , &
     WTRTL     =>   plt_biom%WTRTL     , &
     WSRTL     =>   plt_biom%WSRTL     , &
     EPOOLN    =>   plt_biom%EPOOLN    , &
@@ -328,28 +328,28 @@ implicit none
     instruct   =>   pltpar%instruct   , &
     k_fine_litr=>  pltpar%k_fine_litr , &
     k_woody_litr=> pltpar%k_woody_litr, &
-    RTDNP     =>   plt_morph%RTDNP    , &
+    RootLenDensNLP     =>   plt_morph%RootLenDensNLP    , &
     RTVLW     =>   plt_morph%RTVLW    , &
     RTARP     =>   plt_morph%RTARP    , &
     RTVLP     =>   plt_morph%RTVLP    , &
-    RTNL      =>   plt_morph%RTNL     , &
-    RTN1      =>   plt_morph%RTN1     , &
-    RTDP1     =>   plt_morph%RTDP1    , &
-    RTLGA     =>   plt_morph%RTLGA    , &
-    RRAD1     =>   plt_morph%RRAD1    , &
-    RRAD2     =>   plt_morph%RRAD2    , &
-    RRAD1M    =>   plt_morph%RRAD1M   , &
-    RRAD2M    =>   plt_morph%RRAD2M   , &
-    RTLGP     =>   plt_morph%RTLGP    , &
-    RTLG1     =>   plt_morph%RTLG1    , &
-    RTLG2     =>   plt_morph%RTLG2    , &
+    SecndRootXNumL      =>   plt_morph%SecndRootXNumL     , &
+    PrimRootXNumL     =>   plt_morph%PrimRootXNumL    , &
+    PrimRootDepth    =>   plt_morph%PrimRootDepth   , &
+    AveSecndRootLen     =>   plt_morph%AveSecndRootLen    , &
+    PrimRootRadius     =>   plt_morph%PrimRootRadius    , &
+    SecndRootRadius     =>   plt_morph%SecndRootRadius    , &
+    MaxPrimRootRadius    =>   plt_morph%MaxPrimRootRadius   , &
+    MaxSecndRootRadius    =>   plt_morph%MaxSecndRootRadius   , &
+    RootLenPerP     =>   plt_morph%RootLenPerP    , &
+    PrimRootLen     =>   plt_morph%PrimRootLen    , &
+    SecndRootLen     =>   plt_morph%SecndRootLen    , &
     INTYP     =>   plt_morph%INTYP    , &
     RTN2      =>   plt_morph%RTN2     , &
     MY        =>   plt_morph%MY       , &
-    NIX       =>   plt_morph%NIX      , &
+    NIXBotRootLayer      =>   plt_morph%NIXBotRootLayer     , &
     NINR      =>   plt_morph%NINR     , &
-    SDPTH     =>   plt_morph%SDPTH    , &
-    NG        =>   plt_morph%NG       , &
+    SeedinDepth     =>   plt_morph%SeedinDepth    , &
+    NGTopRootLayer        =>   plt_morph%NGTopRootLayer       , &
     NRT       =>   plt_morph%NRT        &
   )
 !     IDTHR=PFT root living flag: 0=alive,1=dead
@@ -395,39 +395,39 @@ implicit none
 !     WTRT1,WTRT1N,WTRT1P=primary root C,N,P mass in soil layer
 !     WTRT2,WTRT2N,WTRT2P=secondary root C,N,P mass in soil layer
 !     RTWT1,RTWT1N,RTWT1P=primary root C,N,P mass
-!     RTLG1,RTLG2=primary,secondary root length
+!     PrimRootLen,SecndRootLen=primary,secondary root length
 !     RTN2=number of secondary root axes
 !     CPOOLR,ZPOOLR,PPOOLR=non-structural C,N,P mass in root
 !     WTRTL,WTRTD=active,actual root C mass
 !     WSRTL=root protein C mass
-!     RTN1,RTNL=number of primary,secondary root axes
-!     RTDNP,RTLGP=root length density,root length per plant
+!     RTN1,SecndRootXNumL=number of primary,secondary root axes
+!     RootLenDensNLP,RootLenPerP=root length density,root length per plant
 !     RTVLW,RTVLP=root or myco aqueous,gaseous volume
 !     RTARP=root surface area per plant
-!     RTLGA=average secondary root length
+!     AveSecndRootLen=average secondary root length
 !
         D8870: DO NR=1,NRT(NZ)
           WTRT1E(1:npelms,N,L,NR,NZ)=0._r8
           WTRT2E(1:npelms,N,L,NR,NZ)=0._r8
           RTWT1E(1:npelms,N,NR,NZ)=0._r8
-          RTLG1(N,L,NR,NZ)=0._r8
-          RTLG2(N,L,NR,NZ)=0._r8
+          PrimRootLen(N,L,NR,NZ)=0._r8
+          SecndRootLen(N,L,NR,NZ)=0._r8
           RTN2(N,L,NR,NZ)=0._r8
         ENDDO D8870
         EPOOLR(:,N,L,NZ)=0._r8
         WTRTL(N,L,NZ)=0._r8
-        WTRTD(N,L,NZ)=0._r8
+        RootCPZR(N,L,NZ)=0._r8
         WSRTL(N,L,NZ)=0._r8
-        RTN1(N,L,NZ)=0._r8
-        RTNL(N,L,NZ)=0._r8
-        RTLGP(N,L,NZ)=0._r8
-        RTDNP(N,L,NZ)=0._r8
+        PrimRootXNumL(N,L,NZ)=0._r8
+        SecndRootXNumL(N,L,NZ)=0._r8
+        RootLenPerP(N,L,NZ)=0._r8
+        RootLenDensNLP(N,L,NZ)=0._r8
         RTVLP(N,L,NZ)=0._r8
         RTVLW(N,L,NZ)=0._r8
-        RRAD1(N,L,NZ)=RRAD1M(N,NZ)
-        RRAD2(N,L,NZ)=RRAD2M(N,NZ)
+        PrimRootRadius(N,L,NZ)=MaxPrimRootRadius(N,NZ)
+        SecndRootRadius(N,L,NZ)=MaxSecndRootRadius(N,NZ)
         RTARP(N,L,NZ)=0._r8
-        RTLGA(N,L,NZ)=RTLGAX
+        AveSecndRootLen(N,L,NZ)=MinAve2ndRootLen
 !
 !     LITTERFALL AND STATE VARIABLES FROM DEAD NODULES
 !
@@ -457,13 +457,13 @@ implicit none
 !     RTWT1,RTWT1N,RTWT1P=primary root C,N,P mass
 !
     D8795: DO NR=1,NRT(NZ)
-      NINR(NR,NZ)=NG(NZ)
+      NINR(NR,NZ)=NGTopRootLayer(NZ)
       D8790: DO N=1,MY(NZ)
-        RTDP1(N,NR,NZ)=SDPTH(NZ)
+        PrimRootDepth(N,NR,NZ)=SeedinDepth(NZ)
         RTWT1E(1:npelms,N,NR,NZ)=0._r8
       ENDDO D8790
     ENDDO D8795
-    NIX(NZ)=NG(NZ)
+    NIXBotRootLayer(NZ)=NGTopRootLayer(NZ)
     NRT(NZ)=0
   ENDIF
   end associate
@@ -666,10 +666,10 @@ implicit none
     WTHSKBE=> plt_biom%WTHSKBE       , &
     WTEARBE=> plt_biom%WTEARBE       , &
     WTGRBE => plt_biom%WTGRBE        , &
-    WVSTKB => plt_biom%WVSTKB        , &
+    CanPBStalkC => plt_biom%CanPBStalkC        , &
     EPOOLR => plt_biom%EPOOLR        , &
     WTSTXBE=> plt_biom%WTSTXBE       , &
-    WTLSB  => plt_biom%WTLSB         , &
+    CanPBLeafShethC  => plt_biom%CanPBLeafShethC         , &
     WTRVE  => plt_biom%WTRVE         , &
     WTRT1E => plt_biom%WTRT1E        , &
     WTRT2E => plt_biom%WTRT2E        , &
@@ -679,9 +679,9 @@ implicit none
     NJ     => plt_site%NJ            , &
     NU     => plt_site%NU            , &
     IDTH   => plt_pheno%IDTH         , &
-    RTLG2  => plt_morph%RTLG2        , &
+    SecndRootLen  => plt_morph%SecndRootLen        , &
     RTN2   => plt_morph%RTN2         , &
-    RTLG1  => plt_morph%RTLG1        , &
+    PrimRootLen  => plt_morph%PrimRootLen        , &
     MY     => plt_morph%MY           , &
     NBR    => plt_morph%NBR          , &
     NRT    => plt_morph%NRT            &
@@ -701,12 +701,12 @@ implicit none
   ENDDO
   D8835: DO NB=1,NBR(NZ)
     CPOOLK(NB,NZ)=0._r8
-    WVSTKB(NB,NZ)=0._r8
+    CanPBStalkC(NB,NZ)=0._r8
     WTNDBE(1:npelms,NB,NZ)=0._r8
     WTHSKBE(1:npelms,NB,NZ)=0._r8
     WTEARBE(1:npelms,NB,NZ)=0._r8
     WTGRBE(1:npelms,NB,NZ)=0._r8
-    WTLSB(NB,NZ)=0._r8
+    CanPBLeafShethC(NB,NZ)=0._r8
     WTSTXBE(1:npelms,NB,NZ)=0._r8
   ENDDO D8835
 !
@@ -719,8 +719,8 @@ implicit none
         WTRT1E(1:npelms,N,L,NR,NZ)=0._r8
         WTRT2E(1:npelms,N,L,NR,NZ)=0._r8
         RTWT1E(1:npelms,N,NR,NZ)=0._r8
-        RTLG1(N,L,NR,NZ)=0._r8
-        RTLG2(N,L,NR,NZ)=0._r8
+        PrimRootLen(N,L,NR,NZ)=0._r8
+        SecndRootLen(N,L,NR,NZ)=0._r8
         RTN2(N,L,NR,NZ)=0._r8
       enddo
     enddo
@@ -749,9 +749,9 @@ implicit none
     WGLFE    => plt_biom%WGLFE      , &
     WTRSVBE  => plt_biom%WTRSVBE    , &
     WTSTXBE  => plt_biom%WTSTXBE    , &
-    WVSTKB   => plt_biom%WVSTKB     , &
+    CanPBStalkC   => plt_biom%CanPBStalkC     , &
     WTGRBE   => plt_biom%WTGRBE     , &
-    WTLSB    => plt_biom%WTLSB      , &
+    CanPBLeafShethC    => plt_biom%CanPBLeafShethC      , &
     WTHSKBE  => plt_biom%WTHSKBE    , &
     WTEARBE  => plt_biom%WTEARBE    , &
     WSSHE    => plt_biom%WSSHE      , &
@@ -768,8 +768,8 @@ implicit none
     GRWTB    => plt_allom%GRWTB     , &
     GRNXB    => plt_morph%GRNXB     , &
     GRNOB    => plt_morph%GRNOB     , &
-    ARLFB    => plt_morph%ARLFB     , &
-    ARSTK    => plt_morph%ARSTK     , &
+    CanPBLA    => plt_morph%CanPBLA     , &
+    CanPLBSA    => plt_morph%CanPLBSA     , &
     NBR      => plt_morph%NBR       , &
     ARLF1    => plt_morph%ARLF1     , &
     HTSHE    => plt_morph%HTSHE     , &
@@ -778,7 +778,7 @@ implicit none
     HTNODE   => plt_morph%HTNODE    , &
     ARLFV    => plt_morph%ARLFV     , &
     SURFB    => plt_morph%SURFB     , &
-    ARLFL    => plt_morph%ARLFL       &
+    CanPLNBLA    => plt_morph%CanPLNBLA       &
   )
 !
 !     CPOOL,ZPOOL,PPOOL=non-structural C,N,P in branch
@@ -800,7 +800,7 @@ implicit none
 !     CPOOL3,CPOOL4=C4 nonstructural C mass in bundle sheath,mesophyll
 !     CO2B,HCOB=aqueous CO2,HCO3-C mass in bundle sheath
 !     WSLF=leaf protein mass
-!     ARLFB=branch leaf area
+!     CanPBLA=branch leaf area
 !     WGLF,WGLFN,WGLFP,WSLF=node leaf C,N,P,protein mass
 !     WGSHE,WGSHN,WGSHP,WSSHE=node petiole C,N,P,protein mass
 !     WGNODE,WGNODN,WGNODP=node stalk C,N,P mass
@@ -817,12 +817,12 @@ implicit none
   WTHSKBE(1:npelms,NB,NZ)=0._r8
   WTEARBE(1:npelms,NB,NZ)=0._r8
   WTGRBE(1:npelms,NB,NZ)=0._r8
-  WVSTKB(NB,NZ)=0._r8
-  WTLSB(NB,NZ)=0._r8
+  CanPBStalkC(NB,NZ)=0._r8
+  CanPBLeafShethC(NB,NZ)=0._r8
   GRNXB(NB,NZ)=0._r8
   GRNOB(NB,NZ)=0._r8
   GRWTB(NB,NZ)=0._r8
-  ARLFB(NB,NZ)=0._r8
+  CanPBLA(NB,NZ)=0._r8
   WTSTXBE(1:npelms,NB,NZ)=0._r8
 
   D8855: DO K=0,JNODS1
@@ -842,9 +842,9 @@ implicit none
     WGSHE(1:npelms,K,NB,NZ)=0._r8
     WGNODE(1:npelms,K,NB,NZ)=0._r8
     D8865: DO L=1,JC1
-      ARLFV(L,NZ)=ARLFV(L,NZ)-ARLFL(L,K,NB,NZ)
+      ARLFV(L,NZ)=ARLFV(L,NZ)-CanPLNBLA(L,K,NB,NZ)
       WGLFV(L,NZ)=WGLFV(L,NZ)-WGLFLE(ielmc,L,K,NB,NZ)
-      ARLFL(L,K,NB,NZ)=0._r8
+      CanPLNBLA(L,K,NB,NZ)=0._r8
       WGLFLE(1:npelms,L,K,NB,NZ)=0._r8
       IF(K.NE.0)THEN
         D8860: DO N=1,JLI1
@@ -854,7 +854,7 @@ implicit none
     ENDDO D8865
   ENDDO D8855
   D8875: DO L=1,JC1
-    ARSTK(L,NB,NZ)=0._r8
+    CanPLBSA(L,NB,NZ)=0._r8
     DO  N=1,JLI1
       SURFB(N,L,NB,NZ)=0._r8
     enddo

@@ -130,8 +130,8 @@ module TrnsfrMod
 !             :NH4=NH4,NH3=NH3,NO3=NO3,NO2=NO2,P14=HPO4,PO4=H2PO4 in non-band
 !             :N4B=NH4,N3B=NH3,NOB=NO3,N2B=NO2,P1B=HPO4,POB=H2PO4 in band
 !
-!     XNPG=1/number of cycles h-1 for gas flux calculations
-!     XNPH=1/no. of cycles h-1 for water, heat and solute flux calculations
+!     dts_gas=1/number of cycles h-1 for gas flux calculations
+!     dts_HeatWatTP=1/no. of cycles h-1 for water, heat and solute flux calculations
 !     R*SK2=total sink from nitro.f, uptake.f, solute.f
 !     RCO2O=net soil CO2 uptake from nitro.f
 !     RCH4O=net soil CH4 uptake from nitro.f
@@ -174,8 +174,8 @@ module TrnsfrMod
 !     IN SNOWFALL AND IRRIGATION ACCORDING TO CONCENTRATIONS
 !     ENTERED IN WEATHER AND IRRIGATION FILES
 !
-!     PRECW,PRECR=snow,rain
-!     VHCPWM,VHCPWX=current,minimum volumetric heat capacity of snowpack
+!     SnoFalPrec,RainFalPrec=snow,rain
+!     VHCPWM,VLHeatCapSnowMN=current,minimum volumetric heat capacity of snowpack
 !     X*BLS=hourly solute flux to snowpack
 !     solute code:CO=CO2,CH=CH4,OX=O2,NG=N2,N2=N2O,HG=H2
 !             :OC=DOC,ON=DON,OP=DOP,OA=acetate
@@ -189,7 +189,7 @@ module TrnsfrMod
 !     GAS AND SOLUTE FLUXES AT SUB-HOURLY FLUX TIME STEP
 !     ENTERED IN SITE FILE
 !
-!     XNPH=1/no. of cycles h-1 for water, heat and solute flux calculations
+!     dts_HeatWatTP=1/no. of cycles h-1 for water, heat and solute flux calculations
 !     R*BLS,R*FL0,R*FL1,R*FL2=solute flux to snowpack,surface litter,soil surface non-band,band
 !     solute code:CO=CO2,CH=CH4,OX=O2,NG=N2,N2=N2O,HG=H2
 !             :OC=DOC,ON=DON,OP=DOP,OA=acetate
@@ -201,7 +201,7 @@ module TrnsfrMod
 !
 !     SOLUTE FLUXES FROM WATSUB.F, NITRO.F, UPTAKE.F, SOLUTE.F
 !
-!     XNPH=1/no. of cycles h-1 for water, heat and solute flux calculations
+!     dts_HeatWatTP=1/no. of cycles h-1 for water, heat and solute flux calculations
 !     CHY0=H concentration
 !     PH=pH
 !     FLWU,TUPWTR=total root water uptake from extract.f
@@ -453,24 +453,24 @@ module TrnsfrMod
 
   integer :: K
 
-  RBGCSinkG(idg_CO2,0,NY,NX)=RCO2O(0,NY,NX)*XNPG
-  RBGCSinkG(idg_CH4,0,NY,NX)=RCH4O(0,NY,NX)*XNPG
-  RBGCSinkG(idg_N2,0,NY,NX)=(RN2G(0,NY,NX)+XN2GS(0,NY,NX))*XNPG
-  RBGCSinkG(idg_N2O,0,NY,NX)=RN2O(0,NY,NX)*XNPG
+  RBGCSinkG(idg_CO2,0,NY,NX)=RCO2O(0,NY,NX)*dts_gas
+  RBGCSinkG(idg_CH4,0,NY,NX)=RCH4O(0,NY,NX)*dts_gas
+  RBGCSinkG(idg_N2,0,NY,NX)=(RN2G(0,NY,NX)+XN2GS(0,NY,NX))*dts_gas
+  RBGCSinkG(idg_N2O,0,NY,NX)=RN2O(0,NY,NX)*dts_gas
   RBGCSinkG(idg_NH3,0,NY,NX)=0.0_r8
-  RBGCSinkG(idg_H2,0,NY,NX)=RH2GO(0,NY,NX)*XNPG
+  RBGCSinkG(idg_H2,0,NY,NX)=RH2GO(0,NY,NX)*dts_gas
   DO  K=1,jcplx
-    ROCSK2(K,0,NY,NX)=-XOQCS(K,0,NY,NX)*XNPH
-    RONSK2(K,0,NY,NX)=-XOQNS(K,0,NY,NX)*XNPH
-    ROPSK2(K,0,NY,NX)=-XOQPS(K,0,NY,NX)*XNPH
-    ROASK2(K,0,NY,NX)=-XOQAS(K,0,NY,NX)*XNPH
+    ROCSK2(K,0,NY,NX)=-XOQCS(K,0,NY,NX)*dts_HeatWatTP
+    RONSK2(K,0,NY,NX)=-XOQNS(K,0,NY,NX)*dts_HeatWatTP
+    ROPSK2(K,0,NY,NX)=-XOQPS(K,0,NY,NX)*dts_HeatWatTP
+    ROASK2(K,0,NY,NX)=-XOQAS(K,0,NY,NX)*dts_HeatWatTP
   ENDDO
-  RBGCSinkS(ids_NH4,0,NY,NX)=(-XNH4S(0,NY,NX)-TRN4S(0,NY,NX))*XNPH
-  RBGCSinkS(idg_NH3,0,NY,NX)=-TRN3S(0,NY,NX)*XNPH
-  RBGCSinkS(ids_NO3,0,NY,NX)=(-XNO3S(0,NY,NX)-TRNO3(0,NY,NX))*XNPH
-  RBGCSinkS(ids_NO2,0,NY,NX)=(-XNO2S(0,NY,NX)-TRNO2(0,NY,NX))*XNPH
-  RBGCSinkS(ids_H2PO4,0,NY,NX)=(-XH2PS(0,NY,NX)-TRH2P(0,NY,NX))*XNPH
-  RBGCSinkS(ids_H1PO4,0,NY,NX)=(-XH1PS(0,NY,NX)-TRH1P(0,NY,NX))*XNPH
+  RBGCSinkS(ids_NH4,0,NY,NX)=(-XNH4S(0,NY,NX)-TRN4S(0,NY,NX))*dts_HeatWatTP
+  RBGCSinkS(idg_NH3,0,NY,NX)=-TRN3S(0,NY,NX)*dts_HeatWatTP
+  RBGCSinkS(ids_NO3,0,NY,NX)=(-XNO3S(0,NY,NX)-TRNO3(0,NY,NX))*dts_HeatWatTP
+  RBGCSinkS(ids_NO2,0,NY,NX)=(-XNO2S(0,NY,NX)-TRNO2(0,NY,NX))*dts_HeatWatTP
+  RBGCSinkS(ids_H2PO4,0,NY,NX)=(-XH2PS(0,NY,NX)-TRH2P(0,NY,NX))*dts_HeatWatTP
+  RBGCSinkS(ids_H1PO4,0,NY,NX)=(-XH1PS(0,NY,NX)-TRH1P(0,NY,NX))*dts_HeatWatTP
 
   end subroutine SurfaceSinksandSources
 !------------------------------------------------------------------------------------------
@@ -538,7 +538,7 @@ module TrnsfrMod
 
   integer, intent(in) :: I
   integer, intent(in) :: NY,NX
-  IF(PRECW(NY,NX).GT.0.0_r8.OR.(PRECR(NY,NX).GT.0.0_r8.AND.VHCPWM(1,1,NY,NX).GT.VHCPWX(NY,NX)))THEN
+  IF(SnoFalPrec(NY,NX).GT.0.0_r8.OR.(RainFalPrec(NY,NX).GT.0.0_r8.AND.VHCPWM(1,1,NY,NX).GT.VLHeatCapSnowMN(NY,NX)))THEN
     trcg_XBLS(idg_CO2,1,NY,NX)=FLQGQ(NY,NX)*CCOR(NY,NX)+FLQGI(NY,NX)*CCOQ(NY,NX)
     trcg_XBLS(idg_CH4,1,NY,NX)=FLQGQ(NY,NX)*CCHR(NY,NX)+FLQGI(NY,NX)*CCHQ(NY,NX)
     trcg_XBLS(idg_O2,1,NY,NX)=FLQGQ(NY,NX)*COXR(NY,NX)+FLQGI(NY,NX)*COXQ(NY,NX)
@@ -564,7 +564,7 @@ module TrnsfrMod
 !     ENTERED IN WEATHER AND IRRIGATION FILES
 !
   ELSEIF((PRECQ(NY,NX).GT.0.0.OR.PRECI(NY,NX).GT.0.0) &
-    .AND.VHCPWM(1,1,NY,NX).LE.VHCPWX(NY,NX))THEN
+    .AND.VHCPWM(1,1,NY,NX).LE.VLHeatCapSnowMN(NY,NX))THEN
 !
 !     HOURLY SOLUTE FLUXES FROM ATMOSPHERE TO SNOWPACK
 !     IF SNOWFALL AND IRRIGATION IS ZERO AND SNOWPACK IS ABSENT
@@ -653,43 +653,43 @@ module TrnsfrMod
   INTEGER :: K,L,NTS,NTG,NTN
 
   DO  K=1,micpar%n_litrsfk
-    ROCFL0(K,NY,NX)=XOCFLS(K,3,0,NY,NX)*XNPH
-    RONFL0(K,NY,NX)=XONFLS(K,3,0,NY,NX)*XNPH
-    ROPFL0(K,NY,NX)=XOPFLS(K,3,0,NY,NX)*XNPH
-    ROAFL0(K,NY,NX)=XOAFLS(K,3,0,NY,NX)*XNPH
-    ROCFL1(K,NY,NX)=XOCFLS(K,3,NU(NY,NX),NY,NX)*XNPH
-    RONFL1(K,NY,NX)=XONFLS(K,3,NU(NY,NX),NY,NX)*XNPH
-    ROPFL1(K,NY,NX)=XOPFLS(K,3,NU(NY,NX),NY,NX)*XNPH
-    ROAFL1(K,NY,NX)=XOAFLS(K,3,NU(NY,NX),NY,NX)*XNPH
+    ROCFL0(K,NY,NX)=XOCFLS(K,3,0,NY,NX)*dts_HeatWatTP
+    RONFL0(K,NY,NX)=XONFLS(K,3,0,NY,NX)*dts_HeatWatTP
+    ROPFL0(K,NY,NX)=XOPFLS(K,3,0,NY,NX)*dts_HeatWatTP
+    ROAFL0(K,NY,NX)=XOAFLS(K,3,0,NY,NX)*dts_HeatWatTP
+    ROCFL1(K,NY,NX)=XOCFLS(K,3,NU(NY,NX),NY,NX)*dts_HeatWatTP
+    RONFL1(K,NY,NX)=XONFLS(K,3,NU(NY,NX),NY,NX)*dts_HeatWatTP
+    ROPFL1(K,NY,NX)=XOPFLS(K,3,NU(NY,NX),NY,NX)*dts_HeatWatTP
+    ROAFL1(K,NY,NX)=XOAFLS(K,3,NU(NY,NX),NY,NX)*dts_HeatWatTP
   enddo
 
   DO NTG=idg_beg,idg_end-1
-    trcg_RBLS(idg_CO2,1,NY,NX)=trcg_XBLS(idg_CO2,1,NY,NX)*XNPH
+    trcg_RBLS(idg_CO2,1,NY,NX)=trcg_XBLS(idg_CO2,1,NY,NX)*dts_HeatWatTP
   ENDDO
 
   DO NTN=ids_nut_beg,ids_nuts_end
-    trcn_RBLS(NTN,1,NY,NX)=trcn_XBLS(NTN,1,NY,NX)*XNPH
+    trcn_RBLS(NTN,1,NY,NX)=trcn_XBLS(NTN,1,NY,NX)*dts_HeatWatTP
   ENDDO
 
   DO NTG=idg_beg,idg_end-1
-    trcg_RFL0(NTG,NY,NX)=trcs_XFLS(NTG,3,0,NY,NX)*XNPH
+    trcg_RFL0(NTG,NY,NX)=trcs_XFLS(NTG,3,0,NY,NX)*dts_HeatWatTP
   ENDDO
 
-  trcn_RFL0(ids_NH4,NY,NX)=trcs_XFLS(ids_NH4,3,0,NY,NX)*XNPH
-  trcn_RFL0(ids_NO3,NY,NX)=trcs_XFLS(ids_NO3,3,0,NY,NX)*XNPH
-  trcn_RFL0(ids_NO2,NY,NX)=trcs_XFLS(ids_NO2,3,0,NY,NX)*XNPH
-  trcn_RFL0(ids_H1PO4,NY,NX)=trcs_XFLS(ids_H1PO4,3,0,NY,NX)*XNPH
-  trcn_RFL0(ids_H2PO4,NY,NX)=trcs_XFLS(ids_H2PO4,3,0,NY,NX)*XNPH
+  trcn_RFL0(ids_NH4,NY,NX)=trcs_XFLS(ids_NH4,3,0,NY,NX)*dts_HeatWatTP
+  trcn_RFL0(ids_NO3,NY,NX)=trcs_XFLS(ids_NO3,3,0,NY,NX)*dts_HeatWatTP
+  trcn_RFL0(ids_NO2,NY,NX)=trcs_XFLS(ids_NO2,3,0,NY,NX)*dts_HeatWatTP
+  trcn_RFL0(ids_H1PO4,NY,NX)=trcs_XFLS(ids_H1PO4,3,0,NY,NX)*dts_HeatWatTP
+  trcn_RFL0(ids_H2PO4,NY,NX)=trcs_XFLS(ids_H2PO4,3,0,NY,NX)*dts_HeatWatTP
 
   DO NTS=ids_beg,ids_end
-    trcs_RFL1(NTS,NY,NX)=trcs_XFLS(NTS,3,NU(NY,NX),NY,NX)*XNPH
+    trcs_RFL1(NTS,NY,NX)=trcs_XFLS(NTS,3,NU(NY,NX),NY,NX)*dts_HeatWatTP
   ENDDO
 !
 !     GAS AND SOLUTE SINKS AND SOURCES IN SOIL LAYERS FROM MICROBIAL
 !     TRANSFORMATIONS IN 'NITRO' + ROOT EXCHANGE IN 'EXTRACT'
 !     + EQUILIBRIA REACTIONS IN 'SOLUTE' AT SUB-HOURLY TIME STEP
 !
-!     XNPH=1/no. of cycles h-1 for water, heat and solute flux calculations
+!     dts_HeatWatTP=1/no. of cycles h-1 for water, heat and solute flux calculations
 !     *SGL*=solute diffusivity from hour1.f
 !     solute code:CO=CO2,CH=CH4,OX=O2,NG=N2,N2=N2O,HG=H2
 !             :OC=DOC,ON=DON,OP=DOP,OA=acetate
@@ -699,13 +699,13 @@ module TrnsfrMod
 !     XNPT=1/number of cycles NPH-1 for gas flux calculations
 !
   DO NTS=ids_beg,ids_end
-    SolDifcc(NTS,0,NY,NX)=SolDifc(NTS,0,NY,NX)*XNPH
+    SolDifcc(NTS,0,NY,NX)=SolDifc(NTS,0,NY,NX)*dts_HeatWatTP
   ENDDO
 
-  OCSGL2(0,NY,NX)=OCSGL(0,NY,NX)*XNPH
-  ONSGL2(0,NY,NX)=ONSGL(0,NY,NX)*XNPH
-  OPSGL2(0,NY,NX)=OPSGL(0,NY,NX)*XNPH
-  OASGL2(0,NY,NX)=OASGL(0,NY,NX)*XNPH
+  OCSGL2(0,NY,NX)=OCSGL(0,NY,NX)*dts_HeatWatTP
+  ONSGL2(0,NY,NX)=ONSGL(0,NY,NX)*dts_HeatWatTP
+  OPSGL2(0,NY,NX)=OPSGL(0,NY,NX)*dts_HeatWatTP
+  OASGL2(0,NY,NX)=OASGL(0,NY,NX)*dts_HeatWatTP
 !
 !     INITIAL SOLUTES IN SNOWPACK
 !
@@ -730,31 +730,31 @@ module TrnsfrMod
 
   DO L=NU(NY,NX),NL(NY,NX)
     CHY0(L,NY,NX)=10.0_r8**(-(PH(L,NY,NX)-3.0_r8))
-    FLWU(L,NY,NX)=GridPlantRootH2OUptake_vr(L,NY,NX)*XNPH
-    RBGCSinkG(idg_CO2,L,NY,NX)=(RCO2O(L,NY,NX)+TCO2S(L,NY,NX)-TRCO2(L,NY,NX))*XNPG
-    RBGCSinkG(idg_CH4,L,NY,NX)=(RCH4O(L,NY,NX)+TUPCHS(L,NY,NX))*XNPG
-    RBGCSinkG(idg_N2,L,NY,NX)=(RN2G(L,NY,NX)+XN2GS(L,NY,NX)+TUPNF(L,NY,NX))*XNPG
-    RBGCSinkG(idg_N2O,L,NY,NX)=(RN2O(L,NY,NX)+TUPN2S(L,NY,NX))*XNPG
-    RBGCSinkG(idg_NH3,L,NY,NX)=-TRN3G(L,NY,NX)*XNPG
-    RBGCSinkG(idg_H2,L,NY,NX)=(RH2GO(L,NY,NX)+TUPHGS(L,NY,NX))*XNPG
+    FLWU(L,NY,NX)=GridPlantRootH2OUptake_vr(L,NY,NX)*dts_HeatWatTP
+    RBGCSinkG(idg_CO2,L,NY,NX)=(RCO2O(L,NY,NX)+TCO2S(L,NY,NX)-TRCO2(L,NY,NX))*dts_gas
+    RBGCSinkG(idg_CH4,L,NY,NX)=(RCH4O(L,NY,NX)+TUPCHS(L,NY,NX))*dts_gas
+    RBGCSinkG(idg_N2,L,NY,NX)=(RN2G(L,NY,NX)+XN2GS(L,NY,NX)+TUPNF(L,NY,NX))*dts_gas
+    RBGCSinkG(idg_N2O,L,NY,NX)=(RN2O(L,NY,NX)+TUPN2S(L,NY,NX))*dts_gas
+    RBGCSinkG(idg_NH3,L,NY,NX)=-TRN3G(L,NY,NX)*dts_gas
+    RBGCSinkG(idg_H2,L,NY,NX)=(RH2GO(L,NY,NX)+TUPHGS(L,NY,NX))*dts_gas
     DO  K=1,jcplx
-      ROCSK2(K,L,NY,NX)=-XOQCS(K,L,NY,NX)*XNPH
-      RONSK2(K,L,NY,NX)=-XOQNS(K,L,NY,NX)*XNPH
-      ROPSK2(K,L,NY,NX)=-XOQPS(K,L,NY,NX)*XNPH
-      ROASK2(K,L,NY,NX)=-XOQAS(K,L,NY,NX)*XNPH
+      ROCSK2(K,L,NY,NX)=-XOQCS(K,L,NY,NX)*dts_HeatWatTP
+      RONSK2(K,L,NY,NX)=-XOQNS(K,L,NY,NX)*dts_HeatWatTP
+      ROPSK2(K,L,NY,NX)=-XOQPS(K,L,NY,NX)*dts_HeatWatTP
+      ROASK2(K,L,NY,NX)=-XOQAS(K,L,NY,NX)*dts_HeatWatTP
     ENDDO
-    RBGCSinkS(ids_NH4,L,NY,NX)=(-XNH4S(L,NY,NX)-TRN4S(L,NY,NX)+TUPNH4(L,NY,NX))*XNPH
-    RBGCSinkS(idg_NH3,L,NY,NX)=(-TRN3S(L,NY,NX)+TUPN3S(L,NY,NX))*XNPH
-    RBGCSinkS(ids_NO3,L,NY,NX)=(-XNO3S(L,NY,NX)-TRNO3(L,NY,NX)+TUPNO3(L,NY,NX))*XNPH
-    RBGCSinkS(ids_NO2,L,NY,NX)=(-XNO2S(L,NY,NX)-TRNO2(L,NY,NX))*XNPH
-    RBGCSinkS(ids_H2PO4,L,NY,NX)=(-XH2PS(L,NY,NX)-TRH2P(L,NY,NX)+TUPH2P(L,NY,NX))*XNPH
-    RBGCSinkS(ids_H1PO4,L,NY,NX)=(-XH1PS(L,NY,NX)-TRH1P(L,NY,NX)+TUPH1P(L,NY,NX))*XNPH
-    RBGCSinkS(ids_NH4B,L,NY,NX)=(-XNH4B(L,NY,NX)-TRN4B(L,NY,NX)+TUPNHB(L,NY,NX))*XNPH
-    RBGCSinkS(idg_NH3B,L,NY,NX)=(-TRN3B(L,NY,NX)+TUPN3B(L,NY,NX))*XNPH
-    RBGCSinkS(ids_NO3B,L,NY,NX)=(-XNO3B(L,NY,NX)-TRNOB(L,NY,NX)+TUPNOB(L,NY,NX))*XNPH
-    RBGCSinkS(ids_NO2B,L,NY,NX)=(-XNO2B(L,NY,NX)-TRN2B(L,NY,NX))*XNPH
-    RBGCSinkS(ids_H2PO4B,L,NY,NX)=(-XH2BS(L,NY,NX)-TRH2B(L,NY,NX)+TUPH2B(L,NY,NX))*XNPH
-    RBGCSinkS(ids_H1PO4B,L,NY,NX)=(-XH1BS(L,NY,NX)-TRH1B(L,NY,NX)+TUPH1B(L,NY,NX))*XNPH
+    RBGCSinkS(ids_NH4,L,NY,NX)=(-XNH4S(L,NY,NX)-TRN4S(L,NY,NX)+TUPNH4(L,NY,NX))*dts_HeatWatTP
+    RBGCSinkS(idg_NH3,L,NY,NX)=(-TRN3S(L,NY,NX)+TUPN3S(L,NY,NX))*dts_HeatWatTP
+    RBGCSinkS(ids_NO3,L,NY,NX)=(-XNO3S(L,NY,NX)-TRNO3(L,NY,NX)+TUPNO3(L,NY,NX))*dts_HeatWatTP
+    RBGCSinkS(ids_NO2,L,NY,NX)=(-XNO2S(L,NY,NX)-TRNO2(L,NY,NX))*dts_HeatWatTP
+    RBGCSinkS(ids_H2PO4,L,NY,NX)=(-XH2PS(L,NY,NX)-TRH2P(L,NY,NX)+TUPH2P(L,NY,NX))*dts_HeatWatTP
+    RBGCSinkS(ids_H1PO4,L,NY,NX)=(-XH1PS(L,NY,NX)-TRH1P(L,NY,NX)+TUPH1P(L,NY,NX))*dts_HeatWatTP
+    RBGCSinkS(ids_NH4B,L,NY,NX)=(-XNH4B(L,NY,NX)-TRN4B(L,NY,NX)+TUPNHB(L,NY,NX))*dts_HeatWatTP
+    RBGCSinkS(idg_NH3B,L,NY,NX)=(-TRN3B(L,NY,NX)+TUPN3B(L,NY,NX))*dts_HeatWatTP
+    RBGCSinkS(ids_NO3B,L,NY,NX)=(-XNO3B(L,NY,NX)-TRNOB(L,NY,NX)+TUPNOB(L,NY,NX))*dts_HeatWatTP
+    RBGCSinkS(ids_NO2B,L,NY,NX)=(-XNO2B(L,NY,NX)-TRN2B(L,NY,NX))*dts_HeatWatTP
+    RBGCSinkS(ids_H2PO4B,L,NY,NX)=(-XH2BS(L,NY,NX)-TRH2B(L,NY,NX)+TUPH2B(L,NY,NX))*dts_HeatWatTP
+    RBGCSinkS(ids_H1PO4B,L,NY,NX)=(-XH1BS(L,NY,NX)-TRH1B(L,NY,NX)+TUPH1B(L,NY,NX))*dts_HeatWatTP
 !
 !     SOLUTE FLUXES FROM SUBSURFACE IRRIGATION
 !
@@ -789,33 +789,33 @@ module TrnsfrMod
 !     SUB-HOURLY SOLUTE FLUXES FROM SUBSURFACE IRRIGATION
 !
 !     R*FLZ,R*FBZ=subsurface solute flux in non-band,band
-!     XNPH=1/no. of cycles h-1 for water, heat and solute flux calculations
+!     dts_HeatWatTP=1/no. of cycles h-1 for water, heat and solute flux calculations
 !
     DO NTS=ids_beg,ids_end
-      RFLZ_sol(NTS,L,NY,NX)=trcs_RFLU(NTS,L,NY,NX)*XNPH
+      RFLZ_sol(NTS,L,NY,NX)=trcs_RFLU(NTS,L,NY,NX)*dts_HeatWatTP
     ENDDO
 !
 !     GAS AND SOLUTE DIFFUSIVITIES AT SUB-HOURLY TIME STEP
 !
-!     XNPH=1/no. of cycles h-1 for water, heat and solute flux calculations
-!     XNPG=1/number of cycles h-1 for gas flux calculations
+!     dts_HeatWatTP=1/no. of cycles h-1 for water, heat and solute flux calculations
+!     dts_gas=1/number of cycles h-1 for gas flux calculations
 !     *SGL*=solute diffusivity from hour1.f
 !     solute code:CO=CO2,CH=CH4,OX=O2,NG=N2,N2=N2O,HG=H2
 !             :OC=DOC,ON=DON,OP=DOP,OA=acetate
 !             :NH4=NH4,NH3=NH3,NO3=NO3,NO2=NO2,P14=HPO4,PO4=H2PO4 in non-band
 !             :N4B=NH4,N3B=NH3,NOB=NO3,N2B=NO2,P1B=HPO4,POB=H2PO4 in band
 !
-    OCSGL2(L,NY,NX)=OCSGL(L,NY,NX)*XNPH
-    ONSGL2(L,NY,NX)=ONSGL(L,NY,NX)*XNPH
-    OPSGL2(L,NY,NX)=OPSGL(L,NY,NX)*XNPH
-    OASGL2(L,NY,NX)=OASGL(L,NY,NX)*XNPH
+    OCSGL2(L,NY,NX)=OCSGL(L,NY,NX)*dts_HeatWatTP
+    ONSGL2(L,NY,NX)=ONSGL(L,NY,NX)*dts_HeatWatTP
+    OPSGL2(L,NY,NX)=OPSGL(L,NY,NX)*dts_HeatWatTP
+    OASGL2(L,NY,NX)=OASGL(L,NY,NX)*dts_HeatWatTP
 
     DO NTS=ids_beg,ids_end
-      SolDifcc(NTS,L,NY,NX)=SolDifc(NTS,L,NY,NX)*XNPH
+      SolDifcc(NTS,L,NY,NX)=SolDifc(NTS,L,NY,NX)*dts_HeatWatTP
     ENDDO
 
     DO NTG=idg_beg,idg_end
-      GasDifcc(NTG,L,NY,NX)=GasDifc(NTG,L,NY,NX)*XNPG
+      GasDifcc(NTG,L,NY,NX)=GasDifc(NTG,L,NY,NX)*dts_gas
     ENDDO
 !
 !     STATE VARIABLES FOR GASES AND SOLUTES USED IN 'TRNSFR'

@@ -9,11 +9,11 @@ module LandSurfDataType
   character(len=*), private, parameter :: mod_filename = __FILE__
   real(r8) :: ALTIG                             !altitude of landscape, [m]
 
-  real(r8),target,allocatable ::  ZS(:,:)                            !initial soil surface roughness height, [m]
-  real(r8),target,allocatable ::  ZD(:,:)                            !zero plane displacement height, [m]
-  real(r8),target,allocatable ::  ZR(:,:)                            !canopy surface roughness height, [m]
-  real(r8),target,allocatable ::  ZM(:,:)                            ! soil surface roughness height for calculating runoff velocity, [m]
-  real(r8),target,allocatable ::  Z0(:,:)                            !wind speed measurement height, [m]
+  real(r8),target,allocatable ::  SoiSurfRoughnesst0(:,:)                            !initial soil surface roughness height, [m]
+  real(r8),target,allocatable ::  ZeroPlanDisp(:,:)                            !zero plane displacement height, [m]
+  real(r8),target,allocatable ::  RoughHeight(:,:)                   !canopy surface roughness height, [m]
+  real(r8),target,allocatable ::  SoiSurfRoughness(:,:)                            ! soil surface roughness height for calculating runoff velocity, [m]
+  real(r8),target,allocatable ::  WindMesHeight(:,:)                            !wind speed measurement height, [m]
   real(r8),target,allocatable ::  ALT(:,:)                           !altitude of grid cell, [m]
   real(r8),target,allocatable ::  RAB(:,:)                           !isothermal boundary layer resistance, [h m-1]
   real(r8),target,allocatable ::  RIB(:,:)                           !Richardson number for calculating boundary layer resistance, [-]
@@ -39,11 +39,11 @@ contains
   subroutine InitLandSurfData
 
   implicit none
-  allocate(ZS(JY,JX));          ZS=0._r8
-  allocate(ZD(JY,JX));          ZD=0._r8
-  allocate(ZR(JY,JX));          ZR=0._r8
-  allocate(ZM(JY,JX));          ZM=0._r8
-  allocate(Z0(JY,JX));          Z0=0._r8
+  allocate(SoiSurfRoughnesst0(JY,JX));          SoiSurfRoughnesst0=0._r8
+  allocate(ZeroPlanDisp(JY,JX));          ZeroPlanDisp=0._r8
+  allocate(RoughHeight(JY,JX));          RoughHeight=0._r8
+  allocate(SoiSurfRoughness(JY,JX));          SoiSurfRoughness=0._r8
+  allocate(WindMesHeight(JY,JX));          WindMesHeight=0._r8
   allocate(ALT(JY,JX));         ALT=0._r8
   allocate(RAB(JY,JX));         RAB=0._r8
   allocate(RIB(JY,JX));         RIB=0._r8
@@ -70,11 +70,11 @@ contains
   subroutine DestructLandSurfData
   use abortutils, only : destroy
   implicit none
-  call destroy(ZS)
-  call destroy(ZD)
-  call destroy(ZR)
-  call destroy(ZM)
-  call destroy(Z0)
+  call destroy(SoiSurfRoughnesst0)
+  call destroy(ZeroPlanDisp)
+  call destroy(RoughHeight)
+  call destroy(SoiSurfRoughness)
+  call destroy(WindMesHeight)
   call destroy(ALT)
   call destroy(RAB)
   call destroy(RIB)

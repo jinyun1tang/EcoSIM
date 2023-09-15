@@ -17,11 +17,11 @@ module SoilPhysParaMod
 implicit none
   private
   character(len=*), parameter :: mod_filename=__FILE__
-  PUBLIC :: CalcSoilWaterPotential
+  PUBLIC :: CalcSoilWatPotential
   public :: SetDeepSoil
   contains
 !------------------------------------------------------------------------------------------
-  subroutine CalcSoilWaterPotential(NY,NX,N1,N2,N3,PSISoilMatric,THETA1S)
+  subroutine CalcSoilWatPotential(NY,NX,N1,N2,N3,PSISoilMatric,THETA1S)
   implicit none
   integer, intent(in) :: NY,NX,N1,N2,N3
   real(r8), intent(out) :: PSISoilMatric
@@ -44,8 +44,9 @@ implicit none
     !source layer is active soil  
     IF(THETA1.LT.FieldCapacity(N3,N2,N1))THEN
       !water less than field capacity
-      !PSIHY is the minimum water potential allowed
-      PSISoilMatric=AMAX1(PSIHY,-EXP(LOGPSIMX(N2,N1)+((LOGFldCapacity(N3,N2,N1)-LOG(THETA1))/FCD(N3,N2,N1)*LOGPSIMND(N2,N1))))
+      !PSIHY is the minimum water potential allowed, where hygroscopic water is 
+      !held tightly on the surfaces of soil particles and exists as a thin layer of vapor
+      PSISoilMatric=AMAX1(PSIHY,-EXP(LOGPSIFLD(N2,N1)+((LOGFldCapacity(N3,N2,N1)-LOG(THETA1))/FCD(N3,N2,N1)*LOGPSIMND(N2,N1))))
     ELSEIF(THETA1.LT.POROS(N3,N2,N1)-DTHETW)THEN
       PSISoilMatric=-EXP(LOGPSIAtSat(N2,N1)+(((LOGPOROS(N3,N2,N1)-LOG(THETA1))/PSD(N3,N2,N1))**SRP(N3,N2,N1)*LOGPSIMXD(N2,N1)))
     ELSE
@@ -67,7 +68,7 @@ implicit none
     PSDX=LOGPOROS(N3,N2,N1)-FCLX
     FCDX=FCLX-WPLX
     IF(FracSoiPAsWat(N3,N2,N1).LT.FCX)THEN
-      PSISoilMatric=AMAX1(PSIHY,-EXP(LOGPSIMX(N2,N1)+((FCLX-LOG(FracSoiPAsWat(N3,N2,N1)))/FCDX*LOGPSIMND(NY,NX))))
+      PSISoilMatric=AMAX1(PSIHY,-EXP(LOGPSIFLD(N2,N1)+((FCLX-LOG(FracSoiPAsWat(N3,N2,N1)))/FCDX*LOGPSIMND(NY,NX))))
     ELSEIF(FracSoiPAsWat(N3,N2,N1).LT.POROS(N3,N2,N1)-DTHETW)THEN
       PSISoilMatric=-EXP(LOGPSIAtSat(N2,N1)+(((LOGPOROS(N3,N2,N1)-LOG(FracSoiPAsWat(N3,N2,N1)))/PSDX)*LOGPSIMXD(N2,N1)))
     ELSE
@@ -81,7 +82,7 @@ implicit none
   ENDIF
 
   if(present(THETA1S))THETA1S=THETA1
-  end subroutine CalcSoilWaterPotential
+  end subroutine CalcSoilWatPotential
 !------------------------------------------------------------------------------------------
 
 

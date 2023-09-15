@@ -221,7 +221,7 @@ module IngridTranspMod
   real(r8), intent(out) :: trcsa_RFLS0(idsa_beg:idsa_end)
 !     begin_execution
 !
-!     VHCPWM,VHCPWX=current,minimum volumetric heat capacity of snowpack
+!     VHCPWM,VLHeatCapSnowMN=current,minimum volumetric heat capacity of snowpack
 !     VOLWSL=snowpack water content
 !     FLQWM=snowpack water flux
 !     R*BLS=solute flux in snowpack
@@ -229,11 +229,11 @@ module IngridTranspMod
 !
   ICHKL=0
   DO L=1,JS
-    IF(VHCPWM(M,L,NY,NX).GT.VHCPWX(NY,NX))THEN
+    IF(VHCPWM(M,L,NY,NX).GT.VLHeatCapSnowMN(NY,NX))THEN
       L2=MIN(JS,L+1)
-      IF(L.LT.JS.AND.VHCPWM(M,L2,NY,NX).GT.VHCPWX(NY,NX))THEN
-        IF(VOLWSL(L,NY,NX).GT.ZEROS2(NY,NX))THEN
-          VFLWW=AZMAX1(AMIN1(1.0_r8,FLQWM(M,L2,NY,NX)/VOLWSL(L,NY,NX)))
+      IF(L.LT.JS.AND.VHCPWM(M,L2,NY,NX).GT.VLHeatCapSnowMN(NY,NX))THEN
+        IF(VLWatSnow(L,NY,NX).GT.ZEROS2(NY,NX))THEN
+          VFLWW=AZMAX1(AMIN1(1.0_r8,FLQWM(M,L2,NY,NX)/VLWatSnow(L,NY,NX)))
         ELSE
           VFLWW=1.0_r8
         ENDIF
@@ -259,12 +259,12 @@ module IngridTranspMod
 !     R*S1,R*B1=solute flux to soil surface non-band,band
 !
         IF(ICHKL.EQ.0)THEN
-          IF(VOLWSL(L,NY,NX).GT.ZEROS2(NY,NX))THEN
-            VFLWR=AZMAX1(AMIN1(1.0_r8,FLQRM(M,NY,NX)/VOLWSL(L,NY,NX)))
-            VFLWS=AZMAX1(AMIN1(1.0_r8,(FLQSM(M,NY,NX)+FLQHM(M,NY,NX))/VOLWSL(L,NY,NX)))
+          IF(VLWatSnow(L,NY,NX).GT.ZEROS2(NY,NX))THEN
+            VFLWR=AZMAX1(AMIN1(1.0_r8,FLQRM(M,NY,NX)/VLWatSnow(L,NY,NX)))
+            VFLWS=AZMAX1(AMIN1(1.0_r8,(FLQSM(M,NY,NX)+FLQHM(M,NY,NX))/VLWatSnow(L,NY,NX)))
           ELSE
-            VFLWR=CVRD(NY,NX)
-            VFLWS=BARE(NY,NX)
+            VFLWR=FracSurfByLitR(NY,NX)
+            VFLWS=FracSurfAsBareSoi(NY,NX)
           ENDIF
           VFLWPO4=VFLWS*trcs_VLN(ids_H1PO4,NU(NY,NX),NY,NX)
           VFLWPOB=VFLWS*trcs_VLN(ids_H1PO4B,NU(NY,NX),NY,NX)
@@ -467,9 +467,9 @@ module IngridTranspMod
 !     DIF*=aqueous diffusivity-dispersivity between litter and soil surface
 !
   DLYR0=AMAX1(ZERO2,DLYR(3,0,NY,NX))
-  TORT0=TORT(M,0,NY,NX)*CVRD(NY,NX)
+  TORT0=TortMicPM(M,0,NY,NX)*FracSurfByLitR(NY,NX)
   DLYR1=AMAX1(ZERO2,DLYR(3,NU(NY,NX),NY,NX))
-  TORT1=TORT(M,NU(NY,NX),NY,NX)
+  TORT1=TortMicPM(M,NU(NY,NX),NY,NX)
   TORTL=AMIN1(1.0_r8,(TORT0+TORT1)/(DLYR0+DLYR1))
   DISPN=DISP(3,NU(NY,NX),NY,NX)*AMIN1(VFLWX,ABS(FLWRM1/AREA(3,NU(NY,NX),NY,NX)))
 
@@ -708,24 +708,24 @@ module IngridTranspMod
 !          :*1=non-band,*B=band
 !     VLNH4,VLNO3,VLPO4=non-band NH4,NO3,PO4 volume fraction
 !     VLNHB,VLNOB,VLPOB=band NH4,NO3,PO4 volume fraction
-!     XNPH=1/no. of cycles h-1 for water, heat and solute flux calculations
+!     dts_HeatWatTP=1/no. of cycles h-1 for water, heat and solute flux calculations
 !     *H2,*2=macropore,micropore solute content
   VLWatMicPMNU=VLWatMicPM(M,NU(NY,NX),NY,NX)
   VOLWHS=AMIN1(XFRS*VGeomLayer(NU(NY,NX),NY,NX),VLWatMacPM(M,NU(NY,NX),NY,NX))
   VOLWT=VLWatMicPM(M,NU(NY,NX),NY,NX)+VOLWHS
 
   DO NTSA=idsa_beg,idsa_psoil_beg-1
-    trcsa_DFV(NTSA)=XNPH*(AZMAX1(trcsa_soHml2(NTSA,NU(NY,NX),NY,NX))*VLWatMicPMNU &
+    trcsa_DFV(NTSA)=dts_HeatWatTP*(AZMAX1(trcsa_soHml2(NTSA,NU(NY,NX),NY,NX))*VLWatMicPMNU &
       -AZMAX1(trcsa_solml2(NTSA,NU(NY,NX),NY,NX))*VOLWHS)/VOLWT
   ENDDO
 
   DO NTSA=idsa_psoil_beg,idsa_psoil_end
-    trcsa_DFV(NTSA)=XNPH*(AZMAX1(trcsa_soHml2(NTSA,NU(NY,NX),NY,NX))*VLWatMicPMNU &
+    trcsa_DFV(NTSA)=dts_HeatWatTP*(AZMAX1(trcsa_soHml2(NTSA,NU(NY,NX),NY,NX))*VLWatMicPMNU &
       -AZMAX1(trcsa_solml2(NTSA,NU(NY,NX),NY,NX))*VOLWHS)/VOLWT*trcs_VLN(ids_H1PO4,NU(NY,NX),NY,NX)
   ENDDO
 
   DO NTSA=idsa_pband_beg,idsa_pband_end
-    trcsa_DFV(NTSA)=XNPH*(AZMAX1(trcsa_soHml2(NTSA,NU(NY,NX),NY,NX))*VLWatMicPMNU &
+    trcsa_DFV(NTSA)=dts_HeatWatTP*(AZMAX1(trcsa_soHml2(NTSA,NU(NY,NX),NY,NX))*VLWatMicPMNU &
       -AZMAX1(trcsa_solml2(NTSA,NU(NY,NX),NY,NX))*VOLWHS)/VOLWT*trcs_VLN(ids_H1PO4B,NU(NY,NX),NY,NX)
   ENDDO
 
@@ -928,8 +928,8 @@ module IngridTranspMod
 !     IF DRIFT IS FROM CURRENT TO ADJACENT GRID CELL
 !
         ELSEIF(QSM(M,N,N5,N4).GT.0.0)THEN
-          IF(VOLS(N2,N1).GT.ZEROS2(NY,NX))THEN
-            VFLW=AZMAX1(AMIN1(VFLWX,QSM(M,N,N5,N4)/VOLS(N2,N1)))
+          IF(VcumSnoDWI(N2,N1).GT.ZEROS2(NY,NX))THEN
+            VFLW=AZMAX1(AMIN1(VFLWX,QSM(M,N,N5,N4)/VcumSnoDWI(N2,N1)))
           ELSE
             VFLW=VFLWX
           ENDIF
@@ -941,8 +941,8 @@ module IngridTranspMod
 !     IF DRIFT IS TO CURRENT FROM ADJACENT GRID CELL
 !
         ELSEIF(QSM(M,N,N5,N4).LT.-ZEROS2(N2,N1))THEN
-          IF(VOLS(N5,N4).GT.ZEROS2(N5,N4))THEN
-            VFLW=AZMIN1(AMAX1(-VFLWX,QSM(M,N,N5,N4)/VOLS(N5,N4)))
+          IF(VcumSnoDWI(N5,N4).GT.ZEROS2(N5,N4))THEN
+            VFLW=AZMIN1(AMAX1(-VFLWX,QSM(M,N,N5,N4)/VcumSnoDWI(N5,N4)))
           ELSE
             VFLW=-VFLWX
           ENDIF
@@ -1161,7 +1161,7 @@ module IngridTranspMod
 
     DLYR1=AMAX1(ZERO2,DLYR(N,N3,N2,N1))
     DLYR2=AMAX1(ZERO2,DLYR(N,N6,N5,N4))
-    TORTL=(TORT(M,N3,N2,N1)*DLYR1+TORT(M,N6,N5,N4)*DLYR2)/(DLYR1+DLYR2)
+    TORTL=(TortMicPM(M,N3,N2,N1)*DLYR1+TortMicPM(M,N6,N5,N4)*DLYR2)/(DLYR1+DLYR2)
 
     DISPN=DISP(N,N6,N5,N4)*AMIN1(VFLWX,ABS(FLWM(M,N,N6,N5,N4)/AREA(N,N6,N5,N4)))
     DIFPO=(POSGL2(N6,N5,N4)*TORTL+DISPN)*XDPTH(N,N6,N5,N4)
@@ -1381,7 +1381,7 @@ module IngridTranspMod
 !     DIFFUSIVITIES IN CURRENT AND ADJACENT GRID CELL MACROPORES
 !
 !     DLYR=soil layer thickness
-!     TORTH=macropore tortuosity from hour1.f
+!     TortMacPM=macropore tortuosity from hour1.f
 !     DISP=dispersivity parameter
 !     WaterFlowMacPi=water flux through soil macropore from watsub.f
 !     DIF*=aqueous diffusivity-dispersivity through macropore
@@ -1404,7 +1404,7 @@ module IngridTranspMod
 !
     DLYR1=AMAX1(ZERO2,DLYR(N,N3,N2,N1))
     DLYR2=AMAX1(ZERO2,DLYR(N,N6,N5,N4))
-    TORTL=(TORTH(M,N3,N2,N1)*DLYR1+TORTH(M,N6,N5,N4)*DLYR2)/(DLYR1+DLYR2)
+    TORTL=(TortMacPM(M,N3,N2,N1)*DLYR1+TortMacPM(M,N6,N5,N4)*DLYR2)/(DLYR1+DLYR2)
     DISPN=DISP(N,N6,N5,N4)*AMIN1(VFLWX,ABS(WaterFlowMacPi(M,N,N6,N5,N4)/AREA(N,N6,N5,N4)))
     DIFPO=(POSGL2(N6,N5,N4)*TORTL+DISPN)*XDPTH(N,N6,N5,N4)
 
@@ -1550,7 +1550,7 @@ module IngridTranspMod
 !
 !     VLWatMicPM,VLWatMacPM=micropore,macropore water-filled porosity from watsub.f
 !     DFV*S,DFV*B=diffusive solute flux between macro- and micropore in non-band,band
-!     XNPH=1/no. of cycles h-1 for water, heat and solute flux calculations
+!     dts_HeatWatTP=1/no. of cycles h-1 for water, heat and solute flux calculations
 !     salt code: *HY*=H+,*OH*=OH-,*AL*=Al3+,*FE*=Fe3+,*CA*=Ca2+,*MG*=Mg2+
 !          :*NA*=Na+,*KA*=K+,*SO4*=SO42-,*CL*=Cl-,*CO3*=CO32-,*HCO3*=HCO3-
 !          :*CO2*=CO2,*ALO1*=AlOH2-,*ALOH2=AlOH2-,*ALOH3*=AlOH3
@@ -1567,17 +1567,17 @@ module IngridTranspMod
     VOLWHS=AMIN1(XFRS*VGeomLayer(N6,N5,N4),VLWatMacPM(M,N6,N5,N4))
     VOLWT=VLWatMicPM(M,N6,N5,N4)+VOLWHS
     DO NTSA=idsa_beg,idsa_psoil_beg-1
-      trcsa_DFV(NTSA)=XNPH*(AZMAX1(trcsa_soHml2(NTSA,N6,N5,N4))*VLWatMicPM(M,N6,N5,N4) &
+      trcsa_DFV(NTSA)=dts_HeatWatTP*(AZMAX1(trcsa_soHml2(NTSA,N6,N5,N4))*VLWatMicPM(M,N6,N5,N4) &
         -AZMAX1(trcsa_solml2(NTSA,N6,N5,N4))*VOLWHS)/VOLWT
     ENDDO
 
     DO NTSA=idsa_psoil_beg,idsa_psoil_end
-      trcsa_DFV(NTSA)=XNPH*(AZMAX1(trcsa_soHml2(NTSA,N6,N5,N4))*VLWatMicPM(M,N6,N5,N4) &
+      trcsa_DFV(NTSA)=dts_HeatWatTP*(AZMAX1(trcsa_soHml2(NTSA,N6,N5,N4))*VLWatMicPM(M,N6,N5,N4) &
         -AZMAX1(trcsa_solml2(NTSA,N6,N5,N4))*VOLWHS)/VOLWT*trcs_VLN(ids_H1PO4,N6,N5,N4)
     ENDDO
 
     DO NTSA=idsa_pband_beg,idsa_pband_end
-      trcsa_DFV(NTSA)=XNPH*(AZMAX1(trcsa_soHml2(NTSA,N6,N5,N4))*VLWatMicPM(M,N6,N5,N4) &
+      trcsa_DFV(NTSA)=dts_HeatWatTP*(AZMAX1(trcsa_soHml2(NTSA,N6,N5,N4))*VLWatMicPM(M,N6,N5,N4) &
         -AZMAX1(trcsa_solml2(NTSA,N6,N5,N4))*VOLWHS)/VOLWT*trcs_VLN(ids_H1PO4B,N6,N5,N4)
     ENDDO
   ELSE

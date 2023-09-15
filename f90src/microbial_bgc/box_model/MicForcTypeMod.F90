@@ -78,7 +78,7 @@ module MicForcTypeMod
   real(r8), allocatable :: FILM(:)
   real(r8), allocatable :: THETPM(:)
   real(r8), allocatable :: VLWatMicPM(:)
-  real(r8), allocatable :: TORT(:)
+  real(r8), allocatable :: TortMicPM(:)
   real(r8), allocatable :: VLsoiAirPM(:)
   contains
    procedure, public :: Init
@@ -101,7 +101,7 @@ module MicForcTypeMod
   allocate(this%VLWatMicPM(NPH))
   allocate(this%THETPM(NPH))
   allocate(this%FILM(NPH))
-  allocate(this%TORT(NPH))
+  allocate(this%TortMicPM(NPH))
   allocate(this%VLsoiAirPM(NPH))
   allocate(this%DFGS(NPH))
   end subroutine Init
@@ -116,7 +116,7 @@ module MicForcTypeMod
   call destroy(this%VLWatMicPM)
   call destroy(this%THETPM)
   call destroy(this%FILM)
-  call destroy(this%TORT)
+  call destroy(this%TortMicPM)
   call destroy(this%VLsoiAirPM)
   call destroy(this%DFGS)
   call destroy(this%ROQCY)

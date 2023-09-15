@@ -117,9 +117,9 @@ module ErosionMod
 !     ATTENUATED BY DEPTH OF SURFACE WATER
 !
           DETW=DETS(NY,NX)*(1.0+2.0*VLWatMicPM(M,NU(NY,NX),NY,NX)/VLMicP(NU(NY,NX),NY,NX))
-          DETR=AMIN1(SoilMicPMassLayer(NU(NY,NX),NY,NX)*XNPX &
+          DETR=AMIN1(SoilMicPMassLayer(NU(NY,NX),NY,NX)*dts_wat &
             ,DETW*ENGYPM(M,NY,NX)*AREA(3,NU(NY,NX),NY,NX) &
-            *FMPR(NU(NY,NX),NY,NX)*FSNX(NY,NX)*(1.0-FVOLIM(NY,NX)))
+            *FracSoiAsMicP(NU(NY,NX),NY,NX)*FracSurfSnoFree(NY,NX)*(1.0-FVOLIM(NY,NX)))
           RDTSED(NY,NX)=RDTSED(NY,NX)+DETR
         ENDIF
 !
@@ -131,7 +131,7 @@ module ErosionMod
           .AND.FERSNM(NY,NX).GT.ZERO)THEN
           CSEDD=AZMAX1(SEDX/XVLWatMicPM(M,NY,NX))
           DEPI=AMAX1(-SEDX,VLS(NY,NX)*(0.0-CSEDD)*AREA(3,NU(NY,NX),NY,NX) &
-            *FERSNM(NY,NX)*FMPR(NU(NY,NX),NY,NX)*XNPH)
+            *FERSNM(NY,NX)*FracSoiAsMicP(NU(NY,NX),NY,NX)*dts_HeatWatTP)
           RDTSED(NY,NX)=RDTSED(NY,NX)+DEPI
         ENDIF
 !
@@ -149,13 +149,13 @@ module ErosionMod
           CSEDX=PTDSNU(NY,NX)*CER(NY,NX)*AZMAX1(STPR-0.4)**XER(NY,NX)
           CSEDD=AZMAX1(SEDX/XVLWatMicPM(M,NY,NX))
           IF(CSEDX.GT.CSEDD)THEN
-            DETI=AMIN1(SoilMicPMassLayer(NU(NY,NX),NY,NX)*XNPX &
+            DETI=AMIN1(SoilMicPMassLayer(NU(NY,NX),NY,NX)*dts_wat &
               ,DETE(NY,NX)*(CSEDX-CSEDD)*AREA(3,NU(NY,NX),NY,NX) &
-              *FERSNM(NY,NX)*FMPR(NU(NY,NX),NY,NX)*XNPH)
+              *FERSNM(NY,NX)*FracSoiAsMicP(NU(NY,NX),NY,NX)*dts_HeatWatTP)
           ELSE
             IF(SEDX.GT.ZEROS(NY,NX))THEN
               DETI=AMAX1(-SEDX,VLS(NY,NX)*(CSEDX-CSEDD)*AREA(3,NU(NY,NX),NY,NX) &
-                *FERSNM(NY,NX)*FMPR(NU(NY,NX),NY,NX)*XNPH)
+                *FERSNM(NY,NX)*FracSoiAsMicP(NU(NY,NX),NY,NX)*dts_HeatWatTP)
             ELSE
               DETI=0._r8
             ENDIF

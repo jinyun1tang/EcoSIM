@@ -619,7 +619,7 @@ implicit none
           DLYR(3,NUX,NY,NX)=0.0_r8
           IF(SoiBulkDensity(NUX,NY,NX).LE.ZERO)THEN
             VGeomLayer(NUX,NY,NX)=AREA(3,NUX,NY,NX)*DLYR(3,NUX,NY,NX)
-            VLSoilPoreMicP(NUX,NY,NX)=VGeomLayer(NUX,NY,NX)*FMPR(NUX,NY,NX)
+            VLSoilPoreMicP(NUX,NY,NX)=VGeomLayer(NUX,NY,NX)*FracSoiAsMicP(NUX,NY,NX)
           ENDIF
           exit
         ENDIF
@@ -834,26 +834,26 @@ implicit none
               WTRT1E(NE,N,L1,NR,NZ,NY,NX)=WTRT1E(NE,N,L1,NR,NZ,NY,NX)+FX*WTRT1E(NE,N,L0,NR,NZ,NY,NX)
               WTRT2E(NE,N,L1,NR,NZ,NY,NX)=WTRT2E(NE,N,L1,NR,NZ,NY,NX)+FX*WTRT2E(NE,N,L0,NR,NZ,NY,NX)
             ENDDO
-            RTLG1(N,L1,NR,NZ,NY,NX)=RTLG1(N,L1,NR,NZ,NY,NX)+FX*RTLG1(N,L0,NR,NZ,NY,NX)
-            RTLG2(N,L1,NR,NZ,NY,NX)=RTLG2(N,L1,NR,NZ,NY,NX)+FX*RTLG2(N,L0,NR,NZ,NY,NX)
+            PrimRootLen(N,L1,NR,NZ,NY,NX)=PrimRootLen(N,L1,NR,NZ,NY,NX)+FX*PrimRootLen(N,L0,NR,NZ,NY,NX)
+            SecndRootLen(N,L1,NR,NZ,NY,NX)=SecndRootLen(N,L1,NR,NZ,NY,NX)+FX*SecndRootLen(N,L0,NR,NZ,NY,NX)
             RTN2(N,L1,NR,NZ,NY,NX)=RTN2(N,L1,NR,NZ,NY,NX)+FX*RTN2(N,L0,NR,NZ,NY,NX)
           ENDDO
           DO NE=1,npelms
             EPOOLR(NE,N,L1,NZ,NY,NX)=EPOOLR(NE,N,L1,NZ,NY,NX)+FX*EPOOLR(NE,N,L0,NZ,NY,NX)
           ENDDO
           WTRTL(N,L1,NZ,NY,NX)=WTRTL(N,L1,NZ,NY,NX)+FX*WTRTL(N,L0,NZ,NY,NX)
-          WTRTD(N,L1,NZ,NY,NX)=WTRTD(N,L1,NZ,NY,NX)+FX*WTRTD(N,L0,NZ,NY,NX)
+          RootCPZR(N,L1,NZ,NY,NX)=RootCPZR(N,L1,NZ,NY,NX)+FX*RootCPZR(N,L0,NZ,NY,NX)
           WSRTL(N,L1,NZ,NY,NX)=WSRTL(N,L1,NZ,NY,NX)+FX*WSRTL(N,L0,NZ,NY,NX)
-          RTN1(N,L1,NZ,NY,NX)=RTN1(N,L1,NZ,NY,NX)+FX*RTN1(N,L0,NZ,NY,NX)
-          RTNL(N,L1,NZ,NY,NX)=RTNL(N,L1,NZ,NY,NX)+FX*RTNL(N,L0,NZ,NY,NX)
-          RTLGP(N,L1,NZ,NY,NX)=RTLGP(N,L1,NZ,NY,NX)+FX*RTLGP(N,L0,NZ,NY,NX)
-          RTDNP(N,L1,NZ,NY,NX)=RTDNP(N,L1,NZ,NY,NX)+FX*RTDNP(N,L0,NZ,NY,NX)
+          PrimRootXNumL(N,L1,NZ,NY,NX)=PrimRootXNumL(N,L1,NZ,NY,NX)+FX*PrimRootXNumL(N,L0,NZ,NY,NX)
+          SecndRootXNumL(N,L1,NZ,NY,NX)=SecndRootXNumL(N,L1,NZ,NY,NX)+FX*SecndRootXNumL(N,L0,NZ,NY,NX)
+          RootLenPerP(N,L1,NZ,NY,NX)=RootLenPerP(N,L1,NZ,NY,NX)+FX*RootLenPerP(N,L0,NZ,NY,NX)
+          RootLenDensNLP(N,L1,NZ,NY,NX)=RootLenDensNLP(N,L1,NZ,NY,NX)+FX*RootLenDensNLP(N,L0,NZ,NY,NX)
           RTVLP(N,L1,NZ,NY,NX)=RTVLP(N,L1,NZ,NY,NX)+FX*RTVLP(N,L0,NZ,NY,NX)
           RTVLW(N,L1,NZ,NY,NX)=RTVLW(N,L1,NZ,NY,NX)+FX*RTVLW(N,L0,NZ,NY,NX)
-          RRAD1(N,L1,NZ,NY,NX)=RRAD1(N,L1,NZ,NY,NX)+FX*RRAD1(N,L0,NZ,NY,NX)
-          RRAD2(N,L1,NZ,NY,NX)=RRAD2(N,L1,NZ,NY,NX)+FX*RRAD2(N,L0,NZ,NY,NX)
+          PrimRootRadius(N,L1,NZ,NY,NX)=PrimRootRadius(N,L1,NZ,NY,NX)+FX*PrimRootRadius(N,L0,NZ,NY,NX)
+          SecndRootRadius(N,L1,NZ,NY,NX)=SecndRootRadius(N,L1,NZ,NY,NX)+FX*SecndRootRadius(N,L0,NZ,NY,NX)
           RTARP(N,L1,NZ,NY,NX)=RTARP(N,L1,NZ,NY,NX)+FX*RTARP(N,L0,NZ,NY,NX)
-          RTLGA(N,L1,NZ,NY,NX)=RTLGA(N,L1,NZ,NY,NX)+FX*RTLGA(N,L0,NZ,NY,NX)
+          AveSecndRootLen(N,L1,NZ,NY,NX)=AveSecndRootLen(N,L1,NZ,NY,NX)+FX*AveSecndRootLen(N,L0,NZ,NY,NX)
         ENDDO
         DO NE=1,npelms
           WTNDLE(NE,L1,NZ,NY,NX)=WTNDLE(NE,L1,NZ,NY,NX)+FX*WTNDLE(NE,L0,NZ,NY,NX)
@@ -1011,26 +1011,26 @@ implicit none
               WTRT1E(NE,N,L0,NR,NZ,NY,NX)=FY*WTRT1E(NE,N,L0,NR,NZ,NY,NX)
               WTRT2E(NE,N,L0,NR,NZ,NY,NX)=FY*WTRT2E(NE,N,L0,NR,NZ,NY,NX)
             ENDDO
-            RTLG1(N,L0,NR,NZ,NY,NX)=FY*RTLG1(N,L0,NR,NZ,NY,NX)
-            RTLG2(N,L0,NR,NZ,NY,NX)=FY*RTLG2(N,L0,NR,NZ,NY,NX)
+            PrimRootLen(N,L0,NR,NZ,NY,NX)=FY*PrimRootLen(N,L0,NR,NZ,NY,NX)
+            SecndRootLen(N,L0,NR,NZ,NY,NX)=FY*SecndRootLen(N,L0,NR,NZ,NY,NX)
             RTN2(N,L0,NR,NZ,NY,NX)=FY*RTN2(N,L0,NR,NZ,NY,NX)
           ENDDO
           DO NE=1,npelms
             EPOOLR(NE,N,L0,NZ,NY,NX)=FY*EPOOLR(NE,N,L0,NZ,NY,NX)
           ENDDO
           WTRTL(N,L0,NZ,NY,NX)=FY*WTRTL(N,L0,NZ,NY,NX)
-          WTRTD(N,L0,NZ,NY,NX)=FY*WTRTD(N,L0,NZ,NY,NX)
+          RootCPZR(N,L0,NZ,NY,NX)=FY*RootCPZR(N,L0,NZ,NY,NX)
           WSRTL(N,L0,NZ,NY,NX)=FY*WSRTL(N,L0,NZ,NY,NX)
-          RTN1(N,L0,NZ,NY,NX)=FY*RTN1(N,L0,NZ,NY,NX)
-          RTNL(N,L0,NZ,NY,NX)=FY*RTNL(N,L0,NZ,NY,NX)
-          RTLGP(N,L0,NZ,NY,NX)=FY*RTLGP(N,L0,NZ,NY,NX)
-          RTDNP(N,L0,NZ,NY,NX)=FY*RTDNP(N,L0,NZ,NY,NX)
+          PrimRootXNumL(N,L0,NZ,NY,NX)=FY*PrimRootXNumL(N,L0,NZ,NY,NX)
+          SecndRootXNumL(N,L0,NZ,NY,NX)=FY*SecndRootXNumL(N,L0,NZ,NY,NX)
+          RootLenPerP(N,L0,NZ,NY,NX)=FY*RootLenPerP(N,L0,NZ,NY,NX)
+          RootLenDensNLP(N,L0,NZ,NY,NX)=FY*RootLenDensNLP(N,L0,NZ,NY,NX)
           RTVLP(N,L0,NZ,NY,NX)=FY*RTVLP(N,L0,NZ,NY,NX)
           RTVLW(N,L0,NZ,NY,NX)=FY*RTVLW(N,L0,NZ,NY,NX)
-          RRAD1(N,L0,NZ,NY,NX)=FY*RRAD1(N,L0,NZ,NY,NX)
-          RRAD2(N,L0,NZ,NY,NX)=FY*RRAD2(N,L0,NZ,NY,NX)
+          PrimRootRadius(N,L0,NZ,NY,NX)=FY*PrimRootRadius(N,L0,NZ,NY,NX)
+          SecndRootRadius(N,L0,NZ,NY,NX)=FY*SecndRootRadius(N,L0,NZ,NY,NX)
           RTARP(N,L0,NZ,NY,NX)=FY*RTARP(N,L0,NZ,NY,NX)
-          RTLGA(N,L0,NZ,NY,NX)=FY*RTLGA(N,L0,NZ,NY,NX)
+          AveSecndRootLen(N,L0,NZ,NY,NX)=FY*AveSecndRootLen(N,L0,NZ,NY,NX)
         ENDDO
         DO NE=1,npelms
           WTNDLE(NE,L0,NZ,NY,NX)=FY*WTNDLE(NE,L0,NZ,NY,NX)
@@ -1215,12 +1215,12 @@ implicit none
               WTRT2E(NE,N,L1,NR,NZ,NY,NX)=WTRT2E(NE,N,L1,NR,NZ,NY,NX)+FXWTRT2E
               WTRT2E(NE,N,L0,NR,NZ,NY,NX)=WTRT2E(NE,N,L0,NR,NZ,NY,NX)-FXWTRT2E
             ENDDO
-            FXRTLG1=FRO*RTLG1(N,L0,NR,NZ,NY,NX)
-            RTLG1(N,L1,NR,NZ,NY,NX)=RTLG1(N,L1,NR,NZ,NY,NX)+FXRTLG1
-            RTLG1(N,L0,NR,NZ,NY,NX)=RTLG1(N,L0,NR,NZ,NY,NX)-FXRTLG1
-            FXRTLG2=FRO*RTLG2(N,L0,NR,NZ,NY,NX)
-            RTLG2(N,L1,NR,NZ,NY,NX)=RTLG2(N,L1,NR,NZ,NY,NX)+FXRTLG2
-            RTLG2(N,L0,NR,NZ,NY,NX)=RTLG2(N,L0,NR,NZ,NY,NX)-FXRTLG2
+            FXRTLG1=FRO*PrimRootLen(N,L0,NR,NZ,NY,NX)
+            PrimRootLen(N,L1,NR,NZ,NY,NX)=PrimRootLen(N,L1,NR,NZ,NY,NX)+FXRTLG1
+            PrimRootLen(N,L0,NR,NZ,NY,NX)=PrimRootLen(N,L0,NR,NZ,NY,NX)-FXRTLG1
+            FXRTLG2=FRO*SecndRootLen(N,L0,NR,NZ,NY,NX)
+            SecndRootLen(N,L1,NR,NZ,NY,NX)=SecndRootLen(N,L1,NR,NZ,NY,NX)+FXRTLG2
+            SecndRootLen(N,L0,NR,NZ,NY,NX)=SecndRootLen(N,L0,NR,NZ,NY,NX)-FXRTLG2
             FXRTN2=FRO*RTN2(N,L0,NR,NZ,NY,NX)
             RTN2(N,L1,NR,NZ,NY,NX)=RTN2(N,L1,NR,NZ,NY,NX)+FXRTN2
             RTN2(N,L0,NR,NZ,NY,NX)=RTN2(N,L0,NR,NZ,NY,NX)-FXRTN2
@@ -1234,42 +1234,42 @@ implicit none
           FXWTRTL=FRO*WTRTL(N,L0,NZ,NY,NX)
           WTRTL(N,L1,NZ,NY,NX)=WTRTL(N,L1,NZ,NY,NX)+FXWTRTL
           WTRTL(N,L0,NZ,NY,NX)=WTRTL(N,L0,NZ,NY,NX)-FXWTRTL
-          FXWTRTD=FRO*WTRTD(N,L0,NZ,NY,NX)
-          WTRTD(N,L1,NZ,NY,NX)=WTRTD(N,L1,NZ,NY,NX)+FXWTRTD
-          WTRTD(N,L0,NZ,NY,NX)=WTRTD(N,L0,NZ,NY,NX)-FXWTRTD
+          FXWTRTD=FRO*RootCPZR(N,L0,NZ,NY,NX)
+          RootCPZR(N,L1,NZ,NY,NX)=RootCPZR(N,L1,NZ,NY,NX)+FXWTRTD
+          RootCPZR(N,L0,NZ,NY,NX)=RootCPZR(N,L0,NZ,NY,NX)-FXWTRTD
           FXWSRTL=FRO*WSRTL(N,L0,NZ,NY,NX)
           WSRTL(N,L1,NZ,NY,NX)=WSRTL(N,L1,NZ,NY,NX)+FXWSRTL
           WSRTL(N,L0,NZ,NY,NX)=WSRTL(N,L0,NZ,NY,NX)-FXWSRTL
-          FXRTN1=FRO*RTN1(N,L0,NZ,NY,NX)
-          RTN1(N,L1,NZ,NY,NX)=RTN1(N,L1,NZ,NY,NX)+FXRTN1
-          RTN1(N,L0,NZ,NY,NX)=RTN1(N,L0,NZ,NY,NX)-FXRTN1
-          FXRTNL=FRO*RTNL(N,L0,NZ,NY,NX)
-          RTNL(N,L1,NZ,NY,NX)=RTNL(N,L1,NZ,NY,NX)+FXRTNL
-          RTNL(N,L0,NZ,NY,NX)=RTNL(N,L0,NZ,NY,NX)-FXRTNL
-          FXRTLGP=FRO*RTLGP(N,L0,NZ,NY,NX)
-          RTLGP(N,L1,NZ,NY,NX)=RTLGP(N,L1,NZ,NY,NX)+FXRTLGP
-          RTLGP(N,L0,NZ,NY,NX)=RTLGP(N,L0,NZ,NY,NX)-FXRTLGP
-          FXRTDNP=FRO*RTDNP(N,L0,NZ,NY,NX)
-          RTDNP(N,L1,NZ,NY,NX)=RTDNP(N,L1,NZ,NY,NX)+FXRTDNP
-          RTDNP(N,L0,NZ,NY,NX)=RTDNP(N,L0,NZ,NY,NX)-FXRTDNP
+          FXRTN1=FRO*PrimRootXNumL(N,L0,NZ,NY,NX)
+          PrimRootXNumL(N,L1,NZ,NY,NX)=PrimRootXNumL(N,L1,NZ,NY,NX)+FXRTN1
+          PrimRootXNumL(N,L0,NZ,NY,NX)=PrimRootXNumL(N,L0,NZ,NY,NX)-FXRTN1
+          FXRTNL=FRO*SecndRootXNumL(N,L0,NZ,NY,NX)
+          SecndRootXNumL(N,L1,NZ,NY,NX)=SecndRootXNumL(N,L1,NZ,NY,NX)+FXRTNL
+          SecndRootXNumL(N,L0,NZ,NY,NX)=SecndRootXNumL(N,L0,NZ,NY,NX)-FXRTNL
+          FXRTLGP=FRO*RootLenPerP(N,L0,NZ,NY,NX)
+          RootLenPerP(N,L1,NZ,NY,NX)=RootLenPerP(N,L1,NZ,NY,NX)+FXRTLGP
+          RootLenPerP(N,L0,NZ,NY,NX)=RootLenPerP(N,L0,NZ,NY,NX)-FXRTLGP
+          FXRTDNP=FRO*RootLenDensNLP(N,L0,NZ,NY,NX)
+          RootLenDensNLP(N,L1,NZ,NY,NX)=RootLenDensNLP(N,L1,NZ,NY,NX)+FXRTDNP
+          RootLenDensNLP(N,L0,NZ,NY,NX)=RootLenDensNLP(N,L0,NZ,NY,NX)-FXRTDNP
           FXRTVLP=FRO*RTVLP(N,L0,NZ,NY,NX)
           RTVLP(N,L1,NZ,NY,NX)=RTVLP(N,L1,NZ,NY,NX)+FXRTVLP
           RTVLP(N,L0,NZ,NY,NX)=RTVLP(N,L0,NZ,NY,NX)-FXRTVLP
           FXRTVLW=FRO*RTVLW(N,L0,NZ,NY,NX)
           RTVLW(N,L1,NZ,NY,NX)=RTVLW(N,L1,NZ,NY,NX)+FXRTVLW
           RTVLW(N,L0,NZ,NY,NX)=RTVLW(N,L0,NZ,NY,NX)-FXRTVLW
-          FXRRAD1=FRO*RRAD1(N,L0,NZ,NY,NX)
-          RRAD1(N,L1,NZ,NY,NX)=RRAD1(N,L1,NZ,NY,NX)+FXRRAD1
-          RRAD1(N,L0,NZ,NY,NX)=RRAD1(N,L0,NZ,NY,NX)-FXRRAD1
-          FXRRAD2=FRO*RRAD2(N,L0,NZ,NY,NX)
-          RRAD2(N,L1,NZ,NY,NX)=RRAD2(N,L1,NZ,NY,NX)+FXRRAD2
-          RRAD2(N,L0,NZ,NY,NX)=RRAD2(N,L0,NZ,NY,NX)-FXRRAD2
+          FXRRAD1=FRO*PrimRootRadius(N,L0,NZ,NY,NX)
+          PrimRootRadius(N,L1,NZ,NY,NX)=PrimRootRadius(N,L1,NZ,NY,NX)+FXRRAD1
+          PrimRootRadius(N,L0,NZ,NY,NX)=PrimRootRadius(N,L0,NZ,NY,NX)-FXRRAD1
+          FXRRAD2=FRO*SecndRootRadius(N,L0,NZ,NY,NX)
+          SecndRootRadius(N,L1,NZ,NY,NX)=SecndRootRadius(N,L1,NZ,NY,NX)+FXRRAD2
+          SecndRootRadius(N,L0,NZ,NY,NX)=SecndRootRadius(N,L0,NZ,NY,NX)-FXRRAD2
           FXRTARP=FRO*RTARP(N,L0,NZ,NY,NX)
           RTARP(N,L1,NZ,NY,NX)=RTARP(N,L1,NZ,NY,NX)+FXRTARP
           RTARP(N,L0,NZ,NY,NX)=RTARP(N,L0,NZ,NY,NX)-FXRTARP
-          FXRTLGA=FRO*RTLGA(N,L0,NZ,NY,NX)
-          RTLGA(N,L1,NZ,NY,NX)=RTLGA(N,L1,NZ,NY,NX)+FXRTLGA
-          RTLGA(N,L0,NZ,NY,NX)=RTLGA(N,L0,NZ,NY,NX)-FXRTLGA
+          FXRTLGA=FRO*AveSecndRootLen(N,L0,NZ,NY,NX)
+          AveSecndRootLen(N,L1,NZ,NY,NX)=AveSecndRootLen(N,L1,NZ,NY,NX)+FXRTLGA
+          AveSecndRootLen(N,L0,NZ,NY,NX)=AveSecndRootLen(N,L0,NZ,NY,NX)-FXRTLGA
         ENDDO
 !
 !     ROOT NODULES

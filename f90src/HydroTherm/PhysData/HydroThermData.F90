@@ -5,11 +5,11 @@ implicit none
   character(len=*), private, parameter :: mod_filename = __FILE__
   real(r8),allocatable ::  FracSoiPAsWat(:,:,:)                      !
   real(r8),allocatable ::  PSISM1(:,:,:)                      !  
-  real(r8),allocatable ::  TK1(:,:,:)                         !  
+  real(r8),allocatable ::  TKSoi1(:,:,:)                         !  
   real(r8),allocatable ::  DLYRR(:,:)                         !  
   real(r8),allocatable ::  FracSoiPAsIce(:,:,:)               !  
   real(r8),allocatable ::  FracSoiPAsAir(:,:,:)               !  
-  real(r8),allocatable ::  VolHeatCapacity(:,:,:)             !
+  real(r8),allocatable ::  VLHeatCapacity(:,:,:)              !whole layer heat capacity (not snow)
   real(r8),allocatable ::  FracSoilAsAirt(:,:,:)              !fraction of soil volume as air, normalized using current pore volume
   real(r8),allocatable ::  VLWatMicP1(:,:,:)                  !    
   real(r8),allocatable ::  VLiceMicP1(:,:,:)                  !  
@@ -18,8 +18,8 @@ implicit none
   real(r8),allocatable ::  VLairMacPc(:,:,:)                  !  positively corrected macropore volume
   real(r8),allocatable ::  EVAPW(:,:)                         !  
   real(r8),allocatable ::  EVAPS(:,:)                         !  
-  real(r8),allocatable ::  EVAPSN(:,:)
-  real(r8),allocatable ::  FMAC(:,:,:)                        !  
+  real(r8),allocatable ::  VapXAir2Sno(:,:)                   ! air-snow exchange of water vapor through evaporation/condensation, sublimation/deposition
+  real(r8),allocatable ::  SoilFracAsMacP1(:,:,:)                        !  
   real(r8),allocatable ::  HWFLQ0(:,:)                        !  
   real(r8),allocatable ::  VPQ(:,:)                           !  
   real(r8),allocatable ::  PARSW(:,:)                         !  
@@ -29,11 +29,11 @@ implicit none
   real(r8),allocatable ::  RAGW(:,:)                          !  
   real(r8),allocatable ::  THRYW(:,:)                         !  
   real(r8),allocatable ::  VLairMicPc(:,:,:)                       ! corrected air-filled micropore volume 
-  real(r8),allocatable ::  TK0(:,:,:)                         !  
+  real(r8),allocatable ::  TKSnow0(:,:,:)                         !  
   real(r8),allocatable ::  VLWatMacP1(:,:,:)                      !
-  real(r8),allocatable ::  FGRD(:,:,:)                        !
-  real(r8),allocatable ::  VolHeatCapacityA(:,:,:)                      !
-  real(r8),allocatable ::  VolHeatCapacityB(:,:,:)                      !
+  real(r8),allocatable ::  SoilFracAsMicP(:,:,:)                        !
+  real(r8),allocatable ::  VLHeatCapacityA(:,:,:)                      !
+  real(r8),allocatable ::  VLHeatCapacityB(:,:,:)                      !
   real(r8),allocatable ::  RAG(:,:)                           !
   real(r8),allocatable ::  PAREW(:,:)                         ! 
   real(r8),allocatable ::  ALTG(:,:)                          ! 
@@ -64,21 +64,21 @@ implicit none
 
   allocate(FracSoiPAsWat(0:JZ,JY,JX)); FracSoiPAsWat=0._r8
   allocate(PSISM1(0:JZ,JY,JX)); PSISM1=0._r8
-  allocate(TK1(0:JZ,JY,JX));    TK1=0._r8    
+  allocate(TKSoi1(0:JZ,JY,JX));    TKSoi1=0._r8    
   allocate(DLYRR(JY,JX));       DLYRR=0._r8  
   allocate(FracSoiPAsIce(0:JZ,JY,JX)); FracSoiPAsIce=0._r8 
   allocate(FracSoiPAsAir(0:JZ,JY,JX)); FracSoiPAsAir=0._r8   
-  allocate(VolHeatCapacity(0:JZ,JY,JX));  VolHeatCapacity=0._r8  
+  allocate(VLHeatCapacity(0:JZ,JY,JX));  VLHeatCapacity=0._r8  
   allocate(FracSoilAsAirt(0:JZ,JY,JX)); FracSoilAsAirt=0._r8  
   allocate(VLWatMicP1(0:JZ,JY,JX));  VLWatMicP1=0._r8  
   allocate(VLiceMicP1(0:JZ,JY,JX));  VLiceMicP1=0._r8
   allocate(FLQ0S(JY,JX));       FLQ0S=0._r8
   allocate(FLQ0W(JY,JX));       FLQ0W=0._r8
   allocate(VLairMacPc(JZ,JY,JX));   VLairMacPc=0._r8 
-  allocate(EVAPSN(JY,JX));      EVAPSN=0._r8  
+  allocate(VapXAir2Sno(JY,JX));      VapXAir2Sno=0._r8  
   allocate(EVAPW(JY,JX));       EVAPW=0._r8    
   allocate(EVAPS(JY,JX));       EVAPS=0._r8  
-  allocate(FMAC(JZ,JY,JX));     FMAC=0._r8  
+  allocate(SoilFracAsMacP1(JZ,JY,JX));     SoilFracAsMacP1=0._r8  
   allocate(HWFLQ0(JY,JX));      HWFLQ0=0._r8  
   allocate(VPQ(JY,JX));         VPQ=0._r8  
   allocate(PARSW(JY,JX));       PARSW=0._r8
@@ -88,11 +88,11 @@ implicit none
   allocate(RAGW(JY,JX));        RAGW=0._r8  
   allocate(THRYW(JY,JX));       THRYW=0._r8  
   allocate(VLairMicPc(0:JZ,JY,JX));  VLairMicPc=0._r8  
-  allocate(TK0(JS,JY,JX));      TK0=0._r8  
+  allocate(TKSnow0(JS,JY,JX));      TKSnow0=0._r8  
   allocate(VLWatMacP1(JZ,JY,JX));   VLWatMacP1=0._r8
-  allocate(FGRD(JZ,JY,JX));     FGRD=0._r8
-  allocate(VolHeatCapacityA(JZ,JY,JX));   VolHeatCapacityA=0._r8
-  allocate(VolHeatCapacityB(JZ,JY,JX));   VolHeatCapacityB=0._r8  
+  allocate(SoilFracAsMicP(JZ,JY,JX));     SoilFracAsMicP=0._r8
+  allocate(VLHeatCapacityA(JZ,JY,JX));   VLHeatCapacityA=0._r8
+  allocate(VLHeatCapacityB(JZ,JY,JX));   VLHeatCapacityB=0._r8  
   allocate(RAG(JY,JX));         RAG=0._r8
   allocate(PAREW(JY,JX));       PAREW=0._r8
   allocate(ALTG(JY,JX));        ALTG=0._r8  
@@ -122,11 +122,11 @@ implicit none
   call destroy(QR1)
   call destroy(FracSoiPAsWat)
   call destroy(PSISM1)  
-  call destroy(TK1)  
+  call destroy(TKSoi1)  
   call destroy(DLYRR)  
   call destroy(FracSoiPAsIce)  
   call destroy(FracSoiPAsAir)  
-  call destroy(VolHeatCapacity)  
+  call destroy(VLHeatCapacity)  
   call destroy(FracSoilAsAirt)  
   call destroy(VLWatMicP1)  
   call destroy(VLiceMicP1)
@@ -135,8 +135,8 @@ implicit none
   call destroy(VLairMacPc)    
   call destroy(EVAPW)  
   call destroy(EVAPS)  
-  call destroy(EVAPSN)  
-  call destroy(FMAC)  
+  call destroy(VapXAir2Sno)  
+  call destroy(SoilFracAsMacP1)  
   call destroy(HWFLQ0)
   call destroy(VPQ)    
   call destroy(PARSW)  
@@ -146,11 +146,11 @@ implicit none
   call destroy(RAGW) 
   call destroy(THRYW)
   call destroy(VLairMicPc)
-  call destroy(TK0)  
+  call destroy(TKSnow0)  
   call destroy(VLWatMacP1)
-  call destroy(FGRD)
-  call destroy(VolHeatCapacityA)
-  call destroy(VolHeatCapacityB)  
+  call destroy(SoilFracAsMicP)
+  call destroy(VLHeatCapacityA)
+  call destroy(VLHeatCapacityB)  
   call destroy(RAG)
   call destroy(PAREW)
   call destroy(ALTG)

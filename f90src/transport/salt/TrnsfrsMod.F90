@@ -395,7 +395,7 @@ module TrnsfrsMod
 !     begin_execution
 !
 !
-!     XNPH=1/no. of cycles h-1 for water, heat and solute flux calculations
+!     dts_HeatWatTP=1/no. of cycles h-1 for water, heat and solute flux calculations
 !     R*BLS,R*FL0,R*FL1,R*FL2=solute flux to snowpack,surface litter,soil surface non-band,band
 !     salt code: *HY*=H+,*OH*=OH-,*AL*=Al3+,*FE*=Fe3+,*CA*=Ca2+,*MG*=Mg2+
 !          :*NA*=Na+,*KA*=K+,*SO4*=SO42-,*CL*=Cl-,*CO3*=CO32-,*HCO3*=HCO3-
@@ -409,12 +409,12 @@ module TrnsfrsMod
 !          :*1=non-band,*B=band
 !
   DO NTSA=idsa_beg,idsa_end
-    trcsa_RBLS(NTSA,1,NY,NX)=trcsa_XBLS(NTSA,1,NY,NX)*XNPH
-    trcsa_RFL0(NTSA,NY,NX)=trcsa_XFLS(NTSA,3,0,NY,NX)*XNPH
+    trcsa_RBLS(NTSA,1,NY,NX)=trcsa_XBLS(NTSA,1,NY,NX)*dts_HeatWatTP
+    trcsa_RFL0(NTSA,NY,NX)=trcsa_XFLS(NTSA,3,0,NY,NX)*dts_HeatWatTP
   ENDDO
 
   DO NTSA=idsa_beg,idsab_end
-    trcsa_RFL1(NTSA,NY,NX)=trcsa_XFLS(NTSA,3,NU(NY,NX),NY,NX)*XNPH
+    trcsa_RFL1(NTSA,NY,NX)=trcsa_XFLS(NTSA,3,NU(NY,NX),NY,NX)*dts_HeatWatTP
   ENDDO
 
   end subroutine GetSubHourFlux
@@ -433,16 +433,16 @@ module TrnsfrsMod
 
 !     begin_execution
 !
-!     XNPH=1/no. of cycles h-1 for water, heat and solute flux calculations
+!     dts_HeatWatTP=1/no. of cycles h-1 for water, heat and solute flux calculations
 !     RZ*2=solute flux at time step for flux calculations
 !     TR*=solute transformations from solute.f
 !
   D10: DO L=NU(NY,NX),NL(NY,NX)
     DO NTSA=idsa_beg,idsab_end
-      trcsa_solml2R(NTSA,L,NY,NX)=-trcsa_TR(NTSA,L,NY,NX)*XNPH
+      trcsa_solml2R(NTSA,L,NY,NX)=-trcsa_TR(NTSA,L,NY,NX)*dts_HeatWatTP
     ENDDO
 
-    trcsa_solml2R(idsa_Hp,L,NY,NX)=trcsa_solml2R(idsa_Hp,L,NY,NX)-(XZHYS(L,NY,NX))*XNPH
+    trcsa_solml2R(idsa_Hp,L,NY,NX)=trcsa_solml2R(idsa_Hp,L,NY,NX)-(XZHYS(L,NY,NX))*dts_HeatWatTP
 !
 !     SOLUTE FLUXES FROM SUBSURFACE IRRIGATION
 !
@@ -452,7 +452,7 @@ module TrnsfrsMod
 !     VLNH4,VLNO3,VLPO4=non-band NH4,NO3,PO4 volume fraction
 !     VLNHB,VLNOB,VLPOB=band NH4,NO3,PO4 volume fraction
 !
-    FLWU(L,NY,NX)=GridPlantRootH2OUptake_vr(L,NY,NX)*XNPH
+    FLWU(L,NY,NX)=GridPlantRootH2OUptake_vr(L,NY,NX)*dts_HeatWatTP
     trcsa_RFLU(idsa_Al,L,NY,NX)=FWatIrrigate2MicP(L,NY,NX)*CALQ(I,NY,NX)
     trcsa_RFLU(idsa_Fe,L,NY,NX)=FWatIrrigate2MicP(L,NY,NX)*CFEQ(I,NY,NX)
     trcsa_RFLU(idsa_Hp,L,NY,NX)=FWatIrrigate2MicP(L,NY,NX)*CHYQ(I,NY,NX)
@@ -508,31 +508,31 @@ module TrnsfrsMod
 !     SUB-HOURLY SOLUTE FLUXES FROM SUBSURFACE IRRIGATION
 !
 !     R*FLZ,R*FBZ=subsurface solute flux in non-band,band
-!     XNPH=1/no. of cycles h-1 for water, heat and solute flux calculations
+!     dts_HeatWatTP=1/no. of cycles h-1 for water, heat and solute flux calculations
 !
     DO NTSA=idsa_beg,idsab_end
-      trcsa_RFLZ(NTSA,L,NY,NX)=trcsa_RFLU(NTSA,L,NY,NX)*XNPH
+      trcsa_RFLZ(NTSA,L,NY,NX)=trcsa_RFLU(NTSA,L,NY,NX)*dts_HeatWatTP
     ENDDO
 !
 !     SOLUTE DIFFUSIVITIES AT SUB-HOURLY TIME STEP
 !
-!     XNPH=1/no. of cycles h-1 for water, heat and solute flux calculations
+!     dts_HeatWatTP=1/no. of cycles h-1 for water, heat and solute flux calculations
 !     *SGL*=solute diffusivity from hour1.f
 !     solute code:PO=PO4,AL=Al,FE=Fe,HY=H,CA=Ca,GM=Mg,AN=Na,AK=KOH=OH
 !                :SO=SO4,CL=Cl,C3=CO3,HC=HCO3
-    POSGL2(L,NY,NX)=SolDifc(ids_H1PO4,L,NY,NX)*XNPH
-    ALSGL2(L,NY,NX)=ALSGL(L,NY,NX)*XNPH
-    FESGL2(L,NY,NX)=FESGL(L,NY,NX)*XNPH
-    HYSGL2(L,NY,NX)=HYSGL(L,NY,NX)*XNPH
-    CASGL2(L,NY,NX)=CASGL(L,NY,NX)*XNPH
-    GMSGL2(L,NY,NX)=GMSGL(L,NY,NX)*XNPH
-    ANSGL2(L,NY,NX)=ANSGL(L,NY,NX)*XNPH
-    AKSGL2(L,NY,NX)=AKSGL(L,NY,NX)*XNPH
-    OHSGL2(L,NY,NX)=OHSGL(L,NY,NX)*XNPH
-    SOSGL2(L,NY,NX)=SOSGL(L,NY,NX)*XNPH
-    CLSXL2(L,NY,NX)=CLSXL(L,NY,NX)*XNPH
-    C3SGL2(L,NY,NX)=C3SGL(L,NY,NX)*XNPH
-    HCSGL2(L,NY,NX)=HCSGL(L,NY,NX)*XNPH
+    POSGL2(L,NY,NX)=SolDifc(ids_H1PO4,L,NY,NX)*dts_HeatWatTP
+    ALSGL2(L,NY,NX)=ALSGL(L,NY,NX)*dts_HeatWatTP
+    FESGL2(L,NY,NX)=FESGL(L,NY,NX)*dts_HeatWatTP
+    HYSGL2(L,NY,NX)=HYSGL(L,NY,NX)*dts_HeatWatTP
+    CASGL2(L,NY,NX)=CASGL(L,NY,NX)*dts_HeatWatTP
+    GMSGL2(L,NY,NX)=GMSGL(L,NY,NX)*dts_HeatWatTP
+    ANSGL2(L,NY,NX)=ANSGL(L,NY,NX)*dts_HeatWatTP
+    AKSGL2(L,NY,NX)=AKSGL(L,NY,NX)*dts_HeatWatTP
+    OHSGL2(L,NY,NX)=OHSGL(L,NY,NX)*dts_HeatWatTP
+    SOSGL2(L,NY,NX)=SOSGL(L,NY,NX)*dts_HeatWatTP
+    CLSXL2(L,NY,NX)=CLSXL(L,NY,NX)*dts_HeatWatTP
+    C3SGL2(L,NY,NX)=C3SGL(L,NY,NX)*dts_HeatWatTP
+    HCSGL2(L,NY,NX)=HCSGL(L,NY,NX)*dts_HeatWatTP
 !
 !     STATE VARIABLES FOR SOLUTES USED IN 'TRNSFRS'
 !     TO STORE SUB-HOURLY CHANGES DURING FLUX CALCULATIONS
@@ -576,8 +576,8 @@ module TrnsfrsMod
 !     IN SNOWFALL AND IRRIGATION ACCORDING TO CONCENTRATIONS
 !     ENTERED IN WEATHER AND IRRIGATION FILES
 !
-!     PRECW,PRECR=snow,rain
-!     VHCPWM,VHCPWX=current,minimum volumetric heat capacity of snowpack
+!     SnoFalPrec,RainFalPrec=snow,rain
+!     VHCPWM,VLHeatCapSnowMN=current,minimum volumetric heat capacity of snowpack
 !     X*BLS=hourly solute flux to snowpack
 !     salt code: *HY*=H+,*OH*=OH-,*AL*=Al3+,*FE*=Fe3+,*CA*=Ca2+,*MG*=Mg2+
 !          :*NA*=Na+,*KA*=K+,*SO4*=SO42-,*CL*=Cl-,*CO3*=CO32-,*HCO3*=HCO3-
@@ -591,8 +591,8 @@ module TrnsfrsMod
 !     FLQGQ,FLQGI=water flux to snowpack from rain,irrigation
 !     C*R,C*Q=precipitation,irrigation solute concentrations
 !
-      IF(PRECW(NY,NX).GT.0.0.OR.(PRECR(NY,NX).GT.0.0 &
-      .AND.VHCPWM(1,1,NY,NX).GT.VHCPWX(NY,NX)))THEN
+      IF(SnoFalPrec(NY,NX).GT.0.0.OR.(RainFalPrec(NY,NX).GT.0.0 &
+      .AND.VHCPWM(1,1,NY,NX).GT.VLHeatCapSnowMN(NY,NX)))THEN
 !
       call AtmosSoluteFluxToSnowpack(I,NY,NX)
 !
@@ -601,7 +601,7 @@ module TrnsfrsMod
 !     ENTERED IN WEATHER AND IRRIGATION FILES
 !
       ELSEIF((PRECQ(NY,NX).GT.0.0.OR.PRECI(NY,NX).GT.0.0) &
-        .AND.VHCPWM(1,1,NY,NX).LE.VHCPWX(NY,NX))THEN
+        .AND.VHCPWM(1,1,NY,NX).LE.VLHeatCapSnowMN(NY,NX))THEN
 !
       call AtmosSoluteFluxToTopsoil(I,NY,NX)
 !
@@ -921,12 +921,12 @@ module TrnsfrsMod
 !     begin_execution
 
   D1205: DO LS=1,JS
-    IF(VHCPWM(M,LS,NY,NX).GT.VHCPWX(NY,NX))THEN
+    IF(VHCPWM(M,LS,NY,NX).GT.VLHeatCapSnowMN(NY,NX))THEN
       LS2=MIN(JS,LS+1)
 !
 !     IF LOWER LAYER IS IN THE SNOWPACK
   !
-      IF(LS.LT.JS.AND.VHCPWM(M,LS2,N2,N1).GT.VHCPWX(N2,N1))THEN
+      IF(LS.LT.JS.AND.VHCPWM(M,LS2,N2,N1).GT.VLHeatCapSnowMN(N2,N1))THEN
         DO NTSA=idsa_beg,idsa_end
           trcsa_TBLS(NTSA,LS,NY,NX)=trcsa_TBLS(NTSA,LS,NY,NX) &
             +trcsa_RBLS(NTSA,LS,NY,NX)-trcsa_RBLS(NTSA,LS2,NY,NX)
@@ -1255,7 +1255,7 @@ module TrnsfrsMod
             ELSEIF(N.EQ.3)THEN
 !     NET SOLUTE FLUX IN SNOWPACK
 !
-!     VHCPWM,VHCPWX=current,minimum volumetric heat capacity of snowpack
+!     VHCPWM,VLHeatCapSnowMN=current,minimum volumetric heat capacity of snowpack
 !     T*BLS=net solute flux in snowpack
 !     R*BLS=solute flux in snowpack
               call NetFluxInSnowpack(M,NY,NX,N1,N2)

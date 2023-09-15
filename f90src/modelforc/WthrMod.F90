@@ -179,11 +179,11 @@ module WthrMod
 !
       IF(J.GE.13.AND.J.LE.24)THEN
         IF(TCA(NY,NX).GT.TSNOW)THEN
-          PRECRI(NY,NX)=RAIN(I)/12.0_r8
-          PRECWI(NY,NX)=0.0_r8
+          PRECRI(NY,NX)=RAIN(I)/12.0_r8   !rainfall
+          PRECWI(NY,NX)=0.0_r8   !snow fall
         ELSE
           PRECRI(NY,NX)=0.0_r8
-          PRECWI(NY,NX)=RAIN(I)/12.0_r8
+          PRECWI(NY,NX)=RAIN(I)/12.0_r8   !precip as snowfall
     !     IF(PRECWI(NY,NX).LT.0.25E-03_r8)PRECWI(NY,NX)=0.0_r8
         ENDIF
       ELSE
@@ -541,13 +541,13 @@ module WthrMod
       !     PRECA,PRECQ=rain+irrigation,rain+snow
       !     THS=sky LW radiation
 !
-      PRECR(NY,NX)=PRECRI(NY,NX)*AREA(3,NU(NY,NX),NY,NX)
-      PRECW(NY,NX)=PRECWI(NY,NX)*AREA(3,NU(NY,NX),NY,NX)
+      RainFalPrec(NY,NX)=PRECRI(NY,NX)*AREA(3,NU(NY,NX),NY,NX)
+      SnoFalPrec(NY,NX)=PRECWI(NY,NX)*AREA(3,NU(NY,NX),NY,NX)
       PRECI(NY,NX)=PRECII(NY,NX)*AREA(3,NU(NY,NX),NY,NX)
       PRECU(NY,NX)=PRECUI(NY,NX)*AREA(3,NU(NY,NX),NY,NX)
-      PRECA(NY,NX)=PRECR(NY,NX)+PRECI(NY,NX)
-      PRECQ(NY,NX)=PRECR(NY,NX)+PRECW(NY,NX)
-      THS(NY,NX)=THSX(NY,NX)*AREA(3,NU(NY,NX),NY,NX)
+      PRECA(NY,NX)=RainFalPrec(NY,NX)+PRECI(NY,NX)
+      PRECQ(NY,NX)=RainFalPrec(NY,NX)+SnoFalPrec(NY,NX)
+      LWRadSky(NY,NX)=THSX(NY,NX)*AREA(3,NU(NY,NX),NY,NX)
     ENDDO
   ENDDO
   end subroutine SummaryForOutput

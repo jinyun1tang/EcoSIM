@@ -682,7 +682,7 @@ module InsideTranspMod
 !
     DLYR1=AMAX1(ZERO2,DLYR(N,N3,N2,N1))
     DLYR2=AMAX1(ZERO2,DLYR(N,N6,N5,N4))
-    TORTL=(TORT(M,N3,N2,N1)*DLYR1+TORT(M,N6,N5,N4)*DLYR2)/(DLYR1+DLYR2)
+    TORTL=(TortMicPM(M,N3,N2,N1)*DLYR1+TortMicPM(M,N6,N5,N4)*DLYR2)/(DLYR1+DLYR2)
     DISPN=DISP(N,N6,N5,N4)*AMIN1(VFLWX,ABS(FLWM(M,N,N6,N5,N4)/AREA(N,N6,N5,N4)))
 
     DIFOC=(OCSGL2(N6,N5,N4)*TORTL+DISPN)*XDPTH(N,N6,N5,N4)
@@ -1011,7 +1011,7 @@ module InsideTranspMod
 !     DIFFUSIVITIES IN CURRENT AND ADJACENT GRID CELL MACROPORES
 !
 !     DLYR=soil layer thickness
-!     TORTH=macropore tortuosity from hour1.f
+!     TortMacPM=macropore tortuosity from hour1.f
 !     DISP=dispersivity parameter
 !     WaterFlowMacPi=water flux through soil macropore from watsub.f
 !     DIF*=aqueous diffusivity-dispersivity through macropore
@@ -1028,7 +1028,7 @@ module InsideTranspMod
 !
     DLYR1=AMAX1(ZERO2,DLYR(N,N3,N2,N1))
     DLYR2=AMAX1(ZERO2,DLYR(N,N6,N5,N4))
-    TORTL=(TORTH(M,N3,N2,N1)*DLYR1+TORTH(M,N6,N5,N4)*DLYR2)/(DLYR1+DLYR2)
+    TORTL=(TortMacPM(M,N3,N2,N1)*DLYR1+TortMacPM(M,N6,N5,N4)*DLYR2)/(DLYR1+DLYR2)
     DISPN=DISP(N,N6,N5,N4)*AMIN1(VFLWX,ABS(WaterFlowMacPi(M,N,N6,N5,N4)/AREA(N,N6,N5,N4)))
 
     DIFOC=(OCSGL2(N6,N5,N4)*TORTL+DISPN)*XDPTH(N,N6,N5,N4)
@@ -1320,7 +1320,7 @@ module InsideTranspMod
 !
 !     VLWatMicPM,VLWatMacPM=micropore,macropore water-filled porosity from watsub.f
 !     DFV*S,DFV*B=diffusive solute flux between macro- and micropore in non-band,band
-!     XNPH=1/no. of cycles h-1 for water, heat and solute flux calculations
+!     dts_HeatWatTP=1/no. of cycles h-1 for water, heat and solute flux calculations
 !     solute code:CO=CO2,CH=CH4,OX=O2,NG=N2,N2=N2O,HG=H2
 !             :OC=DOC,ON=DON,OP=DOP,OA=acetate
 !             :NH4=NH4,NH3=NH3,NO3=NO3,NO2=NO2,P14=HPO4,PO4=H2PO4 in non-band
@@ -1332,23 +1332,23 @@ module InsideTranspMod
     VOLWT=VLWatMicPM(M,N6,N5,N4)+VLWatMacPS
 
     D9955: DO K=1,jcplx
-      DFVOC(K)=XNPH*(AZMAX1(OQCH2(K,N6,N5,N4))*VLWatMicPM(M,N6,N5,N4) &
+      DFVOC(K)=dts_HeatWatTP*(AZMAX1(OQCH2(K,N6,N5,N4))*VLWatMicPM(M,N6,N5,N4) &
         -AZMAX1(OQC2(K,N6,N5,N4))*VLWatMacPS)/VOLWT
-      DFVON(K)=XNPH*(AZMAX1(OQNH2(K,N6,N5,N4))*VLWatMicPM(M,N6,N5,N4) &
+      DFVON(K)=dts_HeatWatTP*(AZMAX1(OQNH2(K,N6,N5,N4))*VLWatMicPM(M,N6,N5,N4) &
         -AZMAX1(OQN2(K,N6,N5,N4))*VLWatMacPS)/VOLWT
-      DFVOP(K)=XNPH*(AZMAX1(OQPH2(K,N6,N5,N4))*VLWatMicPM(M,N6,N5,N4) &
+      DFVOP(K)=dts_HeatWatTP*(AZMAX1(OQPH2(K,N6,N5,N4))*VLWatMicPM(M,N6,N5,N4) &
         -AZMAX1(OQP2(K,N6,N5,N4))*VLWatMacPS)/VOLWT
-      DFVOA(K)=XNPH*(AZMAX1(OQAH2(K,N6,N5,N4))*VLWatMicPM(M,N6,N5,N4) &
+      DFVOA(K)=dts_HeatWatTP*(AZMAX1(OQAH2(K,N6,N5,N4))*VLWatMicPM(M,N6,N5,N4) &
         -AZMAX1(OQA2(K,N6,N5,N4))*VLWatMacPS)/VOLWT
     ENDDO D9955
 
     DO NTG=idg_beg,idg_end-2
-      trcs_DFV(NTG)=XNPH*(AZMAX1(trc_soHml2(NTG,N6,N5,N4))*VLWatMicPM(M,N6,N5,N4) &
+      trcs_DFV(NTG)=dts_HeatWatTP*(AZMAX1(trc_soHml2(NTG,N6,N5,N4))*VLWatMicPM(M,N6,N5,N4) &
         -AZMAX1(trc_solml2(NTG,N6,N5,N4))*VLWatMacPS)/VOLWT
     ENDDO
 
     DO NTS=ids_nuts_beg,ids_nuts_end
-      trcs_DFV(NTS)=XNPH*(AZMAX1(trc_soHml2(NTS,N6,N5,N4))*VLWatMicPM(M,N6,N5,N4) &
+      trcs_DFV(NTS)=dts_HeatWatTP*(AZMAX1(trc_soHml2(NTS,N6,N5,N4))*VLWatMicPM(M,N6,N5,N4) &
         -AZMAX1(trc_solml2(NTS,N6,N5,N4))*VLWatMacPS)/VOLWT &
         *trcs_VLN(NTS,N6,N5,N4)
     ENDDO

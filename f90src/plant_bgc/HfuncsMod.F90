@@ -49,7 +49,7 @@ module HfuncsMod
 
 ! begin_execution
   associate(                           &
-    PSILT   =>  plt_ew%PSILT     , &
+    PSICanP   =>  plt_ew%PSICanP     , &
     VRNZ    =>  plt_pheno%VRNZ   , &
     IFLGI   =>  plt_pheno%IFLGI  , &
     IFLGP   =>  plt_pheno%IFLGP  , &
@@ -80,7 +80,7 @@ module HfuncsMod
 !
       PPT=PPT+pftPlantPopulation(NZ)
 !
-!         SET CROP FLAG ACCORDING TO PLANTING, HARVEST DATES, DEATH,
+!         SET CROP FLAG ACCORDINGTopRootLayerTO PLANTING, HARVEST DATES, DEATH,
 !         1 = ALIVE, 0 = NOT ALIVE
 !
 !         IDAY0,IYR0,IDAYH,IYRH=day,year of planting,harvesting
@@ -149,11 +149,11 @@ module HfuncsMod
 !
 !             WATER STRESS INDICATOR
 !
-!             PSILT=canopy total water potential
+!             PSICanP=canopy total water potential
 !             PSILY=minimum canopy water potential for leafoff
-!             WSTR=number of hours PSILT < PSILY (for output only)
+!             WSTR=number of hours PSICanP < PSILY (for output only)
 !
-          IF(PSILT(NZ).LT.PSILY(IGTYP(NZ)))THEN
+          IF(PSICanP(NZ).LT.PSILY(IGTYP(NZ)))THEN
             WSTR(NZ)=WSTR(NZ)+1.0_r8
           ENDIF
         ENDIF
@@ -254,7 +254,7 @@ module HfuncsMod
     PB      =>   plt_pheno%PB     , &
     pftPlantPopulation      =>   plt_site%pftPlantPopulation      , &
     VRNS    =>   plt_pheno%VRNS   , &
-    PSIRG   =>   plt_ew%PSIRG     , &
+    PSIRootTurg   =>   plt_ew%PSIRootTurg     , &
     FNOD    =>   plt_allom%FNOD   , &
     NRT     =>   plt_morph%NRT    , &
     NB1     =>   plt_morph%NB1    , &
@@ -262,9 +262,8 @@ module HfuncsMod
     NNOD    =>   plt_morph%NNOD   , &
     NBT     =>   plt_morph%NBT    , &
     NBTB    =>   plt_morph%NBTB   , &
-    NG      =>   plt_morph%NG     , &
+    NGTopRootLayer     =>   plt_morph%NGTopRootLayer    , &
     XTLI    =>   plt_morph%XTLI   , &
-    ARLFL   =>   plt_morph%ARLFL  , &
     PSTG    =>   plt_morph%PSTG     &
   )
 
@@ -273,7 +272,7 @@ module HfuncsMod
 ! CONCENTRATION PERMIT
 !
 ! IFLGI=PFT initialization flag:0=no,1=yes
-! PSIRG=root turgor potential
+! PSIRootTurg=root turgor potential
 ! ISTYP=growth habit from PFT file
 ! IDAY(2,=floral initiation date
 ! NBR=primary root axis number
@@ -289,7 +288,7 @@ module HfuncsMod
 
   IF(IFLGI(NZ).EQ.0)THEN
     IF(J.EQ.1.AND.pftPlantPopulation(NZ).GT.0.0_r8)THEN
-      IF(PSIRG(1,NG(NZ),NZ).GT.PSILM)THEN
+      IF(PSIRootTurg(ipltroot,NGTopRootLayer(NZ),NZ).GT.PSILM)THEN
         IF(ISTYP(NZ).NE.iplt_annual.OR.IDAY(2,NB1(NZ),NZ).EQ.0)THEN
           IF((NBR(NZ).EQ.0.AND.WTRVE(ielmc,NZ).GT.0.0_r8) &
             .OR.(CEPOLP(ielmc,NZ).GT.PB(NZ).AND.PB(NZ).GT.0.0_r8))THEN
@@ -325,9 +324,9 @@ module HfuncsMod
 !     PSTG: node number
 !     NB1: number of main branch
 !     CEPOLP: canopy nonstructural element concentration
-!     PSIRG: root turgor pressure
+!     PSIRootTurg: root turgor pressure
 !     WTRVE: non-structural carbon
-      IF(PSIRG(ipltroot,NG(NZ),NZ).GT.PSILM)THEN
+      IF(PSIRootTurg(ipltroot,NGTopRootLayer(NZ),NZ).GT.PSILM)THEN
         IF(NRT(NZ).EQ.0 .OR. PSTG(NB1(NZ),NZ).GT.NRT(NZ)/FNOD(NZ)+XTLI(NZ))THEN
           IF((NRT(NZ).EQ.0 .AND. WTRVE(ielmc,NZ).GT.0.0_r8) &
             .OR.(CEPOLP(ielmc,NZ).GT.PR(NZ) .AND. PR(NZ).GT.0.0_r8))THEN
@@ -349,9 +348,9 @@ module HfuncsMod
   integer :: NB,N,L,NE
   real(r8):: ARLSP
   associate(                           &
-    WTLS   =>  plt_biom%WTLS     , &
-    WTLSB  =>  plt_biom%WTLSB    , &
-    WTSHTE =>  plt_biom%WTSHTE   , &
+    CanPLeafShethC   =>  plt_biom%CanPLeafShethC     , &
+    CanPBLeafShethC  =>  plt_biom%CanPBLeafShethC    , &
+    CanPShootElmMass =>  plt_biom%CanPShootElmMass   , &
     CCPLNP =>  plt_biom%CCPLNP   , &
     CEPOLB =>  plt_biom%CEPOLB   , &
     CEPOLP =>  plt_biom%CEPOLP   , &
@@ -364,28 +363,28 @@ module HfuncsMod
     ZEROP  =>  plt_biom%ZEROP    , &
     WTRTL  =>  plt_biom%WTRTL    , &
     EPOLNP =>  plt_biom%EPOLNP   , &
-    VOLWC  =>  plt_ew%VOLWC      , &
-    VHCPC  =>  plt_ew%VHCPC      , &
+    WatByPCan  =>  plt_ew%WatByPCan      , &
+    VHeatCapCanP  =>  plt_ew%VHeatCapCanP      , &
     NU     =>  plt_site%NU       , &
     IDTHB  =>  plt_pheno%IDTHB   , &
     IDAY   =>  plt_pheno%IDAY    , &
     NB1    =>  plt_morph%NB1     , &
-    RTDP1  =>  plt_morph%RTDP1   , &
+    PrimRootDepth  =>  plt_morph%PrimRootDepth   , &
     MY     =>  plt_morph%MY      , &
-    ARLFP  =>  plt_morph%ARLFP   , &
-    NG     =>  plt_morph%NG      , &
-    NIX    =>  plt_morph%NIX     , &
+    CanPLA  =>  plt_morph%CanPLA   , &
+    NGTopRootLayer    =>  plt_morph%NGTopRootLayer     , &
+    NIXBotRootLayer   =>  plt_morph%NIXBotRootLayer     , &
     NBR    =>  plt_morph%NBR     , &
     NBTB   =>  plt_morph%NBTB    , &
-    HTCTL  =>  plt_morph%HTCTL   , &
-    SDPTH  =>  plt_morph%SDPTH   , &
-    ARSTP  =>  plt_morph%ARSTP   , &
+    HypoctoylHeight  =>  plt_morph%HypoctoylHeight   , &
+    SeedinDepth  =>  plt_morph%SeedinDepth   , &
+    CanPSA  =>  plt_morph%CanPSA   , &
     NI     =>  plt_morph%NI        &
   )
   plt_bgcr%RootGasLoss_disturb(idg_beg:idg_end-1,NZ)=0.0_r8
   EPOOLP(1:npelms,NZ)=0.0_r8
-  NI(NZ)=NIX(NZ)
-  NG(NZ)=MIN(NI(NZ),MAX(NG(NZ),NU))
+  NI(NZ)=NIXBotRootLayer(NZ)
+  NGTopRootLayer(NZ)=MIN(NI(NZ),MAX(NGTopRootLayer(NZ),NU))
   NB1(NZ)=1
   NBTX=1.0E+06_r8
 !
@@ -439,19 +438,19 @@ module HfuncsMod
 ! CCPLNP=nonstructural C concentration in canopy nodules
 ! CCPOLB,CZPOLB,CPPOLB=nonstructural C,N,P concn in branch(g g-1)
 !
-  IF(WTLS(NZ).GT.ZEROL(NZ))THEN
+  IF(CanPLeafShethC(NZ).GT.ZEROL(NZ))THEN
     DO NE=1,npelms
-      CEPOLP(NE,NZ)=AZMAX1(AMIN1(1.0_r8,EPOOLP(NE,NZ)/WTLS(NZ)))
+      CEPOLP(NE,NZ)=AZMAX1(AMIN1(1.0_r8,EPOOLP(NE,NZ)/CanPLeafShethC(NZ)))
     ENDDO
-    CCPLNP(NZ)=AZMAX1(AMIN1(1.0_r8,EPOLNP(ielmc,NZ)/WTLS(NZ)))
+    CCPLNP(NZ)=AZMAX1(AMIN1(1.0_r8,EPOLNP(ielmc,NZ)/CanPLeafShethC(NZ)))
   ELSE
     CEPOLP(1:npelms,NZ)=1.0_r8
     CCPLNP(NZ)=1.0_r8
   ENDIF
   DO NE=1,npelms
     D190: DO NB=1,NBR(NZ)
-      IF(WTLSB(NB,NZ).GT.ZEROP(NZ))THEN
-        CEPOLB(NE,NB,NZ)=AZMAX1(EPOOL(NE,NB,NZ)/WTLSB(NB,NZ))
+      IF(CanPBLeafShethC(NB,NZ).GT.ZEROP(NZ))THEN
+        CEPOLB(NE,NB,NZ)=AZMAX1(EPOOL(NE,NB,NZ)/CanPBLeafShethC(NB,NZ))
       ELSE
         CEPOLB(NE,NB,NZ)=1.0_r8
       ENDIF
@@ -461,18 +460,18 @@ module HfuncsMod
 ! EMERGENCE DATE FROM COTYLEDON HEIGHT, LEAF AREA, ROOT DEPTH
 !
 ! IDAY(1,=emergence date
-! ARLFP,ARSTP=leaf,stalk areas
-! HTCTL=hypocotyledon height
-! SDPTH=seeding depth
-! RTDP1=primary root depth
-! VHCPC,WTSHT,VOLWC=canopy heat capacity,mass,water content
+! CanPLA,CanPSA=leaf,stalk areas
+! HypoctoylHeight=hypocotyledon height
+! SeedinDepth=seeding depth
+! PrimRootDepth=primary root depth
+! VHeatCapCanP,WTSHT,WatByPCan=canopy heat capacity,mass,water content
 !
   IF(IDAY(1,NB1(NZ),NZ).EQ.0)THEN
-    ARLSP=ARLFP(NZ)+ARSTP(NZ)
-    IF((HTCTL(NZ).GT.SDPTH(NZ)).AND.(ARLSP.GT.ZEROL(NZ)) &
-      .AND.(RTDP1(1,1,NZ).GT.SDPTH(NZ)+ppmc))THEN
+    ARLSP=CanPLA(NZ)+CanPSA(NZ)
+    IF((HypoctoylHeight(NZ).GT.SeedinDepth(NZ)).AND.(ARLSP.GT.ZEROL(NZ)) &
+      .AND.(PrimRootDepth(1,1,NZ).GT.SeedinDepth(NZ)+ppmc))THEN
       IDAY(1,NB1(NZ),NZ)=I
-      VHCPC(NZ)=cpw*(WTSHTE(ielmc,NZ)*10.0E-06_r8+VOLWC(NZ))
+      VHeatCapCanP(NZ)=cpw*(CanPShootElmMass(ielmc,NZ)*10.0E-06_r8+WatByPCan(NZ))
     ENDIF
   ENDIF
   end associate
@@ -484,8 +483,8 @@ module HfuncsMod
   integer, intent(in) :: I,J,NZ
 
   associate(                           &
-    PSILT   =>  plt_ew%PSILT     , &
-    PSILG   =>  plt_ew%PSILG     , &
+    PSICanP   =>  plt_ew%PSICanP     , &
+    PSICanPTurg   =>  plt_ew%PSICanPTurg     , &
     DYLN    =>  plt_site%DYLN    , &
     DYLX    =>  plt_site%DYLX    , &
     DYLM    =>  plt_site%DYLM    , &
@@ -507,7 +506,7 @@ module HfuncsMod
     IFLGF   =>  plt_pheno%IFLGF    &
   )
 !
-! CALCULATE EVERGREEN PHENOLOGY DURING LENGTHENING PHOTOPERIODS
+! CALCULATE EVERGREEN PHENOLOGY DURINGTopRootLayerLENGTHENINGTopRootLayerPHOTOPERIODS
 !
 ! IWTYP=phenology type from PFT file
 ! DYLX,DLYN=daylength of previous,current day
@@ -527,7 +526,7 @@ module HfuncsMod
       ENDIF
     ENDIF
 !
-!   CALCULATE EVERGREEN PHENOLOGY DURING SHORTENING PHOTOPERIODS
+!   CALCULATE EVERGREEN PHENOLOGY DURINGTopRootLayerSHORTENINGTopRootLayerPHOTOPERIODS
 !
 !   VRNS,VRNF=leafout,leafoff hours
 !   VRNZ=hourly counter for shortening photoperiods
@@ -544,8 +543,8 @@ module HfuncsMod
       ENDIF
     ENDIF
 !
-!   CALCULATE WINTER DECIDUOUS PHENOLOGY BY ACCUMULATING HOURS ABOVE
-!   SPECIFIED TEMPERATURE DURING LENGTHENING PHOTOPERIODS
+!   CALCULATE WINTER DECIDUOUS PHENOLOGY BY ACCUMULATINGTopRootLayerHOURS ABOVE
+!   SPECIFIED TEMPERATURE DURINGTopRootLayerLENGTHENINGTopRootLayerPHOTOPERIODS
 !
 !   IWTYP=phenology type from PFT file
 !   DYLX,DLYN=daylength of previous,current day
@@ -577,8 +576,8 @@ module HfuncsMod
         IFLGF(NB,NZ)=0
       ENDIF
 !
-!     CALCULATE WINTER DECIDUOUS PHENOLOGY BY ACCUMULATING HOURS BELOW
-!     SPECIFIED TEMPERATURE DURING SHORTENING PHOTOPERIODS
+!     CALCULATE WINTER DECIDUOUS PHENOLOGY BY ACCUMULATINGTopRootLayerHOURS BELOW
+!     SPECIFIED TEMPERATURE DURINGTopRootLayerSHORTENINGTopRootLayerPHOTOPERIODS
 !
 !     DYLX,DLYN=daylength of previous,current day
 !     VRNS,VRNL=leafout hours,hours required for leafout
@@ -600,14 +599,14 @@ module HfuncsMod
       ENDIF
 
 !
-!     CALCULATE DROUGHT DECIDUOUS PHENOLOGY BY ACCUMULATING HOURS
-!     ABOVE SPECIFIED WATER POTENTIAL DURING DORMANCY
+!     CALCULATE DROUGHT DECIDUOUS PHENOLOGY BY ACCUMULATINGTopRootLayerHOURS
+!     ABOVE SPECIFIED WATER POTENTIAL DURINGTopRootLayerDORMANCY
 !
 !     IWTYP=phenology type from PFT file
 !     VRNS,VRNL=leafout hours,hours required for leafout
 !     VRNF=leafoff hours
 !     IFLGE,IFLGF=flag for enabling leafout,leafoff:0=enable,1=disable
-!     PSILT=canopy total water potential
+!     PSICanP=canopy total water potential
 !     PSILX,PSILY=minimum canopy water potential for leafout,leafoff
 !     ALAT=latitude
 !     IDAY(2,=date of floral initiation
@@ -615,11 +614,11 @@ module HfuncsMod
     ELSEIF(IWTYP(NZ).EQ.2.OR.IWTYP(NZ).EQ.4 &
       .OR.IWTYP(NZ).EQ.5)THEN
       IF(IFLGE(NB,NZ).EQ.0)THEN
-        IF(PSILT(NZ).GE.PSILX)THEN
+        IF(PSICanP(NZ).GE.PSILX)THEN
           VRNS(NB,NZ)=VRNS(NB,NZ)+1.0
         ENDIF
         IF(VRNS(NB,NZ).LT.VRNL(NB,NZ))THEN
-          IF(PSILT(NZ).LT.PSILY(IGTYP(NZ)))THEN
+          IF(PSICanP(NZ).LT.PSILY(IGTYP(NZ)))THEN
             VRNS(NB,NZ)=AZMAX1(VRNS(NB,NZ)-12.0)
           ENDIF
         ENDIF
@@ -630,13 +629,13 @@ module HfuncsMod
       ENDIF
       IF(IDAY(2,NB,NZ).NE.0)IFLGF(NB,NZ)=0
 !
-!     CALCULATE DROUGHT DECIDUOUS PHENOLOGY BY ACCUMULATING HOURS
-!     BELOW SPECIFIED WATER POTENTIAL DURING GROWING SEASON
+!     CALCULATE DROUGHT DECIDUOUS PHENOLOGY BY ACCUMULATINGTopRootLayerHOURS
+!     BELOW SPECIFIED WATER POTENTIAL DURINGTopRootLayerGROWINGTopRootLayerSEASON
 !
 !     VRNS=leafout hours,hours required for leafout
 !     VRNF,VRNX=leafoff hours,hours required for leafoff
 !     IFLGE,IFLGF=flag for enabling leafout,leafoff:0=enable,1=disable
-!     PSILT=canopy total water potential
+!     PSICanP=canopy total water potential
 !     PSILX,PSILY=minimum canopy water potential for leafout,leafoff
 !     ALAT=latitude
 !     IDAY(2,=date of floral initiation
@@ -644,7 +643,7 @@ module HfuncsMod
 !     VRNE=maximum hours for leafout,leafoff
 !
       IF(IFLGE(NB,NZ).EQ.1.AND.IFLGF(NB,NZ).EQ.0)THEN
-        IF(PSILT(NZ).LT.PSILY(IGTYP(NZ)))THEN
+        IF(PSICanP(NZ).LT.PSILY(IGTYP(NZ)))THEN
           VRNF(NB,NZ)=VRNF(NB,NZ)+1.0
         ENDIF
         IF(IWTYP(NZ).EQ.4)THEN
@@ -665,13 +664,13 @@ module HfuncsMod
 !
 !     CALCULATE WINTER AND DROUGHT DECIDUOUS PHENOLOGY BY ACCUMULATING
 !     HOURS ABOVE SPECIFIED TEMPERATURE OR WATER POTENTIAL DURING
-!     LENGTHENING PHOTOPERIODS
+!     LENGTHENINGTopRootLayerPHOTOPERIODS
 !
 !     IWTYP=phenology type from PFT file
 !     DYLX,DLYN=daylength of previous,current day
 !     VRNS,VRNL=leafout hours,hours required for leafout
 !     VRNF,VRNX=leafoff hours,hours required for leafoff
-!     PSILT=canopy total water potential
+!     PSICanP=canopy total water potential
 !     PSILX,PSILY=minimum canopy water potential for leafout,leafoff
 !     IFLGE,IFLGF=flag for enabling leafout,leafoff:0=enable,1=disable
 !     TCG,TCZ,CTC=canopy temp,leafout threshold temp,chilling temp
@@ -680,12 +679,12 @@ module HfuncsMod
 !
     ELSEIF(IWTYP(NZ).EQ.3)THEN
       IF((DYLN.GE.DYLX.OR.DYLN.GE.DYLM-2.0_r8).AND.IFLGE(NB,NZ).EQ.0)THEN
-        IF(TCG(NZ).GE.TCZ(NZ).AND.PSILG(NZ).GT.PSILM)THEN
+        IF(TCG(NZ).GE.TCZ(NZ).AND.PSICanPTurg(NZ).GT.PSILM)THEN
           VRNS(NB,NZ)=VRNS(NB,NZ)+1.0
         ENDIF
         IF(VRNS(NB,NZ).LT.VRNL(NB,NZ))THEN
           IF(TCG(NZ).LT.CTC(NZ) &
-            .OR.PSILG(NZ).LT.PSILM)THEN
+            .OR.PSICanPTurg(NZ).LT.PSILM)THEN
             VRNS(NB,NZ)=AZMAX1(VRNS(NB,NZ)-1.5)
           ENDIF
         ENDIF
@@ -698,20 +697,20 @@ module HfuncsMod
 !
 !     CALCULATE WINTER AND DROUGHT DECIDUOUS PHENOLOGY BY ACCUMULATING
 !     HOURS BELOW SPECIFIED TEMPERATURE OR WATER POTENTIAL DURING
-!     SHORTENING PHOTOPERIODS
+!     SHORTENINGTopRootLayerPHOTOPERIODS
 !
 !     DYLX,DLYN=daylength of previous,current day
 !     VRNS,VRNL=leafout hours,hours required for leafout
 !     VRNF,VRNX=leafoff hours,hours required for leafoff
 !     IFLGE,IFLGF=flag for enabling leafout,leafoff:0=enable,1=disable
 !     TCG,TCZ,CTC=canopy temp,leafout threshold temp,chilling temp
-!     PSILT=canopy total water potential
+!     PSICanP=canopy total water potential
 !     PSILX,PSILY=minimum canopy water potential for leafout,leafoff
 !     ALAT=latitude
 !     IDAY(2,=date of floral initiation
 !
       IF((DYLN.LT.DYLX.OR.DYLN.LT.24.0-DYLM+2.0_r8).AND.IFLGF(NB,NZ).EQ.0)THEN
-        IF(TCG(NZ).LE.TCX(NZ).OR.PSILT(NZ).LT.PSILY(IGTYP(NZ)))THEN
+        IF(TCG(NZ).LE.TCX(NZ).OR.PSICanP(NZ).LT.PSILY(IGTYP(NZ)))THEN
           VRNF(NB,NZ)=VRNF(NB,NZ)+1.0
         ENDIF
         IF(VRNF(NB,NZ).GE.VRNX(NB,NZ) &
@@ -739,7 +738,7 @@ module HfuncsMod
     IYR0    =>  plt_distb%IYR0    , &
     IDAY0   =>  plt_distb%IDAY0   , &
     SnowDepth   =>  plt_ew%SnowDepth      , &
-    PSILT   =>  plt_ew%PSILT      , &
+    PSICanP   =>  plt_ew%PSICanP      , &
     ZERO    =>  plt_site%ZERO     , &
     DYLN    =>  plt_site%DYLN     , &
     IYRC    =>  plt_site%IYRC     , &
@@ -811,12 +810,12 @@ module HfuncsMod
 !
 !   NODE INITIATION AND LEAF APPEARANCE RATES SLOWED BY LOW TURGOR
 !
-!   PSILG=leaf turgor potential
+!   PSICanPTurg=leaf turgor potential
 !   WFNG=water stress effect on phenology
 !
     IF(ISTYP(NZ).EQ.iplt_annual)THEN
       IF(IDAY(6,NB,NZ).EQ.0)THEN
-        WFNG=EXP(0.025_r8*PSILT(NZ))
+        WFNG=EXP(0.025_r8*PSICanP(NZ))
         RNI=RNI*WFNG
         RLA=RLA*WFNG
       ENDIF

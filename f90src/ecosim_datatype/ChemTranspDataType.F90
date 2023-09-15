@@ -33,7 +33,7 @@ module ChemTranspDataType
   real(r8),target,allocatable ::  Z2SGL(:,:,:)                       !gaseous N2O diffusivity, [m2 h-1]
   real(r8),target,allocatable ::  ZVSGL(:,:,:)                       !aqueous N2O diffusivity, [m2 h-1]
   real(r8),target,allocatable ::  WGSGL(:,:,:)                       !water vapor diffusivity, [m2 h-1]
-  real(r8),target,allocatable ::  WGSGW(:,:,:)                       !water vapor diffusivity, [m2 h-1]
+  real(r8),target,allocatable ::  H2OVapDifscSno(:,:,:)                       !water vapor diffusivity, [m2 h-1]
   real(r8),target,allocatable ::  WGSGR(:,:)                         !water vapor diffusivity, [m2 h-1]
   real(r8),target,allocatable ::  WGSGA(:,:)                         !water vapor diffusivity, [m2 h-1]
 
@@ -113,7 +113,7 @@ module ChemTranspDataType
   allocate(Z2SGL(JZ,JY,JX));    Z2SGL=0._r8
   allocate(ZVSGL(0:JZ,JY,JX));  ZVSGL=0._r8
   allocate(WGSGL(JZ,JY,JX));    WGSGL=0._r8
-  allocate(WGSGW(JS,JY,JX));    WGSGW=0._r8
+  allocate(H2OVapDifscSno(JS,JY,JX));    H2OVapDifscSno=0._r8
   allocate(WGSGR(JY,JX));       WGSGR=0._r8
   allocate(WGSGA(JY,JX));       WGSGA=0._r8
   allocate(GSolbility(idg_beg:idg_end,0:JZ,JY,JX)); GSolbility=0._r8
@@ -188,7 +188,7 @@ module ChemTranspDataType
   call destroy(Z2SGL)
   call destroy(ZVSGL)
   call destroy(WGSGL)
-  call destroy(WGSGW)
+  call destroy(H2OVapDifscSno)
   call destroy(WGSGR)
   call destroy(WGSGA)
 

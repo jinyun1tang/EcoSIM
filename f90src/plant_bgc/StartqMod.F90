@@ -20,6 +20,7 @@ module StartqMod
   use GrosubPars
   use UnitMod, only : units
   use EcoSiMParDataMod, only : pltpar
+  use PlantMathFuncMod
   implicit none
 
   private
@@ -44,7 +45,7 @@ module StartqMod
 !     IYR0,IDAY0,IYRH,IDAYH=year,day of planting,arvesting
 !     PPI,PPX=initial,current population (m-2)
 !     CF,CFI=current,initial clumping factor
-!     RSMH=cuticular resistance to water (h m-1)
+!     MaxCanPStomaResistH2O=cuticular resistance to water (h m-1)
 !     RCMX=cuticular resistance to CO2 (s m-1)
 !     CNWS,CPWS=protein:N,protein:P ratios
 !     CWSRT=maximum root protein concentration (g g-1)
@@ -113,7 +114,7 @@ module StartqMod
   PPX(NZ,NY,NX)=PPI(NZ,NY,NX)
   CF(NZ,NY,NX)=CFI(NZ,NY,NX)       !clumping factor
   
-  RSMH(NZ,NY,NX)=RSMX(NZ,NY,NX)/3600.0_r8
+  MaxCanPStomaResistH2O(NZ,NY,NX)=RSMX(NZ,NY,NX)/3600.0_r8
   RCMX(NZ,NY,NX)=RSMX(NZ,NY,NX)*1.56_r8
   CNWS(NZ,NY,NX)=2.5_r8
   CPWS(NZ,NY,NX)=25.0_r8
@@ -393,42 +394,39 @@ module StartqMod
 !
 !     SEED CHARACTERISTICS
 !
-!     SDVL,SDLG,SDAR=seed volume(m3),length(m),area(m2)
-!     GRDM=seed C mass (g) from PFT file
-!
-  SDVL(NZ,NY,NX)=GRDM(NZ,NY,NX)*5.0E-06
-  SDLG(NZ,NY,NX)=2.0*(0.75*SDVL(NZ,NY,NX)/PICON)**0.33
-  SDAR(NZ,NY,NX)=4.0*PICON*(SDLG(NZ,NY,NX)/2.0)**2
+  call calc_seed_geometry(SeedCMass(NZ,NY,NX),SeedVolume(NZ,NY,NX),&
+    SeedLength(NZ,NY,NX),SeedArea(NZ,NY,NX))
+
 !
 !     INITIALIZE ROOT(N=1),MYCORRHIZAL(N=2) DIMENSIONS, UPTAKE PARAMETERS
 !
-!     SDPTH=seeding depth(m) from PFT management file
+!     SeedinDepth=seeding depth(m) from PFT management file
 !     CDPTHZ=depth to soil layer bottom from surface(m)
 !     NG,NIX,NINR=seeding,upper,lower rooting layer
 !     CNRTS,CPRTS=N,P root growth yield
-!     RRAD1M,RRAD2M=maximum primary,secondary mycorrhizal radius (m)
+!     MaxPrimRootRadius,MaxSecndRootRadius=maximum primary,secondary mycorrhizal radius (m)
 !     PORT=mycorrhizal porosity
 !     UPMXZH,UPKMZH,UPMNZH=NH4 max uptake(g m-2 h-1),Km(uM),min concn (uM)
 !     UPMXZO,UPKMZO,UPMNZO=NO3 max uptake(g m-2 h-1),Km(uM), min concn (uM)
 !     UPMXPO,UPKMPO,UPMNPO=H2PO4 max uptake(g m-2 h-1),Km(uM),min concn (uM)
 !     RSRR,RSRA=radial,axial root resistivity (m2 MPa-1 h-1)
 !
-  SDPTH(NZ,NY,NX)=SDPTHI(NZ,NY,NX)
-  DO 9795 L=NU(NY,NX),NL(NY,NX)
-    IF(SDPTH(NZ,NY,NX).GE.CDPTHZ(L-1,NY,NX) &
-      .AND.SDPTH(NZ,NY,NX).LT.CDPTHZ(L,NY,NX))THEN
-      NG(NZ,NY,NX)=L
-      NIX(NZ,NY,NX)=L
+  SeedinDepth(NZ,NY,NX)=PlantinDepth(NZ,NY,NX)
+  D9795: DO L=NU(NY,NX),NL(NY,NX)
+    IF(SeedinDepth(NZ,NY,NX).GE.CDPTHZ(L-1,NY,NX) &
+      .AND.SeedinDepth(NZ,NY,NX).LT.CDPTHZ(L,NY,NX))THEN
+      NGTopRootLayer(NZ,NY,NX)=L
+      NIXBotRootLayer(NZ,NY,NX)=L
       D9790: DO NR=1,pltpar%JRS
         NINR(NR,NZ,NY,NX)=L
       ENDDO D9790
     ENDIF
-9795  CONTINUE
+  ENDDO D9795  
   CNRTS(NZ,NY,NX)=CNRT(NZ,NY,NX)*DMRT(NZ,NY,NX)
   CPRTS(NZ,NY,NX)=CPRT(NZ,NY,NX)*DMRT(NZ,NY,NX)
-  RRAD1M(2,NZ,NY,NX)=5.0E-06
-  RRAD2M(2,NZ,NY,NX)=5.0E-06
-  PORT(2,NZ,NY,NX)=PORT(1,NZ,NY,NX)
+  MaxPrimRootRadius(2,NZ,NY,NX)=5.0E-06
+  MaxSecndRootRadius(2,NZ,NY,NX)=5.0E-06
+  RootPorosity(2,NZ,NY,NX)=RootPorosity(1,NZ,NY,NX)
   UPMXZH(2,NZ,NY,NX)=UPMXZH(1,NZ,NY,NX)
   UPKMZH(2,NZ,NY,NX)=UPKMZH(1,NZ,NY,NX)
   UPMNZH(2,NZ,NY,NX)=UPMNZH(1,NZ,NY,NX)
@@ -444,21 +442,21 @@ module StartqMod
 !     PORTX=tortuosity for gas transport
 !     RRADP=path length for radial diffusion within root (m)
 !     DMVL=volume:C ratio (m3 g-1)
-!     RTLG1X,RTLG2X=specific primary,secondary root length (m g-1)
-!     RTAR1X,RTAR2X=specific primary,secondary root area (m2 g-1)
+!     PrimRootSpecLen,SecndRootSpecLen=specific primary,secondary root length (m g-1)
+!     PrimRootXSecArea,SecndRootXSecArea=specific primary,secondary root area (m2 g-1)
 !
   DO 500 N=1,2
-    PORTX(N,NZ,NY,NX)=PORT(N,NZ,NY,NX)**1.33
-    RRADP(N,NZ,NY,NX)=LOG(1.0/SQRT(AMAX1(0.01,PORT(N,NZ,NY,NX))))
-    DMVL(N,NZ,NY,NX)=ppmc/(0.05*(1.0-PORT(N,NZ,NY,NX)))
-    RTLG1X(N,NZ,NY,NX)=DMVL(N,NZ,NY,NX)/(PICON*RRAD1M(N,NZ,NY,NX)**2)
-    RTLG2X(N,NZ,NY,NX)=DMVL(N,NZ,NY,NX)/(PICON*RRAD2M(N,NZ,NY,NX)**2)
-    RRAD1X(N,NZ,NY,NX)=RRAD1M(N,NZ,NY,NX)
-!    2*SQRT(0.25*(1.0-PORT(N,NZ,NY,NX)))
-    RRAD2X(N,NZ,NY,NX)=RRAD2M(N,NZ,NY,NX)
-!    2*SQRT(0.25*(1.0-PORT(N,NZ,NY,NX)))
-    RTAR1X(N,NZ,NY,NX)=PICON*RRAD1X(N,NZ,NY,NX)**2
-    RTAR2X(N,NZ,NY,NX)=PICON*RRAD2X(N,NZ,NY,NX)**2
+    PORTX(N,NZ,NY,NX)=RootPorosity(N,NZ,NY,NX)**1.33_r8
+    RRADP(N,NZ,NY,NX)=LOG(1.0_r8/SQRT(AMAX1(0.01_r8,RootPorosity(N,NZ,NY,NX))))
+    DMVL(N,NZ,NY,NX)=ppmc/(0.05_r8*(1.0-RootPorosity(N,NZ,NY,NX)))
+    PrimRootSpecLen(N,NZ,NY,NX)=DMVL(N,NZ,NY,NX)/(PICON*MaxPrimRootRadius(N,NZ,NY,NX)**2)
+    SecndRootSpecLen(N,NZ,NY,NX)=DMVL(N,NZ,NY,NX)/(PICON*MaxSecndRootRadius(N,NZ,NY,NX)**2)
+    MaxPrimRootRadius1(N,NZ,NY,NX)=MaxPrimRootRadius(N,NZ,NY,NX)
+!    2*SQRT(0.25*(1.0-RootPorosity(N,NZ,NY,NX)))
+    MaxSecndRootRadius1(N,NZ,NY,NX)=MaxSecndRootRadius(N,NZ,NY,NX)
+!    2*SQRT(0.25*(1.0-RootPorosity(N,NZ,NY,NX)))
+    PrimRootXSecArea(N,NZ,NY,NX)=PICON*MaxPrimRootRadius1(N,NZ,NY,NX)**2._r8
+    SecndRootXSecArea(N,NZ,NY,NX)=PICON*MaxSecndRootRadius1(N,NZ,NY,NX)**2._r8
 500 CONTINUE
   end subroutine InitDimensionsandUptake
 !------------------------------------------------------------------------------------------
@@ -479,7 +477,7 @@ module StartqMod
   IDTHR(NZ,NY,NX)=0
   NBT(NZ,NY,NX)=0
   NBR(NZ,NY,NX)=0
-  HTCTL(NZ,NY,NX)=0._r8
+  HypoctoylHeight(NZ,NY,NX)=0._r8
   CanopyHeight(NZ,NY,NX)=0._r8
   D10: DO NB=1,JBR
     IFLGA(NB,NZ,NY,NX)=0
@@ -538,17 +536,18 @@ module StartqMod
   WTSTXBE(1:npelms,1:JBR,NZ,NY,NX)=0._r8
   WGLFEX(1:npelms,1:JBR,NZ,NY,NX)=0._r8
   D25: DO NB=1,JBR
-    WVSTKB(NB,NZ,NY,NX)=0._r8
-    WTLSB(NB,NZ,NY,NX)=0._r8
+    CanPBStalkC(NB,NZ,NY,NX)=0._r8
+    CanPBLeafShethC(NB,NZ,NY,NX)=0._r8
     GRNXB(NB,NZ,NY,NX)=0._r8
     GRNOB(NB,NZ,NY,NX)=0._r8
     GRWTB(NB,NZ,NY,NX)=0._r8
-    ARLFB(NB,NZ,NY,NX)=0._r8
+    CanPBLA(NB,NZ,NY,NX)=0._r8
     RNH3B(NB,NZ,NY,NX)=0._r8
     ARLFZ(NB,NZ,NY,NX)=0._r8
     HTSHEX(NB,NZ,NY,NX)=0._r8
+    
     D5: DO L=1,JC
-      ARSTK(L,NB,NZ,NY,NX)=0._r8
+      CanPLBSA(L,NB,NZ,NY,NX)=0._r8
       DO N=1,JLI
         SURFB(N,L,NB,NZ,NY,NX)=0._r8
       enddo
@@ -565,7 +564,7 @@ module StartqMod
       WSSHE(K,NB,NZ,NY,NX)=0._r8
 
       D55: DO L=1,JC
-        ARLFL(L,K,NB,NZ,NY,NX)=0._r8
+        CanPLNBLA(L,K,NB,NZ,NY,NX)=0._r8
         WGLFLE(1:npelms,L,K,NB,NZ,NY,NX)=0._r8
       ENDDO D55
       IF(K.NE.0)THEN
@@ -584,16 +583,16 @@ module StartqMod
   D35: DO L=1,JC
     ARLFV(L,NZ,NY,NX)=0._r8
     WGLFV(L,NZ,NY,NX)=0._r8
-    ARSTV(L,NZ,NY,NX)=0._r8
+    CanPLSA(L,NZ,NY,NX)=0._r8
   ENDDO D35
   EPOOLP(1:npelms,NZ,NY,NX)=0._r8
   CEPOLP(1:npelms,NZ,NY,NX)=0._r8
   CCPLNP(NZ,NY,NX)=0._r8
-  WTSHTE(1:npelms,NZ,NY,NX)=0._r8
+  CanPShootElmMass(1:npelms,NZ,NY,NX)=0._r8
   WTLFE(1:npelms,NZ,NY,NX)=0._r8
   WTSHEE(1:npelms,NZ,NY,NX)=0._r8
   WTSTKE(1:npelms,NZ,NY,NX)=0._r8
-  WVSTK(NZ,NY,NX)=0._r8
+  CanPStalkC(NZ,NY,NX)=0._r8
   WTRSVE(1:npelms,NZ,NY,NX)=0._r8
   WTHSKE(1:npelms,NZ,NY,NX)=0._r8
   WTEARE(1:npelms,NZ,NY,NX)=0._r8
@@ -601,11 +600,11 @@ module StartqMod
   WTRTE(1:npelms,NZ,NY,NX)=0._r8
   WTRTSE(1:npelms,NZ,NY,NX)=0._r8
   WTNDE(1:npelms,NZ,NY,NX)=0._r8
-  WTLS(NZ,NY,NX)=0._r8
+  CanPLeafShethC(NZ,NY,NX)=0._r8
 
-  ARLFP(NZ,NY,NX)=0._r8
+  CanPLA(NZ,NY,NX)=0._r8
   WTRTA(NZ,NY,NX)=0._r8
-  ARSTP(NZ,NY,NX)=0._r8
+  CanPSA(NZ,NY,NX)=0._r8
   end subroutine InitPlantPhenoMorphoBio
 !------------------------------------------------------------------------------------------
 
@@ -663,24 +662,24 @@ module StartqMod
 !
 !     INITIALIZE PLANT HEAT AND WATER STATUS
 !
-!     VHCPC=canopy heat capacity (MJ m-3 K-1)
+!     VHeatCapCanP=canopy heat capacity (MJ m-3 K-1)
 !     TCC,TKC=canopy temperature for growth (oC,K)
 !     TCG,TKG=canopy temperature for phenology (oC,K)
-!     PSILT,PSILO,PSILG=canopy total,osmotic,turgor water potl(MPa)
+!     PSICanP,PSICanPOsmo,PSICanPTurg=canopy total,osmotic,turgor water potl(MPa)
 !
-  VHCPC(NZ,NY,NX)=cpw*WTSHTE(ielmc,NZ,NY,NX)*10.0E-06
+  VHeatCapCanP(NZ,NY,NX)=cpw*CanPShootElmMass(ielmc,NZ,NY,NX)*10.0E-06
   ENGYX(NZ,NY,NX)=0._r8
   DTKC(NZ,NY,NX)=0._r8
   TCC(NZ,NY,NX)=ATCA(NY,NX)
   TKC(NZ,NY,NX)=units%Celcius2Kelvin(TCC(NZ,NY,NX))
   TCG(NZ,NY,NX)=TCC(NZ,NY,NX)
   TKG(NZ,NY,NX)=units%Celcius2Kelvin(TCG(NZ,NY,NX))
-  TFN3(NZ,NY,NX)=1.0
-  PSILT(NZ,NY,NX)=-1.0E-03
-  PSILO(NZ,NY,NX)=OSMO(NZ,NY,NX)+PSILT(NZ,NY,NX)
-  PSILG(NZ,NY,NX)=AZMAX1(PSILT(NZ,NY,NX)-PSILO(NZ,NY,NX))
-  EP(NZ,NY,NX)=0._r8
-  FRADP(NZ,NY,NX)=0._r8
+  fTgrowCanP(NZ,NY,NX)=1.0
+  PSICanP(NZ,NY,NX)=-1.0E-03
+  PSICanPOsmo(NZ,NY,NX)=OSMO(NZ,NY,NX)+PSICanP(NZ,NY,NX)
+  PSICanPTurg(NZ,NY,NX)=AZMAX1(PSICanP(NZ,NY,NX)-PSICanPOsmo(NZ,NY,NX))
+  PTrans(NZ,NY,NX)=0._r8
+  FracPARByCanP(NZ,NY,NX)=0._r8
   end subroutine InitPlantHeatandWater
 !------------------------------------------------------------------------------------------
 
@@ -695,7 +694,7 @@ module StartqMod
 !
 !     INITIALIZE ROOT(N=1),MYCORRHIZAL(N=2) MORPHOLOGY AND BIOMASS
 !
-!     PSIRT,PSIRO,PSIRG=root,myco total,osmotic,turgor water potl(MPa)
+!     PSIRoot,PSIRootOSMO,PSIRootTurg=root,myco total,osmotic,turgor water potl(MPa)
 !     CO2A,CO2P=root,myco gaseous,aqueous CO2 content (g)
 !     OXYA,OXYP=root,myco gaseous,aqueous O2 content (g)
 !
@@ -705,28 +704,28 @@ module StartqMod
   UPH2P(NZ,NY,NX)=0._r8
   UPH1P(NZ,NY,NX)=0._r8
   UPNF(NZ,NY,NX)=0._r8
-  D40: DO N=1,2
+  D40: DO N=1,pltpar%jroots
     D20: DO L=1,NL(NY,NX)
       PopPlantRootH2OUptake_vr(N,L,NZ,NY,NX)=0._r8
-      PSIRT(N,L,NZ,NY,NX)=-0.01
-      PSIRO(N,L,NZ,NY,NX)=OSMO(NZ,NY,NX)+PSIRT(N,L,NZ,NY,NX)
-      PSIRG(N,L,NZ,NY,NX)=AZMAX1(PSIRT(N,L,NZ,NY,NX)-PSIRO(N,L,NZ,NY,NX))
+      PSIRoot(N,L,NZ,NY,NX)=-0.01
+      PSIRootOSMO(N,L,NZ,NY,NX)=OSMO(NZ,NY,NX)+PSIRoot(N,L,NZ,NY,NX)
+      PSIRootTurg(N,L,NZ,NY,NX)=AZMAX1(PSIRoot(N,L,NZ,NY,NX)-PSIRootOSMO(N,L,NZ,NY,NX))
       EPOOLR(1:npelms,N,L,NZ,NY,NX)=0._r8
       CEPOLR(1:npelms,N,L,NZ,NY,NX)=0._r8
       CWSRTL(N,L,NZ,NY,NX)=CWSRT(NZ,NY,NX)
       WTRTL(N,L,NZ,NY,NX)=0._r8
-      WTRTD(N,L,NZ,NY,NX)=0._r8
+      RootCPZR(N,L,NZ,NY,NX)=0._r8
       WSRTL(N,L,NZ,NY,NX)=0._r8
-      RTN1(N,L,NZ,NY,NX)=0._r8
-      RTNL(N,L,NZ,NY,NX)=0._r8
-      RTLGP(N,L,NZ,NY,NX)=0._r8
-      RTDNP(N,L,NZ,NY,NX)=0._r8
+      PrimRootXNumL(N,L,NZ,NY,NX)=0._r8
+      SecndRootXNumL(N,L,NZ,NY,NX)=0._r8
+      RootLenPerP(N,L,NZ,NY,NX)=0._r8
+      RootLenDensNLP(N,L,NZ,NY,NX)=0._r8
       RTVLP(N,L,NZ,NY,NX)=0._r8
       RTVLW(N,L,NZ,NY,NX)=0._r8
-      RRAD1(N,L,NZ,NY,NX)=RRAD1M(N,NZ,NY,NX)
-      RRAD2(N,L,NZ,NY,NX)=RRAD2M(N,NZ,NY,NX)
+      PrimRootRadius(N,L,NZ,NY,NX)=MaxPrimRootRadius(N,NZ,NY,NX)
+      SecndRootRadius(N,L,NZ,NY,NX)=MaxSecndRootRadius(N,NZ,NY,NX)
       RTARP(N,L,NZ,NY,NX)=0._r8
-      RTLGA(N,L,NZ,NY,NX)=1.0E-03
+      AveSecndRootLen(N,L,NZ,NY,NX)=1.0E-03
       RUPNH4(N,L,NZ,NY,NX)=0._r8
       RUPNO3(N,L,NZ,NY,NX)=0._r8
       RUPH2P(N,L,NZ,NY,NX)=0._r8
@@ -762,11 +761,11 @@ module StartqMod
       WFR(N,L,NZ,NY,NX)=1.0
       D30: DO NR=1,JRS
         RTN2(N,L,NR,NZ,NY,NX)=0._r8
-        RTLG1(N,L,NR,NZ,NY,NX)=0._r8
+        PrimRootLen(N,L,NR,NZ,NY,NX)=0._r8
         WTRT1E(1:npelms,N,L,NR,NZ,NY,NX)=0._r8
-        RTLG2(N,L,NR,NZ,NY,NX)=0._r8
+        SecndRootLen(N,L,NR,NZ,NY,NX)=0._r8
         WTRT2E(1:npelms,N,L,NR,NZ,NY,NX)=0._r8
-        RTDP1(N,NR,NZ,NY,NX)=SDPTH(NZ,NY,NX)
+        PrimRootDepth(N,NR,NZ,NY,NX)=SeedinDepth(NZ,NY,NX)
         RTWT1E(1:npelms,N,NR,NZ,NY,NX)=0._r8
       ENDDO D30
       IF(N.EQ.1)THEN
@@ -786,7 +785,7 @@ module StartqMod
   RUPNHB(1:2,NL(NY,NX)+1:JZ,NZ,NY,NX)=0._r8
   RUPH2P(1:2,NL(NY,NX)+1:JZ,NZ,NY,NX)=0._r8
   RUPH2B(1:2,NL(NY,NX)+1:JZ,NZ,NY,NX)=0._r8
-  RTDNP(1:2,NL(NY,NX)+1:JZ,NZ,NY,NX)=0._r8
+  RootLenDensNLP(1:2,NL(NY,NX)+1:JZ,NZ,NY,NX)=0._r8
   end subroutine InitRootMychorMorphoBio
 !------------------------------------------------------------------------------------------
 
@@ -800,9 +799,9 @@ module StartqMod
 !
 !     WTRVC,WTRVN,WTRVP=C,N,P in storage reserves (g)
 !     WTLFB,WTLFBN,WTLFBP=C,N,P in leaves (g)
-!     WTLSB=C in leaves+petioles (g)
+!     CanPBLeafShethC=C in leaves+petioles (g)
 !     FDM-dry matter fraction (g DM C g FM C-1)
-!     VOLWP,VOLWC=water volume in,on canopy (m3)
+!     CanWatP,WatByPCan=water volume in,on canopy (m3)
 !     CPOOL,ZPOOL,PPOOL=C,N,P in canopy nonstructural pools (g)
 !     WTRT1,WTRT1N,WTRT1P=C,N,P in primary root layer (g)
 !     RTWT1,RTWT1N,RTWT1P=total C,N,P in primary root (g)
@@ -810,28 +809,28 @@ module StartqMod
 !     WSRTL=total root protein C mass (g)
 !     CPOOLR,ZPOOLR,PPOOLR=C,N,P in root,myco nonstructural pools (g)
 !
-  WTRVX(NZ,NY,NX)=GRDM(NZ,NY,NX)*pftPlantPopulation(NZ,NY,NX)
+  WTRVX(NZ,NY,NX)=SeedCMass(NZ,NY,NX)*pftPlantPopulation(NZ,NY,NX)
   WTRVE(ielmc,NZ,NY,NX)=WTRVX(NZ,NY,NX)
   WTRVE(ielmn,NZ,NY,NX)=CNGR(NZ,NY,NX)*WTRVE(ielmc,NZ,NY,NX)
   WTRVE(ielmp,NZ,NY,NX)=CPGR(NZ,NY,NX)*WTRVE(ielmc,NZ,NY,NX)
   WTLFBE(ielmn,1,NZ,NY,NX)=CNGR(NZ,NY,NX)*WTLFBE(ielmc,1,NZ,NY,NX)
   WTLFBE(ielmp,1,NZ,NY,NX)=CPGR(NZ,NY,NX)*WTLFBE(ielmc,1,NZ,NY,NX)
-  WTLSB(1,NZ,NY,NX)=WTLFBE(ielmc,1,NZ,NY,NX)+WTSHEBE(ielmc,1,NZ,NY,NX)
-  WTLS(NZ,NY,NX)=WTLS(NZ,NY,NX)+WTLSB(1,NZ,NY,NX)
-  FDM=AMIN1(1.0_r8,0.16_r8-0.045_r8*PSILT(NZ,NY,NX))
-  VOLWP(NZ,NY,NX)=ppmc*WTLS(NZ,NY,NX)/FDM
-  VOLWC(NZ,NY,NX)=0._r8
+  CanPBLeafShethC(1,NZ,NY,NX)=WTLFBE(ielmc,1,NZ,NY,NX)+WTSHEBE(ielmc,1,NZ,NY,NX)
+  CanPLeafShethC(NZ,NY,NX)=CanPLeafShethC(NZ,NY,NX)+CanPBLeafShethC(1,NZ,NY,NX)  
+  FDM=AMIN1(1.0_r8,0.16_r8-0.045_r8*PSICanP(NZ,NY,NX))
+  CanWatP(NZ,NY,NX)=ppmc*CanPLeafShethC(NZ,NY,NX)/FDM
+  WatByPCan(NZ,NY,NX)=0._r8
   EPOOL(ielmn,1,NZ,NY,NX)=CNGR(NZ,NY,NX)*EPOOL(ielmc,1,NZ,NY,NX)
   EPOOL(ielmp,1,NZ,NY,NX)=CPGR(NZ,NY,NX)*EPOOL(ielmc,1,NZ,NY,NX)
-  WTRT1E(ielmn,ipltroot,NG(NZ,NY,NX),1,NZ,NY,NX)=CNGR(NZ,NY,NX)*WTRT1E(ielmc,ipltroot,NG(NZ,NY,NX),1,NZ,NY,NX)
-  WTRT1E(ielmp,ipltroot,NG(NZ,NY,NX),1,NZ,NY,NX)=CPGR(NZ,NY,NX)*WTRT1E(ielmc,ipltroot,NG(NZ,NY,NX),1,NZ,NY,NX)
+  WTRT1E(ielmn,ipltroot,NGTopRootLayer(NZ,NY,NX),1,NZ,NY,NX)=CNGR(NZ,NY,NX)*WTRT1E(ielmc,ipltroot,NGTopRootLayer(NZ,NY,NX),1,NZ,NY,NX)
+  WTRT1E(ielmp,ipltroot,NGTopRootLayer(NZ,NY,NX),1,NZ,NY,NX)=CPGR(NZ,NY,NX)*WTRT1E(ielmc,ipltroot,NGTopRootLayer(NZ,NY,NX),1,NZ,NY,NX)
   RTWT1E(ielmn,1,1,NZ,NY,NX)=CNGR(NZ,NY,NX)*RTWT1E(ielmc,1,1,NZ,NY,NX)
   RTWT1E(ielmp,1,1,NZ,NY,NX)=CPGR(NZ,NY,NX)*RTWT1E(ielmc,1,1,NZ,NY,NX)
-  WTRTL(ipltroot,NG(NZ,NY,NX),NZ,NY,NX)=WTRT1E(ielmc,ipltroot,NG(NZ,NY,NX),1,NZ,NY,NX)
-  WTRTD(ipltroot,NG(NZ,NY,NX),NZ,NY,NX)=WTRT1E(ielmc,ipltroot,NG(NZ,NY,NX),1,NZ,NY,NX)
-  WSRTL(1,NG(NZ,NY,NX),NZ,NY,NX)=WTRTL(ipltroot,NG(NZ,NY,NX),NZ,NY,NX)*CWSRT(NZ,NY,NX)
-  EPOOLR(ielmn,1,NG(NZ,NY,NX),NZ,NY,NX)=CNGR(NZ,NY,NX)*EPOOLR(ielmc,1,NG(NZ,NY,NX),NZ,NY,NX)
-  EPOOLR(ielmp,1,NG(NZ,NY,NX),NZ,NY,NX)=CPGR(NZ,NY,NX)*EPOOLR(ielmc,1,NG(NZ,NY,NX),NZ,NY,NX)
+  WTRTL(ipltroot,NGTopRootLayer(NZ,NY,NX),NZ,NY,NX)=WTRT1E(ielmc,ipltroot,NGTopRootLayer(NZ,NY,NX),1,NZ,NY,NX)
+  RootCPZR(ipltroot,NGTopRootLayer(NZ,NY,NX),NZ,NY,NX)=WTRT1E(ielmc,ipltroot,NGTopRootLayer(NZ,NY,NX),1,NZ,NY,NX)
+  WSRTL(1,NGTopRootLayer(NZ,NY,NX),NZ,NY,NX)=WTRTL(ipltroot,NGTopRootLayer(NZ,NY,NX),NZ,NY,NX)*CWSRT(NZ,NY,NX)
+  EPOOLR(ielmn,1,NGTopRootLayer(NZ,NY,NX),NZ,NY,NX)=CNGR(NZ,NY,NX)*EPOOLR(ielmc,1,NGTopRootLayer(NZ,NY,NX),NZ,NY,NX)
+  EPOOLR(ielmp,1,NGTopRootLayer(NZ,NY,NX),NZ,NY,NX)=CPGR(NZ,NY,NX)*EPOOLR(ielmc,1,NGTopRootLayer(NZ,NY,NX),NZ,NY,NX)
   end subroutine InitSeedMorphoBio
 
   end module StartqMod

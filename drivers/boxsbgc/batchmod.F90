@@ -238,7 +238,7 @@ contains
   micfor%FILM(1:NPH)  =forc%FILM
   micfor%THETPM(1:NPH)=forc%THETPM
   micfor%VLWatMicPM(1:NPH) =forc%VLWatMicP
-  micfor%TORT(1:NPH)  =forc%TORT
+  micfor%TortMicPM(1:NPH)  =forc%TortMicPM
   micfor%VLsoiAirPM(1:NPH) =forc%VLsoiAirP
 
   micstt%EPOC=forc%EPOC
@@ -1320,7 +1320,7 @@ contains
   real(r8) :: CZ2GG2,CZ2OG2,CNH3G2
   real(r8) :: CH2GG2
   real(r8) :: VLWatMicPMA,VLWatMicPMB
-  real(r8) :: DLYR1,TORT1
+  real(r8) :: DLYR1,TortMicPM1
   real(r8) :: DFGSCO,DFGSCH
   real(r8) :: DFGSOX,DFGSNG
   real(r8) :: DFGSN2,DFGSN3
@@ -1497,14 +1497,14 @@ contains
 
 !   between atmosphere and topsoil
       DLYR1=forc%DLYR3
-      TORT1=forc%TORT*forc%AREA3/(0.5_r8*DLYR1)
-      DFGSCO=forc%CLSGL*TORT1*XNPH
-      DFGSCH=forc%CQSGL*TORT1*XNPH
-      DFGSOX=forc%OLSGL*TORT1*XNPH
-      DFGSNG=forc%ZLSGL*TORT1*XNPH
-      DFGSN2=forc%ZNSGL*TORT1*XNPH
-      DFGSN3=forc%ZVSGL*TORT1*XNPH
-      DFGSHL=forc%HLSGL*TORT1*XNPH
+      TortMicPM1=forc%TortMicPM*forc%AREA3/(0.5_r8*DLYR1)
+      DFGSCO=forc%CLSGL*TortMicPM1*dts_HeatWatTP
+      DFGSCH=forc%CQSGL*TortMicPM1*dts_HeatWatTP
+      DFGSOX=forc%OLSGL*TortMicPM1*dts_HeatWatTP
+      DFGSNG=forc%ZLSGL*TortMicPM1*dts_HeatWatTP
+      DFGSN2=forc%ZNSGL*TortMicPM1*dts_HeatWatTP
+      DFGSN3=forc%ZVSGL*TortMicPM1*dts_HeatWatTP
+      DFGSHL=forc%HLSGL*TortMicPM1*dts_HeatWatTP
 
       CCO2GQ=(PARG*forc%CCO2E*forc%SCO2L+DFGSCO*CCO2S2)/(DFGSCO+PARG)
       CCH4GQ=(PARG*forc%CCH4E*forc%SCH4L+DFGSCH*CCH4S2)/(DFGSCH+PARG)

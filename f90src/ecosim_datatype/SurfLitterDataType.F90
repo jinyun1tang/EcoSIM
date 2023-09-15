@@ -13,14 +13,14 @@ module SurfLitterDataType
   real(r8) ,target,allocatable ::   XCORP(:,:)                       !factor for surface litter incorporation and soil mixing
   real(r8) ,target,allocatable ::   FLWRM(:,:,:)                     !water transfer between soil surface and surface litter, [g d-2 t-1]
   real(r8) ,target,allocatable ::   FLQRM(:,:,:)                     !meltwater flux into surface litter, [m3 d-2 h-1]
-  real(r8) ,target,allocatable ::   CVRD(:,:)                        !fraction of soil surface covered by surface litter, [-]
+  real(r8) ,target,allocatable ::   FracSurfByLitR(:,:)              !fraction of soil surface covered by surface litter, [-]
   real(r8) ,target,allocatable ::   HFLWR(:,:)                       !net heat transfer to surface litter, [MJ d-2 t-1]
   real(r8) ,target,allocatable ::   VLitR(:,:)                        !surface litter volume, [m3 d-2]
   real(r8) ,target,allocatable ::   VHCPRX(:,:)                      !surface litter heat capacity from previous time step, [MJ d-2 K-1]
   real(r8) ,target,allocatable ::   VWatLitrX(:,:)                      !surface litter water holding capacity, [m3 d-2]
   real(r8) ,target,allocatable ::   FLWR(:,:)                        !net water transfer to surface litter, [MJ d-2 t-1]
-  real(r8) ,target,allocatable ::   THAWR(:,:)                       !freeze (-ve) - thaw (+ve) in surface litter, [m3 d-2 h-1]
-  real(r8) ,target,allocatable ::   HTHAWR(:,:)                      !latent heat of freeze (-ve) - thaw (+ve) in surface litter, [MJ d-2 h-1]
+  real(r8) ,target,allocatable ::   TLitrIceFlxThaw(:,:)             !water from ice thaw in surface litter, [m3 d-2 h-1]
+  real(r8) ,target,allocatable ::   TLitrIceHeatFlxFrez(:,:)         !latent heat released from water freeze in surface litter, [MJ d-2 h-1]
   real(r8) ,target,allocatable ::   FLQRQ(:,:)                       !precipitation flux into surface litter, [m3 d-2 h-1]
   real(r8) ,target,allocatable ::   FLQRI(:,:)                       !irrigation flux into surface litter, [m3 d-2 h-1]
   real(r8) ,target,allocatable ::   POROS0(:,:)                      !litter porosity
@@ -51,14 +51,14 @@ module SurfLitterDataType
   allocate(XCORP(JY,JX));        XCORP=0._r8
   allocate(FLWRM(60,JY,JX));     FLWRM=0._r8
   allocate(FLQRM(60,JY,JX));     FLQRM=0._r8
-  allocate(CVRD(JY,JX));         CVRD=0._r8
+  allocate(FracSurfByLitR(JY,JX));         FracSurfByLitR=0._r8
   allocate(HFLWR(JY,JX));        HFLWR=0._r8
   allocate(VLitR(JY,JX));         VLitR=0._r8
   allocate(VHCPRX(JY,JX));       VHCPRX=0._r8
   allocate(VWatLitrX(JY,JX));       VWatLitrX=0._r8
   allocate(FLWR(JY,JX));         FLWR=0._r8
-  allocate(THAWR(JY,JX));        THAWR=0._r8
-  allocate(HTHAWR(JY,JX));       HTHAWR=0._r8
+  allocate(TLitrIceFlxThaw(JY,JX));        TLitrIceFlxThaw=0._r8
+  allocate(TLitrIceHeatFlxFrez(JY,JX));       TLitrIceHeatFlxFrez=0._r8
   allocate(FLQRQ(JY,JX));        FLQRQ=0._r8
   allocate(FLQRI(JY,JX));        FLQRI=0._r8
   allocate(POROS0(JY,JX));       POROS0=0._r8
@@ -77,14 +77,14 @@ module SurfLitterDataType
   call destroy(XCORP)
   call destroy(FLWRM)
   call destroy(FLQRM)
-  call destroy(CVRD)
+  call destroy(FracSurfByLitR)
   call destroy(HFLWR)
   call destroy(VLitR)
   call destroy(VHCPRX)
   call destroy(VWatLitrX)
   call destroy(FLWR)
-  call destroy(THAWR)
-  call destroy(HTHAWR)
+  call destroy(TLitrIceFlxThaw)
+  call destroy(TLitrIceHeatFlxFrez)
   call destroy(FLQRQ)
   call destroy(FLQRI)
   call destroy(POROS0)

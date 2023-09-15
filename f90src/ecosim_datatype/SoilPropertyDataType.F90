@@ -14,7 +14,7 @@ implicit none
    real(r8) ,target,allocatable ::  CCLAY(:,:,:)                     !soil clay content [kg Mg-1]
    real(r8) ,target,allocatable ::  ROCK(:,:,:)                      !Rock fraction
    real(r8) ,target,allocatable ::  SoiBulkDensityt0(:,:,:)                     !initial bulk density [Mg m-3,0=water]
-   real(r8) ,target,allocatable ::  FMPR(:,:,:)                      !micropore fraction
+   real(r8) ,target,allocatable ::  FracSoiAsMicP(:,:,:)            !micropore fraction
    real(r8) ,target,allocatable ::  SoilFracAsMacP(:,:,:)                      !macropore fraction
    real(r8) ,target,allocatable ::  PathLenMacP(:,:,:)                      !path length between macopores
    real(r8) ,target,allocatable ::  MacPRadius(:,:,:)                      !radius of macropores
@@ -59,7 +59,7 @@ contains
   allocate(CCLAY(JZ,JY,JX));     CCLAY=0._r8
   allocate(ROCK(JZ,JY,JX));      ROCK=0._r8
   allocate(SoiBulkDensityt0(JZ,JY,JX));     SoiBulkDensityt0=0._r8
-  allocate(FMPR(0:JZ,JY,JX));    FMPR=0._r8
+  allocate(FracSoiAsMicP(0:JZ,JY,JX));    FracSoiAsMicP=0._r8
   allocate(SoilFracAsMacP(JZ,JY,JX));      SoilFracAsMacP=0._r8
   allocate(PathLenMacP(JZ,JY,JX));      PathLenMacP=0._r8
   allocate(MacPRadius(JZ,JY,JX));      MacPRadius=0._r8
@@ -93,7 +93,7 @@ contains
   call destroy(CCLAY)
   call destroy(ROCK)
   call destroy(SoiBulkDensityt0)
-  call destroy(FMPR)
+  call destroy(FracSoiAsMicP)
   call destroy(SoilFracAsMacP)
   call destroy(PathLenMacP)
   call destroy(MacPRadius)

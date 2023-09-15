@@ -701,7 +701,7 @@ module readiMod
 !
 !   CALCULATE DERIVED SOIL PROPERTIES FROM INPUT SOIL PROPERTIES
 !
-!   FMPR=micropore fraction excluding macropore,rock
+!   FracSoiAsMicP=micropore fraction excluding macropore,rock
 !   SCNV,SCNH=vertical,lateral Ksat converted to m2 MPa-1 h-1
 !   CSAND,CSILT,CCLAY=sand,silt,clay content converted to g Mg-1
 !   CORGC,CORGR=SOC,POC converted to g Mg-1
@@ -715,12 +715,12 @@ module readiMod
           SoiBulkDensity(L,NY,NX)=SoiBulkDensityt0(L,NY,NX)
           IF(isclose(SoiBulkDensity(L,NY,NX),0.0_r8))SoilFracAsMacP(L,NY,NX)=0.0_r8
   !     fraction of soil as micropore
-          FMPR(L,NY,NX)=(1.0_r8-ROCK(L,NY,NX))*(1.0_r8-SoilFracAsMacP(L,NY,NX))
+          FracSoiAsMicP(L,NY,NX)=(1.0_r8-ROCK(L,NY,NX))*(1.0_r8-SoilFracAsMacP(L,NY,NX))
   !     FieldCapacity(L,NY,NX)=FieldCapacity(L,NY,NX)/(1.0-SoilFracAsMacP(L,NY,NX))
   !     WiltPoint(L,NY,NX)=WiltPoint(L,NY,NX)/(1.0-SoilFracAsMacP(L,NY,NX))
   !
-          SatHydroCondVert(L,NY,NX)=0.098_r8*SatHydroCondVert(L,NY,NX)*FMPR(L,NY,NX)
-          SatHydroCondHrzn(L,NY,NX)=0.098_r8*SatHydroCondHrzn(L,NY,NX)*FMPR(L,NY,NX)
+          SatHydroCondVert(L,NY,NX)=0.098_r8*SatHydroCondVert(L,NY,NX)*FracSoiAsMicP(L,NY,NX)
+          SatHydroCondHrzn(L,NY,NX)=0.098_r8*SatHydroCondHrzn(L,NY,NX)*FracSoiAsMicP(L,NY,NX)
           CCLAY(L,NY,NX)=AZMAX1(1.0E+03_r8-(CSAND(L,NY,NX)+CSILT(L,NY,NX)))
           CORGC(L,NY,NX)=CORGC(L,NY,NX)*1.0E+03_r8   !convert from Kg to g C
           CORGR(L,NY,NX)=CORGR(L,NY,NX)*1.0E+03_r8   !convert from Kg to g C
@@ -770,7 +770,7 @@ module readiMod
           ENDIF
         ENDDO
         CORGC(0,NY,NX)=orgcden
-        FMPR(0,NY,NX)=1.0_r8
+        FracSoiAsMicP(0,NY,NX)=1.0_r8
       ENDDO
     ENDDO
   ENDDO

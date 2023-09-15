@@ -173,7 +173,7 @@ implicit none
 
 !derived variables
     real(r8) :: FILM        !soil water film thickness , [m]
-    real(r8) :: TORT        !soil tortuosity, []
+    real(r8) :: TortMicPM        !soil tortuosity, []
 
     real(r8) :: EPOC      !partitioning coefficient between POC and litter, [], hour1.f
     real(r8) :: CCO2S     !aqueous CO2 concentration micropore	[g m-3]
@@ -430,7 +430,7 @@ implicit none
       forc%PSISoilMatricP=PSISE
     ENDIF
     forc%FILM=FilmThickness(forc%PSISoilMatricP)
-    forc%TORT=TortMicporew(THETW)
+    forc%TortMicPM=TortMicporew(THETW)
     forc%THETPM=1._r8-THETW
     forc%VLWatMicP=forc%THETPM*forc%POROS*forc%VLSoilMicP
     forc%VLsoiAirP=forc%VOLA-forc%VLWatMicP
@@ -470,7 +470,7 @@ implicit none
 
   if (first .or. forctype <=2)then
     Z3S=forc%FieldCapacity/forc%POROS
-    XNPD=600.0_r8*XNPG
+    XNPD=600.0_r8*dts_gas
     scalar=forc%TFND*XNPD
     forc%DFGS=fDFGS(scalar,THETW,Z3S)
 
@@ -485,7 +485,7 @@ implicit none
     forc%ZHSGL=ZHSG*TFACG*DFLG2
     forc%HGSGL=HGSG*TFACG*DFLG2
 
-    forc%PARG=forc%AREA3*XNPH/(0.0139_r8+1.39E-03_r8)
+    forc%PARG=forc%AREA3*dts_HeatWatTP/(0.0139_r8+1.39E-03_r8)
     PARGM=forc%PARG*XNPT
     !GASEOUS BOUNDARY LAYER CONDUCTANCES
     PARGCO=PARGM*0.74_r8
@@ -496,13 +496,13 @@ implicit none
     PARGN3=PARGM*1.02_r8
     PARGH2=PARGM*2.08_r8
 
-    DCO2G=forc%CGSGL*XNPG
-    DCH4G=forc%CHSGL*XNPG
-    DOXYG=forc%OGSGL*XNPG
-    DZ2GG=forc%ZGSGL*XNPG
-    DZ2OG=forc%Z2SGL*XNPG
-    DNH3G=forc%ZHSGL*XNPG
-    DH2GG=forc%HGSGL*XNPG
+    DCO2G=forc%CGSGL*dts_gas
+    DCH4G=forc%CHSGL*dts_gas
+    DOXYG=forc%OGSGL*dts_gas
+    DZ2GG=forc%ZGSGL*dts_gas
+    DZ2OG=forc%Z2SGL*dts_gas
+    DNH3G=forc%ZHSGL*dts_gas
+    DH2GG=forc%HGSGL*dts_gas
 
 
     forc%DCO2GQ=DCO2G*PARGCO/(DCO2G+PARGCO)

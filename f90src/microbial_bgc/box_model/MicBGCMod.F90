@@ -825,7 +825,7 @@ module MicBGCMod
 ! RUPOX, ROXYP=O2-limited, O2-unlimited rates of O2 uptake
 ! RUPMX=O2-unlimited rate of O2 uptake
 ! FOXYX=fraction of O2 uptake by N,K relative to total
-! XNPG=1/(NPH*NPT)
+! dts_gas=1/(NPH*NPT)
 ! ROXYF,ROXYL=net O2 gaseous, aqueous fluxes from previous hour
 ! OLSGL=aqueous O2 diffusivity
 ! OXYG,OXYS=gaseous, aqueous O2 amounts
@@ -3057,7 +3057,7 @@ module MicBGCMod
     THETPM => micfor%THETPM, &
     DFGS => micfor%DFGS, &
     FILM => micfor%FILM, &
-    TORT  => micfor%TORT, &
+    TortMicPM  => micfor%TortMicPM, &
     OXYG => micstt%OXYG, &
     OXYS => micstt%OXYS, &
     COXYS => micstt%COXYS, &
@@ -3075,15 +3075,15 @@ module MicBGCMod
       !write(*,*)'MAXIMUM O2 UPAKE FROM POTENTIAL RESPIRATION OF EACH AEROBIC'
       !     POPULATION
       !
-      RUPMX=ROXYP(NGL,K)*XNPG
-      ROXYFX=ROXYF*XNPG*FOXYX
-      OLSGL1=OLSGL*XNPG
+      RUPMX=ROXYP(NGL,K)*dts_gas
+      ROXYFX=ROXYF*dts_gas*FOXYX
+      OLSGL1=OLSGL*dts_gas
       IF(.not.litrm)THEN
         OXYG1=OXYG*FOXYX
-        ROXYLX=ROXYL*XNPG*FOXYX
+        ROXYLX=ROXYL*dts_gas*FOXYX
       ELSE
         OXYG1=COXYG*VLsoiAirPM(1)*FOXYX
-        ROXYLX=(ROXYL+FLQRQ*COXR+FLQRI*COXQ)*XNPG*FOXYX
+        ROXYLX=(ROXYL+FLQRQ*COXR+FLQRI*COXQ)*dts_gas*FOXYX
       ENDIF
       OXYS1=OXYS*FOXYX
 !
@@ -3100,7 +3100,7 @@ module MicBGCMod
         !
         !     VLWatMicPM,VLsoiAirPM,VLSoilPoreMicP=water, air and total volumes
         !     ORAD=microbial radius,FILM=water film thickness
-        !     DIFOX=aqueous O2 diffusion, TORT=tortuosity
+        !     DIFOX=aqueous O2 diffusion, TortMicPM=tortuosity
         !     BIOS=microbial number, OMA=active biomass
         !     SOXYL=O2 solubility, OXKX=Km for O2 uptake
         !     OXYS,COXYS=aqueous O2 amount, concentration
@@ -3110,7 +3110,7 @@ module MicBGCMod
         !write(*,*)'VLSoilMicP=',VLSoilMicP
         THETW1=AZMAX1(safe_adb(VLWatMicPM(M),VLSoilMicP))
         RRADO=ORAD*(FILM(M)+ORAD)/FILM(M)
-        DIFOX=TORT(M)*OLSGL1*12.57_r8*BIOS*OMA(NGL,K)*RRADO
+        DIFOX=TortMicPM(M)*OLSGL1*12.57_r8*BIOS*OMA(NGL,K)*RRADO
         VOLWOX=VLWatMicPM(M)*SOXYL
         VOLPOX=VLsoiAirPM(M)
         VOLWPM=VOLWOX+VOLPOX

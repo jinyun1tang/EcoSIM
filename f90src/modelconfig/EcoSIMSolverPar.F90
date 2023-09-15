@@ -6,17 +6,17 @@ module EcoSIMSolverPar
   character(len=*), private, parameter :: mod_filename = __FILE__
   public
 
-  real(r8) :: XNPX
-  real(r8) :: XNPA
+  real(r8) :: dts_wat        !1/hour, time step for water transport calculation
+  real(r8) :: dts_sno        !1/hour, time step for snow process
   real(r8) :: XNPB
-  real(r8) :: XNPC
+  real(r8) :: dt_watvap      !1/hour, time step for water vapor fluxes
   real(r8) :: XNPD
-  real(r8) :: XNPY
-  real(r8) :: XNPZ
-  real(r8) :: XNPQ
-  real(r8) :: XNPH
+  real(r8) :: dts_snohttp    !1/hour, time step for snow heat computation
+  real(r8) :: dts_litrhtwtp  !1/hour, time step for litter heat 
+  real(r8) :: dts_litrvapht  !1/hour, time step for litter vapor-heat computation
+  real(r8) :: dts_HeatWatTP   !1/hour, time step for heat, water, solute transport
   real(r8) :: XNPT
-  real(r8) :: XNPG
+  real(r8) :: dts_gas         !1/hour, time step for gas flx update
   real(r8) :: XNPR
   real(r8) :: XNPS
   integer :: NPH             !number of model cycles per hour for heat and water fluxes

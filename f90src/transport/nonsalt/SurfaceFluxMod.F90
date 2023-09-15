@@ -244,9 +244,9 @@ contains
 !     DIF*=aqueous diffusivity-dispersivity between litter and soil surface
 !
     DLYR0=AMAX1(ZERO2,DLYR(3,0,NY,NX))
-    TORT0=TORT(M,0,NY,NX)/DLYR0*CVRD(NY,NX)
+    TORT0=TortMicPM(M,0,NY,NX)/DLYR0*FracSurfByLitR(NY,NX)
     DLYR1=AMAX1(ZERO2,DLYR(3,NU(NY,NX),NY,NX))
-    TORT1=TORT(M,NU(NY,NX),NY,NX)/DLYR1
+    TORT1=TortMicPM(M,NU(NY,NX),NY,NX)/DLYR1
     DISPN=DISP(3,NU(NY,NX),NY,NX)*AMIN1(VFLWX,ABS(FLWRM1/AREA(3,NU(NY,NX),NY,NX)))
     DIFOC0=(OCSGL2(0,NY,NX)*TORT0+DISPN)
     DIFON0=(ONSGL2(0,NY,NX)*TORT0+DISPN)
@@ -532,69 +532,69 @@ contains
 !             :N4B=NH4,N3B=NH3,NOB=NO3,N2B=NO2,P1B=HPO4,POB=H2PO4 in band
 !     VLNH4,VLNO3,VLPO4=non-band NH4,NO3,PO4 volume fraction
 !     VLNHB,VLNOB,VLPOB=band NH4,NO3,PO4 volume fraction
-!     XNPH=1/no. of cycles h-1 for water, heat and solute flux calculations
+!     dts_HeatWatTP=1/no. of cycles h-1 for water, heat and solute flux calculations
 !     *H2,*2=macropore,micropore solute content
 !
   IF(VLWatMacPM(M,NU(NY,NX),NY,NX).GT.ZEROS2(NY,NX))THEN
     VLWatMacPS=AMIN1(XFRS*VGeomLayer(NU(NY,NX),NY,NX),VLWatMacPM(M,NU(NY,NX),NY,NX))
     VOLWT=VLWatMicPM(M,NU(NY,NX),NY,NX)+VLWatMacPS
     DO  K=1,jcplx
-      DFVOC(K)=XNPH*(AZMAX1(OQCH2(K,NU(NY,NX),NY,NX))*VLWatMicPM(M,NU(NY,NX),NY,NX) &
+      DFVOC(K)=dts_HeatWatTP*(AZMAX1(OQCH2(K,NU(NY,NX),NY,NX))*VLWatMicPM(M,NU(NY,NX),NY,NX) &
         -AZMAX1(OQC2(K,NU(NY,NX),NY,NX))*VLWatMacPS)/VOLWT
-      DFVON(K)=XNPH*(AZMAX1(OQNH2(K,NU(NY,NX),NY,NX))*VLWatMicPM(M,NU(NY,NX),NY,NX) &
+      DFVON(K)=dts_HeatWatTP*(AZMAX1(OQNH2(K,NU(NY,NX),NY,NX))*VLWatMicPM(M,NU(NY,NX),NY,NX) &
         -AZMAX1(OQN2(K,NU(NY,NX),NY,NX))*VLWatMacPS)/VOLWT
-      DFVOP(K)=XNPH*(AZMAX1(OQPH2(K,NU(NY,NX),NY,NX))*VLWatMicPM(M,NU(NY,NX),NY,NX) &
+      DFVOP(K)=dts_HeatWatTP*(AZMAX1(OQPH2(K,NU(NY,NX),NY,NX))*VLWatMicPM(M,NU(NY,NX),NY,NX) &
         -AZMAX1(OQP2(K,NU(NY,NX),NY,NX))*VLWatMacPS)/VOLWT
-      DFVOA(K)=XNPH*(AZMAX1(OQAH2(K,NU(NY,NX),NY,NX))*VLWatMicPM(M,NU(NY,NX),NY,NX) &
+      DFVOA(K)=dts_HeatWatTP*(AZMAX1(OQAH2(K,NU(NY,NX),NY,NX))*VLWatMicPM(M,NU(NY,NX),NY,NX) &
         -AZMAX1(OQA2(K,NU(NY,NX),NY,NX))*VLWatMacPS)/VOLWT
     ENDDO
 
-    SDifFlx(idg_CO2)=XNPH*(AZMAX1(trc_soHml2(idg_CO2,NU(NY,NX),NY,NX)) &
+    SDifFlx(idg_CO2)=dts_HeatWatTP*(AZMAX1(trc_soHml2(idg_CO2,NU(NY,NX),NY,NX)) &
       *VLWatMicPM(M,NU(NY,NX),NY,NX)-AZMAX1(trc_solml2(idg_CO2,NU(NY,NX),NY,NX))*VLWatMacPS)/VOLWT
-    SDifFlx(idg_CH4)=XNPH*(AZMAX1(trc_soHml2(idg_CH4,NU(NY,NX),NY,NX)) &
+    SDifFlx(idg_CH4)=dts_HeatWatTP*(AZMAX1(trc_soHml2(idg_CH4,NU(NY,NX),NY,NX)) &
       *VLWatMicPM(M,NU(NY,NX),NY,NX)-AZMAX1(trc_solml2(idg_CH4,NU(NY,NX),NY,NX))*VLWatMacPS)/VOLWT
-    SDifFlx(idg_O2)=XNPH*(AZMAX1(trc_soHml2(idg_O2,NU(NY,NX),NY,NX)) &
+    SDifFlx(idg_O2)=dts_HeatWatTP*(AZMAX1(trc_soHml2(idg_O2,NU(NY,NX),NY,NX)) &
       *VLWatMicPM(M,NU(NY,NX),NY,NX)-AZMAX1(trc_solml2(idg_O2,NU(NY,NX),NY,NX))*VLWatMacPS)/VOLWT
-    SDifFlx(idg_N2)=XNPH*(AZMAX1(trc_soHml2(idg_N2,NU(NY,NX),NY,NX)) &
+    SDifFlx(idg_N2)=dts_HeatWatTP*(AZMAX1(trc_soHml2(idg_N2,NU(NY,NX),NY,NX)) &
       *VLWatMicPM(M,NU(NY,NX),NY,NX)-AZMAX1(trc_solml2(idg_N2,NU(NY,NX),NY,NX))*VLWatMacPS)/VOLWT
-    SDifFlx(idg_N2O)=XNPH*(AZMAX1(trc_soHml2(idg_N2O,NU(NY,NX),NY,NX)) &
+    SDifFlx(idg_N2O)=dts_HeatWatTP*(AZMAX1(trc_soHml2(idg_N2O,NU(NY,NX),NY,NX)) &
       *VLWatMicPM(M,NU(NY,NX),NY,NX)-AZMAX1(trc_solml2(idg_N2O,NU(NY,NX),NY,NX))*VLWatMacPS)/VOLWT
-    SDifFlx(idg_H2)=XNPH*(AZMAX1(trc_soHml2(idg_H2,NU(NY,NX),NY,NX)) &
+    SDifFlx(idg_H2)=dts_HeatWatTP*(AZMAX1(trc_soHml2(idg_H2,NU(NY,NX),NY,NX)) &
       *VLWatMicPM(M,NU(NY,NX),NY,NX)-AZMAX1(trc_solml2(idg_H2,NU(NY,NX),NY,NX))*VLWatMacPS)/VOLWT
-    SDifFlx(ids_NH4)=XNPH*(AZMAX1(trc_soHml2(ids_NH4,NU(NY,NX),NY,NX)) &
+    SDifFlx(ids_NH4)=dts_HeatWatTP*(AZMAX1(trc_soHml2(ids_NH4,NU(NY,NX),NY,NX)) &
       *VLWatMicPM(M,NU(NY,NX),NY,NX)-AZMAX1(trc_solml2(ids_NH4,NU(NY,NX),NY,NX))*VLWatMacPS)/VOLWT &
       *trcs_VLN(ids_NH4,NU(NY,NX),NY,NX)
-    SDifFlx(idg_NH3)=XNPH*(AZMAX1(trc_soHml2(idg_NH3,NU(NY,NX),NY,NX)) &
+    SDifFlx(idg_NH3)=dts_HeatWatTP*(AZMAX1(trc_soHml2(idg_NH3,NU(NY,NX),NY,NX)) &
       *VLWatMicPM(M,NU(NY,NX),NY,NX)-AZMAX1(trc_solml2(idg_NH3,NU(NY,NX),NY,NX))*VLWatMacPS)/VOLWT &
       *trcs_VLN(ids_NH4,NU(NY,NX),NY,NX)
-    SDifFlx(ids_NO3)=XNPH*(AZMAX1(trc_soHml2(ids_NO3,NU(NY,NX),NY,NX)) &
+    SDifFlx(ids_NO3)=dts_HeatWatTP*(AZMAX1(trc_soHml2(ids_NO3,NU(NY,NX),NY,NX)) &
       *VLWatMicPM(M,NU(NY,NX),NY,NX)-AZMAX1(trc_solml2(ids_NO3,NU(NY,NX),NY,NX))*VLWatMacPS)/VOLWT &
       *trcs_VLN(ids_NO3,NU(NY,NX),NY,NX)
-    SDifFlx(ids_NO2)=XNPH*(AZMAX1(trc_soHml2(ids_NO2,NU(NY,NX),NY,NX)) &
+    SDifFlx(ids_NO2)=dts_HeatWatTP*(AZMAX1(trc_soHml2(ids_NO2,NU(NY,NX),NY,NX)) &
       *VLWatMicPM(M,NU(NY,NX),NY,NX)-AZMAX1(trc_solml2(ids_NO2,NU(NY,NX),NY,NX))*VLWatMacPS)/VOLWT &
       *trcs_VLN(ids_NO3,NU(NY,NX),NY,NX)
-    SDifFlx(ids_H1PO4)=XNPH*(AZMAX1(trc_soHml2(ids_H1PO4,NU(NY,NX),NY,NX)) &
+    SDifFlx(ids_H1PO4)=dts_HeatWatTP*(AZMAX1(trc_soHml2(ids_H1PO4,NU(NY,NX),NY,NX)) &
       *VLWatMicPM(M,NU(NY,NX),NY,NX)-AZMAX1(trc_solml2(ids_H1PO4,NU(NY,NX),NY,NX))*VLWatMacPS)/VOLWT &
       *trcs_VLN(ids_H1PO4,NU(NY,NX),NY,NX)
-    SDifFlx(ids_H2PO4)=XNPH*(AZMAX1(trc_soHml2(ids_H2PO4,NU(NY,NX),NY,NX)) &
+    SDifFlx(ids_H2PO4)=dts_HeatWatTP*(AZMAX1(trc_soHml2(ids_H2PO4,NU(NY,NX),NY,NX)) &
       *VLWatMicPM(M,NU(NY,NX),NY,NX)-AZMAX1(trc_solml2(ids_H2PO4,NU(NY,NX),NY,NX))*VLWatMacPS)/VOLWT &
       *trcs_VLN(ids_H1PO4,NU(NY,NX),NY,NX)
-    SDifFlx(ids_NH4B)=XNPH*(AZMAX1(trc_soHml2(ids_NH4B,NU(NY,NX),NY,NX)) &
+    SDifFlx(ids_NH4B)=dts_HeatWatTP*(AZMAX1(trc_soHml2(ids_NH4B,NU(NY,NX),NY,NX)) &
       *VLWatMicPM(M,NU(NY,NX),NY,NX)-AZMAX1(trc_solml2(ids_NH4B,NU(NY,NX),NY,NX))*VLWatMacPS)/VOLWT &
       *trcs_VLN(ids_NH4B,NU(NY,NX),NY,NX)
-    SDifFlx(idg_NH3B)=XNPH*(AZMAX1(trc_soHml2(idg_NH3B,NU(NY,NX),NY,NX)) &
+    SDifFlx(idg_NH3B)=dts_HeatWatTP*(AZMAX1(trc_soHml2(idg_NH3B,NU(NY,NX),NY,NX)) &
       *VLWatMicPM(M,NU(NY,NX),NY,NX)-AZMAX1(trc_solml2(idg_NH3B,NU(NY,NX),NY,NX))*VLWatMacPS)/VOLWT &
       *trcs_VLN(ids_NH4B,NU(NY,NX),NY,NX)
-    SDifFlx(ids_NO3B)=XNPH*(AZMAX1(trc_soHml2(ids_NO3B,NU(NY,NX),NY,NX)) &
+    SDifFlx(ids_NO3B)=dts_HeatWatTP*(AZMAX1(trc_soHml2(ids_NO3B,NU(NY,NX),NY,NX)) &
       *VLWatMicPM(M,NU(NY,NX),NY,NX)-AZMAX1(trc_solml2(ids_NO3B,NU(NY,NX),NY,NX))*VLWatMacPS)/VOLWT &
       *trcs_VLN(ids_NO3B,NU(NY,NX),NY,NX)
-    SDifFlx(ids_NO2B)=XNPH*(AZMAX1(trc_soHml2(ids_NO2B,NU(NY,NX),NY,NX)) &
+    SDifFlx(ids_NO2B)=dts_HeatWatTP*(AZMAX1(trc_soHml2(ids_NO2B,NU(NY,NX),NY,NX)) &
       *VLWatMicPM(M,NU(NY,NX),NY,NX)-AZMAX1(trc_solml2(ids_NO2B,NU(NY,NX),NY,NX))*VLWatMacPS)/VOLWT &
       *trcs_VLN(ids_NO3B,NU(NY,NX),NY,NX)
-    SDifFlx(ids_H1PO4B)=XNPH*(AZMAX1(trc_soHml2(ids_H1PO4B,NU(NY,NX),NY,NX)) &
+    SDifFlx(ids_H1PO4B)=dts_HeatWatTP*(AZMAX1(trc_soHml2(ids_H1PO4B,NU(NY,NX),NY,NX)) &
       *VLWatMicPM(M,NU(NY,NX),NY,NX)-AZMAX1(trc_solml2(ids_H1PO4B,NU(NY,NX),NY,NX))*VLWatMacPS)/VOLWT &
       *trcs_VLN(ids_H1PO4B,NU(NY,NX),NY,NX)
-    SDifFlx(ids_H2PO4B)=XNPH*(AZMAX1(trc_soHml2(ids_H2PO4B,NU(NY,NX),NY,NX)) &
+    SDifFlx(ids_H2PO4B)=dts_HeatWatTP*(AZMAX1(trc_soHml2(ids_H2PO4B,NU(NY,NX),NY,NX)) &
       *VLWatMicPM(M,NU(NY,NX),NY,NX)-AZMAX1(trc_solml2(ids_H2PO4B,NU(NY,NX),NY,NX))*VLWatMacPS)/VOLWT &
       *trcs_VLN(ids_H1PO4B,NU(NY,NX),NY,NX)
   ELSE
@@ -880,8 +880,8 @@ contains
 !     IF DRIFT IS FROM CURRENT TO ADJACENT GRID CELL
 !
         ELSEIF(QSM(M,N,N5,N4).GT.ZEROS2(N2,N1))THEN
-          IF(VOLS(N2,N1).GT.ZEROS2(N2,N1))THEN
-            VFLW=AZMAX1(AMIN1(VFLWX,QSM(M,N,N5,N4)/VOLS(N2,N1)))
+          IF(VcumSnoDWI(N2,N1).GT.ZEROS2(N2,N1))THEN
+            VFLW=AZMAX1(AMIN1(VFLWX,QSM(M,N,N5,N4)/VcumSnoDWI(N2,N1)))
           ELSE
             VFLW=VFLWX
           ENDIF
@@ -898,8 +898,8 @@ contains
 !     IF DRIFT IS TO CURRENT FROM ADJACENT GRID CELL
 !
         ELSEIF(QSM(M,N,N5,N4).LT.-ZEROS2(N2,N1))THEN
-          IF(VOLS(N5,N4).GT.ZEROS2(N5,N4))THEN
-            VFLW=AZMIN1(AMAX1(-VFLWX,QSM(M,N,N5,N4)/VOLS(N5,N4)))
+          IF(VcumSnoDWI(N5,N4).GT.ZEROS2(N5,N4))THEN
+            VFLW=AZMIN1(AMAX1(-VFLWX,QSM(M,N,N5,N4)/VcumSnoDWI(N5,N4)))
           ELSE
             VFLW=-VFLWX
           ENDIF
@@ -1088,7 +1088,7 @@ contains
 
   IF(VGeomLayer(0,NY,NX).GT.ZEROS2(NY,NX).AND.VLWatMicPM(M,0,NY,NX).GT.ZEROS2(NY,NX))THEN
     DLYR0=AMAX1(ZERO2,DLYR(3,0,NY,NX)) !vertical layer thickness
-    TORT0=TORT(M,0,NY,NX)*AREA(3,NU(NY,NX),NY,NX)/(0.5_r8*DLYR0)*CVRD(NY,NX)
+    TORT0=TortMicPM(M,0,NY,NX)*AREA(3,NU(NY,NX),NY,NX)/(0.5_r8*DLYR0)*FracSurfByLitR(NY,NX)
 
     DO NTG=idg_beg,idg_end-1
       DFGcc(NTG)=SolDifcc(NTG,0,NY,NX)*TORT0
@@ -1194,7 +1194,7 @@ contains
     VLWatMicPPA=VLWatMicPM(M,NU(NY,NX),NY,NX)*trcs_VLN(ids_H1PO4,NU(NY,NX),NY,NX)
     VLWatMicPPB=VLWatMicPM(M,NU(NY,NX),NY,NX)*trcs_VLN(ids_H1PO4B,NU(NY,NX),NY,NX)
     DLYR1=AMAX1(ZERO2,DLYR(3,NU(NY,NX),NY,NX))
-    TORT1=TORT(M,NU(NY,NX),NY,NX)*AREA(3,NU(NY,NX),NY,NX)/(0.5_r8*DLYR1)
+    TORT1=TortMicPM(M,NU(NY,NX),NY,NX)*AREA(3,NU(NY,NX),NY,NX)/(0.5_r8*DLYR1)
 
     D8910: DO  K=1,jcplx
       COQC2(K)=AZMAX1(OQC2(K,NU(NY,NX),NY,NX)/VLWatMicPM(M,NU(NY,NX),NY,NX))
@@ -1319,7 +1319,7 @@ contains
   real(r8) :: VFLWNH4,VFLWPO4,VFLWPOB
   integer  :: NTG,NTS,NTN
 !
-!     VHCPWM,VHCPWX=current,minimum volumetric heat capacity of snowpack
+!     VHCPWM,VLHeatCapSnowMN=current,minimum volumetric heat capacity of snowpack
 !     VOLWSL=snowpack water content
 !     FLQWM=snowpack water flux
 !     R*BLS=solute flux in snowpack
@@ -1328,11 +1328,11 @@ contains
 !
   ICHKL=0
   DO  L=1,JS
-    IF(VHCPWM(M,L,NY,NX).GT.VHCPWX(NY,NX))THEN
+    IF(VHCPWM(M,L,NY,NX).GT.VLHeatCapSnowMN(NY,NX))THEN
       L2=MIN(JS,L+1)
-      IF(L.LT.JS.AND.VHCPWM(M,L2,NY,NX).GT.VHCPWX(NY,NX))THEN
-        IF(VOLWSL(L,NY,NX).GT.ZEROS2(NY,NX))THEN
-          VFLWW=AZMAX1(AMIN1(1.0,FLQWM(M,L2,NY,NX)/VOLWSL(L,NY,NX)))
+      IF(L.LT.JS.AND.VHCPWM(M,L2,NY,NX).GT.VLHeatCapSnowMN(NY,NX))THEN
+        IF(VLWatSnow(L,NY,NX).GT.ZEROS2(NY,NX))THEN
+          VFLWW=AZMAX1(AMIN1(1.0,FLQWM(M,L2,NY,NX)/VLWatSnow(L,NY,NX)))
         ELSE
           VFLWW=1.0
         ENDIF
@@ -1363,12 +1363,12 @@ contains
 !     CO2W,CH4W,OXYW,ZNGW,ZN2W,ZN4W,ZN3W,ZNOW,Z1PW,ZHPW=CO2,CH4,O2,N2,N2O,H2 content in snowpack
 !
         IF(ICHKL.EQ.0)THEN
-          IF(VOLWSL(L,NY,NX).GT.ZEROS2(NY,NX))THEN
-            VFLWR=AZMAX1(AMIN1(1.0_r8,FLQRM(M,NY,NX)/VOLWSL(L,NY,NX)))
-            VFLWS=AZMAX1(AMIN1(1.0_r8,(FLQSM(M,NY,NX)+FLQHM(M,NY,NX))/VOLWSL(L,NY,NX)))
+          IF(VLWatSnow(L,NY,NX).GT.ZEROS2(NY,NX))THEN
+            VFLWR=AZMAX1(AMIN1(1.0_r8,FLQRM(M,NY,NX)/VLWatSnow(L,NY,NX)))
+            VFLWS=AZMAX1(AMIN1(1.0_r8,(FLQSM(M,NY,NX)+FLQHM(M,NY,NX))/VLWatSnow(L,NY,NX)))
           ELSE
-            VFLWR=CVRD(NY,NX)
-            VFLWS=BARE(NY,NX)
+            VFLWR=FracSurfByLitR(NY,NX)
+            VFLWS=FracSurfAsBareSoi(NY,NX)
           ENDIF
           VFLWNH4=VFLWS*trcs_VLN(ids_NH4,NU(NY,NX),NY,NX)
           VFLWNHB=VFLWS*trcs_VLN(ids_NH4B,NU(NY,NX),NY,NX)

@@ -6,16 +6,16 @@ module SurfSoilDataType
   public
   save
   character(len=*), private, parameter :: mod_filename = __FILE__
-  real(r8),target,allocatable ::  FSNW(:,:)                          !fraction of snow cover
-  real(r8),target,allocatable ::  FSNX(:,:)                          !fraction of snow-free cover
+  real(r8),target,allocatable ::  FracSurfAsSnow(:,:)                !fraction of snow cover
+  real(r8),target,allocatable ::  FracSurfSnoFree(:,:)               !fraction of snow-free cover
+  real(r8),target,allocatable ::  FracSurfAsBareSoi(:,:)             !fraction of exposed soil surface, [-]
   real(r8),target,allocatable ::  THRMG(:,:)                         !longwave radiation emitted from ground surface, [MJ d-2 t-1]
   real(r8),target,allocatable ::  HEATI(:,:)                         !total net radiation at ground surface, [MJ d-2 t-1]
   real(r8),target,allocatable ::  HEATE(:,:)                         !total latent heat flux at ground surface, [MJ d-2 t-1]
   real(r8),target,allocatable ::  HEATS(:,:)                         !total sensible heat flux at ground surface, [MJ d-2 t-1]
   real(r8),target,allocatable ::  HEATV(:,:)                         !total convective heat flux at ground surface, [MJ d-2 t-1]
   real(r8),target,allocatable ::  HEATH(:,:)                         !total ground heat flux at ground surface, [MJ d-2 t-1]
-  real(r8),target,allocatable ::  TEVAPG(:,:)                        !total evaporation at ground surface, [m3 d-2 t-1]
-  real(r8),target,allocatable ::  BARE(:,:)                          !fraction of exposed soil surface, [-]
+  real(r8),target,allocatable ::  VapXAir2GSurf(:,:)                        !negative of total evaporation at ground surface, [m3 d-2 t-1]
   real(r8),target,allocatable ::  VOLWG(:,:)                         !surface water storage capacity, [m3 d-2]
   real(r8),target,allocatable ::  VOLWD(:,:)                         !soil surface water retention capacity
   real(r8),target,allocatable ::  VHCPNX(:,:)                        !minimum heat capacities
@@ -32,16 +32,16 @@ contains
   subroutine InitSurfSoilData
 
   implicit none
-  allocate(FSNW(JY,JX));        FSNW=0._r8
-  allocate(FSNX(JY,JX));        FSNX=0._r8
+  allocate(FracSurfAsSnow(JY,JX));        FracSurfAsSnow=0._r8
+  allocate(FracSurfSnoFree(JY,JX));        FracSurfSnoFree=0._r8
   allocate(THRMG(JY,JX));       THRMG=0._r8
   allocate(HEATI(JY,JX));       HEATI=0._r8
   allocate(HEATE(JY,JX));       HEATE=0._r8
   allocate(HEATS(JY,JX));       HEATS=0._r8
   allocate(HEATV(JY,JX));       HEATV=0._r8
   allocate(HEATH(JY,JX));       HEATH=0._r8
-  allocate(TEVAPG(JY,JX));      TEVAPG=0._r8
-  allocate(BARE(JY,JX));        BARE=0._r8
+  allocate(VapXAir2GSurf(JY,JX));      VapXAir2GSurf=0._r8
+  allocate(FracSurfAsBareSoi(JY,JX));        FracSurfAsBareSoi=0._r8
   allocate(VOLWG(JY,JX));       VOLWG=0._r8
   allocate(VOLWD(JY,JX));       VOLWD=0._r8
   allocate(VHCPNX(JY,JX));      VHCPNX=0._r8
@@ -58,16 +58,16 @@ contains
   subroutine DestructSurfSoilData
   use abortutils, only : destroy
   implicit none
-  call destroy(FSNW)
-  call destroy(FSNX)
+  call destroy(FracSurfAsSnow)
+  call destroy(FracSurfSnoFree)
   call destroy(THRMG)
   call destroy(HEATI)
   call destroy(HEATE)
   call destroy(HEATS)
   call destroy(HEATV)
   call destroy(HEATH)
-  call destroy(TEVAPG)
-  call destroy(BARE)
+  call destroy(VapXAir2GSurf)
+  call destroy(FracSurfAsBareSoi)
   call destroy(VOLWG)
   call destroy(VOLWD)
   call destroy(VHCPNX)

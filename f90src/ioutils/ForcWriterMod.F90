@@ -263,7 +263,7 @@ implicit none
     call ncd_putvar(ncf,'EHUM',EHUM(L,NY,NX))
     call ncd_putvar(ncf,'EPOC',EPOC(L,NY,NX))
     call ncd_putvar(ncf,'THETY',THETY(L,NY,NX))
-    call ncd_putvar(ncf,'PSIMX',LOGPSIMX(NY,NX))
+    call ncd_putvar(ncf,'PSIMX',LOGPSIFLD(NY,NX))
     call ncd_putvar(ncf,'PSIMD',LOGPSIMND(NY,NX))
     call ncd_putvar(ncf,'PSIMS',LOGPSIAtSat(NY,NX))
     call ncd_putvar(ncf,'PSISD',LOGPSIMXD(NY,NX))

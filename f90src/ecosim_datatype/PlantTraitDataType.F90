@@ -17,25 +17,25 @@ module PlantTraitDataType
   real(r8),target,allocatable :: FWODLE(:,:)             !element allocation for leaf
   real(r8),target,allocatable :: FWODRE(:,:)
   real(r8),target,allocatable :: FWOODE(:,:)             !woody C allocation
-  real(r8),target,allocatable ::  ARSTK(:,:,:,:,:)                   !stem layer area, [m2 d-2]
-  real(r8),target,allocatable ::  ARLFP(:,:,:)                       !plant leaf area, [m2 d-2]
-  real(r8),target,allocatable ::  ARLFS(:,:,:)                       !plant leaf area, [m2 d-2]
+  real(r8),target,allocatable ::  CanPLBSA(:,:,:,:,:)              !stem layer area, [m2 d-2]
+  real(r8),target,allocatable ::  CanPLA(:,:,:)                       !plant leaf area, [m2 d-2]
+  real(r8),target,allocatable ::  CanPA(:,:,:)                       !plant canopy leaf+stem/stalk area, [m2 d-2]
   real(r8),target,allocatable ::  ARLFX(:,:)                         !total canopy leaf area, [m2 d-2]
-  real(r8),target,allocatable ::  ARSTP(:,:,:)                       !plant stem area, [m2 d-2]
+  real(r8),target,allocatable ::  CanPSA(:,:,:)                      !plant stem area, [m2 d-2]
   real(r8),target,allocatable ::  CanopyHeight(:,:,:)                          !canopy height, [m]
   real(r8),target,allocatable ::  ARSTX(:,:)                         !total canopy stem area, [m2 d-2]
   real(r8),target,allocatable ::  ARLFT(:,:,:)                       !total leaf area, [m2 d-2]
   real(r8),target,allocatable ::  ARSTT(:,:,:)                       !total stem area, [m2 d-2]
-  real(r8),target,allocatable ::  ARLFC(:,:)                         !total canopy leaf area, [m2 d-2]
-  real(r8),target,allocatable ::  ARSTC(:,:)                         !total canopy stem area, [m2 d-2]
-  real(r8),target,allocatable ::  ARLSS(:,:)                         !stalk area of combined,each PFT canopy
-  integer ,target,allocatable ::  NG(:,:,:)                           !soil layer at planting depth, [-]
-  real(r8),target,allocatable ::  SDPTHI(:,:,:)                      !planting depth, [m]
-  real(r8),target,allocatable ::  SDPTH(:,:,:)                       !seeding depth, [m]
-  real(r8),target,allocatable ::  SDVL(:,:,:)                        !seed volume, [m3 ]
-  real(r8),target,allocatable ::  SDLG(:,:,:)                        !seed length, [m]
-  real(r8),target,allocatable ::  SDAR(:,:,:)                        !seed surface area, [m2]
-  real(r8),target,allocatable ::  HTCTL(:,:,:)                       !cotyledon height, [m]
+  real(r8),target,allocatable ::  CanGLA(:,:)                         !grid level plant canopy leaf area, [m2 d-2]
+  real(r8),target,allocatable ::  StemAreag(:,:)                     !total canopy stem area, [m2 d-2]
+  real(r8),target,allocatable ::  CanGA(:,:)                         !canopy area of combined over the grid [m2 d-2]
+  integer ,target,allocatable ::  NGTopRootLayer(:,:,:)                           !soil layer at planting depth, [-]
+  real(r8),target,allocatable ::  PlantinDepth(:,:,:)                      !planting depth, [m]
+  real(r8),target,allocatable ::  SeedinDepth(:,:,:)                       !seeding depth, [m]
+  real(r8),target,allocatable ::  SeedVolume(:,:,:)                        !seed volume, [m3 ]
+  real(r8),target,allocatable ::  SeedLength(:,:,:)                        !seed length, [m]
+  real(r8),target,allocatable ::  SeedArea(:,:,:)                        !seed surface area, [m2]
+  real(r8),target,allocatable ::  HypoctoylHeight(:,:,:)                       !cotyledon height, [m]
   real(r8),target,allocatable ::  GridMaxCanopyHeight(:,:)                            !canopy height , [m]
   real(r8),target,allocatable ::  CanopyHeightz(:,:,:)                          !canopy layer height , [m]
   real(r8),target,allocatable ::  ANGBR(:,:,:)                       !branching angle, [degree from horizontal]
@@ -45,7 +45,7 @@ module PlantTraitDataType
   real(r8),target,allocatable ::  ARLF(:,:,:,:,:)                    !leaf area, [m2 d-2]
   real(r8),target,allocatable ::  HTSHE(:,:,:,:,:)                   !sheath height, [m]
   real(r8),target,allocatable ::  HTNODE(:,:,:,:,:)                  !internode height, [m]
-  real(r8),target,allocatable ::  ARLFB(:,:,:,:)                     !branch leaf area, [m2 d-2]
+  real(r8),target,allocatable ::  CanPBLA(:,:,:,:)                     !branch leaf area, [m2 d-2]
   real(r8),target,allocatable ::  ARLFZ(:,:,:,:)                     !branch leaf area, [m2 d-2]
   real(r8),target,allocatable ::  HTSHEX(:,:,:,:)                    !branch height, [m]
   real(r8),target,allocatable ::  GRNOB(:,:,:,:)                     !branch grain number, [d-2]
@@ -86,7 +86,7 @@ module PlantTraitDataType
   real(r8),target,allocatable ::  PPZ(:,:,:)                         !plant population at seeding, [m-2]
   real(r8),target,allocatable ::  WSTR(:,:,:)                        !canopy plant water stress indicator, number of hours PSILT < PSILY, []
   real(r8),target,allocatable ::  PlantO2Stress(:,:,:)                        !plant O2 stress indicator, []
-  real(r8),target,allocatable ::  TFN3(:,:,:)                        !canopy temperature growth function, [-]
+  real(r8),target,allocatable ::  fTgrowCanP(:,:,:)                  !canopy temperature growth function, [-]
   real(r8),target,allocatable ::  TCG(:,:,:)                         !canopy growth temperature, [oC]
   real(r8),target,allocatable ::  TKG(:,:,:)                         !canopy growth temperature, [K]
   real(r8),target,allocatable ::  DMSHE(:,:,:)                       !sheath growth yield, [g g-1]
@@ -139,15 +139,15 @@ module PlantTraitDataType
   real(r8),target,allocatable ::  SNL1(:,:,:)                        !internode length:mass during growth, [m g-1]
   real(r8),target,allocatable ::  FNOD(:,:,:)                        !parameter for allocation of growth to nodes, [-]
   integer,target,allocatable ::  NNOD(:,:,:)                         !number of concurrently growing nodes
-  real(r8),target,allocatable ::  PSILZ(:,:,:)                       !minimum daily canopy water potential, [MPa]
+  real(r8),target,allocatable ::  PSICanPDailyMin(:,:,:)                       !minimum daily canopy water potential, [MPa]
   real(r8),target,allocatable ::  CFX(:,:,:)                         !clumping factor for self-shading in canopy layer at current LAI, [-]
   real(r8),target,allocatable ::  CF(:,:,:)                          !clumping factor for self-shading in canopy layer, [-]
   integer,target,allocatable ::  IDTHP(:,:,:)                        !flag to detect canopy death , [-]
   real(r8),target,allocatable ::  STMX(:,:,:)                        !maximum grain node number per branch, [-]
   real(r8),target,allocatable ::  SDMX(:,:,:)                        !maximum grain number per node , [-]
-  real(r8),target,allocatable ::  GRMX(:,:,:)                        !maximum grain size   , [g]
+  real(r8),target,allocatable ::  MaxSeedCMass(:,:,:)                        !maximum grain size   , [g]
   real(r8),target,allocatable ::  XTLI(:,:,:)                        !number of nodes in seed, [-]
-  real(r8),target,allocatable ::  GRDM(:,:,:)                        !grain size at seeding, [g]
+  real(r8),target,allocatable ::  SeedCMass(:,:,:)                        !grain size at seeding, [g]
   real(r8),target,allocatable ::  GFILL(:,:,:)                       !maximum rate of fill per grain, [g h-1]
   real(r8),target,allocatable ::  FLG4(:,:,:,:)                      !flag to detect physiological maturity from  grain fill , [-]
   real(r8),target,allocatable ::  ATRP(:,:,:,:)                      !counter for mobilizing nonstructural C during spring leafout/dehardening, [h]
@@ -174,25 +174,25 @@ contains
   allocate(FWODBE(npelms,1:n_pltlitrk));  FWODBE=0._r8
   allocate(FWODRE(npelms,1:n_pltlitrk));  FWODRE=0._r8         !
   allocate(FWOODE(npelms,1:n_pltlitrk));  FWOODE=0._r8         !woody element allocation
-  allocate(ARSTK(JC,JBR,JP,JY,JX));ARSTK=0._r8
-  allocate(ARLFP(JP,JY,JX));    ARLFP=0._r8
-  allocate(ARLFS(JP,JY,JX));    ARLFS=0._r8
+  allocate(CanPLBSA(JC,JBR,JP,JY,JX));CanPLBSA=0._r8
+  allocate(CanPLA(JP,JY,JX));    CanPLA=0._r8
+  allocate(CanPA(JP,JY,JX));    CanPA=0._r8
   allocate(ARLFX(JY,JX));       ARLFX=0._r8
-  allocate(ARSTP(JP,JY,JX));    ARSTP=0._r8
+  allocate(CanPSA(JP,JY,JX));    CanPSA=0._r8
   allocate(CanopyHeight(JP,JY,JX));       CanopyHeight=0._r8
   allocate(ARSTX(JY,JX));       ARSTX=0._r8
   allocate(ARLFT(JC,JY,JX));    ARLFT=0._r8
   allocate(ARSTT(JC,JY,JX));    ARSTT=0._r8
-  allocate(ARLFC(JY,JX));       ARLFC=0._r8
-  allocate(ARSTC(JY,JX));       ARSTC=0._r8
-  allocate(ARLSS(JY,JX));       ARLSS=0._r8
-  allocate(NG(JP,JY,JX));       NG=0
-  allocate(SDPTHI(JP,JY,JX));   SDPTHI=0._r8
-  allocate(SDPTH(JP,JY,JX));    SDPTH=0._r8
-  allocate(SDVL(JP,JY,JX));     SDVL=0._r8
-  allocate(SDLG(JP,JY,JX));     SDLG=0._r8
-  allocate(SDAR(JP,JY,JX));     SDAR=0._r8
-  allocate(HTCTL(JP,JY,JX));    HTCTL=0._r8
+  allocate(CanGLA(JY,JX));       CanGLA=0._r8
+  allocate(StemAreag(JY,JX));       StemAreag=0._r8
+  allocate(CanGA(JY,JX));       CanGA=0._r8
+  allocate(NGTopRootLayer(JP,JY,JX));       NGTopRootLayer=0
+  allocate(PlantinDepth(JP,JY,JX));   PlantinDepth=0._r8
+  allocate(SeedinDepth(JP,JY,JX));    SeedinDepth=0._r8
+  allocate(SeedVolume(JP,JY,JX));     SeedVolume=0._r8
+  allocate(SeedLength(JP,JY,JX));     SeedLength=0._r8
+  allocate(SeedArea(JP,JY,JX));     SeedArea=0._r8
+  allocate(HypoctoylHeight(JP,JY,JX));    HypoctoylHeight=0._r8
   allocate(GridMaxCanopyHeight(JY,JX));          GridMaxCanopyHeight=0._r8
   allocate(CanopyHeightz(0:JC,JY,JX));     CanopyHeightz=0._r8
   allocate(ANGBR(JP,JY,JX));    ANGBR=0._r8
@@ -202,7 +202,7 @@ contains
   allocate(ARLF(0:JNODS,JBR,JP,JY,JX));ARLF=0._r8
   allocate(HTSHE(0:JNODS,JBR,JP,JY,JX));HTSHE=0._r8
   allocate(HTNODE(0:JNODS,JBR,JP,JY,JX));HTNODE=0._r8
-  allocate(ARLFB(JBR,JP,JY,JX)); ARLFB=0._r8
+  allocate(CanPBLA(JBR,JP,JY,JX)); CanPBLA=0._r8
   allocate(ARLFZ(JBR,JP,JY,JX)); ARLFZ=0._r8
   allocate(HTSHEX(JBR,JP,JY,JX));HTSHEX=0._r8
   allocate(GRNOB(JBR,JP,JY,JX)); GRNOB=0._r8
@@ -243,7 +243,7 @@ contains
   allocate(PPZ(JP,JY,JX));      PPZ=0._r8
   allocate(WSTR(JP,JY,JX));     WSTR=0._r8
   allocate(PlantO2Stress(JP,JY,JX));     PlantO2Stress=0._r8
-  allocate(TFN3(JP,JY,JX));     TFN3=0._r8
+  allocate(fTgrowCanP(JP,JY,JX));     fTgrowCanP=0._r8
   allocate(TCG(JP,JY,JX));      TCG=0._r8
   allocate(TKG(JP,JY,JX));      TKG=0._r8
   allocate(DMSHE(JP,JY,JX));    DMSHE=0._r8
@@ -296,15 +296,15 @@ contains
   allocate(SNL1(JP,JY,JX));     SNL1=0._r8
   allocate(FNOD(JP,JY,JX));     FNOD=0._r8
   allocate(NNOD(JP,JY,JX));     NNOD=0
-  allocate(PSILZ(JP,JY,JX));    PSILZ=0._r8
+  allocate(PSICanPDailyMin(JP,JY,JX));    PSICanPDailyMin=0._r8
   allocate(CFX(JP,JY,JX));      CFX=0._r8
   allocate(CF(JP,JY,JX));       CF=0._r8
   allocate(IDTHP(JP,JY,JX));    IDTHP=0
   allocate(STMX(JP,JY,JX));     STMX=0._r8
   allocate(SDMX(JP,JY,JX));     SDMX=0._r8
-  allocate(GRMX(JP,JY,JX));     GRMX=0._r8
+  allocate(MaxSeedCMass(JP,JY,JX));     MaxSeedCMass=0._r8
   allocate(XTLI(JP,JY,JX));     XTLI=0._r8
-  allocate(GRDM(JP,JY,JX));     GRDM=0._r8
+  allocate(SeedCMass(JP,JY,JX));     SeedCMass=0._r8
   allocate(GFILL(JP,JY,JX));    GFILL=0._r8
   allocate(FLG4(JBR,JP,JY,JX));  FLG4=0._r8
   allocate(ATRP(JBR,JP,JY,JX));  ATRP=0._r8
@@ -328,25 +328,25 @@ contains
   call destroy(FWODBE)
   call destroy(FWODRE)
   call destroy(FWOODE)
-  call destroy(ARSTK)
-  call destroy(ARLFP)
-  call destroy(ARLFS)
+  call destroy(CanPLBSA)
+  call destroy(CanPLA)
+  call destroy(CanPA)
   call destroy(ARLFX)
-  call destroy(ARSTP)
+  call destroy(CanPSA)
   call destroy(CanopyHeight)
   call destroy(ARSTX)
   call destroy(ARLFT)
   call destroy(ARSTT)
-  call destroy(ARLFC)
-  call destroy(ARSTC)
-  call destroy(ARLSS)
-  call destroy(NG)
-  call destroy(SDPTHI)
-  call destroy(SDPTH)
-  call destroy(SDVL)
-  call destroy(SDLG)
-  call destroy(SDAR)
-  call destroy(HTCTL)
+  call destroy(CanGLA)
+  call destroy(StemAreag)
+  call destroy(CanGA)
+  call destroy(NGTopRootLayer)
+  call destroy(PlantinDepth)
+  call destroy(SeedinDepth)
+  call destroy(SeedVolume)
+  call destroy(SeedLength)
+  call destroy(SeedArea)
+  call destroy(HypoctoylHeight)
   call destroy(GridMaxCanopyHeight)
   call destroy(CanopyHeightz)
   call destroy(ANGBR)
@@ -356,7 +356,7 @@ contains
   call destroy(ARLF)
   call destroy(HTSHE)
   call destroy(HTNODE)
-  call destroy(ARLFB)
+  call destroy(CanPBLA)
   call destroy(ARLFZ)
   call destroy(HTSHEX)
   call destroy(GRNOB)
@@ -397,7 +397,7 @@ contains
   call destroy(PPZ)
   call destroy(WSTR)
   call destroy(PlantO2Stress)
-  call destroy(TFN3)
+  call destroy(fTgrowCanP)
   call destroy(TCG)
   call destroy(TKG)
   call destroy(DMSHE)
@@ -450,15 +450,15 @@ contains
   call destroy(SNL1)
   call destroy(FNOD)
   call destroy(NNOD)
-  call destroy(PSILZ)
+  call destroy(PSICanPDailyMin)
   call destroy(CFX)
   call destroy(CF)
   call destroy(IDTHP)
   call destroy(STMX)
   call destroy(SDMX)
-  call destroy(GRMX)
+  call destroy(MaxSeedCMass)
   call destroy(XTLI)
-  call destroy(GRDM)
+  call destroy(SeedCMass)
   call destroy(GFILL)
   call destroy(FLG4)
   call destroy(ATRP)

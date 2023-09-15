@@ -37,7 +37,7 @@ module SoilWaterDataType
   real(r8),target,allocatable ::  XVOLTM(:,:,:)                     !excess water+ice
   real(r8),target,allocatable ::  XVLWatMicPM(:,:,:)                     !excess water
   real(r8),target,allocatable ::  XVLiceMicPM(:,:,:)                     !excess ice
-  real(r8),target,allocatable ::  SatHydroCond3D(:,:,:,:,:)                   !saturated hydraulic conductivity
+  real(r8),target,allocatable ::  HydroCond3D(:,:,:,:,:)                   !hydraulic conductivity at different moisture levels
   real(r8),target,allocatable ::  HydroCondMacP(:,:,:)                       !macropore hydraulic conductivity, [m MPa-1 h-1]
   real(r8),target,allocatable ::  CNDU(:,:,:)                       !soil micropore hydraulic conductivity for root water uptake [m MPa-1 h-1]
   real(r8),target,allocatable ::  QRM(:,:,:)                        !runoff water flux, [m3 d-2 t-1]
@@ -65,8 +65,8 @@ module SoilWaterDataType
   real(r8),target,allocatable ::  FLQSM(:,:,:)                      !meltwater flux into soil micropores
   real(r8),target,allocatable ::  FLQHM(:,:,:)                      !meltwater flux into soil macropores
   real(r8),target,allocatable ::  THETPM(:,:,:,:)                   !soil air-filled porosity, [m3 m-3]
-  real(r8),target,allocatable ::  TORT(:,:,:,:)                     !soil tortuosity, []
-  real(r8),target,allocatable ::  TORTH(:,:,:,:)                    !macropore tortuosity, []
+  real(r8),target,allocatable ::  TortMicPM(:,:,:,:)                     !soil tortuosity, []
+  real(r8),target,allocatable ::  TortMacPM(:,:,:,:)                    !macropore tortuosity, []
   real(r8),target,allocatable ::  DFGS(:,:,:,:)                     !coefficient for dissolution - volatilization, []
   real(r8),target,allocatable ::  RSCS(:,:,:)                       !soil hydraulic resistance, [MPa h m-2]
   real(r8),target,allocatable ::  PSISE(:,:,:)                      !soil water potential at saturation, [Mpa]
@@ -131,7 +131,7 @@ module SoilWaterDataType
   allocate(XVOLTM(60,JY,JX));   XVOLTM=0._r8
   allocate(XVLWatMicPM(60,JY,JX));   XVLWatMicPM=0._r8
   allocate(XVLiceMicPM(60,JY,JX));   XVLiceMicPM=0._r8
-  allocate(SatHydroCond3D(3,100,0:JZ,JY,JX));SatHydroCond3D=0._r8
+  allocate(HydroCond3D(3,100,0:JZ,JY,JX));HydroCond3D=0._r8
   allocate(HydroCondMacP(JZ,JY,JX));     HydroCondMacP=0._r8
   allocate(CNDU(JZ,JY,JX));     CNDU=0._r8
   allocate(QRM(60,JV,JH));      QRM=0._r8
@@ -159,8 +159,8 @@ module SoilWaterDataType
   allocate(FLQSM(60,JY,JX));    FLQSM=0._r8
   allocate(FLQHM(60,JY,JX));    FLQHM=0._r8
   allocate(THETPM(60,0:JZ,JY,JX));THETPM=0._r8
-  allocate(TORT(60,0:JZ,JY,JX));TORT=0._r8
-  allocate(TORTH(60,JZ,JY,JX)); TORTH=0._r8
+  allocate(TortMicPM(60,0:JZ,JY,JX));TortMicPM=0._r8
+  allocate(TortMacPM(60,JZ,JY,JX)); TortMacPM=0._r8
   allocate(DFGS(60,0:JZ,JY,JX));DFGS=0._r8
   allocate(RSCS(JZ,JY,JX));     RSCS=0._r8
   allocate(PSISE(0:JZ,JY,JX));  PSISE=0._r8
@@ -217,7 +217,7 @@ module SoilWaterDataType
   call destroy(XVOLTM)
   call destroy(XVLWatMicPM)
   call destroy(XVLiceMicPM)
-  call destroy(SatHydroCond3D)
+  call destroy(HydroCond3D)
   call destroy(HydroCondMacP)
   call destroy(CNDU)
   call destroy(QRM)
@@ -245,8 +245,8 @@ module SoilWaterDataType
   call destroy(FLQSM)
   call destroy(FLQHM)
   call destroy(THETPM)
-  call destroy(TORT)
-  call destroy(TORTH)
+  call destroy(TortMicPM)
+  call destroy(TortMacPM)
   call destroy(DFGS)
   call destroy(RSCS)
   call destroy(PSISE)
