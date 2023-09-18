@@ -29,7 +29,9 @@ implicit none
   write(*,*) "In Init_EcoSIM_Soil"
   write(*,*) "Setting Mesh..."
 
-  call SetMesh(NHW,NVN,NHE,NVS)
+  !call SetMesh(NHW,NVN,NHE,NVS)
+
+  call SetMeshATS(NHW,NVN,NHE,NVS)
 
   write(*,*) "Finished mesh, Allocating ..."
 

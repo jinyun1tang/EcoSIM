@@ -6,6 +6,7 @@ set(TOOLS_SOURCES
   restartTest.F90
   NamelistTest.F90
   HFileTest.F90
+	EcoATSTest.F90
 )
 
 include_directories(${ECOSIM_INCLUDE_DIRS})
@@ -29,6 +30,7 @@ add_ecosim_executable(etimerTest.x etimerTest.F90)
 add_ecosim_executable(NamelistTest.x NamelistTest.F90)
 add_ecosim_executable(HFileTest.x HFileTest.F90)
 add_ecosim_executable(restartTest.x restartTest.F90)
+add_ecosim_executable(EcoATSTest.x EcoATSTest.F90)
 
 if (NOT CMAKE_INSTALL_PREFIX STREQUAL "INSTALL_DISABLED")
   install(TARGETS ClimTransformer.x DESTINATION bin)
@@ -38,6 +40,7 @@ if (NOT CMAKE_INSTALL_PREFIX STREQUAL "INSTALL_DISABLED")
   install(TARGETS NamelistTest.x DESTINATION bin)
   install(TARGETS HFileTest.x DESTINATION bin)
   install(TARGETS restartTest.x DESTINATION bin)
+  install(TARGETS EcoATSTest.x DESTINATION bin)
   file(GLOB HEADERS *.mod)
   install(FILES ${HEADERS} DESTINATION include/)
 endif()
