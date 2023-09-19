@@ -143,73 +143,73 @@ implicit none
     CPO4(L,NY,NX)=CPO4(L-1,NY,NX)
     write(*,*) "3"
     !9/12 - error seems to be here
-    CAL(L,NY,NX)=CAL(L-1,NY,NX)
-    write(*,*) "4"
-    CFE(L,NY,NX)=CFE(L-1,NY,NX)
-    write(*,*) "5"
-    CCA(L,NY,NX)=CCA(L-1,NY,NX)
-    write(*,*) "6"
-    CMG(L,NY,NX)=CMG(L-1,NY,NX)
-    write(*,*) "7"
-    CNA(L,NY,NX)=CNA(L-1,NY,NX)
-    write(*,*) "8"
-    CKA(L,NY,NX)=CKA(L-1,NY,NX)
-    write(*,*) "9"
-    CSO4(L,NY,NX)=CSO4(L-1,NY,NX)
-    write(*,*) "10"
-    CCL(L,NY,NX)=CCL(L-1,NY,NX)
-    write(*,*) "11"
-    CALOH(L,NY,NX)=CALOH(L-1,NY,NX)
-    write(*,*) "12"
-    CFEOH(L,NY,NX)=CFEOH(L-1,NY,NX)
-    write(*,*) "13"
-    CCACO(L,NY,NX)=CCACO(L-1,NY,NX)
-    write(*,*) "14"
-    CCASO(L,NY,NX)=CCASO(L-1,NY,NX)
-    write(*,*) "15"
-    CALPO(L,NY,NX)=CALPO(L-1,NY,NX)
-    write(*,*) "16"
-    CFEPO(L,NY,NX)=CFEPO(L-1,NY,NX)
-    write(*,*) "17"
-    CCAPD(L,NY,NX)=CCAPD(L-1,NY,NX)
-    write(*,*) "18"
-    CCAPH(L,NY,NX)=CCAPH(L-1,NY,NX)
-    write(*,*) "19"
-    GKC4(L,NY,NX)=GKC4(L-1,NY,NX)
-    write(*,*) "20"
-    GKCH(L,NY,NX)=GKCH(L-1,NY,NX)
-    write(*,*) "21"
-    GKCA(L,NY,NX)=GKCA(L-1,NY,NX)
-    write(*,*) "22"
-    GKCM(L,NY,NX)=GKCM(L-1,NY,NX)
-    write(*,*) "23"
-    GKCN(L,NY,NX)=GKCN(L-1,NY,NX)
-    write(*,*) "24"
-    GKCK(L,NY,NX)=GKCK(L-1,NY,NX)
-    write(*,*) "25"
-    THW(L,NY,NX)=THW(L-1,NY,NX)
-    write(*,*) "26"
-    THI(L,NY,NX)=THI(L-1,NY,NX)
-    write(*,*) "27"
-    ISOIL(1:4,L,NY,NX)=ISOIL(1:4,L-1,NY,NX)
-    write(*,*) "28"
-    RSC(k_fine_litr,L,NY,NX)=0.0_r8
-    write(*,*) "29"
-    RSN(k_fine_litr,L,NY,NX)=0.0_r8
-    write(*,*) "30"
-    RSP(k_fine_litr,L,NY,NX)=0.0_r8
-    write(*,*) "31"
-    RSC(k_woody_litr,L,NY,NX)=0.0_r8
-    write(*,*) "32"
-    RSN(k_woody_litr,L,NY,NX)=0.0_r8
-    write(*,*) "33"
-    RSP(k_woody_litr,L,NY,NX)=0.0_r8
-    write(*,*) "34"
-    RSC(k_manure,L,NY,NX)=0.0_r8
-    write(*,*) "35"
-    RSN(k_manure,L,NY,NX)=0.0_r8
-    write(*,*) "36"
-    RSP(k_manure,L,NY,NX)=0.0_r8
+    !CAL(L,NY,NX)=CAL(L-1,NY,NX)
+    !write(*,*) "4"
+    !CFE(L,NY,NX)=CFE(L-1,NY,NX)
+    !write(*,*) "5"
+    !CCA(L,NY,NX)=CCA(L-1,NY,NX)
+    !write(*,*) "6"
+    !CMG(L,NY,NX)=CMG(L-1,NY,NX)
+    !write(*,*) "7"
+    !CNA(L,NY,NX)=CNA(L-1,NY,NX)
+    !write(*,*) "8"
+    !CKA(L,NY,NX)=CKA(L-1,NY,NX)
+    !write(*,*) "9"
+    !CSO4(L,NY,NX)=CSO4(L-1,NY,NX)
+    !write(*,*) "10"
+    !CCL(L,NY,NX)=CCL(L-1,NY,NX)
+    !write(*,*) "11"
+    !CALOH(L,NY,NX)=CALOH(L-1,NY,NX)
+    !write(*,*) "12"
+    !CFEOH(L,NY,NX)=CFEOH(L-1,NY,NX)
+    !write(*,*) "13"
+    !CCACO(L,NY,NX)=CCACO(L-1,NY,NX)
+    !write(*,*) "14"
+    !CCASO(L,NY,NX)=CCASO(L-1,NY,NX)
+    !write(*,*) "15"
+    !CALPO(L,NY,NX)=CALPO(L-1,NY,NX)
+    !write(*,*) "16"
+    !CFEPO(L,NY,NX)=CFEPO(L-1,NY,NX)
+    !write(*,*) "17"
+    !CCAPD(L,NY,NX)=CCAPD(L-1,NY,NX)
+    !write(*,*) "18"
+    !CCAPH(L,NY,NX)=CCAPH(L-1,NY,NX)
+    !write(*,*) "19"
+    !GKC4(L,NY,NX)=GKC4(L-1,NY,NX)
+    !write(*,*) "20"
+    !GKCH(L,NY,NX)=GKCH(L-1,NY,NX)
+    !write(*,*) "21"
+    !GKCA(L,NY,NX)=GKCA(L-1,NY,NX)
+    !write(*,*) "22"
+    !GKCM(L,NY,NX)=GKCM(L-1,NY,NX)
+    !write(*,*) "23"
+    !GKCN(L,NY,NX)=GKCN(L-1,NY,NX)
+    !write(*,*) "24"
+    !GKCK(L,NY,NX)=GKCK(L-1,NY,NX)
+    !write(*,*) "25"
+    !THW(L,NY,NX)=THW(L-1,NY,NX)
+    !write(*,*) "26"
+    !THI(L,NY,NX)=THI(L-1,NY,NX)
+    !write(*,*) "27"
+    !ISOIL(1:4,L,NY,NX)=ISOIL(1:4,L-1,NY,NX)
+    !write(*,*) "28"
+    !RSC(k_fine_litr,L,NY,NX)=0.0_r8
+    !write(*,*) "29"
+    !RSN(k_fine_litr,L,NY,NX)=0.0_r8
+    !write(*,*) "30"
+    !RSP(k_fine_litr,L,NY,NX)=0.0_r8
+    !write(*,*) "31"
+    !RSC(k_woody_litr,L,NY,NX)=0.0_r8
+    !write(*,*) "32"
+    !RSN(k_woody_litr,L,NY,NX)=0.0_r8
+    !write(*,*) "33"
+    !RSP(k_woody_litr,L,NY,NX)=0.0_r8
+    !write(*,*) "34"
+    !RSC(k_manure,L,NY,NX)=0.0_r8
+    !write(*,*) "35"
+    !RSN(k_manure,L,NY,NX)=0.0_r8
+    !write(*,*) "36"
+    !RSP(k_manure,L,NY,NX)=0.0_r8
   ENDDO
   END associate
   end subroutine SetDeepSoil
