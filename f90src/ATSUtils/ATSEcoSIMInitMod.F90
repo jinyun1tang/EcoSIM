@@ -16,7 +16,7 @@ implicit none
 
   subroutine Init_EcoSIM_Soil(NYS)
   use EcoSimConst
-  use GridMod           , only : SetMesh
+  use GridMod           , only : SetMeshATS
   use InitAllocMod
   use StartsMod, only : startsim
   implicit none

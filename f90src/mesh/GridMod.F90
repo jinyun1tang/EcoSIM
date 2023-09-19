@@ -4,7 +4,7 @@ implicit none
   private
   character(len=*), parameter :: mod_filename = &
   __FILE__
-  public :: SetMesh
+  public :: SetMesh, SetMeshATS
   public :: get_col, get_pft
 contains
 
