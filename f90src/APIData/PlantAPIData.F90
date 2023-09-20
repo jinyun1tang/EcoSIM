@@ -50,7 +50,7 @@ implicit none
   real(r8) :: PPT       !total plant population, [d-2]
   real(r8) :: POROS1    !top layer soil porosity
   real(r8) :: UA        !wind speed, [m h-1]
-  real(r8), pointer :: TBALE(:)  => null() !total plant element balance	g d-2
+  real(r8), pointer :: PlantElemntStoreLandscape(:)  => null() !total plant element balance	g d-2
   real(r8) :: WindMesHeight        !wind speed measurement height, [m]
   real(r8) :: ZEROS2    !threshold zero
   real(r8) :: ZEROS     !threshold zero
@@ -72,7 +72,7 @@ implicit none
   real(r8), pointer :: AREA3(:)   => null()    !soil cross section area (vertical plan defined by its normal direction)
   integer,  pointer :: IDATA(:)   => null()    !time keeper
   real(r8), pointer :: BALE(:,:)  => null()    !plant element balance, [g d-2]
-  real(r8), pointer :: CDPTHZ(:)  => null()    !depth to bottom of soil layer from  surface of grid cell [m]
+  real(r8), pointer :: CumSoilThickness(:)  => null()    !depth to bottom of soil layer from  surface of grid cell [m]
   real(r8), pointer :: PPI(:)     => null()    !initial plant population, [m-2]
   real(r8), pointer :: PPZ(:)     => null()    !plant population at seeding, [m-2]
   real(r8), pointer :: PPX(:)     => null()    !plant population, [m-2]
@@ -546,7 +546,7 @@ implicit none
   real(r8) :: TSH       !ecosystem sensible heat flux, [MJ d-2 h-1]
   real(r8) :: RoughHeight        !canopy surface roughness height, [m]
   real(r8) :: ZeroPlanDisp        !zero plane displacement height, [m]
-  real(r8) :: RAB       !isothermal boundary layer resistance, [h m-1]
+  real(r8) :: BndlResistAboveCanG       !isothermal boundary layer resistance, [h m-1]
   real(r8) :: RIB       !Richardson number for calculating boundary layer resistance, [-]
   real(r8) :: TGH       !ecosystem storage heat flux, [MJ d-2 h-1]
   real(r8), pointer :: PTrans(:)     => null()    !canopy transpiration, [m2 d-2 h-1]
@@ -993,7 +993,7 @@ implicit none
   class(plant_siteinfo_type) :: this
 
 
-  allocate(this%TBALE(npelms))
+  allocate(this%PlantElemntStoreLandscape(npelms))
   allocate(this%FracSoiAsMicP(0:JZ1))
   allocate(this%DATAP(JP1))
   allocate(this%DATA(30))
@@ -1001,7 +1001,7 @@ implicit none
   allocate(this%IDATA(60))
   allocate(this%DLYR3(0:JZ1))
   allocate(this%BALE(npelms,JP1))
-  allocate(this%CDPTHZ(0:JZ1))
+  allocate(this%CumSoilThickness(0:JZ1))
   allocate(this%DPTHZ(0:JZ1))
   allocate(this%PPI(JP1))
   allocate(this%PPZ(JP1))
@@ -1028,12 +1028,12 @@ implicit none
 !  if(allocated(FILM))deallocate(FILM)
 !  if(allocated(DATAP))deallocate(DATAP)
 !  if(allocated(DATA))deallocate(DATA)
-!  call Destroy(this%TBALE)
+!  call Destroy(this%PlantElemntStoreLandscape)
 !  if(allocated(AREA3))deallocate(AREA3)
 !  if(allocated(IDATA))deallocate(IDATA)
 !  if(allocated(BALE))deallocate(BALE)
 !  if(allocated(BALP))deallocate(BALP)
-!  if(allocated(CDPTHZ))deallocate(CDPTHZ)
+!  if(allocated(CumSoilThickness))deallocate(CumSoilThickness)
 !  if(allocated(DPTHZ))deallocate(DPTHZ)
 !  if(allocated(PPI)) deallocate(PPI)
 !  if(allocated(PPZ)) deallocate(PPZ)

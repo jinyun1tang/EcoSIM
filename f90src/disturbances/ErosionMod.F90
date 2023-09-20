@@ -322,7 +322,7 @@ module ErosionMod
             M4=NX+1
             M5=NY
             XN=-1.0_r8
-            RCHQF=RCHQE(M2,M1)
+            RCHQF=RechargEastSurf(M2,M1)
           ELSE
             cycle
           ENDIF
@@ -333,7 +333,7 @@ module ErosionMod
             M4=NX
             M5=NY
             XN=1.0_r8
-            RCHQF=RCHQW(M5,M4)
+            RCHQF=RechargWestSurf(M5,M4)
           ELSE
             cycle
           ENDIF
@@ -350,7 +350,7 @@ module ErosionMod
             M4=NX
             M5=NY+1
             XN=-1.0_r8
-            RCHQF=RCHQS(M2,M1)
+            RCHQF=RechargSouthSurf(M2,M1)
           ELSE
             cycle
           ENDIF
@@ -361,7 +361,7 @@ module ErosionMod
             M4=NX
             M5=NY
             XN=1.0_r8
-            RCHQF=RCHQN(M5,M4)
+            RCHQF=RechargNorthSurf(M5,M4)
           ELSE
             cycle
           ENDIF
@@ -807,7 +807,7 @@ module ErosionMod
                   M4=NX+1
                   M5=NY
                   XN=-1.0_r8
-                  RCHQF=RCHQE(M2,M1)
+                  RCHQF=RechargEastSurf(M2,M1)
                 ELSE
                   cycle
                 ENDIF
@@ -818,7 +818,7 @@ module ErosionMod
                   M4=NX
                   M5=NY
                   XN=1.0_r8
-                  RCHQF=RCHQW(M5,M4)
+                  RCHQF=RechargWestSurf(M5,M4)
                 ELSE
                   cycle
                 ENDIF
@@ -833,7 +833,7 @@ module ErosionMod
                   M4=NX
                   M5=NY+1
                   XN=-1.0_r8
-                  RCHQF=RCHQS(M2,M1)
+                  RCHQF=RechargSouthSurf(M2,M1)
                 ELSE
                   cycle
                 ENDIF
@@ -844,7 +844,7 @@ module ErosionMod
                   M4=NX
                   M5=NY
                   XN=1.0_r8
-                  RCHQF=RCHQN(M5,M4)
+                  RCHQF=RechargNorthSurf(M5,M4)
                 ELSE
                   cycle
                 ENDIF

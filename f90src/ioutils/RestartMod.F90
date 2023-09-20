@@ -3282,16 +3282,16 @@ implicit none
 
   if(flag=='read')then
     dat1pr => datic_1d
-    call restartvar(ncid, flag, varname='IDTBL', dim1name='column',&
+    call restartvar(ncid, flag, varname='IDWaterTable', dim1name='column',&
        long_name='water table flag from site file', units='none', &
        interpinic_flag='skip', data=dat1pr, missing_value=ispval, &
        fill_value=ispval)
-    call cpcol(flag,NHW,NHE,NVN,NVS,IDTBL,datic_1d)
+    call cpcol(flag,NHW,NHE,NVN,NVS,IDWaterTable,datic_1d)
   else
-    !print*,'IDTBL'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,IDTBL,datic_1d)  
+    !print*,'IDWaterTable'
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,IDWaterTable,datic_1d)  
     dat1pr => datic_1d
-    call restartvar(ncid, flag, varname='IDTBL', dim1name='column',&
+    call restartvar(ncid, flag, varname='IDWaterTable', dim1name='column',&
        long_name='water table flag from site file', units='none', &
        interpinic_flag='skip', data=dat1pr, missing_value=ispval, &
        fill_value=ispval)
@@ -3436,17 +3436,17 @@ implicit none
 
   if(flag=='read')then
     datpr1 => datrc_1d  
-    call restartvar(ncid, flag, varname='THRMG', dim1name='column',&
-       long_name='longwave radiation emitted from ground surface', units='MJ d-2 h-1', &
+    call restartvar(ncid, flag, varname='LWRadBySurf', dim1name='column',&
+       long_name='longwave radiation emitted from ground surface (including snow and litter)', units='MJ d-2 h-1', &
        interpinic_flag='skip', data=datpr1, missing_value=spval, &
        fill_value=spval)
-    call cpcol(flag,NHW,NHE,NVN,NVS,THRMG,datrc_1d)
+    call cpcol(flag,NHW,NHE,NVN,NVS,LWRadBySurf,datrc_1d)
   else
-    !print*,'THRMG'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,THRMG,datrc_1d)  
+    !print*,'LWRadBySurf'
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,LWRadBySurf,datrc_1d)  
     datpr1 => datrc_1d    
-    call restartvar(ncid, flag, varname='THRMG', dim1name='column',&
-       long_name='longwave radiation emitted from ground surface', units='MJ d-2 h-1', &
+    call restartvar(ncid, flag, varname='LWRadBySurf', dim1name='column',&
+       long_name='longwave radiation emitted from ground surface  (including snow and litter)', units='MJ d-2 h-1', &
        interpinic_flag='skip', data=datpr1, missing_value=spval, &
        fill_value=spval)
   endif  
@@ -4440,17 +4440,17 @@ implicit none
 
   if(flag=='read')then
     datpr1 => datrc_1d            
-    call restartvar(ncid, flag, varname='DTBLZ', dim1name='column',&
-       long_name='external water table depth', units='m', &
+    call restartvar(ncid, flag, varname='ExtWaterTablet0', dim1name='column',&
+       long_name='initial external water table depth', units='m', &
        interpinic_flag='skip', data=datpr1, missing_value=spval, &
        fill_value=spval)    
-    call cpcol(flag,NHW,NHE,NVN,NVS,DTBLZ,datrc_1d) 
+    call cpcol(flag,NHW,NHE,NVN,NVS,ExtWaterTablet0,datrc_1d) 
   else
-    !print*,'DTBLZ'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,DTBLZ,datrc_1d)   
+    !print*,'ExtWaterTablet0'
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,ExtWaterTablet0,datrc_1d)   
     datpr1 => datrc_1d              
-    call restartvar(ncid, flag, varname='DTBLZ', dim1name='column',&
-       long_name='external water table depth', units='m', &
+    call restartvar(ncid, flag, varname='ExtWaterTablet0', dim1name='column',&
+       long_name='initial external water table depth', units='m', &
        interpinic_flag='skip', data=datpr1, missing_value=spval, &
        fill_value=spval)    
   endif  
@@ -4678,17 +4678,17 @@ implicit none
 
   if(flag=='read')then
     datpr1 => datrc_1d      
-    call restartvar(ncid, flag, varname='DTBLX', dim1name='column',&
-       long_name='external water table depth', units='m', &
+    call restartvar(ncid, flag, varname='ExtWaterTable', dim1name='column',&
+       long_name='current external water table depth', units='m', &
        interpinic_flag='skip', data=datpr1, missing_value=spval, &
        fill_value=spval)    
-    call cpcol(flag,NHW,NHE,NVN,NVS,DTBLX,datrc_1d) 
+    call cpcol(flag,NHW,NHE,NVN,NVS,ExtWaterTable,datrc_1d) 
   else
-    !print*,'DTBLX'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,DTBLX,datrc_1d)   
+    !print*,'ExtWaterTable'
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,ExtWaterTable,datrc_1d)   
     datpr1 => datrc_1d        
-    call restartvar(ncid, flag, varname='DTBLX', dim1name='column',&
-       long_name='external water table depth', units='m', &
+    call restartvar(ncid, flag, varname='ExtWaterTable', dim1name='column',&
+       long_name='current external water table depth', units='m', &
        interpinic_flag='skip', data=datpr1, missing_value=spval, &
        fill_value=spval)    
   endif  
@@ -5088,17 +5088,17 @@ implicit none
 
   if(flag=='read')then
     datpr2 => datrc_2d(1:ncols,1:JZ+1)        
-    call restartvar(ncid, flag, varname='CDPTHZ', dim1name='column',dim2name='levsoi1',&
-       long_name='depth to bottom of soil layer from  surface of grid cell', units='m', &
+    call restartvar(ncid, flag, varname='CumSoilThickness', dim1name='column',dim2name='levsoi1',&
+       long_name='depth to bottom of soil layer from grid surface', units='m', &
        interpinic_flag='skip', data=datpr2, missing_value=spval, &
        fill_value=spval)    
-    call cpcol(flag,NHW,NHE,NVN,NVS,CDPTHZ,datrc_2d) 
+    call cpcol(flag,NHW,NHE,NVN,NVS,CumSoilThickness,datrc_2d) 
   else
-    !print*,'CDPTHZ'
-    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,CDPTHZ,datrc_2d)   
+    !print*,'CumSoilThickness'
+    if(flag=='write')call cpcol(flag,NHW,NHE,NVN,NVS,CumSoilThickness,datrc_2d)   
     datpr2 => datrc_2d(1:ncols,1:JZ+1)        
-    call restartvar(ncid, flag, varname='CDPTHZ', dim1name='column',dim2name='levsoi1',&
-       long_name='depth to bottom of soil layer from  surface of grid cell', units='m', &
+    call restartvar(ncid, flag, varname='CumSoilThickness', dim1name='column',dim2name='levsoi1',&
+       long_name='depth to bottom of soil layer from grid surface', units='m', &
        interpinic_flag='skip', data=datpr2, missing_value=spval, &
        fill_value=spval)    
   endif  

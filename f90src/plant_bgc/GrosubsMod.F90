@@ -169,7 +169,7 @@ module grosubsMod
     TCO2T   => plt_bgcr%TCO2T    , &
     CARBN   => plt_bgcr%CARBN    , &
     TEUPTK  => plt_rbgc%TEUPTK   , &
-    CDPTHZ  => plt_site%CDPTHZ   , &
+    CumSoilThickness  => plt_site%CumSoilThickness   , &
     PlantinDepth  => plt_morph%PlantinDepth  , &
     NBR     => plt_morph%NBR       &
   )
@@ -182,7 +182,7 @@ module grosubsMod
         IF(IFLGE(NB,NZ).EQ.0.AND.VRNS(NB,NZ).GE.VRNL(NB,NZ))THEN
           IDAY0(NZ)=I
           IYR0(NZ)=IYRC
-          PlantinDepth(NZ)=0.005_r8+CDPTHZ(0)
+          PlantinDepth(NZ)=0.005_r8+CumSoilThickness(0)
           IFLGI(NZ)=ifalse
         ENDIF
       ENDIF

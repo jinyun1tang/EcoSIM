@@ -50,7 +50,7 @@ module IngridTranspMod
 !
 !     CONVECTIVE SOLUTE EXCHANGE BETWEEN RESIDUE AND SOIL SURFACE
 !
-      FLWRM1=FLWRM(M,NY,NX)
+      FLWRM1=WatFLo2LitrM(M,NY,NX)
 !
 !     FLWRM=litter-soil water flux from watsub.f
 
@@ -89,7 +89,7 @@ module IngridTranspMod
 !     SURFACE LAYER FROM WATER EXCHANGE IN 'WATSUB' AND
 !     FROM MACROPORE OR MICROPORE SOLUTE CONCENTRATIONS
 !
-!     FINHM=macro-micropore water transfer from watsub.f
+!     FWatExMacP2MicPM=macro-micropore water transfer from watsub.f
 !     VLWatMicPM,VLWatMacPM=micropore,macropore water volume
 !     RFL*=convective macropore-micropore solute transfer
 !     VLNH4,VLNO3,VLPO4=non-band NH4,NO3,PO4 volume fraction
@@ -108,12 +108,12 @@ module IngridTranspMod
 !
 !     MACROPORE TO MICROPORE TRANSFER
 !
-      IF(FINHM(M,NU(NY,NX),NY,NX).GT.0.0)THEN
+      IF(FWatExMacP2MicPM(M,NU(NY,NX),NY,NX).GT.0.0)THEN
         call MacToMicPoreSoluteAdvExchange(M,NY,NX)
 !
 !     MICROPORE TO MACROPORE TRANSFER
 !
-      ELSEIF(FINHM(M,NU(NY,NX),NY,NX).LT.0.0)THEN
+      ELSEIF(FWatExMacP2MicPM(M,NU(NY,NX),NY,NX).LT.0.0)THEN
         call MicToMacPoreSoluteAdvExchange(M,NY,NX)
 !
 !     NO MACROPORE TO MICROPORE TRANSFER
@@ -223,7 +223,7 @@ module IngridTranspMod
 !
 !     VHCPWM,VLHeatCapSnowMN=current,minimum volumetric heat capacity of snowpack
 !     VOLWSL=snowpack water content
-!     FLQWM=snowpack water flux
+!     WatFlowInSnowM=snowpack water flux
 !     R*BLS=solute flux in snowpack
 !     X*BLS=hourly solute flux in snowpack
 !
@@ -233,7 +233,7 @@ module IngridTranspMod
       L2=MIN(JS,L+1)
       IF(L.LT.JS.AND.VHCPWM(M,L2,NY,NX).GT.VLHeatCapSnowMN(NY,NX))THEN
         IF(VLWatSnow(L,NY,NX).GT.ZEROS2(NY,NX))THEN
-          VFLWW=AZMAX1(AMIN1(1.0_r8,FLQWM(M,L2,NY,NX)/VLWatSnow(L,NY,NX)))
+          VFLWW=AZMAX1(AMIN1(1.0_r8,WatFlowInSnowM(M,L2,NY,NX)/VLWatSnow(L,NY,NX)))
         ELSE
           VFLWW=1.0_r8
         ENDIF
@@ -251,7 +251,7 @@ module IngridTranspMod
 !     SNOWPACK SOLUTE DISCHARGE TO SURFACE LITTER, SOIL SURFACE
 !
 !     VOLWSL=snowpack water content
-!     FLQRM,FLQSM,FLQHM=total water flux to litter,soil micropore,macropore
+!     WatFlowSno2LitRM,WatFlowSno2MicPM,WatFlowSno2MacPM=total water flux to litter,soil micropore,macropore
 !     CVRD,BARE=litter cover fraction,1-CVRD
 !     VLNH4,VLNO3,VLPO4=non-band NH4,NO3,PO4 volume fraction
 !     VLNHB,VLNOB,VLPOB=band NH4,NO3,PO4 volume fraction
@@ -260,8 +260,8 @@ module IngridTranspMod
 !
         IF(ICHKL.EQ.0)THEN
           IF(VLWatSnow(L,NY,NX).GT.ZEROS2(NY,NX))THEN
-            VFLWR=AZMAX1(AMIN1(1.0_r8,FLQRM(M,NY,NX)/VLWatSnow(L,NY,NX)))
-            VFLWS=AZMAX1(AMIN1(1.0_r8,(FLQSM(M,NY,NX)+FLQHM(M,NY,NX))/VLWatSnow(L,NY,NX)))
+            VFLWR=AZMAX1(AMIN1(1.0_r8,WatFlowSno2LitRM(M,NY,NX)/VLWatSnow(L,NY,NX)))
+            VFLWS=AZMAX1(AMIN1(1.0_r8,(WatFlowSno2MicPM(M,NY,NX)+WatFlowSno2MacPM(M,NY,NX))/VLWatSnow(L,NY,NX)))
           ELSE
             VFLWR=FracSurfByLitR(NY,NX)
             VFLWS=FracSurfAsBareSoi(NY,NX)
@@ -620,7 +620,7 @@ module IngridTranspMod
 !     begin_execution
 
   IF(VLWatMacPM(M,NU(NY,NX),NY,NX).GT.ZEROS2(NY,NX))THEN
-    VFLW=AZMAX1(AMIN1(VFLWX,FINHM(M,NU(NY,NX),NY,NX)/VLWatMacPM(M,NU(NY,NX),NY,NX)))
+    VFLW=AZMAX1(AMIN1(VFLWX,FWatExMacP2MicPM(M,NU(NY,NX),NY,NX)/VLWatMacPM(M,NU(NY,NX),NY,NX)))
   ELSE
     VFLW=VFLWX
   ENDIF
@@ -656,7 +656,7 @@ module IngridTranspMod
   real(r8) :: VFLW
 !     begin_execution
   IF(VLWatMicPM(M,NU(NY,NX),NY,NX).GT.ZEROS2(NY,NX))THEN
-    VFLW=AZMIN1(AMAX1(-VFLWX,FINHM(M,NU(NY,NX),NY,NX)/VLWatMicPM(M,NU(NY,NX),NY,NX)))
+    VFLW=AZMIN1(AMAX1(-VFLWX,FWatExMacP2MicPM(M,NU(NY,NX),NY,NX)/VLWatMicPM(M,NU(NY,NX),NY,NX)))
   ELSE
     VFLW=-VFLWX
   ENDIF
@@ -1472,7 +1472,7 @@ module IngridTranspMod
 !     LAYER FROM WATER EXCHANGE IN 'WATSUB' AND
 !     FROM MACROPORE OR MICROPORE SOLUTE CONCENTRATIONS
 !
-!     FINHM=macro-micropore water transfer from watsub.f
+!     FWatExMacP2MicPM=macro-micropore water transfer from watsub.f
 !     VLWatMicPM,VLWatMacPM=micropore,macropore water volume
 !     RFL*=convective macropore-micropore solute transfer
 !     VLNH4,VLNO3,VLPO4=non-band NH4,NO3,PO4 volume fraction
@@ -1491,9 +1491,9 @@ module IngridTranspMod
 !
 !     MACROPORE TO MICROPORE TRANSFER
 !
-  IF(FINHM(M,N6,N5,N4).GT.0.0)THEN
+  IF(FWatExMacP2MicPM(M,N6,N5,N4).GT.0.0)THEN
     IF(VLWatMacPM(M,N6,N5,N4).GT.ZEROS2(NY,NX))THEN
-      VFLW=AZMAX1(AMIN1(VFLWX,FINHM(M,N6,N5,N4)/VLWatMacPM(M,N6,N5,N4)))
+      VFLW=AZMAX1(AMIN1(VFLWX,FWatExMacP2MicPM(M,N6,N5,N4)/VLWatMacPM(M,N6,N5,N4)))
     ELSE
       VFLW=VFLWX
     ENDIF
@@ -1511,9 +1511,9 @@ module IngridTranspMod
 !
 !     MICROPORE TO MACROPORE TRANSFER
 !
-  ELSEIF(FINHM(M,N6,N5,N4).LT.0.0)THEN
+  ELSEIF(FWatExMacP2MicPM(M,N6,N5,N4).LT.0.0)THEN
     IF(VLWatMicPM(M,N6,N5,N4).GT.ZEROS2(NY,NX))THEN
-      VFLW=AZMIN1(AMAX1(-VFLWX,FINHM(M,N6,N5,N4)/VLWatMicPM(M,N6,N5,N4)))
+      VFLW=AZMIN1(AMAX1(-VFLWX,FWatExMacP2MicPM(M,N6,N5,N4)/VLWatMicPM(M,N6,N5,N4)))
     ELSE
       VFLW=-VFLWX
     ENDIF
@@ -1701,14 +1701,15 @@ module IngridTranspMod
 !
   IFLGB=0
   DO  L=1,NL(NY,NX)
-    N1=NX
-    N2=NY
-    N3=L
+
+    N1=NX;N2=NY;N3=L
 !
 !     LOCATE INTERNAL BOUNDARIES BETWEEN ADJACENT GRID CELLS
 !
-    DO  N=NCN(N2,N1),3
+    DO  N=FlowDirIndicator(N2,N1),3
+
       IF(N.EQ.1)THEN
+        !west-east
         IF(NX.EQ.NHE)THEN
           cycle
         ELSE
@@ -1717,6 +1718,7 @@ module IngridTranspMod
           N6=L
         ENDIF
       ELSEIF(N.EQ.2)THEN
+        !north-south
         IF(NY.EQ.NVS)THEN
           cycle
         ELSE
@@ -1725,6 +1727,7 @@ module IngridTranspMod
           N6=L
         ENDIF
       ELSEIF(N.EQ.3)THEN
+        !vertical
         IF(L.EQ.NL(NY,NX))THEN
           cycle
         ELSE
@@ -1733,6 +1736,7 @@ module IngridTranspMod
           N6=L+1
         ENDIF
       ENDIF
+
       DO LL=N6,NL(NY,NX)
         IF(VLSoilPoreMicP(LL,N5,N4).GT.ZEROS2(N5,N4))THEN
           N6=LL

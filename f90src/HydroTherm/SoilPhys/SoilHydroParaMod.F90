@@ -23,7 +23,7 @@ implicit none
   private
   character(len=*), parameter :: mod_filename = __FILE__
   real(r8), parameter :: FORGW=0.25E+06_r8 !threshold for  C concentration in organic soil 	g Mg-1
-  real(r8), parameter :: mGravAcceleration=1.e-3_r8*GravAcceleration  !gravitational constant devided by 1000.  
+  real(r8), parameter :: mGravAccelerat=1.e-3_r8*GravAcceleration  !gravitational constant devided by 1000.  
 
   public :: GetSoilHydraulicVars
   public :: SoilHydroProperty
@@ -92,11 +92,11 @@ contains
 !
 !     SOIL OSMOTIC, GRAVIMETRIC AND MATRIC WATER POTENTIALS
 !
-!     PSISM,PSISO,PSISH,PSIST=matric,osmotic,gravimetric,total water potential
+!     PSISM,PSISO,PSIGrav,PSIST=matric,osmotic,gravimetric,total water potential
 !
     PSISoilOsmotic(L,NY,NX)=-RGAS*1.E-6_r8*TKS(L,NY,NX)*CION(L,NY,NX)
-    PSISH(L,NY,NX)=mGravAcceleration*(ALT(NY,NX)-DPTH(L,NY,NX))
-    TotalSoilH2OPSIMPa(L,NY,NX)=AZMIN1(PSISoilMatricP(L,NY,NX)+PSISoilOsmotic(L,NY,NX)+PSISH(L,NY,NX))
+    PSIGrav(L,NY,NX)=mGravAccelerat*(ALT(NY,NX)-SoiDepthMidLay(L,NY,NX))
+    TotalSoilH2OPSIMPa(L,NY,NX)=AZMIN1(PSISoilMatricP(L,NY,NX)+PSISoilOsmotic(L,NY,NX)+PSIGrav(L,NY,NX))
 
 !
 !     SOIL RESISTANCE TO ROOT PENETRATION
@@ -206,8 +206,8 @@ contains
       !first time step at the beginning year
       !THW=initial soil water content 
       !DPTH=depth to middle of soil layer [m]
-      !DTBLZ=external water table depth, [m]
-      IF(THW(L,NY,NX).GT.1.0_r8.OR.DPTH(L,NY,NX).GE.DTBLZ(NY,NX))THEN
+      !ExtWaterTablet0=external water table depth, [m]
+      IF(THW(L,NY,NX).GT.1.0_r8.OR.SoiDepthMidLay(L,NY,NX).GE.ExtWaterTablet0(NY,NX))THEN
         !below the water table, thus it is saturated
         THETW(L,NY,NX)=POROS(L,NY,NX)
       ELSEIF(isclose(THW(L,NY,NX),1._r8))THEN
@@ -221,7 +221,7 @@ contains
         THETW(L,NY,NX)=0.0_r8
       ENDIF
 
-      IF(THI(L,NY,NX).GT.1.0_r8.OR.DPTH(L,NY,NX).GE.DTBLZ(NY,NX))THEN
+      IF(THI(L,NY,NX).GT.1.0_r8.OR.SoiDepthMidLay(L,NY,NX).GE.ExtWaterTablet0(NY,NX))THEN
         THETI(L,NY,NX)=AZMAX1(AMIN1(POROS(L,NY,NX),POROS(L,NY,NX)-THW(L,NY,NX)))
       ELSEIF(isclose(THI(L,NY,NX),1._r8))THEN
         THETI(L,NY,NX)=AZMAX1(AMIN1(FieldCapacity(L,NY,NX),POROS(L,NY,NX)-THW(L,NY,NX)))
@@ -322,11 +322,13 @@ contains
     DO  M=K,100
       SUM1=SUM1+(2*M+1-2*K)/(PSISK(M)**2_r8)
     ENDDO
+
     DO  N=1,3
       IF(N.EQ.3)THEN
         !vertical
         HydroCond3D(N,K,L,NY,NX)=SatHydroCondVert(L,NY,NX)*YK*SUM1/SUM2
         IF(K.GT.1.AND.PSISK(K).LT.PSISoilAirEntry(L,NY,NX).AND.PSISK(K-1).GE.PSISoilAirEntry(L,NY,NX))THEN
+          !moisture at air-entry saturation
           THETS(L,NY,NX)=H2OSOIatK(K)
         ENDIF
       ELSE
@@ -369,7 +371,7 @@ contains
   IF(VGeomLayer(0,NY,NX).GT.ZEROS2(NY,NX))THEN
     SoiBulkDensity(0,NY,NX)=SoilMicPMassLayer(0,NY,NX)/VGeomLayer(0,NY,NX)
   ELSE
-    SoiBulkDensity(0,NY,NX)=BKRS(micpar%k_fine_litr)
+    SoiBulkDensity(0,NY,NX)=BulkDensLitR(micpar%k_fine_litr)
   ENDIF
   THETY(0,NY,NX)=EXP((LOGPSIFLD(NY,NX)-LOG(-PSIHY))*FCD(0,NY,NX)/LOGPSIMND(NY,NX)+LOGFldCapacity(0,NY,NX))
   SUM2=0.0_r8
@@ -399,6 +401,7 @@ contains
     HydroCond3D(1,K,0,NY,NX)=0.0_r8
     HydroCond3D(2,K,0,NY,NX)=0.0_r8
     IF(K.GT.1.AND.PSISK(K).LT.PSISoilAirEntry(0,NY,NX).AND.PSISK(K-1).GE.PSISoilAirEntry(0,NY,NX))THEN
+      !moisture at air-entry saturation
       THETS(0,NY,NX)=H2OSOIatK(K)
     ENDIF
   ENDDO D1235

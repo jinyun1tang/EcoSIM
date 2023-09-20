@@ -127,7 +127,9 @@ module RedistMod
 !
       call CalcLitterLayerChemicalMass(NY,NX)
 !
-      call UpdateChemInSoilLayers(NY,NX,LG,VOLISO,DORGC,DVLiceMicP,TXCO2,DORGE)
+      call update_physVar_Profile(NY,NX,VOLISO,DVLiceMicP)    
+
+      call UpdateChemInSoilLays(NY,NX,LG,DORGC,TXCO2,DORGE)
 !
 !     SNOWPACK LAYERING
       call SnowpackLayering(NY,NX)
@@ -160,18 +162,19 @@ module RedistMod
   real(r8), intent(in) :: TXCO2(JY,JX)
   real(r8) :: VLSoilPoreMicPX,VOLTX
   integer  :: L
-  TRN(NY,NX)=TRN(NY,NX)+HEATI(NY,NX)
-  TLE(NY,NX)=TLE(NY,NX)+HEATE(NY,NX)
-  TSH(NY,NX)=TSH(NY,NX)+HEATS(NY,NX)
-  TGH(NY,NX)=TGH(NY,NX)-(HEATH(NY,NX)-HEATV(NY,NX))
-  TLEC(NY,NX)=TLEC(NY,NX)+HEATE(NY,NX)*RAC(NY,NX)
-  TSHC(NY,NX)=TSHC(NY,NX)+HEATS(NY,NX)*RAC(NY,NX)
+  TRN(NY,NX)=TRN(NY,NX)+HeatRadiation(NY,NX)
+  TLE(NY,NX)=TLE(NY,NX)+HeatEvapAir2Surf(NY,NX)
+  TSH(NY,NX)=TSH(NY,NX)+HeatSensAir2Surf(NY,NX)
+  TGH(NY,NX)=TGH(NY,NX)-(HeatNet2Surf(NY,NX)-HeatSensVapAir2Surf(NY,NX))
+  TLEC(NY,NX)=TLEC(NY,NX)+HeatEvapAir2Surf(NY,NX)*BndlResistCanG(NY,NX)
+  TSHC(NY,NX)=TSHC(NY,NX)+HeatSensAir2Surf(NY,NX)*BndlResistCanG(NY,NX)
   TCNET(NY,NX)=TCCAN(NY,NX)+HCO2G(NY,NX)
   RECO(NY,NX)=RECO(NY,NX)+HCO2G(NY,NX)
   TCAN(NY,NX)=TCAN(NY,NX)+TCCAN(NY,NX)
   TNPP(NY,NX)=TGPP(NY,NX)+TRAU(NY,NX)
   TNBP(NY,NX)=TCAN(NY,NX)+UCO2G(NY,NX)+UCH4G(NY,NX) &
     -UDOCQ(NY,NX)-UDICQ(NY,NX)-UDOCD(NY,NX)-UDICD(NY,NX)+TXCO2(NY,NX)
+    
   IF(NU(NY,NX).GT.NUI(NY,NX))THEN  !the surface is lowered
     DO L=NUI(NY,NX),NU(NY,NX)-1
       IF(VLSoilPoreMicP(L,NY,NX).LE.ZEROS2(NY,NX))THEN
@@ -223,10 +226,10 @@ module RedistMod
   DO  L=1,JS
     WS=VLDrySnoWE(L,NY,NX)+VLWatSnow(L,NY,NX)+VLIceSnow(L,NY,NX)*DENSICE
 
-    VOLWSO=VOLWSO+WS
+    WaterStoreLandscape=WaterStoreLandscape+WS
     UVLWatMicP(NY,NX)=UVLWatMicP(NY,NX)+WS
     ENGYW=VLHeatCapSnow(L,NY,NX)*TKSnow(L,NY,NX)
-    HEATSO=HEATSO+ENGYW
+    HeatStoreLandscape=HeatStoreLandscape+ENGYW
     TLCO2G=TLCO2G+trcg_solsml(idg_CO2,L,NY,NX)+trcg_solsml(idg_CH4,L,NY,NX)
     UCO2S(NY,NX)=UCO2S(NY,NX)+trcg_solsml(idg_CO2,L,NY,NX)+trcg_solsml(idg_CH4,L,NY,NX)
     OXYGSO=OXYGSO+trcg_solsml(idg_O2,L,NY,NX)
@@ -267,32 +270,32 @@ module RedistMod
 !     DCORP=mixing intensity (fire) or depth (tillage,drainage) of disturbance
 !     CumDepth2LayerBottom(NU=soil surface elevation
 !     DTBLI,DTBLDI=depth of natural,artificial water table from readi.f
-!     DTBLX,DTBLZ=current,initial natural water table depth
+!     ExtWaterTable,ExtWaterTablet0=current,initial natural water table depth
 !     DTBLY,DTBLD=current,initial artificial water table depth
-!     IDTBL=water table flag from readi.f
+!     IDWaterTable=water table flag from readi.f
 !        :0=none
 !        :1,2=natural stationary,mobile
 !        :3,4=artificial stationary,mobile
-!     HVOLO=hourly water loss through lateral and lower boundaries
+!     FWatDischarge=hourly water loss through lateral and lower boundaries
 !
   IF(J.EQ.INT(ZNOON(NY,NX)).AND.ITILL(I,NY,NX).EQ.23)THEN
     ! drainage is on
     DCORPW=DCORP(I,NY,NX)+CumDepth2LayerBottom(NU(NY,NX)-1,NY,NX)
     DTBLI(NY,NX)=DCORPW
-    DTBLZ(NY,NX)=DTBLI(NY,NX)-(ALTZ(NY,NX)-ALT(NY,NX))*(1.0_r8-DTBLG(NY,NX))
-    DTBLX(NY,NX)=DTBLZ(NY,NX)+CumDepth2LayerBottom(NU(NY,NX)-1,NY,NX)
+    ExtWaterTablet0(NY,NX)=DTBLI(NY,NX)-(ALTZ(NY,NX)-ALT(NY,NX))*(1.0_r8-WaterTBLSlope(NY,NX))
+    ExtWaterTable(NY,NX)=ExtWaterTablet0(NY,NX)+CumDepth2LayerBottom(NU(NY,NX)-1,NY,NX)
   ENDIF
 
   IF(J.EQ.INT(ZNOON(NY,NX)).AND.ITILL(I,NY,NX).EQ.24)THEN
     ! drainage in on
     DCORPW=DCORP(I,NY,NX)+CumDepth2LayerBottom(NU(NY,NX)-1,NY,NX)
-    IF(IDTBL(NY,NX).EQ.1)THEN
-      IDTBL(NY,NX)=3
-    ELSEIF(IDTBL(NY,NX).EQ.2)THEN
-      IDTBL(NY,NX)=4
+    IF(IDWaterTable(NY,NX).EQ.1)THEN
+      IDWaterTable(NY,NX)=3
+    ELSEIF(IDWaterTable(NY,NX).EQ.2)THEN
+      IDWaterTable(NY,NX)=4
     ENDIF
     DTBLDI(NY,NX)=DCORPW
-    DTBLD(NY,NX)=AZMAX1(DTBLDI(NY,NX)-(ALTZ(NY,NX)-ALT(NY,NX))*(1.0_r8-DTBLG(NY,NX)))
+    DTBLD(NY,NX)=AZMAX1(DTBLDI(NY,NX)-(ALTZ(NY,NX)-ALT(NY,NX))*(1.0_r8-WaterTBLSlope(NY,NX)))
     DTBLY(NY,NX)=DTBLD(NY,NX)
   ENDIF
 !
@@ -300,13 +303,14 @@ module RedistMod
 ! switched on for change of water table due to discharge/drainage
 ! why 0.00167, time relaxization constant, ?
 ! 4 is mobile tile drainge.
-  IF(IDTBL(NY,NX).EQ.2.OR.IDTBL(NY,NX).EQ.4)THEN
-    DTBLX(NY,NX)=DTBLX(NY,NX)-HVOLO(NY,NX)/AREA(3,NU(NY,NX),NY,NX) &
-      -0.00167_r8*(DTBLX(NY,NX)-DTBLZ(NY,NX)-CumDepth2LayerBottom(NU(NY,NX)-1,NY,NX))
-    DTBLX(NY,NX)=DTBLZ(NY,NX)+CumDepth2LayerBottom(NU(NY,NX)-1,NY,NX)
+  IF(IDWaterTable(NY,NX).EQ.2.OR.IDWaterTable(NY,NX).EQ.4)THEN
+    ExtWaterTable(NY,NX)=ExtWaterTable(NY,NX)-FWatDischarge(NY,NX)/AREA(3,NU(NY,NX),NY,NX) &
+      -0.00167_r8*(ExtWaterTable(NY,NX)-ExtWaterTablet0(NY,NX)-CumDepth2LayerBottom(NU(NY,NX)-1,NY,NX))
+    ExtWaterTable(NY,NX)=ExtWaterTablet0(NY,NX)+CumDepth2LayerBottom(NU(NY,NX)-1,NY,NX)
   ENDIF
-  IF(IDTBL(NY,NX).EQ.4)THEN
-    DTBLY(NY,NX)=DTBLY(NY,NX)-HVOLO(NY,NX)/AREA(3,NU(NY,NX),NY,NX) &
+  
+  IF(IDWaterTable(NY,NX).EQ.4)THEN
+    DTBLY(NY,NX)=DTBLY(NY,NX)-FWatDischarge(NY,NX)/AREA(3,NU(NY,NX),NY,NX) &
       -0.00167_r8*(DTBLY(NY,NX)-DTBLD(NY,NX))
   ENDIF
   end subroutine ModifyExWTBLByDisturbance
@@ -327,7 +331,9 @@ module RedistMod
   real(r8) :: PI,PXB
   real(r8) :: SIN,SGN,SIP,SNB
   real(r8) :: SPB,SNM0,SPM0,SIR,SII,SBU
-  real(r8) :: VHeatCapacityLitrX,VHCPY,VHCPO
+  real(r8) :: VHeatCapacityLitrX  !old litr heat capacity
+  real(r8) :: VHeatCapacityLitr   !current litr heat capacity
+  real(r8) :: dVHeatCapacityLitr  !change in heat capacity
   real(r8) :: WI,WO
   real(r8) :: ZSI,ZXB,ZGI
   real(r8) :: ZNGGIN,ZN2OIN,ZNH3IN
@@ -337,21 +343,22 @@ module RedistMod
   ! CALCULATE SURFACE RESIDUE TEMPERATURE FROM ITS CHANGE
   ! IN HEAT STORAGE
   !
-  VHeatCapacityLitrX=VHeatCapacity(0,NY,NX)             !old heat capacity
-  VHCPY=cpw*VLWatMicP(0,NY,NX)+cpi*VLiceMicP(0,NY,NX)+cpo*ORGC(0,NY,NX) !current heat capacity
-  VHCPO=VHCPY-VHeatCapacityLitrX                        !change in heat capacity
-  HFLXO=VHCPO*TairK(NY,NX)                              !TairK: air temperature in kelvin, hflxo represents incoming heat
+  VHeatCapacityLitrX=VHeatCapacity(0,NY,NX)                          
+  VHeatCapacityLitr=cpw*VLWatMicP(0,NY,NX)+cpi*VLiceMicP(0,NY,NX)+cpo*ORGC(0,NY,NX) 
+  dVHeatCapacityLitr=VHeatCapacityLitr-VHeatCapacityLitrX            
+  !TairK: air temperature in kelvin, hflxo represents increase heat in litr
+  HFLXO=dVHeatCapacityLitr*TairK(NY,NX)                              
   ENGYZ=VHeatCapacityLitrX*TKS(0,NY,NX)
 
   !update water, ice content and heat capacity of residue
-  VLWatMicP(0,NY,NX)=AZMAX1(VLWatMicP(0,NY,NX)+FLWR(NY,NX)+TLitrIceFlxThaw(NY,NX)+TQR(NY,NX))
+  VLWatMicP(0,NY,NX)=AZMAX1(VLWatMicP(0,NY,NX)+WatFLo2Litr(NY,NX)+TLitrIceFlxThaw(NY,NX)+TQR(NY,NX))
   VLiceMicP(0,NY,NX)=AZMAX1(VLiceMicP(0,NY,NX)-TLitrIceFlxThaw(NY,NX)/DENSICE)
   VHeatCapacity(0,NY,NX)=cpo*ORGC(0,NY,NX)+cpw*VLWatMicP(0,NY,NX)+cpi*VLiceMicP(0,NY,NX)
 
-  IF(VHeatCapacity(0,NY,NX).GT.VHCPRX(NY,NX))THEN
+  IF(VHeatCapacity(0,NY,NX).GT.VHeatCapLitR(NY,NX))THEN
     !when there are still significant heat capacity of the residual layer
     tkspre=TKS(0,NY,NX)
-    TKS(0,NY,NX)=(ENGYZ+HFLWR(NY,NX)+TLitrIceHeatFlxFrez(NY,NX)+HFLXO &
+    TKS(0,NY,NX)=(ENGYZ+HeatFLo2LitrByWat(NY,NX)+TLitrIceHeatFlxFrez(NY,NX)+HFLXO &
       +THQR(NY,NX))/VHeatCapacity(0,NY,NX)
     HEATIN=HEATIN+HFLXO
     Ls=NUM(NY,NX)
@@ -364,11 +371,14 @@ module RedistMod
     HEATIN=HEATIN+HFLXO+(TKS(NUM(NY,NX),NY,NX)-TKS(0,NY,NX))*VHeatCapacity(0,NY,NX)
     TKS(0,NY,NX)=TKS(NUM(NY,NX),NY,NX)
   ENDIF
-  
-  ENGYR=VHeatCapacity(0,NY,NX)*TKS(0,NY,NX)
-  HEATSO=HEATSO+ENGYR
-  HEATIN=HEATIN+TLitrIceHeatFlxFrez(NY,NX)
   TCS(0,NY,NX)=units%Kelvin2Celcius(TKS(0,NY,NX))
+    
+  ENGYR=VHeatCapacity(0,NY,NX)*TKS(0,NY,NX)
+
+
+  HeatStoreLandscape=HeatStoreLandscape+ENGYR
+  HEATIN=HEATIN+TLitrIceHeatFlxFrez(NY,NX)
+
   !     UVLWatMicP(NY,NX)=UVLWatMicP(NY,NX)-VLWatMicP(0,NY,NX)-VLiceMicP(0,NY,NX)*DENSICE
   !
   !     SURFACE BOUNDARY WATER FLUXES
@@ -379,19 +389,19 @@ module RedistMod
   WO=VapXAir2GSurf(NY,NX)+TEVAPP(NY,NX) !total outgoing water flux
   CEVAP=CEVAP-WO
   UEVAP(NY,NX)=UEVAP(NY,NX)-WO
-  VOLWOU=VOLWOU-PRECU(NY,NX)
-  HVOLO(NY,NX)=HVOLO(NY,NX)-PRECU(NY,NX)
-  UVOLO(NY,NX)=UVOLO(NY,NX)-PRECU(NY,NX)
+  VOLWOU=VOLWOU-IrrigSubsurf(NY,NX)
+  FWatDischarge(NY,NX)=FWatDischarge(NY,NX)-IrrigSubsurf(NY,NX)
+  UVOLO(NY,NX)=UVOLO(NY,NX)-IrrigSubsurf(NY,NX)
   UDRAIN(NY,NX)=UDRAIN(NY,NX)+WaterFlowSoiMicP(3,NK(NY,NX),NY,NX)
   !
   !     SURFACE BOUNDARY HEAT FLUXES
   !
   HEATIN=HEATIN+cpw*TairK(NY,NX)*PRECA(NY,NX)+cps*TairK(NY,NX)*SnoFalPrec(NY,NX)
-  HEATIN=HEATIN+HEATH(NY,NX)+THFLXC(NY,NX)
+  HEATIN=HEATIN+HeatNet2Surf(NY,NX)+THFLXC(NY,NX)
   D5150: DO L=1,JS
     HEATIN=HEATIN+XTHAWW(L,NY,NX)
   ENDDO D5150
-  HEATOU=HEATOU-cpw*TairK(NY,NX)*PRECU(NY,NX)
+  HEATOU=HEATOU-cpw*TairK(NY,NX)*IrrigSubsurf(NY,NX)
 !
 ! SURFACE BOUNDARY CO2, CH4 AND DOC FLUXES
 ! XCODFS: surface - atmosphere CO2 dissolution (+ve) - volatilization (-ve)
@@ -413,8 +423,8 @@ module RedistMod
       +(FLQGQ(NY,NX)+FLQRQ(NY,NX))*CCHR(NY,NX) &
       +(FLQGI(NY,NX)+FLQRI(NY,NX))*CCHQ(NY,NX) &
       +GasDisFlx(idg_CH4,0,NY,NX)+trcg_XDFR(idg_CH4,NY,NX)
-  CO=-PRECU(NY,NX)*CCOQ(NY,NX)
-  CX=-PRECU(NY,NX)*CCHQ(NY,NX)
+  CO=-IrrigSubsurf(NY,NX)*CCOQ(NY,NX)
+  CX=-IrrigSubsurf(NY,NX)*CCHQ(NY,NX)
   UCO2G(NY,NX)=UCO2G(NY,NX)+CI
   HCO2G(NY,NX)=HCO2G(NY,NX)+CI
   UCH4G(NY,NX)=UCH4G(NY,NX)+CH
@@ -429,7 +439,7 @@ module RedistMod
       +(FLQGI(NY,NX)+FLQRI(NY,NX))*COXQ(NY,NX) &
       +GasDisFlx(idg_O2,0,NY,NX)+trcg_XDFR(idg_O2,NY,NX)
   OXYGIN=OXYGIN+OI
-  OO=RUPOXO(0,NY,NX)-PRECU(NY,NX)*COXQ(NY,NX)
+  OO=RUPOXO(0,NY,NX)-IrrigSubsurf(NY,NX)*COXQ(NY,NX)
   OXYGOU=OXYGOU+OO
   UOXYG(NY,NX)=UOXYG(NY,NX)+OI
   HOXYG(NY,NX)=HOXYG(NY,NX)+OI
@@ -445,7 +455,7 @@ module RedistMod
       *(CN4R(NY,NX)+CN3R(NY,NX)+CNOR(NY,NX)) &
       +(FLQGI(NY,NX)+FLQRI(NY,NX)) &
       *(CN4Q(I,NY,NX)+CN3Q(I,NY,NX)+CNOQ(I,NY,NX)))*14.0
-  ZXB=-PRECU(NY,NX)*(CNNQ(NY,NX)+CN2Q(NY,NX))-PRECU(NY,NX) &
+  ZXB=-IrrigSubsurf(NY,NX)*(CNNQ(NY,NX)+CN2Q(NY,NX))-IrrigSubsurf(NY,NX) &
       *(CN4Q(I,NY,NX)+CN3Q(I,NY,NX)+CNOQ(I,NY,NX))*14.0
   TZIN=TZIN+ZSI
   TZOU=TZOU+ZXB
@@ -482,7 +492,7 @@ module RedistMod
       *(CPOR(NY,NX)+CH1PR(NY,NX)) &
       +(FLQGI(NY,NX)+FLQRI(NY,NX)) &
       *(CPOQ(I,NY,NX)+CH1PQ(I,NY,NX)))
-  PXB=-patomw*PRECU(NY,NX)*(CPOQ(I,NY,NX)+CH1PQ(I,NY,NX))
+  PXB=-patomw*IrrigSubsurf(NY,NX)*(CPOQ(I,NY,NX)+CH1PQ(I,NY,NX))
   TPIN=TPIN+PI
   TPOU=TPOU+PXB
   PDRAIN(NY,NX)=PDRAIN(NY,NX)+trcs_XFLS(ids_H2PO4,3,NK(NY,NX),NY,NX) &
@@ -505,9 +515,9 @@ module RedistMod
       +2.0_r8*(trcg_XDFR(idg_N2,NY,NX)+trcg_XDFR(idg_N2O,NY,NX))+trcg_XDFR(idg_NH3,NY,NX))/natomw
   SIP=((FLQGQ(NY,NX)+FLQRQ(NY,NX))*(3.0_r8*CPOR(NY,NX)+2.0_r8*CH1PR(NY,NX)) &
       +(FLQGI(NY,NX)+FLQRI(NY,NX))*(3.0_r8*CPOQ(I,NY,NX)+2.0_r8*CH1PQ(I,NY,NX)))
-  SNB=-PRECU(NY,NX)*(CNNQ(NY,NX)+CN2Q(NY,NX))-PRECU(NY,NX) &
+  SNB=-IrrigSubsurf(NY,NX)*(CNNQ(NY,NX)+CN2Q(NY,NX))-IrrigSubsurf(NY,NX) &
       *(2.0_r8*CN4Q(I,NY,NX)+CN3Q(I,NY,NX)+CNOQ(I,NY,NX))
-      SPB=-PRECU(NY,NX)*(3.0*CPOQ(I,NY,NX)+2.0*CH1PQ(I,NY,NX))
+      SPB=-IrrigSubsurf(NY,NX)*(3.0*CPOQ(I,NY,NX)+2.0*CH1PQ(I,NY,NX))
   SNM0=(2.0_r8*XNH4S(0,NY,NX)+XNO3S(0,NY,NX)+XNO2S(0,NY,NX) &
       -2.0_r8*XN2GS(0,NY,NX))/natomw
   SPM0=(2.0_r8*XH1PS(0,NY,NX)+3.0_r8*XH2PS(0,NY,NX))/patomw
@@ -553,7 +563,7 @@ module RedistMod
     !
     !     SUBSURFACE BOUNDARY SALT FLUXES FROM SUBSURFACE IRRIGATION
     !
-    SBU=-PRECU(NY,NX)*(CALQ(I,NY,NX)+CFEQ(I,NY,NX)+CHYQ(I,NY,NX) &
+    SBU=-IrrigSubsurf(NY,NX)*(CALQ(I,NY,NX)+CFEQ(I,NY,NX)+CHYQ(I,NY,NX) &
       +CCAQ(I,NY,NX)+CMGQ(I,NY,NX)+CNAQ(I,NY,NX)+CKAQ(I,NY,NX) &
       +COHQ(I,NY,NX)+CSOQ(I,NY,NX)+CCLQ(I,NY,NX)+CC3Q(I,NY,NX) &
       +CH0PQ(I,NY,NX) &
@@ -864,16 +874,16 @@ module RedistMod
   ORGC(0,NY,NX)=DC
   ORGN(0,NY,NX)=DN
   ORGR(0,NY,NX)=DC
-  TLRSDC=TLRSDC+DC
+  LitRCStoreLandscape=LitRCStoreLandscape+DC
   URSDC(NY,NX)=URSDC(NY,NX)+DC
-  TLRSDN=TLRSDN+DN
+  LitRNStoreLandscape=LitRNStoreLandscape+DN
   URSDN(NY,NX)=URSDN(NY,NX)+DN
-  TLRSDP=TLRSDP+DP
+  LitRPStoreLandscape=LitRPStoreLandscape+DP
   URSDP(NY,NX)=URSDP(NY,NX)+DP
   WS=CanH2OHeldVg(NY,NX)+CanWatg(NY,NX)+VLWatMicP(0,NY,NX)+VLiceMicP(0,NY,NX)*DENSICE
-  VOLWSO=VOLWSO+WS
+  WaterStoreLandscape=WaterStoreLandscape+WS
   UVLWatMicP(NY,NX)=UVLWatMicP(NY,NX)+WS
-  HEATSO=HEATSO+TENGYC(NY,NX)
+  HeatStoreLandscape=HeatStoreLandscape+TENGYC(NY,NX)
   CS=trc_solml(idg_CO2,0,NY,NX)+trc_solml(idg_CH4,0,NY,NX)
   TLCO2G=TLCO2G+CS
   UCO2S(NY,NX)=UCO2S(NY,NX)+CS
@@ -980,17 +990,18 @@ module RedistMod
     VOLWXX=VLWatMicP(L,NY,NX)
     VOLIXX=VLiceMicP(L,NY,NX)
     !micropore
-    VLWatMicP(L,NY,NX)=VLWatMicP(L,NY,NX)+TWatFlowCellMicP(L,NY,NX)+FINH(L,NY,NX) &
+    VLWatMicP(L,NY,NX)=VLWatMicP(L,NY,NX)+TWatFlowCellMicP(L,NY,NX)+FWatExMacP2MicP(L,NY,NX) &
       +WatIceThawMicP(L,NY,NX)+GridPlantRootH2OUptake_vr(L,NY,NX)+FWatIrrigate2MicP(L,NY,NX)
-    VLWatMicPX(L,NY,NX)=VLWatMicPX(L,NY,NX)+TFLWX(L,NY,NX)+FINH(L,NY,NX) &
+    VLWatMicPX(L,NY,NX)=VLWatMicPX(L,NY,NX)+TWatFlowCellMicPX(L,NY,NX)+FWatExMacP2MicP(L,NY,NX) &
       +WatIceThawMicP(L,NY,NX)+GridPlantRootH2OUptake_vr(L,NY,NX)+FWatIrrigate2MicP(L,NY,NX)
 
     !do a numerical correction
     VLWatMicPX(L,NY,NX)=AMIN1(VLWatMicP(L,NY,NX),VLWatMicPX(L,NY,NX)+0.01_r8*(VLWatMicP(L,NY,NX)-VLWatMicPX(L,NY,NX)))
     VLiceMicP(L,NY,NX)=VLiceMicP(L,NY,NX)-WatIceThawMicP(L,NY,NX)/DENSICE
 
+    if(L<2)write(*,*)'redist Lwat',L,NY,NX,VLWatMicP(L,NY,NX),VLiceMicP(L,NY,NX)
     !micropore
-    VLWatMacP(L,NY,NX)=VLWatMacP(L,NY,NX)+TWaterFlowMacP(L,NY,NX)-FINH(L,NY,NX)+WatIceThawMacP(L,NY,NX)
+    VLWatMacP(L,NY,NX)=VLWatMacP(L,NY,NX)+TWaterFlowMacP(L,NY,NX)-FWatExMacP2MicP(L,NY,NX)+WatIceThawMacP(L,NY,NX)
     VLiceMacP(L,NY,NX)=VLiceMacP(L,NY,NX)-WatIceThawMacP(L,NY,NX)/DENSICE
 
     !volume change
@@ -1062,24 +1073,23 @@ module RedistMod
       print*,'update_physVar_Profile',NY,NX,TKSX,TKS(L,NY,NX),VHeatCapacity(L,NY,NX)
     TCS(L,NY,NX)=units%Kelvin2Celcius(TKS(L,NY,NX))
     WS=VLWatMicP(L,NY,NX)+VLWatMacP(L,NY,NX)+(VLiceMicP(L,NY,NX)+VLiceMacP(L,NY,NX))*DENSICE
-    VOLWSO=VOLWSO+WS
+    WaterStoreLandscape=WaterStoreLandscape+WS
     VOLISO=VOLISO+VLiceMicP(L,NY,NX)+VLiceMacP(L,NY,NX)
     UVLWatMicP(NY,NX)=UVLWatMicP(NY,NX)+WS
 !    2-WiltPoint(L,NY,NX)*VLSoilPoreMicP(L,NY,NX)
-    HEATSO=HEATSO+VHeatCapacity(L,NY,NX)*TKS(L,NY,NX)
+    HeatStoreLandscape=HeatStoreLandscape+VHeatCapacity(L,NY,NX)*TKS(L,NY,NX)
   ENDDO
   end subroutine update_physVar_Profile
 !------------------------------------------------------------------------------------------
-  subroutine UpdateChemInSoilLayers(NY,NX,LG,VOLISO,DORGC,DVLiceMicP,TXCO2,DORGE)
+  subroutine UpdateChemInSoilLays(NY,NX,LG,DORGC,TXCO2,DORGE)
   !
   use ElmIDMod
   implicit none
-  integer, intent(in) :: NY,NX,LG
-  real(r8), intent(inout) :: VOLISO
-  real(r8),intent(out) :: DORGC(JZ,JY,JX)
-  REAL(R8),INTENT(OUT) :: DVLiceMicP(JZ,JY,JX)
-  real(r8), intent(inout) :: TXCO2(JY,JX)
+  integer,  intent(in) :: NY,NX,LG
   real(r8), intent(in) :: DORGE(JY,JX)
+  real(r8), intent(inout) :: TXCO2(JY,JX)
+  real(r8), intent(out) :: DORGC(JZ,JY,JX)
+
   integer  :: L,K,M,N,LL,NGL,NTX,NTP,NTG,NTS
   real(r8) :: HS,CS
   real(r8) :: CIB,CHB,OIB,COB
@@ -1092,8 +1102,6 @@ module RedistMod
 
   !     begin_execution
   !     UPDATE SOIL LAYER VARIABLES WITH TOTAL FLUXES
-  !
-  call update_physVar_Profile(NY,NX,VOLISO,DVLiceMicP)    
 
   D125: DO L=NU(NY,NX),NL(NY,NX)
     !
@@ -1411,7 +1419,7 @@ module RedistMod
     IF(salt_model)call UpdateSaltIonInSoilLayers(L,NY,NX,TLPO4)
 
   ENDDO D125
-  end subroutine UpdateChemInSoilLayers
+  end subroutine UpdateChemInSoilLays
 
 !------------------------------------------------------------------------------------------
   subroutine UpdateSaltIonInSoilLayers(L,NY,NX,TLPO4)
@@ -1615,7 +1623,8 @@ module RedistMod
     tDC=SUM(OMC(1:nlbiomcp,1:NMICBSO,K,L,NY,NX))
     tDN=SUM(OMN(1:nlbiomcp,1:NMICBSO,K,L,NY,NX))
     tDP=SUM(OMP(1:nlbiomcp,1:NMICBSO,K,L,NY,NX))
-    IF(micpar%is_litter(K))THEN  !K=0,1,2: woody litr, nonwoody litr, and manure
+    IF(micpar%is_litter(K))THEN  
+      !K=0,1,2: woody litr, nonwoody litr, and manure
       DC=DC+tDC
       DN=DN+tDN
       DP=DP+tDP
@@ -1696,17 +1705,17 @@ module RedistMod
     DORGCC=0.0_r8
   ENDIF
 
-  TLRSDC=TLRSDC+DC
+  LitRCStoreLandscape=LitRCStoreLandscape+DC
   URSDC(NY,NX)=URSDC(NY,NX)+DC
-  TLRSDN=TLRSDN+DN
+  LitRNStoreLandscape=LitRNStoreLandscape+DN
   URSDN(NY,NX)=URSDN(NY,NX)+DN
-  TLRSDP=TLRSDP+DP
+  LitRPStoreLandscape=LitRPStoreLandscape+DP
   URSDP(NY,NX)=URSDP(NY,NX)+DP
-  TLORGC=TLORGC+OC
+  PomHumCStoreLandscape=PomHumCStoreLandscape+OC
   UORGC(NY,NX)=UORGC(NY,NX)+OC
-  TLORGN=TLORGN+ON
+  PomHumNStoreLandscape=PomHumNStoreLandscape+ON
   UORGN(NY,NX)=UORGN(NY,NX)+ON
-  TLORGP=TLORGP+OP
+  PomHumPStoreLandscape=PomHumPStoreLandscape+OP
   UORGP(NY,NX)=UORGP(NY,NX)+OP
   TSEDSO=TSEDSO+(DC+OC)*ppmc
   end subroutine SumOMStates
@@ -1739,8 +1748,8 @@ module RedistMod
       ORGC(0,NY,NX)=ORGC(0,NY,NX)+ESNT(ielmc,M,K,0,NY,NX)
       RAINR=ESNT(ielmc,M,K,0,NY,NX)*THETCX(K)
       HRAINR=RAINR*cpw*TairK(NY,NX)
-      FLWR(NY,NX)=FLWR(NY,NX)+RAINR
-      HFLWR(NY,NX)=HFLWR(NY,NX)+HRAINR
+      WatFLo2Litr(NY,NX)=WatFLo2Litr(NY,NX)+RAINR
+      HeatFLo2LitrByWat(NY,NX)=HeatFLo2LitrByWat(NY,NX)+HRAINR
 
       CRAIN=CRAIN+RAINR
       HEATIN=HEATIN+HRAINR

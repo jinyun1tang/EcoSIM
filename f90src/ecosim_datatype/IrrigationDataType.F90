@@ -16,9 +16,9 @@ module IrrigationDataType
   real(r8) :: CNNU                              !subsurface irrigation  N2 concentration	[g m-3]
   real(r8) :: CN2U                              !subsurface irrigation  N2O concentration	[g m-3]
   integer ,target,allocatable ::  IIRRA(:,:,:)                       !start and end dates of automated irrigation, [-]
-  real(r8),target,allocatable ::  RRIG(:,:,:,:)                     !irrigation application, [mm h-1]
-  real(r8),target,allocatable ::  WDPTH(:,:,:)                      !depth of irrigation application, [m]
-  real(r8),target,allocatable ::  PRECU(:,:)                        !underground irrigation, [m3 d-2 h-1]
+  real(r8),target,allocatable ::  RRIG(:,:,:,:)                      !irrigation application, [mm h-1]
+  real(r8),target,allocatable ::  WDPTH(:,:,:)                       !depth of irrigation application, [m]
+  real(r8),target,allocatable ::  IrrigSubsurf(:,:)                  !underground irrigation, [m3 d-2 h-1]
   real(r8),target,allocatable ::  PRECI(:,:)                        !surface irrigation, [m3 d-2 h-1]
   real(r8),target,allocatable ::  FIRRA(:,:)                        !fraction of FC - WP below which automatic irrigation applied, [-]
   real(r8),target,allocatable ::  CIRRA(:,:)                        !fraction of FC - WP to which automatic irrigation applied, [-]
@@ -197,7 +197,7 @@ module IrrigationDataType
   allocate(WDPTH(366,JY,JX));   WDPTH=0._r8
 
   allocate(IIRRA(4,JY,JX));     IIRRA=0
-  allocate(PRECU(JY,JX));       PRECU=0._r8
+  allocate(IrrigSubsurf(JY,JX));       IrrigSubsurf=0._r8
   allocate(PRECI(JY,JX));       PRECI=0._r8
   allocate(FIRRA(JY,JX));       FIRRA=0._r8
   allocate(CIRRA(JY,JX));       CIRRA=0._r8
@@ -320,7 +320,7 @@ module IrrigationDataType
   call destroy(RRIG)
   call destroy(WDPTH)
   call destroy(IIRRA)
-  call destroy(PRECU)
+  call destroy(IrrigSubsurf)
   call destroy(PRECI)
   call destroy(FIRRA)
   call destroy(CIRRA)

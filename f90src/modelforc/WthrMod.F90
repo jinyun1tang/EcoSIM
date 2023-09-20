@@ -544,7 +544,7 @@ module WthrMod
       RainFalPrec(NY,NX)=PRECRI(NY,NX)*AREA(3,NU(NY,NX),NY,NX)
       SnoFalPrec(NY,NX)=PRECWI(NY,NX)*AREA(3,NU(NY,NX),NY,NX)
       PRECI(NY,NX)=PRECII(NY,NX)*AREA(3,NU(NY,NX),NY,NX)
-      PRECU(NY,NX)=PRECUI(NY,NX)*AREA(3,NU(NY,NX),NY,NX)
+      IrrigSubsurf(NY,NX)=PRECUI(NY,NX)*AREA(3,NU(NY,NX),NY,NX)
       PRECA(NY,NX)=RainFalPrec(NY,NX)+PRECI(NY,NX)
       PRECQ(NY,NX)=RainFalPrec(NY,NX)+SnoFalPrec(NY,NX)
       LWRadSky(NY,NX)=THSX(NY,NX)*AREA(3,NU(NY,NX),NY,NX)

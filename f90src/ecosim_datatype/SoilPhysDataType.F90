@@ -30,7 +30,7 @@ implicit none
   REAL(R8),target,allocatable ::  LOGPSIMXD(:,:)                         !log water potential at field capacity 	-
   REAL(R8),target,allocatable ::  LOGPSIMND(:,:)                         !log water potential at saturation - log water potential at field capacity
   real(r8),target,allocatable ::  VHeatCapacitySoilM(:,:,:)                        !soil solid heat capacity [MPa m-3 K-1]
-  real(r8),target,allocatable ::  DPTHA(:,:)                         !active layer depth, [n]
+  real(r8),target,allocatable ::  ActiveLayDepth(:,:)                         !active layer depth, [m]
 !----------------------------------------------------------------------
 
 contains
@@ -61,7 +61,7 @@ contains
   allocate(LOGPSIMXD(JY,JX));       LOGPSIMXD=0._r8
   allocate(LOGPSIMND(JY,JX));       LOGPSIMND=0._r8
   allocate(VHeatCapacitySoilM(0:JZ,JY,JX));   VHeatCapacitySoilM=0._r8
-  allocate(DPTHA(JY,JX));       DPTHA=0._r8
+  allocate(ActiveLayDepth(JY,JX));       ActiveLayDepth=0._r8
   end subroutine InitSoilPhysData
 
 !----------------------------------------------------------------------
@@ -92,7 +92,7 @@ contains
   call destroy(LOGPSIMXD)
   call destroy(LOGPSIMND)
   call destroy(VHeatCapacitySoilM)
-  call destroy(DPTHA)
+  call destroy(ActiveLayDepth)
   end subroutine DestructSoilPhysData
 
 end module SoilPhysDataType

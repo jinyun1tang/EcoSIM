@@ -334,14 +334,14 @@ module InsideTranspMod
 !
   IFLGB=0
   D125: DO L=1,NL(NY,NX)
-    N1=NX
-    N2=NY
-    N3=L
+    N1=NX;N2=NY;N3=L
 !
 !     LOCATE INTERNAL BOUNDARIES BETWEEN ADJACENT GRID CELLS
 !
-    D120: DO N=NCN(N2,N1),3
+    D120: DO N=FlowDirIndicator(N2,N1),3
+
       IF(N.EQ.1)THEN
+        !WEST-EAST
         IF(NX.EQ.NHE)THEN
           cycle
         ELSE
@@ -350,6 +350,7 @@ module InsideTranspMod
           N6=L
         ENDIF
       ELSEIF(N.EQ.2)THEN
+        !NORTH-SOUTH
         IF(NY.EQ.NVS)THEN
           cycle
         ELSE
@@ -358,6 +359,7 @@ module InsideTranspMod
           N6=L
         ENDIF
       ELSEIF(N.EQ.3)THEN
+        !VERTICAL
         IF(L.EQ.NL(NY,NX))THEN
           cycle
         ELSE
@@ -366,6 +368,7 @@ module InsideTranspMod
           N6=L+1
         ENDIF
       ENDIF
+
       DO LL=N6,NL(NY,NX)
         IF(VLSoilPoreMicP(LL,N5,N4).GT.ZEROS2(N5,N4))THEN
           N6=LL
@@ -1214,7 +1217,7 @@ module InsideTranspMod
   integer :: K,NTG,NTS
 !     FROM MACROPORE OR MICROPORE SOLUTE CONCENTRATIONS
 !
-!     FINHM=macro-micropore water transfer from watsub.f
+!     FWatExMacP2MicPM=macro-micropore water transfer from watsub.f
 !     VLWatMicPM,VLWatMacPM=micropore,macropore water volume
 !     RFL*=convective macropore-micropore solute transfer
 !     VLNH4,VLNO3,VLPO4=non-band NH4,NO3,PO4 volume fraction
@@ -1227,9 +1230,9 @@ module InsideTranspMod
 !
 !     MACROPORE TO MICROPORE TRANSFER
 !
-  IF(FINHM(M,N6,N5,N4).GT.0.0_r8)THEN
+  IF(FWatExMacP2MicPM(M,N6,N5,N4).GT.0.0_r8)THEN
     IF(VLWatMacPM(M,N6,N5,N4).GT.ZEROS2(N5,N4))THEN
-      VFLW=AZMAX1(AMIN1(VFLWX,FINHM(M,N6,N5,N4)/VLWatMacPM(M,N6,N5,N4)))
+      VFLW=AZMAX1(AMIN1(VFLWX,FWatExMacP2MicPM(M,N6,N5,N4)/VLWatMacPM(M,N6,N5,N4)))
     ELSE
       VFLW=VFLWX
     ENDIF
@@ -1250,9 +1253,9 @@ module InsideTranspMod
 !
 !     MICROPORE TO MACROPORE TRANSFER
 !
-  ELSEIF(FINHM(M,N6,N5,N4).LT.0.0_r8)THEN
+  ELSEIF(FWatExMacP2MicPM(M,N6,N5,N4).LT.0.0_r8)THEN
     IF(VLWatMicPM(M,N6,N5,N4).GT.ZEROS2(N5,N4))THEN
-      VFLW=AZMIN1(AMAX1(-VFLWX,FINHM(M,N6,N5,N4)/VLWatMicPM(M,N6,N5,N4)))
+      VFLW=AZMIN1(AMAX1(-VFLWX,FWatExMacP2MicPM(M,N6,N5,N4)/VLWatMicPM(M,N6,N5,N4)))
     ELSE
       VFLW=-VFLWX
     ENDIF

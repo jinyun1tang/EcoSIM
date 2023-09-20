@@ -378,13 +378,13 @@ module StarteMod
     trc_gasml(idg_NH3,L,NY,NX)=AtmGgms(idg_NH3,NY,NX)*VLsoiAirP(L,NY,NX)
     trc_gasml(idg_H2,L,NY,NX)=AtmGgms(idg_H2,NY,NX)*VLsoiAirP(L,NY,NX)
 
-!   DTBLZ: external water table depth
-    IF(CumDepth2LayerBottom(L-1,NY,NX).LT.DTBLZ(NY,NX))THEN
-! above water table
+!   ExtWaterTablet0: external water table depth
+    IF(CumDepth2LayerBottom(L-1,NY,NX).LT.ExtWaterTablet0(NY,NX))THEN
+      ! above water table
       trc_solml(idg_O2,L,NY,NX)=AtmGgms(idg_O2,NY,NX)*gas_solubility(idg_O2, ATCA(NY,NX)) &
         /(EXP(ACTCG(idg_O2)*solutevar%CSTR1))*solutevar%FH2O*VLWatMicP(L,NY,NX)
     ELSE
-!below water table
+      !below water table
       trc_solml(idg_O2,L,NY,NX)=0._r8
     ENDIF
 

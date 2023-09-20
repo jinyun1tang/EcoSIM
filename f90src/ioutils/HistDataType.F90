@@ -107,10 +107,10 @@ implicit none
   real(r8),pointer   :: histr_1D_HUM_col(:)            !VPK(NY,NX)
   real(r8),pointer   :: histr_1D_WIND_col(:)           !UA(NY,NX)/3600.0
   real(r8),pointer   :: histr_1D_PREC_col(:)           !(RainFalPrec(NY,NX)+SnoFalPrec(NY,NX))*1000.0/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: histr_1D_SOIL_RN_col(:)        !HEATI(NY,NX)*277.8/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: histr_1D_SOIL_LE_col(:)        !HEATE(NY,NX)*277.8/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: histr_1D_SOIL_H_col(:)         !HEATS(NY,NX)*277.8/AREA(3,NU(NY,NX),NY,NX)
-  real(r8),pointer   :: histr_1D_SOIL_G_col(:)         !-(HEATH(NY,NX)-HEATV(NY,NX))*277.8/AREA(3,NU(NY,NX),NY,NX)
+  real(r8),pointer   :: histr_1D_SOIL_RN_col(:)        !HeatRadiation(NY,NX)*277.8/AREA(3,NU(NY,NX),NY,NX), 1.e6/3600=277.8
+  real(r8),pointer   :: histr_1D_SOIL_LE_col(:)        !HeatEvapAir2Surf(NY,NX)*277.8/AREA(3,NU(NY,NX),NY,NX)
+  real(r8),pointer   :: histr_1D_SOIL_H_col(:)         !HeatSensAir2Surf(NY,NX)*277.8/AREA(3,NU(NY,NX),NY,NX)
+  real(r8),pointer   :: histr_1D_SOIL_G_col(:)         !-(HeatNet2Surf(NY,NX)-HeatSensVapAir2Surf(NY,NX))*277.8/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: histr_1D_ECO_RN_col(:)         !TRN(NY,NX)*277.8/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: histr_1D_ECO_LE_col(:)         !TLE(NY,NX)*277.8/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: histr_1D_ECO_H_col(:)          !TSH(NY,NX)*277.8/AREA(3,NU(NY,NX),NY,NX)
@@ -126,12 +126,12 @@ implicit none
   real(r8),pointer   :: histr_1D_RUNOFF_FLX_col(:)         !-WQRH(NY,NX)*1000.0/TAREA, 
   real(r8),pointer   :: histr_1D_SEDIMENT_FLX_col(:)       !USEDOU(NY,NX)*1000.0/TAREA, soil mass 
   real(r8),pointer   :: histr_1D_tSWC_col(:)        !UVLWatMicP(NY,NX)*1000.0/AREA(3,NU(NY,NX),NY,NX), volumetric soil water content
-  real(r8),pointer   :: histr_1D_DISCHG_FLX_col(:)         !HVOLO(NY,NX)*1000.0/TAREA
+  real(r8),pointer   :: histr_1D_DISCHG_FLX_col(:)         !FWatDischarge(NY,NX)*1000.0/TAREA
   real(r8),pointer   :: histr_1D_SNOWPACK_col(:)       !AZMAX1((VOLSS(NY,NX)+VcumIceSnow(NY,NX)*DENSICE+VOLWS(NY,NX))*1000.0/AREA(3,NU(NY,NX),NY,NX))
   real(r8),pointer   :: histr_1D_SURF_WTR_col(:)       !THETWZ(0,NY,NX)
   real(r8),pointer   :: histr_1D_SURF_ICE_col(:)       !THETIZ(0,NY,NX)
-  real(r8),pointer   :: histr_1D_ACTV_LYR_col(:)       !-(DPTHA(NY,NX)-CumDepth2LayerBottom(NU(NY,NX)-1,NY,NX))
-  real(r8),pointer   :: histr_1D_WTR_TBL_col(:)        !-(DPTHT(NY,NX)-CumDepth2LayerBottom(NU(NY,NX)-1,NY,NX))
+  real(r8),pointer   :: histr_1D_ACTV_LYR_col(:)       !-(ActiveLayDepth(NY,NX)-CumDepth2LayerBottom(NU(NY,NX)-1,NY,NX))
+  real(r8),pointer   :: histr_1D_WTR_TBL_col(:)        !-(DepthInternalWTBL(NY,NX)-CumDepth2LayerBottom(NU(NY,NX)-1,NY,NX))
   real(r8),pointer   :: histr_1D_sN2O_FLX_col(:)        !HN2OG(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: histr_1D_sN2G_FLX_col(:)        !HN2GG(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   real(r8),pointer   :: histr_1D_sNH3_FLX_col(:)        !HNH3G(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
@@ -358,10 +358,10 @@ implicit none
   allocate(this%histr_1D_HUM_col(beg_col:end_col))           !VPK(NY,NX), kPa
   allocate(this%histr_1D_WIND_col(beg_col:end_col))          !UA(NY,NX)/3600.0, m/s
   allocate(this%histr_1D_PREC_col(beg_col:end_col))          !(RainFalPrec(NY,NX)+SnoFalPrec(NY,NX))*1000.0/AREA(3,NU(NY,NX),NY,NX)
-  allocate(this%histr_1D_SOIL_RN_col(beg_col:end_col))       !HEATI(NY,NX)*277.8/AREA(3,NU(NY,NX),NY,NX), W m-2
-  allocate(this%histr_1D_SOIL_LE_col(beg_col:end_col))       !HEATE(NY,NX)*277.8/AREA(3,NU(NY,NX),NY,NX)
-  allocate(this%histr_1D_SOIL_H_col(beg_col:end_col))        !HEATS(NY,NX)*277.8/AREA(3,NU(NY,NX),NY,NX)
-  allocate(this%histr_1D_SOIL_G_col(beg_col:end_col))        !-(HEATH(NY,NX)-HEATV(NY,NX))*277.8/AREA(3,NU(NY,NX),NY,NX)
+  allocate(this%histr_1D_SOIL_RN_col(beg_col:end_col))       !HeatRadiation(NY,NX)*277.8/AREA(3,NU(NY,NX),NY,NX), W m-2
+  allocate(this%histr_1D_SOIL_LE_col(beg_col:end_col))       !HeatEvapAir2Surf(NY,NX)*277.8/AREA(3,NU(NY,NX),NY,NX)
+  allocate(this%histr_1D_SOIL_H_col(beg_col:end_col))        !HeatSensAir2Surf(NY,NX)*277.8/AREA(3,NU(NY,NX),NY,NX)
+  allocate(this%histr_1D_SOIL_G_col(beg_col:end_col))        !-(HeatNet2Surf(NY,NX)-HeatSensVapAir2Surf(NY,NX))*277.8/AREA(3,NU(NY,NX),NY,NX)
   allocate(this%histr_1D_ECO_RN_col(beg_col:end_col))        !TRN(NY,NX)*277.8/AREA(3,NU(NY,NX),NY,NX), W m-2
   allocate(this%histr_1D_ECO_LE_col(beg_col:end_col))        !TLE(NY,NX)*277.8/AREA(3,NU(NY,NX),NY,NX)
   allocate(this%histr_1D_ECO_H_col(beg_col:end_col))         !TSH(NY,NX)*277.8/AREA(3,NU(NY,NX),NY,NX)
@@ -379,14 +379,14 @@ implicit none
   allocate(this%histr_1D_SNOWPACK_col(beg_col:end_col))      !AZMAX1((VcumDrySnoWE(NY,NX)+VcumIceSnow(NY,NX)*DENSICE+VOLWS(NY,NX))*1000.0/AREA(3,NU(NY,NX),NY,NX))
   allocate(this%histr_1D_SURF_WTR_col(beg_col:end_col))      !THETWZ(0,NY,NX)
   allocate(this%histr_1D_SURF_ICE_col(beg_col:end_col))      !THETIZ(0,NY,NX)
-  allocate(this%histr_1D_ACTV_LYR_col(beg_col:end_col))      !-(DPTHA(NY,NX)-CumDepth2LayerBottom(NU(NY,NX)-1,NY,NX))
-  allocate(this%histr_1D_WTR_TBL_col(beg_col:end_col))       !-(DPTHT(NY,NX)-CumDepth2LayerBottom(NU(NY,NX)-1,NY,NX))
+  allocate(this%histr_1D_ACTV_LYR_col(beg_col:end_col))      !-(ActiveLayDepth(NY,NX)-CumDepth2LayerBottom(NU(NY,NX)-1,NY,NX))
+  allocate(this%histr_1D_WTR_TBL_col(beg_col:end_col))       !-(DepthInternalWTBL(NY,NX)-CumDepth2LayerBottom(NU(NY,NX)-1,NY,NX))
   allocate(this%histr_1D_sN2O_FLX_col(beg_col:end_col))       !HN2OG(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   allocate(this%histr_1D_sN2G_FLX_col(beg_col:end_col))       !HN2GG(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   allocate(this%histr_1D_sNH3_FLX_col(beg_col:end_col))       !HNH3G(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
   allocate(this%histr_1D_RUNOFF_FLX_col(beg_col:end_col))        !-WQRH(NY,NX)*1000.0/TAREA, 
   allocate(this%histr_1D_SEDIMENT_FLX_col(beg_col:end_col))      !USEDOU(NY,NX)*1000.0/TAREA, soil mass 
-  allocate(this%histr_1D_DISCHG_FLX_col(beg_col:end_col))        !HVOLO(NY,NX)*1000.0/TAREA
+  allocate(this%histr_1D_DISCHG_FLX_col(beg_col:end_col))        !FWatDischarge(NY,NX)*1000.0/TAREA
   allocate(this%histr_1D_LEAF_PC_ptc(beg_ptc:end_ptc))       !(WTLFE(ielmp,NZ,NY,NX)+EPOOLP(ielmp,NZ,NY,NX))/(WTLFE(ielmc,NZ,NY,NX)+EPOOLP(ielmc,NZ,NY,NX)),mass based CP ratio of leaf
   allocate(this%histr_1D_CAN_RN_ptc(beg_ptc:end_ptc))        !277.8*RadNet2CanP(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX), W m-2
   allocate(this%histr_1D_CAN_LE_ptc(beg_ptc:end_ptc))        !277.8*EvapTransHeatP(NZ,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
@@ -1502,10 +1502,10 @@ implicit none
       this%histr_1D_HUM_col(ncol)         = VPK(NY,NX)
       this%histr_1D_WIND_col(ncol)        = UA(NY,NX)/3600.0_r8
       this%histr_1D_PREC_col(ncol)        = (RainFalPrec(NY,NX)+SnoFalPrec(NY,NX))*1000.0_r8/AREA(3,NU(NY,NX),NY,NX)
-      this%histr_1D_SOIL_RN_col(ncol)     = HEATI(NY,NX)*277.8/AREA(3,NU(NY,NX),NY,NX)
-      this%histr_1D_SOIL_LE_col(ncol)     = HEATE(NY,NX)*277.8/AREA(3,NU(NY,NX),NY,NX)
-      this%histr_1D_SOIL_H_col(ncol)      = HEATS(NY,NX)*277.8/AREA(3,NU(NY,NX),NY,NX)
-      this%histr_1D_SOIL_G_col(ncol)      =-(HEATH(NY,NX)-HEATV(NY,NX))*277.8/AREA(3,NU(NY,NX),NY,NX)
+      this%histr_1D_SOIL_RN_col(ncol)     = HeatRadiation(NY,NX)*277.8/AREA(3,NU(NY,NX),NY,NX)
+      this%histr_1D_SOIL_LE_col(ncol)     = HeatEvapAir2Surf(NY,NX)*277.8/AREA(3,NU(NY,NX),NY,NX)
+      this%histr_1D_SOIL_H_col(ncol)      = HeatSensAir2Surf(NY,NX)*277.8/AREA(3,NU(NY,NX),NY,NX)
+      this%histr_1D_SOIL_G_col(ncol)      =-(HeatNet2Surf(NY,NX)-HeatSensVapAir2Surf(NY,NX))*277.8/AREA(3,NU(NY,NX),NY,NX)
       this%histr_1D_ECO_RN_col(ncol)      = TRN(NY,NX)*277.8/AREA(3,NU(NY,NX),NY,NX)
       this%histr_1D_ECO_LE_col(ncol)      = TLE(NY,NX)*277.8/AREA(3,NU(NY,NX),NY,NX)
       this%histr_1D_ECO_H_col(ncol)       = TSH(NY,NX)*277.8/AREA(3,NU(NY,NX),NY,NX)
@@ -1520,12 +1520,12 @@ implicit none
       this%histr_1D_RUNOFF_FLX_col(ncol)      = -WQRH(NY,NX)*1000.0_r8/TAREA 
       this%histr_1D_SEDIMENT_FLX_col(ncol)    = USEDOU(NY,NX)*1000.0_r8/TAREA
       this%histr_1D_tSWC_col(ncol)     = UVLWatMicP(NY,NX)*1000.0_r8/AREA(3,NU(NY,NX),NY,NX)
-      this%histr_1D_DISCHG_FLX_col(ncol)      = HVOLO(NY,NX)*1000.0_r8/TAREA
+      this%histr_1D_DISCHG_FLX_col(ncol)      = FWatDischarge(NY,NX)*1000.0_r8/TAREA
       this%histr_1D_SNOWPACK_col(ncol)    = AZMAX1((VcumDrySnoWE(NY,NX)+VcumIceSnow(NY,NX)*DENSICE+VcumWatSnow(NY,NX))*1000.0_r8/AREA(3,NU(NY,NX),NY,NX))
       this%histr_1D_SURF_WTR_col(ncol)    = THETWZ(0,NY,NX)
       this%histr_1D_SURF_ICE_col(ncol)    = THETIZ(0,NY,NX)
-      this%histr_1D_ACTV_LYR_col(ncol)    = -(DPTHA(NY,NX)-CumDepth2LayerBottom(NU(NY,NX)-1,NY,NX))
-      this%histr_1D_WTR_TBL_col(ncol)     = -(DPTHT(NY,NX)-CumDepth2LayerBottom(NU(NY,NX)-1,NY,NX))
+      this%histr_1D_ACTV_LYR_col(ncol)    = -(ActiveLayDepth(NY,NX)-CumDepth2LayerBottom(NU(NY,NX)-1,NY,NX))
+      this%histr_1D_WTR_TBL_col(ncol)     = -(DepthInternalWTBL(NY,NX)-CumDepth2LayerBottom(NU(NY,NX)-1,NY,NX))
       this%histr_1D_sN2O_FLX_col(ncol)     =  HN2OG(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%histr_1D_sN2G_FLX_col(ncol)     =  HN2GG(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
       this%histr_1D_sNH3_FLX_col(ncol)     =  HNH3G(NY,NX)/AREA(3,NU(NY,NX),NY,NX)

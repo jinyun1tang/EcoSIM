@@ -59,7 +59,7 @@ implicit none
 
   call PrepLandscapeGrazing(I,J,NHW,NHE,NVN,NVS)
 
-  plt_site%TBALE(:)=TBALE(:)
+  plt_site%PlantElemntStoreLandscape(:)=PlantElemntStoreLandscape(:)
   DO NX=NHW,NHE
     DO NY=NVN,NVS
 !
@@ -81,7 +81,7 @@ implicit none
       call PlantAPIRecv(I,J,NY,NX)
     ENDDO
   ENDDO
-  TBALE(:)=plt_site%TBALE(:)
+  PlantElemntStoreLandscape(:)=plt_site%PlantElemntStoreLandscape(:)
 
 
   end subroutine PlantModel
@@ -707,7 +707,7 @@ implicit none
   plt_site%NP=NP(NY,NX)
   plt_site%NU=NU(NY,NX)
   plt_site%OXYE=OXYE(NY,NX)
-  plt_ew%RAB=RAB(NY,NX)
+  plt_ew%BndlResistAboveCanG=BndlResistAboveCanG(NY,NX)
   plt_ew%RIB=RIB(NY,NX)
   plt_rad%SSINN=SSINN(NY,NX)
   plt_rad%SSIN=SSIN(NY,NX)
@@ -762,7 +762,7 @@ implicit none
 
     plt_soilchem%trc_gascl(idg_beg:idg_end,L) =trc_gascl(idg_beg:idg_end,L,NY,NX)
     plt_soilchem%CORGC(L) =CORGC(L,NY,NX)
-    plt_site%CDPTHZ(L)    =CDPTHZ(L,NY,NX)
+    plt_site%CumSoilThickness(L)    =CumSoilThickness(L,NY,NX)
     plt_site%FracSoiAsMicP(L) =FracSoiAsMicP(L,NY,NX)
 
     plt_soilchem%trc_solml(ids_beg:ids_end,L)  =trc_solml(ids_beg:ids_end,L,NY,NX)
@@ -1610,7 +1610,7 @@ implicit none
 
   ZeroPlanDisp(NY,NX)=plt_ew%ZeroPlanDisp
   RoughHeight(NY,NX)=plt_ew%RoughHeight
-  RAB(NY,NX)=plt_ew%RAB
+  BndlResistAboveCanG(NY,NX)=plt_ew%BndlResistAboveCanG
   RIB(NY,NX)=plt_ew%RIB
   GridMaxCanopyHeight(NY,NX)=plt_morph%GridMaxCanopyHeight
   RADS(NY,NX)=plt_rad%RADS

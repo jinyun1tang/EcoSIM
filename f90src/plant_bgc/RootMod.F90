@@ -373,7 +373,7 @@ implicit none
     WSRTL   =>  plt_biom%WSRTL      , &
     WTRTL   =>  plt_biom%WTRTL      , &
     ZEROP   =>  plt_biom%ZEROP      , &
-    CDPTHZ  =>  plt_site%CDPTHZ     , &
+    CumSoilThickness  =>  plt_site%CumSoilThickness     , &
     RCO2A   =>  plt_rbgc%RCO2A      , &
     RCO2N   =>  plt_rbgc%RCO2N      , &
     RCO2M   =>  plt_rbgc%RCO2M      , &
@@ -720,20 +720,20 @@ implicit none
 !
 !     SoiBulkDensity=soil bulk density
 !     RTDP1,RTDP1X=primary root depth from soil surface
-!     CDPTHZ=depth from soil surface to layer bottom
+!     CumSoilThickness=depth from soil surface to layer bottom
 !     ICHKL=flag for identifying layer with primary root tip
 !     RTN1=number of primary root axes
 !     XRTN1=multiplier for number of primary root axes
 !
       IF(N.EQ.ipltroot)THEN
         IF(SoiBulkDensity(L).GT.ZERO)THEN
-          RTDP1X=PrimRootDepth(N,NR,NZ)-CDPTHZ(0)
+          RTDP1X=PrimRootDepth(N,NR,NZ)-CumSoilThickness(0)
         ELSE
           RTDP1X=PrimRootDepth(N,NR,NZ)
         ENDIF
-        IF(RTDP1X.GT.CDPTHZ(L-1).AND.ICHK1(N,NR).EQ.0)THEN
+        IF(RTDP1X.GT.CumSoilThickness(L-1).AND.ICHK1(N,NR).EQ.0)THEN
             PrimRootXNumL(N,L,NZ)=PrimRootXNumL(N,L,NZ)+XRTN1
-            IF(RTDP1X.LE.CDPTHZ(L).OR.L.EQ.NJ)THEN
+            IF(RTDP1X.LE.CumSoilThickness(L).OR.L.EQ.NJ)THEN
               ICHK1(N,NR)=1
 !
 !     FRACTION OF PRIMARY ROOT SINK IN SOIL LAYER
@@ -809,7 +809,7 @@ implicit none
 !
               RCO2RM=AZMAX1(VMXC*FRTN*EPOOLR(ielmc,N,L,NZ) &
                 *fTgrowRootP(L,NZ))*CNPG*FDBKX(NB1(NZ),NZ)*WFNGR(N,L)
-              IF(RTDP1X.GE.CDPTHZ(NJ))THEN
+              IF(RTDP1X.GE.CumSoilThickness(NJ))THEN
                 RCO2RM=AMIN1(RMNCR,RCO2RM)
               ENDIF
 !
@@ -910,7 +910,7 @@ implicit none
 !     THROUGH WHICH PRIMARY ROOTS GROW
 !
 !     RTDP1=primary root depth from soil surface
-!     CDPTHZ=depth from soil surface to layer bottom
+!     CumSoilThickness=depth from soil surface to layer bottom
 !     PrimRootLen=primary root length
 !     SeedinDepth=seeding depth
 !     FRCO2=fraction of primary root respiration attributed to layer
@@ -918,7 +918,7 @@ implicit none
 !     RCO2M,RCO2N=RCO2A unltd by O2,nonstructural C
 !     RCO2TM,RCO2T=total C respiration unltd,ltd by O2
 !
-              IF(PrimRootDepth(N,NR,NZ).GT.CDPTHZ(NGTopRootLayer(NZ)))THEN
+              IF(PrimRootDepth(N,NR,NZ).GT.CumSoilThickness(NGTopRootLayer(NZ)))THEN
                 TFRCO2=0._r8
                 D5100: DO LL=NGTopRootLayer(NZ),NINR(NR,NZ)
                   IF(LL.LT.NINR(NR,NZ))THEN
@@ -1206,7 +1206,7 @@ implicit none
     CNWS      =>  plt_allom%CNWS       , &
     CPWS      =>  plt_allom%CPWS       , &
     FWODRE    =>  plt_allom%FWODRE     , &
-    CDPTHZ    =>  plt_site%CDPTHZ      , &
+    CumSoilThickness    =>  plt_site%CumSoilThickness      , &
     DLYR3     =>  plt_site%DLYR3       , &
     NJ        =>  plt_site%NJ          , &
     pftPlantPopulation        =>  plt_site%pftPlantPopulation          , &
@@ -1258,7 +1258,7 @@ implicit none
 !     FGROL,FGROZ=fraction of GRTLGL in current,next lower soil layer
 !
   IF(GRTLGL.GT.ZEROP(NZ).AND.L.LT.NJ)THEN
-    FGROL=AZMAX1(AMIN1(1.0_r8,(CDPTHZ(L)-PrimRootDepth(N,NR,NZ))/GRTLGL))
+    FGROL=AZMAX1(AMIN1(1.0_r8,(CumSoilThickness(L)-PrimRootDepth(N,NR,NZ))/GRTLGL))
     IF(FGROL.LT.1.0_r8)FGROL=0._r8
     FGROZ=AZMAX1(1.0_r8-FGROL)
   ELSE
@@ -1352,7 +1352,7 @@ implicit none
     ZEROP    =>  plt_biom%ZEROP    , &
     EPOOLN   =>  plt_biom%EPOOLN   , &
     RootGasLoss_disturb    =>  plt_bgcr%RootGasLoss_disturb    , &
-    CDPTHZ   =>  plt_site%CDPTHZ   , &
+    CumSoilThickness   =>  plt_site%CumSoilThickness   , &
     ZEROS2   =>  plt_site%ZEROS2   , &
     DLYR3    =>  plt_site%DLYR3    , &
     trcg_rootml     =>  plt_rbgc%trcg_rootml , &
@@ -1377,7 +1377,7 @@ implicit none
 !     NINR=deepest root layer
 !     VLSoilPoreMicP=soil layer volume excluding macropore, rocks
 !     RTDP1X=primary root depth from soil surface
-!     CDPTHZ=depth from soil surface to layer bottom
+!     CumSoilThickness=depth from soil surface to layer bottom
 !     SeedinDepth=seeding depth
 !     FRTN=fraction of primary root sink strength in axis
 !     WTRT1,WTRT1N,WTRT1P=primary root C,N,P mass in soil layer
@@ -1388,7 +1388,7 @@ implicit none
 !     CPOOLR,ZPOOLR,PPOOLR=non-structural C,N,P mass in root
 
   D5115: DO LL=L,NGTopRootLayer(NZ)+1,-1
-    IF(VLSoilPoreMicP(LL-1).GT.ZEROS2.AND.(RTDP1X.LT.CDPTHZ(LL-1).OR.RTDP1X.LT.SeedinDepth(NZ)))THEN
+    IF(VLSoilPoreMicP(LL-1).GT.ZEROS2.AND.(RTDP1X.LT.CumSoilThickness(LL-1).OR.RTDP1X.LT.SeedinDepth(NZ)))THEN
       IF(RLNT(N,LL).GT.ZEROP(NZ))THEN
         FRTN=(RTSK1(N,LL,NR)+RTSK2(N,LL,NR))/RLNT(N,LL)
       ELSE
@@ -1440,7 +1440,7 @@ implicit none
 !     RTN2,SecndRootXNumL=number of secondary root axes
 !     PrimRootXNumL=number of primary root axes
 !     PrimRootLen=primary root length
-!     CDPTHZ=depth from soil surface to layer bottom
+!     CumSoilThickness=depth from soil surface to layer bottom
 !     SeedinDepth=seeding depth
 !
       SecndRootXNumL(N,LL,NZ)=SecndRootXNumL(N,LL,NZ)-RTN2(N,LL,NR,NZ)
@@ -1448,10 +1448,10 @@ implicit none
       RTN2(N,LL,NR,NZ)=0._r8
       PrimRootXNumL(N,LL,NZ)=PrimRootXNumL(N,LL,NZ)-XRTN1
       IF(LL-1.GT.NGTopRootLayer(NZ))THEN
-        PrimRootLen(N,LL-1,NR,NZ)=DLYR3(LL-1)-(CDPTHZ(LL-1)-PrimRootDepth(N,NR,NZ))
+        PrimRootLen(N,LL-1,NR,NZ)=DLYR3(LL-1)-(CumSoilThickness(LL-1)-PrimRootDepth(N,NR,NZ))
       ELSE
-        PrimRootLen(N,LL-1,NR,NZ)=DLYR3(LL-1)-(CDPTHZ(LL-1)-PrimRootDepth(N,NR,NZ)) &
-          -(SeedinDepth(NZ)-CDPTHZ(LL-2))
+        PrimRootLen(N,LL-1,NR,NZ)=DLYR3(LL-1)-(CumSoilThickness(LL-1)-PrimRootDepth(N,NR,NZ)) &
+          -(SeedinDepth(NZ)-CumSoilThickness(LL-2))
       ENDIF
 !
 !     WITHDRAW C,N,P FROM ROOT NODULES IN LEGUMES
@@ -1872,7 +1872,7 @@ implicit none
     VLSoilPoreMicP       =>   plt_soilchem%VLSoilPoreMicP  , &
     ZEROS2     =>   plt_site%ZEROS2    , &
     NU         =>   plt_site%NU        , &
-    CDPTHZ     =>   plt_site%CDPTHZ    , &
+    CumSoilThickness     =>   plt_site%CumSoilThickness    , &
     ZERO       =>   plt_site%ZERO      , &
     DLYR3      =>   plt_site%DLYR3     , &
     RUPH1B     =>   plt_rbgc%RUPH1B    , &
@@ -1988,7 +1988,7 @@ implicit none
 !
 !     RTDP1=primary root depth from soil surface
 !     RTDPP=primary root depth from canopy
-!     CDPTHZ=depth from soil surface to layer bottom
+!     CumSoilThickness=depth from soil surface to layer bottom
 !     HTSTZ=canopy height for water uptake
 !     RTSK=relative primary root sink strength
 !     RTSK1=primary root sink strength
@@ -1997,8 +1997,8 @@ implicit none
 !     RTNT,RLNT=total root sink strength
 !
           IF(N.EQ.1)THEN
-            IF(PrimRootDepth(N,NR,NZ).GT.CDPTHZ(L-1))THEN
-              IF(PrimRootDepth(N,NR,NZ).LE.CDPTHZ(L))THEN
+            IF(PrimRootDepth(N,NR,NZ).GT.CumSoilThickness(L-1))THEN
+              IF(PrimRootDepth(N,NR,NZ).LE.CumSoilThickness(L))THEN
                 RTDPP=PrimRootDepth(N,NR,NZ)+HTSTZ(NZ)
                 RTSK1(N,L,NR)=RTSK(IGTYP(NZ))*XRTN1*PrimRootRadius(N,L,NZ)**2._r8/RTDPP
                 RTNT(N)=RTNT(N)+RTSK1(N,L,NR)
@@ -2012,7 +2012,7 @@ implicit none
 !
 !     RTDPL=depth of primary root axis in layer
 !     RTDP1=primary root depth from soil surface
-!     CDPTHZ=depth from soil surface to layer bottom
+!     CumSoilThickness=depth from soil surface to layer bottom
 !     RTDPX=distance behind growing point for secondary roots
 !     DLYR=layer thickness
 !     SeedinDepth=seeding depth
@@ -2026,10 +2026,10 @@ implicit none
 !     RTNT,RLNT=total root sink strength
 !
           IF(N.EQ.1)THEN
-            RTDPL(NR,L)=AZMAX1(PrimRootDepth(ipltroot,NR,NZ)-CDPTHZ(L-1)-RTDPX)
+            RTDPL(NR,L)=AZMAX1(PrimRootDepth(ipltroot,NR,NZ)-CumSoilThickness(L-1)-RTDPX)
             RTDPL(NR,L)=AZMAX1(AMIN1(DLYR3(L),RTDPL(NR,L)) &
-              -AZMAX1(SeedinDepth(NZ)-CDPTHZ(L-1)-HypoctoylHeight(NZ)))
-            RTDPS=AMAX1(SeedinDepth(NZ),CDPTHZ(L-1))+0.5*RTDPL(NR,L)+HTSTZ(NZ)
+              -AZMAX1(SeedinDepth(NZ)-CumSoilThickness(L-1)-HypoctoylHeight(NZ)))
+            RTDPS=AMAX1(SeedinDepth(NZ),CumSoilThickness(L-1))+0.5*RTDPL(NR,L)+HTSTZ(NZ)
             IF(RTDPS.GT.ZERO)THEN
               RTSKP=XRTN1*PrimRootRadius(N,L,NZ)**2._r8/RTDPS
               RTSKS=safe_adb(RTN2(N,L,NR,NZ)*SecndRootRadius(N,L,NZ)**2._r8,AveSecndRootLen(N,L,NZ))

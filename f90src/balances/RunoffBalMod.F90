@@ -43,7 +43,7 @@ implicit none
 !
     N1=NX
     N2=NY
-    D9980: DO N=NCN(NY,NX),3
+    D9980: DO N=FlowDirIndicator(NY,NX),3
       D9975: DO NN=1,2
         IF(N.EQ.1)THEN
           IF(NN.EQ.1)THEN
@@ -447,14 +447,14 @@ implicit none
 !
 !     FLW,WaterFlowMacP,HFLW=micropore,macropore,heat flux through lateral and lower boundaries from watsub.f
 !     VOLWOU,HEATOU=cumulative water, heat loss through lateral and lower boundaries
-!     UVOLO,HVOLO=cumulative,hourly water loss through lateral and lower boundaries
+!     UVOLO,FWatDischarge=cumulative,hourly water loss through lateral and lower boundaries
 !
-  IF(NCN(NY,NX).NE.3.OR.N.EQ.3)THEN
-    HEATOU=HEATOU-XN*HeatFlow(N,N6,N5,N4)
+  IF(FlowDirIndicator(NY,NX).NE.3.OR.N.EQ.3)THEN
+    HEATOU=HEATOU-XN*HeatFlow2Soil(N,N6,N5,N4)
     WO=XN*(WaterFlowSoiMicP(N,N6,N5,N4)+WaterFlowMacP(N,N6,N5,N4))
     IF(abs(WO)>0._r8)THEN
       VOLWOU=VOLWOU-WO
-      HVOLO(N2,N1)=HVOLO(N2,N1)-WO
+      FWatDischarge(N2,N1)=FWatDischarge(N2,N1)-WO
       UVOLO(N2,N1)=UVOLO(N2,N1)-WO
 !     IF((I/10)*10.EQ.I.AND.J.EQ.15)THEN
 !     WRITE(*,3488)'UVOLO',I,J,N6,N5,N4,N,XN,WO

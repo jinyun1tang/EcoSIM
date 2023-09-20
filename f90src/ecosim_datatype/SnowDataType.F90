@@ -9,7 +9,7 @@ module SnowDataType
   character(len=*), private, parameter :: mod_filename = __FILE__
 
   real(r8),target, allocatable ::  VHCPWM(:,:,:,:)                    !volumetric heat capacity of snowpack
-  real(r8),target, allocatable ::  FLQWM(:,:,:,:)                     !snowpack water flux
+  real(r8),target, allocatable ::  WatFlowInSnowM(:,:,:,:)                     !snowpack water flux
   real(r8),target, allocatable ::  QSM(:,:,:,:)                       !runoff snow flux, [m3 d-2 t-1]
   REAL(R8),target, allocatable ::  ALBS(:,:)                          !snowpack albedo
   real(r8),target, allocatable ::  NewSnowDens(:,:)                   !new snowpack density, [Mg m-3]
@@ -37,10 +37,10 @@ module SnowDataType
   real(r8),target, allocatable ::  VcumSnoDWI(:,:)                          !snowpack volume, [m3 d-2]
   real(r8),target, allocatable ::  VLHeatCapSnowMN(:,:)               !minimum layer integrated snowpack heat capacity  [MJ d-2 K-1]
   real(r8),target, allocatable ::  FLSW(:,:,:)                        !water from snowpack to soil micropores
-  real(r8),target, allocatable ::  FLSWH(:,:,:)                       !water from snowpack to soil macropores
-  real(r8),target, allocatable ::  HFLSW(:,:,:)                       !convective heat from snowpack to soil
-  real(r8),target, allocatable ::  FLSWR(:,:,:)                       !water flux from snowpack to litter
-  real(r8),target, allocatable ::  HFLSWR(:,:,:)                      !convective heat flux from snowpack to litter
+  real(r8),target, allocatable ::  WatConvSno2MacP(:,:,:)                       !water from snowpack to soil macropores
+  real(r8),target, allocatable ::  HeatConvSno2Soi(:,:,:)                       !convective heat from snowpack to soil
+  real(r8),target, allocatable ::  WatConvSno2LitR(:,:,:)                       !water flux from snowpack to litter
+  real(r8),target, allocatable ::  HeatConvSno2LitR(:,:,:)                      !convective heat flux from snowpack to litter
   real(r8),target, allocatable ::  QS(:,:,:)                          !snowpack runoff snow, [m3 d-2 h-1]
   real(r8),target, allocatable ::  QW(:,:,:)                          !snowpack runoff water, [m3 d-2 h-1]
   real(r8),target, allocatable ::  QI(:,:,:)                          !snowpack runoff ice, [m3 d-2 h-1]
@@ -69,7 +69,7 @@ contains
 
   implicit none
   allocate(VHCPWM(60,JS,JY,JX));VHCPWM=0._r8
-  allocate(FLQWM(60,JS,JY,JX)); FLQWM=0._r8
+  allocate(WatFlowInSnowM(60,JS,JY,JX)); WatFlowInSnowM=0._r8
   allocate(QSM(60,2,JV,JH));    QSM=0._r8
   allocate(ALBS(JY,JX));        ALBS=0._r8
   allocate(NewSnowDens(JY,JX));       NewSnowDens=0._r8
@@ -97,10 +97,10 @@ contains
   allocate(VcumSnoDWI(JY,JX));        VcumSnoDWI=0._r8
   allocate(VLHeatCapSnowMN(JY,JX));      VLHeatCapSnowMN=0._r8
   allocate(FLSW(JS,JY,JX));     FLSW=0._r8
-  allocate(FLSWH(JS,JY,JX));    FLSWH=0._r8
-  allocate(HFLSW(JS,JY,JX));    HFLSW=0._r8
-  allocate(FLSWR(JS,JY,JX));    FLSWR=0._r8
-  allocate(HFLSWR(JS,JY,JX));   HFLSWR=0._r8
+  allocate(WatConvSno2MacP(JS,JY,JX));    WatConvSno2MacP=0._r8
+  allocate(HeatConvSno2Soi(JS,JY,JX));    HeatConvSno2Soi=0._r8
+  allocate(WatConvSno2LitR(JS,JY,JX));    WatConvSno2LitR=0._r8
+  allocate(HeatConvSno2LitR(JS,JY,JX));   HeatConvSno2LitR=0._r8
   allocate(QS(2,JV,JH));        QS=0._r8
   allocate(QW(2,JV,JH));        QW=0._r8
   allocate(QI(2,JV,JH));        QI=0._r8
@@ -135,7 +135,7 @@ contains
     call destroy(trcsa_XQS)
   endif
   call destroy(VHCPWM)
-  call destroy(FLQWM)
+  call destroy(WatFlowInSnowM)
   call destroy(QSM)
   call destroy(ALBS)
   call destroy(NewSnowDens)
@@ -163,10 +163,10 @@ contains
   call destroy(VcumSnoDWI)
   call destroy(VLHeatCapSnowMN)
   call destroy(FLSW)
-  call destroy(FLSWH)
-  call destroy(HFLSW)
-  call destroy(FLSWR)
-  call destroy(HFLSWR)
+  call destroy(WatConvSno2MacP)
+  call destroy(HeatConvSno2Soi)
+  call destroy(WatConvSno2LitR)
+  call destroy(HeatConvSno2LitR)
   call destroy(QS)
   call destroy(QW)
   call destroy(QI)

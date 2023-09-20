@@ -401,7 +401,7 @@ module StartqMod
 !     INITIALIZE ROOT(N=1),MYCORRHIZAL(N=2) DIMENSIONS, UPTAKE PARAMETERS
 !
 !     SeedinDepth=seeding depth(m) from PFT management file
-!     CDPTHZ=depth to soil layer bottom from surface(m)
+!     CumSoilThickness=depth to soil layer bottom from surface(m)
 !     NG,NIX,NINR=seeding,upper,lower rooting layer
 !     CNRTS,CPRTS=N,P root growth yield
 !     MaxPrimRootRadius,MaxSecndRootRadius=maximum primary,secondary mycorrhizal radius (m)
@@ -413,8 +413,8 @@ module StartqMod
 !
   SeedinDepth(NZ,NY,NX)=PlantinDepth(NZ,NY,NX)
   D9795: DO L=NU(NY,NX),NL(NY,NX)
-    IF(SeedinDepth(NZ,NY,NX).GE.CDPTHZ(L-1,NY,NX) &
-      .AND.SeedinDepth(NZ,NY,NX).LT.CDPTHZ(L,NY,NX))THEN
+    IF(SeedinDepth(NZ,NY,NX).GE.CumSoilThickness(L-1,NY,NX) &
+      .AND.SeedinDepth(NZ,NY,NX).LT.CumSoilThickness(L,NY,NX))THEN
       NGTopRootLayer(NZ,NY,NX)=L
       NIXBotRootLayer(NZ,NY,NX)=L
       D9790: DO NR=1,pltpar%JRS

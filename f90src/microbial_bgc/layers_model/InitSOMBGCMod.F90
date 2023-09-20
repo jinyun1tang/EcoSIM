@@ -582,12 +582,12 @@ module InitSOMBGCMOD
   end associate
   end subroutine InitManureKinetiComponent
 !------------------------------------------------------------------------------------------
-  subroutine InitPOMKinetiComponent(L,NY,NX,HCX,TORGL,CDPTHG,FCX,CORGCM)
+  subroutine InitPOMKinetiComponent(L,NY,NX,HCX,TORGL,LandScape1stSoiLayDepth,FCX,CORGCM)
   implicit none
   integer, intent(in)  :: L, NY, NX
   real(r8), intent(in) :: HCX
   real(r8), intent(in) :: TORGL
-  real(r8), intent(in) :: CDPTHG
+  real(r8), intent(in) :: LandScape1stSoiLayDepth
   real(r8), intent(out):: FCX
   real(r8), intent(out):: CORGCM
   real(r8) :: FCY,FC0,FC1
@@ -619,13 +619,13 @@ module InitSOMBGCMOD
       !     DRYLAND SOIL
       !
       !     CORGC,FORGC=SOC,minimum SOC for organic soil(g Mg-1)
-      !     DPTH,DTBLZ=depth to layer midpoint,external water table(m)
+      !     DPTH,ExtWaterTablet0=depth to layer midpoint,external water table(m)
       !     FC0=partitioning to less resistant component at DPTH=0
       !     FCX=reduction in FC0 at DPTH
       !     CORGCX,CORGNX,CORGPX=C,N,P concentations in humus
 !
-      IF(CORGC(L,NY,NX).LE.FORGC.OR.DPTH(L,NY,NX).LE.DTBLZ(NY,NX) &
-        +CumDepth2LayerBottom(NU(NY,NX),NY,NX)-CDPTHG)THEN
+      IF(CORGC(L,NY,NX).LE.FORGC.OR.SoiDepthMidLay(L,NY,NX).LE.ExtWaterTablet0(NY,NX) &
+        +CumDepth2LayerBottom(NU(NY,NX),NY,NX)-LandScape1stSoiLayDepth)THEN
         FCY=0.60_r8
         IF(CORGCX(k_humus).GT.1.0E-32_r8)THEN
           FC0=FCY*EXP(-5.0_r8*(AMIN1(CORGNX(k_humus), &
@@ -692,13 +692,13 @@ module InitSOMBGCMOD
 
 !------------------------------------------------------------------------------------------
 
-  subroutine InitSOMProfile(L,NY,NX,HCX,TORGL,CDPTHG,CORGCM,FCX)
+  subroutine InitSOMProfile(L,NY,NX,HCX,TORGL,LandScape1stSoiLayDepth,CORGCM,FCX)
 
   implicit none
   integer,  intent(in)  :: L,NY,NX
   real(r8), intent(in)  :: HCX
   real(r8), intent(in)  :: TORGL
-  real(r8), intent(in)  :: CDPTHG
+  real(r8), intent(in)  :: LandScape1stSoiLayDepth
   real(r8), intent(out) :: CORGCM
   real(r8), intent(out) :: FCX
 
@@ -711,7 +711,7 @@ module InitSOMBGCMOD
   call InitManureKinetiComponent(L,NY,NX)
   !
   !     POM
-  call InitPOMKinetiComponent(L,NY,NX,HCX,TORGL,CDPTHG,FCX,CORGCM)
+  call InitPOMKinetiComponent(L,NY,NX,HCX,TORGL,LandScape1stSoiLayDepth,FCX,CORGCM)
 
   end subroutine InitSOMProfile
 

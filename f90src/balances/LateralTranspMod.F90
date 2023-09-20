@@ -77,9 +77,11 @@ implicit none
 
     VTGAS=sum(trcg_VOLG(idg_beg:idg_end-1))
 
+    !air-concentration insignificant, or total gas volume > allwed air
     IF(THETP(L,NY,NX).LT.THETX.OR.VTGAS.GT.VTATM)LX=1
-    IF(THETP(L,NY,NX).GE.THETX.AND.LX.EQ.0)LG=L
 
+    IF(THETP(L,NY,NX).GE.THETX.AND.LX.EQ.0)LG=L
+    !make a copy of soil water/ice in micro- and macropores
     VLWatMicP1(L,NY,NX)=VLWatMicP(L,NY,NX)
     VLiceMicP1(L,NY,NX)=VLiceMicP(L,NY,NX)
     VLWatMacP1(L,NY,NX)=VLWatMacP(L,NY,NX)
@@ -91,10 +93,8 @@ implicit none
   !     N3,N2,N1=L,NY,NX of source grid cell
   !     N6,N5,N4=L,NY,NX of destination grid cell
   !
-    N1=NX
-    N2=NY
-    N3=L
-    D8580: DO N=NCN(NY,NX),3
+    N1=NX;N2=NY;N3=L
+    D8580: DO N=FlowDirIndicator(NY,NX),3
       IF(N.EQ.1)THEN
       !exchange in the x direction
         N4=NX+1   !east
@@ -119,9 +119,9 @@ implicit none
       IF(L.EQ.NUM(N2,N1))THEN
         IF(N.NE.3)THEN
 
-          call FluxesFromRunoff(N,N1,N2,N4,N5,N4B,N5B)
+          call OMH2OFluxesFromRunoff(N,N1,N2,N4,N5,N4B,N5B)
 
-          call FluxFromSnowRunoff(N,N1,N2,N4,N5,N4B,N5B)
+          call MassFluxFromSnowRunoff(N,N1,N2,N4,N5,N4B,N5B)
           !
     !
         ELSEIF(N.EQ.3)THEN
@@ -205,7 +205,7 @@ implicit none
 !
   DO  L=NU(NY,NX),NL(NY,NX)
     TWatFlowCellMicP(L,NY,NX)=0.0_r8
-    TFLWX(L,NY,NX)=0.0_r8
+    TWatFlowCellMicPX(L,NY,NX)=0.0_r8
     TWaterFlowMacP(L,NY,NX)=0.0_r8
     THeatFlowSoiCell(L,NY,NX)=0.0_r8
     WatIceThawMicP(L,NY,NX)=0.0_r8
@@ -240,7 +240,7 @@ implicit none
 
 !------------------------------------------------------------------------------------------
 
-  subroutine FluxesFromRunoff(N,N1,N2,N4,N5,N4B,N5B)
+  subroutine OMH2OFluxesFromRunoff(N,N1,N2,N4,N5,N4B,N5B)
   implicit none
   integer, intent(in) :: N,N1,N2,N4,N5,N4B,N5B
 
@@ -300,7 +300,7 @@ implicit none
   ENDDO D1202
   
 
-  end subroutine FluxesFromRunoff
+  end subroutine OMH2OFluxesFromRunoff
 !------------------------------------------------------------------------------------------
 
   subroutine TotalFluxFromSedmentTransp(N,N1,N2,N4 &
@@ -551,22 +551,24 @@ implicit none
 
   subroutine FluxThruGrids(N,N1,N2,N3,N4,N5,N6,NY,NX)
   implicit none
-  integer, intent(in) :: N   !exchagne along direction
-  integer, intent(in) :: NY,NX  !geophysical location
-  integer, intent(in) :: N1,N2,N3  !source grid indices
-  integer, intent(in) :: N4,N5 !dest grid indices  
+  integer, intent(in) :: N          !exchagne along direction
+  integer, intent(in) :: NY,NX      !geophysical location
+  integer, intent(in) :: N1,N2,N3   !source grid indices
+  integer, intent(in) :: N4,N5      !dest grid indices  
   integer, intent(inout) :: N6
   integer :: LL,K,NTSA,NTS,NTG
+
   !     begin_execution
   !     NET HEAT, WATER FLUXES BETWEEN ADJACENT
   !     GRID CELLS
   !
   !     TFLW,TWaterFlowMacP,TWaterFlowMacP=net micropore,macropore water flux, heat flux
   !     FLW,FLWH,HFLW=micropore,macropore water flux, heat flux from watsub.f
-  !     LakeSurfFlow,FLWHNU,LakeSurfHeatFlux=lake surface water flux, heat flux from watsub.f if lake surface disappears
-  !when NCN /=3, it means lateral exchange is consdiered
+  !     LakeSurfFlowMicP,FLWHNU,LakeSurfHeatFlux=lake surface water flux, heat flux from watsub.f if lake surface disappears
+  !when FlowDirIndicator /=3, it means lateral exchange is consdiered
   !N==3 means vertical direction
-  IF(NCN(N2,N1).NE.3.OR.N.EQ.3)THEN
+
+  IF(FlowDirIndicator(N2,N1).NE.3.OR.N.EQ.3)THEN
     D1200: DO LL=N6,NL(N5,N4)
       !modify the dest grid vertical location if needed
       IF(VLSoilPoreMicP(LL,N2,N1).GT.ZEROS2(N2,N1))THEN
@@ -578,32 +580,34 @@ implicit none
     IF(VLSoilPoreMicP(N3,N2,N1).GT.ZEROS2(N2,N1))THEN
       IF(N3.EQ.NU(N2,N1).AND.N.EQ.3)THEN
         !vertical direction, source is at soil surface
-        TWatFlowCellMicP(N3,N2,N1)=TWatFlowCellMicP(N3,N2,N1)+WaterFlowSoiMicP(N,N3,N2,N1)-LakeSurfFlow(N5,N4)
-        TFLWX(N3,N2,N1)=TFLWX(N3,N2,N1)+FLWX(N,N3,N2,N1)-FLWXNU(N5,N4)
-        TWaterFlowMacP(N3,N2,N1)=TWaterFlowMacP(N3,N2,N1)+WaterFlowMacP(N,N3,N2,N1)-FLWHNU(N5,N4)
-        THeatFlowSoiCell(N3,N2,N1)=THeatFlowSoiCell(N3,N2,N1)+HeatFlow(N,N3,N2,N1)-LakeSurfHeatFlux(N5,N4)
+        TWatFlowCellMicP(N3,N2,N1)=TWatFlowCellMicP(N3,N2,N1)+WaterFlowSoiMicP(N,N3,N2,N1)-LakeSurfFlowMicP(N5,N4)
+        TWatFlowCellMicPX(N3,N2,N1)=TWatFlowCellMicPX(N3,N2,N1)+WaterFlowSoiMicPX(N,N3,N2,N1)-LakeSurfFlowMicPX(N5,N4)
+        TWaterFlowMacP(N3,N2,N1)=TWaterFlowMacP(N3,N2,N1)+WaterFlowMacP(N,N3,N2,N1)-LakeSurfFlowMacP(N5,N4)
+        THeatFlowSoiCell(N3,N2,N1)=THeatFlowSoiCell(N3,N2,N1)+HeatFlow2Soil(N,N3,N2,N1)-LakeSurfHeatFlux(N5,N4)
+
         if(THeatFlowSoiCell(N3,N2,N1)<-1.e10)then
-          write(*,*)'THeatFlowSoiCell(N3,N2,N1)+HeatFlow(N,N3,N2,N1)-LakeSurfHeatFlux(N5,N4)',&
-            THeatFlowSoiCell(N3,N2,N1),HeatFlow(N,N3,N2,N1),LakeSurfHeatFlux(N5,N4)
+          write(*,*)'THeatFlowSoiCell(N3,N2,N1)+HeatFlow2Soil(N,N3,N2,N1)-LakeSurfHeatFlux(N5,N4)',&
+            THeatFlowSoiCell(N3,N2,N1),HeatFlow2Soil(N,N3,N2,N1),LakeSurfHeatFlux(N5,N4)
           write(*,*)'Ns=',N1,n2,n3,n4,n5
           call endrun(trim(mod_filename)//' at line',__LINE__)
         endif
       ELSE
         TWatFlowCellMicP(N3,N2,N1)=TWatFlowCellMicP(N3,N2,N1)+WaterFlowSoiMicP(N,N3,N2,N1)-WaterFlowSoiMicP(N,N6,N5,N4)
-        TFLWX(N3,N2,N1)=TFLWX(N3,N2,N1)+FLWX(N,N3,N2,N1)-FLWX(N,N6,N5,N4)
+        TWatFlowCellMicPX(N3,N2,N1)=TWatFlowCellMicPX(N3,N2,N1)+WaterFlowSoiMicPX(N,N3,N2,N1)-WaterFlowSoiMicPX(N,N6,N5,N4)
         TWaterFlowMacP(N3,N2,N1)=TWaterFlowMacP(N3,N2,N1)+WaterFlowMacP(N,N3,N2,N1)-WaterFlowMacP(N,N6,N5,N4)
-        THeatFlowSoiCell(N3,N2,N1)=THeatFlowSoiCell(N3,N2,N1)+HeatFlow(N,N3,N2,N1)-HeatFlow(N,N6,N5,N4)
+        THeatFlowSoiCell(N3,N2,N1)=THeatFlowSoiCell(N3,N2,N1)+HeatFlow2Soil(N,N3,N2,N1)-HeatFlow2Soil(N,N6,N5,N4)
+
         if(THeatFlowSoiCell(N3,N2,N1)<-1.e10)then
-          write(*,*)'THeatFlowSoiCell(N3,N2,N1)+HeatFlow(N,N3,N2,N1)-HeatFlow(N,N6,N5,N4)',&
-            THeatFlowSoiCell(N3,N2,N1),HeatFlow(N,N3,N2,N1),HeatFlow(N,N6,N5,N4)
+          write(*,*)'THeatFlowSoiCell(N3,N2,N1)+HeatFlow2Soil(N,N3,N2,N1)-HeatFlow2Soil(N,N6,N5,N4)',&
+            THeatFlowSoiCell(N3,N2,N1),HeatFlow2Soil(N,N3,N2,N1),HeatFlow2Soil(N,N6,N5,N4)
           write(*,*)'Ns=',N,N1,n2,n3,n4,n5,n6
           call endrun(trim(mod_filename)//' at line',__LINE__)
         endif
       ENDIF
       !     IF(N1.EQ.1.AND.N3.EQ.1)THEN
       !     WRITE(*,6632)'TFLW',I,J,N,N1,N2,N3,N4,N5,N6,NU(N2,N1)
-      !    2,TWatFlowCellMicP(N3,N2,N1),WaterFlowSoiMicP(N,N3,N2,N1),WaterFlowSoiMicP(N,N6,N5,N4),LakeSurfFlow(N5,N4)
-      !    3,THeatFlowSoiCell(N3,N2,N1),HeatFlow(N,N3,N2,N1),HeatFlow(N,N6,N5,N4)
+      !    2,TWatFlowCellMicP(N3,N2,N1),WaterFlowSoiMicP(N,N3,N2,N1),WaterFlowSoiMicP(N,N6,N5,N4),LakeSurfFlowMicP(N5,N4)
+      !    3,THeatFlowSoiCell(N3,N2,N1),HeatFlow2Soil(N,N3,N2,N1),HeatFlow2Soil(N,N6,N5,N4)
       !    2,LakeSurfHeatFlux(N5,N4),VLWatMicP(N3,N2,N1)
 !6632  FORMAT(A8,10I4,12E16.8)
       !     ENDIF
@@ -670,7 +674,7 @@ implicit none
       ENDIF
     ELSE
       TWatFlowCellMicP(N3,N2,N1)=0.0_r8
-      TFLWX(N3,N2,N1)=0.0_r8
+      TWatFlowCellMicPX(N3,N2,N1)=0.0_r8
       TWaterFlowMacP(N3,N2,N1)=0.0_r8
       THeatFlowSoiCell(N3,N2,N1)=0.0_r8
       WatIceThawMicP(N3,N2,N1)=0.0_r8

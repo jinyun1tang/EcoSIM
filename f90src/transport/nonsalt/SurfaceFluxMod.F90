@@ -132,7 +132,7 @@ contains
   REAL(R8) :: VFLW
   integer :: K,NTS
 
-  FLWRM1=FLWRM(M,NY,NX)
+  FLWRM1=WatFLo2LitrM(M,NY,NX)
 !
 !     FLWRM=litter-soil water flux from watsub.f
 !
@@ -429,7 +429,7 @@ contains
   real(r8) :: SDifFlx(ids_beg:ids_end)
   real(r8) :: SAdvFlx(ids_beg:ids_end)
 !
-!     FINHM=macro-micropore water transfer from watsub.f
+!     FWatExMacP2MicPM=macro-micropore water transfer from watsub.f
 !     VLWatMicPM,VLWatMacPM=micropore,macropore water volume
 !     RFL*=convective macropore-micropore solute transfer
 !     VLNH4,VLNO3,VLPO4=non-band NH4,NO3,PO4 volume fraction
@@ -442,9 +442,9 @@ contains
 !
 !     MACROPORE TO MICROPORE TRANSFER
 !
-  IF(FINHM(M,NU(NY,NX),NY,NX).GT.0.0_r8)THEN
+  IF(FWatExMacP2MicPM(M,NU(NY,NX),NY,NX).GT.0.0_r8)THEN
     IF(VLWatMacPM(M,NU(NY,NX),NY,NX).GT.ZEROS2(NY,NX))THEN
-      VFLW=AZMAX1(AMIN1(VFLWX,FINHM(M,NU(NY,NX),NY,NX) &
+      VFLW=AZMAX1(AMIN1(VFLWX,FWatExMacP2MicPM(M,NU(NY,NX),NY,NX) &
       /VLWatMacPM(M,NU(NY,NX),NY,NX)))
     ELSE
       VFLW=VFLWX
@@ -476,9 +476,9 @@ contains
 !
 !     MICROPORE TO MACROPORE TRANSFER
 !
-  ELSEIF(FINHM(M,NU(NY,NX),NY,NX).LT.0.0_r8)THEN
+  ELSEIF(FWatExMacP2MicPM(M,NU(NY,NX),NY,NX).LT.0.0_r8)THEN
     IF(VLWatMicPM(M,NU(NY,NX),NY,NX).GT.ZEROS2(NY,NX))THEN
-      VFLW=AZMIN1(AMAX1(-VFLWX,FINHM(M,NU(NY,NX),NY,NX)/VLWatMicPM(M,NU(NY,NX),NY,NX)))
+      VFLW=AZMIN1(AMAX1(-VFLWX,FWatExMacP2MicPM(M,NU(NY,NX),NY,NX)/VLWatMicPM(M,NU(NY,NX),NY,NX)))
     ELSE
       VFLW=-VFLWX
     ENDIF
@@ -1321,7 +1321,7 @@ contains
 !
 !     VHCPWM,VLHeatCapSnowMN=current,minimum volumetric heat capacity of snowpack
 !     VOLWSL=snowpack water content
-!     FLQWM=snowpack water flux
+!     WatFlowInSnowM=snowpack water flux
 !     R*BLS=solute flux in snowpack
 !     X*BLS=hourly solute flux in snowpack
 !     CO2W,CH4W,OXYW,ZNGW,ZN2W,ZN4W,ZN3W,ZNOW,Z1PW,ZHPW=CO2,CH4,O2,N2,N2O,H2 content in snowpack
@@ -1332,7 +1332,7 @@ contains
       L2=MIN(JS,L+1)
       IF(L.LT.JS.AND.VHCPWM(M,L2,NY,NX).GT.VLHeatCapSnowMN(NY,NX))THEN
         IF(VLWatSnow(L,NY,NX).GT.ZEROS2(NY,NX))THEN
-          VFLWW=AZMAX1(AMIN1(1.0,FLQWM(M,L2,NY,NX)/VLWatSnow(L,NY,NX)))
+          VFLWW=AZMAX1(AMIN1(1.0,WatFlowInSnowM(M,L2,NY,NX)/VLWatSnow(L,NY,NX)))
         ELSE
           VFLWW=1.0
         ENDIF
@@ -1354,7 +1354,7 @@ contains
 !     SNOWPACK SOLUTE DISCHARGE TO SURFACE LITTER, SOIL SURFACE
 !
 !     VOLWSL=snowpack water content
-!     FLQRM,FLQSM,FLQHM=total water flux to litter,soil micropore,macropore
+!     WatFlowSno2LitRM,WatFlowSno2MicPM,WatFlowSno2MacPM=total water flux to litter,soil micropore,macropore
 !     CVRD,BARE=litter cover fraction,1-CVRD
 !     VLNH4,VLNO3,VLPO4=non-band NH4,NO3,PO4 volume fraction
 !     VLNHB,VLNOB,VLPOB=band NH4,NO3,PO4 volume fraction
@@ -1364,8 +1364,8 @@ contains
 !
         IF(ICHKL.EQ.0)THEN
           IF(VLWatSnow(L,NY,NX).GT.ZEROS2(NY,NX))THEN
-            VFLWR=AZMAX1(AMIN1(1.0_r8,FLQRM(M,NY,NX)/VLWatSnow(L,NY,NX)))
-            VFLWS=AZMAX1(AMIN1(1.0_r8,(FLQSM(M,NY,NX)+FLQHM(M,NY,NX))/VLWatSnow(L,NY,NX)))
+            VFLWR=AZMAX1(AMIN1(1.0_r8,WatFlowSno2LitRM(M,NY,NX)/VLWatSnow(L,NY,NX)))
+            VFLWS=AZMAX1(AMIN1(1.0_r8,(WatFlowSno2MicPM(M,NY,NX)+WatFlowSno2MacPM(M,NY,NX))/VLWatSnow(L,NY,NX)))
           ELSE
             VFLWR=FracSurfByLitR(NY,NX)
             VFLWS=FracSurfAsBareSoi(NY,NX)

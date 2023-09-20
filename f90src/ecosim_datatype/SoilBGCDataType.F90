@@ -121,7 +121,7 @@ implicit none
   real(r8),target,allocatable ::  XZHYS(:,:,:)                       !total H+ production
   real(r8),target,allocatable ::  WaterFlowSoiMicP(:,:,:,:)                       !water flux micropore, [m3 d-2 h-1]
   real(r8),target,allocatable ::  WaterFlowMacP(:,:,:,:)                      !water flux macropore, [m3 d-2 h-1]
-  real(r8),target,allocatable ::  HeatFlow(:,:,:,:)                      !convective heat flux micropore, [MJ d-2 h-1]
+  real(r8),target,allocatable ::  HeatFlow2Soil(:,:,:,:)                      !convective heat flux micropore, [MJ d-2 h-1]
 
   real(r8),target,allocatable ::  trcs_XFLS(:,:,:,:,:)
   real(r8),target,allocatable ::  XOCFLS(:,:,:,:,:)                  !DOC flux micropore, [g d-2 h-1]
@@ -263,7 +263,7 @@ implicit none
   allocate(XZHYS(0:JZ,JY,JX));  XZHYS=0._r8
   allocate(WaterFlowSoiMicP(3,JD,JV,JH));    WaterFlowSoiMicP=0._r8
   allocate(WaterFlowMacP(3,JD,JV,JH));   WaterFlowMacP=0._r8
-  allocate(HeatFlow(3,JD,JV,JH));   HeatFlow=0._r8
+  allocate(HeatFlow2Soil(3,JD,JV,JH));   HeatFlow2Soil=0._r8
 
   allocate(trcs_XFLS(ids_beg:ids_end,3,0:JD,JV,JH));trcs_XFLS=0._r8
   allocate(XOCFLS(1:jcplx,3,0:JD,JV,JH));XOCFLS=0._r8
@@ -395,7 +395,7 @@ implicit none
   call destroy(XZHYS)
   call destroy(WaterFlowSoiMicP)
   call destroy(WaterFlowMacP)
-  call destroy(HeatFlow)
+  call destroy(HeatFlow2Soil)
   call destroy(XOCFLS)
   call destroy(XONFLS)
 

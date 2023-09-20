@@ -53,7 +53,7 @@ module CanopyCondsMod
     WindMesHeight      => plt_site%WindMesHeight      , &
     ZEROS   => plt_site%ZEROS   , &
     NU      => plt_site%NU      , &
-    RAB     => plt_ew%RAB       , &
+    BndlResistAboveCanG     => plt_ew%BndlResistAboveCanG       , &
     ZeroPlanDisp      => plt_ew%ZeroPlanDisp        , &
     RoughHeight      => plt_ew%RoughHeight        , &
     RIB     => plt_ew%RIB       , &
@@ -98,14 +98,14 @@ module CanopyCondsMod
 !
 !     CANOPY ISOTHERMAL BOUNDARY LAYER RESISTANCE
 !
-!     RAB,RAM=biome canopy,minimum isothermal boundary layer resistance
+!     BndlResistAboveCanG,RAM=biome canopy,minimum isothermal boundary layer resistance
 !     UA=wind speed
 !     RIB=canopy isothermal Richardson number
 !
-    RAB=AMAX1(RAM,(LOG((ZZ-ZeroPlanDisp)/RoughHeight))**2._r8/(0.168_r8*UA))
+    BndlResistAboveCanG=AMAX1(RAM,(LOG((ZZ-ZeroPlanDisp)/RoughHeight))**2._r8/(0.168_r8*UA))
     RIB=1.27E+08_r8*(ZZ-RoughHeight)/(UA**2*TairK)
   ELSE
-    RAB=RAM
+    BndlResistAboveCanG=RAM
     RIB=0.0_r8
   ENDIF
   end associate

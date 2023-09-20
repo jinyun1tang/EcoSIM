@@ -356,7 +356,7 @@ module ExtractsMod
   real(r8) :: ENGYC
 
   associate(                       &
-    TBALE => plt_site%TBALE  , &
+    PlantElemntStoreLandscape => plt_site%PlantElemntStoreLandscape  , &
     BALE  => plt_site%BALE   , &
     TNH3C => plt_bgcr%TNH3C  , &
     RNH3C => plt_bgcr%RNH3C  , &
@@ -454,7 +454,7 @@ module ExtractsMod
   StemAreag=StemAreag+CanPSA(NZ)
   DO NE=1,npelms
     ZESNC(NE)=ZESNC(NE)-HEUPTK(NE,NZ)
-    TBALE(NE)=TBALE(NE)+BALE(NE,NZ)
+    PlantElemntStoreLandscape(NE)=PlantElemntStoreLandscape(NE)+BALE(NE,NZ)
   ENDDO
 
   DO NTG=idg_beg,idg_end-1

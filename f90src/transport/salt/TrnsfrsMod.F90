@@ -977,7 +977,7 @@ module TrnsfrsMod
 !          :*C0P*=CaPO4-,*C1P*=CaHPO4,*C2P*=CaH2PO4+,*M1P*=MgHPO4,*COO*=COOH-
 !          :*1=non-band,*B=band
 
-  IF(NCN(N2,N1).NE.3.OR.N.EQ.3)THEN
+  IF(FlowDirIndicator(N2,N1).NE.3.OR.N.EQ.3)THEN
     D1200: DO LL=N6,NL(NY,NX)
       IF(VLSoilPoreMicP(LL,N2,N1).GT.ZEROS2(N2,N1))THEN
         N6=LL
@@ -1024,7 +1024,7 @@ module TrnsfrsMod
 !     LOCATE ALL EXTERNAL BOUNDARIES AND SET BOUNDARY CONDITIONS
 !     ENTERED IN 'READS'
 !
-        D9580: DO N=1,3
+        D9580: DO N=FlowDirIndicator(NY,NX),3
           D9575: DO NN=1,2
             IF(N.EQ.1)THEN
               N4=NX+1
@@ -1041,9 +1041,9 @@ module TrnsfrsMod
                   M5=NY
                   M6=L
                   XN=-1.0
-                  RCHQF=RCHQE(M2,M1)
-                  RCHGFU=RCHGEU(M2,M1)
-                  RCHGFT=RCHGET(M2,M1)
+                  RCHQF=RechargEastSurf(M2,M1)
+                  RCHGFU=RechargEastSubSurf(M2,M1)
+                  RCHGFT=RechargRateEastWTBL(M2,M1)
                 ELSE
                   cycle
                 ENDIF
@@ -1056,9 +1056,9 @@ module TrnsfrsMod
                   M5=NY
                   M6=L
                   XN=1.0
-                  RCHQF=RCHQW(M5,M4)
-                  RCHGFU=RCHGWU(M5,M4)
-                  RCHGFT=RCHGWT(M5,M4)
+                  RCHQF=RechargWestSurf(M5,M4)
+                  RCHGFU=RechargWestSubSurf(M5,M4)
+                  RCHGFT=RechargRateWestWTBL(M5,M4)
                 ELSE
                   CYCLE
                 ENDIF
@@ -1078,9 +1078,9 @@ module TrnsfrsMod
                   M5=NY+1
                   M6=L
                   XN=-1.0
-                  RCHQF=RCHQS(M2,M1)
-                  RCHGFU=RCHGSU(M2,M1)
-                  RCHGFT=RCHGST(M2,M1)
+                  RCHQF=RechargSouthSurf(M2,M1)
+                  RCHGFU=RechargSouthSubSurf(M2,M1)
+                  RCHGFT=RechargRateSouthWTBL(M2,M1)
                 ELSE
                   CYCLE
                 ENDIF
@@ -1093,9 +1093,9 @@ module TrnsfrsMod
                   M5=NY
                   M6=L
                   XN=1.0
-                  RCHQF=RCHQN(M5,M4)
-                  RCHGFU=RCHGNU(M5,M4)
-                  RCHGFT=RCHGNT(M5,M4)
+                  RCHQF=RechargNorthSurf(M5,M4)
+                  RCHGFU=RechargNorthSubSurf(M5,M4)
+                  RCHGFT=RechargRateNorthWTBL(M5,M4)
                 ELSE
                   CYCLE
                 ENDIF
@@ -1194,7 +1194,7 @@ module TrnsfrsMod
 !
             IF(VLSoilPoreMicP(N3,N2,N1).GT.ZEROS(NY,NX))THEN
 
-              IF(NCN(M2,M1).NE.3.OR.N.EQ.3)THEN
+              IF(FlowDirIndicator(M2,M1).NE.3.OR.N.EQ.3)THEN
                 IF(NN.EQ.1.AND.FLWM(M,N,M6,M5,M4).GT.0.0 &
                   .OR.NN.EQ.2.AND.FLWM(M,N,M6,M5,M4).LT.0.0)THEN
 

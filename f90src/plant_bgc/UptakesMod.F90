@@ -20,7 +20,7 @@ module UptakesMod
   public :: uptakes
   public :: InitUptake
 
-  real(r8), parameter :: mGravAcceleration=1.e-3_r8*GravAcceleration  !gravitational constant devided by 1000.  
+  real(r8), parameter :: mGravAccelerat=1.e-3_r8*GravAcceleration  !gravitational constant devided by 1000.  
   contains
 
   subroutine InitUptake
@@ -75,7 +75,7 @@ module UptakesMod
     TLEC   => plt_ew%TLEC      , &
     PTrans    => plt_ew%PTrans       , &
     WatByPCan  => plt_ew%WatByPCan     , &
-    CDPTHZ => plt_site%CDPTHZ  , &
+    CumSoilThickness => plt_site%CumSoilThickness  , &
     PPT    => plt_site%PPT     , &
     NP     => plt_site%NP      , &
     pftPlantPopulation     => plt_site%pftPlantPopulation      , &
@@ -123,7 +123,7 @@ module UptakesMod
 !
 !     (AG: - originally this line had a N0B1 here )
       IF((IDAY(1,NB1(NZ),NZ).NE.0).AND.(CanPA(NZ).GT.ZEROL(NZ) &
-        .AND.FracPARByCanP(NZ).GT.0.0_r8).AND.(PrimRootDepth(1,1,NZ).GT.SeedinDepth(NZ)+CDPTHZ(0)))THEN
+        .AND.FracPARByCanP(NZ).GT.0.0_r8).AND.(PrimRootDepth(1,1,NZ).GT.SeedinDepth(NZ)+CumSoilThickness(0)))THEN
         !leaf area > 0, absorped par>0, and rooting depth > seeding depth
 !
         call CalcResistance(NZ,PATH,FineRootRadius,RootAreaDivRadius,RootResist,RootResistSoi,&
@@ -300,7 +300,7 @@ module UptakesMod
 !     RootCZG=total biome root mass
 !
   D9000: DO L=NU,NJ
-    ElvAdjstedtSoiPSIMPa(L)=TotalSoilH2OPSIMPa(L)-mGravAcceleration*ALT
+    ElvAdjstedtSoiPSIMPa(L)=TotalSoilH2OPSIMPa(L)-mGravAccelerat*ALT
     IF(SoiBulkDensity(L).GT.ZERO)THEN
       WatAvail4Uptake(L)=VLWatMicPM(NPH,L)-THETY(L)*VLSoilMicP(L)     !maximum amount of water for uptake
       AirPoreAvail4Fill(L)=AZMAX1(VLMicP(L)-VLWatMicP(L)-VLiceMicP(L))  !air volume
@@ -333,7 +333,7 @@ module UptakesMod
     ZERO   =>  plt_site%ZERO    , &
     NP     =>  plt_site%NP      , &
     IETYP  =>  plt_site%IETYP   , &
-    RAB    =>  plt_ew%RAB       , &
+    BndlResistAboveCanG   =>  plt_ew%BndlResistAboveCanG      , &
     TairK    =>  plt_ew%TairK       , &
     DTKC   =>  plt_ew%DTKC      , &
     ZeroPlanDisp     =>  plt_ew%ZeroPlanDisp        , &
@@ -389,7 +389,7 @@ module UptakesMod
 !     ZC,ZT,RoughHeight=PFT canopy,grid biome,surface roughness height
 !     FracPARByCanP=fraction of radiation received by each PFT canopy
 !     ALFZ=shape parameter for windspeed attenuation in canopy
-!     RAB=biome canopy isothermal boundary layer resistance
+!     BndlResistAboveCanG=biome canopy isothermal boundary layer resistance
 !     RACZ,RAZ=additional,total PFT canopy isothermal blr
 !
   IF(CanPA(NZ).GT.0.0_r8)THEN
@@ -401,9 +401,9 @@ module UptakesMod
         ENDIF
       ENDDO D700
       ALFZ=2.0_r8*TFRADP
-      IF(RAB.GT.ZERO.AND.GridMaxCanopyHeight.GT.ZERO.AND.ALFZ.GT.ZERO)THEN
+      IF(BndlResistAboveCanG.GT.ZERO.AND.GridMaxCanopyHeight.GT.ZERO.AND.ALFZ.GT.ZERO)THEN
         RACZ(NZ)=AMIN1(RACX,AZMAX1(GridMaxCanopyHeight*EXP(ALFZ) &
-          /(ALFZ/RAB)*(EXP(-ALFZ*CanopyHeight(NZ)/GridMaxCanopyHeight) &
+          /(ALFZ/BndlResistAboveCanG)*(EXP(-ALFZ*CanopyHeight(NZ)/GridMaxCanopyHeight) &
           -EXP(-ALFZ*(ZeroPlanDisp+RoughHeight)/GridMaxCanopyHeight))))
       ELSE
         RACZ(NZ)=0.0_r8
@@ -414,7 +414,7 @@ module UptakesMod
   ELSE
     RACZ(NZ)=RACX
   ENDIF
-  RAZ(NZ)=RAB+RACZ(NZ)
+  RAZ(NZ)=BndlResistAboveCanG+RACZ(NZ)
 !
 !     INITIALIZE CANOPY TEMPERATURE WITH CURRENT AIR TEMPERATURE AND
 !     LAST HOUR'S CANOPY-AIR TEMPERATURE DIFFERENCE, AND CALL A
@@ -446,7 +446,7 @@ module UptakesMod
   associate(                           &
     RootCPZR  =>  plt_biom%RootCPZR    , &
     FracSoiAsMicP   =>  plt_site%FracSoiAsMicP     , &
-    CDPTHZ =>  plt_site%CDPTHZ   , &
+    CumSoilThickness =>  plt_site%CumSoilThickness   , &
     DLYR3  =>  plt_site%DLYR3    , &
     ZEROS  =>  plt_site%ZEROS    , &
     ZERO   =>  plt_site%ZERO     , &
@@ -468,7 +468,7 @@ module UptakesMod
 !     RootDepZ,PrimRootDepth=primary root depth
 !     FracSoiLayByPrimRoot=fraction of each soil layer with primary root
 !     DLYR=layer thickness
-!     CDPTHZ=depth from soil surface to layer bottom
+!     CumSoilThickness=depth from soil surface to layer bottom
 !     SeedinDepth=seeding depth
 !     HypoctoylHeight=hypocotyledon height
 !     FracPRoot4Uptake=PFT fraction of biome root mass
@@ -492,8 +492,8 @@ module UptakesMod
           FracSoiLayByPrimRoot(L,NZ)=1.0_r8
         ELSE
           IF(DLYR3(L).GT.ZERO)THEN
-            RTDPX=AZMAX1(RootDepZ-CDPTHZ(L-1))
-            RTDPX=AZMAX1(AMIN1(DLYR3(L),RTDPX)-AZMAX1(SeedinDepth(NZ)-CDPTHZ(L-1)-HypoctoylHeight(NZ)))
+            RTDPX=AZMAX1(RootDepZ-CumSoilThickness(L-1))
+            RTDPX=AZMAX1(AMIN1(DLYR3(L),RTDPX)-AZMAX1(SeedinDepth(NZ)-CumSoilThickness(L-1)-HypoctoylHeight(NZ)))
             FracSoiLayByPrimRoot(L,NZ)=RTDPX/DLYR3(L)
           ELSE
             FracSoiLayByPrimRoot(L,NZ)=0.0_r8
@@ -1002,7 +1002,7 @@ module UptakesMod
 !
   CNDT=0.0_r8
   HTSTZ(NZ)=0.80*CanopyHeight(NZ)
-  PSILH=-mGravAcceleration*HTSTZ(NZ)
+  PSILH=-mGravAccelerat*HTSTZ(NZ)
   FRADW=1.0E+04_r8*(AMAX1(0.5_r8,1.0_r8+PSICanP(NZ)/EMODW))**4._r8
 !
   !     SOIL AND ROOT HYDRAULIC RESISTANCES TO ROOT WATER UPTAKE

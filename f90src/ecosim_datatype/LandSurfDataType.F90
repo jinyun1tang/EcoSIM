@@ -15,7 +15,7 @@ module LandSurfDataType
   real(r8),target,allocatable ::  SoiSurfRoughness(:,:)                            ! soil surface roughness height for calculating runoff velocity, [m]
   real(r8),target,allocatable ::  WindMesHeight(:,:)                            !wind speed measurement height, [m]
   real(r8),target,allocatable ::  ALT(:,:)                           !altitude of grid cell, [m]
-  real(r8),target,allocatable ::  RAB(:,:)                           !isothermal boundary layer resistance, [h m-1]
+  real(r8),target,allocatable ::  BndlResistAboveCanG(:,:)                           !isothermal boundary layer resistance, [h m-1]
   real(r8),target,allocatable ::  RIB(:,:)                           !Richardson number for calculating boundary layer resistance, [-]
   real(r8),target,allocatable ::  ALTI(:,:)                          !altitude of landscape, [m]
   real(r8),target,allocatable ::  GSIN(:,:)                          !sine of slope, [-]
@@ -45,7 +45,7 @@ contains
   allocate(SoiSurfRoughness(JY,JX));          SoiSurfRoughness=0._r8
   allocate(WindMesHeight(JY,JX));          WindMesHeight=0._r8
   allocate(ALT(JY,JX));         ALT=0._r8
-  allocate(RAB(JY,JX));         RAB=0._r8
+  allocate(BndlResistAboveCanG(JY,JX));         BndlResistAboveCanG=0._r8
   allocate(RIB(JY,JX));         RIB=0._r8
   allocate(ALTI(JY,JX));        ALTI=0._r8
   allocate(GSIN(JY,JX));        GSIN=0._r8
@@ -76,7 +76,7 @@ contains
   call destroy(SoiSurfRoughness)
   call destroy(WindMesHeight)
   call destroy(ALT)
-  call destroy(RAB)
+  call destroy(BndlResistAboveCanG)
   call destroy(RIB)
   call destroy(ALTI)
   call destroy(GSIN)

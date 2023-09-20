@@ -19,7 +19,7 @@ module CanopyDataType
   real(r8),target,allocatable ::  RCS(:,:,:)                         !shape parameter for calculating stomatal resistance from turgor pressure, [-]
   real(r8),target,allocatable ::  CanPStomaResistH2O(:,:,:)         !canopy stomatal resistance, [h m-1]
   real(r8),target,allocatable ::  MinCanPStomaResistH2O(:,:,:)      !canopy minimum stomatal resistance, [s m-1]
-  real(r8),target,allocatable ::  RAC(:,:)                           !canopy boundary layer resistance, [m h-1]
+  real(r8),target,allocatable ::  BndlResistCanG(:,:)                           !canopy boundary layer resistance, [m h-1]
   real(r8),target,allocatable ::  O2I(:,:,:)                         !leaf gaseous O2 concentration, [umol m-3]
   real(r8),target,allocatable ::  CO2I(:,:,:)                        !leaf gaseous CO2 concentration, [umol m-3]
   real(r8),target,allocatable ::  FMOL(:,:,:)                        !total gas concentration, [mol m-3]
@@ -168,7 +168,7 @@ module CanopyDataType
   allocate(RCS(JP,JY,JX));      RCS=0._r8
   allocate(CanPStomaResistH2O(JP,JY,JX));       CanPStomaResistH2O=0._r8
   allocate(MinCanPStomaResistH2O(JP,JY,JX));     MinCanPStomaResistH2O=0._r8
-  allocate(RAC(JY,JX));         RAC=0._r8
+  allocate(BndlResistCanG(JY,JX));         BndlResistCanG=0._r8
   allocate(O2I(JP,JY,JX));      O2I=0._r8
   allocate(CO2I(JP,JY,JX));     CO2I=0._r8
   allocate(FMOL(JP,JY,JX));     FMOL=0._r8
@@ -318,7 +318,7 @@ module CanopyDataType
   call destroy(RCS)
   call destroy(CanPStomaResistH2O)
   call destroy(MinCanPStomaResistH2O)
-  call destroy(RAC)
+  call destroy(BndlResistCanG)
   call destroy(O2I)
   call destroy(CO2I)
   call destroy(FMOL)

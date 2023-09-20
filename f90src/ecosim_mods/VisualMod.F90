@@ -236,7 +236,7 @@ module VisualMod
           OUT(43)=OUT(42)-OUT(39)-OUT(40)-OUT(41)
           OUT(44)=1000.0*URUN(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
           OUT(45)=1000.0*UVOLO(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
-          OUT(46)=-(DPTHT(NY,NX)-CumDepth2LayerBottom(NU(NY,NX)-1,NY,NX))
+          OUT(46)=-(DepthInternalWTBL(NY,NX)-CumDepth2LayerBottom(NU(NY,NX)-1,NY,NX))
           OUT(47)=SnowDepth(NY,NX)
           OUT(48)=CanGLA(NY,NX)/AREA(3,NU(NY,NX),NY,NX)
           OUT(49)=0.001_r8*WTLFE(ielmc,1,NY,NX)/AREA(3,NU(NY,NX),NY,NX)
@@ -282,7 +282,7 @@ module VisualMod
       WRITE(20,2026)'SWC',IYRC,I,J,((SnowDepth(NY,NX) &
       ,NX=NHW,NHE),NY=NVN,NVS),DEFAULT &
       ,((SWC(NY,NX),NX=NHW,NHE),NY=NVN,NVS),DEFAULT &
-      ,((-(DPTHA(NY,NX)-CumDepth2LayerBottom(NU(NY,NX)-1,NY,NX)) &
+      ,((-(ActiveLayDepth(NY,NX)-CumDepth2LayerBottom(NU(NY,NX)-1,NY,NX)) &
       ,NX=NHW,NHE),NY=NVN,NVS)
 2026  FORMAT(A8,3I6,100E12.4)
     ENDIF

@@ -51,7 +51,7 @@ implicit none
   real(r8),allocatable ::  trcp_TER(:,:,:)                        !
   real(r8),allocatable ::  TSEDER(:,:)                        !
   real(r8),allocatable ::  TWatFlowCellMicP(:,:,:)                        !
-  real(r8),allocatable ::  TFLWX(:,:,:)                       !
+  real(r8),allocatable ::  TWatFlowCellMicPX(:,:,:)                       !
   real(r8),allocatable ::  THeatFlowSoiCell(:,:,:)                       !
   real(r8),allocatable ::  TWaterFlowMacP(:,:,:)                       !
 
@@ -154,7 +154,7 @@ implicit none
 
   allocate(TSEDER(JY,JX));      TSEDER=0._r8
   allocate(TWatFlowCellMicP(JZ,JY,JX));     TWatFlowCellMicP=0._r8
-  allocate(TFLWX(JZ,JY,JX));    TFLWX=0._r8
+  allocate(TWatFlowCellMicPX(JZ,JY,JX));    TWatFlowCellMicPX=0._r8
   allocate(THeatFlowSoiCell(JZ,JY,JX));    THeatFlowSoiCell=0._r8
   allocate(TWaterFlowMacP(JZ,JY,JX));    TWaterFlowMacP=0._r8
   allocate(WatIceThawMicP(JZ,JY,JX));    WatIceThawMicP=0._r8
@@ -272,7 +272,7 @@ implicit none
   call destroy(TNO3EB)
   call destroy(TSEDER)
   call destroy(TWatFlowCellMicP)
-  call destroy(TFLWX)
+  call destroy(TWatFlowCellMicPX)
   call destroy(THeatFlowSoiCell)
   call destroy(TWaterFlowMacP)
   call destroy(WatIceThawMicP)

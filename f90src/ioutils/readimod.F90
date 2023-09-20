@@ -50,7 +50,7 @@ module readiMod
   real(r8) :: RCHGNTG,RCHGETG,RCHGSTG,RCHGWTG,RCHGDG
   real(r8) :: SL0,Z2GEG,Z2OEG,ZNH3EG,SLX,SL1,SL2
 
-  integer :: IDTBLG,IETYPG,L,NCNG,NH1,NH2,NV1,NV2,NL1
+  integer :: IDWaterTableG,IETYPG,L,NCNG,NH1,NH2,NV1,NV2,NL1
   integer :: NL2
   type(file_desc_t) :: grid_nfid
 
@@ -137,11 +137,11 @@ module readiMod
 
   select case(NCNG)
   case (1)
-    status='Along the west-east direction'
+    status='Along the west-east direction'   !3D
   case (2)
-    status='Along the north-south direction'
+    status='Along the north-south direction' !2d, no x direction
   case (3)
-    status='3D lateral connection'
+    status='3D lateral connection'           !1d, vertical only
   case default
     status=''
     call endrun('wrong option for NCNG in '//trim(mod_filename)//' at line',__LINE__)
@@ -150,14 +150,14 @@ module readiMod
   end function GridConectionModel
 
 !------------------------------------------------------------------------------------------
-  function WaterTableStatus(IDTBLG)result(status)
+  function WaterTableStatus(IDWaterTableG)result(status)
 
   implicit none
-  integer, intent(in) :: IDTBLG
+  integer, intent(in) :: IDWaterTableG
 
   character(len=64) :: status
 
-  select case(IDTBLG)
+  select case(IDWaterTableG)
 
   case (0)
     status='no water table'
@@ -170,7 +170,7 @@ module readiMod
   case (4)
     status='Artificial mobile water table'
   case default
-    call endrun('wrong option for IDTBLG in '//trim(mod_filename)//' at line',__LINE__)
+    call endrun('wrong option for IDWaterTableG in '//trim(mod_filename)//' at line',__LINE__)
   end select
   end function WaterTableStatus
 
@@ -190,14 +190,14 @@ module readiMod
 ! READ SITE DATA
 !
 ! ALATG,ALTIG,ATCAG=latitude,altitude,MAT(oC)
-! IDTBLG=water table flag
+! IDWaterTableG=water table flag
 ! :0=none
 ! :1,2=natural stationary,mobile
 ! :3,4=artificial stationary,mobile
 ! OXYEG,Z2GEG,CO2EIG,CH4EG,Z2OEG,ZNH3EG=atm O2,N2,CO2,CH4,N2O,NH3 (ppm)
 ! IETYPG,ISALTG,IERSNG=Koppen climate zone,salt,erosion options
 ! NCNG=1:lateral connections between grid cells,3:no connections
-! DTBLIG,DTBLDIG=depth of natural,artificial (tile) water table (IDTBLG)
+! DTBLIG,DTBLDIG=depth of natural,artificial (tile) water table (IDWaterTableG)
 ! DTBLGG=slope of natural water table relative to landscape surface
 ! RCHQNG,RCHQEG,RCHQSG,RCHQWG=boundary condns for N,E,S,W surface runoff
 ! RCHGNUG,RCHGEUG,RCHGSUG,RCHGWUG=bound condns for N,E,S,W subsurf flow
@@ -211,7 +211,7 @@ module readiMod
   call ncd_getvar(grid_nfid,'ALATG',loc,ALATG)
   call ncd_getvar(grid_nfid,'ALTIG',loc,ALTIG)
   call ncd_getvar(grid_nfid,'ATCAG',loc,ATCAG)
-  call ncd_getvar(grid_nfid,'IDTBLG',loc,IDTBLG)
+  call ncd_getvar(grid_nfid,'IDTBLG',loc,IDWaterTableG)
 
 !  call ncd_getvar(grid_nfid,'OXYEG',loc,OXYEG)
 !  call ncd_getvar(grid_nfid,'Z2GEG',loc,Z2GEG)
@@ -250,7 +250,7 @@ module readiMod
     write(*,*)'Latitude (o): ALATG',ALATG
     write(*,*)'Altitude (m): ALTIG',ALTIG
     write(*,*)'Mean annual temperaure (oC): ATCAG',ATCAG
-    write(*,*)'water table flag ',IDTBLG, WaterTableStatus(IDTBLG)
+    write(*,*)'water table flag ',IDWaterTableG, WaterTableStatus(IDWaterTableG)
     write(*,'(40A)')('-',ll=1,40)
     write(*,*)'atmospheric O2 (ppm): OXYEG',OXYEG
     write(*,*)'atmospheric N2 (ppm): Z2GEG',Z2GEG
@@ -295,7 +295,7 @@ module readiMod
       PBOT(NY,NX)=PBOT(NY,NX)*exp(-ALT(NY,NX)/hpresc)
       ALTI(NY,NX)=ALTIG
       ATCAI(NY,NX)=ATCAG
-      IDTBL(NY,NX)=IDTBLG
+      IDWaterTable(NY,NX)=IDWaterTableG
       OXYE(NY,NX)=ao2_ppm
       Z2GE(NY,NX)=an2_ppm
       CO2EI(NY,NX)=aco2_ppm
@@ -303,22 +303,22 @@ module readiMod
       Z2OE(NY,NX)=an2o_ppm
       ZNH3E(NY,NX)=ZNH3EG
       IETYP(NY,NX)=IETYPG
-      NCN(NY,NX)=NCNG
+      FlowDirIndicator(NY,NX)=NCNG
       DTBLI(NY,NX)=DTBLIG
       DTBLDI(NY,NX)=DTBLDIG
-      DTBLG(NY,NX)=DTBLGG
-      RCHQN(NY,NX)=RCHQNG
-      RCHQE(NY,NX)=RCHQEG
-      RCHQS(NY,NX)=RCHQSG
-      RCHQW(NY,NX)=RCHQWG
-      RCHGNU(NY,NX)=RCHGNUG
-      RCHGEU(NY,NX)=RCHGEUG
-      RCHGSU(NY,NX)=RCHGSUG
-      RCHGWU(NY,NX)=RCHGWUG
-      RCHGNT(NY,NX)=RCHGNTG
-      RCHGET(NY,NX)=RCHGETG
-      RCHGST(NY,NX)=RCHGSTG
-      RCHGWT(NY,NX)=RCHGWTG
+      WaterTBLSlope(NY,NX)=DTBLGG
+      RechargNorthSurf(NY,NX)=RCHQNG
+      RechargEastSurf(NY,NX)=RCHQEG
+      RechargSouthSurf(NY,NX)=RCHQSG
+      RechargWestSurf(NY,NX)=RCHQWG
+      RechargNorthSubSurf(NY,NX)=RCHGNUG
+      RechargEastSubSurf(NY,NX)=RCHGEUG
+      RechargSouthSubSurf(NY,NX)=RCHGSUG
+      RechargWestSubSurf(NY,NX)=RCHGWUG
+      RechargRateNorthWTBL(NY,NX)=RCHGNTG
+      RechargRateEastWTBL(NY,NX)=RCHGETG
+      RechargRateSouthWTBL(NY,NX)=RCHGSTG
+      RechargRateWestWTBL(NY,NX)=RCHGWTG
       RCHGD(NY,NX)=RCHGDG
       DH(NY,NX)=DHI(NX)
       DV(NY,NX)=DVI(NY)

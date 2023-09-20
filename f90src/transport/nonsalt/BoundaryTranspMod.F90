@@ -38,17 +38,15 @@ module BoundaryTranspMod
   DO  NX=NHW,NHE
     DO  NY=NVN,NVS
       D9585: DO L=NU(NY,NX),NL(NY,NX)
-        N1=NX
-        N2=NY
-        N3=L
+        N1=NX;N2=NY;N3=L
 !
 !     LOCATE ALL EXTERNAL BOUNDARIES AND SET BOUNDARY CONDITIONS
 !     ENTERED IN 'READS'
 !
-        D9580: DO  N=NCN(NY,NX),3
+        D9580: DO  N=FlowDirIndicator(NY,NX),3
           D9575: DO  NN=1,2
             IF(N.EQ.1)THEN
-!direction x
+              !WEST-EAST
               N4=NX+1
               N5=NY
               N4B=NX-1
@@ -64,9 +62,9 @@ module BoundaryTranspMod
                   M5=NY
                   M6=L
                   XN=-1.0
-                  RCHQF=RCHQE(M2,M1)
-                  RCHGFU=RCHGEU(M2,M1)
-                  RCHGFT=RCHGET(M2,M1)
+                  RCHQF=RechargEastSurf(M2,M1)
+                  RCHGFU=RechargEastSubSurf(M2,M1)
+                  RCHGFT=RechargRateEastWTBL(M2,M1)
                 ELSE
                   cycle
                 ENDIF
@@ -80,15 +78,15 @@ module BoundaryTranspMod
                   M5=NY
                   M6=L
                   XN=1.0
-                  RCHQF=RCHQW(M5,M4)
-                  RCHGFU=RCHGWU(M5,M4)
-                  RCHGFT=RCHGWT(M5,M4)
+                  RCHQF=RechargWestSurf(M5,M4)
+                  RCHGFU=RechargWestSubSurf(M5,M4)
+                  RCHGFT=RechargRateWestWTBL(M5,M4)
                 ELSE
                   cycle
                 ENDIF
               ENDIF
             ELSEIF(N.EQ.2)THEN
-!direction y
+              !NORTH-SOUTH
               N4=NX
               N5=NY+1
               N4B=NX
@@ -104,9 +102,9 @@ module BoundaryTranspMod
                   M5=NY+1
                   M6=L
                   XN=-1.0_r8
-                  RCHQF=RCHQS(M2,M1)
-                  RCHGFU=RCHGSU(M2,M1)
-                  RCHGFT=RCHGST(M2,M1)
+                  RCHQF=RechargSouthSurf(M2,M1)
+                  RCHGFU=RechargSouthSubSurf(M2,M1)
+                  RCHGFT=RechargRateSouthWTBL(M2,M1)
                 ELSE
                   cycle
                 ENDIF
@@ -120,15 +118,15 @@ module BoundaryTranspMod
                   M5=NY
                   M6=L
                   XN=1.0_r8
-                  RCHQF=RCHQN(M5,M4)
-                  RCHGFU=RCHGNU(M5,M4)
-                  RCHGFT=RCHGNT(M5,M4)
+                  RCHQF=RechargNorthSurf(M5,M4)
+                  RCHGFU=RechargNorthSubSurf(M5,M4)
+                  RCHGFT=RechargRateNorthWTBL(M5,M4)
                 ELSE
                   cycle
                 ENDIF
               ENDIF
             ELSEIF(N.EQ.3)THEN
-!vertical
+              !vertical
               N1=NX
               N2=NY
               N3=L
@@ -185,7 +183,7 @@ module BoundaryTranspMod
 !             :NH4=NH4,NH3=NH3,NO3=NO3,NO2=NO2,P14=HPO4,PO4=H2PO4 in non-band
 !             :N4B=NH4,N3B=NH3,NOB=NO3,N2B=NO2,P1B=HPO4,POB=H2PO4 in band
 !
-          IF(NCN(N2,N1).NE.3.OR.N.EQ.3)THEN
+          IF(FlowDirIndicator(N2,N1).NE.3.OR.N.EQ.3)THEN
             call NetFluxMicroandMacropores(NY,NX,N,M,MX,N1,N2,N3,N4,N5,N6)
           ENDIF
         ENDDO D9580
@@ -454,7 +452,7 @@ module BoundaryTranspMod
 !             :N4B=NH4,N3B=NH3,NOB=NO3,N2B=NO2,P1B=HPO4,POB=H2PO4 in band
 !
     IF(VLSoilPoreMicP(N3,N2,N1).GT.ZEROS2(N2,N1))THEN
-      IF(NCN(M2,M1).NE.3.OR.N.EQ.3)THEN
+      IF(FlowDirIndicator(M2,M1).NE.3.OR.N.EQ.3)THEN
 
         call BoundaryRunoffandSnowZ(M,N,NN,M1,M2,M3,M4,M5,M6)
       ENDIF

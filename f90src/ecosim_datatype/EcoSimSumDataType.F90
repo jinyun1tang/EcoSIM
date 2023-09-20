@@ -13,19 +13,19 @@ module EcoSimSumDataType
   real(r8) :: TIONOU   !total subsurface ion flux	mol d-2
   real(r8) :: TSEDSO   !total soil sediment	Mg d-2
   real(r8) :: TSEDOU   !total sediment subsurface flux	Mg d-2
-  real(r8) :: VOLWSO   !total soil water content	m3 d-2
-  real(r8) :: HEATSO   !total soil heat content	MJ d-2
+  real(r8) :: WaterStoreLandscape   !total soil water content	m3 d-2
+  real(r8) :: HeatStoreLandscape   !total soil heat content	MJ d-2
   real(r8) :: OXYGSO   !total soil O2 content	g d-2
-  real(r8) :: TLRSDC   !total soil litter C content	g d-2
-  real(r8) :: TLRSDN   !total soil Litter N content	g d-2
-  real(r8) :: TLRSDP   !total soil Litter P content	g d-2
-  real(r8) :: TLORGC   !total soil POM + humus C content	g d-2
-  real(r8) :: TLORGN   !total soil POM + humus N content	g d-2
-  real(r8) :: TLORGP   !total soil POM + humus P content	g d-2
+  real(r8) :: LitRCStoreLandscape   !total soil litter C content	g d-2
+  real(r8) :: LitRNStoreLandscape   !total soil Litter N content	g d-2
+  real(r8) :: LitRPStoreLandscape   !total soil Litter P content	g d-2
+  real(r8) :: PomHumCStoreLandscape   !total soil POM + humus C content	g d-2
+  real(r8) :: PomHumNStoreLandscape   !total soil POM + humus N content	g d-2
+  real(r8) :: PomHumPStoreLandscape   !total soil POM + humus P content	g d-2
   real(r8) :: TLNH4    !total soil NH4 content	g d-2
   real(r8) :: TLNO3    !total soil NO3 content	g d-2
   real(r8) :: TLPO4    !total soil PO4 content	g d-2
-  real(r8), pointer :: TBALE(:)    !total plant element balance	g d-2
+  real(r8), pointer :: PlantElemntStoreLandscape(:)    !total plant element (C,N,P, etc) balance	g d-2
   real(r8) :: CRAIN    !total precipitation	m3 d-2
   real(r8) :: HEATIN   !total surface heat flux	MJ d-2
   real(r8) :: OXYGIN   !total surface O2 flux	g d-2
@@ -64,13 +64,13 @@ module EcoSimSumDataType
   subroutine InitAllocate
   implicit none
 
-  allocate(TBALE(npelms)); TBALE=0._r8
+  allocate(PlantElemntStoreLandscape(npelms)); PlantElemntStoreLandscape=0._r8
   end subroutine InitAllocate
 
 !----------------------------------------------------------------------
   subroutine DestructEcoSimSum
   use abortutils, only : destroy
   implicit none
-  call destroy(TBALE)
+  call destroy(PlantElemntStoreLandscape)
   end subroutine DestructEcoSimSum
 end module EcoSimSumDataType

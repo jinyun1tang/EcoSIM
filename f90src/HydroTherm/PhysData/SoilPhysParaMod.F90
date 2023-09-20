@@ -24,7 +24,7 @@ implicit none
   subroutine CalcSoilWatPotential(NY,NX,N1,N2,N3,PSISoilMatric,THETA1S)
   implicit none
   integer, intent(in) :: NY,NX,N1,N2,N3
-  real(r8), intent(out) :: PSISoilMatric
+  real(r8), intent(out) :: PSISoilMatric    !< 0
   real(r8), optional, intent(out) :: THETA1S
   real(r8) :: FCDX,FCX,FCLX,WPLX,PSDX,WPX,THETA1
   !     BKVL=soil mass
@@ -40,11 +40,12 @@ implicit none
   ! soil matric potential upper layer
   
   THETA1=AMAX1(THETY(N3,N2,N1),AMIN1(POROS(N3,N2,N1),safe_adb(VLWatMicP1(N3,N2,N1),VLSoilMicP(N3,N2,N1))))
+
   IF(SoilMicPMassLayer(N3,N2,N1).GT.ZEROS(NY,NX))THEN
     !source layer is active soil  
     IF(THETA1.LT.FieldCapacity(N3,N2,N1))THEN
       !water less than field capacity
-      !PSIHY is the minimum water potential allowed, where hygroscopic water is 
+      !PSIHY is the minimum water potential allowed, where hygroscopic water is < 0
       !held tightly on the surfaces of soil particles and exists as a thin layer of vapor
       PSISoilMatric=AMAX1(PSIHY,-EXP(LOGPSIFLD(N2,N1)+((LOGFldCapacity(N3,N2,N1)-LOG(THETA1))/FCD(N3,N2,N1)*LOGPSIMND(N2,N1))))
     ELSEIF(THETA1.LT.POROS(N3,N2,N1)-DTHETW)THEN
@@ -113,7 +114,7 @@ implicit none
     CEC(L,NY,NX)=CEC(L-1,NY,NX)
     AEC(L,NY,NX)=AEC(L-1,NY,NX)
 
-!     IF(IDTBL(NY,NX).EQ.0)THEN
+!     IF(IDWaterTable(NY,NX).EQ.0)THEN
 !       0.25_r8 is the geometric decreasing ratio (tunable)
 !  or different scheme can be used
     CORGC(L,NY,NX)=0.25_r8*CORGC(L-1,NY,NX)
