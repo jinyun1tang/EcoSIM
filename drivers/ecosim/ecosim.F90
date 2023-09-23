@@ -44,7 +44,7 @@ PROGRAM main
 ! begin_execution
 
   is_dos=.false.
-  open(111,file='fort11',status='unknown')
+!  open(111,file='fort11',status='unknown')
   write(iulog,*)'obtain working directory'
   CALL GETCWD(BUF)
 !
@@ -110,7 +110,7 @@ PROGRAM main
   print*,frectyp%ymdhs0,yeari
   
   DO nn1=1,3
-    call set_ecosim_solver(NPXS(NN1),NPYS(NN1))
+    call set_ecosim_solver(NPXS(NN1),NPYS(NN1),NCYC_LITR,NCYC_SNOW)
 
    !set up output frequency
     JOUT=JOUTS(NN1)   !frequency on hourly scale

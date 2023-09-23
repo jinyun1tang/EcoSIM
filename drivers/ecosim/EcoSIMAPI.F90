@@ -136,7 +136,7 @@ contains
   namelist /ecosim/case_name, prefix, do_regression_test, &
     num_of_simdays,lverbose,num_microbial_guilds,transport_on,column_mode,&
     do_instequil,salt_model, pft_file_in,grid_file_in,pft_mgmt_in, clm_factor_in,&
-    clm_file_in,soil_mgmt_in,forc_periods,&
+    clm_file_in,soil_mgmt_in,forc_periods,NCYC_LITR,NCYC_SNOW,&
     NPXS,NPYS,JOUTS,continue_run,visual_out,restart_out,&
     finidat,restartFileFullPath,brnch_retain_casename,plant_model,microbial_model,&
     soichem_model,atm_ghg_in,aco2_ppm,ao2_ppm,an2_ppm,an2_ppm,ach4_ppm,anh3_ppm
@@ -158,7 +158,8 @@ contains
   NPXS=30   !number of cycles per hour for water,heat,solute flux calcns
   NPYS=20   !number of cycles per NPX for gas flux calcns
   JOUTS=1   !frequency on hourly scale
-
+  NCYC_LITR=20
+  NCYC_SNOW=20
   visual_out =.false.
   restart_out=.false.  
   do_budgets =.false.
@@ -350,7 +351,6 @@ subroutine soil(NE,NEX,NHW,NHE,NVN,NVS,nlend)
     CALL DAY(I,NHW,NHE,NVN,NVS)
 
     DO J=1,24
-      print*,'iiijjj',i,j
       call etimer%get_ymdhs(ymdhs)
       
       if(ymdhs==frectyp%ymdhs0)then
@@ -371,8 +371,7 @@ subroutine soil(NE,NEX,NHW,NHE,NVN,NVS,nlend)
       call start_timer(t1)
       CALL WTHR(I,J,NHW,NHE,NVN,NVS)
       call end_timer('WTHR',t1)
-      
-      print*,'redis',I,J
+            
       if(lverb)WRITE(*,333)'Run_EcoSIM_one_step'
       call Run_EcoSIM_one_step(I,J,NHW,NHE,NVN,NVS)
   !
